@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf24819a3 */
+/* HASH CRC-32:0x2d06a120 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __LOCAL_LIBC(obstack_printf) __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) int
 __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(obstack_printf))(struct obstack *__restrict __obstack_,
                                                              char const *__restrict __format,
                                                              ...) {
-#line 1465 "kos/src/libc/magic/stdio.c"
+#line 1510 "kos/src/libc/magic/stdio.c"
 	int __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);

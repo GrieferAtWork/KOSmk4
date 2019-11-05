@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f88065a */
+/* HASH CRC-32:0x63240e84 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -959,11 +959,14 @@
 #define __CRT_ATTR_NOTHROW_NCX__execvp 1
 #define __CRT_ATTR_NOTHROW_NCX__execvpe 1
 #define __CRT_ATTR_NOTHROW_NCX__expand_dbg 1
+#define __CRT_ATTR_NOTHROW_NCX__fclose_nolock 1
 #define __CRT_ATTR_NOTHROW_NCX__fcloseall 1
 #define __CRT_ATTR_NOTHROW_NCX__fcvt 1
 #define __CRT_ATTR_NOTHROW_NCX__fcvt_s 1
 #define __CRT_ATTR_NOTHROW_NCX__fdopen 1
 #define __CRT_ATTR_NOTHROW_NCX__fdpcomp 1
+#define __CRT_ATTR_NOTHROW_NCX__fflush_nolock 1
+#define __CRT_ATTR_NOTHROW_NCX__fgetc_nolock 1
 #define __CRT_ATTR_NOTHROW_NCX__fgetchar 1
 #define __CRT_ATTR_NOTHROW_NCX__fgetwc_nolock 1
 #define __CRT_ATTR_NOTHROW_NCX__fgetwchar 1
@@ -974,27 +977,36 @@
 #define __CRT_ATTR_NOTHROW_NCX__finite 1
 #define __CRT_ATTR_NOTHROW_NCX__flushlbf 1
 #define __CRT_ATTR_NOTHROW_NCX__fpreset 1
+#define __CRT_ATTR_NOTHROW_NCX__fputc_nolock 1
 #define __CRT_ATTR_NOTHROW_NCX__fputchar 1
 #define __CRT_ATTR_NOTHROW_NCX__fputwc_nolock 1
 #define __CRT_ATTR_NOTHROW_NCX__fputwchar 1
+#define __CRT_ATTR_NOTHROW_NCX__fread_nolock 1
 #define __CRT_ATTR_NOTHROW_NCX__free_dbg 1
+#define __CRT_ATTR_NOTHROW_NCX__fseek_nolock 1
 #define __CRT_ATTR_NOTHROW_NCX__fseeki64 1
+#define __CRT_ATTR_NOTHROW_NCX__fseeki64_nolock 1
 #define __CRT_ATTR_NOTHROW_NCX__fstat32 1
 #define __CRT_ATTR_NOTHROW_NCX__fstat32i64 1
 #define __CRT_ATTR_NOTHROW_NCX__fstat64 1
 #define __CRT_ATTR_NOTHROW_NCX__fstat64i32 1
+#define __CRT_ATTR_NOTHROW_NCX__ftell_nolock 1
 #define __CRT_ATTR_NOTHROW_NCX__ftelli64 1
+#define __CRT_ATTR_NOTHROW_NCX__ftelli64_nolock 1
 #define __CRT_ATTR_NOTHROW_NCX__ftime32 1
 #define __CRT_ATTR_NOTHROW_NCX__ftime32_s 1
 #define __CRT_ATTR_NOTHROW_NCX__ftime64 1
 #define __CRT_ATTR_NOTHROW_NCX__ftime64_s 1
 #define __CRT_ATTR_NOTHROW_NCX__fullpath_dbg 1
+#define __CRT_ATTR_NOTHROW_NCX__fwrite_nolock 1
 #define __CRT_ATTR_NOTHROW_NCX__gcvt 1
 #define __CRT_ATTR_NOTHROW_NCX__gcvt_s 1
 #define __CRT_ATTR_NOTHROW_NCX__get_doserrno 1
 #define __CRT_ATTR_NOTHROW_NCX__get_osfhandle 1
 #define __CRT_ATTR_NOTHROW_NCX__get_output_format 1
 #define __CRT_ATTR_NOTHROW_NCX__get_printf_count_output 1
+#define __CRT_ATTR_NOTHROW_NCX__getc_nolock 1
+#define __CRT_ATTR_NOTHROW_NCX__getchar_nolock 1
 #define __CRT_ATTR_NOTHROW_NCX__getcwd_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__getdcwd_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__getdcwd_lk_dbg 1
@@ -1057,6 +1069,8 @@
 #define __CRT_ATTR_NOTHROW_NCX__pclose 1
 #define __CRT_ATTR_NOTHROW_NCX__pipe 1
 #define __CRT_ATTR_NOTHROW_NCX__popen 1
+#define __CRT_ATTR_NOTHROW_NCX__putc_nolock 1
+#define __CRT_ATTR_NOTHROW_NCX__putchar_nolock 1
 #define __CRT_ATTR_NOTHROW_NCX__putenv 1
 #define __CRT_ATTR_NOTHROW_NCX__putenv_s 1
 #define __CRT_ATTR_NOTHROW_NCX__putw 1
@@ -1769,6 +1783,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_fgetc32_unlocked 1
 #define __CRT_ATTR_NOTHROW_NCX_fgetc32s 1
 #define __CRT_ATTR_NOTHROW_NCX_fgetc32s_unlocked 1
+#define __CRT_ATTR_NOTHROW_NCX_fgetchar 1
 #define __CRT_ATTR_NOTHROW_NCX_file_c16printer 1
 #define __CRT_ATTR_NOTHROW_NCX_file_c16printer_unlocked 1
 #define __CRT_ATTR_NOTHROW_NCX_file_c32printer 1
@@ -1777,6 +1792,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_fileno 1
 #define __CRT_ATTR_NOTHROW_NCX_fileno_unlocked 1
 #define __CRT_ATTR_NOTHROW_NCX_fisatty 1
+#define __CRT_ATTR_NOTHROW_NCX_flushall 1
 #define __CRT_ATTR_NOTHROW_NCX_fmemopen 1
 #define __CRT_ATTR_NOTHROW_NCX_fnmatch 1
 #define __CRT_ATTR_NOTHROW_NCX_fopencookie 1
@@ -1836,6 +1852,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_fputc32_unlocked 1
 #define __CRT_ATTR_NOTHROW_NCX_fputc32s 1
 #define __CRT_ATTR_NOTHROW_NCX_fputc32s_unlocked 1
+#define __CRT_ATTR_NOTHROW_NCX_fputchar 1
 #define __CRT_ATTR_NOTHROW_NCX_free 1
 #define __CRT_ATTR_NOTHROW_NCX_freeaddrinfo 1
 #define __CRT_ATTR_NOTHROW_NCX_freeifaddrs 1
@@ -1916,6 +1933,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_gcvt 1
 #define __CRT_ATTR_NOTHROW_NCX_get_exception_handler 1
 #define __CRT_ATTR_NOTHROW_NCX_getauxval 1
+#define __CRT_ATTR_NOTHROW_NCX_getc 1
 #define __CRT_ATTR_NOTHROW_NCX_getc16 1
 #define __CRT_ATTR_NOTHROW_NCX_getc16_unlocked 1
 #define __CRT_ATTR_NOTHROW_NCX_getc32 1
@@ -2395,6 +2413,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_ptrace 1
 #define __CRT_ATTR_NOTHROW_NCX_ptsname 1
 #define __CRT_ATTR_NOTHROW_NCX_ptsname_r 1
+#define __CRT_ATTR_NOTHROW_NCX_putc 1
 #define __CRT_ATTR_NOTHROW_NCX_putc16 1
 #define __CRT_ATTR_NOTHROW_NCX_putc16_unlocked 1
 #define __CRT_ATTR_NOTHROW_NCX_putc32 1
@@ -2476,6 +2495,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_remque 1
 #define __CRT_ATTR_NOTHROW_NCX_rewinddir 1
 #define __CRT_ATTR_NOTHROW_NCX_rindex 1
+#define __CRT_ATTR_NOTHROW_NCX_rmtmp 1
 #define __CRT_ATTR_NOTHROW_NCX_rpmatch 1
 #define __CRT_ATTR_NOTHROW_NCX_sbrk 1
 #define __CRT_ATTR_NOTHROW_NCX_sc16printf 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66a1c7a2 */
+/* HASH CRC-32:0xeb3b9f30 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getw_defined
-#if (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc))
+#if ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))
 #define __local_getw_defined 1
 #include <kos/anno.h>
 /* Dependency: "fgetc" from "stdio" */
@@ -49,7 +49,17 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_fgetc,(__FILE *__restrict __stre
  * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_fgetc,(__FILE *__restrict __stream),_IO_getc,(__stream)) __THROWS(...)
-#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_s) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))
+#elif defined(__CRT_HAVE_fgetc_unlocked)
+/* Read and return a single character from `STREAM'
+ * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+ * returned and the exact cause can be determined by using `ferror' and `feof' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_fgetc,(__FILE *__restrict __stream),fgetc_unlocked,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_getc_unlocked)
+/* Read and return a single character from `STREAM'
+ * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+ * returned and the exact cause can be determined by using `ferror' and `feof' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_fgetc,(__FILE *__restrict __stream),getc_unlocked,(__stream)) __THROWS(...)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread)
 #include <local/stdio/fgetc.h>
 /* Read and return a single character from `STREAM'
  * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
@@ -66,9 +76,21 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_fgetc,(__FILE *__restrict __stre
 #if defined(__CRT_HAVE_ungetc_unlocked) && (defined(__USE_STDIO_UNLOCKED))
 /* Unget a single character byte of data previously returned by `getc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
+#elif defined(__CRT_HAVE__ungetc_nolock) && (defined(__USE_STDIO_UNLOCKED))
+/* Unget a single character byte of data previously returned by `getc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
 #elif defined(__CRT_HAVE_ungetc)
 /* Unget a single character byte of data previously returned by `getc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc,(__ch,__stream))
+#elif defined(__CRT_HAVE__IO_ungetc)
+/* Unget a single character byte of data previously returned by `getc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_IO_ungetc,(__ch,__stream))
+#elif defined(__CRT_HAVE_ungetc_unlocked)
+/* Unget a single character byte of data previously returned by `getc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
+#elif defined(__CRT_HAVE__ungetc_nolock)
+/* Unget a single character byte of data previously returned by `getc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
 #else /* LIBC: ungetc */
 #undef ____localdep_ungetc_defined
 #endif /* ungetc... */
@@ -78,7 +100,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Similar to `getc()', but read 2 bytes */
 __LOCAL_LIBC(getw) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(getw))(__FILE *__restrict __stream) __THROWS(...) {
-#line 1351 "kos/src/libc/magic/stdio.c"
+#line 1396 "kos/src/libc/magic/stdio.c"
 	char __bytes[2]; int __ch;
 	__ch = __localdep_fgetc(__self);
 	if __unlikely(__ch == __EOF)
@@ -94,5 +116,5 @@ __LOCAL_LIBC(getw) __ATTR_NONNULL((1)) int
 	return (int)*(__UINT16_TYPE__ *)__bytes;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc)) */
+#endif /* ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) */
 #endif /* !__local_getw_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7721bc8 */
+/* HASH CRC-32:0xdf2defb3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -115,6 +115,9 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,__NOTHROW_NCX,_
 #ifdef __CRT_HAVE__flushlbf
 /* Flush all line-buffered files */
 __CDECLARE_VOID(,__NOTHROW_NCX,_flushlbf,(void),())
+#elif defined(__CRT_HAVE__IO_flush_all_linebuffere)
+/* Flush all line-buffered files */
+__CREDIRECT_VOID(,__NOTHROW_NCX,_flushlbf,(void),_IO_flush_all_linebuffere,())
 #endif /* _flushlbf... */
 #ifdef __CRT_HAVE___fsetlocking
 /* Set locking status of stream FP to TYPE */

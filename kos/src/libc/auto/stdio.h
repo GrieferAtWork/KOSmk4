@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc36eb43 */
+/* HASH CRC-32:0x18387b76 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,18 +41,12 @@ INTDEF NONNULL((3)) ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBC
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
 INTDEF NONNULL((3)) ATTR_LIBC_PRINTF(3, 4) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_snprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, ...);
 #ifndef __KERNEL__
-/* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
-INTDEF int (LIBCCALL libc_fflush)(FILE *stream) __THROWS(...);
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
 INTDEF WUNUSED NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_vsscanf)(char const *__restrict input, char const *__restrict format, va_list args);
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
 INTDEF NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_sscanf)(char const *__restrict input, char const *__restrict format, ...);
-/* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
-INTDEF int (LIBCCALL libc_fflush_unlocked)(FILE *stream) __THROWS(...);
-INTDEF int (LIBCCALL libc_flushall_unlocked)(void) __THROWS(...);
-INTDEF int (LIBCCALL libc__flushall)(void) __THROWS(...);
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
 #define libc__vsscanf libc_vsscanf
@@ -67,6 +61,9 @@ INTDEF NONNULL((1, 3)) ATTR_LIBC_SCANF(3, 5) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LI
 #define libc__vsnscanf_s_l libc__vsnscanf_l
 INTDEF NONNULL((1, 3)) ATTR_LIBC_SCANF(3, 4) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc__snscanf)(char const *__restrict input, size_t inputlen, char const *__restrict format, ...);
 INTDEF NONNULL((1, 3)) ATTR_LIBC_SCANF(3, 5) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc__snscanf_l)(char const *__restrict input, size_t inputlen, char const *__restrict format, locale_t locale, ...);
+INTDEF NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 4) __STDC_INT_AS_SIZE_T (VLIBCCALL libc__sscanf_s_l)(char const *__restrict input, char const *__restrict format, locale_t locale, ...) __THROWS(...);
+INTDEF NONNULL((1, 3)) ATTR_LIBC_SCANF(3, 4) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc__snscanf_s)(char const *__restrict input, size_t inputlen, char const *__restrict format, ...);
+INTDEF NONNULL((1, 3)) ATTR_LIBC_SCANF(3, 5) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc__snscanf_s_l)(char const *__restrict input, size_t inputlen, char const *__restrict format, locale_t locale, ...);
 INTDEF NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc__vsprintf_l)(char *__restrict buf, char const *__restrict format, locale_t locale, va_list args);
 #define libc__vsprintf_s_l libc__vsnprintf_l
 INTDEF NONNULL((3)) ATTR_LIBC_PRINTF_P(3, 0) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc__vsprintf_p)(char *__restrict buf, size_t bufsize, char const *__restrict format, va_list args);
@@ -103,8 +100,8 @@ INTDEF NONNULL((4)) ATTR_LIBC_PRINTF(4, 6) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIB
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
 #define libc_vsprintf_s libc_vsnprintf
-/* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
-#define libc__fflush_nolock libc_fflush
+/* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
+#define libc__fflush_nolock libc_fflush_unlocked
 #define libc_flushall libc__flushall
 #endif /* !__KERNEL__ */
 

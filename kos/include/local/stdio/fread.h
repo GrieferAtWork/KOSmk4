@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7da61042 */
+/* HASH CRC-32:0x7765e9fb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fread_defined
-#if defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))
+#if (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)
 #define __local_fread_defined 1
 #include <kos/anno.h>
 /* Dependency: "fgetc" from "stdio" */
@@ -49,7 +49,17 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_fgetc,(__FILE *__restrict __stre
  * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_fgetc,(__FILE *__restrict __stream),_IO_getc,(__stream)) __THROWS(...)
-#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_s) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))
+#elif defined(__CRT_HAVE_fgetc_unlocked)
+/* Read and return a single character from `STREAM'
+ * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+ * returned and the exact cause can be determined by using `ferror' and `feof' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_fgetc,(__FILE *__restrict __stream),fgetc_unlocked,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_getc_unlocked)
+/* Read and return a single character from `STREAM'
+ * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+ * returned and the exact cause can be determined by using `ferror' and `feof' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_fgetc,(__FILE *__restrict __stream),getc_unlocked,(__stream)) __THROWS(...)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread)
 #include <local/stdio/fgetc.h>
 /* Read and return a single character from `STREAM'
  * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
@@ -67,7 +77,7 @@ __LOCAL_LIBC(fread) __ATTR_WUNUSED __ATTR_NONNULL((1, 4)) __SIZE_TYPE__
                                       __SIZE_TYPE__ __elemsize,
                                       __SIZE_TYPE__ __elemcount,
                                       __FILE *__restrict __stream) __THROWS(...) {
-#line 568 "kos/src/libc/magic/stdio.c"
+#line 596 "kos/src/libc/magic/stdio.c"
 	__SIZE_TYPE__ __i, __result = 0;
 	for (; __elemcount; --__elemcount, ++__result) {
 		for (__i = 0; __i < __elemsize; ++__i) {
@@ -83,5 +93,5 @@ __done:
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock))) */
+#endif /* (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) */
 #endif /* !__local_fread_defined */

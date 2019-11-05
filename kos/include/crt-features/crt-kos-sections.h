@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b654510 */
+/* HASH CRC-32:0xc210020e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1112,6 +1112,8 @@
 
 /* .text.crt.dos.unicode.locale.format.scanf.* */
 #define __CRT_SECTION__snscanf_l                            __CRT_SECTINFO_dos_unicode_locale_format_scanf          /* .text.crt.dos.unicode.locale.format.scanf._snscanf_l */
+#define __CRT_SECTION__snscanf_s_l                          __CRT_SECTINFO_dos_unicode_locale_format_scanf          /* .text.crt.dos.unicode.locale.format.scanf._snscanf_s_l */
+#define __CRT_SECTION__sscanf_s_l                           __CRT_SECTINFO_dos_unicode_locale_format_scanf          /* .text.crt.dos.unicode.locale.format.scanf._sscanf_s_l */
 #define __CRT_SECTION__vsnscanf_l                           __CRT_SECTINFO_dos_unicode_locale_format_scanf          /* .text.crt.dos.unicode.locale.format.scanf._vsnscanf_l */
 #define __CRT_SECTION__vsscanf_l                            __CRT_SECTINFO_dos_unicode_locale_format_scanf          /* .text.crt.dos.unicode.locale.format.scanf._vsscanf_l */
 
@@ -1149,6 +1151,7 @@
 
 /* .text.crt.dos.unicode.static.format.scanf.* */
 #define __CRT_SECTION__snscanf                              __CRT_SECTINFO_dos_unicode_static_format_scanf          /* .text.crt.dos.unicode.static.format.scanf._snscanf */
+#define __CRT_SECTION__snscanf_s                            __CRT_SECTINFO_dos_unicode_static_format_scanf          /* .text.crt.dos.unicode.static.format.scanf._snscanf_s */
 #define __CRT_SECTION__vsnscanf                             __CRT_SECTINFO_dos_unicode_static_format_scanf          /* .text.crt.dos.unicode.static.format.scanf._vsnscanf */
 #define __CRT_SECTION_scanf_s                               __CRT_SECTINFO_dos_unicode_static_format_scanf          /* .text.crt.dos.unicode.static.format.scanf.scanf_s */
 #define __CRT_SECTION_sscanf_s                              __CRT_SECTINFO_dos_unicode_static_format_scanf          /* .text.crt.dos.unicode.static.format.scanf.sscanf_s */

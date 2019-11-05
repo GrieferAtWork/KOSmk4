@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2022174 */
+/* HASH CRC-32:0x3d3892e6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __LOCAL_LIBC(_vscprintf_p_l) __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_PRIN
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vscprintf_p_l))(char const *__restrict __format,
                                                             __locale_t __locale,
                                                             __builtin_va_list __args) {
-#line 2368 "kos/src/libc/magic/stdio.c"
+#line 2438 "kos/src/libc/magic/stdio.c"
 	(void)__locale;
 	return __localdep__vscprintf_p(__format, __args);
 }

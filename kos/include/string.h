@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7ab1fb2 */
+/* HASH CRC-32:0x8ad4ab18 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1095,7 +1095,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(bzero, __FORCELOCAL __ATTR_NONNULL((1)) void __N
 #endif /* !__bzero_defined */
 #ifndef __bcmp_defined
 #define __bcmp_defined 1
-#ifdef __fast_memcmp_defined
+#if __has_builtin(__builtin_bcmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_bcmp)
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL bcmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_bytes) { return __builtin_bcmp(__s1, __s2, __num_bytes); }
+#elif defined(__fast_memcmp_defined)
 /* Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x978eae0e */
+/* HASH CRC-32:0x9cde7865 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fgetc32s_defined
-#if (defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked))
+#if (defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE__IO_ferror))
 #define __local_fgetc32s_defined 1
 #include <kos/anno.h>
 #include <parts/errno.h>
@@ -46,6 +46,9 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferr
 #elif defined(__CRT_HAVE_ferror_unlocked)
 /* Check if an I/O error occurred in `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE *__restrict __stream),ferror_unlocked,(__stream))
+#elif defined(__CRT_HAVE__IO_ferror)
+/* Check if an I/O error occurred in `STREAM' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE *__restrict __stream),_IO_ferror,(__stream))
 #else /* LIBC: ferror */
 #undef ____localdep_ferror_defined
 #endif /* ferror... */
@@ -115,5 +118,5 @@ __LOCAL_LIBC(fgetc32s) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __CHAR32_TYPE__ *
 	return __buf;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked)) */
+#endif /* (defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE__IO_ferror)) */
 #endif /* !__local_fgetc32s_defined */

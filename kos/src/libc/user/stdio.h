@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73045e90 */
+/* HASH CRC-32:0x412e2a9a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -222,10 +222,10 @@ INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_freopen_unlocked)(char
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_freopen64_unlocked)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
 INTDEF NONNULL((1)) int (LIBCCALL libc_fseek_unlocked)(FILE *__restrict stream, long int off, int whence) __THROWS(...);
-/* Change the current in-file position of `STREAM' */
-INTDEF NONNULL((1)) int (LIBCCALL libc_fseeko_unlocked)(FILE *__restrict stream, off_t off, int whence) __THROWS(...);
 /* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
 INTDEF NONNULL((1)) long int (LIBCCALL libc_ftell_unlocked)(FILE *__restrict stream) __THROWS(...);
+/* Change the current in-file position of `STREAM' */
+INTDEF NONNULL((1)) int (LIBCCALL libc_fseeko_unlocked)(FILE *__restrict stream, off_t off, int whence) __THROWS(...);
 /* Return the current in-file position of `STREAM' */
 INTDEF NONNULL((1)) off_t (LIBCCALL libc_ftello_unlocked)(FILE *__restrict stream) __THROWS(...);
 INTDEF int (LIBCCALL libc_flushall_unlocked)(void) __THROWS(...);
@@ -292,6 +292,7 @@ INTDEF WUNUSED NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (VLIBC
  * Return the number of successfully scanned data items */
 INTDEF WUNUSED NONNULL((1)) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_scanf_unlocked)(char const *__restrict format, ...) __THROWS(...);
 INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBCCALL libc__fsopen)(char const *filename, char const *modes, int sflag);
+INTDEF int (LIBCCALL libc__flushall)(void) __THROWS(...);
 INTDEF int NOTHROW_RPC(LIBCCALL libc__rmtmp)(void);
 INTDEF NONNULL((1)) int (LIBCCALL libc__filbuf)(FILE *__restrict stream) __THROWS(...);
 INTDEF NONNULL((2)) int (LIBCCALL libc__flsbuf)(int ch, FILE *__restrict stream) __THROWS(...);

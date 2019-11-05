@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a3dea07 */
+/* HASH CRC-32:0x19254837 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,15 @@
 #if (defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64))) && (defined(__CRT_HAVE_fileno_unlocked) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno))
 #define __local_fftruncate_unlocked_defined 1
 #include <kos/anno.h>
+#ifndef __PIO_OFFSET
+#ifdef __USE_KOS
+#define __PIO_OFFSET     __FS_TYPE(pos)
+#define __PIO_OFFSET64   __pos64_t
+#else /* __USE_KOS */
+#define __PIO_OFFSET     __FS_TYPE(off)
+#define __PIO_OFFSET64   __off64_t
+#endif /* !__USE_KOS */
+#endif /* !__PIO_OFFSET */
 /* Dependency: "fileno_unlocked" from "stdio" */
 #ifndef ____localdep_fileno_unlocked_defined
 #define ____localdep_fileno_unlocked_defined 1
@@ -76,21 +85,12 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET _
 #endif /* !____localdep_ftruncate_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __PIO_OFFSET
-#ifdef __USE_KOS
-#define __PIO_OFFSET     __FS_TYPE(pos)
-#define __PIO_OFFSET64   __pos64_t
-#else /* __USE_KOS */
-#define __PIO_OFFSET     __FS_TYPE(off)
-#define __PIO_OFFSET64   __off64_t
-#endif /* !__USE_KOS */
-#endif /* !__PIO_OFFSET */
 /* >> fftruncate_unlocked(3)
  * Same as `fftruncate()', but don't acquire a lock to the file */
 __LOCAL_LIBC(fftruncate_unlocked) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fftruncate_unlocked))(__FILE *__restrict __stream,
                                                     __PIO_OFFSET __length) __THROWS(...) {
-#line 1896 "kos/src/libc/magic/stdio.c"
+#line 1970 "kos/src/libc/magic/stdio.c"
 	int __result = -1;
 	__fd_t __fd = __localdep_fileno_unlocked(__stream);
 	if __likely(__fd >= 0)

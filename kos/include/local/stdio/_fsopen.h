@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5802fba5 */
+/* HASH CRC-32:0xaeb22518 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__fsopen_defined
-#if defined(__CRT_HAVE_fopen) || defined(__CRT_HAVE_fopen64)
+#if defined(__CRT_HAVE_fopen) || defined(__CRT_HAVE__IO_fopen) || defined(__CRT_HAVE_fopen64)
 #define __local__fsopen_defined 1
 /* Dependency: "fopen" */
 #ifndef ____localdep_fopen_defined
@@ -29,6 +29,9 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__local
 #elif defined(__CRT_HAVE_fopen)
 /* Create and return a new file-stream for accessing `FILENAME' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen,(char const *__restrict __filename, char const *__restrict __modes),fopen,(__filename,__modes))
+#elif defined(__CRT_HAVE__IO_fopen)
+/* Create and return a new file-stream for accessing `FILENAME' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen,(char const *__restrict __filename, char const *__restrict __modes),_IO_fopen,(__filename,__modes))
 #elif defined(__CRT_HAVE_fopen64)
 /* Create and return a new file-stream for accessing `FILENAME' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen,(char const *__restrict __filename, char const *__restrict __modes),fopen64,(__filename,__modes))
@@ -42,10 +45,10 @@ __LOCAL_LIBC(_fsopen) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __FILE *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_fsopen))(char const *__filename,
                                                      char const *__modes,
                                                      int __sflag) {
-#line 2101 "kos/src/libc/magic/stdio.c"
+#line 2175 "kos/src/libc/magic/stdio.c"
 	(void)__sflag;
 	return __localdep_fopen(__filename, __modes);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_fopen) || defined(__CRT_HAVE_fopen64) */
+#endif /* defined(__CRT_HAVE_fopen) || defined(__CRT_HAVE__IO_fopen) || defined(__CRT_HAVE_fopen64) */
 #endif /* !__local__fsopen_defined */

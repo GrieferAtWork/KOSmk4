@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f077bc0 */
+/* HASH CRC-32:0xdcdba8f3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  */
 
 
+#define __CRT_HAVE_ 1
 #define __CRT_HAVE_Calloc 1
 #define __CRT_HAVE_ChRoot 1
 #define __CRT_HAVE_Chdir 1
@@ -450,10 +451,40 @@
 #define __CRT_HAVE__CrtSetReportHookW2 1
 #define __CRT_HAVE__CrtSetReportMode 1
 #define __CRT_HAVE__Exit 1
+#define __CRT_HAVE__IO_fclose 1
+#define __CRT_HAVE__IO_fdopen 1
 #define __CRT_HAVE__IO_feof 1
+#define __CRT_HAVE__IO_ferror 1
+#define __CRT_HAVE__IO_fflush 1
+#define __CRT_HAVE__IO_fgetpos 1
+#define __CRT_HAVE__IO_fgetpos64 1
+#define __CRT_HAVE__IO_flockfile 1
+#define __CRT_HAVE__IO_flush_all 1
+#define __CRT_HAVE__IO_flush_all_linebuffere 1
+#define __CRT_HAVE__IO_fopen 1
+#define __CRT_HAVE__IO_fprintf 1
+#define __CRT_HAVE__IO_fputs 1
+#define __CRT_HAVE__IO_fread 1
+#define __CRT_HAVE__IO_fsetpos 1
+#define __CRT_HAVE__IO_fsetpos64 1
+#define __CRT_HAVE__IO_ftell 1
+#define __CRT_HAVE__IO_ftrylockfile 1
+#define __CRT_HAVE__IO_funlockfile 1
+#define __CRT_HAVE__IO_fwrite 1
 #define __CRT_HAVE__IO_getc 1
+#define __CRT_HAVE__IO_gets 1
+#define __CRT_HAVE__IO_popen 1
+#define __CRT_HAVE__IO_printf 1
 #define __CRT_HAVE__IO_putc 1
 #define __CRT_HAVE__IO_puts 1
+#define __CRT_HAVE__IO_setbuffer 1
+#define __CRT_HAVE__IO_setvbuf 1
+#define __CRT_HAVE__IO_sprintf 1
+#define __CRT_HAVE__IO_sscanf 1
+#define __CRT_HAVE__IO_ungetc 1
+#define __CRT_HAVE__IO_vfprintf 1
+#define __CRT_HAVE__IO_vfscanf 1
+#define __CRT_HAVE__IO_vsprintf 1
 #define __CRT_HAVE__Strftime 1
 #define __CRT_HAVE__ZSt9terminatev 1
 #define __CRT_HAVE___acos 1
@@ -999,6 +1030,7 @@
 #define __CRT_HAVE__fdpcomp 1
 #define __CRT_HAVE__fdsign 1
 #define __CRT_HAVE__fflush_nolock 1
+#define __CRT_HAVE__fgetc_nolock 1
 #define __CRT_HAVE__fgetchar 1
 #define __CRT_HAVE__fgetwc_nolock 1
 #define __CRT_HAVE__fgetwchar 1
@@ -1030,6 +1062,7 @@
 #define __CRT_HAVE__fprintf_p 1
 #define __CRT_HAVE__fprintf_p_l 1
 #define __CRT_HAVE__fprintf_s_l 1
+#define __CRT_HAVE__fputc_nolock 1
 #define __CRT_HAVE__fputchar 1
 #define __CRT_HAVE__fputwc_nolock 1
 #define __CRT_HAVE__fputwchar 1
@@ -1073,6 +1106,8 @@
 #define __CRT_HAVE__get_osfhandle 1
 #define __CRT_HAVE__get_output_format 1
 #define __CRT_HAVE__get_printf_count_output 1
+#define __CRT_HAVE__getc_nolock 1
+#define __CRT_HAVE__getchar_nolock 1
 #define __CRT_HAVE__getcwd 1
 #define __CRT_HAVE__getcwd_dbg 1
 #define __CRT_HAVE__getdcwd 1
@@ -1167,6 +1202,8 @@
 #define __CRT_HAVE__printf_p 1
 #define __CRT_HAVE__printf_p_l 1
 #define __CRT_HAVE__printf_s_l 1
+#define __CRT_HAVE__putc_nolock 1
+#define __CRT_HAVE__putchar_nolock 1
 #define __CRT_HAVE__putenv 1
 #define __CRT_HAVE__putenv_s 1
 #define __CRT_HAVE__putw 1

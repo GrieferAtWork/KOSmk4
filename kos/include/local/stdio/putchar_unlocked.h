@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54148bf5 */
+/* HASH CRC-32:0x55b8eb8c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  */
 #ifndef __local_putchar_unlocked_defined
 #include <__crt.h>
-#if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s))
+#if !defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_HAVE_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE_fputc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE__IO_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))))
 #define __local_putchar_unlocked_defined 1
 #include <kos/anno.h>
 #include <local/stdstreams.h>
@@ -41,7 +41,10 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,,__localdep_fputc_unlocked,(int __ch, __FILE
 #elif defined(__CRT_HAVE_fputc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))
 /* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,,__localdep_fputc_unlocked,(int __ch, __FILE *__restrict __stream),fputc,(__ch,__stream)) __THROWS(...)
-#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s)
+#elif defined(__CRT_HAVE__IO_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))
+/* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,,__localdep_fputc_unlocked,(int __ch, __FILE *__restrict __stream),_IO_putc,(__ch,__stream)) __THROWS(...)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s)
 #include <local/stdio/fputc_unlocked.h>
 /* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
 #define __localdep_fputc_unlocked (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputc_unlocked))
@@ -54,9 +57,9 @@ __NAMESPACE_LOCAL_BEGIN
 /* Same as `putchar()', but performs I/O without acquiring a lock to `stdout' */
 __LOCAL_LIBC(putchar_unlocked) int
 (__LIBCCALL __LIBC_LOCAL_NAME(putchar_unlocked))(int __ch) __THROWS(...) {
-#line 1307 "kos/src/libc/magic/stdio.c"
+#line 1349 "kos/src/libc/magic/stdio.c"
 	return __localdep_fputc_unlocked(__ch, __LOCAL_stdout);
 }
 __NAMESPACE_LOCAL_END
-#endif /* !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s)) */
+#endif /* !defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_HAVE_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE_fputc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE__IO_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf)))) */
 #endif /* !__local_putchar_unlocked_defined */

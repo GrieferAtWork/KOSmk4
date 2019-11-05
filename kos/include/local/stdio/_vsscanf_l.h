@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdbeb9681 */
+/* HASH CRC-32:0xb363fb24 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsscanf_l))(char const *__restrict _
                                                         char const *__restrict __format,
                                                         __locale_t __locale,
                                                         __builtin_va_list __args) {
-#line 2192 "kos/src/libc/magic/stdio.c"
+#line 2262 "kos/src/libc/magic/stdio.c"
 	(void)__locale;
 	return __localdep_vsscanf(__input, __format, __args);
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc1632d6 */
+/* HASH CRC-32:0x4c16069 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,10 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsprintf,(char *__restrict __dest, char const *__restrict __format, __builtin_va_list __args),vsprintf,(__dest,__format,__args))
+#elif defined(__CRT_HAVE__IO_vsprintf)
+/* Print a formatted string to a given in-member string buffer `BUF'
+ * Return the number of written characters, excluding a trailing NUL-character */
+__CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsprintf,(char *__restrict __dest, char const *__restrict __format, __builtin_va_list __args),_IO_vsprintf,(__dest,__format,__args))
 #else /* LIBC: vsprintf */
 #include <local/stdio/vsprintf.h>
 /* Print a formatted string to a given in-member string buffer `BUF'
@@ -44,7 +48,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsprintf_l))(char *__restrict __buf,
                                                          char const *__restrict __format,
                                                          __locale_t __locale,
                                                          __builtin_va_list __args) {
-#line 2298 "kos/src/libc/magic/stdio.c"
+#line 2368 "kos/src/libc/magic/stdio.c"
 	(void)__locale;
 	return __localdep_vsprintf(__buf, __format, __args);
 }

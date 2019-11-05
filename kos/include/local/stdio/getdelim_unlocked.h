@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c08713 */
+/* HASH CRC-32:0x435767a6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getdelim_unlocked_defined
-#if defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_s)) && (defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE_ungetc))
+#if defined(__CRT_HAVE_realloc) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf)))) && (defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc))
 #define __local_getdelim_unlocked_defined 1
 #include <kos/anno.h>
 /* Dependency: "realloc" */
@@ -50,7 +50,10 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_fgetc_unlocked,(__FILE *__restri
 #elif defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
 /* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),fgetc,(__stream)) __THROWS(...)
-#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_s)
+#elif defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
+/* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),_IO_getc,(__stream)) __THROWS(...)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread)
 #include <local/stdio/fgetc_unlocked.h>
 /* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
 #define __localdep_fgetc_unlocked (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetc_unlocked))
@@ -65,6 +68,12 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_fgetc_unlocked,(__FILE *__restri
 #ifdef __CRT_HAVE_ungetc_unlocked
 /* Unget a single character byte of data previously returned by `getc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
+#elif defined(__CRT_HAVE__ungetc_nolock)
+/* Unget a single character byte of data previously returned by `getc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
+#elif defined(__CRT_HAVE__IO_ungetc)
+/* Unget a single character byte of data previously returned by `getc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),_IO_ungetc,(__ch,__stream))
 #elif defined(__CRT_HAVE_ungetc)
 /* Unget a single character byte of data previously returned by `getc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),ungetc,(__ch,__stream))
@@ -79,7 +88,7 @@ __LOCAL_LIBC(getdelim_unlocked) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)) __SSIZE
                                                   __SIZE_TYPE__ *__restrict __pcount,
                                                   int __delimiter,
                                                   __FILE *__restrict __stream) __THROWS(...) {
-#line 1779 "kos/src/libc/magic/stdio.c"
+#line 1860 "kos/src/libc/magic/stdio.c"
 	int __ch;
 	char *__buffer;
 	__SIZE_TYPE__ __bufsize, __result = 0;
@@ -122,5 +131,5 @@ __LOCAL_LIBC(getdelim_unlocked) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)) __SSIZE
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_s)) && (defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE_ungetc)) */
+#endif /* defined(__CRT_HAVE_realloc) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf)))) && (defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc)) */
 #endif /* !__local_getdelim_unlocked_defined */

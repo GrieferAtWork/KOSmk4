@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4333e10e */
+/* HASH CRC-32:0x75ea7c7c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,15 @@
 #if (defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)) && (defined(__CRT_HAVE_fileno) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno_unlocked))
 #define __local_fftruncate64_defined 1
 #include <kos/anno.h>
+#ifndef __PIO_OFFSET
+#ifdef __USE_KOS
+#define __PIO_OFFSET     __FS_TYPE(pos)
+#define __PIO_OFFSET64   __pos64_t
+#else /* __USE_KOS */
+#define __PIO_OFFSET     __FS_TYPE(off)
+#define __PIO_OFFSET64   __off64_t
+#endif /* !__USE_KOS */
+#endif /* !__PIO_OFFSET */
 /* Dependency: "fileno" */
 #ifndef ____localdep_fileno_defined
 #define ____localdep_fileno_defined 1
@@ -67,21 +76,12 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET
 #endif /* !____localdep_ftruncate64_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __PIO_OFFSET
-#ifdef __USE_KOS
-#define __PIO_OFFSET     __FS_TYPE(pos)
-#define __PIO_OFFSET64   __pos64_t
-#else /* __USE_KOS */
-#define __PIO_OFFSET     __FS_TYPE(off)
-#define __PIO_OFFSET64   __off64_t
-#endif /* !__USE_KOS */
-#endif /* !__PIO_OFFSET */
 /* >> fftruncate64(3)
  * Truncate the given file `STREAM' to a length of `LENGTH' */
 __LOCAL_LIBC(fftruncate64) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fftruncate64))(__FILE *__restrict __stream,
                                              __PIO_OFFSET64 __length) __THROWS(...) {
-#line 1956 "kos/src/libc/magic/stdio.c"
+#line 2027 "kos/src/libc/magic/stdio.c"
 	int __result = -1;
 	__fd_t __fd = __localdep_fileno(__stream);
 	if __likely(__fd >= 0)

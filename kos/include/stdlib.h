@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0a23328 */
+/* HASH CRC-32:0xc00a652d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -997,6 +997,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtold, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL
 #define __std_aligned_alloc_defined 1
 #ifdef __aligned_alloc_defined
 __NAMESPACE_GLB_USING(aligned_alloc)
+#elif __has_builtin(__builtin_aligned_alloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_aligned_alloc)
+__FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1) void *__NOTHROW_NCX(__LIBCCALL aligned_alloc)(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes) { return __builtin_aligned_alloc(__alignment, __n_bytes); }
 #elif defined(__CRT_HAVE_aligned_alloc)
 __CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1),void *,__NOTHROW_NCX,aligned_alloc,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes),(__alignment,__n_bytes))
 #elif defined(__CRT_HAVE_memalign)
@@ -1494,6 +1496,8 @@ __NAMESPACE_STD_USING(aligned_alloc)
 #define __aligned_alloc_defined 1
 #ifdef __std_aligned_alloc_defined
 __NAMESPACE_STD_USING(aligned_alloc)
+#elif __has_builtin(__builtin_aligned_alloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_aligned_alloc)
+__FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1) void *__NOTHROW_NCX(__LIBCCALL aligned_alloc)(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes) { return __builtin_aligned_alloc(__alignment, __n_bytes); }
 #elif defined(__CRT_HAVE_aligned_alloc)
 __CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1),void *,__NOTHROW_NCX,aligned_alloc,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes),(__alignment,__n_bytes))
 #elif defined(__CRT_HAVE_memalign)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b396c8d */
+/* HASH CRC-32:0xf849316b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,42 +26,27 @@
 #ifdef __CRT_HAVE_fflush_unlocked
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(,int,,__localdep_fflush_unlocked,(__FILE *__stream),fflush_unlocked,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fflush)
-/* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(,int,,__localdep_fflush_unlocked,(__FILE *__stream),fflush,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE__fflush_nolock)
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(,int,,__localdep_fflush_unlocked,(__FILE *__stream),_fflush_nolock,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fflush)
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(,int,,__localdep_fflush_unlocked,(__FILE *__stream),fflush,(__stream)) __THROWS(...)
-#else /* LIBC: fflush */
-#include <local/stdio/fflush.h>
+#elif defined(__CRT_HAVE__IO_fflush)
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
-#define __localdep_fflush_unlocked (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fflush))
+__CREDIRECT(,int,,__localdep_fflush_unlocked,(__FILE *__stream),_IO_fflush,(__stream)) __THROWS(...)
+#else /* LIBC: fflush_unlocked */
+#include <local/stdio/fflush_unlocked.h>
+/* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
+#define __localdep_fflush_unlocked (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fflush_unlocked))
 #endif /* fflush_unlocked... */
 #endif /* !____localdep_fflush_unlocked_defined */
-
-/* Dependency: "_flushall" from "stdio" */
-#ifndef ____localdep__flushall_defined
-#define ____localdep__flushall_defined 1
-#ifdef __CRT_HAVE__flushall
-__CREDIRECT(,int,,__localdep__flushall,(void),_flushall,()) __THROWS(...)
-#else /* LIBC: _flushall */
-#include <local/stdio/_flushall.h>
-#define __localdep__flushall (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_flushall))
-#endif /* _flushall... */
-#endif /* !____localdep__flushall_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(flushall_unlocked) int
 (__LIBCCALL __LIBC_LOCAL_NAME(flushall_unlocked))(void) __THROWS(...) {
-#line 1750 "kos/src/libc/magic/stdio.c"
-#if defined(__CRT_HAVE_fflush_unlocked) || defined(__CRT_HAVE__fflush_nolock)
+#line 1824 "kos/src/libc/magic/stdio.c"
 	return __localdep_fflush_unlocked(__NULLPTR);
-#else
-	return __localdep__flushall();
-#endif
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_flushall_unlocked_defined */

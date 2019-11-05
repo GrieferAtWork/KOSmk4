@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa536a0d */
+/* HASH CRC-32:0x2453f6c0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,22 +17,34 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__vfprintf_p_defined
-#if (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked)
-#define __local__vfprintf_p_defined 1
+#ifndef __local_fflush_unlocked_defined
+#define __local_fflush_unlocked_defined 1
 #include <kos/anno.h>
+/* Dependency: "crt_flushall" from "stdio" */
+#ifndef ____localdep_crt_flushall_defined
+#define ____localdep_crt_flushall_defined 1
+#ifdef __CRT_HAVE__flushall
+__CREDIRECT(,int,,__localdep_crt_flushall,(void),_flushall,()) __THROWS(...)
+#elif defined(__CRT_HAVE__IO_flush_all)
+__CREDIRECT(,int,,__localdep_crt_flushall,(void),_IO_flush_all,()) __THROWS(...)
+#else /* LIBC: _flushall */
+#undef ____localdep_crt_flushall_defined
+#endif /* crt_flushall... */
+#endif /* !____localdep_crt_flushall_defined */
+
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_vfprintf_p) __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF_P(2, 0) __STDC_INT_AS_SIZE_T
-(__LIBCCALL __LIBC_LOCAL_NAME(_vfprintf_p))(__FILE *__restrict __stream,
-                                            char const *__restrict __format,
-                                            __builtin_va_list __args) __THROWS(...) {
-#line 2575 "kos/src/libc/magic/stdio.c"
-	/* TODO */
+/* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
+__LOCAL_LIBC(fflush_unlocked) int
+(__LIBCCALL __LIBC_LOCAL_NAME(fflush_unlocked))(__FILE *__stream) __THROWS(...) {
+#line 1120 "kos/src/libc/magic/stdio.c"
+	/* NO-OP (When not implemented by the CRT, assume no
+	 * buffering being done, meaning this function isn't needed) */
+#if defined(__CRT_HAVE__flushall) || defined(__CRT_HAVE__IO_flush_all)
+	if (!__stream)
+		return __localdep_crt_flushall();
+#endif /* defined(__CRT_HAVE__flushall) || defined(__CRT_HAVE__IO_flush_all) */
 	(void)__stream;
-	(void)__format;
-	(void)__args;
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) */
-#endif /* !__local__vfprintf_p_defined */
+#endif /* !__local_fflush_unlocked_defined */

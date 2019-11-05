@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e74909b */
+/* HASH CRC-32:0x536ce9fd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__printf_p_l_defined
-#if (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE__vfprintf_p))) || defined(__CRT_HAVE__vprintf_p) || defined(__CRT_HAVE__vprintf_p_l)
+#if (!defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE__vfprintf_p))) || defined(__CRT_HAVE__vprintf_p) || defined(__CRT_HAVE__vprintf_p_l)
 #define __local__printf_p_l_defined 1
 #include <kos/anno.h>
 /* Dependency: "_vprintf_p_l" from "stdio" */
@@ -26,7 +26,7 @@
 #define ____localdep__vprintf_p_l_defined 1
 #ifdef __CRT_HAVE__vprintf_p_l
 __CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF_P(1, 0),__STDC_INT_AS_SIZE_T,,__localdep__vprintf_p_l,(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vprintf_p_l,(__format,__locale,__args)) __THROWS(...)
-#elif (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE__vfprintf_p))) || defined(__CRT_HAVE__vprintf_p)
+#elif (!defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE__vfprintf_p))) || defined(__CRT_HAVE__vprintf_p)
 #include <local/stdio/_vprintf_p_l.h>
 #define __localdep__vprintf_p_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vprintf_p_l))
 #else /* CUSTOM: _vprintf_p_l */
@@ -39,7 +39,7 @@ __LOCAL_LIBC(_printf_p_l) __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF_P(1, 3) __STDC_
 (__VLIBCCALL __LIBC_LOCAL_NAME(_printf_p_l))(char const *__restrict __format,
                                              __locale_t __locale,
                                              ...) __THROWS(...) {
-#line 2482 "kos/src/libc/magic/stdio.c"
+#line 2552 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __locale);
@@ -48,5 +48,5 @@ __LOCAL_LIBC(_printf_p_l) __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF_P(1, 3) __STDC_
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE__vfprintf_p))) || defined(__CRT_HAVE__vprintf_p) || defined(__CRT_HAVE__vprintf_p_l) */
+#endif /* (!defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE__vfprintf_p))) || defined(__CRT_HAVE__vprintf_p) || defined(__CRT_HAVE__vprintf_p_l) */
 #endif /* !__local__printf_p_l_defined */

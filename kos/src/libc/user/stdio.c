@@ -1784,12 +1784,12 @@ done:
 
 /*[[[start:implementation]]]*/
 
-#undef libc_flushall
-DEFINE_PUBLIC_ALIAS(_flushall, libc_flushall);
-DEFINE_PUBLIC_ALIAS(flushall, libc_flushall);
-DEFINE_INTERN_ALIAS(libc__flushall, libc_flushall);
-INTERN ATTR_SECTION(".text.crt.FILE.locked.write.utility._flushall")
-int LIBCCALL libc_flushall(void) {
+/*[[[head:_flushall,hash:CRC-32=0x667d3c39]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.locked.write.utility._flushall") int
+(LIBCCALL libc__flushall)(void)
+		__THROWS(...)
+/*[[[body:_flushall]]]*/
+{
 	/* All all streams opened by the user. */
 	file_syncall_locked();
 	/* Flush the active STD streams. */
@@ -1798,12 +1798,14 @@ int LIBCCALL libc_flushall(void) {
 	file_sync_locked(stderr);
 	return 0;
 }
+/*[[[end:_flushall]]]*/
 
-/*[[[impl:flushall_unlocked]]]*/
-#undef libc_flushall_unlocked
-DEFINE_INTERN_ALIAS(libc_flushall_unlocked, libc_doflushall_unlocked);
-INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.utility.flushall_unlocked")
-int LIBCCALL libc_flushall_unlocked(void) {
+/*[[[head:flushall_unlocked,hash:CRC-32=0x80bd200a]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.utility.flushall_unlocked") int
+(LIBCCALL libc_flushall_unlocked)(void)
+		__THROWS(...)
+/*[[[body:flushall_unlocked]]]*/
+{
 	/* All all streams opened by the user. */
 	file_syncall_unlocked();
 	/* Flush the active STD streams. */
@@ -1812,6 +1814,7 @@ int LIBCCALL libc_flushall_unlocked(void) {
 	file_sync(stderr);
 	return 0;
 }
+/*[[[end:flushall_unlocked]]]*/
 
 
 /*[[[head:removeat,hash:CRC-32=0xe49fdb2f]]]*/
@@ -5126,12 +5129,6 @@ NOTHROW_RPC(LIBCCALL libc_freopen_unlocked)(char const *__restrict filename,
 /*[[[impl:fopen64]]]*/
 /*[[[impl:freopen64]]]*/
 /*[[[impl:freopen64_unlocked]]]*/
-
-
-
-
-
-
 DEFINE_INTERN_ALIAS(libc_freopen64, libc_freopen);
 DEFINE_INTERN_ALIAS(libc_freopen64_unlocked, libc_freopen_unlocked);
 DEFINE_INTERN_ALIAS(libc_fopen64, libc_fopen);
@@ -5146,11 +5143,13 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x37dd4774]]]*/
+/*[[[start:exports,hash:CRC-32=0xb5cd726b]]]*/
 #undef fprintf
+#undef _IO_fprintf
 #undef fprintf_unlocked
 #undef fprintf_s
 #undef printf
+#undef _IO_printf
 #undef printf_unlocked
 #undef printf_s
 #undef fscanf
@@ -5184,12 +5183,13 @@ DEFINE_PUBLIC_WEAK_ALIAS(remove, libc_remove);
 DEFINE_PUBLIC_WEAK_ALIAS(rename, libc_rename);
 DEFINE_PUBLIC_WEAK_ALIAS(tmpnam, libc_tmpnam);
 DEFINE_PUBLIC_WEAK_ALIAS(fclose, libc_fclose);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_fclose, libc_fclose);
 DEFINE_PUBLIC_WEAK_ALIAS(_fclose_nolock, libc_fclose);
 DEFINE_PUBLIC_WEAK_ALIAS(fflush, libc_fflush);
-DEFINE_PUBLIC_WEAK_ALIAS(fflush_unlocked, libc_fflush);
-DEFINE_PUBLIC_WEAK_ALIAS(_fflush_nolock, libc_fflush);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_fflush, libc_fflush);
 DEFINE_PUBLIC_WEAK_ALIAS(setbuf, libc_setbuf);
 DEFINE_PUBLIC_WEAK_ALIAS(setvbuf, libc_setvbuf);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_setvbuf, libc_setvbuf);
 DEFINE_PUBLIC_WEAK_ALIAS(setvbuf_unlocked, libc_setvbuf);
 DEFINE_PUBLIC_WEAK_ALIAS(fgetc, libc_fgetc);
 DEFINE_PUBLIC_WEAK_ALIAS(_IO_getc, libc_fgetc);
@@ -5203,19 +5203,19 @@ DEFINE_PUBLIC_WEAK_ALIAS(putchar, libc_putchar);
 DEFINE_PUBLIC_WEAK_ALIAS(_fputchar, libc_putchar);
 DEFINE_PUBLIC_WEAK_ALIAS(fgets, libc_fgets);
 DEFINE_PUBLIC_WEAK_ALIAS(fputs, libc_fputs);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_fputs, libc_fputs);
 DEFINE_PUBLIC_WEAK_ALIAS(puts, libc_puts);
 DEFINE_PUBLIC_WEAK_ALIAS(_IO_puts, libc_puts);
 DEFINE_PUBLIC_WEAK_ALIAS(ungetc, libc_ungetc);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_ungetc, libc_ungetc);
 DEFINE_PUBLIC_WEAK_ALIAS(ungetc_unlocked, libc_ungetc);
-DEFINE_PUBLIC_WEAK_ALIAS(_ungetc_nolock, libc_ungetc);
 DEFINE_PUBLIC_WEAK_ALIAS(fread, libc_fread);
 DEFINE_PUBLIC_WEAK_ALIAS(fwrite, libc_fwrite);
 DEFINE_PUBLIC_WEAK_ALIAS(fseek, libc_fseek);
 DEFINE_PUBLIC_WEAK_ALIAS(fseek_unlocked, libc_fseek);
-DEFINE_PUBLIC_WEAK_ALIAS(_fseek_nolock, libc_fseek);
 DEFINE_PUBLIC_WEAK_ALIAS(ftell, libc_ftell);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_ftell, libc_ftell);
 DEFINE_PUBLIC_WEAK_ALIAS(ftell_unlocked, libc_ftell);
-DEFINE_PUBLIC_WEAK_ALIAS(_ftell_nolock, libc_ftell);
 DEFINE_PUBLIC_WEAK_ALIAS(rewind, libc_rewind);
 DEFINE_PUBLIC_WEAK_ALIAS(rewind_unlocked, libc_rewind);
 DEFINE_PUBLIC_WEAK_ALIAS(clearerr, libc_clearerr);
@@ -5224,30 +5224,38 @@ DEFINE_PUBLIC_WEAK_ALIAS(feof, libc_feof);
 DEFINE_PUBLIC_WEAK_ALIAS(_IO_feof, libc_feof);
 DEFINE_PUBLIC_WEAK_ALIAS(feof_unlocked, libc_feof);
 DEFINE_PUBLIC_WEAK_ALIAS(ferror, libc_ferror);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_ferror, libc_ferror);
 DEFINE_PUBLIC_WEAK_ALIAS(ferror_unlocked, libc_ferror);
 DEFINE_PUBLIC_WEAK_ALIAS(perror, libc_perror);
 DEFINE_PUBLIC_WEAK_ALIAS(tmpfile, libc_tmpfile);
 DEFINE_PUBLIC_WEAK_ALIAS(fopen, libc_fopen);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_fopen, libc_fopen);
 DEFINE_PUBLIC_WEAK_ALIAS(fopen64, libc_fopen);
 DEFINE_PUBLIC_WEAK_ALIAS(freopen, libc_freopen);
 DEFINE_PUBLIC_WEAK_ALIAS(freopen64, libc_freopen);
 DEFINE_PUBLIC_WEAK_ALIAS(freopen_unlocked, libc_freopen);
 DEFINE_PUBLIC_WEAK_ALIAS(fgetpos, libc_fgetpos);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_fgetpos, libc_fgetpos);
 DEFINE_PUBLIC_WEAK_ALIAS(fgetpos_unlocked, libc_fgetpos);
 DEFINE_PUBLIC_WEAK_ALIAS(fsetpos, libc_fsetpos);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_fsetpos, libc_fsetpos);
 DEFINE_PUBLIC_WEAK_ALIAS(fsetpos_unlocked, libc_fsetpos);
 DEFINE_PUBLIC_WEAK_ALIAS(vfprintf, libc_vfprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_vfprintf, libc_vfprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(vfprintf_s, libc_vfprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(fprintf, libc_fprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_fprintf, libc_fprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(fprintf_unlocked, libc_fprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(fprintf_s, libc_fprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(vprintf, libc_vprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(vprintf_unlocked, libc_vprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(vprintf_s, libc_vprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(printf, libc_printf);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_printf, libc_printf);
 DEFINE_PUBLIC_WEAK_ALIAS(printf_unlocked, libc_printf);
 DEFINE_PUBLIC_WEAK_ALIAS(printf_s, libc_printf);
 DEFINE_PUBLIC_WEAK_ALIAS(vfscanf, libc_vfscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_vfscanf, libc_vfscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(__vfscanf, libc_vfscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(vfscanf_unlocked, libc_vfscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(_vfscanf, libc_vfscanf);
@@ -5261,6 +5269,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(fscanf_unlocked, libc_fscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(scanf, libc_scanf);
 DEFINE_PUBLIC_WEAK_ALIAS(scanf_unlocked, libc_scanf);
 DEFINE_PUBLIC_WEAK_ALIAS(gets, libc_gets);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_gets, libc_gets);
 DEFINE_PUBLIC_WEAK_ALIAS(vdprintf, libc_vdprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(dprintf, libc_dprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(renameat, libc_renameat);
@@ -5268,15 +5277,24 @@ DEFINE_PUBLIC_WEAK_ALIAS(removeat, libc_removeat);
 DEFINE_PUBLIC_WEAK_ALIAS(frenameat, libc_frenameat);
 DEFINE_PUBLIC_WEAK_ALIAS(tmpnam_r, libc_tmpnam_r);
 DEFINE_PUBLIC_WEAK_ALIAS(setbuffer, libc_setbuffer);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_setbuffer, libc_setbuffer);
 DEFINE_PUBLIC_WEAK_ALIAS(setlinebuf, libc_setlinebuf);
 DEFINE_PUBLIC_WEAK_ALIAS(fflush_unlocked, libc_fflush_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(_fflush_nolock, libc_fflush_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fread_unlocked, libc_fread_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_fread, libc_fread_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(_fread_nolock, libc_fread_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fwrite_unlocked, libc_fwrite_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_fwrite, libc_fwrite_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(_fwrite_nolock, libc_fwrite_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fgetc_unlocked, libc_fgetc_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(getc_unlocked, libc_fgetc_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fputc_unlocked, libc_fputc_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(putc_unlocked, libc_fputc_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(tempnam, libc_tempnam);
 DEFINE_PUBLIC_WEAK_ALIAS(_tempnam, libc_tempnam);
 DEFINE_PUBLIC_WEAK_ALIAS(fdopen, libc_fdopen);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_fdopen, libc_fdopen);
 DEFINE_PUBLIC_WEAK_ALIAS(_fdopen, libc_fdopen);
 DEFINE_PUBLIC_WEAK_ALIAS(fileno, libc_fileno);
 DEFINE_PUBLIC_WEAK_ALIAS(fileno_unlocked, libc_fileno);
@@ -5288,12 +5306,16 @@ DEFINE_PUBLIC_WEAK_ALIAS(getline, libc_getline);
 DEFINE_PUBLIC_WEAK_ALIAS(getchar_unlocked, libc_getchar_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(putchar_unlocked, libc_putchar_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(flockfile, libc_flockfile);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_flockfile, libc_flockfile);
 DEFINE_PUBLIC_WEAK_ALIAS(_lock_file, libc_flockfile);
 DEFINE_PUBLIC_WEAK_ALIAS(funlockfile, libc_funlockfile);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_funlockfile, libc_funlockfile);
 DEFINE_PUBLIC_WEAK_ALIAS(_unlock_file, libc_funlockfile);
 DEFINE_PUBLIC_WEAK_ALIAS(ftrylockfile, libc_ftrylockfile);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_ftrylockfile, libc_ftrylockfile);
 DEFINE_PUBLIC_WEAK_ALIAS(cuserid, libc_cuserid);
 DEFINE_PUBLIC_WEAK_ALIAS(popen, libc_popen);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_popen, libc_popen);
 DEFINE_PUBLIC_WEAK_ALIAS(_popen, libc_popen);
 DEFINE_PUBLIC_WEAK_ALIAS(pclose, libc_pclose);
 DEFINE_PUBLIC_WEAK_ALIAS(_pclose, libc_pclose);
@@ -5318,17 +5340,17 @@ DEFINE_PUBLIC_WEAK_ALIAS(tmpfile64, libc_tmpfile64);
 DEFINE_PUBLIC_WEAK_ALIAS(fseeko64, libc_fseeko64);
 DEFINE_PUBLIC_WEAK_ALIAS(fseeko64_unlocked, libc_fseeko64);
 DEFINE_PUBLIC_WEAK_ALIAS(_fseeki64, libc_fseeko64);
-DEFINE_PUBLIC_WEAK_ALIAS(_fseeki64_nolock, libc_fseeko64);
 DEFINE_PUBLIC_WEAK_ALIAS(ftello64, libc_ftello64);
 DEFINE_PUBLIC_WEAK_ALIAS(ftello64_unlocked, libc_ftello64);
 DEFINE_PUBLIC_WEAK_ALIAS(_ftelli64, libc_ftello64);
-DEFINE_PUBLIC_WEAK_ALIAS(_ftelli64_nolock, libc_ftello64);
 DEFINE_PUBLIC_WEAK_ALIAS(fopen64, libc_fopen64);
 DEFINE_PUBLIC_WEAK_ALIAS(freopen64, libc_freopen64);
 DEFINE_PUBLIC_WEAK_ALIAS(freopen64_unlocked, libc_freopen64);
 DEFINE_PUBLIC_WEAK_ALIAS(fgetpos64, libc_fgetpos64);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_fgetpos64, libc_fgetpos64);
 DEFINE_PUBLIC_WEAK_ALIAS(fgetpos64_unlocked, libc_fgetpos64);
 DEFINE_PUBLIC_WEAK_ALIAS(fsetpos64, libc_fsetpos64);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_fsetpos64, libc_fsetpos64);
 DEFINE_PUBLIC_WEAK_ALIAS(fsetpos64_unlocked, libc_fsetpos64);
 DEFINE_PUBLIC_WEAK_ALIAS(file_printer, libc_file_printer);
 DEFINE_PUBLIC_WEAK_ALIAS(file_printer_unlocked, libc_file_printer_unlocked);
@@ -5341,8 +5363,10 @@ DEFINE_PUBLIC_WEAK_ALIAS(fdreopen_unlocked, libc_fdreopen_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(freopen_unlocked, libc_freopen_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(freopen64_unlocked, libc_freopen64_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fseek_unlocked, libc_fseek_unlocked);
-DEFINE_PUBLIC_WEAK_ALIAS(fseeko_unlocked, libc_fseeko_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(_fseek_nolock, libc_fseek_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(ftell_unlocked, libc_ftell_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(_ftell_nolock, libc_ftell_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(fseeko_unlocked, libc_fseeko_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(ftello_unlocked, libc_ftello_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(flushall_unlocked, libc_flushall_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fgetpos_unlocked, libc_fgetpos_unlocked);
@@ -5351,6 +5375,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(getw_unlocked, libc_getw_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(putw_unlocked, libc_putw_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(setvbuf_unlocked, libc_setvbuf_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(ungetc_unlocked, libc_ungetc_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(_ungetc_nolock, libc_ungetc_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(getdelim_unlocked, libc_getdelim_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(getline_unlocked, libc_getline_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(rewind_unlocked, libc_rewind_unlocked);
@@ -5359,7 +5384,9 @@ DEFINE_PUBLIC_WEAK_ALIAS(fftruncate, libc_fftruncate);
 DEFINE_PUBLIC_WEAK_ALIAS(fftruncate_unlocked, libc_fftruncate_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(puts_unlocked, libc_puts_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fseeko64_unlocked, libc_fseeko64_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(_fseeki64_nolock, libc_fseeko64_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(ftello64_unlocked, libc_ftello64_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(_ftelli64_nolock, libc_ftello64_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fgetpos64_unlocked, libc_fgetpos64_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fsetpos64_unlocked, libc_fsetpos64_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fftruncate64, libc_fftruncate64);
@@ -5373,6 +5400,8 @@ DEFINE_PUBLIC_WEAK_ALIAS(vscanf_unlocked, libc_vscanf_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fscanf_unlocked, libc_fscanf_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(scanf_unlocked, libc_scanf_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(_fsopen, libc__fsopen);
+DEFINE_PUBLIC_WEAK_ALIAS(_flushall, libc__flushall);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_flush_all, libc__flushall);
 DEFINE_PUBLIC_WEAK_ALIAS(_rmtmp, libc__rmtmp);
 DEFINE_PUBLIC_WEAK_ALIAS(_filbuf, libc__filbuf);
 DEFINE_PUBLIC_WEAK_ALIAS(_flsbuf, libc__flsbuf);

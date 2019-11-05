@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ff0e684 */
+/* HASH CRC-32:0x9809387 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,15 +18,27 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_setbuffer_defined
-#ifdef __CRT_HAVE_setvbuf
+#if defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)
 #define __local_setbuffer_defined 1
 /* Dependency: "setvbuf" */
 #ifndef ____localdep_setvbuf_defined
 #define ____localdep_setvbuf_defined 1
-#ifdef __CRT_HAVE_setvbuf
+#if defined(__CRT_HAVE_setvbuf_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+/* Set the buffer and buffer-mode to-be used by the given `STREAM'
+ * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setvbuf,(__FILE *__restrict __stream, char *__restrict __buf, int __modes, __SIZE_TYPE__ __bufsize),setvbuf_unlocked,(__stream,__buf,__modes,__bufsize))
+#elif defined(__CRT_HAVE_setvbuf)
 /* Set the buffer and buffer-mode to-be used by the given `STREAM'
  * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setvbuf,(__FILE *__restrict __stream, char *__restrict __buf, int __modes, __SIZE_TYPE__ __bufsize),setvbuf,(__stream,__buf,__modes,__bufsize))
+#elif defined(__CRT_HAVE__IO_setvbuf)
+/* Set the buffer and buffer-mode to-be used by the given `STREAM'
+ * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setvbuf,(__FILE *__restrict __stream, char *__restrict __buf, int __modes, __SIZE_TYPE__ __bufsize),_IO_setvbuf,(__stream,__buf,__modes,__bufsize))
+#elif defined(__CRT_HAVE_setvbuf_unlocked)
+/* Set the buffer and buffer-mode to-be used by the given `STREAM'
+ * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setvbuf,(__FILE *__restrict __stream, char *__restrict __buf, int __modes, __SIZE_TYPE__ __bufsize),setvbuf_unlocked,(__stream,__buf,__modes,__bufsize))
 #else /* LIBC: setvbuf */
 #undef ____localdep_setvbuf_defined
 #endif /* setvbuf... */
@@ -38,12 +50,12 @@ __LOCAL_LIBC(setbuffer) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setbuffer))(__FILE *__restrict __stream,
                                                        char *__buf,
                                                        __SIZE_TYPE__ __bufsize) {
-#line 1066 "kos/src/libc/magic/stdio.c"
+#line 1103 "kos/src/libc/magic/stdio.c"
 	__localdep_setvbuf(__stream,
 	        __buf,
 	        __buf ? ___IOFBF : ___IONBF,
 	        __buf ? __bufsize : (__SIZE_TYPE__)0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_setvbuf) */
+#endif /* defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked) */
 #endif /* !__local_setbuffer_defined */

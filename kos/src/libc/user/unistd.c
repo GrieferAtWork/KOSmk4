@@ -3707,7 +3707,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4db8e36f]]]*/
+/*[[[start:exports,hash:CRC-32=0xe277419c]]]*/
 #undef execl
 #undef _execl
 #undef execle
@@ -3795,6 +3795,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(_chdir, libc_chdir);
 DEFINE_PUBLIC_WEAK_ALIAS(getcwd, libc_getcwd);
 DEFINE_PUBLIC_WEAK_ALIAS(_getcwd, libc_getcwd);
 DEFINE_PUBLIC_WEAK_ALIAS(unlink, libc_unlink);
+DEFINE_PUBLIC_WEAK_ALIAS(_unlink, libc_unlink);
 DEFINE_PUBLIC_WEAK_ALIAS(rmdir, libc_rmdir);
 DEFINE_PUBLIC_WEAK_ALIAS(_rmdir, libc_rmdir);
 DEFINE_PUBLIC_WEAK_ALIAS(euidaccess, libc_euidaccess);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x310b7de5 */
+/* HASH CRC-32:0x670d9e80 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,8 @@
 #define ____localdep_crt_flushall_defined 1
 #ifdef __CRT_HAVE__flushall
 __CREDIRECT(,int,,__localdep_crt_flushall,(void),_flushall,()) __THROWS(...)
+#elif defined(__CRT_HAVE__IO_flush_all)
+__CREDIRECT(,int,,__localdep_crt_flushall,(void),_IO_flush_all,()) __THROWS(...)
 #else /* LIBC: _flushall */
 #undef ____localdep_crt_flushall_defined
 #endif /* crt_flushall... */
@@ -34,13 +36,13 @@ __NAMESPACE_LOCAL_BEGIN
 /* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
 __LOCAL_LIBC(fflush) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fflush))(__FILE *__stream) __THROWS(...) {
-#line 358 "kos/src/libc/magic/stdio.c"
+#line 390 "kos/src/libc/magic/stdio.c"
 	/* NO-OP (When not implemented by the CRT, assume no
 	 * buffering being done, meaning this function isn't needed) */
-#ifdef __CRT_HAVE__flushall
+#if defined(__CRT_HAVE__flushall) || defined(__CRT_HAVE__IO_flush_all)
 	if (!__stream)
 		return __localdep_crt_flushall();
-#endif
+#endif /* defined(__CRT_HAVE__flushall) || defined(__CRT_HAVE__IO_flush_all) */
 	(void)__stream;
 	return 0;
 }

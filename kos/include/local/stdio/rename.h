@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8415689e */
+/* HASH CRC-32:0xfba7e4c1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_rename_defined
-#if defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat)
+#if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_frenameat) || defined(__CRT_HAVE_renameat))
 #define __local_rename_defined 1
 /* Dependency: "renameat" from "stdio" */
 #ifndef ____localdep_renameat_defined
@@ -39,9 +39,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(rename) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(rename))(char const *__oldname,
                                                     char const *__newname_or_path) {
-#line 336 "kos/src/libc/magic/stdio.c"
+#line 370 "kos/src/libc/magic/stdio.c"
 	return __localdep_renameat(__CRT_AT_FDCWD, __oldname, __CRT_AT_FDCWD, __newname_or_path);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat) */
+#endif /* defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_frenameat) || defined(__CRT_HAVE_renameat)) */
 #endif /* !__local_rename_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3b85a66 */
+/* HASH CRC-32:0x86157280 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,9 @@ __CREDIRECT(,int,,__localdep_fflush,(__FILE *__stream),_fflush_nolock,(__stream)
 #elif defined(__CRT_HAVE_fflush)
 /* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
 __CREDIRECT(,int,,__localdep_fflush,(__FILE *__stream),fflush,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__IO_fflush)
+/* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
+__CREDIRECT(,int,,__localdep_fflush,(__FILE *__stream),_IO_fflush,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fflush_unlocked)
 /* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
 __CREDIRECT(,int,,__localdep_fflush,(__FILE *__stream),fflush_unlocked,(__stream)) __THROWS(...)
@@ -48,12 +51,8 @@ __CREDIRECT(,int,,__localdep_fflush,(__FILE *__stream),_fflush_nolock,(__stream)
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_flushall) int
 (__LIBCCALL __LIBC_LOCAL_NAME(_flushall))(void) __THROWS(...) {
-#line 2109 "kos/src/libc/magic/stdio.c"
-#if defined(__CRT_HAVE_fflush) || defined(__CRT_HAVE_fflush_unlocked) || defined(__CRT_HAVE__fflush_nolock)
+#line 2183 "kos/src/libc/magic/stdio.c"
 	return __localdep_fflush(__NULLPTR);
-#else
-	return 0;
-#endif
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local__flushall_defined */

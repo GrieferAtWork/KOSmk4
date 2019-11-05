@@ -83,6 +83,7 @@ __fpurge:([nonnull] $FILE *fp);
 [ATTR_WUNUSED][ATTR_PURE] __fpending:([nonnull] $FILE *fp) -> size_t;
 
 @@Flush all line-buffered files
+[export_alias(_IO_flush_all_linebuffere)]
 _flushlbf:();
 
 @@Set locking status of stream FP to TYPE

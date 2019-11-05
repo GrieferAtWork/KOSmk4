@@ -1376,6 +1376,17 @@ class CrtBuiltin {
 	public member name: string;
 }
 
+function removeLineFeedAndDuplicateSpaces(text: string): string {
+	text = text.replace("\n", " ");
+	for (;;) {
+		local n = text.replace("  ", " ");
+		if (text == n)
+			break;
+		text = n;
+	}
+	return text;
+}
+
 
 @@Yields an intermixed set of strings and functions to-be used to define
 function parse_functions(filename: string, text: string): {string | Function...} {
@@ -2604,7 +2615,8 @@ again_enum_name:
 				case "requires":
 					if (define_require_string)
 						define_require_string += " && ";
-					define_require_string += add_paren_if_necessary(get_tag_operand(), true);
+					define_require_string += add_paren_if_necessary(
+						removeLineFeedAndDuplicateSpaces(get_tag_operand()), true);
 #ifndef EXPORTS_USE_USER_HEADERS
 					if (dont_export_symbol is none)
 						dont_export_symbol = "auto";
@@ -3616,11 +3628,11 @@ class Function {
 		if (block is FunctionAlias) {
 			symbol_name = block.func.name;
 			symbol_has_fast_implementation = block.func.has_fast_implementation;
-			symbol_preferred_impl = block.func.preferred_impl;
+			if (!symbol_preferred_impl)
+				symbol_preferred_impl = block.func.preferred_impl;
 		} else if (block is UndefinedFunctionAlias) {
 			symbol_name = block.name;
 			symbol_has_fast_implementation = false;
-			symbol_preferred_impl = {};
 		}
 		if (symbol_has_fast_implementation)
 			yield (symbol_name, "defined(__fast_{}_defined)".format({ symbol_name }));
@@ -4586,13 +4598,13 @@ do_return_crt:
 			symbol_return_type = block.func.return_type;
 			symbol_component_name = block.func.component_name;
 			symbol_has_fast_implementation = block.func.has_fast_implementation;
-			symbol_preferred_impl = block.func.preferred_impl;
+			if (!symbol_preferred_impl)
+				symbol_preferred_impl = block.func.preferred_impl;
 		} else if (block is UndefinedFunctionAlias) {
 			symbol_name = block.name;
 			symbol_return_type = none;
 			symbol_component_name = none;
 			symbol_has_fast_implementation = false;
-			symbol_preferred_impl = {};
 		}
 		if (with_guard) {
 			guard_name = "__";

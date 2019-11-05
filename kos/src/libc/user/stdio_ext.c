@@ -215,7 +215,7 @@ NOTHROW_NCX(LIBCCALL libc___fsetlocking)(FILE *fp,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4f1db4a9]]]*/
+/*[[[start:exports,hash:CRC-32=0xfd5529ca]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(__fbufsize, libc___fbufsize);
 DEFINE_PUBLIC_WEAK_ALIAS(__freading, libc___freading);
 DEFINE_PUBLIC_WEAK_ALIAS(__fwriting, libc___fwriting);
@@ -225,6 +225,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(__flbf, libc___flbf);
 DEFINE_PUBLIC_WEAK_ALIAS(__fpurge, libc___fpurge);
 DEFINE_PUBLIC_WEAK_ALIAS(__fpending, libc___fpending);
 DEFINE_PUBLIC_WEAK_ALIAS(_flushlbf, libc__flushlbf);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_flush_all_linebuffere, libc__flushlbf);
 DEFINE_PUBLIC_WEAK_ALIAS(__fsetlocking, libc___fsetlocking);
 /*[[[end:exports]]]*/
 

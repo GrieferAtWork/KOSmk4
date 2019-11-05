@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4dc3c10f */
+/* HASH CRC-32:0xaa0a9712 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7877,8 +7877,8 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,gamma,(double __x),__lgamma,(__x))
 /* Obsolete alias for `lgamma' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,gamma,(double __x),lgamma,(__x))
 #endif /* gamma... */
-#if __has_builtin(__builtin_lgammaf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgammaf)
-__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL gammaf)(float __x) { return __builtin_lgammaf(__x); }
+#if __has_builtin(__builtin_gammaf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_gammaf)
+__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL gammaf)(float __x) { return __builtin_gammaf(__x); }
 #elif defined(__CRT_HAVE_gammaf)
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,gammaf,(float __x),(__x))
 #elif defined(__CRT_HAVE_lgammaf)
@@ -7892,8 +7892,8 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,gammaf,(float __x),__lgammaf,(__x))
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL gammaf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammaf))(__x); }
 #endif /* gammaf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-#if __has_builtin(__builtin_lgammal) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgammal)
-__FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL gammal)(long double __x) { return __builtin_lgammal(__x); }
+#if __has_builtin(__builtin_gammal) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_gammal)
+__FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL gammal)(long double __x) { return __builtin_gammal(__x); }
 #elif defined(__CRT_HAVE_gammal)
 __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,gammal,(long double __x),(__x))
 #elif defined(__CRT_HAVE_lgammal)

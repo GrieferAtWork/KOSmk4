@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed7876d5 */
+/* HASH CRC-32:0xf65808ed */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -427,7 +427,7 @@ __NAMESPACE_GLB_USING(rename)
 /* Rename a given file `OLDNAME' to `NEWNAME_OR_PATH', or in the event
  * that `NEWNAME_OR_PATH' refers to a directory, place the file within. */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,rename,(char const *__oldname, char const *__newname_or_path),(__oldname,__newname_or_path))
-#elif defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat)
+#elif defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_frenameat) || defined(__CRT_HAVE_renameat))
 __NAMESPACE_STD_END
 #include <local/stdio/rename.h>
 __NAMESPACE_STD_BEGIN
@@ -451,6 +451,9 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,tmpnam,(char 
 #ifdef __CRT_HAVE_fclose
 /* Close and destroy a given file `STREAM' */
 __CDECLARE(__ATTR_NONNULL((1)),int,,fclose,(FILE *__restrict __stream),(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__IO_fclose)
+/* Close and destroy a given file `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fclose,(FILE *__restrict __stream),_IO_fclose,(__stream)) __THROWS(...)
 #else /* LIBC: fclose */
 #undef __std_fclose_defined
 #endif /* fclose... */
@@ -464,6 +467,9 @@ __CREDIRECT(,int,,fflush,(FILE *__stream),_fflush_nolock,(__stream)) __THROWS(..
 #elif defined(__CRT_HAVE_fflush)
 /* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
 __CDECLARE(,int,,fflush,(FILE *__stream),(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__IO_fflush)
+/* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
+__CREDIRECT(,int,,fflush,(FILE *__stream),_IO_fflush,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fflush_unlocked)
 /* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
 __CREDIRECT(,int,,fflush,(FILE *__stream),fflush_unlocked,(__stream)) __THROWS(...)
@@ -482,7 +488,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fflush, __FORCELOCAL int (__LIBCCALL fflush)(FIL
 #ifdef __CRT_HAVE_setbuf
 /* Alias for `setvbuf(STREAM, buf, _IOFBF, BUFSIZ)' */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,setbuf,(FILE *__restrict __stream, char *__restrict __buf),(__stream,__buf))
-#elif defined(__CRT_HAVE_setvbuf)
+#elif defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)
 __NAMESPACE_STD_END
 #include <local/stdio/setbuf.h>
 __NAMESPACE_STD_BEGIN
@@ -494,10 +500,22 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(setbuf, __FORCELOCAL __ATTR_NONNULL((1)) void __
 #endif /* !__std_setbuf_defined */
 #ifndef __std_setvbuf_defined
 #define __std_setvbuf_defined 1
-#ifdef __CRT_HAVE_setvbuf
+#if defined(__CRT_HAVE_setvbuf_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+/* Set the buffer and buffer-mode to-be used by the given `STREAM'
+ * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,setvbuf,(FILE *__restrict __stream, char *__restrict __buf, int __modes, size_t __bufsize),setvbuf_unlocked,(__stream,__buf,__modes,__bufsize))
+#elif defined(__CRT_HAVE_setvbuf)
 /* Set the buffer and buffer-mode to-be used by the given `STREAM'
  * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,setvbuf,(FILE *__restrict __stream, char *__restrict __buf, int __modes, size_t __bufsize),(__stream,__buf,__modes,__bufsize))
+#elif defined(__CRT_HAVE__IO_setvbuf)
+/* Set the buffer and buffer-mode to-be used by the given `STREAM'
+ * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,setvbuf,(FILE *__restrict __stream, char *__restrict __buf, int __modes, size_t __bufsize),_IO_setvbuf,(__stream,__buf,__modes,__bufsize))
+#elif defined(__CRT_HAVE_setvbuf_unlocked)
+/* Set the buffer and buffer-mode to-be used by the given `STREAM'
+ * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,setvbuf,(FILE *__restrict __stream, char *__restrict __buf, int __modes, size_t __bufsize),setvbuf_unlocked,(__stream,__buf,__modes,__bufsize))
 #else /* LIBC: setvbuf */
 #undef __std_setvbuf_defined
 #endif /* setvbuf... */
@@ -529,7 +547,17 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,,fgetc,(FILE *__restrict __stream),getc,(__s
  * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fgetc,(FILE *__restrict __stream),_IO_getc,(__stream)) __THROWS(...)
-#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_s) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))
+#elif defined(__CRT_HAVE_fgetc_unlocked)
+/* Read and return a single character from `STREAM'
+ * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+ * returned and the exact cause can be determined by using `ferror' and `feof' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fgetc,(FILE *__restrict __stream),fgetc_unlocked,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_getc_unlocked)
+/* Read and return a single character from `STREAM'
+ * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+ * returned and the exact cause can be determined by using `ferror' and `feof' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fgetc,(FILE *__restrict __stream),getc_unlocked,(__stream)) __THROWS(...)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread)
 __NAMESPACE_STD_END
 #include <local/stdio/fgetc.h>
 __NAMESPACE_STD_BEGIN
@@ -543,27 +571,33 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fgetc, __FORCELOCAL __ATTR_NONNULL((1)) int (__L
 #endif /* !__std_fgetc_defined */
 #ifndef __std_getc_defined
 #define __std_getc_defined 1
-#if defined(__CRT_HAVE_getc_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+#if defined(__CRT_HAVE_fgetc_unlocked) && (defined(__USE_STDIO_UNLOCKED))
 /* Alias for `fgetc()' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,,getc,(FILE *__restrict __stream),getc_unlocked,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetc_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,getc,(FILE *__restrict __stream),fgetc_unlocked,(__stream))
+#elif defined(__CRT_HAVE_getc_unlocked) && (defined(__USE_STDIO_UNLOCKED))
 /* Alias for `fgetc()' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,,getc,(FILE *__restrict __stream),fgetc_unlocked,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_getc)
-/* Alias for `fgetc()' */
-__CDECLARE(__ATTR_NONNULL((1)),int,,getc,(FILE *__restrict __stream),(__stream)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,getc,(FILE *__restrict __stream),getc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fgetc)
 /* Alias for `fgetc()' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,,getc,(FILE *__restrict __stream),fgetc,(__stream)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,getc,(FILE *__restrict __stream),fgetc,(__stream))
+#elif defined(__CRT_HAVE_getc)
+/* Alias for `fgetc()' */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,getc,(FILE *__restrict __stream),(__stream))
 #elif defined(__CRT_HAVE__IO_getc)
 /* Alias for `fgetc()' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,,getc,(FILE *__restrict __stream),_IO_getc,(__stream)) __THROWS(...)
-#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_s) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,getc,(FILE *__restrict __stream),_IO_getc,(__stream))
+#elif defined(__CRT_HAVE_fgetc_unlocked)
+/* Alias for `fgetc()' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,getc,(FILE *__restrict __stream),fgetc_unlocked,(__stream))
+#elif defined(__CRT_HAVE_getc_unlocked)
+/* Alias for `fgetc()' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,getc,(FILE *__restrict __stream),getc_unlocked,(__stream))
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread)
 __NAMESPACE_STD_END
 #include <local/stdio/fgetc.h>
 __NAMESPACE_STD_BEGIN
 /* Alias for `fgetc()' */
-__FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL getc)(FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetc))(__stream); }
+__FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL getc)(FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetc))(__stream); }
 #else /* CUSTOM: fgetc */
 #undef __std_getc_defined
 #endif /* getc... */
@@ -579,7 +613,7 @@ __CDECLARE(,int,,getchar,(void),()) __THROWS(...)
 #elif defined(__CRT_HAVE__fgetchar)
 /* Alias for `fgetc(stdin)' */
 __CREDIRECT(,int,,getchar,(void),_fgetchar,()) __THROWS(...)
-#elif !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock))))
+#elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked))
 __NAMESPACE_STD_END
 #include <local/stdio/getchar.h>
 __NAMESPACE_STD_BEGIN
@@ -609,7 +643,13 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,,fputc,(int __ch, FILE *__restrict __stream)
 #elif defined(__CRT_HAVE__IO_putc)
 /* Write a single character `CH' to `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,,fputc,(int __ch, FILE *__restrict __stream),_IO_putc,(__ch,__stream)) __THROWS(...)
-#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))
+#elif defined(__CRT_HAVE_fputc_unlocked)
+/* Write a single character `CH' to `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,,fputc,(int __ch, FILE *__restrict __stream),fputc_unlocked,(__ch,__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_putc_unlocked)
+/* Write a single character `CH' to `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,,fputc,(int __ch, FILE *__restrict __stream),putc_unlocked,(__ch,__stream)) __THROWS(...)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite)
 __NAMESPACE_STD_END
 #include <local/stdio/fputc.h>
 __NAMESPACE_STD_BEGIN
@@ -622,35 +662,35 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fputc, __FORCELOCAL __ATTR_NONNULL((2)) int (__L
 #ifndef __std_putc_defined
 #define __std_putc_defined 1
 #if __has_builtin(__builtin_fputc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputc)
-/* Alias for `fputc()' */
-__FORCELOCAL __ATTR_NONNULL((2)) int (__LIBCCALL putc)(int __ch, FILE *__restrict __stream) __THROWS(...) { return __builtin_fputc(__ch, __stream); }
-#elif defined(__CRT_HAVE_putc_unlocked) && (defined(__USE_STDIO_UNLOCKED))
-/* Alias for `fputc()' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,,putc,(int __ch, FILE *__restrict __stream),putc_unlocked,(__ch,__stream)) __THROWS(...)
+/* Alias for `fgetc()' */
+__FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL putc)(int __ch, FILE *__restrict __stream) { return __builtin_fputc(__ch, __stream); }
 #elif defined(__CRT_HAVE_fputc_unlocked) && (defined(__USE_STDIO_UNLOCKED))
-/* Alias for `fputc()' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,,putc,(int __ch, FILE *__restrict __stream),fputc_unlocked,(__ch,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_putc)
-/* Alias for `fputc()' */
-__CDECLARE(__ATTR_NONNULL((2)),int,,putc,(int __ch, FILE *__restrict __stream),(__ch,__stream)) __THROWS(...)
+/* Alias for `fgetc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,putc,(int __ch, FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
+#elif defined(__CRT_HAVE_putc_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+/* Alias for `fgetc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,putc,(int __ch, FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc)
-/* Alias for `fputc()' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,,putc,(int __ch, FILE *__restrict __stream),fputc,(__ch,__stream)) __THROWS(...)
+/* Alias for `fgetc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,putc,(int __ch, FILE *__restrict __stream),fputc,(__ch,__stream))
+#elif defined(__CRT_HAVE_putc)
+/* Alias for `fgetc()' */
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,putc,(int __ch, FILE *__restrict __stream),(__ch,__stream))
 #elif defined(__CRT_HAVE__IO_putc)
-/* Alias for `fputc()' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,,putc,(int __ch, FILE *__restrict __stream),_IO_putc,(__ch,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_putc_unlocked)
-/* Alias for `fputc()' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,,putc,(int __ch, FILE *__restrict __stream),putc_unlocked,(__ch,__stream)) __THROWS(...)
+/* Alias for `fgetc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,putc,(int __ch, FILE *__restrict __stream),_IO_putc,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc_unlocked)
-/* Alias for `fputc()' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,,putc,(int __ch, FILE *__restrict __stream),fputc_unlocked,(__ch,__stream)) __THROWS(...)
-#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))
+/* Alias for `fgetc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,putc,(int __ch, FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
+#elif defined(__CRT_HAVE_putc_unlocked)
+/* Alias for `fgetc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,putc,(int __ch, FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite)
 __NAMESPACE_STD_END
 #include <local/stdio/fputc.h>
 __NAMESPACE_STD_BEGIN
-/* Alias for `fputc()' */
-__FORCELOCAL __ATTR_NONNULL((2)) int (__LIBCCALL putc)(int __ch, FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputc))(__ch, __stream); }
+/* Alias for `fgetc()' */
+__FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL putc)(int __ch, FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputc))(__ch, __stream); }
 #else /* CUSTOM: fputc */
 #undef __std_putc_defined
 #endif /* putc... */
@@ -672,7 +712,7 @@ __CREDIRECT(,int,,putchar,(int __ch),_fputchar,(__ch)) __THROWS(...)
 #elif defined(__CRT_HAVE_putchar_unlocked)
 /* Alias for `fputc(CH, stdout)' */
 __CREDIRECT(,int,,putchar,(int __ch),putchar_unlocked,(__ch)) __THROWS(...)
-#elif !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock))))
+#elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))
 __NAMESPACE_STD_END
 #include <local/stdio/putchar.h>
 __NAMESPACE_STD_BEGIN
@@ -699,7 +739,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char *,,fgets,(char *__restrict
  * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `BUF')
  * Afterwards, append a trailing NUL-character and re-return `BUF', or return `NULL' if an error occurred. */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char *,,fgets,(char *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream),fgets_unlocked,(__buf,__bufsize,__stream)) __THROWS(...)
-#elif (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked))
+#elif ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE__IO_ferror))
 __NAMESPACE_STD_END
 #include <local/stdio/fgets.h>
 __NAMESPACE_STD_BEGIN
@@ -725,11 +765,15 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,,fputs,(char const *__r
 /* Print a given string `STR' to `STREAM'. This is identical to:
  * >> fwrite(str, sizeof(char), strlen(str), stream); */
 __CDECLARE(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,,fputs,(char const *__restrict __str, FILE *__restrict __stream),(__str,__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__IO_fputs)
+/* Print a given string `STR' to `STREAM'. This is identical to:
+ * >> fwrite(str, sizeof(char), strlen(str), stream); */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,,fputs,(char const *__restrict __str, FILE *__restrict __stream),_IO_fputs,(__str,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fputs_unlocked)
 /* Print a given string `STR' to `STREAM'. This is identical to:
  * >> fwrite(str, sizeof(char), strlen(str), stream); */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,,fputs,(char const *__restrict __str, FILE *__restrict __stream),fputs_unlocked,(__str,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked)))
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked)
 __NAMESPACE_STD_END
 #include <local/stdio/fputs.h>
 __NAMESPACE_STD_BEGIN
@@ -754,7 +798,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,,puts,(char const *__restri
 #elif defined(__CRT_HAVE__IO_puts)
 /* Print a given string `STR', followed by a line-feed to `STDOUT' */
 __CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,,puts,(char const *__restrict __string),_IO_puts,(__string)) __THROWS(...)
-#elif !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE_fputs) || defined(__CRT_HAVE_fputs_unlocked))
+#elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputs) || defined(__CRT_HAVE__IO_fputs) || defined(__CRT_HAVE_fputs_unlocked)) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))
 __NAMESPACE_STD_END
 #include <local/stdio/puts.h>
 __NAMESPACE_STD_BEGIN
@@ -769,9 +813,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(puts, __FORCELOCAL __ATTR_NONNULL((1)) __STDC_IN
 #if defined(__CRT_HAVE_ungetc_unlocked) && (defined(__USE_STDIO_UNLOCKED))
 /* Unget a single character byte of data previously returned by `getc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,ungetc,(int __ch, FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
+#elif defined(__CRT_HAVE__ungetc_nolock) && (defined(__USE_STDIO_UNLOCKED))
+/* Unget a single character byte of data previously returned by `getc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,ungetc,(int __ch, FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
 #elif defined(__CRT_HAVE_ungetc)
 /* Unget a single character byte of data previously returned by `getc()' */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,ungetc,(int __ch, FILE *__restrict __stream),(__ch,__stream))
+#elif defined(__CRT_HAVE__IO_ungetc)
+/* Unget a single character byte of data previously returned by `getc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,ungetc,(int __ch, FILE *__restrict __stream),_IO_ungetc,(__ch,__stream))
+#elif defined(__CRT_HAVE_ungetc_unlocked)
+/* Unget a single character byte of data previously returned by `getc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,ungetc,(int __ch, FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
+#elif defined(__CRT_HAVE__ungetc_nolock)
+/* Unget a single character byte of data previously returned by `getc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,ungetc,(int __ch, FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
 #else /* LIBC: ungetc */
 #undef __std_ungetc_defined
 #endif /* ungetc... */
@@ -784,10 +840,22 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),size_t,,fread,(void *__restric
 #elif defined(__CRT_HAVE__fread_nolock) && (defined(__USE_STDIO_UNLOCKED))
 /* Read up to `ELEMSIZE * ELEMCOUNT' bytes of data from `STREAM' into `BUF' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),size_t,,fread,(void *__restrict __buf, size_t __elemsize, size_t __elemcount, FILE *__restrict __stream),_fread_nolock,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__IO_fread) && (defined(__USE_STDIO_UNLOCKED))
+/* Read up to `ELEMSIZE * ELEMCOUNT' bytes of data from `STREAM' into `BUF' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),size_t,,fread,(void *__restrict __buf, size_t __elemsize, size_t __elemcount, FILE *__restrict __stream),_IO_fread,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fread)
 /* Read up to `ELEMSIZE * ELEMCOUNT' bytes of data from `STREAM' into `BUF' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),size_t,,fread,(void *__restrict __buf, size_t __elemsize, size_t __elemcount, FILE *__restrict __stream),(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))
+#elif defined(__CRT_HAVE_fread_unlocked)
+/* Read up to `ELEMSIZE * ELEMCOUNT' bytes of data from `STREAM' into `BUF' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),size_t,,fread,(void *__restrict __buf, size_t __elemsize, size_t __elemcount, FILE *__restrict __stream),fread_unlocked,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__fread_nolock)
+/* Read up to `ELEMSIZE * ELEMCOUNT' bytes of data from `STREAM' into `BUF' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),size_t,,fread,(void *__restrict __buf, size_t __elemsize, size_t __elemcount, FILE *__restrict __stream),_fread_nolock,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__IO_fread)
+/* Read up to `ELEMSIZE * ELEMCOUNT' bytes of data from `STREAM' into `BUF' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),size_t,,fread,(void *__restrict __buf, size_t __elemsize, size_t __elemcount, FILE *__restrict __stream),_IO_fread,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)
 __NAMESPACE_STD_END
 #include <local/stdio/fread.h>
 __NAMESPACE_STD_BEGIN
@@ -808,13 +876,16 @@ __CREDIRECT(__ATTR_NONNULL((1, 4)),size_t,,fwrite,(void const *__restrict __buf,
 #elif defined(__CRT_HAVE__fwrite_nolock) && (defined(__USE_STDIO_UNLOCKED))
 /* Write up to `ELEMSIZE * ELEMCOUNT' bytes of data from `BUF' into `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1, 4)),size_t,,fwrite,(void const *__restrict __buf, size_t __elemsize, size_t __elemcount, FILE *__restrict __stream),_fwrite_nolock,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__IO_fwrite) && (defined(__USE_STDIO_UNLOCKED))
+/* Write up to `ELEMSIZE * ELEMCOUNT' bytes of data from `BUF' into `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1, 4)),size_t,,fwrite,(void const *__restrict __buf, size_t __elemsize, size_t __elemcount, FILE *__restrict __stream),_IO_fwrite,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fwrite)
 /* Write up to `ELEMSIZE * ELEMCOUNT' bytes of data from `BUF' into `STREAM' */
 __CDECLARE(__ATTR_NONNULL((1, 4)),size_t,,fwrite,(void const *__restrict __buf, size_t __elemsize, size_t __elemcount, FILE *__restrict __stream),(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fwrite_s)
 /* Write up to `ELEMSIZE * ELEMCOUNT' bytes of data from `BUF' into `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1, 4)),size_t,,fwrite,(void const *__restrict __buf, size_t __elemsize, size_t __elemcount, FILE *__restrict __stream),fwrite_s,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked)
 __NAMESPACE_STD_END
 #include <local/stdio/fwrite.h>
 __NAMESPACE_STD_BEGIN
@@ -829,25 +900,37 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fwrite, __FORCELOCAL __ATTR_NONNULL((1, 4)) size
 #if defined(__CRT_HAVE_fseek_unlocked) && (defined(__USE_STDIO_UNLOCKED))
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseek,(FILE *__restrict __stream, long int __off, int __whence),fseek_unlocked,(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseeko_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == 4
+#elif defined(__CRT_HAVE__fseek_nolock) && (defined(__USE_STDIO_UNLOCKED))
+/* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseek,(FILE *__restrict __stream, long int __off, int __whence),_fseek_nolock,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseeko_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseek,(FILE *__restrict __stream, long int __off, int __whence),fseeko_unlocked,(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseeko64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == 8
+#elif defined(__CRT_HAVE_fseeko64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseek,(FILE *__restrict __stream, long int __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE__fseeki64_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
+/* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseek,(FILE *__restrict __stream, long int __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence)) __THROWS(...)
 #elif defined(__CRT_HAVE_fseek)
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CDECLARE(__ATTR_NONNULL((1)),int,,fseek,(FILE *__restrict __stream, long int __off, int __whence),(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseeko) && (__SIZEOF_LONG__ == 4)
+#elif defined(__CRT_HAVE_fseek_unlocked)
+/* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseek,(FILE *__restrict __stream, long int __off, int __whence),fseek_unlocked,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE__fseek_nolock)
+/* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseek,(FILE *__restrict __stream, long int __off, int __whence),_fseek_nolock,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseeko) && (__SIZEOF_LONG__ == __SIZEOF_OFF32_T__)
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseek,(FILE *__restrict __stream, long int __off, int __whence),fseeko,(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseeko64) && (__SIZEOF_LONG__ == 8)
+#elif defined(__CRT_HAVE_fseeko64) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseek,(FILE *__restrict __stream, long int __off, int __whence),fseeko64,(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE__fseeki64) && (__SIZEOF_LONG__ == 8)
+#elif defined(__CRT_HAVE__fseeki64) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseek,(FILE *__restrict __stream, long int __off, int __whence),_fseeki64,(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE__fseeki64) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseeko64_unlocked)))
+#elif defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64)
 __NAMESPACE_STD_END
 #include <local/stdio/fseek.h>
 __NAMESPACE_STD_BEGIN
@@ -862,25 +945,34 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fseek, __FORCELOCAL __ATTR_NONNULL((1)) int (__L
 #if defined(__CRT_HAVE_ftell_unlocked) && (defined(__USE_STDIO_UNLOCKED))
 /* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,,ftell,(FILE *__restrict __stream),ftell_unlocked,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_ftello_unlocked) && __SIZEOF_LONG__ == 4 && defined(__USE_STDIO_UNLOCKED)
+#elif defined(__CRT_HAVE__ftell_nolock) && (defined(__USE_STDIO_UNLOCKED))
+/* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,,ftell,(FILE *__restrict __stream),_ftell_nolock,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_ftello_unlocked) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__ && defined(__USE_STDIO_UNLOCKED)
 /* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,,ftell,(FILE *__restrict __stream),ftello_unlocked,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_ftello64_unlocked) && __SIZEOF_LONG__ == 8 && defined(__USE_STDIO_UNLOCKED)
+#elif defined(__CRT_HAVE_ftello64_unlocked) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__ && defined(__USE_STDIO_UNLOCKED)
 /* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,,ftell,(FILE *__restrict __stream),ftello64_unlocked,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__ftelli64_nolock) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__ && defined(__USE_STDIO_UNLOCKED)
+/* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,,ftell,(FILE *__restrict __stream),_ftelli64_nolock,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_ftell)
 /* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,,ftell,(FILE *__restrict __stream),(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_ftello) && (__SIZEOF_LONG__ == 4)
+#elif defined(__CRT_HAVE__IO_ftell)
+/* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,,ftell,(FILE *__restrict __stream),_IO_ftell,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_ftello) && (__SIZEOF_LONG__ == __SIZEOF_OFF32_T__)
 /* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,,ftell,(FILE *__restrict __stream),ftello,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_ftello64) && (__SIZEOF_LONG__ == 8)
+#elif defined(__CRT_HAVE_ftello64) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
 /* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,,ftell,(FILE *__restrict __stream),ftello64,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE__ftelli64) && (__SIZEOF_LONG__ == 8)
+#elif defined(__CRT_HAVE__ftelli64) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
 /* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),long int,,ftell,(FILE *__restrict __stream),_ftelli64,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE__ftelli64) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftello64_unlocked)))
+#elif defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_ftello_unlocked)
 __NAMESPACE_STD_END
 #include <local/stdio/ftell.h>
 __NAMESPACE_STD_BEGIN
@@ -892,9 +984,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ftell, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNUL
 #endif /* !__std_ftell_defined */
 #ifndef __std_rewind_defined
 #define __std_rewind_defined 1
-#ifdef __CRT_HAVE_rewind
+#if defined(__CRT_HAVE_rewind_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+/* Rewind the current in-file position of `STREAM' to its starting position */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),,rewind,(FILE *__restrict __stream),rewind_unlocked,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_rewind)
 /* Rewind the current in-file position of `STREAM' to its starting position */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),,rewind,(FILE *__restrict __stream),(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_rewind_unlocked)
+/* Rewind the current in-file position of `STREAM' to its starting position */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),,rewind,(FILE *__restrict __stream),rewind_unlocked,(__stream)) __THROWS(...)
 #else /* LIBC: rewind */
 #undef __std_rewind_defined
 #endif /* rewind... */
@@ -943,6 +1041,9 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror,(FILE *__
 #elif defined(__CRT_HAVE_ferror_unlocked)
 /* Check if an I/O error occurred in `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror,(FILE *__restrict __stream),ferror_unlocked,(__stream))
+#elif defined(__CRT_HAVE__IO_ferror)
+/* Check if an I/O error occurred in `STREAM' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror,(FILE *__restrict __stream),_IO_ferror,(__stream))
 #else /* LIBC: ferror */
 #undef __std_ferror_defined
 #endif /* ferror... */
@@ -986,6 +1087,9 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),FILE *,__NOTHROW_RPC,fopen,(ch
 #elif defined(__CRT_HAVE_fopen)
 /* Create and return a new file-stream for accessing `FILENAME' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),FILE *,__NOTHROW_RPC,fopen,(char const *__restrict __filename, char const *__restrict __modes),(__filename,__modes))
+#elif defined(__CRT_HAVE__IO_fopen)
+/* Create and return a new file-stream for accessing `FILENAME' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),FILE *,__NOTHROW_RPC,fopen,(char const *__restrict __filename, char const *__restrict __modes),_IO_fopen,(__filename,__modes))
 #elif defined(__CRT_HAVE_fopen64)
 /* Create and return a new file-stream for accessing `FILENAME' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),FILE *,__NOTHROW_RPC,fopen,(char const *__restrict __filename, char const *__restrict __modes),fopen64,(__filename,__modes))
@@ -1038,7 +1142,11 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fgetpos,(FILE *__restrict __stream, fpos
 /* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
  * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,,fgetpos,(FILE *__restrict __stream, fpos_t *__restrict __pos),(__stream,__pos)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello64) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64)))
+#elif defined(__CRT_HAVE__IO_fgetpos)
+/* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
+ * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fgetpos,(FILE *__restrict __stream, fpos_t *__restrict __pos),_IO_fgetpos,(__stream,__pos)) __THROWS(...)
+#elif defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock) || defined(__CRT_HAVE__IO_ftell)
 __NAMESPACE_STD_END
 #include <local/stdio/fgetpos.h>
 __NAMESPACE_STD_BEGIN
@@ -1063,7 +1171,10 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fsetpos,(FILE *__restrict __stream, fpos
 #elif defined(__CRT_HAVE_fsetpos) && (!defined(__USE_FILE_OFFSET64))
 /* Set the file position of `STREAM' to `POS', as previously initialized with a call to `fgetpos()' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,,fsetpos,(FILE *__restrict __stream, fpos_t const *__restrict __pos),(__stream,__pos)) __THROWS(...)
-#elif defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE__fseeki64) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fsetpos_unlocked) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseeko64_unlocked)))
+#elif defined(__CRT_HAVE__IO_fsetpos)
+/* Set the file position of `STREAM' to `POS', as previously initialized with a call to `fgetpos()' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fsetpos,(FILE *__restrict __stream, fpos_t const *__restrict __pos),_IO_fsetpos,(__stream,__pos)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
 __NAMESPACE_STD_END
 #include <local/stdio/fsetpos.h>
 __NAMESPACE_STD_BEGIN
@@ -1091,7 +1202,15 @@ __CDECLARE(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_T
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,,vfprintf,(FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfprintf_s,(__stream,__format,__args)) __THROWS(...)
-#elif defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked)
+#elif defined(__CRT_HAVE__IO_vfprintf)
+/* Print data to `STREAM', following `FORMAT'
+ * Return the number of successfully printed bytes */
+__CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,,vfprintf,(FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),_IO_vfprintf,(__stream,__format,__args)) __THROWS(...)
+#elif defined(__CRT_HAVE_vfprintf_unlocked)
+/* Print data to `STREAM', following `FORMAT'
+ * Return the number of successfully printed bytes */
+__CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,,vfprintf,(FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfprintf_unlocked,(__stream,__format,__args)) __THROWS(...)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked)
 __NAMESPACE_STD_END
 #include <local/stdio/vfprintf.h>
 __NAMESPACE_STD_BEGIN
@@ -1116,11 +1235,19 @@ __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fprintf)(FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("fprintf");
+#elif defined(__CRT_HAVE__IO_fprintf) && (!defined(__NO_ASMNAME))
+/* Print data to `STREAM', following `FORMAT'
+ * Return the number of successfully printed bytes */
+__LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fprintf)(FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("_IO_fprintf");
 #elif defined(__CRT_HAVE_fprintf_s) && (!defined(__NO_ASMNAME))
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fprintf)(FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_s");
-#elif defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || (defined(__CRT_HAVE_vfprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s)
+#elif defined(__CRT_HAVE_fprintf_unlocked) && (!defined(__NO_ASMNAME))
+/* Print data to `STREAM', following `FORMAT'
+ * Return the number of successfully printed bytes */
+__LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fprintf)(FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_unlocked");
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked)
 __NAMESPACE_STD_END
 #include <local/stdio/fprintf.h>
 __NAMESPACE_STD_BEGIN
@@ -1153,7 +1280,11 @@ __CDECLARE(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SSIZE_T,,v
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 __CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SSIZE_T,,vprintf,(char const *__restrict __format, __builtin_va_list __args),vprintf_s,(__format,__args)) __THROWS(...)
-#elif !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || (defined(__CRT_HAVE_vfprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s))
+#elif defined(__CRT_HAVE_vprintf_unlocked)
+/* Print data to `stdout', following `FORMAT'
+ * Return the number of successfully printed bytes */
+__CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SSIZE_T,,vprintf,(char const *__restrict __format, __builtin_va_list __args),vprintf_unlocked,(__format,__args)) __THROWS(...)
+#elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked))
 __NAMESPACE_STD_END
 #include <local/stdio/vprintf.h>
 __NAMESPACE_STD_BEGIN
@@ -1178,11 +1309,19 @@ __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (__VLI
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (__VLIBCCALL printf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("printf");
+#elif defined(__CRT_HAVE__IO_printf) && (!defined(__NO_ASMNAME))
+/* Print data to `stdout', following `FORMAT'
+ * Return the number of successfully printed bytes */
+__LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (__VLIBCCALL printf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("_IO_printf");
 #elif defined(__CRT_HAVE_printf_s) && (!defined(__NO_ASMNAME))
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (__VLIBCCALL printf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("printf_s");
-#elif (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || (defined(__CRT_HAVE_vfprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s))) || (defined(__CRT_HAVE_vprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vprintf) || defined(__CRT_HAVE_vprintf_s)
+#elif defined(__CRT_HAVE_printf_unlocked) && (!defined(__NO_ASMNAME))
+/* Print data to `stdout', following `FORMAT'
+ * Return the number of successfully printed bytes */
+__LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (__VLIBCCALL printf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("printf_unlocked");
+#elif (!defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked))) || defined(__CRT_HAVE_vprintf) || defined(__CRT_HAVE_vprintf_s) || defined(__CRT_HAVE_vprintf_unlocked)
 __NAMESPACE_STD_END
 #include <local/stdio/printf.h>
 __NAMESPACE_STD_BEGIN
@@ -1223,11 +1362,19 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 0),__STDC
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 0),__STDC_INT_AS_SIZE_T,,vfscanf,(FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),_vfscanf_s,(__stream,__format,__args)) __THROWS(...)
+#elif defined(__CRT_HAVE__IO_vfscanf)
+/* Scan data from `STREAM', following `FORMAT'
+ * Return the number of successfully scanned data items */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 0),__STDC_INT_AS_SIZE_T,,vfscanf,(FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),_IO_vfscanf,(__stream,__format,__args)) __THROWS(...)
+#elif defined(__CRT_HAVE_vfscanf_unlocked)
+/* Scan data from `STREAM', following `FORMAT'
+ * Return the number of successfully scanned data items */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 0),__STDC_INT_AS_SIZE_T,,vfscanf,(FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfscanf_unlocked,(__stream,__format,__args)) __THROWS(...)
 #elif defined(__CRT_HAVE___vfscanf)
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 0),__STDC_INT_AS_SIZE_T,,vfscanf,(FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),__vfscanf,(__stream,__format,__args)) __THROWS(...)
-#elif (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc))
+#elif ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))
 __NAMESPACE_STD_END
 #include <local/stdio/vfscanf.h>
 __NAMESPACE_STD_BEGIN
@@ -1258,7 +1405,11 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0),__STDC_INT
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SIZE_T,,vscanf,(char const *__restrict __format, __builtin_va_list __args),_vscanf,(__format,__args)) __THROWS(...)
-#elif !defined(__NO_STDSTREAMS) && (((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc))) || (defined(__CRT_HAVE_vfscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE___vfscanf))
+#elif defined(__CRT_HAVE_vscanf_unlocked)
+/* Scan data from `stdin', following `FORMAT'
+ * Return the number of successfully scanned data items */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SIZE_T,,vscanf,(char const *__restrict __format, __builtin_va_list __args),vscanf_unlocked,(__format,__args)) __THROWS(...)
+#elif !defined(__NO_STDSTREAMS) && ((((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf))
 __NAMESPACE_STD_END
 #include <local/stdio/vscanf.h>
 __NAMESPACE_STD_BEGIN
@@ -1285,7 +1436,11 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL fscanf)(FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("fscanf");
-#elif ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc))) || (defined(__CRT_HAVE_vfscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE___vfscanf)
+#elif defined(__CRT_HAVE_fscanf_unlocked) && (!defined(__NO_ASMNAME))
+/* Scan data from `STREAM', following `FORMAT'
+ * Return the number of successfully scanned data items */
+__LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL fscanf)(FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fscanf_unlocked");
+#elif (((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf)
 __NAMESPACE_STD_END
 #include <local/stdio/fscanf.h>
 __NAMESPACE_STD_BEGIN
@@ -1314,7 +1469,11 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (__VLIBCCALL scanf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("scanf");
-#elif (!defined(__NO_STDSTREAMS) && (((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc))) || (defined(__CRT_HAVE_vfscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE___vfscanf))) || (defined(__CRT_HAVE_vscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vscanf) || defined(__CRT_HAVE__vscanf)
+#elif defined(__CRT_HAVE_scanf_unlocked) && (!defined(__NO_ASMNAME))
+/* Scan data from `stdin', following `FORMAT'
+ * Return the number of successfully scanned data items */
+__LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (__VLIBCCALL scanf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("scanf_unlocked");
+#elif (!defined(__NO_STDSTREAMS) && ((((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf))) || defined(__CRT_HAVE_vscanf) || defined(__CRT_HAVE__vscanf) || defined(__CRT_HAVE_vscanf_unlocked)
 __NAMESPACE_STD_END
 #include <local/stdio/scanf.h>
 __NAMESPACE_STD_BEGIN
@@ -1337,7 +1496,9 @@ __NAMESPACE_LOCAL_USING(scanf)
 __NAMESPACE_GLB_USING(gets)
 #elif defined(__CRT_HAVE_gets)
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_DEPRECATED("No buffer size checks (use `fgets' instead)"),char *,,gets,(char *__restrict __buf),(__buf)) __THROWS(...)
-#elif !defined(__NO_STDSTREAMS) && (((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked))) || defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE_fgets_unlocked))
+#elif defined(__CRT_HAVE__IO_gets)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_DEPRECATED("No buffer size checks (use `fgets' instead)"),char *,,gets,(char *__restrict __buf),_IO_gets,(__buf)) __THROWS(...)
+#elif !defined(__NO_STDSTREAMS) && ((((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE__IO_ferror))) || defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE_fgets_unlocked))
 __NAMESPACE_STD_END
 #include <local/stdio/gets.h>
 __NAMESPACE_STD_BEGIN
@@ -1394,6 +1555,10 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL sscanf)(char const *__restrict __input, char const *__restrict __format, ...) __CASMNAME_SAME("sscanf");
+#elif defined(__CRT_HAVE__IO_sscanf) && (!defined(__NO_ASMNAME))
+/* Scan data from a given `INPUT' string, following `FORMAT'
+ * Return the number of successfully scanned data items */
+__LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL sscanf)(char const *__restrict __input, char const *__restrict __format, ...) __CASMNAME("_IO_sscanf");
 #else /* LIBC: sscanf */
 __NAMESPACE_STD_END
 #include <local/stdio/sscanf.h>
@@ -1415,6 +1580,10 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __CDECLARE(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,vsprintf,(char *__restrict __dest, char const *__restrict __format, __builtin_va_list __args),(__dest,__format,__args))
+#elif defined(__CRT_HAVE__IO_vsprintf)
+/* Print a formatted string to a given in-member string buffer `BUF'
+ * Return the number of written characters, excluding a trailing NUL-character */
+__CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,vsprintf,(char *__restrict __dest, char const *__restrict __format, __builtin_va_list __args),_IO_vsprintf,(__dest,__format,__args))
 #else /* LIBC: vsprintf */
 __NAMESPACE_STD_END
 #include <local/stdio/vsprintf.h>
@@ -1433,6 +1602,10 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL sprintf)(char *__restrict __buf, char const *__restrict __format, ...) __CASMNAME_SAME("sprintf");
+#elif defined(__CRT_HAVE__IO_sprintf) && (!defined(__NO_ASMNAME))
+/* Print a formatted string to a given in-member string buffer `BUF'
+ * Return the number of written characters, excluding a trailing NUL-character */
+__LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL sprintf)(char *__restrict __buf, char const *__restrict __format, ...) __CASMNAME("_IO_sprintf");
 #else /* LIBC: sprintf */
 __NAMESPACE_STD_END
 #include <local/stdio/sprintf.h>
@@ -1731,7 +1904,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tmpnam_r, __FORCELOCAL __ATTR_WUNUSED __ATTR_NON
 #ifdef __CRT_HAVE_setbuffer
 /* Specify the location and size for the buffer to-be used by `STREAM' */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,setbuffer,(__FILE *__restrict __stream, char *__buf, __SIZE_TYPE__ __bufsize),(__stream,__buf,__bufsize))
-#elif defined(__CRT_HAVE_setvbuf)
+#elif defined(__CRT_HAVE__IO_setbuffer)
+/* Specify the location and size for the buffer to-be used by `STREAM' */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,setbuffer,(__FILE *__restrict __stream, char *__buf, __SIZE_TYPE__ __bufsize),_IO_setbuffer,(__stream,__buf,__bufsize))
+#elif defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)
 #include <local/stdio/setbuffer.h>
 /* Specify the location and size for the buffer to-be used by `STREAM' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(setbuffer, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL setbuffer)(__FILE *__restrict __stream, char *__buf, __SIZE_TYPE__ __bufsize) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setbuffer))(__stream, __buf, __bufsize); })
@@ -1739,7 +1915,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(setbuffer, __FORCELOCAL __ATTR_NONNULL((1)) void
 #ifdef __CRT_HAVE_setlinebuf
 /* Change the given `STREAM' to become line-buffered */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,setlinebuf,(__FILE *__restrict __stream),(__stream))
-#elif defined(__CRT_HAVE_setvbuf)
+#elif defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)
 #include <local/stdio/setlinebuf.h>
 /* Change the given `STREAM' to become line-buffered */
 __NAMESPACE_LOCAL_USING_OR_IMPL(setlinebuf, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL setlinebuf)(__FILE *__restrict __stream) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setlinebuf))(__stream); })
@@ -1747,19 +1923,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(setlinebuf, __FORCELOCAL __ATTR_NONNULL((1)) voi
 #ifdef __CRT_HAVE_fflush_unlocked
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
 __CDECLARE(,int,,fflush_unlocked,(__FILE *__stream),(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fflush)
-/* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(,int,,fflush_unlocked,(__FILE *__stream),fflush,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE__fflush_nolock)
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(,int,,fflush_unlocked,(__FILE *__stream),_fflush_nolock,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fflush)
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(,int,,fflush_unlocked,(__FILE *__stream),fflush,(__stream)) __THROWS(...)
-#else /* LIBC: fflush */
-#include <local/stdio/fflush.h>
+#elif defined(__CRT_HAVE__IO_fflush)
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
-__FORCELOCAL int (__LIBCCALL fflush_unlocked)(__FILE *__stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fflush))(__stream); }
+__CREDIRECT(,int,,fflush_unlocked,(__FILE *__stream),_IO_fflush,(__stream)) __THROWS(...)
+#else /* LIBC: fflush_unlocked */
+#include <local/stdio/fflush_unlocked.h>
+/* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(fflush_unlocked, __FORCELOCAL int (__LIBCCALL fflush_unlocked)(__FILE *__stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fflush_unlocked))(__stream); })
 #endif /* fflush_unlocked... */
 #ifdef __CRT_HAVE_fread_unlocked
 /* Same as `fread()', but performs I/O without acquiring a lock to `STREAM' */
@@ -1767,10 +1943,13 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,fread_unlocked,(
 #elif defined(__CRT_HAVE__fread_nolock)
 /* Same as `fread()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_fread_nolock,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__IO_fread)
+/* Same as `fread()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_IO_fread,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fread)
 /* Same as `fread()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_s)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf)))
 #include <local/stdio/fread_unlocked.h>
 /* Same as `fread()', but performs I/O without acquiring a lock to `STREAM' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fread_unlocked, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 4)) __SIZE_TYPE__ (__LIBCCALL fread_unlocked)(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fread_unlocked))(__buf, __elemsize, __elemcount, __stream); })
@@ -1784,13 +1963,19 @@ __CDECLARE(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,fwrite_unlocked,(void const *__
 #elif defined(__CRT_HAVE__fwrite_nolock)
 /* Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,fwrite_unlocked,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_fwrite_nolock,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__IO_fwrite)
+/* Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,fwrite_unlocked,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_IO_fwrite,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_)
+/* Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,fwrite_unlocked,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fwrite)
 /* Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,fwrite_unlocked,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fwrite_s)
 /* Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,fwrite_unlocked,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite_s,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_HAVE_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE_fputc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE__IO_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf)))
 #include <local/stdio/fwrite_unlocked.h>
 /* Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fwrite_unlocked, __FORCELOCAL __ATTR_NONNULL((1, 4)) __SIZE_TYPE__ (__LIBCCALL fwrite_unlocked)(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fwrite_unlocked))(__buf, __elemsize, __elemcount, __stream); })
@@ -1838,7 +2023,10 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,,fgetc_unlocked,(__FILE *__restrict __stream
 #elif defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
 /* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fgetc_unlocked,(__FILE *__restrict __stream),fgetc,(__stream)) __THROWS(...)
-#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_s)
+#elif defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
+/* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fgetc_unlocked,(__FILE *__restrict __stream),_IO_getc,(__stream)) __THROWS(...)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread)
 #include <local/stdio/fgetc_unlocked.h>
 /* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fgetc_unlocked, __FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL fgetc_unlocked)(__FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetc_unlocked))(__stream); })
@@ -1858,7 +2046,10 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,,fputc_unlocked,(int __ch, __FILE *__restric
 #elif defined(__CRT_HAVE_fputc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))
 /* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,,fputc_unlocked,(int __ch, __FILE *__restrict __stream),fputc,(__ch,__stream)) __THROWS(...)
-#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s)
+#elif defined(__CRT_HAVE__IO_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))
+/* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,,fputc_unlocked,(int __ch, __FILE *__restrict __stream),_IO_putc,(__ch,__stream)) __THROWS(...)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s)
 #include <local/stdio/fputc_unlocked.h>
 /* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fputc_unlocked, __FORCELOCAL __ATTR_NONNULL((2)) int (__LIBCCALL fputc_unlocked)(int __ch, __FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputc_unlocked))(__ch, __stream); })
@@ -1882,6 +2073,10 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),__FILE *,__NOTHROW_NCX,fdopen,(__f
 /* Open a new file stream by inheriting a given file descriptor `FD'
  * Note that upon success (`return != NULL'), the given `FD' will be `close()'d once `fclose(return)' is called */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__FILE *,__NOTHROW_NCX,fdopen,(__fd_t __fd, char const *__restrict __modes),_fdopen,(__fd,__modes))
+#elif defined(__CRT_HAVE__IO_fdopen)
+/* Open a new file stream by inheriting a given file descriptor `FD'
+ * Note that upon success (`return != NULL'), the given `FD' will be `close()'d once `fclose(return)' is called */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__FILE *,__NOTHROW_NCX,fdopen,(__fd_t __fd, char const *__restrict __modes),_IO_fdopen,(__fd,__modes))
 #endif /* fdopen... */
 #if defined(__CRT_HAVE_fileno_unlocked) && (defined(__USE_STDIO_UNLOCKED))
 /* Return the underlying file descriptor number used by `STREAM' */
@@ -1907,7 +2102,7 @@ __CDECLARE(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,open_memstream,(char **__bufloc
 #endif /* open_memstream... */
 #ifdef __CRT_HAVE_getdelim
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,,__getdelim,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, int __delimiter, __FILE *__restrict __stream),getdelim,(__lineptr,__pcount,__delimiter,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc))
+#elif defined(__CRT_HAVE_realloc) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))
 #include <local/stdio/getdelim.h>
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBCCALL __getdelim)(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, int __delimiter, __FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getdelim))(__lineptr, __pcount, __delimiter, __stream); }
 #endif /* __getdelim... */
@@ -1919,7 +2114,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,,getdelim,(ch
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,,getdelim,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, int __delimiter, __FILE *__restrict __stream),getdelim_unlocked,(__lineptr,__pcount,__delimiter,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE___getdelim)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,,getdelim,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, int __delimiter, __FILE *__restrict __stream),__getdelim,(__lineptr,__pcount,__delimiter,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc))
+#elif defined(__CRT_HAVE_realloc) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))
 #include <local/stdio/getdelim.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(getdelim, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBCCALL getdelim)(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, int __delimiter, __FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getdelim))(__lineptr, __pcount, __delimiter, __stream); })
 #endif /* getdelim... */
@@ -1929,7 +2124,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__SSIZE_TYPE__,,getline,(ch
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__SSIZE_TYPE__,,getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),(__lineptr,__pcount,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_getline_unlocked)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__SSIZE_TYPE__,,getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),getline_unlocked,(__lineptr,__pcount,__stream)) __THROWS(...)
-#elif (defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc))) || defined(__CRT_HAVE_getdelim) || defined(__CRT_HAVE_getdelim_unlocked) || defined(__CRT_HAVE___getdelim)
+#elif (defined(__CRT_HAVE_realloc) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))) || defined(__CRT_HAVE_getdelim) || defined(__CRT_HAVE_getdelim_unlocked) || defined(__CRT_HAVE___getdelim)
 #include <local/stdio/getline.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(getline, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __SSIZE_TYPE__ (__LIBCCALL getline)(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getline))(__lineptr, __pcount, __stream); })
 #endif /* getline... */
@@ -1948,14 +2143,17 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,,getc_unlocked,(__FILE *__restrict __stream)
 #elif defined(__CRT_HAVE_fgetc)
 /* Alias for `fgetc_unlocked()' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,getc_unlocked,(__FILE *__restrict __stream),fgetc,(__stream)) __THROWS(...)
-#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_s)
+#elif defined(__CRT_HAVE__IO_getc)
+/* Alias for `fgetc_unlocked()' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,getc_unlocked,(__FILE *__restrict __stream),_IO_getc,(__stream)) __THROWS(...)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread)
 #include <local/stdio/fgetc_unlocked.h>
 /* Alias for `fgetc_unlocked()' */
 __FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL getc_unlocked)(__FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetc_unlocked))(__stream); }
 #endif /* getc_unlocked... */
-#if __has_builtin(__builtin_fputc_unlocked) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputc_unlocked)
+#if __has_builtin(__builtin_putc_unlocked) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_putc_unlocked)
 /* Alias for `fputc_unlocked()' */
-__FORCELOCAL __ATTR_NONNULL((2)) int (__LIBCCALL putc_unlocked)(int __ch, __FILE *__restrict __stream) __THROWS(...) { return __builtin_fputc_unlocked(__ch, __stream); }
+__FORCELOCAL __ATTR_NONNULL((2)) int (__LIBCCALL putc_unlocked)(int __ch, __FILE *__restrict __stream) __THROWS(...) { return __builtin_putc_unlocked(__ch, __stream); }
 #elif defined(__CRT_HAVE_putc_unlocked)
 /* Alias for `fputc_unlocked()' */
 __CDECLARE(__ATTR_NONNULL((2)),int,,putc_unlocked,(int __ch, __FILE *__restrict __stream),(__ch,__stream)) __THROWS(...)
@@ -1968,7 +2166,10 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,,putc_unlocked,(int __ch, __FILE *__restrict
 #elif defined(__CRT_HAVE_fgetc)
 /* Alias for `fputc_unlocked()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,,putc_unlocked,(int __ch, __FILE *__restrict __stream),fgetc,(__ch,__stream)) __THROWS(...)
-#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s)
+#elif defined(__CRT_HAVE__IO_putc)
+/* Alias for `fputc_unlocked()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,,putc_unlocked,(int __ch, __FILE *__restrict __stream),_IO_putc,(__ch,__stream)) __THROWS(...)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s)
 #include <local/stdio/fputc_unlocked.h>
 /* Alias for `fputc_unlocked()' */
 __FORCELOCAL __ATTR_NONNULL((2)) int (__LIBCCALL putc_unlocked)(int __ch, __FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputc_unlocked))(__ch, __stream); }
@@ -1976,7 +2177,7 @@ __FORCELOCAL __ATTR_NONNULL((2)) int (__LIBCCALL putc_unlocked)(int __ch, __FILE
 #ifdef __CRT_HAVE_getchar_unlocked
 /* Same as `getchar()', but performs I/O without acquiring a lock to `stdin' */
 __CDECLARE(,int,,getchar_unlocked,(void),()) __THROWS(...)
-#elif !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_s))
+#elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))))
 #include <local/stdio/getchar_unlocked.h>
 /* Same as `getchar()', but performs I/O without acquiring a lock to `stdin' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getchar_unlocked, __FORCELOCAL int (__LIBCCALL getchar_unlocked)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getchar_unlocked))(); })
@@ -1987,7 +2188,7 @@ __FORCELOCAL int (__LIBCCALL putchar_unlocked)(int __ch) __THROWS(...) { return 
 #elif defined(__CRT_HAVE_putchar_unlocked)
 /* Same as `putchar()', but performs I/O without acquiring a lock to `stdout' */
 __CDECLARE(,int,,putchar_unlocked,(int __ch),(__ch)) __THROWS(...)
-#elif !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s))
+#elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_HAVE_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE_fputc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE__IO_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))))
 #include <local/stdio/putchar_unlocked.h>
 /* Same as `putchar()', but performs I/O without acquiring a lock to `stdout' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(putchar_unlocked, __FORCELOCAL int (__LIBCCALL putchar_unlocked)(int __ch) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putchar_unlocked))(__ch); })
@@ -1998,6 +2199,9 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,flockfile,(__FILE *__restrict 
 #elif defined(__CRT_HAVE__lock_file)
 /* Acquire a lock to `STREAM' and block until doing so succeeds */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,flockfile,(__FILE *__restrict __stream),_lock_file,(__stream))
+#elif defined(__CRT_HAVE__IO_flockfile)
+/* Acquire a lock to `STREAM' and block until doing so succeeds */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,flockfile,(__FILE *__restrict __stream),_IO_flockfile,(__stream))
 #endif /* flockfile... */
 #ifdef __CRT_HAVE_funlockfile
 /* Release a previously acquired lock from `STREAM' */
@@ -2005,10 +2209,16 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,funlockfile,(__FILE *__restric
 #elif defined(__CRT_HAVE__unlock_file)
 /* Release a previously acquired lock from `STREAM' */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,funlockfile,(__FILE *__restrict __stream),_unlock_file,(__stream))
+#elif defined(__CRT_HAVE__IO_funlockfile)
+/* Release a previously acquired lock from `STREAM' */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,funlockfile,(__FILE *__restrict __stream),_IO_funlockfile,(__stream))
 #endif /* funlockfile... */
 #ifdef __CRT_HAVE_ftrylockfile
 /* Try to acquire a lock to `STREAM' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ftrylockfile,(__FILE *__restrict __stream),(__stream))
+#elif defined(__CRT_HAVE__IO_ftrylockfile)
+/* Try to acquire a lock to `STREAM' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ftrylockfile,(__FILE *__restrict __stream),_IO_ftrylockfile,(__stream))
 #endif /* ftrylockfile... */
 #ifndef __ctermid_defined
 #define __ctermid_defined 1
@@ -2035,6 +2245,9 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,popen,(c
 #elif defined(__CRT_HAVE__popen)
 /* Open and return a new process I/O stream for executing `COMMAND' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,popen,(char const *__command, char const *__modes),_popen,(__command,__modes))
+#elif defined(__CRT_HAVE__IO_popen)
+/* Open and return a new process I/O stream for executing `COMMAND' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,popen,(char const *__command, char const *__modes),_IO_popen,(__command,__modes))
 #endif /* popen... */
 #ifdef __CRT_HAVE_pclose
 /* Close a process I/O file `STREAM' */
@@ -2052,7 +2265,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,,getw,(__FILE *__restrict __stream),(__stream
 #elif defined(__CRT_HAVE__getw)
 /* Similar to `getc()', but read 2 bytes */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,getw,(__FILE *__restrict __stream),_getw,(__stream)) __THROWS(...)
-#elif (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc))
+#elif ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))
 #include <local/stdio/getw.h>
 /* Similar to `getc()', but read 2 bytes */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getw, __FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL getw)(__FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getw))(__stream); })
@@ -2063,7 +2276,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,,putw,(int __w, __FILE *__restrict __stream),
 #elif defined(__CRT_HAVE__putw)
 /* Similar to `putc()', but write 2 bytes loaded from `W & 0xffff' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,,putw,(int __w, __FILE *__restrict __stream),_putw,(__w,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked)))
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked)
 #include <local/stdio/putw.h>
 /* Similar to `putc()', but write 2 bytes loaded from `W & 0xffff' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(putw, __FORCELOCAL __ATTR_NONNULL((2)) int (__LIBCCALL putw)(int __w, __FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putw))(__w, __stream); })
@@ -2090,7 +2303,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char *,,fgets_unlocked,(char *_
 #elif defined(__CRT_HAVE_fgets)
 /* Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char *,,fgets_unlocked,(char *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgets,(__buf,__bufsize,__stream)) __THROWS(...)
-#elif (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_s)) && (defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE_ungetc)) && (defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE_ferror))
+#elif ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf)))) && (defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc)) && (defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE_ferror))
 #include <local/stdio/fgets_unlocked.h>
 /* Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fgets_unlocked, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char *(__LIBCCALL fgets_unlocked)(char *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgets_unlocked))(__buf, __bufsize, __stream); })
@@ -2104,7 +2317,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,,fputs_unlocked,(char con
 #elif defined(__CRT_HAVE_fputs)
 /* Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,,fputs_unlocked,(char const *__restrict __string, __FILE *__restrict __stream),fputs,(__string,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_HAVE_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE_fputc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE__IO_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || defined(__CRT_HAVE_)
 #include <local/stdio/fputs_unlocked.h>
 /* Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fputs_unlocked, __FORCELOCAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (__LIBCCALL fputs_unlocked)(char const *__restrict __string, __FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputs_unlocked))(__string, __stream); })
@@ -2129,12 +2342,18 @@ __NAMESPACE_LOCAL_USING(obstack_printf)
 #if defined(__CRT_HAVE_fseeko64_unlocked) && defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)
 /* Change the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE__fseeki64_nolock) && defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)
+/* Change the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence)) __THROWS(...)
 #elif defined(__CRT_HAVE_fseeko_unlocked) && defined(__USE_STDIO_UNLOCKED) && !defined(__USE_FILE_OFFSET64)
 /* Change the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseeko_unlocked,(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseek_unlocked) && ((defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64) && __SIZEOF_LONG__ == 8) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_LONG__ == 4))
+#elif defined(__CRT_HAVE_fseek_unlocked) && ((defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__))
 /* Change the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseek_unlocked,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE__fseek_nolock) && ((defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__))
+/* Change the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),_fseek_nolock,(__stream,__off,__whence)) __THROWS(...)
 #elif defined(__CRT_HAVE_fseeko64) && (defined(__USE_FILE_OFFSET64))
 /* Change the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseeko64,(__stream,__off,__whence)) __THROWS(...)
@@ -2144,10 +2363,25 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko,(__FILE *__restrict __stream, __FS_T
 #elif defined(__CRT_HAVE_fseeko) && (!defined(__USE_FILE_OFFSET64))
 /* Change the current in-file position of `STREAM' */
 __CDECLARE(__ATTR_NONNULL((1)),int,,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseek) && ((defined(__USE_FILE_OFFSET64) && __SIZEOF_LONG__ == 8) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_LONG__ == 4))
+#elif defined(__CRT_HAVE_fseek) && ((defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__))
 /* Change the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseek,(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseek) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek_unlocked)))
+#elif defined(__CRT_HAVE_fseek_unlocked) && ((defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__))
+/* Change the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseek_unlocked,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE__fseek_nolock) && ((defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__))
+/* Change the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),_fseek_nolock,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseeko64_unlocked) && (defined(__USE_FILE_OFFSET64))
+/* Change the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE__fseeki64_nolock) && (defined(__USE_FILE_OFFSET64))
+/* Change the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseeko_unlocked) && (!defined(__USE_FILE_OFFSET64))
+/* Change the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseeko_unlocked,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
 #include <local/stdio/fseeko.h>
 /* Change the current in-file position of `STREAM' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fseeko, __FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL fseeko)(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fseeko))(__stream, __off, __whence); })
@@ -2155,12 +2389,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fseeko, __FORCELOCAL __ATTR_NONNULL((1)) int (__
 #if defined(__CRT_HAVE_ftello64_unlocked) && defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),,ftello,(__FILE *__restrict __stream),ftello64_unlocked,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__ftelli64_nolock) && defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)
+/* Return the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),,ftello,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_ftello_unlocked) && defined(__USE_STDIO_UNLOCKED) && !defined(__USE_FILE_OFFSET64)
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),,ftello,(__FILE *__restrict __stream),ftello_unlocked,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_ftell_unlocked) && ((defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64) && __SIZEOF_LONG__ == 8) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_LONG__ == 4))
+#elif defined(__CRT_HAVE_ftell_unlocked) && ((defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__))
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),,ftello,(__FILE *__restrict __stream),ftell_unlocked,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__ftell_nolock) && ((defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__))
+/* Return the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),,ftello,(__FILE *__restrict __stream),_ftell_nolock,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_ftello64) && (defined(__USE_FILE_OFFSET64))
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),,ftello,(__FILE *__restrict __stream),ftello64,(__stream)) __THROWS(...)
@@ -2170,10 +2410,13 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),,ftello,(__FILE *_
 #elif defined(__CRT_HAVE_ftello) && (!defined(__USE_FILE_OFFSET64))
 /* Return the current in-file position of `STREAM' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),,ftello,(__FILE *__restrict __stream),(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_ftell) && ((defined(__USE_FILE_OFFSET64) && __SIZEOF_LONG__ == 8) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_LONG__ == 4))
+#elif defined(__CRT_HAVE_ftell) && ((defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__))
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),,ftello,(__FILE *__restrict __stream),ftell,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE__ftelli64) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftello64_unlocked)))
+#elif defined(__CRT_HAVE__IO_ftell) && ((defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__))
+/* Return the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),,ftello,(__FILE *__restrict __stream),_IO_ftell,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock) || defined(__CRT_HAVE__IO_ftell)
 #include <local/stdio/ftello.h>
 /* Return the current in-file position of `STREAM' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ftello, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __FS_TYPE(off) (__LIBCCALL ftello)(__FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftello))(__stream); })
@@ -2194,16 +2437,25 @@ __CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_RPC,tmpfile64,(void),tmpfile,())
 #if defined(__CRT_HAVE_fseeko64_unlocked) && (defined(__USE_STDIO_UNLOCKED))
 /* 64-bit variant of `fseeko' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE__fseeki64_nolock) && (defined(__USE_STDIO_UNLOCKED))
+/* 64-bit variant of `fseeko' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence)) __THROWS(...)
 #elif defined(__CRT_HAVE_fseeko64)
 /* 64-bit variant of `fseeko' */
 __CDECLARE(__ATTR_NONNULL((1)),int,,fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),(__stream,__off,__whence)) __THROWS(...)
 #elif defined(__CRT_HAVE__fseeki64)
 /* 64-bit variant of `fseeko' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),_fseeki64,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseeko64_unlocked)
+/* 64-bit variant of `fseeko' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE__fseeki64_nolock)
+/* 64-bit variant of `fseeko' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence)) __THROWS(...)
 #elif defined(__CRT_HAVE_fseeko) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* 64-bit variant of `fseeko' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseeko,(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseeko) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE_fseeko_unlocked)))
+#elif defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
 #include <local/stdio/fseeko64.h>
 /* 64-bit variant of `fseeko' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fseeko64, __FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL fseeko64)(__FILE *__restrict __stream, __off64_t __off, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fseeko64))(__stream, __off, __whence); })
@@ -2211,22 +2463,31 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fseeko64, __FORCELOCAL __ATTR_NONNULL((1)) int (
 #if defined(__CRT_HAVE_ftello64_unlocked) && (defined(__USE_STDIO_UNLOCKED))
 /* 64-bit variant of `ftello' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,,ftello64,(__FILE *__restrict __stream),ftello64_unlocked,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_ftell_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == 8
+#elif defined(__CRT_HAVE__ftelli64_nolock) && (defined(__USE_STDIO_UNLOCKED))
+/* 64-bit variant of `ftello' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,,ftello64,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_ftell_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
 /* 64-bit variant of `ftello' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,,ftello64,(__FILE *__restrict __stream),ftell_unlocked,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__ftell_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
+/* 64-bit variant of `ftello' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,,ftello64,(__FILE *__restrict __stream),_ftell_nolock,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_ftello64)
 /* 64-bit variant of `ftello' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,,ftello64,(__FILE *__restrict __stream),(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE__ftelli64)
 /* 64-bit variant of `ftello' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,,ftello64,(__FILE *__restrict __stream),_ftelli64,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_ftell) && (__SIZEOF_LONG__ == 8)
+#elif defined(__CRT_HAVE_ftell) && (__SIZEOF_OFF64_T__ == __SIZEOF_LONG__)
 /* 64-bit variant of `ftello' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,,ftello64,(__FILE *__restrict __stream),ftell,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__IO_ftell) && (__SIZEOF_OFF64_T__ == __SIZEOF_LONG__)
+/* 64-bit variant of `ftello' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,,ftello64,(__FILE *__restrict __stream),_IO_ftell,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_ftello) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* 64-bit variant of `ftello' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,,ftello64,(__FILE *__restrict __stream),ftello,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftello) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE_ftello_unlocked)))
+#elif defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock) || defined(__CRT_HAVE__IO_ftell)
 #include <local/stdio/ftello64.h>
 /* 64-bit variant of `ftello' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ftello64, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __off64_t (__LIBCCALL ftello64)(__FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftello64))(__stream); })
@@ -2266,24 +2527,36 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fgetpos64,(__FILE *__restrict __stream, 
 #elif defined(__CRT_HAVE_fgetpos64)
 /* 64-bit variant of `fgetpos' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,,fgetpos64,(__FILE *__restrict __stream, fpos64_t *__restrict __pos),(__stream,__pos)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetpos64_unlocked)
-/* 64-bit variant of `fgetpos' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fgetpos64,(__FILE *__restrict __stream, fpos64_t *__restrict __pos),fgetpos64_unlocked,(__stream,__pos)) __THROWS(...)
 #elif defined(__CRT_HAVE_fgetpos) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* 64-bit variant of `fgetpos' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fgetpos64,(__FILE *__restrict __stream, fpos64_t *__restrict __pos),fgetpos,(__stream,__pos)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64)
+#elif defined(__CRT_HAVE__IO_fgetpos64)
+/* 64-bit variant of `fgetpos' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fgetpos64,(__FILE *__restrict __stream, fpos64_t *__restrict __pos),_IO_fgetpos64,(__stream,__pos)) __THROWS(...)
+#elif defined(__CRT_HAVE_fgetpos64_unlocked)
+/* 64-bit variant of `fgetpos' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fgetpos64,(__FILE *__restrict __stream, fpos64_t *__restrict __pos),fgetpos64_unlocked,(__stream,__pos)) __THROWS(...)
+#elif defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock) || defined(__CRT_HAVE__IO_ftell)
 #include <local/stdio/fgetpos64.h>
 /* 64-bit variant of `fgetpos' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fgetpos64, __FORCELOCAL __ATTR_NONNULL((1, 2)) int (__LIBCCALL fgetpos64)(__FILE *__restrict __stream, fpos64_t *__restrict __pos) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetpos64))(__stream, __pos); })
 #endif /* fgetpos64... */
-#ifdef __CRT_HAVE_fsetpos64
+#if defined(__CRT_HAVE_fsetpos64_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+/* 64-bit variant of `fsetpos' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fsetpos64,(__FILE *__restrict __stream, fpos64_t const *__restrict __pos),fsetpos64_unlocked,(__stream,__pos)) __THROWS(...)
+#elif defined(__CRT_HAVE_fsetpos64)
 /* 64-bit variant of `fsetpos' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,,fsetpos64,(__FILE *__restrict __stream, fpos64_t const *__restrict __pos),(__stream,__pos)) __THROWS(...)
 #elif defined(__CRT_HAVE_fsetpos) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* 64-bit variant of `fsetpos' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fsetpos64,(__FILE *__restrict __stream, fpos64_t const *__restrict __pos),fsetpos,(__stream,__pos)) __THROWS(...)
-#elif defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE__fseeki64)
+#elif defined(__CRT_HAVE__IO_fsetpos64)
+/* 64-bit variant of `fsetpos' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fsetpos64,(__FILE *__restrict __stream, fpos64_t const *__restrict __pos),_IO_fsetpos64,(__stream,__pos)) __THROWS(...)
+#elif defined(__CRT_HAVE_fsetpos64_unlocked)
+/* 64-bit variant of `fsetpos' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fsetpos64,(__FILE *__restrict __stream, fpos64_t const *__restrict __pos),fsetpos64_unlocked,(__stream,__pos)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
 #include <local/stdio/fsetpos64.h>
 /* 64-bit variant of `fsetpos' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fsetpos64, __FORCELOCAL __ATTR_NONNULL((1, 2)) int (__LIBCCALL fsetpos64)(__FILE *__restrict __stream, fpos64_t const *__restrict __pos) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fsetpos64))(__stream, __pos); })
@@ -2300,7 +2573,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,,file_printer,(void *__arg, cha
 #elif defined(__CRT_HAVE_file_printer_unlocked)
 /* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,,file_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),file_printer_unlocked,(__arg,__data,__datalen)) __THROWS(...)
-#elif defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked)))
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked)
 #include <local/stdio/file_printer.h>
 /* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
 __NAMESPACE_LOCAL_USING_OR_IMPL(file_printer, __FORCELOCAL __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ (__LIBCCALL file_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(file_printer))(__arg, __data, __datalen); })
@@ -2311,7 +2584,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,,file_printer_unlocked,(void *_
 #elif defined(__CRT_HAVE_file_printer)
 /* Same as `file_printer()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,,file_printer_unlocked,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),file_printer,(__arg,__data,__datalen)) __THROWS(...)
-#elif defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_HAVE_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE_fputc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE__IO_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || defined(__CRT_HAVE_)
 #include <local/stdio/file_printer_unlocked.h>
 /* Same as `file_printer()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(file_printer_unlocked, __FORCELOCAL __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ (__LIBCCALL file_printer_unlocked)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(file_printer_unlocked))(__arg, __data, __datalen); })
@@ -2426,71 +2699,179 @@ __CDECLARE(__ATTR_NONNULL((1)),int,,fseek_unlocked,(__FILE *__restrict __stream,
 #elif defined(__CRT_HAVE_fseek)
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseek_unlocked,(__FILE *__restrict __stream, long int __off, int __whence),fseek,(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE__fseeki64) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseeko64_unlocked)))
+#elif defined(__CRT_HAVE__fseek_nolock)
+/* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseek_unlocked,(__FILE *__restrict __stream, long int __off, int __whence),_fseek_nolock,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseeko_unlocked) && (__SIZEOF_LONG__ == __SIZEOF_OFF32_T__)
+/* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseek_unlocked,(__FILE *__restrict __stream, long int __off, int __whence),fseeko_unlocked,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseeko) && (__SIZEOF_LONG__ == __SIZEOF_OFF32_T__)
+/* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseek_unlocked,(__FILE *__restrict __stream, long int __off, int __whence),fseeko,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseeko64_unlocked) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
+/* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseek_unlocked,(__FILE *__restrict __stream, long int __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE__fseeki64_nolock) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
+/* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseek_unlocked,(__FILE *__restrict __stream, long int __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseeko64) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
+/* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseek_unlocked,(__FILE *__restrict __stream, long int __off, int __whence),fseeko64,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE__fseeki64) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
+/* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseek_unlocked,(__FILE *__restrict __stream, long int __off, int __whence),_fseeki64,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64)
 #include <local/stdio/fseek.h>
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL fseek_unlocked)(__FILE *__restrict __stream, long int __off, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fseek))(__stream, __off, __whence); }
 #endif /* fseek_unlocked... */
-#ifdef __CRT_HAVE_fseeko_unlocked
-/* Change the current in-file position of `STREAM' */
-__CDECLARE(__ATTR_NONNULL((1)),int,,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseeko)
-/* Change the current in-file position of `STREAM' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseeko,(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseek) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek_unlocked)))
-#include <local/stdio/fseeko.h>
-/* Change the current in-file position of `STREAM' */
-__FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL fseeko_unlocked)(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fseeko))(__stream, __off, __whence); }
-#endif /* fseeko_unlocked... */
 #ifdef __CRT_HAVE_ftell_unlocked
 /* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CDECLARE(__ATTR_NONNULL((1)),long int,,ftell_unlocked,(__FILE *__restrict __stream),(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_ftell)
 /* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),long int,,ftell_unlocked,(__FILE *__restrict __stream),ftell,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE__ftelli64) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftello64_unlocked)))
+#elif defined(__CRT_HAVE__ftell_nolock)
+/* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),long int,,ftell_unlocked,(__FILE *__restrict __stream),_ftell_nolock,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__IO_ftell)
+/* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),long int,,ftell_unlocked,(__FILE *__restrict __stream),_IO_ftell,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_ftello_unlocked) && (__SIZEOF_LONG__ == __SIZEOF_OFF32_T__)
+/* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),long int,,ftell_unlocked,(__FILE *__restrict __stream),ftello_unlocked,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_ftello) && (__SIZEOF_LONG__ == __SIZEOF_OFF32_T__)
+/* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),long int,,ftell_unlocked,(__FILE *__restrict __stream),ftello,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_ftello64_unlocked) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
+/* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),long int,,ftell_unlocked,(__FILE *__restrict __stream),ftello64_unlocked,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__ftelli64_nolock) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
+/* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),long int,,ftell_unlocked,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_ftello64) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
+/* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),long int,,ftell_unlocked,(__FILE *__restrict __stream),ftello64,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__ftelli64) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
+/* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),long int,,ftell_unlocked,(__FILE *__restrict __stream),_ftelli64,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_ftello_unlocked)
 #include <local/stdio/ftell.h>
 /* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __FORCELOCAL __ATTR_NONNULL((1)) long int (__LIBCCALL ftell_unlocked)(__FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftell))(__stream); }
 #endif /* ftell_unlocked... */
-#ifdef __CRT_HAVE_ftello_unlocked
+#if defined(__CRT_HAVE_fseeko64_unlocked) && (defined(__USE_FILE_OFFSET64))
+/* Change the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE__fseeki64_nolock) && (defined(__USE_FILE_OFFSET64))
+/* Change the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseeko64) && (defined(__USE_FILE_OFFSET64))
+/* Change the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseeko64,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE__fseeki64) && (defined(__USE_FILE_OFFSET64))
+/* Change the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),_fseeki64,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseeko_unlocked) && (!defined(__USE_FILE_OFFSET64))
+/* Change the current in-file position of `STREAM' */
+__CDECLARE(__ATTR_NONNULL((1)),int,,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseeko) && (!defined(__USE_FILE_OFFSET64))
+/* Change the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseeko,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseek_unlocked) && ((defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__))
+/* Change the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseek_unlocked,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE__fseek_nolock) && ((defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__))
+/* Change the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),_fseek_nolock,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseek) && ((defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__))
+/* Change the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseek,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
+#include <local/stdio/fseeko.h>
+/* Change the current in-file position of `STREAM' */
+__FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL fseeko_unlocked)(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fseeko))(__stream, __off, __whence); }
+#endif /* fseeko_unlocked... */
+#if defined(__CRT_HAVE_ftello64_unlocked) && (defined(__USE_FILE_OFFSET64))
+/* Return the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),__FS_TYPE(off),,ftello_unlocked,(__FILE *__restrict __stream),ftello64_unlocked,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__ftelli64_nolock) && (defined(__USE_FILE_OFFSET64))
+/* Return the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),__FS_TYPE(off),,ftello_unlocked,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__ftelli64_nolock) && (defined(__USE_FILE_OFFSET64))
+/* Return the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),__FS_TYPE(off),,ftello_unlocked,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_ftello64) && (defined(__USE_FILE_OFFSET64))
+/* Return the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),__FS_TYPE(off),,ftello_unlocked,(__FILE *__restrict __stream),ftello64,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__ftelli64) && (defined(__USE_FILE_OFFSET64))
+/* Return the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),__FS_TYPE(off),,ftello_unlocked,(__FILE *__restrict __stream),_ftelli64,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_ftello_unlocked) && (!defined(__USE_FILE_OFFSET64))
 /* Return the current in-file position of `STREAM' */
 __CDECLARE(__ATTR_NONNULL((1)),__FS_TYPE(off),,ftello_unlocked,(__FILE *__restrict __stream),(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_ftello)
+#elif defined(__CRT_HAVE_ftello) && (!defined(__USE_FILE_OFFSET64))
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1)),__FS_TYPE(off),,ftello_unlocked,(__FILE *__restrict __stream),ftello,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE__ftelli64) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftello64_unlocked)))
+#elif defined(__CRT_HAVE_ftell_unlocked) && ((defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__))
+/* Return the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),__FS_TYPE(off),,ftello_unlocked,(__FILE *__restrict __stream),ftell_unlocked,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__ftell_nolock) && ((defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__))
+/* Return the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),__FS_TYPE(off),,ftello_unlocked,(__FILE *__restrict __stream),_ftell_nolock,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_ftell) && ((defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__))
+/* Return the current in-file position of `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),__FS_TYPE(off),,ftello_unlocked,(__FILE *__restrict __stream),ftell,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock) || defined(__CRT_HAVE__IO_ftell)
 #include <local/stdio/ftello.h>
 /* Return the current in-file position of `STREAM' */
 __FORCELOCAL __ATTR_NONNULL((1)) __FS_TYPE(off) (__LIBCCALL ftello_unlocked)(__FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftello))(__stream); }
 #endif /* ftello_unlocked... */
 #ifdef __CRT_HAVE_flushall_unlocked
 __CDECLARE(,int,,flushall_unlocked,(void),()) __THROWS(...)
+#elif defined(__CRT_HAVE__flushall)
+__CREDIRECT(,int,,flushall_unlocked,(void),_flushall,()) __THROWS(...)
+#elif defined(__CRT_HAVE__IO_flush_all)
+__CREDIRECT(,int,,flushall_unlocked,(void),_IO_flush_all,()) __THROWS(...)
 #else /* LIBC: flushall_unlocked */
 #include <local/stdio/flushall_unlocked.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(flushall_unlocked, __FORCELOCAL int (__LIBCCALL flushall_unlocked)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(flushall_unlocked))(); })
 #endif /* flushall_unlocked... */
-#ifdef __CRT_HAVE_fgetpos_unlocked
+#if defined(__CRT_HAVE_fgetpos64_unlocked) && (defined(__USE_FILE_OFFSET64))
+/* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
+ * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fgetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) *__restrict __pos),fgetpos64_unlocked,(__stream,__pos)) __THROWS(...)
+#elif defined(__CRT_HAVE_fgetpos64) && (defined(__USE_FILE_OFFSET64))
+/* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
+ * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fgetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) *__restrict __pos),fgetpos64,(__stream,__pos)) __THROWS(...)
+#elif defined(__CRT_HAVE_fgetpos_unlocked) && (!defined(__USE_FILE_OFFSET64))
 /* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
  * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,,fgetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) *__restrict __pos),(__stream,__pos)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetpos)
+#elif defined(__CRT_HAVE_fgetpos) && (!defined(__USE_FILE_OFFSET64))
 /* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
  * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fgetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) *__restrict __pos),fgetpos,(__stream,__pos)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello64) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64)))
+#elif defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock) || defined(__CRT_HAVE__IO_ftell)
 #include <local/stdio/fgetpos.h>
 /* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
  * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
 __FORCELOCAL __ATTR_NONNULL((1, 2)) int (__LIBCCALL fgetpos_unlocked)(__FILE *__restrict __stream, __FS_TYPE(pos) *__restrict __pos) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetpos))(__stream, __pos); }
 #endif /* fgetpos_unlocked... */
-#ifdef __CRT_HAVE_fsetpos_unlocked
+#if defined(__CRT_HAVE_fsetpos64_unlocked) && (defined(__USE_FILE_OFFSET64))
+/* Set the file position of `STREAM' to `POS', as previously initialized with a call to `fgetpos()' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) const *__restrict __pos),fsetpos64_unlocked,(__stream,__pos)) __THROWS(...)
+#elif defined(__CRT_HAVE_fsetpos64) && (defined(__USE_FILE_OFFSET64))
+/* Set the file position of `STREAM' to `POS', as previously initialized with a call to `fgetpos()' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) const *__restrict __pos),fsetpos64,(__stream,__pos)) __THROWS(...)
+#elif defined(__CRT_HAVE_fsetpos_unlocked) && (!defined(__USE_FILE_OFFSET64))
 /* Set the file position of `STREAM' to `POS', as previously initialized with a call to `fgetpos()' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,,fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) const *__restrict __pos),(__stream,__pos)) __THROWS(...)
-#elif defined(__CRT_HAVE_fsetpos)
+#elif defined(__CRT_HAVE_fsetpos) && (!defined(__USE_FILE_OFFSET64))
 /* Set the file position of `STREAM' to `POS', as previously initialized with a call to `fgetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) const *__restrict __pos),fsetpos,(__stream,__pos)) __THROWS(...)
-#elif defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE__fseeki64) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fsetpos_unlocked) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseeko64_unlocked)))
+#elif defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
 #include <local/stdio/fsetpos.h>
 /* Set the file position of `STREAM' to `POS', as previously initialized with a call to `fgetpos()' */
 __FORCELOCAL __ATTR_NONNULL((1, 2)) int (__LIBCCALL fsetpos_unlocked)(__FILE *__restrict __stream, __FS_TYPE(pos) const *__restrict __pos) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fsetpos))(__stream, __pos); }
@@ -2501,7 +2882,10 @@ __CDECLARE(__ATTR_NONNULL((1)),int,,getw_unlocked,(__FILE *__restrict __stream),
 #elif defined(__CRT_HAVE_getw)
 /* Similar to `getc()', but read 2 bytes */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,getw_unlocked,(__FILE *__restrict __stream),getw,(__stream)) __THROWS(...)
-#elif (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc))
+#elif defined(__CRT_HAVE__getw)
+/* Similar to `getc()', but read 2 bytes */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,getw_unlocked,(__FILE *__restrict __stream),_getw,(__stream)) __THROWS(...)
+#elif ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))
 #include <local/stdio/getw.h>
 /* Similar to `getc()', but read 2 bytes */
 __FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL getw_unlocked)(__FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getw))(__stream); }
@@ -2512,7 +2896,10 @@ __CDECLARE(__ATTR_NONNULL((2)),int,,putw_unlocked,(int __w, __FILE *__restrict _
 #elif defined(__CRT_HAVE_putw)
 /* Similar to `putc()', but write 2 bytes loaded from `W & 0xffff' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,,putw_unlocked,(int __w, __FILE *__restrict __stream),putw,(__w,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked)))
+#elif defined(__CRT_HAVE__putw)
+/* Similar to `putc()', but write 2 bytes loaded from `W & 0xffff' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,,putw_unlocked,(int __w, __FILE *__restrict __stream),_putw,(__w,__stream)) __THROWS(...)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked)
 #include <local/stdio/putw.h>
 /* Similar to `putc()', but write 2 bytes loaded from `W & 0xffff' */
 __FORCELOCAL __ATTR_NONNULL((2)) int (__LIBCCALL putw_unlocked)(int __w, __FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putw))(__w, __stream); }
@@ -2529,6 +2916,12 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,setvbuf_unlocked,(__FILE *__re
 #ifdef __CRT_HAVE_ungetc_unlocked
 /* Unget a single character byte of data previously returned by `getc()' */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,ungetc_unlocked,(int __ch, __FILE *__restrict __stream),(__ch,__stream))
+#elif defined(__CRT_HAVE__ungetc_nolock)
+/* Unget a single character byte of data previously returned by `getc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,ungetc_unlocked,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
+#elif defined(__CRT_HAVE__IO_ungetc)
+/* Unget a single character byte of data previously returned by `getc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,ungetc_unlocked,(int __ch, __FILE *__restrict __stream),_IO_ungetc,(__ch,__stream))
 #elif defined(__CRT_HAVE_ungetc)
 /* Unget a single character byte of data previously returned by `getc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,ungetc_unlocked,(int __ch, __FILE *__restrict __stream),ungetc,(__ch,__stream))
@@ -2537,7 +2930,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,ungetc_unlocked,(int __ch, __F
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,,getdelim_unlocked,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, int __delimiter, __FILE *__restrict __stream),(__lineptr,__pcount,__delimiter,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_getdelim)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,,getdelim_unlocked,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, int __delimiter, __FILE *__restrict __stream),getdelim,(__lineptr,__pcount,__delimiter,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_s)) && (defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE_ungetc))
+#elif defined(__CRT_HAVE_realloc) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf)))) && (defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc))
 #include <local/stdio/getdelim_unlocked.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(getdelim_unlocked, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBCCALL getdelim_unlocked)(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, int __delimiter, __FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getdelim_unlocked))(__lineptr, __pcount, __delimiter, __stream); })
 #endif /* getdelim_unlocked... */
@@ -2545,7 +2938,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getdelim_unlocked, __FORCELOCAL __ATTR_WUNUSED _
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__SSIZE_TYPE__,,getline_unlocked,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),(__lineptr,__pcount,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_getline)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__SSIZE_TYPE__,,getline_unlocked,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),getline,(__lineptr,__pcount,__stream)) __THROWS(...)
-#elif (defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_s)) && (defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE_ungetc))) || defined(__CRT_HAVE_getdelim_unlocked) || defined(__CRT_HAVE_getdelim)
+#elif (defined(__CRT_HAVE_realloc) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf)))) && (defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc))) || defined(__CRT_HAVE_getdelim_unlocked) || defined(__CRT_HAVE_getdelim)
 #include <local/stdio/getline_unlocked.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(getline_unlocked, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __SSIZE_TYPE__ (__LIBCCALL getline_unlocked)(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getline_unlocked))(__lineptr, __pcount, __stream); })
 #endif /* getline_unlocked... */
@@ -2629,7 +3022,7 @@ __FORCELOCAL __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__LIBCCALL puts_unlocked
 __CDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,,puts_unlocked,(char const *__restrict __string),(__string)) __THROWS(...)
 #elif defined(__CRT_HAVE_puts)
 __CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,,puts_unlocked,(char const *__restrict __string),puts,(__string)) __THROWS(...)
-#elif !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputs_unlocked) || defined(__CRT_HAVE_fputs))
+#elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_HAVE_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE_fputc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE__IO_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || defined(__CRT_HAVE_) || defined(__CRT_HAVE_fputs_unlocked) || defined(__CRT_HAVE_fputs))
 #include <local/stdio/puts_unlocked.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(puts_unlocked, __FORCELOCAL __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__LIBCCALL puts_unlocked)(char const *__restrict __string) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(puts_unlocked))(__string); })
 #endif /* puts_unlocked... */
@@ -2644,7 +3037,16 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko64_unlocked,(__FILE *__restrict __str
 #elif defined(__CRT_HAVE_fseeko_unlocked) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* 64-bit variant of `fseeko' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko64_unlocked,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseeko_unlocked,(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseeko) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE_fseeko_unlocked)))
+#elif defined(__CRT_HAVE__fseeki64_nolock)
+/* 64-bit variant of `fseeko' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko64_unlocked,(__FILE *__restrict __stream, __off64_t __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE__fseeki64)
+/* 64-bit variant of `fseeko' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko64_unlocked,(__FILE *__restrict __stream, __off64_t __off, int __whence),_fseeki64,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseeko64)
+/* 64-bit variant of `fseeko' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko64_unlocked,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseeko64,(__stream,__off,__whence)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
 #include <local/stdio/fseeko64.h>
 /* 64-bit variant of `fseeko' */
 __FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL fseeko64_unlocked)(__FILE *__restrict __stream, __off64_t __off, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fseeko64))(__stream, __off, __whence); }
@@ -2658,7 +3060,16 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,,ftello64_unlocked,(__F
 #elif defined(__CRT_HAVE_ftello_unlocked) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* 64-bit variant of `ftello' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,,ftello64_unlocked,(__FILE *__restrict __stream),ftello_unlocked,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftello) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE_ftello_unlocked)))
+#elif defined(__CRT_HAVE__ftelli64_nolock)
+/* 64-bit variant of `ftello' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,,ftello64_unlocked,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__ftelli64)
+/* 64-bit variant of `ftello' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,,ftello64_unlocked,(__FILE *__restrict __stream),_ftelli64,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_ftello64)
+/* 64-bit variant of `ftello' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,,ftello64_unlocked,(__FILE *__restrict __stream),ftello64,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock) || defined(__CRT_HAVE__IO_ftell)
 #include <local/stdio/ftello64.h>
 /* 64-bit variant of `ftello' */
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __off64_t (__LIBCCALL ftello64_unlocked)(__FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftello64))(__stream); }
@@ -2672,7 +3083,13 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fgetpos64_unlocked,(__FILE *__restrict _
 #elif defined(__CRT_HAVE_fgetpos_unlocked) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* 64-bit variant of `fgetpos' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fgetpos64_unlocked,(__FILE *__restrict __stream, fpos64_t *__restrict __pos),fgetpos_unlocked,(__stream,__pos)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64)
+#elif defined(__CRT_HAVE_fgetpos64)
+/* 64-bit variant of `fgetpos' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fgetpos64_unlocked,(__FILE *__restrict __stream, fpos64_t *__restrict __pos),fgetpos64,(__stream,__pos)) __THROWS(...)
+#elif defined(__CRT_HAVE__IO_fgetpos64)
+/* 64-bit variant of `fgetpos' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fgetpos64_unlocked,(__FILE *__restrict __stream, fpos64_t *__restrict __pos),_IO_fgetpos64,(__stream,__pos)) __THROWS(...)
+#elif defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock) || defined(__CRT_HAVE__IO_ftell)
 #include <local/stdio/fgetpos64.h>
 /* 64-bit variant of `fgetpos' */
 __FORCELOCAL __ATTR_NONNULL((1, 2)) int (__LIBCCALL fgetpos64_unlocked)(__FILE *__restrict __stream, fpos64_t *__restrict __pos) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetpos64))(__stream, __pos); }
@@ -2686,7 +3103,13 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fsetpos64_unlocked,(__FILE *__restrict _
 #elif defined(__CRT_HAVE_fsetpos_unlocked) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* 64-bit variant of `fsetpos' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fsetpos64_unlocked,(__FILE *__restrict __stream, fpos64_t const *__restrict __pos),fsetpos_unlocked,(__stream,__pos)) __THROWS(...)
-#elif defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE__fseeki64)
+#elif defined(__CRT_HAVE_fsetpos64)
+/* 64-bit variant of `fsetpos' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fsetpos64_unlocked,(__FILE *__restrict __stream, fpos64_t const *__restrict __pos),fsetpos64,(__stream,__pos)) __THROWS(...)
+#elif defined(__CRT_HAVE__IO_fsetpos64)
+/* 64-bit variant of `fsetpos' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fsetpos64_unlocked,(__FILE *__restrict __stream, fpos64_t const *__restrict __pos),_IO_fsetpos64,(__stream,__pos)) __THROWS(...)
+#elif defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
 #include <local/stdio/fsetpos64.h>
 /* 64-bit variant of `fsetpos' */
 __FORCELOCAL __ATTR_NONNULL((1, 2)) int (__LIBCCALL fsetpos64_unlocked)(__FILE *__restrict __stream, fpos64_t const *__restrict __pos) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fsetpos64))(__stream, __pos); }
@@ -2738,14 +3161,16 @@ __CDECLARE(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_T
 __CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,,vfprintf_unlocked,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfprintf,(__stream,__format,__args)) __THROWS(...)
 #elif defined(__CRT_HAVE_vfprintf_s)
 __CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,,vfprintf_unlocked,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfprintf_s,(__stream,__format,__args)) __THROWS(...)
-#elif defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_file_printer)
+#elif defined(__CRT_HAVE__IO_vfprintf)
+__CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,,vfprintf_unlocked,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),_IO_vfprintf,(__stream,__format,__args)) __THROWS(...)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_HAVE_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE_fputc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE__IO_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || defined(__CRT_HAVE_) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_file_printer)
 #include <local/stdio/vfprintf_unlocked.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(vfprintf_unlocked, __FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T (__LIBCCALL vfprintf_unlocked)(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vfprintf_unlocked))(__stream, __format, __args); })
 #endif /* vfprintf_unlocked... */
-#if __has_builtin(__builtin_fprintf) && __has_builtin(__builtin_va_arg_pack) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fprintf)
+#if __has_builtin(__builtin_fprintf_unlocked) && __has_builtin(__builtin_va_arg_pack) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fprintf_unlocked)
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fprintf_unlocked)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) { return __builtin_fprintf(__stream, __format, __builtin_va_arg_pack()); }
+__FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fprintf_unlocked)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) { return __builtin_fprintf_unlocked(__stream, __format, __builtin_va_arg_pack()); }
 #elif defined(__CRT_HAVE_fprintf_unlocked)
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
@@ -2758,7 +3183,7 @@ __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fprintf_unlocked)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_s");
-#elif defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || (defined(__CRT_HAVE_vfprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked)
 #include <local/stdio/fprintf.h>
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
@@ -2780,16 +3205,16 @@ __CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SSIZE_T,,
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 __CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SSIZE_T,,vprintf_unlocked,(char const *__restrict __format, __builtin_va_list __args),vprintf_s,(__format,__args)) __THROWS(...)
-#elif !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || (defined(__CRT_HAVE_vfprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s))
+#elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked))
 #include <local/stdio/vprintf.h>
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 __FORCELOCAL __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T (__LIBCCALL vprintf_unlocked)(char const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vprintf))(__format, __args); }
 #endif /* vprintf_unlocked... */
-#if __has_builtin(__builtin_printf) && __has_builtin(__builtin_va_arg_pack) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_printf)
+#if __has_builtin(__builtin_printf_unlocked) && __has_builtin(__builtin_va_arg_pack) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_printf_unlocked)
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
-__FORCELOCAL __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (__VLIBCCALL printf_unlocked)(char const *__restrict __format, ...) __THROWS(...) { return __builtin_printf(__format, __builtin_va_arg_pack()); }
+__FORCELOCAL __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (__VLIBCCALL printf_unlocked)(char const *__restrict __format, ...) __THROWS(...) { return __builtin_printf_unlocked(__format, __builtin_va_arg_pack()); }
 #elif defined(__CRT_HAVE_printf_unlocked)
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
@@ -2802,7 +3227,7 @@ __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (__VLI
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (__VLIBCCALL printf_unlocked)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("printf_s");
-#elif (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || (defined(__CRT_HAVE_vfprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s))) || (defined(__CRT_HAVE_vprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vprintf) || defined(__CRT_HAVE_vprintf_s)
+#elif (!defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked))) || defined(__CRT_HAVE_vprintf) || defined(__CRT_HAVE_vprintf_s) || defined(__CRT_HAVE_vprintf_unlocked)
 #include <local/stdio/printf.h>
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
@@ -2828,7 +3253,11 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 0),__STDC
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 0),__STDC_INT_AS_SIZE_T,,vfscanf_unlocked,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),_vfscanf_s,(__stream,__format,__args)) __THROWS(...)
-#elif (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc))
+#elif defined(__CRT_HAVE__IO_vfscanf)
+/* Scan data from `STREAM', following `FORMAT'
+ * Return the number of successfully scanned data items */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 0),__STDC_INT_AS_SIZE_T,,vfscanf_unlocked,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),_IO_vfscanf,(__stream,__format,__args)) __THROWS(...)
+#elif ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))
 #include <local/stdio/vfscanf.h>
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
@@ -2850,7 +3279,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0),__STDC_IN
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SIZE_T,,vscanf_unlocked,(char const *__restrict __format, __builtin_va_list __args),_vscanf,(__format,__args)) __THROWS(...)
-#elif !defined(__NO_STDSTREAMS) && (((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc))) || (defined(__CRT_HAVE_vfscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE___vfscanf))
+#elif !defined(__NO_STDSTREAMS) && ((((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf))
 #include <local/stdio/vscanf.h>
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
@@ -2868,7 +3297,7 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL fscanf_unlocked)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fscanf");
-#elif ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc))) || (defined(__CRT_HAVE_vfscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE___vfscanf)
+#elif (((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf)
 #include <local/stdio/fscanf.h>
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
@@ -2886,7 +3315,7 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (__VLIBCCALL scanf_unlocked)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("scanf");
-#elif (!defined(__NO_STDSTREAMS) && (((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc))) || (defined(__CRT_HAVE_vfscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE___vfscanf))) || (defined(__CRT_HAVE_vscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vscanf) || defined(__CRT_HAVE__vscanf)
+#elif (!defined(__NO_STDSTREAMS) && ((((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf))) || defined(__CRT_HAVE_vscanf) || defined(__CRT_HAVE__vscanf) || defined(__CRT_HAVE_vscanf_unlocked)
 #include <local/stdio/scanf.h>
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
@@ -2990,6 +3419,9 @@ __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _unlink)(char cons
 #ifdef __CRT_HAVE__popen
 /* Open and return a new process I/O stream for executing `COMMAND' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,_popen,(char const *__command, char const *__modes),(__command,__modes))
+#elif defined(__CRT_HAVE__IO_popen)
+/* Open and return a new process I/O stream for executing `COMMAND' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,_popen,(char const *__command, char const *__modes),_IO_popen,(__command,__modes))
 #elif defined(__CRT_HAVE_popen)
 /* Open and return a new process I/O stream for executing `COMMAND' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,_popen,(char const *__command, char const *__modes),popen,(__command,__modes))
@@ -3003,7 +3435,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_pclose,(__FILE *__stream),pcl
 #endif /* _pclose... */
 #ifdef __CRT_HAVE__fsopen
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,_fsopen,(char const *__filename, char const *__modes, int __sflag),(__filename,__modes,__sflag))
-#elif defined(__CRT_HAVE_fopen) || defined(__CRT_HAVE_fopen64)
+#elif defined(__CRT_HAVE_fopen) || defined(__CRT_HAVE__IO_fopen) || defined(__CRT_HAVE_fopen64)
 #include <local/stdio/_fsopen.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_fsopen, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __FILE *__NOTHROW_RPC(__LIBCCALL _fsopen)(char const *__filename, char const *__modes, int __sflag) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_fsopen))(__filename, __modes, __sflag); })
 #endif /* _fsopen... */
@@ -3011,6 +3443,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_fsopen, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONN
 /* Open a new file stream by inheriting a given file descriptor `FD'
  * Note that upon success (`return != NULL'), the given `FD' will be `close()'d once `fclose(return)' is called */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),__FILE *,__NOTHROW_NCX,_fdopen,(__fd_t __fd, char const *__restrict __modes),(__fd,__modes))
+#elif defined(__CRT_HAVE__IO_fdopen)
+/* Open a new file stream by inheriting a given file descriptor `FD'
+ * Note that upon success (`return != NULL'), the given `FD' will be `close()'d once `fclose(return)' is called */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__FILE *,__NOTHROW_NCX,_fdopen,(__fd_t __fd, char const *__restrict __modes),_IO_fdopen,(__fd,__modes))
 #elif defined(__CRT_HAVE_fdopen)
 /* Open a new file stream by inheriting a given file descriptor `FD'
  * Note that upon success (`return != NULL'), the given `FD' will be `close()'d once `fclose(return)' is called */
@@ -3018,6 +3454,8 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__FILE *,__NOTHROW_NCX,_fdopen,(_
 #endif /* _fdopen... */
 #ifdef __CRT_HAVE__flushall
 __CDECLARE(,int,,_flushall,(void),()) __THROWS(...)
+#elif defined(__CRT_HAVE__IO_flush_all)
+__CREDIRECT(,int,,_flushall,(void),_IO_flush_all,()) __THROWS(...)
 #else /* LIBC: _flushall */
 #include <local/stdio/_flushall.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_flushall, __FORCELOCAL int (__LIBCCALL _flushall)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_flushall))(); })
@@ -3051,7 +3489,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,_fgetchar,(void),getchar,())
 #elif defined(__CRT_HAVE__fgetchar)
 /* Alias for `fgetc(stdin)' */
 __CDECLARE(,int,__NOTHROW_NCX,_fgetchar,(void),())
-#elif !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock))))
+#elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked))
 #include <local/stdio/getchar.h>
 /* Alias for `fgetc(stdin)' */
 __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL _fgetchar)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getchar))(); }
@@ -3071,7 +3509,7 @@ __CDECLARE(,int,__NOTHROW_NCX,_fputchar,(int __ch),(__ch))
 #elif defined(__CRT_HAVE_putchar_unlocked)
 /* Alias for `fputc(CH, stdout)' */
 __CREDIRECT(,int,__NOTHROW_NCX,_fputchar,(int __ch),putchar_unlocked,(__ch))
-#elif !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock))))
+#elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))
 #include <local/stdio/putchar.h>
 /* Alias for `fputc(CH, stdout)' */
 __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL _fputchar)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putchar))(__ch); }
@@ -3082,7 +3520,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_getw,(__FILE *__restrict __st
 #elif defined(__CRT_HAVE__getw)
 /* Similar to `getc()', but read 2 bytes */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_getw,(__FILE *__restrict __stream),(__stream))
-#elif (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc))
+#elif ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))
 #include <local/stdio/getw.h>
 /* Similar to `getc()', but read 2 bytes */
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _getw)(__FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getw))(__stream); }
@@ -3093,7 +3531,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,_putw,(int __w, __FILE *__rest
 #elif defined(__CRT_HAVE__putw)
 /* Similar to `putc()', but write 2 bytes loaded from `W & 0xffff' */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,_putw,(int __w, __FILE *__restrict __stream),(__w,__stream))
-#elif defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked)))
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked)
 #include <local/stdio/putw.h>
 /* Similar to `putc()', but write 2 bytes loaded from `W & 0xffff' */
 __FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL _putw)(int __w, __FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putw))(__w, __stream); }
@@ -3107,16 +3545,25 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,_tempnam,(char con
 #if defined(__CRT_HAVE_fseeko64_unlocked) && (defined(__USE_STDIO_UNLOCKED))
 /* 64-bit variant of `fseeko' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fseeki64,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE__fseeki64_nolock) && (defined(__USE_STDIO_UNLOCKED))
+/* 64-bit variant of `fseeko' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fseeki64,(__FILE *__restrict __stream, __off64_t __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64)
 /* 64-bit variant of `fseeko' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fseeki64,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseeko64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseeki64)
 /* 64-bit variant of `fseeko' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fseeki64,(__FILE *__restrict __stream, __off64_t __off, int __whence),(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseeko64_unlocked)
+/* 64-bit variant of `fseeko' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fseeki64,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE__fseeki64_nolock)
+/* 64-bit variant of `fseeko' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fseeki64,(__FILE *__restrict __stream, __off64_t __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* 64-bit variant of `fseeko' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fseeki64,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseeko,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseeko) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE_fseeko_unlocked)))
+#elif defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
 #include <local/stdio/fseeko64.h>
 /* 64-bit variant of `fseeko' */
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _fseeki64)(__FILE *__restrict __stream, __off64_t __off, int __whence) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fseeko64))(__stream, __off, __whence); }
@@ -3124,22 +3571,31 @@ __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _fseeki64)(__FILE 
 #if defined(__CRT_HAVE_ftello64_unlocked) && (defined(__USE_STDIO_UNLOCKED))
 /* 64-bit variant of `ftello' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,__NOTHROW_NCX,_ftelli64,(__FILE *__restrict __stream),ftello64_unlocked,(__stream))
-#elif defined(__CRT_HAVE_ftell_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == 8
+#elif defined(__CRT_HAVE__ftelli64_nolock) && (defined(__USE_STDIO_UNLOCKED))
+/* 64-bit variant of `ftello' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,__NOTHROW_NCX,_ftelli64,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream))
+#elif defined(__CRT_HAVE_ftell_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
 /* 64-bit variant of `ftello' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,__NOTHROW_NCX,_ftelli64,(__FILE *__restrict __stream),ftell_unlocked,(__stream))
+#elif defined(__CRT_HAVE__ftell_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
+/* 64-bit variant of `ftello' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,__NOTHROW_NCX,_ftelli64,(__FILE *__restrict __stream),_ftell_nolock,(__stream))
 #elif defined(__CRT_HAVE_ftello64)
 /* 64-bit variant of `ftello' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,__NOTHROW_NCX,_ftelli64,(__FILE *__restrict __stream),ftello64,(__stream))
 #elif defined(__CRT_HAVE__ftelli64)
 /* 64-bit variant of `ftello' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,__NOTHROW_NCX,_ftelli64,(__FILE *__restrict __stream),(__stream))
-#elif defined(__CRT_HAVE_ftell) && (__SIZEOF_LONG__ == 8)
+#elif defined(__CRT_HAVE_ftell) && (__SIZEOF_OFF64_T__ == __SIZEOF_LONG__)
 /* 64-bit variant of `ftello' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,__NOTHROW_NCX,_ftelli64,(__FILE *__restrict __stream),ftell,(__stream))
+#elif defined(__CRT_HAVE__IO_ftell) && (__SIZEOF_OFF64_T__ == __SIZEOF_LONG__)
+/* 64-bit variant of `ftello' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,__NOTHROW_NCX,_ftelli64,(__FILE *__restrict __stream),_IO_ftell,(__stream))
 #elif defined(__CRT_HAVE_ftello) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* 64-bit variant of `ftello' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,__NOTHROW_NCX,_ftelli64,(__FILE *__restrict __stream),ftello,(__stream))
-#elif defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftello) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE_ftello_unlocked)))
+#elif defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock) || defined(__CRT_HAVE__IO_ftell)
 #include <local/stdio/ftello64.h>
 /* 64-bit variant of `ftello' */
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __off64_t __NOTHROW_NCX(__LIBCCALL _ftelli64)(__FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftello64))(__stream); }
@@ -3179,7 +3635,7 @@ __CDECLARE(,__UINT32_TYPE__,__NOTHROW_NCX,_set_output_format,(__UINT32_TYPE__ __
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL _scanf_l)(char const *__restrict __format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_scanf_l");
 #elif defined(__CRT_HAVE__scanf_s_l) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL _scanf_l)(char const *__restrict __format, __locale_t __locale, ...) __THROWS(...) __CASMNAME("_scanf_s_l");
-#elif (!defined(__NO_STDSTREAMS) && (((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc))) || (defined(__CRT_HAVE_vfscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE___vfscanf))) || (defined(__CRT_HAVE_vscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vscanf) || defined(__CRT_HAVE__vscanf) || defined(__CRT_HAVE__vscanf_l) || defined(__CRT_HAVE__vscanf_s_l)
+#elif (!defined(__NO_STDSTREAMS) && ((((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf))) || defined(__CRT_HAVE_vscanf) || defined(__CRT_HAVE__vscanf) || defined(__CRT_HAVE_vscanf_unlocked) || defined(__CRT_HAVE__vscanf_l) || defined(__CRT_HAVE__vscanf_s_l)
 #include <local/stdio/_scanf_l.h>
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING(_scanf_l)
@@ -3191,7 +3647,7 @@ __NAMESPACE_LOCAL_USING(_scanf_l)
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 4) __STDC_INT_AS_SIZE_T (__VLIBCCALL _fscanf_l)(__FILE *__restrict __stream, char const *__restrict __format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_fscanf_l");
 #elif defined(__CRT_HAVE__fscanf_s_l) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 4) __STDC_INT_AS_SIZE_T (__VLIBCCALL _fscanf_l)(__FILE *__restrict __stream, char const *__restrict __format, __locale_t __locale, ...) __THROWS(...) __CASMNAME("_fscanf_s_l");
-#elif ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc))) || (defined(__CRT_HAVE_vfscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE___vfscanf) || defined(__CRT_HAVE__vfscanf_l)
+#elif (((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf) || defined(__CRT_HAVE__vfscanf_l)
 #include <local/stdio/_fscanf_l.h>
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING(_fscanf_l)
@@ -3225,7 +3681,7 @@ __NAMESPACE_LOCAL_USING(_snscanf_l)
 #endif /* _snscanf_l... */
 #ifdef __CRT_HAVE__scanf_s_l
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL _scanf_s_l)(char const *__restrict __format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_scanf_s_l");
-#elif defined(__CRT_HAVE__vscanf_s_l) || defined(__CRT_HAVE__vscanf_l) || (!defined(__NO_STDSTREAMS) && (((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc))) || (defined(__CRT_HAVE_vfscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE___vfscanf))) || (defined(__CRT_HAVE_vscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vscanf) || defined(__CRT_HAVE__vscanf)
+#elif defined(__CRT_HAVE__vscanf_s_l) || defined(__CRT_HAVE__vscanf_l) || (!defined(__NO_STDSTREAMS) && ((((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf))) || defined(__CRT_HAVE_vscanf) || defined(__CRT_HAVE__vscanf) || defined(__CRT_HAVE_vscanf_unlocked)
 #include <local/stdio/_scanf_s_l.h>
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING(_scanf_s_l)
@@ -3245,7 +3701,7 @@ __NAMESPACE_LOCAL_USING(_sscanf_s_l)
 #endif /* _sscanf_s_l... */
 #ifdef __CRT_HAVE__fscanf_s_l
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 4) __STDC_INT_AS_SIZE_T (__VLIBCCALL _fscanf_s_l)(__FILE *__restrict __stream, char const *__restrict __format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_fscanf_s_l");
-#elif defined(__CRT_HAVE__vfscanf_s_l) || defined(__CRT_HAVE__vfscanf_l) || ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc))) || (defined(__CRT_HAVE_vfscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE___vfscanf)
+#elif defined(__CRT_HAVE__vfscanf_s_l) || defined(__CRT_HAVE__vfscanf_l) || (((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf)
 #include <local/stdio/_fscanf_s_l.h>
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING(_fscanf_s_l)
@@ -3522,7 +3978,7 @@ __NAMESPACE_LOCAL_USING(_snprintf_s_l)
 __CDECLARE(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SIZE_T,,_vprintf_l,(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),(__format,__locale,__args)) __THROWS(...)
 #elif defined(__CRT_HAVE__vprintf_s_l)
 __CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SIZE_T,,_vprintf_l,(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vprintf_s_l,(__format,__locale,__args)) __THROWS(...)
-#elif (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || (defined(__CRT_HAVE_vfprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s))) || (defined(__CRT_HAVE_vprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vprintf) || defined(__CRT_HAVE_vprintf_s)
+#elif (!defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked))) || defined(__CRT_HAVE_vprintf) || defined(__CRT_HAVE_vprintf_s) || defined(__CRT_HAVE_vprintf_unlocked)
 #include <local/stdio/_vprintf_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_vprintf_l, __FORCELOCAL __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SIZE_T (__LIBCCALL _vprintf_l)(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vprintf_l))(__format, __locale, __args); })
 #endif /* _vprintf_l... */
@@ -3530,25 +3986,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vprintf_l, __FORCELOCAL __ATTR_NONNULL((1)) __A
 __CDECLARE(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SIZE_T,,_vprintf_s_l,(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),(__format,__locale,__args)) __THROWS(...)
 #elif defined(__CRT_HAVE__vprintf_l)
 __CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SIZE_T,,_vprintf_s_l,(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vprintf_l,(__format,__locale,__args)) __THROWS(...)
-#elif (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || (defined(__CRT_HAVE_vfprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s))) || (defined(__CRT_HAVE_vprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vprintf) || defined(__CRT_HAVE_vprintf_s)
+#elif (!defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked))) || defined(__CRT_HAVE_vprintf) || defined(__CRT_HAVE_vprintf_s) || defined(__CRT_HAVE_vprintf_unlocked)
 #include <local/stdio/_vprintf_l.h>
 __FORCELOCAL __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SIZE_T (__LIBCCALL _vprintf_s_l)(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vprintf_l))(__format, __locale, __args); }
 #endif /* _vprintf_s_l... */
 #ifdef __CRT_HAVE__vprintf_p
 __CDECLARE(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF_P(1, 0),__STDC_INT_AS_SIZE_T,,_vprintf_p,(char const *__restrict __format, __builtin_va_list __args),(__format,__args)) __THROWS(...)
-#elif !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE__vfprintf_p))
+#elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE__vfprintf_p))
 #include <local/stdio/_vprintf_p.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_vprintf_p, __FORCELOCAL __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF_P(1, 0) __STDC_INT_AS_SIZE_T (__LIBCCALL _vprintf_p)(char const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vprintf_p))(__format, __args); })
 #endif /* _vprintf_p... */
 #ifdef __CRT_HAVE__vprintf_p_l
 __CDECLARE(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF_P(1, 0),__STDC_INT_AS_SIZE_T,,_vprintf_p_l,(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),(__format,__locale,__args)) __THROWS(...)
-#elif (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE__vfprintf_p))) || defined(__CRT_HAVE__vprintf_p)
+#elif (!defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE__vfprintf_p))) || defined(__CRT_HAVE__vprintf_p)
 #include <local/stdio/_vprintf_p_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_vprintf_p_l, __FORCELOCAL __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF_P(1, 0) __STDC_INT_AS_SIZE_T (__LIBCCALL _vprintf_p_l)(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vprintf_p_l))(__format, __locale, __args); })
 #endif /* _vprintf_p_l... */
 #ifdef __CRT_HAVE__printf_l
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL _printf_l)(char const *__restrict __format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_printf_l");
-#elif (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || (defined(__CRT_HAVE_vfprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s))) || (defined(__CRT_HAVE_vprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vprintf) || defined(__CRT_HAVE_vprintf_s) || defined(__CRT_HAVE__vprintf_l) || defined(__CRT_HAVE__vprintf_s_l)
+#elif (!defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked))) || defined(__CRT_HAVE_vprintf) || defined(__CRT_HAVE_vprintf_s) || defined(__CRT_HAVE_vprintf_unlocked) || defined(__CRT_HAVE__vprintf_l) || defined(__CRT_HAVE__vprintf_s_l)
 #include <local/stdio/_printf_l.h>
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING(_printf_l)
@@ -3558,7 +4014,7 @@ __NAMESPACE_LOCAL_USING(_printf_l)
 #endif /* _printf_l... */
 #ifdef __CRT_HAVE__printf_s_l
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL _printf_s_l)(char const *__restrict __format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_printf_s_l");
-#elif defined(__CRT_HAVE__vprintf_s_l) || defined(__CRT_HAVE__vprintf_l) || (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || (defined(__CRT_HAVE_vfprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s))) || (defined(__CRT_HAVE_vprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vprintf) || defined(__CRT_HAVE_vprintf_s)
+#elif defined(__CRT_HAVE__vprintf_s_l) || defined(__CRT_HAVE__vprintf_l) || (!defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked))) || defined(__CRT_HAVE_vprintf) || defined(__CRT_HAVE_vprintf_s) || defined(__CRT_HAVE_vprintf_unlocked)
 #include <local/stdio/_printf_s_l.h>
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING(_printf_s_l)
@@ -3568,7 +4024,7 @@ __NAMESPACE_LOCAL_USING(_printf_s_l)
 #endif /* _printf_s_l... */
 #ifdef __CRT_HAVE__printf_p
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF_P(1, 2) __STDC_INT_AS_SIZE_T (__VLIBCCALL _printf_p)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("_printf_p");
-#elif (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE__vfprintf_p))) || defined(__CRT_HAVE__vprintf_p)
+#elif (!defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE__vfprintf_p))) || defined(__CRT_HAVE__vprintf_p)
 #include <local/stdio/_printf_p.h>
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING(_printf_p)
@@ -3578,7 +4034,7 @@ __NAMESPACE_LOCAL_USING(_printf_p)
 #endif /* _printf_p... */
 #ifdef __CRT_HAVE__printf_p_l
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF_P(1, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL _printf_p_l)(char const *__restrict __format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_printf_p_l");
-#elif (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE__vfprintf_p))) || defined(__CRT_HAVE__vprintf_p) || defined(__CRT_HAVE__vprintf_p_l)
+#elif (!defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE__vfprintf_p))) || defined(__CRT_HAVE__vprintf_p) || defined(__CRT_HAVE__vprintf_p_l)
 #include <local/stdio/_printf_p_l.h>
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING(_printf_p_l)
@@ -3591,7 +4047,7 @@ __NAMESPACE_LOCAL_USING(_printf_p_l)
 __CDECLARE(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SIZE_T,,_vfprintf_l,(__FILE *__restrict __stream, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),(__stream,__format,__locale,__args)) __THROWS(...)
 #elif defined(__CRT_HAVE__vfprintf_s_l)
 __CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SIZE_T,,_vfprintf_l,(__FILE *__restrict __stream, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vfprintf_s_l,(__stream,__format,__locale,__args)) __THROWS(...)
-#elif defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || (defined(__CRT_HAVE_vfprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked)
 #include <local/stdio/_vfprintf_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_vfprintf_l, __FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SIZE_T (__LIBCCALL _vfprintf_l)(__FILE *__restrict __stream, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vfprintf_l))(__stream, __format, __locale, __args); })
 #endif /* _vfprintf_l... */
@@ -3599,25 +4055,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vfprintf_l, __FORCELOCAL __ATTR_NONNULL((1, 2))
 __CDECLARE(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SIZE_T,,_vfprintf_s_l,(__FILE *__restrict __stream, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),(__stream,__format,__locale,__args)) __THROWS(...)
 #elif defined(__CRT_HAVE__vfprintf_l)
 __CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SIZE_T,,_vfprintf_s_l,(__FILE *__restrict __stream, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vfprintf_l,(__stream,__format,__locale,__args)) __THROWS(...)
-#elif defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || (defined(__CRT_HAVE_vfprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked)
 #include <local/stdio/_vfprintf_l.h>
 __FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SIZE_T (__LIBCCALL _vfprintf_s_l)(__FILE *__restrict __stream, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vfprintf_l))(__stream, __format, __locale, __args); }
 #endif /* _vfprintf_s_l... */
 #ifdef __CRT_HAVE__vfprintf_p
 __CDECLARE(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF_P(2, 0),__STDC_INT_AS_SIZE_T,,_vfprintf_p,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),(__stream,__format,__args)) __THROWS(...)
-#elif defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked)))
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked)
 #include <local/stdio/_vfprintf_p.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_vfprintf_p, __FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF_P(2, 0) __STDC_INT_AS_SIZE_T (__LIBCCALL _vfprintf_p)(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vfprintf_p))(__stream, __format, __args); })
 #endif /* _vfprintf_p... */
 #ifdef __CRT_HAVE__vfprintf_p_l
 __CDECLARE(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF_P(2, 0),__STDC_INT_AS_SIZE_T,,_vfprintf_p_l,(__FILE *__restrict __stream, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),(__stream,__format,__locale,__args)) __THROWS(...)
-#elif defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE__vfprintf_p)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE__vfprintf_p)
 #include <local/stdio/_vfprintf_p_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_vfprintf_p_l, __FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF_P(2, 0) __STDC_INT_AS_SIZE_T (__LIBCCALL _vfprintf_p_l)(__FILE *__restrict __stream, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vfprintf_p_l))(__stream, __format, __locale, __args); })
 #endif /* _vfprintf_p_l... */
 #ifdef __CRT_HAVE__fprintf_l
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 4) __STDC_INT_AS_SIZE_T (__VLIBCCALL _fprintf_l)(__FILE *__restrict __stream, char const *__restrict __format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_fprintf_l");
-#elif defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || (defined(__CRT_HAVE_vfprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__vfprintf_l) || defined(__CRT_HAVE__vfprintf_s_l)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE__vfprintf_l) || defined(__CRT_HAVE__vfprintf_s_l)
 #include <local/stdio/_fprintf_l.h>
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING(_fprintf_l)
@@ -3627,7 +4083,7 @@ __NAMESPACE_LOCAL_USING(_fprintf_l)
 #endif /* _fprintf_l... */
 #ifdef __CRT_HAVE__fprintf_s_l
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 4) __STDC_INT_AS_SIZE_T (__VLIBCCALL _fprintf_s_l)(__FILE *__restrict __stream, char const *__restrict __format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_fprintf_s_l");
-#elif defined(__CRT_HAVE__vfprintf_s_l) || defined(__CRT_HAVE__vfprintf_l) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || (defined(__CRT_HAVE_vfprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s)
+#elif defined(__CRT_HAVE__vfprintf_s_l) || defined(__CRT_HAVE__vfprintf_l) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked)
 #include <local/stdio/_fprintf_s_l.h>
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING(_fprintf_s_l)
@@ -3637,7 +4093,7 @@ __NAMESPACE_LOCAL_USING(_fprintf_s_l)
 #endif /* _fprintf_s_l... */
 #ifdef __CRT_HAVE__fprintf_p
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF_P(2, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL _fprintf_p)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("_fprintf_p");
-#elif defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE__vfprintf_p)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE__vfprintf_p)
 #include <local/stdio/_fprintf_p.h>
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING(_fprintf_p)
@@ -3647,7 +4103,7 @@ __NAMESPACE_LOCAL_USING(_fprintf_p)
 #endif /* _fprintf_p... */
 #ifdef __CRT_HAVE__fprintf_p_l
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF_P(2, 4) __STDC_INT_AS_SIZE_T (__VLIBCCALL _fprintf_p_l)(__FILE *__restrict __stream, char const *__restrict __format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_fprintf_p_l");
-#elif defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE__vfprintf_p) || defined(__CRT_HAVE__vfprintf_p_l)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE__vfprintf_p) || defined(__CRT_HAVE__vfprintf_p_l)
 #include <local/stdio/_fprintf_p_l.h>
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING(_fprintf_p_l)
@@ -3681,13 +4137,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tmpfile_s, __FORCELOCAL __ATTR_NONNULL((1)) errn
 #endif /* tmpfile_s... */
 #ifdef __CRT_HAVE_fread_s
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 5)),__SIZE_TYPE__,__NOTHROW_RPC,fread_s,(void *__restrict __buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),(__buf,__bufsize,__elemsize,__elemcount,__stream))
-#elif defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)))
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)
 #include <local/stdio/fread_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fread_s, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 5)) __SIZE_TYPE__ __NOTHROW_RPC(__LIBCCALL fread_s)(void *__restrict __buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fread_s))(__buf, __bufsize, __elemsize, __elemcount, __stream); })
 #endif /* fread_s... */
 #ifdef __CRT_HAVE_gets_s
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,gets_s,(char *__restrict __buf, rsize_t __bufsize),(__buf,__bufsize))
-#elif !defined(__NO_STDSTREAMS) && (((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked))) || defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE_fgets_unlocked))
+#elif !defined(__NO_STDSTREAMS) && ((((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE__IO_ferror))) || defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE_fgets_unlocked))
 #include <local/stdio/gets_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(gets_s, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_RPC(__LIBCCALL gets_s)(char *__restrict __buf, rsize_t __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gets_s))(__buf, __bufsize); })
 #endif /* gets_s... */
@@ -3703,7 +4159,7 @@ __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SIZE_T (__VLIB
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SIZE_T (__VLIBCCALL printf_s)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("printf");
-#elif (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || (defined(__CRT_HAVE_vfprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s))) || (defined(__CRT_HAVE_vprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vprintf) || defined(__CRT_HAVE_vprintf_s)
+#elif (!defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked))) || defined(__CRT_HAVE_vprintf) || defined(__CRT_HAVE_vprintf_s) || defined(__CRT_HAVE_vprintf_unlocked)
 #include <local/stdio/printf.h>
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
@@ -3721,7 +4177,7 @@ __CDECLARE(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SIZE_T,,vp
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 __CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SIZE_T,,vprintf_s,(char const *__restrict __format, __builtin_va_list __args),vprintf,(__format,__args)) __THROWS(...)
-#elif !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || (defined(__CRT_HAVE_vfprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s))
+#elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked))
 #include <local/stdio/vprintf.h>
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
@@ -3739,7 +4195,7 @@ __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T (__V
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL fprintf_s)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf");
-#elif defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || (defined(__CRT_HAVE_vfprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked)
 #include <local/stdio/fprintf.h>
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
@@ -3757,7 +4213,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SIZE_T,
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SIZE_T,,vfprintf_s,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfprintf,(__stream,__format,__args)) __THROWS(...)
-#elif defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked)
 #include <local/stdio/vfprintf.h>
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
@@ -3853,96 +4309,108 @@ __CDECLARE_VOID(__ATTR_COLD,,_wperror,(__WCHAR_TYPE__ const *__restrict __messag
 #endif /* _STDIO_DEFINED */
 #ifdef __CRT_HAVE_fgetc_unlocked
 /* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,,_fgetc_nolock,(__FILE *__restrict __stream),fgetc_unlocked,(__stream)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fgetc_nolock,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked)
 /* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,,_fgetc_nolock,(__FILE *__restrict __stream),getc_unlocked,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_getc)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fgetc_nolock,(__FILE *__restrict __stream),getc_unlocked,(__stream))
+#elif defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
 /* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,,_fgetc_nolock,(__FILE *__restrict __stream),getc,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetc)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fgetc_nolock,(__FILE *__restrict __stream),getc,(__stream))
+#elif defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
 /* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,,_fgetc_nolock,(__FILE *__restrict __stream),fgetc,(__stream)) __THROWS(...)
-#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_s)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fgetc_nolock,(__FILE *__restrict __stream),fgetc,(__stream))
+#elif defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
+/* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fgetc_nolock,(__FILE *__restrict __stream),_IO_getc,(__stream))
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread)
 #include <local/stdio/fgetc_unlocked.h>
 /* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
-__FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL _fgetc_nolock)(__FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetc_unlocked))(__stream); }
+__FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _fgetc_nolock)(__FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetc_unlocked))(__stream); }
 #endif /* _fgetc_nolock... */
 #if __has_builtin(__builtin_fputc_unlocked) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputc_unlocked)
 /* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
-__FORCELOCAL __ATTR_NONNULL((2)) int (__LIBCCALL _fputc_nolock)(int __ch, __FILE *__restrict __stream) __THROWS(...) { return __builtin_fputc_unlocked(__ch, __stream); }
+__FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL _fputc_nolock)(int __ch, __FILE *__restrict __stream) { return __builtin_fputc_unlocked(__ch, __stream); }
 #elif defined(__CRT_HAVE_fputc_unlocked)
 /* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,,_fputc_nolock,(int __ch, __FILE *__restrict __stream),fputc_unlocked,(__ch,__stream)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,_fputc_nolock,(int __ch, __FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc_unlocked)
 /* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,,_fputc_nolock,(int __ch, __FILE *__restrict __stream),putc_unlocked,(__ch,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_putc)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,_fputc_nolock,(int __ch, __FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
+#elif defined(__CRT_HAVE_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))
 /* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,,_fputc_nolock,(int __ch, __FILE *__restrict __stream),putc,(__ch,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fputc)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,_fputc_nolock,(int __ch, __FILE *__restrict __stream),putc,(__ch,__stream))
+#elif defined(__CRT_HAVE_fputc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))
 /* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,,_fputc_nolock,(int __ch, __FILE *__restrict __stream),fputc,(__ch,__stream)) __THROWS(...)
-#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,_fputc_nolock,(int __ch, __FILE *__restrict __stream),fputc,(__ch,__stream))
+#elif defined(__CRT_HAVE__IO_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))
+/* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,_fputc_nolock,(int __ch, __FILE *__restrict __stream),_IO_putc,(__ch,__stream))
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s)
 #include <local/stdio/fputc_unlocked.h>
 /* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
-__FORCELOCAL __ATTR_NONNULL((2)) int (__LIBCCALL _fputc_nolock)(int __ch, __FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputc_unlocked))(__ch, __stream); }
+__FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL _fputc_nolock)(int __ch, __FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputc_unlocked))(__ch, __stream); }
 #endif /* _fputc_nolock... */
 #ifdef __CRT_HAVE_fgetc_unlocked
 /* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,,_getc_nolock,(__FILE *__restrict __stream),fgetc_unlocked,(__stream)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_getc_nolock,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked)
 /* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,,_getc_nolock,(__FILE *__restrict __stream),getc_unlocked,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_getc)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_getc_nolock,(__FILE *__restrict __stream),getc_unlocked,(__stream))
+#elif defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
 /* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,,_getc_nolock,(__FILE *__restrict __stream),getc,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetc)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_getc_nolock,(__FILE *__restrict __stream),getc,(__stream))
+#elif defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
 /* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,,_getc_nolock,(__FILE *__restrict __stream),fgetc,(__stream)) __THROWS(...)
-#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_s)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_getc_nolock,(__FILE *__restrict __stream),fgetc,(__stream))
+#elif defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
+/* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_getc_nolock,(__FILE *__restrict __stream),_IO_getc,(__stream))
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread)
 #include <local/stdio/fgetc_unlocked.h>
 /* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
-__FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL _getc_nolock)(__FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetc_unlocked))(__stream); }
+__FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _getc_nolock)(__FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetc_unlocked))(__stream); }
 #endif /* _getc_nolock... */
 #if __has_builtin(__builtin_fputc_unlocked) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputc_unlocked)
 /* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
-__FORCELOCAL __ATTR_NONNULL((2)) int (__LIBCCALL _putc_nolock)(int __ch, __FILE *__restrict __stream) __THROWS(...) { return __builtin_fputc_unlocked(__ch, __stream); }
+__FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL _putc_nolock)(int __ch, __FILE *__restrict __stream) { return __builtin_fputc_unlocked(__ch, __stream); }
 #elif defined(__CRT_HAVE_fputc_unlocked)
 /* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,,_putc_nolock,(int __ch, __FILE *__restrict __stream),fputc_unlocked,(__ch,__stream)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,_putc_nolock,(int __ch, __FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc_unlocked)
 /* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,,_putc_nolock,(int __ch, __FILE *__restrict __stream),putc_unlocked,(__ch,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_putc)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,_putc_nolock,(int __ch, __FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
+#elif defined(__CRT_HAVE_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))
 /* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,,_putc_nolock,(int __ch, __FILE *__restrict __stream),putc,(__ch,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fputc)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,_putc_nolock,(int __ch, __FILE *__restrict __stream),putc,(__ch,__stream))
+#elif defined(__CRT_HAVE_fputc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))
 /* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,,_putc_nolock,(int __ch, __FILE *__restrict __stream),fputc,(__ch,__stream)) __THROWS(...)
-#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,_putc_nolock,(int __ch, __FILE *__restrict __stream),fputc,(__ch,__stream))
+#elif defined(__CRT_HAVE__IO_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))
+/* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,_putc_nolock,(int __ch, __FILE *__restrict __stream),_IO_putc,(__ch,__stream))
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s)
 #include <local/stdio/fputc_unlocked.h>
 /* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
-__FORCELOCAL __ATTR_NONNULL((2)) int (__LIBCCALL _putc_nolock)(int __ch, __FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputc_unlocked))(__ch, __stream); }
+__FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL _putc_nolock)(int __ch, __FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputc_unlocked))(__ch, __stream); }
 #endif /* _putc_nolock... */
 #ifdef __CRT_HAVE_getchar_unlocked
 /* Same as `getchar()', but performs I/O without acquiring a lock to `stdin' */
-__CREDIRECT(,int,,_getchar_nolock,(void),getchar_unlocked,()) __THROWS(...)
-#elif !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_s))
+__CREDIRECT(,int,__NOTHROW_NCX,_getchar_nolock,(void),getchar_unlocked,())
+#elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))))
 #include <local/stdio/getchar_unlocked.h>
 /* Same as `getchar()', but performs I/O without acquiring a lock to `stdin' */
-__FORCELOCAL int (__LIBCCALL _getchar_nolock)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getchar_unlocked))(); }
+__FORCELOCAL int __NOTHROW_NCX(__LIBCCALL _getchar_nolock)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getchar_unlocked))(); }
 #endif /* _getchar_nolock... */
 #if __has_builtin(__builtin_putchar_unlocked) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_putchar_unlocked)
 /* Same as `putchar()', but performs I/O without acquiring a lock to `stdout' */
-__FORCELOCAL int (__LIBCCALL _putchar_nolock)(int __ch) __THROWS(...) { return __builtin_putchar_unlocked(__ch); }
+__FORCELOCAL int __NOTHROW_NCX(__LIBCCALL _putchar_nolock)(int __ch) { return __builtin_putchar_unlocked(__ch); }
 #elif defined(__CRT_HAVE_putchar_unlocked)
 /* Same as `putchar()', but performs I/O without acquiring a lock to `stdout' */
-__CREDIRECT(,int,,_putchar_nolock,(int __ch),putchar_unlocked,(__ch)) __THROWS(...)
-#elif !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s))
+__CREDIRECT(,int,__NOTHROW_NCX,_putchar_nolock,(int __ch),putchar_unlocked,(__ch))
+#elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_HAVE_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE_fputc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE__IO_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))))
 #include <local/stdio/putchar_unlocked.h>
 /* Same as `putchar()', but performs I/O without acquiring a lock to `stdout' */
-__FORCELOCAL int (__LIBCCALL _putchar_nolock)(int __ch) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putchar_unlocked))(__ch); }
+__FORCELOCAL int __NOTHROW_NCX(__LIBCCALL _putchar_nolock)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putchar_unlocked))(__ch); }
 #endif /* _putchar_nolock... */
 #ifdef __CRT_HAVE__lock_file
 /* Acquire a lock to `STREAM' and block until doing so succeeds */
@@ -3960,161 +4428,235 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_unlock_file,(__FILE *__restr
 #endif /* _unlock_file... */
 #ifdef __CRT_HAVE__fclose_nolock
 /* Close and destroy a given file `STREAM' */
-__CDECLARE(__ATTR_NONNULL((1)),int,,_fclose_nolock,(__FILE *__restrict __stream),(__stream)) __THROWS(...)
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fclose_nolock,(FILE *__restrict __stream),(__stream))
+#elif defined(__CRT_HAVE__IO_fclose)
+/* Close and destroy a given file `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fclose_nolock,(FILE *__restrict __stream),_IO_fclose,(__stream))
 #elif defined(__CRT_HAVE_fclose)
 /* Close and destroy a given file `STREAM' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,,_fclose_nolock,(__FILE *__restrict __stream),fclose,(__stream)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fclose_nolock,(FILE *__restrict __stream),fclose,(__stream))
 #endif /* _fclose_nolock... */
 #ifdef __CRT_HAVE_fflush_unlocked
-/* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
-__CREDIRECT(__ATTR_NONNULL((1)),int,,_fflush_nolock,(__FILE *__restrict __stream),fflush_unlocked,(__stream)) __THROWS(...)
+/* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(,int,__NOTHROW_NCX,_fflush_nolock,(__FILE *__stream),fflush_unlocked,(__stream))
 #elif defined(__CRT_HAVE__fflush_nolock)
-/* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
-__CDECLARE(__ATTR_NONNULL((1)),int,,_fflush_nolock,(__FILE *__restrict __stream),(__stream)) __THROWS(...)
+/* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
+__CDECLARE(,int,__NOTHROW_NCX,_fflush_nolock,(__FILE *__stream),(__stream))
 #elif defined(__CRT_HAVE_fflush)
-/* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
-__CREDIRECT(__ATTR_NONNULL((1)),int,,_fflush_nolock,(__FILE *__restrict __stream),fflush,(__stream)) __THROWS(...)
-#else /* LIBC: fflush */
-#include <local/stdio/fflush.h>
-/* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
-__FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL _fflush_nolock)(__FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fflush))((__FILE *)__stream); }
+/* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(,int,__NOTHROW_NCX,_fflush_nolock,(__FILE *__stream),fflush,(__stream))
+#elif defined(__CRT_HAVE__IO_fflush)
+/* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(,int,__NOTHROW_NCX,_fflush_nolock,(__FILE *__stream),_IO_fflush,(__stream))
+#else /* LIBC: fflush_unlocked */
+#include <local/stdio/fflush_unlocked.h>
+/* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
+__FORCELOCAL int __NOTHROW_NCX(__LIBCCALL _fflush_nolock)(__FILE *__stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fflush_unlocked))(__stream); }
 #endif /* _fflush_nolock... */
-#ifdef __CRT_HAVE__fread_nolock
+#ifdef __CRT_HAVE_fread_unlocked
 /* Same as `fread()', but performs I/O without acquiring a lock to `STREAM' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,_fread_nolock,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fread_unlocked)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__NOTHROW_NCX,_fread_nolock,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread_unlocked,(__buf,__elemsize,__elemcount,__stream))
+#elif defined(__CRT_HAVE__fread_nolock)
 /* Same as `fread()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,_fread_nolock,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread_unlocked,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__NOTHROW_NCX,_fread_nolock,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),(__buf,__elemsize,__elemcount,__stream))
+#elif defined(__CRT_HAVE__IO_fread)
+/* Same as `fread()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__NOTHROW_NCX,_fread_nolock,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_IO_fread,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE_fread)
 /* Same as `fread()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,_fread_nolock,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fread_s)
-/* Same as `fread()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,_fread_nolock,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread_s,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_s)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__NOTHROW_NCX,_fread_nolock,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread,(__buf,__elemsize,__elemcount,__stream))
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf)))
 #include <local/stdio/fread_unlocked.h>
 /* Same as `fread()', but performs I/O without acquiring a lock to `STREAM' */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 4)) __SIZE_TYPE__ (__LIBCCALL _fread_nolock)(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fread_unlocked))(__buf, __elemsize, __elemcount, __stream); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _fread_nolock)(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fread_unlocked))(__buf, __elemsize, __elemcount, __stream); }
 #endif /* _fread_nolock... */
 #if __has_builtin(__builtin_fwrite_unlocked) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fwrite_unlocked)
 /* Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM' */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 4)) __SIZE_TYPE__ (__LIBCCALL _fwrite_nolock)(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream) __THROWS(...) { return __builtin_fwrite_unlocked(__buf, __elemsize, __elemcount, __stream); }
-#elif defined(__CRT_HAVE__fwrite_nolock)
-/* Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,_fwrite_nolock,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
+__FORCELOCAL __ATTR_NONNULL((1, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _fwrite_nolock)(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream) { return __builtin_fwrite_unlocked(__buf, __elemsize, __elemcount, __stream); }
 #elif defined(__CRT_HAVE_fwrite_unlocked)
 /* Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,_fwrite_nolock,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite_unlocked,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__NOTHROW_NCX,_fwrite_nolock,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite_unlocked,(__buf,__elemsize,__elemcount,__stream))
+#elif defined(__CRT_HAVE__fwrite_nolock)
+/* Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM' */
+__CDECLARE(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__NOTHROW_NCX,_fwrite_nolock,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),(__buf,__elemsize,__elemcount,__stream))
+#elif defined(__CRT_HAVE__IO_fwrite)
+/* Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__NOTHROW_NCX,_fwrite_nolock,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_IO_fwrite,(__buf,__elemsize,__elemcount,__stream))
+#elif defined(__CRT_HAVE_)
+/* Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__NOTHROW_NCX,_fwrite_nolock,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE_fwrite)
 /* Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,_fwrite_nolock,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__NOTHROW_NCX,_fwrite_nolock,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE_fwrite_s)
 /* Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,_fwrite_nolock,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite_s,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s)
+__CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__NOTHROW_NCX,_fwrite_nolock,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite_s,(__buf,__elemsize,__elemcount,__stream))
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_HAVE_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE_fputc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE__IO_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf)))
 #include <local/stdio/fwrite_unlocked.h>
 /* Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM' */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 4)) __SIZE_TYPE__ (__LIBCCALL _fwrite_nolock)(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fwrite_unlocked))(__buf, __elemsize, __elemcount, __stream); }
+__FORCELOCAL __ATTR_NONNULL((1, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _fwrite_nolock)(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fwrite_unlocked))(__buf, __elemsize, __elemcount, __stream); }
 #endif /* _fwrite_nolock... */
 #ifdef __CRT_HAVE__fread_nolock_s
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 5)),__SIZE_TYPE__,,_fread_nolock_s,(void *__restrict __buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),(__buf,__bufsize,__elemsize,__elemcount,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_s) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc)
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf)))
 #include <local/stdio/_fread_nolock_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_fread_nolock_s, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 5)) __SIZE_TYPE__ (__LIBCCALL _fread_nolock_s)(void *__restrict __buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_fread_nolock_s))(__buf, __bufsize, __elemsize, __elemcount, __stream); })
 #endif /* _fread_nolock_s... */
-#ifdef __CRT_HAVE__fseek_nolock
+#ifdef __CRT_HAVE_fseek_unlocked
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),,_fseek_nolock,(__FILE *__restrict __stream, long int __off, int __whence),(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseek)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fseek_nolock,(__FILE *__restrict __stream, long int __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE__fseek_nolock)
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),,_fseek_nolock,(__FILE *__restrict __stream, long int __off, int __whence),fseek,(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseeko) && (__SIZEOF_LONG__ == 4)
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fseek_nolock,(__FILE *__restrict __stream, long int __off, int __whence),(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseeko_unlocked) && (__SIZEOF_LONG__ == __SIZEOF_OFF32_T__)
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),,_fseek_nolock,(__FILE *__restrict __stream, long int __off, int __whence),fseeko,(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseeko64) && (__SIZEOF_LONG__ == 8)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fseek_nolock,(__FILE *__restrict __stream, long int __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseeko) && (__SIZEOF_LONG__ == __SIZEOF_OFF32_T__)
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),,_fseek_nolock,(__FILE *__restrict __stream, long int __off, int __whence),fseeko64,(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE__fseeki64) && (__SIZEOF_LONG__ == 8)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fseek_nolock,(__FILE *__restrict __stream, long int __off, int __whence),fseeko,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseeko64_unlocked) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),,_fseek_nolock,(__FILE *__restrict __stream, long int __off, int __whence),_fseeki64,(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE__fseeki64) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseeko64_unlocked)))
-#include <local/stdio/fseek.h>
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fseek_nolock,(__FILE *__restrict __stream, long int __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE__fseeki64_nolock) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
-__FORCELOCAL __ATTR_NONNULL((1)) void (__LIBCCALL _fseek_nolock)(__FILE *__restrict __stream, long int __off, int __whence) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fseek))(__stream, __off, __whence); }
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fseek_nolock,(__FILE *__restrict __stream, long int __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseeko64) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
+/* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fseek_nolock,(__FILE *__restrict __stream, long int __off, int __whence),fseeko64,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE__fseeki64) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
+/* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fseek_nolock,(__FILE *__restrict __stream, long int __off, int __whence),_fseeki64,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64)
+#include <local/stdio/fseek_unlocked.h>
+/* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _fseek_nolock)(__FILE *__restrict __stream, long int __off, int __whence) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fseek_unlocked))(__stream, __off, __whence); }
 #endif /* _fseek_nolock... */
-#ifdef __CRT_HAVE__ftell_nolock
+#ifdef __CRT_HAVE_ftell_unlocked
 /* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
-__CDECLARE(__ATTR_NONNULL((1)),long int,,_ftell_nolock,(__FILE *__restrict __stream),(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_ftell)
+__CREDIRECT(__ATTR_NONNULL((1)),long int,__NOTHROW_NCX,_ftell_nolock,(__FILE *__restrict __stream),ftell_unlocked,(__stream))
+#elif defined(__CRT_HAVE__ftell_nolock)
 /* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
-__CREDIRECT(__ATTR_NONNULL((1)),long int,,_ftell_nolock,(__FILE *__restrict __stream),ftell,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_ftello) && (__SIZEOF_LONG__ == 4)
+__CDECLARE(__ATTR_NONNULL((1)),long int,__NOTHROW_NCX,_ftell_nolock,(__FILE *__restrict __stream),(__stream))
+#elif defined(__CRT_HAVE__IO_ftell)
 /* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
-__CREDIRECT(__ATTR_NONNULL((1)),long int,,_ftell_nolock,(__FILE *__restrict __stream),ftello,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_ftello64) && (__SIZEOF_LONG__ == 8)
+__CREDIRECT(__ATTR_NONNULL((1)),long int,__NOTHROW_NCX,_ftell_nolock,(__FILE *__restrict __stream),_IO_ftell,(__stream))
+#elif defined(__CRT_HAVE_ftello_unlocked) && (__SIZEOF_LONG__ == __SIZEOF_OFF32_T__)
 /* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
-__CREDIRECT(__ATTR_NONNULL((1)),long int,,_ftell_nolock,(__FILE *__restrict __stream),ftello64,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE__ftelli64) && (__SIZEOF_LONG__ == 8)
+__CREDIRECT(__ATTR_NONNULL((1)),long int,__NOTHROW_NCX,_ftell_nolock,(__FILE *__restrict __stream),ftello_unlocked,(__stream))
+#elif defined(__CRT_HAVE_ftello) && (__SIZEOF_LONG__ == __SIZEOF_OFF32_T__)
 /* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
-__CREDIRECT(__ATTR_NONNULL((1)),long int,,_ftell_nolock,(__FILE *__restrict __stream),_ftelli64,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE__ftelli64) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftello64_unlocked)))
-#include <local/stdio/ftell.h>
+__CREDIRECT(__ATTR_NONNULL((1)),long int,__NOTHROW_NCX,_ftell_nolock,(__FILE *__restrict __stream),ftello,(__stream))
+#elif defined(__CRT_HAVE_ftello64_unlocked) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
 /* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
-__FORCELOCAL __ATTR_NONNULL((1)) long int (__LIBCCALL _ftell_nolock)(__FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftell))(__stream); }
+__CREDIRECT(__ATTR_NONNULL((1)),long int,__NOTHROW_NCX,_ftell_nolock,(__FILE *__restrict __stream),ftello64_unlocked,(__stream))
+#elif defined(__CRT_HAVE__ftelli64_nolock) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
+/* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),long int,__NOTHROW_NCX,_ftell_nolock,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream))
+#elif defined(__CRT_HAVE_ftello64) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
+/* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),long int,__NOTHROW_NCX,_ftell_nolock,(__FILE *__restrict __stream),ftello64,(__stream))
+#elif defined(__CRT_HAVE__ftelli64) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
+/* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__CREDIRECT(__ATTR_NONNULL((1)),long int,__NOTHROW_NCX,_ftell_nolock,(__FILE *__restrict __stream),_ftelli64,(__stream))
+#elif defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_ftello_unlocked)
+#include <local/stdio/ftell_unlocked.h>
+/* Return the current in-file position of `STREAM' as a byte-offet from the start of the file */
+__FORCELOCAL __ATTR_NONNULL((1)) long int __NOTHROW_NCX(__LIBCCALL _ftell_nolock)(__FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftell_unlocked))(__stream); }
 #endif /* _ftell_nolock... */
-#ifdef __CRT_HAVE__fseeki64_nolock
+#ifdef __CRT_HAVE_fseeko64_unlocked
 /* 64-bit variant of `fseeko' */
-__CDECLARE(__ATTR_NONNULL((1)),int,,_fseeki64_nolock,(__FILE *__restrict __stream, __off64_t __off, int __whence),(__stream,__off,__whence)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fseeki64_nolock,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseeko_unlocked) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+/* 64-bit variant of `fseeko' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fseeki64_nolock,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE__fseeki64_nolock)
+/* 64-bit variant of `fseeko' */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fseeki64_nolock,(__FILE *__restrict __stream, __off64_t __off, int __whence),(__stream,__off,__whence))
+#elif defined(__CRT_HAVE__fseeki64)
+/* 64-bit variant of `fseeko' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fseeki64_nolock,(__FILE *__restrict __stream, __off64_t __off, int __whence),_fseeki64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64)
 /* 64-bit variant of `fseeko' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,,_fseeki64_nolock,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseeko64,(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseeko) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE_fseeko_unlocked)))
-#include <local/stdio/fseeko64.h>
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fseeki64_nolock,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseeko64,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
+#include <local/stdio/fseeko64_unlocked.h>
 /* 64-bit variant of `fseeko' */
-__FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL _fseeki64_nolock)(__FILE *__restrict __stream, __off64_t __off, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fseeko64))(__stream, __off, __whence); }
+__FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _fseeki64_nolock)(__FILE *__restrict __stream, __off64_t __off, int __whence) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fseeko64_unlocked))(__stream, __off, __whence); }
 #endif /* _fseeki64_nolock... */
-#ifdef __CRT_HAVE__ftelli64_nolock
+#ifdef __CRT_HAVE_ftello64_unlocked
 /* 64-bit variant of `ftello' */
-__CDECLARE(__ATTR_NONNULL((1)),__off64_t,,_ftelli64_nolock,(__FILE *__restrict __stream),(__stream)) __THROWS(...)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,__NOTHROW_NCX,_ftelli64_nolock,(__FILE *__restrict __stream),ftello64_unlocked,(__stream))
+#elif defined(__CRT_HAVE_ftello_unlocked) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+/* 64-bit variant of `ftello' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,__NOTHROW_NCX,_ftelli64_nolock,(__FILE *__restrict __stream),ftello_unlocked,(__stream))
+#elif defined(__CRT_HAVE__ftelli64_nolock)
+/* 64-bit variant of `ftello' */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,__NOTHROW_NCX,_ftelli64_nolock,(__FILE *__restrict __stream),(__stream))
+#elif defined(__CRT_HAVE__ftelli64)
+/* 64-bit variant of `ftello' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,__NOTHROW_NCX,_ftelli64_nolock,(__FILE *__restrict __stream),_ftelli64,(__stream))
 #elif defined(__CRT_HAVE_ftello64)
 /* 64-bit variant of `ftello' */
-__CREDIRECT(__ATTR_NONNULL((1)),__off64_t,,_ftelli64_nolock,(__FILE *__restrict __stream),ftello64,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftello) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE_ftello_unlocked)))
-#include <local/stdio/ftello64.h>
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,__NOTHROW_NCX,_ftelli64_nolock,(__FILE *__restrict __stream),ftello64,(__stream))
+#elif defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock) || defined(__CRT_HAVE__IO_ftell)
+#include <local/stdio/ftello64_unlocked.h>
 /* 64-bit variant of `ftello' */
-__FORCELOCAL __ATTR_NONNULL((1)) __off64_t (__LIBCCALL _ftelli64_nolock)(__FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftello64))(__stream); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __off64_t __NOTHROW_NCX(__LIBCCALL _ftelli64_nolock)(__FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftello64_unlocked))(__stream); }
 #endif /* _ftelli64_nolock... */
-#ifdef __CRT_HAVE__ungetc_nolock
+#ifdef __CRT_HAVE_ungetc_unlocked
+/* Unget a single character byte of data previously returned by `getc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,_ungetc_nolock,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
+#elif defined(__CRT_HAVE__ungetc_nolock)
 /* Unget a single character byte of data previously returned by `getc()' */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,_ungetc_nolock,(int __ch, __FILE *__restrict __stream),(__ch,__stream))
+#elif defined(__CRT_HAVE__IO_ungetc)
+/* Unget a single character byte of data previously returned by `getc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,_ungetc_nolock,(int __ch, __FILE *__restrict __stream),_IO_ungetc,(__ch,__stream))
 #elif defined(__CRT_HAVE_ungetc)
 /* Unget a single character byte of data previously returned by `getc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,_ungetc_nolock,(int __ch, __FILE *__restrict __stream),ungetc,(__ch,__stream))
 #endif /* _ungetc_nolock... */
-#ifdef __CRT_HAVE_getchar
+#if defined(__CRT_HAVE_getchar_unlocked) && (defined(__USE_STDIO_UNLOCKED))
 /* Alias for `fgetc(stdin)' */
-__CREDIRECT(,int,,fgetchar,(void),getchar,()) __THROWS(...)
-#elif !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock))))
+__CREDIRECT(,int,__NOTHROW_NCX,fgetchar,(void),getchar_unlocked,())
+#elif defined(__CRT_HAVE_getchar)
+/* Alias for `fgetc(stdin)' */
+__CREDIRECT(,int,__NOTHROW_NCX,fgetchar,(void),getchar,())
+#elif defined(__CRT_HAVE__fgetchar)
+/* Alias for `fgetc(stdin)' */
+__CREDIRECT(,int,__NOTHROW_NCX,fgetchar,(void),_fgetchar,())
+#elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked))
 #include <local/stdio/getchar.h>
 /* Alias for `fgetc(stdin)' */
-__FORCELOCAL int (__LIBCCALL fgetchar)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getchar))(); }
+__FORCELOCAL int __NOTHROW_NCX(__LIBCCALL fgetchar)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getchar))(); }
 #endif /* fgetchar... */
 #if __has_builtin(__builtin_putchar) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_putchar)
 /* Alias for `fputc(CH, stdout)' */
-__FORCELOCAL int (__LIBCCALL fputchar)(int __ch) __THROWS(...) { return __builtin_putchar(__ch); }
+__FORCELOCAL int __NOTHROW_NCX(__LIBCCALL fputchar)(int __ch) { return __builtin_putchar(__ch); }
+#elif defined(__CRT_HAVE_putchar_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+/* Alias for `fputc(CH, stdout)' */
+__CREDIRECT(,int,__NOTHROW_NCX,fputchar,(int __ch),putchar_unlocked,(__ch))
 #elif defined(__CRT_HAVE_putchar)
 /* Alias for `fputc(CH, stdout)' */
-__CREDIRECT(,int,,fputchar,(int __ch),putchar,(__ch)) __THROWS(...)
-#elif !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock))))
+__CREDIRECT(,int,__NOTHROW_NCX,fputchar,(int __ch),putchar,(__ch))
+#elif defined(__CRT_HAVE__fputchar)
+/* Alias for `fputc(CH, stdout)' */
+__CREDIRECT(,int,__NOTHROW_NCX,fputchar,(int __ch),_fputchar,(__ch))
+#elif defined(__CRT_HAVE_putchar_unlocked)
+/* Alias for `fputc(CH, stdout)' */
+__CREDIRECT(,int,__NOTHROW_NCX,fputchar,(int __ch),putchar_unlocked,(__ch))
+#elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))
 #include <local/stdio/putchar.h>
 /* Alias for `fputc(CH, stdout)' */
-__FORCELOCAL int (__LIBCCALL fputchar)(int __ch) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putchar))(__ch); }
+__FORCELOCAL int __NOTHROW_NCX(__LIBCCALL fputchar)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putchar))(__ch); }
 #endif /* fputchar... */
 #ifdef __CRT_HAVE__flushall
-__CREDIRECT(,int,,flushall,(void),_flushall,()) __THROWS(...)
+__CREDIRECT(,int,__NOTHROW_NCX,flushall,(void),_flushall,())
+#elif defined(__CRT_HAVE__IO_flush_all)
+__CREDIRECT(,int,__NOTHROW_NCX,flushall,(void),_IO_flush_all,())
 #else /* LIBC: _flushall */
 #include <local/stdio/_flushall.h>
-__FORCELOCAL int (__LIBCCALL flushall)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_flushall))(); }
+__FORCELOCAL int __NOTHROW_NCX(__LIBCCALL flushall)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_flushall))(); }
 #endif /* flushall... */
 #ifdef __CRT_HAVE__rmtmp
 __CREDIRECT(,int,__NOTHROW_RPC,rmtmp,(void),_rmtmp,())
@@ -4242,7 +4784,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),wchar_t *,,fgetws,(wchar_t *__r
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),wchar_t *,,fgetws,(wchar_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE__fgetws_nolock)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),wchar_t *,,fgetws,(wchar_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream)) __THROWS(...)
-#elif (defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked))
+#elif (defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE__IO_ferror))
 #include <local/wchar/fgetws.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fgetws, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) wchar_t *(__LIBCCALL fgetws)(wchar_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetws))(__buf, __bufsize, __stream); })
 #else /* CUSTOM: fgetws */
@@ -5236,7 +5778,7 @@ __FORCELOCAL wint_t __NOTHROW_NCX(__LIBCCALL _fputwchar)(wchar_t __wc) { return 
 #define ___getws_s_defined 1
 #ifdef __CRT_HAVE__getws_s
 __CDECLARE(,wchar_t *,__NOTHROW_NCX,_getws_s,(wchar_t *__buf, __SIZE_TYPE__ __buflen),(__buf,__buflen))
-#elif (((defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked))) || defined(__CRT_HAVE_fgetws) || defined(__CRT_HAVE_fgetws_unlocked) || defined(__CRT_HAVE__fgetws_nolock)) && !defined(__NO_STDSTREAMS)
+#elif (((defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE__IO_ferror))) || defined(__CRT_HAVE_fgetws) || defined(__CRT_HAVE_fgetws_unlocked) || defined(__CRT_HAVE__fgetws_nolock)) && !defined(__NO_STDSTREAMS)
 #include <local/wchar/_getws_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_getws_s, __FORCELOCAL wchar_t *__NOTHROW_NCX(__LIBCCALL _getws_s)(wchar_t *__buf, __SIZE_TYPE__ __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getws_s))(__buf, __buflen); })
 #else /* CUSTOM: _getws_s */

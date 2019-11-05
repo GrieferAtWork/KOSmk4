@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc63f057b */
+/* HASH CRC-32:0x6bdf04b6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fgetpos64_defined
-#if defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64)
+#if defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock) || defined(__CRT_HAVE__IO_ftell)
 #define __local_fgetpos64_defined 1
 #include <kos/anno.h>
 /* Dependency: "crt_ftello64" from "stdio" */
@@ -26,10 +26,14 @@
 #define ____localdep_crt_ftello64_defined 1
 #if defined(__CRT_HAVE_ftello64_unlocked) && (defined(__USE_STDIO_UNLOCKED))
 __CREDIRECT(__ATTR_NONNULL((1)),__off64_t,,__localdep_crt_ftello64,(__FILE *__restrict __stream),ftello64_unlocked,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__ftelli64_nolock) && (defined(__USE_STDIO_UNLOCKED))
+__CREDIRECT(__ATTR_NONNULL((1)),__off64_t,,__localdep_crt_ftello64,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_ftello)
 __CREDIRECT(__ATTR_NONNULL((1)),__off64_t,,__localdep_crt_ftello64,(__FILE *__restrict __stream),ftello,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_ftello64_unlocked)
 __CREDIRECT(__ATTR_NONNULL((1)),__off64_t,,__localdep_crt_ftello64,(__FILE *__restrict __stream),ftello64_unlocked,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__ftelli64_nolock)
+__CREDIRECT(__ATTR_NONNULL((1)),__off64_t,,__localdep_crt_ftello64,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE__ftelli64)
 __CREDIRECT(__ATTR_NONNULL((1)),__off64_t,,__localdep_crt_ftello64,(__FILE *__restrict __stream),_ftelli64,(__stream)) __THROWS(...)
 #else /* LIBC: ftello */
@@ -44,6 +48,8 @@ __CREDIRECT(__ATTR_NONNULL((1)),__off64_t,,__localdep_crt_ftello64,(__FILE *__re
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,__localdep_crt_fgetpos,(__FILE *__restrict __stream, __pos32_t *__restrict __pos),fgetpos_unlocked,(__stream,__pos)) __THROWS(...)
 #elif defined(__CRT_HAVE_fgetpos)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,__localdep_crt_fgetpos,(__FILE *__restrict __stream, __pos32_t *__restrict __pos),fgetpos,(__stream,__pos)) __THROWS(...)
+#elif defined(__CRT_HAVE__IO_fgetpos)
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,,__localdep_crt_fgetpos,(__FILE *__restrict __stream, __pos32_t *__restrict __pos),_IO_fgetpos,(__stream,__pos)) __THROWS(...)
 #elif defined(__CRT_HAVE_fgetpos_unlocked)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,__localdep_crt_fgetpos,(__FILE *__restrict __stream, __pos32_t *__restrict __pos),fgetpos_unlocked,(__stream,__pos)) __THROWS(...)
 #else /* LIBC: fgetpos */
@@ -70,10 +76,16 @@ __CREDIRECT(__ATTR_NONNULL((1)),__off32_t,,__localdep_crt_ftello,(__FILE *__rest
 #define ____localdep_crt_ftell_defined 1
 #if defined(__CRT_HAVE_ftell_unlocked) && (defined(__USE_STDIO_UNLOCKED))
 __CREDIRECT(__ATTR_NONNULL((1)),long int,,__localdep_crt_ftell,(__FILE *__restrict __stream),ftell_unlocked,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__ftell_nolock) && (defined(__USE_STDIO_UNLOCKED))
+__CREDIRECT(__ATTR_NONNULL((1)),long int,,__localdep_crt_ftell,(__FILE *__restrict __stream),_ftell_nolock,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_ftell)
 __CREDIRECT(__ATTR_NONNULL((1)),long int,,__localdep_crt_ftell,(__FILE *__restrict __stream),ftell,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_ftell_unlocked)
 __CREDIRECT(__ATTR_NONNULL((1)),long int,,__localdep_crt_ftell,(__FILE *__restrict __stream),ftell_unlocked,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__ftell_nolock)
+__CREDIRECT(__ATTR_NONNULL((1)),long int,,__localdep_crt_ftell,(__FILE *__restrict __stream),_ftell_nolock,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__IO_ftell)
+__CREDIRECT(__ATTR_NONNULL((1)),long int,,__localdep_crt_ftell,(__FILE *__restrict __stream),_IO_ftell,(__stream)) __THROWS(...)
 #else /* LIBC: ftell */
 #undef ____localdep_crt_ftell_defined
 #endif /* crt_ftell... */
@@ -84,10 +96,10 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fgetpos64) __ATTR_NONNULL((1, 2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetpos64))(__FILE *__restrict __stream,
                                           __pos64_t *__restrict __pos) __THROWS(...) {
-#line 1603 "kos/src/libc/magic/stdio.c"
-#if defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64)
+#line 1656 "kos/src/libc/magic/stdio.c"
+#if defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE__ftelli64)
 	return (__INT64_TYPE__)(*__pos = (__pos64_t)__localdep_crt_ftello64(__stream)) < 0 ? -1 : 0;
-#elif defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked)
+#elif defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked)
 	__pos32_t __pos32;
 	int __result = __localdep_crt_fgetpos(__stream, &__pos32);
 	if (!__result)
@@ -100,5 +112,5 @@ __LOCAL_LIBC(fgetpos64) __ATTR_NONNULL((1, 2)) int
 #endif
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64) */
+#endif /* defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock) || defined(__CRT_HAVE__IO_ftell) */
 #endif /* !__local_fgetpos64_defined */
