@@ -186,12 +186,23 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			                                 &src_module))
 				goto err;
 			if unlikely(dst_sym->st_size != src_size) {
-				syslog(LOG_WARN, "%q: Symbol %q imported with %Iu bytes, but exported with %Iu from %q\n",
-				       self->dm_filename, self->dm_dynstr + dst_sym->st_name,
-				       dst_sym->st_info, src_size, src_module->dm_filename);
+				/* Special handling for symbols exported by the RTLD module itself.
+				 * Since builtin symbols don't have size information associated with themself,
+				 * we ignore import sizes and solely rely on whatever the hosted application
+				 * is telling us to be expecting. */
+				if (src_size == 0 && src_module == &ld_rtld_module)
+					src_size = dst_sym->st_size;
+				else {
+					syslog(LOG_WARN, "%q: Symbol %q imported with %Iu bytes, but exported with %Iu from %q\n",
+					       self->dm_filename, self->dm_dynstr + dst_sym->st_name,
+					       dst_sym->st_info, src_size, src_module->dm_filename);
+					/* NOTE: When `src_size' is ZERO(0), then always copy the size information
+					 *       that is expected by the hosted module (though still emit the warning
+					 *       in this case) */
+					if (!src_size || src_size > dst_sym->st_size)
+						src_size = dst_sym->st_size;
+				}
 			}
-			if unlikely(src_size > dst_sym->st_size)
-				src_size = dst_sym->st_size;
 			memcpy((void *)reladdr,
 			       (void *)value,
 			       src_size);

@@ -186,11 +186,11 @@ driver_do_apply_relocations_vector(struct driver *__restrict self,
 			                                                    ELF_R_SYM(rel.r_info),
 			                                                    &src_size,
 			                                                    &src_module,
-                                                                reloc_flags);
+			                                                    reloc_flags);
 			if unlikely(dst_sym->st_size != src_size) {
 				printk(KERN_WARNING "%q: Symbol %q imported with %Iu bytes, but exported with %Iu from %q\n",
 				       self->d_name, self->d_dynstr + dst_sym->st_name,
-				       dst_sym->st_info, src_size, src_module->d_filename);
+				       dst_sym->st_size, src_size, src_module->d_filename);
 			}
 			if unlikely(src_size > dst_sym->st_size)
 				src_size = dst_sym->st_size;
