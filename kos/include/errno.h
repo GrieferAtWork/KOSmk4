@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf2657e1 */
+/* HASH CRC-32:0x2c36be59 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL) || defined(__USE_GNU)
 #include <bits/types.h>
-#endif /* __USE_KOS || __USE_KOS_KERNEL */
+#endif /* __USE_KOS || __USE_KOS_KERNEL || __USE_GNU */
 
 #ifdef __CRT_DOS_PRIMARY
 #include <parts/dos/errno.h>
@@ -634,6 +634,12 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,_
 #endif /* ____p__pgmptr_defined */
 #endif /* !... */
 #endif /* !program_invocation_short_name */
+
+#ifndef __error_t_defined
+#define __error_t_defined 1
+typedef __errno_t error_t;
+#endif /* !__error_t_defined */
+
 #endif /* __USE_GNU */
 
 __SYSDECL_END
