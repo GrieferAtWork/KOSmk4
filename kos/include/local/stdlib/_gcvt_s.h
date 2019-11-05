@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x543fba39 */
+/* HASH CRC-32:0x5b0a28f9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_gcvt_s))(char *__buf,
                                                      __SIZE_TYPE__ __buflen,
                                                      double __val,
                                                      int __ndigit) {
-#line 2462 "kos/src/libc/magic/stdlib.c"
+#line 2556 "kos/src/libc/magic/stdlib.c"
 	int __a, __b;
 	if (!__buf)
 		return __EINVAL;

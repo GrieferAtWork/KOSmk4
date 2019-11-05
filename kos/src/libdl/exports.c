@@ -41,8 +41,9 @@ DEFINE_PUBLIC_ALIAS(__environ, environ);
 PUBLIC FAKEDATA struct process_peb __peb = { 0 };
 PUBLIC FAKEDATA size_t __argc = 0;
 PUBLIC FAKEDATA char **__argv = NULL;
-PUBLIC FAKEDATA char *_pgmptr = NULL;
-
+PUBLIC FAKEDATA char *program_invocation_name = NULL;
+PUBLIC FAKEDATA char *program_invocation_short_name = NULL;
+DEFINE_PUBLIC_ALIAS(_pgmptr, program_invocation_name);
 
 DECL_END
 

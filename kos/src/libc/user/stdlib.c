@@ -1571,7 +1571,8 @@ NOTHROW_NCX(LIBCCALL libc___p___argv)(void)
 }
 /*[[[end:__p___argv]]]*/
 
-/*[[[head:__p__pgmptr,hash:CRC-32=0x9b4880c2]]]*/
+/*[[[head:__p__pgmptr,hash:CRC-32=0xe184d114]]]*/
+/* Alias for argv[0], as passed to main() */
 INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__pgmptr") char **
 NOTHROW_NCX(LIBCCALL libc___p__pgmptr)(void)
@@ -1600,9 +1601,9 @@ char **libc___p___initenv_pointer = NULL;
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init.__p___initenv.initialized")
 struct atomic_once libc___p___initenv_initialized = ATOMIC_ONCE_INIT;
 
-/*[[[head:__p___initenv,hash:CRC-32=0x9fe24b00]]]*/
+/*[[[head:__p___initenv,hash:CRC-32=0x4f63fd8d]]]*/
 /* Access to the initial environment block */
-INTERN ATTR_CONST
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___initenv") char ***
 NOTHROW_NCX(LIBCCALL libc___p___initenv)(void)
 /*[[[body:__p___initenv]]]*/
@@ -1651,9 +1652,9 @@ NOTHROW_NCX(LIBCCALL libc___p__wenviron)(void)
 }
 /*[[[end:__p__wenviron]]]*/
 
-/*[[[head:DOS$__p___winitenv,hash:CRC-32=0xea43d103]]]*/
+/*[[[head:DOS$__p___winitenv,hash:CRC-32=0xf86cfdf]]]*/
 /* Access to the initial environment block */
-INTERN ATTR_CONST
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___winitenv") char16_t ***
 NOTHROW_NCX(LIBDCALL libd___p___winitenv)(void)
 /*[[[body:DOS$__p___winitenv]]]*/
@@ -1664,9 +1665,9 @@ NOTHROW_NCX(LIBDCALL libd___p___winitenv)(void)
 }
 /*[[[end:DOS$__p___winitenv]]]*/
 
-/*[[[head:__p___winitenv,hash:CRC-32=0x974bb0d6]]]*/
+/*[[[head:__p___winitenv,hash:CRC-32=0x728eae0a]]]*/
 /* Access to the initial environment block */
-INTERN ATTR_CONST
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___winitenv") char32_t ***
 NOTHROW_NCX(LIBCCALL libc___p___winitenv)(void)
 /*[[[body:__p___winitenv]]]*/
@@ -1689,17 +1690,17 @@ NOTHROW_NCX(LIBDCALL libd___p___wargv)(void)
 }
 /*[[[end:DOS$__p___wargv]]]*/
 
-/*[[[head:__p__wpgmptr,hash:CRC-32=0xda4fb24e]]]*/
+/*[[[head:__p___wargv,hash:CRC-32=0x871da926]]]*/
 INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__wpgmptr") char32_t **
-NOTHROW_NCX(LIBCCALL libc___p__wpgmptr)(void)
-/*[[[body:__p__wpgmptr]]]*/
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___wargv") char32_t ***
+NOTHROW_NCX(LIBCCALL libc___p___wargv)(void)
+/*[[[body:__p___wargv]]]*/
 {
-	CRT_UNIMPLEMENTED("__p__wpgmptr"); /* TODO */
+	CRT_UNIMPLEMENTED("__p___wargv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:__p__wpgmptr]]]*/
+/*[[[end:__p___wargv]]]*/
 
 /*[[[head:DOS$__p__wpgmptr,hash:CRC-32=0x87790bd9]]]*/
 INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
@@ -1712,6 +1713,18 @@ NOTHROW_NCX(LIBDCALL libd___p__wpgmptr)(void)
 	return NULL;
 }
 /*[[[end:DOS$__p__wpgmptr]]]*/
+
+/*[[[head:__p__wpgmptr,hash:CRC-32=0xda4fb24e]]]*/
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__wpgmptr") char32_t **
+NOTHROW_NCX(LIBCCALL libc___p__wpgmptr)(void)
+/*[[[body:__p__wpgmptr]]]*/
+{
+	CRT_UNIMPLEMENTED("__p__wpgmptr"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:__p__wpgmptr]]]*/
 
 /*[[[head:_fullpath,hash:CRC-32=0xb89e2b18]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.utility._fullpath") char *
@@ -1751,40 +1764,30 @@ NOTHROW_NCX(LIBCCALL libc__aligned_recalloc)(void *mptr,
 }
 /*[[[end:_aligned_recalloc]]]*/
 
-/*[[[head:__doserrno,hash:CRC-32=0x65d90b38]]]*/
-INTERN ATTR_CONST
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno.__doserrno") u32 *
-NOTHROW_NCX(LIBCCALL libc___doserrno)(void)
-/*[[[body:__doserrno]]]*/
-{
-	CRT_UNIMPLEMENTED("__doserrno"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:__doserrno]]]*/
+/*[[[skip:__doserrno]]]*/
+/*[[[skip:_get_doserrno]]]*/
+/*[[[skip:_set_doserrno]]]*/
 
-/*[[[head:__p___wargv,hash:CRC-32=0x871da926]]]*/
-INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___wargv") char32_t ***
-NOTHROW_NCX(LIBCCALL libc___p___wargv)(void)
-/*[[[body:__p___wargv]]]*/
+/*[[[head:_seterrormode,hash:CRC-32=0x62b91e01]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._seterrormode") void
+NOTHROW_NCX(LIBCCALL libc__seterrormode)(int mode)
+/*[[[body:_seterrormode]]]*/
 {
-	CRT_UNIMPLEMENTED("__p___wargv"); /* TODO */
+	CRT_UNIMPLEMENTED("_seterrormode"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return NULL;
 }
-/*[[[end:__p___wargv]]]*/
+/*[[[end:_seterrormode]]]*/
 
-/*[[[head:_get_doserrno,hash:CRC-32=0x313fa82a]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._get_doserrno") errno_t
-NOTHROW_NCX(LIBCCALL libc__get_doserrno)(u32 *perr)
-/*[[[body:_get_doserrno]]]*/
+/*[[[head:_set_error_mode,hash:CRC-32=0x2e83accf]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._set_error_mode") int
+NOTHROW_NCX(LIBCCALL libc__set_error_mode)(int mode)
+/*[[[body:_set_error_mode]]]*/
 {
-	CRT_UNIMPLEMENTED("_get_doserrno"); /* TODO */
+	CRT_UNIMPLEMENTED("_set_error_mode"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return 0;
+	return -1;
 }
-/*[[[end:_get_doserrno]]]*/
+/*[[[end:_set_error_mode]]]*/
 
 /*[[[head:_aligned_offset_malloc,hash:CRC-32=0x2b246c46]]]*/
 INTERN ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1))
@@ -1845,28 +1848,6 @@ NOTHROW_NCX(LIBCCALL libc__recalloc)(void *mptr,
 }
 /*[[[end:_recalloc]]]*/
 
-/*[[[head:_set_doserrno,hash:CRC-32=0x641cccdf]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._set_doserrno") errno_t
-NOTHROW_NCX(LIBCCALL libc__set_doserrno)(u32 err)
-/*[[[body:_set_doserrno]]]*/
-{
-	CRT_UNIMPLEMENTED("_set_doserrno"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:_set_doserrno]]]*/
-
-/*[[[head:_set_error_mode,hash:CRC-32=0x2e83accf]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._set_error_mode") int
-NOTHROW_NCX(LIBCCALL libc__set_error_mode)(int mode)
-/*[[[body:_set_error_mode]]]*/
-{
-	CRT_UNIMPLEMENTED("_set_error_mode"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
-}
-/*[[[end:_set_error_mode]]]*/
-
 /*[[[head:_aligned_realloc,hash:CRC-32=0x6bdbbaea]]]*/
 INTERN WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_ALLOC_ALIGN(3)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap._aligned_realloc") void *
@@ -1903,16 +1884,6 @@ NOTHROW_RPC(LIBCCALL libc__wperror)(char32_t const *errmsg)
 }
 /*[[[end:_wperror]]]*/
 
-/*[[[head:_seterrormode,hash:CRC-32=0x62b91e01]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._seterrormode") void
-NOTHROW_NCX(LIBCCALL libc__seterrormode)(int mode)
-/*[[[body:_seterrormode]]]*/
-{
-	CRT_UNIMPLEMENTED("_seterrormode"); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:_seterrormode]]]*/
-
 /*[[[head:DOS$_wperror,hash:CRC-32=0xf1b3aa1]]]*/
 INTERN ATTR_COLD
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._wperror") void
@@ -1944,7 +1915,7 @@ NOTHROW_NCX(LIBCCALL libc__beep)(unsigned int freq,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x9e97d8b3]]]*/
+/*[[[start:exports,hash:CRC-32=0x324e9465]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_WEAK_ALIAS(system, libc_system);
 DEFINE_PUBLIC_WEAK_ALIAS(abort, libc_abort);
@@ -2017,18 +1988,16 @@ DEFINE_PUBLIC_WEAK_ALIAS(mkostemp, libc_mkostemp);
 DEFINE_PUBLIC_WEAK_ALIAS(mkostemps, libc_mkostemps);
 DEFINE_PUBLIC_WEAK_ALIAS(mkostemp64, libc_mkostemp64);
 DEFINE_PUBLIC_WEAK_ALIAS(mkostemps64, libc_mkostemps64);
-DEFINE_PUBLIC_WEAK_ALIAS(__doserrno, libc___doserrno);
-DEFINE_PUBLIC_WEAK_ALIAS(_get_doserrno, libc__get_doserrno);
-DEFINE_PUBLIC_WEAK_ALIAS(_set_doserrno, libc__set_doserrno);
 DEFINE_PUBLIC_WEAK_ALIAS(__p___argc, libc___p___argc);
 DEFINE_PUBLIC_WEAK_ALIAS(__p___argv, libc___p___argv);
-DEFINE_PUBLIC_WEAK_ALIAS(__p__pgmptr, libc___p__pgmptr);
 DEFINE_PUBLIC_WEAK_ALIAS(__p___wargv, libc___p___wargv);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$__p___wargv, libd___p___wargv);
 DEFINE_PUBLIC_WEAK_ALIAS(__p__wenviron, libc___p__wenviron);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$__p__wenviron, libd___p__wenviron);
 DEFINE_PUBLIC_WEAK_ALIAS(__p__wpgmptr, libc___p__wpgmptr);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$__p__wpgmptr, libd___p__wpgmptr);
+DEFINE_PUBLIC_WEAK_ALIAS(__p__pgmptr, libc___p__pgmptr);
+DEFINE_PUBLIC_WEAK_ALIAS(__p_program_invocation_name, libc___p__pgmptr);
 DEFINE_PUBLIC_WEAK_ALIAS(__p___initenv, libc___p___initenv);
 DEFINE_PUBLIC_WEAK_ALIAS(__p___winitenv, libc___p___winitenv);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$__p___winitenv, libd___p___winitenv);

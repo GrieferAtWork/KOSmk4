@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c631ed8 */
+/* HASH CRC-32:0x9f174299 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_lrotl) __ATTR_CONST unsigned long
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(_lrotl))(unsigned long __val,
                                                 int __shift) {
-#line 2567 "kos/src/libc/magic/stdlib.c"
+#line 2661 "kos/src/libc/magic/stdlib.c"
 	return __hybrid_rol(__val, __shift);
 }
 __NAMESPACE_LOCAL_END

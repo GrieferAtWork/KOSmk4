@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49acfbf3 */
+/* HASH CRC-32:0x43f1a5cf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -134,19 +134,20 @@ INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_doserrno)(u32 *perr);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__set_doserrno)(u32 err);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED int *NOTHROW_NCX(LIBCCALL libc___p___argc)(void);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char ***NOTHROW_NCX(LIBCCALL libc___p___argv)(void);
-INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char **NOTHROW_NCX(LIBCCALL libc___p__pgmptr)(void);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***NOTHROW_NCX(LIBCCALL libc___p___wargv)(void);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***NOTHROW_NCX(LIBDCALL libd___p___wargv)(void);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***NOTHROW_NCX(LIBCCALL libc___p__wenviron)(void);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***NOTHROW_NCX(LIBDCALL libd___p__wenviron)(void);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t **NOTHROW_NCX(LIBCCALL libc___p__wpgmptr)(void);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t **NOTHROW_NCX(LIBDCALL libd___p__wpgmptr)(void);
+/* Alias for argv[0], as passed to main() */
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char **NOTHROW_NCX(LIBCCALL libc___p__pgmptr)(void);
 /* Access to the initial environment block */
-INTDEF ATTR_CONST char ***NOTHROW_NCX(LIBCCALL libc___p___initenv)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char ***NOTHROW_NCX(LIBCCALL libc___p___initenv)(void);
 /* Access to the initial environment block */
-INTDEF ATTR_CONST char32_t ***NOTHROW_NCX(LIBCCALL libc___p___winitenv)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***NOTHROW_NCX(LIBCCALL libc___p___winitenv)(void);
 /* Access to the initial environment block */
-INTDEF ATTR_CONST char16_t ***NOTHROW_NCX(LIBDCALL libd___p___winitenv)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***NOTHROW_NCX(LIBDCALL libd___p___winitenv)(void);
 INTDEF NONNULL((1, 2, 4)) errno_t NOTHROW_NCX(LIBCCALL libc_getenv_s)(size_t *psize, char *buf, rsize_t bufsize, char const *varname);
 INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBCCALL libc__dupenv_s)(char **__restrict pbuf, size_t *pbuflen, char const *varname);
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_rand_s)(unsigned int *__restrict randval);

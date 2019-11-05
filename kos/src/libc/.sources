@@ -70,7 +70,13 @@ BEGIN
 				elfBinary: LIBC_LIB_BINARY,
 				callback: [](self: BoundStep, symbols: {(string,string,string,string,string)...}) {
 					local symbols_set: {string...} = HashSet();
-					for (local symbolName,none,symbolBind,symbolVisi,none,symbolSect: symbols) {
+					final local CRT_DLSUBST_GLOBALS = {
+						"__peb", "environ", "_environ", "__environ",
+						"__argc", "__argv", "_pgmptr",
+						"program_invocation_name",
+						"program_invocation_short_name",
+					};
+					for (local symbolName, none, symbolBind, symbolVisi, none, symbolSect: symbols) {
 						if (symbolVisi != "DEFAULT")
 							continue;
 						if (symbolBind != "GLOBAL" && symbolBind != "WEAK")
@@ -86,14 +92,14 @@ BEGIN
 								"dlmodulebase", "dllocksection", "dlunlocksection", "dlsectionname",
 								"dlsectionindex", "dlsectionmodule", "dlclearcaches", "___tls_get_addr",
 								"__tls_get_addr", "dltlsallocseg", "dltlsfreeseg", "dltlsalloc",
-								"dltlsfree", "dltlsaddr", "__peb", "environ", "_environ",
-								"__environ", "__argc", "__argv", "_pgmptr", "dlauxinfo"
-							}) print "WARNING: Unresolved symbol in libc:",repr symbolName;
+								"dltlsfree", "dltlsaddr", "dlauxinfo",
+							} && symbolName !in CRT_DLSUBST_GLOBALS)
+								print "WARNING: Unresolved symbol in libc:",repr symbolName;
 						} else if (symbolName.startswith("libc_"))
 							print "WARNING: Potentially unwanted libc export:",repr symbolName;
 						symbols_set.insert(symbolName);
 					}
-					symbols_set.update({ "__peb", "environ", "_environ", "__environ", "__argc", "__argv", "_pgmptr" });
+					symbols_set.update(CRT_DLSUBST_GLOBALS);
 					updateFileContents(self.group.fixFilename(LIBC_FEATURES_HEADER),[](fp: File){
 						fp << COPYRIGHT << "\n\n\n";
 						for (local x: symbols_set.sorted())

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d95b65c */
+/* HASH CRC-32:0xbf2657e1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,9 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+#include <bits/types.h>
+#endif /* __USE_KOS || __USE_KOS_KERNEL */
 
 #ifdef __CRT_DOS_PRIMARY
 #include <parts/dos/errno.h>
@@ -522,25 +525,24 @@
 #define ENOTSUP EOPNOTSUPP
 #endif
 
+#if (defined(__USE_KOS) || defined(__USE_KOS_KERNEL)) && !defined(EOK)
+#define EOK          0 /* Operation completed successfully */
+#endif /* (__USE_KOS || __USE_KOS_KERNEL) && !EOK */
 
 #ifdef __CC__
-#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
-#include <bits/types.h>
-#ifndef EOK
-#define EOK          0 /* Operation completed successfully */
-#endif /* !EOK */
-#endif /* __USE_KOS || __USE_KOS_KERNEL */
 
 __SYSDECL_BEGIN
 
 #if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
 #ifndef __errno_t_defined
 #define __errno_t_defined 1
-typedef int errno_t;
+typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
 #endif /* __USE_KOS || __USE_KOS_KERNEL */
 
 #ifdef __USE_KOS_KERNEL
+/* Helper macros for testing the return values of
+ * system calls (s.a. <kos/syscalls.h>) in errno-mode */
 #define E_ISOK(x)  ((__syscall_ulong_t)(x) <= (__syscall_ulong_t)-4096)
 #define E_ISERR(x) ((__syscall_ulong_t)(x) > (__syscall_ulong_t)-4096)
 #endif /* __USE_KOS_KERNEL */
@@ -548,27 +550,91 @@ typedef int errno_t;
 
 /* The `errno' global variable! */
 #ifndef errno
+#ifdef __errno
+#define errno __errno
+#else /* __errno */
 #ifndef ____errno_location_defined
 #define ____errno_location_defined 1
-#if defined(__CRT_HAVE___errno_location)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int *,__NOTHROW_NCX,__errno_location,(void),())
+#ifdef __CRT_HAVE___errno_location
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__errno_location,(void),())
 #elif defined(__CRT_HAVE__errno)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int *,__NOTHROW_NCX,__errno_location,(void),_errno,())
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__errno_location,(void),_errno,())
 #elif defined(__CRT_HAVE___errno)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int *,__NOTHROW_NCX,__errno_location,(void),__errno,())
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__errno_location,(void),__errno,())
 #else /* LIBC: __errno_location */
 #undef ____errno_location_defined
 #endif /* __errno_location... */
 #endif /* !____errno_location_defined */
 #ifdef ____errno_location_defined
 #define errno     (*__errno_location())
-#elif defined(__errno)
-#define errno       __errno
+#elif defined(__CRT_HAVE_errno) && 0
+__LIBC __ATTR_THREAD __errno_t errno;
+#define errno  errno
 #elif defined(__CRT_HAVE_errno)
-__LIBC __ATTR_THREAD int errno;
+__LIBC __errno_t errno;
 #define errno  errno
 #endif
+#endif /* !__errno */
 #endif /* !errno */
+
+#ifdef __USE_GNU
+
+/* Alias for argv[0], as passed to main() */
+#ifndef program_invocation_name
+#ifdef _pgmptr
+#define program_invocation_name _pgmptr
+#elif defined(__CRT_HAVE_program_invocation_name)
+__LIBC char *program_invocation_name;
+#define program_invocation_name program_invocation_name
+#elif defined(__CRT_HAVE__pgmptr)
+#ifndef __NO_ASMNAME
+__LIBC char *program_invocation_name __ASMNAME("_pgmptr");
+#define program_invocation_name  program_invocation_name
+#else /* !__NO_ASMNAME */
+__LIBC char *_pgmptr;
+#define _pgmptr                 _pgmptr
+#define program_invocation_name _pgmptr
+#endif /* __NO_ASMNAME */
+#else /* ... */
+#ifndef ____p__pgmptr_defined
+#define ____p__pgmptr_defined 1
+#ifdef __CRT_HAVE___p__pgmptr
+/* Alias for argv[0], as passed to main() */
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p__pgmptr,(void),())
+#elif defined(__CRT_HAVE___p_program_invocation_name)
+/* Alias for argv[0], as passed to main() */
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p__pgmptr,(void),__p_program_invocation_name,())
+#else /* LIBC: __p__pgmptr */
+#undef ____p__pgmptr_defined
+#endif /* __p__pgmptr... */
+#endif /* !____p__pgmptr_defined */
+#ifdef ____p__pgmptr_defined
+#define program_invocation_name (*__p__pgmptr())
+#endif /* ____p__pgmptr_defined */
+#endif /* !... */
+#endif /* !program_invocation_name */
+
+/* Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
+#ifndef program_invocation_short_name
+#ifdef __CRT_HAVE_program_invocation_short_name
+__LIBC char *program_invocation_short_name;
+#define program_invocation_short_name program_invocation_short_name
+#else /* ... */
+#ifndef ____p_program_invocation_short_name_defined
+#define ____p_program_invocation_short_name_defined 1
+#ifdef __CRT_HAVE___p_program_invocation_short_name
+/* Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p_program_invocation_short_name,(void),())
+#else /* LIBC: __p_program_invocation_short_name */
+#undef ____p_program_invocation_short_name_defined
+#endif /* __p_program_invocation_short_name... */
+#endif /* !____p_program_invocation_short_name_defined */
+#ifdef ____p__pgmptr_defined
+#define program_invocation_name (*__p__pgmptr())
+#endif /* ____p__pgmptr_defined */
+#endif /* !... */
+#endif /* !program_invocation_short_name */
+#endif /* __USE_GNU */
 
 __SYSDECL_END
 

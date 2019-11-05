@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f30dba6 */
+/* HASH CRC-32:0xf0a23328 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2048,6 +2048,11 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 #endif
 #endif /* !___environ_defined */
 
+#ifndef __argc
+#ifdef __CRT_HAVE___argc
+__LIBC int __argc;
+#define __argc __argc
+#else /* .... */
 #ifndef ____p___argc_defined
 #define ____p___argc_defined 1
 #ifdef __CRT_HAVE___p___argc
@@ -2056,6 +2061,16 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__p
 #undef ____p___argc_defined
 #endif /* __p___argc... */
 #endif /* !____p___argc_defined */
+#ifdef ____p___argc_defined
+#define __argc (*__p___argc())
+#endif /* ____p___argc_defined */
+#endif /* !... */
+#endif /* !__argc */
+
+#ifndef __argv
+#ifdef __CRT_HAVE___argv
+__LIBC char **__argv;
+#else /* .... */
 #ifndef ____p___argv_defined
 #define ____p___argv_defined 1
 #ifdef __CRT_HAVE___p___argv
@@ -2064,14 +2079,17 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char ***,__NOTHROW_NCX,
 #undef ____p___argv_defined
 #endif /* __p___argv... */
 #endif /* !____p___argv_defined */
-#ifndef ____p__pgmptr_defined
-#define ____p__pgmptr_defined 1
-#ifdef __CRT_HAVE___p__pgmptr
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p__pgmptr,(void),())
-#else /* LIBC: __p__pgmptr */
-#undef ____p__pgmptr_defined
-#endif /* __p__pgmptr... */
-#endif /* !____p__pgmptr_defined */
+#ifdef ____p___argv_defined
+#define __argv (*__p___argv())
+#endif /* ____p___argv_defined */
+#endif /* !... */
+#endif /* !__argv */
+
+#ifndef __wargv
+#ifdef __CRT_HAVE___wargv
+__LIBC wchar_t **__wargv;
+#define __wargv __wargv
+#else /* .... */
 #ifndef ____p___wargv_defined
 #define ____p___wargv_defined 1
 #ifdef __CRT_HAVE___p___wargv
@@ -2080,6 +2098,17 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW_N
 #undef ____p___wargv_defined
 #endif /* __p___wargv... */
 #endif /* !____p___wargv_defined */
+#ifdef ____p___wargv_defined
+#define __wargv (*__p___wargv())
+#endif /* ____p___wargv_defined */
+#endif /* !... */
+#endif /* !__wargv */
+
+#ifndef _wenviron
+#ifdef __CRT_HAVE__wenviron
+__LIBC wchar_t **_wenviron;
+#define _wenviron _wenviron
+#else /* .... */
 #ifndef ____p__wenviron_defined
 #define ____p__wenviron_defined 1
 #ifdef __CRT_HAVE___p__wenviron
@@ -2088,6 +2117,17 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW_N
 #undef ____p__wenviron_defined
 #endif /* __p__wenviron... */
 #endif /* !____p__wenviron_defined */
+#ifdef ____p__wenviron_defined
+#define _wenviron (*__p__wenviron())
+#endif /* ____p__wenviron_defined */
+#endif /* !... */
+#endif /* !_wenviron */
+
+#ifndef _wpgmptr
+#ifdef __CRT_HAVE__wpgmptr
+__LIBC wchar_t *_wpgmptr;
+#define _wpgmptr _wpgmptr
+#else /* .... */
 #ifndef ____p__wpgmptr_defined
 #define ____p__wpgmptr_defined 1
 #ifdef __CRT_HAVE___p__wpgmptr
@@ -2096,50 +2136,85 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t **,__NOTHROW_NC
 #undef ____p__wpgmptr_defined
 #endif /* __p__wpgmptr... */
 #endif /* !____p__wpgmptr_defined */
-#ifdef ____p___argc_defined
-#define __argc    (*__p___argc())
-#endif /* ____p___argc_defined */
-#ifdef ____p___argv_defined
-#define __argv    (*__p___argv())
-#endif /* ____p___argv_defined */
-#ifdef ____p___wargv_defined
-#define __wargv   (*__p___wargv())
-#endif /* ____p___wargv_defined */
-#ifdef ____p__wenviron_defined
-#define _wenviron (*__p__wenviron())
-#endif /* ____p__wenviron_defined */
+#ifdef ____p__wpgmptr_defined
+#define _wpgmptr (*__p__wpgmptr())
+#endif /* ____p__wpgmptr_defined */
+#endif /* !... */
+#endif /* !_wpgmptr */
+
+/* Alias for argv[0], as passed to main()
+ * HINT: The GNU equivalent of this is `program_invocation_name' */
+#ifndef _pgmptr
+#ifdef program_invocation_name
+#define _pgmptr   program_invocation_name
+#elif defined(__CRT_HAVE_program_invocation_name)
+#ifndef __NO_ASMNAME
+__LIBC char *_pgmptr __ASMNAME("program_invocation_name");
+#define _pgmptr   _pgmptr
+#else /* !__NO_ASMNAME */
+__LIBC char *program_invocation_name;
+#define program_invocation_name program_invocation_name
+#define _pgmptr                 program_invocation_name
+#endif /* __NO_ASMNAME */
+#elif defined(__CRT_HAVE__pgmptr)
+__LIBC char *_pgmptr;
+#define _pgmptr   _pgmptr
+#else /* ... */
+#ifndef ____p__pgmptr_defined
+#define ____p__pgmptr_defined 1
+#ifdef __CRT_HAVE___p__pgmptr
+/* Alias for argv[0], as passed to main() */
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p__pgmptr,(void),())
+#elif defined(__CRT_HAVE___p_program_invocation_name)
+/* Alias for argv[0], as passed to main() */
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p__pgmptr,(void),__p_program_invocation_name,())
+#else /* LIBC: __p__pgmptr */
+#undef ____p__pgmptr_defined
+#endif /* __p__pgmptr... */
+#endif /* !____p__pgmptr_defined */
 #ifdef ____p__pgmptr_defined
 #define _pgmptr   (*__p__pgmptr())
 #endif /* ____p__pgmptr_defined */
-#ifdef ____p__wpgmptr_defined
-#define _wpgmptr  (*__p__wpgmptr())
-#endif /* ____p__wpgmptr_defined */
+#endif /* !... */
+#endif /* !_pgmptr */
 
 #ifdef __USE_KOS
+#ifndef __initenv
+#ifdef __CRT_HAVE___initenv
+__LIBC char **__initenv;
+#else /* .... */
 #ifndef ____p___initenv_defined
 #define ____p___initenv_defined 1
 #ifdef __CRT_HAVE___p___initenv
 /* Access to the initial environment block */
-__CDECLARE(__ATTR_CONST,char ***,__NOTHROW_NCX,__p___initenv,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char ***,__NOTHROW_NCX,__p___initenv,(void),())
 #else /* LIBC: __p___initenv */
 #undef ____p___initenv_defined
 #endif /* __p___initenv... */
 #endif /* !____p___initenv_defined */
+#ifdef ____p___initenv_defined
+#define __initenv (*__p___initenv())
+#endif /* ____p___initenv_defined */
+#endif /* !... */
+#endif /* !__initenv */
+#ifndef __winitenv
+#ifdef __CRT_HAVE___winitenv
+__LIBC wchar_t **__winitenv;
+#else /* .... */
 #ifndef ____p___winitenv_defined
 #define ____p___winitenv_defined 1
 #ifdef __CRT_HAVE___p___winitenv
 /* Access to the initial environment block */
-__CDECLARE(__ATTR_CONST,wchar_t ***,__NOTHROW_NCX,__p___winitenv,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW_NCX,__p___winitenv,(void),())
 #else /* LIBC: __p___winitenv */
 #undef ____p___winitenv_defined
 #endif /* __p___winitenv... */
 #endif /* !____p___winitenv_defined */
-#ifdef ____p___initenv_defined
-#define _initenv  (*__p___initenv())
-#endif /* ____p___initenv_defined */
 #ifdef ____p___winitenv_defined
-#define _winitenv (*__p___winitenv())
+#define __winitenv (*__p___winitenv())
 #endif /* ____p___winitenv_defined */
+#endif /* !... */
+#endif /* !__winitenv */
 #endif /* __USE_KOS */
 
 #ifndef _countof

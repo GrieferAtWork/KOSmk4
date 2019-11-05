@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7bea4664 */
+/* HASH CRC-32:0x2b1e1ec7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -214,6 +214,7 @@ __CRT_FUNCTION(__p__crtAssertBusy,0,(),0,(),__LONG32_TYPE__ *)
 __CRT_FUNCTION(__p__crtBreakAlloc,0,(),0,(),__LONG32_TYPE__ *)
 __CRT_FUNCTION(__p__crtDbgFlag,0,(),0,(),int *)
 __CRT_FUNCTION(__p__pgmptr,0,(),0,(),char **)
+__CRT_FUNCTION(__p_program_invocation_short_name,0,(),0,(),char **)
 __CRT_FUNCTION(__pthread_cleanup_routine,0,(),1,(struct __pthread_cleanup_frame *,frame),void)
 __CRT_FUNCTION(__pthread_register_cancel,0,(),1,(__pthread_unwind_buf_t *,buf),void)
 __CRT_FUNCTION(__pthread_register_cancel_defer,0,(),1,(__pthread_unwind_buf_t *,buf),void)

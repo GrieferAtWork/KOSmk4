@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb91cd5d2 */
+/* HASH CRC-32:0x8b654510 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1657,6 +1657,7 @@
 
 /* .text.crt.errno.utility.* */
 #define __CRT_SECTION_perror                                __CRT_SECTINFO_errno_utility                            /* .text.crt.errno.utility.perror */
+#define __CRT_SECTION___p_program_invocation_short_name     __CRT_SECTINFO_errno_utility                            /* .text.crt.errno.utility.__p_program_invocation_short_name */
 
 /* .text.crt.errno_access.* */
 #define __CRT_SECTION___errno_location                      __CRT_SECTINFO_errno_access                             /* .text.crt.errno_access.__errno_location */

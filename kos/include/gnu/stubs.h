@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7494f30c */
+/* HASH CRC-32:0x2c409d29 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,6 @@
 #define __stub__CrtSetReportHookW2 1
 #define __stub__CrtSetReportMode 1
 #define __stub___control87_2 1
-#define __stub___doserrno 1
 #define __stub___fpclassify 1
 #define __stub___fpecode 1
 #define __stub___h_errno_location 1
@@ -85,7 +84,6 @@
 #define __stub__findnext64 1
 #define __stub__fpclass 1
 #define __stub__fullpath 1
-#define __stub__get_doserrno 1
 #define __stub__get_output_format 1
 #define __stub__get_printf_count_output 1
 #define __stub__getdiskfree 1
@@ -97,7 +95,6 @@
 #define __stub__rmtmp 1
 #define __stub__searchenv_s 1
 #define __stub__set_controlfp 1
-#define __stub__set_doserrno 1
 #define __stub__set_error_mode 1
 #define __stub__set_output_format 1
 #define __stub__set_printf_count_output 1

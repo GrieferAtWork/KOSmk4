@@ -845,6 +845,8 @@
 #define __CRT_HAVE___p__pgmptr 1
 #define __CRT_HAVE___p__wenviron 1
 #define __CRT_HAVE___p__wpgmptr 1
+#define __CRT_HAVE___p_program_invocation_name 1
+#define __CRT_HAVE___p_program_invocation_short_name 1
 #define __CRT_HAVE___peb 1
 #define __CRT_HAVE___pipe 1
 #define __CRT_HAVE___poll 1
@@ -2845,6 +2847,8 @@
 #define __CRT_HAVE_process_vm_readv 1
 #define __CRT_HAVE_process_vm_writev 1
 #define __CRT_HAVE_profil 1
+#define __CRT_HAVE_program_invocation_name 1
+#define __CRT_HAVE_program_invocation_short_name 1
 #define __CRT_HAVE_pselect 1
 #define __CRT_HAVE_pselect64 1
 #define __CRT_HAVE_psiginfo 1

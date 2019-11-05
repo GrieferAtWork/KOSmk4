@@ -34,6 +34,7 @@
 
 #include <asm/intrin.h>
 #include <assert.h>
+#include <errno.h>
 #include <ctype.h>
 #include <format-printer.h>
 #include <malloc.h>
@@ -102,6 +103,18 @@ int main_environ(int argc, char *argv[], char *envp[]) {
 		for (i = 0; envp[i]; ++i)
 			printf("envp[%Iu]: %q\n", i, envp[i]);
 	}
+	return 0;
+}
+/************************************************************************/
+
+
+
+
+
+/************************************************************************/
+int main_prognam(int argc, char *argv[], char *envp[]) {
+	printf("program_invocation_name       = %q\n", program_invocation_name);
+	printf("program_invocation_short_name = %q\n", program_invocation_short_name);
 	return 0;
 }
 /************************************************************************/
@@ -215,6 +228,7 @@ PRIVATE DEF defs[] = {
 	{ "dprint", &main_dprint },
 	{ "ctype", &main_ctype },
 	{ "signal", &main_signal },
+	{ "prognam", &main_prognam },
 	{ NULL, NULL },
 };
 

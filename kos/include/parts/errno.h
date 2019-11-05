@@ -526,11 +526,11 @@ __DECL_BEGIN
 #ifndef ____errno_location_defined
 #define ____errno_location_defined 1
 #ifdef __CRT_HAVE___errno_location
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int *,__NOTHROW_NCX,__errno_location,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__errno_location,(void),())
 #elif defined(__CRT_HAVE__errno)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int *,__NOTHROW_NCX,__errno_location,(void),_errno,())
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__errno_location,(void),_errno,())
 #elif defined(__CRT_HAVE___errno)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int *,__NOTHROW_NCX,__errno_location,(void),__errno,())
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__errno_location,(void),__errno,())
 #else /* LIBC: __errno_location */
 #undef ____errno_location_defined
 #endif /* __errno_location... */

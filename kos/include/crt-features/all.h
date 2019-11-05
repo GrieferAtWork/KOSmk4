@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x173cf530 */
+/* HASH CRC-32:0x1f077bc0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -739,6 +739,8 @@
 #define __CRT_HAVE___p__pgmptr 1
 #define __CRT_HAVE___p__wenviron 1
 #define __CRT_HAVE___p__wpgmptr 1
+#define __CRT_HAVE___p_program_invocation_name 1
+#define __CRT_HAVE___p_program_invocation_short_name 1
 #define __CRT_HAVE___pipe 1
 #define __CRT_HAVE___poll 1
 #define __CRT_HAVE___posix_getopt 1

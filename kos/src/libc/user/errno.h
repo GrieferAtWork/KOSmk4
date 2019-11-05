@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77721c4f */
+/* HASH CRC-32:0xad607e92 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,13 +17,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__abs64_defined
-#define __local__abs64_defined 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_abs64) __ATTR_CONST __ATTR_WUNUSED __INT64_TYPE__
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(_abs64))(__INT64_TYPE__ __x) {
-#line 1886 "kos/src/libc/magic/stdlib.c"
-	return __x < 0 ? -__x : __x;
-}
-__NAMESPACE_LOCAL_END
-#endif /* !__local__abs64_defined */
+#ifndef GUARD_LIBC_USER_ERRNO_H
+#define GUARD_LIBC_USER_ERRNO_H 1
+
+#include "../api.h"
+#include <hybrid/typecore.h>
+#include <kos/types.h>
+#include <errno.h>
+
+DECL_BEGIN
+
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED errno_t *NOTHROW_NCX(LIBCCALL libc___errno_location)(void);
+/* Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char **NOTHROW_NCX(LIBCCALL libc___p_program_invocation_short_name)(void);
+
+DECL_END
+
+#endif /* !GUARD_LIBC_USER_ERRNO_H */

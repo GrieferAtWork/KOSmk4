@@ -1343,8 +1343,29 @@ DEFINE_PUBLIC_ALIAS(dlauxinfo, libdl_dlauxinfo);
 		"__argc"          : "result = (void *)&root_peb->pp_argc;",       \
 		"__argv"          : "result = (void *)&root_peb->pp_argv;",       \
 		"_pgmptr"         : "result = (void *)&root_peb->pp_argv[0];",    \
+		"program_invocation_name" : "result = (void *)&root_peb->pp_argv[0];", \
+		"program_invocation_short_name" : "result = (void *)dlget_p_program_invocation_short_name();", \
 	}
 
+
+
+PRIVATE char *dl_program_invocation_short_name = NULL;
+PRIVATE char **FCALL dlget_p_program_invocation_short_name(void) {
+	if (!dl_program_invocation_short_name) {
+		char *progname = root_peb->pp_argv
+		                 ? root_peb->pp_argv[0]
+		                 : NULL;
+		if (progname) {
+			char *end;
+			end = strrchr(progname, '/');
+			if (end)
+				progname = end + 1;
+		}
+		ATOMIC_CMPXCH(dl_program_invocation_short_name,
+		              NULL, progname);
+	}
+	return &dl_program_invocation_short_name;
+}
 
 
 
@@ -1659,6 +1680,58 @@ stringSwitch("name",
 		    name[7] == '\0') {
 			/* case "environ": ... */
 			result = (void *)&root_peb->pp_envp;
+		}
+	} else if (name[0] == 'p') {
+		if (name[1] == 'r') {
+			if (name[2] == 'o') {
+				if (name[3] == 'g') {
+					if (name[4] == 'r') {
+						if (name[5] == 'a') {
+							if (name[6] == 'm') {
+								if (name[7] == '_') {
+									if (name[8] == 'i') {
+										if (name[9] == 'n') {
+											if (name[10] == 'v') {
+												if (name[11] == 'o') {
+													if (name[12] == 'c') {
+														if (name[13] == 'a') {
+															if (name[14] == 't') {
+																if (name[15] == 'i') {
+																	if (name[16] == 'o') {
+																		if (name[17] == 'n') {
+																			if (name[18] == '_') {
+																				if (name[19] == 's') {
+																					if (name[20] == 'h' && name[21] == 'o' && name[22] == 'r' &&
+																					    name[23] == 't' && name[24] == '_' && name[25] == 'n' &&
+																					    name[26] == 'a' && name[27] == 'm' && name[28] == 'e' &&
+																					    name[29] == '\0') {
+																						/* case "program_invocation_short_name": ... */
+																						result = (void *)dlget_p_program_invocation_short_name();
+																					}
+																				} else if (name[19] == 'n') {
+																					if (name[20] == 'a' && name[21] == 'm' && name[22] == 'e' &&
+																					    name[23] == '\0') {
+																						/* case "program_invocation_name": ... */
+																						result = (void *)&root_peb->pp_argv[0];
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 //[[[end]]]

@@ -1595,7 +1595,9 @@ mkostemps64:([nonnull] char *template_, int suffixlen, int flags) -> int;
 #define __DOS_CALL_REPORTFAULT 0x2
 #define __DOS_MAX_ENV          0x7fff
 
-#ifdef __USE_DOS
+}
+%#ifdef __USE_DOS
+%{
 
 #include <hybrid/__minmax.h>
 #define __min(a, b) __hybrid_min(a, b)
@@ -1614,7 +1616,9 @@ mkostemps64:([nonnull] char *template_, int suffixlen, int flags) -> int;
 #define _CALL_REPORTFAULT __DOS_CALL_REPORTFAULT
 #define _MAX_ENV          __DOS_MAX_ENV
 
-#ifdef __CC__
+}
+%#ifdef __CC__
+%{
 
 #ifndef __errno_t_defined
 #define __errno_t_defined 1
@@ -1728,47 +1732,137 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 }
 
 %[default_impl_section(.text.crt.dos.application.init)]
-[guard][ATTR_WUNUSED][ATTR_CONST] __p___argc:() -> [nonnull] int *;
-[guard][ATTR_WUNUSED][ATTR_CONST] __p___argv:() -> [nonnull] char ***;
-[guard][ATTR_WUNUSED][ATTR_CONST] __p__pgmptr:() -> [nonnull] char **;
-[guard][ATTR_WUNUSED][ATTR_CONST][wchar] __p___wargv:() -> [nonnull] wchar_t ***;
-[guard][ATTR_WUNUSED][ATTR_CONST][wchar] __p__wenviron:() -> [nonnull] wchar_t ***;
-[guard][ATTR_WUNUSED][ATTR_CONST][wchar] __p__wpgmptr:() -> [nonnull] wchar_t **;
 
 %{
+#ifndef __argc
+#ifdef __CRT_HAVE___argc
+__LIBC int __argc;
+#define __argc __argc
+#else /* .... */
+}
+[guard][ATTR_WUNUSED][ATTR_CONST] __p___argc:() -> [nonnull] int *;
+%{
 #ifdef ____p___argc_defined
-#define __argc    (*__p___argc())
+#define __argc (*__p___argc())
 #endif /* ____p___argc_defined */
+#endif /* !... */
+#endif /* !__argc */
+
+#ifndef __argv
+#ifdef __CRT_HAVE___argv
+__LIBC char **__argv;
+#else /* .... */
+}
+[guard][ATTR_WUNUSED][ATTR_CONST] __p___argv:() -> [nonnull] char ***;
+%{
 #ifdef ____p___argv_defined
-#define __argv    (*__p___argv())
+#define __argv (*__p___argv())
 #endif /* ____p___argv_defined */
+#endif /* !... */
+#endif /* !__argv */
+
+#ifndef __wargv
+#ifdef __CRT_HAVE___wargv
+__LIBC wchar_t **__wargv;
+#define __wargv __wargv
+#else /* .... */
+}
+[guard][ATTR_WUNUSED][ATTR_CONST][wchar] __p___wargv:() -> [nonnull] wchar_t ***;
+%{
 #ifdef ____p___wargv_defined
-#define __wargv   (*__p___wargv())
+#define __wargv (*__p___wargv())
 #endif /* ____p___wargv_defined */
+#endif /* !... */
+#endif /* !__wargv */
+
+#ifndef _wenviron
+#ifdef __CRT_HAVE__wenviron
+__LIBC wchar_t **_wenviron;
+#define _wenviron _wenviron
+#else /* .... */
+}
+[guard][ATTR_WUNUSED][ATTR_CONST][wchar] __p__wenviron:() -> [nonnull] wchar_t ***;
+%{
 #ifdef ____p__wenviron_defined
 #define _wenviron (*__p__wenviron())
 #endif /* ____p__wenviron_defined */
+#endif /* !... */
+#endif /* !_wenviron */
+
+#ifndef _wpgmptr
+#ifdef __CRT_HAVE__wpgmptr
+__LIBC wchar_t *_wpgmptr;
+#define _wpgmptr _wpgmptr
+#else /* .... */
+}
+[guard][ATTR_WUNUSED][ATTR_CONST][wchar] __p__wpgmptr:() -> [nonnull] wchar_t **;
+%{
+#ifdef ____p__wpgmptr_defined
+#define _wpgmptr (*__p__wpgmptr())
+#endif /* ____p__wpgmptr_defined */
+#endif /* !... */
+#endif /* !_wpgmptr */
+
+/* Alias for argv[0], as passed to main()
+ * HINT: The GNU equivalent of this is `program_invocation_name' */
+#ifndef _pgmptr
+#ifdef program_invocation_name
+#define _pgmptr   program_invocation_name
+#elif defined(__CRT_HAVE_program_invocation_name)
+#ifndef __NO_ASMNAME
+__LIBC char *_pgmptr __ASMNAME("program_invocation_name");
+#define _pgmptr   _pgmptr
+#else /* !__NO_ASMNAME */
+__LIBC char *program_invocation_name;
+#define program_invocation_name program_invocation_name
+#define _pgmptr                 program_invocation_name
+#endif /* __NO_ASMNAME */
+#elif defined(__CRT_HAVE__pgmptr)
+__LIBC char *_pgmptr;
+#define _pgmptr   _pgmptr
+#else /* ... */
+}
+@@Alias for argv[0], as passed to main()
+[guard][ATTR_WUNUSED][ATTR_CONST]
+[export_alias(__p_program_invocation_name)]
+__p__pgmptr:() -> [nonnull] char **;
+%{
 #ifdef ____p__pgmptr_defined
 #define _pgmptr   (*__p__pgmptr())
 #endif /* ____p__pgmptr_defined */
-#ifdef ____p__wpgmptr_defined
-#define _wpgmptr  (*__p__wpgmptr())
-#endif /* ____p__wpgmptr_defined */
+#endif /* !... */
+#endif /* !_pgmptr */
 }
 
 %
 %#ifdef __USE_KOS
+%{
+#ifndef __initenv
+#ifdef __CRT_HAVE___initenv
+__LIBC char **__initenv;
+#else /* .... */
+}
 @@Access to the initial environment block
-[guard][ATTR_CONST] __p___initenv:() -> char ***;
-@@Access to the initial environment block
-[guard][ATTR_CONST][wchar] __p___winitenv:() -> wchar_t ***;
+[guard][ATTR_WUNUSED][ATTR_CONST] __p___initenv:() -> [nonnull] char ***;
 %{
 #ifdef ____p___initenv_defined
-#define _initenv  (*__p___initenv())
+#define __initenv (*__p___initenv())
 #endif /* ____p___initenv_defined */
+#endif /* !... */
+#endif /* !__initenv */
+#ifndef __winitenv
+#ifdef __CRT_HAVE___winitenv
+__LIBC wchar_t **__winitenv;
+#else /* .... */
+}
+@@Access to the initial environment block
+[guard][ATTR_WUNUSED][ATTR_CONST][wchar] __p___winitenv:() -> [nonnull] wchar_t ***;
+%{
 #ifdef ____p___winitenv_defined
-#define _winitenv (*__p___winitenv())
+#define __winitenv (*__p___winitenv())
 #endif /* ____p___winitenv_defined */
+#endif /* !... */
+#endif /* !__winitenv */
 }
 %#endif /* __USE_KOS */
 

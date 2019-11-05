@@ -227,7 +227,7 @@ __NAMESPACE_STD_USING(fpos_t)
 #define __fpos64_t_defined 1
 typedef __pos64_t      fpos64_t;
 #endif /* !__fpos64_t_defined */
-#endif
+#endif /* __USE_LARGEFILE64 */
 
 #ifndef __std_FILE_defined
 #define __std_FILE_defined 1
@@ -2719,11 +2719,17 @@ _ungetc_nolock:(int ch, [nonnull] $FILE *__restrict stream) -> int = ungetc;
 %{
 #ifndef WEOF
 #if __SIZEOF_WCHAR_T__ == 4
-#define WEOF 0xffffffffu
+#define WEOF (__CCAST(__WINT_TYPE__)0xffffffffu)
 #else /* __SIZEOF_WCHAR_T__ == 4 */
 #define WEOF (__CCAST(__WINT_TYPE__)0xffff)
 #endif /* __SIZEOF_WCHAR_T__ != 4 */
 #endif /* !WEOF */
+
+/* Define 'wchar_t' */
+#ifndef __wchar_t_defined
+#define __wchar_t_defined 1
+typedef __WCHAR_TYPE__ wchar_t;
+#endif /* !__wchar_t_defined */
 }
 
 %[insert:extern(fgetwc)]

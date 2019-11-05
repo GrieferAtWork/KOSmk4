@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1875a520 */
+/* HASH CRC-32:0xb0fba6f5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,7 +90,7 @@ __SYSDECL_BEGIN
 
 #ifndef WEOF
 #if __SIZEOF_WCHAR_T__ == 4
-#define WEOF 0xffffffffu
+#define WEOF (__CCAST(__WINT_TYPE__)0xffffffffu)
 #else /* __SIZEOF_WCHAR_T__ == 4 */
 #define WEOF (__CCAST(__WINT_TYPE__)0xffff)
 #endif /* __SIZEOF_WCHAR_T__ != 4 */

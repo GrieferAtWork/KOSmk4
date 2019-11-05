@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a802709 */
+/* HASH CRC-32:0xed7876d5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -345,7 +345,7 @@ __NAMESPACE_STD_USING(fpos_t)
 #define __fpos64_t_defined 1
 typedef __pos64_t      fpos64_t;
 #endif /* !__fpos64_t_defined */
-#endif
+#endif /* __USE_LARGEFILE64 */
 
 #ifndef __std_FILE_defined
 #define __std_FILE_defined 1
@@ -4125,11 +4125,17 @@ __CREDIRECT(,int,__NOTHROW_RPC,rmtmp,(void),_rmtmp,())
 #define _WSTDIO_DEFINED 1
 #ifndef WEOF
 #if __SIZEOF_WCHAR_T__ == 4
-#define WEOF 0xffffffffu
+#define WEOF (__CCAST(__WINT_TYPE__)0xffffffffu)
 #else /* __SIZEOF_WCHAR_T__ == 4 */
 #define WEOF (__CCAST(__WINT_TYPE__)0xffff)
 #endif /* __SIZEOF_WCHAR_T__ != 4 */
 #endif /* !WEOF */
+
+/* Define 'wchar_t' */
+#ifndef __wchar_t_defined
+#define __wchar_t_defined 1
+typedef __WCHAR_TYPE__ wchar_t;
+#endif /* !__wchar_t_defined */
 #ifndef __fgetwc_defined
 #define __fgetwc_defined 1
 #ifdef __std_fgetwc_defined

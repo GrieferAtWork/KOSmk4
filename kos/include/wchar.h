@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9acb297 */
+/* HASH CRC-32:0xdd91f80b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -279,7 +279,7 @@ __SYSDECL_BEGIN
 
 #ifndef WEOF
 #if __SIZEOF_WCHAR_T__ == 4
-#define WEOF 0xffffffffu
+#define WEOF (__CCAST(__WINT_TYPE__)0xffffffffu)
 #else /* __SIZEOF_WCHAR_T__ == 4 */
 #define WEOF (__CCAST(__WINT_TYPE__)0xffff)
 #endif /* __SIZEOF_WCHAR_T__ != 4 */
@@ -323,7 +323,7 @@ __NAMESPACE_STD_USING(FILE)
 typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
 
-/* Define `size_t' */
+/* Define `struct tm' */
 __NAMESPACE_STD_BEGIN
 #ifndef __std_tm_defined
 #define __std_tm_defined 1
