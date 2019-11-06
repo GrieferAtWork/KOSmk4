@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e2a957b */
+/* HASH CRC-32:0xbd4c3fba */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1750,8 +1750,10 @@
 #define __CRT_HAVE_erfcl 1
 #define __CRT_HAVE_erff 1
 #define __CRT_HAVE_erfl 1
+#define __CRT_HAVE_err 1
 #define __CRT_HAVE_error 1
 #define __CRT_HAVE_error_at_line 1
+#define __CRT_HAVE_errx 1
 #define __CRT_HAVE_ether_aton 1
 #define __CRT_HAVE_ether_aton_r 1
 #define __CRT_HAVE_ether_hostton 1
@@ -3612,6 +3614,8 @@
 #define __CRT_HAVE_valloc 1
 #define __CRT_HAVE_vasprintf 1
 #define __CRT_HAVE_vdprintf 1
+#define __CRT_HAVE_verr 1
+#define __CRT_HAVE_verrx 1
 #define __CRT_HAVE_versionsort 1
 #define __CRT_HAVE_versionsort64 1
 #define __CRT_HAVE_vfork 1
@@ -3647,6 +3651,8 @@
 #define __CRT_HAVE_vswscanf 1
 #define __CRT_HAVE_vswscanf_s 1
 #define __CRT_HAVE_vsyslog 1
+#define __CRT_HAVE_vwarn 1
+#define __CRT_HAVE_vwarnx 1
 #define __CRT_HAVE_vwprintf 1
 #define __CRT_HAVE_vwprintf_s 1
 #define __CRT_HAVE_vwprintf_unlocked 1
@@ -3659,6 +3665,8 @@
 #define __CRT_HAVE_wait4 1
 #define __CRT_HAVE_waitid 1
 #define __CRT_HAVE_waitpid 1
+#define __CRT_HAVE_warn 1
+#define __CRT_HAVE_warnx 1
 #define __CRT_HAVE_wchdir 1
 #define __CRT_HAVE_wchown 1
 #define __CRT_HAVE_wchroot 1

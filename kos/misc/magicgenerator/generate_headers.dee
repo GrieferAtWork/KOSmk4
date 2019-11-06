@@ -2982,6 +2982,22 @@ again_enum_name:
 						"	va_end(args);\n"
 						"	return result;\n"
 						"}}";
+						if ("ATTR_NORETURN" in function_attributes) {
+							printf_pattern =
+							"{{\n"
+							"	va_list args;\n"
+							"	va_start(args, {largarg});\n"
+							"	{vprintf}({positional_args}, args);\n"
+							"}}";
+						} else if (return_type == "void") {
+							printf_pattern =
+							"{{\n"
+							"	va_list args;\n"
+							"	va_start(args, {largarg});\n"
+							"	{vprintf}({positional_args}, args);\n"
+							"	va_end(args);\n"
+							"}}";
+						}
 						block = printf_pattern.format({
 							"return_type" : return_type,
 							"largarg" : arglist[#arglist-2][1],

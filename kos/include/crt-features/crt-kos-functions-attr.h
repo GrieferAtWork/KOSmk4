@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcac23fa0 */
+/* HASH CRC-32:0x4b499025 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,12 +38,16 @@
 #define __CRT_ATTR_NORETURN___pthread_unwind_next 1
 #define __CRT_ATTR_NORETURN__exit 1
 #define __CRT_ATTR_NORETURN_abort 1
+#define __CRT_ATTR_NORETURN_err 1
+#define __CRT_ATTR_NORETURN_errx 1
 #define __CRT_ATTR_NORETURN_exit 1
 #define __CRT_ATTR_NORETURN_exit_thread 1
 #define __CRT_ATTR_NORETURN_pthread_exit 1
 #define __CRT_ATTR_NORETURN_quick_exit 1
 #define __CRT_ATTR_NORETURN_sigreturn 1
 #define __CRT_ATTR_NORETURN_thrd_exit 1
+#define __CRT_ATTR_NORETURN_verr 1
+#define __CRT_ATTR_NORETURN_verrx 1
 
 
 /* ATTR_NOTHROW */

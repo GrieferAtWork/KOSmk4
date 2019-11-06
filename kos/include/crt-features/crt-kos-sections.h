@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd26f5c31 */
+/* HASH CRC-32:0x4b378c51 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1668,8 +1668,16 @@
 #define __CRT_SECTION___errno_location                      __CRT_SECTINFO_errno_access                             /* .text.crt.errno_access.__errno_location */
 
 /* .text.crt.error.* */
-#define __CRT_SECTION_error_at_line                         __CRT_SECTINFO_error                                    /* .text.crt.error.error_at_line */
+#define __CRT_SECTION_err                                   __CRT_SECTINFO_error                                    /* .text.crt.error.err */
 #define __CRT_SECTION_error                                 __CRT_SECTINFO_error                                    /* .text.crt.error.error */
+#define __CRT_SECTION_error_at_line                         __CRT_SECTINFO_error                                    /* .text.crt.error.error_at_line */
+#define __CRT_SECTION_errx                                  __CRT_SECTINFO_error                                    /* .text.crt.error.errx */
+#define __CRT_SECTION_verr                                  __CRT_SECTINFO_error                                    /* .text.crt.error.verr */
+#define __CRT_SECTION_verrx                                 __CRT_SECTINFO_error                                    /* .text.crt.error.verrx */
+#define __CRT_SECTION_vwarn                                 __CRT_SECTINFO_error                                    /* .text.crt.error.vwarn */
+#define __CRT_SECTION_vwarnx                                __CRT_SECTINFO_error                                    /* .text.crt.error.vwarnx */
+#define __CRT_SECTION_warn                                  __CRT_SECTINFO_error                                    /* .text.crt.error.warn */
+#define __CRT_SECTION_warnx                                 __CRT_SECTINFO_error                                    /* .text.crt.error.warnx */
 
 /* .text.crt.except.fs.basic_property.* */
 #define __CRT_SECTION_Chdir                                 __CRT_SECTINFO_except_fs_basic_property                 /* .text.crt.except.fs.basic_property.Chdir */

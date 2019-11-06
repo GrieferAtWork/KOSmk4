@@ -30,6 +30,11 @@
 
 DECL_BEGIN
 
+/* Use the KOS-function `libc_strerror_s()' */
+#undef libc_strerror
+#define libc_strerror libc_strerror_s
+
+
 typedef void (__LIBCCALL *LPERROR_PRINT_PROGNAME)(void);
 
 #define ERROR_BSS(name) ATTR_SECTION(".bss.crt.error." name) 
@@ -37,12 +42,12 @@ typedef void (__LIBCCALL *LPERROR_PRINT_PROGNAME)(void);
 /* Define globals and meta-data for accessing those globals without any relocations. */
 #undef error_message_count
 #undef error_print_progname
-#undef program_invocation_short_name
 #undef error_one_per_line
+#undef program_invocation_short_name
 #undef __LOCAL_error_print_progname
 #undef __LOCAL_error_message_count
-#undef __LOCAL_program_invocation_short_name
 #undef __LOCAL_error_one_per_line
+#undef __LOCAL_program_invocation_short_name
 PUBLIC ERROR_BSS("error_print_progname") LPERROR_PRINT_PROGNAME error_print_progname = NULL;
 PUBLIC ERROR_BSS("error_message_count") unsigned int error_message_count = 0;
 PUBLIC ERROR_BSS("error_one_per_line") int error_one_per_line = 0;
