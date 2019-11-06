@@ -69,7 +69,7 @@ NOTHROW(FCALL hd_setbyte)(void *addr, byte_t value) {
 		if (pagedir_ismapped(page)) {
 			vm_phys_t phys;
 			phys = pagedir_translate((vm_virt_t)addr);
-			vm_copytophys(phys, &value, 1);
+			vm_writephysb(phys, value);
 			return true;
 		}
 	}
@@ -91,8 +91,8 @@ NOTHROW(FCALL hd_getbyte)(void *addr, byte_t *pvalue) {
 		 * accessing the underlying physical memory (if there is any). */
 		if (pagedir_ismapped(page)) {
 			vm_phys_t phys;
-			phys = pagedir_translate((vm_virt_t)addr);
-			vm_copyfromphys(pvalue, phys, 1);
+			phys    = pagedir_translate((vm_virt_t)addr);
+			*pvalue = vm_readphysb(phys);
 			return true;
 		}
 	}

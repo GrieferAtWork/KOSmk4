@@ -1628,8 +1628,8 @@ NOTHROW(KCALL uhci_syncheap_fini)(struct uhci_syncheap *__restrict self) {
 	page = self->sh_current;
 	while (page != PAGEPTR_INVALID) {
 		struct uhci_syncheap_page next;
-		vm_copyfromphys(&next, VM_PPAGE2ADDR(self->sh_current),
-		                sizeof(struct uhci_syncheap_page));
+		vm_copyfromphys_onepage(&next, VM_PPAGE2ADDR(self->sh_current),
+		                        sizeof(struct uhci_syncheap_page));
 		page_free(page, next.shp_count);
 		page = next.shp_next;
 	}
@@ -1662,7 +1662,7 @@ NOTHROW(KCALL uhci_syncheap_alloc)(struct uhci_syncheap *__restrict self,
 		if (pg == PAGEPTR_INVALID)
 			return UHCI_SYNCHEAP_ALLOC_FAILED;
 		header.shp_next = self->sh_current;
-		vm_copytophys(VM_PPAGE2ADDR(pg), &header, sizeof(header));
+		vm_copytophys_onepage(VM_PPAGE2ADDR(pg), &header, sizeof(header));
 		self->sh_free = (header.shp_count * PAGESIZE) -
 		                sizeof(struct uhci_syncheap_page);
 		self->sh_current = pg;

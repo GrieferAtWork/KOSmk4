@@ -193,19 +193,9 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 			vm_phys_t addr; vm_phys_t base;
 			addr = acpi_root + sizeof(ACPISDTHeader) + i * ACPI_POINTER_SIZE;
 			/* Dereference the base pointer. */
-			if (ACPI_POINTER_SIZE == sizeof(vm_phys_t)) {
-				vm_copyfromphys(&base, addr, 4);
-			} else {
-#if __SIZEOF_VM_PHYS_T__ == 4
-				u64 temp;
-				assert(ACPI_POINTER_SIZE == 8);
-#else /* __SIZEOF_VM_PHYS_T__ == 4 */
-				u32 temp;
-				assert(ACPI_POINTER_SIZE == 4);
-#endif /* __SIZEOF_VM_PHYS_T__ != 4 */
-				vm_copyfromphys(&temp, addr, sizeof(temp));
-				base = (vm_phys_t)temp;
-			}
+			base = ACPI_POINTER_SIZE == 4
+			       ? (vm_phys_t)vm_readphysl_unaligned(addr)
+			       : (vm_phys_t)vm_readphysq_unaligned(addr);
 			/* Load the component header. */
 			vm_copyfromphys(&header, (vm_phys_t)base, sizeof(header));
 			/* Validate the table. */
@@ -252,19 +242,9 @@ NOTHROW(KCALL acpi_lookup)(char const signature[4],
 		vm_phys_t addr, base;
 		size_t missing;
 		addr = acpi_root + sizeof(ACPISDTHeader) + i * ACPI_POINTER_SIZE;
-		if (ACPI_POINTER_SIZE == sizeof(vm_phys_t)) {
-			vm_copyfromphys(&base, addr, 4);
-		} else {
-#if __SIZEOF_VM_PHYS_T__ == 4
-			u64 temp;
-			assert(ACPI_POINTER_SIZE == 8);
-#else /* __SIZEOF_VM_PHYS_T__ == 4 */
-			u32 temp;
-			assert(ACPI_POINTER_SIZE == 4);
-#endif /* __SIZEOF_VM_PHYS_T__ != 4 */
-			vm_copyfromphys(&temp, addr, sizeof(temp));
-			base = (vm_phys_t)temp;
-		}
+		base = ACPI_POINTER_SIZE == 4
+		       ? (vm_phys_t)vm_readphysl_unaligned(addr)
+		       : (vm_phys_t)vm_readphysq_unaligned(addr);
 		vm_copyfromphys(buf, base, sizeof(ACPISDTHeader));
 		if (*(u32 *)((ACPISDTHeader *)buf)->rsdp_signature != *(u32 *)signature)
 			continue;

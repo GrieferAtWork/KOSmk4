@@ -206,13 +206,13 @@ LOCAL errr_t
 #ifdef DEFINE_IO_READ
 						data.word = inw(bus->b_busio + ATA_DATA);
 #ifdef DEFINE_IO_PHYS
-						vm_copytophys((vm_phys_t)(ent.ab_base + ent.ab_size - 1), &data.bytes[0], 1);
+						vm_writephysb((vm_phys_t)(ent.ab_base + ent.ab_size - 1), data.bytes[0]);
 #else /* DEFINE_IO_PHYS */
 						((u8 *)ent.ab_base)[ent.ab_size - 1] = data.bytes[0];
 #endif /* !DEFINE_IO_PHYS */
 #else /* DEFINE_IO_READ */
 #ifdef DEFINE_IO_PHYS
-						vm_copyfromphys(&data.bytes[0], (vm_phys_t)(ent.ab_base + ent.ab_size - 1), 1);
+						data.bytes[0] = vm_readphysb((vm_phys_t)(ent.ab_base + ent.ab_size - 1));
 #else /* DEFINE_IO_PHYS */
 						data.bytes[0] = ((u8 *)ent.ab_base)[ent.ab_size - 1];
 #endif /* !DEFINE_IO_PHYS */
@@ -223,7 +223,7 @@ LOCAL errr_t
 						++next_ent_index;
 #ifdef DEFINE_IO_READ
 #ifdef DEFINE_IO_PHYS
-						vm_copytophys(ent.ab_base, &data.bytes[1], 1);
+						vm_writephysb(ent.ab_base, data.bytes[1]);
 						++ent.ab_base;
 #else /* DEFINE_IO_PHYS */
 						((u8 *)ent.ab_base)[0] = data.bytes[1];
@@ -231,7 +231,7 @@ LOCAL errr_t
 #endif /* !DEFINE_IO_PHYS */
 #else /* DEFINE_IO_READ */
 #ifdef DEFINE_IO_PHYS
-						vm_copyfromphys(&data.bytes[1], ent.ab_base, 1);
+						data.bytes[1] = vm_readphysb(ent.ab_base);
 						++ent.ab_base;
 #else /* DEFINE_IO_PHYS */
 						data.bytes[1] = ((u8 *)ent.ab_base)[0];
