@@ -30,8 +30,9 @@
 warn:(char const *format, ...) %{auto_block(printf(vwarn))}
 
 [doc_alias(warn)][ATTR_LIBC_PRINTF(1, 0)][same_impl][cp_stdio]
+[decl_include(<local/stdstreams.h>)]
 [dependency_include(<parts/errno.h>)]
-[requires_include(<local/stdstreams.h>)]
+[requires_include(<__crt.h>)]
 [requires_include(<local/program_invocation_name.h>)]
 [requires(!defined(__NO_STDSTREAMS) && defined(__LOCAL_program_invocation_short_name) &&
           $has_function(fprintf) && $has_function(vfprintf) &&
@@ -59,7 +60,7 @@ vwarn:(char const *format, va_list args) {
 warnx:(char const *format, ...) %{auto_block(printf(vwarnx))}
 
 [doc_alias(warnx)][ATTR_LIBC_PRINTF(1, 0)][same_impl][cp_stdio]
-[requires_include(<local/stdstreams.h>)]
+[decl_include(<local/stdstreams.h>)][requires_include(<__crt.h>)]
 [requires_include(<local/program_invocation_name.h>)]
 [requires(!defined(__NO_STDSTREAMS) && defined(__LOCAL_program_invocation_short_name) &&
           $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc))]

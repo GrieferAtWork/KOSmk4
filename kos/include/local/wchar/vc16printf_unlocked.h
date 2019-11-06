@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d630fa */
+/* HASH CRC-32:0x2ab149a2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,6 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_vc16printf_unlocked_defined
-#include <__crt.h>
 #if (defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_vfwprintf_unlocked)) && !defined(__NO_STDSTREAMS)
 #define __local_vc16printf_unlocked_defined 1
 #include <kos/anno.h>

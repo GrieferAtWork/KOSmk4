@@ -3436,6 +3436,68 @@ function format_define_require_string(fp: File, text: string) {
 	}
 	fp << text.substr(flush_start, len);
 }
+
+@@Enumerate the names of all functions that appear in $has_function() tags
+function enumerateFormatRequireFunctionDependencies(text: string): {string...} {
+	local i = 0;
+	local len = #text;
+	while (i < len) {
+		local ch = text[i];
+		if (ch == "$") {
+			++i;
+			local block;
+			if (i < len && text[i] != "{") {
+				local end = i;
+				while (end < len) {
+					if (text.issymstrt(end)) {
+						++end;
+						continue;
+					}
+					local ch = text[end];
+					local map = {
+						"(" : ")",
+						"[" : "]",
+						"{" : "}",
+					};
+					local ot = map.get(ch);
+					if (ot is none)
+						break;
+					++end;
+					local par_end = text.findmatch(ch, ot, end);
+					if (par_end < 0)
+						throw "Missing closing `" + ot + "' after `" + ch + "' in [requires(" + repr text + ")]";
+					end = par_end + 1;
+				}
+				block = text.substr(i, end).strip();
+				i = end;
+			} else {
+				++i;
+				local end = text.findmatch("{", "}", i);
+				if (end < 0)
+					throw "Missing closing `}' after `${' in [requires(" + repr text + ")]";
+				block = text.substr(i, end).strip();
+				i = end + 1;
+			}
+			local arg_start = block.find("(");
+			if (arg_start < 0)
+				arg_start = #block;
+			local cmd = block.substr(0, arg_start).rstrip();
+			block = block.substr(arg_start);
+			function get_tag_operand() {
+				if (!block.startswith("(") && !block.endswith(")")) {
+					throw "Expected the tag block " + repr block + " to be surrounded by parenthesis in [requires(" + repr text + ")]";
+				}
+				return block.substr(1, #block - 1).strip();
+			}
+			if (cmd == "has_function") {
+				yield get_tag_operand();
+			}
+			continue;
+		}
+		++i;
+	}
+}
+
 function format_define_require_string_comment(fp: File, text: string) {
 	/* TODO: Special variant */
 	format_define_require_string(fp, text);
@@ -3603,6 +3665,14 @@ class Function {
 	operator str() -> name;
 	operator repr() -> "Function({!r}, ...)".format({ name });
 
+	operator hash(): int -> name.operator hash();
+	operator == (other: Function): bool -> name == other.name;
+	operator != (other: Function): bool -> name != other.name;
+	operator < (other: Function): bool -> name < other.name;
+	operator > (other: Function): bool -> name > other.name;
+	operator <= (other: Function): bool -> name <= other.name;
+	operator >= (other: Function): bool -> name >= other.name;
+
 	private member m_dependencies: {Function...};
 	private member m_dependencies_names: {string...};
 	private member m_localvars: {string...};
@@ -3760,7 +3830,9 @@ class Function {
 			    result.findmatch("(", ")", 1) == #result - 1)
 				result = result[1:-1];
 		}
-		return optimizePreprocessorExpression(result);
+		result = optimizePreprocessorExpression(result);
+		dependency_string = result;
+		return result;
 	}
 
 	public property defaultEnv: {string: Object} = {
@@ -4187,6 +4259,67 @@ class Function {
 		return functions.get(wchar_t_replacement == WCHAR_MODE_DOS ? uchar16_function_name : uchar32_function_name);
 	}
 
+	member m_full_requires_prefix: string;
+	@@Returns the full requires prefix (including the requires prefixes of any
+	@@function that may appear as a `$has_function()' annotation of this function's
+	@@requires expression, as well as having all duplicate #include-directives, and
+	@@all empty lines removed)
+	property full_requires_prefix: string = {
+		get(): string {
+			if (m_full_requires_prefix is bound)
+				return m_full_requires_prefix;
+			File.Writer tempfp;
+			if (define_require_string) {
+				local requiresDependencies: {Function...} = HashSet({ this });
+				for (;;) {
+					local more: {Function...} = HashSet();
+					for (local f: requiresDependencies) {
+						for (local x: enumerateFormatRequireFunctionDependencies(f.define_require_string)) {
+							local dep = functions_prototypes.get(x.rstrip("?"));
+							if (dep !is none)
+								more.insert(dep);
+						}
+					}
+					local on = #requiresDependencies;
+					requiresDependencies.update(more);
+					if (on >= #requiresDependencies)
+						break;
+				}
+				for (local f: requiresDependencies.sorted()) {
+					if (f.requires_prefix) {
+						for (local none, word: split_words(f.requires_prefix, env: this))
+							tempfp << word;
+						tempfp << "\n";
+					}
+				}
+			} else if (requires_prefix) {
+				for (local none, word: split_words(requires_prefix, env: this))
+					tempfp << word;
+				tempfp << "\n";
+			}
+			tempfp = tempfp.string;
+			File.Writer resfp;
+			local knownIncludes: {string...} = HashSet({
+				/* A couple of headers may be assumed to already have been included. */
+				"#include <__crt.h>",    /* Already required for __CRT_HAVE_* */
+				"#include <__stdinc.h>", /* Already required for __REDIRECT(), __ATTR_*, etc... */
+			});
+			for (local l: tempfp.splitlines(false)) {
+				l = l.rstrip();
+				if (!l || l in knownIncludes)
+					continue;
+				if (l.startswith("#include"))
+					knownIncludes.insert(l);
+				resfp << l << "\n";
+			}
+			resfp = resfp.string;
+			m_full_requires_prefix = resfp;
+			assert !resfp || resfp.endswith("\n");
+			return resfp;
+		}
+	}
+	
+
 	function generate_local_impl(
 			fp: File, with_copyright: bool = true,
 			wchar_t_replacement: int | none = none) {
@@ -4202,8 +4335,7 @@ class Function {
 			fp << copyright << "\n";
 		fp << "#ifndef __local_" << used_name << "_defined\n";
 		if (define_require_string) {
-			for (local none, word: split_words(requires_prefix, env: this))
-				fp << word;
+			fp << full_requires_prefix;
 			File.Writer tempfp;
 			format_define_require_string(tempfp, define_require_string);
 			fp << optimizeAndWrapProcessorExpressionForIf(tempfp.string);
@@ -4970,16 +5102,28 @@ skip_alias_redirections:
 					fp << "}\n";
 				}
 				local always_available = true;
+				local has_define_require_prefix = false;
 				local effective_define_require = define_require_string;
-				if (!effective_define_require && block is FunctionAlias)
+				local effective_define_require_prefix = full_requires_prefix;
+				if (!effective_define_require && block is FunctionAlias) {
 					effective_define_require = block.func.define_require_string;
+					effective_define_require_prefix = block.func.full_requires_prefix;
+				}
+				effective_define_require_prefix = effective_define_require_prefix;
 				if (uchar_function !is none) {
 					if (effective_define_require) {
 						File.Writer tempfp;
 						format_define_require_string(tempfp, effective_define_require);
 						tempfp = optimizePreprocessorExpression(tempfp.string);
 						if (tempfp !in ["", "1"]) {
-							fp << "#elif " << tempfp << "\n";
+							if (effective_define_require_prefix) {
+								fp << "#else /* LIBC: " << symbol_name << " */\n";
+								fp << effective_define_require_prefix;
+								fp << wrapProcessorExpressionForIf(tempfp) << "\n";
+								has_define_require_prefix = true;
+							} else {
+								fp << "#elif " << tempfp << "\n";
+							}
 							always_available = false;
 						}
 					}
@@ -5001,7 +5145,14 @@ skip_alias_redirections:
 						format_define_require_string(tempfp, effective_define_require);
 						tempfp = optimizePreprocessorExpression(tempfp.string);
 						if (tempfp !in ["", "1"]) {
-							fp << "#elif " << tempfp << "\n";
+							if (effective_define_require_prefix) {
+								fp << "#else /* LIBC: " << symbol_name << " */\n";
+								fp << effective_define_require_prefix;
+								fp << wrapProcessorExpressionForIf(tempfp) << "\n";
+								has_define_require_prefix = true;
+							} else {
+								fp << "#elif " << tempfp << "\n";
+							}
 							always_available = false;
 						}
 					}
@@ -5009,9 +5160,13 @@ skip_alias_redirections:
 						fp << "#else /* LIBC: " << symbol_name << " */\n";
 					bind_local_function(symbol_name);
 				}
-				if (!always_available && with_guard) {
+				if (has_define_require_prefix) {
 					fp << "#else /* CUSTOM: " << symbol_name << " */\n"
-						  "#undef " << guard_name << "\n";
+					      "#undef " << guard_name << "\n"
+					      "#endif /* " << name << "... */\n";
+				} else if (!always_available && with_guard) {
+					fp << "#else /* CUSTOM: " << symbol_name << " */\n"
+					      "#undef " << guard_name << "\n";
 				}
 			} else if (with_guard) {
 				fp << "#else /* LIBC: " << symbol_name << " */\n"
@@ -5575,16 +5730,28 @@ skip_alias_redirections2:
 				}
 			}
 			local effective_define_require = define_require_string;
-			if (!effective_define_require && block is FunctionAlias)
+			local effective_define_require_prefix = full_requires_prefix;
+			if (!effective_define_require && block is FunctionAlias) {
 				effective_define_require = block.func.define_require_string;
+				effective_define_require_prefix = block.func.full_requires_prefix;
+			}
+			effective_define_require_prefix = effective_define_require_prefix;
 			local always_available = true;
+			local has_define_require_prefix = false;
 			if (uchar_function !is none) {
 				if (effective_define_require) {
 					File.Writer tempfp;
 					format_define_require_string(tempfp, effective_define_require);
 					tempfp = optimizePreprocessorExpression(tempfp.string);
 					if (tempfp !in ["", "1"]) {
-						fp << "#elif " << tempfp << "\n";
+						if (effective_define_require_prefix) {
+							fp << "#else /* LIBC: " << symbol_name << " */\n";
+							fp << effective_define_require_prefix;
+							fp << wrapProcessorExpressionForIf(tempfp) << "\n";
+							has_define_require_prefix = true;
+						} else {
+							fp << "#elif " << tempfp << "\n";
+						}
 						always_available = false;
 					}
 				}
@@ -5608,7 +5775,14 @@ skip_alias_redirections2:
 					if (tempfp in ["", "1"]) {
 						fp << "#else /* LIBC: " << symbol_name << " */\n";
 					} else {
-						fp << "#elif " << tempfp << "\n";
+						if (effective_define_require_prefix) {
+							fp << "#else /* LIBC: " << symbol_name << " */\n";
+							fp << effective_define_require_prefix;
+							fp << wrapProcessorExpressionForIf(tempfp) << "\n";
+							has_define_require_prefix = true;
+						} else {
+							fp << "#elif " << tempfp << "\n";
+						}
 						always_available = false;
 					}
 				} else {
@@ -5616,7 +5790,11 @@ skip_alias_redirections2:
 				}
 				bind_local_function(symbol_name);
 			}
-			if (!always_available && with_guard) {
+			if (has_define_require_prefix) {
+				fp << "#else /* CUSTOM: " << symbol_name << " */\n"
+				      "#undef " << guard_name << "\n"
+				      "#endif /* " << name << "... */\n";
+			} else if (!always_available && with_guard) {
 				fp << "#else /* CUSTOM: " << symbol_name << " */\n"
 				      "#undef " << guard_name << "\n";
 			}
@@ -5876,6 +6054,17 @@ function inheritExplicitFields(func: Function, alias_func: Function) {
 	} else {
 		func.define_require_string = alias_func.define_require_string;
 	}
+	if (func.requires_prefix) {
+		if (func.requires_prefix != alias_func.requires_prefix) {
+			print "[requires_prefix] tag of", repr func.name, "was explicitly specified, but doesn't";
+			print "match the requires_prefix tag of the aliased function", repr alias_func.name;
+			print (repr func.name)+":", repr func.requires_prefix;
+			print (repr alias_func.name)+":", repr alias_func.requires_prefix;
+			throw "Miss-matching requires_prefix";
+		}
+	} else {
+		func.requires_prefix = alias_func.requires_prefix;
+	}
 	if (func.dependency_string) {
 		if (!alias_func.dependency_string || func.dependency_string != alias_func.dependency_string) {
 			print "[dependency_string] tag of", repr func.name, "was explicitly specified, but doesn't";
@@ -5947,6 +6136,8 @@ function linkFunctionAliases(func: Function) {
 		func.block = body;
 		if (!func.define_require_string)
 			func.define_require_string = convert(alias_func, func, alias_func.define_require_string);
+		if (!func.requires_prefix)
+			func.requires_prefix = convert(alias_func, func, alias_func.requires_prefix);
 		if (func.dont_export_symbol == "auto")
 			func.dont_export_symbol = alias_func.dont_export_symbol;
 		if (include_line_directives) {
@@ -6229,8 +6420,8 @@ function write_libc_slow_header(fp, comnam, functions) {
 			for (local none, word: split_words(f.declaration_prefix, env: f))
 				headerPrefixFp << word;
 		}
-		if (f.requires_prefix) {
-			for (local none, word: split_words(f.requires_prefix, env: f))
+		if (f.full_requires_prefix) {
+			for (local none, word: split_words(f.full_requires_prefix, env: f))
 				headerPrefixFp << word;
 		}
 		if (f.hasThrowsAnnotation()) {

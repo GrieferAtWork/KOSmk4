@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb4facf7 */
+/* HASH CRC-32:0xe6cdec99 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,6 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_putwchar_unlocked_defined
-#include <__crt.h>
 #if (defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock)) && !defined(__NO_STDSTREAMS)
 #define __local_putwchar_unlocked_defined 1
 #include <kos/anno.h>
