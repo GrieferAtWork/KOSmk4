@@ -1147,10 +1147,7 @@ class ExternFunction { member func; this = default; }
 class IntermediateString {
 	member string;
 	member locations;
-	this(s, l) {
-		string = s;
-		locations = l;
-	}
+	this = default;
 }
 
 
@@ -1541,8 +1538,9 @@ function parse_functions(filename: string, text: string): {string | Function...}
 							"Expected operand of `insert:extern' to be surrounded by "
 							"parenthesis, but is actually " + repr extern_name);
 					}
-					extern_name = extern_name.substr(1, #extern_name-1).strip();
-					yield FunctionAlias(extern_name);
+					extern_name = extern_name[1:-1];
+					for (local x: extern_name.split(","))
+						yield FunctionAlias(x.strip());
 				} else if (directive.startswith("declare_known_section")) {
 					directive = directive[#"declare_known_section":].lstrip();
 					if (!directive.startswith("("))
@@ -1719,8 +1717,7 @@ got_section_prefix:
 						options.insert(option);
 						directive = directive[optend:].lstrip();
 					}
-					if ((directive.startswith("{") && directive.endswith("}")) ||
-					    (directive.startswith("(") && directive.endswith(")")))
+					if (directive.startswith("{") && directive.endswith("}"))
 						directive = directive[1:-1];
 					else {
 						err(directive_begin, "Missing argument block in {!r}".format({ directive }));
@@ -6491,9 +6488,9 @@ for (local comnam, funcs: components) {
 	local libc_slow_functions = [];
 	for (local f: funcs) {
 		if (f is IntermediateString) {
-			if ("libc_fast" in f.locations || "libc" in f.locations)
+			if ("libc_fast" in f.locations)
 				libc_fast_functions.append(f);
-			if ("libc_slow" in f.locations || "libc" in f.locations)
+			if ("libc_slow" in f.locations)
 				libc_slow_functions.append(f);
 			continue;
 		}
@@ -6773,11 +6770,8 @@ for (local comnam, funcs: components) {
 function need_libc_auto_header(funcs, comnam) {
 	for (local f: funcs) {
 		if (f is IntermediateString) {
-			if ("auto_kernel_header" in f.locations || "auto_header" in f.locations ||
-			    "auto_kernel" in f.locations || "auto" in f.locations)
-				return true;
-			if ("auto_libc_header" in f.locations || "auto_header" in f.locations ||
-			    "auto_libc" in f.locations || "auto" in f.locations)
+			if ("auto_libc_header" in f.locations ||
+			    "auto_header" in f.locations)
 				return true;
 			continue;
 		}
@@ -6799,7 +6793,7 @@ function enum_user_header_functions(
 	want_ignored_functions: bool = true) {
 	for (local f: funcs) {
 		if (f is IntermediateString) {
-			if (include_strings && ("auto_user" in f.locations || "user" in f.locations))
+			if (include_strings && ("user" in f.locations))
 				yield f;
 			continue;
 		}
@@ -6834,11 +6828,9 @@ function write_libc_auto_header(fp, comnam, funcs) {
 	local kernel_funcs = [];
 	for (local f: funcs) {
 		if (f is IntermediateString) {
-			if ("auto_kernel_header" in f.locations || "auto_header" in f.locations ||
-			    "auto_kernel" in f.locations || "auto" in f.locations)
+			if ("auto_header" in f.locations)
 				kernel_funcs.append(f);
-			if ("auto_libc_header" in f.locations ||
-			    "auto_libc" in f.locations)
+			if ("auto_libc_header" in f.locations)
 				libc_funcs.append(f);
 			continue;
 		}
@@ -7533,11 +7525,9 @@ function write_libc_auto_implementation(fp, comnam, funcs) {
 	local kernel_funcs = [];
 	for (local f: funcs) {
 		if (f is IntermediateString) {
-			if ("auto_kernel_source" in f.locations || "auto_source" in f.locations ||
-			    "auto_kernel" in f.locations || "auto" in f.locations)
+			if ("auto_source" in f.locations)
 				kernel_funcs.append(f);
-			if ("auto_libc_source" in f.locations ||
-			    "auto_libc" in f.locations)
+			if ("auto_libc_source" in f.locations)
 				user_funcs.append(f);
 			continue;
 		}
@@ -7694,10 +7684,8 @@ print;
 for (local comnam, funcs: components) {
 	for (local f: funcs) {
 		if (f is IntermediateString) {
-			if ("auto_kernel_source" in f.locations || "auto_kernel_header" in f.locations ||
-			    "auto_libc_source" in f.locations || "auto_libc_header" in f.locations ||
-			    "auto_kernel" in f.locations || "auto_source" in f.locations ||
-			    "auto_libc" in f.locations || "auto" in f.locations)
+			if ("auto_libc_source" in f.locations ||
+			    "auto_source" in f.locations)
 				goto do_create_libc_auto_impl;
 			continue;
 		}
