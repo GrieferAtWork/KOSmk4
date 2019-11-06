@@ -128,9 +128,9 @@ foo:() { do_something(); }
   The given `do_something` will appear in `/include/local/string/memcpy.h` and in `/src/libc/auto/string.c` (if the possible). Otherwise (if the `[same_impl]` tag is given), the same implementation will also appear as the `/*AUTO*/` implementation in `/src/libc/user/string.c`
 
 - The implementation uses a generator  
-```
-foo:() %{...}
-```
+  ```
+  foo:() %{...}
+  ```
 	- For this purpose, the following generators are defined:
 		- `foo:() %{copy(name)}`, `foo:() %{copy(name, direct)}`  
 		  Copy the implementation of another function `name`
