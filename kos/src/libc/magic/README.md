@@ -112,19 +112,19 @@ strchr:(char const *s, int c) -> char *
 `impl` is used to provide the default implementation for the function and must be one of:
 
 - No implementation is given (the function will appear as unimplemented in `/src/libc/user/string.c`)  
-```
-foo:();
-```
+  ```
+  foo:();
+  ```
 
 - The implementation is aliasing another function (This will cause `bar` to be exposed with the alias `foo` (unless the `[nocrt]` tag was used), and `foo` to use the implementation of `bar` (if any))  
-```
-foo:() = bar;
-```
+  ```
+  foo:() = bar;
+  ```
 
 - The implementation is given locally  
-```
-foo:() { do_something(); }
-```  
+  ```
+  foo:() { do_something(); }
+  ```  
   The given `do_something` will appear in `/include/local/string/memcpy.h` and in `/src/libc/auto/string.c` (if the possible). Otherwise (if the `[same_impl]` tag is given), the same implementation will also appear as the `/*AUTO*/` implementation in `/src/libc/user/string.c`
 
 - The implementation uses a generator  
