@@ -44,6 +44,8 @@ PUBLIC FAKEDATA char **__argv = NULL;
 PUBLIC FAKEDATA char *program_invocation_name = NULL;
 PUBLIC FAKEDATA char *program_invocation_short_name = NULL;
 DEFINE_PUBLIC_ALIAS(_pgmptr, program_invocation_name);
+DEFINE_PUBLIC_ALIAS(__progname_full, program_invocation_name);
+DEFINE_PUBLIC_ALIAS(__progname, program_invocation_short_name);
 
 DECL_END
 

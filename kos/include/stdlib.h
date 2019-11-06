@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc00a652d */
+/* HASH CRC-32:0xc7c4cf57 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2151,6 +2151,8 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t **,__NOTHROW_NC
 #ifndef _pgmptr
 #ifdef program_invocation_name
 #define _pgmptr   program_invocation_name
+#elif defined(__progname_full)
+#define _pgmptr   __progname_full
 #elif defined(__CRT_HAVE_program_invocation_name)
 #ifndef __NO_ASMNAME
 __LIBC char *_pgmptr __ASMNAME("program_invocation_name");
@@ -2163,6 +2165,15 @@ __LIBC char *program_invocation_name;
 #elif defined(__CRT_HAVE__pgmptr)
 __LIBC char *_pgmptr;
 #define _pgmptr   _pgmptr
+#elif defined(__CRT_HAVE___progname_full)
+#ifndef __NO_ASMNAME
+__LIBC char *_pgmptr __ASMNAME("__progname_full");
+#define _pgmptr   _pgmptr
+#else /* !__NO_ASMNAME */
+__LIBC char *__progname_full;
+#define __progname_full __progname_full
+#define _pgmptr         __progname_full
+#endif /* __NO_ASMNAME */
 #else /* ... */
 #ifndef ____p__pgmptr_defined
 #define ____p__pgmptr_defined 1

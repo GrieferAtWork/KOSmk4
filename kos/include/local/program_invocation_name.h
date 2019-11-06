@@ -28,6 +28,8 @@ __SYSDECL_BEGIN
 #define __LOCAL_program_invocation_name program_invocation_name
 #elif defined(_pgmptr)
 #define __LOCAL_program_invocation_name _pgmptr
+#elif defined(__progname_full)
+#define __LOCAL_program_invocation_name __progname_full
 #elif defined(__CRT_HAVE_program_invocation_name)
 #ifndef __NO_ASMNAME
 __LIBC char *__LOCAL_program_invocation_name __ASMNAME("program_invocation_name");
@@ -45,6 +47,15 @@ __LIBC char *__LOCAL_program_invocation_name __ASMNAME("_pgmptr");
 __LIBC char *_pgmptr;
 #define _pgmptr                         _pgmptr
 #define __LOCAL_program_invocation_name _pgmptr
+#endif /* __NO_ASMNAME */
+#elif defined(__CRT_HAVE___progname_full)
+#ifndef __NO_ASMNAME
+__LIBC char *__LOCAL_program_invocation_name __ASMNAME("__progname_full");
+#define __LOCAL_program_invocation_name __LOCAL_program_invocation_name
+#else /* !__NO_ASMNAME */
+__LIBC char *__progname_full;
+#define __progname_full                 __progname_full
+#define __LOCAL_program_invocation_name __progname_full
 #endif /* __NO_ASMNAME */
 #else /* ... */
 #ifndef ____p__pgmptr_defined
@@ -69,6 +80,8 @@ __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,
 #ifndef __LOCAL_program_invocation_short_name
 #ifdef program_invocation_short_name
 #define __LOCAL_program_invocation_short_name program_invocation_short_name
+#elif defined(__progname)
+#define __LOCAL_program_invocation_short_name __progname
 #elif defined(__CRT_HAVE_program_invocation_short_name)
 #ifndef __NO_ASMNAME
 __LIBC char *__LOCAL_program_invocation_short_name __ASMNAME("program_invocation_short_name");
@@ -77,6 +90,15 @@ __LIBC char *__LOCAL_program_invocation_short_name __ASMNAME("program_invocation
 __LIBC char *program_invocation_short_name;
 #define program_invocation_short_name         program_invocation_short_name
 #define __LOCAL_program_invocation_short_name program_invocation_short_name
+#endif /* __NO_ASMNAME */
+#elif defined(__CRT_HAVE___progname)
+#ifndef __NO_ASMNAME
+__LIBC char *__LOCAL_program_invocation_short_name __ASMNAME("__progname");
+#define __LOCAL_program_invocation_short_name __LOCAL_program_invocation_short_name
+#else /* !__NO_ASMNAME */
+__LIBC char *__progname;
+#define __progname                            __progname
+#define __LOCAL_program_invocation_short_name __progname
 #endif /* __NO_ASMNAME */
 #else /* ... */
 #ifndef ____p_program_invocation_short_name_defined

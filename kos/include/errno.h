@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c36be59 */
+/* HASH CRC-32:0x66a6c884 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -583,6 +583,8 @@ __LIBC __errno_t errno;
 #ifndef program_invocation_name
 #ifdef _pgmptr
 #define program_invocation_name _pgmptr
+#elif defined(_pgmptr)
+#define program_invocation_name __progname_full
 #elif defined(__CRT_HAVE_program_invocation_name)
 __LIBC char *program_invocation_name;
 #define program_invocation_name program_invocation_name
@@ -594,6 +596,15 @@ __LIBC char *program_invocation_name __ASMNAME("_pgmptr");
 __LIBC char *_pgmptr;
 #define _pgmptr                 _pgmptr
 #define program_invocation_name _pgmptr
+#endif /* __NO_ASMNAME */
+#elif defined(__CRT_HAVE___progname_full)
+#ifndef __NO_ASMNAME
+__LIBC char *program_invocation_name __ASMNAME("__progname_full");
+#define program_invocation_name  program_invocation_name
+#else /* !__NO_ASMNAME */
+__LIBC char *__progname_full;
+#define __progname_full         __progname_full
+#define program_invocation_name __progname_full
 #endif /* __NO_ASMNAME */
 #else /* ... */
 #ifndef ____p__pgmptr_defined
@@ -616,9 +627,20 @@ __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,
 
 /* Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
 #ifndef program_invocation_short_name
-#ifdef __CRT_HAVE_program_invocation_short_name
+#ifdef __progname
+#define program_invocation_short_name __progname
+#elif defined(__CRT_HAVE_program_invocation_short_name)
 __LIBC char *program_invocation_short_name;
 #define program_invocation_short_name program_invocation_short_name
+#elif defined(__CRT_HAVE___progname)
+#ifndef __NO_ASMNAME
+__LIBC char *program_invocation_short_name __ASMNAME("__progname");
+#define program_invocation_short_name  program_invocation_short_name
+#else /* !__NO_ASMNAME */
+__LIBC char *__progname;
+#define __progname                    __progname
+#define program_invocation_short_name __progname
+#endif /* __NO_ASMNAME */
 #else /* ... */
 #ifndef ____p_program_invocation_short_name_defined
 #define ____p_program_invocation_short_name_defined 1

@@ -73,8 +73,8 @@ BEGIN
 					final local CRT_DLSUBST_GLOBALS = {
 						"__peb", "environ", "_environ", "__environ",
 						"__argc", "__argv", "_pgmptr",
-						"program_invocation_name",
-						"program_invocation_short_name",
+						"program_invocation_name", "__progname_full",
+						"program_invocation_short_name", "__progname",
 					};
 					for (local symbolName, none, symbolBind, symbolVisi, none, symbolSect: symbols) {
 						if (symbolVisi != "DEFAULT")

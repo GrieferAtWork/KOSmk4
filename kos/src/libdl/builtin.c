@@ -1343,7 +1343,9 @@ DEFINE_PUBLIC_ALIAS(dlauxinfo, libdl_dlauxinfo);
 		"__argc"          : "result = (void *)&root_peb->pp_argc;",       \
 		"__argv"          : "result = (void *)&root_peb->pp_argv;",       \
 		"_pgmptr"         : "result = (void *)&root_peb->pp_argv[0];",    \
+		"__progname_full" : "result = (void *)&root_peb->pp_argv[0];",    \
 		"program_invocation_name" : "result = (void *)&root_peb->pp_argv[0];", \
+		"__progname"      : "result = (void *)dlget_p_program_invocation_short_name();", \
 		"program_invocation_short_name" : "result = (void *)dlget_p_program_invocation_short_name();", \
 	}
 

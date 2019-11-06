@@ -888,6 +888,8 @@
 #define __CRT_HAVE___powf 1
 #define __CRT_HAVE___powl 1
 #define __CRT_HAVE___pread64 1
+#define __CRT_HAVE___progname 1
+#define __CRT_HAVE___progname_full 1
 #define __CRT_HAVE___pthread_cleanup_routine 1
 #define __CRT_HAVE___pthread_register_cancel 1
 #define __CRT_HAVE___pthread_register_cancel_defer 1

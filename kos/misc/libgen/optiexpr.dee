@@ -96,6 +96,9 @@ function optimizePPBranch(b: Object): Object {
 				b = b.conditions[0];
 				continue;
 			}
+			/* TODO: (a && b&&...) || (b&&...) --> (b&&...)
+			 *       (a || b||...) && (b||...) --> (b||...)
+			 * Where `b' can be any number of expressions */
 			break;
 		}
 		break;

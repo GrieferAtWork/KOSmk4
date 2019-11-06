@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x441c7a3 */
+/* HASH CRC-32:0x287c9ab3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __LOCAL_LIBC(itoa) __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(itoa))(int __val,
                                                   char *__dst,
                                                   int __radix) {
-#line 2810 "kos/src/libc/magic/stdlib.c"
+#line 2821 "kos/src/libc/magic/stdlib.c"
 	__localdep__itoa_s(__val, __dst, (__SIZE_TYPE__)-1, __radix);
 	return __dst;
 }
