@@ -37,6 +37,7 @@
 #include <kernel/printk.h>
 #include <kernel/tss.h>
 #include <kernel/vm.h>
+#include <kernel/vm/phys.h>
 #include <sched/cpu.h>
 #include <sched/smp.h>
 #include <sched/task.h>

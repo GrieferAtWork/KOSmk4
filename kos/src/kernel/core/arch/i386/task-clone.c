@@ -33,8 +33,9 @@
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
-#include <sched/except-handler.h>
+#include <kernel/vm/phys.h>
 #include <sched/cpu.h>
+#include <sched/except-handler.h>
 #include <sched/pid.h>
 #include <sched/rpc.h>
 #include <sched/task.h>

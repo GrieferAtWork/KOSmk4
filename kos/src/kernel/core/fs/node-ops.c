@@ -27,6 +27,7 @@
 #include <kernel/except.h>
 #include <kernel/paging.h>
 #include <kernel/vm.h>
+#include <kernel/vm/phys.h>
 
 #include <assert.h>
 

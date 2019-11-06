@@ -26,6 +26,7 @@
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/aio.h>
+#include <kernel/vm/phys.h>
 
 #if !defined(DEFINE_IO_READ) && !defined(DEFINE_IO_WRITE)
 #error "Must #define DEFINE_IO_READ or DEFINE_IO_WRITE"

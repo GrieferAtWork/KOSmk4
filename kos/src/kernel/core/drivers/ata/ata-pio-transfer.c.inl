@@ -25,6 +25,8 @@
 #define DEFINE_IO_PHYS 1
 #endif
 
+#include <kernel/vm/phys.h>
+
 #if (defined(DEFINE_IO_READ) + defined(DEFINE_IO_WRITE)) != 1
 #error "Must #define exactly one of `DEFINE_IO_READ' or `DEFINE_IO_WRITE'"
 #endif

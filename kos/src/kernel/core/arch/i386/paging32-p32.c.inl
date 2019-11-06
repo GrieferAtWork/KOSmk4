@@ -28,18 +28,13 @@
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/vm.h>
+#include <kernel/vm/phys.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 
 #include <assert.h>
 #include <string.h>
-
-/*TODO:REMOVE_ME*/
-#include <asm/cpu-flags.h>
-#include <asm/intrin.h>
-/*TODO:REMOVE_ME*/
-
 
 #ifndef CONFIG_NO_PAGING_P32
 

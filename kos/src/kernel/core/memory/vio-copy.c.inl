@@ -23,6 +23,8 @@
 //#define DEFINE_IO_WRITE 1
 #endif /* __INTELLISENSE__ */
 
+#include <kernel/vm/phys.h>
+
 DECL_BEGIN
 
 #if (defined(DEFINE_IO_READ) + defined(DEFINE_IO_WRITE)) != 1

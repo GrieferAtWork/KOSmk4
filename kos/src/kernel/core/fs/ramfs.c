@@ -27,6 +27,7 @@
 #include <kernel/driver.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
+#include <kernel/vm/phys.h>
 
 #include <hybrid/atomic.h>
 

@@ -29,7 +29,6 @@ sys.inotify.c
 sys.mtio.c  (Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
 sys.perm.c  (i386-only header)
 sys.prctl.c
-sys.procfs.c  (i386-only header)
 sys.profil.c
 sys.queue.c (It's just like our <hybrid/sequence/list.h>)
 sys.quota.c

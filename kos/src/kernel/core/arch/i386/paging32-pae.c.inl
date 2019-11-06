@@ -25,19 +25,21 @@
 #include <kernel/compiler.h>
 
 #include <kernel/arch/paging32-pae.h>
+#include <kernel/cpuid.h>
+#include <kernel/except.h>
 #include <kernel/memory.h>
 #include <kernel/paging.h>
-#include <kernel/except.h>
 #include <kernel/vm.h>
-#include <kernel/cpuid.h>
+#include <kernel/vm/phys.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+
 #include <asm/cpu-cpuid.h>
 
 #include <assert.h>
-#include <string.h>
 #include <stdint.h>
+#include <string.h>
 
 #ifndef CONFIG_NO_PAGING_PAE
 

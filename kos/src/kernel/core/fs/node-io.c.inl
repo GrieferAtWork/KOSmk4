@@ -22,6 +22,7 @@
 
 #include <fs/node.h>
 #include <kernel/swap.h>
+#include <kernel/vm/phys.h>
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>

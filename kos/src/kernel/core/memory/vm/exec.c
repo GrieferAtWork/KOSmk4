@@ -23,13 +23,14 @@
 #include <kernel/compiler.h>
 
 #include <fs/node.h>
+#include <kernel/debugtrap.h>
 #include <kernel/driver-param.h>
 #include <kernel/except.h>
-#include <kernel/debugtrap.h>
 #include <kernel/vm.h>
 #include <kernel/vm/builder.h>
-#include <kernel/vm/library.h>
 #include <kernel/vm/exec.h>
+#include <kernel/vm/library.h>
+#include <kernel/vm/phys.h>
 
 #include <hybrid/align.h>
 

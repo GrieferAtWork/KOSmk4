@@ -24,6 +24,7 @@
 
 #include <kernel/except.h>
 #include <kernel/vm.h>
+#include <kernel/vm/phys.h>
 
 #include <alloca.h>
 #include <assert.h>

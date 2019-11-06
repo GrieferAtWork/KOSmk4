@@ -29,6 +29,7 @@
 #include <kernel/types.h>
 #include <kernel/vio.h>
 #include <kernel/vm.h>
+#include <kernel/vm/phys.h>
 
 #include <hybrid/unaligned.h>
 

@@ -1907,20 +1907,6 @@ FUNDEF NOBLOCK void NOTHROW(FCALL vm_kernel_sync)(vm_vpage_t page_index, size_t 
 FUNDEF NOBLOCK void NOTHROW(FCALL vm_kernel_syncone)(vm_vpage_t page_index);
 FUNDEF NOBLOCK void NOTHROW(FCALL vm_kernel_syncall)(void);
 
-/* Copy memory to/from the physical address space. */
-FUNDEF void KCALL vm_copyfromphys(USER CHECKED void *dst, PHYS vm_phys_t src, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF void KCALL vm_copytophys(PHYS vm_phys_t dst, USER CHECKED void const *src, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_copyinphys)(PHYS vm_phys_t dst, PHYS vm_phys_t src, size_t num_bytes);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphys)(PHYS vm_phys_t dst, int byte, size_t num_bytes);
-
-/* no-#PF variants of `vm_copy(from|to)phys()'.
- * @return: 0 : The copy operation completed without any problems.
- * @return: * : The number of bytes that could not be transfered.
- *              The affected memory range is:
- *               - `(dst|src) + num_bytes - return ... (dst|src) + num_bytes - 1' */
-FUNDEF size_t NOTHROW(KCALL vm_copyfromphys_nopf)(USER CHECKED void *dst, PHYS vm_phys_t src, size_t num_bytes);
-FUNDEF size_t NOTHROW(KCALL vm_copytophys_nopf)(PHYS vm_phys_t dst, USER CHECKED void const *src, size_t num_bytes);
-
 /* read/write memory to/form the address space of a given VM
  * Note that these functions behave similar to memcpy_nopf(), in that they
  * will only ever copy _true_ RAM, and never access VIO or cause LOA/COW.
@@ -2217,22 +2203,6 @@ DATDEF CALLBACK_LIST(void FCALL(struct vm *)) vm_onfini_callbacks;
 #define DEFINE_PERVM_CLONE(func)   DEFINE_CALLBACK(".rodata.callback.pervm.clone", func)
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
-
-/* A single page of virtual memory in the kernel VM, that is always
- * prepared for being used for whatever purposes a thread has in mind.
- * NOTE: This page is also used by PAGEFAULTS, though it will
- *       restore a previous mapping, if such a mapping existed.
- * NOTE: Because this page is unique for each thread, the user is not
- *       required to acquire a lock to the kernel VM when wishing to
- *       map something at this location! */
-DATDEF ATTR_PERTASK vm_vpage_t _this_trampoline_page;
-#define THIS_TRAMPOLINE_PAGE PERTASK_GET(_this_trampoline_page)
-
-#ifdef CONFIG_BUILDING_KERNEL_CORE
-/* A data part used to describe a single, reserved page. */
-INTDEF ATTR_PERTASK struct vm_node _this_trampoline_node;
-
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
 #endif /* __CC__ */
 
 DECL_END

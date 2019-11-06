@@ -29,15 +29,19 @@ if (gcc_opt.remove("-O3"))
 
 #include <kernel/debugger.h>
 #ifndef CONFIG_NO_DEBUGGER
-#include <kos/keyboard.h>
 #include <kernel/except.h>
 #include <kernel/paging.h>
 #include <kernel/vm.h>
+#include <kernel/vm/phys.h>
+
+#include <hybrid/align.h>
+
+#include <kos/kernel/cpu-state.h>
+#include <kos/keyboard.h>
+
 #include <alloca.h>
 #include <ctype.h>
 #include <string.h>
-#include <hybrid/align.h>
-#include <kos/kernel/cpu-state.h>
 
 DECL_BEGIN
 

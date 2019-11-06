@@ -44,18 +44,22 @@ if (gcc_opt.remove("-O3"))
 #define CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER 1
 
 
-#include <kos/keyboard.h>
+#include <kernel/driver.h>
+#include <kernel/except.h>
 #include <kernel/paging.h>
 #include <kernel/vm.h>
-#include <kernel/except.h>
-#include <kernel/driver.h>
-#include <stddef.h>
+#include <kernel/vm/phys.h>
+
+#include <kos/keyboard.h>
+
 #include <alloca.h>
+#include <stddef.h>
 #include <string.h>
-#include <libdisasm/disassembler.h>
-#include <libdisasm/format.h>
+
 #include <libdebuginfo/addr2line.h>
 #include <libdebuginfo/debug_info.h>
+#include <libdisasm/disassembler.h>
+#include <libdisasm/format.h>
 
 #ifndef CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER
 #include <libinstrlen/instrlen.h>

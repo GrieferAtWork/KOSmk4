@@ -29,6 +29,7 @@
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
+#include <kernel/vm/phys.h>
 
 #include <hybrid/align.h>
 #include <hybrid/minmax.h>

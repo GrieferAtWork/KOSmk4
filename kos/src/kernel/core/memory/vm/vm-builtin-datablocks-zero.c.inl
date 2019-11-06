@@ -24,6 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/vm.h>
+#include <kernel/vm/phys.h>
 
 #include <hybrid/limits.h>
 

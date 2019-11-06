@@ -26,6 +26,7 @@
 
 #include <kernel/aio.h>
 #include <kernel/vm.h>
+#include <kernel/vm/phys.h>
 
 #include <string.h>
 

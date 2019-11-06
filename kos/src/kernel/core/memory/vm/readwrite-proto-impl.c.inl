@@ -23,10 +23,12 @@
 #define VM_MEMSET_IMPL 1
 #endif
 
-#include <kernel/vio.h>
 #include <kernel/printk.h>
-#include <hybrid/atomic.h>
+#include <kernel/vio.h>
+#include <kernel/vm/phys.h>
 #include <sched/pid.h>
+
+#include <hybrid/atomic.h>
 
 #if (defined(COPY_USER2KERNEL) + defined(COPY_KERNEL2USER) + defined(VM_MEMSET_IMPL)) != 1
 #error "Must #define COPY_USER2KERNEL or COPY_KERNEL2USER or VM_MEMSET_IMPL before #include-ing this file"

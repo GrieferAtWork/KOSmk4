@@ -30,6 +30,7 @@
 #include <kernel/printk.h>
 #include <kernel/vio.h>
 #include <kernel/vm.h>
+#include <kernel/vm/phys.h>
 #include <sched/pid.h>
 
 #include <hybrid/atomic.h>

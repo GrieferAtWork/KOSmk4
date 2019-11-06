@@ -33,6 +33,7 @@
 #include <kernel/swap.h>
 #include <kernel/vm.h>
 #include <kernel/vm/futex.h>
+#include <kernel/vm/phys.h>
 #include <sched/cpu.h>
 #include <sched/pid.h>
 

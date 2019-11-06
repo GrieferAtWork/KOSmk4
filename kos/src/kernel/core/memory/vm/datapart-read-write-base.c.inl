@@ -25,6 +25,7 @@
 #endif
 
 #include <limits.h> /* SSIZE_MAX */
+#include <kernel/vm/phys.h>
 
 DECL_BEGIN
 
