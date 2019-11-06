@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf65808ed */
+/* HASH CRC-32:0x69bc5115 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -258,18 +258,18 @@ __SYSDECL_BEGIN
 #ifndef BUFSIZ
 #ifdef __USE_DOS
 #define BUFSIZ 512
-#else
+#else /* __USE_DOS */
 #define BUFSIZ 8192
-#endif
-#endif
+#endif /* !__USE_DOS */
+#endif /* !BUFSIZ */
 
 #ifndef EOF
 #ifdef __EOF
 #define EOF __EOF
-#else
+#else /* __EOF */
 #define EOF (-1)
-#endif
-#endif
+#endif /* !__EOF */
+#endif /* !EOF */
 
 #ifndef SEEK_SET
 #   define SEEK_SET  0 /* Seek from beginning of file.  */
@@ -279,15 +279,15 @@ __SYSDECL_BEGIN
 #   define SEEK_DATA 3 /* Seek to next data.  */
 #   define SEEK_HOLE 4 /* Seek to next hole.  */
 #endif /* __USE_GNU && (__CRT_KOS || __CRT_GLC) */
-#endif
+#endif /* !SEEK_SET */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 #ifdef __USE_DOS
 #define P_tmpdir "\\"
-#else
+#else /* __USE_DOS */
 #define P_tmpdir "/tmp"
-#endif
-#endif
+#endif /* !__USE_DOS */
+#endif /* __USE_MISC || __USE_XOPEN */
 
 
 #ifdef __CC__

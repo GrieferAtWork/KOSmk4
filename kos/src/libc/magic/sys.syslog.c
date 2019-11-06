@@ -149,7 +149,7 @@ syslog:(int level, [nonnull] char const *format, ...) {
 
 %
 %#ifdef __USE_MISC
-[cp][ATTR_LIBC_PRINTF(2,0)][requires($has_function(syslog_printer))]
+[cp][ATTR_LIBC_PRINTF(2,0)][requires_dependency(syslog_printer)]
 vsyslog:(int level, [nonnull] char const *format, $va_list args) {
 	format_vprintf(&syslog_printer,
 	              (void *)(uintptr_t)(unsigned int)level,

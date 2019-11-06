@@ -93,18 +93,18 @@ __SYSDECL_BEGIN
 #ifndef BUFSIZ
 #ifdef __USE_DOS
 #define BUFSIZ 512
-#else
+#else /* __USE_DOS */
 #define BUFSIZ 8192
-#endif
-#endif
+#endif /* !__USE_DOS */
+#endif /* !BUFSIZ */
 
 #ifndef EOF
 #ifdef __EOF
 #define EOF __EOF
-#else
+#else /* __EOF */
 #define EOF (-1)
-#endif
-#endif
+#endif /* !__EOF */
+#endif /* !EOF */
 
 #ifndef SEEK_SET
 #   define SEEK_SET  0 /* Seek from beginning of file.  */
@@ -114,15 +114,15 @@ __SYSDECL_BEGIN
 #   define SEEK_DATA 3 /* Seek to next data.  */
 #   define SEEK_HOLE 4 /* Seek to next hole.  */
 #endif /* __USE_GNU && (__CRT_KOS || __CRT_GLC) */
-#endif
+#endif /* !SEEK_SET */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 #ifdef __USE_DOS
 #define P_tmpdir "\\"
-#else
+#else /* __USE_DOS */
 #define P_tmpdir "/tmp"
-#endif
-#endif
+#endif /* !__USE_DOS */
+#endif /* __USE_MISC || __USE_XOPEN */
 
 
 #ifdef __CC__
@@ -810,7 +810,7 @@ fsetpos:([nonnull] FILE *__restrict stream, [nonnull] fpos_t const *__restrict p
 [std][cp_stdio][ATTR_LIBC_PRINTF(2, 0)]
 [section(.text.crt.FILE.locked.write.printf)][crtbuiltin]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(vfprintf_unlocked)]
-[same_impl][requires($has_function(file_printer))][alias(vfprintf_s)]
+[same_impl][requires_dependency(file_printer)][alias(vfprintf_s)]
 [export_alias(_IO_vfprintf)][alias(vfprintf_unlocked)]
 vfprintf:([nonnull] FILE *__restrict stream,
           [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
@@ -974,7 +974,7 @@ sscanf:([nonnull] char const *__restrict input,
 @@Print a formatted string to a given in-member string buffer `BUF'
 @@Return the number of written characters, excluding a trailing NUL-character
 [std][ATTR_LIBC_PRINTF(2, 0)][kernel][crtbuiltin][alias(_IO_vsprintf)]
-[section(.text.crt.unicode.static.format.printf)]
+[section(.text.crt.unicode.static.format.printf)][dependency(format_sprintf_printer)]
 vsprintf:([nonnull] char *__restrict dest,
           [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	@__STDC_INT_AS_SSIZE_T@ result;
@@ -1013,7 +1013,7 @@ struct __format_snprintf_data {
 	__SIZE_TYPE__ __sd_bufsiz; /* Remaining buffer size. */
 };
 #endif /* !____format_snprintf_data_defined */
-)][crtbuiltin]
+)][crtbuiltin][dependency(format_snprintf_printer)]
 [section(.text.crt.unicode.static.format.printf)][export_alias(__vsnprintf)]
 vsnprintf:([outp_opt(min(return,buflen))] char *__restrict buf, size_t buflen,
            [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
@@ -1729,7 +1729,7 @@ struct format_aprintf_data {
 	__SIZE_TYPE__ ap_used;  /* Used buffer size */
 };
 #endif /* !__format_aprintf_data_defined */
-)]
+)][dependency(format_aprintf_printer)]
 vasprintf:([nonnull] char **__restrict pstr, [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	char *result;
 	ssize_t error;
@@ -2049,7 +2049,7 @@ fftruncate64_unlocked:([nonnull] $FILE *__restrict stream, __PIO_OFFSET64 length
 
 %[default_impl_section(.text.crt.FILE.unlocked.write.printf)]
 [cp_stdio][ATTR_LIBC_PRINTF(2, 0)][same_impl]
-[requires($has_function(file_printer_unlocked))]
+[requires_dependency(file_printer_unlocked)]
 [alias(vfprintf, vfprintf_s, _IO_vfprintf)][user]
 vfprintf_unlocked:([nonnull] $FILE *__restrict stream,
                    [nonnull] char const *__restrict format,

@@ -846,21 +846,21 @@ NOTHROW_RPC(LIBDCALL libd_wsystem)(char16_t const *cmd)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xb805b42]]]*/
+/*[[[start:exports,hash:CRC-32=0xc6531083]]]*/
 #undef wexecl
 #undef _wexecl
-#undef wexecle
-#undef _wexecle
 #undef wexeclp
 #undef _wexeclp
+#undef wexecle
+#undef _wexecle
 #undef wexeclpe
 #undef _wexeclpe
 #undef wspawnl
 #undef _wspawnl
-#undef wspawnle
-#undef _wspawnle
 #undef wspawnlp
 #undef _wspawnlp
+#undef wspawnle
+#undef _wspawnle
 #undef wspawnlpe
 #undef _wspawnlpe
 DEFINE_PUBLIC_WEAK_ALIAS(wexecv, libc_wexecv);
@@ -878,12 +878,12 @@ DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wexecvpe, libd_wexecvpe);
 DEFINE_PUBLIC_WEAK_ALIAS(wexecl, libc_wexecl);
 DEFINE_PUBLIC_WEAK_ALIAS(_wexecl, libc_wexecl);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wexecl, libd_wexecl);
-DEFINE_PUBLIC_WEAK_ALIAS(wexecle, libc_wexecle);
-DEFINE_PUBLIC_WEAK_ALIAS(_wexecle, libc_wexecle);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wexecle, libd_wexecle);
 DEFINE_PUBLIC_WEAK_ALIAS(wexeclp, libc_wexeclp);
 DEFINE_PUBLIC_WEAK_ALIAS(_wexeclp, libc_wexeclp);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wexeclp, libd_wexeclp);
+DEFINE_PUBLIC_WEAK_ALIAS(wexecle, libc_wexecle);
+DEFINE_PUBLIC_WEAK_ALIAS(_wexecle, libc_wexecle);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wexecle, libd_wexecle);
 DEFINE_PUBLIC_WEAK_ALIAS(wexeclpe, libc_wexeclpe);
 DEFINE_PUBLIC_WEAK_ALIAS(_wexeclpe, libc_wexeclpe);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wexecle, libd_wexeclpe);
@@ -902,12 +902,12 @@ DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wspawnvpe, libd_wspawnvpe);
 DEFINE_PUBLIC_WEAK_ALIAS(wspawnl, libc_wspawnl);
 DEFINE_PUBLIC_WEAK_ALIAS(_wspawnl, libc_wspawnl);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wspawnl, libd_wspawnl);
-DEFINE_PUBLIC_WEAK_ALIAS(wspawnle, libc_wspawnle);
-DEFINE_PUBLIC_WEAK_ALIAS(_wspawnle, libc_wspawnle);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wspawnle, libd_wspawnle);
 DEFINE_PUBLIC_WEAK_ALIAS(wspawnlp, libc_wspawnlp);
 DEFINE_PUBLIC_WEAK_ALIAS(_wspawnlp, libc_wspawnlp);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wspawnlp, libd_wspawnlp);
+DEFINE_PUBLIC_WEAK_ALIAS(wspawnle, libc_wspawnle);
+DEFINE_PUBLIC_WEAK_ALIAS(_wspawnle, libc_wspawnle);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wspawnle, libd_wspawnle);
 DEFINE_PUBLIC_WEAK_ALIAS(wspawnlpe, libc_wspawnlpe);
 DEFINE_PUBLIC_WEAK_ALIAS(_wspawnlpe, libc_wspawnlpe);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wspawnle, libd_wspawnlpe);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5473ad0 */
+/* HASH CRC-32:0xfe4a4c18 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,10 +55,10 @@ INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_wexecvpe)(char32_t const
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBDCALL libd_wexecvpe)(char16_t const *__restrict file, __T16ARGV, __T16ENVP);
 INTDEF ATTR_SENTINEL NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_wexecl)(char32_t const *__restrict path, char32_t const *args, ... /*, (wchar_t *)NULL*/);
 INTDEF ATTR_SENTINEL NONNULL((1)) int NOTHROW_RPC(VLIBDCALL libd_wexecl)(char16_t const *__restrict path, char16_t const *args, ... /*, (wchar_t *)NULL*/);
-INTDEF ATTR_SENTINEL_O(1) NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_wexecle)(char32_t const *__restrict path, char32_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/);
-INTDEF ATTR_SENTINEL_O(1) NONNULL((1)) int NOTHROW_RPC(VLIBDCALL libd_wexecle)(char16_t const *__restrict path, char16_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/);
 INTDEF ATTR_SENTINEL NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_wexeclp)(char32_t const *__restrict file, char32_t const *args, ... /*, (wchar_t *)NULL*/);
 INTDEF ATTR_SENTINEL NONNULL((1)) int NOTHROW_RPC(VLIBDCALL libd_wexeclp)(char16_t const *__restrict file, char16_t const *args, ... /*, (wchar_t *)NULL*/);
+INTDEF ATTR_SENTINEL_O(1) NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_wexecle)(char32_t const *__restrict path, char32_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/);
+INTDEF ATTR_SENTINEL_O(1) NONNULL((1)) int NOTHROW_RPC(VLIBDCALL libd_wexecle)(char16_t const *__restrict path, char16_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/);
 INTDEF ATTR_SENTINEL_O(1) NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_wexeclpe)(char32_t const *__restrict file, char32_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/);
 INTDEF ATTR_SENTINEL_O(1) NONNULL((1)) int NOTHROW_RPC(VLIBDCALL libd_wexeclpe)(char16_t const *__restrict file, char16_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/);
 INTDEF NONNULL((2, 3)) pid_t NOTHROW_RPC(LIBCCALL libc_wspawnv)(int mode, char32_t const *__restrict path, __T32ARGV);
@@ -71,10 +71,10 @@ INTDEF NONNULL((2, 3, 4)) pid_t NOTHROW_RPC(LIBCCALL libc_wspawnvpe)(int mode, c
 INTDEF NONNULL((2, 3, 4)) pid_t NOTHROW_RPC(LIBDCALL libd_wspawnvpe)(int mode, char16_t const *__restrict file, __T16ARGV, __T16ENVP);
 INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_wspawnl)(int mode, char32_t const *__restrict path, char32_t const *args, ... /*, (wchar_t *)NULL*/);
 INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBDCALL libd_wspawnl)(int mode, char16_t const *__restrict path, char16_t const *args, ... /*, (wchar_t *)NULL*/);
-INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_wspawnle)(int mode, char32_t const *__restrict path, char32_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/);
-INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBDCALL libd_wspawnle)(int mode, char16_t const *__restrict path, char16_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/);
 INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_wspawnlp)(int mode, char32_t const *__restrict file, char32_t const *args, ... /*, (wchar_t *)NULL*/);
 INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBDCALL libd_wspawnlp)(int mode, char16_t const *__restrict file, char16_t const *args, ... /*, (wchar_t *)NULL*/);
+INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_wspawnle)(int mode, char32_t const *__restrict path, char32_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/);
+INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBDCALL libd_wspawnle)(int mode, char16_t const *__restrict path, char16_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/);
 INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_wspawnlpe)(int mode, char32_t const *__restrict file, char32_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/);
 INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBDCALL libd_wspawnlpe)(int mode, char16_t const *__restrict file, char16_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_wsystem)(char32_t const *cmd);

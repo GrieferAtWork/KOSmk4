@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf8c23ee */
+/* HASH CRC-32:0x3fca8c70 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,12 +39,12 @@ INTDEF int (LIBCCALL libc__unloaddll)(intptr_t hnd) __THROWS(...);
 INTDEF __procfun (LIBCCALL libc__getdllprocaddr)(intptr_t hnd, char __KOS_FIXED_CONST *symname, intptr_t ord) __THROWS(...);
 INTDEF pid_t NOTHROW_RPC(LIBCCALL libc_cwait)(int *tstat, pid_t pid, int action);
 INTDEF NONNULL((2, 3)) pid_t NOTHROW_RPC(LIBCCALL libc_spawnv)(int mode, char const *__restrict path, __TARGV);
-INTDEF NONNULL((2, 3, 4)) pid_t NOTHROW_RPC(LIBCCALL libc_spawnve)(int mode, char const *__restrict path, __TARGV, __TENVP);
 INTDEF NONNULL((2, 3)) pid_t NOTHROW_RPC(LIBCCALL libc_spawnvp)(int mode, char const *__restrict file, __TARGV);
+INTDEF NONNULL((2, 3, 4)) pid_t NOTHROW_RPC(LIBCCALL libc_spawnve)(int mode, char const *__restrict path, __TARGV, __TENVP);
 INTDEF NONNULL((2, 3, 4)) pid_t NOTHROW_RPC(LIBCCALL libc_spawnvpe)(int mode, char const *__restrict file, __TARGV, __TENVP);
 INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnl)(int mode, char const *__restrict path, char const *args, ... /*, (char *)NULL*/);
-INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnle)(int mode, char const *__restrict path, char const *args, ... /*, (char *)NULL, char **environ*/);
 INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnlp)(int mode, char const *__restrict file, char const *args, ... /*, (char *)NULL*/);
+INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnle)(int mode, char const *__restrict path, char const *args, ... /*, (char *)NULL, char **environ*/);
 INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnlpe)(int mode, char const *__restrict file, char const *args, ... /*, (char *)NULL, char **environ*/);
 
 DECL_END

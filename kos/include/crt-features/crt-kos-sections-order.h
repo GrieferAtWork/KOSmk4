@@ -147,6 +147,7 @@
 
 	# strerror(), etc...
 	.errno*
+	.error*
 
 	# Databases
 	.database.shell*
@@ -252,6 +253,7 @@
 	CB(PREFIX.fs.statfs.statvfs.* PREFIX.fs.statfs.statfs.*) \
 	CB(PREFIX.timer.*) \
 	CB(PREFIX.errno.utility.* PREFIX.errno.*) \
+	CB(PREFIX.error.*) \
 	CB(PREFIX.database.shell.*) \
 	CB(PREFIX.database.group.*) \
 	CB(PREFIX.database.shadow.*) \

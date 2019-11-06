@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe470e476 */
+/* HASH CRC-32:0x54398f04 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __LOCAL_LIBC(wexeclp) __ATTR_SENTINEL __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(wexeclp))(__WCHAR_TYPE__ const *__restrict __file,
                                                       __WCHAR_TYPE__ const *__args,
                                                       ... /*, (wchar_t *)NULL*/) {
-#line 94 "kos/src/libc/magic/parts.wchar.process.c"
+#line 89 "kos/src/libc/magic/parts.wchar.process.c"
 	__REDIRECT_EXECL(__WCHAR_TYPE__, __localdep_wexecvp, __file, __args)
 }
 __NAMESPACE_LOCAL_END

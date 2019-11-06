@@ -262,7 +262,7 @@ execvp:([notnull] char const *__restrict file, [notnull] @__TARGV@) -> int;
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list
 [cp][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires($has_function(execv))][ATTR_SENTINEL][alias(_execl)][allow_macros][crtbuiltin]
+[requires_dependency(execv)][ATTR_SENTINEL][alias(_execl)][allow_macros][crtbuiltin]
 execl:([notnull] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) -> int {
 	__REDIRECT_EXECL(char, execv, path, args)
 }
@@ -270,7 +270,7 @@ execl:([notnull] char const *__restrict path, char const *args, ... /*, (char *)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal
 [cp][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires($has_function(execve))][ATTR_SENTINEL_O(1)][alias(_execle)][allow_macros][crtbuiltin]
+[requires_dependency(execve)][ATTR_SENTINEL_O(1)][alias(_execle)][allow_macros][crtbuiltin]
 execle:([notnull] char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) -> int {
 	__REDIRECT_EXECLE(char, execve, path, args)
 }
@@ -279,7 +279,7 @@ execle:([notnull] char const *__restrict path, char const *args, ... /*, (char *
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list
 [cp][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires($has_function(execvp))][ATTR_SENTINEL][alias(_execlp)][allow_macros][crtbuiltin]
+[requires_dependency(execvp)][ATTR_SENTINEL][alias(_execlp)][allow_macros][crtbuiltin]
 execlp:([notnull] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) -> int {
 	__REDIRECT_EXECL(char, execvp, file, args)
 }
@@ -297,7 +297,7 @@ execvpe:([notnull] char const *__restrict file, [notnull] @__TARGV@, [notnull] @
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal
 [cp][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires($has_function(execvpe))][ATTR_SENTINEL_O(1)][alias(_execlpe)][allow_macros]
+[requires_dependency(execvpe)][ATTR_SENTINEL_O(1)][alias(_execlpe)][allow_macros]
 execlpe:([notnull] char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) -> int {
 	__REDIRECT_EXECLE(char, execvp, file, args)
 }

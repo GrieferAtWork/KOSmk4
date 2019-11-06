@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63240e84 */
+/* HASH CRC-32:0xcac23fa0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -651,12 +651,6 @@
 #define __CRT_ATTR_NOTHROW_NCX___coshf 1
 #define __CRT_ATTR_NOTHROW_NCX___coshl 1
 #define __CRT_ATTR_NOTHROW_NCX___cosl 1
-#define __CRT_ATTR_NOTHROW_NCX___crt_dos_ftime32 1
-#define __CRT_ATTR_NOTHROW_NCX___crt_dos_ftime64 1
-#define __CRT_ATTR_NOTHROW_NCX___crt_ftime32 1
-#define __CRT_ATTR_NOTHROW_NCX___crt_ftime32_s 1
-#define __CRT_ATTR_NOTHROW_NCX___crt_ftime64 1
-#define __CRT_ATTR_NOTHROW_NCX___crt_ftime64_s 1
 #define __CRT_ATTR_NOTHROW_NCX___dos_dpcomp 1
 #define __CRT_ATTR_NOTHROW_NCX___dos_fdpcomp 1
 #define __CRT_ATTR_NOTHROW_NCX___dos_ldpcomp 1
@@ -1679,6 +1673,12 @@
 #define __CRT_ATTR_NOTHROW_NCX_crt_c32utime32 1
 #define __CRT_ATTR_NOTHROW_NCX_crt_c32utime64 1
 #define __CRT_ATTR_NOTHROW_NCX_crt_calloc 1
+#define __CRT_ATTR_NOTHROW_NCX_crt_dos_ftime32 1
+#define __CRT_ATTR_NOTHROW_NCX_crt_dos_ftime64 1
+#define __CRT_ATTR_NOTHROW_NCX_crt_ftime32 1
+#define __CRT_ATTR_NOTHROW_NCX_crt_ftime32_s 1
+#define __CRT_ATTR_NOTHROW_NCX_crt_ftime64 1
+#define __CRT_ATTR_NOTHROW_NCX_crt_ftime64_s 1
 #define __CRT_ATTR_NOTHROW_NCX_crt_posix_memalign 1
 #define __CRT_ATTR_NOTHROW_NCX_crt_strftime_l 1
 #define __CRT_ATTR_NOTHROW_NCX_crt_strptime_l 1

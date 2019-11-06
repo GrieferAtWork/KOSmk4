@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x120b535 */
+/* HASH CRC-32:0x751a0019 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #include <kos/types.h>
 #include "search.h"
 #include "unistd.h"
-#include "stdlib.h"
 #include "string.h"
 
 DECL_BEGIN
@@ -82,8 +81,8 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.isprime") int
 NOTHROW_NCX(LIBCCALL libc_isprime)(unsigned int number) {
 #line 255 "kos/src/libc/magic/search.c"
 	/* no even number will be passed */
-	for (unsigned int libc_div = 3; libc_div <= number / libc_div; libc_div += 2)
-		if (number % libc_div == 0)
+	for (unsigned int div = 3; div <= number / div; div += 2)
+		if (number % div == 0)
 			return 0;
 	return 1;
 }

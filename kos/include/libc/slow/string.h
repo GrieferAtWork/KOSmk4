@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x809929d4 */
+/* HASH CRC-32:0x2b4419a1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,8 @@
 
 __SYSDECL_BEGIN
 
+#ifndef ____libc_slow_memcpy_defined
+#define ____libc_slow_memcpy_defined 1
 #ifdef __CRT_HAVE_memcpy
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
@@ -36,6 +38,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
  * @return: * : Always re-returns `dst' */
 #define __libc_slow_memcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy))
 #endif /* memcpy... */
+#endif /* !____libc_slow_memcpy_defined */
+#ifndef ____libc_slow_memmove_defined
+#define ____libc_slow_memmove_defined 1
 #ifdef __CRT_HAVE_memmove
 /* Move memory between potentially overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
@@ -46,6 +51,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
  * @return: * : Always re-returns `dst' */
 #define __libc_slow_memmove (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmove))
 #endif /* memmove... */
+#endif /* !____libc_slow_memmove_defined */
+#ifndef ____libc_slow_memset_defined
+#define ____libc_slow_memset_defined 1
 #ifdef __CRT_HAVE_memset
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
@@ -56,6 +64,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_N
  * @return: * : Always re-returns `dst' */
 #define __libc_slow_memset (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memset))
 #endif /* memset... */
+#endif /* !____libc_slow_memset_defined */
+#ifndef ____libc_slow_memcmp_defined
+#define ____libc_slow_memcmp_defined 1
 #ifdef __CRT_HAVE_memcmp
 /* Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
@@ -76,6 +87,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 #define __libc_slow_memcmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmp))
 #endif /* memcmp... */
+#endif /* !____libc_slow_memcmp_defined */
+#ifndef ____libc_slow_memchr_defined
+#define ____libc_slow_memchr_defined 1
 #ifdef __CRT_HAVE_memchr
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_slow_memchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memchr,(__haystack,__needle,__n_bytes))
@@ -84,6 +98,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __libc_slow_memchr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memchr))
 #endif /* memchr... */
+#endif /* !____libc_slow_memchr_defined */
+#ifndef ____libc_slow_strlen_defined
+#define ____libc_slow_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_slow_strlen,(char const *__restrict __string),strlen,(__string))
@@ -92,6 +109,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 #define __libc_slow_strlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlen))
 #endif /* strlen... */
+#endif /* !____libc_slow_strlen_defined */
+#ifndef ____libc_slow_strchr_defined
+#define ____libc_slow_strchr_defined 1
 #if __has_builtin(__builtin_strchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strchr)
 /* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL __libc_slow_strchr)(char const *__restrict __haystack, int __needle) { return __builtin_strchr(__haystack, __needle); }
@@ -103,6 +123,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,
 /* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 #define __libc_slow_strchr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strchr))
 #endif /* strchr... */
+#endif /* !____libc_slow_strchr_defined */
+#ifndef ____libc_slow_strcmp_defined
+#define ____libc_slow_strcmp_defined 1
 #if __has_builtin(__builtin_strcmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcmp)
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL __libc_slow_strcmp)(char const *__s1, char const *__s2) { return __builtin_strcmp(__s1, __s2); }
@@ -114,6 +137,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 #define __libc_slow_strcmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcmp))
 #endif /* strcmp... */
+#endif /* !____libc_slow_strcmp_defined */
+#ifndef ____libc_slow_strnlen_defined
+#define ____libc_slow_strnlen_defined 1
 #if __has_builtin(__builtin_strnlen) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strnlen)
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL __libc_slow_strnlen)(char const *__restrict __string, __SIZE_TYPE__ __maxlen) { return __builtin_strnlen(__string, __maxlen); }
@@ -125,6 +151,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 #define __libc_slow_strnlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnlen))
 #endif /* strnlen... */
+#endif /* !____libc_slow_strnlen_defined */
+#ifndef ____libc_slow_memrchr_defined
+#define ____libc_slow_memrchr_defined 1
 #ifdef __CRT_HAVE_memrchr
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_slow_memrchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memrchr,(__haystack,__needle,__n_bytes))
@@ -133,6 +162,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __libc_slow_memrchr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchr))
 #endif /* memrchr... */
+#endif /* !____libc_slow_memrchr_defined */
+#ifndef ____libc_slow_memmem_defined
+#define ____libc_slow_memmem_defined 1
 #if defined(__CRT_HAVE_memmem0) && (defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL))
 /* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
@@ -162,6 +194,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_N
  * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 #define __libc_slow_memmem (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmem))
 #endif /* memmem... */
+#endif /* !____libc_slow_memmem_defined */
+#ifndef ____libc_slow_mempcpy_defined
+#define ____libc_slow_mempcpy_defined 1
 #ifdef __CRT_HAVE_mempcpy
 /* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_slow_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
@@ -173,6 +208,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 /* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
 #define __libc_slow_mempcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpy))
 #endif /* mempcpy... */
+#endif /* !____libc_slow_mempcpy_defined */
+#ifndef ____libc_slow_memcpyw_defined
+#define ____libc_slow_memcpyw_defined 1
 #ifdef __CRT_HAVE_memcpyw
 /* Copy memory between non-overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_slow_memcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),memcpyw,(__dst,__src,__n_words))
@@ -184,6 +222,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__
 /* Copy memory between non-overlapping memory blocks. */
 #define __libc_slow_memcpyw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyw))
 #endif /* memcpyw... */
+#endif /* !____libc_slow_memcpyw_defined */
+#ifndef ____libc_slow_mempcpyw_defined
+#define ____libc_slow_mempcpyw_defined 1
 #ifdef __CRT_HAVE_mempcpyw
 /* Same as `memcpyw', but return `DST+N_WORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_slow_mempcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),mempcpyw,(__dst,__src,__n_words))
@@ -195,6 +236,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__
 /* Same as `memcpyw', but return `DST+N_WORDS', rather than `DST' */
 #define __libc_slow_mempcpyw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyw))
 #endif /* mempcpyw... */
+#endif /* !____libc_slow_mempcpyw_defined */
+#ifndef ____libc_slow_memcpyl_defined
+#define ____libc_slow_memcpyl_defined 1
 #ifdef __CRT_HAVE_memcpyl
 /* Copy memory between non-overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_slow_memcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),memcpyl,(__dst,__src,__n_dwords))
@@ -206,6 +250,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__
 /* Copy memory between non-overlapping memory blocks. */
 #define __libc_slow_memcpyl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyl))
 #endif /* memcpyl... */
+#endif /* !____libc_slow_memcpyl_defined */
+#ifndef ____libc_slow_mempcpyl_defined
+#define ____libc_slow_mempcpyl_defined 1
 #ifdef __CRT_HAVE_mempcpyl
 /* Same as `memcpyl', but return `DST+N_DWORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_slow_mempcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),mempcpyl,(__dst,__src,__n_dwords))
@@ -217,6 +264,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__
 /* Same as `memcpyl', but return `DST+N_DWORDS', rather than `DST' */
 #define __libc_slow_mempcpyl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyl))
 #endif /* mempcpyl... */
+#endif /* !____libc_slow_mempcpyl_defined */
+#ifndef ____libc_slow_memmovew_defined
+#define ____libc_slow_memmovew_defined 1
 #ifdef __CRT_HAVE_memmovew
 /* Move memory between potentially overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_slow_memmovew,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),memmovew,(__dst,__src,__n_words))
@@ -228,6 +278,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__
 /* Move memory between potentially overlapping memory blocks. */
 #define __libc_slow_memmovew (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovew))
 #endif /* memmovew... */
+#endif /* !____libc_slow_memmovew_defined */
+#ifndef ____libc_slow_mempmovew_defined
+#define ____libc_slow_mempmovew_defined 1
 #ifdef __CRT_HAVE_mempmovew
 /* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_slow_mempmovew,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),mempmovew,(__dst,__src,__n_words))
@@ -236,6 +289,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__
 /* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' */
 #define __libc_slow_mempmovew (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovew))
 #endif /* mempmovew... */
+#endif /* !____libc_slow_mempmovew_defined */
+#ifndef ____libc_slow_memmovel_defined
+#define ____libc_slow_memmovel_defined 1
 #ifdef __CRT_HAVE_memmovel
 /* Move memory between potentially overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_slow_memmovel,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),memmovel,(__dst,__src,__n_dwords))
@@ -247,6 +303,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__
 /* Move memory between potentially overlapping memory blocks. */
 #define __libc_slow_memmovel (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovel))
 #endif /* memmovel... */
+#endif /* !____libc_slow_memmovel_defined */
+#ifndef ____libc_slow_mempmovel_defined
+#define ____libc_slow_mempmovel_defined 1
 #ifdef __CRT_HAVE_mempmovel
 /* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_slow_mempmovel,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),mempmovel,(__dst,__src,__n_dwords))
@@ -255,6 +314,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__
 /* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' */
 #define __libc_slow_mempmovel (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovel))
 #endif /* mempmovel... */
+#endif /* !____libc_slow_mempmovel_defined */
+#ifndef ____libc_slow_memsetw_defined
+#define ____libc_slow_memsetw_defined 1
 #ifdef __CRT_HAVE_memsetw
 /* Fill memory with a given word */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_slow_memsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),memsetw,(__dst,__word,__n_words))
@@ -263,6 +325,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,
 /* Fill memory with a given word */
 #define __libc_slow_memsetw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memsetw))
 #endif /* memsetw... */
+#endif /* !____libc_slow_memsetw_defined */
+#ifndef ____libc_slow_mempsetw_defined
+#define ____libc_slow_mempsetw_defined 1
 #ifdef __CRT_HAVE_mempsetw
 /* Same as `memsetw', but return `DST+N_WORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_slow_mempsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),mempsetw,(__dst,__word,__n_words))
@@ -271,6 +336,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,
 /* Same as `memsetw', but return `DST+N_WORDS', rather than `DST' */
 #define __libc_slow_mempsetw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempsetw))
 #endif /* mempsetw... */
+#endif /* !____libc_slow_mempsetw_defined */
+#ifndef ____libc_slow_memsetl_defined
+#define ____libc_slow_memsetl_defined 1
 #ifdef __CRT_HAVE_memsetl
 /* Fill memory with a given dword */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_slow_memsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),memsetl,(__dst,__dword,__n_dwords))
@@ -279,6 +347,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,
 /* Fill memory with a given dword */
 #define __libc_slow_memsetl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memsetl))
 #endif /* memsetl... */
+#endif /* !____libc_slow_memsetl_defined */
+#ifndef ____libc_slow_mempsetl_defined
+#define ____libc_slow_mempsetl_defined 1
 #ifdef __CRT_HAVE_mempsetl
 /* Same as `memsetl', but return `DST+N_DWORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_slow_mempsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),mempsetl,(__dst,__dword,__n_dwords))
@@ -287,6 +358,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,
 /* Same as `memsetl', but return `DST+N_DWORDS', rather than `DST' */
 #define __libc_slow_mempsetl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempsetl))
 #endif /* mempsetl... */
+#endif /* !____libc_slow_mempsetl_defined */
+#ifndef ____libc_slow_memcmpw_defined
+#define ____libc_slow_memcmpw_defined 1
 #ifdef __CRT_HAVE_memcmpw
 /* Compare memory buffers and return the difference of the first non-matching word */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__INT16_TYPE__,__NOTHROW_NCX,__libc_slow_memcmpw,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_words),memcmpw,(__s1,__s2,__n_words))
@@ -298,6 +372,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__INT16_TYPE__,__N
 /* Compare memory buffers and return the difference of the first non-matching word */
 #define __libc_slow_memcmpw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpw))
 #endif /* memcmpw... */
+#endif /* !____libc_slow_memcmpw_defined */
+#ifndef ____libc_slow_memcmpl_defined
+#define ____libc_slow_memcmpl_defined 1
 #ifdef __CRT_HAVE_memcmpl
 /* Compare memory buffers and return the difference of the first non-matching dword */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__INT32_TYPE__,__NOTHROW_NCX,__libc_slow_memcmpl,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_dwords),memcmpl,(__s1,__s2,__n_dwords))
@@ -309,6 +386,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__INT32_TYPE__,__N
 /* Compare memory buffers and return the difference of the first non-matching dword */
 #define __libc_slow_memcmpl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpl))
 #endif /* memcmpl... */
+#endif /* !____libc_slow_memcmpl_defined */
+#ifndef ____libc_slow_memchrw_defined
+#define ____libc_slow_memchrw_defined 1
 #ifdef __CRT_HAVE_memchrw
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_slow_memchrw,(void const *__restrict __haystack, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),memchrw,(__haystack,__word,__n_words))
@@ -320,6 +400,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__N
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __libc_slow_memchrw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memchrw))
 #endif /* memchrw... */
+#endif /* !____libc_slow_memchrw_defined */
+#ifndef ____libc_slow_memchrl_defined
+#define ____libc_slow_memchrl_defined 1
 #ifdef __CRT_HAVE_memchrl
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_slow_memchrl,(void const *__restrict __haystack, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),memchrl,(__haystack,__dword,__n_dwords))
@@ -331,6 +414,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__N
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __libc_slow_memchrl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memchrl))
 #endif /* memchrl... */
+#endif /* !____libc_slow_memchrl_defined */
+#ifndef ____libc_slow_memrchrw_defined
+#define ____libc_slow_memrchrw_defined 1
 #ifdef __CRT_HAVE_memrchrw
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_WORDS'. - Return `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_slow_memrchrw,(void const *__restrict __haystack, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),memrchrw,(__haystack,__word,__n_words))
@@ -339,6 +425,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__N
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_WORDS'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __libc_slow_memrchrw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchrw))
 #endif /* memrchrw... */
+#endif /* !____libc_slow_memrchrw_defined */
+#ifndef ____libc_slow_memrchrl_defined
+#define ____libc_slow_memrchrl_defined 1
 #ifdef __CRT_HAVE_memrchrl
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_DWORDS'. - Return `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_slow_memrchrl,(void const *__restrict __haystack, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),memrchrl,(__haystack,__dword,__n_dwords))
@@ -347,6 +436,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__N
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_DWORDS'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __libc_slow_memrchrl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchrl))
 #endif /* memrchrl... */
+#endif /* !____libc_slow_memrchrl_defined */
+#ifndef ____libc_slow_memendw_defined
+#define ____libc_slow_memendw_defined 1
 #ifdef __CRT_HAVE_memendw
 /* Same as `memchrw', but return `HAYSTACK+N_WORDS', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_slow_memendw,(void const *__restrict __haystack, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_bytes),memendw,(__haystack,__word,__n_bytes))
@@ -355,6 +447,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__U
 /* Same as `memchrw', but return `HAYSTACK+N_WORDS', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_slow_memendw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memendw))
 #endif /* memendw... */
+#endif /* !____libc_slow_memendw_defined */
+#ifndef ____libc_slow_memendl_defined
+#define ____libc_slow_memendl_defined 1
 #ifdef __CRT_HAVE_memendl
 /* Same as `memchrl', but return `HAYSTACK+N_DWORDS', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_slow_memendl,(void const *__restrict __haystack, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_bytes),memendl,(__haystack,__dword,__n_bytes))
@@ -363,6 +458,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__U
 /* Same as `memchrl', but return `HAYSTACK+N_DWORDS', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_slow_memendl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memendl))
 #endif /* memendl... */
+#endif /* !____libc_slow_memendl_defined */
+#ifndef ____libc_slow_memrendw_defined
+#define ____libc_slow_memrendw_defined 1
 #ifdef __CRT_HAVE_memrendw
 /* Same as `memrchrw', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_slow_memrendw,(void const *__restrict __haystack, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),memrendw,(__haystack,__word,__n_words))
@@ -371,6 +469,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__U
 /* Same as `memrchrw', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_slow_memrendw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrendw))
 #endif /* memrendw... */
+#endif /* !____libc_slow_memrendw_defined */
+#ifndef ____libc_slow_memrendl_defined
+#define ____libc_slow_memrendl_defined 1
 #ifdef __CRT_HAVE_memrendl
 /* Same as `memrchrl', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_slow_memrendl,(void const *__restrict __haystack, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),memrendl,(__haystack,__dword,__n_dwords))
@@ -379,6 +480,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__U
 /* Same as `memrchrl', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_slow_memrendl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrendl))
 #endif /* memrendl... */
+#endif /* !____libc_slow_memrendl_defined */
+#ifndef ____libc_slow_memcpyq_defined
+#define ____libc_slow_memcpyq_defined 1
 #ifdef __CRT_HAVE_memcpyq
 /* Copy memory between non-overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__libc_slow_memcpyq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),memcpyq,(__dst,__src,__n_qwords))
@@ -387,6 +491,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__
 /* Copy memory between non-overlapping memory blocks. */
 #define __libc_slow_memcpyq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyq))
 #endif /* memcpyq... */
+#endif /* !____libc_slow_memcpyq_defined */
+#ifndef ____libc_slow_mempcpyq_defined
+#define ____libc_slow_mempcpyq_defined 1
 #ifdef __CRT_HAVE_mempcpyq
 /* Same as `memcpyq', but return `DST+N_QWORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__libc_slow_mempcpyq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempcpyq,(__dst,__src,__n_qwords))
@@ -395,6 +502,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__
 /* Same as `memcpyq', but return `DST+N_QWORDS', rather than `DST' */
 #define __libc_slow_mempcpyq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyq))
 #endif /* mempcpyq... */
+#endif /* !____libc_slow_mempcpyq_defined */
+#ifndef ____libc_slow_memmoveq_defined
+#define ____libc_slow_memmoveq_defined 1
 #ifdef __CRT_HAVE_memmoveq
 /* Move memory between potentially overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__libc_slow_memmoveq,(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords),memmoveq,(__dst,__src,__n_qwords))
@@ -403,6 +513,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__
 /* Move memory between potentially overlapping memory blocks. */
 #define __libc_slow_memmoveq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveq))
 #endif /* memmoveq... */
+#endif /* !____libc_slow_memmoveq_defined */
+#ifndef ____libc_slow_mempmoveq_defined
+#define ____libc_slow_mempmoveq_defined 1
 #ifdef __CRT_HAVE_mempmoveq
 /* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__libc_slow_mempmoveq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempmoveq,(__dst,__src,__n_qwords))
@@ -411,6 +524,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__
 /* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' */
 #define __libc_slow_mempmoveq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveq))
 #endif /* mempmoveq... */
+#endif /* !____libc_slow_mempmoveq_defined */
+#ifndef ____libc_slow_memsetq_defined
+#define ____libc_slow_memsetq_defined 1
 #ifdef __CRT_HAVE_memsetq
 /* Fill memory with a given qword */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__libc_slow_memsetq,(void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),memsetq,(__dst,__qword,__n_qwords))
@@ -419,6 +535,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,
 /* Fill memory with a given qword */
 #define __libc_slow_memsetq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memsetq))
 #endif /* memsetq... */
+#endif /* !____libc_slow_memsetq_defined */
+#ifndef ____libc_slow_mempsetq_defined
+#define ____libc_slow_mempsetq_defined 1
 #ifdef __CRT_HAVE_mempsetq
 /* Same as `memsetq', but return `DST+N_QWORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__libc_slow_mempsetq,(void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),mempsetq,(__dst,__qword,__n_qwords))
@@ -427,6 +546,9 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,
 /* Same as `memsetq', but return `DST+N_QWORDS', rather than `DST' */
 #define __libc_slow_mempsetq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempsetq))
 #endif /* mempsetq... */
+#endif /* !____libc_slow_mempsetq_defined */
+#ifndef ____libc_slow_memcmpq_defined
+#define ____libc_slow_memcmpq_defined 1
 #ifdef __CRT_HAVE_memcmpq
 /* Compare memory buffers and return the difference of the first non-matching qword */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__INT64_TYPE__,__NOTHROW_NCX,__libc_slow_memcmpq,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_dwords),memcmpq,(__s1,__s2,__n_dwords))
@@ -435,6 +557,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__INT64_TYPE__,__N
 /* Compare memory buffers and return the difference of the first non-matching qword */
 #define __libc_slow_memcmpq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpq))
 #endif /* memcmpq... */
+#endif /* !____libc_slow_memcmpq_defined */
+#ifndef ____libc_slow_memchrq_defined
+#define ____libc_slow_memchrq_defined 1
 #ifdef __CRT_HAVE_memchrq
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__libc_slow_memchrq,(void const *__restrict __haystack, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),memchrq,(__haystack,__qword,__n_qwords))
@@ -443,6 +568,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__N
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __libc_slow_memchrq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memchrq))
 #endif /* memchrq... */
+#endif /* !____libc_slow_memchrq_defined */
+#ifndef ____libc_slow_memrchrq_defined
+#define ____libc_slow_memrchrq_defined 1
 #ifdef __CRT_HAVE_memrchrq
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_QWORDS'. - Return `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__libc_slow_memrchrq,(void const *__restrict __haystack, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),memrchrq,(__haystack,__qword,__n_qwords))
@@ -451,6 +579,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__N
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_QWORDS'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __libc_slow_memrchrq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchrq))
 #endif /* memrchrq... */
+#endif /* !____libc_slow_memrchrq_defined */
+#ifndef ____libc_slow_memendq_defined
+#define ____libc_slow_memendq_defined 1
 #ifdef __CRT_HAVE_memendq
 /* Same as `memchrq', but return `HAYSTACK+N_QWORDS', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__libc_slow_memendq,(void const *__restrict __haystack, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_bytes),memendq,(__haystack,__qword,__n_bytes))
@@ -459,6 +590,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__U
 /* Same as `memchrq', but return `HAYSTACK+N_QWORDS', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_slow_memendq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memendq))
 #endif /* memendq... */
+#endif /* !____libc_slow_memendq_defined */
+#ifndef ____libc_slow_memrendq_defined
+#define ____libc_slow_memrendq_defined 1
 #ifdef __CRT_HAVE_memrendq
 /* Same as `memrchrq', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__libc_slow_memrendq,(void const *__restrict __haystack, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),memrendq,(__haystack,__qword,__n_qwords))
@@ -467,6 +601,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__U
 /* Same as `memrchrq', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_slow_memrendq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrendq))
 #endif /* memrendq... */
+#endif /* !____libc_slow_memrendq_defined */
+#ifndef ____libc_slow_memlenq_defined
+#define ____libc_slow_memlenq_defined 1
 #ifdef __CRT_HAVE_memlenq
 /* Same as `memendq', but return the offset from `HAYSTACK', rather than the actual address. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_slow_memlenq,(void const *__restrict __haystack, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),memlenq,(__haystack,__qword,__n_qwords))
@@ -475,6 +612,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 /* Same as `memendq', but return the offset from `HAYSTACK', rather than the actual address. */
 #define __libc_slow_memlenq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memlenq))
 #endif /* memlenq... */
+#endif /* !____libc_slow_memlenq_defined */
+#ifndef ____libc_slow_memrlenq_defined
+#define ____libc_slow_memrlenq_defined 1
 #ifdef __CRT_HAVE_memrlenq
 /* Same as `memrendq', but return the offset from `HAYSTACK', rather than the actual address. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_slow_memrlenq,(void const *__restrict __haystack, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),memrlenq,(__haystack,__qword,__n_qwords))
@@ -483,6 +623,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 /* Same as `memrendq', but return the offset from `HAYSTACK', rather than the actual address. */
 #define __libc_slow_memrlenq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrlenq))
 #endif /* memrlenq... */
+#endif /* !____libc_slow_memrlenq_defined */
+#ifndef ____libc_slow_rawmemlenq_defined
+#define ____libc_slow_rawmemlenq_defined 1
 #ifdef __CRT_HAVE_rawmemlenq
 /* Same as `rawmemchrq', but return the offset from `HAYSTACK', rather than the actual address. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_slow_rawmemlenq,(void const *__restrict __haystack, __UINT64_TYPE__ __qword),rawmemlenq,(__haystack,__qword))
@@ -491,6 +634,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 /* Same as `rawmemchrq', but return the offset from `HAYSTACK', rather than the actual address. */
 #define __libc_slow_rawmemlenq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rawmemlenq))
 #endif /* rawmemlenq... */
+#endif /* !____libc_slow_rawmemlenq_defined */
+#ifndef ____libc_slow_rawmemrlenq_defined
+#define ____libc_slow_rawmemrlenq_defined 1
 #ifdef __CRT_HAVE_rawmemrlenq
 /* Same as `rawmemrchrq', but return the offset from `HAYSTACK', rather than the actual address. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_slow_rawmemrlenq,(void const *__restrict __haystack, __UINT64_TYPE__ __qword),rawmemrlenq,(__haystack,__qword))
@@ -499,6 +645,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 /* Same as `rawmemrchrq', but return the offset from `HAYSTACK', rather than the actual address. */
 #define __libc_slow_rawmemrlenq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rawmemrlenq))
 #endif /* rawmemrlenq... */
+#endif /* !____libc_slow_rawmemrlenq_defined */
+#ifndef ____libc_slow_strend_defined
+#define ____libc_slow_strend_defined 1
 #ifdef __CRT_HAVE_strend
 /* Same as `STR+strlen(STR)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__libc_slow_strend,(char const *__restrict __string),strend,(__string))
@@ -507,6 +656,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),cha
 /* Same as `STR+strlen(STR)' */
 #define __libc_slow_strend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strend))
 #endif /* strend... */
+#endif /* !____libc_slow_strend_defined */
+#ifndef ____libc_slow_strnend_defined
+#define ____libc_slow_strnend_defined 1
 #ifdef __CRT_HAVE_strnend
 /* Same as `STR+strnlen(STR, MAX_CHARS)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__libc_slow_strnend,(char const *__restrict __string, __SIZE_TYPE__ __maxlen),strnend,(__string,__maxlen))
@@ -515,6 +667,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),cha
 /* Same as `STR+strnlen(STR, MAX_CHARS)' */
 #define __libc_slow_strnend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnend))
 #endif /* strnend... */
+#endif /* !____libc_slow_strnend_defined */
+#ifndef ____libc_slow_mempset_defined
+#define ____libc_slow_mempset_defined 1
 #ifdef __CRT_HAVE_mempset
 /* Same as `memset', but return `DST+N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_slow_mempset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),mempset,(__dst,__byte,__n_bytes))
@@ -523,6 +678,9 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_sl
 /* Same as `memset', but return `DST+N_BYTES', rather than `DST' */
 #define __libc_slow_mempset (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempset))
 #endif /* mempset... */
+#endif /* !____libc_slow_mempset_defined */
+#ifndef ____libc_slow_mempmove_defined
+#define ____libc_slow_mempmove_defined 1
 #ifdef __CRT_HAVE_mempmove
 /* Same as `memmove', but return `DST+N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_slow_mempmove,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmove,(__dst,__src,__n_bytes))
@@ -531,6 +689,9 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc
 /* Same as `memmove', but return `DST+N_BYTES', rather than `DST' */
 #define __libc_slow_mempmove (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmove))
 #endif /* mempmove... */
+#endif /* !____libc_slow_mempmove_defined */
+#ifndef ____libc_slow_memend_defined
+#define ____libc_slow_memend_defined 1
 #ifdef __CRT_HAVE_memend
 /* Same as `memchr', but return `HAYSTACK+N_BYTES', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_slow_memend,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memend,(__haystack,__needle,__n_bytes))
@@ -539,6 +700,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),voi
 /* Same as `memchr', but return `HAYSTACK+N_BYTES', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_slow_memend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memend))
 #endif /* memend... */
+#endif /* !____libc_slow_memend_defined */
+#ifndef ____libc_slow_memrend_defined
+#define ____libc_slow_memrend_defined 1
 #ifdef __CRT_HAVE_memrend
 /* Same as `memrchr', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_slow_memrend,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memrend,(__haystack,__needle,__n_bytes))
@@ -547,6 +711,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),voi
 /* Same as `memrchr', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __libc_slow_memrend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrend))
 #endif /* memrend... */
+#endif /* !____libc_slow_memrend_defined */
+#ifndef ____libc_slow_memlen_defined
+#define ____libc_slow_memlen_defined 1
 #ifdef __CRT_HAVE_memlen
 /* Same as `memend', but return the offset from `HAYSTACK', rather than the actual address. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_slow_memlen,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memlen,(__haystack,__needle,__n_bytes))
@@ -555,6 +722,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 /* Same as `memend', but return the offset from `HAYSTACK', rather than the actual address. */
 #define __libc_slow_memlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memlen))
 #endif /* memlen... */
+#endif /* !____libc_slow_memlen_defined */
+#ifndef ____libc_slow_memrlen_defined
+#define ____libc_slow_memrlen_defined 1
 #ifdef __CRT_HAVE_memrlen
 /* Same as `memrend', but return the offset from `HAYSTACK', rather than the actual address. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_slow_memrlen,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memrlen,(__haystack,__needle,__n_bytes))
@@ -563,6 +733,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 /* Same as `memrend', but return the offset from `HAYSTACK', rather than the actual address. */
 #define __libc_slow_memrlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrlen))
 #endif /* memrlen... */
+#endif /* !____libc_slow_memrlen_defined */
+#ifndef ____libc_slow_memrmem_defined
+#define ____libc_slow_memrmem_defined 1
 #if defined(__CRT_HAVE_memrmem0) && (defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL))
 /* Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
@@ -592,6 +765,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_N
  * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 #define __libc_slow_memrmem (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrmem))
 #endif /* memrmem... */
+#endif /* !____libc_slow_memrmem_defined */
+#ifndef ____libc_slow_mempatw_defined
+#define ____libc_slow_mempatw_defined 1
 #ifdef __CRT_HAVE_mempatw
 /* Same as `memsetw', but repeat a 2-byte pattern on aligned addresses. */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_slow_mempatw,(void *__restrict __dst, __UINT16_TYPE__ __pattern, __SIZE_TYPE__ __n_bytes),mempatw,(__dst,__pattern,__n_bytes))
@@ -600,6 +776,9 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_sl
 /* Same as `memsetw', but repeat a 2-byte pattern on aligned addresses. */
 #define __libc_slow_mempatw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempatw))
 #endif /* mempatw... */
+#endif /* !____libc_slow_mempatw_defined */
+#ifndef ____libc_slow_mempatl_defined
+#define ____libc_slow_mempatl_defined 1
 #ifdef __CRT_HAVE_mempatl
 /* Same as `memsetl', but repeat a 4-byte pattern on aligned addresses. */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_slow_mempatl,(void *__restrict __dst, __UINT32_TYPE__ __pattern, __SIZE_TYPE__ __n_bytes),mempatl,(__dst,__pattern,__n_bytes))
@@ -608,6 +787,9 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_sl
 /* Same as `memsetl', but repeat a 4-byte pattern on aligned addresses. */
 #define __libc_slow_mempatl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempatl))
 #endif /* mempatl... */
+#endif /* !____libc_slow_mempatl_defined */
+#ifndef ____libc_slow_mempatq_defined
+#define ____libc_slow_mempatq_defined 1
 #ifdef __CRT_HAVE_mempatq
 /* Same as `memsetq', but repeat an 8-byte pattern on aligned addresses. */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_slow_mempatq,(void *__restrict __dst, __UINT64_TYPE__ __pattern, __SIZE_TYPE__ __n_bytes),mempatq,(__dst,__pattern,__n_bytes))
@@ -616,6 +798,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_sl
 /* Same as `memsetq', but repeat an 8-byte pattern on aligned addresses. */
 #define __libc_slow_mempatq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempatq))
 #endif /* mempatq... */
+#endif /* !____libc_slow_mempatq_defined */
 
 __SYSDECL_END
 

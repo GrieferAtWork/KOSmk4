@@ -90,8 +90,8 @@ struct __timeb_alt {
 
 }
 
-[doc_alias(ftime)][ignore] __crt_ftime32:([nonnull] struct __timeb32 *timebuf) -> int = ftime?;
-[doc_alias(ftime)][ignore] __crt_ftime64:([nonnull] struct __timeb64 *timebuf) -> int = ftime64?;
+[doc_alias(ftime)][ignore] crt_ftime32:([nonnull] struct __timeb32 *timebuf) -> int = ftime?;
+[doc_alias(ftime)][ignore] crt_ftime64:([nonnull] struct __timeb64 *timebuf) -> int = ftime64?;
 
 %#ifdef __USE_DOS
 %#ifndef __errno_t_defined
@@ -99,35 +99,37 @@ struct __timeb_alt {
 %typedef int errno_t;
 %#endif /* !__errno_t_defined */
 
-[doc_alias(ftime)][ignore] __crt_dos_ftime32:([nonnull] struct __timeb32 *timebuf) = _ftime32?;
-[doc_alias(ftime)][ignore] __crt_dos_ftime64:([nonnull] struct __timeb64 *timebuf) = _ftime64?;
-[doc_alias(ftime)][ignore] __crt_ftime32_s:([nonnull] struct __timeb32 *timebuf) -> errno_t = _ftime32_s?;
-[doc_alias(ftime)][ignore] __crt_ftime64_s:([nonnull] struct __timeb64 *timebuf) -> errno_t = _ftime64_s?;
+[doc_alias(ftime)][ignore] crt_dos_ftime32:([nonnull] struct __timeb32 *timebuf) = _ftime32?;
+[doc_alias(ftime)][ignore] crt_dos_ftime64:([nonnull] struct __timeb64 *timebuf) = _ftime64?;
+[doc_alias(ftime)][ignore] crt_ftime32_s:([nonnull] struct __timeb32 *timebuf) -> errno_t = _ftime32_s?;
+[doc_alias(ftime)][ignore] crt_ftime64_s:([nonnull] struct __timeb64 *timebuf) -> errno_t = _ftime64_s?;
 
 
 
 [doc_alias(ftime)]
-[requires(defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime64))]
+[requires($has_function(crt_ftime32_s) || $has_function(crt_ftime32) ||
+          $has_function(crt_dos_ftime64) || $has_function(crt_ftime64_s) ||
+          $has_function(crt_ftime64))]
 _ftime32:([nonnull] struct __timeb32 *timebuf) {
-#if defined(__CRT_HAVE__ftime32_s)
-	if unlikely(__crt_ftime32_s(timebuf))
+#if @@yield $has_function("crt_ftime32_s")@@
+	if unlikely(crt_ftime32_s(timebuf))
 		memset(timebuf,0,sizeof(*timebuf));
-#elif defined(__CRT_HAVE_ftime)
-	if unlikely(__crt_ftime32(timebuf))
+#elif @@yield $has_function("crt_ftime32")@@
+	if unlikely(crt_ftime32(timebuf))
 		memset(timebuf,0,sizeof(*timebuf));
-#elif defined(__CRT_HAVE__ftime64)
+#elif @@yield $has_function("crt_dos_ftime64")@@
 	struct __timeb64 temp;
-	__crt_dos_ftime64(&temp)
+	crt_dos_ftime64(&temp)
 	timebuf->@time@     = (time32_t)temp.@time@;
 	timebuf->@millitm@  = temp.@millitm@;
 	timebuf->@timezone@ = temp.@timezone@;
 	timebuf->@dstflag@  = temp.@dstflag@;
 #else
 	struct __timeb64 temp;
-#ifdef __CRT_HAVE__ftime64_s
-	if unlikely(__crt_ftime64_s(&temp))
+#if @@yield $has_function("crt_ftime64_s")@@
+	if unlikely(crt_ftime64_s(&temp))
 #else
-	if unlikely(__crt_ftime64(&temp))
+	if unlikely(crt_ftime64(&temp))
 #endif
 		memset(timebuf,0,sizeof(*timebuf));
 	else {
@@ -141,27 +143,29 @@ _ftime32:([nonnull] struct __timeb32 *timebuf) {
 
 [doc_alias(ftime)]
 [time64_variant_of(_ftime32)]
-[requires(defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32))]
+[requires($has_function(crt_ftime64_s) || $has_function(crt_ftime64) ||
+          $has_function(crt_dos_ftime32) || $has_function(crt_ftime32_s) ||
+          $has_function(crt_ftime32))]
 _ftime64:([nonnull] struct __timeb64 *timebuf) {
-#if defined(__CRT_HAVE__ftime64_s)
-	if unlikely(__crt_ftime64_s(timebuf))
+#if @@yield $has_function("crt_ftime64_s")@@
+	if unlikely(crt_ftime64_s(timebuf))
 		memset(timebuf,0,sizeof(*timebuf));
-#elif defined(__CRT_HAVE_ftime64)
-	if unlikely(__crt_ftime64(timebuf))
+#elif @@yield $has_function("crt_ftime64")@@
+	if unlikely(crt_ftime64(timebuf))
 		memset(timebuf,0,sizeof(*timebuf));
-#elif defined(__CRT_HAVE__ftime32)
+#elif @@yield $has_function("crt_dos_ftime32")@@
 	struct __timeb32 temp;
-	__crt_dos_ftime32(&temp)
+	crt_dos_ftime32(&temp)
 	timebuf->@time@     = (time64_t)temp.@time@;
 	timebuf->@millitm@  = temp.@millitm@;
 	timebuf->@timezone@ = temp.@timezone@;
 	timebuf->@dstflag@  = temp.@dstflag@;
 #else
 	struct __timeb32 temp;
-#ifdef __CRT_HAVE__ftime32_s
-	if unlikely(__crt_ftime32_s(&temp))
+#if @@yield $has_function("crt_ftime32_s")@@
+	if unlikely(crt_ftime32_s(&temp))
 #else
-	if unlikely(__crt_ftime32(&temp))
+	if unlikely(crt_ftime32(&temp))
 #endif
 		memset(timebuf,0,sizeof(*timebuf));
 	else {
@@ -174,32 +178,34 @@ _ftime64:([nonnull] struct __timeb64 *timebuf) {
 }
 
 [doc_alias(ftime)]
-[requires(defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime64))]
+[requires($has_function(crt_ftime32) || $has_function(crt_ftime64_s) ||
+          $has_function(crt_ftime64) || $has_function(crt_dos_ftime32) ||
+          $has_function(crt_dos_ftime64))]
 [dependency_include(<parts/errno.h>)][dos_variant]
 _ftime32_s:([nonnull] struct __timeb32 *timebuf) -> errno_t {
-#ifdef __CRT_HAVE_ftime
-	return __crt_ftime32(timebuf) ? 0 : __libc_geterrno_or(@EPERM@);
-#elif defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime64_s)
+#if @@yield $has_function("crt_ftime32")@@
+	return crt_ftime32(timebuf) ? 0 : __libc_geterrno_or(@EPERM@);
+#elif @@yield $has_function("crt_ftime64_s")@@ || @@yield $has_function("crt_ftime64")@@
 	struct __timeb64 temp;
-#ifdef __CRT_HAVE__ftime64_s
-	errno_t error = __crt_ftime64_s(&temp);
+#if @@yield $has_function("crt_ftime64_s")@@
+	errno_t error = crt_ftime64_s(&temp);
 	if (error)
 		return error;
-#else /* __CRT_HAVE__ftime64_s */
-	if (__crt_ftime64(&temp))
+#else @@yield "/* " + $has_function("crt_ftime64_s") + " */"@@
+	if (crt_ftime64(&temp))
 		return __libc_geterrno_or(@EPERM@);
-#endif /* !__CRT_HAVE__ftime64_s */
+#endif @@yield "/* !" + $has_function("crt_ftime64_s") + " */"@@
 	timebuf->@time@     = (time32_t)temp.@time@;
 	timebuf->@millitm@  = temp.@millitm@;
 	timebuf->@timezone@ = temp.@timezone@;
 	timebuf->@dstflag@  = temp.@dstflag@;
 	return 0;
-#elif defined(__CRT_HAVE__ftime32)
-	__crt_dos_ftime32(timebuf);
+#elif @@yield $has_function("crt_dos_ftime32")@@
+	crt_dos_ftime32(timebuf);
 	return 0;
 #else
 	struct __timeb64 temp;
-	__crt_dos_ftime64(&temp);
+	crt_dos_ftime64(&temp);
 	timebuf->@time@     = (time32_t)temp.@time@;
 	timebuf->@millitm@  = temp.@millitm@;
 	timebuf->@timezone@ = temp.@timezone@;
@@ -209,32 +215,34 @@ _ftime32_s:([nonnull] struct __timeb32 *timebuf) -> errno_t {
 }
 
 [doc_alias(ftime)][time64_variant_of(_ftime32_s)][dos_variant]
-[requires(defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime64))]
+[requires($has_function(crt_ftime64) || $has_function(crt_ftime32_s) ||
+          $has_function(crt_ftime32) || $has_function(crt_dos_ftime64) ||
+          $has_function(crt_dos_ftime32))]
 [dependency_include(<parts/errno.h>)]
 _ftime64_s:([nonnull] struct __timeb64 *timebuf) -> errno_t {
-#ifdef __CRT_HAVE_ftime64
-	return __crt_ftime64(timebuf) ? 0 : __libc_geterrno_or(@EPERM@);
-#elif defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE__ftime32_s)
+#if @@yield $has_function("crt_ftime64")@@
+	return crt_ftime64(timebuf) ? 0 : __libc_geterrno_or(@EPERM@);
+#elif @@yield $has_function("crt_ftime32_s")@@ || @@yield $has_function("crt_ftime32")@@
 	struct __timeb32 temp;
-#ifdef __CRT_HAVE__ftime32_s
-	errno_t error = __crt_ftime32_s(&temp);
+#if @@yield $has_function("crt_ftime32_s")@@
+	errno_t error = crt_ftime32_s(&temp);
 	if (error)
 		return error;
-#else /* __CRT_HAVE__ftime32_s */
-	if (__crt_ftime32(&temp))
+#else @@yield "/* " + $has_function("crt_ftime32_s") + " */"@@
+	if (crt_ftime32(&temp))
 		return __libc_geterrno_or(@EPERM@);
-#endif /* !__CRT_HAVE__ftime32_s */
+#endif @@yield "/* !" + $has_function("crt_ftime32_s") + " */"@@
 	timebuf->@time@     = (time64_t)temp.@time@;
 	timebuf->@millitm@  = temp.@millitm@;
 	timebuf->@timezone@ = temp.@timezone@;
 	timebuf->@dstflag@  = temp.@dstflag@;
 	return 0;
-#elif defined(__CRT_HAVE__ftime64)
-	__crt_dos_ftime64(timebuf);
+#elif @@yield $has_function("crt_dos_ftime64")@@
+	crt_dos_ftime64(timebuf);
 	return 0;
 #else
 	struct __timeb32 temp;
-	__crt_dos_ftime32(&temp);
+	crt_dos_ftime32(&temp);
 	timebuf->@time@     = (time64_t)temp.@time@;
 	timebuf->@millitm@  = temp.@millitm@;
 	timebuf->@timezone@ = temp.@timezone@;
@@ -250,34 +258,36 @@ _ftime64_s:([nonnull] struct __timeb64 *timebuf) -> errno_t {
 %
 %
 @@Fill in TIMEBUF with information about the current time
-[if(defined(__USE_TIME_BITS64)),preferred_alias(ftime64)]
-[if(!defined(__USE_TIME_BITS64)),preferred_alias(ftime)]
-[requires(defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE__ftime64_s))]
+[if(defined(__USE_TIME_BITS64)), preferred_alias(ftime64)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(ftime)]
+[requires($has_function(crt_ftime32_s) || $has_function(crt_ftime64_s) ||
+          $has_function(crt_dos_ftime32) || $has_function(crt_dos_ftime64) ||
+          $has_function(crt_ftime32) || $has_function(crt_ftime64))]
 [dependency_include(<parts/errno.h>)]
 ftime:([nonnull] struct timeb *timebuf) -> int {
-#if defined(__CRT_HAVE__ftime32_s) && !defined(__USE_TIME_BITS64)
-	errno_t error = __crt_ftime32_s(timebuf);
+#if (@@yield $has_function("crt_ftime32_s")@@) && !defined(__USE_TIME_BITS64)
+	errno_t error = crt_ftime32_s(timebuf);
 	if unlikely(error) {
 		__libc_seterrno(error);
 		error = -1;
 	}
 	return (int)error;
-#elif defined(__CRT_HAVE__ftime64_s) && defined(__USE_TIME_BITS64)
-	errno_t error = __crt_ftime64_s(timebuf);
+#elif (@@yield $has_function("crt_ftime64_s")@@) && defined(__USE_TIME_BITS64)
+	errno_t error = crt_ftime64_s(timebuf);
 	if unlikely(error) {
 		__libc_seterrno(error);
 		error = -1;
 	}
 	return (int)error;
-#elif defined(__CRT_HAVE__ftime32) && !defined(__USE_TIME_BITS64)
-	__crt_dos_ftime32(&temp);
+#elif (@@yield $has_function("crt_dos_ftime32")@@) && !defined(__USE_TIME_BITS64)
+	crt_dos_ftime32(&temp);
 	return 0;
-#elif defined(__CRT_HAVE__ftime64) && defined(__USE_TIME_BITS64)
-	__crt_dos_ftime64(&temp);
+#elif (@@yield $has_function("crt_dos_ftime64")@@) && defined(__USE_TIME_BITS64)
+	crt_dos_ftime64(&temp);
 	return 0;
-#elif defined(__CRT_HAVE_ftime)
+#elif @@yield $has_function("crt_ftime32")@@
 	struct __timeb32 temp;
-	int error = __crt_ftime32(&temp);
+	int error = crt_ftime32(&temp);
 	if likely(!error) {
 		timebuf->@time@     = (time64_t)temp.@time@;
 		timebuf->@millitm@  = temp.@millitm@;
@@ -285,9 +295,9 @@ ftime:([nonnull] struct timeb *timebuf) -> int {
 		timebuf->@dstflag@  = temp.@dstflag@;
 	}
 	return error;
-#elif defined(__CRT_HAVE_ftime64)
+#elif @@yield $has_function("crt_ftime64")@@
 	struct __timeb64 temp;
-	int error = __crt_ftime64(&temp);
+	int error = crt_ftime64(&temp);
 	if likely(!error) {
 		timebuf->@time@     = (time32_t)temp.@time@;
 		timebuf->@millitm@  = temp.@millitm@;
@@ -295,9 +305,9 @@ ftime:([nonnull] struct timeb *timebuf) -> int {
 		timebuf->@dstflag@  = temp.@dstflag@;
 	}
 	return error;
-#elif defined(__CRT_HAVE__ftime32_s)
+#elif @@yield $has_function("crt_ftime32_s")@@
 	struct __timeb32 temp;
-	errno_t error = __crt_ftime32_s(&temp);
+	errno_t error = crt_ftime32_s(&temp);
 	if unlikely(error) {
 		__libc_seterrno(error);
 		error = -1;
@@ -308,9 +318,9 @@ ftime:([nonnull] struct timeb *timebuf) -> int {
 		timebuf->@dstflag@  = temp.@dstflag@;
 	}
 	return (int)error;
-#elif defined(__CRT_HAVE__ftime64_s)
+#elif @@yield $has_function("crt_ftime64_s")@@
 	struct __timeb64 temp;
-	errno_t error = __crt_ftime64_s(&temp);
+	errno_t error = crt_ftime64_s(&temp);
 	if unlikely(error) {
 		__libc_seterrno(error);
 		error = -1;
@@ -321,9 +331,9 @@ ftime:([nonnull] struct timeb *timebuf) -> int {
 		timebuf->@dstflag@  = temp.@dstflag@;
 	}
 	return (int)error;
-#elif defined(__CRT_HAVE__ftime32)
+#elif @@yield $has_function("crt_dos_ftime32")@@
 	struct __timeb32 temp;
-	__crt_dos_ftime32(&temp);
+	crt_dos_ftime32(&temp);
 	timebuf->@time@     = (time64_t)temp.@time@;
 	timebuf->@millitm@  = temp.@millitm@;
 	timebuf->@timezone@ = temp.@timezone@;
@@ -331,7 +341,7 @@ ftime:([nonnull] struct timeb *timebuf) -> int {
 	return 0;
 #else
 	struct __timeb64 temp;
-	__crt_dos_ftime64(&temp);
+	crt_dos_ftime64(&temp);
 	timebuf->@time@     = (time32_t)temp.@time@;
 	timebuf->@millitm@  = temp.@millitm@;
 	timebuf->@timezone@ = temp.@timezone@;
@@ -342,22 +352,24 @@ ftime:([nonnull] struct timeb *timebuf) -> int {
 
 %
 %#ifdef __USE_TIME64
-[requires(defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE__ftime64_s))]
+[requires($has_function(crt_ftime64_s) || $has_function(crt_dos_ftime64) ||
+          $has_function(crt_ftime32) || $has_function(crt_ftime32_s) ||
+          $has_function(crt_dos_ftime32))]
 [time64_variant_of(ftime)][dependency_include(<parts/errno.h>)]
 ftime64:([nonnull] struct timeb64 *timebuf) -> int {
-#ifdef __CRT_HAVE__ftime64_s
-	errno_t error = __crt_ftime64_s(timebuf);
+#if @@yield $has_function("crt_ftime64_s")@@
+	errno_t error = crt_ftime64_s(timebuf);
 	if unlikely(error) {
 		__libc_seterrno(error);
 		error = -1;
 	}
 	return (int)error;
-#elif defined(__CRT_HAVE__ftime64)
-	__crt_dos_ftime64(&temp);
+#elif @@yield $has_function("crt_dos_ftime64")@@
+	crt_dos_ftime64(&temp);
 	return 0;
-#elif defined(__CRT_HAVE_ftime)
+#elif @@yield $has_function("crt_ftime32")@@
 	struct __timeb32 temp;
-	int error = __crt_ftime32(&temp);
+	int error = crt_ftime32(&temp);
 	if likely(!error) {
 		timebuf->@time@     = (time64_t)temp.@time@;
 		timebuf->@millitm@  = temp.@millitm@;
@@ -365,9 +377,9 @@ ftime64:([nonnull] struct timeb64 *timebuf) -> int {
 		timebuf->@dstflag@  = temp.@dstflag@;
 	}
 	return error;
-#elif defined(__CRT_HAVE__ftime32_s)
+#elif @@yield $has_function("crt_ftime32_s")@@
 	struct __timeb32 temp;
-	errno_t error = __crt_ftime32_s(&temp);
+	errno_t error = crt_ftime32_s(&temp);
 	if unlikely(error) {
 		__libc_seterrno(error);
 		error = -1;
@@ -380,7 +392,7 @@ ftime64:([nonnull] struct timeb64 *timebuf) -> int {
 	return (int)error;
 #else
 	struct __timeb32 temp;
-	__crt_dos_ftime32(&temp);
+	crt_dos_ftime32(&temp);
 	timebuf->@time@     = (time64_t)temp.@time@;
 	timebuf->@millitm@  = temp.@millitm@;
 	timebuf->@timezone@ = temp.@timezone@;

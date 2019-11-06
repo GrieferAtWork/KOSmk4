@@ -547,7 +547,7 @@ fwide:([nonnull] FILE *fp, int mode) -> int {
 fwprintf:([nonnull] FILE *__restrict stream, [nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 	%{auto_block(printf(vfwprintf))}
 
-[cp_stdio][std][std_guard][ATTR_LIBC_WPRINTF(2, 0)][wchar][requires($has_function(file_wprinter))]
+[cp_stdio][std][std_guard][ATTR_LIBC_WPRINTF(2, 0)][wchar][requires_dependency(file_wprinter)]
 [section({.text.crt.wchar.FILE.locked.write.printf|.text.crt.dos.wchar.FILE.locked.write.printf})][same_impl]
 vfwprintf:([nonnull] FILE *__restrict stream, [nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	return (__STDC_INT_AS_SSIZE_T)format_vwprintf(&file_wprinter, stream, format, args);
@@ -1072,7 +1072,7 @@ file_wprinter_unlocked:([nonnull] void *arg, [inp(datalen)] wchar_t const *__res
 [wchar][user][section({.text.crt.wchar.FILE.unlocked.write.putc|.text.crt.dos.wchar.FILE.unlocked.write.putc})]
 ungetwc_unlocked:($wint_t ch, [nonnull] $FILE *__restrict stream) -> $wint_t;
 
-[cp_stdio][ATTR_LIBC_WPRINTF(2, 0)][wchar][requires($has_function(file_wprinter_unlocked))]
+[cp_stdio][ATTR_LIBC_WPRINTF(2, 0)][wchar][requires_dependency(file_wprinter_unlocked)]
 [section({.text.crt.wchar.FILE.unlocked.write.printf|.text.crt.dos.wchar.FILE.unlocked.write.printf})][same_impl]
 vfwprintf_unlocked:([nonnull] $FILE *__restrict stream, [nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	return (__STDC_INT_AS_SSIZE_T)format_vwprintf(&file_wprinter_unlocked, stream, format, args);

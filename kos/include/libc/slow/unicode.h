@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe305ccc4 */
+/* HASH CRC-32:0xba0ea630 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,8 @@
 
 __SYSDECL_BEGIN
 
+#ifndef ____libc_slow_unicode_readutf8_defined
+#define ____libc_slow_unicode_readutf8_defined 1
 #ifdef __CRT_HAVE_unicode_readutf8
 /* Read a single Unicode character from a given UTF-8 string */
 __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_slow_unicode_readutf8,(/*utf-8*/ char const **__restrict __ptext),unicode_readutf8,(__ptext))
@@ -34,6 +36,9 @@ __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_slow_unicod
 /* Read a single Unicode character from a given UTF-8 string */
 #define __libc_slow_unicode_readutf8 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8))
 #endif /* unicode_readutf8... */
+#endif /* !____libc_slow_unicode_readutf8_defined */
+#ifndef ____libc_slow_unicode_readutf8_rev_defined
+#define ____libc_slow_unicode_readutf8_rev_defined 1
 #ifdef __CRT_HAVE_unicode_readutf8_rev
 /* Same as `unicode_readutf8', but read backwards, with `*ptext'
  * starting out as a pointer after the character to be read, before
@@ -46,6 +51,9 @@ __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_slow_unicod
  * being updated to point to the start of the character that was read */
 #define __libc_slow_unicode_readutf8_rev (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_rev))
 #endif /* unicode_readutf8_rev... */
+#endif /* !____libc_slow_unicode_readutf8_rev_defined */
+#ifndef ____libc_slow_unicode_readutf8_n_defined
+#define ____libc_slow_unicode_readutf8_n_defined 1
 #ifdef __CRT_HAVE_unicode_readutf8_n
 /* Same as `unicode_readutf8()', but don't read past `text_end' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_slow_unicode_readutf8_n,(/*utf-8*/ char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
@@ -54,6 +62,9 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_slow_uni
 /* Same as `unicode_readutf8()', but don't read past `text_end' */
 #define __libc_slow_unicode_readutf8_n (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_n))
 #endif /* unicode_readutf8_n... */
+#endif /* !____libc_slow_unicode_readutf8_n_defined */
+#ifndef ____libc_slow_unicode_readutf8_rev_n_defined
+#define ____libc_slow_unicode_readutf8_rev_n_defined 1
 #ifdef __CRT_HAVE_unicode_readutf8_rev_n
 /* Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_slow_unicode_readutf8_rev_n,(/*utf-8*/ char const **__restrict __ptext, char const *__text_start),unicode_readutf8_rev_n,(__ptext,__text_start))
@@ -62,6 +73,9 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_slow_uni
 /* Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
 #define __libc_slow_unicode_readutf8_rev_n (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_rev_n))
 #endif /* unicode_readutf8_rev_n... */
+#endif /* !____libc_slow_unicode_readutf8_rev_n_defined */
+#ifndef ____libc_slow_unicode_writeutf8_defined
+#define ____libc_slow_unicode_writeutf8_defined 1
 #ifdef __CRT_HAVE_unicode_writeutf8
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
@@ -72,6 +86,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__libc_sl
  * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
 #define __libc_slow_unicode_writeutf8 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_writeutf8))
 #endif /* unicode_writeutf8... */
+#endif /* !____libc_slow_unicode_writeutf8_defined */
 
 __SYSDECL_END
 

@@ -113,6 +113,7 @@ incdir("", "../../include");
 #include <alloc.h>
 #include <alloca.h>
 #include <ar.h>
+#include <argz.h>
 #include <arpa/inet.h>
 #include <asm/bitsperlong.h>
 #include <asm/byteswap.h>
@@ -216,11 +217,15 @@ incdir("", "../../include");
 #include <bits/timex.h>
 #include <bits/types/FILE.h>
 #include <bits/types/__FILE.h>
+#include <bits/types/__fpos64_t.h>
+#include <bits/types/__fpos_t.h>
 #include <bits/types/__locale_t.h>
 #include <bits/types/__mbstate_t.h>
 #include <bits/types/__sigset_t.h>
+#include <bits/types/__sigval_t.h>
 #include <bits/types/clock_t.h>
 #include <bits/types/clockid_t.h>
+#include <bits/types/cookie_io_functions_t.h>
 #include <bits/types/locale_t.h>
 #include <bits/types/mbstate_t.h>
 #include <bits/types/sig_atomic_t.h>
@@ -272,7 +277,9 @@ incdir("", "../../include");
 #include <dos.h>
 #include <elf.h>
 #include <endian.h>
+#include <envz.h>
 #include <errno.h>
+#include <error.h>
 #if __has_include(<eti.h>)
 #include <eti.h>
 #endif /* __has_include(<eti.h>) */
@@ -415,9 +422,11 @@ incdir("", "../../include");
 #include <libbuffer/linebuffer.h>
 #include <libbuffer/ringbuffer.h>
 #include <libc/ctype.h>
+#include <libc/error.h>
 #include <libc/malloc.h>
 #include <libc/parts.uchar.string.h>
 #include <libc/slow/ctype.h>
+#include <libc/slow/error.h>
 #include <libc/slow/malloc.h>
 #include <libc/slow/parts.uchar.string.h>
 #include <libc/slow/stdlib.h>
@@ -572,6 +581,7 @@ incdir("", "../../include");
 #include <netpacket/packet.h>
 #include <newlib.h>
 #include <optimized/string.h>
+#include <optimized/error.h>
 #include <osfcn.h>
 #if __has_include(<panel.h>)
 #include <panel.h>

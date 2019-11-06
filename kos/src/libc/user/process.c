@@ -279,13 +279,13 @@ NOTHROW_RPC(VLIBCCALL libc_spawnlpe)(int mode,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xa616d6c5]]]*/
+/*[[[start:exports,hash:CRC-32=0x2ca13327]]]*/
 #undef spawnl
 #undef _spawnl
-#undef spawnle
-#undef _spawnle
 #undef spawnlp
 #undef _spawnlp
+#undef spawnle
+#undef _spawnle
 #undef spawnlpe
 #undef _spawnlpe
 DEFINE_PUBLIC_WEAK_ALIAS(_beginthread, libc__beginthread);
@@ -301,18 +301,18 @@ DEFINE_PUBLIC_WEAK_ALIAS(cwait, libc_cwait);
 DEFINE_PUBLIC_WEAK_ALIAS(_cwait, libc_cwait);
 DEFINE_PUBLIC_WEAK_ALIAS(spawnv, libc_spawnv);
 DEFINE_PUBLIC_WEAK_ALIAS(_spawnv, libc_spawnv);
-DEFINE_PUBLIC_WEAK_ALIAS(spawnve, libc_spawnve);
-DEFINE_PUBLIC_WEAK_ALIAS(_spawnve, libc_spawnve);
 DEFINE_PUBLIC_WEAK_ALIAS(spawnvp, libc_spawnvp);
 DEFINE_PUBLIC_WEAK_ALIAS(_spawnvp, libc_spawnvp);
+DEFINE_PUBLIC_WEAK_ALIAS(spawnve, libc_spawnve);
+DEFINE_PUBLIC_WEAK_ALIAS(_spawnve, libc_spawnve);
 DEFINE_PUBLIC_WEAK_ALIAS(spawnvpe, libc_spawnvpe);
 DEFINE_PUBLIC_WEAK_ALIAS(_spawnvpe, libc_spawnvpe);
 DEFINE_PUBLIC_WEAK_ALIAS(spawnl, libc_spawnl);
 DEFINE_PUBLIC_WEAK_ALIAS(_spawnl, libc_spawnl);
-DEFINE_PUBLIC_WEAK_ALIAS(spawnle, libc_spawnle);
-DEFINE_PUBLIC_WEAK_ALIAS(_spawnle, libc_spawnle);
 DEFINE_PUBLIC_WEAK_ALIAS(spawnlp, libc_spawnlp);
 DEFINE_PUBLIC_WEAK_ALIAS(_spawnlp, libc_spawnlp);
+DEFINE_PUBLIC_WEAK_ALIAS(spawnle, libc_spawnle);
+DEFINE_PUBLIC_WEAK_ALIAS(_spawnle, libc_spawnle);
 DEFINE_PUBLIC_WEAK_ALIAS(spawnlpe, libc_spawnlpe);
 DEFINE_PUBLIC_WEAK_ALIAS(_spawnlpe, libc_spawnlpe);
 /*[[[end:exports]]]*/

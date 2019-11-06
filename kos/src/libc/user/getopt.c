@@ -20,25 +20,18 @@
 #define GUARD_LIBC_USER_GETOPT_C 1
 
 #include "../api.h"
-#include "getopt.h"
-#include <stdio.h>
-#include <string.h>
-#include <malloc.h>
+/**/
+
 #include <alloca.h>
+#include <malloc.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include "getopt.h"
+#include "stdio-api.h"
 
 DECL_BEGIN
-
-#undef stdin
-#undef stdout
-#undef stderr
-DECLARE_NOREL_GLOBAL_META(FILE *, stdin);
-DECLARE_NOREL_GLOBAL_META(FILE *, stdout);
-DECLARE_NOREL_GLOBAL_META(FILE *, stderr);
-#define stdin  GET_NOREL_GLOBAL(stdin)
-#define stdout GET_NOREL_GLOBAL(stdout)
-#define stderr GET_NOREL_GLOBAL(stderr)
-
 
 
 

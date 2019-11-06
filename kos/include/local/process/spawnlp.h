@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x527168f9 */
+/* HASH CRC-32:0xec4d9573 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(spawnlp))(int __mode,
                                                       char const *__restrict __file,
                                                       char const *__args,
                                                       ... /*, (char *)NULL*/) {
-#line 249 "kos/src/libc/magic/process.c"
+#line 245 "kos/src/libc/magic/process.c"
 	__REDIRECT_SPAWNLP(char, __localdep_spawnvp, __mode, __file, __args)
 }
 __NAMESPACE_LOCAL_END

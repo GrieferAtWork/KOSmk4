@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab5e14f8 */
+/* HASH CRC-32:0xa843fdc5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,8 @@
 
 __SYSDECL_BEGIN
 
+#ifndef ____libc_slow_c16end_defined
+#define ____libc_slow_c16end_defined 1
 #if defined(__CRT_HAVE_wcsend) && (__SIZEOF_WCHAR_T__ == 2)
 /* Same as `STR+c16len(STR)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_slow_c16end,(__CHAR16_TYPE__ const *__restrict __string),wcsend,(__string))
@@ -41,6 +43,9 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1))
 /* Same as `STR+c16len(STR)' */
 #define __libc_slow_c16end (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16end))
 #endif /* c16end... */
+#endif /* !____libc_slow_c16end_defined */
+#ifndef ____libc_slow_c32end_defined
+#define ____libc_slow_c32end_defined 1
 #if defined(__CRT_HAVE_wcsend) && (__SIZEOF_WCHAR_T__ == 4)
 /* Same as `STR+c32len(STR)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_slow_c32end,(__CHAR32_TYPE__ const *__restrict __string),wcsend,(__string))
@@ -53,6 +58,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__C
 /* Same as `STR+c32len(STR)' */
 #define __libc_slow_c32end (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32end))
 #endif /* c32end... */
+#endif /* !____libc_slow_c32end_defined */
+#ifndef ____libc_slow_c16nend_defined
+#define ____libc_slow_c16nend_defined 1
 #if defined(__CRT_HAVE_wcsnend) && (__SIZEOF_WCHAR_T__ == 2)
 /* Same as `STR+c16nlen(STR, MAX_CHARS)' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_slow_c16nend,(__CHAR16_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnend,(__string,__maxlen))
@@ -68,6 +76,9 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *
 /* Same as `STR+c16nlen(STR, MAX_CHARS)' */
 #define __libc_slow_c16nend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16nend))
 #endif /* c16nend... */
+#endif /* !____libc_slow_c16nend_defined */
+#ifndef ____libc_slow_c32nend_defined
+#define ____libc_slow_c32nend_defined 1
 #if defined(__CRT_HAVE_wcsnend) && (__SIZEOF_WCHAR_T__ == 4)
 /* Same as `STR+c32nlen(STR, MAX_CHARS)' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_slow_c32nend,(__CHAR32_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnend,(__string,__maxlen))
@@ -80,6 +91,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__N
 /* Same as `STR+c32nlen(STR, MAX_CHARS)' */
 #define __libc_slow_c32nend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32nend))
 #endif /* c32nend... */
+#endif /* !____libc_slow_c32nend_defined */
+#ifndef ____libc_slow_c16len_defined
+#define ____libc_slow_c16len_defined 1
 #if defined(__CRT_HAVE_wcslen) && (__SIZEOF_WCHAR_T__ == 2)
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_slow_c16len,(__CHAR16_TYPE__ const *__restrict __string),wcslen,(__string))
@@ -95,6 +109,9 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 #define __libc_slow_c16len (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16len))
 #endif /* c16len... */
+#endif /* !____libc_slow_c16len_defined */
+#ifndef ____libc_slow_c32len_defined
+#define ____libc_slow_c32len_defined 1
 #if defined(__CRT_HAVE_wcslen) && (__SIZEOF_WCHAR_T__ == 4)
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_slow_c32len,(__CHAR32_TYPE__ const *__restrict __string),wcslen,(__string))
@@ -107,6 +124,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 #define __libc_slow_c32len (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32len))
 #endif /* c32len... */
+#endif /* !____libc_slow_c32len_defined */
+#ifndef ____libc_slow_c16nlen_defined
+#define ____libc_slow_c16nlen_defined 1
 #if defined(__CRT_HAVE_wcsnlen) && (__SIZEOF_WCHAR_T__ == 2)
 /* Same as `c16len', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_slow_c16nlen,(__CHAR16_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
@@ -122,6 +142,9 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 /* Same as `c16len', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 #define __libc_slow_c16nlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16nlen))
 #endif /* c16nlen... */
+#endif /* !____libc_slow_c16nlen_defined */
+#ifndef ____libc_slow_c32nlen_defined
+#define ____libc_slow_c32nlen_defined 1
 #if defined(__CRT_HAVE_wcsnlen) && (__SIZEOF_WCHAR_T__ == 4)
 /* Same as `c32len', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_slow_c32nlen,(__CHAR32_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
@@ -134,6 +157,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 /* Same as `c32len', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 #define __libc_slow_c32nlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32nlen))
 #endif /* c32nlen... */
+#endif /* !____libc_slow_c32nlen_defined */
+#ifndef ____libc_slow_c16cmp_defined
+#define ____libc_slow_c16cmp_defined 1
 #if defined(__CRT_HAVE_wcscmp) && (__SIZEOF_WCHAR_T__ == 2)
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_slow_c16cmp,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2),wcscmp,(__s1,__s2))
@@ -149,6 +175,9 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 #define __libc_slow_c16cmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16cmp))
 #endif /* c16cmp... */
+#endif /* !____libc_slow_c16cmp_defined */
+#ifndef ____libc_slow_c32cmp_defined
+#define ____libc_slow_c32cmp_defined 1
 #if defined(__CRT_HAVE_wcscmp) && (__SIZEOF_WCHAR_T__ == 4)
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_slow_c32cmp,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2),wcscmp,(__s1,__s2))
@@ -161,6 +190,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 #define __libc_slow_c32cmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32cmp))
 #endif /* c32cmp... */
+#endif /* !____libc_slow_c32cmp_defined */
+#ifndef ____libc_slow_c16ncmp_defined
+#define ____libc_slow_c16ncmp_defined 1
 #if defined(__CRT_HAVE_wcsncmp) && (__SIZEOF_WCHAR_T__ == 2)
 /* Same as `c16cmp', but compare at most `MAXLEN' characters from either string */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_slow_c16ncmp,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
@@ -176,6 +208,9 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_
 /* Same as `c16cmp', but compare at most `MAXLEN' characters from either string */
 #define __libc_slow_c16ncmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16ncmp))
 #endif /* c16ncmp... */
+#endif /* !____libc_slow_c16ncmp_defined */
+#ifndef ____libc_slow_c32ncmp_defined
+#define ____libc_slow_c32ncmp_defined 1
 #if defined(__CRT_HAVE_wcsncmp) && (__SIZEOF_WCHAR_T__ == 4)
 /* Same as `c32cmp', but compare at most `MAXLEN' characters from either string */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_slow_c32ncmp,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
@@ -188,6 +223,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 /* Same as `c32cmp', but compare at most `MAXLEN' characters from either string */
 #define __libc_slow_c32ncmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32ncmp))
 #endif /* c32ncmp... */
+#endif /* !____libc_slow_c32ncmp_defined */
 
 __SYSDECL_END
 

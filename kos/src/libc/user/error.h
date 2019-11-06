@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73b01398 */
+/* HASH CRC-32:0x36f42431 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,22 +17,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_isprime_defined
-#define __local_isprime_defined 1
-__NAMESPACE_LOCAL_BEGIN
-/* For the used double hash method the table size has to be a prime. To
- * correct the user given table size we need a prime test.  This trivial
- * algorithm is adequate because
- * a)  the code is (most probably) called a few times per program run and
- * b)  the number is small because the table must fit in the core */
-__LOCAL_LIBC(isprime) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(isprime))(unsigned int __number) {
-#line 255 "kos/src/libc/magic/search.c"
-	/* no even number will be passed */
-	for (unsigned int __div = 3; __div <= __number / __div; __div += 2)
-		if (__number % __div == 0)
-			return 0;
-	return 1;
-}
-__NAMESPACE_LOCAL_END
-#endif /* !__local_isprime_defined */
+#ifndef GUARD_LIBC_USER_ERROR_H
+#define GUARD_LIBC_USER_ERROR_H 1
+
+#include "../api.h"
+#include <kos/anno.h>
+#include <hybrid/typecore.h>
+#include <kos/types.h>
+#include <error.h>
+
+DECL_BEGIN
+
+/* Helper function for printing an error message to `stderr' and possibly exiting the program
+ * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
+ * Also note that `stdout' is flushed before the message is printed.
+ * If `STATUS' is non-zero, follow up with a call to `exit(status)' */
+INTDEF ATTR_LIBC_PRINTF(3, 4) void (VLIBCCALL libc_error)(int status, errno_t errnum, const char *format, ...) __THROWS(...);
+/* Same as `error()', but also include the given filename in the error message.
+ * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
+ * Additionally, when `error_one_per_line' is non-zero, consecutive calls to this function that
+ * pass the same values for `filename' and `line' will not produce the error message. */
+INTDEF ATTR_LIBC_PRINTF(5, 6) void (VLIBCCALL libc_error_at_line)(int status, errno_t errnum, char const *filename, unsigned int line, char const *format, ...) __THROWS(...);
+
+DECL_END
+
+#endif /* !GUARD_LIBC_USER_ERROR_H */

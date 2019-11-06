@@ -2534,37 +2534,45 @@ again_enum_name:
 						alias_args[x.strip()] = pck;
 				}	break;
 				case "impl_prefix":
-					if (impl_prefix) impl_prefix += "\n";
+					if (impl_prefix)
+						impl_prefix += "\n";
 					impl_prefix += get_tag_operand() + "\n";
 					break;
 				case "impl_include":
-					if (impl_prefix) impl_prefix += "\n";
+					if (impl_prefix)
+						impl_prefix += "\n";
 					impl_prefix += "#include @{}@\n".format({ get_tag_operand() });
 					break;
 				case "requires_prefix":
-					if (requires_prefix) requires_prefix += "\n";
+					if (requires_prefix)
+						requires_prefix += "\n";
 					requires_prefix += get_tag_operand() + "\n";
 					break;
 				case "requires_include":
-					if (requires_prefix) requires_prefix += "\n";
+					if (requires_prefix)
+						requires_prefix += "\n";
 					requires_prefix += "#include @{}@\n".format({ get_tag_operand() });
 					break;
 				case "decl_prefix":
 				case "declaration_prefix":
-					if (declaration_prefix) declaration_prefix += "\n";
+					if (declaration_prefix)
+						declaration_prefix += "\n";
 					declaration_prefix += get_tag_operand() + "\n";
 					break;
 				case "decl_include":
 				case "declaration_include":
-					if (declaration_prefix) declaration_prefix += "\n";
+					if (declaration_prefix)
+						declaration_prefix += "\n";
 					declaration_prefix += "#include @{}@\n".format({ get_tag_operand() });
 					break;
 				case "dependency_prefix":
-					if (dependency_prefix) dependency_prefix += "\n";
+					if (dependency_prefix)
+						dependency_prefix += "\n";
 					dependency_prefix += get_tag_operand() + "\n";
 					break;
 				case "dependency_include":
-					if (dependency_prefix) dependency_prefix += "\n";
+					if (dependency_prefix)
+						dependency_prefix += "\n";
 					dependency_prefix += "#include @{}@\n".format({ get_tag_operand() });
 					break;
 				case "no_libc_impl":
@@ -2609,8 +2617,18 @@ again_enum_name:
 					libc_impl = get_tag_operand();
 					user_impl = libc_impl;
 					break;
+				case "requires_dependency":
+					for (local d: get_tag_operand().split(",")) {
+						d = d.strip();
+						forced_dependencies.append(d);
+						if (define_require_string)
+							define_require_string += " && ";
+						define_require_string += "$has_function({})".format({ d });
+					}
+					break;
 				case "dependency":
-					forced_dependencies.append(get_tag_operand());
+					for (local d: get_tag_operand().split(","))
+						forced_dependencies.append(d.strip());
 					break;
 				case "requires":
 					if (define_require_string)
@@ -3802,9 +3820,11 @@ class Function {
 		m_dependencies_names = HashSet();
 		m_localvars = HashSet(args_by_name.keys);
 		if (block !is string) return;
-		for (local is_word, word: split_words(block, env: this)) {
+		local it = split_words(block, env: this).operator iter();
+		foreach (local is_word, word: it) {
 			local dep;
-			if (!is_word) continue;
+			if (!is_word)
+				continue;
 			if (word in macros)
 				continue;
 			if (word.startswith("$"))
@@ -3815,7 +3835,26 @@ class Function {
 				continue;
 			if (word in c_keywords)
 				continue;
+			if (word in m_localvars)
+				continue;
+			if (word in forced_dependencies)
+				continue;
 			dep = functions_prototypes.get(word, none);
+			if (dep !is none) {
+				local next_is_word, next_word;
+				do {
+					next_is_word, next_word =
+						(try it.operator next() catch (...) none)...;
+				} while (next_word.isspace());
+				/* don't assume a dependency based on the next word:
+				 * int error;                  // Not a dependency on error()
+				 * int error = 5;              // Not a dependency on error()
+				 * printf("%d, %d", error, 5); // Not a dependency on error()
+				 * printf("%d", error);        // Not a dependency on error()
+				 */
+				if (next_word in [")", ";", ",", "="])
+					dep = none;
+			}
 			if (dep is none) {
 				if (word.startswith("__"))
 					continue;
@@ -3832,8 +3871,9 @@ class Function {
 				m_dependencies_names.insert(word);
 				local dep = functions_prototypes.get(word, none);
 				if (dep is none) {
-					print "Error: Dependency", repr word, "of", repr name, "could not be found";
-					throw "Dependency could not be found";
+					print "Error: Dependency", repr word, "of",
+						repr name, "could not be found";
+					throw Error("Dependency could not be found");
 				}
 				m_dependencies.append(dep);
 			}
@@ -3925,8 +3965,7 @@ class Function {
 						local fun = functions.get(word);
 						/* Don't redirect functions with potential fast-implementations.
 						 * Since the libc_* prototypes don't account for those, we still
-						 * want to be a use them if they exist, so don't redirect fast
-						 * function calls. */
+						 * want to use them if they exist, so don't redirect them. */
 						if (fun is none || !fun.has_fast_implementation)
 							word = keydep(word);
 					} else {
@@ -5236,100 +5275,84 @@ skip_alias_redirections:
 		/* Try to link an optimized version of the function */
 		if (symbol_has_fast_implementation) {
 			if (is_first) {
-				fp << "#ifdef __fast_" << symbol_name << "_defined";
+				fp << "#ifdef __fast_" << symbol_name << "_defined\n";
 				is_first = false;
 			} else {
-				fp << "#elif defined(__fast_" << symbol_name << "_defined)";
+				fp << "#elif defined(__fast_" << symbol_name << "_defined)\n";
 			}
-			if (args_is_varargs) {
-				fp << " && defined(__cplusplus)\n";
-				fp << "__NAMESPACE_FAST_USING(" << symbol_name << ")\n";
+			if (args_is_varargs || allow_macros) {
+				if (my_name == symbol_name) {
+					fp << "#ifdef __cplusplus\n";
+					fp << "__NAMESPACE_FAST_USING(" << symbol_name << ")\n";
+					fp << "#else /* __cplusplus */\n";
+				}
+				print_macro_alias(fp, my_name, "(__NAMESPACE_FAST_SYM " + key_fastimpl(symbol_name) + ")", symbol_name);
+				if (my_name == symbol_name)
+					fp << "#endif /* !__cplusplus */\n";
 			} else {
-				fp << "\n";
-				if (allow_macros) {
-					if (my_name == symbol_name) {
-						fp << "#ifdef __cplusplus\n";
-						fp << "__NAMESPACE_FAST_USING(" << symbol_name << ")\n";
-						fp << "#else /* __cplusplus */\n";
-					}
-					print_macro_alias(fp, my_name, "(__NAMESPACE_FAST_SYM " + key_fastimpl(symbol_name) + ")", symbol_name);
-					if (my_name == symbol_name)
-						fp << "#endif /* !__cplusplus */\n";
-				} else if (args_is_varargs) {
-					if (my_name == symbol_name) {
-						fp << "#ifdef __cplusplus\n";
-						fp << "__NAMESPACE_FAST_USING(" << symbol_name << ")\n";
-						fp << "#else /* __cplusplus */\n";
-					}
-					/* TODO */
-					print_macro_alias(fp, my_name, "(__NAMESPACE_FAST_SYM " + key_fastimpl(symbol_name) + ")", symbol_name);
-					if (my_name == symbol_name)
-						fp << "#endif /* !__cplusplus */\n";
-				} else {
-					if (my_name == symbol_name) {
-						if (single_line_local_wrappers) {
-							print_doc(fp);
-							fp << "__NAMESPACE_FAST_USING_OR_IMPL(" << symbol_name << ", ";
-						} else {
-							fp << "#ifdef __cplusplus\n";
-							fp << "__NAMESPACE_FAST_USING(" << symbol_name << ")\n";
-							fp << "#else /* __cplusplus */\n";
-							print_doc(fp);
-						}
+				if (my_name == symbol_name) {
+					if (single_line_local_wrappers) {
+						print_doc(fp);
+						fp << "__NAMESPACE_FAST_USING_OR_IMPL(" << symbol_name << ", ";
 					} else {
+						fp << "#ifdef __cplusplus\n";
+						fp << "__NAMESPACE_FAST_USING(" << symbol_name << ")\n";
+						fp << "#else /* __cplusplus */\n";
 						print_doc(fp);
 					}
-					fp << "__FORCELOCAL ";
-					local is_nothrow = "";
-					for (local at: attr_tags) {
-						at = at.strip();
-						if (at in nothrow_attributes) {
-							is_nothrow = at[#"ATTR_":];
-							continue;
+				} else {
+					print_doc(fp);
+				}
+				fp << "__FORCELOCAL ";
+				local is_nothrow = "";
+				for (local at: attr_tags) {
+					at = at.strip();
+					if (at in nothrow_attributes) {
+						is_nothrow = at[#"ATTR_":];
+						continue;
+					}
+					fp << key_attr_header(at) << " ";
+				}
+				local args_prefix = "({} {})(".format({ args_is_varargs ? "__VLIBCCALL" : "__LIBCCALL", my_name });
+				if (is_nothrow) args_prefix = "__" + is_nothrow + args_prefix;
+				//if (is_nothrow) args_prefix = "__" + is_nothrow + "(" + args_prefix;
+				File.Writer return_type_fp;
+				File.Writer function_decl_fp;
+				for (local is_word, word: split_words(return_type, env: this)) {
+					if (is_word)
+						word = replace_word(word, transform_argument_types);
+					return_type_fp << word;
+				}
+				function_decl_fp << args_prefix;
+				print_argument_list(
+					function_decl_fp, args, key_underscore,
+					(single_line_local_wrappers ? "" : " " * #args_prefix),
+					transform_argument_types);
+				//if (is_nothrow) function_decl_fp << ")";
+				function_decl_fp << ")";
+				printThrowsAnnotation(function_decl_fp);
+				fp << join_variable_name(return_type_fp.string, function_decl_fp.string);
+				fp << " {" << (single_line_local_wrappers ? " " : "\n    ");
+				if (return_type != "void") {
+					fp << "return ";
+					if (!is_implicitly_castable(symbol_return_type, return_type)) {
+						fp << "(";
+						for (local is_word, word: split_words(return_type, env: this)) {
+							if (is_word)
+								word = replace_word(word, transform_argument_types);
+							fp << word;
 						}
-						fp << key_attr_header(at) << " ";
+						fp << ")";
 					}
-					local args_prefix = "({} {})(".format({ args_is_varargs ? "__VLIBCCALL" : "__LIBCCALL", my_name });
-					if (is_nothrow) args_prefix = "__" + is_nothrow + args_prefix;
-					//if (is_nothrow) args_prefix = "__" + is_nothrow + "(" + args_prefix;
-					File.Writer return_type_fp;
-					File.Writer function_decl_fp;
-					for (local is_word, word: split_words(return_type, env: this)) {
-						if (is_word)
-							word = replace_word(word, transform_argument_types);
-						return_type_fp << word;
-					}
-					function_decl_fp << args_prefix;
-					print_argument_list(
-						function_decl_fp, args, key_underscore,
-						(single_line_local_wrappers ? "" : " " * #args_prefix),
-						transform_argument_types);
-					//if (is_nothrow) function_decl_fp << ")";
-					function_decl_fp << ")";
-					printThrowsAnnotation(function_decl_fp);
-					fp << join_variable_name(return_type_fp.string, function_decl_fp.string);
-					fp << " {" << (single_line_local_wrappers ? " " : "\n    ");
-					if (return_type != "void") {
-						fp << "return ";
-						if (!is_implicitly_castable(symbol_return_type, return_type)) {
-							fp << "(";
-							for (local is_word, word: split_words(return_type, env: this)) {
-								if (is_word)
-									word = replace_word(word, transform_argument_types);
-								fp << word;
-							}
-							fp << ")";
-						}
-					}
-					fp << "(__NAMESPACE_FAST_SYM " << key_fastimpl(symbol_name) << ")(";
-					print_argument_cast_list(fp, args, key_underscore);
-					if (my_name == symbol_name && single_line_local_wrappers) {
-						fp << "); })\n";
-					} else {
-						fp << (single_line_local_wrappers ? "); }\n" : ");\n}\n");
-						if (my_name == symbol_name)
-							fp << "#endif /* !__cplusplus */\n";
-					}
+				}
+				fp << "(__NAMESPACE_FAST_SYM " << key_fastimpl(symbol_name) << ")(";
+				print_argument_cast_list(fp, args, key_underscore);
+				if (my_name == symbol_name && single_line_local_wrappers) {
+					fp << "); })\n";
+				} else {
+					fp << (single_line_local_wrappers ? "); }\n" : ");\n}\n");
+					if (my_name == symbol_name)
+						fp << "#endif /* !__cplusplus */\n";
 				}
 			}
 			for (local cond, alias_name: preferred_aliases) {
@@ -6176,6 +6199,7 @@ function write_libc_slow_header(fp, comnam, functions) {
 	      "#include <__crt.h>\n"
 	      "#include <hybrid/typecore.h>\n";
 	local needKosAnno = false;
+	File.Writer headerPrefixFp;
 	for (local f: functions) {
 		if (f is IntermediateString)
 			continue;
@@ -6185,10 +6209,38 @@ function write_libc_slow_header(fp, comnam, functions) {
 			continue;
 		if (f.component_name is bound && f.component_name != comnam)
 			continue;
+		if (f.declaration_prefix) {
+			for (local none, word: split_words(f.declaration_prefix, env: f))
+				headerPrefixFp << word;
+		}
+		if (f.requires_prefix) {
+			for (local none, word: split_words(f.requires_prefix, env: f))
+				headerPrefixFp << word;
+		}
 		if (f.hasThrowsAnnotation()) {
 			needKosAnno = true;
 			break;
 		}
+	}
+	headerPrefixFp = headerPrefixFp.string;
+	if (headerPrefixFp) {
+		headerPrefixFp = List(
+			for (local l: headerPrefixFp.splitlines())
+				if (l.rstrip())
+					l.rstrip());
+		local knownIncludes = HashSet();
+		for (local i = 0; i < #headerPrefixFp;) {
+			local l = headerPrefixFp[i];
+			if (!l || l in knownIncludes) {
+				headerPrefixFp.erase(i);
+				continue;
+			}
+			if (l.startswith("#include"))
+				knownIncludes.insert(l);
+			++i;
+		}
+		if (headerPrefixFp)
+			fp << "\n".join(headerPrefixFp) << "\n";
 	}
 	if (needKosAnno)
 		fp << "#include <kos/anno.h>\n";
@@ -6209,7 +6261,14 @@ function write_libc_slow_header(fp, comnam, functions) {
 		print "\tfunction:", key_libc(f.name);
 		local old = f.has_fast_implementation;
 		f.has_fast_implementation = false;
-		f.generate_header_block(fp, key_libc_slow, none, false, false, true, REPLACE_TYPE_WORDS_LOCAL);
+		f.generate_header_block(
+			fp: fp,
+			keyname: key_libc_slow,
+			namespace_name: none,
+			include_overloads: false,
+			with_guard: true,
+			allow_macros: true,
+			transform_argument_types: REPLACE_TYPE_WORDS_LOCAL);
 		f.has_fast_implementation = old;
 	}
 	fp << "\n__SYSDECL_END\n"

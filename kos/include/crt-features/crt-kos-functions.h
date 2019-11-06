@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88642f83 */
+/* HASH CRC-32:0xb6f099a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -633,6 +633,8 @@ __CRT_FUNCTION(erfcf,0,(),1,(float,x),float)
 __CRT_FUNCTION(erfcl,0,(),1,(long double,x),long double)
 __CRT_FUNCTION(erff,0,(),1,(float,x),float)
 __CRT_FUNCTION(erfl,0,(),1,(long double,x),long double)
+__CRT_FUNCTION(error,0,(),VA(3),(int,status,errno_t,errnum,const char *,format),void)
+__CRT_FUNCTION(error_at_line,0,(),VA(5),(int,status,errno_t,errnum,char const *,filename,unsigned int,line,char const *,format),void)
 __CRT_FUNCTION(ether_aton,0,(),1,(char const *,asc),struct ether_addr *)
 __CRT_FUNCTION(ether_aton_r,0,(),2,(char const *,asc,struct ether_addr *,addr),struct ether_addr *)
 __CRT_FUNCTION(ether_hostton,0,(),2,(char const *,hostname,struct ether_addr *,addr),int)

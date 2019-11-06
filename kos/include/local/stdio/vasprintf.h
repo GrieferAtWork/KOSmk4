@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdae85bf3 */
+/* HASH CRC-32:0xb879bfa5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -216,21 +216,6 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0),__SSIZE_TYPE__,,__lo
 #endif /* format_vprintf... */
 #endif /* !____localdep_format_vprintf_defined */
 
-/* Dependency: "format_aprintf_printer" from "format-printer" */
-#ifndef ____localdep_format_aprintf_printer_defined
-#define ____localdep_format_aprintf_printer_defined 1
-#ifdef __CRT_HAVE_format_aprintf_printer
-/* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_aprintf_printer,(/*struct format_aprintf_data **/void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),format_aprintf_printer,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_realloc)
-#include <local/format-printer/format_aprintf_printer.h>
-/* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
-#define __localdep_format_aprintf_printer (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_aprintf_printer))
-#else /* CUSTOM: format_aprintf_printer */
-#undef ____localdep_format_aprintf_printer_defined
-#endif /* format_aprintf_printer... */
-#endif /* !____localdep_format_aprintf_printer_defined */
-
 /* Dependency: "free" */
 #ifndef ____localdep_free_defined
 #define ____localdep_free_defined 1
@@ -299,6 +284,21 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONN
 #undef ____localdep_format_aprintf_pack_defined
 #endif /* format_aprintf_pack... */
 #endif /* !____localdep_format_aprintf_pack_defined */
+
+/* Dependency: "format_aprintf_printer" from "format-printer" */
+#ifndef ____localdep_format_aprintf_printer_defined
+#define ____localdep_format_aprintf_printer_defined 1
+#ifdef __CRT_HAVE_format_aprintf_printer
+/* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_aprintf_printer,(/*struct format_aprintf_data **/void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),format_aprintf_printer,(__arg,__data,__datalen))
+#elif defined(__CRT_HAVE_realloc)
+#include <local/format-printer/format_aprintf_printer.h>
+/* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
+#define __localdep_format_aprintf_printer (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_aprintf_printer))
+#else /* CUSTOM: format_aprintf_printer */
+#undef ____localdep_format_aprintf_printer_defined
+#endif /* format_aprintf_printer... */
+#endif /* !____localdep_format_aprintf_printer_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */

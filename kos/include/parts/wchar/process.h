@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x833f7de3 */
+/* HASH CRC-32:0x46ac4ae3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -106,23 +106,6 @@ __NAMESPACE_LOCAL_USING(wexecl)
 #undef __wexecl_defined
 #endif /* wexecl... */
 #endif /* !__wexecl_defined */
-#ifndef __wexecle_defined
-#define __wexecle_defined 1
-#ifdef __CRT_HAVE_wexecle
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexecle)(wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME_SAME("wexecle");
-#elif defined(__CRT_HAVE__wexecle) && (!defined(__NO_ASMNAME))
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexecle)(wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME("_wexecle");
-#elif defined(__CRT_HAVE_wexecve) || defined(__CRT_HAVE__wexecve)
-#include <local/parts.wchar.process/wexecle.h>
-#ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(wexecle)
-#else /* __cplusplus */
-#define wexecle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecle))
-#endif /* !__cplusplus */
-#else /* CUSTOM: wexecle */
-#undef __wexecle_defined
-#endif /* wexecle... */
-#endif /* !__wexecle_defined */
 #ifndef __wexeclp_defined
 #define __wexeclp_defined 1
 #ifdef __CRT_HAVE_wexeclp
@@ -140,6 +123,23 @@ __NAMESPACE_LOCAL_USING(wexeclp)
 #undef __wexeclp_defined
 #endif /* wexeclp... */
 #endif /* !__wexeclp_defined */
+#ifndef __wexecle_defined
+#define __wexecle_defined 1
+#ifdef __CRT_HAVE_wexecle
+__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexecle)(wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME_SAME("wexecle");
+#elif defined(__CRT_HAVE__wexecle) && (!defined(__NO_ASMNAME))
+__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexecle)(wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME("_wexecle");
+#elif defined(__CRT_HAVE_wexecve) || defined(__CRT_HAVE__wexecve)
+#include <local/parts.wchar.process/wexecle.h>
+#ifdef __cplusplus
+__NAMESPACE_LOCAL_USING(wexecle)
+#else /* __cplusplus */
+#define wexecle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecle))
+#endif /* !__cplusplus */
+#else /* CUSTOM: wexecle */
+#undef __wexecle_defined
+#endif /* wexecle... */
+#endif /* !__wexecle_defined */
 #ifndef __wexeclpe_defined
 #define __wexeclpe_defined 1
 #ifdef __CRT_HAVE_wexeclpe
@@ -214,23 +214,6 @@ __NAMESPACE_LOCAL_USING(wspawnl)
 #undef __wspawnl_defined
 #endif /* wspawnl... */
 #endif /* !__wspawnl_defined */
-#ifndef __wspawnle_defined
-#define __wspawnle_defined 1
-#ifdef __CRT_HAVE_wspawnle
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wspawnle)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME_SAME("wspawnle");
-#elif defined(__CRT_HAVE__wspawnle) && (!defined(__NO_ASMNAME))
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wspawnle)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME("_wspawnle");
-#elif defined(__CRT_HAVE_wspawnve) || defined(__CRT_HAVE__wspawnve)
-#include <local/parts.wchar.process/wspawnle.h>
-#ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(wspawnle)
-#else /* __cplusplus */
-#define wspawnle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnle))
-#endif /* !__cplusplus */
-#else /* CUSTOM: wspawnle */
-#undef __wspawnle_defined
-#endif /* wspawnle... */
-#endif /* !__wspawnle_defined */
 #ifndef __wspawnlp_defined
 #define __wspawnlp_defined 1
 #ifdef __CRT_HAVE_wspawnlp
@@ -248,6 +231,23 @@ __NAMESPACE_LOCAL_USING(wspawnlp)
 #undef __wspawnlp_defined
 #endif /* wspawnlp... */
 #endif /* !__wspawnlp_defined */
+#ifndef __wspawnle_defined
+#define __wspawnle_defined 1
+#ifdef __CRT_HAVE_wspawnle
+__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wspawnle)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME_SAME("wspawnle");
+#elif defined(__CRT_HAVE__wspawnle) && (!defined(__NO_ASMNAME))
+__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wspawnle)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME("_wspawnle");
+#elif defined(__CRT_HAVE_wspawnve) || defined(__CRT_HAVE__wspawnve)
+#include <local/parts.wchar.process/wspawnle.h>
+#ifdef __cplusplus
+__NAMESPACE_LOCAL_USING(wspawnle)
+#else /* __cplusplus */
+#define wspawnle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnle))
+#endif /* !__cplusplus */
+#else /* CUSTOM: wspawnle */
+#undef __wspawnle_defined
+#endif /* wspawnle... */
+#endif /* !__wspawnle_defined */
 #ifndef __wspawnlpe_defined
 #define __wspawnlpe_defined 1
 #ifdef __CRT_HAVE_wspawnlpe

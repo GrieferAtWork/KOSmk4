@@ -46,25 +46,25 @@ typedef __pos64_t pos64_t; /* File/device position */
 [throws][cp][ATTR_NORETURN][doc_alias(execvp)]  Execvp:([notnull] char const *__restrict file, [notnull] @__TARGV@);
 
 [throws][cp][dependency_include(<parts/redirect-exec.h>)][doc_alias(execl)]
-[requires($has_function(Execv))][ATTR_SENTINEL][ATTR_NORETURN][allow_macros]
+[requires_dependency(Execv)][ATTR_SENTINEL][ATTR_NORETURN][allow_macros]
 Execl:([notnull] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_XEXECL(char, Execv, path, args)
 }
 
 [throws][cp][dependency_include(<parts/redirect-exec.h>)][doc_alias(execle)]
-[requires($has_function(Execve))][ATTR_SENTINEL_O(1)][ATTR_NORETURN][allow_macros]
+[requires_dependency(Execve)][ATTR_SENTINEL_O(1)][ATTR_NORETURN][allow_macros]
 Execle:([notnull] char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
 	__REDIRECT_XEXECLE(char, Execve, path, args)
 }
 
 [throws][cp][dependency_include(<parts/redirect-exec.h>)][doc_alias(execlp)]
-[requires($has_function(Execvp))][ATTR_SENTINEL][ATTR_NORETURN][allow_macros]
+[requires_dependency(Execvp)][ATTR_SENTINEL][ATTR_NORETURN][allow_macros]
 Execpl:([notnull] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_XEXECL(char, Execvp, file, args)
 }
 
 [throws][cp][dependency_include(<parts/redirect-exec.h>)][doc_alias(execle)]
-[requires($has_function(Execvpe))][ATTR_SENTINEL_O(1)][ATTR_NORETURN][allow_macros]
+[requires_dependency(Execvpe)][ATTR_SENTINEL_O(1)][ATTR_NORETURN][allow_macros]
 Execlpe:([notnull] char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
 	__REDIRECT_XEXECLE(char, Execvpe, file, args)
 }

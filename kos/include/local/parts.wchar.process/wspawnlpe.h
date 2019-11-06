@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x224a5b3d */
+/* HASH CRC-32:0x9519d259 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(wspawnlpe))(int __mode,
                                                         __WCHAR_TYPE__ const *__restrict __file,
                                                         __WCHAR_TYPE__ const *__args,
                                                         ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
-#line 131 "kos/src/libc/magic/parts.wchar.process.c"
+#line 134 "kos/src/libc/magic/parts.wchar.process.c"
 	__REDIRECT_SPAWNLPE(__WCHAR_TYPE__, __localdep_wspawnvpe, __mode, __file, __args)
 }
 __NAMESPACE_LOCAL_END
