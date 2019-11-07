@@ -29,106 +29,104 @@ __SYSDECL_BEGIN
 
 #ifdef __x86_64__
 
-#define gpregs64            gpregs
-#define OFFSET_GPREGS_R15   OFFSET_GPREGS64_R15
-#define OFFSET_GPREGS_R14   OFFSET_GPREGS64_R14
-#define OFFSET_GPREGS_R13   OFFSET_GPREGS64_R13
-#define OFFSET_GPREGS_R12   OFFSET_GPREGS64_R12
-#define OFFSET_GPREGS_R11   OFFSET_GPREGS64_R11
-#define OFFSET_GPREGS_R10   OFFSET_GPREGS64_R10
-#define OFFSET_GPREGS_R9    OFFSET_GPREGS64_R9
-#define OFFSET_GPREGS_R8    OFFSET_GPREGS64_R8
-#define OFFSET_GPREGS_RDI   OFFSET_GPREGS64_RDI
-#define OFFSET_GPREGS_RSI   OFFSET_GPREGS64_RSI
-#define OFFSET_GPREGS_RBP   OFFSET_GPREGS64_RBP
-#define OFFSET_GPREGS_RSP   OFFSET_GPREGS64_RSP
-#define OFFSET_GPREGS_RBX   OFFSET_GPREGS64_RBX
-#define OFFSET_GPREGS_RDX   OFFSET_GPREGS64_RDX
-#define OFFSET_GPREGS_RCX   OFFSET_GPREGS64_RCX
-#define OFFSET_GPREGS_RAX   OFFSET_GPREGS64_RAX
-#define SIZEOF_GPREGS       SIZEOF_GPREGS64
-#define GPREGS_TO_GPREGSNSP GPREGS64_TO_GPREGSNSP64
+#define gpregs64                   gpregs
+#define OFFSET_GPREGS_R15          OFFSET_GPREGS64_R15
+#define OFFSET_GPREGS_R14          OFFSET_GPREGS64_R14
+#define OFFSET_GPREGS_R13          OFFSET_GPREGS64_R13
+#define OFFSET_GPREGS_R12          OFFSET_GPREGS64_R12
+#define OFFSET_GPREGS_R11          OFFSET_GPREGS64_R11
+#define OFFSET_GPREGS_R10          OFFSET_GPREGS64_R10
+#define OFFSET_GPREGS_R9           OFFSET_GPREGS64_R9
+#define OFFSET_GPREGS_R8           OFFSET_GPREGS64_R8
+#define OFFSET_GPREGS_RDI          OFFSET_GPREGS64_RDI
+#define OFFSET_GPREGS_RSI          OFFSET_GPREGS64_RSI
+#define OFFSET_GPREGS_RBP          OFFSET_GPREGS64_RBP
+#define OFFSET_GPREGS_RSP          OFFSET_GPREGS64_RSP
+#define OFFSET_GPREGS_RBX          OFFSET_GPREGS64_RBX
+#define OFFSET_GPREGS_RDX          OFFSET_GPREGS64_RDX
+#define OFFSET_GPREGS_RCX          OFFSET_GPREGS64_RCX
+#define OFFSET_GPREGS_RAX          OFFSET_GPREGS64_RAX
+#define SIZEOF_GPREGS              SIZEOF_GPREGS64
 
-#define gpregsnsp64          gpregsnsp
-#define OFFSET_GPREGSNSP_R15 OFFSET_GPREGSNSP64_R15
-#define OFFSET_GPREGSNSP_R14 OFFSET_GPREGSNSP64_R14
-#define OFFSET_GPREGSNSP_R13 OFFSET_GPREGSNSP64_R13
-#define OFFSET_GPREGSNSP_R12 OFFSET_GPREGSNSP64_R12
-#define OFFSET_GPREGSNSP_R11 OFFSET_GPREGSNSP64_R11
-#define OFFSET_GPREGSNSP_R10 OFFSET_GPREGSNSP64_R10
-#define OFFSET_GPREGSNSP_R9  OFFSET_GPREGSNSP64_R9
-#define OFFSET_GPREGSNSP_R8  OFFSET_GPREGSNSP64_R8
-#define OFFSET_GPREGSNSP_RDI OFFSET_GPREGSNSP64_RDI
-#define OFFSET_GPREGSNSP_RSI OFFSET_GPREGSNSP64_RSI
-#define OFFSET_GPREGSNSP_RBP OFFSET_GPREGSNSP64_RBP
-/*      OFFSET_GPREGSNSP_RSP OFFSET_GPREGSNSP64_RSP */
-#define OFFSET_GPREGSNSP_RBX OFFSET_GPREGSNSP64_RBX
-#define OFFSET_GPREGSNSP_RDX OFFSET_GPREGSNSP64_RDX
-#define OFFSET_GPREGSNSP_RCX OFFSET_GPREGSNSP64_RCX
-#define OFFSET_GPREGSNSP_RAX OFFSET_GPREGSNSP64_RAX
-#define SIZEOF_GPREGSNSP     SIZEOF_GPREGSNSP64
-#define GPREGSNSP_TO_GPREGS  GPREGSNSP64_TO_GPREGS64
+#define gpregsnsp64                gpregsnsp
+#define OFFSET_GPREGSNSP_R15       OFFSET_GPREGSNSP64_R15
+#define OFFSET_GPREGSNSP_R14       OFFSET_GPREGSNSP64_R14
+#define OFFSET_GPREGSNSP_R13       OFFSET_GPREGSNSP64_R13
+#define OFFSET_GPREGSNSP_R12       OFFSET_GPREGSNSP64_R12
+#define OFFSET_GPREGSNSP_R11       OFFSET_GPREGSNSP64_R11
+#define OFFSET_GPREGSNSP_R10       OFFSET_GPREGSNSP64_R10
+#define OFFSET_GPREGSNSP_R9        OFFSET_GPREGSNSP64_R9
+#define OFFSET_GPREGSNSP_R8        OFFSET_GPREGSNSP64_R8
+#define OFFSET_GPREGSNSP_RDI       OFFSET_GPREGSNSP64_RDI
+#define OFFSET_GPREGSNSP_RSI       OFFSET_GPREGSNSP64_RSI
+#define OFFSET_GPREGSNSP_RBP       OFFSET_GPREGSNSP64_RBP
+/*      OFFSET_GPREGSNSP_RSP       OFFSET_GPREGSNSP64_RSP */
+#define OFFSET_GPREGSNSP_RBX       OFFSET_GPREGSNSP64_RBX
+#define OFFSET_GPREGSNSP_RDX       OFFSET_GPREGSNSP64_RDX
+#define OFFSET_GPREGSNSP_RCX       OFFSET_GPREGSNSP64_RCX
+#define OFFSET_GPREGSNSP_RAX       OFFSET_GPREGSNSP64_RAX
+#define SIZEOF_GPREGSNSP           SIZEOF_GPREGSNSP64
 
-#define sgregs64             sgregs
-#define OFFSET_SGREGS_GS     OFFSET_SGREGS64_GS
-#define OFFSET_SGREGS_FS     OFFSET_SGREGS64_FS
-#define OFFSET_SGREGS_ES     OFFSET_SGREGS64_ES
-#define OFFSET_SGREGS_DS     OFFSET_SGREGS64_DS
-#define SIZEOF_SGREGS        SIZEOF_SGREGS64
+#define sgregs64                   sgregs
+#define OFFSET_SGREGS_GS           OFFSET_SGREGS64_GS
+#define OFFSET_SGREGS_FS           OFFSET_SGREGS64_FS
+#define OFFSET_SGREGS_ES           OFFSET_SGREGS64_ES
+#define OFFSET_SGREGS_DS           OFFSET_SGREGS64_DS
+#define SIZEOF_SGREGS              SIZEOF_SGREGS64
 
-#define sgbase64             sgbase
-#define OFFSET_SGBASE_GSBASE OFFSET_SGBASE64_GSBASE
-#define OFFSET_SGBASE_FSBASE OFFSET_SGBASE64_FSBASE
-#define SIZEOF_SGBASE        SIZEOF_SGBASE64
+#define sgbase64                   sgbase
+#define OFFSET_SGBASE_GSBASE       OFFSET_SGBASE64_GSBASE
+#define OFFSET_SGBASE_FSBASE       OFFSET_SGBASE64_FSBASE
+#define SIZEOF_SGBASE              SIZEOF_SGBASE64
 
-#define coregs64             coregs
-#define OFFSET_COREGS_CR0    OFFSET_COREGS64_CR0
-#define OFFSET_COREGS_CR2    OFFSET_COREGS64_CR2
-#define OFFSET_COREGS_CR3    OFFSET_COREGS64_CR3
-#define OFFSET_COREGS_CR4    OFFSET_COREGS64_CR4
-#define SIZEOF_COREGS        SIZEOF_COREGS64
+#define coregs64                   coregs
+#define OFFSET_COREGS_CR0          OFFSET_COREGS64_CR0
+#define OFFSET_COREGS_CR2          OFFSET_COREGS64_CR2
+#define OFFSET_COREGS_CR3          OFFSET_COREGS64_CR3
+#define OFFSET_COREGS_CR4          OFFSET_COREGS64_CR4
+#define SIZEOF_COREGS              SIZEOF_COREGS64
 
-#define drregs64             drregs
-#define OFFSET_DRREGS_DR0    OFFSET_DRREGS64_DR0
-#define OFFSET_DRREGS_DR1    OFFSET_DRREGS64_DR1
-#define OFFSET_DRREGS_DR2    OFFSET_DRREGS64_DR2
-#define OFFSET_DRREGS_DR3    OFFSET_DRREGS64_DR3
-#define OFFSET_DRREGS_DR6    OFFSET_DRREGS64_DR6
-#define OFFSET_DRREGS_DR7    OFFSET_DRREGS64_DR7
-#define SIZEOF_DRREGS        SIZEOF_DRREGS64
+#define drregs64                   drregs
+#define OFFSET_DRREGS_DR0          OFFSET_DRREGS64_DR0
+#define OFFSET_DRREGS_DR1          OFFSET_DRREGS64_DR1
+#define OFFSET_DRREGS_DR2          OFFSET_DRREGS64_DR2
+#define OFFSET_DRREGS_DR3          OFFSET_DRREGS64_DR3
+#define OFFSET_DRREGS_DR6          OFFSET_DRREGS64_DR6
+#define OFFSET_DRREGS_DR7          OFFSET_DRREGS64_DR7
+#define SIZEOF_DRREGS              SIZEOF_DRREGS64
 
-#define irregs64             irregs
-#define OFFSET_IRREGS_RIP    OFFSET_IRREGS64_RIP
-#define OFFSET_IRREGS_CS     OFFSET_IRREGS64_CS
-#define OFFSET_IRREGS_RFLAGS OFFSET_IRREGS64_RFLAGS
-#define OFFSET_IRREGS_RSP    OFFSET_IRREGS64_RSP
-#define OFFSET_IRREGS_SS     OFFSET_IRREGS64_SS
-#define SIZEOF_IRREGS        SIZEOF_IRREGS64
+#define irregs64                   irregs
+#define OFFSET_IRREGS_RIP          OFFSET_IRREGS64_RIP
+#define OFFSET_IRREGS_CS           OFFSET_IRREGS64_CS
+#define OFFSET_IRREGS_RFLAGS       OFFSET_IRREGS64_RFLAGS
+#define OFFSET_IRREGS_RSP          OFFSET_IRREGS64_RSP
+#define OFFSET_IRREGS_SS           OFFSET_IRREGS64_SS
+#define SIZEOF_IRREGS              SIZEOF_IRREGS64
 
-#define ucpustate64             ucpustate
-#define OFFSET_UCPUSTATE_SGBASE OFFSET_UCPUSTATE64_SGBASE
-#define OFFSET_UCPUSTATE_GPREGS OFFSET_UCPUSTATE64_GPREGS
-#define OFFSET_UCPUSTATE_SGREGS OFFSET_UCPUSTATE64_SGREGS
-#define OFFSET_UCPUSTATE_RFLAGS OFFSET_UCPUSTATE64_RFLAGS
-#define OFFSET_UCPUSTATE_RIP    OFFSET_UCPUSTATE64_RIP
-#define SIZEOF_UCPUSTATE        SIZEOF_UCPUSTATE64
+#define ucpustate64                ucpustate
+#define OFFSET_UCPUSTATE_SGBASE    OFFSET_UCPUSTATE64_SGBASE
+#define OFFSET_UCPUSTATE_GPREGS    OFFSET_UCPUSTATE64_GPREGS
+#define OFFSET_UCPUSTATE_SGREGS    OFFSET_UCPUSTATE64_SGREGS
+#define OFFSET_UCPUSTATE_RFLAGS    OFFSET_UCPUSTATE64_RFLAGS
+#define OFFSET_UCPUSTATE_RIP       OFFSET_UCPUSTATE64_RIP
+#define SIZEOF_UCPUSTATE           SIZEOF_UCPUSTATE64
 
-#define lcpustate64             lcpustate
-#define OFFSET_LCPUSTATE_R15    OFFSET_LCPUSTATE64_R15
-#define OFFSET_LCPUSTATE_R14    OFFSET_LCPUSTATE64_R14
-#define OFFSET_LCPUSTATE_R13    OFFSET_LCPUSTATE64_R13
-#define OFFSET_LCPUSTATE_R12    OFFSET_LCPUSTATE64_R12
-#define OFFSET_LCPUSTATE_RBP    OFFSET_LCPUSTATE64_RBP
-#define OFFSET_LCPUSTATE_RSP    OFFSET_LCPUSTATE64_RSP
-#define OFFSET_LCPUSTATE_RBX    OFFSET_LCPUSTATE64_RBX
-#define OFFSET_LCPUSTATE_RIP    OFFSET_LCPUSTATE64_RIP
-#define SIZEOF_LCPUSTATE        SIZEOF_LCPUSTATE64
+#define lcpustate64                lcpustate
+#define OFFSET_LCPUSTATE_R15       OFFSET_LCPUSTATE64_R15
+#define OFFSET_LCPUSTATE_R14       OFFSET_LCPUSTATE64_R14
+#define OFFSET_LCPUSTATE_R13       OFFSET_LCPUSTATE64_R13
+#define OFFSET_LCPUSTATE_R12       OFFSET_LCPUSTATE64_R12
+#define OFFSET_LCPUSTATE_RBP       OFFSET_LCPUSTATE64_RBP
+#define OFFSET_LCPUSTATE_RSP       OFFSET_LCPUSTATE64_RSP
+#define OFFSET_LCPUSTATE_RBX       OFFSET_LCPUSTATE64_RBX
+#define OFFSET_LCPUSTATE_RIP       OFFSET_LCPUSTATE64_RIP
+#define SIZEOF_LCPUSTATE           SIZEOF_LCPUSTATE64
 
-#define kcpustate64              kcpustate
-#define OFFSET_KCPUSTATE_GPREGS  OFFSET_KCPUSTATE64_GPREGS
-#define OFFSET_KCPUSTATE_RFLAGS  OFFSET_KCPUSTATE64_RFLAGS
-#define OFFSET_KCPUSTATE_RIP     OFFSET_KCPUSTATE64_RIP
-#define SIZEOF_KCPUSTATE         SIZEOF_KCPUSTATE64
+#define kcpustate64                kcpustate
+#define OFFSET_KCPUSTATE_GPREGS    OFFSET_KCPUSTATE64_GPREGS
+#define OFFSET_KCPUSTATE_RFLAGS    OFFSET_KCPUSTATE64_RFLAGS
+#define OFFSET_KCPUSTATE_RIP       OFFSET_KCPUSTATE64_RIP
+#define SIZEOF_KCPUSTATE           SIZEOF_KCPUSTATE64
 
 #define icpustate64                icpustate
 #define OFFSET_ICPUSTATE_GPREGSNSP OFFSET_ICPUSTATE64_GPREGSNSP
@@ -142,29 +140,29 @@ __SYSDECL_BEGIN
 #define OFFSET_SCPUSTATE_IRREGS    OFFSET_SCPUSTATE64_IRREGS
 #define SIZEOF_SCPUSTATE           SIZEOF_SCPUSTATE64
 
-#define desctab64               desctab
-#define OFFSET_DESCTAB_LIMIT    OFFSET_DESCTAB_LIMIT
-#define OFFSET_DESCTAB_BASE     OFFSET_DESCTAB_BASE
-#define SIZEOF_DESCTAB          SIZEOF_DESCTAB
+#define desctab64                  desctab
+#define OFFSET_DESCTAB_LIMIT       OFFSET_DESCTAB_LIMIT
+#define OFFSET_DESCTAB_BASE        OFFSET_DESCTAB_BASE
+#define SIZEOF_DESCTAB             SIZEOF_DESCTAB
 
-#define fcpustate64             fcpustate
-#define OFFSET_FCPUSTATE_GPREGS OFFSET_FCPUSTATE64_GPREGS
-#define OFFSET_FCPUSTATE_RFLAGS OFFSET_FCPUSTATE64_RFLAGS
-#define OFFSET_FCPUSTATE_RIP    OFFSET_FCPUSTATE64_RIP
-#define OFFSET_FCPUSTATE_ES     OFFSET_FCPUSTATE64_ES
-#define OFFSET_FCPUSTATE_CS     OFFSET_FCPUSTATE64_CS
-#define OFFSET_FCPUSTATE_SS     OFFSET_FCPUSTATE64_SS
-#define OFFSET_FCPUSTATE_DS     OFFSET_FCPUSTATE64_DS
-#define OFFSET_FCPUSTATE_FS     OFFSET_FCPUSTATE64_FS
-#define OFFSET_FCPUSTATE_GS     OFFSET_FCPUSTATE64_GS
-#define OFFSET_FCPUSTATE_TR     OFFSET_FCPUSTATE64_TR
-#define OFFSET_FCPUSTATE_LDT    OFFSET_FCPUSTATE64_LDT
-#define OFFSET_FCPUSTATE_SGREGS OFFSET_FCPUSTATE64_SGREGS
-#define OFFSET_FCPUSTATE_COREGS OFFSET_FCPUSTATE64_COREGS
-#define OFFSET_FCPUSTATE_DRREGS OFFSET_FCPUSTATE64_DRREGS
-#define OFFSET_FCPUSTATE_GDT    OFFSET_FCPUSTATE64_GDT
-#define OFFSET_FCPUSTATE_IDT    OFFSET_FCPUSTATE64_IDT
-#define SIZEOF_FCPUSTATE        SIZEOF_FCPUSTATE64
+#define fcpustate64                fcpustate
+#define OFFSET_FCPUSTATE_GPREGS    OFFSET_FCPUSTATE64_GPREGS
+#define OFFSET_FCPUSTATE_RFLAGS    OFFSET_FCPUSTATE64_RFLAGS
+#define OFFSET_FCPUSTATE_RIP       OFFSET_FCPUSTATE64_RIP
+#define OFFSET_FCPUSTATE_ES        OFFSET_FCPUSTATE64_ES
+#define OFFSET_FCPUSTATE_CS        OFFSET_FCPUSTATE64_CS
+#define OFFSET_FCPUSTATE_SS        OFFSET_FCPUSTATE64_SS
+#define OFFSET_FCPUSTATE_DS        OFFSET_FCPUSTATE64_DS
+#define OFFSET_FCPUSTATE_FS        OFFSET_FCPUSTATE64_FS
+#define OFFSET_FCPUSTATE_GS        OFFSET_FCPUSTATE64_GS
+#define OFFSET_FCPUSTATE_TR        OFFSET_FCPUSTATE64_TR
+#define OFFSET_FCPUSTATE_LDT       OFFSET_FCPUSTATE64_LDT
+#define OFFSET_FCPUSTATE_SGREGS    OFFSET_FCPUSTATE64_SGREGS
+#define OFFSET_FCPUSTATE_COREGS    OFFSET_FCPUSTATE64_COREGS
+#define OFFSET_FCPUSTATE_DRREGS    OFFSET_FCPUSTATE64_DRREGS
+#define OFFSET_FCPUSTATE_GDT       OFFSET_FCPUSTATE64_GDT
+#define OFFSET_FCPUSTATE_IDT       OFFSET_FCPUSTATE64_IDT
+#define SIZEOF_FCPUSTATE           SIZEOF_FCPUSTATE64
 
 #endif /* __x86_64__ */
 
@@ -205,23 +203,9 @@ struct __ATTR_PACKED gpregs64 {
 	__u64   gp_rcx;    /* [C] Count register */
 	__u64   gp_rax;    /* [C] Accumulator register */
 };
-#define GPREGS64_TO_GPREGSNSP64(dst, src) \
-	((dst).gp_r15 = (src).gp_r15,         \
-	 (dst).gp_r14 = (src).gp_r14,         \
-	 (dst).gp_r13 = (src).gp_r13,         \
-	 (dst).gp_r12 = (src).gp_r12,         \
-	 (dst).gp_r11 = (src).gp_r11,         \
-	 (dst).gp_r10 = (src).gp_r10,         \
-	 (dst).gp_r9  = (src).gp_r9,          \
-	 (dst).gp_r8  = (src).gp_r8,          \
-	 (dst).gp_rdi = (src).gp_rdi,         \
-	 (dst).gp_rsi = (src).gp_rsi,         \
-	 (dst).gp_rbp = (src).gp_rbp,         \
-	 (dst).gp_rbx = (src).gp_rbx,         \
-	 (dst).gp_rdx = (src).gp_rdx,         \
-	 (dst).gp_rcx = (src).gp_rcx,         \
-	 (dst).gp_rax = (src).gp_rax)
 #endif /* __CC__ */
+
+
 
 #define OFFSET_GPREGSNSP64_R15 0
 #define OFFSET_GPREGSNSP64_R14 8
@@ -258,24 +242,9 @@ struct __ATTR_PACKED gpregsnsp64 /*[PREFIX(gp_)]*/ {
 	__u64   gp_rcx;    /* [C] Count register */
 	__u64   gp_rax;    /* [C] Accumulator register */
 };
-#define GPREGSNSP64_TO_GPREGS64(dst, src, sp) \
-	((dst).gp_r15 = (src).gp_r15,             \
-	 (dst).gp_r14 = (src).gp_r14,             \
-	 (dst).gp_r13 = (src).gp_r13,             \
-	 (dst).gp_r12 = (src).gp_r12,             \
-	 (dst).gp_r11 = (src).gp_r11,             \
-	 (dst).gp_r10 = (src).gp_r10,             \
-	 (dst).gp_r9  = (src).gp_r9,              \
-	 (dst).gp_r8  = (src).gp_r8,              \
-	 (dst).gp_rdi = (src).gp_rdi,             \
-	 (dst).gp_rsi = (src).gp_rsi,             \
-	 (dst).gp_rbp = (src).gp_rbp,             \
-	 (dst).gp_rsp = (sp),                     \
-	 (dst).gp_rbx = (src).gp_rbx,             \
-	 (dst).gp_rdx = (src).gp_rdx,             \
-	 (dst).gp_rcx = (src).gp_rcx,             \
-	 (dst).gp_rax = (src).gp_rax)
 #endif /* __CC__ */
+
+
 
 #define OFFSET_SGREGS64_GS  0
 #define OFFSET_SGREGS64_FS  8
@@ -319,6 +288,7 @@ struct __ATTR_PACKED sgbase64 /*[PREFIX(sg_)]*/{
 #endif /* __CC__ */
 
 
+
 #define OFFSET_COREGS64_CR0 0
 #define OFFSET_COREGS64_CR2 8
 #define OFFSET_COREGS64_CR3 16
@@ -354,6 +324,7 @@ struct __ATTR_PACKED drregs64 {
 #endif /* __CC__ */
 
 
+
 #define OFFSET_IRREGS64_RIP    0
 #define OFFSET_IRREGS64_CS     8
 #define OFFSET_IRREGS64_RFLAGS 16
@@ -378,6 +349,7 @@ struct __ATTR_PACKED irregs64 {
 	};
 };
 #endif /* __CC__ */
+
 
 
 #define OFFSET_UCPUSTATE64_SGBASE 0
@@ -409,10 +381,8 @@ struct __ATTR_PACKED ucpustate64 { /* u -- User */
 	__u64           ucs_rflags; /* Flags register */
 	__u64           ucs_rip;    /* Instruction pointer */
 };
-
-#define UCPUSTATE64_SP(x) ((x).ucs_gpregs.gp_rsp)
-#define UCPUSTATE64_PC(x) ((x).ucs_rip)
 #endif /* __CC__ */
+
 
 
 #define OFFSET_LCPUSTATE64_R15  0
@@ -437,64 +407,8 @@ struct __ATTR_PACKED lcpustate64 { /* l -- Little */
 	__u64         lcs_rbx;    /* [P] Base register */
 	__u64         lcs_rip;    /* Instruction pointer */
 };
-
-#ifdef __x86_64__
-__FORCELOCAL void __FCALL lcpustate_cur(struct lcpustate64 *__restrict __st) {
-	__asm__("movq %%r15, %0\n\t"
-			"movq %%r14, %1\n\t"
-			"movq %%r13, %2\n\t"
-			"movq %%r12, %3\n\t"
-			"movq %%rbp, %4\n\t"
-			"movq %%rsp, %5\n\t"
-			"movq %%rbx, %6\n\t"
-			"leaq 991f(%%rip), %7\n\t"
-			"991:\n\t"
-			: "=m" (__st->lcs_r15)
-			, "=m" (__st->lcs_r14)
-			, "=m" (__st->lcs_r13)
-			, "=m" (__st->lcs_r12)
-			, "=m" (__st->lcs_rbp)
-			, "=m" (__st->lcs_rsp)
-			, "=m" (__st->lcs_rbx)
-			, "=r" (__st->lcs_rip));
-}
-#endif /* !__x86_64__ */
-
-
-#define LCPUSTATE64_TO_GPREGS64(dst, src) \
-	((dst).gp_r15 = (src).lcs_r15,        \
-	 (dst).gp_r14 = (src).lcs_r14,        \
-	 (dst).gp_r13 = (src).lcs_r13,        \
-	 (dst).gp_r12 = (src).lcs_r12,        \
-	 (dst).gp_rbp = (src).lcs_rbp,        \
-	 (dst).gp_rsp = (src).lcs_rsp,        \
-	 (dst).gp_rbx = (src).lcs_rbx,        \
-	 (dst).gp_r11 = 0,                    \
-	 (dst).gp_r10 = 0,                    \
-	 (dst).gp_r9  = 0,                    \
-	 (dst).gp_r8  = 0,                    \
-	 (dst).gp_rdi = 0,                    \
-	 (dst).gp_rsi = 0,                    \
-	 (dst).gp_rdx = 0,                    \
-	 (dst).gp_rcx = 0,                    \
-	 (dst).gp_rax = 0)
-#define LCPUSTATE64_TO_UCPUSTATE64(dst, src)           \
-	(LCPUSTATE64_TO_GPREGS64((dst).ucs_gpregs, src),   \
-	 (dst).ucs_sgbase.sg_gsbase = (__u64)__rdgsbase(), \
-	 (dst).ucs_sgbase.sg_fsbase = (__u64)__rdfsbase(), \
-	 (dst).ucs_sgregs.sg_gs     = __rdgs(),            \
-	 (dst).ucs_sgregs.sg_fs     = __rdfs(),            \
-	 (dst).ucs_sgregs.sg_es     = __rdes(),            \
-	 (dst).ucs_sgregs.sg_ds     = __rdds(),            \
-	 (dst).ucs_cs               = __rdcs(),            \
-	 (dst).ucs_ss               = __rdss(),            \
-	 (dst).ucs_rflags           = __rdflags(),         \
-	 (dst).ucs_rip              = (src).lcs_rip)
-#define LCPUSTATE64_TO_KCPUSTATE64(dst, src)         \
-	(LCPUSTATE64_TO_GPREGS64((dst).kcs_gpregs, src), \
-	 (dst).kcs_rflags = __rdflags(),                 \
-	 (dst).kcs_rip    = (src).lcs_rip)
 #endif /* __CC__ */
+
 
 
 #define OFFSET_KCPUSTATE64_GPREGS  0
@@ -510,31 +424,9 @@ struct __ATTR_PACKED kcpustate64 {
 	__u64           kcs_rflags; /* Flags register */
 	__u64           kcs_rip;    /* Instruction pointer */
 };
-
-#define KCPUSTATE64_TO_UCPUSTATE64(dst, src)           \
-	((dst).ucs_gpregs           = (src).kcs_gpregs,    \
-	 (dst).ucs_sgbase.sg_gsbase = (__u64)__rdgsbase(), \
-	 (dst).ucs_sgbase.sg_fsbase = (__u64)__rdfsbase(), \
-	 (dst).ucs_sgregs.sg_gs     = __rdgs(),            \
-	 (dst).ucs_sgregs.sg_fs     = __rdfs(),            \
-	 (dst).ucs_sgregs.sg_es     = __rdes(),            \
-	 (dst).ucs_sgregs.sg_ds     = __rdds(),            \
-	 (dst).ucs_cs               = __rdcs(),            \
-	 (dst).ucs_ss               = __rdss(),            \
-	 (dst).ucs_rflags           = (src).kcs_rflags,    \
-	 (dst).ucs_rip              = (src).kcs_rip)
-#define KCPUSTATE64_TO_LCPUSTATE64(dst, src)  \
-	((dst).lcs_r15 = (src).kcs_gpregs.gp_r15, \
-	 (dst).lcs_r14 = (src).kcs_gpregs.gp_r14, \
-	 (dst).lcs_r13 = (src).kcs_gpregs.gp_r13, \
-	 (dst).lcs_r12 = (src).kcs_gpregs.gp_r12, \
-	 (dst).lcs_rbp = (src).kcs_gpregs.gp_rbp, \
-	 (dst).lcs_rsp = (src).kcs_gpregs.gp_rsp, \
-	 (dst).lcs_rbx = (src).kcs_gpregs.gp_rbx, \
-	 (dst).lcs_rip = (src).kcs_rip)
-#define KCPUSTATE64_SP(self) ((self).kcs_gpregs.gp_rsp)
-#define KCPUSTATE64_PC(self) ((self).kcs_rip)
 #endif /* __CC__ */
+
+
 
 #define OFFSET_ICPUSTATE64_GPREGSNSP 0   /* [FIELD(ics_gpregs)] */
 #define OFFSET_ICPUSTATE64_IRREGS    120
@@ -591,50 +483,8 @@ struct __ATTR_PACKED icpustate64 { /* i -- Interrupts */
 	struct gpregsnsp64 ics_gpregs; /* General purpose registers. */
 	struct irregs64    ics_irregs; /* Interrupt return registers. */
 };
-
-/* Convert the given `struct icpustate &src' to a `struct ucpustate &dst' */
-#define ICPUSTATE64_TO_UCPUSTATE64(dst, src)                  \
-	((dst).ucs_gpregs.gp_r15    = (src).ics_gpregs.gp_r15,    \
-	 (dst).ucs_gpregs.gp_r14    = (src).ics_gpregs.gp_r14,    \
-	 (dst).ucs_gpregs.gp_r13    = (src).ics_gpregs.gp_r13,    \
-	 (dst).ucs_gpregs.gp_r12    = (src).ics_gpregs.gp_r12,    \
-	 (dst).ucs_gpregs.gp_r11    = (src).ics_gpregs.gp_r11,    \
-	 (dst).ucs_gpregs.gp_r10    = (src).ics_gpregs.gp_r10,    \
-	 (dst).ucs_gpregs.gp_r9     = (src).ics_gpregs.gp_r9,     \
-	 (dst).ucs_gpregs.gp_r8     = (src).ics_gpregs.gp_r8,     \
-	 (dst).ucs_gpregs.gp_rdi    = (src).ics_gpregs.gp_rdi,    \
-	 (dst).ucs_gpregs.gp_rsi    = (src).ics_gpregs.gp_rsi,    \
-	 (dst).ucs_gpregs.gp_rbp    = (src).ics_gpregs.gp_rbp,    \
-	 (dst).ucs_gpregs.gp_rsp    = (src).ics_irregs.ir_rsp,    \
-	 (dst).ucs_gpregs.gp_rbx    = (src).ics_gpregs.gp_rbx,    \
-	 (dst).ucs_gpregs.gp_rdx    = (src).ics_gpregs.gp_rdx,    \
-	 (dst).ucs_gpregs.gp_rcx    = (src).ics_gpregs.gp_rcx,    \
-	 (dst).ucs_gpregs.gp_rax    = (src).ics_gpregs.gp_rax,    \
-	 (dst).ucs_sgbase.sg_fsbase = (__u64)__rdfsbase(),        \
-	 (dst).ucs_sgbase.sg_gsbase = (__u64)__rdgsbase(),        \
-	 (dst).ucs_sgregs.sg_gs     = __rdgs(),                   \
-	 (dst).ucs_sgregs.sg_fs     = __rdfs(),                   \
-	 (dst).ucs_sgregs.sg_es     = __rdes(),                   \
-	 (dst).ucs_sgregs.sg_ds     = __rdds(),                   \
-	 (dst).ucs_cs               = (src).ics_irregs.ir_cs,     \
-	 (dst).ucs_ss               = (src).ics_irregs.ir_ss,     \
-	 (dst).ucs_rflags           = (src).ics_irregs.ir_rflags, \
-	 (dst).ucs_rip              = (src).ics_irregs.ir_rip)
-#define ICPUSTATE64_TO_SCPUSTATE64(dst, src)               \
-	((dst).scs_gpregs           = (src).ics_gpregs.gp_r15, \
-	 (dst).scs_sgbase.sg_fsbase = (__u64)__rdfsbase(),     \
-	 (dst).scs_sgbase.sg_gsbase = (__u64)__rdgsbase(),     \
-	 (dst).scs_sgregs.sg_gs     = __rdgs(),                \
-	 (dst).scs_sgregs.sg_fs     = __rdfs(),                \
-	 (dst).scs_sgregs.sg_es     = __rdes(),                \
-	 (dst).scs_sgregs.sg_ds     = __rdds(),                \
-	 (dst).scs_irregs           = (src).ics_irregs)
-#define ICPUSTATE64_ISKERNEL(self) (!((self).ics_irregs.ir_cs16 & 3))
-#define ICPUSTATE64_ISUSER(self)   ((self).ics_irregs.ir_cs16 & 3)
-#define ICPUSTATE64_SP(self)       ((self).ics_irregs.ir_rsp)
-#define ICPUSTATE64_PC(self)       ((self).ics_irregs.ir_rip)
-
 #endif /* __CC__ */
+
 
 
 #define OFFSET_SCPUSTATE64_SGBASE        0
@@ -652,40 +502,8 @@ struct __ATTR_PACKED scpustate64 { /* i -- Interrupts */
 	struct gpregsnsp64 scs_gpregs;        /* General purpose registers. */
 	struct irregs64    scs_irregs;        /* Interrupt return registers. */
 };
-
-/* Convert the given `struct scpustate &src' to a `struct ucpustate &dst' */
-#define SCPUSTATE64_TO_UCPUSTATE64(dst, src)               \
-	((dst).ucs_sgbase        = (src).scs_sgbase,           \
-	 (dst).ucs_gpregs.gp_r15 = (src).scs_gpregs.gp_r15,    \
-	 (dst).ucs_gpregs.gp_r14 = (src).scs_gpregs.gp_r14,    \
-	 (dst).ucs_gpregs.gp_r13 = (src).scs_gpregs.gp_r13,    \
-	 (dst).ucs_gpregs.gp_r12 = (src).scs_gpregs.gp_r12,    \
-	 (dst).ucs_gpregs.gp_r11 = (src).scs_gpregs.gp_r11,    \
-	 (dst).ucs_gpregs.gp_r10 = (src).scs_gpregs.gp_r10,    \
-	 (dst).ucs_gpregs.gp_r9  = (src).scs_gpregs.gp_r9,     \
-	 (dst).ucs_gpregs.gp_r8  = (src).scs_gpregs.gp_r8,     \
-	 (dst).ucs_gpregs.gp_rdi = (src).scs_gpregs.gp_rdi,    \
-	 (dst).ucs_gpregs.gp_rsi = (src).scs_gpregs.gp_rsi,    \
-	 (dst).ucs_gpregs.gp_rbp = (src).scs_gpregs.gp_rbp,    \
-	 (dst).ucs_gpregs.gp_rsp = (src).scs_irregs.ir_rsp,    \
-	 (dst).ucs_gpregs.gp_rbx = (src).scs_gpregs.gp_rbx,    \
-	 (dst).ucs_gpregs.gp_rdx = (src).scs_gpregs.gp_rdx,    \
-	 (dst).ucs_gpregs.gp_rcx = (src).scs_gpregs.gp_rcx,    \
-	 (dst).ucs_gpregs.gp_rax = (src).scs_gpregs.gp_rax,    \
-	 (dst).ucs_sgregs        = (src).scs_sgregs,           \
-	 (dst).ucs_cs            = (src).scs_irregs.ir_cs,     \
-	 (dst).ucs_ss            = (src).scs_irregs.ir_ss,     \
-	 (dst).ucs_rflags        = (src).scs_irregs.ir_rflags, \
-	 (dst).ucs_rip           = (src).scs_irregs.ir_rip)
-#define SCPUSTATE64_TO_ICPUSTATE64(dst, src) \
-	((dst).ics_gpregs = (src).scs_gpregs,    \
-	 (dst).ics_irregs = (src).scs_irregs)
-#define SCPUSTATE64_ISKERNEL(self) (!((self).scs_irregs.ir_cs16 & 3))
-#define SCPUSTATE64_ISUSER(self)   ((self).scs_irregs.ir_cs16 & 3)
-#define SCPUSTATE64_SP(self)       ((self).scs_irregs.ir_rsp)
-#define SCPUSTATE64_PC(self)       ((self).scs_irregs.ir_rip)
-
 #endif /* __CC__ */
+
 
 
 #define OFFSET_DESCTAB64_LIMIT 0
@@ -773,30 +591,6 @@ struct __ATTR_PACKED fcpustate64 { /* f -- Full */
 	__u16          __fcs_pad1[3]; /* ... */
 	struct desctab64 fcs_idt;     /* Interrupt descriptor table. */
 };
-
-#define FCPUSTATE64_TO_UCPUSTATE64(dst, src)          \
-	((dst).ucs_sgbase       = (src).fcs_sgbase,       \
-	 (dst).ucs_gpregs       = (src).fcs_gpregs,       \
-	 (dst).ucs_sgregs.sg_gs = (src).fcs_sgregs.sg_gs, \
-	 (dst).ucs_sgregs.sg_fs = (src).fcs_sgregs.sg_fs, \
-	 (dst).ucs_sgregs.sg_es = (src).fcs_sgregs.sg_es, \
-	 (dst).ucs_sgregs.sg_ds = (src).fcs_sgregs.sg_ds, \
-	 (dst).ucs_cs           = (src).fcs_sgregs.sg_cs, \
-	 (dst).ucs_ss           = (src).fcs_sgregs.sg_ss, \
-	 (dst).ucs_rflags       = (src).fcs_rflags,       \
-	 (dst).ucs_rip          = (src).fcs_rip)
-#define FCPUSTATE64_TO_LCPUSTATE64(dst, src)  \
-	((dst).lcs_r15 = (src).fcs_gpregs.gp_r15, \
-	 (dst).lcs_r14 = (src).fcs_gpregs.gp_r14, \
-	 (dst).lcs_r13 = (src).fcs_gpregs.gp_r13, \
-	 (dst).lcs_r12 = (src).fcs_gpregs.gp_r12, \
-	 (dst).lcs_rbp = (src).fcs_gpregs.gp_rbp, \
-	 (dst).lcs_rsp = (src).fcs_gpregs.gp_rsp, \
-	 (dst).lcs_rbx = (src).fcs_gpregs.gp_rbx, \
-	 (dst).lcs_rip = (src).fcs_rip)
-#define FCPUSTATE64_PC(x) ((x).fcs_rip)
-#define FCPUSTATE64_SP(x) ((x).fcs_gpregs.gp_rsp)
-
 #endif /* __CC__ */
 
 
