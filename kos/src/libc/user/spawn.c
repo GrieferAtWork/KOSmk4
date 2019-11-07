@@ -95,11 +95,11 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_destroy)(posix_spawnattr_t *__restrict
 }
 /*[[[end:posix_spawnattr_destroy]]]*/
 
-/*[[[head:posix_spawnattr_getsigdefault,hash:CRC-32=0x3802aee6]]]*/
+/*[[[head:posix_spawnattr_getsigdefault,hash:CRC-32=0x1754a20f]]]*/
 /* Store signal mask for signals with default handling from ATTR in SIGDEFAULT */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawnattr_getsigdefault") int
-NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getsigdefault)(posix_spawnattr_t const * __restrict attr,
+NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getsigdefault)(posix_spawnattr_t const *__restrict attr,
                                                          sigset_t *__restrict sigdefault)
 /*[[[body:posix_spawnattr_getsigdefault]]]*/
 {

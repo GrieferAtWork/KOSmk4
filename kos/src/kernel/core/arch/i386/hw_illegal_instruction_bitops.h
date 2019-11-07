@@ -43,7 +43,7 @@ DECL_BEGIN
  *       very instructions which we're trying to emulate... */
 #define DEFINE_POPCOUNT(n, T)                                                \
 	LOCAL ATTR_CONST unsigned int                                            \
-	NOTHROW(KCALL simple_popcnt##n)(T i, uintptr_t * __restrict pflags) {    \
+	NOTHROW(KCALL simple_popcnt##n)(T i, uintptr_t *__restrict pflags) {     \
 		unsigned int result = 0;                                             \
 		T mask              = 1;                                             \
 		*pflags &= ~(OF | SF | ZF | AF | CF | PF | ZF);                      \
@@ -59,7 +59,7 @@ DECL_BEGIN
 	}
 #define DEFINE_TZCOUNT(n, T)                                                     \
 	LOCAL ATTR_CONST unsigned int                                                \
-	NOTHROW(KCALL simple_tzcnt##n)(T i, uintptr_t * __restrict pflags) {         \
+	NOTHROW(KCALL simple_tzcnt##n)(T i, uintptr_t *__restrict pflags) {          \
 		unsigned int result = 0;                                                 \
 		T mask              = 1;                                                 \
 		*pflags &= ~(CF | ZF);                                                   \
@@ -71,29 +71,29 @@ DECL_BEGIN
 			*pflags |= ZF;                                                       \
 		return result;                                                           \
 	}
-#define DEFINE_LZCOUNT(n, T)                                             \
-	LOCAL ATTR_CONST unsigned int                                        \
-	NOTHROW(KCALL simple_lzcnt##n)(T i, uintptr_t * __restrict pflags) { \
-		unsigned int result = 0;                                         \
-		T mask              = (T)1 << ((sizeof(T) * 8) - 1);             \
-		*pflags &= ~(CF | ZF);                                           \
-		if (!i)                                                          \
-			*pflags |= CF;                                               \
-		for (; !((T)(i)&mask) && mask; mask >>= 1, ++result)             \
-			;                                                            \
-		if (!result)                                                     \
-			*pflags |= ZF;                                               \
-		return result;                                                   \
+#define DEFINE_LZCOUNT(n, T)                                            \
+	LOCAL ATTR_CONST unsigned int                                       \
+	NOTHROW(KCALL simple_lzcnt##n)(T i, uintptr_t *__restrict pflags) { \
+		unsigned int result = 0;                                        \
+		T mask              = (T)1 << ((sizeof(T) * 8) - 1);            \
+		*pflags &= ~(CF | ZF);                                          \
+		if (!i)                                                         \
+			*pflags |= CF;                                              \
+		for (; !((T)(i)&mask) && mask; mask >>= 1, ++result)            \
+			;                                                           \
+		if (!result)                                                    \
+			*pflags |= ZF;                                              \
+		return result;                                                  \
 	}
 
 
-/*DEFINE_POPCOUNT(8,u8)*/
+/*DEFINE_POPCOUNT(8, u8)*/
 DEFINE_POPCOUNT(16, u16)
 DEFINE_POPCOUNT(32, u32)
-/*DEFINE_TZCOUNT(8,u8)*/
+/*DEFINE_TZCOUNT(8, u8)*/
 DEFINE_TZCOUNT(16, u16)
 DEFINE_TZCOUNT(32, u32)
-/*DEFINE_LZCOUNT(8,u8)*/
+/*DEFINE_LZCOUNT(8, u8)*/
 DEFINE_LZCOUNT(16, u16)
 DEFINE_LZCOUNT(32, u32)
 

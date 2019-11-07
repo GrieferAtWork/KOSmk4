@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4e8d548 */
+/* HASH CRC-32:0x316bff24 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1571,7 +1571,7 @@ __CRT_FUNCTION(posix_spawnattr_getflags,0,(),2,(posix_spawnattr_t const *__restr
 __CRT_FUNCTION(posix_spawnattr_getpgroup,0,(),2,(posix_spawnattr_t const *__restrict,attr,pid_t *__restrict,pgroup),int)
 __CRT_FUNCTION(posix_spawnattr_getschedparam,0,(),2,(posix_spawnattr_t const *__restrict,attr,struct sched_param *__restrict,schedparam),int)
 __CRT_FUNCTION(posix_spawnattr_getschedpolicy,0,(),2,(posix_spawnattr_t const *__restrict,attr,int *__restrict,schedpolicy),int)
-__CRT_FUNCTION(posix_spawnattr_getsigdefault,0,(),2,(posix_spawnattr_t const * __restrict,attr,sigset_t *__restrict,sigdefault),int)
+__CRT_FUNCTION(posix_spawnattr_getsigdefault,0,(),2,(posix_spawnattr_t const *__restrict,attr,sigset_t *__restrict,sigdefault),int)
 __CRT_FUNCTION(posix_spawnattr_getsigmask,0,(),2,(posix_spawnattr_t const *__restrict,attr,sigset_t *__restrict,sigmask),int)
 __CRT_FUNCTION(posix_spawnattr_init,0,(),1,(posix_spawnattr_t *__restrict,attr),int)
 __CRT_FUNCTION(posix_spawnattr_setflags,0,(),2,(posix_spawnattr_t *__restrict,attr,short int,flags),int)

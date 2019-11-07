@@ -294,12 +294,12 @@ KCALL pty_master_alloc(void) THROWS(E_BADALLOC) {
 	REF struct pty_master *result;
 	result = CHARACTER_DEVICE_ALLOC(struct pty_master);
 	ttybase_device_cinit(result, &kernel_pty_oprinter);
-	result->cd_type.ct_fini  = (void /*NOTHROW*/ (KCALL *)(struct character_device * __restrict))&pty_master_fini;
-	result->cd_type.ct_read  = (size_t(KCALL *)(struct character_device * __restrict, USER CHECKED void *, size_t, iomode_t))&pty_master_read;
-	result->cd_type.ct_write = (size_t(KCALL *)(struct character_device * __restrict, USER CHECKED void const *, size_t, iomode_t))&pty_master_write;
-	result->cd_type.ct_ioctl = (syscall_slong_t(KCALL *)(struct character_device * __restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&pty_master_ioctl;
-	result->cd_type.ct_stat  = (void(KCALL *)(struct character_device * __restrict, USER CHECKED struct stat *))&pty_master_stat;
-	result->cd_type.ct_poll  = (poll_mode_t(KCALL *)(struct character_device * __restrict, poll_mode_t))&pty_master_poll;
+	result->cd_type.ct_fini  = (void /*NOTHROW*/ (KCALL *)(struct character_device *__restrict))&pty_master_fini;
+	result->cd_type.ct_read  = (size_t(KCALL *)(struct character_device *__restrict, USER CHECKED void *, size_t, iomode_t))&pty_master_read;
+	result->cd_type.ct_write = (size_t(KCALL *)(struct character_device *__restrict, USER CHECKED void const *, size_t, iomode_t))&pty_master_write;
+	result->cd_type.ct_ioctl = (syscall_slong_t(KCALL *)(struct character_device *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&pty_master_ioctl;
+	result->cd_type.ct_stat  = (void(KCALL *)(struct character_device *__restrict, USER CHECKED struct stat *))&pty_master_stat;
+	result->cd_type.ct_poll  = (poll_mode_t(KCALL *)(struct character_device *__restrict, poll_mode_t))&pty_master_poll;
 	ringbuffer_cinit(&result->pm_obuf);
 	return result;
 }
@@ -308,12 +308,12 @@ KCALL pty_slave_alloc(struct pty_master *__restrict master) THROWS(E_BADALLOC) {
 	REF struct pty_slave *result;
 	result                   = CHARACTER_DEVICE_ALLOC(struct pty_slave);
 	result->ps_master        = (REF struct pty_master *)incref(master);
-	result->cd_type.ct_fini  = (void /*NOTHROW*/ (KCALL *)(struct character_device * __restrict))&pty_slave_fini;
-	result->cd_type.ct_read  = (size_t(KCALL *)(struct character_device * __restrict, USER CHECKED void *, size_t, iomode_t))&pty_slave_read;
-	result->cd_type.ct_write = (size_t(KCALL *)(struct character_device * __restrict, USER CHECKED void const *, size_t, iomode_t))&pty_slave_write;
-	result->cd_type.ct_ioctl = (syscall_slong_t(KCALL *)(struct character_device * __restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&pty_slave_ioctl;
-	result->cd_type.ct_stat  = (void(KCALL *)(struct character_device * __restrict, USER CHECKED struct stat *))&pty_slave_stat;
-	result->cd_type.ct_poll  = (poll_mode_t(KCALL *)(struct character_device * __restrict, poll_mode_t))&pty_slave_poll;
+	result->cd_type.ct_fini  = (void /*NOTHROW*/ (KCALL *)(struct character_device *__restrict))&pty_slave_fini;
+	result->cd_type.ct_read  = (size_t(KCALL *)(struct character_device *__restrict, USER CHECKED void *, size_t, iomode_t))&pty_slave_read;
+	result->cd_type.ct_write = (size_t(KCALL *)(struct character_device *__restrict, USER CHECKED void const *, size_t, iomode_t))&pty_slave_write;
+	result->cd_type.ct_ioctl = (syscall_slong_t(KCALL *)(struct character_device *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&pty_slave_ioctl;
+	result->cd_type.ct_stat  = (void(KCALL *)(struct character_device *__restrict, USER CHECKED struct stat *))&pty_slave_stat;
+	result->cd_type.ct_poll  = (poll_mode_t(KCALL *)(struct character_device *__restrict, poll_mode_t))&pty_slave_poll;
 	return result;
 }
 

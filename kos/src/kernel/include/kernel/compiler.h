@@ -332,43 +332,43 @@ __NAMESPACE_INT_END
 	}
 
 #ifdef __INTELLISENSE__
-#define DEFINE_REFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy)                                     \
-	extern "C++" {                                                                                     \
-	T operator,(T, __NAMESPACE_INT_SYM __refcnt_select_tag);                                           \
-	NOBLOCK WUNUSED NONNULL((1)) __UINTPTR_TYPE__ NOTHROW(KCALL getrefcnt)(T const * __restrict self); \
-	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL isshared)(T const * __restrict self);            \
-	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL tryincref)(T * __restrict self);                 \
-	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL wasdestroyed)(T const * __restrict self);        \
-	NOBLOCK T *NOTHROW(KCALL xincref)(T * __restrict self);                                            \
-	NOBLOCK ATTR_RETNONNULL NONNULL((1)) T *NOTHROW(KCALL incref)(T * __restrict self);                \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL destroy)(T * __restrict self);                             \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref)(T * __restrict self);                              \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_nokill)(T * __restrict self);                       \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_likely)(T * __restrict self);                       \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_unlikely)(T * __restrict self);                     \
-	NOBLOCK void NOTHROW(KCALL xdecref)(T * self);                                                     \
-	NOBLOCK void NOTHROW(KCALL xdecref_nokill)(T * self);                                              \
-	NOBLOCK void NOTHROW(KCALL xdecref_likely)(T * self);                                              \
-	NOBLOCK void NOTHROW(KCALL xdecref_unlikely)(T * self);                                            \
+#define DEFINE_REFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy)                                    \
+	extern "C++" {                                                                                    \
+	T operator,(T, __NAMESPACE_INT_SYM __refcnt_select_tag);                                          \
+	NOBLOCK WUNUSED NONNULL((1)) __UINTPTR_TYPE__ NOTHROW(KCALL getrefcnt)(T const *__restrict self); \
+	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL isshared)(T const *__restrict self);            \
+	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL tryincref)(T *__restrict self);                 \
+	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL wasdestroyed)(T const *__restrict self);        \
+	NOBLOCK T *NOTHROW(KCALL xincref)(T *__restrict self);                                            \
+	NOBLOCK ATTR_RETNONNULL NONNULL((1)) T *NOTHROW(KCALL incref)(T *__restrict self);                \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL destroy)(T *__restrict self);                             \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref)(T *__restrict self);                              \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_nokill)(T *__restrict self);                       \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_likely)(T *__restrict self);                       \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_unlikely)(T *__restrict self);                     \
+	NOBLOCK void NOTHROW(KCALL xdecref)(T * self);                                                    \
+	NOBLOCK void NOTHROW(KCALL xdecref_nokill)(T * self);                                             \
+	NOBLOCK void NOTHROW(KCALL xdecref_likely)(T * self);                                             \
+	NOBLOCK void NOTHROW(KCALL xdecref_unlikely)(T * self);                                           \
 	}
-#define DEFINE_WEAKREFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy)                                     \
-	extern "C++" {                                                                                         \
-	T operator,(T, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                           \
-	NOBLOCK WUNUSED NONNULL((1)) __UINTPTR_TYPE__ NOTHROW(KCALL getweakrefcnt)(T const * __restrict self); \
-	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL isweakshared)(T * __restrict self);                  \
-	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL tryweakincref)(T * __restrict self);                 \
-	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL wasweakdestroyed)(T const * __restrict self);        \
-	NOBLOCK T *NOTHROW(KCALL xweakincref)(T * __restrict self);                                            \
-	NOBLOCK ATTR_RETNONNULL NONNULL((1)) T *NOTHROW(KCALL weakincref)(T * __restrict self);                \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdestroy)(T * __restrict self);                             \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref)(T * __restrict self);                              \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_nokill)(T * __restrict self);                       \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_likely)(T * __restrict self);                       \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_unlikely)(T * __restrict self);                     \
-	NOBLOCK void NOTHROW(KCALL xweakdecref)(T * self);                                                     \
-	NOBLOCK void NOTHROW(KCALL xweakdecref_nokill)(T * self);                                              \
-	NOBLOCK void NOTHROW(KCALL xweakdecref_likely)(T * self);                                              \
-	NOBLOCK void NOTHROW(KCALL xweakdecref_unlikely)(T * self);                                            \
+#define DEFINE_WEAKREFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy)                                    \
+	extern "C++" {                                                                                        \
+	T operator,(T, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                          \
+	NOBLOCK WUNUSED NONNULL((1)) __UINTPTR_TYPE__ NOTHROW(KCALL getweakrefcnt)(T const *__restrict self); \
+	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL isweakshared)(T *__restrict self);                  \
+	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL tryweakincref)(T *__restrict self);                 \
+	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL wasweakdestroyed)(T const *__restrict self);        \
+	NOBLOCK T *NOTHROW(KCALL xweakincref)(T *__restrict self);                                            \
+	NOBLOCK ATTR_RETNONNULL NONNULL((1)) T *NOTHROW(KCALL weakincref)(T *__restrict self);                \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdestroy)(T *__restrict self);                             \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref)(T *__restrict self);                              \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_nokill)(T *__restrict self);                       \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_likely)(T *__restrict self);                       \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_unlikely)(T *__restrict self);                     \
+	NOBLOCK void NOTHROW(KCALL xweakdecref)(T * self);                                                    \
+	NOBLOCK void NOTHROW(KCALL xweakdecref_nokill)(T * self);                                             \
+	NOBLOCK void NOTHROW(KCALL xweakdecref_likely)(T * self);                                             \
+	NOBLOCK void NOTHROW(KCALL xweakdecref_unlikely)(T * self);                                           \
 	}
 #else /* __INTELLISENSE__ */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6fc75ac9 */
+/* HASH CRC-32:0x3e3ee479 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_init)(posix_sp
 /* Free resources associated with ATTR */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_destroy)(posix_spawnattr_t *__restrict attr);
 /* Store signal mask for signals with default handling from ATTR in SIGDEFAULT */
-INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getsigdefault)(posix_spawnattr_t const * __restrict attr, sigset_t *__restrict sigdefault);
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getsigdefault)(posix_spawnattr_t const *__restrict attr, sigset_t *__restrict sigdefault);
 /* Set signal mask for signals with default handling in ATTR to SIGDEFAULT */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setsigdefault)(posix_spawnattr_t *__restrict attr, sigset_t const *__restrict sigdefault);
 /* Store signal mask for the new process from ATTR in SIGMASK */

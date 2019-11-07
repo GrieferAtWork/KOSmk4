@@ -19,19 +19,23 @@
 #ifndef _I386_KOS_KOS_KERNEL_CPU_STATE_HELPERSCC_H
 #define _I386_KOS_KOS_KERNEL_CPU_STATE_HELPERSCC_H 1
 
+/* HINT: The `cc' in this file's name stands for CrossCompat
+ *      (as in compatibility between 32-bit and 64-bit modes) */
+
+#include <hybrid/__assert.h>
 #include <hybrid/host.h>
 
 #include <asm/intrin.h>
 #include <bits/types.h>
 #include <kos/anno.h>
 #include <kos/kernel/gdt.h>
-#include <hybrid/__assert.h>
+
 #include <libc/string.h>
 
-#include "cpu-state32.h"
-#include "cpu-state64.h"
 #include "cpu-state-helpers32.h"
 #include "cpu-state-helpers64.h"
+#include "cpu-state32.h"
+#include "cpu-state64.h"
 
 #ifdef __CC__
 __DECL_BEGIN

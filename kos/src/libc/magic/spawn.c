@@ -154,7 +154,7 @@ posix_spawnattr_destroy:([nonnull] posix_spawnattr_t *__restrict attr) -> int;
 
 %
 @@Store signal mask for signals with default handling from ATTR in SIGDEFAULT
-posix_spawnattr_getsigdefault:([nonnull] posix_spawnattr_t const * __restrict attr,
+posix_spawnattr_getsigdefault:([nonnull] posix_spawnattr_t const *__restrict attr,
                                [nonnull] sigset_t *__restrict sigdefault) -> int;
 
 %

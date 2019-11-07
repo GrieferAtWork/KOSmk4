@@ -1487,7 +1487,7 @@ again_readstate:
 			                             VM_DATAPART_PPP_INITIALIZING))
 				goto again_readstate;
 			TRY {
-				void (KCALL *dt_loadpart)(struct vm_datablock * __restrict,
+				void (KCALL *dt_loadpart)(struct vm_datablock *__restrict,
 				                          vm_dpage_t, vm_phys_t, size_t);
 				/* Invoke a custom load protocol of the associated datablock. */
 				dt_loadpart = self->dp_block->db_type->dt_loadpart;
@@ -1531,8 +1531,8 @@ again_readstate:
 					goto again_readstate;
 set_datapart_changed:
 				if (!(ATOMIC_FETCHOR(self->dp_flags, VM_DATAPART_FLAG_CHANGED) & VM_DATAPART_FLAG_CHANGED)) {
-					void (KCALL *dt_changed)(struct vm_datablock * __restrict,
-					                         struct vm_datapart * __restrict);
+					void (KCALL *dt_changed)(struct vm_datablock *__restrict,
+					                         struct vm_datapart *__restrict);
 					dt_changed = self->dp_block->db_type->dt_changed;
 					if (dt_changed)
 						(*dt_changed)(self->dp_block, self);
@@ -1585,7 +1585,7 @@ again_readstate_multi:
 				                               VM_DATAPART_PPP_INITIALIZING))
 					++num_init_pages;
 				TRY {
-					void (KCALL *dt_loadpart)(struct vm_datablock * __restrict,
+					void (KCALL *dt_loadpart)(struct vm_datablock *__restrict,
 					                          vm_dpage_t, vm_phys_t, size_t);
 					/* Invoke a custom load protocol of the associated datablock. */
 					dt_loadpart = self->dp_block->db_type->dt_loadpart;
@@ -1614,8 +1614,8 @@ again_readstate_multi:
 					result_has_changed = true;
 					if (!(ATOMIC_FETCHOR(self->dp_flags, VM_DATAPART_FLAG_CHANGED) &
 					      VM_DATAPART_FLAG_CHANGED)) {
-						void (KCALL *dt_changed)(struct vm_datablock * __restrict,
-						                         struct vm_datapart * __restrict);
+						void (KCALL *dt_changed)(struct vm_datablock *__restrict,
+						                         struct vm_datapart *__restrict);
 						dt_changed = self->dp_block->db_type->dt_changed;
 						if (dt_changed)
 							(*dt_changed)(self->dp_block, self);
@@ -1662,8 +1662,8 @@ again_readstate_multi:
 					result_has_changed = true;
 					if (!(ATOMIC_FETCHOR(self->dp_flags, VM_DATAPART_FLAG_CHANGED) &
 					      VM_DATAPART_FLAG_CHANGED)) {
-						void (KCALL *dt_changed)(struct vm_datablock * __restrict,
-						                         struct vm_datapart * __restrict);
+						void (KCALL *dt_changed)(struct vm_datablock *__restrict,
+						                         struct vm_datapart *__restrict);
 						dt_changed = self->dp_block->db_type->dt_changed;
 						if (dt_changed)
 							(*dt_changed)(self->dp_block, self);
@@ -1717,7 +1717,7 @@ again_readstate:
 		                             VM_DATAPART_PPP_INITIALIZING))
 			goto again_readstate;
 		TRY {
-			void (KCALL *dt_loadpart)(struct vm_datablock * __restrict,
+			void (KCALL *dt_loadpart)(struct vm_datablock *__restrict,
 			                          vm_dpage_t, vm_phys_t, size_t);
 			/* Invoke a custom load protocol of the associated datablock. */
 			dt_loadpart = block->db_type->dt_loadpart;
@@ -1760,8 +1760,8 @@ again_readstate:
 set_datapart_changed:
 			if (!(ATOMIC_FETCHOR(self->dp_flags, VM_DATAPART_FLAG_CHANGED) &
 			      VM_DATAPART_FLAG_CHANGED)) {
-				void (KCALL *dt_changed)(struct vm_datablock * __restrict,
-				                         struct vm_datapart * __restrict);
+				void (KCALL *dt_changed)(struct vm_datablock *__restrict,
+				                         struct vm_datapart *__restrict);
 				dt_changed = block->db_type->dt_changed;
 				if (dt_changed)
 					(*dt_changed)(block, self);
@@ -2194,7 +2194,7 @@ vm_datapart_sync(struct vm_datapart *__restrict self,
 	pointer_set_init(&vms);
 again_lock_datapart:
 	TRY {
-		void (KCALL *dt_savepart)(struct vm_datablock * __restrict,
+		void (KCALL *dt_savepart)(struct vm_datablock *__restrict,
 		                          vm_dpage_t, vm_phys_t, size_t);
 		size_t vms_count;
 		struct vm_node *node;

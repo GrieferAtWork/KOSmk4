@@ -1114,11 +1114,11 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_futexfd_hop(struct vm_futexfd *
 		return getrefcnt(self);                                       \
 	}                                                                 \
 	INTERN NOBLOCK NONNULL((1)) void                                  \
-	NOTHROW(FCALL handle_##name##_incref)(T * __restrict self) {      \
+	NOTHROW(FCALL handle_##name##_incref)(T *__restrict self) {       \
 		incref(self);                                                 \
 	}                                                                 \
 	INTERN NOBLOCK NONNULL((1)) void                                  \
-	NOTHROW(FCALL handle_##name##_decref)(REF T * __restrict self) {  \
+	NOTHROW(FCALL handle_##name##_decref)(REF T *__restrict self) {   \
 		decref(self);                                                 \
 	}
 

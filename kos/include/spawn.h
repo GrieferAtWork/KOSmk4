@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59ea38e4 */
+/* HASH CRC-32:0x627efbb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -149,7 +149,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawnattr_destroy,(posix_
 
 #ifdef __CRT_HAVE_posix_spawnattr_getsigdefault
 /* Store signal mask for signals with default handling from ATTR in SIGDEFAULT */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_getsigdefault,(posix_spawnattr_t const * __restrict __attr, sigset_t *__restrict __sigdefault),(__attr,__sigdefault))
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_getsigdefault,(posix_spawnattr_t const *__restrict __attr, sigset_t *__restrict __sigdefault),(__attr,__sigdefault))
 #endif /* posix_spawnattr_getsigdefault... */
 
 #ifdef __CRT_HAVE_posix_spawnattr_setsigdefault

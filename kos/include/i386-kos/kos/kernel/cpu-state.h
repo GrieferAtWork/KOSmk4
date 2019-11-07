@@ -48,12 +48,20 @@
  *               depends on the state's address.
  *  - scpustate: SchedulerCpuState
  *               Very similar to `icpustate', but used by the
- *               scheduler. The only difference to `icpustate' is
- *               that this state also contains a field for `%gs'
+ *               scheduler. The only difference (on i386) to `icpustate'
+ *               is that this state also contains a field for `%gs'
+ *               Note however that on x86_64, this structure contains
+ *               a lot more registers than `icpustate' does, since on
+ *               x86_64, segment registers don't need to be modified
+ *               upon entry to an interrupt. Additionally, (fs|gs)base
+ *               values are stored inside, thus making them apart of
+ *               the standard set of registers saved/restored during
+ *               scheduling (on i386, (fs|gs)base are saved as part
+ *               of THIS_TASK)
  *  - fcpustate: FullCpuState
- *               A full cpu state, contains every regular not related
+ *               A full cpu state, contains every register not related
  *               to floating point handling, including values to-be
- *               loaded into descriptor caches and what-not.
+ *               loaded into descriptor table registers and what-not.
  */
 
 #ifdef __x86_64__

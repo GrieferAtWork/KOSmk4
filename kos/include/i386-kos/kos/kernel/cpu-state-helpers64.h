@@ -19,13 +19,14 @@
 #ifndef _I386_KOS_KOS_KERNEL_CPU_STATE_HELPERS64_H
 #define _I386_KOS_KOS_KERNEL_CPU_STATE_HELPERS64_H 1
 
+#include <hybrid/__assert.h>
 #include <hybrid/host.h>
 
 #include <asm/intrin.h>
 #include <bits/types.h>
 #include <kos/anno.h>
 #include <kos/kernel/gdt.h>
-#include <hybrid/__assert.h>
+
 #include <libc/string.h>
 
 #include "cpu-state64.h"

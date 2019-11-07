@@ -40,7 +40,7 @@ DECL_BEGIN
 /* Declare/define a cache for preallocated/re-use free. */
 #define DECLARE_PREALLOCATION_CACHE(decl, name, T)                                                         \
 	decl ATTR_MALLOC WUNUSED ATTR_RETNONNULL T *(KCALL name##_alloc)(gfp_t alloc_flags)THROWS(E_BADALLOC); \
-	decl NOBLOCK void NOTHROW(KCALL name##_free)(T * __restrict p);                                        \
+	decl NOBLOCK void NOTHROW(KCALL name##_free)(T *__restrict p);                                         \
 	decl NOBLOCK size_t NOTHROW(KCALL name##_clear)(void);
 #define DECLARE_PREALLOCATION_CACHE_ALLOC_NX(decl, name, T) \
 	decl ATTR_MALLOC WUNUSED T *NOTHROW(KCALL name##_alloc_nx)(gfp_t alloc_flags);
@@ -68,7 +68,7 @@ DECL_BEGIN
 		return (T *)kmalloc(sizeof(T), alloc_flags);        \
 	}                                                       \
 	decl NOBLOCK NONNULL((1)) void                          \
-	NOTHROW(KCALL name##_free)(T * __restrict p) {          \
+	NOTHROW(KCALL name##_free)(T *__restrict p) {           \
 		if (name##_freesize < max_size) {                   \
 			if (sync_trywrite(&name##_lock)) {              \
 				COMPILER_READ_BARRIER();                    \
