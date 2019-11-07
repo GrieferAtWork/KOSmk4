@@ -37,6 +37,7 @@
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/cpu-state-helpers.h>
 #include <sys/io.h>
 
 #include <format-printer.h>
@@ -139,7 +140,7 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 	rd_printer.rdp_printer_arg = (void *)KERN_EMERG;
 	rd_printer.rdp_format      = &indent_regdump_print_format;
 	regdump_gpregs(&rd_printer, &ustate->ucs_gpregs);
-	regdump_ip(&rd_printer, UCPUSTATE_PC(*ustate));
+	regdump_ip(&rd_printer, ucpustate_getpc(ustate));
 	regdump_sgregs_with_cs_ss_tr_ldt(&rd_printer, &ustate->ucs_sgregs,
 	                                 ustate->ucs_cs, ustate->ucs_ss,
 	                                 __str(), __sldt());
@@ -152,26 +153,26 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 	regdump_cr4(&rd_printer, __rdcr4());
 	printk(KERN_EMERG "    %%cr3 %p\n", (void *)cr3);
 	addr2line_printf(&kprinter, (void *)KERN_RAW,
-	                 UCPUSTATE_PC(*ustate),
-	                 (uintptr_t)instruction_trysucc((void const *)UCPUSTATE_PC(*ustate)),
+	                 ucpustate_getpc(ustate),
+	                 (uintptr_t)instruction_trysucc((void const *)ucpustate_getpc(ustate)),
 	                 "Caused here [sp=%p]",
-	                 UCPUSTATE_SP(*ustate));
+	                 ucpustate_getsp(ustate));
 	is_first = true;
 	for (;;) {
 		struct ucpustate old_state;
 		old_state = *ustate;
 		error = unwind((void *)(is_first
-		                        ? UCPUSTATE_PC(old_state)
-		                        : UCPUSTATE_PC(old_state) - 1),
+		                        ? ucpustate_getpc(&old_state)
+		                        : ucpustate_getpc(&old_state) - 1),
 		               &unwind_getreg_ucpustate, &old_state,
 		               &unwind_setreg_ucpustate, ustate);
 		if (error != UNWIND_SUCCESS)
 			break;
 		is_first = false;
 		addr2line_printf(&kprinter, (void *)KERN_RAW,
-		                 (uintptr_t)instruction_trypred((void const *)UCPUSTATE_PC(*ustate)),
-		                 UCPUSTATE_PC(*ustate), "Called here [sp=%p]",
-		                 UCPUSTATE_SP(*ustate));
+		                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(ustate)),
+		                 ucpustate_getpc(ustate), "Called here [sp=%p]",
+		                 ucpustate_getsp(ustate));
 	}
 	if (error != UNWIND_NO_FRAME)
 		printk(KERN_EMERG "Unwind failure: %u\n", error);
@@ -210,7 +211,7 @@ panic_uhi_dbg_main(void *arg) {
 	           "func: " DF_WHITE("%n") "\n"
 	           "addr: " DF_WHITE("%p") "\n"
 	           "]",
-	           FCPUSTATE_PC(dbg_exitstate));
+	           fcpustate_getpc(&dbg_exitstate));
 	dbg_main(0);
 }
 #endif
@@ -221,7 +222,7 @@ x86_interrupt_generic(struct icpustate *__restrict state,
                       uintptr_t ecode, uintptr_t intno) {
 	struct ucpustate ustate;
 	__cli();
-	ICPUSTATE_TO_UCPUSTATE(ustate, *state);
+	icpustate_to_ucpustate(state, &ustate);
 	printk(KERN_EMERG "Unhandled interrupt %Ix (%Iu)", intno, intno);
 	{
 		char const *name, *desc;
@@ -244,7 +245,7 @@ x86_interrupt_generic(struct icpustate *__restrict state,
 	x86_dump_ucpustate_register_state(&ustate, (PHYS pagedir_t *)__rdcr3());
 	if (THIS_TASK != &_boottask) {
 		printk(KERN_EMERG "Boot task state:\n");
-		SCPUSTATE_TO_UCPUSTATE(ustate, *_boottask.t_sched.s_state);
+		scpustate_to_ucpustate(_boottask.t_sched.s_state, &ustate);
 		x86_dump_ucpustate_register_state(&ustate, _boottask.t_vm->v_pdir_phys_ptr);
 	}
 

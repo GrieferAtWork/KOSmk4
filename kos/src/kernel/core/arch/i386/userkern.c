@@ -38,26 +38,18 @@
 
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
-#include <kos/bits/ukern-struct.h>
-#include <kos/except-inval.h>
-
-#include <string.h>
-#ifdef __x86_64__
-#include <kos/bits/ukern-struct32.h>
-#endif /* __x86_64__ */
 #include <asm/registers.h>
+#include <kos/bits/ukern-struct.h>
+#include <kos/bits/ukern-struct32.h>
+#include <kos/except-inval.h>
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
 #include <kos/kernel/segment.h>
 
 #include <stddef.h>
+#include <string.h>
 
 DECL_BEGIN
-
-
-#ifdef __x86_64__
-#define IFELSE64(if32, if64) if64
-#else /* __x86_64__ */
-#define IFELSE64(if32, if64) if32
-#endif /* !__x86_64__ */
 
 
 
@@ -76,88 +68,71 @@ userkern_ucpustate32_getfield32(struct icpustate *__restrict state,
 			goto nope; /* XXX: While is would be insanely slow, we could use
 			            *      the unwind system to unwind to the kernel entry
 			            *      point, at which point we could emulate access
-			            *      to the original user-space registers... */
+			            *      to the original user-space registers via CFI... */
 		switch (offset) {
 
 		case offsetof(struct userkern32, uk_regs.ucs_gpregs.gp_edi):
-			*presult = (u32)state->ics_gpregs.IFELSE64(gp_edi, gp_rdi);
+			*presult = (u32)gpregs_getpdi(&state->ics_gpregs);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_gpregs.gp_esi):
-			*presult = (u32)state->ics_gpregs.IFELSE64(gp_esi, gp_rsi);
+			*presult = (u32)gpregs_getpsi(&state->ics_gpregs);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_gpregs.gp_ebp):
-			*presult = (u32)state->ics_gpregs.IFELSE64(gp_ebp, gp_rbp);
+			*presult = (u32)gpregs_getpbp(&state->ics_gpregs);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_gpregs.gp_esp):
-			*presult = (u32)IFELSE64(state->ics_irregs_u.ir_esp,
-			                         irregs_rdsp(&state->ics_irregs));
+			*presult = (u32)icpustate_getuserpsp(state);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_gpregs.gp_ebx):
-			*presult = (u32)state->ics_gpregs.IFELSE64(gp_ebx, gp_rbx);
+			*presult = (u32)gpregs_getpbx(&state->ics_gpregs);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_gpregs.gp_edx):
-			*presult = (u32)state->ics_gpregs.IFELSE64(gp_edx, gp_rdx);
+			*presult = (u32)gpregs_getpdx(&state->ics_gpregs);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_gpregs.gp_ecx):
-			*presult = (u32)state->ics_gpregs.IFELSE64(gp_ecx, gp_rcx);
+			*presult = (u32)gpregs_getpcx(&state->ics_gpregs);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_gpregs.gp_eax):
-			*presult = (u32)state->ics_gpregs.IFELSE64(gp_eax, gp_rax);
+			*presult = (u32)gpregs_getpax(&state->ics_gpregs);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_sgregs.sg_gs):
-#ifdef __x86_64__
-			*presult = (u32)__rdgs();
-#else /* __x86_64__ */
-			*presult = irregs_isvm86(&state->ics_irregs)
-			           ? state->ics_irregs_v.ir_gs16
-			           : (u32)__rdgs();
-#endif /* !__x86_64__ */
+			*presult = icpustate_getgs(state);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_sgregs.sg_fs):
-			*presult = (u32)IFELSE64(irregs_isvm86(&state->ics_irregs)
-			                         ? state->ics_irregs_v.ir_fs16
-			                         : state->ics_fs16,
-			                         __rdfs());
+			*presult = icpustate_getfs(state);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_sgregs.sg_es):
-			*presult = (u32)IFELSE64(irregs_isvm86(&state->ics_irregs)
-			                         ? state->ics_irregs_v.ir_es16
-			                         : state->ics_es16,
-			                         __rdes());
+			*presult = icpustate_getes(state);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_sgregs.sg_ds):
-			*presult = (u32)IFELSE64(irregs_isvm86(&state->ics_irregs)
-			                         ? state->ics_irregs_v.ir_ds16
-			                         : state->ics_ds16,
-			                         __rdds());
+			*presult = icpustate_getds(state);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_cs):
-			*presult = (u32)irregs_rdcs(&state->ics_irregs);
+			*presult = icpustate_getcs(state);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_ss):
-			*presult = (u32)IFELSE64(state->ics_irregs_u.ir_ss16,
-			                         irregs_rdss(&state->ics_irregs));
+			*presult = icpustate_getuserss(state);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_eflags):
-			*presult = (u32)irregs_rdflags(&state->ics_irregs);
+			*presult = (u32)icpustate_getpflags(state);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_eip):
-			*presult = (u32)irregs_rdip(&state->ics_irregs);
+			*presult = (u32)icpustate_getpc(state);
 			break;
 
 		default:
@@ -185,45 +160,44 @@ userkern_ucpustate32_setfield32(struct icpustate *__restrict state,
 			goto nope; /* XXX: While is would be insanely slow, we could use
 			            *      the unwind system to unwind to the kernel entry
 			            *      point, at which point we could emulate access
-			            *      to the original user-space registers... */
+			            *      to the original user-space registers via CFI... */
 		switch (offset) {
 
 		case offsetof(struct userkern32, uk_regs.ucs_gpregs.gp_edi):
-			state->ics_gpregs.IFELSE64(gp_edi, gp_rdi) = value;
+			gpregs_setpdi(&state->ics_gpregs, value);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_gpregs.gp_esi):
-			state->ics_gpregs.IFELSE64(gp_esi, gp_rsi) = value;
+			gpregs_setpsi(&state->ics_gpregs, value);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_gpregs.gp_ebp):
-			state->ics_gpregs.IFELSE64(gp_ebp, gp_rbp) = value;
+			gpregs_setpbp(&state->ics_gpregs, value);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_gpregs.gp_esp):
-			IFELSE64(state->ics_irregs_u.ir_esp = value,
-			         irregs_wrsp(&state->ics_irregs, value));
+			icpustate_setuserpsp(state, value);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_gpregs.gp_ebx):
-			state->ics_gpregs.IFELSE64(gp_ebx, gp_rbx) = value;
+			gpregs_setpbx(&state->ics_gpregs, value);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_gpregs.gp_edx):
-			state->ics_gpregs.IFELSE64(gp_edx, gp_rdx) = value;
+			gpregs_setpdx(&state->ics_gpregs, value);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_gpregs.gp_ecx):
-			state->ics_gpregs.IFELSE64(gp_ecx, gp_rcx) = value;
+			gpregs_setpcx(&state->ics_gpregs, value);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_gpregs.gp_eax):
-			state->ics_gpregs.IFELSE64(gp_eax, gp_rax) = value;
+			gpregs_setpax(&state->ics_gpregs, value);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_sgregs.sg_gs):
 #ifndef __x86_64__
-			if (irregs_isvm86(&state->ics_irregs)) {
+			if (icpustate_isvm86(state)) {
 				state->ics_irregs_v.ir_gs = value & 0xffff;
 				break;
 			}
@@ -233,12 +207,12 @@ userkern_ucpustate32_setfield32(struct icpustate *__restrict state,
 				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 				      X86_REGISTER_SEGMENT_GS, value);
 			}
-			__wrgs((u16)value);
+			icpustate_setgs_novm86(state, value);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_sgregs.sg_fs):
 #ifndef __x86_64__
-			if (irregs_isvm86(&state->ics_irregs)) {
+			if (icpustate_isvm86(state)) {
 				state->ics_irregs_v.ir_fs = value & 0xffff;
 				break;
 			}
@@ -248,12 +222,12 @@ userkern_ucpustate32_setfield32(struct icpustate *__restrict state,
 				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 				      X86_REGISTER_SEGMENT_FS, value);
 			}
-			IFELSE64(state->ics_fs = value, __wrfs((u16)value));
+			icpustate_setfs_novm86(state, value);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_sgregs.sg_es):
 #ifndef __x86_64__
-			if (irregs_isvm86(&state->ics_irregs)) {
+			if (icpustate_isvm86(state)) {
 				state->ics_irregs_v.ir_es = value & 0xffff;
 				break;
 			}
@@ -263,12 +237,12 @@ userkern_ucpustate32_setfield32(struct icpustate *__restrict state,
 				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 				      X86_REGISTER_SEGMENT_ES, value);
 			}
-			IFELSE64(state->ics_es = value, __wres((u16)value));
+			icpustate_setes_novm86(state, value);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_sgregs.sg_ds):
 #ifndef __x86_64__
-			if (irregs_isvm86(&state->ics_irregs)) {
+			if (icpustate_isvm86(state)) {
 				state->ics_irregs_v.ir_ds = value & 0xffff;
 				break;
 			}
@@ -278,53 +252,50 @@ userkern_ucpustate32_setfield32(struct icpustate *__restrict state,
 				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 				      X86_REGISTER_SEGMENT_DS, value);
 			}
-			IFELSE64(state->ics_ds = value, __wrds((u16)value));
+			icpustate_setds_novm86(state, value);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_cs):
 #ifndef __x86_64__
-			if (irregs_isvm86(&state->ics_irregs)) {
-				state->ics_irregs_v.ir_cs = value & 0xffff;
-				break;
-			}
+			if (!icpustate_isvm86(state))
 #endif /* !__x86_64__ */
-			if unlikely(!SEGMENT_IS_VALID_USERCODE(value)) {
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-				      X86_REGISTER_SEGMENT_CS, value);
+			{
+				if unlikely(!SEGMENT_IS_VALID_USERCODE(value)) {
+					THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+					      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
+					      X86_REGISTER_SEGMENT_CS, value);
+				}
 			}
-			irregs_wrcs(&state->ics_irregs, value);
+			icpustate_setcs(state, value);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_ss):
 #ifndef __x86_64__
-			if (irregs_isvm86(&state->ics_irregs)) {
-				state->ics_irregs_v.ir_ss = value & 0xffff;
-				break;
-			}
+			if (!icpustate_isvm86(state))
 #endif /* !__x86_64__ */
-			if unlikely(!SEGMENT_IS_VALID_USERDATA(value)) {
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-				      X86_REGISTER_SEGMENT_SS, value);
+			{
+				if unlikely(!SEGMENT_IS_VALID_USERDATA(value)) {
+					THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+					      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
+					      X86_REGISTER_SEGMENT_SS, value);
+				}
 			}
-			IFELSE64(state->ics_irregs_u.ir_ss = value,
-			         irregs_wrss(&state->ics_irregs, value));
+			icpustate_setuserss(state, value);
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_eflags): {
-			uintptr_t eflags_mask = cred_allow_eflags_modify_mask();
-			if ((irregs_rdflags(&state->ics_irregs) & ~eflags_mask) !=
-			    (value & ~eflags_mask)) {
+			uintptr_t pflags_mask = cred_allow_eflags_modify_mask();
+			if ((icpustate_getpflags(state) & ~pflags_mask) !=
+			    (value & ~pflags_mask)) {
 				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 				      X86_REGISTER_MISC_EFLAGS, value);
 			}
-			irregs_wrflags(&state->ics_irregs, value);
+			icpustate_setpflags(state, value);
 		}	break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_eip):
-			irregs_wrip(&state->ics_irregs, value);
+			icpustate_setpc(state, value);
 			break;
 
 		default:

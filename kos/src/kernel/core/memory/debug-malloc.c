@@ -64,6 +64,8 @@
 
 #include <libinstrlen/instrlen.h>
 #include <libunwind/unwind.h>
+#include <kos/kernel/cpu-state.h>
+#include <kos/kernel/cpu-state-helpers.h>
 
 #include "corebase.h"
 
@@ -84,10 +86,10 @@ NOTHROW(KCALL debug_malloc_generate_traceback)(void **__restrict buffer, size_t 
 	TRY {
 		struct lcpustate oldstate;
 		oldstate = *state;
-		while (unwind((void *)(LCPUSTATE_PC(oldstate) - 1),
+		while (unwind((void *)(lcpustate_getpc(&oldstate) - 1),
 		              &unwind_getreg_lcpustate, &oldstate,
 		              &unwind_setreg_lcpustate, state) == UNWIND_SUCCESS) {
-			*buffer++ = (void *)LCPUSTATE_PC(*state);
+			*buffer++ = (void *)lcpustate_getpc(state);
 			if (!--buflen)
 				return;
 			oldstate = *state;
@@ -106,7 +108,7 @@ DECL_END
 
 #define LOAD_CALLER_CONTEXT      \
 	struct lcpustate context[1]; \
-	lcpustate_cur(context);
+	lcpustate_current(context);
 #define FILL_NODE_TRACE_WITH_CALLER_TRACEBACK(node) \
 	debug_malloc_generate_traceback((node)->m_trace, MALLNODE_TRACESZ(node), (struct lcpustate *)context)
 #define PANIC_HERE(...) kernel_panic(__VA_ARGS__)
@@ -887,12 +889,7 @@ PRIVATE NOBLOCK void
 NOTHROW(KCALL mall_search_task_scpustate)(struct task *__restrict thread,
                                           struct scpustate *__restrict context) {
 	/* Search the registers of this thread. */
-#ifdef SCPUSTATE_ISUSER_OR_VM86
-	if (SCPUSTATE_ISUSER_OR_VM86(*context))
-#else /* SCPUSTATE_ISUSER_OR_VM86 */
-	if (SCPUSTATE_ISUSER(*context))
-#endif /* !SCPUSTATE_ISUSER_OR_VM86 */
-	{
+	if (scpustate_isuser(context)) {
 		/* Thread is currently in user-space (meaning its kernel stack is unused) */
 	} else {
 		unsigned int i;
@@ -902,11 +899,11 @@ NOTHROW(KCALL mall_search_task_scpustate)(struct task *__restrict thread,
 			mall_reachable_pointer(((void **)&context->scs_gpregs)[i]);
 		stack_min = VM_NODE_MINADDR(&FORTASK(thread, _this_kernel_stack));
 		stack_end = VM_NODE_ENDADDR(&FORTASK(thread, _this_kernel_stack));
-#ifdef SCPUSTATE_KERNEL_ESP
-		sp = (vm_virt_t)SCPUSTATE_KERNEL_ESP(*context);
-#else /* SCPUSTATE_KERNEL_ESP */ 
-		sp = (vm_virt_t)SCPUSTATE_SP(*context);
-#endif /* !SCPUSTATE_KERNEL_ESP */
+#ifdef scpustate_getkernelpsp
+		sp = (vm_virt_t)scpustate_getkernelpsp(context);
+#else /* scpustate_getkernelpsp */ 
+		sp = (vm_virt_t)scpustate_getsp(context);
+#endif /* !scpustate_getkernelpsp */
 		if (sp > stack_min && sp <= stack_end) {
 			/* Search the used portion of the kernel stack. */
 			mall_reachable_data((byte_t *)sp,
@@ -925,12 +922,7 @@ PRIVATE NOBLOCK void
 NOTHROW(KCALL mall_search_task_icpustate)(struct task *__restrict thread,
                                           struct icpustate *__restrict context) {
 	/* Search the registers of this thread. */
-#ifdef ICPUSTATE_ISUSER_OR_VM86
-	if (ICPUSTATE_ISUSER_OR_VM86(*context))
-#else /* ICPUSTATE_ISUSER_OR_VM86 */
-	if (ICPUSTATE_ISUSER(*context))
-#endif /* !ICPUSTATE_ISUSER_OR_VM86 */
-	{
+	if (irregs_isuser(&context->ics_irregs)) {
 		/* Thread is currently in user-space (meaning its kernel stack is unused) */
 	} else {
 		unsigned int i;
@@ -940,11 +932,7 @@ NOTHROW(KCALL mall_search_task_icpustate)(struct task *__restrict thread,
 			mall_reachable_pointer(((void **)&context->ics_gpregs)[i]);
 		stack_min = VM_NODE_MINADDR(&FORTASK(thread, _this_kernel_stack));
 		stack_end = VM_NODE_ENDADDR(&FORTASK(thread, _this_kernel_stack));
-#ifdef ICPUSTATE_KERNEL_ESP
-		sp = (vm_virt_t)ICPUSTATE_KERNEL_ESP(*context);
-#else /* ICPUSTATE_KERNEL_ESP */ 
-		sp = (vm_virt_t)ICPUSTATE_SP(*context);
-#endif /* !ICPUSTATE_KERNEL_ESP */
+		sp = (vm_virt_t)irregs_getkernelpsp(&context->ics_irregs);
 		if (sp > stack_min && sp <= stack_end) {
 			/* Search the used portion of the kernel stack. */
 			mall_reachable_data((byte_t *)sp,
@@ -966,14 +954,14 @@ NOTHROW(KCALL mall_search_this_task)(void) {
 	struct lcpustate context;
 	struct vm_node const *my_stack;
 	/* Search the registers of this thread. */
-	lcpustate_cur(&context);
+	lcpustate_current(&context);
 	/* Search general-purpose registers. */
 	for (i = 0; i < (sizeof(struct lcpustate) / sizeof(void *)); ++i)
 		mall_reachable_pointer(((void **)&context)[i]);
 	my_stack  = stack_current();
 	stack_min = VM_NODE_MINADDR(my_stack);
 	stack_end = VM_NODE_ENDADDR(my_stack);
-	sp        = (vm_virt_t)LCPUSTATE_SP(context);
+	sp        = (vm_virt_t)lcpustate_getsp(&context);
 	if (sp > stack_min && sp <= stack_end) {
 		/* Search the used portion of the kernel stack. */
 		mall_reachable_data((byte_t *)sp,

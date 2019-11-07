@@ -124,6 +124,8 @@ __UINTPTR_TYPE__ ____intellisense_vm_addr2page(__UINTPTR_TYPE__ __x);
 __vm_vpage_t ____intellisense_vm_addr2page(__vm_virt_t __x);
 __vm_ppage_t ____intellisense_vm_addr2page(__vm_phys_t __x);
 #if __SIZEOF_POINTER__ != 8
+__INTPTR_TYPE__ ____intellisense_vm_addr2page(__INTPTR_TYPE__ __x);
+__INT64_TYPE__ ____intellisense_vm_addr2page(__INT64_TYPE__ __x);
 __UINT64_TYPE__ ____intellisense_vm_addr2page(__UINT64_TYPE__ __x);
 #endif /* __SIZEOF_POINTER__ != 8 */
 }}

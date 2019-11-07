@@ -37,6 +37,7 @@ if (gcc_opt.remove("-O3"))
 #include <sched/pid.h>
 
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/cpu-state-helpers.h>
 #include <asm/intrin.h>
 #include <string.h>
 #include <stdio.h>
@@ -78,10 +79,10 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 	           ,
 	           (unsigned int)thread->t_cpu->c_id);
 	dbg_printf(DBGSTR("%[vinfo:%n(%p)]\t%p"),
-	           thread == debug_original_thread ? FCPUSTATE_PC(dbg_exitstate)
-	                                           : SCPUSTATE_PC(*thread->t_sched.s_state),
-	           thread == debug_original_thread ? FCPUSTATE_SP(dbg_exitstate)
-	                                           : SCPUSTATE_SP(*thread->t_sched.s_state));
+	           thread == debug_original_thread ? fcpustate_getpc(&dbg_exitstate)
+	                                           : scpustate_getpc(thread->t_sched.s_state),
+	           thread == debug_original_thread ? fcpustate_getsp(&dbg_exitstate)
+	                                           : scpustate_getsp(thread->t_sched.s_state));
 	if (thread == &_boottask)
 		dbg_print(DBGSTR("\t_boottask"));
 	else if (thread == &_bootidle)

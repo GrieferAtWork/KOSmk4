@@ -35,6 +35,7 @@
 #include <asm/intrin.h>
 #include <asm/registers.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/segment.h>
 
 #include <assert.h>
@@ -215,7 +216,7 @@ INTERN WUNUSED u16
 NOTHROW(FCALL x86_icpustate_get16)(struct icpustate *__restrict state, u8 regno) {
 #ifndef __x86_64__
 	if (EFFECTIVE_REGNO(regno) == R_ESP)
-		return (u16)ICPUSTATE_SP(*state);
+		return (u16)icpustate_getsp(state);
 #endif /* !__x86_64__ */
 	return *(u16 *)&ACCESS_GPREG(state, regno);
 }
@@ -224,7 +225,7 @@ INTERN WUNUSED u32
 NOTHROW(FCALL x86_icpustate_get32)(struct icpustate *__restrict state, u8 regno) {
 #ifndef __x86_64__
 	if (EFFECTIVE_REGNO(regno) == R_ESP)
-		return (u32)ICPUSTATE_SP(*state);
+		return (u32)icpustate_getsp(state);
 #endif /* !__x86_64__ */
 	return *(u32 *)&ACCESS_GPREG(state, regno);
 }
@@ -268,7 +269,7 @@ INTERN void FCALL
 x86_icpustate_set16(struct icpustate *__restrict state,
                     u8 regno, u16 value) {
 	if (EFFECTIVE_REGNO(regno) == R_ESP) {
-		if (!ICPUSTATE_WRSP(*state, value))
+		if (!icpustate_trysetsp(state, value))
 			THROW(E_ILLEGAL_INSTRUCTION_VIO_INVALID_KERNEL_SP, value);
 	}
 	ACCESS_GPREG(state, regno) = (uintptr_t)value;
@@ -278,7 +279,7 @@ INTERN void FCALL
 x86_icpustate_set32(struct icpustate *__restrict state,
                     u8 regno, u32 value) {
 	if (EFFECTIVE_REGNO(regno) == R_ESP) {
-		if (!ICPUSTATE_WRSP(*state, value))
+		if (!icpustate_trysetsp(state, value))
 			THROW(E_ILLEGAL_INSTRUCTION_VIO_INVALID_KERNEL_SP, value);
 	}
 	ACCESS_GPREG(state, regno) = (uintptr_t)value;
@@ -344,8 +345,8 @@ NOTHROW(KCALL x86_decode_segmentbase)(struct icpustate *__restrict state, op_fla
 	case F_SEGES: result = get_segment_base(state->ics_es); break;
 	case F_SEGFS: result = get_segment_base(state->ics_fs); break;
 	case F_SEGGS: result = get_segment_base(__rdgs()); break;
-	case F_SEGCS: result = get_segment_base(state->ics_irregs_k.ir_cs); break;
-	case F_SEGSS: result = get_segment_base(ICPUSTATE_SS(*state)); break;
+	case F_SEGCS: result = get_segment_base(irregs_getcs(&state->ics_irregs)); break;
+	case F_SEGSS: result = get_segment_base(irregs_getss(&state->ics_irregs)); break;
 #endif /* !__x86_64__ */
 	}
 	return result;

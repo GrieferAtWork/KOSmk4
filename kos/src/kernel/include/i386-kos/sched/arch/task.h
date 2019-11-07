@@ -36,13 +36,14 @@
 DECL_BEGIN
 
 
+
 /* Arch-specific task flags. */
-#ifndef CONFIG_NO_VM86
+#if !defined(CONFIG_NO_VM86) && !defined(__x86_64__)
 #define TASK_FX86_VM86   0x4000 /* [lock(PRIVATE(THIS_TASK))] The thread's IRET tail uses the vm86 format. */
 #define task_isvm86(x) ((x)->t_flags & TASK_FX86_VM86)
-#else
+#else /* !CONFIG_NO_VM86 && !__x86_64__ */
 #define task_isvm86(x)   0
-#endif
+#endif /* CONFIG_NO_VM86 || __x86_64__ */
 
 
 #ifdef __CC__
@@ -414,10 +415,31 @@ NOTHROW(FCALL irregs_rdflags)(struct irregs_kernel const *__restrict self) {
 FORCELOCAL NOBLOCK WUNUSED __BOOL
 NOTHROW(FCALL irregs_isuser)(struct irregs_kernel const *__restrict self) {
 	/* NOTE: The read-order here is very important! */
-	u16 cs           = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
-	uintptr_t eflags = __hybrid_atomic_load(self->ir_eflags, __ATOMIC_ACQUIRE);
-	uintptr_t eip    = __hybrid_atomic_load(self->ir_eip, __ATOMIC_ACQUIRE);
-	if (eip == (uintptr_t)&x86_rpc_user_redirection || (cs & 3) || (eflags & 0x20000))
+	u16 cs;
+	uintptr_t eflags, eip;
+	cs = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
+	if (cs & 3)
+		return 1;
+	eflags = __hybrid_atomic_load(self->ir_eflags, __ATOMIC_ACQUIRE);
+	if (eflags & 0x20000)
+		return 1;
+	eip = __hybrid_atomic_load(self->ir_eip, __ATOMIC_ACQUIRE);
+	if (eip == (uintptr_t)&x86_rpc_user_redirection)
+		return 1;
+	return 0;
+}
+
+/* Not guarantied to return `1' for vm86 interrupt registers. */
+FORCELOCAL NOBLOCK WUNUSED __BOOL
+NOTHROW(FCALL irregs_isuser_novm86)(struct irregs_kernel const *__restrict self) {
+	/* NOTE: The read-order here is very important! */
+	u16 cs;
+	uintptr_t eip;
+	cs = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
+	if (cs & 3)
+		return 1;
+	eip = __hybrid_atomic_load(self->ir_eip, __ATOMIC_ACQUIRE);
+	if (eip == (uintptr_t)&x86_rpc_user_redirection)
 		return 1;
 	return 0;
 }

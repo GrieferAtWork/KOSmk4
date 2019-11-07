@@ -35,6 +35,7 @@
 #include <kos/bits/exception_data.h>
 #include <kos/bits/exception_data32.h>
 #include <kos/except-inval.h>
+#include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state32.h>
 #include <sys/wait.h>
@@ -56,20 +57,7 @@ DECL_BEGIN
 LOCAL NOBLOCK void
 NOTHROW(KCALL user_icpu_to_ucpu)(struct icpustate const *__restrict state,
                                  struct ucpustate *__restrict ust) {
-#ifdef __x86_64__
-#error TODO
-#else /* __x86_64__ */
-	ust->ucs_gpregs        = state->ics_gpregs;
-	ust->ucs_sgregs.sg_ds  = state->ics_ds16;
-	ust->ucs_sgregs.sg_es  = state->ics_es16;
-	ust->ucs_sgregs.sg_fs  = state->ics_fs16;
-	ust->ucs_sgregs.sg_gs  = __rdgs();
-	ust->ucs_cs            = irregs_rdcs(&state->ics_irregs);
-	ust->ucs_ss            = state->ics_irregs_u.ir_ss16;
-	ust->ucs_eflags        = irregs_rdflags(&state->ics_irregs);
-	ust->ucs_eip           = irregs_rdip(&state->ics_irregs);
-	ust->ucs_gpregs.gp_esp = state->ics_irregs_u.ir_esp;
-#endif /* !__x86_64__ */
+	icpustate_user_to_ucpustate(state, ust);
 }
 
 LOCAL NOBLOCK void KCALL
@@ -82,7 +70,7 @@ user_ucpu32_to_ucpu(struct icpustate const *__restrict return_state,
 	u32 eflags_mask;
 	memcpy(ust, ust32, sizeof(struct ucpustate));
 	eflags_mask = (u32)cred_allow_eflags_modify_mask();
-	if unlikely((irregs_rdflags(&return_state->ics_irregs) & ~eflags_mask) !=
+	if unlikely((icpustate_getpflags(return_state) & ~eflags_mask) !=
 	            (ust->ucs_eflags & ~eflags_mask)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
@@ -94,7 +82,7 @@ user_ucpu32_to_ucpu(struct icpustate const *__restrict return_state,
 	ust->ucs_sgregs.sg_fs = ust->ucs_sgregs.sg_fs16;
 	ust->ucs_sgregs.sg_es = ust->ucs_sgregs.sg_es16;
 	ust->ucs_sgregs.sg_ds = ust->ucs_sgregs.sg_ds16;
-	if (!irregs_isvm86(&return_state->ics_irregs)) {
+	if (!icpustate_isvm86(return_state)) {
 		/* Validate segment register indices before actually restoring them. */
 		if unlikely(!SEGMENT_IS_VALID_USERCODE(ust->ucs_cs)) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
@@ -206,9 +194,9 @@ coredump32_impl(struct icpustate *__restrict return_state,
 			/* Coredump caused by a signal. */
 			siginfo_t si;
 #ifdef __x86_64__
-			siginfo32_to_siginfo64(&si, (siginfo32_t *)exception);
+			siginfo32_to_siginfo64(&si, (siginfo32_t *)(uintptr_t)exception);
 #else /* __x86_64__ */
-			memcpy(&si, (siginfo32_t *)exception, sizeof(siginfo_t));
+			memcpy(&si, (siginfo32_t *)(uintptr_t)exception, sizeof(siginfo_t));
 #endif /* !__x86_64__ */
 			COMPILER_READ_BARRIER();
 			signo = si.si_signo;

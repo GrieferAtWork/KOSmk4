@@ -38,6 +38,7 @@
 #include <libunwind/except.h>
 #include <libunwind/unwind.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/cpu-state-helpers.h>
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -433,8 +434,9 @@ handle_special_exception(error_register_state_t *__restrict state,
 	return NULL;
 }
 
-#define ERROR_REGISTER_STATE_TO_UCPUSTATE KCPUSTATE_TO_UCPUSTATE
-#define ERROR_REGISTER_STATE_PC           KCPUSTATE_PC
+#define error_register_state_to_ucpustate kcpustate_to_ucpustate
+#define error_register_state_getpc        kcpustate_getpc
+#define error_register_state_setpc        kcpustate_setpc
 
 PRIVATE ATTR_NOINLINE void LIBCCALL
 trigger_debugtrap(struct ucpustate *__restrict state,
@@ -456,8 +458,8 @@ trigger_coredump(error_register_state_t *curr_state,
                  unsigned int unwind_tracelength,
                  unsigned int unwind_error) {
 	struct ucpustate curr_ust, orig_ust;
-	ERROR_REGISTER_STATE_TO_UCPUSTATE(curr_ust, *curr_state);
-	ERROR_REGISTER_STATE_TO_UCPUSTATE(orig_ust, *orig_state);
+	error_register_state_to_ucpustate(curr_state, &curr_ust);
+	error_register_state_to_ucpustate(orig_state, &orig_ust);
 
 	/* Try to trigger a coredump including all of the information needed
 	 * to re-construct (up to `EXCEPT_BACKTRACE_SIZE' frames) of the unwind
@@ -472,7 +474,7 @@ trigger_coredump(error_register_state_t *curr_state,
 
 	/* Shouldn't get here, but in something went wrong,
 	 * also try to trigger a legacy debug trap. */
-	ERROR_REGISTER_STATE_TO_UCPUSTATE(curr_ust, *curr_state);
+	error_register_state_to_ucpustate(curr_state, &curr_ust);
 	trigger_debugtrap(&curr_ust, exc);
 
 	/* As a fallback: just abort execution. */
@@ -487,7 +489,7 @@ try_raise_signal_from_exception(error_register_state_t *__restrict state,
 	if (error_as_signal(error, &si)) {
 		/* raise a signal `si' at `*state' */
 		struct ucpustate ust;
-		ERROR_REGISTER_STATE_TO_UCPUSTATE(ust, *state);
+		error_register_state_to_ucpustate(state, &ust);
 		sys_raiseat(&ust, &si);
 	}
 }
@@ -605,7 +607,7 @@ err:
 #if EXCEPT_BACKTRACE_SIZE != 0
 		if (orig_tracecount < EXCEPT_BACKTRACE_SIZE) {
 			/* Mark the traceback as complete by setting LAST_PC == CURR_PC */
-			info->ei_trace[orig_tracecount] = (void *)ERROR_REGISTER_STATE_PC(orig_state);
+			info->ei_trace[orig_tracecount] = (void *)error_register_state_getpc(&orig_state);
 			++orig_tracecount;
 		}
 #endif /* EXCEPT_BACKTRACE_SIZE == 0 */

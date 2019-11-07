@@ -37,6 +37,7 @@
 
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
+#include <kos/kernel/cpu-state-helpers.h>
 
 #include <assert.h>
 #include <signal.h>
@@ -69,6 +70,12 @@ DATDEF byte_t x86_memcpy_nopf_ret_pointer[];
 
 
 
+#ifdef __x86_64__
+#define ir_pip ir_rip
+#else /* __x86_64__ */
+#define ir_pip ir_eip
+#endif /* !__x86_64__ */
+
 INTERN struct icpustate *FCALL
 x86_cirq_0e(struct icpustate *__restrict state, uintptr_t ecode) {
 #if 1
@@ -85,12 +92,11 @@ x86_cirq_0e(struct icpustate *__restrict state, uintptr_t ecode) {
 	vm_ppage_t ppage;
 	bool has_changed;
 	/* Check for memcpy_nopf() */
-	pc = ICPUSTATE_PC(*state);
+	pc = state->ics_irregs.ir_pip;
 	if unlikely_untraced(pc == (uintptr_t)x86_memcpy_nopf_rep_pointer) {
-		ICPUSTATE_PC(*state) = (uintptr_t)x86_memcpy_nopf_ret_pointer;
+		state->ics_irregs.ir_pip = (uintptr_t)x86_memcpy_nopf_ret_pointer;
 		return state;
 	}
-
 	addr = (vm_virt_t)__rdcr2();
 	/* Re-enable interrupts if they were enabled before. */
 #ifdef __x86_64__
@@ -104,7 +110,7 @@ x86_cirq_0e(struct icpustate *__restrict state, uintptr_t ecode) {
 #if 0
 	printk(KERN_DEBUG "Page fault at %p (page %p) [pc=%p,sp=%p] [ecode=%#x] [pid=%u]\n",
 	       (uintptr_t)addr, (uintptr_t)VM_PAGE2ADDR(page),
-	       pc, ICPUSTATE_SP(*state), ecode,
+	       pc, icpustate_getsp(*state), ecode,
 	       (unsigned int)task_getroottid_s());
 #endif
 	if ((ecode & (PAGEFAULT_F_PRESENT | PAGEFAULT_F_USERSPACE)) == 0 &&
@@ -822,7 +828,8 @@ PAGEFAULT_F_WRITING == E_SEGFAULT_CONTEXT_WRITING
 	pc = (uintptr_t)instruction_trysucc((void const *)pc);
 #if 1
 	printk(KERN_DEBUG "Segmentation fault at %p (page %p) [pc=%p,%p] [ecode=%#x] [pid=%u]\n",
-	       (uintptr_t)addr, (uintptr_t)VM_PAGE2ADDR(page), ICPUSTATE_PC(*state), pc, ecode,
+	       (uintptr_t)addr, (uintptr_t)VM_PAGE2ADDR(page),
+	       icpustate_getpc(state), pc, ecode,
 	       (unsigned int)task_getroottid_s());
 #endif
 	irregs_wrip(&state->ics_irregs, pc);

@@ -259,14 +259,6 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_edx = state->ics_gpregs.gp_rdx;
 	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_ecx = state->ics_gpregs.gp_rcx;
 	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_eax = state->ics_gpregs.gp_rax;
-	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_gs  = __rdgs();
-	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_fs  = __rdfs();
-	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_es  = __rdes();
-	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_ds  = __rdds();
-	user_ucontext->uc_mcontext.mc_context.ucs_cs            = (u32)irregs_rdcs(&state->ics_irregs);
-	user_ucontext->uc_mcontext.mc_context.ucs_ss            = (u32)irregs_rdss(&state->ics_irregs);
-	user_ucontext->uc_mcontext.mc_context.ucs_eflags        = (u32)irregs_rdflags(&state->ics_irregs);
-	user_ucontext->uc_mcontext.mc_context.ucs_eip           = (u32)irregs_rdip(&state->ics_irregs);
 #else /* __x86_64__ */
 	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_edi = state->ics_gpregs.gp_edi;
 	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_esi = state->ics_gpregs.gp_esi;
@@ -275,15 +267,15 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_edx = state->ics_gpregs.gp_edx;
 	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_ecx = state->ics_gpregs.gp_ecx;
 	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_eax = state->ics_gpregs.gp_eax;
-	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_gs  = ICPUSTATE_GS(*state);
-	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_fs  = ICPUSTATE_FS(*state);
-	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_es  = ICPUSTATE_ES(*state);
-	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_ds  = ICPUSTATE_DS(*state);
-	user_ucontext->uc_mcontext.mc_context.ucs_cs            = irregs_rdcs(&state->ics_irregs);
-	user_ucontext->uc_mcontext.mc_context.ucs_ss            = state->ics_irregs_u.ir_ss16;
-	user_ucontext->uc_mcontext.mc_context.ucs_eflags        = irregs_rdflags(&state->ics_irregs);
-	user_ucontext->uc_mcontext.mc_context.ucs_eip           = irregs_rdip(&state->ics_irregs);
 #endif /* !__x86_64__ */
+	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_gs  = icpustate_getgs(state);
+	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_fs  = icpustate_getfs(state);
+	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_es  = icpustate_getes(state);
+	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_ds  = icpustate_getds(state);
+	user_ucontext->uc_mcontext.mc_context.ucs_cs            = icpustate_getcs(state);
+	user_ucontext->uc_mcontext.mc_context.ucs_ss            = icpustate_getss(state);
+	user_ucontext->uc_mcontext.mc_context.ucs_eflags        = icpustate_getpflags(state);
+	user_ucontext->uc_mcontext.mc_context.ucs_eip           = icpustate_getpc(state);
 
 	user_sc_info = NULL;
 	if (sc_info) {
@@ -431,9 +423,7 @@ syscall_fill_icpustate_from_ucpustate(struct icpustate *__restrict state,
 		      X86_REGISTER_MISC_EFLAGS, eflags);
 	}
 #ifndef __x86_64__
-	if (irregs_isvm86(&state->ics_irregs)) {
-		irregs_wrcs(&state->ics_irregs, cs);
-		state->ics_irregs_v.ir_ss = ss;
+	if (icpustate_isvm86(state)) {
 		state->ics_irregs_v.ir_es = es;
 		state->ics_irregs_v.ir_ds = ds;
 		state->ics_irregs_v.ir_fs = fs;
@@ -482,34 +472,19 @@ syscall_fill_icpustate_from_ucpustate(struct icpustate *__restrict state,
 		state->ics_es = es;
 		state->ics_ds = ds;
 #endif /* !__x86_64__ */
-		irregs_wrcs(&state->ics_irregs, cs);
-#ifdef __x86_64__
-		irregs_wrss(&state->ics_irregs, ss);
-#else /* __x86_64__ */
-		state->ics_irregs_u.ir_ss = ss;
-#endif /* !__x86_64__ */
 	}
-	irregs_wrflags(&state->ics_irregs, eflags);
-#ifdef __x86_64__
-	state->ics_gpregs.gp_rdi = ust->ucs_gpregs.gp_edi;
-	state->ics_gpregs.gp_rsi = ust->ucs_gpregs.gp_esi;
-	state->ics_gpregs.gp_rbp = ust->ucs_gpregs.gp_ebp;
-	state->ics_gpregs.gp_rbx = ust->ucs_gpregs.gp_ebx;
-	state->ics_gpregs.gp_rdx = ust->ucs_gpregs.gp_edx;
-	state->ics_gpregs.gp_rcx = ust->ucs_gpregs.gp_ecx;
-	state->ics_gpregs.gp_rax = ust->ucs_gpregs.gp_eax;
-	irregs_wrsp(&state->ics_irregs, ust->ucs_gpregs.gp_esp);
-#else /* __x86_64__ */
-	state->ics_gpregs.gp_edi   = ust->ucs_gpregs.gp_edi;
-	state->ics_gpregs.gp_esi   = ust->ucs_gpregs.gp_esi;
-	state->ics_gpregs.gp_ebp   = ust->ucs_gpregs.gp_ebp;
-	state->ics_gpregs.gp_ebx   = ust->ucs_gpregs.gp_ebx;
-	state->ics_gpregs.gp_edx   = ust->ucs_gpregs.gp_edx;
-	state->ics_gpregs.gp_ecx   = ust->ucs_gpregs.gp_ecx;
-	state->ics_gpregs.gp_eax   = ust->ucs_gpregs.gp_eax;
-	state->ics_irregs_u.ir_esp = ust->ucs_gpregs.gp_esp;
-#endif /* !__x86_64__ */
-	irregs_wrip(&state->ics_irregs, ust->ucs_eip);
+	icpustate_setcs(state, cs);
+	icpustate_setuserss(state, ss);
+	gpregs_setpdi(&state->ics_gpregs, ust->ucs_gpregs.gp_edi);
+	gpregs_setpsi(&state->ics_gpregs, ust->ucs_gpregs.gp_esi);
+	gpregs_setpbp(&state->ics_gpregs, ust->ucs_gpregs.gp_ebp);
+	gpregs_setpbx(&state->ics_gpregs, ust->ucs_gpregs.gp_ebx);
+	gpregs_setpdx(&state->ics_gpregs, ust->ucs_gpregs.gp_edx);
+	gpregs_setpcx(&state->ics_gpregs, ust->ucs_gpregs.gp_ecx);
+	gpregs_setpax(&state->ics_gpregs, ust->ucs_gpregs.gp_eax);
+	icpustate_setpflags(state, eflags);
+	icpustate_setpc(state, ust->ucs_eip);
+	icpustate_setuserpsp(state, ust->ucs_gpregs.gp_esp);
 	return state;
 }
 

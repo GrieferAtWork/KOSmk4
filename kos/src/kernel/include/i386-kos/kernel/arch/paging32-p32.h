@@ -118,8 +118,8 @@ DECL_BEGIN
 
 /* Return the in-page offset of a regular pointer mapping,
  * or one that has been mapped within a 4MiB page. */
-#define P32_PDIR_PAGEINDEX_4KIB(ptr) (__CCAST(unsigned int)(__CCAST(vm_virt_t)(ptr) & P32_PAGE_OFFST_4KIB))
-#define P32_PDIR_PAGEINDEX_4MIB(ptr) (__CCAST(unsigned int)(__CCAST(vm_virt_t)(ptr) & P32_PAGE_OFFST_4MIB))
+#define P32_PDIR_PAGEINDEX_4KIB(ptr) (__CCAST(u32)(__CCAST(vm_virt_t)(ptr) & P32_PAGE_OFFST_4KIB))
+#define P32_PDIR_PAGEINDEX_4MIB(ptr) (__CCAST(u32)(__CCAST(vm_virt_t)(ptr) & P32_PAGE_OFFST_4MIB))
 
 #define P32_PDIR_ALIGN  4096 /* Alignment required for instances of `struct p32_pdir' */
 #define P32_PDIR_SIZE   4096 /* The total size of `struct p32_pdir' in bytes. */
@@ -129,8 +129,6 @@ DECL_BEGIN
 union p32_pdir_e1 {
 	/* Lowest-level page-directory entry. */
 	u32                 p_word;      /* Mapping data. */
-	PHYS u32            p_addr;      /* [MASK(P32_PAGE_FADDR_4KIB)]
-	                                  * [valid_if(c_PAGE_FPRESENT)] _Physical_ page address. */
 #define P32_PDIR_E1_IS1KIB(e1_word)    ((e1_word) & P32_PAGE_FPRESENT)
 #define P32_PDIR_E1_ISHINT(e1_word)    (((e1_word) & (P32_PAGE_FPRESENT | P32_PAGE_FISAHINT)) == P32_PAGE_FISAHINT)
 #define P32_PDIR_E1_ISUNUSED(e1_word)  (((e1_word) & (P32_PAGE_FPRESENT | P32_PAGE_FISAHINT)) == 0)
@@ -153,14 +151,11 @@ union p32_pdir_e1 {
 union p32_pdir_e2 {
 	/* TIER#2 page-directory entry. */
 	u32                      p_word;      /* Mapping data. */
-	PHYS u32                 p_addr;      /* [MASK(P32_PAGE_FADDR_4MIB)]
-	                                       * [valid_if(P32_PDIR_E2_IS4MIB(p_word))]
-	                                       * _Physical_ page address of a 4MiB page. */
 #define P32_PDIR_E2_ISVEC1(e2_word)       (((e2_word) & (P32_PAGE_FPRESENT | P32_PAGE_F4MIB)) == P32_PAGE_FPRESENT)
 #define P32_PDIR_E2_IS4MIB(e2_word)       (((e2_word) & (P32_PAGE_FPRESENT | P32_PAGE_F4MIB)) == (P32_PAGE_FPRESENT | P32_PAGE_F4MIB))
 #define P32_PDIR_E2_ISUNUSED(e2_word)     ((e2_word) == P32_PAGE_ABSENT)
 	PHYS union p32_pdir_e1 (*p_e1)[1024]; /* [MASK(P32_PAGE_FVECTOR)]
-	                                       * [owned_if(P32_PDIR_E2_ISVEC1_OWNED(p_word) &&
+	                                       * [owned_if(P32_PDIR_E2_ISVEC1(p_word) &&
 	                                       *         ((self - :p_e2) < P32_PDIR_VEC2INDEX(KERNEL_BASE)))]
 	                                       * [const_if((self - :p_e2) >= P32_PDIR_VEC2INDEX(KERNEL_BASE))]
 	                                       * [valid_if(P32_PDIR_E2_ISVEC1(p_word))]

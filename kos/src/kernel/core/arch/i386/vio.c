@@ -49,6 +49,7 @@ opt.append("-Os");
 #include <asm/registers.h>
 #include <kos/except-inval.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/cpu-state-helpers.h>
 #include <sys/io.h>
 
 #include <stdint.h>
@@ -282,11 +283,7 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/vio_main_args_t *__restrict args,
 	uintptr_t value,temp; u32 opcode;
 	op_flag_t op_flags; bool isuser;
 	__cli();
-#ifdef __x86_64__
-	isuser = ICPUSTATE_ISUSER(*state);
-#else /* __x86_64__ */
-	isuser = ICPUSTATE_ISUSER_OR_VM86(*state);
-#endif /* !__x86_64__ */
+	isuser = irregs_isuser(&state->ics_irregs);
 	if (state->ics_irregs.ir_Xflags & EFLAGS_IF)
 		__sti();
 	vio_addr  = (vm_daddr_t)cr2;
@@ -307,7 +304,7 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/vio_main_args_t *__restrict args,
 #ifdef __x86_64__
 #define RD_RMQ()  modrm_getrmq(state, &mod, op_flags)
 #define WR_RMQ(v) modrm_setrmq(state, &mod, op_flags, v)
-#endif
+#endif /* __x86_64__ */
 
 #define RD_VIOB()  vio_readb(&args->ma_args, vio_addr)
 #define WR_VIOB(v) vio_writeb(&args->ma_args, vio_addr, v)
@@ -320,10 +317,10 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/vio_main_args_t *__restrict args,
 #define WR_VIOQ(v) vio_writeq(&args->ma_args, vio_addr, v)
 #define RD_VIO()   vio_readq(&args->ma_args, vio_addr)
 #define WR_VIO(v)  vio_writeq(&args->ma_args, vio_addr, v)
-#else
+#else /* __x86_64__ */
 #define RD_VIO()   vio_readl(&args->ma_args, vio_addr)
 #define WR_VIO(v)  vio_writel(&args->ma_args, vio_addr, v)
-#endif
+#endif /* !__x86_64__ */
 
 #define RD_REG()   modrm_getreg(state, &mod, op_flags)
 #define WR_REG(v)  modrm_setreg(state, &mod, op_flags, v)
@@ -336,7 +333,7 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/vio_main_args_t *__restrict args,
 #ifdef __x86_64__
 #define RD_REGQ()  modrm_getregq(state, &mod, op_flags)
 #define WR_REGQ(v) modrm_setregq(state, &mod, op_flags, v)
-#endif
+#endif /* __x86_64__ */
 
 #define RD_VEXREG()   x86_icpustate_get(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
 #define WR_VEXREG(v)  x86_icpustate_set(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S), v)
@@ -349,7 +346,7 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/vio_main_args_t *__restrict args,
 #ifdef __x86_64__
 #define RD_VEXREGQ()  x86_icpustate_get64(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
 #define WR_VEXREGQ(v) x86_icpustate_set64(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S), v)
-#endif
+#endif /* __x86_64__ */
 
 
 #define RD_PFLAGS()         irregs_rdflags(&state->ics_irregs)
@@ -488,19 +485,12 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/vio_main_args_t *__restrict args,
 				if (mod.mi_reg < 6) {
 					u16 value;
 					switch (mod.mi_reg) {
-#ifdef __x86_64__
-					case 0: value = __rdes(); break;
-					case 2: value = irregs_rdss(&state->ics_irregs); break;
-					case 3: value = __rdds(); break;
-					case 4: value = __rdfs(); break;
-					case 5: value = __rdgs(); break;
-#else /* __x86_64__ */
-					case 0: value = ICPUSTATE_ES(*state); break;
-					case 2: value = ICPUSTATE_SS(*state); break;
-					case 3: value = ICPUSTATE_DS(*state); break;
-					case 4: value = ICPUSTATE_FS(*state); break;
-					case 5: value = ICPUSTATE_GS(*state); break;
-#endif /* !__x86_64__ */
+					case 0: value = icpustate_getes(state); break;
+					case 1: value = icpustate_getcs(state); break;
+					case 2: value = icpustate_getss(state); break;
+					case 3: value = icpustate_getds(state); break;
+					case 4: value = icpustate_getfs(state); break;
+					case 5: value = icpustate_getgs(state); break;
 					default: __builtin_unreachable();
 					}
 					IF_X86_64(if (op_flags & F_REX_W) {
@@ -546,19 +536,12 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/vio_main_args_t *__restrict args,
 							      X86_REGISTER_SEGMENT_ES + mod.mi_reg, value);
 						}
 						switch (mod.mi_reg) {
-						case 1: irregs_wrcs(&state->ics_irregs, value); break;
-#ifdef __x86_64__
-						case 0: __wres(value); break;
-						case 2: irregs_wrss(&state->ics_irregs, value); break;
-						case 3: __wrds(value); break;
-						case 4: __wrfs(value); break;
-#else /* __x86_64__ */
-						case 0: state->ics_es = value; break;
-						case 2: state->ics_irregs_u.ir_ss = value; break;
-						case 3: state->ics_ds = value; break;
-						case 4: state->ics_fs = value; break;
-#endif /* !__x86_64__ */
-						case 5: __wrgs(value); break;
+						case 0: icpustate_setes_novm86(state, value); break;
+						case 1: icpustate_setcs(state, value); break;
+						case 2: icpustate_setuserss(state, value); break;
+						case 3: icpustate_setds_novm86(state, value); break;
+						case 4: icpustate_setfs_novm86(state, value); break;
+						case 5: icpustate_setgs_novm86(state, value); break;
 						default: __builtin_unreachable();
 						}
 					}
@@ -1675,7 +1658,7 @@ user_push_value_vio_stack_2_4_8:
 						      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 						      X86_REGISTER_SEGMENT_DS, value);
 					}
-					IFELSE_X86_64(state->ics_ds = value, __wrds(value));
+					icpustate_setds_novm86(state, value);
 				}
 				goto done;
 			}
@@ -1707,7 +1690,7 @@ user_push_value_vio_stack_2_4_8:
 						      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 						      X86_REGISTER_SEGMENT_ES, value);
 					}
-					IFELSE_X86_64(state->ics_es = value, __wres(value));
+					icpustate_setes_novm86(state, value);
 				}
 				goto done;
 			}
@@ -1767,7 +1750,7 @@ user_push_value_vio_stack_2_4_8:
 						      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 						      X86_REGISTER_SEGMENT_FS, value);
 					}
-					IFELSE_X86_64(state->ics_fs = value, __wrfs(value));
+					icpustate_setfs_novm86(state, value);
 				}
 				goto done;
 			}
@@ -1799,7 +1782,7 @@ user_push_value_vio_stack_2_4_8:
 						      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 						      X86_REGISTER_SEGMENT_GS, value);
 					}
-					__wrgs(value);
+					icpustate_setgs_novm86(state, value);
 				}
 				goto done;
 			}

@@ -40,6 +40,8 @@
 #include <asm/intrin-fpu.h>
 #include <asm/intrin.h>
 #include <kos/kernel/fpu-state.h>
+#include <kos/kernel/cpu-state.h>
+#include <kos/kernel/cpu-state-helpers.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -265,7 +267,8 @@ x86_cirq_07(struct icpustate *__restrict state) {
 		struct fpustate *mystate;
 		printk(KERN_INFO "Switch FPU context from task %p[pid=%u] to %p[pid=%u] [pc=%p]\n",
 		       old_task, old_task ? task_getroottid_of_s(old_task) : 0,
-		       new_task, task_getroottid_of_s(new_task), ICPUSTATE_PC(*state));
+		       new_task, task_getroottid_of_s(new_task),
+		       icpustate_getpc(state));
 		mystate = PERTASK_GET(_this_fpustate);
 		if (!mystate) {
 			/* Try to have interrupts enabled when allocating memory.

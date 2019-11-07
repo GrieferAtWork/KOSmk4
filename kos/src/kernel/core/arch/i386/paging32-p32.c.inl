@@ -87,7 +87,7 @@ NOTHROW(FCALL p32_pagedir_fini)(VIRT struct p32_pdir *__restrict self) {
 	for (vec2 = 0; vec2 < 768; ++vec2) {
 		union p32_pdir_e2 e2 = self->p_e2[vec2];
 		if (P32_PDIR_E2_ISVEC1(e2.p_word))
-			page_free(VM_ADDR2PAGE((vm_phys_t)(e2.p_addr & P32_PAGE_FVECTOR)), 1);
+			page_free(VM_ADDR2PAGE((vm_phys_t)(e2.p_word & P32_PAGE_FVECTOR)), 1);
 	}
 }
 

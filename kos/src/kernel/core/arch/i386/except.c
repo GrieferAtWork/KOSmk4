@@ -49,6 +49,7 @@
 #include <libregdump/x86.h>
 #include <libunwind/eh_frame.h>
 #include <libunwind/unwind.h>
+#include <kos/kernel/cpu-state-helpers.h>
 
 
 /* TODO: This file needs some _major_ cleanup! */
@@ -405,7 +406,7 @@ NOTHROW(KCALL print_unhandled_exception)(pformatprinter printer, void *arg,
 	rd_printer.rdp_printer_arg = arg;
 	rd_printer.rdp_format      = &indent_regdump_print_format;
 	regdump_gpregs(&rd_printer, &info->ei_state.kcs_gpregs);
-	regdump_ip(&rd_printer, KCPUSTATE_PC(info->ei_state));
+	regdump_ip(&rd_printer, kcpustate_getpc(&info->ei_state));
 #ifdef __x86_64__
 	regdump_flags(&rd_printer, info->ei_state.kcs_rflags);
 #else /* __x86_64__ */
@@ -426,8 +427,8 @@ NOTHROW(KCALL print_unhandled_exception)(pformatprinter printer, void *arg,
 		              info->ei_data.e_pointers[i]);
 	}
 	addr2line_printf(tb_printer, tb_arg,
-	                 (uintptr_t)instruction_trypred((void const *)KCPUSTATE_PC(info->ei_state)),
-	                 KCPUSTATE_PC(info->ei_state), "Thrown here");
+	                 (uintptr_t)instruction_trypred((void const *)kcpustate_getpc(&info->ei_state)),
+	                 kcpustate_getpc(&info->ei_state), "Thrown here");
 #if EXCEPT_BACKTRACE_SIZE != 0
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i) {
 		if (!info->ei_trace[i])
@@ -507,8 +508,8 @@ panic_uhe_dbg_main(void *arg) {
 		           info->ei_data.e_pointers[i],
 		           info->ei_data.e_pointers[i]);
 	}
-	dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)KCPUSTATE_PC(info->ei_state)),
-	                     KCPUSTATE_PC(info->ei_state), "Thrown here");
+	dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)kcpustate_getpc(&info->ei_state)),
+	                     kcpustate_getpc(&info->ei_state), "Thrown here");
 #if EXCEPT_BACKTRACE_SIZE != 0
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i) {
 		if (!info->ei_trace[i])
@@ -526,7 +527,7 @@ panic_uhe_dbg_main(void *arg) {
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
 			if (!info->ei_trace[i])
 				break;
-		prev_last_pc = i ? (uintptr_t)info->ei_trace[i - 1] : KCPUSTATE_PC(info->ei_state);
+		prev_last_pc = i ? (uintptr_t)info->ei_trace[i - 1] : kcpustate_getpc(&info->ei_state);
 		if (!my_last_pc)
 			my_last_pc = prev_last_pc;
 		else if (my_last_pc != prev_last_pc) {
@@ -559,7 +560,7 @@ INTERN void FCALL
 halt_unhandled_exception(unsigned int unwind_error,
                          struct kcpustate *__restrict unwind_state) {
 	struct exception_info *info;
-	uintptr_t last_pc = KCPUSTATE_PC(*unwind_state);
+	uintptr_t last_pc = kcpustate_getpc(unwind_state);
 	printk(KERN_RAW "\n\n\n");
 	print_unhandled_exception(&kprinter, (void *)KERN_EMERG,
 	                          &kprinter, (void *)KERN_RAW,
@@ -576,7 +577,7 @@ halt_unhandled_exception(unsigned int unwind_error,
 		}
 		prev_last_pc = i < EXCEPT_BACKTRACE_SIZE
 		               ? (uintptr_t)info->ei_trace[i - 1]
-		               : KCPUSTATE_PC(info->ei_state);
+		               : kcpustate_getpc(&info->ei_state);
 		if (!my_last_pc)
 			my_last_pc = prev_last_pc;
 		else if (my_last_pc != prev_last_pc) {
@@ -598,7 +599,7 @@ halt_unhandled_exception(unsigned int unwind_error,
 	{
 		struct ucpustate ustate;
 		/* Dump the remainder of the stack after the caller stopped unwinding. */
-		KCPUSTATE_TO_UCPUSTATE(ustate, *unwind_state);
+		kcpustate_to_ucpustate(unwind_state, &ustate);
 		kernel_halt_dump_traceback(&kprinter, (void *)KERN_RAW, &ustate);
 	}
 #ifndef CONFIG_NO_DEBUGGER
@@ -653,7 +654,7 @@ search_fde:
 	 * NOTE: -1 because the state we're being given has its PC pointer
 	 *       set to be directed after the faulting instruction. */
 	memcpy(&old_state, state, sizeof(old_state));
-	pc = (void *)(KCPUSTATE_PC(old_state) - 1);
+	pc = (void *)(kcpustate_getpc(&old_state) - 1);
 	error = unwind_fde_find(pc, &fde);
 	if unlikely(error != UNWIND_SUCCESS)
 		goto err;
@@ -672,7 +673,7 @@ search_fde:
 				uintptr_t adjustment;
 				error = unwind_fde_exec_landing_pad_adjustment(&fde, &adjustment, pc);
 				if likely(error == UNWIND_SUCCESS) {
-					KCPUSTATE_SP(*state) += adjustment;
+					kcpustate_setsp(state, kcpustate_getsp(state) + adjustment);
 				} else if unlikely(error != UNWIND_NO_FRAME) {
 					goto err;
 				}
@@ -698,7 +699,7 @@ search_fde:
 	if (error == UNWIND_INVALID_REGISTER) {
 		struct ucpustate ustate;
 		unwind_cfa_sigframe_state_t sigframe_cfa;
-		KCPUSTATE_TO_UCPUSTATE(ustate, old_state);
+		kcpustate_to_ucpustate(&old_state, &ustate);
 		/* Assume that we're unwinding a signal frame when returning to user-space. */
 		error = unwind_fde_sigframe_exec(&fde, &sigframe_cfa, pc);
 		if unlikely(error != UNWIND_SUCCESS)
@@ -774,7 +775,7 @@ search_fde:
 				goto err_old_state;
 			}
 		}
-		UCPUSTATE_TO_KCPUSTATE(*state, ustate);
+		ucpustate_to_kcpustate(&ustate, state);
 	} else {
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err_old_state;
@@ -789,9 +790,9 @@ search_fde:
 			if (!PERTASK_GET(_this_exception_info.ei_trace[i]))
 				break;
 		}
-		PERTASK_SET(_this_exception_info.ei_trace[i], (void *)KCPUSTATE_PC(*state));
+		PERTASK_SET(_this_exception_info.ei_trace[i], (void *)kcpustate_getpc(state));
 #else /* EXCEPT_BACKTRACE_SIZE > 1 */
-		PERTASK_SET(_this_exception_info.ei_trace[0], (void *)KCPUSTATE_PC(*state));
+		PERTASK_SET(_this_exception_info.ei_trace[0], (void *)kcpustate_getpc(state));
 #endif /* EXCEPT_BACKTRACE_SIZE <= 1 */
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -845,15 +846,15 @@ NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
 
 #if 1 /* Compare pointers like this, as `kcs_eip' is the _RETURN_ address \
        * (i.e. the address after the piece of code that caused the exception) */
-		if (KCPUSTATE_PC(*state) > start && KCPUSTATE_PC(*state) <= start + size)
+		if (kcpustate_getpc(state) > start && kcpustate_getpc(state) <= start + size)
 #else
-		if (KCPUSTATE_PC(*state) >= start && KCPUSTATE_PC(*state) < start + size)
+		if (kcpustate_getpc(state) >= start && kcpustate_getpc(state) < start + size)
 #endif
 		{
 			if (handler == 0)
 				return DWARF_PERSO_CONTINUE_UNWIND; /* No handler -> exception should be propagated. */
 			/* Just to the associated handler */
-			KCPUSTATE_PC(*state) = landingpad + handler;
+			kcpustate_setpc(state, landingpad + handler);
 			if (action != 0) {
 				/* The ABI wants us to fill %eax with a pointer to the exception (`_Unwind_Exception').
 				 * However, since KOS exception is kept a bit simpler (so-as to allow it to function
@@ -882,7 +883,7 @@ NOTHROW(KCALL x86_asm_except_personality)(struct unwind_fde_struct *__restrict f
                                           struct kcpustate *__restrict state,
                                           void *lsda) {
 	struct x86_asm_except_entry *ent;
-	uintptr_t pc = KCPUSTATE_PC(*state);
+	uintptr_t pc = kcpustate_getpc(state);
 	ent = (struct x86_asm_except_entry *)lsda;
 	if (ent) {
 		for (; ent->ee_entry != 0; ++ent) {
@@ -895,7 +896,7 @@ NOTHROW(KCALL x86_asm_except_personality)(struct unwind_fde_struct *__restrict f
 					    : ERROR_CLASS(ent->ee_mask) != ERROR_CLASS(code))
 						continue; /* Different mask. */
 				}
-				KCPUSTATE_PC(*state) = ent->ee_entry;
+				kcpustate_setpc(state, ent->ee_entry);
 				return DWARF_PERSO_EXECUTE_HANDLER;
 			}
 		}

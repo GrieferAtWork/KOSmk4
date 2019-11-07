@@ -30,10 +30,10 @@
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/gdt.h>
 #endif /* __USE_KOS_KERNEL */
 #ifdef __KERNEL__
-#include <sched/task.h>
 #include <kernel/gdt.h>
 #endif /* __KERNEL__ */
 
@@ -111,20 +111,9 @@ struct rpc_register_state64 {
 #define RPC_REGISTER_STATE64_GETREG(x, regno) ((x).rs_regs[regno])
 
 #ifdef __USE_KOS_KERNEL
-#if defined(__x86_64__) && defined(__KERNEL__)
 #define RPC_REGISTER_STATE64_INIT_ICPUSTATE(x, state)          \
 	((x).rs_valid = ((__uint64_t)1 << RPC_X86_64_REGISTER_SP), \
-	 (x).rs_regs[RPC_X86_64_REGISTER_SP] = irregs_rdsp(&(state).ics_irregs))
-#elif !defined(__x86_64__)
-#define RPC_REGISTER_STATE64_INIT_ICPUSTATE(x, state)          \
-	((x).rs_valid = ((__uint64_t)1 << RPC_X86_64_REGISTER_SP), \
-	 (x).rs_regs[RPC_X86_64_REGISTER_SP] = ICPUSTATE_USER_ESP(state))
-#else /* !__x86_64__ */
-#define RPC_REGISTER_STATE64_INIT_ICPUSTATE(x, state)          \
-	((x).rs_valid = ((__uint64_t)1 << RPC_X86_64_REGISTER_SP), \
-	 (x).rs_regs[RPC_X86_64_REGISTER_SP] = ICPUSTATE_SP(state))
-#endif /* __x86_64__ */
-
+	 (x).rs_regs[RPC_X86_64_REGISTER_SP] = irregs_getuserpsp(&(state).ics_irregs))
 
 /* Apply modifications made by a given RPC register state to the given `state' */
 __LOCAL __ATTR_WUNUSED struct icpustate *LIBRPC_CC
@@ -133,11 +122,7 @@ rpc_register_state64_apply_icpustate(struct rpc_register_state64 *__restrict sel
 	/* Make sure that the new register configuration is valid (validate 32-bit segments). */
 #ifndef __x86_64__
 	bool is_vm86;
-#ifdef __KERNEL__
-	is_vm86 = irregs_isvm86(&state->ics_irregs_k);
-#else /* __KERNEL__ */
-	is_vm86 = (state->ics_irregs_u.ir_eflags & EFLAGS_VM) != 0;
-#endif /* !__KERNEL__ */
+	is_vm86 = irregs_isvm86(&state->ics_irregs);
 	if (!is_vm86)
 #endif /* !__x86_64__ */
 	{
@@ -174,12 +159,8 @@ rpc_register_state64_apply_icpustate(struct rpc_register_state64 *__restrict sel
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_R13, state->ics_gpregs.gp_r13);   /* [P] General purpose register #13 */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_R14, state->ics_gpregs.gp_r14);   /* [P] General purpose register #14 */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_R15, state->ics_gpregs.gp_r15);   /* [P] General purpose register #15 */
-#ifdef __KERNEL__
 	if (RPC_REGISTER_STATE64_ISVALID(*self, RPC_X86_64_REGISTER_RSP))
-		irregs_wrsp(&state->ics_irregs, self->rs_regs[RPC_X86_64_REGISTER_RSP]);
-#else /* __KERNEL__ */
-	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_RSP, state->ics_irregs.ir_rsp);   /* [P] Stack pointer. */
-#endif /* !__KERNEL__ */
+		irregs_setuserpsp(&state->ics_irregs, self->rs_regs[RPC_X86_64_REGISTER_RSP]);
 #else /* __x86_64__ */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_RAX, state->ics_gpregs.gp_eax);   /* [C] Accumulator. */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_RCX, state->ics_gpregs.gp_ecx);   /* [C] Counter register. */
@@ -190,14 +171,8 @@ rpc_register_state64_apply_icpustate(struct rpc_register_state64 *__restrict sel
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_RSI, state->ics_gpregs.gp_esi);   /* [P] Source pointer. */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_RDI, state->ics_gpregs.gp_edi);   /* [P] Destination pointer. */
 #endif /* !__x86_64__ */
-#ifdef __KERNEL__
 	if (RPC_REGISTER_STATE64_ISVALID(*self, RPC_X86_64_REGISTER_RIP))
-		irregs_wrip(&state->ics_irregs, (__uintptr_t)self->rs_regs[RPC_X86_64_REGISTER_RIP]);
-#elif defined(__x86_64__)
-	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_RIP, state->ics_irregs.ir_rip);   /* Instruction pointer. */
-#else
-	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_RIP, state->ics_irregs_u.ir_eip); /* Instruction pointer. */
-#endif
+		irregs_setpc(&state->ics_irregs, (__uintptr_t)self->rs_regs[RPC_X86_64_REGISTER_RIP]);
 	/* Mask of modifiable CPU status flags */
 #define LIBRPC_PRIVATE_X86_RPC_REGISTER_FLAGS_MASK \
 	(EFLAGS_CF | EFLAGS_PF | EFLAGS_AF | EFLAGS_ZF | EFLAGS_SF | EFLAGS_OF)
@@ -205,15 +180,7 @@ rpc_register_state64_apply_icpustate(struct rpc_register_state64 *__restrict sel
 		__syscall_ulong_t new_flags;
 		new_flags = (__syscall_ulong_t)self->rs_regs[RPC_X86_64_REGISTER_RFLAGS];
 		new_flags &= LIBRPC_PRIVATE_X86_RPC_REGISTER_FLAGS_MASK;
-#ifdef __KERNEL__
-		irregs_mskflags(&state->ics_irregs, ~LIBRPC_PRIVATE_X86_RPC_REGISTER_FLAGS_MASK, new_flags);
-#elif defined(__x86_64__)
-		state->ics_irregs.ir_rflags &= ~LIBRPC_PRIVATE_X86_RPC_REGISTER_FLAGS_MASK;
-		state->ics_irregs.ir_rflags |= new_flags;
-#else /* __x86_64__ */
-		state->ics_irregs_k.ir_eflags &= ~LIBRPC_PRIVATE_X86_RPC_REGISTER_FLAGS_MASK;
-		state->ics_irregs_k.ir_eflags |= new_flags;
-#endif /* !__x86_64__ */
+		irregs_mskpflags(&state->ics_irregs, ~LIBRPC_PRIVATE_X86_RPC_REGISTER_FLAGS_MASK, new_flags);
 	}
 #undef LIBRPC_PRIVATE_X86_RPC_REGISTER_FLAGS_MASK
 #ifdef __KERNEL__
@@ -227,19 +194,11 @@ rpc_register_state64_apply_icpustate(struct rpc_register_state64 *__restrict sel
 	if (RPC_REGISTER_STATE64_ISVALID(*self, RPC_X86_64_REGISTER_GSBASE))
 		__wrgsbase((void *)(__uintptr_t)self->rs_regs[RPC_X86_64_REGISTER_GSBASE]);
 #endif /* !__KERNEL__ */
-#ifdef __KERNEL__
 	if (RPC_REGISTER_STATE64_ISVALID(*self, RPC_X86_64_REGISTER_CS))
-		irregs_wrcs(&state->ics_irregs, self->rs_regs[RPC_X86_64_REGISTER_CS]);
-#else /* __KERNEL__ */
-	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_CS, state->ics_irregs.ir_cs);
-#endif /* !__KERNEL__ */
+		irregs_setcs(&state->ics_irregs, self->rs_regs[RPC_X86_64_REGISTER_CS]);
 #ifdef __x86_64__
-#ifdef __KERNEL__
 	if (RPC_REGISTER_STATE64_ISVALID(*self, RPC_X86_64_REGISTER_SS))
-		irregs_wrss(&state->ics_irregs, self->rs_regs[RPC_X86_64_REGISTER_SS]);
-#else /* __KERNEL__ */
-	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_SS, state->ics_irregs.ir_ss);
-#endif /* !__KERNEL__ */
+		irregs_setss(&state->ics_irregs, self->rs_regs[RPC_X86_64_REGISTER_SS]);
 #else /* __x86_64__ */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_SS, state->ics_irregs_u.ir_ss);
 #endif /* !__x86_64__ */
@@ -292,47 +251,24 @@ rpc_register_state64_getreg_icpustate(struct icpustate *__restrict state,
 	case RPC_X86_64_REGISTER_R13:    result = state->ics_gpregs.gp_r13; break; /* [P] General purpose register #13 */
 	case RPC_X86_64_REGISTER_R14:    result = state->ics_gpregs.gp_r14; break; /* [P] General purpose register #14 */
 	case RPC_X86_64_REGISTER_R15:    result = state->ics_gpregs.gp_r15; break; /* [P] General purpose register #15 */
-#ifdef __KERNEL__
-	case RPC_X86_64_REGISTER_RSP:    result = irregs_rdsp(&state->ics_irregs); break; /* [P] Stack pointer. */
-	case RPC_X86_64_REGISTER_RIP:    result = irregs_rdip(&state->ics_irregs); break; /* Instruction pointer. */
-	case RPC_X86_64_REGISTER_RFLAGS: result = irregs_rdflags(&state->ics_irregs); break; /* Flags register. */
-	case RPC_X86_64_REGISTER_CS:     result = irregs_rdcs(&state->ics_irregs); break; /* CS segment. */
-	case RPC_X86_64_REGISTER_SS:     result = irregs_rdss(&state->ics_irregs); break; /* SS segment. */
-#else /* __KERNEL__ */
-	case RPC_X86_64_REGISTER_RSP:    result = state->ics_irregs.ir_rsp; break; /* [P] Stack pointer. */
-	case RPC_X86_64_REGISTER_RIP:    result = state->ics_irregs.ir_rip; break; /* Instruction pointer. */
-	case RPC_X86_64_REGISTER_RFLAGS: result = state->ics_irregs.ir_rflags; break; /* Flags register. */
-	case RPC_X86_64_REGISTER_CS:     result = state->ics_irregs.ir_cs; break; /* CS segment. */
-	case RPC_X86_64_REGISTER_SS:     result = state->ics_irregs.ir_ss; break; /* SS segment. */
-#endif /* !__KERNEL__ */
-	case RPC_X86_64_REGISTER_ES:     result = __rdes(); break; /* ES segment. */
-	case RPC_X86_64_REGISTER_DS:     result = __rdds(); break; /* DS segment. */
-	case RPC_X86_64_REGISTER_FS:     result = __rdfs(); break; /* FS segment. */
-	case RPC_X86_64_REGISTER_GS:     result = __rdgs(); break; /* GS segment. */
 #else /* __x86_64__ */
 	case RPC_X86_64_REGISTER_RAX:    result = state->ics_gpregs.gp_eax; break; /* [C] Accumulator. */
 	case RPC_X86_64_REGISTER_RCX:    result = state->ics_gpregs.gp_ecx; break; /* [C] Counter register. */
 	case RPC_X86_64_REGISTER_RDX:    result = state->ics_gpregs.gp_edx; break; /* [C] General purpose d-register. */
 	case RPC_X86_64_REGISTER_RBX:    result = state->ics_gpregs.gp_ebx; break; /* [P] General purpose b-register. */
-	case RPC_X86_64_REGISTER_RSP:    result = state->ics_irregs_u.ir_esp; break; /* [P] Stack pointer. */
 	case RPC_X86_64_REGISTER_RBP:    result = state->ics_gpregs.gp_ebp; break; /* [P] Stack base pointer. */
 	case RPC_X86_64_REGISTER_RSI:    result = state->ics_gpregs.gp_esi; break; /* [P] Source pointer. */
 	case RPC_X86_64_REGISTER_RDI:    result = state->ics_gpregs.gp_edi; break; /* [P] Destination pointer. */
-	case RPC_X86_64_REGISTER_ES:     result = ICPUSTATE_ES(*state); break; /* ES segment. */
-	case RPC_X86_64_REGISTER_SS:     result = state->ics_irregs_u.ir_ss; break; /* SS segment. */
-	case RPC_X86_64_REGISTER_DS:     result = ICPUSTATE_DS(*state); break; /* DS segment. */
-	case RPC_X86_64_REGISTER_FS:     result = ICPUSTATE_FS(*state); break; /* FS segment. */
-	case RPC_X86_64_REGISTER_GS:     result = ICPUSTATE_GS(*state); break; /* GS segment. */
-#ifdef __KERNEL__
-	case RPC_X86_64_REGISTER_CS:     result = irregs_rdcs(&state->ics_irregs_k); break; /* CS segment. */
-	case RPC_X86_64_REGISTER_RIP:    result = irregs_rdip(&state->ics_irregs_k); break; /* Instruction pointer. */
-	case RPC_X86_64_REGISTER_RFLAGS: result = irregs_rdflags(&state->ics_irregs_k); break; /* Flags register. */
-#else /* __KERNEL__ */
-	case RPC_X86_64_REGISTER_CS:     result = state->ics_irregs_k.ir_cs; break; /* CS segment. */
-	case RPC_X86_64_REGISTER_RIP:    result = state->ics_irregs_k.ir_eip; break; /* Instruction pointer. */
-	case RPC_X86_64_REGISTER_RFLAGS: result = state->ics_irregs_k.ir_eflags; break; /* Flags register. */
-#endif /* !__KERNEL__ */
 #endif /* !__x86_64__ */
+	case RPC_X86_64_REGISTER_ES:     result = icpustate_getes(state); break; /* ES segment. */
+	case RPC_X86_64_REGISTER_DS:     result = icpustate_getds(state); break; /* DS segment. */
+	case RPC_X86_64_REGISTER_FS:     result = icpustate_getfs(state); break; /* FS segment. */
+	case RPC_X86_64_REGISTER_GS:     result = icpustate_getgs(state); break; /* GS segment. */
+	case RPC_X86_64_REGISTER_RSP:    result = irregs_getuserpsp(&state->ics_irregs); break; /* [P] Stack pointer. */
+	case RPC_X86_64_REGISTER_RIP:    result = irregs_getpc(&state->ics_irregs); break;     /* Instruction pointer. */
+	case RPC_X86_64_REGISTER_RFLAGS: result = irregs_getpflags(&state->ics_irregs); break;  /* Flags register. */
+	case RPC_X86_64_REGISTER_CS:     result = irregs_getcs(&state->ics_irregs); break;      /* CS segment. */
+	case RPC_X86_64_REGISTER_SS:     result = irregs_getuserss(&state->ics_irregs); break;  /* SS segment. */
 #ifdef __KERNEL__
 	case RPC_X86_64_REGISTER_FSBASE: result = (__uint64_t)get_user_fsbase(); break;
 	case RPC_X86_64_REGISTER_GSBASE: result = (__uint64_t)get_user_gsbase(); break;

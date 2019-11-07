@@ -21,15 +21,19 @@
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
-#include <kos/kernel/cpu-state.h>
-#include <kernel/printk.h>
+
 #include <kernel/debugger.h>
+#include <kernel/debugtrap.h>
+#include <kernel/paging.h>
+#include <kernel/printk.h>
+#include <kernel/types.h>
+
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
+
 #include <signal.h>
 #include <stddef.h>
 #include <string.h>
-#include <kernel/debugtrap.h>
-#include <kernel/paging.h>
-#include <kernel/types.h>
 
 DECL_BEGIN
 
@@ -67,7 +71,7 @@ panic_df_dbg_main(void *cr3) {
 	           "func: " DF_WHITE("%n") "\n"
 	           "addr: " DF_WHITE("%p") "\n"
 	           "]",
-	           FCPUSTATE_PC(dbg_exitstate));
+	           fcpustate_getpc(&dbg_exitstate));
 	dbg_main(0);
 }
 #endif

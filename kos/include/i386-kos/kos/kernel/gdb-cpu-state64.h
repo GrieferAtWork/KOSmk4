@@ -41,6 +41,7 @@ __SYSDECL_BEGIN
 
 #ifdef __x86_64__
 #define GDB_REGISTER_MAXSIZE GDB_REGISTER_X86_64_MAXSIZE
+#define GDB_REGISTER_PC      GDB_REGISTER_X86_64_RIP
 #endif /* __x86_64__ */
 #define GDB_REGISTER_X86_64_MAXSIZE 16 /* Max register size (including extended registers). */
 

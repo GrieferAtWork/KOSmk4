@@ -60,6 +60,12 @@ DECL_BEGIN
 DATDEF byte_t x86_memcpy_nopf_rep_pointer[];
 DATDEF byte_t x86_memcpy_nopf_ret_pointer[];
 
+#ifdef __x86_64__
+#define ir_pip ir_rip
+#else /* __x86_64__ */
+#define ir_pip ir_eip
+#endif /* !__x86_64__ */
+
 INTERN ATTR_DBGTEXT ATTR_RETNONNULL NONNULL((1)) struct icpustate *
 NOTHROW(FCALL x86_debug_cirq_0e)(struct icpustate *__restrict state, uintptr_t ecode) {
 	/* Use a dedicated #PF handler for the debugger, so-as to prevent crashes arising when
@@ -69,8 +75,8 @@ NOTHROW(FCALL x86_debug_cirq_0e)(struct icpustate *__restrict state, uintptr_t e
 	uintptr_t pc;
 	uintptr_t addr;
 	/* Check for memcpy_nopf() */
-	if unlikely(ICPUSTATE_PC(*state) == (uintptr_t)x86_memcpy_nopf_rep_pointer) {
-		ICPUSTATE_PC(*state) = (uintptr_t)x86_memcpy_nopf_ret_pointer;
+	if unlikely(state->ics_irregs.ir_pip == (uintptr_t)x86_memcpy_nopf_rep_pointer) {
+		state->ics_irregs.ir_pip = (uintptr_t)x86_memcpy_nopf_ret_pointer;
 		return state;
 	}
 	addr = __rdcr2();

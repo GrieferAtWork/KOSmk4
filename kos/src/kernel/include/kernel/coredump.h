@@ -49,7 +49,7 @@ struct __siginfo_struct;
  *                            for the purposes of being displayed to a human as part of a traceback
  *                            listing.
  *                            Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] ==
- *                            UCPUSTATE_PC(*curr_ustate)', it can be assumed that the traceback is
+ *                            ucpustate_getpc(curr_ustate)', it can be assumed that the traceback is
  *                            complete and contains all traversed instruction locations. In this case,
  *                            a traceback displayed to a human should not include the text location
  *                            at `traceback_vector[traceback_length-1]', since that location would

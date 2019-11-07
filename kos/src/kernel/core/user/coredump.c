@@ -26,6 +26,9 @@
 #include <kernel/except.h>
 #include <kernel/printk.h>
 
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
+
 #include <assert.h>
 #include <format-printer.h>
 #include <signal.h>
@@ -58,7 +61,7 @@ INTDEF void NOTHROW(KCALL print_exception_desc_of)(struct exception_data const *
  *                            for the purposes of being displayed to a human as part of a traceback
  *                            listing.
  *                            Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] ==
- *                            UCPUSTATE_PC(*curr_ustate)', it can be assumed that the traceback is
+ *                            ucpustate_getpc(curr_ustate)', it can be assumed that the traceback is
  *                            complete and contains all traversed instruction locations. In this case,
  *                            a traceback displayed to a human should not include the text location
  *                            at `traceback_vector[traceback_length-1]', since that location would
@@ -153,19 +156,19 @@ coredump_create(struct ucpustate const *curr_ustate,
 	}
 #define VINFO_FORMAT  "%[vinfo:%p [%Rf:%l,%c:%n]]"
 	if (orig_kstate)
-		printk(KERN_RAW VINFO_FORMAT " orig_kstate\n", KCPUSTATE_PC(*orig_kstate));
+		printk(KERN_RAW VINFO_FORMAT " orig_kstate\n", kcpustate_getpc(orig_kstate));
 	for (i = 0; i < ktraceback_length; ++i) {
 		printk(KERN_RAW VINFO_FORMAT " ktraceback_vector[%Iu]\n",
 		       ktraceback_vector[i], i);
 	}
-	printk(KERN_RAW VINFO_FORMAT " orig_ustate\n", UCPUSTATE_PC(*orig_ustate));
+	printk(KERN_RAW VINFO_FORMAT " orig_ustate\n", ucpustate_getpc(orig_ustate));
 	for (i = 0; i < traceback_length; ++i) {
 		printk(KERN_RAW VINFO_FORMAT " traceback_vector[%Iu]\n",
 		       traceback_vector[i], i);
 	}
-	if (UCPUSTATE_PC(*curr_ustate) != UCPUSTATE_PC(*orig_ustate) &&
-	    (traceback_length == 0 || UCPUSTATE_PC(*curr_ustate) != (uintptr_t)traceback_vector[traceback_length - 1])) {
-		printk(KERN_RAW VINFO_FORMAT " curr_ustate\n", UCPUSTATE_PC(*curr_ustate));
+	if (ucpustate_getpc(curr_ustate) != ucpustate_getpc(orig_ustate) &&
+	    (traceback_length == 0 || ucpustate_getpc(curr_ustate) != (uintptr_t)traceback_vector[traceback_length - 1])) {
+		printk(KERN_RAW VINFO_FORMAT " curr_ustate\n", ucpustate_getpc(curr_ustate));
 	}
 
 	/* Try to trigger a debugger trap (if enabled) */

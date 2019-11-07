@@ -588,8 +588,14 @@ global class GCCToolchain: Toolchain {
 		if (!fs.stat.isreg(testObjectFile)) {
 			local testSourceFile = joinpath(this.config.BUILD_PATH, "testObjectFile.c");
 			if (!fs.stat.isreg(testSourceFile)) {
-				with (local fp = File.open(testSourceFile, "w"))
+				with (local fp = try
+					File.open(testSourceFile, "w")
+				catch (...) ({
+					createDirectoryTree(fs.headof(testSourceFile));
+					File.open(testSourceFile, "w");
+				})) {
 					fp.write("int placeholder = 1;\n");
+				}
 			}
 			local proc = ipc.Process("gcc", { "-c", "-o", testObjectFile, testSourceFile });
 			proc.start();

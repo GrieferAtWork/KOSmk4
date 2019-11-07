@@ -29,12 +29,16 @@ if (gcc_opt.remove("-O3"))
 #include <kernel/compiler.h>
 
 #include <kernel/debugger.h>
+
 #ifndef CONFIG_NO_DEBUGGER
-#include <string.h>
+#include <hybrid/typecore.h>
+
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
+
 #include <ctype.h>
 #include <stdlib.h>
-#include <hybrid/typecore.h>
-#include <kos/kernel/cpu-state.h>
+#include <string.h>
 
 DECL_BEGIN
 
@@ -156,7 +160,7 @@ do_parse_as_hex:
 
 	case '.':
 		/* Current address. */
-		value = FCPUSTATE_PC(dbg_viewstate);
+		value = fcpustate_getpc(&dbg_viewstate);
 		break;
 
 	case '+':

@@ -33,6 +33,7 @@
 #include <hybrid/host.h>
 
 #include <asm/intrin.h>
+#include <kos/kernel/cpu-state-helpers.h>
 
 #include <format-printer.h>
 #include <signal.h>
@@ -67,28 +68,28 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 	unsigned int error;
 	struct ucpustate mystate = *state;
 #ifdef LOG_STACK_REMAINDER
-	uintptr_t last_good_sp = UCPUSTATE_SP(mystate);
+	uintptr_t last_good_sp = ucpustate_getsp(&mystate);
 #endif /* LOG_STACK_REMAINDER */
 	addr2line_printf(printer, arg,
-	                 (uintptr_t)instruction_trypred((void const *)UCPUSTATE_PC(mystate)),
-	                 UCPUSTATE_PC(mystate),
+	                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(&mystate)),
+	                 ucpustate_getpc(&mystate),
 	                 "Caused here [sp=%p]",
-	                 (void *)UCPUSTATE_SP(mystate));
+	                 (void *)ucpustate_getsp(&mystate));
 	for (;;) {
 		struct ucpustate old_state;
 		old_state = mystate;
-		error = unwind((void *)(UCPUSTATE_PC(old_state) - 1),
+		error = unwind((void *)(ucpustate_getpc(&old_state) - 1),
 		               &unwind_getreg_ucpustate, &old_state,
 		               &unwind_setreg_ucpustate, &mystate);
 		if (error != UNWIND_SUCCESS)
 			break;
 		addr2line_printf(printer, arg,
-		                 (uintptr_t)instruction_trypred((void const *)UCPUSTATE_PC(mystate)),
-		                 UCPUSTATE_PC(mystate),
+		                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(&mystate)),
+		                 ucpustate_getpc(&mystate),
 		                 "Called here [sp=%p]",
-		                 (void *)UCPUSTATE_SP(mystate));
+		                 (void *)ucpustate_getsp(&mystate));
 #ifdef LOG_STACK_REMAINDER
-		last_good_sp = UCPUSTATE_SP(mystate);
+		last_good_sp = ucpustate_getsp(&mystate);
 #endif /* LOG_STACK_REMAINDER */
 	}
 	if (error != UNWIND_NO_FRAME)
@@ -160,7 +161,7 @@ panic_assert_dbg_main(void *arg) {
 		dbg_print(DF_DEFCOLOR "\n");
 	}
 	dbg_printf("addr: " DF_SETFGCOLOR(DBG_COLOR_WHITE) "%p" DF_DEFFGCOLOR "\n",
-	           KCPUSTATE_PC(args->aa_state));
+	           kcpustate_getpc(&args->aa_state));
 	dbg_main(0);
 }
 #endif /* !CONFIG_NO_DEBUGGER */
@@ -171,7 +172,7 @@ libc_assertion_failure_core(struct assert_args *__restrict args) {
 	PREEMPTION_DISABLE();
 	printk(KERN_RAW "\n\n\n");
 	printk(KERN_EMERG "Assertion Failure [pc=%p]\n",
-	       KCPUSTATE_PC(args->aa_state));
+	       kcpustate_getpc(&args->aa_state));
 	printk(KERN_RAW "%s(%d) : %s%s%s\n",
 	       args->aa_file, args->aa_line,
 	       args->aa_func ? args->aa_func : "",
@@ -186,7 +187,7 @@ libc_assertion_failure_core(struct assert_args *__restrict args) {
 	}
 	{
 		struct ucpustate temp;
-		KCPUSTATE_TO_UCPUSTATE(temp, args->aa_state);
+		kcpustate_to_ucpustate(&args->aa_state, &temp);
 		kernel_halt_dump_traceback(&kprinter, (void *)KERN_RAW, &temp);
 	}
 	/* Try to trigger a debugger trap (if enabled) */
@@ -224,7 +225,7 @@ panic_assert_chk_print_message(void *arg) {
 		dbg_print(DF_DEFCOLOR "\n");
 	}
 	dbg_printf("addr: " DF_SETFGCOLOR(DBG_COLOR_WHITE) "%p" DF_DEFFGCOLOR "\n",
-	           KCPUSTATE_PC(args->aa_state));
+	           kcpustate_getpc(&args->aa_state));
 }
 
 
@@ -249,7 +250,7 @@ panic_assert_chk_dbg_main(void *arg) {
 	unsigned int i, option;
 	args = (struct assert_args *)arg;
 	for (i = 0; i < COMPILER_LENOF(always_ignored_assertions); ++i) {
-		if (FCPUSTATE_PC(dbg_exitstate) == always_ignored_assertions[i]) {
+		if (fcpustate_getpc(&dbg_exitstate) == always_ignored_assertions[i]) {
 			option = ASSERTION_OPTION_IGNORE;
 			goto handle_retry_or_ignore;
 		}
@@ -267,7 +268,7 @@ panic_assert_chk_dbg_main(void *arg) {
 		for (i = 0; i < COMPILER_LENOF(always_ignored_assertions); ++i) {
 			if (always_ignored_assertions[i])
 				continue;
-			always_ignored_assertions[i] = FCPUSTATE_PC(dbg_exitstate);
+			always_ignored_assertions[i] = fcpustate_getpc(&dbg_exitstate);
 			break;
 		}
 		option = ASSERTION_OPTION_IGNORE;
@@ -296,11 +297,11 @@ handle_retry_or_ignore:
 
 INTERN ATTR_COLDTEXT ATTR_NOINLINE struct kcpustate *FCALL
 libc_assertion_check_core(struct assert_args *__restrict args) {
-	/* TODO: Check if assertion failures at `KCPUSTATE_PC(args->aa_state)' should be ignored. */
+	/* TODO: Check if assertion failures at `kcpustate_getpc(&args->aa_state)' should be ignored. */
 	PREEMPTION_DISABLE();
 	printk(KERN_RAW "\n\n\n");
 	printk(KERN_EMERG "Assertion Failure [pc=%p]\n",
-	       KCPUSTATE_PC(args->aa_state));
+	       kcpustate_getpc(&args->aa_state));
 	printk(KERN_RAW "%s(%d) : %s%s%s\n",
 	       args->aa_file, args->aa_line,
 	       args->aa_func ? args->aa_func : "",
@@ -315,7 +316,7 @@ libc_assertion_check_core(struct assert_args *__restrict args) {
 	}
 	{
 		struct ucpustate temp;
-		KCPUSTATE_TO_UCPUSTATE(temp, args->aa_state);
+		kcpustate_to_ucpustate(&args->aa_state, &temp);
 		kernel_halt_dump_traceback(&kprinter, (void *)KERN_RAW, &temp);
 	}
 	/* Try to trigger a debugger trap (if enabled) */
@@ -335,13 +336,13 @@ libc_assertion_check_core(struct assert_args *__restrict args) {
 PRIVATE ATTR_COLDTEXT void KCALL
 panic_genfail_dbg_main(void *arg) {
 	uintptr_t prev_pc;
-	prev_pc = (uintptr_t)instruction_trypred((void const *)FCPUSTATE_PC(dbg_exitstate));
+	prev_pc = (uintptr_t)instruction_trypred((void const *)fcpustate_getpc(&dbg_exitstate));
 	dbg_printf(DF_SETCOLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON) "%s" DF_DEFCOLOR "%[vinfo:"
 	           "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
 	           "func: " DF_WHITE("%n") "\n]"
 	           "addr: " DF_WHITE("%p") "+" DF_WHITE("%Iu") "\n",
 	           arg, prev_pc, prev_pc,
-	           (size_t)(FCPUSTATE_PC(dbg_exitstate) - prev_pc));
+	           (size_t)(fcpustate_getpc(&dbg_exitstate) - prev_pc));
 	dbg_main(0);
 }
 #endif
@@ -360,8 +361,8 @@ libc_stack_failure_core(struct kcpustate *__restrict state) {
 	struct ucpustate ustate;
 	PREEMPTION_DISABLE();
 	printk(KERN_RAW "\n\n\n");
-	printk(KERN_EMERG "Stack check failure [pc=%p]\n", KCPUSTATE_PC(*state));
-	KCPUSTATE_TO_UCPUSTATE(ustate, *state);
+	printk(KERN_EMERG "Stack check failure [pc=%p]\n", kcpustate_getpc(state));
+	kcpustate_to_ucpustate(state, &ustate);
 	kernel_halt_dump_traceback(&kprinter, (void *)KERN_RAW, &ustate);
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())
@@ -380,8 +381,8 @@ libc_abort_failure_core(struct kcpustate *__restrict state) {
 	struct ucpustate ustate;
 	PREEMPTION_DISABLE();
 	printk(KERN_RAW "\n\n\n");
-	printk(KERN_EMERG "Kernel aborted [pc=%p]\n", KCPUSTATE_PC(*state));
-	KCPUSTATE_TO_UCPUSTATE(ustate, *state);
+	printk(KERN_EMERG "Kernel aborted [pc=%p]\n", kcpustate_getpc(state));
+	kcpustate_to_ucpustate(state, &ustate);
 	kernel_halt_dump_traceback(&kprinter, (void *)KERN_RAW, &ustate);
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())
@@ -405,7 +406,7 @@ PRIVATE ATTR_COLDTEXT void KCALL
 panic_kernel_dbg_main(void *arg) {
 	struct panic_args *args;
 	uintptr_t prev_pc;
-	prev_pc = (uintptr_t)instruction_trypred((void const *)FCPUSTATE_PC(dbg_exitstate));
+	prev_pc = (uintptr_t)instruction_trypred((void const *)fcpustate_getpc(&dbg_exitstate));
 	args    = (struct panic_args *)arg;
 	dbg_printf("Kernel Panic\n"
 	           "%[vinfo:" "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
@@ -420,7 +421,7 @@ panic_kernel_dbg_main(void *arg) {
 		dbg_print(DF_DEFCOLOR "\n");
 	}
 	dbg_printf("addr: " DF_WHITE("%p") "+" DF_WHITE("%Iu") "\n",
-	           prev_pc, (size_t)(FCPUSTATE_PC(dbg_exitstate) - prev_pc));
+	           prev_pc, (size_t)(fcpustate_getpc(&dbg_exitstate) - prev_pc));
 	dbg_main(0);
 }
 #endif /* !CONFIG_NO_DEBUGGER */
@@ -431,7 +432,7 @@ kernel_vpanic_ucpustate(struct ucpustate *__restrict state,
 	PREEMPTION_DISABLE();
 	printk(KERN_RAW "\n\n\n");
 	printk(KERN_EMERG "Kernel Panic [pc=%p]\n",
-	       UCPUSTATE_PC(*state));
+	       ucpustate_getpc(state));
 	if (format) {
 		va_list cargs;
 		va_copy(cargs, args);
@@ -461,7 +462,7 @@ FUNDEF ATTR_NORETURN ATTR_COLD void FCALL
 kernel_vpanic_lcpustate(struct lcpustate *__restrict state,
                         char const *format, va_list args) {
 	struct ucpustate ustate;
-	LCPUSTATE_TO_UCPUSTATE(ustate, *state);
+	lcpustate_to_ucpustate(state, &ustate);
 	kernel_vpanic_ucpustate(&ustate, format, args);
 }
 
@@ -469,7 +470,7 @@ FUNDEF ATTR_NORETURN ATTR_COLD void FCALL
 kernel_vpanic_kcpustate(struct kcpustate *__restrict state,
                         char const *format, va_list args) {
 	struct ucpustate ustate;
-	KCPUSTATE_TO_UCPUSTATE(ustate, *state);
+	kcpustate_to_ucpustate(state, &ustate);
 	kernel_vpanic_ucpustate(&ustate, format, args);
 }
 
@@ -477,7 +478,7 @@ FUNDEF ATTR_NORETURN ATTR_COLD void FCALL
 kernel_vpanic_icpustate(struct icpustate *__restrict state,
                         char const *format, va_list args) {
 	struct ucpustate ustate;
-	ICPUSTATE_TO_UCPUSTATE(ustate, *state);
+	icpustate_to_ucpustate(state, &ustate);
 	kernel_vpanic_ucpustate(&ustate, format, args);
 }
 
@@ -485,7 +486,7 @@ FUNDEF ATTR_NORETURN ATTR_COLD void FCALL
 kernel_vpanic_scpustate(struct scpustate *__restrict state,
                         char const *format, va_list args) {
 	struct ucpustate ustate;
-	SCPUSTATE_TO_UCPUSTATE(ustate, *state);
+	scpustate_to_ucpustate(state, &ustate);
 	kernel_vpanic_ucpustate(&ustate, format, args);
 }
 

@@ -24,11 +24,11 @@
 #include <kernel/compiler.h>
 
 #include <kernel/cpuid.h>
+#include <kernel/debugtrap.h>
 #include <kernel/except.h>
+#include <kernel/fpu.h>
 #include <kernel/gdt.h>
 #include <kernel/paging.h>
-#include <kernel/debugtrap.h>
-#include <kernel/fpu.h>
 #include <kernel/printk.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
@@ -46,11 +46,12 @@
 #include <asm/intrin-arith.h>
 #include <asm/intrin.h>
 #include <asm/registers.h>
+#include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <signal.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <signal.h>
 
 #include <libinstrlen/instrlen.h>
 
@@ -192,7 +193,7 @@ x86_cirq_06(struct icpustate *__restrict state) {
 	u32 opcode;
 	op_flag_t op_flags;
 	struct modrm mod;
-	pc = (byte_t *)ICPUSTATE_PC(*state);
+	pc = (byte_t *)icpustate_getpc(state);
 	COMPILER_READ_BARRIER();
 	/* Re-enable interrupts if they were enabled before. */
 	if (IRREGS(state).ir_Xflags & EFLAGS_IF)

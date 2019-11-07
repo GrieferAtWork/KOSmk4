@@ -32,6 +32,9 @@
 #include <kernel/printk.h>
 #include <kernel/types.h>
 
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
+
 /**/
 #include <kernel/debugtrap.h> /* TODO: Remove me; `kernel_debugtrap()' should be called by _start32.S */
 #include <kos/debugtrap.h>    /* TODO: Remove me; `kernel_debugtrap()' should be called by _start32.S */
@@ -432,15 +435,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * executing /bin/init (or whatever was passed as `init=...') */
 	state = kernel_initialize_exec_init(state);
 
-#ifdef __x86_64__
 	printk(FREESTR(KERN_INFO "Initial jump to user-space [pc=%p] [sp=%p]\n"),
-	       state->ics_irregs.ir_rip,
-	       state->ics_irregs.ir_rsp);
-#else /* __x86_64__ */
-	printk(FREESTR(KERN_INFO "Initial jump to user-space [pc=%p] [sp=%p]\n"),
-	       state->ics_irregs_u.ir_eip,
-	       state->ics_irregs_u.ir_esp);
-#endif /* !__x86_64__ */
+	       icpustate_getpc(state),
+	       icpustate_getsp(state));
 
 	return state;
 }

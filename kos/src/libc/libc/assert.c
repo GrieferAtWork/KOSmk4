@@ -37,6 +37,7 @@
 #include <unistd.h>
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/cpu-state-helpers.h>
 
 #include "assert.h"
 
@@ -49,7 +50,7 @@ PRIVATE void LIBCCALL trap(struct kcpustate *__restrict state,
                            syscall_ulong_t trapno) {
 	struct ucpustate ustate;
 	struct debugtrap_reason r;
-	KCPUSTATE_TO_UCPUSTATE(ustate, *state);
+	kcpustate_to_ucpustate(state, &ustate);
 	r.dtr_signo  = SIGABRT;
 	r.dtr_reason = DEBUGTRAP_REASON_NONE;
 	sys_debugtrap(&ustate, &r);
@@ -59,14 +60,14 @@ PRIVATE void LIBCCALL trap(struct kcpustate *__restrict state,
 INTERN ATTR_SECTION(".text.crt.assert.__stack_chk_fail") ATTR_NORETURN void __FCALL
 libc_stack_failure_core(struct kcpustate *__restrict state) {
 	syslog(LOG_ERR, "User-space stack check failure [pc=%p]\n",
-	       KCPUSTATE_PC(*state));
+	       kcpustate_getpc(state));
 	trap(state, SIGABRT);
 	_Exit(EXIT_FAILURE);
 }
 
 INTERN ATTR_SECTION(".text.crt.assert.abort") ATTR_NORETURN void __FCALL
 libc_abort_failure_core(struct kcpustate *__restrict state) {
-	syslog(LOG_ERR, "abort() called [pc=%p]\n", KCPUSTATE_PC(*state));
+	syslog(LOG_ERR, "abort() called [pc=%p]\n", kcpustate_getpc(state));
 	trap(state, SIGABRT);
 	_Exit(EXIT_FAILURE);
 }
@@ -76,7 +77,7 @@ INTERN ATTR_SECTION(".text.crt.assert.assert")
 ATTR_NOINLINE ATTR_NORETURN void LIBCCALL
 libc_assertion_failure_core(struct assert_args *__restrict args) {
 	syslog(LOG_ERR, "Assertion Failure [pc=%p]\n",
-	       KCPUSTATE_PC(args->aa_state));
+	       kcpustate_getpc(&args->aa_state));
 	syslog(LOG_ERR, "%s(%d) : %s%s%s\n",
 	       args->aa_file, args->aa_line,
 	       args->aa_func ? args->aa_func : "",

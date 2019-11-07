@@ -225,7 +225,7 @@ function normalizePath(path: string, expand_symlinks: bool = true): string {
 final local _createdDirectoriesCache: {string...} = HashSet();
 
 @@Create a full tree of directories. (For build artifacts)
-final local function createDirectoryTree(path: string) {
+final global function createDirectoryTree(path: string) {
 	path = path.rstrip("/");
 	if (path in _createdDirectoriesCache)
 		return;

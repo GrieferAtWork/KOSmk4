@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7af21087 */
+/* HASH CRC-32:0x325ae20a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -9794,7 +9794,7 @@ END(__asm64_syscall_raiseat)
  *                           travered when the stack was walked from `orig_state' to `curr_state'
  *                           Note that earlier entires within this vector are further up the call-stack, with
  *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
- *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == UCPUSTATE_PC(*curr_state)',
+ *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
  *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
  *                           In this case, a traceback displayed to a human should not include the text location at
  *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
@@ -18665,7 +18665,7 @@ END(__asm32_int80_raiseat)
  *                           travered when the stack was walked from `orig_state' to `curr_state'
  *                           Note that earlier entires within this vector are further up the call-stack, with
  *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
- *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == UCPUSTATE_PC(*curr_state)',
+ *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
  *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
  *                           In this case, a traceback displayed to a human should not include the text location at
  *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
@@ -24542,7 +24542,7 @@ END(__asm32_sysenter_raiseat)
  *                           travered when the stack was walked from `orig_state' to `curr_state'
  *                           Note that earlier entires within this vector are further up the call-stack, with
  *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
- *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == UCPUSTATE_PC(*curr_state)',
+ *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
  *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
  *                           In this case, a traceback displayed to a human should not include the text location at
  *                           `traceback_vector[traceback_length-1]', since that location would also be printed when

@@ -32,9 +32,9 @@
 DECL_BEGIN
 
 /* To differentiate between hints and allocated, but non-present pages, we use this:
-*                                                        PAE_PAGE_FPREPARED
+ *                                                       PAE_PAGE_FPREPARED
  *                                                       |
-  *                                                      |         PAE_PAGE_FISAHINT
+ *                                                       |         PAE_PAGE_FISAHINT
  *                                                       |         |
  *                                                       |         |PAE_PAGE_FPRESENT
  *                                                       |         ||
@@ -121,8 +121,8 @@ DECL_BEGIN
 
 /* Return the in-page offset of a regular pointer mapping,
  * or one that has been mapped within a 2MiB page. */
-#define PAE_PDIR_PAGEINDEX_4KIB(ptr) (__CCAST(unsigned int)(__CCAST(vm_virt_t)(ptr) & 0xfff))
-#define PAE_PDIR_PAGEINDEX_2MIB(ptr) (__CCAST(unsigned int)(__CCAST(vm_virt_t)(ptr) & 0x1fffff))
+#define PAE_PDIR_PAGEINDEX_4KIB(ptr) (__CCAST(u64)(__CCAST(vm_virt_t)(ptr) & 0xfff))
+#define PAE_PDIR_PAGEINDEX_2MIB(ptr) (__CCAST(u64)(__CCAST(vm_virt_t)(ptr) & 0x1fffff))
 
 #define PAE_PDIR_ALIGN  4096 /* Alignment required for instances of `struct pae_pdir' */
 #define PAE_PDIR_SIZE   32   /* The total size of `struct pae_pdir' in bytes. */
@@ -134,9 +134,6 @@ union pae_pdir_e1 {
 	/* TIER#1 page-directory entry:
 	 *   - PAE Page-Table Entry that Maps a 4-KByte Page */
 	u64                      p_word;     /* Mapping data. */
-	PHYS u64                 p_addr;     /* [MASK(PAE_PAGE_FADDR_4KIB)]
-	                                      * [valid_if(PAE_PDIR_E1_IS1KIB(p_word))]
-	                                      * _Physical_ page address. */
 #define PAE_PDIR_E1_IS1KIB(e1_word)    ((e1_word) & PAE_PAGE_FPRESENT)
 #define PAE_PDIR_E1_ISHINT(e1_word)    (((e1_word) & (PAE_PAGE_FPRESENT | PAE_PAGE_FISAHINT)) == PAE_PAGE_FISAHINT)
 #define PAE_PDIR_E1_ISUNUSED(e1_word)  (((e1_word) & (PAE_PAGE_FPRESENT | PAE_PAGE_FISAHINT)) == 0)
@@ -166,8 +163,7 @@ union pae_pdir_e2 {
 #define PAE_PDIR_E2_IS4MIB(e2_word)       (((e2_word) & (PAE_PAGE_FPRESENT | PAE_PAGE_F2MIB)) == (PAE_PAGE_FPRESENT | PAE_PAGE_F2MIB))
 #define PAE_PDIR_E2_ISUNUSED(e2_word)     ((e2_word) == PAE_PAGE_ABSENT)
 	PHYS union pae_pdir_e1 (*p_e1)[512]; /* [MASK(PAE_PAGE_FVECTOR)]
-	                                      * [owned_if(PAE_PDIR_E2_ISVEC1_OWNED(p_word))]
-	                                      * [valid_if(PAE_PDIR_E2_ISVEC1(p_word))]
+	                                      * [owned][valid_if(PAE_PDIR_E2_ISVEC1(p_word))]
 	                                      * _Physical_ pointer to a level #1 paging vector. */
 	struct ATTR_PACKED {
 		u64          v_present : 1;      /* PAE_PAGE_FPRESENT */

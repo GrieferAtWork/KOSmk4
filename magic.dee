@@ -415,6 +415,15 @@ _err_unknown_argument:
 				{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
 			));
 		toolchain.provideStdlibCache(
+			("c", ("-fstack-protector-strong", )), (
+				{	"binutils/x86_64-kos/lib/gcc/x86_64-kos/9.1.0",
+					"binutils/x86_64-kos/x86_64-kos/lib",
+					"binutils/x86_64-kos/lib",
+					"bin/" + TARGET_NAME + "/lib" },
+				{ "ssp_nonshared", "ssp", "gcc", "c", "dl" },
+				{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
+			));
+		toolchain.provideStdlibCache(
 			("c", ()), (
 				{	"binutils/x86_64-kos/lib/gcc/x86_64-kos/9.1.0",
 					"binutils/x86_64-kos/x86_64-kos/lib",

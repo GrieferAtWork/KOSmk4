@@ -216,15 +216,13 @@ sys_do_debugtrap32_impl(struct icpustate *__restrict return_state,
 		cs     = ustate->ucs_cs16;
 		eflags = ustate->ucs_eflags;
 		COMPILER_READ_BARRIER();
-		if unlikely((irregs_rdflags(&return_state->ics_irregs) & ~eflags_mask) !=
+		if unlikely((icpustate_getpflags(return_state) & ~eflags_mask) !=
 		            (eflags & ~eflags_mask))
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 			      X86_REGISTER_MISC_EFLAGS, eflags);
 #ifndef __x86_64__
-		if (irregs_isvm86(&return_state->ics_irregs)) {
-			irregs_wrcs(&return_state->ics_irregs, cs);
-			return_state->ics_irregs_v.ir_ss = ss;
+		if (icpustate_isvm86(return_state)) {
 			return_state->ics_irregs_v.ir_es = es;
 			return_state->ics_irregs_v.ir_ds = ds;
 			return_state->ics_irregs_v.ir_fs = fs;
@@ -262,46 +260,27 @@ sys_do_debugtrap32_impl(struct icpustate *__restrict return_state,
 			__wrfs(fs);
 			__wres(es);
 			__wrds(ds);
-			irregs_wrcs(&return_state->ics_irregs, cs);
-			irregs_wrss(&return_state->ics_irregs, ss);
 #else /* __x86_64__ */
 			return_state->ics_fs = fs;
 			return_state->ics_es = es;
 			return_state->ics_ds = ds;
-			irregs_wrcs(&return_state->ics_irregs, cs);
-			return_state->ics_irregs_u.ir_ss = ss;
 #endif /* !__x86_64__ */
 		}
-#ifdef __x86_64__
-		return_state->ics_gpregs.gp_rdi = ustate->ucs_gpregs.gp_edi;
-		return_state->ics_gpregs.gp_rsi = ustate->ucs_gpregs.gp_esi;
-		return_state->ics_gpregs.gp_rbp = ustate->ucs_gpregs.gp_ebp;
-		return_state->ics_gpregs.gp_rbx = ustate->ucs_gpregs.gp_ebx;
-		return_state->ics_gpregs.gp_rdx = ustate->ucs_gpregs.gp_edx;
-		return_state->ics_gpregs.gp_rcx = ustate->ucs_gpregs.gp_ecx;
-		return_state->ics_gpregs.gp_rax = ustate->ucs_gpregs.gp_eax;
-		irregs_wrflags(&return_state->ics_irregs, eflags);
-		irregs_wrip(&return_state->ics_irregs, ustate->ucs_eip);
-		irregs_wrsp(&return_state->ics_irregs, ustate->ucs_gpregs.gp_esp);
-#else /* __x86_64__ */
-		return_state->ics_gpregs.gp_edi = ustate->ucs_gpregs.gp_edi;
-		return_state->ics_gpregs.gp_esi = ustate->ucs_gpregs.gp_esi;
-		return_state->ics_gpregs.gp_ebp = ustate->ucs_gpregs.gp_ebp;
-		return_state->ics_gpregs.gp_ebx = ustate->ucs_gpregs.gp_ebx;
-		return_state->ics_gpregs.gp_edx = ustate->ucs_gpregs.gp_edx;
-		return_state->ics_gpregs.gp_ecx = ustate->ucs_gpregs.gp_ecx;
-		return_state->ics_gpregs.gp_eax = ustate->ucs_gpregs.gp_eax;
-		irregs_wrflags(&return_state->ics_irregs_k, eflags);
-		irregs_wrip(&return_state->ics_irregs_k, ustate->ucs_eip);
-		return_state->ics_irregs_u.ir_esp = ustate->ucs_gpregs.gp_esp;
-#endif /* !__x86_64__ */
+		icpustate_setcs(return_state, cs);
+		icpustate_setuserss(return_state, ss);
+		gpregs_setpdi(&return_state->ics_gpregs, ustate->ucs_gpregs.gp_edi);
+		gpregs_setpsi(&return_state->ics_gpregs, ustate->ucs_gpregs.gp_esi);
+		gpregs_setpbp(&return_state->ics_gpregs, ustate->ucs_gpregs.gp_ebp);
+		gpregs_setpbx(&return_state->ics_gpregs, ustate->ucs_gpregs.gp_ebx);
+		gpregs_setpdx(&return_state->ics_gpregs, ustate->ucs_gpregs.gp_edx);
+		gpregs_setpcx(&return_state->ics_gpregs, ustate->ucs_gpregs.gp_ecx);
+		gpregs_setpax(&return_state->ics_gpregs, ustate->ucs_gpregs.gp_eax);
+		icpustate_setpflags(return_state, eflags);
+		icpustate_setpc(return_state, ustate->ucs_eip);
+		icpustate_setuserpsp(return_state, ustate->ucs_gpregs.gp_esp);
 	} else {
 		/* Return EOK to indicate that the trap got triggered */
-#ifdef __x86_64__
-		return_state->ics_gpregs.gp_rax = (u32)-EOK;
-#else /* __x86_64__ */
-		return_state->ics_gpregs.gp_eax = (u32)-EOK;
-#endif /* !__x86_64__ */
+		gpregs_setpax(&return_state->ics_gpregs, (uintptr_t)-EOK);
 	}
 	/* Trigger the trap. */
 	return kernel_debugtrap_r_icpustate(return_state, reason);
@@ -314,11 +293,7 @@ sys_debugtrap32_impl(struct icpustate *__restrict return_state,
 	struct debugtrap_reason reason;
 	if (!kernel_debugtrap_enabled()) {
 		/* Debug traps are disabled. */
-#ifdef __x86_64__
-		return_state->ics_gpregs.gp_rax = (u32)-ENOENT;
-#else /* __x86_64__ */
-		return_state->ics_gpregs.gp_eax = (u32)-ENOENT;
-#endif /* !__x86_64__ */
+		gpregs_setpax(&return_state->ics_gpregs, (uintptr_t)-ENOENT);
 		return return_state;
 	}
 	if (ureason) {

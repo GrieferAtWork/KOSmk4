@@ -34,16 +34,17 @@ if (gcc_opt.remove("-O3"))
 
 #include <hybrid/overflow.h>
 
+#include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
-
-#include <libdebuginfo/debug_info.h>
-#include <libunwind/cfi.h>
-#include <libunwind/unwind.h>
 
 #include <alloca.h>
 #include <format-printer.h>
 #include <stddef.h>
 #include <string.h>
+
+#include <libdebuginfo/debug_info.h>
+#include <libunwind/cfi.h>
+#include <libunwind/unwind.h>
 
 DECL_BEGIN
 
@@ -254,7 +255,7 @@ DEFINE_DEBUG_FUNCTION(
 		, argc, argv) {
 	/* Enumerate location variables. */
 	debuginfo_enum_locals(&kernel_enum_locals_sections,
-	                      FCPUSTATE_PC(dbg_viewstate),
+	                      fcpustate_getpc(&dbg_viewstate),
 	                      &print_local,
 	                      NULL);
 	return 0;
@@ -289,11 +290,11 @@ DEFINE_DEBUG_FUNCTION(
 	size_t maxlen = 0;
 	/* Enumerate location variables. */
 	debuginfo_enum_locals(&kernel_enum_locals_sections,
-	                      FCPUSTATE_PC(dbg_viewstate),
+	                      fcpustate_getpc(&dbg_viewstate),
 	                      &locals_maxlen,
 	                      &maxlen);
 	debuginfo_enum_locals(&kernel_enum_locals_sections,
-	                      FCPUSTATE_PC(dbg_viewstate),
+	                      fcpustate_getpc(&dbg_viewstate),
 	                      &print_local,
 	                      &maxlen);
 	return 0;

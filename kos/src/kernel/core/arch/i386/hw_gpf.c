@@ -37,6 +37,7 @@
 #include <asm/cpu-msr.h>
 #include <asm/intrin.h>
 #include <asm/registers.h>
+#include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/paging.h>
 
@@ -86,7 +87,7 @@ PRIVATE struct icpustate *FCALL
 x86_handle_gpf(struct icpustate *__restrict state, uintptr_t ecode, bool is_ss) {
 	byte_t *pc; u32 opcode; op_flag_t flags; struct modrm mod;
 	u16 effective_segment_value; unsigned int i;
-	pc = (byte_t *)ICPUSTATE_PC(*state);
+	pc = (byte_t *)icpustate_getpc(state);
 	COMPILER_READ_BARRIER();
 	/* Re-enable interrupts if they were enabled before. */
 	if (state->ics_irregs.ir_Xflags & EFLAGS_IF)
@@ -758,7 +759,7 @@ done_noncanon_check:
 		case 0x8c:
 			/* MOV r/m16,Sreg** */
 			MOD_DECODE();
-			if (mod.mi_reg > 5) {
+			if (mod.mi_reg >= 6) {
 				/* Non-existent segment register */
 				PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 				PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)opcode);

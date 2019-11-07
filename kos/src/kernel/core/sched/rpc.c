@@ -470,7 +470,7 @@ user_rpc_callback(void *arg, struct icpustate *__restrict state,
 				}
 				i = 0;
 				reader = (byte_t *)data->rpc_program;
-				RPC_REGISTER_STATE_INIT_ICPUSTATE(program_state, *state);
+				RPC_REGISTER_STATE_INIT_ICPUSTATE(program_state, state);
 next_opcode:
 				opcode = ATOMIC_READ(*reader);
 				++reader;

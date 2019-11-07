@@ -243,7 +243,7 @@ NOTHROW(KCALL pagedir_set)(PHYS pagedir_t *__restrict value) {
  * intent is to also sync all of kernel-space, `pagedir_syncall()'
  * must be used instead. */
 FORCELOCAL NOBLOCK void NOTHROW(FCALL pagedir_syncall_user)(void) {
-	__register uintptr_t temp;
+	__register u32 temp;
 	__asm__("movl %%cr3, %0\n\t"
 	        "movl %0, %%cr3"
 	        : "=&r" (temp));

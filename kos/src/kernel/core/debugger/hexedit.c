@@ -36,6 +36,7 @@ if (gcc_opt.remove("-O3"))
 
 #include <hybrid/align.h>
 
+#include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/keyboard.h>
 
@@ -801,7 +802,7 @@ DEFINE_DEBUG_FUNCTION(
 		"h [ADDR=pc]\n"
 		"\tOpen an interactive hex editor at ADDR\n",
 		argc, argv) {
-	void *addr = (void *)FCPUSTATE_PC(dbg_viewstate);
+	void *addr = (void *)fcpustate_getpc(&dbg_viewstate);
 	if (argc >= 2) {
 		if (!dbg_evaladdr(argv[1], (uintptr_t *)&addr))
 			return DBG_FUNCTION_INVALID_ARGUMENTS;

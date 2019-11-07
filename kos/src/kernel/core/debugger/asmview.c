@@ -50,6 +50,7 @@ if (gcc_opt.remove("-O3"))
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
 
+#include <kos/kernel/cpu-state-helpers.h>
 #include <kos/keyboard.h>
 
 #include <alloca.h>
@@ -699,7 +700,7 @@ DEFINE_DEBUG_FUNCTION(
 		"a [ADDR=pc]\n"
 		"\tOpen an interactive assembly view at ADDR\n",
 		argc, argv) {
-	void *addr = (void *)FCPUSTATE_PC(dbg_viewstate);
+	void *addr = (void *)fcpustate_getpc(&dbg_viewstate);
 	if (argc >= 2) {
 		if (!dbg_evaladdr(argv[1], (uintptr_t *)&addr))
 			return DBG_FUNCTION_INVALID_ARGUMENTS;

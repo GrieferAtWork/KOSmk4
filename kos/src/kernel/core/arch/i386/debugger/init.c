@@ -47,6 +47,7 @@ if (gcc_opt.remove("-O3"))
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/gdt.h>
 
 #include <assert.h>
@@ -74,7 +75,7 @@ NOTHROW(KCALL dbg_impersonate_thread)(struct task *__restrict thread) {
 	if (thread == THIS_TASK)
 		return;
 #ifdef __x86_64__
-	__wrgsbase((uintptr_t)thread);
+	__wrgsbase(thread);
 #else /* __x86_64__ */
 	segment_wrbaseX(&x86_debug_gdt[SEGMENT_INDEX(SEGMENT_KERNEL_FSBASE)],
 	                (uintptr_t)thread);
@@ -89,35 +90,7 @@ NOTHROW(KCALL dbg_impersonate_thread)(struct task *__restrict thread) {
 	} else {
 		struct scpustate *state;
 		state = thread->t_sched.s_state;
-#ifdef __x86_64__
-		/* TODO */
-#else /* __x86_64__ */
-		dbg_viewstate.fcs_gpregs        = state->scs_gpregs;
-		dbg_viewstate.fcs_eip           = state->scs_irregs_k.ir_eip;
-		dbg_viewstate.fcs_eflags        = state->scs_irregs_k.ir_eflags;
-		dbg_viewstate.fcs_sgregs.sg_cs  = state->scs_irregs_k.ir_cs16;
-		dbg_viewstate.fcs_coregs.co_cr3 = (u32)thread->t_vm->v_pdir_phys_ptr;
-		if (SCPUSTATE_ISVM86(*state)) {
-			dbg_viewstate.fcs_gpregs.gp_esp = state->scs_irregs_v.ir_esp;
-			dbg_viewstate.fcs_sgregs.sg_ss  = state->scs_irregs_v.ir_ss16;
-			dbg_viewstate.fcs_sgregs.sg_ds  = state->scs_irregs_v.ir_ds16;
-			dbg_viewstate.fcs_sgregs.sg_es  = state->scs_irregs_v.ir_es16;
-			dbg_viewstate.fcs_sgregs.sg_fs  = state->scs_irregs_v.ir_fs16;
-			dbg_viewstate.fcs_sgregs.sg_gs  = state->scs_irregs_v.ir_gs16;
-		} else {
-			dbg_viewstate.fcs_sgregs.sg_ds = state->scs_sgregs.sg_ds16;
-			dbg_viewstate.fcs_sgregs.sg_es = state->scs_sgregs.sg_es16;
-			dbg_viewstate.fcs_sgregs.sg_fs = state->scs_sgregs.sg_fs16;
-			dbg_viewstate.fcs_sgregs.sg_gs = state->scs_sgregs.sg_gs16;
-			if (state->scs_irregs_k.ir_cs & 3) {
-				dbg_viewstate.fcs_sgregs.sg_ss  = SCPUSTATE_USER_SS16(*state);
-				dbg_viewstate.fcs_gpregs.gp_esp = SCPUSTATE_USER_ESP(*state);
-			} else {
-				dbg_viewstate.fcs_sgregs.sg_ss  = SCPUSTATE_KERNEL_SS(*state);
-				dbg_viewstate.fcs_gpregs.gp_esp = SCPUSTATE_KERNEL_ESP(*state);
-			}
-		}
-#endif /* !__x86_64__ */
+		fcpustate_assign_scpustate(&dbg_viewstate, state);
 		memcpy(&dbg_origstate, &dbg_viewstate, sizeof(struct fcpustate));
 	}
 }

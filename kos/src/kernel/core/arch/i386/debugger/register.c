@@ -35,6 +35,7 @@ if (gcc_opt.remove("-O3"))
 #include <asm/cpu-flags.h>
 #include <sched/task.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/gdt.h>
 
 DECL_BEGIN
@@ -139,7 +140,7 @@ PUBLIC void NOTHROW(FCALL dbg_applyreg)(void) {
 		/* TODO */
 #else /* __x86_64__ */
 		if (dbg_viewstate.fcs_eflags & EFLAGS_VM) {
-			state = (struct scpustate *)((byte_t *)me->t_sched.s_state + SCPUSTATE_SIZEOF(*state));
+			state = (struct scpustate *)((byte_t *)me->t_sched.s_state + scpustate_sizeof(state));
 			state = (struct scpustate *)((byte_t *)state - (OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_VM86));
 			state->scs_sgregs.sg_ds   = SEGMENT_USER_DATA_RPL;
 			state->scs_sgregs.sg_es   = SEGMENT_USER_DATA_RPL;
@@ -152,7 +153,7 @@ PUBLIC void NOTHROW(FCALL dbg_applyreg)(void) {
 			goto set_user_specific_registers;
 		} else {
 			if (dbg_viewstate.fcs_sgregs.sg_cs & 3) {
-				state = (struct scpustate *)((byte_t *)me->t_sched.s_state + SCPUSTATE_SIZEOF(*state));
+				state = (struct scpustate *)((byte_t *)me->t_sched.s_state + scpustate_sizeof(state));
 				state = (struct scpustate *)((byte_t *)state - (OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_USER));
 				state->scs_sgregs.sg_ds = dbg_viewstate.fcs_sgregs.sg_ds16;
 				state->scs_sgregs.sg_es = dbg_viewstate.fcs_sgregs.sg_es16;

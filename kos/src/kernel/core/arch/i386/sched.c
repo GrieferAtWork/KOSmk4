@@ -42,6 +42,8 @@
 #include <asm/cpu-flags.h>
 #include <kos/compat/linux-ldt.h>
 #include <kos/except-inval.h>
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
 #include <sys/io.h>
 
 #include <assert.h>
@@ -361,7 +363,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
 	result = (struct scpustate *)dest;
 	/* Fill in the new state to generate a redirection towards the RPC wrapper. */
 	result->scs_gpregs.gp_ebp   = (uintptr_t)istate;
-	result->scs_gpregs.gp_ebx   = ICPUSTATE_ISUSER_OR_VM86(*istate)
+	result->scs_gpregs.gp_ebx   = irregs_isuser(&istate->ics_irregs)
 	                              ? TASK_RPC_REASON_ASYNCUSER
 	                              : TASK_RPC_REASON_ASYNC;
 	result->scs_gpregs.gp_edx   = (uintptr_t)istate;
@@ -413,7 +415,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
 	result = (struct scpustate *)dest;
 	/* Fill in the new state to generate a redirection towards the RPC wrapper. */
 	result->scs_gpregs.gp_ebp = (uintptr_t)istate;
-	result->scs_gpregs.gp_ebx = ICPUSTATE_ISUSER_OR_VM86(*istate)
+	result->scs_gpregs.gp_ebx = irregs_isuser(&istate->ics_irregs)
 	                            ? TASK_RPC_REASON_ASYNCUSER
 	                            : TASK_RPC_REASON_ASYNC;
 	result->scs_gpregs.gp_edx = (uintptr_t)istate;
@@ -598,7 +600,7 @@ NOTHROW(KCALL x86_rpc_user_redirection_personality)(struct unwind_fde_struct *__
                                                     byte_t *__restrict UNUSED(reader)) {
 	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
 	 * frame just as it is, with no modifications made to the register state. */
-	if (KCPUSTATE_PC(*state) == (uintptr_t)&x86_rpc_user_redirection)
+	if (kcpustate_getpc(state) == (uintptr_t)&x86_rpc_user_redirection)
 		return DWARF_PERSO_EXECUTE_HANDLER_NOW;
 	return DWARF_PERSO_CONTINUE_UNWIND;
 }
@@ -609,8 +611,8 @@ NOTHROW(KCALL x86_rpc_kernel_redirection_personality)(struct unwind_fde_struct *
                                                       byte_t *__restrict UNUSED(reader)) {
 	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
 	 * frame just as it is, with no modifications made to the register state. */
-	if (KCPUSTATE_PC(*state) == (uintptr_t)&x86_rpc_kernel_redirection) {
-		KCPUSTATE_PC(*state) = (uintptr_t)&x86_rpc_kernel_redirection_handler;
+	if (kcpustate_getpc(state) == (uintptr_t)&x86_rpc_kernel_redirection) {
+		kcpustate_setpc(state, (uintptr_t)&x86_rpc_kernel_redirection_handler);
 		return DWARF_PERSO_EXECUTE_HANDLER_NOW;
 	}
 	return DWARF_PERSO_CONTINUE_UNWIND;
@@ -622,8 +624,8 @@ NOTHROW(KCALL x86_rpc_kernel_redirection_c_personality)(struct unwind_fde_struct
                                                         byte_t *__restrict UNUSED(reader)) {
 	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
 	 * frame just as it is, with no modifications made to the register state. */
-	if (KCPUSTATE_PC(*state) == (uintptr_t)&x86_rpc_kernel_redirection_c) {
-		KCPUSTATE_PC(*state) = (uintptr_t)&x86_rpc_kernel_redirection_c_handler;
+	if (kcpustate_getpc(state) == (uintptr_t)&x86_rpc_kernel_redirection_c) {
+		kcpustate_setpc(state, (uintptr_t)&x86_rpc_kernel_redirection_c_handler);
 		return DWARF_PERSO_EXECUTE_HANDLER_NOW;
 	}
 	return DWARF_PERSO_CONTINUE_UNWIND;
@@ -635,8 +637,8 @@ NOTHROW(KCALL x86_srpc_kernel_redirection_personality)(struct unwind_fde_struct 
                                                        byte_t *__restrict UNUSED(reader)) {
 	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
 	 * frame just as it is, with no modifications made to the register state. */
-	if (KCPUSTATE_PC(*state) == (uintptr_t)&x86_srpc_kernel_redirection) {
-		KCPUSTATE_PC(*state) = (uintptr_t)&x86_srpc_kernel_redirection_handler;
+	if (kcpustate_getpc(state) == (uintptr_t)&x86_srpc_kernel_redirection) {
+		kcpustate_setpc(state, (uintptr_t)&x86_srpc_kernel_redirection_handler);
 		return DWARF_PERSO_EXECUTE_HANDLER_NOW;
 	}
 	return DWARF_PERSO_CONTINUE_UNWIND;
@@ -648,8 +650,8 @@ NOTHROW(KCALL x86_srpc_kernel_redirection_c_personality)(struct unwind_fde_struc
                                                          byte_t *__restrict UNUSED(reader)) {
 	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
 	 * frame just as it is, with no modifications made to the register state. */
-	if (KCPUSTATE_PC(*state) == (uintptr_t)&x86_srpc_kernel_redirection_c) {
-		KCPUSTATE_PC(*state) = (uintptr_t)&x86_srpc_kernel_redirection_c_handler;
+	if (kcpustate_getpc(state) == (uintptr_t)&x86_srpc_kernel_redirection_c) {
+		kcpustate_setpc(state, (uintptr_t)&x86_srpc_kernel_redirection_c_handler);
 		return DWARF_PERSO_EXECUTE_HANDLER_NOW;
 	}
 	return DWARF_PERSO_CONTINUE_UNWIND;

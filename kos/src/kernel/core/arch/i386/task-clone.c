@@ -107,7 +107,7 @@ kernel_debugtrap_fork_thread_entry(void *UNUSED(arg),
 
 
 INTERN pid_t KCALL
-x86_task_clone(struct ucpustate const *__restrict init_state,
+x86_task_clone(struct icpustate const *__restrict init_state,
                uintptr_t clone_flags,
                USER UNCHECKED pid_t *parent_tidptr,
 #ifndef __x86_64__
@@ -216,51 +216,28 @@ again_lock_vm:
 		RETHROW();
 	}
 
-	/* Initial the task's initial CPU state. */
 	{
 		struct scpustate *state;
+		void *kernel_stack;
+		/* Initial the task's initial CPU state. */
+		kernel_stack = (void *)VM_NODE_ENDADDR(&FORTASK(result, _this_kernel_stack));
+		state        = icpustate_to_scpustate_p(init_state, kernel_stack);
+
+		/* Have `clone()' or `fork()' return `0' in the child thread/process */
+		gpregs_setpax(&state->scs_gpregs, 0);
+
+		/* Check if the child thread/process should be running in vm86-mode */
+#ifdef TASK_FX86_VM86
 #ifdef __x86_64__
-		state = (struct scpustate *)(VM_NODE_ENDADDR(&FORTASK(result, _this_kernel_stack)) - SIZEOF_SCPUSTATE);
+		if (state->scs_irregs.ir_rflags & EFLAGS_VM)
 #else /* __x86_64__ */
-		if (init_state->ucs_eflags & EFLAGS_VM)
+		if (state->scs_irregs.ir_eflags & EFLAGS_VM)
+#endif /* !__x86_64__ */
+		{
 			result->t_flags |= TASK_FX86_VM86;
-		state = (struct scpustate *)(VM_NODE_ENDADDR(&FORTASK(result, _this_kernel_stack)) -
-		                             (OFFSET_SCPUSTATE_IRREGS +
-		                              (init_state->ucs_eflags & EFLAGS_VM ? SIZEOF_IRREGS_VM86 : init_state->ucs_cs & 3 ? SIZEOF_IRREGS_USER : SIZEOF_IRREGS_KERNEL)));
-#endif /* !__x86_64__ */
-#ifdef __x86_64__
-		GPREGS_TO_GPREGSNSP(state->scs_gpregs, init_state->ucs_gpregs);
-		state->scs_sgregs.sg_gs     = init_state->ucs_sgregs.sg_gs16;
-		state->scs_sgregs.sg_fs     = init_state->ucs_sgregs.sg_fs16;
-		state->scs_sgregs.sg_es     = init_state->ucs_sgregs.sg_es16;
-		state->scs_sgregs.sg_ds     = init_state->ucs_sgregs.sg_ds16;
-		state->scs_sgbase           = init_state->ucs_sgbase;
-		state->scs_irregs.ir_rip    = init_state->ucs_rip;
-		state->scs_irregs.ir_cs     = init_state->ucs_cs16;
-		state->scs_irregs.ir_rflags = init_state->ucs_rflags;
-		state->scs_irregs.ir_ss     = init_state->ucs_ss16;
-		state->scs_irregs.ir_rsp    = init_state->ucs_gpregs.gp_rsp;
-#else /* __x86_64__ */
-		state->scs_gpregs             = init_state->ucs_gpregs;
-		state->scs_sgregs.sg_gs       = init_state->ucs_sgregs.sg_gs16;
-		state->scs_sgregs.sg_fs       = init_state->ucs_sgregs.sg_fs16;
-		state->scs_sgregs.sg_es       = init_state->ucs_sgregs.sg_es16;
-		state->scs_sgregs.sg_ds       = init_state->ucs_sgregs.sg_ds16;
-		state->scs_irregs_u.ir_eip    = init_state->ucs_eip;
-		state->scs_irregs_u.ir_cs     = init_state->ucs_cs16;
-		state->scs_irregs_u.ir_eflags = init_state->ucs_eflags;
-		if (init_state->ucs_eflags & EFLAGS_VM) {
-			state->scs_irregs_u.ir_esp = init_state->ucs_gpregs.gp_esp;
-			state->scs_irregs_u.ir_ss  = init_state->ucs_ss16;
-			state->scs_irregs_v.ir_es  = init_state->ucs_sgregs.sg_es16;
-			state->scs_irregs_v.ir_ds  = init_state->ucs_sgregs.sg_ds16;
-			state->scs_irregs_v.ir_fs  = init_state->ucs_sgregs.sg_fs16;
-			state->scs_irregs_v.ir_gs  = init_state->ucs_sgregs.sg_gs16;
-		} else if (init_state->ucs_cs & 3) {
-			state->scs_irregs_u.ir_esp = init_state->ucs_gpregs.gp_esp;
-			state->scs_irregs_u.ir_ss  = init_state->ucs_ss16;
 		}
-#endif /* !__x86_64__ */
+#endif /* TASK_FX86_VM86 */
+
 #if 0
 		if (kernel_debugtrap_enabled()) {
 			/* When debug traps are enabled, trigger a FORK trap
@@ -359,38 +336,7 @@ task_clone_rpc(void *UNUSED(arg),
 	       reason == TASK_RPC_REASON_SHUTDOWN);
 	if (reason == TASK_RPC_REASON_SYSCALL) {
 		pid_t child_tid;
-		struct ucpustate ustate;
-#ifdef __x86_64__
-		GPREGSNSP_TO_GPREGS(ustate.ucs_gpregs,
-		                    state->ics_gpregs,
-		                    sc_info->rsi_args[1]); /* child_stack */
-		ustate.ucs_sgbase.sg_fsbase = get_user_fsbase();
-		ustate.ucs_sgbase.sg_gsbase = get_user_gsbase();
-		ustate.ucs_sgregs.sg_ds     = __rdds();
-		ustate.ucs_sgregs.sg_es     = __rdes();
-		ustate.ucs_sgregs.sg_fs     = __rdfs();
-		ustate.ucs_sgregs.sg_gs     = __rdgs();
-		ustate.ucs_cs               = irregs_rdcs(&state->ics_irregs);
-		ustate.ucs_ss               = irregs_rdss(&state->ics_irregs);
-		ustate.ucs_rflags           = irregs_rdflags(&state->ics_irregs);
-		ustate.ucs_rip              = irregs_rdip(&state->ics_irregs);
-		if (sc_info->rsi_args[0] & CLONE_SETTLS)
-			ustate.ucs_sgbase.sg_gsbase = sc_info->rsi_args[4]; /* newtls */
-#else /* __x86_64__ */
-		ustate.ucs_gpregs        = state->ics_gpregs;
-		ustate.ucs_sgregs.sg_ds  = state->ics_ds16;
-		ustate.ucs_sgregs.sg_es  = state->ics_es16;
-		ustate.ucs_sgregs.sg_fs  = state->ics_fs16;
-		ustate.ucs_sgregs.sg_gs  = __rdgs();
-		ustate.ucs_cs            = SEGMENT_USER_CODE_RPL;
-		ustate.ucs_ss            = SEGMENT_USER_DATA_RPL;
-		ustate.ucs_eflags        = irregs_rdflags(&state->ics_irregs_k);
-		ustate.ucs_eip           = irregs_rdip(&state->ics_irregs_k);
-		ustate.ucs_gpregs.gp_esp = (uintptr_t)sc_info->rsi_args[1]; /* child_stack */
-		ustate.ucs_gpregs.gp_eax = 0;
-#endif /* !__x86_64__ */
-
-		child_tid = x86_task_clone(&ustate,
+		child_tid = x86_task_clone(state,
 		                           sc_info->rsi_args[0],                         /* clone_flags */
 		                           (USER UNCHECKED pid_t *)sc_info->rsi_args[2], /* parent_tidptr */
 #ifndef __x86_64__
@@ -400,11 +346,7 @@ task_clone_rpc(void *UNUSED(arg),
 		                           (USER UNCHECKED pid_t *)sc_info->rsi_args[3] /* child_tidptr */
 #endif /* __x86_64__ */
 		                           );
-#ifdef __x86_64__
-		state->ics_gpregs.gp_rax = child_tid;
-#else /* __x86_64__ */
-		state->ics_gpregs.gp_eax = child_tid;
-#endif /* !__x86_64__ */
+		gpregs_setpax(&state->ics_gpregs, child_tid);
 	}
 	return state;
 }
@@ -417,45 +359,14 @@ task_fork_rpc(void *UNUSED(arg), struct icpustate *__restrict state,
 	       reason == TASK_RPC_REASON_SHUTDOWN);
 	if (reason != TASK_RPC_REASON_SHUTDOWN) {
 		pid_t child_tid;
-		struct ucpustate ustate;
-#ifdef __x86_64__
-		GPREGSNSP_TO_GPREGS(ustate.ucs_gpregs,
-		                    state->ics_gpregs,
-		                    irregs_rdsp(&state->ics_irregs));
-		ustate.ucs_sgregs.sg_ds  = __rdds();
-		ustate.ucs_sgregs.sg_es  = __rdes();
-		ustate.ucs_sgregs.sg_fs  = __rdfs();
-		ustate.ucs_sgregs.sg_gs  = __rdgs();
-		ustate.ucs_cs            = irregs_rdcs(&state->ics_irregs);
-		ustate.ucs_ss            = irregs_rdss(&state->ics_irregs);
-		ustate.ucs_rflags        = irregs_rdflags(&state->ics_irregs);
-		ustate.ucs_rip           = irregs_rdip(&state->ics_irregs);
-		ustate.ucs_gpregs.gp_rax = 0; /* Return 0 for in the child process. */
-#else /* __x86_64__ */
-		ustate.ucs_gpregs        = state->ics_gpregs;
-		ustate.ucs_sgregs.sg_ds  = state->ics_ds16;
-		ustate.ucs_sgregs.sg_es  = state->ics_es16;
-		ustate.ucs_sgregs.sg_fs  = state->ics_fs16;
-		ustate.ucs_sgregs.sg_gs  = __rdgs();
-		ustate.ucs_cs            = irregs_rdcs(&state->ics_irregs_k);
-		ustate.ucs_ss            = state->ics_irregs_u.ir_ss16;
-		ustate.ucs_gpregs.gp_esp = irregs_rdsp(&state->ics_irregs_k);
-		ustate.ucs_eflags        = irregs_rdflags(&state->ics_irregs_k);
-		ustate.ucs_eip           = irregs_rdip(&state->ics_irregs_k);
-		ustate.ucs_gpregs.gp_eax = 0;
-#endif /* !__x86_64__ */
-		child_tid = x86_task_clone(&ustate,
+		child_tid = x86_task_clone(state,
 		                           SIGCHLD,
 		                           NULL,
 #ifndef __x86_64__
 		                           0, /* Ignored because we don't set CLONE_SETTLS */
 #endif /* !__x86_64__ */
 		                           NULL);
-#ifdef __x86_64__
-		state->ics_gpregs.gp_rax = child_tid;
-#else /* __x86_64__ */
-		state->ics_gpregs.gp_eax = child_tid;
-#endif /* !__x86_64__ */
+		gpregs_setpax(&state->ics_gpregs, child_tid);
 	}
 	return state;
 }

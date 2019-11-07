@@ -97,24 +97,6 @@ __SYSDECL_BEGIN
 #define OFFSET_IRREGS_VM86_DS       OFFSET_IRREGS32_VM86_DS
 #define OFFSET_IRREGS_VM86_FS       OFFSET_IRREGS32_VM86_FS
 #define OFFSET_IRREGS_VM86_GS       OFFSET_IRREGS32_VM86_GS
-#define IRREGS_SP                   IRREGS32_SP
-#define IRREGS_PC                   IRREGS32_PC
-
-#define IRREGS32_ISVM86         IRREGS32_ISVM86
-#define IRREGS32_ISKERNEL       IRREGS32_ISKERNEL
-#define IRREGS32_ISUSER         IRREGS32_ISUSER
-#define IRREGS32_ISUSER_OR_VM86 IRREGS32_ISUSER_OR_VM86
-#define IRREGS32_USER_ESP       IRREGS32_USER_ESP
-#define IRREGS32_USER_SS        IRREGS32_USER_SS
-#define IRREGS32_USER_SS16      IRREGS32_USER_SS16
-#define IRREGS32_KERNEL_ESP     IRREGS32_KERNEL_ESP
-#define IRREGS32_KERNEL_SS      IRREGS32_KERNEL_SS
-#define IRREGS32_PC             IRREGS32_PC
-#define IRREGS32_SP             IRREGS32_SP
-#define IRREGS32_SS             IRREGS32_SS
-#define IRREGS32_WRSP           IRREGS32_WRSP
-#define IRREGS32_WRSS           IRREGS32_WRSS
-#define IRREGS32_SIZEOF         IRREGS32_SIZEOF
 
 #define ucpustate32             ucpustate
 #define OFFSET_UCPUSTATE_GPREGS OFFSET_UCPUSTATE32_GPREGS
@@ -124,9 +106,6 @@ __SYSDECL_BEGIN
 #define OFFSET_UCPUSTATE_EFLAGS OFFSET_UCPUSTATE32_EFLAGS
 #define OFFSET_UCPUSTATE_EIP    OFFSET_UCPUSTATE32_EIP
 #define SIZEOF_UCPUSTATE        SIZEOF_UCPUSTATE32
-#define UCPUSTATE_TO_KCPUSTATE  UCPUSTATE32_TO_KCPUSTATE32
-#define UCPUSTATE_PC            UCPUSTATE32_PC
-#define UCPUSTATE_SP            UCPUSTATE32_SP
 
 #define lcpustate32            lcpustate
 #define OFFSET_LCPUSTATE_EDI   OFFSET_LCPUSTATE32_EDI
@@ -136,22 +115,12 @@ __SYSDECL_BEGIN
 #define OFFSET_LCPUSTATE_EBX   OFFSET_LCPUSTATE32_EBX
 #define OFFSET_LCPUSTATE_EIP   OFFSET_LCPUSTATE32_EIP
 #define SIZEOF_LCPUSTATE       SIZEOF_LCPUSTATE32
-#define LCPUSTATE_TO_GPREGS    LCPUSTATE32_TO_GPREGS32
-#define LCPUSTATE_TO_UCPUSTATE LCPUSTATE32_TO_UCPUSTATE32
-#define LCPUSTATE_TO_KCPUSTATE LCPUSTATE32_TO_KCPUSTATE32
-#define LCPUSTATE_PC           LCPUSTATE32_PC
-#define LCPUSTATE_SP           LCPUSTATE32_SP
 
 #define kcpustate32             kcpustate
 #define OFFSET_KCPUSTATE_GPREGS OFFSET_KCPUSTATE32_GPREGS
 #define OFFSET_KCPUSTATE_EFLAGS OFFSET_KCPUSTATE32_EFLAGS
 #define OFFSET_KCPUSTATE_EIP    OFFSET_KCPUSTATE32_EIP
 #define SIZEOF_KCPUSTATE        SIZEOF_KCPUSTATE32
-#define KCPUSTATE_TO_UCPUSTATE  KCPUSTATE32_TO_UCPUSTATE32
-#define KCPUSTATE_TO_LCPUSTATE  KCPUSTATE32_TO_LCPUSTATE32
-#define KCPUSTATE_PC            KCPUSTATE32_PC
-#define KCPUSTATE_SP            KCPUSTATE32_SP
-
 
 #define icpustate32              icpustate
 #define OFFSET_ICPUSTATE_GPREGS  OFFSET_ICPUSTATE32_GPREGS
@@ -159,59 +128,11 @@ __SYSDECL_BEGIN
 #define OFFSET_ICPUSTATE_ES      OFFSET_ICPUSTATE32_ES
 #define OFFSET_ICPUSTATE_DS      OFFSET_ICPUSTATE32_DS
 #define OFFSET_ICPUSTATE_IRREGS  OFFSET_ICPUSTATE32_IRREGS
-#define ICPUSTATE_TO_UCPUSTATE   ICPUSTATE32_TO_UCPUSTATE32
-#define ICPUSTATE_ISVM86         ICPUSTATE32_ISVM86
-#define ICPUSTATE_ISKERNEL       ICPUSTATE32_ISKERNEL
-#define ICPUSTATE_ISUSER         ICPUSTATE32_ISUSER
-#define ICPUSTATE_ISUSER_OR_VM86 ICPUSTATE32_ISUSER_OR_VM86
-#define ICPUSTATE_USER_ESP       ICPUSTATE32_USER_ESP
-#define ICPUSTATE_KERNEL_ESP     ICPUSTATE32_KERNEL_ESP
-#define ICPUSTATE_USER_SS        ICPUSTATE32_USER_SS
-#define ICPUSTATE_USER_SS16      ICPUSTATE32_USER_SS16
-#define ICPUSTATE_KERNEL_SS      ICPUSTATE32_KERNEL_SS
-#define ICPUSTATE_PC             ICPUSTATE32_PC
-#define ICPUSTATE_DS             ICPUSTATE32_DS
-#define ICPUSTATE_ES             ICPUSTATE32_ES
-#define ICPUSTATE_FS             ICPUSTATE32_FS
-#define ICPUSTATE_GS             ICPUSTATE32_GS
-#define ICPUSTATE_WRDS           ICPUSTATE32_WRDS
-#define ICPUSTATE_WRES           ICPUSTATE32_WRES
-#define ICPUSTATE_WRFS           ICPUSTATE32_WRFS
-#define ICPUSTATE_WRGS           ICPUSTATE32_WRGS
-#define ICPUSTATE_SP             ICPUSTATE32_SP
-#define ICPUSTATE_SS             ICPUSTATE32_SS
-#define ICPUSTATE_WRSP           ICPUSTATE32_WRSP
-#define ICPUSTATE_WRSS           ICPUSTATE32_WRSS
-#define ICPUSTATE_SIZEOF         ICPUSTATE32_SIZEOF
 
 #define scpustate32              scpustate
 #define OFFSET_SCPUSTATE_GPREGS  OFFSET_SCPUSTATE32_GPREGS
 #define OFFSET_SCPUSTATE_SGREGS  OFFSET_SCPUSTATE32_SGREGS
 #define OFFSET_SCPUSTATE_IRREGS  OFFSET_SCPUSTATE32_IRREGS
-#define SCPUSTATE_TO_UCPUSTATE   SCPUSTATE32_TO_UCPUSTATE32
-#define SCPUSTATE_ISVM86         SCPUSTATE32_ISVM86
-#define SCPUSTATE_ISKERNEL       SCPUSTATE32_ISKERNEL
-#define SCPUSTATE_ISUSER         SCPUSTATE32_ISUSER
-#define SCPUSTATE_ISUSER_OR_VM86 SCPUSTATE32_ISUSER_OR_VM86
-#define SCPUSTATE_USER_ESP       SCPUSTATE32_USER_ESP
-#define SCPUSTATE_KERNEL_ESP     SCPUSTATE32_KERNEL_ESP
-#define SCPUSTATE_USER_SS        SCPUSTATE32_USER_SS
-#define SCPUSTATE_USER_SS16      SCPUSTATE32_USER_SS16
-#define SCPUSTATE_KERNEL_SS      SCPUSTATE32_KERNEL_SS
-#define SCPUSTATE_PC             SCPUSTATE32_PC
-#define SCPUSTATE_DS             SCPUSTATE32_DS
-#define SCPUSTATE_ES             SCPUSTATE32_ES
-#define SCPUSTATE_FS             SCPUSTATE32_FS
-#define SCPUSTATE_GS             SCPUSTATE32_GS
-#define SCPUSTATE_WRDS           SCPUSTATE32_WRDS
-#define SCPUSTATE_WRES           SCPUSTATE32_WRES
-#define SCPUSTATE_WRFS           SCPUSTATE32_WRFS
-#define SCPUSTATE_WRGS           SCPUSTATE32_WRGS
-#define SCPUSTATE_SP             SCPUSTATE32_SP
-#define SCPUSTATE_SS             SCPUSTATE32_SS
-#define SCPUSTATE_WRSP           SCPUSTATE32_WRSP
-#define SCPUSTATE_WRSS           SCPUSTATE32_WRSS
-#define SCPUSTATE_SIZEOF         SCPUSTATE32_SIZEOF
 
 #define desctab32            desctab
 #define OFFSET_DESCTAB_LIMIT OFFSET_DESCTAB32_LIMIT
@@ -235,10 +156,6 @@ __SYSDECL_BEGIN
 #define OFFSET_FCPUSTATE_GDT    OFFSET_FCPUSTATE32_GDT
 #define OFFSET_FCPUSTATE_IDT    OFFSET_FCPUSTATE32_IDT
 #define SIZEOF_FCPUSTATE        SIZEOF_FCPUSTATE32
-#define FCPUSTATE_TO_UCPUSTATE  FCPUSTATE32_TO_UCPUSTATE32
-#define FCPUSTATE_TO_LCPUSTATE  FCPUSTATE32_TO_LCPUSTATE32
-#define FCPUSTATE_PC            FCPUSTATE32_PC
-#define FCPUSTATE_SP            FCPUSTATE32_SP
 
 #endif /* !__x86_64__ */
 
@@ -451,30 +368,6 @@ struct __ATTR_PACKED irregs32_vm86 {
 	};
 };
 #endif
-
-#define IRREGS32_ISVM86(x)          ((x).ir_eflags & 0x20000)
-#define IRREGS32_ISKERNEL(x)        (!((x).ir_cs16 & 3) && !IRREGS32_ISVM86(x))
-#define IRREGS32_ISUSER(x)          (((x).ir_cs16 & 3) && !IRREGS32_ISVM86(x))
-#define IRREGS32_ISUSER_OR_VM86(x)  (((x).ir_cs16 & 3) || IRREGS32_ISVM86(x))
-
-#define IRREGS32_USER_ESP(x)        (((struct irregs32_user *)&(x))->ir_esp)
-#define IRREGS32_USER_SS(x)         (((struct irregs32_user *)&(x))->ir_ss)
-#define IRREGS32_USER_SS16(x)       (((struct irregs32_user *)&(x))->ir_ss16)
-#define IRREGS32_KERNEL_ESP(x)      ((__uintptr_t)((__byte_t *)&(x) + SIZEOF_IRREGS32_KERNEL))
-#define IRREGS32_KERNEL_SS(x)       SEGMENT_KERNEL_DATA
-
-#define IRREGS32_PC(x)          ((x).ir_eip)
-#define IRREGS32_SP(x)          (IRREGS32_ISUSER_OR_VM86(x) ? IRREGS32_USER_ESP(x) : IRREGS32_KERNEL_ESP(x))
-#define IRREGS32_SS(x)          (IRREGS32_ISUSER_OR_VM86(x) ? IRREGS32_USER_SS16(x) : IRREGS32_KERNEL_SS(x))
-#define IRREGS32_WRSP(x, value) (IRREGS32_ISUSER_OR_VM86(x) ? (IRREGS32_USER_ESP(x) = (value), 1) : (IRREGS32_KERNEL_ESP(x) == (value)))
-#define IRREGS32_WRSS(x, value) (IRREGS32_ISUSER_OR_VM86(x) ? (IRREGS32_USER_SS(x) = (value), 1) : (IRREGS32_KERNEL_SS(x) == (value)))
-
-/* Returns the total size of the given CPU state. */
-#define IRREGS32_SIZEOF(x)                     \
-	(IRREGS32_ISVM86(x) ? SIZEOF_IRREGS32_VM86 \
-	 ((x).ir_cs16 & 3)  ? SIZEOF_IRREGS32_USER \
-	                    : SIZEOF_IRREGS32_KERNEL)
-
 #endif /* __CC__ */
 
 
@@ -505,14 +398,8 @@ struct __ATTR_PACKED ucpustate32 { /* u -- User */
 	__u32           ucs_eflags; /* Flags register */
 	__u32           ucs_eip;    /* Instruction pointer */
 };
-
-#define UCPUSTATE32_TO_KCPUSTATE32(dst, src) \
-	((dst).kcs_gpregs = (src).ucs_gpregs,    \
-	 (dst).kcs_eflags = (src).ucs_eflags,    \
-	 (dst).kcs_eip    = (src).ucs_eip)
 #define UCPUSTATE32_PC(x) ((x).ucs_eip)
 #define UCPUSTATE32_SP(x) ((x).ucs_gpregs.gp_esp)
-
 #endif /* __CC__ */
 
 #define OFFSET_LCPUSTATE32_EDI  0
@@ -533,59 +420,6 @@ struct __ATTR_PACKED lcpustate32 { /* l -- Little */
 	__u32         lcs_ebx;    /* [P] Base register */
 	__u32         lcs_eip;    /* Instruction pointer */
 };
-
-#ifndef __x86_64__
-__FORCELOCAL void __FCALL lcpustate_cur(struct lcpustate32 *__restrict __st) {
-	__asm__("movl %%edi, %0\n\t"
-			"movl %%esi, %1\n\t"
-			"movl %%ebp, %2\n\t"
-			"movl %%esp, %3\n\t"
-			"movl %%ebx, %4\n\t"
-#if (defined(__pic__) || defined(__PIC__) || \
-     defined(__pie__) || defined(__PIE__)) && 0
-			"call 991f\n\t"
-			"991: .cfi_adjust_cfa_offset 4\n\t"
-			"popl %5\n\t"
-			".cfi_adjust_cfa_offset -4"
-#else
-			"movl $991f, %5\n\t"
-			"991:"
-#endif
-			: "=m" (__st->lcs_edi)
-			, "=m" (__st->lcs_esi)
-			, "=m" (__st->lcs_ebp)
-			, "=m" (__st->lcs_esp)
-			, "=m" (__st->lcs_ebx)
-			, "=m" (__st->lcs_eip));
-}
-#endif /* !__x86_64__ */
-
-#define LCPUSTATE32_TO_GPREGS32(dst, src) \
-	((dst).gp_edi = (src).lcs_edi,        \
-	 (dst).gp_esi = (src).lcs_esi,        \
-	 (dst).gp_ebp = (src).lcs_ebp,        \
-	 (dst).gp_esp = (src).lcs_esp,        \
-	 (dst).gp_ebx = (src).lcs_ebx,        \
-	 (dst).gp_edx = 0,                    \
-	 (dst).gp_ecx = 0,                    \
-	 (dst).gp_eax = 0)
-#define LCPUSTATE32_TO_UCPUSTATE32(dst, src)                          \
-	(LCPUSTATE32_TO_GPREGS32((dst).ucs_gpregs, src),                  \
-	 (dst).ucs_sgregs.sg_gs  = __rdgs(),                              \
-	 (dst).ucs_sgregs.sg_fs  = __rdfs(),                              \
-	 (dst).ucs_sgregs.sg_es  = __rdes(),                              \
-	 (dst).ucs_sgregs.sg_ds  = __rdds(),                              \
-	 (dst).ucs_cs            = SEGMENT_CURRENT_CODE_RPL /*__rdcs()*/, \
-	 (dst).ucs_ss            = SEGMENT_CURRENT_DATA_RPL /*__rdss()*/, \
-	 (dst).ucs_eflags        = (__u32)__rdflags(),                    \
-	 (dst).ucs_eip           = (src).lcs_eip)
-#define LCPUSTATE32_TO_KCPUSTATE32(dst, src)         \
-	(LCPUSTATE32_TO_GPREGS32((dst).kcs_gpregs, src), \
-	 (dst).kcs_eflags = (__u32)__rdflags(),          \
-	 (dst).kcs_eip    = (src).lcs_eip)
-
-#define LCPUSTATE32_PC(x) ((x).lcs_eip)
-#define LCPUSTATE32_SP(x) ((x).lcs_esp)
 #endif /* __CC__ */
 
 
@@ -602,28 +436,6 @@ struct __ATTR_PACKED kcpustate32 {
 	__u32           kcs_eflags; /* Flags register */
 	__u32           kcs_eip;    /* Instruction pointer */
 };
-
-#define KCPUSTATE32_TO_UCPUSTATE32(dst, src)                         \
-	((dst).ucs_gpregs       = (src).kcs_gpregs,                      \
-	 (dst).ucs_sgregs.sg_gs = __rdgs(),                              \
-	 (dst).ucs_sgregs.sg_fs = __rdfs(),                              \
-	 (dst).ucs_sgregs.sg_es = __rdes(),                              \
-	 (dst).ucs_sgregs.sg_ds = __rdds(),                              \
-	 (dst).ucs_cs           = SEGMENT_CURRENT_CODE_RPL /*__rdcs()*/, \
-	 (dst).ucs_ss           = SEGMENT_CURRENT_DATA_RPL /*__rdss()*/, \
-	 (dst).ucs_eflags       = (src).kcs_eflags,                      \
-	 (dst).ucs_eip          = (src).kcs_eip)
-#define KCPUSTATE32_TO_LCPUSTATE32(dst, src)  \
-	((dst).lcs_edi = (src).kcs_gpregs.gp_edi, \
-	 (dst).lcs_esi = (src).kcs_gpregs.gp_esi, \
-	 (dst).lcs_ebp = (src).kcs_gpregs.gp_ebp, \
-	 (dst).lcs_esp = (src).kcs_gpregs.gp_esp, \
-	 (dst).lcs_ebx = (src).kcs_gpregs.gp_ebx, \
-	 (dst).lcs_eip = (src).kcs_eip)
-
-#define KCPUSTATE32_PC(x) ((x).kcs_eip)
-#define KCPUSTATE32_SP(x) ((x).kcs_gpregs.gp_esp)
-
 #endif /* __CC__ */
 
 
@@ -668,9 +480,9 @@ struct __ATTR_PACKED icpustate32 { /* i -- Interrupts */
 		 * NOTE: When returning to user-space, the ESP inside
 		 *       of this structure is the user-space EPS.
 		 *       Otherwise, the return-ESP is equal to the
-		 *       address of `ir_esp' (Use `ICPUSTATE_SP')
+		 *       address of `ir_esp' (Use `icpustate_getsp()')
 		 * NOTE: Since the size of this structure depends on one
-		 *       of its fields, use `ICPUSTATE_SIZEOF()'
+		 *       of its fields, use `icpustate_sizeof()'
 		 *       to determine it. */
 		struct irregs32_kernel ics_irregs;
 		struct irregs32_kernel ics_irregs_k;
@@ -678,71 +490,6 @@ struct __ATTR_PACKED icpustate32 { /* i -- Interrupts */
 		struct irregs32_vm86   ics_irregs_v;
 	};
 };
-
-/* Convert the given `struct icpustate32 &src' to a `struct ucpustate32 &dst' */
-#define ICPUSTATE32_TO_UCPUSTATE32(dst, src)                        \
-	((dst).ucs_gpregs = (src).ics_gpregs,                           \
-	 (dst).ucs_eip    = (src).ics_irregs_k.ir_eip,                  \
-	 (dst).ucs_eflags = (src).ics_irregs_k.ir_eflags,               \
-	 (dst).ucs_cs     = (src).ics_irregs_k.ir_cs,                   \
-	 ICPUSTATE32_ISVM86(src)                                        \
-	 ? ((dst).ucs_gpregs.gp_esp = (src).ics_irregs_v.ir_esp,        \
-	    (dst).ucs_ss            = (src).ics_irregs_v.ir_ss,         \
-	    (dst).ucs_sgregs.sg_ds  = (src).ics_irregs_v.ir_ds,         \
-	    (dst).ucs_sgregs.sg_es  = (src).ics_irregs_v.ir_es,         \
-	    (dst).ucs_sgregs.sg_fs  = (src).ics_irregs_v.ir_fs,         \
-	    (dst).ucs_sgregs.sg_gs  = (src).ics_irregs_v.ir_gs)         \
-	 : ((dst).ucs_sgregs.sg_ds = (src).ics_ds,                      \
-	    (dst).ucs_sgregs.sg_es = (src).ics_es,                      \
-	    (dst).ucs_sgregs.sg_fs = (src).ics_fs,                      \
-	    (dst).ucs_sgregs.sg_gs = __rdgs(),                          \
-	    ((src).ics_irregs_k.ir_cs16 & 3)                            \
-	    ? ((dst).ucs_ss            = ICPUSTATE32_USER_SS(src),      \
-	       (dst).ucs_gpregs.gp_esp = ICPUSTATE32_USER_ESP(src))     \
-	    : ((dst).ucs_ss            = ICPUSTATE32_KERNEL_SS(src),    \
-	       (dst).ucs_gpregs.gp_esp = ICPUSTATE32_KERNEL_ESP(src))), \
-	 (void)0)
-
-#define ICPUSTATE32_ISVM86(x)          ((x).ics_irregs_k.ir_eflags & 0x20000)
-#define ICPUSTATE32_ISKERNEL(x)        (!((x).ics_irregs_k.ir_cs16 & 3) && !ICPUSTATE32_ISVM86(x))
-#define ICPUSTATE32_ISUSER(x)          (((x).ics_irregs_k.ir_cs16 & 3) && !ICPUSTATE32_ISVM86(x))
-#define ICPUSTATE32_ISUSER_OR_VM86(x)  (((x).ics_irregs_k.ir_cs16 & 3) || ICPUSTATE32_ISVM86(x))
-
-#define ICPUSTATE32_USER_ESP(x)   ((x).ics_irregs_u.ir_esp)
-#define ICPUSTATE32_KERNEL_ESP(x) ((__uintptr_t)(&(x).ics_irregs_k + 1))
-#define ICPUSTATE32_USER_SS(x)    ((x).ics_irregs_u.ir_ss)
-#define ICPUSTATE32_USER_SS16(x)  ((x).ics_irregs_u.ir_ss16)
-#define ICPUSTATE32_KERNEL_SS(x)  SEGMENT_KERNEL_DATA
-
-#define ICPUSTATE32_PC(x)         ((x).ics_irregs_k.ir_eip)
-
-/* Get/set the values of segment registers (these setters won't fail)
- * Macros are required for these, because of special handling required for vm86 support */
-#define ICPUSTATE32_DS(x)          (ICPUSTATE32_ISVM86(x) ? (x).ics_irregs_v.ir_ds16 : (x).ics_ds16)
-#define ICPUSTATE32_ES(x)          (ICPUSTATE32_ISVM86(x) ? (x).ics_irregs_v.ir_es16 : (x).ics_es16)
-#define ICPUSTATE32_FS(x)          (ICPUSTATE32_ISVM86(x) ? (x).ics_irregs_v.ir_fs16 : (x).ics_fs16)
-#define ICPUSTATE32_GS(x)          (ICPUSTATE32_ISVM86(x) ? (x).ics_irregs_v.ir_gs16 : __rdgs())
-#define ICPUSTATE32_WRDS(x, value) (ICPUSTATE32_ISVM86(x) ? (void)((x).ics_irregs_v.ir_ds = (value)) : (void)((x).ics_ds = (value)))
-#define ICPUSTATE32_WRES(x, value) (ICPUSTATE32_ISVM86(x) ? (void)((x).ics_irregs_v.ir_es = (value)) : (void)((x).ics_es = (value)))
-#define ICPUSTATE32_WRFS(x, value) (ICPUSTATE32_ISVM86(x) ? (void)((x).ics_irregs_v.ir_fs = (value)) : (void)((x).ics_fs = (value)))
-#define ICPUSTATE32_WRGS(x, value) (ICPUSTATE32_ISVM86(x) ? (void)((x).ics_irregs_v.ir_gs = (value)) : __wrgs(value))
-
-/* Return the values of conditionally restored registers, as
- * they will appear when the cpu state is restored. */
-#define ICPUSTATE32_SP(x)         (ICPUSTATE32_ISUSER_OR_VM86(x) ? ICPUSTATE32_USER_ESP(x) : ICPUSTATE32_KERNEL_ESP(x))
-#define ICPUSTATE32_SS(x)         (ICPUSTATE32_ISUSER_OR_VM86(x) ? ICPUSTATE32_USER_SS16(x) : ICPUSTATE32_KERNEL_SS(x))
-
-/* Set values of conditionally restored registers.
- * @return: 1: The given `value' will be stored.
- * @return: 0: Failed to modify the state such that `value' will be restored. */
-#define ICPUSTATE32_WRSP(x, value) (ICPUSTATE32_ISUSER_OR_VM86(x) ? ((x).ics_irregs_u.ir_esp = (value),1) : (ICPUSTATE32_KERNEL_ESP(x) == (value)))
-#define ICPUSTATE32_WRSS(x, value) (ICPUSTATE32_ISUSER_OR_VM86(x) ? ((x).ics_irregs_u.ir_ss = (value),1) : (ICPUSTATE32_KERNEL_SS(x) == (value)))
-
-/* Returns the total size of the given CPU state. */
-#define ICPUSTATE32_SIZEOF(x)                                                               \
-	(((x).ics_irregs_k.ir_eflags & 0x20000) ? (SIZEOF_GPREGS32 + 12 + SIZEOF_IRREGS32_VM86) \
-	 ((x).ics_irregs_k.ir_cs16 & 3)         ? (SIZEOF_GPREGS32 + 12 + SIZEOF_IRREGS32_USER) \
-	                                        : (SIZEOF_GPREGS32 + 12 + SIZEOF_IRREGS32_KERNEL))
 #endif /* __CC__ */
 
 
@@ -759,9 +506,9 @@ struct __ATTR_PACKED scpustate32 { /* s -- Scheduling */
 		 * NOTE: When returning to user-space, the ESP inside
 		 *       of this structure is the user-space EPS.
 		 *       Otherwise, the return-ESP is equal to the
-		 *       address of `ir_esp' (Use `SCPUSTATE_SP')
+		 *       address of `ir_esp' (Use `scpustate_getsp()')
 		 * NOTE: Since the size of this structure depends on one
-		 *       of its fields, use `SCPUSTATE_SIZEOF()'
+		 *       of its fields, use `scpustate_sizeof()'
 		 *       to determine it. */
 		struct irregs32_kernel scs_irregs;
 		struct irregs32_kernel scs_irregs_k;
@@ -769,68 +516,6 @@ struct __ATTR_PACKED scpustate32 { /* s -- Scheduling */
 		struct irregs32_vm86   scs_irregs_v;
 	};
 };
-
-/* Convert the given `struct scpustate32 &src' to a `struct ucpustate32 &dst' */
-#define SCPUSTATE32_TO_UCPUSTATE32(dst, src)                        \
-	((dst).ucs_gpregs = (src).scs_gpregs,                           \
-	 (dst).ucs_eip    = (src).scs_irregs_k.ir_eip,                  \
-	 (dst).ucs_eflags = (src).scs_irregs_k.ir_eflags,               \
-	 (dst).ucs_cs     = (src).scs_irregs_k.ir_cs,                   \
-	 SCPUSTATE32_ISVM86(src)                                        \
-	 ? ((dst).ucs_gpregs.gp_esp = (src).scs_irregs_v.ir_esp,        \
-	    (dst).ucs_ss            = (src).scs_irregs_v.ir_ss,         \
-	    (dst).ucs_sgregs.sg_ds  = (src).scs_irregs_v.ir_ds,         \
-	    (dst).ucs_sgregs.sg_es  = (src).scs_irregs_v.ir_es,         \
-	    (dst).ucs_sgregs.sg_fs  = (src).scs_irregs_v.ir_fs,         \
-	    (dst).ucs_sgregs.sg_gs  = (src).scs_irregs_v.ir_gs)         \
-	 : ((dst).ucs_sgregs = (src).scs_sgregs,                        \
-	    ((src).scs_irregs_k.ir_cs16 & 3)                            \
-	    ? ((dst).ucs_ss            = SCPUSTATE32_USER_SS(src),      \
-	       (dst).ucs_gpregs.gp_esp = SCPUSTATE32_USER_ESP(src))     \
-	    : ((dst).ucs_ss            = SCPUSTATE32_KERNEL_SS(src),    \
-	       (dst).ucs_gpregs.gp_esp = SCPUSTATE32_KERNEL_ESP(src))), \
-	 (void)0)
-
-#define SCPUSTATE32_ISVM86(x)          ((x).scs_irregs_k.ir_eflags & 0x20000)
-#define SCPUSTATE32_ISKERNEL(x)        (!((x).scs_irregs_k.ir_cs16 & 3) && !SCPUSTATE32_ISVM86(x))
-#define SCPUSTATE32_ISUSER(x)          (((x).scs_irregs_k.ir_cs16 & 3) && !SCPUSTATE32_ISVM86(x))
-#define SCPUSTATE32_ISUSER_OR_VM86(x)  (((x).scs_irregs_k.ir_cs16 & 3) || SCPUSTATE32_ISVM86(x))
-
-#define SCPUSTATE32_USER_ESP(x)   ((x).scs_irregs_u.ir_esp)
-#define SCPUSTATE32_KERNEL_ESP(x) ((__uintptr_t)(&(x).scs_irregs_k + 1))
-#define SCPUSTATE32_USER_SS(x)    ((x).scs_irregs_u.ir_ss)
-#define SCPUSTATE32_USER_SS16(x)  ((x).scs_irregs_u.ir_ss16)
-#define SCPUSTATE32_KERNEL_SS(x)  SEGMENT_KERNEL_DATA
-
-#define SCPUSTATE32_PC(x)         ((x).scs_irregs_k.ir_eip)
-
-/* Get/set the values of segment registers (these setters won't fail)
- * Macros are required for these, because of special handling required for vm86 support */
-#define SCPUSTATE32_DS(x)         (SCPUSTATE32_ISVM86(x) ? (x).scs_irregs_v.ir_ds16 : (x).scs_sgregs.sg_ds16)
-#define SCPUSTATE32_ES(x)         (SCPUSTATE32_ISVM86(x) ? (x).scs_irregs_v.ir_es16 : (x).scs_sgregs.sg_es16)
-#define SCPUSTATE32_FS(x)         (SCPUSTATE32_ISVM86(x) ? (x).scs_irregs_v.ir_fs16 : (x).scs_sgregs.sg_fs16)
-#define SCPUSTATE32_GS(x)         (SCPUSTATE32_ISVM86(x) ? (x).scs_irregs_v.ir_gs16 : (x).scs_sgregs.sg_gs16)
-#define SCPUSTATE32_WRDS(x,value) (SCPUSTATE32_ISVM86(x) ? (void)((x).scs_irregs_v.ir_ds = (value)) : (void)((x).scs_sgregs.sg_ds = (value)))
-#define SCPUSTATE32_WRES(x,value) (SCPUSTATE32_ISVM86(x) ? (void)((x).scs_irregs_v.ir_es = (value)) : (void)((x).scs_sgregs.sg_es = (value)))
-#define SCPUSTATE32_WRFS(x,value) (SCPUSTATE32_ISVM86(x) ? (void)((x).scs_irregs_v.ir_fs = (value)) : (void)((x).scs_sgregs.sg_fs = (value)))
-#define SCPUSTATE32_WRGS(x,value) (SCPUSTATE32_ISVM86(x) ? (void)((x).scs_irregs_v.ir_gs = (value)) : (void)((x).scs_sgregs.sg_gs = (value)))
-
-/* Return the values of conditionally restored registers, as
- * they will appear when the cpu state is restored. */
-#define SCPUSTATE32_SP(x)         (SCPUSTATE32_ISUSER_OR_VM86(x) ? SCPUSTATE32_USER_ESP(x) : SCPUSTATE32_KERNEL_ESP(x))
-#define SCPUSTATE32_SS(x)         (SCPUSTATE32_ISUSER_OR_VM86(x) ? SCPUSTATE32_USER_SS16(x) : SCPUSTATE32_KERNEL_SS(x))
-
-/* Set values of conditionally restored registers.
- * @return: 1: The given `value' will be stored.
- * @return: 0: Failed to modify the state such that `value' will be restored. */
-#define SCPUSTATE32_WRSP(x, value) (SCPUSTATE32_ISUSER_OR_VM86(x) ? ((x).scs_irregs_u.ir_esp = (value), 1) : (SCPUSTATE32_KERNEL_ESP(x) == (value)))
-#define SCPUSTATE32_WRSS(x, value) (SCPUSTATE32_ISUSER_OR_VM86(x) ? ((x).scs_irregs_u.ir_ss = (value), 1) : (SCPUSTATE32_KERNEL_SS(x) == (value)))
-
-/* Returns the total size of the given CPU state. */
-#define SCPUSTATE32_SIZEOF(x)                                                                              \
-	(((x).scs_irregs_k.ir_eflags & 0x20000) ? (SIZEOF_GPREGS32 + SIZEOF_SGREGS32 + SIZEOF_IRREGS32_VM86) : \
-	 ((x).scs_irregs_k.ir_cs16 & 3)         ? (SIZEOF_GPREGS32 + SIZEOF_SGREGS32 + SIZEOF_IRREGS32_USER) : \
-	                                          (SIZEOF_GPREGS32 + SIZEOF_SGREGS32 + SIZEOF_IRREGS32_KERNEL))
 #endif /* __CC__ */
 
 
@@ -918,27 +603,6 @@ struct __ATTR_PACKED fcpustate32 { /* f -- Full */
 	__u16          __fcs_pad1;   /* ... */
 	struct desctab32 fcs_idt;    /* Interrupt descriptor table. */
 };
-
-#define FCPUSTATE32_TO_UCPUSTATE32(dst, src)          \
-	((dst).ucs_gpregs       = (src).fcs_gpregs,       \
-	 (dst).ucs_sgregs.sg_gs = (src).fcs_sgregs.sg_gs, \
-	 (dst).ucs_sgregs.sg_fs = (src).fcs_sgregs.sg_fs, \
-	 (dst).ucs_sgregs.sg_es = (src).fcs_sgregs.sg_es, \
-	 (dst).ucs_sgregs.sg_ds = (src).fcs_sgregs.sg_ds, \
-	 (dst).ucs_cs           = (src).fcs_sgregs.sg_cs, \
-	 (dst).ucs_ss           = (src).fcs_sgregs.sg_ss, \
-	 (dst).ucs_eflags       = (src).fcs_eflags,       \
-	 (dst).ucs_eip          = (src).fcs_eip)
-#define FCPUSTATE32_TO_LCPUSTATE32(dst, src)  \
-	((dst).lcs_edi = (src).fcs_gpregs.gp_edi, \
-	 (dst).lcs_esi = (src).fcs_gpregs.gp_esi, \
-	 (dst).lcs_ebp = (src).fcs_gpregs.gp_ebp, \
-	 (dst).lcs_esp = (src).fcs_gpregs.gp_esp, \
-	 (dst).lcs_ebx = (src).fcs_gpregs.gp_ebx, \
-	 (dst).lcs_eip = (src).fcs_eip)
-#define FCPUSTATE32_PC(x) ((x).fcs_eip)
-#define FCPUSTATE32_SP(x) ((x).fcs_gpregs.gp_esp)
-
 #endif /* __CC__ */
 
 __SYSDECL_END

@@ -28,6 +28,7 @@
 #include <kos/kernel/cpu-state32.h>
 
 #if !defined(__INTELLISENSE__)
+#include <kos/kernel/cpu-state-helpers32.h>
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 
@@ -162,24 +163,18 @@ gdb_cpustate32_from_icpustate32(struct gdb_cpustate32 *__restrict dst,
 	dst->gcs_ecx    = src->ics_gpregs.gp_ecx;
 	dst->gcs_edx    = src->ics_gpregs.gp_edx;
 	dst->gcs_ebx    = src->ics_gpregs.gp_ebx;
-	dst->gcs_esp    = ICPUSTATE32_SP(*src);
+	dst->gcs_esp    = icpustate32_getesp(src);
 	dst->gcs_ebp    = src->ics_gpregs.gp_ebp;
 	dst->gcs_esi    = src->ics_gpregs.gp_esi;
 	dst->gcs_edi    = src->ics_gpregs.gp_edi;
-#ifdef __KERNEL__
-	dst->gcs_eip    = irregs_rdip(&src->ics_irregs_k);
-	dst->gcs_eflags = irregs_rdflags(&src->ics_irregs_k);
-	dst->gcs_cs     = irregs_rdcs(&src->ics_irregs_k);
-#else /* __KERNEL__ */
-	dst->gcs_eip    = src->ics_irregs_k.ir_eip;
-	dst->gcs_eflags = src->ics_irregs_k.ir_eflags;
-	dst->gcs_cs     = src->ics_irregs_k.ir_cs16;
-#endif /* !__KERNEL__ */
-	dst->gcs_ss     = ICPUSTATE32_SS(*src);
-	dst->gcs_ds     = ICPUSTATE32_DS(*src);
-	dst->gcs_es     = ICPUSTATE32_ES(*src);
-	dst->gcs_fs     = ICPUSTATE32_FS(*src);
-	dst->gcs_gs     = ICPUSTATE32_GS(*src);
+	dst->gcs_eip    = icpustate32_geteip(src);
+	dst->gcs_eflags = icpustate32_geteflags(src);
+	dst->gcs_cs     = icpustate32_getcs(src);
+	dst->gcs_ss     = icpustate32_getss(src);
+	dst->gcs_ds     = icpustate32_getds(src);
+	dst->gcs_es     = icpustate32_getes(src);
+	dst->gcs_fs     = icpustate32_getfs(src);
+	dst->gcs_gs     = icpustate32_getgs(src);
 }
 
 __LOCAL void
@@ -189,18 +184,18 @@ gdb_cpustate32_from_scpustate32(struct gdb_cpustate32 *__restrict dst,
 	dst->gcs_ecx    = src->scs_gpregs.gp_ecx;
 	dst->gcs_edx    = src->scs_gpregs.gp_edx;
 	dst->gcs_ebx    = src->scs_gpregs.gp_ebx;
-	dst->gcs_esp    = SCPUSTATE32_SP(*src);
+	dst->gcs_esp    = scpustate32_getesp(src);
 	dst->gcs_ebp    = src->scs_gpregs.gp_ebp;
 	dst->gcs_esi    = src->scs_gpregs.gp_esi;
 	dst->gcs_edi    = src->scs_gpregs.gp_edi;
 	dst->gcs_eip    = src->scs_irregs_k.ir_eip;
 	dst->gcs_eflags = src->scs_irregs_k.ir_eflags;
 	dst->gcs_cs     = src->scs_irregs_k.ir_cs16;
-	dst->gcs_ss     = SCPUSTATE_SS(*src);
-	dst->gcs_ds     = SCPUSTATE_DS(*src);
-	dst->gcs_es     = SCPUSTATE_ES(*src);
-	dst->gcs_fs     = SCPUSTATE_FS(*src);
-	dst->gcs_gs     = SCPUSTATE_GS(*src);
+	dst->gcs_ss     = scpustate32_getss(src);
+	dst->gcs_ds     = scpustate32_getds(src);
+	dst->gcs_es     = scpustate32_getes(src);
+	dst->gcs_fs     = scpustate32_getfs(src);
+	dst->gcs_gs     = scpustate32_getgs(src);
 }
 
 __LOCAL void
@@ -306,15 +301,9 @@ gdb_cpustate32_to_icpustate32(struct icpustate32 *__restrict dst,
 	result->ics_fs                 = src->gcs_fs;
 	result->ics_es                 = src->gcs_es;
 	result->ics_ds                 = src->gcs_ds;
-#if defined(__KERNEL__) && !defined(__x86_64__)
-	irregs_wrip(&result->ics_irregs_k, src->gcs_eip);
-	irregs_wrflags(&result->ics_irregs_k,src->gcs_eflags);
-	irregs_wrcs(&result->ics_irregs_k, src->gcs_cs);
-#else /* __KERNEL__ && !__x86_64__ */
-	result->ics_irregs_k.ir_eip    = src->gcs_eip;
-	result->ics_irregs_k.ir_eflags = src->gcs_eflags;
-	result->ics_irregs_k.ir_cs     = src->gcs_cs;
-#endif /* !__KERNEL__ || __x86_64__ */
+	icpustate32_seteip(result, src->gcs_eip);
+	icpustate32_seteflags(result,src->gcs_eflags);
+	icpustate32_setcs(result, src->gcs_cs);
 	if (src->gcs_eflags & EFLAGS_VM) {
 		result->ics_irregs_v.ir_esp = src->gcs_esp;
 		result->ics_irregs_v.ir_ss  = src->gcs_ss;

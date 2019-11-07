@@ -126,6 +126,17 @@ __SYSDECL_BEGIN
  * different values for their %gs segment selector.
  */
 
+
+
+#ifdef SEGMENT_USER_CODE32_RPL
+#define __KOS64_IS_CS32(cs) ((cs) == SEGMENT_USER_CODE32_RPL)
+#define __KOS64_IS_CS64(cs) ((cs) != SEGMENT_USER_CODE32_RPL)
+#else /* SEGMENT_USER_CODE32_RPL */
+#define __KOS64_IS_CS32(cs) ((cs) == 0x002b)
+#define __KOS64_IS_CS64(cs) ((cs) != 0x002b)
+#endif /* !SEGMENT_USER_CODE32_RPL */
+
+
 __SYSDECL_END
 
 #endif /* !_I386_KOS_KOS_KERNEL_GDT_H */

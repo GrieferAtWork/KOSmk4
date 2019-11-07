@@ -55,6 +55,8 @@
 #include <asm/cpu-msr.h>
 #include <asm/intrin.h>
 #include <kos/bits/exception_data32.h>
+#include <kos/kernel/cpu-state-compat.h>
+#include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state32.h>
 #include <kos/kernel/gdt.h>
@@ -551,26 +553,22 @@ NOTHROW(FCALL x86_handle_except_before_userspace)(struct ucpustate *__restrict u
 	return_state = (struct icpustate *)((byte_t *)VM_PAGE2ADDR(PERTASK_GET((*(struct vm_node *)&_this_kernel_stack).vn_node.a_vmax) + 1) -
 	                                    (
 #ifdef __x86_64__
-	                                    SIZEOF_ICPUSTATE
+	                                    SIZEOF_ICPUSTATE64
 #elif !defined(CONFIG_NO_VM86)
 	                                    task_isvm86(THIS_TASK)
-	                                    ? COMPILER_OFFSETAFTER(struct icpustate, ics_irregs_v)
-	                                    : COMPILER_OFFSETAFTER(struct icpustate, ics_irregs_u)
+	                                    ? OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_VM86
+	                                    : OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_USER
 #else
-	                                    COMPILER_OFFSETAFTER(struct icpustate, ics_irregs_u)
+	                                    OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_USER
 #endif
 	                                    ));
 	/* Check if user-space got redirected (if so, we need to follow some custom unwinding rules). */
-	if (IRREGS_PC(return_state->ics_irregs) == (uintptr_t)&x86_rpc_user_redirection) {
+	if (return_state->ics_irregs.ir_pip == (uintptr_t)&x86_rpc_user_redirection) {
 		/* A re-direction may have happened whilst we were unwinding. - Adjust for that now!
 		 * HINT: The actual user-space return location is stored in `x86_rpc_redirection_iret' */
-		assert(PERTASK_GET(IRREGS_PC(x86_rpc_redirection_iret)) != (uintptr_t)&x86_rpc_user_redirection);
+		assert(PERTASK_GET(x86_rpc_redirection_iret.ir_pip) != (uintptr_t)&x86_rpc_user_redirection);
+		assert(return_state->ics_irregs.ir_pflags == 0);
 		assert(return_state->ics_irregs.ir_cs == SEGMENT_KERNEL_CODE);
-#ifdef __x86_64__
-		assert(return_state->ics_irregs.ir_rflags == 0);
-#else /* __x86_64__ */
-		assert(return_state->ics_irregs.ir_eflags == 0);
-#endif /* !__x86_64__ */
 		/* Manually unwind additional FLAGS registers.
 		 * Because .cfi_iret_signal_frame perform a kernel-space unwind
 		 * due to the redirection, we must manually complete the
@@ -585,14 +583,14 @@ NOTHROW(FCALL x86_handle_except_before_userspace)(struct ucpustate *__restrict u
 		        return_state->ics_irregs.ir_rsp);
 #else /* __x86_64__ */
 		assertf(ustate->ucs_gpregs.gp_esp == (u32)&return_state->ics_irregs_u.ir_esp,
-		        "ustate->ucs_gpregs.gp_esp = %p\n"
+		        "ustate->ucs_gpregs.gp_esp          = %p\n"
 		        "&return_state->ics_irregs_u.ir_esp = %p\n",
 		        ustate->ucs_gpregs.gp_esp,
 		        &return_state->ics_irregs_u.ir_esp);
 #endif /* !__x86_64__ */
 
 #ifdef __x86_64__
-		GPREGS_TO_GPREGSNSP(return_state->ics_gpregs, ustate->ucs_gpregs);
+		gpregs64_to_gpregsnsp64(&ustate->ucs_gpregs, &return_state->ics_gpregs);
 		return_state->ics_irregs.ir_rip    = PERTASK_GET(x86_rpc_redirection_iret.ir_rip);
 		return_state->ics_irregs.ir_cs     = PERTASK_GET(x86_rpc_redirection_iret.ir_cs16);
 		return_state->ics_irregs.ir_rflags = PERTASK_GET(x86_rpc_redirection_iret.ir_rflags);
@@ -630,7 +628,7 @@ NOTHROW(FCALL x86_handle_except_before_userspace)(struct ucpustate *__restrict u
 	} else {
 		/* Fill in the user-space return location to match `ustate' */
 #ifdef __x86_64__
-		GPREGS_TO_GPREGSNSP(return_state->ics_gpregs, ustate->ucs_gpregs);
+		gpregs64_to_gpregsnsp64(&ustate->ucs_gpregs, &return_state->ics_gpregs);
 		__wrgs(ustate->ucs_sgregs.sg_gs16);
 		__wrfs(ustate->ucs_sgregs.sg_fs16);
 		__wres(ustate->ucs_sgregs.sg_es16);
@@ -657,7 +655,7 @@ NOTHROW(FCALL x86_handle_except_before_userspace)(struct ucpustate *__restrict u
 			return_state->ics_irregs_v.ir_fs = ustate->ucs_sgregs.sg_fs16;
 			return_state->ics_irregs_v.ir_gs = ustate->ucs_sgregs.sg_gs16;
 		} else
-#endif
+#endif /* !CONFIG_NO_VM86 */
 		{
 			return_state->ics_fs = ustate->ucs_sgregs.sg_fs16;
 			return_state->ics_es = ustate->ucs_sgregs.sg_es16;
@@ -687,17 +685,13 @@ NOTHROW(FCALL x86_handle_except_before_userspace)(struct ucpustate *__restrict u
 		struct rpc_syscall_info info;
 		bool must_restart_syscall;
 		/* Fill in system call information. */
-#ifdef __x86_64__
-		info.rsi_sysno = return_state->ics_gpregs.gp_rax;
-#else /* __x86_64__ */
-		info.rsi_sysno = return_state->ics_gpregs.gp_eax;
-#endif /* !__x86_64__ */
+		info.rsi_sysno = gpregs_getpax(&return_state->ics_gpregs);
 		info.rsi_flags = (RPC_SYSCALL_INFO_FARGVALID(0) | RPC_SYSCALL_INFO_FARGVALID(1) |
 		                  RPC_SYSCALL_INFO_FARGVALID(2) | RPC_SYSCALL_INFO_FARGVALID(3));
-		if (irregs_rdflags(&return_state->ics_irregs) & EFLAGS_CF)
+		if (icpustate_getpflags(return_state) & EFLAGS_CF)
 			info.rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 #ifdef __x86_64__
-		if (!irregs_iscompat(&return_state->ics_irregs)) {
+		if (icpustate_is64(return_state)) {
 			/* Native 64-bit system call. */
 			info.rsi_flags = (RPC_SYSCALL_INFO_FARGVALID(0) | RPC_SYSCALL_INFO_FARGVALID(1) |
 			                  RPC_SYSCALL_INFO_FARGVALID(2) | RPC_SYSCALL_INFO_FARGVALID(3) |
@@ -715,17 +709,10 @@ NOTHROW(FCALL x86_handle_except_before_userspace)(struct ucpustate *__restrict u
 			unsigned int method;
 			method = TASK_RPC_REASON_GETMETHOD(reason);
 			/* Load system call argument information. */
-#ifdef __x86_64__
-			info.rsi_args[0] = return_state->ics_gpregs.gp_rbx;
-			info.rsi_args[1] = return_state->ics_gpregs.gp_rcx;
-			info.rsi_args[2] = return_state->ics_gpregs.gp_rdx;
-			info.rsi_args[3] = return_state->ics_gpregs.gp_rsi;
-#else /* __x86_64__ */
-			info.rsi_args[0] = return_state->ics_gpregs.gp_ebx;
-			info.rsi_args[1] = return_state->ics_gpregs.gp_ecx;
-			info.rsi_args[2] = return_state->ics_gpregs.gp_edx;
-			info.rsi_args[3] = return_state->ics_gpregs.gp_esi;
-#endif /* !__x86_64__ */
+			info.rsi_args[0] = gpregs_getpbx(&return_state->ics_gpregs);
+			info.rsi_args[1] = gpregs_getpcx(&return_state->ics_gpregs);
+			info.rsi_args[2] = gpregs_getpdx(&return_state->ics_gpregs);
+			info.rsi_args[3] = gpregs_getpsi(&return_state->ics_gpregs);
 			if (method == TASK_RPC_REASON_SYSCALL_METHOD_SYSENTER) {
 				unsigned int max_argc;
 				info.rsi_flags |= RPC_SYSCALL_INFO_METHOD_SYSENTER;
@@ -734,11 +721,7 @@ NOTHROW(FCALL x86_handle_except_before_userspace)(struct ucpustate *__restrict u
 				if (max_argc > 4) {
 					/* Try to load a 5th (and possibly 6th) argument. */
 					USER syscall_ulong_t *argv;
-#ifdef __x86_64__
-					argv = (USER syscall_ulong_t *)return_state->ics_gpregs.gp_rbp;
-#else /* __x86_64__ */
-					argv = (USER syscall_ulong_t *)return_state->ics_gpregs.gp_ebp;
-#endif /* !__x86_64__ */
+					argv = (USER syscall_ulong_t *)gpregs_getpbp(&return_state->ics_gpregs);
 					if likely(ADDR_IS_USER(argv)) {
 						struct exception_data old_except;
 						memcpy(&old_except, &THIS_EXCEPTION_INFO.ei_data, sizeof(old_except));
@@ -765,13 +748,8 @@ restore_old_except:
 				info.rsi_flags |= (RPC_SYSCALL_INFO_FARGVALID(4) |
 				                   RPC_SYSCALL_INFO_FARGVALID(5) |
 				                   RPC_SYSCALL_INFO_METHOD_INT80);
-#ifdef __x86_64__
-				info.rsi_args[4] = return_state->ics_gpregs.gp_rdi;
-				info.rsi_args[5] = return_state->ics_gpregs.gp_rbp;
-#else /* __x86_64__ */
-				info.rsi_args[4] = return_state->ics_gpregs.gp_edi;
-				info.rsi_args[5] = return_state->ics_gpregs.gp_ebp;
-#endif /* !__x86_64__ */
+				info.rsi_args[4] = gpregs_getpdi(&return_state->ics_gpregs);
+				info.rsi_args[5] = gpregs_getpbp(&return_state->ics_gpregs);
 			}
 		}
 		must_restart_syscall = false;
@@ -794,7 +772,7 @@ restore_old_except:
 			 *    and directly jump to the applicable int80 / sysenter entry points.
 			 *    NOTE: During this process, the system call may get traced a second time. */
 #ifdef __x86_64__
-			if (!irregs_iscompat(&return_state->ics_irregs)) {
+			if (icpustate_is64(return_state)) {
 				x86_syscall_emulation(return_state);
 			} else
 #endif /* __x86_64__ */
@@ -839,10 +817,10 @@ NOTHROW(KCALL x86_syscall_personality)(struct unwind_fde_struct *__restrict fde,
                                        byte_t *__restrict lsda) {
 	struct ucpustate ustate;
 	unsigned int error;
-	KCPUSTATE_TO_UCPUSTATE(ustate, *state);
+	kcpustate_to_ucpustate(state, &ustate);
 	{
 		unwind_cfa_sigframe_state_t cfa;
-		void *pc = (void *)(UCPUSTATE_PC(ustate) - 1);
+		void *pc = (void *)(ucpustate_getpc(&ustate) - 1);
 		error = unwind_fde_sigframe_exec(fde, &cfa, pc);
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err;
@@ -854,11 +832,8 @@ NOTHROW(KCALL x86_syscall_personality)(struct unwind_fde_struct *__restrict fde,
 	}
 	/* Check if the return state actually points into user-space,
 	 * or alternatively: indicates a user-space redirection. */
-	if (!(ustate.ucs_cs & 3) &&
-#ifndef __x86_64__
-	    !(ustate.ucs_eflags & EFLAGS_VM) &&
-#endif /* !__x86_64__ */
-	    UCPUSTATE_PC(ustate) != (uintptr_t)&x86_rpc_user_redirection)
+	if (ucpustate_iskernel(&ustate) &&
+	    ucpustate_getpc(&ustate) != (uintptr_t)&x86_rpc_user_redirection)
 		goto err;
 	/* System calls encode their vector number as the LSDA pointer, so that
 	 * when unwinding we can reverse-engineer that number in order to decide
@@ -866,13 +841,8 @@ NOTHROW(KCALL x86_syscall_personality)(struct unwind_fde_struct *__restrict fde,
 	 * inform user-space of which function caused the exception, as well as
 	 * implement system call restarting. */
 	if (((uintptr_t)lsda & ~X86_SYSCALL_PERSONALITY_LSDA_SYSENTER_FLAG) !=
-	    ((uintptr_t)-1 & ~X86_SYSCALL_PERSONALITY_LSDA_SYSENTER_FLAG)) {
-#ifdef __x86_64__
-		ustate.ucs_gpregs.gp_rax = (uintptr_t)lsda & ~X86_SYSCALL_PERSONALITY_LSDA_SYSENTER_FLAG;
-#else /* __x86_64__ */
-		ustate.ucs_gpregs.gp_eax = (uintptr_t)lsda & ~X86_SYSCALL_PERSONALITY_LSDA_SYSENTER_FLAG;
-#endif /* !__x86_64__ */
-	}
+	    ((uintptr_t)-1 & ~X86_SYSCALL_PERSONALITY_LSDA_SYSENTER_FLAG))
+		gpregs_setpax(&ustate.ucs_gpregs, (uintptr_t)lsda & ~X86_SYSCALL_PERSONALITY_LSDA_SYSENTER_FLAG);
 	x86_handle_except_before_userspace(&ustate,
 	                                   (uintptr_t)lsda & X86_SYSCALL_PERSONALITY_LSDA_SYSENTER_FLAG
 	                                   ? TASK_RPC_REASON_SYSCALL | TASK_RPC_REASON_SYSCALL_METHOD_SYSENTER
@@ -1335,9 +1305,9 @@ NOTHROW(KCALL x86_syscall_lcall7_personality)(struct unwind_fde_struct *__restri
                                               struct kcpustate *__restrict state,
                                               byte_t *__restrict UNUSED(lsda)) {
 	struct x86_lcall7_syscall_data *data;
-	if (KCPUSTATE_PC(*state) != (uintptr_t)x86_lcall7_syscall_guard)
+	if (kcpustate_getpc(state) != (uintptr_t)x86_lcall7_syscall_guard)
 		return DWARF_PERSO_CONTINUE_UNWIND;
-	data = (struct x86_lcall7_syscall_data *)KCPUSTATE_SP(*state);
+	data = (struct x86_lcall7_syscall_data *)kcpustate_getsp(state);
 	assertf((uintptr_t)(data + 1) == (uintptr_t)VM_PAGE2ADDR(PERTASK_GET((*(struct vm_node *)&_this_kernel_stack).vn_node.a_vmax) + 1),
 	        "%p != %p",
 	        (uintptr_t)(data + 1),
