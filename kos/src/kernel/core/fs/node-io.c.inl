@@ -425,7 +425,7 @@ do_inode_flexread_phys(struct inode *__restrict self,
                        vm_phys_t buf, size_t num_bytes,
                        pos_t file_position) {
 	size_t temp, result = 0;
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	bool is_first;
 	is_first = true;

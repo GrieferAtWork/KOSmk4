@@ -21,7 +21,10 @@
 #define SET_REGISTER 1
 #endif /* __INTELLISENSE__ */
 
-#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state-helpers32.h>
+#include <kos/kernel/cpu-state32.h>
+#include <kos/kernel/fpu-state32.h>
+#include <kos/kernel/gdb-cpu-state32.h>
 
 #if (defined(GET_REGISTER) + defined(SET_REGISTER)) != 1
 #error "Must either defined GET_REGISTER or SET_REGISTER"
@@ -91,7 +94,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
                                     void BUF_CONST *buf, size_t bufsize) {
 	if (regno >= GDB_REGISTER_I386_ST0 &&
 	    regno <= GDB_REGISTER_I386_MXCSR) {
-		struct fpustate *fpu;
+		struct fpustate32 *fpu;
 		if (thread == THIS_TASK)
 			fpustate_save();
 		fpu = FORTASK(thread, _this_fpustate);
@@ -263,7 +266,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 
 PRIVATE NONNULL((2, 4)) size_t
 NOTHROW(FCALL FUNC(GPRegsRegister))(uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
-                                    struct gpregs STATE_CONST *__restrict gpregs_pointer) {
+                                    struct gpregs32 STATE_CONST *__restrict gpregs_pointer) {
 	if (regno >= GDB_REGISTER_I386_EAX &&
 	    regno <= GDB_REGISTER_I386_EDI) {
 		size_t offset;
@@ -278,31 +281,31 @@ NOTHROW(FCALL FUNC(GPRegsRegister))(uintptr_t regno, void BUF_CONST *buf, size_t
 INTERN NONNULL((1, 3, 5)) size_t FCALL
 NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
                                  uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
-                                 struct icpustate STATE_PARAM) {
+                                 struct icpustate32 STATE_PARAM) {
 	switch (regno) {
 
 	case GDB_REGISTER_I386_ESP:
-		GETSET4(icpustate_getsp(STATE),
-		        *pstate = icpustate_setsp_p(*pstate, value));
+		GETSET4(icpustate32_getesp(STATE),
+		        *pstate = icpustate32_setesp_p(*pstate, value));
 		break;
 
 	case GDB_REGISTER_I386_EIP:
-		GETSET4(icpustate_getpc(STATE),
-		        icpustate_setpc(STATE, value));
+		GETSET4(icpustate32_geteip(STATE),
+		        icpustate32_seteip(STATE, value));
 		break;
 
 	case GDB_REGISTER_I386_EFLAGS:
-		GETSET4(icpustate_getpflags(STATE),
-		        icpustate_setpflags(STATE, value));
+		GETSET4(icpustate32_geteflags(STATE),
+		        icpustate32_seteflags(STATE, value));
 		break;
 
 	case GDB_REGISTER_I386_CS:
-		GETSET4(icpustate_getcs(STATE),
-		        icpustate_setcs(STATE, value));
+		GETSET4(icpustate32_getcs(STATE),
+		        icpustate32_setcs(STATE, value));
 		break;
 
 	case GDB_REGISTER_I386_SS:
-		if (icpustate_isuser(STATE)) {
+		if (icpustate32_isuser(STATE)) {
 			FIELD4(STATE->ics_irregs_u.ir_ss);
 		} else {
 			GETSET4(__rdss(), __wrss(value));
@@ -310,29 +313,23 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 		break;
 
 	case GDB_REGISTER_I386_DS:
-		FIELD4(*(icpustate_isvm86(STATE)
-		         ? &STATE->ics_irregs_v.ir_ds
-		         : &STATE->ics_ds));
+		GETSET4(icpustate32_getds(STATE),
+		        icpustate32_setds(STATE, value));
 		break;
 
 	case GDB_REGISTER_I386_ES:
-		FIELD4(*(icpustate_isvm86(STATE)
-		         ? &STATE->ics_irregs_v.ir_es
-		         : &STATE->ics_es));
+		GETSET4(icpustate32_getes(STATE),
+		        icpustate32_setes(STATE, value));
 		break;
 
 	case GDB_REGISTER_I386_FS:
-		FIELD4(*(icpustate_isvm86(STATE)
-		         ? &STATE->ics_irregs_v.ir_fs
-		         : &STATE->ics_fs));
+		GETSET4(icpustate32_getfs(STATE),
+		        icpustate32_setfs(STATE, value));
 		break;
 
 	case GDB_REGISTER_I386_GS:
-		if (icpustate_isuser(STATE)) {
-			FIELD4(STATE->ics_irregs_v.ir_gs);
-		} else {
-			GETSET4(__rdgs(), __wrgs(value));
-		}
+		GETSET4(icpustate32_getgs(STATE),
+		        icpustate32_setgs(STATE, value));
 		break;
 
 	default: {
@@ -349,31 +346,31 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 INTERN NONNULL((1, 3, 5)) size_t
 NOTHROW(FCALL FUNC(SCpuStateRegister))(struct task *__restrict thread,
                                        uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
-                                       struct scpustate STATE_PARAM) {
+                                       struct scpustate32 STATE_PARAM) {
 	switch (regno) {
 
 	case GDB_REGISTER_I386_ESP:
-		GETSET4(scpustate_getsp(STATE),
-		        *pstate = scpustate_setsp_p(*pstate, value));
+		GETSET4(scpustate32_getesp(STATE),
+		        *pstate = scpustate32_setesp_p(*pstate, value));
 		break;
 
 	case GDB_REGISTER_I386_EIP:
-		GETSET4(scpustate_getpc(STATE),
-		        scpustate_setpc(STATE, value));
+		GETSET4(scpustate32_geteip(STATE),
+		        scpustate32_seteip(STATE, value));
 		break;
 
 	case GDB_REGISTER_I386_EFLAGS:
-		GETSET4(scpustate_getpflags(STATE),
-		        scpustate_setpflags(STATE, value));
+		GETSET4(scpustate32_geteflags(STATE),
+		        scpustate32_seteflags(STATE, value));
 		break;
 
 	case GDB_REGISTER_I386_CS:
-		GETSET4(scpustate_getcs(STATE),
-		        scpustate_setcs(STATE, value));
+		GETSET4(scpustate32_getcs(STATE),
+		        scpustate32_setcs(STATE, value));
 		break;
 
 	case GDB_REGISTER_I386_SS:
-		if (scpustate_isuser(STATE)) {
+		if (scpustate32_isuser(STATE)) {
 			FIELD4(STATE->scs_irregs_u.ir_ss);
 		} else {
 			GETSET4(__rdss(), __wrss(value));
@@ -381,27 +378,23 @@ NOTHROW(FCALL FUNC(SCpuStateRegister))(struct task *__restrict thread,
 		break;
 
 	case GDB_REGISTER_I386_DS:
-		FIELD4(*(scpustate_isvm86(STATE)
-		         ? &STATE->scs_irregs_v.ir_ds
-		         : &STATE->scs_sgregs.sg_ds));
+		GETSET4(scpustate32_getds(STATE),
+		        scpustate32_setds(STATE, value));
 		break;
 
 	case GDB_REGISTER_I386_ES:
-		FIELD4(*(scpustate_isvm86(STATE)
-		         ? &STATE->scs_irregs_v.ir_es
-		         : &STATE->scs_sgregs.sg_es));
+		GETSET4(scpustate32_getes(STATE),
+		        scpustate32_setes(STATE, value));
 		break;
 
 	case GDB_REGISTER_I386_FS:
-		FIELD4(*(scpustate_isvm86(STATE)
-		         ? &STATE->scs_irregs_v.ir_fs
-		         : &STATE->scs_sgregs.sg_fs));
+		GETSET4(scpustate32_getfs(STATE),
+		        scpustate32_setfs(STATE, value));
 		break;
 
 	case GDB_REGISTER_I386_GS:
-		FIELD4(*(scpustate_isvm86(STATE)
-		         ? &STATE->scs_irregs_v.ir_gs
-		         : &STATE->scs_sgregs.sg_gs));
+		GETSET4(scpustate32_getgs(STATE),
+		        scpustate32_setgs(STATE, value));
 		break;
 
 	default: {
@@ -418,7 +411,7 @@ NOTHROW(FCALL FUNC(SCpuStateRegister))(struct task *__restrict thread,
 INTERN NONNULL((1, 3, 5)) size_t
 NOTHROW(FCALL FUNC(UCpuStateRegister))(struct task *__restrict thread,
                                        uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
-                                       struct ucpustate STATE_PARAM) {
+                                       struct ucpustate32 STATE_PARAM) {
 	switch (regno) {
 
 	case GDB_REGISTER_I386_EIP:
@@ -504,7 +497,7 @@ NOTHROW(FCALL FUNC(ActiveSegmentRegister))(uintptr_t regno,
 INTERN NONNULL((1, 3, 5)) size_t
 NOTHROW(FCALL FUNC(KCpuStateRegister))(struct task *__restrict thread,
                                        uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
-                                       struct kcpustate STATE_PARAM) {
+                                       struct kcpustate32 STATE_PARAM) {
 	switch (regno) {
 
 	case GDB_REGISTER_I386_EIP:
@@ -531,7 +524,7 @@ NOTHROW(FCALL FUNC(KCpuStateRegister))(struct task *__restrict thread,
 INTERN NONNULL((1, 3, 5)) size_t
 NOTHROW(FCALL FUNC(LCpuStateRegister))(struct task *__restrict thread,
                                        uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
-                                       struct lcpustate STATE_PARAM) {
+                                       struct lcpustate32 STATE_PARAM) {
 	switch (regno) {
 
 	case GDB_REGISTER_I386_EDI:
@@ -579,7 +572,7 @@ NOTHROW(FCALL FUNC(LCpuStateRegister))(struct task *__restrict thread,
 INTERN NONNULL((1, 3, 5)) size_t
 NOTHROW(FCALL FUNC(FCpuStateRegister))(struct task *__restrict thread,
                                        uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
-                                       struct fcpustate STATE_PARAM) {
+                                       struct fcpustate32 STATE_PARAM) {
 	switch (regno) {
 
 	case GDB_REGISTER_I386_EIP:
@@ -629,9 +622,9 @@ NOTHROW(FCALL FUNC(FCpuStateRegister))(struct task *__restrict thread,
 /* Get/Set the full GDB cpustate. */
 INTERN NONNULL((1, 2)) bool
 NOTHROW(FCALL FUNC(Registers))(struct task *__restrict thread,
-                               struct gdb_cpustate BUF_CONST *buf) {
+                               struct gdb_cpustate32 BUF_CONST *buf) {
 	uintptr_t regno;
-	for (regno = 0; regno <= sizeof(struct gdb_cpustate)/4; ++regno) {
+	for (regno = 0; regno <= sizeof(struct gdb_cpustate32) / 4; ++regno) {
 		if (!FUNC(Register)(thread, regno, (u32 *)buf + regno, 4))
 			return false;
 	}

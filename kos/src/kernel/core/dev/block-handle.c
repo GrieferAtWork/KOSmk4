@@ -295,7 +295,7 @@ do_BLKRAGET_compat:
 	case BLKFRASET:
 #ifdef __ARCH_HAVE_COMPAT
 		if (syscall_iscompat())
-			goto do_BLKRASET_compat;
+			goto do_BLKFRASET_compat;
 		ATTR_FALLTHROUGH
 #endif /* __ARCH_HAVE_COMPAT */
 	case _IOW(_IOC_TYPE(BLKFRASET), _IOC_NR(BLKFRASET), uintptr_t):
@@ -304,7 +304,7 @@ do_BLKRAGET_compat:
 		break;
 #ifdef __ARCH_HAVE_COMPAT
 	case _IOW(_IOC_TYPE(BLKFRASET), _IOC_NR(BLKFRASET), __ARCH_COMPAT_ULONGPTR_TYPE):
-do_BLKRASET_compat:
+do_BLKFRASET_compat:
 		validate_readable(arg, sizeof(__ARCH_COMPAT_ULONGPTR_TYPE));
 		block_device_set_fsreadahead(self, (size_t)*(__ARCH_COMPAT_ULONGPTR_TYPE *)arg);
 		break;
@@ -314,7 +314,7 @@ do_BLKRASET_compat:
 	case BLKFRAGET:
 #ifdef __ARCH_HAVE_COMPAT
 		if (syscall_iscompat())
-			goto do_BLKRAGET_compat;
+			goto do_BLKFRAGET_compat;
 		ATTR_FALLTHROUGH
 #endif /* __ARCH_HAVE_COMPAT */
 	case _IOR(_IOC_TYPE(BLKFRAGET), _IOC_NR(BLKFRAGET), uintptr_t):
@@ -323,7 +323,7 @@ do_BLKRASET_compat:
 		break;
 #ifdef __ARCH_HAVE_COMPAT
 	case _IOR(_IOC_TYPE(BLKFRAGET), _IOC_NR(BLKFRAGET), __ARCH_COMPAT_ULONGPTR_TYPE):
-do_BLKRAGET_compat:
+do_BLKFRAGET_compat:
 		validate_writable(arg, sizeof(__ARCH_COMPAT_ULONGPTR_TYPE));
 		*(__ARCH_COMPAT_ULONGPTR_TYPE *)arg = (__ARCH_COMPAT_ULONGPTR_TYPE)block_device_get_fsreadahead(self);
 		break;

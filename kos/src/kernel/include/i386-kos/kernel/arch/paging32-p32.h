@@ -244,8 +244,8 @@ p32_pdir_e2_identity_t[1024 /* P32_PDIR_VEC2INDEX(pointer) */];
  * >>     }
  * >> }
  */
-#define P32_PDIR_E1_IDENTITY  (*(p32_pdir_e1_identity_t *)P32_PDIR_E1_IDENTITY_BASE)
-#define P32_PDIR_E2_IDENTITY  (*(p32_pdir_e2_identity_t *)P32_PDIR_E2_IDENTITY_BASE)
+#define P32_PDIR_E1_IDENTITY  (*(p32_pdir_e1_identity_t *)P32_PDIR_E1_IDENTITY_BASE) /* `p32_pdir_e2::p_e1' */
+#define P32_PDIR_E2_IDENTITY  (*(p32_pdir_e2_identity_t *)P32_PDIR_E2_IDENTITY_BASE) /* `p32_pdir::p_e2' */
 
 #else /* __CC__ */
 
@@ -254,6 +254,21 @@ p32_pdir_e2_identity_t[1024 /* P32_PDIR_VEC2INDEX(pointer) */];
 
 #endif /* !__CC__ */
 
+
+/* A special value that is never returned by `p32_pagedir_push_mapone()' */
+#if defined(CONFIG_NO_PAGING_PAE) || defined(CONFIG_NO_PAGING_P32)
+#define SIZEOF_P32_PAGEDIR_PUSHVAL  4
+#else /* CONFIG_NO_PAGING_PAE || CONFIG_NO_PAGING_P32 */
+#define SIZEOF_P32_PAGEDIR_PUSHVAL  8 /* For binary compatibility with PAE paging! */
+#endif /* !CONFIG_NO_PAGING_PAE && !CONFIG_NO_PAGING_P32 */
+#define P32_PAGEDIR_PUSHVAL_INVALID (__CCAST(p32_pagedir_pushval_t)-1)
+#ifdef __CC__
+#if SIZEOF_P32_PAGEDIR_PUSHVAL == 4
+typedef u32 p32_pagedir_pushval_t;
+#else /* SIZEOF_P32_PAGEDIR_PUSHVAL == 4 */
+typedef u64 p32_pagedir_pushval_t;
+#endif /* SIZEOF_P32_PAGEDIR_PUSHVAL != 4 */
+#endif /* __CC__ */
 
 
 #if defined(__CC__) && defined(CONFIG_BUILDING_KERNEL_CORE)
@@ -313,8 +328,9 @@ INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_map)(VIRT vm_vpage_t virt_page, si
  * operation in the sense that the data is entirely thread-private, while modifications
  * do not require any kind of lock.
  * NOTE: If the page had been mapped, `pagedir_pop_mapone()' will automatically sync the page. */
-INTDEF NOBLOCK WUNUSED uintptr_t NOTHROW(FCALL p32_pagedir_push_mapone)(VIRT vm_vpage_t virt_page, PHYS vm_ppage_t phys_page, u16 perm);
-INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_pop_mapone)(VIRT vm_vpage_t virt_page, uintptr_t backup);
+INTDEF NOBLOCK WUNUSED p32_pagedir_pushval_t
+NOTHROW(FCALL p32_pagedir_push_mapone)(VIRT vm_vpage_t virt_page, PHYS vm_ppage_t phys_page, u16 perm);
+INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_pop_mapone)(VIRT vm_vpage_t virt_page, p32_pagedir_pushval_t backup);
 
 /* Unmap pages from the given address range. (requires that the given area be prepared) */
 INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unmapone)(VIRT vm_vpage_t virt_page);

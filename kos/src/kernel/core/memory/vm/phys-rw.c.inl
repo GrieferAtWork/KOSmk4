@@ -90,7 +90,7 @@ DECL_BEGIN
 #ifndef DEFINE_PHYS_UNALIGNED
 PUBLIC NOBLOCK WUNUSED RETURN_TYPE(u8)
 NOTHROW(KCALL FUNC(physb))(PHYS vm_phys_t addr VALUE_ARG(u8)) {
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	size_t pagesize;
 	IFRD(u8 result);
@@ -112,7 +112,7 @@ NOTHROW(KCALL FUNC(physb))(PHYS vm_phys_t addr VALUE_ARG(u8)) {
 
 PUBLIC NOBLOCK WUNUSED RETURN_TYPE(u16)
 NOTHROW(KCALL FUNC(physw))(PHYS vm_phys_t addr VALUE_ARG(u16)) {
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	size_t pagesize;
 	IFRD(u16 result;)
@@ -153,7 +153,7 @@ NOTHROW(KCALL FUNC(physw))(PHYS vm_phys_t addr VALUE_ARG(u16)) {
 
 PUBLIC NOBLOCK WUNUSED RETURN_TYPE(u32)
 NOTHROW(KCALL FUNC(physl))(PHYS vm_phys_t addr VALUE_ARG(u32)) {
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	size_t pagesize;
 	IFRD(u32 result;)
@@ -216,7 +216,7 @@ NOTHROW(KCALL FUNC(physl))(PHYS vm_phys_t addr VALUE_ARG(u32)) {
 
 PUBLIC NOBLOCK WUNUSED RETURN_TYPE(u64)
 NOTHROW(KCALL FUNC(physq))(PHYS vm_phys_t addr VALUE_ARG(u64)) {
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	size_t pagesize;
 	IFRD(u64 result;)

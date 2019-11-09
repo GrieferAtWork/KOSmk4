@@ -69,10 +69,10 @@ typedef __UINT16_TYPE__ error_subclass32_t;
 #undef e_subclass
 
 /* Exception information. */
-struct __ATTR_PACKED exception_data32 /*[PREFIX(e_)]*/ {
-	union __ATTR_PACKED {
+struct exception_data32 /*[PREFIX(e_)]*/ {
+	union {
 		error_code32_t          e_code;   /* Exception code. */
-		struct __ATTR_PACKED {
+		struct {
 			error_class32_t     e_class;    /* Current exception class. */
 			error_subclass32_t  e_subclass; /* Current exception sub-class. */
 		}

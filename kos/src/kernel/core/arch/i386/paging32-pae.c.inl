@@ -150,16 +150,16 @@ NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self) {
 	STATIC_ASSERT(PAE_PDIR_VEC1INDEX(PAE_VM_KERNEL_PDIR_IDENTITY_BASE) == 0);
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 
-	e3[0] = (u64)page_malloc(1);
+	e3[0] = (u64)page_mallocone();
 	if unlikely((pageptr_t)e3[0] == PAGEPTR_INVALID)
 		goto err_0;
-	e3[1] = (u64)page_malloc(1);
+	e3[1] = (u64)page_mallocone();
 	if unlikely((pageptr_t)e3[1] == PAGEPTR_INVALID)
 		goto err_1;
-	e3[2] = (u64)page_malloc(1);
+	e3[2] = (u64)page_mallocone();
 	if unlikely((pageptr_t)e3[2] == PAGEPTR_INVALID)
 		goto err_2;
-	e3[3] = (u64)page_malloc(1);
+	e3[3] = (u64)page_mallocone();
 	if unlikely((pageptr_t)e3[3] == PAGEPTR_INVALID)
 		goto err_3;
 	/* Now to initialize our pre-allocated level#3 vectors.
@@ -257,7 +257,7 @@ NOTHROW(FCALL pae_pagedir_fini)(VIRT struct pae_pdir *__restrict self,
 			e2 = PAE_PDIR_E2_IDENTITY[vec3][vec2];
 			/* Free allocated E1-vectors from E2-entries. */
 			if unlikely(PAE_PDIR_E2_ISVEC1(e2.p_word))
-				page_free(VM_ADDR2PAGE((vm_phys_t)(e2.p_word & PAE_PAGE_FVECTOR)), 1);
+				page_freeone(VM_ADDR2PAGE((vm_phys_t)(e2.p_word & PAE_PAGE_FVECTOR)));
 		}
 	}
 	pagedir_set(old_pagedir);
@@ -265,7 +265,7 @@ NOTHROW(FCALL pae_pagedir_fini)(VIRT struct pae_pdir *__restrict self,
 	/* Free the always-allocated E2-vectors */
 	for (vec3 = 0; vec3 < 4; ++vec3) {
 		assert(self->p_e3[vec3].p_vec2.v_present);
-		page_free(VM_ADDR2PAGE((vm_phys_t)(self->p_e3[vec3].p_word & PAE_PAGE_FVECTOR)), 1);
+		page_freeone(VM_ADDR2PAGE((vm_phys_t)(self->p_e3[vec3].p_word & PAE_PAGE_FVECTOR)));
 	}
 }
 
@@ -303,9 +303,13 @@ NOTHROW(FCALL pae_pagedir_unset_prepared)(union pae_pdir_e1 *__restrict e1_p) {
 
 
 /* Try to widen a 2MiB mapping to a 512*4KiB vector of linear memory
- * Alternatively, if the specified vector is absent, pre-allocate it.
+ * Alternatively, if the specified E1-vector is absent, pre-allocate it.
+ * Additionally, set the `P64_PAGE_FPREPARED' bit for all E1 vector elements
+ * within the range of `vec1_prepare_start...+=vec1_prepare_size'
+ * Note that `vec1_prepare_size' must be non-zero!
+ * @return: true:  Success
  * @return: false: Failed to allocate physical memory */
-PRIVATE NOBLOCK bool
+PRIVATE NOBLOCK WUNUSED bool
 NOTHROW(FCALL pae_pagedir_prepare_impl_widen)(unsigned int vec3,
                                               unsigned int vec2,
                                               unsigned int vec1_prepare_start,
@@ -331,7 +335,7 @@ again:
 	e2.p_word = ATOMIC_READ64(e2_p->p_word);
 	if (!e2.p_vec1.v_present) {
 		/* Not present */
-		new_e1_vector = page_malloc(1);
+		new_e1_vector = page_mallocone();
 		if unlikely(new_e1_vector == PAGEPTR_INVALID)
 			return false;
 		/* Initialize the inner vector.
@@ -356,7 +360,7 @@ again:
 		COMPILER_WRITE_BARRIER();
 		pae_pagedir_pop_mapone(tramp, backup);
 		/* Map the new vector. */
-		new_e2_word = VM_PAGE2ADDR((u64)new_e1_vector) |
+		new_e2_word = ((u64)new_e1_vector * 4096) |
 		              PAE_PAGE_FPRESENT | PAE_PAGE_FWRITE | PAE_PAGE_FACCESSED;
 #if 0 /* This is always the case: Kernel-space always has all vectors allocated. */
 		if (vec3 < PAE_PDIR_VEC3INDEX(KERNEL_BASE))
@@ -367,7 +371,7 @@ again:
 		}
 atomic_set_new_e2_word_or_free_new_e1_vector:
 		if unlikely(!ATOMIC_CMPXCH(e2_p->p_word, e2.p_word, new_e2_word)) {
-			page_free(new_e1_vector, 1);
+			page_freeone(new_e1_vector);
 			goto again;
 		}
 	} else if (e2.p_2mib.d_2mib_1) {
@@ -378,7 +382,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 		 * temporary mapping trampoline to temporarily map the new page
 		 * for initialization (Because the trampoline always uses
 		 * `PAE_PAGE_FNOFLATTEN' when mapping, it is always prepared) */
-		new_e1_vector = page_malloc(1);
+		new_e1_vector = page_mallocone();
 		if unlikely(new_e1_vector == PAGEPTR_INVALID)
 			return false;
 		e1.p_word = e2.p_word & ~(PAE_PAGE_F2MIB | PAE_PAGE_FPAT_2MIB);
@@ -408,7 +412,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 		}
 		pae_pagedir_pop_mapone(tramp, backup);
 		COMPILER_WRITE_BARRIER();
-		new_e2_word  = VM_PAGE2ADDR((u64)new_e1_vector);
+		new_e2_word  = (u64)new_e1_vector * 4096;
 		new_e2_word |= PAE_PAGE_FPRESENT | PAE_PAGE_FWRITE;
 		new_e2_word |= e2.p_word & (PAE_PAGE_FUSER | PAE_PAGE_FPWT |
 		                            PAE_PAGE_FPCD | PAE_PAGE_FACCESSED |
@@ -443,7 +447,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 
 
 
-LOCAL NOBLOCK bool
+LOCAL NOBLOCK WUNUSED bool
 NOTHROW(KCALL pae_pagedir_can_flatten_e1_vector)(union pae_pdir_e1 e1_p[512],
                                                  u64 *__restrict new_e2_word,
                                                  unsigned int still_prepared_vec2) {
@@ -482,7 +486,7 @@ NOTHROW(KCALL pae_pagedir_can_flatten_e1_vector)(union pae_pdir_e1 e1_p[512],
 		if (e1.p_word & PAE_PAGE_FPAT_4KIB) {
 #if PAE_PAGE_FPAT_4KIB != PAE_PAGE_F2MIB
 			e1.p_word &= ~PAE_PAGE_FPAT_4KIB;
-#endif
+#endif /* PAE_PAGE_FPAT_4KIB != PAE_PAGE_F2MIB */
 			e1.p_word |= PAE_PAGE_FPAT_2MIB;
 		}
 		e1.p_word |= PAE_PAGE_F2MIB;
@@ -513,7 +517,7 @@ NOTHROW(FCALL pae_pagedir_unprepare_impl_flatten)(unsigned int vec3,
 	union pae_pdir_e1 *e1_p;
 	union pae_pdir_e2 e2, *e2_p;
 	unsigned int vec1;
-	size_t old_version;
+	uintptr_t old_version;
 	u64 new_e2_word;
 	bool can_flatten;
 	assert(vec3 < 4);
@@ -552,7 +556,7 @@ NOTHROW(FCALL pae_pagedir_unprepare_impl_flatten)(unsigned int vec3,
 	/* Read the current prepare-version _before_ we check if flattening is
 	 * possible. - That way, other threads are allowed to increment the version,
 	 * and forcing us to check again further below. */
-	old_version = ATOMIC_READ64(x86_pagedir_prepare_version);
+	old_version = ATOMIC_READ(x86_pagedir_prepare_version);
 	can_flatten = pae_pagedir_can_flatten_e1_vector(e1_p, &new_e2_word, vec1_unprepare_start);
 	pae_pagedir_unset_prepared(&e1_p[vec1_unprepare_start]);
 	if unlikely(can_flatten) {
@@ -588,7 +592,7 @@ again_try_exchange_e2_word:
 		}
 		/* Successfully merged the vector.
 		 * At this point, all that's left is to free the vector. */
-		page_free(VM_ADDR2PAGE((vm_phys_t)(e2.p_word & PAE_PAGE_FVECTOR)), 1);
+		page_freeone(VM_ADDR2PAGE((vm_phys_t)(e2.p_word & PAE_PAGE_FVECTOR)));
 	}
 }
 
@@ -760,7 +764,7 @@ NOTHROW(FCALL pae_pagedir_prepare_map_keep)(VIRT vm_vpage_t virt_page, size_t nu
 		/* Prepare within the same 1GiB region. */
 		if likely(vec2_min == vec2_max) /* Prepare within the same 2MiB region. */
 			return pae_pagedir_prepare_impl_widen(vec3_min, vec2_min, vec1_min, num_pages);
-		vec1_end = PAE_PDIR_VEC1INDEX_VPAGE(virt_page + num_pages);
+		vec1_end = PAE_PDIR_VEC1INDEX_VPAGE(virt_page + num_pages); /* FIXME: I believe that `vec1_end' can overflow and become 0 here! */
 		/* Prepare the partial range of the first 2MiB region. */
 		if unlikely(!pae_pagedir_prepare_impl_widen(vec3_min, vec2_min, vec1_min, 512 - vec1_min))
 			goto err;
@@ -886,13 +890,11 @@ NOTHROW(FCALL pae_pagedir_assert_e1_word_prepared)(unsigned int vec3,
 	e2 = PAE_PDIR_E2_IDENTITY[vec3][vec2];
 	assertf(e2.p_word & PAE_PAGE_FPRESENT,
 	        "Page vector #%u:%u for page %p...%p isn't allocated",
-	        (unsigned int)vec3,
-	        (unsigned int)vec2,
+	        (unsigned int)vec3, (unsigned int)vec2,
 	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1)),
 	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + (PAGESIZE - 1)));
 	assertf(!(e2.p_word & PAE_PAGE_F2MIB),
-	        "Page %p...%p exists as a present 2MiB page #%u:%u"
-	        "Page vector #%u for page %p...%p isn't allocated",
+	        "Page %p...%p exists as a present 2MiB page #%u:%u",
 	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1)),
 	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + (PAGESIZE - 1)),
 	        (unsigned int)vec3, (unsigned int)vec2);
@@ -921,10 +923,10 @@ NOTHROW(FCALL pae_pagedir_set_e1_word)(unsigned int vec3,
 }
 
 LOCAL NOBLOCK void
-NOTHROW(FCALL pae_pagedir_andl_e1_word)(unsigned int vec3,
-                                        unsigned int vec2,
-                                        unsigned int vec1,
-                                        u64 e1_kept_bits_mask) {
+NOTHROW(FCALL pae_pagedir_and_e1_word)(unsigned int vec3,
+                                       unsigned int vec2,
+                                       unsigned int vec1,
+                                       u64 e1_kept_bits_mask) {
 	pae_pagedir_assert_e1_word_prepared(vec3, vec2, vec1, e1_kept_bits_mask);
 	ATOMIC_FETCHAND(PAE_PDIR_E1_IDENTITY[vec3][vec2][vec1].p_word, e1_kept_bits_mask);
 }
@@ -974,9 +976,9 @@ NOTHROW(FCALL pae_pagedir_encode_4kib)(PHYS vm_vpage_t dest_page,
 	result  = (u64)VM_PPAGE2ADDR(phys_page);
 #if PAGEDIR_MAP_FMASK == 0xf
 	result |= pae_pageperm_matrix[perm];
-#else
+#else /* PAGEDIR_MAP_FMASK == 0xf */
 	result |= pae_pageperm_matrix[perm & 0xf];
-#endif
+#endif /* PAGEDIR_MAP_FMASK != 0xf */
 	if (dest_page >= (vm_vpage_t)KERNEL_BASE_PAGE)
 		result |= USED_PAE_PAGE_FGLOBAL;
 	return result;
@@ -1009,7 +1011,7 @@ NOTHROW(FCALL pae_pagedir_maphint)(VIRT vm_vpage_t virt_page, size_t num_pages,
 	u64 e1_word;
 	assertf(virt_page <= VM_VPAGE_MAX, "Invalid page range %I64p...%I64p", (u64)virt_page, (u64)virt_page + num_pages - 1);
 	assertf(virt_page + num_pages >= virt_page, "Invalid page %I64p...%I64p", (u64)virt_page, (u64)virt_page + num_pages - 1);
-	assertf(virt_page + num_pages <= VM_VPAGE_MAX, "Invalid page %I64p...%I64ps", (u64)virt_page, (u64)virt_page + num_pages - 1);
+	assertf(virt_page + num_pages <= VM_VPAGE_MAX, "Invalid page %I64p...%I64p", (u64)virt_page, (u64)virt_page + num_pages - 1);
 	assert(IS_ALIGNED((uintptr_t)hint, PAE_PAGEDIR_MAPHINT_ALIGNMENT));
 	e1_word = (u64)(uintptr_t)hint | PAE_PAGE_FISAHINT;
 	for (i = 0; i < num_pages; ++i) {
@@ -1070,7 +1072,7 @@ NOTHROW(FCALL pae_pagedir_map)(VIRT vm_vpage_t virt_page, size_t num_pages,
 	        (u64)virt_page, (u64)virt_page + num_pages - 1);
 	assertf(virt_page + num_pages >= virt_page, "Invalid page %I64p...%I64p",
 	        (u64)virt_page, (u64)virt_page + num_pages - 1);
-	assertf(virt_page + num_pages <= VM_VPAGE_MAX, "Invalid page %I64p...%I64ps",
+	assertf(virt_page + num_pages <= VM_VPAGE_MAX, "Invalid page %I64p...%I64p",
 	        (u64)virt_page, (u64)virt_page + num_pages - 1);
 	e1_word = pae_pagedir_encode_4kib(virt_page, phys_page, perm);
 	for (i = 0; i < num_pages; ++i) {
@@ -1091,7 +1093,7 @@ NOTHROW(FCALL pae_pagedir_map)(VIRT vm_vpage_t virt_page, size_t num_pages,
  * operation in the sense that the data is entirely thread-private, while modifications
  * do not require any kind of lock.
  * NOTE: If the page had been mapped, `pagedir_pop_mapone()' will automatically sync the page. */
-INTERN NOBLOCK WUNUSED uintptr_t
+INTERN NOBLOCK WUNUSED pae_pagedir_pushval_t
 NOTHROW(FCALL pae_pagedir_push_mapone)(VIRT vm_vpage_t virt_page,
                                        PHYS vm_ppage_t phys_page, u16 perm) {
 	u64 e1_word, result;
@@ -1109,7 +1111,8 @@ NOTHROW(FCALL pae_pagedir_push_mapone)(VIRT vm_vpage_t virt_page,
 }
 
 INTERN NOBLOCK void
-NOTHROW(FCALL pae_pagedir_pop_mapone)(VIRT vm_vpage_t virt_page, uintptr_t backup) {
+NOTHROW(FCALL pae_pagedir_pop_mapone)(VIRT vm_vpage_t virt_page,
+                                      pae_pagedir_pushval_t backup) {
 	u64 old_word;
 	unsigned int vec3, vec2, vec1;
 	vec3 = PAE_PDIR_VEC3INDEX_VPAGE(virt_page);
@@ -1138,7 +1141,7 @@ NOTHROW(FCALL pae_pagedir_unmap)(VIRT vm_vpage_t virt_page, size_t num_pages) {
 	        (u64)virt_page, (u64)virt_page + num_pages - 1);
 	assertf(virt_page + num_pages >= virt_page, "Invalid page %I64p...%I64p",
 	        (u64)virt_page, (u64)virt_page + num_pages - 1);
-	assertf(virt_page + num_pages <= VM_VPAGE_MAX, "Invalid page %I64p...%I64ps",
+	assertf(virt_page + num_pages <= VM_VPAGE_MAX, "Invalid page %I64p...%I64p",
 	        (u64)virt_page, (u64)virt_page + num_pages - 1);
 	for (i = 0; i < num_pages; ++i) {
 		unsigned int vec3, vec2, vec1;
@@ -1158,7 +1161,7 @@ NOTHROW(FCALL pae_pagedir_unwriteone)(VIRT vm_vpage_t virt_page) {
 	vec3 = PAE_PDIR_VEC3INDEX_VPAGE(virt_page);
 	vec2 = PAE_PDIR_VEC2INDEX_VPAGE(virt_page);
 	vec1 = PAE_PDIR_VEC1INDEX_VPAGE(virt_page);
-	pae_pagedir_andl_e1_word(vec3, vec2, vec1, ~PAE_PAGE_FWRITE);
+	pae_pagedir_and_e1_word(vec3, vec2, vec1, ~PAE_PAGE_FWRITE);
 }
 
 INTERN NOBLOCK void
@@ -1168,7 +1171,7 @@ NOTHROW(FCALL pae_pagedir_unwrite)(VIRT vm_vpage_t virt_page, size_t num_pages) 
 	        (u64)virt_page, (u64)virt_page + num_pages - 1);
 	assertf(virt_page + num_pages >= virt_page, "Invalid page %I64p...%I64p",
 	        (u64)virt_page, (u64)virt_page + num_pages - 1);
-	assertf(virt_page + num_pages <= VM_VPAGE_MAX, "Invalid page %I64p...%I64ps",
+	assertf(virt_page + num_pages <= VM_VPAGE_MAX, "Invalid page %I64p...%I64p",
 	        (u64)virt_page, (u64)virt_page + num_pages - 1);
 	for (i = 0; i < num_pages; ++i) {
 		unsigned int vec3, vec2, vec1;
@@ -1176,7 +1179,7 @@ NOTHROW(FCALL pae_pagedir_unwrite)(VIRT vm_vpage_t virt_page, size_t num_pages) 
 		vec3 = PAE_PDIR_VEC3INDEX_VPAGE(effective_virt_page);
 		vec2 = PAE_PDIR_VEC2INDEX_VPAGE(effective_virt_page);
 		vec1 = PAE_PDIR_VEC1INDEX_VPAGE(effective_virt_page);
-		pae_pagedir_andl_e1_word(vec3, vec2, vec1, ~PAE_PAGE_FWRITE);
+		pae_pagedir_and_e1_word(vec3, vec2, vec1, ~PAE_PAGE_FWRITE);
 	}
 }
 

@@ -33,10 +33,10 @@
 #define HIGH_MEMORY_KERNEL 1
 
 #ifdef __x86_64__
-#define USERSPACE_END           __UINT64_C(0x0001000000000000) /* lower address space limit for kernel-space */
-#define USERSPACE_END_I                    0x0001000000000000  /* lower address space limit for kernel-space */
-#define KERNEL_BASE             __UINT64_C(0xffff800000000000) /* lower address space limit for kernel-space */
-#define KERNEL_BASE_I                      0xffff800000000000  /* lower address space limit for kernel-space */
+#define USERSPACE_END           __UINT64_C(0x0001000000000000) /* Upper address space limit for user-space (first invalid address) */
+#define USERSPACE_END_I                    0x0001000000000000  /* Upper address space limit for user-space (first invalid address) */
+#define KERNEL_BASE             __UINT64_C(0xffff800000000000) /* Lower address space limit for kernel-space */
+#define KERNEL_BASE_I                      0xffff800000000000  /* Lower address space limit for kernel-space */
 #define KERNEL_CORE_BASE        __UINT64_C(0xffffffff80000000) /* Load address of the kernel core. (-2GB) */
 #define KERNEL_CORE_BASE_I                 0xffffffff80000000  /* Load address of the kernel core. (-2GB) */
 #define KERNEL_BASE_PAGE        __UINT64_C(0xffff800000000)    /* Page index for the user/kernel address space split. */
@@ -48,6 +48,29 @@
 #define KERNEL_NUM_CORE_PAGES   __UINT64_C(0x0000000080000)    /* The number of pages associated with the kernel. */
 #define KERNEL_NUM_CORE_PAGES_I            0x0000000080000     /* The number of pages associated with the kernel. */
 
+/* First first half of the kernel address space is used as identity mapping
+ * for the first 64TiB (yes: that is Terrabyte) of physical memory. */
+#define KERNEL_PHYS2VIRT_BASE         __UINT64_C(0xffff880000000000) /* Start of the physical identity mapping */
+#define KERNEL_PHYS2VIRT_BASE_I                  0xffff880000000000  /* Start of the physical identity mapping */
+#define KERNEL_PHYS2VIRT_SIZE             __UINT64_C(0x400000000000) /* Size of the physical identity mapping (== 64TiB) */
+#define KERNEL_PHYS2VIRT_SIZE_I                      0x400000000000  /* Size of the physical identity mapping (== 64TiB) */
+#define KERNEL_PHYS2VIRT_PAGECOUNT        __UINT64_C(0x400000000)    /* Number of pages apart of the physical identity mapping */
+#define KERNEL_PHYS2VIRT_PAGECOUNT_I                 0x400000000     /* Number of pages apart of the physical identity mapping */
+#define KERNEL_PHYS2VIRT_MIN          KERNEL_PHYS2VIRT_BASE          /* Lowest address apart of the physical identity mapping */
+#define KERNEL_PHYS2VIRT_MIN_I        KERNEL_PHYS2VIRT_BASE_I        /* Lowest address apart of the physical identity mapping */
+#define KERNEL_PHYS2VIRT_MAX          __UINT64_C(0xffffc7ffffffffff) /* Greatest address apart of the physical identity mapping */
+#define KERNEL_PHYS2VIRT_MAX_I                   0xffffc7ffffffffff  /* Greatest address apart of the physical identity mapping */
+
+/* Accessor macros for physical identity translation. */
+
+/* Check if a given physical address range is identity mapped. */
+#if 0 /* TODO: Add a configuration option for this.
+       * TODO: Must test the x86_64 kernel (once its working) with _and_ without the phyiscal identity mapping! */
+#define PHYS_IS_IDENTITY(base, num_bytes) (((__u64)(base) + (__u64)(num_bytes)) <= KERNEL_PHYS2VIRT_SIZE)
+#define PHYS_TO_IDENTITY(base)            ((void *)((__u64)(base) + KERNEL_PHYS2VIRT_BASE))
+#define PHYS_IS_IDENTITY_PAGE(pageno)     ((__u64)(pageno) <= KERNEL_PHYS2VIRT_PAGECOUNT)
+#define PHYS_TO_IDENTITY_PAGE(pageno)     ((void *)(((__u64)(pageno) * 4096) + KERNEL_PHYS2VIRT_BASE))
+#endif
 
 /* NOTE: All non-canonical bits must be equal to the most significant canonical bit.
  *       In other words: Memory addresses behave as signed with the bits 48-63 being
@@ -89,6 +112,7 @@
 
 
 /* VM hints for where to map different, dynamic kernel components. */
+#ifdef __x86_64__
 #define KERNEL_VMHINT_HEAP         (0xe1200, VM_GETFREE_ABOVE) /* Hint for the regular kernel heap. */
 #define KERNEL_VMHINT_LHEAP        (0xe1a00, VM_GETFREE_ABOVE) /* Hint for the locked kernel heap. */
 #define KERNEL_VMHINT_SLAB         (0xe8000, VM_GETFREE_BELOW) /* Hint for the slab allocator. */
@@ -108,6 +132,27 @@
 #define KERNEL_VMHINT_USER_LIBRARY (0x0e000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space dynamic libraries. */
 #define KERNEL_VMHINT_USER_DYNLINK (0xbf100, VM_GETFREE_ASLR)  /* Hint for user-space dynamic linkers. */
 #define KERNEL_VMHINT_USER_PEB     (0xc0000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space process environment blocks. */
+#else /* __x86_64__ */
+#define KERNEL_VMHINT_HEAP         (0xe1200, VM_GETFREE_ABOVE) /* Hint for the regular kernel heap. */
+#define KERNEL_VMHINT_LHEAP        (0xe1a00, VM_GETFREE_ABOVE) /* Hint for the locked kernel heap. */
+#define KERNEL_VMHINT_SLAB         (0xe8000, VM_GETFREE_BELOW) /* Hint for the slab allocator. */
+#define KERNEL_VMHINT_DHEAP        (0xe0000, VM_GETFREE_BELOW) /* Hint for the kernel heap used for allocating debug controllers. */
+#define KERNEL_VMHINT_COREPAGE     (0xf0000, VM_GETFREE_BELOW) /* Hint for core-base pointers. */
+#define KERNEL_VMHINT_PHYSINFO     (0xf0000, VM_GETFREE_BELOW) /* Hint for physical memory information/controller data. */
+#define KERNEL_VMHINT_LAPIC        (0xf0000, VM_GETFREE_BELOW) /* Hint for the LAPIC (if present). */
+#define KERNEL_VMHINT_TRAMPOLINE   (0xeffe0, VM_GETFREE_BELOW) /* Hint for per-task trampoline pages. */
+#define KERNEL_VMHINT_KERNSTACK    (0xeb000, VM_GETFREE_BELOW) /* Hint for kernel stacks. */
+#define KERNEL_VMHINT_IDLESTACK    (0xf0000, VM_GETFREE_BELOW) /* Hint for per-cpu IDLE stacks. */
+#define KERNEL_VMHINT_DFSTACK      (0xf0000, VM_GETFREE_BELOW) /* Hint for per-cpu #DF stacks. */
+#define KERNEL_VMHINT_DRIVER       (0xd0000, VM_GETFREE_ABOVE) /* Hint for the custom kernel-space drivers. */
+#define KERNEL_VMHINT_DEVICE       (0xf0000, VM_GETFREE_BELOW) /* Hint for device memory mappings. */
+#define KERNEL_VMHINT_TEMPORARY    (0xf0000, VM_GETFREE_ABOVE) /* Hint for temporary memory mappings. */
+#define KERNEL_VMHINT_USER_HEAP    (0x10000, VM_GETFREE_ABOVE | VM_GETFREE_ASLR) /* Hint for user-space heap memory. */
+#define KERNEL_VMHINT_USER_STACK   (0x80000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space stack memory. */
+#define KERNEL_VMHINT_USER_LIBRARY (0x0e000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space dynamic libraries. */
+#define KERNEL_VMHINT_USER_DYNLINK (0xbf100, VM_GETFREE_ASLR)  /* Hint for user-space dynamic linkers. */
+#define KERNEL_VMHINT_USER_PEB     (0xc0000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space process environment blocks. */
+#endif /* !__x86_64__ */
 
 
 

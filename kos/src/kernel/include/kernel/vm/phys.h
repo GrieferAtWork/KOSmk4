@@ -20,13 +20,46 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_VM_PHYS_H 1
 
 #include <kernel/compiler.h>
+
+#include <kernel/arch/paging.h> /* `pagedir_pushval_t' */
+#include <kernel/paging.h>      /* `pagedir_push_mapone()' */
 #include <kernel/types.h>
 #include <sched/pertask.h> /* PERTASK_GET() */
+
+#include <hybrid/__assert.h>
 #include <hybrid/__unaligned.h>
+
+#include <kos/kernel/paging.h> /* `PHYS_IS_IDENTITY()' */
 
 /* Helper functions for accessing physical memory */
 
 DECL_BEGIN
+
+#ifndef PHYS_IS_IDENTITY
+#define NO_PHYS_IDENTITY 1
+#define PHYS_IS_IDENTITY(addr, num_bytes) 0
+#define PHYS_TO_IDENTITY(addr) (void *)0
+#endif /* !PHYS_IS_IDENTITY */
+
+#ifndef PHYS_IS_IDENTITY_PAGE
+#define PHYS_IS_IDENTITY_PAGE(pageno) \
+	PHYS_IS_IDENTITY(VM_PPAGE2ADDR(pageno), pagedir_pagesize())
+#define PHYS_TO_IDENTITY_PAGE(addr) \
+	PHYS_TO_IDENTITY(VM_PPAGE2ADDR(pageno))
+#endif /* !PHYS_IS_IDENTITY_PAGE */
+
+
+#ifndef __pagedir_pushval_t_defined
+#define __pagedir_pushval_t_defined 1
+#define PAGEDIR_PUSHVAL_INVALID (__CCAST(pagedir_pushval_t)-1)
+#define SIZEOF_PAGEDIR_PUSHVAL  __SIZEOF_POINTER__
+#ifdef __CC__
+typedef uintptr_t pagedir_pushval_t;
+#endif /* __CC__ */
+#endif /* !__pagedir_pushval_t_defined */
+
+
+#ifdef __CC__
 
 /* Helper functions for accessing very small segments of physical memory.
  * WARNING: DON'T SPAM THESE FUNCTIONS! If you want to access consecutive physical memory,
@@ -163,6 +196,9 @@ FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_pagetophys_nopf)(PHYS vm_ppage_t 
  *       required to acquire a lock to the kernel VM when wishing to
  *       map something at this location! */
 DATDEF ATTR_PERTASK vm_vpage_t _this_trampoline_page;
+
+/* TODO: Go through all uses of `THIS_TRAMPOLINE_PAGE' and add
+ *       optimizations for supporting `PHYS_IS_IDENTITY()' */
 #define THIS_TRAMPOLINE_PAGE PERTASK_GET(_this_trampoline_page)
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
@@ -170,6 +206,70 @@ DATDEF ATTR_PERTASK vm_vpage_t _this_trampoline_page;
 INTDEF ATTR_PERTASK struct vm_node _this_trampoline_node;
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
+
+/* Helper for unifying `PHYS_IS_IDENTITY()' and `pagedir_push_mapone(THIS_TRAMPOLINE)' */
+struct vm_ptram {
+	/* VM_PhysTRAMpoline */
+	pagedir_pushval_t pt_pushval; /* The pushed value (or `PAGEDIR_PUSHVAL_INVALID' if nothing was pushed) */
+};
+#define VM_PTRAM_INIT        { PAGEDIR_PUSHVAL_INVALID }
+#define vm_ptram_init(self)  ((self)->pt_pushval = PAGEDIR_PUSHVAL_INVALID)
+#ifdef __PAGEDIR_PUSHVAL_INVALID_IS_ZERO
+#define vm_ptram_cinit(self) __hybrid_assert((self)->pt_pushval == 0)
+#else /* __PAGEDIR_PUSHVAL_INVALID_IS_ZERO */
+#define vm_ptram_cinit(self) (__hybrid_assert((self)->pt_pushval == 0), (self)->pt_pushval = PAGEDIR_PUSHVAL_INVALID)
+#endif /* !__PAGEDIR_PUSHVAL_INVALID_IS_ZERO */
+#define vm_ptram_fini(self) \
+	((self)->pt_pushval == PAGEDIR_PUSHVAL_INVALID \
+	 ? (void)0                                     \
+	 : pagedir_pop_mapone(THIS_TRAMPOLINE_PAGE, (self)->pt_pushval))
+
+LOCAL NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) byte_t *
+NOTHROW(KCALL vm_ptram_mappage_noidentity)(struct vm_ptram *__restrict self,
+                                           vm_ppage_t page, __BOOL writable DFL(true)) {
+	vm_vpage_t trampoline;
+	trampoline = THIS_TRAMPOLINE_PAGE;
+	if (self->pt_pushval == PAGEDIR_PUSHVAL_INVALID) {
+		self->pt_pushval = pagedir_push_mapone(trampoline, page,
+		                                       writable ? PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE
+		                                                : PAGEDIR_MAP_FREAD);
+	} else {
+		pagedir_mapone(trampoline, page,
+		               writable ? PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE
+		                        : PAGEDIR_MAP_FREAD);
+	}
+	return (byte_t *)VM_PAGE2ADDR(trampoline);
+}
+
+/* Return a (possibly temporary) virtual memory mapping of `page' */
+#ifndef NO_PHYS_IDENTITY
+LOCAL NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) byte_t *
+NOTHROW(KCALL vm_ptram_mappage)(struct vm_ptram *__restrict self,
+                                vm_ppage_t page, __BOOL writable DFL(true)) {
+	if (PHYS_IS_IDENTITY_PAGE(page))
+		return (byte_t *)PHYS_TO_IDENTITY_PAGE(page);
+	return vm_ptram_mappage_noidentity(self, page, writable);
+}
+#else /* !NO_PHYS_IDENTITY */
+#define vm_ptram_mappage vm_ptram_mappage_noidentity
+#endif /* NO_PHYS_IDENTITY */
+
+LOCAL NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) byte_t *
+NOTHROW(KCALL vm_ptram_map)(struct vm_ptram *__restrict self,
+                            vm_phys_t addr, __BOOL writable DFL(true)) {
+	byte_t *result;
+#ifndef NO_PHYS_IDENTITY
+	if (PHYS_IS_IDENTITY(addr, 1))
+		return (byte_t *)PHYS_TO_IDENTITY(addr);
+#endif /* !NO_PHYS_IDENTITY */
+	result = vm_ptram_mappage_noidentity(self, VM_ADDR2PAGE(addr), writable);
+	result += (uintptr_t)(addr & (pagedir_pagesize() - 1));
+	return result;
+}
+
+
+
+#endif /* __CC__ */
 
 DECL_END
 

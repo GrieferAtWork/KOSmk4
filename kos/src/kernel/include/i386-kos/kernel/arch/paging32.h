@@ -237,7 +237,36 @@ NOTHROW(KCALL pagedir_set)(PHYS pagedir_t *__restrict value) {
 #define CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_SYNCONE 1
 #define CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_SYNC 1
 
+
+#ifndef __pagedir_pushval_t_defined
+#define __pagedir_pushval_t_defined 1
+#ifdef CONFIG_NO_PAGING_PAE
+#define PAGEDIR_PUSHVAL_INVALID PAE_PAGEDIR_PUSHVAL_INVALID
+#define SIZEOF_PAGEDIR_PUSHVAL  SIZEOF_PAE_PAGEDIR_PUSHVAL
 #ifdef __CC__
+typedef p32_pagedir_pushval_t pagedir_pushval_t;
+#endif /* __CC__ */
+#elif defined(CONFIG_NO_PAGING_P32)
+#define PAGEDIR_PUSHVAL_INVALID P32_PAGEDIR_PUSHVAL_INVALID
+#define SIZEOF_PAGEDIR_PUSHVAL  SIZEOF_P32_PAGEDIR_PUSHVAL
+#ifdef __CC__
+typedef pae_pagedir_pushval_t pagedir_pushval_t;
+#endif /* __CC__ */
+#elif SIZEOF_PAE_PAGEDIR_PUSHVAL == SIZEOF_P32_PAGEDIR_PUSHVAL
+#define PAGEDIR_PUSHVAL_INVALID PAE_PAGEDIR_PUSHVAL_INVALID
+#define SIZEOF_PAGEDIR_PUSHVAL  SIZEOF_PAE_PAGEDIR_PUSHVAL
+#ifdef __CC__
+typedef pae_pagedir_pushval_t pagedir_pushval_t;
+#endif /* __CC__ */
+#else
+#error "The types `pae_pagedir_pushval_t' and `p32_pagedir_pushval_t' are not compatible"
+#endif
+#endif /* !__pagedir_pushval_t_defined */
+
+
+
+#ifdef __CC__
+
 /* Synchronize the entirety of the current page directory.
  * Note that this function may only sync all user-space mappings. If the
  * intent is to also sync all of kernel-space, `pagedir_syncall()'

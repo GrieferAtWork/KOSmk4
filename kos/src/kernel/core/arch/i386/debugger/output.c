@@ -1260,7 +1260,7 @@ dbg_pprintf(int x, int y, /*utf-8*/ char const *__restrict format, ...) {
 
 
 
-PRIVATE ATTR_DBGBSS uintptr_t vga_oldmapping[VGA_VRAM_SIZE / PAGESIZE];
+PRIVATE ATTR_DBGBSS pagedir_pushval_t vga_oldmapping[VGA_VRAM_SIZE / PAGESIZE];
 PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_map)(void) {
 	unsigned int i;
 	if (vga_real_terminal_start != NULL)
@@ -1276,7 +1276,7 @@ PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_map)(void) {
 	pagedir_prepare_map(VM_ADDR2PAGE((vm_virt_t)vga_real_terminal_start), VGA_VRAM_SIZE / PAGESIZE);
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	for (i = 0; i < COMPILER_LENOF(vga_oldmapping); ++i) {
-		uintptr_t oldword;
+		pagedir_pushval_t oldword;
 		vm_vpage_t vp = VM_ADDR2PAGE((vm_virt_t)vga_real_terminal_start) + i;
 		oldword = pagedir_push_mapone(vp, VM_ADDR2PAGE((vm_phys_t)VGA_VRAM_TEXT) + i,
 		                              PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);

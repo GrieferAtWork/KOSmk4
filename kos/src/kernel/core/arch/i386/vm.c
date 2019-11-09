@@ -322,7 +322,6 @@ INTDEF byte_t __kernel_free_startpage[];
 INTDEF byte_t __kernel_free_endpage[];
 INTDEF byte_t __kernel_free_numpages[];
 
-
 INTERN ATTR_FREEDATA struct vm_datapart x86_kernel_vm_part_free = {
 	/* .dp_refcnt = */2, /* 2 == 1(myself) + 1(node) */
 	/* .dp_lock   = */SHARED_RWLOCK_INIT,
@@ -590,9 +589,10 @@ NOTHROW(KCALL x86_initialize_kernel_vm_readonly)(void) {
 }
 
 
-INTDEF byte_t __kernel_free_start[];
-INTDEF byte_t __kernel_free_end[];
-INTDEF byte_t __kernel_free_size[];
+/* The actual page ranges that should be released as general-purpose RAM. */
+INTDEF byte_t __kernel_pfree_startpage[];
+INTDEF byte_t __kernel_pfree_endpage[];
+INTDEF byte_t __kernel_pfree_numpages[];
 
 /* This function can't be made apart of the .free section, because if it was,
  * it could potentially override itself, crashing in a spectacular manner.
@@ -619,12 +619,16 @@ void KCALL x86_kernel_unload_free_and_jump_to_userspace(void) {
 	{
 		pagedir_unmap((vm_vpage_t)__kernel_free_startpage,
 		              (size_t)__kernel_free_numpages);
+#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+		pagedir_unprepare_map((vm_vpage_t)__kernel_free_startpage,
+		                      (size_t)__kernel_free_numpages);
+#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	}
 
 	/* Release all pages of the .free section, as well as those
 	 * previously used by BRK data to the physical memory allocator. */
-	page_free((pageptr_t)((vm_vpage_t)__kernel_free_startpage - KERNEL_CORE_PAGE),
-	          (size_t)__kernel_free_numpages);
+	page_free((pageptr_t)((vm_vpage_t)__kernel_pfree_startpage - KERNEL_CORE_PAGE),
+	          (size_t)__kernel_pfree_numpages);
 
 	/* TODO: Go through memory information and find the first `PMEMBANK_TYPE_KFREE'
 	 *       bank, then split it into a `PMEMBANK_TYPE_KERNEL' / `PMEMBANK_TYPE_RAM'

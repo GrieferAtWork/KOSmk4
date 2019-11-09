@@ -52,7 +52,7 @@ PP_CAT2(anon_zero_loadpart, DATAPAGE_SHIFT)(struct vm_datablock *__restrict UNUS
                                             vm_dpage_t UNUSED(start),
                                             vm_phys_t buffer,
                                             size_t num_pages) {
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	vm_ppage_t phys = VM_ADDR2PAGE(buffer);
 	assert(num_pages != 0);

@@ -1279,7 +1279,7 @@ _block_device_write_phys(struct block_device *__restrict self,
                          vm_phys_t src, size_t num_bytes,
                          pos_t device_position)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	bool is_first;
 	if unlikely(!num_bytes)

@@ -156,7 +156,7 @@ PRIVATE void
 NOTHROW(KCALL debug_pat_loadpart)(struct vm_datablock *__restrict UNUSED(self),
                                   vm_dpage_t UNUSED(start),
                                   vm_phys_t buffer, size_t num_data_pages) {
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	vm_ppage_t phys = VM_ADDR2PAGE(buffer);
 	HEAP_ASSERT(num_data_pages != 0);

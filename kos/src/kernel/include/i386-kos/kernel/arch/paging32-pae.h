@@ -279,9 +279,9 @@ pae_pdir_e3_identity_t[4   /* PAE_PDIR_VEC3INDEX(pointer) */];
  * >>     }
  * >> }
  */
-#define PAE_PDIR_E1_IDENTITY  (*(pae_pdir_e1_identity_t *)PAE_PDIR_E1_IDENTITY_BASE)
-#define PAE_PDIR_E2_IDENTITY  (*(pae_pdir_e2_identity_t *)PAE_PDIR_E2_IDENTITY_BASE)
-#define PAE_PDIR_E3_IDENTITY  (*(pae_pdir_e3_identity_t *)PAE_PDIR_E3_IDENTITY_BASE)
+#define PAE_PDIR_E1_IDENTITY  (*(pae_pdir_e1_identity_t *)PAE_PDIR_E1_IDENTITY_BASE) /* `union pae_pdir_e2::p_e1' */
+#define PAE_PDIR_E2_IDENTITY  (*(pae_pdir_e2_identity_t *)PAE_PDIR_E2_IDENTITY_BASE) /* `union pae_pdir_e3::p_e2' */
+#define PAE_PDIR_E3_IDENTITY  (*(pae_pdir_e3_identity_t *)PAE_PDIR_E3_IDENTITY_BASE) /* `struct pae_pdir::p_e3' */
 
 #else /* __CC__ */
 
@@ -292,6 +292,13 @@ pae_pdir_e3_identity_t[4   /* PAE_PDIR_VEC3INDEX(pointer) */];
 #endif /* !__CC__ */
 
 
+
+/* A special value that is never returned by `pae_pagedir_push_mapone()' */
+#define SIZEOF_PAE_PAGEDIR_PUSHVAL  8
+#define PAE_PAGEDIR_PUSHVAL_INVALID (__CCAST(pae_pagedir_pushval_t)-1)
+#ifdef __CC__
+typedef u64 pae_pagedir_pushval_t;
+#endif /* __CC__ */
 
 
 #if defined(__CC__) && defined(CONFIG_BUILDING_KERNEL_CORE)
@@ -354,8 +361,9 @@ INTDEF NOBLOCK void NOTHROW(FCALL pae_pagedir_map)(VIRT vm_vpage_t virt_page, si
  * operation in the sense that the data is entirely thread-private, while modifications
  * do not require any kind of lock.
  * NOTE: If the page had been mapped, `pagedir_pop_mapone()' will automatically sync the page. */
-INTDEF NOBLOCK WUNUSED uintptr_t NOTHROW(FCALL pae_pagedir_push_mapone)(VIRT vm_vpage_t virt_page, PHYS vm_ppage_t phys_page, u16 perm);
-INTDEF NOBLOCK void NOTHROW(FCALL pae_pagedir_pop_mapone)(VIRT vm_vpage_t virt_page, uintptr_t backup);
+INTDEF NOBLOCK WUNUSED pae_pagedir_pushval_t
+NOTHROW(FCALL pae_pagedir_push_mapone)(VIRT vm_vpage_t virt_page, PHYS vm_ppage_t phys_page, u16 perm);
+INTDEF NOBLOCK void NOTHROW(FCALL pae_pagedir_pop_mapone)(VIRT vm_vpage_t virt_page, pae_pagedir_pushval_t backup);
 
 /* Unmap pages from the given address range. (requires that the given area be prepared) */
 INTDEF NOBLOCK void NOTHROW(FCALL pae_pagedir_unmapone)(VIRT vm_vpage_t virt_page);

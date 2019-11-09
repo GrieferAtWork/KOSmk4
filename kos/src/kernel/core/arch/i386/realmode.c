@@ -198,6 +198,7 @@ INTERN ATTR_FREEDATA struct segment x86_realmode_gdt[SEGMENT_COUNT] = {
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_realmode_initialize)(void) {
+#ifndef __x86_64__
 	if (X86_PAGEDIR_USES_P32()) {
 		memcpyl(pagedir_kernel.pd_p32.p_e2,
 		        pagedir_kernel.pd_p32.p_e2 + (1024 - 256),
@@ -205,6 +206,7 @@ NOTHROW(KCALL x86_realmode_initialize)(void) {
 	} else {
 		memcpyq(PAE_PDIR_E2_IDENTITY[0], PAE_PDIR_E2_IDENTITY[3], 512);
 	}
+#endif /* !__x86_64__ */
 	pagedir_syncall();
 	x86_realmode_base    = (uintptr_t)0x7c00;
 	x86_realmode_segment = (x86_realmode_base & 0xf0000) >> 4;
@@ -219,11 +221,13 @@ NOTHROW(KCALL x86_realmode_initialize)(void) {
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_realmode_finalize)(void) {
+#ifndef __x86_64__
 	if (X86_PAGEDIR_USES_P32()) {
 		memsetl(pagedir_kernel.pd_p32.p_e2, 0, 256);
 	} else {
 		memsetq(PAE_PDIR_E2_IDENTITY[0], 0, 512);
 	}
+#endif /* !__x86_64__ */
 	pagedir_syncall();
 #if 0
 	page_free(x86_realmode_page, CEILDIV((size_t)x86_realmode_interrupt_16_size, PAGESIZE));

@@ -631,7 +631,7 @@ NOTHROW(FCALL x86_handle_except_before_userspace)(struct ucpustate *__restrict u
 		if (icpustate_getpflags(return_state) & EFLAGS_CF)
 			info.rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 #ifdef __x86_64__
-		if (icpustate_is64(return_state)) {
+		if (icpustate_is64bit(return_state)) {
 			/* Native 64-bit system call. */
 			info.rsi_flags = (RPC_SYSCALL_INFO_FARGVALID(0) | RPC_SYSCALL_INFO_FARGVALID(1) |
 			                  RPC_SYSCALL_INFO_FARGVALID(2) | RPC_SYSCALL_INFO_FARGVALID(3) |
@@ -712,7 +712,7 @@ restore_old_except:
 			 *    and directly jump to the applicable int80 / sysenter entry points.
 			 *    NOTE: During this process, the system call may get traced a second time. */
 #ifdef __x86_64__
-			if (icpustate_is64(return_state)) {
+			if (icpustate_is64bit(return_state)) {
 				x86_syscall_emulation(return_state);
 			} else
 #endif /* __x86_64__ */

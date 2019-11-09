@@ -398,6 +398,13 @@ SECTIONS {
 	PROVIDE_HIDDEN(__kernel_free_startpage = ABSOLUTE(.) / PAGESIZE);
 	PROVIDE_HIDDEN(__kernel_size_nofree = ABSOLUTE(ABSOLUTE(__kernel_free_start) - ABSOLUTE(__kernel_start)));
 	SECTION(.free) {
+		/* A special section where data can go that will be unmapped, but have
+		 * its physical backing memory not be freed once `.free' is deleted.
+		 * This section is needed by x86_64's pageing initialization, or more
+		 * specifically its `kernel_initialize_boot_trampolines()' function */
+		KEEP(*(.free.unmap_but_keep_allocated))
+		IP_ALIGN(PAGESIZE);
+		PROVIDE_HIDDEN(__kernel_pfree_startpage = ABSOLUTE(.) / PAGESIZE);
 		*(.text.free)
 
 		IP_ALIGN(__SIZEOF_POINTER__);
@@ -432,10 +439,14 @@ SECTIONS {
 		*(.bss.free)
 		IP_ALIGN(PAGESIZE);
 		PROVIDE_HIDDEN(__kernel_end = ABSOLUTE(.));
+		/* TODO: Check if the outer `ABSOLUTE()' here is actually necessary (remove if it is not). */
 		PROVIDE_HIDDEN(__kernel_size = ABSOLUTE(ABSOLUTE(__kernel_end) - ABSOLUTE(__kernel_start)));
-		PROVIDE_HIDDEN(__kernel_free_end = ABSOLUTE(.));
-		PROVIDE_HIDDEN(__kernel_free_size = ABSOLUTE(ABSOLUTE(__kernel_free_end) - ABSOLUTE(__kernel_free_start)));
-		PROVIDE_HIDDEN(__kernel_free_endpage = ABSOLUTE(ABSOLUTE(.) / PAGESIZE));
+
+		PROVIDE_HIDDEN(__kernel_pfree_endpage = ABSOLUTE(.) / PAGESIZE);
+		PROVIDE_HIDDEN(__kernel_pfree_numpages = ABSOLUTE(ABSOLUTE(__kernel_pfree_endpage) - ABSOLUTE(__kernel_pfree_startpage)));
+
+		PROVIDE_HIDDEN(__kernel_free_size = ABSOLUTE(ABSOLUTE(.) - ABSOLUTE(__kernel_free_start)));
+		PROVIDE_HIDDEN(__kernel_free_endpage = ABSOLUTE(.) / PAGESIZE);
 		PROVIDE_HIDDEN(__kernel_free_numpages = ABSOLUTE(ABSOLUTE(__kernel_free_endpage) - ABSOLUTE(__kernel_free_startpage)));
 	}
 

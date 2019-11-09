@@ -280,7 +280,7 @@ KCALL vm_datablock_vio_write
 		src_offset += ent.ab_size;
 	}
 #elif defined(DEFINE_IO_PHYS)
-	uintptr_t backup; vm_vpage_t tramp;
+	pagedir_pushval_t backup; vm_vpage_t tramp;
 	bool is_first;
 	if unlikely(!num_bytes) return;
 	is_first = true;

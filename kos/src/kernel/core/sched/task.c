@@ -218,28 +218,28 @@ INTDEF pertask_init_t __kernel_pertask_init_start[];
 INTDEF pertask_init_t __kernel_pertask_init_end[];
 INTDEF FREE void KCALL kernel_initialize_scheduler_arch(void);
 
-PRIVATE ATTR_FREETEXT void
-NOTHROW(KCALL initialize_predefined_vm_trampoline)(struct task *__restrict self, char const *__restrict name) {
-	vm_vpage_t addr;
-	addr = vm_getfree(&vm_kernel,
-	                  (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_TRAMPOLINE), 1, 1,
-	                  HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
-	if unlikely_untraced(addr == VM_GETFREE_ERROR)
-		kernel_panic(FREESTR("Failed to locate virtual memory for %s's VM trampoline"), name);
-	FORTASK(self, _this_trampoline_node).vn_node.a_vmin = addr;
-	FORTASK(self, _this_trampoline_node).vn_node.a_vmax = addr;
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if unlikely(!pagedir_prepare_mapone(addr))
-		kernel_panic(FREESTR("Failed to prepare paging for %s's VM trampoline"), name);
-#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+LOCAL ATTR_FREETEXT void
+NOTHROW(KCALL initialize_predefined_vm_trampoline)(struct task *__restrict self,
+                                                   vm_vpage_t vpage) {
+	FORTASK(self, _this_trampoline_node).vn_node.a_vmin = vpage;
+	FORTASK(self, _this_trampoline_node).vn_node.a_vmax = vpage;
 	/* Load the trampoline node into the kernel VM. */
 	assert(FORTASK(self, _this_trampoline_node).vn_vm == &vm_kernel);
 	vm_node_insert(&FORTASK(self, _this_trampoline_node));
 }
 
+#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+/* Prepare 2 consecutive (and 2-page aligned) pages of virtual
+ * memory for the purpose of doing the initial prepare required
+ * for `THIS_TRAMPOLINE_PAGE' of `_boottask' and also `_bootidle' */
+INTDEF NOBLOCK FREE vm_vpage_t
+NOTHROW(FCALL kernel_initialize_boot_trampolines)(void);
+#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_scheduler)(void) {
+	vm_vpage_t boot_trampoline_pages;
 	DEFINE_PUBLIC_SYMBOL(_this_task, offsetof(struct task, t_self), sizeof(struct task));
 	DEFINE_PUBLIC_SYMBOL(_this_cpu, offsetof(struct task, t_cpu), sizeof(struct cpu *));
 	DEFINE_PUBLIC_SYMBOL(_this_vm, offsetof(struct task, t_vm), sizeof(struct vm *));
@@ -253,9 +253,20 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	assert(_boottask.t_refcnt == 1);
 	assert(_bootidle.t_refcnt == 1);
 
+	/* Figure out where to put the initial trampolines for _boottask and _bootidle */
+#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+	boot_trampoline_pages = kernel_initialize_boot_trampolines();
+#else /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+	boot_trampoline_pages = vm_getfree(&vm_kernel,
+	                                   (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_TRAMPOLINE),
+	                                   /* num_pages: */ 2,
+	                                   /* alignment: */ 1,
+	                                   HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
+#endif /* !CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+
 	/* Construct the trampoline node for the predefined tasks. */
-	initialize_predefined_vm_trampoline(&_boottask, FREESTR("boottask"));
-	initialize_predefined_vm_trampoline(&_bootidle, FREESTR("bootidle"));
+	initialize_predefined_vm_trampoline(&_boottask, boot_trampoline_pages + 0);
+	initialize_predefined_vm_trampoline(&_bootidle, boot_trampoline_pages + 1);
 
 	*(uintptr_t *)&FORTASK(&_boottask, __this_kernel_stack).vn_part += (uintptr_t)&_boottask;
 	*(uintptr_t *)&FORTASK(&_boottask, __this_kernel_stack).vn_link.ln_pself += (uintptr_t)&_boottask;

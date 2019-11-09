@@ -50,6 +50,15 @@ DECL_BEGIN
 #error "Missing `#define PAGEDIR_SIZE'"
 #endif /* !PAGEDIR_SIZE */
 
+#ifndef __pagedir_pushval_t_defined
+#define __pagedir_pushval_t_defined 1
+#define PAGEDIR_PUSHVAL_INVALID (__CCAST(pagedir_pushval_t)-1)
+#define SIZEOF_PAGEDIR_PUSHVAL  __SIZEOF_POINTER__
+#ifdef __CC__
+typedef uintptr_t pagedir_pushval_t;
+#endif /* __CC__ */
+#endif /* !__pagedir_pushval_t_defined */
+
 #ifdef __CC__
 /* The physical and virtual address bindings of the kernel's page directory.
  * This is the initial page directory active when KOS boots, as well as the
@@ -58,7 +67,6 @@ DECL_BEGIN
 DATDEF VIRT pagedir_t pagedir_kernel;
 DATDEF PHYS pagedir_t pagedir_kernel_phys;
 #endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_KERNEL */
-
 
 /* Initialize the given page directory.
  * The caller is required to allocate the page directory controller itself, which
@@ -279,8 +287,9 @@ FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_map)(VIRT vm_vpage_t virt_page, size_t
  * do not require any kind of lock.
  * NOTE: If the page had been mapped, `pagedir_pop_mapone()' will automatically sync the page. */
 #ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_PUSH_MAPONE
-FUNDEF NOBLOCK WUNUSED uintptr_t NOTHROW(FCALL pagedir_push_mapone)(VIRT vm_vpage_t virt_page, PHYS vm_ppage_t phys_page, u16 perm);
-FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_pop_mapone)(VIRT vm_vpage_t virt_page, uintptr_t backup);
+FUNDEF NOBLOCK WUNUSED pagedir_pushval_t
+NOTHROW(FCALL pagedir_push_mapone)(VIRT vm_vpage_t virt_page, PHYS vm_ppage_t phys_page, u16 perm);
+FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_pop_mapone)(VIRT vm_vpage_t virt_page, pagedir_pushval_t backup);
 #endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_PUSH_MAPONE */
 
 /* Unmap pages from the given address range. (requires that the given area be prepared) */

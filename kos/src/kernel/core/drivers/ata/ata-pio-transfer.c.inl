@@ -69,7 +69,7 @@ LOCAL void KCALL vm_outsw_phys(port_t port, vm_phys_t buf, size_t count)
 #else
 #define PAGEDIR_MAPPING_FLAGS   PAGEDIR_MAP_FREAD
 #endif
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	bool is_first;
 	is_first = true;

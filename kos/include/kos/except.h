@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8034e362 */
+/* HASH CRC-32:0xda9c1f9b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -851,9 +851,9 @@ struct exception_info {
 	void                     *ei_trace[EXCEPT_BACKTRACE_SIZE];
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	__uintptr_t               ei_flags;    /* Flags describing the current exception state (Set of `EXCEPT_F*'). */
-	union __ATTR_PACKED {
+	union {
 		error_code_t          ei_code;     /* Current exception code. */
-		struct __ATTR_PACKED {
+		struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 			error_class_t     ei_class;    /* Current exception class. */
 			error_subclass_t  ei_subclass; /* Current exception sub-class. */

@@ -101,7 +101,7 @@ INTERN ATTR_PAGING_READMOSTLY u64 used_pxx_page_fglobal = PAE_PAGE_FGLOBAL; /* C
 PRIVATE struct atomic_rwlock x86_pagedir_prepare_lock = ATOMIC_RWLOCK_INIT;
 
 /* Version counter for `x86_pagedir_prepare_lock' (incremented each read/write) */
-PRIVATE ATTR_WRITEMOSTLY WEAK size_t x86_pagedir_prepare_version = 0;
+PRIVATE ATTR_WRITEMOSTLY WEAK uintptr_t x86_pagedir_prepare_version = 0;
 
 #define X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_READ(was)                    \
 	do {                                                              \

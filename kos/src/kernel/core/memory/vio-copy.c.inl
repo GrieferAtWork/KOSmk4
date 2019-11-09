@@ -45,7 +45,7 @@ vio_copytovio_from_phys(struct vio_args *__restrict args,
 #endif
 		THROWS(...) {
 	bool is_first;
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	if unlikely(!num_bytes)
 		return;

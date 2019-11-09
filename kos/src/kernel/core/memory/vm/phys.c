@@ -32,22 +32,6 @@
 #include <assert.h>
 #include <string.h>
 
-#ifndef PHYS_IS_IDENTITY
-#ifndef __INTELLISENSE__
-#define NO_PHYS_IDENTITY 1
-#endif /* !__INTELLISENSE__ */
-#define PHYS_IS_IDENTITY(addr, num_bytes) 0
-#define PHYS_TO_IDENTITY(addr) (void *)0
-#endif /* !PHYS_IS_IDENTITY */
-
-#ifndef PHYS_IS_IDENTITY_PAGE
-#define PHYS_IS_IDENTITY_PAGE(pageno) \
-	PHYS_IS_IDENTITY(VM_PPAGE2ADDR(pageno), pagedir_pagesize())
-#define PHYS_TO_IDENTITY_PAGE(addr) \
-	PHYS_TO_IDENTITY(VM_PPAGE2ADDR(pageno))
-#endif /* !PHYS_IS_IDENTITY_PAGE */
-
-
 DECL_BEGIN
 
 /* A data part used to describe a single, reserved page. */
@@ -70,7 +54,7 @@ vm_copyfromphys(USER CHECKED void *dst,
                 size_t num_bytes)
 		THROWS(E_SEGFAULT) {
 	size_t pagesize;
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	bool is_first;
 #ifndef NO_PHYS_IDENTITY
@@ -128,7 +112,7 @@ vm_copytophys(PHYS vm_phys_t dst,
               size_t num_bytes)
 		THROWS(E_SEGFAULT) {
 	size_t pagesize;
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	bool is_first;
 #ifndef NO_PHYS_IDENTITY
@@ -187,7 +171,7 @@ NOTHROW(KCALL vm_copyfromphys_nopf)(USER CHECKED void *dst,
                                     size_t num_bytes) {
 	size_t pagesize;
 	size_t result = 0;
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	bool is_first;
 #ifndef NO_PHYS_IDENTITY
@@ -247,7 +231,7 @@ NOTHROW(KCALL vm_copytophys_nopf)(PHYS vm_phys_t dst,
                                   size_t num_bytes) {
 	size_t pagesize;
 	size_t result = 0;
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	bool is_first;
 #ifndef NO_PHYS_IDENTITY
@@ -367,7 +351,7 @@ NOTHROW(KCALL vm_copyinphys)(PHYS vm_phys_t dst,
 PUBLIC NOBLOCK void
 NOTHROW(KCALL vm_memsetphys)(PHYS vm_phys_t dst, int byte, size_t num_bytes) {
 	size_t pagesize;
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	bool is_first;
 #ifndef NO_PHYS_IDENTITY
@@ -424,7 +408,7 @@ vm_copyfromphys_onepage(USER CHECKED void *dst,
                         PHYS vm_phys_t src,
                         size_t num_bytes)
 		THROWS(E_SEGFAULT) {
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	size_t pagesize;
 	pagesize = pagedir_pagesize();
@@ -456,7 +440,7 @@ vm_copytophys_onepage(PHYS vm_phys_t dst,
                       USER CHECKED void const *src,
                       size_t num_bytes)
 		THROWS(E_SEGFAULT) {
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	size_t pagesize;
 	pagesize = pagedir_pagesize();
@@ -550,7 +534,7 @@ NOTHROW(KCALL vm_copyinphys_onepage)(PHYS vm_phys_t dst,
 PUBLIC NOBLOCK void
 NOTHROW(KCALL vm_memsetphys_onepage)(PHYS vm_phys_t dst, int byte, size_t num_bytes) {
 	size_t pagesize;
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	pagesize = pagedir_pagesize();
 	ASSERT_ONEPAGE_RANGE(dst, num_bytes, pagesize);
@@ -574,7 +558,7 @@ PUBLIC NOBLOCK WUNUSED size_t
 NOTHROW(KCALL vm_copyfromphys_onepage_nopf)(USER CHECKED void *dst,
                                             PHYS vm_phys_t src,
                                             size_t num_bytes) {
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	size_t result, pagesize;
 	pagesize = pagedir_pagesize();
@@ -598,7 +582,7 @@ PUBLIC NOBLOCK WUNUSED size_t
 NOTHROW(KCALL vm_copytophys_onepage_nopf)(PHYS vm_phys_t dst,
                                           USER CHECKED void const *src,
                                           size_t num_bytes) {
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	size_t result, pagesize;
 	pagesize = pagedir_pagesize();
@@ -624,7 +608,7 @@ PUBLIC void KCALL
 vm_pagefromphys(USER CHECKED void *dst,
                 PHYS vm_ppage_t src)
 		THROWS(E_SEGFAULT) {
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	size_t pagesize;
 	pagesize = pagedir_pagesize();
@@ -653,7 +637,7 @@ PUBLIC void KCALL
 vm_pagetophys(PHYS vm_ppage_t dst,
               USER CHECKED void const *src)
 		THROWS(E_SEGFAULT) {
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	size_t pagesize;
 	pagesize = pagedir_pagesize();
@@ -749,7 +733,7 @@ use_whole_page_buffer:
 
 PUBLIC NOBLOCK void
 NOTHROW(KCALL vm_memsetphyspage)(PHYS vm_ppage_t dst, int byte) {
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	size_t pagesize;
 	pagesize = pagedir_pagesize();
@@ -769,7 +753,7 @@ NOTHROW(KCALL vm_memsetphyspage)(PHYS vm_ppage_t dst, int byte) {
 
 PUBLIC NOBLOCK WUNUSED size_t
 NOTHROW(KCALL vm_pagefromphys_nopf)(USER CHECKED void *dst, PHYS vm_ppage_t src) {
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	size_t result, pagesize;
 	pagesize = pagedir_pagesize();
@@ -788,7 +772,7 @@ NOTHROW(KCALL vm_pagefromphys_nopf)(USER CHECKED void *dst, PHYS vm_ppage_t src)
 
 PUBLIC NOBLOCK WUNUSED size_t
 NOTHROW(KCALL vm_pagetophys_nopf)(PHYS vm_ppage_t dst, USER CHECKED void const *src) {
-	uintptr_t backup;
+	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	size_t result, pagesize;
 	pagesize = pagedir_pagesize();

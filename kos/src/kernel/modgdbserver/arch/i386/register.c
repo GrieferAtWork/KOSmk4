@@ -39,7 +39,11 @@
 #ifndef __INTELLISENSE__
 #ifdef __x86_64__
 
-#error TODO
+#define GET_REGISTER 1
+#include "register64-impl.c.inl"
+
+#define SET_REGISTER 1
+#include "register64-impl.c.inl"
 
 #else /* __x86_64__ */
 

@@ -93,11 +93,11 @@ DECL_BEGIN
  *
  * NOTE: In the case of E4, you may assume that any address with `P64_PDIR_VEC4INDEX(addr) >= 256'
  *       always has the `P64_PAGE_FPRESENT' bit set, and that it points to a statically allocated
- *       block of `union x86_pdir_e3[512]' that are shared between all page directories.
+ *       block of `union p64_pdir_e3[512]' that are shared between all page directories.
  */
 
 /* The minimum alignment required for pointers passed to `pagedir_maphint()' */
-#define PAGEDIR_MAPHINT_ALIGNMENT  4
+#define PAGEDIR_MAPHINT_ALIGNMENT 4
 
 
 #define P64_PAGE_SHIFT      12 /* Shift to convert between pages and addresses. */
@@ -123,8 +123,8 @@ DECL_BEGIN
 #define P64_PAGE_FPCD       __UINT64_C(0x0000000000000010) /* [bit(4)] Page-level cache disable. */
 #define P64_PAGE_FACCESSED  __UINT64_C(0x0000000000000020) /* [bit(5)] The page has been read from, or written to. */
 #define P64_PAGE_FDIRTY     __UINT64_C(0x0000000000000040) /* [bit(6)] The page has been written to. (only valid in entries that map physical memory, rather than point to other vectors) */
-#define P64_PAGE_F2MIB      __UINT64_C(0x0000000000000080) /* [bit(7)] Directly map a physical address on level #2 (for use in `union x86_pdir_e2::p_word'). */
-#define P64_PAGE_F1GIB      __UINT64_C(0x0000000000000080) /* [bit(7)] Directly map a physical address on level #3 (for use in `union x86_pdir_e3::p_word'). */
+#define P64_PAGE_F2MIB      __UINT64_C(0x0000000000000080) /* [bit(7)] Directly map a physical address on level #2 (for use in `union p64_pdir_e2::p_word'). */
+#define P64_PAGE_F1GIB      __UINT64_C(0x0000000000000080) /* [bit(7)] Directly map a physical address on level #3 (for use in `union p64_pdir_e3::p_word'). */
 #define P64_PAGE_FGLOBAL    __UINT64_C(0x0000000000000100) /* [bit(8)] Set to optimize mappings that appear at the same location in all
                                                             *          directories it appears inside of (aka: Kernel-allocated stack/memory). */
 #define P64_PAGE_FPREPARED  __UINT64_C(0x0000000000000800) /* [bit(11)][KOS_SPECIFIC] Prevent the associated mapping from being flattened. (May only appear in E1-entries)
@@ -136,15 +136,20 @@ DECL_BEGIN
 #define P64_PAGE_FNOEXEC    __UINT64_C(0x8000000000000000) /* [bit(63)] Memory within the page cannot be executed. */
 
 
-#define P64_PDIR_VEC1INDEX(ptr)  ((__CCAST(u64)(ptr) >> 12) & 0x1ff) /* For `union x86_pdir_e2::p_e1' */
-#define P64_PDIR_VEC2INDEX(ptr)  ((__CCAST(u64)(ptr) >> 21) & 0x1ff) /* For `union x86_pdir_e3::p_e2' */
-#define P64_PDIR_VEC3INDEX(ptr)  ((__CCAST(u64)(ptr) >> 30) & 0x1ff) /* For `union x86_pdir_e4::p_e3' */
-#define P64_PDIR_VEC4INDEX(ptr)  ((__CCAST(u64)(ptr) >> 39) & 0x1ff) /* For `struct x86_pdir::p_e4' */
+#define P64_PDIR_VEC1INDEX(ptr)  ((__CCAST(u64)(ptr) >> 12) & 0x1ff) /* For `union p64_pdir_e2::p_e1' */
+#define P64_PDIR_VEC2INDEX(ptr)  ((__CCAST(u64)(ptr) >> 21) & 0x1ff) /* For `union p64_pdir_e3::p_e2' */
+#define P64_PDIR_VEC3INDEX(ptr)  ((__CCAST(u64)(ptr) >> 30) & 0x1ff) /* For `union p64_pdir_e4::p_e3' */
+#define P64_PDIR_VEC4INDEX(ptr)  ((__CCAST(u64)(ptr) >> 39) & 0x1ff) /* For `struct p64_pdir::p_e4' */
+#define P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) \
+	((__CCAST(u64)(vec4) << 39) |                \
+	 (__CCAST(u64)(vec3) << 30) |                \
+	 (__CCAST(u64)(vec2) << 21) |                \
+	 (__CCAST(u64)(vec1) << 12))
 
-#define P64_PDIR_VEC1INDEX_VPAGE(vpage)   (__CCAST(u64)(vpage) & 0x1ff)        /* For `union x86_pdir_e2::p_e1' */
-#define P64_PDIR_VEC2INDEX_VPAGE(vpage)  ((__CCAST(u64)(vpage) >> 9) & 0x1ff)  /* For `union x86_pdir_e3::p_e2' */
-#define P64_PDIR_VEC3INDEX_VPAGE(vpage)  ((__CCAST(u64)(vpage) >> 18) & 0x1ff) /* For `union x86_pdir_e4::p_e3' */
-#define P64_PDIR_VEC4INDEX_VPAGE(vpage)  ((__CCAST(u64)(vpage) >> 27) & 0x1ff) /* For `struct x86_pdir::p_e4' */
+#define P64_PDIR_VEC1INDEX_VPAGE(vpage)   (__CCAST(u64)(vpage) & 0x1ff)        /* For `union p64_pdir_e2::p_e1' */
+#define P64_PDIR_VEC2INDEX_VPAGE(vpage)  ((__CCAST(u64)(vpage) >> 9) & 0x1ff)  /* For `union p64_pdir_e3::p_e2' */
+#define P64_PDIR_VEC3INDEX_VPAGE(vpage)  ((__CCAST(u64)(vpage) >> 18) & 0x1ff) /* For `union p64_pdir_e4::p_e3' */
+#define P64_PDIR_VEC4INDEX_VPAGE(vpage)  ((__CCAST(u64)(vpage) >> 27) & 0x1ff) /* For `struct p64_pdir::p_e4' */
 
 /* Pagesizes of different page directory levels. */
 #define P64_PDIR_E1_SIZE     __UINT64_C(0x0000000000001000) /* 4 KiB (Same as `PAGESIZE') */
@@ -162,12 +167,12 @@ DECL_BEGIN
 #define P64_PDIR_PAGEINDEX_2MIB(ptr) (__CCAST(u64)(__CCAST(vm_virt_t)(ptr) & 0x1fffff))
 #define P64_PDIR_PAGEINDEX_1GIB(ptr) (__CCAST(u64)(__CCAST(vm_virt_t)(ptr) & 0x3fffffff))
 
-#define P64_PDIR_ALIGN  4096 /* Alignment required for instances of `struct x86_pdir' */
-#define P64_PDIR_SIZE   4096 /* The total size of `struct x86_pdir' in bytes. */
+#define P64_PDIR_ALIGN  4096 /* Alignment required for instances of `struct p64_pdir' */
+#define P64_PDIR_SIZE   4096 /* The total size of `struct p64_pdir' in bytes. */
 
 
 #ifdef __CC__
-union x86_pdir_e1 {
+union p64_pdir_e1 {
 	/* Lowest-level page-directory entry:
 	 *   - 4-Level Page-Table Entry that Maps a 4-KByte Page */
 	u64                      p_word;     /* Mapping data. */
@@ -192,15 +197,15 @@ union x86_pdir_e1 {
 	} p_4kib;
 };
 
-union x86_pdir_e2 {
+union p64_pdir_e2 {
 	/* TIER#2 page-directory entry:
 	 *   - 4-Level Page-Directory Entry that References a Page Table
 	 *   - 4-Level Page-Directory Entry that Maps a 2-MByte Page */
 	u64                      p_word;     /* Mapping data. */
 #define P64_PDIR_E2_ISVEC1(e2_word)       (((e2_word) & (P64_PAGE_FPRESENT | P64_PAGE_F2MIB)) == P64_PAGE_FPRESENT)
-#define P64_PDIR_E2_IS4MIB(e2_word)       (((e2_word) & (P64_PAGE_FPRESENT | P64_PAGE_F2MIB)) == (P64_PAGE_FPRESENT | P64_PAGE_F2MIB))
+#define P64_PDIR_E2_IS2MIB(e2_word)       (((e2_word) & (P64_PAGE_FPRESENT | P64_PAGE_F2MIB)) == (P64_PAGE_FPRESENT | P64_PAGE_F2MIB))
 #define P64_PDIR_E2_ISUNUSED(e2_word)     ((e2_word) == P64_PAGE_ABSENT)
-	PHYS union x86_pdir_e1 (*p_e1)[512]; /* [MASK(P64_PAGE_FVECTOR)]
+	PHYS union p64_pdir_e1 (*p_e1)[512]; /* [MASK(P64_PAGE_FVECTOR)]
 	                                      * [owned][valid_if(P64_PDIR_E2_ISVEC1(p_word))]
 	                                      * _Physical_ pointer to a level #1 paging vector. */
 	struct {
@@ -214,7 +219,7 @@ union x86_pdir_e2 {
 		u64          v_2mib_0 : 1;       /* [valid_if(v_present)] Must be 0  (P64_PAGE_F2MIB) */
 		u64          v_global_ign : 1;   /* [valid_if(v_present)] Ignored...  (P64_PAGE_FGLOBAL) */
 		u64          v_unused1_ign : 3;  /* [valid_if(v_present)] Ignored...  (0x200, 0x400, 0x800) */
-		u64          v_e1 : 40;          /* [valid_if(v_present)][TYPE(union x86_pdir_e2(*)[512])][owned] P64_PAGE_FVECTOR */
+		u64          v_e1 : 40;          /* [valid_if(v_present)][TYPE(union p64_pdir_e2(*)[512])][owned] P64_PAGE_FVECTOR */
 		u64          v_unused2_ign : 11; /* [valid_if(v_present)] Ignored...  (Bits 52:62) */
 		u64          v_noexec : 1;       /* [valid_if(v_present)] P64_PAGE_FNOEXEC */
 	} p_vec1; /* [valid_if(p_vec1.v_2mib_0 == 0)] */
@@ -238,7 +243,7 @@ union x86_pdir_e2 {
 	} p_2mib; /* [valid_if(p_2mib.d_2mib_1 == 0)] */
 };
 
-union x86_pdir_e3 {
+union p64_pdir_e3 {
 	/* TIER#3 page-directory entry:
 	 *   - 4-Level Page-Directory-Pointer-Table Entry (PDPTE) that References a Page Directory
 	 *   - 4-Level Page-Directory-Pointer-Table Entry (PDPTE) that Maps a 1-GByte Page */
@@ -246,7 +251,7 @@ union x86_pdir_e3 {
 #define P64_PDIR_E3_ISVEC2(e3_word)       (((e3_word) & (P64_PAGE_FPRESENT | P64_PAGE_F1GIB)) == P64_PAGE_FPRESENT)
 #define P64_PDIR_E3_IS1GIB(e3_word)       (((e3_word) & (P64_PAGE_FPRESENT | P64_PAGE_F1GIB)) == (P64_PAGE_FPRESENT | P64_PAGE_F1GIB))
 #define P64_PDIR_E3_ISUNUSED(e3_word)     ((e3_word) == P64_PAGE_ABSENT)
-	PHYS union x86_pdir_e2 (*p_e2)[512]; /* [MASK(P64_PAGE_FVECTOR)]
+	PHYS union p64_pdir_e2 (*p_e2)[512]; /* [MASK(P64_PAGE_FVECTOR)]
 	                                      * [owned][valid_if(P64_PDIR_E3_ISVEC2(p_word))]
 	                                      * _Physical_ pointer to a level #2 paging vector. */
 	struct ATTR_PACKED {
@@ -260,7 +265,7 @@ union x86_pdir_e3 {
 		u64          v_1gib_0 : 1;       /* [valid_if(v_present)] Must be 0  (P64_PAGE_F1GIB) */
 		u64          v_global_ign : 1;   /* [valid_if(v_present)] Ignored...  (P64_PAGE_FGLOBAL) */
 		u64          v_unused1_ign : 3;  /* [valid_if(v_present)] Ignored...  (0x200, 0x400, 0x800) */
-		u64          v_e2 : 40;          /* [valid_if(v_present)][TYPE(union x86_pdir_e2(*)[512])][owned] P64_PAGE_FVECTOR */
+		u64          v_e2 : 40;          /* [valid_if(v_present)][TYPE(union p64_pdir_e2(*)[512])][owned] P64_PAGE_FVECTOR */
 		u64          v_unused2_ign : 11; /* [valid_if(v_present)] Ignored...  (Bits 52:62) */
 		u64          v_noexec : 1;       /* [valid_if(v_present)] P64_PAGE_FNOEXEC */
 	} p_vec2; /* [valid_if(p_vec2.v_1gib_0 == 0)] */
@@ -284,15 +289,15 @@ union x86_pdir_e3 {
 	} p_1gib; /* [valid_if(p_1gib.d_1gib_1 == 1)] */
 };
 
-union x86_pdir_e4 {
+union p64_pdir_e4 {
 	/* TIER#4 page-directory entry:
 	 *   - 4-Level PML4 Entry (PML4E) that References a Page-Directory-Pointer Table
 	 * NOTE: These is no 512GiB page extension! */
 	u64                      p_word;     /* Mapping data. */
-#define P64_PDIR_E3_ISVEC1(e3_word)       ((e3_word) & P64_PAGE_FPRESENT)
-#define P64_PDIR_E3_ISUNUSED(e3_word)     ((e3_word) == P64_PAGE_ABSENT)
-	PHYS union x86_pdir_e3 (*p_e3)[512]; /* [MASK(P64_PAGE_FVECTOR)]
-	                                      * [owned_if(P64_PDIR_E3_ISVEC1(p_word) &&
+#define P64_PDIR_E4_ISVEC3(e3_word)       ((e3_word) & P64_PAGE_FPRESENT)
+#define P64_PDIR_E4_ISUNUSED(e3_word)     ((e3_word) == P64_PAGE_ABSENT)
+	PHYS union p64_pdir_e3 (*p_e3)[512]; /* [MASK(P64_PAGE_FVECTOR)]
+	                                      * [owned_if(P64_PDIR_E4_ISVEC3(p_word) &&
 	                                      *           ((self - :p_e4) < P64_PDIR_VEC4INDEX(KERNEL_BASE)))]
 	                                      * [const_if((self - :p_e4) >= P64_PDIR_VEC4INDEX(KERNEL_BASE))]
 	                                      * [valid_if(P64_PAGE_FPRESENT)]
@@ -311,7 +316,7 @@ union x86_pdir_e4 {
 		u64         v_bigpage_0 : 1;     /* [valid_if(v_present)] Must be zero  (P64_PAGE_F2MIB / P64_PAGE_F1GIB) */
 		u64         v_ignore_global : 1; /* [valid_if(v_present)] Ignored...  (P64_PAGE_FGLOBAL) */
 		u64         v_unused1_ign : 3;   /* [valid_if(v_present)] Ignored...  (0x200, 0x400, 0x800) */
-		u64         v_e3 : 40;           /* [valid_if(v_present)][TYPE(union x86_pdir_e3(*)[512])]
+		u64         v_e3 : 40;           /* [valid_if(v_present)][TYPE(union p64_pdir_e3(*)[512])]
 		                                  * [owned_if((self - :p_e4) < P64_PDIR_VEC4INDEX(KERNEL_BASE))] P64_PAGE_FVECTOR */
 		u64         v_unused2_ign : 11;  /* [valid_if(v_present)] Ignored...  (Bits 52:62) */
 		u64         v_noexec : 1;        /* [valid_if(v_present)] P64_PAGE_FNOEXEC */
@@ -320,17 +325,17 @@ union x86_pdir_e4 {
 #endif /* __CC__ */
 
 #ifdef __CC__
-struct x86_pdir {
-	/* Page-directory (512-entry/4096-byte vector of `union x86_pdir_e4') */
-	union x86_pdir_e4 p_e4[512];
+struct p64_pdir {
+	/* Page-directory (512-entry/4096-byte vector of `union p64_pdir_e4') */
+	union p64_pdir_e4 p_e4[512];
 };
 #endif /* __CC__ */
 
 
-#define X86_VM_KERNEL_PDIR_IDENTITY_BASE  __UINT64_C(0xffff808000000000) /* KERNEL_BASE + 512GiB */
-#define X86_VM_KERNEL_PDIR_IDENTITY_SIZE  __UINT64_C(0x0000008000000000) /* 512GiB */
-#define X86_VM_KERNEL_PDIR_RESERVED_BASE  __UINT64_C(0xffff808000000000) /* Start of the address range reserved for page-directory self-modifications. */
-#define X86_VM_KERNEL_PDIR_RESERVED_SIZE  __UINT64_C(0x0000008000000000) /* Amount of memory reserved for page-directory self-modifications. */
+#define P64_VM_KERNEL_PDIR_IDENTITY_BASE  __UINT64_C(0xffff808000000000) /* KERNEL_BASE + 512GiB */
+#define P64_VM_KERNEL_PDIR_IDENTITY_SIZE  __UINT64_C(0x0000008000000000) /* 512GiB */
+#define P64_VM_KERNEL_PDIR_RESERVED_BASE  __UINT64_C(0xffff808000000000) /* Start of the address range reserved for page-directory self-modifications. */
+#define P64_VM_KERNEL_PDIR_RESERVED_SIZE  __UINT64_C(0x0000008000000000) /* Amount of memory reserved for page-directory self-modifications. */
 
 /* Page directory self-mapping addresses.
  * NOTE: We put the self-mapping 512 GIB after `KERNEL_BASE', just
@@ -358,29 +363,29 @@ struct x86_pdir {
 
 
 #ifdef __CC__
-typedef union x86_pdir_e1
-x86_pdir_e1_identity_t[512 /*P64_PDIR_VEC4INDEX(pointer)*/]
+typedef union p64_pdir_e1
+p64_pdir_e1_identity_t[512 /*P64_PDIR_VEC4INDEX(pointer)*/]
                       [512 /*P64_PDIR_VEC3INDEX(pointer)*/]
                       [512 /*P64_PDIR_VEC2INDEX(pointer)*/]
                       [512 /*P64_PDIR_VEC1INDEX(pointer)*/];
-typedef union x86_pdir_e2
-x86_pdir_e2_identity_t[512 /*P64_PDIR_VEC4INDEX(pointer)*/]
+typedef union p64_pdir_e2
+p64_pdir_e2_identity_t[512 /*P64_PDIR_VEC4INDEX(pointer)*/]
                       [512 /*P64_PDIR_VEC3INDEX(pointer)*/]
                       [512 /*P64_PDIR_VEC2INDEX(pointer)*/];
-typedef union x86_pdir_e3
-x86_pdir_e3_identity_t[512 /*P64_PDIR_VEC4INDEX(pointer)*/]
+typedef union p64_pdir_e3
+p64_pdir_e3_identity_t[512 /*P64_PDIR_VEC4INDEX(pointer)*/]
                       [512 /*P64_PDIR_VEC3INDEX(pointer)*/];
-typedef union x86_pdir_e4
-x86_pdir_e4_identity_t[512 /*P64_PDIR_VEC4INDEX(pointer)*/];
+typedef union p64_pdir_e4
+p64_pdir_e4_identity_t[512 /*P64_PDIR_VEC4INDEX(pointer)*/];
 
 /* E1 identity mapping access for the current page directory.
- *    Index #0: VEC4 -- The same index as used in `struct x86_pdir::p_e4'
- *    Index #1: VEC3 -- The same index as used in `union x86_pdir_e4::p_e3'
- *    Index #2: VEC2 -- The same index as used in `union x86_pdir_e3::p_e2'
- *    Index #3: VEC1 -- The same index as used in `union x86_pdir_e2::p_e1'
+ *    Index #0: VEC4 -- The same index as used in `struct p64_pdir::p_e4'
+ *    Index #1: VEC3 -- The same index as used in `union p64_pdir_e4::p_e3'
+ *    Index #2: VEC2 -- The same index as used in `union p64_pdir_e3::p_e2'
+ *    Index #3: VEC1 -- The same index as used in `union p64_pdir_e2::p_e1'
  * Example:
  * >> VIRT void *pointer = get_pointer();
- * >> union x86_pdir_e1 *desc;
+ * >> union p64_pdir_e1 *desc;
  * >> unsigned int vec4 = P64_PDIR_VEC4INDEX(pointer);
  * >> unsigned int vec3 = P64_PDIR_VEC3INDEX(pointer);
  * >> unsigned int vec2 = P64_PDIR_VEC2INDEX(pointer);
@@ -405,10 +410,10 @@ x86_pdir_e4_identity_t[512 /*P64_PDIR_VEC4INDEX(pointer)*/];
  * >>     }
  * >> }
  */
-#define P64_PDIR_E1_IDENTITY  (*(x86_pdir_e1_identity_t *)P64_PDIR_E1_IDENTITY_BASE)
-#define P64_PDIR_E2_IDENTITY  (*(x86_pdir_e2_identity_t *)P64_PDIR_E2_IDENTITY_BASE)
-#define P64_PDIR_E3_IDENTITY  (*(x86_pdir_e3_identity_t *)P64_PDIR_E3_IDENTITY_BASE)
-#define P64_PDIR_E4_IDENTITY  (*(x86_pdir_e4_identity_t *)P64_PDIR_E4_IDENTITY_BASE)
+#define P64_PDIR_E1_IDENTITY  (*(p64_pdir_e1_identity_t *)P64_PDIR_E1_IDENTITY_BASE) /* `union p64_pdir_e2::p_e1' */
+#define P64_PDIR_E2_IDENTITY  (*(p64_pdir_e2_identity_t *)P64_PDIR_E2_IDENTITY_BASE) /* `union p64_pdir_e3::p_e2' */
+#define P64_PDIR_E3_IDENTITY  (*(p64_pdir_e3_identity_t *)P64_PDIR_E3_IDENTITY_BASE) /* `union p64_pdir_e4::p_e3' */
+#define P64_PDIR_E4_IDENTITY  (*(p64_pdir_e4_identity_t *)P64_PDIR_E4_IDENTITY_BASE) /* `struct p64_pdir::p_e4' */
 
 #else /* __CC__ */
 
@@ -426,7 +431,7 @@ x86_pdir_e4_identity_t[512 /*P64_PDIR_VEC4INDEX(pointer)*/];
 #define PAGEDIR_ALIGN P64_PDIR_ALIGN
 #define PAGEDIR_SIZE  P64_PDIR_SIZE
 #ifdef __CC__
-typedef struct x86_pdir pagedir_t;
+typedef struct p64_pdir pagedir_t;
 #endif /* __CC__ */
 
 /* On x86, the `pagedir_init' function never throws an error. */

@@ -105,6 +105,15 @@ __SYSDECL_END
 #endif /* __CC__ */
 
 
+/* TODO: Re-write the vpage system to work more efficiently in regards
+ *       to the whole pointer-sign-extension thingy on x86_64.
+ * Also: On x86_64 we're actually dealing with:
+ *       36-bit vpage indices (36 == X86_64_ADDRBUS_CANONBITS - PAGESHIFT):
+ *       >> #define __VM_VPAGE_MAX __CCAST(__vm_vpage_t)__UINT64_C(0xfffffffff)
+ *       40-bit ppage indices (40 == popcount(P64_PAGE_FADDR_4KIB)):
+ *       >> #define __VM_PPAGE_MAX __CCAST(__vm_vpage_t)__UINT64_C(0xffffffffff)
+ */
+
 #ifdef __x86_64__
 #define __VM_VPAGE_MAX __CCAST(__vm_vpage_t)__UINT64_C(0xfffffffffffff) /* (4096Tib / 4096) - 1 */
 #define __VM_PPAGE_MAX __CCAST(__vm_ppage_t)__UINT64_C(0xfffffffffffff) /* (4096Tib / 4096) - 1 */

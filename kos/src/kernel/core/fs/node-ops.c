@@ -56,7 +56,7 @@ inode_file_pwrite_with_write(struct inode *__restrict self, vm_phys_t src,
 	minpage = VM_ADDR2PAGE(src);
 	maxpage = VM_ADDR2PAGE(src + num_bytes);
 	if (minpage == maxpage) {
-		uintptr_t backup;
+		pagedir_pushval_t backup;
 		vm_vpage_t tramp;
 		if unlikely(!num_bytes)
 			return;
