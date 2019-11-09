@@ -20,11 +20,13 @@
 #define _I386_KOS_KOS_KERNEL_UCONTEXT32_H 1
 
 #include <__stdinc.h>
-#include <hybrid/host.h>
+
 #include <hybrid/__pointer.h>
-#include <kos/kernel/mcontext32.h>
+#include <hybrid/host.h>
+
 #include <bits/sigset.h>
 #include <bits/sigstack32.h>
+#include <kos/kernel/mcontext32.h>
 
 __DECL_BEGIN
 
@@ -46,10 +48,22 @@ __DECL_BEGIN
 #define __SIZEOF_UCONTEXT32          736
 
 #ifdef __CC__
+#ifndef ____sigset32_t_defined
+#define ____sigset32_t_defined 1
+#ifdef __x86_64__
+typedef struct __sigset_struct32 {
+	__UINT32_TYPE__ __val[__SIZEOF_SIGSET_T__ / 4];
+} __sigset32_t;
+#else /* __x86_64__ */
+#define __sigset_struct32 __sigset_struct
+#define __sigset32_t      __sigset_t
+#endif /* !__x86_64__ */
+#endif /* !____sigset32_t_defined */
+
 struct ucontext32; /* Userlevel context. */
 typedef struct ucontext32 {
 	mcontext32_t                      uc_mcontext;
-	__sigset_t                        uc_sigmask;
+	__sigset32_t                      uc_sigmask;
 	struct sigaltstack32              uc_stack;
 	__HYBRID_PTR32(struct ucontext32) uc_link;
 } ucontext32_t;

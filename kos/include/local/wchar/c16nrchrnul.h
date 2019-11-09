@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0f3228 */
+/* HASH CRC-32:0x860cd1f5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `c16nrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
 __LOCAL_LIBC(c16nrchrnul) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c16nrchrnul))(__CHAR16_TYPE__ const *__restrict __haystack,
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16nrchrnul))(__CHAR16_TYPE__ const *__restrict __haystack,
                                                          __CHAR16_TYPE__ __needle,
                                                          __SIZE_TYPE__ __maxlen) {
 #line 2226 "kos/src/libc/magic/string.c"

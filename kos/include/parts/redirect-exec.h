@@ -57,6 +57,14 @@
 #include <libc/malloc.h>
 #include <hybrid/typecore.h>
 __DECL_BEGIN
+
+#ifdef ____libc_free_defined
+#define __CAPTURE_FREE(p) __libc_free(p)
+#else /* ____libc_free_defined */
+#define __CAPTURE_FREE(p) (void)0
+#endif /* !____libc_free_defined */
+
+#if defined(____libc_malloc_defined) && defined(____libc_realloc_defined)
 __LOCAL char **(__LIBCCALL __capture_exec_args)(char *__first,
                                                 __builtin_va_list __args,
                                                 char ***__penviron) {
@@ -65,15 +73,16 @@ __LOCAL char **(__LIBCCALL __capture_exec_args)(char *__first,
 	char *__arg;
 	__SIZE_TYPE__ __count = 1;
 	if (!__first) {
-		__result    = (char **)__libc_malloc(sizeof(char *));
-		__result[0] = __NULLPTR;
+		__result = (char **)__libc_malloc(sizeof(char *));
+		if __likely(__result)
+			__result[0] = __NULLPTR;
 		return __result;
 	}
 	for (;;) {
 		__new_result = (char **)__libc_realloc(__result, (__count + 2) *
 		                                       sizeof(char *));
-		if (!__new_result) {
-			__libc_free(__result);
+		if __unlikely(!__new_result) {
+			__CAPTURE_FREE(__result);
 			return __NULLPTR;
 		}
 		__arg = __builtin_va_arg(__args, char *);
@@ -95,16 +104,17 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 	char *__arg;
 	__SIZE_TYPE__ __count = 1;
 	if (!__first) {
-		__result    = (char **)__libc_malloc(sizeof(char *));
-		__result[0] = __NULLPTR;
+		__result = (char **)__libc_malloc(sizeof(char *));
+		if __likely(__result)
+			__result[0] = __NULLPTR;
 		return __result;
 	}
 	for (;;) {
 		__new_result = (char **)__libc_realloc(__result,
 		                                         (__count + 2) *
 		                                         sizeof(char *));
-		if (!__new_result) {
-			__libc_free(__result);
+		if __unlikely(!__new_result) {
+			__CAPTURE_FREE(__result);
 			return __NULLPTR;
 		}
 		__arg = __builtin_va_arg(__args, char *);
@@ -117,6 +127,20 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 	*__pflags = __builtin_va_arg(__args, int);
 	return __result;
 }
+#else /* ____libc_malloc_defined && ____libc_realloc_defined */
+__LOCAL char **(__LIBCCALL __capture_exec_args)(char *__UNUSED(__first),
+                                                __builtin_va_list __UNUSED(__args),
+                                                char ***__UNUSED(__penviron)) {
+	return __NULLPTR;
+}
+
+__LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__UNUSED(__first),
+                                                 __builtin_va_list __UNUSED(__args),
+                                                 char ***__UNUSED(__penviron),
+                                                 int *__UNUSED(__pflags)) {
+	return __NULLPTR;
+}
+#endif /* !____libc_malloc_defined || !____libc_realloc_defined */
 
 #define __REDIRECT_EXECL(T, execv, path, args)                                       \
 	{                                                                                \
@@ -127,7 +151,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 		__execargv = (T **)__capture_exec_args((char *)args, __execargs, __NULLPTR); \
 		__builtin_va_end(__execargs);                                                \
 		__execres = execv(path, __execargv);                                         \
-		__libc_free(__execargv);                                                     \
+		__CAPTURE_FREE(__execargv);                                                  \
 		return __execres;                                                            \
 	}
 #define __REDIRECT_EXECLE(T, execve, path, args)                                                 \
@@ -140,7 +164,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 		__execargv = (T **)__capture_exec_args((char *)args, __execargs, (char ***)&__execenvp); \
 		__builtin_va_end(__execargs);                                                            \
 		__execres = execve(path, __execargv, __execenvp);                                        \
-		__libc_free(__execargv);                                                                 \
+		__CAPTURE_FREE(__execargv);                                                              \
 		return __execres;                                                                        \
 	}
 #define __REDIRECT_SPAWNL(T, spawnv, mode, path, args)                               \
@@ -152,7 +176,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 		__execargv = (T **)__capture_exec_args((char *)args, __execargs, __NULLPTR); \
 		__builtin_va_end(__execargs);                                                \
 		__execres = spawnv(mode, path, __execargv);                                  \
-		__libc_free(__execargv);                                                     \
+		__CAPTURE_FREE(__execargv);                                                  \
 		return __execres;                                                            \
 	}
 #define __REDIRECT_SPAWNLE(T, spawnve, mode, path, args)                                         \
@@ -165,7 +189,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 		__execargv = (T **)__capture_exec_args((char *)args, __execargs, (char ***)&__execenvp); \
 		__builtin_va_end(__execargs);                                                            \
 		__execres = spawnve(mode, path, __execargv, __execenvp);                                 \
-		__libc_free(__execargv);                                                                 \
+		__CAPTURE_FREE(__execargv);                                                              \
 		return __execres;                                                                        \
 	}
 #define __REDIRECT_FEXECLAT(T, fexecvat, dfd, path, args)                                         \
@@ -178,7 +202,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 		__execargv = (T **)__capture_exec_argsf((char *)args, __execargs, __NULLPTR, &__fdflags); \
 		__builtin_va_end(__execargs);                                                             \
 		__execres = fexecvat(path, __execargv, __fdflags);                                        \
-		__libc_free(__execargv);                                                                  \
+		__CAPTURE_FREE(__execargv);                                                               \
 		return __execres;                                                                         \
 	}
 #define __REDIRECT_FEXECLEAT(T, fexecveat, dfd, path, args)                                                   \
@@ -192,7 +216,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 		__execargv = (T **)__capture_exec_argsf((char *)args, __execargs, (char ***)&__execenvp, &__fdflags); \
 		__builtin_va_end(__execargs);                                                                         \
 		__execres = fexecveat(dfd, path, __execargv, __execenvp, __fdflags);                                  \
-		__libc_free(__execargv);                                                                              \
+		__CAPTURE_FREE(__execargv);                                                                           \
 		return __execres;                                                                                     \
 	}
 #define __REDIRECT_FEXECLPAT(T, fexecvpat, file, args)                                            \
@@ -205,7 +229,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 		__execargv = (T **)__capture_exec_argsf((char *)args, __execargs, __NULLPTR, &__fdflags); \
 		__builtin_va_end(__execargs);                                                             \
 		__execres = fexecvpat(path, __execargv, __fdflags);                                       \
-		__libc_free(__execargv);                                                                  \
+		__CAPTURE_FREE(__execargv);                                                               \
 		return __execres;                                                                         \
 	}
 #define __REDIRECT_FEXECLPEAT(T, fexecvpeat, path, args)                                                      \
@@ -219,7 +243,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 		__execargv = (T **)__capture_exec_argsf((char *)args, __execargs, (char ***)&__execenvp, &__fdflags); \
 		__builtin_va_end(__execargs);                                                                         \
 		__execres = fexecvpeat(path, __execargv, __execenvp, __fdflags);                                      \
-		__libc_free(__execargv);                                                                              \
+		__CAPTURE_FREE(__execargv);                                                                           \
 		return __execres;                                                                                     \
 	}
 #define __REDIRECT_FSPAWNLAT(T, fspawnvat, mode, dfd, path, args)                                    \
@@ -232,7 +256,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 		__spawnargv = (T **)__capture_spawn_argsf((char *)args, __spawnargs, __NULLPTR, &__fdflags); \
 		__builtin_va_end(__spawnargs, args);                                                         \
 		__spawnres = fspawnvat(mode, path, __spawnargv, __fdflags);                                  \
-		__libc_free(__spawnargv);                                                                    \
+		__CAPTURE_FREE(__spawnargv);                                                                 \
 		return __spawnres;                                                                           \
 	}
 #define __REDIRECT_FSPAWNLEAT(T, fspawnveat, mode, dfd, path, args)                                               \
@@ -246,7 +270,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 		__spawnargv = (T **)__capture_spawn_argsf((char *)args, __spawnargs, (char ***)&__spawnenvp, &__fdflags); \
 		__builtin_va_end(__spawnargs, args);                                                                      \
 		__spawnres = fspawnveat(mode, dfd, path, __spawnargv, __spawnenvp, __fdflags);                            \
-		__libc_free(__spawnargv);                                                                                 \
+		__CAPTURE_FREE(__spawnargv);                                                                              \
 		return __spawnres;                                                                                        \
 	}
 #define __REDIRECT_FSPAWNLPAT(T, fspawnvpat, mode, file, args)                                       \
@@ -259,7 +283,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 		__spawnargv = (T **)__capture_spawn_argsf((char *)args, __spawnargs, __NULLPTR, &__fdflags); \
 		__builtin_va_end(__spawnargs, args);                                                         \
 		__spawnres = fspawnvpat(mode, path, __spawnargv, __fdflags);                                 \
-		__libc_free(__spawnargv);                                                                    \
+		__CAPTURE_FREE(__spawnargv);                                                                 \
 		return __spawnres;                                                                           \
 	}
 #define __REDIRECT_FSPAWNLPEAT(T, fspawnvpeat, mode, path, args)                                                  \
@@ -273,7 +297,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 		__spawnargv = (T **)__capture_spawn_argsf((char *)args, __spawnargs, (char ***)&__spawnenvp, &__fdflags); \
 		__builtin_va_end(__spawnargs, args);                                                                      \
 		__spawnres = fspawnvpeat(mode, path, __spawnargv, __spawnenvp, __fdflags);                                \
-		__libc_free(__spawnargv);                                                                                 \
+		__CAPTURE_FREE(__spawnargv);                                                                              \
 		return __spawnres;                                                                                        \
 	}
 
@@ -289,7 +313,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 			Xexecv(path, __execargv);                                                \
 		}                                                                            \
 		__FINALLY {                                                                  \
-			__libc_free(__spawnargv);                                                \
+			__CAPTURE_FREE(__spawnargv);                                             \
 		}                                                                            \
 	}
 #define __REDIRECT_XEXECLE(T, Xexecve, path, args)                                               \
@@ -304,7 +328,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 			Xexecve(path, __execargv, __execenvp);                                               \
 		}                                                                                        \
 		__FINALLY {                                                                              \
-			__libc_free(__spawnargv);                                                            \
+			__CAPTURE_FREE(__spawnargv);                                                         \
 		}                                                                                        \
 	}
 #define __REDIRECT_XSPAWNL(T, Xspawnv, mode, path, args)                             \
@@ -319,7 +343,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 			__execres = Xspawnv(mode, path, __execargv);                             \
 		}                                                                            \
 		__FINALLY {                                                                  \
-			__libc_free(__spawnargv);                                                \
+			__CAPTURE_FREE(__spawnargv);                                             \
 		}                                                                            \
 		return __execres;                                                            \
 	}
@@ -336,7 +360,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 			__execres = Xspawnve(mode, path, __execargv, __execenvp);                            \
 		}                                                                                        \
 		__FINALLY {                                                                              \
-			__libc_free(__spawnargv);                                                            \
+			__CAPTURE_FREE(__spawnargv);                                                         \
 		}                                                                                        \
 		return __execres;                                                                        \
 	}
@@ -352,7 +376,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 			Xfexecvat(path, __execargv, __fdflags);                                               \
 		}                                                                                         \
 		__FINALLY {                                                                               \
-			__libc_free(__execargv);                                                              \
+			__CAPTURE_FREE(__execargv);                                                           \
 		}                                                                                         \
 	}
 #define __REDIRECT_XFEXECLEAT(T, Xfexecveat, dfd, path, args)                                                 \
@@ -368,7 +392,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 			Xfexecveat(dfd, path, __execargv, __execenvp, __fdflags);                                         \
 		}                                                                                                     \
 		__FINALLY {                                                                                           \
-			__libc_free(__execargv);                                                                          \
+			__CAPTURE_FREE(__execargv);                                                                       \
 		}                                                                                                     \
 	}
 #define __REDIRECT_XFEXECLPAT(T, Xfexecvpat, file, args)                                          \
@@ -383,7 +407,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 			Xfexecvpat(path, __execargv, __fdflags);                                              \
 		}                                                                                         \
 		__FINALLY {                                                                               \
-			__libc_free(__execargv);                                                              \
+			__CAPTURE_FREE(__execargv);                                                           \
 		}                                                                                         \
 	}
 #define __REDIRECT_XFEXECLPEAT(T, Xfexecvpeat, path, args)                                                    \
@@ -399,7 +423,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 			Xfexecvpeat(path, __execargv, __execenvp, __fdflags);                                             \
 		}                                                                                                     \
 		__FINALLY {                                                                                           \
-			__libc_free(__execargv);                                                                          \
+			__CAPTURE_FREE(__execargv);                                                                       \
 		}                                                                                                     \
 	}
 #define __REDIRECT_XFSPAWNLAT(T, Xfspawnvat, mode, dfd, path, args)                                  \
@@ -415,7 +439,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 			__spawnres = Xfspawnvat(mode, path, __spawnargv, __fdflags);                             \
 		}                                                                                            \
 		__FINALLY {                                                                                  \
-			__libc_free(__spawnargv);                                                                \
+			__CAPTURE_FREE(__spawnargv);                                                             \
 		}                                                                                            \
 		return __spawnres;                                                                           \
 	}
@@ -433,7 +457,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 			__spawnres = Xfspawnveat(mode, dfd, path, __spawnargv, __spawnenvp, __fdflags);                       \
 		}                                                                                                         \
 		__FINALLY {                                                                                               \
-			__libc_free(__spawnargv);                                                                             \
+			__CAPTURE_FREE(__spawnargv);                                                                          \
 		}                                                                                                         \
 		return __spawnres;                                                                                        \
 	}
@@ -450,7 +474,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 			__spawnres = Xfspawnvpat(mode, path, __spawnargv, __fdflags);                            \
 		}                                                                                            \
 		__FINALLY {                                                                                  \
-			__libc_free(__spawnargv);                                                                \
+			__CAPTURE_FREE(__spawnargv);                                                             \
 		}                                                                                            \
 		return __spawnres;                                                                           \
 	}
@@ -468,7 +492,7 @@ __LOCAL char **(__LIBCCALL __capture_exec_argsf)(char *__first,
 			__spawnres = Xfspawnvpeat(mode, path, __spawnargv, __spawnenvp, __fdflags);                           \
 		}                                                                                                         \
 		__FINALLY {                                                                                               \
-			__libc_free(__spawnargv);                                                                             \
+			__CAPTURE_FREE(__spawnargv);                                                                          \
 		}                                                                                                         \
 		return __spawnres;                                                                                        \
 	}

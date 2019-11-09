@@ -59,6 +59,14 @@ EXTERN(_this_exception_pointers)
 #define S_EXCEPT_STRING(name)  .rodata.crt.except.name
 #endif /* !__KERNEL__ */
 
+#ifdef __KERNEL__
+#define IK(...) __VA_ARGS__
+#define IU(...) /* nothing */
+#else /* __KERNEL__ */
+#define IK(...) /* nothing */
+#define IU(...) __VA_ARGS__
+#endif /* !__KERNEL__ */
+
 
 
 .section S_EXCEPT_TEXT(error_rethrow)
@@ -72,10 +80,8 @@ INTERN_FUNCTION(libc_error_rethrow)
 	addl   $((SIZEOF_KCPUSTATE - OFFSET_KCPUSTATE_GPREGS) - OFFSET_KCPUSTATE_EFLAGS), \
 	          OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%esp)
 	.cfi_rel_offset %esp, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP
-#ifndef __KERNEL__
-	INTERN(libc_error_info)
-	call   libc_error_info
-#endif /* !__KERNEL__ */
+IU(	INTERN(libc_error_info))
+IU(	call   libc_error_info)
 	orl    $(EXCEPT_FRETHROW), FIELD_ERROR_FLAGS
 .Ldo_unwind_esp:
 	movl   %esp, %ecx
@@ -89,27 +95,40 @@ INTERN_FUNCTION(libc_error_rethrow)
 	.cfi_same_value %esi
 	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBP(%eax), %ebp
 	.cfi_same_value %ebp
-	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%eax), %esp
-	.cfi_same_value %esp
 	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBX(%eax), %ebx
 	.cfi_same_value %ebx
-	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX(%eax), %edx
-	.cfi_same_value %edx
-	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX(%eax), %ecx
-	.cfi_same_value %ecx
-	pushl  OFFSET_KCPUSTATE_EIP(%eax)
-	.cfi_reg_value %esp, 4, %esp
+	/* Push registers that we're going to restore later!
+	 * This must be done before we write to the target ESP in case
+	 * that target ESP overlaps with the kcpustate structure (in which
+	 * case we'll be overwriting the kcpustate during the stack setup,
+	 * meaning that any read from the structure has to happen before then) */
 	pushl  OFFSET_KCPUSTATE_EFLAGS(%eax)
-	.cfi_reg_value %esp, 8, %esp
-	.cfi_reg_offset %eip, 4, %esp
-	.cfi_reg_offset %eflags, 0, %esp
-	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX(%eax), %eax
-	.cfi_def_cfa_register %esp
+	pushl  OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX(%eax)
+	pushl  OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX(%eax)
+	/* Push %ecx and the return address onto the target stack */
+	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%eax), %ecx
+	subl   $8, %ecx
+	/* NOTE: Push EIP first, since that one is stored closer to the bottom
+	 *       of the kcpustate structure, meaning it would get overwritten
+	 *       first! */
+	movl   OFFSET_KCPUSTATE_EIP(%eax), %edx
+	movl   %edx, 4(%ecx)
+	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX(%eax), %edx
+	movl   %edx, 0(%ecx)
+	/* Restore pushed registers */
+	popl   %edx
+	.cfi_same_value %edx
+	popl   %eax
 	.cfi_same_value %eax
 	popfl
 	.cfi_same_value %eflags
-	.cfi_reg_value %esp, 4, %esp
-	.cfi_reg_offset %eip, 0, %esp
+	/* Load the target stack. */
+	movl   %ecx, %esp
+	.cfi_def_cfa %esp, 8
+	.cfi_rel_offset %ecx, 0
+	.cfi_rel_offset %eip, 4
+	/* Restore %ecx and %eip. */
+	popl_cfi_r %ecx
 	ret
 	.cfi_endproc
 END(libc_error_rethrow)
@@ -128,6 +147,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(__cxa_rethrow, libc_error_rethrow)
 .section .text
 PUBLIC_FUNCTION(_Unwind_Resume)
 	.cfi_startproc
+	.cfi_signal_frame
 	pushfl_cfi_r
 	pushal_cfi_r
 	addl   $((SIZEOF_KCPUSTATE - OFFSET_KCPUSTATE_GPREGS) - OFFSET_KCPUSTATE_EFLAGS), \
@@ -150,8 +170,8 @@ INTERN_FUNCTION(libc_Unwind_RaiseException)
 	pushal_cfi_r
 	addl   $((SIZEOF_KCPUSTATE - OFFSET_KCPUSTATE_GPREGS) - OFFSET_KCPUSTATE_EFLAGS), \
 	          OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%esp)
-	.cfi_rel_offset %esp, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP
-	movl   %esp, %ecx
+/*	.cfi_rel_offset %esp, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP */
+	movl   %esp, %ecx /* error_register_state_t *__restrict state */
 	movl   SIZEOF_KCPUSTATE(%esp), %edx /* struct _Unwind_Exception *__restrict exception_object */
 	INTERN(libc_Unwind_RaiseException_impl)
 	call   libc_Unwind_RaiseException_impl
@@ -169,8 +189,8 @@ INTERN_FUNCTION(libc_Unwind_Resume)
 	pushal_cfi_r
 	addl   $((SIZEOF_KCPUSTATE - OFFSET_KCPUSTATE_GPREGS) - OFFSET_KCPUSTATE_EFLAGS), \
 	          OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%esp)
-	.cfi_rel_offset %esp, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP
-	movl   %esp, %ecx
+/*	.cfi_rel_offset %esp, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP */
+	movl   %esp, %ecx /* error_register_state_t *__restrict state */
 	movl   SIZEOF_KCPUSTATE(%esp), %edx /* struct _Unwind_Exception *__restrict exception_object */
 	INTERN(libc_Unwind_Resume_impl)
 	call   libc_Unwind_Resume_impl
@@ -188,8 +208,8 @@ INTERN_FUNCTION(libc_Unwind_Resume_or_Rethrow)
 	pushal_cfi_r
 	addl   $((SIZEOF_KCPUSTATE - OFFSET_KCPUSTATE_GPREGS) - OFFSET_KCPUSTATE_EFLAGS), \
 	          OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%esp)
-	.cfi_rel_offset %esp, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP
-	movl   %esp, %ecx
+/*	.cfi_rel_offset %esp, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP */
+	movl   %esp, %ecx /* error_register_state_t *__restrict state */
 	movl   SIZEOF_KCPUSTATE(%esp), %edx /* struct _Unwind_Exception *__restrict exception_object */
 	INTERN(libc_Unwind_Resume_or_Rethrow_impl)
 	call   libc_Unwind_Resume_or_Rethrow_impl
@@ -207,8 +227,8 @@ INTERN_FUNCTION(libc_Unwind_ForcedUnwind)
 	pushal_cfi_r
 	addl   $((SIZEOF_KCPUSTATE - OFFSET_KCPUSTATE_GPREGS) - OFFSET_KCPUSTATE_EFLAGS), \
 	          OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%esp)
-	.cfi_rel_offset %esp, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP
-	movl   %esp, %ecx
+/*	.cfi_rel_offset %esp, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP */
+	movl   %esp, %ecx /* error_register_state_t *__restrict state */
 	movl   SIZEOF_KCPUSTATE(%esp), %edx /* struct _Unwind_Exception *__restrict exception_object */
 	pushl_cfi (SIZEOF_KCPUSTATE + 12)(%esp)   /* void *stop_arg */
 	pushl_cfi (SIZEOF_KCPUSTATE + 12)(%esp)   /* _Unwind_Stop_Fn stop */
@@ -229,35 +249,40 @@ INTERN_FUNCTION(libc_Unwind_Backtrace)
 	pushal_cfi_r
 	addl   $((SIZEOF_KCPUSTATE - OFFSET_KCPUSTATE_GPREGS) - OFFSET_KCPUSTATE_EFLAGS), \
 	          OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%esp)
-	.cfi_rel_offset %esp, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP
-	movl   %esp, %ecx
+/*	.cfi_rel_offset %esp, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP */
+	movl   %esp, %ecx /* error_register_state_t *__restrict state */
 	movl   SIZEOF_KCPUSTATE(%esp), %edx /* _Unwind_Trace_Fn func */
 	pushl_cfi (SIZEOF_KCPUSTATE + 12)(%esp)   /* void *arg */
 	INTERN(libc_Unwind_Backtrace_impl)
 	call   libc_Unwind_Backtrace_impl
 	.cfi_adjust_cfa_offset -4
 	addl   $(SIZEOF_KCPUSTATE - 4), %esp /* -4: EIP */
+	.cfi_adjust_cfa_offset -(SIZEOF_KCPUSTATE - 4)
 	ret
 	.cfi_endproc
 END(libc_Unwind_Backtrace)
 DEFINE_PUBLIC_ALIAS(_Unwind_Backtrace, libc_Unwind_Backtrace)
 
 
+#define CFI_REL_OFFSET_KCPUSTATE_DEFS(offset)                                       \
+	.cfi_rel_offset %edi, ((offset) + OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDI); \
+	.cfi_rel_offset %esi, ((offset) + OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESI); \
+	.cfi_rel_offset %ebp, ((offset) + OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBP); \
+	.cfi_rel_offset %esp, ((offset) + OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP); \
+	.cfi_rel_offset %ebx, ((offset) + OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBX); \
+	.cfi_rel_offset %edx, ((offset) + OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX); \
+	.cfi_rel_offset %ecx, ((offset) + OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX); \
+	.cfi_rel_offset %eax, ((offset) + OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX); \
+	.cfi_rel_offset %eflags, ((offset) + OFFSET_KCPUSTATE_EFLAGS);                  \
+	.cfi_rel_offset %eip, ((offset) + OFFSET_KCPUSTATE_EIP);
+
+
 .section S_EXCEPT_TEXT(except_handler3)
 INTERN_FUNCTION(libc_except_handler3)
-	.cfi_startproc
+	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %ecx, SIZEOF_KCPUSTATE
-	.cfi_rel_offset %edi, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDI
-	.cfi_rel_offset %esi, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESI
-	.cfi_rel_offset %ebp, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBP
-	.cfi_rel_offset %esp, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP
-	.cfi_rel_offset %ebx, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBX
-	.cfi_rel_offset %edx, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX
-	.cfi_rel_offset %ecx, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX
-	.cfi_rel_offset %eax, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX
-	.cfi_rel_offset %eflags, OFFSET_KCPUSTATE_EFLAGS
-	.cfi_rel_offset %eip, OFFSET_KCPUSTATE_EIP
+	CFI_REL_OFFSET_KCPUSTATE_DEFS(0)
 	movl   %ecx, %ebp /* Preserve `error_register_state_t *__restrict state' for unwinding. */
 	.cfi_def_cfa_register %ebp
 	INTERN(libc_except_handler3_impl)
@@ -269,19 +294,10 @@ DEFINE_PUBLIC_ALIAS(except_handler3, libc_except_handler3)
 
 .section S_EXCEPT_TEXT(except_handler4)
 INTERN_FUNCTION(libc_except_handler4)
-	.cfi_startproc
+	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %ecx, SIZEOF_KCPUSTATE
-	.cfi_rel_offset %edi, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDI
-	.cfi_rel_offset %esi, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESI
-	.cfi_rel_offset %ebp, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBP
-	.cfi_rel_offset %esp, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP
-	.cfi_rel_offset %ebx, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBX
-	.cfi_rel_offset %edx, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX
-	.cfi_rel_offset %ecx, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX
-	.cfi_rel_offset %eax, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX
-	.cfi_rel_offset %eflags, OFFSET_KCPUSTATE_EFLAGS
-	.cfi_rel_offset %eip, OFFSET_KCPUSTATE_EIP
+	CFI_REL_OFFSET_KCPUSTATE_DEFS(0)
 	movl   %ecx, %ebp /* Preserve `error_register_state_t *__restrict state' for unwinding. */
 	.cfi_def_cfa_register %ebp
 	INTERN(libc_except_handler4_impl)
@@ -295,6 +311,12 @@ DEFINE_PUBLIC_ALIAS(except_handler4, libc_except_handler4)
 
 
 
+#if EXCEPT_BACKTRACE_SIZE != 0
+#define Ldo_unwind_rsp_maybe_fill_trace Ldo_fill_trace
+#else /* EXCEPT_BACKTRACE_SIZE != 0 */
+#define Ldo_unwind_rsp_maybe_fill_trace Ldo_unwind_rsp
+#endif /* EXCEPT_BACKTRACE_SIZE == 0 */
+
 
 
 .section S_EXCEPT_TEXT(error_thrown)
@@ -304,26 +326,21 @@ INTERN_FUNCTION(libc_error_thrown)
 	.cfi_startproc
 	pushfl_cfi_r
 	pushal_cfi_r
-#ifndef __KERNEL__
-	INTERN(libc_error_info)
-	call   libc_error_info
-#endif
+IU(	INTERN(libc_error_info))
+IU(	call   libc_error_info)
 /*	.cfi_rel_offset %esp, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP */
 	/* Fill in the per-task exception context. */
-#ifdef __KERNEL__
-	movl   %eax, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX)
-	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX)
-	movl   %edx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX)
-#else /* __KERNEL__ */
+IK(	movl   %eax, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX))
+IK(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX))
+IK(	movl   %edx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX))
 	/* The call to `libc_error_info()' (may) have clobbered eax, ecx, edx
 	 * So instead, we must copy these registers from the stack. */
-	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX(%esp), %ecx
-	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX)
-	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX(%esp), %ecx
-	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX)
-	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX(%esp), %ecx
-	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX)
-#endif /* !__KERNEL__ */
+IU(	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX(%esp), %ecx)
+IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX))
+IU(	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX(%esp), %ecx)
+IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX))
+IU(	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX(%esp), %ecx)
+IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX))
 	movl   %ebx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBX)
 	leal   SIZEOF_KCPUSTATE(%esp), %ecx
 	movl   %ecx, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%esp)
@@ -338,15 +355,12 @@ INTERN_FUNCTION(libc_error_thrown)
 	/* Copy exception information. */
 	movl   $(EXCEPT_FNORMAL), FIELD_ERROR_FLAGS
 	leal   SIZEOF_KCPUSTATE(%esp), %esi /* %esi = &code */
-#ifdef __KERNEL__
-	movl   $(_this_exception_code), %edi
-	addl   %fs:0, %edi  /* %edi = &%fs:_this_exception_code */
-#else /* __KERNEL__ */
-	leal   OFFSET_EXCEPTION_INFO_CODE(%eax), %edi /* %edi = &libc_error_info()->ei_code */
+IK(	movl   $(_this_exception_code), %edi)
+IK(	addl   %fs:0, %edi                            /* %edi = &%fs:_this_exception_code */)
+IU(	leal   OFFSET_EXCEPTION_INFO_CODE(%eax), %edi /* %edi = &libc_error_info()->ei_code */)
 #if EXCEPT_BACKTRACE_SIZE != 0
-	pushl_cfi %eax
+IU(	pushl_cfi %eax)
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-#endif /* !__KERNEL__ */
 	lodsl  /* %eax = code */
 	stosl  /* %fs:_this_exception_code = code */
 	movl   %edi, %edx
@@ -366,13 +380,9 @@ INTERN_FUNCTION(libc_error_thrown)
 	xorl   %eax, %eax
 	rep    stosl       /* Set all unset pointers to NULL */
 #if EXCEPT_BACKTRACE_SIZE != 0
-#ifndef __KERNEL__
-	popl_cfi %eax
-#endif /* !__KERNEL__ */
-	jmp    .Ldo_fill_trace
-#else
-	jmp    .Ldo_unwind_esp
-#endif
+IU(	popl_cfi %eax)
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+	jmp    .Ldo_unwind_rsp_maybe_fill_trace
 	.cfi_endproc
 END(libc_error_thrown)
 
@@ -383,13 +393,11 @@ DEFINE_PUBLIC_ALIAS(error_throw, libc_error_throw)
 INTERN_FUNCTION(libc_error_throw)
 	.cfi_startproc
 	/* ATTR_NORETURN void FCALL error_throw(error_code_t code) */
-#ifndef __KERNEL__
-	.cfi_remember_state
-	pushfl_cfi_r
-	pushal_cfi_r
-	INTERN(libc_error_info)
-	call   libc_error_info
-#endif /* !__KERNEL__ */
+IU(	.cfi_remember_state)
+IU(	pushfl_cfi_r)
+IU(	pushal_cfi_r)
+IU(	INTERN(libc_error_info))
+IU(	call   libc_error_info)
 	movl   %ecx, FIELD_ERROR_CODE
 #if EXCEPTION_DATA_POINTERS != 0
 	.Lindex = 0
@@ -398,35 +406,28 @@ INTERN_FUNCTION(libc_error_throw)
 	.Lindex = .Lindex + 4
 	.endr
 #endif /* EXCEPTION_DATA_POINTERS != 0 */
-#ifndef __KERNEL__
-	jmp    1f
-	.cfi_restore_state
-#endif /* !__KERNEL__ */
+IU(	jmp    1f)
+IU(	.cfi_restore_state)
 DEFINE_PUBLIC_ALIAS(error_throw_current, libc_error_throw_current)
 INTERN_FUNCTION(libc_error_throw_current)
 	/* ATTR_NORETURN void error_throw_current(void) */
 	pushfl_cfi_r
 	pushal_cfi_r
-#ifndef __KERNEL__
-	INTERN(libc_error_info)
-	call   libc_error_info
-1:
-#endif /* !__KERNEL__ */
+IU(	INTERN(libc_error_info))
+IU(	call   libc_error_info)
+IU(1:)
 	/* Fill in the per-task exception context. */
-#ifdef __KERNEL__
-	movl   %eax, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX)
-	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX)
-	movl   %edx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX)
-#else /* __KERNEL__ */
+IK(	movl   %eax, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX))
+IK(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX))
+IK(	movl   %edx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX))
 	/* The call to `libc_error_info()' (may) have clobbered eax, ecx, edx
 	 * So instead, we must copy these registers from the stack. */
-	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX(%esp), %ecx
-	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX)
-	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX(%esp), %ecx
-	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX)
-	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX(%esp), %ecx
-	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX)
-#endif /* !__KERNEL__ */
+IU(	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX(%esp), %ecx)
+IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX))
+IU(	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX(%esp), %ecx)
+IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX))
+IU(	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX(%esp), %ecx)
+IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX))
 	movl   %ebx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBX)
 	leal   SIZEOF_KCPUSTATE(%esp), %ecx
 	movl   %ecx, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%esp)
@@ -438,7 +439,7 @@ INTERN_FUNCTION(libc_error_throw_current)
 	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_EFLAGS)
 	movl   OFFSET_KCPUSTATE_EIP(%esp), %ecx
 	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_EIP)
-	movl   $EXCEPT_FNORMAL, FIELD_ERROR_FLAGS
+	movl   $(EXCEPT_FNORMAL), FIELD_ERROR_FLAGS
 #if EXCEPT_BACKTRACE_SIZE != 0
 .Ldo_fill_trace:
 	.Lindex = 0
@@ -446,7 +447,7 @@ INTERN_FUNCTION(libc_error_throw_current)
 	movl   $0, FIELD_ERROR_TRACE(.Lindex)
 	.Lindex = .Lindex + 4
 	.endr
-#endif
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	jmp    .Ldo_unwind_esp
 END(libc_error_throw_current)
 	.cfi_endproc
@@ -466,12 +467,12 @@ INTERN(x86_serve_user_rpc_and_propagate_exceptions)
 INTERN_FUNCTION(x86_unwind_interrupt)
 	.cfi_startproc simple
 	.cfi_signal_frame
+	.cfi_def_cfa %ecx, OFFSET_ICPUSTATE_IRREGS
 	.cfi_restore_iret_eip
 	.cfi_restore_iret_cs
 	.cfi_restore_iret_eflags
 	.cfi_restore_iret_esp
 	.cfi_restore_iret_ss
-	.cfi_def_cfa %ecx, OFFSET_ICPUSTATE_IRREGS
 	.cfi_rel_offset %edi, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDI
 	.cfi_rel_offset %esi, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ESI
 	.cfi_rel_offset %ebp, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBP
@@ -510,7 +511,7 @@ INTERN_FUNCTION(x86_unwind_interrupt_esp)
 	.cfi_rel_offset %eax, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EAX
 	.cfi_rel_offset %eflags, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_EFLAGS
 	.cfi_rel_offset %eip, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_EIP
-	.cfi_rel_offset %cs, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS
+/*	.cfi_rel_offset %cs, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS */
 
 INTERN_FUNCTION(x86_unwind_kernel_interrupt_esp)
 	/* NOTE: RPC guaranties never to modify a kernel-target iret tail, meaning
@@ -539,7 +540,7 @@ INTERN_FUNCTION(x86_unwind_kernel_interrupt_esp)
 	COPYSTATE(%ebp, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBP, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBP)
 	leal   OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL(%esp), %eax /* ESP */
 	movl   %eax, %fs:_this_exception_state + OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP
-	movl   %eax, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%esp) /* Fix ESP */
+	movl   %eax, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%esp)
 	COPYSTATE(%ebx, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBX, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBX)
 	COPYSTATE(%edx, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDX, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX)
 	COPYSTATE(%ecx, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ECX, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX)

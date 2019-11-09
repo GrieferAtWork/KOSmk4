@@ -171,7 +171,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpyl))(void *__restrict __dst,
 		return (__UINT32_TYPE__ *)__dst;
 #else /* !__OPTIMIZE_SIZE__ */
 		if (!(__n_dwords & 1))
-			return __libc_slow_memcpyq(__dst, __src, __n_dwords >> 1);
+			return (__UINT32_TYPE__ *)__libc_slow_memcpyq((__UINT64_TYPE__ *)__dst, __src, __n_dwords >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memcpyq && __SIZEOF_BUSINT__ >= 8 */
 	}
@@ -730,7 +730,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpyl))(void *__restrict __dst,
 		return (__UINT32_TYPE__ *)__dst + 1;
 #else /* !__OPTIMIZE_SIZE__ */
 		if (!(__n_dwords & 1))
-			return __libc_slow_mempcpyq(__dst, __src, __n_dwords >> 1);
+			return (__UINT32_TYPE__ *)__libc_slow_mempcpyq((__UINT64_TYPE__ *)__dst, __src, __n_dwords >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempcpyq && __SIZEOF_BUSINT__ >= 8 */
 	}

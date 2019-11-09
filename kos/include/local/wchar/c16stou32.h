@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ca0969b */
+/* HASH CRC-32:0x50948e68 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_c16stou32_defined 1
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16stou32) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c16stou32))(__CHAR16_TYPE__ const *__restrict __nptr,
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stou32))(__CHAR16_TYPE__ const *__restrict __nptr,
                                                        __CHAR16_TYPE__ **__endptr,
                                                        int __base) {
 #line 882 "kos/src/libc/magic/stdlib.c"

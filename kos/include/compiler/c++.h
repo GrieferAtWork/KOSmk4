@@ -136,16 +136,14 @@
 #define __register               /* nothing */
 #endif
 
+#ifdef __INTELLISENSE__
 __NAMESPACE_INT_BEGIN
 extern "C++" {
-class __any_ptr {
-	void *__m_p;
-public:
-	__CXX11_CONSTEXPR __ATTR_INLINE __any_ptr(void *__p) __CXX_NOEXCEPT: __m_p(__p) {}
-	template<class __T> __CXX11_CONSTEXPR __ATTR_INLINE
-	operator __T *() __CXX_NOEXCEPT { return (__T *)this->__m_p; }
-};
+template<class __T> __T ____intellisense_requires_type(__T v);
 }
 __NAMESPACE_INT_END
-#define __COMPILER_UNIPOINTER(p) \
-	__NAMESPACE_INT_SYM __any_ptr((void *)(__UINTPTR_TYPE__)(p))
+#define __COMPILER_REQTYPE(T, v) (__NAMESPACE_INT_SYM ____intellisense_requires_type< T >(v))
+#else /* __INTELLISENSE__ */
+#define __COMPILER_REQTYPE(T, v) (v)
+#endif /* !__INTELLISENSE__ */
+

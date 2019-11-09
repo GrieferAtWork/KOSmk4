@@ -66,7 +66,7 @@ typedef struct user_fpregs_struct elf_fpregset_t;
    the Pentium III SSE registers in addition to the classic
    floating-point stuff. */
 typedef struct user_fpxregs_struct elf_fpxregset_t;
-#else  /* __x86_64__ */
+#else /* __x86_64__ */
 /* Register set for the extended floating-point registers. Includes
    the Pentium III SSE registers in addition to the classic
    floating-point stuff. */

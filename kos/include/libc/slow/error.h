@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3811737a */
+/* HASH CRC-32:0xa7ef3836 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,8 @@
 #define _LIBC_SLOW_ERROR_H 1
 
 #include <__stdinc.h>
+
+#ifdef __CC__
 #include <__crt.h>
 #include <hybrid/typecore.h>
 #include <bits/types.h>
@@ -75,5 +77,6 @@ __LIBC __ATTR_LIBC_PRINTF(5, 6) void (__VLIBCCALL __libc_slow_error_at_line)(int
 #endif /* !____libc_slow_error_at_line_defined */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_LIBC_SLOW_ERROR_H */

@@ -124,7 +124,7 @@ INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 	call   rpc_serve_async_user_redirection
 
 	.cfi_def_cfa_register %rax
-	movl   %rax, %rsp
+	movq   %rax, %rsp
 	.cfi_def_cfa_register %rsp
 
 	/* Check for additional RPC callbacks. */
@@ -416,10 +416,10 @@ PUBLIC_FUNCTION(task_serve)
 #if 1 /* Service blocking cleanup operations. */
 	call   blocking_cleanup_service
 	/* If there are pending X-RPCs, service them below. */
-	cmpl   $(BLOCKING_CLEANUP_SERVICE_XRPC), %rax
+	cmpq   $(BLOCKING_CLEANUP_SERVICE_XRPC), %rax
 	je     1f
 	/* return EAX == BLOCKING_CLEANUP_SERVICE_DONE */
-	cmpl   $(BLOCKING_CLEANUP_SERVICE_DONE), %rax
+	cmpq   $(BLOCKING_CLEANUP_SERVICE_DONE), %rax
 	sete   %cl
 	movzbq %cl, %rax
 	ret
@@ -475,7 +475,7 @@ PUBLIC_FUNCTION(task_serve)
 
 #if 1 /* Service blocking cleanup operations. */
 	call   blocking_cleanup_service
-	cmpl   $(BLOCKING_CLEANUP_SERVICE_XRPC), %rax
+	cmpq   $(BLOCKING_CLEANUP_SERVICE_XRPC), %rax
 	je     1b
 #endif
 

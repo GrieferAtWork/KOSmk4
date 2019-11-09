@@ -35,7 +35,7 @@ DECL_BEGIN
 		size_t count = 0;                                            \
 		__builtin_va_list copy;                                      \
 		__builtin_va_copy(copy, args);                               \
-		while ((arg = __builtin_va_arg(copy)) != NULL)               \
+		while ((arg = __builtin_va_arg(copy, T *)) != NULL)          \
 			++count;                                                 \
 		__builtin_va_end(copy);                                      \
 		/* Always need to use alloca(), since malloc() might corrupt \
@@ -43,7 +43,7 @@ DECL_BEGIN
 		vector = (T **)alloca((count + 1) * sizeof(T *));            \
 		count  = 0;                                                  \
 		do {                                                         \
-			vector[count++] = arg = __builtin_va_arg(args);          \
+			vector[count++] = arg = __builtin_va_arg(args, T *);     \
 		} while (arg != NULL);                                       \
 	} __WHILE0
 

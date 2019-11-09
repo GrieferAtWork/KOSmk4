@@ -108,7 +108,6 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify.MkfifoAt") void
 /*[[[skip:LStat64]]]*/
 /*[[[skip:FStatAt64]]]*/
 /*[[[skip:Chmod]]]*/
-/*[[[skip:LChmod]]]*/
 /*[[[skip:FChmodAt]]]*/
 /*[[[skip:FChmod]]]*/
 /*[[[skip:UTimensAt]]]*/
@@ -119,11 +118,24 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify.MkfifoAt") void
 /*[[[skip:MkdirAt]]]*/
 /*[[[skip:MknodAt]]]*/
 
+/*[[[head:LChmod,hash:CRC-32=0x862ce55e]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify.LChmod") void
+(LIBCCALL libc_LChmod)(char const *filename,
+                       mode_t mode)
+		__THROWS(...)
+/*[[[body:LChmod]]]*/
+{
+	sys_Xfchmodat(AT_FDCWD, filename, mode, AT_SYMLINK_NOFOLLOW);
+}
+/*[[[end:LChmod]]]*/
+
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x75894c4f]]]*/
+/*[[[start:exports,hash:CRC-32=0xa5ff7617]]]*/
+DEFINE_PUBLIC_WEAK_ALIAS(LChmod, libc_LChmod);
 DEFINE_PUBLIC_WEAK_ALIAS(Mkfifo, libc_Mkfifo);
 DEFINE_PUBLIC_WEAK_ALIAS(MkfifoAt, libc_MkfifoAt);
 DEFINE_PUBLIC_WEAK_ALIAS(Mknod, libc_Mknod);

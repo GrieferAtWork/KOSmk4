@@ -25,6 +25,7 @@
 
 #include <fs/vfs.h>
 #include <kernel/apic.h>
+#include <kernel/cpuid.h>
 #include <kernel/debugger.h>
 #include <kernel/driver-param.h>
 #include <kernel/gdt.h>
@@ -67,7 +68,7 @@ INTDEF byte_t x86_debug_pic_acknowledge[];
 #endif /* !CONFIG_NO_DEBUGGER */
 
 #ifdef __x86_64__
-PRIVATE ATTR_FREERODATA u8 const x86_ack_apic = {
+PRIVATE ATTR_FREERODATA u8 const x86_ack_apic[18] = {
 	//TODO: movq x86_lapic_base_address, %rax
 	//TODO: movl $(APIC_EOI_FSIGNAL), APIC_EOI(%rax)
 };

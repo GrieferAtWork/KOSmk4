@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xffd7a980 */
+/* HASH CRC-32:0xaf0ff3c3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,8 @@
 #define _LIBC_UNICODE_H 1
 
 #include <__stdinc.h>
+
+#ifdef __CC__
 #include <__crt.h>
 #include "slow/unicode.h"
 
@@ -164,5 +166,7 @@ __NOTHROW_NCX(__LIBCCALL __libc_unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYP
 #endif /* !__CRT_HAVE___unicode_descriptor */
 
 __DECL_END
+
+#endif /* __CC__ */
 
 #endif /* !_LIBC_UNICODE_H */

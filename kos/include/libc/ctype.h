@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19e47544 */
+/* HASH CRC-32:0xadef76f4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,8 @@
 #define _LIBC_CTYPE_H 1
 
 #include <__stdinc.h>
+
+#ifdef __CC__
 #include <__crt.h>
 #include "slow/ctype.h"
 
@@ -38,5 +40,7 @@
 #define __libc_tolower __libc_slow_tolower
 #define __libc_toupper __libc_slow_toupper
 #define __libc_isblank __libc_slow_isblank
+
+#endif /* __CC__ */
 
 #endif /* !_LIBC_CTYPE_H */

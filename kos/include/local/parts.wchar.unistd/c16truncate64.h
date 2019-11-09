@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf539001f */
+/* HASH CRC-32:0x5cc2bf0e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -133,7 +133,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> c16truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __LOCAL_LIBC(c16truncate64) __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c16truncate64))(__CHAR16_TYPE__ const *__file,
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16truncate64))(__CHAR16_TYPE__ const *__file,
                                                            __PIO_OFFSET64 __length) {
 #line 1296 "kos/src/libc/magic/unistd.c"
 #if defined(__CRT_HAVE_wtruncate) && (!defined(__CRT_HAVE_open) || !defined(__CRT_HAVE_open64) || !defined(__CRT_HAVE__open) || (!defined(__CRT_HAVE__chsize_s) && !defined(__CRT_HAVE_ftruncate64)))

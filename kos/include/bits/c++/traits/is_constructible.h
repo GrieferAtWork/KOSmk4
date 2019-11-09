@@ -51,7 +51,7 @@ template<class __T> struct is_default_constructible
 template<class __T, class... __Args> struct is_constructible
     : public integral_constant<bool, __is_constructible(__T, __Args...)>::type {};
 __NAMESPACE_STD_END
-#else  /* !... */
+#else /* !... */
 __NAMESPACE_INT_BEGIN
 struct __do_is_default_constructible_impl {
 	template<class __T, class __Sel = decltype(__T())>
@@ -170,7 +170,7 @@ __NAMESPACE_STD_BEGIN
 template<class __T> struct is_move_constructible
     : public __NAMESPACE_INT_SYM __is_move_constructible_impl<__T, __NAMESPACE_INT_SYM __is_referenceable<__T>::value> {};
 __NAMESPACE_STD_END
-#else  /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
+#else /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
 __NAMESPACE_STD_BEGIN
 template<class __T> struct is_move_constructible: public false_type {};
 __NAMESPACE_STD_END
@@ -183,7 +183,7 @@ template<class __T> struct is_nothrow_default_constructible
 template<class __T, class... __Args> struct is_nothrow_constructible
     : public integral_constant<bool, __is_nothrow_constructible(__T, __Args...)> {};
 __NAMESPACE_STD_END
-#else  /* !... */
+#else /* !... */
 __NAMESPACE_INT_BEGIN
 template<class __T> struct __is_nt_default_constructible_atom
     : public __NAMESPACE_STD_SYM integral_constant<bool, noexcept(__T())> {};
@@ -236,7 +236,7 @@ __NAMESPACE_STD_BEGIN
 template<class __T> struct is_nothrow_move_constructible
     : public __NAMESPACE_INT_SYM __is_nothrow_move_constructible_impl<__T, __NAMESPACE_INT_SYM __is_referenceable<__T>::value> {};
 __NAMESPACE_STD_END
-#else  /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
+#else /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
 __NAMESPACE_STD_BEGIN
 template<class __T> struct is_nothrow_move_constructible: public false_type {};
 __NAMESPACE_STD_END
@@ -245,7 +245,7 @@ __NAMESPACE_STD_BEGIN
 #if !defined(__GNUC__) || defined(__INTELLISENSE__)
 template<class __T, class... __Args> struct is_trivially_constructible
     : public integral_constant<bool, __is_trivially_constructible(__T, __Args...)> {};
-#else  /* !... */
+#else /* !... */
 template<class __T, class... __Args> struct is_trivially_constructible
     : public __NAMESPACE_INT_SYM __and_<is_constructible<__T, __Args...>,
                                         integral_constant<bool, __is_trivially_constructible(__T, __Args...)> > {};
@@ -261,7 +261,7 @@ template<class __T> struct is_trivially_copy_constructible
 template<class __T> struct is_trivially_move_constructible
     : public __NAMESPACE_INT_SYM __and_<is_move_constructible<__T>,
                                         integral_constant<bool, __is_trivially_constructible(__T, __T &&)> > {};
-#else  /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
+#else /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
 template<class __T> struct is_trivially_move_constructible: public false_type {};
 #endif /* !__COMPILER_HAVE_CXX_RVALUE_REFERENCE */
 template<class __T> struct has_trivial_default_constructor

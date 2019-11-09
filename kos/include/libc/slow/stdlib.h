@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ee5b8e9 */
+/* HASH CRC-32:0x9e5285ac */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,8 @@
 #define _LIBC_SLOW_STDLIB_H 1
 
 #include <__stdinc.h>
+
+#ifdef __CC__
 #include <__crt.h>
 #include <hybrid/typecore.h>
 
@@ -76,5 +78,6 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__libc_slow_free,(void *__mallptr),cfree,(__mall
 #endif /* !____libc_slow_free_defined */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_LIBC_SLOW_STDLIB_H */

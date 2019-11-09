@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5eae501d */
+/* HASH CRC-32:0x53857686 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_c16set_defined 1
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16set) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c16set))(__CHAR16_TYPE__ *__restrict __str,
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16set))(__CHAR16_TYPE__ *__restrict __str,
                                                     __CHAR16_TYPE__ __ch) {
 #line 4375 "kos/src/libc/magic/string.c"
 	__CHAR16_TYPE__ *__iter;

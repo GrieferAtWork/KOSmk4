@@ -25,19 +25,10 @@
 
 #include <hybrid/host.h>
 
-
-/* For x86_64 compatibility mode, the entire userkern implementation
- * needs to be arch-specific, since we need both 32-bit and 64-bit
- * field getter/setting, and must differentiate on accessed fields
- * based on the compatibility mode setting of the calling thread. */
-#undef CONFIG_USERKERN_SEGMENT_IMPLEMENTATION_IS_ARCH_SPECIFIC
-#ifdef __x86_64__
-#define CONFIG_USERKERN_SEGMENT_IMPLEMENTATION_IS_ARCH_SPECIFIC 1
-#endif /* __x86_64__ */
-
 #ifndef USERKERN_SEGMENT_ALIGN
 #define USERKERN_SEGMENT_ALIGN 16
-#endif
+#endif /* !USERKERN_SEGMENT_ALIGN */
+
 
 /* Get/set the base address of the userkern segment. */
 #ifdef __x86_64__

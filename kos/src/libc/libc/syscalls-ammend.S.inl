@@ -34,14 +34,11 @@ DEFINE_XSYSCALL_EXPORT(Pipe, sys_Xpipe)
 DEFINE_XSYSCALL_EXPORT(Execve, sys_Xexecve)
 DEFINE_XSYSCALL_EXPORT(SetPGid, sys_Xsetpgid)
 DEFINE_XSYSCALL_EXPORT(SetSid, sys_Xsetsid)
-DEFINE_XSYSCALL_EXPORT(SetUid, sys_Xsetuid)
-DEFINE_XSYSCALL_EXPORT(SetGid, sys_Xsetgid)
 DEFINE_XSYSCALL_EXPORT(Fork, sys_Xfork)
 DEFINE_XSYSCALL_EXPORT(VFork, sys_Xfork) /* TODO */
 DEFINE_XSYSCALL_EXPORT(Link, sys_Xlink)
 DEFINE_XSYSCALL_EXPORT(Read, sys_Xread)
 DEFINE_XSYSCALL_EXPORT(Write, sys_Xwrite)
-DEFINE_XSYSCALL_EXPORT(LSeek, sys_Xlseek)
 DEFINE_XSYSCALL_EXPORT(Dup2, sys_Xdup2)
 DEFINE_XSYSCALL_EXPORT(Dup, sys_Xdup)
 DEFINE_XSYSCALL_EXPORT(Chdir, sys_Xchdir)
@@ -60,8 +57,6 @@ DEFINE_XSYSCALL_EXPORT(SyncFs, sys_Xsyncfs)
 DEFINE_XSYSCALL_EXPORT(FChdir, sys_Xfchdir)
 DEFINE_XSYSCALL_EXPORT(GetPGid, sys_Xgetpgid)
 DEFINE_XSYSCALL_EXPORT(GetSid, sys_Xgetsid)
-DEFINE_XSYSCALL_EXPORT(Truncate, sys_Xtruncate)
-DEFINE_XSYSCALL_EXPORT(FTruncate, sys_Xftruncate)
 DEFINE_XSYSCALL_EXPORT(Symlink, sys_Xsymlink)
 DEFINE_XSYSCALL_EXPORT(Readlink, sys_Xreadlink)
 DEFINE_XSYSCALL_EXPORT(SetHostName, sys_Xsethostname)
@@ -89,7 +84,6 @@ DEFINE_XSYSCALL_EXPORT(KFStat64, sys_Xkfstat)     DEFINE_INTERN_ALIAS(libc_FStat
 DEFINE_XSYSCALL_EXPORT(KLStat64, sys_Xklstat)     DEFINE_INTERN_ALIAS(libc_LStat64, sys_Xklstat)
 DEFINE_XSYSCALL_EXPORT(KFStatAt64, sys_Xkfstatat) DEFINE_INTERN_ALIAS(libc_FStatAt64, sys_Xkfstatat)
 DEFINE_XSYSCALL_EXPORT(Chmod, sys_Xchmod)
-DEFINE_XSYSCALL_EXPORT(LChmod, sys_Xlchmod)
 DEFINE_XSYSCALL_EXPORT(FChmodAt, sys_Xfchmodat)
 DEFINE_XSYSCALL_EXPORT(FChmod, sys_Xfchmod)
 DEFINE_XSYSCALL_EXPORT(UTimensAt, sys_Xutimensat)
@@ -106,9 +100,6 @@ DEFINE_XSYSCALL_EXPORT(SetResUid, sys_Xsetresuid32)
 DEFINE_XSYSCALL_EXPORT(SetResGid, sys_Xsetresgid32)
 DEFINE_XSYSCALL_EXPORT(SetReUid, sys_Xsetreuid32)
 DEFINE_XSYSCALL_EXPORT(SetReGid, sys_Xsetregid32)
-DEFINE_XSYSCALL_EXPORT(Chown, sys_Xchown32)
-DEFINE_XSYSCALL_EXPORT(FChown, sys_Xfchown32)
-DEFINE_XSYSCALL_EXPORT(LChown, sys_Xlchown32)
 #else /* __NR_getresuid32 */
 DEFINE_XSYSCALL_EXPORT(GetResUid, sys_Xgetresuid)
 DEFINE_XSYSCALL_EXPORT(GetResGid, sys_Xgetresgid)
@@ -116,10 +107,25 @@ DEFINE_XSYSCALL_EXPORT(SetResUid, sys_Xsetresuid)
 DEFINE_XSYSCALL_EXPORT(SetResGid, sys_Xsetresgid)
 DEFINE_XSYSCALL_EXPORT(SetReUid, sys_Xsetreuid)
 DEFINE_XSYSCALL_EXPORT(SetReGid, sys_Xsetregid)
+#endif /* !__NR_getresuid32 */
+
+#ifdef __NR_setuid32
+DEFINE_XSYSCALL_EXPORT(SetUid, sys_Xsetuid32)
+DEFINE_XSYSCALL_EXPORT(SetGid, sys_Xsetgid32)
+#else /* __NR_setuid32 */
+DEFINE_XSYSCALL_EXPORT(SetUid, sys_Xsetuid)
+DEFINE_XSYSCALL_EXPORT(SetGid, sys_Xsetgid)
+#endif /* !__NR_setuid32 */
+
+#ifdef __NR_chown32
+DEFINE_XSYSCALL_EXPORT(Chown, sys_Xchown32)
+DEFINE_XSYSCALL_EXPORT(FChown, sys_Xfchown32)
+DEFINE_XSYSCALL_EXPORT(LChown, sys_Xlchown32)
+#else /* __NR_chown32 */
 DEFINE_XSYSCALL_EXPORT(Chown, sys_Xchown)
 DEFINE_XSYSCALL_EXPORT(FChown, sys_Xfchown)
 DEFINE_XSYSCALL_EXPORT(LChown, sys_Xlchown)
-#endif /* !__NR_getresuid32 */
+#endif /* !__NR_chown32 */
 
 #ifdef __NR_fchownat32
 DEFINE_XSYSCALL_EXPORT(FChownAt, sys_Xfchownat32)
@@ -128,13 +134,19 @@ DEFINE_XSYSCALL_EXPORT(FChownAt, sys_Xfchownat)
 #endif /* !__NR_fchownat32 */
 
 #ifdef __NR_truncate64
+DEFINE_XSYSCALL_EXPORT(Truncate, sys_Xtruncate)
 DEFINE_XSYSCALL_EXPORT(Truncate64, sys_Xtruncate64)
+DEFINE_XSYSCALL_EXPORT(FTruncate, sys_Xftruncate)
 DEFINE_XSYSCALL_EXPORT(FTruncate64, sys_Xftruncate64)
+DEFINE_XSYSCALL_EXPORT(LSeek, sys_Xlseek)
 DEFINE_XSYSCALL_EXPORT(LSeek64, sys_Xlseek64)
 #elif __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+DEFINE_XSYSCALL_EXPORT(Truncate, sys_Xtruncate)
 DEFINE_XSYSCALL_EXPORT(Truncate64, sys_Xtruncate)
+DEFINE_XSYSCALL_EXPORT(FTruncate, sys_Xftruncate)
 DEFINE_XSYSCALL_EXPORT(FTruncate64, sys_Xftruncate)
-DEFINE_XSYSCALL_EXPORT(LSeek64, sys_Xlseek)
+DEFINE_XSYSCALL_EXPORT(LSeek, sys_Xlseek64)
+DEFINE_XSYSCALL_EXPORT(LSeek64, sys_Xlseek64)
 #else
 #error "Invalid configuration"
 #endif

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x198a60a7 */
+/* HASH CRC-32:0x7d02a0d1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,7 +73,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fputc16s_unlocked) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
-(__LIBCCALL __LIBC_LOCAL_NAME(fputc16s_unlocked))(__CHAR16_TYPE__ const *__restrict __string,
+(__LIBDCALL __LIBC_LOCAL_NAME(fputc16s_unlocked))(__CHAR16_TYPE__ const *__restrict __string,
                                                   __FILE *__restrict __stream) __THROWS(...) {
 #line 998 "kos/src/libc/magic/wchar.c"
 	__STDC_INT_AS_SIZE_T __result;

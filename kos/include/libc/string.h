@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96c78251 */
+/* HASH CRC-32:0x6a65b707 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,8 @@
 #define _LIBC_STRING_H 1
 
 #include <__stdinc.h>
+
+#ifdef __CC__
 #include <__crt.h>
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
@@ -437,5 +439,7 @@
 /* Same as `memsetq', but repeat an 8-byte pattern on aligned addresses. */
 #define __libc_mempatq __libc_slow_mempatq
 #endif /* !__fast_mempatq_defined */
+
+#endif /* __CC__ */
 
 #endif /* !_LIBC_STRING_H */

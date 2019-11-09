@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37c9e57e */
+/* HASH CRC-32:0x2052c5de */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
 __LOCAL_LIBC(c16euidaccess) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(c16euidaccess))(__CHAR16_TYPE__ const *__file,
+__NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16euidaccess))(__CHAR16_TYPE__ const *__file,
                                                            int __type) {
 #line 732 "kos/src/libc/magic/unistd.c"
 	return __localdep_c16faccessat(__CRT_AT_FDCWD, __file, __type, 0x0200); /* AT_EACCESS */

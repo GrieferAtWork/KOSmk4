@@ -31,6 +31,7 @@
 #include <kos/syscalls.h>
 #include <sys/mman.h>
 #include <sys/param.h>
+#include <sys/resource.h>
 #include <sys/stat.h>
 #include <sys/sysinfo.h>
 #include <sys/time.h>
@@ -3655,13 +3656,28 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.param.nice") int
 NOTHROW_NCX(LIBCCALL libc_nice)(int inc)
 /*[[[body:nice]]]*/
 {
-	errno_t error;
+	syscall_slong_t error;
+#ifdef __sys_nice_defined
 	error = sys_nice(-inc);
-	if unlikely(E_ISERR(error)) {
-		libc_seterrno(-error);
-		return -1;
-	}
+	if unlikely(E_ISERR(error))
+		goto err;
+#else /* __sys_Xnice_defined */
+	error = sys_getpriority(PRIO_PROCESS, 0);
+	if unlikely(E_ISERR(error))
+		goto err;
+	error = (20 - error);
+	error += inc;
+	error = sys_setpriority(PRIO_PROCESS, 0, (syscall_ulong_t)(20 - error));
+	if unlikely(E_ISERR(error))
+		goto err;
+	error = sys_getpriority(PRIO_PROCESS, 0);
+	if unlikely(E_ISERR(error))
+		goto err;
+#endif /* !__sys_Xnice_defined */
 	return 20 - error;
+err:
+	libc_seterrno(-error);
+	return -1;
 }
 /*[[[end:nice]]]*/
 

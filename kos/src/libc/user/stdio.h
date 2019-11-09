@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x412e2a9a */
+/* HASH CRC-32:0x730aaa06 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -327,13 +327,6 @@ INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_clearerr_s)(FILE *__restri
 INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBCCALL libc_tmpfile_s)(FILE **pstream);
 INTDEF WUNUSED NONNULL((1, 5)) size_t NOTHROW_RPC(LIBCCALL libc_fread_s)(void *__restrict buf, size_t bufsize, size_t elemsize, size_t elemcount, FILE *__restrict stream);
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_gets_s)(char *__restrict buf, rsize_t bufsize);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fscanf_s)(FILE *__restrict stream, char const *__restrict format, ...) __THROWS(...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfscanf_s)(FILE *__restrict stream, char const *__restrict format, va_list args) __THROWS(...);
-INTDEF NONNULL((1)) ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_scanf_s)(char const *__restrict format, ...) __THROWS(...);
-INTDEF NONNULL((1)) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vscanf_s)(char const *__restrict format, va_list args) __THROWS(...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_sscanf_s)(char const *__restrict input, char const *__restrict format, ...);
-INTDEF NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_vsscanf_s)(char const *__restrict input, char const *__restrict format, va_list args);
-INTDEF NONNULL((4)) ATTR_LIBC_PRINTF(4, 0) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_vsnprintf_s)(char *__restrict buf, size_t bufsize, size_t buflen, char const *__restrict format, va_list args);
 INTDEF ATTR_COLD void (LIBCCALL libc__wperror)(char32_t const *__restrict message) __THROWS(...);
 INTDEF ATTR_COLD void (LIBDCALL libd__wperror)(char16_t const *__restrict message) __THROWS(...);
 INTDEF WUNUSED NONNULL((1, 5)) size_t (LIBCCALL libc__fread_nolock_s)(void *__restrict buf, size_t bufsize, size_t elemsize, size_t elemcount, FILE *__restrict stream) __THROWS(...);

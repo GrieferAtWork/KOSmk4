@@ -543,7 +543,7 @@ search_fde:
 			if likely(unwind_error == UNWIND_SUCCESS) {
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 				__ERROR_REGISTER_STATE_TYPE_WRSP(*state, (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDSP(*state) + adjustment);
-#else  /* __ARCH_STACK_GROWS_DOWNWARDS */
+#else /* __ARCH_STACK_GROWS_DOWNWARDS */
 				__ERROR_REGISTER_STATE_TYPE_WRSP(*state, (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDSP(*state) - adjustment);
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 			} else if unlikely(unwind_error != UNWIND_NO_FRAME) {
@@ -650,7 +650,7 @@ apply_state_with_landing_pad_adjustment(error_register_state_t *__restrict state
 		memcpy(state, (void *)&new_state, sizeof(new_state));
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 		__ERROR_REGISTER_STATE_TYPE_WRSP(*state, (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDSP(*state) + adjustment);
-#else  /* __ARCH_STACK_GROWS_DOWNWARDS */
+#else /* __ARCH_STACK_GROWS_DOWNWARDS */
 		__ERROR_REGISTER_STATE_TYPE_WRSP(*state, (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDSP(*state) - adjustment);
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 	} else if unlikely(unwind_error != UNWIND_NO_FRAME) {
@@ -1097,7 +1097,7 @@ libc_except_handler4_impl(error_register_state_t *__restrict state,
 					if likely(unwind_error == UNWIND_SUCCESS) {
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 						__ERROR_REGISTER_STATE_TYPE_WRSP(first_handler, (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDSP(first_handler) + adjustment);
-#else  /* __ARCH_STACK_GROWS_DOWNWARDS */
+#else /* __ARCH_STACK_GROWS_DOWNWARDS */
 						__ERROR_REGISTER_STATE_TYPE_WRSP(first_handler, (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDSP(first_handler) - adjustment);
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 					} else if unlikely(unwind_error != UNWIND_NO_FRAME) {

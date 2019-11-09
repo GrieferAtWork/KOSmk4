@@ -745,7 +745,7 @@ inode_stat(struct inode *__restrict self,
 		COMPILER_WRITE_BARRIER();
 		result->st_ctim64 = temp;
 	}
-#else  /* __TIMESPEC64_HAVE_TV_PAD */
+#else /* __TIMESPEC64_HAVE_TV_PAD */
 	result->st_atim64 = self->i_fileatime;
 	result->st_mtim64 = self->i_filemtime;
 	result->st_ctim64 = self->i_filectime;

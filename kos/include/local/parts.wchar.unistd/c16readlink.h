@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52582dc5 */
+/* HASH CRC-32:0x83d87ce1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __NAMESPACE_LOCAL_BEGIN
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `c16freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 __LOCAL_LIBC(c16readlink) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(c16readlink))(__CHAR16_TYPE__ const *__restrict __path,
+__NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16readlink))(__CHAR16_TYPE__ const *__restrict __path,
                                                          __CHAR16_TYPE__ *__restrict __buf,
                                                          __SIZE_TYPE__ __buflen) {
 #line 1505 "kos/src/libc/magic/unistd.c"

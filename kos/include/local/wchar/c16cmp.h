@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x838d9ed7 */
+/* HASH CRC-32:0xe464b542 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __LOCAL_LIBC(c16cmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c16cmp))(__CHAR16_TYPE__ const *__s1,
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16cmp))(__CHAR16_TYPE__ const *__s1,
                                                     __CHAR16_TYPE__ const *__s2) {
 #line 245 "kos/src/libc/magic/string.c"
 	__CHAR16_TYPE__ __c1, __c2;

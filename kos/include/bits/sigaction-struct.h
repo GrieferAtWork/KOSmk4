@@ -22,6 +22,7 @@
 #include <__stdinc.h>
 #include <features.h>
 #include <bits/sigset.h>
+#include <bits/types.h>
 
 __SYSDECL_BEGIN
 
@@ -66,7 +67,7 @@ struct sigaction /*[PREFIX(sa_)]*/ {
 #if __SIZEOF_POINTER__ > __SIZEOF_INT__
 	__byte_t __sa_bad[__SIZEOF_POINTER__ - __SIZEOF_INT__]; /* ... */
 #endif /* __SIZEOF_POINTER__ > __SIZEOF_INT__ */
-	void (*sa_restorer)(void); /* Restore handler. */
+	void (__LIBCCALL *sa_restorer)(void); /* Restore handler. */
 };
 #endif /* __CC__ */
 

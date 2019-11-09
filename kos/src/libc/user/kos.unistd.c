@@ -25,6 +25,7 @@
 #include <kos/except.h>
 #include <kos/malloc.h>
 #include <kos/syscalls.h>
+#include <sys/resource.h>
 #include <sys/utsname.h>
 
 #include <fcntl.h>
@@ -520,7 +521,17 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.sched.param.Nice") int
 		__THROWS(...)
 /*[[[body:Nice]]]*/
 {
-	return 20 - sys_Xnice(-inc);
+#ifdef __sys_Xnice_defined
+	return 20 - sys_Xnice(inc);
+#else /* __sys_Xnice_defined */
+	syscall_slong_t prio;
+	prio = sys_Xgetpriority(PRIO_PROCESS, 0);
+	prio = (20 - prio);
+	prio += inc;
+	sys_Xsetpriority(PRIO_PROCESS, 0, (syscall_ulong_t)(20 - prio));
+	prio = sys_Xgetpriority(PRIO_PROCESS, 0);
+	return 20 - prio;
+#endif /* !__sys_Xnice_defined */
 }
 /*[[[end:Nice]]]*/
 
@@ -613,6 +624,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.system.configuration.GetDomainName") vo
 }
 /*[[[end:GetDomainName]]]*/
 
+
 /*[[[skip:Pipe]]]*/
 /*[[[skip:SetPGid]]]*/
 /*[[[skip:SetSid]]]*/
@@ -665,6 +677,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.system.configuration.GetDomainName") vo
 /*[[[skip:Syscall]]]*/
 /*[[[skip:Syscall64]]]*/
 /*[[[skip:FTruncate]]]*/
+/*[[[skip:FSync]]]*/
 
 /*[[[end:implementation]]]*/
 

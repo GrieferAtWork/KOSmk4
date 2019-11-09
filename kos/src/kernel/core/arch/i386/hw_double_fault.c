@@ -57,7 +57,8 @@ struct df_cpustate {
 
 
 INTDEF void FCALL
-x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate, PHYS pagedir_t *cr3);
+x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
+                                  PHYS pagedir_t *cr3);
 
 #ifndef CONFIG_NO_DEBUGGER
 PRIVATE void KCALL
@@ -81,13 +82,17 @@ panic_df_dbg_main(void *cr3) {
 INTERN struct df_cpustate *FCALL
 x86_cirq_08(struct df_cpustate *__restrict state) {
 #ifdef __x86_64__
-	printk(KERN_EMERG "Double fault at %p\n", state->dcs_regs.ucs_rip);
+	printk(KERN_EMERG "Double fault at %p\n", state->dcs_regs.ics_irregs.ir_rip);
 #else /* __x86_64__ */
 	printk(KERN_EMERG "Double fault at %p\n", state->dcs_regs.ucs_eip);
 #endif /* !__x86_64__ */
 	{
 		struct ucpustate ustate;
-		memcpy(&ustate, &state->dcs_regs, sizeof(ustate));
+#ifdef __x86_64__
+		icpustate_to_ucpustate(&state->dcs_regs, &ustate);
+#else /* __x86_64__ */
+		ucpustate_to_ucpustate(&state->dcs_regs, &ustate);
+#endif /* !__x86_64__ */
 		x86_dump_ucpustate_register_state(&ustate, state->dcs_cr3);
 	}
 	/* Try to trigger a debugger trap (if enabled) */
@@ -95,9 +100,9 @@ x86_cirq_08(struct df_cpustate *__restrict state) {
 		kernel_debugtrap(&state->dcs_regs, SIGBUS);
 #ifndef CONFIG_NO_DEBUGGER
 	dbg_enter(&state->dcs_regs, &panic_df_dbg_main, state->dcs_cr3);
-#else
+#else /* !CONFIG_NO_DEBUGGER */
 	PREEMPTION_HALT();
-#endif
+#endif /* CONFIG_NO_DEBUGGER */
 	return state;
 }
 

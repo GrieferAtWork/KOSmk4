@@ -4251,27 +4251,6 @@ NOTHROW_NCX(LIBCCALL libc_tmpnam_s)(char *__restrict buf,
 }
 /*[[[end:tmpnam_s]]]*/
 
-/*[[[head:sscanf_s,hash:CRC-32=0xd4bed1e0]]]*/
-INTERN NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 3)
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.scanf.sscanf_s") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc_sscanf_s)(char const *__restrict input,
-                                     char const *__restrict format,
-                                     ...)
-/*[[[body:sscanf_s]]]*/
-/*AUTO*/{
-	__STDC_INT_AS_SIZE_T result;
-	va_list args;
-	va_start(args, format);
-	result = libc_vsscanf_s(input, format, args);
-	va_end(args);
-	return result;
-}
-/*[[[end:sscanf_s]]]*/
-
-/*[[[impl:vscanf_s]]]*/
-/*[[[impl:fscanf_s]]]*/
-DEFINE_INTERN_ALIAS(libc_vscanf_s, libc_vscanf);
-DEFINE_INTERN_ALIAS(libc_fscanf_s, libc_fscanf);
 
 
 
@@ -4311,22 +4290,6 @@ NOTHROW_RPC(VLIBCCALL libc_dprintf)(fd_t fd,
 }
 /*[[[end:dprintf]]]*/
 
-
-
-/*[[[head:vsnprintf_s,hash:CRC-32=0x8b659769]]]*/
-INTERN NONNULL((4)) ATTR_LIBC_PRINTF(4, 0)
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf.vsnprintf_s") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc_vsnprintf_s)(char *__restrict buf,
-                                       size_t bufsize,
-                                       size_t buflen,
-                                       char const *__restrict format,
-                                       va_list args)
-/*[[[body:vsnprintf_s]]]*/
-{
-	return vsnprintf(buf, buflen < bufsize ? buflen : bufsize, format, args);
-}
-/*[[[end:vsnprintf_s]]]*/
-
 /*[[[head:_fread_nolock_s,hash:CRC-32=0xec54db4b]]]*/
 INTERN WUNUSED NONNULL((1, 5))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.unlocked.read.read._fread_nolock_s") size_t
@@ -4351,9 +4314,6 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.unlocked.read.read._fread_nolock_s") 
 	return fread_unlocked(buf, elemsize, elemcount, stream);
 }
 /*[[[end:_fread_nolock_s]]]*/
-
-/*[[[impl:vsscanf_s]]]*/
-DEFINE_INTERN_ALIAS(libc_vsscanf_s,libc_vsscanf);
 
 /*[[[head:fread_s,hash:CRC-32=0xd1f76686]]]*/
 INTERN WUNUSED NONNULL((1, 5))
@@ -4412,11 +4372,6 @@ NOTHROW_RPC(LIBCCALL libc_freopen_s)(FILE **pstream,
 	return EOK;
 }
 /*[[[end:freopen_s]]]*/
-
-/*[[[impl:vfscanf_s]]]*/
-/*[[[impl:scanf_s]]]*/
-DEFINE_INTERN_ALIAS(libc_vfscanf_s, libc_vfscanf);
-DEFINE_INTERN_ALIAS(libc_scanf_s, libc_scanf);
 
 
 /*[[[head:_vfprintf_p,hash:CRC-32=0x9eff5c68]]]*/
@@ -5143,7 +5098,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0xb5cd726b]]]*/
+/*[[[start:exports,hash:CRC-32=0x6295edbf]]]*/
 #undef fprintf
 #undef _IO_fprintf
 #undef fprintf_unlocked
@@ -5154,8 +5109,10 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 #undef printf_s
 #undef fscanf
 #undef fscanf_unlocked
+#undef fscanf_s
 #undef scanf
 #undef scanf_unlocked
+#undef scanf_s
 #undef dprintf
 #undef obstack_printf
 #undef asprintf
@@ -5176,9 +5133,6 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 #undef _fprintf_s_l
 #undef _fprintf_p
 #undef _fprintf_p_l
-#undef fscanf_s
-#undef scanf_s
-#undef sscanf_s
 DEFINE_PUBLIC_WEAK_ALIAS(remove, libc_remove);
 DEFINE_PUBLIC_WEAK_ALIAS(rename, libc_rename);
 DEFINE_PUBLIC_WEAK_ALIAS(tmpnam, libc_tmpnam);
@@ -5260,14 +5214,18 @@ DEFINE_PUBLIC_WEAK_ALIAS(__vfscanf, libc_vfscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(vfscanf_unlocked, libc_vfscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(_vfscanf, libc_vfscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(_vfscanf_s, libc_vfscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(vfscanf_s, libc_vfscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(vscanf, libc_vscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(vscanf_unlocked, libc_vscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(_vscanf, libc_vscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(_vscanf_s, libc_vscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(vscanf_s, libc_vscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(fscanf, libc_fscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(fscanf_unlocked, libc_fscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(fscanf_s, libc_fscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(scanf, libc_scanf);
 DEFINE_PUBLIC_WEAK_ALIAS(scanf_unlocked, libc_scanf);
+DEFINE_PUBLIC_WEAK_ALIAS(scanf_s, libc_scanf);
 DEFINE_PUBLIC_WEAK_ALIAS(gets, libc_gets);
 DEFINE_PUBLIC_WEAK_ALIAS(_IO_gets, libc_gets);
 DEFINE_PUBLIC_WEAK_ALIAS(vdprintf, libc_vdprintf);
@@ -5438,13 +5396,6 @@ DEFINE_PUBLIC_WEAK_ALIAS(clearerr_s, libc_clearerr_s);
 DEFINE_PUBLIC_WEAK_ALIAS(tmpfile_s, libc_tmpfile_s);
 DEFINE_PUBLIC_WEAK_ALIAS(fread_s, libc_fread_s);
 DEFINE_PUBLIC_WEAK_ALIAS(gets_s, libc_gets_s);
-DEFINE_PUBLIC_WEAK_ALIAS(fscanf_s, libc_fscanf_s);
-DEFINE_PUBLIC_WEAK_ALIAS(vfscanf_s, libc_vfscanf_s);
-DEFINE_PUBLIC_WEAK_ALIAS(scanf_s, libc_scanf_s);
-DEFINE_PUBLIC_WEAK_ALIAS(vscanf_s, libc_vscanf_s);
-DEFINE_PUBLIC_WEAK_ALIAS(sscanf_s, libc_sscanf_s);
-DEFINE_PUBLIC_WEAK_ALIAS(vsscanf_s, libc_vsscanf_s);
-DEFINE_PUBLIC_WEAK_ALIAS(vsnprintf_s, libc_vsnprintf_s);
 DEFINE_PUBLIC_WEAK_ALIAS(_wperror, libc__wperror);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wperror, libd__wperror);
 DEFINE_PUBLIC_WEAK_ALIAS(_fread_nolock_s, libc__fread_nolock_s);

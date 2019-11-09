@@ -1,4 +1,9 @@
-/* HASH CRC-32:0x8b37843c */
+/*[[[magic
+options["COMPILE.language"] = "c";
+local gcc_opt = options.setdefault("GCC.options", []);
+gcc_opt.remove("-fno-rtti");
+gcc_opt.append("-fexceptions");
+]]]*/
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,33 +22,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_AUTO_KOS_UNISTD_C
-#define GUARD_LIBC_AUTO_KOS_UNISTD_C 1
-
-#include "../api.h"
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include "kos.unistd.h"
-
-DECL_BEGIN
-
-#ifndef __KERNEL__
-/* >> fsync(2)
- * Synchronize a file (including its descriptor which contains timestamps, and its size),
- * meaning that changes to its data and/or descriptor are written to disk */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.io.sync.FSync") void
-(LIBCCALL libc_FSync)(fd_t fd) __THROWS(...) {
-#line 83 "kos/src/libc/magic/kos.unistd.c"
-	(void)fd;
-	/* No-Op */
-}
-
-#endif /* !__KERNEL__ */
-#ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(FSync, libc_FSync);
-DEFINE_PUBLIC_WEAK_ALIAS(FDataSync, libc_FSync);
-#endif /* !__KERNEL__ */
-
-DECL_END
-
-#endif /* !GUARD_LIBC_AUTO_KOS_UNISTD_C */
+#define _ALL_SOURCE 1
+#define _ISOC_PURE_SOURCE 1
+#include "include-everything.h"

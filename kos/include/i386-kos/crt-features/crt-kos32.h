@@ -420,6 +420,7 @@
 #define __CRT_HAVE_KLStat64 1
 #define __CRT_HAVE_KStat 1
 #define __CRT_HAVE_KStat64 1
+#define __CRT_HAVE_LChmod 1
 #define __CRT_HAVE_LChown 1
 #define __CRT_HAVE_LSeek 1
 #define __CRT_HAVE_LSeek64 1
@@ -4414,6 +4415,7 @@
 #define __CRT_HAVE_vsprintf 1
 #define __CRT_HAVE_vsprintf_s 1
 #define __CRT_HAVE_vsscanf 1
+#define __CRT_HAVE_vsscanf_s 1
 #define __CRT_HAVE_vstrdupf 1
 #define __CRT_HAVE_vswprintf 1
 #define __CRT_HAVE_vswprintf_s 1

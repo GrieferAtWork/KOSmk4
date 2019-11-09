@@ -31,11 +31,15 @@
 
 #include <hybrid/host.h>
 
+#include <asm/cpu-flags.h>
 #include <asm/registers.h>
+#include <bits/siginfo-convert.h>
+#include <kos/bits/exception_data-convert.h>
 #include <kos/bits/exception_data.h>
 #include <kos/bits/exception_data32.h>
 #include <kos/except-inval.h>
 #include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state-verify.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state32.h>
 #include <sys/wait.h>
@@ -46,76 +50,25 @@
 
 #include <librpc/rpc.h>
 #include <libunwind/api.h>
-#ifdef __x86_64__
-#include <bits/siginfo-convert.h>
-#include <kos/bits/exception_data-convert.h>
-#endif /* __x86_64__ */
 
 DECL_BEGIN
 
-
-LOCAL NOBLOCK void
-NOTHROW(KCALL user_icpu_to_ucpu)(struct icpustate const *__restrict state,
-                                 struct ucpustate *__restrict ust) {
-	icpustate_user_to_ucpustate(state, ust);
-}
-
-LOCAL NOBLOCK void KCALL
+LOCAL void KCALL
 user_ucpu32_to_ucpu(struct icpustate const *__restrict return_state,
                     struct ucpustate32 const *__restrict ust32,
-                    struct ucpustate *__restrict ust) {
-#ifdef __x86_64__
-#error TODO
-#else /* __x86_64__ */
-	u32 eflags_mask;
-	memcpy(ust, ust32, sizeof(struct ucpustate));
-	eflags_mask = (u32)cred_allow_eflags_modify_mask();
-	if unlikely((icpustate_getpflags(return_state) & ~eflags_mask) !=
-	            (ust->ucs_eflags & ~eflags_mask)) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-		      X86_REGISTER_MISC_EFLAGS, ust->ucs_eflags);
-	}
-	ust->ucs_cs           = ust->ucs_cs16;
-	ust->ucs_ss           = ust->ucs_ss16;
-	ust->ucs_sgregs.sg_gs = ust->ucs_sgregs.sg_gs16;
-	ust->ucs_sgregs.sg_fs = ust->ucs_sgregs.sg_fs16;
-	ust->ucs_sgregs.sg_es = ust->ucs_sgregs.sg_es16;
-	ust->ucs_sgregs.sg_ds = ust->ucs_sgregs.sg_ds16;
+                    struct ucpustate *__restrict result) {
+	ucpustate32_to_ucpustate(ust32, result);
+	cpustate_verify_userpflags(icpustate_getpflags(return_state),
+	                           ucpustate_getpflags(result),
+	                           cred_allow_eflags_modify_mask());
 	if (!icpustate_isvm86(return_state)) {
-		/* Validate segment register indices before actually restoring them. */
-		if unlikely(!SEGMENT_IS_VALID_USERCODE(ust->ucs_cs)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_CS, ust->ucs_cs);
-		}
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(ust->ucs_sgregs.sg_gs)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_GS, ust->ucs_sgregs.sg_gs);
-		}
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(ust->ucs_sgregs.sg_fs)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_FS, ust->ucs_sgregs.sg_fs);
-		}
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(ust->ucs_sgregs.sg_es)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_ES, ust->ucs_sgregs.sg_es);
-		}
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(ust->ucs_sgregs.sg_ds)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_DS, ust->ucs_sgregs.sg_ds);
-		}
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(ust->ucs_ss)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_SS, ust->ucs_ss);
-		}
+		cpustate_verify_usercs(result->ucs_cs16);
+		cpustate_verify_userss(result->ucs_ss16);
+		cpustate_verify_usergs(result->ucs_sgregs.sg_gs16);
+		cpustate_verify_userfs(result->ucs_sgregs.sg_fs16);
+		cpustate_verify_useres(result->ucs_sgregs.sg_es16);
+		cpustate_verify_userds(result->ucs_sgregs.sg_ds16);
 	}
-#endif /* !__x86_64__ */
 }
 
 #ifndef CONFIG_COREDUMP_TRACEBACK_LIMIT
@@ -137,7 +90,7 @@ coredump32_impl(struct icpustate *__restrict return_state,
 	                      unwind_error == UNWIND_SUCCESS ? sizeof(exception_data32)
 	                                                     : sizeof(siginfo32_t));
 	if (!curr_state && !orig_state) {
-		user_icpu_to_ucpu(return_state, &curr_ustate);
+		icpustate_user_to_ucpustate(return_state, &curr_ustate);
 		memcpy(&orig_ustate, &curr_ustate, sizeof(struct ucpustate));
 		traceback_vector = NULL;
 		traceback_length = 0;
@@ -193,11 +146,7 @@ coredump32_impl(struct icpustate *__restrict return_state,
 		} else if (unwind_error == UNWIND_SUCCESS) {
 			/* Coredump caused by a signal. */
 			siginfo_t si;
-#ifdef __x86_64__
-			siginfo32_to_siginfo64(&si, (siginfo32_t *)(uintptr_t)exception);
-#else /* __x86_64__ */
-			memcpy(&si, (siginfo32_t *)(uintptr_t)exception, sizeof(siginfo_t));
-#endif /* !__x86_64__ */
+			siginfo32_to_siginfo((siginfo32_t *)(uintptr_t)exception, &si);
 			COMPILER_READ_BARRIER();
 			signo = si.si_signo;
 			coredump_create(&curr_ustate,
@@ -215,11 +164,7 @@ coredump32_impl(struct icpustate *__restrict return_state,
 			siginfo_t si;
 			struct exception_data exc;
 			bool has_signal;
-#ifdef __x86_64__
-			exception_data32_to_exception_data64(&exc, exception);
-#else /* __x86_64__ */
-			memcpy(&exc, exception, sizeof(struct exception_data));
-#endif /* !__x86_64__ */
+			exception_data32_to_exception_data(exception, &exc);
 			COMPILER_READ_BARRIER();
 			has_signal = error_as_signal(&exc, &si);
 			if (has_signal)

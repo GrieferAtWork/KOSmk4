@@ -39,9 +39,10 @@
 #include <asm/cpu-flags.h>
 #include <asm/intrin-fpu.h>
 #include <asm/intrin.h>
-#include <kos/kernel/fpu-state.h>
-#include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
+#include <kos/kernel/fpu-state.h>
+#include <kos/kernel/fpu-state32.h>
 
 #include <assert.h>
 #include <stddef.h>

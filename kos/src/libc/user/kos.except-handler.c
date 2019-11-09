@@ -82,7 +82,7 @@ NOTHROW_NCX(LIBCCALL libc_get_exception_handler)(int *pmode,
 	result = sys_get_exception_handler((syscall_ulong_t *)pmode,
 	                                   phandler,
 	                                   phandler_sp);
-#else  /* __SIZEOF_SYSCALL_LONG_T__ == __SIZEOF_INT__ */
+#else /* __SIZEOF_SYSCALL_LONG_T__ == __SIZEOF_INT__ */
 	syscall_ulong_t mode_value;
 	result = sys_get_exception_handler(pmode ? &mode_value : NULL,
 	                                   phandler,

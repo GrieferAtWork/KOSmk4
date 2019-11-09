@@ -35,6 +35,11 @@
 #include <sched/arch/task.h>
 #endif /* __KERNEL__ && !__x86_64__ */
 
+#if defined(__i386__) && !defined(__x86_64__)
+#include <hybrid/__asm.h>
+/* TODO: CFI helpers */
+#endif /* __i386__ && !__x86_64 */
+
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -57,6 +62,10 @@ __DECL_BEGIN
 #define gpregs32_setecx(self, value) ((self)->gp_ecx = (value))
 #define gpregs32_geteax(self)        ((__u32)(self)->gp_eax)
 #define gpregs32_seteax(self, value) ((self)->gp_eax = (value))
+#define gpregs32_to_gpregs32(self, result)                           \
+	__libc_memcpy(__COMPILER_REQTYPE(struct gpregs32 *, result),     \
+	              __COMPILER_REQTYPE(struct gpregs32 const *, self), \
+	              sizeof(struct gpregs32))
 /************************************************************************/
 
 
@@ -96,7 +105,7 @@ __DECL_BEGIN
 #define irregs32_setuseresp(self, value) (((struct irregs32_user *)(self))->ir_esp=(value))
 #define irregs32_getuserss(self)         ((struct irregs32_user const *)(self))->ir_ss16
 #define irregs32_setuserss(self, value)  (((struct irregs32_user *)(self))->ir_ss=(value))
-#define irregs32_getkernelesp(self)      ((__uintptr_t)(self) + SIZEOF_IRREGS32_KERNEL)
+#define irregs32_getkernelesp(self)      ((__u32)((__uintptr_t)(self) + SIZEOF_IRREGS32_KERNEL))
 #define irregs32_getkernelss(self)       SEGMENT_KERNEL_DATA
 #define irregs32_getss(self)             (irregs32_isuser(self) ? irregs32_getuserss(self) : irregs32_getkernelss(self))
 #define irregs32_trysetesp(self, value)  (irregs32_isuser(self) ? (irregs32_setuseresp(self, value), 1) : (irregs32_getkernelesp(self) == (value)))
@@ -121,6 +130,10 @@ __DECL_BEGIN
 #define lcpustate32_seteip(self, value) ((self)->lcs_eip = (value))
 #define lcpustate32_getesp(self)        ((__u32)(self)->lcs_esp)
 #define lcpustate32_setesp(self, value) ((self)->lcs_esp = (value))
+#define lcpustate32_to_lcpustate32(self, result)                        \
+	__libc_memcpy(__COMPILER_REQTYPE(struct lcpustate32 *, result),     \
+	              __COMPILER_REQTYPE(struct lcpustate32 const *, self), \
+	              sizeof(struct lcpustate32))
 #ifndef __x86_64__
 __FORCELOCAL void __FCALL lcpustate32_current(struct lcpustate32 *__restrict __result) {
 	__asm__("movl %%edi, %0\n\t"
@@ -224,6 +237,10 @@ __NOTHROW_NCX(lcpustate32_to_kcpustate32)(struct lcpustate32 const *__restrict _
 #define kcpustate32_setesp(self, value)    ((self)->kcs_gpregs.gp_esp = (value))
 #define kcpustate32_geteflags(self)        ((__u32)(self)->kcs_eflags)
 #define kcpustate32_seteflags(self, value) ((self)->kcs_eflags = (value))
+#define kcpustate32_to_kcpustate32(self, result)                        \
+	__libc_memcpy(__COMPILER_REQTYPE(struct kcpustate32 *, result),     \
+	              __COMPILER_REQTYPE(struct kcpustate32 const *, self), \
+	              sizeof(struct kcpustate32))
 __LOCAL __NOBLOCK void
 __NOTHROW_NCX(kcpustate32_to_ucpustate32_ex)(struct kcpustate32 const *__restrict __self,
                                              struct ucpustate32 *__restrict __result,
@@ -263,6 +280,129 @@ __NOTHROW_NCX(kcpustate32_to_lcpustate32)(struct kcpustate32 const *__restrict _
 	__result->lcs_esp = __self->kcs_gpregs.gp_esp;
 	__result->lcs_ebx = __self->kcs_gpregs.gp_ebx;
 	__result->lcs_eip = __self->kcs_eip;
+}
+__LOCAL __NOBLOCK __ATTR_RETNONNULL struct scpustate32 *
+__NOTHROW_NCX(kcpustate32_to_scpustate32_p_ex)(struct kcpustate32 const *__restrict __self,
+                                               void *__restrict __kernel_esp,
+                                               __u16 __v_gs, __u16 __v_fs, __u16 __v_es,
+                                               __u16 __v_ds, __u16 __v_cs, __u16 __v_ss) {
+	struct scpustate32 *__result;
+	if (__self->kcs_eflags & 0x20000) {
+		__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
+		                                  OFFSET_SCPUSTATE32_IRREGS +
+		                                  SIZEOF_IRREGS32_VM86);
+		__result->scs_irregs_v.ir_esp = __self->kcs_gpregs.gp_esp;
+		__result->scs_irregs_v.ir_ss  = __v_ss;
+		__result->scs_irregs_v.ir_es  = __v_es;
+		__result->scs_irregs_v.ir_ds  = __v_ds;
+		__result->scs_irregs_v.ir_fs  = __v_fs;
+		__result->scs_irregs_v.ir_gs  = __v_gs;
+		__result->scs_sgregs.sg_ds = SEGMENT_USER_DATA_RPL;
+		__result->scs_sgregs.sg_es = SEGMENT_USER_DATA_RPL;
+#ifdef __x86_64__
+		__result->scs_sgregs.sg_fs = SEGMENT_USER_DATA_RPL;
+		__result->scs_sgregs.sg_gs = SEGMENT_USER_DATA_RPL;
+#else /* __x86_64__ */
+		__result->scs_sgregs.sg_fs = SEGMENT_USER_FSBASE_RPL;
+		__result->scs_sgregs.sg_gs = SEGMENT_USER_GSBASE_RPL;
+#endif /* !__x86_64__ */
+	} else {
+		if (__v_cs & 3) {
+			__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
+			                                  OFFSET_SCPUSTATE32_IRREGS +
+			                                  SIZEOF_IRREGS32_USER);
+			__result->scs_irregs_u.ir_esp = __self->kcs_gpregs.gp_esp;
+			__result->scs_irregs_u.ir_ss  = __v_ss;
+		} else {
+			__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
+			                                  OFFSET_SCPUSTATE32_IRREGS +
+			                                  SIZEOF_IRREGS32_KERNEL);
+		}
+		__result->scs_sgregs.sg_fs = __v_fs;
+		__result->scs_sgregs.sg_gs = __v_gs;
+		__result->scs_sgregs.sg_es = __v_es;
+		__result->scs_sgregs.sg_ds = __v_ds;
+	}
+	__result->scs_irregs.ir_eip    = __self->kcs_eip;
+	__result->scs_irregs.ir_eflags = __self->kcs_eflags;
+	__result->scs_irregs.ir_cs     = __v_cs;
+	__result->scs_gpregs           = __self->kcs_gpregs;
+	return __result;
+}
+__LOCAL __NOBLOCK __ATTR_RETNONNULL struct scpustate32 *
+__NOTHROW_NCX(kcpustate32_to_scpustate32_p)(struct kcpustate32 const *__restrict __self,
+                                            void *__restrict __kernel_esp) {
+	return kcpustate32_to_scpustate32_p_ex(__self, __kernel_esp,
+	                                       __rdgs(),
+#if defined(__KERNEL__) && !defined(__x86_64__)
+	                                       SEGMENT_KERNEL_FSBASE,
+	                                       SEGMENT_USER_DATA_RPL,
+	                                       SEGMENT_USER_DATA_RPL,
+#else /* __KERNEL__ && !__x86_64__ */
+	                                       __rdfs(), __rdes(), __rdds(),
+#endif /* !__KERNEL__ || __x86_64__ */
+	                                       SEGMENT_CURRENT_CODE_RPL,
+	                                       SEGMENT_CURRENT_DATA_RPL);
+}
+__LOCAL __NOBLOCK __ATTR_RETNONNULL struct icpustate32 *
+__NOTHROW_NCX(kcpustate32_to_icpustate32_p_ex)(struct kcpustate32 const *__restrict __self,
+                                               void *__restrict __kernel_esp,
+                                               __u16 __v_gs_vm86, __u16 __v_fs, __u16 __v_es,
+                                               __u16 __v_ds, __u16 __v_cs, __u16 __v_ss) {
+	struct icpustate32 *__result;
+	if (__self->kcs_eflags & 0x20000) {
+		__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
+		                                  OFFSET_ICPUSTATE32_IRREGS +
+		                                  SIZEOF_IRREGS32_VM86);
+		__result->ics_irregs_v.ir_esp = __self->kcs_gpregs.gp_esp;
+		__result->ics_irregs_v.ir_ss  = __v_ss;
+		__result->ics_irregs_v.ir_es  = __v_es;
+		__result->ics_irregs_v.ir_ds  = __v_ds;
+		__result->ics_irregs_v.ir_fs  = __v_fs;
+		__result->ics_irregs_v.ir_gs  = __v_gs_vm86;
+		__result->ics_ds = SEGMENT_USER_DATA_RPL;
+		__result->ics_es = SEGMENT_USER_DATA_RPL;
+#ifdef __x86_64__
+		__result->ics_fs = SEGMENT_USER_DATA_RPL;
+#else /* __x86_64__ */
+		__result->ics_fs = SEGMENT_USER_FSBASE_RPL;
+#endif /* !__x86_64__ */
+	} else {
+		if (__v_cs & 3) {
+			__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
+			                                  OFFSET_ICPUSTATE32_IRREGS +
+			                                  SIZEOF_IRREGS32_USER);
+			__result->ics_irregs_u.ir_esp = __self->kcs_gpregs.gp_esp;
+			__result->ics_irregs_u.ir_ss  = __v_ss;
+		} else {
+			__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
+			                                  OFFSET_ICPUSTATE32_IRREGS +
+			                                  SIZEOF_IRREGS32_KERNEL);
+		}
+		__result->ics_fs = __v_fs;
+		__result->ics_es = __v_es;
+		__result->ics_ds = __v_ds;
+	}
+	__result->ics_irregs.ir_eip    = __self->kcs_eip;
+	__result->ics_irregs.ir_eflags = __self->kcs_eflags;
+	__result->ics_irregs.ir_cs     = __v_cs;
+	__result->ics_gpregs           = __self->kcs_gpregs;
+	return __result;
+}
+__LOCAL __NOBLOCK __ATTR_RETNONNULL struct icpustate32 *
+__NOTHROW_NCX(kcpustate32_to_icpustate32_p)(struct kcpustate32 const *__restrict __self,
+                                            void *__restrict __kernel_esp) {
+	return kcpustate32_to_icpustate32_p_ex(__self, __kernel_esp,
+	                                       0,
+#if defined(__KERNEL__) && !defined(__x86_64__)
+	                                       SEGMENT_KERNEL_FSBASE,
+	                                       SEGMENT_USER_DATA_RPL,
+	                                       SEGMENT_USER_DATA_RPL,
+#else /* __KERNEL__ && !__x86_64__ */
+	                                       __rdfs(), __rdes(), __rdds(),
+#endif /* !__KERNEL__ || __x86_64__ */
+	                                       SEGMENT_CURRENT_CODE_RPL,
+	                                       SEGMENT_CURRENT_DATA_RPL);
 }
 /************************************************************************/
 
@@ -311,7 +451,6 @@ __NOTHROW_NCX(kcpustate32_to_lcpustate32)(struct kcpustate32 const *__restrict _
 #define icpustate32_trysetss(self, value)        irregs32_trysetss(&(self)->ics_irregs, value)
 #define icpustate32_trysetesp(self, value)       irregs32_trysetesp(&(self)->ics_irregs, value)
 #define icpustate32_sizeof(self)                 (irregs32_sizeof(&(self)->ics_irregs) + OFFSET_ICPUSTATE32_IRREGS)
-
 __LOCAL __NOBLOCK __ATTR_WUNUSED struct icpustate32 *
 __NOTHROW_NCX(icpustate32_setesp_p)(struct icpustate32 *__restrict __self,
                                     __u32 __v_esp) {
@@ -334,12 +473,12 @@ __NOTHROW_NCX(icpustate32_to_ucpustate32_ex)(struct icpustate32 const *__restric
                                              struct ucpustate32 *__restrict __result,
                                              __u16 __v_nonvm86_gs) {
 	__result->ucs_gpregs = __self->ics_gpregs;
-	__result->ucs_eip    = irregs32_geteip(&__self->ics_irregs);
-	__result->ucs_eflags = irregs32_geteflags(&__self->ics_irregs);
-	__result->ucs_cs     = irregs32_getcs(&__self->ics_irregs);
-	if (irregs32_isvm86(&__self->ics_irregs)) {
-		__result->ucs_gpregs.gp_esp = __self->ics_irregs_v.ir_esp;
-		__result->ucs_ss            = __self->ics_irregs_v.ir_ss;
+	__result->ucs_eip    = icpustate32_geteip(__self);
+	__result->ucs_eflags = icpustate32_geteflags(__self);
+	__result->ucs_cs     = icpustate32_getcs(__self);
+	if (icpustate32_isvm86(__self)) {
+		__result->ucs_gpregs.gp_esp = icpustate32_getuseresp(__self);
+		__result->ucs_ss            = icpustate32_getuserss(__self);
 		__result->ucs_sgregs.sg_ds  = __self->ics_irregs_v.ir_ds;
 		__result->ucs_sgregs.sg_es  = __self->ics_irregs_v.ir_es;
 		__result->ucs_sgregs.sg_fs  = __self->ics_irregs_v.ir_fs;
@@ -349,12 +488,12 @@ __NOTHROW_NCX(icpustate32_to_ucpustate32_ex)(struct icpustate32 const *__restric
 		__result->ucs_sgregs.sg_es = __self->ics_es;
 		__result->ucs_sgregs.sg_fs = __self->ics_fs;
 		__result->ucs_sgregs.sg_gs = __v_nonvm86_gs;
-		if (irregs32_isuser(&__self->ics_irregs)) {
-			__result->ucs_gpregs.gp_esp = irregs32_getuseresp(&__self->ics_irregs_u);
-			__result->ucs_ss            = irregs32_getuserss(&__self->ics_irregs_u);
+		if (icpustate32_isuser(__self)) {
+			__result->ucs_gpregs.gp_esp = icpustate32_getuseresp(__self);
+			__result->ucs_ss            = icpustate32_getuserss(__self);
 		} else {
-			__result->ucs_gpregs.gp_esp = irregs32_getkernelesp(&__self->ics_irregs);
-			__result->ucs_ss            = irregs32_getkernelss(&__self->ics_irregs);
+			__result->ucs_gpregs.gp_esp = icpustate32_getkernelesp(__self);
+			__result->ucs_ss            = icpustate32_getkernelss(__self);
 		}
 	}
 }
@@ -362,14 +501,14 @@ __LOCAL __NOBLOCK void
 __NOTHROW_NCX(icpustate32_user_to_ucpustate32_ex)(struct icpustate32 const *__restrict __self,
                                                   struct ucpustate32 *__restrict __result,
                                                   __u16 __v_nonvm86_gs) {
-	__hybrid_assert(irregs32_isuser(&__self->ics_irregs));
+	__hybrid_assert(icpustate32_isuser(__self));
 	__result->ucs_gpregs = __self->ics_gpregs;
-	__result->ucs_eip    = irregs32_geteip(&__self->ics_irregs);
-	__result->ucs_eflags = irregs32_geteflags(&__self->ics_irregs);
-	__result->ucs_cs     = irregs32_getcs(&__self->ics_irregs);
-	if (irregs32_isvm86(&__self->ics_irregs)) {
-		__result->ucs_gpregs.gp_esp = __self->ics_irregs_v.ir_esp;
-		__result->ucs_ss            = __self->ics_irregs_v.ir_ss;
+	__result->ucs_eip    = icpustate32_geteip(__self);
+	__result->ucs_eflags = icpustate32_geteflags(__self);
+	__result->ucs_cs     = icpustate32_getcs(__self);
+	if (icpustate32_isvm86(__self)) {
+		__result->ucs_gpregs.gp_esp = icpustate32_getuseresp(__self);
+		__result->ucs_ss            = icpustate32_getuserss(__self);
 		__result->ucs_sgregs.sg_ds  = __self->ics_irregs_v.ir_ds;
 		__result->ucs_sgregs.sg_es  = __self->ics_irregs_v.ir_es;
 		__result->ucs_sgregs.sg_fs  = __self->ics_irregs_v.ir_fs;
@@ -379,8 +518,8 @@ __NOTHROW_NCX(icpustate32_user_to_ucpustate32_ex)(struct icpustate32 const *__re
 		__result->ucs_sgregs.sg_es  = __self->ics_es;
 		__result->ucs_sgregs.sg_fs  = __self->ics_fs;
 		__result->ucs_sgregs.sg_gs  = __v_nonvm86_gs;
-		__result->ucs_gpregs.gp_esp = irregs32_getuseresp(&__self->ics_irregs_u);
-		__result->ucs_ss            = irregs32_getuserss(&__self->ics_irregs_u);
+		__result->ucs_gpregs.gp_esp = icpustate32_getuseresp(__self);
+		__result->ucs_ss            = icpustate32_getuserss(__self);
 	}
 }
 __LOCAL __NOBLOCK void
@@ -392,6 +531,23 @@ __LOCAL __NOBLOCK void
 __NOTHROW_NCX(icpustate32_user_to_ucpustate32)(struct icpustate32 const *__restrict __self,
                                                struct ucpustate32 *__restrict __result) {
 	icpustate32_user_to_ucpustate32_ex(__self, __result, __rdgs());
+}
+__LOCAL __NOBLOCK void
+__NOTHROW_NCX(icpustate32_to_kcpustate32)(struct icpustate32 const *__restrict __self,
+                                          struct kcpustate32 *__restrict __result) {
+	__result->kcs_gpregs        = __self->ics_gpregs;
+	__result->kcs_eip           = icpustate32_geteip(__self);
+	__result->kcs_eflags        = icpustate32_geteflags(__self);
+	__result->kcs_gpregs.gp_esp = icpustate32_getesp(__self);
+}
+__LOCAL __NOBLOCK void
+__NOTHROW_NCX(icpustate32_user_to_kcpustate32)(struct icpustate32 const *__restrict __self,
+                                               struct kcpustate32 *__restrict __result) {
+	__hybrid_assert(icpustate32_isuser(__self));
+	__result->kcs_gpregs        = __self->ics_gpregs;
+	__result->kcs_eip           = icpustate32_geteip(__self);
+	__result->kcs_eflags        = icpustate32_geteflags(__self);
+	__result->kcs_gpregs.gp_esp = icpustate32_getuseresp(__self);
 }
 /* Create a new scheduler cpu-state from a given interrupt cpu state. */
 __LOCAL __NOBLOCK __ATTR_RETNONNULL struct scpustate32 *
@@ -407,8 +563,8 @@ __NOTHROW_NCX(icpustate32_to_scpustate32_p_ex)(struct icpustate32 const *__restr
 		                                  SIZEOF_IRREGS32_VM86);
 		__result->scs_irregs_v.ir_esp = icpustate32_getuseresp(__self);
 		__result->scs_irregs_v.ir_ss  = icpustate32_getuserss(__self);
-		__result->scs_irregs_v.ir_es  = icpustate32_getes(__self);
-		__result->scs_irregs_v.ir_ds  = icpustate32_getds(__self);
+		__result->scs_irregs_v.ir_es  = __self->ics_irregs_v.ir_es16;
+		__result->scs_irregs_v.ir_ds  = __self->ics_irregs_v.ir_ds16;
 		__result->scs_irregs_v.ir_fs  = __self->ics_irregs_v.ir_fs16;
 		__result->scs_irregs_v.ir_gs  = __self->ics_irregs_v.ir_gs16;
 		__result->scs_sgregs.sg_ds    = __self->ics_ds16;
@@ -438,10 +594,54 @@ __NOTHROW_NCX(icpustate32_to_scpustate32_p_ex)(struct icpustate32 const *__restr
 	__result->scs_gpregs           = __self->ics_gpregs;
 	return __result;
 }
+/* Create a new scheduler cpu-state from a given interrupt cpu state. */
+__LOCAL __NOBLOCK __ATTR_RETNONNULL struct scpustate32 *
+__NOTHROW_NCX(icpustate32_user_to_scpustate32_p_ex)(struct icpustate32 const *__restrict __self,
+                                                    void *__restrict __kernel_esp,
+                                                    __u16 __v_nonvm86_gs) {
+	struct scpustate32 *__result;
+	__u32 __v_eflags = icpustate32_geteflags(__self);
+	if (__v_eflags & 0x20000) {
+		__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
+		                                  OFFSET_SCPUSTATE32_IRREGS +
+		                                  SIZEOF_IRREGS32_VM86);
+		__result->scs_irregs_v.ir_esp = icpustate32_getuseresp(__self);
+		__result->scs_irregs_v.ir_ss  = icpustate32_getuserss(__self);
+		__result->scs_irregs_v.ir_es  = __self->ics_irregs_v.ir_es16;
+		__result->scs_irregs_v.ir_ds  = __self->ics_irregs_v.ir_ds16;
+		__result->scs_irregs_v.ir_fs  = __self->ics_irregs_v.ir_fs16;
+		__result->scs_irregs_v.ir_gs  = __self->ics_irregs_v.ir_gs16;
+		__result->scs_sgregs.sg_ds    = __self->ics_ds16;
+		__result->scs_sgregs.sg_es    = __self->ics_es16;
+		__result->scs_sgregs.sg_fs    = __self->ics_fs16;
+		__result->scs_sgregs.sg_gs    = __v_nonvm86_gs;
+	} else {
+		__hybrid_assert(icpustate32_getcs(__self) & 3);
+		__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
+		                                  OFFSET_SCPUSTATE32_IRREGS +
+		                                  SIZEOF_IRREGS32_USER);
+		__result->scs_irregs_u.ir_esp = icpustate32_getuseresp(__self);
+		__result->scs_irregs_u.ir_ss  = icpustate32_getuserss(__self);
+		__result->scs_sgregs.sg_gs = __v_nonvm86_gs;
+		__result->scs_sgregs.sg_fs = __self->ics_fs16;
+		__result->scs_sgregs.sg_es = __self->ics_es16;
+		__result->scs_sgregs.sg_ds = __self->ics_ds16;
+	}
+	__result->scs_irregs.ir_eip    = icpustate32_geteip(__self);
+	__result->scs_irregs.ir_eflags = __v_eflags;
+	__result->scs_irregs.ir_cs     = icpustate32_getcs(__self);
+	__result->scs_gpregs           = __self->ics_gpregs;
+	return __result;
+}
 __LOCAL __NOBLOCK __ATTR_RETNONNULL struct scpustate32 *
 __NOTHROW_NCX(icpustate32_to_scpustate32_p)(struct icpustate32 const *__restrict __self,
                                             void *__restrict __kernel_esp) {
 	return icpustate32_to_scpustate32_p_ex(__self, __kernel_esp, __rdgs());
+}
+__LOCAL __NOBLOCK __ATTR_RETNONNULL struct scpustate32 *
+__NOTHROW_NCX(icpustate32_user_to_scpustate32_p)(struct icpustate32 const *__restrict __self,
+                                                 void *__restrict __kernel_esp) {
+	return icpustate32_user_to_scpustate32_p_ex(__self, __kernel_esp, __rdgs());
 }
 /* Create a duplicate of the given interrupt cpu state. */
 __LOCAL __NOBLOCK __ATTR_RETNONNULL struct icpustate32 *
@@ -484,50 +684,6 @@ __NOTHROW_NCX(icpustate32_to_icpustate32_p)(struct icpustate32 const *__restrict
 	__result->ics_irregs.ir_cs     = __v_cs;
 	__result->ics_gpregs           = __self->ics_gpregs;
 	return __result;
-}
-/* Create a new scheduler cpu-state from a given interrupt cpu state. */
-__LOCAL __NOBLOCK __ATTR_RETNONNULL struct scpustate32 *
-__NOTHROW_NCX(icpustate32_user_to_scpustate32_p_ex)(struct icpustate32 const *__restrict __self,
-                                                    void *__restrict __kernel_esp,
-                                                    __u16 __v_nonvm86_gs) {
-	struct scpustate32 *__result;
-	__u32 __v_eflags = icpustate32_geteflags(__self);
-	if (__v_eflags & 0x20000) {
-		__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
-		                                  OFFSET_SCPUSTATE32_IRREGS +
-		                                  SIZEOF_IRREGS32_VM86);
-		__result->scs_irregs_v.ir_esp = icpustate32_getuseresp(__self);
-		__result->scs_irregs_v.ir_ss  = icpustate32_getuserss(__self);
-		__result->scs_irregs_v.ir_es  = icpustate32_getes(__self);
-		__result->scs_irregs_v.ir_ds  = icpustate32_getds(__self);
-		__result->scs_irregs_v.ir_fs  = __self->ics_irregs_v.ir_fs16;
-		__result->scs_irregs_v.ir_gs  = __self->ics_irregs_v.ir_gs16;
-		__result->scs_sgregs.sg_ds    = __self->ics_ds16;
-		__result->scs_sgregs.sg_es    = __self->ics_es16;
-		__result->scs_sgregs.sg_fs    = __self->ics_fs16;
-		__result->scs_sgregs.sg_gs    = __v_nonvm86_gs;
-	} else {
-		__hybrid_assert(icpustate32_getcs(__self) & 3);
-		__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
-		                                  OFFSET_SCPUSTATE32_IRREGS +
-		                                  SIZEOF_IRREGS32_USER);
-		__result->scs_irregs_u.ir_esp = icpustate32_getuseresp(__self);
-		__result->scs_irregs_u.ir_ss  = icpustate32_getuserss(__self);
-		__result->scs_sgregs.sg_gs = __v_nonvm86_gs;
-		__result->scs_sgregs.sg_fs = __self->ics_fs16;
-		__result->scs_sgregs.sg_es = __self->ics_es16;
-		__result->scs_sgregs.sg_ds = __self->ics_ds16;
-	}
-	__result->scs_irregs.ir_eip    = icpustate32_geteip(__self);
-	__result->scs_irregs.ir_eflags = __v_eflags;
-	__result->scs_irregs.ir_cs     = icpustate32_getcs(__self);
-	__result->scs_gpregs           = __self->ics_gpregs;
-	return __result;
-}
-__LOCAL __NOBLOCK __ATTR_RETNONNULL struct scpustate32 *
-__NOTHROW_NCX(icpustate32_user_to_scpustate32_p)(struct icpustate32 const *__restrict __self,
-                                                 void *__restrict __kernel_esp) {
-	return icpustate32_user_to_scpustate32_p_ex(__self, __kernel_esp, __rdgs());
 }
 /* Create a duplicate of the given interrupt cpu state. */
 __LOCAL __NOBLOCK __ATTR_RETNONNULL struct icpustate32 *
@@ -584,7 +740,7 @@ __NOTHROW_NCX(icpustate32_user_to_icpustate32_p)(struct icpustate32 const *__res
 #define scpustate32_getuserss(self)              ((__u32)(self)->scs_irregs_u.ir_ss16)
 #define scpustate32_setuserss(self, value)       ((self)->scs_irregs_u.ir_ss = (value))
 #define scpustate32_getkernelss(self)            SEGMENT_KERNEL_DATA
-#define scpustate32_getkernelesp(self)           ((__u32)(&(self)->scs_irregs_k + 1))
+#define scpustate32_getkernelesp(self)           ((__u32)(__uintptr_t)(&(self)->scs_irregs_k + 1))
 #define scpustate32_getds(self)                  (scpustate32_isvm86(self) ? (self)->scs_irregs_v.ir_ds16 : (self)->scs_sgregs.sg_ds16)
 #define scpustate32_setds(self, value)           (scpustate32_isvm86(self) ? ((self)->scs_irregs_v.ir_ds = (value)) : ((self)->scs_sgregs.sg_ds = (value)))
 #define scpustate32_getes(self)                  (scpustate32_isvm86(self) ? (self)->scs_irregs_v.ir_es16 : (self)->scs_sgregs.sg_es16)
@@ -604,7 +760,7 @@ __NOTHROW_NCX(icpustate32_user_to_icpustate32_p)(struct icpustate32 const *__res
 #define scpustate32_geteflags(self)              ((__u32)(self)->scs_irregs.ir_eflags)
 #define scpustate32_seteflags(self, value)       ((self)->scs_irregs.ir_eflags = (value))
 #define scpustate32_mskeflags(self, mask, value) ((self)->scs_irregs.ir_eflags = ((self)->scs_irregs.ir_eflags & (mask)) | (flags))
-#define scpustate32_getcs(self)                  ((__u32)(self)->scs_irregs.ir_cs)
+#define scpustate32_getcs(self)                  ((__u16)(self)->scs_irregs.ir_cs16)
 #define scpustate32_setcs(self, value)           ((self)->scs_irregs.ir_cs = (value))
 #define scpustate32_getesp(self)                 (scpustate32_isuser(self) ? scpustate32_getuseresp(self) : scpustate32_getkernelesp(self))
 #define scpustate32_getss(self)                  (scpustate32_isuser(self) ? scpustate32_getuserss(self) : scpustate32_getkernelss(self))
@@ -638,47 +794,64 @@ __LOCAL __NOBLOCK void
 __NOTHROW_NCX(scpustate32_to_ucpustate32)(struct scpustate32 const *__restrict __self,
                                           struct ucpustate32 *__restrict __result) {
 	__result->ucs_gpregs = __self->scs_gpregs;
-	__result->ucs_eip    = irregs32_geteip(&__self->scs_irregs);
-	__result->ucs_eflags = irregs32_geteflags(&__self->scs_irregs);
-	__result->ucs_cs     = irregs32_getcs(&__self->scs_irregs);
-	if (irregs32_isvm86(&__self->scs_irregs)) {
-		__result->ucs_gpregs.gp_esp = __self->scs_irregs_v.ir_esp;
-		__result->ucs_ss            = __self->scs_irregs_v.ir_ss;
-		__result->ucs_sgregs.sg_ds  = __self->scs_irregs_v.ir_ds;
-		__result->ucs_sgregs.sg_es  = __self->scs_irregs_v.ir_es;
-		__result->ucs_sgregs.sg_fs  = __self->scs_irregs_v.ir_fs;
-		__result->ucs_sgregs.sg_gs  = __self->scs_irregs_v.ir_gs;
+	__result->ucs_eip    = scpustate32_geteip(__self);
+	__result->ucs_eflags = scpustate32_geteflags(__self);
+	__result->ucs_cs     = scpustate32_getcs(__self);
+	if (scpustate32_isvm86(__self)) {
+		__result->ucs_gpregs.gp_esp = scpustate32_getuseresp(__self);
+		__result->ucs_ss            = scpustate32_getuserss(__self);
+		__result->ucs_sgregs.sg_ds  = __self->scs_irregs_v.ir_ds16;
+		__result->ucs_sgregs.sg_es  = __self->scs_irregs_v.ir_es16;
+		__result->ucs_sgregs.sg_fs  = __self->scs_irregs_v.ir_fs16;
+		__result->ucs_sgregs.sg_gs  = __self->scs_irregs_v.ir_gs16;
 	} else {
 		__result->ucs_sgregs = __self->scs_sgregs;
-		if (irregs32_isuser(&__self->scs_irregs)) {
-			__result->ucs_gpregs.gp_esp = irregs32_getuseresp(&__self->scs_irregs_u);
-			__result->ucs_ss            = irregs32_getuserss(&__self->scs_irregs_u);
+		if (scpustate32_isuser(__self)) {
+			__result->ucs_gpregs.gp_esp = scpustate32_getuseresp(__self);
+			__result->ucs_ss            = scpustate32_getuserss(__self);
 		} else {
-			__result->ucs_gpregs.gp_esp = irregs32_getkernelesp(&__self->scs_irregs);
-			__result->ucs_ss            = irregs32_getkernelss(&__self->scs_irregs);
+			__result->ucs_gpregs.gp_esp = scpustate32_getkernelesp(__self);
+			__result->ucs_ss            = scpustate32_getkernelss(__self);
 		}
 	}
 }
 __LOCAL __NOBLOCK void
 __NOTHROW_NCX(scpustate32_user_to_ucpustate32)(struct scpustate32 const *__restrict __self,
                                                struct ucpustate32 *__restrict __result) {
-	__hybrid_assert(irregs32_isuser(&__self->scs_irregs));
+	__hybrid_assert(scpustate32_isuser(__self));
 	__result->ucs_gpregs = __self->scs_gpregs;
-	__result->ucs_eip    = irregs32_geteip(&__self->scs_irregs);
-	__result->ucs_eflags = irregs32_geteflags(&__self->scs_irregs);
-	__result->ucs_cs     = irregs32_getcs(&__self->scs_irregs);
-	if (irregs32_isvm86(&__self->scs_irregs)) {
-		__result->ucs_gpregs.gp_esp = __self->scs_irregs_v.ir_esp;
-		__result->ucs_ss            = __self->scs_irregs_v.ir_ss;
-		__result->ucs_sgregs.sg_ds  = __self->scs_irregs_v.ir_ds;
-		__result->ucs_sgregs.sg_es  = __self->scs_irregs_v.ir_es;
-		__result->ucs_sgregs.sg_fs  = __self->scs_irregs_v.ir_fs;
-		__result->ucs_sgregs.sg_gs  = __self->scs_irregs_v.ir_gs;
+	__result->ucs_eip    = scpustate32_geteip(__self);
+	__result->ucs_eflags = scpustate32_geteflags(__self);
+	__result->ucs_cs     = scpustate32_getcs(__self);
+	if (scpustate32_isvm86(__self)) {
+		__result->ucs_gpregs.gp_esp = scpustate32_getuseresp(__self);
+		__result->ucs_ss            = scpustate32_getuserss(__self);
+		__result->ucs_sgregs.sg_ds  = __self->scs_irregs_v.ir_ds16;
+		__result->ucs_sgregs.sg_es  = __self->scs_irregs_v.ir_es16;
+		__result->ucs_sgregs.sg_fs  = __self->scs_irregs_v.ir_fs16;
+		__result->ucs_sgregs.sg_gs  = __self->scs_irregs_v.ir_gs16;
 	} else {
 		__result->ucs_sgregs        = __self->scs_sgregs;
-		__result->ucs_gpregs.gp_esp = irregs32_getuseresp(&__self->scs_irregs_u);
-		__result->ucs_ss            = irregs32_getuserss(&__self->scs_irregs_u);
+		__result->ucs_gpregs.gp_esp = scpustate32_getuseresp(__self);
+		__result->ucs_ss            = scpustate32_getuserss(__self);
 	}
+}
+__LOCAL __NOBLOCK void
+__NOTHROW_NCX(scpustate32_to_kcpustate32)(struct scpustate32 const *__restrict __self,
+                                          struct kcpustate32 *__restrict __result) {
+	__result->kcs_gpregs        = __self->scs_gpregs;
+	__result->kcs_eip           = scpustate32_geteip(__self);
+	__result->kcs_eflags        = scpustate32_geteflags(__self);
+	__result->kcs_gpregs.gp_esp = scpustate32_getesp(__self);
+}
+__LOCAL __NOBLOCK void
+__NOTHROW_NCX(scpustate32_user_to_kcpustate32)(struct scpustate32 const *__restrict __self,
+                                               struct kcpustate32 *__restrict __result) {
+	__hybrid_assert(scpustate32_isuser(__self));
+	__result->kcs_gpregs        = __self->scs_gpregs;
+	__result->kcs_eip           = scpustate32_geteip(__self);
+	__result->kcs_eflags        = scpustate32_geteflags(__self);
+	__result->kcs_gpregs.gp_esp = scpustate32_getuseresp(__self);
 }
 /* Create a new interrupt cpu-state from a given scheduler cpu state. */
 __LOCAL __NOBLOCK __ATTR_RETNONNULL struct icpustate32 *
@@ -722,23 +895,6 @@ __NOTHROW_NCX(scpustate32_to_icpustate32_p)(struct scpustate32 const *__restrict
 	__result->ics_gpregs           = __self->scs_gpregs;
 	return __result;
 }
-/* Create a duplicate of the given interrupt cpu state. */
-__LOCAL __NOBLOCK __ATTR_RETNONNULL struct scpustate32 *
-__NOTHROW_NCX(scpustate32_to_scpustate32_p)(struct scpustate32 const *__restrict __self,
-                                            void *__restrict __kernel_esp) {
-	__size_t __result_size;
-	struct scpustate32 *__result;
-	if (scpustate32_isvm86(__self))
-		__result_size = OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_VM86;
-	else if (scpustate32_isuser_novm86(__self))
-		__result_size = OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_USER;
-	else {
-		__result_size = OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_KERNEL;
-	}
-	__result = (struct scpustate32 *)((__byte_t *)__kernel_esp - __result_size);
-	__libc_memcpy(__result, __self, __result_size);
-	return __result;
-}
 /* Create a new interrupt cpu-state from a given scheduler cpu state. */
 __LOCAL __NOBLOCK __ATTR_RETNONNULL struct icpustate32 *
 __NOTHROW_NCX(scpustate32_user_to_icpustate32_p)(struct scpustate32 const *__restrict __self,
@@ -773,6 +929,23 @@ __NOTHROW_NCX(scpustate32_user_to_icpustate32_p)(struct scpustate32 const *__res
 	__result->ics_irregs.ir_eflags = __v_eflags;
 	__result->ics_irregs.ir_cs     = scpustate32_getcs(__self);
 	__result->ics_gpregs           = __self->scs_gpregs;
+	return __result;
+}
+/* Create a duplicate of the given interrupt cpu state. */
+__LOCAL __NOBLOCK __ATTR_RETNONNULL struct scpustate32 *
+__NOTHROW_NCX(scpustate32_to_scpustate32_p)(struct scpustate32 const *__restrict __self,
+                                            void *__restrict __kernel_esp) {
+	__size_t __result_size;
+	struct scpustate32 *__result;
+	if (scpustate32_isvm86(__self))
+		__result_size = OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_VM86;
+	else if (scpustate32_isuser_novm86(__self))
+		__result_size = OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_USER;
+	else {
+		__result_size = OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_KERNEL;
+	}
+	__result = (struct scpustate32 *)((__byte_t *)__kernel_esp - __result_size);
+	__libc_memcpy(__result, __self, __result_size);
 	return __result;
 }
 /* Create a duplicate of the given interrupt cpu state. */
@@ -825,6 +998,10 @@ __NOTHROW_NCX(scpustate32_user_to_scpustate32_p)(struct scpustate32 const *__res
 #define ucpustate32_setesp(self, value)    ((self)->ucs_gpregs.gp_esp = (value))
 #define ucpustate32_geteflags(self)        ((__u32)(self)->ucs_eflags)
 #define ucpustate32_seteflags(self, value) ((self)->ucs_eflags = (value))
+#define ucpustate32_to_ucpustate32(self, result)                        \
+	__libc_memcpy(__COMPILER_REQTYPE(struct ucpustate32 *, result),     \
+	              __COMPILER_REQTYPE(struct ucpustate32 const *, self), \
+	              sizeof(struct ucpustate32))
 __LOCAL __NOBLOCK void
 __NOTHROW_NCX(ucpustate32_to_kcpustate32)(struct ucpustate32 const *__restrict __self,
                                           struct kcpustate32 *__restrict __result) {
@@ -943,6 +1120,10 @@ __NOTHROW_NCX(ucpustate32_to_scpustate32_p)(struct ucpustate32 const *__restrict
 #define fcpustate32_setesp(self, value)    ((self)->fcs_gpregs.gp_esp = (value))
 #define fcpustate32_geteflags(self)        ((__u32)(self)->fcs_eflags)
 #define fcpustate32_seteflags(self, value) ((self)->fcs_eflags = (value))
+#define fcpustate32_to_fcpustate32(self, result)                        \
+	__libc_memcpy(__COMPILER_REQTYPE(struct fcpustate32 *, result),     \
+	              __COMPILER_REQTYPE(struct fcpustate32 const *, self), \
+	              sizeof(struct fcpustate32))
 __LOCAL __NOBLOCK void
 __NOTHROW_NCX(fcpustate32_to_lcpustate32)(struct fcpustate32 const *__restrict __self,
                                           struct lcpustate32 *__restrict __result) {
@@ -1000,7 +1181,7 @@ __NOTHROW_NCX(fcpustate32_assign_scpustate32)(struct fcpustate32 *__restrict __s
 		__self->fcs_sgregs.sg_fs  = __data->scs_irregs_v.ir_fs16;
 		__self->fcs_sgregs.sg_es  = __data->scs_irregs_v.ir_es16;
 		__self->fcs_sgregs.sg_ds  = __data->scs_irregs_v.ir_ds16;
-		__self->fcs_sgregs.sg_ss  = __data->scs_irregs_v.ir_ss16;
+		__self->fcs_sgregs.sg_ss  = scpustate32_getuserss(__data);
 		__self->fcs_gpregs.gp_esp = scpustate32_getuseresp(__data);
 	} else {
 		if (__self->fcs_sgregs.sg_cs & 3) {
@@ -1029,7 +1210,7 @@ __NOTHROW_NCX(fcpustate32_assign_icpustate32_ex)(struct fcpustate32 *__restrict 
 		__self->fcs_sgregs.sg_fs  = __data->ics_irregs_v.ir_fs16;
 		__self->fcs_sgregs.sg_es  = __data->ics_irregs_v.ir_es16;
 		__self->fcs_sgregs.sg_ds  = __data->ics_irregs_v.ir_ds16;
-		__self->fcs_sgregs.sg_ss  = __data->ics_irregs_v.ir_ss16;
+		__self->fcs_sgregs.sg_ss  = icpustate32_getuserss(__data);
 		__self->fcs_gpregs.gp_esp = icpustate32_getuseresp(__data);
 	} else {
 		if (__self->fcs_sgregs.sg_cs & 3) {
@@ -1050,13 +1231,98 @@ __NOTHROW_NCX(fcpustate32_assign_icpustate32)(struct fcpustate32 *__restrict __s
                                               struct icpustate32 const *__restrict __data) {
 	fcpustate32_assign_icpustate32_ex(__self, __data, __rdgs());
 }
+__LOCAL __NOBLOCK __ATTR_RETNONNULL struct icpustate32 *
+__NOTHROW_NCX(fcpustate32_to_icpustate32_p)(struct fcpustate32 const *__restrict __self,
+                                            void *__restrict __kernel_esp) {
+	struct icpustate32 *__result;
+	if (fcpustate32_isvm86(__self)) {
+		__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
+		                                  OFFSET_ICPUSTATE32_IRREGS +
+		                                  SIZEOF_IRREGS32_VM86);
+		__result->ics_irregs_v.ir_esp = __self->fcs_gpregs.gp_esp;
+		__result->ics_irregs_v.ir_ss  = __self->fcs_sgregs.sg_ss16;
+		__result->ics_irregs_v.ir_es  = __self->fcs_sgregs.sg_es16;
+		__result->ics_irregs_v.ir_ds  = __self->fcs_sgregs.sg_ds16;
+		__result->ics_irregs_v.ir_fs  = __self->fcs_sgregs.sg_fs16;
+		__result->ics_irregs_v.ir_gs  = __self->fcs_sgregs.sg_gs16;
+		__result->ics_ds = SEGMENT_USER_DATA_RPL;
+		__result->ics_es = SEGMENT_USER_DATA_RPL;
+#ifdef __x86_64__
+		__result->ics_fs = SEGMENT_USER_DATA_RPL;
+#else /* __x86_64__ */
+		__result->ics_fs = SEGMENT_USER_FSBASE_RPL;
+#endif /* !__x86_64__ */
+	} else {
+		if (fcpustate32_isuser_novm86(__self)) {
+			__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
+			                                  OFFSET_ICPUSTATE32_IRREGS +
+			                                  SIZEOF_IRREGS32_USER);
+			__result->ics_irregs_u.ir_esp = __self->fcs_gpregs.gp_esp;
+			__result->ics_irregs_u.ir_ss  = __self->fcs_sgregs.sg_ss16;
+		} else {
+			__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
+			                                  OFFSET_ICPUSTATE32_IRREGS +
+			                                  SIZEOF_IRREGS32_KERNEL);
+		}
+		__result->ics_ds = __self->fcs_sgregs.sg_ds16;
+		__result->ics_es = __self->fcs_sgregs.sg_es16;
+		__result->ics_fs = __self->fcs_sgregs.sg_fs16;
+	}
+	__result->ics_irregs.ir_eip    = __self->fcs_eip;
+	__result->ics_irregs.ir_eflags = __self->fcs_eflags;
+	__result->ics_irregs.ir_cs     = __self->fcs_sgregs.sg_cs16;
+	__result->ics_gpregs = __self->fcs_gpregs;
+	return __result;
+}
+__LOCAL __NOBLOCK __ATTR_RETNONNULL struct scpustate32 *
+__NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict __self,
+                                            void *__restrict __kernel_esp) {
+	struct scpustate32 *__result;
+	if (fcpustate32_isvm86(__self)) {
+		__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
+		                                  OFFSET_SCPUSTATE32_IRREGS +
+		                                  SIZEOF_IRREGS32_VM86);
+		__result->scs_irregs_v.ir_esp = __self->fcs_gpregs.gp_esp;
+		__result->scs_irregs_v.ir_ss  = __self->fcs_sgregs.sg_ss16;
+		__result->scs_irregs_v.ir_es  = __self->fcs_sgregs.sg_es16;
+		__result->scs_irregs_v.ir_ds  = __self->fcs_sgregs.sg_ds16;
+		__result->scs_irregs_v.ir_fs  = __self->fcs_sgregs.sg_fs16;
+		__result->scs_irregs_v.ir_gs  = __self->fcs_sgregs.sg_gs16;
+		__result->scs_sgregs.sg_ds = SEGMENT_USER_DATA_RPL;
+		__result->scs_sgregs.sg_es = SEGMENT_USER_DATA_RPL;
+#ifdef __x86_64__
+		__result->scs_sgregs.sg_fs = SEGMENT_USER_DATA_RPL;
+		__result->scs_sgregs.sg_gs = SEGMENT_USER_DATA_RPL;
+#else /* __x86_64__ */
+		__result->scs_sgregs.sg_fs = SEGMENT_USER_FSBASE_RPL;
+		__result->scs_sgregs.sg_gs = SEGMENT_USER_GSBASE_RPL;
+#endif /* !__x86_64__ */
+	} else {
+		if (fcpustate32_isuser_novm86(__self)) {
+			__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
+			                                  OFFSET_SCPUSTATE32_IRREGS +
+			                                  SIZEOF_IRREGS32_USER);
+			__result->scs_irregs_u.ir_esp = __self->fcs_gpregs.gp_esp;
+			__result->scs_irregs_u.ir_ss  = __self->fcs_sgregs.sg_ss16;
+		} else {
+			__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
+			                                  OFFSET_SCPUSTATE32_IRREGS +
+			                                  SIZEOF_IRREGS32_KERNEL);
+		}
+		__result->scs_sgregs.sg_gs = __self->fcs_sgregs.sg_gs16;
+		__result->scs_sgregs.sg_fs = __self->fcs_sgregs.sg_fs16;
+		__result->scs_sgregs.sg_es = __self->fcs_sgregs.sg_es16;
+		__result->scs_sgregs.sg_ds = __self->fcs_sgregs.sg_ds16;
+	}
+	__result->scs_irregs.ir_eip    = __self->fcs_eip;
+	__result->scs_irregs.ir_eflags = __self->fcs_eflags;
+	__result->scs_irregs.ir_cs     = __self->fcs_sgregs.sg_cs16;
+	__result->scs_gpregs = __self->fcs_gpregs;
+	return __result;
+}
 /************************************************************************/
 
 
-/* TODO: kcpustate32_to_icpustate32_p */
-/* TODO: kcpustate32_to_scpustate32_p */
-/* TODO: fcpustate32_to_icpustate32_p */
-/* TODO: fcpustate32_to_scpustate32_p */
 
 
 
@@ -1079,13 +1345,19 @@ __NOTHROW_NCX(fcpustate32_assign_icpustate32)(struct fcpustate32 *__restrict __s
 #define gpregs_setpcx                       gpregs32_setecx
 #define gpregs_getpax                       gpregs32_geteax
 #define gpregs_setpax                       gpregs32_seteax
+#define gpregs_to_gpregs                    gpregs32_to_gpregs32
+#define gpregs_to_gpregs32                  gpregs32_to_gpregs32
+#define gpregs32_to_gpregs                  gpregs32_to_gpregs32
+#define gpregs_to_gpregsnsp                 gpregs32_to_gpregs32
+#define gpregs_to_gpregsnsp32               gpregs32_to_gpregs32
+#define gpregs32_to_gpregsnsp               gpregs32_to_gpregs32
 
 #define irregs_isvm86(self)                 irregs32_isvm86(self)
 #define irregs_isuser_novm86(self)          irregs32_isuser_novm86(self)
 #define irregs_isuser(self)                 irregs32_isuser(self)
 #define irregs_iskernel(self)               irregs32_iskernel(self)
-#define irregs_is32(self)                   1
-#define irregs_is64(self)                   0
+#define irregs_is32bit(self)                1
+#define irregs_is64bit(self)                0
 #define irregs_isnative(self)               1
 #define irregs_iscompat(self)               0
 #define irregs_getpc                        irregs32_geteip
@@ -1111,13 +1383,28 @@ __NOTHROW_NCX(fcpustate32_assign_icpustate32)(struct fcpustate32 *__restrict __s
 #define lcpustate_setpc                     lcpustate32_seteip
 #define lcpustate_getsp                     lcpustate32_getesp
 #define lcpustate_setsp                     lcpustate32_setesp
+#define lcpustate_to_lcpustate              lcpustate32_to_lcpustate32
+#define lcpustate_to_lcpustate32            lcpustate32_to_lcpustate32
+#define lcpustate32_to_lcpustate            lcpustate32_to_lcpustate32
 #define lcpustate_current                   lcpustate32_current
 #define lcpustate_to_gpregs_ex              lcpustate32_to_gpregs32_ex
+#define lcpustate_to_gpregs32_ex            lcpustate32_to_gpregs32_ex
+#define lcpustate32_to_gpregs_ex            lcpustate32_to_gpregs32_ex
 #define lcpustate_to_gpregs                 lcpustate32_to_gpregs32
+#define lcpustate_to_gpregs32               lcpustate32_to_gpregs32
+#define lcpustate32_to_gpregs               lcpustate32_to_gpregs32
 #define lcpustate_to_ucpustate_ex           lcpustate32_to_ucpustate32_ex
+#define lcpustate_to_ucpustate32_ex         lcpustate32_to_ucpustate32_ex
+#define lcpustate32_to_ucpustate_ex         lcpustate32_to_ucpustate32_ex
 #define lcpustate_to_ucpustate              lcpustate32_to_ucpustate32
+#define lcpustate_to_ucpustate32            lcpustate32_to_ucpustate32
+#define lcpustate32_to_ucpustate            lcpustate32_to_ucpustate32
 #define lcpustate_to_kcpustate_ex           lcpustate32_to_kcpustate32_ex
+#define lcpustate_to_kcpustate32_ex         lcpustate32_to_kcpustate32_ex
+#define lcpustate32_to_kcpustate_ex         lcpustate32_to_kcpustate32_ex
 #define lcpustate_to_kcpustate              lcpustate32_to_kcpustate32
+#define lcpustate_to_kcpustate32            lcpustate32_to_kcpustate32
+#define lcpustate32_to_kcpustate            lcpustate32_to_kcpustate32
 
 #define kcpustate_getpc                     kcpustate32_geteip
 #define kcpustate_setpc                     kcpustate32_seteip
@@ -1125,9 +1412,30 @@ __NOTHROW_NCX(fcpustate32_assign_icpustate32)(struct fcpustate32 *__restrict __s
 #define kcpustate_setsp                     kcpustate32_setesp
 #define kcpustate_getpflags                 kcpustate32_geteflags
 #define kcpustate_setpflags                 kcpustate32_seteflags
+#define kcpustate_to_kcpustate              kcpustate32_to_kcpustate32
+#define kcpustate_to_kcpustate32            kcpustate32_to_kcpustate32
+#define kcpustate32_to_kcpustate            kcpustate32_to_kcpustate32
 #define kcpustate_to_ucpustate_ex           kcpustate32_to_ucpustate32_ex
+#define kcpustate_to_ucpustate32_ex         kcpustate32_to_ucpustate32_ex
+#define kcpustate32_to_ucpustate_ex         kcpustate32_to_ucpustate32_ex
 #define kcpustate_to_ucpustate              kcpustate32_to_ucpustate32
+#define kcpustate_to_ucpustate32            kcpustate32_to_ucpustate32
+#define kcpustate32_to_ucpustate            kcpustate32_to_ucpustate32
 #define kcpustate_to_lcpustate              kcpustate32_to_lcpustate32
+#define kcpustate_to_lcpustate32            kcpustate32_to_lcpustate32
+#define kcpustate32_to_lcpustate            kcpustate32_to_lcpustate32
+#define kcpustate_to_scpustate_p_ex         kcpustate32_to_scpustate32_p_ex
+#define kcpustate_to_scpustate32_p_ex       kcpustate32_to_scpustate32_p_ex
+#define kcpustate32_to_scpustate_p_ex       kcpustate32_to_scpustate32_p_ex
+#define kcpustate_to_scpustate_p            kcpustate32_to_scpustate32_p
+#define kcpustate_to_scpustate32_p          kcpustate32_to_scpustate32_p
+#define kcpustate32_to_scpustate_p          kcpustate32_to_scpustate32_p
+#define kcpustate_to_icpustate_p_ex         kcpustate32_to_icpustate32_p_ex
+#define kcpustate_to_icpustate32_p_ex       kcpustate32_to_icpustate32_p_ex
+#define kcpustate32_to_icpustate_p_ex       kcpustate32_to_icpustate32_p_ex
+#define kcpustate_to_icpustate_p            kcpustate32_to_icpustate32_p
+#define kcpustate_to_icpustate32_p          kcpustate32_to_icpustate32_p
+#define kcpustate32_to_icpustate_p          kcpustate32_to_icpustate32_p
 
 #define icpustate_getpc                     icpustate32_geteip
 #define icpustate_setpc                     icpustate32_seteip
@@ -1138,8 +1446,8 @@ __NOTHROW_NCX(fcpustate32_assign_icpustate32)(struct fcpustate32 *__restrict __s
 #define icpustate_isuser_novm86             icpustate32_isuser_novm86
 #define icpustate_isuser                    icpustate32_isuser
 #define icpustate_iskernel                  icpustate32_iskernel
-#define icpustate_is32(self)                1
-#define icpustate_is64(self)                0
+#define icpustate_is32bit(self)             1
+#define icpustate_is64bit(self)             0
 #define icpustate_isnative(self)            1
 #define icpustate_iscompat(self)            0
 #define icpustate_getuserpsp                icpustate32_getuseresp
@@ -1174,15 +1482,41 @@ __NOTHROW_NCX(fcpustate32_assign_icpustate32)(struct fcpustate32 *__restrict __s
 #define icpustate_trysetss                  icpustate32_trysetss
 #define icpustate_sizeof                    icpustate32_sizeof
 #define icpustate_to_ucpustate_ex           icpustate32_to_ucpustate32_ex
+#define icpustate_to_ucpustate32_ex         icpustate32_to_ucpustate32_ex
+#define icpustate32_to_ucpustate_ex         icpustate32_to_ucpustate32_ex
 #define icpustate_to_ucpustate              icpustate32_to_ucpustate32
+#define icpustate_to_ucpustate32            icpustate32_to_ucpustate32
+#define icpustate32_to_ucpustate            icpustate32_to_ucpustate32
 #define icpustate_user_to_ucpustate_ex      icpustate32_user_to_ucpustate32_ex
+#define icpustate_user_to_ucpustate32_ex    icpustate32_user_to_ucpustate32_ex
+#define icpustate32_user_to_ucpustate_ex    icpustate32_user_to_ucpustate32_ex
 #define icpustate_user_to_ucpustate         icpustate32_user_to_ucpustate32
+#define icpustate_user_to_ucpustate32       icpustate32_user_to_ucpustate32
+#define icpustate32_user_to_ucpustate       icpustate32_user_to_ucpustate32
+#define icpustate_to_kcpustate              icpustate32_to_kcpustate32
+#define icpustate_to_kcpustate32            icpustate32_to_kcpustate32
+#define icpustate32_to_kcpustate            icpustate32_to_kcpustate32
+#define icpustate_user_to_kcpustate         icpustate32_user_to_kcpustate32
+#define icpustate_user_to_kcpustate32       icpustate32_user_to_kcpustate32
+#define icpustate32_user_to_kcpustate       icpustate32_user_to_kcpustate32
 #define icpustate_to_scpustate_p_ex         icpustate32_to_scpustate32_p_ex
-#define icpustate_to_scpustate_p            icpustate32_to_scpustate32_p
-#define icpustate_to_icpustate_p            icpustate32_to_icpustate32_p
+#define icpustate_to_scpustate32_p_ex       icpustate32_to_scpustate32_p_ex
+#define icpustate32_to_scpustate_p_ex       icpustate32_to_scpustate32_p_ex
 #define icpustate_user_to_scpustate_p_ex    icpustate32_user_to_scpustate32_p_ex
+#define icpustate_user_to_scpustate32_p_ex  icpustate32_user_to_scpustate32_p_ex
+#define icpustate32_user_to_scpustate_p_ex  icpustate32_user_to_scpustate32_p_ex
+#define icpustate_to_scpustate_p            icpustate32_to_scpustate32_p
+#define icpustate_to_scpustate32_p          icpustate32_to_scpustate32_p
+#define icpustate32_to_scpustate_p          icpustate32_to_scpustate32_p
 #define icpustate_user_to_scpustate_p       icpustate32_user_to_scpustate32_p
+#define icpustate_user_to_scpustate32_p     icpustate32_user_to_scpustate32_p
+#define icpustate32_user_to_scpustate_p     icpustate32_user_to_scpustate32_p
+#define icpustate_to_icpustate_p            icpustate32_to_icpustate32_p
+#define icpustate_to_icpustate32_p          icpustate32_to_icpustate32_p
+#define icpustate32_to_icpustate_p          icpustate32_to_icpustate32_p
 #define icpustate_user_to_icpustate_p       icpustate32_user_to_icpustate32_p
+#define icpustate_user_to_icpustate32_p     icpustate32_user_to_icpustate32_p
+#define icpustate32_user_to_icpustate_p     icpustate32_user_to_icpustate32_p
 
 #define scpustate_getpc                     scpustate32_geteip
 #define scpustate_setpc                     scpustate32_seteip
@@ -1193,8 +1527,8 @@ __NOTHROW_NCX(fcpustate32_assign_icpustate32)(struct fcpustate32 *__restrict __s
 #define scpustate_isuser_novm86             scpustate32_isuser_novm86
 #define scpustate_isuser                    scpustate32_isuser
 #define scpustate_iskernel                  scpustate32_iskernel
-#define scpustate_is32(self)                1
-#define scpustate_is64(self)                0
+#define scpustate_is32bit(self)             1
+#define scpustate_is64bit(self)             0
 #define scpustate_isnative(self)            1
 #define scpustate_iscompat(self)            0
 #define scpustate_getuserpsp                scpustate32_getuseresp
@@ -1228,18 +1562,36 @@ __NOTHROW_NCX(fcpustate32_assign_icpustate32)(struct fcpustate32 *__restrict __s
 #define scpustate_trysetss                  scpustate32_trysetss
 #define scpustate_sizeof                    scpustate32_sizeof
 #define scpustate_to_ucpustate              scpustate32_to_ucpustate32
+#define scpustate_to_ucpustate32            scpustate32_to_ucpustate32
+#define scpustate32_to_ucpustate            scpustate32_to_ucpustate32
 #define scpustate_user_to_ucpustate         scpustate32_user_to_ucpustate32
+#define scpustate_user_to_ucpustate32       scpustate32_user_to_ucpustate32
+#define scpustate32_user_to_ucpustate       scpustate32_user_to_ucpustate32
+#define scpustate_to_kcpustate              scpustate32_to_kcpustate32
+#define scpustate_to_kcpustate32            scpustate32_to_kcpustate32
+#define scpustate32_to_kcpustate            scpustate32_to_kcpustate32
+#define scpustate_user_to_kcpustate         scpustate32_user_to_kcpustate32
+#define scpustate_user_to_kcpustate32       scpustate32_user_to_kcpustate32
+#define scpustate32_user_to_kcpustate       scpustate32_user_to_kcpustate32
 #define scpustate_to_icpustate_p            scpustate32_to_icpustate32_p
-#define scpustate_to_scpustate_p            scpustate32_to_scpustate32_p
+#define scpustate_to_icpustate32_p          scpustate32_to_icpustate32_p
+#define scpustate32_to_icpustate_p          scpustate32_to_icpustate32_p
 #define scpustate_user_to_icpustate_p       scpustate32_user_to_icpustate32_p
+#define scpustate_user_to_icpustate32_p     scpustate32_user_to_icpustate32_p
+#define scpustate32_user_to_icpustate_p     scpustate32_user_to_icpustate32_p
+#define scpustate_to_scpustate_p            scpustate32_to_scpustate32_p
+#define scpustate_to_scpustate32_p          scpustate32_to_scpustate32_p
+#define scpustate32_to_scpustate_p          scpustate32_to_scpustate32_p
 #define scpustate_user_to_scpustate_p       scpustate32_user_to_scpustate32_p
+#define scpustate_user_to_scpustate32_p     scpustate32_user_to_scpustate32_p
+#define scpustate32_user_to_scpustate_p     scpustate32_user_to_scpustate32_p
 
 #define ucpustate_isvm86                    ucpustate32_isvm86
 #define ucpustate_isuser_novm86             ucpustate32_isuser_novm86
 #define ucpustate_isuser                    ucpustate32_isuser
 #define ucpustate_iskernel                  ucpustate32_iskernel
-#define ucpustate_is32(self)                1
-#define ucpustate_is64(self)                0
+#define ucpustate_is32bit(self)             1
+#define ucpustate_is64bit(self)             0
 #define ucpustate_isnative(self)            1
 #define ucpustate_iscompat(self)            0
 #define ucpustate_getpc                     ucpustate32_geteip
@@ -1248,16 +1600,25 @@ __NOTHROW_NCX(fcpustate32_assign_icpustate32)(struct fcpustate32 *__restrict __s
 #define ucpustate_setsp                     ucpustate32_setesp
 #define ucpustate_getpflags                 ucpustate32_geteflags
 #define ucpustate_setpflags                 ucpustate32_seteflags
+#define ucpustate_to_ucpustate              ucpustate32_to_ucpustate32
+#define ucpustate_to_ucpustate32            ucpustate32_to_ucpustate32
+#define ucpustate32_to_ucpustate            ucpustate32_to_ucpustate32
 #define ucpustate_to_kcpustate              ucpustate32_to_kcpustate32
+#define ucpustate_to_kcpustate32            ucpustate32_to_kcpustate32
+#define ucpustate32_to_kcpustate            ucpustate32_to_kcpustate32
 #define ucpustate_to_icpustate_p            ucpustate32_to_icpustate32_p
+#define ucpustate_to_icpustate32_p          ucpustate32_to_icpustate32_p
+#define ucpustate32_to_icpustate_p          ucpustate32_to_icpustate32_p
 #define ucpustate_to_scpustate_p            ucpustate32_to_scpustate32_p
+#define ucpustate_to_scpustate32_p          ucpustate32_to_scpustate32_p
+#define ucpustate32_to_scpustate_p          ucpustate32_to_scpustate32_p
 
 #define fcpustate_isvm86                    fcpustate32_isvm86
 #define fcpustate_isuser_novm86             fcpustate32_isuser_novm86
 #define fcpustate_isuser                    fcpustate32_isuser
 #define fcpustate_iskernel                  fcpustate32_iskernel
-#define fcpustate_is32(self)                1
-#define fcpustate_is64(self)                0
+#define fcpustate_is32bit(self)             1
+#define fcpustate_is64bit(self)             0
 #define fcpustate_isnative(self)            1
 #define fcpustate_iscompat(self)            0
 #define fcpustate_getpc                     fcpustate32_geteip
@@ -1266,13 +1627,36 @@ __NOTHROW_NCX(fcpustate32_assign_icpustate32)(struct fcpustate32 *__restrict __s
 #define fcpustate_setsp                     fcpustate32_setesp
 #define fcpustate_getpflags                 fcpustate32_geteflags
 #define fcpustate_setpflags                 fcpustate32_seteflags
+#define fcpustate_to_fcpustate              fcpustate32_to_fcpustate32
+#define fcpustate_to_fcpustate32            fcpustate32_to_fcpustate32
+#define fcpustate32_to_fcpustate            fcpustate32_to_fcpustate32
 #define fcpustate_to_lcpustate              fcpustate32_to_lcpustate32
+#define fcpustate_to_lcpustate32            fcpustate32_to_lcpustate32
+#define fcpustate32_to_lcpustate            fcpustate32_to_lcpustate32
 #define fcpustate_to_kcpustate              fcpustate32_to_kcpustate32
+#define fcpustate_to_kcpustate32            fcpustate32_to_kcpustate32
+#define fcpustate32_to_kcpustate            fcpustate32_to_kcpustate32
 #define fcpustate_to_ucpustate              fcpustate32_to_ucpustate32
+#define fcpustate_to_ucpustate32            fcpustate32_to_ucpustate32
+#define fcpustate32_to_ucpustate            fcpustate32_to_ucpustate32
 #define fcpustate_assign_ucpustate          fcpustate32_assign_ucpustate32
+#define fcpustate_assign_ucpustate32        fcpustate32_assign_ucpustate32
+#define fcpustate32_assign_ucpustate        fcpustate32_assign_ucpustate32
 #define fcpustate_assign_scpustate          fcpustate32_assign_scpustate32
+#define fcpustate_assign_scpustate32        fcpustate32_assign_scpustate32
+#define fcpustate32_assign_scpustate        fcpustate32_assign_scpustate32
 #define fcpustate_assign_icpustate_ex       fcpustate32_assign_icpustate32_ex
+#define fcpustate_assign_icpustate32_ex     fcpustate32_assign_icpustate32_ex
+#define fcpustate32_assign_icpustate_ex     fcpustate32_assign_icpustate32_ex
 #define fcpustate_assign_icpustate          fcpustate32_assign_icpustate32
+#define fcpustate_assign_icpustate32        fcpustate32_assign_icpustate32
+#define fcpustate32_assign_icpustate        fcpustate32_assign_icpustate32
+#define fcpustate_to_icpustate_p            fcpustate32_to_icpustate32_p
+#define fcpustate_to_icpustate32_p          fcpustate32_to_icpustate32_p
+#define fcpustate32_to_icpustate_p          fcpustate32_to_icpustate32_p
+#define fcpustate_to_scpustate_p            fcpustate32_to_scpustate32_p
+#define fcpustate_to_scpustate32_p          fcpustate32_to_scpustate32_p
+#define fcpustate32_to_scpustate_p          fcpustate32_to_scpustate32_p
 
 #endif /* !__x86_64__ */
 

@@ -19,13 +19,15 @@
 #ifndef _I386_KOS_BITS_SIGACTION_STRUCT32_H
 #define _I386_KOS_BITS_SIGACTION_STRUCT32_H 1
 
-#include <__stdinc.h>
 #include <__crt.h>
+#include <__stdinc.h>
 #include <features.h>
-#include <bits/types.h>
-#include <bits/sigset.h>
+
 #include <hybrid/__pointer.h>
 #include <hybrid/host.h>
+
+#include <bits/sigset.h>
+#include <bits/types.h>
 
 #if !defined(__x86_64__) && !defined(__CRT_CYG_PRIMARY)
 #define __OFFSET_SIGACTION_HANDLER   __OFFSET_SIGACTION32_HANDLER
@@ -63,6 +65,17 @@ struct ucontext;
 #endif /* !__x86_64__ */
 #endif /* __USE_KOS */
 #endif /* __USE_POSIX199309 */
+#ifndef ____sigset32_t_defined
+#define ____sigset32_t_defined 1
+#ifdef __x86_64__
+typedef struct __sigset_struct32 {
+	__UINT32_TYPE__ __val[__SIZEOF_SIGSET_T__ / 4];
+} __sigset32_t;
+#else /* __x86_64__ */
+#define __sigset_struct32 __sigset_struct
+#define __sigset32_t      __sigset_t
+#endif /* !__x86_64__ */
+#endif /* !____sigset32_t_defined */
 #endif /* __CC__ */
 
 
@@ -99,8 +112,8 @@ struct __ATTR_ALIGNED(__ALIGNOF_SIGACTION32) sigaction32 /*[PREFIX(sa_)]*/ {
 #else /* __USE_POSIX199309 */
 	__sighandler32_t sa_handler;
 #endif /* !__USE_POSIX199309 */
-	__sigset_t sa_mask;  /* Additional set of signals to be blocked. */
-	__uint32_t sa_flags; /* Special flags. */
+	__sigset32_t sa_mask;  /* Additional set of signals to be blocked. */
+	__uint32_t   sa_flags; /* Special flags. */
 #ifdef __x86_64__
 	__HYBRID_FUNCPTR32(void, , sa_restorer, (void)); /* Restore handler. */
 #else /* __x86_64__ */

@@ -443,7 +443,7 @@ __FORCELOCAL void __NOTHROW_NCX(__hybrid_atomic_store)(__T &__x, __V __v, int __
 #define __impl_hybrid_atomic_fetchadd_seqcst(x, v) \
 	__impl_hybrid_atomic_fetchsub_seqcst(x, 0 - (v))
 #endif /* __impl_hybrid_atomic_fetchsub_seqcst */
-#else  /* !__impl_hybrid_atomic_fetchadd_seqcst */
+#else /* !__impl_hybrid_atomic_fetchadd_seqcst */
 #ifndef __impl_hybrid_atomic_fetchsub_seqcst
 #define __impl_hybrid_atomic_fetchsub_seqcst(x, v) \
 	__impl_hybrid_atomic_fetchadd_seqcst(x, 0 - (v))

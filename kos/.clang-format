@@ -96,7 +96,6 @@ IndentWrappedFunctionNames: false
 JavaScriptQuotes: Leave
 JavaScriptWrapImports: true
 KeepEmptyLinesAtTheStartOfBlocks: true
-Language: Cpp
 MaxEmptyLinesToKeep: 8
 NamespaceIndentation: None
 ObjCBinPackProtocolList: Auto

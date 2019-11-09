@@ -35,7 +35,7 @@ template<class __T> struct __make_signed { typedef __T type; };
 template<class __T> struct __make_unsigned { typedef __T type; };
 #ifdef __CHAR_UNSIGNED__
 template<> struct __make_signed<char> { typedef signed char type; };
-#else  /* __CHAR_UNSIGNED__ */
+#else /* __CHAR_UNSIGNED__ */
 template<> struct __make_unsigned<char> { typedef unsigned char type; };
 #endif /* !__CHAR_UNSIGNED__ */
 template<> struct __make_signed<unsigned char> { typedef signed char type; };
@@ -49,7 +49,7 @@ template<> struct __make_unsigned<long> { typedef unsigned long type; };
 #ifdef __native_wchar_t_defined
 #ifdef __WCHAR_UNSIGNED__
 template<> struct __make_signed<wchar_t> { typedef __TYPEFOR_INTIB(__SIZEOF_WCHAR_T__) type; };
-#else  /* __WCHAR_UNSIGNED__ */
+#else /* __WCHAR_UNSIGNED__ */
 template<> struct __make_unsigned<wchar_t> { typedef __TYPEFOR_UINTIB(__SIZEOF_WCHAR_T__) type; };
 #endif /* !__WCHAR_UNSIGNED__ */
 #endif /* __native_wchar_t_defined */

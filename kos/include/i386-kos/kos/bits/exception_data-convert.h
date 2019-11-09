@@ -20,37 +20,61 @@
 #define _I386_KOS_KOS_BITS_EXCEPTION_DATA_CONVERT_H 1
 
 #include <__stdinc.h>
+
+#include <hybrid/host.h>
 #include <hybrid/typecore.h>
+
 #include <kos/bits/exception_data32.h>
 #include <kos/bits/exception_data64.h>
 
-__SYSDECL_BEGIN
+#include <libc/string.h>
+
+#ifdef __CC__
+__DECL_BEGIN
 
 /* Convert between 32-bit and 64-bit siginfo_t structures */
-#ifdef __CC__
+#define exception_data32_to_exception_data32(self, result)                   \
+	__libc_memcpy(__COMPILER_REQTYPE(struct exception_data32 *, result),     \
+	              __COMPILER_REQTYPE(struct exception_data32 const *, self), \
+	              sizeof(struct exception_data32))
+#define exception_data64_to_exception_data64(self, result)                   \
+	__libc_memcpy(__COMPILER_REQTYPE(struct exception_data64 *, result),     \
+	              __COMPILER_REQTYPE(struct exception_data64 const *, self), \
+	              sizeof(struct exception_data64))
 
 __LOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void
-__NOTHROW_NCX(exception_data32_to_exception_data64)(struct exception_data64 *__restrict dst,
-                                                    struct exception_data32 const *__restrict src) {
+__NOTHROW_NCX(exception_data32_to_exception_data64)(struct exception_data32 const *__restrict __self,
+                                                    struct exception_data64 *__restrict __result) {
 	unsigned int i;
-	dst->e_class    = (error_class64_t)src->e_class;
-	dst->e_subclass = (error_subclass64_t)src->e_subclass;
+	__result->e_class    = (error_class64_t)__self->e_class;
+	__result->e_subclass = (error_subclass64_t)__self->e_subclass;
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
-		dst->e_pointers[i] = (__UINT64_TYPE__)src->e_pointers[i];
+		__result->e_pointers[i] = (__UINT64_TYPE__)__self->e_pointers[i];
 }
 
 __LOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void
-__NOTHROW_NCX(exception_data64_to_exception_data32)(struct exception_data32 *__restrict dst,
-                                                    struct exception_data64 const *__restrict src) {
+__NOTHROW_NCX(exception_data64_to_exception_data32)(struct exception_data64 const *__restrict __self,
+                                                    struct exception_data32 *__restrict __result) {
 	unsigned int i;
-	dst->e_class    = (error_class32_t)src->e_class;
-	dst->e_subclass = (error_subclass32_t)src->e_subclass;
+	__result->e_class    = (error_class32_t)__self->e_class;
+	__result->e_subclass = (error_subclass32_t)__self->e_subclass;
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
-		dst->e_pointers[i] = (__UINT32_TYPE__)src->e_pointers[i];
+		__result->e_pointers[i] = (__UINT32_TYPE__)__self->e_pointers[i];
 }
 
+#ifdef __x86_64__
+#define exception_data64_to_exception_data exception_data64_to_exception_data64
+#define exception_data32_to_exception_data exception_data32_to_exception_data64
+#define exception_data_to_exception_data32 exception_data64_to_exception_data32
+#define exception_data_to_exception_data64 exception_data64_to_exception_data64
+#else /* __x86_64__ */
+#define exception_data64_to_exception_data exception_data64_to_exception_data32
+#define exception_data32_to_exception_data exception_data32_to_exception_data32
+#define exception_data_to_exception_data32 exception_data32_to_exception_data32
+#define exception_data_to_exception_data64 exception_data32_to_exception_data64
+#endif /* !__x86_64__ */
+
+__DECL_END
 #endif /* __CC__ */
-
-__SYSDECL_END
 
 #endif /* !_I386_KOS_KOS_BITS_EXCEPTION_DATA_CONVERT_H */

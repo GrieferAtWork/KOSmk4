@@ -41,25 +41,22 @@
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <asm/registers.h>
+#include <bits/siginfo-convert.h>  /* siginfo64_to_siginfo32 */
 #include <bits/siginfo-struct32.h> /* siginfo32_t */
 #include <kos/except-inval.h>
-#include <kos/kernel/cpu-state.h>   /* icpustate */
-#include <kos/kernel/cpu-state32.h> /* ucpustate32 */
-#include <kos/kernel/fpu-state32.h> /* fpustate32 */
-#include <kos/kernel/ucontext32.h>  /* ucontext32_t */
+#include <kos/kernel/cpu-state-verify.h> /* cpustate_verify_user...() */
+#include <kos/kernel/cpu-state.h>        /* icpustate */
+#include <kos/kernel/cpu-state32.h>      /* ucpustate32 */
+#include <kos/kernel/fpu-state32.h>      /* fpustate32 */
+#include <kos/kernel/ucontext32.h>       /* ucontext32_t */
 
 #include <signal.h>
 #include <string.h>
 #include <syscall.h>
 
-#include <librpc/bits/syscall-info32.h> /* rpc_syscall_info32 */
+#include <librpc/bits/syscall-info-convert.h> /* rpc_syscall_info_to_rpc_syscall_info32 */
+#include <librpc/bits/syscall-info32.h>       /* rpc_syscall_info32 */
 #include <librpc/rpc.h>
-
-#ifdef __x86_64__
-#include <bits/siginfo-convert.h> /* siginfo64_to_siginfo32 */
-
-#include <librpc/bits/syscall-info-convert.h> /* rpc_syscall_info64_to_rpc_syscall_info32 */
-#endif                                        /* __x86_64__ */
 
 DECL_BEGIN
 
@@ -213,12 +210,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		usp -= sizeof(ucontext32_t) + EFFECTIVE_SIZEOF_SIGINFO_T;
 		/* Copy signal information into user-space. */
 		user_siginfo = (siginfo32_t *)usp;
-#ifdef __x86_64__
-		/* Convert siginfo64_t --> siginfo32_t */
-		siginfo64_to_siginfo32(user_siginfo, siginfo);
-#else /* __x86_64__ */
-		memcpy(user_siginfo, siginfo, SIZEOF_KERNEL_SIGINFO_T);
-#endif /* !__x86_64__ */
+		siginfo_to_siginfo32(siginfo, user_siginfo);
 	} else {
 		/* Only push the bare minimum */
 		user_ucontext = COMPILER_CONTAINER_OF((struct ucpustate32 *)(usp - sizeof(struct ucpustate32)),
@@ -250,32 +242,21 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		}
 	}
 	/* Fill in return context information */
-
-#ifdef __x86_64__
-	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_edi = state->ics_gpregs.gp_rdi;
-	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_esi = state->ics_gpregs.gp_rsi;
-	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_ebp = state->ics_gpregs.gp_rbp;
-	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_ebx = state->ics_gpregs.gp_rbx;
-	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_edx = state->ics_gpregs.gp_rdx;
-	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_ecx = state->ics_gpregs.gp_rcx;
-	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_eax = state->ics_gpregs.gp_rax;
-#else /* __x86_64__ */
-	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_edi = state->ics_gpregs.gp_edi;
-	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_esi = state->ics_gpregs.gp_esi;
-	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_ebp = state->ics_gpregs.gp_ebp;
-	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_ebx = state->ics_gpregs.gp_ebx;
-	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_edx = state->ics_gpregs.gp_edx;
-	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_ecx = state->ics_gpregs.gp_ecx;
-	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_eax = state->ics_gpregs.gp_eax;
-#endif /* !__x86_64__ */
+	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_edi = (u32)gpregs_getpdi(&state->ics_gpregs);
+	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_esi = (u32)gpregs_getpsi(&state->ics_gpregs);
+	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_ebp = (u32)gpregs_getpbp(&state->ics_gpregs);
+	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_ebx = (u32)gpregs_getpbx(&state->ics_gpregs);
+	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_edx = (u32)gpregs_getpdx(&state->ics_gpregs);
+	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_ecx = (u32)gpregs_getpcx(&state->ics_gpregs);
+	user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_eax = (u32)gpregs_getpax(&state->ics_gpregs);
 	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_gs  = icpustate_getgs(state);
 	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_fs  = icpustate_getfs(state);
 	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_es  = icpustate_getes(state);
 	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_ds  = icpustate_getds(state);
 	user_ucontext->uc_mcontext.mc_context.ucs_cs            = icpustate_getcs(state);
 	user_ucontext->uc_mcontext.mc_context.ucs_ss            = icpustate_getss(state);
-	user_ucontext->uc_mcontext.mc_context.ucs_eflags        = icpustate_getpflags(state);
-	user_ucontext->uc_mcontext.mc_context.ucs_eip           = icpustate_getpc(state);
+	user_ucontext->uc_mcontext.mc_context.ucs_eflags        = (u32)icpustate_getpflags(state);
+	user_ucontext->uc_mcontext.mc_context.ucs_eip           = (u32)icpustate_getpc(state);
 
 	user_sc_info = NULL;
 	if (sc_info) {
@@ -291,12 +272,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		user_sc_info = (USER CHECKED struct rpc_syscall_info32 *)usp;
 		validate_writable(user_sc_info, ob_size);
 		COMPILER_WRITE_BARRIER();
-#ifdef __x86_64__
-		rpc_syscall_info64_to_rpc_syscall_info32(user_sc_info,
-		                                         sc_info, argc);
-#else /* __x86_64__ */
-		memcpy(user_sc_info, sc_info, ob_size);
-#endif /* !__x86_64__ */
+		rpc_syscall_info_to_rpc_syscall_info32(sc_info, user_sc_info, argc);
 	}
 
 	/* At this point, we must setup everything to restore:
@@ -402,26 +378,22 @@ sighand_raise_signal(struct icpustate *__restrict state,
 
 
 INTERN struct icpustate *FCALL
-syscall_fill_icpustate_from_ucpustate(struct icpustate *__restrict state,
-                                      USER CHECKED struct ucpustate const *__restrict ust)
+syscall_fill_icpustate_from_ucpustate32(struct icpustate *__restrict state,
+                                        USER CHECKED struct ucpustate32 const *__restrict ust)
 		THROWS(E_INVALID_ARGUMENT_BAD_VALUE, E_SEGFAULT, ...) {
 	u16 gs, fs, es, ds, ss, cs;
-	u32 eflags, eflags_mask;
-	eflags_mask = (u32)cred_allow_eflags_modify_mask();
-	gs = ust->ucs_sgregs.sg_gs16;
-	fs = ust->ucs_sgregs.sg_fs16;
-	es = ust->ucs_sgregs.sg_es16;
-	ds = ust->ucs_sgregs.sg_ds16;
-	ss = ust->ucs_ss16;
-	cs = ust->ucs_cs16;
-	eflags = ust->ucs_eflags;
+	uintptr_t eflags;
+	gs     = ust->ucs_sgregs.sg_gs16;
+	fs     = ust->ucs_sgregs.sg_fs16;
+	es     = ust->ucs_sgregs.sg_es16;
+	ds     = ust->ucs_sgregs.sg_ds16;
+	ss     = ust->ucs_ss16;
+	cs     = ust->ucs_cs16;
+	eflags = ucpustate32_geteflags(ust);
 	COMPILER_READ_BARRIER();
-	if unlikely((irregs_rdflags(&state->ics_irregs) & ~eflags_mask) !=
-	            (eflags & ~eflags_mask)) {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-		      X86_REGISTER_MISC_EFLAGS, eflags);
-	}
+	cpustate_verify_userpflags(icpustate_getpflags(state),
+	                           eflags,
+	                           cred_allow_eflags_modify_mask());
 #ifndef __x86_64__
 	if (icpustate_isvm86(state)) {
 		state->ics_irregs_v.ir_es = es;
@@ -432,59 +404,23 @@ syscall_fill_icpustate_from_ucpustate(struct icpustate *__restrict state,
 #endif /* !__x86_64__ */
 	{
 		/* Validate segment register indices before actually restoring them. */
-		if unlikely(!SEGMENT_IS_VALID_USERCODE(cs)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_CS, cs);
-		}
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(gs)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_GS, gs);
-		}
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(fs)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_FS, fs);
-		}
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(es)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_ES, es);
-		}
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(ds)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_DS, ds);
-		}
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(ss)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_SS, ss);
-		}
-		__wrgs((u16)gs);
-#ifdef __x86_64__
-		__wrfs((u16)fs);
-		__wres((u16)es);
-		__wrds((u16)ds);
-#else /* __x86_64__ */
-		state->ics_fs = fs;
-		state->ics_es = es;
-		state->ics_ds = ds;
-#endif /* !__x86_64__ */
+		cpustate_verify_usercs(cs);
+		cpustate_verify_userss(ss);
+		cpustate_verify_usergs(gs);
+		cpustate_verify_userfs(fs);
+		cpustate_verify_useres(es);
+		cpustate_verify_userds(ds);
+		icpustate_setgs_novm86(state, gs);
+		icpustate_setfs_novm86(state, fs);
+		icpustate_setes_novm86(state, es);
+		icpustate_setds_novm86(state, ds);
 	}
 	icpustate_setcs(state, cs);
 	icpustate_setuserss(state, ss);
-	gpregs_setpdi(&state->ics_gpregs, ust->ucs_gpregs.gp_edi);
-	gpregs_setpsi(&state->ics_gpregs, ust->ucs_gpregs.gp_esi);
-	gpregs_setpbp(&state->ics_gpregs, ust->ucs_gpregs.gp_ebp);
-	gpregs_setpbx(&state->ics_gpregs, ust->ucs_gpregs.gp_ebx);
-	gpregs_setpdx(&state->ics_gpregs, ust->ucs_gpregs.gp_edx);
-	gpregs_setpcx(&state->ics_gpregs, ust->ucs_gpregs.gp_ecx);
-	gpregs_setpax(&state->ics_gpregs, ust->ucs_gpregs.gp_eax);
+	gpregs32_to_gpregsnsp(&ust->ucs_gpregs, &state->ics_gpregs);
 	icpustate_setpflags(state, eflags);
-	icpustate_setpc(state, ust->ucs_eip);
-	icpustate_setuserpsp(state, ust->ucs_gpregs.gp_esp);
+	icpustate_setpc(state, ucpustate32_geteip(ust));
+	icpustate_setuserpsp(state, ucpustate32_getesp(ust));
 	return state;
 }
 
@@ -498,10 +434,10 @@ syscall_fill_icpustate_from_ucpustate(struct icpustate *__restrict state,
 /* Sigreturn system call implementation. */
 INTERN struct icpustate *FCALL
 sigreturn32_impl(struct icpustate *__restrict state,
-                   USER UNCHECKED struct ucpustate32 const *restore_cpu,
-                   USER UNCHECKED struct fpustate32 const *restore_fpu,
-                   USER UNCHECKED sigset_t const *restore_sigmask,
-                   USER UNCHECKED struct rpc_syscall_info *sc_info) {
+                 USER UNCHECKED struct ucpustate32 const *restore_cpu,
+                 USER UNCHECKED struct fpustate32 const *restore_fpu,
+                 USER UNCHECKED sigset_t const *restore_sigmask,
+                 USER UNCHECKED struct rpc_syscall_info *sc_info) {
 	bool enable_except;
 	enable_except = (irregs_rdflags(&state->ics_irregs) & EFLAGS_CF) != 0;
 	TRY {
@@ -528,7 +464,7 @@ again:
 		if (restore_fpu)
 			fpustate_loadfrom32(restore_fpu);
 		/* Restore the CPU context */
-		state = syscall_fill_icpustate_from_ucpustate(state, restore_cpu);
+		state = syscall_fill_icpustate_from_ucpustate32(state, restore_cpu);
 
 		if (sc_info) {
 			/* Restart a system call. */
@@ -663,7 +599,7 @@ raiseat32_impl(struct icpustate *__restrict state,
 	memcpy(&siginfo, si, sizeof(siginfo_t));
 	if (ust) {
 		validate_readable(ust, sizeof(*ust));
-		state = syscall_fill_icpustate_from_ucpustate(state, ust);
+		state = syscall_fill_icpustate_from_ucpustate32(state, ust);
 	}
 	/* Verify that the signal number is inside of its mandatory bounds. */
 	if unlikely(!siginfo.si_signo || siginfo.si_signo >= NSIG)

@@ -22,9 +22,7 @@
 
 %{
 #include <features.h>
-#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL) || defined(__USE_GNU)
 #include <bits/types.h>
-#endif /* __USE_KOS || __USE_KOS_KERNEL || __USE_GNU */
 
 #ifdef __CRT_DOS_PRIMARY
 #include <parts/dos/errno.h>

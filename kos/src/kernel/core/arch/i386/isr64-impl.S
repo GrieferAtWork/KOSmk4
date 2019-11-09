@@ -56,6 +56,7 @@ INTERN_FUNCTION(FUNC(x86_asmirq_))
 #if VECTOR_ID == 0xf7
 	/* SPUR#1 */
 #define HAVE_SPURIOUS_FAULT 1
+	.cfi_remember_state
 	movb   $(X86_PIC_READ_ISR), %al
 	outb   %al,      $(X86_PIC1_CMD) /* outb(X86_PIC1_CMD, X86_PIC_READ_ISR); */
 	inb    $(X86_PIC2_CMD),     %al
@@ -64,6 +65,7 @@ INTERN_FUNCTION(FUNC(x86_asmirq_))
 #elif VECTOR_ID == 0xff
 	/* SPUR#2 */
 #define HAVE_SPURIOUS_FAULT 1
+	.cfi_remember_state
 	movb   $(X86_PIC_READ_ISR), %al
 	outb   %al,      $(X86_PIC2_CMD) /* outb(X86_PIC2_CMD, X86_PIC_READ_ISR); */
 	inb    $(X86_PIC2_CMD),     %al
@@ -101,14 +103,8 @@ INTERN_FUNCTION(FUNC(x86_asmirq_))
 
 #ifdef HAVE_SPURIOUS_FAULT
 #undef HAVE_SPURIOUS_FAULT
-	.cfi_def_cfa_offset 24
-	.cfi_restore_iret_ds_or_offset -4
-	.cfi_restore_iret_es_or_offset -8
-	.cfi_restore_iret_fs_or_offset -12
-	.cfi_rel_offset %eax, 8
-	.cfi_rel_offset %ecx, 4
-	.cfi_rel_offset %edx, 0
-99:	pushl_cfi $98b
+	.cfi_restore_state
+99:	pushq_cfi $98b
 #if VECTOR_ID == 0xf7
 	INTERN(x86_pic1_spur)
 	jmp    x86_pic1_spur

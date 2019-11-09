@@ -61,7 +61,7 @@ template<class __T> struct is_copy_assignable
 #ifdef __COMPILER_HAVE_CXX_RVALUE_REFERENCE
 template<class __T> struct is_move_assignable
     : public __NAMESPACE_INT_SYM __is_move_assignable_impl<__T, __NAMESPACE_INT_SYM __is_referenceable<__T>::value> {};
-#else  /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
+#else /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
 template<class __T> struct is_move_assignable
     : public false_type {};
 #endif /* !__COMPILER_HAVE_CXX_RVALUE_REFERENCE */
@@ -69,7 +69,7 @@ template<class __T> struct is_move_assignable
 defined(__INTELLISENSE__) || defined(_MSC_VER)
 template<class __To, class __From> struct is_nothrow_assignable
     : public integral_constant<bool, __is_nothrow_assignable(__To, __From)>> {};
-#else  /* __COMPILER_HAVE_CXX11_NOEXCEPT */
+#else /* __COMPILER_HAVE_CXX11_NOEXCEPT */
 __NAMESPACE_STD_END
 __NAMESPACE_INT_BEGIN
 template<class __To, class __From> struct __is_nt_assignable_impl
@@ -100,7 +100,7 @@ template<class __T> struct is_nothrow_copy_assignable
 #ifdef __COMPILER_HAVE_CXX_RVALUE_REFERENCE
 template<class __T> struct is_nothrow_move_assignable
     : public __NAMESPACE_INT_SYM __is_nt_move_assignable_impl<__T, __NAMESPACE_INT_SYM __is_referenceable<__T>::value> {};
-#else  /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
+#else /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
 template<class __T> struct is_nothrow_move_assignable
     : public false_type {};
 #endif /* !__COMPILER_HAVE_CXX_RVALUE_REFERENCE */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9622e3f6 */
+/* HASH CRC-32:0x4797cbbe */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,7 +114,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fuzzy_c16memcasecmp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_c16memcasecmp_l))(__CHAR16_TYPE__ const *__s1,
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(fuzzy_c16memcasecmp_l))(__CHAR16_TYPE__ const *__s1,
                                                                    __SIZE_TYPE__ __s1_bytes,
                                                                    __CHAR16_TYPE__ const *__s2,
                                                                    __SIZE_TYPE__ __s2_bytes,

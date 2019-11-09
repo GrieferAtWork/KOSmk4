@@ -41,7 +41,7 @@ template<class __T> struct add_lvalue_reference
 template<class __T> struct add_rvalue_reference
     : public __NAMESPACE_INT_SYM __add_rvalue_reference_helper<
       __T, __NAMESPACE_INT_SYM __is_referenceable<__T>::value> {};
-#else  /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
+#else /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
 template<class __T> struct add_rvalue_reference { typedef __T type; };
 #endif /* !__COMPILER_HAVE_CXX_RVALUE_REFERENCE */
 __NAMESPACE_STD_END

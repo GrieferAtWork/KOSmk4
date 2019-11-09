@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x804319d3 */
+/* HASH CRC-32:0x10224486 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,6 @@
 #define GUARD_LIBC_USER_KOS_UNISTD_H 1
 
 #include "../api.h"
-#include "../auto/kos.unistd.h"
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 #include <kos/types.h>
@@ -60,6 +59,10 @@ INTDEF ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void (VLIBCCALL libc_Execlp
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
 INTDEF NONNULL((1)) void (LIBCCALL libc_Pipe)(fd_t pipedes[2]) __THROWS(...);
+/* >> fsync(2)
+ * Synchronize a file (including its descriptor which contains timestamps, and its size),
+ * meaning that changes to its data and/or descriptor are written to disk */
+INTDEF void (LIBCCALL libc_FSync)(fd_t fd) __THROWS(...);
 /* >> setpgid(2)
  * Change the ID of the process group associated with `PID's process.
  * (That is the TID of the leader of the process group of `PID's leader)

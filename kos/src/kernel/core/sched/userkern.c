@@ -23,8 +23,8 @@
 
 #include <sched/userkern.h>
 #ifndef CONFIG_NO_USERKERN_SEGMENT
-#ifndef CONFIG_USERKERN_SEGMENT_IMPLEMENTATION_IS_ARCH_SPECIFIC
 
+#include <kernel/compat.h>
 #include <kernel/except.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
@@ -35,239 +35,145 @@
 #include <sched/pertask.h>
 #include <sched/pid.h>
 
+#include <kos/bits/ukern-struct.h>
 #include <kos/except-inval.h>
 #include <kos/ukern.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <hybrid/byteorder.h>
+
+#include <kos/bits/ukern-struct32.h>
+#include <kos/bits/ukern-struct64.h>
+#endif /* __ARCH_HAVE_COMPAT */
+
 
 DECL_BEGIN
 
 /* These 2 functions must be overwritten to implement arch-specific behavior.
  * Mainly: To implement access to the register identity map structure. */
-INTDEF NONNULL((1)) bool KCALL
-userkern_get_arch_specific_field(struct vio_args *__restrict args,
-                                 uintptr_t offset, uintptr_t *__restrict presult);
-INTDEF NONNULL((1)) bool KCALL
-userkern_set_arch_specific_field(struct vio_args *__restrict args,
-                                 uintptr_t offset, uintptr_t value);
+INTDEF NONNULL((1)) bool KCALL userkern_get_arch_specific_field(struct vio_args *__restrict args, uintptr_t offset, uintptr_t *__restrict presult);
+INTDEF NONNULL((1)) bool KCALL userkern_set_arch_specific_field(struct vio_args *__restrict args, uintptr_t offset, uintptr_t value);
+#ifdef __ARCH_HAVE_COMPAT
+INTDEF NONNULL((1)) bool KCALL userkern_get_arch_specific_field_compat(struct vio_args *__restrict args, uintptr_t offset, __ARCH_COMPAT_UINTPTR_TYPE *__restrict presult);
+INTDEF NONNULL((1)) bool KCALL userkern_set_arch_specific_field_compat(struct vio_args *__restrict args, uintptr_t offset, __ARCH_COMPAT_UINTPTR_TYPE value);
+#endif /* __ARCH_HAVE_COMPAT */
+
+#ifdef __INTELLISENSE__
+#if __SIZEOF_POINTER__ == 4 || defined(__ARCH_HAVE_COMPAT)
+PRIVATE NONNULL((1)) u32 KCALL userkern_segment_readl(struct vio_args *__restrict args, vm_daddr_t addr);
+PRIVATE NONNULL((1)) void KCALL userkern_segment_writel(struct vio_args *__restrict args, vm_daddr_t addr, u32 value);
+#endif /* __SIZEOF_POINTER__ == 4 || __ARCH_HAVE_COMPAT */
+#if __SIZEOF_POINTER__ == 8 || defined(__ARCH_HAVE_COMPAT)
+PRIVATE NONNULL((1)) u64 KCALL userkern_segment_readq(struct vio_args *__restrict args, vm_daddr_t addr);
+PRIVATE NONNULL((1)) void KCALL userkern_segment_writeq(struct vio_args *__restrict args, vm_daddr_t addr, u64 value);
+#endif /* __SIZEOF_POINTER__ == 8 || __ARCH_HAVE_COMPAT */
+#else /* __INTELLISENSE__ */
+DECL_END
+
+#if __SIZEOF_POINTER__ == 4 || defined(__ARCH_HAVE_COMPAT)
+#ifdef __ARCH_HAVE_COMPAT
+#define USERKERN_STRUCT struct userkern32
+#endif /* __ARCH_HAVE_COMPAT */
+#define DEFINE_IO_READ 1
+#define USERKERN_WIDTH 4
+#include "userkern-rw.c.inl"
+#ifdef __ARCH_HAVE_COMPAT
+#define USERKERN_STRUCT struct userkern32
+#endif /* __ARCH_HAVE_COMPAT */
+#define DEFINE_IO_WRITE 1
+#define USERKERN_WIDTH 4
+#include "userkern-rw.c.inl"
+#endif /* __SIZEOF_POINTER__ == 4 || __ARCH_HAVE_COMPAT */
+
+#if __SIZEOF_POINTER__ == 8 || defined(__ARCH_HAVE_COMPAT)
+#ifdef __ARCH_HAVE_COMPAT
+#define USERKERN_STRUCT struct userkern64
+#endif /* __ARCH_HAVE_COMPAT */
+#define DEFINE_IO_READ 1
+#define USERKERN_WIDTH 8
+#include "userkern-rw.c.inl"
+#ifdef __ARCH_HAVE_COMPAT
+#define USERKERN_STRUCT struct userkern64
+#endif /* __ARCH_HAVE_COMPAT */
+#define DEFINE_IO_WRITE 1
+#define USERKERN_WIDTH 8
+#include "userkern-rw.c.inl"
+#endif /* __SIZEOF_POINTER__ == 8 || __ARCH_HAVE_COMPAT */
+
+DECL_BEGIN
+#endif /* !__INTELLISENSE__ */
 
 
-INTERN NONNULL((1)) uintptr_t KCALL
-userkern_segment_read(struct vio_args *__restrict args,
-                      vm_daddr_t addr) {
-	uintptr_t result;
-	uintptr_t reladdr;
-	uintptr_t base = get_userkern_base();
-	if (!ADDR_IS_KERNEL(base))
-		goto err_invalid_addr;
-#ifdef HIGH_MEMORY_KERNEL
-	base -= KERNEL_BASE;
-#endif /* HIGH_MEMORY_KERNEL */
-	if ((uintptr_t)addr < base)
-		goto err_invalid_addr;
-	reladdr = (uintptr_t)addr - base;
-	switch (reladdr) {
+#ifdef __ARCH_HAVE_COMPAT
+#if __ARCH_COMPAT_SIZEOF_POINTER == 4
+#define IS32(x) (icpustate_iscompat(x))
+#else /* __ARCH_COMPAT_SIZEOF_POINTER == 4 */
+#define IS32(x) (!icpustate_iscompat(x))
+#endif /* !__ARCH_COMPAT_SIZEOF_POINTER != 4 */
 
-	case offsetof(struct userkern, uk_base):
-		result = base;
-		break;
 
-	case offsetof(struct userkern, uk_tid):
-		result = task_gettid();
-		break;
-
-	case offsetof(struct userkern, uk_pid):
-		result = task_getpid();
-		break;
-
-	case offsetof(struct userkern, uk_ppid): {
-		REF struct task *parent;
-		result = 0;
-		parent = task_getprocessparent();
-		if likely(parent) {
-			result = task_getpid_of(parent);
-			decref(parent);
-		}
-	}	break;
-
-	case offsetof(struct userkern, uk_pgid): {
-		REF struct task *leader;
-		leader = task_getprocessgroupleader();
-		result = task_getpid_of(leader);
-		decref(leader);
-	}	break;
-
-	case offsetof(struct userkern, uk_sid): {
-		REF struct task *leader;
-		leader = task_getsessionleader();
-		result = task_getpid_of(leader);
-		decref(leader);
-	}	break;
-
-	case offsetof(struct userkern, uk_uid):
-		result = cred_getuid();
-		break;
-
-	case offsetof(struct userkern, uk_gid):
-		result = cred_getgid();
-		break;
-
-	case offsetof(struct userkern, uk_euid):
-		result = cred_geteuid();
-		break;
-
-	case offsetof(struct userkern, uk_egid):
-		result = cred_getegid();
-		break;
-
-	case offsetof(struct userkern, uk_suid):
-		result = cred_getsuid();
-		break;
-
-	case offsetof(struct userkern, uk_sgid):
-		result = cred_getsgid();
-		break;
-
-	default:
-		if unlikely(!userkern_get_arch_specific_field(args, reladdr, &result)) {
-			if (reladdr < sizeof(struct userkern)) {
-				addr -= (vm_daddr_t)args->va_access_partoff;
-				addr += (vm_daddr_t)args->va_access_pageaddr * PAGESIZE;
-				THROW(E_SEGFAULT_NOTREADABLE,
-				      (uintptr_t)addr,
-				      E_SEGFAULT_CONTEXT_USERCODE);
-			}
-			goto err_invalid_addr;
-		}
-		break;
+PRIVATE NONNULL((1)) u32 KCALL
+userkern_segment_readl_real(struct vio_args *__restrict args, vm_daddr_t addr) {
+	if (IS32(args->va_state)) {
+		/* 32-bit */
+		return userkern_segment_readl(args, addr);
+	} else {
+		/* 64-bit */
+		return (u32)userkern_segment_readq(args, addr);
 	}
-	return result;
-err_invalid_addr:
-	addr -= (vm_daddr_t)args->va_access_partoff;
-	addr += (vm_daddr_t)args->va_access_pageaddr * PAGESIZE;
-	THROW(E_SEGFAULT_UNMAPPED,
-	      (uintptr_t)addr,
-	      E_SEGFAULT_CONTEXT_FAULT |
-	      E_SEGFAULT_CONTEXT_USERCODE);
+}
+PRIVATE NONNULL((1)) u64 KCALL
+userkern_segment_readq_real(struct vio_args *__restrict args, vm_daddr_t addr) {
+	if (IS32(args->va_state)) {
+		/* 32-bit */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+		return (u64)userkern_segment_readl(args, addr) |
+		       (u64)userkern_segment_readl(args, addr + 4) << 32;
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+		return (u64)userkern_segment_readl(args, addr) << 32 |
+		       (u64)userkern_segment_readl(args, addr + 4);
+#else
+#error "Unsupported endian"
+#endif
+	} else {
+		/* 64-bit */
+		return userkern_segment_readq(args, addr);
+	}
 }
 
-
-INTERN NONNULL((1)) void KCALL
-userkern_segment_write(struct vio_args *__restrict args,
-                       vm_daddr_t addr, uintptr_t value) {
-	uintptr_t reladdr;
-	uintptr_t base = get_userkern_base();
-	if (!ADDR_IS_KERNEL(base))
-		goto err_invalid_addr;
-#ifdef HIGH_MEMORY_KERNEL
-	base -= KERNEL_BASE;
-#endif /* HIGH_MEMORY_KERNEL */
-	if ((uintptr_t)addr < base)
-		goto err_invalid_addr;
-	reladdr = (uintptr_t)addr - base;
-	switch (reladdr) {
-
-	case offsetof(struct userkern, uk_base):
-		/* Re-assign the base address of the user-thread segment. */
-		if (!ADDR_IS_KERNEL(value))
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_USERKERN_BASE,
-			      value);
-		set_userkern_base(value);
-		break;
-
-	case offsetof(struct userkern, uk_ppid):
-		if (value != 0)
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_USERKERN_PPID,
-			      value);
-		task_detach(task_getprocess());
-		break;
-
-	case offsetof(struct userkern, uk_pgid): {
-		struct task *caller;
-		caller = THIS_TASK;
-		if (value == 0)
-			task_setprocessgroupleader(THIS_TASK, caller);
-		else {
-			unsigned int error;
-			REF struct task *group;
-			group = pidns_lookup_task(THIS_PIDNS, value);
-			{
-				FINALLY_DECREF_UNLIKELY(group);
-				error = task_setprocessgroupleader(caller, group);
-			}
-			if (error == TASK_SETPROCESSGROUPLEADER_EXITED)
-				THROW(E_PROCESS_EXITED, (upid_t)value);
-			if (error == TASK_SETPROCESSGROUPLEADER_LEADER) {
-				THROW(E_ILLEGAL_PROCESS_OPERATION,
-				      (upid_t)0,
-				      E_ILLEGAL_PROCESS_OPERATION_SETPGID_LEADER,
-				      (upid_t)value);
-			}
-		}
-	}	break;
-
-	case offsetof(struct userkern, uk_sid): {
-		struct task *caller;
-		caller = THIS_TASK;
-		if (value != 0 &&
-		    value != task_gettid_of(THIS_TASK) &&
-		    value != task_getpid_of(THIS_TASK))
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_USERKERN_SID,
-			      value);
-		task_setsessionleader(caller,
-		                      caller,
-		                      NULL,
-		                      NULL,
-		                      NULL);
-	}	break;
-
-	case offsetof(struct userkern, uk_uid):
-		cred_setuid(value);
-		break;
-
-	case offsetof(struct userkern, uk_gid):
-		cred_setgid(value);
-		break;
-
-	case offsetof(struct userkern, uk_euid):
-		cred_seteuid(value);
-		break;
-
-	case offsetof(struct userkern, uk_egid):
-		cred_setegid(value);
-		break;
-
-	case offsetof(struct userkern, uk_suid):
-		cred_setsuid(value);
-		break;
-
-	case offsetof(struct userkern, uk_sgid):
-		cred_setsgid(value);
-		break;
-
-	default:
-		if unlikely(!userkern_set_arch_specific_field(args, reladdr, value)) {
-			if (reladdr < sizeof(struct userkern)) {
-				addr -= (vm_daddr_t)args->va_access_partoff;
-				addr += (vm_daddr_t)args->va_access_pageaddr * PAGESIZE;
-				THROW(E_SEGFAULT_READONLY,
-				      (uintptr_t)addr,
-				      E_SEGFAULT_CONTEXT_USERCODE);
-			}
-		}
-		break;
+PRIVATE NONNULL((1)) void KCALL
+userkern_segment_writel_real(struct vio_args *__restrict args,
+                             vm_daddr_t addr, u32 value) {
+	if (IS32(args->va_state)) {
+		/* 32-bit */
+		userkern_segment_writel(args, addr, value);
+	} else {
+		/* 64-bit */
+		userkern_segment_writeq(args, addr, value);
 	}
-	return;
-err_invalid_addr:
-	addr -= (vm_daddr_t)args->va_access_partoff;
-	addr += (vm_daddr_t)args->va_access_pageaddr * PAGESIZE;
-	THROW(E_SEGFAULT_UNMAPPED,
-	      (uintptr_t)addr,
-	      E_SEGFAULT_CONTEXT_FAULT |
-	      E_SEGFAULT_CONTEXT_USERCODE);
 }
 
+PRIVATE NONNULL((1)) void KCALL
+userkern_segment_writeq_real(struct vio_args *__restrict args,
+                             vm_daddr_t addr, u64 value) {
+	if (IS32(args->va_state)) {
+		/* 32-bit */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+		userkern_segment_writel(args, addr, (u32)value);
+		userkern_segment_writel(args, addr + 4, (u32)(value >> 32));
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+		userkern_segment_writel(args, addr, (u32)(value >> 32));
+		userkern_segment_writel(args, addr + 4, (u32)value);
+#else
+#error "Unsupported endian"
+#endif
+	} else {
+		/* 64-bit */
+		userkern_segment_writeq(args, addr, value);
+	}
+}
+
+#endif /* __ARCH_HAVE_COMPAT */
 
 
 PRIVATE struct icpustate *KCALL
@@ -302,28 +208,42 @@ err_invalid_addr:
 
 
 
-#if __SIZEOF_POINTER__ >= 8
+#ifdef __ARCH_HAVE_COMPAT
 #ifndef CONFIG_VIO_HAS_QWORD
 #error "Invalid configuration"
-#endif
-#define INIT_OPERATION_PTR(fun) { NULL, NULL, NULL, fun }
+#endif /* !CONFIG_VIO_HAS_QWORD */
+#define INIT_OPERATION_PTR(name) \
+	{ NULL, NULL, &userkern_segment_##name##l_real, &userkern_segment_##name##q_real }
+#elif __SIZEOF_POINTER__ >= 8
+#ifndef CONFIG_VIO_HAS_QWORD
+#error "Invalid configuration"
+#endif /* !CONFIG_VIO_HAS_QWORD */
+#define INIT_OPERATION_PTR(name) \
+	{ NULL, NULL, NULL, &userkern_segment_##name##q }
 #elif defined(CONFIG_VIO_HAS_QWORD)
-#define INIT_OPERATION_PTR(fun) { NULL, NULL, fun, NULL }
+#define INIT_OPERATION_PTR(name) \
+	{ NULL, NULL, &userkern_segment_##name##l, NULL }
 #else
-#define INIT_OPERATION_PTR(fun) { NULL, NULL, fun }
+#define INIT_OPERATION_PTR(name) \
+	{ NULL, NULL, &userkern_segment_##name##l }
 #endif
+#ifdef CONFIG_VIO_HAS_QWORD
+#define INIT_OPERATION_PTR_NULL { NULL, NULL, NULL, NULL }
+#else /* CONFIG_VIO_HAS_QWORD */
+#define INIT_OPERATION_PTR_NULL { NULL, NULL, NULL }
+#endif /* !CONFIG_VIO_HAS_QWORD */
 
 /* VIO bindings for the kernel-reserve segment of user-space VMs */
 PUBLIC struct vm_datablock_type_vio userkern_segment_vio = {
-	/* .dtv_read   = */ INIT_OPERATION_PTR(&userkern_segment_read),
-	/* .dtv_write  = */ INIT_OPERATION_PTR(&userkern_segment_write),
-	/* .dtv_cmpxch = */ INIT_OPERATION_PTR(NULL),
-	/* .dtv_xch    = */ INIT_OPERATION_PTR(NULL),
-	/* .dtv_add    = */ INIT_OPERATION_PTR(NULL),
-	/* .dtv_sub    = */ INIT_OPERATION_PTR(NULL),
-	/* .dtv_and    = */ INIT_OPERATION_PTR(NULL),
-	/* .dtv_or     = */ INIT_OPERATION_PTR(NULL),
-	/* .dtv_xor    = */ INIT_OPERATION_PTR(NULL),
+	/* .dtv_read   = */ INIT_OPERATION_PTR(read),
+	/* .dtv_write  = */ INIT_OPERATION_PTR(write),
+	/* .dtv_cmpxch = */ INIT_OPERATION_PTR_NULL,
+	/* .dtv_xch    = */ INIT_OPERATION_PTR_NULL,
+	/* .dtv_add    = */ INIT_OPERATION_PTR_NULL,
+	/* .dtv_sub    = */ INIT_OPERATION_PTR_NULL,
+	/* .dtv_and    = */ INIT_OPERATION_PTR_NULL,
+	/* .dtv_or     = */ INIT_OPERATION_PTR_NULL,
+	/* .dtv_xor    = */ INIT_OPERATION_PTR_NULL,
 	/* .dtv_call   = */ &userkern_segment_call
 };
 #undef INIT_OPERATION_PTR
@@ -378,7 +298,6 @@ PUBLIC struct vm_datablock userkern_segment_block = {
 
 DECL_END
 
-#endif /* !CONFIG_USERKERN_SEGMENT_IMPLEMENTATION_IS_ARCH_SPECIFIC */
 #endif /* !CONFIG_NO_USERKERN_SEGMENT */
 
 

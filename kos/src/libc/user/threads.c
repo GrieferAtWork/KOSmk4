@@ -110,7 +110,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.threads.thrd_exit") void
 (LIBCCALL libc_thrd_exit)(int res)
 /*[[[body:thrd_exit]]]*/
 /*AUTO*/{
-	libc_pthread_exit((void *)res);
+	libc_pthread_exit((void *)(uintptr_t)(unsigned int)res);
 }
 /*[[[end:thrd_exit]]]*/
 

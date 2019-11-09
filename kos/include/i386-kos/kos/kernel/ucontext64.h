@@ -20,11 +20,13 @@
 #define _I386_KOS_KOS_KERNEL_UCONTEXT64_H 1
 
 #include <__stdinc.h>
-#include <hybrid/host.h>
+
 #include <hybrid/__pointer.h>
-#include <kos/kernel/mcontext64.h>
+#include <hybrid/host.h>
+
 #include <bits/sigset.h>
 #include <bits/sigstack64.h>
+#include <kos/kernel/mcontext64.h>
 
 __DECL_BEGIN
 

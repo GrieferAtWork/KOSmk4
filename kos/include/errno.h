@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66a6c884 */
+/* HASH CRC-32:0x7e33d125 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,7 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL) || defined(__USE_GNU)
 #include <bits/types.h>
-#endif /* __USE_KOS || __USE_KOS_KERNEL || __USE_GNU */
 
 #ifdef __CRT_DOS_PRIMARY
 #include <parts/dos/errno.h>

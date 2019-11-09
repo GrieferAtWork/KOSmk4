@@ -407,11 +407,7 @@ NOTHROW(KCALL print_unhandled_exception)(pformatprinter printer, void *arg,
 	rd_printer.rdp_format      = &indent_regdump_print_format;
 	regdump_gpregs(&rd_printer, &info->ei_state.kcs_gpregs);
 	regdump_ip(&rd_printer, kcpustate_getpc(&info->ei_state));
-#ifdef __x86_64__
-	regdump_flags(&rd_printer, info->ei_state.kcs_rflags);
-#else /* __x86_64__ */
-	regdump_flags(&rd_printer, info->ei_state.kcs_eflags);
-#endif /* !__x86_64__ */
+	regdump_flags(&rd_printer, kcpustate_getpflags(&info->ei_state));
 	(*printer)(arg, "\n", 1);
 	is_first_pointer = true;
 	/* Print exception pointers. */
@@ -709,11 +705,7 @@ search_fde:
 		                                  &unwind_setreg_ucpustate, &ustate);
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err_old_state;
-		if ((ustate.ucs_cs & 3) ||
-#ifndef __x86_64__
-		    (ustate.ucs_eflags & EFLAGS_VM)
-#endif /* !__x86_64__ */
-		    ) {
+		if (ucpustate_isuser(&ustate)) {
 			/* At this point, we've got an exception that should be unwound
 			 * into user-space, with the user-space context at the unwind
 			 * location within user-space.
@@ -961,11 +953,7 @@ x86_cirq_29(struct icpustate *__restrict state) {
 		kernel_debugtrap(state, SIGNO);
 	/* Use the fastfail code as exitcode for the program (not
 	 * exactly what window does, but still close enough...) */
-#ifdef __x86_64__
-	THROW(E_EXIT_PROCESS, W_EXITCODE(state->ics_gpregs.gp_rcx, SIGNO));
-#else /* __x86_64__ */
-	THROW(E_EXIT_PROCESS, W_EXITCODE(state->ics_gpregs.gp_ecx, SIGNO));
-#endif /* !__x86_64__ */
+	THROW(E_EXIT_PROCESS, W_EXITCODE(gpregs_getpcx(&state->ics_gpregs), SIGNO));
 }
 
 

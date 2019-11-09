@@ -24,9 +24,9 @@
 
 #ifdef __x86_64__
 #include "lazybind64.h"
-#else
+#else /* __x86_64__ */
 #include "lazybind32.h"
-#endif
+#endif /* !__x86_64__ */
 
 
 /* >> (PRIVATE|INTERN|PUBLIC)_LAZYBIND(SYMBOL name, void *getaddr(void))

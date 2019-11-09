@@ -1015,7 +1015,7 @@ struct __format_snprintf_data {
 #endif /* !____format_snprintf_data_defined */
 )][crtbuiltin][dependency(format_snprintf_printer)]
 [section(.text.crt.unicode.static.format.printf)][export_alias(__vsnprintf)]
-vsnprintf:([outp_opt(min(return,buflen))] char *__restrict buf, size_t buflen,
+vsnprintf:([outp_opt(min(return, buflen))] char *__restrict buf, size_t buflen,
            [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	struct @__format_snprintf_data@ data;
 	@__STDC_INT_AS_SSIZE_T@ result;
@@ -1034,7 +1034,7 @@ vsnprintf:([outp_opt(min(return,buflen))] char *__restrict buf, size_t buflen,
 @@Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF'
 [ATTR_LIBC_PRINTF(3, 4)][kernel][crtbuiltin][std][std_guard]
 [section(.text.crt.unicode.static.format.printf)]
-snprintf:([outp_opt(min(return,buflen))] char *__restrict buf, size_t buflen,
+snprintf:([outp_opt(min(return, buflen))] char *__restrict buf, size_t buflen,
           [nonnull] char const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 %{
 	auto_block(printf(vsnprintf))
@@ -2151,6 +2151,17 @@ typedef __errno_t errno_t;
 typedef __size_t rsize_t;
 #endif /* !__rsize_t_defined */
 
+#ifndef __std_FILE_defined
+#define __std_FILE_defined 1
+__NAMESPACE_STD_BEGIN
+typedef __FILE FILE;
+__NAMESPACE_STD_END
+#endif /* !__std_FILE_defined */
+#ifndef __FILE_defined
+#define __FILE_defined 1
+__NAMESPACE_STD_USING(FILE)
+#endif /* !__FILE_defined */
+
 }
 
 %
@@ -2672,18 +2683,24 @@ gets_s:([outp(min(strlen(return),bufsize))] char *__restrict buf, rsize_t bufsiz
 [cp_stdio][ATTR_LIBC_PRINTF(2, 3)] fprintf_s:([nonnull] $FILE *__restrict stream, [nonnull] char const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T = fprintf;
 [cp_stdio][ATTR_LIBC_PRINTF(2, 0)] vfprintf_s:([nonnull] $FILE *__restrict stream, [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T = vfprintf;
 %[default_impl_section(.text.crt.dos.unicode.static.format.printf)]
-[ATTR_LIBC_PRINTF(3, 4)] sprintf_s:([outp_opt(min(return,buflen))] char *__restrict buf, $size_t buflen, [nonnull] char const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T = snprintf; /* XXX: This binding probably isn't correct... */
-[ATTR_LIBC_PRINTF(3, 0)] vsprintf_s:([outp_opt(min(return,buflen))] char *__restrict buf, $size_t buflen, [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T = vsnprintf; /* XXX: This binding probably isn't correct... */
+[ATTR_LIBC_PRINTF(3, 4)] sprintf_s:([outp_opt(min(return, buflen))] char *__restrict buf, $size_t buflen, [nonnull] char const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T = snprintf; /* XXX: This binding probably isn't correct... */
+[ATTR_LIBC_PRINTF(3, 0)] vsprintf_s:([outp_opt(min(return, buflen))] char *__restrict buf, $size_t buflen, [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T = vsnprintf; /* XXX: This binding probably isn't correct... */
 %[default_impl_section(.text.crt.dos.FILE.locked.read.scanf)]
-[cp_stdio][ATTR_LIBC_PRINTF(2, 3)] fscanf_s:([nonnull] $FILE *__restrict stream, [nonnull] char const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T %{auto_block(printf(vfscanf_s))}
-[cp_stdio][ATTR_LIBC_PRINTF(2, 0)] vfscanf_s:([nonnull] $FILE *__restrict stream, [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T;
+[cp_stdio][ATTR_LIBC_PRINTF(2, 3)] fscanf_s:([nonnull] $FILE *__restrict stream, [nonnull] char const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T = fscanf;
+[cp_stdio][ATTR_LIBC_PRINTF(2, 0)] vfscanf_s:([nonnull] $FILE *__restrict stream, [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T = vfscanf;
 %[default_impl_section(.text.crt.dos.unicode.static.format.scanf)]
-[cp_stdio][ATTR_LIBC_PRINTF(1, 2)] scanf_s:([nonnull] char const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T %{auto_block(printf(vscanf_s))}
-[cp_stdio][ATTR_LIBC_PRINTF(1, 0)] vscanf_s:([nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T;
-[ATTR_LIBC_PRINTF(2, 3)] sscanf_s:([nonnull] char const *__restrict input, [nonnull] char const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T %{auto_block(printf(vsscanf_s))}
-[ATTR_LIBC_PRINTF(2, 0)] vsscanf_s:([nonnull] char const *__restrict input, [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T;
+[cp_stdio][ATTR_LIBC_PRINTF(1, 2)] scanf_s:([nonnull] char const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T = scanf;
+[cp_stdio][ATTR_LIBC_PRINTF(1, 0)] vscanf_s:([nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T = vscanf;
+[ATTR_LIBC_PRINTF(2, 3)] sscanf_s:([nonnull] char const *__restrict input, [nonnull] char const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T = sscanf;
+[ATTR_LIBC_PRINTF(2, 0)] vsscanf_s:([nonnull] char const *__restrict input, [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T = vsscanf;
 %[default_impl_section(.text.crt.dos.unicode.static.format.printf)]
-[ATTR_LIBC_PRINTF(4, 0)] vsnprintf_s:([outp_opt(min(return,buflen,bufsize))] char *__restrict buf, $size_t bufsize, $size_t buflen, [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T;
+[ATTR_LIBC_PRINTF(4, 0)]
+vsnprintf_s:([outp_opt(min(return, buflen, bufsize))] char *__restrict buf,
+             $size_t bufsize, $size_t buflen,
+             [nonnull] char const *__restrict format,
+             $va_list args) -> __STDC_INT_AS_SIZE_T {
+	return vsnprintf(buf, buflen < bufsize ? buflen : bufsize, format, args);
+}
 
 %#endif /* __USE_DOS_SLIB */
 
@@ -2707,7 +2724,7 @@ gets_s:([outp(min(strlen(return),bufsize))] char *__restrict buf, rsize_t bufsiz
 [cp] _lock_file:([nonnull] $FILE *__restrict stream) = flockfile;
 _unlock_file:([nonnull] $FILE *__restrict stream) = funlockfile;
 
-[attribute(*)][alias(*)] _fclose_nolock:(*) = fclose;
+[attribute(*)][alias(*)] _fclose_nolock:($FILE *__restrict stream) -> int = fclose;
 [attribute(*)][alias(*)] _fflush_nolock:(*) = fflush_unlocked;
 [attribute(*)][alias(*)] _fread_nolock:(*) = fread_unlocked;
 [attribute(*)][alias(*)] _fwrite_nolock:(*) = fwrite_unlocked;

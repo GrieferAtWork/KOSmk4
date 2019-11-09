@@ -27,9 +27,9 @@
 
 #ifdef __KERNEL__
 #define ASSERTION_SECTION(n)   .text.cold
-#else
+#else /* __KERNEL__ */
 #define ASSERTION_SECTION(n)   .text.crt.assert.n
-#endif
+#endif /* !__KERNEL__ */
 
 
 .section ASSERTION_SECTION(__stack_chk_fail)
@@ -93,6 +93,9 @@ END(abort)
 
 DEFINE_PUBLIC_ALIAS(_ZSt9terminatev, abort) /* std::terminate(void) */
 DEFINE_INTERN_ALIAS(libc_abort, abort)
+/* Provide debugging facilities for __builtin_unreachable() (s.a. <__crt.h>) */
+DEFINE_PUBLIC_ALIAS(__crt_unreachable, libc_abort)
+DEFINE_INTERN_ALIAS(libc___crt_unreachable, libc_abort)
 
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18f974c9 */
+/* HASH CRC-32:0x851785c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -161,7 +161,7 @@ NOTHROW_NCX(LIBCCALL libc__vsscanf_l)(char const *__restrict input,
                                       char const *__restrict format,
                                       locale_t locale,
                                       va_list args) {
-#line 2262 "kos/src/libc/magic/stdio.c"
+#line 2273 "kos/src/libc/magic/stdio.c"
 	(void)locale;
 	return libc_vsscanf(input, format, args);
 }
@@ -195,7 +195,7 @@ NOTHROW_NCX(LIBCCALL libc__vsnscanf)(char const *__restrict input,
                                      size_t inputlen,
                                      char const *__restrict format,
                                      va_list args) {
-#line 2300 "kos/src/libc/magic/stdio.c"
+#line 2311 "kos/src/libc/magic/stdio.c"
 	struct __vsnscanf_data data;
 	data.__ptr = input;
 	data.__end = input + inputlen;
@@ -209,7 +209,7 @@ NOTHROW_NCX(LIBCCALL libc__vsnscanf_l)(char const *__restrict input,
                                        char const *__restrict format,
                                        locale_t locale,
                                        va_list args) {
-#line 2313 "kos/src/libc/magic/stdio.c"
+#line 2324 "kos/src/libc/magic/stdio.c"
 	(void)locale;
 	return libc__vsnscanf(input, inputlen, format, args);
 }
@@ -220,7 +220,7 @@ NOTHROW_NCX(VLIBCCALL libc__snscanf)(char const *__restrict input,
                                      size_t inputlen,
                                      char const *__restrict format,
                                      ...) {
-#line 2335 "kos/src/libc/magic/stdio.c"
+#line 2346 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -236,7 +236,7 @@ NOTHROW_NCX(VLIBCCALL libc__snscanf_l)(char const *__restrict input,
                                        char const *__restrict format,
                                        locale_t locale,
                                        ...) {
-#line 2340 "kos/src/libc/magic/stdio.c"
+#line 2351 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
@@ -251,7 +251,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.scanf._sscanf_s_l") 
                              char const *__restrict format,
                              locale_t locale,
                              ...) __THROWS(...) {
-#line 2348 "kos/src/libc/magic/stdio.c"
+#line 2359 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
@@ -266,7 +266,7 @@ NOTHROW_NCX(VLIBCCALL libc__snscanf_s)(char const *__restrict input,
                                        size_t inputlen,
                                        char const *__restrict format,
                                        ...) {
-#line 2357 "kos/src/libc/magic/stdio.c"
+#line 2368 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -282,7 +282,7 @@ NOTHROW_NCX(VLIBCCALL libc__snscanf_s_l)(char const *__restrict input,
                                          char const *__restrict format,
                                          locale_t locale,
                                          ...) {
-#line 2362 "kos/src/libc/magic/stdio.c"
+#line 2373 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
@@ -297,7 +297,7 @@ NOTHROW_NCX(LIBCCALL libc__vsprintf_l)(char *__restrict buf,
                                        char const *__restrict format,
                                        locale_t locale,
                                        va_list args) {
-#line 2368 "kos/src/libc/magic/stdio.c"
+#line 2379 "kos/src/libc/magic/stdio.c"
 	(void)locale;
 	return libc_vsprintf(buf, format, args);
 }
@@ -308,7 +308,7 @@ NOTHROW_NCX(LIBCCALL libc__vsprintf_p)(char *__restrict buf,
                                        size_t bufsize,
                                        char const *__restrict format,
                                        va_list args) {
-#line 2381 "kos/src/libc/magic/stdio.c"
+#line 2392 "kos/src/libc/magic/stdio.c"
 	(void)buf;
 	(void)bufsize;
 	(void)format;
@@ -324,7 +324,7 @@ NOTHROW_NCX(LIBCCALL libc__vsprintf_p_l)(char *__restrict buf,
                                          char const *__restrict format,
                                          locale_t locale,
                                          va_list args) {
-#line 2393 "kos/src/libc/magic/stdio.c"
+#line 2404 "kos/src/libc/magic/stdio.c"
 	(void)locale;
 	return libc__vsprintf_p(buf, bufsize, format, args);
 }
@@ -335,7 +335,7 @@ NOTHROW_NCX(VLIBCCALL libc__sprintf_l)(char *__restrict buf,
                                        char const *__restrict format,
                                        locale_t locale,
                                        ...) {
-#line 2400 "kos/src/libc/magic/stdio.c"
+#line 2411 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
@@ -351,7 +351,7 @@ NOTHROW_NCX(VLIBCCALL libc__sprintf_s_l)(char *__restrict buf,
                                          char const *__restrict format,
                                          locale_t locale,
                                          ...) {
-#line 2401 "kos/src/libc/magic/stdio.c"
+#line 2412 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
@@ -366,7 +366,7 @@ NOTHROW_NCX(VLIBCCALL libc__sprintf_p)(char *__restrict buf,
                                        size_t bufsize,
                                        char const *__restrict format,
                                        ...) {
-#line 2402 "kos/src/libc/magic/stdio.c"
+#line 2413 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -382,7 +382,7 @@ NOTHROW_NCX(VLIBCCALL libc__sprintf_p_l)(char *__restrict buf,
                                          char const *__restrict format,
                                          locale_t locale,
                                          ...) {
-#line 2403 "kos/src/libc/magic/stdio.c"
+#line 2414 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
@@ -395,7 +395,7 @@ INTERN WUNUSED NONNULL((1)) ATTR_LIBC_PRINTF(1, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._vscprintf") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vscprintf)(char const *__restrict format,
                                       va_list args) {
-#line 2408 "kos/src/libc/magic/stdio.c"
+#line 2419 "kos/src/libc/magic/stdio.c"
 	return libc_vsnprintf(NULL, 0, format, args);
 }
 
@@ -403,7 +403,7 @@ INTERN WUNUSED NONNULL((1)) ATTR_LIBC_PRINTF(1, 2)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._scprintf") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__scprintf)(char const *__restrict format,
                                       ...) {
-#line 2415 "kos/src/libc/magic/stdio.c"
+#line 2426 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -417,7 +417,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vscprintf_l"
 NOTHROW_NCX(LIBCCALL libc__vscprintf_l)(char const *__restrict format,
                                         locale_t locale,
                                         va_list args) {
-#line 2422 "kos/src/libc/magic/stdio.c"
+#line 2433 "kos/src/libc/magic/stdio.c"
 	(void)locale;
 	return libc__vscprintf(format, args);
 }
@@ -426,7 +426,7 @@ INTERN WUNUSED NONNULL((1)) ATTR_LIBC_PRINTF_P(1, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._vscprintf_p") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vscprintf_p)(char const *__restrict format,
                                         va_list args) {
-#line 2429 "kos/src/libc/magic/stdio.c"
+#line 2440 "kos/src/libc/magic/stdio.c"
 	(void)format;
 	(void)args;
 	/* TODO */
@@ -438,7 +438,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vscprintf_p_
 NOTHROW_NCX(LIBCCALL libc__vscprintf_p_l)(char const *__restrict format,
                                           locale_t locale,
                                           va_list args) {
-#line 2438 "kos/src/libc/magic/stdio.c"
+#line 2449 "kos/src/libc/magic/stdio.c"
 	(void)locale;
 	return libc__vscprintf_p(format, args);
 }
@@ -448,7 +448,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._scprintf_l")
 NOTHROW_NCX(VLIBCCALL libc__scprintf_l)(char const *__restrict format,
                                         locale_t locale,
                                         ...) {
-#line 2445 "kos/src/libc/magic/stdio.c"
+#line 2456 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
@@ -461,7 +461,7 @@ INTERN WUNUSED NONNULL((1)) ATTR_LIBC_PRINTF_P(1, 2)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._scprintf_p") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__scprintf_p)(char const *__restrict format,
                                         ...) {
-#line 2449 "kos/src/libc/magic/stdio.c"
+#line 2460 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -475,7 +475,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._scprintf_p_l
 NOTHROW_NCX(VLIBCCALL libc__scprintf_p_l)(char const *__restrict format,
                                           locale_t locale,
                                           ...) {
-#line 2453 "kos/src/libc/magic/stdio.c"
+#line 2464 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
@@ -491,7 +491,7 @@ NOTHROW_NCX(LIBCCALL libc__vsnprintf)(char *__restrict buf,
                                       size_t bufsize,
                                       char const *__restrict format,
                                       va_list args) {
-#line 2460 "kos/src/libc/magic/stdio.c"
+#line 2471 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T result;
 	result = libc_vsnprintf(buf, bufsize, format, args);
 	if (result > bufsize)
@@ -506,7 +506,7 @@ NOTHROW_NCX(LIBCCALL libc__vsnprintf_l)(char *__restrict buf,
                                         char const *__restrict format,
                                         locale_t locale,
                                         va_list args) {
-#line 2471 "kos/src/libc/magic/stdio.c"
+#line 2482 "kos/src/libc/magic/stdio.c"
 	(void)locale;
 	return libc__vsnprintf(buf, bufsize, format, args);
 }
@@ -518,7 +518,7 @@ NOTHROW_NCX(LIBCCALL libc__vsnprintf_s)(char *__restrict buf,
                                         size_t buflen,
                                         char const *__restrict format,
                                         va_list args) {
-#line 2484 "kos/src/libc/magic/stdio.c"
+#line 2495 "kos/src/libc/magic/stdio.c"
 	(void)buflen;
 	return libc__vsnprintf(buf, bufsize, format, args);
 }
@@ -531,7 +531,7 @@ NOTHROW_NCX(LIBCCALL libc__vsnprintf_s_l)(char *__restrict buf,
                                           char const *__restrict format,
                                           locale_t locale,
                                           va_list args) {
-#line 2491 "kos/src/libc/magic/stdio.c"
+#line 2502 "kos/src/libc/magic/stdio.c"
 	(void)buflen;
 	(void)locale;
 	return libc__vsnprintf(buf, bufsize, format, args);
@@ -543,7 +543,7 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf)(char *__restrict buf,
                                       size_t bufsize,
                                       char const *__restrict format,
                                       ...) {
-#line 2498 "kos/src/libc/magic/stdio.c"
+#line 2509 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -559,7 +559,7 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf_l)(char *__restrict buf,
                                         char const *__restrict format,
                                         locale_t locale,
                                         ...) {
-#line 2501 "kos/src/libc/magic/stdio.c"
+#line 2512 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
@@ -574,7 +574,7 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf_c)(char *__restrict buf,
                                         size_t bufsize,
                                         char const *__restrict format,
                                         ...) {
-#line 2504 "kos/src/libc/magic/stdio.c"
+#line 2515 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -590,7 +590,7 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf_c_l)(char *__restrict buf,
                                           char const *__restrict format,
                                           locale_t locale,
                                           ...) {
-#line 2507 "kos/src/libc/magic/stdio.c"
+#line 2518 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
@@ -606,7 +606,7 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf_s)(char *__restrict buf,
                                         size_t buflen,
                                         char const *__restrict format,
                                         ...) {
-#line 2510 "kos/src/libc/magic/stdio.c"
+#line 2521 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
@@ -623,13 +623,24 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf_s_l)(char *__restrict buf,
                                           char const *__restrict format,
                                           locale_t locale,
                                           ...) {
-#line 2513 "kos/src/libc/magic/stdio.c"
+#line 2524 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
 	result = libc__vsnprintf_s_l(buf, bufsize, buflen, format, locale, args);
 	va_end(args);
 	return result;
+}
+
+INTERN NONNULL((4)) ATTR_LIBC_PRINTF(4, 0)
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf.vsnprintf_s") __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc_vsnprintf_s)(char *__restrict buf,
+                                       size_t bufsize,
+                                       size_t buflen,
+                                       char const *__restrict format,
+                                       va_list args) {
+#line 2702 "kos/src/libc/magic/stdio.c"
+	return libc_vsnprintf(buf, buflen < bufsize ? buflen : bufsize, format, args);
 }
 
 #endif /* !__KERNEL__ */
@@ -646,6 +657,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sprintf_s, libc_snprintf);
 #ifndef __KERNEL__
 #undef sscanf
 #undef _IO_sscanf
+#undef sscanf_s
 #undef _snscanf
 #undef _snscanf_s
 #undef _snscanf_l
@@ -671,8 +683,10 @@ DEFINE_PUBLIC_WEAK_ALIAS(vsscanf, libc_vsscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(__vsscanf, libc_vsscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(_vsscanf, libc_vsscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(_vsscanf_s, libc_vsscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(vsscanf_s, libc_vsscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(sscanf, libc_sscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(_IO_sscanf, libc_sscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(sscanf_s, libc_sscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(_IO_vsprintf, libc_vsprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(_IO_sprintf, libc_sprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(_snscanf, libc__snscanf);
@@ -710,6 +724,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(_snprintf_c, libc__snprintf_c);
 DEFINE_PUBLIC_WEAK_ALIAS(_snprintf_c_l, libc__snprintf_c_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_snprintf_s, libc__snprintf_s);
 DEFINE_PUBLIC_WEAK_ALIAS(_snprintf_s_l, libc__snprintf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(vsnprintf_s, libc_vsnprintf_s);
 #endif /* !__KERNEL__ */
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6c9a840 */
+/* HASH CRC-32:0x1bff06d4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,8 @@
 #define _LIBC_PARTS_UCHAR_STRING_H 1
 
 #include <__stdinc.h>
+
+#ifdef __CC__
 #include <__crt.h>
 #include "slow/parts.uchar.string.h"
 
@@ -48,5 +50,7 @@
 #define __libc_c16ncmp __libc_slow_c16ncmp
 /* Same as `c32cmp', but compare at most `MAXLEN' characters from either string */
 #define __libc_c32ncmp __libc_slow_c32ncmp
+
+#endif /* __CC__ */
 
 #endif /* !_LIBC_PARTS_UCHAR_STRING_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd2884eb */
+/* HASH CRC-32:0x46fb0ee3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __LOCAL_LIBC(format_c16escape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c16escape))(__pc16formatprinter __printer,
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16escape))(__pc16formatprinter __printer,
                                                               void *__arg,
                                                               /*utf-8*/ __CHAR16_TYPE__ const *__restrict __text,
                                                               __SIZE_TYPE__ __textlen,

@@ -164,10 +164,14 @@
 #define __CRT_GENERIC 1
 #endif
 
-#ifdef __CRT_KOS_PRIMARY
-#ifdef __CRT_KOS_KERNEL
+
+#if defined(__KERNEL__) && defined(__KOS__)
 #undef __NO_FPU
 #define __NO_FPU 1 /* Disable functions using FPU registers in kernel-mode. */
+#endif /* __KERNEL__ && __KOS__ */
+
+#ifdef __CRT_KOS_PRIMARY
+#ifdef __CRT_KOS_KERNEL
 #include <crt-features/crt-kos-kernel.h>
 #if defined(CONFIG_NO_ASSERT_RESTARTABLE) || defined(CONFIG_NO_DEBUGGER)
 #undef __CRT_HAVE___acheck

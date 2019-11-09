@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0b4667e */
+/* HASH CRC-32:0xda1f6df7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,8 @@
 #define _LIBC_SLOW_MALLOC_H 1
 
 #include <__stdinc.h>
+
+#ifdef __CC__
 #include <__crt.h>
 #include <hybrid/typecore.h>
 
@@ -29,5 +31,6 @@ __SYSDECL_BEGIN
 #include "stdlib.h"
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_LIBC_SLOW_MALLOC_H */

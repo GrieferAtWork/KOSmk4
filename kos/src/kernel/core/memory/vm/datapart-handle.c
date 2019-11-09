@@ -193,7 +193,7 @@ handle_datapart_stat(struct vm_datapart *__restrict self,
 			COMPILER_WRITE_BARRIER();
 			result->st_ctim64 = temp;
 		}
-#else  /* __TIMESPEC64_HAVE_TV_PAD */
+#else /* __TIMESPEC64_HAVE_TV_PAD */
 		result->st_atim64 = ino->i_fileatime;
 		result->st_mtim64 = ino->i_filemtime;
 		result->st_ctim64 = ino->i_filectime;

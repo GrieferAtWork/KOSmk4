@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa288f29d */
+/* HASH CRC-32:0x8a7e69e7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__WEOF */
 /* Same as `file_c16printer()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 __LOCAL_LIBC(file_c16printer_unlocked) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-(__LIBCCALL __LIBC_LOCAL_NAME(file_c16printer_unlocked))(void *__arg,
+(__LIBDCALL __LIBC_LOCAL_NAME(file_c16printer_unlocked))(void *__arg,
                                                          __CHAR16_TYPE__ const *__restrict __data,
                                                          __SIZE_TYPE__ __datalen) __THROWS(...) {
 #line 1062 "kos/src/libc/magic/wchar.c"

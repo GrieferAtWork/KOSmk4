@@ -77,7 +77,7 @@ Pipe:([notnull] $fd_t pipedes[2]);
 
 
 %
-[doc_alias(fsync)][throws][cp]
+[doc_alias(fsync)][throws][cp][userimpl]
 [alias(FDataSync)][section(.text.crt.except.io.sync)]
 FSync:($fd_t fd) {
 	(void)fd;

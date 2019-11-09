@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x173e4853 */
+/* HASH CRC-32:0xde375a6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> c16link(2)
  * Create a hard link from `FROM', leading to `TO' */
 __LOCAL_LIBC(c16link) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(c16link))(__CHAR16_TYPE__ const *__from,
+__NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16link))(__CHAR16_TYPE__ const *__from,
                                                      __CHAR16_TYPE__ const *__to) {
 #line 529 "kos/src/libc/magic/unistd.c"
 	/* TODO: Header-implementation for `link()' on DOS (using the windows API) */

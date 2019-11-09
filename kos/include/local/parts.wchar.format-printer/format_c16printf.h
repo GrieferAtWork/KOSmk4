@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf8ec1d5 */
+/* HASH CRC-32:0x28e98e63 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -475,7 +475,7 @@ __NAMESPACE_LOCAL_BEGIN
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 __LOCAL_LIBC(format_c16printf) __ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 4) __SSIZE_TYPE__
-__NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(format_c16printf))(__pc16formatprinter __printer,
+__NOTHROW_NCX(__VLIBDCALL __LIBC_LOCAL_NAME(format_c16printf))(__pc16formatprinter __printer,
                                                                void *__arg,
                                                                __CHAR16_TYPE__ const *__restrict __format,
                                                                ...) {

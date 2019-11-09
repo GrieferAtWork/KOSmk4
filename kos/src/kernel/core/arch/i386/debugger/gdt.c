@@ -46,32 +46,37 @@ INTDEF byte_t __x86_gdt_kernel_tls_hi[];
 
 #ifdef __x86_64__
 #define GDT_L 1
-#else
+#define N64(...) /* nothing */
+#else /* __x86_64__ */
 #define GDT_L 0
-#endif
+#define N64(...) __VA_ARGS__
+#endif /* !__x86_64__ */
+
+#ifdef __x86_64__
+#define DEFINE_LOHI_SEGMENT(id, lo, hi)                     \
+	[SEGMENT_INDEX(id) + 0] = { { .s_u = (uintptr_t)lo } }, \
+	[SEGMENT_INDEX(id) + 1] = { { .s_u = (uintptr_t)hi } }
+#else /* __x86_64__ */
+#define DEFINE_LOHI_SEGMENT(id, lo, hi) \
+	[SEGMENT_INDEX(id)] = { { { (uintptr_t)lo, (uintptr_t)hi } } }
+#endif /* !__x86_64__ */
 
 PUBLIC struct segment x86_debug_gdt[SEGMENT_COUNT] = {
 	[SEGMENT_INDEX(SEGMENT_NULL)]          = SEGMENT_DESCRIPTOR_INIT(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),                                           /* NULL segment */
 	[SEGMENT_INDEX(SEGMENT_KERNEL_CODE)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 0, 1, 0, GDT_L, 1, 1), /* Kernel code segment */
 	[SEGMENT_INDEX(SEGMENT_KERNEL_DATA)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 0, 1, 0, GDT_L, 1, 1), /* Kernel data segment */
-	[SEGMENT_INDEX(SEGMENT_USER_CODE)]     = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 3, 1, 0, GDT_L, 1, 1), /* User code */
-	[SEGMENT_INDEX(SEGMENT_USER_DATA)]     = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 3, 1, 0, GDT_L, 1, 1), /* User data */
+	DEFINE_LOHI_SEGMENT(SEGMENT_CPU_LDT, __x86_gdt_ldt_lo, __x86_gdt_ldt_hi),                          /* CPU LDT */
+	N64(DEFINE_LOHI_SEGMENT(SEGMENT_KERNEL_FSBASE, __x86_gdt_kernel_tls_lo, __x86_gdt_kernel_tls_hi),) /* THIS_TASK */
+	DEFINE_LOHI_SEGMENT(SEGMENT_CPU_TSS, __x86_gdt_tss_lo, __x86_gdt_tss_hi),                          /* CPU TSS */
+	N64(DEFINE_LOHI_SEGMENT(SEGMENT_CPU_TSS_DF, __x86_gdt_tss_df_lo, __x86_gdt_tss_df_hi),)            /* CPU TSS (for #DF) */
+	[SEGMENT_INDEX(SEGMENT_USER_CODE32)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 3, 1, 0, 0, 1, 1), /* User code (32-bit) */
+	[SEGMENT_INDEX(SEGMENT_USER_DATA32)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 3, 1, 0, 0, 1, 1), /* User data (32-bit) */
+	[SEGMENT_INDEX(SEGMENT_USER_FSBASE)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 3, 1, 0, 0, 1, 1), /* User %fs base */
+	[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 3, 1, 0, 0, 1, 1), /* User %gs base */
 #ifdef __x86_64__
-	[SEGMENT_INDEX(SEGMENT_USER_CODE32)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 0, 1, 0, 0, 1, 1),     /* User code (32-bit mode) */
-	[SEGMENT_INDEX(SEGMENT_USER_DATA32)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 0, 1, 0, 0, 1, 1),     /* User data (32-bit mode) */
-	[SEGMENT_INDEX(0x38)]                  = SEGMENT_DESCRIPTOR_INIT(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),                                           /* Unused... */
-	[SEGMENT_INDEX(SEGMENT_CPU_LDT) + 0]   = { { .s_u = (uintptr_t)__x86_gdt_ldt_lo } },                                                      /* CPU LDT */
-	[SEGMENT_INDEX(SEGMENT_CPU_LDT) + 1]   = { { .s_u = (uintptr_t)__x86_gdt_ldt_hi } },                                                      /* CPU LDT */
-	[SEGMENT_INDEX(SEGMENT_CPU_TSS) + 0]   = { { .s_u = (uintptr_t)__x86_gdt_tss_lo } },                                                      /* CPU TSS */
-	[SEGMENT_INDEX(SEGMENT_CPU_TSS) + 1]   = { { .s_u = (uintptr_t)__x86_gdt_tss_hi } },                                                      /* CPU TSS */
-#else /* __x86_64__ */
-	[SEGMENT_INDEX(SEGMENT_CPU_TSS)]       = { { { (uintptr_t)__x86_gdt_tss_lo, (uintptr_t)__x86_gdt_tss_hi } } },                            /* CPU TSS */
-	[SEGMENT_INDEX(SEGMENT_CPU_TSS_DF)]    = { { { (uintptr_t)__x86_gdt_tss_df_lo, (uintptr_t)__x86_gdt_tss_df_hi } } },                      /* CPU TSS (for #DF) */
-	[SEGMENT_INDEX(SEGMENT_CPU_LDT)]       = { { { (uintptr_t)__x86_gdt_ldt_lo, (uintptr_t)__x86_gdt_ldt_hi } } },                            /* CPU LDT */
-	[SEGMENT_INDEX(SEGMENT_KERNEL_FSBASE)] = { { { (uintptr_t)__x86_gdt_kernel_tls_lo, (uintptr_t)__x86_gdt_kernel_tls_hi } } },              /* task-self */
-	[SEGMENT_INDEX(SEGMENT_USER_FSBASE)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 3, 1, 0, GDT_L, 1, 1), /* User %fs base */
-	[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 3, 1, 0, GDT_L, 1, 1), /* User %gs base */
-#endif /* !__x86_64__ */
+	[SEGMENT_INDEX(SEGMENT_USER_CODE64)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 3, 1, 0, 1, 1, 1), /* User code (64-bit) */
+	[SEGMENT_INDEX(SEGMENT_USER_DATA64)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 3, 1, 0, 1, 1, 1), /* User data (64-bit) */
+#endif /* __x86_64__ */
 };
 
 DECL_END

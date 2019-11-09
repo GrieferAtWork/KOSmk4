@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91d402ab */
+/* HASH CRC-32:0x4a99bf94 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_c16utime64,(__C
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16utime) __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(c16utime))(__CHAR16_TYPE__ const *__filename,
+__NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16utime))(__CHAR16_TYPE__ const *__filename,
                                                       struct utimbuf const *__file_times) {
 #line 50 "kos/src/libc/magic/parts.wchar.utime.c"
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO

@@ -1363,7 +1363,7 @@ do_read_bit_pieces:
 			if (self->ue_tlsbase == (byte_t *)-1) {
 #ifdef __KERNEL__
 				self->ue_tlsbase = (byte_t *)RD_TLS_BASE_REGISTER();
-#else  /* __KERNEL__ */
+#else /* __KERNEL__ */
 				{
 					/* Try to use the TLS-base of the associated module */
 					void *base = dltlsaddr(dlgethandle(pc));

@@ -75,7 +75,7 @@ function getFilenameForLog(filename: string): string {
 
 
 #ifdef WARN_KNOWN_BUILTINS
-global final known_builtins = Dict();
+global final known_builtins: {string: bool} = Dict();
 with (local fp = try File.open("misc/scripts/gcc_builtins_known", "r") catch (...) none) {
 	for (local l: fp) {
 		l = l.strip().decode("utf-8");
@@ -87,7 +87,7 @@ with (local fp = try File.open("misc/scripts/gcc_builtins_known", "r") catch (..
 #endif /* WARN_KNOWN_BUILTINS */
 
 #ifdef WARN_KNOWN_ALIASES
-global final known_aliases = Dict();
+global final known_aliases: {string: string} = Dict();
 with (local fp = try File.open("include/i386-kos/crt-features/crt-glc.h", "r") catch (...) none) {
 	local known_functions = HashSet();
 	for (local l: fp) {
@@ -108,10 +108,10 @@ with (local fp = try File.open("include/i386-kos/crt-features/crt-glc.h", "r") c
 #endif /* WARN_KNOWN_ALIASES */
 
 
-function key_identity(x) {
+function key_identity(x: string): string {
 	return x;
 }
-function key_underscore(x) {
+function key_underscore(x: string): string {
 #if 1
 	if (x in ["argc", "argv", "envp"])
 		return "___" + x;
@@ -121,78 +121,78 @@ function key_underscore(x) {
 	return "_" + x[0].upper() + x[1:];
 #endif
 }
-function key_libc(x) {
+function key_libc(x: string): string {
 	return "__libc_" + x;
 }
-function key_libc_slow(x) {
+function key_libc_slow(x: string): string {
 	return "__libc_slow_" + x;
 }
-function key_libclocal(x) {
+function key_libclocal(x: string): string {
 	return "__LIBC_LOCAL_NAME({})".format({ x.replace("-", "_") });
 }
-function key_fastimpl(x) {
+function key_fastimpl(x: string): string {
 	return "__LIBC_FAST_NAME({})".format({ x.replace("-", "_") });
 }
-function key_dependency(x) {
+function key_dependency(x: string): string {
 	return "__localdep_" + x;
 }
-function key_sanitize_for_guard(x) {
+function key_sanitize_for_guard(x: string): string {
 	return x.replace("-", "_").replace(".", "_").upper();
 }
-function key_libc_guard(x) {
+function key_libc_guard(x: string): string {
 	return "_LIBC_{}_H".format({ key_sanitize_for_guard(x) });
 }
-function key_libc_slow_guard(x) {
+function key_libc_slow_guard(x: string): string {
 	return "_LIBC_SLOW_{}_H".format({ key_sanitize_for_guard(x) });
 }
-function key_std_guard(x) {
+function key_std_guard(x: string): string {
 	return "_{}_H".format({ key_sanitize_for_guard(x) });
 }
-function key_cxx_guard(x) {
+function key_cxx_guard(x: string): string {
 	return "_CXX_{}".format({ key_sanitize_for_guard(x) });
 }
-function key_cxx_stdonly_guard(x) {
+function key_cxx_stdonly_guard(x: string): string {
 	return "_CXX_STDONLY_{}".format({ key_sanitize_for_guard(x) });
 }
-function key_libc_auto_header_guard(x) {
+function key_libc_auto_header_guard(x: string): string {
 	return "GUARD_LIBC_AUTO_{}_H".format({ key_sanitize_for_guard(x) });
 }
-function key_libc_user_header_guard(x) {
+function key_libc_user_header_guard(x: string): string {
 	return "GUARD_LIBC_USER_{}_H".format({ key_sanitize_for_guard(x) });
 }
-function key_libc_user_source_guard(x) {
+function key_libc_user_source_guard(x: string): string {
 	return "GUARD_LIBC_USER_{}_C".format({ key_sanitize_for_guard(x) });
 }
-function key_libc_auto_impl_guard(x) {
+function key_libc_auto_impl_guard(x: string): string {
 	return "GUARD_LIBC_AUTO_{}_C".format({ key_sanitize_for_guard(x) });
 }
-function key_libc_internal(x) {
+function key_libc_internal(x: string): string {
 	return "libc_" + x;
 }
-function key_libd_internal(x) {
+function key_libd_internal(x: string): string {
 	return "libd_" + x;
 }
-function key_libd_export(x) {
+function key_libd_export(x: string): string {
 	return "DOS$" + x;
 }
-function key_libd_is_export(x) {
+function key_libd_is_export(x: string): string {
 	return x.startswith("DOS$");
 }
-global all_crt_features = HashSet();
-function key_crt_have(x) {
+global all_crt_features: {string...} = HashSet();
+function key_crt_have(x: string): string {
 	all_crt_features.insert(x);
 	return "defined(__CRT_HAVE_{})".format({ x });
 }
-function key_crt_have_pp(x) {
+function key_crt_have_pp(x: string): string {
 	all_crt_features.insert(x);
 	return "__CRT_HAVE_{}".format({ x });
 }
-function key_attr_header(x) {
+function key_attr_header(x: string): string {
 	if (x.startswith("@") && x.endswith("@"))
 		return x[1:-1];
 	return "__" + x;
 }
-function key_attr_source(x) {
+function key_attr_source(x: string): string {
 	local map = {
 		"ATTR_WUNUSED" : "WUNUSED",
 	};
@@ -204,7 +204,7 @@ function key_attr_source(x) {
 }
 
 
-local argument_cast_omit_keyword_list = {
+local argument_cast_omit_keyword_list: {string...} = {
 	"__restrict"
 };
 
@@ -219,10 +219,10 @@ function cc_for_key(key: Callable): int {
 	return key === key_libd_internal ? "LIBDCALL" : "LIBCCALL";
 }
 
-local wchar_replacements = {
+local wchar_replacements: {string: (string, string)} = {
 	"wchar_t" : ("char16_t", "char32_t"),
 };
-local replacement_words = {
+local replacement_words: {string: string} = {
 	"size_t" : "__SIZE_TYPE__",
 	"ssize_t" : "__SSIZE_TYPE__",
 	"intptr_t" : "__INTPTR_TYPE__",
@@ -257,7 +257,7 @@ local replacement_words = {
 	"NULL" : "__NULLPTR",
 };
 
-local c_keywords = {
+local c_keywords: {string...} = {
 	"if",
 	"else",
 	"while",
@@ -338,7 +338,8 @@ function replace_word(
 	return word;
 }
 
-function add_paren_if_necessary(text: string, used_for_logical_and: bool): string {
+function add_paren_if_necessary(
+		text: string, used_for_logical_and: bool): string {
 	local i = 0, end = #text;
 	local blacklist = used_for_logical_and
 		? "|+-*/"
@@ -365,7 +366,7 @@ function add_paren_if_necessary(text: string, used_for_logical_and: bool): strin
 	return text;
 }
 
-local paren_match = {
+local paren_match: {string: string} = {
 	"(" : ")",
 	"[" : "]",
 	"{" : "}",
@@ -662,7 +663,9 @@ function split_words(
 	}
 }
 
-function replace_wchar_words(text: string, wchar_t_replacement: int, env: {string: string} = none): string {
+function replace_wchar_words(
+		text: string, wchar_t_replacement: int,
+		env: {string: string} = none): string {
 	File.Writer tempfp;
 	for (local is_word, word: split_words(text, env)) {
 		if (is_word)
@@ -672,7 +675,8 @@ function replace_wchar_words(text: string, wchar_t_replacement: int, env: {strin
 	return tempfp.string;
 }
 
-function replace_unify_words(text: string, env: {string: string} = none): string {
+function replace_unify_words(
+		text: string, env: {string: string} = none): string {
 	File.Writer tempfp;
 	for (local is_word, word: split_words(text, env)) {
 		if (is_word)
@@ -683,7 +687,8 @@ function replace_unify_words(text: string, env: {string: string} = none): string
 }
 
 
-function is_implicitly_castable(src_type: string, dst_type: string): bool {
+function is_implicitly_castable(
+		src_type: string, dst_type: string): bool {
 	if (src_type == dst_type)
 		return true;
 	/* Unify word replacements. */
@@ -849,8 +854,8 @@ global split_argument_list;
 
 @@Parse special annotations applied to a function return type
 @@@param: args: A list of (typ, name) for each argument taken
-function parse_return_type_annotations(return_type: string,
-		args: {(string, string)...},
+function parse_return_type_annotations(
+		return_type: string, args: {(string, string)...},
 		function_attr: List with string = none,
 		arglist_attributes: List with string = none,
 		file: string = none, line: int = none): string {
@@ -996,8 +1001,8 @@ found_equals_argument:
 }
 
 @@Split a given argument list into the individual type+name
-function split_argument_list(l: string,
-		function_attr: List with string = none,
+function split_argument_list(
+		l: string, function_attr: List with string = none,
 		file: string = none, line: int = none)
 		: {(string, string)...} {
 	l = l.strip();
@@ -1056,8 +1061,10 @@ add_nonnull:
 		yield (typ, nam);
 		++i;
 	}
-	if (non_null_arguments)
-		function_attr.append("ATTR_NONNULL(({}))".format({ ", ".join(non_null_arguments) }));
+	if (non_null_arguments) {
+		function_attr.append("ATTR_NONNULL(({}))"
+			.format({ ", ".join(non_null_arguments) }));
+	}
 }
 
 @@Sort function attributes
@@ -1109,9 +1116,11 @@ function replaceDocKeywords(docstring: string, replace: Callable): string {
 	fp << docstring[i:];
 	return fp.string;
 }
+
 @@Similar to @replaceDocKeywords, but @replace is invoked only for individual
 @@keywords with `...' sections, rather than once for every such section
-function replaceDocKeywordWords(docstring: string, replace: Callable, env: {string: string} = none): string {
+function replaceDocKeywordWords(
+		docstring: string, replace: Callable, env: {string: string} = none): string {
 	return replaceDocKeywords(docstring, [](fp: File, text: string) {
 		for (local is_word, word: split_words(text, env)) {
 			if (!is_word) {
@@ -1128,7 +1137,7 @@ function replaceDocKeywordWords(docstring: string, replace: Callable, env: {stri
 global components: {string: {Function...}};
 global functions: {string: Function};
 global function_body_conversions: {string: {string: Callable}} = Dict();
-@@Map for c-header to c++-header ("string.h" : ("cstring", "_CXX_CCTYPE", "_CXX_STDONLY_CCTYPE"))
+@@Map for c-header to c++-header @("string.h" : ("cstring", "_CXX_CCTYPE", "_CXX_STDONLY_CCTYPE"))
 global ccompat_cpp_headers: {string: (string, string, string)} = Dict();
 global functions_prototypes;
 global known_libc_sections;
@@ -4417,8 +4426,13 @@ class Function {
 			fp << word;
 		}
 		fp << "\n";
+		local cc = "C";
+		if (wchar_t_replacement !is none && wchar_t_replacement == WCHAR_MODE_DOS)
+			cc = "D";
 		local args_prefix = "({} {})(".format({
-			args_is_varargs ? "__VLIBCCALL" : "__LIBCCALL",
+			args_is_varargs
+				? "__VLIB" + cc + "CALL"
+				: "__LIB" + cc + "CALL",
 			key_libclocal(used_name)
 		});
 		if (is_nothrow) args_prefix = "__" + is_nothrow + args_prefix;
@@ -5416,7 +5430,8 @@ skip_alias_redirections:
 					}
 					fp << key_attr_header(at) << " ";
 				}
-				local args_prefix = "({} {})(".format({ args_is_varargs ? "__VLIBCCALL" : "__LIBCCALL", my_name });
+				local args_prefix = "({} {})(".format({
+					args_is_varargs ? "__VLIBCCALL" : "__LIBCCALL", my_name });
 				if (is_nothrow) args_prefix = "__" + is_nothrow + args_prefix;
 				File.Writer return_type_fp;
 				File.Writer function_decl_fp;
@@ -5481,7 +5496,8 @@ skip_alias_redirections:
 					}
 					fp << key_attr_header(at) << " ";
 				}
-				local args_prefix = "({} {})(".format({ args_is_varargs ? "__VLIBCCALL" : "__LIBCCALL", my_name });
+				local args_prefix = "({} {})(".format({
+					args_is_varargs ? "__VLIBCCALL" : "__LIBCCALL", my_name });
 				if (is_nothrow) args_prefix = "__" + is_nothrow + args_prefix;
 				//if (is_nothrow) args_prefix = "__" + is_nothrow + "(" + args_prefix;
 				File.Writer return_type_fp;
@@ -6338,6 +6354,8 @@ function write_libc_header(fp, comnam, functions, has_slow_header) {
 	      "#define " << guard_name << " 1\n"
 	      "\n"
 	      "#include <__stdinc.h>\n"
+	      "\n"
+	      "#ifdef __CC__\n"
 	      "#include <__crt.h>\n";
 	local has_fast_functions = false;
 	for (local f: functions) {
@@ -6374,6 +6392,9 @@ function write_libc_header(fp, comnam, functions, has_slow_header) {
 		if (f.component_name is bound && f.component_name != comnam)
 			continue;
 		print "\tfunction:", key_libc(f.name);
+		local hasLibcGuard = f.get_dependency_string() !in ["", "1"];
+		local libc_name = key_libc(f.name);
+		local slow_name = key_libc_slow(f.name);
 		if (f.has_fast_implementation) {
 			local symbol_name = f.name;
 			if (f.block is FunctionAlias) {
@@ -6381,16 +6402,40 @@ function write_libc_header(fp, comnam, functions, has_slow_header) {
 			} else if (f.block is UndefinedFunctionAlias) {
 				symbol_name = f.block.name;
 			}
+			if (hasLibcGuard) {
+				fp << "#ifndef __" << libc_name << "_defined\n";
+				fp << "#define __" << libc_name << "_defined 1\n";
+			}
 			fp << "#ifdef __fast_" << symbol_name << "_defined\n";
-			f.print_macro_alias(fp, key_libc(f.name), "(__NAMESPACE_FAST_SYM {})".format({ key_fastimpl(symbol_name) }), symbol_name, dont_cast: true);
-			fp << "#else /* __fast_" << symbol_name << "_defined */\n";
-			f.print_macro_alias(fp, key_libc(f.name), key_libc_slow(f.name), f.name, dont_cast: true);
-			fp << "#endif /* !__fast_" << symbol_name << "_defined */\n";
+			f.print_macro_alias(fp, libc_name,
+				"(__NAMESPACE_FAST_SYM {})".format({ key_fastimpl(symbol_name) }),
+				symbol_name, dont_cast: true);
+			if (hasLibcGuard) {
+				fp << "#elif defined(__" << slow_name << "_defined)\n";
+				f.print_macro_alias(fp, libc_name, slow_name, f.name, dont_cast: true);
+				fp << "#else /* " << symbol_name << "... */\n";
+				fp << "#undef __" << libc_name << "_defined\n";
+				fp << "#endif /* !" << symbol_name << "... */\n";
+			} else {
+				fp << "#else /* __fast_" << symbol_name << "_defined */\n";
+				f.print_macro_alias(fp, libc_name, slow_name, f.name, dont_cast: true);
+				fp << "#endif /* !__fast_" << symbol_name << "_defined */\n";
+			}
+			if (hasLibcGuard)
+				fp << "#endif /* !__" << libc_name << "_defined */\n";
 		} else {
-			f.print_macro_alias(fp, key_libc(f.name), key_libc_slow(f.name), f.name, dont_cast: true);
+			if (hasLibcGuard) {
+				fp << "#if !defined(__" << libc_name << "_defined) && defined(__" << slow_name << "_defined)\n";
+				fp << "#define __" << libc_name << "_defined 1\n";
+			}
+			f.print_macro_alias(fp, libc_name, slow_name, f.name, dont_cast: true);
+			if (hasLibcGuard)
+				fp << "#endif /* !__" << libc_name << "_defined && __" << slow_name << "_defined */\n";
 		}
 	}
 	fp << "\n"
+	      "#endif /* __CC__ */\n"
+	      "\n"
 	      "#endif /* !" << guard_name << " */\n";
 }
 function write_libc_slow_header(fp, comnam, functions) {
@@ -6400,6 +6445,8 @@ function write_libc_slow_header(fp, comnam, functions) {
 	      "#define " << guard_name << " 1\n"
 	      "\n"
 	      "#include <__stdinc.h>\n"
+	      "\n"
+	      "#ifdef __CC__\n"
 	      "#include <__crt.h>\n"
 	      "#include <hybrid/typecore.h>\n";
 	local needKosAnno = false;
@@ -6470,12 +6517,14 @@ function write_libc_slow_header(fp, comnam, functions) {
 			keyname: key_libc_slow,
 			namespace_name: none,
 			include_overloads: false,
-			with_guard: true,
+			with_guard: f.get_dependency_string() !in ["", "1"],
 			allow_macros: true,
 			transform_argument_types: REPLACE_TYPE_WORDS_LOCAL);
 		f.has_fast_implementation = old;
 	}
-	fp << "\n__SYSDECL_END\n"
+	fp << "\n"
+	      "__SYSDECL_END\n"
+	      "#endif /* __CC__ */\n"
 	      "\n"
 	      "#endif /* !" << guard_name << " */\n";
 }
@@ -6767,7 +6816,7 @@ for (local comnam, funcs: components) {
 }
 
 
-function need_libc_auto_header(funcs, comnam) {
+function need_libc_auto_header(funcs: {Function...}, comnam: string) {
 	for (local f: funcs) {
 		if (f is IntermediateString) {
 			if ("auto_libc_header" in f.locations ||
@@ -6789,8 +6838,9 @@ function need_libc_auto_header(funcs, comnam) {
 }
 
 function enum_user_header_functions(
-	comnam, funcs, include_strings: bool = false,
-	want_ignored_functions: bool = true) {
+		comnam: string, funcs: {Function...},
+		include_strings: bool = false,
+		want_ignored_functions: bool = true): {Function | string...} {
 	for (local f: funcs) {
 		if (f is IntermediateString) {
 			if (include_strings && ("user" in f.locations))
@@ -6817,12 +6867,14 @@ function enum_user_header_functions(
 			yield f;
 	}
 }
-function need_libc_user_header(comnam, funcs) {
+
+function need_libc_user_header(comnam: string, funcs: {Function...}): bool {
 	return !!enum_user_header_functions(comnam, funcs, true);
 }
 
 
-function write_libc_auto_header(fp, comnam, funcs) {
+function write_libc_auto_header(
+		fp: File, comnam: string, funcs: {Function...}) {
 	local guard_name = key_libc_auto_header_guard(comnam);
 	local libc_funcs = [];
 	local kernel_funcs = [];
@@ -6904,7 +6956,7 @@ function write_libc_auto_header(fp, comnam, funcs) {
 }
 
 
-function write_libc_user_header(fp, comnam, funcs) {
+function write_libc_user_header(fp: File, comnam: string, funcs: {Function...}) {
 	local guard_name = key_libc_user_header_guard(comnam);
 	fp << copyright << "\n"
 	      "#ifndef " << guard_name << "\n"
@@ -7042,7 +7094,7 @@ function generate_libc_user_source(fp: File, comnam: string, funcs: {Function...
 	fp << "#endif /* !" << guard_name << " */\n";
 }
 
-function is_empty_function_body(body) {
+function is_empty_function_body(body: string): bool {
 	body = body.replace("\n", " ").replace("\t", " ").strip();
 	if (body.startswith("/*AUTO*/"))
 		return true;
@@ -7077,9 +7129,8 @@ continue_strip_body:
 			break;
 		body = newbody;
 	}
-	if (body in [
-		"", "return", "return 0", "return -1",
-		"return NULL", "for(;;){}", "for(;;)"])
+	if (body in ["", "return", "return 0", "return -1",
+	             "return NULL", "for(;;){}", "for(;;)"])
 		return true;
 	return false;
 }
@@ -7303,7 +7354,8 @@ function libc_user_update_implementation_section(
 }
 
 
-function write_libc_user_source(filename: string, comnam: string, funcs: {Function...}) {
+function write_libc_user_source(
+		filename: string, comnam: string, funcs: {Function...}) {
 	local fp = try File.open(filename, "r") catch (...) none;
 	if (fp is none) {
 create_new_file:
@@ -7472,7 +7524,8 @@ do_create_libc_user_source:
 
 
 
-function write_libc_auto_implementation(fp, comnam, funcs) {
+function write_libc_auto_implementation(
+		fp: File, comnam: string, funcs: {Function...}) {
 	local guard_name = key_libc_auto_impl_guard(comnam);
 	fp << copyright << "\n"
 	      "#ifndef " << guard_name << "\n"
@@ -7703,7 +7756,7 @@ for (local comnam, funcs: components) {
 do_create_libc_auto_impl:
 	local compath = "src/libc/auto/{}.c".format({ comnam });
 	print "Creating libc auto-implementation: ", compath;
-	write_hashed_file(compath, [](fp) {
+	write_hashed_file(compath, [](fp: File) {
 		write_libc_auto_implementation(fp, comnam, funcs);
 	});
 }
@@ -7711,7 +7764,7 @@ do_create_libc_auto_impl:
 print;
 
 /* Write the crt-all-features header File. */
-write_hashed_file_l("include/crt-features/all.h", [](fp) {
+write_hashed_file_l("include/crt-features/all.h", [](fp: File) {
 	local feat = List(all_crt_features);
 	feat.sort();
 	fp << copyright << "\n\n\n";
@@ -7728,10 +7781,12 @@ write_hashed_file_l("include/crt-features/crt-kos-sections.h", [](fp) {
 		if (!func.got_implementation)
 			continue;
 		local knam = func.get_section_prefix(WCHAR_MODE_KOS).lsstrip(".text.crt");
-		sections_map.setdefault(knam, []).append((prefix_crt_section + func.name, func.name));
+		sections_map.setdefault(knam, []).append(
+			(prefix_crt_section + func.name, func.name));
 		if (func.wchar_function) {
 			local dnam = func.get_section_prefix(WCHAR_MODE_DOS).lsstrip(".text.crt");
-			sections_map.setdefault(dnam, []).append((prefix_crt_dos_section + func.name, func.name));
+			sections_map.setdefault(dnam, []).append(
+				(prefix_crt_dos_section + func.name, func.name));
 		}
 	}
 	local longest_function_name = 0;
@@ -7791,7 +7846,7 @@ write_hashed_file_l("include/crt-features/crt-kos-sections.h", [](fp) {
 local functions_sorted = List(functions.values);
 functions_sorted.sort(Function.name);
 
-write_hashed_file_l("include/crt-features/crt-kos-functions-attr.h", [](fp) {
+write_hashed_file_l("include/crt-features/crt-kos-functions-attr.h", [](fp: File) {
 	final local traced_attributes = {
 		"ATTR_RETURNS_TWICE",
 		"ATTR_NORETURN",
@@ -7819,7 +7874,7 @@ write_hashed_file_l("include/crt-features/crt-kos-functions-attr.h", [](fp) {
 	}
 });
 
-write_hashed_file_l("include/crt-features/crt-kos-functions.h", [](fp) {
+write_hashed_file_l("include/crt-features/crt-kos-functions.h", [](fp: File) {
 	fp << copyright << "\n\n\n";
 	fp << "/* __CRT_FUNCTION(name, num_intern_aliases, intern_aliases, argc, args, return_type, ...)\n"
 	      " * name:               <KEYWORD>\n"
@@ -7925,10 +7980,10 @@ function print_unimplemented_functions_header(fp: File, prefix: string) {
 	}
 }
 
-write_hashed_file_l("include/crt-features/crt-kos-stubs.h", [](fp) {
+write_hashed_file_l("include/crt-features/crt-kos-stubs.h", [](fp: File) {
 	print_unimplemented_functions_header(fp, "__CRT_STUB_");
 });
-write_hashed_file_l("include/gnu/stubs.h", [](fp) {
+write_hashed_file_l("include/gnu/stubs.h", [](fp: File) {
 	print_unimplemented_functions_header(fp, "__stub_");
 });
 
@@ -7948,7 +8003,7 @@ function update_sections_order(filename: string) {
 	local output_start = input_end + #end_pattern;
 	local output_end = text.index(end2_pattern, output_start);
 	local input = text[input_start:input_end].unifylines().expandtabs(4).replace("\\\n", "");
-	function err(message) {
+	function err(message: string) {
 		print getFilenameForLog(filename), ":", "Error", ":", message;
 		throw Error("Error : " + message);
 	}
@@ -8016,7 +8071,8 @@ function update_sections_order(filename: string) {
 	sorted_section_rules.sort([](item) -> #item[1]);  /* Sort based on the length of the name */
 	sorted_section_rules.reverse();
 	@@Final list of sections, sorted by their link order
-	local final_sections_mapping: {{string...}...} = List(for (local x: [:#section_rules]) []);
+	local final_sections_mapping: {{string...}...} =
+		List(for (local x: [:#section_rules]) []);
 	local sections = copy known_libc_sections;
 	while (sections) {
 		local sect = sections.popitem().lsstrip(".text.crt");

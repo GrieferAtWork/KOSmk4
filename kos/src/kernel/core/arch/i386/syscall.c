@@ -54,6 +54,7 @@
 #include <asm/cpu-flags.h>
 #include <asm/cpu-msr.h>
 #include <asm/intrin.h>
+#include <kos/bits/exception_data-convert.h>
 #include <kos/bits/exception_data32.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
@@ -72,10 +73,6 @@
 #include <libunwind/unwind.h>
 
 #include "except.h"
-
-#ifdef __x86_64__
-#include <kos/bits/exception_data-convert.h>
-#endif /* __x86_64__ */
 
 DECL_BEGIN
 
@@ -109,25 +106,6 @@ NOTHROW(FCALL process_exit_for_exception_after_coredump)(void) {
 	process_exit(W_EXITCODE(1, si.si_signo) | WCOREFLAG);
 }
 
-LOCAL NOBLOCK void
-NOTHROW(KCALL user_icpu_to_ucpu)(struct icpustate const *__restrict state,
-                                 struct ucpustate *__restrict ust) {
-#ifdef __x86_64__
-#error TODO
-#else /* __x86_64__ */
-	ust->ucs_gpregs        = state->ics_gpregs;
-	ust->ucs_sgregs.sg_ds  = state->ics_ds16;
-	ust->ucs_sgregs.sg_es  = state->ics_es16;
-	ust->ucs_sgregs.sg_fs  = state->ics_fs16;
-	ust->ucs_sgregs.sg_gs  = __rdgs();
-	ust->ucs_cs            = irregs_rdcs(&state->ics_irregs);
-	ust->ucs_ss            = state->ics_irregs_u.ir_ss16;
-	ust->ucs_eflags        = irregs_rdflags(&state->ics_irregs);
-	ust->ucs_eip           = irregs_rdip(&state->ics_irregs);
-	ust->ucs_gpregs.gp_esp = state->ics_irregs_u.ir_esp;
-#endif /* !__x86_64__ */
-}
-
 
 /* Create a coredump because of the currently thrown exception */
 PUBLIC ATTR_NOINLINE NONNULL((1)) void FCALL
@@ -139,7 +117,7 @@ coredump_create_for_exception(struct icpustate *__restrict state,
 	siginfo_t si;
 	bool has_si;
 	memcpy(&error, &info->ei_data, sizeof(struct exception_data));
-	user_icpu_to_ucpu(state, &ust);
+	icpustate_user_to_ucpustate(state, &ust);
 	has_si = error_as_signal(&error, &si);
 	if (!originates_from_kernelspace) {
 		/* If the exception doesn't originate from kernel-space, such
@@ -180,7 +158,7 @@ PUBLIC ATTR_NOINLINE NONNULL((1, 2)) void FCALL
 coredump_create_for_signal(struct icpustate *__restrict state,
                            siginfo_t const *__restrict si) {
 	struct ucpustate ust;
-	user_icpu_to_ucpu(state, &ust);
+	icpustate_user_to_ucpustate(state, &ust);
 	coredump_create(&ust, NULL, 0, &ust, NULL, 0,
 	                NULL, NULL, si, UNWIND_DISABLED);
 }
@@ -198,7 +176,8 @@ NOTHROW(FCALL translate_exception_errno)(struct icpustate *__restrict state,
 		while (pointer_count != 0 &&
 		       data->e_pointers[pointer_count - 1] == 0)
 			--pointer_count;
-		printk(KERN_TRACE "[except] Translate exception %#x:%#x",data->e_class, data->e_subclass);
+		printk(KERN_TRACE "[except] Translate exception %#x:%#x",
+		       data->e_class, data->e_subclass);
 		if (pointer_count != 0) {
 			unsigned int i;
 			for (i = 0; i < pointer_count; ++i) {
@@ -212,16 +191,9 @@ NOTHROW(FCALL translate_exception_errno)(struct icpustate *__restrict state,
 		       errval, task_getroottid_s());
 	}
 #endif
-#ifdef __x86_64__
-	state->ics_gpregs.gp_rax = errval;
-	if (SYSCALL32_DOUBLE_WIDE(state->ics_gpregs.gp_rax) &&
-	    irregs_iscompat(&state->ics_irregs))
-		state->ics_gpregs.gp_rdx = (u64)-1; /* sign-extend */
-#else /* __x86_64__ */
-	if (SYSCALL32_DOUBLE_WIDE(state->ics_gpregs.gp_eax))
-		state->ics_gpregs.gp_edx = (u32)-1; /* sign-extend */
-	state->ics_gpregs.gp_eax = errval;
-#endif /* !__x86_64__ */
+	gpregs_setpax(&state->ics_gpregs, errval);
+	if (SYSCALL32_DOUBLE_WIDE(gpregs_getpax(&state->ics_gpregs)) && icpustate_is32bit(state))
+		gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
 	//error_printf("Propagate to user-space\n");
 	return state;
 }
@@ -332,9 +304,11 @@ raise_excption_as_user_signal(struct icpustate *__restrict state,
 	if (!error_as_signal(error_data(), &siginfo))
 		return NULL;
 	switch (siginfo.si_signo) {
+
 	case SIGSYS:
-		siginfo.si_call_addr = (void *)irregs_rdip(&state->ics_irregs);
+		siginfo.si_call_addr = (void *)icpustate_getpc(state);
 		break;
+
 	default: break;
 	}
 	return raise_user_signal(state, &siginfo, reason, true);
@@ -362,13 +336,8 @@ call_user_exception_handler(struct icpustate *__restrict state,
 	stack   = PERTASK_GET(_this_user_except_handler.ueh_stack);
 	if unlikely(!(mode & EXCEPT_HANDLER_FLAG_SETHANDLER))
 		return NULL; /* No handler defined */
-	if (stack == EXCEPT_HANDLER_SP_CURRENT) {
-#ifdef __x86_64__
-		stack = (void *)irregs_rdsp(&state->ics_irregs);
-#else /* __x86_64__ */
-		stack = (void *)state->ics_irregs_u.ir_esp;
-#endif /* !__x86_64__ */
-	}
+	if (stack == EXCEPT_HANDLER_SP_CURRENT)
+		stack = (void *)icpustate_getuserpsp(state);
 	/* Align the stack. */
 	stack = (void *)((uintptr_t)stack & ~3);
 	/* Allocate structures */
@@ -378,45 +347,15 @@ call_user_exception_handler(struct icpustate *__restrict state,
 	validate_writable(user_error, sizeof(struct exception_data32) + sizeof(struct kcpustate32));
 	COMPILER_WRITE_BARRIER();
 	/* Fill in user-space context information */
-#ifdef __x86_64__
-	user_state->kcs_gpregs.gp_edi = (u32)state->ics_gpregs.gp_rdi;
-	user_state->kcs_gpregs.gp_esi = (u32)state->ics_gpregs.gp_rsi;
-	user_state->kcs_gpregs.gp_ebp = (u32)state->ics_gpregs.gp_rbp;
-	user_state->kcs_gpregs.gp_esp = (u32)irregs_rdsp(&state->ics_irregs);
-	user_state->kcs_gpregs.gp_ebx = (u32)state->ics_gpregs.gp_rbx;
-	user_state->kcs_gpregs.gp_edx = (u32)state->ics_gpregs.gp_rdx;
-	user_state->kcs_gpregs.gp_ecx = (u32)state->ics_gpregs.gp_rcx;
-	user_state->kcs_gpregs.gp_eax = (u32)state->ics_gpregs.gp_rax;
-#else /* __x86_64__ */
-	user_state->kcs_gpregs.gp_edi = state->ics_gpregs.gp_edi;
-	user_state->kcs_gpregs.gp_esi = state->ics_gpregs.gp_esi;
-	user_state->kcs_gpregs.gp_ebp = state->ics_gpregs.gp_ebp;
-	user_state->kcs_gpregs.gp_esp = state->ics_irregs_u.ir_esp;
-	user_state->kcs_gpregs.gp_ebx = state->ics_gpregs.gp_ebx;
-	user_state->kcs_gpregs.gp_edx = state->ics_gpregs.gp_edx;
-	user_state->kcs_gpregs.gp_ecx = state->ics_gpregs.gp_ecx;
-	user_state->kcs_gpregs.gp_eax = state->ics_gpregs.gp_eax;
-#endif /* !__x86_64__ */
-	user_state->kcs_eflags = (u32)irregs_rdflags(&state->ics_irregs);
-	user_state->kcs_eip    = (u32)irregs_rdip(&state->ics_irregs);
+	icpustate_to_kcpustate32(state, user_state);
 	/* Copy exception data onto the user-space stack. */
 	mydata = &THIS_EXCEPTION_INFO.ei_data;
-#ifdef __x86_64__
-	exception_data64_to_exception_data32(user_error, mydata);
-#else /* __x86_64__ */
-	memcpy(user_error, mydata, sizeof(struct exception_data32));
-#endif /* !__x86_64__ */
+	exception_data_to_exception_data32(mydata, user_error);
 	/* Redirect the given CPU state to return to the user-space handler. */
-#ifdef __x86_64__
-	state->ics_gpregs.gp_rcx   = (u32)(uintptr_t)user_state; /* struct kcpustate32 *__restrict state */
-	state->ics_gpregs.gp_rdx   = (u32)(uintptr_t)user_error; /* struct exception_data32 *__restrict error */
-	irregs_wrsp(&state->ics_irregs, (u32)(uintptr_t)user_error);
-#else /* __x86_64__ */
-	state->ics_gpregs.gp_ecx   = (u32)(uintptr_t)user_state; /* struct kcpustate32 *__restrict state */
-	state->ics_gpregs.gp_edx   = (u32)(uintptr_t)user_error; /* struct exception_data32 *__restrict error */
-	state->ics_irregs_u.ir_esp = (u32)(uintptr_t)user_error;
-#endif /* !__x86_64__ */
-	irregs_wrip(&state->ics_irregs, (uintptr_t)(void *)handler);
+	gpregs_setpcx(&state->ics_gpregs, (uintptr_t)user_state); /* struct kcpustate32 *__restrict state */
+	gpregs_setpdx(&state->ics_gpregs, (uintptr_t)user_error); /* struct exception_data32 *__restrict error */
+	icpustate_setuserpsp(state, (uintptr_t)user_error);
+	icpustate_setpc(state, (uintptr_t)(void *)handler);
 	COMPILER_WRITE_BARRIER();
 	/* Disable exception handling on one-shot mode. */
 	if (mode & EXCEPT_HANDLER_FLAG_ONESHOT)
@@ -431,7 +370,7 @@ LOCAL struct icpustate *FCALL
 call_user_exception_handler(struct icpustate *__restrict state,
                             unsigned int reason) THROWS(E_SEGFAULT) {
 	struct icpustate *result;
-	if (irregs_iscompat(&state->ics_irregs)) {
+	if (icpustate_iscompat(state)) {
 		result = call_user_exception_handler32(state, reason);
 	} else {
 		kernel_panic("TODO");
@@ -464,6 +403,7 @@ NOTHROW(FCALL x86_propagate_userspace_exception)(struct icpustate *__restrict st
 
 	case ERROR_CODEOF(E_EXIT_PROCESS):
 		process_exit(PERTASK_GET(_this_exception_info.ei_data.e_pointers[0]));
+
 	case ERROR_CODEOF(E_EXIT_THREAD):
 		task_exit(PERTASK_GET(_this_exception_info.ei_data.e_pointers[0]));
 
@@ -472,7 +412,7 @@ NOTHROW(FCALL x86_propagate_userspace_exception)(struct icpustate *__restrict st
 
 	if (reason == TASK_RPC_REASON_SYSCALL) {
 		//error_printf("Unwind to userspace");
-		if (irregs_rdflags(&state->ics_irregs) & EFLAGS_CF) {
+		if (icpustate_getpflags(state) & EFLAGS_CF) {
 			/* System call exceptions are enabled. */
 			TRY {
 				/* Propagate the exception to user-space if handlers are enabled. */

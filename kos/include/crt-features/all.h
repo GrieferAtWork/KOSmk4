@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd4c3fba */
+/* HASH CRC-32:0xeab7b42d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1615,9 +1615,21 @@
 #define __CRT_HAVE_bsearch_s 1
 #define __CRT_HAVE_btowc 1
 #define __CRT_HAVE_bzero 1
+#define __CRT_HAVE_c16cmp 1
 #define __CRT_HAVE_c16dup 1
+#define __CRT_HAVE_c16end 1
 #define __CRT_HAVE_c16getcwd 1
+#define __CRT_HAVE_c16len 1
+#define __CRT_HAVE_c16ncmp 1
+#define __CRT_HAVE_c16nend 1
+#define __CRT_HAVE_c16nlen 1
 #define __CRT_HAVE_c16rtomb 1
+#define __CRT_HAVE_c32cmp 1
+#define __CRT_HAVE_c32end 1
+#define __CRT_HAVE_c32len 1
+#define __CRT_HAVE_c32ncmp 1
+#define __CRT_HAVE_c32nend 1
+#define __CRT_HAVE_c32nlen 1
 #define __CRT_HAVE_c32rtomb 1
 #define __CRT_HAVE_call_once 1
 #define __CRT_HAVE_calloc 1

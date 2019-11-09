@@ -1146,7 +1146,7 @@ handle_set_register_error:
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 				memmove(regbuf, regbuf + (reqlen - reglen), reglen);
 				memset(regbuf, 0, reqlen - reglen);
-#else  /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
 				memset(regbuf + reglen, 0, reqlen - reglen);
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 			} else {
@@ -1167,7 +1167,7 @@ handle_set_register_error:
 				} else {
 					ERROR(err_invalid_register_size);
 				}
-#else  /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
 				if (regbuf[0] == 0xff) {
 					/* Sign-extension */
 					do {

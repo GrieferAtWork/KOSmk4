@@ -22,6 +22,7 @@
 #include <kernel/cpuid.h>
 #include <kernel/paging.h>
 
+#include <asm/cpu-cpuid.h>
 #include <asm/cpu-flags.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/segment.h>
@@ -169,24 +170,24 @@ INTERN_FUNCTION(_start)
 
 	/* if (Family == 6 && Model < 3 && Stepping < 3)
 	 *     OFFSET_CPUID_1D &= ~CPUID_1D_SEP; */
-	testl  $CPUID_1D_SEP, %edx
+	testl  $(CPUID_1D_SEP), %edx
 	jz     1f
 	movl   %eax, %ecx
-	andl   $CPUID_1A_FAMILY_M, %ecx
+	andl   $(CPUID_1A_FAMILY_M), %ecx
 	cmpl   $(6 << CPUID_1A_FAMILY_S), %ecx
 	jne    1f  /* if (Family != 6) goto 1f; */
 	movl   %eax, %ecx
-	andl   $CPUID_1A_MODEL_M, %ecx
+	andl   $(CPUID_1A_MODEL_M), %ecx
 #if CPUID_1A_MODEL_S
-	shrl   $CPUID_1A_MODEL_S, %ecx
-#endif
+	shrl   $(CPUID_1A_MODEL_S), %ecx
+#endif /* CPUID_1A_MODEL_S */
 	cmpl   $3, %ecx
 	jae    1f  /* if (Model >= 3) goto 1f; */
 	movl   %eax, %ecx
-	andl   $CPUID_1A_STEPPING_M, %ecx
+	andl   $(CPUID_1A_STEPPING_M), %ecx
 #if CPUID_1A_STEPPING_S
-	shrl   $CPUID_1A_STEPPING_S, %ecx
-#endif
+	shrl   $(CPUID_1A_STEPPING_S), %ecx
+#endif /* CPUID_1A_STEPPING_S */
 	cmpl   $3, %ecx
 	/* if (Stepping >= 3) goto 1f; */
 	jae    1f
@@ -194,7 +195,7 @@ INTERN_FUNCTION(_start)
 1:
 
 
-	testl  $CPUID_1D_PGE, %edx /* Check if the PAGE_FGLOBAL bit is supported. */
+	testl  $(CPUID_1D_PGE), %edx /* Check if the PAGE_FGLOBAL bit is supported. */
 	jnz    1f
 	movl   $0,   V2P(x86_page_global)
 1:
@@ -206,39 +207,39 @@ INTERN_FUNCTION(_start)
 	movl   %ebx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_0B
 	movl   %edx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_0D
 	movl   %ecx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_0C
-	cmpl   $7, %eax
+	cmpl   $(7), %eax
 	jnae   1f
-	movl   $7, %eax
-	movl   $0, %ecx /* Sub-leaf:0 */
+	movl   $(7), %eax
+	movl   $(0), %ecx /* Sub-leaf:0 */
 	cpuid
 	movl   %edx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_7D
 	movl   %ecx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_7C
 	movl   %ebx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_7B
-1:	movl   $0x80000000, %eax
+1:	movl   $(0x80000000), %eax
 	cpuid
 	movl   %eax, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000000A
-	cmpl   $0x80000001, %eax
+	cmpl   $(0x80000001), %eax
 	jnae   2f
-	movl   $0x80000001, %eax
+	movl   $(0x80000001), %eax
 	cpuid
 	movl   %ecx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000001C
 	movl   %edx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000001D
 	movl   V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000000A, %eax
-	cmpl   $0x80000004, %eax
+	cmpl   $(0x80000004), %eax
 	jnae   3f
-	movl   $0x80000004, %eax
+	movl   $(0x80000004), %eax
 	cpuid
 	movl   %eax, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000004A
 	movl   %ebx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000004B
 	movl   %ecx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000004C
 	movl   %edx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000004D
-	movl   $0x80000003, %eax
+	movl   $(0x80000003), %eax
 	cpuid
 	movl   %eax, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000003A
 	movl   %ebx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000003B
 	movl   %ecx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000003C
 	movl   %edx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000003D
-	movl   $0x80000002, %eax
+	movl   $(0x80000002), %eax
 	cpuid
 	movl   %eax, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000002A
 	movl   %ebx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000002B

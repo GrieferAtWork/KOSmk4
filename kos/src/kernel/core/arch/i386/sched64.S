@@ -143,7 +143,7 @@ INTERN_FUNCTION(x86_pic_acknowledge)
 END(x86_pic_acknowledge)
 
 	movq   %gs:0, %rdi           /* cpu_scheduler_interrupt::struct task *__restrict thread */
-	movq   %esp, _this_sched_state(%rdi)
+	movq   %rsp, _this_sched_state(%rdi)
 	movq   _this_cpu(%rdi), %rbx /* THIS_CPU */
 	movq   %rbx, %rcx            /* cpu_scheduler_interrupt::struct cpu *__restrict caller */
 
@@ -719,7 +719,7 @@ END(cpu_quantum_remaining_nopr)
 
 
 PUBLIC_FUNCTION(cpu_quantum_remaining)
-	pushfl
+	pushfq
 	cli
 	/* Read the current PIT counter position. */
 	movb   $(PIT_COMMAND_SELECT_F0 | \
@@ -729,7 +729,7 @@ PUBLIC_FUNCTION(cpu_quantum_remaining)
 	inb    $(PIT_DATA0),     %al
 	movb   %al, %cl
 	inb    $(PIT_DATA0),     %al
-	popfl
+	popfq
 	movb   %al, %ch
 	movzwq %cx, %rax
 	ret
@@ -757,7 +757,7 @@ PUBLIC_FUNCTION(cpu_quantum_elapsed_nopr)
 END(cpu_quantum_elapsed_nopr)
 
 PUBLIC_FUNCTION(cpu_quantum_elapsed)
-	pushfl
+	pushfq
 	movb   $(PIT_COMMAND_SELECT_F0 | \
 	         PIT_COMMAND_ACCESS_FLATCH | \
 	         PIT_COMMAND_FBINARY), %al
@@ -767,7 +767,7 @@ PUBLIC_FUNCTION(cpu_quantum_elapsed)
 	inb    $(PIT_DATA0),     %al
 	movb   %al, %cl
 	inb    $(PIT_DATA0),     %al
-	popfl
+	popfq
 	movb   %al, %ch
 	movq   $PIT_HZ_DIV(HZ), %rax
 	subw   %cx, %ax
@@ -779,7 +779,7 @@ END(cpu_quantum_elapsed)
 
 
 INTERN_FUNCTION(x86_cpu_disable_preemptive_interrupts)
-	pushfl
+	pushfq
 	cli
 	/* Disable the PIT interrupt within the PIC */
 	inb    $(X86_PIC1_DATA), %al
@@ -798,7 +798,7 @@ INTERN_FUNCTION(x86_cpu_disable_preemptive_interrupts)
 	/* Normally at this point, the PIT would want us to specify the delay,
 	 * however by not telling it anything, we essentially leave it hanging
 	 * in this semi-disabled mode until we reset it at a later point in time. */
-	popfl
+	popfq
 	ret
 .if x86_apic_cpu_disable_preemptive_interrupts_size > (. - x86_cpu_disable_preemptive_interrupts)
 .skip x86_apic_cpu_disable_preemptive_interrupts_size - (. - x86_cpu_disable_preemptive_interrupts)
@@ -830,7 +830,7 @@ INTERN_FUNCTION(x86_cpu_disable_preemptive_interrupts_nopr)
 END(x86_cpu_disable_preemptive_interrupts_nopr)
 
 INTERN_FUNCTION(x86_cpu_enable_preemptive_interrupts)
-	pushfl
+	pushfq
 	movb   $(PIT_COMMAND_SELECT_F0 | \
 	         PIT_COMMAND_ACCESS_FLOHI | \
 	         PIT_COMMAND_MODE_FSQRWAVE | \
@@ -853,7 +853,7 @@ INTERN_FUNCTION(x86_cpu_enable_preemptive_interrupts)
 	inb    $(X86_PIC1_DATA), %al
 	andb   $~(1 << (X86_INTNO_PIC1_PIT-X86_INTERRUPT_PIC1_BASE)), %al
 	outb   %al, $(X86_PIC1_DATA)
-	popfl
+	popfq
 	ret
 .if x86_apic_cpu_enable_preemptive_interrupts_size > (. - x86_cpu_enable_preemptive_interrupts)
 .skip x86_apic_cpu_enable_preemptive_interrupts_size - (. - x86_cpu_enable_preemptive_interrupts)
@@ -890,7 +890,7 @@ END(x86_cpu_enable_preemptive_interrupts_nopr)
 
 
 PUBLIC_FUNCTION(cpu_quantum_reset)
-	pushfl
+	pushfq
 	movb   $(PIT_COMMAND_SELECT_F0 | \
 	         PIT_COMMAND_ACCESS_FLOHI | \
 	         PIT_COMMAND_MODE_FSQRWAVE | \
@@ -910,7 +910,7 @@ PUBLIC_FUNCTION(cpu_quantum_reset)
 	/* outb(PIT_DATA0, PIT_HZ_DIV(HZ) >> 8); */
 	movb   $(PIT_HZ_DIV(HZ) >> 8), %al
 	outb   %al, $(PIT_DATA0)
-	popfl
+	popfq
 	ret
 .if x86_apic_cpu_quantum_reset_size > (. - cpu_quantum_reset)
 .skip x86_apic_cpu_quantum_reset_size - (. - cpu_quantum_reset)
@@ -945,13 +945,13 @@ END(cpu_quantum_reset_nopr)
 
 PUBLIC_FUNCTION(cpu_hwipi_pending)
 	/* outb(X86_PIC1_CMD, X86_PIC_READ_IRR) */
-	pushfl
+	pushfq
 	movq   $(X86_PIC_READ_IRR), %rax /* NOTE: This also clears all of the upper bits! */
 	cli
 	outb   %al, $(X86_PIC1_CMD)
 	/* AL = inb(X86_PIC1_CMD) */
 	inb    $(X86_PIC2_CMD), %al
-	popfl
+	popfq
 	/* return PIT_BIT_IS_SET(AL); */
 	testb  $(1 << (X86_INTNO_PIC1_PIT-X86_INTERRUPT_PIC1_BASE)), %al
 	setnz  %al

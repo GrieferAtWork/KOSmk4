@@ -537,7 +537,7 @@ err_during_delivery:
 						decref_unlikely(pgroup);
 						return error;
 					}
-#else  /* DELIVER_NX */
+#else /* DELIVER_NX */
 					pointer_set_insert(&ps, thread, rpc_flags);
 #endif /* !DELIVER_NX */
 					/* Deliver to this process. */

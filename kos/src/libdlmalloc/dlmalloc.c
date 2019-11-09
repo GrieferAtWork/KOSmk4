@@ -1447,7 +1447,7 @@ DLMALLOC_EXPORT int mspace_mallopt(int, int);
 #else /* ABORT_ON_ASSERT_FAILURE */
 #include <assert.h>
 #endif /* ABORT_ON_ASSERT_FAILURE */
-#else  /* DEBUG */
+#else /* DEBUG */
 #ifndef assert
 #define assert(x)
 #endif
@@ -1712,10 +1712,10 @@ static FORCEINLINE int win32munmap(void* ptr, size_t size) {
 #if HAVE_MORECORE
     #ifdef MORECORE
         #define CALL_MORECORE(S)    MORECORE(S)
-    #else  /* MORECORE */
+    #else /* MORECORE */
         #define CALL_MORECORE(S)    MORECORE_DEFAULT(S)
     #endif /* MORECORE */
-#else  /* HAVE_MORECORE */
+#else /* HAVE_MORECORE */
     #define CALL_MORECORE(S)        MFAIL
 #endif /* HAVE_MORECORE */
 
@@ -1740,7 +1740,7 @@ static FORCEINLINE int win32munmap(void* ptr, size_t size) {
     #else /* DIRECT_MMAP */
         #define CALL_DIRECT_MMAP(s) DIRECT_MMAP_DEFAULT(s)
     #endif /* DIRECT_MMAP */
-#else  /* HAVE_MMAP */
+#else /* HAVE_MMAP */
     #define USE_MMAP_BIT            (SIZE_T_ZERO)
 
     #define MMAP(s)                 MFAIL
@@ -1760,7 +1760,7 @@ static FORCEINLINE int win32munmap(void* ptr, size_t size) {
     #else /* MREMAP */
         #define CALL_MREMAP(addr, osz, nsz, mv) MREMAP_DEFAULT((addr), (osz), (nsz), (mv))
     #endif /* MREMAP */
-#else  /* HAVE_MMAP && HAVE_MREMAP */
+#else /* HAVE_MMAP && HAVE_MREMAP */
     #define CALL_MREMAP(addr, osz, nsz, mv)     MFAIL
 #endif /* HAVE_MMAP && HAVE_MREMAP */
 
@@ -2718,7 +2718,7 @@ static int has_segment_link(mstate m, msegmentptr ss) {
 
 #ifndef MORECORE_CANNOT_TRIM
 #define should_trim(M,s)  ((s) > (M)->trim_check)
-#else  /* MORECORE_CANNOT_TRIM */
+#else /* MORECORE_CANNOT_TRIM */
 #define should_trim(M,s)  (0)
 #endif /* MORECORE_CANNOT_TRIM */
 
@@ -3024,7 +3024,7 @@ static size_t traverse_and_check(mstate m);
 #if (FOOTERS && !INSECURE)
 /* Check if (alleged) mstate m has expected magic field */
 #define ok_magic(M)      ((M)->magic == mparams.magic)
-#else  /* (FOOTERS && !INSECURE) */
+#else /* (FOOTERS && !INSECURE) */
 #define ok_magic(M)      (1)
 #endif /* (FOOTERS && !INSECURE) */
 
@@ -3142,7 +3142,7 @@ static int init_mparams(void) {
     mparams.trim_threshold = DEFAULT_TRIM_THRESHOLD;
 #if MORECORE_CONTIGUOUS
     mparams.default_mflags = USE_LOCK_BIT|USE_MMAP_BIT;
-#else  /* MORECORE_CONTIGUOUS */
+#else /* MORECORE_CONTIGUOUS */
     mparams.default_mflags = USE_LOCK_BIT|USE_MMAP_BIT|USE_NONCONTIGUOUS_BIT;
 #endif /* MORECORE_CONTIGUOUS */
 

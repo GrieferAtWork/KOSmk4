@@ -21,10 +21,12 @@
 
 #include <__stdinc.h>
 #include <features.h>
-#include <bits/types.h>
-#include <bits/sigset.h>
+
 #include <hybrid/__pointer.h>
 #include <hybrid/host.h>
+
+#include <bits/sigset.h>
+#include <bits/types.h>
 
 #if defined(__x86_64__) && !defined(__CRT_CYG_PRIMARY)
 #define __OFFSET_SIGACTION_HANDLER   __OFFSET_SIGACTION64_HANDLER

@@ -20,42 +20,68 @@
 #define _I386_KOS_LIBRPC_BITS_SYSCALL_INFO_CONVERT_H 1
 
 #include <__stdinc.h>
-#include "syscall-info32.h"
-#include "syscall-info64.h"
+
+#include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
+#include "syscall-info32.h"
+#include "syscall-info64.h"
+
+#ifdef __CC__
 __DECL_BEGIN
 
 /* Convert between 32-bit and 64-bit siginfo_t structures */
-#ifdef __CC__
+__LOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void
+__NOTHROW_NCX(rpc_syscall_info32_to_rpc_syscall_info32)(struct rpc_syscall_info32 const *__restrict __self,
+                                                        struct rpc_syscall_info32 *__restrict __result,
+                                                        unsigned int __max_argc __DFL(6)) {
+	__libc_memcpy(__result, __self, OFFSET_RPC_SYSCALL_INFO32_ARG(__max_argc));
+}
 
 __LOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void
-__NOTHROW_NCX(rpc_syscall_info32_to_rpc_syscall_info64)(struct rpc_syscall_info64 *__restrict dst,
-                                                        struct rpc_syscall_info32 const *__restrict src,
-                                                        unsigned int max_argc __DFL(6)) {
-	unsigned int i;
-	dst->rsi_flags = (__UINT64_TYPE__)src->rsi_flags;
-	dst->rsi_sysno = (__UINT64_TYPE__)src->rsi_sysno;
-	for (i = 0; i < max_argc; ++i) {
-		dst->rsi_args[i] = (__UINT64_TYPE__)src->rsi_args[i];
+__NOTHROW_NCX(rpc_syscall_info64_to_rpc_syscall_info64)(struct rpc_syscall_info64 const *__restrict __self,
+                                                        struct rpc_syscall_info64 *__restrict __result,
+                                                        unsigned int __max_argc __DFL(6)) {
+	__libc_memcpy(__result, __self, OFFSET_RPC_SYSCALL_INFO64_ARG(__max_argc));
+}
+
+__LOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void
+__NOTHROW_NCX(rpc_syscall_info32_to_rpc_syscall_info64)(struct rpc_syscall_info32 const *__restrict __self,
+                                                        struct rpc_syscall_info64 *__restrict __result,
+                                                        unsigned int __max_argc __DFL(6)) {
+	unsigned int __i;
+	__result->rsi_flags = (__UINT64_TYPE__)__self->rsi_flags;
+	__result->rsi_sysno = (__UINT64_TYPE__)__self->rsi_sysno;
+	for (__i = 0; __i < __max_argc; ++__i) {
+		__result->rsi_args[__i] = (__UINT64_TYPE__)__self->rsi_args[__i];
 	}
 }
 
 __LOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void
-__NOTHROW_NCX(rpc_syscall_info64_to_rpc_syscall_info32)(struct rpc_syscall_info32 *__restrict dst,
-                                                        struct rpc_syscall_info64 const *__restrict src,
-                                                        unsigned int max_argc __DFL(6)) {
-	unsigned int i;
-	dst->rsi_flags = (__UINT32_TYPE__)src->rsi_flags;
-	dst->rsi_sysno = (__UINT32_TYPE__)src->rsi_sysno;
-	for (i = 0; i < max_argc; ++i) {
-		dst->rsi_args[i] = (__UINT32_TYPE__)src->rsi_args[i];
+__NOTHROW_NCX(rpc_syscall_info64_to_rpc_syscall_info32)(struct rpc_syscall_info64 const *__restrict __self,
+                                                        struct rpc_syscall_info32 *__restrict __result,
+                                                        unsigned int __max_argc __DFL(6)) {
+	unsigned int __i;
+	__result->rsi_flags = (__UINT32_TYPE__)__self->rsi_flags;
+	__result->rsi_sysno = (__UINT32_TYPE__)__self->rsi_sysno;
+	for (__i = 0; __i < __max_argc; ++__i) {
+		__result->rsi_args[__i] = (__UINT32_TYPE__)__self->rsi_args[__i];
 	}
 }
 
-#endif /* __CC__ */
-
+#ifdef __x86_64__
+#define rpc_syscall_info64_to_rpc_syscall_info rpc_syscall_info64_to_rpc_syscall_info64
+#define rpc_syscall_info32_to_rpc_syscall_info rpc_syscall_info32_to_rpc_syscall_info64
+#define rpc_syscall_info_to_rpc_syscall_info32 rpc_syscall_info64_to_rpc_syscall_info32
+#define rpc_syscall_info_to_rpc_syscall_info64 rpc_syscall_info64_to_rpc_syscall_info64
+#else /* __x86_64__ */
+#define rpc_syscall_info64_to_rpc_syscall_info rpc_syscall_info64_to_rpc_syscall_info32
+#define rpc_syscall_info32_to_rpc_syscall_info rpc_syscall_info32_to_rpc_syscall_info32
+#define rpc_syscall_info_to_rpc_syscall_info32 rpc_syscall_info32_to_rpc_syscall_info32
+#define rpc_syscall_info_to_rpc_syscall_info64 rpc_syscall_info32_to_rpc_syscall_info64
+#endif /* !__x86_64__ */
 
 __DECL_END
+#endif /* __CC__ */
 
 #endif /* !_I386_KOS_LIBRPC_BITS_SYSCALL_INFO_CONVERT_H */

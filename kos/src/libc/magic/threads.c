@@ -186,7 +186,7 @@ thrd_sleep64:([nonnull] struct timespec64 const *time_point,
 @@s.a. `pthread_exit()'
 [throws()][ATTR_NORETURN][same_impl][requires($has_function(pthread_exit))]
 thrd_exit:(int res) {
-	pthread_exit((void *)res);
+	pthread_exit((void *)(uintptr_t)(unsigned int)res);
 }
 
 @@Detach the thread identified by THR from the current

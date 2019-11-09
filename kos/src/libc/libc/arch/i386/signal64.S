@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x7233513b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,28 +16,41 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_AUTO_KOS_UNISTD_H
-#define GUARD_LIBC_AUTO_KOS_UNISTD_H 1
+#define _KOS_KERNEL_SOURCE 1
 
-#include "../api.h"
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <kos/unistd.h>
-#include <kos/anno.h>
+#include <hybrid/compiler.h>
+#include <asm/cfi.h>
+#include <syscall.h>
+#include <kos/kernel/cpu-state.h>
 
-DECL_BEGIN
+.section .text.crt.sched.signal.sig_restore
+INTERN_FUNCTION(libc_sig_restore)
+	.cfi_startproc simple
+	.cfi_signal_frame
+	.cfi_def_cfa %rsp, 0
 
-#ifndef __KERNEL__
-/* >> fsync(2)
- * Synchronize a file (including its descriptor which contains timestamps, and its size),
- * meaning that changes to its data and/or descriptor are written to disk */
-INTDEF void (LIBCCALL libc_FSync)(fd_t fd) __THROWS(...);
-/* >> fdatasync(2)
- * Synchronize only the data of a file (not its descriptor which contains
- * timestamps, and its size), meaning that changes are written to disk */
-INTDEF void (LIBCCALL libc_FDataSync)(fd_t fd) __THROWS(...);
-#endif /* !__KERNEL__ */
+	/* TODO: Encode CFI instrumentation for unwinding */
 
-DECL_END
+	movq  $(SYS_rt_sigreturn), %rax
+	syscall
+	.cfi_endproc
+END(libc_sig_restore)
 
-#endif /* !GUARD_LIBC_AUTO_KOS_UNISTD_H */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

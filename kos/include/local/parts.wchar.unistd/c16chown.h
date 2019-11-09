@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa907a479 */
+/* HASH CRC-32:0xd6e74b13 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> c16chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 __LOCAL_LIBC(c16chown) __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(c16chown))(__CHAR16_TYPE__ const *__file,
+__NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16chown))(__CHAR16_TYPE__ const *__file,
                                                       __uid_t __owner,
                                                       __gid_t __group) {
 #line 513 "kos/src/libc/magic/unistd.c"

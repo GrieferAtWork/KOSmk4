@@ -38,7 +38,7 @@ struct elf_dlmodule;
 struct elf_dlsection;
 typedef struct elf_dlmodule *library_handle_t;
 typedef struct elf_dlsection *section_handle_t;
-#else  /* GUARD_LIBDL_API_H */
+#else /* GUARD_LIBDL_API_H */
 #ifdef __INTELLISENSE__
 struct __library_handle_struct;
 typedef struct __library_handle_struct *library_handle_t;

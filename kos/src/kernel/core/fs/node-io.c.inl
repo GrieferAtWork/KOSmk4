@@ -267,7 +267,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 #if defined(DEFINE_IO_PHYS) && !defined(DEFINE_IO_VECTOR)
 #ifdef DEFINE_IO_READ
 			vio_copyfromvio_to_phys(&args, buf, file_position, num_bytes);
-#else  /* DEFINE_IO_READ */
+#else /* DEFINE_IO_READ */
 			vio_copytovio_from_phys(&args, file_position, buf, num_bytes);
 #endif /* !DEFINE_IO_READ */
 #elif defined(DEFINE_IO_VECTOR)
@@ -288,19 +288,19 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 					                        ent.ab_base,
 					                        file_position,
 					                        ent.ab_size);
-#else  /* DEFINE_IO_READ */
+#else /* DEFINE_IO_READ */
 					vio_copytovio_from_phys(&args,
 					                        ent.ab_base,
 					                        file_position,
 					                        ent.ab_size);
 #endif /* !DEFINE_IO_READ */
-#else  /* DEFINE_IO_PHYS */
+#else /* DEFINE_IO_PHYS */
 #ifdef DEFINE_IO_READ
 					vio_copyfromvio(&args,
 					                (byte_t *)ent.ab_base,
 					                file_position,
 					                ent.ab_size);
-#else  /* DEFINE_IO_READ */
+#else /* DEFINE_IO_READ */
 					vio_copytovio(&args,
 					              file_position,
 					              (byte_t *)ent.ab_base,
@@ -344,19 +344,19 @@ load_next_part:
 #endif
 #ifdef DEFINE_IO_READ
 			max_io_bytes = FUNC0(vm_datapart_read)(part, &view, part_offset);
-#else  /* DEFINE_IO_READ */
+#else /* DEFINE_IO_READ */
 			max_io_bytes = FUNC0(vm_datapart_write)(part, &view, num_bytes, part_offset);
 #endif /* !DEFINE_IO_READ */
 #elif defined(DEFINE_IO_KERNEL)
 #ifdef DEFINE_IO_READ
 			max_io_bytes = vm_datapart_read_unsafe(part, buf, num_bytes, part_offset);
-#else  /* DEFINE_IO_READ */
+#else /* DEFINE_IO_READ */
 			max_io_bytes = vm_datapart_write_unsafe(part, buf, num_bytes, num_bytes, part_offset);
 #endif /* !DEFINE_IO_READ */
 #else
 #ifdef DEFINE_IO_READ
 			max_io_bytes = FUNC0(vm_datapart_read)(part, buf, num_bytes, part_offset);
-#else  /* DEFINE_IO_READ */
+#else /* DEFINE_IO_READ */
 			max_io_bytes = FUNC0(vm_datapart_write)(part, buf, num_bytes, num_bytes, part_offset);
 #endif /* !DEFINE_IO_READ */
 #endif

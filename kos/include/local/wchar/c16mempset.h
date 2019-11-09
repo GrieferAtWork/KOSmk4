@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64e5d15b */
+/* HASH CRC-32:0x82d236a7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,7 +73,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localde
 __NAMESPACE_LOCAL_BEGIN
 /* Same as wmemset, but return a pointer after the last written character */
 __LOCAL_LIBC(c16mempset) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c16mempset))(__CHAR16_TYPE__ *__dst,
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16mempset))(__CHAR16_TYPE__ *__dst,
                                                         __CHAR16_TYPE__ __filler,
                                                         __SIZE_TYPE__ __num_chars) {
 #line 1268 "kos/src/libc/magic/wchar.c"

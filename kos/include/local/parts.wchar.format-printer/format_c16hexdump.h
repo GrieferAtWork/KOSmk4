@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40471688 */
+/* HASH CRC-32:0x2ee94de */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,7 +78,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: 0: The given data was successfully hex-dumped
  * @return: *: The first non-ZERO(0) return value of PRINTER */
 __LOCAL_LIBC(format_c16hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c16hexdump))(__pc16formatprinter __printer,
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16hexdump))(__pc16formatprinter __printer,
                                                                void *__arg,
                                                                void const *__restrict __data,
                                                                __SIZE_TYPE__ __size,

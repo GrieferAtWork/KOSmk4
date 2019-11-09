@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e35ea56 */
+/* HASH CRC-32:0xcfac7545 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -239,7 +239,7 @@ struct ifreq {
 			__UINT16_TYPE__    ifru_flags;
 			__UINT32_TYPE__    ifru_ivalue;
 			__UINT32_TYPE__    ifru_mtu;
-#else  /* __USE_KOS */
+#else /* __USE_KOS */
 			__INT16_TYPE__     ifru_flags;
 			__INT32_TYPE__     ifru_ivalue;
 			__INT32_TYPE__     ifru_mtu;

@@ -32,6 +32,10 @@
  *   - __CRT_FREESTANDING, _ALL_SOURCE
  *   - __CRT_FREESTANDING, __cplusplus
  *   - __CRT_FREESTANDING, __cplusplus, _ALL_SOURCE
+ *   - _ISOC_PURE_SOURCE
+ *   - _ISOC_PURE_SOURCE, _ALL_SOURCE
+ *   - _ISOC_PURE_SOURCE, __cplusplus
+ *   - _ISOC_PURE_SOURCE, __cplusplus, _ALL_SOURCE
  *   - __KERNEL__
  *   - __KERNEL__, _ALL_SOURCE
  *   - __KERNEL__, __cplusplus
@@ -40,6 +44,10 @@
  *   - __CRT_FREESTANDING, __KERNEL__, _ALL_SOURCE
  *   - __CRT_FREESTANDING, __KERNEL__, __cplusplus
  *   - __CRT_FREESTANDING, __KERNEL__, __cplusplus, _ALL_SOURCE
+ *   - _ISOC_PURE_SOURCE, __KERNEL__
+ *   - _ISOC_PURE_SOURCE, __KERNEL__, _ALL_SOURCE
+ *   - _ISOC_PURE_SOURCE, __KERNEL__, __cplusplus
+ *   - _ISOC_PURE_SOURCE, __KERNEL__, __cplusplus, _ALL_SOURCE
  * NOTE: The __KERNEL__ variants are achieved by include all *.c files
  *       twice, once as part of the kernel core, and once again as part
  *       of /bin/system-test
@@ -278,6 +286,7 @@ incdir("", "../../include");
 #include <elf.h>
 #include <endian.h>
 #include <envz.h>
+#include <err.h>
 #include <errno.h>
 #include <error.h>
 #if __has_include(<eti.h>)
@@ -807,7 +816,6 @@ incdir("", "../../include");
 #include <memory>
 #include <mutex>
 #include <new>
-#include <string_view>
 #include <type_traits>
 #include <typeinfo>
 #include <utility>

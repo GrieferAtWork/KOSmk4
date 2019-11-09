@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69bc5115 */
+/* HASH CRC-32:0x444c61c3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3371,6 +3371,17 @@ typedef __errno_t errno_t;
 typedef __size_t rsize_t;
 #endif /* !__rsize_t_defined */
 
+#ifndef __std_FILE_defined
+#define __std_FILE_defined 1
+__NAMESPACE_STD_BEGIN
+typedef __FILE FILE;
+__NAMESPACE_STD_END
+#endif /* !__std_FILE_defined */
+#ifndef __FILE_defined
+#define __FILE_defined 1
+__NAMESPACE_STD_USING(FILE)
+#endif /* !__FILE_defined */
+
 
 #ifndef _CRT_DIRECTORY_DEFINED
 #define _CRT_DIRECTORY_DEFINED 1
@@ -4255,47 +4266,119 @@ __CREDIRECT(__ATTR_NONNULL((3)) __ATTR_LIBC_PRINTF(3, 0),__STDC_INT_AS_SIZE_T,__
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
 __FORCELOCAL __ATTR_NONNULL((3)) __ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL vsprintf_s)(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vsnprintf))(__buf, __buflen, __format, __args); }
 #endif /* vsprintf_s... */
-#ifdef __CRT_HAVE_fscanf_s
+#if __has_builtin(__builtin_fscanf) && __has_builtin(__builtin_va_arg_pack) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fscanf)
+/* Scan data from `STREAM', following `FORMAT'
+ * Return the number of successfully scanned data items */
+__FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL fscanf_s)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) { return __builtin_fscanf(__stream, __format, __builtin_va_arg_pack()); }
+#elif defined(__CRT_HAVE_fscanf_s)
+/* Scan data from `STREAM', following `FORMAT'
+ * Return the number of successfully scanned data items */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL fscanf_s)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("fscanf_s");
-#elif defined(__CRT_HAVE_vfscanf_s)
-#include <local/stdio/fscanf_s.h>
-#ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(fscanf_s)
-#else /* __cplusplus */
-#define fscanf_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fscanf_s))
-#endif /* !__cplusplus */
+#elif defined(__CRT_HAVE_fscanf) && (!defined(__NO_ASMNAME))
+/* Scan data from `STREAM', following `FORMAT'
+ * Return the number of successfully scanned data items */
+__LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL fscanf_s)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fscanf");
+#elif (((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf)
+#include <local/stdio/fscanf.h>
+/* Scan data from `STREAM', following `FORMAT'
+ * Return the number of successfully scanned data items */
+#define fscanf_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fscanf))
 #endif /* fscanf_s... */
-#ifdef __CRT_HAVE_vfscanf_s
+#if __has_builtin(__builtin_vfscanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vfscanf)
+/* Scan data from `STREAM', following `FORMAT'
+ * Return the number of successfully scanned data items */
+__FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SIZE_T (__LIBCCALL vfscanf_s)(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return __builtin_vfscanf(__stream, __format, __args); }
+#elif defined(__CRT_HAVE_vfscanf_s)
+/* Scan data from `STREAM', following `FORMAT'
+ * Return the number of successfully scanned data items */
 __CDECLARE(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SIZE_T,,vfscanf_s,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),(__stream,__format,__args)) __THROWS(...)
+#elif defined(__CRT_HAVE_vfscanf)
+/* Scan data from `STREAM', following `FORMAT'
+ * Return the number of successfully scanned data items */
+__CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SIZE_T,,vfscanf_s,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfscanf,(__stream,__format,__args)) __THROWS(...)
+#elif ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))
+#include <local/stdio/vfscanf.h>
+/* Scan data from `STREAM', following `FORMAT'
+ * Return the number of successfully scanned data items */
+__FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SIZE_T (__LIBCCALL vfscanf_s)(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vfscanf))(__stream, __format, __args); }
 #endif /* vfscanf_s... */
-#ifdef __CRT_HAVE_scanf_s
+#if __has_builtin(__builtin_scanf) && __has_builtin(__builtin_va_arg_pack) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scanf)
+/* Scan data from `stdin', following `FORMAT'
+ * Return the number of successfully scanned data items */
+__FORCELOCAL __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SIZE_T (__VLIBCCALL scanf_s)(char const *__restrict __format, ...) __THROWS(...) { return __builtin_scanf(__format, __builtin_va_arg_pack()); }
+#elif defined(__CRT_HAVE_scanf_s)
+/* Scan data from `stdin', following `FORMAT'
+ * Return the number of successfully scanned data items */
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SIZE_T (__VLIBCCALL scanf_s)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("scanf_s");
-#elif defined(__CRT_HAVE_vscanf_s)
-#include <local/stdio/scanf_s.h>
-#ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(scanf_s)
-#else /* __cplusplus */
-#define scanf_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scanf_s))
-#endif /* !__cplusplus */
+#elif defined(__CRT_HAVE_scanf) && (!defined(__NO_ASMNAME))
+/* Scan data from `stdin', following `FORMAT'
+ * Return the number of successfully scanned data items */
+__LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SIZE_T (__VLIBCCALL scanf_s)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("scanf");
+#elif (!defined(__NO_STDSTREAMS) && ((((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf))) || defined(__CRT_HAVE_vscanf) || defined(__CRT_HAVE__vscanf) || defined(__CRT_HAVE_vscanf_unlocked)
+#include <local/stdio/scanf.h>
+/* Scan data from `stdin', following `FORMAT'
+ * Return the number of successfully scanned data items */
+#define scanf_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scanf))
 #endif /* scanf_s... */
-#ifdef __CRT_HAVE_vscanf_s
+#if __has_builtin(__builtin_vscanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vscanf)
+/* Scan data from `stdin', following `FORMAT'
+ * Return the number of successfully scanned data items */
+__FORCELOCAL __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SIZE_T (__LIBCCALL vscanf_s)(char const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return __builtin_vscanf(__format, __args); }
+#elif defined(__CRT_HAVE_vscanf_s)
+/* Scan data from `stdin', following `FORMAT'
+ * Return the number of successfully scanned data items */
 __CDECLARE(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SIZE_T,,vscanf_s,(char const *__restrict __format, __builtin_va_list __args),(__format,__args)) __THROWS(...)
+#elif defined(__CRT_HAVE_vscanf)
+/* Scan data from `stdin', following `FORMAT'
+ * Return the number of successfully scanned data items */
+__CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SIZE_T,,vscanf_s,(char const *__restrict __format, __builtin_va_list __args),vscanf,(__format,__args)) __THROWS(...)
+#elif !defined(__NO_STDSTREAMS) && ((((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf))
+#include <local/stdio/vscanf.h>
+/* Scan data from `stdin', following `FORMAT'
+ * Return the number of successfully scanned data items */
+__FORCELOCAL __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SIZE_T (__LIBCCALL vscanf_s)(char const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vscanf))(__format, __args); }
 #endif /* vscanf_s... */
-#ifdef __CRT_HAVE_sscanf_s
+#if __has_builtin(__builtin_sscanf) && __has_builtin(__builtin_va_arg_pack) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sscanf)
+/* Scan data from a given `INPUT' string, following `FORMAT'
+ * Return the number of successfully scanned data items */
+__FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL sscanf_s)(char const *__restrict __input, char const *__restrict __format, ...) { return __builtin_sscanf(__input, __format, __builtin_va_arg_pack()); }
+#elif defined(__CRT_HAVE_sscanf_s)
+/* Scan data from a given `INPUT' string, following `FORMAT'
+ * Return the number of successfully scanned data items */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL sscanf_s)(char const *__restrict __input, char const *__restrict __format, ...) __CASMNAME_SAME("sscanf_s");
-#elif defined(__CRT_HAVE_vsscanf_s)
-#include <local/stdio/sscanf_s.h>
-#ifdef __cplusplus
-__NAMESPACE_LOCAL_USING(sscanf_s)
-#else /* __cplusplus */
-#define sscanf_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sscanf_s))
-#endif /* !__cplusplus */
+#elif defined(__CRT_HAVE_sscanf) && (!defined(__NO_ASMNAME))
+/* Scan data from a given `INPUT' string, following `FORMAT'
+ * Return the number of successfully scanned data items */
+__LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL sscanf_s)(char const *__restrict __input, char const *__restrict __format, ...) __CASMNAME("sscanf");
+#else /* LIBC: sscanf */
+#include <local/stdio/sscanf.h>
+/* Scan data from a given `INPUT' string, following `FORMAT'
+ * Return the number of successfully scanned data items */
+#define sscanf_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sscanf))
 #endif /* sscanf_s... */
-#ifdef __CRT_HAVE_vsscanf_s
+#if __has_builtin(__builtin_vsscanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vsscanf)
+/* Scan data from a given `INPUT' string, following `FORMAT'
+ * Return the number of successfully scanned data items */
+__FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL vsscanf_s)(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args) { return __builtin_vsscanf(__input, __format, __args); }
+#elif defined(__CRT_HAVE_vsscanf_s)
+/* Scan data from a given `INPUT' string, following `FORMAT'
+ * Return the number of successfully scanned data items */
 __CDECLARE(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vsscanf_s,(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args),(__input,__format,__args))
+#elif defined(__CRT_HAVE_vsscanf)
+/* Scan data from a given `INPUT' string, following `FORMAT'
+ * Return the number of successfully scanned data items */
+__CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vsscanf_s,(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args),vsscanf,(__input,__format,__args))
+#else /* LIBC: vsscanf */
+#include <local/stdio/vsscanf.h>
+/* Scan data from a given `INPUT' string, following `FORMAT'
+ * Return the number of successfully scanned data items */
+__FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL vsscanf_s)(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vsscanf))(__input, __format, __args); }
 #endif /* vsscanf_s... */
 #ifdef __CRT_HAVE_vsnprintf_s
 __CDECLARE(__ATTR_NONNULL((4)) __ATTR_LIBC_PRINTF(4, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vsnprintf_s,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __buflen, char const *__restrict __format, __builtin_va_list __args),(__buf,__bufsize,__buflen,__format,__args))
+#else /* LIBC: vsnprintf_s */
+#include <local/stdio/vsnprintf_s.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(vsnprintf_s, __FORCELOCAL __ATTR_NONNULL((4)) __ATTR_LIBC_PRINTF(4, 0) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL vsnprintf_s)(char *__restrict __buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __buflen, char const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vsnprintf_s))(__buf, __bufsize, __buflen, __format, __args); })
 #endif /* vsnprintf_s... */
 #endif /* __USE_DOS_SLIB */
 
@@ -4428,13 +4511,13 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_unlock_file,(__FILE *__restr
 #endif /* _unlock_file... */
 #ifdef __CRT_HAVE__fclose_nolock
 /* Close and destroy a given file `STREAM' */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fclose_nolock,(FILE *__restrict __stream),(__stream))
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fclose_nolock,(__FILE *__restrict __stream),(__stream))
 #elif defined(__CRT_HAVE__IO_fclose)
 /* Close and destroy a given file `STREAM' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fclose_nolock,(FILE *__restrict __stream),_IO_fclose,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fclose_nolock,(__FILE *__restrict __stream),_IO_fclose,(__stream))
 #elif defined(__CRT_HAVE_fclose)
 /* Close and destroy a given file `STREAM' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fclose_nolock,(FILE *__restrict __stream),fclose,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_fclose_nolock,(__FILE *__restrict __stream),fclose,(__stream))
 #endif /* _fclose_nolock... */
 #ifdef __CRT_HAVE_fflush_unlocked
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */

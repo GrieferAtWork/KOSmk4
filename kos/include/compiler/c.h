@@ -43,9 +43,5 @@
 #define __BOOL unsigned char
 #endif
 
-#ifdef __CC__
-#   define __COMPILER_UNIPOINTER(p) ((void *)(__UINTPTR_TYPE__)(p))
-#else /* __CC__ */
-#   define __COMPILER_UNIPOINTER(p)                            (p)
-#endif /* !__CC__ */
+#define __COMPILER_REQTYPE(T, v) (v)
 

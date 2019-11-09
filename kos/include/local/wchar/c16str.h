@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbecee16c */
+/* HASH CRC-32:0x5cebd033 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Search for a given `NEEDLE' appearing as a sub-string within `HAYSTACK'
  * If no such needle exists, return `NULL' */
 __LOCAL_LIBC(c16str) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __CHAR16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c16str))(__CHAR16_TYPE__ const *__haystack,
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16str))(__CHAR16_TYPE__ const *__haystack,
                                                     __CHAR16_TYPE__ const *__needle) {
 #line 273 "kos/src/libc/magic/string.c"
 	__CHAR16_TYPE__ const *__hay2, *__ned_iter;

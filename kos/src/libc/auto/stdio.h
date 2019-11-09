@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18387b76 */
+/* HASH CRC-32:0xd041ddc1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -100,6 +100,13 @@ INTDEF NONNULL((4)) ATTR_LIBC_PRINTF(4, 6) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIB
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
 #define libc_vsprintf_s libc_vsnprintf
+/* Scan data from a given `INPUT' string, following `FORMAT'
+ * Return the number of successfully scanned data items */
+#define libc_sscanf_s libc_sscanf
+/* Scan data from a given `INPUT' string, following `FORMAT'
+ * Return the number of successfully scanned data items */
+#define libc_vsscanf_s libc_vsscanf
+INTDEF NONNULL((4)) ATTR_LIBC_PRINTF(4, 0) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_vsnprintf_s)(char *__restrict buf, size_t bufsize, size_t buflen, char const *__restrict format, va_list args);
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
 #define libc__fflush_nolock libc_fflush_unlocked
 #define libc_flushall libc__flushall

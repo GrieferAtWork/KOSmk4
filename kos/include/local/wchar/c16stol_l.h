@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa87014a6 */
+/* HASH CRC-32:0xfcc1d058 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,__localdep_c16stol,(__CHA
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16stol_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c16stol_l))(__CHAR16_TYPE__ const *__restrict __nptr,
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stol_l))(__CHAR16_TYPE__ const *__restrict __nptr,
                                                        __CHAR16_TYPE__ **__restrict __endptr,
                                                        int __base,
                                                        __locale_t __locale) {

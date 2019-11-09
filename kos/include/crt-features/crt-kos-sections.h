@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b378c51 */
+/* HASH CRC-32:0xaf850882 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -883,8 +883,6 @@
 #define __CRT_SECTION__scanf_l                              __CRT_SECTINFO_dos_FILE_locked_read_scanf               /* .text.crt.dos.FILE.locked.read.scanf._scanf_l */
 #define __CRT_SECTION__vfscanf_l                            __CRT_SECTINFO_dos_FILE_locked_read_scanf               /* .text.crt.dos.FILE.locked.read.scanf._vfscanf_l */
 #define __CRT_SECTION__vscanf_l                             __CRT_SECTINFO_dos_FILE_locked_read_scanf               /* .text.crt.dos.FILE.locked.read.scanf._vscanf_l */
-#define __CRT_SECTION_fscanf_s                              __CRT_SECTINFO_dos_FILE_locked_read_scanf               /* .text.crt.dos.FILE.locked.read.scanf.fscanf_s */
-#define __CRT_SECTION_vfscanf_s                             __CRT_SECTINFO_dos_FILE_locked_read_scanf               /* .text.crt.dos.FILE.locked.read.scanf.vfscanf_s */
 
 /* .text.crt.dos.FILE.locked.utility.* */
 #define __CRT_SECTION_clearerr_s                            __CRT_SECTINFO_dos_FILE_locked_utility                  /* .text.crt.dos.FILE.locked.utility.clearerr_s */
@@ -1155,10 +1153,6 @@
 #define __CRT_SECTION__snscanf                              __CRT_SECTINFO_dos_unicode_static_format_scanf          /* .text.crt.dos.unicode.static.format.scanf._snscanf */
 #define __CRT_SECTION__snscanf_s                            __CRT_SECTINFO_dos_unicode_static_format_scanf          /* .text.crt.dos.unicode.static.format.scanf._snscanf_s */
 #define __CRT_SECTION__vsnscanf                             __CRT_SECTINFO_dos_unicode_static_format_scanf          /* .text.crt.dos.unicode.static.format.scanf._vsnscanf */
-#define __CRT_SECTION_scanf_s                               __CRT_SECTINFO_dos_unicode_static_format_scanf          /* .text.crt.dos.unicode.static.format.scanf.scanf_s */
-#define __CRT_SECTION_sscanf_s                              __CRT_SECTINFO_dos_unicode_static_format_scanf          /* .text.crt.dos.unicode.static.format.scanf.sscanf_s */
-#define __CRT_SECTION_vscanf_s                              __CRT_SECTINFO_dos_unicode_static_format_scanf          /* .text.crt.dos.unicode.static.format.scanf.vscanf_s */
-#define __CRT_SECTION_vsscanf_s                             __CRT_SECTINFO_dos_unicode_static_format_scanf          /* .text.crt.dos.unicode.static.format.scanf.vsscanf_s */
 
 /* .text.crt.dos.unicode.static.memory.* */
 #define __CRT_SECTION__strupr_s                             __CRT_SECTINFO_dos_unicode_static_memory                /* .text.crt.dos.unicode.static.memory._strupr_s */

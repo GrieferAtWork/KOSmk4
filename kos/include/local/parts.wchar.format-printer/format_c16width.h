@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6cfe899 */
+/* HASH CRC-32:0x160ac7fc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 __LOCAL_LIBC(format_c16width) __ATTR_NONNULL((2)) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c16width))(void *__arg,
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16width))(void *__arg,
                                                              __CHAR16_TYPE__ const *__restrict __data,
                                                              __SIZE_TYPE__ __datalen) {
 #line 123 "kos/src/libc/magic/parts.wchar.format-printer.c"

@@ -59,7 +59,7 @@ DEFINE_SYSCALL6(syscall_slong_t, futex,
                 USER UNCHECKED uint32_t *, uaddr,
                 syscall_ulong_t, futex_op,
                 uint32_t, val,
-                USER UNCHECKED struct timespec32 const *, timeout_or_val2,
+                USER UNCHECKED struct __timespec32 const *, timeout_or_val2,
                 USER UNCHECKED uint32_t *, uaddr2,
                 uint32_t, val3) {
 	kernel_panic("TODO");

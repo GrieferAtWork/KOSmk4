@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17a95130 */
+/* HASH CRC-32:0x996ccf33 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `c16len', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __LOCAL_LIBC(c16nlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c16nlen))(__CHAR16_TYPE__ const *__restrict __string,
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16nlen))(__CHAR16_TYPE__ const *__restrict __string,
                                                      __SIZE_TYPE__ __maxlen) {
 #line 408 "kos/src/libc/magic/string.c"
 	return (__SIZE_TYPE__)(__localdep_c16nend(__string, __maxlen) - __string);

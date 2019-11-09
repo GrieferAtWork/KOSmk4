@@ -167,7 +167,7 @@ __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_endread)(struct atomic_owner_rwlock
 #ifdef NDEBUG
 	__COMPILER_READ_BARRIER();
 	return __hybrid_atomic_fetchdec(__self->aorw_lock, __ATOMIC_RELEASE) == 1;
-#else  /* NDEBUG */
+#else /* NDEBUG */
 	__UINTPTR_TYPE__ __f;
 	do {
 		__f = __hybrid_atomic_load(__self->aorw_lock, __ATOMIC_ACQUIRE);
