@@ -26,6 +26,7 @@
 #include <features.h>
 #include <stdint.h>
 #include <hybrid/typecore.h>
+#include <hybrid/__va_size.h>
 #ifdef __USE_DOS
 #include <xlocale.h>
 #endif /* __USE_DOS */
@@ -37,169 +38,403 @@ __SYSDECL_BEGIN
 #define __gwchar_t __WCHAR_TYPE__
 #endif
 
-#if __SIZEOF_LONG__ == 8
-#define __PRI64_PREFIX  "l"
-#define __PRIPTR_PREFIX "l"
-#else /* __SIZEOF_LONG__ == 8 */
-#define __PRI64_PREFIX  "ll"
-#define __PRIPTR_PREFIX
-#endif /* __SIZEOF_LONG__ != 8 */
+/* Since `__VA_SIZE >= sizeof(int)', and `sizeof(int) != 0',
+ * we also know that `sizeof(int) >= 1', meaning that any 8-bit
+ * data word will _always_ be promoted to an int, meaning in order
+ * to print an 8-bit data word we never need any sort of prefix! */
+#ifndef __PRI1_PREFIX
+#define __PRI1_PREFIX /* nothing */
+#endif /* !__PRI1_PREFIX */
 
-#define PRId8          "d"
-#define PRId16         "d"
-#define PRId32         "d"
-#define PRId64         __PRI64_PREFIX "d"
-#define PRIdLEAST8     "d"
-#define PRIdLEAST16    "d"
-#define PRIdLEAST32    "d"
-#define PRIdLEAST64    __PRI64_PREFIX "d"
-#define PRIdFAST8      "d"
-#define PRIdFAST16     __PRIPTR_PREFIX "d"
-#define PRIdFAST32     __PRIPTR_PREFIX "d"
-#define PRIdFAST64     __PRI64_PREFIX "d"
-#define PRIi8          "i"
-#define PRIi16         "i"
-#define PRIi32         "i"
-#define PRIi64         __PRI64_PREFIX "i"
-#define PRIiLEAST8     "i"
-#define PRIiLEAST16    "i"
-#define PRIiLEAST32    "i"
-#define PRIiLEAST64    __PRI64_PREFIX "i"
-#define PRIiFAST8      "i"
-#define PRIiFAST16     __PRIPTR_PREFIX "i"
-#define PRIiFAST32     __PRIPTR_PREFIX "i"
-#define PRIiFAST64     __PRI64_PREFIX "i"
-#define PRIo8          "o"
-#define PRIo16         "o"
-#define PRIo32         "o"
-#define PRIo64         __PRI64_PREFIX "o"
-#define PRIoLEAST8     "o"
-#define PRIoLEAST16    "o"
-#define PRIoLEAST32    "o"
-#define PRIoLEAST64    __PRI64_PREFIX "o"
-#define PRIoFAST8      "o"
-#define PRIoFAST16     __PRIPTR_PREFIX "o"
-#define PRIoFAST32     __PRIPTR_PREFIX "o"
-#define PRIoFAST64     __PRI64_PREFIX "o"
-#define PRIu8          "u"
-#define PRIu16         "u"
-#define PRIu32         "u"
-#define PRIu64         __PRI64_PREFIX "u"
-#define PRIuLEAST8     "u"
-#define PRIuLEAST16    "u"
-#define PRIuLEAST32    "u"
-#define PRIuLEAST64    __PRI64_PREFIX "u"
-#define PRIuFAST8      "u"
-#define PRIuFAST16     __PRIPTR_PREFIX "u"
-#define PRIuFAST32     __PRIPTR_PREFIX "u"
-#define PRIuFAST64     __PRI64_PREFIX "u"
-#define PRIx8          "x"
-#define PRIx16         "x"
-#define PRIx32         "x"
-#define PRIx64         __PRI64_PREFIX "x"
-#define PRIxLEAST8     "x"
-#define PRIxLEAST16    "x"
-#define PRIxLEAST32    "x"
-#define PRIxLEAST64    __PRI64_PREFIX "x"
-#define PRIxFAST8      "x"
-#define PRIxFAST16     __PRIPTR_PREFIX "x"
-#define PRIxFAST32     __PRIPTR_PREFIX "x"
-#define PRIxFAST64     __PRI64_PREFIX "x"
-#define PRIX8          "X"
-#define PRIX16         "X"
-#define PRIX32         "X"
-#define PRIX64         __PRI64_PREFIX "X"
-#define PRIXLEAST8     "X"
-#define PRIXLEAST16    "X"
-#define PRIXLEAST32    "X"
-#define PRIXLEAST64    __PRI64_PREFIX "X"
-#define PRIXFAST8      "X"
-#define PRIXFAST16     __PRIPTR_PREFIX "X"
-#define PRIXFAST32     __PRIPTR_PREFIX "X"
-#define PRIXFAST64     __PRI64_PREFIX "X"
-#define PRIdMAX        __PRI64_PREFIX "d"
-#define PRIiMAX        __PRI64_PREFIX "i"
-#define PRIoMAX        __PRI64_PREFIX "o"
-#define PRIuMAX        __PRI64_PREFIX "u"
-#define PRIxMAX        __PRI64_PREFIX "x"
-#define PRIXMAX        __PRI64_PREFIX "X"
-#define PRIdPTR        __PRIPTR_PREFIX "d"
-#define PRIiPTR        __PRIPTR_PREFIX "i"
-#define PRIoPTR        __PRIPTR_PREFIX "o"
-#define PRIuPTR        __PRIPTR_PREFIX "u"
-#define PRIxPTR        __PRIPTR_PREFIX "x"
-#define PRIXPTR        __PRIPTR_PREFIX "X"
+#ifndef __PRI2_PREFIX
+#if __VA_SIZE >= 2
+#define __PRI2_PREFIX /* nothing */
+#elif __SIZEOF_LONG__ == 2
+#define __PRI2_PREFIX "l"
+#elif __SIZEOF_POINTER__ == 2 && \
+     (defined(__CRT_KOS) || defined(__CRT_DOS))
+#define __PRI2_PREFIX "I"
+#elif __SIZEOF_LONG_LONG__ == 2
+#define __PRI2_PREFIX "ll"
+#else
+#define __PRI2_PREFIX "I16"
+#endif
+#endif /* !__PRI2_PREFIX */
 
-#define SCNd8          "hhd"
-#define SCNd16         "hd"
-#define SCNd32         "d"
-#define SCNd64         __PRI64_PREFIX "d"
-#define SCNdLEAST8     "hhd"
-#define SCNdLEAST16    "hd"
-#define SCNdLEAST32    "d"
-#define SCNdLEAST64    __PRI64_PREFIX "d"
-#define SCNdFAST8      "hhd"
-#define SCNdFAST16     __PRIPTR_PREFIX "d"
-#define SCNdFAST32     __PRIPTR_PREFIX "d"
-#define SCNdFAST64     __PRI64_PREFIX "d"
-#define SCNi8          "hhi"
-#define SCNi16         "hi"
-#define SCNi32         "i"
-#define SCNi64         __PRI64_PREFIX "i"
-#define SCNiLEAST8     "hhi"
-#define SCNiLEAST16    "hi"
-#define SCNiLEAST32    "i"
-#define SCNiLEAST64    __PRI64_PREFIX "i"
-#define SCNiFAST8      "hhi"
-#define SCNiFAST16     __PRIPTR_PREFIX "i"
-#define SCNiFAST32     __PRIPTR_PREFIX "i"
-#define SCNiFAST64     __PRI64_PREFIX "i"
-#define SCNu8          "hhu"
-#define SCNu16         "hu"
-#define SCNu32         "u"
-#define SCNu64         __PRI64_PREFIX "u"
-#define SCNuLEAST8     "hhu"
-#define SCNuLEAST16    "hu"
-#define SCNuLEAST32    "u"
-#define SCNuLEAST64    __PRI64_PREFIX "u"
-#define SCNuFAST8      "hhu"
-#define SCNuFAST16     __PRIPTR_PREFIX "u"
-#define SCNuFAST32     __PRIPTR_PREFIX "u"
-#define SCNuFAST64     __PRI64_PREFIX "u"
-#define SCNo8          "hho"
-#define SCNo16         "ho"
-#define SCNo32         "o"
-#define SCNo64         __PRI64_PREFIX "o"
-#define SCNoLEAST8     "hho"
-#define SCNoLEAST16    "ho"
-#define SCNoLEAST32    "o"
-#define SCNoLEAST64    __PRI64_PREFIX "o"
-#define SCNoFAST8      "hho"
-#define SCNoFAST16     __PRIPTR_PREFIX "o"
-#define SCNoFAST32     __PRIPTR_PREFIX "o"
-#define SCNoFAST64     __PRI64_PREFIX "o"
-#define SCNx8          "hhx"
-#define SCNx16         "hx"
-#define SCNx32         "x"
-#define SCNx64         __PRI64_PREFIX "x"
-#define SCNxLEAST8     "hhx"
-#define SCNxLEAST16    "hx"
-#define SCNxLEAST32    "x"
-#define SCNxLEAST64    __PRI64_PREFIX "x"
-#define SCNxFAST8      "hhx"
-#define SCNxFAST16     __PRIPTR_PREFIX "x"
-#define SCNxFAST32     __PRIPTR_PREFIX "x"
-#define SCNxFAST64     __PRI64_PREFIX "x"
-#define SCNdMAX        __PRI64_PREFIX "d"
-#define SCNiMAX        __PRI64_PREFIX "i"
-#define SCNoMAX        __PRI64_PREFIX "o"
-#define SCNuMAX        __PRI64_PREFIX "u"
-#define SCNxMAX        __PRI64_PREFIX "x"
-#define SCNdPTR        __PRIPTR_PREFIX "d"
-#define SCNiPTR        __PRIPTR_PREFIX "i"
-#define SCNoPTR        __PRIPTR_PREFIX "o"
-#define SCNuPTR        __PRIPTR_PREFIX "u"
-#define SCNxPTR        __PRIPTR_PREFIX "x"
+#ifndef __PRI4_PREFIX
+#if __VA_SIZE >= 4
+#define __PRI4_PREFIX /* nothing */
+#elif __SIZEOF_LONG__ == 4
+#define __PRI4_PREFIX "l"
+#elif __SIZEOF_POINTER__ == 4 && \
+     (defined(__CRT_KOS) || defined(__CRT_DOS))
+#define __PRI4_PREFIX "I"
+#elif __SIZEOF_LONG_LONG__ == 4
+#define __PRI4_PREFIX "ll"
+#else
+#define __PRI4_PREFIX "I32"
+#endif
+#endif /* !__PRI4_PREFIX */
+
+#ifndef __PRI8_PREFIX
+#if __VA_SIZE >= 8
+#define __PRI8_PREFIX /* nothing */
+#elif __SIZEOF_LONG__ == 8
+#define __PRI8_PREFIX "l"
+#elif __SIZEOF_INTMAX_T__ == 8
+#define __PRI8_PREFIX "j"
+#elif __SIZEOF_POINTER__ == 8 && \
+     (defined(__CRT_KOS) || defined(__CRT_DOS))
+#define __PRI8_PREFIX "I"
+#elif __SIZEOF_LONG_LONG__ == 8
+#define __PRI8_PREFIX "ll"
+#else
+#define __PRI8_PREFIX "I64"
+#endif
+#endif /* !__PRI8_PREFIX */
+
+#ifndef __PRIP_PREFIX
+#if __VA_SIZE >= __SIZEOF_POINTER__
+#define __PRIP_PREFIX /* nothing */
+#elif __SIZEOF_LONG__ == __SIZEOF_POINTER__
+#define __PRIP_PREFIX "l"
+#elif __SIZEOF_INTMAX_T__ == __SIZEOF_POINTER__
+#define __PRIP_PREFIX "j"
+#else
+#define __PRIP_PREFIX "I"
+#endif
+#endif /* !__PRIP_PREFIX */
+
+#define __PRIN2_PREFIX(n) __PRI##n##_PREFIX
+#define __PRIN_PREFIX(n) __PRIN2_PREFIX(n)
+#define __PRIL1_PREFIX __PRIN_PREFIX(__SIZEOF_INT_LEAST8_T__)
+#define __PRIL2_PREFIX __PRIN_PREFIX(__SIZEOF_INT_LEAST16_T__)
+#define __PRIL4_PREFIX __PRIN_PREFIX(__SIZEOF_INT_LEAST32_T__)
+#define __PRIL8_PREFIX __PRIN_PREFIX(__SIZEOF_INT_LEAST64_T__)
+#define __PRIF1_PREFIX __PRIN_PREFIX(__SIZEOF_INT_FAST8_T__)
+#define __PRIF2_PREFIX __PRIN_PREFIX(__SIZEOF_INT_FAST16_T__)
+#define __PRIF4_PREFIX __PRIN_PREFIX(__SIZEOF_INT_FAST32_T__)
+#define __PRIF8_PREFIX __PRIN_PREFIX(__SIZEOF_INT_FAST64_T__)
+
+
+#ifndef __SCA1_PREFIX
+#if __SIZEOF_INT__ == 1
+#define __SCA1_PREFIX /* nothing */
+#elif __SIZEOF_SHORT__ == 1
+#define __SCA1_PREFIX "h"
+#elif __SIZEOF_CHAR__ == 1
+#define __SCA1_PREFIX "hh"
+#else
+#define __SCA1_PREFIX "I8"
+#endif
+#endif /* !__SCA1_PREFIX */
+
+#ifndef __SCA2_PREFIX
+#if __SIZEOF_INT__ == 2
+#define __SCA2_PREFIX /* nothing */
+#elif __SIZEOF_SHORT__ == 2
+#define __SCA2_PREFIX "h"
+#elif __SIZEOF_LONG__ == 2
+#define __SCA2_PREFIX "l"
+#elif __SIZEOF_POINTER__ == 2
+#define __SCA2_PREFIX "I"
+#else
+#define __SCA2_PREFIX "I16"
+#endif
+#endif /* !__SCA2_PREFIX */
+
+#ifndef __SCA4_PREFIX
+#if __SIZEOF_INT__ == 4
+#define __SCA4_PREFIX /* nothing */
+#elif __SIZEOF_SHORT__ == 4
+#define __SCA4_PREFIX "h"
+#elif __SIZEOF_LONG__ == 4
+#define __SCA4_PREFIX "l"
+#elif __SIZEOF_POINTER__ == 4 && \
+     (defined(__CRT_KOS) || defined(__CRT_DOS))
+#define __SCA4_PREFIX "I"
+#elif __SIZEOF_LONG_LONG__ == 4
+#define __SCA4_PREFIX "ll"
+#else
+#define __SCA4_PREFIX "I32"
+#endif
+#endif /* !__SCA4_PREFIX */
+
+#ifndef __SCA8_PREFIX
+#if __SIZEOF_INT__ == 8
+#define __SCA8_PREFIX /* nothing */
+#elif __SIZEOF_SHORT__ == 8
+#define __SCA8_PREFIX "h"
+#elif __SIZEOF_LONG__ == 8
+#define __SCA8_PREFIX "l"
+#elif __SIZEOF_POINTER__ == 8 && \
+     (defined(__CRT_KOS) || defined(__CRT_DOS))
+#define __SCA8_PREFIX "I"
+#elif __SIZEOF_LONG_LONG__ == 8
+#define __SCA8_PREFIX "ll"
+#else
+#define __SCA8_PREFIX "I64"
+#endif
+#endif /* !__SCA8_PREFIX */
+
+#ifndef __SCAP_PREFIX
+#if __SIZEOF_INT__ == __SIZEOF_POINTER__
+#define __SCAP_PREFIX /* nothing */
+#elif __SIZEOF_LONG__ == __SIZEOF_POINTER__
+#define __SCAP_PREFIX "l"
+#elif __SIZEOF_INTMAX_T__ == __SIZEOF_POINTER__
+#define __SCAP_PREFIX "j"
+#else
+#define __SCAP_PREFIX "I"
+#endif
+#endif /* !__SCAP_PREFIX */
+
+#define __SCAN2_PREFIX(n) __SCA##n##_PREFIX
+#define __SCAN_PREFIX(n) __SCAN2_PREFIX(n)
+#define __SCAL1_PREFIX __SCAN_PREFIX(__SIZEOF_INT_LEAST8_T__)
+#define __SCAL2_PREFIX __SCAN_PREFIX(__SIZEOF_INT_LEAST16_T__)
+#define __SCAL4_PREFIX __SCAN_PREFIX(__SIZEOF_INT_LEAST32_T__)
+#define __SCAL8_PREFIX __SCAN_PREFIX(__SIZEOF_INT_LEAST64_T__)
+#define __SCAF1_PREFIX __SCAN_PREFIX(__SIZEOF_INT_FAST8_T__)
+#define __SCAF2_PREFIX __SCAN_PREFIX(__SIZEOF_INT_FAST16_T__)
+#define __SCAF4_PREFIX __SCAN_PREFIX(__SIZEOF_INT_FAST32_T__)
+#define __SCAF8_PREFIX __SCAN_PREFIX(__SIZEOF_INT_FAST64_T__)
+
+
+
+/* printf(): (u)int8_t */
+#define PRId8          __PRI1_PREFIX "d"
+#define PRIi8          __PRI1_PREFIX "i"
+#define PRIo8          __PRI1_PREFIX "o"
+#define PRIu8          __PRI1_PREFIX "u"
+#define PRIx8          __PRI1_PREFIX "x"
+#define PRIX8          __PRI1_PREFIX "X"
+
+/* printf(): (u)int16_t */
+#define PRId16         __PRI2_PREFIX "d"
+#define PRIi16         __PRI2_PREFIX "i"
+#define PRIo16         __PRI2_PREFIX "o"
+#define PRIu16         __PRI2_PREFIX "u"
+#define PRIx16         __PRI2_PREFIX "x"
+#define PRIX16         __PRI2_PREFIX "X"
+
+/* printf(): (u)int32_t */
+#define PRId32         __PRI4_PREFIX "d"
+#define PRIi32         __PRI4_PREFIX "i"
+#define PRIo32         __PRI4_PREFIX "o"
+#define PRIu32         __PRI4_PREFIX "u"
+#define PRIx32         __PRI4_PREFIX "x"
+#define PRIX32         __PRI4_PREFIX "X"
+
+/* printf(): (u)int64_t */
+#define PRId64         __PRI8_PREFIX "d"
+#define PRIi64         __PRI8_PREFIX "i"
+#define PRIo64         __PRI8_PREFIX "o"
+#define PRIu64         __PRI8_PREFIX "u"
+#define PRIx64         __PRI8_PREFIX "x"
+#define PRIX64         __PRI8_PREFIX "X"
+
+/* printf(): (u)int_least8_t */
+#define PRIdLEAST8     __PRIL1_PREFIX "d"
+#define PRIiLEAST8     __PRIL1_PREFIX "i"
+#define PRIoLEAST8     __PRIL1_PREFIX "o"
+#define PRIuLEAST8     __PRIL1_PREFIX "u"
+#define PRIxLEAST8     __PRIL1_PREFIX "x"
+#define PRIXLEAST8     __PRIL1_PREFIX "X"
+
+/* printf(): (u)int_least16_t */
+#define PRIdLEAST16    __PRIL2_PREFIX "d"
+#define PRIiLEAST16    __PRIL2_PREFIX "i"
+#define PRIoLEAST16    __PRIL2_PREFIX "o"
+#define PRIuLEAST16    __PRIL2_PREFIX "u"
+#define PRIxLEAST16    __PRIL2_PREFIX "x"
+#define PRIXLEAST16    __PRIL2_PREFIX "X"
+
+/* printf(): (u)int_least32_t */
+#define PRIdLEAST32    __PRIL4_PREFIX "d"
+#define PRIiLEAST32    __PRIL4_PREFIX "i"
+#define PRIoLEAST32    __PRIL4_PREFIX "o"
+#define PRIuLEAST32    __PRIL4_PREFIX "u"
+#define PRIxLEAST32    __PRIL4_PREFIX "x"
+#define PRIXLEAST32    __PRIL4_PREFIX "X"
+
+/* printf(): (u)int_least64_t */
+#define PRIdLEAST64    __PRIL8_PREFIX "d"
+#define PRIiLEAST64    __PRIL8_PREFIX "i"
+#define PRIoLEAST64    __PRIL8_PREFIX "o"
+#define PRIuLEAST64    __PRIL8_PREFIX "u"
+#define PRIxLEAST64    __PRIL8_PREFIX "x"
+#define PRIXLEAST64    __PRIL8_PREFIX "X"
+
+/* printf(): (u)int_fast8_t */
+#define PRIdFAST8      __PRIF1_PREFIX "d"
+#define PRIiFAST8      __PRIF1_PREFIX "i"
+#define PRIoFAST8      __PRIF1_PREFIX "o"
+#define PRIuFAST8      __PRIF1_PREFIX "u"
+#define PRIxFAST8      __PRIF1_PREFIX "x"
+#define PRIXFAST8      __PRIF1_PREFIX "X"
+
+/* printf(): (u)int_fast16_t */
+#define PRIdFAST16     __PRIF2_PREFIX "d"
+#define PRIiFAST16     __PRIF2_PREFIX "i"
+#define PRIoFAST16     __PRIF2_PREFIX "o"
+#define PRIuFAST16     __PRIF2_PREFIX "u"
+#define PRIxFAST16     __PRIF2_PREFIX "x"
+#define PRIXFAST16     __PRIF2_PREFIX "X"
+
+/* printf(): (u)int_fast32_t */
+#define PRIdFAST32     __PRIF4_PREFIX "d"
+#define PRIiFAST32     __PRIF4_PREFIX "i"
+#define PRIoFAST32     __PRIF4_PREFIX "o"
+#define PRIuFAST32     __PRIF4_PREFIX "u"
+#define PRIxFAST32     __PRIF4_PREFIX "x"
+#define PRIXFAST32     __PRIF4_PREFIX "X"
+
+/* printf(): (u)int_fast64_t */
+#define PRIdFAST64     __PRIF8_PREFIX "d"
+#define PRIiFAST64     __PRIF8_PREFIX "i"
+#define PRIoFAST64     __PRIF8_PREFIX "o"
+#define PRIuFAST64     __PRIF8_PREFIX "u"
+#define PRIxFAST64     __PRIF8_PREFIX "x"
+#define PRIXFAST64     __PRIF8_PREFIX "X"
+
+/* printf(): (u)intmax_t */
+#define PRIdMAX        __PRI8_PREFIX "d"
+#define PRIiMAX        __PRI8_PREFIX "i"
+#define PRIoMAX        __PRI8_PREFIX "o"
+#define PRIuMAX        __PRI8_PREFIX "u"
+#define PRIxMAX        __PRI8_PREFIX "x"
+#define PRIXMAX        __PRI8_PREFIX "X"
+
+/* printf(): (u)intptr_t / void * */
+#define PRIdPTR        __PRIP_PREFIX "d"
+#define PRIiPTR        __PRIP_PREFIX "i"
+#define PRIoPTR        __PRIP_PREFIX "o"
+#define PRIuPTR        __PRIP_PREFIX "u"
+#define PRIxPTR        __PRIP_PREFIX "x"
+#define PRIXPTR        __PRIP_PREFIX "X"
+
+#ifdef __USE_KOS
+/* printf(): (s)size_t */
+#define PRIdSIZ        __PRIP_PREFIX "d"
+#define PRIiSIZ        __PRIP_PREFIX "i"
+#define PRIoSIZ        __PRIP_PREFIX "o"
+#define PRIuSIZ        __PRIP_PREFIX "u"
+#define PRIxSIZ        __PRIP_PREFIX "x"
+#define PRIXSIZ        __PRIP_PREFIX "X"
+#endif /* __USE_KOS */
+
+
+
+
+/* scanf(): (u)int8_t */
+#define SCNd8          __SCA1_PREFIX "d"
+#define SCNi8          __SCA1_PREFIX "i"
+#define SCNu8          __SCA1_PREFIX "u"
+#define SCNo8          __SCA1_PREFIX "o"
+#define SCNx8          __SCA1_PREFIX "x"
+
+/* scanf(): (u)int16_t */
+#define SCNd16         __SCA2_PREFIX "d"
+#define SCNi16         __SCA2_PREFIX "i"
+#define SCNu16         __SCA2_PREFIX "u"
+#define SCNo16         __SCA2_PREFIX "o"
+#define SCNx16         __SCA2_PREFIX "x"
+
+/* scanf(): (u)int32_t */
+#define SCNd32         __SCA4_PREFIX "d"
+#define SCNi32         __SCA4_PREFIX "i"
+#define SCNu32         __SCA4_PREFIX "u"
+#define SCNo32         __SCA4_PREFIX "o"
+#define SCNx32         __SCA4_PREFIX "x"
+
+/* scanf(): (u)int64_t */
+#define SCNd64         __SCA8_PREFIX "d"
+#define SCNi64         __SCA8_PREFIX "i"
+#define SCNu64         __SCA8_PREFIX "u"
+#define SCNo64         __SCA8_PREFIX "o"
+#define SCNx64         __SCA8_PREFIX "x"
+
+/* scanf(): (u)int_least8_t */
+#define SCNdLEAST8     __SCAL1_PREFIX "d"
+#define SCNiLEAST8     __SCAL1_PREFIX "i"
+#define SCNuLEAST8     __SCAL1_PREFIX "u"
+#define SCNoLEAST8     __SCAL1_PREFIX "o"
+#define SCNxLEAST8     __SCAL1_PREFIX "x"
+
+/* scanf(): (u)int_least16_t */
+#define SCNdLEAST16    __SCAL2_PREFIX "d"
+#define SCNiLEAST16    __SCAL2_PREFIX "i"
+#define SCNuLEAST16    __SCAL2_PREFIX "u"
+#define SCNoLEAST16    __SCAL2_PREFIX "o"
+#define SCNxLEAST16    __SCAL2_PREFIX "x"
+
+/* scanf(): (u)int_least32_t */
+#define SCNdLEAST32    __SCAL4_PREFIX "d"
+#define SCNiLEAST32    __SCAL4_PREFIX "i"
+#define SCNuLEAST32    __SCAL4_PREFIX "u"
+#define SCNoLEAST32    __SCAL4_PREFIX "o"
+#define SCNxLEAST32    __SCAL4_PREFIX "x"
+
+/* scanf(): (u)int_least64_t */
+#define SCNdLEAST64    __SCAL8_PREFIX "d"
+#define SCNiLEAST64    __SCAL8_PREFIX "i"
+#define SCNuLEAST64    __SCAL8_PREFIX "u"
+#define SCNoLEAST64    __SCAL8_PREFIX "o"
+#define SCNxLEAST64    __SCAL8_PREFIX "x"
+
+/* scanf(): (u)int_fast8_t */
+#define SCNdFAST8      __SCAF1_PREFIX "d"
+#define SCNiFAST8      __SCAF1_PREFIX "i"
+#define SCNuFAST8      __SCAF1_PREFIX "u"
+#define SCNoFAST8      __SCAF1_PREFIX "o"
+#define SCNxFAST8      __SCAF1_PREFIX "x"
+
+/* scanf(): (u)int_fast16_t */
+#define SCNdFAST16     __SCAF2_PREFIX "d"
+#define SCNiFAST16     __SCAF2_PREFIX "i"
+#define SCNuFAST16     __SCAF2_PREFIX "u"
+#define SCNoFAST16     __SCAF2_PREFIX "o"
+#define SCNxFAST16     __SCAF2_PREFIX "x"
+
+/* scanf(): (u)int_fast32_t */
+#define SCNdFAST32     __SCAF4_PREFIX "d"
+#define SCNiFAST32     __SCAF4_PREFIX "i"
+#define SCNuFAST32     __SCAF4_PREFIX "u"
+#define SCNoFAST32     __SCAF4_PREFIX "o"
+#define SCNxFAST32     __SCAF4_PREFIX "x"
+
+/* scanf(): (u)int_fast64_t */
+#define SCNdFAST64     __SCAF8_PREFIX "d"
+#define SCNiFAST64     __SCAF8_PREFIX "i"
+#define SCNuFAST64     __SCAF8_PREFIX "u"
+#define SCNoFAST64     __SCAF8_PREFIX "o"
+#define SCNxFAST64     __SCAF8_PREFIX "x"
+
+/* scanf(): (u)intmax_t */
+#define SCNdMAX        __SCA8_PREFIX "d"
+#define SCNiMAX        __SCA8_PREFIX "i"
+#define SCNuMAX        __SCA8_PREFIX "u"
+#define SCNoMAX        __SCA8_PREFIX "o"
+#define SCNxMAX        __SCA8_PREFIX "x"
+
+/* scanf(): (u)intptr_t / void * */
+#define SCNdPTR        __SCAP_PREFIX "d"
+#define SCNiPTR        __SCAP_PREFIX "i"
+#define SCNuPTR        __SCAP_PREFIX "u"
+#define SCNoPTR        __SCAP_PREFIX "o"
+#define SCNxPTR        __SCAP_PREFIX "x"
+
+#ifdef __USE_KOS
+/* scanf(): (s)size_t */
+#define SCNdSIZ        __SCAP_PREFIX "d"
+#define SCNiSIZ        __SCAP_PREFIX "i"
+#define SCNuSIZ        __SCAP_PREFIX "u"
+#define SCNoSIZ        __SCAP_PREFIX "o"
+#define SCNxSIZ        __SCAP_PREFIX "x"
+#endif /* __USE_KOS */
+
+
 
 #ifdef __CC__
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa36802f0 */
+/* HASH CRC-32:0xfbcf019 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ __LOCAL_LIBC(c16toumax) __ATTR_PURE __ATTR_NONNULL((1)) __UINTMAX_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16toumax))(__CHAR16_TYPE__ const *__restrict __nptr,
                                                        __CHAR16_TYPE__ **__endptr,
                                                        int __base) {
-#line 274 "kos/src/libc/magic/inttypes.c"
+#line 509 "kos/src/libc/magic/inttypes.c"
 #if __SIZEOF_INTMAX_T__ <= 4
 	return (__UINTMAX_TYPE__)__localdep_c16stou32(__nptr, __endptr, __base);
 #else /* __SIZEOF_INTMAX_T__ <= 4 */

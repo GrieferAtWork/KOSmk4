@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf00f0fea */
+/* HASH CRC-32:0xf197f918 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ __LOCAL_LIBC(wcstoimax) __ATTR_PURE __ATTR_NONNULL((1)) __INTMAX_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstoimax))(__WCHAR_TYPE__ const *__restrict __nptr,
                                                        __WCHAR_TYPE__ **__endptr,
                                                        int __base) {
-#line 260 "kos/src/libc/magic/inttypes.c"
+#line 495 "kos/src/libc/magic/inttypes.c"
 #if __SIZEOF_INTMAX_T__ <= 4
 	return (__INTMAX_TYPE__)__localdep_wcsto32(__nptr, __endptr, __base);
 #else /* __SIZEOF_INTMAX_T__ <= 4 */

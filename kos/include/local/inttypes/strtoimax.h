@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x428c23c2 */
+/* HASH CRC-32:0x4314d530 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ __LOCAL_LIBC(strtoimax) __ATTR_PURE __ATTR_NONNULL((1)) __INTMAX_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoimax))(char const *__restrict __nptr,
                                                        char **__endptr,
                                                        int __base) {
-#line 260 "kos/src/libc/magic/inttypes.c"
+#line 495 "kos/src/libc/magic/inttypes.c"
 #if __SIZEOF_INTMAX_T__ <= 4
 	return (__INTMAX_TYPE__)__localdep_strto32(__nptr, __endptr, __base);
 #else /* __SIZEOF_INTMAX_T__ <= 4 */

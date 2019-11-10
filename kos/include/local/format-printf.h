@@ -54,17 +54,8 @@
 #endif /* !__FORMAT_ARGS */
 
 #include <hybrid/typecore.h>
+#include <hybrid/__va_size.h>
 
-#ifndef __VA_SIZE
-#include <hybrid/host.h>
-#if defined(__x86_64__)
-#define __VA_SIZE  8
-#elif defined(__i386__)
-#define __VA_SIZE  4
-#else
-#define __VA_SIZE  __SIZEOF_INT__
-#endif
-#endif /* !__VA_SIZE */
 #if __VA_SIZE >= 8
 #   define __PRINTF_LENGTH_R64  0
 #   define __PRINTF_LENGTH_R32  0

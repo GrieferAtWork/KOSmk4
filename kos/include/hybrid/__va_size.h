@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x4ea9f742 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,13 +16,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_imaxabs_defined
-#define __local_imaxabs_defined 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(imaxabs) __ATTR_CONST __INTMAX_TYPE__
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(imaxabs))(__INTMAX_TYPE__ __x) {
-#line 477 "kos/src/libc/magic/inttypes.c"
-	return __x < 0 ? -__x : __x;
-}
-__NAMESPACE_LOCAL_END
-#endif /* !__local_imaxabs_defined */
+#ifndef __GUARD_HYBRID___VA_SIZE_H
+#define __GUARD_HYBRID___VA_SIZE_H 1
+
+#include "../__stdinc.h"
+#include "host.h"
+
+/* __VA_SIZE: Minimal size of integral type arguments in ellipsis
+ *            May be used to optimize PRI* macros from <inttypes.h>,
+ *            as well as implement a more efficient `printf()' function. */
+#ifndef __VA_SIZE
+#if defined(__x86_64__)
+#define __VA_SIZE 8
+#elif defined(__i386__)
+#define __VA_SIZE 4
+#else
+#include "typecore.h"
+/* The C standard implies a minimal alignment for int-types.
+ * With this in mind (and so-as not to do something wrong), assume
+ * integer alignment an all other cases */
+#define __VA_SIZE __SIZEOF_INT__
+#endif
+#endif /* !__VA_SIZE */
+
+
+#endif /* !__GUARD_HYBRID___VA_SIZE_H */
