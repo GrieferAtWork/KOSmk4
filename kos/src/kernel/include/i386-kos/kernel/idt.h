@@ -65,8 +65,37 @@ DATDEF struct idt_segment x86_dbgidt[256];
 DATDEF struct desctab const x86_dbgidt_ptr;
 #endif /* !CONFIG_NO_DEBUGGER */
 
-
-//FUNDEF void KCALL x86_;
+/* Start modifying `x86_idt'
+ * This function must be called prior to making modifications to `x86_idt'.
+ * Doing this is required to prevent other CPUs/threads from servicing
+ * interrupts with IDT segments that aren't fully initialized.
+ * As such, any modifications made to `x86_dbgidt' after this function
+ * is called will only code into effect once `x86_idt_modify_end()' is
+ * called. These functions are implemented as:
+ *   x86_idt_modify_start():
+ *     - Acquire an internal mutex
+ *     - Allocate an internal copy of the IDT
+ *     - Copy `x86_idt' into the internal copy
+ *     - Broadcast an IPI, telling all CPUs to lidt() the internal copy
+ *   x86_idt_modify_end():
+ *     - if (discard_changes) x86_idt = <INTERNAL_COPY>;
+ *     - Broadcast an IPI, telling all CPUs to `lidt(&x86_idt_ptr)'
+ *     - Free the internal copy previously allocated by `x86_idt_modify_start()'
+ *     - Release the internal mutex
+ * Using this method, changes can be staged for eventual use in `x86_idt',
+ * without running the risk of any CPU/thread ever accessing an incomplete/
+ * corrupt IDT entry.
+ * When calling `x86_idt_modify_end()', the caller is responsible to ensure
+ * that the call was preceded by `x86_idt_modify_start()', as well as to ensure
+ * that any call to `x86_idt_modify_start()' is eventually followed by another
+ * call to `x86_idt_modify_end()'
+ * Also note that these functions must not be called recursively from the same
+ * thread. - A call to `x86_idt_modify_start()' must _NOT_ be followed by another
+ * call to `x86_idt_modify_start()' from the same thread! */
+FUNDEF void FCALL x86_idt_modify_start(void)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INTERRUPT);
+FUNDEF NOBLOCK void
+NOTHROW(FCALL x86_idt_modify_end)(bool discard_changes DFL(false));
 
 
 #endif /* __CC__ */

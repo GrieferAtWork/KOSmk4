@@ -2150,10 +2150,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak __predict_update_dx; .long __predict_update_dx
 	.reloc ., R_386_SIZE32, __predict_update_dx; .long 0
 	.long 0x455218
-	.long 0 /* index: 537 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname537 /* index: 537 */
+	.weak x86_idt_modify_start; .long x86_idt_modify_start
+	.reloc ., R_386_SIZE32, x86_idt_modify_start; .long 0
+	.long 0xf6afb04
 	.long 0 /* index: 538 */
 	.long 0
 	.long 0
@@ -11002,10 +11002,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 2750 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2750 /* index: 2750 */
+	.weak x86_idt_modify_end; .long x86_idt_modify_end
+	.reloc ., R_386_SIZE32, x86_idt_modify_end; .long 0
+	.long 0x39f5c14
 	.long 0 /* index: 2751 */
 	.long 0
 	.long 0
@@ -16964,6 +16964,8 @@ END(kernel_symbol_table)
 	.string "sys_recvmmsg"
 .Lname536:
 	.string "__predict_update_dx"
+.Lname537:
+	.string "x86_idt_modify_start"
 .Lname539:
 	.string "__cpuset_full_mask"
 .Lname543:
@@ -19286,6 +19288,8 @@ END(kernel_symbol_table)
 	.string "vm_datablock_vio_write_phys"
 .Lname2745:
 	.string "dbg_impersonate_thread"
+.Lname2750:
+	.string "x86_idt_modify_end"
 .Lname2756:
 	.string "directory_mknod"
 .Lname2757:

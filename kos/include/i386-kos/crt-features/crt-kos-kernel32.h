@@ -2160,6 +2160,8 @@
 #define __CRT_HAVE_x86_fxsave 1
 #define __CRT_HAVE_x86_fxsave_mxcsr_mask 1
 #define __CRT_HAVE_x86_idt 1
+#define __CRT_HAVE_x86_idt_modify_end 1
+#define __CRT_HAVE_x86_idt_modify_start 1
 #define __CRT_HAVE_x86_idt_ptr 1
 #define __CRT_HAVE_x86_lapic_base_address 1
 #define __CRT_HAVE_x86_lapic_id 1
