@@ -17,17 +17,17 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#include "isr32.S"
-#define ISR_VECTOR 0e
+#include "idt32.S"
+#define IDT_VECTOR 0e
 #endif /* __INTELLISENSE__ */
 
-#if ISR_X86_CONFIG_GETDPL(ISR_VECTOR_ID) == 3
-ISR_HANDLER_SETDPL(3)
-#endif /* ISR_X86_CONFIG_GETDPL(ISR_VECTOR_ID) == 3 */
+#if IDT_CONFIG_GETDPL(IDT_VECTOR_ID) == 3
+IDT_HANDLER_SETDPL(3)
+#endif /* IDT_CONFIG_GETDPL(IDT_VECTOR_ID) == 3 */
 
-ISR_HANDLER_BEGIN
+IDT_HANDLER_BEGIN
 	.cfi_startproc simple
-#if ISR_VECTOR_ID == 0x08 || defined(__DEEMON__)
+#if IDT_VECTOR_ID == 0x08 || defined(__DEEMON__)
 	/* Double Fault */
 	.cfi_signal_frame
 	.cfi_def_cfa %ebp, 0
@@ -109,7 +109,7 @@ __ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_LDTR),0x56,0x22)
 	movl   %esi, x86_cputss_df + OFFSET_TSS_ESI(%esi)
 	movl   %esp, x86_cputss_df + OFFSET_TSS_ESP(%esi)
 	movl   %ebp, x86_cputss_df + OFFSET_TSS_EBP(%esi)
-	movl   $(PP_CAT2(__x86_defisr_, ISR_VECTOR_NAME)), x86_cputss_df + OFFSET_TSS_EIP(%esi)
+	movl   $(PP_CAT2(x86_defidt_, IDT_VECTOR_NAME)), x86_cputss_df + OFFSET_TSS_EIP(%esi)
 
 	movl   %ebp, %esp
 
@@ -165,8 +165,8 @@ __ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_LDTR),0x56,0x22)
 
 	/* Invoke the C-level double-fault handler. */
 	movl   %esp, %ecx
-	INTERN(PP_CAT2(x86_handle_, ISR_VECTOR_NAME))
-	call   PP_CAT2(x86_handle_, ISR_VECTOR_NAME)
+	INTERN(PP_CAT2(x86_handle_, IDT_VECTOR_NAME))
+	call   PP_CAT2(x86_handle_, IDT_VECTOR_NAME)
 
 	cli
 	.cfi_def_cfa_register %eax
@@ -233,14 +233,14 @@ __ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_LDTR),0x56,0x22)
 	/* Resume execution. */
 	iret
 #undef OFFSET_DF_CPUSTATE_REGS
-#else /* ISR_VECTOR_ID == 0x08 */
+#else /* IDT_VECTOR_ID == 0x08 */
 	.cfi_iret_signal_frame
-#if ISR_X86_CONFIG_PUSHESERRORS(ISR_VECTOR_ID)
+#if IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)
 	.cfi_def_cfa %esp, 4 /* Adjust for the error code. */
 	popl_cfi %ss:-(12 + SIZEOF_GPREGS + 4)(%esp) /* ECODE */
-#else /* ISR_X86_CONFIG_PUSHESERRORS(ISR_VECTOR_ID) */
+#else /* IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */
 	.cfi_def_cfa %esp, 0
-#endif /* !ISR_X86_CONFIG_PUSHESERRORS(ISR_VECTOR_ID) */
+#endif /* !IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */
 
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -257,12 +257,12 @@ __ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_LDTR),0x56,0x22)
 	movw   %ax, %fs
 
 	movl   %esp, %ecx     /* struct icpustate *state */
-#if ISR_X86_CONFIG_PUSHESERRORS(ISR_VECTOR_ID)
+#if IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)
 	movl   -4(%esp), %edx /* uintptr_t ecode */
-#endif /* ISR_X86_CONFIG_PUSHESERRORS(ISR_VECTOR_ID) */
+#endif /* IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */
 
-	INTERN(PP_CAT2(x86_handle_, ISR_VECTOR_NAME))
-	call   PP_CAT2(x86_handle_, ISR_VECTOR_NAME)
+	INTERN(PP_CAT2(x86_handle_, IDT_VECTOR_NAME))
+	call   PP_CAT2(x86_handle_, IDT_VECTOR_NAME)
 
 	popal_cfi_r
 	popl_cfi %fs
@@ -272,24 +272,24 @@ __ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_LDTR),0x56,0x22)
 	popl_cfi %ds
 	.cfi_restore_iret_ds
 	iret
-#endif /* ISR_VECTOR_ID != 0x08 */
+#endif /* IDT_VECTOR_ID != 0x08 */
 	.cfi_endproc
-ISR_HANDLER_END
+IDT_HANDLER_END
 
 
-_isr_set_impl_section cirq, ISR_VECTOR_NAME
-.weak PP_CAT2(x86_handle_, ISR_VECTOR_NAME)
-INTERN_FUNCTION(PP_CAT2(x86_handle_, ISR_VECTOR_NAME))
+_idt_set_impl_section cirq, IDT_VECTOR_NAME
+.weak PP_CAT2(x86_handle_, IDT_VECTOR_NAME)
+INTERN_FUNCTION(PP_CAT2(x86_handle_, IDT_VECTOR_NAME))
 	.cfi_startproc
-#if !ISR_X86_CONFIG_PUSHESERRORS(ISR_VECTOR_ID)
+#if !IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)
 	xorl   %edx, %edx /* uintptr_t ecode */
-#endif /* ISR_X86_CONFIG_PUSHESERRORS(ISR_VECTOR_ID) */
-	pushl_cfi $(ISR_VECTOR_ID)
-	INTERN(x86_handle_isr)
-	call   x86_handle_isr
+#endif /* IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */
+	pushl_cfi $(IDT_VECTOR_ID)
+	INTERN(x86_handle_idt)
+	call   x86_handle_idt
 	.cfi_adjust_cfa_offset -4
 	ret
 	.cfi_endproc
-END(PP_CAT2(x86_handle_, ISR_VECTOR_NAME))
+END(PP_CAT2(x86_handle_, IDT_VECTOR_NAME))
 
-#undef ISR_VECTOR
+#undef IDT_VECTOR

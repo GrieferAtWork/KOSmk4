@@ -23,7 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
-#include <kernel/interrupt.h>
+#include <kernel/isr.h>
 #include <kernel/printk.h>
 
 #include <hybrid/host.h>

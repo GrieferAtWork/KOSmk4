@@ -501,10 +501,10 @@ SECTIONS {
 #endif /* !CONFIG_NO_PAGING_P32 */
 #endif /* !__x86_64__ */
 
-#include "interrupt.ld"
+#include "idt.ld"
 #ifndef CONFIG_NO_DEBUGGER
-#define PREFIX __x86_dbg
-#include "interrupt.ld"
+#define PREFIX x86_dbg
+#include "idt.ld"
 #endif /* !CONFIG_NO_DEBUGGER */
 
 	/DISCARD/ : {

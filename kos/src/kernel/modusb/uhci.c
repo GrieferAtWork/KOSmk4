@@ -33,7 +33,7 @@
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
-#include <kernel/interrupt.h>
+#include <kernel/isr.h>
 #include <kernel/memory.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>

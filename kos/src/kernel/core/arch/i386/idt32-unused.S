@@ -16,26 +16,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_INTERRUPT_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_INTERRUPT_H 1
+#ifdef __INTELLISENSE__
+#include "idt32.S"
+#define IDT_VECTOR 7f
+#endif /* __INTELLISENSE__ */
 
-#include <kernel/compiler.h>
-#include <kernel/types.h>
-#include <kernel/debugger.h>
-#include <kos/kernel/segment.h>
-#include <kos/kernel/cpu-state.h>
+INTERN_FUNCTION(PP_CAT2(x86_defidt_, IDT_VECTOR_NAME))
+	pushl_cfi  $(IDT_VECTOR_ID)
+	PRIVATE(x86_idt_unused_common)
+	jmp     x86_idt_unused_common
+	.cfi_adjust_cfa_offset -4
+END(PP_CAT2(x86_defidt_, IDT_VECTOR_NAME))
 
-#ifdef __CC__
-DECL_BEGIN
-
-DATDEF struct idt_segment __x86_defidt[256];
-DATDEF struct desctab const __x86_defidtptr;
-#ifndef CONFIG_NO_DEBUGGER
-DATDEF struct idt_segment __x86_dbgidt[256];
-DATDEF struct desctab const __x86_dbgidtptr;
-#endif /* !CONFIG_NO_DEBUGGER */
-
-DECL_END
-#endif /* __CC__ */
-
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_INTERRUPT_H */
+#undef IDT_VECTOR

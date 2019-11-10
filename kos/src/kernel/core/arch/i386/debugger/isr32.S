@@ -31,7 +31,7 @@
 
 
 .section .text.cold
-INTERN_FUNCTION(__x86_dbgisr_pagefault)
+INTERN_FUNCTION(x86_dbgidt_pagefault)
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 4 /* Adjust for the error code. */
@@ -62,12 +62,12 @@ INTERN_FUNCTION(__x86_dbgisr_pagefault)
 	.cfi_restore_iret_ds
 	iret
 	.cfi_endproc
-END(__x86_dbgisr_pagefault)
+END(x86_dbgidt_pagefault)
 
 
 
 .section .text.cold
-INTERN_FUNCTION(__x86_dbgisr_preemption) /* ISR_X86_f0 */
+INTERN_FUNCTION(x86_dbgidt_preemption) /* ISR_X86_f0 */
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
@@ -91,12 +91,12 @@ END(x86_debug_pic_acknowledge)
 
 	iret
 	.cfi_endproc
-END(__x86_dbgisr_preemption)
+END(x86_dbgidt_preemption)
 
 
 
 .section .text.cold
-INTERN_FUNCTION(__x86_dbgisr_specific_00h) /* ISR_X86_f1 */
+INTERN_FUNCTION(x86_dbgidt_specific_00h) /* ISR_X86_f1 */
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
@@ -138,14 +138,14 @@ INTERN_FUNCTION(__x86_dbgisr_specific_00h) /* ISR_X86_f1 */
 
 	iret
 	.cfi_endproc
-END(__x86_dbgisr_specific_00h)
+END(x86_dbgidt_specific_00h)
 
 
 /* TODO: Override all of the generic ISR handlers
- *        - `__x86_dbgisr_generic_00h'
- *        - `__x86_dbgisr_generic_01h'
- *        - `__x86_dbgisr_generic_??h'
- *        - `__x86_dbgisr_generic_6ch'
+ *        - `x86_dbgidt_generic_00h'
+ *        - `x86_dbgidt_generic_01h'
+ *        - `x86_dbgidt_generic_??h'
+ *        - `x86_dbgidt_generic_6ch'
  *       and queue them being serviced until
  *       the debugger is eventually exited. */
 

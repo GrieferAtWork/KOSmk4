@@ -43,8 +43,8 @@ END(dbg_gdt_pointer)
 .section .rodata.cold
 PRIVATE_OBJECT(dbg_idt_pointer)
 	.word  (256 * SIZEOF_IDT_SEGMENT) - 1
-	PUBLIC(__x86_dbgidt)
-	.long  __x86_dbgidt
+	PUBLIC(x86_dbgidt)
+	.long  x86_dbgidt
 END(dbg_idt_pointer)
 
 #ifndef CONFIG_NO_SMP

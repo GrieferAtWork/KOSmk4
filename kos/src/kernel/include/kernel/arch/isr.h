@@ -16,16 +16,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifdef __INTELLISENSE__
-#include "isr32.S"
-#define ISR_VECTOR 7f
-#endif /* __INTELLISENSE__ */
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_ARCH_ISR_H
+#define GUARD_KERNEL_INCLUDE_KERNEL_ARCH_ISR_H 1
 
-INTERN_FUNCTION(PP_CAT2(__x86_defisr_, ISR_VECTOR_NAME))
-	pushl_cfi  $(ISR_VECTOR_ID)
-	PRIVATE(__x86_isr_unused_common)
-	jmp     __x86_isr_unused_common
-	.cfi_adjust_cfa_offset -4
-END(PP_CAT2(__x86_defisr_, ISR_VECTOR_NAME))
+#include <kernel/compiler.h>
+#include <kernel/types.h>
 
-#undef ISR_VECTOR
+DECL_BEGIN
+
+#define ISR_VECTOR_INVALID (__CCAST(isr_vector_t)-1)
+#ifdef __CC__
+typedef uintptr_t isr_vector_t;
+#endif /* __CC__ */
+
+DECL_END
+
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_ARCH_ISR_H */

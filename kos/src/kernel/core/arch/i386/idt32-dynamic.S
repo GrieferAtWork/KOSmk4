@@ -17,11 +17,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#include "isr32.S"
-#define ISR_VECTOR ff
+#include "idt32.S"
+#define IDT_VECTOR ff
 #endif /* __INTELLISENSE__ */
 
-ISR_HANDLER_BEGIN
+IDT_HANDLER_BEGIN
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
@@ -43,7 +43,7 @@ ISR_HANDLER_BEGIN
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
 
-#if ISR_VECTOR_ID == 0xf7
+#if IDT_VECTOR_ID == 0xf7
 	/* SPUR#1 */
 #define HAVE_SPURIOUS_FAULT 1
 	movb   $(X86_PIC_READ_ISR), %al
@@ -51,7 +51,7 @@ ISR_HANDLER_BEGIN
 	inb    $(X86_PIC2_CMD),     %al
 	testb  $0x80,               %al
 	jnz    99f /* if (!(inb(X86_PIC2_CMD) & 0x80)) goto 99f; */
-#elif ISR_VECTOR_ID == 0xff
+#elif IDT_VECTOR_ID == 0xff
 	/* SPUR#2 */
 #define HAVE_SPURIOUS_FAULT 1
 	movb   $(X86_PIC_READ_ISR), %al
@@ -61,18 +61,18 @@ ISR_HANDLER_BEGIN
 	jz     99f /* if (!(inb(X86_PIC2_CMD) & 0x80)) goto 99f; */
 #endif
 
-	/* Invoke the C-level ISR callback */
-	INTERN(PP_CAT2(kernel_isr_, ISR_VECTOR_NAME))
-	call   PP_CAT2(kernel_isr_, ISR_VECTOR_NAME)
+	/* Invoke the C-level ISR handler */
+	INTERN(PP_CAT2(kernel_isr_, IDT_VECTOR_NAME))
+	call   PP_CAT2(kernel_isr_, IDT_VECTOR_NAME)
 
 	/* Signal EOI */
-#if ISR_VECTOR_ID >= X86_INTERRUPT_PIC1_BASE
+#if IDT_VECTOR_ID >= X86_INTERRUPT_PIC1_BASE
 	movb   $(X86_PIC_CMD_EOI), %al
-#if ISR_VECTOR_ID >= X86_INTERRUPT_PIC2_BASE
+#if IDT_VECTOR_ID >= X86_INTERRUPT_PIC2_BASE
 	outb   %al,      $(X86_PIC2_CMD) /* outb(X86_PIC2_CMD, X86_PIC_CMD_EOI); */
-#endif /* ISR_VECTOR_ID >= X86_INTERRUPT_PIC2_BASE */
+#endif /* IDT_VECTOR_ID >= X86_INTERRUPT_PIC2_BASE */
 	outb   %al,      $(X86_PIC1_CMD) /* outb(X86_PIC1_CMD, X86_PIC_CMD_EOI); */
-#endif /* ISR_VECTOR_ID >= X86_INTERRUPT_PIC1_BASE */
+#endif /* IDT_VECTOR_ID >= X86_INTERRUPT_PIC1_BASE */
 
 #ifdef HAVE_SPURIOUS_FAULT
 98:
@@ -100,16 +100,16 @@ ISR_HANDLER_BEGIN
 	.cfi_rel_offset %ecx, 4
 	.cfi_rel_offset %edx, 0
 99:	pushl_cfi $98b
-#if ISR_VECTOR_ID == 0xf7
+#if IDT_VECTOR_ID == 0xf7
 	INTERN(x86_pic1_spur)
 	jmp    x86_pic1_spur
-#else /* ISR_VECTOR_ID == 0xf7 */
+#else /* IDT_VECTOR_ID == 0xf7 */
 	INTERN(x86_pic2_spur)
 	jmp    x86_pic2_spur
-#endif /* ISR_VECTOR_ID != 0xf7 */
+#endif /* IDT_VECTOR_ID != 0xf7 */
 #endif /* HAVE_SPURIOUS_FAULT */
 	.cfi_endproc
-ISR_HANDLER_END
+IDT_HANDLER_END
 
 
-#undef ISR_VECTOR
+#undef IDT_VECTOR

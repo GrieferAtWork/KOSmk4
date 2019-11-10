@@ -22,12 +22,11 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/interrupt.h>
+#include <kernel/isr.h>
 
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/segment.h>
-#include <kernel/arch/interrupt.h>
 
 #include <assert.h>
 #include <string.h>
@@ -66,9 +65,9 @@ GDBX86InterruptBackup_Override(GDBX86InterruptBackup *__restrict backup,
 	 *         - Broadcast an IPI to have all other CPUs load the original IDT
 	 *         - Free the copy */
 	COMPILER_BARRIER();
-	backup->ib_segment = __x86_defidt[vector];
+	backup->ib_segment = x86_defidt[vector];
 	COMPILER_BARRIER();
-	GDBX86Interrupt_EncodeSegment(&__x86_defidt[vector], asmHandler, dpl);
+	GDBX86Interrupt_EncodeSegment(&x86_defidt[vector], asmHandler, dpl);
 	COMPILER_BARRIER();
 }
 
@@ -82,7 +81,7 @@ GDBX86InterruptBackup_Restore(GDBX86InterruptBackup *__restrict backup,
 	 *         - Modify the original IDT
 	 *         - Broadcast an IPI to have all other CPUs load the original IDT
 	 *         - Free the copy */
-	__x86_defidt[vector] = backup->ib_segment;
+	x86_defidt[vector] = backup->ib_segment;
 }
 
 

@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_INTERRUPT_UNHANDLED_C
-#define GUARD_KERNEL_CORE_ARCH_I386_INTERRUPT_UNHANDLED_C 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_IDT_UNHANDLED_C
+#define GUARD_KERNEL_CORE_ARCH_I386_IDT_UNHANDLED_C 1
 
 #include <kernel/compiler.h>
 
@@ -225,7 +225,7 @@ panic_uhi_dbg_main(void *arg) {
 
 
 INTERN struct icpustate *FCALL
-x86_handle_isr(struct icpustate *__restrict state,
+x86_handle_idt(struct icpustate *__restrict state,
                uintptr_t ecode, uintptr_t intno) {
 	struct ucpustate ustate;
 	__cli();
@@ -275,4 +275,4 @@ x86_handle_isr(struct icpustate *__restrict state,
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_INTERRUPT_UNHANDLED_C */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_IDT_UNHANDLED_C */

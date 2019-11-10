@@ -16,12 +16,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_ISR_FOREACH_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_ISR_FOREACH_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_IDT_FOREACH_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_IDT_FOREACH_H 1
 
 /* Invoke `callback()' with `00, 01, 02, ..., 0a, 0b, ..., ff' */
 /*[[[deemon
-print "#define ISR_X86_FOREACH(callback)"
+print "#define IDT_X86_FOREACH(callback)"
       "                                 "
       "                                 "
       "         \\";
@@ -41,7 +41,7 @@ for (local x: [:16]) {
 	print;
 }
 ]]]*/
-#define ISR_X86_FOREACH(callback)                                                                           \
+#define IDT_X86_FOREACH(callback)                                                                           \
 	callback(00) callback(01) callback(02) callback(03) callback(04) callback(05) callback(06) callback(07) \
 	callback(08) callback(09) callback(0a) callback(0b) callback(0c) callback(0d) callback(0e) callback(0f) \
 	callback(10) callback(11) callback(12) callback(13) callback(14) callback(15) callback(16) callback(17) \
@@ -76,6 +76,4 @@ for (local x: [:16]) {
 	callback(f8) callback(f9) callback(fa) callback(fb) callback(fc) callback(fd) callback(fe) callback(ff)
 /*[[[end]]]*/
 
-
-
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_ISR_FOREACH_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_IDT_FOREACH_H */

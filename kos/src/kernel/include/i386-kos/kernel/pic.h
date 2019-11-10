@@ -29,6 +29,18 @@
 
 DECL_BEGIN
 
+/* Interrupt numbers. */
+#define X86_INTERRUPT_PIC1_BASE 0xf0
+#define X86_INTERRUPT_PIC2_BASE 0xf8
+
+/* Return the IRQ numbers of hardware interrupt
+ * lines wired either to the master, or slave PIC.
+ * @param: i :  The line number (0..7)
+ * @return: * : The IRQ number. */
+#define X86_INTNO_PIC1(i) (X86_INTERRUPT_PIC1_BASE + (i))
+#define X86_INTNO_PIC2(i) (X86_INTERRUPT_PIC2_BASE + (i))
+
+
 /* PIC (Programmable Interrupt Controller) API. */
 #define X86_PIC1       __IOPORT(0x20) /* IO base address for master PIC */
 #define X86_PIC2       __IOPORT(0xa0) /* IO base address for slave PIC */

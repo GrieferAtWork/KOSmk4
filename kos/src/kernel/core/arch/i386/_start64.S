@@ -773,8 +773,8 @@ INTERN_FUNCTION(_start64)
 	wrmsr
 
 	/* Initialize the interrupt handling subsystem. */
-	PUBLIC(__x86_defidtptr)
-	lidtq  __x86_defidtptr
+	PUBLIC(x86_defidt_ptr)
+	lidtq  x86_defidt_ptr
 
 	/* And that's all the assembly-based initialization done!
 	 * Now we just have to invoke `__i386_kernel_main()' */

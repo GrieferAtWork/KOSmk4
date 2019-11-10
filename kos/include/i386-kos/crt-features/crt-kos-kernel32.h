@@ -47,10 +47,6 @@
 #define __CRT_HAVE___vsnprintf 1
 #define __CRT_HAVE___x86_bootcpu_features 1
 #define __CRT_HAVE___x86_bootcpu_idfeatures 1
-#define __CRT_HAVE___x86_dbgidt 1
-#define __CRT_HAVE___x86_dbgidtptr 1
-#define __CRT_HAVE___x86_defidt 1
-#define __CRT_HAVE___x86_defidtptr 1
 #define __CRT_HAVE__bootcpu 1
 #define __CRT_HAVE__bootidle 1
 #define __CRT_HAVE__boottask 1
@@ -2148,7 +2144,11 @@
 #define __CRT_HAVE_x86_cpuldt 1
 #define __CRT_HAVE_x86_cputss 1
 #define __CRT_HAVE_x86_cputss_df 1
+#define __CRT_HAVE_x86_dbgidt 1
+#define __CRT_HAVE_x86_dbgidt_ptr 1
 #define __CRT_HAVE_x86_debug_gdt 1
+#define __CRT_HAVE_x86_defidt 1
+#define __CRT_HAVE_x86_defidt_ptr 1
 #define __CRT_HAVE_x86_exsyscall_is_cancellation_point 1
 #define __CRT_HAVE_x86_exsyscall_register_count 1
 #define __CRT_HAVE_x86_exsyscall_restart_mode 1

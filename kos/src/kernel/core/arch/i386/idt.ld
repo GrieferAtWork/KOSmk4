@@ -8,12 +8,12 @@
  * including commercial applications, and to alter it and redistribute it     *
  * freely, subject to the following restrictions:                             *
  *                                                                            *
- * 1. The origin of this software must not be misrepresented; you must not    *
+ * 1. The origin of this software must not be midtepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
  *    in a product, an acknowledgement in the product documentation would be  *
  *    appreciated but is not required.                                        *
  * 2. Altered source versions must be plainly marked as such, and must not be *
- *    misrepresented as being the original software.                          *
+ *    midtepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
@@ -21,44 +21,46 @@
 #endif /* __INTELLISENSE__ */
 
 #include <hybrid/compiler.h>
-#include <kos/kernel/segment.h>
+
+#include <kernel/idt-names.h>
+
 #include <kos/kernel/gdt.h>
-#include <kernel/arch/isr-names.h>
+#include <kos/kernel/segment.h>
 
 
 #ifndef PREFIX
 #define IS_DEFAULT_PREFIX 1
-#define PREFIX __x86_def
+#define PREFIX x86_def
 #endif /* !PREFIX */
 
-#define SYMBOL(prefix2, id) PP_CAT3(PREFIX, prefix2, ISR_X86_##id)
+#define SYMBOL(prefix2, id) PP_CAT3(PREFIX, prefix2, IDT_X86_##id)
 #ifdef IS_DEFAULT_PREFIX
-#define PROVIDE_ISR_ADDRESS(id) /* nothing */
+#define PROVIDE_IDT_ADDRESS(id) /* nothing */
 #else /* IS_DEFAULT_PREFIX */
-#define PROVIDE_ISR_ADDRESS(id) \
-	PROVIDE_HIDDEN(SYMBOL(isr_, id) = PP_CAT3(__x86_def, isr_, ISR_X86_##id));
+#define PROVIDE_IDT_ADDRESS(id) \
+	PROVIDE_HIDDEN(SYMBOL(idt_, id) = PP_CAT3(x86_def, idt_, IDT_X86_##id));
 #ifdef __x86_64__
 #define PROVIDE_IST(id) \
-	PROVIDE_HIDDEN(SYMBOL(ist_, id) = PP_CAT3(__x86_def, ist_, ISR_X86_##id));
+	PROVIDE_HIDDEN(SYMBOL(ist_, id) = PP_CAT3(x86_def, ist_, IDT_X86_##id));
 #endif /* __x86_64__ */
 #define PROVIDE_DPL(id) \
-	PROVIDE_HIDDEN(SYMBOL(dpl_, id) = PP_CAT3(__x86_def, dpl_, ISR_X86_##id));
+	PROVIDE_HIDDEN(SYMBOL(dpl_, id) = PP_CAT3(x86_def, dpl_, IDT_X86_##id));
 #endif /* !IS_DEFAULT_PREFIX */
 
 
 #ifdef __x86_64__
-#define DEFINE(id, segment_name, args)                                                  \
-	PROVIDE_HIDDEN(PP_CAT3(PREFIX, isrlo_, id) = SEGMENT_##segment_name##_INIT_U args); \
-	PROVIDE_HIDDEN(PP_CAT3(PREFIX, isrhi_, id) = SEGMENT_##segment_name##_HI_INIT_U args);
+#define DEFINE(id, segment_name, args)                                                      \
+	PROVIDE_HIDDEN(PP_CAT4(__, PREFIX, idtlo_, id) = SEGMENT_##segment_name##_INIT_U args); \
+	PROVIDE_HIDDEN(PP_CAT4(__, PREFIX, idthi_, id) = SEGMENT_##segment_name##_HI_INIT_U args);
 #define DEFINE_INTRGATE_EX(id, offset, TYPE, DPL, IST) \
 	DEFINE(id, INTRGATE, (offset, SEGMENT_KERNEL_CODE, IST, TYPE, DPL, 1))
 #ifndef PROVIDE_IST
 #define PROVIDE_IST(id) PROVIDE_HIDDEN(SYMBOL(ist_, id) = 0);
 #endif /* !PROVIDE_IST */
 #else /* __x86_64__ */
-#define DEFINE(id, segment_name, args)                                                   \
-	PROVIDE_HIDDEN(PP_CAT3(PREFIX, isrlo_, id) = SEGMENT_##segment_name##_INIT_UL args); \
-	PROVIDE_HIDDEN(PP_CAT3(PREFIX, isrhi_, id) = SEGMENT_##segment_name##_INIT_UH args);
+#define DEFINE(id, segment_name, args)                                                       \
+	PROVIDE_HIDDEN(PP_CAT4(__, PREFIX, idtlo_, id) = SEGMENT_##segment_name##_INIT_UL args); \
+	PROVIDE_HIDDEN(PP_CAT4(__, PREFIX, idthi_, id) = SEGMENT_##segment_name##_INIT_UH args);
 #define DEFINE_INTRGATE_EX(id, offset, TYPE, DPL, IST) \
 	DEFINE(id, INTRGATE, (offset, SEGMENT_KERNEL_CODE, TYPE, DPL, 1))
 #ifndef PROVIDE_IST
@@ -73,8 +75,8 @@
 #define DEFINE_INTRGATE(id, TYPE) \
 	PROVIDE_DPL(id)               \
 	PROVIDE_IST(id)               \
-	PROVIDE_ISR_ADDRESS(id)       \
-	DEFINE_INTRGATE_EX(id, SYMBOL(isr_, id), TYPE, SYMBOL(dpl_, id), SYMBOL(ist_, id))
+	PROVIDE_IDT_ADDRESS(id)       \
+	DEFINE_INTRGATE_EX(id, SYMBOL(idt_, id), TYPE, SYMBOL(dpl_, id), SYMBOL(ist_, id))
 
 #define INTR(id) DEFINE_INTRGATE(id, SEGMENT_DESCRIPTOR_TYPE_INTRGATE)
 #define TRAP(id) DEFINE_INTRGATE(id, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE)
@@ -354,7 +356,7 @@ INTR(ff)
 #undef INTR
 #undef PROVIDE_DPL
 #undef PROVIDE_IST
-#undef PROVIDE_ISR_ADDRESS
+#undef PROVIDE_IDT_ADDRESS
 #undef DEFINE_INTRGATE
 #undef DEFINE_INTRGATE_EX
 #undef IS_DEFAULT_PREFIX

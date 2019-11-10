@@ -26,7 +26,7 @@
 #include <dev/keyboard.h>
 #include <kernel/driver-param.h>
 #include <kernel/driver.h>
-#include <kernel/interrupt.h>
+#include <kernel/isr.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
 

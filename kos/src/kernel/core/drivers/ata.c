@@ -29,7 +29,7 @@
 #include <kernel/driver-param.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
-#include <kernel/interrupt.h>
+#include <kernel/isr.h>
 #include <kernel/pic.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>

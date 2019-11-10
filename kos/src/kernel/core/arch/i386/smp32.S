@@ -52,7 +52,7 @@ PUBLIC_FUNCTION(cpu_ipi_service)
 	pushl_cfi %eax
 /*	.cfi_rel_offset %eip, 0 */
 	.cfi_endproc
-INTERN_FUNCTION(__x86_defisr_apic_ipi)
+INTERN_FUNCTION(x86_defidt_apic_ipi)
 	.cfi_startproc
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
@@ -161,7 +161,7 @@ INTERN_FUNCTION(__x86_defisr_apic_ipi)
 	movl   _this_cpu_current(%ebx), %eax
 	jmp    x86_load_thread_eax_cpu_ebx
 	.cfi_endproc
-END(__x86_defisr_apic_ipi)
+END(x86_defidt_apic_ipi)
 END(cpu_ipi_service)
 
 .section .rodata
@@ -415,8 +415,8 @@ INTERN_FUNCTION(x86_smp_entry32)
 1:
 
 	/* Load the interrupt descriptor table. */
-	PUBLIC(__x86_defidtptr)
-	lidtl  __x86_defidtptr
+	PUBLIC(x86_defidt_ptr)
+	lidtl  x86_defidt_ptr
 
 	/* ============== Configure cpuid features ============== */
 	/* R_CPU:  THIS_CPU

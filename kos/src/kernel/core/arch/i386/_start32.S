@@ -580,8 +580,8 @@ END(__x86_paging_init_identity_mapped_text)
 	lldtw  %ax
 
 	/* Initialize the interrupt handling subsystem. */
-	PUBLIC(__x86_defidtptr)
-	lidtl  __x86_defidtptr
+	PUBLIC(x86_defidt_ptr)
+	lidtl  x86_defidt_ptr
 
 	/* Setup the state of /bin/init at our stack base, thus following the
 	 * general expectation that the user-space return state can be found

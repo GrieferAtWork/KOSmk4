@@ -19,8 +19,7 @@
 #define __ASSEMBLER__ 1
 #include <hybrid/compiler.h>
 
-#include <kernel/arch/isr-config.h>
-#include <kernel/arch/isr-names.h>
+#include <kernel/idt-names.h>
 #include <kernel/idt.h>
 #include <kernel/pic.h>
 
@@ -33,40 +32,40 @@
 #include <libunwind/cfi.h>
 
 
-#define PRIVATE_ISR_VECTOR_ID2(id) 0x##id
-#define PRIVATE_ISR_VECTOR_ID(id) PRIVATE_ISR_VECTOR_ID2(id)
-#define ISR_VECTOR_ID PRIVATE_ISR_VECTOR_ID(ISR_VECTOR)
+#define PRIVATE_IDT_VECTOR_ID2(id) 0x##id
+#define PRIVATE_IDT_VECTOR_ID(id) PRIVATE_IDT_VECTOR_ID2(id)
+#define IDT_VECTOR_ID PRIVATE_IDT_VECTOR_ID(IDT_VECTOR)
 
-#define PRIVATE_ISR_VECTOR_NAME2(id) ISR_X86_##id
-#define PRIVATE_ISR_VECTOR_NAME(id) PRIVATE_ISR_VECTOR_NAME2(id)
-#define ISR_VECTOR_NAME PRIVATE_ISR_VECTOR_NAME(ISR_VECTOR)
+#define PRIVATE_IDT_VECTOR_NAME2(id) IDT_X86_##id
+#define PRIVATE_IDT_VECTOR_NAME(id) PRIVATE_IDT_VECTOR_NAME2(id)
+#define IDT_VECTOR_NAME PRIVATE_IDT_VECTOR_NAME(IDT_VECTOR)
 
-.macro _isr_set_impl_section prefix:req, id:req
+.macro _idt_set_impl_section prefix:req, id:req
 .section .text.x86.\prefix.\id
 .endm
 
-#define ISR_HANDLER_SETDPL(dpl)                      \
-	INTERN(PP_CAT2(__x86_defdpl_, ISR_VECTOR_NAME)); \
-	.set PP_CAT2(__x86_defdpl_, ISR_VECTOR_NAME), dpl;
-#define ISR_HANDLER_BEGIN                          \
-	_isr_set_impl_section asmirq, ISR_VECTOR_NAME; \
-	INTERN_FUNCTION(PP_CAT2(__x86_defisr_, ISR_VECTOR_NAME))
-#define ISR_HANDLER_END \
-	END(PP_CAT2(__x86_defisr_, ISR_VECTOR_NAME))
+#define IDT_HANDLER_SETDPL(dpl)                      \
+	INTERN(PP_CAT2(x86_defdpl_, IDT_VECTOR_NAME)); \
+	.set PP_CAT2(x86_defdpl_, IDT_VECTOR_NAME), dpl;
+#define IDT_HANDLER_BEGIN                          \
+	_idt_set_impl_section asmirq, IDT_VECTOR_NAME; \
+	INTERN_FUNCTION(PP_CAT2(x86_defidt_, IDT_VECTOR_NAME))
+#define IDT_HANDLER_END \
+	END(PP_CAT2(x86_defidt_, IDT_VECTOR_NAME))
 
 
 #ifndef __INTELLISENSE__
-#define ISR_EXCEPT_IMPL   "isr32-exception.S"
-#define ISR_WINSPEC_IMPL  "isr32-exception.S"
-#define ISR_GENERIC_IMPL  "isr32-dynamic.S"
-#define ISR_SPECIFIC_IMPL "isr32-dynamic.S"
-#include "isr-foreach.h"
+#define IDT_EXCEPT_IMPL   "idt32-exception.S"
+#define IDT_WINSPEC_IMPL  "idt32-exception.S"
+#define IDT_GENERIC_IMPL  "idt32-dynamic.S"
+#define IDT_SPECIFIC_IMPL "idt32-dynamic.S"
+#include "idt-foreach.h"
 #endif /* !__INTELLISENSE__ */
 
 .section .text.cold
 .cfi_startproc
 .cfi_iret_signal_frame
-PRIVATE_FUNCTION(__x86_isr_unused_common)
+PRIVATE_FUNCTION(x86_idt_unused_common)
 	.cfi_def_cfa %esp, 4
 	popl_cfi %ss:-(12 + SIZEOF_GPREGS + 4)(%esp) /* VECNO */
 	pushl_cfi %ds
@@ -81,8 +80,8 @@ PRIVATE_FUNCTION(__x86_isr_unused_common)
 	subl   $4, %esp   /* VECNO */
 	.cfi_adjust_cfa_offset 4
 
-	INTERN(x86_handle_isr)
-	call   x86_handle_isr
+	INTERN(x86_handle_idt)
+	call   x86_handle_idt
 	movl   %eax, %esp
 
 	popal_cfi_r
@@ -93,11 +92,11 @@ PRIVATE_FUNCTION(__x86_isr_unused_common)
 	popl_cfi %ds
 	.cfi_restore_iret_ds
 	iret
-END(__x86_isr_unused_common)
+END(x86_idt_unused_common)
 
 #ifndef __INTELLISENSE__
-#define ISR_UNUSED_IMPL   "isr32-unused.S"
-#include "isr-foreach.h"
+#define IDT_UNUSED_IMPL   "idt32-unused.S"
+#include "idt-foreach.h"
 #endif /* !__INTELLISENSE__ */
 .cfi_endproc
 

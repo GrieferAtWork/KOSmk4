@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_IDT_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_IDT_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_IDT_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_IDT_H 1
 
 #include <kernel/compiler.h>
 #include <kernel/types.h>
@@ -25,56 +25,48 @@
 
 DECL_BEGIN
 
-#define X86_IDTFLAG_PRESENT                 0x80 /* Set to 0 for unused interrupts. */
-/* Descriptor Privilege LevelGate call protection.
- * Specifies which privilege Level the calling Descriptor minimum should have.
- * So hardware and CPU interrupts can be protected from being called out of userspace. */
-#define X86_IDTFLAG_DPL(n)          (((n)&3)<<5) /* Mask: 0x60 */
-#define X86_IDTFLAG_DPL_MASK                0x60
-#define X86_IDTFLAG_STORAGE_SEGMENT         0x10 /* Set to 0 for interrupt gates. */
-#define X86_IDTTYPE_MASK                    0x0f
-#define X86_IDTTYPE_80386_32_TASK_GATE      0x05
-#define X86_IDTTYPE_80286_16_INTERRUPT_GATE 0x06
-#define X86_IDTTYPE_80286_16_TRAP_GATE      0x07
-#define X86_IDTTYPE_80386_32_INTERRUPT_GATE 0x0e
-#define X86_IDTTYPE_80386_32_TRAP_GATE      0x0f
-
-/* Different TRAP vs. Interrupt gate:
- *   - Upon entry into an interrupt gate, #IF is disabled
- *   - Upon entry to a trap gate, #IF is left unchanged.
- * NOTE: The default X86-interrupt handling code used by
- *       KOS assumes that Interrupt gates are being used,
- *       as it modifies part of the start prior to allocating
- *       it, meaning that it assumes not to be interrupted
- *       and have some other piece of code tinker with
- *       unallocated stack memory. */
-
-
-/* Return the IRQ numbers of hardware interrupt
- * lines wired either to the master, or slave PIC.
- * @param: i :  The line number (0..7)
- * @return: * : The IRQ number. */
-#define X86_INTNO_PIC1(i) (X86_INTERRUPT_PIC1_BASE+(i))
-#define X86_INTNO_PIC2(i) (X86_INTERRUPT_PIC2_BASE+(i))
-
-
-/* Interrupt numbers. */
-#define X86_INTERRUPT_SYSCALL       0x80 /* System call interrupt. */
+/* Special interrupt numbers. */
 #define X86_INTERRUPT_APIC_IPI      0xee
 #define X86_INTERRUPT_APIC_SPURIOUS 0xef
-#define X86_INTERRUPT_PIC1_BASE     0xf0
-#define X86_INTERRUPT_PIC2_BASE     0xf8
 
-/* NOTE: These names must match the interrupt vectors above! */
-#define X86_IRQ_APICIPI  irq_ee
-#define X86_IRQ_APICSPUR irq_ef
-#define X86_IRQ_ATA0     irq_fe
-#define X86_IRQ_ATA1     irq_ff
-#define X86_IRQ_KBD      irq_f1
-#define X86_IRQ_PS2M     irq_fc
+/* ISR pushes-error-code selector */
+#define IDT_CONFIG_PUSHESERRORS(vector_id)                       \
+	((vector_id) == 0x08 /* #DF  Double Fault. */ ||             \
+	 (vector_id) == 0x0a /* #TS  Invalid TSS. */ ||              \
+	 (vector_id) == 0x0b /* #NP  Segment Not Present. */ ||      \
+	 (vector_id) == 0x0c /* #SS  Stack-Segment Fault. */ ||      \
+	 (vector_id) == 0x0d /* #GP  General Protection Fault. */ || \
+	 (vector_id) == 0x0e /* #PF  Page Fault. */ ||               \
+	 (vector_id) == 0x11 /* #AC  Alignment Check. */ ||          \
+	 (vector_id) == 0x1e /* #SX  Security Exception. */)
+
+/* ISR user-space access selector */
+#define IDT_CONFIG_ALLOWUSER(vector_id)                     \
+	((vector_id) == 0x80 /* Syscall */ ||                   \
+	 (vector_id) == 0x29 /* __fastfail() */ ||              \
+	 (vector_id) == 0x05 /* #BR  Bound Range Exceeded */ || \
+	 (vector_id) == 0x04 /* #OF  Overflow */ ||             \
+	 (vector_id) == 0x03 /* #BP  Breakpoint */)
+
+/* Return the DPL to-be configured for a given ISR vector. */
+#define IDT_CONFIG_GETDPL(vector_id) \
+	(IDT_CONFIG_ALLOWUSER(vector_id) ? 3 : 0)
 
 
+#ifdef __CC__
+
+struct idt_segment; /* From <kos/kernel/segment.h> */
+struct desctab;     /* From <kos/kernel/cpu-state.h> */
+
+DATDEF struct idt_segment x86_defidt[256];
+DATDEF struct desctab const x86_defidt_ptr;
+#ifndef CONFIG_NO_DEBUGGER
+DATDEF struct idt_segment x86_dbgidt[256];
+DATDEF struct desctab const x86_dbgidt_ptr;
+#endif /* !CONFIG_NO_DEBUGGER */
+
+#endif /* __CC__ */
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_IDT_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_IDT_H */

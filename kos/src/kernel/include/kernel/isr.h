@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_INTERRUPT_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_INTERRUPT_H 1
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_ISR_H
+#define GUARD_KERNEL_INCLUDE_KERNEL_ISR_H 1
 
 #include <kernel/compiler.h>
 #include <kernel/pic.h>
@@ -120,11 +120,8 @@ NOTHROW(KCALL isr_usage_of)(isr_vector_t vector);
 /* Trigger the given ISR vector, returning true if any handler returned
  * true, or if a greedy handler was defined. Otherwise, return `false'. */
 FUNDEF NOBLOCK bool NOTHROW(KCALL isr_vector_trigger)(isr_vector_t vector);
-
-
 #endif /* __CC__ */
-
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_INTERRUPT_H */
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_ISR_H */
