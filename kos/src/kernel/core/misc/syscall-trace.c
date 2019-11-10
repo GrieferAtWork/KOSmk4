@@ -86,31 +86,33 @@ syscall_printtrace(pformatprinter printer, void *arg,
 	/* Trace system calls. */
 	switch (args->ta_sysno) {
 
-		__NR_raiseat;
-
-#define __SYSCALL(name)                                                        \
-	case SYS_##name:                                                           \
-		temp = format_printf(printer,                                          \
-		                     arg,                                              \
-		                     #name "(" SYSCALL_TRACE_ARGS_FORMAT_L(name) ")\n" \
-		                     SYSCALL_TRACE_ARGS_ARGS(name,                     \
-		                         (__NRAM_##name(args->ta_arg0,                 \
-		                                        args->ta_arg1,                 \
-		                                        args->ta_arg2,                 \
-		                                        args->ta_arg3,                 \
-		                                        args->ta_arg4,                 \
-		                                        args->ta_arg5))                \
-		                     ));                                               \
+#define __SYSCALL(name)                                                  \
+	case SYS_##name:                                                     \
+		temp = format_printf(printer,                                    \
+		                     arg,                                        \
+		                     #name "(" SYSCALL_TRACE_ARGS_FORMAT_L(name) \
+		                     SYSCALL_TRACE_ARGS_ARGS(name,               \
+		                         (__NRAM_##name(args->ta_arg0,           \
+		                                        args->ta_arg1,           \
+		                                        args->ta_arg2,           \
+		                                        args->ta_arg3,           \
+		                                        args->ta_arg4,           \
+		                                        args->ta_arg5))          \
+		                     ));                                         \
 		break;
-
 #include <asm/ls_syscalls.h>
 #undef __SYSCALL
 
 	default:
 		/* Unknown system call... */
 		temp = format_printf(printer, arg, "break:%#Ix?\n", args->ta_sysno);
-		break;
+		goto done_check_and_account_temp;
 	}
+	if unlikely(temp < 0)
+		goto err_temp;
+	result += temp;
+	temp = (*printer)(arg, ")\n", 2);
+done_check_and_account_temp:
 	if unlikely(temp < 0)
 		goto err_temp;
 	result += temp;
