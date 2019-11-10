@@ -80,7 +80,7 @@ panic_df_dbg_main(void *cr3) {
 
 /* Double fault handler. */
 INTERN struct df_cpustate *FCALL
-x86_cirq_08(struct df_cpustate *__restrict state) {
+x86_handle_double_fault(struct df_cpustate *__restrict state) {
 #ifdef __x86_64__
 	printk(KERN_EMERG "Double fault at %p\n", state->dcs_regs.ics_irregs.ir_rip);
 #else /* __x86_64__ */

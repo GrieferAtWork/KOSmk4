@@ -16,30 +16,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifdef __INTELLISENSE__
+#include "isr32.S"
+#define ISR_VECTOR ff
+#endif /* __INTELLISENSE__ */
 
-#ifndef VECTOR
-#error "Must #define VECTOR ... before #include-ing this file"
-#endif
-
-#include <kernel/pic.h>
-
-#ifndef FUNC
-#define FUNC3(x, y) x ## y
-#define FUNC2(x, y) FUNC3(x, y)
-#define FUNC(x)     FUNC2(x, VECTOR)
-#define VECTOR_ID   FUNC(0x)
-#endif /* !FUNC */
-
-#ifndef SECTION_MACRO_DEFINED
-#define SECTION_MACRO_DEFINED 1
-.macro SET_ASMIRQ_SECTION vector:req
-.section .text.x86.asmisr.\vector
-.endm
-#endif
-
-
-SET_ASMIRQ_SECTION VECTOR
-INTERN_FUNCTION(FUNC(x86_asmirq_))
+ISR_HANDLER_BEGIN
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
@@ -61,7 +43,7 @@ INTERN_FUNCTION(FUNC(x86_asmirq_))
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
 
-#if VECTOR_ID == 0xf7
+#if ISR_VECTOR_ID == 0xf7
 	/* SPUR#1 */
 #define HAVE_SPURIOUS_FAULT 1
 	movb   $(X86_PIC_READ_ISR), %al
@@ -69,7 +51,7 @@ INTERN_FUNCTION(FUNC(x86_asmirq_))
 	inb    $(X86_PIC2_CMD),     %al
 	testb  $0x80,               %al
 	jnz    99f /* if (!(inb(X86_PIC2_CMD) & 0x80)) goto 99f; */
-#elif VECTOR_ID == 0xff
+#elif ISR_VECTOR_ID == 0xff
 	/* SPUR#2 */
 #define HAVE_SPURIOUS_FAULT 1
 	movb   $(X86_PIC_READ_ISR), %al
@@ -80,17 +62,17 @@ INTERN_FUNCTION(FUNC(x86_asmirq_))
 #endif
 
 	/* Invoke the C-level ISR callback */
-	INTERN(FUNC(kernel_isr))
-	call   FUNC(kernel_isr)
+	INTERN(PP_CAT2(kernel_isr_, ISR_VECTOR_NAME))
+	call   PP_CAT2(kernel_isr_, ISR_VECTOR_NAME)
 
 	/* Signal EOI */
-#if VECTOR_ID >= X86_INTERRUPT_PIC1_BASE
+#if ISR_VECTOR_ID >= X86_INTERRUPT_PIC1_BASE
 	movb   $(X86_PIC_CMD_EOI), %al
-#if VECTOR_ID >= X86_INTERRUPT_PIC2_BASE
+#if ISR_VECTOR_ID >= X86_INTERRUPT_PIC2_BASE
 	outb   %al,      $(X86_PIC2_CMD) /* outb(X86_PIC2_CMD, X86_PIC_CMD_EOI); */
-#endif /* VECTOR_ID >= X86_INTERRUPT_PIC2_BASE */
+#endif /* ISR_VECTOR_ID >= X86_INTERRUPT_PIC2_BASE */
 	outb   %al,      $(X86_PIC1_CMD) /* outb(X86_PIC1_CMD, X86_PIC_CMD_EOI); */
-#endif /* VECTOR_ID >= X86_INTERRUPT_PIC1_BASE */
+#endif /* ISR_VECTOR_ID >= X86_INTERRUPT_PIC1_BASE */
 
 #ifdef HAVE_SPURIOUS_FAULT
 98:
@@ -118,15 +100,16 @@ INTERN_FUNCTION(FUNC(x86_asmirq_))
 	.cfi_rel_offset %ecx, 4
 	.cfi_rel_offset %edx, 0
 99:	pushl_cfi $98b
-#if VECTOR_ID == 0xf7
+#if ISR_VECTOR_ID == 0xf7
 	INTERN(x86_pic1_spur)
 	jmp    x86_pic1_spur
-#else /* VECTOR_ID == 0xf7 */
+#else /* ISR_VECTOR_ID == 0xf7 */
 	INTERN(x86_pic2_spur)
 	jmp    x86_pic2_spur
-#endif /* VECTOR_ID != 0xf7 */
+#endif /* ISR_VECTOR_ID != 0xf7 */
 #endif /* HAVE_SPURIOUS_FAULT */
 	.cfi_endproc
-END(FUNC(x86_asmirq_))
+ISR_HANDLER_END
 
-#undef VECTOR
+
+#undef ISR_VECTOR

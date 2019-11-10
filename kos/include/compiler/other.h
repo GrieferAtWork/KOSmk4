@@ -233,4 +233,16 @@
 #define union     <<__FILE__:__LINE__:ERROR: Invalid keyword: 'union'>>
 #define typedef   <<__FILE__:__LINE__:ERROR: Invalid keyword: 'typedef'>>
 #define enum      <<__FILE__:__LINE__:ERROR: Invalid keyword: 'enum'>>
+#ifdef __INTELLISENSE__
+#define ENTRY(...)
+#define PROVIDE(...)
+#define PROVIDE_HIDDEN(...)
+#define SECTIONS int foo()
+#define ABSOLUTE(...) __VA_ARGS__
+#define KEEP(...)
+#define BLOCK(...) __VA_ARGS__
+#define AT(...)
+#define ADDR(...)
+#define ALIGN(...) __VA_ARGS__
+#endif /* __INTELLISENSE__ */
 #endif /* __LINKER__ */

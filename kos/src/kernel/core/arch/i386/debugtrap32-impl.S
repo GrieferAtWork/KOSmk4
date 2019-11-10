@@ -49,7 +49,6 @@ INTERN_BEGIN(PP_CAT3(__x86_trigger_debugtrap_,CPUSTATE,_call_offset))
 	.reloc ., R_386_PC32, PP_CAT2(kernel_debugtrap_r_,CPUSTATE)
 	.long  -4
 END(PP_CAT3(__x86_trigger_debugtrap_,CPUSTATE,_call_offset))
-
 #if defined(CPUSTATE_IS_ICPUSTATE) || defined(CPUSTATE_IS_SCPUSTATE)
 	movl   %eax, %esp
 	EXTERN(PP_CAT3(cpu_apply_,CPUSTATE,_esp))

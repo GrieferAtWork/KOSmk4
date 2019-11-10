@@ -34,7 +34,7 @@
 
 /* ... */
 
-#if /*defined(__cplusplus) ||*/ defined(__INTELLISENSE__) || \
+#if /*defined(__cplusplus) ||*/ \
   (!defined(__LINKER__) && !defined(__ASSEMBLY__) && \
    !defined(__ASSEMBLER__) && !defined(__assembler) && \
    !defined(__DEEMON__))

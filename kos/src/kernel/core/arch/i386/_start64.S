@@ -25,6 +25,7 @@
 #include <asm/cpu-cpuid.h>
 #include <asm/cpu-flags.h>
 #include <asm/cpu-msr.h>
+#include <asm/instr/interrupt.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
 #include <kos/kernel/segment.h>
@@ -44,9 +45,6 @@ EXPORT_AS_OBJECT(_boottask)
 EXPORT_AS_OBJECT(pagedir_kernel)
 EXPORT_AS_OBJECT(pagedir_kernel_phys)
 EXPORT_AS_OBJECT(jiffies)
-EXPORT_AS_OBJECT(x86_idt_start)
-EXPORT_AS_OBJECT(x86_idt_start_traced)
-EXPORT_AS_OBJECT(x86_idt_start_debug)
 #undef EXPORT_AS_OBJECT
 
 
@@ -774,6 +772,10 @@ INTERN_FUNCTION(_start64)
 	movl   $(IA32_GS_BASE), %ecx
 	wrmsr
 
+	/* Initialize the interrupt handling subsystem. */
+	PUBLIC(__x86_defidtptr)
+	lidtq  __x86_defidtptr
+
 	/* And that's all the assembly-based initialization done!
 	 * Now we just have to invoke `__i386_kernel_main()' */
 	pushq  $(SEGMENT_USER_DATA_RPL)   /* ics_irregs.ir_ss */
@@ -809,6 +811,6 @@ INTERN_FUNCTION(_start64)
 	popq   %rdx    /* [C] Data register */
 	popq   %rcx    /* [C] Count register */
 	popq   %rax    /* [C] Accumulator register */
-	iretq
+	intr_exit
 END(_start64)
 

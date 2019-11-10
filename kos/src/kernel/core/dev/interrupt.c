@@ -41,12 +41,11 @@ DECL_BEGIN
 STATIC_ASSERT(!ISR_VECTOR_IS_VALID(ISR_VECTOR_INVALID));
 
 #ifndef __INTELLISENSE__
-#define ASSERT_INDICES(idx, vec)                        \
-	STATIC_ASSERT(ISR_VECTOR_TO_INDEX(0x##vec) == idx); \
-	STATIC_ASSERT(ISR_INDEX_TO_VECTOR(idx) == 0x##vec);
-#define ASSERT_INDICES_SPECIFIC(idx, vec)                                          \
-	STATIC_ASSERT(ISR_VECTOR_TO_INDEX(0x##vec) == idx + ISR_GENERIC_VECTOR_COUNT); \
-	STATIC_ASSERT(ISR_INDEX_TO_VECTOR(idx + ISR_GENERIC_VECTOR_COUNT) == 0x##vec);
+#define ASSERT_INDICES(idx) \
+	STATIC_ASSERT(ISR_VECTOR_TO_INDEX(ISR_INDEX_TO_VECTOR(0x##idx)) == 0x##idx);
+#define ASSERT_INDICES_SPECIFIC(idx)                                                              \
+	STATIC_ASSERT(ISR_VECTOR_TO_INDEX(ISR_INDEX_TO_VECTOR(0x##idx + ISR_GENERIC_VECTOR_COUNT)) == \
+	              0x##idx + ISR_GENERIC_VECTOR_COUNT);
 ISR_GENERIC_VECTOR_ENUM(ASSERT_INDICES);
 ISR_SPECIFIC_VECTOR_ENUM(ASSERT_INDICES_SPECIFIC);
 #undef ASSERT_INDICES_SPECIFIC
@@ -83,22 +82,22 @@ PRIVATE REF struct isr_vector_state *
 
 
 PRIVATE struct isr_vector_state empty_vector_state = {
-	/* .ivs_refcnt     = */1 + ISR_COUNT,
-	/* .ivs_heapsize   = */offsetof(struct isr_vector_state, ivs_handv),
-	/* .ivs_greedy_fun = */NULL,
-	/* .ivs_greedy_arg = */NULL,
-	/* .ivs_greedy_drv = */NULL,
-	/* .ivs_greedy_cnt = */0,
-	/* .ivs_unhandled  = */0,
-	/* .ivs_handc      = */0,
-	/* .ivs_handv      = */{ }
+	/* .ivs_refcnt     = */ 1 + ISR_COUNT,
+	/* .ivs_heapsize   = */ offsetof(struct isr_vector_state, ivs_handv),
+	/* .ivs_greedy_fun = */ NULL,
+	/* .ivs_greedy_arg = */ NULL,
+	/* .ivs_greedy_drv = */ NULL,
+	/* .ivs_greedy_cnt = */ 0,
+	/* .ivs_unhandled  = */ 0,
+	/* .ivs_handc      = */ 0,
+	/* .ivs_handv      = */ { }
 };
 
 
 /* The main ISR vector table. */
 PRIVATE ATTR_SECTION(".data.hot.read_mostly.tail")
 ATOMIC_REF(struct isr_vector_state) isr_vectors[ISR_COUNT] = {
-#define ENUM_EMPTY_VECTOR_STATE(idx, vec) ATOMIC_REF_INIT(&empty_vector_state),
+#define ENUM_EMPTY_VECTOR_STATE(idx) ATOMIC_REF_INIT(&empty_vector_state),
 	ISR_GENERIC_VECTOR_ENUM(ENUM_EMPTY_VECTOR_STATE)
 	ISR_SPECIFIC_VECTOR_ENUM(ENUM_EMPTY_VECTOR_STATE)
 #undef ENUM_EMPTY_VECTOR_STATE
@@ -625,11 +624,16 @@ NOTHROW(KCALL isr_handler)(size_t index) {
 }
 
 
-#define DEFINE_ISR_HANDLER(index, vec)                         \
-	INTERN NOBLOCK void NOTHROW(KCALL kernel_isr##vec)(void) { \
-		isr_handler(ISR_VECTOR_TO_INDEX(0x##vec));             \
+#define DEFINE_ISR_HANDLER(index)                                            \
+	INTERN NOBLOCK void NOTHROW(KCALL kernel_isr_generic_##index##h)(void) { \
+		isr_handler(0x##index);                                              \
 	}
 ISR_GENERIC_VECTOR_ENUM(DEFINE_ISR_HANDLER)
+#undef DEFINE_ISR_HANDLER
+#define DEFINE_ISR_HANDLER(index)                                             \
+	INTERN NOBLOCK void NOTHROW(KCALL kernel_isr_specific_##index##h)(void) { \
+		isr_handler(ISR_GENERIC_VECTOR_COUNT + 0x##index);                    \
+	}
 ISR_SPECIFIC_VECTOR_ENUM(DEFINE_ISR_HANDLER)
 #undef DEFINE_ISR_HANDLER
 

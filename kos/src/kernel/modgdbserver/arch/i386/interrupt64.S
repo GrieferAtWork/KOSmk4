@@ -17,15 +17,52 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-#include <hybrid/compiler.h>
+#include <kernel/compiler.h>
+
+#include <kernel/gdt.h>
+
 #include <asm/cfi.h>
-#include <asm/cpu-flags.h>
+#include <asm/instr/interrupt.h>
+#include <kos/kernel/cpu-state.h>
+#include <kos/kernel/cpu-state-asm.h>
+
+.section .text
+INTERN_FUNCTION(GDBX86Interrupt_AsmInt1Handler)
+	/* INTERN void ASMCALL GDBX86Interrupt_AsmInt1Handler(void); */
+	.cfi_startproc simple
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	intr_enter TRAP
+	ASM_PUSH_GPREGSNSP_CFI_R
+
+	movq   %rsp, %rdi
+	INTERN(GDBX86Interrupt_Int1Handler)
+	call   GDBX86Interrupt_Int1Handler
+	movq   %rax, %rsp
+
+	ASM_POP_GPREGSNSP_CFI_R
+	intr_exit
+	.cfi_endproc
+END(GDBX86Interrupt_AsmInt1Handler)
 
 
 .section .text
-INTERN_FUNCTION(test)
-.cfi_startproc
-nop
-.cfi_endproc
-END(test)
+INTERN_FUNCTION(GDBX86Interrupt_AsmInt3Handler)
+	/* INTERN void ASMCALL GDBX86Interrupt_AsmInt3Handler(void); */
+	.cfi_startproc simple
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	intr_enter TRAP
+	ASM_PUSH_GPREGSNSP_CFI_R
+
+	movq   %rsp, %rdi
+	INTERN(GDBX86Interrupt_Int3Handler)
+	call   GDBX86Interrupt_Int3Handler
+	movq   %rax, %rsp
+
+	ASM_POP_GPREGSNSP_CFI_R
+	intr_exit
+	.cfi_endproc
+END(GDBX86Interrupt_AsmInt3Handler)
+
 

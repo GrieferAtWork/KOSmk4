@@ -29,54 +29,45 @@
 #include <kos/kernel/cpu-state.h>
 
 
+
 .section .text.cold
-INTERN_FUNCTION(x86_debug_asmirq_f1)
+INTERN_FUNCTION(__x86_dbgisr_pagefault)
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-
+	.cfi_def_cfa %esp, 4 /* Adjust for the error code. */
+	popl_cfi %ss:-(12 + SIZEOF_GPREGS + 4)(%esp) /* ECODE */
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
 	pushl_cfi %es
 	.cfi_restore_iret_es_or_offset -8
 	pushl_cfi %fs
 	.cfi_restore_iret_fs_or_offset -12
-
-	pushl_cfi_r %eax
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
-
+	pushal_cfi_r
 	movw   $(SEGMENT_USER_DATA_RPL), %ax
 	movw   %ax, %ds
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-
-	INTERN(x86_debug_ps2_interrupt)
-	call   x86_debug_ps2_interrupt
-
-	/* outb(X86_PIC1_CMD,X86_PIC_CMD_EOI); */
-	movb   $(X86_PIC_CMD_EOI), %al
-	outb   %al, $(X86_PIC1_CMD)
-
-	popl_cfi_r %edx
-	popl_cfi_r %ecx
-	popl_cfi_r %eax
-
+	movl   -4(%esp), %edx /* ECODE */
+	movl   %esp, %ecx
+	INTERN(x86_handle_dbg_pagefault)
+	call   x86_handle_dbg_pagefault
+	movl   %eax, %esp
+	popal_cfi_r
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
 	.cfi_restore_iret_es
 	popl_cfi %ds
 	.cfi_restore_iret_ds
-
 	iret
 	.cfi_endproc
-END(x86_debug_asmirq_f1)
+END(__x86_dbgisr_pagefault)
+
 
 
 .section .text.cold
-INTERN_FUNCTION(x86_debug_asmirq_f0)
+INTERN_FUNCTION(__x86_dbgisr_preemption) /* ISR_X86_f0 */
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
@@ -100,40 +91,15 @@ END(x86_debug_pic_acknowledge)
 
 	iret
 	.cfi_endproc
-END(x86_debug_asmirq_f0)
+END(__x86_dbgisr_preemption)
 
 
 
-
-
-#define INTERRUPT_TYPE_NORMAL 0 /* Normal interrupt */
-#define INTERRUPT_TYPE_ERROR  1 /* This interrupt pushes an error code onto the stack. */
-#define INTERRUPT_TYPE_SPUR1  2 /* This interrupt may happen spuriously (PIC#1). */
-#define INTERRUPT_TYPE_SPUR2  3 /* This interrupt may happen spuriously (PIC#2). */
-
-.macro define_interrupt id, dpl=0, type=INTERRUPT_TYPE_NORMAL
-	.hidden x86_debug_asmirq_\id
-	.global x86_debug_asmirq_\id
-	.type   x86_debug_asmirq_\id, @function
-	.hidden x86_debug_irqdpl_\id
-	.global x86_debug_irqdpl_\id
-x86_debug_irqdpl_\id = \dpl
-	.section .text.x86.asmirq.debug.\id
-x86_debug_asmirq_\id:
+.section .text.cold
+INTERN_FUNCTION(__x86_dbgisr_specific_00h) /* ISR_X86_f1 */
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
-.if \type == INTERRUPT_TYPE_ERROR
-	.cfi_def_cfa %esp, 4 /* Adjust for the error code. */
-	popl_cfi %ss:-(12 + SIZEOF_GPREGS + 4)(%esp) /* ECODE */
-.else
 	.cfi_def_cfa %esp, 0
-.endif
-	/* Check for spurios interrupts */
-.if \type == INTERRUPT_TYPE_SPUR1
-	call    x86_check_spurious_interrupt_PIC1
-.elseif \type == INTERRUPT_TYPE_SPUR2
-	call    x86_check_spurious_interrupt_PIC2
-.endif
 
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -142,22 +108,26 @@ x86_debug_asmirq_\id:
 	pushl_cfi %fs
 	.cfi_restore_iret_fs_or_offset -12
 
-	pushal_cfi_r
-	/* Load segment registers, as expected in kernel-space */
-	movw    $(SEGMENT_USER_DATA_RPL), %ax
-	movw    %ax, %ds
-	movw    %ax, %es
-	movw    $(SEGMENT_KERNEL_FSBASE), %ax
-	movw    %ax, %fs
-.if \type == INTERRUPT_TYPE_ERROR
-	movl    -4(%esp), %edx /* ECODE */
-.endif
-	movl    %esp, %ecx
-	/* Invoke the high-level C-function */
-	call    x86_debug_cirq_\id
-	movl    %eax, %esp
-	/* Start restoring registers. */
-	popal_cfi_r
+	pushl_cfi_r %eax
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+
+	INTERN(x86_handle_dbg_ps2_interrupt)
+	call   x86_handle_dbg_ps2_interrupt
+
+	/* outb(X86_PIC1_CMD,X86_PIC_CMD_EOI); */
+	movb   $(X86_PIC_CMD_EOI), %al
+	outb   %al, $(X86_PIC1_CMD)
+
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi_r %eax
 
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -168,16 +138,16 @@ x86_debug_asmirq_\id:
 
 	iret
 	.cfi_endproc
-.size x86_debug_asmirq_\id, . - x86_debug_asmirq_\id
-.endm
+END(__x86_dbgisr_specific_00h)
 
 
-define_interrupt 0e, 0, INTERRUPT_TYPE_ERROR /* #PF  Page Fault. */
-
-
-
-
-
+/* TODO: Override all of the generic ISR handlers
+ *        - `__x86_dbgisr_generic_00h'
+ *        - `__x86_dbgisr_generic_01h'
+ *        - `__x86_dbgisr_generic_??h'
+ *        - `__x86_dbgisr_generic_6ch'
+ *       and queue them being serviced until
+ *       the debugger is eventually exited. */
 
 
 

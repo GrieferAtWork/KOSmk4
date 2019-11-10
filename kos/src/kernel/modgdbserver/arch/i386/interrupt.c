@@ -27,6 +27,7 @@
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/segment.h>
+#include <kernel/arch/interrupt.h>
 
 #include <assert.h>
 #include <string.h>
@@ -35,16 +36,8 @@
 
 DECL_BEGIN
 
-DATDEF struct idt_segment x86_idt_start[256];
-DATDEF struct idt_segment x86_idt_start_traced[256];
-
-
-#define IDT_VARIANT_NORMAL 0 /* `x86_idt_start' */
-#define IDT_VARIANT_TRACED 1 /* `x86_idt_start_traced' */
-#define IDT_VARIANT_COUNT  2 /* Number of known IDT variants. */
-
 typedef struct {
-	struct idt_segment ib_segments[IDT_VARIANT_COUNT]; /* Saved segments. */
+	struct idt_segment ib_segment; /* Saved segment. */
 } GDBX86InterruptBackup;
 
 LOCAL NONNULL((1, 2)) void FCALL
@@ -65,20 +58,31 @@ GDBX86InterruptBackup_Override(GDBX86InterruptBackup *__restrict backup,
                                isr_vector_t vector,
                                void (ASMCALL *asmHandler)(void),
                                unsigned int dpl) {
+	/* TODO: This method of changing the IDT is racy.
+	 *       A proper solution would be to:
+	 *         - Temporary copy the entire IDT somewhere else
+	 *         - Broadcast an IPI to have all other CPUs load the address of the IDT copy
+	 *         - Modify the original IDT
+	 *         - Broadcast an IPI to have all other CPUs load the original IDT
+	 *         - Free the copy */
 	COMPILER_BARRIER();
-	backup->ib_segments[IDT_VARIANT_NORMAL] = x86_idt_start[vector];
-	backup->ib_segments[IDT_VARIANT_TRACED] = x86_idt_start_traced[vector];
+	backup->ib_segment = __x86_defidt[vector];
 	COMPILER_BARRIER();
-	GDBX86Interrupt_EncodeSegment(&x86_idt_start[vector], asmHandler, dpl);
-	GDBX86Interrupt_EncodeSegment(&x86_idt_start_traced[vector], asmHandler, dpl);
+	GDBX86Interrupt_EncodeSegment(&__x86_defidt[vector], asmHandler, dpl);
 	COMPILER_BARRIER();
 }
 
 PRIVATE NONNULL((1)) void FCALL
 GDBX86InterruptBackup_Restore(GDBX86InterruptBackup *__restrict backup,
                               isr_vector_t vector) {
-	x86_idt_start[vector]        = backup->ib_segments[IDT_VARIANT_NORMAL];
-	x86_idt_start_traced[vector] = backup->ib_segments[IDT_VARIANT_TRACED];
+	/* TODO: This method of changing the IDT is racy.
+	 *       A proper solution would be to:
+	 *         - Temporary copy the entire IDT somewhere else
+	 *         - Broadcast an IPI to have all other CPUs load the address of the IDT copy
+	 *         - Modify the original IDT
+	 *         - Broadcast an IPI to have all other CPUs load the original IDT
+	 *         - Free the copy */
+	__x86_defidt[vector] = backup->ib_segment;
 }
 
 

@@ -102,9 +102,9 @@ INTERN_FUNCTION(x86_int80_emulation)
 #ifndef CONFIG_NO_SYSCALL_TRACING
 	INTERN(syscall_tracing_enabled)
 	cmpb   $0, %ss:syscall_tracing_enabled
-	jne    x86_asmirq_80_traced /* With tracing enabled... */
+	jne    __x86_defisr_syscall_traced /* With tracing enabled... */
 #endif
-	jmp    x86_asmirq_80
+	jmp    __x86_defisr_syscall
 	.cfi_endproc
 END(x86_int80_emulation)
 
@@ -339,7 +339,9 @@ INTERN_FUNCTION(x86_sysenter_main)
 END(x86_sysenter_main)
 
 .section .text.hot
-INTERN_FUNCTION(x86_asmirq_80)
+INTERN(__x86_defdpl_syscall)
+	__x86_defdpl_syscall = 3
+INTERN_FUNCTION(__x86_defisr_syscall)
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
@@ -352,7 +354,7 @@ INTERN_FUNCTION(x86_asmirq_80)
 	ja     __asm32_int80_invalid
 	jmpl   *%ss:__asm32_exsyscallrouter_int80 - ((__NR_exsyscall_min * 4) & 0xffffffff)(,%eax,4)
 	.cfi_endproc
-END(x86_asmirq_80)
+END(__x86_defisr_syscall)
 
 
 #define TEST_DOUBLE_WIDE(sysno_reg,tempreg_l,tempreg_b,segment_prefix)           \
@@ -522,7 +524,7 @@ END(x86_sysenter_main_traced)
 
 #ifndef CONFIG_NO_SYSCALL_TRACING
 .section .text.hot
-INTERN_FUNCTION(x86_asmirq_80_traced)
+INTERN_FUNCTION(__x86_defisr_syscall_traced)
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
@@ -580,7 +582,7 @@ INTERN_FUNCTION(x86_asmirq_80_traced)
 	ja     __asm32_int80_invalid
 	jmpl   *%ss:__asm32_exsyscallrouter_int80 - ((__NR_exsyscall_min * 4) & 0xffffffff)(,%eax,4)
 	.cfi_endproc
-END(x86_asmirq_80_traced)
+END(__x86_defisr_syscall_traced)
 #endif /* !CONFIG_NO_SYSCALL_TRACING */
 
 

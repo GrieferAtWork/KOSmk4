@@ -1936,7 +1936,7 @@ function generate_x86_64_kernel_syscall_wrappers(
 				fp << "\tpopq_cfi_r %rdx\n";
 			}
 			fp << "\tpopq_cfi_r %rcx\n";
-			fp << "\tiretq\n";
+			fp << "\tintr_exit_sysret\n";
 		}
 		function print_x64_386sysenter_wrapper(sc: Syscall) {
 			fp << "\t/* TODO: print_x64_386sysenter_wrapper() */\n";

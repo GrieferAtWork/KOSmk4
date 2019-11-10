@@ -33,7 +33,7 @@ DECL_BEGIN
 
 /* The GDT and IDT used by the debugger. */
 DATDEF struct segment x86_debug_gdt[SEGMENT_COUNT];
-DATDEF struct idt_segment x86_debug_idt[256] ASMNAME("x86_idt_start_debug");
+DATDEF struct idt_segment x86_debug_idt[256] ASMNAME("__x86_dbgidt");
 
 #endif /* __CC__ */
 

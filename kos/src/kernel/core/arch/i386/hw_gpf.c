@@ -63,15 +63,16 @@ DECL_BEGIN
 #define OF EFLAGS_OF
 
 PRIVATE struct icpustate *FCALL
-x86_handle_gpf(struct icpustate *__restrict state, uintptr_t ecode, bool is_ss);
+x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is_ss);
 
 INTERN struct icpustate *FCALL
-x86_cirq_0c(struct icpustate *__restrict state, uintptr_t ecode) {
-	return x86_handle_gpf(state, ecode, true);
+x86_handle_stackfault(struct icpustate *__restrict state, uintptr_t ecode) {
+	return x86_handle_gpf_impl(state, ecode, true);
 }
+
 INTERN struct icpustate *FCALL
-x86_cirq_0d(struct icpustate *__restrict state, uintptr_t ecode) {
-	return x86_handle_gpf(state, ecode, false);
+x86_handle_gpf(struct icpustate *__restrict state, uintptr_t ecode) {
+	return x86_handle_gpf_impl(state, ecode, false);
 }
 
 #ifdef __x86_64__
@@ -84,7 +85,7 @@ x86_cirq_0d(struct icpustate *__restrict state, uintptr_t ecode) {
 
 
 PRIVATE struct icpustate *FCALL
-x86_handle_gpf(struct icpustate *__restrict state, uintptr_t ecode, bool is_ss) {
+x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is_ss) {
 	byte_t *pc; u32 opcode; op_flag_t flags; struct modrm mod;
 	u16 effective_segment_value; unsigned int i;
 	pc = (byte_t *)icpustate_getpc(state);

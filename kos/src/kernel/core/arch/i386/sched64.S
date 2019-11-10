@@ -65,7 +65,7 @@
 
 
 .section .text
-INTERN_FUNCTION(x86_asmirq_ef)
+INTERN_FUNCTION(__x86_defisr_apic_spurious)
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
@@ -97,7 +97,7 @@ INTERN_FUNCTION(x86_asmirq_ef)
 
 	intr_exit
 	.cfi_endproc
-END(x86_asmirq_ef)
+END(__x86_defisr_apic_spurious)
 
 
 INTERN(cpu_scheduler_interrupt)
@@ -105,7 +105,7 @@ INTERN(cpu_scheduler_interrupt)
 /* The PIT interrupt handler -- Used for scheduling.
  * NOTE: If available, this interrupt will actually be fired by the LAPIC */
 .section .text
-INTERN_FUNCTION(x86_asmirq_f0)
+INTERN_FUNCTION(__x86_defisr_preemption)
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
@@ -213,7 +213,7 @@ INTERN_FUNCTION(x86_load_thread_rax_cpu_rbx)
 	intr_exit
 	.cfi_endproc
 END(x86_load_thread_rax_cpu_rbx)
-END(x86_asmirq_f0)
+END(__x86_defisr_preemption)
 
 
 .section .text

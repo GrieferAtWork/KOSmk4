@@ -22,7 +22,7 @@
 #include <kernel/compiler.h>
 #include <kernel/pic.h>
 #include <kernel/types.h>
-#include <kernel/arch/interrupt.h>
+#include <kernel/arch/isr.h>
 #include <stdbool.h>
 
 DECL_BEGIN

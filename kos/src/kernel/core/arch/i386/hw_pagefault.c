@@ -77,7 +77,7 @@ DATDEF byte_t x86_memcpy_nopf_ret_pointer[];
 #endif /* !__x86_64__ */
 
 INTERN struct icpustate *FCALL
-x86_cirq_0e(struct icpustate *__restrict state, uintptr_t ecode) {
+x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 #if 1
 #define IS_USER() (ecode & PAGEFAULT_F_USERSPACE)
 #else

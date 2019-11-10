@@ -188,7 +188,7 @@ x86_sysenter_emulation(struct icpustate *__restrict state);
 
 
 INTERN struct icpustate *FCALL
-x86_cirq_06(struct icpustate *__restrict state) {
+x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 	byte_t *start_pc, *pc;
 	u32 opcode;
 	op_flag_t op_flags;

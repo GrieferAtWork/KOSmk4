@@ -18,16 +18,18 @@
  */
 
 #include <kernel/compiler.h>
-#include <kernel/gdt.h>
+
 #include <kernel/except.h>
-#include <sched/task.h>
+#include <kernel/gdt.h>
 #include <sched/rpc.h>
-#include <kos/kernel/cpu-state.h>
+#include <sched/task.h>
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
 #include <asm/instr/interrupt.h>
 #include <asm/instr/movzxq.h>
+#include <kos/kernel/cpu-state-asm.h>
+#include <kos/kernel/cpu-state.h>
 
 
 
@@ -98,21 +100,7 @@ PUBLIC_FUNCTION(x86_rpc_user_redirection)
 	sti
 
 	/* Now save all of the user-space GP registers to create an icpustate. */
-	pushq_cfi_r %rax                 /* [C] Accumulator register */
-	pushq_cfi_r %rcx                 /* [C] Count register */
-	pushq_cfi_r %rdx                 /* [C] Data register */
-	pushq_cfi_r %rbx                 /* [P] Base register */
-	pushq_cfi_r %rbp                 /* [P] Frame base pointer */
-	pushq_cfi_r %rsi                 /* [C] Source pointer */
-	pushq_cfi_r %rdi                 /* [C] Destination pointer */
-	pushq_cfi_r %r8                  /* [C] General purpose register #8 */
-	pushq_cfi_r %r9                  /* [C] General purpose register #9 */
-	pushq_cfi_r %r10                 /* [C] General purpose register #10 */
-	pushq_cfi_r %r11                 /* [C] General purpose register #11 */
-	pushq_cfi_r %r12                 /* [P] General purpose register #12 */
-	pushq_cfi_r %r13                 /* [P] General purpose register #13 */
-	pushq_cfi_r %r14                 /* [P] General purpose register #14 */
-	pushq_cfi_r %r15                 /* [P] General purpose register #15 */
+	ASM_PUSH_GPREGSNSP_CFI_R
 
 INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 
@@ -163,21 +151,7 @@ INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 	.cfi_def_cfa_register %rsp
 
 1:	/* Restore the state after exception propagation. */
-	popq_cfi_r %r15                 /* [P] General purpose register #15 */
-	popq_cfi_r %r14                 /* [P] General purpose register #14 */
-	popq_cfi_r %r13                 /* [P] General purpose register #13 */
-	popq_cfi_r %r12                 /* [P] General purpose register #12 */
-	popq_cfi_r %r11                 /* [C] General purpose register #11 */
-	popq_cfi_r %r10                 /* [C] General purpose register #10 */
-	popq_cfi_r %r9                  /* [C] General purpose register #9 */
-	popq_cfi_r %r8                  /* [C] General purpose register #8 */
-	popq_cfi_r %rdi                 /* [C] Destination pointer */
-	popq_cfi_r %rsi                 /* [C] Source pointer */
-	popq_cfi_r %rbp                 /* [P] Frame base pointer */
-	popq_cfi_r %rbx                 /* [P] Base register */
-	popq_cfi_r %rdx                 /* [C] Data register */
-	popq_cfi_r %rcx                 /* [C] Count register */
-	popq_cfi_r %rax                 /* [C] Accumulator register */
+	ASM_POP_GPREGSNSP_CFI_R
 	intr_exit
 	.cfi_endproc
 END(x86_serve_user_rpc_and_propagate_exceptions)
@@ -305,22 +279,7 @@ PUBLIC_FUNCTION(task_rpc_exec_here)
 	.cfi_rel_offset %cs, 0
 	pushq_cfi %rax                   /* ir_rip */
 	.cfi_rel_offset %rip, 0
-	pushq_cfi_r %rax                 /* [C] Accumulator register */
-	pushq_cfi_r %rcx                 /* [C] Count register */
-	pushq_cfi_r %rdx                 /* [C] Data register */
-	pushq_cfi_r %rbx                 /* [P] Base register */
-	pushq_cfi_r %rbp                 /* [P] Frame base pointer */
-	pushq_cfi_r %rsi                 /* [C] Source pointer */
-	pushq_cfi_r %rdi                 /* [C] Destination pointer */
-	pushq_cfi_r %r8                  /* [C] General purpose register #8 */
-	pushq_cfi_r %r9                  /* [C] General purpose register #9 */
-	pushq_cfi_r %r10                 /* [C] General purpose register #10 */
-	pushq_cfi_r %r11                 /* [C] General purpose register #11 */
-	pushq_cfi_r %r12                 /* [P] General purpose register #12 */
-	pushq_cfi_r %r13                 /* [P] General purpose register #13 */
-	pushq_cfi_r %r14                 /* [P] General purpose register #14 */
-	pushq_cfi_r %r15                 /* [P] General purpose register #15 */
-
+	ASM_PUSH_GPREGSNSP_CFI_R
 
 	movq   %rdx, %rbp                   /* <struct sig *completed> */
 	movq   %rdi, %rax                   /* <task_rpc_t func> */
@@ -341,22 +300,8 @@ PUBLIC_FUNCTION(task_rpc_exec_here)
 1:	movq   %rax, %rsp
 	.cfi_def_cfa_register %rsp
 
-	popq_cfi_r %r15                  /* [P] General purpose register #15 */
-	popq_cfi_r %r14                  /* [P] General purpose register #14 */
-	popq_cfi_r %r13                  /* [P] General purpose register #13 */
-	popq_cfi_r %r12                  /* [P] General purpose register #12 */
-	popq_cfi_r %r11                  /* [C] General purpose register #11 */
-	popq_cfi_r %r10                  /* [C] General purpose register #10 */
-	popq_cfi_r %r9                   /* [C] General purpose register #9 */
-	popq_cfi_r %r8                   /* [C] General purpose register #8 */
-	popq_cfi_r %rdi                  /* [C] Destination pointer */
-	popq_cfi_r %rsi                  /* [C] Source pointer */
-	popq_cfi_r %rbp                  /* [P] Frame base pointer */
-	popq_cfi_r %rbx                  /* [P] Base register */
-	popq_cfi_r %rdx                  /* [C] Data register */
-	popq_cfi_r %rcx                  /* [C] Count register */
-	popq_cfi_r %rax                  /* [C] Accumulator register */
-	iretq
+	ASM_POP_GPREGSNSP_CFI_R
+	intr_exit
 	.cfi_endproc
 END(task_rpc_exec_here)
 
@@ -374,22 +319,7 @@ PUBLIC_FUNCTION(task_rpc_exec_here_onexit)
 	pushfq_cfi                       /* ir_rflags */
 	pushq_cfi $(SEGMENT_KERNEL_CODE) /* ir_cs */
 	pushq_cfi (5 * 8)(%rsp)          /* ir_rip */
-
-	pushq_cfi %rax                 /* [C] Accumulator register */
-	pushq_cfi %rcx                 /* [C] Count register */
-	pushq_cfi %rdx                 /* [C] Data register */
-	pushq_cfi %rbx                 /* [P] Base register */
-	pushq_cfi %rbp                 /* [P] Frame base pointer */
-	pushq_cfi %rsi                 /* [C] Source pointer */
-	pushq_cfi %rdi                 /* [C] Destination pointer */
-	pushq_cfi %r8                  /* [C] General purpose register #8 */
-	pushq_cfi %r9                  /* [C] General purpose register #9 */
-	pushq_cfi %r10                 /* [C] General purpose register #10 */
-	pushq_cfi %r11                 /* [C] General purpose register #11 */
-	pushq_cfi %r12                 /* [P] General purpose register #12 */
-	pushq_cfi %r13                 /* [P] General purpose register #13 */
-	pushq_cfi %r14                 /* [P] General purpose register #14 */
-	pushq_cfi %r15                 /* [P] General purpose register #15 */
+	ASM_PUSH_GPREGSNSP_CFI_R
 
 	movq   %rdi, %rax                           /* <task_rpc_t func> */
 	movq   %rsi, %rdi                           /* <void *arg> */
@@ -399,8 +329,8 @@ PUBLIC_FUNCTION(task_rpc_exec_here_onexit)
 
 	call   *%rax
 
-	addq   $(20 * 8), %rsp
-	.cfi_adjust_cfa_offset -(20 * 8)
+	addq   $(SIZEOF_ICPUSTATE64), %rsp
+	.cfi_adjust_cfa_offset -SIZEOF_ICPUSTATE64
 	ret
 	.cfi_endproc
 END(task_rpc_exec_here_onexit)
@@ -446,21 +376,7 @@ PUBLIC_FUNCTION(task_serve)
 
 	movq   $1, %rax /* Return $1 later on (unless overwritten by RPC functions themself) */
 
-	pushq_cfi_r %rax                 /* [C] Accumulator register */
-	pushq_cfi_r %rcx                 /* [C] Count register */
-	pushq_cfi_r %rdx                 /* [C] Data register */
-	pushq_cfi_r %rbx                 /* [P] Base register */
-	pushq_cfi_r %rbp                 /* [P] Frame base pointer */
-	pushq_cfi_r %rsi                 /* [C] Source pointer */
-	pushq_cfi_r %rdi                 /* [C] Destination pointer */
-	pushq_cfi_r %r8                  /* [C] General purpose register #8 */
-	pushq_cfi_r %r9                  /* [C] General purpose register #9 */
-	pushq_cfi_r %r10                 /* [C] General purpose register #10 */
-	pushq_cfi_r %r11                 /* [C] General purpose register #11 */
-	pushq_cfi_r %r12                 /* [P] General purpose register #12 */
-	pushq_cfi_r %r13                 /* [P] General purpose register #13 */
-	pushq_cfi_r %r14                 /* [P] General purpose register #14 */
-	pushq_cfi_r %r15                 /* [P] General purpose register #15 */
+	ASM_PUSH_GPREGSNSP_CFI_R
 
 1:	movq   %rsp, %rdi
 	/* Service a single RPC function */
@@ -479,22 +395,8 @@ PUBLIC_FUNCTION(task_serve)
 	je     1b
 #endif
 
-	popq_cfi_r %r15                  /* [P] General purpose register #15 */
-	popq_cfi_r %r14                  /* [P] General purpose register #14 */
-	popq_cfi_r %r13                  /* [P] General purpose register #13 */
-	popq_cfi_r %r12                  /* [P] General purpose register #12 */
-	popq_cfi_r %r11                  /* [C] General purpose register #11 */
-	popq_cfi_r %r10                  /* [C] General purpose register #10 */
-	popq_cfi_r %r9                   /* [C] General purpose register #9 */
-	popq_cfi_r %r8                   /* [C] General purpose register #8 */
-	popq_cfi_r %rdi                  /* [C] Destination pointer */
-	popq_cfi_r %rsi                  /* [C] Source pointer */
-	popq_cfi_r %rbp                  /* [P] Frame base pointer */
-	popq_cfi_r %rbx                  /* [P] Base register */
-	popq_cfi_r %rdx                  /* [C] Data register */
-	popq_cfi_r %rcx                  /* [C] Count register */
-	popq_cfi_r %rax                  /* [C] Accumulator register */
-	iretq
+	ASM_POP_GPREGSNSP_CFI_R
+	intr_exit
 	.cfi_endproc
 END(task_serve)
 
@@ -540,21 +442,7 @@ PUBLIC_FUNCTION(task_serve_nx)
 
 	/* Return $1 later on (unless overwritten by RPC functions themself) */
 	movq   $(TASK_SERVE_NX_DIDRUN), %rax
-	pushq_cfi_r %rax                 /* [C] Accumulator register */
-	pushq_cfi_r %rcx                 /* [C] Count register */
-	pushq_cfi_r %rdx                 /* [C] Data register */
-	pushq_cfi_r %rbx                 /* [P] Base register */
-	pushq_cfi_r %rbp                 /* [P] Frame base pointer */
-	pushq_cfi_r %rsi                 /* [C] Source pointer */
-	pushq_cfi_r %rdi                 /* [C] Destination pointer */
-	pushq_cfi_r %r8                  /* [C] General purpose register #8 */
-	pushq_cfi_r %r9                  /* [C] General purpose register #9 */
-	pushq_cfi_r %r10                 /* [C] General purpose register #10 */
-	pushq_cfi_r %r11                 /* [C] General purpose register #11 */
-	pushq_cfi_r %r12                 /* [P] General purpose register #12 */
-	pushq_cfi_r %r13                 /* [P] General purpose register #13 */
-	pushq_cfi_r %r14                 /* [P] General purpose register #14 */
-	pushq_cfi_r %r15                 /* [P] General purpose register #15 */
+	ASM_PUSH_GPREGSNSP_CFI_R
 
 1:	movq   %rsp, %rdi
 	/* Service a single RPC function */
@@ -572,25 +460,11 @@ PUBLIC_FUNCTION(task_serve_nx)
 	orq    %rax, OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RAX(%rsp)
 #endif
 
-	popq_cfi_r %r15                  /* [P] General purpose register #15 */
-	popq_cfi_r %r14                  /* [P] General purpose register #14 */
-	popq_cfi_r %r13                  /* [P] General purpose register #13 */
-	popq_cfi_r %r12                  /* [P] General purpose register #12 */
-	popq_cfi_r %r11                  /* [C] General purpose register #11 */
-	popq_cfi_r %r10                  /* [C] General purpose register #10 */
-	popq_cfi_r %r9                   /* [C] General purpose register #9 */
-	popq_cfi_r %r8                   /* [C] General purpose register #8 */
-	popq_cfi_r %rdi                  /* [C] Destination pointer */
-	popq_cfi_r %rsi                  /* [C] Source pointer */
-	popq_cfi_r %rbp                  /* [P] Frame base pointer */
-	popq_cfi_r %rbx                  /* [P] Base register */
-	popq_cfi_r %rdx                  /* [C] Data register */
-	popq_cfi_r %rcx                  /* [C] Count register */
-	popq_cfi_r %rax                  /* [C] Accumulator register */
+	ASM_POP_GPREGSNSP_CFI_R
 	cmpq   $0, %gs:_this_pending_sync_count
 	je     1f
 	orq    $(TASK_SERVE_NX_XPENDING), %rax
-1:	iretq
+1:	intr_exit
 	.cfi_endproc
 END(task_serve_nx)
 

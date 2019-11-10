@@ -67,7 +67,7 @@ DATDEF byte_t x86_memcpy_nopf_ret_pointer[];
 #endif /* !__x86_64__ */
 
 INTERN ATTR_DBGTEXT ATTR_RETNONNULL NONNULL((1)) struct icpustate *
-NOTHROW(FCALL x86_debug_cirq_0e)(struct icpustate *__restrict state, uintptr_t ecode) {
+NOTHROW(FCALL x86_handle_dbg_pagefault)(struct icpustate *__restrict state, uintptr_t ecode) {
 	/* Use a dedicated #PF handler for the debugger, so-as to prevent crashes arising when
 	 * the debugger is invoked for some kind of problem related to page initialization.
 	 * Also: This way, the debugger accessing memory will never cause disk activity, or

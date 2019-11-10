@@ -254,7 +254,7 @@ fpustate_saveinto(USER CHECKED struct fpustate *state)
 
 
 INTERN struct icpustate *FCALL /* #NM */
-x86_cirq_07(struct icpustate *__restrict state) {
+x86_handle_device_not_available(struct icpustate *__restrict state) {
 	struct task *old_task, *new_task;
 	old_task = PERCPU(x86_fpu_current);
 	new_task = THIS_TASK;

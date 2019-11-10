@@ -16,6 +16,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#define __LINKER__ 1
 #define _KOS_SOURCE 1
 #define _KOS_KERNEL_SOURCE 1
 
@@ -94,9 +95,8 @@ SECTIONS {
 #ifdef __x86_64__
 		*(.text.x86.syscall32.*) /* C-level implementations of system calls (for compatibility mode). */
 #endif /* __x86_64__ */
-		KEEP(*(.text.x86.cirq.*))
-		KEEP(*(.text.x86.asmirq.*))
-		KEEP(*(.text.x86.asmisr.*))
+		*(.text.x86.cisr.*)
+		*(.text.x86.asmisr.*)
 #ifdef __x86_64__
 		*(.text.x86.asm64_syscall.*)
 #endif /* __x86_64__ */
@@ -263,30 +263,6 @@ SECTIONS {
 		PROVIDE_HIDDEN(kernel_profile_branch_annotated_start = ABSOLUTE(.));
 		PROVIDE_HIDDEN(kernel_profile_branch_annotated_end = ABSOLUTE(.));
 #endif /* CONFIG_NO_BRANCH_PROFILING */
-
-		IP_ALIGN(__SIZEOF_POINTER__);
-		PROVIDE(x86_idt_start = ABSOLUTE(.));
-		/* Use the linker to generate our IDT table.
-		 * This way, we don't have to keep a table of pointers
-		 * that we'd otherwise need to convert at runtime! */
-#include "interrupt.ld"
-
-#ifndef CONFIG_NO_SYSCALL_TRACING
-		IP_ALIGN(__SIZEOF_POINTER__);
-		PROVIDE(x86_idt_start_traced = ABSOLUTE(.));
-#define WITH_SYSCALL_TRACING_ENABLED 1
-#include "interrupt.ld"
-#undef WITH_SYSCALL_TRACING_ENABLED
-#endif /* !CONFIG_NO_SYSCALL_TRACING */
-
-#ifndef CONFIG_NO_DEBUGGER
-		IP_ALIGN(__SIZEOF_POINTER__);
-		PROVIDE(x86_idt_start_debug = ABSOLUTE(.));
-		/* Use the linker to generate our IDT table.
-		 * This way, we don't have to keep a table of pointers
-		 * that we'd otherwise need to convert at runtime! */
-#include "debugger/interrupt.ld"
-#endif /* !CONFIG_NO_DEBUGGER */
 
 #ifdef CONFIG_NO_SMP
 		IP_ALIGN(__SIZEOF_CACHELINE__);
@@ -525,7 +501,11 @@ SECTIONS {
 #endif /* !CONFIG_NO_PAGING_P32 */
 #endif /* !__x86_64__ */
 
-
+#include "interrupt.ld"
+#ifndef CONFIG_NO_DEBUGGER
+#define PREFIX __x86_dbg
+#include "interrupt.ld"
+#endif /* !CONFIG_NO_DEBUGGER */
 
 	/DISCARD/ : {
 		*(.rel*)

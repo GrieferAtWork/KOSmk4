@@ -20,7 +20,11 @@
 #define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_PIC_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/types.h>
+
+#include <sys/io.h>
+
 #include "idt.h"
 
 DECL_BEGIN

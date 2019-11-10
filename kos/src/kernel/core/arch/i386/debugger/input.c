@@ -227,7 +227,7 @@ NOTHROW(KCALL ps2_keyboard_putbyte)(u8 byte) {
 }
 
 INTERN ATTR_DBGTEXT NOBLOCK void
-NOTHROW(KCALL x86_debug_ps2_interrupt)(void) {
+NOTHROW(KCALL x86_handle_dbg_ps2_interrupt)(void) {
 	u8 data;
 #if 1
 	for (;;) {

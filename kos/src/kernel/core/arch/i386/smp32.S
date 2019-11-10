@@ -52,7 +52,7 @@ PUBLIC_FUNCTION(cpu_ipi_service)
 	pushl_cfi %eax
 /*	.cfi_rel_offset %eip, 0 */
 	.cfi_endproc
-INTERN_FUNCTION(x86_asmirq_ee)
+INTERN_FUNCTION(__x86_defisr_apic_ipi)
 	.cfi_startproc
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
@@ -161,7 +161,7 @@ INTERN_FUNCTION(x86_asmirq_ee)
 	movl   _this_cpu_current(%ebx), %eax
 	jmp    x86_load_thread_eax_cpu_ebx
 	.cfi_endproc
-END(x86_asmirq_ee)
+END(__x86_defisr_apic_ipi)
 END(cpu_ipi_service)
 
 .section .rodata
@@ -414,25 +414,9 @@ INTERN_FUNCTION(x86_smp_entry32)
 	ljmp   $(SEGMENT_KERNEL_CODE), $1f
 1:
 
-
 	/* Load the interrupt descriptor table. */
-	PUBLIC(x86_idt_start)
-#ifndef CONFIG_NO_SYSCALL_TRACING
-	INTERN(syscall_tracing_enabled)
-	/* Must use `x86_idt_start_traced' when syscall tracing is enabled! */
-	movl   $x86_idt_start, %ecx
-	cmpb   $0, syscall_tracing_enabled
-	je     1f
-	PUBLIC(x86_idt_start_traced)
-	movl   $x86_idt_start_traced, %ecx
-1:	pushl  %ecx
-#else /* !CONFIG_NO_SYSCALL_TRACING */
-	pushl  $x86_idt_start
-#endif /* CONFIG_NO_SYSCALL_TRACING */
-	pushw  $((256 * SIZEOF_IDT_SEGMENT) - 1)
-	lidt   (%esp)
-	addl   $6, %esp
-
+	PUBLIC(__x86_defidtptr)
+	lidtl  __x86_defidtptr
 
 	/* ============== Configure cpuid features ============== */
 	/* R_CPU:  THIS_CPU
@@ -573,7 +557,6 @@ INTERN_FUNCTION(x86_smp_entry32)
 	movl   $(x86_sysenter_main), %eax
 #ifndef CONFIG_NO_SYSCALL_TRACING
 	INTERN(syscall_tracing_enabled)
-	movl   $(x86_idt_start), %ecx
 	cmpb   $0, syscall_tracing_enabled
 	je     1f
 	INTERN(x86_sysenter_main_traced)

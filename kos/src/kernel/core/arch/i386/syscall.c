@@ -27,6 +27,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/interrupt.h>
 #include <kernel/coredump.h>
 #include <kernel/cpuid.h>
 #include <kernel/debugtrap.h>
@@ -799,16 +800,10 @@ INTDEF byte_t x86_sysenter_main[];
 PRIVATE ATTR_COLDBSS struct mutex syscall_tracing_lock = MUTEX_INIT;
 INTERN ATTR_COLDBSS bool syscall_tracing_enabled = false;
 
-DATDEF struct idt_segment x86_idt_start[256];
-DATDEF struct idt_segment x86_idt_start_traced[256];
-
+INTDEF byte_t __x86_defisr_syscall[];
+INTDEF byte_t __x86_defisr_syscall_traced[];
 INTDEF byte_t x86_sysenter_main_traced[];
 
-
-struct ATTR_PACKED idt_pointer {
-	uint16_t ip_length; /* Length */
-	void    *ip_base;   /* Base */
-};
 
 PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL syscall_tracing_ipi)(struct icpustate *__restrict state,
@@ -816,10 +811,10 @@ NOTHROW(FCALL syscall_tracing_ipi)(struct icpustate *__restrict state,
 	if (CPUID_FEATURES.ci_1d & CPUID_1D_SEP) {
 		/* Also re-direct the `sysenter' instruction */
 		__wrmsr(IA32_SYSENTER_EIP,
-		        args[0] == x86_idt_start_traced ? (uintptr_t)x86_sysenter_main_traced
-		                                        : (uintptr_t)x86_sysenter_main);
+		        args[0] ? (uintptr_t)x86_sysenter_main_traced
+		                : (uintptr_t)x86_sysenter_main);
 	}
-	__lidt(sizeof(x86_idt_start) - 1, args[0]);
+	__lidt_p(&__x86_defidtptr);
 	return state;
 }
 
@@ -827,13 +822,32 @@ NOTHROW(FCALL syscall_tracing_ipi)(struct icpustate *__restrict state,
  * @return: true:  Successfully changed the current tracing state.
  * @return: false: Tracing was already enabled/disabled. */
 PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
+	bool result;
 	void *argv[CPU_IPI_ARGCOUNT];
-	struct idt_pointer oldptr;
+	struct idt_segment newsyscall;
+	uintptr_t addr;
 	SCOPED_WRITELOCK(&syscall_tracing_lock);
-	argv[0] = enable
-	          ? x86_idt_start_traced
-	          : x86_idt_start;
-	ATOMIC_WRITE(syscall_tracing_enabled, enable);
+	argv[0] = (void *)(enable ? (uintptr_t)1 : (uintptr_t)0);
+	addr = enable ? (uintptr_t)__x86_defisr_syscall
+	              : (uintptr_t)__x86_defisr_syscall_traced;
+#ifdef __x86_64__
+	newsyscall.i_seg.s_u = SEGMENT_INTRGATE_INIT_U(addr, SEGMENT_KERNEL_CODE, 0, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
+	newsyscall.i_ext.s_u = SEGMENT_INTRGATE_HI_INIT_U(addr, SEGMENT_KERNEL_CODE, 0, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
+#else /* __x86_64__ */
+	newsyscall.i_seg.s_ul = SEGMENT_INTRGATE_INIT_UL(addr, SEGMENT_KERNEL_CODE, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
+	newsyscall.i_seg.s_uh = SEGMENT_INTRGATE_INIT_UH(addr, SEGMENT_KERNEL_CODE, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
+#endif /* !__x86_64__ */
+	/* TODO: This method of changing the IDT is racy.
+	 *       A proper solution would be to:
+	 *         - Temporary copy the entire IDT somewhere else
+	 *         - Broadcast an IPI to have all other CPUs load the address of the IDT copy
+	 *         - Modify the original IDT
+	 *         - Broadcast an IPI to have all other CPUs load the original IDT
+	 *         - Free the copy */
+	__x86_defidt[0x80] = newsyscall;
+
+	result = syscall_tracing_enabled;
+	syscall_tracing_enabled = enable;
 	cpu_broadcastipi_notthis(&syscall_tracing_ipi,
 	                         argv,
 #if 1
@@ -852,20 +866,13 @@ PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
 		        enable ? (uintptr_t)x86_sysenter_main_traced
 		               : (uintptr_t)x86_sysenter_main);
 	}
-	__sidt(&oldptr);
-	__lidt(sizeof(x86_idt_start) - 1, argv[0]);
-	return oldptr.ip_base != argv[0];
+	__lidt_p(&__x86_defidtptr);
+	return result;
 }
 /* Check if system call tracing is enabled. */
 PUBLIC WUNUSED bool
 NOTHROW(KCALL syscall_tracing_getenabled)(void) {
-#if 1
 	return ATOMIC_READ(syscall_tracing_enabled);
-#else
-	struct idt_pointer ptr;
-	__sidt(&ptr);
-	return ptr.ip_base == x86_idt_start_traced;
-#endif
 }
 #endif /* !CONFIG_NO_SYSCALL_TRACING */
 

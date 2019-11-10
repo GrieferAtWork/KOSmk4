@@ -42,7 +42,7 @@ DECL_BEGIN
 
 
 INTERN struct icpustate *FCALL
-x86_cirq_05(struct icpustate *__restrict state) {
+x86_handle_bound_range(struct icpustate *__restrict state) {
 	byte_t *pc;
 	u32 opcode;
 	op_flag_t flags;

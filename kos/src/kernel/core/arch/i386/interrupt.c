@@ -21,251 +21,82 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/addr2line.h>
+#include <kernel/arch/interrupt.h>
+#include <kernel/arch/isr-foreach.h>
+#include <kernel/arch/isr-names.h>
 #include <kernel/debugger.h>
-#include <kernel/debugtrap.h>
-#include <kernel/vm.h>
-#include <kernel/except.h>
-#include <kernel/gdt.h>
-#include <kernel/idt.h>
-#include <kernel/memory.h>
-#include <kernel/paging.h>
-#include <kernel/pic.h>
-#include <kernel/printk.h>
-#include <sched/task.h>
+#include <kernel/types.h>
 
-#include <asm/cpu-flags.h>
-#include <asm/intrin.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/cpu-state-helpers.h>
-#include <sys/io.h>
-
-#include <format-printer.h>
-#include <signal.h>
-#include <stddef.h>
-
-#include <libinstrlen/instrlen.h>
-#include <libregdump/x86.h>
-#include <libunwind/unwind.h>
+#include <kos/kernel/segment.h>
 
 DECL_BEGIN
 
-PUBLIC ATTR_PERCPU struct x86_spurious_interrupts
-x86_spurious_interrupts = { 0, 0, 0 };
-
-INTERN void KCALL x86_pic1_spur(void) {
-	++PERCPU(x86_spurious_interrupts).sp_pic1;
-}
-INTERN void KCALL x86_pic2_spur(void) {
-	++PERCPU(x86_spurious_interrupts).sp_pic2;
-}
-INTERN void KCALL x86_apic_spur(void) {
-	++PERCPU(x86_spurious_interrupts).sp_apic;
-}
-
-
-
-PRIVATE char const *FCALL get_interrupt_name(uintptr_t intno) {
-	char const *result;
-	switch (intno & 0xff) {
-	case X86_E_SYSTEM_DE & 0xff: result = "DIVIDE_BY_ZERO"; break;
-	case X86_E_SYSTEM_DB & 0xff: result = "DEBUG"; break;
-	case X86_E_SYSTEM_NMI & 0xff: result = "NON_MASKABLE_INTERRUPT"; break;
-	case X86_E_SYSTEM_BP & 0xff: result = "BREAKPOINT"; break;
-	case X86_E_SYSTEM_OF & 0xff: result = "OVERFLOW"; break;
-	case X86_E_SYSTEM_BR & 0xff: result = "BOUND_RANGE_EXCEEDED"; break;
-	case X86_E_SYSTEM_UD & 0xff: result = "INVALID_OPCODE"; break;
-	case X86_E_SYSTEM_NM & 0xff: result = "DEVICE_NOT_AVAILABLE"; break;
-	case X86_E_SYSTEM_DF & 0xff: result = "DOUBLE_FAULT"; break;
-	case X86_E_SYSTEM_TS & 0xff: result = "INVALID_TSS"; break;
-	case X86_E_SYSTEM_NP & 0xff: result = "SEGMENT_NOT_PRESENT"; break;
-	case X86_E_SYSTEM_SS & 0xff: result = "STACK_SEGMENT_FAULT"; break;
-	case X86_E_SYSTEM_GP & 0xff: result = "GENERAL_PROTECTION_FAULT"; break;
-	case X86_E_SYSTEM_PF & 0xff: result = "PAGE_FAULT"; break;
-	case X86_E_SYSTEM_MF & 0xff: result = "X87_FLOATING_POINT_EXCEPTION"; break;
-	case X86_E_SYSTEM_AC & 0xff: result = "ALIGNMENT_CHECK"; break;
-	case X86_E_SYSTEM_MC & 0xff: result = "MACHINE_CHECK"; break;
-	case X86_E_SYSTEM_XM & 0xff: result = "SIMD_FLOATING_POINT_EXCEPTION"; break;
-	case X86_E_SYSTEM_VE & 0xff: result = "VIRTUALIZATION_EXCEPTION"; break;
-	case X86_E_SYSTEM_SX & 0xff: result = "SECURITY_EXCEPTION"; break;
-	default: result = NULL; break;
-	}
-	return result;
-}
-
-PRIVATE char const *FCALL
-get_interrupt_desc(uintptr_t intno, uintptr_t ecode) {
-	char const *result = NULL;
-	switch (intno & 0xff) {
-
-	case X86_E_SYSTEM_PF & 0xff:
-		if (!(ecode & 1))
-			result = "PAGE_NOT_PRESENT";
-		else if (ecode & 8)
-			result = "RESERVED_PAGING_BIT_SET";
-		else if (ecode & 16)
-			result = "INSTRUCTION_FETCH";
-		else if (ecode & 2)
-			result = "ILLEGAL_WRITE";
-		break;
-
-	default:
-		break;
-	}
-	return result;
-}
-
-
-INTERN ssize_t LIBREGDUMP_CC
-indent_regdump_print_format(struct regdump_printer *__restrict self,
-                            unsigned int format_option) {
-	switch (format_option) {
-	case REGDUMP_FORMAT_INDENT:
-		return (*self->rdp_printer)(self->rdp_printer_arg, "    ", 4);
-	default:
-		break;
-	}
-	return 0;
-}
-
-
-INTERN void FCALL
-x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
-                                  PHYS pagedir_t *cr3) {
-	unsigned int error;
-	bool is_first;
-	struct regdump_printer rd_printer;
-	struct desctab tab;
-	rd_printer.rdp_printer     = &kprinter;
-	rd_printer.rdp_printer_arg = (void *)KERN_EMERG;
-	rd_printer.rdp_format      = &indent_regdump_print_format;
-	regdump_gpregs(&rd_printer, &ustate->ucs_gpregs);
-	regdump_ip(&rd_printer, ucpustate_getpc(ustate));
-	regdump_sgregs_with_cs_ss_tr_ldt(&rd_printer, &ustate->ucs_sgregs,
-	                                 ustate->ucs_cs, ustate->ucs_ss,
-	                                 __str(), __sldt());
-	__sgdt(&tab);
-	regdump_gdt(&rd_printer, &tab);
-	__sidt(&tab);
-	regdump_idt(&rd_printer, &tab);
-	regdump_cr0(&rd_printer, __rdcr0());
-	printk(KERN_EMERG "    %%cr2 %p\n", __rdcr2());
-	regdump_cr4(&rd_printer, __rdcr4());
-	printk(KERN_EMERG "    %%cr3 %p\n", (void *)cr3);
-	addr2line_printf(&kprinter, (void *)KERN_RAW,
-	                 ucpustate_getpc(ustate),
-	                 (uintptr_t)instruction_trysucc((void const *)ucpustate_getpc(ustate)),
-	                 "Caused here [sp=%p]",
-	                 ucpustate_getsp(ustate));
-	is_first = true;
-	for (;;) {
-		struct ucpustate old_state;
-		old_state = *ustate;
-		error = unwind((void *)(is_first
-		                        ? ucpustate_getpc(&old_state)
-		                        : ucpustate_getpc(&old_state) - 1),
-		               &unwind_getreg_ucpustate, &old_state,
-		               &unwind_setreg_ucpustate, ustate);
-		if (error != UNWIND_SUCCESS)
-			break;
-		is_first = false;
-		addr2line_printf(&kprinter, (void *)KERN_RAW,
-		                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(ustate)),
-		                 ucpustate_getpc(ustate), "Called here [sp=%p]",
-		                 ucpustate_getsp(ustate));
-	}
-	if (error != UNWIND_NO_FRAME)
-		printk(KERN_EMERG "Unwind failure: %u\n", error);
-}
-
-
-#ifndef CONFIG_NO_DEBUGGER
-struct panic_args {
-	uintptr_t ecode;
-	uintptr_t intno;
-};
-PRIVATE void KCALL
-panic_uhi_dbg_main(void *arg) {
-	struct panic_args *args;
-	args = (struct panic_args *)arg;
-	dbg_printf(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON,
-	                    "Unhandled interrupt")
-	           " [int: " DF_WHITE("%#.2I8x") " (" DF_WHITE("%I8u") ")]",
-	           (u8)args->intno, (u8)args->intno);
-	if (args->ecode)
-		dbg_printf(" [ecode=" DF_WHITE("%#.8I32x") "]", (u32)args->ecode);
-	{
-		char const *name, *desc;
-		name = get_interrupt_name(args->intno);
-		if (name) {
-			desc = get_interrupt_desc(args->intno, args->ecode);
-			dbg_printf(" [" DF_WHITE("%s"), name);
-			if (desc)
-				dbg_printf(":" DF_WHITE("%s"), desc);
-			dbg_putc(']');
-		}
-	}
-	dbg_printf("\n"
-	           "%[vinfo:"
-	           "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
-	           "func: " DF_WHITE("%n") "\n"
-	           "addr: " DF_WHITE("%p") "\n"
-	           "]",
-	           fcpustate_getpc(&dbg_exitstate));
-	dbg_main(0);
-}
-#endif
-
-
-INTERN struct icpustate *FCALL
-x86_interrupt_generic(struct icpustate *__restrict state,
-                      uintptr_t ecode, uintptr_t intno) {
-	struct ucpustate ustate;
-	__cli();
-	icpustate_to_ucpustate(state, &ustate);
-	printk(KERN_EMERG "Unhandled interrupt %Ix (%Iu)", intno, intno);
-	{
-		char const *name, *desc;
-		name = get_interrupt_name(intno);
-		desc = get_interrupt_desc(intno, ecode);
-		if (name) {
-			printk(KERN_EMERG " [%s%s%s]",
-			       name, desc ? ":" : "", desc ? desc : "");
-		}
-	}
-	if (ecode != 0)
-		printk(KERN_EMERG " [ecode=%#Ix]", ecode);
-	if (intno == 0xe)
-		printk(KERN_EMERG " [%%cr2=%p]", __rdcr2());
-	printk(KERN_EMERG "\n");
-#ifndef CONFIG_NO_DEBUGGER
-	if (dbg_active)
-		return state; /* Don't override the debugger return location if we're already inside. */
+#ifdef CONFIG_NO_DEBUGGER
+#define ISR_DEFINE_HILO(id)              \
+	INTDEF byte_t __x86_defisrlo_##id[]; \
+	INTDEF byte_t __x86_defisrhi_##id[];
+#else /* CONFIG_NO_DEBUGGER */
+#define ISR_DEFINE_HILO(id)              \
+	INTDEF byte_t __x86_defisrlo_##id[]; \
+	INTDEF byte_t __x86_defisrhi_##id[]; \
+	INTDEF byte_t __x86_dbgisrlo_##id[]; \
+	INTDEF byte_t __x86_dbgisrhi_##id[];
 #endif /* !CONFIG_NO_DEBUGGER */
-	x86_dump_ucpustate_register_state(&ustate, (PHYS pagedir_t *)__rdcr3());
-	if (THIS_TASK != &_boottask) {
-		printk(KERN_EMERG "Boot task state:\n");
-		scpustate_to_ucpustate(_boottask.t_sched.s_state, &ustate);
-		x86_dump_ucpustate_register_state(&ustate, _boottask.t_vm->v_pdir_phys_ptr);
-	}
+ISR_X86_FOREACH(ISR_DEFINE_HILO)
+#undef ISR_DEFINE_HILO
+#ifdef __x86_64__
+#define ISR_DEFINE_HILO(prefix, id)       \
+	/* [0x##id] = */ {                    \
+		/* .i_seg = */ { {                \
+			 .s_u = (u64)prefix##lo_##id, \
+		} },                              \
+		/* .i_ext = */ { {                \
+			 .s_u = (u64)prefix##hi_##id, \
+		} }                               \
+	},
+#else /* __x86_64__ */
+#define ISR_DEFINE_HILO(prefix, id)            \
+	/* [0x##id] = */ {                         \
+		/* .i_seg = */ { { {                   \
+			/* .s_ul = */(u32)prefix##lo_##id, \
+			/* .s_uh = */(u32)prefix##hi_##id  \
+		} } }                                  \
+	},
+#endif /* !__x86_64__ */
 
-	/* Try to trigger a debugger trap (if enabled) */
-	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_UNHANDLED_INTERRUPT))
-		kernel_debugtrap(state, SIGBUS);
+
+/************************************************************************/
+/* The Default InterruptDescriptorTable used by KOS                     */
+/************************************************************************/
+PUBLIC ATTR_SECTION(".data.hot") struct idt_segment __x86_defidt[256] = {
+#define ISR_DEFINE(id) ISR_DEFINE_HILO(__x86_defisr, id)
+	ISR_X86_FOREACH(ISR_DEFINE)
+#undef ISR_DEFINE
+};
+
+PUBLIC_CONST ATTR_SECTION(".rodata.cold") struct desctab const __x86_defidtptr = {
+	/* .dt_limit = */ sizeof(__x86_defidt) - 1,
+	/* .dt_base  = */ (uintptr_t)__x86_defidt
+};
+
+
+/************************************************************************/
+/* The InterruptDescriptorTable used by the builtin debugger            */
+/************************************************************************/
 #ifndef CONFIG_NO_DEBUGGER
-	{
-		struct panic_args args;
-		if (intno >= X86_INTERRUPT_PIC1_BASE)
-			X86_PIC_EOI(intno);
-		args.ecode = ecode;
-		args.intno = intno;
-		dbg_enter(state, &panic_uhi_dbg_main, &args);
-	}
-#else
-	PREEMPTION_HALT();
-#endif
-	return state;
-}
+PUBLIC ATTR_SECTION(".data.cold") struct idt_segment __x86_dbgidt[256] = {
+#define ISR_DEFINE(id) ISR_DEFINE_HILO(__x86_dbgisr, id)
+	ISR_X86_FOREACH(ISR_DEFINE)
+#undef ISR_DEFINE
+};
+PUBLIC_CONST ATTR_SECTION(".rodata.cold") struct desctab const __x86_dbgidtptr = {
+	/* .dt_limit = */ sizeof(__x86_dbgidt) - 1,
+	/* .dt_base  = */ (uintptr_t)__x86_dbgidt
+};
+#endif /* !CONFIG_NO_DEBUGGER */
+
+
 
 
 DECL_END

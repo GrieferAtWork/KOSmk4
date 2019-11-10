@@ -16,26 +16,39 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_INTERRUPT_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_INTERRUPT_H 1
 
 #include <kernel/compiler.h>
-#include <kernel/types.h>
-#include <kernel/debugger.h>
-#include <kos/kernel/segment.h>
-#include <kos/kernel/cpu-state.h>
 
-#ifdef __CC__
-DECL_BEGIN
+#include <kernel/paging.h> /* KERNEL_DEBUG_STACKSIZE */
 
-DATDEF struct idt_segment __x86_defidt[256];
-DATDEF struct desctab const __x86_defidtptr;
-#ifndef CONFIG_NO_DEBUGGER
-DATDEF struct idt_segment __x86_dbgidt[256];
-DATDEF struct desctab const __x86_dbgidtptr;
-#endif /* !CONFIG_NO_DEBUGGER */
+#include <asm/cfi.h>
 
-DECL_END
-#endif /* __CC__ */
+.section .bss
+	.align 8
+INTERN_OBJECT(GDB_Main_alternate_stack)
+	.skip KERNEL_DEBUG_STACKSIZE
+END(GDB_Main_alternate_stack)
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_INTERRUPT_H */
+.section .text
+/* Wrapper for `GDB_Main()' that will invoke said function
+ * using an alternate, statically allocated stack. */
+/* INTDEF void NOTHROW(FCALL GDB_MainWithAlternateStack)(void); */
+INTERN_FUNCTION(GDB_MainWithAlternateStack)
+	.cfi_startproc
+	pushq_cfi_r %rbp
+	movq   %rsp, %rbp
+	.cfi_def_cfa_register %rbp
+
+	/* Load the alternate stack and call the regular GDB_Main() function. */
+	movq   $(GDB_Main_alternate_stack + KERNEL_DEBUG_STACKSIZE), %rsp
+	INTERN(GDB_Main)
+	call   GDB_Main
+
+	leave
+	.cfi_restore %rbp
+	.cfi_adjust_cfa_offset -8
+	.cfi_def_cfa_register %rsp
+	ret
+	.cfi_endproc
+END(GDB_MainWithAlternateStack)
+

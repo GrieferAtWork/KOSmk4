@@ -16,26 +16,30 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_INTERRUPT_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_INTERRUPT_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_ISR_CONFIG_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_ISR_CONFIG_H 1
 
-#include <kernel/compiler.h>
-#include <kernel/types.h>
-#include <kernel/debugger.h>
-#include <kos/kernel/segment.h>
-#include <kos/kernel/cpu-state.h>
+/* ISR pushes-error-code selector */
+#define ISR_X86_CONFIG_PUSHESERRORS(vector_id)                   \
+	((vector_id) == 0x08 /* #DF  Double Fault. */ ||             \
+	 (vector_id) == 0x0a /* #TS  Invalid TSS. */ ||              \
+	 (vector_id) == 0x0b /* #NP  Segment Not Present. */ ||      \
+	 (vector_id) == 0x0c /* #SS  Stack-Segment Fault. */ ||      \
+	 (vector_id) == 0x0d /* #GP  General Protection Fault. */ || \
+	 (vector_id) == 0x0e /* #PF  Page Fault. */ ||               \
+	 (vector_id) == 0x11 /* #AC  Alignment Check. */ ||          \
+	 (vector_id) == 0x1e /* #SX  Security Exception. */)
 
-#ifdef __CC__
-DECL_BEGIN
+/* ISR user-space access selector */
+#define ISR_X86_CONFIG_ALLOWUSER(vector_id)                 \
+	((vector_id) == 0x80 /* Syscall */ ||                   \
+	 (vector_id) == 0x29 /* __fastfail() */ ||              \
+	 (vector_id) == 0x05 /* #BR  Bound Range Exceeded */ || \
+	 (vector_id) == 0x04 /* #OF  Overflow */ ||             \
+	 (vector_id) == 0x03 /* #BP  Breakpoint */)
 
-DATDEF struct idt_segment __x86_defidt[256];
-DATDEF struct desctab const __x86_defidtptr;
-#ifndef CONFIG_NO_DEBUGGER
-DATDEF struct idt_segment __x86_dbgidt[256];
-DATDEF struct desctab const __x86_dbgidtptr;
-#endif /* !CONFIG_NO_DEBUGGER */
+/* Return the DPL to-be configured for a given ISR vector. */
+#define ISR_X86_CONFIG_GETDPL(vector_id) \
+	(ISR_X86_CONFIG_ALLOWUSER(vector_id) ? 3 : 0)
 
-DECL_END
-#endif /* __CC__ */
-
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_INTERRUPT_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_ISR_CONFIG_H */

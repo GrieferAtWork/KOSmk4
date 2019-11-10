@@ -47,6 +47,10 @@
 #define __CRT_HAVE___vsnprintf 1
 #define __CRT_HAVE___x86_bootcpu_features 1
 #define __CRT_HAVE___x86_bootcpu_idfeatures 1
+#define __CRT_HAVE___x86_dbgidt 1
+#define __CRT_HAVE___x86_dbgidtptr 1
+#define __CRT_HAVE___x86_defidt 1
+#define __CRT_HAVE___x86_defidtptr 1
 #define __CRT_HAVE__bootcpu 1
 #define __CRT_HAVE__bootidle 1
 #define __CRT_HAVE__boottask 1
@@ -2140,8 +2144,6 @@
 #define __CRT_HAVE_vsprintf 1
 #define __CRT_HAVE_vsprintf_s 1
 #define __CRT_HAVE_x86_asm_except_personality 1
-#define __CRT_HAVE_x86_check_spurious_interrupt_PIC1 1
-#define __CRT_HAVE_x86_check_spurious_interrupt_PIC2 1
 #define __CRT_HAVE_x86_cpugdt 1
 #define __CRT_HAVE_x86_cpuldt 1
 #define __CRT_HAVE_x86_cputss 1
@@ -2159,9 +2161,6 @@
 #define __CRT_HAVE_x86_fxrstor 1
 #define __CRT_HAVE_x86_fxsave 1
 #define __CRT_HAVE_x86_fxsave_mxcsr_mask 1
-#define __CRT_HAVE_x86_idt_start 1
-#define __CRT_HAVE_x86_idt_start_debug 1
-#define __CRT_HAVE_x86_idt_start_traced 1
 #define __CRT_HAVE_x86_lapic_base_address 1
 #define __CRT_HAVE_x86_lapic_id 1
 #define __CRT_HAVE_x86_lapic_version 1

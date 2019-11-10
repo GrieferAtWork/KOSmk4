@@ -65,9 +65,6 @@ EXPORT_AS_OBJECT(_boottask)
 EXPORT_AS_OBJECT(pagedir_kernel)
 EXPORT_AS_OBJECT(pagedir_kernel_phys)
 EXPORT_AS_OBJECT(jiffies)
-EXPORT_AS_OBJECT(x86_idt_start)
-EXPORT_AS_OBJECT(x86_idt_start_traced)
-EXPORT_AS_OBJECT(x86_idt_start_debug)
 EXPORT_AS_OBJECT(__x86_bootcpu_features)
 EXPORT_AS_OBJECT(__x86_bootcpu_idfeatures)
 EXPORT_AS_OBJECT(__x86_bootcpu_gdt)
@@ -583,11 +580,8 @@ END(__x86_paging_init_identity_mapped_text)
 	lldtw  %ax
 
 	/* Initialize the interrupt handling subsystem. */
-	PUBLIC(x86_idt_start)
-	pushl  $x86_idt_start
-	pushw  $(SIZEOF_IDT_SEGMENT * 256 - 1)
-	lidtl  0(%esp)
-	addl   $6, %esp
+	PUBLIC(__x86_defidtptr)
+	lidtl  __x86_defidtptr
 
 	/* Setup the state of /bin/init at our stack base, thus following the
 	 * general expectation that the user-space return state can be found

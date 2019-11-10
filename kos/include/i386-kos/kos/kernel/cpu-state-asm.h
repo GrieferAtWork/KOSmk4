@@ -16,26 +16,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_INTERRUPT_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_INTERRUPT_H 1
+#ifndef _I386_KOS_KOS_KERNEL_CPU_STATE_ASM32_H
+#define _I386_KOS_KOS_KERNEL_CPU_STATE_ASM32_H 1
 
-#include <kernel/compiler.h>
-#include <kernel/types.h>
-#include <kernel/debugger.h>
-#include <kos/kernel/segment.h>
-#include <kos/kernel/cpu-state.h>
+#include <hybrid/host.h>
 
-#ifdef __CC__
-DECL_BEGIN
+#ifdef __x86_64__
+#include "cpu-state-asm64.h"
+#else /* __x86_64__ */
+#include "cpu-state-asm32.h"
+#endif /* !__x86_64__ */
 
-DATDEF struct idt_segment __x86_defidt[256];
-DATDEF struct desctab const __x86_defidtptr;
-#ifndef CONFIG_NO_DEBUGGER
-DATDEF struct idt_segment __x86_dbgidt[256];
-DATDEF struct desctab const __x86_dbgidtptr;
-#endif /* !CONFIG_NO_DEBUGGER */
-
-DECL_END
-#endif /* __CC__ */
-
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_INTERRUPT_H */
+#endif /* !_I386_KOS_KOS_KERNEL_CPU_STATE_ASM32_H */

@@ -577,7 +577,6 @@ __SYSDECL_END
 
 #ifndef __IOPORT
 #define __IOPORT(x)    x
-#endif
-
+#endif /* !__IOPORT */
 
 #endif /* !_I386_KOS_SYS_IO_H */

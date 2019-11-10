@@ -7021,32 +7021,31 @@ diff -Naur gcc-9.1.0-orig/libstdc++-v3/include/ext/ropeimpl.h gcc-9.1.0/libstdc+
    using std::__throw_length_error;
 diff -Naur gcc-9.1.0-orig/libstdc++-v3/include/ext/string_conversions.h gcc-9.1.0/libstdc++-v3/include/ext/string_conversions.h
 --- gcc-9.1.0-orig/libstdc++-v3/include/ext/string_conversions.h	2019-01-01 13:31:55.000000000 +0100
-+++ gcc-9.1.0/libstdc++-v3/include/ext/string_conversions.h	2019-11-04 12:32:44.316601000 +0100
-@@ -115,6 +115,28 @@
++++ gcc-9.1.0/libstdc++-v3/include/ext/string_conversions.h	2019-11-10 15:14:14.151192600 +0100
+@@ -94,9 +94,9 @@
+     }
+ 
+   // Helper for the to_string / to_wstring functions.
+-  template<typename _String, typename _CharT = typename _String::value_type>
++  template<typename _String, typename _ReturnType, typename _CharT = typename _String::value_type>
+     _String
+-    __to_xstring(int (*__convf) (_CharT*, std::size_t, const _CharT*,
++    __to_xstring(_ReturnType (*__convf) (_CharT*, std::size_t, const _CharT*,
+ 				 __builtin_va_list), std::size_t __n,
+ 		 const _CharT* __fmt, ...)
+     {
+@@ -108,13 +108,14 @@
+       __builtin_va_list __args;
+       __builtin_va_start(__args, __fmt);
+ 
+-      const int __len = __convf(__s, __n, __fmt, __args);
++      const _ReturnType __len = __convf(__s, __n, __fmt, __args);
+ 
+       __builtin_va_end(__args);
+ 
        return _String(__s, __s + __len);
      }
  
-+  // Helper for the to_string / to_wstring functions.
-+  template<typename _String, typename _CharT = typename _String::value_type>
-+    _String
-+    __to_xstring(std::size_t (*__convf) (_CharT*, std::size_t, const _CharT*,
-+				 __builtin_va_list), std::size_t __n,
-+		 const _CharT* __fmt, ...)
-+    {
-+      // XXX Eventually the result should be constructed in-place in
-+      // the __cxx11 string, likely with the help of internal hooks.
-+      _CharT* __s = static_cast<_CharT*>(__builtin_alloca(sizeof(_CharT)
-+							  * __n));
-+
-+      __builtin_va_list __args;
-+      __builtin_va_start(__args, __fmt);
-+
-+      const std::size_t __len = __convf(__s, __n, __fmt, __args);
-+
-+      __builtin_va_end(__args);
-+
-+      return _String(__s, __s + __len);
-+    }
 +
  _GLIBCXX_END_NAMESPACE_VERSION
  } // namespace

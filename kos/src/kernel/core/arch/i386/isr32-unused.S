@@ -16,5 +16,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#define FOR_DEBUGGER 1
-#include "../interrupt.ld"
+#ifdef __INTELLISENSE__
+#include "isr32.S"
+#define ISR_VECTOR 7f
+#endif /* __INTELLISENSE__ */
+
+INTERN_FUNCTION(PP_CAT2(__x86_defisr_, ISR_VECTOR_NAME))
+	pushl_cfi  $(ISR_VECTOR_ID)
+	PRIVATE(__x86_isr_unused_common)
+	jmp     __x86_isr_unused_common
+	.cfi_adjust_cfa_offset -4
+END(PP_CAT2(__x86_defisr_, ISR_VECTOR_NAME))
+
+#undef ISR_VECTOR

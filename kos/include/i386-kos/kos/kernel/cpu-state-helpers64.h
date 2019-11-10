@@ -35,53 +35,6 @@
 #include <sched/arch/task.h>
 #endif /* __KERNEL__ && __x86_64__ */
 
-
-#ifdef __x86_64__
-#include <hybrid/__asm.h>
-
-/* Helper macros for restoring registers from cpu-state structures */
-#define CFI_REL_OFFSET_RESTORE_GPREGSNSP(offset)                     \
-	__ASM_L(.cfi_rel_offset %r15, ((offset) + OFFSET_GPREGSNSP_R15)) \
-	__ASM_L(.cfi_rel_offset %r14, ((offset) + OFFSET_GPREGSNSP_R14)) \
-	__ASM_L(.cfi_rel_offset %r13, ((offset) + OFFSET_GPREGSNSP_R13)) \
-	__ASM_L(.cfi_rel_offset %r12, ((offset) + OFFSET_GPREGSNSP_R12)) \
-	__ASM_L(.cfi_rel_offset %r11, ((offset) + OFFSET_GPREGSNSP_R11)) \
-	__ASM_L(.cfi_rel_offset %r10, ((offset) + OFFSET_GPREGSNSP_R10)) \
-	__ASM_L(.cfi_rel_offset %r9, ((offset) + OFFSET_GPREGSNSP_R9))   \
-	__ASM_L(.cfi_rel_offset %r8, ((offset) + OFFSET_GPREGSNSP_R8))   \
-	__ASM_L(.cfi_rel_offset %rdi, ((offset) + OFFSET_GPREGSNSP_RDI)) \
-	__ASM_L(.cfi_rel_offset %rsi, ((offset) + OFFSET_GPREGSNSP_RSI)) \
-	__ASM_L(.cfi_rel_offset %rbp, ((offset) + OFFSET_GPREGSNSP_RBP)) \
-	__ASM_L(.cfi_rel_offset %rbx, ((offset) + OFFSET_GPREGSNSP_RBX)) \
-	__ASM_L(.cfi_rel_offset %rdx, ((offset) + OFFSET_GPREGSNSP_RDX)) \
-	__ASM_L(.cfi_rel_offset %rcx, ((offset) + OFFSET_GPREGSNSP_RCX)) \
-	__ASM_L(.cfi_rel_offset %rax, ((offset) + OFFSET_GPREGSNSP_RAX))
-#define CFI_REL_OFFSET_RESTORE_GPREGS(offset)                     \
-	__ASM_L(.cfi_rel_offset %r15, ((offset) + OFFSET_GPREGS_R15)) \
-	__ASM_L(.cfi_rel_offset %r14, ((offset) + OFFSET_GPREGS_R14)) \
-	__ASM_L(.cfi_rel_offset %r13, ((offset) + OFFSET_GPREGS_R13)) \
-	__ASM_L(.cfi_rel_offset %r12, ((offset) + OFFSET_GPREGS_R12)) \
-	__ASM_L(.cfi_rel_offset %r11, ((offset) + OFFSET_GPREGS_R11)) \
-	__ASM_L(.cfi_rel_offset %r10, ((offset) + OFFSET_GPREGS_R10)) \
-	__ASM_L(.cfi_rel_offset %r9, ((offset) + OFFSET_GPREGS_R9))   \
-	__ASM_L(.cfi_rel_offset %r8, ((offset) + OFFSET_GPREGS_R8))   \
-	__ASM_L(.cfi_rel_offset %rdi, ((offset) + OFFSET_GPREGS_RDI)) \
-	__ASM_L(.cfi_rel_offset %rsi, ((offset) + OFFSET_GPREGS_RSI)) \
-	__ASM_L(.cfi_rel_offset %rbp, ((offset) + OFFSET_GPREGS_RBP)) \
-	__ASM_L(.cfi_rel_offset %rsp, ((offset) + OFFSET_GPREGS_RSP)) \
-	__ASM_L(.cfi_rel_offset %rbx, ((offset) + OFFSET_GPREGS_RBX)) \
-	__ASM_L(.cfi_rel_offset %rdx, ((offset) + OFFSET_GPREGS_RDX)) \
-	__ASM_L(.cfi_rel_offset %rcx, ((offset) + OFFSET_GPREGS_RCX)) \
-	__ASM_L(.cfi_rel_offset %rax, ((offset) + OFFSET_GPREGS_RAX))
-#define CFI_REL_OFFSET_RESTORE_KCPUSTATE(offset)                           \
-	CFI_REL_OFFSET_RESTORE_GPREGS((offset) + OFFSET_KCPUSTATE_GPREGS);     \
-	__ASM_L(.cfi_rel_offset %rflags, ((offset) + OFFSET_KCPUSTATE_RFLAGS)) \
-	__ASM_L(.cfi_rel_offset %rip, ((offset) + OFFSET_KCPUSTATE_RIP))
-
-#endif /* __x86_64__ */
-
-
-
 #ifdef __CC__
 __DECL_BEGIN
 

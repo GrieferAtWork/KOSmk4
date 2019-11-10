@@ -947,7 +947,7 @@ PUBLIC void __cxa_end_catch(void) {
  * an E_EXIT_PROCESS exception to terminate the calling process.
  * It doesn't get much simpler than this... */
 INTERN struct icpustate *FCALL
-x86_cirq_29(struct icpustate *__restrict state) {
+x86_handle_ms_fastfail(struct icpustate *__restrict state) {
 	enum { SIGNO = SIGABRT };
 	if (kernel_debugtrap_enabled())
 		kernel_debugtrap(state, SIGNO);

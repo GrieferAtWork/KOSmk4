@@ -23,6 +23,7 @@
 #include <asm/instr/movzxq.h>
 #include <kos/except.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <asm/cpu-flags.h>
 
@@ -284,7 +285,7 @@ INTERN_FUNCTION(libc_except_handler3)
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %rdi, SIZEOF_KCPUSTATE
-	CFI_REL_OFFSET_RESTORE_KCPUSTATE(0)
+	ASM_CFI_REL_OFFSET_RESTORE_KCPUSTATE(0)
 	movq   %rdi, %rbp /* Preserve `error_register_state_t *__restrict state' for unwinding. */
 	.cfi_def_cfa_register %rbp
 	INTERN(libc_except_handler3_impl)
@@ -299,7 +300,7 @@ INTERN_FUNCTION(libc_except_handler4)
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %rdi, SIZEOF_KCPUSTATE
-	CFI_REL_OFFSET_RESTORE_KCPUSTATE(0)
+	ASM_CFI_REL_OFFSET_RESTORE_KCPUSTATE(0)
 	movq   %rdi, %rbp /* Preserve `error_register_state_t *__restrict state' for unwinding. */
 	.cfi_def_cfa_register %rbp
 	INTERN(libc_except_handler4_impl)
@@ -522,7 +523,7 @@ INTERN_FUNCTION(x86_unwind_interrupt)
 	.cfi_restore_iret_rsp
 	.cfi_restore_iret_ss
 	.cfi_def_cfa %rdi, OFFSET_ICPUSTATE_IRREGS
-	CFI_REL_OFFSET_RESTORE_GPREGSNSP(OFFSET_ICPUSTATE_GPREGSNSP)
+	ASM_CFI_REL_OFFSET_RESTORE_GPREGSNSP(OFFSET_ICPUSTATE_GPREGSNSP)
 	movq   %rdi, %rsp
 	.cfi_def_cfa_register %rsp
 INTERN_FUNCTION(x86_unwind_interrupt_esp)
@@ -537,7 +538,7 @@ INTERN_FUNCTION(x86_unwind_interrupt_esp)
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %rsp, SIZEOF_ICPUSTATE
-	CFI_REL_OFFSET_RESTORE_GPREGSNSP(OFFSET_ICPUSTATE_GPREGSNSP)
+	ASM_CFI_REL_OFFSET_RESTORE_GPREGSNSP(OFFSET_ICPUSTATE_GPREGSNSP)
 	.cfi_rel_offset %rflags, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_RFLAGS
 	.cfi_rel_offset %rip, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_RIP
 	.cfi_rel_offset %rsp, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_RSP
