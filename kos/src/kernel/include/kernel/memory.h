@@ -253,12 +253,6 @@ NOTHROW(KCALL page_malloc_part_between)(pageptr_t min_page, pageptr_t max_page,
                                         pagecnt_t min_pages, pagecnt_t max_pages,
                                         pagecnt_t *__restrict res_pages);
 
-#ifdef CONFIG_MEMORY_NEED_PAGE_ALLOC32
-/* XXX: Dedicated function? */
-#define page_malloc32(num_pages) \
-	page_malloc_between(0, 0xffffffff, num_pages)
-#endif /* CONFIG_MEMORY_NEED_PAGE_ALLOC32 */
-
 
 /* Free a given physical address range.
  * The caller is responsible to ensure that the given range has previously been allocated. */

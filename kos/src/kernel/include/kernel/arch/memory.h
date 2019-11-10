@@ -21,4 +21,6 @@
 
 #include <kernel/compiler.h>
 
+/* ... */
+
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_ARCH_MEMORY_H */
