@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6845365 */
+/* HASH CRC-32:0x78377f97 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3218,17 +3218,17 @@
 #define __NR64ATRA0_read(fd, buf, bufsize)    ,(int)(fd)
 #define __NR64ATRF1_read                      "%p"
 #define __NR64ATRA1_read(fd, buf, bufsize)    ,buf
-#define __NR64ATRF2_read                      "%" PRIuPTR
+#define __NR64ATRF2_read                      "%" PRIuSIZ
 #define __NR64ATRA2_read(fd, buf, bufsize)    ,bufsize
 #define __NR64ATRF0_write                     "%d"
 #define __NR64ATRA0_write(fd, buf, bufsize)   ,(int)(fd)
 #define __NR64ATRF1_write                     "%p"
 #define __NR64ATRA1_write(fd, buf, bufsize)   ,buf
-#define __NR64ATRF2_write                     "%" PRIuPTR
+#define __NR64ATRF2_write                     "%" PRIuSIZ
 #define __NR64ATRA2_write(fd, buf, bufsize)   ,bufsize
 #define __NR64ATRF0_open                      "%q"
 #define __NR64ATRA0_open(filename, oflags, mode) ,(validate_readable_opt(filename,1),filename)
-#define __NR64ATRF1_open                      "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF1_open                      "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA1_open(filename, oflags, mode) ,(uintptr_t)(oflags),(oflags) & O_WRONLY ? "O_WRONLY" : (oflags) ? "" : "O_RDONLY" \
                                                  ,((oflags) & O_RDWR) && ((oflags) & (O_WRONLY)) ? "|" : "",(oflags) & O_RDWR ? "O_RDWR" : "" \
                                                  ,((oflags) & O_CREAT) && ((oflags) & (O_WRONLY|O_RDWR)) ? "|" : "",(oflags) & O_CREAT ? "O_CREAT" : "" \
@@ -3251,7 +3251,7 @@
                                                  ,((oflags) & 0x0400000) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW|O_NOATIME|O_CLOEXEC|O_CLOFORK|O_PATH)) ? "|" : "",(oflags) & 0x0400000 ? "O_TMPFILE" : "" \
                                                  ,((oflags) & O_SYMLINK) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW|O_NOATIME|O_CLOEXEC|O_CLOFORK|O_PATH|0x0400000)) ? "|" : "",(oflags) & O_SYMLINK ? "O_SYMLINK" : "" \
                                                  ,((oflags) & O_DOSPATH) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW|O_NOATIME|O_CLOEXEC|O_CLOFORK|O_PATH|0x0400000|O_SYMLINK)) ? "|" : "",(oflags) & O_DOSPATH ? "O_DOSPATH" : ""
-#define __NR64ATRF2_open                      "%#" PRIoPTR
+#define __NR64ATRF2_open                      "%#" PRIoSIZ
 #define __NR64ATRA2_open(filename, oflags, mode) ,(uintptr_t)(mode)
 #define __NR64ATRF0_close                     "%d"
 #define __NR64ATRA0_close(fd)                 ,(int)(fd)
@@ -3269,9 +3269,9 @@
 #define __NR64ATRA1_linux_lstat64(filename, statbuf) ,statbuf
 #define __NR64ATRF0_poll                      "%p"
 #define __NR64ATRA0_poll(fds, nfds, timeout)  ,fds
-#define __NR64ATRF1_poll                      "%" PRIuPTR
+#define __NR64ATRF1_poll                      "%" PRIuSIZ
 #define __NR64ATRA1_poll(fds, nfds, timeout)  ,nfds
-#define __NR64ATRF2_poll                      "%" PRIdPTR
+#define __NR64ATRF2_poll                      "%" PRIdSIZ
 #define __NR64ATRA2_poll(fds, nfds, timeout)  ,(intptr_t)(timeout)
 #define __NR64ATRF0_lseek64                   "%d"
 #define __NR64ATRA0_lseek64(fd, offset, whence) ,(int)(fd)
@@ -3281,16 +3281,16 @@
 #define __NR64ATRA2_lseek64(fd, offset, whence) ,(whence),(whence) == SEEK_SET ? "SEEK_SET" : (whence) == SEEK_CUR ? "SEEK_CUR" : (whence) == SEEK_END ? "SEEK_END" : (whence) == SEEK_DATA ? "SEEK_DATA" : (whence) == SEEK_HOLE ? "SEEK_HOLE" : "?"
 #define __NR64ATRF0_mmap                      "%p"
 #define __NR64ATRA0_mmap(addr, len, prot, flags, fd, offset) ,addr
-#define __NR64ATRF1_mmap                      "%" PRIuPTR
+#define __NR64ATRF1_mmap                      "%" PRIuSIZ
 #define __NR64ATRA1_mmap(addr, len, prot, flags, fd, offset) ,len
-#define __NR64ATRF2_mmap                      "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF2_mmap                      "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA2_mmap(addr, len, prot, flags, fd, offset) ,(uintptr_t)(prot),(prot) & PROT_EXEC ? "PROT_EXEC" : (prot) ? "" : "PROT_NONE" \
                                                              ,((prot) & PROT_WRITE) && ((prot) & (PROT_EXEC)) ? "|" : "",(prot) & PROT_WRITE ? "PROT_WRITE" : "" \
                                                              ,((prot) & PROT_READ) && ((prot) & (PROT_EXEC|PROT_WRITE)) ? "|" : "",(prot) & PROT_READ ? "PROT_READ" : "" \
                                                              ,((prot) & PROT_SEM) && ((prot) & (PROT_EXEC|PROT_WRITE|PROT_READ)) ? "|" : "",(prot) & PROT_SEM ? "PROT_SEM" : "" \
                                                              ,((prot) & PROT_LOOSE) && ((prot) & (PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM)) ? "|" : "",(prot) & PROT_LOOSE ? "PROT_LOOSE" : "" \
                                                              ,((prot) & PROT_SHARED) && ((prot) & (PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE)) ? "|" : "",(prot) & PROT_SHARED ? "PROT_SHARED" : ""
-#define __NR64ATRF3_mmap                      "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF3_mmap                      "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA3_mmap(addr, len, prot, flags, fd, offset) ,(uintptr_t)(flags),(flags) & MAP_SHARED ? "MAP_SHARED" : (flags) ? "" : "MAP_AUTOMATIC" \
                                                              ,((flags) & MAP_PRIVATE) && ((flags) & (MAP_SHARED)) ? "|" : "",(flags) & MAP_PRIVATE ? "MAP_PRIVATE" : "" \
                                                              ,((flags) & MAP_FIXED) && ((flags) & (MAP_SHARED|MAP_PRIVATE)) ? "|" : "",(flags) & MAP_FIXED ? "MAP_FIXED" : "" \
@@ -3308,42 +3308,42 @@
                                                              ,((flags) & MAP_DONT_OVERRIDE) && ((flags) & (MAP_SHARED|MAP_PRIVATE|MAP_FIXED|MAP_ANON|MAP_32BIT|MAP_GROWSDOWN|MAP_GROWSUP|MAP_LOCKED|MAP_NORESERVE|MAP_POPULATE|MAP_NONBLOCK|MAP_STACK|MAP_UNINITIALIZED|MAP_DONT_MAP)) ? "|" : "",(flags) & MAP_DONT_OVERRIDE ? "MAP_DONT_OVERRIDE" : ""
 #define __NR64ATRF4_mmap                      "%d"
 #define __NR64ATRA4_mmap(addr, len, prot, flags, fd, offset) ,(int)(fd)
-#define __NR64ATRF5_mmap                      "%#" PRIxPTR
+#define __NR64ATRF5_mmap                      "%#" PRIxSIZ
 #define __NR64ATRA5_mmap(addr, len, prot, flags, fd, offset) ,(uintptr_t)(offset)
 #define __NR64ATRF0_mprotect                  "%p"
 #define __NR64ATRA0_mprotect(addr, len, prot) ,addr
-#define __NR64ATRF1_mprotect                  "%" PRIuPTR
+#define __NR64ATRF1_mprotect                  "%" PRIuSIZ
 #define __NR64ATRA1_mprotect(addr, len, prot) ,len
-#define __NR64ATRF2_mprotect                  "%#" PRIxPTR "=%s%s%s%s%s%s%s"
+#define __NR64ATRF2_mprotect                  "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
 #define __NR64ATRA2_mprotect(addr, len, prot) ,(uintptr_t)(prot),(prot) & PROT_EXEC ? "PROT_EXEC" : (prot) ? "" : "PROT_NONE" \
                                               ,((prot) & PROT_WRITE) && ((prot) & (PROT_EXEC)) ? "|" : "",(prot) & PROT_WRITE ? "PROT_WRITE" : "" \
                                               ,((prot) & PROT_READ) && ((prot) & (PROT_EXEC|PROT_WRITE)) ? "|" : "",(prot) & PROT_READ ? "PROT_READ" : "" \
                                               ,((prot) & PROT_SEM) && ((prot) & (PROT_EXEC|PROT_WRITE|PROT_READ)) ? "|" : "",(prot) & PROT_SEM ? "PROT_SEM" : ""
 #define __NR64ATRF0_munmap                    "%p"
 #define __NR64ATRA0_munmap(addr, len)         ,addr
-#define __NR64ATRF1_munmap                    "%" PRIuPTR
+#define __NR64ATRF1_munmap                    "%" PRIuSIZ
 #define __NR64ATRA1_munmap(addr, len)         ,len
 #define __NR64ATRF0_brk                       "%p"
 #define __NR64ATRA0_brk(addr)                 ,addr
-#define __NR64ATRF0_rt_sigaction              "%#" PRIxPTR
+#define __NR64ATRF0_rt_sigaction              "%#" PRIxSIZ
 #define __NR64ATRA0_rt_sigaction(signo, act, oact, sigsetsize) ,(uintptr_t)(signo)
 #define __NR64ATRF1_rt_sigaction              "%p"
 #define __NR64ATRA1_rt_sigaction(signo, act, oact, sigsetsize) ,act
 #define __NR64ATRF2_rt_sigaction              "%p"
 #define __NR64ATRA2_rt_sigaction(signo, act, oact, sigsetsize) ,oact
-#define __NR64ATRF3_rt_sigaction              "%" PRIuPTR
+#define __NR64ATRF3_rt_sigaction              "%" PRIuSIZ
 #define __NR64ATRA3_rt_sigaction(signo, act, oact, sigsetsize) ,sigsetsize
-#define __NR64ATRF0_rt_sigprocmask            "%#" PRIxPTR
+#define __NR64ATRF0_rt_sigprocmask            "%#" PRIxSIZ
 #define __NR64ATRA0_rt_sigprocmask(how, set, oset, sigsetsize) ,(uintptr_t)(how)
 #define __NR64ATRF1_rt_sigprocmask            "%p"
 #define __NR64ATRA1_rt_sigprocmask(how, set, oset, sigsetsize) ,set
 #define __NR64ATRF2_rt_sigprocmask            "%p"
 #define __NR64ATRA2_rt_sigprocmask(how, set, oset, sigsetsize) ,oset
-#define __NR64ATRF3_rt_sigprocmask            "%" PRIuPTR
+#define __NR64ATRF3_rt_sigprocmask            "%" PRIuSIZ
 #define __NR64ATRA3_rt_sigprocmask(how, set, oset, sigsetsize) ,sigsetsize
 #define __NR64ATRF0_ioctl                     "%d"
 #define __NR64ATRA0_ioctl(fd, request, arg)   ,(int)(fd)
-#define __NR64ATRF1_ioctl                     "%#" PRIxPTR
+#define __NR64ATRF1_ioctl                     "%#" PRIxSIZ
 #define __NR64ATRA1_ioctl(fd, request, arg)   ,(uintptr_t)(request)
 #define __NR64ATRF2_ioctl                     "%p"
 #define __NR64ATRA2_ioctl(fd, request, arg)   ,arg
@@ -3351,7 +3351,7 @@
 #define __NR64ATRA0_pread64(fd, buf, bufsize, offset) ,(int)(fd)
 #define __NR64ATRF1_pread64                   "%p"
 #define __NR64ATRA1_pread64(fd, buf, bufsize, offset) ,buf
-#define __NR64ATRF2_pread64                   "%" PRIuPTR
+#define __NR64ATRF2_pread64                   "%" PRIuSIZ
 #define __NR64ATRA2_pread64(fd, buf, bufsize, offset) ,bufsize
 #define __NR64ATRF3_pread64                   "%" PRIu64
 #define __NR64ATRA3_pread64(fd, buf, bufsize, offset) ,offset
@@ -3359,7 +3359,7 @@
 #define __NR64ATRA0_pwrite64(fd, buf, bufsize, offset) ,(int)(fd)
 #define __NR64ATRF1_pwrite64                  "%p"
 #define __NR64ATRA1_pwrite64(fd, buf, bufsize, offset) ,buf
-#define __NR64ATRF2_pwrite64                  "%" PRIuPTR
+#define __NR64ATRF2_pwrite64                  "%" PRIuSIZ
 #define __NR64ATRA2_pwrite64(fd, buf, bufsize, offset) ,bufsize
 #define __NR64ATRF3_pwrite64                  "%" PRIu64
 #define __NR64ATRA3_pwrite64(fd, buf, bufsize, offset) ,offset
@@ -3367,23 +3367,23 @@
 #define __NR64ATRA0_readv(fd, iovec, count)   ,(int)(fd)
 #define __NR64ATRF1_readv                     "%p"
 #define __NR64ATRA1_readv(fd, iovec, count)   ,iovec
-#define __NR64ATRF2_readv                     "%" PRIuPTR
+#define __NR64ATRF2_readv                     "%" PRIuSIZ
 #define __NR64ATRA2_readv(fd, iovec, count)   ,count
 #define __NR64ATRF0_writev                    "%d"
 #define __NR64ATRA0_writev(fd, iovec, count)  ,(int)(fd)
 #define __NR64ATRF1_writev                    "%p"
 #define __NR64ATRA1_writev(fd, iovec, count)  ,iovec
-#define __NR64ATRF2_writev                    "%" PRIuPTR
+#define __NR64ATRF2_writev                    "%" PRIuSIZ
 #define __NR64ATRA2_writev(fd, iovec, count)  ,count
 #define __NR64ATRF0_access                    "%q"
 #define __NR64ATRA0_access(filename, type)    ,(validate_readable_opt(filename,1),filename)
-#define __NR64ATRF1_access                    "%#" PRIxPTR "=%s%s%s%s%s"
+#define __NR64ATRF1_access                    "%#" PRIxSIZ "=%s%s%s%s%s"
 #define __NR64ATRA1_access(filename, type)    ,(uintptr_t)(type),(type) & R_OK ? "R_OK" : (type) ? "" : "F_OK" \
                                               ,((type) & W_OK) && ((type) & (R_OK)) ? "|" : "",(type) & W_OK ? "W_OK" : "" \
                                               ,((type) & X_OK) && ((type) & (R_OK|W_OK)) ? "|" : "",(type) & X_OK ? "X_OK" : ""
 #define __NR64ATRF0_pipe                      "%p"
 #define __NR64ATRA0_pipe(pipedes)             ,pipedes
-#define __NR64ATRF0_select                    "%" PRIuPTR
+#define __NR64ATRF0_select                    "%" PRIuSIZ
 #define __NR64ATRA0_select(nfds, readfds, writefds, exceptfds, timeout) ,nfds
 #define __NR64ATRF1_select                    "%p"
 #define __NR64ATRA1_select(nfds, readfds, writefds, exceptfds, timeout) ,readfds
@@ -3395,32 +3395,32 @@
 #define __NR64ATRA4_select(nfds, readfds, writefds, exceptfds, timeout) ,timeout
 #define __NR64ATRF0_mremap                    "%p"
 #define __NR64ATRA0_mremap(addr, old_len, new_len, flags, new_address) ,addr
-#define __NR64ATRF1_mremap                    "%" PRIuPTR
+#define __NR64ATRF1_mremap                    "%" PRIuSIZ
 #define __NR64ATRA1_mremap(addr, old_len, new_len, flags, new_address) ,old_len
-#define __NR64ATRF2_mremap                    "%" PRIuPTR
+#define __NR64ATRF2_mremap                    "%" PRIuSIZ
 #define __NR64ATRA2_mremap(addr, old_len, new_len, flags, new_address) ,new_len
-#define __NR64ATRF3_mremap                    "%#" PRIxPTR "=%s%s%s"
+#define __NR64ATRF3_mremap                    "%#" PRIxSIZ "=%s%s%s"
 #define __NR64ATRA3_mremap(addr, old_len, new_len, flags, new_address) ,(uintptr_t)(flags),(flags) & MREMAP_MAYMOVE ? "MREMAP_MAYMOVE" : "" \
                                                                        ,((flags) & MREMAP_FIXED) && ((flags) & (MREMAP_MAYMOVE)) ? "|" : "",(flags) & MREMAP_FIXED ? "MREMAP_FIXED" : ""
 #define __NR64ATRF4_mremap                    "%p"
 #define __NR64ATRA4_mremap(addr, old_len, new_len, flags, new_address) ,new_address
 #define __NR64ATRF0_msync                     "%p"
 #define __NR64ATRA0_msync(addr, len, flags)   ,addr
-#define __NR64ATRF1_msync                     "%" PRIuPTR
+#define __NR64ATRF1_msync                     "%" PRIuSIZ
 #define __NR64ATRA1_msync(addr, len, flags)   ,len
-#define __NR64ATRF2_msync                     "%#" PRIxPTR
+#define __NR64ATRF2_msync                     "%#" PRIxSIZ
 #define __NR64ATRA2_msync(addr, len, flags)   ,(uintptr_t)(flags)
 #define __NR64ATRF0_mincore                   "%p"
 #define __NR64ATRA0_mincore(start, len, vec)  ,start
-#define __NR64ATRF1_mincore                   "%" PRIuPTR
+#define __NR64ATRF1_mincore                   "%" PRIuSIZ
 #define __NR64ATRA1_mincore(start, len, vec)  ,len
 #define __NR64ATRF2_mincore                   "%p"
 #define __NR64ATRA2_mincore(start, len, vec)  ,vec
 #define __NR64ATRF0_madvise                   "%p"
 #define __NR64ATRA0_madvise(addr, len, advice) ,addr
-#define __NR64ATRF1_madvise                   "%" PRIuPTR
+#define __NR64ATRF1_madvise                   "%" PRIuSIZ
 #define __NR64ATRA1_madvise(addr, len, advice) ,len
-#define __NR64ATRF2_madvise                   "%#" PRIxPTR
+#define __NR64ATRF2_madvise                   "%#" PRIxSIZ
 #define __NR64ATRA2_madvise(addr, len, advice) ,(uintptr_t)(advice)
 #define __NR64ATRF0_dup                       "%d"
 #define __NR64ATRA0_dup(fd)                   ,(int)(fd)
@@ -3432,13 +3432,13 @@
 #define __NR64ATRA0_nanosleep(req, rem)       ,req
 #define __NR64ATRF1_nanosleep                 "%p"
 #define __NR64ATRA1_nanosleep(req, rem)       ,rem
-#define __NR64ATRF0_getitimer                 "%#" PRIxPTR
+#define __NR64ATRF0_getitimer                 "%#" PRIxSIZ
 #define __NR64ATRA0_getitimer(which, curr_value) ,(uintptr_t)(which)
 #define __NR64ATRF1_getitimer                 "%p"
 #define __NR64ATRA1_getitimer(which, curr_value) ,curr_value
-#define __NR64ATRF0_alarm                     "%#" PRIxPTR
+#define __NR64ATRF0_alarm                     "%#" PRIxSIZ
 #define __NR64ATRA0_alarm(seconds)            ,(uintptr_t)(seconds)
-#define __NR64ATRF0_setitimer                 "%#" PRIxPTR
+#define __NR64ATRF0_setitimer                 "%#" PRIxSIZ
 #define __NR64ATRA0_setitimer(which, newval, oldval) ,(uintptr_t)(which)
 #define __NR64ATRF1_setitimer                 "%p"
 #define __NR64ATRA1_setitimer(which, newval, oldval) ,newval
@@ -3450,27 +3450,27 @@
 #define __NR64ATRA1_sendfile(out_fd, in_fd, offset, count) ,(int)(in_fd)
 #define __NR64ATRF2_sendfile                  "%p"
 #define __NR64ATRA2_sendfile(out_fd, in_fd, offset, count) ,offset
-#define __NR64ATRF3_sendfile                  "%" PRIuPTR
+#define __NR64ATRF3_sendfile                  "%" PRIuSIZ
 #define __NR64ATRA3_sendfile(out_fd, in_fd, offset, count) ,count
-#define __NR64ATRF0_socket                    "%#" PRIxPTR
+#define __NR64ATRF0_socket                    "%#" PRIxSIZ
 #define __NR64ATRA0_socket(domain, type, protocol) ,(uintptr_t)(domain)
-#define __NR64ATRF1_socket                    "%#" PRIxPTR
+#define __NR64ATRF1_socket                    "%#" PRIxSIZ
 #define __NR64ATRA1_socket(domain, type, protocol) ,(uintptr_t)(type)
-#define __NR64ATRF2_socket                    "%#" PRIxPTR
+#define __NR64ATRF2_socket                    "%#" PRIxSIZ
 #define __NR64ATRA2_socket(domain, type, protocol) ,(uintptr_t)(protocol)
 #define __NR64ATRF0_connect                   "%d"
 #define __NR64ATRA0_connect(sockfd, addr, addr_len) ,(int)(sockfd)
 #define __NR64ATRF1_connect                   "%p"
 #define __NR64ATRA1_connect(sockfd, addr, addr_len) ,addr
-#define __NR64ATRF2_connect                   "%" PRIuPTR
+#define __NR64ATRF2_connect                   "%" PRIuSIZ
 #define __NR64ATRA2_connect(sockfd, addr, addr_len) ,(uintptr_t)(addr_len)
 #define __NR64ATRF0_sendto                    "%d"
 #define __NR64ATRA0_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,(int)(sockfd)
 #define __NR64ATRF1_sendto                    "%p"
 #define __NR64ATRA1_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,buf
-#define __NR64ATRF2_sendto                    "%" PRIuPTR
+#define __NR64ATRF2_sendto                    "%" PRIuSIZ
 #define __NR64ATRA2_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,bufsize
-#define __NR64ATRF3_sendto                    "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF3_sendto                    "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA3_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,(uintptr_t)(flags),(flags) & MSG_CONFIRM ? "MSG_CONFIRM" : "" \
                                                                         ,((flags) & MSG_DONTROUTE) && ((flags) & (MSG_CONFIRM)) ? "|" : "",(flags) & MSG_DONTROUTE ? "MSG_DONTROUTE" : "" \
                                                                         ,((flags) & MSG_DONTWAIT) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE)) ? "|" : "",(flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
@@ -3480,15 +3480,15 @@
                                                                         ,((flags) & MSG_OOB) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE|MSG_NOSIGNAL)) ? "|" : "",(flags) & MSG_OOB ? "MSG_OOB" : ""
 #define __NR64ATRF4_sendto                    "%p"
 #define __NR64ATRA4_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,addr
-#define __NR64ATRF5_sendto                    "%" PRIuPTR
+#define __NR64ATRF5_sendto                    "%" PRIuSIZ
 #define __NR64ATRA5_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,(uintptr_t)(addr_len)
 #define __NR64ATRF0_recvfrom                  "%d"
 #define __NR64ATRA0_recvfrom(sockfd, buf, bufsize, flags, addr, addr_len) ,(int)(sockfd)
 #define __NR64ATRF1_recvfrom                  "%p"
 #define __NR64ATRA1_recvfrom(sockfd, buf, bufsize, flags, addr, addr_len) ,buf
-#define __NR64ATRF2_recvfrom                  "%" PRIuPTR
+#define __NR64ATRF2_recvfrom                  "%" PRIuSIZ
 #define __NR64ATRA2_recvfrom(sockfd, buf, bufsize, flags, addr, addr_len) ,bufsize
-#define __NR64ATRF3_recvfrom                  "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF3_recvfrom                  "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA3_recvfrom(sockfd, buf, bufsize, flags, addr, addr_len) ,(uintptr_t)(flags),(flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
                                                                           ,((flags) & MSG_ERRQUEUE) && ((flags) & (MSG_DONTWAIT)) ? "|" : "",(flags) & MSG_ERRQUEUE ? "MSG_ERRQUEUE" : "" \
                                                                           ,((flags) & MSG_OOB) && ((flags) & (MSG_DONTWAIT|MSG_ERRQUEUE)) ? "|" : "",(flags) & MSG_OOB ? "MSG_OOB" : "" \
@@ -3503,7 +3503,7 @@
 #define __NR64ATRA0_sendmsg(sockfd, message, flags) ,(int)(sockfd)
 #define __NR64ATRF1_sendmsg                   "%p"
 #define __NR64ATRA1_sendmsg(sockfd, message, flags) ,message
-#define __NR64ATRF2_sendmsg                   "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF2_sendmsg                   "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA2_sendmsg(sockfd, message, flags) ,(uintptr_t)(flags),(flags) & MSG_CONFIRM ? "MSG_CONFIRM" : "" \
                                                     ,((flags) & MSG_DONTROUTE) && ((flags) & (MSG_CONFIRM)) ? "|" : "",(flags) & MSG_DONTROUTE ? "MSG_DONTROUTE" : "" \
                                                     ,((flags) & MSG_DONTWAIT) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE)) ? "|" : "",(flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
@@ -3515,7 +3515,7 @@
 #define __NR64ATRA0_recvmsg(sockfd, message, flags) ,(int)(sockfd)
 #define __NR64ATRF1_recvmsg                   "%p"
 #define __NR64ATRA1_recvmsg(sockfd, message, flags) ,message
-#define __NR64ATRF2_recvmsg                   "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF2_recvmsg                   "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA2_recvmsg(sockfd, message, flags) ,(uintptr_t)(flags),(flags) & MSG_CMSG_CLOEXEC ? "MSG_CMSG_CLOEXEC" : "" \
                                                     ,((flags) & MSG_CMSG_CLOFORK) && ((flags) & (MSG_CMSG_CLOEXEC)) ? "|" : "",(flags) & MSG_CMSG_CLOFORK ? "MSG_CMSG_CLOFORK" : "" \
                                                     ,((flags) & MSG_DONTWAIT) && ((flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK)) ? "|" : "",(flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
@@ -3532,11 +3532,11 @@
 #define __NR64ATRA0_bind(sockfd, addr, addr_len) ,(int)(sockfd)
 #define __NR64ATRF1_bind                      "%p"
 #define __NR64ATRA1_bind(sockfd, addr, addr_len) ,addr
-#define __NR64ATRF2_bind                      "%" PRIuPTR
+#define __NR64ATRF2_bind                      "%" PRIuSIZ
 #define __NR64ATRA2_bind(sockfd, addr, addr_len) ,(uintptr_t)(addr_len)
 #define __NR64ATRF0_listen                    "%d"
 #define __NR64ATRA0_listen(sockfd, max_backlog) ,(int)(sockfd)
-#define __NR64ATRF1_listen                    "%#" PRIxPTR
+#define __NR64ATRF1_listen                    "%#" PRIxSIZ
 #define __NR64ATRA1_listen(sockfd, max_backlog) ,(uintptr_t)(max_backlog)
 #define __NR64ATRF0_getsockname               "%d"
 #define __NR64ATRA0_getsockname(sockfd, addr, addr_len) ,(int)(sockfd)
@@ -3550,11 +3550,11 @@
 #define __NR64ATRA1_getpeername(sockfd, addr, addr_len) ,addr
 #define __NR64ATRF2_getpeername               "%p"
 #define __NR64ATRA2_getpeername(sockfd, addr, addr_len) ,addr_len
-#define __NR64ATRF0_socketpair                "%#" PRIxPTR
+#define __NR64ATRF0_socketpair                "%#" PRIxSIZ
 #define __NR64ATRA0_socketpair(domain, type, protocol, fds) ,(uintptr_t)(domain)
-#define __NR64ATRF1_socketpair                "%#" PRIxPTR
+#define __NR64ATRF1_socketpair                "%#" PRIxSIZ
 #define __NR64ATRA1_socketpair(domain, type, protocol, fds) ,(uintptr_t)(type)
-#define __NR64ATRF2_socketpair                "%#" PRIxPTR
+#define __NR64ATRF2_socketpair                "%#" PRIxSIZ
 #define __NR64ATRA2_socketpair(domain, type, protocol, fds) ,(uintptr_t)(protocol)
 #define __NR64ATRF3_socketpair                "%p"
 #define __NR64ATRA3_socketpair(domain, type, protocol, fds) ,fds
@@ -3562,23 +3562,23 @@
 #define __NR64ATRA0_setsockopt(sockfd, level, optname, optval, optlen) ,(int)(sockfd)
 #define __NR64ATRF1_setsockopt                "%#Ix=%s"
 #define __NR64ATRA1_setsockopt(sockfd, level, optname, optval, optlen) ,(level),(level) == SOL_SOCKET ? "SOL_SOCKET" : "?"
-#define __NR64ATRF2_setsockopt                "%#" PRIxPTR
+#define __NR64ATRF2_setsockopt                "%#" PRIxSIZ
 #define __NR64ATRA2_setsockopt(sockfd, level, optname, optval, optlen) ,(uintptr_t)(optname)
 #define __NR64ATRF3_setsockopt                "%p"
 #define __NR64ATRA3_setsockopt(sockfd, level, optname, optval, optlen) ,optval
-#define __NR64ATRF4_setsockopt                "%" PRIuPTR
+#define __NR64ATRF4_setsockopt                "%" PRIuSIZ
 #define __NR64ATRA4_setsockopt(sockfd, level, optname, optval, optlen) ,(uintptr_t)(optlen)
 #define __NR64ATRF0_getsockopt                "%d"
 #define __NR64ATRA0_getsockopt(sockfd, level, optname, optval, optlen) ,(int)(sockfd)
 #define __NR64ATRF1_getsockopt                "%#Ix=%s"
 #define __NR64ATRA1_getsockopt(sockfd, level, optname, optval, optlen) ,(level),(level) == SOL_SOCKET ? "SOL_SOCKET" : "?"
-#define __NR64ATRF2_getsockopt                "%#" PRIxPTR
+#define __NR64ATRF2_getsockopt                "%#" PRIxSIZ
 #define __NR64ATRA2_getsockopt(sockfd, level, optname, optval, optlen) ,(uintptr_t)(optname)
 #define __NR64ATRF3_getsockopt                "%p"
 #define __NR64ATRA3_getsockopt(sockfd, level, optname, optval, optlen) ,optval
 #define __NR64ATRF4_getsockopt                "%p"
 #define __NR64ATRA4_getsockopt(sockfd, level, optname, optval, optlen) ,optlen
-#define __NR64ATRF0_clone                     "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF0_clone                     "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA0_clone(flags, child_stack, ptid, ctid, newtls) ,(uintptr_t)(flags),(flags) & CLONE_VM ? "CLONE_VM" : "" \
                                                                   ,((flags) & CLONE_FS) && ((flags) & (CLONE_VM)) ? "|" : "",(flags) & CLONE_FS ? "CLONE_FS" : "" \
                                                                   ,((flags) & CLONE_FILES) && ((flags) & (CLONE_VM|CLONE_FS)) ? "|" : "",(flags) & CLONE_FILES ? "CLONE_FILES" : "" \
@@ -3615,34 +3615,34 @@
 #define __NR64ATRA1_execve(path, argv, envp)  ,argv
 #define __NR64ATRF2_execve                    "%p"
 #define __NR64ATRA2_execve(path, argv, envp)  ,envp
-#define __NR64ATRF0_exit                      "%" PRIuPTR
+#define __NR64ATRF0_exit                      "%" PRIuSIZ
 #define __NR64ATRA0_exit(status)              ,(uintptr_t)(status)
-#define __NR64ATRF0_wait4                     "%" PRIdPTR
+#define __NR64ATRF0_wait4                     "%" PRIdSIZ
 #define __NR64ATRA0_wait4(pid, stat_loc, options, usage) ,(intptr_t)(pid)
 #define __NR64ATRF1_wait4                     "%p"
 #define __NR64ATRA1_wait4(pid, stat_loc, options, usage) ,stat_loc
-#define __NR64ATRF2_wait4                     "%#" PRIxPTR "=%s%s%s%s%s%s%s"
+#define __NR64ATRF2_wait4                     "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
 #define __NR64ATRA2_wait4(pid, stat_loc, options, usage) ,(uintptr_t)(options),(options) & WNOHANG ? "WNOHANG" : "" \
                                                          ,((options) & WUNTRACED) && ((options) & (WNOHANG)) ? "|" : "",(options) & WUNTRACED ? "WUNTRACED" : "" \
                                                          ,((options) & WCONTINUED) && ((options) & (WNOHANG|WUNTRACED)) ? "|" : "",(options) & WCONTINUED ? "WCONTINUED" : "" \
                                                          ,((options) & WNOWAIT) && ((options) & (WNOHANG|WUNTRACED|WCONTINUED)) ? "|" : "",(options) & WNOWAIT ? "WNOWAIT" : ""
 #define __NR64ATRF3_wait4                     "%p"
 #define __NR64ATRA3_wait4(pid, stat_loc, options, usage) ,usage
-#define __NR64ATRF0_kill                      "%" PRIdPTR
+#define __NR64ATRF0_kill                      "%" PRIdSIZ
 #define __NR64ATRA0_kill(pid, signo)          ,(intptr_t)(pid)
-#define __NR64ATRF1_kill                      "%#" PRIxPTR
+#define __NR64ATRF1_kill                      "%#" PRIxSIZ
 #define __NR64ATRA1_kill(pid, signo)          ,(uintptr_t)(signo)
 #define __NR64ATRF0_uname                     "%p"
 #define __NR64ATRA0_uname(name)               ,name
 #define __NR64ATRF0_fcntl                     "%d"
 #define __NR64ATRA0_fcntl(fd, cmd, arg)       ,(int)(fd)
-#define __NR64ATRF1_fcntl                     "%#" PRIxPTR
+#define __NR64ATRF1_fcntl                     "%#" PRIxSIZ
 #define __NR64ATRA1_fcntl(fd, cmd, arg)       ,(uintptr_t)(cmd)
 #define __NR64ATRF2_fcntl                     "%p"
 #define __NR64ATRA2_fcntl(fd, cmd, arg)       ,arg
 #define __NR64ATRF0_flock                     "%d"
 #define __NR64ATRA0_flock(fd, operation)      ,(int)(fd)
-#define __NR64ATRF1_flock                     "%#" PRIxPTR
+#define __NR64ATRF1_flock                     "%#" PRIxSIZ
 #define __NR64ATRA1_flock(fd, operation)      ,(uintptr_t)(operation)
 #define __NR64ATRF0_fsync                     "%d"
 #define __NR64ATRA0_fsync(fd)                 ,(int)(fd)
@@ -3650,21 +3650,21 @@
 #define __NR64ATRA0_fdatasync(fd)             ,(int)(fd)
 #define __NR64ATRF0_truncate                  "%q"
 #define __NR64ATRA0_truncate(filename, length) ,(validate_readable_opt(filename,1),filename)
-#define __NR64ATRF1_truncate                  "%#" PRIxPTR
+#define __NR64ATRF1_truncate                  "%#" PRIxSIZ
 #define __NR64ATRA1_truncate(filename, length) ,(uintptr_t)(length)
 #define __NR64ATRF0_ftruncate                 "%d"
 #define __NR64ATRA0_ftruncate(fd, length)     ,(int)(fd)
-#define __NR64ATRF1_ftruncate                 "%#" PRIxPTR
+#define __NR64ATRF1_ftruncate                 "%#" PRIxSIZ
 #define __NR64ATRA1_ftruncate(fd, length)     ,(uintptr_t)(length)
 #define __NR64ATRF0_getdents                  "%d"
 #define __NR64ATRA0_getdents(fd, dirp, count) ,(int)(fd)
 #define __NR64ATRF1_getdents                  "%p"
 #define __NR64ATRA1_getdents(fd, dirp, count) ,dirp
-#define __NR64ATRF2_getdents                  "%" PRIuPTR
+#define __NR64ATRF2_getdents                  "%" PRIuSIZ
 #define __NR64ATRA2_getdents(fd, dirp, count) ,count
 #define __NR64ATRF0_getcwd                    "%p"
 #define __NR64ATRA0_getcwd(buf, size)         ,buf
-#define __NR64ATRF1_getcwd                    "%" PRIuPTR
+#define __NR64ATRF1_getcwd                    "%" PRIuSIZ
 #define __NR64ATRA1_getcwd(buf, size)         ,size
 #define __NR64ATRF0_chdir                     "%q"
 #define __NR64ATRA0_chdir(path)               ,(validate_readable_opt(path,1),path)
@@ -3676,13 +3676,13 @@
 #define __NR64ATRA1_rename(oldname, newname_or_path) ,(validate_readable_opt(newname_or_path,1),newname_or_path)
 #define __NR64ATRF0_mkdir                     "%q"
 #define __NR64ATRA0_mkdir(pathname, mode)     ,(validate_readable_opt(pathname,1),pathname)
-#define __NR64ATRF1_mkdir                     "%#" PRIoPTR
+#define __NR64ATRF1_mkdir                     "%#" PRIoSIZ
 #define __NR64ATRA1_mkdir(pathname, mode)     ,(uintptr_t)(mode)
 #define __NR64ATRF0_rmdir                     "%q"
 #define __NR64ATRA0_rmdir(path)               ,(validate_readable_opt(path,1),path)
 #define __NR64ATRF0_creat                     "%q"
 #define __NR64ATRA0_creat(filename, mode)     ,(validate_readable_opt(filename,1),filename)
-#define __NR64ATRF1_creat                     "%#" PRIoPTR
+#define __NR64ATRF1_creat                     "%#" PRIoSIZ
 #define __NR64ATRA1_creat(filename, mode)     ,(uintptr_t)(mode)
 #define __NR64ATRF0_link                      "%q"
 #define __NR64ATRA0_link(existing_file, link_file) ,(validate_readable_opt(existing_file,1),existing_file)
@@ -3698,15 +3698,15 @@
 #define __NR64ATRA0_readlink(path, buf, buflen) ,(validate_readable_opt(path,1),path)
 #define __NR64ATRF1_readlink                  "%p"
 #define __NR64ATRA1_readlink(path, buf, buflen) ,buf
-#define __NR64ATRF2_readlink                  "%" PRIuPTR
+#define __NR64ATRF2_readlink                  "%" PRIuSIZ
 #define __NR64ATRA2_readlink(path, buf, buflen) ,buflen
 #define __NR64ATRF0_chmod                     "%q"
 #define __NR64ATRA0_chmod(filename, mode)     ,(validate_readable_opt(filename,1),filename)
-#define __NR64ATRF1_chmod                     "%#" PRIoPTR
+#define __NR64ATRF1_chmod                     "%#" PRIoSIZ
 #define __NR64ATRA1_chmod(filename, mode)     ,(uintptr_t)(mode)
 #define __NR64ATRF0_fchmod                    "%d"
 #define __NR64ATRA0_fchmod(fd, mode)          ,(int)(fd)
-#define __NR64ATRF1_fchmod                    "%#" PRIoPTR
+#define __NR64ATRF1_fchmod                    "%#" PRIoSIZ
 #define __NR64ATRA1_fchmod(fd, mode)          ,(uintptr_t)(mode)
 #define __NR64ATRF0_chown                     "%q"
 #define __NR64ATRA0_chown(filename, owner, group) ,(validate_readable_opt(filename,1),filename)
@@ -3726,17 +3726,17 @@
 #define __NR64ATRA1_lchown(filename, owner, group) ,owner
 #define __NR64ATRF2_lchown                    "%" PRIu32
 #define __NR64ATRA2_lchown(filename, owner, group) ,group
-#define __NR64ATRF0_umask                     "%#" PRIoPTR
+#define __NR64ATRF0_umask                     "%#" PRIoSIZ
 #define __NR64ATRA0_umask(mode)               ,(uintptr_t)(mode)
 #define __NR64ATRF0_gettimeofday              "%p"
 #define __NR64ATRA0_gettimeofday(tv, tz)      ,tv
 #define __NR64ATRF1_gettimeofday              "%p"
 #define __NR64ATRA1_gettimeofday(tv, tz)      ,tz
-#define __NR64ATRF0_getrlimit                 "%#" PRIxPTR
+#define __NR64ATRF0_getrlimit                 "%#" PRIxSIZ
 #define __NR64ATRA0_getrlimit(resource, rlimits) ,(uintptr_t)(resource)
 #define __NR64ATRF1_getrlimit                 "%p"
 #define __NR64ATRA1_getrlimit(resource, rlimits) ,rlimits
-#define __NR64ATRF0_getrusage                 "%" PRIdPTR
+#define __NR64ATRF0_getrusage                 "%" PRIdSIZ
 #define __NR64ATRA0_getrusage(who, usage)     ,(intptr_t)(who)
 #define __NR64ATRF1_getrusage                 "%p"
 #define __NR64ATRA1_getrusage(who, usage)     ,usage
@@ -3744,27 +3744,27 @@
 #define __NR64ATRA0_sysinfo(info)             ,info
 #define __NR64ATRF0_times                     "%p"
 #define __NR64ATRA0_times(buf)                ,buf
-#define __NR64ATRF0_ptrace                    "%#" PRIxPTR
+#define __NR64ATRF0_ptrace                    "%#" PRIxSIZ
 #define __NR64ATRA0_ptrace(request, pid, addr, data) ,(uintptr_t)(request)
-#define __NR64ATRF1_ptrace                    "%" PRIdPTR
+#define __NR64ATRF1_ptrace                    "%" PRIdSIZ
 #define __NR64ATRA1_ptrace(request, pid, addr, data) ,(intptr_t)(pid)
 #define __NR64ATRF2_ptrace                    "%p"
 #define __NR64ATRA2_ptrace(request, pid, addr, data) ,addr
 #define __NR64ATRF3_ptrace                    "%p"
 #define __NR64ATRA3_ptrace(request, pid, addr, data) ,data
-#define __NR64ATRF0_syslog                    "%" PRIuPTR
+#define __NR64ATRF0_syslog                    "%" PRIuSIZ
 #define __NR64ATRA0_syslog(level, str, len)   ,(uintptr_t)(level)
 #define __NR64ATRF1_syslog                    "%$q"
 #define __NR64ATRA1_syslog(level, str, len)   ,len,(validate_readable(str,len),str)
-#define __NR64ATRF2_syslog                    "%" PRIuPTR
+#define __NR64ATRF2_syslog                    "%" PRIuSIZ
 #define __NR64ATRA2_syslog(level, str, len)   ,len
 #define __NR64ATRF0_setuid32                  "%" PRIu32
 #define __NR64ATRA0_setuid32(uid)             ,uid
 #define __NR64ATRF0_setgid32                  "%" PRIu32
 #define __NR64ATRA0_setgid32(gid)             ,gid
-#define __NR64ATRF0_setpgid                   "%" PRIdPTR
+#define __NR64ATRF0_setpgid                   "%" PRIdSIZ
 #define __NR64ATRA0_setpgid(pid, pgid)        ,(intptr_t)(pid)
-#define __NR64ATRF1_setpgid                   "%" PRIdPTR
+#define __NR64ATRF1_setpgid                   "%" PRIdSIZ
 #define __NR64ATRA1_setpgid(pid, pgid)        ,(intptr_t)(pgid)
 #define __NR64ATRF0_setreuid32                "%" PRIu32
 #define __NR64ATRA0_setreuid32(ruid, euid)    ,ruid
@@ -3774,11 +3774,11 @@
 #define __NR64ATRA0_setregid32(rgid, egid)    ,rgid
 #define __NR64ATRF1_setregid32                "%" PRIu32
 #define __NR64ATRA1_setregid32(rgid, egid)    ,egid
-#define __NR64ATRF0_getgroups32               "%" PRIuPTR
+#define __NR64ATRF0_getgroups32               "%" PRIuSIZ
 #define __NR64ATRA0_getgroups32(size, list)   ,size
 #define __NR64ATRF1_getgroups32               "%p"
 #define __NR64ATRA1_getgroups32(size, list)   ,list
-#define __NR64ATRF0_setgroups32               "%" PRIuPTR
+#define __NR64ATRF0_setgroups32               "%" PRIuSIZ
 #define __NR64ATRA0_setgroups32(count, groups) ,count
 #define __NR64ATRF1_setgroups32               "%p"
 #define __NR64ATRA1_setgroups32(count, groups) ,groups
@@ -3806,17 +3806,17 @@
 #define __NR64ATRA1_getresgid32(rgid, egid, sgid) ,egid
 #define __NR64ATRF2_getresgid32               "%p"
 #define __NR64ATRA2_getresgid32(rgid, egid, sgid) ,sgid
-#define __NR64ATRF0_getpgid                   "%" PRIdPTR
+#define __NR64ATRF0_getpgid                   "%" PRIdSIZ
 #define __NR64ATRA0_getpgid(pid)              ,(intptr_t)(pid)
 #define __NR64ATRF0_setfsuid32                "%" PRIu32
 #define __NR64ATRA0_setfsuid32(uid)           ,uid
 #define __NR64ATRF0_setfsgid32                "%" PRIu32
 #define __NR64ATRA0_setfsgid32(gid)           ,gid
-#define __NR64ATRF0_getsid                    "%" PRIdPTR
+#define __NR64ATRF0_getsid                    "%" PRIdSIZ
 #define __NR64ATRA0_getsid(pid)               ,(intptr_t)(pid)
 #define __NR64ATRF0_rt_sigpending             "%p"
 #define __NR64ATRA0_rt_sigpending(set, sigsetsize) ,set
-#define __NR64ATRF1_rt_sigpending             "%" PRIuPTR
+#define __NR64ATRF1_rt_sigpending             "%" PRIuSIZ
 #define __NR64ATRA1_rt_sigpending(set, sigsetsize) ,sigsetsize
 #define __NR64ATRF0_rt_sigtimedwait           "%p"
 #define __NR64ATRA0_rt_sigtimedwait(set, info, timeout, sigsetsize) ,set
@@ -3824,17 +3824,17 @@
 #define __NR64ATRA1_rt_sigtimedwait(set, info, timeout, sigsetsize) ,info
 #define __NR64ATRF2_rt_sigtimedwait           "%p"
 #define __NR64ATRA2_rt_sigtimedwait(set, info, timeout, sigsetsize) ,timeout
-#define __NR64ATRF3_rt_sigtimedwait           "%" PRIuPTR
+#define __NR64ATRF3_rt_sigtimedwait           "%" PRIuSIZ
 #define __NR64ATRA3_rt_sigtimedwait(set, info, timeout, sigsetsize) ,sigsetsize
-#define __NR64ATRF0_rt_sigqueueinfo           "%" PRIdPTR
+#define __NR64ATRF0_rt_sigqueueinfo           "%" PRIdSIZ
 #define __NR64ATRA0_rt_sigqueueinfo(tgid, signo, uinfo) ,(intptr_t)(tgid)
-#define __NR64ATRF1_rt_sigqueueinfo           "%#" PRIxPTR
+#define __NR64ATRF1_rt_sigqueueinfo           "%#" PRIxSIZ
 #define __NR64ATRA1_rt_sigqueueinfo(tgid, signo, uinfo) ,(uintptr_t)(signo)
 #define __NR64ATRF2_rt_sigqueueinfo           "%p"
 #define __NR64ATRA2_rt_sigqueueinfo(tgid, signo, uinfo) ,uinfo
 #define __NR64ATRF0_rt_sigsuspend             "%p"
 #define __NR64ATRA0_rt_sigsuspend(set, sigsetsize) ,set
-#define __NR64ATRF1_rt_sigsuspend             "%" PRIuPTR
+#define __NR64ATRF1_rt_sigsuspend             "%" PRIuSIZ
 #define __NR64ATRA1_rt_sigsuspend(set, sigsetsize) ,sigsetsize
 #define __NR64ATRF0_sigaltstack               "%p"
 #define __NR64ATRA0_sigaltstack(ss, oss)      ,ss
@@ -3846,7 +3846,7 @@
 #define __NR64ATRA1_utime(filename, times)    ,times
 #define __NR64ATRF0_mknod                     "%q"
 #define __NR64ATRA0_mknod(nodename, mode, dev) ,(validate_readable_opt(nodename,1),nodename)
-#define __NR64ATRF1_mknod                     "%#" PRIoPTR
+#define __NR64ATRF1_mknod                     "%#" PRIoSIZ
 #define __NR64ATRA1_mknod(nodename, mode, dev) ,(uintptr_t)(mode)
 #define __NR64ATRF2_mknod                     "%.2x:%.2x"
 #define __NR64ATRA2_mknod(nodename, mode, dev) ,(unsigned int)MAJOR(dev),(unsigned int)MINOR(dev)
@@ -3862,57 +3862,57 @@
 #define __NR64ATRA0_fstatfs(file, buf)        ,(int)(file)
 #define __NR64ATRF1_fstatfs                   "%p"
 #define __NR64ATRA1_fstatfs(file, buf)        ,buf
-#define __NR64ATRF0_getpriority               "%#" PRIxPTR
+#define __NR64ATRF0_getpriority               "%#" PRIxSIZ
 #define __NR64ATRA0_getpriority(which, who)   ,(uintptr_t)(which)
-#define __NR64ATRF1_getpriority               "%" PRIuPTR
+#define __NR64ATRF1_getpriority               "%" PRIuSIZ
 #define __NR64ATRA1_getpriority(which, who)   ,(uintptr_t)(who)
-#define __NR64ATRF0_setpriority               "%#" PRIxPTR
+#define __NR64ATRF0_setpriority               "%#" PRIxSIZ
 #define __NR64ATRA0_setpriority(which, who, value) ,(uintptr_t)(which)
-#define __NR64ATRF1_setpriority               "%" PRIuPTR
+#define __NR64ATRF1_setpriority               "%" PRIuSIZ
 #define __NR64ATRA1_setpriority(which, who, value) ,(uintptr_t)(who)
-#define __NR64ATRF2_setpriority               "%#" PRIxPTR
+#define __NR64ATRF2_setpriority               "%#" PRIxSIZ
 #define __NR64ATRA2_setpriority(which, who, value) ,(uintptr_t)(value)
-#define __NR64ATRF0_sched_setparam            "%" PRIdPTR
+#define __NR64ATRF0_sched_setparam            "%" PRIdSIZ
 #define __NR64ATRA0_sched_setparam(pid, param) ,(intptr_t)(pid)
 #define __NR64ATRF1_sched_setparam            "%p"
 #define __NR64ATRA1_sched_setparam(pid, param) ,param
-#define __NR64ATRF0_sched_getparam            "%" PRIdPTR
+#define __NR64ATRF0_sched_getparam            "%" PRIdSIZ
 #define __NR64ATRA0_sched_getparam(pid, param) ,(intptr_t)(pid)
 #define __NR64ATRF1_sched_getparam            "%p"
 #define __NR64ATRA1_sched_getparam(pid, param) ,param
-#define __NR64ATRF0_sched_setscheduler        "%" PRIdPTR
+#define __NR64ATRF0_sched_setscheduler        "%" PRIdSIZ
 #define __NR64ATRA0_sched_setscheduler(pid, policy, param) ,(intptr_t)(pid)
-#define __NR64ATRF1_sched_setscheduler        "%#" PRIxPTR
+#define __NR64ATRF1_sched_setscheduler        "%#" PRIxSIZ
 #define __NR64ATRA1_sched_setscheduler(pid, policy, param) ,(uintptr_t)(policy)
 #define __NR64ATRF2_sched_setscheduler        "%p"
 #define __NR64ATRA2_sched_setscheduler(pid, policy, param) ,param
-#define __NR64ATRF0_sched_getscheduler        "%" PRIdPTR
+#define __NR64ATRF0_sched_getscheduler        "%" PRIdSIZ
 #define __NR64ATRA0_sched_getscheduler(pid)   ,(intptr_t)(pid)
-#define __NR64ATRF0_sched_get_priority_max    "%#" PRIxPTR
+#define __NR64ATRF0_sched_get_priority_max    "%#" PRIxSIZ
 #define __NR64ATRA0_sched_get_priority_max(algorithm) ,(uintptr_t)(algorithm)
-#define __NR64ATRF0_sched_get_priority_min    "%#" PRIxPTR
+#define __NR64ATRF0_sched_get_priority_min    "%#" PRIxSIZ
 #define __NR64ATRA0_sched_get_priority_min(algorithm) ,(uintptr_t)(algorithm)
-#define __NR64ATRF0_sched_rr_get_interval     "%" PRIdPTR
+#define __NR64ATRF0_sched_rr_get_interval     "%" PRIdSIZ
 #define __NR64ATRA0_sched_rr_get_interval(pid, tms) ,(intptr_t)(pid)
 #define __NR64ATRF1_sched_rr_get_interval     "%p"
 #define __NR64ATRA1_sched_rr_get_interval(pid, tms) ,tms
 #define __NR64ATRF0_mlock                     "%p"
 #define __NR64ATRA0_mlock(addr, len)          ,addr
-#define __NR64ATRF1_mlock                     "%" PRIuPTR
+#define __NR64ATRF1_mlock                     "%" PRIuSIZ
 #define __NR64ATRA1_mlock(addr, len)          ,len
 #define __NR64ATRF0_munlock                   "%p"
 #define __NR64ATRA0_munlock(addr, len)        ,addr
-#define __NR64ATRF1_munlock                   "%" PRIuPTR
+#define __NR64ATRF1_munlock                   "%" PRIuSIZ
 #define __NR64ATRA1_munlock(addr, len)        ,len
-#define __NR64ATRF0_mlockall                  "%#" PRIxPTR
+#define __NR64ATRF0_mlockall                  "%#" PRIxSIZ
 #define __NR64ATRA0_mlockall(flags)           ,(uintptr_t)(flags)
-#define __NR64ATRF0_modify_ldt                "%#" PRIxPTR
+#define __NR64ATRF0_modify_ldt                "%#" PRIxSIZ
 #define __NR64ATRA0_modify_ldt(func, ptr, bytecount) ,(uintptr_t)(func)
 #define __NR64ATRF1_modify_ldt                "%p"
 #define __NR64ATRA1_modify_ldt(func, ptr, bytecount) ,ptr
-#define __NR64ATRF2_modify_ldt                "%#" PRIxPTR
+#define __NR64ATRF2_modify_ldt                "%#" PRIxSIZ
 #define __NR64ATRA2_modify_ldt(func, ptr, bytecount) ,(uintptr_t)(bytecount)
-#define __NR64ATRF0_setrlimit                 "%#" PRIxPTR
+#define __NR64ATRF0_setrlimit                 "%#" PRIxSIZ
 #define __NR64ATRA0_setrlimit(resource, rlimits) ,(uintptr_t)(resource)
 #define __NR64ATRF1_setrlimit                 "%p"
 #define __NR64ATRA1_setrlimit(resource, rlimits) ,rlimits
@@ -3930,44 +3930,44 @@
 #define __NR64ATRA1_mount(special_file, dir, fstype, rwflag, data) ,(validate_readable_opt(dir,1),dir)
 #define __NR64ATRF2_mount                     "%q"
 #define __NR64ATRA2_mount(special_file, dir, fstype, rwflag, data) ,(validate_readable_opt(fstype,1),fstype)
-#define __NR64ATRF3_mount                     "%#" PRIxPTR
+#define __NR64ATRF3_mount                     "%#" PRIxSIZ
 #define __NR64ATRA3_mount(special_file, dir, fstype, rwflag, data) ,(uintptr_t)(rwflag)
 #define __NR64ATRF4_mount                     "%p"
 #define __NR64ATRA4_mount(special_file, dir, fstype, rwflag, data) ,data
 #define __NR64ATRF0_umount2                   "%q"
 #define __NR64ATRA0_umount2(special_file, flags) ,(validate_readable_opt(special_file,1),special_file)
-#define __NR64ATRF1_umount2                   "%#" PRIxPTR
+#define __NR64ATRF1_umount2                   "%#" PRIxSIZ
 #define __NR64ATRA1_umount2(special_file, flags) ,(uintptr_t)(flags)
 #define __NR64ATRF0_swapon                    "%q"
 #define __NR64ATRA0_swapon(pathname, swapflags) ,(validate_readable_opt(pathname,1),pathname)
-#define __NR64ATRF1_swapon                    "%#" PRIxPTR "=%s%s%s"
+#define __NR64ATRF1_swapon                    "%#" PRIxSIZ "=%s%s%s"
 #define __NR64ATRA1_swapon(pathname, swapflags) ,(uintptr_t)(swapflags),(swapflags) & SWAP_FLAG_PREFER ? "SWAP_FLAG_PREFER" : "" \
                                                 ,((swapflags) & SWAP_FLAG_DISCARD) && ((swapflags) & (SWAP_FLAG_PREFER)) ? "|" : "",(swapflags) & SWAP_FLAG_DISCARD ? "SWAP_FLAG_DISCARD" : ""
 #define __NR64ATRF0_swapoff                   "%q"
 #define __NR64ATRA0_swapoff(pathname)         ,(validate_readable_opt(pathname,1),pathname)
-#define __NR64ATRF0_reboot                    "%#" PRIxPTR
+#define __NR64ATRF0_reboot                    "%#" PRIxSIZ
 #define __NR64ATRA0_reboot(how)               ,(uintptr_t)(how)
 #define __NR64ATRF0_sethostname               "%q"
 #define __NR64ATRA0_sethostname(name, len)    ,(validate_readable_opt(name,1),name)
-#define __NR64ATRF1_sethostname               "%" PRIuPTR
+#define __NR64ATRF1_sethostname               "%" PRIuSIZ
 #define __NR64ATRA1_sethostname(name, len)    ,len
 #define __NR64ATRF0_setdomainname             "%q"
 #define __NR64ATRA0_setdomainname(name, len)  ,(validate_readable_opt(name,1),name)
-#define __NR64ATRF1_setdomainname             "%" PRIuPTR
+#define __NR64ATRF1_setdomainname             "%" PRIuSIZ
 #define __NR64ATRA1_setdomainname(name, len)  ,len
-#define __NR64ATRF0_iopl                      "%#" PRIxPTR
+#define __NR64ATRF0_iopl                      "%#" PRIxSIZ
 #define __NR64ATRA0_iopl(level)               ,(uintptr_t)(level)
-#define __NR64ATRF0_ioperm                    "%#" PRIxPTR
+#define __NR64ATRF0_ioperm                    "%#" PRIxSIZ
 #define __NR64ATRA0_ioperm(from, num, turn_on) ,(uintptr_t)(from)
-#define __NR64ATRF1_ioperm                    "%#" PRIxPTR
+#define __NR64ATRF1_ioperm                    "%#" PRIxSIZ
 #define __NR64ATRA1_ioperm(from, num, turn_on) ,(uintptr_t)(num)
-#define __NR64ATRF2_ioperm                    "%#" PRIxPTR
+#define __NR64ATRF2_ioperm                    "%#" PRIxSIZ
 #define __NR64ATRA2_ioperm(from, num, turn_on) ,(uintptr_t)(turn_on)
 #define __NR64ATRF0_readahead                 "%d"
 #define __NR64ATRA0_readahead(fd, offset, count) ,(int)(fd)
 #define __NR64ATRF1_readahead                 "%" PRIu64
 #define __NR64ATRA1_readahead(fd, offset, count) ,offset
-#define __NR64ATRF2_readahead                 "%" PRIuPTR
+#define __NR64ATRF2_readahead                 "%" PRIuSIZ
 #define __NR64ATRA2_readahead(fd, offset, count) ,count
 #define __NR64ATRF0_setxattr                  "%q"
 #define __NR64ATRA0_setxattr(path, name, buf, bufsize, flags) ,(validate_readable_opt(path,1),path)
@@ -3975,9 +3975,9 @@
 #define __NR64ATRA1_setxattr(path, name, buf, bufsize, flags) ,(validate_readable_opt(name,1),name)
 #define __NR64ATRF2_setxattr                  "%p"
 #define __NR64ATRA2_setxattr(path, name, buf, bufsize, flags) ,buf
-#define __NR64ATRF3_setxattr                  "%" PRIuPTR
+#define __NR64ATRF3_setxattr                  "%" PRIuSIZ
 #define __NR64ATRA3_setxattr(path, name, buf, bufsize, flags) ,bufsize
-#define __NR64ATRF4_setxattr                  "%#" PRIxPTR
+#define __NR64ATRF4_setxattr                  "%#" PRIxSIZ
 #define __NR64ATRA4_setxattr(path, name, buf, bufsize, flags) ,(uintptr_t)(flags)
 #define __NR64ATRF0_lsetxattr                 "%q"
 #define __NR64ATRA0_lsetxattr(path, name, buf, bufsize, flags) ,(validate_readable_opt(path,1),path)
@@ -3985,9 +3985,9 @@
 #define __NR64ATRA1_lsetxattr(path, name, buf, bufsize, flags) ,(validate_readable_opt(name,1),name)
 #define __NR64ATRF2_lsetxattr                 "%p"
 #define __NR64ATRA2_lsetxattr(path, name, buf, bufsize, flags) ,buf
-#define __NR64ATRF3_lsetxattr                 "%" PRIuPTR
+#define __NR64ATRF3_lsetxattr                 "%" PRIuSIZ
 #define __NR64ATRA3_lsetxattr(path, name, buf, bufsize, flags) ,bufsize
-#define __NR64ATRF4_lsetxattr                 "%#" PRIxPTR
+#define __NR64ATRF4_lsetxattr                 "%#" PRIxSIZ
 #define __NR64ATRA4_lsetxattr(path, name, buf, bufsize, flags) ,(uintptr_t)(flags)
 #define __NR64ATRF0_fsetxattr                 "%d"
 #define __NR64ATRA0_fsetxattr(fd, name, buf, bufsize, flags) ,(int)(fd)
@@ -3995,9 +3995,9 @@
 #define __NR64ATRA1_fsetxattr(fd, name, buf, bufsize, flags) ,(validate_readable_opt(name,1),name)
 #define __NR64ATRF2_fsetxattr                 "%p"
 #define __NR64ATRA2_fsetxattr(fd, name, buf, bufsize, flags) ,buf
-#define __NR64ATRF3_fsetxattr                 "%" PRIuPTR
+#define __NR64ATRF3_fsetxattr                 "%" PRIuSIZ
 #define __NR64ATRA3_fsetxattr(fd, name, buf, bufsize, flags) ,bufsize
-#define __NR64ATRF4_fsetxattr                 "%#" PRIxPTR
+#define __NR64ATRF4_fsetxattr                 "%#" PRIxSIZ
 #define __NR64ATRA4_fsetxattr(fd, name, buf, bufsize, flags) ,(uintptr_t)(flags)
 #define __NR64ATRF0_getxattr                  "%q"
 #define __NR64ATRA0_getxattr(path, name, buf, bufsize) ,(validate_readable_opt(path,1),path)
@@ -4005,7 +4005,7 @@
 #define __NR64ATRA1_getxattr(path, name, buf, bufsize) ,(validate_readable_opt(name,1),name)
 #define __NR64ATRF2_getxattr                  "%p"
 #define __NR64ATRA2_getxattr(path, name, buf, bufsize) ,buf
-#define __NR64ATRF3_getxattr                  "%" PRIuPTR
+#define __NR64ATRF3_getxattr                  "%" PRIuSIZ
 #define __NR64ATRA3_getxattr(path, name, buf, bufsize) ,bufsize
 #define __NR64ATRF0_lgetxattr                 "%q"
 #define __NR64ATRA0_lgetxattr(path, name, buf, bufsize) ,(validate_readable_opt(path,1),path)
@@ -4013,7 +4013,7 @@
 #define __NR64ATRA1_lgetxattr(path, name, buf, bufsize) ,(validate_readable_opt(name,1),name)
 #define __NR64ATRF2_lgetxattr                 "%p"
 #define __NR64ATRA2_lgetxattr(path, name, buf, bufsize) ,buf
-#define __NR64ATRF3_lgetxattr                 "%" PRIuPTR
+#define __NR64ATRF3_lgetxattr                 "%" PRIuSIZ
 #define __NR64ATRA3_lgetxattr(path, name, buf, bufsize) ,bufsize
 #define __NR64ATRF0_fgetxattr                 "%d"
 #define __NR64ATRA0_fgetxattr(fd, name, buf, bufsize) ,(int)(fd)
@@ -4021,25 +4021,25 @@
 #define __NR64ATRA1_fgetxattr(fd, name, buf, bufsize) ,(validate_readable_opt(name,1),name)
 #define __NR64ATRF2_fgetxattr                 "%p"
 #define __NR64ATRA2_fgetxattr(fd, name, buf, bufsize) ,buf
-#define __NR64ATRF3_fgetxattr                 "%" PRIuPTR
+#define __NR64ATRF3_fgetxattr                 "%" PRIuSIZ
 #define __NR64ATRA3_fgetxattr(fd, name, buf, bufsize) ,bufsize
 #define __NR64ATRF0_listxattr                 "%q"
 #define __NR64ATRA0_listxattr(path, listbuf, listbufsize) ,(validate_readable_opt(path,1),path)
 #define __NR64ATRF1_listxattr                 "%p"
 #define __NR64ATRA1_listxattr(path, listbuf, listbufsize) ,listbuf
-#define __NR64ATRF2_listxattr                 "%" PRIuPTR
+#define __NR64ATRF2_listxattr                 "%" PRIuSIZ
 #define __NR64ATRA2_listxattr(path, listbuf, listbufsize) ,listbufsize
 #define __NR64ATRF0_llistxattr                "%q"
 #define __NR64ATRA0_llistxattr(path, listbuf, listbufsize) ,(validate_readable_opt(path,1),path)
 #define __NR64ATRF1_llistxattr                "%p"
 #define __NR64ATRA1_llistxattr(path, listbuf, listbufsize) ,listbuf
-#define __NR64ATRF2_llistxattr                "%" PRIuPTR
+#define __NR64ATRF2_llistxattr                "%" PRIuSIZ
 #define __NR64ATRA2_llistxattr(path, listbuf, listbufsize) ,listbufsize
 #define __NR64ATRF0_flistxattr                "%d"
 #define __NR64ATRA0_flistxattr(fd, listbuf, listbufsize) ,(int)(fd)
 #define __NR64ATRF1_flistxattr                "%p"
 #define __NR64ATRA1_flistxattr(fd, listbuf, listbufsize) ,listbuf
-#define __NR64ATRF2_flistxattr                "%" PRIuPTR
+#define __NR64ATRF2_flistxattr                "%" PRIuSIZ
 #define __NR64ATRA2_flistxattr(fd, listbuf, listbufsize) ,listbufsize
 #define __NR64ATRF0_removexattr               "%q"
 #define __NR64ATRA0_removexattr(path, name)   ,(validate_readable_opt(path,1),path)
@@ -4053,15 +4053,15 @@
 #define __NR64ATRA0_fremovexattr(fd, name)    /* nothing */
 #define __NR64ATRF1_fremovexattr              "%q"
 #define __NR64ATRA1_fremovexattr(fd, name)    ,(validate_readable_opt(name,1),name)
-#define __NR64ATRF0_tkill                     "%" PRIdPTR
+#define __NR64ATRF0_tkill                     "%" PRIdSIZ
 #define __NR64ATRA0_tkill(tid, signo)         ,(intptr_t)(tid)
-#define __NR64ATRF1_tkill                     "%#" PRIxPTR
+#define __NR64ATRF1_tkill                     "%#" PRIxSIZ
 #define __NR64ATRA1_tkill(tid, signo)         ,(uintptr_t)(signo)
 #define __NR64ATRF0_time                      "%p"
 #define __NR64ATRA0_time(timer)               ,timer
 #define __NR64ATRF0_futex                     "%p"
 #define __NR64ATRA0_futex(uaddr, futex_op, val, timeout_or_val2, uaddr2, val3) ,uaddr
-#define __NR64ATRF1_futex                     "%#" PRIxPTR
+#define __NR64ATRF1_futex                     "%#" PRIxSIZ
 #define __NR64ATRA1_futex(uaddr, futex_op, val, timeout_or_val2, uaddr2, val3) ,(uintptr_t)(futex_op)
 #define __NR64ATRF2_futex                     "%" PRIu32
 #define __NR64ATRA2_futex(uaddr, futex_op, val, timeout_or_val2, uaddr2, val3) ,val
@@ -4071,19 +4071,19 @@
 #define __NR64ATRA4_futex(uaddr, futex_op, val, timeout_or_val2, uaddr2, val3) ,uaddr2
 #define __NR64ATRF5_futex                     "%" PRIu32
 #define __NR64ATRA5_futex(uaddr, futex_op, val, timeout_or_val2, uaddr2, val3) ,val3
-#define __NR64ATRF0_sched_setaffinity         "%" PRIdPTR
+#define __NR64ATRF0_sched_setaffinity         "%" PRIdSIZ
 #define __NR64ATRA0_sched_setaffinity(pid, cpusetsize, cpuset) ,(intptr_t)(pid)
-#define __NR64ATRF1_sched_setaffinity         "%" PRIuPTR
+#define __NR64ATRF1_sched_setaffinity         "%" PRIuSIZ
 #define __NR64ATRA1_sched_setaffinity(pid, cpusetsize, cpuset) ,cpusetsize
 #define __NR64ATRF2_sched_setaffinity         "%p"
 #define __NR64ATRA2_sched_setaffinity(pid, cpusetsize, cpuset) ,cpuset
-#define __NR64ATRF0_sched_getaffinity         "%" PRIdPTR
+#define __NR64ATRF0_sched_getaffinity         "%" PRIdSIZ
 #define __NR64ATRA0_sched_getaffinity(pid, cpusetsize, cpuset) ,(intptr_t)(pid)
-#define __NR64ATRF1_sched_getaffinity         "%" PRIuPTR
+#define __NR64ATRF1_sched_getaffinity         "%" PRIuSIZ
 #define __NR64ATRA1_sched_getaffinity(pid, cpusetsize, cpuset) ,cpusetsize
 #define __NR64ATRF2_sched_getaffinity         "%p"
 #define __NR64ATRA2_sched_getaffinity(pid, cpusetsize, cpuset) ,cpuset
-#define __NR64ATRF0_epoll_create              "%#" PRIxPTR
+#define __NR64ATRF0_epoll_create              "%#" PRIxSIZ
 #define __NR64ATRA0_epoll_create(size)        ,(uintptr_t)(size)
 #define __NR64ATRF0_epoll_ctl_old             "%d"
 #define __NR64ATRA0_epoll_ctl_old(epfd, op, fd, event) ,(int)(epfd)
@@ -4097,25 +4097,25 @@
 #define __NR64ATRA0_epoll_wait_old(epfd, events, maxevents, timeout) ,(int)(epfd)
 #define __NR64ATRF1_epoll_wait_old            "%p"
 #define __NR64ATRA1_epoll_wait_old(epfd, events, maxevents, timeout) ,events
-#define __NR64ATRF2_epoll_wait_old            "%#" PRIxPTR
+#define __NR64ATRF2_epoll_wait_old            "%#" PRIxSIZ
 #define __NR64ATRA2_epoll_wait_old(epfd, events, maxevents, timeout) ,(uintptr_t)(maxevents)
-#define __NR64ATRF3_epoll_wait_old            "%" PRIdPTR
+#define __NR64ATRF3_epoll_wait_old            "%" PRIdSIZ
 #define __NR64ATRA3_epoll_wait_old(epfd, events, maxevents, timeout) ,(intptr_t)(timeout)
 #define __NR64ATRF0_remap_file_pages          "%p"
 #define __NR64ATRA0_remap_file_pages(start, size, prot, pgoff, flags) ,start
-#define __NR64ATRF1_remap_file_pages          "%" PRIuPTR
+#define __NR64ATRF1_remap_file_pages          "%" PRIuSIZ
 #define __NR64ATRA1_remap_file_pages(start, size, prot, pgoff, flags) ,size
-#define __NR64ATRF2_remap_file_pages          "%#" PRIxPTR
+#define __NR64ATRF2_remap_file_pages          "%#" PRIxSIZ
 #define __NR64ATRA2_remap_file_pages(start, size, prot, pgoff, flags) ,(uintptr_t)(prot)
-#define __NR64ATRF3_remap_file_pages          "%" PRIuPTR
+#define __NR64ATRF3_remap_file_pages          "%" PRIuSIZ
 #define __NR64ATRA3_remap_file_pages(start, size, prot, pgoff, flags) ,pgoff
-#define __NR64ATRF4_remap_file_pages          "%#" PRIxPTR
+#define __NR64ATRF4_remap_file_pages          "%#" PRIxSIZ
 #define __NR64ATRA4_remap_file_pages(start, size, prot, pgoff, flags) ,(uintptr_t)(flags)
 #define __NR64ATRF0_getdents64                "%d"
 #define __NR64ATRA0_getdents64(fd, dirp, count) ,(int)(fd)
 #define __NR64ATRF1_getdents64                "%p"
 #define __NR64ATRA1_getdents64(fd, dirp, count) ,dirp
-#define __NR64ATRF2_getdents64                "%" PRIuPTR
+#define __NR64ATRF2_getdents64                "%" PRIuSIZ
 #define __NR64ATRA2_getdents64(fd, dirp, count) ,count
 #define __NR64ATRF0_set_tid_address           "%p"
 #define __NR64ATRA0_set_tid_address(tidptr)   ,tidptr
@@ -4127,7 +4127,7 @@
 #define __NR64ATRA2_timer_create(clock_id, evp, timerid) ,timerid
 #define __NR64ATRF0_timer_settime             "?"
 #define __NR64ATRA0_timer_settime(timerid, flags, value, ovalue) /* nothing */
-#define __NR64ATRF1_timer_settime             "%#" PRIxPTR
+#define __NR64ATRF1_timer_settime             "%#" PRIxSIZ
 #define __NR64ATRA1_timer_settime(timerid, flags, value, ovalue) ,(uintptr_t)(flags)
 #define __NR64ATRF2_timer_settime             "%p"
 #define __NR64ATRA2_timer_settime(timerid, flags, value, ovalue) ,value
@@ -4155,21 +4155,21 @@
 #define __NR64ATRA1_clock_getres(clock_id, res) ,res
 #define __NR64ATRF0_clock_nanosleep           "?"
 #define __NR64ATRA0_clock_nanosleep(clock_id, flags, requested_time, remaining) /* nothing */
-#define __NR64ATRF1_clock_nanosleep           "%#" PRIxPTR
+#define __NR64ATRF1_clock_nanosleep           "%#" PRIxSIZ
 #define __NR64ATRA1_clock_nanosleep(clock_id, flags, requested_time, remaining) ,(uintptr_t)(flags)
 #define __NR64ATRF2_clock_nanosleep           "%p"
 #define __NR64ATRA2_clock_nanosleep(clock_id, flags, requested_time, remaining) ,requested_time
 #define __NR64ATRF3_clock_nanosleep           "%p"
 #define __NR64ATRA3_clock_nanosleep(clock_id, flags, requested_time, remaining) ,remaining
-#define __NR64ATRF0_exit_group                "%" PRIuPTR
+#define __NR64ATRF0_exit_group                "%" PRIuSIZ
 #define __NR64ATRA0_exit_group(exit_code)     ,(uintptr_t)(exit_code)
 #define __NR64ATRF0_epoll_wait                "%d"
 #define __NR64ATRA0_epoll_wait(epfd, events, maxevents, timeout) ,(int)(epfd)
 #define __NR64ATRF1_epoll_wait                "%p"
 #define __NR64ATRA1_epoll_wait(epfd, events, maxevents, timeout) ,events
-#define __NR64ATRF2_epoll_wait                "%#" PRIxPTR
+#define __NR64ATRF2_epoll_wait                "%#" PRIxSIZ
 #define __NR64ATRA2_epoll_wait(epfd, events, maxevents, timeout) ,(uintptr_t)(maxevents)
-#define __NR64ATRF3_epoll_wait                "%" PRIdPTR
+#define __NR64ATRF3_epoll_wait                "%" PRIdSIZ
 #define __NR64ATRA3_epoll_wait(epfd, events, maxevents, timeout) ,(intptr_t)(timeout)
 #define __NR64ATRF0_epoll_ctl                 "%d"
 #define __NR64ATRA0_epoll_ctl(epfd, op, fd, event) ,(int)(epfd)
@@ -4179,11 +4179,11 @@
 #define __NR64ATRA2_epoll_ctl(epfd, op, fd, event) ,(int)(fd)
 #define __NR64ATRF3_epoll_ctl                 "%p"
 #define __NR64ATRA3_epoll_ctl(epfd, op, fd, event) ,event
-#define __NR64ATRF0_tgkill                    "%" PRIdPTR
+#define __NR64ATRF0_tgkill                    "%" PRIdSIZ
 #define __NR64ATRA0_tgkill(tgid, tid, signo)  ,(intptr_t)(tgid)
-#define __NR64ATRF1_tgkill                    "%" PRIdPTR
+#define __NR64ATRF1_tgkill                    "%" PRIdSIZ
 #define __NR64ATRA1_tgkill(tgid, tid, signo)  ,(intptr_t)(tid)
-#define __NR64ATRF2_tgkill                    "%#" PRIxPTR
+#define __NR64ATRF2_tgkill                    "%#" PRIxSIZ
 #define __NR64ATRA2_tgkill(tgid, tid, signo)  ,(uintptr_t)(signo)
 #define __NR64ATRF0_utimes                    "%q"
 #define __NR64ATRA0_utimes(filename, times)   ,(validate_readable_opt(filename,1),filename)
@@ -4191,11 +4191,11 @@
 #define __NR64ATRA1_utimes(filename, times)   ,times
 #define __NR64ATRF0_waitid                    "%#Ix=%s"
 #define __NR64ATRA0_waitid(idtype, id, infop, options, ru) ,(idtype),(idtype) == P_ALL ? "P_ALL" : (idtype) == P_PID ? "P_PID" : (idtype) == P_PGID ? "P_PGID" : "?"
-#define __NR64ATRF1_waitid                    "%" PRIuPTR
+#define __NR64ATRF1_waitid                    "%" PRIuSIZ
 #define __NR64ATRA1_waitid(idtype, id, infop, options, ru) ,(uintptr_t)(id)
 #define __NR64ATRF2_waitid                    "%p"
 #define __NR64ATRA2_waitid(idtype, id, infop, options, ru) ,infop
-#define __NR64ATRF3_waitid                    "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF3_waitid                    "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA3_waitid(idtype, id, infop, options, ru) ,(uintptr_t)(options),(options) & WEXITED ? "WEXITED" : "" \
                                                            ,((options) & WSTOPPED) && ((options) & (WEXITED)) ? "|" : "",(options) & WSTOPPED ? "WSTOPPED" : "" \
                                                            ,((options) & WCONTINUED) && ((options) & (WEXITED|WSTOPPED)) ? "|" : "",(options) & WCONTINUED ? "WCONTINUED" : "" \
@@ -4203,21 +4203,21 @@
                                                            ,((options) & WNOWAIT) && ((options) & (WEXITED|WSTOPPED|WCONTINUED|WNOHANG)) ? "|" : "",(options) & WNOWAIT ? "WNOWAIT" : ""
 #define __NR64ATRF4_waitid                    "%p"
 #define __NR64ATRA4_waitid(idtype, id, infop, options, ru) ,ru
-#define __NR64ATRF0_ioprio_set                "%#" PRIxPTR
+#define __NR64ATRF0_ioprio_set                "%#" PRIxSIZ
 #define __NR64ATRA0_ioprio_set(which, who, ioprio) ,(uintptr_t)(which)
-#define __NR64ATRF1_ioprio_set                "%#" PRIxPTR
+#define __NR64ATRF1_ioprio_set                "%#" PRIxSIZ
 #define __NR64ATRA1_ioprio_set(which, who, ioprio) ,(uintptr_t)(who)
-#define __NR64ATRF2_ioprio_set                "%#" PRIxPTR
+#define __NR64ATRF2_ioprio_set                "%#" PRIxSIZ
 #define __NR64ATRA2_ioprio_set(which, who, ioprio) ,(uintptr_t)(ioprio)
-#define __NR64ATRF0_ioprio_get                "%#" PRIxPTR
+#define __NR64ATRF0_ioprio_get                "%#" PRIxSIZ
 #define __NR64ATRA0_ioprio_get(which, who)    ,(uintptr_t)(which)
-#define __NR64ATRF1_ioprio_get                "%#" PRIxPTR
+#define __NR64ATRF1_ioprio_get                "%#" PRIxSIZ
 #define __NR64ATRA1_ioprio_get(which, who)    ,(uintptr_t)(who)
 #define __NR64ATRF0_openat                    "%d"
 #define __NR64ATRA0_openat(dirfd, filename, oflags, mode) ,(int)(dirfd)
 #define __NR64ATRF1_openat                    "%q"
 #define __NR64ATRA1_openat(dirfd, filename, oflags, mode) ,(validate_readable_opt(filename,1),filename)
-#define __NR64ATRF2_openat                    "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF2_openat                    "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA2_openat(dirfd, filename, oflags, mode) ,(uintptr_t)(oflags),(oflags) & O_WRONLY ? "O_WRONLY" : (oflags) ? "" : "O_RDONLY" \
                                                           ,((oflags) & O_RDWR) && ((oflags) & (O_WRONLY)) ? "|" : "",(oflags) & O_RDWR ? "O_RDWR" : "" \
                                                           ,((oflags) & O_CREAT) && ((oflags) & (O_WRONLY|O_RDWR)) ? "|" : "",(oflags) & O_CREAT ? "O_CREAT" : "" \
@@ -4240,19 +4240,19 @@
                                                           ,((oflags) & 0x0400000) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW|O_NOATIME|O_CLOEXEC|O_CLOFORK|O_PATH)) ? "|" : "",(oflags) & 0x0400000 ? "O_TMPFILE" : "" \
                                                           ,((oflags) & O_SYMLINK) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW|O_NOATIME|O_CLOEXEC|O_CLOFORK|O_PATH|0x0400000)) ? "|" : "",(oflags) & O_SYMLINK ? "O_SYMLINK" : "" \
                                                           ,((oflags) & O_DOSPATH) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW|O_NOATIME|O_CLOEXEC|O_CLOFORK|O_PATH|0x0400000|O_SYMLINK)) ? "|" : "",(oflags) & O_DOSPATH ? "O_DOSPATH" : ""
-#define __NR64ATRF3_openat                    "%#" PRIoPTR
+#define __NR64ATRF3_openat                    "%#" PRIoSIZ
 #define __NR64ATRA3_openat(dirfd, filename, oflags, mode) ,(uintptr_t)(mode)
 #define __NR64ATRF0_mkdirat                   "%d"
 #define __NR64ATRA0_mkdirat(dirfd, pathname, mode) ,(int)(dirfd)
 #define __NR64ATRF1_mkdirat                   "%q"
 #define __NR64ATRA1_mkdirat(dirfd, pathname, mode) ,(validate_readable_opt(pathname,1),pathname)
-#define __NR64ATRF2_mkdirat                   "%#" PRIoPTR
+#define __NR64ATRF2_mkdirat                   "%#" PRIoSIZ
 #define __NR64ATRA2_mkdirat(dirfd, pathname, mode) ,(uintptr_t)(mode)
 #define __NR64ATRF0_mknodat                   "%d"
 #define __NR64ATRA0_mknodat(dirfd, nodename, mode, dev) ,(int)(dirfd)
 #define __NR64ATRF1_mknodat                   "%q"
 #define __NR64ATRA1_mknodat(dirfd, nodename, mode, dev) ,(validate_readable_opt(nodename,1),nodename)
-#define __NR64ATRF2_mknodat                   "%#" PRIoPTR
+#define __NR64ATRF2_mknodat                   "%#" PRIoSIZ
 #define __NR64ATRA2_mknodat(dirfd, nodename, mode, dev) ,(uintptr_t)(mode)
 #define __NR64ATRF3_mknodat                   "%.2x:%.2x"
 #define __NR64ATRA3_mknodat(dirfd, nodename, mode, dev) ,(unsigned int)MAJOR(dev),(unsigned int)MINOR(dev)
@@ -4264,7 +4264,7 @@
 #define __NR64ATRA2_fchownat(dirfd, filename, owner, group, flags) ,owner
 #define __NR64ATRF3_fchownat                  "%" PRIu32
 #define __NR64ATRA3_fchownat(dirfd, filename, owner, group, flags) ,group
-#define __NR64ATRF4_fchownat                  "%#" PRIxPTR "=%s%s%s"
+#define __NR64ATRF4_fchownat                  "%#" PRIxSIZ "=%s%s%s"
 #define __NR64ATRA4_fchownat(dirfd, filename, owner, group, flags) ,(uintptr_t)(flags),(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
                                                                    ,((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NR64ATRF0_futimesat                 "%d"
@@ -4279,14 +4279,14 @@
 #define __NR64ATRA1_fstatat(dirfd, filename, statbuf, flags) ,(validate_readable_opt(filename,1),filename)
 #define __NR64ATRF2_fstatat                   "%p"
 #define __NR64ATRA2_fstatat(dirfd, filename, statbuf, flags) ,statbuf
-#define __NR64ATRF3_fstatat                   "%#" PRIxPTR "=%s%s%s"
+#define __NR64ATRF3_fstatat                   "%#" PRIxSIZ "=%s%s%s"
 #define __NR64ATRA3_fstatat(dirfd, filename, statbuf, flags) ,(uintptr_t)(flags),(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
                                                              ,((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NR64ATRF0_unlinkat                  "%d"
 #define __NR64ATRA0_unlinkat(dirfd, name, flags) ,(int)(dirfd)
 #define __NR64ATRF1_unlinkat                  "%q"
 #define __NR64ATRA1_unlinkat(dirfd, name, flags) ,(validate_readable_opt(name,1),name)
-#define __NR64ATRF2_unlinkat                  "%#" PRIxPTR "=%s%s%s%s%s"
+#define __NR64ATRF2_unlinkat                  "%#" PRIxSIZ "=%s%s%s%s%s"
 #define __NR64ATRA2_unlinkat(dirfd, name, flags) ,(uintptr_t)(flags),(flags) & AT_REMOVEDIR ? "AT_REMOVEDIR" : "" \
                                                  ,((flags) & AT_REMOVEREG) && ((flags) & (AT_REMOVEDIR)) ? "|" : "",(flags) & AT_REMOVEREG ? "AT_REMOVEREG" : "" \
                                                  ,((flags) & AT_DOSPATH) && ((flags) & (AT_REMOVEDIR|AT_REMOVEREG)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
@@ -4306,7 +4306,7 @@
 #define __NR64ATRA2_linkat(fromfd, existing_file, tofd, target_path, flags) ,(int)(tofd)
 #define __NR64ATRF3_linkat                    "%q"
 #define __NR64ATRA3_linkat(fromfd, existing_file, tofd, target_path, flags) ,(validate_readable_opt(target_path,1),target_path)
-#define __NR64ATRF4_linkat                    "%#" PRIxPTR "=%s%s%s%s%s"
+#define __NR64ATRF4_linkat                    "%#" PRIxSIZ "=%s%s%s%s%s"
 #define __NR64ATRA4_linkat(fromfd, existing_file, tofd, target_path, flags) ,(uintptr_t)(flags),(flags) & AT_EMPTY_PATH ? "AT_EMPTY_PATH" : "" \
                                                                             ,((flags) & AT_SYMLINK_FOLLOW) && ((flags) & (AT_EMPTY_PATH)) ? "|" : "",(flags) & AT_SYMLINK_FOLLOW ? "AT_SYMLINK_FOLLOW" : "" \
                                                                             ,((flags) & AT_DOSPATH) && ((flags) & (AT_EMPTY_PATH|AT_SYMLINK_FOLLOW)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
@@ -4322,30 +4322,30 @@
 #define __NR64ATRA1_readlinkat(dirfd, path, buf, buflen) ,(validate_readable_opt(path,1),path)
 #define __NR64ATRF2_readlinkat                "%p"
 #define __NR64ATRA2_readlinkat(dirfd, path, buf, buflen) ,buf
-#define __NR64ATRF3_readlinkat                "%" PRIuPTR
+#define __NR64ATRF3_readlinkat                "%" PRIuSIZ
 #define __NR64ATRA3_readlinkat(dirfd, path, buf, buflen) ,buflen
 #define __NR64ATRF0_fchmodat                  "%d"
 #define __NR64ATRA0_fchmodat(dirfd, filename, mode, flags) ,(int)(dirfd)
 #define __NR64ATRF1_fchmodat                  "%q"
 #define __NR64ATRA1_fchmodat(dirfd, filename, mode, flags) ,(validate_readable_opt(filename,1),filename)
-#define __NR64ATRF2_fchmodat                  "%#" PRIoPTR
+#define __NR64ATRF2_fchmodat                  "%#" PRIoSIZ
 #define __NR64ATRA2_fchmodat(dirfd, filename, mode, flags) ,(uintptr_t)(mode)
-#define __NR64ATRF3_fchmodat                  "%#" PRIxPTR "=%s%s%s"
+#define __NR64ATRF3_fchmodat                  "%#" PRIxSIZ "=%s%s%s"
 #define __NR64ATRA3_fchmodat(dirfd, filename, mode, flags) ,(uintptr_t)(flags),(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
                                                            ,((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NR64ATRF0_faccessat                 "%d"
 #define __NR64ATRA0_faccessat(dirfd, filename, type, flags) ,(int)(dirfd)
 #define __NR64ATRF1_faccessat                 "%q"
 #define __NR64ATRA1_faccessat(dirfd, filename, type, flags) ,(validate_readable_opt(filename,1),filename)
-#define __NR64ATRF2_faccessat                 "%#" PRIxPTR "=%s%s%s%s%s"
+#define __NR64ATRF2_faccessat                 "%#" PRIxSIZ "=%s%s%s%s%s"
 #define __NR64ATRA2_faccessat(dirfd, filename, type, flags) ,(uintptr_t)(type),(type) & R_OK ? "R_OK" : (type) ? "" : "F_OK" \
                                                             ,((type) & W_OK) && ((type) & (R_OK)) ? "|" : "",(type) & W_OK ? "W_OK" : "" \
                                                             ,((type) & X_OK) && ((type) & (R_OK|W_OK)) ? "|" : "",(type) & X_OK ? "X_OK" : ""
-#define __NR64ATRF3_faccessat                 "%#" PRIxPTR "=%s%s%s%s%s"
+#define __NR64ATRF3_faccessat                 "%#" PRIxSIZ "=%s%s%s%s%s"
 #define __NR64ATRA3_faccessat(dirfd, filename, type, flags) ,(uintptr_t)(flags),(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
                                                             ,((flags) & AT_EACCESS) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_EACCESS ? "AT_EACCESS" : "" \
                                                             ,((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW|AT_EACCESS)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NR64ATRF0_pselect6                  "%" PRIuPTR
+#define __NR64ATRF0_pselect6                  "%" PRIuSIZ
 #define __NR64ATRA0_pselect6(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) ,nfds
 #define __NR64ATRF1_pselect6                  "%p"
 #define __NR64ATRA1_pselect6(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) ,readfds
@@ -4359,15 +4359,15 @@
 #define __NR64ATRA5_pselect6(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) ,sigmask_sigset_and_len
 #define __NR64ATRF0_ppoll                     "%p"
 #define __NR64ATRA0_ppoll(fds, nfds, timeout_ts, sigmask, sigsetsize) ,fds
-#define __NR64ATRF1_ppoll                     "%" PRIuPTR
+#define __NR64ATRF1_ppoll                     "%" PRIuSIZ
 #define __NR64ATRA1_ppoll(fds, nfds, timeout_ts, sigmask, sigsetsize) ,nfds
 #define __NR64ATRF2_ppoll                     "%p"
 #define __NR64ATRA2_ppoll(fds, nfds, timeout_ts, sigmask, sigsetsize) ,timeout_ts
 #define __NR64ATRF3_ppoll                     "%p"
 #define __NR64ATRA3_ppoll(fds, nfds, timeout_ts, sigmask, sigsetsize) ,sigmask
-#define __NR64ATRF4_ppoll                     "%" PRIuPTR
+#define __NR64ATRF4_ppoll                     "%" PRIuSIZ
 #define __NR64ATRA4_ppoll(fds, nfds, timeout_ts, sigmask, sigsetsize) ,sigsetsize
-#define __NR64ATRF0_unshare                   "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF0_unshare                   "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA0_unshare(flags)            ,(uintptr_t)(flags),(flags) & CLONE_VM ? "CLONE_VM" : "" \
                                               ,((flags) & CLONE_FS) && ((flags) & (CLONE_VM)) ? "|" : "",(flags) & CLONE_FS ? "CLONE_FS" : "" \
                                               ,((flags) & CLONE_FILES) && ((flags) & (CLONE_VM|CLONE_FS)) ? "|" : "",(flags) & CLONE_FILES ? "CLONE_FILES" : "" \
@@ -4398,17 +4398,17 @@
 #define __NR64ATRA2_splice(fdin, offin, fdout, offout, length, flags) ,(int)(fdout)
 #define __NR64ATRF3_splice                    "%p"
 #define __NR64ATRA3_splice(fdin, offin, fdout, offout, length, flags) ,offout
-#define __NR64ATRF4_splice                    "%" PRIuPTR
+#define __NR64ATRF4_splice                    "%" PRIuSIZ
 #define __NR64ATRA4_splice(fdin, offin, fdout, offout, length, flags) ,length
-#define __NR64ATRF5_splice                    "%#" PRIxPTR
+#define __NR64ATRF5_splice                    "%#" PRIxSIZ
 #define __NR64ATRA5_splice(fdin, offin, fdout, offout, length, flags) ,(uintptr_t)(flags)
 #define __NR64ATRF0_tee                       "%d"
 #define __NR64ATRA0_tee(fdin, fdout, length, flags) ,(int)(fdin)
 #define __NR64ATRF1_tee                       "%d"
 #define __NR64ATRA1_tee(fdin, fdout, length, flags) ,(int)(fdout)
-#define __NR64ATRF2_tee                       "%" PRIuPTR
+#define __NR64ATRF2_tee                       "%" PRIuSIZ
 #define __NR64ATRA2_tee(fdin, fdout, length, flags) ,length
-#define __NR64ATRF3_tee                       "%#" PRIxPTR
+#define __NR64ATRF3_tee                       "%#" PRIxSIZ
 #define __NR64ATRA3_tee(fdin, fdout, length, flags) ,(uintptr_t)(flags)
 #define __NR64ATRF0_sync_file_range           "%d"
 #define __NR64ATRA0_sync_file_range(fd, offset, count, flags) ,(int)(fd)
@@ -4416,15 +4416,15 @@
 #define __NR64ATRA1_sync_file_range(fd, offset, count, flags) ,offset
 #define __NR64ATRF2_sync_file_range           "%" PRIu64
 #define __NR64ATRA2_sync_file_range(fd, offset, count, flags) ,count
-#define __NR64ATRF3_sync_file_range           "%#" PRIxPTR
+#define __NR64ATRF3_sync_file_range           "%#" PRIxSIZ
 #define __NR64ATRA3_sync_file_range(fd, offset, count, flags) ,(uintptr_t)(flags)
 #define __NR64ATRF0_vmsplice                  "%d"
 #define __NR64ATRA0_vmsplice(fdout, iov, count, flags) ,(int)(fdout)
 #define __NR64ATRF1_vmsplice                  "%p"
 #define __NR64ATRA1_vmsplice(fdout, iov, count, flags) ,iov
-#define __NR64ATRF2_vmsplice                  "%" PRIuPTR
+#define __NR64ATRF2_vmsplice                  "%" PRIuSIZ
 #define __NR64ATRA2_vmsplice(fdout, iov, count, flags) ,count
-#define __NR64ATRF3_vmsplice                  "%#" PRIxPTR
+#define __NR64ATRF3_vmsplice                  "%#" PRIxSIZ
 #define __NR64ATRA3_vmsplice(fdout, iov, count, flags) ,(uintptr_t)(flags)
 #define __NR64ATRF0_utimensat                 "%d"
 #define __NR64ATRA0_utimensat(dirfd, filename, times, flags) ,(int)(dirfd)
@@ -4432,7 +4432,7 @@
 #define __NR64ATRA1_utimensat(dirfd, filename, times, flags) ,(validate_readable_opt(filename,1),filename)
 #define __NR64ATRF2_utimensat                 "%p"
 #define __NR64ATRA2_utimensat(dirfd, filename, times, flags) ,times
-#define __NR64ATRF3_utimensat                 "%#" PRIxPTR "=%s%s%s%s%s"
+#define __NR64ATRF3_utimensat                 "%#" PRIxSIZ "=%s%s%s%s%s"
 #define __NR64ATRA3_utimensat(dirfd, filename, times, flags) ,(uintptr_t)(flags),(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
                                                              ,((flags) & AT_CHANGE_CTIME) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_CHANGE_CTIME ? "AT_CHANGE_CTIME" : "" \
                                                              ,((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
@@ -4440,9 +4440,9 @@
 #define __NR64ATRA0_epoll_pwait(epfd, events, maxevents, timeout, ss) ,(int)(epfd)
 #define __NR64ATRF1_epoll_pwait               "%p"
 #define __NR64ATRA1_epoll_pwait(epfd, events, maxevents, timeout, ss) ,events
-#define __NR64ATRF2_epoll_pwait               "%#" PRIxPTR
+#define __NR64ATRF2_epoll_pwait               "%#" PRIxSIZ
 #define __NR64ATRA2_epoll_pwait(epfd, events, maxevents, timeout, ss) ,(uintptr_t)(maxevents)
-#define __NR64ATRF3_epoll_pwait               "%" PRIdPTR
+#define __NR64ATRF3_epoll_pwait               "%" PRIdSIZ
 #define __NR64ATRA3_epoll_pwait(epfd, events, maxevents, timeout, ss) ,(intptr_t)(timeout)
 #define __NR64ATRF4_epoll_pwait               "%p"
 #define __NR64ATRA4_epoll_pwait(epfd, events, maxevents, timeout, ss) ,ss
@@ -4450,17 +4450,17 @@
 #define __NR64ATRA0_signalfd(fd, sigmask, sigsetsize) ,(int)(fd)
 #define __NR64ATRF1_signalfd                  "%p"
 #define __NR64ATRA1_signalfd(fd, sigmask, sigsetsize) ,sigmask
-#define __NR64ATRF2_signalfd                  "%" PRIuPTR
+#define __NR64ATRF2_signalfd                  "%" PRIuSIZ
 #define __NR64ATRA2_signalfd(fd, sigmask, sigsetsize) ,sigsetsize
 #define __NR64ATRF0_timerfd_create            "?"
 #define __NR64ATRA0_timerfd_create(clock_id, flags) /* nothing */
-#define __NR64ATRF1_timerfd_create            "%#" PRIxPTR
+#define __NR64ATRF1_timerfd_create            "%#" PRIxSIZ
 #define __NR64ATRA1_timerfd_create(clock_id, flags) ,(uintptr_t)(flags)
-#define __NR64ATRF0_eventfd                   "%#" PRIxPTR
+#define __NR64ATRF0_eventfd                   "%#" PRIxSIZ
 #define __NR64ATRA0_eventfd(initval)          ,(uintptr_t)(initval)
 #define __NR64ATRF0_fallocate                 "%d"
 #define __NR64ATRA0_fallocate(fd, mode, offset, length) ,(int)(fd)
-#define __NR64ATRF1_fallocate                 "%#" PRIxPTR
+#define __NR64ATRF1_fallocate                 "%#" PRIxSIZ
 #define __NR64ATRA1_fallocate(fd, mode, offset, length) ,(uintptr_t)(mode)
 #define __NR64ATRF2_fallocate                 "%" PRIu32
 #define __NR64ATRA2_fallocate(fd, mode, offset, length) ,offset
@@ -4468,7 +4468,7 @@
 #define __NR64ATRA3_fallocate(fd, mode, offset, length) ,length
 #define __NR64ATRF0_timerfd_settime           "%d"
 #define __NR64ATRA0_timerfd_settime(ufd, flags, utmr, otmr) ,(int)(ufd)
-#define __NR64ATRF1_timerfd_settime           "%#" PRIxPTR
+#define __NR64ATRF1_timerfd_settime           "%#" PRIxSIZ
 #define __NR64ATRA1_timerfd_settime(ufd, flags, utmr, otmr) ,(uintptr_t)(flags)
 #define __NR64ATRF2_timerfd_settime           "%p"
 #define __NR64ATRA2_timerfd_settime(ufd, flags, utmr, otmr) ,utmr
@@ -4484,7 +4484,7 @@
 #define __NR64ATRA1_accept4(sockfd, addr, addr_len, flags) ,addr
 #define __NR64ATRF2_accept4                   "%p"
 #define __NR64ATRA2_accept4(sockfd, addr, addr_len, flags) ,addr_len
-#define __NR64ATRF3_accept4                   "%#" PRIxPTR "=%s%s%s%s%s"
+#define __NR64ATRF3_accept4                   "%#" PRIxSIZ "=%s%s%s%s%s"
 #define __NR64ATRA3_accept4(sockfd, addr, addr_len, flags) ,(uintptr_t)(flags),(flags) & SOCK_NONBLOCK ? "SOCK_NONBLOCK" : "" \
                                                            ,((flags) & SOCK_CLOEXEC) && ((flags) & (SOCK_NONBLOCK)) ? "|" : "",(flags) & SOCK_CLOEXEC ? "SOCK_CLOEXEC" : "" \
                                                            ,((flags) & SOCK_CLOFORK) && ((flags) & (SOCK_NONBLOCK|SOCK_CLOEXEC)) ? "|" : "",(flags) & SOCK_CLOFORK ? "SOCK_CLOFORK" : ""
@@ -4492,24 +4492,24 @@
 #define __NR64ATRA0_signalfd4(fd, sigmask, sigsetsize, flags) ,(int)(fd)
 #define __NR64ATRF1_signalfd4                 "%p"
 #define __NR64ATRA1_signalfd4(fd, sigmask, sigsetsize, flags) ,sigmask
-#define __NR64ATRF2_signalfd4                 "%" PRIuPTR
+#define __NR64ATRF2_signalfd4                 "%" PRIuSIZ
 #define __NR64ATRA2_signalfd4(fd, sigmask, sigsetsize, flags) ,sigsetsize
-#define __NR64ATRF3_signalfd4                 "%#" PRIxPTR "=%s%s%s"
+#define __NR64ATRF3_signalfd4                 "%#" PRIxSIZ "=%s%s%s"
 #define __NR64ATRA3_signalfd4(fd, sigmask, sigsetsize, flags) ,(uintptr_t)(flags),(flags) & SFD_NONBLOCK ? "SFD_NONBLOCK" : "" \
                                                               ,((flags) & SFD_CLOEXEC) && ((flags) & (SFD_NONBLOCK)) ? "|" : "",(flags) & SFD_CLOEXEC ? "SFD_CLOEXEC" : ""
-#define __NR64ATRF0_eventfd2                  "%#" PRIxPTR
+#define __NR64ATRF0_eventfd2                  "%#" PRIxSIZ
 #define __NR64ATRA0_eventfd2(initval, flags)  ,(uintptr_t)(initval)
-#define __NR64ATRF1_eventfd2                  "%#" PRIxPTR "=%s%s%s%s%s"
+#define __NR64ATRF1_eventfd2                  "%#" PRIxSIZ "=%s%s%s%s%s"
 #define __NR64ATRA1_eventfd2(initval, flags)  ,(uintptr_t)(flags),(flags) & EFD_SEMAPHORE ? "EFD_SEMAPHORE" : "" \
                                               ,((flags) & EFD_NONBLOCK) && ((flags) & (EFD_SEMAPHORE)) ? "|" : "",(flags) & EFD_NONBLOCK ? "EFD_NONBLOCK" : "" \
                                               ,((flags) & EFD_CLOEXEC) && ((flags) & (EFD_SEMAPHORE|EFD_NONBLOCK)) ? "|" : "",(flags) & EFD_CLOEXEC ? "EFD_CLOEXEC" : ""
-#define __NR64ATRF0_epoll_create1             "%#" PRIxPTR
+#define __NR64ATRF0_epoll_create1             "%#" PRIxSIZ
 #define __NR64ATRA0_epoll_create1(flags)      ,(uintptr_t)(flags)
 #define __NR64ATRF0_dup3                      "%d"
 #define __NR64ATRA0_dup3(oldfd, newfd, flags) ,(int)(oldfd)
 #define __NR64ATRF1_dup3                      "%d"
 #define __NR64ATRA1_dup3(oldfd, newfd, flags) ,(int)(newfd)
-#define __NR64ATRF2_dup3                      "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF2_dup3                      "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA2_dup3(oldfd, newfd, flags) ,(uintptr_t)(flags),(flags) & O_WRONLY ? "O_WRONLY" : (flags) ? "" : "O_RDONLY" \
                                               ,((flags) & O_RDWR) && ((flags) & (O_WRONLY)) ? "|" : "",(flags) & O_RDWR ? "O_RDWR" : "" \
                                               ,((flags) & O_CREAT) && ((flags) & (O_WRONLY|O_RDWR)) ? "|" : "",(flags) & O_CREAT ? "O_CREAT" : "" \
@@ -4534,7 +4534,7 @@
                                               ,((flags) & O_DOSPATH) && ((flags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW|O_NOATIME|O_CLOEXEC|O_CLOFORK|O_PATH|0x0400000|O_SYMLINK)) ? "|" : "",(flags) & O_DOSPATH ? "O_DOSPATH" : ""
 #define __NR64ATRF0_pipe2                     "%p"
 #define __NR64ATRA0_pipe2(pipedes, flags)     ,pipedes
-#define __NR64ATRF1_pipe2                     "%#" PRIxPTR "=%s%s%s%s%s%s%s"
+#define __NR64ATRF1_pipe2                     "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
 #define __NR64ATRA1_pipe2(pipedes, flags)     ,(uintptr_t)(flags),(flags) & O_CLOEXEC ? "O_CLOEXEC" : "" \
                                               ,((flags) & O_CLOFORK) && ((flags) & (O_CLOEXEC)) ? "|" : "",(flags) & O_CLOFORK ? "O_CLOFORK" : "" \
                                               ,((flags) & O_NONBLOCK) && ((flags) & (O_CLOEXEC|O_CLOFORK)) ? "|" : "",(flags) & O_NONBLOCK ? "O_NONBLOCK" : "" \
@@ -4543,7 +4543,7 @@
 #define __NR64ATRA0_preadv(fd, iovec, count, offset) ,(int)(fd)
 #define __NR64ATRF1_preadv                    "%p"
 #define __NR64ATRA1_preadv(fd, iovec, count, offset) ,iovec
-#define __NR64ATRF2_preadv                    "%" PRIuPTR
+#define __NR64ATRF2_preadv                    "%" PRIuSIZ
 #define __NR64ATRA2_preadv(fd, iovec, count, offset) ,count
 #define __NR64ATRF3_preadv                    "%" PRIu64
 #define __NR64ATRA3_preadv(fd, iovec, count, offset) ,offset
@@ -4551,15 +4551,15 @@
 #define __NR64ATRA0_pwritev(fd, iovec, count, offset) ,(int)(fd)
 #define __NR64ATRF1_pwritev                   "%p"
 #define __NR64ATRA1_pwritev(fd, iovec, count, offset) ,iovec
-#define __NR64ATRF2_pwritev                   "%" PRIuPTR
+#define __NR64ATRF2_pwritev                   "%" PRIuSIZ
 #define __NR64ATRA2_pwritev(fd, iovec, count, offset) ,count
 #define __NR64ATRF3_pwritev                   "%" PRIu64
 #define __NR64ATRA3_pwritev(fd, iovec, count, offset) ,offset
-#define __NR64ATRF0_rt_tgsigqueueinfo         "%" PRIdPTR
+#define __NR64ATRF0_rt_tgsigqueueinfo         "%" PRIdSIZ
 #define __NR64ATRA0_rt_tgsigqueueinfo(tgid, tid, signo, uinfo) ,(intptr_t)(tgid)
-#define __NR64ATRF1_rt_tgsigqueueinfo         "%" PRIdPTR
+#define __NR64ATRF1_rt_tgsigqueueinfo         "%" PRIdSIZ
 #define __NR64ATRA1_rt_tgsigqueueinfo(tgid, tid, signo, uinfo) ,(intptr_t)(tid)
-#define __NR64ATRF2_rt_tgsigqueueinfo         "%#" PRIxPTR
+#define __NR64ATRF2_rt_tgsigqueueinfo         "%#" PRIxSIZ
 #define __NR64ATRA2_rt_tgsigqueueinfo(tgid, tid, signo, uinfo) ,(uintptr_t)(signo)
 #define __NR64ATRF3_rt_tgsigqueueinfo         "%p"
 #define __NR64ATRA3_rt_tgsigqueueinfo(tgid, tid, signo, uinfo) ,uinfo
@@ -4567,15 +4567,15 @@
 #define __NR64ATRA0_recvmmsg(sockfd, vmessages, vlen, flags, tmo) ,(int)(sockfd)
 #define __NR64ATRF1_recvmmsg                  "%p"
 #define __NR64ATRA1_recvmmsg(sockfd, vmessages, vlen, flags, tmo) ,vmessages
-#define __NR64ATRF2_recvmmsg                  "%" PRIuPTR
+#define __NR64ATRF2_recvmmsg                  "%" PRIuSIZ
 #define __NR64ATRA2_recvmmsg(sockfd, vmessages, vlen, flags, tmo) ,vlen
-#define __NR64ATRF3_recvmmsg                  "%#" PRIxPTR
+#define __NR64ATRF3_recvmmsg                  "%#" PRIxSIZ
 #define __NR64ATRA3_recvmmsg(sockfd, vmessages, vlen, flags, tmo) ,(uintptr_t)(flags)
 #define __NR64ATRF4_recvmmsg                  "%p"
 #define __NR64ATRA4_recvmmsg(sockfd, vmessages, vlen, flags, tmo) ,tmo
-#define __NR64ATRF0_prlimit64                 "%" PRIdPTR
+#define __NR64ATRF0_prlimit64                 "%" PRIdSIZ
 #define __NR64ATRA0_prlimit64(pid, resource, new_limit, old_limit) ,(intptr_t)(pid)
-#define __NR64ATRF1_prlimit64                 "%#" PRIxPTR
+#define __NR64ATRF1_prlimit64                 "%#" PRIxSIZ
 #define __NR64ATRA1_prlimit64(pid, resource, new_limit, old_limit) ,(uintptr_t)(resource)
 #define __NR64ATRF2_prlimit64                 "%p"
 #define __NR64ATRA2_prlimit64(pid, resource, new_limit, old_limit) ,new_limit
@@ -4589,13 +4589,13 @@
 #define __NR64ATRA2_name_to_handle_at(dirfd, name, handle, mnt_id, flags) ,handle
 #define __NR64ATRF3_name_to_handle_at         "%p"
 #define __NR64ATRA3_name_to_handle_at(dirfd, name, handle, mnt_id, flags) ,mnt_id
-#define __NR64ATRF4_name_to_handle_at         "%#" PRIxPTR
+#define __NR64ATRF4_name_to_handle_at         "%#" PRIxSIZ
 #define __NR64ATRA4_name_to_handle_at(dirfd, name, handle, mnt_id, flags) ,(uintptr_t)(flags)
 #define __NR64ATRF0_open_by_handle_at         "%d"
 #define __NR64ATRA0_open_by_handle_at(mountdirfd, handle, flags) ,(int)(mountdirfd)
 #define __NR64ATRF1_open_by_handle_at         "%p"
 #define __NR64ATRA1_open_by_handle_at(mountdirfd, handle, flags) ,handle
-#define __NR64ATRF2_open_by_handle_at         "%#" PRIxPTR
+#define __NR64ATRF2_open_by_handle_at         "%#" PRIxSIZ
 #define __NR64ATRA2_open_by_handle_at(mountdirfd, handle, flags) ,(uintptr_t)(flags)
 #define __NR64ATRF0_syncfs                    "%d"
 #define __NR64ATRA0_syncfs(fd)                ,(int)(fd)
@@ -4603,13 +4603,13 @@
 #define __NR64ATRA0_sendmmsg(sockfd, vmessages, vlen, flags) ,(int)(sockfd)
 #define __NR64ATRF1_sendmmsg                  "%p"
 #define __NR64ATRA1_sendmmsg(sockfd, vmessages, vlen, flags) ,vmessages
-#define __NR64ATRF2_sendmmsg                  "%" PRIuPTR
+#define __NR64ATRF2_sendmmsg                  "%" PRIuSIZ
 #define __NR64ATRA2_sendmmsg(sockfd, vmessages, vlen, flags) ,vlen
-#define __NR64ATRF3_sendmmsg                  "%#" PRIxPTR
+#define __NR64ATRF3_sendmmsg                  "%#" PRIxSIZ
 #define __NR64ATRA3_sendmmsg(sockfd, vmessages, vlen, flags) ,(uintptr_t)(flags)
 #define __NR64ATRF0_setns                     "%d"
 #define __NR64ATRA0_setns(fd, nstype)         ,(int)(fd)
-#define __NR64ATRF1_setns                     "%#" PRIxPTR
+#define __NR64ATRF1_setns                     "%#" PRIxSIZ
 #define __NR64ATRA1_setns(fd, nstype)         ,(uintptr_t)(nstype)
 #define __NR64ATRF0_getcpu                    "%p"
 #define __NR64ATRA0_getcpu(cpu, node, tcache) ,cpu
@@ -4617,39 +4617,39 @@
 #define __NR64ATRA1_getcpu(cpu, node, tcache) ,node
 #define __NR64ATRF2_getcpu                    "%p"
 #define __NR64ATRA2_getcpu(cpu, node, tcache) ,tcache
-#define __NR64ATRF0_process_vm_readv          "%" PRIdPTR
+#define __NR64ATRF0_process_vm_readv          "%" PRIdSIZ
 #define __NR64ATRA0_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,(intptr_t)(pid)
 #define __NR64ATRF1_process_vm_readv          "%p"
 #define __NR64ATRA1_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,lvec
-#define __NR64ATRF2_process_vm_readv          "%" PRIuPTR
+#define __NR64ATRF2_process_vm_readv          "%" PRIuSIZ
 #define __NR64ATRA2_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,liovcnt
 #define __NR64ATRF3_process_vm_readv          "%p"
 #define __NR64ATRA3_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,rvec
-#define __NR64ATRF4_process_vm_readv          "%" PRIuPTR
+#define __NR64ATRF4_process_vm_readv          "%" PRIuSIZ
 #define __NR64ATRA4_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,riovcnt
-#define __NR64ATRF5_process_vm_readv          "%#" PRIxPTR
+#define __NR64ATRF5_process_vm_readv          "%#" PRIxSIZ
 #define __NR64ATRA5_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,(uintptr_t)(flags)
-#define __NR64ATRF0_process_vm_writev         "%" PRIdPTR
+#define __NR64ATRF0_process_vm_writev         "%" PRIdSIZ
 #define __NR64ATRA0_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,(intptr_t)(pid)
 #define __NR64ATRF1_process_vm_writev         "%p"
 #define __NR64ATRA1_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,lvec
-#define __NR64ATRF2_process_vm_writev         "%" PRIuPTR
+#define __NR64ATRF2_process_vm_writev         "%" PRIuSIZ
 #define __NR64ATRA2_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,liovcnt
 #define __NR64ATRF3_process_vm_writev         "%p"
 #define __NR64ATRA3_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,rvec
-#define __NR64ATRF4_process_vm_writev         "%" PRIuPTR
+#define __NR64ATRF4_process_vm_writev         "%" PRIuSIZ
 #define __NR64ATRA4_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,riovcnt
-#define __NR64ATRF5_process_vm_writev         "%#" PRIxPTR
+#define __NR64ATRF5_process_vm_writev         "%#" PRIxSIZ
 #define __NR64ATRA5_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,(uintptr_t)(flags)
-#define __NR64ATRF0_kcmp                      "%" PRIdPTR
+#define __NR64ATRF0_kcmp                      "%" PRIdSIZ
 #define __NR64ATRA0_kcmp(pid1, pid2, type, idx1, idx2) ,(intptr_t)(pid1)
-#define __NR64ATRF1_kcmp                      "%" PRIdPTR
+#define __NR64ATRF1_kcmp                      "%" PRIdSIZ
 #define __NR64ATRA1_kcmp(pid1, pid2, type, idx1, idx2) ,(intptr_t)(pid2)
-#define __NR64ATRF2_kcmp                      "%#" PRIxPTR
+#define __NR64ATRF2_kcmp                      "%#" PRIxSIZ
 #define __NR64ATRA2_kcmp(pid1, pid2, type, idx1, idx2) ,(uintptr_t)(type)
-#define __NR64ATRF3_kcmp                      "%#" PRIxPTR
+#define __NR64ATRF3_kcmp                      "%#" PRIxSIZ
 #define __NR64ATRA3_kcmp(pid1, pid2, type, idx1, idx2) ,(uintptr_t)(idx1)
-#define __NR64ATRF4_kcmp                      "%#" PRIxPTR
+#define __NR64ATRF4_kcmp                      "%#" PRIxSIZ
 #define __NR64ATRA4_kcmp(pid1, pid2, type, idx1, idx2) ,(uintptr_t)(idx2)
 #define __NR64ATRF0_renameat2                 "%d"
 #define __NR64ATRA0_renameat2(olddirfd, oldpath, newdirfd, newpath, flags) ,(int)(olddirfd)
@@ -4659,7 +4659,7 @@
 #define __NR64ATRA2_renameat2(olddirfd, oldpath, newdirfd, newpath, flags) ,(int)(newdirfd)
 #define __NR64ATRF3_renameat2                 "%q"
 #define __NR64ATRA3_renameat2(olddirfd, oldpath, newdirfd, newpath, flags) ,(validate_readable_opt(newpath,1),newpath)
-#define __NR64ATRF4_renameat2                 "%#" PRIxPTR
+#define __NR64ATRF4_renameat2                 "%#" PRIxSIZ
 #define __NR64ATRA4_renameat2(olddirfd, oldpath, newdirfd, newpath, flags) ,(uintptr_t)(flags)
 #define __NR64ATRF0_execveat                  "%d"
 #define __NR64ATRA0_execveat(dirfd, pathname, argv, envp, flags) ,(int)(dirfd)
@@ -4669,7 +4669,7 @@
 #define __NR64ATRA2_execveat(dirfd, pathname, argv, envp, flags) ,argv
 #define __NR64ATRF3_execveat                  "%p"
 #define __NR64ATRA3_execveat(dirfd, pathname, argv, envp, flags) ,envp
-#define __NR64ATRF4_execveat                  "%#" PRIxPTR "=%s%s%s%s%s"
+#define __NR64ATRF4_execveat                  "%#" PRIxSIZ "=%s%s%s%s%s"
 #define __NR64ATRA4_execveat(dirfd, pathname, argv, envp, flags) ,(uintptr_t)(flags),(flags) & AT_EMPTY_PATH ? "AT_EMPTY_PATH" : "" \
                                                                  ,((flags) & AT_SYMLINK_NOFOLLOW) && ((flags) & (AT_EMPTY_PATH)) ? "|" : "",(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
                                                                  ,((flags) & AT_DOSPATH) && ((flags) & (AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
@@ -4677,9 +4677,9 @@
 #define __NR64ATRA0_readf(fd, buf, bufsize, mode) ,(int)(fd)
 #define __NR64ATRF1_readf                     "%p"
 #define __NR64ATRA1_readf(fd, buf, bufsize, mode) ,buf
-#define __NR64ATRF2_readf                     "%" PRIuPTR
+#define __NR64ATRF2_readf                     "%" PRIuSIZ
 #define __NR64ATRA2_readf(fd, buf, bufsize, mode) ,bufsize
-#define __NR64ATRF3_readf                     "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF3_readf                     "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA3_readf(fd, buf, bufsize, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                   ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                   ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
@@ -4693,9 +4693,9 @@
 #define __NR64ATRA0_writef(fd, buf, bufsize, mode) ,(int)(fd)
 #define __NR64ATRF1_writef                    "%p"
 #define __NR64ATRA1_writef(fd, buf, bufsize, mode) ,buf
-#define __NR64ATRF2_writef                    "%" PRIuPTR
+#define __NR64ATRF2_writef                    "%" PRIuSIZ
 #define __NR64ATRA2_writef(fd, buf, bufsize, mode) ,bufsize
-#define __NR64ATRF3_writef                    "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF3_writef                    "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA3_writef(fd, buf, bufsize, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                    ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                    ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
@@ -4707,15 +4707,15 @@
                                                    ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
 #define __NR64ATRF0_hop                       "%d"
 #define __NR64ATRA0_hop(fd, command, arg)     ,(int)(fd)
-#define __NR64ATRF1_hop                       "%#" PRIxPTR
+#define __NR64ATRF1_hop                       "%#" PRIxSIZ
 #define __NR64ATRA1_hop(fd, command, arg)     ,(uintptr_t)(command)
 #define __NR64ATRF2_hop                       "%p"
 #define __NR64ATRA2_hop(fd, command, arg)     ,arg
 #define __NR64ATRF0_hopf                      "%d"
 #define __NR64ATRA0_hopf(fd, command, mode, arg) ,(int)(fd)
-#define __NR64ATRF1_hopf                      "%#" PRIxPTR
+#define __NR64ATRF1_hopf                      "%#" PRIxSIZ
 #define __NR64ATRA1_hopf(fd, command, mode, arg) ,(uintptr_t)(command)
-#define __NR64ATRF2_hopf                      "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF2_hopf                      "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA2_hopf(fd, command, mode, arg) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                  ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                  ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
@@ -4739,15 +4739,15 @@
 #define __NR64ATRA0_klstat(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
 #define __NR64ATRF1_klstat                    "%p"
 #define __NR64ATRA1_klstat(filename, statbuf) ,statbuf
-#define __NR64ATRF0_detach                    "%" PRIdPTR
+#define __NR64ATRF0_detach                    "%" PRIdSIZ
 #define __NR64ATRA0_detach(pid)               ,(intptr_t)(pid)
 #define __NR64ATRF0_frealpath4                "%d"
 #define __NR64ATRA0_frealpath4(fd, buf, buflen, flags) ,(int)(fd)
 #define __NR64ATRF1_frealpath4                "%p"
 #define __NR64ATRA1_frealpath4(fd, buf, buflen, flags) ,buf
-#define __NR64ATRF2_frealpath4                "%" PRIuPTR
+#define __NR64ATRF2_frealpath4                "%" PRIuSIZ
 #define __NR64ATRA2_frealpath4(fd, buf, buflen, flags) ,buflen
-#define __NR64ATRF3_frealpath4                "%#" PRIxPTR "=%s%s%s%s%s"
+#define __NR64ATRF3_frealpath4                "%#" PRIxSIZ "=%s%s%s%s%s"
 #define __NR64ATRA3_frealpath4(fd, buf, buflen, flags) ,(uintptr_t)(flags),(flags) & AT_ALTPATH ? "AT_ALTPATH" : "" \
                                                        ,((flags) & AT_READLINK_REQSIZE) && ((flags) & (AT_ALTPATH)) ? "|" : "",(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
                                                        ,((flags) & AT_DOSPATH) && ((flags) & (AT_ALTPATH|AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
@@ -4757,16 +4757,16 @@
 #define __NR64ATRA1_frealpathat(dirfd, filename, buf, buflen, flags) ,(validate_readable_opt(filename,1),filename)
 #define __NR64ATRF2_frealpathat               "%p"
 #define __NR64ATRA2_frealpathat(dirfd, filename, buf, buflen, flags) ,buf
-#define __NR64ATRF3_frealpathat               "%" PRIuPTR
+#define __NR64ATRF3_frealpathat               "%" PRIuSIZ
 #define __NR64ATRA3_frealpathat(dirfd, filename, buf, buflen, flags) ,buflen
-#define __NR64ATRF4_frealpathat               "%#" PRIxPTR "=%s%s%s%s%s%s%s"
+#define __NR64ATRF4_frealpathat               "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
 #define __NR64ATRA4_frealpathat(dirfd, filename, buf, buflen, flags) ,(uintptr_t)(flags),(flags) & AT_ALTPATH ? "AT_ALTPATH" : "" \
                                                                      ,((flags) & AT_SYMLINK_NOFOLLOW) && ((flags) & (AT_ALTPATH)) ? "|" : "",(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
                                                                      ,((flags) & AT_READLINK_REQSIZE) && ((flags) & (AT_ALTPATH|AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
                                                                      ,((flags) & AT_DOSPATH) && ((flags) & (AT_ALTPATH|AT_SYMLINK_NOFOLLOW|AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NR64ATRF0_rpc_schedule              "%" PRIdPTR
+#define __NR64ATRF0_rpc_schedule              "%" PRIdSIZ
 #define __NR64ATRA0_rpc_schedule(target, flags, program, arguments) ,(intptr_t)(target)
-#define __NR64ATRF1_rpc_schedule              "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF1_rpc_schedule              "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA1_rpc_schedule(target, flags, program, arguments) ,(uintptr_t)(flags),(flags) & RPC_SCHEDULE_ASYNC ? "RPC_SCHEDULE_ASYNC" : (flags) ? "" : "RPC_SCHEDULE_SYNC" \
                                                                     ,((flags) & RPC_SCHEDULE_FLAG_NONSYSCALL) && ((flags) & (RPC_SCHEDULE_ASYNC)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_NONSYSCALL ? "RPC_SCHEDULE_FLAG_NONSYSCALL" : "" \
                                                                     ,((flags) & RPC_SCHEDULE_FLAG_WAITFORSTART) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_WAITFORSTART ? "RPC_SCHEDULE_FLAG_WAITFORSTART" : "" \
@@ -4781,7 +4781,7 @@
 #define __NR64ATRA2_rpc_schedule(target, flags, program, arguments) ,program
 #define __NR64ATRF3_rpc_schedule              "%p"
 #define __NR64ATRA3_rpc_schedule(target, flags, program, arguments) ,arguments
-#define __NR64ATRF0_sysctl                    "%#" PRIxPTR
+#define __NR64ATRF0_sysctl                    "%#" PRIxSIZ
 #define __NR64ATRA0_sysctl(command, arg)      ,(uintptr_t)(command)
 #define __NR64ATRF1_sysctl                    "%p"
 #define __NR64ATRA1_sysctl(command, arg)      ,arg
@@ -4795,7 +4795,7 @@
 #define __NR64ATRA3_openpty(amaster, aslave, name, termp, winp) ,termp
 #define __NR64ATRF4_openpty                   "%p"
 #define __NR64ATRA4_openpty(amaster, aslave, name, termp, winp) ,winp
-#define __NR64ATRF0_set_exception_handler     "%#" PRIxPTR
+#define __NR64ATRF0_set_exception_handler     "%#" PRIxSIZ
 #define __NR64ATRA0_set_exception_handler(mode, handler, handler_sp) ,(uintptr_t)(mode)
 #define __NR64ATRF1_set_exception_handler     "%p"
 #define __NR64ATRA1_set_exception_handler(mode, handler, handler_sp) ,handler
@@ -4809,9 +4809,9 @@
 #define __NR64ATRA2_get_exception_handler(pmode, phandler, phandler_sp) ,phandler_sp
 #define __NR64ATRF0_ioctlf                    "%d"
 #define __NR64ATRA0_ioctlf(fd, command, mode, arg) ,(int)(fd)
-#define __NR64ATRF1_ioctlf                    "%#" PRIxPTR
+#define __NR64ATRF1_ioctlf                    "%#" PRIxSIZ
 #define __NR64ATRA1_ioctlf(fd, command, mode, arg) ,(uintptr_t)(command)
-#define __NR64ATRF2_ioctlf                    "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF2_ioctlf                    "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA2_ioctlf(fd, command, mode, arg) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                    ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                    ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
@@ -4827,11 +4827,11 @@
 #define __NR64ATRA0_pread64f(fd, buf, bufsize, offset, mode) ,(int)(fd)
 #define __NR64ATRF1_pread64f                  "%p"
 #define __NR64ATRA1_pread64f(fd, buf, bufsize, offset, mode) ,buf
-#define __NR64ATRF2_pread64f                  "%" PRIuPTR
+#define __NR64ATRF2_pread64f                  "%" PRIuSIZ
 #define __NR64ATRA2_pread64f(fd, buf, bufsize, offset, mode) ,bufsize
 #define __NR64ATRF3_pread64f                  "%" PRIu64
 #define __NR64ATRA3_pread64f(fd, buf, bufsize, offset, mode) ,offset
-#define __NR64ATRF4_pread64f                  "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF4_pread64f                  "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA4_pread64f(fd, buf, bufsize, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                              ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                              ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
@@ -4845,11 +4845,11 @@
 #define __NR64ATRA0_pwrite64f(fd, buf, bufsize, offset, mode) ,(int)(fd)
 #define __NR64ATRF1_pwrite64f                 "%p"
 #define __NR64ATRA1_pwrite64f(fd, buf, bufsize, offset, mode) ,buf
-#define __NR64ATRF2_pwrite64f                 "%" PRIuPTR
+#define __NR64ATRF2_pwrite64f                 "%" PRIuSIZ
 #define __NR64ATRA2_pwrite64f(fd, buf, bufsize, offset, mode) ,bufsize
 #define __NR64ATRF3_pwrite64f                 "%" PRIu64
 #define __NR64ATRA3_pwrite64f(fd, buf, bufsize, offset, mode) ,offset
-#define __NR64ATRF4_pwrite64f                 "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF4_pwrite64f                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA4_pwrite64f(fd, buf, bufsize, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                               ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                               ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
@@ -4863,9 +4863,9 @@
 #define __NR64ATRA0_readvf(fd, iovec, count, mode) ,(int)(fd)
 #define __NR64ATRF1_readvf                    "%p"
 #define __NR64ATRA1_readvf(fd, iovec, count, mode) ,iovec
-#define __NR64ATRF2_readvf                    "%" PRIuPTR
+#define __NR64ATRF2_readvf                    "%" PRIuSIZ
 #define __NR64ATRA2_readvf(fd, iovec, count, mode) ,count
-#define __NR64ATRF3_readvf                    "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF3_readvf                    "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA3_readvf(fd, iovec, count, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                    ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                    ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
@@ -4879,9 +4879,9 @@
 #define __NR64ATRA0_writevf(fd, iovec, count, mode) ,(int)(fd)
 #define __NR64ATRF1_writevf                   "%p"
 #define __NR64ATRA1_writevf(fd, iovec, count, mode) ,iovec
-#define __NR64ATRF2_writevf                   "%" PRIuPTR
+#define __NR64ATRF2_writevf                   "%" PRIuSIZ
 #define __NR64ATRA2_writevf(fd, iovec, count, mode) ,count
-#define __NR64ATRF3_writevf                   "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF3_writevf                   "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA3_writevf(fd, iovec, count, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                     ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                     ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
@@ -4897,7 +4897,7 @@
 #define __NR64ATRA0_debugtrap(state, reason)  ,state
 #define __NR64ATRF1_debugtrap                 "%p"
 #define __NR64ATRA1_debugtrap(state, reason)  ,reason
-#define __NR64ATRF0_select64                  "%" PRIuPTR
+#define __NR64ATRF0_select64                  "%" PRIuSIZ
 #define __NR64ATRA0_select64(nfds, readfds, writefds, exceptfds, timeout) ,nfds
 #define __NR64ATRF1_select64                  "%p"
 #define __NR64ATRA1_select64(nfds, readfds, writefds, exceptfds, timeout) ,readfds
@@ -4909,7 +4909,7 @@
 #define __NR64ATRA4_select64(nfds, readfds, writefds, exceptfds, timeout) ,timeout
 #define __NR64ATRF0_lfutex                    "%p"
 #define __NR64ATRA0_lfutex(uaddr, futex_op, val, timeout, val2) ,uaddr
-#define __NR64ATRF1_lfutex                    "%#" PRIxPTR
+#define __NR64ATRF1_lfutex                    "%#" PRIxSIZ
 #define __NR64ATRA1_lfutex(uaddr, futex_op, val, timeout, val2) ,(uintptr_t)(futex_op)
 #define __NR64ATRF2_lfutex                    "%p"
 #define __NR64ATRA2_lfutex(uaddr, futex_op, val, timeout, val2) ,val
@@ -4919,25 +4919,25 @@
 #define __NR64ATRA4_lfutex(uaddr, futex_op, val, timeout, val2) ,val2
 #define __NR64ATRF0_lfutexexpr                "%p"
 #define __NR64ATRA0_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,base
-#define __NR64ATRF1_lfutexexpr                "%" PRIuPTR
+#define __NR64ATRF1_lfutexexpr                "%" PRIuSIZ
 #define __NR64ATRA1_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,exprc
 #define __NR64ATRF2_lfutexexpr                "%p"
 #define __NR64ATRA2_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,exprv
 #define __NR64ATRF3_lfutexexpr                "%p"
 #define __NR64ATRA3_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,timeout
-#define __NR64ATRF4_lfutexexpr                "%#" PRIxPTR
+#define __NR64ATRF4_lfutexexpr                "%#" PRIxSIZ
 #define __NR64ATRA4_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,(uintptr_t)(timeout_flags)
 #define __NR64ATRF0_lfutexlockexpr            "%p"
 #define __NR64ATRA0_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,ulockaddr
 #define __NR64ATRF1_lfutexlockexpr            "%p"
 #define __NR64ATRA1_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,base
-#define __NR64ATRF2_lfutexlockexpr            "%" PRIuPTR
+#define __NR64ATRF2_lfutexlockexpr            "%" PRIuSIZ
 #define __NR64ATRA2_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,exprc
 #define __NR64ATRF3_lfutexlockexpr            "%p"
 #define __NR64ATRA3_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,exprv
 #define __NR64ATRF4_lfutexlockexpr            "%p"
 #define __NR64ATRA4_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,timeout
-#define __NR64ATRF5_lfutexlockexpr            "%#" PRIxPTR
+#define __NR64ATRF5_lfutexlockexpr            "%#" PRIxSIZ
 #define __NR64ATRA5_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,(uintptr_t)(timeout_flags)
 #define __NR64ATRF0_mktty                     "%d"
 #define __NR64ATRA0_mktty(keyboard, display, name, rsvd) ,(int)(keyboard)
@@ -4945,7 +4945,7 @@
 #define __NR64ATRA1_mktty(keyboard, display, name, rsvd) ,(int)(display)
 #define __NR64ATRF2_mktty                     "%q"
 #define __NR64ATRA2_mktty(keyboard, display, name, rsvd) ,(validate_readable_opt(name,1),name)
-#define __NR64ATRF3_mktty                     "%#" PRIxPTR
+#define __NR64ATRF3_mktty                     "%#" PRIxSIZ
 #define __NR64ATRA3_mktty(keyboard, display, name, rsvd) ,(uintptr_t)(rsvd)
 #define __NR64ATRF0_raiseat                   "%p"
 #define __NR64ATRA0_raiseat(state, si)        ,state
@@ -4957,17 +4957,17 @@
 #define __NR64ATRA1_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,orig_state
 #define __NR64ATRF2_coredump                  "%p"
 #define __NR64ATRA2_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,traceback_vector
-#define __NR64ATRF3_coredump                  "%" PRIuPTR
+#define __NR64ATRF3_coredump                  "%" PRIuSIZ
 #define __NR64ATRA3_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,traceback_length
 #define __NR64ATRF4_coredump                  "%p"
 #define __NR64ATRA4_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,exception
-#define __NR64ATRF5_coredump                  "%#" PRIxPTR
+#define __NR64ATRF5_coredump                  "%#" PRIxSIZ
 #define __NR64ATRA5_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,(uintptr_t)(unwind_error)
-#define __NR64ATRF0_getitimer64               "%#" PRIxPTR
+#define __NR64ATRF0_getitimer64               "%#" PRIxSIZ
 #define __NR64ATRA0_getitimer64(which, curr_value) ,(uintptr_t)(which)
 #define __NR64ATRF1_getitimer64               "%p"
 #define __NR64ATRA1_getitimer64(which, curr_value) ,curr_value
-#define __NR64ATRF0_setitimer64               "%#" PRIxPTR
+#define __NR64ATRF0_setitimer64               "%#" PRIxSIZ
 #define __NR64ATRA0_setitimer64(which, newval, oldval) ,(uintptr_t)(which)
 #define __NR64ATRF1_setitimer64               "%p"
 #define __NR64ATRA1_setitimer64(which, newval, oldval) ,newval
@@ -4977,9 +4977,9 @@
 #define __NR64ATRA0_kreaddir(fd, buf, bufsize, mode) ,(int)(fd)
 #define __NR64ATRF1_kreaddir                  "%p"
 #define __NR64ATRA1_kreaddir(fd, buf, bufsize, mode) ,buf
-#define __NR64ATRF2_kreaddir                  "%" PRIuPTR
+#define __NR64ATRF2_kreaddir                  "%" PRIuSIZ
 #define __NR64ATRA2_kreaddir(fd, buf, bufsize, mode) ,bufsize
-#define __NR64ATRF3_kreaddir                  "%#" PRIxPTR "=%s%s%s%s%s%s%s"
+#define __NR64ATRF3_kreaddir                  "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
 #define __NR64ATRA3_kreaddir(fd, buf, bufsize, mode) ,(uintptr_t)(mode),(mode) & READDIR_CONTINUE ? "READDIR_CONTINUE" : (mode) ? "" : "READDIR_DEFAULT" \
                                                      ,((mode) & READDIR_PEEK) && ((mode) & (READDIR_CONTINUE)) ? "|" : "",(mode) & READDIR_PEEK ? "READDIR_PEEK" : "" \
                                                      ,((mode) & READDIR_SKIPREL) && ((mode) & (READDIR_CONTINUE|READDIR_PEEK)) ? "|" : "",(mode) & READDIR_SKIPREL ? "READDIR_SKIPREL" : "" \
@@ -4988,7 +4988,7 @@
 #define __NR64ATRA0_fchdirat(dirfd, path, flags) ,(int)(dirfd)
 #define __NR64ATRF1_fchdirat                  "%q"
 #define __NR64ATRA1_fchdirat(dirfd, path, flags) ,(validate_readable_opt(path,1),path)
-#define __NR64ATRF2_fchdirat                  "%#" PRIxPTR "=%s"
+#define __NR64ATRF2_fchdirat                  "%#" PRIxSIZ "=%s"
 #define __NR64ATRA2_fchdirat(dirfd, path, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NR64ATRF0_fsmode                    "%" PRIu64
 #define __NR64ATRA0_fsmode(mode)              ,mode
@@ -5002,7 +5002,7 @@
 #define __NR64ATRA1_utime64(filename, times)  ,times
 #define __NR64ATRF0_maplibrary                "%p"
 #define __NR64ATRA0_maplibrary(addr, flags, fd, hdrv, hdrc) ,addr
-#define __NR64ATRF1_maplibrary                "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF1_maplibrary                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA1_maplibrary(addr, flags, fd, hdrv, hdrc) ,(uintptr_t)(flags),(flags) & MAP_FIXED ? "MAP_FIXED" : "" \
                                                             ,((flags) & MAP_LOCKED) && ((flags) & (MAP_FIXED)) ? "|" : "",(flags) & MAP_LOCKED ? "MAP_LOCKED" : "" \
                                                             ,((flags) & MAP_NONBLOCK) && ((flags) & (MAP_FIXED|MAP_LOCKED)) ? "|" : "",(flags) & MAP_NONBLOCK ? "MAP_NONBLOCK" : "" \
@@ -5015,7 +5015,7 @@
 #define __NR64ATRA2_maplibrary(addr, flags, fd, hdrv, hdrc) ,(int)(fd)
 #define __NR64ATRF3_maplibrary                "%p"
 #define __NR64ATRA3_maplibrary(addr, flags, fd, hdrv, hdrc) ,hdrv
-#define __NR64ATRF4_maplibrary                "%" PRIuPTR
+#define __NR64ATRF4_maplibrary                "%" PRIuSIZ
 #define __NR64ATRA4_maplibrary(addr, flags, fd, hdrv, hdrc) ,hdrc
 #define __NR64ATRF0_settimeofday64            "%p"
 #define __NR64ATRA0_settimeofday64(tv, tz)    ,tv
@@ -5027,14 +5027,14 @@
 #define __NR64ATRA0_kreaddirf(fd, buf, bufsize, mode, iomode) ,(int)(fd)
 #define __NR64ATRF1_kreaddirf                 "%p"
 #define __NR64ATRA1_kreaddirf(fd, buf, bufsize, mode, iomode) ,buf
-#define __NR64ATRF2_kreaddirf                 "%" PRIuPTR
+#define __NR64ATRF2_kreaddirf                 "%" PRIuSIZ
 #define __NR64ATRA2_kreaddirf(fd, buf, bufsize, mode, iomode) ,bufsize
-#define __NR64ATRF3_kreaddirf                 "%#" PRIxPTR "=%s%s%s%s%s%s%s"
+#define __NR64ATRF3_kreaddirf                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
 #define __NR64ATRA3_kreaddirf(fd, buf, bufsize, mode, iomode) ,(uintptr_t)(mode),(mode) & READDIR_CONTINUE ? "READDIR_CONTINUE" : (mode) ? "" : "READDIR_DEFAULT" \
                                                               ,((mode) & READDIR_PEEK) && ((mode) & (READDIR_CONTINUE)) ? "|" : "",(mode) & READDIR_PEEK ? "READDIR_PEEK" : "" \
                                                               ,((mode) & READDIR_SKIPREL) && ((mode) & (READDIR_CONTINUE|READDIR_PEEK)) ? "|" : "",(mode) & READDIR_SKIPREL ? "READDIR_SKIPREL" : "" \
                                                               ,((mode) & READDIR_WANTEOF) && ((mode) & (READDIR_CONTINUE|READDIR_PEEK|READDIR_SKIPREL)) ? "|" : "",(mode) & READDIR_WANTEOF ? "READDIR_WANTEOF" : ""
-#define __NR64ATRF4_kreaddirf                 "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF4_kreaddirf                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA4_kreaddirf(fd, buf, bufsize, mode, iomode) ,(uintptr_t)(iomode),(iomode) & IO_WRONLY ? "IO_WRONLY" : (iomode) ? "" : "IO_RDONLY" \
                                                               ,((iomode) & IO_RDWR) && ((iomode) & (IO_WRONLY)) ? "|" : "",(iomode) & IO_RDWR ? "IO_RDWR" : "" \
                                                               ,((iomode) & IO_CLOEXEC) && ((iomode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(iomode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
@@ -5052,19 +5052,19 @@
 #define __NR64ATRA0_fmkdirat(dirfd, pathname, mode, flags) ,(int)(dirfd)
 #define __NR64ATRF1_fmkdirat                  "%q"
 #define __NR64ATRA1_fmkdirat(dirfd, pathname, mode, flags) ,(validate_readable_opt(pathname,1),pathname)
-#define __NR64ATRF2_fmkdirat                  "%#" PRIoPTR
+#define __NR64ATRF2_fmkdirat                  "%#" PRIoSIZ
 #define __NR64ATRA2_fmkdirat(dirfd, pathname, mode, flags) ,(uintptr_t)(mode)
-#define __NR64ATRF3_fmkdirat                  "%#" PRIxPTR "=%s"
+#define __NR64ATRF3_fmkdirat                  "%#" PRIxSIZ "=%s"
 #define __NR64ATRA3_fmkdirat(dirfd, pathname, mode, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NR64ATRF0_fmknodat                  "%d"
 #define __NR64ATRA0_fmknodat(dirfd, nodename, mode, dev, flags) ,(int)(dirfd)
 #define __NR64ATRF1_fmknodat                  "%q"
 #define __NR64ATRA1_fmknodat(dirfd, nodename, mode, dev, flags) ,(validate_readable_opt(nodename,1),nodename)
-#define __NR64ATRF2_fmknodat                  "%#" PRIoPTR
+#define __NR64ATRF2_fmknodat                  "%#" PRIoSIZ
 #define __NR64ATRA2_fmknodat(dirfd, nodename, mode, dev, flags) ,(uintptr_t)(mode)
 #define __NR64ATRF3_fmknodat                  "%.2x:%.2x"
 #define __NR64ATRA3_fmknodat(dirfd, nodename, mode, dev, flags) ,(unsigned int)MAJOR(dev),(unsigned int)MINOR(dev)
-#define __NR64ATRF4_fmknodat                  "%#" PRIxPTR "=%s"
+#define __NR64ATRF4_fmknodat                  "%#" PRIxSIZ "=%s"
 #define __NR64ATRA4_fmknodat(dirfd, nodename, mode, dev, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NR64ATRF0_futimesat64               "%d"
 #define __NR64ATRA0_futimesat64(dirfd, filename, times) ,(int)(dirfd)
@@ -5078,7 +5078,7 @@
 #define __NR64ATRA1_kfstatat(dirfd, filename, statbuf, flags) ,(validate_readable_opt(filename,1),filename)
 #define __NR64ATRF2_kfstatat                  "%p"
 #define __NR64ATRA2_kfstatat(dirfd, filename, statbuf, flags) ,statbuf
-#define __NR64ATRF3_kfstatat                  "%#" PRIxPTR "=%s%s%s"
+#define __NR64ATRF3_kfstatat                  "%#" PRIxSIZ "=%s%s%s"
 #define __NR64ATRA3_kfstatat(dirfd, filename, statbuf, flags) ,(uintptr_t)(flags),(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
                                                               ,((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NR64ATRF0_frenameat                 "%d"
@@ -5089,7 +5089,7 @@
 #define __NR64ATRA2_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(int)(newfd)
 #define __NR64ATRF3_frenameat                 "%q"
 #define __NR64ATRA3_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(validate_readable_opt(newname_or_path,1),newname_or_path)
-#define __NR64ATRF4_frenameat                 "%#" PRIxPTR "=%s"
+#define __NR64ATRF4_frenameat                 "%#" PRIxSIZ "=%s"
 #define __NR64ATRA4_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NR64ATRF0_fsymlinkat                "%q"
 #define __NR64ATRA0_fsymlinkat(link_text, tofd, target_path, flags) ,(validate_readable_opt(link_text,1),link_text)
@@ -5097,7 +5097,7 @@
 #define __NR64ATRA1_fsymlinkat(link_text, tofd, target_path, flags) ,(int)(tofd)
 #define __NR64ATRF2_fsymlinkat                "%q"
 #define __NR64ATRA2_fsymlinkat(link_text, tofd, target_path, flags) ,(validate_readable_opt(target_path,1),target_path)
-#define __NR64ATRF3_fsymlinkat                "%#" PRIxPTR "=%s"
+#define __NR64ATRF3_fsymlinkat                "%#" PRIxSIZ "=%s"
 #define __NR64ATRA3_fsymlinkat(link_text, tofd, target_path, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NR64ATRF0_freadlinkat               "%d"
 #define __NR64ATRA0_freadlinkat(dirfd, path, buf, buflen, flags) ,(int)(dirfd)
@@ -5105,14 +5105,14 @@
 #define __NR64ATRA1_freadlinkat(dirfd, path, buf, buflen, flags) ,(validate_readable_opt(path,1),path)
 #define __NR64ATRF2_freadlinkat               "%p"
 #define __NR64ATRA2_freadlinkat(dirfd, path, buf, buflen, flags) ,buf
-#define __NR64ATRF3_freadlinkat               "%" PRIuPTR
+#define __NR64ATRF3_freadlinkat               "%" PRIuSIZ
 #define __NR64ATRA3_freadlinkat(dirfd, path, buf, buflen, flags) ,buflen
-#define __NR64ATRF4_freadlinkat               "%#" PRIxPTR "=%s%s%s"
+#define __NR64ATRF4_freadlinkat               "%#" PRIxSIZ "=%s%s%s"
 #define __NR64ATRA4_freadlinkat(dirfd, path, buf, buflen, flags) ,(uintptr_t)(flags),(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
                                                                  ,((flags) & AT_DOSPATH) && ((flags) & (AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NR64ATRF0_fallocate64               "%d"
 #define __NR64ATRA0_fallocate64(fd, mode, offset, length) ,(int)(fd)
-#define __NR64ATRF1_fallocate64               "%#" PRIxPTR
+#define __NR64ATRF1_fallocate64               "%#" PRIxSIZ
 #define __NR64ATRA1_fallocate64(fd, mode, offset, length) ,(uintptr_t)(mode)
 #define __NR64ATRF2_fallocate64               "%" PRIu64
 #define __NR64ATRA2_fallocate64(fd, mode, offset, length) ,offset
@@ -5122,11 +5122,11 @@
 #define __NR64ATRA0_preadvf(fd, iovec, count, offset, mode) ,(int)(fd)
 #define __NR64ATRF1_preadvf                   "%p"
 #define __NR64ATRA1_preadvf(fd, iovec, count, offset, mode) ,iovec
-#define __NR64ATRF2_preadvf                   "%" PRIuPTR
+#define __NR64ATRF2_preadvf                   "%" PRIuSIZ
 #define __NR64ATRA2_preadvf(fd, iovec, count, offset, mode) ,count
 #define __NR64ATRF3_preadvf                   "%" PRIu64
 #define __NR64ATRA3_preadvf(fd, iovec, count, offset, mode) ,offset
-#define __NR64ATRF4_preadvf                   "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF4_preadvf                   "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA4_preadvf(fd, iovec, count, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                             ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                             ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
@@ -5140,11 +5140,11 @@
 #define __NR64ATRA0_pwritevf(fd, iovec, count, offset, mode) ,(int)(fd)
 #define __NR64ATRF1_pwritevf                  "%p"
 #define __NR64ATRA1_pwritevf(fd, iovec, count, offset, mode) ,iovec
-#define __NR64ATRF2_pwritevf                  "%" PRIuPTR
+#define __NR64ATRF2_pwritevf                  "%" PRIuSIZ
 #define __NR64ATRA2_pwritevf(fd, iovec, count, offset, mode) ,count
 #define __NR64ATRF3_pwritevf                  "%" PRIu64
 #define __NR64ATRA3_pwritevf(fd, iovec, count, offset, mode) ,offset
-#define __NR64ATRF4_pwritevf                  "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRF4_pwritevf                  "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NR64ATRA4_pwritevf(fd, iovec, count, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                              ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                              ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \

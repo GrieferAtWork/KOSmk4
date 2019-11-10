@@ -22,7 +22,7 @@ global inttypesPRIMacros = Dict();
 for (local format: "diouxX") {
 	for (local n: ["8", "16", "32", "64"])
 		inttypesPRIMacros["I" + n + format] = "PRI" + format + n;
-	inttypesPRIMacros["I" + format] = "PRI" + format + "PTR";
+	inttypesPRIMacros["I" + format] = "PRI" + format + "SIZ";
 }
 
 @@Optimize a printf() format string, and return its c-string
@@ -84,7 +84,7 @@ continue_outer:
 	return fp;
 }
 
-assert optimizePrintf("a%Iub") == "\"a%\" PRIuPTR \"b\"";
+assert optimizePrintf("a%Iub") == "\"a%\" PRIuSIZ \"b\"";
 assert optimizePrintf("a%ub") == "\"a%ub\"";
 
 

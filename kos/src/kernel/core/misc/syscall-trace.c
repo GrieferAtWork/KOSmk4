@@ -37,16 +37,16 @@
 #include <sched/pid.h>
 #include <sched/task.h>
 
-#include <kos/dev.h>      /* MAJOR(), MINOR() */
-#include <kos/io.h>       /* IO_* */
-#include <sys/epoll.h>    /* EPOLL* */
-#include <sys/eventfd.h>  /* EFD_* */
-#include <sys/mman.h>     /* PROT_*, MAP_* */
-#include <sys/signalfd.h> /* SFD_* */
-#include <sys/socket.h>   /* SHUT_*, SOL_*, SOCK_*, MSG_* */
-#include <sys/swap.h>     /* SWAP_FLAG_* */
-#include <sys/syscall-trace.h>
-#include <sys/wait.h> /* W* */
+#include <kos/dev.h>           /* MAJOR(), MINOR() */
+#include <kos/io.h>            /* IO_* */
+#include <sys/epoll.h>         /* EPOLL* */
+#include <sys/eventfd.h>       /* EFD_* */
+#include <sys/mman.h>          /* PROT_*, MAP_* */
+#include <sys/signalfd.h>      /* SFD_* */
+#include <sys/socket.h>        /* SHUT_*, SOL_*, SOCK_*, MSG_* */
+#include <sys/swap.h>          /* SWAP_FLAG_* */
+#include <sys/syscall-trace.h> /* SYSCALL_TRACE_* */
+#include <sys/wait.h>          /* W* */
 
 #include <fcntl.h>          /* O_* */
 #include <format-printer.h> /* pformatprinter */
