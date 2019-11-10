@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6a433c7 */
+/* HASH CRC-32:0xb9bf4387 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3218,17 +3218,17 @@
 #define __NRATRA0_read(fd, buf, bufsize)    ,(int)(fd)
 #define __NRATRF1_read                      "%p"
 #define __NRATRA1_read(fd, buf, bufsize)    ,buf
-#define __NRATRF2_read                      "%Iu"
+#define __NRATRF2_read                      "%" PRIuPTR
 #define __NRATRA2_read(fd, buf, bufsize)    ,bufsize
 #define __NRATRF0_write                     "%d"
 #define __NRATRA0_write(fd, buf, bufsize)   ,(int)(fd)
 #define __NRATRF1_write                     "%p"
 #define __NRATRA1_write(fd, buf, bufsize)   ,buf
-#define __NRATRF2_write                     "%Iu"
+#define __NRATRF2_write                     "%" PRIuPTR
 #define __NRATRA2_write(fd, buf, bufsize)   ,bufsize
 #define __NRATRF0_open                      "%q"
 #define __NRATRA0_open(filename, oflags, mode) ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF1_open                      "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF1_open                      "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA1_open(filename, oflags, mode) ,(uintptr_t)(oflags),(oflags) & O_WRONLY ? "O_WRONLY" : (oflags) ? "" : "O_RDONLY" \
                                                ,((oflags) & O_RDWR) && ((oflags) & (O_WRONLY)) ? "|" : "",(oflags) & O_RDWR ? "O_RDWR" : "" \
                                                ,((oflags) & O_CREAT) && ((oflags) & (O_WRONLY|O_RDWR)) ? "|" : "",(oflags) & O_CREAT ? "O_CREAT" : "" \
@@ -3251,7 +3251,7 @@
                                                ,((oflags) & 0x0400000) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW|O_NOATIME|O_CLOEXEC|O_CLOFORK|O_PATH)) ? "|" : "",(oflags) & 0x0400000 ? "O_TMPFILE" : "" \
                                                ,((oflags) & O_SYMLINK) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW|O_NOATIME|O_CLOEXEC|O_CLOFORK|O_PATH|0x0400000)) ? "|" : "",(oflags) & O_SYMLINK ? "O_SYMLINK" : "" \
                                                ,((oflags) & O_DOSPATH) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW|O_NOATIME|O_CLOEXEC|O_CLOFORK|O_PATH|0x0400000|O_SYMLINK)) ? "|" : "",(oflags) & O_DOSPATH ? "O_DOSPATH" : ""
-#define __NRATRF2_open                      "%#Io"
+#define __NRATRF2_open                      "%#" PRIoPTR
 #define __NRATRA2_open(filename, oflags, mode) ,(uintptr_t)(mode)
 #define __NRATRF0_close                     "%d"
 #define __NRATRA0_close(fd)                 ,(int)(fd)
@@ -3269,28 +3269,28 @@
 #define __NRATRA1_linux_lstat64(filename, statbuf) ,statbuf
 #define __NRATRF0_poll                      "%p"
 #define __NRATRA0_poll(fds, nfds, timeout)  ,fds
-#define __NRATRF1_poll                      "%Iu"
+#define __NRATRF1_poll                      "%" PRIuPTR
 #define __NRATRA1_poll(fds, nfds, timeout)  ,nfds
-#define __NRATRF2_poll                      "%Id"
+#define __NRATRF2_poll                      "%" PRIdPTR
 #define __NRATRA2_poll(fds, nfds, timeout)  ,(intptr_t)(timeout)
 #define __NRATRF0_lseek64                   "%d"
 #define __NRATRA0_lseek64(fd, offset, whence) ,(int)(fd)
-#define __NRATRF1_lseek64                   "%I64d"
+#define __NRATRF1_lseek64                   "%" PRId64
 #define __NRATRA1_lseek64(fd, offset, whence) ,offset
 #define __NRATRF2_lseek64                   "%#Ix=%s"
 #define __NRATRA2_lseek64(fd, offset, whence) ,(whence),(whence) == SEEK_SET ? "SEEK_SET" : (whence) == SEEK_CUR ? "SEEK_CUR" : (whence) == SEEK_END ? "SEEK_END" : (whence) == SEEK_DATA ? "SEEK_DATA" : (whence) == SEEK_HOLE ? "SEEK_HOLE" : "?"
 #define __NRATRF0_mmap                      "%p"
 #define __NRATRA0_mmap(addr, len, prot, flags, fd, offset) ,addr
-#define __NRATRF1_mmap                      "%Iu"
+#define __NRATRF1_mmap                      "%" PRIuPTR
 #define __NRATRA1_mmap(addr, len, prot, flags, fd, offset) ,len
-#define __NRATRF2_mmap                      "%#Ix=%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF2_mmap                      "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA2_mmap(addr, len, prot, flags, fd, offset) ,(uintptr_t)(prot),(prot) & PROT_EXEC ? "PROT_EXEC" : (prot) ? "" : "PROT_NONE" \
                                                            ,((prot) & PROT_WRITE) && ((prot) & (PROT_EXEC)) ? "|" : "",(prot) & PROT_WRITE ? "PROT_WRITE" : "" \
                                                            ,((prot) & PROT_READ) && ((prot) & (PROT_EXEC|PROT_WRITE)) ? "|" : "",(prot) & PROT_READ ? "PROT_READ" : "" \
                                                            ,((prot) & PROT_SEM) && ((prot) & (PROT_EXEC|PROT_WRITE|PROT_READ)) ? "|" : "",(prot) & PROT_SEM ? "PROT_SEM" : "" \
                                                            ,((prot) & PROT_LOOSE) && ((prot) & (PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM)) ? "|" : "",(prot) & PROT_LOOSE ? "PROT_LOOSE" : "" \
                                                            ,((prot) & PROT_SHARED) && ((prot) & (PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE)) ? "|" : "",(prot) & PROT_SHARED ? "PROT_SHARED" : ""
-#define __NRATRF3_mmap                      "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF3_mmap                      "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA3_mmap(addr, len, prot, flags, fd, offset) ,(uintptr_t)(flags),(flags) & MAP_SHARED ? "MAP_SHARED" : (flags) ? "" : "MAP_AUTOMATIC" \
                                                            ,((flags) & MAP_PRIVATE) && ((flags) & (MAP_SHARED)) ? "|" : "",(flags) & MAP_PRIVATE ? "MAP_PRIVATE" : "" \
                                                            ,((flags) & MAP_FIXED) && ((flags) & (MAP_SHARED|MAP_PRIVATE)) ? "|" : "",(flags) & MAP_FIXED ? "MAP_FIXED" : "" \
@@ -3308,42 +3308,42 @@
                                                            ,((flags) & MAP_DONT_OVERRIDE) && ((flags) & (MAP_SHARED|MAP_PRIVATE|MAP_FIXED|MAP_ANON|MAP_32BIT|MAP_GROWSDOWN|MAP_GROWSUP|MAP_LOCKED|MAP_NORESERVE|MAP_POPULATE|MAP_NONBLOCK|MAP_STACK|MAP_UNINITIALIZED|MAP_DONT_MAP)) ? "|" : "",(flags) & MAP_DONT_OVERRIDE ? "MAP_DONT_OVERRIDE" : ""
 #define __NRATRF4_mmap                      "%d"
 #define __NRATRA4_mmap(addr, len, prot, flags, fd, offset) ,(int)(fd)
-#define __NRATRF5_mmap                      "%#Ix"
+#define __NRATRF5_mmap                      "%#" PRIxPTR
 #define __NRATRA5_mmap(addr, len, prot, flags, fd, offset) ,(uintptr_t)(offset)
 #define __NRATRF0_mprotect                  "%p"
 #define __NRATRA0_mprotect(addr, len, prot) ,addr
-#define __NRATRF1_mprotect                  "%Iu"
+#define __NRATRF1_mprotect                  "%" PRIuPTR
 #define __NRATRA1_mprotect(addr, len, prot) ,len
-#define __NRATRF2_mprotect                  "%#Ix=%s%s%s%s%s%s%s"
+#define __NRATRF2_mprotect                  "%#" PRIxPTR "=%s%s%s%s%s%s%s"
 #define __NRATRA2_mprotect(addr, len, prot) ,(uintptr_t)(prot),(prot) & PROT_EXEC ? "PROT_EXEC" : (prot) ? "" : "PROT_NONE" \
                                             ,((prot) & PROT_WRITE) && ((prot) & (PROT_EXEC)) ? "|" : "",(prot) & PROT_WRITE ? "PROT_WRITE" : "" \
                                             ,((prot) & PROT_READ) && ((prot) & (PROT_EXEC|PROT_WRITE)) ? "|" : "",(prot) & PROT_READ ? "PROT_READ" : "" \
                                             ,((prot) & PROT_SEM) && ((prot) & (PROT_EXEC|PROT_WRITE|PROT_READ)) ? "|" : "",(prot) & PROT_SEM ? "PROT_SEM" : ""
 #define __NRATRF0_munmap                    "%p"
 #define __NRATRA0_munmap(addr, len)         ,addr
-#define __NRATRF1_munmap                    "%Iu"
+#define __NRATRF1_munmap                    "%" PRIuPTR
 #define __NRATRA1_munmap(addr, len)         ,len
 #define __NRATRF0_brk                       "%p"
 #define __NRATRA0_brk(addr)                 ,addr
-#define __NRATRF0_rt_sigaction              "%#Ix"
+#define __NRATRF0_rt_sigaction              "%#" PRIxPTR
 #define __NRATRA0_rt_sigaction(signo, act, oact, sigsetsize) ,(uintptr_t)(signo)
 #define __NRATRF1_rt_sigaction              "%p"
 #define __NRATRA1_rt_sigaction(signo, act, oact, sigsetsize) ,act
 #define __NRATRF2_rt_sigaction              "%p"
 #define __NRATRA2_rt_sigaction(signo, act, oact, sigsetsize) ,oact
-#define __NRATRF3_rt_sigaction              "%Iu"
+#define __NRATRF3_rt_sigaction              "%" PRIuPTR
 #define __NRATRA3_rt_sigaction(signo, act, oact, sigsetsize) ,sigsetsize
-#define __NRATRF0_rt_sigprocmask            "%#Ix"
+#define __NRATRF0_rt_sigprocmask            "%#" PRIxPTR
 #define __NRATRA0_rt_sigprocmask(how, set, oset, sigsetsize) ,(uintptr_t)(how)
 #define __NRATRF1_rt_sigprocmask            "%p"
 #define __NRATRA1_rt_sigprocmask(how, set, oset, sigsetsize) ,set
 #define __NRATRF2_rt_sigprocmask            "%p"
 #define __NRATRA2_rt_sigprocmask(how, set, oset, sigsetsize) ,oset
-#define __NRATRF3_rt_sigprocmask            "%Iu"
+#define __NRATRF3_rt_sigprocmask            "%" PRIuPTR
 #define __NRATRA3_rt_sigprocmask(how, set, oset, sigsetsize) ,sigsetsize
 #define __NRATRF0_ioctl                     "%d"
 #define __NRATRA0_ioctl(fd, request, arg)   ,(int)(fd)
-#define __NRATRF1_ioctl                     "%#Ix"
+#define __NRATRF1_ioctl                     "%#" PRIxPTR
 #define __NRATRA1_ioctl(fd, request, arg)   ,(uintptr_t)(request)
 #define __NRATRF2_ioctl                     "%p"
 #define __NRATRA2_ioctl(fd, request, arg)   ,arg
@@ -3351,39 +3351,39 @@
 #define __NRATRA0_pread64(fd, buf, bufsize, offset) ,(int)(fd)
 #define __NRATRF1_pread64                   "%p"
 #define __NRATRA1_pread64(fd, buf, bufsize, offset) ,buf
-#define __NRATRF2_pread64                   "%Iu"
+#define __NRATRF2_pread64                   "%" PRIuPTR
 #define __NRATRA2_pread64(fd, buf, bufsize, offset) ,bufsize
-#define __NRATRF3_pread64                   "%I64u"
+#define __NRATRF3_pread64                   "%" PRIu64
 #define __NRATRA3_pread64(fd, buf, bufsize, offset) ,offset
 #define __NRATRF0_pwrite64                  "%d"
 #define __NRATRA0_pwrite64(fd, buf, bufsize, offset) ,(int)(fd)
 #define __NRATRF1_pwrite64                  "%p"
 #define __NRATRA1_pwrite64(fd, buf, bufsize, offset) ,buf
-#define __NRATRF2_pwrite64                  "%Iu"
+#define __NRATRF2_pwrite64                  "%" PRIuPTR
 #define __NRATRA2_pwrite64(fd, buf, bufsize, offset) ,bufsize
-#define __NRATRF3_pwrite64                  "%I64u"
+#define __NRATRF3_pwrite64                  "%" PRIu64
 #define __NRATRA3_pwrite64(fd, buf, bufsize, offset) ,offset
 #define __NRATRF0_readv                     "%d"
 #define __NRATRA0_readv(fd, iovec, count)   ,(int)(fd)
 #define __NRATRF1_readv                     "%p"
 #define __NRATRA1_readv(fd, iovec, count)   ,iovec
-#define __NRATRF2_readv                     "%Iu"
+#define __NRATRF2_readv                     "%" PRIuPTR
 #define __NRATRA2_readv(fd, iovec, count)   ,count
 #define __NRATRF0_writev                    "%d"
 #define __NRATRA0_writev(fd, iovec, count)  ,(int)(fd)
 #define __NRATRF1_writev                    "%p"
 #define __NRATRA1_writev(fd, iovec, count)  ,iovec
-#define __NRATRF2_writev                    "%Iu"
+#define __NRATRF2_writev                    "%" PRIuPTR
 #define __NRATRA2_writev(fd, iovec, count)  ,count
 #define __NRATRF0_access                    "%q"
 #define __NRATRA0_access(filename, type)    ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF1_access                    "%#Ix=%s%s%s%s%s"
+#define __NRATRF1_access                    "%#" PRIxPTR "=%s%s%s%s%s"
 #define __NRATRA1_access(filename, type)    ,(uintptr_t)(type),(type) & R_OK ? "R_OK" : (type) ? "" : "F_OK" \
                                             ,((type) & W_OK) && ((type) & (R_OK)) ? "|" : "",(type) & W_OK ? "W_OK" : "" \
                                             ,((type) & X_OK) && ((type) & (R_OK|W_OK)) ? "|" : "",(type) & X_OK ? "X_OK" : ""
 #define __NRATRF0_pipe                      "%p"
 #define __NRATRA0_pipe(pipedes)             ,pipedes
-#define __NRATRF0_select                    "%Iu"
+#define __NRATRF0_select                    "%" PRIuPTR
 #define __NRATRA0_select(nfds, readfds, writefds, exceptfds, timeout) ,nfds
 #define __NRATRF1_select                    "%p"
 #define __NRATRA1_select(nfds, readfds, writefds, exceptfds, timeout) ,readfds
@@ -3395,32 +3395,32 @@
 #define __NRATRA4_select(nfds, readfds, writefds, exceptfds, timeout) ,timeout
 #define __NRATRF0_mremap                    "%p"
 #define __NRATRA0_mremap(addr, old_len, new_len, flags, new_address) ,addr
-#define __NRATRF1_mremap                    "%Iu"
+#define __NRATRF1_mremap                    "%" PRIuPTR
 #define __NRATRA1_mremap(addr, old_len, new_len, flags, new_address) ,old_len
-#define __NRATRF2_mremap                    "%Iu"
+#define __NRATRF2_mremap                    "%" PRIuPTR
 #define __NRATRA2_mremap(addr, old_len, new_len, flags, new_address) ,new_len
-#define __NRATRF3_mremap                    "%#Ix=%s%s%s"
+#define __NRATRF3_mremap                    "%#" PRIxPTR "=%s%s%s"
 #define __NRATRA3_mremap(addr, old_len, new_len, flags, new_address) ,(uintptr_t)(flags),(flags) & MREMAP_MAYMOVE ? "MREMAP_MAYMOVE" : "" \
                                                                      ,((flags) & MREMAP_FIXED) && ((flags) & (MREMAP_MAYMOVE)) ? "|" : "",(flags) & MREMAP_FIXED ? "MREMAP_FIXED" : ""
 #define __NRATRF4_mremap                    "%p"
 #define __NRATRA4_mremap(addr, old_len, new_len, flags, new_address) ,new_address
 #define __NRATRF0_msync                     "%p"
 #define __NRATRA0_msync(addr, len, flags)   ,addr
-#define __NRATRF1_msync                     "%Iu"
+#define __NRATRF1_msync                     "%" PRIuPTR
 #define __NRATRA1_msync(addr, len, flags)   ,len
-#define __NRATRF2_msync                     "%#Ix"
+#define __NRATRF2_msync                     "%#" PRIxPTR
 #define __NRATRA2_msync(addr, len, flags)   ,(uintptr_t)(flags)
 #define __NRATRF0_mincore                   "%p"
 #define __NRATRA0_mincore(start, len, vec)  ,start
-#define __NRATRF1_mincore                   "%Iu"
+#define __NRATRF1_mincore                   "%" PRIuPTR
 #define __NRATRA1_mincore(start, len, vec)  ,len
 #define __NRATRF2_mincore                   "%p"
 #define __NRATRA2_mincore(start, len, vec)  ,vec
 #define __NRATRF0_madvise                   "%p"
 #define __NRATRA0_madvise(addr, len, advice) ,addr
-#define __NRATRF1_madvise                   "%Iu"
+#define __NRATRF1_madvise                   "%" PRIuPTR
 #define __NRATRA1_madvise(addr, len, advice) ,len
-#define __NRATRF2_madvise                   "%#Ix"
+#define __NRATRF2_madvise                   "%#" PRIxPTR
 #define __NRATRA2_madvise(addr, len, advice) ,(uintptr_t)(advice)
 #define __NRATRF0_dup                       "%d"
 #define __NRATRA0_dup(fd)                   ,(int)(fd)
@@ -3432,13 +3432,13 @@
 #define __NRATRA0_nanosleep(req, rem)       ,req
 #define __NRATRF1_nanosleep                 "%p"
 #define __NRATRA1_nanosleep(req, rem)       ,rem
-#define __NRATRF0_getitimer                 "%#Ix"
+#define __NRATRF0_getitimer                 "%#" PRIxPTR
 #define __NRATRA0_getitimer(which, curr_value) ,(uintptr_t)(which)
 #define __NRATRF1_getitimer                 "%p"
 #define __NRATRA1_getitimer(which, curr_value) ,curr_value
-#define __NRATRF0_alarm                     "%#Ix"
+#define __NRATRF0_alarm                     "%#" PRIxPTR
 #define __NRATRA0_alarm(seconds)            ,(uintptr_t)(seconds)
-#define __NRATRF0_setitimer                 "%#Ix"
+#define __NRATRF0_setitimer                 "%#" PRIxPTR
 #define __NRATRA0_setitimer(which, newval, oldval) ,(uintptr_t)(which)
 #define __NRATRF1_setitimer                 "%p"
 #define __NRATRA1_setitimer(which, newval, oldval) ,newval
@@ -3450,27 +3450,27 @@
 #define __NRATRA1_sendfile(out_fd, in_fd, offset, count) ,(int)(in_fd)
 #define __NRATRF2_sendfile                  "%p"
 #define __NRATRA2_sendfile(out_fd, in_fd, offset, count) ,offset
-#define __NRATRF3_sendfile                  "%Iu"
+#define __NRATRF3_sendfile                  "%" PRIuPTR
 #define __NRATRA3_sendfile(out_fd, in_fd, offset, count) ,count
-#define __NRATRF0_socket                    "%#Ix"
+#define __NRATRF0_socket                    "%#" PRIxPTR
 #define __NRATRA0_socket(domain, type, protocol) ,(uintptr_t)(domain)
-#define __NRATRF1_socket                    "%#Ix"
+#define __NRATRF1_socket                    "%#" PRIxPTR
 #define __NRATRA1_socket(domain, type, protocol) ,(uintptr_t)(type)
-#define __NRATRF2_socket                    "%#Ix"
+#define __NRATRF2_socket                    "%#" PRIxPTR
 #define __NRATRA2_socket(domain, type, protocol) ,(uintptr_t)(protocol)
 #define __NRATRF0_connect                   "%d"
 #define __NRATRA0_connect(sockfd, addr, addr_len) ,(int)(sockfd)
 #define __NRATRF1_connect                   "%p"
 #define __NRATRA1_connect(sockfd, addr, addr_len) ,addr
-#define __NRATRF2_connect                   "%Iu"
+#define __NRATRF2_connect                   "%" PRIuPTR
 #define __NRATRA2_connect(sockfd, addr, addr_len) ,(uintptr_t)(addr_len)
 #define __NRATRF0_sendto                    "%d"
 #define __NRATRA0_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,(int)(sockfd)
 #define __NRATRF1_sendto                    "%p"
 #define __NRATRA1_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,buf
-#define __NRATRF2_sendto                    "%Iu"
+#define __NRATRF2_sendto                    "%" PRIuPTR
 #define __NRATRA2_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,bufsize
-#define __NRATRF3_sendto                    "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF3_sendto                    "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA3_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,(uintptr_t)(flags),(flags) & MSG_CONFIRM ? "MSG_CONFIRM" : "" \
                                                                       ,((flags) & MSG_DONTROUTE) && ((flags) & (MSG_CONFIRM)) ? "|" : "",(flags) & MSG_DONTROUTE ? "MSG_DONTROUTE" : "" \
                                                                       ,((flags) & MSG_DONTWAIT) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE)) ? "|" : "",(flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
@@ -3480,15 +3480,15 @@
                                                                       ,((flags) & MSG_OOB) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE|MSG_NOSIGNAL)) ? "|" : "",(flags) & MSG_OOB ? "MSG_OOB" : ""
 #define __NRATRF4_sendto                    "%p"
 #define __NRATRA4_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,addr
-#define __NRATRF5_sendto                    "%Iu"
+#define __NRATRF5_sendto                    "%" PRIuPTR
 #define __NRATRA5_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,(uintptr_t)(addr_len)
 #define __NRATRF0_recvfrom                  "%d"
 #define __NRATRA0_recvfrom(sockfd, buf, bufsize, flags, addr, addr_len) ,(int)(sockfd)
 #define __NRATRF1_recvfrom                  "%p"
 #define __NRATRA1_recvfrom(sockfd, buf, bufsize, flags, addr, addr_len) ,buf
-#define __NRATRF2_recvfrom                  "%Iu"
+#define __NRATRF2_recvfrom                  "%" PRIuPTR
 #define __NRATRA2_recvfrom(sockfd, buf, bufsize, flags, addr, addr_len) ,bufsize
-#define __NRATRF3_recvfrom                  "%#Ix=%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF3_recvfrom                  "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA3_recvfrom(sockfd, buf, bufsize, flags, addr, addr_len) ,(uintptr_t)(flags),(flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
                                                                         ,((flags) & MSG_ERRQUEUE) && ((flags) & (MSG_DONTWAIT)) ? "|" : "",(flags) & MSG_ERRQUEUE ? "MSG_ERRQUEUE" : "" \
                                                                         ,((flags) & MSG_OOB) && ((flags) & (MSG_DONTWAIT|MSG_ERRQUEUE)) ? "|" : "",(flags) & MSG_OOB ? "MSG_OOB" : "" \
@@ -3503,7 +3503,7 @@
 #define __NRATRA0_sendmsg(sockfd, message, flags) ,(int)(sockfd)
 #define __NRATRF1_sendmsg                   "%p"
 #define __NRATRA1_sendmsg(sockfd, message, flags) ,message
-#define __NRATRF2_sendmsg                   "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF2_sendmsg                   "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA2_sendmsg(sockfd, message, flags) ,(uintptr_t)(flags),(flags) & MSG_CONFIRM ? "MSG_CONFIRM" : "" \
                                                   ,((flags) & MSG_DONTROUTE) && ((flags) & (MSG_CONFIRM)) ? "|" : "",(flags) & MSG_DONTROUTE ? "MSG_DONTROUTE" : "" \
                                                   ,((flags) & MSG_DONTWAIT) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE)) ? "|" : "",(flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
@@ -3515,7 +3515,7 @@
 #define __NRATRA0_recvmsg(sockfd, message, flags) ,(int)(sockfd)
 #define __NRATRF1_recvmsg                   "%p"
 #define __NRATRA1_recvmsg(sockfd, message, flags) ,message
-#define __NRATRF2_recvmsg                   "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF2_recvmsg                   "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA2_recvmsg(sockfd, message, flags) ,(uintptr_t)(flags),(flags) & MSG_CMSG_CLOEXEC ? "MSG_CMSG_CLOEXEC" : "" \
                                                   ,((flags) & MSG_CMSG_CLOFORK) && ((flags) & (MSG_CMSG_CLOEXEC)) ? "|" : "",(flags) & MSG_CMSG_CLOFORK ? "MSG_CMSG_CLOFORK" : "" \
                                                   ,((flags) & MSG_DONTWAIT) && ((flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK)) ? "|" : "",(flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
@@ -3532,11 +3532,11 @@
 #define __NRATRA0_bind(sockfd, addr, addr_len) ,(int)(sockfd)
 #define __NRATRF1_bind                      "%p"
 #define __NRATRA1_bind(sockfd, addr, addr_len) ,addr
-#define __NRATRF2_bind                      "%Iu"
+#define __NRATRF2_bind                      "%" PRIuPTR
 #define __NRATRA2_bind(sockfd, addr, addr_len) ,(uintptr_t)(addr_len)
 #define __NRATRF0_listen                    "%d"
 #define __NRATRA0_listen(sockfd, max_backlog) ,(int)(sockfd)
-#define __NRATRF1_listen                    "%#Ix"
+#define __NRATRF1_listen                    "%#" PRIxPTR
 #define __NRATRA1_listen(sockfd, max_backlog) ,(uintptr_t)(max_backlog)
 #define __NRATRF0_getsockname               "%d"
 #define __NRATRA0_getsockname(sockfd, addr, addr_len) ,(int)(sockfd)
@@ -3550,11 +3550,11 @@
 #define __NRATRA1_getpeername(sockfd, addr, addr_len) ,addr
 #define __NRATRF2_getpeername               "%p"
 #define __NRATRA2_getpeername(sockfd, addr, addr_len) ,addr_len
-#define __NRATRF0_socketpair                "%#Ix"
+#define __NRATRF0_socketpair                "%#" PRIxPTR
 #define __NRATRA0_socketpair(domain, type, protocol, fds) ,(uintptr_t)(domain)
-#define __NRATRF1_socketpair                "%#Ix"
+#define __NRATRF1_socketpair                "%#" PRIxPTR
 #define __NRATRA1_socketpair(domain, type, protocol, fds) ,(uintptr_t)(type)
-#define __NRATRF2_socketpair                "%#Ix"
+#define __NRATRF2_socketpair                "%#" PRIxPTR
 #define __NRATRA2_socketpair(domain, type, protocol, fds) ,(uintptr_t)(protocol)
 #define __NRATRF3_socketpair                "%p"
 #define __NRATRA3_socketpair(domain, type, protocol, fds) ,fds
@@ -3562,23 +3562,23 @@
 #define __NRATRA0_setsockopt(sockfd, level, optname, optval, optlen) ,(int)(sockfd)
 #define __NRATRF1_setsockopt                "%#Ix=%s"
 #define __NRATRA1_setsockopt(sockfd, level, optname, optval, optlen) ,(level),(level) == SOL_SOCKET ? "SOL_SOCKET" : "?"
-#define __NRATRF2_setsockopt                "%#Ix"
+#define __NRATRF2_setsockopt                "%#" PRIxPTR
 #define __NRATRA2_setsockopt(sockfd, level, optname, optval, optlen) ,(uintptr_t)(optname)
 #define __NRATRF3_setsockopt                "%p"
 #define __NRATRA3_setsockopt(sockfd, level, optname, optval, optlen) ,optval
-#define __NRATRF4_setsockopt                "%Iu"
+#define __NRATRF4_setsockopt                "%" PRIuPTR
 #define __NRATRA4_setsockopt(sockfd, level, optname, optval, optlen) ,(uintptr_t)(optlen)
 #define __NRATRF0_getsockopt                "%d"
 #define __NRATRA0_getsockopt(sockfd, level, optname, optval, optlen) ,(int)(sockfd)
 #define __NRATRF1_getsockopt                "%#Ix=%s"
 #define __NRATRA1_getsockopt(sockfd, level, optname, optval, optlen) ,(level),(level) == SOL_SOCKET ? "SOL_SOCKET" : "?"
-#define __NRATRF2_getsockopt                "%#Ix"
+#define __NRATRF2_getsockopt                "%#" PRIxPTR
 #define __NRATRA2_getsockopt(sockfd, level, optname, optval, optlen) ,(uintptr_t)(optname)
 #define __NRATRF3_getsockopt                "%p"
 #define __NRATRA3_getsockopt(sockfd, level, optname, optval, optlen) ,optval
 #define __NRATRF4_getsockopt                "%p"
 #define __NRATRA4_getsockopt(sockfd, level, optname, optval, optlen) ,optlen
-#define __NRATRF0_clone                     "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF0_clone                     "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA0_clone(flags, child_stack, ptid, ctid, newtls) ,(uintptr_t)(flags),(flags) & CLONE_VM ? "CLONE_VM" : "" \
                                                                 ,((flags) & CLONE_FS) && ((flags) & (CLONE_VM)) ? "|" : "",(flags) & CLONE_FS ? "CLONE_FS" : "" \
                                                                 ,((flags) & CLONE_FILES) && ((flags) & (CLONE_VM|CLONE_FS)) ? "|" : "",(flags) & CLONE_FILES ? "CLONE_FILES" : "" \
@@ -3615,34 +3615,34 @@
 #define __NRATRA1_execve(path, argv, envp)  ,argv
 #define __NRATRF2_execve                    "%p"
 #define __NRATRA2_execve(path, argv, envp)  ,envp
-#define __NRATRF0_exit                      "%Iu"
+#define __NRATRF0_exit                      "%" PRIuPTR
 #define __NRATRA0_exit(status)              ,(uintptr_t)(status)
-#define __NRATRF0_wait4                     "%Id"
+#define __NRATRF0_wait4                     "%" PRIdPTR
 #define __NRATRA0_wait4(pid, stat_loc, options, usage) ,(intptr_t)(pid)
 #define __NRATRF1_wait4                     "%p"
 #define __NRATRA1_wait4(pid, stat_loc, options, usage) ,stat_loc
-#define __NRATRF2_wait4                     "%#Ix=%s%s%s%s%s%s%s"
+#define __NRATRF2_wait4                     "%#" PRIxPTR "=%s%s%s%s%s%s%s"
 #define __NRATRA2_wait4(pid, stat_loc, options, usage) ,(uintptr_t)(options),(options) & WNOHANG ? "WNOHANG" : "" \
                                                        ,((options) & WUNTRACED) && ((options) & (WNOHANG)) ? "|" : "",(options) & WUNTRACED ? "WUNTRACED" : "" \
                                                        ,((options) & WCONTINUED) && ((options) & (WNOHANG|WUNTRACED)) ? "|" : "",(options) & WCONTINUED ? "WCONTINUED" : "" \
                                                        ,((options) & WNOWAIT) && ((options) & (WNOHANG|WUNTRACED|WCONTINUED)) ? "|" : "",(options) & WNOWAIT ? "WNOWAIT" : ""
 #define __NRATRF3_wait4                     "%p"
 #define __NRATRA3_wait4(pid, stat_loc, options, usage) ,usage
-#define __NRATRF0_kill                      "%Id"
+#define __NRATRF0_kill                      "%" PRIdPTR
 #define __NRATRA0_kill(pid, signo)          ,(intptr_t)(pid)
-#define __NRATRF1_kill                      "%#Ix"
+#define __NRATRF1_kill                      "%#" PRIxPTR
 #define __NRATRA1_kill(pid, signo)          ,(uintptr_t)(signo)
 #define __NRATRF0_uname                     "%p"
 #define __NRATRA0_uname(name)               ,name
 #define __NRATRF0_fcntl                     "%d"
 #define __NRATRA0_fcntl(fd, cmd, arg)       ,(int)(fd)
-#define __NRATRF1_fcntl                     "%#Ix"
+#define __NRATRF1_fcntl                     "%#" PRIxPTR
 #define __NRATRA1_fcntl(fd, cmd, arg)       ,(uintptr_t)(cmd)
 #define __NRATRF2_fcntl                     "%p"
 #define __NRATRA2_fcntl(fd, cmd, arg)       ,arg
 #define __NRATRF0_flock                     "%d"
 #define __NRATRA0_flock(fd, operation)      ,(int)(fd)
-#define __NRATRF1_flock                     "%#Ix"
+#define __NRATRF1_flock                     "%#" PRIxPTR
 #define __NRATRA1_flock(fd, operation)      ,(uintptr_t)(operation)
 #define __NRATRF0_fsync                     "%d"
 #define __NRATRA0_fsync(fd)                 ,(int)(fd)
@@ -3650,21 +3650,21 @@
 #define __NRATRA0_fdatasync(fd)             ,(int)(fd)
 #define __NRATRF0_truncate                  "%q"
 #define __NRATRA0_truncate(filename, length) ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF1_truncate                  "%#Ix"
+#define __NRATRF1_truncate                  "%#" PRIxPTR
 #define __NRATRA1_truncate(filename, length) ,(uintptr_t)(length)
 #define __NRATRF0_ftruncate                 "%d"
 #define __NRATRA0_ftruncate(fd, length)     ,(int)(fd)
-#define __NRATRF1_ftruncate                 "%#Ix"
+#define __NRATRF1_ftruncate                 "%#" PRIxPTR
 #define __NRATRA1_ftruncate(fd, length)     ,(uintptr_t)(length)
 #define __NRATRF0_getdents                  "%d"
 #define __NRATRA0_getdents(fd, dirp, count) ,(int)(fd)
 #define __NRATRF1_getdents                  "%p"
 #define __NRATRA1_getdents(fd, dirp, count) ,dirp
-#define __NRATRF2_getdents                  "%Iu"
+#define __NRATRF2_getdents                  "%" PRIuPTR
 #define __NRATRA2_getdents(fd, dirp, count) ,count
 #define __NRATRF0_getcwd                    "%p"
 #define __NRATRA0_getcwd(buf, size)         ,buf
-#define __NRATRF1_getcwd                    "%Iu"
+#define __NRATRF1_getcwd                    "%" PRIuPTR
 #define __NRATRA1_getcwd(buf, size)         ,size
 #define __NRATRF0_chdir                     "%q"
 #define __NRATRA0_chdir(path)               ,(validate_readable_opt(path,1),path)
@@ -3676,13 +3676,13 @@
 #define __NRATRA1_rename(oldname, newname_or_path) ,(validate_readable_opt(newname_or_path,1),newname_or_path)
 #define __NRATRF0_mkdir                     "%q"
 #define __NRATRA0_mkdir(pathname, mode)     ,(validate_readable_opt(pathname,1),pathname)
-#define __NRATRF1_mkdir                     "%#Io"
+#define __NRATRF1_mkdir                     "%#" PRIoPTR
 #define __NRATRA1_mkdir(pathname, mode)     ,(uintptr_t)(mode)
 #define __NRATRF0_rmdir                     "%q"
 #define __NRATRA0_rmdir(path)               ,(validate_readable_opt(path,1),path)
 #define __NRATRF0_creat                     "%q"
 #define __NRATRA0_creat(filename, mode)     ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF1_creat                     "%#Io"
+#define __NRATRF1_creat                     "%#" PRIoPTR
 #define __NRATRA1_creat(filename, mode)     ,(uintptr_t)(mode)
 #define __NRATRF0_link                      "%q"
 #define __NRATRA0_link(existing_file, link_file) ,(validate_readable_opt(existing_file,1),existing_file)
@@ -3698,45 +3698,45 @@
 #define __NRATRA0_readlink(path, buf, buflen) ,(validate_readable_opt(path,1),path)
 #define __NRATRF1_readlink                  "%p"
 #define __NRATRA1_readlink(path, buf, buflen) ,buf
-#define __NRATRF2_readlink                  "%Iu"
+#define __NRATRF2_readlink                  "%" PRIuPTR
 #define __NRATRA2_readlink(path, buf, buflen) ,buflen
 #define __NRATRF0_chmod                     "%q"
 #define __NRATRA0_chmod(filename, mode)     ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF1_chmod                     "%#Io"
+#define __NRATRF1_chmod                     "%#" PRIoPTR
 #define __NRATRA1_chmod(filename, mode)     ,(uintptr_t)(mode)
 #define __NRATRF0_fchmod                    "%d"
 #define __NRATRA0_fchmod(fd, mode)          ,(int)(fd)
-#define __NRATRF1_fchmod                    "%#Io"
+#define __NRATRF1_fchmod                    "%#" PRIoPTR
 #define __NRATRA1_fchmod(fd, mode)          ,(uintptr_t)(mode)
 #define __NRATRF0_chown                     "%q"
 #define __NRATRA0_chown(filename, owner, group) ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF1_chown                     "%I32u"
+#define __NRATRF1_chown                     "%" PRIu32
 #define __NRATRA1_chown(filename, owner, group) ,owner
-#define __NRATRF2_chown                     "%I32u"
+#define __NRATRF2_chown                     "%" PRIu32
 #define __NRATRA2_chown(filename, owner, group) ,group
 #define __NRATRF0_fchown                    "%d"
 #define __NRATRA0_fchown(fd, owner, group)  ,(int)(fd)
-#define __NRATRF1_fchown                    "%I32u"
+#define __NRATRF1_fchown                    "%" PRIu32
 #define __NRATRA1_fchown(fd, owner, group)  ,owner
-#define __NRATRF2_fchown                    "%I32u"
+#define __NRATRF2_fchown                    "%" PRIu32
 #define __NRATRA2_fchown(fd, owner, group)  ,group
 #define __NRATRF0_lchown                    "%q"
 #define __NRATRA0_lchown(filename, owner, group) ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF1_lchown                    "%I32u"
+#define __NRATRF1_lchown                    "%" PRIu32
 #define __NRATRA1_lchown(filename, owner, group) ,owner
-#define __NRATRF2_lchown                    "%I32u"
+#define __NRATRF2_lchown                    "%" PRIu32
 #define __NRATRA2_lchown(filename, owner, group) ,group
-#define __NRATRF0_umask                     "%#Io"
+#define __NRATRF0_umask                     "%#" PRIoPTR
 #define __NRATRA0_umask(mode)               ,(uintptr_t)(mode)
 #define __NRATRF0_gettimeofday              "%p"
 #define __NRATRA0_gettimeofday(tv, tz)      ,tv
 #define __NRATRF1_gettimeofday              "%p"
 #define __NRATRA1_gettimeofday(tv, tz)      ,tz
-#define __NRATRF0_getrlimit                 "%#Ix"
+#define __NRATRF0_getrlimit                 "%#" PRIxPTR
 #define __NRATRA0_getrlimit(resource, rlimits) ,(uintptr_t)(resource)
 #define __NRATRF1_getrlimit                 "%p"
 #define __NRATRA1_getrlimit(resource, rlimits) ,rlimits
-#define __NRATRF0_getrusage                 "%Id"
+#define __NRATRF0_getrusage                 "%" PRIdPTR
 #define __NRATRA0_getrusage(who, usage)     ,(intptr_t)(who)
 #define __NRATRF1_getrusage                 "%p"
 #define __NRATRA1_getrusage(who, usage)     ,usage
@@ -3744,49 +3744,49 @@
 #define __NRATRA0_sysinfo(info)             ,info
 #define __NRATRF0_times                     "%p"
 #define __NRATRA0_times(buf)                ,buf
-#define __NRATRF0_ptrace                    "%#Ix"
+#define __NRATRF0_ptrace                    "%#" PRIxPTR
 #define __NRATRA0_ptrace(request, pid, addr, data) ,(uintptr_t)(request)
-#define __NRATRF1_ptrace                    "%Id"
+#define __NRATRF1_ptrace                    "%" PRIdPTR
 #define __NRATRA1_ptrace(request, pid, addr, data) ,(intptr_t)(pid)
 #define __NRATRF2_ptrace                    "%p"
 #define __NRATRA2_ptrace(request, pid, addr, data) ,addr
 #define __NRATRF3_ptrace                    "%p"
 #define __NRATRA3_ptrace(request, pid, addr, data) ,data
-#define __NRATRF0_syslog                    "%Iu"
+#define __NRATRF0_syslog                    "%" PRIuPTR
 #define __NRATRA0_syslog(level, str, len)   ,(uintptr_t)(level)
 #define __NRATRF1_syslog                    "%$q"
 #define __NRATRA1_syslog(level, str, len)   ,len,(validate_readable(str,len),str)
-#define __NRATRF2_syslog                    "%Iu"
+#define __NRATRF2_syslog                    "%" PRIuPTR
 #define __NRATRA2_syslog(level, str, len)   ,len
-#define __NRATRF0_setuid32                  "%I32u"
+#define __NRATRF0_setuid32                  "%" PRIu32
 #define __NRATRA0_setuid32(uid)             ,uid
-#define __NRATRF0_setgid32                  "%I32u"
+#define __NRATRF0_setgid32                  "%" PRIu32
 #define __NRATRA0_setgid32(gid)             ,gid
-#define __NRATRF0_setpgid                   "%Id"
+#define __NRATRF0_setpgid                   "%" PRIdPTR
 #define __NRATRA0_setpgid(pid, pgid)        ,(intptr_t)(pid)
-#define __NRATRF1_setpgid                   "%Id"
+#define __NRATRF1_setpgid                   "%" PRIdPTR
 #define __NRATRA1_setpgid(pid, pgid)        ,(intptr_t)(pgid)
-#define __NRATRF0_setreuid32                "%I32u"
+#define __NRATRF0_setreuid32                "%" PRIu32
 #define __NRATRA0_setreuid32(ruid, euid)    ,ruid
-#define __NRATRF1_setreuid32                "%I32u"
+#define __NRATRF1_setreuid32                "%" PRIu32
 #define __NRATRA1_setreuid32(ruid, euid)    ,euid
-#define __NRATRF0_setregid32                "%I32u"
+#define __NRATRF0_setregid32                "%" PRIu32
 #define __NRATRA0_setregid32(rgid, egid)    ,rgid
-#define __NRATRF1_setregid32                "%I32u"
+#define __NRATRF1_setregid32                "%" PRIu32
 #define __NRATRA1_setregid32(rgid, egid)    ,egid
-#define __NRATRF0_getgroups32               "%Iu"
+#define __NRATRF0_getgroups32               "%" PRIuPTR
 #define __NRATRA0_getgroups32(size, list)   ,size
 #define __NRATRF1_getgroups32               "%p"
 #define __NRATRA1_getgroups32(size, list)   ,list
-#define __NRATRF0_setgroups32               "%Iu"
+#define __NRATRF0_setgroups32               "%" PRIuPTR
 #define __NRATRA0_setgroups32(count, groups) ,count
 #define __NRATRF1_setgroups32               "%p"
 #define __NRATRA1_setgroups32(count, groups) ,groups
-#define __NRATRF0_setresuid32               "%I32u"
+#define __NRATRF0_setresuid32               "%" PRIu32
 #define __NRATRA0_setresuid32(ruid, euid, suid) ,ruid
-#define __NRATRF1_setresuid32               "%I32u"
+#define __NRATRF1_setresuid32               "%" PRIu32
 #define __NRATRA1_setresuid32(ruid, euid, suid) ,euid
-#define __NRATRF2_setresuid32               "%I32u"
+#define __NRATRF2_setresuid32               "%" PRIu32
 #define __NRATRA2_setresuid32(ruid, euid, suid) ,suid
 #define __NRATRF0_getresuid32               "%p"
 #define __NRATRA0_getresuid32(ruid, euid, suid) ,ruid
@@ -3794,11 +3794,11 @@
 #define __NRATRA1_getresuid32(ruid, euid, suid) ,euid
 #define __NRATRF2_getresuid32               "%p"
 #define __NRATRA2_getresuid32(ruid, euid, suid) ,suid
-#define __NRATRF0_setresgid32               "%I32u"
+#define __NRATRF0_setresgid32               "%" PRIu32
 #define __NRATRA0_setresgid32(rgid, egid, sgid) ,rgid
-#define __NRATRF1_setresgid32               "%I32u"
+#define __NRATRF1_setresgid32               "%" PRIu32
 #define __NRATRA1_setresgid32(rgid, egid, sgid) ,egid
-#define __NRATRF2_setresgid32               "%I32u"
+#define __NRATRF2_setresgid32               "%" PRIu32
 #define __NRATRA2_setresgid32(rgid, egid, sgid) ,sgid
 #define __NRATRF0_getresgid32               "%p"
 #define __NRATRA0_getresgid32(rgid, egid, sgid) ,rgid
@@ -3806,17 +3806,17 @@
 #define __NRATRA1_getresgid32(rgid, egid, sgid) ,egid
 #define __NRATRF2_getresgid32               "%p"
 #define __NRATRA2_getresgid32(rgid, egid, sgid) ,sgid
-#define __NRATRF0_getpgid                   "%Id"
+#define __NRATRF0_getpgid                   "%" PRIdPTR
 #define __NRATRA0_getpgid(pid)              ,(intptr_t)(pid)
-#define __NRATRF0_setfsuid32                "%I32u"
+#define __NRATRF0_setfsuid32                "%" PRIu32
 #define __NRATRA0_setfsuid32(uid)           ,uid
-#define __NRATRF0_setfsgid32                "%I32u"
+#define __NRATRF0_setfsgid32                "%" PRIu32
 #define __NRATRA0_setfsgid32(gid)           ,gid
-#define __NRATRF0_getsid                    "%Id"
+#define __NRATRF0_getsid                    "%" PRIdPTR
 #define __NRATRA0_getsid(pid)               ,(intptr_t)(pid)
 #define __NRATRF0_rt_sigpending             "%p"
 #define __NRATRA0_rt_sigpending(set, sigsetsize) ,set
-#define __NRATRF1_rt_sigpending             "%Iu"
+#define __NRATRF1_rt_sigpending             "%" PRIuPTR
 #define __NRATRA1_rt_sigpending(set, sigsetsize) ,sigsetsize
 #define __NRATRF0_rt_sigtimedwait           "%p"
 #define __NRATRA0_rt_sigtimedwait(set, info, timeout, sigsetsize) ,set
@@ -3824,17 +3824,17 @@
 #define __NRATRA1_rt_sigtimedwait(set, info, timeout, sigsetsize) ,info
 #define __NRATRF2_rt_sigtimedwait           "%p"
 #define __NRATRA2_rt_sigtimedwait(set, info, timeout, sigsetsize) ,timeout
-#define __NRATRF3_rt_sigtimedwait           "%Iu"
+#define __NRATRF3_rt_sigtimedwait           "%" PRIuPTR
 #define __NRATRA3_rt_sigtimedwait(set, info, timeout, sigsetsize) ,sigsetsize
-#define __NRATRF0_rt_sigqueueinfo           "%Id"
+#define __NRATRF0_rt_sigqueueinfo           "%" PRIdPTR
 #define __NRATRA0_rt_sigqueueinfo(tgid, signo, uinfo) ,(intptr_t)(tgid)
-#define __NRATRF1_rt_sigqueueinfo           "%#Ix"
+#define __NRATRF1_rt_sigqueueinfo           "%#" PRIxPTR
 #define __NRATRA1_rt_sigqueueinfo(tgid, signo, uinfo) ,(uintptr_t)(signo)
 #define __NRATRF2_rt_sigqueueinfo           "%p"
 #define __NRATRA2_rt_sigqueueinfo(tgid, signo, uinfo) ,uinfo
 #define __NRATRF0_rt_sigsuspend             "%p"
 #define __NRATRA0_rt_sigsuspend(set, sigsetsize) ,set
-#define __NRATRF1_rt_sigsuspend             "%Iu"
+#define __NRATRF1_rt_sigsuspend             "%" PRIuPTR
 #define __NRATRA1_rt_sigsuspend(set, sigsetsize) ,sigsetsize
 #define __NRATRF0_sigaltstack               "%p"
 #define __NRATRA0_sigaltstack(ss, oss)      ,ss
@@ -3846,7 +3846,7 @@
 #define __NRATRA1_utime(filename, times)    ,times
 #define __NRATRF0_mknod                     "%q"
 #define __NRATRA0_mknod(nodename, mode, dev) ,(validate_readable_opt(nodename,1),nodename)
-#define __NRATRF1_mknod                     "%#Io"
+#define __NRATRF1_mknod                     "%#" PRIoPTR
 #define __NRATRA1_mknod(nodename, mode, dev) ,(uintptr_t)(mode)
 #define __NRATRF2_mknod                     "%.2x:%.2x"
 #define __NRATRA2_mknod(nodename, mode, dev) ,(unsigned int)MAJOR(dev),(unsigned int)MINOR(dev)
@@ -3862,57 +3862,57 @@
 #define __NRATRA0_fstatfs(file, buf)        ,(int)(file)
 #define __NRATRF1_fstatfs                   "%p"
 #define __NRATRA1_fstatfs(file, buf)        ,buf
-#define __NRATRF0_getpriority               "%#Ix"
+#define __NRATRF0_getpriority               "%#" PRIxPTR
 #define __NRATRA0_getpriority(which, who)   ,(uintptr_t)(which)
-#define __NRATRF1_getpriority               "%Iu"
+#define __NRATRF1_getpriority               "%" PRIuPTR
 #define __NRATRA1_getpriority(which, who)   ,(uintptr_t)(who)
-#define __NRATRF0_setpriority               "%#Ix"
+#define __NRATRF0_setpriority               "%#" PRIxPTR
 #define __NRATRA0_setpriority(which, who, value) ,(uintptr_t)(which)
-#define __NRATRF1_setpriority               "%Iu"
+#define __NRATRF1_setpriority               "%" PRIuPTR
 #define __NRATRA1_setpriority(which, who, value) ,(uintptr_t)(who)
-#define __NRATRF2_setpriority               "%#Ix"
+#define __NRATRF2_setpriority               "%#" PRIxPTR
 #define __NRATRA2_setpriority(which, who, value) ,(uintptr_t)(value)
-#define __NRATRF0_sched_setparam            "%Id"
+#define __NRATRF0_sched_setparam            "%" PRIdPTR
 #define __NRATRA0_sched_setparam(pid, param) ,(intptr_t)(pid)
 #define __NRATRF1_sched_setparam            "%p"
 #define __NRATRA1_sched_setparam(pid, param) ,param
-#define __NRATRF0_sched_getparam            "%Id"
+#define __NRATRF0_sched_getparam            "%" PRIdPTR
 #define __NRATRA0_sched_getparam(pid, param) ,(intptr_t)(pid)
 #define __NRATRF1_sched_getparam            "%p"
 #define __NRATRA1_sched_getparam(pid, param) ,param
-#define __NRATRF0_sched_setscheduler        "%Id"
+#define __NRATRF0_sched_setscheduler        "%" PRIdPTR
 #define __NRATRA0_sched_setscheduler(pid, policy, param) ,(intptr_t)(pid)
-#define __NRATRF1_sched_setscheduler        "%#Ix"
+#define __NRATRF1_sched_setscheduler        "%#" PRIxPTR
 #define __NRATRA1_sched_setscheduler(pid, policy, param) ,(uintptr_t)(policy)
 #define __NRATRF2_sched_setscheduler        "%p"
 #define __NRATRA2_sched_setscheduler(pid, policy, param) ,param
-#define __NRATRF0_sched_getscheduler        "%Id"
+#define __NRATRF0_sched_getscheduler        "%" PRIdPTR
 #define __NRATRA0_sched_getscheduler(pid)   ,(intptr_t)(pid)
-#define __NRATRF0_sched_get_priority_max    "%#Ix"
+#define __NRATRF0_sched_get_priority_max    "%#" PRIxPTR
 #define __NRATRA0_sched_get_priority_max(algorithm) ,(uintptr_t)(algorithm)
-#define __NRATRF0_sched_get_priority_min    "%#Ix"
+#define __NRATRF0_sched_get_priority_min    "%#" PRIxPTR
 #define __NRATRA0_sched_get_priority_min(algorithm) ,(uintptr_t)(algorithm)
-#define __NRATRF0_sched_rr_get_interval     "%Id"
+#define __NRATRF0_sched_rr_get_interval     "%" PRIdPTR
 #define __NRATRA0_sched_rr_get_interval(pid, tms) ,(intptr_t)(pid)
 #define __NRATRF1_sched_rr_get_interval     "%p"
 #define __NRATRA1_sched_rr_get_interval(pid, tms) ,tms
 #define __NRATRF0_mlock                     "%p"
 #define __NRATRA0_mlock(addr, len)          ,addr
-#define __NRATRF1_mlock                     "%Iu"
+#define __NRATRF1_mlock                     "%" PRIuPTR
 #define __NRATRA1_mlock(addr, len)          ,len
 #define __NRATRF0_munlock                   "%p"
 #define __NRATRA0_munlock(addr, len)        ,addr
-#define __NRATRF1_munlock                   "%Iu"
+#define __NRATRF1_munlock                   "%" PRIuPTR
 #define __NRATRA1_munlock(addr, len)        ,len
-#define __NRATRF0_mlockall                  "%#Ix"
+#define __NRATRF0_mlockall                  "%#" PRIxPTR
 #define __NRATRA0_mlockall(flags)           ,(uintptr_t)(flags)
-#define __NRATRF0_modify_ldt                "%#Ix"
+#define __NRATRF0_modify_ldt                "%#" PRIxPTR
 #define __NRATRA0_modify_ldt(func, ptr, bytecount) ,(uintptr_t)(func)
 #define __NRATRF1_modify_ldt                "%p"
 #define __NRATRA1_modify_ldt(func, ptr, bytecount) ,ptr
-#define __NRATRF2_modify_ldt                "%#Ix"
+#define __NRATRF2_modify_ldt                "%#" PRIxPTR
 #define __NRATRA2_modify_ldt(func, ptr, bytecount) ,(uintptr_t)(bytecount)
-#define __NRATRF0_setrlimit                 "%#Ix"
+#define __NRATRF0_setrlimit                 "%#" PRIxPTR
 #define __NRATRA0_setrlimit(resource, rlimits) ,(uintptr_t)(resource)
 #define __NRATRF1_setrlimit                 "%p"
 #define __NRATRA1_setrlimit(resource, rlimits) ,rlimits
@@ -3930,44 +3930,44 @@
 #define __NRATRA1_mount(special_file, dir, fstype, rwflag, data) ,(validate_readable_opt(dir,1),dir)
 #define __NRATRF2_mount                     "%q"
 #define __NRATRA2_mount(special_file, dir, fstype, rwflag, data) ,(validate_readable_opt(fstype,1),fstype)
-#define __NRATRF3_mount                     "%#Ix"
+#define __NRATRF3_mount                     "%#" PRIxPTR
 #define __NRATRA3_mount(special_file, dir, fstype, rwflag, data) ,(uintptr_t)(rwflag)
 #define __NRATRF4_mount                     "%p"
 #define __NRATRA4_mount(special_file, dir, fstype, rwflag, data) ,data
 #define __NRATRF0_umount2                   "%q"
 #define __NRATRA0_umount2(special_file, flags) ,(validate_readable_opt(special_file,1),special_file)
-#define __NRATRF1_umount2                   "%#Ix"
+#define __NRATRF1_umount2                   "%#" PRIxPTR
 #define __NRATRA1_umount2(special_file, flags) ,(uintptr_t)(flags)
 #define __NRATRF0_swapon                    "%q"
 #define __NRATRA0_swapon(pathname, swapflags) ,(validate_readable_opt(pathname,1),pathname)
-#define __NRATRF1_swapon                    "%#Ix=%s%s%s"
+#define __NRATRF1_swapon                    "%#" PRIxPTR "=%s%s%s"
 #define __NRATRA1_swapon(pathname, swapflags) ,(uintptr_t)(swapflags),(swapflags) & SWAP_FLAG_PREFER ? "SWAP_FLAG_PREFER" : "" \
                                               ,((swapflags) & SWAP_FLAG_DISCARD) && ((swapflags) & (SWAP_FLAG_PREFER)) ? "|" : "",(swapflags) & SWAP_FLAG_DISCARD ? "SWAP_FLAG_DISCARD" : ""
 #define __NRATRF0_swapoff                   "%q"
 #define __NRATRA0_swapoff(pathname)         ,(validate_readable_opt(pathname,1),pathname)
-#define __NRATRF0_reboot                    "%#Ix"
+#define __NRATRF0_reboot                    "%#" PRIxPTR
 #define __NRATRA0_reboot(how)               ,(uintptr_t)(how)
 #define __NRATRF0_sethostname               "%q"
 #define __NRATRA0_sethostname(name, len)    ,(validate_readable_opt(name,1),name)
-#define __NRATRF1_sethostname               "%Iu"
+#define __NRATRF1_sethostname               "%" PRIuPTR
 #define __NRATRA1_sethostname(name, len)    ,len
 #define __NRATRF0_setdomainname             "%q"
 #define __NRATRA0_setdomainname(name, len)  ,(validate_readable_opt(name,1),name)
-#define __NRATRF1_setdomainname             "%Iu"
+#define __NRATRF1_setdomainname             "%" PRIuPTR
 #define __NRATRA1_setdomainname(name, len)  ,len
-#define __NRATRF0_iopl                      "%#Ix"
+#define __NRATRF0_iopl                      "%#" PRIxPTR
 #define __NRATRA0_iopl(level)               ,(uintptr_t)(level)
-#define __NRATRF0_ioperm                    "%#Ix"
+#define __NRATRF0_ioperm                    "%#" PRIxPTR
 #define __NRATRA0_ioperm(from, num, turn_on) ,(uintptr_t)(from)
-#define __NRATRF1_ioperm                    "%#Ix"
+#define __NRATRF1_ioperm                    "%#" PRIxPTR
 #define __NRATRA1_ioperm(from, num, turn_on) ,(uintptr_t)(num)
-#define __NRATRF2_ioperm                    "%#Ix"
+#define __NRATRF2_ioperm                    "%#" PRIxPTR
 #define __NRATRA2_ioperm(from, num, turn_on) ,(uintptr_t)(turn_on)
 #define __NRATRF0_readahead                 "%d"
 #define __NRATRA0_readahead(fd, offset, count) ,(int)(fd)
-#define __NRATRF1_readahead                 "%I64u"
+#define __NRATRF1_readahead                 "%" PRIu64
 #define __NRATRA1_readahead(fd, offset, count) ,offset
-#define __NRATRF2_readahead                 "%Iu"
+#define __NRATRF2_readahead                 "%" PRIuPTR
 #define __NRATRA2_readahead(fd, offset, count) ,count
 #define __NRATRF0_setxattr                  "%q"
 #define __NRATRA0_setxattr(path, name, buf, bufsize, flags) ,(validate_readable_opt(path,1),path)
@@ -3975,9 +3975,9 @@
 #define __NRATRA1_setxattr(path, name, buf, bufsize, flags) ,(validate_readable_opt(name,1),name)
 #define __NRATRF2_setxattr                  "%p"
 #define __NRATRA2_setxattr(path, name, buf, bufsize, flags) ,buf
-#define __NRATRF3_setxattr                  "%Iu"
+#define __NRATRF3_setxattr                  "%" PRIuPTR
 #define __NRATRA3_setxattr(path, name, buf, bufsize, flags) ,bufsize
-#define __NRATRF4_setxattr                  "%#Ix"
+#define __NRATRF4_setxattr                  "%#" PRIxPTR
 #define __NRATRA4_setxattr(path, name, buf, bufsize, flags) ,(uintptr_t)(flags)
 #define __NRATRF0_lsetxattr                 "%q"
 #define __NRATRA0_lsetxattr(path, name, buf, bufsize, flags) ,(validate_readable_opt(path,1),path)
@@ -3985,9 +3985,9 @@
 #define __NRATRA1_lsetxattr(path, name, buf, bufsize, flags) ,(validate_readable_opt(name,1),name)
 #define __NRATRF2_lsetxattr                 "%p"
 #define __NRATRA2_lsetxattr(path, name, buf, bufsize, flags) ,buf
-#define __NRATRF3_lsetxattr                 "%Iu"
+#define __NRATRF3_lsetxattr                 "%" PRIuPTR
 #define __NRATRA3_lsetxattr(path, name, buf, bufsize, flags) ,bufsize
-#define __NRATRF4_lsetxattr                 "%#Ix"
+#define __NRATRF4_lsetxattr                 "%#" PRIxPTR
 #define __NRATRA4_lsetxattr(path, name, buf, bufsize, flags) ,(uintptr_t)(flags)
 #define __NRATRF0_fsetxattr                 "%d"
 #define __NRATRA0_fsetxattr(fd, name, buf, bufsize, flags) ,(int)(fd)
@@ -3995,9 +3995,9 @@
 #define __NRATRA1_fsetxattr(fd, name, buf, bufsize, flags) ,(validate_readable_opt(name,1),name)
 #define __NRATRF2_fsetxattr                 "%p"
 #define __NRATRA2_fsetxattr(fd, name, buf, bufsize, flags) ,buf
-#define __NRATRF3_fsetxattr                 "%Iu"
+#define __NRATRF3_fsetxattr                 "%" PRIuPTR
 #define __NRATRA3_fsetxattr(fd, name, buf, bufsize, flags) ,bufsize
-#define __NRATRF4_fsetxattr                 "%#Ix"
+#define __NRATRF4_fsetxattr                 "%#" PRIxPTR
 #define __NRATRA4_fsetxattr(fd, name, buf, bufsize, flags) ,(uintptr_t)(flags)
 #define __NRATRF0_getxattr                  "%q"
 #define __NRATRA0_getxattr(path, name, buf, bufsize) ,(validate_readable_opt(path,1),path)
@@ -4005,7 +4005,7 @@
 #define __NRATRA1_getxattr(path, name, buf, bufsize) ,(validate_readable_opt(name,1),name)
 #define __NRATRF2_getxattr                  "%p"
 #define __NRATRA2_getxattr(path, name, buf, bufsize) ,buf
-#define __NRATRF3_getxattr                  "%Iu"
+#define __NRATRF3_getxattr                  "%" PRIuPTR
 #define __NRATRA3_getxattr(path, name, buf, bufsize) ,bufsize
 #define __NRATRF0_lgetxattr                 "%q"
 #define __NRATRA0_lgetxattr(path, name, buf, bufsize) ,(validate_readable_opt(path,1),path)
@@ -4013,7 +4013,7 @@
 #define __NRATRA1_lgetxattr(path, name, buf, bufsize) ,(validate_readable_opt(name,1),name)
 #define __NRATRF2_lgetxattr                 "%p"
 #define __NRATRA2_lgetxattr(path, name, buf, bufsize) ,buf
-#define __NRATRF3_lgetxattr                 "%Iu"
+#define __NRATRF3_lgetxattr                 "%" PRIuPTR
 #define __NRATRA3_lgetxattr(path, name, buf, bufsize) ,bufsize
 #define __NRATRF0_fgetxattr                 "%d"
 #define __NRATRA0_fgetxattr(fd, name, buf, bufsize) ,(int)(fd)
@@ -4021,25 +4021,25 @@
 #define __NRATRA1_fgetxattr(fd, name, buf, bufsize) ,(validate_readable_opt(name,1),name)
 #define __NRATRF2_fgetxattr                 "%p"
 #define __NRATRA2_fgetxattr(fd, name, buf, bufsize) ,buf
-#define __NRATRF3_fgetxattr                 "%Iu"
+#define __NRATRF3_fgetxattr                 "%" PRIuPTR
 #define __NRATRA3_fgetxattr(fd, name, buf, bufsize) ,bufsize
 #define __NRATRF0_listxattr                 "%q"
 #define __NRATRA0_listxattr(path, listbuf, listbufsize) ,(validate_readable_opt(path,1),path)
 #define __NRATRF1_listxattr                 "%p"
 #define __NRATRA1_listxattr(path, listbuf, listbufsize) ,listbuf
-#define __NRATRF2_listxattr                 "%Iu"
+#define __NRATRF2_listxattr                 "%" PRIuPTR
 #define __NRATRA2_listxattr(path, listbuf, listbufsize) ,listbufsize
 #define __NRATRF0_llistxattr                "%q"
 #define __NRATRA0_llistxattr(path, listbuf, listbufsize) ,(validate_readable_opt(path,1),path)
 #define __NRATRF1_llistxattr                "%p"
 #define __NRATRA1_llistxattr(path, listbuf, listbufsize) ,listbuf
-#define __NRATRF2_llistxattr                "%Iu"
+#define __NRATRF2_llistxattr                "%" PRIuPTR
 #define __NRATRA2_llistxattr(path, listbuf, listbufsize) ,listbufsize
 #define __NRATRF0_flistxattr                "%d"
 #define __NRATRA0_flistxattr(fd, listbuf, listbufsize) ,(int)(fd)
 #define __NRATRF1_flistxattr                "%p"
 #define __NRATRA1_flistxattr(fd, listbuf, listbufsize) ,listbuf
-#define __NRATRF2_flistxattr                "%Iu"
+#define __NRATRF2_flistxattr                "%" PRIuPTR
 #define __NRATRA2_flistxattr(fd, listbuf, listbufsize) ,listbufsize
 #define __NRATRF0_removexattr               "%q"
 #define __NRATRA0_removexattr(path, name)   ,(validate_readable_opt(path,1),path)
@@ -4053,37 +4053,37 @@
 #define __NRATRA0_fremovexattr(fd, name)    /* nothing */
 #define __NRATRF1_fremovexattr              "%q"
 #define __NRATRA1_fremovexattr(fd, name)    ,(validate_readable_opt(name,1),name)
-#define __NRATRF0_tkill                     "%Id"
+#define __NRATRF0_tkill                     "%" PRIdPTR
 #define __NRATRA0_tkill(tid, signo)         ,(intptr_t)(tid)
-#define __NRATRF1_tkill                     "%#Ix"
+#define __NRATRF1_tkill                     "%#" PRIxPTR
 #define __NRATRA1_tkill(tid, signo)         ,(uintptr_t)(signo)
 #define __NRATRF0_time                      "%p"
 #define __NRATRA0_time(timer)               ,timer
 #define __NRATRF0_futex                     "%p"
 #define __NRATRA0_futex(uaddr, futex_op, val, timeout_or_val2, uaddr2, val3) ,uaddr
-#define __NRATRF1_futex                     "%#Ix"
+#define __NRATRF1_futex                     "%#" PRIxPTR
 #define __NRATRA1_futex(uaddr, futex_op, val, timeout_or_val2, uaddr2, val3) ,(uintptr_t)(futex_op)
-#define __NRATRF2_futex                     "%I32u"
+#define __NRATRF2_futex                     "%" PRIu32
 #define __NRATRA2_futex(uaddr, futex_op, val, timeout_or_val2, uaddr2, val3) ,val
 #define __NRATRF3_futex                     "%p"
 #define __NRATRA3_futex(uaddr, futex_op, val, timeout_or_val2, uaddr2, val3) ,timeout_or_val2
 #define __NRATRF4_futex                     "%p"
 #define __NRATRA4_futex(uaddr, futex_op, val, timeout_or_val2, uaddr2, val3) ,uaddr2
-#define __NRATRF5_futex                     "%I32u"
+#define __NRATRF5_futex                     "%" PRIu32
 #define __NRATRA5_futex(uaddr, futex_op, val, timeout_or_val2, uaddr2, val3) ,val3
-#define __NRATRF0_sched_setaffinity         "%Id"
+#define __NRATRF0_sched_setaffinity         "%" PRIdPTR
 #define __NRATRA0_sched_setaffinity(pid, cpusetsize, cpuset) ,(intptr_t)(pid)
-#define __NRATRF1_sched_setaffinity         "%Iu"
+#define __NRATRF1_sched_setaffinity         "%" PRIuPTR
 #define __NRATRA1_sched_setaffinity(pid, cpusetsize, cpuset) ,cpusetsize
 #define __NRATRF2_sched_setaffinity         "%p"
 #define __NRATRA2_sched_setaffinity(pid, cpusetsize, cpuset) ,cpuset
-#define __NRATRF0_sched_getaffinity         "%Id"
+#define __NRATRF0_sched_getaffinity         "%" PRIdPTR
 #define __NRATRA0_sched_getaffinity(pid, cpusetsize, cpuset) ,(intptr_t)(pid)
-#define __NRATRF1_sched_getaffinity         "%Iu"
+#define __NRATRF1_sched_getaffinity         "%" PRIuPTR
 #define __NRATRA1_sched_getaffinity(pid, cpusetsize, cpuset) ,cpusetsize
 #define __NRATRF2_sched_getaffinity         "%p"
 #define __NRATRA2_sched_getaffinity(pid, cpusetsize, cpuset) ,cpuset
-#define __NRATRF0_epoll_create              "%#Ix"
+#define __NRATRF0_epoll_create              "%#" PRIxPTR
 #define __NRATRA0_epoll_create(size)        ,(uintptr_t)(size)
 #define __NRATRF0_epoll_ctl_old             "%d"
 #define __NRATRA0_epoll_ctl_old(epfd, op, fd, event) ,(int)(epfd)
@@ -4097,25 +4097,25 @@
 #define __NRATRA0_epoll_wait_old(epfd, events, maxevents, timeout) ,(int)(epfd)
 #define __NRATRF1_epoll_wait_old            "%p"
 #define __NRATRA1_epoll_wait_old(epfd, events, maxevents, timeout) ,events
-#define __NRATRF2_epoll_wait_old            "%#Ix"
+#define __NRATRF2_epoll_wait_old            "%#" PRIxPTR
 #define __NRATRA2_epoll_wait_old(epfd, events, maxevents, timeout) ,(uintptr_t)(maxevents)
-#define __NRATRF3_epoll_wait_old            "%Id"
+#define __NRATRF3_epoll_wait_old            "%" PRIdPTR
 #define __NRATRA3_epoll_wait_old(epfd, events, maxevents, timeout) ,(intptr_t)(timeout)
 #define __NRATRF0_remap_file_pages          "%p"
 #define __NRATRA0_remap_file_pages(start, size, prot, pgoff, flags) ,start
-#define __NRATRF1_remap_file_pages          "%Iu"
+#define __NRATRF1_remap_file_pages          "%" PRIuPTR
 #define __NRATRA1_remap_file_pages(start, size, prot, pgoff, flags) ,size
-#define __NRATRF2_remap_file_pages          "%#Ix"
+#define __NRATRF2_remap_file_pages          "%#" PRIxPTR
 #define __NRATRA2_remap_file_pages(start, size, prot, pgoff, flags) ,(uintptr_t)(prot)
-#define __NRATRF3_remap_file_pages          "%Iu"
+#define __NRATRF3_remap_file_pages          "%" PRIuPTR
 #define __NRATRA3_remap_file_pages(start, size, prot, pgoff, flags) ,pgoff
-#define __NRATRF4_remap_file_pages          "%#Ix"
+#define __NRATRF4_remap_file_pages          "%#" PRIxPTR
 #define __NRATRA4_remap_file_pages(start, size, prot, pgoff, flags) ,(uintptr_t)(flags)
 #define __NRATRF0_getdents64                "%d"
 #define __NRATRA0_getdents64(fd, dirp, count) ,(int)(fd)
 #define __NRATRF1_getdents64                "%p"
 #define __NRATRA1_getdents64(fd, dirp, count) ,dirp
-#define __NRATRF2_getdents64                "%Iu"
+#define __NRATRF2_getdents64                "%" PRIuPTR
 #define __NRATRA2_getdents64(fd, dirp, count) ,count
 #define __NRATRF0_set_tid_address           "%p"
 #define __NRATRA0_set_tid_address(tidptr)   ,tidptr
@@ -4127,7 +4127,7 @@
 #define __NRATRA2_timer_create(clock_id, evp, timerid) ,timerid
 #define __NRATRF0_timer_settime             "?"
 #define __NRATRA0_timer_settime(timerid, flags, value, ovalue) /* nothing */
-#define __NRATRF1_timer_settime             "%#Ix"
+#define __NRATRF1_timer_settime             "%#" PRIxPTR
 #define __NRATRA1_timer_settime(timerid, flags, value, ovalue) ,(uintptr_t)(flags)
 #define __NRATRF2_timer_settime             "%p"
 #define __NRATRA2_timer_settime(timerid, flags, value, ovalue) ,value
@@ -4155,21 +4155,21 @@
 #define __NRATRA1_clock_getres(clock_id, res) ,res
 #define __NRATRF0_clock_nanosleep           "?"
 #define __NRATRA0_clock_nanosleep(clock_id, flags, requested_time, remaining) /* nothing */
-#define __NRATRF1_clock_nanosleep           "%#Ix"
+#define __NRATRF1_clock_nanosleep           "%#" PRIxPTR
 #define __NRATRA1_clock_nanosleep(clock_id, flags, requested_time, remaining) ,(uintptr_t)(flags)
 #define __NRATRF2_clock_nanosleep           "%p"
 #define __NRATRA2_clock_nanosleep(clock_id, flags, requested_time, remaining) ,requested_time
 #define __NRATRF3_clock_nanosleep           "%p"
 #define __NRATRA3_clock_nanosleep(clock_id, flags, requested_time, remaining) ,remaining
-#define __NRATRF0_exit_group                "%Iu"
+#define __NRATRF0_exit_group                "%" PRIuPTR
 #define __NRATRA0_exit_group(exit_code)     ,(uintptr_t)(exit_code)
 #define __NRATRF0_epoll_wait                "%d"
 #define __NRATRA0_epoll_wait(epfd, events, maxevents, timeout) ,(int)(epfd)
 #define __NRATRF1_epoll_wait                "%p"
 #define __NRATRA1_epoll_wait(epfd, events, maxevents, timeout) ,events
-#define __NRATRF2_epoll_wait                "%#Ix"
+#define __NRATRF2_epoll_wait                "%#" PRIxPTR
 #define __NRATRA2_epoll_wait(epfd, events, maxevents, timeout) ,(uintptr_t)(maxevents)
-#define __NRATRF3_epoll_wait                "%Id"
+#define __NRATRF3_epoll_wait                "%" PRIdPTR
 #define __NRATRA3_epoll_wait(epfd, events, maxevents, timeout) ,(intptr_t)(timeout)
 #define __NRATRF0_epoll_ctl                 "%d"
 #define __NRATRA0_epoll_ctl(epfd, op, fd, event) ,(int)(epfd)
@@ -4179,11 +4179,11 @@
 #define __NRATRA2_epoll_ctl(epfd, op, fd, event) ,(int)(fd)
 #define __NRATRF3_epoll_ctl                 "%p"
 #define __NRATRA3_epoll_ctl(epfd, op, fd, event) ,event
-#define __NRATRF0_tgkill                    "%Id"
+#define __NRATRF0_tgkill                    "%" PRIdPTR
 #define __NRATRA0_tgkill(tgid, tid, signo)  ,(intptr_t)(tgid)
-#define __NRATRF1_tgkill                    "%Id"
+#define __NRATRF1_tgkill                    "%" PRIdPTR
 #define __NRATRA1_tgkill(tgid, tid, signo)  ,(intptr_t)(tid)
-#define __NRATRF2_tgkill                    "%#Ix"
+#define __NRATRF2_tgkill                    "%#" PRIxPTR
 #define __NRATRA2_tgkill(tgid, tid, signo)  ,(uintptr_t)(signo)
 #define __NRATRF0_utimes                    "%q"
 #define __NRATRA0_utimes(filename, times)   ,(validate_readable_opt(filename,1),filename)
@@ -4191,11 +4191,11 @@
 #define __NRATRA1_utimes(filename, times)   ,times
 #define __NRATRF0_waitid                    "%#Ix=%s"
 #define __NRATRA0_waitid(idtype, id, infop, options, ru) ,(idtype),(idtype) == P_ALL ? "P_ALL" : (idtype) == P_PID ? "P_PID" : (idtype) == P_PGID ? "P_PGID" : "?"
-#define __NRATRF1_waitid                    "%Iu"
+#define __NRATRF1_waitid                    "%" PRIuPTR
 #define __NRATRA1_waitid(idtype, id, infop, options, ru) ,(uintptr_t)(id)
 #define __NRATRF2_waitid                    "%p"
 #define __NRATRA2_waitid(idtype, id, infop, options, ru) ,infop
-#define __NRATRF3_waitid                    "%#Ix=%s%s%s%s%s%s%s%s%s"
+#define __NRATRF3_waitid                    "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s"
 #define __NRATRA3_waitid(idtype, id, infop, options, ru) ,(uintptr_t)(options),(options) & WEXITED ? "WEXITED" : "" \
                                                          ,((options) & WSTOPPED) && ((options) & (WEXITED)) ? "|" : "",(options) & WSTOPPED ? "WSTOPPED" : "" \
                                                          ,((options) & WCONTINUED) && ((options) & (WEXITED|WSTOPPED)) ? "|" : "",(options) & WCONTINUED ? "WCONTINUED" : "" \
@@ -4203,21 +4203,21 @@
                                                          ,((options) & WNOWAIT) && ((options) & (WEXITED|WSTOPPED|WCONTINUED|WNOHANG)) ? "|" : "",(options) & WNOWAIT ? "WNOWAIT" : ""
 #define __NRATRF4_waitid                    "%p"
 #define __NRATRA4_waitid(idtype, id, infop, options, ru) ,ru
-#define __NRATRF0_ioprio_set                "%#Ix"
+#define __NRATRF0_ioprio_set                "%#" PRIxPTR
 #define __NRATRA0_ioprio_set(which, who, ioprio) ,(uintptr_t)(which)
-#define __NRATRF1_ioprio_set                "%#Ix"
+#define __NRATRF1_ioprio_set                "%#" PRIxPTR
 #define __NRATRA1_ioprio_set(which, who, ioprio) ,(uintptr_t)(who)
-#define __NRATRF2_ioprio_set                "%#Ix"
+#define __NRATRF2_ioprio_set                "%#" PRIxPTR
 #define __NRATRA2_ioprio_set(which, who, ioprio) ,(uintptr_t)(ioprio)
-#define __NRATRF0_ioprio_get                "%#Ix"
+#define __NRATRF0_ioprio_get                "%#" PRIxPTR
 #define __NRATRA0_ioprio_get(which, who)    ,(uintptr_t)(which)
-#define __NRATRF1_ioprio_get                "%#Ix"
+#define __NRATRF1_ioprio_get                "%#" PRIxPTR
 #define __NRATRA1_ioprio_get(which, who)    ,(uintptr_t)(who)
 #define __NRATRF0_openat                    "%d"
 #define __NRATRA0_openat(dirfd, filename, oflags, mode) ,(int)(dirfd)
 #define __NRATRF1_openat                    "%q"
 #define __NRATRA1_openat(dirfd, filename, oflags, mode) ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF2_openat                    "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF2_openat                    "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA2_openat(dirfd, filename, oflags, mode) ,(uintptr_t)(oflags),(oflags) & O_WRONLY ? "O_WRONLY" : (oflags) ? "" : "O_RDONLY" \
                                                         ,((oflags) & O_RDWR) && ((oflags) & (O_WRONLY)) ? "|" : "",(oflags) & O_RDWR ? "O_RDWR" : "" \
                                                         ,((oflags) & O_CREAT) && ((oflags) & (O_WRONLY|O_RDWR)) ? "|" : "",(oflags) & O_CREAT ? "O_CREAT" : "" \
@@ -4240,19 +4240,19 @@
                                                         ,((oflags) & 0x0400000) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW|O_NOATIME|O_CLOEXEC|O_CLOFORK|O_PATH)) ? "|" : "",(oflags) & 0x0400000 ? "O_TMPFILE" : "" \
                                                         ,((oflags) & O_SYMLINK) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW|O_NOATIME|O_CLOEXEC|O_CLOFORK|O_PATH|0x0400000)) ? "|" : "",(oflags) & O_SYMLINK ? "O_SYMLINK" : "" \
                                                         ,((oflags) & O_DOSPATH) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW|O_NOATIME|O_CLOEXEC|O_CLOFORK|O_PATH|0x0400000|O_SYMLINK)) ? "|" : "",(oflags) & O_DOSPATH ? "O_DOSPATH" : ""
-#define __NRATRF3_openat                    "%#Io"
+#define __NRATRF3_openat                    "%#" PRIoPTR
 #define __NRATRA3_openat(dirfd, filename, oflags, mode) ,(uintptr_t)(mode)
 #define __NRATRF0_mkdirat                   "%d"
 #define __NRATRA0_mkdirat(dirfd, pathname, mode) ,(int)(dirfd)
 #define __NRATRF1_mkdirat                   "%q"
 #define __NRATRA1_mkdirat(dirfd, pathname, mode) ,(validate_readable_opt(pathname,1),pathname)
-#define __NRATRF2_mkdirat                   "%#Io"
+#define __NRATRF2_mkdirat                   "%#" PRIoPTR
 #define __NRATRA2_mkdirat(dirfd, pathname, mode) ,(uintptr_t)(mode)
 #define __NRATRF0_mknodat                   "%d"
 #define __NRATRA0_mknodat(dirfd, nodename, mode, dev) ,(int)(dirfd)
 #define __NRATRF1_mknodat                   "%q"
 #define __NRATRA1_mknodat(dirfd, nodename, mode, dev) ,(validate_readable_opt(nodename,1),nodename)
-#define __NRATRF2_mknodat                   "%#Io"
+#define __NRATRF2_mknodat                   "%#" PRIoPTR
 #define __NRATRA2_mknodat(dirfd, nodename, mode, dev) ,(uintptr_t)(mode)
 #define __NRATRF3_mknodat                   "%.2x:%.2x"
 #define __NRATRA3_mknodat(dirfd, nodename, mode, dev) ,(unsigned int)MAJOR(dev),(unsigned int)MINOR(dev)
@@ -4260,11 +4260,11 @@
 #define __NRATRA0_fchownat(dirfd, filename, owner, group, flags) ,(int)(dirfd)
 #define __NRATRF1_fchownat                  "%q"
 #define __NRATRA1_fchownat(dirfd, filename, owner, group, flags) ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF2_fchownat                  "%I32u"
+#define __NRATRF2_fchownat                  "%" PRIu32
 #define __NRATRA2_fchownat(dirfd, filename, owner, group, flags) ,owner
-#define __NRATRF3_fchownat                  "%I32u"
+#define __NRATRF3_fchownat                  "%" PRIu32
 #define __NRATRA3_fchownat(dirfd, filename, owner, group, flags) ,group
-#define __NRATRF4_fchownat                  "%#Ix=%s%s%s"
+#define __NRATRF4_fchownat                  "%#" PRIxPTR "=%s%s%s"
 #define __NRATRA4_fchownat(dirfd, filename, owner, group, flags) ,(uintptr_t)(flags),(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
                                                                  ,((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NRATRF0_futimesat                 "%d"
@@ -4279,14 +4279,14 @@
 #define __NRATRA1_fstatat(dirfd, filename, statbuf, flags) ,(validate_readable_opt(filename,1),filename)
 #define __NRATRF2_fstatat                   "%p"
 #define __NRATRA2_fstatat(dirfd, filename, statbuf, flags) ,statbuf
-#define __NRATRF3_fstatat                   "%#Ix=%s%s%s"
+#define __NRATRF3_fstatat                   "%#" PRIxPTR "=%s%s%s"
 #define __NRATRA3_fstatat(dirfd, filename, statbuf, flags) ,(uintptr_t)(flags),(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
                                                            ,((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NRATRF0_unlinkat                  "%d"
 #define __NRATRA0_unlinkat(dirfd, name, flags) ,(int)(dirfd)
 #define __NRATRF1_unlinkat                  "%q"
 #define __NRATRA1_unlinkat(dirfd, name, flags) ,(validate_readable_opt(name,1),name)
-#define __NRATRF2_unlinkat                  "%#Ix=%s%s%s%s%s"
+#define __NRATRF2_unlinkat                  "%#" PRIxPTR "=%s%s%s%s%s"
 #define __NRATRA2_unlinkat(dirfd, name, flags) ,(uintptr_t)(flags),(flags) & AT_REMOVEDIR ? "AT_REMOVEDIR" : "" \
                                                ,((flags) & AT_REMOVEREG) && ((flags) & (AT_REMOVEDIR)) ? "|" : "",(flags) & AT_REMOVEREG ? "AT_REMOVEREG" : "" \
                                                ,((flags) & AT_DOSPATH) && ((flags) & (AT_REMOVEDIR|AT_REMOVEREG)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
@@ -4306,7 +4306,7 @@
 #define __NRATRA2_linkat(fromfd, existing_file, tofd, target_path, flags) ,(int)(tofd)
 #define __NRATRF3_linkat                    "%q"
 #define __NRATRA3_linkat(fromfd, existing_file, tofd, target_path, flags) ,(validate_readable_opt(target_path,1),target_path)
-#define __NRATRF4_linkat                    "%#Ix=%s%s%s%s%s"
+#define __NRATRF4_linkat                    "%#" PRIxPTR "=%s%s%s%s%s"
 #define __NRATRA4_linkat(fromfd, existing_file, tofd, target_path, flags) ,(uintptr_t)(flags),(flags) & AT_EMPTY_PATH ? "AT_EMPTY_PATH" : "" \
                                                                           ,((flags) & AT_SYMLINK_FOLLOW) && ((flags) & (AT_EMPTY_PATH)) ? "|" : "",(flags) & AT_SYMLINK_FOLLOW ? "AT_SYMLINK_FOLLOW" : "" \
                                                                           ,((flags) & AT_DOSPATH) && ((flags) & (AT_EMPTY_PATH|AT_SYMLINK_FOLLOW)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
@@ -4322,30 +4322,30 @@
 #define __NRATRA1_readlinkat(dirfd, path, buf, buflen) ,(validate_readable_opt(path,1),path)
 #define __NRATRF2_readlinkat                "%p"
 #define __NRATRA2_readlinkat(dirfd, path, buf, buflen) ,buf
-#define __NRATRF3_readlinkat                "%Iu"
+#define __NRATRF3_readlinkat                "%" PRIuPTR
 #define __NRATRA3_readlinkat(dirfd, path, buf, buflen) ,buflen
 #define __NRATRF0_fchmodat                  "%d"
 #define __NRATRA0_fchmodat(dirfd, filename, mode, flags) ,(int)(dirfd)
 #define __NRATRF1_fchmodat                  "%q"
 #define __NRATRA1_fchmodat(dirfd, filename, mode, flags) ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF2_fchmodat                  "%#Io"
+#define __NRATRF2_fchmodat                  "%#" PRIoPTR
 #define __NRATRA2_fchmodat(dirfd, filename, mode, flags) ,(uintptr_t)(mode)
-#define __NRATRF3_fchmodat                  "%#Ix=%s%s%s"
+#define __NRATRF3_fchmodat                  "%#" PRIxPTR "=%s%s%s"
 #define __NRATRA3_fchmodat(dirfd, filename, mode, flags) ,(uintptr_t)(flags),(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
                                                          ,((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NRATRF0_faccessat                 "%d"
 #define __NRATRA0_faccessat(dirfd, filename, type, flags) ,(int)(dirfd)
 #define __NRATRF1_faccessat                 "%q"
 #define __NRATRA1_faccessat(dirfd, filename, type, flags) ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF2_faccessat                 "%#Ix=%s%s%s%s%s"
+#define __NRATRF2_faccessat                 "%#" PRIxPTR "=%s%s%s%s%s"
 #define __NRATRA2_faccessat(dirfd, filename, type, flags) ,(uintptr_t)(type),(type) & R_OK ? "R_OK" : (type) ? "" : "F_OK" \
                                                           ,((type) & W_OK) && ((type) & (R_OK)) ? "|" : "",(type) & W_OK ? "W_OK" : "" \
                                                           ,((type) & X_OK) && ((type) & (R_OK|W_OK)) ? "|" : "",(type) & X_OK ? "X_OK" : ""
-#define __NRATRF3_faccessat                 "%#Ix=%s%s%s%s%s"
+#define __NRATRF3_faccessat                 "%#" PRIxPTR "=%s%s%s%s%s"
 #define __NRATRA3_faccessat(dirfd, filename, type, flags) ,(uintptr_t)(flags),(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
                                                           ,((flags) & AT_EACCESS) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_EACCESS ? "AT_EACCESS" : "" \
                                                           ,((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW|AT_EACCESS)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_pselect6                  "%Iu"
+#define __NRATRF0_pselect6                  "%" PRIuPTR
 #define __NRATRA0_pselect6(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) ,nfds
 #define __NRATRF1_pselect6                  "%p"
 #define __NRATRA1_pselect6(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) ,readfds
@@ -4359,15 +4359,15 @@
 #define __NRATRA5_pselect6(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) ,sigmask_sigset_and_len
 #define __NRATRF0_ppoll                     "%p"
 #define __NRATRA0_ppoll(fds, nfds, timeout_ts, sigmask, sigsetsize) ,fds
-#define __NRATRF1_ppoll                     "%Iu"
+#define __NRATRF1_ppoll                     "%" PRIuPTR
 #define __NRATRA1_ppoll(fds, nfds, timeout_ts, sigmask, sigsetsize) ,nfds
 #define __NRATRF2_ppoll                     "%p"
 #define __NRATRA2_ppoll(fds, nfds, timeout_ts, sigmask, sigsetsize) ,timeout_ts
 #define __NRATRF3_ppoll                     "%p"
 #define __NRATRA3_ppoll(fds, nfds, timeout_ts, sigmask, sigsetsize) ,sigmask
-#define __NRATRF4_ppoll                     "%Iu"
+#define __NRATRF4_ppoll                     "%" PRIuPTR
 #define __NRATRA4_ppoll(fds, nfds, timeout_ts, sigmask, sigsetsize) ,sigsetsize
-#define __NRATRF0_unshare                   "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF0_unshare                   "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA0_unshare(flags)            ,(uintptr_t)(flags),(flags) & CLONE_VM ? "CLONE_VM" : "" \
                                             ,((flags) & CLONE_FS) && ((flags) & (CLONE_VM)) ? "|" : "",(flags) & CLONE_FS ? "CLONE_FS" : "" \
                                             ,((flags) & CLONE_FILES) && ((flags) & (CLONE_VM|CLONE_FS)) ? "|" : "",(flags) & CLONE_FILES ? "CLONE_FILES" : "" \
@@ -4398,33 +4398,33 @@
 #define __NRATRA2_splice(fdin, offin, fdout, offout, length, flags) ,(int)(fdout)
 #define __NRATRF3_splice                    "%p"
 #define __NRATRA3_splice(fdin, offin, fdout, offout, length, flags) ,offout
-#define __NRATRF4_splice                    "%Iu"
+#define __NRATRF4_splice                    "%" PRIuPTR
 #define __NRATRA4_splice(fdin, offin, fdout, offout, length, flags) ,length
-#define __NRATRF5_splice                    "%#Ix"
+#define __NRATRF5_splice                    "%#" PRIxPTR
 #define __NRATRA5_splice(fdin, offin, fdout, offout, length, flags) ,(uintptr_t)(flags)
 #define __NRATRF0_tee                       "%d"
 #define __NRATRA0_tee(fdin, fdout, length, flags) ,(int)(fdin)
 #define __NRATRF1_tee                       "%d"
 #define __NRATRA1_tee(fdin, fdout, length, flags) ,(int)(fdout)
-#define __NRATRF2_tee                       "%Iu"
+#define __NRATRF2_tee                       "%" PRIuPTR
 #define __NRATRA2_tee(fdin, fdout, length, flags) ,length
-#define __NRATRF3_tee                       "%#Ix"
+#define __NRATRF3_tee                       "%#" PRIxPTR
 #define __NRATRA3_tee(fdin, fdout, length, flags) ,(uintptr_t)(flags)
 #define __NRATRF0_sync_file_range           "%d"
 #define __NRATRA0_sync_file_range(fd, offset, count, flags) ,(int)(fd)
-#define __NRATRF1_sync_file_range           "%I64u"
+#define __NRATRF1_sync_file_range           "%" PRIu64
 #define __NRATRA1_sync_file_range(fd, offset, count, flags) ,offset
-#define __NRATRF2_sync_file_range           "%I64u"
+#define __NRATRF2_sync_file_range           "%" PRIu64
 #define __NRATRA2_sync_file_range(fd, offset, count, flags) ,count
-#define __NRATRF3_sync_file_range           "%#Ix"
+#define __NRATRF3_sync_file_range           "%#" PRIxPTR
 #define __NRATRA3_sync_file_range(fd, offset, count, flags) ,(uintptr_t)(flags)
 #define __NRATRF0_vmsplice                  "%d"
 #define __NRATRA0_vmsplice(fdout, iov, count, flags) ,(int)(fdout)
 #define __NRATRF1_vmsplice                  "%p"
 #define __NRATRA1_vmsplice(fdout, iov, count, flags) ,iov
-#define __NRATRF2_vmsplice                  "%Iu"
+#define __NRATRF2_vmsplice                  "%" PRIuPTR
 #define __NRATRA2_vmsplice(fdout, iov, count, flags) ,count
-#define __NRATRF3_vmsplice                  "%#Ix"
+#define __NRATRF3_vmsplice                  "%#" PRIxPTR
 #define __NRATRA3_vmsplice(fdout, iov, count, flags) ,(uintptr_t)(flags)
 #define __NRATRF0_utimensat                 "%d"
 #define __NRATRA0_utimensat(dirfd, filename, times, flags) ,(int)(dirfd)
@@ -4432,7 +4432,7 @@
 #define __NRATRA1_utimensat(dirfd, filename, times, flags) ,(validate_readable_opt(filename,1),filename)
 #define __NRATRF2_utimensat                 "%p"
 #define __NRATRA2_utimensat(dirfd, filename, times, flags) ,times
-#define __NRATRF3_utimensat                 "%#Ix=%s%s%s%s%s"
+#define __NRATRF3_utimensat                 "%#" PRIxPTR "=%s%s%s%s%s"
 #define __NRATRA3_utimensat(dirfd, filename, times, flags) ,(uintptr_t)(flags),(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
                                                            ,((flags) & AT_CHANGE_CTIME) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_CHANGE_CTIME ? "AT_CHANGE_CTIME" : "" \
                                                            ,((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
@@ -4440,9 +4440,9 @@
 #define __NRATRA0_epoll_pwait(epfd, events, maxevents, timeout, ss) ,(int)(epfd)
 #define __NRATRF1_epoll_pwait               "%p"
 #define __NRATRA1_epoll_pwait(epfd, events, maxevents, timeout, ss) ,events
-#define __NRATRF2_epoll_pwait               "%#Ix"
+#define __NRATRF2_epoll_pwait               "%#" PRIxPTR
 #define __NRATRA2_epoll_pwait(epfd, events, maxevents, timeout, ss) ,(uintptr_t)(maxevents)
-#define __NRATRF3_epoll_pwait               "%Id"
+#define __NRATRF3_epoll_pwait               "%" PRIdPTR
 #define __NRATRA3_epoll_pwait(epfd, events, maxevents, timeout, ss) ,(intptr_t)(timeout)
 #define __NRATRF4_epoll_pwait               "%p"
 #define __NRATRA4_epoll_pwait(epfd, events, maxevents, timeout, ss) ,ss
@@ -4450,25 +4450,25 @@
 #define __NRATRA0_signalfd(fd, sigmask, sigsetsize) ,(int)(fd)
 #define __NRATRF1_signalfd                  "%p"
 #define __NRATRA1_signalfd(fd, sigmask, sigsetsize) ,sigmask
-#define __NRATRF2_signalfd                  "%Iu"
+#define __NRATRF2_signalfd                  "%" PRIuPTR
 #define __NRATRA2_signalfd(fd, sigmask, sigsetsize) ,sigsetsize
 #define __NRATRF0_timerfd_create            "?"
 #define __NRATRA0_timerfd_create(clock_id, flags) /* nothing */
-#define __NRATRF1_timerfd_create            "%#Ix"
+#define __NRATRF1_timerfd_create            "%#" PRIxPTR
 #define __NRATRA1_timerfd_create(clock_id, flags) ,(uintptr_t)(flags)
-#define __NRATRF0_eventfd                   "%#Ix"
+#define __NRATRF0_eventfd                   "%#" PRIxPTR
 #define __NRATRA0_eventfd(initval)          ,(uintptr_t)(initval)
 #define __NRATRF0_fallocate                 "%d"
 #define __NRATRA0_fallocate(fd, mode, offset, length) ,(int)(fd)
-#define __NRATRF1_fallocate                 "%#Ix"
+#define __NRATRF1_fallocate                 "%#" PRIxPTR
 #define __NRATRA1_fallocate(fd, mode, offset, length) ,(uintptr_t)(mode)
-#define __NRATRF2_fallocate                 "%I32u"
+#define __NRATRF2_fallocate                 "%" PRIu32
 #define __NRATRA2_fallocate(fd, mode, offset, length) ,offset
-#define __NRATRF3_fallocate                 "%I32u"
+#define __NRATRF3_fallocate                 "%" PRIu32
 #define __NRATRA3_fallocate(fd, mode, offset, length) ,length
 #define __NRATRF0_timerfd_settime           "%d"
 #define __NRATRA0_timerfd_settime(ufd, flags, utmr, otmr) ,(int)(ufd)
-#define __NRATRF1_timerfd_settime           "%#Ix"
+#define __NRATRF1_timerfd_settime           "%#" PRIxPTR
 #define __NRATRA1_timerfd_settime(ufd, flags, utmr, otmr) ,(uintptr_t)(flags)
 #define __NRATRF2_timerfd_settime           "%p"
 #define __NRATRA2_timerfd_settime(ufd, flags, utmr, otmr) ,utmr
@@ -4484,7 +4484,7 @@
 #define __NRATRA1_accept4(sockfd, addr, addr_len, flags) ,addr
 #define __NRATRF2_accept4                   "%p"
 #define __NRATRA2_accept4(sockfd, addr, addr_len, flags) ,addr_len
-#define __NRATRF3_accept4                   "%#Ix=%s%s%s%s%s"
+#define __NRATRF3_accept4                   "%#" PRIxPTR "=%s%s%s%s%s"
 #define __NRATRA3_accept4(sockfd, addr, addr_len, flags) ,(uintptr_t)(flags),(flags) & SOCK_NONBLOCK ? "SOCK_NONBLOCK" : "" \
                                                          ,((flags) & SOCK_CLOEXEC) && ((flags) & (SOCK_NONBLOCK)) ? "|" : "",(flags) & SOCK_CLOEXEC ? "SOCK_CLOEXEC" : "" \
                                                          ,((flags) & SOCK_CLOFORK) && ((flags) & (SOCK_NONBLOCK|SOCK_CLOEXEC)) ? "|" : "",(flags) & SOCK_CLOFORK ? "SOCK_CLOFORK" : ""
@@ -4492,24 +4492,24 @@
 #define __NRATRA0_signalfd4(fd, sigmask, sigsetsize, flags) ,(int)(fd)
 #define __NRATRF1_signalfd4                 "%p"
 #define __NRATRA1_signalfd4(fd, sigmask, sigsetsize, flags) ,sigmask
-#define __NRATRF2_signalfd4                 "%Iu"
+#define __NRATRF2_signalfd4                 "%" PRIuPTR
 #define __NRATRA2_signalfd4(fd, sigmask, sigsetsize, flags) ,sigsetsize
-#define __NRATRF3_signalfd4                 "%#Ix=%s%s%s"
+#define __NRATRF3_signalfd4                 "%#" PRIxPTR "=%s%s%s"
 #define __NRATRA3_signalfd4(fd, sigmask, sigsetsize, flags) ,(uintptr_t)(flags),(flags) & SFD_NONBLOCK ? "SFD_NONBLOCK" : "" \
                                                             ,((flags) & SFD_CLOEXEC) && ((flags) & (SFD_NONBLOCK)) ? "|" : "",(flags) & SFD_CLOEXEC ? "SFD_CLOEXEC" : ""
-#define __NRATRF0_eventfd2                  "%#Ix"
+#define __NRATRF0_eventfd2                  "%#" PRIxPTR
 #define __NRATRA0_eventfd2(initval, flags)  ,(uintptr_t)(initval)
-#define __NRATRF1_eventfd2                  "%#Ix=%s%s%s%s%s"
+#define __NRATRF1_eventfd2                  "%#" PRIxPTR "=%s%s%s%s%s"
 #define __NRATRA1_eventfd2(initval, flags)  ,(uintptr_t)(flags),(flags) & EFD_SEMAPHORE ? "EFD_SEMAPHORE" : "" \
                                             ,((flags) & EFD_NONBLOCK) && ((flags) & (EFD_SEMAPHORE)) ? "|" : "",(flags) & EFD_NONBLOCK ? "EFD_NONBLOCK" : "" \
                                             ,((flags) & EFD_CLOEXEC) && ((flags) & (EFD_SEMAPHORE|EFD_NONBLOCK)) ? "|" : "",(flags) & EFD_CLOEXEC ? "EFD_CLOEXEC" : ""
-#define __NRATRF0_epoll_create1             "%#Ix"
+#define __NRATRF0_epoll_create1             "%#" PRIxPTR
 #define __NRATRA0_epoll_create1(flags)      ,(uintptr_t)(flags)
 #define __NRATRF0_dup3                      "%d"
 #define __NRATRA0_dup3(oldfd, newfd, flags) ,(int)(oldfd)
 #define __NRATRF1_dup3                      "%d"
 #define __NRATRA1_dup3(oldfd, newfd, flags) ,(int)(newfd)
-#define __NRATRF2_dup3                      "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF2_dup3                      "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA2_dup3(oldfd, newfd, flags) ,(uintptr_t)(flags),(flags) & O_WRONLY ? "O_WRONLY" : (flags) ? "" : "O_RDONLY" \
                                             ,((flags) & O_RDWR) && ((flags) & (O_WRONLY)) ? "|" : "",(flags) & O_RDWR ? "O_RDWR" : "" \
                                             ,((flags) & O_CREAT) && ((flags) & (O_WRONLY|O_RDWR)) ? "|" : "",(flags) & O_CREAT ? "O_CREAT" : "" \
@@ -4534,7 +4534,7 @@
                                             ,((flags) & O_DOSPATH) && ((flags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW|O_NOATIME|O_CLOEXEC|O_CLOFORK|O_PATH|0x0400000|O_SYMLINK)) ? "|" : "",(flags) & O_DOSPATH ? "O_DOSPATH" : ""
 #define __NRATRF0_pipe2                     "%p"
 #define __NRATRA0_pipe2(pipedes, flags)     ,pipedes
-#define __NRATRF1_pipe2                     "%#Ix=%s%s%s%s%s%s%s"
+#define __NRATRF1_pipe2                     "%#" PRIxPTR "=%s%s%s%s%s%s%s"
 #define __NRATRA1_pipe2(pipedes, flags)     ,(uintptr_t)(flags),(flags) & O_CLOEXEC ? "O_CLOEXEC" : "" \
                                             ,((flags) & O_CLOFORK) && ((flags) & (O_CLOEXEC)) ? "|" : "",(flags) & O_CLOFORK ? "O_CLOFORK" : "" \
                                             ,((flags) & O_NONBLOCK) && ((flags) & (O_CLOEXEC|O_CLOFORK)) ? "|" : "",(flags) & O_NONBLOCK ? "O_NONBLOCK" : "" \
@@ -4543,23 +4543,23 @@
 #define __NRATRA0_preadv(fd, iovec, count, offset) ,(int)(fd)
 #define __NRATRF1_preadv                    "%p"
 #define __NRATRA1_preadv(fd, iovec, count, offset) ,iovec
-#define __NRATRF2_preadv                    "%Iu"
+#define __NRATRF2_preadv                    "%" PRIuPTR
 #define __NRATRA2_preadv(fd, iovec, count, offset) ,count
-#define __NRATRF3_preadv                    "%I64u"
+#define __NRATRF3_preadv                    "%" PRIu64
 #define __NRATRA3_preadv(fd, iovec, count, offset) ,offset
 #define __NRATRF0_pwritev                   "%d"
 #define __NRATRA0_pwritev(fd, iovec, count, offset) ,(int)(fd)
 #define __NRATRF1_pwritev                   "%p"
 #define __NRATRA1_pwritev(fd, iovec, count, offset) ,iovec
-#define __NRATRF2_pwritev                   "%Iu"
+#define __NRATRF2_pwritev                   "%" PRIuPTR
 #define __NRATRA2_pwritev(fd, iovec, count, offset) ,count
-#define __NRATRF3_pwritev                   "%I64u"
+#define __NRATRF3_pwritev                   "%" PRIu64
 #define __NRATRA3_pwritev(fd, iovec, count, offset) ,offset
-#define __NRATRF0_rt_tgsigqueueinfo         "%Id"
+#define __NRATRF0_rt_tgsigqueueinfo         "%" PRIdPTR
 #define __NRATRA0_rt_tgsigqueueinfo(tgid, tid, signo, uinfo) ,(intptr_t)(tgid)
-#define __NRATRF1_rt_tgsigqueueinfo         "%Id"
+#define __NRATRF1_rt_tgsigqueueinfo         "%" PRIdPTR
 #define __NRATRA1_rt_tgsigqueueinfo(tgid, tid, signo, uinfo) ,(intptr_t)(tid)
-#define __NRATRF2_rt_tgsigqueueinfo         "%#Ix"
+#define __NRATRF2_rt_tgsigqueueinfo         "%#" PRIxPTR
 #define __NRATRA2_rt_tgsigqueueinfo(tgid, tid, signo, uinfo) ,(uintptr_t)(signo)
 #define __NRATRF3_rt_tgsigqueueinfo         "%p"
 #define __NRATRA3_rt_tgsigqueueinfo(tgid, tid, signo, uinfo) ,uinfo
@@ -4567,15 +4567,15 @@
 #define __NRATRA0_recvmmsg(sockfd, vmessages, vlen, flags, tmo) ,(int)(sockfd)
 #define __NRATRF1_recvmmsg                  "%p"
 #define __NRATRA1_recvmmsg(sockfd, vmessages, vlen, flags, tmo) ,vmessages
-#define __NRATRF2_recvmmsg                  "%Iu"
+#define __NRATRF2_recvmmsg                  "%" PRIuPTR
 #define __NRATRA2_recvmmsg(sockfd, vmessages, vlen, flags, tmo) ,vlen
-#define __NRATRF3_recvmmsg                  "%#Ix"
+#define __NRATRF3_recvmmsg                  "%#" PRIxPTR
 #define __NRATRA3_recvmmsg(sockfd, vmessages, vlen, flags, tmo) ,(uintptr_t)(flags)
 #define __NRATRF4_recvmmsg                  "%p"
 #define __NRATRA4_recvmmsg(sockfd, vmessages, vlen, flags, tmo) ,tmo
-#define __NRATRF0_prlimit64                 "%Id"
+#define __NRATRF0_prlimit64                 "%" PRIdPTR
 #define __NRATRA0_prlimit64(pid, resource, new_limit, old_limit) ,(intptr_t)(pid)
-#define __NRATRF1_prlimit64                 "%#Ix"
+#define __NRATRF1_prlimit64                 "%#" PRIxPTR
 #define __NRATRA1_prlimit64(pid, resource, new_limit, old_limit) ,(uintptr_t)(resource)
 #define __NRATRF2_prlimit64                 "%p"
 #define __NRATRA2_prlimit64(pid, resource, new_limit, old_limit) ,new_limit
@@ -4589,13 +4589,13 @@
 #define __NRATRA2_name_to_handle_at(dirfd, name, handle, mnt_id, flags) ,handle
 #define __NRATRF3_name_to_handle_at         "%p"
 #define __NRATRA3_name_to_handle_at(dirfd, name, handle, mnt_id, flags) ,mnt_id
-#define __NRATRF4_name_to_handle_at         "%#Ix"
+#define __NRATRF4_name_to_handle_at         "%#" PRIxPTR
 #define __NRATRA4_name_to_handle_at(dirfd, name, handle, mnt_id, flags) ,(uintptr_t)(flags)
 #define __NRATRF0_open_by_handle_at         "%d"
 #define __NRATRA0_open_by_handle_at(mountdirfd, handle, flags) ,(int)(mountdirfd)
 #define __NRATRF1_open_by_handle_at         "%p"
 #define __NRATRA1_open_by_handle_at(mountdirfd, handle, flags) ,handle
-#define __NRATRF2_open_by_handle_at         "%#Ix"
+#define __NRATRF2_open_by_handle_at         "%#" PRIxPTR
 #define __NRATRA2_open_by_handle_at(mountdirfd, handle, flags) ,(uintptr_t)(flags)
 #define __NRATRF0_syncfs                    "%d"
 #define __NRATRA0_syncfs(fd)                ,(int)(fd)
@@ -4603,13 +4603,13 @@
 #define __NRATRA0_sendmmsg(sockfd, vmessages, vlen, flags) ,(int)(sockfd)
 #define __NRATRF1_sendmmsg                  "%p"
 #define __NRATRA1_sendmmsg(sockfd, vmessages, vlen, flags) ,vmessages
-#define __NRATRF2_sendmmsg                  "%Iu"
+#define __NRATRF2_sendmmsg                  "%" PRIuPTR
 #define __NRATRA2_sendmmsg(sockfd, vmessages, vlen, flags) ,vlen
-#define __NRATRF3_sendmmsg                  "%#Ix"
+#define __NRATRF3_sendmmsg                  "%#" PRIxPTR
 #define __NRATRA3_sendmmsg(sockfd, vmessages, vlen, flags) ,(uintptr_t)(flags)
 #define __NRATRF0_setns                     "%d"
 #define __NRATRA0_setns(fd, nstype)         ,(int)(fd)
-#define __NRATRF1_setns                     "%#Ix"
+#define __NRATRF1_setns                     "%#" PRIxPTR
 #define __NRATRA1_setns(fd, nstype)         ,(uintptr_t)(nstype)
 #define __NRATRF0_getcpu                    "%p"
 #define __NRATRA0_getcpu(cpu, node, tcache) ,cpu
@@ -4617,39 +4617,39 @@
 #define __NRATRA1_getcpu(cpu, node, tcache) ,node
 #define __NRATRF2_getcpu                    "%p"
 #define __NRATRA2_getcpu(cpu, node, tcache) ,tcache
-#define __NRATRF0_process_vm_readv          "%Id"
+#define __NRATRF0_process_vm_readv          "%" PRIdPTR
 #define __NRATRA0_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,(intptr_t)(pid)
 #define __NRATRF1_process_vm_readv          "%p"
 #define __NRATRA1_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,lvec
-#define __NRATRF2_process_vm_readv          "%Iu"
+#define __NRATRF2_process_vm_readv          "%" PRIuPTR
 #define __NRATRA2_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,liovcnt
 #define __NRATRF3_process_vm_readv          "%p"
 #define __NRATRA3_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,rvec
-#define __NRATRF4_process_vm_readv          "%Iu"
+#define __NRATRF4_process_vm_readv          "%" PRIuPTR
 #define __NRATRA4_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,riovcnt
-#define __NRATRF5_process_vm_readv          "%#Ix"
+#define __NRATRF5_process_vm_readv          "%#" PRIxPTR
 #define __NRATRA5_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,(uintptr_t)(flags)
-#define __NRATRF0_process_vm_writev         "%Id"
+#define __NRATRF0_process_vm_writev         "%" PRIdPTR
 #define __NRATRA0_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,(intptr_t)(pid)
 #define __NRATRF1_process_vm_writev         "%p"
 #define __NRATRA1_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,lvec
-#define __NRATRF2_process_vm_writev         "%Iu"
+#define __NRATRF2_process_vm_writev         "%" PRIuPTR
 #define __NRATRA2_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,liovcnt
 #define __NRATRF3_process_vm_writev         "%p"
 #define __NRATRA3_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,rvec
-#define __NRATRF4_process_vm_writev         "%Iu"
+#define __NRATRF4_process_vm_writev         "%" PRIuPTR
 #define __NRATRA4_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,riovcnt
-#define __NRATRF5_process_vm_writev         "%#Ix"
+#define __NRATRF5_process_vm_writev         "%#" PRIxPTR
 #define __NRATRA5_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,(uintptr_t)(flags)
-#define __NRATRF0_kcmp                      "%Id"
+#define __NRATRF0_kcmp                      "%" PRIdPTR
 #define __NRATRA0_kcmp(pid1, pid2, type, idx1, idx2) ,(intptr_t)(pid1)
-#define __NRATRF1_kcmp                      "%Id"
+#define __NRATRF1_kcmp                      "%" PRIdPTR
 #define __NRATRA1_kcmp(pid1, pid2, type, idx1, idx2) ,(intptr_t)(pid2)
-#define __NRATRF2_kcmp                      "%#Ix"
+#define __NRATRF2_kcmp                      "%#" PRIxPTR
 #define __NRATRA2_kcmp(pid1, pid2, type, idx1, idx2) ,(uintptr_t)(type)
-#define __NRATRF3_kcmp                      "%#Ix"
+#define __NRATRF3_kcmp                      "%#" PRIxPTR
 #define __NRATRA3_kcmp(pid1, pid2, type, idx1, idx2) ,(uintptr_t)(idx1)
-#define __NRATRF4_kcmp                      "%#Ix"
+#define __NRATRF4_kcmp                      "%#" PRIxPTR
 #define __NRATRA4_kcmp(pid1, pid2, type, idx1, idx2) ,(uintptr_t)(idx2)
 #define __NRATRF0_renameat2                 "%d"
 #define __NRATRA0_renameat2(olddirfd, oldpath, newdirfd, newpath, flags) ,(int)(olddirfd)
@@ -4659,7 +4659,7 @@
 #define __NRATRA2_renameat2(olddirfd, oldpath, newdirfd, newpath, flags) ,(int)(newdirfd)
 #define __NRATRF3_renameat2                 "%q"
 #define __NRATRA3_renameat2(olddirfd, oldpath, newdirfd, newpath, flags) ,(validate_readable_opt(newpath,1),newpath)
-#define __NRATRF4_renameat2                 "%#Ix"
+#define __NRATRF4_renameat2                 "%#" PRIxPTR
 #define __NRATRA4_renameat2(olddirfd, oldpath, newdirfd, newpath, flags) ,(uintptr_t)(flags)
 #define __NRATRF0_execveat                  "%d"
 #define __NRATRA0_execveat(dirfd, pathname, argv, envp, flags) ,(int)(dirfd)
@@ -4669,7 +4669,7 @@
 #define __NRATRA2_execveat(dirfd, pathname, argv, envp, flags) ,argv
 #define __NRATRF3_execveat                  "%p"
 #define __NRATRA3_execveat(dirfd, pathname, argv, envp, flags) ,envp
-#define __NRATRF4_execveat                  "%#Ix=%s%s%s%s%s"
+#define __NRATRF4_execveat                  "%#" PRIxPTR "=%s%s%s%s%s"
 #define __NRATRA4_execveat(dirfd, pathname, argv, envp, flags) ,(uintptr_t)(flags),(flags) & AT_EMPTY_PATH ? "AT_EMPTY_PATH" : "" \
                                                                ,((flags) & AT_SYMLINK_NOFOLLOW) && ((flags) & (AT_EMPTY_PATH)) ? "|" : "",(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
                                                                ,((flags) & AT_DOSPATH) && ((flags) & (AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
@@ -4677,9 +4677,9 @@
 #define __NRATRA0_readf(fd, buf, bufsize, mode) ,(int)(fd)
 #define __NRATRF1_readf                     "%p"
 #define __NRATRA1_readf(fd, buf, bufsize, mode) ,buf
-#define __NRATRF2_readf                     "%Iu"
+#define __NRATRF2_readf                     "%" PRIuPTR
 #define __NRATRA2_readf(fd, buf, bufsize, mode) ,bufsize
-#define __NRATRF3_readf                     "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF3_readf                     "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA3_readf(fd, buf, bufsize, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                 ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                 ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
@@ -4693,9 +4693,9 @@
 #define __NRATRA0_writef(fd, buf, bufsize, mode) ,(int)(fd)
 #define __NRATRF1_writef                    "%p"
 #define __NRATRA1_writef(fd, buf, bufsize, mode) ,buf
-#define __NRATRF2_writef                    "%Iu"
+#define __NRATRF2_writef                    "%" PRIuPTR
 #define __NRATRA2_writef(fd, buf, bufsize, mode) ,bufsize
-#define __NRATRF3_writef                    "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF3_writef                    "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA3_writef(fd, buf, bufsize, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                  ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                  ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
@@ -4707,15 +4707,15 @@
                                                  ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
 #define __NRATRF0_hop                       "%d"
 #define __NRATRA0_hop(fd, command, arg)     ,(int)(fd)
-#define __NRATRF1_hop                       "%#Ix"
+#define __NRATRF1_hop                       "%#" PRIxPTR
 #define __NRATRA1_hop(fd, command, arg)     ,(uintptr_t)(command)
 #define __NRATRF2_hop                       "%p"
 #define __NRATRA2_hop(fd, command, arg)     ,arg
 #define __NRATRF0_hopf                      "%d"
 #define __NRATRA0_hopf(fd, command, mode, arg) ,(int)(fd)
-#define __NRATRF1_hopf                      "%#Ix"
+#define __NRATRF1_hopf                      "%#" PRIxPTR
 #define __NRATRA1_hopf(fd, command, mode, arg) ,(uintptr_t)(command)
-#define __NRATRF2_hopf                      "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF2_hopf                      "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA2_hopf(fd, command, mode, arg) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
@@ -4739,15 +4739,15 @@
 #define __NRATRA0_klstat(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
 #define __NRATRF1_klstat                    "%p"
 #define __NRATRA1_klstat(filename, statbuf) ,statbuf
-#define __NRATRF0_detach                    "%Id"
+#define __NRATRF0_detach                    "%" PRIdPTR
 #define __NRATRA0_detach(pid)               ,(intptr_t)(pid)
 #define __NRATRF0_frealpath4                "%d"
 #define __NRATRA0_frealpath4(fd, buf, buflen, flags) ,(int)(fd)
 #define __NRATRF1_frealpath4                "%p"
 #define __NRATRA1_frealpath4(fd, buf, buflen, flags) ,buf
-#define __NRATRF2_frealpath4                "%Iu"
+#define __NRATRF2_frealpath4                "%" PRIuPTR
 #define __NRATRA2_frealpath4(fd, buf, buflen, flags) ,buflen
-#define __NRATRF3_frealpath4                "%#Ix=%s%s%s%s%s"
+#define __NRATRF3_frealpath4                "%#" PRIxPTR "=%s%s%s%s%s"
 #define __NRATRA3_frealpath4(fd, buf, buflen, flags) ,(uintptr_t)(flags),(flags) & AT_ALTPATH ? "AT_ALTPATH" : "" \
                                                      ,((flags) & AT_READLINK_REQSIZE) && ((flags) & (AT_ALTPATH)) ? "|" : "",(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
                                                      ,((flags) & AT_DOSPATH) && ((flags) & (AT_ALTPATH|AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
@@ -4757,16 +4757,16 @@
 #define __NRATRA1_frealpathat(dirfd, filename, buf, buflen, flags) ,(validate_readable_opt(filename,1),filename)
 #define __NRATRF2_frealpathat               "%p"
 #define __NRATRA2_frealpathat(dirfd, filename, buf, buflen, flags) ,buf
-#define __NRATRF3_frealpathat               "%Iu"
+#define __NRATRF3_frealpathat               "%" PRIuPTR
 #define __NRATRA3_frealpathat(dirfd, filename, buf, buflen, flags) ,buflen
-#define __NRATRF4_frealpathat               "%#Ix=%s%s%s%s%s%s%s"
+#define __NRATRF4_frealpathat               "%#" PRIxPTR "=%s%s%s%s%s%s%s"
 #define __NRATRA4_frealpathat(dirfd, filename, buf, buflen, flags) ,(uintptr_t)(flags),(flags) & AT_ALTPATH ? "AT_ALTPATH" : "" \
                                                                    ,((flags) & AT_SYMLINK_NOFOLLOW) && ((flags) & (AT_ALTPATH)) ? "|" : "",(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
                                                                    ,((flags) & AT_READLINK_REQSIZE) && ((flags) & (AT_ALTPATH|AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
                                                                    ,((flags) & AT_DOSPATH) && ((flags) & (AT_ALTPATH|AT_SYMLINK_NOFOLLOW|AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_rpc_schedule              "%Id"
+#define __NRATRF0_rpc_schedule              "%" PRIdPTR
 #define __NRATRA0_rpc_schedule(target, flags, program, arguments) ,(intptr_t)(target)
-#define __NRATRF1_rpc_schedule              "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF1_rpc_schedule              "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA1_rpc_schedule(target, flags, program, arguments) ,(uintptr_t)(flags),(flags) & RPC_SCHEDULE_ASYNC ? "RPC_SCHEDULE_ASYNC" : (flags) ? "" : "RPC_SCHEDULE_SYNC" \
                                                                   ,((flags) & RPC_SCHEDULE_FLAG_NONSYSCALL) && ((flags) & (RPC_SCHEDULE_ASYNC)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_NONSYSCALL ? "RPC_SCHEDULE_FLAG_NONSYSCALL" : "" \
                                                                   ,((flags) & RPC_SCHEDULE_FLAG_WAITFORSTART) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_WAITFORSTART ? "RPC_SCHEDULE_FLAG_WAITFORSTART" : "" \
@@ -4781,7 +4781,7 @@
 #define __NRATRA2_rpc_schedule(target, flags, program, arguments) ,program
 #define __NRATRF3_rpc_schedule              "%p"
 #define __NRATRA3_rpc_schedule(target, flags, program, arguments) ,arguments
-#define __NRATRF0_sysctl                    "%#Ix"
+#define __NRATRF0_sysctl                    "%#" PRIxPTR
 #define __NRATRA0_sysctl(command, arg)      ,(uintptr_t)(command)
 #define __NRATRF1_sysctl                    "%p"
 #define __NRATRA1_sysctl(command, arg)      ,arg
@@ -4795,7 +4795,7 @@
 #define __NRATRA3_openpty(amaster, aslave, name, termp, winp) ,termp
 #define __NRATRF4_openpty                   "%p"
 #define __NRATRA4_openpty(amaster, aslave, name, termp, winp) ,winp
-#define __NRATRF0_set_exception_handler     "%#Ix"
+#define __NRATRF0_set_exception_handler     "%#" PRIxPTR
 #define __NRATRA0_set_exception_handler(mode, handler, handler_sp) ,(uintptr_t)(mode)
 #define __NRATRF1_set_exception_handler     "%p"
 #define __NRATRA1_set_exception_handler(mode, handler, handler_sp) ,handler
@@ -4809,9 +4809,9 @@
 #define __NRATRA2_get_exception_handler(pmode, phandler, phandler_sp) ,phandler_sp
 #define __NRATRF0_ioctlf                    "%d"
 #define __NRATRA0_ioctlf(fd, command, mode, arg) ,(int)(fd)
-#define __NRATRF1_ioctlf                    "%#Ix"
+#define __NRATRF1_ioctlf                    "%#" PRIxPTR
 #define __NRATRA1_ioctlf(fd, command, mode, arg) ,(uintptr_t)(command)
-#define __NRATRF2_ioctlf                    "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF2_ioctlf                    "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA2_ioctlf(fd, command, mode, arg) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                  ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                  ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
@@ -4827,11 +4827,11 @@
 #define __NRATRA0_pread64f(fd, buf, bufsize, offset, mode) ,(int)(fd)
 #define __NRATRF1_pread64f                  "%p"
 #define __NRATRA1_pread64f(fd, buf, bufsize, offset, mode) ,buf
-#define __NRATRF2_pread64f                  "%Iu"
+#define __NRATRF2_pread64f                  "%" PRIuPTR
 #define __NRATRA2_pread64f(fd, buf, bufsize, offset, mode) ,bufsize
-#define __NRATRF3_pread64f                  "%I64u"
+#define __NRATRF3_pread64f                  "%" PRIu64
 #define __NRATRA3_pread64f(fd, buf, bufsize, offset, mode) ,offset
-#define __NRATRF4_pread64f                  "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF4_pread64f                  "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA4_pread64f(fd, buf, bufsize, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                            ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                            ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
@@ -4845,11 +4845,11 @@
 #define __NRATRA0_pwrite64f(fd, buf, bufsize, offset, mode) ,(int)(fd)
 #define __NRATRF1_pwrite64f                 "%p"
 #define __NRATRA1_pwrite64f(fd, buf, bufsize, offset, mode) ,buf
-#define __NRATRF2_pwrite64f                 "%Iu"
+#define __NRATRF2_pwrite64f                 "%" PRIuPTR
 #define __NRATRA2_pwrite64f(fd, buf, bufsize, offset, mode) ,bufsize
-#define __NRATRF3_pwrite64f                 "%I64u"
+#define __NRATRF3_pwrite64f                 "%" PRIu64
 #define __NRATRA3_pwrite64f(fd, buf, bufsize, offset, mode) ,offset
-#define __NRATRF4_pwrite64f                 "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF4_pwrite64f                 "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA4_pwrite64f(fd, buf, bufsize, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                             ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                             ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
@@ -4863,9 +4863,9 @@
 #define __NRATRA0_readvf(fd, iovec, count, mode) ,(int)(fd)
 #define __NRATRF1_readvf                    "%p"
 #define __NRATRA1_readvf(fd, iovec, count, mode) ,iovec
-#define __NRATRF2_readvf                    "%Iu"
+#define __NRATRF2_readvf                    "%" PRIuPTR
 #define __NRATRA2_readvf(fd, iovec, count, mode) ,count
-#define __NRATRF3_readvf                    "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF3_readvf                    "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA3_readvf(fd, iovec, count, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                  ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                  ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
@@ -4879,9 +4879,9 @@
 #define __NRATRA0_writevf(fd, iovec, count, mode) ,(int)(fd)
 #define __NRATRF1_writevf                   "%p"
 #define __NRATRA1_writevf(fd, iovec, count, mode) ,iovec
-#define __NRATRF2_writevf                   "%Iu"
+#define __NRATRF2_writevf                   "%" PRIuPTR
 #define __NRATRA2_writevf(fd, iovec, count, mode) ,count
-#define __NRATRF3_writevf                   "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF3_writevf                   "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA3_writevf(fd, iovec, count, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                   ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                   ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
@@ -4897,7 +4897,7 @@
 #define __NRATRA0_debugtrap(state, reason)  ,state
 #define __NRATRF1_debugtrap                 "%p"
 #define __NRATRA1_debugtrap(state, reason)  ,reason
-#define __NRATRF0_select64                  "%Iu"
+#define __NRATRF0_select64                  "%" PRIuPTR
 #define __NRATRA0_select64(nfds, readfds, writefds, exceptfds, timeout) ,nfds
 #define __NRATRF1_select64                  "%p"
 #define __NRATRA1_select64(nfds, readfds, writefds, exceptfds, timeout) ,readfds
@@ -4909,7 +4909,7 @@
 #define __NRATRA4_select64(nfds, readfds, writefds, exceptfds, timeout) ,timeout
 #define __NRATRF0_lfutex                    "%p"
 #define __NRATRA0_lfutex(uaddr, futex_op, val, timeout, val2) ,uaddr
-#define __NRATRF1_lfutex                    "%#Ix"
+#define __NRATRF1_lfutex                    "%#" PRIxPTR
 #define __NRATRA1_lfutex(uaddr, futex_op, val, timeout, val2) ,(uintptr_t)(futex_op)
 #define __NRATRF2_lfutex                    "%p"
 #define __NRATRA2_lfutex(uaddr, futex_op, val, timeout, val2) ,val
@@ -4919,25 +4919,25 @@
 #define __NRATRA4_lfutex(uaddr, futex_op, val, timeout, val2) ,val2
 #define __NRATRF0_lfutexexpr                "%p"
 #define __NRATRA0_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,base
-#define __NRATRF1_lfutexexpr                "%Iu"
+#define __NRATRF1_lfutexexpr                "%" PRIuPTR
 #define __NRATRA1_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,exprc
 #define __NRATRF2_lfutexexpr                "%p"
 #define __NRATRA2_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,exprv
 #define __NRATRF3_lfutexexpr                "%p"
 #define __NRATRA3_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,timeout
-#define __NRATRF4_lfutexexpr                "%#Ix"
+#define __NRATRF4_lfutexexpr                "%#" PRIxPTR
 #define __NRATRA4_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,(uintptr_t)(timeout_flags)
 #define __NRATRF0_lfutexlockexpr            "%p"
 #define __NRATRA0_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,ulockaddr
 #define __NRATRF1_lfutexlockexpr            "%p"
 #define __NRATRA1_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,base
-#define __NRATRF2_lfutexlockexpr            "%Iu"
+#define __NRATRF2_lfutexlockexpr            "%" PRIuPTR
 #define __NRATRA2_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,exprc
 #define __NRATRF3_lfutexlockexpr            "%p"
 #define __NRATRA3_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,exprv
 #define __NRATRF4_lfutexlockexpr            "%p"
 #define __NRATRA4_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,timeout
-#define __NRATRF5_lfutexlockexpr            "%#Ix"
+#define __NRATRF5_lfutexlockexpr            "%#" PRIxPTR
 #define __NRATRA5_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,(uintptr_t)(timeout_flags)
 #define __NRATRF0_mktty                     "%d"
 #define __NRATRA0_mktty(keyboard, display, name, rsvd) ,(int)(keyboard)
@@ -4945,7 +4945,7 @@
 #define __NRATRA1_mktty(keyboard, display, name, rsvd) ,(int)(display)
 #define __NRATRF2_mktty                     "%q"
 #define __NRATRA2_mktty(keyboard, display, name, rsvd) ,(validate_readable_opt(name,1),name)
-#define __NRATRF3_mktty                     "%#Ix"
+#define __NRATRF3_mktty                     "%#" PRIxPTR
 #define __NRATRA3_mktty(keyboard, display, name, rsvd) ,(uintptr_t)(rsvd)
 #define __NRATRF0_raiseat                   "%p"
 #define __NRATRA0_raiseat(state, si)        ,state
@@ -4957,17 +4957,17 @@
 #define __NRATRA1_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,orig_state
 #define __NRATRF2_coredump                  "%p"
 #define __NRATRA2_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,traceback_vector
-#define __NRATRF3_coredump                  "%Iu"
+#define __NRATRF3_coredump                  "%" PRIuPTR
 #define __NRATRA3_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,traceback_length
 #define __NRATRF4_coredump                  "%p"
 #define __NRATRA4_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,exception
-#define __NRATRF5_coredump                  "%#Ix"
+#define __NRATRF5_coredump                  "%#" PRIxPTR
 #define __NRATRA5_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,(uintptr_t)(unwind_error)
-#define __NRATRF0_getitimer64               "%#Ix"
+#define __NRATRF0_getitimer64               "%#" PRIxPTR
 #define __NRATRA0_getitimer64(which, curr_value) ,(uintptr_t)(which)
 #define __NRATRF1_getitimer64               "%p"
 #define __NRATRA1_getitimer64(which, curr_value) ,curr_value
-#define __NRATRF0_setitimer64               "%#Ix"
+#define __NRATRF0_setitimer64               "%#" PRIxPTR
 #define __NRATRA0_setitimer64(which, newval, oldval) ,(uintptr_t)(which)
 #define __NRATRF1_setitimer64               "%p"
 #define __NRATRA1_setitimer64(which, newval, oldval) ,newval
@@ -4977,9 +4977,9 @@
 #define __NRATRA0_kreaddir(fd, buf, bufsize, mode) ,(int)(fd)
 #define __NRATRF1_kreaddir                  "%p"
 #define __NRATRA1_kreaddir(fd, buf, bufsize, mode) ,buf
-#define __NRATRF2_kreaddir                  "%Iu"
+#define __NRATRF2_kreaddir                  "%" PRIuPTR
 #define __NRATRA2_kreaddir(fd, buf, bufsize, mode) ,bufsize
-#define __NRATRF3_kreaddir                  "%#Ix=%s%s%s%s%s%s%s"
+#define __NRATRF3_kreaddir                  "%#" PRIxPTR "=%s%s%s%s%s%s%s"
 #define __NRATRA3_kreaddir(fd, buf, bufsize, mode) ,(uintptr_t)(mode),(mode) & READDIR_CONTINUE ? "READDIR_CONTINUE" : (mode) ? "" : "READDIR_DEFAULT" \
                                                    ,((mode) & READDIR_PEEK) && ((mode) & (READDIR_CONTINUE)) ? "|" : "",(mode) & READDIR_PEEK ? "READDIR_PEEK" : "" \
                                                    ,((mode) & READDIR_SKIPREL) && ((mode) & (READDIR_CONTINUE|READDIR_PEEK)) ? "|" : "",(mode) & READDIR_SKIPREL ? "READDIR_SKIPREL" : "" \
@@ -4988,9 +4988,9 @@
 #define __NRATRA0_fchdirat(dirfd, path, flags) ,(int)(dirfd)
 #define __NRATRF1_fchdirat                  "%q"
 #define __NRATRA1_fchdirat(dirfd, path, flags) ,(validate_readable_opt(path,1),path)
-#define __NRATRF2_fchdirat                  "%#Ix=%s"
+#define __NRATRF2_fchdirat                  "%#" PRIxPTR "=%s"
 #define __NRATRA2_fchdirat(dirfd, path, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_fsmode                    "%I64u"
+#define __NRATRF0_fsmode                    "%" PRIu64
 #define __NRATRA0_fsmode(mode)              ,mode
 #define __NRATRF0_gettimeofday64            "%p"
 #define __NRATRA0_gettimeofday64(tv, tz)    ,tv
@@ -5002,7 +5002,7 @@
 #define __NRATRA1_utime64(filename, times)  ,times
 #define __NRATRF0_maplibrary                "%p"
 #define __NRATRA0_maplibrary(addr, flags, fd, hdrv, hdrc) ,addr
-#define __NRATRF1_maplibrary                "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF1_maplibrary                "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA1_maplibrary(addr, flags, fd, hdrv, hdrc) ,(uintptr_t)(flags),(flags) & MAP_FIXED ? "MAP_FIXED" : "" \
                                                           ,((flags) & MAP_LOCKED) && ((flags) & (MAP_FIXED)) ? "|" : "",(flags) & MAP_LOCKED ? "MAP_LOCKED" : "" \
                                                           ,((flags) & MAP_NONBLOCK) && ((flags) & (MAP_FIXED|MAP_LOCKED)) ? "|" : "",(flags) & MAP_NONBLOCK ? "MAP_NONBLOCK" : "" \
@@ -5015,7 +5015,7 @@
 #define __NRATRA2_maplibrary(addr, flags, fd, hdrv, hdrc) ,(int)(fd)
 #define __NRATRF3_maplibrary                "%p"
 #define __NRATRA3_maplibrary(addr, flags, fd, hdrv, hdrc) ,hdrv
-#define __NRATRF4_maplibrary                "%Iu"
+#define __NRATRF4_maplibrary                "%" PRIuPTR
 #define __NRATRA4_maplibrary(addr, flags, fd, hdrv, hdrc) ,hdrc
 #define __NRATRF0_settimeofday64            "%p"
 #define __NRATRA0_settimeofday64(tv, tz)    ,tv
@@ -5027,14 +5027,14 @@
 #define __NRATRA0_kreaddirf(fd, buf, bufsize, mode, iomode) ,(int)(fd)
 #define __NRATRF1_kreaddirf                 "%p"
 #define __NRATRA1_kreaddirf(fd, buf, bufsize, mode, iomode) ,buf
-#define __NRATRF2_kreaddirf                 "%Iu"
+#define __NRATRF2_kreaddirf                 "%" PRIuPTR
 #define __NRATRA2_kreaddirf(fd, buf, bufsize, mode, iomode) ,bufsize
-#define __NRATRF3_kreaddirf                 "%#Ix=%s%s%s%s%s%s%s"
+#define __NRATRF3_kreaddirf                 "%#" PRIxPTR "=%s%s%s%s%s%s%s"
 #define __NRATRA3_kreaddirf(fd, buf, bufsize, mode, iomode) ,(uintptr_t)(mode),(mode) & READDIR_CONTINUE ? "READDIR_CONTINUE" : (mode) ? "" : "READDIR_DEFAULT" \
                                                             ,((mode) & READDIR_PEEK) && ((mode) & (READDIR_CONTINUE)) ? "|" : "",(mode) & READDIR_PEEK ? "READDIR_PEEK" : "" \
                                                             ,((mode) & READDIR_SKIPREL) && ((mode) & (READDIR_CONTINUE|READDIR_PEEK)) ? "|" : "",(mode) & READDIR_SKIPREL ? "READDIR_SKIPREL" : "" \
                                                             ,((mode) & READDIR_WANTEOF) && ((mode) & (READDIR_CONTINUE|READDIR_PEEK|READDIR_SKIPREL)) ? "|" : "",(mode) & READDIR_WANTEOF ? "READDIR_WANTEOF" : ""
-#define __NRATRF4_kreaddirf                 "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF4_kreaddirf                 "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA4_kreaddirf(fd, buf, bufsize, mode, iomode) ,(uintptr_t)(iomode),(iomode) & IO_WRONLY ? "IO_WRONLY" : (iomode) ? "" : "IO_RDONLY" \
                                                             ,((iomode) & IO_RDWR) && ((iomode) & (IO_WRONLY)) ? "|" : "",(iomode) & IO_RDWR ? "IO_RDWR" : "" \
                                                             ,((iomode) & IO_CLOEXEC) && ((iomode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(iomode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
@@ -5052,19 +5052,19 @@
 #define __NRATRA0_fmkdirat(dirfd, pathname, mode, flags) ,(int)(dirfd)
 #define __NRATRF1_fmkdirat                  "%q"
 #define __NRATRA1_fmkdirat(dirfd, pathname, mode, flags) ,(validate_readable_opt(pathname,1),pathname)
-#define __NRATRF2_fmkdirat                  "%#Io"
+#define __NRATRF2_fmkdirat                  "%#" PRIoPTR
 #define __NRATRA2_fmkdirat(dirfd, pathname, mode, flags) ,(uintptr_t)(mode)
-#define __NRATRF3_fmkdirat                  "%#Ix=%s"
+#define __NRATRF3_fmkdirat                  "%#" PRIxPTR "=%s"
 #define __NRATRA3_fmkdirat(dirfd, pathname, mode, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NRATRF0_fmknodat                  "%d"
 #define __NRATRA0_fmknodat(dirfd, nodename, mode, dev, flags) ,(int)(dirfd)
 #define __NRATRF1_fmknodat                  "%q"
 #define __NRATRA1_fmknodat(dirfd, nodename, mode, dev, flags) ,(validate_readable_opt(nodename,1),nodename)
-#define __NRATRF2_fmknodat                  "%#Io"
+#define __NRATRF2_fmknodat                  "%#" PRIoPTR
 #define __NRATRA2_fmknodat(dirfd, nodename, mode, dev, flags) ,(uintptr_t)(mode)
 #define __NRATRF3_fmknodat                  "%.2x:%.2x"
 #define __NRATRA3_fmknodat(dirfd, nodename, mode, dev, flags) ,(unsigned int)MAJOR(dev),(unsigned int)MINOR(dev)
-#define __NRATRF4_fmknodat                  "%#Ix=%s"
+#define __NRATRF4_fmknodat                  "%#" PRIxPTR "=%s"
 #define __NRATRA4_fmknodat(dirfd, nodename, mode, dev, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NRATRF0_futimesat64               "%d"
 #define __NRATRA0_futimesat64(dirfd, filename, times) ,(int)(dirfd)
@@ -5078,7 +5078,7 @@
 #define __NRATRA1_kfstatat(dirfd, filename, statbuf, flags) ,(validate_readable_opt(filename,1),filename)
 #define __NRATRF2_kfstatat                  "%p"
 #define __NRATRA2_kfstatat(dirfd, filename, statbuf, flags) ,statbuf
-#define __NRATRF3_kfstatat                  "%#Ix=%s%s%s"
+#define __NRATRF3_kfstatat                  "%#" PRIxPTR "=%s%s%s"
 #define __NRATRA3_kfstatat(dirfd, filename, statbuf, flags) ,(uintptr_t)(flags),(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
                                                             ,((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NRATRF0_frenameat                 "%d"
@@ -5089,7 +5089,7 @@
 #define __NRATRA2_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(int)(newfd)
 #define __NRATRF3_frenameat                 "%q"
 #define __NRATRA3_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(validate_readable_opt(newname_or_path,1),newname_or_path)
-#define __NRATRF4_frenameat                 "%#Ix=%s"
+#define __NRATRF4_frenameat                 "%#" PRIxPTR "=%s"
 #define __NRATRA4_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NRATRF0_fsymlinkat                "%q"
 #define __NRATRA0_fsymlinkat(link_text, tofd, target_path, flags) ,(validate_readable_opt(link_text,1),link_text)
@@ -5097,7 +5097,7 @@
 #define __NRATRA1_fsymlinkat(link_text, tofd, target_path, flags) ,(int)(tofd)
 #define __NRATRF2_fsymlinkat                "%q"
 #define __NRATRA2_fsymlinkat(link_text, tofd, target_path, flags) ,(validate_readable_opt(target_path,1),target_path)
-#define __NRATRF3_fsymlinkat                "%#Ix=%s"
+#define __NRATRF3_fsymlinkat                "%#" PRIxPTR "=%s"
 #define __NRATRA3_fsymlinkat(link_text, tofd, target_path, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NRATRF0_freadlinkat               "%d"
 #define __NRATRA0_freadlinkat(dirfd, path, buf, buflen, flags) ,(int)(dirfd)
@@ -5105,28 +5105,28 @@
 #define __NRATRA1_freadlinkat(dirfd, path, buf, buflen, flags) ,(validate_readable_opt(path,1),path)
 #define __NRATRF2_freadlinkat               "%p"
 #define __NRATRA2_freadlinkat(dirfd, path, buf, buflen, flags) ,buf
-#define __NRATRF3_freadlinkat               "%Iu"
+#define __NRATRF3_freadlinkat               "%" PRIuPTR
 #define __NRATRA3_freadlinkat(dirfd, path, buf, buflen, flags) ,buflen
-#define __NRATRF4_freadlinkat               "%#Ix=%s%s%s"
+#define __NRATRF4_freadlinkat               "%#" PRIxPTR "=%s%s%s"
 #define __NRATRA4_freadlinkat(dirfd, path, buf, buflen, flags) ,(uintptr_t)(flags),(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
                                                                ,((flags) & AT_DOSPATH) && ((flags) & (AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NRATRF0_fallocate64               "%d"
 #define __NRATRA0_fallocate64(fd, mode, offset, length) ,(int)(fd)
-#define __NRATRF1_fallocate64               "%#Ix"
+#define __NRATRF1_fallocate64               "%#" PRIxPTR
 #define __NRATRA1_fallocate64(fd, mode, offset, length) ,(uintptr_t)(mode)
-#define __NRATRF2_fallocate64               "%I64u"
+#define __NRATRF2_fallocate64               "%" PRIu64
 #define __NRATRA2_fallocate64(fd, mode, offset, length) ,offset
-#define __NRATRF3_fallocate64               "%I64u"
+#define __NRATRF3_fallocate64               "%" PRIu64
 #define __NRATRA3_fallocate64(fd, mode, offset, length) ,length
 #define __NRATRF0_preadvf                   "%d"
 #define __NRATRA0_preadvf(fd, iovec, count, offset, mode) ,(int)(fd)
 #define __NRATRF1_preadvf                   "%p"
 #define __NRATRA1_preadvf(fd, iovec, count, offset, mode) ,iovec
-#define __NRATRF2_preadvf                   "%Iu"
+#define __NRATRF2_preadvf                   "%" PRIuPTR
 #define __NRATRA2_preadvf(fd, iovec, count, offset, mode) ,count
-#define __NRATRF3_preadvf                   "%I64u"
+#define __NRATRF3_preadvf                   "%" PRIu64
 #define __NRATRA3_preadvf(fd, iovec, count, offset, mode) ,offset
-#define __NRATRF4_preadvf                   "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF4_preadvf                   "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA4_preadvf(fd, iovec, count, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                           ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                           ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
@@ -5140,11 +5140,11 @@
 #define __NRATRA0_pwritevf(fd, iovec, count, offset, mode) ,(int)(fd)
 #define __NRATRF1_pwritevf                  "%p"
 #define __NRATRA1_pwritevf(fd, iovec, count, offset, mode) ,iovec
-#define __NRATRF2_pwritevf                  "%Iu"
+#define __NRATRF2_pwritevf                  "%" PRIuPTR
 #define __NRATRA2_pwritevf(fd, iovec, count, offset, mode) ,count
-#define __NRATRF3_pwritevf                  "%I64u"
+#define __NRATRF3_pwritevf                  "%" PRIu64
 #define __NRATRA3_pwritevf(fd, iovec, count, offset, mode) ,offset
-#define __NRATRF4_pwritevf                  "%#Ix=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRF4_pwritevf                  "%#" PRIxPTR "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
 #define __NRATRA4_pwritevf(fd, iovec, count, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                            ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                            ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \

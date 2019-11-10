@@ -1,0 +1,90 @@
+/* Copyright (c) 2018 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+import * from deemon;
+
+global inttypesPRIMacros = Dict();
+for (local format: "diouxX") {
+	for (local n: ["8", "16", "32", "64"])
+		inttypesPRIMacros["I" + n + format] = "PRI" + format + n;
+	inttypesPRIMacros["I" + format] = "PRI" + format + "PTR";
+}
+
+@@Optimize a printf() format string, and return its c-string
+@@variant (possibly using the macros from <inttypes.h>)
+function optimizePrintf(format: string): string {
+	File.Writer fp;
+	local inString = false;
+	local n = #format;
+	local i = 0;
+	local flush_start = 0;
+	while (i < n) {
+continue_outer:
+		local ch = format[i];
+		++i;
+		if (ch != "%")
+			continue;
+		while (i < n) {
+			ch = format[i];
+			++i;
+			if (ch == "%")
+				goto continue_outer;
+			if (ch !in "-+ #0?*$.:" && !ch.isnumeric())
+				break;
+		}
+		local codec_start = i - 1;
+		while (i < n && ch in "I123468hljztL") {
+			ch = format[i];
+			++i;
+		}
+		local codec = format[codec_start:i];
+		local fastcodec = inttypesPRIMacros.get(codec);
+		if (fastcodec !is none) {
+			if (codec_start > flush_start) {
+				if (!inString)
+					fp << " \"";
+				inString = true;
+				fp << format[flush_start:codec_start].encode("c-escape");
+			}
+			if (inString) {
+				fp << "\" ";
+				inString = false;
+			}
+			fp << fastcodec;
+			flush_start = i;
+		}
+	}
+	if (flush_start < n) {
+		if (!inString) {
+			fp << " \"";
+			inString = true;
+		}
+		fp << format[flush_start:].encode("c-escape");
+	}
+	if (inString)
+		fp << "\"";
+	fp = fp.string.strip();
+	if (!fp)
+		fp = "\"\"";
+	return fp;
+}
+
+assert optimizePrintf("a%Iub") == "\"a%\" PRIuPTR \"b\"";
+assert optimizePrintf("a%ub") == "\"a%ub\"";
+
+

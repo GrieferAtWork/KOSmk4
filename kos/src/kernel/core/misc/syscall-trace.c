@@ -48,10 +48,11 @@
 #include <sys/syscall-trace.h>
 #include <sys/wait.h> /* W* */
 
-#include <fcntl.h> /* O_* */
-#include <format-printer.h>
-#include <sched.h>  /* CLONE_* */
-#include <unistd.h> /* SEEK_* */
+#include <fcntl.h>          /* O_* */
+#include <format-printer.h> /* pformatprinter */
+#include <inttypes.h>       /* PRI* */
+#include <sched.h>          /* CLONE_* */
+#include <unistd.h>         /* SEEK_* */
 
 #include <librpc/rpc.h> /* RPC_SCHEDULE_FLAG_* */
 

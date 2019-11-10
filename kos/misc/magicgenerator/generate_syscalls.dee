@@ -40,6 +40,7 @@ local copyright =
 import fs;
 import * from deemon;
 import hash from hashlib;
+import optimizePrintf from ..libgen.optiprintf;
 
 #define SYSNO_EXTENDED_START 0x80000000
 
@@ -642,6 +643,8 @@ do_overwrite_file:
 }
 
 
+
+
 function unpack_trace(tags: {(string, string)...}, typ: string): (string, string) {
 	local x = Dict(tags).get("printf");
 	if (x is none)
@@ -724,7 +727,7 @@ function unpack_trace(tags: {(string, string)...}, typ: string): (string, string
 				args_writer << ",({me}) & " << fval << " ? " << repr(f) << " : \"\"\n";
 			}
 		}
-		return (repr(format_string), args_writer.string.rstrip());
+		return (optimizePrintf(format_string), args_writer.string.rstrip());
 	}
 	assert x.startswith("\"");
 	local i = 1;
@@ -736,6 +739,7 @@ function unpack_trace(tags: {(string, string)...}, typ: string): (string, string
 	x = x[i:].lstrip();
 	assert x.startswith(",");
 	x = x[1:].lstrip();
+	format_string = optimizePrintf(format_string.decode("c-escape"));
 	return (format_string, "," + x);
 }
 
