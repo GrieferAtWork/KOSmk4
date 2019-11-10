@@ -30,7 +30,7 @@
 
 #ifndef PREFIX
 #define IS_DEFAULT_PREFIX 1
-#define PREFIX x86_def
+#define PREFIX x86_
 #endif /* !PREFIX */
 
 #define SYMBOL(prefix2, id) PP_CAT3(PREFIX, prefix2, IDT_X86_##id)
@@ -38,13 +38,13 @@
 #define PROVIDE_IDT_ADDRESS(id) /* nothing */
 #else /* IS_DEFAULT_PREFIX */
 #define PROVIDE_IDT_ADDRESS(id) \
-	PROVIDE_HIDDEN(SYMBOL(idt_, id) = PP_CAT3(x86_def, idt_, IDT_X86_##id));
+	PROVIDE_HIDDEN(SYMBOL(idt_, id) = PP_CAT3(x86_, idt_, IDT_X86_##id));
 #ifdef __x86_64__
 #define PROVIDE_IST(id) \
-	PROVIDE_HIDDEN(SYMBOL(ist_, id) = PP_CAT3(x86_def, ist_, IDT_X86_##id));
+	PROVIDE_HIDDEN(SYMBOL(idtist_, id) = PP_CAT3(x86_, idtist_, IDT_X86_##id));
 #endif /* __x86_64__ */
 #define PROVIDE_DPL(id) \
-	PROVIDE_HIDDEN(SYMBOL(dpl_, id) = PP_CAT3(x86_def, dpl_, IDT_X86_##id));
+	PROVIDE_HIDDEN(SYMBOL(idtdpl_, id) = PP_CAT3(x86_, idtdpl_, IDT_X86_##id));
 #endif /* !IS_DEFAULT_PREFIX */
 
 
@@ -55,7 +55,7 @@
 #define DEFINE_INTRGATE_EX(id, offset, TYPE, DPL, IST) \
 	DEFINE(id, INTRGATE, (offset, SEGMENT_KERNEL_CODE, IST, TYPE, DPL, 1))
 #ifndef PROVIDE_IST
-#define PROVIDE_IST(id) PROVIDE_HIDDEN(SYMBOL(ist_, id) = 0);
+#define PROVIDE_IST(id) PROVIDE_HIDDEN(SYMBOL(idtist_, id) = 0);
 #endif /* !PROVIDE_IST */
 #else /* __x86_64__ */
 #define DEFINE(id, segment_name, args)                                                       \
@@ -69,14 +69,14 @@
 #endif /* !__x86_64__ */
 
 #ifndef PROVIDE_DPL
-#define PROVIDE_DPL(id) PROVIDE_HIDDEN(SYMBOL(dpl_, id) = 0);
+#define PROVIDE_DPL(id) PROVIDE_HIDDEN(SYMBOL(idtdpl_, id) = 0);
 #endif /* !PROVIDE_DPL */
 
 #define DEFINE_INTRGATE(id, TYPE) \
 	PROVIDE_DPL(id)               \
 	PROVIDE_IST(id)               \
 	PROVIDE_IDT_ADDRESS(id)       \
-	DEFINE_INTRGATE_EX(id, SYMBOL(idt_, id), TYPE, SYMBOL(dpl_, id), SYMBOL(ist_, id))
+	DEFINE_INTRGATE_EX(id, SYMBOL(idt_, id), TYPE, SYMBOL(idtdpl_, id), SYMBOL(idtist_, id))
 
 #define INTR(id) DEFINE_INTRGATE(id, SEGMENT_DESCRIPTOR_TYPE_INTRGATE)
 #define TRAP(id) DEFINE_INTRGATE(id, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE)
@@ -99,7 +99,7 @@ INTR(08) /* #DF -- Double Fault. */
 #else /* __x86_64__ */
 /* Special handling for #DF (implemented using a task gate on i386) */
 PROVIDE_DPL(08)
-DEFINE(08, TASKGATE, (SEGMENT_CPU_TSS_DF, SYMBOL(dpl_, 08), 1))
+DEFINE(08, TASKGATE, (SEGMENT_CPU_TSS_DF, SYMBOL(idtdpl_, 08), 1))
 #endif /* !__x86_64__ */
 
 INTR(09)

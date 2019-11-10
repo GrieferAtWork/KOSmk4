@@ -8610,10 +8610,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak handle_installxchg; .long handle_installxchg
 	.reloc ., R_386_SIZE32, handle_installxchg; .long 0
 	.long 0xbabf867
-	.long 0 /* index: 2152 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2152 /* index: 2152 */
+	.weak x86_idt_ptr; .long x86_idt_ptr
+	.reloc ., R_386_SIZE32, x86_idt_ptr; .long 0
+	.long 0xfc3dbe2
 	.long .Lname2153 /* index: 2153 */
 	.weak vm_futex_destroy; .long vm_futex_destroy
 	.reloc ., R_386_SIZE32, vm_futex_destroy; .long 0
@@ -12482,10 +12482,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname3120 /* index: 3120 */
-	.weak x86_defidt_ptr; .long x86_defidt_ptr
-	.reloc ., R_386_SIZE32, x86_defidt_ptr; .long 0
-	.long 0x47dcbc2
+	.long 0 /* index: 3120 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname3121 /* index: 3121 */
 	.weak task_redirect_usercode_rpc; .long task_redirect_usercode_rpc
 	.reloc ., R_386_SIZE32, task_redirect_usercode_rpc; .long 0
@@ -15810,10 +15810,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 3952 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3952 /* index: 3952 */
+	.weak x86_idt; .long x86_idt
+	.reloc ., R_386_SIZE32, x86_idt; .long 0
+	.long 0xbbc5fc4
 	.long .Lname3953 /* index: 3953 */
 	.weak dbg_getscreendata; .long dbg_getscreendata
 	.reloc ., R_386_SIZE32, dbg_getscreendata; .long 0
@@ -15830,10 +15830,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname3957 /* index: 3957 */
-	.weak x86_defidt; .long x86_defidt
-	.reloc ., R_386_SIZE32, x86_defidt; .long 0
-	.long 0x5ac7474
+	.long 0 /* index: 3957 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 3958 */
 	.long 0
 	.long 0
@@ -18634,6 +18634,8 @@ END(kernel_symbol_table)
 	.string "json_parser_rewind"
 .Lname2151:
 	.string "handle_installxchg"
+.Lname2152:
+	.string "x86_idt_ptr"
 .Lname2153:
 	.string "vm_futex_destroy"
 .Lname2160:
@@ -19672,8 +19674,6 @@ END(kernel_symbol_table)
 	.string "vio_cmpxchb"
 .Lname3118:
 	.string "vmb_isused"
-.Lname3120:
-	.string "x86_defidt_ptr"
 .Lname3121:
 	.string "task_redirect_usercode_rpc"
 .Lname3122:
@@ -20598,14 +20598,14 @@ END(kernel_symbol_table)
 	.string "vm_tasklock_read"
 .Lname3949:
 	.string "x86_vm86_inb"
+.Lname3952:
+	.string "x86_idt"
 .Lname3953:
 	.string "dbg_getscreendata"
 .Lname3954:
 	.string "dbg_evaladdr"
 .Lname3955:
 	.string "pidns_alloc"
-.Lname3957:
-	.string "x86_defidt"
 .Lname3961:
 	.string "handle_installat"
 .Lname3963:

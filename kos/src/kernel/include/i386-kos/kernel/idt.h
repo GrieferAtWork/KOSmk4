@@ -58,12 +58,16 @@ DECL_BEGIN
 struct idt_segment; /* From <kos/kernel/segment.h> */
 struct desctab;     /* From <kos/kernel/cpu-state.h> */
 
-DATDEF struct idt_segment x86_defidt[256];
-DATDEF struct desctab const x86_defidt_ptr;
+DATDEF struct idt_segment x86_idt[256];
+DATDEF struct desctab const x86_idt_ptr;
 #ifndef CONFIG_NO_DEBUGGER
 DATDEF struct idt_segment x86_dbgidt[256];
 DATDEF struct desctab const x86_dbgidt_ptr;
 #endif /* !CONFIG_NO_DEBUGGER */
+
+
+//FUNDEF void KCALL x86_;
+
 
 #endif /* __CC__ */
 

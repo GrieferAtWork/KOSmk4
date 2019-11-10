@@ -109,7 +109,7 @@ __ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_LDTR),0x56,0x22)
 	movl   %esi, x86_cputss_df + OFFSET_TSS_ESI(%esi)
 	movl   %esp, x86_cputss_df + OFFSET_TSS_ESP(%esi)
 	movl   %ebp, x86_cputss_df + OFFSET_TSS_EBP(%esi)
-	movl   $(PP_CAT2(x86_defidt_, IDT_VECTOR_NAME)), x86_cputss_df + OFFSET_TSS_EIP(%esi)
+	movl   $(PP_CAT2(x86_idt_, IDT_VECTOR_NAME)), x86_cputss_df + OFFSET_TSS_EIP(%esi)
 
 	movl   %ebp, %esp
 
@@ -285,8 +285,8 @@ INTERN_FUNCTION(PP_CAT2(x86_handle_, IDT_VECTOR_NAME))
 	xorl   %edx, %edx /* uintptr_t ecode */
 #endif /* IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */
 	pushl_cfi $(IDT_VECTOR_ID)
-	INTERN(x86_handle_idt)
-	call   x86_handle_idt
+	INTERN(x86_handle_unhandled_idt)
+	call   x86_handle_unhandled_idt
 	.cfi_adjust_cfa_offset -4
 	ret
 	.cfi_endproc

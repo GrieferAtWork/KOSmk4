@@ -172,7 +172,7 @@ PUBLIC ATTR_PERCPU struct tss x86_cputss = {
 };
 
 #ifndef __x86_64__
-INTDEF void ASMCALL x86_defidt_double_fault(void);
+INTDEF void ASMCALL x86_idt_double_fault(void);
 
 PUBLIC ATTR_PERCPU struct tss x86_cputss_df = {
 	.t_link       = 0,
@@ -187,7 +187,7 @@ PUBLIC ATTR_PERCPU struct tss x86_cputss_df = {
 	.t_ss2        = SEGMENT_KERNEL_DATA,
 	.__t_zero3    = 0,
 	.t_cr3        = (u32)(uintptr_t)&pagedir_kernel_phys,
-	.t_eip        = (u32)(uintptr_t)&x86_defidt_double_fault,
+	.t_eip        = (u32)(uintptr_t)&x86_idt_double_fault,
 	.t_eflags     = 0,
 	.t_eax        = 0,
 	.t_ecx        = 0,

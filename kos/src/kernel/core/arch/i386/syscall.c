@@ -800,8 +800,8 @@ INTDEF byte_t x86_sysenter_main[];
 PRIVATE ATTR_COLDBSS struct mutex syscall_tracing_lock = MUTEX_INIT;
 INTERN ATTR_COLDBSS bool syscall_tracing_enabled = false;
 
-INTDEF byte_t x86_defidt_syscall[];
-INTDEF byte_t x86_defidt_syscall_traced[];
+INTDEF byte_t x86_idt_syscall[];
+INTDEF byte_t x86_idt_syscall_traced[];
 INTDEF byte_t x86_sysenter_main_traced[];
 
 
@@ -814,7 +814,7 @@ NOTHROW(FCALL syscall_tracing_ipi)(struct icpustate *__restrict state,
 		        args[0] ? (uintptr_t)x86_sysenter_main_traced
 		                : (uintptr_t)x86_sysenter_main);
 	}
-	__lidt_p(&x86_defidt_ptr);
+	__lidt_p(&x86_idt_ptr);
 	return state;
 }
 
@@ -828,8 +828,8 @@ PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
 	uintptr_t addr;
 	SCOPED_WRITELOCK(&syscall_tracing_lock);
 	argv[0] = (void *)(enable ? (uintptr_t)1 : (uintptr_t)0);
-	addr = enable ? (uintptr_t)x86_defidt_syscall
-	              : (uintptr_t)x86_defidt_syscall_traced;
+	addr = enable ? (uintptr_t)x86_idt_syscall
+	              : (uintptr_t)x86_idt_syscall_traced;
 #ifdef __x86_64__
 	newsyscall.i_seg.s_u = SEGMENT_INTRGATE_INIT_U(addr, SEGMENT_KERNEL_CODE, 0, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
 	newsyscall.i_ext.s_u = SEGMENT_INTRGATE_HI_INIT_U(addr, SEGMENT_KERNEL_CODE, 0, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
@@ -844,7 +844,7 @@ PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
 	 *         - Modify the original IDT
 	 *         - Broadcast an IPI to have all other CPUs load the original IDT
 	 *         - Free the copy */
-	x86_defidt[0x80] = newsyscall;
+	x86_idt[0x80] = newsyscall;
 
 	result = syscall_tracing_enabled;
 	syscall_tracing_enabled = enable;
@@ -866,7 +866,7 @@ PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
 		        enable ? (uintptr_t)x86_sysenter_main_traced
 		               : (uintptr_t)x86_sysenter_main);
 	}
-	__lidt_p(&x86_defidt_ptr);
+	__lidt_p(&x86_idt_ptr);
 	return result;
 }
 /* Check if system call tracing is enabled. */

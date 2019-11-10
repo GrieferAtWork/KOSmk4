@@ -2147,8 +2147,6 @@
 #define __CRT_HAVE_x86_dbgidt 1
 #define __CRT_HAVE_x86_dbgidt_ptr 1
 #define __CRT_HAVE_x86_debug_gdt 1
-#define __CRT_HAVE_x86_defidt 1
-#define __CRT_HAVE_x86_defidt_ptr 1
 #define __CRT_HAVE_x86_exsyscall_is_cancellation_point 1
 #define __CRT_HAVE_x86_exsyscall_register_count 1
 #define __CRT_HAVE_x86_exsyscall_restart_mode 1
@@ -2161,6 +2159,8 @@
 #define __CRT_HAVE_x86_fxrstor 1
 #define __CRT_HAVE_x86_fxsave 1
 #define __CRT_HAVE_x86_fxsave_mxcsr_mask 1
+#define __CRT_HAVE_x86_idt 1
+#define __CRT_HAVE_x86_idt_ptr 1
 #define __CRT_HAVE_x86_lapic_base_address 1
 #define __CRT_HAVE_x86_lapic_id 1
 #define __CRT_HAVE_x86_lapic_version 1

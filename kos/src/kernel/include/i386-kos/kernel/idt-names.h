@@ -20,13 +20,13 @@
 #define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_IDT_NAMES_H 1
 
 /* X86 IDT symbol assembly function names
- * These names are prefixed by either `x86_def(idt|dpl|ist)_' or `x86_dbg(idt|dpl|ist)_'
- *  - x86_defidt_divide_by_zero
- *  - x86_defdpl_divide_by_zero = 0
- *  - x86_defist_divide_by_zero = 0
- *  - x86_dbgidt_divide_by_zero = x86_defidt_divide_by_zero
- *  - x86_dbgdpl_divide_by_zero = x86_defdpl_divide_by_zero
- *  - x86_dbgist_divide_by_zero = x86_defist_divide_by_zero
+ * These names are prefixed by either `x86_(idt|idtdpl|idtist)_' or `x86_dbg(idt|idtdpl|idtist)_'
+ *  - x86_idt_divide_by_zero
+ *  - x86_idtdpl_divide_by_zero = 0
+ *  - x86_idtist_divide_by_zero = 0
+ *  - x86_dbgidt_divide_by_zero    = x86_idt_divide_by_zero
+ *  - x86_dbgidtdpl_divide_by_zero = x86_idtdpl_divide_by_zero
+ *  - x86_dbgidtist_divide_by_zero = x86_idtist_divide_by_zero
  *
  * Certain IDT ranges allow for additional symbols:
  *  - 0x00 - 0x1f: x86_handle_divide_by_zero

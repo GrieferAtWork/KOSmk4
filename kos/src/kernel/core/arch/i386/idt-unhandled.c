@@ -225,8 +225,8 @@ panic_uhi_dbg_main(void *arg) {
 
 
 INTERN struct icpustate *FCALL
-x86_handle_idt(struct icpustate *__restrict state,
-               uintptr_t ecode, uintptr_t intno) {
+x86_handle_unhandled_idt(struct icpustate *__restrict state,
+                         uintptr_t ecode, uintptr_t intno) {
 	struct ucpustate ustate;
 	__cli();
 	icpustate_to_ucpustate(state, &ustate);

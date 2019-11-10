@@ -21,11 +21,11 @@
 #define IDT_VECTOR 7f
 #endif /* __INTELLISENSE__ */
 
-INTERN_FUNCTION(PP_CAT2(x86_defidt_, IDT_VECTOR_NAME))
+INTERN_FUNCTION(PP_CAT2(x86_idt_, IDT_VECTOR_NAME))
 	pushl_cfi  $(IDT_VECTOR_ID)
 	PRIVATE(x86_idt_unused_common)
 	jmp     x86_idt_unused_common
 	.cfi_adjust_cfa_offset -4
-END(PP_CAT2(x86_defidt_, IDT_VECTOR_NAME))
+END(PP_CAT2(x86_idt_, IDT_VECTOR_NAME))
 
 #undef IDT_VECTOR

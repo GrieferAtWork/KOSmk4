@@ -65,9 +65,9 @@ GDBX86InterruptBackup_Override(GDBX86InterruptBackup *__restrict backup,
 	 *         - Broadcast an IPI to have all other CPUs load the original IDT
 	 *         - Free the copy */
 	COMPILER_BARRIER();
-	backup->ib_segment = x86_defidt[vector];
+	backup->ib_segment = x86_idt[vector];
 	COMPILER_BARRIER();
-	GDBX86Interrupt_EncodeSegment(&x86_defidt[vector], asmHandler, dpl);
+	GDBX86Interrupt_EncodeSegment(&x86_idt[vector], asmHandler, dpl);
 	COMPILER_BARRIER();
 }
 
@@ -81,7 +81,7 @@ GDBX86InterruptBackup_Restore(GDBX86InterruptBackup *__restrict backup,
 	 *         - Modify the original IDT
 	 *         - Broadcast an IPI to have all other CPUs load the original IDT
 	 *         - Free the copy */
-	x86_defidt[vector] = backup->ib_segment;
+	x86_idt[vector] = backup->ib_segment;
 }
 
 

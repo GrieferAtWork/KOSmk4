@@ -31,13 +31,13 @@
 DECL_BEGIN
 
 #ifdef CONFIG_NO_DEBUGGER
-#define ISR_DEFINE_HILO(id)              \
-	INTDEF byte_t __x86_defidtlo_##id[]; \
-	INTDEF byte_t __x86_defidthi_##id[];
+#define ISR_DEFINE_HILO(id)           \
+	INTDEF byte_t __x86_idtlo_##id[]; \
+	INTDEF byte_t __x86_idthi_##id[];
 #else /* CONFIG_NO_DEBUGGER */
 #define ISR_DEFINE_HILO(id)              \
-	INTDEF byte_t __x86_defidtlo_##id[]; \
-	INTDEF byte_t __x86_defidthi_##id[]; \
+	INTDEF byte_t __x86_idtlo_##id[];    \
+	INTDEF byte_t __x86_idthi_##id[];    \
 	INTDEF byte_t __x86_dbgidtlo_##id[]; \
 	INTDEF byte_t __x86_dbgidthi_##id[];
 #endif /* !CONFIG_NO_DEBUGGER */
@@ -67,15 +67,15 @@ IDT_X86_FOREACH(ISR_DEFINE_HILO)
 /************************************************************************/
 /* The Default InterruptDescriptorTable used by KOS                     */
 /************************************************************************/
-PUBLIC ATTR_SECTION(".data.hot") struct idt_segment x86_defidt[256] = {
-#define ISR_DEFINE(id) ISR_DEFINE_HILO(__x86_defidt, id)
+PUBLIC ATTR_SECTION(".data.hot") struct idt_segment x86_idt[256] = {
+#define ISR_DEFINE(id) ISR_DEFINE_HILO(__x86_idt, id)
 	IDT_X86_FOREACH(ISR_DEFINE)
 #undef ISR_DEFINE
 };
 
-PUBLIC_CONST ATTR_SECTION(".rodata.cold") struct desctab const x86_defidt_ptr = {
-	/* .dt_limit = */ sizeof(x86_defidt) - 1,
-	/* .dt_base  = */ (uintptr_t)x86_defidt
+PUBLIC_CONST ATTR_SECTION(".rodata.cold") struct desctab const x86_idt_ptr = {
+	/* .dt_limit = */ sizeof(x86_idt) - 1,
+	/* .dt_base  = */ (uintptr_t)x86_idt
 };
 
 
