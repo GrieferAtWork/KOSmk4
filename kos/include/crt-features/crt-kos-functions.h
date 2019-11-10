@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbcb0c63 */
+/* HASH CRC-32:0x5559a45f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -582,7 +582,7 @@ __CRT_FUNCTION(difftime,0,(),2,(time_t,time1,time_t,time0),double)
 __CRT_FUNCTION(difftime64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,difftime),2,(time64_t,time1,time64_t,time0),double)
 __CRT_FUNCTION(dirfd,0,(),1,(DIR *__restrict,dirp),fd_t)
 __CRT_FUNCTION(dirname,0,(),1,(char *,path),char *)
-__CRT_FUNCTION(div,0,(),2,(int,numer,int,denom),div_t)
+__CRT_FUNCTION(div,0,(),2,(int,numer,int,denom),struct __div_struct)
 __CRT_FUNCTION(dprintf,0,(),VA(2),(fd_t,fd,char const *__restrict,format),__STDC_INT_AS_SSIZE_T)
 __CRT_FUNCTION(drand48,0,(),0,(),double)
 __CRT_FUNCTION(drand48_r,0,(),2,(struct drand48_data *__restrict,buffer,double *__restrict,result),int)

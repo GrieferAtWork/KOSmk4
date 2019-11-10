@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d921f92 */
+/* HASH CRC-32:0x1a6071b8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ INTDEF ATTR_CONST WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llabs)(__LONGLONG x);
 INTDEF ATTR_CONST WUNUSED ldiv_t NOTHROW_NCX(LIBCCALL libc_ldiv)(long numer, long denom);
 INTDEF ATTR_CONST WUNUSED lldiv_t NOTHROW_NCX(LIBCCALL libc_lldiv)(__LONGLONG numer, __LONGLONG denom);
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_abs)(int x);
-INTDEF ATTR_CONST WUNUSED div_t NOTHROW_NCX(LIBCCALL libc_div)(int numer, int denom);
+INTDEF ATTR_CONST WUNUSED struct __div_struct NOTHROW_NCX(LIBCCALL libc_div)(int numer, int denom);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_mblen)(char const *s, size_t n);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_mbtowc)(char32_t *__restrict pwc, char const *__restrict s, size_t n);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_mbtowc)(char16_t *__restrict pwc, char const *__restrict s, size_t n);

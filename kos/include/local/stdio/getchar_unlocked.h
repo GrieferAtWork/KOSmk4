@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc17079f */
+/* HASH CRC-32:0x6420858f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Same as `getchar()', but performs I/O without acquiring a lock to `stdin' */
 __LOCAL_LIBC(getchar_unlocked) int
 (__LIBCCALL __LIBC_LOCAL_NAME(getchar_unlocked))(void) __THROWS(...) {
-#line 1340 "kos/src/libc/magic/stdio.c"
+#line 1343 "kos/src/libc/magic/stdio.c"
 	return __localdep_fgetc_unlocked(__LOCAL_stdin);
 }
 __NAMESPACE_LOCAL_END

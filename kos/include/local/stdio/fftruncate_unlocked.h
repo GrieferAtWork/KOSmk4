@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19254837 */
+/* HASH CRC-32:0x1f13138c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,7 +90,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fftruncate_unlocked) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fftruncate_unlocked))(__FILE *__restrict __stream,
                                                     __PIO_OFFSET __length) __THROWS(...) {
-#line 1970 "kos/src/libc/magic/stdio.c"
+#line 1973 "kos/src/libc/magic/stdio.c"
 	int __result = -1;
 	__fd_t __fd = __localdep_fileno_unlocked(__stream);
 	if __likely(__fd >= 0)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9809387 */
+/* HASH CRC-32:0xd941ab53 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __LOCAL_LIBC(setbuffer) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setbuffer))(__FILE *__restrict __stream,
                                                        char *__buf,
                                                        __SIZE_TYPE__ __bufsize) {
-#line 1103 "kos/src/libc/magic/stdio.c"
+#line 1106 "kos/src/libc/magic/stdio.c"
 	__localdep_setvbuf(__stream,
 	        __buf,
 	        __buf ? ___IOFBF : ___IONBF,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68c38f4b */
+/* HASH CRC-32:0xf01639f3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -111,7 +111,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the current in-file position of `STREAM' */
 __LOCAL_LIBC(ftello) __ATTR_WUNUSED __ATTR_NONNULL((1)) __FS_TYPE(off)
 (__LIBCCALL __LIBC_LOCAL_NAME(ftello))(__FILE *__restrict __stream) __THROWS(...) {
-#line 1555 "kos/src/libc/magic/stdio.c"
+#line 1558 "kos/src/libc/magic/stdio.c"
 #if defined(__USE_FILE_OFFSET64) && (defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked))
 	__pos64_t __pos;
 	if (__localdep_crt_fgetpos64(__stream, &__pos))

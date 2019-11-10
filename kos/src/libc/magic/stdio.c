@@ -954,7 +954,9 @@ __LOCAL_LIBC(@vsscanf_ungetc@) __SSIZE_TYPE__ (__LIBCCALL __vsscanf_ungetc)(void
 [section(.text.crt.unicode.static.format.scanf)][export_alias(__vsscanf)]
 vsscanf:([nonnull] char const *__restrict input,
          [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
-	return format_vscanf(&@__vsscanf_getc@, &@__vsscanf_ungetc@, (void *)&input, format, args);
+	char const *input_pointer = input;
+	return format_vscanf(&@__vsscanf_getc@, &@__vsscanf_ungetc@,
+	                     (void *)&input_pointer, format, args);
 }
 %(std)#endif /* __USE_ISOC99 || __USE_DOS */
 
@@ -978,12 +980,13 @@ sscanf:([nonnull] char const *__restrict input,
 vsprintf:([nonnull] char *__restrict dest,
           [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	@__STDC_INT_AS_SSIZE_T@ result;
+	char *dest_pointer = dest;
 	result = (@__STDC_INT_AS_SSIZE_T@)format_vprintf(&format_sprintf_printer,
-	                                                 (void *)&dest,
+	                                                 (void *)&dest_pointer,
 	                                                 format,
 	                                                 args);
 	if (result >= 0)
-		*dest = '\0';
+		*dest_pointer = '\0';
 	return result;
 }
 

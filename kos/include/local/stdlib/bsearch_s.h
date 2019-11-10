@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36f44d05 */
+/* HASH CRC-32:0x5c5fe8a4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bsearch_s))(void const *__key,
                                                        __SIZE_TYPE__ __size,
                                                        __dos_compar_d_fn_t __compar,
                                                        void *__arg) {
-#line 1998 "kos/src/libc/magic/stdlib.c"
+#line 2055 "kos/src/libc/magic/stdlib.c"
 	struct __invoke_compare_helper_s_data __data;
 	__data.__fun = __compar;
 	__data.__arg = __arg;

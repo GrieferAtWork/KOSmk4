@@ -913,7 +913,7 @@ again_read_word:
 
 INTERN NOBLOCK void
 NOTHROW(FCALL p32_pagedir_unmap_userspace_nosync)(void) {
-	unsigned int vec2, free_count = 0;
+	unsigned int vec2;
 	/* Map all pages before the share-segment as absent. */
 	for (vec2 = 0; vec2 < P32_PDIR_VEC2INDEX(KERNEL_BASE); ++vec2) {
 		union p32_pdir_e2 e2;

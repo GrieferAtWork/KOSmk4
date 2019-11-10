@@ -4351,7 +4351,16 @@ class Function {
 		/* Include dependencies. */
 		local fast_dependency_components = HashSet();
 		local dependency_prefix_lines = List();
-		if (hasThrowsAnnotation())
+		local needKosAnno = hasThrowsAnnotation();
+		if (!needKosAnno) {
+			for (local f: dependencies) {
+				if (f.hasThrowsAnnotation()) {
+					needKosAnno = true;
+					break;
+				}
+			}
+		}
+		if (needKosAnno)
 			dependency_prefix_lines.append("#include <kos/anno.h>");
 		for (local f: dependencies) {
 			if (f.declaration_prefix) {

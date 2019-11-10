@@ -731,43 +731,43 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #elif defined(__TINYC__)
 #ifdef __x86_64__
 #ifndef _WIN64
-#define __builtin_va_list                    void *
-#define __builtin_va_start(ap,last) (void)((ap)=__va_start(__builtin_frame_address(0)))
-#define __builtin_va_arg(ap,type)   (*(type *)__va_arg(ap,__builtin_va_arg_types(type),sizeof(type)))
-#define __builtin_va_copy(dest,src) (void)((dest)=__va_copy(src))
+#define __builtin_va_list            void *
+#define __builtin_va_start(ap, last) (void)((ap) = __va_start(__builtin_frame_address(0)))
+#define __builtin_va_arg(ap, type)   (*(type *)__va_arg(ap, __builtin_va_arg_types(type), sizeof(type)))
+#define __builtin_va_copy(dest, src) (void)((dest) = __va_copy(src))
 #define __builtin_va_end(ap)         __va_end(ap)
 extern __builtin_va_list (__va_start)(void *fp);
 extern __builtin_va_list (__va_copy)(__builtin_va_list src);
 extern void *(__va_arg)(__builtin_va_list ap, int arg_type, int size);
 extern void (__va_end)(__builtin_va_list ap);
 #else /* _WIN64 */
-#define __builtin_va_list                    char *
-#define __builtin_va_start(ap,last) (void)((ap)=((char *)&(last))+((sizeof(last)+7)&~7))
-#define __builtin_va_arg(ap,type)   ((ap)+=(sizeof(type)+7)&~7,*(type *)((ap)-((sizeof(type)+7)&~7)))
-#define __builtin_va_copy(dest,src) (void)((dest)=(src))
-#define __builtin_va_end(ap)        (void)0
+#define __builtin_va_list            char *
+#define __builtin_va_start(ap, last) (void)((ap) = ((char *)&(last)) + ((sizeof(last) + 7) & ~7))
+#define __builtin_va_arg(ap, type)   ((ap) += (sizeof(type) + 7) & ~7, *(type *)((ap) - ((sizeof(type) + 7) & ~7)))
+#define __builtin_va_copy(dest, src) (void)((dest) = (src))
+#define __builtin_va_end(ap)         (void)0
 #endif /* !_WIN64 */
 #else
-#define __builtin_va_list                    char *
-#define __builtin_va_start(ap,last) (void)((ap)=((char *)&(last))+((sizeof(last)+3)&~3))
-#define __builtin_va_arg(ap,type)   ((ap)+=(sizeof(type)+3)&~3,*(type *)((ap)-((sizeof(type)+3)&~3)))
-#define __builtin_va_copy(dest,src) (void)((dest)=(src))
-#define __builtin_va_end(ap)        (void)0
+#define __builtin_va_list            char *
+#define __builtin_va_start(ap, last) (void)((ap) = ((char *)&(last)) + ((sizeof(last) + 3) & ~3))
+#define __builtin_va_arg(ap, type)   ((ap) += (sizeof(type) + 3) & ~3, *(type *)((ap) - ((sizeof(type) + 3) & ~3)))
+#define __builtin_va_copy(dest, src) (void)((dest) = (src))
+#define __builtin_va_end(ap)         (void)0
 #endif
 #elif defined(__NO_KOS_SYSTEM_HEADERS__)
 /* Without KOS's system headers around, we can
  * try to make use of someone else's work :) */
 #include <stdarg.h>
-#define __builtin_va_list            va_list
-#define __builtin_va_start(ap,v)     va_start(ap,v)
-#define __builtin_va_arg(ap,T)       va_arg(ap,T)
-#define __builtin_va_end(ap)         va_end(ap)
+#define __builtin_va_list         va_list
+#define __builtin_va_start(ap, v) va_start(ap, v)
+#define __builtin_va_arg(ap, T)   va_arg(ap, T)
+#define __builtin_va_end(ap)      va_end(ap)
 #else
 /* Just guess some generic implementation... */
-#define __builtin_va_list                    char *
-#define __VA_ADDROF(v)              &(v)
-#define __VA_SIZEOF(n)              ((sizeof(n)+3)&~3)
-#define __builtin_va_start(ap,v)    (ap = (__builtin_va_list)__VA_ADDROF(v)+__VA_SIZEOF(v))
-#define __builtin_va_arg(ap,T)      (*(T *)((ap += __VA_SIZEOF(T))-__VA_SIZEOF(T)))
-#define __builtin_va_end(ap)        (void)0
+#define __builtin_va_list         char *
+#define __VA_ADDROF(v)            &(v)
+#define __VA_SIZEOF(n)            ((sizeof(n) + (sizeof(int) - 1)) & ~(sizeof(int) - 1))
+#define __builtin_va_start(ap, v) (ap = (__builtin_va_list)__VA_ADDROF(v) + __VA_SIZEOF(v))
+#define __builtin_va_arg(ap, T)   (*(T *)((ap += __VA_SIZEOF(T)) - __VA_SIZEOF(T)))
+#define __builtin_va_end(ap)      (void)0
 #endif

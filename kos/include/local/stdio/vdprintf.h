@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3cfeed28 */
+/* HASH CRC-32:0x10bb832c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
 #ifndef __local_vdprintf_defined
 #if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 #define __local_vdprintf_defined 1
+#include <kos/anno.h>
 #include <bits/format-printer.h>
 /* Dependency: "format_vprintf" from "format-printer" */
 #ifndef ____localdep_format_vprintf_defined
@@ -234,7 +235,7 @@ __LOCAL_LIBC(vdprintf) __ATTR_NONNULL((2)) __ATTR_LIBC_PRINTF(2, 0) __STDC_INT_A
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(vdprintf))(__fd_t __fd,
                                                       char const *__restrict __format,
                                                       __builtin_va_list __args) {
-#line 1054 "kos/src/libc/magic/stdio.c"
+#line 1057 "kos/src/libc/magic/stdio.c"
 	return __localdep_format_vprintf(&__vdprintf_printer,
 	                     (void *)(__UINTPTR_TYPE__)(unsigned int)__fd,
 	                      __format,

@@ -466,11 +466,68 @@ llabs:(__LONGLONG x) -> __LONGLONG {
 }
 %(std, c, ccompat)#endif /* __USE_ISOC99 */
 
+
+/* NOTE: `div_t', `ldiv_t' and `lldiv_t' return types need to be escaped, even if
+ *       the associated unescaped types are actually defined in the current scope
+ *       in order to work around a g++ bug I've discovered:
+ *  When running `g++ -std=c++1z' or `g++ -std=gnu++1z', and `__LIBCCALL' is defined
+ *  as non-empty, g++ will see something like this as definition for `div':
+ *  >> static inline
+ *  >>     __attribute__((__always_inline__))
+ *  >>     __attribute__((__const__))
+ *  >>     __attribute__((__warn_unused_result__))
+ *  >> div_t (__attribute__((__stdcall__)) div)(int __numer, int __denom) {
+ *  >>     ...
+ *  >> }
+ *
+ *  There is nothing work with this declaration, however g++ will generate an error:
+ *     ```error: 'int std::div_t' redeclared as different kind of entity```
+ *  With the error indicating pointing to the `)' after `div)'
+ *  However, changing the declaration to not use `div_t', but `struct __div_struct'
+ *  fixes the problem (NOTE: The problem also goes away if `__attribute__((__stdcall__))'
+ *  were to be removed, however we can't do the later since that would break the ABI)
+ *  >> static inline
+ *  >>     __attribute__((__always_inline__))
+ *  >>     __attribute__((__const__))
+ *  >>     __attribute__((__warn_unused_result__))
+ *  >> struct __div_struct (__attribute__((__stdcall__)) div)(int __numer, int __denom) {
+ *  >>     ...
+ *  >> }
+ *
+ *  g++ seems to think that the first version is trying to declare `div_t' as a
+ *  variable with a c++ initializer (remember: you can declare c++ variables
+ *  as `int x(42);' instead of `int x = 42;'). A point that is proven even more,
+ *  as re-writing the declaration like the following also fixes the problem:
+ *  >> static inline
+ *  >>     __attribute__((__always_inline__))
+ *  >>     __attribute__((__const__))
+ *  >>     __attribute__((__warn_unused_result__))
+ *  >> div_t __attribute__((__stdcall__)) div(int __numer, int __denom) {
+ *  >>     ...
+ *  >> }
+ *
+ *  However, this last version also wouldn't work for us, since that would leave
+ *  the declaration of `div' vulnerable to `#define div(a, b)' macro overrides
+ *  being declared prior to the header being included (which we prevent by declaring
+ *  functions such that their names cannot be interpreted by function-like macros
+ *  using the same name)
+ *
+ *  Honestly: I don't really understand why using the struct-prefixed name (`struct __div_struct')
+ *  fixes the problem (Note that when leaving out the `struct' and only writing `__div_struct',
+ *  a different error ```error: expected primary-expression before '__attribute__'``` occurs with
+ *  is also incorrect in this scenario), however a work-around is a work-around, and I'm happy
+ *  enough 
+ *
+ *  For reference, I've created a bug report for this problem here:
+ *  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92438
+ *
+ */
+
 [ATTR_CONST][ATTR_WUNUSED][std]
 [if(__SIZEOF_LONG__ == __SIZEOF_INT__), alias(div)]
 [if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(lldiv)]
 [if(__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias(imaxdiv)]
-ldiv:(long numer, long denom) -> ldiv_t {
+ldiv:(long numer, long denom) -> $ldiv_t {
 	ldiv_t result;
 	result.@quot@ = numer / denom;
 	result.@rem@  = numer % denom;
@@ -482,7 +539,7 @@ ldiv:(long numer, long denom) -> ldiv_t {
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__), alias(div)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(ldiv)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(imaxdiv)]
-lldiv:(__LONGLONG numer, __LONGLONG denom) -> lldiv_t {
+lldiv:(__LONGLONG numer, __LONGLONG denom) -> $lldiv_t {
 	lldiv_t result;
 	result.@quot@ = numer / denom;
 	result.@rem@  = numer % denom;
@@ -518,26 +575,26 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),imaxabs,(_
 __LOCAL __ATTR_CONST __ATTR_WUNUSED long (__LIBCCALL abs)(long __x) { return (labs)(__x); }
 #endif /* !lbas... */
 #ifdef __CRT_HAVE_div
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,div_t,__NOTHROW_NCX,div,(int __numer, int __denom),div,(__numer,__denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,div,(int __numer, int __denom),div,(__numer,__denom))
 #elif defined(__CRT_HAVE_ldiv) && __SIZEOF_INT__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,div_t,__NOTHROW_NCX,div,(int __numer, int __denom),ldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,div,(int __numer, int __denom),ldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_lldiv) && __SIZEOF_INT__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,div_t,__NOTHROW_NCX,div,(int __numer, int __denom),lldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,div,(int __numer, int __denom),lldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_imaxdiv) && __SIZEOF_INT__ == __SIZEOF_INTMAX_T__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,div_t,__NOTHROW_NCX,div,(int __numer, int __denom),imaxdiv,(__numer,__denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,div,(int __numer, int __denom),imaxdiv,(__numer,__denom))
 #else /* div... */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED div_t (__LIBCCALL div)(int __numer, int __denom) { div_t __result; __result.quot = __numer / __denom; __result.rem = __numer % __denom; return __result; }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED struct __div_struct (__LIBCCALL div)(int __numer, int __denom) { div_t __result; __result.quot = __numer / __denom; __result.rem = __numer % __denom; return __result; }
 #endif /* !div... */
 #ifdef __CRT_HAVE_ldiv
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,ldiv_t,__NOTHROW_NCX,div,(long __numer, long __denom),ldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,div,(long __numer, long __denom),ldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_div) && __SIZEOF_LONG__ == __SIZEOF_INT__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,ldiv_t,__NOTHROW_NCX,div,(long __numer, long __denom),div,(__numer,__denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,div,(long __numer, long __denom),div,(__numer,__denom))
 #elif defined(__CRT_HAVE_lldiv) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,ldiv_t,__NOTHROW_NCX,div,(long __numer, long __denom),lldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,div,(long __numer, long __denom),lldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_imaxdiv) && __SIZEOF_LONG__ == __SIZEOF_INTMAX_T__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,ldiv_t,__NOTHROW_NCX,div,(long __numer, long __denom),imaxdiv,(__numer,__denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,div,(long __numer, long __denom),imaxdiv,(__numer,__denom))
 #else /* ldiv... */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED ldiv_t (__LIBCCALL div)(long __numer, long __denom) { return ldiv(__numer, __denom); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED struct __ldiv_struct (__LIBCCALL div)(long __numer, long __denom) { return ldiv(__numer, __denom); }
 #endif /* !ldiv... */
 #ifdef __USE_ISOC99
 #ifdef __CRT_HAVE_llabs
@@ -552,15 +609,15 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG __x
 __LOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG (__LIBCCALL abs)(__LONGLONG __x) { return (llabs)(__x); }
 #endif /* !llabs... */
 #ifdef __CRT_HAVE_lldiv
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,lldiv_t,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),lldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),lldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_div) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,lldiv_t,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),div,(__numer,__denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),div,(__numer,__denom))
 #elif defined(__CRT_HAVE_div) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,lldiv_t,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),ldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),ldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_div) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,lldiv_t,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),imaxdiv,(__numer,__denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),imaxdiv,(__numer,__denom))
 #else /* lldiv... */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED lldiv_t (__LIBCCALL div)(__LONGLONG __numer, __LONGLONG __denom) { return lldiv(__numer, __denom); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED struct __lldiv_struct (__LIBCCALL div)(__LONGLONG __numer, __LONGLONG __denom) { return lldiv(__numer, __denom); }
 #endif /* !lldiv... */
 #endif /* __USE_ISOC99 */
 } /* extern "C++" */
@@ -577,7 +634,7 @@ abs:(int x) -> int {
 [if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(ldiv)]
 [if(__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias(lldiv)]
 [if(__SIZEOF_INT__ == __SIZEOF_INTMAX_T__), alias(imaxdiv)]
-div:(int numer, int denom) -> div_t {
+div:(int numer, int denom) -> struct __div_struct {
 	div_t result;
 	result.@quot@ = numer / denom;
 	result.@rem@  = numer % denom;

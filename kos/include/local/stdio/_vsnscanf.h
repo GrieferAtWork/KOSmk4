@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe239e7d */
+/* HASH CRC-32:0x7c2339a9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  */
 #ifndef __local__vsnscanf_defined
 #define __local__vsnscanf_defined 1
+#include <kos/anno.h>
 #include <bits/format-printer.h>
 /* Dependency: "format_vscanf" from "format-printer" */
 #ifndef ____localdep_format_vscanf_defined
@@ -136,7 +137,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsnscanf))(char const *__restrict __
                                                        __SIZE_TYPE__ __inputlen,
                                                        char const *__restrict __format,
                                                        __builtin_va_list __args) {
-#line 2311 "kos/src/libc/magic/stdio.c"
+#line 2314 "kos/src/libc/magic/stdio.c"
 	struct __vsnscanf_data __data;
 	__data.__ptr = __input;
 	__data.__end = __input + __inputlen;

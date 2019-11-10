@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e49a99d */
+/* HASH CRC-32:0x7fcca738 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
 #ifndef __local_fread_s_defined
 #if (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)
 #define __local_fread_s_defined 1
+#include <kos/anno.h>
 #include <parts/errno.h>
 /* Dependency: "fread" from "stdio" */
 #ifndef ____localdep_fread_defined
@@ -61,7 +62,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fread_s))(void *__restrict __buf,
                                                      __SIZE_TYPE__ __elemsize,
                                                      __SIZE_TYPE__ __elemcount,
                                                      __FILE *__restrict __stream) {
-#line 2666 "kos/src/libc/magic/stdio.c"
+#line 2669 "kos/src/libc/magic/stdio.c"
 	__bufsize = __elemsize ? __bufsize / __elemsize : 0;
 	return __localdep_fread(__buf, __elemsize, __bufsize < __elemcount ? __bufsize : __elemcount, __stream);
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xffc740eb */
+/* HASH CRC-32:0x5adeb7df */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@ __LOCAL_LIBC(strtou64) __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou64))(char const *__restrict __nptr,
                                                       char **__endptr,
                                                       int __base) {
-#line 942 "kos/src/libc/magic/stdlib.c"
+#line 999 "kos/src/libc/magic/stdlib.c"
 	__UINT64_TYPE__ __result, __temp;
 	if (!__base) {
 		if (*__nptr == '0') {

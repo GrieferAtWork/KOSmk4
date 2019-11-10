@@ -558,7 +558,8 @@ extern "C++" { template<class T> struct __compiler_alignof { char __x; T __y; };
 #if defined(__NO_INLINE__) && 0
 #   define __NO_ATTR_INLINE        1
 #   define __ATTR_INLINE           /* Nothing */
-#elif defined(__STDC_VERSION__) && __STDC_VERSION__ > 199901L
+#elif defined(inline) || defined(__cplusplus) || \
+     (defined(__STDC_VERSION__) && __STDC_VERSION__ > 199901L)
 #   define __ATTR_INLINE           inline
 #elif __GCC_VERSION(2,7,0)
 #   define __ATTR_INLINE           __inline__
@@ -567,10 +568,10 @@ extern "C++" { template<class T> struct __compiler_alignof { char __x; T __y; };
 #   define __ATTR_INLINE           /* Nothing */
 #endif
 #if __GCC_VERSION(3,0,0)
-#   define __ATTR_FORCEINLINE      __inline__ __attribute__((__always_inline__))
+#   define __ATTR_FORCEINLINE      __ATTR_INLINE __attribute__((__always_inline__))
 #elif __GCC_VERSION(2,7,0)
 #   define __NO_ATTR_FORCEINLINE   1
-#   define __ATTR_FORCEINLINE      __inline__
+#   define __ATTR_FORCEINLINE      __ATTR_INLINE
 #else
 #   define __NO_ATTR_FORCEINLINE   1
 #   define __ATTR_FORCEINLINE      /* Nothing */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36edd95f */
+/* HASH CRC-32:0x13b57a1c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,7 +91,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* 64-bit variant of `ftello' */
 __LOCAL_LIBC(ftello64) __ATTR_WUNUSED __ATTR_NONNULL((1)) __off64_t
 (__LIBCCALL __LIBC_LOCAL_NAME(ftello64))(__FILE *__restrict __stream) __THROWS(...) {
-#line 1615 "kos/src/libc/magic/stdio.c"
+#line 1618 "kos/src/libc/magic/stdio.c"
 #if defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked)
 	__pos64_t __pos;
 	if (__localdep_crt_fgetpos64(__stream, &__pos))

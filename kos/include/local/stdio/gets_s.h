@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x101453c2 */
+/* HASH CRC-32:0x1a436d2d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
 #ifndef __local_gets_s_defined
 #if !defined(__NO_STDSTREAMS) && ((((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE__IO_ferror))) || defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE_fgets_unlocked))
 #define __local_gets_s_defined 1
+#include <kos/anno.h>
 #include <local/stdstreams.h>
 /* Dependency: "fgets" from "stdio" */
 #ifndef ____localdep_fgets_defined
@@ -54,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(gets_s) __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(gets_s))(char *__restrict __buf,
                                                     __SIZE_TYPE__ __bufsize) {
-#line 2676 "kos/src/libc/magic/stdio.c"
+#line 2679 "kos/src/libc/magic/stdio.c"
 	return __localdep_fgets(__buf, (int)(unsigned int)__bufsize, __LOCAL_stdin);
 }
 __NAMESPACE_LOCAL_END

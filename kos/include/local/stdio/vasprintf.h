@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb879bfa5 */
+/* HASH CRC-32:0x583a1d50 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
 #ifndef __local_vasprintf_defined
 #if (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_pack)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #define __local_vasprintf_defined 1
+#include <kos/anno.h>
 #include <bits/format-printer.h>
 #include <hybrid/__assert.h>
 
@@ -306,7 +307,7 @@ __LOCAL_LIBC(vasprintf) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vasprintf))(char **__restrict __pstr,
                                                        char const *__restrict __format,
                                                        __builtin_va_list __args) {
-#line 1734 "kos/src/libc/magic/stdio.c"
+#line 1737 "kos/src/libc/magic/stdio.c"
 	char *__result;
 	__SSIZE_TYPE__ __error;
 	struct format_aprintf_data __data;
