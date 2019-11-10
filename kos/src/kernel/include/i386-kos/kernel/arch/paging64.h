@@ -337,6 +337,10 @@ struct p64_pdir {
 #define P64_VM_KERNEL_PDIR_RESERVED_BASE  __UINT64_C(0xffff808000000000) /* Start of the address range reserved for page-directory self-modifications. */
 #define P64_VM_KERNEL_PDIR_RESERVED_SIZE  __UINT64_C(0x0000008000000000) /* Amount of memory reserved for page-directory self-modifications. */
 
+#define X86_VM_KERNEL_PDIR_RESERVED_BASE P64_VM_KERNEL_PDIR_RESERVED_BASE
+#define X86_VM_KERNEL_PDIR_RESERVED_SIZE P64_VM_KERNEL_PDIR_RESERVED_SIZE
+
+
 /* Page directory self-mapping addresses.
  * NOTE: We put the self-mapping 512 GIB after `KERNEL_BASE', just
  *       so we can ensure that the first kernel-page can remain

@@ -232,47 +232,47 @@ INTERN struct vm_node x86_vmnode_transition_reserve =
 INTERN struct vm_node x86_kernel_vm_nodes[6] = {
 	/* [X86_KERNEL_VMMAPPING_CORE_TEXT] = */
 	   INIT_NODE(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_TEXT],
-	            (vm_vpage_t)(uintptr_t)__kernel_text_startpage,
-	            (vm_vpage_t)(uintptr_t)__kernel_text_endpage - 1,
-	             VM_PROT_READ | VM_PROT_EXEC,
-	             x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_TEXT]),
+	             (vm_vpage_t)(uintptr_t)__kernel_text_startpage,
+	             (vm_vpage_t)(uintptr_t)__kernel_text_endpage - 1,
+	              VM_PROT_READ | VM_PROT_EXEC,
+	              x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_TEXT]),
 	/* [X86_KERNEL_VMMAPPING_CORE_RODATA] = */
 	   INIT_NODE(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_RODATA],
-	            (vm_vpage_t)(uintptr_t)__kernel_rodata_startpage,
-	            (vm_vpage_t)(uintptr_t)__kernel_rodata_endpage - 1,
-	             VM_PROT_READ,
-	             x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_RODATA]),
+	             (vm_vpage_t)(uintptr_t)__kernel_rodata_startpage,
+	             (vm_vpage_t)(uintptr_t)__kernel_rodata_endpage - 1,
+	              VM_PROT_READ,
+	              x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_RODATA]),
 	/* [X86_KERNEL_VMMAPPING_CORE_DATA] = */
 	   INIT_NODE(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA],
-	            (vm_vpage_t)(uintptr_t)__kernel_data_startpage,
-	            (vm_vpage_t)(uintptr_t)__kernel_data_endpage - 1,
-	             VM_PROT_READ | VM_PROT_WRITE,
-	             x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_DATA]),
+	             (vm_vpage_t)(uintptr_t)__kernel_data_startpage,
+	             (vm_vpage_t)(uintptr_t)__kernel_data_endpage - 1,
+	              VM_PROT_READ | VM_PROT_WRITE,
+	              x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_DATA]),
 	/* [X86_KERNEL_VMMAPPING_CORE_XDATA] = */
 	   INIT_NODE(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_XDATA],
-	            (vm_vpage_t)(uintptr_t)__kernel_xdata_startpage,
-	            (vm_vpage_t)(uintptr_t)__kernel_xdata_endpage - 1,
-	             VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC,
-	             x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_XDATA]),
+	             (vm_vpage_t)(uintptr_t)__kernel_xdata_startpage,
+	             (vm_vpage_t)(uintptr_t)__kernel_xdata_endpage - 1,
+	              VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC,
+	              x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_XDATA]),
 	/* [X86_KERNEL_VMMAPPING_CORE_BSS] = */
 	   INIT_NODE(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS],
-	            (vm_vpage_t)(uintptr_t)__kernel_bss_startpage,
-	            (vm_vpage_t)(uintptr_t)__kernel_bss_endpage - 1,
-	             VM_PROT_READ | VM_PROT_WRITE,
-	             x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_BSS]),
+	             (vm_vpage_t)(uintptr_t)__kernel_bss_startpage,
+	             (vm_vpage_t)(uintptr_t)__kernel_bss_endpage - 1,
+	              VM_PROT_READ | VM_PROT_WRITE,
+	              x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_BSS]),
 	/* [X86_KERNEL_VMMAPPING_IDENTITY_RESERVE] = */
 #ifdef X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE
 	   INIT_NODE_RESERVE(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE],
-	            (vm_vpage_t)0, /* Calculated below */
-	            (vm_vpage_t)0, /* Calculated below */
-	             VM_PROT_NONE,
-	             x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE]),
+	                     (vm_vpage_t)0, /* Calculated below */
+	                     (vm_vpage_t)0, /* Calculated below */
+	                      VM_PROT_NONE,
+	                      x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE]),
 #else /* X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE */
 	   INIT_NODE_RESERVE(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE],
-	            (vm_vpage_t)(X86_VM_KERNEL_PDIR_RESERVED_BASE / PAGESIZE), /* TODO: This needs to be dynamically selected based on PAE-support */
-	            (vm_vpage_t)(X86_VM_KERNEL_PDIR_RESERVED_BASE + X86_VM_KERNEL_PDIR_RESERVED_SIZE - PAGESIZE) / PAGESIZE,
-	             VM_PROT_NONE,
-	             x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE]),
+	                     (vm_vpage_t)(X86_VM_KERNEL_PDIR_RESERVED_BASE / PAGESIZE), /* TODO: This needs to be dynamically selected based on PAE-support */
+	                     (vm_vpage_t)(X86_VM_KERNEL_PDIR_RESERVED_BASE + X86_VM_KERNEL_PDIR_RESERVED_SIZE - PAGESIZE) / PAGESIZE,
+	                      VM_PROT_NONE,
+	                      x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE]),
 #endif /* !X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE */
 };
 
@@ -305,10 +305,10 @@ INTERN struct vm_datapart x86_vm_part_pdata = {
 
 INTERN struct vm_node x86_vm_node_pdata =
 	INIT_NODE(x86_vm_node_pdata,
-	         (vm_vpage_t)((uintptr_t)__kernel_pdata_startpage - KERNEL_BASE_PAGE),
-	         (vm_vpage_t)((uintptr_t)__kernel_pdata_endpage - (KERNEL_BASE_PAGE + 1)),
-	          VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC,
-	          x86_vm_part_pdata);
+	          (vm_vpage_t)((uintptr_t)__kernel_pdata_startpage - KERNEL_BASE_PAGE),
+	          (vm_vpage_t)((uintptr_t)__kernel_pdata_endpage - (KERNEL_BASE_PAGE + 1)),
+	           VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC,
+	           x86_vm_part_pdata);
 
 
 

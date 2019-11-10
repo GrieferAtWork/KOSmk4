@@ -312,7 +312,7 @@ INTERN_FUNCTION(x86_sysenter_main)
 	pushfl
 	orl    $(EFLAGS_IF), %ss:(%esp)
 	.cfi_reg_offset %eflags, 0, %esp
-	pushl  $SEGMENT_USER_CODE_RPL /* %cs */
+	pushl  $(SEGMENT_USER_CODE_RPL) /* %cs */
 	.cfi_reg_offset %eflags, 4, %esp
 	pushl  %edi                   /* %eip */
 	.cfi_reg_offset %eflags, 8, %esp
@@ -399,7 +399,7 @@ INTERN_FUNCTION(x86_sysenter_main_traced)
 	pushfl
 	orl    $(EFLAGS_IF), %ss:(%esp)
 	.cfi_reg_offset %eflags, 0, %esp
-	pushl  $SEGMENT_USER_CODE_RPL /* %cs */
+	pushl  $(SEGMENT_USER_CODE_RPL) /* %cs */
 	.cfi_reg_offset %eflags, 4, %esp
 	pushl  %edi                   /* %eip */
 

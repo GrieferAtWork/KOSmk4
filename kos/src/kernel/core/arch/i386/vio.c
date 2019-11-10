@@ -2172,7 +2172,7 @@ again_0xf7:
 				IF_X86_64(if (op_flags & F_REX_W) {
 					u64 res_ax, res_dx;
 					u64 value = RD_VIOQ();
-					__asm__("mulq %w5\n\t"
+					__asm__("mulq %q5\n\t"
 					        INSTR_PUSHFP
 					        TAIL_POPP_OP0
 					        : "=g" (temp)
@@ -2224,7 +2224,7 @@ again_0xf7:
 				IF_X86_64(if (op_flags & F_REX_W) {
 					u64 res_ax, res_dx;
 					u64 value = RD_VIOQ();
-					__asm__("imulq %w5\n\t"
+					__asm__("imulq %q5\n\t"
 					        INSTR_PUSHFP
 					        TAIL_POPP_OP0
 					        : "=g" (temp)

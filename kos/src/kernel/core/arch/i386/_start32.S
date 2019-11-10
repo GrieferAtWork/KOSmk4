@@ -26,6 +26,7 @@
 #include <asm/cpu-flags.h>
 #include <asm/cpu-cpuid.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/cpu-state32.h>
 #include <kos/kernel/segment.h>
 #include <kos/kernel/gdt.h>
 
@@ -46,11 +47,11 @@
  * That is the segment where the kernel itself resides at, which
  * is then mapped again in all other page directories. */
 #define VEC2_SHARE_BEGIN     X86_PDIR_VEC2INDEX(KERNEL_BASE)
-#define VEC2_SHARE_SIZE     (VEC2_IDENTITY_BEGIN-VEC2_SHARE_BEGIN)
+#define VEC2_SHARE_SIZE     (VEC2_IDENTITY_BEGIN - VEC2_SHARE_BEGIN)
 
 /* Similar to the SHARE indices, but for the identity mapping instead. */
 #define VEC2_IDENTITY_BEGIN  X86_PDIR_VEC2INDEX(X86_PDIR_E1_IDENTITY_BASE)
-#define VEC2_IDENTITY_SIZE  (1024-VEC2_IDENTITY_BEGIN)
+#define VEC2_IDENTITY_SIZE  (1024 - VEC2_IDENTITY_BEGIN)
 
 
 #define EXPORT_AS_OBJECT(name) \
@@ -125,15 +126,15 @@ INTERN_FUNCTION(_start)
 	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE32_DRREGS + OFFSET_DRREGS32_DR6)
 	movl   %dr7, %eax
 	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE32_DRREGS + OFFSET_DRREGS32_DR7)
+	movl   $(V2P(__kernel_boottask_stack + KERNEL_STACKSIZE)), %esp
 
 #if 1 /* Fixup required when loaded via bochs's `load32bitOSImage' function */
 	/* Prematurely load our GDT, so we can manually set valid segments for %ds, %es and %ss,
 	 * as we only want to rely on the boot loader to have set up a valid %ds and %cs */
-	movl   $(V2P(__kernel_boottask_stack + KERNEL_STACKSIZE)), %esp
 	movw   $(SEGMENT_COUNT * 8 - 1), %ds:-6(%esp)
 	INTERN(__x86_template_gdt)
 	/* Load from template, as the boot cpu's hasn't been initialized, yet. */
-	movl   $V2P(__x86_template_gdt), %ds:-4(%esp)
+	movl   $(V2P(__x86_template_gdt)), %ds:-4(%esp)
 	lgdtl  %ds:-6(%esp)
 	movw   $(SEGMENT_KERNEL_DATA), %ax
 	movw   %ax, %ss
@@ -142,10 +143,19 @@ INTERN_FUNCTION(_start)
 #endif
 
 	pushfl
-	popl   V2P(boot_cpustate + OFFSET_FCPUSTATE32_EFLAGS)
-
-	cli  /* Disable interrupts */
-	cld  /* Clear the direction bit (required for REP instructions) */
+	movl   0(%esp), %eax
+	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE_EFLAGS)
+	/* Make sure that %eflags is in a valid state */
+	andl   $(~(EFLAGS_IF | /* Disable interrupts */                                      \
+	           EFLAGS_TF |                                                               \
+	           EFLAGS_DF | /* Clear the direction bit (required for REP instructions) */ \
+	           EFLAGS_IOPLMASK |                                                         \
+	           EFLAGS_NT |                                                               \
+	           EFLAGS_RF |                                                               \
+	           EFLAGS_AC                                                                 \
+	           )), %eax
+	movl   %eax, 0(%esp)
+	popfl
 
 	/* memcpy(&_bootcpu, __kernel_percpu_start, (size_t)__kernel_percpu_size); */
 #ifndef CONFIG_NO_SMP
@@ -501,7 +511,7 @@ INTERN_FUNCTION(_start)
 	 *       can get the management above to only have to ensure a single page of identity-
 	 *       mapped memory needing to exist.
 	 * With all of this mind, we are guarantied that the page which these 8 bytes of text
-	 * reside inside of are identity-mapped when we enable paging, which is all we need for
+	 * reside inside of is identity-mapped when we enable paging, which is all we need for
 	 * this setup to work flawlessly!
 	 * To accomplish this identity mapping, PAE/P32 do the following
 	 * PAE: (Always identity-maps the first 1GiB since this is the simplest)
@@ -525,6 +535,7 @@ END(__x86_paging_init_identity_mapped_text)
 	jz     .Lcleanup_paging_p32
 	/* Fallthrough to `.Lcleanup_paging_pae' */
 #endif /* HYBRID_PAGING_MODE */
+
 #ifndef CONFIG_NO_PAGING_PAE
 .Lcleanup_paging_pae:
 	movl   $(PAE_KS_SHARE_E2(0, 0) + PAE_PAGE_FPRESENT), PAE_PAGEDIR_KERNEL_P_E3(0)
@@ -532,6 +543,7 @@ END(__x86_paging_init_identity_mapped_text)
 	jmp    .Ldone_cleanup_paging
 #endif /* HYBRID_PAGING_MODE */
 #endif /* !CONFIG_NO_PAGING_PAE */
+
 #ifndef CONFIG_NO_PAGING_P32
 .Lcleanup_paging_p32:
 	movl   $0, __x86_p32_identity_mapped_text_4mib_e2_word
@@ -544,13 +556,14 @@ END(__x86_paging_init_identity_mapped_text)
 	/* Setup a stack. */
 	movl   $(__kernel_boottask_stack + KERNEL_STACKSIZE), %esp
 
-
 	/* Load the initial (boot) GDT. (now that it's been copied) */
-	INTERN(__x86_bootcpu_gdt)
-	pushl  $__x86_bootcpu_gdt
-	pushw  $(SEGMENT_COUNT * 8 - 1)
-	lgdtl  0(%esp)
-	addl   $6, %esp
+	.pushsection .rodata.free
+		.align 2
+1:		.word  (SEGMENT_COUNT * 8) - 1
+		INTERN(__x86_bootcpu_gdt)
+		.long  __x86_bootcpu_gdt
+	.popsection
+	lgdtl  1b
 
 	/* With the new GDT now loaded, load the new segments. */
 	movw   $(SEGMENT_USER_DATA_RPL), %ax
@@ -579,22 +592,22 @@ END(__x86_paging_init_identity_mapped_text)
 	/* Setup the state of /bin/init at our stack base, thus following the
 	 * general expectation that the user-space return state can be found
 	 * at exactly that location. */
-	pushl  $(SEGMENT_USER_DATA_RPL) /* ir_ss */
-	pushl  $0                       /* ir_esp (set by `__i386_kernel_main') */
-	pushl  $(EFLAGS_IF)             /* ir_eflags */
-	pushl  $SEGMENT_USER_CODE_RPL   /* ir_cs */
-	pushl  $0                       /* ir_eip (set by `__i386_kernel_main') */
-	pushl  $(SEGMENT_USER_DATA_RPL) /* ics_ds */
-	pushl  $(SEGMENT_USER_DATA_RPL) /* ics_es */
-	pushl  $SEGMENT_USER_FSBASE_RPL /* ics_fs */
-	pushl  $0                       /* gp_eax */
-	pushl  $0                       /* gp_ecx */
-	pushl  $0                       /* gp_edx */
-	pushl  $0                       /* gp_ebx */
-	pushl  $0                       /* gp_esp */
-	pushl  $0                       /* gp_ebp */
-	pushl  $0                       /* gp_esi */
-	pushl  $0                       /* gp_edi */
+	pushl  $(SEGMENT_USER_DATA_RPL)   /* ir_ss */
+	pushl  $(0)                       /* ir_esp (set by `__i386_kernel_main') */
+	pushl  $(EFLAGS_IF)               /* ir_eflags */
+	pushl  $(SEGMENT_USER_CODE_RPL)   /* ir_cs */
+	pushl  $(0)                       /* ir_eip (set by `__i386_kernel_main') */
+	pushl  $(SEGMENT_USER_DATA_RPL)   /* ics_ds */
+	pushl  $(SEGMENT_USER_DATA_RPL)   /* ics_es */
+	pushl  $(SEGMENT_USER_FSBASE_RPL) /* ics_fs */
+	pushl  $(0)                       /* gp_eax */
+	pushl  $(0)                       /* gp_ecx */
+	pushl  $(0)                       /* gp_edx */
+	pushl  $(0)                       /* gp_ebx */
+	pushl  $(0)                       /* gp_esp */
+	pushl  $(0)                       /* gp_ebp */
+	pushl  $(0)                       /* gp_esi */
+	pushl  $(0)                       /* gp_edi */
 	pushl  %esp /* struct icpustate *state */
 	/* Initialize the kernel. */
 	call   __i386_kernel_main

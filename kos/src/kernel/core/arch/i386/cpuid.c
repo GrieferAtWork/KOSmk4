@@ -21,6 +21,7 @@
 
 #include <kernel/compiler.h>
 
+#include <hybrid/host.h>
 #include <kernel/cpuid.h>
 
 #include <stddef.h>
@@ -28,7 +29,11 @@
 DECL_BEGIN
 
 /* Basic CPU feature flags (Set of `CPU_BASIC_FEATURE_F*') */
+#ifdef __x86_64__
+PUBLIC ATTR_PERCPU u16 cpu_features_ ASMNAME("cpu_features") = CPU_FEATURE_FCPUID;
+#else /* __x86_64__ */
 PUBLIC ATTR_PERCPU u16 cpu_features_ ASMNAME("cpu_features") = CPU_FEATURE_FNONE;
+#endif /* !__x86_64__ */
 PUBLIC ATTR_PERCPU struct cpuinfo cpuid_features_ ASMNAME("cpuid_features") = {};
 
 STATIC_ASSERT(OFFSET_CPUID_0A        == offsetof(struct cpuinfo, ci_0a));

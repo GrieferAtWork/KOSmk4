@@ -45,11 +45,16 @@
 DECL_BEGIN
 
 /* Feature tests for 1GiB and 2Mib pages */
-#define HAVE_1GIB_PAGES (__x86_bootcpu_idfeatures.ci_80000001d & CPUID_80000001D_PSE)
-#define HAVE_2MIB_PAGES 1 /* Always available! (and also assumed to be by code below!) */
+#define HAVE_PAGE_GLOBAL_BIT       (__x86_bootcpu_idfeatures.ci_1d & CPUID_1D_PGE)
+#define HAVE_PAGE_ATTRIBUTE_TABLE  (__x86_bootcpu_idfeatures.ci_1d & CPUID_1D_PAT)
+#define HAVE_INSTR_INVLPG          1 /* Always supported on x86_64 */
+#define HAVE_INSTR_INVPCID         (__x86_bootcpu_idfeatures.ci_7b & CPUID_7B_INVPCID)
+#define HAVE_1GIB_PAGES            (__x86_bootcpu_idfeatures.ci_80000001d & CPUID_80000001D_PSE)
+#define HAVE_2MIB_PAGES            1 /* Always available! (and also assumed to be by code below!) */
+#define HAVE_EXECUTE_DISABLE       (__x86_bootcpu_idfeatures.ci_80000001d & CPUID_80000001D_NX)
 
-INTERN u64 used_PAGE_FGLOBAL = P64_PAGE_FGLOBAL;
-#define USED_P64_PAGE_FGLOBAL used_PAGE_FGLOBAL
+INTERN u64 used_pxx_page_fglobal = P64_PAGE_FGLOBAL;
+#define USED_P64_PAGE_FGLOBAL used_pxx_page_fglobal
 
 
 /* I always find recursive array declarations in C to be extremely confusing,
@@ -134,6 +139,67 @@ again_calculate_vecN:
 	return trampoline_page;
 }
 
+
+
+
+
+
+INTDEF byte_t __kernel_pervm_size[];
+
+/* Define the kernel VM */
+INTERN ATTR_SECTION(".data.pervm.head")
+struct vm vm_kernel_head = {
+	{
+		.v_pdir_phys_ptr = &pagedir_kernel_phys,
+	},
+	/* .v_refcnt     = */ 3,
+	/* .v_weakrefcnt = */ 1,
+	/* .v_tree       = */ NULL,
+	/* .v_byaddr     = */ NULL,
+	/* .v_heap_size  = */ (size_t)__kernel_pervm_size + PAGEDIR_SIZE,
+	/* .v_treelock   = */ ATOMIC_RWLOCK_INIT,
+	/* .v_tasks      = */ NULL,
+	/* .v_tasklock   = */ ATOMIC_RWLOCK_INIT,
+	/* .v_deltasks   = */ NULL,
+	/* .v_kernreserve = */ {
+		/* .vn_node   = */ { (struct vm_node *)UINT64_C(0xcccccccccccccccc),
+		                     (struct vm_node *)UINT64_C(0xcccccccccccccccc),
+		                     (vm_vpage_t)UINT64_C(0xcccccccccccccccc),
+		                     (vm_vpage_t)UINT64_C(0xcccccccccccccccc) },
+		/* .vn_byaddr = */ { (struct vm_node *)UINT64_C(0xcccccccccccccccc),
+		                     (struct vm_node **)UINT64_C(0xcccccccccccccccc) },
+		/* .vn_prot   = */ UINT32_C(0xcccccccc),
+		/* .vn_flags  = */ UINT32_C(0xcccccccc),
+		/* .vn_vm     = */ (struct vm *)UINT64_C(0xcccccccccccccccc),
+		/* .vn_part   = */ (struct vm_datapart *)UINT64_C(0xcccccccccccccccc),
+		/* .vn_block  = */ (struct vm_datablock *)UINT64_C(0xcccccccccccccccc),
+		/* .vn_link   = */ { (struct vm_node *)UINT64_C(0xcccccccccccccccc),
+		                     (struct vm_node **)UINT64_C(0xcccccccccccccccc) },
+		/* .vn_guard  = */ UINT64_C(0xcccccccccccccccc)
+	}
+};
+
+
+typedef struct {
+	/* Allocate enough structures to allow _start64.S to create an
+	 * identity mapping of the first 2GiB of physical memory at -2GiB,
+	 * using only 2MiB mappings.
+	 * With this in mind, we need:
+	 *  - 255 * E3-VECTOR  (`union p64_pdir_e3[255][512]') that will be used for the kernel-share
+	 *  - 1 * E3-VECTOR  (`union p64_pdir_e3[512]') that goes into `pagedir_kernel.p_e4[511]'
+	 *  - 2 * E2-VECTOR  (`union p64_pdir_e2[2][512]') that go into `p64_pdir_e3[510]' and `p64_pdir_e3[511]'
+	 * _start64.S will then fill the two E2-vectors with 2MiB identity mappings,
+	 * before having the E3 vector point towards them, before finally placing the
+	 * E3 vector within the kernel page directory. */
+	union p64_pdir_e3 ks_share_e3[256][512];
+	union p64_pdir_e2 ks_share_e2[2][512];
+} kernel_share_t;
+
+/* Allocate BSS memory for the initial shared+identity mapping
+ * that will later be shared with, and re-appear in all other
+ * page directories (except for the identity page) */
+INTERN ATTR_SECTION(".bss.x86.pagedir_kernel_share")
+kernel_share_t __x86_pagedir_kernel_share = {};
 
 
 
@@ -645,7 +711,6 @@ word_changed_after_e2_vector:
 		 *  - 512 * 4KiB mappings */
 		struct vm_ptram ptram;
 		pageptr_t e1_vector;
-		union p64_pdir_e1 e1;
 		u64 new_word, new_e2_word;
 		X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was);
 		vm_ptram_init(&ptram);
@@ -718,7 +783,7 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten)(unsigned int vec4,
 
 
 
-PRIVATE NOBLOCK WUNUSED bool
+LOCAL NOBLOCK WUNUSED bool
 NOTHROW(FCALL p64_pagedir_prepare_impl_widen_v1)(unsigned int vec4,
                                                  unsigned int vec3,
                                                  unsigned int vec2,
@@ -730,7 +795,7 @@ NOTHROW(FCALL p64_pagedir_prepare_impl_widen_v1)(unsigned int vec4,
 	                                      (vec1_max - vec1_min) + 1);
 }
 
-PRIVATE NOBLOCK void
+LOCAL NOBLOCK void
 NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten_v1)(unsigned int vec4,
                                                      unsigned int vec3,
                                                      unsigned int vec2,
@@ -742,7 +807,7 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten_v1)(unsigned int vec4,
 	                                   (vec1_max - vec1_min) + 1);
 }
 
-PRIVATE NOBLOCK WUNUSED bool
+LOCAL NOBLOCK WUNUSED bool
 NOTHROW(FCALL p64_pagedir_prepare_impl_widen_v2)(unsigned int vec4,
                                                  unsigned int vec3,
                                                  unsigned int vec2_min,
@@ -774,7 +839,7 @@ err:
 	return false;
 }
 
-PRIVATE NOBLOCK WUNUSED bool
+LOCAL NOBLOCK WUNUSED bool
 NOTHROW(FCALL p64_pagedir_prepare_impl_widen_v2_keep)(unsigned int vec4,
                                                       unsigned int vec3,
                                                       unsigned int vec2_min,
@@ -798,7 +863,7 @@ err:
 	return false;
 }
 
-PRIVATE NOBLOCK void
+LOCAL NOBLOCK void
 NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten_v2)(unsigned int vec4,
                                                      unsigned int vec3,
                                                      unsigned int vec2_min,
@@ -817,7 +882,7 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten_v2)(unsigned int vec4,
 		p64_pagedir_unprepare_impl_flatten_v1(vec4, vec3, vec2, 0, 511);
 }
 
-PRIVATE NOBLOCK WUNUSED bool
+LOCAL NOBLOCK WUNUSED bool
 NOTHROW(FCALL p64_pagedir_prepare_impl_widen_v3)(unsigned int vec4,
                                                  unsigned int vec3_min,
                                                  unsigned int vec3_max,
@@ -828,7 +893,7 @@ NOTHROW(FCALL p64_pagedir_prepare_impl_widen_v3)(unsigned int vec4,
 	unsigned int vec3;
 	assert(vec3_min <= vec3_max);
 	if (vec3_min == vec3_max)
-		return p64_pagedir_prepare_impl_widen_v2(vec4, vec3, vec2_min, vec2_max, vec1_min, vec1_max);
+		return p64_pagedir_prepare_impl_widen_v2(vec4, vec3_min, vec2_min, vec2_max, vec1_min, vec1_max);
 	if (!p64_pagedir_prepare_impl_widen_v2(vec4, vec3_min, vec2_min, 511, vec1_min, 511))
 		goto err;
 	if (!p64_pagedir_prepare_impl_widen_v2(vec4, vec3_max, 0, vec2_max, 0, vec1_max))
@@ -850,7 +915,7 @@ err:
 	return false;
 }
 
-PRIVATE NOBLOCK WUNUSED bool
+LOCAL NOBLOCK WUNUSED bool
 NOTHROW(FCALL p64_pagedir_prepare_impl_widen_v3_keep)(unsigned int vec4,
                                                       unsigned int vec3_min,
                                                       unsigned int vec3_max,
@@ -861,7 +926,7 @@ NOTHROW(FCALL p64_pagedir_prepare_impl_widen_v3_keep)(unsigned int vec4,
 	unsigned int vec3;
 	assert(vec3_min <= vec3_max);
 	if (vec3_min == vec3_max)
-		return p64_pagedir_prepare_impl_widen_v2_keep(vec4, vec3, vec2_min, vec2_max, vec1_min, vec1_max);
+		return p64_pagedir_prepare_impl_widen_v2_keep(vec4, vec3_min, vec2_min, vec2_max, vec1_min, vec1_max);
 	if (!p64_pagedir_prepare_impl_widen_v2_keep(vec4, vec3_min, vec2_min, 511, vec1_min, 511))
 		goto err;
 	if (!p64_pagedir_prepare_impl_widen_v2_keep(vec4, vec3_max, 0, vec2_max, 0, vec1_max))
@@ -875,7 +940,7 @@ err:
 	return false;
 }
 
-PRIVATE NOBLOCK void
+LOCAL NOBLOCK void
 NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten_v3)(unsigned int vec4,
                                                      unsigned int vec3_min,
                                                      unsigned int vec3_max,
@@ -886,7 +951,7 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten_v3)(unsigned int vec4,
 	unsigned int vec3;
 	assert(vec3_min <= vec3_max);
 	if (vec3_min == vec3_max) {
-		p64_pagedir_unprepare_impl_flatten_v2(vec4, vec3, vec2_min, vec2_max, vec1_min, vec1_max);
+		p64_pagedir_unprepare_impl_flatten_v2(vec4, vec3_min, vec2_min, vec2_max, vec1_min, vec1_max);
 		return;
 	}
 	p64_pagedir_unprepare_impl_flatten_v2(vec4, vec3_min, vec2_min, 511, vec1_min, 511);
@@ -895,7 +960,7 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten_v3)(unsigned int vec4,
 		p64_pagedir_unprepare_impl_flatten_v2(vec4, vec3, 0, 511, 0, 511);
 }
 
-PRIVATE NOBLOCK WUNUSED bool
+LOCAL NOBLOCK WUNUSED bool
 NOTHROW(FCALL p64_pagedir_prepare_impl_widen_v4)(unsigned int vec4_min,
                                                  unsigned int vec4_max,
                                                  unsigned int vec3_min,
@@ -907,7 +972,7 @@ NOTHROW(FCALL p64_pagedir_prepare_impl_widen_v4)(unsigned int vec4_min,
 	unsigned int vec4;
 	assert(vec4_min <= vec4_max);
 	if (vec4_min == vec4_max)
-		return p64_pagedir_prepare_impl_widen_v3(vec4, vec3_min, vec3_max, vec2_min, vec2_max, vec1_min, vec1_max);
+		return p64_pagedir_prepare_impl_widen_v3(vec4_min, vec3_min, vec3_max, vec2_min, vec2_max, vec1_min, vec1_max);
 	if (!p64_pagedir_prepare_impl_widen_v3(vec4_min, vec3_min, 511, vec2_min, 511, vec1_min, 511))
 		goto err;
 	if (!p64_pagedir_prepare_impl_widen_v3(vec4_max, 0, vec3_max, 0, vec2_max, 0, vec1_max))
@@ -929,7 +994,7 @@ err:
 	return false;
 }
 
-PRIVATE NOBLOCK WUNUSED bool
+LOCAL NOBLOCK WUNUSED bool
 NOTHROW(FCALL p64_pagedir_prepare_impl_widen_v4_keep)(unsigned int vec4_min,
                                                       unsigned int vec4_max,
                                                       unsigned int vec3_min,
@@ -941,7 +1006,7 @@ NOTHROW(FCALL p64_pagedir_prepare_impl_widen_v4_keep)(unsigned int vec4_min,
 	unsigned int vec4;
 	assert(vec4_min <= vec4_max);
 	if (vec4_min == vec4_max)
-		return p64_pagedir_prepare_impl_widen_v3_keep(vec4, vec3_min, vec3_max, vec2_min, vec2_max, vec1_min, vec1_max);
+		return p64_pagedir_prepare_impl_widen_v3_keep(vec4_min, vec3_min, vec3_max, vec2_min, vec2_max, vec1_min, vec1_max);
 	if (!p64_pagedir_prepare_impl_widen_v3_keep(vec4_min, vec3_min, 511, vec2_min, 511, vec1_min, 511))
 		goto err;
 	if (!p64_pagedir_prepare_impl_widen_v3_keep(vec4_max, 0, vec3_max, 0, vec2_max, 0, vec1_max))
@@ -955,7 +1020,7 @@ err:
 	return false;
 }
 
-PRIVATE NOBLOCK void
+LOCAL NOBLOCK void
 NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten_v4)(unsigned int vec4_min,
                                                      unsigned int vec4_max,
                                                      unsigned int vec3_min,
@@ -967,7 +1032,7 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten_v4)(unsigned int vec4_min,
 	unsigned int vec4;
 	assert(vec4_min <= vec4_max);
 	if (vec4_min == vec4_max) {
-		p64_pagedir_unprepare_impl_flatten_v3(vec4, vec3_min, vec3_max, vec2_min, vec2_max, vec1_min, vec1_max);
+		p64_pagedir_unprepare_impl_flatten_v3(vec4_min, vec3_min, vec3_max, vec2_min, vec2_max, vec1_min, vec1_max);
 		return;
 	}
 	p64_pagedir_unprepare_impl_flatten_v3(vec4_min, vec3_min, 511, vec2_min, 511, vec1_min, 511);
@@ -993,8 +1058,6 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten_v4)(unsigned int vec4_min,
 INTERN NOBLOCK WUNUSED bool
 NOTHROW(FCALL p64_pagedir_prepare_mapone)(VIRT vm_vpage_t virt_page) {
 	unsigned int vec4, vec3, vec2, vec1;
-	if unlikely(virt_page >= (vm_vpage_t)KERNEL_BASE_PAGE)
-		return true;
 	vec4 = P64_PDIR_VEC4INDEX_VPAGE(virt_page);
 	vec3 = P64_PDIR_VEC3INDEX_VPAGE(virt_page);
 	vec2 = P64_PDIR_VEC2INDEX_VPAGE(virt_page);
@@ -1005,8 +1068,6 @@ NOTHROW(FCALL p64_pagedir_prepare_mapone)(VIRT vm_vpage_t virt_page) {
 INTERN NOBLOCK void
 NOTHROW(FCALL p64_pagedir_unprepare_mapone)(VIRT vm_vpage_t virt_page) {
 	unsigned int vec4, vec3, vec2, vec1;
-	if unlikely(virt_page >= (vm_vpage_t)KERNEL_BASE_PAGE)
-		return;
 	vec4 = P64_PDIR_VEC4INDEX_VPAGE(virt_page);
 	vec3 = P64_PDIR_VEC3INDEX_VPAGE(virt_page);
 	vec2 = P64_PDIR_VEC2INDEX_VPAGE(virt_page);
@@ -1451,12 +1512,95 @@ NOTHROW(FCALL p64_pagedir_unwrite)(VIRT vm_vpage_t virt_page, size_t num_pages) 
  *       can perform the task without needing to allocate more memory! */
 INTERN NOBLOCK void
 NOTHROW(FCALL p64_pagedir_unmap_userspace)(struct vm *__restrict sync_vm) {
-	kernel_panic("TODO");
+	unsigned int free_count = 0;
+	unsigned int vec4;
+	u64 free_pages[64];
+#define FREEPAGE(pageptr)                                                        \
+	do {                                                                         \
+		if unlikely(free_count >= COMPILER_LENOF(free_pages)) {                  \
+			/* Must sync memory before we can actually delete pages.             \
+			 * Otherwise, other CPUs may still be using the mappings after       \
+			 * they've already been re-designated as general-purpose RAM, at     \
+			 * which point they'd start reading garbage, or corrupt pointers. */ \
+			vm_syncall_locked(sync_vm);                                          \
+			page_freeone(pageptr);                                               \
+			do {                                                                 \
+				--free_count;                                                    \
+				page_freeone((pageptr_t)free_pages[free_count]);                 \
+			} while (free_count);                                                \
+		}                                                                        \
+		else {                                                                   \
+			free_pages[free_count++] = (u64)(pageptr);                           \
+		}                                                                        \
+	} __WHILE0
+	/* Map all pages before the share-segment as absent. */
+	for (vec4 = 0; vec4 < 256; ++vec4) {
+		union p64_pdir_e4 e4;
+		unsigned int vec3;
+		e4 = P64_PDIR_E4_IDENTITY[vec4];
+		if (!P64_PDIR_E4_ISVEC3(e4.p_word))
+			continue;
+		for (vec3 = 0; vec3 < 512; ++vec3) {
+			union p64_pdir_e3 e3;
+			unsigned int vec2;
+			e3 = P64_PDIR_E3_IDENTITY[vec4][vec3];
+			if (!P64_PDIR_E3_ISVEC2(e3.p_word))
+				continue;
+			for (vec2 = 0; vec2 < 512; ++vec2) {
+				union p64_pdir_e2 e2;
+				e2 = P64_PDIR_E2_IDENTITY[vec4][vec3][vec2];
+				if (!P64_PDIR_E2_ISVEC1(e2.p_word))
+					continue;
+				ATOMIC_WRITE(P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word, P64_PAGE_ABSENT);
+				FREEPAGE((pageptr_t)((e2.p_word & P64_PAGE_FVECTOR) / 4096));
+			}
+			ATOMIC_WRITE(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word, P64_PAGE_ABSENT);
+			FREEPAGE((pageptr_t)((e3.p_word & P64_PAGE_FVECTOR) / 4096));
+		}
+		ATOMIC_WRITE(P64_PDIR_E4_IDENTITY[vec4].p_word, P64_PAGE_ABSENT);
+		FREEPAGE((pageptr_t)((e4.p_word & P64_PAGE_FVECTOR) / 4096));
+	}
+	/* Free any remaining pages. */
+	if (free_count) {
+		vm_syncall_locked(sync_vm);
+		do {
+			--free_count;
+			page_freeone((pageptr_t)free_pages[free_count]);
+		} while (free_count);
+	}
+#undef FREEPAGE
 }
 
 INTERN NOBLOCK void
 NOTHROW(FCALL p64_pagedir_unmap_userspace_nosync)(void) {
-	kernel_panic("TODO");
+	unsigned int vec4;
+	/* Map all pages before the share-segment as absent. */
+	for (vec4 = 0; vec4 < 256; ++vec4) {
+		union p64_pdir_e4 e4;
+		unsigned int vec3;
+		e4 = P64_PDIR_E4_IDENTITY[vec4];
+		if (!P64_PDIR_E4_ISVEC3(e4.p_word))
+			continue;
+		for (vec3 = 0; vec3 < 512; ++vec3) {
+			union p64_pdir_e3 e3;
+			unsigned int vec2;
+			e3 = P64_PDIR_E3_IDENTITY[vec4][vec3];
+			if (!P64_PDIR_E3_ISVEC2(e3.p_word))
+				continue;
+			for (vec2 = 0; vec2 < 512; ++vec2) {
+				union p64_pdir_e2 e2;
+				e2 = P64_PDIR_E2_IDENTITY[vec4][vec3][vec2];
+				if (!P64_PDIR_E2_ISVEC1(e2.p_word))
+					continue;
+				ATOMIC_WRITE(P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word, P64_PAGE_ABSENT);
+				page_freeone((pageptr_t)((e2.p_word & P64_PAGE_FVECTOR) / 4096));
+			}
+			ATOMIC_WRITE(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word, P64_PAGE_ABSENT);
+			page_freeone((pageptr_t)((e3.p_word & P64_PAGE_FVECTOR) / 4096));
+		}
+		ATOMIC_WRITE(P64_PDIR_E4_IDENTITY[vec4].p_word, P64_PAGE_ABSENT);
+		page_freeone((pageptr_t)((e4.p_word & P64_PAGE_FVECTOR) / 4096));
+	}
 }
 
 
@@ -1669,6 +1813,30 @@ DEFINE_PUBLIC_ALIAS(pagedir_unmapone, p64_pagedir_unmapone);
 DEFINE_PUBLIC_ALIAS(pagedir_unmap, p64_pagedir_unmap);
 DEFINE_PUBLIC_ALIAS(pagedir_unwriteone, p64_pagedir_unwriteone);
 DEFINE_PUBLIC_ALIAS(pagedir_unwrite, p64_pagedir_unwrite);
+DEFINE_PUBLIC_ALIAS(pagedir_unmap_userspace, p64_pagedir_unmap_userspace);
+DEFINE_PUBLIC_ALIAS(pagedir_unmap_userspace_nosync, p64_pagedir_unmap_userspace_nosync);
+DEFINE_PUBLIC_ALIAS(pagedir_translate, p64_pagedir_translate);
+DEFINE_PUBLIC_ALIAS(pagedir_ismapped, p64_pagedir_ismapped);
+DEFINE_PUBLIC_ALIAS(pagedir_iswritable, p64_pagedir_iswritable);
+DEFINE_PUBLIC_ALIAS(pagedir_isuseraccessible, p64_pagedir_isuseraccessible);
+DEFINE_PUBLIC_ALIAS(pagedir_isuserwritable, p64_pagedir_isuserwritable);
+DEFINE_PUBLIC_ALIAS(pagedir_haschanged, p64_pagedir_haschanged);
+DEFINE_PUBLIC_ALIAS(pagedir_unsetchanged, p64_pagedir_unsetchanged);
+
+
+
+INTERN ATTR_FREETEXT void
+NOTHROW(KCALL x86_initialize_paging)(void) {
+	/* Configure paging */
+	if (!HAVE_PAGE_GLOBAL_BIT)
+		used_pxx_page_fglobal = 0;
+	if (!HAVE_EXECUTE_DISABLE) {
+		unsigned int i;
+		for (i = 0; i < COMPILER_LENOF(p64_pageperm_matrix); ++i)
+			p64_pageperm_matrix[i] &= ~P64_PAGE_FNOEXEC;
+	}
+}
+
 
 DECL_END
 

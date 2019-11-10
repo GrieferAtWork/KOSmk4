@@ -914,7 +914,6 @@ again_read_word:
 INTERN NOBLOCK void
 NOTHROW(FCALL p32_pagedir_unmap_userspace_nosync)(void) {
 	unsigned int vec2, free_count = 0;
-	u32 free_pages[64];
 	/* Map all pages before the share-segment as absent. */
 	for (vec2 = 0; vec2 < P32_PDIR_VEC2INDEX(KERNEL_BASE); ++vec2) {
 		union p32_pdir_e2 e2;
@@ -929,22 +928,7 @@ again_read_word:
 		if unlikely(e2.p_word & P32_PAGE_F4MIB)
 			continue; /* 4MiB page. */
 		pageptr = e2.p_word >> P32_PAGE_SHIFT;
-		if unlikely(free_count >= COMPILER_LENOF(free_pages)) {
-			page_freeone((pageptr_t)pageptr);
-			do {
-				--free_count;
-				page_freeone((pageptr_t)free_pages[free_count]);
-			} while (free_count);
-		} else {
-			free_pages[free_count++] = (u32)pageptr;
-		}
-	}
-	/* Free any remaining pages. */
-	if (free_count) {
-		do {
-			--free_count;
-			page_freeone((pageptr_t)free_pages[free_count]);
-		} while (free_count);
+		page_freeone((pageptr_t)pageptr);
 	}
 }
 

@@ -636,183 +636,243 @@ NOTHROW(FCALL pae_pagedir_unprepare_mapone)(VIRT vm_vpage_t virt_page) {
 	pae_pagedir_unprepare_impl_flatten(vec3, vec2, vec1, 1);
 }
 
-INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL pae_pagedir_prepare_map)(VIRT vm_vpage_t virt_page, size_t num_pages) {
-	unsigned int vec3_min, vec3_max;
-	unsigned int vec2_min, vec2_max;
-	unsigned int vec1_min, vec1_end;
-	unsigned int vec2;
-	if unlikely(virt_page >= (vm_vpage_t)KERNEL_BASE_PAGE)
-		return true;
-	assert(virt_page + num_pages >= virt_page);
-	if unlikely(virt_page + num_pages > (vm_vpage_t)KERNEL_BASE_PAGE)
-		num_pages = (size_t)((vm_vpage_t)KERNEL_BASE_PAGE - virt_page);
-	switch (num_pages) {
-	case 0:
-		return true;
-	case 1:
-		return pae_pagedir_prepare_mapone(virt_page);
-	default:
-		break;
-	}
-	vec3_min = PAE_PDIR_VEC3INDEX_VPAGE(virt_page);
-	vec3_max = PAE_PDIR_VEC3INDEX_VPAGE(virt_page + num_pages - 1);
-	vec2_min = PAE_PDIR_VEC2INDEX_VPAGE(virt_page);
-	vec2_max = PAE_PDIR_VEC2INDEX_VPAGE(virt_page + num_pages - 1);
-	vec1_min = PAE_PDIR_VEC1INDEX_VPAGE(virt_page);
-	if likely(vec3_min == vec3_max) {
-		/* Prepare within the same 1GiB region. */
-		if likely(vec2_min == vec2_max) /* Prepare within the same 2MiB region. */
-			return pae_pagedir_prepare_impl_widen(vec3_min, vec2_min, vec1_min, num_pages);
-		vec1_end = PAE_PDIR_VEC1INDEX_VPAGE(virt_page + num_pages);
-		/* Prepare the partial range of the first 2MiB region. */
-		if unlikely(!pae_pagedir_prepare_impl_widen(vec3_min, vec2_min, vec1_min, 512 - vec1_min))
-			goto err_0;
-		/* Prepare the partial range of the last 2MiB region. */
-		if unlikely(!pae_pagedir_prepare_impl_widen(vec3_min, vec2_max, 0, vec1_end))
-			goto err_1;
-		if unlikely(vec2_min + 1 < vec2_max) {
-			/* Now _fully_ prepare all of the intermediate 2MiB regions. */
-			for (vec2 = vec2_min + 1; vec2 < vec2_max; ++vec2) {
-				if unlikely(!pae_pagedir_prepare_impl_widen(vec3_min, vec2, 0, 512))
-					goto err_2;
-			}
-		}
-	} else {
-		vec1_end = PAE_PDIR_VEC1INDEX_VPAGE(virt_page + num_pages);
-		if unlikely(!pae_pagedir_prepare_impl_widen(vec3_min, vec2_min, vec1_min, 512 - vec1_min))
-			goto err_0;
-		if unlikely(!pae_pagedir_prepare_impl_widen(vec3_max, vec2_max, 0, vec1_end))
-			goto errl_1;
-		for (vec2 = vec2_min + 1; vec2 < 512; ++vec2) {
-			if unlikely(!pae_pagedir_prepare_impl_widen(vec3_min, vec2, 0, 512))
-				goto errl_2;
-		}
-		for (vec2 = 0; vec2 < vec2_max; ++vec2) {
-			if unlikely(!pae_pagedir_prepare_impl_widen(vec3_max, vec2, 0, 512))
-				goto errl_3;
-		}
-		if unlikely(vec3_min + 1 < vec3_max) {
-			assert(vec3_min == 0);
-			assert(vec3_max == 2);
-			/* Prepare the entirety of E3[1] */
-			for (vec2 = 0; vec2 < 512; ++vec2) {
-				if unlikely(!pae_pagedir_prepare_impl_widen(1, vec2, 0, 512))
-					goto errl_4;
-			}
-		}
-	}
-	return true;
-err_2:
-	while (vec2 > vec2_min + 1) {
-		--vec2;
-		pae_pagedir_unprepare_impl_flatten(vec3_min, vec2, 0, 512);
-	}
-	pae_pagedir_unprepare_impl_flatten(vec3_min, vec2_max, 0, vec1_end);
-err_1:
-	pae_pagedir_unprepare_impl_flatten(vec3_min, vec2_min, vec1_min, 512 - vec1_min);
-err_0:
-	return false;
-errl_4:
-	while (vec2 > 0) {
-		--vec2;
-		pae_pagedir_unprepare_impl_flatten(1, vec2, 0, 512);
-	}
-	vec2 = vec2_max;
-errl_3:
-	while (vec2 > 0) {
-		--vec2;
-		pae_pagedir_unprepare_impl_flatten(vec3_max, vec2, 0, 512);
-	}
-	vec2 = 512;
-errl_2:
-	while (vec2 > vec2_min + 1) {
-		--vec2;
-		pae_pagedir_unprepare_impl_flatten(vec3_min, vec2, 0, 512);
-	}
-	pae_pagedir_unprepare_impl_flatten(vec3_max, vec2_max, 0, vec1_end);
-errl_1:
-	pae_pagedir_unprepare_impl_flatten(vec3_min, vec2_min, vec1_min, 512 - vec1_min);
-	goto err_0;
+
+LOCAL NOBLOCK WUNUSED bool
+NOTHROW(FCALL pae_pagedir_prepare_impl_widen_v1)(unsigned int vec3,
+                                                 unsigned int vec2,
+                                                 unsigned int vec1_min,
+                                                 unsigned int vec1_max) {
+	assert(vec1_min <= vec1_max);
+	return pae_pagedir_prepare_impl_widen(vec3, vec2, vec1_min,
+	                                      (vec1_max - vec1_min) + 1);
 }
 
-INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL pae_pagedir_prepare_map_keep)(VIRT vm_vpage_t virt_page, size_t num_pages) {
-	unsigned int vec3_min, vec3_max;
-	unsigned int vec2_min, vec2_max;
-	unsigned int vec1_min, vec1_end;
+LOCAL NOBLOCK void
+NOTHROW(FCALL pae_pagedir_unprepare_impl_flatten_v1)(unsigned int vec3,
+                                                     unsigned int vec2,
+                                                     unsigned int vec1_min,
+                                                     unsigned int vec1_max) {
+	assert(vec1_min <= vec1_max);
+	pae_pagedir_unprepare_impl_flatten(vec3, vec2, vec1_min,
+	                                   (vec1_max - vec1_min) + 1);
+}
+
+LOCAL NOBLOCK WUNUSED bool
+NOTHROW(FCALL pae_pagedir_prepare_impl_widen_v2)(unsigned int vec3,
+                                                 unsigned int vec2_min,
+                                                 unsigned int vec2_max,
+                                                 unsigned int vec1_min,
+                                                 unsigned int vec1_max) {
 	unsigned int vec2;
-	if unlikely(virt_page >= (vm_vpage_t)KERNEL_BASE_PAGE)
-		return true;
-	assert(virt_page + num_pages >= virt_page);
-	if unlikely(virt_page + num_pages > (vm_vpage_t)KERNEL_BASE_PAGE)
-		num_pages = (size_t)((vm_vpage_t)KERNEL_BASE_PAGE - virt_page);
-	switch (num_pages) {
-	case 0:
-		return true;
-	case 1:
-		return pae_pagedir_prepare_mapone(virt_page);
-	default:
-		break;
+	assert(vec2_min <= vec2_max);
+	if (vec2_min == vec2_max)
+		return pae_pagedir_prepare_impl_widen_v1(vec3, vec2_min, vec1_min, vec1_max);
+	if (!pae_pagedir_prepare_impl_widen_v1(vec3, vec2_min, vec1_min, 511))
+		goto err;
+	if (!pae_pagedir_prepare_impl_widen_v1(vec3, vec2_max, 0, vec1_max))
+		goto err1;
+	for (vec2 = vec2_min + 1; vec2 < vec2_max; ++vec2) {
+		if (!pae_pagedir_prepare_impl_widen_v1(vec3, vec2, 0, 511))
+			goto err2;
 	}
-	vec3_min = PAE_PDIR_VEC3INDEX_VPAGE(virt_page);
-	vec3_max = PAE_PDIR_VEC3INDEX_VPAGE(virt_page + num_pages - 1);
-	vec2_min = PAE_PDIR_VEC2INDEX_VPAGE(virt_page);
-	vec2_max = PAE_PDIR_VEC2INDEX_VPAGE(virt_page + num_pages - 1);
-	vec1_min = PAE_PDIR_VEC1INDEX_VPAGE(virt_page);
-	if likely(vec3_min == vec3_max) {
-		/* Prepare within the same 1GiB region. */
-		if likely(vec2_min == vec2_max) /* Prepare within the same 2MiB region. */
-			return pae_pagedir_prepare_impl_widen(vec3_min, vec2_min, vec1_min, num_pages);
-		vec1_end = PAE_PDIR_VEC1INDEX_VPAGE(virt_page + num_pages); /* FIXME: I believe that `vec1_end' can overflow and become 0 here! */
-		/* Prepare the partial range of the first 2MiB region. */
-		if unlikely(!pae_pagedir_prepare_impl_widen(vec3_min, vec2_min, vec1_min, 512 - vec1_min))
+	return true;
+err2:
+	while (vec2 > vec2_min + 1) {
+		--vec2;
+		pae_pagedir_unprepare_impl_flatten_v1(vec3, vec2, 0, 511);
+	}
+	pae_pagedir_unprepare_impl_flatten_v1(vec3, vec2_max, 0, vec1_max);
+err1:
+	pae_pagedir_unprepare_impl_flatten_v1(vec3, vec2_min, vec1_min, 511);
+err:
+	return false;
+}
+
+LOCAL NOBLOCK WUNUSED bool
+NOTHROW(FCALL pae_pagedir_prepare_impl_widen_v2_keep)(unsigned int vec3,
+                                                      unsigned int vec2_min,
+                                                      unsigned int vec2_max,
+                                                      unsigned int vec1_min,
+                                                      unsigned int vec1_max) {
+	unsigned int vec2;
+	assert(vec2_min <= vec2_max);
+	if (vec2_min == vec2_max)
+		return pae_pagedir_prepare_impl_widen_v1(vec3, vec2_min, vec1_min, vec1_max);
+	if (!pae_pagedir_prepare_impl_widen_v1(vec3, vec2_min, vec1_min, 511))
+		goto err;
+	if (!pae_pagedir_prepare_impl_widen_v1(vec3, vec2_max, 0, vec1_max))
+		goto err;
+	for (vec2 = vec2_min + 1; vec2 < vec2_max; ++vec2) {
+		if (!pae_pagedir_prepare_impl_widen_v1(vec3, vec2, 0, 511))
 			goto err;
-		/* Prepare the partial range of the last 2region. */
-		if unlikely(!pae_pagedir_prepare_impl_widen(vec3_min, vec2_max, 0, vec1_end))
-			goto err;
-		if unlikely(vec2_min + 1 < vec2_max) {
-			/* Now _fully_ prepare all of the intermediate 2MiB regions. */
-			for (vec2 = vec2_min + 1; vec2 < vec2_max; ++vec2) {
-				if unlikely(!pae_pagedir_prepare_impl_widen(vec3_min, vec2, 0, 512))
-					goto err;
-			}
-		}
-	} else {
-		vec1_end = PAE_PDIR_VEC1INDEX_VPAGE(virt_page + num_pages);
-		if unlikely(!pae_pagedir_prepare_impl_widen(vec3_min, vec2_min, vec1_min, 512 - vec1_min))
-			goto err;
-		if unlikely(!pae_pagedir_prepare_impl_widen(vec3_max, vec2_max, 0, vec1_end))
-			goto err;
-		for (vec2 = vec2_min + 1; vec2 < 512; ++vec2) {
-			if unlikely(!pae_pagedir_prepare_impl_widen(vec3_min, vec2, 0, 512))
-				goto err;
-		}
-		for (vec2 = 0; vec2 < vec2_max; ++vec2) {
-			if unlikely(!pae_pagedir_prepare_impl_widen(vec3_max, vec2, 0, 512))
-				goto err;
-		}
-		if unlikely(vec3_min + 1 < vec3_max) {
-			assert(vec3_min == 0);
-			assert(vec3_max == 2);
-			/* Prepare the entirety of E3[1] */
-			for (vec2 = 0; vec2 < 512; ++vec2) {
-				if unlikely(!pae_pagedir_prepare_impl_widen(1, vec2, 0, 512))
-					goto err;
-			}
-		}
 	}
 	return true;
 err:
 	return false;
 }
 
+LOCAL NOBLOCK void
+NOTHROW(FCALL pae_pagedir_unprepare_impl_flatten_v2)(unsigned int vec3,
+                                                     unsigned int vec2_min,
+                                                     unsigned int vec2_max,
+                                                     unsigned int vec1_min,
+                                                     unsigned int vec1_max) {
+	unsigned int vec2;
+	assert(vec2_min <= vec2_max);
+	if (vec2_min == vec2_max) {
+		pae_pagedir_unprepare_impl_flatten_v1(vec3, vec2_min, vec1_min, vec1_max);
+		return;
+	}
+	pae_pagedir_unprepare_impl_flatten_v1(vec3, vec2_min, vec1_min, 511);
+	pae_pagedir_unprepare_impl_flatten_v1(vec3, vec2_max, 0, vec1_max);
+	for (vec2 = vec2_min + 1; vec2 < vec2_max; ++vec2)
+		pae_pagedir_unprepare_impl_flatten_v1(vec3, vec2, 0, 511);
+}
+
+
+LOCAL NOBLOCK WUNUSED bool
+NOTHROW(FCALL pae_pagedir_prepare_impl_widen_v3)(unsigned int vec3_min,
+                                                 unsigned int vec3_max,
+                                                 unsigned int vec2_min,
+                                                 unsigned int vec2_max,
+                                                 unsigned int vec1_min,
+                                                 unsigned int vec1_max) {
+	assert(vec3_min <= vec3_max);
+	assert(vec3_max <= 2);
+	if (vec3_min == vec3_max)
+		return pae_pagedir_prepare_impl_widen_v2(vec3_min, vec2_min, vec2_max, vec1_min, vec1_max);
+	if (!pae_pagedir_prepare_impl_widen_v2(vec3_min, vec2_min, 511, vec1_min, 511))
+		goto err;
+	if (!pae_pagedir_prepare_impl_widen_v2(vec3_max, 0, vec2_max, 0, vec1_max))
+		goto err1;
+	if (vec3_min + 1 < vec3_max) {
+		assert(vec3_min == 0);
+		assert(vec3_max == 2);
+		if (!pae_pagedir_prepare_impl_widen_v2(1, 0, 511, 0, 511))
+			goto err2;
+	}
+	return true;
+err2:
+	pae_pagedir_unprepare_impl_flatten_v2(vec3_max, 0, vec2_max, 0, vec1_max);
+err1:
+	pae_pagedir_unprepare_impl_flatten_v2(vec3_min, vec2_min, 511, vec1_min, 511);
+err:
+	return false;
+}
+
+LOCAL NOBLOCK WUNUSED bool
+NOTHROW(FCALL pae_pagedir_prepare_impl_widen_v3_keep)(unsigned int vec3_min,
+                                                      unsigned int vec3_max,
+                                                      unsigned int vec2_min,
+                                                      unsigned int vec2_max,
+                                                      unsigned int vec1_min,
+                                                      unsigned int vec1_max) {
+	assert(vec3_min <= vec3_max);
+	assert(vec3_max <= 2);
+	if (vec3_min == vec3_max)
+		return pae_pagedir_prepare_impl_widen_v2_keep(vec3_min, vec2_min, vec2_max, vec1_min, vec1_max);
+	if (!pae_pagedir_prepare_impl_widen_v2_keep(vec3_min, vec2_min, 511, vec1_min, 511))
+		goto err;
+	if (!pae_pagedir_prepare_impl_widen_v2_keep(vec3_max, 0, vec2_max, 0, vec1_max))
+		goto err;
+	if (vec3_min + 1 < vec3_max) {
+		assert(vec3_min == 0);
+		assert(vec3_max == 2);
+		if (!pae_pagedir_prepare_impl_widen_v2_keep(1, 0, 511, 0, 511))
+			goto err;
+	}
+	return true;
+err:
+	return false;
+}
+
+LOCAL NOBLOCK void
+NOTHROW(FCALL pae_pagedir_unprepare_impl_flatten_v3)(unsigned int vec3_min,
+                                                     unsigned int vec3_max,
+                                                     unsigned int vec2_min,
+                                                     unsigned int vec2_max,
+                                                     unsigned int vec1_min,
+                                                     unsigned int vec1_max) {
+	assert(vec3_min <= vec3_max);
+	assert(vec3_max <= 2);
+	if (vec3_min == vec3_max) {
+		pae_pagedir_unprepare_impl_flatten_v2(vec3_min, vec2_min, vec2_max, vec1_min, vec1_max);
+		return;
+	}
+	pae_pagedir_unprepare_impl_flatten_v2(vec3_min, vec2_min, 511, vec1_min, 511);
+	pae_pagedir_unprepare_impl_flatten_v2(vec3_max, 0, vec2_max, 0, vec1_max);
+	if (vec3_min + 1 < vec3_max) {
+		assert(vec3_min == 0);
+		assert(vec3_max == 2);
+		pae_pagedir_unprepare_impl_flatten_v2(1, 0, 511, 0, 511);
+	}
+}
+
+
+
+INTERN NOBLOCK WUNUSED bool
+NOTHROW(FCALL pae_pagedir_prepare_map)(VIRT vm_vpage_t virt_page, size_t num_pages) {
+	unsigned int vec3_min, vec3_max;
+	unsigned int vec2_min, vec2_max;
+	unsigned int vec1_min, vec1_max;
+	if unlikely(virt_page >= (vm_vpage_t)KERNEL_BASE_PAGE)
+		return true;
+	assert(virt_page + num_pages >= virt_page);
+	if unlikely(virt_page + num_pages > (vm_vpage_t)KERNEL_BASE_PAGE)
+		num_pages = (size_t)((vm_vpage_t)KERNEL_BASE_PAGE - virt_page);
+	switch (num_pages) {
+	case 0:
+		return true;
+	case 1:
+		return pae_pagedir_prepare_mapone(virt_page);
+	default:
+		break;
+	}
+	vec3_min = PAE_PDIR_VEC3INDEX_VPAGE(virt_page);
+	vec3_max = PAE_PDIR_VEC3INDEX_VPAGE(virt_page + num_pages - 1);
+	vec2_min = PAE_PDIR_VEC2INDEX_VPAGE(virt_page);
+	vec2_max = PAE_PDIR_VEC2INDEX_VPAGE(virt_page + num_pages - 1);
+	vec1_min = PAE_PDIR_VEC1INDEX_VPAGE(virt_page);
+	vec1_max = PAE_PDIR_VEC1INDEX_VPAGE(virt_page + num_pages - 1);
+	return pae_pagedir_prepare_impl_widen_v3(vec3_min, vec3_max,
+	                                         vec2_min, vec2_max,
+	                                         vec1_min, vec1_max);
+}
+
+INTERN NOBLOCK WUNUSED bool
+NOTHROW(FCALL pae_pagedir_prepare_map_keep)(VIRT vm_vpage_t virt_page, size_t num_pages) {
+	unsigned int vec3_min, vec3_max;
+	unsigned int vec2_min, vec2_max;
+	unsigned int vec1_min, vec1_max;
+	if unlikely(virt_page >= (vm_vpage_t)KERNEL_BASE_PAGE)
+		return true;
+	assert(virt_page + num_pages >= virt_page);
+	if unlikely(virt_page + num_pages > (vm_vpage_t)KERNEL_BASE_PAGE)
+		num_pages = (size_t)((vm_vpage_t)KERNEL_BASE_PAGE - virt_page);
+	switch (num_pages) {
+	case 0:
+		return true;
+	case 1:
+		return pae_pagedir_prepare_mapone(virt_page);
+	default:
+		break;
+	}
+	vec3_min = PAE_PDIR_VEC3INDEX_VPAGE(virt_page);
+	vec3_max = PAE_PDIR_VEC3INDEX_VPAGE(virt_page + num_pages - 1);
+	vec2_min = PAE_PDIR_VEC2INDEX_VPAGE(virt_page);
+	vec2_max = PAE_PDIR_VEC2INDEX_VPAGE(virt_page + num_pages - 1);
+	vec1_min = PAE_PDIR_VEC1INDEX_VPAGE(virt_page);
+	vec1_max = PAE_PDIR_VEC1INDEX_VPAGE(virt_page + num_pages - 1);
+	return pae_pagedir_prepare_impl_widen_v3_keep(vec3_min, vec3_max,
+	                                              vec2_min, vec2_max,
+	                                              vec1_min, vec1_max);
+}
+
 INTERN NOBLOCK void
 NOTHROW(FCALL pae_pagedir_unprepare_map)(VIRT vm_vpage_t virt_page, size_t num_pages) {
 	unsigned int vec3_min, vec3_max;
 	unsigned int vec2_min, vec2_max;
-	unsigned int vec1_min, vec1_end;
-	unsigned int vec2;
+	unsigned int vec1_min, vec1_max;
 	if unlikely(virt_page >= (vm_vpage_t)KERNEL_BASE_PAGE)
 		return;
 	assert(virt_page + num_pages >= virt_page);
@@ -832,42 +892,10 @@ NOTHROW(FCALL pae_pagedir_unprepare_map)(VIRT vm_vpage_t virt_page, size_t num_p
 	vec2_min = PAE_PDIR_VEC2INDEX_VPAGE(virt_page);
 	vec2_max = PAE_PDIR_VEC2INDEX_VPAGE(virt_page + num_pages - 1);
 	vec1_min = PAE_PDIR_VEC1INDEX_VPAGE(virt_page);
-	if likely(vec3_min == vec3_max) {
-		/* Unprepare within the same 1GiB region. */
-		if likely(vec2_min == vec2_max) { /* Unprepare within the same 2MiB region. */
-			pae_pagedir_unprepare_impl_flatten(vec3_min, vec2_min, vec1_min, num_pages);
-			return;
-		}
-		vec1_end = PAE_PDIR_VEC1INDEX_VPAGE(virt_page + num_pages);
-		/* Unprepare the partial range of the first 2MiB region. */
-		pae_pagedir_unprepare_impl_flatten(vec3_min, vec2_min, vec1_min, 512 - vec1_min);
-		/* Unprepare the partial range of the last 2region. */
-		pae_pagedir_unprepare_impl_flatten(vec3_min, vec2_max, 0, vec1_end);
-		if unlikely(vec2_min + 1 < vec2_max) {
-			/* Now _fully_ prepare all of the intermediate 2MiB regions. */
-			for (vec2 = vec2_min + 1; vec2 < vec2_max; ++vec2) {
-				pae_pagedir_unprepare_impl_flatten(vec3_min, vec2, 0, 512);
-			}
-		}
-	} else {
-		vec1_end = PAE_PDIR_VEC1INDEX_VPAGE(virt_page + num_pages);
-		pae_pagedir_unprepare_impl_flatten(vec3_min, vec2_min, vec1_min, 512 - vec1_min);
-		pae_pagedir_unprepare_impl_flatten(vec3_max, vec2_max, 0, vec1_end);
-		for (vec2 = vec2_min + 1; vec2 < 512; ++vec2) {
-			pae_pagedir_unprepare_impl_flatten(vec3_min, vec2, 0, 512);
-		}
-		for (vec2 = 0; vec2 < vec2_max; ++vec2) {
-			pae_pagedir_unprepare_impl_flatten(vec3_max, vec2, 0, 512);
-		}
-		if unlikely(vec3_min + 1 < vec3_max) {
-			assert(vec3_min == 0);
-			assert(vec3_max == 2);
-			/* Unprepare the entirety of E3[1] */
-			for (vec2 = 0; vec2 < 512; ++vec2) {
-				pae_pagedir_unprepare_impl_flatten(1, vec2, 0, 512);
-			}
-		}
-	}
+	vec1_max = PAE_PDIR_VEC1INDEX_VPAGE(virt_page + num_pages - 1);
+	pae_pagedir_unprepare_impl_flatten_v3(vec3_min, vec3_max,
+	                                      vec2_min, vec2_max,
+	                                      vec1_min, vec1_max);
 }
 
 
@@ -1235,8 +1263,7 @@ again_read_word:
 
 INTERN NOBLOCK void
 NOTHROW(FCALL pae_pagedir_unmap_userspace_nosync)(void) {
-	unsigned int vec3, vec2, free_count = 0;
-	u64 free_pages[64];
+	unsigned int vec3, vec2;
 	/* Map all pages before the share-segment as absent. */
 	for (vec3 = 0; vec3 < 3; ++vec3) {
 		assert(PAE_PDIR_E3_IDENTITY[vec3].p_word & PAE_PAGE_FPRESENT);
@@ -1254,23 +1281,8 @@ again_read_word:
 			if unlikely(e2.p_word & PAE_PAGE_F2MIB)
 				continue; /* 2MiB page. */
 			pageptr = e2.p_word >> PAE_PAGE_SHIFT;
-			if unlikely(free_count >= COMPILER_LENOF(free_pages)) {
-				page_freeone((pageptr_t)pageptr);
-				do {
-					--free_count;
-					page_freeone((pageptr_t)free_pages[free_count]);
-				} while (free_count);
-			} else {
-				free_pages[free_count++] = (u64)pageptr;
-			}
+			page_freeone((pageptr_t)pageptr);
 		}
-	}
-	/* Free any remaining pages. */
-	if (free_count) {
-		do {
-			--free_count;
-			page_freeone((pageptr_t)free_pages[free_count]);
-		} while (free_count);
 	}
 }
 

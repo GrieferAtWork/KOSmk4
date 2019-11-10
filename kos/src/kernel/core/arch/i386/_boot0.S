@@ -18,6 +18,9 @@
  */
 
 #include <kernel/compiler.h>
+
+#include <hybrid/host.h>
+
 #include <asm/cpu-flags.h>
 #include <asm/instr/jccN.h>
 #include <kos/kernel/segment.h>
@@ -25,13 +28,21 @@
 
 .macro call16 sym:req
 	.byte  0xe8
+#ifdef __x86_64__
+	.reloc ., R_X86_64_PC16, \sym
+#else /* __x86_64__ */
 	.reloc ., R_386_PC16, \sym
+#endif /* !__x86_64__ */
 	.word  -2
 .endm
 .macro call16_p sym:req
 	.byte  0x66
 	.byte  0xe8
+#ifdef __x86_64__
+	.reloc ., R_X86_64_PC16, \sym
+#else /* __x86_64__ */
 	.reloc ., R_386_PC16, \sym
+#endif /* !__x86_64__ */
 	.word  -2
 .endm
 

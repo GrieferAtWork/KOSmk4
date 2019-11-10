@@ -216,26 +216,30 @@ __FORCELOCAL void (__wrds)(__UINT16_TYPE__ __val) { __asm__ __volatile__("movw %
 __FORCELOCAL void (__wrfs)(__UINT16_TYPE__ __val) { __asm__ __volatile__("movw %w0, %%fs" : : "rm" (__val) : "memory"); }
 __FORCELOCAL void (__wrgs)(__UINT16_TYPE__ __val) { __asm__ __volatile__("movw %w0, %%gs" : : "rm" (__val) : "memory"); }
 __FORCELOCAL void (__wrcs)(__UINT16_TYPE__ __val) {
+#ifndef __x86_64__
 	if (__builtin_constant_p(__val)) {
 		__asm__ __volatile__("ljmp %0, $1f\n\t"
 		                     "1:"
 		                     :
 		                     : "i" (__val)
 		                     : "memory");
-	} else {
-#ifdef _x86_64__
-		__asm__ __volatile__("pushq %%esp\n\t"
-		                     "pushq %%ss\n\t"
-		                     "addq $8, 0(%%esp)\n\t"
+	} else
+#endif /* !__x86_64__ */
+	{
+#ifdef __x86_64__
+		__asm__ __volatile__("pushq %q0\n\t"
+		                     "pushq %%rsp\n\t"
+		                     "addq $8, 0(%%rsp)\n\t"
 		                     "pushfq\n\t"
-		                     "pushq %q0\n\t"
+		                     "pushq %q1\n\t"
 		                     "pushq $1f\n\t"
 		                     "iretq\n\t"
 		                     "1:"
 		                     :
-		                     : "r" ((__UINT64_TYPE__)__val)
+		                     : "g" ((__UINT64_TYPE__)__rdss())
+		                     , "r" ((__UINT64_TYPE__)__val)
 		                     : "memory");
-#else
+#else /* __x86_64__ */
 		__asm__ __volatile__("pushfl\n\t"
 		                     "pushl %k0\n\t"
 		                     "pushl $1f\n\t"
@@ -244,7 +248,7 @@ __FORCELOCAL void (__wrcs)(__UINT16_TYPE__ __val) {
 		                     :
 		                     : "r" ((__UINT32_TYPE__)__val)
 		                     : "memory");
-#endif
+#endif /* !__x86_64__ */
 	}
 }
 __FORCELOCAL void (__ltr)(__UINT16_TYPE__ __val) { __asm__ __volatile__("ltr %w0" : : "rm" (__val) : "memory"); }
@@ -367,15 +371,15 @@ void (__wrgsbase)(void *__val);
 #elif defined(__KOS__)
 
 #define __PRIVATE_EMIT_BYTE_REGISTER_SELECT(slot,b_eax,b_ecx,b_edx,b_ebx,b_esp,b_ebp,b_esi,b_edi) \
-	".ifc " slot ",%%eax\n\t.byte " b_eax "\n\t.else\n\t" \
-	".ifc " slot ",%%ecx\n\t.byte " b_ecx "\n\t.else\n\t" \
-	".ifc " slot ",%%edx\n\t.byte " b_edx "\n\t.else\n\t" \
-	".ifc " slot ",%%ebx\n\t.byte " b_ebx "\n\t.else\n\t" \
-	".ifc " slot ",%%esp\n\t.byte " b_esp "\n\t.else\n\t" \
-	".ifc " slot ",%%ebp\n\t.byte " b_ebp "\n\t.else\n\t" \
-	".ifc " slot ",%%esi\n\t.byte " b_esi "\n\t.else\n\t" \
-	".ifc " slot ",%%edi\n\t.byte " b_edi "\n\t.else\n\t" \
-	".error \"Invalid register " slot "\"\n\t" \
+	".ifc " slot ",%%eax\n\t.byte " b_eax "\n\t.else\n\t"                                         \
+	".ifc " slot ",%%ecx\n\t.byte " b_ecx "\n\t.else\n\t"                                         \
+	".ifc " slot ",%%edx\n\t.byte " b_edx "\n\t.else\n\t"                                         \
+	".ifc " slot ",%%ebx\n\t.byte " b_ebx "\n\t.else\n\t"                                         \
+	".ifc " slot ",%%esp\n\t.byte " b_esp "\n\t.else\n\t"                                         \
+	".ifc " slot ",%%ebp\n\t.byte " b_ebp "\n\t.else\n\t"                                         \
+	".ifc " slot ",%%esi\n\t.byte " b_esi "\n\t.else\n\t"                                         \
+	".ifc " slot ",%%edi\n\t.byte " b_edi "\n\t.else\n\t"                                         \
+	".error \"Invalid register " slot "\"\n\t"                                                    \
 	".endif\n\t.endif\n\t.endif\n\t.endif\n\t.endif\n\t.endif\n\t.endif\n\t.endif\n\t"
 
 /* The KOS kernel emulates the `(wr|rd)(fs|gs)base' instructions in 32-bit mode!

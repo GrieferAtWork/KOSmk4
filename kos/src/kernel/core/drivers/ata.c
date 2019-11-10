@@ -885,7 +885,9 @@ again_readstate:
 			handle = self->b_dma_current;
 			assert(handle);
 			if (dma_status & DMA_STATUS_FTRANSPORT_FAILURE) {
-				handle_completion_ioerror(handle, ERROR_CODEOF(E_IOERROR_ERRORBIT));
+				handle_completion_ioerror(handle,
+				                          ERRR(E_IOERROR_ERRORBIT,
+				                               E_IOERROR_REASON_ATA_DMA_ERR));
 			} else {
 				/* Indicate a successful completion of the data transfer */
 				ATA_VERBOSE("[ata] Signal DMA success on bus:%#I16x,ctrl:%#I16x,dma:%#I16x\n",
@@ -992,7 +994,9 @@ again_cancel:
 			assert(completed_handle);
 			/* Report the completion status to the accidentally canceled handle. */
 			if (bus->b_cancel_intr_dma_status & DMA_STATUS_FTRANSPORT_FAILURE) {
-				handle_completion_ioerror(completed_handle, ERROR_CODEOF(E_IOERROR_ERRORBIT));
+				handle_completion_ioerror(completed_handle,
+				                          ERRR(E_IOERROR_ERRORBIT,
+				                               E_IOERROR_REASON_ATA_DMA_ERR));
 			} else {
 				/* Indicate a successful completion of the data transfer */
 				ata_handle_signal(completed_handle, AIO_COMPLETION_SUCCESS);
