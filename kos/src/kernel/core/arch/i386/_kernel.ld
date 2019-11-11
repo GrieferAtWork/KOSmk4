@@ -406,9 +406,9 @@ SECTIONS {
 		PROVIDE_HIDDEN(__kernel_commandline_late_end = ABSOLUTE(.));
 
 #ifdef __x86_64__
-		PROVIDE_HIDDEN(__x86_64_fixup_fsgsbase_start = ABSOLUTE(.));
+		PROVIDE_HIDDEN(__x64_fixup_fsgsbase_start = ABSOLUTE(.));
 		KEEP(*(.rodata.fixup.fsgsbase.free))
-		PROVIDE_HIDDEN(__x86_64_fixup_fsgsbase_end = ABSOLUTE(.));
+		PROVIDE_HIDDEN(__x64_fixup_fsgsbase_end = ABSOLUTE(.));
 #endif /* __x86_64__ */
 
 		*(.rodata.free)

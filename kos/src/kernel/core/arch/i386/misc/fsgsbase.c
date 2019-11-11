@@ -56,10 +56,10 @@ DECL_BEGIN
 	callback(r14)                         \
 	callback(r15)
 #define DEFINE_FSGSBASE_FUNCTIONS(reg)       \
-	INTDEF byte_t __x86_64_rdfsbase_##reg[]; \
-	INTDEF byte_t __x86_64_rdgsbase_##reg[]; \
-	INTDEF byte_t __x86_64_wrfsbase_##reg[]; \
-	INTDEF byte_t __x86_64_wrgsbase_##reg[];
+	INTDEF byte_t __x64_rdfsbase_##reg[]; \
+	INTDEF byte_t __x64_rdgsbase_##reg[]; \
+	INTDEF byte_t __x64_wrfsbase_##reg[]; \
+	INTDEF byte_t __x64_wrgsbase_##reg[];
 ENUM_FSGSBASE_REGISTERS(DEFINE_FSGSBASE_FUNCTIONS)
 #undef DEFINE_FSGSBASE_FUNCTIONS
 
@@ -75,22 +75,22 @@ typedef fsgsbase_method_patches_t fsgsbase_patches_t[4];
 
 PRIVATE ATTR_COLDRODATA fsgsbase_patches_t const fsgsbase_patches = {
 	{
-#define PATCH_RDFSBASE(reg) __x86_64_rdfsbase_##reg,
+#define PATCH_RDFSBASE(reg) __x64_rdfsbase_##reg,
 		ENUM_FSGSBASE_REGISTERS(PATCH_RDFSBASE)
 #undef PATCH_RDFSBASE
 	},
 	{
-#define PATCH_RDGSBASE(reg) __x86_64_rdgsbase_##reg,
+#define PATCH_RDGSBASE(reg) __x64_rdgsbase_##reg,
 		ENUM_FSGSBASE_REGISTERS(PATCH_RDGSBASE)
 #undef PATCH_RDGSBASE
 	},
 	{
-#define PATCH_WRFSBASE(reg) __x86_64_wrfsbase_##reg,
+#define PATCH_WRFSBASE(reg) __x64_wrfsbase_##reg,
 		ENUM_FSGSBASE_REGISTERS(PATCH_WRFSBASE)
 #undef PATCH_WRFSBASE
 	},
 	{
-#define PATCH_WRGSBASE(reg) __x86_64_wrgsbase_##reg,
+#define PATCH_WRGSBASE(reg) __x64_wrgsbase_##reg,
 		ENUM_FSGSBASE_REGISTERS(PATCH_WRGSBASE)
 #undef PATCH_WRGSBASE
 	},
@@ -106,7 +106,7 @@ PRIVATE ATTR_COLDRODATA fsgsbase_patches_t const fsgsbase_patches = {
  * @return: true:  Successfully patched the given code location.
  * @return: false: The given code location was already patched,
  *                 or isn't one of the above instructions. */
-FUNDEF ATTR_COLDTEXT NOBLOCK bool
+PUBLIC ATTR_COLDTEXT NOBLOCK bool
 NOTHROW(KCALL fsgsbase_patch)(void *__restrict pc) {
 	/* F3 REX.W 0F AE /0 RDFSBASE r64 */
 	/* F3 REX.W 0F AE /1 RDGSBASE r64 */
@@ -165,8 +165,8 @@ NOTHROW(KCALL fsgsbase_patch)(void *__restrict pc) {
 }
 
 
-INTDEF uint32_t __x86_64_fixup_fsgsbase_start[];
-INTDEF uint32_t __x86_64_fixup_fsgsbase_end[];
+INTDEF uint32_t __x64_fixup_fsgsbase_start[];
+INTDEF uint32_t __x64_fixup_fsgsbase_end[];
 
 /* Patch all (rd|wr)(fs|gs)base text location within the kernel core. */
 INTERN NOBLOCK ATTR_FREETEXT void
@@ -176,8 +176,8 @@ NOTHROW(KCALL fsgsbase_patch_kernel)(void) {
 	 *       CPU doesn't support the fsgsbase instruction set. */
 
 	/* Patch all fsgsbase instructions within the kernel core. */
-	for (iter = __x86_64_fixup_fsgsbase_start;
-	     iter < __x86_64_fixup_fsgsbase_end; ++iter) {
+	for (iter = __x64_fixup_fsgsbase_start;
+	     iter < __x64_fixup_fsgsbase_end; ++iter) {
 		uintptr_t pc = KERNEL_CORE_BASE + *iter;
 		bool was_ok = fsgsbase_patch((void *)pc);
 		if unlikely(!was_ok)

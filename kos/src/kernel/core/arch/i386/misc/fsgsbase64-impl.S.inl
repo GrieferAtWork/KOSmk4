@@ -31,7 +31,7 @@
 #endif /* !TARGET_REGISTER */
 
 .section .text
-INTERN_FUNCTION(PP_CAT2(__x86_64_rdfsbase_, TARGET_REGISTER))
+INTERN_FUNCTION(PP_CAT2(__x64_rdfsbase_, TARGET_REGISTER))
 	.cfi_startproc
 	pushfq_cfi_r
 #ifndef TARGET_REGISTER_IS_RAX
@@ -67,12 +67,12 @@ INTERN_FUNCTION(PP_CAT2(__x86_64_rdfsbase_, TARGET_REGISTER))
 	popfq_cfi_r
 	ret
 	.cfi_endproc
-END(PP_CAT2(__x86_64_rdfsbase_, TARGET_REGISTER))
+END(PP_CAT2(__x64_rdfsbase_, TARGET_REGISTER))
 
 
 
 .section .text
-INTERN_FUNCTION(PP_CAT2(__x86_64_rdgsbase_, TARGET_REGISTER))
+INTERN_FUNCTION(PP_CAT2(__x64_rdgsbase_, TARGET_REGISTER))
 	.cfi_startproc
 	pushfq_cfi_r
 #ifndef TARGET_REGISTER_IS_RAX
@@ -108,13 +108,13 @@ INTERN_FUNCTION(PP_CAT2(__x86_64_rdgsbase_, TARGET_REGISTER))
 	popfq_cfi_r
 	ret
 	.cfi_endproc
-END(PP_CAT2(__x86_64_rdfsbase_, TARGET_REGISTER))
+END(PP_CAT2(__x64_rdfsbase_, TARGET_REGISTER))
 
 
 
 
 .section .text
-INTERN_FUNCTION(PP_CAT2(__x86_64_wrfsbase_, TARGET_REGISTER))
+INTERN_FUNCTION(PP_CAT2(__x64_wrfsbase_, TARGET_REGISTER))
 	.cfi_startproc
 	pushfq_cfi_r
 	pushq_cfi_r %rax
@@ -137,11 +137,11 @@ INTERN_FUNCTION(PP_CAT2(__x86_64_wrfsbase_, TARGET_REGISTER))
 	popfq_cfi_r
 	ret
 	.cfi_endproc
-END(PP_CAT2(__x86_64_rdfsbase_, TARGET_REGISTER))
+END(PP_CAT2(__x64_rdfsbase_, TARGET_REGISTER))
 
 
 .section .text
-INTERN_FUNCTION(PP_CAT2(__x86_64_wrgsbase_, TARGET_REGISTER))
+INTERN_FUNCTION(PP_CAT2(__x64_wrgsbase_, TARGET_REGISTER))
 	.cfi_startproc
 	pushfq_cfi_r
 	pushq_cfi_r %rax
@@ -164,7 +164,7 @@ INTERN_FUNCTION(PP_CAT2(__x86_64_wrgsbase_, TARGET_REGISTER))
 	popfq_cfi_r
 	ret
 	.cfi_endproc
-END(PP_CAT2(__x86_64_rdfsbase_, TARGET_REGISTER))
+END(PP_CAT2(__x64_rdfsbase_, TARGET_REGISTER))
 
 
 #undef TARGET_REGISTER_IS_RCX
