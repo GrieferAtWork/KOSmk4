@@ -41,7 +41,7 @@
 #define IDT_VECTOR_NAME PRIVATE_IDT_VECTOR_NAME(IDT_VECTOR)
 
 .macro _idt_set_impl_section prefix:req, id:req
-.section .text.x86.\prefix.\id
+.section .text.x86.\prefix\().\id
 .endm
 
 #define IDT_HANDLER_SETDPL(dpl)                      \
