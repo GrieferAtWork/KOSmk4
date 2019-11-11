@@ -25,11 +25,10 @@ BEGIN
 	local KENREL_LIBDL_BINARY_SOURCE =
 		"arch/" + TARGET_XARCH + "/libdl-binary.S";
 	local KERNEL_ASM_SOURCES = [
-		"arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
-		"arch/" + TARGET_XARCH + "/debugger/*" + TARGET_BITS_PER_POINTER + ".S",
 		"../../libc/hybrid/arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
 		"../../libunwind/arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
 		"../../libcpustate/arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
+		"arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
 	];
 	local KERNEL_C_SOURCES = [
 		/* Include libc auto- and hybrid-sources */
@@ -83,8 +82,6 @@ BEGIN
 		"../../libkeymap/*.c",
 
 		/* Pull in the actual kernel sources */
-		"arch/" + TARGET_XARCH + "/*.c",
-		"arch/" + TARGET_XARCH + "/debugger/*.c",
 		"debugger/*.c",
 		"memory/*.c",
 		"memory/vm/*.c",
@@ -94,7 +91,15 @@ BEGIN
 		"sched/*.c",
 		"drivers/*.c",
 		"user/*.c",
+		"arch/" + TARGET_XARCH + "/*.c",
 	];
+	for (local x: fs.dir("kos/src/kernel/core/arch/" + TARGET_XARCH)) {
+		if ("." in x || x in ["__ice__"])
+			continue; /* Not a directory */
+		local path = "arch/{}/{}/".format({ TARGET_XARCH, x });
+		KERNEL_ASM_SOURCES.append(path + "*" + TARGET_BITS_PER_POINTER + ".S");
+		KERNEL_C_SOURCES.append(path + "*.c");
+	}
 
 	if (TARGET_ARCH in ["i386", "x86_64"]) {
 		/* Required for: Emulation of BIOS functions (especially on x86_64, where EFLAGS_VM doesn't work) */

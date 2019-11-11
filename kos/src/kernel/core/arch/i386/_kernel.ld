@@ -503,10 +503,10 @@ SECTIONS {
 #endif /* !CONFIG_NO_PAGING_P32 */
 #endif /* !__x86_64__ */
 
-#include "idt.ld"
+#include "idt/idt.ld"
 #ifndef CONFIG_NO_DEBUGGER
 #define PREFIX x86_dbg
-#include "idt.ld"
+#include "idt/idt.ld"
 #endif /* !CONFIG_NO_DEBUGGER */
 
 	/DISCARD/ : {

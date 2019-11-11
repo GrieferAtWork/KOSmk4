@@ -29,12 +29,12 @@ local copyright =
  *   - /include/i386-kos/asm/syscalls64_d.inl
  *   - /src/libc/libc/arch/i386/syscalls32.S
  *   - /src/libc/libc/arch/i386/syscalls64.S
- *   - /src/kernel/core/arch/i386/syscall_wrappers32.S
- *   - /src/kernel/core/arch/i386/syscall_wrappers64.S
- *   - /src/kernel/core/arch/i386/syscall_router32.S
- *   - /src/kernel/core/arch/i386/syscall_router64.S
- *   - /src/kernel/core/arch/i386/syscall_unimplemented32.c.inl
- *   - /src/kernel/core/arch/i386/syscall_unimplemented64.c.inl
+ *   - /src/kernel/core/arch/i386/syscall/wrappers32.S
+ *   - /src/kernel/core/arch/i386/syscall/wrappers64.S
+ *   - /src/kernel/core/arch/i386/syscall/router32.S
+ *   - /src/kernel/core/arch/i386/syscall/router64.S
+ *   - /src/kernel/core/arch/i386/syscall/unimplemented32.c.inl
+ *   - /src/kernel/core/arch/i386/syscall/unimplemented64.c.inl
  */
 
 import fs;
@@ -2680,18 +2680,18 @@ function generate_x86() {
 		"src/libc/libc/arch/i386/syscalls64.S", scs64
 		, x64: true);
 	generate_386_kernel_syscall_wrappers(
-		"src/kernel/core/arch/i386/syscall_wrappers32.S", scs32);
+		"src/kernel/core/arch/i386/syscall/wrappers32.S", scs32);
 	generate_x86_64_kernel_syscall_wrappers(
-		"src/kernel/core/arch/i386/syscall_wrappers64.S", scs32, scs64);
+		"src/kernel/core/arch/i386/syscall/wrappers64.S", scs32, scs64);
 	generate_i386_kernel_syscall_router(
-		"src/kernel/core/arch/i386/syscall_router32.S", scs32);
+		"src/kernel/core/arch/i386/syscall/router32.S", scs32);
 	generate_x86_64_kernel_syscall_router(
-		"src/kernel/core/arch/i386/syscall_router64.S", scs32, scs64);
+		"src/kernel/core/arch/i386/syscall/router64.S", scs32, scs64);
 	generate_x86_kernel_syscall_unimplemented(
-		"src/kernel/core/arch/i386/syscall_unimplemented32.c.inl", scs32
+		"src/kernel/core/arch/i386/syscall/unimplemented32.c.inl", scs32
 		, x64: false);
 	generate_x86_kernel_syscall_unimplemented(
-		"src/kernel/core/arch/i386/syscall_unimplemented64.c.inl", scs64
+		"src/kernel/core/arch/i386/syscall/unimplemented64.c.inl", scs64
 		, x64: true);
 	local scs32_without_64 = [];
 	for (local sc: scs32) {
@@ -2707,7 +2707,7 @@ function generate_x86() {
 			scs32_without_64.append(sc);
 	}
 	generate_x86_kernel_syscall_unimplemented(
-		"src/kernel/core/arch/i386/syscall_unimplemented64_32.c.inl", scs32_without_64
+		"src/kernel/core/arch/i386/syscall/unimplemented64_32.c.inl", scs32_without_64
 		, x64: false, prefix: "sys32_");
 	local scs_map = Dict();
 	for (local x: scs32) scs_map[x.name] = [x];
