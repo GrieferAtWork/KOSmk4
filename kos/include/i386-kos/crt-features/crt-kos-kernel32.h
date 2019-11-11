@@ -2002,6 +2002,7 @@
 #define __CRT_HAVE_vm_execinfo 1
 #define __CRT_HAVE_vm_find_first_node_greater_equal 1
 #define __CRT_HAVE_vm_find_last_node_lower_equal 1
+#define __CRT_HAVE_vm_forcefault 1
 #define __CRT_HAVE_vm_free 1
 #define __CRT_HAVE_vm_futex_broadcast 1
 #define __CRT_HAVE_vm_futex_destroy 1
@@ -2147,6 +2148,10 @@
 #define __CRT_HAVE_x86_dbgidt 1
 #define __CRT_HAVE_x86_dbgidt_ptr 1
 #define __CRT_HAVE_x86_debug_gdt 1
+#define __CRT_HAVE_x86_emulock_cmpxchg16 1
+#define __CRT_HAVE_x86_emulock_cmpxchg32 1
+#define __CRT_HAVE_x86_emulock_cmpxchg64 1
+#define __CRT_HAVE_x86_emulock_cmpxchg8 1
 #define __CRT_HAVE_x86_exsyscall_is_cancellation_point 1
 #define __CRT_HAVE_x86_exsyscall_register_count 1
 #define __CRT_HAVE_x86_exsyscall_restart_mode 1

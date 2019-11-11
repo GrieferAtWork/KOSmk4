@@ -24,6 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
+#include <kernel/fault.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
@@ -37,6 +38,7 @@
 #include <asm/cpu-msr.h>
 #include <asm/intrin.h>
 #include <asm/registers.h>
+#include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/paging.h>
@@ -49,21 +51,11 @@
 #include "../except.h"
 #include "decode.h"
 
-
 DECL_BEGIN
 
-#define CF EFLAGS_CF
-#define PF EFLAGS_PF
-#define AF EFLAGS_AF
-#define ZF EFLAGS_ZF
-#define SF EFLAGS_SF
-#define TF EFLAGS_TF
-#define IF EFLAGS_IF
-#define DF EFLAGS_DF
-#define OF EFLAGS_OF
-
 PRIVATE struct icpustate *FCALL
-x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is_ss);
+x86_handle_gpf_impl(struct icpustate *__restrict state,
+                    uintptr_t ecode, bool is_ss);
 
 INTERN struct icpustate *FCALL
 x86_handle_stackfault(struct icpustate *__restrict state, uintptr_t ecode) {
@@ -75,39 +67,23 @@ x86_handle_gpf(struct icpustate *__restrict state, uintptr_t ecode) {
 	return x86_handle_gpf_impl(state, ecode, false);
 }
 
-#ifdef __x86_64__
-#define ics_irregs_u ics_irregs
-#define ir_Xflags    ir_rflags
-#else
-#define ics_irregs_u ics_irregs_u
-#define ir_Xflags    ir_eflags
-#endif
-
 
 PRIVATE struct icpustate *FCALL
 x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is_ss) {
-	byte_t *pc; u32 opcode; op_flag_t flags; struct modrm mod;
-	u16 effective_segment_value; unsigned int i;
-	pc = (byte_t *)icpustate_getpc(state);
+	byte_t *pc;
+	u32 opcode;
+	op_flag_t flags;
+	struct modrm mod;
+	u16 effective_segment_value;
+	unsigned int i;
+	pc = (byte_t *)state->ics_irregs.ir_pip;
 	COMPILER_READ_BARRIER();
 	/* Re-enable interrupts if they were enabled before. */
-	if (state->ics_irregs.ir_Xflags & EFLAGS_IF)
+	if (state->ics_irregs.ir_pflags & EFLAGS_IF)
 		__sti();
 	opcode = x86_decode_instruction(state, &pc, &flags);
 	TRY {
-
-#define IS_USER()   irregs_isuser(&state->ics_irregs)
-
-#ifdef __x86_64__
-#define S_EAX          ((u32)state->ics_gpregs.gp_rax)
-#define S_ECX          ((u32)state->ics_gpregs.gp_rcx)
-#define S_EDX          ((u32)state->ics_gpregs.gp_rdx)
-#else
-#define S_EAX          ((u32)state->ics_gpregs.gp_eax)
-#define S_ECX          ((u32)state->ics_gpregs.gp_ecx)
-#define S_EDX          ((u32)state->ics_gpregs.gp_edx)
-#endif
-
+#define isuser()     icpustate_isuser(state)
 #define MOD_DECODE() (pc = x86_decode_modrm(pc, &mod, flags))
 
 #define RD_RMB()  modrm_getrmb(state, &mod, flags)
@@ -119,7 +95,7 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 #ifdef __x86_64__
 #define RD_RMQ()  modrm_getrmq(state, &mod, flags)
 #define WR_RMQ(v) modrm_setrmq(state, &mod, flags, v)
-#endif
+#endif /* __x86_64__ */
 
 #define RD_RMREGB()  modrm_getrmregb(state, &mod, flags)
 #define WR_RMREGB(v) modrm_setrmregb(state, &mod, flags, v)
@@ -130,7 +106,7 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 #ifdef __x86_64__
 #define RD_RMREGQ()  modrm_getrmregq(state, &mod, flags)
 #define WR_RMREGQ(v) modrm_setrmregq(state, &mod, flags, v)
-#endif
+#endif /* __x86_64__ */
 
 #define RD_REG()   modrm_getreg(state, &mod, flags)
 #define WR_REG(v)  modrm_setreg(state, &mod, flags, v)
@@ -143,40 +119,23 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 #ifdef __x86_64__
 #define RD_REGQ()  modrm_getregq(state, &mod, flags)
 #define WR_REGQ(v) modrm_setregq(state, &mod, flags, v)
-#endif
+#endif /* !__x86_64__ */
 
-
-#ifdef __x86_64__
-		if (is_ss)
-			effective_segment_value = state->ics_irregs.ir_ss16;
-		else {
-			switch (flags & F_SEGMASK) {
-			case F_SEGFS: effective_segment_value = __rdfs(); break;
-			case F_SEGGS: effective_segment_value = __rdgs(); break;
-			default: effective_segment_value = state->ics_irregs.ir_ss16; break;
-			}
-		}
-#else
 		if (is_ss) {
-			effective_segment_value = __rdss();
-			if (irregs_isuser(&state->ics_irregs_k))
-				effective_segment_value = state->ics_irregs_u.ir_ss16;
+			effective_segment_value = icpustate_getss(state);
 		} else {
 			switch (flags & F_SEGMASK) {
-			case F_SEGDS: effective_segment_value = state->ics_ds16; break;
-			case F_SEGES: effective_segment_value = state->ics_es16; break;
-			case F_SEGFS: effective_segment_value = state->ics_fs16; break;
-			case F_SEGGS: effective_segment_value = __rdgs(); break;
-			case F_SEGCS: effective_segment_value = irregs_rdcs(&state->ics_irregs_k); break;
-			case F_SEGSS:
-				effective_segment_value = irregs_isuser(&state->ics_irregs_k)
-				                          ? state->ics_irregs_u.ir_ss16
-				                          : __rdss();
-				break;
+			case F_SEGFS: effective_segment_value = icpustate_getfs(state); break;
+			case F_SEGGS: effective_segment_value = icpustate_getgs(state); break;
+#ifndef __x86_64__
+			case F_SEGDS: effective_segment_value = icpustate_getds(state); break;
+			case F_SEGES: effective_segment_value = icpustate_getes(state); break;
+			case F_SEGCS: effective_segment_value = icpustate_getcs(state); break;
+			case F_SEGSS: effective_segment_value = icpustate_getss(state); break;
+#endif /* !__x86_64__ */
 			default: __builtin_unreachable(); break;
 			}
 		}
-#endif
 
 #if defined(__x86_64__)
 		/* Check for #GPFs caused by non-canonical memory accesses. */
@@ -244,7 +203,7 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 			case 0x0fbf:  /* movsx r/m16, r32 */
 			case 0x0fb6:  /* movzx r/m8, r16 / movzx r/m8, r32 */
 			case 0x0fb7:  /* movzx r/m16, r32 */
-			 /* All of the following are technically read+write, but since the read comes first... */
+			/* All of the following are technically read+write, but since the read comes first... */
 			case 0x12:    /* adc r/m8, r8 */
 			case 0x13:    /* adc r/m16, r16 / adc r/m32, r32 */
 			case 0x02:    /* add r/m8, r8 */
@@ -574,7 +533,7 @@ noncanon_write:
 do_noncanon:
 				PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
 				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)nc_addr);
-				if (IS_USER()) {
+				if (isuser()) {
 					PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
 					            (uintptr_t)PERTASK_GET(_this_exception_info.ei_data.e_pointers[1]) |
 					            E_SEGFAULT_CONTEXT_USERCODE);
@@ -584,7 +543,7 @@ do_noncanon:
 done_noncanon_check:
 			pc = old_pc;
 		}
-#endif
+#endif /* __x86_64__ */
 
 		switch (opcode) {
 
@@ -599,18 +558,21 @@ done_noncanon_check:
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[3], (uintptr_t)RD_REG());
 #ifdef __x86_64__
 			if (mod.mi_reg == 1 || (mod.mi_reg > 4 && mod.mi_reg != 8))
-#else
+#else /* __x86_64__ */
 			if (mod.mi_reg == 1 || mod.mi_reg > 4)
-#endif
+#endif /* !__x86_64__ */
 			{
 				/* Error was caused because CR* doesn't exist */
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRINV);
-			} else if (IS_USER()) {
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRINV);
+			} else if (isuser()) {
 				/* Error was caused because CR* are privileged */
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
 			} else {
 				/* Error was caused because value written must be invalid. */
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
 			}
 			goto unwind_state;
 
@@ -624,15 +586,17 @@ done_noncanon_check:
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_CONTROL + mod.mi_reg);
 #ifdef __x86_64__
 			if (mod.mi_reg == 1 || (mod.mi_reg > 4 && mod.mi_reg != 8))
-#else
+#else /* __x86_64__ */
 			if (mod.mi_reg == 1 || mod.mi_reg > 4)
-#endif
+#endif /* !__x86_64__ */
 			{
 				/* Undefined control register. */
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDINV);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDINV);
 			} else {
 				/* Userspace tried to read from an control register. */
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV);
 			}
 			goto unwind_state;
 
@@ -649,10 +613,13 @@ done_noncanon_check:
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_CONTROL + mod.mi_reg);
 			if (opcode == 0x0f23) {
 				/* Save the value user-space tried to write. */
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[3], (uintptr_t)RD_REG());
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[3],
+				            (uintptr_t)RD_REG());
 			} else {
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV);
 			}
 			break;
 
@@ -665,28 +632,35 @@ done_noncanon_check:
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[0],
 			            E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
 			for (i = 3; i < EXCEPTION_DATA_POINTERS; ++i)
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[i],
+				            (uintptr_t)0);
 			if (mod.mi_reg == 3) {
 				/* LTR r/m16 */
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_MISC_TR);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[2],
+				            (uintptr_t)X86_REGISTER_MISC_TR);
 			} else if (mod.mi_reg == 2) {
 				/* LLDT r/m16 */
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_MISC_LDT);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[2],
+				            (uintptr_t)X86_REGISTER_MISC_LDT);
 			} else if (mod.mi_reg == 0) {
 				/* SLDT r/m16 */
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV);
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_MISC_LDT);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[2],
+				            (uintptr_t)X86_REGISTER_MISC_LDT);
 				goto unwind_state;
 			} else {
 				goto generic_failure;
 			}
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[3], (uintptr_t)RD_RMW());
-			if (ecode != 0 && !IS_USER()) {
+			if (ecode != 0 && !isuser()) {
 				/* Invalid operand for this opcode. */
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
 			} else {
 				/* User-space use of a privileged instruction. */
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
 			}
 			goto unwind_state;
 
@@ -695,40 +669,52 @@ done_noncanon_check:
 			MOD_DECODE();
 			if (effective_segment_value == 0)
 				goto null_segment_error;
-			PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+			PERTASK_SET(_this_exception_info.ei_code,
+			            (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[0],
 			            E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
 			for (i = 3; i < EXCEPTION_DATA_POINTERS; ++i)
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[i],
+				            (uintptr_t)0);
 			if (mod.mi_reg == 2) {
 				/* LGDT m16&32 */
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_MISC_GDT);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[2],
+				            (uintptr_t)X86_REGISTER_MISC_GDT);
 			} else if (mod.mi_reg == 3) {
 				/* LIDT m16&32 */
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_MISC_IDT);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[2],
+				            (uintptr_t)X86_REGISTER_MISC_IDT);
 			} else if (mod.mi_reg == 0) {
 				/* SGDT r/m16 */
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV);
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_MISC_GDT);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[2],
+				            (uintptr_t)X86_REGISTER_MISC_GDT);
 				goto unwind_state;
 			} else if (mod.mi_reg == 1) {
 				/* SIDT r/m16 */
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV);
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_MISC_IDT);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[2],
+				            (uintptr_t)X86_REGISTER_MISC_IDT);
 				goto unwind_state;
 			} else if (mod.mi_reg == 4) {
 				/* SMSW r/m16 */
 				/* SMSW r/m32 */
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV);
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_CONTROL_CR0);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[2],
+				            (uintptr_t)X86_REGISTER_CONTROL_CR0);
 				goto unwind_state;
 			} else if (mod.mi_reg == 6) {
 				/* LMSW r/m16 */
 				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
-				            IS_USER() ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV
-				                      : (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_CONTROL_CR0);
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[3], (uintptr_t)RD_RMW());
+				            isuser() ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV
+				                     : (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[2],
+				            (uintptr_t)X86_REGISTER_CONTROL_CR0);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[3],
+				            (uintptr_t)RD_RMW());
 				goto unwind_state;
 			} else {
 				goto generic_failure;
@@ -736,8 +722,10 @@ done_noncanon_check:
 			/* LGDT m16&32 */
 			/* LIDT m16&32 */
 			if (mod.mi_type != MODRM_MEMORY) {
-				PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND));
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE);
+				PERTASK_SET(_this_exception_info.ei_code,
+				            (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND));
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE);
 				for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
 					PERTASK_SET(_this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
 				goto unwind_state;
@@ -745,12 +733,14 @@ done_noncanon_check:
 			{
 				u8 buf[2 + sizeof(uintptr_t)];
 				uintptr_t addr = x86_decode_modrmgetmem(state, &mod, flags);
-				if (IS_USER()) {
+				if (isuser()) {
 					validate_readable((void *)addr, sizeof(buf));
 					memcpy(buf, (void *)addr, sizeof(buf));
-					PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
+					PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+					            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
 				} else {
-					PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
+					PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+					            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
 				}
 				PERTASK_SET(_this_exception_info.ei_data.e_pointers[3], (uintptr_t) * (u16 *)(buf + 0));
 				PERTASK_SET(_this_exception_info.ei_data.e_pointers[4], *(uintptr_t *)(buf + 2));
@@ -762,10 +752,14 @@ done_noncanon_check:
 			MOD_DECODE();
 			if (mod.mi_reg >= 6) {
 				/* Non-existent segment register */
-				PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)opcode);
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDINV);
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT + mod.mi_reg);
+				PERTASK_SET(_this_exception_info.ei_code,
+				            (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[0],
+				            (uintptr_t)opcode);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDINV);
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[2],
+				            (uintptr_t)X86_REGISTER_SEGMENT + mod.mi_reg);
 				for (i = 3; i < EXCEPTION_DATA_POINTERS; ++i)
 					PERTASK_SET(_this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
 				goto unwind_state;
@@ -775,65 +769,85 @@ done_noncanon_check:
 		case 0x8e:
 			/* MOV Sreg**,r/m16 */
 			MOD_DECODE();
-			PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)opcode);
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT + mod.mi_reg);
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[3], (uintptr_t)RD_RMW());
-			for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
+			PERTASK_SET(_this_exception_info.ei_code,
+			            (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+			PERTASK_SET(_this_exception_info.ei_data.e_pointers[0],
+			            (uintptr_t)opcode);
+			PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+			            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
+			PERTASK_SET(_this_exception_info.ei_data.e_pointers[2],
+			            (uintptr_t)X86_REGISTER_SEGMENT + mod.mi_reg);
+			PERTASK_SET(_this_exception_info.ei_data.e_pointers[3],
+			            (uintptr_t)RD_RMW());
+			for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i) {
 				PERTASK_SET(_this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
+			}
 			/* Invalid segment index. */
-			if (mod.mi_reg > 5) /* Non-existent segment register */
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRINV);
+			if (mod.mi_reg > 5) {
+				/* Non-existent segment register */
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRINV);
+			}
 			goto unwind_state;
 
 		case 0x0f31: /* rdtsc */
 		case 0x0f32: /* rdmsr */
 		case 0x0f33: /* rdpmc */
-			PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+			PERTASK_SET(_this_exception_info.ei_code,
+			            (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)opcode);
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
-			            IS_USER() ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV
-			                      : (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDINV);
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_MSR);
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[3], (uintptr_t)S_ECX);
-			if (opcode == 0x0f31)
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[3], (uintptr_t)IA32_TIME_STAMP_COUNTER);
+			            isuser() ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV
+			                     : (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDINV);
+			PERTASK_SET(_this_exception_info.ei_data.e_pointers[2],
+			            (uintptr_t)X86_REGISTER_MSR);
+			PERTASK_SET(_this_exception_info.ei_data.e_pointers[3],
+			            (uintptr_t)(u32)gpregs_getpcx(&state->ics_gpregs));
+			if (opcode == 0x0f31) {
+				PERTASK_SET(_this_exception_info.ei_data.e_pointers[3],
+				            (uintptr_t)IA32_TIME_STAMP_COUNTER);
+			}
 			for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
 				PERTASK_SET(_this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
 			goto unwind_state;
 
 		case 0x0f30:
 			/* wrmsr */
-			PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+			PERTASK_SET(_this_exception_info.ei_code,
+			            (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)opcode);
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
-			            IS_USER() ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV
-			                      : (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRINV);
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_MSR);
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[3], (uintptr_t)S_ECX);
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[4], (uintptr_t)S_EAX);
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[5], (uintptr_t)S_EDX);
+			            isuser() ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV
+			                     : (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRINV);
+			PERTASK_SET(_this_exception_info.ei_data.e_pointers[2],
+			            (uintptr_t)X86_REGISTER_MSR);
+			PERTASK_SET(_this_exception_info.ei_data.e_pointers[3],
+			            (uintptr_t)(u32)gpregs_getpcx(&state->ics_gpregs));
+			PERTASK_SET(_this_exception_info.ei_data.e_pointers[4],
+			            (uintptr_t)(u32)gpregs_getpax(&state->ics_gpregs));
+			PERTASK_SET(_this_exception_info.ei_data.e_pointers[5],
+			            (uintptr_t)(u32)gpregs_getpdx(&state->ics_gpregs));
 			goto unwind_state;
 
 		default: {
 			uintptr_t next_pc;
 			/*unsupported_instruction:*/
-			next_pc = irregs_rdip(&state->ics_irregs);
+			next_pc = (uintptr_t)icpustate_getpc(state);
 			next_pc = (uintptr_t)instruction_succ((void const *)next_pc);
 			if (next_pc)
 				pc = (byte_t *)next_pc;
 			goto generic_failure;
 		}	break;
+
 		}
 	} EXCEPT {
 		if (was_thrown(E_ILLEGAL_INSTRUCTION) &&
 		    PERTASK_GET(_this_exception_info.ei_data.e_pointers[0]) == 0)
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)opcode);
-		irregs_wrip(&state->ics_irregs, (uintptr_t)pc);
+		icpustate_setpc(state, (uintptr_t)pc);
 		RETHROW();
 	}
-	irregs_wrip(&state->ics_irregs, (uintptr_t)pc);
+	icpustate_setpc(state, (uintptr_t)pc);
 	return state;
 generic_failure:
 	/* Fallback: Choose between a NULL-segment and generic error. */
@@ -846,7 +860,7 @@ null_segment_error:
 		PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
 		PERTASK_SET(_this_exception_info.ei_data.e_pointers[3], (uintptr_t)effective_segment_value);
 		switch (flags & F_SEGMASK) {
-		default: PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_DS); break;
+		default:      PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_DS); break;
 		case F_SEGFS: PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_FS); break;
 		case F_SEGGS: PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_GS); break;
 #ifndef __x86_64__
@@ -877,9 +891,10 @@ null_segment_error:
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
 		PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
 		PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)X86_64_ADDRBUS_NONCANON_MIN);
-		if (IS_USER()) {
+		if (isuser()) {
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
-			            (uintptr_t)E_SEGFAULT_CONTEXT_NONCANON | E_SEGFAULT_CONTEXT_USERCODE);
+			            (uintptr_t)(E_SEGFAULT_CONTEXT_NONCANON |
+			                        E_SEGFAULT_CONTEXT_USERCODE));
 		} else {
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
 			            (uintptr_t)E_SEGFAULT_CONTEXT_NONCANON);
@@ -889,15 +904,17 @@ null_segment_error:
 #endif
 	/* If the error originated from user-space, default to assuming it's
 	 * because of some privileged instruction not explicitly handled above. */
-	if (IS_USER()) {
+	if (isuser()) {
 		for (i = 1; i < EXCEPTION_DATA_POINTERS; ++i)
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
-		PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE));
+		PERTASK_SET(_this_exception_info.ei_code,
+		            (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE));
 		PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)opcode);
 		goto unwind_state;
 	}
 	/* In kernel space, this one's a wee bit more complicated... */
-	PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT));
+	PERTASK_SET(_this_exception_info.ei_code,
+	            (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT));
 	PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)opcode);
 	PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], is_ss ? (uintptr_t)0x0c : (uintptr_t)0x0d);
 	PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)ecode);
@@ -905,11 +922,11 @@ null_segment_error:
 	for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
 		PERTASK_SET(_this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
 unwind_state:
-	irregs_wrip(&state->ics_irregs, (uintptr_t)pc);
+	icpustate_setpc(state, (uintptr_t)pc);
 #if EXCEPT_BACKTRACE_SIZE != 0
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
 		PERTASK_SET(_this_exception_info.ei_trace[i], (void *)0);
-#endif
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	x86_unwind_interrupt(state);
 }
 

@@ -39,7 +39,7 @@
 #include <asm/cpu-flags.h>
 #include <asm/intrin-fpu.h>
 #include <asm/intrin.h>
-#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/fpu-state.h>
 #include <kos/kernel/fpu-state32.h>
@@ -269,19 +269,14 @@ x86_handle_device_not_available(struct icpustate *__restrict state) {
 		printk(KERN_INFO "Switch FPU context from task %p[pid=%u] to %p[pid=%u] [pc=%p]\n",
 		       old_task, old_task ? task_getroottid_of_s(old_task) : 0,
 		       new_task, task_getroottid_of_s(new_task),
-		       icpustate_getpc(state));
+		       state->ics_irregs.ir_pip);
 		mystate = PERTASK_GET(_this_fpustate);
 		if (!mystate) {
 			/* Try to have interrupts enabled when allocating memory.
 			 * By doing this, we prevent the allocation failing with `E_WOULDBLOCK'
 			 * if at some point it needs to do something that may block. */
-#ifdef __x86_64__
-			if (state->ics_irregs.ir_rflags & EFLAGS_IF)
+			if (state->ics_irregs.ir_pflags & EFLAGS_IF)
 				__sti();
-#else /* __x86_64__ */
-			if (state->ics_irregs.ir_eflags & EFLAGS_IF)
-				__sti();
-#endif /* !__x86_64__ */
 			/* Lazily allocate a new state upon first access.
 			 * NOTE: If this causes an exception, that exception
 			 *       will be propagated to user-space. */
@@ -318,6 +313,9 @@ x86_handle_device_not_available(struct icpustate *__restrict state) {
 
 
 /* TODO: FPU Exception handlers. */
+//INTDEF struct icpustate *FCALL x86_handle_coprocessor_fault(struct icpustate *__restrict state);
+//INTDEF struct icpustate *FCALL x86_handle_fpu_x87(struct icpustate *__restrict state);
+//INTDEF struct icpustate *FCALL x86_handle_fpu_simd(struct icpustate *__restrict state);
 
 
 

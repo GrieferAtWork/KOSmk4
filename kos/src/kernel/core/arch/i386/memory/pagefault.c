@@ -24,6 +24,7 @@
 
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
+#include <kernel/fault.h>
 #include <kernel/malloc.h>
 #include <kernel/memory.h>
 #include <kernel/paging.h>

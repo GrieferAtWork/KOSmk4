@@ -20,12 +20,17 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_VIO_H 1
 
 #include <kernel/compiler.h>
-#include <kernel/types.h>
-#include "vm.h"
 
+#include <kernel/types.h>
+
+#include "vm.h"
 
 #ifdef CONFIG_VIO
 #include <kernel/arch/vio.h>
+
+#ifdef CONFIG_VIO_HAS_INT128_CMPXCH
+#include <int128.h>
+#endif /* CONFIG_VIO_HAS_INT128_CMPXCH */
 
 DECL_BEGIN
 
@@ -93,6 +98,7 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) void (KCALL *f_qword)(struct vio_args *__restrict args, vm_daddr_t addr, u64 value);
 #endif /* CONFIG_VIO_HAS_QWORD */
 	} dtv_write;
+
 	struct {
 		/* Return the old value (regardless of the compare-exchange having been successful) */
 		NONNULL((1)) u8  (KCALL *f_byte)(struct vio_args *__restrict args, vm_daddr_t addr, u8 oldvalue, u8 newvalue, bool atomic);
@@ -101,7 +107,11 @@ struct vm_datablock_type_vio {
 #if defined(CONFIG_VIO_HAS_QWORD) || defined(CONFIG_VIO_HAS_QWORD_CMPXCH)
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, vm_daddr_t addr, u64 oldvalue, u64 newvalue, bool atomic);
 #endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
+#ifdef CONFIG_VIO_HAS_INT128_CMPXCH
+		NONNULL((1)) uint128_t (KCALL *f_int128)(struct vio_args *__restrict args, vm_daddr_t addr, uint128_t oldvalue, uint128_t newvalue, bool atomic);
+#endif /* CONFIG_VIO_HAS_INT128_CMPXCH */
 	} dtv_cmpxch;
+
 	struct {
 		/* Return the old value */
 		NONNULL((1)) u8  (KCALL *f_byte)(struct vio_args *__restrict args, vm_daddr_t addr, u8 newvalue, bool atomic);
@@ -230,6 +240,9 @@ FUNDEF NONNULL((1)) void KCALL vio_copytovio_from_phys(struct vio_args *__restri
 #if defined(CONFIG_VIO_HAS_QWORD) || defined(CONFIG_VIO_HAS_QWORD_CMPXCH)
 FUNDEF NONNULL((1)) u64 KCALL vio_cmpxchq(struct vio_args *__restrict args, vm_daddr_t addr, u64 oldvalue, u64 newvalue, bool atomic);
 #endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
+#ifdef CONFIG_VIO_HAS_INT128_CMPXCH
+FUNDEF NONNULL((1)) uint128_t KCALL vio_cmpxch128(struct vio_args *__restrict args, vm_daddr_t addr, uint128_t oldvalue, uint128_t newvalue, bool atomic);
+#endif /* CONFIG_VIO_HAS_INT128_CMPXCH */
 #ifdef CONFIG_VIO_HAS_QWORD
 FUNDEF NONNULL((1)) u64 KCALL vio_cmpxch_or_writeq(struct vio_args *__restrict args, vm_daddr_t addr, u64 oldvalue, u64 newvalue, bool atomic);
 FUNDEF NONNULL((1)) u64 KCALL vio_readq(struct vio_args *__restrict args, vm_daddr_t addr);

@@ -24,6 +24,7 @@
 #include <kernel/except.h>
 #include <kernel/idt-foreach.h>
 #include <kernel/idt.h>
+#include <kernel/isr.h>
 #include <kernel/malloc.h>
 #include <kernel/types.h>
 #include <sched/cpu.h>
@@ -235,6 +236,23 @@ NOTHROW(FCALL x86_idt_modify_end)(bool discard_changes) {
 	/* Free the temporary IDT copy */
 	kfree(copy);
 }
+
+
+PUBLIC ATTR_PERCPU struct x86_spurious_interrupts
+x86_spurious_interrupts = { 0, 0, 0 };
+
+INTERN void KCALL x86_pic1_spur(void) {
+	++PERCPU(x86_spurious_interrupts).sp_pic1;
+}
+
+INTERN void KCALL x86_pic2_spur(void) {
+	++PERCPU(x86_spurious_interrupts).sp_pic2;
+}
+
+INTERN void KCALL x86_apic_spur(void) {
+	++PERCPU(x86_spurious_interrupts).sp_apic;
+}
+
 
 DECL_END
 

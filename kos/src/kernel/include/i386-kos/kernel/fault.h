@@ -1,0 +1,92 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_FAULT_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_FAULT_H 1
+
+#include <kernel/compiler.h>
+
+#include <kernel/types.h>
+
+DECL_BEGIN
+
+#ifdef __CC__
+
+/* Helpers and prototypes for c-level hardware fault handlers. */
+#ifdef CONFIG_BUILDING_KERNEL_CORE
+struct icpustate;
+struct df_cpustate;
+
+/* Exception handlers */
+INTDEF struct icpustate *FCALL x86_handle_divide_by_zero(struct icpustate *__restrict state);                       /* #DE  Divide-by-zero */
+INTDEF struct icpustate *FCALL x86_handle_debugtrap(struct icpustate *__restrict state);                            /* #DB  Debug */
+INTDEF struct icpustate *FCALL x86_handle_non_maskable_interrupt(struct icpustate *__restrict state);               /* #NMI Non-maskable Interrupt */
+INTDEF struct icpustate *FCALL x86_handle_breakpoint(struct icpustate *__restrict state);                           /* #BP  Breakpoint */
+INTDEF struct icpustate *FCALL x86_handle_overflow(struct icpustate *__restrict state);                             /* #OF  Overflow */
+INTDEF struct icpustate *FCALL x86_handle_bound_range(struct icpustate *__restrict state);                          /* #BR  Bound Range Exceeded */
+INTDEF struct icpustate *FCALL x86_handle_illegal_instruction(struct icpustate *__restrict state);                  /* #UD  Invalid Opcode */
+INTDEF struct icpustate *FCALL x86_handle_device_not_available(struct icpustate *__restrict state);                 /* #NM  Device Not Available */
+INTDEF struct df_cpustate *FCALL x86_handle_double_fault(struct df_cpustate *__restrict state);                     /* #DF  Double Fault */
+INTDEF struct icpustate *FCALL x86_handle_coprocessor_fault(struct icpustate *__restrict state);                    /* #CSO Coprocessor Segment Overrun (unused on 486+) */
+INTDEF struct icpustate *FCALL x86_handle_invalid_tss(struct icpustate *__restrict state, uintptr_t ecode);         /* #TS  Invalid TSS */
+INTDEF struct icpustate *FCALL x86_handle_segment_not_present(struct icpustate *__restrict state, uintptr_t ecode); /* #NP  Segment Not Present */
+INTDEF struct icpustate *FCALL x86_handle_stackfault(struct icpustate *__restrict state, uintptr_t ecode);          /* #SS  Stack-Segment Fault */
+INTDEF struct icpustate *FCALL x86_handle_gpf(struct icpustate *__restrict state, uintptr_t ecode);                 /* #GP  General Protection Fault */
+INTDEF struct icpustate *FCALL x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode);           /* #PF  Page Fault */
+INTDEF struct icpustate *FCALL x86_handle_0fh(struct icpustate *__restrict state);                                  /* Reserved (exception)... */
+INTDEF struct icpustate *FCALL x86_handle_fpu_x87(struct icpustate *__restrict state);                              /* #MF  x87 Floating-Point Exception */
+INTDEF struct icpustate *FCALL x86_handle_bad_alignment(struct icpustate *__restrict state, uintptr_t ecode);       /* #AC  Alignment Check */
+INTDEF struct icpustate *FCALL x86_handle_machine_check(struct icpustate *__restrict state);                        /* #MC  Machine Check */
+INTDEF struct icpustate *FCALL x86_handle_fpu_simd(struct icpustate *__restrict state);                             /* #XM  SIMD Floating-Point Exception */
+INTDEF struct icpustate *FCALL x86_handle_virtualization_error(struct icpustate *__restrict state);                 /* #VE  Virtualization Exception */
+INTDEF struct icpustate *FCALL x86_handle_15h(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_16h(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_17h(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_18h(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_19h(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_1ah(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_1bh(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_1ch(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_1dh(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_security_exception(struct icpustate *__restrict state, uintptr_t ecode); /* #SX  Security Exception. */
+INTDEF struct icpustate *FCALL x86_handle_1fh(struct icpustate *__restrict state);
+
+/* NT Service interrupt handlers. */
+INTDEF struct icpustate *FCALL x86_handle_20h(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_21h(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_22h(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_23h(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_24h(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_25h(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_26h(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_27h(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_28h(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_ms_fastfail(struct icpustate *__restrict state); /* __fastfail() */
+INTDEF struct icpustate *FCALL x86_handle_2ah(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_2bh(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_2ch(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_2dh(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_2eh(struct icpustate *__restrict state);
+INTDEF struct icpustate *FCALL x86_handle_2fh(struct icpustate *__restrict state);
+
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* __CC__ */
+
+DECL_END
+
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_FPU_H */

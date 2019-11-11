@@ -23,6 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
+#include <kernel/fault.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/task.h>
@@ -30,6 +31,7 @@
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <asm/registers.h>
+#include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
 #include <libinstrlen/instrlen.h>
@@ -47,7 +49,7 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 	u32 opcode;
 	op_flag_t flags;
 	uintptr_t bound_index, bound_min, bound_max;
-	pc        = (byte_t *)irregs_rdip(&state->ics_irregs);
+	pc        = (byte_t *)icpustate_getpc(state);
 	opcode    = x86_decode_instruction(state, &pc, &flags);
 	bound_min = bound_index = bound_max = 0;
 	if (opcode == 0x62) {
@@ -60,7 +62,7 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 			addr = (byte_t *)x86_decode_modrmgetmem(state, &mod, flags);
 			/* If the interrupt originated for user-space, make sure to validate
 			 * the address bounds structure, so-as not to leak kernel memory. */
-			if (irregs_isuser(&state->ics_irregs))
+			if (icpustate_isuser(state))
 				validate_readable(addr, flags & F_OP16 ? 4 : 8);
 			if (flags & F_OP16) {
 				bound_index = modrm_getregw(state, &mod, flags);
@@ -72,7 +74,7 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 				bound_max   = *(u32 *)(addr + 4);
 			}
 		} EXCEPT {
-			irregs_wrip(&state->ics_irregs, (uintptr_t)pc);
+			icpustate_setpc(state, (uintptr_t)pc);
 			RETHROW();
 		}
 		if ((s32)bound_index >= (s32)bound_min &&
@@ -81,12 +83,12 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 			 *                 must have modified the bounds before we got to
 			 *                 read them. - Just ignore this and act as though
 			 *                 this exception has never gotten raised! */
-			irregs_wrip(&state->ics_irregs, (uintptr_t)pc);
+			icpustate_setpc(state, (uintptr_t)pc);
 			return state;
 		}
 	} else {
 		uintptr_t next_pc;
-		next_pc = irregs_rdip(&state->ics_irregs);
+		next_pc = icpustate_getpc(state);
 		next_pc = (uintptr_t)instruction_succ((void const *)next_pc);
 		if (next_pc)
 			pc = (byte_t *)next_pc;
@@ -105,7 +107,7 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 			PERTASK_SET(_this_exception_info.ei_trace[i], (void *)0);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	}
-	irregs_wrip(&state->ics_irregs, (uintptr_t)pc);
+	icpustate_setpc(state, (uintptr_t)pc);
 	x86_unwind_interrupt(state);
 }
 

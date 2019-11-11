@@ -940,24 +940,6 @@ PUBLIC void __cxa_end_catch(void) {
 }
 
 
-
-
-/* Implement support for window's __fastfail() intrinsic.
- * In KOS, we too generate a debugger trap, then simply raise
- * an E_EXIT_PROCESS exception to terminate the calling process.
- * It doesn't get much simpler than this... */
-INTERN struct icpustate *FCALL
-x86_handle_ms_fastfail(struct icpustate *__restrict state) {
-	enum { SIGNO = SIGABRT };
-	if (kernel_debugtrap_enabled())
-		kernel_debugtrap(state, SIGNO);
-	/* Use the fastfail code as exitcode for the program (not
-	 * exactly what window does, but still close enough...) */
-	THROW(E_EXIT_PROCESS, W_EXITCODE(gpregs_getpcx(&state->ics_gpregs), SIGNO));
-}
-
-
-
 DECL_END
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_EXCEPT_C */

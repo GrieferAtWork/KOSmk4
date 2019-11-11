@@ -1118,10 +1118,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 279 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname279 /* index: 279 */
+	.weak x86_emulock_cmpxchg64; .long x86_emulock_cmpxchg64
+	.reloc ., R_386_SIZE32, x86_emulock_cmpxchg64; .long 0
+	.long 0xe348374
 	.long .Lname280 /* index: 280 */
 	.weak instruction_length; .long instruction_length
 	.reloc ., R_386_SIZE32, instruction_length; .long 0
@@ -1350,10 +1350,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 337 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname337 /* index: 337 */
+	.weak x86_emulock_cmpxchg8; .long x86_emulock_cmpxchg8
+	.reloc ., R_386_SIZE32, x86_emulock_cmpxchg8; .long 0
+	.long 0xee34838
 	.long .Lname338 /* index: 338 */
 	.weak vio_xorb; .long vio_xorb
 	.reloc ., R_386_SIZE32, vio_xorb; .long 0
@@ -3594,10 +3594,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak memrendq; .long memrendq
 	.reloc ., R_386_SIZE32, memrendq; .long 0
 	.long 0xc48c381
-	.long 0 /* index: 898 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname898 /* index: 898 */
+	.weak x86_emulock_cmpxchg32; .long x86_emulock_cmpxchg32
+	.reloc ., R_386_SIZE32, x86_emulock_cmpxchg32; .long 0
+	.long 0xe348382
 	.long .Lname899 /* index: 899 */
 	.weak sys_fstatfs; .long sys_fstatfs
 	.reloc ., R_386_SIZE32, sys_fstatfs; .long 0
@@ -6039,9 +6039,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, path_traverse_at; .long 0
 	.long 0x2f555e4
 	.long .Lname1509 /* index: 1509 */
-	.weak zlib_reader_feed; .long zlib_reader_feed
-	.reloc ., R_386_SIZE32, zlib_reader_feed; .long 0
-	.long 0x4256ee4
+	.weak x86_emulock_cmpxchg16; .long x86_emulock_cmpxchg16
+	.reloc ., R_386_SIZE32, x86_emulock_cmpxchg16; .long 0
+	.long 0xe3483a6
 	.long 0 /* index: 1510 */
 	.long 0
 	.long 0
@@ -13802,10 +13802,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_prlimit64; .long sys_prlimit64
 	.reloc ., R_386_SIZE32, sys_prlimit64; .long 0
 	.long 0xa0b6f94
-	.long 0 /* index: 3450 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3450 /* index: 3450 */
+	.weak zlib_reader_feed; .long zlib_reader_feed
+	.reloc ., R_386_SIZE32, zlib_reader_feed; .long 0
+	.long 0x4256ee4
 	.long 0 /* index: 3451 */
 	.long 0
 	.long 0
@@ -14758,10 +14758,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_readlinkat; .long sys_readlinkat
 	.reloc ., R_386_SIZE32, sys_readlinkat; .long 0
 	.long 0xbbadd44
-	.long 0 /* index: 3689 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3689 /* index: 3689 */
+	.weak vm_forcefault; .long vm_forcefault
+	.reloc ., R_386_SIZE32, vm_forcefault; .long 0
+	.long 0x4895ec4
 	.long 0 /* index: 3690 */
 	.long 0
 	.long 0
@@ -16680,6 +16680,8 @@ END(kernel_symbol_table)
 	.string "sys_linkat"
 .Lname277:
 	.string "cpu_apply_kcpustate"
+.Lname279:
+	.string "x86_emulock_cmpxchg64"
 .Lname280:
 	.string "instruction_length"
 .Lname281:
@@ -16732,6 +16734,8 @@ END(kernel_symbol_table)
 	.string "vio_xorw"
 .Lname333:
 	.string "vio_writeb"
+.Lname337:
+	.string "x86_emulock_cmpxchg8"
 .Lname338:
 	.string "vio_xorb"
 .Lname339:
@@ -17358,6 +17362,8 @@ END(kernel_symbol_table)
 	.string "vm_map"
 .Lname897:
 	.string "memrendq"
+.Lname898:
+	.string "x86_emulock_cmpxchg32"
 .Lname899:
 	.string "sys_fstatfs"
 .Lname900:
@@ -18007,7 +18013,7 @@ END(kernel_symbol_table)
 .Lname1508:
 	.string "path_traverse_at"
 .Lname1509:
-	.string "zlib_reader_feed"
+	.string "x86_emulock_cmpxchg16"
 .Lname1512:
 	.string "sys_ftime"
 .Lname1513:
@@ -20028,6 +20034,8 @@ END(kernel_symbol_table)
 	.string "dbg_printf"
 .Lname3449:
 	.string "sys_prlimit64"
+.Lname3450:
+	.string "zlib_reader_feed"
 .Lname3452:
 	.string "memrlenl"
 .Lname3454:
@@ -20304,6 +20312,8 @@ END(kernel_symbol_table)
 	.string "vm_datapart_getfutex_existing"
 .Lname3688:
 	.string "sys_readlinkat"
+.Lname3689:
+	.string "vm_forcefault"
 .Lname3694:
 	.string "unwind_fde_exec_landing_pad_adjustment"
 .Lname3695:

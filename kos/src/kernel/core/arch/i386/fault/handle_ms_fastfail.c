@@ -16,26 +16,40 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VIO_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VIO_H 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_FAULT_HANDLE_MS_FASTFAIL_C
+#define GUARD_KERNEL_CORE_ARCH_I386_FAULT_HANDLE_MS_FASTFAIL_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
-#include <kernel/vm.h>
-#include <hybrid/host.h>
 
-#ifdef CONFIG_VIO
+#include <kernel/debugtrap.h>
+#include <kernel/except.h>
+#include <kernel/fault.h>
+
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
+#include <sys/wait.h>
+
+#include <signal.h>
+
 DECL_BEGIN
 
-#undef CONFIG_VIO_HAS_QWORD
-#undef CONFIG_VIO_HAS_QWORD_CMPXCH
-#undef CONFIG_VIO_HAS_INT128_CMPXCH
-#define CONFIG_VIO_HAS_QWORD_CMPXCH 1 /* Because of the `cmpxchg8b' instruction */
-#ifdef __x86_64__
-#define CONFIG_VIO_HAS_QWORD 1
-#define CONFIG_VIO_HAS_INT128_CMPXCH 1 /* Because of the `cmpxchg16b' instruction */
-#endif /* __x86_64__ */
+/* Implement support for window's __fastfail() intrinsic.
+ * In KOS, we too generate a debugger trap, then simply raise
+ * an E_EXIT_PROCESS exception to terminate the calling process.
+ * It doesn't get much simpler than this... */
+INTERN struct icpustate *FCALL
+x86_handle_ms_fastfail(struct icpustate *__restrict state) {
+	enum { SIGNO = SIGABRT };
+	if (kernel_debugtrap_enabled())
+		kernel_debugtrap(state, SIGNO);
+	/* Use the fastfail code as exitcode for the program (not
+	 * exactly what window does, but still close enough...) */
+	THROW(E_EXIT_PROCESS,
+	      W_EXITCODE(gpregs_getpcx(&state->ics_gpregs),
+	                 SIGNO));
+}
 
 DECL_END
-#endif /* CONFIG_VIO */
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VIO_H */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_FAULT_HANDLE_MS_FASTFAIL_C */

@@ -38,8 +38,9 @@
  *  - 0x81 - 0xed + 0xf1 - 0xff: kernel_isr_generic_00h
  *    This is a C-function defined declared as either:
  *    >> void FCALL kernel_isr_generic_00h(void);
- *
  */
+
+/* Exception vectors. */
 #define IDT_X86_00 divide_by_zero         /* #DE  Divide-by-zero */
 #define IDT_X86_01 debugtrap              /* #DB  Debug */
 #define IDT_X86_02 non_maskable_interrupt /* #NMI Non-maskable Interrupt */
@@ -72,6 +73,8 @@
 #define IDT_X86_1d 1dh
 #define IDT_X86_1e security_exception /* #SX  Security Exception. */
 #define IDT_X86_1f 1fh
+
+/* NT service interrupts. */
 #define IDT_X86_20 20h
 #define IDT_X86_21 21h
 #define IDT_X86_22 22h
@@ -88,6 +91,8 @@
 #define IDT_X86_2d 2dh
 #define IDT_X86_2e 2eh
 #define IDT_X86_2f 2fh
+
+/* Unused interrupts. */
 #define IDT_X86_30 30h
 #define IDT_X86_31 31h
 #define IDT_X86_32 32h
@@ -168,7 +173,11 @@
 #define IDT_X86_7d 7dh
 #define IDT_X86_7e 7eh
 #define IDT_X86_7f 7fh
+
+/* The system call interrupt. */
 #define IDT_X86_80 syscall
+
+/* Generic I/O interrupts. */
 #define IDT_X86_81 generic_00h
 #define IDT_X86_82 generic_01h
 #define IDT_X86_83 generic_02h
@@ -278,9 +287,17 @@
 #define IDT_X86_eb generic_6ah
 #define IDT_X86_ec generic_6bh
 #define IDT_X86_ed generic_6ch
+
+/* APIC IPI interrupt. */
 #define IDT_X86_ee apic_ipi
+
+/* APIC Spurious interrupt. */
 #define IDT_X86_ef apic_spurious
+
+/* Scheduler preemption interrupt. */
 #define IDT_X86_f0 preemption
+
+/* PIC interrupts (NOTE: `IDT_X86_f0' is also a PIC interrupt). */
 #define IDT_X86_f1 specific_00h
 #define IDT_X86_f2 specific_01h
 #define IDT_X86_f3 specific_02h

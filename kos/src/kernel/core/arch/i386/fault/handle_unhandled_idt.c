@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_IDT_UNHANDLED_C
-#define GUARD_KERNEL_CORE_ARCH_I386_IDT_UNHANDLED_C 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_FAULT_HANDLE_UNHANDLED_IDT_C
+#define GUARD_KERNEL_CORE_ARCH_I386_FAULT_HANDLE_UNHANDLED_IDT_C 1
 
 #include <kernel/compiler.h>
 
@@ -25,45 +25,26 @@
 #include <kernel/debugger.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
-#include <kernel/gdt.h>
-#include <kernel/idt.h>
-#include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/pic.h>
 #include <kernel/printk.h>
+#include <kernel/types.h>
 #include <kernel/vm.h>
+#include <sched/cpu.h>
 #include <sched/task.h>
 
-#include <asm/cpu-flags.h>
-#include <asm/intrin.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
-#include <sys/io.h>
 
-#include <format-printer.h>
 #include <signal.h>
 #include <stddef.h>
 
 #include <libinstrlen/instrlen.h>
+#include <libregdump/cpu-state.h>
 #include <libregdump/x86.h>
 #include <libunwind/unwind.h>
 
 DECL_BEGIN
-
-PUBLIC ATTR_PERCPU struct x86_spurious_interrupts
-x86_spurious_interrupts = { 0, 0, 0 };
-
-INTERN void KCALL x86_pic1_spur(void) {
-	++PERCPU(x86_spurious_interrupts).sp_pic1;
-}
-
-INTERN void KCALL x86_pic2_spur(void) {
-	++PERCPU(x86_spurious_interrupts).sp_pic2;
-}
-
-INTERN void KCALL x86_apic_spur(void) {
-	++PERCPU(x86_spurious_interrupts).sp_apic;
-}
 
 
 
@@ -275,4 +256,4 @@ x86_handle_unhandled_idt(struct icpustate *__restrict state,
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_IDT_UNHANDLED_C */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_FAULT_HANDLE_UNHANDLED_IDT_C */

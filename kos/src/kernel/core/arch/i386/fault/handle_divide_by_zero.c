@@ -16,26 +16,44 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VIO_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VIO_H 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_FAULT_HANDLE_DIVIDE_BY_ZERO_C
+#define GUARD_KERNEL_CORE_ARCH_I386_FAULT_HANDLE_DIVIDE_BY_ZERO_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
-#include <kernel/vm.h>
-#include <hybrid/host.h>
 
-#ifdef CONFIG_VIO
+#include <kernel/except.h>
+#include <kernel/fault.h>
+#include <kernel/types.h>
+
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
+
+#include <libinstrlen/instrlen.h>
+
+#include "../except.h"
+
 DECL_BEGIN
 
-#undef CONFIG_VIO_HAS_QWORD
-#undef CONFIG_VIO_HAS_QWORD_CMPXCH
-#undef CONFIG_VIO_HAS_INT128_CMPXCH
-#define CONFIG_VIO_HAS_QWORD_CMPXCH 1 /* Because of the `cmpxchg8b' instruction */
-#ifdef __x86_64__
-#define CONFIG_VIO_HAS_QWORD 1
-#define CONFIG_VIO_HAS_INT128_CMPXCH 1 /* Because of the `cmpxchg16b' instruction */
-#endif /* __x86_64__ */
+INTERN struct icpustate *FCALL
+x86_handle_divide_by_zero(struct icpustate *__restrict state) {
+	byte_t *pc, *next_pc;
+	unsigned int i;
+	PERTASK_SET(_this_exception_info.ei_code,
+	            (error_code_t)ERROR_CODEOF(E_DIVIDE_BY_ZERO));
+	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
+		PERTASK_SET(_this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
+#if EXCEPT_BACKTRACE_SIZE != 0
+	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
+		PERTASK_SET(_this_exception_info.ei_trace[i], (void *)0);
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+	pc      = (byte_t *)icpustate_getpc(state);
+	next_pc = (byte_t *)instruction_succ(pc);
+	if (next_pc)
+		icpustate_setpc(state, (uintptr_t)next_pc);
+	x86_unwind_interrupt(state);
+}
 
 DECL_END
-#endif /* CONFIG_VIO */
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_VIO_H */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_FAULT_HANDLE_DIVIDE_BY_ZERO_C */

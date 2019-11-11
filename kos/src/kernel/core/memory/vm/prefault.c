@@ -22,8 +22,10 @@
 
 #include <kernel/compiler.h>
 
-#include <assert.h>
+#include <kernel/panic.h>
 #include <kernel/vm.h>
+
+#include <assert.h>
 
 DECL_BEGIN
 
@@ -143,6 +145,43 @@ vm_prefault(USER CHECKED void const *addr,
 
 	return 1;
 }
+
+
+
+/* Force all bytes within the given address range to be faulted for either reading
+ * or writing. If any page within the specified range isn't mapped, throw an E_SEGFAULT
+ * exception. Otherwise, ensure that copy-on-write is invoked when `for_writing' is true,
+ * and that irregardless of `for_writing', physical memory is allocated for any mapping
+ * that can be made to be backed by RAM.
+ * Any VIO mappings within the specified range are simply ignored (and will not count
+ * towards the returned value)
+ * @return: * : The total number of V-pages that become faulted as the resule of this
+ *              function being called. Note that even if you may be expecting that some
+ *              specified page within the range wasn't faulted before, you must still
+ *              allow for this function to return `0', since there always exists a
+ *              possibility of some other thread changing the backing mappings, or
+ *              faulting the mappings themself.
+ *              As such, the return value should only be used for probability optimizations,
+ *              as well as profiling, but not for the purpose of actual logic decisions.
+ * NOTE: This function will also update the page directory mappings for any dataparts
+ *       that get faulted during its invocation, meaning that use of `memcpy_nopf()'
+ *       within the indicated address range (whilst still checking it for errors for
+ *       the even of the mapping changing, or the mapping being a VIO mapping) becomes
+ *       possible immediately, without having to force any soft of additional memory
+ *       access (note though that this only applies to the page directory of `effective_vm',
+ *       though also note that if some datapart within the range was already faulted, its
+ *       page directory mapping in `effective_vm' will still be updated). */
+PUBLIC size_t FCALL
+vm_forcefault(struct vm *__restrict effective_vm,
+              vm_vpage_t minpage,
+              vm_vpage_t maxpage, bool for_writing)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
+
+	kernel_panic("TODO");
+
+	return 0;
+}
+
 
 
 DECL_END

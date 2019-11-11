@@ -28,6 +28,7 @@
 #include <hybrid/unaligned.h>
 
 #include <assert.h>
+#include <string.h>
 
 DECL_BEGIN
 
@@ -1520,6 +1521,47 @@ vio_cmpxchq(struct vio_args *__restrict args,
 	}
 }
 #endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
+
+#ifdef CONFIG_VIO_HAS_INT128_CMPXCH
+PUBLIC NONNULL((1)) uint128_t KCALL
+vio_cmpxch128(struct vio_args *__restrict args,
+              vm_daddr_t addr, uint128_t oldvalue,
+              uint128_t newvalue, bool atomic) {
+	struct vm_datablock_type_vio const *type = args->va_type;
+	if (type->dtv_cmpxch.f_int128 && ((uintptr_t)addr & 15) == 0)
+		return (*type->dtv_cmpxch.f_int128)(args, addr, oldvalue, newvalue, atomic);
+	/* Non-atomic compare-exchange */
+	if (atomic)
+		vio_nonatomic_operation(args, addr, 16);
+	{
+		union {
+			uint128_t v128;
+			u64       v64[2];
+			u32       v32[4];
+		} result;
+#ifdef CONFIG_VIO_HAS_QWORD
+		result.v64[0] = vio_readq(args, addr + 0);
+		result.v64[1] = vio_readq(args, addr + 8);
+		if (memcmp(&result, &oldvalue, 16) == 0) {
+			vio_writeq(args, addr + 0, ((u64 *)&newvalue)[0]);
+			vio_writeq(args, addr + 8, ((u64 *)&newvalue)[1]);
+		}
+#else /* CONFIG_VIO_HAS_QWORD */
+		result.v32[0] = vio_readl(args, addr + 0);
+		result.v32[1] = vio_readl(args, addr + 4);
+		result.v32[2] = vio_readl(args, addr + 8);
+		result.v32[3] = vio_readl(args, addr + 12);
+		if (memcmp(&result, &oldvalue, 16) == 0) {
+			vio_writel(args, addr + 0,  ((u32 *)&newvalue)[0]);
+			vio_writel(args, addr + 4,  ((u32 *)&newvalue)[1]);
+			vio_writel(args, addr + 8,  ((u32 *)&newvalue)[2]);
+			vio_writel(args, addr + 12, ((u32 *)&newvalue)[3]);
+		}
+#endif /* !CONFIG_VIO_HAS_QWORD */
+		return result.v128;
+	}
+}
+#endif /* CONFIG_VIO_HAS_INT128_CMPXCH */
 
 PUBLIC NONNULL((1)) u8 KCALL
 vio_cmpxch_or_writeb(struct vio_args *__restrict args,

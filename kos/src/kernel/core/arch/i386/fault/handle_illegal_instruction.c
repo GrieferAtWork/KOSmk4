@@ -25,7 +25,9 @@
 
 #include <kernel/cpuid.h>
 #include <kernel/debugtrap.h>
+#include <kernel/emulock.h>
 #include <kernel/except.h>
+#include <kernel/fault.h>
 #include <kernel/fpu.h>
 #include <kernel/gdt.h>
 #include <kernel/paging.h>
@@ -37,6 +39,7 @@
 #include <sched/pid.h>
 #include <sched/task.h>
 
+#include <hybrid/atomic.h>
 #include <hybrid/bit.h>
 #include <hybrid/byteswap.h>
 #include <hybrid/limits.h>
@@ -46,6 +49,7 @@
 #include <asm/intrin-arith.h>
 #include <asm/intrin.h>
 #include <asm/registers.h>
+#include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
@@ -73,99 +77,14 @@
 
 DECL_BEGIN
 
-/* atomics _CAN_ be emulated:
- *  >> u32 emu_cmpxchl(u32 *p, u32 o, u32 n) {
- *  >>     pflag_t was;
- *  >>     struct cpu *me = THIS_CPU;
- *  >>     u32 result;
- *  >>     was = PREEMPTION_PUSHOFF();
- *  >>     ENSURE_PAGE_LOADED_INTO_MEMORY(p);
- *  >>     ACQUIRE_BUS_LOCK();
- *  >>     result = *p;
- *  >>     if (result == o)
- *  >>         *p = n;
- *  >>     RELEASE_BUS_LOCK();
- *  >>     PREEMPTION_POP(was);
- *  >>     return result;
- *  >> }
- * The BUS_LOCK can be implemented using this:
- * https://stackoverflow.com/questions/33270575/implementing-mutual-exclusion-algorithm-by-burns-and-lynch-in-java-could-there
- * http://groups.csail.mit.edu/tds/papers/Lynch/allertonconf.pdf
- */
-
-#ifndef __x86_64__
-#ifdef CONFIG_NO_SMP
-#define bus_tryacquirelock()  true
-#define bus_acquirelock()     COMPILER_BARRIER()
-#define bus_releaselock()     COMPILER_BARRIER()
-#else /* CONFIG_NO_SMP */
-PRIVATE ATTR_CACHELINE_ALIGNED uint8_t volatile bus_flags[CONFIG_MAX_CPU_COUNT];
-PRIVATE ATTR_PERCPU uint8_t bus_line7 = 0;
-
-PRIVATE NOBLOCK bool
-NOTHROW(KCALL bus_tryacquirelock)(void) {
-	struct cpu *me = THIS_CPU;
-	cpuid_t i, myid = me->c_id;
-	if (!FORCPU(me, bus_line7)) {
-		COMPILER_BARRIER();
-		bus_flags[myid] = false; /* down */
-		COMPILER_BARRIER();
-		for (i = 0; i < myid; ++i) {
-			if (bus_flags[i])
-				return false;
-		}
-		COMPILER_BARRIER();
-		bus_flags[myid] = true; /* up */
-		COMPILER_BARRIER();
-		for (i = 0; i < myid; ++i) {
-			if (bus_flags[i])
-				return false;
-		}
-		COMPILER_BARRIER();
-		FORCPU(me, bus_line7) = true;
-		COMPILER_BARRIER();
-	}
-	COMPILER_BARRIER();
-	for (i = myid + 1; i < cpu_count; ++i) {
-		if (bus_flags[i])
-			return false;
-	}
-	COMPILER_BARRIER();
-	return true;
-}
-PRIVATE void NOTHROW(KCALL bus_acquirelock)(void) {
-	while (!bus_tryacquirelock())
-		__pause();
-}
-
-PRIVATE NOBLOCK void
-NOTHROW(KCALL bus_releaselock)(void) {
-	struct cpu *me = THIS_CPU;
-	cpuid_t myid   = me->c_id;
-	COMPILER_BARRIER();
-	FORCPU(me, bus_line7) = false;
-	COMPILER_BARRIER();
-	bus_flags[myid] = false;
-	COMPILER_BARRIER();
-}
-#endif /* CONFIG_NO_SMP */
-#endif /* !__x86_64__ */
-
-
 #ifdef __x86_64__
 #define IF_X86_64(...)  __VA_ARGS__
 #define NIF_X86_64(...) /* nothing */
-#else
+#else /* __x86_64__ */
 #define IF_X86_64(...)  /* nothing */
 #define NIF_X86_64(...) __VA_ARGS__
-#endif
+#endif /* !__x86_64__ */
 
-
-
-
-
-
-#define prefault(state,addr,num_bytes) (void)0 /* ??? */
 
 
 typedef union {
@@ -178,25 +97,16 @@ INTDEF ATTR_NORETURN void FCALL
 x86_sysenter_emulation(struct icpustate *__restrict state);
 
 
-#ifdef __x86_64__
-#define IRREGS(x) (x)->ics_irregs
-#define ir_Xflags      ir_rflags
-#else
-#define IRREGS(x) (x)->ics_irregs_k
-#define ir_Xflags      ir_eflags
-#endif
-
-
 INTERN struct icpustate *FCALL
 x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 	byte_t *start_pc, *pc;
 	u32 opcode;
 	op_flag_t op_flags;
 	struct modrm mod;
-	pc = (byte_t *)icpustate_getpc(state);
+	pc = (byte_t *)state->ics_irregs.ir_pip;
 	COMPILER_READ_BARRIER();
 	/* Re-enable interrupts if they were enabled before. */
-	if (IRREGS(state).ir_Xflags & EFLAGS_IF)
+	if (state->ics_irregs.ir_pflags & EFLAGS_IF)
 		__sti();
 	start_pc = pc;
 	opcode   = x86_decode_instruction(state, &pc, &op_flags);
@@ -213,88 +123,78 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 		       opcode, start_pc, task_getroottid_s());
 		switch (opcode) {
 
-#define IS_USER()   irregs_isuser(&IRREGS(state))
+#define get_al()       (u8)gpregs_getpax(&state->ics_gpregs)
+#define set_al(value)  (*(u8 *)&state->ics_gpregs.gp_pax = (u8)(value)) /* Special case: Don't clobber %ah */
+#define get_ax()       (u16)gpregs_getpax(&state->ics_gpregs)
+#define set_ax(value)  gpregs_setpax(&state->ics_gpregs, (u16)(value))
+#define get_eax()      (u32)gpregs_getpax(&state->ics_gpregs)
+#define set_eax(value) gpregs_setpax(&state->ics_gpregs, (u32)(value))
+#define get_ecx()      (u32)gpregs_getpcx(&state->ics_gpregs)
+#define set_ecx(value) gpregs_setpcx(&state->ics_gpregs, (u32)(value))
+#define get_edx()      (u32)gpregs_getpdx(&state->ics_gpregs)
+#define set_edx(value) gpregs_setpdx(&state->ics_gpregs, (u32)(value))
+#define get_ebx()      (u32)gpregs_getpbx(&state->ics_gpregs)
+#define set_ebx(value) gpregs_setpbx(&state->ics_gpregs, (u32)(value))
+#define get_eaxedx()   ((u64)get_eax() | (u64)get_edx() << 32)
+#define get_ebxecx()   ((u64)get_ebx() | (u64)get_ecx() << 32)
 
+#define isuser()                icpustate_isuser(state)
+#define get_pflags()            icpustate_getpflags(state)
+#define set_pflags(value)       icpustate_setpflags(state, value)
+#define msk_pflags(mask, value) icpustate_mskpflags(state, mask, value)
+#define add_pflags(mask)        msk_pflags(~0, mask)
+#define del_pflags(mask)        msk_pflags(~(mask), 0)
+#define set_pflags_mask(value, mask) \
+	msk_pflags(~(mask), (value) & (mask))
+#define MOD_DECODE() (pc = x86_decode_modrm(pc, &mod, op_flags))
+
+#define RD_RMB()  modrm_getrmb(state, &mod, op_flags)
+#define WR_RMB(v) modrm_setrmb(state, &mod, op_flags, v)
+#define RD_RMW()  modrm_getrmw(state, &mod, op_flags)
+#define WR_RMW(v) modrm_setrmw(state, &mod, op_flags, v)
+#define RD_RML()  modrm_getrml(state, &mod, op_flags)
+#define WR_RML(v) modrm_setrml(state, &mod, op_flags, v)
 #ifdef __x86_64__
-#define S_AL           ((u8)state->ics_gpregs.gp_rax)
-#define S_AX           ((u16)state->ics_gpregs.gp_rax)
-#define S_EAX          ((u32)state->ics_gpregs.gp_rax)
-#define S_ECX          ((u32)state->ics_gpregs.gp_rcx)
-#define S_EDX          ((u32)state->ics_gpregs.gp_rdx)
-#define S_EBX          ((u32)state->ics_gpregs.gp_rbx)
-#define SET_S_AL(v)    (state->ics_gpregs.gp_rax=(u32)(u8)(v))
-#define SET_S_AX(v)    (state->ics_gpregs.gp_rax=(u32)(u16)(v))
-#define SET_S_EAX(v)   (state->ics_gpregs.gp_rax=(u32)(v))
-#define SET_S_ECX(v)   (state->ics_gpregs.gp_rcx=(u32)(v))
-#define SET_S_EDX(v)   (state->ics_gpregs.gp_rdx=(u32)(v))
-#define SET_S_EBX(v)   (state->ics_gpregs.gp_rbx=(u32)(v))
-#else /* __x86_64__ */
-#define S_AL           ((u8)state->ics_gpregs.gp_eax)
-#define S_AX           ((u16)state->ics_gpregs.gp_eax)
-#define S_EAX          ((u32)state->ics_gpregs.gp_eax)
-#define S_ECX          ((u32)state->ics_gpregs.gp_ecx)
-#define S_EDX          ((u32)state->ics_gpregs.gp_edx)
-#define S_EBX          ((u32)state->ics_gpregs.gp_ebx)
-#define SET_S_AL(v)    (state->ics_gpregs.gp_eax=(u32)(u8)(v))
-#define SET_S_AX(v)    (state->ics_gpregs.gp_eax=(u32)(u16)(v))
-#define SET_S_EAX(v)   (state->ics_gpregs.gp_eax=(u32)(v))
-#define SET_S_ECX(v)   (state->ics_gpregs.gp_ecx=(u32)(v))
-#define SET_S_EDX(v)   (state->ics_gpregs.gp_edx=(u32)(v))
-#define SET_S_EBX(v)   (state->ics_gpregs.gp_ebx=(u32)(v))
-#endif /* !__x86_64__ */
-#define S_EFLAGS       (IRREGS(state).ir_Xflags)
-#define F_ATOMIC       (!!(op_flags & F_LOCK))
-#define SET_EFLAGS(v,mask) (S_EFLAGS &= ~(mask),S_EFLAGS |= (v) & (mask))
+#define RD_RMQ()  modrm_getrmq(state, &mod, op_flags)
+#define WR_RMQ(v) modrm_setrmq(state, &mod, op_flags, v)
+#endif /* __x86_64__ */
 
-#define MOD_DECODE() (pc = x86_decode_modrm(pc,&mod,op_flags))
-
-#define RD_RMB()  modrm_getrmb(state,&mod,op_flags)
-#define WR_RMB(v) modrm_setrmb(state,&mod,op_flags,v)
-#define RD_RMW()  modrm_getrmw(state,&mod,op_flags)
-#define WR_RMW(v) modrm_setrmw(state,&mod,op_flags,v)
-#define RD_RML()  modrm_getrml(state,&mod,op_flags)
-#define WR_RML(v) modrm_setrml(state,&mod,op_flags,v)
+#define RD_RMREGB()  modrm_getrmregb(state, &mod, op_flags)
+#define WR_RMREGB(v) modrm_setrmregb(state, &mod, op_flags, v)
+#define RD_RMREGW()  modrm_getrmregw(state, &mod, op_flags)
+#define WR_RMREGW(v) modrm_setrmregw(state, &mod, op_flags, v)
+#define RD_RMREGL()  modrm_getrmregl(state, &mod, op_flags)
+#define WR_RMREGL(v) modrm_setrmregl(state, &mod, op_flags, v)
 #ifdef __x86_64__
-#define RD_RMQ()  modrm_getrmq(state,&mod,op_flags)
-#define WR_RMQ(v) modrm_setrmq(state,&mod,op_flags,v)
-#endif
+#define RD_RMREGQ()  modrm_getrmregq(state, &mod, op_flags)
+#define WR_RMREGQ(v) modrm_setrmregq(state, &mod, op_flags, v)
+#endif /* __x86_64__ */
 
-#define RD_RMREGB()  modrm_getrmregb(state,&mod,op_flags)
-#define WR_RMREGB(v) modrm_setrmregb(state,&mod,op_flags,v)
-#define RD_RMREGW()  modrm_getrmregw(state,&mod,op_flags)
-#define WR_RMREGW(v) modrm_setrmregw(state,&mod,op_flags,v)
-#define RD_RMREGL()  modrm_getrmregl(state,&mod,op_flags)
-#define WR_RMREGL(v) modrm_setrmregl(state,&mod,op_flags,v)
+#define RD_REG()   modrm_getreg(state, &mod, op_flags)
+#define WR_REG(v)  modrm_setreg(state, &mod, op_flags, v)
+#define RD_REGB()  modrm_getregb(state, &mod, op_flags)
+#define WR_REGB(v) modrm_setregb(state, &mod, op_flags, v)
+#define RD_REGW()  modrm_getregw(state, &mod, op_flags)
+#define WR_REGW(v) modrm_setregw(state, &mod, op_flags, v)
+#define RD_REGL()  modrm_getregl(state, &mod, op_flags)
+#define WR_REGL(v) modrm_setregl(state, &mod, op_flags, v)
 #ifdef __x86_64__
-#define RD_RMREGQ()  modrm_getrmregq(state,&mod,op_flags)
-#define WR_RMREGQ(v) modrm_setrmregq(state,&mod,op_flags,v)
-#endif
+#define RD_REGQ()  modrm_getregq(state, &mod, op_flags)
+#define WR_REGQ(v) modrm_setregq(state, &mod, op_flags, v)
+#endif /* __x86_64__ */
 
-#define RD_REG()   modrm_getreg(state,&mod,op_flags)
-#define WR_REG(v)  modrm_setreg(state,&mod,op_flags,v)
-#define RD_REGB()  modrm_getregb(state,&mod,op_flags)
-#define WR_REGB(v) modrm_setregb(state,&mod,op_flags,v)
-#define RD_REGW()  modrm_getregw(state,&mod,op_flags)
-#define WR_REGW(v) modrm_setregw(state,&mod,op_flags,v)
-#define RD_REGL()  modrm_getregl(state,&mod,op_flags)
-#define WR_REGL(v) modrm_setregl(state,&mod,op_flags,v)
+#define RD_VEXREG()   x86_icpustate_get(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
+#define WR_VEXREG(v)  x86_icpustate_set(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S), v)
+#define RD_VEXREGB()  x86_icpustate_get8(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
+#define WR_VEXREGB(v) x86_icpustate_set8(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S), v)
+#define RD_VEXREGW()  x86_icpustate_get16(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
+#define WR_VEXREGW(v) x86_icpustate_set16(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S), v)
+#define RD_VEXREGL()  x86_icpustate_get32(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
+#define WR_VEXREGL(v) x86_icpustate_set32(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S), v)
 #ifdef __x86_64__
-#define RD_REGQ()  modrm_getregq(state,&mod,op_flags)
-#define WR_REGQ(v) modrm_setregq(state,&mod,op_flags,v)
-#endif
-
-#define RD_VEXREG()   x86_icpustate_get(state,(u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
-#define WR_VEXREG(v)  x86_icpustate_set(state,(u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S),v)
-#define RD_VEXREGB()  x86_icpustate_get8(state,(u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
-#define WR_VEXREGB(v) x86_icpustate_set8(state,(u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S),v)
-#define RD_VEXREGW()  x86_icpustate_get16(state,(u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
-#define WR_VEXREGW(v) x86_icpustate_set16(state,(u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S),v)
-#define RD_VEXREGL()  x86_icpustate_get32(state,(u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
-#define WR_VEXREGL(v) x86_icpustate_set32(state,(u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S),v)
-#ifdef __x86_64__
-#define RD_VEXREGQ()  x86_icpustate_get64(state,(u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
-#define WR_VEXREGQ(v) x86_icpustate_set64(state,(u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S),v)
-#endif
+#define RD_VEXREGQ()  x86_icpustate_get64(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S))
+#define WR_VEXREGQ(v) x86_icpustate_set64(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S), v)
+#endif /* __x86_64__ */
 
 #ifndef __x86_64__
 		case 0x0fb0: {
@@ -303,7 +203,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			if (op_flags & (F_OP16 | F_AD16 | F_REP | F_REPNE))
 				goto e_bad_prefix;
 			/* 0F B0 /r      CMPXCHG r/m8,r8      Compare AL with r/m8. If equal, ZF is set and r8 is loaded into r/m8. Else, clear ZF and load r/m8 into AL */
-			value    = S_AL;
+			value    = get_al();
 			newvalue = RD_REGB();
 			if (mod.mi_type == MODRM_REGISTER) {
 				temp = RD_RMREGB();
@@ -312,22 +212,18 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			} else {
 				uintptr_t addr;
 				addr = x86_decode_modrmgetmem(state, &mod, op_flags);
-				prefault(state, addr, 1);
-				if (F_ATOMIC) {
-					bus_acquirelock();
-					temp = *(u8 volatile *)addr;
-					if (temp == value)
-						*(u8 volatile *)addr = (u8)newvalue;
-					bus_releaselock();
+				if (op_flags & F_LOCK) {
+					temp = x86_emulock_cmpxchg8((struct icpustate **)&state,
+					                            (u8 *)addr, value, newvalue);
 				} else {
 					temp = *(u8 volatile *)addr;
 					if (temp == value)
-						*(u8 volatile *)addr = (u8)newvalue;
+						*(u8 volatile *)addr = newvalue;
 				}
 			}
-			SET_S_AL(temp);
-			S_EFLAGS &= ~(ZF | CF | PF | AF | SF | OF);
-			S_EFLAGS |= __cmpb(value, temp) & (ZF | CF | PF | AF | SF | OF);
+			set_al(temp);
+			set_pflags_mask(__cmpb(value, temp),
+			                ZF | CF | PF | AF | SF | OF);
 		}	break;
 
 		case 0x0fb1: {
@@ -338,7 +234,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			/* 0F B1 /r      CMPXCHG r/m32,r32    Compare EAX with r/m32. If equal, ZF is set and r32 is loaded into r/m32. Else, clear ZF and load r/m32 into EAX */
 			if (op_flags & F_OP16) {
 				u16 temp, value, newvalue;
-				value    = S_AX;
+				value    = get_ax();
 				newvalue = RD_REGW();
 				if (mod.mi_type == MODRM_REGISTER) {
 					temp = RD_RMREGW();
@@ -347,25 +243,21 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				} else {
 					uintptr_t addr;
 					addr = x86_decode_modrmgetmem(state, &mod, op_flags);
-					prefault(state, addr, 2);
-					if (F_ATOMIC) {
-						bus_acquirelock();
-						temp = *(u16 volatile *)addr;
-						if (temp == value)
-							*(u16 volatile *)addr = newvalue;
-						bus_releaselock();
+					if (op_flags & F_LOCK) {
+						temp = x86_emulock_cmpxchg16((struct icpustate **)&state,
+						                             (u16 *)addr, value, newvalue);
 					} else {
 						temp = *(u16 volatile *)addr;
 						if (temp == value)
 							*(u16 volatile *)addr = newvalue;
 					}
 				}
-				SET_S_AX(temp);
-				S_EFLAGS &= ~(ZF | CF | PF | AF | SF | OF);
-				S_EFLAGS |= __cmpw((u16)value, temp) & (ZF | CF | PF | AF | SF | OF);
+				set_ax(temp);
+				set_pflags_mask(__cmpw((u16)value, temp),
+				                ZF | CF | PF | AF | SF | OF);
 			} else {
 				u32 temp, value, newvalue;
-				value    = S_EAX;
+				value    = get_eax();
 				newvalue = RD_REGL();
 				if (mod.mi_type == MODRM_REGISTER) {
 					temp = RD_RMREGL();
@@ -374,22 +266,18 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				} else {
 					uintptr_t addr;
 					addr = x86_decode_modrmgetmem(state, &mod, op_flags);
-					prefault(state, addr, 4);
-					if (F_ATOMIC) {
-						bus_acquirelock();
-						temp = *(u32 volatile *)addr;
-						if (temp == value)
-							*(u32 volatile *)addr = newvalue;
-						bus_releaselock();
+					if (op_flags & F_LOCK) {
+						temp = x86_emulock_cmpxchg32((struct icpustate **)&state,
+						                             (u32 *)addr, value, newvalue);
 					} else {
 						temp = *(u32 volatile *)addr;
 						if ((u32)temp == value)
 							*(u32 volatile *)addr = newvalue;
 					}
 				}
-				SET_S_EAX(temp);
-				S_EFLAGS &= ~(ZF | CF | PF | AF | SF | OF);
-				S_EFLAGS |= __cmpl(value, temp) & (ZF | CF | PF | AF | SF | OF);
+				set_eax(temp);
+				set_pflags_mask(__cmpl(value, temp),
+				                ZF | CF | PF | AF | SF | OF);
 			}
 		}	break;
 
@@ -407,27 +295,23 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				if unlikely(mod.mi_type != MODRM_MEMORY)
 					goto e_bad_operand_addrmode;
 				/* 0F C7 /1 m64      CMPXCHG8B m64      Compare EDX:EAX with m64. If equal, set ZF and load ECX:EBX into m64. Else, clear ZF and load m64 into EDX:EAX */
-				old_value = ((u64)S_EDX << 32) | (u64)S_EAX;
-				new_value = ((u64)S_ECX << 32) | (u64)S_EBX;
+				old_value = get_eaxedx();
+				new_value = get_ebxecx();
 				addr      = x86_decode_modrmgetmem(state, &mod, op_flags);
-				prefault(state, addr, 8);
-				if (F_ATOMIC) {
-					bus_acquirelock();
-					real_old_value = *(u64 volatile *)addr;
-					if (real_old_value == old_value)
-						*(u64 volatile *)addr = new_value;
-					bus_releaselock();
+				if (op_flags & F_LOCK) {
+					real_old_value = x86_emulock_cmpxchg64((struct icpustate **)&state,
+					                                       (u64 *)addr, old_value, new_value);
 				} else {
 					real_old_value = *(u64 volatile *)addr;
 					if (real_old_value == old_value)
 						*(u64 volatile *)addr = new_value;
 				}
 				if (real_old_value == old_value) {
-					S_EFLAGS |= ZF;
+					add_pflags(ZF);
 				} else {
-					S_EFLAGS &= ~ZF;
-					SET_S_EDX((u32)(real_old_value >> 32));
-					SET_S_EAX((u32)real_old_value);
+					del_pflags(ZF);
+					set_edx((u32)(real_old_value >> 32));
+					set_eax((u32)real_old_value);
 				}
 			}	break;
 
@@ -445,24 +329,24 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			temp = RD_REGB();
 			if (mod.mi_type == MODRM_REGISTER) {
 				value = RD_RMREGB();
-				WR_RMREGB((u8)value + (u8)temp);
+				WR_RMREGB(value + temp);
 			} else {
 				uintptr_t addr;
 				addr = x86_decode_modrmgetmem(state, &mod, op_flags);
-				prefault(state, addr, 1);
-				if (F_ATOMIC) {
-					bus_acquirelock();
-					value                = *(u8 volatile *)addr;
-					*(u8 volatile *)addr = (u8)value + (u8)temp;
-					bus_releaselock();
+				if (op_flags & F_LOCK) {
+					u8 real_old_value;
+					value = ATOMIC_READ(*(u8 *)addr);
+					while ((real_old_value = x86_emulock_cmpxchg8((struct icpustate **)&state,
+					                                              (u8 *)addr, value, value + temp)))
+						value = real_old_value;
 				} else {
-					value                = *(u8 volatile *)addr;
-					*(u8 volatile *)addr = (u8)value + (u8)temp;
+					value = *(u8 volatile *)addr;
+					*(u8 volatile *)addr = value + temp;
 				}
 			}
 			WR_REGB((u8)value);
 			new_eflags = __addb_ff(value, temp);
-			SET_EFLAGS(new_eflags, CF | PF | AF | SF | ZF | OF);
+			set_pflags_mask(new_eflags, CF | PF | AF | SF | ZF | OF);
 		}	break;
 
 		case 0x0fc1: {
@@ -481,15 +365,15 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				} else {
 					uintptr_t addr;
 					addr = x86_decode_modrmgetmem(state, &mod, op_flags);
-					prefault(state, addr, 2);
-					if (F_ATOMIC) {
-						bus_acquirelock();
-						value                 = *(u16 volatile *)addr;
-						*(u16 volatile *)addr = (u16)value + (u16)temp;
-						bus_releaselock();
+					if (op_flags & F_LOCK) {
+						u16 real_old_value;
+						value = ATOMIC_READ(*(u16 *)addr);
+						while ((real_old_value = x86_emulock_cmpxchg16((struct icpustate **)&state,
+						                                               (u16 *)addr, value, value + temp)))
+							value = real_old_value;
 					} else {
-						value                 = *(u16 volatile *)addr;
-						*(u16 volatile *)addr = (u16)value + (u16)temp;
+						value = *(u16 volatile *)addr;
+						*(u16 volatile *)addr = value + temp;
 					}
 				}
 				WR_REGW((u16)value);
@@ -503,26 +387,26 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				} else {
 					uintptr_t addr;
 					addr = x86_decode_modrmgetmem(state, &mod, op_flags);
-					prefault(state, addr, 4);
-					if (F_ATOMIC) {
-						bus_acquirelock();
-						value                 = *(u32 volatile *)addr;
-						*(u32 volatile *)addr = (u32)value + (u32)temp;
-						bus_releaselock();
+					if (op_flags & F_LOCK) {
+						u32 real_old_value;
+						value = ATOMIC_READ(*(u32 *)addr);
+						while ((real_old_value = x86_emulock_cmpxchg32((struct icpustate **)&state,
+						                                               (u32 *)addr, value, value + temp)))
+							value = real_old_value;
 					} else {
-						value                 = *(u32 volatile *)addr;
-						*(u32 volatile *)addr = (u32)value + (u32)temp;
+						value = *(u32 volatile *)addr;
+						*(u32 volatile *)addr = value + temp;
 					}
 				}
 				WR_REGL((u32)value);
 				new_eflags = __addl_ff(value, temp);
 			}
-			SET_EFLAGS(new_eflags, CF | PF | AF | SF | ZF | OF);
+			set_pflags_mask(new_eflags, CF | PF | AF | SF | ZF | OF);
 		}	break;
 
 		case 0x0f34:
 			/* 0F 34       SYSENTER       Fast call to privilege level 0 system procedures. */
-			if unlikely(!irregs_isuser(&IRREGS(state)))
+			if unlikely(!isuser())
 				goto generic_illegal_instruction; /* Not allowed from kernel-space. */
 			/* sysenter emulation */
 #if 1
@@ -589,7 +473,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 		case 0x0f09: /* WBINVD */
 			if (op_flags & (F_OP16 | F_AD16 | F_LOCK | F_REP | F_REPNE))
 				goto e_bad_prefix;
-			if (IS_USER())
+			if (isuser())
 				goto e_privileged_instruction;
 			pagedir_syncall(); /* What other caches are there? */
 			break;
@@ -603,10 +487,12 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			break;
 
 #define DEFINE_MOVcc(opcode, cond_expr)                         \
-		case opcode:                                            \
+		case opcode: {                                          \
+			uintptr_t pflags;                                   \
 			MOD_DECODE();                                       \
 			if (op_flags & (F_AD16 | F_LOCK | F_REP | F_REPNE)) \
 				goto e_bad_prefix;                              \
+			pflags = get_pflags();                              \
 			if (cond_expr) {                                    \
 				if (op_flags & F_OP16) {                        \
 					WR_REGW(RD_RMW());                          \
@@ -614,15 +500,15 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 					WR_REGL(RD_RML());                          \
 				}                                               \
 			}                                                   \
-			break
+		}	break
 
 		/* 0F 40      CMOVO r16, r/m16        Move if overflow (OF=1) */
 		/* 0F 40      CMOVO r32, r/m32        Move if overflow (OF=1) */
-		DEFINE_MOVcc(0x0f40,S_EFLAGS & OF);
+		DEFINE_MOVcc(0x0f40, pflags & OF);
 
 		/* 0F 41      CMOVNO r16, r/m16       Move if not overflow (OF=0) */
 		/* 0F 41      CMOVNO r32, r/m32       Move if not overflow (OF=0) */
-		DEFINE_MOVcc(0x0f41,!(S_EFLAGS & OF));
+		DEFINE_MOVcc(0x0f41, !(pflags & OF));
 
 		/* 0F 42      CMOVB r16, r/m16        Move if below (CF=1) */
 		/* 0F 42      CMOVB r32, r/m32        Move if below (CF=1) */
@@ -630,7 +516,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 		/* 0F 42      CMOVC r32, r/m32        Move if carry (CF=1) */
 		/* 0F 42      CMOVNAE r16, r/m16      Move if not above or equal (CF=1) */
 		/* 0F 42      CMOVNAE r32, r/m32      Move if not above or equal (CF=1) */
-		DEFINE_MOVcc(0x0f42,S_EFLAGS & CF);
+		DEFINE_MOVcc(0x0f42, pflags & CF);
 
 		/* 0F 43      CMOVAE r16, r/m16       Move if above or equal (CF=0) */
 		/* 0F 43      CMOVAE r32, r/m32       Move if above or equal (CF=0) */
@@ -638,88 +524,88 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 		/* 0F 43      CMOVNB r32, r/m32       Move if not below (CF=0) */
 		/* 0F 43      CMOVNC r16, r/m16       Move if not carry (CF=0) */
 		/* 0F 43      CMOVNC r32, r/m32       Move if not carry (CF=0) */
-		DEFINE_MOVcc(0x0f43,!(S_EFLAGS & CF));
+		DEFINE_MOVcc(0x0f43, !(pflags & CF));
 
 		/* 0F 44      CMOVE r16, r/m16        Move if equal (ZF=1) */
 		/* 0F 44      CMOVE r32, r/m32        Move if equal (ZF=1) */
 		/* 0F 44      CMOVZ r16, r/m16        Move if zero (ZF=1) */
 		/* 0F 44      CMOVZ r32, r/m32        Move if zero (ZF=1) */
-		DEFINE_MOVcc(0x0f44,S_EFLAGS & ZF);
+		DEFINE_MOVcc(0x0f44, pflags & ZF);
 
 		/* 0F 45      CMOVNE r16, r/m16       Move if not equal (ZF=0) */
 		/* 0F 45      CMOVNE r32, r/m32       Move if not equal (ZF=0) */
 		/* 0F 45      CMOVNZ r16, r/m16       Move if not zero (ZF=0) */
 		/* 0F 45      CMOVNZ r32, r/m32       Move if not zero (ZF=0) */
-		DEFINE_MOVcc(0x0f45,!(S_EFLAGS & ZF));
+		DEFINE_MOVcc(0x0f45, !(pflags & ZF));
 
 		/* 0F 46      CMOVBE r16, r/m16       Move if below or equal (CF=1 or ZF=1) */
 		/* 0F 46      CMOVBE r32, r/m32       Move if below or equal (CF=1 or ZF=1) */
 		/* 0F 46      CMOVNA r16, r/m16       Move if not above (CF=1 or ZF=1) */
 		/* 0F 46      CMOVNA r32, r/m32       Move if not above (CF=1 or ZF=1) */
-		DEFINE_MOVcc(0x0f46,S_EFLAGS & (CF|ZF));
+		DEFINE_MOVcc(0x0f46, pflags & (CF|ZF));
 
 		/* 0F 47      CMOVA r16, r/m16        Move if above (CF=0 and ZF=0) */
 		/* 0F 47      CMOVA r32, r/m32        Move if above (CF=0 and ZF=0) */
 		/* 0F 47      CMOVNBE r16, r/m16      Move if not below or equal (CF=0 and ZF=0) */
 		/* 0F 47      CMOVNBE r32, r/m32      Move if not below or equal (CF=0 and ZF=0) */
-		DEFINE_MOVcc(0x0f47,!(S_EFLAGS & (CF|ZF)));
+		DEFINE_MOVcc(0x0f47, !(pflags & (CF|ZF)));
 
 		/* 0F 48      CMOVS r16, r/m16        Move if sign (SF=1) */
 		/* 0F 48      CMOVS r32, r/m32        Move if sign (SF=1) */
-		DEFINE_MOVcc(0x0f48,S_EFLAGS & SF);
+		DEFINE_MOVcc(0x0f48, pflags & SF);
 
 		/* 0F 49      CMOVNS r16, r/m16       Move if not sign (SF=0) */
 		/* 0F 49      CMOVNS r32, r/m32       Move if not sign (SF=0) */
-		DEFINE_MOVcc(0x0f49,!(S_EFLAGS & SF));
+		DEFINE_MOVcc(0x0f49, !(pflags & SF));
 
 		/* 0F 4A      CMOVP r16, r/m16        Move if parity (PF=1) */
 		/* 0F 4A      CMOVP r32, r/m32        Move if parity (PF=1) */
 		/* 0F 4A      CMOVPE r16, r/m16       Move if parity even (PF=1) */
 		/* 0F 4A      CMOVPE r32, r/m32       Move if parity even (PF=1) */
-		DEFINE_MOVcc(0x0f4a,S_EFLAGS & PF);
+		DEFINE_MOVcc(0x0f4a, pflags & PF);
 
 		/* 0F 4B      CMOVNP r16, r/m16       Move if not parity (PF=0) */
 		/* 0F 4B      CMOVNP r32, r/m32       Move if not parity (PF=0) */
 		/* 0F 4B      CMOVPO r16, r/m16       Move if parity odd (PF=0) */
 		/* 0F 4B      CMOVPO r32, r/m32       Move if parity odd (PF=0) */
-		DEFINE_MOVcc(0x0f4b,!(S_EFLAGS & PF));
+		DEFINE_MOVcc(0x0f4b, !(pflags & PF));
 
 		/* 0F 4C      CMOVL r16, r/m16        Move if less (SF<>OF) */
 		/* 0F 4C      CMOVL r32, r/m32        Move if less (SF<>OF) */
 		/* 0F 4C      CMOVNGE r16, r/m16      Move if not greater or equal (SF<>OF) */
 		/* 0F 4C      CMOVNGE r32, r/m32      Move if not greater or equal (SF<>OF) */
-		DEFINE_MOVcc(0x0f4c,!!(S_EFLAGS & SF) != !!(S_EFLAGS & OF));
+		DEFINE_MOVcc(0x0f4c, !!(pflags & SF) != !!(pflags & OF));
 
 		/* 0F 4D      CMOVGE r16, r/m16       Move if greater or equal (SF=OF) */
 		/* 0F 4D      CMOVGE r32, r/m32       Move if greater or equal (SF=OF) */
 		/* 0F 4D      CMOVNL r16, r/m16       Move if not less (SF=OF) */
 		/* 0F 4D      CMOVNL r32, r/m32       Move if not less (SF=OF) */
-		DEFINE_MOVcc(0x0f4d,!!(S_EFLAGS & SF) == !!(S_EFLAGS & OF));
+		DEFINE_MOVcc(0x0f4d, !!(pflags & SF) == !!(pflags & OF));
 
 		/* 0F 4E      CMOVLE r16, r/m16       Move if less or equal (ZF=1 or SF<>OF) */
 		/* 0F 4E      CMOVLE r32, r/m32       Move if less or equal (ZF=1 or SF<>OF) */
 		/* 0F 4E      CMOVNG r16, r/m16       Move if not greater (ZF=1 or SF<>OF) */
 		/* 0F 4E      CMOVNG r32, r/m32       Move if not greater (ZF=1 or SF<>OF) */
-		DEFINE_MOVcc(0x0f4e,(S_EFLAGS & ZF) || (!!(S_EFLAGS & SF) != !!(S_EFLAGS & OF)));
+		DEFINE_MOVcc(0x0f4e, (pflags & ZF) || (!!(pflags & SF) != !!(pflags & OF)));
 
 		/* 0F 4F      CMOVG r16, r/m16        Move if greater (ZF=0 and SF=OF) */
 		/* 0F 4F      CMOVG r32, r/m32        Move if greater (ZF=0 and SF=OF) */
 		/* 0F 4F      CMOVNLE r16, r/m16      Move if not less or equal (ZF=0 and SF=OF) */
 		/* 0F 4F      CMOVNLE r32, r/m32      Move if not less or equal (ZF=0 and SF=OF) */
-		DEFINE_MOVcc(0x0f4f,!(S_EFLAGS & ZF) && (!!(S_EFLAGS & SF) == !!(S_EFLAGS & OF)));
+		DEFINE_MOVcc(0x0f4f, !(pflags & ZF) && (!!(pflags & SF) == !!(pflags & OF)));
 #undef DEFINE_MOVcc
 
 		case 0x0f31: {
 			qtime_t now;
 			u64 result;
 			/* 0F 31       RDTSC       Read time-stamp counter into EDX:EAX */
-			if ((__rdcr4() & CR4_TSD) && IS_USER())
+			if ((__rdcr4() & CR4_TSD) && isuser())
 				goto e_privileged_instruction;
 			now    = cpu_quantum_time();
 			result = (u64)now.q_jtime * now.q_qsize;
 			result += (u64)now.q_qtime;
-			SET_S_EAX((u32)result);
-			SET_S_EDX((u32)(result >> 32));
+			set_eax((u32)result);
+			set_edx((u32)(result >> 32));
 		} break;
 
 		case 0x0fae:
@@ -736,7 +622,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 						goto e_bad_operand_addrmode;
 					/* FXSAVE m512byte */
 					addr = x86_decode_modrmgetmem(state, &mod, op_flags);
-					if (IS_USER())
+					if (isuser())
 						validate_writable((void *)addr, 512);
 					x86_fxsave((USER CHECKED struct xfpustate *)(void *)addr);
 					break;
@@ -788,7 +674,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 						goto e_bad_operand_addrmode;
 					/* FXRSTOR m512byte */
 					addr = x86_decode_modrmgetmem(state, &mod, op_flags);
-					if (IS_USER())
+					if (isuser())
 						validate_readable((void *)addr, 512);
 					x86_fxrstor((USER CHECKED struct xfpustate *)(void *)addr);
 					break;
@@ -814,7 +700,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 					/* NOTE: We must load `IA32_KERNEL_GS_BASE', since the `swapgs' invoked upon
 					 *       entry into kernel-space has caused the actual user-space GS to be
 					 *       saved within the `IA32_KERNEL_GS_BASE' msr */
-					u32 msr = irregs_isuser(&IRREGS(state))
+					u32 msr = isuser()
 					          ? IA32_KERNEL_GS_BASE
 					          : IA32_GS_BASE;
 					if (op_flags & F_REX_W) {
@@ -907,7 +793,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 					/* NOTE: We must write `IA32_KERNEL_GS_BASE', since the `swapgs' invoked upon
 					 *       entry into kernel-space has caused the actual user-space GS to be
 					 *       saved within the `IA32_KERNEL_GS_BASE' msr */
-					u32 msr = irregs_isuser(&IRREGS(state))
+					u32 msr = isuser()
 					          ? IA32_KERNEL_GS_BASE
 					          : IA32_GS_BASE;
 					temp.val64 = RD_RMREGQ();
@@ -943,75 +829,75 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			struct cpuinfo const *info;
 			/* CPUID */
 			info = &CPUID_FEATURES;
-			switch (S_EAX) {
+			switch (get_eax()) {
 
 			case 0:
-				SET_S_EAX(info->ci_0a);
-				SET_S_EBX(info->ci_0b);
-				SET_S_ECX(info->ci_0c);
-				SET_S_EDX(info->ci_0d);
+				set_eax(info->ci_0a);
+				set_ebx(info->ci_0b);
+				set_ecx(info->ci_0c);
+				set_edx(info->ci_0d);
 				break;
 
 			case 1:
-				SET_S_EAX(info->ci_1a);
-				SET_S_EBX(info->ci_1b);
-				SET_S_ECX(info->ci_1c);
-				SET_S_EDX(info->ci_1d);
+				set_eax(info->ci_1a);
+				set_ebx(info->ci_1b);
+				set_ecx(info->ci_1c);
+				set_edx(info->ci_1d);
 				break;
 
 			case 7:
-				SET_S_EAX(0);
-				SET_S_EBX(info->ci_7b);
-				SET_S_ECX(info->ci_7c);
-				SET_S_EDX(info->ci_7d);
+				set_eax(0);
+				set_ebx(info->ci_7b);
+				set_ecx(info->ci_7c);
+				set_edx(info->ci_7d);
 				break;
 
 			case 0x80000000:
-				SET_S_EAX(info->ci_80000000a);
+				set_eax(info->ci_80000000a);
 #if 1
-				SET_S_EBX(info->ci_0b);
-				SET_S_ECX(info->ci_0c);
-				SET_S_EDX(info->ci_0d);
+				set_ebx(info->ci_0b);
+				set_ecx(info->ci_0c);
+				set_edx(info->ci_0d);
 #else
-				SET_S_EBX(0);
-				SET_S_ECX(0);
-				SET_S_EDX(0);
+				set_ebx(0);
+				set_ecx(0);
+				set_edx(0);
 #endif
 				break;
 
 			case 0x80000001:
-				SET_S_EAX(0);
-				SET_S_EBX(0);
-				SET_S_ECX(info->ci_80000001c);
-				SET_S_EDX(info->ci_80000001d);
+				set_eax(0);
+				set_ebx(0);
+				set_ecx(info->ci_80000001c);
+				set_edx(info->ci_80000001d);
 				break;
 
 			case 0x80000002:
-				SET_S_EAX(info->ci_80000002a);
-				SET_S_EBX(info->ci_80000002b);
-				SET_S_ECX(info->ci_80000002c);
-				SET_S_EDX(info->ci_80000002d);
+				set_eax(info->ci_80000002a);
+				set_ebx(info->ci_80000002b);
+				set_ecx(info->ci_80000002c);
+				set_edx(info->ci_80000002d);
 				break;
 
 			case 0x80000003:
-				SET_S_EAX(info->ci_80000003a);
-				SET_S_EBX(info->ci_80000003b);
-				SET_S_ECX(info->ci_80000003c);
-				SET_S_EDX(info->ci_80000003d);
+				set_eax(info->ci_80000003a);
+				set_ebx(info->ci_80000003b);
+				set_ecx(info->ci_80000003c);
+				set_edx(info->ci_80000003d);
 				break;
 
 			case 0x80000004:
-				SET_S_EAX(info->ci_80000004a);
-				SET_S_EBX(info->ci_80000004b);
-				SET_S_ECX(info->ci_80000004c);
-				SET_S_EDX(info->ci_80000004d);
+				set_eax(info->ci_80000004a);
+				set_ebx(info->ci_80000004b);
+				set_ecx(info->ci_80000004c);
+				set_edx(info->ci_80000004d);
 				break;
 
 			default:
-				SET_S_EAX(0);
-				SET_S_ECX(0);
-				SET_S_EDX(0);
-				SET_S_EBX(0);
+				set_eax(0);
+				set_ecx(0);
+				set_edx(0);
+				set_ebx(0);
 				break;
 			}
 		}	break;
@@ -1029,58 +915,62 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 					case 2: /* VMLAUNCH */
 					case 3: /* VMRESUME */
 					case 4: /* VMXOFF */
-						if (IS_USER())
+						if (isuser())
 							goto e_privileged_instruction;
 						goto e_unsupported_instruction;
 					default:
 						goto e_unknown_instruction;
 					}
 				}
-				if (IS_USER())
+				if (isuser())
 					goto e_privileged_instruction;
 				goto e_bad_operand_addrmode; /* SGDT m16&32 */
 			}
 			if (mod.mi_reg == 1) {
 				if (mod.mi_type == MODRM_REGISTER) {
 					switch (mod.mi_rm) {
+
 					case 2: /* CLAC */
-						if (IS_USER())
+						if (isuser())
 							goto e_privileged_instruction;
-						irregs_wrflags(&IRREGS(state),
-						               irregs_rdflags(&IRREGS(state)) & ~EFLAGS_AC);
+						del_pflags(EFLAGS_AC);
 						goto done;
+
 					case 3: /* STAC */
-						if (IS_USER())
+						if (isuser())
 							goto e_privileged_instruction;
-						irregs_wrflags(&IRREGS(state),
-						               irregs_rdflags(&IRREGS(state)) | EFLAGS_AC);
+						add_pflags(EFLAGS_AC);
 						goto done;
+
 					case 0: /* MONITOR */
 					case 1: /* MWAIT */
 					case 7: /* ENCLS */
-						if (IS_USER())
+						if (isuser())
 							goto e_privileged_instruction;
 						goto e_unsupported_instruction;
+
 					default:
 						goto e_unknown_instruction;
 					}
 				}
-				if (IS_USER())
+				if (isuser())
 					goto e_privileged_instruction;
 				goto e_bad_operand_addrmode; /* SIDT m16&32 */
 			}
 			if (mod.mi_reg == 2) {
 				if (mod.mi_type == MODRM_REGISTER) {
 					switch (mod.mi_rm) {
+
 					case 0: /* XGETBV */
 					case 1: /* XSETBV */
 					case 4: /* VMFUNC */
 					case 5: /* VMFUNC */
 					case 6: /* XTEST */
 					case 7: /* ENCLU */
-						if (IS_USER())
+						if (isuser())
 							goto e_privileged_instruction;
 						goto e_unsupported_instruction;
+
 					default:
 						goto e_unknown_instruction;
 					}
@@ -1090,7 +980,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			if (mod.mi_reg == 3) {
 				if (mod.mi_type == MODRM_REGISTER)
 					goto e_bad_operand_addrmode; /* LIDT m16&32 */
-				if (IS_USER())
+				if (isuser())
 					goto e_privileged_instruction;
 				goto e_unknown_instruction;
 			}
@@ -1098,9 +988,10 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				/* INVLPG m */
 				if (mod.mi_type != MODRM_MEMORY) {
 					switch (mod.mi_rm) {
+
 					case 0:
 						/* SWAPGS */
-						if (IS_USER())
+						if (isuser())
 							goto e_privileged_instruction;
 #ifdef __x86_64__
 						{
@@ -1112,14 +1003,16 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 #else /* __x86_64__ */
 						goto e_unsupported_instruction;
 #endif /* !__x86_64__ */
+
 					case 1:
 						/* RDTSCP */
 						goto e_unsupported_instruction;
+
 					default:
 						goto e_unknown_instruction;
 					}
 				}
-				if (IS_USER())
+				if (isuser())
 					goto e_privileged_instruction;
 				/* Without INVLPG, we can only flush the entire page directory. */
 				{
@@ -1134,30 +1027,6 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			}
 			goto e_unknown_instruction;
 
-#if 0
-		case 0x0f0b: {
-			__register uintptr_t addr;
-			__register u32 real_oldval;
-			__register u32 oldval;
-			__register u32 newval;
-			if (flags & (F_OP16 | F_AD16 | F_REP | F_REPNE))
-				goto e_bad_prefix;
-			/* ud2 */
-			addr   = state->ics_gpregs.gp_edi;
-			oldval = state->ics_gpregs.gp_eax;
-			newval = state->ics_gpregs.gp_edx;
-			prefault(state, addr, 4);
-			bus_acquirelock();
-			real_oldval = *(u32 volatile *)addr;
-			if (real_oldval == oldval)
-				*(u32 volatile *)addr = newval;
-			bus_releaselock();
-			state->ics_gpregs.gp_eax = real_oldval;
-		}
-		break;
-#endif
-
-
 		case 0x90:
 			/* 90       NOP       No operation. */
 			/* F3 90    PAUSE     Gives hint to processor that improves performance of spin-wait loops. */
@@ -1169,7 +1038,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			if (op_flags & (F_AD16 | F_LOCK | F_REP | F_REPNE))
 				goto e_bad_prefix;
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
-			            IS_USER() ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV
+			            isuser() ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV
 			                      : (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDINV);
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[4], (uintptr_t)0);
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[5], (uintptr_t)0);
@@ -1179,10 +1048,10 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			if (op_flags & (F_AD16 | F_LOCK | F_REP | F_REPNE))
 				goto e_bad_prefix;
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
-			            IS_USER() ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV
+			            isuser() ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV
 			                      : (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRINV);
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[4], (uintptr_t)S_EAX);
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[5], (uintptr_t)S_EDX);
+			PERTASK_SET(_this_exception_info.ei_data.e_pointers[4], (uintptr_t)get_eax());
+			PERTASK_SET(_this_exception_info.ei_data.e_pointers[5], (uintptr_t)get_edx());
 			goto e_bad_msr_regno;
 
 
@@ -1298,53 +1167,62 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			}
 		}	break;
 
-		case 0x0fb8:
+		case 0x0fb8: {
 			/* F3 0F B8 /r        POPCNT r16, r/m16     POPCNT on r/m16
 			 * F3 0F B8 /r        POPCNT r32, r/m32     POPCNT on r/m32
 			 * F3 REX.W 0F B8 /r  POPCNT r64, r/m64     POPCNT on r/m64 */
+			uintptr_t pflags;
 			MOD_DECODE();
 			if (op_flags & (F_AD16 | F_LOCK | F_REPNE) || !(op_flags & F_REP))
 				goto e_bad_prefix;
+			pflags = get_pflags();
 			IF_X86_64(if (op_flags & F_REX_W) {
-				WR_REGQ(simple_popcnt64(RD_RMQ(), &S_EFLAGS));
+				WR_REGQ(simple_popcnt64(RD_RMQ(), &pflags));
 			} else) if (!(op_flags & F_OP16)) {
-				WR_REGL(simple_popcnt32(RD_RML(), &S_EFLAGS));
+				WR_REGL(simple_popcnt32(RD_RML(), &pflags));
 			} else {
-				WR_REGW(simple_popcnt16(RD_RMW(), &S_EFLAGS));
+				WR_REGW(simple_popcnt16(RD_RMW(), &pflags));
 			}
-			break;
+			set_pflags(pflags);
+		}	break;
 
-		case 0x0fbc:
+		case 0x0fbc: {
+			uintptr_t pflags;
 			/* F3 0F BC /r       TZCNT r16, r/m16   A   V/V      BMI1   Count the number of trailing zero bits in r/m16, return result in r16.
 			 * F3 0F BC /r       TZCNT r32, r/m32   A   V/V      BMI1   Count the number of trailing zero bits in r/m32, return result in r32.
 			 * F3 REX.W 0F BC /r TZCNT r64, r/m64   A   V/N.E.   BMI1   Count the number of trailing zero bits in r/m64, return result in r64. */
 			MOD_DECODE();
 			if (op_flags & (F_AD16 | F_LOCK | F_REPNE) || !(op_flags & F_REP))
 				goto e_bad_prefix;
+			pflags = get_pflags();
 			IF_X86_64(if (op_flags & F_REX_W) {
-				WR_REGQ(simple_tzcnt64(RD_RMQ(), &S_EFLAGS));
+				WR_REGQ(simple_tzcnt64(RD_RMQ(), &pflags));
 			} else) if (!(op_flags & F_OP16)) {
-				WR_REGL(simple_tzcnt32(RD_RML(), &S_EFLAGS));
+				WR_REGL(simple_tzcnt32(RD_RML(), &pflags));
 			} else {
-				WR_REGW(simple_tzcnt16(RD_RMW(), &S_EFLAGS));
+				WR_REGW(simple_tzcnt16(RD_RMW(), &pflags));
 			}
-			break;
+			set_pflags(pflags);
+		}	break;
 
-		case 0x0fbd:
+		case 0x0fbd: {
+			uintptr_t pflags;
 			/* F3 0F BD /r        LZCNT r16, r/m16
 			 * F3 0F BD /r        LZCNT r32, r/m32
 			 * F3 REX.W 0F BD /r  LZCNT r64, r/m64 */
 			MOD_DECODE();
 			if (op_flags & (F_AD16 | F_LOCK | F_REPNE) || !(op_flags & F_REP))
 				goto e_bad_prefix;
+			pflags = get_pflags();
 			IF_X86_64(if (op_flags & F_REX_W) {
-				WR_REGQ(simple_lzcnt64(RD_RMQ(), &S_EFLAGS));
+				WR_REGQ(simple_lzcnt64(RD_RMQ(), &pflags));
 			} else) if (!(op_flags & F_OP16)) {
-				WR_REGL(simple_lzcnt32(RD_RML(), &S_EFLAGS));
+				WR_REGL(simple_lzcnt32(RD_RML(), &pflags));
 			} else {
-				WR_REGW(simple_lzcnt16(RD_RMW(), &S_EFLAGS));
+				WR_REGW(simple_lzcnt16(RD_RMW(), &pflags));
 			}
-			break;
+			set_pflags(pflags);
+		}	break;
 
 		case 0x0f38f5:
 			MOD_DECODE();
@@ -1370,56 +1248,62 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				/* VEX.LZ.0F38.W0 F5 /r BZHI r32a, r/m32, r32b         RMV         V/V         BMI2         Zero bits in r/m32 starting with the position in r32b, write result to r32a.
 				 * VEX.LZ.0F38.W1 F5 /r BZHI r64a, r/m64, r64b         RMV         V/N.E.         BMI2         Zero bits in r/m64 starting with the position in r64b, write result to r64a. */
 				uint8_t n = (uint8_t)RD_VEXREG();
+				uintptr_t pflags;
+				pflags = get_pflags();
 				IF_X86_64(if (op_flags & F_VEX_W) {
 					u64 temp;
 					temp = RD_RMQ();
 					if (n < 64)
 						temp &= (((u64)1 << n) - 1);
 					WR_REGQ((u64)temp);
-					S_EFLAGS &= ~(OF | CF | SF | ZF);
+					pflags &= ~(OF | CF | SF | ZF);
 					if (n > 63)
-						S_EFLAGS |= CF;
-					S_EFLAGS |= __testq((u64)temp, (u64)temp) & (SF | ZF);
+						pflags |= CF;
+					pflags |= __testq((u64)temp, (u64)temp) & (SF | ZF);
 				} else) {
 					u32 temp;
 					temp = RD_RML();
 					if (n < 32)
 						temp &= (((u32)1 << n) - 1);
 					WR_REGL((u32)temp);
-					S_EFLAGS &= ~(OF | CF | SF | ZF);
+					pflags &= ~(OF | CF | SF | ZF);
 					if (n > 31)
-						S_EFLAGS |= CF;
-					S_EFLAGS |= __testl((u32)temp, (u32)temp) & (SF | ZF);
+						pflags |= CF;
+					pflags |= __testl((u32)temp, (u32)temp) & (SF | ZF);
 				}
+				set_pflags(pflags);
 			}
 			break;
 
-		case 0x0f38f2:
+		case 0x0f38f2: {
+			uintptr_t pflags;
 			MOD_DECODE();
 			if (op_flags & (F_AD16 | F_LOCK | F_REP | F_REPNE | F_VEX_L))
 				goto e_bad_prefix;
 			/* VEX.LZ.0F38.W0 F2 /r ANDN r32a, r32b, r/m32         RVM         V/V         BMI1         Bitwise AND of inverted r32b with r/m32, store result in r32a.
 			 * VEX.LZ.0F38.W1 F2 /r ANDN r64a, r64b, r/m64         RVM         V/NE         BMI1         Bitwise AND of inverted r64b with r/m64, store result in r64a. */
+			pflags = get_pflags();
 			IF_X86_64(if (op_flags & F_VEX_W) {
 				u64 temp;
 				temp = (~RD_VEXREGQ()) & RD_RMQ();
 				WR_REGQ((u64)temp);
-				S_EFLAGS &= ~(SF | ZF | OF | CF);
+				pflags &= ~(SF | ZF | OF | CF);
 				if (!(u64)temp)
-					S_EFLAGS |= ZF;
+					pflags |= ZF;
 				if ((u64)temp & UINT64_C(0x8000000000000000))
-					S_EFLAGS |= SF;
+					pflags |= SF;
 			} else) {
 				u32 temp;
 				temp = (~RD_VEXREGL()) & RD_RML();
 				WR_REGL((u32)temp);
-				S_EFLAGS &= ~(SF | ZF | OF | CF);
+				pflags &= ~(SF | ZF | OF | CF);
 				if (!(u32)temp)
-					S_EFLAGS |= ZF;
+					pflags |= ZF;
 				if ((u32)temp & UINT32_C(0x80000000))
-					S_EFLAGS |= SF;
+					pflags |= SF;
 			}
-			break;
+			set_pflags(pflags);
+		}	break;
 
 
 //TODO: VEX.LZ.0F38.W0 F3 /1 BLSR r32, r/m32         VM         V/V         BMI1         Reset lowest set bit of r/m32, keep all other bits of r/m32 and write result to r32.
@@ -1449,7 +1333,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 		default: {
 			uintptr_t next_pc;
 e_unknown_instruction:
-			next_pc = irregs_rdip(&IRREGS(state));
+			next_pc = icpustate_getpc(state);
 			next_pc = (uintptr_t)instruction_succ((void const *)next_pc);
 			if (next_pc)
 				pc = (byte_t *)next_pc;
@@ -1460,18 +1344,18 @@ e_unknown_instruction:
 		if (was_thrown(E_ILLEGAL_INSTRUCTION) &&
 		    PERTASK_GET(_this_exception_info.ei_data.e_pointers[0]) == 0)
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)opcode);
-		irregs_wrip(&IRREGS(state), (uintptr_t)pc);
+		icpustate_setpc(state, (uintptr_t)pc);
 		RETHROW();
 	}
 done:
-	irregs_wrip(&IRREGS(state), (uintptr_t)pc);
+	icpustate_setpc(state, (uintptr_t)pc);
 	return state;
 	{
 		unsigned int i;
 e_bad_msr_regno:
 		PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 		PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_MSR);
-		PERTASK_SET(_this_exception_info.ei_data.e_pointers[3], (uintptr_t)S_ECX);
+		PERTASK_SET(_this_exception_info.ei_data.e_pointers[3], (uintptr_t)get_ecx());
 		i = 6;
 		goto set_generic_illegal_instruction;
 e_bad_operand_addrmode:
@@ -1636,9 +1520,9 @@ set_generic_illegal_instruction:
 #if EXCEPT_BACKTRACE_SIZE != 0
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
 			PERTASK_SET(_this_exception_info.ei_trace[i], (void *)0);
-#endif
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	}
-	irregs_wrip(&IRREGS(state), (uintptr_t)pc);
+	icpustate_setpc(state, (uintptr_t)pc);
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_ILLEGAL_INSTRUCTION))
 		kernel_debugtrap(state, SIGILL);

@@ -42,7 +42,7 @@ DECL_BEGIN
  *       those themself may have been linked to make use of the
  *       very instructions which we're trying to emulate... */
 #define DEFINE_POPCOUNT(n, T)                                                \
-	LOCAL ATTR_CONST unsigned int                                            \
+	LOCAL ATTR_LEAF unsigned int                                             \
 	NOTHROW(KCALL simple_popcnt##n)(T i, uintptr_t *__restrict pflags) {     \
 		unsigned int result = 0;                                             \
 		T mask              = 1;                                             \
@@ -58,7 +58,7 @@ DECL_BEGIN
 		return result;                                                       \
 	}
 #define DEFINE_TZCOUNT(n, T)                                                     \
-	LOCAL ATTR_CONST unsigned int                                                \
+	LOCAL ATTR_LEAF unsigned int                                                 \
 	NOTHROW(KCALL simple_tzcnt##n)(T i, uintptr_t *__restrict pflags) {          \
 		unsigned int result = 0;                                                 \
 		T mask              = 1;                                                 \
@@ -72,10 +72,10 @@ DECL_BEGIN
 		return result;                                                           \
 	}
 #define DEFINE_LZCOUNT(n, T)                                            \
-	LOCAL ATTR_CONST unsigned int                                       \
+	LOCAL ATTR_LEAF unsigned int                                        \
 	NOTHROW(KCALL simple_lzcnt##n)(T i, uintptr_t *__restrict pflags) { \
 		unsigned int result = 0;                                        \
-		T mask              = (T)1 << ((sizeof(T) * 8) - 1);            \
+		T mask = (T)1 << ((sizeof(T) * 8) - 1);                         \
 		*pflags &= ~(CF | ZF);                                          \
 		if (!i)                                                         \
 			*pflags |= CF;                                              \
