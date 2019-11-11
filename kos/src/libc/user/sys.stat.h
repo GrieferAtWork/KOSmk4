@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33c6d164 */
+/* HASH CRC-32:0xb02c7400 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,11 +74,11 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_fchmod)(fd_t fd, mode_t mode);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_mknod)(char const *nodename, mode_t mode, dev_t dev);
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_mknodat)(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev);
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_utimensat)(fd_t dirfd, char const *filename, struct timespec const times[2/*or:3*/], atflag_t flags);
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_utimensat)(fd_t dirfd, char const *filename, struct timespec const times[2 /*or:3*/], atflag_t flags);
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_utimensat64)(fd_t dirfd, char const *filename, struct timespec64 const times[2/*or:3*/], atflag_t flags);
-INTDEF int NOTHROW_RPC(LIBCCALL libc_futimens)(fd_t fd, struct timespec const times[2/*or:3*/]);
-INTDEF int NOTHROW_RPC(LIBCCALL libc_futimens64)(fd_t fd, struct timespec64 const times[2/*or:3*/]);
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_utimensat64)(fd_t dirfd, char const *filename, struct timespec64 const times[2 /*or:3*/], atflag_t flags);
+INTDEF int NOTHROW_RPC(LIBCCALL libc_futimens)(fd_t fd, struct timespec const times[2 /*or:3*/]);
+INTDEF int NOTHROW_RPC(LIBCCALL libc_futimens64)(fd_t fd, struct timespec64 const times[2 /*or:3*/]);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc__wstat32)(char32_t const *filename, struct __dos_stat32 *buf);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd__wstat32)(char16_t const *filename, struct __dos_stat32 *buf);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc__wstat64)(char32_t const *filename, struct __dos_stat64 *buf);

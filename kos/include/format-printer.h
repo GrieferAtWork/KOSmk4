@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34924372 */
+/* HASH CRC-32:0xe5abf69f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -652,12 +652,12 @@ __NAMESPACE_LOCAL_USING(format_scanf)
 #ifdef __CRT_HAVE_format_sprintf_printer
 /* Format-printer implementation for printing to a string buffer like `sprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
-__CDECLARE(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_sprintf_printer,(/*char ***/void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
+__CDECLARE(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_sprintf_printer,(/*char ***/ void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
 #else /* LIBC: format_sprintf_printer */
 #include <local/format-printer/format_sprintf_printer.h>
 /* Format-printer implementation for printing to a string buffer like `sprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_sprintf_printer, __FORCELOCAL __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_sprintf_printer)(/*char ***/void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_sprintf_printer))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_sprintf_printer, __FORCELOCAL __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_sprintf_printer)(/*char ***/ void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_sprintf_printer))(__arg, __data, __datalen); })
 #endif /* format_sprintf_printer... */
 
 
@@ -677,14 +677,14 @@ struct format_snprintf_data {
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
-__CDECLARE(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_snprintf_printer,(/*struct format_snprintf_data**/void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
+__CDECLARE(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_snprintf_printer,(/*struct format_snprintf_data**/ void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
 #else /* LIBC: format_snprintf_printer */
 #include <local/format-printer/format_snprintf_printer.h>
 /* Format-printer implementation for printing to a string buffer like `snprintf' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_snprintf_printer, __FORCELOCAL __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_snprintf_printer)(/*struct format_snprintf_data**/void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_snprintf_printer))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_snprintf_printer, __FORCELOCAL __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_snprintf_printer)(/*struct format_snprintf_data**/ void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_snprintf_printer))(__arg, __data, __datalen); })
 #endif /* format_snprintf_printer... */
 #ifdef __CRT_HAVE_format_width
 /* Returns the width (number of characters; not bytes) of the given unicode string */
@@ -786,11 +786,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_aprintf_pack, __FORCELOCAL __ATTR_MALLOC 
 #endif /* format_aprintf_pack... */
 #ifdef __CRT_HAVE_format_aprintf_printer
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_aprintf_printer,(/*struct format_aprintf_data **/void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_aprintf_printer,(/*struct format_aprintf_data **/ void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_realloc)
 #include <local/format-printer/format_aprintf_printer.h>
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_aprintf_printer, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_aprintf_printer)(/*struct format_aprintf_data **/void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_aprintf_printer))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_aprintf_printer, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_aprintf_printer)(/*struct format_aprintf_data **/ void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_aprintf_printer))(__arg, __data, __datalen); })
 #endif /* format_aprintf_printer... */
 
 __SYSDECL_END

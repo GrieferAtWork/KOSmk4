@@ -831,7 +831,7 @@ DATDEF CALLBACK_LIST(void KCALL(struct driver *)) driver_loaded_callbacks;
 DATDEF CALLBACK_LIST(void KCALL(struct driver *)) driver_finalized_callbacks;
 
 /* Callbacks invoked just before a driver is unloaded. */
-DATDEF CALLBACK_LIST(NOBLOCK void /*NOEXCEPT*/KCALL(struct driver *)) driver_unloaded_callbacks;
+DATDEF CALLBACK_LIST(NOBLOCK void /*NOEXCEPT*/ KCALL(struct driver *)) driver_unloaded_callbacks;
 
 #endif /* __CC__ */
 

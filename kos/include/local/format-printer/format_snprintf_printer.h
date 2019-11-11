@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe4c3369 */
+/* HASH CRC-32:0x975febb0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __NAMESPACE_LOCAL_BEGIN
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
 __LOCAL_LIBC(format_snprintf_printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_snprintf_printer))(/*struct format_snprintf_data**/void *__arg,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_snprintf_printer))(/*struct format_snprintf_data**/ void *__arg,
                                                                      /*utf-8*/ char const *__restrict __data,
                                                                      __SIZE_TYPE__ __datalen) {
 #line 973 "kos/src/libc/magic/format-printer.c"

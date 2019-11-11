@@ -28,11 +28,11 @@ __SYSDECL_BEGIN
 
 #if __KOS_VERSION__ >= 400
 typedef __SSIZE_TYPE__ (__LIBCCALL *__pformatprinter)(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen);
-typedef /*utf-32*/__SSIZE_TYPE__ (__LIBCCALL *__pformatgetc)(void *__arg);
+typedef /*utf-32*/ __SSIZE_TYPE__ (__LIBCCALL *__pformatgetc)(void *__arg);
 typedef __SSIZE_TYPE__ (__LIBCCALL *__pformatungetc)(void *__arg, /*utf-32*/ __CHAR32_TYPE__ __ch);
 #else /* __KOS_VERSION__ >= 400 */
 typedef __SSIZE_TYPE__ (__LIBCCALL *__pformatprinter)(/*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen, void *__arg);
-typedef /*utf-32*/__SSIZE_TYPE__ (__LIBCCALL *__pformatgetc)(void *__arg);
+typedef /*utf-32*/ __SSIZE_TYPE__ (__LIBCCALL *__pformatgetc)(void *__arg);
 typedef __SSIZE_TYPE__ (__LIBCCALL *__pformatungetc)(/*utf-32*/ __CHAR32_TYPE__ __ch, void *__arg);
 #endif /* __KOS_VERSION__ < 400 */
 

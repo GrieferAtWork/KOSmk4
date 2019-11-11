@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70b78903 */
+/* HASH CRC-32:0xfa8711bb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1830,7 +1830,7 @@ INTERN_FUNCTION(__asm32_int80_dup)
 END(__asm32_int80_dup)
 
 .section .text.x86.asm32_syscall_int80.pipe
-	/* errno_t pipe([2]fd_t *pipedes) */
+	/* errno_t pipe([2] fd_t *pipedes) */
 	.weak __asm32_int80_pipe
 INTERN_FUNCTION(__asm32_int80_pipe)
 	.cfi_startproc simple
@@ -3096,7 +3096,7 @@ END(__asm32_int80_settimeofday)
 
 .section .text.x86.asm32_syscall_int80.getgroups
 	/* errno_t getgroups(size_t size,
-	 *                   []uint16_t *list) */
+	 *                   [] uint16_t *list) */
 	.weak __asm32_int80_getgroups
 INTERN_FUNCTION(__asm32_int80_getgroups)
 	.cfi_startproc simple
@@ -6952,7 +6952,7 @@ END(__asm32_int80_setregid32)
 
 .section .text.x86.asm32_syscall_int80.getgroups32
 	/* errno_t getgroups32(size_t size,
-	 *                     []uint32_t *list) */
+	 *                     [] uint32_t *list) */
 	.weak __asm32_int80_getgroups32
 INTERN_FUNCTION(__asm32_int80_getgroups32)
 	.cfi_startproc simple
@@ -9033,7 +9033,7 @@ END(__asm32_int80_tgkill)
 
 .section .text.x86.asm32_syscall_int80.utimes
 	/* errno_t utimes(char const *filename,
-	 *                [2]struct __timeval32 const *times) */
+	 *                [2] struct __timeval32 const *times) */
 	.weak __asm32_int80_utimes
 INTERN_FUNCTION(__asm32_int80_utimes)
 	.cfi_startproc simple
@@ -9364,7 +9364,7 @@ END(__asm32_int80_fchownat)
 .section .text.x86.asm32_syscall_int80.futimesat
 	/* errno_t futimesat(fd_t dirfd,
 	 *                   const char *filename,
-	 *                   [2]struct __timeval32 const *times) */
+	 *                   [2] struct __timeval32 const *times) */
 	.weak __asm32_int80_futimesat
 INTERN_FUNCTION(__asm32_int80_futimesat)
 	.cfi_startproc simple
@@ -10133,7 +10133,7 @@ END(__asm32_int80_epoll_pwait)
 .section .text.x86.asm32_syscall_int80.utimensat
 	/* errno_t utimensat(fd_t dirfd,
 	 *                   char const *filename,
-	 *                   [2-3]struct __timespec32 const *times,
+	 *                   [2-3] struct __timespec32 const *times,
 	 *                   atflag_t flags) */
 	.weak __asm32_int80_utimensat
 INTERN_FUNCTION(__asm32_int80_utimensat)
@@ -10571,7 +10571,7 @@ INTERN_FUNCTION(__asm32_int80_dup3)
 END(__asm32_int80_dup3)
 
 .section .text.x86.asm32_syscall_int80.pipe2
-	/* errno_t pipe2([2]fd_t *pipedes,
+	/* errno_t pipe2([2] fd_t *pipedes,
 	 *               oflag_t flags) */
 	.weak __asm32_int80_pipe2
 INTERN_FUNCTION(__asm32_int80_pipe2)
@@ -11302,7 +11302,7 @@ END(__asm32_int80_socket)
 	/* errno_t socketpair(syscall_ulong_t domain,
 	 *                    syscall_ulong_t type,
 	 *                    syscall_ulong_t protocol,
-	 *                    [2]fd_t *fds) */
+	 *                    [2] fd_t *fds) */
 	.weak __asm32_int80_socketpair
 INTERN_FUNCTION(__asm32_int80_socketpair)
 	.cfi_startproc simple
@@ -14292,7 +14292,7 @@ END(__asm32_int80_clock_nanosleep64)
 
 .section .text.x86.asm32_syscall_int80.utimes64
 	/* errno_t utimes64(char const *filename,
-	 *                  [2]struct __timeval64 const *times) */
+	 *                  [2] struct __timeval64 const *times) */
 	.weak __asm32_int80_utimes64
 INTERN_FUNCTION(__asm32_int80_utimes64)
 	.cfi_startproc simple
@@ -14421,7 +14421,7 @@ END(__asm32_int80_fmknodat)
 .section .text.x86.asm32_syscall_int80.futimesat64
 	/* errno_t futimesat64(fd_t dirfd,
 	 *                     const char *filename,
-	 *                     [2-3]struct __timeval64 const *times) */
+	 *                     [2-3] struct __timeval64 const *times) */
 	.weak __asm32_int80_futimesat64
 INTERN_FUNCTION(__asm32_int80_futimesat64)
 	.cfi_startproc simple
@@ -14731,7 +14731,7 @@ END(__asm32_int80_ppoll64)
 .section .text.x86.asm32_syscall_int80.utimensat64
 	/* errno_t utimensat64(fd_t dirfd,
 	 *                     char const *filename,
-	 *                     [2-3]struct __timespec64 const *times,
+	 *                     [2-3] struct __timespec64 const *times,
 	 *                     atflag_t flags) */
 	.weak __asm32_int80_utimensat64
 INTERN_FUNCTION(__asm32_int80_utimensat64)
@@ -16471,7 +16471,7 @@ INTERN_FUNCTION(__asm32_sysenter_dup)
 END(__asm32_sysenter_dup)
 
 .section .text.x86.asm32_syscall_sysenter.pipe
-	/* errno_t pipe([2]fd_t *pipedes) */
+	/* errno_t pipe([2] fd_t *pipedes) */
 	.weak __asm32_sysenter_pipe
 INTERN_FUNCTION(__asm32_sysenter_pipe)
 	.cfi_startproc simple
@@ -17737,7 +17737,7 @@ END(__asm32_sysenter_settimeofday)
 
 .section .text.x86.asm32_syscall_sysenter.getgroups
 	/* errno_t getgroups(size_t size,
-	 *                   []uint16_t *list) */
+	 *                   [] uint16_t *list) */
 	.weak __asm32_sysenter_getgroups
 INTERN_FUNCTION(__asm32_sysenter_getgroups)
 	.cfi_startproc simple
@@ -21611,7 +21611,7 @@ END(__asm32_sysenter_setregid32)
 
 .section .text.x86.asm32_syscall_sysenter.getgroups32
 	/* errno_t getgroups32(size_t size,
-	 *                     []uint32_t *list) */
+	 *                     [] uint32_t *list) */
 	.weak __asm32_sysenter_getgroups32
 INTERN_FUNCTION(__asm32_sysenter_getgroups32)
 	.cfi_startproc simple
@@ -23702,7 +23702,7 @@ END(__asm32_sysenter_tgkill)
 
 .section .text.x86.asm32_syscall_sysenter.utimes
 	/* errno_t utimes(char const *filename,
-	 *                [2]struct __timeval32 const *times) */
+	 *                [2] struct __timeval32 const *times) */
 	.weak __asm32_sysenter_utimes
 INTERN_FUNCTION(__asm32_sysenter_utimes)
 	.cfi_startproc simple
@@ -24037,7 +24037,7 @@ END(__asm32_sysenter_fchownat)
 .section .text.x86.asm32_syscall_sysenter.futimesat
 	/* errno_t futimesat(fd_t dirfd,
 	 *                   const char *filename,
-	 *                   [2]struct __timeval32 const *times) */
+	 *                   [2] struct __timeval32 const *times) */
 	.weak __asm32_sysenter_futimesat
 INTERN_FUNCTION(__asm32_sysenter_futimesat)
 	.cfi_startproc simple
@@ -24818,7 +24818,7 @@ END(__asm32_sysenter_epoll_pwait)
 .section .text.x86.asm32_syscall_sysenter.utimensat
 	/* errno_t utimensat(fd_t dirfd,
 	 *                   char const *filename,
-	 *                   [2-3]struct __timespec32 const *times,
+	 *                   [2-3] struct __timespec32 const *times,
 	 *                   atflag_t flags) */
 	.weak __asm32_sysenter_utimensat
 INTERN_FUNCTION(__asm32_sysenter_utimensat)
@@ -25256,7 +25256,7 @@ INTERN_FUNCTION(__asm32_sysenter_dup3)
 END(__asm32_sysenter_dup3)
 
 .section .text.x86.asm32_syscall_sysenter.pipe2
-	/* errno_t pipe2([2]fd_t *pipedes,
+	/* errno_t pipe2([2] fd_t *pipedes,
 	 *               oflag_t flags) */
 	.weak __asm32_sysenter_pipe2
 INTERN_FUNCTION(__asm32_sysenter_pipe2)
@@ -26005,7 +26005,7 @@ END(__asm32_sysenter_socket)
 	/* errno_t socketpair(syscall_ulong_t domain,
 	 *                    syscall_ulong_t type,
 	 *                    syscall_ulong_t protocol,
-	 *                    [2]fd_t *fds) */
+	 *                    [2] fd_t *fds) */
 	.weak __asm32_sysenter_socketpair
 INTERN_FUNCTION(__asm32_sysenter_socketpair)
 	.cfi_startproc simple
@@ -29025,7 +29025,7 @@ END(__asm32_sysenter_clock_nanosleep64)
 
 .section .text.x86.asm32_syscall_sysenter.utimes64
 	/* errno_t utimes64(char const *filename,
-	 *                  [2]struct __timeval64 const *times) */
+	 *                  [2] struct __timeval64 const *times) */
 	.weak __asm32_sysenter_utimes64
 INTERN_FUNCTION(__asm32_sysenter_utimes64)
 	.cfi_startproc simple
@@ -29156,7 +29156,7 @@ END(__asm32_sysenter_fmknodat)
 .section .text.x86.asm32_syscall_sysenter.futimesat64
 	/* errno_t futimesat64(fd_t dirfd,
 	 *                     const char *filename,
-	 *                     [2-3]struct __timeval64 const *times) */
+	 *                     [2-3] struct __timeval64 const *times) */
 	.weak __asm32_sysenter_futimesat64
 INTERN_FUNCTION(__asm32_sysenter_futimesat64)
 	.cfi_startproc simple
@@ -29474,7 +29474,7 @@ END(__asm32_sysenter_ppoll64)
 .section .text.x86.asm32_syscall_sysenter.utimensat64
 	/* errno_t utimensat64(fd_t dirfd,
 	 *                     char const *filename,
-	 *                     [2-3]struct __timespec64 const *times,
+	 *                     [2-3] struct __timespec64 const *times,
 	 *                     atflag_t flags) */
 	.weak __asm32_sysenter_utimensat64
 INTERN_FUNCTION(__asm32_sysenter_utimensat64)

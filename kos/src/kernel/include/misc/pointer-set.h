@@ -86,7 +86,7 @@ NOTHROW(KCALL pointer_set_clear)(struct pointer_set *__restrict self) {
 
 LOCAL NOBLOCK void
 NOTHROW(KCALL pointer_set_rehash_with)(struct pointer_set *__restrict self,
-                                       /*inherit*/uintptr_t *__restrict new_set,
+                                       /*inherit*/ uintptr_t *__restrict new_set,
                                        uintptr_t new_mask) {
 	size_t i;
 	uintptr_t j, perturb;

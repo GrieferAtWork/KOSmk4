@@ -487,14 +487,14 @@ err_overlap:
 
 		/* Initialize the RTLD portion of the user-space bootstrap process. */
 		if (linker_base != (vm_vpage_t)-1) {
-			user_state = exec_initialize_elf_rtld(/* user_state:           */user_state,
-			                                      /* exec_path:            */exec_path,
-			                                      /* exec_dentry:          */exec_dentry,
-			                                      /* exec_node:            */exec_node,
-			                                      /* application_loadaddr: */(uintptr_t)0,
-			                                      /* linker_loadaddr:      */(uintptr_t)VM_PAGE2ADDR(linker_base),
-			                                      /* phdr_vec:             */phdr_vector,
-			                                      /* phdr_cnt:             */ehdr.e_phnum);
+			user_state = exec_initialize_elf_rtld(/* user_state:           */ user_state,
+			                                      /* exec_path:            */ exec_path,
+			                                      /* exec_dentry:          */ exec_dentry,
+			                                      /* exec_node:            */ exec_node,
+			                                      /* application_loadaddr: */ (uintptr_t)0,
+			                                      /* linker_loadaddr:      */ (uintptr_t)VM_PAGE2ADDR(linker_base),
+			                                      /* phdr_vec:             */ phdr_vector,
+			                                      /* phdr_cnt:             */ ehdr.e_phnum);
 		}
 		{
 			/* Initialize the library definitions list to use the PEB

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x505c3db7 */
+/* HASH CRC-32:0xce39735d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,7 @@
 #define __NR32_mkdir                      39         /* errno_t mkdir(char const *pathname, mode_t mode) */
 #define __NR32_rmdir                      40         /* errno_t rmdir(char const *path) */
 #define __NR32_dup                        41         /* fd_t dup(fd_t fd) */
-#define __NR32_pipe                       42         /* errno_t pipe([2]fd_t *pipedes) */
+#define __NR32_pipe                       42         /* errno_t pipe([2] fd_t *pipedes) */
 #define __NR32_times                      43         /* clock_t times(struct tms *buf) */
 #define __NR32_brk                        45         /* errno_t brk(void *addr) */
 #define __NR32_setgid                     46         /* errno_t setgid(uint16_t gid) */
@@ -101,7 +101,7 @@
 #define __NR32_getrusage                  77         /* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
 #define __NR32_gettimeofday               78         /* errno_t gettimeofday(struct __timeval32 *tv, struct timezone *tz) */
 #define __NR32_settimeofday               79         /* errno_t settimeofday(struct __timeval32 const *tv, struct timezone const *tz) */
-#define __NR32_getgroups                  80         /* errno_t getgroups(size_t size, []uint16_t *list) */
+#define __NR32_getgroups                  80         /* errno_t getgroups(size_t size, [] uint16_t *list) */
 #define __NR32_setgroups                  81         /* errno_t setgroups(size_t count, uint16_t const *groups) */
 #define __NR32_select                     82         /* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timeval32 *timeout) */
 #define __NR32_symlink                    83         /* errno_t symlink(char const *link_text, char const *target_path) */
@@ -222,7 +222,7 @@
 #define __NR32_getegid32                  202        /* uint32_t getegid32(void) */
 #define __NR32_setreuid32                 203        /* errno_t setreuid32(uint32_t ruid, uint32_t euid) */
 #define __NR32_setregid32                 204        /* errno_t setregid32(uint32_t rgid, uint32_t egid) */
-#define __NR32_getgroups32                205        /* errno_t getgroups32(size_t size, []uint32_t *list) */
+#define __NR32_getgroups32                205        /* errno_t getgroups32(size_t size, [] uint32_t *list) */
 #define __NR32_setgroups32                206        /* errno_t setgroups32(size_t count, uint32_t const *groups) */
 #define __NR32_fchown32                   207        /* errno_t fchown32(fd_t fd, uint32_t owner, uint32_t group) */
 #define __NR32_setresuid32                208        /* errno_t setresuid32(uint32_t ruid, uint32_t euid, uint32_t suid) */
@@ -277,7 +277,7 @@
 #define __NR32_fstatfs64                  269        /* errno_t fstatfs64(fd_t file, struct statfs64 *buf) */
 /* @param: signo: One of `SIG*' */
 #define __NR32_tgkill                     270        /* errno_t tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo) */
-#define __NR32_utimes                     271        /* errno_t utimes(char const *filename, [2]struct __timeval32 const *times) */
+#define __NR32_utimes                     271        /* errno_t utimes(char const *filename, [2] struct __timeval32 const *times) */
 /* @param: options: At least one of `WEXITED|WSTOPPED|WCONTINUED', optionally or'd with `WNOHANG|WNOWAIT' */
 #define __NR32_waitid                     284        /* errno_t waitid(idtype_t idtype, id_t id, struct __siginfo_struct *infop, syscall_ulong_t options, struct rusage *ru) */
 #define __NR32_ioprio_set                 289        /* errno_t ioprio_set(syscall_ulong_t which, syscall_ulong_t who, syscall_ulong_t ioprio) */
@@ -287,7 +287,7 @@
 #define __NR32_mknodat                    297        /* errno_t mknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev) */
 /* @param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
 #define __NR32_fchownat                   298        /* errno_t fchownat(fd_t dirfd, char const *filename, uint32_t owner, uint32_t group, atflag_t flags) */
-#define __NR32_futimesat                  299        /* errno_t futimesat(fd_t dirfd, const char *filename, [2]struct __timeval32 const *times) */
+#define __NR32_futimesat                  299        /* errno_t futimesat(fd_t dirfd, const char *filename, [2] struct __timeval32 const *times) */
 /* @param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
 #define __NR32_linux_fstatat64            300        /* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_stat64 *statbuf, atflag_t flags) */
 /* @param: flags: Set of `0|AT_REMOVEDIR|AT_REMOVEREG|AT_DOSPATH' */
@@ -313,7 +313,7 @@
 #define __NR32_getcpu                     318        /* errno_t getcpu(uint32_t *cpu, uint32_t *node, struct getcpu_cache *tcache) */
 #define __NR32_epoll_pwait                319        /* errno_t epoll_pwait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss) */
 /* @param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-#define __NR32_utimensat                  320        /* errno_t utimensat(fd_t dirfd, char const *filename, [2-3]struct __timespec32 const *times, atflag_t flags) */
+#define __NR32_utimensat                  320        /* errno_t utimensat(fd_t dirfd, char const *filename, [2-3] struct __timespec32 const *times, atflag_t flags) */
 #define __NR32_signalfd                   321        /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 /* Return file descriptor for new interval timer source */
 #define __NR32_timerfd_create             322        /* fd_t timerfd_create(clockid_t clock_id, syscall_ulong_t flags) */
@@ -330,7 +330,7 @@
 #define __NR32_epoll_create1              329        /* fd_t epoll_create1(syscall_ulong_t flags) */
 /* @param: flags:  Set of `O_CLOEXEC|O_CLOFORK' */
 #define __NR32_dup3                       330        /* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */
-#define __NR32_pipe2                      331        /* errno_t pipe2([2]fd_t *pipedes, oflag_t flags) */
+#define __NR32_pipe2                      331        /* errno_t pipe2([2] fd_t *pipedes, oflag_t flags) */
 #define __NR32_preadv                     333        /* ssize_t preadv(fd_t fd, struct iovec const *iovec, size_t count, uint64_t offset) */
 #define __NR32_pwritev                    334        /* ssize_t pwritev(fd_t fd, struct iovec const *iovec, size_t count, uint64_t offset) */
 /* @param: signo: One of `SIG*' */
@@ -351,7 +351,7 @@
 /* @param: flags: Set of `0|AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
 #define __NR32_execveat                   358        /* errno_t execveat(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp, atflag_t flags) */
 #define __NR32_socket                     359        /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
-#define __NR32_socketpair                 360        /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, [2]fd_t *fds) */
+#define __NR32_socketpair                 360        /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, [2] fd_t *fds) */
 #define __NR32_bind                       361        /* errno_t bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 #define __NR32_connect                    362        /* errno_t connect(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 #define __NR32_listen                     363        /* errno_t listen(fd_t sockfd, syscall_ulong_t max_backlog) */
@@ -690,13 +690,13 @@
 #define __NR32_clock_gettime64            0x80000109 /* errno_t clock_gettime64(clockid_t clock_id, struct __timespec64 *tp) */
 #define __NR32_clock_getres64             0x8000010a /* errno_t clock_getres64(clockid_t clock_id, struct __timespec64 *res) */
 #define __NR32_clock_nanosleep64          0x8000010b /* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct __timespec64 const *requested_time, struct __timespec64 *remaining) */
-#define __NR32_utimes64                   0x8000010f /* errno_t utimes64(char const *filename, [2]struct __timeval64 const *times) */
+#define __NR32_utimes64                   0x8000010f /* errno_t utimes64(char const *filename, [2] struct __timeval64 const *times) */
 /* @param: flags: Set of `0|AT_DOSPATH' */
 #define __NR32_fmkdirat                   0x80000128 /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
 /* @param: flags: Set of `0|AT_DOSPATH' */
 #define __NR32_fmknodat                   0x80000129 /* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
 /* @param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-#define __NR32_futimesat64                0x8000012b /* errno_t futimesat64(fd_t dirfd, const char *filename, [2-3]struct __timeval64 const *times) */
+#define __NR32_futimesat64                0x8000012b /* errno_t futimesat64(fd_t dirfd, const char *filename, [2-3] struct __timeval64 const *times) */
 /* @param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
 #define __NR32_kfstatat                   0x8000012c /* errno_t kfstatat(fd_t dirfd, char const *filename, struct stat *statbuf, atflag_t flags) */
 /* @param: flags: Set of `0|AT_DOSPATH' */
@@ -708,7 +708,7 @@
 #define __NR32_pselect6_64                0x80000134 /* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespec64 const *timeout, void const *sigmask_sigset_and_len) */
 #define __NR32_ppoll64                    0x80000135 /* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct __timespec64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 /* @param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-#define __NR32_utimensat64                0x80000140 /* errno_t utimensat64(fd_t dirfd, char const *filename, [2-3]struct __timespec64 const *times, atflag_t flags) */
+#define __NR32_utimensat64                0x80000140 /* errno_t utimensat64(fd_t dirfd, char const *filename, [2-3] struct __timespec64 const *times, atflag_t flags) */
 #define __NR32_fallocate64                0x80000144 /* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
@@ -1918,7 +1918,7 @@
 #define __NR32AT1_mkdir                      mode_t
 #define __NR32AT0_rmdir                      char const *
 #define __NR32AT0_dup                        fd_t
-#define __NR32AT0_pipe                       /*[2]*/fd_t *
+#define __NR32AT0_pipe                       /*[2]*/ fd_t *
 #define __NR32AT0_times                      struct tms *
 #define __NR32AT0_brk                        void *
 #define __NR32AT0_setgid                     uint16_t
@@ -1965,7 +1965,7 @@
 #define __NR32AT0_settimeofday               struct __timeval32 const *
 #define __NR32AT1_settimeofday               struct timezone const *
 #define __NR32AT0_getgroups                  size_t
-#define __NR32AT1_getgroups                  /*[]*/uint16_t *
+#define __NR32AT1_getgroups                  /*[]*/ uint16_t *
 #define __NR32AT0_setgroups                  size_t
 #define __NR32AT1_setgroups                  uint16_t const *
 #define __NR32AT0_select                     size_t
@@ -2192,7 +2192,7 @@
 #define __NR32AT0_setregid32                 uint32_t
 #define __NR32AT1_setregid32                 uint32_t
 #define __NR32AT0_getgroups32                size_t
-#define __NR32AT1_getgroups32                /*[]*/uint32_t *
+#define __NR32AT1_getgroups32                /*[]*/ uint32_t *
 #define __NR32AT0_setgroups32                size_t
 #define __NR32AT1_setgroups32                uint32_t const *
 #define __NR32AT0_fchown32                   fd_t
@@ -2337,7 +2337,7 @@
 #define __NR32AT1_tgkill                     pid_t
 #define __NR32AT2_tgkill                     syscall_ulong_t
 #define __NR32AT0_utimes                     char const *
-#define __NR32AT1_utimes                     /*[2]*/struct __timeval32 const *
+#define __NR32AT1_utimes                     /*[2]*/ struct __timeval32 const *
 #define __NR32AT0_waitid                     idtype_t
 #define __NR32AT1_waitid                     id_t
 #define __NR32AT2_waitid                     struct __siginfo_struct *
@@ -2366,7 +2366,7 @@
 #define __NR32AT4_fchownat                   atflag_t
 #define __NR32AT0_futimesat                  fd_t
 #define __NR32AT1_futimesat                  const char *
-#define __NR32AT2_futimesat                  /*[2]*/struct __timeval32 const *
+#define __NR32AT2_futimesat                  /*[2]*/ struct __timeval32 const *
 #define __NR32AT0_linux_fstatat64            fd_t
 #define __NR32AT1_linux_fstatat64            char const *
 #define __NR32AT2_linux_fstatat64            struct linux_stat64 *
@@ -2438,7 +2438,7 @@
 #define __NR32AT4_epoll_pwait                struct __sigset_struct const *
 #define __NR32AT0_utimensat                  fd_t
 #define __NR32AT1_utimensat                  char const *
-#define __NR32AT2_utimensat                  /*[2-3]*/struct __timespec32 const *
+#define __NR32AT2_utimensat                  /*[2-3]*/ struct __timespec32 const *
 #define __NR32AT3_utimensat                  atflag_t
 #define __NR32AT0_signalfd                   fd_t
 #define __NR32AT1_signalfd                   struct __sigset_struct const *
@@ -2466,7 +2466,7 @@
 #define __NR32AT0_dup3                       fd_t
 #define __NR32AT1_dup3                       fd_t
 #define __NR32AT2_dup3                       oflag_t
-#define __NR32AT0_pipe2                      /*[2]*/fd_t *
+#define __NR32AT0_pipe2                      /*[2]*/ fd_t *
 #define __NR32AT1_pipe2                      oflag_t
 #define __NR32AT0_preadv                     fd_t
 #define __NR32AT1_preadv                     struct iovec const *
@@ -2537,7 +2537,7 @@
 #define __NR32AT0_socketpair                 syscall_ulong_t
 #define __NR32AT1_socketpair                 syscall_ulong_t
 #define __NR32AT2_socketpair                 syscall_ulong_t
-#define __NR32AT3_socketpair                 /*[2]*/fd_t *
+#define __NR32AT3_socketpair                 /*[2]*/ fd_t *
 #define __NR32AT0_bind                       fd_t
 #define __NR32AT1_bind                       struct sockaddr const *
 #define __NR32AT2_bind                       socklen_t
@@ -2751,7 +2751,7 @@
 #define __NR32AT2_clock_nanosleep64          struct __timespec64 const *
 #define __NR32AT3_clock_nanosleep64          struct __timespec64 *
 #define __NR32AT0_utimes64                   char const *
-#define __NR32AT1_utimes64                   /*[2]*/struct __timeval64 const *
+#define __NR32AT1_utimes64                   /*[2]*/ struct __timeval64 const *
 #define __NR32AT0_fmkdirat                   fd_t
 #define __NR32AT1_fmkdirat                   char const *
 #define __NR32AT2_fmkdirat                   mode_t
@@ -2763,7 +2763,7 @@
 #define __NR32AT4_fmknodat                   atflag_t
 #define __NR32AT0_futimesat64                fd_t
 #define __NR32AT1_futimesat64                const char *
-#define __NR32AT2_futimesat64                /*[2-3]*/struct __timeval64 const *
+#define __NR32AT2_futimesat64                /*[2-3]*/ struct __timeval64 const *
 #define __NR32AT0_kfstatat                   fd_t
 #define __NR32AT1_kfstatat                   char const *
 #define __NR32AT2_kfstatat                   struct stat *
@@ -2795,7 +2795,7 @@
 #define __NR32AT4_ppoll64                    size_t
 #define __NR32AT0_utimensat64                fd_t
 #define __NR32AT1_utimensat64                char const *
-#define __NR32AT2_utimensat64                /*[2-3]*/struct __timespec64 const *
+#define __NR32AT2_utimensat64                /*[2-3]*/ struct __timespec64 const *
 #define __NR32AT3_utimensat64                atflag_t
 #define __NR32AT0_fallocate64                fd_t
 #define __NR32AT1_fallocate64                syscall_ulong_t
@@ -6452,7 +6452,7 @@
 #define __NR32AM_mkdir(a, b, c, d, e, f)                      (char const *)a, (__mode_t)b
 #define __NR32AM_rmdir(a, b, c, d, e, f)                      (char const *)a
 #define __NR32AM_dup(a, b, c, d, e, f)                        (__fd_t)a
-#define __NR32AM_pipe(a, b, c, d, e, f)                       (/*[2]*/__fd_t *)a
+#define __NR32AM_pipe(a, b, c, d, e, f)                       (/*[2]*/ __fd_t *)a
 #define __NR32AM_times(a, b, c, d, e, f)                      (struct tms *)a
 #define __NR32AM_brk(a, b, c, d, e, f)                        (void *)a
 #define __NR32AM_setgid(a, b, c, d, e, f)                     (__uint16_t)a
@@ -6486,7 +6486,7 @@
 #define __NR32AM_getrusage(a, b, c, d, e, f)                  (__syscall_slong_t)a, (struct rusage *)b
 #define __NR32AM_gettimeofday(a, b, c, d, e, f)               (struct __timeval32 *)a, (struct timezone *)b
 #define __NR32AM_settimeofday(a, b, c, d, e, f)               (struct __timeval32 const *)a, (struct timezone const *)b
-#define __NR32AM_getgroups(a, b, c, d, e, f)                  (__size_t)a, (/*[]*/__uint16_t *)b
+#define __NR32AM_getgroups(a, b, c, d, e, f)                  (__size_t)a, (/*[]*/ __uint16_t *)b
 #define __NR32AM_setgroups(a, b, c, d, e, f)                  (__size_t)a, (__uint16_t const *)b
 #define __NR32AM_select(a, b, c, d, e, f)                     (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct __timeval32 *)e
 #define __NR32AM_symlink(a, b, c, d, e, f)                    (char const *)a, (char const *)b
@@ -6585,7 +6585,7 @@
 #define __NR32AM_getegid32(a, b, c, d, e, f)                  /* nothing */
 #define __NR32AM_setreuid32(a, b, c, d, e, f)                 (__uint32_t)a, (__uint32_t)b
 #define __NR32AM_setregid32(a, b, c, d, e, f)                 (__uint32_t)a, (__uint32_t)b
-#define __NR32AM_getgroups32(a, b, c, d, e, f)                (__size_t)a, (/*[]*/__uint32_t *)b
+#define __NR32AM_getgroups32(a, b, c, d, e, f)                (__size_t)a, (/*[]*/ __uint32_t *)b
 #define __NR32AM_setgroups32(a, b, c, d, e, f)                (__size_t)a, (__uint32_t const *)b
 #define __NR32AM_fchown32(a, b, c, d, e, f)                   (__fd_t)a, (__uint32_t)b, (__uint32_t)c
 #define __NR32AM_setresuid32(a, b, c, d, e, f)                (__uint32_t)a, (__uint32_t)b, (__uint32_t)c
@@ -6638,7 +6638,7 @@
 #define __NR32AM_statfs64(a, b, c, d, e, f)                   (char const *)a, (struct statfs64 *)b
 #define __NR32AM_fstatfs64(a, b, c, d, e, f)                  (__fd_t)a, (struct statfs64 *)b
 #define __NR32AM_tgkill(a, b, c, d, e, f)                     (__pid_t)a, (__pid_t)b, (__syscall_ulong_t)c
-#define __NR32AM_utimes(a, b, c, d, e, f)                     (char const *)a, (/*[2]*/struct __timeval32 const *)b
+#define __NR32AM_utimes(a, b, c, d, e, f)                     (char const *)a, (/*[2]*/ struct __timeval32 const *)b
 #define __NR32AM_waitid(a, b, c, d, e, f)                     (__idtype_t)a, (__id_t)b, (struct __siginfo_struct *)c, (__syscall_ulong_t)d, (struct rusage *)e
 #define __NR32AM_ioprio_set(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AM_ioprio_get(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b
@@ -6646,7 +6646,7 @@
 #define __NR32AM_mkdirat(a, b, c, d, e, f)                    (__fd_t)a, (char const *)b, (__mode_t)c
 #define __NR32AM_mknodat(a, b, c, d, e, f)                    (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d
 #define __NR32AM_fchownat(a, b, c, d, e, f)                   (__fd_t)a, (char const *)b, (__uint32_t)c, (__uint32_t)d, (__atflag_t)e
-#define __NR32AM_futimesat(a, b, c, d, e, f)                  (__fd_t)a, (const char *)b, (/*[2]*/struct __timeval32 const *)c
+#define __NR32AM_futimesat(a, b, c, d, e, f)                  (__fd_t)a, (const char *)b, (/*[2]*/ struct __timeval32 const *)c
 #define __NR32AM_linux_fstatat64(a, b, c, d, e, f)            (__fd_t)a, (char const *)b, (struct linux_stat64 *)c, (__atflag_t)d
 #define __NR32AM_unlinkat(a, b, c, d, e, f)                   (__fd_t)a, (char const *)b, (__atflag_t)c
 #define __NR32AM_renameat(a, b, c, d, e, f)                   (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d
@@ -6664,7 +6664,7 @@
 #define __NR32AM_vmsplice(a, b, c, d, e, f)                   (__fd_t)a, (struct iovec const *)b, (__size_t)c, (__syscall_ulong_t)d
 #define __NR32AM_getcpu(a, b, c, d, e, f)                     (__uint32_t *)a, (__uint32_t *)b, (struct getcpu_cache *)c
 #define __NR32AM_epoll_pwait(a, b, c, d, e, f)                (__fd_t)a, (struct epoll_event *)b, (__syscall_ulong_t)c, (__syscall_slong_t)d, (struct __sigset_struct const *)e
-#define __NR32AM_utimensat(a, b, c, d, e, f)                  (__fd_t)a, (char const *)b, (/*[2-3]*/struct __timespec32 const *)c, (__atflag_t)d
+#define __NR32AM_utimensat(a, b, c, d, e, f)                  (__fd_t)a, (char const *)b, (/*[2-3]*/ struct __timespec32 const *)c, (__atflag_t)d
 #define __NR32AM_signalfd(a, b, c, d, e, f)                   (__fd_t)a, (struct __sigset_struct const *)b, (__size_t)c
 #define __NR32AM_timerfd_create(a, b, c, d, e, f)             (__clockid_t)a, (__syscall_ulong_t)b
 #define __NR32AM_eventfd(a, b, c, d, e, f)                    (__syscall_ulong_t)a
@@ -6675,7 +6675,7 @@
 #define __NR32AM_eventfd2(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AM_epoll_create1(a, b, c, d, e, f)              (__syscall_ulong_t)a
 #define __NR32AM_dup3(a, b, c, d, e, f)                       (__fd_t)a, (__fd_t)b, (__oflag_t)c
-#define __NR32AM_pipe2(a, b, c, d, e, f)                      (/*[2]*/__fd_t *)a, (__oflag_t)b
+#define __NR32AM_pipe2(a, b, c, d, e, f)                      (/*[2]*/ __fd_t *)a, (__oflag_t)b
 #define __NR32AM_preadv(a, b, c, d, e, f)                     (__fd_t)a, (struct iovec const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32)
 #define __NR32AM_pwritev(a, b, c, d, e, f)                    (__fd_t)a, (struct iovec const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32)
 #define __NR32AM_rt_tgsigqueueinfo(a, b, c, d, e, f)          (__pid_t)a, (__pid_t)b, (__syscall_ulong_t)c, (struct __siginfo_struct const *)d
@@ -6692,7 +6692,7 @@
 #define __NR32AM_renameat2(a, b, c, d, e, f)                  (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__syscall_ulong_t)e
 #define __NR32AM_execveat(a, b, c, d, e, f)                   (__fd_t)a, (char const *)b, (char const *const *)c, (char const *const *)d, (__atflag_t)e
 #define __NR32AM_socket(a, b, c, d, e, f)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NR32AM_socketpair(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (/*[2]*/__fd_t *)d
+#define __NR32AM_socketpair(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (/*[2]*/ __fd_t *)d
 #define __NR32AM_bind(a, b, c, d, e, f)                       (__fd_t)a, (struct sockaddr const *)b, (__socklen_t)c
 #define __NR32AM_connect(a, b, c, d, e, f)                    (__fd_t)a, (struct sockaddr const *)b, (__socklen_t)c
 #define __NR32AM_listen(a, b, c, d, e, f)                     (__fd_t)a, (__syscall_ulong_t)b
@@ -6759,17 +6759,17 @@
 #define __NR32AM_clock_gettime64(a, b, c, d, e, f)            (__clockid_t)a, (struct __timespec64 *)b
 #define __NR32AM_clock_getres64(a, b, c, d, e, f)             (__clockid_t)a, (struct __timespec64 *)b
 #define __NR32AM_clock_nanosleep64(a, b, c, d, e, f)          (__clockid_t)a, (__syscall_ulong_t)b, (struct __timespec64 const *)c, (struct __timespec64 *)d
-#define __NR32AM_utimes64(a, b, c, d, e, f)                   (char const *)a, (/*[2]*/struct __timeval64 const *)b
+#define __NR32AM_utimes64(a, b, c, d, e, f)                   (char const *)a, (/*[2]*/ struct __timeval64 const *)b
 #define __NR32AM_fmkdirat(a, b, c, d, e, f)                   (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
 #define __NR32AM_fmknodat(a, b, c, d, e, f)                   (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d, (__atflag_t)e
-#define __NR32AM_futimesat64(a, b, c, d, e, f)                (__fd_t)a, (const char *)b, (/*[2-3]*/struct __timeval64 const *)c
+#define __NR32AM_futimesat64(a, b, c, d, e, f)                (__fd_t)a, (const char *)b, (/*[2-3]*/ struct __timeval64 const *)c
 #define __NR32AM_kfstatat(a, b, c, d, e, f)                   (__fd_t)a, (char const *)b, (struct stat *)c, (__atflag_t)d
 #define __NR32AM_frenameat(a, b, c, d, e, f)                  (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__atflag_t)e
 #define __NR32AM_fsymlinkat(a, b, c, d, e, f)                 (char const *)a, (__fd_t)b, (char const *)c, (__atflag_t)d
 #define __NR32AM_freadlinkat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
 #define __NR32AM_pselect6_64(a, b, c, d, e, f)                (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct __timespec64 const *)e, (void const *)f
 #define __NR32AM_ppoll64(a, b, c, d, e, f)                    (struct pollfd *)a, (__size_t)b, (struct __timespec64 const *)c, (struct __sigset_struct const *)d, (__size_t)e
-#define __NR32AM_utimensat64(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (/*[2-3]*/struct __timespec64 const *)c, (__atflag_t)d
+#define __NR32AM_utimensat64(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (/*[2-3]*/ struct __timespec64 const *)c, (__atflag_t)d
 #define __NR32AM_fallocate64(a, b, c, d, e, f)                (__fd_t)a, (__syscall_ulong_t)b, (__uint64_t)((__uint64_t)c | (__uint64_t)d << 32), (__uint64_t)((__uint64_t)e | (__uint64_t)f << 32)
 #define __NR32AM_timerfd_settime64(a, b, c, d, e, f)          (__fd_t)a, (__syscall_ulong_t)b, (struct __itimerspec64 const *)c, (struct __itimerspec64 *)d
 #define __NR32AM_timerfd_gettime64(a, b, c, d, e, f)          (__fd_t)a, (struct __itimerspec64 *)b

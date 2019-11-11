@@ -53,9 +53,11 @@ INTDEF struct vm_datapart __x86_bootcpu_dfstack_part;
 
 PUBLIC ATTR_PERCPU struct vm_datapart
 _x86_this_dfstack_part ASMNAME("x86_this_dfstack_part") = {
-	/* .dp_refcnt = */2, /* `x86_this_dfstack_part', `x86_this_dfstack' */
+	/* .dp_refcnt = */ 2, /* `x86_this_dfstack_part', `x86_this_dfstack' */
 	.dp_lock   = SHARED_RWLOCK_INIT,
-	{/* .dp_tree = */{ NULL, NULL, 0, CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) - 1 }},
+	{
+		/* .dp_tree = */ { NULL, NULL, 0, CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) - 1 }
+	},
 	.dp_crefs = LLIST_INIT,
 	.dp_srefs = &__x86_bootcpu_dfstack_node,
 	.dp_stale = NULL,
@@ -70,10 +72,10 @@ _x86_this_dfstack_part ASMNAME("x86_this_dfstack_part") = {
 		.dp_ramdata = {
 			.rd_blockv = &__x86_bootcpu_dfstack_part.dp_ramdata.rd_block0,
 			{
-					.rd_block0 = {
-						.rb_start = (vm_ppage_t)(uintptr_t)__x86_bootcpu_df_stackpage - KERNEL_BASE_PAGE,
-						.rb_size  = CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE)
-					}
+				.rd_block0 = {
+					.rb_start = (vm_ppage_t)(uintptr_t)__x86_bootcpu_df_stackpage - KERNEL_BASE_PAGE,
+					.rb_size  = CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE)
+				}
 			}
 		}
 	},
@@ -85,6 +87,7 @@ _x86_this_dfstack_part ASMNAME("x86_this_dfstack_part") = {
 #endif
 	},
 };
+
 PUBLIC ATTR_PERCPU struct vm_node _x86_this_dfstack ASMNAME("x86_this_dfstack") = {
 	.vn_node = {
 		NULL,

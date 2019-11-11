@@ -423,12 +423,12 @@ IFELSE_NX(err: return NULL;, )
 }
 
 
-//TODO:FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__SIZEOF_PAGE__) VIRT /*page-aligned*/void *(KCALL vpage_alloc)(size_t num_pages, size_t alignment_in_pages, gfp_t flags);
-//TODO:FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__SIZEOF_PAGE__) VIRT /*page-aligned*/void *NOTHROW(KCALL vpage_alloc_nx)(size_t num_pages, size_t alignment_in_pages, gfp_t flags);
-//TODO:FUNDEF WUNUSED ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__SIZEOF_PAGE__) VIRT /*page-aligned*/void *(KCALL vpage_realloc)(VIRT /*page-aligned*/void *old_base, size_t old_pages, size_t new_pages, size_t alignment_in_pages, gfp_t alloc_flags, gfp_t free_flags);
-//TODO:FUNDEF WUNUSED ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__SIZEOF_PAGE__) VIRT /*page-aligned*/void *NOTHROW(KCALL vpage_realloc_nx)(VIRT /*page-aligned*/void *old_base, size_t old_pages, size_t new_pages, size_t alignment_in_pages, gfp_t alloc_flags, gfp_t free_flags);
-//TODO:FUNDEF NOBLOCK void NOTHROW(KCALL vpage_free)(VIRT /*page-aligned*/void *base, size_t num_pages);
-//TODO:FUNDEF NOBLOCK void NOTHROW(KCALL vpage_ffree)(VIRT /*page-aligned*/void *base, size_t num_pages, gfp_t flags);
+//TODO:FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__SIZEOF_PAGE__) VIRT /*page-aligned*/ void *(KCALL vpage_alloc)(size_t num_pages, size_t alignment_in_pages, gfp_t flags);
+//TODO:FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__SIZEOF_PAGE__) VIRT /*page-aligned*/ void *NOTHROW(KCALL vpage_alloc_nx)(size_t num_pages, size_t alignment_in_pages, gfp_t flags);
+//TODO:FUNDEF WUNUSED ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__SIZEOF_PAGE__) VIRT /*page-aligned*/ void *(KCALL vpage_realloc)(VIRT /*page-aligned*/ void *old_base, size_t old_pages, size_t new_pages, size_t alignment_in_pages, gfp_t alloc_flags, gfp_t free_flags);
+//TODO:FUNDEF WUNUSED ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__SIZEOF_PAGE__) VIRT /*page-aligned*/ void *NOTHROW(KCALL vpage_realloc_nx)(VIRT /*page-aligned*/ void *old_base, size_t old_pages, size_t new_pages, size_t alignment_in_pages, gfp_t alloc_flags, gfp_t free_flags);
+//TODO:FUNDEF NOBLOCK void NOTHROW(KCALL vpage_free)(VIRT /*page-aligned*/ void *base, size_t num_pages);
+//TODO:FUNDEF NOBLOCK void NOTHROW(KCALL vpage_ffree)(VIRT /*page-aligned*/ void *base, size_t num_pages, gfp_t flags);
 
 DECL_END
 

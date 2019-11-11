@@ -86,7 +86,7 @@ typedef __pwformatprinter pwformatprinter;
 @@Format-printer implementation for printing to a string buffer like `wsprintf' would
 @@WARNING: No trailing NUL-character is implicitly appended
 [wchar]
-format_wsprintf_printer:([nonnull] /*wchar_t ***/void *arg,
+format_wsprintf_printer:([nonnull] /*wchar_t ***/ void *arg,
                          [nonnull] wchar_t const *__restrict data, $size_t datalen) -> $ssize_t
 	%{copy(format_sprintf_printer, str2wcs)}
 
@@ -112,7 +112,7 @@ struct format_wsnprintf_data {
 @@NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
 @@NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()'
 [wchar][dependency_include(<hybrid/typecore.h>)]
-format_wsnprintf_printer:([nonnull] /*struct format_wsnprintf_data**/void *arg,
+format_wsnprintf_printer:([nonnull] /*struct format_wsnprintf_data**/ void *arg,
                           [nonnull] wchar_t const *__restrict data, $size_t datalen) -> $ssize_t
 	%{copy(format_snprintf_printer, str2wcs)}
 
@@ -268,7 +268,7 @@ format_waprintf_pack:([nonnull] struct format_waprintf_data *__restrict self,
 @@Print data to a dynamically allocated heap buffer. On error, -1 is returned
 [requires($has_function(realloc))][same_impl][user][wchar]
 [dependency_include(<hybrid/__assert.h>)][ATTR_WUNUSED]
-format_waprintf_printer:([nonnull] /*struct format_waprintf_data **/void *arg,
+format_waprintf_printer:([nonnull] /*struct format_waprintf_data **/ void *arg,
                          [nonnull] wchar_t const *__restrict data, $size_t datalen) -> $ssize_t
 	%{copy(format_aprintf_printer, str2wcs)}
 

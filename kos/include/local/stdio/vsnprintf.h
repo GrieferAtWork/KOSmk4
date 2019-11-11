@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a05b443 */
+/* HASH CRC-32:0xf580b23b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -221,7 +221,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0),__SSIZE_TYPE__,,__lo
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_snprintf_printer,(/*struct format_snprintf_data**/void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),format_snprintf_printer,(__arg,__data,__datalen))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_snprintf_printer,(/*struct format_snprintf_data**/ void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),format_snprintf_printer,(__arg,__data,__datalen))
 #else /* LIBC: format_snprintf_printer */
 #include <local/format-printer/format_snprintf_printer.h>
 /* Format-printer implementation for printing to a string buffer like `snprintf' would

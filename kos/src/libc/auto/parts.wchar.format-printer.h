@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5468113c */
+/* HASH CRC-32:0xc9dec889 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -439,20 +439,20 @@ INTDEF NONNULL((1, 3)) ATTR_LIBC_PRINTF(3, 4) ssize_t NOTHROW_NCX(VLIBCCALL libc
 INTDEF NONNULL((1, 3)) ATTR_LIBC_PRINTF(3, 4) ssize_t NOTHROW_NCX(VLIBDCALL libd_format_wprintf)(pc16formatprinter printer, void *arg, char16_t const *__restrict format, ...);
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_wsprintf_printer)(/*wchar_t ***/void *arg, char32_t const *__restrict data, size_t datalen);
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_wsprintf_printer)(/*wchar_t ***/ void *arg, char32_t const *__restrict data, size_t datalen);
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_wsprintf_printer)(/*wchar_t ***/void *arg, char16_t const *__restrict data, size_t datalen);
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_wsprintf_printer)(/*wchar_t ***/ void *arg, char16_t const *__restrict data, size_t datalen);
 /* Format-printer implementation for printing to a string buffer like `wsnprintf' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_wsnprintf_printer)(/*struct format_wsnprintf_data**/void *arg, char32_t const *__restrict data, size_t datalen);
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_wsnprintf_printer)(/*struct format_wsnprintf_data**/ void *arg, char32_t const *__restrict data, size_t datalen);
 /* Format-printer implementation for printing to a string buffer like `wsnprintf' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(/*struct format_wsnprintf_data**/void *arg, char16_t const *__restrict data, size_t datalen);
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(/*struct format_wsnprintf_data**/ void *arg, char16_t const *__restrict data, size_t datalen);
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 INTDEF NONNULL((2)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_wwidth)(void *arg, char32_t const *__restrict data, size_t datalen);
 /* Returns the width (number of characters; not bytes) of the given unicode string */

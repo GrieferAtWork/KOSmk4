@@ -126,8 +126,8 @@ NOTHROW(KCALL taskpid_destroy)(struct taskpid *__restrict self) {
  * [lock(LINKED_LIST(APPEND(ATOMIC),CLEAR(THIS_TASK)))]
  * Pending signals for the calling thread. */
 PUBLIC ATTR_PERTASK struct sigqueue _this_sigqueue = {
-	/* .sq_newsig = */SIG_INIT,
-	/* .sq_queue  = */NULL
+	/* .sq_newsig = */ SIG_INIT,
+	/* .sq_queue  = */ NULL
 };
 
 
@@ -601,8 +601,8 @@ again_lock_proc_threads_lock:
  * @return: * : One of `TASK_SETPROCESSGROUPLEADER_*' */
 PUBLIC NONNULL((1, 2)) unsigned int KCALL
 task_setprocessgroupleader(struct task *thread, struct task *leader,
-                           /*OUT,OPT*/REF struct task **pold_group_leader,
-                           /*OUT,OPT*/REF struct task **pnew_group_leader)
+                           /*OUT,OPT*/ REF struct task **pold_group_leader,
+                           /*OUT,OPT*/ REF struct task **pnew_group_leader)
 		THROWS(E_WOULDBLOCK) {
 #ifdef __INTELLISENSE__
 	struct taskgroup &thread_taskgroup = FORTASK(thread, _this_taskgroup);
@@ -797,9 +797,9 @@ again_set_existing:
  * @return: * : One of `TASK_SETSESSIONLEADER_*' */
 PUBLIC NONNULL((1, 2)) unsigned int KCALL
 task_setsessionleader(struct task *thread, struct task *leader,
-                      /*OUT,OPT*/REF struct task **pold_group_leader,
-                      /*OUT,OPT*/REF struct task **pold_session_leader,
-                      /*OUT,OPT*/REF struct task **pnew_session_leader)
+                      /*OUT,OPT*/ REF struct task **pold_group_leader,
+                      /*OUT,OPT*/ REF struct task **pold_session_leader,
+                      /*OUT,OPT*/ REF struct task **pnew_session_leader)
                       THROWS(E_WOULDBLOCK) {
 	REF struct task *new_session_leader;
 #ifdef __INTELLISENSE__

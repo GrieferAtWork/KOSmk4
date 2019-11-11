@@ -155,12 +155,12 @@ NOTHROW(KCALL cpu_broadcastipi_notthis)(cpu_ipi_t func, void *args[CPU_IPI_ARGCO
  * NOTE: These functions inherit a reference to `thread' from the caller!
  * NOTE: Preemption must be disabled before this function may be called! */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL cpu_addrunningtask)(/*in*/REF struct task *__restrict thread) {
+NOTHROW(FCALL cpu_addrunningtask)(/*in*/ REF struct task *__restrict thread) {
 	struct cpu *me = thread->t_cpu;
 	assert(!PREEMPTION_ENABLED());
 	assert(me == THIS_CPU);
 	assert(thread->t_flags & TASK_FRUNNING);
-	cpu_assert_integrity(/*ignored_thread:*/thread);
+	cpu_assert_integrity(/*ignored_thread:*/ thread);
 	/* Schedule for execution after the current thread. */
 	thread->t_sched.s_running.sr_runprv                              = me->c_current;
 	thread->t_sched.s_running.sr_runnxt                              = me->c_current->t_sched.s_running.sr_runnxt;
@@ -170,13 +170,13 @@ NOTHROW(FCALL cpu_addrunningtask)(/*in*/REF struct task *__restrict thread) {
 }
 
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL cpu_addsleepingtask)(/*in*/REF struct task *__restrict thread) {
+NOTHROW(FCALL cpu_addsleepingtask)(/*in*/ REF struct task *__restrict thread) {
 	struct cpu *me = thread->t_cpu;
 	struct task **pnext, *next;
 	assert(!PREEMPTION_ENABLED());
 	assert(me == THIS_CPU);
 	assert(!(thread->t_flags & TASK_FRUNNING));
-	cpu_assert_integrity(/*ignored_thread:*/thread);
+	cpu_assert_integrity(/*ignored_thread:*/ thread);
 	/* Schedule for execution after the current thread. */
 	pnext = &me->c_sleeping;
 	while ((next = *pnext) != NULL) {
@@ -197,7 +197,7 @@ NOTHROW(FCALL cpu_addsleepingtask)(/*in*/REF struct task *__restrict thread) {
  * NOTE: This function returns with a reference to `thread' handed to the caller.
  * NOTE: Preemption must be disabled before this function may be called! */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL cpu_delrunningtask)(/*out*/REF struct task *__restrict thread) {
+NOTHROW(FCALL cpu_delrunningtask)(/*out*/ REF struct task *__restrict thread) {
 	struct cpu *me = thread->t_cpu;
 	assert(!PREEMPTION_ENABLED());
 	assert(me == THIS_CPU);
@@ -242,7 +242,7 @@ done:
 }
 
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL cpu_delsleepingtask)(/*out*/REF struct task *__restrict thread) {
+NOTHROW(FCALL cpu_delsleepingtask)(/*out*/ REF struct task *__restrict thread) {
 	struct cpu *me = thread->t_cpu;
 	assert(!PREEMPTION_ENABLED());
 	assert(me == THIS_CPU);
@@ -736,7 +736,7 @@ yield_and_return:
 	FORCPU(me, _this_idle).t_sched.s_asleep.ss_pself           = NULL;
 	FORCPU(me, _this_idle).t_sched.s_asleep.ss_tmonxt          = NULL;
 	FORCPU(me, _this_idle).t_sched.s_asleep.ss_timeout.q_jtime = (jtime_t)-1;
-	cpu_assert_integrity(/*ignored_thread:*/THIS_TASK);
+	cpu_assert_integrity(/*ignored_thread:*/ THIS_TASK);
 	/* Switch context to the next task. */
 	cpu_run_current_and_remember(&FORCPU(me, _this_idle));
 	assert(FORCPU(me, _this_idle).t_flags & TASK_FRUNNING);

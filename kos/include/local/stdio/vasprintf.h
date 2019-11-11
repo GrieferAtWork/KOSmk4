@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x583a1d50 */
+/* HASH CRC-32:0x6077ae30 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -291,7 +291,7 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONN
 #define ____localdep_format_aprintf_printer_defined 1
 #ifdef __CRT_HAVE_format_aprintf_printer
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_aprintf_printer,(/*struct format_aprintf_data **/void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),format_aprintf_printer,(__arg,__data,__datalen))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_aprintf_printer,(/*struct format_aprintf_data **/ void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),format_aprintf_printer,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_realloc)
 #include <local/format-printer/format_aprintf_printer.h>
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */

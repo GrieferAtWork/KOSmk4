@@ -226,12 +226,12 @@ FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_unprepare_map)(VIRT vm_vpage_t virt_pa
  *   - Memory mappings defined in `vm_kernel' to be non-blocking have their
  *     mapping hint set to the address of the associated `struct vm_node' */
 #ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_MAPHINT
-FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_maphintone)(VIRT vm_vpage_t virt_page, VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/void *hint);
+FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_maphintone)(VIRT vm_vpage_t virt_page, VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint);
 #ifndef __OMIT_PAGING_CONSTANT_P_WRAPPERS
-FUNDEF NOBLOCK void NOTHROW(FCALL __os_pagedir_maphint)(VIRT vm_vpage_t virt_page, size_t num_pages, VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/void *hint) ASMNAME("pagedir_maphint");
+FUNDEF NOBLOCK void NOTHROW(FCALL __os_pagedir_maphint)(VIRT vm_vpage_t virt_page, size_t num_pages, VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint) ASMNAME("pagedir_maphint");
 FORCELOCAL NOBLOCK void
 NOTHROW(FCALL pagedir_maphint)(VIRT vm_vpage_t virt_page, size_t num_pages,
-                                VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/void *hint) {
+                                VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint) {
 	if (__builtin_constant_p(num_pages)) {
 		if (num_pages == 1) {
 			pagedir_maphintone(virt_page, hint);
@@ -243,7 +243,7 @@ NOTHROW(FCALL pagedir_maphint)(VIRT vm_vpage_t virt_page, size_t num_pages,
 	__os_pagedir_maphint(virt_page, num_pages, hint);
 }
 #else
-FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_maphint)(VIRT vm_vpage_t virt_page, size_t num_pages, VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/void *hint);
+FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_maphint)(VIRT vm_vpage_t virt_page, size_t num_pages, VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint);
 #endif
 #endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_MAPHINT */
 
@@ -462,7 +462,7 @@ __FORCELOCAL ATTR_CONST __pagedir_p_selftype KCALL __pagedir_p_selfofvm(struct v
  * NOTE: The caller is responsible for synchronization. */
 FUNDEF NOBLOCK WUNUSED __BOOL NOTHROW(KCALL pagedir_prepare_mapone_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t virt_page);
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unprepare_mapone_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t virt_page);
-FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_maphintone_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t virt_page, VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/void *hint);
+FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_maphintone_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t virt_page, VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint);
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_mapone_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t virt_page, PHYS vm_ppage_t phys_page, u16 perm);
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unmapone_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t virt_page);
 #ifdef CONFIG_HAVE_PAGEDIR_UNWRITE
@@ -480,7 +480,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unsetchanged_p)(PAGEDIR_P_SELFTYPE sel
 #ifndef __OMIT_PAGING_CONSTANT_P_WRAPPERS
 FUNDEF NOBLOCK WUNUSED __BOOL NOTHROW(KCALL __os_pagedir_prepare_map_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t virt_page, size_t num_pages) ASMNAME("pagedir_prepare_map_p");
 FUNDEF NOBLOCK void NOTHROW(KCALL __os_pagedir_unprepare_map_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t virt_page, size_t num_pages) ASMNAME("pagedir_unprepare_map_p");
-FUNDEF NOBLOCK void NOTHROW(KCALL __os_pagedir_maphint_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t virt_page, size_t num_pages, VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/void *hint) ASMNAME("pagedir_maphint_p");
+FUNDEF NOBLOCK void NOTHROW(KCALL __os_pagedir_maphint_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t virt_page, size_t num_pages, VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint) ASMNAME("pagedir_maphint_p");
 FUNDEF NOBLOCK void NOTHROW(KCALL __os_pagedir_map_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t virt_page, size_t num_pages, PHYS vm_ppage_t phys_page, u16 perm) ASMNAME("pagedir_map_p");
 FUNDEF NOBLOCK void NOTHROW(KCALL __os_pagedir_unmap_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t virt_page, size_t num_pages) ASMNAME("pagedir_unmap_p");
 #ifdef CONFIG_HAVE_PAGEDIR_UNWRITE
@@ -513,7 +513,7 @@ NOTHROW(KCALL pagedir_unprepare_map_p)(PAGEDIR_P_SELFTYPE self,
 FORCELOCAL NOBLOCK void
 NOTHROW(KCALL pagedir_maphint_p)(PAGEDIR_P_SELFTYPE self,
                                  VIRT vm_vpage_t virt_page, size_t num_pages,
-                                 VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/void *hint) {
+                                 VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint) {
 	if (__builtin_constant_p(num_pages)) {
 		if (num_pages == 1) {
 			pagedir_maphintone_p(self, virt_page, hint);
@@ -569,7 +569,7 @@ NOTHROW(KCALL pagedir_unwrite_p)(PAGEDIR_P_SELFTYPE self,
 #else
 FUNDEF NOBLOCK WUNUSED __BOOL NOTHROW(KCALL pagedir_prepare_map_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t virt_page, size_t num_pages);
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unprepare_map_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t virt_page, size_t num_pages);
-FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_maphint_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t virt_page, size_t num_pages, VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/void *hint);
+FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_maphint_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t virt_page, size_t num_pages, VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint);
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_map_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t virt_page, size_t num_pages, PHYS vm_ppage_t phys_page, u16 perm);
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unmap_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t virt_page, size_t num_pages);
 #ifdef CONFIG_HAVE_PAGEDIR_UNWRITE

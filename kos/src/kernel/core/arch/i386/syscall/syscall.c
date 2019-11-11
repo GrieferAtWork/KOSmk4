@@ -1415,15 +1415,15 @@ DATDEF struct extended_syscalls_argc_info const x86_exsyscall_register_count_s A
 #define __BEGIN_SYSCALLS_EXTENDED(min,max,cnt)    PUBLIC_CONST struct extended_syscalls_argc_info const x86_exsyscall_register_count_s = {
 #define __END_SYSCALLS_EXTENDED(min,max,cnt)      };
 #ifdef __x86_64__
-#define __SYSCALL(name)                                              /* .argc_##name  = */__NRAC_##name,
+#define __SYSCALL(name)                                              /* .argc_##name  = */ __NRAC_##name,
 #else /* __x86_64__ */
 #define IS_DOUBLE_WIDE(name)   IS_DEFINED(__NRDW386_##name)
-#define __SYSCALL(name)                                              /* .argc_##name  = */__NRAC386_##name | (IS_DOUBLE_WIDE(name) ? 8 : 0),
+#define __SYSCALL(name)                                              /* .argc_##name  = */ __NRAC386_##name | (IS_DOUBLE_WIDE(name) ? 8 : 0),
 #endif /* !__x86_64__ */
-#define __SYSCALL_UNUSED_LEADING(sysno,index)                        /* .argc_##sysno = */0,
-#define __SYSCALL_UNUSED(sysno,index,index_without_leading)          /* .argc_##sysno = */0,
+#define __SYSCALL_UNUSED_LEADING(sysno,index)                        /* .argc_##sysno = */ 0,
+#define __SYSCALL_UNUSED(sysno,index,index_without_leading)          /* .argc_##sysno = */ 0,
 #define __SYSCALL_EXTENDED_UNUSED_LEADING(sysno,index)               /* nothing */
-#define __SYSCALL_EXTENDED_UNUSED(sysno,index,index_without_leading) /* .argc_##sysno = */0,
+#define __SYSCALL_EXTENDED_UNUSED(sysno,index,index_without_leading) /* .argc_##sysno = */ 0,
 #include <asm/ls_syscalls.h>
 #undef __SYSCALL_EXTENDED_UNUSED
 #undef __SYSCALL_EXTENDED_UNUSED_LEADING
@@ -1463,11 +1463,11 @@ DATDEF struct extended_syscalls_restart_info const x86_exsyscall_restart_mode_s 
 #define __END_SYSCALLS(min,max,cnt)               };
 #define __BEGIN_SYSCALLS_EXTENDED(min,max,cnt)    PUBLIC_CONST struct extended_syscalls_restart_info const x86_exsyscall_restart_mode_s = {
 #define __END_SYSCALLS_EXTENDED(min,max,cnt)      };
-#define __SYSCALL(name)                                              /* .rm_##name  = */__NRRM_##name,
-#define __SYSCALL_UNUSED_LEADING(sysno,index)                        /* .rm_unused_##sysno = */SYSCALL_RESTART_MODE_AUTO,
-#define __SYSCALL_UNUSED(sysno,index,index_without_leading)          /* .rm_unused_##sysno = */SYSCALL_RESTART_MODE_AUTO,
+#define __SYSCALL(name)                                              /* .rm_##name  = */ __NRRM_##name,
+#define __SYSCALL_UNUSED_LEADING(sysno,index)                        /* .rm_unused_##sysno = */ SYSCALL_RESTART_MODE_AUTO,
+#define __SYSCALL_UNUSED(sysno,index,index_without_leading)          /* .rm_unused_##sysno = */ SYSCALL_RESTART_MODE_AUTO,
 #define __SYSCALL_EXTENDED_UNUSED_LEADING(sysno,index)               /* nothing */
-#define __SYSCALL_EXTENDED_UNUSED(sysno,index,index_without_leading) /* .rm_unused_##sysno = */SYSCALL_RESTART_MODE_AUTO,
+#define __SYSCALL_EXTENDED_UNUSED(sysno,index,index_without_leading) /* .rm_unused_##sysno = */ SYSCALL_RESTART_MODE_AUTO,
 #include <asm/ls_syscalls.h>
 #undef __SYSCALL_EXTENDED_UNUSED
 #undef __SYSCALL_EXTENDED_UNUSED_LEADING
@@ -1506,11 +1506,11 @@ DATDEF struct extended_syscalls_is_cancellation_point_info const x86_exsyscall_i
 #define __END_SYSCALLS(min,max,cnt)               };
 #define __BEGIN_SYSCALLS_EXTENDED(min,max,cnt)    PUBLIC_CONST struct extended_syscalls_is_cancellation_point_info const x86_exsyscall_is_cancellation_point_s = {
 #define __END_SYSCALLS_EXTENDED(min,max,cnt)      };
-#define __SYSCALL(name)                                              /* .icp_##name  = */__NRCP_##name,
-#define __SYSCALL_UNUSED_LEADING(sysno,index)                        /* .icp_unused_##sysno = */1,
-#define __SYSCALL_UNUSED(sysno,index,index_without_leading)          /* .icp_unused_##sysno = */1,
+#define __SYSCALL(name)                                              /* .icp_##name  = */ __NRCP_##name,
+#define __SYSCALL_UNUSED_LEADING(sysno,index)                        /* .icp_unused_##sysno = */ 1,
+#define __SYSCALL_UNUSED(sysno,index,index_without_leading)          /* .icp_unused_##sysno = */ 1,
 #define __SYSCALL_EXTENDED_UNUSED_LEADING(sysno,index)               /* nothing */
-#define __SYSCALL_EXTENDED_UNUSED(sysno,index,index_without_leading) /* .icp_unused_##sysno = */1,
+#define __SYSCALL_EXTENDED_UNUSED(sysno,index,index_without_leading) /* .icp_unused_##sysno = */ 1,
 #include <asm/ls_syscalls.h>
 #undef __SYSCALL_EXTENDED_UNUSED
 #undef __SYSCALL_EXTENDED_UNUSED_LEADING
@@ -1558,11 +1558,11 @@ DATDEF struct extended_syscalls32_argc_info const x86_exsyscall32_register_count
 #define __BEGIN_SYSCALLS_EXTENDED(min,max,cnt) PUBLIC_CONST struct extended_syscalls32_argc_info const x86_exsyscall32_register_count_s = {
 #define __END_SYSCALLS_EXTENDED(min,max,cnt)   };
 #define IS_DOUBLE_WIDE_386(name)   IS_DEFINED(__NR32AC386_##name)
-#define __SYSCALL(name)                                              /* .argc_##name  = */__NR32AC386_##name | (IS_DOUBLE_WIDE_386(name) ? 8 : 0),
-#define __SYSCALL_UNUSED_LEADING(sysno,index)                        /* .argc_##sysno = */0,
-#define __SYSCALL_UNUSED(sysno,index,index_without_leading)          /* .argc_##sysno = */0,
+#define __SYSCALL(name)                                              /* .argc_##name  = */ __NR32AC386_##name | (IS_DOUBLE_WIDE_386(name) ? 8 : 0),
+#define __SYSCALL_UNUSED_LEADING(sysno,index)                        /* .argc_##sysno = */ 0,
+#define __SYSCALL_UNUSED(sysno,index,index_without_leading)          /* .argc_##sysno = */ 0,
 #define __SYSCALL_EXTENDED_UNUSED_LEADING(sysno,index)               /* nothing */
-#define __SYSCALL_EXTENDED_UNUSED(sysno,index,index_without_leading) /* .argc_##sysno = */0,
+#define __SYSCALL_EXTENDED_UNUSED(sysno,index,index_without_leading) /* .argc_##sysno = */ 0,
 #include <asm/ls_syscalls32.inl>
 #undef __SYSCALL_EXTENDED_UNUSED
 #undef __SYSCALL_EXTENDED_UNUSED_LEADING
@@ -1603,11 +1603,11 @@ DATDEF struct extended_syscalls32_restart_info const x86_exsyscall32_restart_mod
 #define __END_SYSCALLS(min,max,cnt)               };
 #define __BEGIN_SYSCALLS_EXTENDED(min,max,cnt)    PUBLIC_CONST struct extended_syscalls32_restart_info const x86_exsyscall32_restart_mode_s = {
 #define __END_SYSCALLS_EXTENDED(min,max,cnt)      };
-#define __SYSCALL(name)                                              /* .rm_##name  = */__NR32RM_##name,
-#define __SYSCALL_UNUSED_LEADING(sysno,index)                        /* .rm_unused_##sysno = */SYSCALL_RESTART_MODE_AUTO,
-#define __SYSCALL_UNUSED(sysno,index,index_without_leading)          /* .rm_unused_##sysno = */SYSCALL_RESTART_MODE_AUTO,
+#define __SYSCALL(name)                                              /* .rm_##name  = */ __NR32RM_##name,
+#define __SYSCALL_UNUSED_LEADING(sysno,index)                        /* .rm_unused_##sysno = */ SYSCALL_RESTART_MODE_AUTO,
+#define __SYSCALL_UNUSED(sysno,index,index_without_leading)          /* .rm_unused_##sysno = */ SYSCALL_RESTART_MODE_AUTO,
 #define __SYSCALL_EXTENDED_UNUSED_LEADING(sysno,index)               /* nothing */
-#define __SYSCALL_EXTENDED_UNUSED(sysno,index,index_without_leading) /* .rm_unused_##sysno = */SYSCALL_RESTART_MODE_AUTO,
+#define __SYSCALL_EXTENDED_UNUSED(sysno,index,index_without_leading) /* .rm_unused_##sysno = */ SYSCALL_RESTART_MODE_AUTO,
 #include <asm/ls_syscalls32.inl>
 #undef __SYSCALL_EXTENDED_UNUSED
 #undef __SYSCALL_EXTENDED_UNUSED_LEADING
@@ -1646,11 +1646,11 @@ DATDEF struct extended_syscalls32_is_cancellation_point_info const x86_exsyscall
 #define __END_SYSCALLS(min,max,cnt)               };
 #define __BEGIN_SYSCALLS_EXTENDED(min,max,cnt)    PUBLIC_CONST struct extended_syscalls32_is_cancellation_point_info const x86_exsyscall32_is_cancellation_point_s = {
 #define __END_SYSCALLS_EXTENDED(min,max,cnt)      };
-#define __SYSCALL(name)                                              /* .icp_##name  = */__NR32CP_##name,
-#define __SYSCALL_UNUSED_LEADING(sysno,index)                        /* .icp_unused_##sysno = */1,
-#define __SYSCALL_UNUSED(sysno,index,index_without_leading)          /* .icp_unused_##sysno = */1,
+#define __SYSCALL(name)                                              /* .icp_##name  = */ __NR32CP_##name,
+#define __SYSCALL_UNUSED_LEADING(sysno,index)                        /* .icp_unused_##sysno = */ 1,
+#define __SYSCALL_UNUSED(sysno,index,index_without_leading)          /* .icp_unused_##sysno = */ 1,
 #define __SYSCALL_EXTENDED_UNUSED_LEADING(sysno,index)               /* nothing */
-#define __SYSCALL_EXTENDED_UNUSED(sysno,index,index_without_leading) /* .icp_unused_##sysno = */1,
+#define __SYSCALL_EXTENDED_UNUSED(sysno,index,index_without_leading) /* .icp_unused_##sysno = */ 1,
 #include <asm/ls_syscalls32.inl>
 #undef __SYSCALL_EXTENDED_UNUSED
 #undef __SYSCALL_EXTENDED_UNUSED_LEADING

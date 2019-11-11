@@ -69,13 +69,13 @@ STATIC_ASSERT(offsetof(struct exception_info, ei_data.e_pointers) == OFFSET_EXCE
 
 
 INTERN ATTR_THREAD struct exception_info my_exception_info = {
-	/* .ei_state = */{},
+	/* .ei_state = */ {},
 #if EXCEPT_BACKTRACE_SIZE != 0
-	/* .ei_trace = */{},
+	/* .ei_trace = */ {},
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	/* .ei_flags = */EXCEPT_FNORMAL,
+	/* .ei_flags = */ EXCEPT_FNORMAL,
 	{
-		/* .ei_code = */E_OK
+		/* .ei_code = */ E_OK
 	}
 };
 

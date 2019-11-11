@@ -104,7 +104,7 @@ ATOMIC_REF(struct isr_vector_state) isr_vectors[ISR_COUNT] = {
 };
 
 LOCAL bool KCALL
-isr_try_register_at_impl(/*inherit(on_success)*/REF struct driver *__restrict func_driver,
+isr_try_register_at_impl(/*inherit(on_success)*/ REF struct driver *__restrict func_driver,
                          struct isr_vector_state *__restrict old_state, size_t index,
                          void *func, void *arg, bool is_greedy)
 		THROWS(E_BADALLOC) {

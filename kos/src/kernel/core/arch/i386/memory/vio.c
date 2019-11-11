@@ -209,7 +209,7 @@ DECL_BEGIN
 		goto do_sub##w##_write; \
 	}
 #define VIO_SBB_READ(w)                                                      \
-	/*do_sbb##w##_read:*/{                                                   \
+	/*do_sbb##w##_read:*/ {                                                  \
 		TYPEFOR(w)                                                           \
 		addend;                                                              \
 		addend = FUNCFOR(vio_read, w)(&args->ma_args, vio_addr);             \
@@ -260,7 +260,7 @@ DECL_BEGIN
 
 
 FORCELOCAL ATTR_NORETURN void
-NOTHROW(KCALL cleanup_and_unwind_interrupt)(/*inherit(always)*/vio_main_args_t *__restrict args,
+NOTHROW(KCALL cleanup_and_unwind_interrupt)(/*inherit(always)*/ vio_main_args_t *__restrict args,
                                             struct icpustate *__restrict state) {
 	decref_unlikely(args->ma_args.va_block);
 	decref_unlikely(args->ma_args.va_part);
@@ -271,7 +271,7 @@ NOTHROW(KCALL cleanup_and_unwind_interrupt)(/*inherit(always)*/vio_main_args_t *
 
 
 INTERN struct icpustate *
-NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/vio_main_args_t *__restrict args,
+NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args,
                             uintptr_t cr2, uintptr_t ecode) {
 	/* Exceptions always point to the instruction _after_ the faulting one! */
 	byte_t *orig_pc, *pc;

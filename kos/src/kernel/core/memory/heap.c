@@ -180,20 +180,20 @@ NOTHROW(KCALL debug_pat_loadpart)(struct vm_datablock *__restrict UNUSED(self),
 }
 
 PUBLIC struct vm_datablock_type vm_datablock_debugheap_type = {
-	/* .dt_destroy  = */NULL,
-	/* .dt_initpart = */NULL,
-	/* .dt_loadpart = */&debug_pat_loadpart,
-	/* .dt_savepart = */NULL,
+	/* .dt_destroy  = */ NULL,
+	/* .dt_initpart = */ NULL,
+	/* .dt_loadpart = */ &debug_pat_loadpart,
+	/* .dt_savepart = */ NULL,
 };
 
 PUBLIC struct vm_datablock vm_datablock_debugheap = {
-	/* .db_refcnt = */((refcnt_t)-1)/2,
-	/* .db_lock   = */RWLOCK_INIT,
-	/* .db_type   = */&vm_datablock_debugheap_type,
+	/* .db_refcnt = */ ((refcnt_t)-1)/2,
+	/* .db_lock   = */ RWLOCK_INIT,
+	/* .db_type   = */ &vm_datablock_debugheap_type,
 #ifdef CONFIG_VIO
-	/* .db_vio    = */NULL,
+	/* .db_vio    = */ NULL,
 #endif /* CONFIG_VIO */
-	/* .db_parts  = */VM_DATABLOCK_ANONPARTS_INIT,
+	/* .db_parts  = */ VM_DATABLOCK_ANONPARTS_INIT,
 	VM_DATABLOCK_INIT_PAGEINFO(0)
 };
 
@@ -1327,14 +1327,14 @@ DECL_END
 DECL_BEGIN
 
 PUBLIC NOBLOCK void
-NOTHROW(KCALL vpage_free_untraced)(VIRT /*page-aligned*/void *base,
+NOTHROW(KCALL vpage_free_untraced)(VIRT /*page-aligned*/ void *base,
                                    size_t num_pages) {
 	assertf(IS_ALIGNED((uintptr_t)base, pagedir_pagesize()), "base = %p", base);
 	vm_unmap_kernel_ram(VM_ADDR2PAGE((vm_virt_t)base), num_pages, false);
 }
 
 PUBLIC NOBLOCK void
-NOTHROW(KCALL vpage_ffree_untraced)(VIRT /*page-aligned*/void *base,
+NOTHROW(KCALL vpage_ffree_untraced)(VIRT /*page-aligned*/ void *base,
                                     size_t num_pages, gfp_t flags) {
 	assertf(IS_ALIGNED((uintptr_t)base, pagedir_pagesize()), "base = %p", base);
 	vm_unmap_kernel_ram(VM_ADDR2PAGE((vm_virt_t)base), num_pages, !!(flags & GFP_CALLOC));

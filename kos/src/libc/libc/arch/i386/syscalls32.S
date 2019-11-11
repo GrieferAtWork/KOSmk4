@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf8c9129 */
+/* HASH CRC-32:0xbe13a742 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1820,7 +1820,7 @@ INTERN_FUNCTION(libc_sys_dup)
 END(libc_sys_dup)
 
 .section .text.crt.syscall.pipe
-/* errno_t pipe([2]fd_t *pipedes) */
+/* errno_t pipe([2] fd_t *pipedes) */
 INTERN_FUNCTION(libc_sys_pipe)
 	/* Argument count: 1 */
 	.cfi_startproc
@@ -2824,7 +2824,7 @@ END(libc_sys_settimeofday)
 
 .section .text.crt.syscall.getgroups
 /* errno_t getgroups(size_t size,
- *                   []uint16_t *list) */
+ *                   [] uint16_t *list) */
 INTERN_FUNCTION(libc_sys_getgroups)
 	/* Argument count: 2 */
 	.cfi_startproc
@@ -6189,7 +6189,7 @@ END(libc_sys_setregid32)
 
 .section .text.crt.syscall.getgroups32
 /* errno_t getgroups32(size_t size,
- *                     []uint32_t *list) */
+ *                     [] uint32_t *list) */
 INTERN_FUNCTION(libc_sys_getgroups32)
 	/* Argument count: 2 */
 	.cfi_startproc
@@ -8081,7 +8081,7 @@ END(libc_sys_tgkill)
 
 .section .text.crt.syscall.utimes
 /* errno_t utimes(char const *filename,
- *                [2]struct __timeval32 const *times) */
+ *                [2] struct __timeval32 const *times) */
 INTERN_FUNCTION(libc_sys_utimes)
 	/* Argument count: 2 */
 	.cfi_startproc
@@ -8400,7 +8400,7 @@ END(libc_sys_fchownat)
 .section .text.crt.syscall.futimesat
 /* errno_t futimesat(fd_t dirfd,
  *                   const char *filename,
- *                   [2]struct __timeval32 const *times) */
+ *                   [2] struct __timeval32 const *times) */
 INTERN_FUNCTION(libc_sys_futimesat)
 	/* Argument count: 3 */
 	.cfi_startproc
@@ -9178,7 +9178,7 @@ END(libc_sys_epoll_pwait)
 .section .text.crt.syscall.utimensat
 /* errno_t utimensat(fd_t dirfd,
  *                   char const *filename,
- *                   [2-3]struct __timespec32 const *times,
+ *                   [2-3] struct __timespec32 const *times,
  *                   atflag_t flags) */
 INTERN_FUNCTION(libc_sys_utimensat)
 	/* Argument count: 4 */
@@ -9574,7 +9574,7 @@ INTERN_FUNCTION(libc_sys_dup3)
 END(libc_sys_dup3)
 
 .section .text.crt.syscall.pipe2
-/* errno_t pipe2([2]fd_t *pipedes,
+/* errno_t pipe2([2] fd_t *pipedes,
  *               oflag_t flags) */
 INTERN_FUNCTION(libc_sys_pipe2)
 	/* Argument count: 2 */
@@ -10319,7 +10319,7 @@ END(libc_sys_socket)
 /* errno_t socketpair(syscall_ulong_t domain,
  *                    syscall_ulong_t type,
  *                    syscall_ulong_t protocol,
- *                    [2]fd_t *fds) */
+ *                    [2] fd_t *fds) */
 INTERN_FUNCTION(libc_sys_socketpair)
 	/* Argument count: 4 */
 	.cfi_startproc
@@ -13177,7 +13177,7 @@ END(libc_sys_clock_nanosleep64)
 
 .section .text.crt.syscall.utimes64
 /* errno_t utimes64(char const *filename,
- *                  [2]struct __timeval64 const *times) */
+ *                  [2] struct __timeval64 const *times) */
 INTERN_FUNCTION(libc_sys_utimes64)
 	/* Argument count: 2 */
 	.cfi_startproc
@@ -13304,7 +13304,7 @@ END(libc_sys_fmknodat)
 .section .text.crt.syscall.futimesat64
 /* errno_t futimesat64(fd_t dirfd,
  *                     const char *filename,
- *                     [2-3]struct __timeval64 const *times) */
+ *                     [2-3] struct __timeval64 const *times) */
 INTERN_FUNCTION(libc_sys_futimesat64)
 	/* Argument count: 3 */
 	.cfi_startproc
@@ -13629,7 +13629,7 @@ END(libc_sys_ppoll64)
 .section .text.crt.syscall.utimensat64
 /* errno_t utimensat64(fd_t dirfd,
  *                     char const *filename,
- *                     [2-3]struct __timespec64 const *times,
+ *                     [2-3] struct __timespec64 const *times,
  *                     atflag_t flags) */
 INTERN_FUNCTION(libc_sys_utimensat64)
 	/* Argument count: 4 */
@@ -15154,7 +15154,7 @@ INTERN_FUNCTION(libc_sys_Xdup)
 END(libc_sys_Xdup)
 
 .section .text.crt.syscall.Xpipe
-/* errno_t pipe([2]fd_t *pipedes) */
+/* errno_t pipe([2] fd_t *pipedes) */
 INTERN_FUNCTION(libc_sys_Xpipe)
 	/* Argument count: 1 */
 	.cfi_startproc
@@ -16158,7 +16158,7 @@ END(libc_sys_Xsettimeofday)
 
 .section .text.crt.syscall.Xgetgroups
 /* errno_t getgroups(size_t size,
- *                   []uint16_t *list) */
+ *                   [] uint16_t *list) */
 INTERN_FUNCTION(libc_sys_Xgetgroups)
 	/* Argument count: 2 */
 	.cfi_startproc
@@ -19463,7 +19463,7 @@ END(libc_sys_Xsetregid32)
 
 .section .text.crt.syscall.Xgetgroups32
 /* errno_t getgroups32(size_t size,
- *                     []uint32_t *list) */
+ *                     [] uint32_t *list) */
 INTERN_FUNCTION(libc_sys_Xgetgroups32)
 	/* Argument count: 2 */
 	.cfi_startproc
@@ -21355,7 +21355,7 @@ END(libc_sys_Xtgkill)
 
 .section .text.crt.syscall.Xutimes
 /* errno_t utimes(char const *filename,
- *                [2]struct __timeval32 const *times) */
+ *                [2] struct __timeval32 const *times) */
 INTERN_FUNCTION(libc_sys_Xutimes)
 	/* Argument count: 2 */
 	.cfi_startproc
@@ -21674,7 +21674,7 @@ END(libc_sys_Xfchownat)
 .section .text.crt.syscall.Xfutimesat
 /* errno_t futimesat(fd_t dirfd,
  *                   const char *filename,
- *                   [2]struct __timeval32 const *times) */
+ *                   [2] struct __timeval32 const *times) */
 INTERN_FUNCTION(libc_sys_Xfutimesat)
 	/* Argument count: 3 */
 	.cfi_startproc
@@ -22452,7 +22452,7 @@ END(libc_sys_Xepoll_pwait)
 .section .text.crt.syscall.Xutimensat
 /* errno_t utimensat(fd_t dirfd,
  *                   char const *filename,
- *                   [2-3]struct __timespec32 const *times,
+ *                   [2-3] struct __timespec32 const *times,
  *                   atflag_t flags) */
 INTERN_FUNCTION(libc_sys_Xutimensat)
 	/* Argument count: 4 */
@@ -22848,7 +22848,7 @@ INTERN_FUNCTION(libc_sys_Xdup3)
 END(libc_sys_Xdup3)
 
 .section .text.crt.syscall.Xpipe2
-/* errno_t pipe2([2]fd_t *pipedes,
+/* errno_t pipe2([2] fd_t *pipedes,
  *               oflag_t flags) */
 INTERN_FUNCTION(libc_sys_Xpipe2)
 	/* Argument count: 2 */
@@ -23593,7 +23593,7 @@ END(libc_sys_Xsocket)
 /* errno_t socketpair(syscall_ulong_t domain,
  *                    syscall_ulong_t type,
  *                    syscall_ulong_t protocol,
- *                    [2]fd_t *fds) */
+ *                    [2] fd_t *fds) */
 INTERN_FUNCTION(libc_sys_Xsocketpair)
 	/* Argument count: 4 */
 	.cfi_startproc
@@ -26451,7 +26451,7 @@ END(libc_sys_Xclock_nanosleep64)
 
 .section .text.crt.syscall.Xutimes64
 /* errno_t utimes64(char const *filename,
- *                  [2]struct __timeval64 const *times) */
+ *                  [2] struct __timeval64 const *times) */
 INTERN_FUNCTION(libc_sys_Xutimes64)
 	/* Argument count: 2 */
 	.cfi_startproc
@@ -26578,7 +26578,7 @@ END(libc_sys_Xfmknodat)
 .section .text.crt.syscall.Xfutimesat64
 /* errno_t futimesat64(fd_t dirfd,
  *                     const char *filename,
- *                     [2-3]struct __timeval64 const *times) */
+ *                     [2-3] struct __timeval64 const *times) */
 INTERN_FUNCTION(libc_sys_Xfutimesat64)
 	/* Argument count: 3 */
 	.cfi_startproc
@@ -26903,7 +26903,7 @@ END(libc_sys_Xppoll64)
 .section .text.crt.syscall.Xutimensat64
 /* errno_t utimensat64(fd_t dirfd,
  *                     char const *filename,
- *                     [2-3]struct __timespec64 const *times,
+ *                     [2-3] struct __timespec64 const *times,
  *                     atflag_t flags) */
 INTERN_FUNCTION(libc_sys_Xutimensat64)
 	/* Argument count: 4 */

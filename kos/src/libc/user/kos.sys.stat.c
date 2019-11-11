@@ -32,10 +32,10 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:FUtimens,hash:CRC-32=0x9d6dc5e6]]]*/
+/*[[[head:FUtimens,hash:CRC-32=0xd2903bd5]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify_time.FUtimens") void
 (LIBCCALL libc_FUtimens)(fd_t fd,
-                         struct timespec const times[2/*or:3*/])
+                         struct timespec const times[2 /*or:3*/])
 		__THROWS(...)
 /*[[[body:FUtimens]]]*/
 {
@@ -43,13 +43,13 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify_time.FUtimens") void
 }
 /*[[[end:FUtimens]]]*/
 
-/*[[[head:FUtimens64,hash:CRC-32=0x659eb8a1]]]*/
+/*[[[head:FUtimens64,hash:CRC-32=0x3ad01c9b]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_FUtimens64, libc_FUtimens);
 #else
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify_time.FUtimens64") void
 (LIBCCALL libc_FUtimens64)(fd_t fd,
-                           struct timespec64 const times[2/*or:3*/])
+                           struct timespec64 const times[2 /*or:3*/])
 		__THROWS(...)
 /*[[[body:FUtimens64]]]*/
 {

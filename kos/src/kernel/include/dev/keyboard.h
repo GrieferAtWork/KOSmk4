@@ -96,7 +96,7 @@ struct keyboard_device
 	struct atomic_rwlock       kd_map_lock;     /* Lock for `kd_map' */
 	struct keymap              kd_map;          /* [lock(kd_maplock)][owned(kfree(.km_ext))] Keyboard key translation map. */
 	size_t                     kd_map_extsiz;   /* [lock(kd_maplock)] Size (in bytes) of `kd_map::km_ext' */
-	/*utf-8*/char              kd_map_pend[32]; /* [lock(kd_maplock)] List of pending utf-8 characters (terminated by a NUL-character; empty if `kd_map_pend[0] == NUL') */
+	/*utf-8*/ char              kd_map_pend[32]; /* [lock(kd_maplock)] List of pending utf-8 characters (terminated by a NUL-character; empty if `kd_map_pend[0] == NUL') */
 	uintptr_t                  kd_mods;         /* [lock(kd_maplock)] Currently active keyboard modifiers (Set of `KEYMOD_*'). */
 	struct mutex               kd_leds_lock;    /* Lock for updating `kd_leds' */
 	uintptr_t                  kd_leds;         /* [lock(kd_leds)] Set of currently lit LEDs (when modified, `ko_setled' must be called). */

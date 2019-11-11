@@ -40,15 +40,15 @@ __DECL_BEGIN
 
 /* Register accessor callbacks for a variety of known cpu context structures. */
 #ifndef __KERNEL__
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_UCONTEXT)(/*struct ucontext*/void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_UCONTEXT)(/*struct ucontext*/void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_MCONTEXT)(/*struct mcontext*/void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_MCONTEXT)(/*struct mcontext*/void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_UCONTEXT)(/*struct ucontext*/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_UCONTEXT)(/*struct ucontext*/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_MCONTEXT)(/*struct mcontext*/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_MCONTEXT)(/*struct mcontext*/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucontext)(/*struct ucontext*/void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucontext)(/*struct ucontext*/void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_mcontext)(/*struct mcontext*/void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_mcontext)(/*struct mcontext*/void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucontext)(/*struct ucontext*/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucontext)(/*struct ucontext*/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_mcontext)(/*struct mcontext*/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_mcontext)(/*struct mcontext*/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 #ifndef LIBUNWIND_HAVE_ERROR_REGISTER_STATE_ACCESSORS

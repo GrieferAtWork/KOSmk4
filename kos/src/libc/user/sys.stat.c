@@ -693,13 +693,13 @@ NOTHROW_RPC(LIBCCALL libc_mknodat)(fd_t dirfd,
 
 
 
-/*[[[head:utimensat,hash:CRC-32=0xffe22c80]]]*/
+/*[[[head:utimensat,hash:CRC-32=0xba1bba02]]]*/
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.utimensat") int
 NOTHROW_RPC(LIBCCALL libc_utimensat)(fd_t dirfd,
                                      char const *filename,
-                                     struct timespec const times[2/*or:3*/],
+                                     struct timespec const times[2 /*or:3*/],
                                      atflag_t flags)
 /*[[[body:utimensat]]]*/
 {
@@ -712,7 +712,7 @@ NOTHROW_RPC(LIBCCALL libc_utimensat)(fd_t dirfd,
 }
 /*[[[end:utimensat]]]*/
 
-/*[[[head:utimensat64,hash:CRC-32=0xc00999ff]]]*/
+/*[[[head:utimensat64,hash:CRC-32=0x37740ef2]]]*/
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_utimensat64, libc_utimensat);
@@ -721,7 +721,7 @@ INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.utimensat64") int
 NOTHROW_RPC(LIBCCALL libc_utimensat64)(fd_t dirfd,
                                        char const *filename,
-                                       struct timespec64 const times[2/*or:3*/],
+                                       struct timespec64 const times[2 /*or:3*/],
                                        atflag_t flags)
 /*[[[body:utimensat64]]]*/
 {
@@ -735,10 +735,10 @@ NOTHROW_RPC(LIBCCALL libc_utimensat64)(fd_t dirfd,
 #endif /* MAGIC:alias */
 /*[[[end:utimensat64]]]*/
 
-/*[[[head:futimens,hash:CRC-32=0xe192a680]]]*/
+/*[[[head:futimens,hash:CRC-32=0x6d60548c]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.futimens") int
 NOTHROW_RPC(LIBCCALL libc_futimens)(fd_t fd,
-                                    struct timespec const times[2/*or:3*/])
+                                    struct timespec const times[2 /*or:3*/])
 /*[[[body:futimens]]]*/
 {
 	errno_t result;
@@ -750,13 +750,13 @@ NOTHROW_RPC(LIBCCALL libc_futimens)(fd_t fd,
 }
 /*[[[end:futimens]]]*/
 
-/*[[[head:futimens64,hash:CRC-32=0x67035e9]]]*/
+/*[[[head:futimens64,hash:CRC-32=0x59e96fe3]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_futimens64, libc_futimens);
 #else
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.futimens64") int
 NOTHROW_RPC(LIBCCALL libc_futimens64)(fd_t fd,
-                                      struct timespec64 const times[2/*or:3*/])
+                                      struct timespec64 const times[2 /*or:3*/])
 /*[[[body:futimens64]]]*/
 {
 	errno_t result;

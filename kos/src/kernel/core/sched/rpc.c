@@ -267,7 +267,7 @@ NOTHROW(KCALL task_free_rpc)(struct rpc_entry *__restrict rpc) {
  *                                        NOTE: Propagation may be performed by throwing an `E_INTERRUPT_USER_RPC' exception. */
 PUBLIC NOBLOCK NONNULL((1, 2)) int
 NOTHROW(KCALL task_deliver_rpc)(struct task *__restrict target,
-                                /*inherit(on_success)*/struct rpc_entry *__restrict rpc,
+                                /*inherit(on_success)*/ struct rpc_entry *__restrict rpc,
                                 uintptr_t priority) {
 	uintptr_t target_flags;
 	uintptr_t rpc_mode;

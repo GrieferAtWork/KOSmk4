@@ -2649,18 +2649,18 @@ Fat_SynchronizeSuperblock(FatSuperblock *__restrict self)
 
 
 PRIVATE struct superblock_type Fat_SuperblockType = {
-	/*.st_driver            = */&drv_self,
+	/*.st_driver            = */ &drv_self,
 	/*.st_name              =*/ "fat",
-	/*.st_flags             = */SUPERBLOCK_TYPE_FNORMAL,
-	/*.st_sizeof_superblock = */sizeof(FatSuperblock),
+	/*.st_flags             = */ SUPERBLOCK_TYPE_FNORMAL,
+	/*.st_sizeof_superblock = */ sizeof(FatSuperblock),
 	{
-		/*.st_open = */(void(KCALL *)(struct superblock *__restrict,UNCHECKED USER char *))&Fat_OpenSuperblock
+		/*.st_open = */ (void(KCALL *)(struct superblock *__restrict,UNCHECKED USER char *))&Fat_OpenSuperblock
 	},
-	/*.st_functions = */{
-		/*.f_fini     = */(void(KCALL *)(struct superblock *__restrict))&Fat_FinalizeSuperblock,
-		/*.f_opennode = */(void(KCALL *)(struct superblock *__restrict,struct inode *__restrict,struct directory_node *__restrict,struct directory_entry *__restrict))&Fat_OpenINode,
-		/*.f_sync     = */(void(KCALL *)(struct superblock *__restrict,USER CHECKED struct statfs *))&Fat_StatSuperblock,
-		/*.f_sync     = */(void(KCALL *)(struct superblock *__restrict))&Fat_SynchronizeSuperblock
+	/*.st_functions = */ {
+		/*.f_fini     = */ (void(KCALL *)(struct superblock *__restrict))&Fat_FinalizeSuperblock,
+		/*.f_opennode = */ (void(KCALL *)(struct superblock *__restrict,struct inode *__restrict,struct directory_node *__restrict,struct directory_entry *__restrict))&Fat_OpenINode,
+		/*.f_sync     = */ (void(KCALL *)(struct superblock *__restrict,USER CHECKED struct statfs *))&Fat_StatSuperblock,
+		/*.f_sync     = */ (void(KCALL *)(struct superblock *__restrict))&Fat_SynchronizeSuperblock
 	}
 };
 

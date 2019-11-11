@@ -19,7 +19,9 @@
 #ifndef _CXX_INITIALIZER_LIST
 #define _CXX_INITIALIZER_LIST 1
 
+#include <__crt.h>
 #include <__stdcxx.h>
+
 #include <hybrid/typecore.h>
 
 __CXXDECL_BEGIN
@@ -28,27 +30,44 @@ __NAMESPACE_STD_BEGIN
 template<class __E>
 class initializer_list {
 public:
-    typedef __E           value_type;
-    typedef __E const    &reference;
-    typedef __E const    &const_reference;
-    typedef __SIZE_TYPE__ size_type;
-    typedef __E const    *iterator;
-    typedef __E const    *const_iterator;
+	typedef __E           value_type;
+	typedef __E const    &reference;
+	typedef __E const    &const_reference;
+	typedef __SIZE_TYPE__ size_type;
+	typedef __E const    *iterator;
+	typedef __E const    *const_iterator;
 private:
-    iterator   __m_array;
-    size_type  __m_len;
-    /* Constructor called by the compiler. */
-    __CXX_CLASSMEMBER __CXX14_CONSTEXPR __LIBCCALL initializer_list(const_iterator __a,size_type __l)
-         /*__CXX_NOEXCEPT*/: __m_array(__a), __m_len(__l) {}
+	iterator   __m_array;
+	size_type  __m_len;
+	/* Constructor called by the compiler. */
+	__CXX_CLASSMEMBER __CXX14_CONSTEXPR __LIBCCALL initializer_list(const_iterator __a, size_type __l)
+	    /*__CXX_NOEXCEPT*/
+	    : __m_array(__a)
+	    , __m_len(__l) {
+	}
 public:
-    __CXX_CLASSMEMBER __CXX14_CONSTEXPR __LIBCCALL initializer_list() __CXX_NOEXCEPT: __m_array(0),__m_len(0) { }
-    __CXX_CLASSMEMBER __CXX14_CONSTEXPR size_type __LIBCCALL size() const __CXX_NOEXCEPT { return this->__m_len; }
-    __CXX_CLASSMEMBER __CXX14_CONSTEXPR const_iterator __LIBCCALL begin() const __CXX_NOEXCEPT { return this->__m_array; }
-    __CXX_CLASSMEMBER __CXX14_CONSTEXPR const_iterator __LIBCCALL end() const __CXX_NOEXCEPT { return this->__m_array + this->__m_len; }
+	__CXX_CLASSMEMBER __CXX14_CONSTEXPR __LIBCCALL initializer_list() __CXX_NOEXCEPT
+	    : __m_array(0)
+	    , __m_len(0) {}
+	__CXX_CLASSMEMBER __CXX14_CONSTEXPR size_type __LIBCCALL size() const __CXX_NOEXCEPT {
+		return this->__m_len;
+	}
+	__CXX_CLASSMEMBER __CXX14_CONSTEXPR const_iterator __LIBCCALL begin() const __CXX_NOEXCEPT {
+		return this->__m_array;
+	}
+	__CXX_CLASSMEMBER __CXX14_CONSTEXPR const_iterator __LIBCCALL end() const __CXX_NOEXCEPT {
+		return this->__m_array + this->__m_len;
+	}
 };
 
-template<class __T> __CXX_CLASSMEMBER __CXX14_CONSTEXPR __T const *__LIBCCALL begin(initializer_list<__T> __self) __CXX_NOEXCEPT { return __self.begin(); }
-template<class __T> __CXX_CLASSMEMBER __CXX14_CONSTEXPR __T const *__LIBCCALL end(initializer_list<__T> __self) __CXX_NOEXCEPT { return __self.end(); }
+template<class __T> __CXX_CLASSMEMBER __CXX14_CONSTEXPR __T const *__LIBCCALL
+begin(initializer_list<__T> __self) __CXX_NOEXCEPT {
+	return __self.begin();
+}
+template<class __T> __CXX_CLASSMEMBER __CXX14_CONSTEXPR __T const *__LIBCCALL
+end(initializer_list<__T> __self) __CXX_NOEXCEPT {
+	return __self.end();
+}
 
 __NAMESPACE_STD_END
 __CXXDECL_END

@@ -428,8 +428,8 @@ void __builtin_va_end(__builtin_va_list &__ap);
 /* Disable some warnings that are caused by function redirections in system headers. */
 #define __REDIRECT_WSUPPRESS_BEGIN \
  __pragma(warning(push)) \
- __pragma(warning(disable: /* Redirections  */4210 4028 4142 4565 4559 4211 4115 4996 \
-                           /* Unnamed union */4201))
+ __pragma(warning(disable: /* Redirections  */ 4210 4028 4142 4565 4559 4211 4115 4996 \
+                           /* Unnamed union */ 4201))
 
 #define __REDIRECT_WSUPPRESS_END   __pragma(warning(pop))
 /* Suppress warnings caused by C-mode redirections in system headers. */
@@ -438,6 +438,6 @@ void __builtin_va_end(__builtin_va_list &__ap);
 #else /* !__cplusplus */
 /* Disable some warnings that are caused by function redirections in system headers. */
 /* Suppress warnings caused by C-mode redirections in system headers. */
-#define __SYSDECL_BEGIN __DECL_BEGIN __pragma(warning(push)) __pragma(warning(disable: /* Unnamed union */4201))
+#define __SYSDECL_BEGIN __DECL_BEGIN __pragma(warning(push)) __pragma(warning(disable: /* Unnamed union */ 4201))
 #define __SYSDECL_END   __pragma(warning(pop)) __DECL_END
 #endif /* __cplusplus */

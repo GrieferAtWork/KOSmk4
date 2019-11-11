@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x519c7d21 */
+/* HASH CRC-32:0x638bc493 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `unicode_writeutf16()', but return `NULL' when `UNICODE_ISVALIDUTF16(ch)' is false */
 __LOCAL_LIBC(unicode_writeutf16_chk) __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_writeutf16_chk))(/*utf-16*/__CHAR16_TYPE__ *__restrict __dst,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_writeutf16_chk))(/*utf-16*/ __CHAR16_TYPE__ *__restrict __dst,
                                                                     __CHAR32_TYPE__ __ch) {
 #line 746 "kos/src/libc/magic/unicode.c"
 	if (__ch > 0x10ffff)

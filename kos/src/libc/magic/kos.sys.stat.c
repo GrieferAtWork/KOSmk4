@@ -151,7 +151,7 @@ Mkfifo:([nonnull] char const *fifoname, $mode_t mode);
 
 [throws][doc_alias(utimensat32)][cp][ignore]
 UTimensAt32:($fd_t dirfd, [nonnull] char const *filename,
-             [nullable] struct timespec const times[2/*or:3*/], $atflag_t flags) = UTimensAt?;
+             [nullable] struct timespec const times[2 /*or:3*/], $atflag_t flags) = UTimensAt?;
 
 %
 %#ifdef __USE_ATFILE
@@ -160,7 +160,7 @@ UTimensAt32:($fd_t dirfd, [nonnull] char const *filename,
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(UTimensAt)]
 [cp][noexport][requires(defined(__CRT_HAVE_UTimensAt) || defined(__CRT_HAVE_UTimensAt64))]
 UTimensAt:($fd_t dirfd, [nonnull] char const *filename,
-           [nullable] struct timespec const times[2/*or:3*/], $atflag_t flags) {
+           [nullable] struct timespec const times[2 /*or:3*/], $atflag_t flags) {
 #ifdef __CRT_HAVE_UTimensAt64
 #if defined(__KOS__) && __KOS_VERSION__ >= 300
 	struct timespec64 tms[3];
@@ -224,7 +224,7 @@ UTimensAt:($fd_t dirfd, [nonnull] char const *filename,
 [throws][time64_variant_of(UTimensAt)][doc_alias(utimensat)]
 [cp][noexport][requires(defined(__CRT_HAVE_UTimensAt))]
 UTimensAt64:($fd_t dirfd, [nonnull] char const *filename,
-             [nullable] struct timespec64 const times[2/*or:3*/], $atflag_t flags) {
+             [nullable] struct timespec64 const times[2 /*or:3*/], $atflag_t flags) {
 #if defined(__KOS__) && __KOS_VERSION__ >= 300
 	struct timespec32 tms[3];
 	if (!times) {
@@ -257,7 +257,7 @@ UTimensAt64:($fd_t dirfd, [nonnull] char const *filename,
 %#endif /* __USE_ATFILE */
 
 [throws][cp][ignore][doc_alias(futimens32)]
-FUtimens32:($fd_t fd, [nullable] struct timespec const times[2/*or:3*/]) = FUtimens?;
+FUtimens32:($fd_t fd, [nullable] struct timespec const times[2 /*or:3*/]) = FUtimens?;
 
 %
 %#ifdef __USE_XOPEN2K8
@@ -265,7 +265,7 @@ FUtimens32:($fd_t fd, [nullable] struct timespec const times[2/*or:3*/]) = FUtim
 [if(defined(__USE_TIME_BITS64)), preferred_alias(FUtimens64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(FUtimens)]
 [requires(defined(__CRT_HAVE_FUtimens) || defined(__CRT_HAVE_FUtimens64))]
-FUtimens:($fd_t fd, [nullable] struct timespec const times[2/*or:3*/]) {
+FUtimens:($fd_t fd, [nullable] struct timespec const times[2 /*or:3*/]) {
 #ifdef __CRT_HAVE_UTimensAt64
 	struct timespec64 tms[2];
 	if (!times) {
@@ -294,7 +294,7 @@ FUtimens:($fd_t fd, [nullable] struct timespec const times[2/*or:3*/]) {
 %#ifdef __USE_TIME64
 [throws][time64_variant_of(FUtimens)][doc_alias(futimens)]
 [cp][noexport][requires(defined(__CRT_HAVE_FUtimens))]
-FUtimens64:($fd_t fd, [nullable] struct timespec64 const times[2/*or:3*/]) {
+FUtimens64:($fd_t fd, [nullable] struct timespec64 const times[2 /*or:3*/]) {
 	struct timespec32 tms[2];
 	if (!times) {
 		FUtimens32(fd, NULL);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67454cdd */
+/* HASH CRC-32:0x505ad3a5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -987,7 +987,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_scanf") ssize_t
  * WARNING: No trailing NUL-character is implicitly appended */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_sprintf_printer") ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_sprintf_printer)(/*char ***/void *arg,
+NOTHROW_NCX(LIBCCALL libc_format_sprintf_printer)(/*char ***/ void *arg,
                                                   /*utf-8*/ char const *__restrict data,
                                                   size_t datalen) {
 #line 941 "kos/src/libc/magic/format-printer.c"
@@ -1006,7 +1006,7 @@ NOTHROW_NCX(LIBCCALL libc_format_sprintf_printer)(/*char ***/void *arg,
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_snprintf_printer") ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_snprintf_printer)(/*struct format_snprintf_data**/void *arg,
+NOTHROW_NCX(LIBCCALL libc_format_snprintf_printer)(/*struct format_snprintf_data**/ void *arg,
                                                    /*utf-8*/ char const *__restrict data,
                                                    size_t datalen) {
 #line 973 "kos/src/libc/magic/format-printer.c"

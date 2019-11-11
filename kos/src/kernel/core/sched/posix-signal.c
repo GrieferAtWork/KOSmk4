@@ -825,7 +825,7 @@ done:
  * @return: false: The given process has terminated. */
 PRIVATE bool KCALL
 deliver_signal_to_some_thread_in_process(struct task *__restrict process_leader,
-                                         /*inherit(always)*/struct sigqueue_entry *__restrict info,
+                                         /*inherit(always)*/ struct sigqueue_entry *__restrict info,
                                          gfp_t rpc_flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_INTERRUPT_USER_RPC);
 
@@ -881,7 +881,7 @@ deliver_to_some_thread:
 
 
 LOCAL ATTR_NORETURN void KCALL
-send_signal_rpc_to_self(/*inherit(always)*/struct sigqueue_entry *__restrict entry) {
+send_signal_rpc_to_self(/*inherit(always)*/ struct sigqueue_entry *__restrict entry) {
 	TRY {
 		task_schedule_user_rpc(THIS_TASK,
 		                       &task_signal_rpc_handler,
@@ -898,7 +898,7 @@ send_signal_rpc_to_self(/*inherit(always)*/struct sigqueue_entry *__restrict ent
 }
 
 LOCAL ATTR_NORETURN void KCALL
-send_signal_rpc_to_self_after_syscall(/*inherit(always)*/struct sigqueue_entry *__restrict entry,
+send_signal_rpc_to_self_after_syscall(/*inherit(always)*/ struct sigqueue_entry *__restrict entry,
                                       syscall_ulong_t syscall_result) {
 	TRY {
 		entry->sqe_next = (struct sigqueue_entry *)(void *)(uintptr_t)syscall_result;

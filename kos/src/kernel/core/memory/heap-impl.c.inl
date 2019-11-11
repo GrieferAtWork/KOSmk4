@@ -1448,7 +1448,7 @@ err:
 
 
 PUBLIC WUNUSED ATTR_MALLOC ATTR_RETNONNULL
-ATTR_ASSUME_ALIGNED(PAGEDIR_MIN_PAGESIZE) VIRT /*page-aligned*/void *
+ATTR_ASSUME_ALIGNED(PAGEDIR_MIN_PAGESIZE) VIRT /*page-aligned*/ void *
 NOTHROW_NX(KCALL FUNC(vpage_alloc_untraced))(size_t num_pages,
                                              size_t alignment_in_pages,
                                              gfp_t flags) {
@@ -1466,8 +1466,8 @@ NOTHROW_NX(KCALL FUNC(vpage_alloc_untraced))(size_t num_pages,
 }
 
 PUBLIC WUNUSED ATTR_RETNONNULL
-ATTR_ASSUME_ALIGNED(PAGEDIR_MIN_PAGESIZE) VIRT /*page-aligned*/void *
-NOTHROW_NX(KCALL FUNC(vpage_realloc_untraced))(VIRT /*page-aligned*/void *old_base,
+ATTR_ASSUME_ALIGNED(PAGEDIR_MIN_PAGESIZE) VIRT /*page-aligned*/ void *
+NOTHROW_NX(KCALL FUNC(vpage_realloc_untraced))(VIRT /*page-aligned*/ void *old_base,
                                                size_t old_pages, size_t new_pages,
                                                size_t alignment_in_pages,
                                                gfp_t alloc_flags, gfp_t free_flags) {

@@ -55,17 +55,17 @@ DECL_BEGIN
 #define LEVEL_RAW     10
 #define LEVEL_COUNT   11
 PRIVATE char const level_prefix[LEVEL_COUNT][16] = {
-	/* KERN_EMERG   */"[emerg ] ",
-	/* KERN_ALERT   */"[alert ] ",
-	/* KERN_CRIT    */"[crit  ] ",
-	/* KERN_ERR     */"[error ] ",
-	/* KERN_WARNING */"[warn  ] ",
-	/* KERN_NOTICE  */"[notice] ",
-	/* KERN_INFO    */"[info  ] ",
-	/* KERN_DEBUG   */"[trace ] ",
-	/* KERN_TRACE   */"[debug ] ",
-	/* KERN_DEFAULT */"[output] ",
-	/* KERN_RAW     */"",
+	/* KERN_EMERG   */ "[emerg ] ",
+	/* KERN_ALERT   */ "[alert ] ",
+	/* KERN_CRIT    */ "[crit  ] ",
+	/* KERN_ERR     */ "[error ] ",
+	/* KERN_WARNING */ "[warn  ] ",
+	/* KERN_NOTICE  */ "[notice] ",
+	/* KERN_INFO    */ "[info  ] ",
+	/* KERN_DEBUG   */ "[trace ] ",
+	/* KERN_TRACE   */ "[debug ] ",
+	/* KERN_DEFAULT */ "[output] ",
+	/* KERN_RAW     */ "",
 };
 
 

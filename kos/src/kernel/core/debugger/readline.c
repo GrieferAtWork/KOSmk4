@@ -43,7 +43,7 @@ DECL_BEGIN
 //PRIVATE char dbg_backlog_text[4096];
 
 PUBLIC ATTR_DBGTEXT size_t KCALL
-dbg_readline(/*utf-8*/char *__restrict buf,
+dbg_readline(/*utf-8*/ char *__restrict buf,
              size_t bufsize,
              dbg_autocomplete_t autocomplete) {
 	char ch;

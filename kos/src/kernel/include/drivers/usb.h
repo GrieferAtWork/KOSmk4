@@ -161,7 +161,7 @@ struct block_device;
  * @param: status: One of `USB_INTERRUPT_HANDLER_STATUS_*'
  * @return: * :    One of `USB_INTERRUPT_HANDLER_RETURN_*' */
 typedef NOBLOCK unsigned int
-/*NOTHROW*/(KCALL *PUSB_INTERRUPT_HANDLER)(void *__restrict self, unsigned int status,
+/*NOTHROW*/ (KCALL *PUSB_INTERRUPT_HANDLER)(void *__restrict self, unsigned int status,
                                            void const *data, size_t datalen);
 #define USB_INTERRUPT_HANDLER_STATUS_OK    0 /* Data was successfully received. */
 #define USB_INTERRUPT_HANDLER_STATUS_ERROR 1 /* The USB controller has indicated an error.
@@ -180,8 +180,8 @@ typedef NOBLOCK unsigned int
                                               * from the set of those that the USB controller will use for polling
                                               * connected devices for incoming data. */
 
-typedef NOBLOCK unsigned int /*NOTHROW*/(KCALL *PUSB_INTERRUPT_HANDLER_CHR)(struct character_device *__restrict self, unsigned int status, void const *data, size_t datalen);
-typedef NOBLOCK unsigned int /*NOTHROW*/(KCALL *PUSB_INTERRUPT_HANDLER_BLK)(struct block_device *__restrict self, unsigned int status, void const *data, size_t datalen);
+typedef NOBLOCK unsigned int /*NOTHROW*/ (KCALL *PUSB_INTERRUPT_HANDLER_CHR)(struct character_device *__restrict self, unsigned int status, void const *data, size_t datalen);
+typedef NOBLOCK unsigned int /*NOTHROW*/ (KCALL *PUSB_INTERRUPT_HANDLER_BLK)(struct block_device *__restrict self, unsigned int status, void const *data, size_t datalen);
 
 
 

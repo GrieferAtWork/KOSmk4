@@ -659,7 +659,7 @@ for (local i,x: util.enumerate(l)) {
 /* Encode the given unicode character `ch' using cp437 (the codepage
  * used by VGA) If the character can't be encoded, return 0 instead.
  * s.a.: https://en.wikipedia.org/wiki/Code_page_437  */
-LOCAL u8 NOTHROW(KCALL cp437_encode)(/*utf-32*/u32 ch) {
+LOCAL u8 NOTHROW(KCALL cp437_encode)(/*utf-32*/ u32 ch) {
 	u8 result;
 	if (ch <= 0xff) {
 		result = cp437_from_latin1[ch];
@@ -782,7 +782,7 @@ LOCAL u8 NOTHROW(KCALL cp437_encode)(/*utf-32*/u32 ch) {
 
 PRIVATE ATTR_DBGBSS bool vga_last_chr_caused_linewrap = false;
 LOCAL ATTR_DBGTEXT void
-NOTHROW(KCALL dbg_putcp437)(/*cp-437*/u8 ch) {
+NOTHROW(KCALL dbg_putcp437)(/*cp-437*/ u8 ch) {
 	/* VGA terminal output */
 	scroll_down_if_cur_end();
 	/* When indent-mode is active, wraps to the next line */
@@ -1171,7 +1171,7 @@ NOTHROW(KCALL dbg_pprinter_pending_ch32)(dbg_pprinter_arg_t *__restrict printer)
 }
 
 PRIVATE ATTR_DBGTEXT NONNULL((1)) void
-NOTHROW(KCALL dbg_pprinter_putc)(dbg_pprinter_arg_t *__restrict printer, /*utf-8*/char ch) {
+NOTHROW(KCALL dbg_pprinter_putc)(dbg_pprinter_arg_t *__restrict printer, /*utf-8*/ char ch) {
 	if (printer->p_utf8[0]) {
 		/* Continue a utf-8 sequence. */
 		u8 reqlen = unicode_utf8seqlen[printer->p_utf8[0]];

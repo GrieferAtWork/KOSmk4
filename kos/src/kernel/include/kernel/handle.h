@@ -64,9 +64,9 @@ struct handle_types {
 	 *       >> calll  *handle_type_db+h_sync(,%eax,4)
 	 */
 	char const *h_typename[HANDLE_TYPE_COUNT];
-	void /*NOTHROW*/(NOBLOCK NONNULL((1)) FCALL *h_incref[HANDLE_TYPE_COUNT])(void *__restrict ptr);
-	void /*NOTHROW*/(NOBLOCK NONNULL((1)) FCALL *h_decref[HANDLE_TYPE_COUNT])(void *__restrict ptr);
-	refcnt_t /*NOTHROW*/(NOBLOCK WUNUSED NONNULL((1)) FCALL *h_refcnt[HANDLE_TYPE_COUNT])(void const *__restrict ptr);
+	void /*NOTHROW*/ (NOBLOCK NONNULL((1)) FCALL *h_incref[HANDLE_TYPE_COUNT])(void *__restrict ptr);
+	void /*NOTHROW*/ (NOBLOCK NONNULL((1)) FCALL *h_decref[HANDLE_TYPE_COUNT])(void *__restrict ptr);
+	refcnt_t /*NOTHROW*/ (NOBLOCK WUNUSED NONNULL((1)) FCALL *h_refcnt[HANDLE_TYPE_COUNT])(void const *__restrict ptr);
 
 	/* Basic read/write primitives. */
 	size_t (WUNUSED NONNULL((1)) KCALL *h_read[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);

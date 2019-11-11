@@ -51,7 +51,7 @@ struct mb_tag {
 };
 
 /* Multiboot header */
-#define MB_FLAGS       (/*MB_PAGE_ALIGN|*/MB_MEMORY_INFO/*|MB_VIDEO_MODE*/)
+#define MB_FLAGS (/*MB_PAGE_ALIGN |*/ MB_MEMORY_INFO /*| MB_VIDEO_MODE*/)
 PRIVATE ATTR_SECTION(".x86.mb") ATTR_ALIGNED(MB_HEADER_ALIGN)
 ATTR_USED struct mb_tag mb_multiboot = {
 	/* .mt_magic    = */ MB_HEADER_MAGIC,

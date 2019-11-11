@@ -112,9 +112,9 @@ struct vm_swpblock {
  * @param: paddr:     The physical memory base address of the range.
  * @param: num_bytes: The number of bytes found within the range.
  * @param: lock:      The lock used to lock the associated DMA range. */
-typedef bool /*NOTHROW*/(KCALL *vm_dmarangefunc_t)(void *arg, vm_phys_t paddr, size_t num_bytes,
+typedef bool /*NOTHROW*/ (KCALL *vm_dmarangefunc_t)(void *arg, vm_phys_t paddr, size_t num_bytes,
                                                    struct vm_dmalock *__restrict lock);
-typedef void /*NOTHROW*/(KCALL *vm_dmaresetfunc_t)(void *arg);
+typedef void /*NOTHROW*/ (KCALL *vm_dmaresetfunc_t)(void *arg);
 #endif /* __CC__ */
 
 
@@ -149,7 +149,7 @@ struct vm_datapart {
 			union ATTR_PACKED {
 				uintptr_t       a_vmin_ptr; /* Lower bound. */
 #ifdef __INTELLISENSE__
-				struct{vm_dpage_t a_vmin;   /* Lower bound. */};
+				struct { vm_dpage_t a_vmin; /* Lower bound. */ };
 #else /* __INTELLISENSE__ */
 				vm_dpage_t      a_vmin;     /* Lower bound. */
 #endif /* !__INTELLISENSE__ */
@@ -157,7 +157,7 @@ struct vm_datapart {
 			union ATTR_PACKED {
 				uintptr_t       a_vmax_ptr; /* Upper bound. */
 #ifdef __INTELLISENSE__
-				struct{vm_dpage_t a_vmax;   /* Upper bound. */};
+				struct { vm_dpage_t a_vmax; /* Upper bound. */ };
 #else /* __INTELLISENSE__ */
 				vm_dpage_t      a_vmax;     /* Upper bound. */
 #endif /* !__INTELLISENSE__ */
@@ -834,7 +834,7 @@ struct vm_datablock_type_vio;
 
 struct vm_datablock_type {
 	/* [0..1] Finalize + free the given data-block. */
-	NOBLOCK NONNULL((1)) void /*NOTHROW*/(KCALL *dt_destroy)(struct vm_datablock *__restrict self);
+	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *dt_destroy)(struct vm_datablock *__restrict self);
 	/* [0..1] Initialize the given data part (called whenever a new part is created)
 	 * NOTE: This function isn't required to do anything, and may assume that the
 	 *       given part is already fully initialized as ABSENT, with the proper
@@ -842,7 +842,7 @@ struct vm_datablock_type {
 	 * This function is mainly intended to assign physical memory ranges for data blocks
 	 * that directly map physical memory into virtual memory, allowing them to use this
 	 * function to assign the proper memory ranges. */
-	NOBLOCK NONNULL((1)) void /*NOTHROW*/(KCALL *dt_initpart)(struct vm_datapart *__restrict part);
+	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *dt_initpart)(struct vm_datapart *__restrict part);
 	/* [0..1] Initialize the data buffer.
 	 * @assume(num_data_pages != 0);
 	 * @assume(IS_ALIGNED(buffer,VM_DATABLOCK_PAGESIZE(self)));
@@ -1245,7 +1245,7 @@ struct vm_ramfile {
 DATDEF struct vm_datablock_type vm_ramfile_type;
 
 #define VM_RAMFILE_INIT(start, size) \
-	{ VM_DATABLOCK_INIT(&vm_ramfile_type, NULL, 0), /* .rf_data = */{ start, size } }
+	{ VM_DATABLOCK_INIT(&vm_ramfile_type, NULL, 0), /* .rf_data = */ { start, size } }
 
 
 
@@ -1406,7 +1406,7 @@ struct vm {
 	union {
 		PHYS pagedir_t        *v_pdir_phys_ptr; /* [1..1][const] Physical pointer of the page directory */
 #ifdef __INTELLISENSE__
-		struct{PHYS vm_phys_t  v_pdir_phys;     /* [1..1][const] Physical pointer of the page directory */};
+		struct { PHYS vm_phys_t v_pdir_phys;    /* [1..1][const] Physical pointer of the page directory */ };
 #else
 		PHYS vm_phys_t         v_pdir_phys;     /* [1..1][const] Physical pointer of the page directory */
 #endif

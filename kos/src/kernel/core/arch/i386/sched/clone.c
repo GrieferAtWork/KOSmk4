@@ -84,7 +84,7 @@ DATDEF ATTR_PERTASK struct vm_datapart __this_kernel_stack_part ASMNAME("_this_k
 
 
 PRIVATE void FCALL
-task_srpc_set_child_tid(/*USER CHECKED pid_t*/void *arg) {
+task_srpc_set_child_tid(/*USER CHECKED pid_t*/ void *arg) {
 	ATOMIC_WRITE(*(pid_t *)arg, task_gettid());
 }
 

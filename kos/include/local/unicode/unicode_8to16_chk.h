@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1873c4e1 */
+/* HASH CRC-32:0x3fa4e57 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unic
 #ifdef __CRT_HAVE_unicode_writeutf16
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_unicode_writeutf16,(/*utf-16*/__CHAR16_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf16,(__dst,__ch))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_unicode_writeutf16,(/*utf-16*/ __CHAR16_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf16,(__dst,__ch))
 #else /* LIBC: unicode_writeutf16 */
 #include <local/unicode/unicode_writeutf16.h>
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: * : A pointer after the last written UTF-16 character.
  * @return: NULL: Attempted to write an invalid character */
 __LOCAL_LIBC(unicode_8to16_chk) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __CHAR16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_8to16_chk))(/*utf-16*/__CHAR16_TYPE__ *__restrict __utf16_dst,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_8to16_chk))(/*utf-16*/ __CHAR16_TYPE__ *__restrict __utf16_dst,
                                                                /*utf-8*/ char const *__restrict __utf8_text,
                                                                __SIZE_TYPE__ __utf8_characters) {
 #line 994 "kos/src/libc/magic/unicode.c"

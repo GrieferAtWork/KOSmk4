@@ -549,7 +549,7 @@ struct icpustate;
  * @param: args: The arguments alongside which the IPI was scheduled.
  * @return: * :  The cpu state to restore, or one of `CPU_IPI_MODE_*'
  */
-typedef NOBLOCK NONNULL((1, 2)) /*ATTR_NOTHROW*/struct icpustate *
+typedef NOBLOCK NONNULL((1, 2)) /*ATTR_NOTHROW*/ struct icpustate *
 (FCALL *cpu_ipi_t)(struct icpustate *__restrict state,
                    void *args[CPU_IPI_ARGCOUNT]);
 #endif /* !CONFIG_NO_SMP */
@@ -666,26 +666,26 @@ FUNDEF ATTR_NORETURN void NOTHROW(FCALL cpu_run_current)(void);
  *                 pending, sleeping, or running. */
 FUNDEF NOBLOCK NONNULL((1, 2)) bool
 NOTHROW(FCALL cpu_addpendingtask)(struct cpu *__restrict target,
-                                  /*in*/REF struct task *__restrict thread);
+                                  /*in*/ REF struct task *__restrict thread);
 #endif /* !CONFIG_NO_SMP */
 
 /* Add the given task as running / sleeping within the current CPU.
  * NOTE: These functions inherit a reference to `thread' from the caller!
  * NOTE: Preemption must be disabled before this function may be called! */
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL cpu_addrunningtask)(/*in*/REF struct task *__restrict thread);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL cpu_addsleepingtask)(/*in*/REF struct task *__restrict thread);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL cpu_addrunningtask)(/*in*/ REF struct task *__restrict thread);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL cpu_addsleepingtask)(/*in*/ REF struct task *__restrict thread);
 
 /* Remove a running or sleeping task `thread' from the current CPU.
  * NOTE: These functions return with a reference to `thread' handed to the caller.
  * NOTE: Preemption must be disabled before this function may be called! */
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL cpu_delrunningtask)(/*out*/REF struct task *__restrict thread);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL cpu_delsleepingtask)(/*out*/REF struct task *__restrict thread);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL cpu_delrunningtask)(/*out*/ REF struct task *__restrict thread);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL cpu_delsleepingtask)(/*out*/ REF struct task *__restrict thread);
 
 
 /* IDLE job prototype.
  * @param: arg:  The argument with which the job was scheduled.
  * @param: mode: One of `IDLE_JOB_MODE_*' */
-typedef NOBLOCK void /*NOTHROW*/(FCALL *idle_job_t)(void *arg, unsigned int mode);
+typedef NOBLOCK void /*NOTHROW*/ (FCALL *idle_job_t)(void *arg, unsigned int mode);
 #define IDLE_JOB_MODE_SERVICE 0x0000 /* Service the IDLE job now. */
 #define IDLE_JOB_MODE_CANCEL  0x0001 /* The IDLE job was canceled after when the CPU decided
                                       * that too much time has already passed since the job
@@ -726,7 +726,7 @@ FUNDEF NOBLOCK NONNULL((1)) bool NOTHROW(FCALL cpu_delete_idle_job)(idle_job_t j
 
 /* Helper functions to schedule a simple IDLE job. */
 FUNDEF NOBLOCK NONNULL((1)) bool
-NOTHROW(FCALL cpu_schedule_idle_job_simple)(NOBLOCK void /*NOTHROW*/(KCALL *func)(void));
+NOTHROW(FCALL cpu_schedule_idle_job_simple)(NOBLOCK void /*NOTHROW*/ (KCALL *func)(void));
 
 
 #endif /* __CC__ */

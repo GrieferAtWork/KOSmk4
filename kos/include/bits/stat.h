@@ -67,9 +67,9 @@ __SYSDECL_BEGIN
 #define __S_IEXEC  00100 /* Execute by owner. */
 
 #ifdef __USE_ATFILE
-#   define UTIME_NOW   ((1l << 30) - 1l)
-#   define UTIME_OMIT  ((1l << 30) - 2l)
-#endif
+#define UTIME_NOW  ((1l << 30) - 1l)
+#define UTIME_OMIT ((1l << 30) - 2l)
+#endif /* __USE_ATFILE */
 
 #undef _STATBUF_ST_TIM      /* .st_atim, .st_ctim, .st_mtim */
 #undef _STATBUF_ST_TIME     /* .st_atime, .st_ctime, .st_mtime */
@@ -110,32 +110,32 @@ __SYSDECL_BEGIN
 #ifdef __USE_TIME_BITS64
 #ifdef __USE_KOS
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim##32; struct { __time32_t st_xtime##32; __UINT32_TYPE__ __##st_xtime##_pad32; __syscall_ulong_t st_xtimensec##32; }; };
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim; struct __timespec64 st_xtimespec; struct { __time64_t st_xtime; __syscall_ulong_t st_xtimensec; }; \
 	        struct __timespec64 st_xtim##64; struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; }; };
-#define __DEFINE_TIMESPEC64_NO32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_NO32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim; struct __timespec64 st_xtimespec; struct { union { __time32_t st_xtime##32; __time64_t st_xtime; }; union { __syscall_ulong_t st_xtimensec##32; __syscall_ulong_t st_xtimensec; }; }; \
 	        struct __timespec64 st_xtim##64; struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; }; };
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim##32; struct { __time32_t st_xtime##32; __syscall_ulong_t st_xtimensec##32; }; };
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim; struct __timespec64 st_xtimespec; struct { __time64_t st_xtime; __syscall_ulong_t st_xtimensec; __UINT32_TYPE__ __##st_xtime##_pad; }; \
 	        struct __timespec64 st_xtim##64; struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; __UINT32_TYPE__ __##st_xtime##_pad64; }; };
-#define __DEFINE_TIMESPEC64_NO32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_NO32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim; struct __timespec64 st_xtimespec; struct { union { __time32_t st_xtime##32; __time64_t st_xtime; }; union { __syscall_ulong_t st_xtimensec##32; __syscall_ulong_t st_xtimensec; }; __UINT32_TYPE__ __##st_xtime##_pad; }; \
 	        struct __timespec64 st_xtim##64; struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; __UINT32_TYPE__ __##st_xtime##_pad64; }; };
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #else /* __USE_KOS */
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	struct __timespec32 __##st_xtim##32;
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim; struct __timespec64 st_xtimespec; struct { __time64_t st_xtime; __syscall_ulong_t st_xtimensec; }; };
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim; struct __timespec64 st_xtimespec; struct { __time64_t st_xtime; __syscall_ulong_t st_xtimensec; __UINT32_TYPE__ __##st_xtime##_pad; }; };
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #define __DEFINE_TIMESPEC64_NO32 __DEFINE_TIMESPEC64
@@ -143,70 +143,70 @@ __SYSDECL_BEGIN
 #else /* __USE_TIME_BITS64 */
 #ifdef __USE_KOS
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim; struct __timespec32 st_xtimespec; struct { __time32_t st_xtime; __UINT32_TYPE__ __##st_xtime##_pad; __syscall_ulong_t st_xtimensec; }; \
 	        struct __timespec32 st_xtim##32; struct { __time32_t st_xtime##32; __UINT32_TYPE__ __##st_xtime##_pad32; __syscall_ulong_t st_xtimensec##32; }; };
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim##64; struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; }; };
-#define __DEFINE_TIMESPEC64_NO32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_NO32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim##64; struct { union { __time32_t st_xtime; __time32_t st_xtime##32; __time64_t st_xtime##64; }; union { __syscall_ulong_t st_xtimensec; __syscall_ulong_t st_xtimensec##32; __syscall_ulong_t st_xtimensec##64; }; }; };
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim; struct __timespec32 st_xtimespec; struct { __time32_t st_xtime; __syscall_ulong_t st_xtimensec; }; \
 	        struct __timespec32 st_xtim##32; struct { __time32_t st_xtime##32; __syscall_ulong_t st_xtimensec##32; }; };
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim##64; struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; __UINT32_TYPE__ __##st_xtime##_pad64; }; };
-#define __DEFINE_TIMESPEC64_NO32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_NO32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim##64; struct { union { __time32_t st_xtime; __time32_t st_xtime##32; __time64_t st_xtime##64; }; union { __syscall_ulong_t st_xtimensec; __syscall_ulong_t st_xtimensec##32; __syscall_ulong_t st_xtimensec##64; }; __UINT32_TYPE__ __##st_xtime##_pad64; }; };
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #else /* __USE_KOS */
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	struct __timespec64 __##st_xtim##64;
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim; struct __timespec32 st_xtimespec; struct { __time32_t st_xtime; __UINT32_TYPE__ __##st_xtime##_pad; __syscall_ulong_t st_xtimensec; }; };
-#define __DEFINE_TIMESPEC64_NO32(st_xtim,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_NO32(st_xtim, st_xtime, st_xtimensec) \
 	union { __time32_t st_xtime; __time64_t __#st_xtime##64; }; __syscall_ulong_t st_xtimensec;
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim; struct __timespec32 st_xtimespec; struct { __time32_t st_xtime; __syscall_ulong_t st_xtimensec; }; };
-#define __DEFINE_TIMESPEC64_NO32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_NO32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { __time32_t st_xtime; __time64_t __##st_xtime##64; }; __syscall_ulong_t st_xtimensec; __UINT32_TYPE__ __##st_xtime##_pad64;
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #endif /* !__USE_KOS */
 #endif /* !__USE_TIME_BITS64 */
 #ifdef __USE_KOS
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC32_ALT(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ALT(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	struct __timespec32 st_xtim##32;
-#define __DEFINE_TIMESPEC64_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim; struct __timespec64 st_xtimespec; struct { union { __time32_t st_xtime##32; __time64_t st_xtime; }; union { __syscall_ulong_t st_xtimensec##32; __syscall_ulong_t st_xtimensec; }; }; \
 	        struct __timespec64 st_xtim##64; struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; }; };
-#define __DEFINE_TIMESPEC32_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim; struct __timespec32 st_xtimespec; struct { __time32_t st_xtime; __UINT32_TYPE__ __##st_xtime##_pad; __syscall_ulong_t st_xtimensec; }; \
 	        struct __timespec32 st_xtim##32; struct { __time32_t st_xtime##32; __UINT32_TYPE__ __##st_xtime##_pad32; __syscall_ulong_t st_xtimensec##32; }; };
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC32_ALT(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ALT(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	struct __timespec32 st_xtim##32;
-#define __DEFINE_TIMESPEC64_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim; struct __timespec64 st_xtimespec; struct { union { __time32_t st_xtime##32; __time64_t st_xtime; }; union { __syscall_ulong_t st_xtimensec##32; __syscall_ulong_t st_xtimensec; }; __UINT32_TYPE__ __##st_xtime##_pad; }; \
 	        struct __timespec64 st_xtim##64; struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; __UINT32_TYPE__ __##st_xtime##_pad64; }; };
-#define __DEFINE_TIMESPEC32_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim; struct __timespec32 st_xtimespec; struct { __time32_t st_xtime; __syscall_ulong_t st_xtimensec; }; \
 	        struct __timespec32 st_xtim##32; struct { __time32_t st_xtime##32; __syscall_ulong_t st_xtimensec##32; }; };
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #else /* __USE_KOS */
-#define __DEFINE_TIMESPEC32_ALT(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ALT(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	struct __timespec32 __##st_xtim##32;
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC64_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim; struct __timespec64 st_xtimespec; struct { __time64_t st_xtime; __syscall_ulong_t st_xtimensec; }; };
-#define __DEFINE_TIMESPEC32_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim; struct __timespec32 st_xtimespec; struct { __time32_t st_xtime; __UINT32_TYPE__ __##st_xtime##_pad; __syscall_ulong_t st_xtimensec; }; };
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC64_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim; struct __timespec64 st_xtimespec; struct { __time64_t st_xtime; __syscall_ulong_t st_xtimensec; __UINT32_TYPE__ __##st_xtime##_pad; }; };
-#define __DEFINE_TIMESPEC32_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim; struct __timespec32 st_xtimespec; struct { __time32_t st_xtime; __syscall_ulong_t st_xtimensec; }; };
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #endif /* !__USE_KOS */
@@ -214,32 +214,32 @@ __SYSDECL_BEGIN
 #ifdef __USE_TIME_BITS64
 #ifdef __USE_KOS
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	__time32_t st_xtime##32; __UINT32_TYPE__ __##st_xtime##_pad32; __syscall_ulong_t st_xtimensec##32;
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtimespec; struct { __time64_t st_xtime; __syscall_ulong_t st_xtimensec; }; \
 	        struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; }; };
-#define __DEFINE_TIMESPEC64_NO32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_NO32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtimespec; struct { union { __time32_t st_xtime##32; __time64_t st_xtime; }; union { __syscall_ulong_t st_xtimensec##32; __syscall_ulong_t st_xtimensec; }; }; \
 	        struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; }; };
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	__time32_t st_xtime##32; __syscall_ulong_t st_xtimensec##32;
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtimespec; struct { __time64_t st_xtime; __syscall_ulong_t st_xtimensec; __UINT32_TYPE__ __##st_xtime##_pad; }; \
 	        struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; __UINT32_TYPE__ __##st_xtime##_pad64; }; };
-#define __DEFINE_TIMESPEC64_NO32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_NO32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtimespec; struct { union { __time32_t st_xtime##32; __time64_t st_xtime; }; union { __syscall_ulong_t st_xtimensec##32; __syscall_ulong_t st_xtimensec; }; __UINT32_TYPE__ __##st_xtime##_pad; }; \
 	        struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; __UINT32_TYPE__ __##st_xtime##_pad64; }; };
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #else /* __USE_KOS */
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	struct __timespec32 __##st_xtim##32;
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtimespec; struct { __time64_t st_xtime; __syscall_ulong_t st_xtimensec; }; };
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtimespec; struct { __time64_t st_xtime; __syscall_ulong_t st_xtimensec; __UINT32_TYPE__ __##st_xtime##_pad; }; };
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #define __DEFINE_TIMESPEC64_NO32 __DEFINE_TIMESPEC64
@@ -247,73 +247,73 @@ __SYSDECL_BEGIN
 #else /* __USE_TIME_BITS64 */
 #ifdef __USE_KOS
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtimespec; struct { __time32_t st_xtime; __UINT32_TYPE__ __##st_xtime##_pad; __syscall_ulong_t st_xtimensec; }; \
 	        struct { __time32_t st_xtime##32; __UINT32_TYPE__ __##st_xtime##_pad32; __syscall_ulong_t st_xtimensec##32; }; };
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	__time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64;
-#define __DEFINE_TIMESPEC64_NO32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_NO32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { __time32_t st_xtime; __time32_t st_xtime##32; __time64_t st_xtime##64; }; \
 	union { __syscall_ulong_t st_xtimensec; __syscall_ulong_t st_xtimensec##32; __syscall_ulong_t st_xtimensec##64; };
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtimespec; struct { __time32_t st_xtime; __syscall_ulong_t st_xtimensec; }; \
 	        struct { __time32_t st_xtime##32; __syscall_ulong_t st_xtimensec##32; }; };
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	__time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; __UINT32_TYPE__ __##st_xtime##_pad64;
-#define __DEFINE_TIMESPEC64_NO32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_NO32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { __time32_t st_xtime; __time32_t st_xtime##32; __time64_t st_xtime##64; }; \
 	union { __syscall_ulong_t st_xtimensec; __syscall_ulong_t st_xtimensec##32; __syscall_ulong_t st_xtimensec##64; }; \
 	__UINT32_TYPE__ __##st_xtime##_pad64;
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #else /* __USE_KOS */
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	struct __timespec64 __##st_xtim##64;
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtimespec; struct { __time32_t st_xtime; __UINT32_TYPE__ __##st_xtime##_pad; __syscall_ulong_t st_xtimensec; }; };
-#define __DEFINE_TIMESPEC64_NO32(st_xtim,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_NO32(st_xtim, st_xtime, st_xtimensec) \
 	union { __time32_t st_xtime; __time64_t __#st_xtime##64; }; __syscall_ulong_t st_xtimensec;
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtimespec; struct { __time32_t st_xtime; __syscall_ulong_t st_xtimensec; }; };
-#define __DEFINE_TIMESPEC64_NO32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_NO32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { __time32_t st_xtime; __time64_t __##st_xtime##64; }; __syscall_ulong_t st_xtimensec; __UINT32_TYPE__ __##st_xtime##_pad64;
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #endif /* !__USE_KOS */
 #endif /* !__USE_TIME_BITS64 */
 #ifdef __USE_KOS
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC32_ALT(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ALT(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	struct __timespec32 st_xtim##32;
-#define __DEFINE_TIMESPEC64_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtimespec; struct { union { __time32_t st_xtime##32; __time64_t st_xtime; }; union { __syscall_ulong_t st_xtimensec##32; __syscall_ulong_t st_xtimensec; }; }; \
 	        struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; }; };
-#define __DEFINE_TIMESPEC32_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtimespec; struct { __time32_t st_xtime; __UINT32_TYPE__ __##st_xtime##_pad; __syscall_ulong_t st_xtimensec; }; \
 	        struct { __time32_t st_xtime##32; __UINT32_TYPE__ __##st_xtime##_pad32; __syscall_ulong_t st_xtimensec##32; }; };
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC32_ALT(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ALT(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	struct __timespec32 st_xtim##32;
-#define __DEFINE_TIMESPEC64_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtimespec; struct { union { __time32_t st_xtime##32; __time64_t st_xtime; }; union { __syscall_ulong_t st_xtimensec##32; __syscall_ulong_t st_xtimensec; }; __UINT32_TYPE__ __##st_xtime##_pad; }; \
 	        struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; __UINT32_TYPE__ __##st_xtime##_pad64; }; };
-#define __DEFINE_TIMESPEC32_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtimespec; struct { __time32_t st_xtime; __syscall_ulong_t st_xtimensec; }; \
 	        struct { __time32_t st_xtime##32; __syscall_ulong_t st_xtimensec##32; }; };
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #else /* __USE_KOS */
-#define __DEFINE_TIMESPEC32_ALT(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ALT(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	struct __timespec32 __##st_xtim##32;
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC64_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtimespec; struct { __time64_t st_xtime; __syscall_ulong_t st_xtimensec; }; };
-#define __DEFINE_TIMESPEC32_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtimespec; struct { __time32_t st_xtime; __UINT32_TYPE__ __##st_xtime##_pad; __syscall_ulong_t st_xtimensec; }; };
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC64_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtimespec; struct { __time64_t st_xtime; __syscall_ulong_t st_xtimensec; __UINT32_TYPE__ __##st_xtime##_pad; }; };
-#define __DEFINE_TIMESPEC32_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtimespec; struct { __time32_t st_xtime; __syscall_ulong_t st_xtimensec; }; };
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #endif /* !__USE_KOS */
@@ -321,32 +321,32 @@ __SYSDECL_BEGIN
 #ifdef __USE_TIME_BITS64
 #ifdef __USE_KOS
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim##32; struct { __time32_t st_xtime##32; __UINT32_TYPE__ __##st_xtime##_pad32; __syscall_ulong_t st_xtimensec##32; }; };
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim; struct { __time64_t st_xtime; __syscall_ulong_t st_xtimensec; }; \
 	        struct __timespec64 st_xtim##64; struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; }; };
-#define __DEFINE_TIMESPEC64_NO32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_NO32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim; struct { union { __time32_t st_xtime##32; __time64_t st_xtime; }; union { __syscall_ulong_t st_xtimensec##32; __syscall_ulong_t st_xtimensec; }; }; \
 	        struct __timespec64 st_xtim##64; struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; }; };
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim##32; struct { __time32_t st_xtime##32; __syscall_ulong_t st_xtimensec##32; }; };
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim; struct { __time64_t st_xtime; __syscall_ulong_t st_xtimensec; __UINT32_TYPE__ __##st_xtime##_pad; }; \
 	        struct __timespec64 st_xtim##64; struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; __UINT32_TYPE__ __##st_xtime##_pad64; }; };
-#define __DEFINE_TIMESPEC64_NO32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_NO32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim; struct { union { __time32_t st_xtime##32; __time64_t st_xtime; }; union { __syscall_ulong_t st_xtimensec##32; __syscall_ulong_t st_xtimensec; }; __UINT32_TYPE__ __##st_xtime##_pad; }; \
 	        struct __timespec64 st_xtim##64; struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; __UINT32_TYPE__ __##st_xtime##_pad64; }; };
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #else /* __USE_KOS */
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	struct __timespec32 __##st_xtim##32;
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim; struct { __time64_t st_xtime; __syscall_ulong_t st_xtimensec; }; };
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim; struct { __time64_t st_xtime; __syscall_ulong_t st_xtimensec; __UINT32_TYPE__ __##st_xtime##_pad; }; };
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #define __DEFINE_TIMESPEC64_NO32 __DEFINE_TIMESPEC64
@@ -354,70 +354,70 @@ __SYSDECL_BEGIN
 #else /* __USE_TIME_BITS64 */
 #ifdef __USE_KOS
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim; struct { __time32_t st_xtime; __UINT32_TYPE__ __##st_xtime##_pad; __syscall_ulong_t st_xtimensec; }; \
 	        struct __timespec32 st_xtim##32; struct { __time32_t st_xtime##32; __UINT32_TYPE__ __##st_xtime##_pad32; __syscall_ulong_t st_xtimensec##32; }; };
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim##64; struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; }; };
-#define __DEFINE_TIMESPEC64_NO32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_NO32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim##64; struct { union { __time32_t st_xtime; __time32_t st_xtime##32; __time64_t st_xtime##64; }; union { __syscall_ulong_t st_xtimensec; __syscall_ulong_t st_xtimensec##32; __syscall_ulong_t st_xtimensec##64; }; }; };
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim; struct { __time32_t st_xtime; __syscall_ulong_t st_xtimensec; }; \
 	        struct __timespec32 st_xtim##32; struct { __time32_t st_xtime##32; __syscall_ulong_t st_xtimensec##32; }; };
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim##64; struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; __UINT32_TYPE__ __##st_xtime##_pad64; }; };
-#define __DEFINE_TIMESPEC64_NO32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_NO32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim##64; struct { union { __time32_t st_xtime; __time32_t st_xtime##32; __time64_t st_xtime##64; }; union { __syscall_ulong_t st_xtimensec; __syscall_ulong_t st_xtimensec##32; __syscall_ulong_t st_xtimensec##64; }; __UINT32_TYPE__ __##st_xtime##_pad64; }; };
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #else /* __USE_KOS */
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	struct __timespec64 __##st_xtim##64;
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim; struct { __time32_t st_xtime; __UINT32_TYPE__ __##st_xtime##_pad; __syscall_ulong_t st_xtimensec; }; };
-#define __DEFINE_TIMESPEC64_NO32(st_xtim,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_NO32(st_xtim, st_xtime, st_xtimensec) \
 	union { __time32_t st_xtime; __time64_t __#st_xtime##64; }; __syscall_ulong_t st_xtimensec;
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim; struct { __time32_t st_xtime; __syscall_ulong_t st_xtimensec; }; };
-#define __DEFINE_TIMESPEC64_NO32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_NO32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { __time32_t st_xtime; __time64_t __##st_xtime##64; }; __syscall_ulong_t st_xtimensec; __UINT32_TYPE__ __##st_xtime##_pad64;
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #endif /* !__USE_KOS */
 #endif /* !__USE_TIME_BITS64 */
 #ifdef __USE_KOS
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC32_ALT(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ALT(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	struct __timespec32 st_xtim##32;
-#define __DEFINE_TIMESPEC64_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim; struct { union { __time32_t st_xtime##32; __time64_t st_xtime; }; union { __syscall_ulong_t st_xtimensec##32; __syscall_ulong_t st_xtimensec; }; }; \
 	        struct __timespec64 st_xtim##64; struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; }; };
-#define __DEFINE_TIMESPEC32_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim; struct { __time32_t st_xtime; __UINT32_TYPE__ __##st_xtime##_pad; __syscall_ulong_t st_xtimensec; }; \
 	        struct __timespec32 st_xtim##32; struct { __time32_t st_xtime##32; __UINT32_TYPE__ __##st_xtime##_pad32; __syscall_ulong_t st_xtimensec##32; }; };
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC32_ALT(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ALT(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	struct __timespec32 st_xtim##32;
-#define __DEFINE_TIMESPEC64_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim; struct { union { __time32_t st_xtime##32; __time64_t st_xtime; }; union { __syscall_ulong_t st_xtimensec##32; __syscall_ulong_t st_xtimensec; }; __UINT32_TYPE__ __##st_xtime##_pad; }; \
 	        struct __timespec64 st_xtim##64; struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; __UINT32_TYPE__ __##st_xtime##_pad64; }; };
-#define __DEFINE_TIMESPEC32_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim; struct { __time32_t st_xtime; __syscall_ulong_t st_xtimensec; }; \
 	        struct __timespec32 st_xtim##32; struct { __time32_t st_xtime##32; __syscall_ulong_t st_xtimensec##32; }; };
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #else /* __USE_KOS */
-#define __DEFINE_TIMESPEC32_ALT(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ALT(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	struct __timespec32 __##st_xtim##32;
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC64_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim; struct { __time64_t st_xtime; __syscall_ulong_t st_xtimensec; }; };
-#define __DEFINE_TIMESPEC32_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim; struct { __time32_t st_xtime; __UINT32_TYPE__ __##st_xtime##_pad; __syscall_ulong_t st_xtimensec; }; };
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC64_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec64 st_xtim; struct { __time64_t st_xtime; __syscall_ulong_t st_xtimensec; __UINT32_TYPE__ __##st_xtime##_pad; }; };
-#define __DEFINE_TIMESPEC32_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim; struct { __time32_t st_xtime; __syscall_ulong_t st_xtimensec; }; };
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #endif /* !__USE_KOS */
@@ -425,52 +425,52 @@ __SYSDECL_BEGIN
 #ifdef __USE_TIME_BITS64
 #ifdef __USE_KOS
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	__time32_t st_xtime##32; __UINT32_TYPE__ __##st_xtime##_pad32; __syscall_ulong_t st_xtimensec##32;
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct { __time64_t st_xtime; __syscall_ulong_t st_xtimensec; }; \
 	        struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; }; };
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	__time32_t st_xtime##32; __syscall_ulong_t st_xtimensec##32;
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct { __time64_t st_xtime; __syscall_ulong_t st_xtimensec; __UINT32_TYPE__ __##st_xtime##_pad; }; \
 	        struct { __time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; __UINT32_TYPE__ __##st_xtime##_pad64; }; };
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #else /* __USE_KOS */
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	struct __timespec32 __##st_xtim##32;
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	__time64_t st_xtime; __syscall_ulong_t st_xtimensec;
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	__time64_t st_xtime; __syscall_ulong_t st_xtimensec; __UINT32_TYPE__ __##st_xtime##_pad;
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #endif /* !__USE_KOS */
 #else /* __USE_TIME_BITS64 */
 #ifdef __USE_KOS
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct { __time32_t st_xtime; __UINT32_TYPE__ __##st_xtime##_pad; __syscall_ulong_t st_xtimensec; }; \
 	        struct { __time32_t st_xtime##32; __UINT32_TYPE__ __##st_xtime##_pad32; __syscall_ulong_t st_xtimensec##32; }; };
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	__time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64;
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct { __time32_t st_xtime; __syscall_ulong_t st_xtimensec; }; \
 	        struct { __time32_t st_xtime##32; __syscall_ulong_t st_xtimensec##32; }; };
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	__time64_t st_xtime##64; __syscall_ulong_t st_xtimensec##64; __UINT32_TYPE__ __##st_xtime##_pad64;
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #else /* __USE_KOS */
-#define __DEFINE_TIMESPEC64(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	struct __timespec64 __##st_xtim##64;
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	__time32_t st_xtime; __UINT32_TYPE__ __##st_xtime##_pad; __syscall_ulong_t st_xtimensec;
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC32(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	__time32_t st_xtime; __syscall_ulong_t st_xtimensec;
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #endif /* !__USE_KOS */
@@ -479,37 +479,37 @@ __SYSDECL_BEGIN
 
 #ifdef __USE_KOS
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC32_ALT(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ALT(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	__time32_t __##st_xtime##32; __UINT32_TYPE__ __##st_xtime##_pad32; __syscall_ulong_t __##st_xtimensec##32;
-#define __DEFINE_TIMESPEC64_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { __time64_t st_xtime; __time32_t st_xtime##32; __time64_t st_xtime##64; }; \
 	union { __syscall_ulong_t st_xtimensec; __syscall_ulong_t st_xtimensec##32; __syscall_ulong_t st_xtimensec##64; };
-#define __DEFINE_TIMESPEC32_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct { __time32_t st_xtime; __UINT32_TYPE__ __##st_xtime##_pad; __syscall_ulong_t st_xtimensec; }; \
 	        struct { __time32_t st_xtime##32; __UINT32_TYPE__ __##st_xtime##_pad32; __syscall_ulong_t st_xtimensec##32; }; };
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC32_ALT(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ALT(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	__time32_t __##st_xtime##32; __syscall_ulong_t __##st_xtimensec##32;
-#define __DEFINE_TIMESPEC64_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { __time64_t st_xtime; __time32_t st_xtime##32; __time64_t st_xtime##64; }; \
 	union { __syscall_ulong_t st_xtimensec; __syscall_ulong_t st_xtimensec##32; __syscall_ulong_t st_xtimensec##64; }; \
 	__UINT32_TYPE__ __##st_xtime##_pad64;
-#define __DEFINE_TIMESPEC32_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct { __time32_t st_xtime; __syscall_ulong_t st_xtimensec; }; \
 	        struct { __time32_t st_xtime##32; __syscall_ulong_t st_xtimensec##32; }; };
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #else /* __USE_KOS */
-#define __DEFINE_TIMESPEC32_ALT(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ALT(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	struct __timespec32 __##st_xtim##32;
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
-#define __DEFINE_TIMESPEC64_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	__time64_t st_xtime; __syscall_ulong_t st_xtimensec;
-#define __DEFINE_TIMESPEC32_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	__time32_t st_xtime; __UINT32_TYPE__ __##st_xtime##_pad; __syscall_ulong_t st_xtimensec;
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
-#define __DEFINE_TIMESPEC64_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC64_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	__time64_t st_xtime; __syscall_ulong_t st_xtimensec; __UINT32_TYPE__ __##st_xtime##_pad;
-#define __DEFINE_TIMESPEC32_ONLY(st_xtim,st_xtimespec,st_xtime,st_xtimensec) \
+#define __DEFINE_TIMESPEC32_ONLY(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	__time32_t st_xtime; __syscall_ulong_t st_xtimensec;
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 #endif /* !__USE_KOS */
@@ -670,12 +670,12 @@ struct stat {
 		__blkcnt64_t  __st_blocks64;
 #endif /* !__USE_KOS */
 	};
-	__DEFINE_TIMESPEC32(st_atim,st_atimespec,st_atime,st_atimensec)
-	__DEFINE_TIMESPEC32(st_mtim,st_mtimespec,st_mtime,st_mtimensec)
-	__DEFINE_TIMESPEC32(st_ctim,st_ctimespec,st_ctime,st_ctimensec)
-	__DEFINE_TIMESPEC64(st_atim,st_atimespec,st_atime,st_atimensec)
-	__DEFINE_TIMESPEC64(st_mtim,st_mtimespec,st_mtime,st_mtimensec)
-	__DEFINE_TIMESPEC64(st_ctim,st_ctimespec,st_ctime,st_ctimensec)
+	__DEFINE_TIMESPEC32(st_atim, st_atimespec, st_atime, st_atimensec)
+	__DEFINE_TIMESPEC32(st_mtim, st_mtimespec, st_mtime, st_mtimensec)
+	__DEFINE_TIMESPEC32(st_ctim, st_ctimespec, st_ctime, st_ctimensec)
+	__DEFINE_TIMESPEC64(st_atim, st_atimespec, st_atime, st_atimensec)
+	__DEFINE_TIMESPEC64(st_mtim, st_mtimespec, st_mtime, st_mtimensec)
+	__DEFINE_TIMESPEC64(st_ctim, st_ctimespec, st_ctime, st_ctimensec)
 };
 #endif /* !__stat_defined */
 #ifdef __USE_LARGEFILE64
@@ -716,12 +716,12 @@ struct stat64 {
 #else /* __USE_KOS */
 	__blkcnt64_t        st_blocks;
 #endif /* !__USE_KOS */
-	__DEFINE_TIMESPEC32_ALT(st_atim,st_atimespec,st_atime,st_atimensec)
-	__DEFINE_TIMESPEC32_ALT(st_mtim,st_mtimespec,st_mtime,st_mtimensec)
-	__DEFINE_TIMESPEC32_ALT(st_ctim,st_ctimespec,st_ctime,st_ctimensec)
-	__DEFINE_TIMESPEC64_ONLY(st_atim,st_atimespec,st_atime,st_atimensec)
-	__DEFINE_TIMESPEC64_ONLY(st_mtim,st_mtimespec,st_mtime,st_mtimensec)
-	__DEFINE_TIMESPEC64_ONLY(st_ctim,st_ctimespec,st_ctime,st_ctimensec)
+	__DEFINE_TIMESPEC32_ALT(st_atim, st_atimespec, st_atime, st_atimensec)
+	__DEFINE_TIMESPEC32_ALT(st_mtim, st_mtimespec, st_mtime, st_mtimensec)
+	__DEFINE_TIMESPEC32_ALT(st_ctim, st_ctimespec, st_ctime, st_ctimensec)
+	__DEFINE_TIMESPEC64_ONLY(st_atim, st_atimespec, st_atime, st_atimensec)
+	__DEFINE_TIMESPEC64_ONLY(st_mtim, st_mtimespec, st_mtime, st_mtimensec)
+	__DEFINE_TIMESPEC64_ONLY(st_ctim, st_ctimespec, st_ctime, st_ctimensec)
 };
 #endif /* !__stat64_defined */
 #endif /* __USE_LARGEFILE64 */
@@ -744,65 +744,65 @@ struct stat64 {
 #ifndef __stat_defined
 #define __stat_defined 1
 struct stat {
-	/* +0  */__UINT64_TYPE__   st_dev;
-	/* +8  */__UINT32_TYPE__ __pad0;
+	/* +0  */ __UINT64_TYPE__   st_dev;
+	/* +8  */ __UINT32_TYPE__ __pad0;
 #if defined(__USE_KOS) && !defined(__USE_FILE_OFFSET64)
 	union {
-		/* +12 */__UINT32_TYPE__   st_ino32;
-		/* +12 */__UINT32_TYPE__   st_ino;
+		/* +12 */ __UINT32_TYPE__   st_ino32;
+		/* +12 */ __UINT32_TYPE__   st_ino;
 	};
 #elif defined(__USE_KOS)
-	/* +12 */__UINT32_TYPE__   st_ino32;
+	/* +12 */ __UINT32_TYPE__   st_ino32;
 #elif defined(__USE_FILE_OFFSET64)
-	/* +12 */__UINT32_TYPE__ __st_ino32;
+	/* +12 */ __UINT32_TYPE__ __st_ino32;
 #else /* ... */
-	/* +12 */__UINT32_TYPE__   st_ino;
+	/* +12 */ __UINT32_TYPE__   st_ino;
 #endif /* !... */
-	/* +16 */__UINT32_TYPE__   st_mode;
-	/* +20 */__UINT32_TYPE__   st_nlink;
-	/* +24 */__UINT32_TYPE__   st_uid;
-	/* +28 */__UINT32_TYPE__   st_gid;
-	/* +32 */__UINT64_TYPE__   st_rdev;
-	/* +40 */__UINT32_TYPE__ __pad1;
+	/* +16 */ __UINT32_TYPE__   st_mode;
+	/* +20 */ __UINT32_TYPE__   st_nlink;
+	/* +24 */ __UINT32_TYPE__   st_uid;
+	/* +28 */ __UINT32_TYPE__   st_gid;
+	/* +32 */ __UINT64_TYPE__   st_rdev;
+	/* +40 */ __UINT32_TYPE__ __pad1;
 #ifdef __USE_FILE_OFFSET64
 #ifdef __USE_KOS
 	union {
-		/* +44 */__UINT64_TYPE__   st_size;
-		/* +44 */__UINT32_TYPE__   st_size32;
-		/* +44 */__UINT64_TYPE__   st_size64;
+		/* +44 */ __UINT64_TYPE__   st_size;
+		/* +44 */ __UINT32_TYPE__   st_size32;
+		/* +44 */ __UINT64_TYPE__   st_size64;
 	};
 #else /* __USE_KOS */
-	/* +44 */__INT64_TYPE__    st_size;
+	/* +44 */ __INT64_TYPE__    st_size;
 #endif /* !__USE_KOS */
-	/* +52 */__INT32_TYPE__    st_blksize;
-	/* +56 */__INT64_TYPE__    st_blocks;
-	/* +64 */__DEFINE_TIMESPEC32_ONLY(st_atim,st_atimespec,st_atime,st_atimensec)
-	/* +72 */__DEFINE_TIMESPEC32_ONLY(st_mtim,st_mtimespec,st_mtime,st_mtimensec)
-	/* +80 */__DEFINE_TIMESPEC32_ONLY(st_ctim,st_ctimespec,st_ctime,st_ctimensec)
+	/* +52 */ __INT32_TYPE__    st_blksize;
+	/* +56 */ __INT64_TYPE__    st_blocks;
+	/* +64 */ __DEFINE_TIMESPEC32_ONLY(st_atim, st_atimespec, st_atime, st_atimensec)
+	/* +72 */ __DEFINE_TIMESPEC32_ONLY(st_mtim, st_mtimespec, st_mtime, st_mtimensec)
+	/* +80 */ __DEFINE_TIMESPEC32_ONLY(st_ctim, st_ctimespec, st_ctime, st_ctimensec)
 #ifdef __USE_KOS
 	union {
-		/* +88 */__UINT64_TYPE__ st_ino;
-		/* +88 */__UINT64_TYPE__ st_ino64;
+		/* +88 */ __UINT64_TYPE__ st_ino;
+		/* +88 */ __UINT64_TYPE__ st_ino64;
 	};
 #else /* __USE_KOS */
-	/* +88 */__UINT64_TYPE__   st_ino;
+	/* +88 */ __UINT64_TYPE__   st_ino;
 #endif /* !__USE_KOS */
 #else /* __USE_FILE_OFFSET64 */
 #ifdef __USE_KOS
 	union {
-		/* +44 */__INT32_TYPE__    st_size;
-		/* +44 */__INT32_TYPE__    st_size32;
+		/* +44 */ __INT32_TYPE__    st_size;
+		/* +44 */ __INT32_TYPE__    st_size32;
 	};
 #else
-	/* +44 */__INT32_TYPE__    st_size;
+	/* +44 */ __INT32_TYPE__    st_size;
 #endif
-	/* +48 */__INT32_TYPE__    st_blksize;
-	/* +52 */__INT32_TYPE__    st_blocks;
-	/* +56 */__DEFINE_TIMESPEC32_ONLY(st_atim,st_atimespec,st_atime,st_atimensec)
-	/* +64 */__DEFINE_TIMESPEC32_ONLY(st_mtim,st_mtimespec,st_mtime,st_mtimensec)
-	/* +72 */__DEFINE_TIMESPEC32_ONLY(st_ctim,st_ctimespec,st_ctime,st_ctimensec)
-	/* +80 */__UINT32_TYPE__ __pad2;
-	/* +84 */__UINT32_TYPE__ __pad3;
+	/* +48 */ __INT32_TYPE__    st_blksize;
+	/* +52 */ __INT32_TYPE__    st_blocks;
+	/* +56 */ __DEFINE_TIMESPEC32_ONLY(st_atim, st_atimespec, st_atime, st_atimensec)
+	/* +64 */ __DEFINE_TIMESPEC32_ONLY(st_mtim, st_mtimespec, st_mtime, st_mtimensec)
+	/* +72 */ __DEFINE_TIMESPEC32_ONLY(st_ctim, st_ctimespec, st_ctime, st_ctimensec)
+	/* +80 */ __UINT32_TYPE__ __pad2;
+	/* +84 */ __UINT32_TYPE__ __pad3;
 #endif /* !__USE_FILE_OFFSET64 */
 };
 #endif /* !__stat_defined */
@@ -810,40 +810,40 @@ struct stat {
 #ifndef __stat64_defined
 #define __stat64_defined 1
 struct stat64 {
-	/* +0  */__UINT64_TYPE__   st_dev;
-	/* +8  */__UINT32_TYPE__ __pad0;
+	/* +0  */ __UINT64_TYPE__   st_dev;
+	/* +8  */ __UINT32_TYPE__ __pad0;
 #ifdef __USE_KOS
-	/* +12 */__UINT32_TYPE__   st_ino32;
+	/* +12 */ __UINT32_TYPE__   st_ino32;
 #else /* __USE_KOS */
-	/* +12 */__UINT32_TYPE__ __st_ino32;
+	/* +12 */ __UINT32_TYPE__ __st_ino32;
 #endif /* !__USE_KOS */
-	/* +16 */__UINT32_TYPE__   st_mode;
-	/* +20 */__UINT32_TYPE__   st_nlink;
-	/* +24 */__UINT32_TYPE__   st_uid;
-	/* +28 */__UINT32_TYPE__   st_gid;
-	/* +32 */__UINT64_TYPE__   st_rdev;
-	/* +40 */__UINT32_TYPE__ __pad1;
+	/* +16 */ __UINT32_TYPE__   st_mode;
+	/* +20 */ __UINT32_TYPE__   st_nlink;
+	/* +24 */ __UINT32_TYPE__   st_uid;
+	/* +28 */ __UINT32_TYPE__   st_gid;
+	/* +32 */ __UINT64_TYPE__   st_rdev;
+	/* +40 */ __UINT32_TYPE__ __pad1;
 #ifdef __USE_KOS
 	union {
-		/* +44 */__UINT64_TYPE__ st_size;
-		/* +44 */__UINT32_TYPE__ st_size32;
-		/* +44 */__UINT64_TYPE__ st_size64;
+		/* +44 */ __UINT64_TYPE__ st_size;
+		/* +44 */ __UINT32_TYPE__ st_size32;
+		/* +44 */ __UINT64_TYPE__ st_size64;
 	};
 #else /* __USE_KOS */
-	/* +44 */__INT64_TYPE__    st_size;
+	/* +44 */ __INT64_TYPE__    st_size;
 #endif /* !__USE_KOS */
-	/* +52 */__INT32_TYPE__    st_blksize;
-	/* +56 */__INT64_TYPE__    st_blocks;
-	/* +64 */__DEFINE_TIMESPEC32_ONLY(st_atim,st_atimespec,st_atime,st_atimensec)
-	/* +72 */__DEFINE_TIMESPEC32_ONLY(st_mtim,st_mtimespec,st_mtime,st_mtimensec)
-	/* +80 */__DEFINE_TIMESPEC32_ONLY(st_ctim,st_ctimespec,st_ctime,st_ctimensec)
+	/* +52 */ __INT32_TYPE__    st_blksize;
+	/* +56 */ __INT64_TYPE__    st_blocks;
+	/* +64 */ __DEFINE_TIMESPEC32_ONLY(st_atim, st_atimespec, st_atime, st_atimensec)
+	/* +72 */ __DEFINE_TIMESPEC32_ONLY(st_mtim, st_mtimespec, st_mtime, st_mtimensec)
+	/* +80 */ __DEFINE_TIMESPEC32_ONLY(st_ctim, st_ctimespec, st_ctime, st_ctimensec)
 #ifdef __USE_KOS
 	union {
-		/* +88 */__UINT64_TYPE__ st_ino;
-		/* +88 */__UINT64_TYPE__ st_ino64;
+		/* +88 */ __UINT64_TYPE__ st_ino;
+		/* +88 */ __UINT64_TYPE__ st_ino64;
 	};
 #else /* __USE_KOS */
-	/* +88 */__UINT64_TYPE__   st_ino;
+	/* +88 */ __UINT64_TYPE__   st_ino;
 #endif /* !__USE_KOS */
 };
 #endif /* !__stat64_defined */
@@ -869,98 +869,98 @@ struct stat64 {
 #ifndef __stat_defined
 #define __stat_defined 1
 struct stat {
-	/* +0   */__UINT32_TYPE__     st_dev;
-	/* +4   */__UINT32_TYPE__   __st_pad0;
+	/* +0   */ __UINT32_TYPE__     st_dev;
+	/* +4   */ __UINT32_TYPE__   __st_pad0;
 #ifdef __USE_KOS
 	union {
-		/* +8   */__UINT32_TYPE__ st_ino;
-		/* +8   */__UINT64_TYPE__ st_ino64;
-		/* +8   */__UINT32_TYPE__ st_ino32;
+		/* +8   */ __UINT32_TYPE__ st_ino;
+		/* +8   */ __UINT64_TYPE__ st_ino64;
+		/* +8   */ __UINT32_TYPE__ st_ino32;
 	};
 #else /* __USE_KOS */
-	/* +8   */__UINT64_TYPE__     st_ino;
+	/* +8   */ __UINT64_TYPE__     st_ino;
 #endif /* !__USE_KOS */
-	/* +16  */__UINT32_TYPE__     st_mode;
-	/* +20  */__UINT16_TYPE__     st_nlink;
-	/* +22  */__UINT16_TYPE__   __st_pad1;
-	/* +24  */__UINT32_TYPE__     st_uid;
-	/* +28  */__UINT32_TYPE__     st_gid;
-	/* +32  */__UINT32_TYPE__     st_rdev;
-	/* +36  */__UINT32_TYPE__   __st_pad2;
+	/* +16  */ __UINT32_TYPE__     st_mode;
+	/* +20  */ __UINT16_TYPE__     st_nlink;
+	/* +22  */ __UINT16_TYPE__   __st_pad1;
+	/* +24  */ __UINT32_TYPE__     st_uid;
+	/* +28  */ __UINT32_TYPE__     st_gid;
+	/* +32  */ __UINT32_TYPE__     st_rdev;
+	/* +36  */ __UINT32_TYPE__   __st_pad2;
 #ifdef __USE_KOS
 	union {
-		/* +40  */__UINT32_TYPE__ st_size;
-		/* +40  */__UINT64_TYPE__ st_size64;
-		/* +40  */__UINT32_TYPE__ st_size32;
+		/* +40  */ __UINT32_TYPE__ st_size;
+		/* +40  */ __UINT64_TYPE__ st_size64;
+		/* +40  */ __UINT32_TYPE__ st_size32;
 	};
 #else /* __USE_KOS */
-	/* +40  */__UINT32_TYPE__     st_size;
-	/* +44  */__UINT32_TYPE__   __st_padsize;
+	/* +40  */ __UINT32_TYPE__     st_size;
+	/* +44  */ __UINT32_TYPE__   __st_padsize;
 #endif /* !__USE_KOS */
-	/* +48  */__DEFINE_TIMESPEC64_NO32(st_atim,st_atimespec,st_atime,st_atimensec)
-	/* +64  */__DEFINE_TIMESPEC64_NO32(st_mtim,st_mtimespec,st_mtime,st_mtimensec)
-	/* +80  */__DEFINE_TIMESPEC64_NO32(st_ctim,st_ctimespec,st_ctime,st_ctimensec)
-	/* +96  */__UINT32_TYPE__     st_blksize;
-	/* +100 */__UINT32_TYPE__   __st_pad3;
+	/* +48  */ __DEFINE_TIMESPEC64_NO32(st_atim, st_atimespec, st_atime, st_atimensec)
+	/* +64  */ __DEFINE_TIMESPEC64_NO32(st_mtim, st_mtimespec, st_mtime, st_mtimensec)
+	/* +80  */ __DEFINE_TIMESPEC64_NO32(st_ctim, st_ctimespec, st_ctime, st_ctimensec)
+	/* +96  */ __UINT32_TYPE__     st_blksize;
+	/* +100 */ __UINT32_TYPE__   __st_pad3;
 #ifdef __USE_KOS
 	union {
-		/* +104 */__UINT32_TYPE__ st_blocks;
-		/* +104 */__UINT64_TYPE__ st_blocks64;
-		/* +104 */__UINT32_TYPE__ st_blocks32;
+		/* +104 */ __UINT32_TYPE__ st_blocks;
+		/* +104 */ __UINT64_TYPE__ st_blocks64;
+		/* +104 */ __UINT32_TYPE__ st_blocks32;
 	};
 #else /* __USE_KOS */
-	/* +104 */__UINT32_TYPE__     st_blocks;
-	/* +108 */__UINT32_TYPE__   __st_padblocks;
+	/* +104 */ __UINT32_TYPE__     st_blocks;
+	/* +108 */ __UINT32_TYPE__   __st_padblocks;
 #endif /* !__USE_KOS */
-	/* +112 */__DEFINE_TIMESPEC64_NO32(st_birthtim,st_birthtimespec,st_birthtime,st_birthtimensec)
+	/* +112 */ __DEFINE_TIMESPEC64_NO32(st_birthtim, st_birthtimespec, st_birthtime, st_birthtimensec)
 };
 #endif /* !__stat_defined */
 #ifdef __USE_LARGEFILE64
 #ifndef __stat64_defined
 #define __stat64_defined 1
 struct stat64 {
-	/* +0   */__UINT32_TYPE__     st_dev;
-	/* +4   */__UINT32_TYPE__   __st_pad0;
+	/* +0   */ __UINT32_TYPE__     st_dev;
+	/* +4   */ __UINT32_TYPE__   __st_pad0;
 #ifdef __USE_KOS
 	union {
-		/* +8   */__UINT64_TYPE__ st_ino;
-		/* +8   */__UINT64_TYPE__ st_ino64;
-		/* +8   */__UINT32_TYPE__ st_ino32;
+		/* +8   */ __UINT64_TYPE__ st_ino;
+		/* +8   */ __UINT64_TYPE__ st_ino64;
+		/* +8   */ __UINT32_TYPE__ st_ino32;
 	};
 #else /* __USE_KOS */
-	/* +8   */__UINT64_TYPE__     st_ino;
+	/* +8   */ __UINT64_TYPE__     st_ino;
 #endif /* !__USE_KOS */
-	/* +16  */__UINT32_TYPE__     st_mode;
-	/* +20  */__UINT16_TYPE__     st_nlink;
-	/* +22  */__UINT16_TYPE__   __st_pad1;
-	/* +24  */__UINT32_TYPE__     st_uid;
-	/* +28  */__UINT32_TYPE__     st_gid;
-	/* +32  */__UINT32_TYPE__     st_rdev;
-	/* +36  */__UINT32_TYPE__   __st_pad2;
+	/* +16  */ __UINT32_TYPE__     st_mode;
+	/* +20  */ __UINT16_TYPE__     st_nlink;
+	/* +22  */ __UINT16_TYPE__   __st_pad1;
+	/* +24  */ __UINT32_TYPE__     st_uid;
+	/* +28  */ __UINT32_TYPE__     st_gid;
+	/* +32  */ __UINT32_TYPE__     st_rdev;
+	/* +36  */ __UINT32_TYPE__   __st_pad2;
 #ifdef __USE_KOS
 	union {
-		/* +40  */__UINT64_TYPE__ st_size;
-		/* +40  */__UINT64_TYPE__ st_size64;
-		/* +40  */__UINT32_TYPE__ st_size32;
+		/* +40  */ __UINT64_TYPE__ st_size;
+		/* +40  */ __UINT64_TYPE__ st_size64;
+		/* +40  */ __UINT32_TYPE__ st_size32;
 	};
 #else /* __USE_KOS */
-	/* +40  */__UINT64_TYPE__     st_size;
+	/* +40  */ __UINT64_TYPE__     st_size;
 #endif /* !__USE_KOS */
-	/* +48  */__DEFINE_TIMESPEC64_ONLY(st_atim,st_atimespec,st_atime,st_atimensec)
-	/* +64  */__DEFINE_TIMESPEC64_ONLY(st_mtim,st_mtimespec,st_mtime,st_mtimensec)
-	/* +80  */__DEFINE_TIMESPEC64_ONLY(st_ctim,st_ctimespec,st_ctime,st_ctimensec)
-	/* +96  */__UINT32_TYPE__     st_blksize;
-	/* +100 */__UINT32_TYPE__   __st_pad3;
+	/* +48  */ __DEFINE_TIMESPEC64_ONLY(st_atim, st_atimespec, st_atime, st_atimensec)
+	/* +64  */ __DEFINE_TIMESPEC64_ONLY(st_mtim, st_mtimespec, st_mtime, st_mtimensec)
+	/* +80  */ __DEFINE_TIMESPEC64_ONLY(st_ctim, st_ctimespec, st_ctime, st_ctimensec)
+	/* +96  */ __UINT32_TYPE__     st_blksize;
+	/* +100 */ __UINT32_TYPE__   __st_pad3;
 #ifdef __USE_KOS
 	union {
-		/* +104 */__UINT64_TYPE__ st_blocks;
-		/* +104 */__UINT64_TYPE__ st_blocks64;
-		/* +104 */__UINT32_TYPE__ st_blocks32;
+		/* +104 */ __UINT64_TYPE__ st_blocks;
+		/* +104 */ __UINT64_TYPE__ st_blocks64;
+		/* +104 */ __UINT32_TYPE__ st_blocks32;
 	};
 #else /* __USE_KOS */
-	/* +104 */__UINT64_TYPE__     st_blocks;
+	/* +104 */ __UINT64_TYPE__     st_blocks;
 #endif /* !__USE_KOS */
-	/* +112 */__DEFINE_TIMESPEC64_ONLY(st_birthtim,st_birthtimespec,st_birthtime,st_birthtimensec)
+	/* +112 */ __DEFINE_TIMESPEC64_ONLY(st_birthtim, st_birthtimespec, st_birthtime, st_birthtimensec)
 };
 #endif /* !__stat64_defined */
 #endif /* __USE_LARGEFILE64 */
@@ -1189,77 +1189,77 @@ struct __kos_stat {
 #ifdef __DEFINE_GLC_STAT_STRUCTURES
 #undef __DEFINE_GLC_STAT_STRUCTURES
 struct __glc_stat {
-	/* +0  */__UINT64_TYPE__   st_dev;
-	/* +8  */__UINT32_TYPE__ __st_pad0;
-	/* +12 */__UINT32_TYPE__   st_ino;
-	/* +16 */__UINT32_TYPE__   st_mode;
-	/* +20 */__UINT32_TYPE__   st_nlink;
-	/* +24 */__UINT32_TYPE__   st_uid;
-	/* +28 */__UINT32_TYPE__   st_gid;
-	/* +32 */__UINT64_TYPE__   st_rdev;
-	/* +40 */__UINT32_TYPE__ __st_pad1;
+	/* +0  */ __UINT64_TYPE__   st_dev;
+	/* +8  */ __UINT32_TYPE__ __st_pad0;
+	/* +12 */ __UINT32_TYPE__   st_ino;
+	/* +16 */ __UINT32_TYPE__   st_mode;
+	/* +20 */ __UINT32_TYPE__   st_nlink;
+	/* +24 */ __UINT32_TYPE__   st_uid;
+	/* +28 */ __UINT32_TYPE__   st_gid;
+	/* +32 */ __UINT64_TYPE__   st_rdev;
+	/* +40 */ __UINT32_TYPE__ __st_pad1;
 #ifdef __USE_KOS
-	/* +44 */__UINT32_TYPE__   st_size;
-	/* +48 */__UINT32_TYPE__   st_blksize;
-	/* +52 */__UINT32_TYPE__   st_blocks;
+	/* +44 */ __UINT32_TYPE__   st_size;
+	/* +48 */ __UINT32_TYPE__   st_blksize;
+	/* +52 */ __UINT32_TYPE__   st_blocks;
 #else /* __USE_KOS */
-	/* +44 */__INT32_TYPE__    st_size;
-	/* +48 */__INT32_TYPE__    st_blksize;
-	/* +52 */__INT32_TYPE__    st_blocks;
+	/* +44 */ __INT32_TYPE__    st_size;
+	/* +48 */ __INT32_TYPE__    st_blksize;
+	/* +52 */ __INT32_TYPE__    st_blocks;
 #endif /* !__USE_KOS */
-	/* +56 */struct __timespec32 st_atim;
-	/* +64 */struct __timespec32 st_mtim;
-	/* +72 */struct __timespec32 st_ctim;
-	/* +80 */__UINT32_TYPE__ __st_pad2;
-	/* +84 */__UINT32_TYPE__ __st_pad3;
+	/* +56 */ struct __timespec32 st_atim;
+	/* +64 */ struct __timespec32 st_mtim;
+	/* +72 */ struct __timespec32 st_ctim;
+	/* +80 */ __UINT32_TYPE__ __st_pad2;
+	/* +84 */ __UINT32_TYPE__ __st_pad3;
 };
 struct __glc_stat64 {
-	/* +0  */__UINT64_TYPE__   st_dev;
-	/* +8  */__UINT32_TYPE__ __st_pad0;
-	/* +12 */__UINT32_TYPE__   st_ino32;
-	/* +16 */__UINT32_TYPE__   st_mode;
-	/* +20 */__UINT32_TYPE__   st_nlink;
-	/* +24 */__UINT32_TYPE__   st_uid;
-	/* +28 */__UINT32_TYPE__   st_gid;
-	/* +32 */__UINT64_TYPE__   st_rdev;
-	/* +40 */__UINT32_TYPE__ __st_pad1;
+	/* +0  */ __UINT64_TYPE__   st_dev;
+	/* +8  */ __UINT32_TYPE__ __st_pad0;
+	/* +12 */ __UINT32_TYPE__   st_ino32;
+	/* +16 */ __UINT32_TYPE__   st_mode;
+	/* +20 */ __UINT32_TYPE__   st_nlink;
+	/* +24 */ __UINT32_TYPE__   st_uid;
+	/* +28 */ __UINT32_TYPE__   st_gid;
+	/* +32 */ __UINT64_TYPE__   st_rdev;
+	/* +40 */ __UINT32_TYPE__ __st_pad1;
 #ifdef __USE_KOS
-	/* +44 */__UINT64_TYPE__   st_size64;
-	/* +52 */__UINT32_TYPE__   st_blksize;
-	/* +56 */__UINT64_TYPE__   st_blocks;
+	/* +44 */ __UINT64_TYPE__   st_size64;
+	/* +52 */ __UINT32_TYPE__   st_blksize;
+	/* +56 */ __UINT64_TYPE__   st_blocks;
 #else
-	/* +44 */__INT64_TYPE__    st_size64;
-	/* +52 */__INT32_TYPE__    st_blksize;
-	/* +56 */__INT64_TYPE__    st_blocks;
+	/* +44 */ __INT64_TYPE__    st_size64;
+	/* +52 */ __INT32_TYPE__    st_blksize;
+	/* +56 */ __INT64_TYPE__    st_blocks;
 #endif
-	/* +64 */struct __timespec32 st_atim;
-	/* +72 */struct __timespec32 st_mtim;
-	/* +80 */struct __timespec32 st_ctim;
-	/* +88 */__UINT64_TYPE__   st_ino64;
+	/* +64 */ struct __timespec32 st_atim;
+	/* +72 */ struct __timespec32 st_mtim;
+	/* +80 */ struct __timespec32 st_ctim;
+	/* +88 */ __UINT64_TYPE__   st_ino64;
 };
 #endif /* __DEFINE_GLC_STAT_STRUCTURES */
 
 #ifdef __DEFINE_CYG_STAT_STRUCTURES
 #undef __DEFINE_CYG_STAT_STRUCTURES
 struct __cyg_stat {
-	/* +0   */__UINT32_TYPE__     st_dev;
-	/* +4   */__UINT32_TYPE__   __st_pad0;
-	/* +8   */__UINT64_TYPE__     st_ino;
-	/* +16  */__UINT32_TYPE__     st_mode;
-	/* +20  */__UINT16_TYPE__     st_nlink;
-	/* +22  */__UINT16_TYPE__   __st_pad1;
-	/* +24  */__UINT32_TYPE__     st_uid;
-	/* +28  */__UINT32_TYPE__     st_gid;
-	/* +32  */__UINT32_TYPE__     st_rdev;
-	/* +36  */__UINT32_TYPE__   __st_pad2;
-	/* +40  */__UINT64_TYPE__     st_size;
-	/* +48  */struct __timespec64 st_atim;
-	/* +64  */struct __timespec64 st_mtim;
-	/* +80  */struct __timespec64 st_ctim;
-	/* +96  */__UINT32_TYPE__     st_blksize;
-	/* +100 */__UINT32_TYPE__   __st_pad3;
-	/* +104 */__UINT64_TYPE__     st_blocks;
-	/* +112 */struct __timespec64 st_birthtim;
+	/* +0   */ __UINT32_TYPE__     st_dev;
+	/* +4   */ __UINT32_TYPE__   __st_pad0;
+	/* +8   */ __UINT64_TYPE__     st_ino;
+	/* +16  */ __UINT32_TYPE__     st_mode;
+	/* +20  */ __UINT16_TYPE__     st_nlink;
+	/* +22  */ __UINT16_TYPE__   __st_pad1;
+	/* +24  */ __UINT32_TYPE__     st_uid;
+	/* +28  */ __UINT32_TYPE__     st_gid;
+	/* +32  */ __UINT32_TYPE__     st_rdev;
+	/* +36  */ __UINT32_TYPE__   __st_pad2;
+	/* +40  */ __UINT64_TYPE__     st_size;
+	/* +48  */ struct __timespec64 st_atim;
+	/* +64  */ struct __timespec64 st_mtim;
+	/* +80  */ struct __timespec64 st_ctim;
+	/* +96  */ __UINT32_TYPE__     st_blksize;
+	/* +100 */ __UINT32_TYPE__   __st_pad3;
+	/* +104 */ __UINT64_TYPE__     st_blocks;
+	/* +112 */ struct __timespec64 st_birthtim;
 };
 #endif /* __DEFINE_CYG_STAT_STRUCTURES */
 

@@ -171,7 +171,7 @@ NOTHROW(KCALL dbg_autocomplete_command)(char *__restrict line,
  * @param: autocomplete: The autocomplete function that should be used
  *                       for TAB (or `NULL' if this should be disabled)
  * @return: * : The number of bytes read and written to `buf' */
-FUNDEF size_t KCALL dbg_readline(/*utf-8*/char *__restrict buf, size_t bufsize,
+FUNDEF size_t KCALL dbg_readline(/*utf-8*/ char *__restrict buf, size_t bufsize,
                                  dbg_autocomplete_t autocomplete);
 #define DBG_MAXLINE 256 /* Default max length of a line (aka. intended size for `dbg_readline:buf') */
 

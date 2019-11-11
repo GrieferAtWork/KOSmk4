@@ -37,7 +37,7 @@ struct aio_multihandle;
 struct character_device_type {
 	REF struct driver *ct_driver; /* [1..1] The associated, implementing driver. */
 	/* [0..1] Finalizer callback. */
-	NOBLOCK NONNULL((1)) void /*NOTHROW*/(KCALL *ct_fini)(struct character_device *__restrict self);
+	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *ct_fini)(struct character_device *__restrict self);
 	/* All of these are [0..1] */
 	NONNULL((1)) size_t (KCALL *ct_read)(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 	NONNULL((1)) size_t (KCALL *ct_write)(struct character_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);

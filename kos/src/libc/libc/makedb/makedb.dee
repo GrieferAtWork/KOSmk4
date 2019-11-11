@@ -325,7 +325,7 @@ print out: copyright.strip();
 print out: "#define DESCRIPTORS_COUNT",#descriptors;
 print out: "PRIVATE ATTR_SECTION(\".rodata.crt.unicode.UTF.descriptors\") struct __unitraits const descriptors[" + #descriptors + "] = {";
 for (local i,x: util::enumerate(descriptors)) {
-	print out: ("\t/* 0x%.2x */" % i)+"{ 0x%x, %d, %d, %d, %d, %d }," % x;
+	print out: ("\t/* 0x%.2x */" % i)+" { 0x%x, %d, %d, %d, %d, %d }," % x;
 }
 print out: "};";
 

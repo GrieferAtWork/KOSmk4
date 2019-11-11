@@ -71,25 +71,25 @@ STATIC_ASSERT(offsetof(struct task, t_sched.s_state) == OFFSET_TASK_SCHED_STATE)
 
 PRIVATE ATTR_USED ATTR_SECTION(".data.pertask.head")
 struct task task_header = {
-	/* .t_self     = */NULL, /* Filled in by the initializer. */
-	/* .t_refcnt   = */1,
-	/* .t_flags    = */TASK_FNORMAL,
-	/* .t_cpu      = */&_bootcpu,
-	/* .t_vm       = */&vm_kernel,
-	/* .t_vm_tasks = */LLIST_INITNODE,
-	/* .t_heapsz   = */(size_t)__kernel_pertask_size,
-	/* .t_sched    = */{
-		/* .s_state = */NULL
+	/* .t_self     = */ NULL, /* Filled in by the initializer. */
+	/* .t_refcnt   = */ 1,
+	/* .t_flags    = */ TASK_FNORMAL,
+	/* .t_cpu      = */ &_bootcpu,
+	/* .t_vm       = */ &vm_kernel,
+	/* .t_vm_tasks = */ LLIST_INITNODE,
+	/* .t_heapsz   = */ (size_t)__kernel_pertask_size,
+	/* .t_sched    = */ {
+		/* .s_state = */ NULL
 	},
-	/* .t_ctime = */{
-		/* .q_jtime = */0,
-		/* .q_qtime = */0,
-		/* .q_qsize = */1
+	/* .t_ctime = */ {
+		/* .q_jtime = */ 0,
+		/* .q_qtime = */ 0,
+		/* .q_qsize = */ 1
 	},
-	/* .t_atime = */{
-		/* .q_jtime = */0,
-		/* .q_qtime = */0,
-		/* .q_qsize = */1
+	/* .t_atime = */ {
+		/* .q_jtime = */ 0,
+		/* .q_qtime = */ 0,
+		/* .q_qsize = */ 1
 	}
 };
 
@@ -98,49 +98,51 @@ INTDEF byte_t __kernel_bootidle_stack_page[];
 
 PUBLIC ATTR_PERTASK struct vm_datapart
 __this_kernel_stack_part ASMNAME("_this_kernel_stack_part") = {
-	/* .dp_refcnt = */1,
-	/* .dp_lock   = */SHARED_RWLOCK_INIT,
-	{/* .dp_tree = */{ NULL, NULL, 0, CEILDIV(KERNEL_STACKSIZE,PAGESIZE) - 1 }},
-	/* .dp_crefs = */LLIST_INIT,
-	/* .dp_srefs = */(struct vm_node *)&_this_kernel_stack,
-	/* .dp_stale = */NULL,
-	/* .dp_block = */&vm_datablock_anonymous,
-#if CEILDIV(KERNEL_STACKSIZE,PAGESIZE) > (BITS_PER_POINTER / VM_DATAPART_PPP_BITS)
-	/* .dp_flags = */VM_DATAPART_FLAG_HEAPPPP,
-#else
-	/* .dp_flags = */VM_DATAPART_FLAG_NORMAL,
-#endif
-	/* .dp_state = */VM_DATAPART_STATE_LOCKED,
+	/* .dp_refcnt = */ 1,
+	/* .dp_lock   = */ SHARED_RWLOCK_INIT,
 	{
-		/* .dp_ramdata = */{
-			/* .rd_blockv = */&__this_kernel_stack_part.dp_ramdata.rd_block0,
+		/* .dp_tree = */ { NULL, NULL, 0, CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1 }
+	},
+	/* .dp_crefs = */ LLIST_INIT,
+	/* .dp_srefs = */ (struct vm_node *)&_this_kernel_stack,
+	/* .dp_stale = */ NULL,
+	/* .dp_block = */ &vm_datablock_anonymous,
+#if CEILDIV(KERNEL_STACKSIZE, PAGESIZE) > (BITS_PER_POINTER / VM_DATAPART_PPP_BITS)
+	/* .dp_flags = */ VM_DATAPART_FLAG_HEAPPPP,
+#else
+	/* .dp_flags = */ VM_DATAPART_FLAG_NORMAL,
+#endif
+	/* .dp_state = */ VM_DATAPART_STATE_LOCKED,
+	{
+		/* .dp_ramdata = */ {
+			/* .rd_blockv = */ &__this_kernel_stack_part.dp_ramdata.rd_block0,
 			{
-					/* .rd_block0 = */{
-						/* .rb_start = */0, /* Filled later. */
-						/* .rb_size  = */CEILDIV(KERNEL_STACKSIZE,PAGESIZE)
-					}
+				/* .rd_block0 = */ {
+					/* .rb_start = */ 0, /* Filled later. */
+					/* .rb_size  = */ CEILDIV(KERNEL_STACKSIZE, PAGESIZE)
+				}
 			}
 		}
 	},
 	{
-#if CEILDIV(KERNEL_STACKSIZE,PAGESIZE) > (BITS_PER_POINTER / VM_DATAPART_PPP_BITS)
-		/* .dp_pprop = */0,
+#if CEILDIV(KERNEL_STACKSIZE, PAGESIZE) > (BITS_PER_POINTER / VM_DATAPART_PPP_BITS)
+		/* .dp_pprop = */ 0,
 #else
-		/* .dp_pprop = */(uintptr_t)-1,
+		/* .dp_pprop = */ (uintptr_t)-1,
 #endif
 	},
 };
 PUBLIC ATTR_PERTASK struct vm_node
 __this_kernel_stack ASMNAME("_this_kernel_stack") = {
-	/* .vn_node      = */{ NULL, NULL, 0, 0 },
-	/* .vn_byaddr    = */LLIST_INITNODE,
-	/* .vn_prot      = */VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED,
-	/* .vn_flags     = */VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED,
-	/* .vn_vm        = */&vm_kernel,
-	/* .vn_part      = */&__this_kernel_stack_part,
-	/* .vn_block     = */&vm_datablock_anonymous,
-	/* .vn_link      = */{ NULL, &LLIST_HEAD(__this_kernel_stack_part.dp_srefs) },
-	/* .vn_guard     = */0
+	/* .vn_node      = */ { NULL, NULL, 0, 0 },
+	/* .vn_byaddr    = */ LLIST_INITNODE,
+	/* .vn_prot      = */ VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED,
+	/* .vn_flags     = */ VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED,
+	/* .vn_vm        = */ &vm_kernel,
+	/* .vn_part      = */ &__this_kernel_stack_part,
+	/* .vn_block     = */ &vm_datablock_anonymous,
+	/* .vn_link      = */ { NULL, &LLIST_HEAD(__this_kernel_stack_part.dp_srefs) },
+	/* .vn_guard     = */ 0
 };
 
 

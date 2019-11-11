@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3ef2a5c */
+/* HASH CRC-32:0x7e9700fa */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #define ____localdep_utimensat32_defined 1
 #ifdef __CRT_HAVE_utimensat
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_utimensat32,(__fd_t __dirfd, char const *__filename, struct __TM_TYPE(timespec) const __times[2/*or:3*/], __atflag_t __flags),utimensat,(__dirfd,__filename,__times,__flags))
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_utimensat32,(__fd_t __dirfd, char const *__filename, struct __TM_TYPE(timespec) const __times[2 /*or:3*/], __atflag_t __flags),utimensat,(__dirfd,__filename,__times,__flags))
 #else /* LIBC: utimensat */
 #undef ____localdep_utimensat32_defined
 #endif /* utimensat32... */
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(utimensat64) __ATTR_NONNULL((2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(utimensat64))(__fd_t __dirfd,
                                                          char const *__filename,
-                                                         struct __timespec64 const __times[2/*or:3*/],
+                                                         struct __timespec64 const __times[2 /*or:3*/],
                                                          __atflag_t __flags) {
 #line 607 "kos/src/libc/magic/sys.stat.c"
 #if defined(__KOS__) && __KOS_VERSION__ >= 300

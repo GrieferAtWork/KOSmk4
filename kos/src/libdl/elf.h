@@ -404,7 +404,7 @@ INTDEF DlModule *CC DlModule_FindFromStaticPointer(void const *static_pointer);
 
 /* Functions made available to applications being loaded. */
 INTDEF REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *LIBCCALL
-libdl_dlfopen(/*inherit(on_success)*/fd_t fd, unsigned int mode);
+libdl_dlfopen(/*inherit(on_success)*/ fd_t fd, unsigned int mode);
 INTDEF WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *LIBCCALL
 libdl_dlopen(char const *filename, int mode);
 INTDEF NONNULL((1)) int LIBCCALL libdl_dlclose(REF DlModule *handle);

@@ -54,8 +54,8 @@ LIBINSTRLEN_DECL __ATTR_PURE __ATTR_WUNUSED void const *__NOTHROW_NCX(LIBINSTRLE
 /* Same as above, but return pc +/- 1, and discard a SEGFAULT and restore any old
  * exception when `pc' is invalid invalid pointer, or when `arch_instruction_(curr|pred)'
  * would have returned `NULL'. */
-typedef /*__ATTR_PURE*/ __ATTR_WUNUSED void const * /*__NOTHROW*/(LIBINSTRLEN_CC *PINSTRUCTION_TRYSUCC)(void const *pc);
-typedef /*__ATTR_PURE*/ __ATTR_WUNUSED void const * /*__NOTHROW*/(LIBINSTRLEN_CC *PINSTRUCTION_TRYPRED)(void const *pc);
+typedef /*__ATTR_PURE*/ __ATTR_WUNUSED void const * /*__NOTHROW*/ (LIBINSTRLEN_CC *PINSTRUCTION_TRYSUCC)(void const *pc);
+typedef /*__ATTR_PURE*/ __ATTR_WUNUSED void const * /*__NOTHROW*/ (LIBINSTRLEN_CC *PINSTRUCTION_TRYPRED)(void const *pc);
 #ifdef LIBINSTRLEN_WANT_PROTOTYPES
 LIBINSTRLEN_DECL __ATTR_PURE __ATTR_WUNUSED void const *__NOTHROW(LIBINSTRLEN_CC instruction_trysucc)(void const *pc);
 LIBINSTRLEN_DECL __ATTR_PURE __ATTR_WUNUSED void const *__NOTHROW(LIBINSTRLEN_CC instruction_trypred)(void const *pc);

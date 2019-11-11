@@ -107,7 +107,7 @@ __REDIRECT(__IMPDEF,__ATTR_WUNUSED,dlfunc_t,__NOTHROW_NCX,__DLFCN_CALL,
 /* Open a library, given a file descriptor previously acquired by `open()'
  * NOTE: This function will inherit the given `FD' on success.
  * @param: MODE: Set of `RTLD_*' */
-__REDIRECT(__IMPDEF,__ATTR_WUNUSED,void *,__NOTHROW_NCX,__DLFCN_CALL,fdlopen,(/*inherit(on_success)*/__fd_t __fd, int __mode),dlfopen,(__fd,__mode))
+__REDIRECT(__IMPDEF,__ATTR_WUNUSED,void *,__NOTHROW_NCX,__DLFCN_CALL,fdlopen,(/*inherit(on_success)*/ __fd_t __fd, int __mode),dlfopen,(__fd,__mode))
 #endif /* __KOS_VERSION__ >= 400 */
 #endif /* (__USE_KOS || __USE_BSD) && __KOS__ */
 
@@ -206,7 +206,7 @@ struct dl_section {
  *                 and allows the user to access the contents of the section, as it is loaded in memory.
  *                 Note however that the actual section data is usually mapped as read-only!
  * @return: NULL:  Error (s.a. `dlerror()'; usually: unknown section) */
-__IMPDEF __ATTR_WUNUSED /*REF*/struct dl_section *
+__IMPDEF __ATTR_WUNUSED /*REF*/ struct dl_section *
 __NOTHROW_NCX(__DLFCN_CALL dllocksection)(void *__handle,
                                           char const *__restrict __name,
                                           unsigned int __flags __DFL(DLLOCKSECTION_FNORMAL));
@@ -217,7 +217,7 @@ __NOTHROW_NCX(__DLFCN_CALL dllocksection)(void *__handle,
  * @return: 0 : Successfully unlocked the given section `SECT'
  * @return: -1: Error (s.a. `dlerror()') */
 __IMPDEF int
-__NOTHROW_NCX(__DLFCN_CALL dlunlocksection)(/*REF*/struct dl_section *__sect);
+__NOTHROW_NCX(__DLFCN_CALL dlunlocksection)(/*REF*/ struct dl_section *__sect);
 
 /* Return the name of a given section, or NULL on error
  * WARNING: The name of a section can no longer be queried after the associated

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22ff8daa */
+/* HASH CRC-32:0xda9e048d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1739,7 +1739,7 @@ NOTHROW_NCX(VLIBDCALL libd_format_wprintf)(pc16formatprinter printer,
  * WARNING: No trailing NUL-character is implicitly appended */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_wsprintf_printer") ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_wsprintf_printer)(/*wchar_t ***/void *arg,
+NOTHROW_NCX(LIBCCALL libc_format_wsprintf_printer)(/*wchar_t ***/ void *arg,
                                                    char32_t const *__restrict data,
                                                    size_t datalen) {
 #line 941 "kos/src/libc/magic/format-printer.c"
@@ -1754,7 +1754,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wsprintf_printer)(/*wchar_t ***/void *arg,
  * WARNING: No trailing NUL-character is implicitly appended */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_wsprintf_printer") ssize_t
-NOTHROW_NCX(LIBDCALL libd_format_wsprintf_printer)(/*wchar_t ***/void *arg,
+NOTHROW_NCX(LIBDCALL libd_format_wsprintf_printer)(/*wchar_t ***/ void *arg,
                                                    char16_t const *__restrict data,
                                                    size_t datalen) {
 #line 941 "kos/src/libc/magic/format-printer.c"
@@ -1773,7 +1773,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wsprintf_printer)(/*wchar_t ***/void *arg,
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_wsnprintf_printer") ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_wsnprintf_printer)(/*struct format_wsnprintf_data**/void *arg,
+NOTHROW_NCX(LIBCCALL libc_format_wsnprintf_printer)(/*struct format_wsnprintf_data**/ void *arg,
                                                     char32_t const *__restrict data,
                                                     size_t datalen) {
 #line 973 "kos/src/libc/magic/format-printer.c"
@@ -1802,7 +1802,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wsnprintf_printer)(/*struct format_wsnprintf_da
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_wsnprintf_printer") ssize_t
-NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(/*struct format_wsnprintf_data**/void *arg,
+NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(/*struct format_wsnprintf_data**/ void *arg,
                                                     char16_t const *__restrict data,
                                                     size_t datalen) {
 #line 973 "kos/src/libc/magic/format-printer.c"

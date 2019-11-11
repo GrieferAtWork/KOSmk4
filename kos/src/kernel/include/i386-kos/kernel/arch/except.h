@@ -39,7 +39,7 @@ struct kcpustate;
  * @param: lsda: A pointer to the LanguageSpecificDAta specified within the FDE.
  * @return: * :  One of `DWARF_PERSO_*' */
 typedef NONNULL((1, 2)) unsigned int
-/*NOTHROW*/(KCALL *dwarf_perso_t)(struct unwind_fde_struct *__restrict fde,
+/*NOTHROW*/ (KCALL *dwarf_perso_t)(struct unwind_fde_struct *__restrict fde,
                                   struct kcpustate *__restrict state,
                                   void *lsda);
 #endif /* __CC__ */

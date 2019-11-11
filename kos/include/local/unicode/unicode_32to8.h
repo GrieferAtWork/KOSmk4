@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16d72e2f */
+/* HASH CRC-32:0x78782149 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: * : A pointer after the last written UTF-8 character */
 __LOCAL_LIBC(unicode_32to8) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_32to8))(/*utf-8*/ char *__restrict __utf8_dst,
-                                                           /*utf-32*/__CHAR32_TYPE__ const *__restrict __utf32_text,
+                                                           /*utf-32*/ __CHAR32_TYPE__ const *__restrict __utf32_text,
                                                            __SIZE_TYPE__ __utf32_characters) {
 #line 1076 "kos/src/libc/magic/unicode.c"
 	while (__utf32_characters--)

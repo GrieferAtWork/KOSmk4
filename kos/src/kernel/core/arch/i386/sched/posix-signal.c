@@ -437,7 +437,7 @@ sigreturn32_impl(struct icpustate *__restrict state,
                  USER UNCHECKED struct ucpustate32 const *restore_cpu,
                  USER UNCHECKED struct fpustate32 const *restore_fpu,
                  USER UNCHECKED sigset_t const *restore_sigmask,
-                 USER UNCHECKED struct rpc_syscall_info *sc_info) {
+                 USER UNCHECKED struct rpc_syscall_info32 *sc_info) {
 	bool enable_except;
 	enable_except = (irregs_rdflags(&state->ics_irregs) & EFLAGS_CF) != 0;
 	TRY {
@@ -470,7 +470,7 @@ again:
 			/* Restart a system call. */
 			unsigned int i;
 			struct rpc_syscall_info sc;
-			memcpy(&sc, sc_info, sizeof(sc));
+			rpc_syscall_info32_to_rpc_syscall_info(sc_info, &sc);
 			COMPILER_READ_BARRIER();
 			/* Check for restartable system calls.
 			 * NOTE: When performing this check, use the system call given
@@ -500,7 +500,7 @@ again:
 				restore_cpu     = (USER UNCHECKED struct ucpustate32 const *)sc.rsi_args[SIGRETURN_386_ARGID_RESTORE_CPU];
 				restore_fpu     = (USER UNCHECKED struct fpustate32 const *)sc.rsi_args[SIGRETURN_386_ARGID_RESTORE_FPU];
 				restore_sigmask = (USER UNCHECKED sigset_t const *)sc.rsi_args[SIGRETURN_386_ARGID_RESTORE_SIGMASK];
-				sc_info         = (USER UNCHECKED struct rpc_syscall_info *)sc.rsi_args[SIGRETURN_386_ARGID_SC_INFO];
+				sc_info         = (USER UNCHECKED struct rpc_syscall_info32 *)sc.rsi_args[SIGRETURN_386_ARGID_SC_INFO];
 				/* Disable exception propagation when sigreturn() is invoked without exceptions enabled. */
 				if ((sc.rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) == 0)
 					enable_except = false;
@@ -557,16 +557,16 @@ sigreturn32_rpc(void *UNUSED(arg),
 	                        (USER UNCHECKED struct ucpustate32 const *)sc_info->rsi_args[SIGRETURN_386_ARGID_RESTORE_CPU],
 	                        (USER UNCHECKED struct fpustate32 const *)sc_info->rsi_args[SIGRETURN_386_ARGID_RESTORE_FPU],
 	                        (USER UNCHECKED sigset_t const *)sc_info->rsi_args[SIGRETURN_386_ARGID_RESTORE_SIGMASK],
-	                        (USER UNCHECKED struct rpc_syscall_info *)sc_info->rsi_args[SIGRETURN_386_ARGID_SC_INFO]);
+	                        (USER UNCHECKED struct rpc_syscall_info32 *)sc_info->rsi_args[SIGRETURN_386_ARGID_SC_INFO]);
 }
 
 DEFINE_SYSCALL32_6(void, sigreturn,
-                    USER UNCHECKED struct /*fpustate32*/fpustate const *, restore_fpu,
+                    USER UNCHECKED struct /*fpustate32*/ fpustate const *, restore_fpu,
                     syscall_ulong_t, unused1,
                     syscall_ulong_t, unused2,
                     USER UNCHECKED sigset_t const *, restore_sigmask,
-                    USER UNCHECKED struct rpc_syscall_info *, sc_info,
-                    USER UNCHECKED struct /*ucpustate32*/ucpustate const *, restore_cpu) {
+                    USER UNCHECKED struct /*rpc_syscall_info32*/ rpc_syscall_info *, sc_info,
+                    USER UNCHECKED struct /*ucpustate32*/ ucpustate const *, restore_cpu) {
 	(void)restore_fpu;
 	(void)unused1;
 	(void)unused2;
@@ -623,8 +623,8 @@ raiseat32_rpc(void *UNUSED(arg),
 }
 
 DEFINE_SYSCALL32_2(errno_t, raiseat,
-                   USER UNCHECKED /*ucpustate32*/struct ucpustate const *, state,
-                   USER UNCHECKED /*siginfo32_t*/struct __siginfo_struct const *, si) {
+                   USER UNCHECKED /*ucpustate32*/ struct ucpustate const *, state,
+                   USER UNCHECKED /*siginfo32_t*/ struct __siginfo_struct const *, si) {
 	(void)state;
 	(void)si;
 	task_schedule_user_rpc(THIS_TASK,

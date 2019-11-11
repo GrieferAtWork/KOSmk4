@@ -1214,12 +1214,12 @@ NOTHROW(KCALL pagedir_unsetchanged_p)(VIRT pagedir_t *__restrict self, VIRT vm_v
 /* TODO: Add dedicated implementations for all of these: */
 INTERN NOBLOCK WUNUSED bool NOTHROW(KCALL pagedir_prepare_mapone_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page);
 INTERN NOBLOCK void NOTHROW(KCALL pagedir_unprepare_mapone_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page);
-INTERN NOBLOCK void NOTHROW(KCALL pagedir_maphintone_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page, VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/void *hint);
+INTERN NOBLOCK void NOTHROW(KCALL pagedir_maphintone_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page, VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint);
 INTERN NOBLOCK void NOTHROW(KCALL pagedir_mapone_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page, PHYS vm_ppage_t phys_page, u16 perm);
 INTERN NOBLOCK void NOTHROW(KCALL pagedir_unmapone_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page);
 INTERN NOBLOCK WUNUSED bool NOTHROW(KCALL pagedir_prepare_map_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page, size_t num_pages);
 INTERN NOBLOCK void NOTHROW(KCALL pagedir_unprepare_map_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page, size_t num_pages);
-INTERN NOBLOCK void NOTHROW(KCALL pagedir_maphint_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page, size_t num_pages, VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/void *hint);
+INTERN NOBLOCK void NOTHROW(KCALL pagedir_maphint_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page, size_t num_pages, VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint);
 INTERN NOBLOCK void NOTHROW(KCALL pagedir_map_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page, size_t num_pages, PHYS vm_ppage_t phys_page, u16 perm);
 INTERN NOBLOCK void NOTHROW(KCALL pagedir_unmap_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page, size_t num_pages);
 INTERN NOBLOCK void NOTHROW(KCALL pagedir_unwrite_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page, size_t num_pages);

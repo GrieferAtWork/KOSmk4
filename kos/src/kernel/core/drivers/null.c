@@ -409,26 +409,26 @@ urandom_mmap(struct character_device *__restrict self,
 
 
 #define INIT_DEVICE(name, mkdev, read, write, pread, pwrite, mmap, stat, poll) \
-	{                                                        \
-		/* .cd_refcnt   = */1,                               \
-		/* .cd_heapsize = */sizeof(struct character_device), \
-		/* .cd_type     = */{                                \
-			/* .ct_driver    = */&drv_self,                  \
-			/* .ct_fini      = */NULL,                       \
-			/* .ct_read      = */read,                       \
-			/* .ct_write     = */write,                      \
-			/* .ct_pread     = */pread,                      \
-			/* .ct_pwrite    = */pwrite,                     \
-			/* .ct_ioctl     = */NULL,                       \
-			/* .ct_mmap      = */mmap,                       \
-			/* .ct_sync      = */NULL,                       \
-			/* .ct_stat      = */stat,                       \
-			/* .ct_poll      = */poll                        \
-		},                                                   \
-		/* .cd_devlink  = */{ NULL, NULL, mkdev },           \
-		/* .cd_devfs_inode = */NULL,                         \
-		/* .cd_devfs_entry = */NULL,                         \
-		/* .cd_name     = */name                             \
+	{                                                                          \
+		/* .cd_refcnt   = */ 1,                                                \
+		/* .cd_heapsize = */ sizeof(struct character_device),                  \
+		/* .cd_type     = */ {                                                 \
+			/* .ct_driver    = */ &drv_self,                                   \
+			/* .ct_fini      = */ NULL,                                        \
+			/* .ct_read      = */ read,                                        \
+			/* .ct_write     = */ write,                                       \
+			/* .ct_pread     = */ pread,                                       \
+			/* .ct_pwrite    = */ pwrite,                                      \
+			/* .ct_ioctl     = */ NULL,                                        \
+			/* .ct_mmap      = */ mmap,                                        \
+			/* .ct_sync      = */ NULL,                                        \
+			/* .ct_stat      = */ stat,                                        \
+			/* .ct_poll      = */ poll                                         \
+		},                                                                     \
+		/* .cd_devlink  = */ { NULL, NULL, mkdev },                            \
+		/* .cd_devfs_inode = */ NULL,                                          \
+		/* .cd_devfs_entry = */ NULL,                                          \
+		/* .cd_name     = */ name                                              \
 	}
 
 

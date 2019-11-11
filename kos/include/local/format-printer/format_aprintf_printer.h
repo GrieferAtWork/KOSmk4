@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96110a68 */
+/* HASH CRC-32:0x7420f684 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 __NAMESPACE_LOCAL_BEGIN
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 __LOCAL_LIBC(format_aprintf_printer) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_printer))(/*struct format_aprintf_data **/void *__arg,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_printer))(/*struct format_aprintf_data **/ void *__arg,
                                                                     /*utf-8*/ char const *__restrict __data,
                                                                     __SIZE_TYPE__ __datalen) {
 #line 1141 "kos/src/libc/magic/format-printer.c"

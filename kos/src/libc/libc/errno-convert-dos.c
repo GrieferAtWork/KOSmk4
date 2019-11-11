@@ -36,27 +36,27 @@ DECL_BEGIN
 
 DEFINE_PUBLIC_ALIAS(errno_nt2kos, libd_errno_nt2kos);
 INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_nt2kos")
-NOBLOCK /*kos*/errno_t NOTHROW(LIBDCALL libd_errno_nt2kos)(/*nt*/errno_t value) {
+NOBLOCK /*kos*/ errno_t NOTHROW(LIBDCALL libd_errno_nt2kos)(/*nt*/ errno_t value) {
 	return libd_errno_dos2kos(libd_errno_nt2dos(value));
 }
 
 DEFINE_PUBLIC_ALIAS(errno_kos2nt, libd_errno_kos2nt);
 INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_kos2nt")
-NOBLOCK /*nt*/errno_t NOTHROW(LIBDCALL libd_errno_kos2nt)(/*kos*/errno_t value) {
+NOBLOCK /*nt*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2nt)(/*kos*/ errno_t value) {
 	return libd_errno_dos2nt(libd_errno_kos2dos(value));
 }
 
 DEFINE_PUBLIC_ALIAS(errno_nt2dos, libd_errno_nt2dos);
 DEFINE_INTERN_ALIAS(libd__dosmaperr, libd_errno_nt2dos);
 INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_nt2dos")
-NOBLOCK /*dos*/errno_t NOTHROW(LIBDCALL libd_errno_nt2dos)(/*nt*/errno_t value) {
+NOBLOCK /*dos*/ errno_t NOTHROW(LIBDCALL libd_errno_nt2dos)(/*nt*/ errno_t value) {
 	/* TODO */
 	return value;
 }
 
 DEFINE_PUBLIC_ALIAS(errno_dos2nt, libd_errno_dos2nt);
 INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_dos2nt")
-NOBLOCK /*nt*/errno_t NOTHROW(LIBDCALL libd_errno_dos2nt)(/*kos*/errno_t value) {
+NOBLOCK /*nt*/ errno_t NOTHROW(LIBDCALL libd_errno_dos2nt)(/*kos*/ errno_t value) {
 	/* TODO */
 	return value;
 }
@@ -64,7 +64,7 @@ NOBLOCK /*nt*/errno_t NOTHROW(LIBDCALL libd_errno_dos2nt)(/*kos*/errno_t value) 
 
 DEFINE_PUBLIC_ALIAS(errno_kos2dos, libd_errno_dos2kos);
 INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_kos2dos")
-NOBLOCK /*dos*/errno_t NOTHROW(LIBDCALL libd_errno_kos2dos)(/*kos*/errno_t value) {
+NOBLOCK /*dos*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2dos)(/*kos*/ errno_t value) {
 	errno_t result;
 	switch (value) {
 	case EPERM:           result = __DOS_EPERM;           break; /* Operation not permitted */
@@ -152,7 +152,7 @@ NOBLOCK /*dos*/errno_t NOTHROW(LIBDCALL libd_errno_kos2dos)(/*kos*/errno_t value
 
 DEFINE_PUBLIC_ALIAS(errno_dos2kos, libd_errno_dos2kos);
 INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_dos2kos")
-NOBLOCK /*kos*/errno_t NOTHROW(LIBDCALL libd_errno_dos2kos)(/*dos*/errno_t value) {
+NOBLOCK /*kos*/ errno_t NOTHROW(LIBDCALL libd_errno_dos2kos)(/*dos*/ errno_t value) {
 	errno_t result;
 	switch (value) {
 	case __DOS_EPERM:           result = EPERM;           break; /* Operation not permitted */

@@ -504,95 +504,95 @@ Ext2_ReadSymLink(struct symlink_node *__restrict self) {
 
 
 INTERN struct inode_type Ext2_DirOps = {
-	/*.it_fini = */&ExtINode_Fini,
-	/*.it_attr = */{
-		/*.a_loadattr   = */&ExtINode_LoadAttr,
-		/*.a_saveattr   = */&ExtINode_SaveAttr,
-		/*.a_maskattr   = */NULL,
-		/*.a_pathconf   = */NULL,
-		/*.a_clearcache = */NULL,
+	/*.it_fini = */ &ExtINode_Fini,
+	/*.it_attr = */ {
+		/*.a_loadattr   = */ &ExtINode_LoadAttr,
+		/*.a_saveattr   = */ &ExtINode_SaveAttr,
+		/*.a_maskattr   = */ NULL,
+		/*.a_pathconf   = */ NULL,
+		/*.a_clearcache = */ NULL,
 	},
-	/*.it_file = */{
-		/*.f_read     = */NULL,
-		/*.f_pread    = */NULL,
-		/*.f_readv    = */NULL,
-		/*.f_preadv   = */NULL,
-		/*.f_write    = */NULL,
-		/*.f_pwrite   = */NULL,
-		/*.f_writev   = */NULL,
-		/*.f_pwritev  = */NULL,
-		/*.f_truncate = */NULL,
+	/*.it_file = */ {
+		/*.f_read     = */ NULL,
+		/*.f_pread    = */ NULL,
+		/*.f_readv    = */ NULL,
+		/*.f_preadv   = */ NULL,
+		/*.f_write    = */ NULL,
+		/*.f_pwrite   = */ NULL,
+		/*.f_writev   = */ NULL,
+		/*.f_pwritev  = */ NULL,
+		/*.f_truncate = */ NULL,
 	},
 	{
-		/*.it_directory = */{
-			/*.d_readdir = */&ExtDir_ReadDir,
+		/*.it_directory = */ {
+			/*.d_readdir = */ &ExtDir_ReadDir,
 			{ NULL },
-			/*.d_creat   = */NULL,
-			/*.d_mkdir   = */NULL,
-			/*.d_symlink = */NULL,
-			/*.d_mknod   = */NULL,
-			/*.d_link    = */NULL,
-			/*.d_rename  = */NULL,
-			/*.d_unlink  = */NULL,
-			/*.d_rmdir   = */NULL,
+			/*.d_creat   = */ NULL,
+			/*.d_mkdir   = */ NULL,
+			/*.d_symlink = */ NULL,
+			/*.d_mknod   = */ NULL,
+			/*.d_link    = */ NULL,
+			/*.d_rename  = */ NULL,
+			/*.d_unlink  = */ NULL,
+			/*.d_rmdir   = */ NULL,
 		}
 	}
 };
 
 INTERN struct inode_type Ext2_RegOps = {
-	/*.it_fini = */&ExtINode_Fini,
-	/*.it_attr = */{
-		/*.a_loadattr   = */&ExtINode_LoadAttr,
-		/*.a_saveattr   = */&ExtINode_SaveAttr,
-		/*.a_maskattr   = */NULL,
-		/*.a_pathconf   = */NULL,
-		/*.a_clearcache = */NULL,
+	/*.it_fini = */ &ExtINode_Fini,
+	/*.it_attr = */ {
+		/*.a_loadattr   = */ &ExtINode_LoadAttr,
+		/*.a_saveattr   = */ &ExtINode_SaveAttr,
+		/*.a_maskattr   = */ NULL,
+		/*.a_pathconf   = */ NULL,
+		/*.a_clearcache = */ NULL,
 	},
-	/*.it_file = */{
-		/*.f_read     = */&Ext2_ReadFromINode,
-		/*.f_pread    = */&Ext2_ReadFromINodePhys,
-		/*.f_readv    = */&Ext2_ReadFromINodeVector,
-		/*.f_preadv   = */&Ext2_ReadFromINodeVectorPhys,
-		/*.f_write    = */&Ext2_WriteToINode,
-		/*.f_pwrite   = */&Ext2_WriteToINodePhys,
-		/*.f_writev   = */&Ext2_WriteToINodeVector,
-		/*.f_pwritev  = */&Ext2_WriteToINodeVectorPhys,
-		/*.f_truncate = */NULL,
+	/*.it_file = */ {
+		/*.f_read     = */ &Ext2_ReadFromINode,
+		/*.f_pread    = */ &Ext2_ReadFromINodePhys,
+		/*.f_readv    = */ &Ext2_ReadFromINodeVector,
+		/*.f_preadv   = */ &Ext2_ReadFromINodeVectorPhys,
+		/*.f_write    = */ &Ext2_WriteToINode,
+		/*.f_pwrite   = */ &Ext2_WriteToINodePhys,
+		/*.f_writev   = */ &Ext2_WriteToINodeVector,
+		/*.f_pwritev  = */ &Ext2_WriteToINodeVectorPhys,
+		/*.f_truncate = */ NULL,
 	}
 };
 INTERN struct inode_type Ext2_DevOps = {
-	/*.it_fini = */&ExtINode_Fini,
-	/*.it_attr = */{
-		/*.a_loadattr   = */&ExtINode_LoadAttr,
-		/*.a_saveattr   = */&ExtINode_SaveAttr,
-		/*.a_maskattr   = */NULL,
-		/*.a_pathconf   = */NULL,
-		/*.a_clearcache = */NULL,
+	/*.it_fini = */ &ExtINode_Fini,
+	/*.it_attr = */ {
+		/*.a_loadattr   = */ &ExtINode_LoadAttr,
+		/*.a_saveattr   = */ &ExtINode_SaveAttr,
+		/*.a_maskattr   = */ NULL,
+		/*.a_pathconf   = */ NULL,
+		/*.a_clearcache = */ NULL,
 	}
 };
 INTERN struct inode_type Ext2_LnkOps = {
-	/*.it_fini = */&ExtINode_Fini,
-	/*.it_attr = */{
-		/*.a_loadattr   = */&ExtINode_LoadAttr,
-		/*.a_saveattr   = */&ExtINode_SaveAttr,
-		/*.a_maskattr   = */NULL,
-		/*.a_pathconf   = */NULL,
-		/*.a_clearcache = */NULL,
+	/*.it_fini = */ &ExtINode_Fini,
+	/*.it_attr = */ {
+		/*.a_loadattr   = */ &ExtINode_LoadAttr,
+		/*.a_saveattr   = */ &ExtINode_SaveAttr,
+		/*.a_maskattr   = */ NULL,
+		/*.a_pathconf   = */ NULL,
+		/*.a_clearcache = */ NULL,
 	},
-	/*.it_file = */{
-		/*.f_read     = */NULL,
-		/*.f_pread    = */NULL,
-		/*.f_readv    = */NULL,
-		/*.f_preadv   = */NULL,
-		/*.f_write    = */NULL,
-		/*.f_pwrite   = */NULL,
-		/*.f_writev   = */NULL,
-		/*.f_pwritev  = */NULL,
-		/*.f_truncate = */NULL,
+	/*.it_file = */ {
+		/*.f_read     = */ NULL,
+		/*.f_pread    = */ NULL,
+		/*.f_readv    = */ NULL,
+		/*.f_preadv   = */ NULL,
+		/*.f_write    = */ NULL,
+		/*.f_pwrite   = */ NULL,
+		/*.f_writev   = */ NULL,
+		/*.f_pwritev  = */ NULL,
+		/*.f_truncate = */ NULL,
 	},
 	{
 		.it_symlink = {
-			/*.sl_readlink = */&Ext2_ReadSymLink,
+			/*.sl_readlink = */ &Ext2_ReadSymLink,
 		}
 	}
 };
@@ -764,18 +764,18 @@ Ext2_SynchronizeSuperblock(Ext2Superblock *__restrict self)
 
 
 INTERN struct superblock_type Ext2_SuperblockType = {
-	/*.st_driver            = */&drv_self,
+	/*.st_driver            = */ &drv_self,
 	/*.st_name              =*/ "ext2",
-	/*.st_flags             = */SUPERBLOCK_TYPE_FNORMAL,
-	/*.st_sizeof_superblock = */sizeof(Ext2Superblock),
+	/*.st_flags             = */ SUPERBLOCK_TYPE_FNORMAL,
+	/*.st_sizeof_superblock = */ sizeof(Ext2Superblock),
 	{
-		/*.st_open = */(void(KCALL *)(struct superblock *__restrict, UNCHECKED USER char *))&Ext2_OpenSuperblock
+		/*.st_open = */ (void(KCALL *)(struct superblock *__restrict, UNCHECKED USER char *))&Ext2_OpenSuperblock
 	},
 	/*.st_functions = */ {
-		/*.f_fini     = */(void(KCALL *)(struct superblock *__restrict))&Ext2_FinalizeSuperblock,
-		/*.f_opennode = */(void(KCALL *)(struct superblock *__restrict, struct inode *__restrict, struct directory_node *__restrict, struct directory_entry *__restrict))&Ext2_OpenINode,
-		/*.f_sync     = */(void(KCALL *)(struct superblock *__restrict, USER CHECKED struct statfs *))&Ext2_StatSuperblock,
-		/*.f_sync     = */(void(KCALL *)(struct superblock *__restrict))&Ext2_SynchronizeSuperblock
+		/*.f_fini     = */ (void(KCALL *)(struct superblock *__restrict))&Ext2_FinalizeSuperblock,
+		/*.f_opennode = */ (void(KCALL *)(struct superblock *__restrict, struct inode *__restrict, struct directory_node *__restrict, struct directory_entry *__restrict))&Ext2_OpenINode,
+		/*.f_sync     = */ (void(KCALL *)(struct superblock *__restrict, USER CHECKED struct statfs *))&Ext2_StatSuperblock,
+		/*.f_sync     = */ (void(KCALL *)(struct superblock *__restrict))&Ext2_SynchronizeSuperblock
 	}
 };
 

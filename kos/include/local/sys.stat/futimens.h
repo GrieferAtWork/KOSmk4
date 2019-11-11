@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6bc3f5f */
+/* HASH CRC-32:0x799eb779 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,9 @@
 #ifndef ____localdep_futimens64_defined
 #define ____localdep_futimens64_defined 1
 #ifdef __CRT_HAVE_futimens64
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens64,(__fd_t __fd, struct __timespec64 const __times[2/*or:3*/]),futimens64,(__fd,__times))
+__CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens64,(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]),futimens64,(__fd,__times))
 #elif defined(__CRT_HAVE_futimens) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens64,(__fd_t __fd, struct __timespec64 const __times[2/*or:3*/]),futimens,(__fd,__times))
+__CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens64,(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]),futimens,(__fd,__times))
 #elif defined(__CRT_HAVE_futimens)
 #include <local/sys.stat/futimens64.h>
 #define __localdep_futimens64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimens64))
@@ -39,7 +39,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens64,(__fd_t __fd, struct __time
 #ifndef ____localdep_futimens32_defined
 #define ____localdep_futimens32_defined 1
 #ifdef __CRT_HAVE_futimens
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens32,(__fd_t __fd, struct __TM_TYPE(timespec) const __times[2/*or:3*/]),futimens,(__fd,__times))
+__CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens32,(__fd_t __fd, struct __TM_TYPE(timespec) const __times[2 /*or:3*/]),futimens,(__fd,__times))
 #else /* LIBC: futimens */
 #undef ____localdep_futimens32_defined
 #endif /* futimens32... */
@@ -48,7 +48,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens32,(__fd_t __fd, struct __TM_T
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(futimens) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futimens))(__fd_t __fd,
-                                                      struct __TM_TYPE(timespec) const __times[2/*or:3*/]) {
+                                                      struct __TM_TYPE(timespec) const __times[2 /*or:3*/]) {
 #line 643 "kos/src/libc/magic/sys.stat.c"
 #ifdef __CRT_HAVE_utimensat64
 	struct __timespec64 __tms[2];

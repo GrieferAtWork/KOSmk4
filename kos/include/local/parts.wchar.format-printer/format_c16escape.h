@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46fb0ee3 */
+/* HASH CRC-32:0xfcdc77bc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #define ____localdep_unicode_readutf16_n_defined 1
 #ifdef __CRT_HAVE_unicode_readutf16_n
 /* Same as `unicode_readutf16()', but don't read past `text_end' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf16_n,(/*utf-16*/__CHAR16_TYPE__ const **__restrict __ptext, __CHAR16_TYPE__ const *__text_end),unicode_readutf16_n,(__ptext,__text_end))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf16_n,(/*utf-16*/ __CHAR16_TYPE__ const **__restrict __ptext, __CHAR16_TYPE__ const *__text_end),unicode_readutf16_n,(__ptext,__text_end))
 #else /* LIBC: unicode_readutf16_n */
 #include <local/unicode/unicode_readutf16_n.h>
 /* Same as `unicode_readutf16()', but don't read past `text_end' */

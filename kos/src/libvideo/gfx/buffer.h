@@ -35,13 +35,13 @@ DECL_BEGIN
  *       which may not necessarily use the given, or default `codec' and `palette'
  * @param: codec:   The preferred video codec, or NULL to use `video_preferred_format()'.
  * @param: palette: The palette to use (only needed if used by `codec') */
-INTDEF WUNUSED /*REF*/struct video_buffer *CC
+INTDEF WUNUSED /*REF*/ struct video_buffer *CC
 libvideo_buffer_create(unsigned int type, size_t size_x, size_t size_y,
                        struct video_codec *codec, struct video_palette *palette);
 
 /* Returns a video buffer for the entire screen (or return NULL and set errno on error)
  * Note that screen buffer access is only granted to ROOT and the window server */
-INTDEF WUNUSED /*REF*/struct video_buffer *CC libvideo_buffer_screen(void);
+INTDEF WUNUSED /*REF*/ struct video_buffer *CC libvideo_buffer_screen(void);
 
 
 

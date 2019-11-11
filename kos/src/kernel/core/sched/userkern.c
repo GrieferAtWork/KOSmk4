@@ -255,8 +255,12 @@ PUBLIC struct vm_datapart userkern_segment_part = {
 		/* .dp_tree_ptr = */ {
 			/* .a_min = */ NULL,
 			/* .a_max = */ NULL,
-			{ /* .a_vmin_ptr = */ 0 },
-			{ /* .a_vmax_ptr = */ KERNEL_NUM_PAGES - 1 },
+			{
+				/* .a_vmin_ptr = */ 0
+			},
+			{
+				/* .a_vmax_ptr = */ KERNEL_NUM_PAGES - 1
+			},
 		}
 	},
 	/* .dp_crefs  = */ LLIST_INIT,
@@ -264,10 +268,10 @@ PUBLIC struct vm_datapart userkern_segment_part = {
 	/* .dp_stale  = */ NULL,
 	/* .dp_block  = */ &userkern_segment_block,
 	/* .dp_flags  = */ (VM_DATAPART_FLAG_LOCKED |
-	                   VM_DATAPART_FLAG_CHANGED |
-	                   VM_DATAPART_FLAG_KEEPRAM |
-	                   VM_DATAPART_FLAG_HEAPPPP |
-	                   VM_DATAPART_FLAG_KERNPRT),
+	                    VM_DATAPART_FLAG_CHANGED |
+	                    VM_DATAPART_FLAG_KEEPRAM |
+	                    VM_DATAPART_FLAG_HEAPPPP |
+	                    VM_DATAPART_FLAG_KERNPRT),
 	/* .dp_state  = */ VM_DATAPART_STATE_VIOPRT,
 	{
 		/* .dp_ramdata = */ {

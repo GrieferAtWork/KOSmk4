@@ -57,8 +57,8 @@ INTERN_CONST struct vga_mode const vga_mode_gfx320x200_256 = {
 	.vm_att_plane_enable  = 0x0f,
 	.vm_att_pel           = 0x00,
 	.vm_att_color_page    = 0x00,
-	.vm_mis               = VGA_MIS_FCOLOR|VGA_MIS_FENB_MEM_ACCESS|
-	                        /*VGA_MIS_FVSYNCPOL|*/VGA_MIS_FHSYNCPOL|
+	.vm_mis               = VGA_MIS_FCOLOR | VGA_MIS_FENB_MEM_ACCESS |
+	                        /*VGA_MIS_FVSYNCPOL |*/ VGA_MIS_FHSYNCPOL |
 	                        VGA_MIS_FSEL_HIGH_PAGE,
 	.vm_gfx_sr_value      = 0x00,
 	.vm_gfx_sr_enable     = 0x00,
@@ -841,7 +841,7 @@ for (local i,x: util.enumerate(l)) {
 /* Encode the given unicode character `ch' using cp437 (the codepage
  * used by VGA) If the character can't be encoded, return 0 instead.
  * s.a.: https://en.wikipedia.org/wiki/Code_page_437  */
-LOCAL u8 NOTHROW(KCALL cp437_encode)(/*utf-32*/u32 ch) {
+LOCAL u8 NOTHROW(KCALL cp437_encode)(/*utf-32*/ u32 ch) {
 	u8 result;
 	if (ch <= 0xff) {
 		result = cp437_from_latin1[ch];

@@ -34,8 +34,8 @@ local copyright =
  * should be usable with any kind of CRT, so-long as that CRT provides a features File)
  */
 
-
-
+#undef IGNORE_HASH_DIFF
+//#define IGNORE_HASH_DIFF 1
 #undef WARN_KNOWN_BUILTINS
 #define WARN_KNOWN_BUILTINS 1
 #undef WARN_KNOWN_ALIASES
@@ -5838,6 +5838,7 @@ skip_alias_redirections2:
 
 @@Safely re-write a hashed file @filename, by calling ${fp_writer(fp: File)}
 function write_hashed_file(filename: string, fp_writer: Callable) {
+#ifndef IGNORE_HASH_DIFF
 	local old_text = none;
 	try {
 		local firstline;
@@ -5869,10 +5870,14 @@ function write_hashed_file(filename: string, fp_writer: Callable) {
 		throw "Don't overwrite modified File";
 	}
 do_overwrite_file:
+#endif /* !IGNORE_HASH_DIFF */
 	File.Writer contents;
 	fp_writer(contents);
 	contents = contents.string.encode("utf-8").bytes();
-	if (old_text is none || old_text != contents) {
+#ifndef IGNORE_HASH_DIFF
+	if (old_text is none || old_text != contents)
+#endif /* !IGNORE_HASH_DIFF */
+	{
 		with (local fp = File.open(filename, "w")) {
 			local new_hash = hash(hashfunc, contents).hex();
 			fp << "/* HASH " << hashfunc << ":" << new_hash << " */\n";
@@ -7236,9 +7241,11 @@ function libc_user_update_implementation_section(
 		hash_func = hash_func.strip();
 		hash_value = try int(hash_value.strip()) catch (...) -1;
 		local hash_real = hash(hash_func.decode("utf-8"), head);
+#ifndef IGNORE_HASH_DIFF
 		if ((hash_value != hash_real) && head)
 			err(pos, "Miss-matching function {!r} header hash ({} != {})"
 				.format({ name, hash_value.hex(), hash_real.hex() }));
+#endif
 		pos += #tag_body;
 		local tag_end = "/*[[[end:{}]]]*/\n".format({ name });
 		local body_end = text.find(tag_end, pos);
@@ -7443,6 +7450,7 @@ create_new_file:
 	exports_hash_value = try int(exports_hash_value.strip()) catch (...) 0;
 	exports = exports.strip();
 	local exports_hash_real = try hash(exports_hash_func.decode("utf-8"), exports) catch (...) 0;
+#ifndef IGNORE_HASH_DIFF
 	if ((exports_hash_value != exports_hash_real) && exports) {
 		print getFilenameForLog(filename),;
 		print "(",;
@@ -7452,6 +7460,7 @@ create_new_file:
 			exports_hash_value.hex(), "!=", exports_hash_real.hex();
 		throw "Modified exports section";
 	}
+#endif /* !IGNORE_HASH_DIFF */
 	File.Writer tempfp;
 	tempfp << before_impl;
 	tempfp << s_impl_start;

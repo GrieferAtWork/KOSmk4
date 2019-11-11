@@ -279,76 +279,76 @@ ramfs_readlink(struct symlink_node *__restrict UNUSED(self))
 
 
 PUBLIC struct inode_type ramfs_dev_type = {
-	/* .it_fini = */NULL,
-	/* .it_attr = */{
-		/* .a_loadattr   = */NULL, /* All nodes are created with attributes already loaded */
-		/* .a_saveattr   = */&ramfs_saveattr,
-		/* .a_maskattr   = */NULL,
-		/* .a_pathconf   = */NULL,
-		/* .a_clearcache = */NULL
+	/* .it_fini = */ NULL,
+	/* .it_attr = */ {
+		/* .a_loadattr   = */ NULL, /* All nodes are created with attributes already loaded */
+		/* .a_saveattr   = */ &ramfs_saveattr,
+		/* .a_maskattr   = */ NULL,
+		/* .a_pathconf   = */ NULL,
+		/* .a_clearcache = */ NULL
 	},
 };
 PUBLIC struct inode_type ramfs_regular_type = {
-	/* .it_fini = */NULL,
-	/* .it_attr = */{
-		/* .a_loadattr   = */NULL, /* All nodes are created with attributes already loaded */
-		/* .a_saveattr   = */&ramfs_saveattr,
-		/* .a_maskattr   = */NULL,
-		/* .a_pathconf   = */NULL,
-		/* .a_clearcache = */NULL
+	/* .it_fini = */ NULL,
+	/* .it_attr = */ {
+		/* .a_loadattr   = */ NULL, /* All nodes are created with attributes already loaded */
+		/* .a_saveattr   = */ &ramfs_saveattr,
+		/* .a_maskattr   = */ NULL,
+		/* .a_pathconf   = */ NULL,
+		/* .a_clearcache = */ NULL
 	},
-	/* .it_file = */{
-		/* .f_read     = */&ramfs_read,
-		/* .f_pread    = */&ramfs_pread,
-		/* .f_readv    = */&ramfs_readv,
-		/* .f_preadv   = */&ramfs_preadv,
-		/* .f_write    = */&ramfs_write,
-		/* .f_pwrite   = */&ramfs_pwrite,
-		/* .f_writev   = */&ramfs_writev,
-		/* .f_pwritev  = */&ramfs_pwritev,
-		/* .f_truncate = */&ramfs_truncate,
+	/* .it_file = */ {
+		/* .f_read     = */ &ramfs_read,
+		/* .f_pread    = */ &ramfs_pread,
+		/* .f_readv    = */ &ramfs_readv,
+		/* .f_preadv   = */ &ramfs_preadv,
+		/* .f_write    = */ &ramfs_write,
+		/* .f_pwrite   = */ &ramfs_pwrite,
+		/* .f_writev   = */ &ramfs_writev,
+		/* .f_pwritev  = */ &ramfs_pwritev,
+		/* .f_truncate = */ &ramfs_truncate,
 	},
 };
 
 PUBLIC struct inode_type ramfs_directory_type = {
-	/* .it_fini = */NULL,
-	/* .it_attr = */{
-		/* .a_loadattr   = */NULL, /* All nodes are created with attributes already loaded */
-		/* .a_saveattr   = */&ramfs_saveattr,
-		/* .a_maskattr   = */NULL,
-		/* .a_pathconf   = */NULL,
-		/* .a_clearcache = */NULL
+	/* .it_fini = */ NULL,
+	/* .it_attr = */ {
+		/* .a_loadattr   = */ NULL, /* All nodes are created with attributes already loaded */
+		/* .a_saveattr   = */ &ramfs_saveattr,
+		/* .a_maskattr   = */ NULL,
+		/* .a_pathconf   = */ NULL,
+		/* .a_clearcache = */ NULL
 	},
-	/* .it_file = */{ /* NULL... */ },
+	/* .it_file = */ { /* NULL... */ },
 	{
-		/* .it_directory = */{
-			/* .d_readdir = */&ramfs_readdir,
+		/* .it_directory = */ {
+			/* .d_readdir = */ &ramfs_readdir,
 			{ NULL },
-			/* .d_creat   = */&ramfs_creat,
-			/* .d_mkdir   = */&ramfs_mkdir,
-			/* .d_symlink = */&ramfs_symlink,
-			/* .d_mknod   = */&ramfs_mknod,
-			/* .d_link    = */&ramfs_link,
-			/* .d_rename  = */NULL, /* Emulated using link() + unlink() */
-			/* .d_unlink  = */&ramfs_unlink,
-			/* .d_rmdir   = */&ramfs_rmdir,
+			/* .d_creat   = */ &ramfs_creat,
+			/* .d_mkdir   = */ &ramfs_mkdir,
+			/* .d_symlink = */ &ramfs_symlink,
+			/* .d_mknod   = */ &ramfs_mknod,
+			/* .d_link    = */ &ramfs_link,
+			/* .d_rename  = */ NULL, /* Emulated using link() + unlink() */
+			/* .d_unlink  = */ &ramfs_unlink,
+			/* .d_rmdir   = */ &ramfs_rmdir,
 		}
 	}
 };
 
 PUBLIC struct inode_type ramfs_symlink_type = {
-	/* .it_fini = */NULL,
-	/* .it_attr = */{
-		/* .a_loadattr   = */NULL, /* All nodes are created with attributes already loaded */
-		/* .a_saveattr   = */&ramfs_saveattr,
-		/* .a_maskattr   = */NULL,
-		/* .a_pathconf   = */NULL,
-		/* .a_clearcache = */NULL
+	/* .it_fini = */ NULL,
+	/* .it_attr = */ {
+		/* .a_loadattr   = */ NULL, /* All nodes are created with attributes already loaded */
+		/* .a_saveattr   = */ &ramfs_saveattr,
+		/* .a_maskattr   = */ NULL,
+		/* .a_pathconf   = */ NULL,
+		/* .a_clearcache = */ NULL
 	},
-	/* .it_file = */{ /* NULL... */ },
+	/* .it_file = */ { /* NULL... */ },
 	{
 		.it_symlink = {
-			/* .sl_readlink = */&ramfs_readlink
+			/* .sl_readlink = */ &ramfs_readlink
 		}
 	}
 };
@@ -398,16 +398,16 @@ ramfs_opennode(struct superblock *__restrict UNUSED(self),
 
 
 PUBLIC struct superblock_type ramfs_type = {
-	/* .st_driver            = */&drv_self,
-	/* .st_name              = */"ramfs",
-	/* .st_flags             = */SUPERBLOCK_TYPE_FNODEV,
-	/* .st_sizeof_superblock = */sizeof(struct superblock),
+	/* .st_driver            = */ &drv_self,
+	/* .st_name              = */ "ramfs",
+	/* .st_flags             = */ SUPERBLOCK_TYPE_FNODEV,
+	/* .st_sizeof_superblock = */ sizeof(struct superblock),
 	{
-		/* .st_open = */&ramfs_open
+		/* .st_open = */ &ramfs_open
 	},
-	/* .st_functions = */{
-		/* .f_fini     = */NULL,
-		/* .f_opennode = */&ramfs_opennode,
+	/* .st_functions = */ {
+		/* .f_fini     = */ NULL,
+		/* .f_opennode = */ &ramfs_opennode,
 	}
 };
 

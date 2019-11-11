@@ -71,7 +71,7 @@ libvideo_gfx_ramgfx_getcolor_with_key(struct video_buffer_gfx *__restrict self,
 #define div256(x) (x)/0xff
 #endif
 
-#define blend_zero(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                                       /* lhs* */0
+#define blend_zero(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                                       /* lhs* */ 0
 #define blend_one(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                                           lhs
 #define blend_src_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)                div256((uint32_t)lhs * csrc)
 #define blend_one_minus_src_color(lhs, rhs, csrc, cdst, asrc, adst, cc, ac)      div256((uint32_t)lhs * (0xff - csrc))
@@ -350,18 +350,18 @@ LOCAL struct video_buffer_ops *CC get_rambuffer_ops(void) {
 
 
 /* Create a new RAM-based video buffer */
-INTERN WUNUSED /*REF*/struct video_buffer *CC
+INTERN WUNUSED /*REF*/ struct video_buffer *CC
 libvideo_rambuffer_create(size_t size_x, size_t size_y,
                           struct video_codec *__restrict codec,
                           struct video_palette *palette) {
-	/*REF*/struct video_rambuffer *result;
+	/*REF*/ struct video_rambuffer *result;
 	struct video_rambuffer_requirements req;
 	assert(codec);
 	/* Figure out buffer requirements. */
 	(*codec->vc_rambuffer_requirements)(size_x, size_y, &req);
 
 	/* Allocate heap memory for the buffer */
-	result = (/*REF*/struct video_rambuffer *)malloc(sizeof(struct video_rambuffer));
+	result = (/*REF*/ struct video_rambuffer *)malloc(sizeof(struct video_rambuffer));
 	if unlikely(!result)
 		goto err;
 	result->vb_data = (byte_t *)calloc(1, req.vbs_bufsize);

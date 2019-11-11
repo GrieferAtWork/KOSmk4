@@ -310,8 +310,8 @@ INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unprepare_map)(VIRT vm_vpage_t vir
  * Their main purpose is to be accessible through atomic means, allowing
  * them to be used by the PAGE_FAULT handler, while still ensuring that
  * access remains non-blocking. */
-INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_maphintone)(VIRT vm_vpage_t virt_page, VIRT /*ALIGNED(P32_PAGEDIR_MAPHINT_ALIGNMENT)*/void *hint);
-INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_maphint)(VIRT vm_vpage_t virt_page, size_t num_pages, VIRT /*ALIGNED(P32_PAGEDIR_MAPHINT_ALIGNMENT)*/void *hint);
+INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_maphintone)(VIRT vm_vpage_t virt_page, VIRT /*ALIGNED(P32_PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint);
+INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_maphint)(VIRT vm_vpage_t virt_page, size_t num_pages, VIRT /*ALIGNED(P32_PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint);
 
 /* Return the given of the given page, or NULL if no hint has been mapped. */
 INTDEF NOBLOCK WUNUSED void *NOTHROW(FCALL p32_pagedir_gethint)(VIRT vm_vpage_t virt_page);

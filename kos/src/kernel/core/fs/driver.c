@@ -255,7 +255,7 @@ PUBLIC CALLBACK_LIST(void KCALL(struct driver *))
 driver_finalized_callbacks = CALLBACK_LIST_INIT;
 
 /* Callbacks invoked just before a driver is unloaded. */
-PUBLIC CALLBACK_LIST(NOBLOCK void /*NOEXCEPT*/KCALL(struct driver *))
+PUBLIC CALLBACK_LIST(NOBLOCK void /*NOEXCEPT*/ KCALL(struct driver *))
 driver_unloaded_callbacks = CALLBACK_LIST_INIT;
 
 
@@ -371,8 +371,8 @@ again:
 INTDEF struct driver_state empty_driver_state;
 DEFINE_INTERN_ALIAS(empty_driver_state,callback_list_empty);
 PUBLIC struct callback_list_struct callback_list_empty = {
-	/* .cl_refcnt  = */2, /* +1: empty_driver_state, +1: current_driver_state */
-	/* .cl_count   = */0
+	/* .cl_refcnt  = */ 2, /* +1: empty_driver_state, +1: current_driver_state */
+	/* .cl_count   = */ 0
 };
 
 
@@ -508,7 +508,7 @@ NOTHROW(KCALL driver_clear_fde_caches)(void) {
 }
 
 
-typedef NOBLOCK size_t /*NOTHROW*/(KCALL *kernel_system_clearcache_t)(void);
+typedef NOBLOCK size_t /*NOTHROW*/ (KCALL *kernel_system_clearcache_t)(void);
 INTDEF kernel_system_clearcache_t __kernel_system_clearcaches_start[];
 INTDEF kernel_system_clearcache_t __kernel_system_clearcaches_end[];
 
@@ -883,30 +883,30 @@ PUBLIC struct driver kernel_driver = {
 	{
 		/* [0] = */ ELF_PHDR_INIT(
 			/* .p_type   = */PT_LOAD,
-			/* .p_offset = */0, /* Doesn't matter... */
-			/* .p_vaddr  = */(uintptr_t)__kernel_start,
-			/* .p_paddr  = */(uintptr_t)__kernel_start - KERNEL_BASE,
-			/* .p_filesz = */(uintptr_t)__kernel_size_nofree,
-			/* .p_memsz  = */(uintptr_t)__kernel_size_nofree,
+			/* .p_offset = */ 0, /* Doesn't matter... */
+			/* .p_vaddr  = */ (uintptr_t)__kernel_start,
+			/* .p_paddr  = */ (uintptr_t)__kernel_start - KERNEL_BASE,
+			/* .p_filesz = */ (uintptr_t)__kernel_size_nofree,
+			/* .p_memsz  = */ (uintptr_t)__kernel_size_nofree,
 			/* .p_flags  = */PF_X|PF_W|PF_R,
 #ifdef PAGESIZE
 			/* .p_align  = */PAGESIZE
 #else /* PAGESIZE */
-			/* .p_align  = */__ALIGNOF_MAX_ALIGN_T__
+			/* .p_align  = */ __ALIGNOF_MAX_ALIGN_T__
 #endif /* !PAGESIZE */
 		),
 		/* [1] = */ ELF_PHDR_INIT(
 			/* .p_type   = */PT_LOAD,
-			/* .p_offset = */0, /* Doesn't matter... */
-			/* .p_vaddr  = */(uintptr_t)__kernel_free_start,
-			/* .p_paddr  = */(uintptr_t)__kernel_free_start - KERNEL_BASE,
-			/* .p_filesz = */(uintptr_t)__kernel_free_size,
-			/* .p_memsz  = */(uintptr_t)__kernel_free_size,
+			/* .p_offset = */ 0, /* Doesn't matter... */
+			/* .p_vaddr  = */ (uintptr_t)__kernel_free_start,
+			/* .p_paddr  = */ (uintptr_t)__kernel_free_start - KERNEL_BASE,
+			/* .p_filesz = */ (uintptr_t)__kernel_free_size,
+			/* .p_memsz  = */ (uintptr_t)__kernel_free_size,
 			/* .p_flags  = */PF_X|PF_W|PF_R,
 #ifdef PAGESIZE
 			/* .p_align  = */PAGESIZE
 #else /* PAGESIZE */
-			/* .p_align  = */__ALIGNOF_MAX_ALIGN_T__
+			/* .p_align  = */ __ALIGNOF_MAX_ALIGN_T__
 #endif /* !PAGESIZE */
 		)
 	}
@@ -1590,7 +1590,7 @@ do_start_finalization:
  *                 references to it other than the reference given through `self')
  *                 In this case, this function has _NOT_ inherited the reference to `self' */
 PUBLIC WUNUSED NONNULL((1)) bool KCALL
-driver_try_decref_and_delmod(/*inherit(on_success)*/REF struct driver *__restrict self,
+driver_try_decref_and_delmod(/*inherit(on_success)*/ REF struct driver *__restrict self,
                              unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	if unlikely(self == &kernel_driver)
@@ -4104,7 +4104,7 @@ PUBLIC ATOMIC_REF(struct driver_library_path_string)
 driver_library_path = ATOMIC_REF_INIT(&default_library_path);
 
 
-PRIVATE WUNUSED NONNULL((1)) /*ATTR_RETNONNULL_IF(second_phase)*/REF struct driver *KCALL
+PRIVATE WUNUSED NONNULL((1)) /*ATTR_RETNONNULL_IF(second_phase)*/ REF struct driver *KCALL
 driver_insmod_loadlib_at(char const *__restrict path_start, size_t path_length,
                          USER CHECKED char const *driver_name, size_t driver_name_length,
                          USER CHECKED char const *driver_cmdline,
@@ -4139,7 +4139,7 @@ driver_insmod_loadlib_at(char const *__restrict path_start, size_t path_length,
 	return result;
 }
 
-PRIVATE WUNUSED NONNULL((1)) /*ATTR_RETNONNULL_IF(second_phase)*/REF struct driver *KCALL
+PRIVATE WUNUSED NONNULL((1)) /*ATTR_RETNONNULL_IF(second_phase)*/ REF struct driver *KCALL
 driver_insmod_loadlib(struct driver_library_path_string *__restrict libpath,
                       USER CHECKED char const *driver_name,
                       USER CHECKED char const *driver_cmdline,

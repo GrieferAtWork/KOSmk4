@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9d6cf72 */
+/* HASH CRC-32:0xf8da5b87 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@
 #define SYS_mkdir                   __NR_mkdir                   /* errno_t mkdir(char const *pathname, mode_t mode) */
 #define SYS_rmdir                   __NR_rmdir                   /* errno_t rmdir(char const *path) */
 #define SYS_dup                     __NR_dup                     /* fd_t dup(fd_t fd) */
-#define SYS_pipe                    __NR_pipe                    /* errno_t pipe([2]fd_t *pipedes) */
+#define SYS_pipe                    __NR_pipe                    /* errno_t pipe([2] fd_t *pipedes) */
 #define SYS_times                   __NR_times                   /* clock_t times(struct tms *buf) */
 #define SYS_brk                     __NR_brk                     /* errno_t brk(void *addr) */
 #define SYS_acct                    __NR_acct                    /* errno_t acct(char const *filename) */
@@ -170,7 +170,7 @@
 #define SYS_getegid32               __NR_getegid32               /* uint32_t getegid32(void) */
 #define SYS_setreuid32              __NR_setreuid32              /* errno_t setreuid32(uint32_t ruid, uint32_t euid) */
 #define SYS_setregid32              __NR_setregid32              /* errno_t setregid32(uint32_t rgid, uint32_t egid) */
-#define SYS_getgroups32             __NR_getgroups32             /* errno_t getgroups32(size_t size, []uint32_t *list) */
+#define SYS_getgroups32             __NR_getgroups32             /* errno_t getgroups32(size_t size, [] uint32_t *list) */
 #define SYS_setgroups32             __NR_setgroups32             /* errno_t setgroups32(size_t count, uint32_t const *groups) */
 #define SYS_setresuid32             __NR_setresuid32             /* errno_t setresuid32(uint32_t ruid, uint32_t euid, uint32_t suid) */
 #define SYS_getresuid32             __NR_getresuid32             /* errno_t getresuid32(uint32_t *ruid, uint32_t *euid, uint32_t *suid) */
@@ -219,7 +219,7 @@
 #define SYS_clock_nanosleep         __NR_clock_nanosleep         /* errno_t clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct __timespec32 const *requested_time, struct __timespec32 *remaining) */
 /* @param: signo: One of `SIG*' */
 #define SYS_tgkill                  __NR_tgkill                  /* errno_t tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo) */
-#define SYS_utimes                  __NR_utimes                  /* errno_t utimes(char const *filename, [2]struct __timeval32 const *times) */
+#define SYS_utimes                  __NR_utimes                  /* errno_t utimes(char const *filename, [2] struct __timeval32 const *times) */
 /* @param: options: At least one of `WEXITED|WSTOPPED|WCONTINUED', optionally or'd with `WNOHANG|WNOWAIT' */
 #define SYS_waitid                  __NR_waitid                  /* errno_t waitid(idtype_t idtype, id_t id, struct __siginfo_struct *infop, syscall_ulong_t options, struct rusage *ru) */
 #define SYS_ioprio_set              __NR_ioprio_set              /* errno_t ioprio_set(syscall_ulong_t which, syscall_ulong_t who, syscall_ulong_t ioprio) */
@@ -229,7 +229,7 @@
 #define SYS_mknodat                 __NR_mknodat                 /* errno_t mknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev) */
 /* @param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
 #define SYS_fchownat                __NR_fchownat                /* errno_t fchownat(fd_t dirfd, char const *filename, uint32_t owner, uint32_t group, atflag_t flags) */
-#define SYS_futimesat               __NR_futimesat               /* errno_t futimesat(fd_t dirfd, const char *filename, [2]struct __timeval32 const *times) */
+#define SYS_futimesat               __NR_futimesat               /* errno_t futimesat(fd_t dirfd, const char *filename, [2] struct __timeval32 const *times) */
 /* @param: flags: Set of `0|AT_REMOVEDIR|AT_REMOVEREG|AT_DOSPATH' */
 #define SYS_unlinkat                __NR_unlinkat                /* errno_t unlinkat(fd_t dirfd, char const *name, atflag_t flags) */
 #define SYS_renameat                __NR_renameat                /* errno_t renameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path) */
@@ -253,7 +253,7 @@
 #define SYS_getcpu                  __NR_getcpu                  /* errno_t getcpu(uint32_t *cpu, uint32_t *node, struct getcpu_cache *tcache) */
 #define SYS_epoll_pwait             __NR_epoll_pwait             /* errno_t epoll_pwait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss) */
 /* @param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-#define SYS_utimensat               __NR_utimensat               /* errno_t utimensat(fd_t dirfd, char const *filename, [2-3]struct __timespec32 const *times, atflag_t flags) */
+#define SYS_utimensat               __NR_utimensat               /* errno_t utimensat(fd_t dirfd, char const *filename, [2-3] struct __timespec32 const *times, atflag_t flags) */
 #define SYS_signalfd                __NR_signalfd                /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 /* Return file descriptor for new interval timer source */
 #define SYS_timerfd_create          __NR_timerfd_create          /* fd_t timerfd_create(clockid_t clock_id, syscall_ulong_t flags) */
@@ -270,7 +270,7 @@
 #define SYS_epoll_create1           __NR_epoll_create1           /* fd_t epoll_create1(syscall_ulong_t flags) */
 /* @param: flags:  Set of `O_CLOEXEC|O_CLOFORK' */
 #define SYS_dup3                    __NR_dup3                    /* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */
-#define SYS_pipe2                   __NR_pipe2                   /* errno_t pipe2([2]fd_t *pipedes, oflag_t flags) */
+#define SYS_pipe2                   __NR_pipe2                   /* errno_t pipe2([2] fd_t *pipedes, oflag_t flags) */
 #define SYS_preadv                  __NR_preadv                  /* ssize_t preadv(fd_t fd, struct iovec const *iovec, size_t count, uint64_t offset) */
 #define SYS_pwritev                 __NR_pwritev                 /* ssize_t pwritev(fd_t fd, struct iovec const *iovec, size_t count, uint64_t offset) */
 /* @param: signo: One of `SIG*' */
@@ -291,7 +291,7 @@
 /* @param: flags: Set of `0|AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
 #define SYS_execveat                __NR_execveat                /* errno_t execveat(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp, atflag_t flags) */
 #define SYS_socket                  __NR_socket                  /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
-#define SYS_socketpair              __NR_socketpair              /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, [2]fd_t *fds) */
+#define SYS_socketpair              __NR_socketpair              /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, [2] fd_t *fds) */
 #define SYS_bind                    __NR_bind                    /* errno_t bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 #define SYS_connect                 __NR_connect                 /* errno_t connect(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 #define SYS_listen                  __NR_listen                  /* errno_t listen(fd_t sockfd, syscall_ulong_t max_backlog) */
@@ -620,13 +620,13 @@
 #define SYS_klstat                  __NR_klstat                  /* errno_t klstat(char const *filename, struct stat *statbuf) */
 #define SYS_kfstat                  __NR_kfstat                  /* errno_t kfstat(fd_t fd, struct stat *statbuf) */
 #define SYS_kreaddirf               __NR_kreaddirf               /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
-#define SYS_utimes64                __NR_utimes64                /* errno_t utimes64(char const *filename, [2]struct __timeval64 const *times) */
+#define SYS_utimes64                __NR_utimes64                /* errno_t utimes64(char const *filename, [2] struct __timeval64 const *times) */
 /* @param: flags: Set of `0|AT_DOSPATH' */
 #define SYS_fmkdirat                __NR_fmkdirat                /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
 /* @param: flags: Set of `0|AT_DOSPATH' */
 #define SYS_fmknodat                __NR_fmknodat                /* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
 /* @param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-#define SYS_futimesat64             __NR_futimesat64             /* errno_t futimesat64(fd_t dirfd, const char *filename, [2-3]struct __timeval64 const *times) */
+#define SYS_futimesat64             __NR_futimesat64             /* errno_t futimesat64(fd_t dirfd, const char *filename, [2-3] struct __timeval64 const *times) */
 /* @param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
 #define SYS_kfstatat                __NR_kfstatat                /* errno_t kfstatat(fd_t dirfd, char const *filename, struct stat *statbuf, atflag_t flags) */
 /* @param: flags: Set of `0|AT_DOSPATH' */
@@ -675,7 +675,7 @@
 #define SYS_setregid                __NR_setregid                /* errno_t setregid(uint16_t rgid, uint16_t egid) */
 #define SYS_sigsuspend              __NR_sigsuspend              /* errno_t sigsuspend(struct __sigset_struct const *set) */
 #define SYS_sigpending              __NR_sigpending              /* errno_t sigpending(struct __sigset_struct *set) */
-#define SYS_getgroups               __NR_getgroups               /* errno_t getgroups(size_t size, []uint16_t *list) */
+#define SYS_getgroups               __NR_getgroups               /* errno_t getgroups(size_t size, [] uint16_t *list) */
 #define SYS_setgroups               __NR_setgroups               /* errno_t setgroups(size_t count, uint16_t const *groups) */
 #define SYS_linux_oldlstat          __NR_linux_oldlstat          /* errno_t linux_oldlstat(char const *filename, struct linux_oldstat *statbuf) */
 /* Returns `0' to indicate end-of-directory; 1 to to indicate success */
@@ -727,7 +727,7 @@
 #define SYS_pselect6_64             __NR_pselect6_64             /* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespec64 const *timeout, void const *sigmask_sigset_and_len) */
 #define SYS_ppoll64                 __NR_ppoll64                 /* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct __timespec64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 /* @param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-#define SYS_utimensat64             __NR_utimensat64             /* errno_t utimensat64(fd_t dirfd, char const *filename, [2-3]struct __timespec64 const *times, atflag_t flags) */
+#define SYS_utimensat64             __NR_utimensat64             /* errno_t utimensat64(fd_t dirfd, char const *filename, [2-3] struct __timespec64 const *times, atflag_t flags) */
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
  * is absolute. Optionally return the old expiration time in OTMR */

@@ -70,19 +70,19 @@ typedef uintptr_t pagedir_pushval_t;
  *          region is defined by the arch (as is the case for `i386'), will need to
  *          be accessed through use of `THIS_TRAMPOLINE_PAGE'!) */
 FUNDEF NOBLOCK WUNUSED u8 NOTHROW(KCALL vm_readphysb)(PHYS vm_phys_t addr);
-FUNDEF NOBLOCK WUNUSED u16 NOTHROW(KCALL vm_readphysw)(/*aligned(2)*/PHYS vm_phys_t addr);
-FUNDEF NOBLOCK WUNUSED u32 NOTHROW(KCALL vm_readphysl)(/*aligned(4)*/PHYS vm_phys_t addr);
+FUNDEF NOBLOCK WUNUSED u16 NOTHROW(KCALL vm_readphysw)(/*aligned(2)*/ PHYS vm_phys_t addr);
+FUNDEF NOBLOCK WUNUSED u32 NOTHROW(KCALL vm_readphysl)(/*aligned(4)*/ PHYS vm_phys_t addr);
 FUNDEF NOBLOCK WUNUSED u16 NOTHROW(KCALL vm_readphysw_unaligned)(PHYS vm_phys_t addr);
 FUNDEF NOBLOCK WUNUSED u32 NOTHROW(KCALL vm_readphysl_unaligned)(PHYS vm_phys_t addr);
 FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysb)(PHYS vm_phys_t addr, u8 value);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysw)(/*aligned(2)*/PHYS vm_phys_t addr, u16 value);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysl)(/*aligned(4)*/PHYS vm_phys_t addr, u32 value);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysw)(/*aligned(2)*/ PHYS vm_phys_t addr, u16 value);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysl)(/*aligned(4)*/ PHYS vm_phys_t addr, u32 value);
 FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysw_unaligned)(PHYS vm_phys_t addr, u16 value);
 FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysl_unaligned)(PHYS vm_phys_t addr, u32 value);
 #ifdef __UINT64_TYPE__
-FUNDEF NOBLOCK WUNUSED u64 NOTHROW(KCALL vm_readphysq)(/*aligned(8)*/PHYS vm_phys_t addr);
+FUNDEF NOBLOCK WUNUSED u64 NOTHROW(KCALL vm_readphysq)(/*aligned(8)*/ PHYS vm_phys_t addr);
 FUNDEF NOBLOCK WUNUSED u64 NOTHROW(KCALL vm_readphysq_unaligned)(PHYS vm_phys_t addr);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysq)(/*aligned(8)*/PHYS vm_phys_t addr, u64 value);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysq)(/*aligned(8)*/ PHYS vm_phys_t addr, u64 value);
 FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysq_unaligned)(PHYS vm_phys_t addr, u64 value);
 #endif /* __UINT64_TYPE__ */
 

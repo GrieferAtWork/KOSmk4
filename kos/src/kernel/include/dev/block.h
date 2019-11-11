@@ -46,7 +46,7 @@ struct block_device_type {
 	 * Since the boot CPU is meant to be responsible for serving any and all device
 	 * interrupts, by disabling preemption within this finalizer, you can safely
 	 * modify data structures that are used locklessly by such interrupt handlers. */
-	NOBLOCK NONNULL((1)) void /*NOTHROW*/(KCALL *dt_fini)(struct block_device *__restrict self);
+	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *dt_fini)(struct block_device *__restrict self);
 	/* [1..1] Read function.
 	 * NOTE: Errors may propagated by calling `aio->ah_func' with `AIO_COMPLETION_FAILURE'
 	 *       Errors that are thrown by this function are automatically passed to `aio->ah_func'.

@@ -170,11 +170,11 @@ NOTHROW_NCX(LIBDCALL libd_format_waprintf_pack)(struct format_c16aprintf_data *_
 }
 /*[[[end:DOS$format_waprintf_pack]]]*/
 
-/*[[[head:format_waprintf_printer,hash:CRC-32=0x8444cc5a]]]*/
+/*[[[head:format_waprintf_printer,hash:CRC-32=0x14d90401]]]*/
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_waprintf_printer") ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_waprintf_printer)(/*struct format_waprintf_data **/void *arg,
+NOTHROW_NCX(LIBCCALL libc_format_waprintf_printer)(/*struct format_waprintf_data **/ void *arg,
                                                    char32_t const *__restrict data,
                                                    size_t datalen)
 /*[[[body:format_waprintf_printer]]]*/
@@ -212,11 +212,11 @@ NOTHROW_NCX(LIBCCALL libc_format_waprintf_printer)(/*struct format_waprintf_data
 }
 /*[[[end:format_waprintf_printer]]]*/
 
-/*[[[head:DOS$format_waprintf_printer,hash:CRC-32=0x668cb633]]]*/
+/*[[[head:DOS$format_waprintf_printer,hash:CRC-32=0x808c96c2]]]*/
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_waprintf_printer") ssize_t
-NOTHROW_NCX(LIBDCALL libd_format_waprintf_printer)(/*struct format_waprintf_data **/void *arg,
+NOTHROW_NCX(LIBDCALL libd_format_waprintf_printer)(/*struct format_waprintf_data **/ void *arg,
                                                    char16_t const *__restrict data,
                                                    size_t datalen)
 /*[[[body:DOS$format_waprintf_printer]]]*/

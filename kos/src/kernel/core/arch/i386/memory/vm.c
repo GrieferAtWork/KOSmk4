@@ -83,111 +83,121 @@ INTDEF struct vm_node x86_vmnode_transition_reserve;
 
 
 INTERN struct vm_datapart x86_kernel_vm_parts[5] = {
-	/* [X86_KERNEL_VMMAPPING_CORE_TEXT] = */{
-		/* .dp_refcnt = */2, /* 2 == 1(myself) + 1(node) */
-		/* .dp_lock   = */SHARED_RWLOCK_INIT,
-		{/* .dp_tree_ptr = */{ NULL, NULL, 0, (size_t)__kernel_text_numpages - 1 }},
-		/* .dp_crefs = */LLIST_INIT,
-		/* .dp_srefs = */&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_TEXT],
-		/* .dp_stale = */NULL,
-		/* .dp_block = */&vm_datablock_anonymous,
-		/* .dp_flags = */VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,
-		/* .dp_state = */VM_DATAPART_STATE_LOCKED,
+	/* [X86_KERNEL_VMMAPPING_CORE_TEXT] = */ {
+		/* .dp_refcnt = */ 2, /* 2 == 1(myself) + 1(node) */
+		/* .dp_lock   = */ SHARED_RWLOCK_INIT,
 		{
-			/* .dp_ramdata = */{
-				/* .rd_blockv = */&x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_TEXT].dp_ramdata.rd_block0,
+			/* .dp_tree_ptr = */ { NULL, NULL, 0, (size_t)__kernel_text_numpages - 1 }
+		},
+		/* .dp_crefs = */ LLIST_INIT,
+		/* .dp_srefs = */ &x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_TEXT],
+		/* .dp_stale = */ NULL,
+		/* .dp_block = */ &vm_datablock_anonymous,
+		/* .dp_flags = */ VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,
+		/* .dp_state = */ VM_DATAPART_STATE_LOCKED,
+		{
+			/* .dp_ramdata = */ {
+				/* .rd_blockv = */ &x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_TEXT].dp_ramdata.rd_block0,
 				{
-					/* .rd_block0 = */{
-						/* .rb_start = */(vm_ppage_t)(uintptr_t)__kernel_text_startpage - KERNEL_BASE_PAGE,
-						/* .rb_size  = */(size_t)__kernel_text_numpages
+					/* .rd_block0 = */ {
+						/* .rb_start = */ (vm_ppage_t)(uintptr_t)__kernel_text_startpage - KERNEL_BASE_PAGE,
+						/* .rb_size  = */ (size_t)__kernel_text_numpages
 					}
 				}
 			}
 		}
 	},
-	/* [X86_KERNEL_VMMAPPING_CORE_RODATA] = */{
-		/* .dp_refcnt = */2, /* 2 == 1(myself) + 1(node) */
-		/* .dp_lock = */SHARED_RWLOCK_INIT,
-		{/* .dp_tree_ptr = */{ NULL, NULL, 0, (size_t)__kernel_rodata_numpages - 1 }},
-		/* .dp_crefs = */LLIST_INIT,
-		/* .dp_srefs = */&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_RODATA],
-		/* .dp_stale = */NULL,
-		/* .dp_block = */&vm_datablock_anonymous,
-		/* .dp_flags = */VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,
-		/* .dp_state = */VM_DATAPART_STATE_LOCKED,
+	/* [X86_KERNEL_VMMAPPING_CORE_RODATA] = */ {
+		/* .dp_refcnt = */ 2, /* 2 == 1(myself) + 1(node) */
+		/* .dp_lock = */ SHARED_RWLOCK_INIT,
 		{
-			/* .dp_ramdata = */{
-				/* .rd_blockv = */&x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_RODATA].dp_ramdata.rd_block0,
+			/* .dp_tree_ptr = */ { NULL, NULL, 0, (size_t)__kernel_rodata_numpages - 1 }
+		},
+		/* .dp_crefs = */ LLIST_INIT,
+		/* .dp_srefs = */ &x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_RODATA],
+		/* .dp_stale = */ NULL,
+		/* .dp_block = */ &vm_datablock_anonymous,
+		/* .dp_flags = */ VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,
+		/* .dp_state = */ VM_DATAPART_STATE_LOCKED,
+		{
+			/* .dp_ramdata = */ {
+				/* .rd_blockv = */ &x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_RODATA].dp_ramdata.rd_block0,
 				{
-					/* .rd_block0 = */{
-						/* .rb_start = */(vm_ppage_t)(uintptr_t)__kernel_rodata_startpage - KERNEL_BASE_PAGE,
-						/* .rb_size  = */(size_t)__kernel_rodata_numpages
+					/* .rd_block0 = */ {
+						/* .rb_start = */ (vm_ppage_t)(uintptr_t)__kernel_rodata_startpage - KERNEL_BASE_PAGE,
+						/* .rb_size  = */ (size_t)__kernel_rodata_numpages
 					}
 				}
 			}
 		}
 	},
-	/* [X86_KERNEL_VMMAPPING_CORE_DATA] = */{
-		/* .dp_refcnt = */2, /* 2 == 1(myself) + 1(node) */
-		/* .dp_lock = */SHARED_RWLOCK_INIT,
-		{/* .dp_tree_ptr = */{ NULL, NULL, 0, (size_t)__kernel_data_numpages - 1 }},
-		/* .dp_crefs = */LLIST_INIT,
-		/* .dp_srefs = */&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA],
-		/* .dp_stale = */NULL,
-		/* .dp_block = */&vm_datablock_anonymous,
-		/* .dp_flags = */VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,
-		/* .dp_state = */VM_DATAPART_STATE_LOCKED,
+	/* [X86_KERNEL_VMMAPPING_CORE_DATA] = */ {
+		/* .dp_refcnt = */ 2, /* 2 == 1(myself) + 1(node) */
+		/* .dp_lock = */ SHARED_RWLOCK_INIT,
 		{
-			/* .dp_ramdata = */{
-				/* .rd_blockv = */&x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_DATA].dp_ramdata.rd_block0,
+			/* .dp_tree_ptr = */ { NULL, NULL, 0, (size_t)__kernel_data_numpages - 1 }
+		},
+		/* .dp_crefs = */ LLIST_INIT,
+		/* .dp_srefs = */ &x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA],
+		/* .dp_stale = */ NULL,
+		/* .dp_block = */ &vm_datablock_anonymous,
+		/* .dp_flags = */ VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,
+		/* .dp_state = */ VM_DATAPART_STATE_LOCKED,
+		{
+			/* .dp_ramdata = */ {
+				/* .rd_blockv = */ &x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_DATA].dp_ramdata.rd_block0,
 				{
-					/* .rd_block0 = */{
-						/* .rb_start = */(vm_ppage_t)(uintptr_t)__kernel_data_startpage - KERNEL_BASE_PAGE,
-						/* .rb_size  = */(size_t)__kernel_data_numpages
+					/* .rd_block0 = */ {
+						/* .rb_start = */ (vm_ppage_t)(uintptr_t)__kernel_data_startpage - KERNEL_BASE_PAGE,
+						/* .rb_size  = */ (size_t)__kernel_data_numpages
 					}
 				}
 			}
 		}
 	},
-	/* [X86_KERNEL_VMMAPPING_CORE_XDATA] = */{
-		/* .dp_refcnt = */2, /* 2 == 1(myself) + 1(node) */
-		/* .dp_lock = */SHARED_RWLOCK_INIT,
-		{/* .dp_tree_ptr = */{ NULL, NULL, 0, (size_t)__kernel_xdata_numpages - 1 }},
-		/* .dp_crefs = */LLIST_INIT,
-		/* .dp_srefs = */&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_XDATA],
-		/* .dp_stale = */NULL,
-		/* .dp_block = */&vm_datablock_anonymous,
-		/* .dp_flags = */VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,
-		/* .dp_state = */VM_DATAPART_STATE_LOCKED,
+	/* [X86_KERNEL_VMMAPPING_CORE_XDATA] = */ {
+		/* .dp_refcnt = */ 2, /* 2 == 1(myself) + 1(node) */
+		/* .dp_lock = */ SHARED_RWLOCK_INIT,
 		{
-			/* .dp_ramdata = */{
-				/* .rd_blockv = */&x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_XDATA].dp_ramdata.rd_block0,
+			/* .dp_tree_ptr = */ { NULL, NULL, 0, (size_t)__kernel_xdata_numpages - 1 }
+		},
+		/* .dp_crefs = */ LLIST_INIT,
+		/* .dp_srefs = */ &x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_XDATA],
+		/* .dp_stale = */ NULL,
+		/* .dp_block = */ &vm_datablock_anonymous,
+		/* .dp_flags = */ VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,
+		/* .dp_state = */ VM_DATAPART_STATE_LOCKED,
+		{
+			/* .dp_ramdata = */ {
+				/* .rd_blockv = */ &x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_XDATA].dp_ramdata.rd_block0,
 				{
-					/* .rd_block0 = */{
-						/* .rb_start = */(vm_ppage_t)(uintptr_t)__kernel_xdata_startpage - KERNEL_BASE_PAGE,
-						/* .rb_size  = */(size_t)__kernel_xdata_numpages
+					/* .rd_block0 = */ {
+						/* .rb_start = */ (vm_ppage_t)(uintptr_t)__kernel_xdata_startpage - KERNEL_BASE_PAGE,
+						/* .rb_size  = */ (size_t)__kernel_xdata_numpages
 					}
 				}
 			}
 		}
 	},
-	/* [X86_KERNEL_VMMAPPING_CORE_BSS] = */{
-		/* .dp_refcnt = */2, /* 2 == 1(myself) + 1(node) */
-		/* .dp_lock = */SHARED_RWLOCK_INIT,
-		{/* .dp_tree_ptr = */{ NULL, NULL, 0, (size_t)__kernel_bss_numpages - 1 }},
-		/* .dp_crefs = */LLIST_INIT,
-		/* .dp_srefs = */&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS],
-		/* .dp_stale = */NULL,
-		/* .dp_block = */&vm_datablock_anonymous,
-		/* .dp_flags = */VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,
-		/* .dp_state = */VM_DATAPART_STATE_LOCKED,
+	/* [X86_KERNEL_VMMAPPING_CORE_BSS] = */ {
+		/* .dp_refcnt = */ 2, /* 2 == 1(myself) + 1(node) */
+		/* .dp_lock = */ SHARED_RWLOCK_INIT,
 		{
-			/* .dp_ramdata = */{
-				/* .rd_blockv = */&x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_BSS].dp_ramdata.rd_block0,
+			/* .dp_tree_ptr = */ { NULL, NULL, 0, (size_t)__kernel_bss_numpages - 1 }
+		},
+		/* .dp_crefs = */ LLIST_INIT,
+		/* .dp_srefs = */ &x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS],
+		/* .dp_stale = */ NULL,
+		/* .dp_block = */ &vm_datablock_anonymous,
+		/* .dp_flags = */ VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,
+		/* .dp_state = */ VM_DATAPART_STATE_LOCKED,
+		{
+			/* .dp_ramdata = */ {
+				/* .rd_blockv = */ &x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_BSS].dp_ramdata.rd_block0,
 				{
-					/* .rd_block0 = */{
-						/* .rb_start = */(vm_ppage_t)(uintptr_t)__kernel_bss_startpage - KERNEL_BASE_PAGE,
-						/* .rb_size  = */(size_t)__kernel_bss_numpages
+					/* .rd_block0 = */ {
+						/* .rb_start = */ (vm_ppage_t)(uintptr_t)__kernel_bss_startpage - KERNEL_BASE_PAGE,
+						/* .rb_size  = */ (size_t)__kernel_bss_numpages
 					}
 				}
 			}
@@ -281,22 +291,24 @@ INTERN struct vm_node x86_kernel_vm_nodes[6] = {
 INTDEF struct vm_datapart x86_vm_part_pdata;
 INTDEF struct vm_node x86_vm_node_pdata;
 INTERN struct vm_datapart x86_vm_part_pdata = {
-	/* .dp_refcnt = */2, /* 2 == 1(myself) + 1(node) */
-	/* .dp_lock = */SHARED_RWLOCK_INIT,
-	{/* .dp_tree_ptr = */{ NULL, NULL, 0, (size_t)__kernel_pdata_numpages - 1 }},
-	/* .dp_crefs = */LLIST_INIT,
-	/* .dp_srefs = */&x86_vm_node_pdata,
-	/* .dp_stale = */NULL,
-	/* .dp_block = */&vm_datablock_anonymous,
-	/* .dp_flags = */VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,
-	/* .dp_state = */VM_DATAPART_STATE_LOCKED,
+	/* .dp_refcnt = */ 2, /* 2 == 1(myself) + 1(node) */
+	/* .dp_lock = */ SHARED_RWLOCK_INIT,
 	{
-		/* .dp_ramdata = */{
-			/* .rd_blockv = */&x86_vm_part_pdata.dp_ramdata.rd_block0,
+		/* .dp_tree_ptr = */ { NULL, NULL, 0, (size_t)__kernel_pdata_numpages - 1 }
+	},
+	/* .dp_crefs = */ LLIST_INIT,
+	/* .dp_srefs = */ &x86_vm_node_pdata,
+	/* .dp_stale = */ NULL,
+	/* .dp_block = */ &vm_datablock_anonymous,
+	/* .dp_flags = */ VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,
+	/* .dp_state = */ VM_DATAPART_STATE_LOCKED,
+	{
+		/* .dp_ramdata = */ {
+			/* .rd_blockv = */ &x86_vm_part_pdata.dp_ramdata.rd_block0,
 			{
-				/* .rd_block0 = */{
-					/* .rb_start = */(vm_ppage_t)(uintptr_t)__kernel_pdata_startpage - KERNEL_BASE_PAGE,
-					/* .rb_size  = */(size_t)__kernel_pdata_numpages
+				/* .rd_block0 = */ {
+					/* .rb_start = */ (vm_ppage_t)(uintptr_t)__kernel_pdata_startpage - KERNEL_BASE_PAGE,
+					/* .rb_size  = */ (size_t)__kernel_pdata_numpages
 				}
 			}
 		}
@@ -323,22 +335,24 @@ INTDEF byte_t __kernel_free_endpage[];
 INTDEF byte_t __kernel_free_numpages[];
 
 INTERN ATTR_FREEDATA struct vm_datapart x86_kernel_vm_part_free = {
-	/* .dp_refcnt = */2, /* 2 == 1(myself) + 1(node) */
-	/* .dp_lock   = */SHARED_RWLOCK_INIT,
-	{/* .dp_tree_ptr = */{ NULL, NULL, 0, (size_t)__kernel_free_numpages - 1 }},
-	/* .dp_crefs = */LLIST_INIT,
-	/* .dp_srefs = */&x86_kernel_vm_node_free,
-	/* .dp_stale = */NULL,
-	/* .dp_block = */&vm_datablock_anonymous,
-	/* .dp_flags = */VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,
-	/* .dp_state = */VM_DATAPART_STATE_LOCKED,
+	/* .dp_refcnt = */ 2, /* 2 == 1(myself) + 1(node) */
+	/* .dp_lock   = */ SHARED_RWLOCK_INIT,
 	{
-		/* .dp_ramdata = */{
-			/* .rd_blockv = */&x86_kernel_vm_part_free.dp_ramdata.rd_block0,
+		/* .dp_tree_ptr = */ { NULL, NULL, 0, (size_t)__kernel_free_numpages - 1 }
+	},
+	/* .dp_crefs = */ LLIST_INIT,
+	/* .dp_srefs = */ &x86_kernel_vm_node_free,
+	/* .dp_stale = */ NULL,
+	/* .dp_block = */ &vm_datablock_anonymous,
+	/* .dp_flags = */ VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,
+	/* .dp_state = */ VM_DATAPART_STATE_LOCKED,
+	{
+		/* .dp_ramdata = */ {
+			/* .rd_blockv = */ &x86_kernel_vm_part_free.dp_ramdata.rd_block0,
 			{
-				/* .rd_block0 = */{
-					/* .rb_start = */(vm_ppage_t)(uintptr_t)__kernel_free_startpage - KERNEL_BASE_PAGE,
-					/* .rb_size  = */(size_t)__kernel_free_numpages
+				/* .rd_block0 = */ {
+					/* .rb_start = */ (vm_ppage_t)(uintptr_t)__kernel_free_startpage - KERNEL_BASE_PAGE,
+					/* .rb_size  = */ (size_t)__kernel_free_numpages
 				}
 			}
 		}
@@ -356,22 +370,24 @@ INTERN ATTR_FREEDATA struct vm_node x86_kernel_vm_node_free =
 INTDEF struct vm_datapart kernel_vm_part_pagedata;
 INTDEF struct vm_node kernel_vm_node_pagedata;
 INTERN struct vm_datapart kernel_vm_part_pagedata = {
-	/* .dp_refcnt = */2, /* 2 == 1(myself) + 1(node) */
-	/* .dp_lock   = */SHARED_RWLOCK_INIT,
-	{/* .dp_tree_ptr = */{ NULL, NULL, 0, 0 }}, /* Filled in later */
-	/* .dp_crefs = */LLIST_INIT,
-	/* .dp_srefs = */&kernel_vm_node_pagedata,
-	/* .dp_stale = */NULL,
-	/* .dp_block = */&vm_datablock_anonymous,
-	/* .dp_flags = */VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,
-	/* .dp_state = */VM_DATAPART_STATE_LOCKED,
+	/* .dp_refcnt = */ 2, /* 2 == 1(myself) + 1(node) */
+	/* .dp_lock   = */ SHARED_RWLOCK_INIT,
 	{
-		/* .dp_ramdata = */{
-			/* .rd_blockv = */&kernel_vm_part_pagedata.dp_ramdata.rd_block0,
+		/* .dp_tree_ptr = */ { NULL, NULL, 0, 0 } /* Filled in later */
+	},
+	/* .dp_crefs = */ LLIST_INIT,
+	/* .dp_srefs = */ &kernel_vm_node_pagedata,
+	/* .dp_stale = */ NULL,
+	/* .dp_block = */ &vm_datablock_anonymous,
+	/* .dp_flags = */ VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,
+	/* .dp_state = */ VM_DATAPART_STATE_LOCKED,
+	{
+		/* .dp_ramdata = */ {
+			/* .rd_blockv = */ &kernel_vm_part_pagedata.dp_ramdata.rd_block0,
 			{
-				/* .rd_block0 = */{
-					/* .rb_start = */0, /* Filled in later */
-					/* .rb_size  = */0  /* Filled in later */
+				/* .rd_block0 = */ {
+					/* .rb_start = */ 0, /* Filled in later */
+					/* .rb_size  = */ 0  /* Filled in later */
 				}
 			}
 		}
@@ -388,22 +404,22 @@ INTDEF struct vm_node x86_vm_node_lapic;
 
 
 INTERN struct vm_datapart x86_vm_part_lapic = {
-	/* .dp_refcnt = */2, /* 2 == 1(myself) + 1(node) */
-	/* .dp_lock = */SHARED_RWLOCK_INIT,
+	/* .dp_refcnt = */ 2, /* 2 == 1(myself) + 1(node) */
+	/* .dp_lock = */ SHARED_RWLOCK_INIT,
 	{ .dp_tree = { NULL, NULL, (vm_dpage_t)-1, 0 }}, /* (possibly) filled in later */
-	/* .dp_crefs = */LLIST_INIT,
-	/* .dp_srefs = */&x86_vm_node_lapic,
-	/* .dp_stale = */NULL,
-	/* .dp_block = */&vm_datablock_anonymous,
-	/* .dp_flags = */VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,
-	/* .dp_state = */VM_DATAPART_STATE_LOCKED,
+	/* .dp_crefs = */ LLIST_INIT,
+	/* .dp_srefs = */ &x86_vm_node_lapic,
+	/* .dp_stale = */ NULL,
+	/* .dp_block = */ &vm_datablock_anonymous,
+	/* .dp_flags = */ VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,
+	/* .dp_state = */ VM_DATAPART_STATE_LOCKED,
 	{
-		/* .dp_ramdata = */{
-			/* .rd_blockv = */&x86_vm_part_lapic.dp_ramdata.rd_block0,
+		/* .dp_ramdata = */ {
+			/* .rd_blockv = */ &x86_vm_part_lapic.dp_ramdata.rd_block0,
 			{
-				/* .rd_block0 = */{
-					/* .rb_start = */0, /* (possibly) filled in later */
-					/* .rb_size  = */0  /* (possibly) filled in later */
+				/* .rd_block0 = */ {
+					/* .rb_start = */ 0, /* (possibly) filled in later */
+					/* .rb_size  = */ 0  /* (possibly) filled in later */
 				}
 			}
 		}

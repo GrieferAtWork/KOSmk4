@@ -142,7 +142,7 @@ DEFINE {0x00000025,0x0000003e} = kill(pid_t pid, syscall_ulong_t signo): errno_t
 [cp] DEFINE {0x00000027,0x00000053} = mkdir(char const *pathname, mode_t mode): errno_t;
 DEFINE {0x00000028,0x00000054} = rmdir(char const *path): errno_t;
 DEFINE {0x00000029,0x00000020} = dup(fd_t fd): fd_t;
-DEFINE {0x0000002a,0x00000016} = pipe(/*[2]*/fd_t *pipedes): errno_t;
+DEFINE {0x0000002a,0x00000016} = pipe(/*[2]*/ fd_t *pipedes): errno_t;
 DEFINE {0x0000002b,0x00000064} = times(struct tms *buf): clock_t;
 //Unimplemented by linux:%(i386)DEFINE 0x0000002c = prof(...): errno_t;
 DEFINE {0x0000002d,0x0000000c} = brk(void *addr): errno_t;
@@ -187,7 +187,7 @@ DEFINE {0x0000004e,0x00000060} = gettimeofday(struct __timeval32 *tv, struct tim
 DEFINE {0x8000004e,0x80000060} = gettimeofday64(struct __timeval64 *tv, struct timezone *tz): errno_t;
 DEFINE {0x0000004f,0x000000a4} = settimeofday(struct __timeval32 const *tv, struct timezone const *tz): errno_t;
 DEFINE {0x8000004f,0x800000a4} = settimeofday64(struct __timeval64 const *tv, struct timezone const *tz): errno_t;
-%(i386)DEFINE 0x00000050 = getgroups(size_t size, /*[]*/uint16_t *list): errno_t;
+%(i386)DEFINE 0x00000050 = getgroups(size_t size, /*[]*/ uint16_t *list): errno_t;
 %(i386)DEFINE 0x00000051 = setgroups(size_t count, uint16_t const *groups): errno_t;
 [restart(dont)][cp] DEFINE {0x00000052,0x00000017} = select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timeval32 *timeout): ssize_t;
 [restart(dont)][cp] DEFINE {0x80000052,0x80000017} = select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timeval64 *timeout): ssize_t;
@@ -445,7 +445,7 @@ DEFINE {0x000000be,0x0000003a} = vfork(): pid_t;
 [restart(must)] DEFINE {0x000000ca,0x0000006c} = getegid32(): uint32_t;
 [restart(must)] DEFINE {0x000000cb,0x00000071} = setreuid32(uint32_t ruid, uint32_t euid): errno_t;
 [restart(must)] DEFINE {0x000000cc,0x00000072} = setregid32(uint32_t rgid, uint32_t egid): errno_t;
-[restart(must)] DEFINE {0x000000cd,0x00000073} = getgroups32(size_t size, /*[]*/uint32_t *list): errno_t;
+[restart(must)] DEFINE {0x000000cd,0x00000073} = getgroups32(size_t size, /*[]*/ uint32_t *list): errno_t;
 [restart(must)] DEFINE {0x000000ce,0x00000074} = setgroups32(size_t count, uint32_t const *groups): errno_t;
 %(i386)[cp] DEFINE 0x000000cf = fchown32(fd_t fd, uint32_t owner, uint32_t group): errno_t;
 [restart(must)] DEFINE {0x000000d0,0x00000075} = setresuid32(uint32_t ruid, uint32_t euid, uint32_t suid): errno_t;
@@ -530,8 +530,8 @@ DEFINE {0x0000010a,0x000000e5} = clock_getres(clockid_t clock_id, struct __times
 %(i386)DEFINE 0x0000010d = fstatfs64(fd_t file, struct statfs64 *buf): errno_t;
 @@@param: signo: One of `SIG*'
 DEFINE {0x0000010e,0x000000ea} = tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo): errno_t;
-[cp] DEFINE {0x0000010f,0x000000eb} = utimes(char const *filename, /*[2]*/struct __timeval32 const *times): errno_t;
-[cp] DEFINE {0x8000010f,0x800000eb} = utimes64(char const *filename, /*[2]*/struct __timeval64 const *times): errno_t;
+[cp] DEFINE {0x0000010f,0x000000eb} = utimes(char const *filename, /*[2]*/ struct __timeval32 const *times): errno_t;
+[cp] DEFINE {0x8000010f,0x800000eb} = utimes64(char const *filename, /*[2]*/ struct __timeval64 const *times): errno_t;
 //TODO:DEFINE {0x00000110} = fadvise64_64(...): errno_t;
 //TODO:DEFINE {0x00000111,0x000000ec} = vserver(...): errno_t;
 //TODO:DEFINE {0x00000112,0x000000ed} = mbind(...): errno_t;
@@ -570,9 +570,9 @@ DEFINE {0x00000122,0x000000fc} = ioprio_get(syscall_ulong_t which, syscall_ulong
 [cp] DEFINE {0x0000012a,0x00000104} = fchownat(
 	fd_t dirfd, char const *filename, uint32_t owner, uint32_t group,
 	[printf(flagset(AT_SYMLINK_NOFOLLOW,AT_DOSPATH))] atflag_t flags): errno_t;
-[cp] DEFINE {0x0000012b,0x00000105} = futimesat(fd_t dirfd, const char *filename, /*[2]*/struct __timeval32 const *times): errno_t;
+[cp] DEFINE {0x0000012b,0x00000105} = futimesat(fd_t dirfd, const char *filename, /*[2]*/ struct __timeval32 const *times): errno_t;
 @@@param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH'
-[cp] DEFINE {0x8000012b,0x80000105} = futimesat64(fd_t dirfd, const char *filename, /*[2-3]*/struct __timeval64 const *times): errno_t;
+[cp] DEFINE {0x8000012b,0x80000105} = futimesat64(fd_t dirfd, const char *filename, /*[2-3]*/ struct __timeval64 const *times): errno_t;
 %(i386)@@@param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH'
 %(i386)[cp] DEFINE 0x0000012c = linux_fstatat64(fd_t dirfd, char const *filename, struct linux_stat64 *statbuf, [printf(flagset(AT_SYMLINK_NOFOLLOW,AT_DOSPATH))] atflag_t flags): errno_t;
 @@@param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH'
@@ -625,10 +625,10 @@ DEFINE {0x0000013f,0x00000119} = epoll_pwait(
 	syscall_slong_t timeout, struct __sigset_struct const *ss): errno_t;
 
 @@@param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH'
-[cp] DEFINE {0x00000140,0x00000118} = utimensat(fd_t dirfd, char const *filename, /*[2-3]*/struct __timespec32 const *times,
+[cp] DEFINE {0x00000140,0x00000118} = utimensat(fd_t dirfd, char const *filename, /*[2-3]*/ struct __timespec32 const *times,
 	[printf(flagset(AT_SYMLINK_NOFOLLOW,AT_CHANGE_CTIME,AT_DOSPATH))] atflag_t flags): errno_t;
 %(i386)@@@param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH'
-%(i386)[cp] DEFINE {0x80000140,0x80000118} = utimensat64(fd_t dirfd, char const *filename, /*[2-3]*/struct __timespec64 const *times, [printf(flagset(AT_SYMLINK_NOFOLLOW,AT_CHANGE_CTIME,AT_DOSPATH))] atflag_t flags): errno_t;
+%(i386)[cp] DEFINE {0x80000140,0x80000118} = utimensat64(fd_t dirfd, char const *filename, /*[2-3]*/ struct __timespec64 const *times, [printf(flagset(AT_SYMLINK_NOFOLLOW,AT_CHANGE_CTIME,AT_DOSPATH))] atflag_t flags): errno_t;
 DEFINE {0x00000141,0x0000011a} = signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize): errno_t;
 
 @@Return file descriptor for new interval timer source
@@ -663,7 +663,7 @@ DEFINE {0x00000149,0x00000123} = epoll_create1(syscall_ulong_t flags): fd_t;
 
 @@@param: flags:  Set of `O_CLOEXEC|O_CLOFORK'
 DEFINE {0x0000014a,0x00000124} = dup3(fd_t oldfd, fd_t newfd, oflag_t flags): fd_t;
-DEFINE {0x0000014b,0x00000125} = pipe2(/*[2]*/fd_t *pipedes,
+DEFINE {0x0000014b,0x00000125} = pipe2(/*[2]*/ fd_t *pipedes,
 	[printf(flagset(O_CLOEXEC,O_CLOFORK,O_NONBLOCK,O_DIRECT))] oflag_t flags): errno_t;
 //TODO:DEFINE {0x0000014c,0x00000126} = inotify_init1(...): errno_t;
 [cp] DEFINE {0x0000014d,0x00000127} = preadv(fd_t fd, struct iovec const *iovec, size_t count, [double_wide] uint64_t offset): ssize_t;
@@ -701,7 +701,7 @@ DEFINE {0x0000015d,0x00000138} = kcmp(pid_t pid1, pid_t pid2, syscall_ulong_t ty
 [cp] DEFINE {0x00000166,0x00000142} = execveat(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp,
 	[printf(flagset(AT_EMPTY_PATH,AT_SYMLINK_NOFOLLOW,AT_DOSPATH))] atflag_t flags): errno_t;
 DEFINE {0x00000167,0x00000029} = socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol): fd_t;
-DEFINE {0x00000168,0x00000035} = socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, /*[2]*/fd_t *fds): errno_t;
+DEFINE {0x00000168,0x00000035} = socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, /*[2]*/ fd_t *fds): errno_t;
 DEFINE {0x00000169,0x00000031} = bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len): errno_t;
 [restart(dont)][cp] DEFINE {0x0000016a,0x0000002a} = connect(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len): errno_t;
 DEFINE {0x0000016b,0x00000032} = listen(fd_t sockfd, syscall_ulong_t max_backlog): errno_t;

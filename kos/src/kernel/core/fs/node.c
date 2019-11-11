@@ -161,7 +161,7 @@ handle_directoryentry_hop(struct directory_entry *__restrict self, syscall_ulong
 
 
 PUBLIC WUNUSED NONNULL((1)) uintptr_t KCALL
-directory_entry_hash(CHECKED USER /*utf-8*/char const *__restrict name,
+directory_entry_hash(CHECKED USER /*utf-8*/ char const *__restrict name,
                      u16 namelen) THROWS(E_SEGFAULT) {
 	size_t const *iter, *end;
 	size_t hash = DIRECTORY_ENTRY_EMPTY_HASH;
@@ -253,7 +253,7 @@ directory_entry_alloc(u16 namelen) THROWS(E_BADALLOC) {
 }
 
 PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct directory_entry *KCALL
-directory_entry_alloc_s(USER CHECKED /*utf-8*/char const *name, u16 namelen)
+directory_entry_alloc_s(USER CHECKED /*utf-8*/ char const *name, u16 namelen)
 		THROWS(E_BADALLOC, E_SEGFAULT) {
 	REF struct directory_entry *result;
 	result = directory_entry_alloc(namelen);
@@ -495,8 +495,8 @@ NOTHROW(KCALL inode_recent_tryremove)(struct inode *__restrict self) {
 
 /* GLOBAL LIST OF ALL KNOWN SUPERBLOCKS */
 PUBLIC struct filesystems fs_filesystems = {
-	/* .f_superlock   = */RWLOCK_INIT,
-	/* .f_superblocks = */NULL,
+	/* .f_superlock   = */ RWLOCK_INIT,
+	/* .f_superblocks = */ NULL,
 };
 
 DEFINE_DBG_BZERO_OBJECT(fs_filesystems.f_superlock);
@@ -4186,8 +4186,8 @@ unregister_filesystem_type(struct superblock_type *__restrict type)
 
 
 PUBLIC struct filesystem_types fs_filesystem_types = {
-	/* .ft_typelock = */ATOMIC_RWLOCK_INIT,
-	/* .ft_types    = */NULL
+	/* .ft_typelock = */ ATOMIC_RWLOCK_INIT,
+	/* .ft_types    = */ NULL
 };
 DEFINE_DBG_BZERO_OBJECT(fs_filesystem_types.ft_typelock);
 
@@ -4599,11 +4599,11 @@ db_inode_changed(struct inode *__restrict self,
 }
 
 PUBLIC struct vm_datablock_type inode_datablock_type = {
-	/* .dt_destroy  = */(NOBLOCK void(KCALL *)(struct vm_datablock *__restrict))&inode_destroy,
-	/* .dt_initpart = */NULL,
-	/* .dt_loadpart = */(void(KCALL *)(struct vm_datablock *__restrict,vm_dpage_t,vm_phys_t,size_t))&db_inode_loadpart,
-	/* .dt_savepart = */(void(KCALL *)(struct vm_datablock *__restrict,vm_dpage_t,vm_phys_t,size_t))&db_inode_savepart,
-	/* .dt_changed  = */(void(KCALL *)(struct vm_datablock *__restrict,struct vm_datapart *__restrict))&db_inode_changed
+	/* .dt_destroy  = */ (NOBLOCK void(KCALL *)(struct vm_datablock *__restrict))&inode_destroy,
+	/* .dt_initpart = */ NULL,
+	/* .dt_loadpart = */ (void(KCALL *)(struct vm_datablock *__restrict,vm_dpage_t,vm_phys_t,size_t))&db_inode_loadpart,
+	/* .dt_savepart = */ (void(KCALL *)(struct vm_datablock *__restrict,vm_dpage_t,vm_phys_t,size_t))&db_inode_savepart,
+	/* .dt_changed  = */ (void(KCALL *)(struct vm_datablock *__restrict,struct vm_datapart *__restrict))&db_inode_changed
 };
 
 

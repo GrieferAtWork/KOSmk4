@@ -755,8 +755,8 @@ struct heap_printer_data {
 };
 
 PRIVATE WUNUSED NONNULL((1, 2)) ssize_t KCALL
-heap_printer(/*struct heap_printer_data **/void *arg,
-             /*utf-8*/char const *__restrict data,
+heap_printer(/*struct heap_printer_data **/ void *arg,
+             /*utf-8*/ char const *__restrict data,
              size_t datalen) {
 	struct heap_printer_data *buf;
 	buf = (struct heap_printer_data *)arg;

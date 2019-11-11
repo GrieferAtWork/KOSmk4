@@ -281,7 +281,7 @@ struct __ATTR_PACKED sgregs64 {
 #define OFFSET_SGBASE64_FSBASE  8
 #define SIZEOF_SGBASE64         16
 #ifdef __CC__
-struct __ATTR_PACKED sgbase64 /*[PREFIX(sg_)]*/{
+struct __ATTR_PACKED sgbase64 /*[PREFIX(sg_)]*/ {
 	__u64   sg_gsbase;  /* G segment register base */
 	__u64   sg_fsbase;  /* F segment register base */
 };

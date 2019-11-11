@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9221624d */
+/* HASH CRC-32:0xb6d303cb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -212,7 +212,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0),__SSIZE_TYPE__,,__lo
 #ifdef __CRT_HAVE_format_sprintf_printer
 /* Format-printer implementation for printing to a string buffer like `sprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_sprintf_printer,(/*char ***/void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),format_sprintf_printer,(__arg,__data,__datalen))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_sprintf_printer,(/*char ***/ void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),format_sprintf_printer,(__arg,__data,__datalen))
 #else /* LIBC: format_sprintf_printer */
 #include <local/format-printer/format_sprintf_printer.h>
 /* Format-printer implementation for printing to a string buffer like `sprintf' would

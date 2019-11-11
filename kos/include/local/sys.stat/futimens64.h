@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5de53f8d */
+/* HASH CRC-32:0x97e6d0fb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #ifndef ____localdep_futimens32_defined
 #define ____localdep_futimens32_defined 1
 #ifdef __CRT_HAVE_futimens
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens32,(__fd_t __fd, struct __TM_TYPE(timespec) const __times[2/*or:3*/]),futimens,(__fd,__times))
+__CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens32,(__fd_t __fd, struct __TM_TYPE(timespec) const __times[2 /*or:3*/]),futimens,(__fd,__times))
 #else /* LIBC: futimens */
 #undef ____localdep_futimens32_defined
 #endif /* futimens32... */
@@ -33,7 +33,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens32,(__fd_t __fd, struct __TM_T
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(futimens64) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futimens64))(__fd_t __fd,
-                                                        struct __timespec64 const __times[2/*or:3*/]) {
+                                                        struct __timespec64 const __times[2 /*or:3*/]) {
 #line 668 "kos/src/libc/magic/sys.stat.c"
 	struct __timespec32 __tms[2];
 	if (!__times)

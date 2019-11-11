@@ -49,64 +49,64 @@ PRIVATE struct superblock_type devfs_type = {
 #define DEVFS_INITIAL_ROOTDIR_MASK  15
 #define devfs_lock       devfs.s_rootdir.d_node.i_datablock.db_lock
 PUBLIC struct superblock devfs = {
-	/* .s_rootdir = */{
-		/* .d_node = */{
-			/* .i_datablock = */{
-				/* .db_refcnt = */2, /* +1: devfs, +1: devfs_type.st_singleton */
-				/* .db_lock   = */RWLOCK_INIT,
-				/* .db_type   = */&inode_datablock_type,
+	/* .s_rootdir = */ {
+		/* .d_node = */ {
+			/* .i_datablock = */ {
+				/* .db_refcnt = */ 2, /* +1: devfs, +1: devfs_type.st_singleton */
+				/* .db_lock   = */ RWLOCK_INIT,
+				/* .db_type   = */ &inode_datablock_type,
 #ifdef CONFIG_VIO
-				/* .db_vio    = */NULL,
+				/* .db_vio    = */ NULL,
 #endif /* CONFIG_VIO */
-				/* .db_parts  = */NULL,
+				/* .db_parts  = */ NULL,
 				VM_DATABLOCK_INIT_PAGEINFO(0)
 			},
-			/* .i_type         = */&ramfs_directory_type,
-			/* .i_super        = */&devfs,
-			/* .i_fsdata       = */NULL,
-			/* .i_heapsize     = */sizeof(devfs),
-			/* .i_flags        = */INODE_FNORMAL|INODE_FATTRLOADED|INODE_FDIRLOADED,
-			/* .i_changed_next = */(struct inode *)NULL,
-			/* .i_recent       = */{ NULL, NULL },
-			/* .i_filetree     = */{ NULL, NULL, (ino_t)0 },
+			/* .i_type         = */ &ramfs_directory_type,
+			/* .i_super        = */ &devfs,
+			/* .i_fsdata       = */ NULL,
+			/* .i_heapsize     = */ sizeof(devfs),
+			/* .i_flags        = */ INODE_FNORMAL | INODE_FATTRLOADED | INODE_FDIRLOADED,
+			/* .i_changed_next = */ (struct inode *)NULL,
+			/* .i_recent       = */ { NULL, NULL },
+			/* .i_filetree     = */ { NULL, NULL, (ino_t)0 },
 #ifdef __INTELLISENSE__
-			/* .i_fileino      = */(ino_t)0,
+			/* .i_fileino      = */ (ino_t)0,
 #endif
-			/* .i_filesize     = */(pos_t)0,
-			/* .i_filemode     = */(mode_t)(S_IFDIR | 0755),
-			/* .i_filenlink    = */(nlink_t)0,
-			/* .i_fileuid      = */(uid_t)0,
-			/* .i_filegid      = */(gid_t)0,
-			/* .i_fileatime    = */{ 0, 0 },
-			/* .i_filemtime    = */{ 0, 0 },
-			/* .i_filectime    = */{ 0, 0 },
-			/* .i_filerdev     = */(dev_t)0,
+			/* .i_filesize     = */ (pos_t)0,
+			/* .i_filemode     = */ (mode_t)(S_IFDIR | 0755),
+			/* .i_filenlink    = */ (nlink_t)0,
+			/* .i_fileuid      = */ (uid_t)0,
+			/* .i_filegid      = */ (gid_t)0,
+			/* .i_fileatime    = */ { 0, 0 },
+			/* .i_filemtime    = */ { 0, 0 },
+			/* .i_filectime    = */ { 0, 0 },
+			/* .i_filerdev     = */ (dev_t)0,
 		},
-		/* .d_parent    = */NULL,
-		/* .d_dirend    = */NULL,
-		/* .d_size      = */0,
-		/* .d_mask      = */DEVFS_INITIAL_ROOTDIR_MASK,
-		/* .d_map       = */NULL, /* Allocated during init */
-		/* .d_bypos     = */NULL,
-		/* .d_bypos_end = */NULL
+		/* .d_parent    = */ NULL,
+		/* .d_dirend    = */ NULL,
+		/* .d_size      = */ 0,
+		/* .d_mask      = */ DEVFS_INITIAL_ROOTDIR_MASK,
+		/* .d_map       = */ NULL, /* Allocated during init */
+		/* .d_bypos     = */ NULL,
+		/* .d_bypos_end = */ NULL
 	},
-	/* .s_type         = */&devfs_type,
-	/* .s_device       = */NULL,
-	/* .s_driver       = */&drv_self,
-	/* .s_wall_lock    = */ATOMIC_RWLOCK_INIT,
-	/* .s_wall         = */NULL,
-	/* .s_flags        = */SUPERBLOCK_FNORMAL,
-	/* .s_changed_lock = */ATOMIC_RWLOCK_INIT,
-	/* .s_changed      = */NULL,
-	/* .s_delnodes     = */NULL,
-	/* .s_unlinknodes  = */NULL,
-	/* .s_nodes_lock   = */ATOMIC_RWLOCK_INIT,
-	/* .s_nodes        = */&devfs.s_rootdir.d_node,
-	/* .s_mount_lock   = */ATOMIC_RWLOCK_INIT,
-	/* .s_mount        = */LLIST_INIT,
-	/* .s_cblock_next  = */NULL,
-	/* .s_umount_pend  = */NULL,
-	/* .s_filesystems  = */SLIST_INITNODE
+	/* .s_type         = */ &devfs_type,
+	/* .s_device       = */ NULL,
+	/* .s_driver       = */ &drv_self,
+	/* .s_wall_lock    = */ ATOMIC_RWLOCK_INIT,
+	/* .s_wall         = */ NULL,
+	/* .s_flags        = */ SUPERBLOCK_FNORMAL,
+	/* .s_changed_lock = */ ATOMIC_RWLOCK_INIT,
+	/* .s_changed      = */ NULL,
+	/* .s_delnodes     = */ NULL,
+	/* .s_unlinknodes  = */ NULL,
+	/* .s_nodes_lock   = */ ATOMIC_RWLOCK_INIT,
+	/* .s_nodes        = */ &devfs.s_rootdir.d_node,
+	/* .s_mount_lock   = */ ATOMIC_RWLOCK_INIT,
+	/* .s_mount        = */ LLIST_INIT,
+	/* .s_cblock_next  = */ NULL,
+	/* .s_umount_pend  = */ NULL,
+	/* .s_filesystems  = */ SLIST_INITNODE
 };
 
 
@@ -187,7 +187,7 @@ PRIVATE ATTR_READMOSTLY REF struct directory_entry *devfs_pending_delete = NULL;
 
 INTDEF NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL directory_delentry)(struct directory_node *__restrict self,
-                                  /*out*/REF struct directory_entry *__restrict entry);
+                                  /*out*/ REF struct directory_entry *__restrict entry);
 
 PRIVATE NOBLOCK void
 NOTHROW(KCALL devfs_remove_directory_entry)(struct directory_entry *__restrict ent) {

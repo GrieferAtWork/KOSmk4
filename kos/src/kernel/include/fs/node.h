@@ -63,7 +63,7 @@ typedef NONNULL((1)) void
 
 struct inode_type {
 	/* [0..1] Finalizer callback. */
-	NOBLOCK NONNULL((1)) void /*NOTHROW*/(KCALL *it_fini)(struct inode *__restrict self);
+	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *it_fini)(struct inode *__restrict self);
 
 	struct {
 		/* [1..1][locked(WRITE(self))] Load INode attributes.
@@ -128,7 +128,7 @@ struct inode_type {
 		/* [0..1][locked(WRITE(self))]
 		 * An optional callback that is invoked when kernel caches are being cleared. */
 		NOBLOCK NONNULL((1))
-		size_t /*NOTHROW*/(KCALL *a_clearcache)(struct inode *__restrict self);
+		size_t /*NOTHROW*/ (KCALL *a_clearcache)(struct inode *__restrict self);
 
 	} it_attr;
 
@@ -313,7 +313,7 @@ struct inode_type {
 				 * @throw: E_IOERROR:     Failed to read data from disk. */
 				NONNULL((1, 2))
 				REF struct directory_entry *(KCALL *o_lookup)(struct directory_node *__restrict self,
-				                                              CHECKED USER /*utf-8*/char const *__restrict name,
+				                                              CHECKED USER /*utf-8*/ char const *__restrict name,
 				                                              u16 namelen, uintptr_t hash, fsmode_t mode)
 						THROWS(E_SEGFAULT, E_FSERROR_FILE_NOT_FOUND,
 						       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
@@ -899,7 +899,7 @@ struct directory_entry {
 	uintptr_t                         de_hash;    /* [const] Hash of this directory entry. */
 	u16                               de_namelen; /* [const][!0] Length of the directory entry name (in characters). */
 	unsigned char                     de_type;    /* [const] Directory entry type (one of `DT_*') */
-	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/char, de_name); /* [const][de_namelen] Directory entry name. (NUL-terminated) */
+	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/ char, de_name); /* [const][de_namelen] Directory entry name. (NUL-terminated) */
 };
 
 DATDEF struct directory_entry empty_directory_entry;
@@ -924,14 +924,14 @@ DEFINE_REFCOUNT_FUNCTIONS(struct directory_entry, de_refcnt, directory_entry_des
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct directory_entry *KCALL
 directory_entry_alloc(u16 namelen) THROWS(E_BADALLOC);
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL NONNULL((1)) WUNUSED REF struct directory_entry *KCALL
-directory_entry_alloc_s(USER CHECKED /*utf-8*/char const *name, u16 namelen) THROWS(E_BADALLOC,E_SEGFAULT);
+directory_entry_alloc_s(USER CHECKED /*utf-8*/ char const *name, u16 namelen) THROWS(E_BADALLOC,E_SEGFAULT);
 
 
 
 /* Return the hash of a given directory entry name.
  * @throw: E_SEGFAULT: Failed to access the given `name'. */
 FUNDEF WUNUSED NONNULL((1)) uintptr_t KCALL
-directory_entry_hash(CHECKED USER /*utf-8*/char const *__restrict name, u16 namelen)
+directory_entry_hash(CHECKED USER /*utf-8*/ char const *__restrict name, u16 namelen)
 		THROWS(E_SEGFAULT);
 #define DIRECTORY_ENTRY_EMPTY_HASH 0 /* == directory_entry_hash("",0) */
 
@@ -994,10 +994,10 @@ struct symlink_node
 	                                * [OVERRIDE(.i_filerdev,[== 0])]
 	                                * The underlying node. */
 #endif
-	KERNEL /*utf-8*/char *sl_text; /* [0..i_filesize][owned_if(!= sl_stext)]
+	KERNEL /*utf-8*/ char *sl_text; /* [0..i_filesize][owned_if(!= sl_stext)]
 	                                * [valid_if(INODE_FLNKLOADED)] Symbolic link text.
 	                                * NOTE: Not required to be NUL-terminated! */
-	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/char,sl_stext); /* Inline-text. */
+	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/ char,sl_stext); /* Inline-text. */
 };
 
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)
@@ -1875,7 +1875,7 @@ struct superblock_type {
 
 		/* [0..1][const] Called during `superblock_destroy'. */
 		NONNULL((1))
-		NOBLOCK void /*NOTHROW*/(KCALL *f_fini)(struct superblock *__restrict self);
+		NOBLOCK void /*NOTHROW*/ (KCALL *f_fini)(struct superblock *__restrict self);
 
 		/* [1..1][const]
 		 * [locked(WRITE(self->s_nodes_lock))]
@@ -1915,7 +1915,7 @@ struct superblock_type {
 		/* [0..1][const]
 		 * An optional callback that is invoked when kernel caches are being cleared. */
 		NOBLOCK NONNULL((1))
-		size_t /*NOTHROW*/(KCALL *f_clearcache)(struct superblock *__restrict self);
+		size_t /*NOTHROW*/ (KCALL *f_clearcache)(struct superblock *__restrict self);
 
 	} st_functions;
 

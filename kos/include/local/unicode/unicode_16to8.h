@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a88059a */
+/* HASH CRC-32:0xb9263bb1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #define ____localdep_unicode_readutf16_n_defined 1
 #ifdef __CRT_HAVE_unicode_readutf16_n
 /* Same as `unicode_readutf16()', but don't read past `text_end' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf16_n,(/*utf-16*/__CHAR16_TYPE__ const **__restrict __ptext, __CHAR16_TYPE__ const *__text_end),unicode_readutf16_n,(__ptext,__text_end))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf16_n,(/*utf-16*/ __CHAR16_TYPE__ const **__restrict __ptext, __CHAR16_TYPE__ const *__text_end),unicode_readutf16_n,(__ptext,__text_end))
 #else /* LIBC: unicode_readutf16_n */
 #include <local/unicode/unicode_readutf16_n.h>
 /* Same as `unicode_readutf16()', but don't read past `text_end' */
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: * : A pointer after the last written UTF-8 character */
 __LOCAL_LIBC(unicode_16to8) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_16to8))(/*utf-8*/ char *__restrict __utf8_dst,
-                                                           /*utf-16*/__CHAR16_TYPE__ const *__restrict __utf16_text,
+                                                           /*utf-16*/ __CHAR16_TYPE__ const *__restrict __utf16_text,
                                                            __SIZE_TYPE__ __utf16_characters) {
 #line 1032 "kos/src/libc/magic/unicode.c"
 	__CHAR16_TYPE__ const *__utf16_end = __utf16_text + __utf16_characters;

@@ -89,15 +89,15 @@ PUBLIC ATTR_SECTION(".data.hot") struct pmem mzones = {
 };
 
 PUBLIC_CONST char const pmembank_type_names[PMEMBANK_TYPE_COUNT][16] = {
-	/* [PMEMBANK_TYPE_UNDEF]     = */"undefined",
-	/* [PMEMBANK_TYPE_RAM]       = */"ram",
-	/* [PMEMBANK_TYPE_PRESERVE]  = */"preserve",
-	/* [PMEMBANK_TYPE_ALLOCATED] = */"allocated",
-	/* [PMEMBANK_TYPE_KFREE]     = */"kernel_free",
-	/* [PMEMBANK_TYPE_KERNEL]    = */"kernel",
-	/* [PMEMBANK_TYPE_NVS]       = */"nvs",
-	/* [PMEMBANK_TYPE_DEVICE]    = */"device",
-	/* [PMEMBANK_TYPE_BADRAM]    = */"badram",
+	/* [PMEMBANK_TYPE_UNDEF]     = */ "undefined",
+	/* [PMEMBANK_TYPE_RAM]       = */ "ram",
+	/* [PMEMBANK_TYPE_PRESERVE]  = */ "preserve",
+	/* [PMEMBANK_TYPE_ALLOCATED] = */ "allocated",
+	/* [PMEMBANK_TYPE_KFREE]     = */ "kernel_free",
+	/* [PMEMBANK_TYPE_KERNEL]    = */ "kernel",
+	/* [PMEMBANK_TYPE_NVS]       = */ "nvs",
+	/* [PMEMBANK_TYPE_DEVICE]    = */ "device",
+	/* [PMEMBANK_TYPE_BADRAM]    = */ "badram",
 };
 
 

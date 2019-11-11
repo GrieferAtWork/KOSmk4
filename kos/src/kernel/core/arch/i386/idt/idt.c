@@ -67,12 +67,12 @@ IDT_X86_FOREACH(ISR_DEFINE_HILO)
 		} }                               \
 	},
 #else /* __x86_64__ */
-#define ISR_DEFINE_HILO(prefix, id)            \
-	/* [0x##id] = */ {                         \
-		/* .i_seg = */ { { {                   \
-			/* .s_ul = */(u32)prefix##lo_##id, \
-			/* .s_uh = */(u32)prefix##hi_##id  \
-		} } }                                  \
+#define ISR_DEFINE_HILO(prefix, id)             \
+	/* [0x##id] = */ {                          \
+		/* .i_seg = */ { { {                    \
+			/* .s_ul = */ (u32)prefix##lo_##id, \
+			/* .s_uh = */ (u32)prefix##hi_##id  \
+		} } }                                   \
 	},
 #endif /* !__x86_64__ */
 

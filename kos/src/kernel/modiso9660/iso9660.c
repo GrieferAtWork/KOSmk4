@@ -205,58 +205,58 @@ Iso9660_StatFs(Iso9660Superblock *__restrict self,
 
 
 INTERN struct inode_type Iso9660_RegType = {
-	/*.it_fini = */NULL,
-	/*.it_attr = */{
-		/*.a_loadattr   = */&Iso9660INode_LoadAttr,
-		/*.a_saveattr   = */NULL,
-		/*.a_maskattr   = */NULL,
-		/*.a_pathconf   = */NULL, /* TODO */
-		/*.a_clearcache = */NULL,
+	/*.it_fini = */ NULL,
+	/*.it_attr = */ {
+		/*.a_loadattr   = */ &Iso9660INode_LoadAttr,
+		/*.a_saveattr   = */ NULL,
+		/*.a_maskattr   = */ NULL,
+		/*.a_pathconf   = */ NULL, /* TODO */
+		/*.a_clearcache = */ NULL,
 	},
-	/*.it_file = */{
-		/*.f_read     = */&Iso9660_ReadFromINode,
-		/*.f_pread    = */&Iso9660_ReadFromINodePhys,
-		/*.f_readv    = */&Iso9660_ReadFromINodeVector,
-		/*.f_preadv   = */&Iso9660_ReadFromINodeVectorPhys,
-		/*.f_write    = */NULL,
-		/*.f_pwrite   = */NULL,
-		/*.f_writev   = */NULL,
-		/*.f_pwritev  = */NULL,
-		/*.f_truncate = */NULL,
+	/*.it_file = */ {
+		/*.f_read     = */ &Iso9660_ReadFromINode,
+		/*.f_pread    = */ &Iso9660_ReadFromINodePhys,
+		/*.f_readv    = */ &Iso9660_ReadFromINodeVector,
+		/*.f_preadv   = */ &Iso9660_ReadFromINodeVectorPhys,
+		/*.f_write    = */ NULL,
+		/*.f_pwrite   = */ NULL,
+		/*.f_writev   = */ NULL,
+		/*.f_pwritev  = */ NULL,
+		/*.f_truncate = */ NULL,
 	}
 };
 INTERN struct inode_type Iso9660_DirType = {
-	/*.it_fini = */NULL,
-	/*.it_attr = */{
-		/*.a_loadattr   = */&Iso9660INode_LoadAttr,
-		/*.a_saveattr   = */NULL,
-		/*.a_maskattr   = */NULL,
-		/*.a_pathconf   = */NULL, /* TODO */
-		/*.a_clearcache = */NULL,
+	/*.it_fini = */ NULL,
+	/*.it_attr = */ {
+		/*.a_loadattr   = */ &Iso9660INode_LoadAttr,
+		/*.a_saveattr   = */ NULL,
+		/*.a_maskattr   = */ NULL,
+		/*.a_pathconf   = */ NULL, /* TODO */
+		/*.a_clearcache = */ NULL,
 	},
-	/*.it_file = */{
-		/*.f_read     = */NULL,
-		/*.f_pread    = */NULL,
-		/*.f_readv    = */NULL,
-		/*.f_preadv   = */NULL,
-		/*.f_write    = */NULL,
-		/*.f_pwrite   = */NULL,
-		/*.f_writev   = */NULL,
-		/*.f_pwritev  = */NULL,
-		/*.f_truncate = */NULL,
+	/*.it_file = */ {
+		/*.f_read     = */ NULL,
+		/*.f_pread    = */ NULL,
+		/*.f_readv    = */ NULL,
+		/*.f_preadv   = */ NULL,
+		/*.f_write    = */ NULL,
+		/*.f_pwrite   = */ NULL,
+		/*.f_writev   = */ NULL,
+		/*.f_pwritev  = */ NULL,
+		/*.f_truncate = */ NULL,
 	},
 	{
-		/*.it_directory = */{
-			/*.d_readdir = */&Iso9660Inode_ReadDir,
+		/*.it_directory = */ {
+			/*.d_readdir = */ &Iso9660Inode_ReadDir,
 			{ NULL },
-			/*.d_creat   = */NULL,
-			/*.d_mkdir   = */NULL,
-			/*.d_symlink = */NULL,
-			/*.d_mknod   = */NULL,
-			/*.d_link    = */NULL,
-			/*.d_rename  = */NULL,
-			/*.d_unlink  = */NULL,
-			/*.d_rmdir   = */NULL,
+			/*.d_creat   = */ NULL,
+			/*.d_mkdir   = */ NULL,
+			/*.d_symlink = */ NULL,
+			/*.d_mknod   = */ NULL,
+			/*.d_link    = */ NULL,
+			/*.d_rename  = */ NULL,
+			/*.d_unlink  = */ NULL,
+			/*.d_rmdir   = */ NULL,
 		}
 	}
 };
@@ -362,18 +362,18 @@ Iso9660_OpenSuperblock(Iso9660Superblock *__restrict self, UNCHECKED USER char *
 
 
 INTERN struct superblock_type Iso9660_SuperblockType = {
-	/* .st_driver            = */&drv_self,
-	/* .st_name              = */"iso9660",
-	/* .st_flags             = */SUPERBLOCK_TYPE_FNORMAL,
-	/* .st_sizeof_superblock = */sizeof(Iso9660Superblock),
+	/* .st_driver            = */ &drv_self,
+	/* .st_name              = */ "iso9660",
+	/* .st_flags             = */ SUPERBLOCK_TYPE_FNORMAL,
+	/* .st_sizeof_superblock = */ sizeof(Iso9660Superblock),
 	{
-		/* .st_open = */(void(KCALL *)(struct superblock *__restrict, UNCHECKED USER char *))&Iso9660_OpenSuperblock
+		/* .st_open = */ (void(KCALL *)(struct superblock *__restrict, UNCHECKED USER char *))&Iso9660_OpenSuperblock
 	},
 	/* .st_functions = */ {
-		/* .f_fini     = */NULL,
-		/* .f_opennode = */(void(KCALL *)(struct superblock *__restrict, struct inode *__restrict, struct directory_node *__restrict, struct directory_entry *__restrict))&Iso9660_OpenINode,
-		/* .f_statfs   = */(void(KCALL *)(struct superblock *__restrict, USER CHECKED struct statfs *))&Iso9660_StatFs,
-		/* .f_sync     = */NULL
+		/* .f_fini     = */ NULL,
+		/* .f_opennode = */ (void(KCALL *)(struct superblock *__restrict, struct inode *__restrict, struct directory_node *__restrict, struct directory_entry *__restrict))&Iso9660_OpenINode,
+		/* .f_statfs   = */ (void(KCALL *)(struct superblock *__restrict, USER CHECKED struct statfs *))&Iso9660_StatFs,
+		/* .f_sync     = */ NULL
 	}
 };
 

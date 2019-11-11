@@ -136,25 +136,25 @@ ctty_poll(struct character_device *__restrict self, poll_mode_t what) {
  * This device implements all operators as direct aliasing callbacks
  * to the TTY character device addressable through `task_getctty()' */
 PUBLIC struct character_device dev_tty = {
-	/* .cd_refcnt   = */1,
-	/* .cd_heapsize = */sizeof(dev_tty),
-	/* .cd_type     = */{
-		/* .ct_driver = */&drv_self,
-		/* .ct_fini   = */NULL,
-		/* .ct_read   = */&ctty_read,
-		/* .ct_write  = */&ctty_write,
-		/* .ct_pread  = */&ctty_pread,
-		/* .ct_pwrite = */&ctty_pwrite,
-		/* .ct_ioctl  = */&ctty_ioctl,
-		/* .ct_mmap   = */&ctty_mmap,
-		/* .ct_sync   = */&ctty_sync,
-		/* .ct_stat   = */&ctty_stat,
-		/* .ct_poll   = */&ctty_poll,
+	/* .cd_refcnt   = */ 1,
+	/* .cd_heapsize = */ sizeof(dev_tty),
+	/* .cd_type     = */ {
+		/* .ct_driver = */ &drv_self,
+		/* .ct_fini   = */ NULL,
+		/* .ct_read   = */ &ctty_read,
+		/* .ct_write  = */ &ctty_write,
+		/* .ct_pread  = */ &ctty_pread,
+		/* .ct_pwrite = */ &ctty_pwrite,
+		/* .ct_ioctl  = */ &ctty_ioctl,
+		/* .ct_mmap   = */ &ctty_mmap,
+		/* .ct_sync   = */ &ctty_sync,
+		/* .ct_stat   = */ &ctty_stat,
+		/* .ct_poll   = */ &ctty_poll,
 	},
-	/* .cd_devlink     = */{ NULL, NULL, 0 },
-	/* .cd_devfs_inode = */NULL,
-	/* .cd_devfs_entry = */NULL,
-	/* .cd_name        = */"tty"
+	/* .cd_devlink     = */ { NULL, NULL, 0 },
+	/* .cd_devfs_inode = */ NULL,
+	/* .cd_devfs_entry = */ NULL,
+	/* .cd_name        = */ "tty"
 };
 
 

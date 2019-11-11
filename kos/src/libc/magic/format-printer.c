@@ -936,7 +936,7 @@ format_scanf:([nonnull] pformatgetc pgetc,
 @@Format-printer implementation for printing to a string buffer like `sprintf' would
 @@WARNING: No trailing NUL-character is implicitly appended
 [kernel]
-format_sprintf_printer:([nonnull] /*char ***/void *arg,
+format_sprintf_printer:([nonnull] /*char ***/ void *arg,
                         [nonnull] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
 @@if $wchar_function@@
 	*(wchar_t **)arg = (wchar_t *)wmempcpy(*(wchar_t **)arg, data, datalen);
@@ -968,7 +968,7 @@ struct format_snprintf_data {
 @@NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
 @@NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()'
 [dependency_include(<hybrid/typecore.h>)][kernel]
-format_snprintf_printer:([nonnull] /*struct format_snprintf_data**/void *arg,
+format_snprintf_printer:([nonnull] /*struct format_snprintf_data**/ void *arg,
                          [nonnull] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
 	struct format_snprintf_data_ {
 		char         *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
@@ -1136,7 +1136,7 @@ format_aprintf_pack:([nonnull] struct format_aprintf_data *__restrict self,
 @@Print data to a dynamically allocated heap buffer. On error, -1 is returned
 [requires($has_function(realloc))][same_impl]
 [dependency_include(<hybrid/__assert.h>)][ATTR_WUNUSED]
-format_aprintf_printer:([nonnull] /*struct format_aprintf_data **/void *arg,
+format_aprintf_printer:([nonnull] /*struct format_aprintf_data **/ void *arg,
                         [nonnull] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
 	struct @__format_aprintf_data@ {
 		char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */

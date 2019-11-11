@@ -550,9 +550,9 @@ NOTHROW(KCALL Ata_ResetBus)(port_t ctrl) {
 
 
 INTERN struct aio_handle_type Ata_DmaHandleType = {
-	/* .ht_cancel   = */&Ata_FiniDmaHandle,
-	/* .ht_cancel   = */&Ata_CancelDmaHandle,
-	/* .ht_progress = */&Ata_DmaHandleProgress
+	/* .ht_cancel   = */ &Ata_FiniDmaHandle,
+	/* .ht_cancel   = */ &Ata_CancelDmaHandle,
+	/* .ht_progress = */ &Ata_DmaHandleProgress
 };
 
 /* Signal the given ATA handle for completion

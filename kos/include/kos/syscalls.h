@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9f3f70a */
+/* HASH CRC-32:0xc95dba68 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -817,14 +817,14 @@ __CDECLARE_SC(,__syscall_slong_t,futex,(__uint32_t *__uaddr, __syscall_ulong_t _
 #if __CRT_HAVE_SC(futimesat)
 #ifndef __sys_futimesat_defined
 #define __sys_futimesat_defined 1
-__CDECLARE_SC(,__errno_t,futimesat,(__fd_t __dirfd, const char *__filename, /*[2]*/struct __timeval32 const *__times),(__dirfd,__filename,__times))
+__CDECLARE_SC(,__errno_t,futimesat,(__fd_t __dirfd, const char *__filename, /*[2]*/ struct __timeval32 const *__times),(__dirfd,__filename,__times))
 #endif /* !__sys_futimesat_defined */
 #endif /* sys_futimesat... */
 #if __CRT_HAVE_SC(futimesat64)
 #ifndef __sys_futimesat64_defined
 #define __sys_futimesat64_defined 1
 /* @param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-__CDECLARE_SC(,__errno_t,futimesat64,(__fd_t __dirfd, const char *__filename, /*[2-3]*/struct __timeval64 const *__times),(__dirfd,__filename,__times))
+__CDECLARE_SC(,__errno_t,futimesat64,(__fd_t __dirfd, const char *__filename, /*[2-3]*/ struct __timeval64 const *__times),(__dirfd,__filename,__times))
 #endif /* !__sys_futimesat64_defined */
 #endif /* sys_futimesat64... */
 #if __CRT_HAVE_SC(get_exception_handler)
@@ -929,7 +929,7 @@ __CDECLARE_SC(,__uint32_t,getgid32,(void),())
 #ifndef __sys_getgroups_defined
 #define __sys_getgroups_defined 1
 #if defined(__i386__) && !defined(__x86_64__)
-__CDECLARE_SC(,__errno_t,getgroups,(__size_t __size, /*[]*/__uint16_t *__list),(__size,__list))
+__CDECLARE_SC(,__errno_t,getgroups,(__size_t __size, /*[]*/ __uint16_t *__list),(__size,__list))
 #else /* ... */
 #undef __sys_getgroups_defined
 #endif /* !... */
@@ -938,7 +938,7 @@ __CDECLARE_SC(,__errno_t,getgroups,(__size_t __size, /*[]*/__uint16_t *__list),(
 #if __CRT_HAVE_SC(getgroups32)
 #ifndef __sys_getgroups32_defined
 #define __sys_getgroups32_defined 1
-__CDECLARE_SC(,__errno_t,getgroups32,(__size_t __size, /*[]*/__uint32_t *__list),(__size,__list))
+__CDECLARE_SC(,__errno_t,getgroups32,(__size_t __size, /*[]*/ __uint32_t *__list),(__size,__list))
 #endif /* !__sys_getgroups32_defined */
 #endif /* sys_getgroups32... */
 #if __CRT_HAVE_SC(getitimer)
@@ -1699,13 +1699,13 @@ __CDECLARE_SC(,__errno_t,pause,(void),())
 #if __CRT_HAVE_SC(pipe)
 #ifndef __sys_pipe_defined
 #define __sys_pipe_defined 1
-__CDECLARE_SC(,__errno_t,pipe,(/*[2]*/__fd_t *__pipedes),(__pipedes))
+__CDECLARE_SC(,__errno_t,pipe,(/*[2]*/ __fd_t *__pipedes),(__pipedes))
 #endif /* !__sys_pipe_defined */
 #endif /* sys_pipe... */
 #if __CRT_HAVE_SC(pipe2)
 #ifndef __sys_pipe2_defined
 #define __sys_pipe2_defined 1
-__CDECLARE_SC(,__errno_t,pipe2,(/*[2]*/__fd_t *__pipedes, __oflag_t __flags),(__pipedes,__flags))
+__CDECLARE_SC(,__errno_t,pipe2,(/*[2]*/ __fd_t *__pipedes, __oflag_t __flags),(__pipedes,__flags))
 #endif /* !__sys_pipe2_defined */
 #endif /* sys_pipe2... */
 #if __CRT_HAVE_SC(poll)
@@ -2548,7 +2548,7 @@ __CDECLARE_SC(,__errno_t,socketcall,(int __call, unsigned long *__args),(__call,
 #if __CRT_HAVE_SC(socketpair)
 #ifndef __sys_socketpair_defined
 #define __sys_socketpair_defined 1
-__CDECLARE_SC(,__errno_t,socketpair,(__syscall_ulong_t __domain, __syscall_ulong_t __type, __syscall_ulong_t __protocol, /*[2]*/__fd_t *__fds),(__domain,__type,__protocol,__fds))
+__CDECLARE_SC(,__errno_t,socketpair,(__syscall_ulong_t __domain, __syscall_ulong_t __type, __syscall_ulong_t __protocol, /*[2]*/ __fd_t *__fds),(__domain,__type,__protocol,__fds))
 #endif /* !__sys_socketpair_defined */
 #endif /* sys_socketpair... */
 #if __CRT_HAVE_SC(splice)
@@ -2885,7 +2885,7 @@ __CDECLARE_SC(,__errno_t,utime64,(char const *__filename, struct utimbuf64 const
 #ifndef __sys_utimensat_defined
 #define __sys_utimensat_defined 1
 /* @param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-__CDECLARE_SC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, /*[2-3]*/struct __timespec32 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
+__CDECLARE_SC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, /*[2-3]*/ struct __timespec32 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
 #endif /* !__sys_utimensat_defined */
 #endif /* sys_utimensat... */
 #if __CRT_HAVE_SC(utimensat64)
@@ -2893,7 +2893,7 @@ __CDECLARE_SC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, /*[2
 #define __sys_utimensat64_defined 1
 #if defined(__i386__) && !defined(__x86_64__)
 /* @param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-__CDECLARE_SC(,__errno_t,utimensat64,(__fd_t __dirfd, char const *__filename, /*[2-3]*/struct __timespec64 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
+__CDECLARE_SC(,__errno_t,utimensat64,(__fd_t __dirfd, char const *__filename, /*[2-3]*/ struct __timespec64 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
 #else /* ... */
 #undef __sys_utimensat64_defined
 #endif /* !... */
@@ -2902,13 +2902,13 @@ __CDECLARE_SC(,__errno_t,utimensat64,(__fd_t __dirfd, char const *__filename, /*
 #if __CRT_HAVE_SC(utimes)
 #ifndef __sys_utimes_defined
 #define __sys_utimes_defined 1
-__CDECLARE_SC(,__errno_t,utimes,(char const *__filename, /*[2]*/struct __timeval32 const *__times),(__filename,__times))
+__CDECLARE_SC(,__errno_t,utimes,(char const *__filename, /*[2]*/ struct __timeval32 const *__times),(__filename,__times))
 #endif /* !__sys_utimes_defined */
 #endif /* sys_utimes... */
 #if __CRT_HAVE_SC(utimes64)
 #ifndef __sys_utimes64_defined
 #define __sys_utimes64_defined 1
-__CDECLARE_SC(,__errno_t,utimes64,(char const *__filename, /*[2]*/struct __timeval64 const *__times),(__filename,__times))
+__CDECLARE_SC(,__errno_t,utimes64,(char const *__filename, /*[2]*/ struct __timeval64 const *__times),(__filename,__times))
 #endif /* !__sys_utimes64_defined */
 #endif /* sys_utimes64... */
 #if __CRT_HAVE_SC(vfork)
@@ -3672,14 +3672,14 @@ __CDECLARE_XSC(,__syscall_slong_t,futex,(__uint32_t *__uaddr, __syscall_ulong_t 
 #if __CRT_HAVE_XSC(futimesat)
 #ifndef __sys_Xfutimesat_defined
 #define __sys_Xfutimesat_defined 1
-__CDECLARE_XSC(,__errno_t,futimesat,(__fd_t __dirfd, const char *__filename, /*[2]*/struct __timeval32 const *__times),(__dirfd,__filename,__times))
+__CDECLARE_XSC(,__errno_t,futimesat,(__fd_t __dirfd, const char *__filename, /*[2]*/ struct __timeval32 const *__times),(__dirfd,__filename,__times))
 #endif /* !__sys_Xfutimesat_defined */
 #endif /* sys_Xfutimesat... */
 #if __CRT_HAVE_XSC(futimesat64)
 #ifndef __sys_Xfutimesat64_defined
 #define __sys_Xfutimesat64_defined 1
 /* @param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-__CDECLARE_XSC(,__errno_t,futimesat64,(__fd_t __dirfd, const char *__filename, /*[2-3]*/struct __timeval64 const *__times),(__dirfd,__filename,__times))
+__CDECLARE_XSC(,__errno_t,futimesat64,(__fd_t __dirfd, const char *__filename, /*[2-3]*/ struct __timeval64 const *__times),(__dirfd,__filename,__times))
 #endif /* !__sys_Xfutimesat64_defined */
 #endif /* sys_Xfutimesat64... */
 #if __CRT_HAVE_XSC(get_exception_handler)
@@ -3784,7 +3784,7 @@ __CDECLARE_XSC(,__uint32_t,getgid32,(void),())
 #ifndef __sys_Xgetgroups_defined
 #define __sys_Xgetgroups_defined 1
 #if defined(__i386__) && !defined(__x86_64__)
-__CDECLARE_XSC(,__errno_t,getgroups,(__size_t __size, /*[]*/__uint16_t *__list),(__size,__list))
+__CDECLARE_XSC(,__errno_t,getgroups,(__size_t __size, /*[]*/ __uint16_t *__list),(__size,__list))
 #else /* ... */
 #undef __sys_Xgetgroups_defined
 #endif /* !... */
@@ -3793,7 +3793,7 @@ __CDECLARE_XSC(,__errno_t,getgroups,(__size_t __size, /*[]*/__uint16_t *__list),
 #if __CRT_HAVE_XSC(getgroups32)
 #ifndef __sys_Xgetgroups32_defined
 #define __sys_Xgetgroups32_defined 1
-__CDECLARE_XSC(,__errno_t,getgroups32,(__size_t __size, /*[]*/__uint32_t *__list),(__size,__list))
+__CDECLARE_XSC(,__errno_t,getgroups32,(__size_t __size, /*[]*/ __uint32_t *__list),(__size,__list))
 #endif /* !__sys_Xgetgroups32_defined */
 #endif /* sys_Xgetgroups32... */
 #if __CRT_HAVE_XSC(getitimer)
@@ -4554,13 +4554,13 @@ __CDECLARE_XSC(,__errno_t,pause,(void),())
 #if __CRT_HAVE_XSC(pipe)
 #ifndef __sys_Xpipe_defined
 #define __sys_Xpipe_defined 1
-__CDECLARE_XSC(,__errno_t,pipe,(/*[2]*/__fd_t *__pipedes),(__pipedes))
+__CDECLARE_XSC(,__errno_t,pipe,(/*[2]*/ __fd_t *__pipedes),(__pipedes))
 #endif /* !__sys_Xpipe_defined */
 #endif /* sys_Xpipe... */
 #if __CRT_HAVE_XSC(pipe2)
 #ifndef __sys_Xpipe2_defined
 #define __sys_Xpipe2_defined 1
-__CDECLARE_XSC(,__errno_t,pipe2,(/*[2]*/__fd_t *__pipedes, __oflag_t __flags),(__pipedes,__flags))
+__CDECLARE_XSC(,__errno_t,pipe2,(/*[2]*/ __fd_t *__pipedes, __oflag_t __flags),(__pipedes,__flags))
 #endif /* !__sys_Xpipe2_defined */
 #endif /* sys_Xpipe2... */
 #if __CRT_HAVE_XSC(poll)
@@ -5387,7 +5387,7 @@ __CDECLARE_XSC(,__errno_t,socketcall,(int __call, unsigned long *__args),(__call
 #if __CRT_HAVE_XSC(socketpair)
 #ifndef __sys_Xsocketpair_defined
 #define __sys_Xsocketpair_defined 1
-__CDECLARE_XSC(,__errno_t,socketpair,(__syscall_ulong_t __domain, __syscall_ulong_t __type, __syscall_ulong_t __protocol, /*[2]*/__fd_t *__fds),(__domain,__type,__protocol,__fds))
+__CDECLARE_XSC(,__errno_t,socketpair,(__syscall_ulong_t __domain, __syscall_ulong_t __type, __syscall_ulong_t __protocol, /*[2]*/ __fd_t *__fds),(__domain,__type,__protocol,__fds))
 #endif /* !__sys_Xsocketpair_defined */
 #endif /* sys_Xsocketpair... */
 #if __CRT_HAVE_XSC(splice)
@@ -5724,7 +5724,7 @@ __CDECLARE_XSC(,__errno_t,utime64,(char const *__filename, struct utimbuf64 cons
 #ifndef __sys_Xutimensat_defined
 #define __sys_Xutimensat_defined 1
 /* @param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-__CDECLARE_XSC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, /*[2-3]*/struct __timespec32 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
+__CDECLARE_XSC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, /*[2-3]*/ struct __timespec32 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
 #endif /* !__sys_Xutimensat_defined */
 #endif /* sys_Xutimensat... */
 #if __CRT_HAVE_XSC(utimensat64)
@@ -5732,7 +5732,7 @@ __CDECLARE_XSC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, /*[
 #define __sys_Xutimensat64_defined 1
 #if defined(__i386__) && !defined(__x86_64__)
 /* @param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-__CDECLARE_XSC(,__errno_t,utimensat64,(__fd_t __dirfd, char const *__filename, /*[2-3]*/struct __timespec64 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
+__CDECLARE_XSC(,__errno_t,utimensat64,(__fd_t __dirfd, char const *__filename, /*[2-3]*/ struct __timespec64 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
 #else /* ... */
 #undef __sys_Xutimensat64_defined
 #endif /* !... */
@@ -5741,13 +5741,13 @@ __CDECLARE_XSC(,__errno_t,utimensat64,(__fd_t __dirfd, char const *__filename, /
 #if __CRT_HAVE_XSC(utimes)
 #ifndef __sys_Xutimes_defined
 #define __sys_Xutimes_defined 1
-__CDECLARE_XSC(,__errno_t,utimes,(char const *__filename, /*[2]*/struct __timeval32 const *__times),(__filename,__times))
+__CDECLARE_XSC(,__errno_t,utimes,(char const *__filename, /*[2]*/ struct __timeval32 const *__times),(__filename,__times))
 #endif /* !__sys_Xutimes_defined */
 #endif /* sys_Xutimes... */
 #if __CRT_HAVE_XSC(utimes64)
 #ifndef __sys_Xutimes64_defined
 #define __sys_Xutimes64_defined 1
-__CDECLARE_XSC(,__errno_t,utimes64,(char const *__filename, /*[2]*/struct __timeval64 const *__times),(__filename,__times))
+__CDECLARE_XSC(,__errno_t,utimes64,(char const *__filename, /*[2]*/ struct __timeval64 const *__times),(__filename,__times))
 #endif /* !__sys_Xutimes64_defined */
 #endif /* sys_Xutimes64... */
 #if __CRT_HAVE_XSC(vfork)

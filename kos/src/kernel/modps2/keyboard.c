@@ -405,7 +405,7 @@ ps2_keyboard_setleds(struct keyboard_device *__restrict self,
 
 
 PRIVATE struct keyboard_device_ops const ps2_keyboard_ops = {
-	/* .ko_setleds = */&ps2_keyboard_setleds
+	/* .ko_setleds = */ &ps2_keyboard_setleds
 };
 
 

@@ -494,7 +494,7 @@ FUNDEF WUNUSED unsigned int NOTHROW(KCALL task_serve_nx)(void);
  * >>     // Schedule the function for execution.
  * >>     BLOCKING_CLEANUP_SCHEDULE(self,MYDATA_FUN_FIELD,MYDATA_NXT_FIELD);
  * >> } */
-typedef void */*NOTHROW*/(FCALL *blocking_cleanup_t)(void *pfun, unsigned int action);
+typedef void * /*NOTHROW*/ (FCALL *blocking_cleanup_t)(void *pfun, unsigned int action);
 #define BLOCKING_CLEANUP_ACTION_SERVICE 0x0000 /* Service the operation. */
 #define BLOCKING_CLEANUP_ACTION_GETNEXT 0x0001 /* Return a pointer to the next-function-field. */
 

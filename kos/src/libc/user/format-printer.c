@@ -101,11 +101,11 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_pack)(struct format_aprintf_data *__res
 }
 /*[[[end:format_aprintf_pack]]]*/
 
-/*[[[head:format_aprintf_printer,hash:CRC-32=0xe58524ab]]]*/
+/*[[[head:format_aprintf_printer,hash:CRC-32=0x91067bd0]]]*/
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_aprintf_printer") ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_aprintf_printer)(/*struct format_aprintf_data **/void *arg,
+NOTHROW_NCX(LIBCCALL libc_format_aprintf_printer)(/*struct format_aprintf_data **/ void *arg,
                                                   /*utf-8*/ char const *__restrict data,
                                                   size_t datalen)
 /*[[[body:format_aprintf_printer]]]*/

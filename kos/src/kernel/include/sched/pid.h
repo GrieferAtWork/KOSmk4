@@ -320,8 +320,8 @@ FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) upid_t NOTHROW(KCALL task_getrootpid_of_
  * @return: * : One of `TASK_SETPROCESSGROUPLEADER_*' */
 FUNDEF NONNULL((1, 2)) unsigned int KCALL
 task_setprocessgroupleader(struct task *thread, struct task *leader,
-                           /*OUT,OPT*/REF struct task **pold_group_leader DFL(__NULLPTR),
-                           /*OUT,OPT*/REF struct task **pnew_group_leader DFL(__NULLPTR))
+                           /*OUT,OPT*/ REF struct task **pold_group_leader DFL(__NULLPTR),
+                           /*OUT,OPT*/ REF struct task **pnew_group_leader DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK);
 #define TASK_SETPROCESSGROUPLEADER_SUCCESS 0 /* Successfully added `task_getprocess_of(thread)' to the process group
                                               * that `leader' is apart of (which is `task_getprocessgroupleader_of(leader)'),
@@ -345,9 +345,9 @@ task_setprocessgroupleader(struct task *thread, struct task *leader,
  * @return: * : One of `TASK_SETSESSIONLEADER_*' */
 FUNDEF NONNULL((1, 2)) unsigned int KCALL
 task_setsessionleader(struct task *thread, struct task *leader,
-                      /*OUT,OPT*/REF struct task **pold_group_leader DFL(__NULLPTR),
-                      /*OUT,OPT*/REF struct task **pold_session_leader DFL(__NULLPTR),
-                      /*OUT,OPT*/REF struct task **pnew_session_leader DFL(__NULLPTR))
+                      /*OUT,OPT*/ REF struct task **pold_group_leader DFL(__NULLPTR),
+                      /*OUT,OPT*/ REF struct task **pold_session_leader DFL(__NULLPTR),
+                      /*OUT,OPT*/ REF struct task **pnew_session_leader DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK);
 #define TASK_SETSESSIONLEADER_SUCCESS 0 /* Successfully added `task_getprocess_of(thread)' (which at that
                                          * point is guarantied to be identical to `task_getprocessgroupleader(thread)')

@@ -422,19 +422,19 @@ struct aio_handle_stat {
 
 struct aio_handle_type {
 	/* [1..1] Finalizer for this AIO handle. */
-	NOBLOCK NONNULL((1)) void /*NOTHROW*/(KCALL *ht_fini)(struct aio_handle *__restrict self);
+	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *ht_fini)(struct aio_handle *__restrict self);
 	/* [1..1] Cancel execution of the given AIO operation.
 	 * NOTE: This function is required to _immediatly_ cancel the operation associated
 	 *       with the given handle, so long as that operation hasn't yet completed.
 	 *       If the first holds true, the associated handle function must be invoked
 	 *       with `AIO_COMPLETION_CANCEL' before this operator may return. */
-	NOBLOCK NONNULL((1)) void /*NOTHROW*/(KCALL *ht_cancel)(struct aio_handle *__restrict self);
+	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *ht_cancel)(struct aio_handle *__restrict self);
 	/* [0..1] An optional operator which can be used to query the operation progress
 	 *        in order to determine how much has already been done, and how much is
 	 *        still left to be done.
 	 * @param: stat: Filled in by this operator.
 	 * @return: * :  One of `AIO_PROGRESS_STATUS_*' */
-	NOBLOCK NONNULL((1, 2)) unsigned int /*NOTHROW*/(KCALL *ht_progress)(struct aio_handle *__restrict self,
+	NOBLOCK NONNULL((1, 2)) unsigned int /*NOTHROW*/ (KCALL *ht_progress)(struct aio_handle *__restrict self,
 	                                                                     struct aio_handle_stat *__restrict stat);
 #define AIO_PROGRESS_STATUS_PENDING    0x0000 /* The operation is still pending execution. */
 #define AIO_PROGRESS_STATUS_INPROGRESS 0x0001 /* The operation is currently being performed. */
@@ -447,7 +447,7 @@ struct aio_handle_type {
 	 *        data (in bytes) once AIO operation has completed successfully.
 	 *        Calling this operator at any time other than after/during the completion
 	 *        function was called with `AIO_COMPLETION_SUCCESS' causes undefined behavior. */
-	NOBLOCK WUNUSED NONNULL((1)) size_t /*NOTHROW*/(KCALL *ht_retsize)(struct aio_handle *__restrict self);
+	NOBLOCK WUNUSED NONNULL((1)) size_t /*NOTHROW*/ (KCALL *ht_retsize)(struct aio_handle *__restrict self);
 };
 
 
@@ -472,7 +472,7 @@ struct aio_handle_type {
  *                 either pass ownership of `self' to some waiter, or to destroy
  *                `self' on its own.
  * @param: status: One of `AIO_COMPLETION_*', explaining how the operation ended. */
-typedef NOBLOCK NONNULL((1)) void /*NOTHROW*/(KCALL *aio_completion_t)(struct aio_handle *__restrict self,
+typedef NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *aio_completion_t)(struct aio_handle *__restrict self,
                                                                        unsigned int status);
 
 /* Number of pointers available for drivers
@@ -659,7 +659,7 @@ NOTHROW(KCALL aio_handle_multiple_func)(struct aio_handle *__restrict self,
 
 /* Callback for `aio_multihandle' (called under the same context as `aio_completion_t') */
 typedef NOBLOCK NONNULL((1)) void
-/*NOTHROW*/(KCALL *aio_multiple_completion_t)(struct aio_multihandle *__restrict self,
+/*NOTHROW*/ (KCALL *aio_multiple_completion_t)(struct aio_multihandle *__restrict self,
                                               unsigned int status);
 #define AIO_MULTIHANDLE_IVECLIMIT  2    /* Max number of inline-allocated handles. */
 #define AIO_MULTIHANDLE_XVECLIMIT  8    /* Max number of heap-allocated handles per extension. */
