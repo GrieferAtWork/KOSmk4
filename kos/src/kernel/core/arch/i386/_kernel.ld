@@ -319,12 +319,14 @@ SECTIONS {
 
 		/* Boot CPU/TASK/VM data. */
 #ifndef CONFIG_NO_SMP
+		IP_ALIGN(__SIZEOF_CACHELINE__);
 		PROVIDE(_bootcpu = ABSOLUTE(.));
-		. += __kernel_percpu_size - __kernel_pertask_size;
+		. += _this_idle;
 		PROVIDE(_bootidle = ABSOLUTE(.));
 		. += __kernel_pertask_size;
 #endif /* !CONFIG_NO_SMP */
 
+		IP_ALIGN(__SIZEOF_CACHELINE__);
 		PROVIDE(_boottask = ABSOLUTE(.));
 		. += __kernel_pertask_size;
 
