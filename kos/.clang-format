@@ -72,7 +72,7 @@ IncludeBlocks: Regroup
 IncludeCategories:
   - Regex:           '\"api.h\"'
     Priority:        1
-  - Regex:           '<(.*/ compiler|__stdinc|__stdcxx|__crt|features)[.]h>'
+  - Regex:           '<(.*/compiler|__stdinc|__stdcxx|__crt|features)[.]h>'
     Priority:        2
   - Regex:           '<(kernel|dev|drivers|fs|misc|sched)/.*>'
     Priority:        3
