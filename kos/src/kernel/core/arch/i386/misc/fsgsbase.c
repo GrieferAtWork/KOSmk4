@@ -21,16 +21,21 @@
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
-#include <kernel/types.h>
+
+#include <hybrid/host.h>
+#ifdef __x86_64__
+
 #include <kernel/fsgsbase.h>
 #include <kernel/panic.h>
-#include <hybrid/host.h>
+#include <kernel/types.h>
+
 #include <hybrid/unaligned.h>
+
+#include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
 
-#ifdef __x86_64__
-#include "hw_except.h"
+#include "../fault/decode.h"
 
 DECL_BEGIN
 
