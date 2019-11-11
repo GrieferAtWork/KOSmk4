@@ -37,7 +37,6 @@ DECL_BEGIN
 
 INTERN struct icpustate *FCALL
 x86_handle_overflow(struct icpustate *__restrict state) {
-	byte_t *pc, *next_pc;
 	unsigned int i;
 	PERTASK_SET(_this_exception_info.ei_code,
 	            (error_code_t)ERROR_CODEOF(E_OVERFLOW));
@@ -47,11 +46,8 @@ x86_handle_overflow(struct icpustate *__restrict state) {
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
 		PERTASK_SET(_this_exception_info.ei_trace[i], (void *)0);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	pc = (byte_t *)icpustate_getpc(state);
-	PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)pc);
-	next_pc = (byte_t *)instruction_succ(pc);
-	if (next_pc)
-		icpustate_setpc(state, (uintptr_t)next_pc);
+	PERTASK_SET(_this_exception_info.ei_data.e_faultaddr,
+	            (void *)icpustate_getpc(state));
 	x86_unwind_interrupt(state);
 }
 
