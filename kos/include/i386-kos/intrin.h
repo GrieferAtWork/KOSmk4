@@ -21,13 +21,15 @@
 
 #include <__stdinc.h>
 #include <features.h>
-#include <hybrid/host.h>
+
 #include <hybrid/__byteswap.h>
 #include <hybrid/__rotate.h>
-#include <asm/intrin.h>
+#include <hybrid/host.h>
+
 #include <asm/intrin-arith.h>
 #include <asm/intrin-lock.h>
 #include <asm/intrin-segarith.h>
+#include <asm/intrin.h>
 
 
 /* __MACHINE */
@@ -64,7 +66,7 @@
 #define _WriteBarrier() __COMPILER_WRITE_BARRIER()
 #if __has_builtin(__builtin_return_address)
 #define _ReturnAddress() __builtin_return_address(0)
-#endif
+#endif /* __has_builtin(__builtin_return_address) */
 /* __MACHINE: void __code_seg(const char *) */
 #define __debugbreak() __int3()
 #ifdef __COMPILER_HAVE_GCC_ASM
@@ -106,13 +108,13 @@ __FORCELOCAL __ATTR_NORETURN void (__fastfail)(unsigned int __Code) {
 #define __readcr2() __rdcr2()
 #define __readcr3() __rdcr3()
 #define __readcr4() __rdcr4()
-/* __MACHINEX86: unsigned long __readcr8(void) */
-/* __MACHINEX64: unsigned __int64 __readcr8(void) */
 #define __writecr0(Value) __wrcr0(Value)
 #define __writecr3(Value) __wrcr3(Value)
 #define __writecr4(Value) __wrcr4(Value)
-/* __MACHINEX86: void __writecr8(unsigned int) */
-/* __MACHINEX64: void __writecr8(unsigned __int64) */
+#ifdef __x86_64__
+#define __readcr8() __rdcr8()
+#define __writecr8(Value) __wrcr8(Value)
+#endif /* __x86_64__ */
 #define __readeflags() __rdflags()
 #define __writeeflags(Value) __wrflags(Value)
 __FORCELOCAL __ATTR_WUNUSED __REGISTER_TYPE__ (__readdr)(unsigned int __N) {
@@ -156,7 +158,7 @@ __FORCELOCAL void (__writedr)(unsigned int __N, __REGISTER_TYPE__ __Val) {
 #define __readfsdword(Offset) __rdfsl(Offset)
 #ifdef __x86_64__
 #define __readfsqword(Offset) __rdfsq(Offset)
-#else
+#else /* __x86_64__ */
 __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__readfsqword)(__ULONGPTR_TYPE__ __Offset) {
 	union {
 		__UINT64_TYPE__ __Val64;
@@ -166,13 +168,13 @@ __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__readfsqword)(__ULONGPTR_TYPE__ __
 	__Result.__Val32[1] = __rdfsl(__Offset + 4);
 	return __Result.__Val64;
 }
-#endif
+#endif /* !__x86_64__ */
 #define __readfsword(Offset) __rdfsw(Offset)
 #define __writefsbyte(Offset, Value) __wrfsb(Offset, Value)
 #define __writefsdword(Offset, Value) __wrfsl(Offset, Value)
 #ifdef __x86_64__
 #define __writefsqword(Offset, Value) __wrfsq(Offset, Value)
-#else
+#else /* __x86_64__ */
 __FORCELOCAL void (__writefsqword)(__ULONGPTR_TYPE__ __Offset, __UINT64_TYPE__ __Value) {
 	union {
 		__UINT64_TYPE__ __Val64;
@@ -182,7 +184,7 @@ __FORCELOCAL void (__writefsqword)(__ULONGPTR_TYPE__ __Offset, __UINT64_TYPE__ _
 	__wrfsl(__Offset + 0, __Data.__Val32[0]);
 	__wrfsl(__Offset + 4, __Data.__Val32[1]);
 }
-#endif
+#endif /* !__x86_64__ */
 #define __writefsword(Offset, Value) __wrfsw(Offset, Value)
 /* __MACHINEX86: void _m_empty(void) */
 /* __MACHINEX86: void _m_femms(void) */

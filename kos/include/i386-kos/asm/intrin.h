@@ -187,6 +187,11 @@ __FORCELOCAL void (__wrcr0)(__REGISTER_TYPE__ __val) { __asm__ __volatile__("mov
 __FORCELOCAL void (__wrcr2)(__REGISTER_TYPE__ __val) { __asm__ __volatile__("mov %0, %%cr2" : : "r" (__val)); }
 __FORCELOCAL void (__wrcr3)(__REGISTER_TYPE__ __val) { __asm__ __volatile__("mov %0, %%cr3" : : "r" (__val)); }
 __FORCELOCAL void (__wrcr4)(__REGISTER_TYPE__ __val) { __asm__ __volatile__("mov %0, %%cr4" : : "r" (__val)); }
+#ifdef __x86_64__
+__FORCELOCAL __ATTR_WUNUSED __REGISTER_TYPE__ (__rdcr8)(void) { __register __REGISTER_TYPE__ __result; __asm__ __volatile__("mov %%cr8, %0" : "=r" (__result)); return __result; }
+__FORCELOCAL void (__wrcr8)(__REGISTER_TYPE__ __val) { __asm__ __volatile__("mov %0, %%cr8" : : "r" (__val)); }
+#endif /* __x86_64__ */
+
 
 /* Read/Write debug registers. */
 __FORCELOCAL __ATTR_WUNUSED __REGISTER_TYPE__ (__rddr0)(void) { __register __REGISTER_TYPE__ __result; __asm__ __volatile__("mov %%dr0, %0" : "=r" (__result)); return __result; }
