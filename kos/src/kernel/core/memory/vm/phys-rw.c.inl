@@ -65,26 +65,26 @@ DECL_BEGIN
 #define USED_PAGEDIR_PROT \
 	IFELSERW(PAGEDIR_MAP_FREAD, PAGEDIR_MAP_FWRITE)
 
-#define DORW_AND_RETURN(n_bits, virtaddr)                          \
-	IFELSERW(                                                      \
-	do {                                                           \
-		return IFELSEAL(*(u##n_bits *)(virtaddr),                  \
-		                UNALIGNED_GET16((u##n_bits *)(virtaddr))); \
-	} __WHILE0,                                                    \
-	do {                                                           \
-		IFELSEAL(*(u##n_bits *)(virtaddr) = value,                 \
-		         UNALIGNED_SET16((u##n_bits *)(virtaddr), value)); \
-		return;                                                    \
+#define DORW_AND_RETURN(n_bits, virtaddr)                                \
+	IFELSERW(                                                            \
+	do {                                                                 \
+		return IFELSEAL(*(u##n_bits *)(virtaddr),                        \
+		                UNALIGNED_GET##n_bits((u##n_bits *)(virtaddr))); \
+	} __WHILE0,                                                          \
+	do {                                                                 \
+		IFELSEAL(*(u##n_bits *)(virtaddr) = value,                       \
+		         UNALIGNED_SET##n_bits((u##n_bits *)(virtaddr), value)); \
+		return;                                                          \
 	} __WHILE0)
-#define DORW_AND_CONTINUE(n_bits, virtaddr)                          \
-	IFELSERW(                                                        \
-	do {                                                             \
-		result = IFELSEAL(*(u##n_bits *)(virtaddr),                  \
-		                  UNALIGNED_GET16((u##n_bits *)(virtaddr))); \
-	} __WHILE0,                                                      \
-	do {                                                             \
-		IFELSEAL(*(u##n_bits *)(virtaddr) = value,                   \
-		         UNALIGNED_SET16((u##n_bits *)(virtaddr), value));   \
+#define DORW_AND_CONTINUE(n_bits, virtaddr)                                \
+	IFELSERW(                                                              \
+	do {                                                                   \
+		result = IFELSEAL(*(u##n_bits *)(virtaddr),                        \
+		                  UNALIGNED_GET##n_bits((u##n_bits *)(virtaddr))); \
+	} __WHILE0,                                                            \
+	do {                                                                   \
+		IFELSEAL(*(u##n_bits *)(virtaddr) = value,                         \
+		         UNALIGNED_SET##n_bits((u##n_bits *)(virtaddr), value));   \
 	} __WHILE0)
 
 #ifndef DEFINE_PHYS_UNALIGNED
