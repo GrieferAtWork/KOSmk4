@@ -47,7 +47,8 @@ x86_handle_divide_by_zero(struct icpustate *__restrict state) {
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
 		PERTASK_SET(_this_exception_info.ei_trace[i], (void *)0);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	pc      = (byte_t *)icpustate_getpc(state);
+	pc = (byte_t *)icpustate_getpc(state);
+	PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)pc);
 	next_pc = (byte_t *)instruction_succ(pc);
 	if (next_pc)
 		icpustate_setpc(state, (uintptr_t)next_pc);

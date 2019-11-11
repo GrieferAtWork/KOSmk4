@@ -439,6 +439,16 @@ STATIC_ASSERT(offsetof(struct hop_openfd, of_hint) == __OFFSET_HOP_OPENFD_HINT);
 STATIC_ASSERT(offsetof(struct hop_openfd, of_mode) == __OFFSET_HOP_OPENFD_MODE);
 STATIC_ASSERT(sizeof(struct hop_openfd) == __SIZEOF_HOP_OPENFD);
 
+/* struct hop_handle_stat */
+STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_address) == __OFFSET_HOP_HANDLE_STAT_ADDRESS);
+STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_kind) == __OFFSET_HOP_HANDLE_STAT_KIND);
+STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_mode) == __OFFSET_HOP_HANDLE_STAT_MODE);
+STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_refcnt) == __OFFSET_HOP_HANDLE_STAT_REFCNT);
+STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_struct_size) == __OFFSET_HOP_HANDLE_STAT_STRUCT_SIZE);
+STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_type) == __OFFSET_HOP_HANDLE_STAT_TYPE);
+STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_typename) == __OFFSET_HOP_HANDLE_STAT_TYPENAME);
+STATIC_ASSERT(sizeof(struct hop_handle_stat) == __SIZEOF_HOP_HANDLE_STAT);
+
 /* struct hop_datablock_stat */
 STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_features) == __OFFSET_HOP_DATABLOCK_STAT_FEATURES);
 STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_pageshift) == __OFFSET_HOP_DATABLOCK_STAT_PAGESHIFT);
@@ -476,6 +486,25 @@ STATIC_ASSERT(offsetof(struct hop_datablock_syncbytes, dsb_minbyte) == __OFFSET_
 STATIC_ASSERT(offsetof(struct hop_datablock_syncbytes, dsb_struct_size) == __OFFSET_HOP_DATABLOCK_SYNCBYTES_STRUCT_SIZE);
 STATIC_ASSERT(sizeof(struct hop_datablock_syncbytes) == __SIZEOF_HOP_DATABLOCK_SYNCBYTES);
 
+/* struct hop_datablock_openpart */
+STATIC_ASSERT(offsetof(struct hop_datablock_openpart, dop_openfd) == __OFFSET_HOP_DATABLOCK_OPENPART_OPENFD);
+STATIC_ASSERT(offsetof(struct hop_datablock_openpart, dop_pageno) == __OFFSET_HOP_DATABLOCK_OPENPART_PAGENO);
+STATIC_ASSERT(offsetof(struct hop_datablock_openpart, dop_pages_hint) == __OFFSET_HOP_DATABLOCK_OPENPART_PAGES_HINT);
+STATIC_ASSERT(offsetof(struct hop_datablock_openpart, dop_struct_size) == __OFFSET_HOP_DATABLOCK_OPENPART_STRUCT_SIZE);
+STATIC_ASSERT(sizeof(struct hop_datablock_openpart) == __SIZEOF_HOP_DATABLOCK_OPENPART);
+
+/* struct hop_datablock_haschanged */
+STATIC_ASSERT(offsetof(struct hop_datablock_haschanged, dhc_maxbyte) == __OFFSET_HOP_DATABLOCK_HASCHANGED_MAXBYTE);
+STATIC_ASSERT(offsetof(struct hop_datablock_haschanged, dhc_minbyte) == __OFFSET_HOP_DATABLOCK_HASCHANGED_MINBYTE);
+STATIC_ASSERT(offsetof(struct hop_datablock_haschanged, dhc_struct_size) == __OFFSET_HOP_DATABLOCK_HASCHANGED_STRUCT_SIZE);
+STATIC_ASSERT(sizeof(struct hop_datablock_haschanged) == __SIZEOF_HOP_DATABLOCK_HASCHANGED);
+
+/* struct hop_datablock_open_futex */
+STATIC_ASSERT(offsetof(struct hop_datablock_open_futex, dof_address) == __OFFSET_HOP_DATABLOCK_OPEN_FUTEX_ADDRESS);
+STATIC_ASSERT(offsetof(struct hop_datablock_open_futex, dof_openfd) == __OFFSET_HOP_DATABLOCK_OPEN_FUTEX_OPENFD);
+STATIC_ASSERT(offsetof(struct hop_datablock_open_futex, dof_struct_size) == __OFFSET_HOP_DATABLOCK_OPEN_FUTEX_STRUCT_SIZE);
+STATIC_ASSERT(sizeof(struct hop_datablock_open_futex) == __SIZEOF_HOP_DATABLOCK_OPEN_FUTEX);
+
 /* struct hop_blockdevice_stat */
 STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_device_flag) == __OFFSET_HOP_BLOCKDEVICE_STAT_DEVICE_FLAG);
 STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_devno) == __OFFSET_HOP_BLOCKDEVICE_STAT_DEVNO);
@@ -492,16 +521,6 @@ STATIC_ASSERT(offsetof(struct hop_blockdevice_openpart, bop_openfd) == __OFFSET_
 STATIC_ASSERT(offsetof(struct hop_blockdevice_openpart, bop_partno) == __OFFSET_HOP_BLOCKDEVICE_OPENPART_PARTNO);
 STATIC_ASSERT(offsetof(struct hop_blockdevice_openpart, bop_struct_size) == __OFFSET_HOP_BLOCKDEVICE_OPENPART_STRUCT_SIZE);
 STATIC_ASSERT(sizeof(struct hop_blockdevice_openpart) == __SIZEOF_HOP_BLOCKDEVICE_OPENPART);
-
-/* struct hop_handle_stat */
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_address) == __OFFSET_HOP_HANDLE_STAT_ADDRESS);
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_kind) == __OFFSET_HOP_HANDLE_STAT_KIND);
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_mode) == __OFFSET_HOP_HANDLE_STAT_MODE);
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_refcnt) == __OFFSET_HOP_HANDLE_STAT_REFCNT);
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_struct_size) == __OFFSET_HOP_HANDLE_STAT_STRUCT_SIZE);
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_type) == __OFFSET_HOP_HANDLE_STAT_TYPE);
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_typename) == __OFFSET_HOP_HANDLE_STAT_TYPENAME);
-STATIC_ASSERT(sizeof(struct hop_handle_stat) == __SIZEOF_HOP_HANDLE_STAT);
 
 /* struct hop_inode_chmod */
 STATIC_ASSERT(offsetof(struct hop_inode_chmod, icm_perm_flag) == __OFFSET_HOP_INODE_CHMOD_PERM_FLAG);
@@ -681,6 +700,18 @@ STATIC_ASSERT(offsetof(struct hop_pipe_unwrite, puw_struct_size) == __OFFSET_HOP
 STATIC_ASSERT(offsetof(struct hop_pipe_unwrite, puw_unwritten) == __OFFSET_HOP_PIPE_UNWRITE_UNWRITTEN);
 STATIC_ASSERT(offsetof(struct hop_pipe_unwrite, puw_wrpos) == __OFFSET_HOP_PIPE_UNWRITE_WRPOS);
 STATIC_ASSERT(sizeof(struct hop_pipe_unwrite) == __SIZEOF_HOP_PIPE_UNWRITE);
+
+/* struct hop_datapart_stat */
+STATIC_ASSERT(offsetof(struct hop_datapart_stat, ds_features) == __OFFSET_HOP_DATAPART_STAT_FEATURES);
+STATIC_ASSERT(offsetof(struct hop_datapart_stat, ds_maxaddr) == __OFFSET_HOP_DATAPART_STAT_MAXADDR);
+STATIC_ASSERT(offsetof(struct hop_datapart_stat, ds_maxdpage) == __OFFSET_HOP_DATAPART_STAT_MAXDPAGE);
+STATIC_ASSERT(offsetof(struct hop_datapart_stat, ds_maxvpage) == __OFFSET_HOP_DATAPART_STAT_MAXVPAGE);
+STATIC_ASSERT(offsetof(struct hop_datapart_stat, ds_minaddr) == __OFFSET_HOP_DATAPART_STAT_MINADDR);
+STATIC_ASSERT(offsetof(struct hop_datapart_stat, ds_mindpage) == __OFFSET_HOP_DATAPART_STAT_MINDPAGE);
+STATIC_ASSERT(offsetof(struct hop_datapart_stat, ds_minvpage) == __OFFSET_HOP_DATAPART_STAT_MINVPAGE);
+STATIC_ASSERT(offsetof(struct hop_datapart_stat, ds_state) == __OFFSET_HOP_DATAPART_STAT_STATE);
+STATIC_ASSERT(offsetof(struct hop_datapart_stat, ds_struct_size) == __OFFSET_HOP_DATAPART_STAT_STRUCT_SIZE);
+STATIC_ASSERT(sizeof(struct hop_datapart_stat) == __SIZEOF_HOP_DATAPART_STAT);
 
 
 

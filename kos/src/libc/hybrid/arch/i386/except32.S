@@ -35,6 +35,7 @@
 
 #ifdef __KERNEL__
 EXTERN(_this_exception_code)
+EXTERN(_this_exception_data)
 EXTERN(_this_exception_state)
 EXTERN(_this_exception_pointers)
 
@@ -42,6 +43,7 @@ EXTERN(_this_exception_pointers)
 #define FIELD_ERROR_FLAGS          %fs:_this_exception_flags
 #define FIELD_ERROR_TRACE(off)     %fs:_this_exception_trace + (off)
 #define FIELD_ERROR_POINTERS(off)  %fs:_this_exception_pointers + (off)
+#define FIELD_ERROR_FAULTADDR      %fs:_this_exception_data + __OFFSET_EXCEPTION_DATA_FAULTADDR
 #define FIELD_ERROR_REGISTERS(off) %fs:_this_exception_state + (off)
 #define S_EXCEPT_TEXT(name)    .text
 #define S_EXCEPT_DATA(name)    .data
@@ -50,9 +52,10 @@ EXTERN(_this_exception_pointers)
 #else /* __KERNEL__ */
 #define FIELD_ERROR_CODE            OFFSET_EXCEPTION_INFO_CODE(%eax)
 #define FIELD_ERROR_FLAGS           OFFSET_EXCEPTION_INFO_FLAGS(%eax)
-#define FIELD_ERROR_POINTERS(off)  (OFFSET_EXCEPTION_INFO_POINTERS+(off))(%eax)
-#define FIELD_ERROR_TRACE(off)     (OFFSET_EXCEPTION_INFO_TRACE+(off))(%eax)
-#define FIELD_ERROR_REGISTERS(off) (OFFSET_EXCEPTION_INFO_STATE+(off))(%eax)
+#define FIELD_ERROR_POINTERS(off)  (OFFSET_EXCEPTION_INFO_POINTERS + (off))(%eax)
+#define FIELD_ERROR_FAULTADDR      (OFFSET_EXCEPTION_INFO_DATA + __OFFSET_EXCEPTION_DATA_FAULTADDR)(%eax)
+#define FIELD_ERROR_TRACE(off)     (OFFSET_EXCEPTION_INFO_TRACE + (off))(%eax)
+#define FIELD_ERROR_REGISTERS(off) (OFFSET_EXCEPTION_INFO_STATE + (off))(%eax)
 #define S_EXCEPT_TEXT(name)    .text.crt.except.name
 #define S_EXCEPT_DATA(name)    .data.crt.except.name
 #define S_EXCEPT_RODATA(name)  .rodata.crt.except.name
@@ -352,6 +355,7 @@ IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_E
 	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_EFLAGS)
 	movl   OFFSET_KCPUSTATE_EIP(%esp), %ecx
 	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_EIP)
+	movl   %ecx, FIELD_ERROR_FAULTADDR
 	/* Copy exception information. */
 	movl   $(EXCEPT_FNORMAL), FIELD_ERROR_FLAGS
 	leal   SIZEOF_KCPUSTATE(%esp), %esi /* %esi = &code */
@@ -439,6 +443,7 @@ IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_E
 	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_EFLAGS)
 	movl   OFFSET_KCPUSTATE_EIP(%esp), %ecx
 	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_EIP)
+	movl   %ecx, FIELD_ERROR_FAULTADDR
 	movl   $(EXCEPT_FNORMAL), FIELD_ERROR_FLAGS
 #if EXCEPT_BACKTRACE_SIZE != 0
 .Ldo_fill_trace:

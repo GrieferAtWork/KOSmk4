@@ -336,6 +336,9 @@ STATIC_ASSERT(offsetof(struct __sigaction_cygwin, sa_sigaction) == __OFFSET_SIGA
 
 #include <bits/sigaction-struct32.h>
 
+/* struct __sigset_struct32 */
+/* ... */
+
 /* struct sigaction32 */
 STATIC_ASSERT(offsetof(struct sigaction32, sa_flags) == __OFFSET_SIGACTION32_FLAGS);
 STATIC_ASSERT(offsetof(struct sigaction32, sa_handler) == __OFFSET_SIGACTION32_HANDLER);
@@ -526,6 +529,7 @@ STATIC_ASSERT(sizeof(struct debugtrap_reason64) == __SIZEOF_DEBUGTRAP_REASON64);
 /* struct exception_data32 */
 STATIC_ASSERT(offsetof(struct exception_data32, e_class) == __OFFSET_EXCEPTION_DATA32_CLASS);
 STATIC_ASSERT(offsetof(struct exception_data32, e_code) == __OFFSET_EXCEPTION_DATA32_CODE);
+STATIC_ASSERT(offsetof(struct exception_data32, e_faultaddr) == __OFFSET_EXCEPTION_DATA32_FAULTADDR);
 STATIC_ASSERT(offsetof(struct exception_data32, e_pointers) == __OFFSET_EXCEPTION_DATA32_POINTERS);
 STATIC_ASSERT(offsetof(struct exception_data32, e_subclass) == __OFFSET_EXCEPTION_DATA32_SUBCLASS);
 STATIC_ASSERT(sizeof(struct exception_data32) == __SIZEOF_EXCEPTION_DATA32);
@@ -539,6 +543,7 @@ STATIC_ASSERT(sizeof(struct exception_data32) == __SIZEOF_EXCEPTION_DATA32);
 /* struct exception_data64 */
 STATIC_ASSERT(offsetof(struct exception_data64, e_class) == __OFFSET_EXCEPTION_DATA64_CLASS);
 STATIC_ASSERT(offsetof(struct exception_data64, e_code) == __OFFSET_EXCEPTION_DATA64_CODE);
+STATIC_ASSERT(offsetof(struct exception_data64, e_faultaddr) == __OFFSET_EXCEPTION_DATA64_FAULTADDR);
 STATIC_ASSERT(offsetof(struct exception_data64, e_pointers) == __OFFSET_EXCEPTION_DATA64_POINTERS);
 STATIC_ASSERT(offsetof(struct exception_data64, e_subclass) == __OFFSET_EXCEPTION_DATA64_SUBCLASS);
 STATIC_ASSERT(sizeof(struct exception_data64) == __SIZEOF_EXCEPTION_DATA64);
@@ -1111,6 +1116,9 @@ STATIC_ASSERT(alignof(struct tss64) == ALIGNOF_TSS64);
 
 
 #include <kos/kernel/ucontext32.h>
+
+/* struct __sigset_struct32 */
+/* ... */
 
 /* struct ucontext32 */
 STATIC_ASSERT(offsetof(struct ucontext32, uc_link) == __OFFSET_UCONTEXT32_LINK);

@@ -48,8 +48,9 @@ opt.append("-Os");
 #include <asm/intrin.h>
 #include <asm/registers.h>
 #include <kos/except-inval.h>
-#include <kos/kernel/cpu-state.h>
+#include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
 #include <sys/io.h>
 
 #include <stdint.h>
@@ -267,30 +268,27 @@ NOTHROW(KCALL cleanup_and_unwind_interrupt)(/*inherit(always)*/vio_main_args_t *
 	x86_unwind_interrupt(state);
 }
 
-#ifdef __x86_64__
-#define ir_Xflags    ir_rflags
-#else /* __x86_64__ */
-#define ir_Xflags    ir_eflags
-#endif /* !__x86_64__ */
 
 
 INTERN struct icpustate *
 NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/vio_main_args_t *__restrict args,
                             uintptr_t cr2, uintptr_t ecode) {
 	/* Exceptions always point to the instruction _after_ the faulting one! */
-	byte_t *pc; vm_daddr_t vio_addr; struct modrm mod;
+	byte_t *orig_pc, *pc;
+	vm_daddr_t vio_addr;
+	struct modrm mod;
 	struct icpustate *state = args->ma_args.va_state;
-	uintptr_t value,temp; u32 opcode;
-	op_flag_t op_flags; bool isuser;
-	__cli();
-	isuser = irregs_isuser(&state->ics_irregs);
-	if (state->ics_irregs.ir_Xflags & EFLAGS_IF)
-		__sti();
-	vio_addr  = (vm_daddr_t)cr2;
+	uintptr_t value, temp;
+	u32 opcode;
+	op_flag_t op_flags;
+	bool isuser;
+	isuser  = icpustate_isuser(state);
+	orig_pc = (byte_t *)icpustate_getpc(state);
+	vio_addr = (vm_daddr_t)cr2;
 	vio_addr -= (vm_daddr_t)args->ma_args.va_access_pageaddr * PAGESIZE;
 	vio_addr += (vm_daddr_t)args->ma_args.va_access_partoff;
 	TRY {
-		pc     = (byte_t *)irregs_rdip(&state->ics_irregs);
+		pc     = orig_pc;
 		opcode = x86_decode_instruction(state, &pc, &op_flags);
 		switch (opcode) {
 #define MOD_DECODE() pc = x86_decode_modrm(pc, &mod, op_flags)
@@ -4489,11 +4487,13 @@ undefined_instruction:
 			for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
 				PERTASK_SET(_this_exception_info.ei_trace[i], (void *)0);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+			PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)orig_pc);
 			cleanup_and_unwind_interrupt(args, state);
 		}
 done:
 		irregs_wrip(&state->ics_irregs, (uintptr_t)pc);
 	} EXCEPT {
+		PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)orig_pc);
 		cleanup_and_unwind_interrupt(args, state);
 	}
 	decref_unlikely(args->ma_args.va_block);
@@ -4524,9 +4524,13 @@ do_pop_value_2_4_kernel_sp:
 	        ? *(u16 *)((byte_t *)state + OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL)
 	        : *(u32 *)((byte_t *)state + OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL);
 	TRY {
-		op_flags &F_OP16 ? WR_VIOW((u16)value)
-		                 : WR_VIOL((u32)value);
+		if (op_flags & F_OP16)
+			WR_VIOW((u16)value);
+		else {
+			WR_VIOL((u32)value);
+		}
 	} EXCEPT {
+		PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)orig_pc);
 		cleanup_and_unwind_interrupt(args, state);
 	}
 	decref_unlikely(args->ma_args.va_block);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda9c1f9b */
+/* HASH CRC-32:0x47097547 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -801,6 +801,7 @@ __DECL_BEGIN
 #define OFFSET_EXCEPTION_INFO_TRACE     __SIZEOF_ERROR_REGISTER_STATE
 #define OFFSET_EXCEPTION_INFO_FLAGS    (__SIZEOF_ERROR_REGISTER_STATE+(__SIZEOF_POINTER__ * EXCEPT_BACKTRACE_SIZE))
 #define OFFSET_EXCEPTION_INFO_CODE     (__SIZEOF_ERROR_REGISTER_STATE+(__SIZEOF_POINTER__ * (EXCEPT_BACKTRACE_SIZE+1)))
+#define OFFSET_EXCEPTION_INFO_DATA     (__SIZEOF_ERROR_REGISTER_STATE+(__SIZEOF_POINTER__ * (EXCEPT_BACKTRACE_SIZE+1)))
 #define OFFSET_EXCEPTION_INFO_POINTERS (__SIZEOF_ERROR_REGISTER_STATE+(__SIZEOF_POINTER__ * (EXCEPT_BACKTRACE_SIZE+2)))
 #endif /* __USE_KOS_KERNEL */
 

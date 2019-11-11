@@ -637,6 +637,7 @@ NOTHROW(FCALL libc_error_unwind)(struct kcpustate *__restrict state) {
 	struct kcpustate old_state;
 	void *pc;
 	DEFINE_INTERN_SYMBOL(_this_exception_code, &_this_exception_info.ei_code, sizeof(_this_exception_info.ei_code));
+	DEFINE_INTERN_SYMBOL(_this_exception_data, &_this_exception_info.ei_data, sizeof(_this_exception_info.ei_data));
 	DEFINE_INTERN_SYMBOL(_this_exception_state, &_this_exception_info.ei_state, sizeof(_this_exception_info.ei_state));
 	DEFINE_INTERN_SYMBOL(_this_exception_pointers, &_this_exception_info.ei_data.e_pointers, sizeof(_this_exception_info.ei_data.e_pointers));
 	DEFINE_INTERN_SYMBOL(_this_exception_flags, &_this_exception_info.ei_flags, sizeof(_this_exception_info.ei_flags));

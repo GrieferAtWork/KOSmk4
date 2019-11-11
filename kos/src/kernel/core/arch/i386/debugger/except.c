@@ -96,38 +96,39 @@ NOTHROW(FCALL x86_handle_dbg_pagefault)(struct icpustate *__restrict state, uint
 	if (pc == (uintptr_t)addr) {
 		/* This can happen when trying to call an invalid function pointer.
 		 * -> Try to unwind this happening. */
-		uintptr_t old_eip;
+		uintptr_t old_pip;
 		uintptr_t sp = irregs_rdsp(&state->ics_irregs);
 		if (sp != (uintptr_t)(&state->ics_irregs + 1) && sp >= KERNEL_BASE)
 			goto not_a_badcall;
 		TRY {
-			old_eip = *(uintptr_t *)sp;
+			old_pip = *(uintptr_t *)sp;
 		} EXCEPT {
 			if (!was_thrown(E_SEGFAULT))
 				RETHROW();
 			goto not_a_badcall;
 		}
 #ifdef __x86_64__
-		if (IS_USER() != (old_eip >= KERNEL_BASE))
+		if (IS_USER() != (old_pip >= KERNEL_BASE))
 			goto not_a_badcall;
-		irregs_wrip(&state->ics_irregs, old_eip);
+		irregs_wrip(&state->ics_irregs, old_pip);
 		irregs_wrsp(&state->ics_irregs, sp + 8);
 #else /* __x86_64__ */
 		if (sp != (uintptr_t)(&state->ics_irregs_k + 1) ||
 		    IS_USER()) {
-			if (old_eip >= KERNEL_BASE)
+			if (old_pip >= KERNEL_BASE)
 				goto not_a_badcall;
-			irregs_wrip(&state->ics_irregs_k, old_eip);
+			irregs_wrip(&state->ics_irregs_k, old_pip);
 			state->ics_irregs_u.ir_esp += 4;
 		} else {
-			if (old_eip < KERNEL_BASE)
+			if (old_pip < KERNEL_BASE)
 				goto not_a_badcall;
-			state->ics_irregs_k.ir_eip = old_eip;
+			state->ics_irregs_k.ir_eip = old_pip;
 			state = (struct icpustate *)memmove((byte_t *)state + sizeof(void *), state,
 			                                    OFFSET_ICPUSTATE_IRREGS +
 			                                    SIZEOF_IRREGS_KERNEL);
 		}
 #endif /* !__x86_64__ */
+		PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)old_pip);
 		PERTASK_SET(_this_exception_info.ei_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
 		PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)addr);
 #if PAGEFAULT_F_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
@@ -179,8 +180,8 @@ not_a_badcall:
 #endif
 	}
 	/* Always make the state point to the instruction _after_ the one causing the problem. */
-	pc = (uintptr_t)instruction_trysucc((void const *)pc);
-	irregs_wrip(&state->ics_irregs, pc);
+	irregs_wrip(&state->ics_irregs, (uintptr_t)instruction_trysucc((void const *)pc));
+	PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)pc);
 do_unwind_state:
 	x86_unwind_interrupt(state);
 }

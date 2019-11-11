@@ -29,23 +29,23 @@
 #endif /* !EXCEPTION_DATA_POINTERS */
 
 
-#define __OFFSET_EXCEPTION_DATA_CODE      0
+#define __OFFSET_EXCEPTION_DATA_CODE       0
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define __OFFSET_EXCEPTION_DATA_CLASS     0
-#define __OFFSET_EXCEPTION_DATA_SUBCLASS (__SIZEOF_POINTER__ / 2)
+#define __OFFSET_EXCEPTION_DATA_CLASS      0
+#define __OFFSET_EXCEPTION_DATA_SUBCLASS   (__SIZEOF_POINTER__ / 2)
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-#define __OFFSET_EXCEPTION_DATA_CLASS    (__SIZEOF_POINTER__ / 2)
-#define __OFFSET_EXCEPTION_DATA_SUBCLASS  0
+#define __OFFSET_EXCEPTION_DATA_CLASS      (__SIZEOF_POINTER__ / 2)
+#define __OFFSET_EXCEPTION_DATA_SUBCLASS   0
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
-#define __OFFSET_EXCEPTION_DATA_POINTERS  __SIZEOF_POINTER__
+#define __OFFSET_EXCEPTION_DATA_POINTERS   __SIZEOF_POINTER__
 #define __OFFSET_EXCEPTION_DATA_POINTER(i) (((i) + 1) * __SIZEOF_POINTER__)
-#define __SIZEOF_EXCEPTION_DATA          ((EXCEPTION_DATA_POINTERS + 1) * __SIZEOF_POINTER__)
+#define __OFFSET_EXCEPTION_DATA_FAULTADDR  __OFFSET_EXCEPTION_DATA_POINTER(EXCEPTION_DATA_POINTERS)
+#define __SIZEOF_EXCEPTION_DATA            ((EXCEPTION_DATA_POINTERS + 2) * __SIZEOF_POINTER__)
 
 
-#define __SIZEOF_ERROR_CODE_T__       __SIZEOF_POINTER__
-#define __SIZEOF_ERROR_CLASS_T__     (__SIZEOF_POINTER__/2)
-#define __SIZEOF_ERROR_SUBCLASS_T__  (__SIZEOF_POINTER__/2)
-
+#define __SIZEOF_ERROR_CODE_T__     __SIZEOF_POINTER__
+#define __SIZEOF_ERROR_CLASS_T__    (__SIZEOF_POINTER__/2)
+#define __SIZEOF_ERROR_SUBCLASS_T__ (__SIZEOF_POINTER__/2)
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -82,6 +82,21 @@ struct __ATTR_PACKED exception_data /*[PREFIX(e_)]*/ {
 	;
 	/* Exception-specific data pointers */
 	__UINTPTR_TYPE__      e_pointers[EXCEPTION_DATA_POINTERS];
+	/* The address of the instruction that caused the fault.
+	 * Unlike the program counter stored within the `error_register_state_t'
+	 * structure which can be accessed through `error_register_state()', this
+	 * one _may_ point _before_ the instruction that caused the error, however
+	 * it may also point after the instruction. Which of the two it is depends
+	 * on how the specific exception was generated, though it should be noted
+	 * that in the case of errors thrown by `THROW()', this address will _always_
+	 * point _after_ the instruction (meaning it's always equal to the program
+	 * counter stored in `error_register_state()')
+	 *  - e_faultaddr: Either equal to `GETPC(error_register_state())', or points
+	 *                 to the instruction that is `error_register_state()'.
+	 *  - GETPC(error_register_state()):
+	 *                 Always points to the instruction that would have been
+	 *                 executed next if the exception hadn't been thrown. */
+	void                 *e_faultaddr;
 };
 
 #if !defined(__COMPILER_HAVE_TRANSPARENT_UNION) && !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT)

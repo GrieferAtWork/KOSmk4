@@ -49,7 +49,8 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 	u32 opcode;
 	op_flag_t flags;
 	uintptr_t bound_index, bound_min, bound_max;
-	pc        = (byte_t *)icpustate_getpc(state);
+	pc = (byte_t *)icpustate_getpc(state);
+	PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)pc);
 	opcode    = x86_decode_instruction(state, &pc, &flags);
 	bound_min = bound_index = bound_max = 0;
 	if (opcode == 0x62) {

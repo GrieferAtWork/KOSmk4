@@ -38,6 +38,7 @@
 
 #ifdef __KERNEL__
 EXTERN(_this_exception_code)
+EXTERN(_this_exception_data)
 EXTERN(_this_exception_state)
 EXTERN(_this_exception_pointers)
 
@@ -45,6 +46,7 @@ EXTERN(_this_exception_pointers)
 #define FIELD_ERROR_FLAGS          %gs:_this_exception_flags
 #define FIELD_ERROR_TRACE(off)     %gs:_this_exception_trace + (off)
 #define FIELD_ERROR_POINTERS(off)  %gs:_this_exception_pointers + (off)
+#define FIELD_ERROR_FAULTADDR      %gs:_this_exception_data + __OFFSET_EXCEPTION_DATA_FAULTADDR
 #define FIELD_ERROR_REGISTERS(off) %gs:_this_exception_state + (off)
 #define S_EXCEPT_TEXT(name)    .text
 #define S_EXCEPT_DATA(name)    .data
@@ -53,9 +55,10 @@ EXTERN(_this_exception_pointers)
 #else /* __KERNEL__ */
 #define FIELD_ERROR_CODE            OFFSET_EXCEPTION_INFO_CODE(%rax)
 #define FIELD_ERROR_FLAGS           OFFSET_EXCEPTION_INFO_FLAGS(%rax)
-#define FIELD_ERROR_POINTERS(off)  (OFFSET_EXCEPTION_INFO_POINTERS+(off))(%rax)
-#define FIELD_ERROR_TRACE(off)     (OFFSET_EXCEPTION_INFO_TRACE+(off))(%rax)
-#define FIELD_ERROR_REGISTERS(off) (OFFSET_EXCEPTION_INFO_STATE+(off))(%rax)
+#define FIELD_ERROR_POINTERS(off)  (OFFSET_EXCEPTION_INFO_POINTERS + (off))(%rax)
+#define FIELD_ERROR_FAULTADDR      (OFFSET_EXCEPTION_INFO_DATA + __OFFSET_EXCEPTION_DATA_FAULTADDR)(%rax)
+#define FIELD_ERROR_TRACE(off)     (OFFSET_EXCEPTION_INFO_TRACE + (off))(%rax)
+#define FIELD_ERROR_REGISTERS(off) (OFFSET_EXCEPTION_INFO_STATE + (off))(%rax)
 #define S_EXCEPT_TEXT(name)    .text.crt.except.name
 #define S_EXCEPT_DATA(name)    .data.crt.except.name
 #define S_EXCEPT_RODATA(name)  .rodata.crt.except.name
@@ -374,6 +377,7 @@ IU(	movq   %rbx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R
 	movq   %rbx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_RFLAGS)
 	movq   OFFSET_KCPUSTATE_RIP(%rsp), %rbx
 	movq   %rbx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_RIP)
+	movq   %rbx, FIELD_ERROR_FAULTADDR
 	/* Copy exception information. */
 	movq   $(EXCEPT_FNORMAL), FIELD_ERROR_FLAGS
 
@@ -489,6 +493,7 @@ IU(	movq   %rcx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R
 	movq   %rcx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_RFLAGS)
 	movq   OFFSET_KCPUSTATE_RIP(%rsp), %rcx
 	movq   %rcx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_RIP)
+	movq   %rcx, FIELD_ERROR_FAULTADDR
 	movq   $(EXCEPT_FNORMAL), FIELD_ERROR_FLAGS
 #if EXCEPT_BACKTRACE_SIZE != 0
 .Ldo_fill_trace:

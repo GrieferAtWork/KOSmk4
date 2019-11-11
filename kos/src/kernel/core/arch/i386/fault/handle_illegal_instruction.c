@@ -99,7 +99,7 @@ x86_sysenter_emulation(struct icpustate *__restrict state);
 
 INTERN struct icpustate *FCALL
 x86_handle_illegal_instruction(struct icpustate *__restrict state) {
-	byte_t *start_pc, *pc;
+	byte_t *orig_pc, *pc;
 	u32 opcode;
 	op_flag_t op_flags;
 	struct modrm mod;
@@ -108,19 +108,19 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 	/* Re-enable interrupts if they were enabled before. */
 	if (state->ics_irregs.ir_pflags & EFLAGS_IF)
 		__sti();
-	start_pc = pc;
-	opcode   = x86_decode_instruction(state, &pc, &op_flags);
+	orig_pc = pc;
+	opcode  = x86_decode_instruction(state, &pc, &op_flags);
 	TRY {
-		if unlikely((pc - start_pc) > 16) {
+		if unlikely((pc - orig_pc) > 16) {
 			uintptr_t next_pc;
-			next_pc = (uintptr_t)start_pc;
+			next_pc = (uintptr_t)orig_pc;
 			next_pc = (uintptr_t)instruction_succ((void const *)next_pc);
 			if (next_pc && next_pc > (uintptr_t)pc)
 				pc = (byte_t *)next_pc;
 			goto e_instruction_too_long;
 		}
 		printk(KERN_DEBUG "Illegal instruction %#I32x (from %p in %u)\n",
-		       opcode, start_pc, task_getroottid_s());
+		       opcode, orig_pc, task_getroottid_s());
 		switch (opcode) {
 
 #define get_al()       (u8)gpregs_getpax(&state->ics_gpregs)
@@ -1342,8 +1342,12 @@ e_unknown_instruction:
 		}
 	} EXCEPT {
 		if (was_thrown(E_ILLEGAL_INSTRUCTION) &&
-		    PERTASK_GET(_this_exception_info.ei_data.e_pointers[0]) == 0)
+		    PERTASK_GET(_this_exception_info.ei_data.e_pointers[0]) == 0) {
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)opcode);
+			PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)orig_pc);
+		} else if (isuser()) {
+			PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)orig_pc);
+		}
 		icpustate_setpc(state, (uintptr_t)pc);
 		RETHROW();
 	}
@@ -1522,6 +1526,7 @@ set_generic_illegal_instruction:
 			PERTASK_SET(_this_exception_info.ei_trace[i], (void *)0);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	}
+	PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)orig_pc);
 	icpustate_setpc(state, (uintptr_t)pc);
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_ILLEGAL_INSTRUCTION))

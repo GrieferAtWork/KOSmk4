@@ -70,7 +70,7 @@ x86_handle_gpf(struct icpustate *__restrict state, uintptr_t ecode) {
 
 PRIVATE struct icpustate *FCALL
 x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is_ss) {
-	byte_t *pc;
+	byte_t *orig_pc, *pc;
 	u32 opcode;
 	op_flag_t flags;
 	struct modrm mod;
@@ -81,7 +81,8 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 	/* Re-enable interrupts if they were enabled before. */
 	if (state->ics_irregs.ir_pflags & EFLAGS_IF)
 		__sti();
-	opcode = x86_decode_instruction(state, &pc, &flags);
+	orig_pc = pc;
+	opcode  = x86_decode_instruction(state, &pc, &flags);
 	TRY {
 #define isuser()     icpustate_isuser(state)
 #define MOD_DECODE() (pc = x86_decode_modrm(pc, &mod, flags))
@@ -842,8 +843,12 @@ done_noncanon_check:
 		}
 	} EXCEPT {
 		if (was_thrown(E_ILLEGAL_INSTRUCTION) &&
-		    PERTASK_GET(_this_exception_info.ei_data.e_pointers[0]) == 0)
+		    PERTASK_GET(_this_exception_info.ei_data.e_pointers[0]) == 0) {
 			PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)opcode);
+			PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)orig_pc);
+		} else if (isuser()) {
+			PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)orig_pc);
+		}
 		icpustate_setpc(state, (uintptr_t)pc);
 		RETHROW();
 	}
@@ -922,6 +927,7 @@ null_segment_error:
 	for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
 		PERTASK_SET(_this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
 unwind_state:
+	PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)orig_pc);
 	icpustate_setpc(state, (uintptr_t)pc);
 #if EXCEPT_BACKTRACE_SIZE != 0
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)

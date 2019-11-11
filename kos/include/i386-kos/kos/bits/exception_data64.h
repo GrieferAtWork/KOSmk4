@@ -20,21 +20,24 @@
 #define _I386_KOS_KOS_BITS_EXCEPTION_DATA64_H 1
 
 #include <__stdinc.h>
+
+#include <hybrid/__pointer.h>
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
+
 #include <kos/asm/except.h> /* Optional: EXCEPTION_DATA_POINTERS */
 
-
 #ifdef __x86_64__
-#define __OFFSET_EXCEPTION_DATA_CODE     __OFFSET_EXCEPTION_DATA64_CODE
-#define __OFFSET_EXCEPTION_DATA_CLASS    __OFFSET_EXCEPTION_DATA64_CLASS
-#define __OFFSET_EXCEPTION_DATA_SUBCLASS __OFFSET_EXCEPTION_DATA64_SUBCLASS
-#define __OFFSET_EXCEPTION_DATA_POINTERS __OFFSET_EXCEPTION_DATA64_POINTERS
-#define __OFFSET_EXCEPTION_DATA_POINTER  __OFFSET_EXCEPTION_DATA64_POINTER
-#define __SIZEOF_EXCEPTION_DATA          __SIZEOF_EXCEPTION_DATA64
-#define __SIZEOF_ERROR_CODE_T__          __SIZEOF_ERROR_CODE64_T__
-#define __SIZEOF_ERROR_CLASS_T__         __SIZEOF_ERROR_CLASS64_T__
-#define __SIZEOF_ERROR_SUBCLASS_T__      __SIZEOF_ERROR_SUBCLASS64_T__
+#define __OFFSET_EXCEPTION_DATA_CODE      __OFFSET_EXCEPTION_DATA64_CODE
+#define __OFFSET_EXCEPTION_DATA_CLASS     __OFFSET_EXCEPTION_DATA64_CLASS
+#define __OFFSET_EXCEPTION_DATA_SUBCLASS  __OFFSET_EXCEPTION_DATA64_SUBCLASS
+#define __OFFSET_EXCEPTION_DATA_POINTERS  __OFFSET_EXCEPTION_DATA64_POINTERS
+#define __OFFSET_EXCEPTION_DATA_POINTER   __OFFSET_EXCEPTION_DATA64_POINTER
+#define __OFFSET_EXCEPTION_DATA_FAULTADDR __OFFSET_EXCEPTION_DATA64_FAULTADDR
+#define __SIZEOF_EXCEPTION_DATA           __SIZEOF_EXCEPTION_DATA64
+#define __SIZEOF_ERROR_CODE_T__           __SIZEOF_ERROR_CODE64_T__
+#define __SIZEOF_ERROR_CLASS_T__          __SIZEOF_ERROR_CLASS64_T__
+#define __SIZEOF_ERROR_SUBCLASS_T__       __SIZEOF_ERROR_SUBCLASS64_T__
 #define error_code64_t      error_code_t
 #define error_class64_t     error_class_t
 #define error_subclass64_t  error_subclass_t
@@ -46,12 +49,13 @@
 #define EXCEPTION_DATA_POINTERS  8 /* Default value */
 #endif /* !EXCEPTION_DATA_POINTERS */
 
-#define __OFFSET_EXCEPTION_DATA64_CODE        0
-#define __OFFSET_EXCEPTION_DATA64_CLASS       0
-#define __OFFSET_EXCEPTION_DATA64_SUBCLASS    4
-#define __OFFSET_EXCEPTION_DATA64_POINTERS    8
+#define __OFFSET_EXCEPTION_DATA64_CODE       0
+#define __OFFSET_EXCEPTION_DATA64_CLASS      0
+#define __OFFSET_EXCEPTION_DATA64_SUBCLASS   4
+#define __OFFSET_EXCEPTION_DATA64_POINTERS   8
 #define __OFFSET_EXCEPTION_DATA64_POINTER(i) (((i) + 1) * 8)
-#define __SIZEOF_EXCEPTION_DATA64            ((EXCEPTION_DATA_POINTERS + 1) * 8)
+#define __OFFSET_EXCEPTION_DATA64_FAULTADDR  __OFFSET_EXCEPTION_DATA64_POINTER(EXCEPTION_DATA_POINTERS)
+#define __SIZEOF_EXCEPTION_DATA64            ((EXCEPTION_DATA_POINTERS + 2) * 8)
 
 #define __SIZEOF_ERROR_CODE64_T__     8
 #define __SIZEOF_ERROR_CLASS64_T__    4
@@ -87,6 +91,21 @@ struct exception_data64 /*[PREFIX(e_)]*/ {
 	;
 	/* Exception-specific data pointers */
 	__UINT64_TYPE__      e_pointers[EXCEPTION_DATA_POINTERS];
+	/* The address of the instruction that caused the fault.
+	 * Unlike the program counter stored within the `error_register_state_t'
+	 * structure which can be accessed through `error_register_state()', this
+	 * one _may_ point _before_ the instruction that caused the error, however
+	 * it may also point after the instruction. Which of the two it is depends
+	 * on how the specific exception was generated, though it should be noted
+	 * that in the case of errors thrown by `THROW()', this address will _always_
+	 * point _after_ the instruction (meaning it's always equal to the program
+	 * counter stored in `error_register_state()')
+	 *  - e_faultaddr: Either equal to `GETPC(error_register_state())', or points
+	 *                 to the instruction that is `error_register_state()'.
+	 *  - GETPC(error_register_state()):
+	 *                 Always points to the instruction that would have been
+	 *                 executed next if the exception hadn't been thrown. */
+	__HYBRID_PTR64(void) e_faultaddr;
 };
 
 #if !defined(__COMPILER_HAVE_TRANSPARENT_UNION) && !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT)

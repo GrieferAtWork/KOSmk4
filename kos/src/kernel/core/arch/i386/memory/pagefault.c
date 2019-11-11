@@ -38,7 +38,9 @@
 
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
+#include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
 
 #include <assert.h>
 #include <signal.h>
@@ -82,7 +84,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 #if 1
 #define IS_USER() (ecode & PAGEFAULT_F_USERSPACE)
 #else
-#define IS_USER() irregs_isuser(&state->ics_irregs_k)
+#define IS_USER() icpustate_isuser(state)
 #endif
 	vm_virt_t addr;
 	uintptr_t pc;
@@ -100,13 +102,8 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	}
 	addr = (vm_virt_t)__rdcr2();
 	/* Re-enable interrupts if they were enabled before. */
-#ifdef __x86_64__
-	if (state->ics_irregs.ir_rflags & EFLAGS_IF)
+	if (state->ics_irregs.ir_pflags & EFLAGS_IF)
 		__sti();
-#else /* __x86_64__ */
-	if (state->ics_irregs_k.ir_eflags & EFLAGS_IF)
-		__sti();
-#endif /* !__x86_64__ */
 	page = VM_ADDR2PAGE(addr);
 #if 0
 	printk(KERN_DEBUG "Page fault at %p (page %p) [pc=%p,sp=%p] [ecode=%#x] [pid=%u]\n",
@@ -210,8 +207,7 @@ again_lookup_node_already_locked:
 					args.ma_args.va_state           = state;
 					args.ma_oldcons                 = &con; /* Inherit */
 					/* Check for special case: call into VIO memory */
-					if (args.ma_args.va_type->dtv_call &&
-					    (uintptr_t)addr == irregs_rdip(&state->ics_irregs)) {
+					if (args.ma_args.va_type->dtv_call && (uintptr_t)addr == pc) {
 						/* Make sure that memory mapping has execute permissions! */
 						if unlikely(!(nodeprot & VM_PROT_EXEC)) {
 							goto vio_failure_throw_segfault;
@@ -222,7 +218,7 @@ again_lookup_node_already_locked:
 							uintptr_t callsite_eip;
 							uintptr_t sp;
 							/* Must unwind the stack to restore the IP of the VIO call-site. */
-							sp = irregs_rdsp(&state->ics_irregs);
+							sp = icpustate_getsp(state);
 							if (IS_USER() && sp >= KERNEL_BASE)
 								goto do_normal_vio; /* Validate the stack-pointer for user-space. */
 							TRY {
@@ -724,6 +720,8 @@ done_before_pop_connections:
 		} EXCEPT {
 			task_disconnectall();
 			task_popconnections(&con);
+			if (IS_USER())
+				PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)pc);
 			RETHROW();
 		}
 		task_popconnections(&con);
@@ -750,8 +748,11 @@ throw_segfault:
 		TRY {
 			old_eip = *(uintptr_t *)sp;
 		} EXCEPT {
-			if (!was_thrown(E_SEGFAULT))
+			if (!was_thrown(E_SEGFAULT)) {
+				if (IS_USER())
+					PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)pc);
 				RETHROW();
+			}
 			goto not_a_badcall;
 		}
 #ifdef __x86_64__
@@ -774,6 +775,7 @@ throw_segfault:
 			                                    SIZEOF_IRREGS_KERNEL);
 		}
 #endif /* !__x86_64__ */
+		PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)old_eip);
 		PERTASK_SET(_this_exception_info.ei_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
 		PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)addr);
 #if PAGEFAULT_F_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
@@ -826,6 +828,7 @@ set_exception_pointers:
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	}
 	/* Always make the state point to the instruction _after_ the one causing the problem. */
+	PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)pc);
 	pc = (uintptr_t)instruction_trysucc((void const *)pc);
 #if 1
 	printk(KERN_DEBUG "Segmentation fault at %p (page %p) [pc=%p,%p] [ecode=%#x] [pid=%u]\n",
@@ -833,7 +836,7 @@ set_exception_pointers:
 	       icpustate_getpc(state), pc, ecode,
 	       (unsigned int)task_getroottid_s());
 #endif
-	irregs_wrip(&state->ics_irregs, pc);
+	icpustate_setpc(state, pc);
 do_unwind_state:
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_SEGFAULT))

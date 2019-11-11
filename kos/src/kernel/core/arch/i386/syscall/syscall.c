@@ -348,9 +348,17 @@ call_user_exception_handler(struct icpustate *__restrict state,
 	validate_writable(user_error, sizeof(struct exception_data32) + sizeof(struct kcpustate32));
 	COMPILER_WRITE_BARRIER();
 	/* Fill in user-space context information */
-	icpustate_to_kcpustate32(state, user_state);
+	icpustate_user_to_kcpustate32(state, user_state);
 	/* Copy exception data onto the user-space stack. */
 	mydata = &THIS_EXCEPTION_INFO.ei_data;
+	/* Set the user-space syscall return address as fault address
+	 * if the exception was caused during a system call. Otherwise,
+	 * the exception must have happened due to something else that
+	 * user-space did, such as for example divide-by-zero, in which
+	 * case the currently set fault address was already fill in
+	 * correctly by the fault handler. */
+	if (reason == TASK_RPC_REASON_SYSCALL)
+		mydata->e_faultaddr = (void *)icpustate_getuserpsp(state);
 	exception_data_to_exception_data32(mydata, user_error);
 	/* Redirect the given CPU state to return to the user-space handler. */
 	gpregs_setpcx(&state->ics_gpregs, (uintptr_t)user_state); /* struct kcpustate32 *__restrict state */
