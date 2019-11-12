@@ -30,12 +30,14 @@
 #include <kernel/except.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
+#include <sched/except-handler.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
 
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <asm/registers.h>
+#include <kos/kernel/cpu-state-helpers.h>
 
 #include <format-printer.h>
 #include <signal.h>
@@ -49,7 +51,6 @@
 #include <libregdump/x86.h>
 #include <libunwind/eh_frame.h>
 #include <libunwind/unwind.h>
-#include <kos/kernel/cpu-state-helpers.h>
 
 
 /* TODO: This file needs some _major_ cleanup! */
@@ -712,8 +713,7 @@ search_fde:
 			 * location within user-space.
 			 * Now we must use that state to build a full `struct icpustate',
 			 * then pass that state to `x86_propagate_userspace_exception' */
-			x86_handle_except_before_userspace(&ustate,
-			                                   TASK_RPC_REASON_ASYNCUSER);
+			x86_userexcept_unwind(&ustate, NULL);
 		}
 		{
 			u16 expected_gs = __rdgs();

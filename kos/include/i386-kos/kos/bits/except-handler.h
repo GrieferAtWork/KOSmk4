@@ -23,11 +23,9 @@
 #include <hybrid/host.h>
 
 #ifdef __x86_64__
-#define __EXCEPT_HANDLER_CC  __ATTR_SYSVABI
+#include "except-handler64.h"
 #else /* __x86_64__ */
-#define __EXCEPT_HANDLER_CC  __ATTR_FASTCALL
+#include "except-handler32.h"
 #endif /* !__x86_64__ */
-
-#include "../../../kos/bits/except-handler.h"
 
 #endif /* !_I386_KOS_KOS_BITS_EXCEPT_HANDLER_H */

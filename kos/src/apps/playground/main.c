@@ -26,16 +26,21 @@
 
 #include <hybrid/compiler.h>
 
+#include <asm/intrin.h>
 #include <kos/debugtrap.h>
+#include <kos/except.h>
 #include <kos/kernel/types.h>
 #include <kos/syscalls.h>
 #include <kos/sysctl.h>
 #include <kos/types.h>
+#include <kos/unistd.h>
+#include <kos/ukern.h>
+#include <sys/syscall.h>
+#include <sys/syscall-proto.h>
 
-#include <asm/intrin.h>
 #include <assert.h>
-#include <errno.h>
 #include <ctype.h>
+#include <errno.h>
 #include <format-printer.h>
 #include <malloc.h>
 #include <signal.h>
@@ -43,8 +48,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <syslog.h>
+#include <unistd.h>
 
 DECL_BEGIN
 
@@ -154,6 +159,61 @@ int main_signal(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
+int main_except(int argc, char *argv[], char *envp[]) {
+	/* Test all 3 ways in which an exception can be thrown:
+	 *  - syscall
+	 *  - THROW()
+	 *  - user-space fault
+	 */
+	TRY {
+		Pipe(NULL);
+		printf("syscall: Shouldn't get here!\n");
+	} EXCEPT {
+		printf("syscall: error_code(): %I#x\n", error_code());
+	}
+	/* Also make sure that ukern system calls _can_ work */
+	{
+		fd_t fds[2];
+		fds[0] = fds[1] = -1;
+		userkern_Syscall(userkern_self(), pipe)(fds);
+		assert(fds[0] != -1);
+		assert(fds[1] != -1);
+		userkern_Syscall(userkern_self(), close)(fds[1]);
+		userkern_Syscall(userkern_self(), close)(fds[0]);
+	}
+	TRY {
+		userkern_Syscall(userkern_self(), pipe)(NULL);
+		printf("syscall: Shouldn't get here! (useg)\n");
+	} EXCEPT {
+		printf("syscall: error_code(): %I#x (useg)\n", error_code());
+	}
+	/* TODO: Manually invoke: lcall $7 */
+	/* TODO: Manually invoke: int $0x80 */
+	/* TODO: Manually invoke: sysenter */
+	TRY {
+		THROW(E_DIVIDE_BY_ZERO);
+		printf("THROW(): Shouldn't get here!\n");
+	} EXCEPT {
+		printf("THROW(): error_code(): %I#x\n", error_code());
+	}
+	TRY {
+		static volatile int x = 10;
+		static volatile int y = 0;
+		static volatile int z;
+		z = x / y;
+		printf("usfault: Shouldn't get here!\n");
+	} EXCEPT {
+		printf("usfault: error_code(): %I#x\n", error_code());
+	}
+	return 0;
+}
+/************************************************************************/
+
+
+
+
+
+/************************************************************************/
 PRIVATE ssize_t __LIBCCALL
 debug_printer(void *UNUSED(arg), char const *message, size_t len) {
 	struct debugtrap_reason r;
@@ -229,6 +289,7 @@ PRIVATE DEF defs[] = {
 	{ "ctype", &main_ctype },
 	{ "signal", &main_signal },
 	{ "prognam", &main_prognam },
+	{ "except", &main_except },
 	{ NULL, NULL },
 };
 

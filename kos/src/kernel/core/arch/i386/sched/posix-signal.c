@@ -382,7 +382,7 @@ syscall_fill_icpustate_from_ucpustate32(struct icpustate *__restrict state,
                                         USER CHECKED struct ucpustate32 const *__restrict ust)
 		THROWS(E_INVALID_ARGUMENT_BAD_VALUE, E_SEGFAULT, ...) {
 	u16 gs, fs, es, ds, ss, cs;
-	uintptr_t eflags;
+	u32 eflags;
 	gs     = ust->ucs_sgregs.sg_gs16;
 	fs     = ust->ucs_sgregs.sg_fs16;
 	es     = ust->ucs_sgregs.sg_es16;
@@ -395,7 +395,7 @@ syscall_fill_icpustate_from_ucpustate32(struct icpustate *__restrict state,
 	                           eflags,
 	                           cred_allow_eflags_modify_mask());
 #ifndef __x86_64__
-	if (icpustate_isvm86(state)) {
+	if (eflags & EFLAGS_VM) {
 		state->ics_irregs_v.ir_es = es;
 		state->ics_irregs_v.ir_ds = ds;
 		state->ics_irregs_v.ir_fs = fs;
@@ -512,7 +512,7 @@ again:
 			 *       way they would have originally been propagated if the
 			 *       system call hadn't had to be restarted. */
 			sc.rsi_flags &= ~RPC_SYSCALL_INFO_FMETHOD;
-			sc.rsi_flags |= RPC_SYSCALL_INFO_METHOD_EMULATE;
+			sc.rsi_flags |= RPC_SYSCALL_INFO_METHOD_SIGRETURN_32;
 			state = syscall_emulate(state, &sc);
 		} else {
 			if (restore_sigmask) {
@@ -534,13 +534,14 @@ again:
 		/* NOTE: Technically, this behavior right here is incorrect, as it doesn't
 		 *       preserve the correct user-space EFLAGS.CF value. However, we have
 		 *       no other way of passing the knowledge about how the exception should
-		 *       be propagated to `x86_propagate_userspace_exception()' and friends.
+		 *       be propagated to `x86_userexcept_propagate()' and friends.
 		 *       So with this in mind, this is the best we can do when it comes to this problem.
 		 * However, since sigreturn() should only ever be used when returning from signal
-		 * handlers, this shouldn't actually be a problem... */
-		irregs_wrflags(&state->ics_irregs,
-		               (irregs_rdflags(&state->ics_irregs) & ~EFLAGS_CF) |
-		               (enable_except ? EFLAGS_CF : 0));
+		 * handlers, this shouldn't actually be a problem...
+		 * XXX: Why not call `x86_userexcept_propagate()' directly here? */
+		icpustate_setpflags(state,
+		                    (icpustate_getpflags(state) & ~EFLAGS_CF) |
+		                    (enable_except ? EFLAGS_CF : 0));
 		RETHROW();
 	}
 	return state;
@@ -584,29 +585,27 @@ DEFINE_SYSCALL32_6(void, sigreturn,
 }
 
 
-INTDEF struct icpustate *FCALL
-raise_user_signal(struct icpustate *__restrict state,
-                  siginfo_t const *__restrict siginfo,
-                  unsigned int reason,
-                  bool derived_from_exception);
 
 INTERN struct icpustate *FCALL
 raiseat32_impl(struct icpustate *__restrict state,
                USER UNCHECKED struct ucpustate32 const *ust,
-               USER UNCHECKED siginfo32_t const *si) {
-	siginfo_t siginfo;
-	validate_readable(si, sizeof(siginfo_t));
-	memcpy(&siginfo, si, sizeof(siginfo_t));
+               USER UNCHECKED siginfo32_t const *usi) {
+	siginfo_t si;
+	validate_readable(usi, sizeof(*usi));
+	siginfo32_to_siginfo(usi, &si);
 	if (ust) {
 		validate_readable(ust, sizeof(*ust));
 		state = syscall_fill_icpustate_from_ucpustate32(state, ust);
 	}
 	/* Verify that the signal number is inside of its mandatory bounds. */
-	if unlikely(!siginfo.si_signo || siginfo.si_signo >= NSIG)
+	if unlikely(!si.si_signo || si.si_signo >= NSIG) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
-		      siginfo.si_signo);
-	state = raise_user_signal(state, &siginfo, TASK_RPC_REASON_ASYNCUSER, false);
+		      si.si_signo);
+	}
+	/* By passing sc_info as NULL, we can guaranty that raiseat() isn't restarted. */
+	state = x86_userexcept_raisesignal(state, NULL,
+	                                   &si, false);
 	return state;
 }
 
@@ -637,6 +636,97 @@ DEFINE_SYSCALL32_2(errno_t, raiseat,
 	__builtin_unreachable();
 }
 
+
+#ifdef __x86_64__
+INTERN struct icpustate *FCALL
+syscall_fill_icpustate_from_ucpustate64(struct icpustate *__restrict state,
+                                        USER CHECKED struct ucpustate64 const *__restrict ust)
+		THROWS(E_INVALID_ARGUMENT_BAD_VALUE, E_SEGFAULT, ...) {
+	u16 gs, fs, es, ds, ss, cs;
+	u64 rflags;
+	gs     = ust->ucs_sgregs.sg_gs16;
+	fs     = ust->ucs_sgregs.sg_fs16;
+	es     = ust->ucs_sgregs.sg_es16;
+	ds     = ust->ucs_sgregs.sg_ds16;
+	ss     = ust->ucs_ss16;
+	cs     = ust->ucs_cs16;
+	rflags = ucpustate64_getrflags(ust);
+	COMPILER_READ_BARRIER();
+	cpustate_verify_userpflags(icpustate_getpflags(state),
+	                           rflags,
+	                           cred_allow_eflags_modify_mask());
+	/* Validate segment register indices before actually restoring them. */
+	cpustate_verify_usercs(cs);
+	cpustate_verify_userss(ss);
+	cpustate_verify_usergs(gs);
+	cpustate_verify_userfs(fs);
+	cpustate_verify_useres(es);
+	cpustate_verify_userds(ds);
+	icpustate_setgs_novm86(state, gs);
+	icpustate_setfs_novm86(state, fs);
+	icpustate_setes_novm86(state, es);
+	icpustate_setds_novm86(state, ds);
+	icpustate_setcs(state, cs);
+	icpustate_setuserss(state, ss);
+	gpregs64_to_gpregsnsp(&ust->ucs_gpregs, &state->ics_gpregs);
+	icpustate_setpflags(state, rflags);
+	icpustate_setpc(state, ucpustate64_getrip(ust));
+	icpustate_setuserpsp(state, ucpustate64_getrsp(ust));
+	set_user_gsbase(ust->ucs_sgbase.sg_gsbase);
+	set_user_fsbase(ust->ucs_sgbase.sg_fsbase);
+	return state;
+}
+
+INTERN struct icpustate *FCALL
+raiseat64_impl(struct icpustate *__restrict state,
+               USER UNCHECKED struct ucpustate64 const *ust,
+               USER UNCHECKED siginfo64_t const *usi) {
+	siginfo_t si;
+	validate_readable(usi, sizeof(*usi));
+	siginfo64_to_siginfo(usi, &si);
+	if (ust) {
+		validate_readable(ust, sizeof(*ust));
+		state = syscall_fill_icpustate_from_ucpustate64(state, ust);
+	}
+	/* Verify that the signal number is inside of its mandatory bounds. */
+	if unlikely(!si.si_signo || si.si_signo >= NSIG) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+		      si.si_signo);
+	}
+	/* By passing sc_info as NULL, we can guaranty that raiseat() isn't restarted. */
+	state = x86_userexcept_raisesignal(state, NULL,
+	                                   &si, false);
+	return state;
+}
+
+INTERN struct icpustate *FCALL
+raiseat64_rpc(void *UNUSED(arg),
+              struct icpustate *__restrict state,
+              unsigned int reason,
+              struct rpc_syscall_info const *sc_info) {
+	if unlikely(reason != TASK_RPC_REASON_SYSCALL)
+		return state;
+	return raiseat64_impl(state,
+	                      (USER UNCHECKED struct ucpustate64 const *)sc_info->rsi_args[0],
+	                      (USER UNCHECKED siginfo64_t const *)sc_info->rsi_args[1]);
+}
+
+DEFINE_SYSCALL64_2(errno_t, raiseat,
+                   USER UNCHECKED /*ucpustate32*/ struct ucpustate const *, state,
+                   USER UNCHECKED /*siginfo32_t*/ struct __siginfo_struct const *, si) {
+	(void)state;
+	(void)si;
+	task_schedule_user_rpc(THIS_TASK,
+	                       &raiseat64_rpc,
+	                       NULL,
+	                       TASK_RPC_FHIGHPRIO |
+	                       TASK_USER_RPC_FINTR,
+	                       NULL,
+	                       GFP_NORMAL);
+	__builtin_unreachable();
+}
+#endif /* __x86_64__ */
 
 
 DECL_END

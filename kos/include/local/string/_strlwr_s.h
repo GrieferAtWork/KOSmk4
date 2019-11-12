@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc38e905 */
+/* HASH CRC-32:0x489736f8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_strlwr_s) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_strlwr_s))(char *__buf,
                                                        __SIZE_TYPE__ __buflen) {
-#line 4615 "kos/src/libc/magic/string.c"
+#line 4622 "kos/src/libc/magic/string.c"
 	char *__iter, __ch;
 	if (__buf == __NULLPTR)
 		return __EINVAL;

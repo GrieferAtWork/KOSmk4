@@ -25,7 +25,6 @@ BEGIN GROUP("apps.init") { COMPILE, LINK, MCOPY };
 END
 
 BEGIN GROUP("apps.playground") { COMPILE, LINK, MCOPY };
-	SET_LANGUAGE("c")
 	SET_OUTPUT("/" + BINPATH + "/bin/playground")
 	SET_DISKFILE("/bin/playground")
 	SOURCE({ "playground/*.c" })

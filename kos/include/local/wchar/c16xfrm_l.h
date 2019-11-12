@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x639a2ba5 */
+/* HASH CRC-32:0xd9f6d429 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16xfrm_l))(__CHAR16_TYPE__ *__dst,
                                                        __CHAR16_TYPE__ const *__restrict __src,
                                                        __SIZE_TYPE__ __maxlen,
                                                        __locale_t __locale) {
-#line 449 "kos/src/libc/magic/string.c"
+#line 456 "kos/src/libc/magic/string.c"
 	(void)__locale;
 	return __localdep_c16xfrm(__dst, __src, __maxlen);
 }

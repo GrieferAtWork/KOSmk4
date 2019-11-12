@@ -38,6 +38,7 @@ opt.append("-Os");
 #include <kernel/user.h>
 #include <kernel/vio.h>
 #include <kernel/vm86.h>
+#include <sched/except-handler.h>
 #include <sched/task.h>
 
 #include <hybrid/bit.h>
@@ -265,7 +266,7 @@ NOTHROW(KCALL cleanup_and_unwind_interrupt)(/*inherit(always)*/ vio_main_args_t 
 	decref_unlikely(args->ma_args.va_block);
 	decref_unlikely(args->ma_args.va_part);
 	task_popconnections(args->ma_oldcons);
-	x86_unwind_interrupt(state);
+	x86_userexcept_unwind_interrupt(state);
 }
 
 

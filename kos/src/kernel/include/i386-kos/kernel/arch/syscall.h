@@ -25,6 +25,7 @@
 #include <hybrid/typecore.h>
 
 #include <asm/unistd.h>
+#include <bits/types.h>
 
 #ifdef __x86_64__
 #include <asm/syscalls32.inl>
@@ -62,17 +63,6 @@
  *   - RET(%eip): %edi
  *   - RET(%esp): %ebp
  *
- * x86_64: int $0x80 / syscall
- *   - SYSNO:     %rax
- *   - ARG0:      %rdi
- *   - ARG1:      %rsi
- *   - ARG2:      %rdx
- *   - ARG3:      %r10
- *   - ARG4:      %r8
- *   - ARG5:      %r9
- *   - RET0:      %rax
- *   - RET1:      %rdx
- *
  * i386: lcall $7, $MAYBE_SYSNO
  *   - SYSNO:     MAYBE_SYSNO != 0 ? MAYBE_SYSNO : %eax
  *   - ARG0:      0(%esp)  // NOTE: Only accessed if used
@@ -83,6 +73,17 @@
  *   - ARG5:      20(%esp) // NOTE: Only accessed if used
  *   - RET0:      %eax
  *   - RET1:      %edx
+ *
+ * x86_64: syscall
+ *   - SYSNO:     %rax
+ *   - ARG0:      %rdi
+ *   - ARG1:      %rsi
+ *   - ARG2:      %rdx
+ *   - ARG3:      %r10
+ *   - ARG4:      %r8
+ *   - ARG5:      %r9
+ *   - RET0:      %rax
+ *   - RET1:      %rdx
  *
  */
 
@@ -133,10 +134,66 @@
 DECL_BEGIN
 
 struct icpustate;
+struct rpc_syscall_info;
 
-/* Emulate an int80 / sysenter system call invocation, given a user-space register state. */
-FUNDEF struct icpustate *FCALL syscall_emulate_int80(struct icpustate *__restrict regs);
-FUNDEF struct icpustate *FCALL syscall_emulate_sysenter(struct icpustate *__restrict regs);
+/* Emulate a system call invocation, given a user-space register state. */
+FUNDEF struct icpustate *FCALL x86_syscall_emulate32_int80h(struct icpustate *__restrict state);
+FUNDEF struct icpustate *FCALL x86_syscall_emulate32_sysenter(struct icpustate *__restrict state);
+FUNDEF struct icpustate *FCALL x86_syscall_emulate32_cdecl(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except);
+FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate32_int80h_r(struct icpustate *__restrict state);
+FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate32_sysenter_r(struct icpustate *__restrict state);
+FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate32_cdecl_r(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except);
+#ifdef __x86_64__
+FUNDEF struct icpustate *FCALL x86_syscall_emulate64_int80h(struct icpustate *__restrict state);
+FUNDEF struct icpustate *FCALL x86_syscall_emulate64_sysvabi(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except);
+FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate64_int80h_r(struct icpustate *__restrict state);
+FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate64_sysvabi_r(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except);
+#define x86_syscall_emulate_int80h     x86_syscall_emulate64_int80h
+#define x86_syscall_emulate_sysvabi    x86_syscall_emulate64_sysvabi
+#define x86_syscall_emulate_int80h_r   x86_syscall_emulate64_int80h_r
+#define x86_syscall_emulate_sysvabi_r  x86_syscall_emulate64_sysvabi_r
+#else /* __x86_64__ */
+#define x86_syscall_emulate_int80h     x86_syscall_emulate32_int80h
+#define x86_syscall_emulate_sysenter   x86_syscall_emulate32_sysenter
+#define x86_syscall_emulate_cdecl      x86_syscall_emulate32_cdecl
+#define x86_syscall_emulate_int80h_r   x86_syscall_emulate32_int80h_r
+#define x86_syscall_emulate_sysenter_r x86_syscall_emulate32_sysenter_r
+#define x86_syscall_emulate_cdecl_r    x86_syscall_emulate32_cdecl_r
+#endif /* !__x86_64__ */
+
+/* Emulate a system call using a standard function call */
+#ifdef __x86_64__
+#define syscall_emulate_callback   x86_syscall_emulate64_sysvabi
+#define syscall_emulate_callback_r x86_syscall_emulate64_sysvabi_r
+#else /* __x86_64__ */
+#define syscall_emulate_callback   x86_syscall_emulate32_cdecl
+#define syscall_emulate_callback_r x86_syscall_emulate32_cdecl_r
+#endif /* !__x86_64__ */
+
+/* Emulate the execution of a system call.
+ * NOTE: `syscall_emulate_r()' is the same as `syscall_emulate()', however
+ *       will reset the kernel-space stack to `state', and immediately return
+ *       to userspace after the system call has returned (or unwind any exception
+ *       that was thrown by the system call, also dealing with the possibility
+ *       of RPC function handling, as well as system call restarting) */
+FUNDEF WUNUSED struct icpustate *FCALL
+syscall_emulate(struct icpustate *__restrict state,
+                struct rpc_syscall_info *__restrict sc_info);
+FUNDEF ATTR_NORETURN void FCALL
+syscall_emulate_r(struct icpustate *__restrict state,
+                  struct rpc_syscall_info *__restrict sc_info);
+
+#ifdef __x86_64__
+FUNDEF WUNUSED struct icpustate *FCALL
+syscall_emulate32(struct icpustate *__restrict state,
+                  struct rpc_syscall_info *__restrict sc_info);
+FUNDEF WUNUSED struct icpustate *FCALL
+syscall_emulate64(struct icpustate *__restrict state,
+                  struct rpc_syscall_info *__restrict sc_info);
+#else /* __x86_64__ */
+#define syscall_emulate32 syscall_emulate
+#endif /* !__x86_64__ */
+
 
 
 #define SYSCALL_RESTART_MODE_AUTO 0 /* Automatic restarting */
@@ -154,7 +211,16 @@ DATDEF __UINT8_TYPE__ const x86_syscall32_restart_mode[];            /* 0 ... __
 DATDEF __UINT8_TYPE__ const x86_exsyscall32_restart_mode[];          /* __NR32_exsyscall_min ... __NR32_exsyscall_max */
 DATDEF __UINT8_TYPE__ const x86_syscall32_is_cancellation_point[];   /* 0 ... __NR_syscall_max */
 DATDEF __UINT8_TYPE__ const x86_exsyscall32_is_cancellation_point[]; /* __NR_exsyscall_min ... __NR_exsyscall_max */
-#endif /* __x86_64__ */
+#define x86_syscall64_restart_mode            x86_syscall_restart_mode
+#define x86_exsyscall64_restart_mode          x86_exsyscall_restart_mode
+#define x86_syscall64_is_cancellation_point   x86_syscall_is_cancellation_point
+#define x86_exsyscall64_is_cancellation_point x86_exsyscall_is_cancellation_point
+#else /* __x86_64__ */
+#define x86_syscall32_restart_mode            x86_syscall_restart_mode
+#define x86_exsyscall32_restart_mode          x86_exsyscall_restart_mode
+#define x86_syscall32_is_cancellation_point   x86_syscall_is_cancellation_point
+#define x86_exsyscall32_is_cancellation_point x86_exsyscall_is_cancellation_point
+#endif /* !__x86_64__ */
 
 FORCELOCAL ATTR_CONST NOBLOCK __UINT8_TYPE__
 NOTHROW(KCALL x86_syscall_restart_mode_get)(__UINT8_TYPE__ const *__restrict base,
@@ -201,6 +267,15 @@ NOTHROW(KCALL x86_exsyscall_is_cancellation_point_get)(__UINT8_TYPE__ const *__r
 	   : (error))
 #define SYSCALL32_IS_CANCELLATION_POINT(sysno) \
 	SYSCALL32_IS_CANCELLATION_POINT_EX(sysno, 1)
+#define SYSCALL64_RESTART_MODE_EX          SYSCALL_RESTART_MODE_EX
+#define SYSCALL64_RESTART_MODE             SYSCALL_RESTART_MODE
+#define SYSCALL64_IS_CANCELLATION_POINT_EX SYSCALL_IS_CANCELLATION_POINT_EX
+#define SYSCALL64_IS_CANCELLATION_POINT    SYSCALL_IS_CANCELLATION_POINT
+#else /* __x86_64__ */
+#define SYSCALL32_RESTART_MODE_EX          SYSCALL_RESTART_MODE_EX
+#define SYSCALL32_RESTART_MODE             SYSCALL_RESTART_MODE
+#define SYSCALL32_IS_CANCELLATION_POINT_EX SYSCALL_IS_CANCELLATION_POINT_EX
+#define SYSCALL32_IS_CANCELLATION_POINT    SYSCALL_IS_CANCELLATION_POINT
 #endif /* !__x86_64__ */
 
 
@@ -210,7 +285,13 @@ DATDEF __UINT8_TYPE__ const x86_exsyscall_register_count[]; /* __NR_exsyscall_mi
 #ifdef __x86_64__ /* Argument counts of 386 compatibility mode system calls. */
 DATDEF __UINT8_TYPE__ const x86_syscall32_register_count[];   /* 0 ... __NR32_syscall_max */
 DATDEF __UINT8_TYPE__ const x86_exsyscall32_register_count[]; /* __NR32_exsyscall_min ... __NR32_exsyscall_max */
-#endif /* __x86_64__ */
+#define x86_syscall64_register_count   x86_syscall_register_count
+#define x86_exsyscall64_register_count x86_exsyscall_register_count
+#else /* __x86_64__ */
+#define x86_syscall32_register_count   x86_syscall_register_count
+#define x86_exsyscall32_register_count x86_exsyscall_register_count
+#endif /* !__x86_64__ */
+
 FORCELOCAL ATTR_CONST NOBLOCK __UINT8_TYPE__
 NOTHROW(KCALL x86_syscall_register_count_get)(__UINT8_TYPE__ const *__restrict base,
                                               __REGISTER_TYPE__ rel_sysno) {
@@ -235,10 +316,18 @@ NOTHROW(KCALL x86_syscall_double_wide_get)(__UINT8_TYPE__ const *__restrict base
 	 : ((sysno) >= __NR_exsyscall_min && (sysno) <= __NR_exsyscall_max)                           \
 	   ? x86_syscall_register_count_get(x86_exsyscall_register_count, (sysno)-__NR_exsyscall_min) \
 	   : (error))
+#define SYSCALL_DOUBLE_WIDE(sysno) \
+	SYSCALL_DOUBLE_WIDE_EX(sysno, 0)
+#define SYSCALL_DOUBLE_WIDE_EX(sysno, error)                                                   \
+	((sysno) <= __NR_syscall_max                                                               \
+	 ? x86_syscall_double_wide_get(x86_syscall_register_count, sysno)                          \
+	 : ((sysno) >= __NR_exsyscall_min && (sysno) <= __NR_exsyscall_max)                        \
+	   ? x86_syscall_double_wide_get(x86_exsyscall_register_count, (sysno)-__NR_exsyscall_min) \
+	   : (error))
 #ifdef __x86_64__ /* Argument counts of 386 compatibility mode system calls. */
-#define SYSCALL_REGISTER_COUNT_386(sysno) \
-	SYSCALL_REGISTER_COUNT_386_EX(sysno, 0)
-#define SYSCALL_REGISTER_COUNT_386_EX(sysno, error)                                                   \
+#define SYSCALL32_REGISTER_COUNT(sysno) \
+	SYSCALL32_REGISTER_COUNT_EX(sysno, 0)
+#define SYSCALL32_REGISTER_COUNT_EX(sysno, error)                                                     \
 	((sysno) <= __NR32_syscall_max                                                                    \
 	 ? x86_syscall_register_count_get(x86_syscall32_register_count, sysno)                            \
 	 : ((sysno) >= __NR32_exsyscall_min && (sysno) <= __NR32_exsyscall_max)                           \
@@ -252,15 +341,13 @@ NOTHROW(KCALL x86_syscall_double_wide_get)(__UINT8_TYPE__ const *__restrict base
 	 : ((sysno) >= __NR32_exsyscall_min && (sysno) <= __NR32_exsyscall_max)                        \
 	   ? x86_syscall_double_wide_get(x86_exsyscall32_register_count, (sysno)-__NR32_exsyscall_min) \
 	   : (error))
+#define SYSCALL64_DOUBLE_WIDE    SYSCALL_DOUBLE_WIDE
+#define SYSCALL64_DOUBLE_WIDE_EX SYSCALL_DOUBLE_WIDE_EX
 #else /* __x86_64__ */
-#define SYSCALL32_DOUBLE_WIDE(sysno) \
-	SYSCALL32_DOUBLE_WIDE_EX(sysno, 0)
-#define SYSCALL32_DOUBLE_WIDE_EX(sysno, error)                                                 \
-	((sysno) <= __NR_syscall_max                                                               \
-	 ? x86_syscall_double_wide_get(x86_syscall_register_count, sysno)                          \
-	 : ((sysno) >= __NR_exsyscall_min && (sysno) <= __NR_exsyscall_max)                        \
-	   ? x86_syscall_double_wide_get(x86_exsyscall_register_count, (sysno)-__NR_exsyscall_min) \
-	   : (error))
+#define SYSCALL32_REGISTER_COUNT    SYSCALL_REGISTER_COUNT
+#define SYSCALL32_REGISTER_COUNT_EX SYSCALL_REGISTER_COUNT_EX
+#define SYSCALL32_DOUBLE_WIDE       SYSCALL_DOUBLE_WIDE
+#define SYSCALL32_DOUBLE_WIDE_EX    SYSCALL_DOUBLE_WIDE_EX
 #endif /* !__x86_64__ */
 
 DECL_END
@@ -329,13 +416,13 @@ DECL_END
 	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT5_##name, T5));                                                       \
 	FUNDEF return_type __ARCH_SYSCALLCC impl_sys32_##name(T0 N0, T1 N1, T2 N2, T3 N3, T4 N4, T5 N5) ASMNAME("sys32_" #name); \
 	PUBLIC ATTR_SECTION_SYSCALL32(name) return_type __ARCH_SYSCALLCC impl_sys32_##name(T0 N0, T1 N1, T2 N2, T3 N3, T4 N4, T5 N5)
-#define DEFINE_SYSCALL64_0 DEFINE_SYSCALL_0
-#define DEFINE_SYSCALL64_1 DEFINE_SYSCALL_1
-#define DEFINE_SYSCALL64_2 DEFINE_SYSCALL_2
-#define DEFINE_SYSCALL64_3 DEFINE_SYSCALL_3
-#define DEFINE_SYSCALL64_4 DEFINE_SYSCALL_4
-#define DEFINE_SYSCALL64_5 DEFINE_SYSCALL_5
-#define DEFINE_SYSCALL64_6 DEFINE_SYSCALL_6
+#define DEFINE_SYSCALL64_0 DEFINE_SYSCALL0
+#define DEFINE_SYSCALL64_1 DEFINE_SYSCALL1
+#define DEFINE_SYSCALL64_2 DEFINE_SYSCALL2
+#define DEFINE_SYSCALL64_3 DEFINE_SYSCALL3
+#define DEFINE_SYSCALL64_4 DEFINE_SYSCALL4
+#define DEFINE_SYSCALL64_5 DEFINE_SYSCALL5
+#define DEFINE_SYSCALL64_6 DEFINE_SYSCALL6
 #else /* __x86_64__ */
 #define DEFINE_SYSCALL32_0 DEFINE_SYSCALL0
 #define DEFINE_SYSCALL32_1 DEFINE_SYSCALL1

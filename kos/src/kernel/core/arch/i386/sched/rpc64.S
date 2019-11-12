@@ -136,16 +136,16 @@ INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 	 * From there, we automatically restore the actual user-space
 	 * iret tail, handle additional RPC requests, before eventually
 	 * getting here while the current IRET tail still points into
-	 * userspace when `x86_propagate_userspace_exception()' is invoked! */
+	 * userspace when `x86_userexcept_propagate()' is invoked! */
 	je     1f
-	INTERN(x86_unwind_kernel_interrupt_esp)
-	jmp    x86_unwind_kernel_interrupt_esp
+	PUBLIC(x86_userexcept_unwind_interrupt_kernel_esp)
+	jmp    x86_userexcept_unwind_interrupt_kernel_esp
 
 2:	/* User-space target */
-	movq   %rsp, %rdi
-	movq   $(TASK_RPC_REASON_ASYNCUSER), %rsi
-	INTERN(x86_propagate_userspace_exception)
-	call   x86_propagate_userspace_exception
+	movq   %rsp, %rdi /* struct icpustate *__restrict state */
+	xorq   %rdx, %rsi /* struct rpc_syscall_info *sc_info */
+	PUBLIC(x86_userexcept_propagate)
+	call   x86_userexcept_propagate
 	.cfi_def_cfa_register %rax
 	movq   %rax, %rsp
 	.cfi_def_cfa_register %rsp

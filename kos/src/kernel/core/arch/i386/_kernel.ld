@@ -102,6 +102,7 @@ SECTIONS {
 #endif /* __x86_64__ */
 		*(.text.x86.asm32_syscall_int80.*)
 		*(.text.x86.asm32_syscall_sysenter.*)
+		*(.text.x86.*)
 	}
 
 #define DEFINE_CALLBACK_VECTOR(name,section) \

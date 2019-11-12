@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a184c7 */
+/* HASH CRC-32:0x8e8de9b1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __LOCAL_LIBC(memcpyq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UIN
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcpyq))(void *__restrict __dst,
                                                      void const *__restrict __src,
                                                      __SIZE_TYPE__ __n_qwords) {
-#line 1408 "kos/src/libc/magic/string.c"
+#line 1415 "kos/src/libc/magic/string.c"
 #if __SIZEOF_POINTER__ >= 8
 	__UINT64_TYPE__ *__pdst = (__UINT64_TYPE__ *)__dst;
 	__UINT64_TYPE__ *__psrc = (__UINT64_TYPE__ *)__src;

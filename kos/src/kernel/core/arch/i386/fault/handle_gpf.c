@@ -30,6 +30,7 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/cpu.h>
+#include <sched/except-handler.h>
 #include <sched/task.h>
 
 #include <hybrid/limits.h>
@@ -933,7 +934,7 @@ unwind_state:
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
 		PERTASK_SET(_this_exception_info.ei_trace[i], (void *)0);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	x86_unwind_interrupt(state);
+	x86_userexcept_unwind_interrupt(state);
 }
 
 DECL_END

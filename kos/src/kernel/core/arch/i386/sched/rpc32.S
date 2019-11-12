@@ -224,16 +224,16 @@ INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 	 * From there, we automatically restore the actual user-space
 	 * iret tail, handle additional RPC requests, before eventually
 	 * getting here while the current IRET tail still points into
-	 * userspace when `x86_propagate_userspace_exception()' is invoked! */
+	 * userspace when `x86_userexcept_propagate()' is invoked! */
 	je     1f
-	INTERN(x86_unwind_kernel_interrupt_esp)
-	jmp    x86_unwind_kernel_interrupt_esp
+	PUBLIC(x86_userexcept_unwind_interrupt_kernel_esp)
+	jmp    x86_userexcept_unwind_interrupt_kernel_esp
 
 2:	/* User-space target */
-	movl   %esp, %ecx
-	movl   $TASK_RPC_REASON_ASYNCUSER, %edx
-	INTERN(x86_propagate_userspace_exception)
-	call   x86_propagate_userspace_exception
+	movl   %esp, %ecx /* struct icpustate *__restrict state */
+	xorl   %edx, %edx /* struct rpc_syscall_info *sc_info */
+	PUBLIC(x86_userexcept_propagate)
+	call   x86_userexcept_propagate
 	movl   %eax, %esp
 
 1:	/* Restore the state after exception propagation. */
@@ -354,8 +354,8 @@ INTERN_FUNCTION(x86_rpc_kernel_redirection_handler)
 	call   *%eax
 	movl   %eax, %esp
 	/* Continue unwinding the exception that brought us here. */
-	INTERN(x86_unwind_interrupt_esp)
-	jmp    x86_unwind_interrupt_esp
+	INTERN(x86_userexcept_unwind_interrupt_esp)
+	jmp    x86_userexcept_unwind_interrupt_esp
 END(x86_rpc_kernel_redirection_handler)
 .cfi_endproc
 
@@ -463,8 +463,8 @@ INTERN_FUNCTION(x86_rpc_kernel_redirection_c_handler)
 	movl   %ebx, %esp
 	.cfi_def_cfa_register %esp
 	/* Continue unwinding the exception that brought us here. */
-	INTERN(x86_unwind_interrupt_esp)
-	jmp    x86_unwind_interrupt_esp
+	PUBLIC(x86_userexcept_unwind_interrupt_esp)
+	jmp    x86_userexcept_unwind_interrupt_esp
 END(x86_rpc_kernel_redirection_handler)
 .cfi_endproc
 
@@ -550,8 +550,8 @@ INTERN_FUNCTION(x86_srpc_kernel_redirection_handler)
 	popl_cfi_r %eax
 	pushal_cfi_r
 	/* Continue unwinding the exception that brought us here. */
-	INTERN(x86_unwind_interrupt_esp)
-	jmp    x86_unwind_interrupt_esp
+	PUBLIC(x86_userexcept_unwind_interrupt_esp)
+	jmp    x86_userexcept_unwind_interrupt_esp
 END(x86_srpc_kernel_redirection_handler)
 .cfi_endproc
 
@@ -642,8 +642,8 @@ INTERN_FUNCTION(x86_srpc_kernel_redirection_c_handler)
 	popl_cfi_r %eax
 	pushal_cfi_r
 	/* Continue unwinding the exception that brought us here. */
-	INTERN(x86_unwind_interrupt_esp)
-	jmp    x86_unwind_interrupt_esp
+	PUBLIC(x86_userexcept_unwind_interrupt_esp)
+	jmp    x86_userexcept_unwind_interrupt_esp
 END(x86_srpc_kernel_redirection_c_handler)
 .cfi_endproc
 

@@ -469,7 +469,7 @@ END(libc_error_throw)
 INTERN(x86_serve_user_rpc_and_propagate_exceptions)
 
 .section .text
-INTERN_FUNCTION(x86_unwind_interrupt)
+PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt)
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %ecx, OFFSET_ICPUSTATE_IRREGS
@@ -492,7 +492,7 @@ INTERN_FUNCTION(x86_unwind_interrupt)
 	.cfi_restore_iret_ds_or_offset (OFFSET_ICPUSTATE_DS - OFFSET_ICPUSTATE_IRREGS)
 	movl   %ecx, %esp
 	.cfi_def_cfa_register %esp
-INTERN_FUNCTION(x86_unwind_interrupt_esp)
+PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_esp)
 	/* Check if the interrupt state points into user-space. */
 	testl  $3, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS(%esp)
 	jnz    x86_serve_user_rpc_and_propagate_exceptions
@@ -518,7 +518,7 @@ INTERN_FUNCTION(x86_unwind_interrupt_esp)
 	.cfi_rel_offset %eip, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_EIP
 /*	.cfi_rel_offset %cs, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS */
 
-INTERN_FUNCTION(x86_unwind_kernel_interrupt_esp)
+PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_kernel_esp)
 	/* NOTE: RPC guaranties never to modify a kernel-target iret tail, meaning
 	 *       we're entirely safe to modify the tail without having to worry
 	 *       about intervention of RPC callbacks! */
@@ -554,9 +554,9 @@ INTERN_FUNCTION(x86_unwind_kernel_interrupt_esp)
 
 	jmp    .Ldo_unwind_esp
 	.cfi_endproc
-END(x86_unwind_kernel_interrupt_esp)
-END(x86_unwind_interrupt_esp)
-END(x86_unwind_interrupt)
+END(x86_userexcept_unwind_interrupt_kernel_esp)
+END(x86_userexcept_unwind_interrupt_esp)
+END(x86_userexcept_unwind_interrupt)
 
 #endif /* __KERNEL__ */
 

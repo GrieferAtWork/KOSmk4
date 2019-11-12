@@ -606,10 +606,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 151 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname151 /* index: 151 */
+	.weak x86_userexcept_unwind_i; .long x86_userexcept_unwind_i
+	.reloc ., R_386_SIZE32, x86_userexcept_unwind_i; .long 0
+	.long 0x1010019
 	.long .Lname152 /* index: 152 */
 	.weak path_traversefull_ex; .long path_traversefull_ex
 	.reloc ., R_386_SIZE32, path_traversefull_ex; .long 0
@@ -1226,10 +1226,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak error_data; .long error_data
 	.reloc ., R_386_SIZE32, error_data; .long 0
 	.long 0x6836131
-	.long .Lname306 /* index: 306 */
-	.weak syscall_emulate_sysenter; .long syscall_emulate_sysenter
-	.reloc ., R_386_SIZE32, syscall_emulate_sysenter; .long 0
-	.long 0x4a5f132
+	.long 0 /* index: 306 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname307 /* index: 307 */
 	.weak instruction_trysucc; .long instruction_trysucc
 	.reloc ., R_386_SIZE32, instruction_trysucc; .long 0
@@ -2110,10 +2110,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak cpu_idlemain; .long cpu_idlemain
 	.reloc ., R_386_SIZE32, cpu_idlemain; .long 0
 	.long 0xd8d820e
-	.long 0 /* index: 527 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname527 /* index: 527 */
+	.weak x86_userexcept_unwind; .long x86_userexcept_unwind
+	.reloc ., R_386_SIZE32, x86_userexcept_unwind; .long 0
+	.long 0x64100f4
 	.long .Lname528 /* index: 528 */
 	.weak vm_datablock_writevp; .long vm_datablock_writevp
 	.reloc ., R_386_SIZE32, vm_datablock_writevp; .long 0
@@ -2918,10 +2918,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 729 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname729 /* index: 729 */
+	.weak x86_userexcept_unwind_interrupt; .long x86_userexcept_unwind_interrupt
+	.reloc ., R_386_SIZE32, x86_userexcept_unwind_interrupt; .long 0
+	.long 0xbc98324
 	.long 0 /* index: 730 */
 	.long 0
 	.long 0
@@ -3778,10 +3778,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 944 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname944 /* index: 944 */
+	.weak x86_userexcept_propagate; .long x86_userexcept_propagate
+	.reloc ., R_386_SIZE32, x86_userexcept_propagate; .long 0
+	.long 0x46cb745
 	.long 0 /* index: 945 */
 	.long 0
 	.long 0
@@ -3978,10 +3978,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 994 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname994 /* index: 994 */
+	.weak x86_userexcept_callhandler; .long x86_userexcept_callhandler
+	.reloc ., R_386_SIZE32, x86_userexcept_callhandler; .long 0
+	.long 0x535a3e2
 	.long .Lname995 /* index: 995 */
 	.weak inode_aread_phys; .long inode_aread_phys
 	.reloc ., R_386_SIZE32, inode_aread_phys; .long 0
@@ -4354,10 +4354,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak atomic64_write; .long atomic64_write
 	.reloc ., R_386_SIZE32, atomic64_write; .long 0
 	.long 0x30d80b5
-	.long .Lname1088 /* index: 1088 */
-	.weak syscall_emulate_int80; .long syscall_emulate_int80
-	.reloc ., R_386_SIZE32, syscall_emulate_int80; .long 0
-	.long 0xa8c1440
+	.long 0 /* index: 1088 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 1089 */
 	.long 0
 	.long 0
@@ -5046,10 +5046,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_signal; .long sys_signal
 	.reloc ., R_386_SIZE32, sys_signal; .long 0
 	.long 0x69874ec
-	.long 0 /* index: 1261 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1261 /* index: 1261 */
+	.weak x86_syscall_emulate32_sysenter_r; .long x86_syscall_emulate32_sysenter_r
+	.reloc ., R_386_SIZE32, x86_syscall_emulate32_sysenter_r; .long 0
+	.long 0xb5b70d2
 	.long .Lname1262 /* index: 1262 */
 	.weak sys_getgroups; .long sys_getgroups
 	.reloc ., R_386_SIZE32, sys_getgroups; .long 0
@@ -8578,10 +8578,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak debuginfo_print_value; .long debuginfo_print_value
 	.reloc ., R_386_SIZE32, debuginfo_print_value; .long 0
 	.long 0x8b66165
-	.long 0 /* index: 2144 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2144 /* index: 2144 */
+	.weak x86_userexcept_unwind_interrupt_kernel_esp; .long x86_userexcept_unwind_interrupt_kernel_esp
+	.reloc ., R_386_SIZE32, x86_userexcept_unwind_interrupt_kernel_esp; .long 0
+	.long 0x69cd860
 	.long 0 /* index: 2145 */
 	.long 0
 	.long 0
@@ -9510,10 +9510,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_rt_sigsuspend; .long sys_rt_sigsuspend
 	.reloc ., R_386_SIZE32, sys_rt_sigsuspend; .long 0
 	.long 0x337fec4
-	.long 0 /* index: 2377 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2377 /* index: 2377 */
+	.weak x86_syscall_emulate32_cdecl; .long x86_syscall_emulate32_cdecl
+	.reloc ., R_386_SIZE32, x86_syscall_emulate32_cdecl; .long 0
+	.long 0x2a298c
 	.long 0 /* index: 2378 */
 	.long 0
 	.long 0
@@ -10658,10 +10658,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 2664 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2664 /* index: 2664 */
+	.weak x86_syscall_emulate32_int80h; .long x86_syscall_emulate32_int80h
+	.reloc ., R_386_SIZE32, x86_syscall_emulate32_int80h; .long 0
+	.long 0x2dd5a68
 	.long 0 /* index: 2665 */
 	.long 0
 	.long 0
@@ -10874,10 +10874,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_tasklock_endwrite; .long vm_tasklock_endwrite
 	.reloc ., R_386_SIZE32, vm_tasklock_endwrite; .long 0
 	.long 0x68a2ad5
-	.long 0 /* index: 2718 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2718 /* index: 2718 */
+	.weak x86_userexcept_raisesignal_from_exception; .long x86_userexcept_raisesignal_from_exception
+	.reloc ., R_386_SIZE32, x86_userexcept_raisesignal_from_exception; .long 0
+	.long 0x1898a9e
 	.long .Lname2719 /* index: 2719 */
 	.weak vm_tasklock_trywrite; .long vm_tasklock_trywrite
 	.reloc ., R_386_SIZE32, vm_tasklock_trywrite; .long 0
@@ -10954,10 +10954,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak slab_kmalloc28; .long slab_kmalloc28
 	.reloc ., R_386_SIZE32, slab_kmalloc28; .long 0
 	.long 0x66b31c8
-	.long 0 /* index: 2738 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2738 /* index: 2738 */
+	.weak syscall_emulate_r; .long syscall_emulate_r
+	.reloc ., R_386_SIZE32, syscall_emulate_r; .long 0
+	.long 0x443fab2
 	.long .Lname2739 /* index: 2739 */
 	.weak inode_areadallv_phys; .long inode_areadallv_phys
 	.reloc ., R_386_SIZE32, inode_areadallv_phys; .long 0
@@ -11658,10 +11658,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 2914 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2914 /* index: 2914 */
+	.weak x86_syscall_emulate32_sysenter; .long x86_syscall_emulate32_sysenter
+	.reloc ., R_386_SIZE32, x86_syscall_emulate32_sysenter; .long 0
+	.long 0x8bb5b62
 	.long .Lname2915 /* index: 2915 */
 	.weak block_device_writev_sync; .long block_device_writev_sync
 	.reloc ., R_386_SIZE32, block_device_writev_sync; .long 0
@@ -12190,10 +12190,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak inode_areadallv; .long inode_areadallv
 	.reloc ., R_386_SIZE32, inode_areadallv; .long 0
 	.long 0xed16be6
-	.long 0 /* index: 3047 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3047 /* index: 3047 */
+	.weak x86_userexcept_raisesignal; .long x86_userexcept_raisesignal
+	.reloc ., R_386_SIZE32, x86_userexcept_raisesignal; .long 0
+	.long 0x7fff6ec
 	.long 0 /* index: 3048 */
 	.long 0
 	.long 0
@@ -12526,10 +12526,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 3131 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3131 /* index: 3131 */
+	.weak x86_userexcept_seterrno; .long x86_userexcept_seterrno
+	.reloc ., R_386_SIZE32, x86_userexcept_seterrno; .long 0
+	.long 0x98c2f5f
 	.long .Lname3132 /* index: 3132 */
 	.weak memlenl; .long memlenl
 	.reloc ., R_386_SIZE32, memlenl; .long 0
@@ -13878,10 +13878,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 3469 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3469 /* index: 3469 */
+	.weak x86_syscall_emulate32_cdecl_r; .long x86_syscall_emulate32_cdecl_r
+	.reloc ., R_386_SIZE32, x86_syscall_emulate32_cdecl_r; .long 0
+	.long 0xa299242
 	.long 0 /* index: 3470 */
 	.long 0
 	.long 0
@@ -15662,10 +15662,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname3915 /* index: 3915 */
-	.weak syscall_emulate_callback; .long syscall_emulate_callback
-	.reloc ., R_386_SIZE32, syscall_emulate_callback; .long 0
-	.long 0x42d2f4b
+	.long 0 /* index: 3915 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 3916 */
 	.long 0
 	.long 0
@@ -16544,6 +16544,8 @@ END(kernel_symbol_table)
 	.string "slab_malloc28"
 .Lname149:
 	.string "block_device_acquire_partlock_write"
+.Lname151:
+	.string "x86_userexcept_unwind_i"
 .Lname152:
 	.string "path_traversefull_ex"
 .Lname153:
@@ -16706,8 +16708,6 @@ END(kernel_symbol_table)
 	.string "vm_datablock_anonymous_zero"
 .Lname305:
 	.string "error_data"
-.Lname306:
-	.string "syscall_emulate_sysenter"
 .Lname307:
 	.string "instruction_trysucc"
 .Lname308:
@@ -16952,6 +16952,8 @@ END(kernel_symbol_table)
 	.string "__predict_update_dl"
 .Lname526:
 	.string "cpu_idlemain"
+.Lname527:
+	.string "x86_userexcept_unwind"
 .Lname528:
 	.string "vm_datablock_writevp"
 .Lname530:
@@ -17190,6 +17192,8 @@ END(kernel_symbol_table)
 	.string "inode_areadv_phys"
 .Lname724:
 	.string "sys_linux_lstat64"
+.Lname729:
+	.string "x86_userexcept_unwind_interrupt"
 .Lname732:
 	.string "__predict_update_al"
 .Lname738:
@@ -17418,6 +17422,8 @@ END(kernel_symbol_table)
 	.string "slab_kmalloc_nx12"
 .Lname942:
 	.string "sys_stime"
+.Lname944:
+	.string "x86_userexcept_propagate"
 .Lname947:
 	.string "_this_fs"
 .Lname948:
@@ -17472,6 +17478,8 @@ END(kernel_symbol_table)
 	.string "sys_rename"
 .Lname992:
 	.string "unregister_filesystem_type"
+.Lname994:
+	.string "x86_userexcept_callhandler"
 .Lname995:
 	.string "inode_aread_phys"
 .Lname996:
@@ -17568,8 +17576,6 @@ END(kernel_symbol_table)
 	.string "file_destroy"
 .Lname1087:
 	.string "atomic64_write"
-.Lname1088:
-	.string "syscall_emulate_int80"
 .Lname1092:
 	.string "sys_setresgid"
 .Lname1093:
@@ -17754,6 +17760,8 @@ END(kernel_symbol_table)
 	.string "pidns_endwrite"
 .Lname1260:
 	.string "sys_signal"
+.Lname1261:
+	.string "x86_syscall_emulate32_sysenter_r"
 .Lname1262:
 	.string "sys_getgroups"
 .Lname1263:
@@ -18638,6 +18646,8 @@ END(kernel_symbol_table)
 	.string "vmb_find_first_node_greater_equal"
 .Lname2143:
 	.string "debuginfo_print_value"
+.Lname2144:
+	.string "x86_userexcept_unwind_interrupt_kernel_esp"
 .Lname2148:
 	.string "json_parser_rewind"
 .Lname2151:
@@ -18890,6 +18900,8 @@ END(kernel_symbol_table)
 	.string "superblock_nodeslock_endwrite"
 .Lname2376:
 	.string "sys_rt_sigsuspend"
+.Lname2377:
+	.string "x86_syscall_emulate32_cdecl"
 .Lname2379:
 	.string "cpu_addpendingtask"
 .Lname2380:
@@ -19192,6 +19204,8 @@ END(kernel_symbol_table)
 	.string "sys_gettid"
 .Lname2661:
 	.string "sys_getrusage"
+.Lname2664:
+	.string "x86_syscall_emulate32_int80h"
 .Lname2667:
 	.string "sys_setxattr"
 .Lname2668:
@@ -19256,6 +19270,8 @@ END(kernel_symbol_table)
 	.string "x86_vm86_inl"
 .Lname2717:
 	.string "vm_tasklock_endwrite"
+.Lname2718:
+	.string "x86_userexcept_raisesignal_from_exception"
 .Lname2719:
 	.string "vm_tasklock_trywrite"
 .Lname2720:
@@ -19280,6 +19296,8 @@ END(kernel_symbol_table)
 	.string "path_free"
 .Lname2737:
 	.string "slab_kmalloc28"
+.Lname2738:
+	.string "syscall_emulate_r"
 .Lname2739:
 	.string "inode_areadallv_phys"
 .Lname2740:
@@ -19460,6 +19478,8 @@ END(kernel_symbol_table)
 	.string "x86_lapic_version"
 .Lname2911:
 	.string "sys_swapoff"
+.Lname2914:
+	.string "x86_syscall_emulate32_sysenter"
 .Lname2915:
 	.string "block_device_writev_sync"
 .Lname2916:
@@ -19610,6 +19630,8 @@ END(kernel_symbol_table)
 	.string "sys_readf"
 .Lname3046:
 	.string "inode_areadallv"
+.Lname3047:
+	.string "x86_userexcept_raisesignal"
 .Lname3049:
 	.string "ramfs_symlink_type"
 .Lname3052:
@@ -19698,6 +19720,8 @@ END(kernel_symbol_table)
 	.string "vm_datapart_lockread_setcore_unsharecow"
 .Lname3129:
 	.string "vm_destroy"
+.Lname3131:
+	.string "x86_userexcept_seterrno"
 .Lname3132:
 	.string "memlenl"
 .Lname3135:
@@ -20058,6 +20082,8 @@ END(kernel_symbol_table)
 	.string "sys_kstat"
 .Lname3467:
 	.string "sys_vfork"
+.Lname3469:
+	.string "x86_syscall_emulate32_cdecl_r"
 .Lname3473:
 	.string "vm_startdma"
 .Lname3475:
@@ -20572,8 +20598,6 @@ END(kernel_symbol_table)
 	.string "format_vscanf"
 .Lname3912:
 	.string "sprintf"
-.Lname3915:
-	.string "syscall_emulate_callback"
 .Lname3917:
 	.string "sys_getresuid32"
 .Lname3919:

@@ -32,6 +32,7 @@
 #include <kernel/vio.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
+#include <sched/except-handler.h>
 #include <sched/pid.h>
 
 #include <hybrid/atomic.h>
@@ -73,18 +74,13 @@ DATDEF byte_t x86_memcpy_nopf_ret_pointer[];
 
 
 
-#ifdef __x86_64__
-#define ir_pip ir_rip
-#else /* __x86_64__ */
-#define ir_pip ir_eip
-#endif /* !__x86_64__ */
 
 INTERN struct icpustate *FCALL
 x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 #if 1
-#define IS_USER() (ecode & PAGEFAULT_F_USERSPACE)
+#define isuser() (ecode & PAGEFAULT_F_USERSPACE)
 #else
-#define IS_USER() icpustate_isuser(state)
+#define isuser() icpustate_isuser(state)
 #endif
 	vm_virt_t addr;
 	uintptr_t pc;
@@ -151,7 +147,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 		goto done;
 	}
 	effective_vm = &vm_kernel;
-	if (page < (vm_vpage_t)KERNEL_BASE_PAGE || IS_USER())
+	if (page < (vm_vpage_t)KERNEL_BASE_PAGE || isuser())
 		effective_vm = THIS_VM;
 	{
 		struct task_connections con;
@@ -219,7 +215,7 @@ again_lookup_node_already_locked:
 							uintptr_t sp;
 							/* Must unwind the stack to restore the IP of the VIO call-site. */
 							sp = icpustate_getsp(state);
-							if (IS_USER() && sp >= KERNEL_BASE)
+							if (isuser() && sp >= KERNEL_BASE)
 								goto do_normal_vio; /* Validate the stack-pointer for user-space. */
 							TRY {
 								callsite_eip = *(uintptr_t *)sp;
@@ -230,13 +226,13 @@ again_lookup_node_already_locked:
 							}
 							/* Unwind the stack, and remember the call-site instruction pointer. */
 #ifdef __x86_64__
-							if (IS_USER() != (callsite_eip < KERNEL_BASE))
+							if (isuser() != (callsite_eip < KERNEL_BASE))
 								goto do_normal_vio;
 							irregs_wrip(&state->ics_irregs, callsite_eip);
 							irregs_wrsp(&state->ics_irregs, sp + 8);
 #else /* __x86_64__ */
 							if (sp != (uintptr_t)(&state->ics_irregs_k + 1) ||
-							    IS_USER()) {
+							    isuser()) {
 								if (callsite_eip >= KERNEL_BASE)
 									goto do_normal_vio;
 								irregs_wrip(&state->ics_irregs_k, callsite_eip);
@@ -720,7 +716,7 @@ done_before_pop_connections:
 		} EXCEPT {
 			task_disconnectall();
 			task_popconnections(&con);
-			if (IS_USER())
+			if (isuser())
 				PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)pc);
 			RETHROW();
 		}
@@ -749,19 +745,19 @@ throw_segfault:
 			old_eip = *(uintptr_t *)sp;
 		} EXCEPT {
 			if (!was_thrown(E_SEGFAULT)) {
-				if (IS_USER())
+				if (isuser())
 					PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)pc);
 				RETHROW();
 			}
 			goto not_a_badcall;
 		}
 #ifdef __x86_64__
-		if (IS_USER() != (old_eip >= KERNEL_BASE))
+		if (isuser() != (old_eip >= KERNEL_BASE))
 			goto not_a_badcall;
 		irregs_wrip(&state->ics_irregs, old_eip);
 		irregs_wrsp(&state->ics_irregs, sp + 8);
 #else /* __x86_64__ */
-		if (sp != (uintptr_t)(&state->ics_irregs_k + 1) || IS_USER()) {
+		if (sp != (uintptr_t)(&state->ics_irregs_k + 1) || isuser()) {
 			if (old_eip >= KERNEL_BASE)
 				goto not_a_badcall;
 			irregs_wrip(&state->ics_irregs_k, old_eip);
@@ -841,8 +837,8 @@ do_unwind_state:
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_SEGFAULT))
 		state = kernel_debugtrap_r(state, SIGSEGV);
-	x86_unwind_interrupt(state);
-#undef IS_USER
+	x86_userexcept_unwind_interrupt(state);
+#undef isuser
 }
 
 DECL_END

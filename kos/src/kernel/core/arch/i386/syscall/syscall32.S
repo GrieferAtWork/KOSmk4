@@ -47,7 +47,7 @@ EXTERN(__asm32_exsyscallrouter_sysenter)
 
 
 .section .text
-INTERN_FUNCTION(x86_int80_emulation)
+INTERN_FUNCTION(x86_syscall_emulate32_int80h_r)
 	.cfi_startproc simple
 	/* `struct icpustate *%ecx'
 	 * NOTE: ENDOF(%ecx->IRREGS) is located at the end (top) of our kernel-stack! */
@@ -106,13 +106,13 @@ INTERN_FUNCTION(x86_int80_emulation)
 #endif
 	jmp    x86_idt_syscall
 	.cfi_endproc
-END(x86_int80_emulation)
+END(x86_syscall_emulate32_int80h_r)
 
 
 
 
 .section .text
-INTERN_FUNCTION(x86_sysenter_emulation)
+PUBLIC_FUNCTION(x86_syscall_emulate32_sysenter_r)
 	.cfi_startproc simple
 	/* `struct icpustate *%ecx'
 	 * NOTE: ENDOF(%ecx->IRREGS) is located at the end (top) of our kernel-stack! */
@@ -171,7 +171,7 @@ INTERN_FUNCTION(x86_sysenter_emulation)
 #endif
 	jmp    .Ldo_prepared_sysenter
 	.cfi_endproc
-END(x86_sysenter_emulation)
+END(x86_syscall_emulate32_sysenter_r)
 
 
 
@@ -308,13 +308,13 @@ INTERN_FUNCTION(x86_sysenter_main)
 	movl   %ss:0(%esp), %esp
 	/* Construct an IRET tail. */
 	pushl  $(SEGMENT_USER_DATA_RPL) /* %ss */
-	pushl  %ebp                   /* %useresp */
+	pushl  %ebp                     /* %useresp */
 	pushfl
 	orl    $(EFLAGS_IF), %ss:(%esp)
 	.cfi_reg_offset %eflags, 0, %esp
 	pushl  $(SEGMENT_USER_CODE_RPL) /* %cs */
 	.cfi_reg_offset %eflags, 4, %esp
-	pushl  %edi                   /* %eip */
+	pushl  %edi                     /* %eip */
 	.cfi_reg_offset %eflags, 8, %esp
 
 	/* Switch over to IRET signal framing */
@@ -327,12 +327,12 @@ INTERN_FUNCTION(x86_sysenter_main)
 	/* Enable interrupts. */
 	sti
 .Ldo_prepared_sysenter:
-	cmpl   $__NR_syscall_max, %eax
+	cmpl   $(__NR_syscall_max), %eax
 	ja     1f
 	jmpl   *%ss:__asm32_syscallrouter_sysenter(,%eax,4)
-1:	cmpl   $__NR_exsyscall_min, %eax
+1:	cmpl   $(__NR_exsyscall_min), %eax
 	jb     __asm32_sysenter_invalid
-	cmpl   $__NR_exsyscall_max, %eax
+	cmpl   $(__NR_exsyscall_max), %eax
 	ja     __asm32_sysenter_invalid
 	jmpl   *%ss:__asm32_exsyscallrouter_sysenter - ((__NR_exsyscall_min * 4) & 0xffffffff)(,%eax,4)
 	.cfi_endproc
@@ -345,20 +345,20 @@ INTERN_FUNCTION(x86_idt_syscall)
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
-	cmpl   $__NR_syscall_max, %eax
+	cmpl   $(__NR_syscall_max), %eax
 	ja     1f
 	jmpl   *%ss:__asm32_syscallrouter_int80(,%eax,4)
-1:	cmpl   $__NR_exsyscall_min, %eax
+1:	cmpl   $(__NR_exsyscall_min), %eax
 	jb     __asm32_int80_invalid
-	cmpl   $__NR_exsyscall_max, %eax
+	cmpl   $(__NR_exsyscall_max), %eax
 	ja     __asm32_int80_invalid
-	jmpl   *%ss:__asm32_exsyscallrouter_int80 - ((__NR_exsyscall_min * 4) & 0xffffffff)(,%eax,4)
+	jmpl   *%ss:(__asm32_exsyscallrouter_int80 - ((__NR_exsyscall_min * 4) & 0xffffffff))(,%eax,4)
 	.cfi_endproc
 END(x86_idt_syscall)
 
 
-#define TEST_DOUBLE_WIDE(sysno_reg,tempreg_l,tempreg_b,segment_prefix)           \
-	cmpl   $__NR_syscall_max, sysno_reg;                                         \
+#define TEST_DOUBLE_WIDE(sysno_reg, tempreg_l, tempreg_b, segment_prefix)        \
+	cmpl   $(__NR_syscall_max), sysno_reg;                                       \
 	ja     1234f;                                                                \
 	movl   sysno_reg, tempreg_l;                                                 \
 	shrl   $1, tempreg_l;                                                        \
@@ -366,11 +366,7 @@ END(x86_idt_syscall)
 	movb   segment_prefix x86_syscall_register_count(,tempreg_l,1), tempreg_b;   \
 	jmp    1235f;                                                                \
 1234:                                                                            \
-	subl   $__NR_exsyscall_min, sysno_reg;                                       \
-	jb    .Lgot_sysenter_args;                                                   \
-	cmpl   $(__NR_exsyscall_max - __NR_exsyscall_min), sysno_reg;                \
-	ja    .Lgot_sysenter_args;                                                   \
-	movl   sysno_reg, tempreg_l;                                                 \
+	leal   -__NR_exsyscall_min(sysno_reg), tempreg_l;                            \
 	shrl   $1, tempreg_l;                                                        \
 	EXTERN(x86_exsyscall_register_count);                                        \
 	movb   segment_prefix x86_exsyscall_register_count(,tempreg_l,1), tempreg_b; \
@@ -379,8 +375,7 @@ END(x86_idt_syscall)
 	jz     1234f;                                                                \
 	shrb   $4, tempreg_b;                                                        \
 1234:                                                                            \
-	testb  $0x8, tempreg_b;                                                      \
-/**/
+	testb  $0x8, tempreg_b;
 
 
 #ifndef CONFIG_NO_SYSCALL_TRACING
@@ -443,14 +438,14 @@ INTERN_FUNCTION(x86_sysenter_main_traced)
 	movl   %ecx, %fs
 
 	/* Load ARG[4] / ARG[5] if necessary */
-	cmpl   $__NR_syscall_max, %eax
+	cmpl   $(__NR_syscall_max), %eax
 	ja     1f
 	movl   %eax, %ecx
 	shrl   $1, %ecx
 	EXTERN(x86_syscall_register_count)
 	movb   x86_syscall_register_count(,%ecx,1), %cl
 	jmp   .Lgot_mask
-1:	subl   $__NR_exsyscall_min, %eax
+1:	subl   $(__NR_exsyscall_min), %eax
 	jb    .Lgot_sysenter_args
 	cmpl   $(__NR_exsyscall_max - __NR_exsyscall_min), %eax
 	ja    .Lgot_sysenter_args
@@ -499,12 +494,12 @@ INTERN_FUNCTION(x86_sysenter_main_traced)
 
 	popfl_cfi_r
 
-	cmpl   $__NR_syscall_max, %eax
+	cmpl   $(__NR_syscall_max), %eax
 	ja     1f
 	jmpl   *%ss:__asm32_syscallrouter_sysenter(,%eax,4)
-1:	cmpl   $__NR_exsyscall_min, %eax
+1:	cmpl   $(__NR_exsyscall_min), %eax
 	jb     __asm32_sysenter_invalid
-	cmpl   $__NR_exsyscall_max, %eax
+	cmpl   $(__NR_exsyscall_max), %eax
 	ja     __asm32_sysenter_invalid
 	jmpl   *%ss:__asm32_exsyscallrouter_sysenter - ((__NR_exsyscall_min * 4) & 0xffffffff)(,%eax,4)
 	.cfi_restore_state
@@ -573,12 +568,12 @@ INTERN_FUNCTION(x86_idt_syscall_traced)
 
 	popfl_cfi_r
 
-	cmpl   $__NR_syscall_max, %eax
+	cmpl   $(__NR_syscall_max), %eax
 	ja     1f
 	jmpl   *%ss:__asm32_syscallrouter_int80(,%eax,4)
-1:	cmpl   $__NR_exsyscall_min, %eax
+1:	cmpl   $(__NR_exsyscall_min), %eax
 	jb     __asm32_int80_invalid
-	cmpl   $__NR_exsyscall_max, %eax
+	cmpl   $(__NR_exsyscall_max), %eax
 	ja     __asm32_int80_invalid
 	jmpl   *%ss:__asm32_exsyscallrouter_int80 - ((__NR_exsyscall_min * 4) & 0xffffffff)(,%eax,4)
 	.cfi_endproc
@@ -611,7 +606,7 @@ INTERN_FUNCTION(__asm32_bad_sysenter_extension)
 
 	/* Check if we must sign-extend the error return value. */
 	pushl_cfi_r %ecx
-	TEST_DOUBLE_WIDE(%eax,%ecx,%cl,%ss:)
+	TEST_DOUBLE_WIDE(%eax, %ecx, %cl, %ss:)
 	popl_cfi_r %ecx
 	jz     1f
 	movl   $-1, %edx
@@ -784,325 +779,29 @@ END(sys_invalid0)
 .cfi_startproc
 INTERN_FUNCTION(sys_invalid1)
 	movl   $(SYS_INVALID_ENCODE_COUNT(1)), %ecx
-	jmp .Lsys_invalid_common
+	jmp    .Lsys_invalid_common
 END(sys_invalid1)
 INTERN_FUNCTION(sys_invalid2)
 	movl   $(SYS_INVALID_ENCODE_COUNT(2)), %ecx
-	jmp .Lsys_invalid_common
+	jmp    .Lsys_invalid_common
 END(sys_invalid2)
 INTERN_FUNCTION(sys_invalid3)
 	movl   $(SYS_INVALID_ENCODE_COUNT(3)), %ecx
-	jmp .Lsys_invalid_common
+	jmp    .Lsys_invalid_common
 END(sys_invalid3)
 INTERN_FUNCTION(sys_invalid4)
 	movl   $(SYS_INVALID_ENCODE_COUNT(4)), %ecx
-	jmp .Lsys_invalid_common
+	jmp    .Lsys_invalid_common
 END(sys_invalid4)
 INTERN_FUNCTION(sys_invalid5)
 	movl   $(SYS_INVALID_ENCODE_COUNT(5)), %ecx
-	jmp .Lsys_invalid_common
+	jmp    .Lsys_invalid_common
 END(sys_invalid5)
 INTERN_FUNCTION(sys_invalid6)
 	movl   $(SYS_INVALID_ENCODE_COUNT(6)), %ecx
-	jmp .Lsys_invalid_common
+	jmp    .Lsys_invalid_common
 END(sys_invalid6)
 .cfi_endproc
 
 #include "unimplemented32.c.inl"
-
-
-
-
-
-
-/* Emulate a system call invocation, with arguments passed via the
- * standard argument passage mechanism, using the given `regs'.
- * On i386, this means that arguments are found in `regs->ics_irregs_u.ir_esp'
- * @param: sysno:         The system call ID that is being invoked.
- * @param: enable_except: When true, enable support for exceptions.
- *                        Otherwise, translate exceptions to errno codes,
- *                        and write them into the return register of `regs'. */
-//PUBLIC struct icpustate *FCALL
-//syscall_emulate_callback(struct icpustate *__restrict regs,
-//                         uintptr_t sysno,
-//                         bool enable_except)
-.section .text
-PUBLIC_FUNCTION(syscall_emulate_callback)
-	.cfi_startproc
-	INTERN(x86_syscall_emulate_callback_personality)
-	.cfi_personality 0, x86_syscall_emulate_callback_personality
-	pushl_cfi   %edx /* Backup `sysno' for unwinding (s.a. `x86_syscall_emulate_callback_personality') */
-	pushl_cfi   %ecx /* Backup `regs' for unwinding (s.a. `x86_syscall_emulate_callback_personality') */
-	pushl_cfi_r %edi
-	pushl_cfi_r %esi
-	movl   %ecx, %edi
-
-	/* Allocate stack memory for the system call arguments. */
-	subl   $24, %esp
-	.cfi_adjust_cfa_offset 24
-
-	/* Figure out how many arguments need to be copied. */
-	cmpl   $__NR_syscall_max, %edx
-	ja     1f
-	movl   %edx, %eax
-	shrl   $1, %eax
-	EXTERN(x86_syscall_register_count)
-	movb   x86_syscall_register_count(,%eax,1), %al
-	jmp   .Lgot_mask_emu
-1:	subl   $__NR_exsyscall_min, %edx
-	jb    .Linvalid_sysno
-	cmpl   $(__NR_exsyscall_max - __NR_exsyscall_min), %edx
-	ja    .Linvalid_sysno
-	movl   %edx, %eax
-	shrl   $1, %eax
-	EXTERN(x86_exsyscall_register_count)
-	movb   x86_exsyscall_register_count(,%eax,1), %al
-.Lgot_mask_emu:
-	testl  $1, %edx
-	jz     1f
-	shrb   $4, %al
-1:	testb  $0x8, %al
-	setnz  %cl  /* Used below by `testb  %cl, %cl /* Check if the return value needs to be extended...' */
-	andb   $0x7, %al
-	movzbl %al, %eax
-	movl   OFFSET_ICPUSTATE_IRREGS+OFFSET_IRREGS_ESP(%edi), %esi
-	jmp   *.Larguments_copy_jump_table(,%eax,4)
-.pushsection .rodata
-INTERN_OBJECT(.Larguments_copy_jump_table)
-	.long  .Lcopy0
-	.long  .Lcopy1
-	.long  .Lcopy2
-	.long  .Lcopy3
-	.long  .Lcopy4
-	.long  .Lcopy5
-	.long  .Lcopy6
-END(.Larguments_copy_jump_table)
-.popsection
-INTERN(x86_syscall_emulate_callback_guard_begin)
-INTERN(x86_syscall_emulate_callback_guard_end)
-x86_syscall_emulate_callback_guard_begin = .
-
-	/* Copy arguments. */
-#define COPY_ARGUMENT(offset) movl offset(%esi), %eax; movl %eax, offset(%esp)
-.Lcopy6:
-	COPY_ARGUMENT(20)
-.Lcopy5:
-	COPY_ARGUMENT(16)
-.Lcopy4:
-	COPY_ARGUMENT(12)
-.Lcopy3:
-	COPY_ARGUMENT(8)
-.Lcopy2:
-	COPY_ARGUMENT(4)
-.Lcopy1:
-	COPY_ARGUMENT(0)
-#undef COPY_ARGUMENT
-.Lcopy0:
-
-	.cfi_remember_state
-	/* Load the C-level prototype of the system call that should be invoked. */
-	EXTERN(__c32_syscallrouter)
-	EXTERN(__c32_exsyscallrouter)
-	cmpl   $__NR_syscall_max, %edx
-	ja     1f
-	movl   __c32_syscallrouter(,%edx,4), %edx
-	jmp    2f
-1:	cmpl   $__NR_exsyscall_min, %edx
-	jb     .Linvalid_sysno
-	cmpl   $__NR_exsyscall_max, %edx
-	ja     .Linvalid_sysno
-	movl   __c32_exsyscallrouter - ((__NR_exsyscall_min * 4) & 0xffffffff)(,%edx,4), %edx
-2:
-
-	/* Actually invoke the system call. */
-	testb  %cl, %cl /* Check if the return value needs to be extended. */
-	jz     1f
-	call  *%edx
-	movl   %edx, OFFSET_ICPUSTATE_GPREGS+OFFSET_GPREGS_EDX(%edi)
-	jmp    2f
-1:	call  *%edx
-2:	movl   %eax, OFFSET_ICPUSTATE_GPREGS+OFFSET_GPREGS_EAX(%edi)
-
-x86_syscall_emulate_callback_guard_end = .
-
-	movl   %edi, %eax
-	addl   $24, %esp
-	.cfi_adjust_cfa_offset -24
-	popl_cfi_r %esi
-	popl_cfi_r %edi
-	addl   $8, %esp
-	.cfi_adjust_cfa_offset -8
-	ret    $4
-.Linvalid_sysno:
-	.cfi_restore_state
-	addl   $24, %esp
-	.cfi_adjust_cfa_offset -24
-	movl   %edi, %eax /* EAX = regs */
-	popl_cfi_r %esi
-	popl_cfi_r %edi   /* Restore EDI */
-	addl   $8, %esp
-	.cfi_adjust_cfa_offset -8
-	/* Check if we're simply supposed to return -ENOSYS */
-	cmpl   $0, 4(%esp)
-	jnz    1f
-	/* Just return -ENOSYS to user-space */
-	movl   $-ENOSYS, OFFSET_ICPUSTATE_GPREGS+OFFSET_GPREGS_EAX(%eax)
-	ret    $4
-1:	.cfi_endproc
-	.cfi_startproc
-	pushl_cfi $0   /* ARG[5] */
-	pushl_cfi $0   /* ARG[4] */
-	pushl_cfi $0   /* ARG[3] */
-	pushl_cfi $0   /* ARG[2] */
-	pushl_cfi $0   /* ARG[1] */
-	pushl_cfi $0   /* ARG[0] */
-	pushl_cfi %edx /* SYSNO */
-
-	/* Try to load as many system call arguments as possible. */
-	movl   OFFSET_ICPUSTATE_IRREGS+OFFSET_IRREGS_ESP(%eax), %eax
-	cmpl   $KERNEL_BASE, %eax
-	jae    1f
-	EXCEPT_HANDLERS_START
-		EXCEPT_HANDLERS_CATCH(
-			E_SEGFAULT,
-			.Linvalid_sysno_guard_start,
-			.Linvalid_sysno_guard_end,
-			.Linvalid_sysno_guard_entry)
-	EXCEPT_HANDLERS_END
-.Linvalid_sysno_guard_start:
-#define COPY_ARGUMENT(offset) movl offset(%eax), %edx; movl %edx, (offset+4)(%esp)
-	COPY_ARGUMENT(0)  /* ARG[0] */
-	COPY_ARGUMENT(4)  /* ARG[1] */
-	COPY_ARGUMENT(8)  /* ARG[2] */
-	COPY_ARGUMENT(12) /* ARG[3] */
-	COPY_ARGUMENT(16) /* ARG[4] */
-	COPY_ARGUMENT(20) /* ARG[5] */
-#undef COPY_ARGUMENT
-.Linvalid_sysno_guard_end:
-.Linvalid_sysno_guard_entry:
-
-1:	/* Throw an `E_UNKNOWN_SYSTEMCALL' exception */
-	pushl_cfi $7
-	pushl_cfi $ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)
-	call   error_thrown
-	.cfi_endproc
-END(syscall_emulate_callback)
-
-
-
-
-
-.section .text
-PUBLIC_FUNCTION(syscall_emulate_int80)
-	.cfi_startproc
-	INTERN(syscall_emulate_int80_personality)
-	.cfi_personality 0, syscall_emulate_int80_personality
-
-	movl   OFFSET_ICPUSTATE_GPREGS+OFFSET_GPREGS_EAX(%ecx), %eax
-
-	/* Push system call arguments. */
-	pushl_cfi %ecx /* Backup `regs' for unwinding (s.a. `syscall_emulate_int80_personality') */
-	pushl_cfi OFFSET_ICPUSTATE_GPREGS+OFFSET_GPREGS_EBP(%ecx) /* ARG[5] */
-	pushl_cfi OFFSET_ICPUSTATE_GPREGS+OFFSET_GPREGS_EDI(%ecx) /* ARG[4] */
-	pushl_cfi OFFSET_ICPUSTATE_GPREGS+OFFSET_GPREGS_ESI(%ecx) /* ARG[3] */
-	pushl_cfi OFFSET_ICPUSTATE_GPREGS+OFFSET_GPREGS_EDX(%ecx) /* ARG[2] */
-	pushl_cfi OFFSET_ICPUSTATE_GPREGS+OFFSET_GPREGS_ECX(%ecx) /* ARG[1] */
-	pushl_cfi OFFSET_ICPUSTATE_GPREGS+OFFSET_GPREGS_EBX(%ecx) /* ARG[0] */
-
-	/* Load the C-level prototype of the system call that should be invoked. */
-	EXTERN(__c32_syscallrouter)
-	EXTERN(__c32_exsyscallrouter)
-	cmpl   $__NR_syscall_max, %eax
-	ja     1f
-	movl   __c32_syscallrouter(,%eax,4), %edx
-	jmp    2f
-1:	cmpl   $__NR_exsyscall_min, %eax
-	jb     .Linvalid_sysno_int80
-	cmpl   $__NR_exsyscall_max, %eax
-	ja     .Linvalid_sysno_int80
-	movl   __c32_exsyscallrouter - ((__NR_exsyscall_min * 4) & 0xffffffff)(,%eax,4), %edx
-2:
-	/* Actually invoke the system call. */
-	call   *%edx
-INTERN(x86_syscall_emulate_int80_guard)
-x86_syscall_emulate_int80_guard = .
-	addl   $24, %esp
-	.cfi_adjust_cfa_offset -24
-	popl_cfi %ecx
-
-	/* Store the regular system call return value. (and check for it being double-wide) */
-	xchgl  OFFSET_ICPUSTATE_GPREGS+OFFSET_GPREGS_EAX(%ecx), %eax
-	pushl_cfi %ecx
-	TEST_DOUBLE_WIDE(%eax,%ecx,%cl,)
-	popl_cfi %ecx
-	jz     1f
-	movl   %edx, OFFSET_ICPUSTATE_GPREGS+OFFSET_GPREGS_EAX(%ecx)
-1:	movl   %ecx, %eax
-	ret
-	.cfi_adjust_cfa_offset 28
-.Linvalid_sysno_int80:
-	/* Check if we're supposed to return -ENOSYS. */
-	testl  $EFLAGS_CF, OFFSET_ICPUSTATE_IRREGS+OFFSET_IRREGS_EFLAGS(%ecx)
-	jnz    1f
-	addl   $28, %esp
-	.cfi_adjust_cfa_offset -28
-	movl   $-ENOSYS, OFFSET_ICPUSTATE_GPREGS+OFFSET_GPREGS_EAX(%ecx)
-	movl   %ecx, %eax
-	ret
-	.cfi_adjust_cfa_offset 28
-1:	pushl_cfi %eax /* SYSNO */
-	/* Throw an `E_UNKNOWN_SYSTEMCALL' exception */
-	pushl_cfi $7
-	pushl_cfi $ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)
-	call   error_thrown
-	.cfi_endproc
-END(syscall_emulate_int80)
-
-
-
-
-
-
-.section .text
-PUBLIC_FUNCTION(syscall_emulate_sysenter)
-	.cfi_startproc
-	/* Load return registers according to our sysenter ABI. */
-	/* state->ics_irregs_u.ir_eip = state->ics_gpregs.gp_edi; */
-	movl   OFFSET_ICPUSTATE_GPREGS+OFFSET_GPREGS_EDI(%ecx), %eax
-	movl   %eax, OFFSET_ICPUSTATE_IRREGS+OFFSET_IRREGS_EIP(%ecx)
-	/* state->ics_irregs_u.ir_esp = state->ics_gpregs.gp_ebp; */
-	movl   OFFSET_ICPUSTATE_GPREGS+OFFSET_GPREGS_EBP(%ecx), %eax
-	movl   %eax, OFFSET_ICPUSTATE_IRREGS+OFFSET_IRREGS_ESP(%ecx)
-
-	/* TODO */
-
-	movl   %ecx, %eax
-	ret
-	.cfi_endproc
-END(syscall_emulate_sysenter)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf54dee2f */
+/* HASH CRC-32:0xc2fbc423 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __CREDIRECT(,int,__NOTHROW,__localdep_rand,(void),random,())
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcsfry) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsfry))(__WCHAR_TYPE__ *__restrict __string) {
-#line 728 "kos/src/libc/magic/string.c"
+#line 735 "kos/src/libc/magic/string.c"
 	__WCHAR_TYPE__ __temp;
 	__SIZE_TYPE__ __i, __count = __localdep_wcslen(__string);
 	for (__i = 0; __i < __count; ++__i) {

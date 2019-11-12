@@ -76,41 +76,6 @@ struct ATTR_PACKED gcc_lsda {
 };
 /* END::: GCC DATA LAYOUT */
 
-/* Intended to be called at the end of C-level implementations of X86 interrupts:
- *  - The caller must have already filled in the exception code and pointers.
- *  - If `state' refers to a user-code location, directly propagate the exception to user-space.
- *  - Otherwise, clear out `ei_trace' and copy `state' into `ei_state',
- *    then start unwind the kernel stack normally, starting at `state'.
- * WARNING: This function will not clean up the scope of the caller, or of their caller, and so on.
- *          It will start cleaning up the stack with `state', meaning that any intermediate stack
- *          frames will not have their destructors called (the same way a longjmp() wouldn't either) */
-INTDEF ATTR_NORETURN void NOTHROW(FCALL x86_unwind_interrupt)(struct icpustate *__restrict state);
-
-/* Called to propagate the current exception into user-space, then unwind
- * `state' to the first user-space exception handler, or if not found, to
- * the effective unhandled-exception-handler set by user-space, or if that
- * one doesn't exist, the function will terminate the calling process and
- * will not return normally.
- * Upon normal return, `state' will have been updated to enter the first
- * user-space exception handler.
- * @param: reason: How is the exception being propagated?
- *                 One of { TASK_RPC_REASON_ASYNCUSER,
- *                          TASK_RPC_REASON_SYSCALL | TASK_RPC_REASON_SYSCALL_METHOD_* }
- *                 Where `TASK_RPC_REASON_SYSCALL' refers to the exception being
- *                 propagated because it happened while inside of a system call,
- *                 and `TASK_RPC_REASON_ASYNCUSER' referring to any other reason.
- * NOTE: If the given `state' does not refer to user-space, this
- *       function will simply re-return it without modifications.
- *       Also note that modifications made to `state' will take note
- *       of user-space RPC redirection. - aka `x86_rpc_user_redirection' */
-INTDEF ATTR_NORETURN void
-NOTHROW(FCALL x86_handle_except_before_userspace)(struct ucpustate *__restrict ustate,
-                                                  unsigned int reason);
-#define TASK_RPC_REASON_SYSCALL_METHOD_INT80     0x0000
-#define TASK_RPC_REASON_SYSCALL_METHOD_SYSENTER  0x1000 /* sysenter/syscall */
-#define TASK_RPC_REASON_GETMETHOD(x)            ((x) & 0x1000)
-#define TASK_RPC_REASON_GETREASON(x)            ((x) & ~0x1000)
-
 
 
 DECL_END

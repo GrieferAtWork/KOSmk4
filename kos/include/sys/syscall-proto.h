@@ -32,10 +32,10 @@
 #define __WANT_SYSCALL_ARGUMENT_TYPES 1
 #define __WANT_SYSCALL_RETURN_TYPES   1
 
-#include <asm/unistd.h>
-#include <bits/syscall.h>
 #include <__crt.h>
 
+#include <asm/unistd.h>
+#include <bits/syscall.h>
 
 #define __PRIVATE_SYSCALL_PROTO_0(name, decl) __NRRT_##name decl(void)
 #define __PRIVATE_SYSCALL_PROTO_1(name, decl) __NRRT_##name decl(__NRAT0_##name)

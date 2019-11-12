@@ -145,6 +145,13 @@ memcpy:([nonnull] void *__restrict dst,
 	return dst;
 }
 
+
+/* TODO: `memmoveup' / `memmovedown'
+ *    -> Same as memmove, however allow:
+ *      memmoveup:   assert(dst >= src);
+ *      memmovedown: assert(dst <= src);
+ */
+
 @@Move memory between potentially overlapping memory blocks.
 @@@return: * : Always re-returns `dst'
 [fast][libc][kernel][std][nobuiltin][ATTR_LEAF]

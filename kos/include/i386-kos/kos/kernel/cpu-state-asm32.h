@@ -26,8 +26,15 @@
 #if defined(__i386__) && !defined(__x86_64__)
 #include <hybrid/__asm.h>
 
+#define ASM_CFI_REL_OFFSET_RESTORE_GPREGSNSP(offset)              \
+	__ASM_L(.cfi_rel_offset %edi, ((offset) + OFFSET_GPREGS_EDI)) \
+	__ASM_L(.cfi_rel_offset %esi, ((offset) + OFFSET_GPREGS_ESI)) \
+	__ASM_L(.cfi_rel_offset %ebp, ((offset) + OFFSET_GPREGS_EBP)) \
+	__ASM_L(.cfi_rel_offset %ebx, ((offset) + OFFSET_GPREGS_EBX)) \
+	__ASM_L(.cfi_rel_offset %edx, ((offset) + OFFSET_GPREGS_EDX)) \
+	__ASM_L(.cfi_rel_offset %ecx, ((offset) + OFFSET_GPREGS_ECX)) \
+	__ASM_L(.cfi_rel_offset %eax, ((offset) + OFFSET_GPREGS_EAX))
 
-/* ... */
 
 #endif /* __i386__ && !__x86_64__ */
 

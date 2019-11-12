@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_KOS_KERNEL_CPU_STATE_ASM32_H
-#define _I386_KOS_KOS_KERNEL_CPU_STATE_ASM32_H 1
+#ifndef _I386_KOS_KOS_KERNEL_CPU_STATE_ASM_H
+#define _I386_KOS_KOS_KERNEL_CPU_STATE_ASM_H 1
 
 #include <hybrid/host.h>
 
@@ -27,4 +27,4 @@
 #include "cpu-state-asm32.h"
 #endif /* !__x86_64__ */
 
-#endif /* !_I386_KOS_KOS_KERNEL_CPU_STATE_ASM32_H */
+#endif /* !_I386_KOS_KOS_KERNEL_CPU_STATE_ASM_H */

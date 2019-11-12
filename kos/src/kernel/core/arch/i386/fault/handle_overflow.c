@@ -25,6 +25,7 @@
 #include <kernel/except.h>
 #include <kernel/fault.h>
 #include <kernel/types.h>
+#include <sched/except-handler.h>
 
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
@@ -48,7 +49,7 @@ x86_handle_overflow(struct icpustate *__restrict state) {
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	PERTASK_SET(_this_exception_info.ei_data.e_faultaddr,
 	            (void *)icpustate_getpc(state));
-	x86_unwind_interrupt(state);
+	x86_userexcept_unwind_interrupt(state);
 }
 
 DECL_END

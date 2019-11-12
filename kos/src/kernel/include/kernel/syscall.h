@@ -34,6 +34,7 @@
 
 #include <__crt.h>
 #include <kernel/compiler.h>
+#include <bits/compat.h>
 
 #include <kernel/arch/syscall.h>
 #include <kernel/types.h>
@@ -49,7 +50,8 @@ DECL_BEGIN
 
 #ifndef __ARCH_SYSCALLCC
 #define __ARCH_SYSCALLCC KCALL
-#endif
+#endif /* !__ARCH_SYSCALLCC */
+
 #ifndef __ARCH_DEFINE_SYSCALL_COMMON
 #define __ARCH_DEFINE_SYSCALL_COMMON(name) /* nothing */
 #endif /* !__ARCH_DEFINE_SYSCALL_COMMON */
@@ -146,35 +148,18 @@ FUNDEF void FCALL syscall_trace(struct syscall_trace_args const *__restrict args
 FUNDEF ssize_t KCALL
 syscall_printtrace(__pformatprinter printer, void *arg,
                    struct syscall_trace_args const *__restrict args);
+
+#ifdef __ARCH_HAVE_COMPAT
+FUNDEF void FCALL
+syscall_trace_compat(struct syscall_trace_args const *__restrict args);
+FUNDEF ssize_t KCALL
+syscall_printtrace_compat(__pformatprinter printer, void *arg,
+                          struct syscall_trace_args const *__restrict args);
+#endif /* __ARCH_HAVE_COMPAT */
+
 #else /* !CONFIG_NO_SYSCALL_TRACING */
 #define syscall_tracing_getenabled()  false
 #endif /* CONFIG_NO_SYSCALL_TRACING */
-
-struct icpustate;
-
-/* Emulate a system call invocation, with arguments passed via the
- * standard argument passage mechanism, using the given `regs'.
- * On i386, this means that arguments are found in `regs->ics_irregs_u.ir_esp'
- * @param: regs:          The user-space register context from which to
- *                        take arguments to-be passed to the system call.
- * @param: sysno:         The system call ID that is being invoked.
- * @param: enable_except: When true, enable support for exceptions.
- *                        Otherwise, translate exceptions to errno codes,
- *                        and write them into the return register of `regs'. */
-FUNDEF struct icpustate *FCALL
-syscall_emulate_callback(struct icpustate *__restrict regs,
-                         uintptr_t sysno,
-                         bool enable_except);
-
-struct rpc_syscall_info;
-/* Emulate a system call, given its all possible information about it.
- * @param: regs:    The user-space register context in which the
- *                  system call should be executed.
- * @param: sc_info: Information about the system call that should be emulated. */
-FUNDEF struct icpustate *FCALL
-syscall_emulate(struct icpustate *__restrict regs,
-                struct rpc_syscall_info *__restrict sc_info);
-
 #endif /* !__CC__ */
 
 

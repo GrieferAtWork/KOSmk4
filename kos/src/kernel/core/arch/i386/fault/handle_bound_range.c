@@ -26,6 +26,7 @@
 #include <kernel/fault.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
+#include <sched/except-handler.h>
 #include <sched/task.h>
 
 #include <asm/cpu-flags.h>
@@ -109,7 +110,7 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	}
 	icpustate_setpc(state, (uintptr_t)pc);
-	x86_unwind_interrupt(state);
+	x86_userexcept_unwind_interrupt(state);
 }
 
 DECL_END

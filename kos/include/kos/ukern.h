@@ -60,6 +60,12 @@ __DECL_BEGIN
 	(*(SYSCALL_PROTO_POINTER(name))(void *)((__UINTPTR_TYPE__)(base) + \
 	                                        USERKERN_SYSCALL_ENCODE(__NR_##name)))
 
+/* Same as `userkern_syscall()', but enable exceptions (s.a. `set_exception_handler()'),
+ * as opposed to causing the system call to return a negative errno code (s.a. `E_ISERR()') */
+#define userkern_Syscall(base, name)                                   \
+	(*(SYSCALL_PROTO_POINTER(name))(void *)((__UINTPTR_TYPE__)(base) + \
+	                                        USERKERN_SYSCALL_ENCODE_EX(__NR_##name, 1)))
+
 
 /* Access fields of- or return the base address of the userkern descriptor
  * for the calling thread. - Based on architecture, these functions assume

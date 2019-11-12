@@ -56,6 +56,22 @@
 
 #include <librpc/rpc.h> /* RPC_SCHEDULE_FLAG_* */
 
+#ifdef __ARCH_HAVE_COMPAT
+#if __ARCH_COMPAT_SIZEOF_POINTER == 4
+#include <asm/syscalls32.inl>
+#include <sys/syscall-trace32.h>
+#define COMPAT_NR(x)       __NR32##x
+#define COMPAT_SYSCALL(x)  SYSCALL32_##x
+#define COMPAT_LS_SYSCALLS <asm/ls_syscalls32.inl>
+#else /* __ARCH_COMPAT_SIZEOF_POINTER == 4 */
+#include <asm/syscalls64.inl>
+#include <sys/syscall-trace64.h>
+#define COMPAT_NR(x)       __NR64##x
+#define COMPAT_SYSCALL(x)  SYSCALL64_##x
+#define COMPAT_LS_SYSCALLS <asm/ls_syscalls64.inl>
+#endif /* __ARCH_COMPAT_SIZEOF_POINTER != 4 */
+#endif /* __ARCH_HAVE_COMPAT */
+
 DECL_BEGIN
 
 #ifndef ____idtype_t_defined
@@ -122,6 +138,65 @@ err_temp:
 	return temp;
 }
 
+#ifdef __ARCH_HAVE_COMPAT
+PUBLIC void FCALL
+syscall_trace_compat(struct syscall_trace_args const *__restrict args) {
+#if 1
+	if (args->ta_sysno == COMPAT_NR(_syslog))
+		return; /* Don't trace this one! */
+#endif
+	syscall_printtrace_compat(&kprinter,
+	                          (void *)(char *)KERN_TRACE,
+	                          args);
+}
+
+PUBLIC ssize_t KCALL
+syscall_printtrace_compat(pformatprinter printer, void *arg,
+                          struct syscall_trace_args const *__restrict args) {
+	ssize_t result, temp;
+	result = format_printf(printer, arg, "task[%u].compat_sys_", task_gettid_s());
+	if unlikely(result < 0)
+		goto done;
+
+	/* Trace system calls. */
+	switch (args->ta_sysno) {
+
+#define __SYSCALL(name)                                                           \
+	case COMPAT_NR(_##name):                                                      \
+		temp = format_printf(printer,                                             \
+		                     arg,                                                 \
+		                     #name "(" COMPAT_SYSCALL(_TRACE_ARGS_FORMAT_L)(name) \
+		                     COMPAT_SYSCALL(_TRACE_ARGS_ARGS)(name,               \
+		                         (COMPAT_NR(AM_##name)(args->ta_arg0,             \
+		                                               args->ta_arg1,             \
+		                                               args->ta_arg2,             \
+		                                               args->ta_arg3,             \
+		                                               args->ta_arg4,             \
+		                                               args->ta_arg5))            \
+		                     ));                                                  \
+		break;
+#include COMPAT_LS_SYSCALLS
+#undef __SYSCALL
+
+	default:
+		/* Unknown system call... */
+		temp = format_printf(printer, arg, "break:%#Ix?\n", args->ta_sysno);
+		goto done_check_and_account_temp;
+	}
+	if unlikely(temp < 0)
+		goto err_temp;
+	result += temp;
+	temp = (*printer)(arg, ")\n", 2);
+done_check_and_account_temp:
+	if unlikely(temp < 0)
+		goto err_temp;
+	result += temp;
+done:
+	return result;
+err_temp:
+	return temp;
+}
+#endif /* __ARCH_HAVE_COMPAT */
 
 
 

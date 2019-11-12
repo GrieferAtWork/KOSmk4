@@ -25,6 +25,7 @@
 #include <kernel/except.h>
 #include <kernel/fault.h>
 #include <kernel/types.h>
+#include <sched/except-handler.h>
 
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
@@ -52,7 +53,7 @@ x86_handle_divide_by_zero(struct icpustate *__restrict state) {
 	next_pc = (byte_t *)instruction_succ(pc);
 	if (next_pc)
 		icpustate_setpc(state, (uintptr_t)next_pc);
-	x86_unwind_interrupt(state);
+	x86_userexcept_unwind_interrupt(state);
 }
 
 DECL_END

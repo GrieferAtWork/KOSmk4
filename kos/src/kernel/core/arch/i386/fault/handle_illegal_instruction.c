@@ -36,6 +36,7 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/cpu.h>
+#include <sched/except-handler.h>
 #include <sched/pid.h>
 #include <sched/task.h>
 
@@ -91,11 +92,6 @@ typedef union {
 	u32 lohi[2];
 	u64 val64;
 } LOHI64;
-
-/* Emulate the `sysenter' instruction */
-INTDEF ATTR_NORETURN void FCALL
-x86_sysenter_emulation(struct icpustate *__restrict state);
-
 
 INTERN struct icpustate *FCALL
 x86_handle_illegal_instruction(struct icpustate *__restrict state) {
@@ -409,14 +405,8 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			if unlikely(!isuser())
 				goto generic_illegal_instruction; /* Not allowed from kernel-space. */
 			/* sysenter emulation */
-#if 1
-			/* Direct emulation (allowing for low-level assembly callbacks.) */
-			x86_sysenter_emulation(state);
-#else
-			/* High-level emulation (guaranties that the
-			 * function returns normally, or via an exception) */
-			return syscall_emulate_sysenter(state);
-#endif
+			/* Direct emulation (allowing for low-level assembly callbacks). */
+			x86_syscall_emulate32_sysenter_r(state);
 
 		case 0x0fc8 ... 0x0fcf: {
 			/* BSWAP r32  -- Added with 80486 */
@@ -1531,7 +1521,7 @@ set_generic_illegal_instruction:
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_ILLEGAL_INSTRUCTION))
 		kernel_debugtrap(state, SIGILL);
-	x86_unwind_interrupt(state);
+	x86_userexcept_unwind_interrupt(state);
 }
 
 DECL_END

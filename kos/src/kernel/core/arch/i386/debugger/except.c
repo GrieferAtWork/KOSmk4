@@ -34,15 +34,16 @@ if (gcc_opt.remove("-O3"))
 #include <kernel/except.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
+#include <sched/except-handler.h>
 #include <sched/task.h>
 
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state.h>
 
-#include <libinstrlen/instrlen.h>
-
 #include <string.h>
+
+#include <libinstrlen/instrlen.h>
 
 #include "../except.h"
 
@@ -183,7 +184,7 @@ not_a_badcall:
 	irregs_wrip(&state->ics_irregs, (uintptr_t)instruction_trysucc((void const *)pc));
 	PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)pc);
 do_unwind_state:
-	x86_unwind_interrupt(state);
+	x86_userexcept_unwind_interrupt(state);
 }
 
 
