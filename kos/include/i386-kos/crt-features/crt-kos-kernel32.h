@@ -2179,11 +2179,12 @@
 #define __CRT_HAVE_x86_rpc_redirection_iret 1
 #define __CRT_HAVE_x86_rpc_user_redirection 1
 #define __CRT_HAVE_x86_spurious_interrupts 1
-#define __CRT_HAVE_x86_syscall_emulate32_cdecl 1
-#define __CRT_HAVE_x86_syscall_emulate32_cdecl_r 1
-#define __CRT_HAVE_x86_syscall_emulate32_int80h 1
-#define __CRT_HAVE_x86_syscall_emulate32_sysenter 1
-#define __CRT_HAVE_x86_syscall_emulate32_sysenter_r 1
+#define __CRT_HAVE_x86_syscall_emulate_cdecl 1
+#define __CRT_HAVE_x86_syscall_emulate_cdecl_r 1
+#define __CRT_HAVE_x86_syscall_emulate_int80h 1
+#define __CRT_HAVE_x86_syscall_emulate_int80h_r 1
+#define __CRT_HAVE_x86_syscall_emulate_sysenter 1
+#define __CRT_HAVE_x86_syscall_emulate_sysenter_r 1
 #define __CRT_HAVE_x86_syscall_is_cancellation_point 1
 #define __CRT_HAVE_x86_syscall_register_count 1
 #define __CRT_HAVE_x86_syscall_restart_mode 1

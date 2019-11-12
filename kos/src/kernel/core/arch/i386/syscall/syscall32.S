@@ -47,7 +47,7 @@ EXTERN(__asm32_exsyscallrouter_sysenter)
 
 
 .section .text
-INTERN_FUNCTION(x86_syscall_emulate32_int80h_r)
+PUBLIC_FUNCTION(x86_syscall_emulate_int80h_r)
 	.cfi_startproc simple
 	/* `struct icpustate *%ecx'
 	 * NOTE: ENDOF(%ecx->IRREGS) is located at the end (top) of our kernel-stack! */
@@ -106,13 +106,13 @@ INTERN_FUNCTION(x86_syscall_emulate32_int80h_r)
 #endif
 	jmp    x86_idt_syscall
 	.cfi_endproc
-END(x86_syscall_emulate32_int80h_r)
+END(x86_syscall_emulate_int80h_r)
 
 
 
 
 .section .text
-PUBLIC_FUNCTION(x86_syscall_emulate32_sysenter_r)
+PUBLIC_FUNCTION(x86_syscall_emulate_sysenter_r)
 	.cfi_startproc simple
 	/* `struct icpustate *%ecx'
 	 * NOTE: ENDOF(%ecx->IRREGS) is located at the end (top) of our kernel-stack! */
@@ -171,7 +171,7 @@ PUBLIC_FUNCTION(x86_syscall_emulate32_sysenter_r)
 #endif
 	jmp    .Ldo_prepared_sysenter
 	.cfi_endproc
-END(x86_syscall_emulate32_sysenter_r)
+END(x86_syscall_emulate_sysenter_r)
 
 
 

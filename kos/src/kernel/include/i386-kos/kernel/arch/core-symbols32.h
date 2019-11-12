@@ -678,10 +678,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 169 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname169 /* index: 169 */
+	.weak x86_syscall_emulate_cdecl; .long x86_syscall_emulate_cdecl
+	.reloc ., R_386_SIZE32, x86_syscall_emulate_cdecl; .long 0
+	.long 0x131d81c
 	.long 0 /* index: 170 */
 	.long 0
 	.long 0
@@ -3554,10 +3554,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak mouse_device_hwheel; .long mouse_device_hwheel
 	.reloc ., R_386_SIZE32, mouse_device_hwheel; .long 0
 	.long 0xb5d892c
-	.long 0 /* index: 888 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname888 /* index: 888 */
+	.weak x86_syscall_emulate_int80h; .long x86_syscall_emulate_int80h
+	.reloc ., R_386_SIZE32, x86_syscall_emulate_int80h; .long 0
+	.long 0x3824378
 	.long 0 /* index: 889 */
 	.long 0
 	.long 0
@@ -5046,10 +5046,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_signal; .long sys_signal
 	.reloc ., R_386_SIZE32, sys_signal; .long 0
 	.long 0x69874ec
-	.long .Lname1261 /* index: 1261 */
-	.weak x86_syscall_emulate32_sysenter_r; .long x86_syscall_emulate32_sysenter_r
-	.reloc ., R_386_SIZE32, x86_syscall_emulate32_sysenter_r; .long 0
-	.long 0xb5b70d2
+	.long 0 /* index: 1261 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname1262 /* index: 1262 */
 	.weak sys_getgroups; .long sys_getgroups
 	.reloc ., R_386_SIZE32, sys_getgroups; .long 0
@@ -6518,10 +6518,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak x86_this_user_fsbase; .long x86_this_user_fsbase
 	.reloc ., R_386_SIZE32, x86_this_user_fsbase; .long 0
 	.long 0x173be45
-	.long 0 /* index: 1629 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1629 /* index: 1629 */
+	.weak x86_syscall_emulate_cdecl_r; .long x86_syscall_emulate_cdecl_r
+	.reloc ., R_386_SIZE32, x86_syscall_emulate_cdecl_r; .long 0
+	.long 0x1d82152
 	.long 0 /* index: 1630 */
 	.long 0
 	.long 0
@@ -9510,10 +9510,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_rt_sigsuspend; .long sys_rt_sigsuspend
 	.reloc ., R_386_SIZE32, sys_rt_sigsuspend; .long 0
 	.long 0x337fec4
-	.long .Lname2377 /* index: 2377 */
-	.weak x86_syscall_emulate32_cdecl; .long x86_syscall_emulate32_cdecl
-	.reloc ., R_386_SIZE32, x86_syscall_emulate32_cdecl; .long 0
-	.long 0x2a298c
+	.long 0 /* index: 2377 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 2378 */
 	.long 0
 	.long 0
@@ -10658,10 +10658,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname2664 /* index: 2664 */
-	.weak x86_syscall_emulate32_int80h; .long x86_syscall_emulate32_int80h
-	.reloc ., R_386_SIZE32, x86_syscall_emulate32_int80h; .long 0
-	.long 0x2dd5a68
+	.long 0 /* index: 2664 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 2665 */
 	.long 0
 	.long 0
@@ -10806,10 +10806,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 2701 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2701 /* index: 2701 */
+	.weak x86_syscall_emulate_sysenter_r; .long x86_syscall_emulate_sysenter_r
+	.reloc ., R_386_SIZE32, x86_syscall_emulate_sysenter_r; .long 0
+	.long 0x44af1c2
 	.long 0 /* index: 2702 */
 	.long 0
 	.long 0
@@ -11210,10 +11210,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak superblock_mountlock_write_nx; .long superblock_mountlock_write_nx
 	.reloc ., R_386_SIZE32, superblock_mountlock_write_nx; .long 0
 	.long 0x91da728
-	.long 0 /* index: 2802 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2802 /* index: 2802 */
+	.weak x86_syscall_emulate_sysenter; .long x86_syscall_emulate_sysenter
+	.reloc ., R_386_SIZE32, x86_syscall_emulate_sysenter; .long 0
+	.long 0x7a44af2
 	.long .Lname2803 /* index: 2803 */
 	.weak unwind_instruction_succ; .long unwind_instruction_succ
 	.reloc ., R_386_SIZE32, unwind_instruction_succ; .long 0
@@ -11658,10 +11658,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname2914 /* index: 2914 */
-	.weak x86_syscall_emulate32_sysenter; .long x86_syscall_emulate32_sysenter
-	.reloc ., R_386_SIZE32, x86_syscall_emulate32_sysenter; .long 0
-	.long 0x8bb5b62
+	.long 0 /* index: 2914 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname2915 /* index: 2915 */
 	.weak block_device_writev_sync; .long block_device_writev_sync
 	.reloc ., R_386_SIZE32, block_device_writev_sync; .long 0
@@ -13318,10 +13318,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 3329 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3329 /* index: 3329 */
+	.weak x86_syscall_emulate_int80h_r; .long x86_syscall_emulate_int80h_r
+	.reloc ., R_386_SIZE32, x86_syscall_emulate_int80h_r; .long 0
+	.long 0x2437fe2
 	.long .Lname3330 /* index: 3330 */
 	.weak sys_flistxattr; .long sys_flistxattr
 	.reloc ., R_386_SIZE32, sys_flistxattr; .long 0
@@ -13878,10 +13878,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname3469 /* index: 3469 */
-	.weak x86_syscall_emulate32_cdecl_r; .long x86_syscall_emulate32_cdecl_r
-	.reloc ., R_386_SIZE32, x86_syscall_emulate32_cdecl_r; .long 0
-	.long 0xa299242
+	.long 0 /* index: 3469 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 3470 */
 	.long 0
 	.long 0
@@ -16568,6 +16568,8 @@ END(kernel_symbol_table)
 	.string "block_device_awritev"
 .Lname167:
 	.string "heap_realloc_untraced"
+.Lname169:
+	.string "x86_syscall_emulate_cdecl"
 .Lname173:
 	.string "_this_vm"
 .Lname175:
@@ -17354,6 +17356,8 @@ END(kernel_symbol_table)
 	.string "dbg_vpprintf"
 .Lname887:
 	.string "mouse_device_hwheel"
+.Lname888:
+	.string "x86_syscall_emulate_int80h"
 .Lname891:
 	.string "driver_section_lock"
 .Lname892:
@@ -17760,8 +17764,6 @@ END(kernel_symbol_table)
 	.string "pidns_endwrite"
 .Lname1260:
 	.string "sys_signal"
-.Lname1261:
-	.string "x86_syscall_emulate32_sysenter_r"
 .Lname1262:
 	.string "sys_getgroups"
 .Lname1263:
@@ -18150,6 +18152,8 @@ END(kernel_symbol_table)
 	.string "vm_execinfo"
 .Lname1628:
 	.string "x86_this_user_fsbase"
+.Lname1629:
+	.string "x86_syscall_emulate_cdecl_r"
 .Lname1632:
 	.string "sys_poll"
 .Lname1633:
@@ -18900,8 +18904,6 @@ END(kernel_symbol_table)
 	.string "superblock_nodeslock_endwrite"
 .Lname2376:
 	.string "sys_rt_sigsuspend"
-.Lname2377:
-	.string "x86_syscall_emulate32_cdecl"
 .Lname2379:
 	.string "cpu_addpendingtask"
 .Lname2380:
@@ -19204,8 +19206,6 @@ END(kernel_symbol_table)
 	.string "sys_gettid"
 .Lname2661:
 	.string "sys_getrusage"
-.Lname2664:
-	.string "x86_syscall_emulate32_int80h"
 .Lname2667:
 	.string "sys_setxattr"
 .Lname2668:
@@ -19246,6 +19246,8 @@ END(kernel_symbol_table)
 	.string "dbg"
 .Lname2696:
 	.string "task_waitfor_norpc_nx"
+.Lname2701:
+	.string "x86_syscall_emulate_sysenter_r"
 .Lname2705:
 	.string "vm_getfutex"
 .Lname2706:
@@ -19368,6 +19370,8 @@ END(kernel_symbol_table)
 	.string "cpu_run_current_and_remember"
 .Lname2801:
 	.string "superblock_mountlock_write_nx"
+.Lname2802:
+	.string "x86_syscall_emulate_sysenter"
 .Lname2803:
 	.string "unwind_instruction_succ"
 .Lname2804:
@@ -19478,8 +19482,6 @@ END(kernel_symbol_table)
 	.string "x86_lapic_version"
 .Lname2911:
 	.string "sys_swapoff"
-.Lname2914:
-	.string "x86_syscall_emulate32_sysenter"
 .Lname2915:
 	.string "block_device_writev_sync"
 .Lname2916:
@@ -19924,6 +19926,8 @@ END(kernel_symbol_table)
 	.string "regdump_cr4"
 .Lname3327:
 	.string "rwlock_canwrite"
+.Lname3329:
+	.string "x86_syscall_emulate_int80h_r"
 .Lname3330:
 	.string "sys_flistxattr"
 .Lname3331:
@@ -20082,8 +20086,6 @@ END(kernel_symbol_table)
 	.string "sys_kstat"
 .Lname3467:
 	.string "sys_vfork"
-.Lname3469:
-	.string "x86_syscall_emulate32_cdecl_r"
 .Lname3473:
 	.string "vm_startdma"
 .Lname3475:
