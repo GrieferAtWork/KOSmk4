@@ -20,13 +20,16 @@
 #ifndef _KOS_EXCEPT_H
 #define _KOS_EXCEPT_H 1
 
+#include <__crt.h>
 #include <__stdinc.h>
+#include <features.h>
+
 #include <hybrid/byteorder.h>
 #include <hybrid/pp/__va_nargs.h>
+
 #include <bits/types.h>
 #include <kos/asm/except.h>
 #include <kos/bits/exception_data.h>
-#include <features.h>
 
 #ifndef __KOS__
 #error "KOS-only system header"
@@ -1186,26 +1189,41 @@ struct exception_info;
 #ifdef __KOS__
 
 /* Returns non-zero if there is an active exception. */
+#ifdef __CRT_HAVE_error_data
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,struct exception_data *,__NOTHROW_NCX,error_data,(void),())
+#endif /* __CRT_HAVE_error_data */
 #ifdef __USE_KOS_KERNEL
+#ifdef __CRT_HAVE_error_info
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,struct exception_info *,__NOTHROW_NCX,error_info,(void),())
+#endif /* __CRT_HAVE_error_info */
 #endif /* __USE_KOS_KERNEL */
+#ifdef __CRT_HAVE_error_code
 __CDECLARE(__ATTR_WUNUSED,error_code_t,__NOTHROW_NCX,error_code,(void),())
+#endif /* __CRT_HAVE_error_code */
+#ifdef __CRT_HAVE_error_active
 __CDECLARE(__ATTR_WUNUSED,__BOOL,__NOTHROW_NCX,error_active,(void),())
+#endif /* __CRT_HAVE_error_active */
+#ifdef __CRT_HAVE_error_class
 __CDECLARE(__ATTR_WUNUSED,error_class_t,__NOTHROW_NCX,error_class,(void),())
+#endif /* __CRT_HAVE_error_class */
+#ifdef __CRT_HAVE_error_subclass
 __CDECLARE(__ATTR_WUNUSED,error_subclass_t,__NOTHROW_NCX,error_subclass,(void),())
+#endif /* __CRT_HAVE_error_subclass */
+#ifdef __CRT_HAVE_error_register_state
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,error_register_state_t *,__NOTHROW_NCX,error_register_state,(void),())
+#endif /* __CRT_HAVE_error_register_state */
 
 #ifdef __USE_KOS_KERNEL
 /* Unwind the given register state to propagate the currently set error.
  * Following this, the returned register state should then be loaded. */
-#if defined(__i386__) && !defined(__x86_64__)
+#ifdef __CRT_HAVE_error_unwind
+#ifndef __ERROR_UNWIND_CC
+#define __ERROR_UNWIND_CC __LIBCCALL
+#endif /* !__ERROR_UNWIND_CC */
 __LIBC __ATTR_WUNUSED error_register_state_t *
-__NOTHROW_NCX(__ATTR_FASTCALL error_unwind)(error_register_state_t *__restrict state) __CASMNAME_SAME("error_unwind");
-#else
-__LIBC __ATTR_WUNUSED error_register_state_t *
-__NOTHROW_NCX(__LIBCCALL error_unwind)(error_register_state_t *__restrict state) __CASMNAME_SAME("error_unwind");
-#endif
+__NOTHROW_NCX(__ERROR_UNWIND_CC error_unwind)(error_register_state_t *__restrict state)
+		__CASMNAME_SAME("error_unwind");
+#endif /* __CRT_HAVE_error_unwind */
 #endif /* __USE_KOS_KERNEL */
 
 #ifndef __INTELLISENSE__
@@ -1215,28 +1233,38 @@ __NOTHROW_NCX(__LIBCCALL error_unwind)(error_register_state_t *__restrict state)
 #endif /* !__INTELLISENSE__ */
 
 /* Throw an exception. */
+#ifdef __CRT_HAVE_error_throw_current
 __CDECLARE_VOID(__ATTR_NORETURN __ATTR_COLD,,error_throw_current,(void),())
+#endif /* __CRT_HAVE_error_throw_current */
+#ifdef __CRT_HAVE_error_rethrow
 __CDECLARE_VOID(__ATTR_NORETURN,,error_rethrow,(void),())
+#endif /* __CRT_HAVE_error_rethrow */
 
 /* Transform the given exception into a posix errno value. */
+#ifdef __CRT_HAVE_error_as_errno
 #ifdef __KERNEL__
 __CDECLARE(__ATTR_WUNUSED,__errno_t,__NOTHROW,error_as_errno,(struct exception_data const *__restrict data),())
 #else /* __KERNEL__ */
 __CDECLARE(__ATTR_WUNUSED,__errno_t,__NOTHROW_NCX,error_as_errno,(struct exception_data const *__restrict data),())
 #endif /* !__KERNEL__ */
+#endif /* __CRT_HAVE_error_as_errno */
 
 struct __siginfo_struct;
 /* Transform the given exception into a posix signal.
  * If doing this is possible, fill in `*result' and return `true'.
  * Otherwise, `*result' is left in an undefined state, and `false' is returned. */
+#ifdef __CRT_HAVE_error_as_signal
 #ifdef __KERNEL__
 __CDECLARE(__ATTR_WUNUSED,__BOOL,__NOTHROW,error_as_signal,(struct exception_data const *__restrict data, struct __siginfo_struct *__restrict result),(data,result))
 #else /* __KERNEL__ */
 __CDECLARE(__ATTR_WUNUSED,__BOOL,__NOTHROW_NCX,error_as_signal,(struct exception_data const *__restrict data, struct __siginfo_struct *__restrict result),(data,result))
 #endif /* !__KERNEL__ */
+#endif /* __CRT_HAVE_error_as_signal */
 
 /* Rethrow the last exception */
+#ifdef __CRT_HAVE_error_rethrow
 #define RETHROW()   error_rethrow()
+#endif /* __CRT_HAVE_error_rethrow */
 
 #ifdef __INTELLISENSE__
 /* Throw a new exception `code', which is either an exception class,
@@ -1260,19 +1288,23 @@ __LIBC __ATTR_NORETURN __ATTR_COLD void (__VLIBCCALL THROW)(error_code_t code, .
  * >> }
  */
 __CDECLARE(__ATTR_WUNUSED,__BOOL,__NOTHROW_NCX,was_thrown,(error_code_t code),(code))
-#else
+#else /* __INTELLISENSE__ */
+
+#ifndef __ERROR_THROW_CC
+#define __ERROR_THROW_CC __LIBCCALL
+#endif /* !__ERROR_THROW_CC */
+
+#ifndef __ERROR_THROWN_CC
+#define __ERROR_THROWN_CC __LIBCCALL
+#endif /* !__ERROR_THROWN_CC */
+
 #define __PRIVATE_THROW_PACKAGE_CODE1(code) code
 #define __PRIVATE_THROW_PACKAGE_CODE2       ERROR_CODE
 #define __PRIVATE_THROW_PACKAGE_CODEN2(n) __PRIVATE_THROW_PACKAGE_CODE##n
 #define __PRIVATE_THROW_PACKAGE_CODEN(n) __PRIVATE_THROW_PACKAGE_CODEN2(n)
 #define __PRIVATE_THROW_PACKAGE_CODE(...) __PRIVATE_THROW_PACKAGE_CODEN(__HYBRID_PP_VA_NARGS(__VA_ARGS__))(__VA_ARGS__)
-#if defined(__i386__) && !defined(__x86_64__)
-__LIBC __ATTR_NORETURN __ATTR_COLD void (__ATTR_FASTCALL error_throw)(error_code_t __code) __CASMNAME_SAME("error_throw");
-__LIBC __ATTR_NORETURN __ATTR_COLD void (__ATTR_CDECL error_thrown)(error_code_t __code, unsigned int ___argc, ...) __CASMNAME_SAME("error_thrown");
-#else
-__LIBC __ATTR_NORETURN __ATTR_COLD void (__LIBCCALL error_throw)(error_code_t __code) __CASMNAME_SAME("error_throw");
-__LIBC __ATTR_NORETURN __ATTR_COLD void (__LIBCCALL error_thrown)(error_code_t __code, unsigned int ___argc, ...) __CASMNAME_SAME("error_thrown");
-#endif
+__LIBC __ATTR_NORETURN __ATTR_COLD void (__ERROR_THROW_CC error_throw)(error_code_t __code) __CASMNAME_SAME("error_throw");
+__LIBC __ATTR_NORETURN __ATTR_COLD void (__ERROR_THROWN_CC error_thrown)(error_code_t __code, unsigned int ___argc, ...) __CASMNAME_SAME("error_thrown");
 #define __PRIVATE_THROW1(code)               error_throw(__PRIVATE_THROW_PACKAGE_CODE code)
 #if EXCEPTION_DATA_POINTERS == 8
 #define __PRIVATE_THROW2(code,a)               error_thrown(__PRIVATE_THROW_PACKAGE_CODE code,1,(__UINTPTR_TYPE__)(a))
@@ -1283,9 +1315,9 @@ __LIBC __ATTR_NORETURN __ATTR_COLD void (__LIBCCALL error_thrown)(error_code_t _
 #define __PRIVATE_THROW7(code,a,b,c,d,e,f)     error_thrown(__PRIVATE_THROW_PACKAGE_CODE code,6,(__UINTPTR_TYPE__)(a),(__UINTPTR_TYPE__)(b),(__UINTPTR_TYPE__)(c),(__UINTPTR_TYPE__)(d),(__UINTPTR_TYPE__)(e),(__UINTPTR_TYPE__)(f))
 #define __PRIVATE_THROW8(code,a,b,c,d,e,f,g)   error_thrown(__PRIVATE_THROW_PACKAGE_CODE code,7,(__UINTPTR_TYPE__)(a),(__UINTPTR_TYPE__)(b),(__UINTPTR_TYPE__)(c),(__UINTPTR_TYPE__)(d),(__UINTPTR_TYPE__)(e),(__UINTPTR_TYPE__)(f),(__UINTPTR_TYPE__)(g))
 #define __PRIVATE_THROW9(code,a,b,c,d,e,f,g,h) error_thrown(__PRIVATE_THROW_PACKAGE_CODE code,8,(__UINTPTR_TYPE__)(a),(__UINTPTR_TYPE__)(b),(__UINTPTR_TYPE__)(c),(__UINTPTR_TYPE__)(d),(__UINTPTR_TYPE__)(e),(__UINTPTR_TYPE__)(f),(__UINTPTR_TYPE__)(g),(__UINTPTR_TYPE__)(h))
-#else
+#else /* EXCEPTION_DATA_POINTERS == ... */
 #error "Unsupported EXCEPTION_DATA_POINTERS"
-#endif
+#endif /* EXCEPTION_DATA_POINTERS != ... */
 #define __PRIVATE_THROW_N2(n) __PRIVATE_THROW##n
 #define __PRIVATE_THROW_N(n)  __PRIVATE_THROW_N2(n)
 #define THROW(...)  __PRIVATE_THROW_N(__HYBRID_PP_VA_NARGS(__VA_ARGS__))(__VA_ARGS__)
@@ -1298,7 +1330,7 @@ __LIBC __ATTR_NORETURN __ATTR_COLD void (__LIBCCALL error_thrown)(error_code_t _
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODE(...) __PRIVATE_WAS_THROWN_PACKAGE_CODEX(__PRIVATE_WAS_THROWN_PACKAGE_CODEN(__HYBRID_PP_VA_NARGS(__VA_ARGS__))(__VA_ARGS__))
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODEX(x)  x
 #define was_thrown(code) __PRIVATE_WAS_THROWN_PACKAGE_CODE code
-#endif
+#endif /* !__INTELLISENSE__ */
 
 #ifdef __cplusplus
 #define TRY         try

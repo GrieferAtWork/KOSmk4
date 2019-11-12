@@ -28,7 +28,14 @@
 #include <kos/asm/except.h> /* Optional: EXCEPTION_DATA_POINTERS */
 
 
-#ifndef __x86_64__
+#if defined(__i386__) && !defined(__x86_64__)
+#undef __ERROR_UNWIND_CC
+#undef __ERROR_THROW_CC
+#undef __ERROR_THROWN_CC
+#define __ERROR_UNWIND_CC __ATTR_FASTCALL
+#define __ERROR_THROW_CC  __ATTR_FASTCALL
+#define __ERROR_THROWN_CC __ATTR_CDECL
+
 #define __OFFSET_EXCEPTION_DATA_CODE      __OFFSET_EXCEPTION_DATA32_CODE
 #define __OFFSET_EXCEPTION_DATA_CLASS     __OFFSET_EXCEPTION_DATA32_CLASS
 #define __OFFSET_EXCEPTION_DATA_SUBCLASS  __OFFSET_EXCEPTION_DATA32_SUBCLASS
@@ -43,7 +50,7 @@
 #define error_class32_t     error_class_t
 #define error_subclass32_t  error_subclass_t
 #define exception_data32    exception_data
-#endif /* !__x86_64__ */
+#endif /* __i386__ && !__x86_64__ */
 
 
 #ifndef EXCEPTION_DATA_POINTERS
