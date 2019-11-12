@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGEFAULT_C
-#define GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGEFAULT_C 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_FAULT_HANDLE_PAGEFAULT_C
+#define GUARD_KERNEL_CORE_ARCH_I386_FAULT_HANDLE_PAGEFAULT_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -49,7 +49,6 @@
 
 #include <libinstrlen/instrlen.h>
 
-#include "../except.h"
 #include "vio.h"
 
 DECL_BEGIN
@@ -843,4 +842,4 @@ do_unwind_state:
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGEFAULT_C */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_FAULT_HANDLE_PAGEFAULT_C */

@@ -37,9 +37,7 @@
 
 #include <libinstrlen/instrlen.h>
 
-#include "../except.h"
 #include "decode.h"
-
 
 DECL_BEGIN
 

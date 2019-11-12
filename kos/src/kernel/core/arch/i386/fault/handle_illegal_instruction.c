@@ -60,7 +60,6 @@
 
 #include <libinstrlen/instrlen.h>
 
-#include "../except.h"
 #include "decode.h"
 #include "handle_illegal_instruction-bitops.h"
 

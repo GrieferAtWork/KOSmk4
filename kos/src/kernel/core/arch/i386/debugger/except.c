@@ -45,8 +45,6 @@ if (gcc_opt.remove("-O3"))
 
 #include <libinstrlen/instrlen.h>
 
-#include "../except.h"
-
 DECL_BEGIN
 
 #define PAGEFAULT_F_PRESENT     0x0001 /* FLAG: The accessed page is present (Check for LOA) */

@@ -68,8 +68,6 @@
 #include <librpc/rpc.h>
 #include <libunwind/unwind.h>
 
-#include "../except.h"
-
 DECL_BEGIN
 
 

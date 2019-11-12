@@ -22,8 +22,8 @@ opt.append("-Os");
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_MEMORY_VIO_C
-#define GUARD_KERNEL_CORE_ARCH_I386_MEMORY_VIO_C 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_FAULT_VIO_C
+#define GUARD_KERNEL_CORE_ARCH_I386_FAULT_VIO_C 1
 #define DISABLE_BRANCH_PROFILING 1
 
 #include <kernel/compiler.h>
@@ -59,9 +59,8 @@ opt.append("-Os");
 
 #include <libinstrlen/instrlen.h>
 
-#include "../except.h"
-#include "../fault/decode.h"
-#include "../fault/handle_illegal_instruction-bitops.h"
+#include "decode.h"
+#include "handle_illegal_instruction-bitops.h"
 #include "vio.h"
 
 DECL_BEGIN
@@ -4556,4 +4555,4 @@ DECL_END
 
 #endif /* CONFIG_VIO */
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MEMORY_VIO_C */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_FAULT_VIO_C */

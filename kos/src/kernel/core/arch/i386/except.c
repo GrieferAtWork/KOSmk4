@@ -20,8 +20,6 @@
 #define GUARD_KERNEL_CORE_ARCH_I386_EXCEPT_C 1
 #define _KOS_SOURCE 1
 
-#include "except.h"
-
 #include <kernel/compiler.h>
 
 #include <kernel/addr2line.h>

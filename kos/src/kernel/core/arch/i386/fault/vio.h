@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_MEMORY_VIO_H
-#define GUARD_KERNEL_CORE_ARCH_I386_MEMORY_VIO_H 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_FAULT_VIO_H
+#define GUARD_KERNEL_CORE_ARCH_I386_FAULT_VIO_H 1
 
 #include <kernel/compiler.h>
 
@@ -42,4 +42,4 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args
 DECL_END
 #endif /* CONFIG_VIO */
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MEMORY_VIO_H */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_FAULT_VIO_H */

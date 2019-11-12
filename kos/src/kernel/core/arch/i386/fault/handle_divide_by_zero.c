@@ -32,8 +32,6 @@
 
 #include <libinstrlen/instrlen.h>
 
-#include "../except.h"
-
 DECL_BEGIN
 
 INTERN struct icpustate *FCALL
