@@ -734,7 +734,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 						PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
 						PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_FS);
 						PERTASK_SET(_this_exception_info.ei_data.e_pointers[3], (uintptr_t)val);
-						goto set_generic_illegal_instruction;
+						goto set_generic_illegal_instruction_4;
 					}
 				}
 #else /* !__x86_64__ */
@@ -773,7 +773,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 						PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
 						PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_GS);
 						PERTASK_SET(_this_exception_info.ei_data.e_pointers[3], (uintptr_t)val);
-						goto set_generic_illegal_instruction;
+						goto set_generic_illegal_instruction_4;
 					}
 				}
 #else /* !__x86_64__ */
@@ -1355,6 +1355,9 @@ e_bad_operand_addrmode:
 		PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND));
 		PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE);
 		i = 2;
+		goto set_generic_illegal_instruction;
+set_generic_illegal_instruction_4:
+		i = 4;
 		goto set_generic_illegal_instruction;
 e_privileged_instruction:
 		PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE));
