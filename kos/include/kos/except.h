@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b3e7b7f */
+/* HASH CRC-32:0x17fd10c8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -900,41 +900,25 @@ struct exception_info;
 #ifdef __KOS__
 
 /* Returns non-zero if there is an active exception. */
-#ifdef __CRT_HAVE_error_data
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,struct exception_data *,__NOTHROW_NCX,error_data,(void),())
-#endif /* __CRT_HAVE_error_data */
 #ifdef __USE_KOS_KERNEL
-#ifdef __CRT_HAVE_error_info
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,struct exception_info *,__NOTHROW_NCX,error_info,(void),())
-#endif /* __CRT_HAVE_error_info */
 #endif /* __USE_KOS_KERNEL */
-#ifdef __CRT_HAVE_error_code
 __CDECLARE(__ATTR_WUNUSED,error_code_t,__NOTHROW_NCX,error_code,(void),())
-#endif /* __CRT_HAVE_error_code */
-#ifdef __CRT_HAVE_error_active
 __CDECLARE(__ATTR_WUNUSED,__BOOL,__NOTHROW_NCX,error_active,(void),())
-#endif /* __CRT_HAVE_error_active */
-#ifdef __CRT_HAVE_error_class
 __CDECLARE(__ATTR_WUNUSED,error_class_t,__NOTHROW_NCX,error_class,(void),())
-#endif /* __CRT_HAVE_error_class */
-#ifdef __CRT_HAVE_error_subclass
 __CDECLARE(__ATTR_WUNUSED,error_subclass_t,__NOTHROW_NCX,error_subclass,(void),())
-#endif /* __CRT_HAVE_error_subclass */
-#ifdef __CRT_HAVE_error_register_state
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,error_register_state_t *,__NOTHROW_NCX,error_register_state,(void),())
-#endif /* __CRT_HAVE_error_register_state */
 
 #ifdef __USE_KOS_KERNEL
 /* Unwind the given register state to propagate the currently set error.
  * Following this, the returned register state should then be loaded. */
-#ifdef __CRT_HAVE_error_unwind
 #ifndef __ERROR_UNWIND_CC
 #define __ERROR_UNWIND_CC __LIBCCALL
 #endif /* !__ERROR_UNWIND_CC */
 __LIBC __ATTR_WUNUSED error_register_state_t *
 __NOTHROW_NCX(__ERROR_UNWIND_CC error_unwind)(error_register_state_t *__restrict state)
 		__CASMNAME_SAME("error_unwind");
-#endif /* __CRT_HAVE_error_unwind */
 #endif /* __USE_KOS_KERNEL */
 
 #ifndef __INTELLISENSE__
@@ -944,38 +928,28 @@ __NOTHROW_NCX(__ERROR_UNWIND_CC error_unwind)(error_register_state_t *__restrict
 #endif /* !__INTELLISENSE__ */
 
 /* Throw an exception. */
-#ifdef __CRT_HAVE_error_throw_current
 __CDECLARE_VOID(__ATTR_NORETURN __ATTR_COLD,,error_throw_current,(void),())
-#endif /* __CRT_HAVE_error_throw_current */
-#ifdef __CRT_HAVE_error_rethrow
 __CDECLARE_VOID(__ATTR_NORETURN,,error_rethrow,(void),())
-#endif /* __CRT_HAVE_error_rethrow */
 
 /* Transform the given exception into a posix errno value. */
-#ifdef __CRT_HAVE_error_as_errno
 #ifdef __KERNEL__
 __CDECLARE(__ATTR_WUNUSED,__errno_t,__NOTHROW,error_as_errno,(struct exception_data const *__restrict data),())
 #else /* __KERNEL__ */
 __CDECLARE(__ATTR_WUNUSED,__errno_t,__NOTHROW_NCX,error_as_errno,(struct exception_data const *__restrict data),())
 #endif /* !__KERNEL__ */
-#endif /* __CRT_HAVE_error_as_errno */
 
 struct __siginfo_struct;
 /* Transform the given exception into a posix signal.
  * If doing this is possible, fill in `*result' and return `true'.
  * Otherwise, `*result' is left in an undefined state, and `false' is returned. */
-#ifdef __CRT_HAVE_error_as_signal
 #ifdef __KERNEL__
 __CDECLARE(__ATTR_WUNUSED,__BOOL,__NOTHROW,error_as_signal,(struct exception_data const *__restrict data, struct __siginfo_struct *__restrict result),(data,result))
 #else /* __KERNEL__ */
 __CDECLARE(__ATTR_WUNUSED,__BOOL,__NOTHROW_NCX,error_as_signal,(struct exception_data const *__restrict data, struct __siginfo_struct *__restrict result),(data,result))
 #endif /* !__KERNEL__ */
-#endif /* __CRT_HAVE_error_as_signal */
 
 /* Rethrow the last exception */
-#ifdef __CRT_HAVE_error_rethrow
 #define RETHROW()   error_rethrow()
-#endif /* __CRT_HAVE_error_rethrow */
 
 #ifdef __INTELLISENSE__
 /* Throw a new exception `code', which is either an exception class,
