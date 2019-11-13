@@ -45,6 +45,9 @@ NOTHROW_NCX(CC libuw_unwind_fde_find)(void *absolute_pc,
 /* Top-level function for unwinding the specific register state, automatically
  * locating the associated FDE entry, before using it to unwind the specified
  * register state.
+ * NOTE: The given `absolute_pc' should point _to_ the instruction that should
+ *       be unwound; Not after it. - i.e. range checking is done as:
+ *       `absolute_pc >= start && absolute_pc < end'
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
 INTDEF NONNULL((2, 4)) unsigned int
 NOTHROW_NCX(CC linuw_unwind)(void *absolute_pc,

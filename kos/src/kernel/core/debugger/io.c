@@ -359,8 +359,8 @@ DEFINE_DEBUG_FUNCTION(
 	                     DBGSTR("sp=%p"), (void *)ucpustate_getsp(&state));
 	for (;;) {
 		struct ucpustate old_state;
-		memcpy(&old_state, &state, sizeof(old_state));
-		error = unwind((void *)ucpustate_getpc(&old_state),
+		memcpy(&old_state, &state, sizeof(struct ucpustate));
+		error = unwind((void *)(ucpustate_getpc(&old_state) - 1),
 		               &unwind_getreg_ucpustate, &old_state,
 		               &unwind_setreg_ucpustate, &state);
 		if (error != UNWIND_SUCCESS)
@@ -422,7 +422,7 @@ DEFINE_DEBUG_FUNCTION(
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	memcpy(&newstate, &dbg_viewstate, sizeof(struct fcpustate));
-	error = unwind((void *)fcpustate_getpc(&dbg_viewstate),
+	error = unwind((void *)fcpustate_getpc(&dbg_viewstate) - 1,
 	               &unwind_getreg_fcpustate, &dbg_viewstate,
 	               &unwind_setreg_fcpustate, &newstate);
 	if (error != UNWIND_SUCCESS) {

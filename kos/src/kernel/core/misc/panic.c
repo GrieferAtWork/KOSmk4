@@ -64,32 +64,36 @@ NOTHROW(KCALL is_pc)(uintptr_t pc) {
 
 INTERN ATTR_COLDTEXT void KCALL
 kernel_halt_dump_traceback(pformatprinter printer, void *arg,
-                           struct ucpustate const *__restrict state) {
+                           struct ucpustate const *__restrict dumpstate) {
 	unsigned int error;
-	struct ucpustate mystate = *state;
+	struct ucpustate state;
 #ifdef LOG_STACK_REMAINDER
-	uintptr_t last_good_sp = ucpustate_getsp(&mystate);
+	uintptr_t last_good_sp;
+#endif /* LOG_STACK_REMAINDER */
+	memcpy(&state, dumpstate, sizeof(struct ucpustate));
+#ifdef LOG_STACK_REMAINDER
+	last_good_sp = ucpustate_getsp(&state);
 #endif /* LOG_STACK_REMAINDER */
 	addr2line_printf(printer, arg,
-	                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(&mystate)),
-	                 ucpustate_getpc(&mystate),
+	                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(&state)),
+	                 ucpustate_getpc(&state),
 	                 "Caused here [sp=%p]",
-	                 (void *)ucpustate_getsp(&mystate));
+	                 (void *)ucpustate_getsp(&state));
 	for (;;) {
 		struct ucpustate old_state;
-		old_state = mystate;
+		memcpy(&old_state, &state, sizeof(struct ucpustate));
 		error = unwind((void *)(ucpustate_getpc(&old_state) - 1),
 		               &unwind_getreg_ucpustate, &old_state,
-		               &unwind_setreg_ucpustate, &mystate);
+		               &unwind_setreg_ucpustate, &state);
 		if (error != UNWIND_SUCCESS)
 			break;
 		addr2line_printf(printer, arg,
-		                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(&mystate)),
-		                 ucpustate_getpc(&mystate),
+		                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(&state)),
+		                 ucpustate_getpc(&state),
 		                 "Called here [sp=%p]",
-		                 (void *)ucpustate_getsp(&mystate));
+		                 (void *)ucpustate_getsp(&state));
 #ifdef LOG_STACK_REMAINDER
-		last_good_sp = ucpustate_getsp(&mystate);
+		last_good_sp = ucpustate_getsp(&state);
 #endif /* LOG_STACK_REMAINDER */
 	}
 	if (error != UNWIND_NO_FRAME)
