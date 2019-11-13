@@ -96,20 +96,19 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 		format_printf(printer, arg, "Unwind failure: %u\n", error);
 #ifdef LOG_STACK_REMAINDER
 	{
-		struct vm_node const *stack = stack_current();
-		if ((vm_virt_t)last_good_sp >= VM_NODE_MINADDR(stack) &&
-		    (vm_virt_t)last_good_sp <= VM_NODE_MAXADDR(stack)) {
+		void *minaddr, *endaddr;
+		get_stack_for(&minaddr, &endaddr, (void *)last_good_sp);
+		if (last_good_sp >= (uintptr_t)minaddr &&
+		    last_good_sp < (uintptr_t)endaddr) {
 			bool is_first = true;
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
-			uintptr_t iter, end;
-			end  = (uintptr_t)VM_NODE_ENDADDR(stack);
-			iter = CEIL_ALIGN(last_good_sp, sizeof(void *));
-			for (; iter < end; iter += sizeof(void *))
+			uintptr_t iter;
+			iter = FLOOR_ALIGN(last_good_sp, sizeof(void *));
+			for (; iter < (uintptr_t)endaddr; iter += sizeof(void *))
 #else /* __ARCH_STACK_GROWS_DOWNWARDS */
-			uintptr_t iter, begin;
+			uintptr_t iter;
 			iter  = CEIL_ALIGN(last_good_sp, sizeof(void *));
-			begin = (uintptr_t)VM_NODE_MINADDR(stack);
-			while (iter > begin)
+			while (iter > (uintptr_t)minaddr)
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 			{
 				void *pc;
@@ -127,11 +126,7 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 				                 (uintptr_t)instruction_trypred(pc),
 				                 (uintptr_t)pc,
 				                 "Return address from [sp=%p]",
-				                 iter
-#ifdef __ARCH_STACK_GROWS_DOWNWARDS
-				                 - sizeof(void *)
-#endif /* __ARCH_STACK_GROWS_DOWNWARDS */
-				                 );
+				                 iter);
 			}
 		}
 	}

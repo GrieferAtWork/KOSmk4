@@ -426,10 +426,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname106 /* index: 106 */
-	.weak sys_lgetxattr; .long sys_lgetxattr
-	.reloc ., R_386_SIZE32, sys_lgetxattr; .long 0
-	.long 0x7b7e912
+	.long 0 /* index: 106 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname107 /* index: 107 */
 	.weak vio_addw; .long vio_addw
 	.reloc ., R_386_SIZE32, vio_addw; .long 0
@@ -2215,9 +2215,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, __predict_update_ax; .long 0
 	.long 0x455228
 	.long .Lname553 /* index: 553 */
-	.weak stack_avail; .long stack_avail
-	.reloc ., R_386_SIZE32, stack_avail; .long 0
-	.long 0x122605c
+	.weak sys_setfsuid; .long sys_setfsuid
+	.reloc ., R_386_SIZE32, sys_setfsuid; .long 0
+	.long 0xb1d3d64
 	.long .Lname554 /* index: 554 */
 	.weak strto64; .long strto64
 	.reloc ., R_386_SIZE32, strto64; .long 0
@@ -2995,9 +2995,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sys__llseek; .long 0
 	.long 0x66892eb
 	.long .Lname748 /* index: 748 */
-	.weak stack_inuse; .long stack_inuse
-	.reloc ., R_386_SIZE32, stack_inuse; .long 0
-	.long 0x126fb35
+	.weak sys_epoll_create; .long sys_epoll_create
+	.reloc ., R_386_SIZE32, sys_epoll_create; .long 0
+	.long 0x6a4b35
 	.long 0 /* index: 749 */
 	.long 0
 	.long 0
@@ -4839,9 +4839,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, superblock_nodeslock_upgrade_nx; .long 0
 	.long 0xe6014b8
 	.long .Lname1209 /* index: 1209 */
-	.weak stack_current; .long stack_current
-	.reloc ., R_386_SIZE32, stack_current; .long 0
-	.long 0x6e2b74
+	.weak superblock_nodeslock_read; .long superblock_nodeslock_read
+	.reloc ., R_386_SIZE32, superblock_nodeslock_read; .long 0
+	.long 0x61aeb74
 	.long 0 /* index: 1210 */
 	.long 0
 	.long 0
@@ -5742,10 +5742,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 1435 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1435 /* index: 1435 */
+	.weak get_current_stack; .long get_current_stack
+	.reloc ., R_386_SIZE32, get_current_stack; .long 0
+	.long 0x4cee59b
 	.long 0 /* index: 1436 */
 	.long 0
 	.long 0
@@ -6235,9 +6235,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, syscall_printtrace; .long 0
 	.long 0x30d6615
 	.long .Lname1558 /* index: 1558 */
-	.weak sys_setgid; .long sys_setgid
-	.reloc ., R_386_SIZE32, sys_setgid; .long 0
-	.long 0x69b1d64
+	.weak sys_setreuid; .long sys_setreuid
+	.reloc ., R_386_SIZE32, sys_setreuid; .long 0
+	.long 0xb085d64
 	.long .Lname1559 /* index: 1559 */
 	.weak rwlock_reading_any; .long rwlock_reading_any
 	.reloc ., R_386_SIZE32, rwlock_reading_any; .long 0
@@ -7127,9 +7127,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sys_chroot; .long 0
 	.long 0x59846f4
 	.long .Lname1781 /* index: 1781 */
-	.weak vm_datapart_lockwrite_setcore; .long vm_datapart_lockwrite_setcore
-	.reloc ., R_386_SIZE32, vm_datapart_lockwrite_setcore; .long 0
-	.long 0x5e236f5
+	.weak get_stack_inuse; .long get_stack_inuse
+	.reloc ., R_386_SIZE32, get_stack_inuse; .long 0
+	.long 0xb3696f5
 	.long .Lname1782 /* index: 1782 */
 	.weak vm_pagetophys_nopf; .long vm_pagetophys_nopf
 	.reloc ., R_386_SIZE32, vm_pagetophys_nopf; .long 0
@@ -8167,9 +8167,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname2041 /* index: 2041 */
-	.weak superblock_nodeslock_read; .long superblock_nodeslock_read
-	.reloc ., R_386_SIZE32, superblock_nodeslock_read; .long 0
-	.long 0x61aeb74
+	.weak sys_chmod; .long sys_chmod
+	.reloc ., R_386_SIZE32, sys_chmod; .long 0
+	.long 0x959a954
 	.long 0 /* index: 2042 */
 	.long 0
 	.long 0
@@ -8354,10 +8354,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vpage_realloc_untraced; .long vpage_realloc_untraced
 	.reloc ., R_386_SIZE32, vpage_realloc_untraced; .long 0
 	.long 0x51c9214
-	.long .Lname2088 /* index: 2088 */
-	.weak sys_chmod; .long sys_chmod
-	.reloc ., R_386_SIZE32, sys_chmod; .long 0
-	.long 0x959a954
+	.long 0 /* index: 2088 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname2089 /* index: 2089 */
 	.weak vio_xorl; .long vio_xorl
 	.reloc ., R_386_SIZE32, vio_xorl; .long 0
@@ -9291,9 +9291,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname2322 /* index: 2322 */
-	.weak sys_epoll_create; .long sys_epoll_create
-	.reloc ., R_386_SIZE32, sys_epoll_create; .long 0
-	.long 0x6a4b35
+	.weak sys_lgetxattr; .long sys_lgetxattr
+	.reloc ., R_386_SIZE32, sys_lgetxattr; .long 0
+	.long 0x7b7e912
 	.long .Lname2323 /* index: 2323 */
 	.weak keyboard_device_readchars; .long keyboard_device_readchars
 	.reloc ., R_386_SIZE32, keyboard_device_readchars; .long 0
@@ -9982,10 +9982,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak heap_realign; .long heap_realign
 	.reloc ., R_386_SIZE32, heap_realign; .long 0
 	.long 0xe5da9be
-	.long 0 /* index: 2495 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2495 /* index: 2495 */
+	.weak vm_datapart_lockwrite_setcore; .long vm_datapart_lockwrite_setcore
+	.reloc ., R_386_SIZE32, vm_datapart_lockwrite_setcore; .long 0
+	.long 0x5e236f5
 	.long 0 /* index: 2496 */
 	.long 0
 	.long 0
@@ -11079,9 +11079,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, vm_kernel_syncall; .long 0
 	.long 0x80d105c
 	.long .Lname2769 /* index: 2769 */
-	.weak sys_setfsuid; .long sys_setfsuid
-	.reloc ., R_386_SIZE32, sys_setfsuid; .long 0
-	.long 0xb1d3d64
+	.weak sys_setgid; .long sys_setgid
+	.reloc ., R_386_SIZE32, sys_setgid; .long 0
+	.long 0x69b1d64
 	.long .Lname2770 /* index: 2770 */
 	.weak sys_getegid32; .long sys_getegid32
 	.reloc ., R_386_SIZE32, sys_getegid32; .long 0
@@ -13938,10 +13938,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_rmdir; .long sys_rmdir
 	.reloc ., R_386_SIZE32, sys_rmdir; .long 0
 	.long 0x9694202
-	.long 0 /* index: 3484 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3484 /* index: 3484 */
+	.weak get_stack_avail; .long get_stack_avail
+	.reloc ., R_386_SIZE32, get_stack_avail; .long 0
+	.long 0xb320d9c
 	.long 0 /* index: 3485 */
 	.long 0
 	.long 0
@@ -14134,10 +14134,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak block_device_partition_ioctl; .long block_device_partition_ioctl
 	.reloc ., R_386_SIZE32, block_device_partition_ioctl; .long 0
 	.long 0x66adcc
-	.long 0 /* index: 3533 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3533 /* index: 3533 */
+	.weak get_stack_for; .long get_stack_for
+	.reloc ., R_386_SIZE32, get_stack_for; .long 0
+	.long 0xa6b37a2
 	.long .Lname3534 /* index: 3534 */
 	.weak zlib_reader_read; .long zlib_reader_read
 	.reloc ., R_386_SIZE32, zlib_reader_read; .long 0
@@ -14782,10 +14782,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak unwind_fde_exec_landing_pad_adjustment; .long unwind_fde_exec_landing_pad_adjustment
 	.reloc ., R_386_SIZE32, unwind_fde_exec_landing_pad_adjustment; .long 0
 	.long 0x3144214
-	.long .Lname3695 /* index: 3695 */
-	.weak sys_setreuid; .long sys_setreuid
-	.reloc ., R_386_SIZE32, sys_setreuid; .long 0
-	.long 0xb085d64
+	.long 0 /* index: 3695 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 3696 */
 	.long 0
 	.long 0
@@ -16494,8 +16494,6 @@ END(kernel_symbol_table)
 	.string "linebuffer_rewrite"
 .Lname103:
 	.string "__cxa_rethrow"
-.Lname106:
-	.string "sys_lgetxattr"
 .Lname107:
 	.string "vio_addw"
 .Lname109:
@@ -16993,7 +16991,7 @@ END(kernel_symbol_table)
 .Lname552:
 	.string "__predict_update_ax"
 .Lname553:
-	.string "stack_avail"
+	.string "sys_setfsuid"
 .Lname554:
 	.string "strto64"
 .Lname557:
@@ -17215,7 +17213,7 @@ END(kernel_symbol_table)
 .Lname747:
 	.string "sys__llseek"
 .Lname748:
-	.string "stack_inuse"
+	.string "sys_epoll_create"
 .Lname751:
 	.string "task_alloc_synchronous_srpc"
 .Lname752:
@@ -17713,7 +17711,7 @@ END(kernel_symbol_table)
 .Lname1208:
 	.string "superblock_nodeslock_upgrade_nx"
 .Lname1209:
-	.string "stack_current"
+	.string "superblock_nodeslock_read"
 .Lname1212:
 	.string "vm_tasklock_tryread"
 .Lname1214:
@@ -17938,6 +17936,8 @@ END(kernel_symbol_table)
 	.string "vpage_realloc_untraced_nx"
 .Lname1433:
 	.string "vm_prefault"
+.Lname1435:
+	.string "get_current_stack"
 .Lname1439:
 	.string "handle_manager_clone"
 .Lname1442:
@@ -18077,7 +18077,7 @@ END(kernel_symbol_table)
 .Lname1557:
 	.string "syscall_printtrace"
 .Lname1558:
-	.string "sys_setgid"
+	.string "sys_setreuid"
 .Lname1559:
 	.string "rwlock_reading_any"
 .Lname1561:
@@ -18289,7 +18289,7 @@ END(kernel_symbol_table)
 .Lname1780:
 	.string "sys_chroot"
 .Lname1781:
-	.string "vm_datapart_lockwrite_setcore"
+	.string "get_stack_inuse"
 .Lname1782:
 	.string "vm_pagetophys_nopf"
 .Lname1785:
@@ -18545,7 +18545,7 @@ END(kernel_symbol_table)
 .Lname2039:
 	.string "sys_clock_settime"
 .Lname2041:
-	.string "superblock_nodeslock_read"
+	.string "sys_chmod"
 .Lname2046:
 	.string "superblock_nodeslock_upgrade"
 .Lname2048:
@@ -18592,8 +18592,6 @@ END(kernel_symbol_table)
 	.string "vm_datablock_writev"
 .Lname2087:
 	.string "vpage_realloc_untraced"
-.Lname2088:
-	.string "sys_chmod"
 .Lname2089:
 	.string "vio_xorl"
 .Lname2090:
@@ -18831,7 +18829,7 @@ END(kernel_symbol_table)
 .Lname2319:
 	.string "unwind_getreg_icpustate"
 .Lname2322:
-	.string "sys_epoll_create"
+	.string "sys_lgetxattr"
 .Lname2323:
 	.string "keyboard_device_readchars"
 .Lname2325:
@@ -19018,6 +19016,8 @@ END(kernel_symbol_table)
 	.string "ringbuffer_poll"
 .Lname2494:
 	.string "heap_realign"
+.Lname2495:
+	.string "vm_datapart_lockwrite_setcore"
 .Lname2498:
 	.string "x86_exsyscall_is_cancellation_point"
 .Lname2499:
@@ -19335,7 +19335,7 @@ END(kernel_symbol_table)
 .Lname2768:
 	.string "vm_kernel_syncall"
 .Lname2769:
-	.string "sys_setfsuid"
+	.string "sys_setgid"
 .Lname2770:
 	.string "sys_getegid32"
 .Lname2771:
@@ -20102,6 +20102,8 @@ END(kernel_symbol_table)
 	.string "task_alloc_user_srpc_nx"
 .Lname3483:
 	.string "sys_rmdir"
+.Lname3484:
+	.string "get_stack_avail"
 .Lname3487:
 	.string "directory_getnode"
 .Lname3489:
@@ -20146,6 +20148,8 @@ END(kernel_symbol_table)
 	.string "__acheck"
 .Lname3532:
 	.string "block_device_partition_ioctl"
+.Lname3533:
+	.string "get_stack_for"
 .Lname3534:
 	.string "zlib_reader_read"
 .Lname3536:
@@ -20344,8 +20348,6 @@ END(kernel_symbol_table)
 	.string "vm_forcefault"
 .Lname3694:
 	.string "unwind_fde_exec_landing_pad_adjustment"
-.Lname3695:
-	.string "sys_setreuid"
 .Lname3697:
 	.string "regdump_sgregs"
 .Lname3698:

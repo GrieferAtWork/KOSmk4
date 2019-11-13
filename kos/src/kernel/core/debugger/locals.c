@@ -149,7 +149,7 @@ do_print_local(void *arg,
 	unsigned int error;
 	void *value_buffer;
 	size_t num_bits;
-	if (stack_avail() < ((256 * sizeof(void *)) + bufsize))
+	if (get_stack_avail() < ((256 * sizeof(void *)) + bufsize))
 		return UNWIND_BADALLOC;
 	value_buffer = alloca(bufsize);
 	/* Read the value of this local variable. */

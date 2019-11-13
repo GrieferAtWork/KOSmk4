@@ -53,7 +53,7 @@
 #include <malloc.h>
 #else /* !__KERNEL__ */
 #include <kernel/except.h>
-#include <sched/task.h> /* stack_avail() */
+#include <sched/task.h> /* get_stack_avail() */
 #endif /* !__KERNEL__ */
 
 
@@ -1453,7 +1453,7 @@ libuw_unwind_emulator_exec_alloca_stack(unwind_emulator_t *__restrict self,
 	unsigned int result;
 #ifdef __KERNEL__
 	unwind_ste_t *stack;
-	if (stack_avail() < ((256 * sizeof(void *)) + (stack_size * sizeof(unwind_ste_t))))
+	if (get_stack_avail() < ((256 * sizeof(void *)) + (stack_size * sizeof(unwind_ste_t))))
 		ERROR(err_badalloc);
 	stack = (unwind_ste_t *)alloca(stack_size * sizeof(unwind_ste_t));
 #else /* __KERNEL__ */

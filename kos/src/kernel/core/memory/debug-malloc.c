@@ -950,7 +950,7 @@ NOTHROW(KCALL mall_search_task_icpustate)(struct task *__restrict thread,
 PRIVATE NOBLOCK void
 NOTHROW(KCALL mall_search_this_task)(void) {
 	unsigned int i;
-	vm_virt_t sp, stack_min, stack_end;
+	byte_t *sp, *stack_min, *stack_end;
 	struct lcpustate context;
 	struct vm_node const *my_stack;
 	/* Search the registers of this thread. */
@@ -958,19 +958,23 @@ NOTHROW(KCALL mall_search_this_task)(void) {
 	/* Search general-purpose registers. */
 	for (i = 0; i < (sizeof(struct lcpustate) / sizeof(void *)); ++i)
 		mall_reachable_pointer(((void **)&context)[i]);
-	my_stack  = stack_current();
-	stack_min = VM_NODE_MINADDR(my_stack);
-	stack_end = VM_NODE_ENDADDR(my_stack);
-	sp        = (vm_virt_t)lcpustate_getsp(&context);
+	my_stack = THIS_KERNEL_STACK;
+	sp       = (byte_t *)lcpustate_getsp(&context);
+	get_stack_for((void **)&stack_min,
+	              (void **)&stack_end, sp);
 	if (sp > stack_min && sp <= stack_end) {
 		/* Search the used portion of the kernel stack. */
-		mall_reachable_data((byte_t *)sp,
-		                    (size_t)(stack_end - sp));
+		mall_reachable_data(sp, (size_t)(stack_end - sp));
+		/* If we're running from a custom stack, also search the original kernel stack! */
+		if (stack_end != (byte_t *)VM_NODE_ENDADDR(my_stack))
+			goto do_search_kernel_stack;
 	} else {
 		/* Stack pointer is out-of-bounds (no idea what this is
 		 * about, but let's just assume the entire stack is allocated) */
-		mall_reachable_data((byte_t *)stack_min,
-		                    (size_t)(stack_end - stack_min));
+do_search_kernel_stack:
+		stack_min = (byte_t *)VM_NODE_MINADDR(my_stack);
+		stack_end = (byte_t *)VM_NODE_ENDADDR(my_stack);
+		mall_reachable_data(stack_min, (size_t)(stack_end - stack_min));
 	}
 }
 

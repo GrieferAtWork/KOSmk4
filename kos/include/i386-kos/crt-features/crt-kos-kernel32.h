@@ -546,6 +546,10 @@
 #define __CRT_HAVE_fs_filesystems_lock_write 1
 #define __CRT_HAVE_fs_filesystems_remove 1
 #define __CRT_HAVE_fs_kernel 1
+#define __CRT_HAVE_get_current_stack 1
+#define __CRT_HAVE_get_stack_avail 1
+#define __CRT_HAVE_get_stack_for 1
+#define __CRT_HAVE_get_stack_inuse 1
 #define __CRT_HAVE_handle_close 1
 #define __CRT_HAVE_handle_close_nosym 1
 #define __CRT_HAVE_handle_datasize 1
@@ -1210,9 +1214,6 @@
 #define __CRT_HAVE_snprintf 1
 #define __CRT_HAVE_sprintf 1
 #define __CRT_HAVE_sprintf_s 1
-#define __CRT_HAVE_stack_avail 1
-#define __CRT_HAVE_stack_current 1
-#define __CRT_HAVE_stack_inuse 1
 #define __CRT_HAVE_strchr 1
 #define __CRT_HAVE_strcmp 1
 #define __CRT_HAVE_strend 1

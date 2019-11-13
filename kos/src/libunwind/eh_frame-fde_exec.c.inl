@@ -26,7 +26,7 @@
 #endif
 
 #ifdef __KERNEL__
-#include <sched/task.h>        /* stack_avail() */
+#include <sched/task.h>        /* get_stack_avail() */
 #include <alloca.h>
 #else /* __KERNEL__ */
 #include <malloc.h>
@@ -635,7 +635,7 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 				} else {
 					/* Check if we have enough stack space left to create a backup. */
 #ifdef __KERNEL__
-					if (stack_avail() < ((256 * sizeof(void *)) + sizeof(SYM(unwind_cfa_backup_state_t))))
+					if (get_stack_avail() < ((256 * sizeof(void *)) + sizeof(SYM(unwind_cfa_backup_state_t))))
 						ERROR(err_nomem);
 					backup = (SYM(unwind_cfa_backup_state_t) *)alloca(sizeof(SYM(unwind_cfa_backup_state_t)));
 #else /* __KERNEL__ */

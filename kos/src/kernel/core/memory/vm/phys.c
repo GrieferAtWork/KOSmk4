@@ -315,7 +315,7 @@ NOTHROW(KCALL vm_copyinphys)(PHYS vm_phys_t dst,
 #endif /* !NO_PHYS_IDENTITY */
 	if unlikely(!num_bytes)
 		return;
-	bufsize = stack_avail();
+	bufsize = get_stack_avail();
 	/* `512*(4|8)' bytes is more than enough of a reservation to
 	 * be made, considering that the #PF handler for is guarantied
 	 * to never actually be called because of us, since `buf' is
@@ -498,7 +498,7 @@ NOTHROW(KCALL vm_copyinphys_onepage)(PHYS vm_phys_t dst,
 	}
 #endif /* !NO_PHYS_IDENTITY */
 	/* Copy data using a temporary buffer. */
-	bufsize = stack_avail();
+	bufsize = get_stack_avail();
 	/* `512*(4|8)' bytes is more than enough of a reservation to
 	 * be made, considering that the #PF handler for is guarantied
 	 * to never actually be called because of us, since `buf' is
@@ -689,7 +689,7 @@ NOTHROW(KCALL vm_pageinphys)(PHYS vm_ppage_t dst, PHYS vm_ppage_t src) {
 	}
 #endif /* !NO_PHYS_IDENTITY */
 	/* Copy data using a temporary buffer. */
-	bufsize = stack_avail();
+	bufsize = get_stack_avail();
 	/* `512*(4|8)' bytes is more than enough of a reservation to
 	 * be made, considering that the #PF handler for is guarantied
 	 * to never actually be called because of us, since `buf' is

@@ -222,7 +222,7 @@ PUBLIC ATTR_PERCPU struct tss x86_cputss_df = {
 	.t_iomap      = 0
 };
 
-/* Prevent `stack_current()' from thinking that we're running on
+/* Prevent `get_current_stack()' from thinking that we're running on
 	* the #DF stack by ensuing that x86_cputss_df.t_ecx is set to 0
 	* Separately, note we set override the temporarily override the
 	* pointers inside of `THIS_KERNEL_STACK' whilst in debug-mode,
@@ -234,7 +234,7 @@ DEFINE_DBG_BZERO(&PERCPU(x86_cputss_df).t_ecx, sizeof(x86_cputss_df.t_ecx));
 
 
 PUBLIC NOBLOCK WUNUSED ATTR_PURE size_t
-NOTHROW(KCALL stack_avail)(void) {
+NOTHROW(KCALL get_stack_avail)(void) {
 	vm_virt_t start, end;
 	vm_virt_t sp = (vm_virt_t)__rdsp();
 #ifndef __x86_64__
@@ -254,11 +254,14 @@ NOTHROW(KCALL stack_avail)(void) {
 	}
 	if likely(sp >= start && sp < end)
 		return (size_t)(sp - start);
-	return 0;
+	/* FIXME: This is an ugly work-around for when the kernel is
+	 *        running from a custom stack, such as the debugger stack,
+	 *        or the stack defined by the GDB server driver. */
+	return 8096;
 }
 
 PUBLIC NOBLOCK WUNUSED ATTR_PURE size_t
-NOTHROW(KCALL stack_inuse)(void) {
+NOTHROW(KCALL get_stack_inuse)(void) {
 	vm_virt_t start, end;
 	vm_virt_t sp = (vm_virt_t)__rdsp();
 #ifndef __x86_64__
@@ -281,19 +284,42 @@ NOTHROW(KCALL stack_inuse)(void) {
 	return 0;
 }
 
-PUBLIC NOBLOCK WUNUSED ATTR_CONST ATTR_RETNONNULL
-struct vm_node const *NOTHROW(KCALL stack_current)(void) {
-	struct vm_node const *result;
+/* Returns the bounds of the currently used kernel-space stack.
+ * @param: pbase: Filled with a pointer to the lowest-address byte that is still apart of the stack.
+ * @param: pend:  Filled with a pointer one past the highest-address byte that is still apart of the stack. */
+PUBLIC NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp) {
+	vm_virt_t start, end;
 #ifndef __x86_64__
 	struct cpu *c = THIS_CPU;
-	if unlikely(FORCPU(c, x86_cputss_df.t_ecx))
-		result = &FORCPU(c, x86_this_dfstack);
-	else
+	if unlikely(FORCPU(c, x86_cputss_df.t_ecx)) {
+		struct vm_node const *node;
+		node  = &FORCPU(c, x86_this_dfstack);
+		start = VM_NODE_STARTADDR(node);
+		end   = VM_NODE_ENDADDR(node);
+	} else
 #endif /* !__x86_64__ */
 	{
-		result = THIS_KERNEL_STACK;
+		struct vm_node const *node;
+		node  = THIS_KERNEL_STACK;
+		start = VM_NODE_STARTADDR(node);
+		end   = VM_NODE_ENDADDR(node);
 	}
-	return result;
+	if likely((vm_virt_t)sp >= start && (vm_virt_t)sp < end) {
+		*pbase = (void *)start;
+		*pend  = (void *)end;
+		return;
+	}
+	/* FIXME: This is an ugly work-around for when the kernel is
+	 *        running from a custom stack, such as the debugger stack,
+	 *        or the stack defined by the GDB server driver. */
+	*pbase = (void *)(FLOOR_ALIGN((uintptr_t)sp, PAGESIZE) - PAGESIZE);
+	*pend  = (void *)(FLOOR_ALIGN((uintptr_t)sp, PAGESIZE) + PAGESIZE);
+}
+
+PUBLIC NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL get_current_stack)(void **pbase, void **pend) {
+	get_stack_for(pbase, pend, (void *)__rdsp());
 }
 
 

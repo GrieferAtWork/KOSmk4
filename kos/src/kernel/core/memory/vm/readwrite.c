@@ -236,7 +236,7 @@ direct_copy:
 			byte_t *buffer; size_t bufsize;
 			if unlikely(!num_bytes)
 				goto done;
-			bufsize = stack_avail() / 2;
+			bufsize = get_stack_avail() / 2;
 			if (bufsize > 1024)
 				bufsize -= 1024;
 			if (bufsize > num_bytes)
@@ -303,7 +303,7 @@ direct_copy:
 			byte_t *buffer; size_t bufsize;
 			if unlikely(!num_bytes)
 				goto done;
-			bufsize = stack_avail() / 2;
+			bufsize = get_stack_avail() / 2;
 			if (bufsize > 1024)
 				bufsize -= 1024;
 			if (bufsize > num_bytes)
@@ -445,7 +445,7 @@ copy_from_vm:
 			byte_t *buffer; size_t bufsize;
 			if unlikely(!num_bytes)
 				return;
-			bufsize = stack_avail() / 2;
+			bufsize = get_stack_avail() / 2;
 			if (bufsize > 1024)
 				bufsize -= 1024;
 			if (bufsize > num_bytes)
@@ -515,7 +515,7 @@ copy_to_vm:
 			byte_t *buffer; size_t bufsize;
 			if unlikely(!num_bytes)
 				return;
-			bufsize = stack_avail() / 2;
+			bufsize = get_stack_avail() / 2;
 			if (bufsize > 1024)
 				bufsize -= 1024;
 			if (bufsize > num_bytes)

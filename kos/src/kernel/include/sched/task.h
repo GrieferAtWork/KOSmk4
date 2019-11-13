@@ -209,18 +209,20 @@ DATDEF ATTR_PERTASK struct vm_datapart const _this_kernel_stack_part;
 #define THIS_KERNEL_STACK_PART  (&PERTASK(_this_kernel_stack_part))
 
 /* Return some rough estimates for the available/used stack memory.
- * These `stack_avail()' is usually called prior to `alloca()' in order
+ * These `get_stack_avail()' is usually called prior to `alloca()' in order
  * to ensure that sufficient memory remains available after the allocation
  * was made. (for example: the max CFI remember-stack size is directly
  * determined by the amount of available stack memory) */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE size_t NOTHROW(KCALL stack_avail)(void);
-FUNDEF NOBLOCK WUNUSED ATTR_PURE size_t NOTHROW(KCALL stack_inuse)(void);
+FUNDEF NOBLOCK WUNUSED ATTR_PURE size_t NOTHROW(KCALL get_stack_avail)(void);
+FUNDEF NOBLOCK WUNUSED ATTR_PURE size_t NOTHROW(KCALL get_stack_inuse)(void);
 
-/* Returns a pointer to the currently used stack, which is
- * either `THIS_KERNEL_STACK', or an arch-specific special
- * stack. */
-FUNDEF NOBLOCK WUNUSED ATTR_CONST ATTR_RETNONNULL
-struct vm_node const *NOTHROW(KCALL stack_current)(void);
+/* Returns the bounds of the currently used kernel-space stack.
+ * @param: pbase: Filled with a pointer to the lowest-address byte that is still apart of the stack.
+ * @param: pend:  Filled with a pointer one past the highest-address byte that is still apart of the stack. */
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL get_current_stack)(void **pbase, void **pend);
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp);
 
 
 
