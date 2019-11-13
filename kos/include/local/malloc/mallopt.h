@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf40f5d53 */
+/* HASH CRC-32:0x5c48a4ea */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,8 +23,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mallopt) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mallopt))(int __parameter_number,
                                                      int __parameter_value) {
-#line 147 "kos/src/libc/magic/malloc.c"
+#line 149 "kos/src/libc/magic/malloc.c"
 	/* NO-OP */
+	__COMPILER_IMPURE();
 	(void)__parameter_number;
 	(void)__parameter_value;
 	return 0;

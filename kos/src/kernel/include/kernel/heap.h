@@ -603,7 +603,7 @@ FUNDEF NONNULL((1)) size_t NOTHROW(KCALL heap_trim)(struct heap *__restrict self
 #ifdef CONFIG_DEBUG_HEAP
 /* Validate the memory of the given heap for
  * consistency, checking for invalid use-after-free. */
-FUNDEF NOBLOCK void NOTHROW(KCALL heap_validate)(struct heap *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL heap_validate)(struct heap *__restrict self);
 FUNDEF NOBLOCK void NOTHROW(KCALL heap_validate_all)(void);
 #define DEFINE_VALIDATABLE_HEAP(x) DEFINE_CALLBACK(".rodata.heaps.validatable", x)
 #else /* CONFIG_DEBUG_HEAP */

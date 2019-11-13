@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x927de701 */
+/* HASH CRC-32:0x8975728d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(maybe_split_for_insert))(void **__roo
                                                                     int __p_r,
                                                                     int __gp_r,
                                                                     int __mode) {
-#line 390 "kos/src/libc/magic/search.c"
+#line 391 "kos/src/libc/magic/search.c"
 	typedef struct __node_struct {
 		void const         *__key;
 		struct __node_struct *__left_node;

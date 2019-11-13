@@ -158,6 +158,7 @@
 #define __CRT_HAVE_DOS$_wtmpnam_s 1
 #define __CRT_HAVE_DOS$_wunlink 1
 #define __CRT_HAVE_DOS$_wutime32 1
+#define __CRT_HAVE_DOS$btowc 1
 #define __CRT_HAVE_DOS$creat 1
 #define __CRT_HAVE_DOS$fgetwc 1
 #define __CRT_HAVE_DOS$fgetws 1

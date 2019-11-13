@@ -245,6 +245,7 @@ NOTHROW_RPC(LIBCCALL libc___lock_fhandle)(fd_t fd)
 /*[[[body:__lock_fhandle]]]*/
 {
 	(void)fd; /* no-op */
+	COMPILER_IMPURE();
 	return 0;
 }
 /*[[[end:__lock_fhandle]]]*/
@@ -255,6 +256,7 @@ NOTHROW_NCX(LIBCCALL libc__unlock_fhandle)(fd_t fd)
 /*[[[body:_unlock_fhandle]]]*/
 {
 	(void)fd; /* no-op */
+	COMPILER_IMPURE();
 }
 /*[[[end:_unlock_fhandle]]]*/
 

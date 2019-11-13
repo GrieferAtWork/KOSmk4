@@ -587,8 +587,8 @@ ok:
 }
 
 
-PRIVATE WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) char *CC
-find_rparen(char *pattern_iter, char *pattern_end) {
+PRIVATE WUNUSED ATTR_RETNONNULL ATTR_PURE NONNULL((1, 2)) char *
+CC find_rparen(char const *pattern_iter, char const *pattern_end) {
 	unsigned int paren_recursion = 0;
 	while (pattern_iter < pattern_end) {
 		char ch = *pattern_iter++;
@@ -610,11 +610,11 @@ find_rparen(char *pattern_iter, char *pattern_end) {
 			}
 		}
 	}
-	return pattern_iter;
+	return (char *)pattern_iter;
 }
 
-PRIVATE WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) char *CC
-find_rparen_escaped(char *pattern_iter, char *pattern_end) {
+PRIVATE WUNUSED ATTR_RETNONNULL ATTR_PURE NONNULL((1, 2)) char *
+CC find_rparen_escaped(char const *pattern_iter, char const *pattern_end) {
 	unsigned int paren_recursion = 0;
 	while (pattern_iter < pattern_end) {
 		char ch = *pattern_iter++;
@@ -637,14 +637,14 @@ find_rparen_escaped(char *pattern_iter, char *pattern_end) {
 			}
 		}
 	}
-	return pattern_iter;
+	return (char *)pattern_iter;
 }
 
 /* @return: *: A pointer to the pipe-character
  * @return: NULL: No pipe */
-PRIVATE WUNUSED NONNULL((1, 2, 3)) char *CC
-find_pipe(char *pattern_iter, char *pattern_end,
-          struct regex_data *__restrict data) {
+PRIVATE WUNUSED ATTR_PURE NONNULL((1, 2, 3)) char *
+CC find_pipe(char const *pattern_iter, char const *pattern_end,
+             struct regex_data const *__restrict data) {
 	unsigned int paren_recursion = 0;
 	if unlikely((data->flags & (REGEX_FLAG_ESCAPED_PIPE |
 	                            REGEX_FLAG_LIMITED_OPERATORS)) == REGEX_FLAG_LIMITED_OPERATORS)
@@ -665,7 +665,7 @@ find_pipe(char *pattern_iter, char *pattern_end,
 		} else if (ch == '|' && !(data->flags & REGEX_FLAG_ESCAPED_PIPE)) {
 handle_pipe:
 			if (!paren_recursion)
-				return pattern_iter;
+				return (char *)pattern_iter;
 		} else if ((data->flags & REGEX_FLAG_NEWLINE_IS_PIPE) && unicode_islf(ch)) {
 			if (ch == '\r' && *pattern_iter == '\n')
 				++pattern_iter;

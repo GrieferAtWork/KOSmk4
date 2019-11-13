@@ -82,7 +82,7 @@ NOTHROW_NCX(CC search_symtab)(di_debug_sections_t const *__restrict sections,
                               di_debug_addr2line_t *__restrict result,
                               uintptr_t module_relative_pc,
                               bool fill_symstart_symend) {
-	byte_t *symaddr;
+	byte_t const *symaddr;
 	symaddr = libdi_symtab_scantable(sections->ds_symtab_start,
 	                                 sections->ds_symtab_end,
 	                                 sections->ds_symtab_ent,
@@ -90,19 +90,20 @@ NOTHROW_NCX(CC search_symtab)(di_debug_sections_t const *__restrict sections,
 	if (symaddr) {
 		uint32_t name_offset;
 		if (sections->ds_symtab_ent == sizeof(Elf32_Sym)) {
-			name_offset = ((Elf32_Sym *)symaddr)->st_name;
+			name_offset = ((Elf32_Sym const *)symaddr)->st_name;
 			if (fill_symstart_symend) {
-				result->al_symstart = (uintptr_t)((Elf32_Sym *)symaddr)->st_value;
-				result->al_symend   = result->al_symstart + (size_t)((Elf32_Sym *)symaddr)->st_size;
+				result->al_symstart = (uintptr_t)((Elf32_Sym const *)symaddr)->st_value;
+				result->al_symend   = result->al_symstart + (size_t)((Elf32_Sym const *)symaddr)->st_size;
 			}
 		} else {
-			name_offset = ((Elf64_Sym *)symaddr)->st_name;
+			name_offset = ((Elf64_Sym const *)symaddr)->st_name;
 			if (fill_symstart_symend) {
-				result->al_symstart = (uintptr_t)((Elf64_Sym *)symaddr)->st_value;
-				result->al_symend   = result->al_symstart + (size_t)((Elf64_Sym *)symaddr)->st_size;
+				result->al_symstart = (uintptr_t)((Elf64_Sym const *)symaddr)->st_value;
+				result->al_symend   = result->al_symstart + (size_t)((Elf64_Sym const *)symaddr)->st_size;
 			}
 		}
-		if (name_offset < (size_t)((char *)sections->ds_strtab_end - (char *)sections->ds_strtab_start))
+		if (name_offset < (size_t)((char *)sections->ds_strtab_end -
+		                           (char *)sections->ds_strtab_start))
 			result->al_rawname = (char *)sections->ds_strtab_start + name_offset;
 	}
 	/* Special case: The kernel core doesn't include its internal `.symtab' as part of its binary

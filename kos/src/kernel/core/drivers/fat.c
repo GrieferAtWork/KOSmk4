@@ -60,15 +60,15 @@ DECL_BEGIN
 
 
 /* The fat get/set implementation for different table sizes. */
-PRIVATE FatClusterIndex KCALL Fat12_GetFatIndirection(FatSuperblock *__restrict self, FatClusterIndex index);
-PRIVATE FatClusterIndex KCALL Fat16_GetFatIndirection(FatSuperblock *__restrict self, FatClusterIndex index);
-PRIVATE FatClusterIndex KCALL Fat32_GetFatIndirection(FatSuperblock *__restrict self, FatClusterIndex index);
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL Fat12_GetFatIndirection(FatSuperblock const *__restrict self, FatClusterIndex index);
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL Fat16_GetFatIndirection(FatSuperblock const *__restrict self, FatClusterIndex index);
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL Fat32_GetFatIndirection(FatSuperblock const *__restrict self, FatClusterIndex index);
 PRIVATE void KCALL Fat16_SetFatIndirection(FatSuperblock *__restrict self, FatClusterIndex index, FatClusterIndex indirection_target);
 PRIVATE void KCALL Fat12_SetFatIndirection(FatSuperblock *__restrict self, FatClusterIndex index, FatClusterIndex indirection_target);
 PRIVATE void KCALL Fat32_SetFatIndirection(FatSuperblock *__restrict self, FatClusterIndex index, FatClusterIndex indirection_target);
-PRIVATE FatSectorIndex KCALL Fat12_GetTableSector(FatSuperblock *__restrict self, FatClusterIndex id);
-PRIVATE FatSectorIndex KCALL Fat16_GetTableSector(FatSuperblock *__restrict self, FatClusterIndex id);
-PRIVATE FatSectorIndex KCALL Fat32_GetTableSector(FatSuperblock *__restrict self, FatClusterIndex id);
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatSectorIndex KCALL Fat12_GetTableSector(FatSuperblock const *__restrict self, FatClusterIndex id);
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatSectorIndex KCALL Fat16_GetTableSector(FatSuperblock const *__restrict self, FatClusterIndex id);
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatSectorIndex KCALL Fat32_GetTableSector(FatSuperblock const *__restrict self, FatClusterIndex id);
 
 INTDEF struct inode_type Fat_FileNodeOperators;
 INTDEF struct inode_type Fat_DirectoryNodeOperators;
@@ -88,7 +88,7 @@ INTDEF struct inode_type Fat32_RootDirectoryNodeOperators;
 
 
 
-INTERN void KCALL
+INTERN NONNULL((1)) void KCALL
 Fat32_VReadFromINode(struct inode *__restrict self,
                      CHECKED USER byte_t *buf,
                      size_t bufsize, pos_t pos) {
@@ -137,7 +137,8 @@ Fat32_VReadFromINode(struct inode *__restrict self,
 		}
 	}
 }
-INTERN size_t KCALL
+
+INTERN NONNULL((1)) size_t KCALL
 Fat32_VTryReadFromINode(struct inode *__restrict self,
                         CHECKED USER byte_t *buf,
                         size_t bufsize, pos_t pos) {
@@ -185,7 +186,8 @@ Fat32_VTryReadFromINode(struct inode *__restrict self,
 	}
 	return result;
 }
-INTERN void KCALL
+
+INTERN NONNULL((1)) void KCALL
 Fat32_VWriteToINode(struct inode *__restrict self,
                     CHECKED USER byte_t const *buf,
                     size_t bufsize, pos_t pos) {
@@ -229,8 +231,7 @@ Fat32_VWriteToINode(struct inode *__restrict self,
 	}
 }
 
-
-INTDEF void KCALL
+INTERN NONNULL((1)) void KCALL
 Fat16_VReadFromRootDirectory(FatSuperblock *__restrict self,
                              CHECKED USER byte_t *buf,
                              size_t bufsize, pos_t pos) {
@@ -254,7 +255,8 @@ Fat16_VReadFromRootDirectory(FatSuperblock *__restrict self,
 	                  max_read,
 	                  self->i_fsdata->i16_root.f16_rootpos + pos);
 }
-INTDEF size_t KCALL
+
+INTERN NONNULL((1)) size_t KCALL
 Fat16_VTryReadFromRootDirectory(FatSuperblock *__restrict self,
                                 CHECKED USER byte_t *buf,
                                 size_t bufsize, pos_t pos) {
@@ -274,7 +276,8 @@ Fat16_VTryReadFromRootDirectory(FatSuperblock *__restrict self,
 	                  self->i_fsdata->i16_root.f16_rootpos + pos);
 	return max_read;
 }
-INTDEF void KCALL
+
+INTERN NONNULL((1)) void KCALL
 Fat16_VWriteToRootDirectory(FatSuperblock *__restrict self,
                             CHECKED USER byte_t const *buf,
                             size_t bufsize, pos_t pos) {
@@ -297,7 +300,7 @@ too_large:
 	THROW(E_FSERROR_DISK_FULL);
 }
 
-INTDEF void KCALL
+INTERN NONNULL((1)) void KCALL
 Fat_VReadFromINode(struct inode *__restrict self,
                    CHECKED USER byte_t *buf,
                    size_t bufsize, pos_t pos) {
@@ -308,7 +311,8 @@ Fat_VReadFromINode(struct inode *__restrict self,
 		Fat16_VReadFromRootDirectory((FatSuperblock *)self, buf, bufsize, pos);
 	}
 }
-INTDEF size_t KCALL
+
+INTERN NONNULL((1)) size_t KCALL
 Fat_VTryReadFromINode(struct inode *__restrict self,
                       CHECKED USER byte_t *buf,
                       size_t bufsize, pos_t pos) {
@@ -319,7 +323,8 @@ Fat_VTryReadFromINode(struct inode *__restrict self,
 		return Fat16_VTryReadFromRootDirectory((FatSuperblock *)self, buf, bufsize, pos);
 	}
 }
-INTDEF void KCALL
+
+INTERN NONNULL((1)) void KCALL
 Fat_VWriteToINode(struct inode *__restrict self,
                   CHECKED USER byte_t const *buf,
                   size_t bufsize, pos_t pos) {
@@ -337,7 +342,7 @@ Fat_VWriteToINode(struct inode *__restrict self,
 
 
 /* Returns the absolute on-disk position of `pos' in `self' */
-INTERN pos_t KCALL
+INTERN NONNULL((1)) pos_t KCALL
 Fat_GetAbsDiskPos(struct inode *__restrict self, pos_t pos) {
 	if (self != self->i_super ||
 	    ((FatSuperblock *)self->i_super)->f_type == FAT32) {
@@ -355,7 +360,7 @@ Fat_GetAbsDiskPos(struct inode *__restrict self, pos_t pos) {
 	return pos;
 }
 
-LOCAL void KCALL
+LOCAL NONNULL((1, 2, 3)) void KCALL
 preallocate_cluster_vector_entries(struct inode *__restrict node,
                                    FatNode *__restrict data,
                                    FatSuperblock *__restrict fat,
@@ -394,7 +399,7 @@ allocate_smallest_possible:
 	data->i_clustera = new_alloc;
 }
 
-LOCAL void KCALL
+LOCAL NONNULL((1)) void KCALL
 zero_initialize_cluster(FatSuperblock *__restrict fat,
                         FatClusterIndex cluster) {
 	/* TODO */
@@ -403,7 +408,7 @@ zero_initialize_cluster(FatSuperblock *__restrict fat,
 
 /* Lookup (and potentially allocate the associated
  * chain for) the `nth_cluster' of the given `node' */
-INTERN FatClusterIndex KCALL
+INTERN NONNULL((1)) FatClusterIndex KCALL
 Fat_GetFileCluster(struct inode *__restrict node,
                    size_t nth_cluster, unsigned int mode) {
 	FatClusterIndex result;
@@ -561,10 +566,10 @@ create_more_clusters_already_locked:
 
 
 
-PRIVATE u32 KCALL
+PRIVATE NONNULL((1, 3)) u32 KCALL
 FatDirectory_AllocateFreeRange(struct directory_node *__restrict self,
                                u32 entry_count,
-                               bool *pis_directory_end) {
+                               bool *__restrict pis_directory_end) {
 	/* XXX: Search through available free ranges and return the first
 	 *      one with at least `entry_count' free slots and set
 	 *     `*pis_directory_end' to `false'.  Otherwise return the
@@ -593,17 +598,19 @@ FatDirectory_AllocateFreeRange(struct directory_node *__restrict self,
 	}
 }
 
-PRIVATE void
+PRIVATE NONNULL((1)) void
 NOTHROW(KCALL FatDirectory_AddFreeRange)(struct directory_node *__restrict self,
                                          u32 first_entry_number, u32 entry_count) {
 	/* XXX: Mark the given range as free, and panic of any entry is already marked as free. */
 }
-PRIVATE void
+
+PRIVATE NONNULL((1)) void
 NOTHROW(KCALL FatDirectory_AddFreeFile)(struct directory_node *__restrict self,
                                         u32 entry_number) {
 	/* XXX: Mark `entry_number' as free, but don't do anything if it was already marked as such. */
 }
-PRIVATE void
+
+PRIVATE NONNULL((1)) void
 NOTHROW(KCALL FatDirectory_CheckTruncation)(struct directory_node *__restrict self) {
 	if (self == self->i_super && ((FatSuperblock *)self)->f_type != FAT32)
 		return; /* Fixed-length directory (cannot be truncated) */
@@ -664,7 +671,7 @@ typedef struct ATTR_PACKED {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waddress-of-packed-member"
 
-PRIVATE REF struct directory_entry *KCALL
+PRIVATE NONNULL((1, 2)) REF struct directory_entry *KCALL
 Fat_ReadDirectory(struct directory_node *__restrict self,
                   pos_t *__restrict pentry_pos) {
 	REF struct directory_entry *result;
@@ -915,7 +922,7 @@ PRIVATE time_t const time_monthstart_yday[2][13] = {
 	time_monthstart_yday[!!(leap_year)][month]
 
 
-LOCAL time_t KCALL
+LOCAL ATTR_CONST time_t KCALL
 Fat_DecodeFileDate(FatFileDate self) {
 	time_t result;
 	unsigned int year;
@@ -925,7 +932,8 @@ Fat_DecodeFileDate(FatFileDate self) {
 	result += self.fd_day - 1;
 	return result * SECONDS_PER_DAY;
 }
-LOCAL FatFileDate KCALL
+
+LOCAL ATTR_CONST FatFileDate KCALL
 Fat_EncodeFileDate(time_t tmt) {
 	FatFileDate result;
 	unsigned int year;
@@ -945,12 +953,16 @@ Fat_EncodeFileDate(time_t tmt) {
 	result.fd_day   = (tmt - monthvec[i - 1]) + 1;
 	return result;
 }
-LOCAL time_t KCALL Fat_DecodeFileTime(FatFileTime self) {
+
+LOCAL ATTR_CONST time_t KCALL
+Fat_DecodeFileTime(FatFileTime self) {
 	return ((time_t)self.ft_hour * 60 * 60) +
 	       ((time_t)self.ft_min * 60) +
 	       ((time_t)self.ft_sec * 2);
 }
-LOCAL FatFileTime KCALL Fat_EncodeFileTime(time_t tmt) {
+
+LOCAL ATTR_CONST FatFileTime KCALL
+Fat_EncodeFileTime(time_t tmt) {
 	FatFileTime result;
 	result.ft_sec  = (tmt % 60) / 2;
 	result.ft_min  = ((tmt / 60) % 60);
@@ -959,8 +971,9 @@ LOCAL FatFileTime KCALL Fat_EncodeFileTime(time_t tmt) {
 }
 
 
-PRIVATE NONNULL((1)) void(KCALL Fat_MaskINodeAttributes)(struct inode *__restrict self)
-THROWS(E_FSERROR_UNSUPPORTED_OPERATION, ...) {
+PRIVATE NONNULL((1)) void
+(KCALL Fat_MaskINodeAttributes)(struct inode *__restrict self)
+		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, ...) {
 	FatSuperblock *super = (FatSuperblock *)self->i_super;
 	{
 		FatFileTime temp_time;
@@ -1008,7 +1021,7 @@ THROWS(E_FSERROR_UNSUPPORTED_OPERATION, ...) {
 	}
 }
 
-PRIVATE void KCALL
+PRIVATE NONNULL((1, 2)) void KCALL
 Fat_LoadINodeFromFatFile(struct inode *__restrict self,
                          FatFile const *__restrict file) {
 	FatNode *data        = self->i_fsdata;
@@ -1087,7 +1100,7 @@ Fat_LoadINodeFromFatFile(struct inode *__restrict self,
 
 }
 
-PRIVATE void KCALL
+PRIVATE NONNULL((1, 2)) void KCALL
 Fat_SaveINodeToFatFile(struct inode const *__restrict self,
                        FatFile *__restrict file) {
 	FatSuperblock *super = (FatSuperblock *)self->i_super;
@@ -1176,6 +1189,7 @@ Fat32_LoadINodeAttributes(struct inode *__restrict self)
 	/* Load Node data from the file. */
 	Fat_LoadINodeFromFatFile(self, COMPILER_CONTAINER_OF((u8 *)buf, FatFile, f_attr));
 }
+
 PRIVATE NONNULL((1)) void KCALL
 Fat32_SaveINodeAttributes(struct inode *__restrict self)
 		THROWS(E_IOERROR, ...) {
@@ -1186,6 +1200,7 @@ Fat32_SaveINodeAttributes(struct inode *__restrict self)
 	block_device_write(self->i_super->s_device, buf, sizeof(buf),
 	                   (pos_t)self->i_fileino + offsetof(FatFile, f_attr));
 }
+
 PRIVATE NONNULL((1)) void KCALL
 Fat16_LoadRootDirectoryEntryINodeAttributes(struct inode *__restrict self)
 		THROWS(E_IOERROR, ...) {
@@ -1196,6 +1211,7 @@ Fat16_LoadRootDirectoryEntryINodeAttributes(struct inode *__restrict self)
 	/* Load Node data from the file. */
 	Fat_LoadINodeFromFatFile(self, COMPILER_CONTAINER_OF((u8 *)buf, FatFile, f_attr));
 }
+
 PRIVATE NONNULL((1)) void KCALL
 Fat16_SaveRootDirectoryEntryINodeAttributes(struct inode *__restrict self)
 		THROWS(E_IOERROR, ...) {
@@ -1276,8 +1292,9 @@ Fat_Ioctl(struct inode *__restrict self, syscall_ulong_t cmd,
 
 
 
-PRIVATE void KCALL
-Fat_DoTruncateINode(struct inode *__restrict self, size_t new_cluster_count) {
+PRIVATE NONNULL((1)) void KCALL
+Fat_DoTruncateINode(struct inode *__restrict self,
+                    size_t new_cluster_count) {
 	FatNode *node      = self->i_fsdata;
 	FatSuperblock *fat = (FatSuperblock *)self->i_super;
 	FatClusterIndex delete_start;
@@ -1305,7 +1322,7 @@ Fat_DoTruncateINode(struct inode *__restrict self, size_t new_cluster_count) {
 	node->i_clusterc                    = new_cluster_count + 1;
 }
 
-PRIVATE void KCALL
+PRIVATE NONNULL((1)) void KCALL
 Fat_TruncateINode(struct inode *__restrict self, pos_t new_size) {
 	if (new_size > self->i_filesize)
 		return; /* File extending is done lazily. */
@@ -1366,7 +1383,7 @@ Fat_RemoveDirectoryFromParentDirectory(struct directory_node *__restrict contain
 
 
 
-LOCAL WUNUSED u8
+LOCAL WUNUSED ATTR_PURE NONNULL((1)) u8
 NOTHROW(KCALL lfn_checksum)(char const *__restrict dos83_name) {
 	unsigned int i;
 	u8 result = 0;
@@ -1393,7 +1410,7 @@ NOTHROW(KCALL lfn_checksum)(char const *__restrict dos83_name) {
  *              When `buffer' is re-returned, `inhert_heap_buffer' is ignored.
  *              Otherwise, the returned buffer is allocated on the heap using
  *              kmalloc(), and must be freed by the caller. */
-PRIVATE NOBLOCK ATTR_RETNONNULL FatFile *KCALL
+PRIVATE NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4)) FatFile *KCALL
 Fat_GenerateFileEntries(FatFile *__restrict buffer,
                         u32 *__restrict pbuffer_length,
                         struct directory_entry *__restrict target_dirent,
@@ -1647,7 +1664,7 @@ Fat_GenerateFileEntries(FatFile *__restrict buffer,
 }
 
 
-LOCAL NOBLOCK bool
+LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1, 2)) bool
 NOTHROW(KCALL directory_has_dos83)(struct directory_node *__restrict self,
                                    char *__restrict name) {
 	size_t i;
@@ -1665,7 +1682,7 @@ NOTHROW(KCALL directory_has_dos83)(struct directory_node *__restrict self,
 /* Same as `Fat_GenerateFileEntries()', but the givne `buffer' must be allocated
  * on the stack, and this function will automatically re-try when an 8.3 variant
  * of a long filename already exists. */
-PRIVATE NOBLOCK ATTR_RETNONNULL FatFile *
+PRIVATE NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5)) FatFile *
 (KCALL Fat_GenerateFileEntriesAuto)(struct directory_node *__restrict target_directory,
                                     FatFile *__restrict buffer,
                                     u32 *__restrict pbuffer_length,
@@ -2148,24 +2165,26 @@ INTERN struct inode_type Fat32_RootDirectoryNodeOperators = {
 
 
 
-PRIVATE FatSectorIndex KCALL
-Fat12_GetTableSector(FatSuperblock *__restrict self,
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatSectorIndex KCALL
+Fat12_GetTableSector(FatSuperblock const *__restrict self,
                      FatClusterIndex id) {
 	return (id + (id / 2)) / self->f_sectorsize;
 }
-PRIVATE FatSectorIndex KCALL
-Fat16_GetTableSector(FatSuperblock *__restrict self,
+
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatSectorIndex KCALL
+Fat16_GetTableSector(FatSuperblock const *__restrict self,
                      FatClusterIndex id) {
 	return (id * 2) / self->f_sectorsize;
 }
-PRIVATE FatSectorIndex KCALL
-Fat32_GetTableSector(FatSuperblock *__restrict self,
+
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatSectorIndex KCALL
+Fat32_GetTableSector(FatSuperblock const *__restrict self,
                      FatClusterIndex id) {
 	return (id * 4) / self->f_sectorsize;
 }
 
-PRIVATE FatClusterIndex KCALL
-Fat12_GetFatIndirection(FatSuperblock *__restrict self,
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL
+Fat12_GetFatIndirection(FatSuperblock const *__restrict self,
                         FatClusterIndex index) {
 	u16 val;
 	assertf(index < self->f_fat_length,
@@ -2178,7 +2197,8 @@ Fat12_GetFatIndirection(FatSuperblock *__restrict self,
 		val &= 0x0fff;
 	return val;
 }
-PRIVATE void KCALL
+
+PRIVATE NONNULL((1)) void KCALL
 Fat12_SetFatIndirection(FatSuperblock *__restrict self,
                         FatClusterIndex index,
                         FatClusterIndex indirection_target) {
@@ -2193,15 +2213,16 @@ Fat12_SetFatIndirection(FatSuperblock *__restrict self,
 		*pval |= indirection_target & 0xfff;
 }
 
-PRIVATE FatClusterIndex KCALL
-Fat16_GetFatIndirection(FatSuperblock *__restrict self,
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL
+Fat16_GetFatIndirection(FatSuperblock const *__restrict self,
                         FatClusterIndex index) {
 	assertf(index < self->f_fat_length,
 	        "Out-of-bounds FAT index: %I32u >= %I32u",
 	        index, self->f_fat_length);
 	return ((u16 *)self->f_fat_table)[index];
 }
-PRIVATE void KCALL
+
+PRIVATE NONNULL((1)) void KCALL
 Fat16_SetFatIndirection(FatSuperblock *__restrict self,
                         FatClusterIndex index,
                         FatClusterIndex indirection_target) {
@@ -2211,15 +2232,16 @@ Fat16_SetFatIndirection(FatSuperblock *__restrict self,
 	((u16 *)self->f_fat_table)[index] = (u16)indirection_target;
 }
 
-PRIVATE FatClusterIndex KCALL
-Fat32_GetFatIndirection(FatSuperblock *__restrict self,
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL
+Fat32_GetFatIndirection(FatSuperblock const *__restrict self,
                         FatClusterIndex index) {
 	assertf(index < self->f_fat_length,
 	        "Out-of-bounds FAT index: %I32u >= %I32u",
 	        index, self->f_fat_length);
 	return ((u32 *)self->f_fat_table)[index];
 }
-PRIVATE void KCALL
+
+PRIVATE NONNULL((1)) void KCALL
 Fat32_SetFatIndirection(FatSuperblock *__restrict self,
                         FatClusterIndex index,
                         FatClusterIndex indirection_target) {
@@ -2229,7 +2251,7 @@ Fat32_SetFatIndirection(FatSuperblock *__restrict self,
 	((u32 *)self->f_fat_table)[index] = indirection_target;
 }
 
-INTERN FatClusterIndex KCALL
+INTERN WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL
 Fat_GetFatIndirection(FatSuperblock *__restrict self,
                       FatClusterIndex index) {
 	FatSectorIndex table_sector;
@@ -2252,7 +2274,7 @@ Fat_GetFatIndirection(FatSuperblock *__restrict self,
 }
 
 
-INTERN void KCALL
+INTERN NONNULL((1)) void KCALL
 Fat_SetFatIndirection(FatSuperblock *__restrict self,
                       FatClusterIndex index,
                       FatClusterIndex indirection_target) {
@@ -2278,7 +2300,7 @@ Fat_SetFatIndirection(FatSuperblock *__restrict self,
 }
 
 
-INTERN FatClusterIndex KCALL
+INTERN WUNUSED NONNULL((1)) FatClusterIndex KCALL
 Fat_FindFreeCluster(FatSuperblock *__restrict self) {
 	FatClusterIndex result;
 	assert(sync_reading(&self->f_fat_lock));
@@ -2300,7 +2322,7 @@ found_one:
 	return result;
 }
 
-INTERN void KCALL
+INTERN NONNULL((1)) void KCALL
 Fat_DeleteClusterChain(FatSuperblock *__restrict self,
                        FatClusterIndex first_delete_index) {
 	SCOPED_WRITELOCK(&self->f_fat_lock);
@@ -2317,7 +2339,8 @@ Fat_DeleteClusterChain(FatSuperblock *__restrict self,
 }
 
 
-PRIVATE void KCALL trimspecstring(char *__restrict buf, size_t size) {
+PRIVATE NONNULL((1)) void KCALL
+trimspecstring(char *__restrict buf, size_t size) {
 	while (size && FAT_ISSPACE(*buf)) {
 		memmove(buf, buf + 1, --size);
 		buf[size] = '\0';
@@ -2327,7 +2350,7 @@ PRIVATE void KCALL trimspecstring(char *__restrict buf, size_t size) {
 }
 
 
-PRIVATE void KCALL
+PRIVATE NONNULL((1)) void KCALL
 Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 		THROWS(E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_CORRUPTED_FILE_SYSTEM,
 		       E_IOERROR_BADBOUNDS, E_DIVIDE_BY_ZERO, E_OVERFLOW, E_INDEX_ERROR,
@@ -2527,7 +2550,7 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 }
 
 
-PRIVATE NOBLOCK void
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL Fat_FinalizeSuperblock)(FatSuperblock *__restrict self) {
 	if (self->f_type == FAT32)
 		kfree(self->f_root.i_clusterv);
@@ -2535,12 +2558,12 @@ NOTHROW(KCALL Fat_FinalizeSuperblock)(FatSuperblock *__restrict self) {
 	kfree(self->f_fat_meta);
 }
 
-PRIVATE void KCALL
+PRIVATE NONNULL((1, 2, 3, 4)) void KCALL
 Fat_OpenINode(FatSuperblock *__restrict self,
               struct inode *__restrict node,
               struct directory_node *__restrict parent_directory,
               struct directory_entry *__restrict parent_directory_entry)
-             THROWS(E_IOERROR, E_BADALLOC,...) {
+		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	switch (node->i_filemode & S_IFMT) {
 
 	case S_IFREG:
@@ -2570,7 +2593,7 @@ Fat_OpenINode(FatSuperblock *__restrict self,
 }
 
 
-LOCAL void KCALL
+LOCAL NONNULL((1)) void KCALL
 Fat_WriteFatIndirectionTableSegment(FatSuperblock *__restrict self,
                                     FatSectorIndex fat_sector_index,
                                     size_t num_sectors) {
@@ -2610,7 +2633,7 @@ Fat_StatSuperblock(FatSuperblock *__restrict self,
 }
 
 
-PRIVATE void KCALL
+PRIVATE NONNULL((1)) void KCALL
 Fat_SynchronizeSuperblock(FatSuperblock *__restrict self)
 		THROWS(E_IOERROR, ...) {
 	FatSectorIndex changed_begin, changed_end;

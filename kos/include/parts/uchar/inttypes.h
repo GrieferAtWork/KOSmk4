@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa7d6054 */
+/* HASH CRC-32:0x3415ccc6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,104 +41,104 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 
 #if defined(__CRT_HAVE_wcstoimax) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoimax,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoimax,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstol) && __SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstol,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstol,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoll) && __SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoll,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoll,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoq) && __SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoq,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcsto64) && __SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 8
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcsto64,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcsto64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcsto32) && __SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 4
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcsto32,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcsto32,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcstol) && (__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstol,(__nptr,__endptr,__base))
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstol,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcstoll) && (__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoll,(__nptr,__endptr,__base))
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoll,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcstoq) && (__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoq,(__nptr,__endptr,__base))
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcsto64) && (__SIZEOF_INTMAX_T__ == 8)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcsto64,(__nptr,__endptr,__base))
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcsto64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcsto32) && (__SIZEOF_INTMAX_T__ == 4)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcsto32,(__nptr,__endptr,__base))
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcsto32,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcstoimax)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoimax,(__nptr,__endptr,__base))
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoimax,(__nptr,__endptr,__base))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/inttypes/wcstoimax.h>
-__FORCELOCAL __ATTR_PURE __ATTR_NONNULL((1)) __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL c16toimax)(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoimax))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
+__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL c16toimax)(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoimax))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
 #else /* LIBC: c16toimax */
 #include <local/inttypes/c16toimax.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(c16toimax, __FORCELOCAL __ATTR_PURE __ATTR_NONNULL((1)) __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL c16toimax)(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16toimax))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16toimax, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL c16toimax)(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16toimax))(__nptr, __endptr, __base); })
 #endif /* c16toimax... */
 #if defined(__CRT_HAVE_wcstoimax) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c32toimax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstoimax,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c32toimax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstoimax,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstol) && __SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c32toimax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstol,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c32toimax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstol,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoll) && __SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c32toimax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstoll,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c32toimax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstoll,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoq) && __SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c32toimax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstoq,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c32toimax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstoq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcsto64) && __SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == 8
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c32toimax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcsto64,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c32toimax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcsto64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcsto32) && __SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == 4
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c32toimax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcsto32,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c32toimax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcsto32,(__nptr,__endptr,__base))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/inttypes/wcstoimax.h>
-__FORCELOCAL __ATTR_PURE __ATTR_NONNULL((1)) __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL c32toimax)(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoimax))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
+__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL c32toimax)(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoimax))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
 #else /* LIBC: c32toimax */
 #include <local/inttypes/c32toimax.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(c32toimax, __FORCELOCAL __ATTR_PURE __ATTR_NONNULL((1)) __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL c32toimax)(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32toimax))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32toimax, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL c32toimax)(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32toimax))(__nptr, __endptr, __base); })
 #endif /* c32toimax... */
 #if defined(__CRT_HAVE_wcstoumax) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoumax,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoumax,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoul) && __SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoul,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoul,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoull) && __SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoull,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoull,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstouq) && __SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstouq,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstouq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstou64) && __SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 8
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstou64,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstou64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstou32) && __SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 4
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstou32,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstou32,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcstoul) && (__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoul,(__nptr,__endptr,__base))
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoul,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcstoull) && (__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoull,(__nptr,__endptr,__base))
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoull,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcstouq) && (__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstouq,(__nptr,__endptr,__base))
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstouq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcstou64) && (__SIZEOF_INTMAX_T__ == 8)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstou64,(__nptr,__endptr,__base))
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstou64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcstou32) && (__SIZEOF_INTMAX_T__ == 4)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstou32,(__nptr,__endptr,__base))
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstou32,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcstoumax)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoumax,(__nptr,__endptr,__base))
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoumax,(__nptr,__endptr,__base))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/inttypes/wcstoumax.h>
-__FORCELOCAL __ATTR_PURE __ATTR_NONNULL((1)) __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL c16toumax)(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoumax))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
+__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL c16toumax)(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoumax))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
 #else /* LIBC: c16toumax */
 #include <local/inttypes/c16toumax.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(c16toumax, __FORCELOCAL __ATTR_PURE __ATTR_NONNULL((1)) __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL c16toumax)(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16toumax))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16toumax, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL c16toumax)(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16toumax))(__nptr, __endptr, __base); })
 #endif /* c16toumax... */
 #if defined(__CRT_HAVE_wcstoumax) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c32toumax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstoumax,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c32toumax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstoumax,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoul) && __SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c32toumax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstoul,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c32toumax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstoul,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoull) && __SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c32toumax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstoull,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c32toumax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstoull,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstouq) && __SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c32toumax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstouq,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c32toumax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstouq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstou64) && __SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == 8
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c32toumax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstou64,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c32toumax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstou64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstou32) && __SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INTMAX_T__ == 4
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c32toumax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstou32,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c32toumax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstou32,(__nptr,__endptr,__base))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/inttypes/wcstoumax.h>
-__FORCELOCAL __ATTR_PURE __ATTR_NONNULL((1)) __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL c32toumax)(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoumax))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
+__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL c32toumax)(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoumax))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
 #else /* LIBC: c32toumax */
 #include <local/inttypes/c32toumax.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(c32toumax, __FORCELOCAL __ATTR_PURE __ATTR_NONNULL((1)) __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL c32toumax)(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32toumax))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32toumax, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL c32toumax)(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32toumax))(__nptr, __endptr, __base); })
 #endif /* c32toumax... */
 #ifdef __USE_XOPEN2K8
 #if defined(__CRT_HAVE_wcstoimax_l) && (__SIZEOF_WCHAR_T__ == 2)

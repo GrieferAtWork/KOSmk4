@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b21f32c */
+/* HASH CRC-32:0x2c04aafd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lfind))(void const *__key,
                                                    __SIZE_TYPE__ *__nmemb,
                                                    __SIZE_TYPE__ __size,
                                                    __compar_fn_t __compar) {
-#line 774 "kos/src/libc/magic/search.c"
+#line 775 "kos/src/libc/magic/search.c"
 	__SIZE_TYPE__ __i, __count = *__nmemb;
 	void const *__result = __base;
 	for (__i = 0; __i < __count; ++__i) {

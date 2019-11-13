@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xada7bd9 */
+/* HASH CRC-32:0xfdf6ef55 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(pthread_mutex_timedlock64) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_mutex_timedlock64))(__pthread_mutex_t *__restrict __mutex,
                                                                        struct __timespec64 const *__restrict __abstime) {
-#line 843 "kos/src/libc/magic/pthread.c"
+#line 844 "kos/src/libc/magic/pthread.c"
 	int __result;
 	struct __timespec32 __abstime32;
 	__abstime32.tv_sec  = (__time32_t)__abstime->tv_sec;

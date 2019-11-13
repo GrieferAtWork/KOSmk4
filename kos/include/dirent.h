@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10924ff8 */
+/* HASH CRC-32:0x521d0f5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -243,7 +243,7 @@ __CDECLARE(__ATTR_NONNULL((1)),long int,__NOTHROW_NCX,telldir,(DIR *__restrict _
 #ifdef __USE_XOPEN2K8
 #ifdef __CRT_HAVE_dirfd
 /* Return the underlying file descriptor of the given directory stream */
-__CDECLARE(__ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,dirfd,(DIR *__restrict __dirp),(__dirp))
+__CDECLARE(__ATTR_PURE __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,dirfd,(DIR __KOS_FIXED_CONST *__restrict __dirp),(__dirp))
 #endif /* dirfd... */
 typedef int (*__scandir_selector_t)(struct dirent const *);
 typedef int (*__scandir_cmp_t)(struct dirent const **, struct dirent const **);

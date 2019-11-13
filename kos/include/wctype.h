@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0fba6f5 */
+/* HASH CRC-32:0xdde4b3c6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -268,12 +268,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(iswxdigit, __FORCELOCAL __ATTR_CONST __ATTR_WUNU
 #ifdef __wctrans_defined
 __NAMESPACE_GLB_USING(wctrans)
 #elif defined(__CRT_HAVE_wctrans)
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),wctrans_t,__NOTHROW_NCX,wctrans,(char const *__prop),(__prop))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),wctrans_t,__NOTHROW_NCX,wctrans,(char const *__prop),(__prop))
 #else /* LIBC: wctrans */
 __NAMESPACE_STD_END
 #include <local/wctype/wctrans.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(wctrans, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) wctrans_t __NOTHROW_NCX(__LIBCCALL wctrans)(char const *__prop) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wctrans))(__prop); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wctrans, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) wctrans_t __NOTHROW_NCX(__LIBCCALL wctrans)(char const *__prop) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wctrans))(__prop); })
 #endif /* wctrans... */
 #endif /* !__std_wctrans_defined */
 #ifndef __std_towctrans_defined
@@ -281,36 +281,36 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wctrans, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONN
 #ifdef __towctrans_defined
 __NAMESPACE_GLB_USING(towctrans)
 #elif defined(__CRT_HAVE_towctrans)
-__CDECLARE(__ATTR_WUNUSED,wint_t,__NOTHROW_NCX,towctrans,(wint_t __wc, wctrans_t __desc),(__wc,__desc))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,wint_t,__NOTHROW_NCX,towctrans,(wint_t __wc, wctrans_t __desc),(__wc,__desc))
 #elif defined(__CRT_HAVE___towctrans)
-__CREDIRECT(__ATTR_WUNUSED,wint_t,__NOTHROW_NCX,towctrans,(wint_t __wc, wctrans_t __desc),__towctrans,(__wc,__desc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,wint_t,__NOTHROW_NCX,towctrans,(wint_t __wc, wctrans_t __desc),__towctrans,(__wc,__desc))
 #else /* LIBC: towctrans */
 __NAMESPACE_STD_END
 #include <local/wctype/towctrans.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(towctrans, __FORCELOCAL __ATTR_WUNUSED wint_t __NOTHROW_NCX(__LIBCCALL towctrans)(wint_t __wc, wctrans_t __desc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(towctrans))(__wc, __desc); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(towctrans, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED wint_t __NOTHROW_NCX(__LIBCCALL towctrans)(wint_t __wc, wctrans_t __desc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(towctrans))(__wc, __desc); })
 #endif /* towctrans... */
 #endif /* !__std_towctrans_defined */
 #endif /* __USE_ISOC99 */
 #ifdef __CRT_HAVE_wctype
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),wctype_t,__NOTHROW_NCX,wctype,(char const *__prop),(__prop))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),wctype_t,__NOTHROW_NCX,wctype,(char const *__prop),(__prop))
 #else /* LIBC: wctype */
 __NAMESPACE_STD_END
 #include <local/wctype/wctype.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(wctype, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) wctype_t __NOTHROW_NCX(__LIBCCALL wctype)(char const *__prop) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wctype))(__prop); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wctype, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) wctype_t __NOTHROW_NCX(__LIBCCALL wctype)(char const *__prop) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wctype))(__prop); })
 #endif /* wctype... */
 #ifdef __CRT_HAVE_iswctype
-__CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,iswctype,(wint_t __wc, wctype_t __desc),(__wc,__desc))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,iswctype,(wint_t __wc, wctype_t __desc),(__wc,__desc))
 #elif defined(__CRT_HAVE_is_wctype)
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,iswctype,(wint_t __wc, wctype_t __desc),is_wctype,(__wc,__desc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,iswctype,(wint_t __wc, wctype_t __desc),is_wctype,(__wc,__desc))
 #elif defined(__CRT_HAVE___iswctype)
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,iswctype,(wint_t __wc, wctype_t __desc),__iswctype,(__wc,__desc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,iswctype,(wint_t __wc, wctype_t __desc),__iswctype,(__wc,__desc))
 #else /* LIBC: iswctype */
 __NAMESPACE_STD_END
 #include <local/wctype/iswctype.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(iswctype, __FORCELOCAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL iswctype)(wint_t __wc, wctype_t __desc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswctype))(__wc, __desc); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(iswctype, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL iswctype)(wint_t __wc, wctype_t __desc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswctype))(__wc, __desc); })
 #endif /* iswctype... */
 #ifdef __USE_ISOC99
 #ifndef __std_iswblank_defined

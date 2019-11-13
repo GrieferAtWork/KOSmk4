@@ -1986,7 +1986,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL uhci_aio_noop_noarg)(struct aio_handle *__restrict UNUSED(self)) {
 }
 
-PRIVATE NOBLOCK WUNUSED NONNULL((1)) size_t
+PRIVATE NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) size_t
 NOTHROW(KCALL uhci_aio_sync_retsize)(struct aio_handle *__restrict self) {
 	return (size_t)self->ah_data[0];
 }
@@ -2347,7 +2347,7 @@ uhci_interrupt_frameentry_init(struct uhci_interrupt_frameentry *__restrict self
 	}
 }
 
-LOCAL NOBLOCK size_t
+LOCAL NOBLOCK ATTR_PURE size_t
 NOTHROW(FCALL uhci_count_tds)(struct uhci_ostd *__restrict first) {
 	size_t result = 1;
 	while ((first = first->td_next) != NULL)

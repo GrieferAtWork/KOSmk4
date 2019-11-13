@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5f3b2a1 */
+/* HASH CRC-32:0x43d34067 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -402,10 +402,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_free_dbg, __FORCELOCAL void __NOTHROW_NCX(__LIB
 #ifndef ___msize_dbg_defined
 #define ___msize_dbg_defined 1
 #ifdef __CRT_HAVE__msize_dbg
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,_msize_dbg,(void *__ptr, int __block_type),(__ptr,__block_type))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,_msize_dbg,(void *__ptr, int __block_type),(__ptr,__block_type))
 #elif defined(__CRT_HAVE__msize) || defined(__CRT_HAVE_malloc_usable_size)
 #include <local/crtdbg/_msize_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_msize_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _msize_dbg)(void *__ptr, int __block_type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_msize_dbg))(__ptr, __block_type); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_msize_dbg, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _msize_dbg)(void *__ptr, int __block_type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_msize_dbg))(__ptr, __block_type); })
 #else /* CUSTOM: _msize_dbg */
 #undef ___msize_dbg_defined
 #endif /* _msize_dbg... */
@@ -413,10 +413,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_msize_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_N
 #ifndef ___aligned_msize_dbg_defined
 #define ___aligned_msize_dbg_defined 1
 #ifdef __CRT_HAVE__aligned_msize_dbg
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,_aligned_msize_dbg,(void *__ptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),(__ptr,__min_alignment,__offset))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,_aligned_msize_dbg,(void *__ptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),(__ptr,__min_alignment,__offset))
 #else /* LIBC: _aligned_msize_dbg */
 #include <local/crtdbg/_aligned_msize_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_msize_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _aligned_msize_dbg)(void *__ptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_msize_dbg))(__ptr, __min_alignment, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_msize_dbg, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _aligned_msize_dbg)(void *__ptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_msize_dbg))(__ptr, __min_alignment, __offset); })
 #endif /* _aligned_msize_dbg... */
 #endif /* !___aligned_msize_dbg_defined */
 #ifndef ___aligned_malloc_dbg_defined
@@ -658,16 +658,16 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_CrtDoForAllClientObjects,(_PF
 __NAMESPACE_LOCAL_USING_OR_IMPL(_CrtDoForAllClientObjects, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL _CrtDoForAllClientObjects)(_PFNCRTDOFORALLCLIENTOBJECTS __pfn, void *__context) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtDoForAllClientObjects))(__pfn, __context); })
 #endif /* _CrtDoForAllClientObjects... */
 #ifdef __CRT_HAVE__CrtIsValidPointer
-__CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,_CrtIsValidPointer,(void const *__ptr, __STDC_UINT_AS_SIZE_T __num_bytes, int __writable),(__ptr,__num_bytes,__writable))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_CrtIsValidPointer,(void const *__ptr, __STDC_UINT_AS_SIZE_T __num_bytes, int __writable),(__ptr,__num_bytes,__writable))
 #else /* LIBC: _CrtIsValidPointer */
 #include <local/crtdbg/_CrtIsValidPointer.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtIsValidPointer, __FORCELOCAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _CrtIsValidPointer)(void const *__ptr, __STDC_UINT_AS_SIZE_T __num_bytes, int __writable) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtIsValidPointer))(__ptr, __num_bytes, __writable); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtIsValidPointer, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _CrtIsValidPointer)(void const *__ptr, __STDC_UINT_AS_SIZE_T __num_bytes, int __writable) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtIsValidPointer))(__ptr, __num_bytes, __writable); })
 #endif /* _CrtIsValidPointer... */
 #ifdef __CRT_HAVE__CrtIsValidHeapPointer
-__CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,_CrtIsValidHeapPointer,(void const *__heap_ptr),(__heap_ptr))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_CrtIsValidHeapPointer,(void const *__heap_ptr),(__heap_ptr))
 #else /* LIBC: _CrtIsValidHeapPointer */
 #include <local/crtdbg/_CrtIsValidHeapPointer.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtIsValidHeapPointer, __FORCELOCAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _CrtIsValidHeapPointer)(void const *__heap_ptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtIsValidHeapPointer))(__heap_ptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtIsValidHeapPointer, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _CrtIsValidHeapPointer)(void const *__heap_ptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtIsValidHeapPointer))(__heap_ptr); })
 #endif /* _CrtIsValidHeapPointer... */
 #ifdef __CRT_HAVE__CrtIsMemoryBlock
 __CDECLARE(,int,__NOTHROW_NCX,_CrtIsMemoryBlock,(void const *__ptr, __STDC_UINT_AS_SIZE_T __num_bytes, __LONG32_TYPE__ *__prequest_number, char **__filename, int *__line),(__ptr,__num_bytes,__prequest_number,__filename,__line))
@@ -676,10 +676,10 @@ __CDECLARE(,int,__NOTHROW_NCX,_CrtIsMemoryBlock,(void const *__ptr, __STDC_UINT_
 __NAMESPACE_LOCAL_USING_OR_IMPL(_CrtIsMemoryBlock, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL _CrtIsMemoryBlock)(void const *__ptr, __STDC_UINT_AS_SIZE_T __num_bytes, __LONG32_TYPE__ *__prequest_number, char **__filename, int *__line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtIsMemoryBlock))(__ptr, __num_bytes, __prequest_number, __filename, __line); })
 #endif /* _CrtIsMemoryBlock... */
 #ifdef __CRT_HAVE__CrtReportBlockType
-__CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,_CrtReportBlockType,(void const *__ptr),(__ptr))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_CrtReportBlockType,(void const *__ptr),(__ptr))
 #else /* LIBC: _CrtReportBlockType */
 #include <local/crtdbg/_CrtReportBlockType.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtReportBlockType, __FORCELOCAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _CrtReportBlockType)(void const *__ptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtReportBlockType))(__ptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtReportBlockType, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _CrtReportBlockType)(void const *__ptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtReportBlockType))(__ptr); })
 #endif /* _CrtReportBlockType... */
 #ifdef __CRT_HAVE__CrtMemCheckpoint
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_CrtMemCheckpoint,(/*out*/ _CrtMemState *__state),(__state))
@@ -718,10 +718,10 @@ __CDECLARE(,int,__NOTHROW_NCX,_CrtSetCheckCount,(int __check_count),(__check_cou
 __NAMESPACE_LOCAL_USING_OR_IMPL(_CrtSetCheckCount, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL _CrtSetCheckCount)(int __check_count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtSetCheckCount))(__check_count); })
 #endif /* _CrtSetCheckCount... */
 #ifdef __CRT_HAVE__CrtGetCheckCount
-__CDECLARE(,int,__NOTHROW_NCX,_CrtGetCheckCount,(void),())
+__CDECLARE(__ATTR_PURE,int,__NOTHROW_NCX,_CrtGetCheckCount,(void),())
 #else /* LIBC: _CrtGetCheckCount */
 #include <local/crtdbg/_CrtGetCheckCount.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtGetCheckCount, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL _CrtGetCheckCount)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtGetCheckCount))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtGetCheckCount, __FORCELOCAL __ATTR_PURE int __NOTHROW_NCX(__LIBCCALL _CrtGetCheckCount)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtGetCheckCount))(); })
 #endif /* _CrtGetCheckCount... */
 
 #ifndef ___CrtDbgBreak_defined

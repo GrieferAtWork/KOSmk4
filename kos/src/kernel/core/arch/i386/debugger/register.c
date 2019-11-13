@@ -59,7 +59,7 @@ PRIVATE ATTR_DBGRODATA struct regdesc const known_regs[] = {
 };
 
 
-PRIVATE ATTR_DBGTEXT unsigned int
+PRIVATE ATTR_DBGTEXT WUNUSED ATTR_PURE unsigned int
 NOTHROW(FCALL name2regid)(char const *__restrict name,
                           size_t namelen) {
 	unsigned int result;

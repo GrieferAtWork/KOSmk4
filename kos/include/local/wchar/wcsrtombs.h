@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf62ec588 */
+/* HASH CRC-32:0x3ce9affa */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,15 +19,65 @@
  */
 #ifndef __local_wcsrtombs_defined
 #define __local_wcsrtombs_defined 1
+#ifdef __LIBC_BIND_OPTIMIZATIONS
+#include <optimized/string.h>
+#endif /* __LIBC_BIND_OPTIMIZATIONS */
+/* Dependency: "wcrtomb" from "wchar" */
+#ifndef ____localdep_wcrtomb_defined
+#define ____localdep_wcrtomb_defined 1
+#ifdef __CRT_HAVE_wcrtomb
+__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __WCHAR_TYPE__ __wc, __mbstate_t *__ps),wcrtomb,(__str,__wc,__ps))
+#else /* LIBC: wcrtomb */
+#include <local/wchar/wcrtomb.h>
+#define __localdep_wcrtomb (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcrtomb))
+#endif /* wcrtomb... */
+#endif /* !____localdep_wcrtomb_defined */
+
+/* Dependency: "mempcpy" from "string" */
+#ifndef ____localdep_mempcpy_defined
+#define ____localdep_mempcpy_defined 1
+#ifdef __fast_mempcpy_defined
+/* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
+#define __localdep_mempcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))
+#elif defined(__CRT_HAVE_mempcpy)
+/* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
+#elif defined(__CRT_HAVE___mempcpy)
+/* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
+#else /* LIBC: mempcpy */
+#include <local/string/mempcpy.h>
+/* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
+#define __localdep_mempcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpy))
+#endif /* mempcpy... */
+#endif /* !____localdep_mempcpy_defined */
+
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcsrtombs) __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsrtombs))(char *__dst,
                                                        __WCHAR_TYPE__ const **__restrict __psrc,
-                                                       __SIZE_TYPE__ __len,
+                                                       __SIZE_TYPE__ __dstlen,
                                                        __mbstate_t *__ps) {
-#line 223 "kos/src/libc/magic/wchar.c"
-	/* TODO */
-	return 0;
+#line 295 "kos/src/libc/magic/wchar.c"
+	__SIZE_TYPE__ __result = 0;
+	__WCHAR_TYPE__ const *__src = *__psrc;
+	while (__dstlen) {
+		__SIZE_TYPE__ __error;
+		char __buf[8]; /* 8 == UNICODE_UTF8_MAXLEN */
+		__error = __localdep_wcrtomb(__buf, *__src, __ps);
+		if (!__error)
+			break;
+		if (__error == (__SIZE_TYPE__)-1)
+			return (__SIZE_TYPE__)-1; /* EILSEQ */
+		if (__error > __dstlen)
+			break;
+		__dst = (char *)__localdep_mempcpy(__dst, __buf, __error);
+		__result += __error;
+		__dstlen -= __error;
+		++__src;
+	}
+	*__psrc = __src;
+	return __result;
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_wcsrtombs_defined */

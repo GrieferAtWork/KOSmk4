@@ -991,7 +991,7 @@ format_snprintf_printer:([nonnull] /*struct format_snprintf_data**/ void *arg,
 
 
 @@Returns the width (number of characters; not bytes) of the given unicode string
-[dependency_include(<local/unicode_utf8seqlen.h>)][kernel]
+[dependency_include(<local/unicode_utf8seqlen.h>)][kernel][ATTR_PURE]
 format_width:(void *arg, [nonnull] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
 	size_t result = 0;
 	char const *iter, *end;
@@ -1009,7 +1009,7 @@ format_width:(void *arg, [nonnull] /*utf-8*/ char const *__restrict data, $size_
 }
 
 @@Always re-return `datalen' and ignore all other arguments
-[alternate_names(format_wwidth)]
+[alternate_names(format_wwidth)][ATTR_CONST]
 format_length:(void *arg, /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
 	(void)arg;
 	(void)data;

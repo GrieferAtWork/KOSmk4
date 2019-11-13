@@ -31,7 +31,7 @@
 DECL_BEGIN
 
 
-LOCAL u32 CC
+LOCAL WUNUSED ATTR_PURE NONNULL((1)) u32 CC
 elf_symhash(char const *__restrict name) {
 	u32 h = 0, g;
 	while (*name) {

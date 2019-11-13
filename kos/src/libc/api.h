@@ -190,8 +190,8 @@ typedef __errno_t errno_t;
 #endif /* !errno_t_defined */
 
 INTDEF NOBLOCK ATTR_CONST errno_t *NOTHROW(LIBCCALL libc_errno_p)(void);
-INTDEF NOBLOCK errno_t NOTHROW(LIBCCALL libc_geterrno)(void);
-INTDEF NOBLOCK errno_t NOTHROW(LIBCCALL libc_geterrno_safe)(void);
+INTDEF NOBLOCK ATTR_PURE errno_t NOTHROW(LIBCCALL libc_geterrno)(void);
+INTDEF NOBLOCK ATTR_PURE errno_t NOTHROW(LIBCCALL libc_geterrno_safe)(void);
 /* Always returns (syscall_slong_t)-1 */
 INTDEF NOBLOCK syscall_slong_t NOTHROW(__FCALL libc_seterrno)(errno_t value);
 

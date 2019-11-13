@@ -93,7 +93,7 @@ INTDEF WUNUSED bool NOTHROW(FCALL GDBPacket_TransmitEscape)(char *endptr);
 INTDEF void NOTHROW(FCALL GDBPacket_TransmitNotification)(char *endptr);
 
 /* Calculate and return the checksum for the given memory block. */
-INTDEF WUNUSED NONNULL((1)) byte_t
+INTDEF WUNUSED ATTR_PURE NONNULL((1)) byte_t
 NOTHROW(KCALL GDBPacket_GetCheckSum)(void const *__restrict buf, size_t buflen);
 
 /* Convenience wrappers for sending packets. */

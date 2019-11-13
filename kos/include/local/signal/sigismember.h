@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6384d03 */
+/* HASH CRC-32:0x62260090 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #include <bits/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
 /* @param signo: One of `SIG*' */
-__LOCAL_LIBC(sigismember) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(sigismember) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigismember))(struct __sigset_struct const *__set,
                                                          int __signo) {
 #line 279 "kos/src/libc/magic/signal.c"

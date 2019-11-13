@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x862b6d0a */
+/* HASH CRC-32:0xeb95a6b8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -215,19 +215,19 @@ INTDEF NONNULL((2)) char *NOTHROW_NCX(LIBCCALL libc_strtok)(char *string, char c
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strcoll)(char const *s1, char const *s2);
 INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBCCALL libc_strxfrm)(char *dst, char const *__restrict src, size_t maxlen);
 /* Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´ */
-INTDEF ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_stpcpy)(char *__restrict buf, char const *__restrict src);
-INTDEF ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_stpncpy)(char *__restrict buf, char const *__restrict src, size_t buflen);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_stpcpy)(char *__restrict buf, char const *__restrict src);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_stpncpy)(char *__restrict buf, char const *__restrict src, size_t buflen);
 /* Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´ */
 #define libc___stpcpy libc_stpcpy
 #define libc___stpncpy libc_stpncpy
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strcoll_l)(char const *s1, char const *s2, locale_t locale);
 INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBCCALL libc_strxfrm_l)(char *dst, char const *__restrict src, size_t maxlen, locale_t locale);
-INTDEF ATTR_LEAF NONNULL((2, 3)) char *NOTHROW_NCX(LIBCCALL libc_strtok_r)(char *string, char const *delim, char **__restrict save_ptr);
+INTDEF ATTR_LEAF ATTR_LEAF NONNULL((2, 3)) char *NOTHROW_NCX(LIBCCALL libc_strtok_r)(char *string, char const *delim, char **__restrict save_ptr);
 /* Same as `strchr', but return `strend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strchrnul)(char const *__restrict haystack, int needle);
 INTDEF ATTR_PURE WUNUSED char *NOTHROW_NCX(LIBCCALL libc_basename)(char const *filename);
 /* Same as `strstr', but ignore casing */
-INTDEF WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strcasestr)(char const *haystack, char const *needle);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strcasestr)(char const *haystack, char const *needle);
 /* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
@@ -241,11 +241,11 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strverscm
 #define libc___mempcpy libc_mempcpy
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strfry)(char *__restrict string);
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_memfrob)(void *buf, size_t num_bytes);
-INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strcasecmp_l)(char const *s1, char const *s2, locale_t locale);
-INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strncasecmp_l)(char const *s1, char const *s2, size_t maxlen, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strcasecmp_l)(char const *s1, char const *s2, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strncasecmp_l)(char const *s1, char const *s2, size_t maxlen, locale_t locale);
 INTDEF ATTR_LEAF NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strsep)(char **__restrict stringp, char const *__restrict delim);
-INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strcasecmp)(char const *s1, char const *s2);
-INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strncasecmp)(char const *s1, char const *s2, size_t maxlen);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strcasecmp)(char const *s1, char const *s2);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strncasecmp)(char const *s1, char const *s2, size_t maxlen);
 INTDEF ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T NOTHROW(LIBCCALL libc_ffs)(int i);
 INTDEF ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T NOTHROW(LIBCCALL libc_ffsl)(long i);
 INTDEF ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T NOTHROW(LIBCCALL libc_ffsll)(__LONGLONG i);
@@ -360,7 +360,7 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_strnroff)
  * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
  * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 3)) void *NOTHROW_NCX(LIBCCALL libc_memrmem)(void const *haystack, size_t haystacklen, void const *needle, size_t needlelen);
-INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_memcasecmp)(void const *s1, void const *s2, size_t n_bytes);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_memcasecmp)(void const *s1, void const *s2, size_t n_bytes);
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * During comprisons, casing of character is ignored (s.a. `memmem()')
  * If no such sub-string exists, return `NULL' instead.
@@ -370,7 +370,7 @@ INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_memcasecmp)(void co
  * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
  * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 3)) void *NOTHROW_NCX(LIBCCALL libc_memcasemem)(void const *haystack, size_t haystacklen, void const *needle, size_t needlelen);
-INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_memcasecmp_l)(void const *s1, void const *s2, size_t n_bytes, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_memcasecmp_l)(void const *s1, void const *s2, size_t n_bytes, locale_t locale);
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * During comprisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
  * If no such sub-string exists, return `NULL' instead.
@@ -379,36 +379,36 @@ INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_memcasecmp_l)(void 
  * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
  * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
-INTDEF ATTR_PURE WUNUSED NONNULL((1, 3)) void *NOTHROW_NCX(LIBCCALL libc_memcasemem_l)(void const *haystack, size_t haystacklen, void const *needle, size_t needlelen, locale_t locale);
-INTDEF WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strcasestr_l)(char const *haystack, char const *needle, locale_t locale);
+INTDEF ATTR_PURE ATTR_PURE WUNUSED NONNULL((1, 3)) void *NOTHROW_NCX(LIBCCALL libc_memcasemem_l)(void const *haystack, size_t haystacklen, void const *needle, size_t needlelen, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strcasestr_l)(char const *haystack, char const *needle, locale_t locale);
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_wildstrcmp)(char const *pattern, char const *string);
-INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_wildstrcasecmp)(char const *pattern, char const *string);
-INTDEF WUNUSED NONNULL((1, 2)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_strcmp)(char const *s1, char const *s2);
-INTDEF WUNUSED NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_strncmp)(char const *s1, size_t s1_maxlen, char const *s2, size_t s2_maxlen);
-INTDEF WUNUSED NONNULL((1, 2)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_strcasecmp)(char const *s1, char const *s2);
-INTDEF WUNUSED NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_strncasecmp)(char const *s1, size_t s1_maxlen, char const *s2, size_t s2_maxlen);
-INTDEF WUNUSED NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmp)(void const *s1, size_t s1_bytes, void const *s2, size_t s2_bytes);
-INTDEF WUNUSED NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_memcasecmp)(void const *s1, size_t s1_bytes, void const *s2, size_t s2_bytes);
-INTDEF WUNUSED NONNULL((1, 2)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_strcasecmp_l)(char const *s1, char const *s2, locale_t locale);
-INTDEF WUNUSED NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_strncasecmp_l)(char const *s1, size_t s1_maxlen, char const *s2, size_t s2_maxlen, locale_t locale);
-INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_wildstrcasecmp_l)(char const *pattern, char const *string, locale_t locale);
-INTDEF WUNUSED NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_memcasecmp_l)(void const *s1, size_t s1_bytes, void const *s2, size_t s2_bytes, locale_t locale);
-INTDEF WUNUSED NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpw)(void const *s1, size_t s1_words, void const *s2, size_t s2_words);
-INTDEF WUNUSED NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpl)(void const *s1, size_t s1_dwords, void const *s2, size_t s2_dwords);
-INTDEF WUNUSED NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpq)(void const *s1, size_t s1_qwords, void const *s2, size_t s2_qwords);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_wildstrcasecmp)(char const *pattern, char const *string);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_strcmp)(char const *s1, char const *s2);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_strncmp)(char const *s1, size_t s1_maxlen, char const *s2, size_t s2_maxlen);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_strcasecmp)(char const *s1, char const *s2);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_strncasecmp)(char const *s1, size_t s1_maxlen, char const *s2, size_t s2_maxlen);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmp)(void const *s1, size_t s1_bytes, void const *s2, size_t s2_bytes);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_memcasecmp)(void const *s1, size_t s1_bytes, void const *s2, size_t s2_bytes);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_strcasecmp_l)(char const *s1, char const *s2, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_strncasecmp_l)(char const *s1, size_t s1_maxlen, char const *s2, size_t s2_maxlen, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_wildstrcasecmp_l)(char const *pattern, char const *string, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_memcasecmp_l)(void const *s1, size_t s1_bytes, void const *s2, size_t s2_bytes, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpw)(void const *s1, size_t s1_words, void const *s2, size_t s2_words);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpl)(void const *s1, size_t s1_dwords, void const *s2, size_t s2_dwords);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpq)(void const *s1, size_t s1_qwords, void const *s2, size_t s2_qwords);
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strncoll)(char const *s1, char const *s2, size_t maxlen);
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strcasecoll)(char const *s1, char const *s2);
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strncasecoll)(char const *s1, char const *s2, size_t maxlen);
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strnrev)(char *__restrict str, size_t maxlen);
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strnlwr)(char *__restrict str, size_t maxlen);
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strnupr)(char *__restrict str, size_t maxlen);
-INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strncoll_l)(char const *s1, char const *s2, size_t maxlen, locale_t locale);
-INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strcasecoll_l)(char const *s1, char const *s2, locale_t locale);
-INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strncasecoll_l)(char const *s1, char const *s2, size_t maxlen, locale_t locale);
-INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strlwr_l)(char *__restrict str, locale_t locale);
-INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strupr_l)(char *__restrict str, locale_t locale);
-INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strnlwr_l)(char *__restrict str, size_t maxlen, locale_t locale);
-INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strnupr_l)(char *__restrict str, size_t maxlen, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strncoll_l)(char const *s1, char const *s2, size_t maxlen, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strcasecoll_l)(char const *s1, char const *s2, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strncasecoll_l)(char const *s1, char const *s2, size_t maxlen, locale_t locale);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strlwr_l)(char *__restrict str, locale_t locale);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strupr_l)(char *__restrict str, locale_t locale);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strnlwr_l)(char *__restrict str, size_t maxlen, locale_t locale);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strnupr_l)(char *__restrict str, size_t maxlen, locale_t locale);
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_memrev)(void *__restrict base, size_t n_bytes);
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memrevw)(void *__restrict base, size_t n_words);
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memrevl)(void *__restrict base, size_t n_dwords);
@@ -440,13 +440,13 @@ INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_strncpy_s)(char *dst, size_t dstsize, c
 #define libc__strncoll_l libc_strncoll_l
 #define libc__strnicoll libc_strncasecoll
 #define libc__strnicoll_l libc_strncasecoll_l
-INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__strlwr_s)(char *buf, size_t buflen);
-INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__strupr_s)(char *buf, size_t buflen);
-INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__strlwr_s_l)(char *buf, size_t buflen, locale_t locale);
-INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__strupr_s_l)(char *buf, size_t buflen, locale_t locale);
+INTDEF ATTR_LEAF errno_t NOTHROW_NCX(LIBCCALL libc__strlwr_s)(char *buf, size_t buflen);
+INTDEF ATTR_LEAF errno_t NOTHROW_NCX(LIBCCALL libc__strupr_s)(char *buf, size_t buflen);
+INTDEF ATTR_LEAF errno_t NOTHROW_NCX(LIBCCALL libc__strlwr_s_l)(char *buf, size_t buflen, locale_t locale);
+INTDEF ATTR_LEAF errno_t NOTHROW_NCX(LIBCCALL libc__strupr_s_l)(char *buf, size_t buflen, locale_t locale);
 #define libc__strnicmp libc_strncasecmp
 #define libc__strnicmp_l libc_strncasecmp_l
-INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__strnset_s)(char *__restrict buf, size_t buflen, int ch, size_t maxlen);
+INTDEF ATTR_LEAF errno_t NOTHROW_NCX(LIBCCALL libc__strnset_s)(char *__restrict buf, size_t buflen, int ch, size_t maxlen);
 #define libc__strrev libc_strrev
 #define libc__strxfrm_l libc_strxfrm_l
 #define libc_stricmp libc_strcasecmp

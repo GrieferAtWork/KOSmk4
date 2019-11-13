@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c24386e */
+/* HASH CRC-32:0xa4221ae8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,23 @@
  */
 #ifndef __local_wctomb_defined
 #define __local_wctomb_defined 1
+/* Dependency: "wcrtomb" from "wchar" */
+#ifndef ____localdep_wcrtomb_defined
+#define ____localdep_wcrtomb_defined 1
+#ifdef __CRT_HAVE_wcrtomb
+__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __WCHAR_TYPE__ __wc, __mbstate_t *__ps),wcrtomb,(__str,__wc,__ps))
+#else /* LIBC: wcrtomb */
+#include <local/wchar/wcrtomb.h>
+#define __localdep_wcrtomb (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcrtomb))
+#endif /* wcrtomb... */
+#endif /* !____localdep_wcrtomb_defined */
+
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wctomb) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctomb))(char *__s,
-                                                    __WCHAR_TYPE__ __wchar) {
-#line 689 "kos/src/libc/magic/stdlib.c"
-	/* TODO */
-	return 0;
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctomb))(char *__str,
+                                                    __WCHAR_TYPE__ __wc) {
+#line 690 "kos/src/libc/magic/stdlib.c"
+	return __localdep_wcrtomb(__str, __wc, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_wctomb_defined */

@@ -60,7 +60,8 @@ DECL_BEGIN
 
 PUBLIC ATTR_PERTASK struct exception_info _this_exception_info;
 
-INTERN char const *NOTHROW(FCALL get_exception_name)(error_code_t code) {
+INTERN ATTR_CONST char const *
+NOTHROW(FCALL get_exception_name)(error_code_t code) {
 	char const *result;
 #undef END
 #undef CLASS
@@ -898,7 +899,7 @@ NOTHROW(KCALL x86_asm_except_personality)(struct unwind_fde_struct *__restrict f
 
 
 
-PUBLIC void *__cxa_begin_catch(void *ptr) {
+PUBLIC ATTR_CONST void *__cxa_begin_catch(void *ptr) {
 	/* This function returns the address that would
 	 * be assigned to the exception storage object:
 	 * >> try {
@@ -910,6 +911,7 @@ PUBLIC void *__cxa_begin_catch(void *ptr) {
 	 * for the `UNWIND_REGISTER_EXCEPTION' register. */
 	return ptr;
 }
+
 PUBLIC void __cxa_end_catch(void) {
 	/* This function is called at the end of any user-defined catch-block
 	 * (that isn't noexcept), similar to how `__cxa_begin_catch()' is always

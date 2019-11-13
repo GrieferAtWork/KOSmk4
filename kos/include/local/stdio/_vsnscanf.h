@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c2339a9 */
+/* HASH CRC-32:0x8912561e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -113,10 +113,10 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __EOF
 #ifdef EOF
 #define __EOF  EOF
-#else
+#else /* EOF */
 #define __EOF (-1)
-#endif
-#endif
+#endif /* !EOF */
+#endif /* !__EOF */
 struct __vsnscanf_data {
 	char const *__ptr;
 	char const *__end;

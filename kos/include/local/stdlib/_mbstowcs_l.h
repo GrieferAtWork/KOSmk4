@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91bb796a */
+/* HASH CRC-32:0x35b152d1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,28 +19,26 @@
  */
 #ifndef __local__mbstowcs_l_defined
 #define __local__mbstowcs_l_defined 1
-/* Dependency: "_mbstowcs_s_l" from "stdlib" */
-#ifndef ____localdep__mbstowcs_s_l_defined
-#define ____localdep__mbstowcs_s_l_defined 1
-#ifdef __CRT_HAVE__mbstowcs_s_l
-__CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep__mbstowcs_s_l,(__SIZE_TYPE__ *__presult, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, char const *__src, __SIZE_TYPE__ __maxlen, __locale_t __locale),_mbstowcs_s_l,(__presult,__buf,__buflen,__src,__maxlen,__locale))
-#else /* LIBC: _mbstowcs_s_l */
-#include <local/stdlib/_mbstowcs_s_l.h>
-#define __localdep__mbstowcs_s_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstowcs_s_l))
-#endif /* _mbstowcs_s_l... */
-#endif /* !____localdep__mbstowcs_s_l_defined */
+/* Dependency: "mbstowcs" from "stdlib" */
+#ifndef ____localdep_mbstowcs_defined
+#define ____localdep_mbstowcs_defined 1
+#ifdef __CRT_HAVE_mbstowcs
+__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbstowcs,(__WCHAR_TYPE__ *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __dstlen),mbstowcs,(__dst,__src,__dstlen))
+#else /* LIBC: mbstowcs */
+#include <local/stdlib/mbstowcs.h>
+#define __localdep_mbstowcs (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbstowcs))
+#endif /* mbstowcs... */
+#endif /* !____localdep_mbstowcs_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_mbstowcs_l) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbstowcs_l))(__WCHAR_TYPE__ *__buf,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbstowcs_l))(__WCHAR_TYPE__ *__dst,
                                                          char const *__src,
-                                                         __SIZE_TYPE__ __maxlen,
+                                                         __SIZE_TYPE__ __dstlen,
                                                          __locale_t __locale) {
-#line 2346 "kos/src/libc/magic/stdlib.c"
-	__SIZE_TYPE__ __result;
-	if (__localdep__mbstowcs_s_l(&__result, __buf, (__SIZE_TYPE__)-1, __src, __maxlen, __locale))
-		__result = 0;
-	return __result;
+#line 2371 "kos/src/libc/magic/stdlib.c"
+	(void)__locale;
+	return __localdep_mbstowcs(__dst, __src, __dstlen);
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local__mbstowcs_l_defined */

@@ -41,12 +41,13 @@ INTDEF byte_t __x86_syscall_emulate_r_protect_end[];
 /* The personality function used to handle exceptions propagated through
  * system calls. - Specifically, the special handling that is required for
  * servicing an RPC as `rpc_serve_user_redirection_all' */
-INTERN unsigned int
+INTERN NONNULL((1, 2, 3)) unsigned int
 NOTHROW(KCALL syscall_emulate_r_personality)(struct unwind_fde_struct *__restrict fde,
                                              struct kcpustate *__restrict state,
                                              byte_t *__restrict lsda) {
 	struct icpustate *return_cpustate;
 	struct rpc_syscall_info *sc_info;
+	COMPILER_IMPURE(); /* ??? */
 	/* Check if the exception happened while actually
 	 * in the process of servicing the system call. */
 	if (kcpustate_getpc(state) <= (uintptr_t)__x86_syscall_emulate_r_protect_start ||

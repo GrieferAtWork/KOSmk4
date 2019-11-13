@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xddf0f733 */
+/* HASH CRC-32:0x8785091f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,11 +23,11 @@
 #ifndef ____localdep_memcasecmp_defined
 #define ____localdep_memcasecmp_defined 1
 #ifdef __CRT_HAVE_memcasecmp
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcasecmp,(__s1,__s2,__n_bytes))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcasecmp,(__s1,__s2,__n_bytes))
 #elif defined(__CRT_HAVE_memicmp)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memicmp,(__s1,__s2,__n_bytes))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memicmp,(__s1,__s2,__n_bytes))
 #elif defined(__CRT_HAVE__memicmp)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),_memicmp,(__s1,__s2,__n_bytes))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),_memicmp,(__s1,__s2,__n_bytes))
 #else /* LIBC: memcasecmp */
 #include <local/string/memcasecmp.h>
 #define __localdep_memcasecmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcasecmp))
@@ -35,12 +35,12 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_m
 #endif /* !____localdep_memcasecmp_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(memcasecmp_l) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(memcasecmp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcasecmp_l))(void const *__s1,
                                                           void const *__s2,
                                                           __SIZE_TYPE__ __n_bytes,
                                                           __locale_t __locale) {
-#line 2526 "kos/src/libc/magic/string.c"
+#line 2527 "kos/src/libc/magic/string.c"
 	(void)__locale;
 	return __localdep_memcasecmp(__s1, __s2, __n_bytes);
 }

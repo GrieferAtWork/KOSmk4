@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb586026 */
+/* HASH CRC-32:0x793dba9d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,10 +67,10 @@ INTDEF FILE *NOTHROW_NCX(LIBCCALL libc_open_wmemstream)(char32_t **bufloc, size_
 INTDEF FILE *NOTHROW_NCX(LIBDCALL libd_open_wmemstream)(char16_t **bufloc, size_t *sizeloc);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char32_t *NOTHROW_NCX(LIBCCALL libc_wcsdup)(char32_t const *__restrict string);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *NOTHROW_NCX(LIBDCALL libd_wcsdup)(char16_t const *__restrict string);
-INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_wcwidth)(char32_t ch);
-INTDEF WUNUSED int NOTHROW_NCX(LIBDCALL libd_wcwidth)(char16_t ch);
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_wcswidth)(char32_t const *__restrict string, size_t num_chars);
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wcswidth)(char16_t const *__restrict string, size_t num_chars);
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_wcwidth)(char32_t ch);
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd_wcwidth)(char16_t ch);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_wcswidth)(char32_t const *__restrict string, size_t num_chars);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wcswidth)(char16_t const *__restrict string, size_t num_chars);
 INTDEF wint_t (LIBCCALL libc_getwchar_unlocked)(void) __THROWS(...);
 INTDEF wint_t (LIBDCALL libd_getwchar_unlocked)(void) __THROWS(...);
 INTDEF wint_t (LIBCCALL libc_putwchar_unlocked)(char32_t wc) __THROWS(...);

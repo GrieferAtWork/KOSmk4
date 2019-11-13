@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd802cbae */
+/* HASH CRC-32:0x85e1db05 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,16 +76,16 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_fgetc,(__FILE *__restrict __stre
 #define ____localdep_ferror_defined 1
 #if defined(__CRT_HAVE_ferror_unlocked) && (defined(__USE_STDIO_UNLOCKED))
 /* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE *__restrict __stream),ferror_unlocked,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ferror)
 /* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE *__restrict __stream),ferror,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror,(__stream))
 #elif defined(__CRT_HAVE_ferror_unlocked)
 /* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE *__restrict __stream),ferror_unlocked,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE__IO_ferror)
 /* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE *__restrict __stream),_IO_ferror,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),_IO_ferror,(__stream))
 #else /* LIBC: ferror */
 #undef ____localdep_ferror_defined
 #endif /* ferror... */

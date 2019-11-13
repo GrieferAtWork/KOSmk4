@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc09c4468 */
+/* HASH CRC-32:0xf4854561 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,26 @@
  */
 #ifndef __local_mbtowc_defined
 #define __local_mbtowc_defined 1
+/* Dependency: "mbrtowc" from "wchar" */
+#ifndef ____localdep_mbrtowc_defined
+#define ____localdep_mbrtowc_defined 1
+#ifdef __CRT_HAVE_mbrtowc
+__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__ps),mbrtowc,(__pwc,__str,__maxlen,__ps))
+#elif defined(__CRT_HAVE___mbrtowc)
+__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__ps),__mbrtowc,(__pwc,__str,__maxlen,__ps))
+#else /* LIBC: mbrtowc */
+#include <local/wchar/mbrtowc.h>
+#define __localdep_mbrtowc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbrtowc))
+#endif /* mbrtowc... */
+#endif /* !____localdep_mbrtowc_defined */
+
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mbtowc) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbtowc))(__WCHAR_TYPE__ *__restrict __pwc,
-                                                    char const *__restrict __s,
-                                                    __SIZE_TYPE__ __n) {
-#line 684 "kos/src/libc/magic/stdlib.c"
-	/* TODO */
-	return 0;
+                                                    char const *__restrict __str,
+                                                    __SIZE_TYPE__ __maxlen) {
+#line 685 "kos/src/libc/magic/stdlib.c"
+	return __localdep_mbrtowc(__pwc, __str, __maxlen, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_mbtowc_defined */

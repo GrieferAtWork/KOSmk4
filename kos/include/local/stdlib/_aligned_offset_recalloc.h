@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf98878a3 */
+/* HASH CRC-32:0xcd97de73 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW
 #ifndef ____localdep__aligned_msize_defined
 #define ____localdep__aligned_msize_defined 1
 #ifdef __CRT_HAVE__aligned_msize
-__CREDIRECT(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__aligned_msize,(void *__mptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_msize,(__mptr,__min_alignment,__offset))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__aligned_msize,(void *__mptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_msize,(__mptr,__min_alignment,__offset))
 #else /* LIBC: _aligned_msize */
 #include <local/stdlib/_aligned_msize.h>
 #define __localdep__aligned_msize (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_msize))
@@ -105,7 +105,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_offset_recalloc))(void *__mp
                                                                       __SIZE_TYPE__ __num_bytes,
                                                                       __SIZE_TYPE__ __min_alignment,
                                                                       __SIZE_TYPE__ __offset) {
-#line 2565 "kos/src/libc/magic/stdlib.c"
+#line 2617 "kos/src/libc/magic/stdlib.c"
 	void *__result;
 	__num_bytes *= __count;
 	__result = __localdep__aligned_offset_malloc(__num_bytes, __min_alignment, __offset);

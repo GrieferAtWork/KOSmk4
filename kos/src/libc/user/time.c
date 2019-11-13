@@ -48,19 +48,19 @@ DEFINE_NOREL_GLOBAL_META(int, daylight, ".crt.time.timezone.daylight");
 #define daylight   GET_NOREL_GLOBAL(daylight)
 
 DEFINE_PUBLIC_ALIAS(DOS$__tzname, libd___tzname);
-INTERN ATTR_SECTION(".text.crt.dos.time.timezone.__tzname") char **
+INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.time.timezone.__tzname") char **
 NOTHROW_NCX(libd___tzname)(void) {
 	return &tzname;
 }
 
 DEFINE_PUBLIC_ALIAS(DOS$__daylight, libd___daylight);
-INTERN ATTR_SECTION(".text.crt.dos.time.timezone.__daylight") int *
+INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.time.timezone.__daylight") int *
 NOTHROW_NCX(libd___daylight)(void) {
 	return &daylight;
 }
 
 DEFINE_PUBLIC_ALIAS(DOS$__timezone, libd___timezone);
-INTERN ATTR_SECTION(".text.crt.dos.time.timezone.__daylight") __LONGPTR_TYPE__ *
+INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.time.timezone.__daylight") __LONGPTR_TYPE__ *
 NOTHROW_NCX(libd___timezone)(void) {
 	return &timezone;
 }

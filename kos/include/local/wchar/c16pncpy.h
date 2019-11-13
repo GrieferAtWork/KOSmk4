@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbee060f5 */
+/* HASH CRC-32:0xfebf7f55 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,13 +62,13 @@ __CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR16_TYPE__ *,__NOT
 #define ____localdep_c16mempset_defined 1
 #if defined(__CRT_HAVE_wmempset) && (__SIZEOF_WCHAR_T__ == 2)
 /* Same as wmemset, but return a pointer after the last written character */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16mempset,(__CHAR16_TYPE__ *__dst, __CHAR16_TYPE__ __filler, __SIZE_TYPE__ __num_chars),wmempset,(__dst,__filler,__num_chars))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16mempset,(__CHAR16_TYPE__ *__dst, __CHAR16_TYPE__ __filler, __SIZE_TYPE__ __num_chars),wmempset,(__dst,__filler,__num_chars))
 #elif defined(__CRT_HAVE_mempsetw)
 /* Same as wmemset, but return a pointer after the last written character */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16mempset,(__CHAR16_TYPE__ *__dst, __CHAR16_TYPE__ __filler, __SIZE_TYPE__ __num_chars),mempsetw,(__dst,__filler,__num_chars))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16mempset,(__CHAR16_TYPE__ *__dst, __CHAR16_TYPE__ __filler, __SIZE_TYPE__ __num_chars),mempsetw,(__dst,__filler,__num_chars))
 #elif defined(__CRT_HAVE_DOS$wmempset)
 /* Same as wmemset, but return a pointer after the last written character */
-__CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16mempset,(__CHAR16_TYPE__ *__dst, __CHAR16_TYPE__ __filler, __SIZE_TYPE__ __num_chars),wmempset,(__dst,__filler,__num_chars))
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16mempset,(__CHAR16_TYPE__ *__dst, __CHAR16_TYPE__ __filler, __SIZE_TYPE__ __num_chars),wmempset,(__dst,__filler,__num_chars))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wmempset.h>
 /* Same as wmemset, but return a pointer after the last written character */
@@ -82,11 +82,11 @@ __CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHRO
 
 __NAMESPACE_LOCAL_BEGIN
 /* Same as wcsncpy, but return a pointer after the last written character */
-__LOCAL_LIBC(c16pncpy) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __CHAR16_TYPE__ *
+__LOCAL_LIBC(c16pncpy) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16pncpy))(__CHAR16_TYPE__ *__restrict __buf,
                                                       __CHAR16_TYPE__ const *__restrict __src,
                                                       __SIZE_TYPE__ __buflen) {
-#line 1258 "kos/src/libc/magic/wchar.c"
+#line 1350 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __srclen = __localdep_c16nlen(__src, __buflen);
 	__localdep_c16memcpy(__buf, __src, __srclen);
 	return __localdep_c16mempset(__buf+__srclen, '\0', __buflen - __srclen);

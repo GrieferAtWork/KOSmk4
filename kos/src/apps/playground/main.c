@@ -131,6 +131,7 @@ int main_prognam(int argc, char *argv[], char *envp[]) {
 /************************************************************************/
 int main_ctype(int argc, char *argv[], char *envp[]) {
 	assert(isalpha('s'));
+	COMPILER_IMPURE();
 	return 0;
 }
 /************************************************************************/
@@ -202,6 +203,7 @@ int main_except(int argc, char *argv[], char *envp[]) {
 		static volatile int z;
 		z = x / y;
 		printf("usfault: Shouldn't get here!\n");
+		x = z; /* Suppress z set, but not used */
 	} EXCEPT {
 		printf("usfault: error_code(): %I#x\n", error_code());
 	}

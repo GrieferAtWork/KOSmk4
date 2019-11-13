@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e8734c7 */
+/* HASH CRC-32:0xa76ffc78 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,10 +35,11 @@ __NAMESPACE_LOCAL_BEGIN
 /* Free storage allocated in PGLOB by a previous `glob' call */
 __LOCAL_LIBC(globfree64) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(globfree64))(struct __glob64_struct *__pglob) {
-#line 215 "kos/src/libc/magic/glob.c"
+#line 226 "kos/src/libc/magic/glob.c"
 #if defined(__CRT_HAVE_globfree)
 	__localdep_globfree32(__pglob);
 #else
+	__COMPILER_IMPURE();
 	(void)__pglob;
 #endif
 }

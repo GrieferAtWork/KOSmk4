@@ -551,7 +551,7 @@ fdim:(double x, double y) -> double {
 llrint:(double x) -> __LONGLONG;
 
 @@Round X to nearest integral value, rounding halfway cases away from zero
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__llround)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llround)][crtbuiltin]
 llround:(double x) -> __LONGLONG {
 	return (__LONGLONG)round(x);
 }
@@ -571,8 +571,8 @@ llround:(double x) -> __LONGLONG {
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fminf)][crtbuiltin] fminf:(float x, float y) -> float %{copy(%auto, double2float)}
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fmaf)][crtbuiltin] fmaf:(float x, float y, float z) -> float %{copy(%auto, double2float)}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__llrintf)][crtbuiltin] llrintf:(float x) -> __LONGLONG %{auto_block(math)}
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__llroundf)][crtbuiltin] llroundf:(float x) -> __LONGLONG %{copy(%auto, math)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llrintf)][crtbuiltin] llrintf:(float x) -> __LONGLONG %{auto_block(math)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llroundf)][crtbuiltin] llroundf:(float x) -> __LONGLONG %{copy(%auto, math)}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGLONG */
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nexttowardl)][crtbuiltin] nexttowardl:(long double x, long double y) -> long double %{auto_block(math)}
@@ -587,10 +587,10 @@ llround:(double x) -> __LONGLONG {
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fdiml)][crtbuiltin] fdiml:(long double x, long double y) -> long double %{copy(%auto, math)}
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fmaxl)][crtbuiltin] fmaxl:(long double x, long double y) -> long double %{copy(%auto, math)}
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fminl)][crtbuiltin] fminl:(long double x, long double y) -> long double %{copy(%auto, math)}
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__fmal)][crtbuiltin] fmal:(long double x, long double y, long double z) -> long double %{copy(%auto, math)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fmal)][crtbuiltin] fmal:(long double x, long double y, long double z) -> long double %{copy(%auto, math)}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__llrintl)][crtbuiltin] llrintl:(long double x) -> __LONGLONG %{auto_block(math)}
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__llroundl)][crtbuiltin] llroundl:(long double x) -> __LONGLONG %{copy(%auto, math)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llroundl)][crtbuiltin] llroundl:(long double x) -> __LONGLONG %{copy(%auto, math)}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGLONG */
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_ISOC99 */

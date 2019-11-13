@@ -35,8 +35,12 @@
 
 DECL_BEGIN
 
-PRIVATE Elf_Word CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) Elf_Word CC
 builtin_symbol_size(char const *__restrict name) {
+	if (!strcmp(name, "program_invocation_name"))
+		return sizeof(void *);
+	if (!strcmp(name, "program_invocation_short_name"))
+		return sizeof(void *);
 	if (*name == '_') {
 		++name;
 		if (!strcmp(name, "pgmptr"))
@@ -48,6 +52,10 @@ builtin_symbol_size(char const *__restrict name) {
 			if (!strcmp(name, "argc"))
 				return sizeof(size_t);
 			if (!strcmp(name, "argv"))
+				return sizeof(void *);
+			if (!strcmp(name, "progname"))
+				return sizeof(void *);
+			if (!strcmp(name, "progname_full"))
 				return sizeof(void *);
 		}
 	}

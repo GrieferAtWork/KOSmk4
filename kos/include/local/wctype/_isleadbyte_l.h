@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8e33e6f */
+/* HASH CRC-32:0x5d3e46c3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,8 +34,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_isleadbyte_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_isleadbyte_l))(int __wc,
                                                            __locale_t __locale) {
-#line 366 "kos/src/libc/magic/wctype.c"
+#line 388 "kos/src/libc/magic/wctype.c"
 	(void)__locale;
+	__COMPILER_IMPURE();
 	return __localdep_isleadbyte(__wc);
 }
 __NAMESPACE_LOCAL_END

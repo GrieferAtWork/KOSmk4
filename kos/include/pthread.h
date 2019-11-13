@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81dd9644 */
+/* HASH CRC-32:0x82582d27 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -631,7 +631,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,pthread_gettid_np,(
 #ifdef __USE_UNIX98
 #ifdef __CRT_HAVE_pthread_getconcurrency
 /* Determine level of concurrency */
-__CDECLARE(,int,__NOTHROW_NCX,pthread_getconcurrency,(void),())
+__CDECLARE(__ATTR_PURE,int,__NOTHROW_NCX,pthread_getconcurrency,(void),())
 #endif /* pthread_getconcurrency... */
 
 #ifdef __CRT_HAVE_pthread_setconcurrency

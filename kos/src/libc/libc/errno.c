@@ -78,14 +78,14 @@ NOBLOCK errno_t *NOTHROW(LIBCCALL libc_errno_p)(void) {
 DEFINE_PUBLIC_ALIAS(__get_errno_fast, libc_geterrno);
 DEFINE_INTERN_ALIAS(libc___get_errno_fast, libc_geterrno);
 INTERN ATTR_SECTION(".text.crt.errno_access.geterrno")
-NOBLOCK errno_t NOTHROW(LIBCCALL libc_geterrno)(void) {
+NOBLOCK ATTR_PURE errno_t NOTHROW(LIBCCALL libc_geterrno)(void) {
 	return libc_errno_global.ed_value;
 }
 
 DEFINE_PUBLIC_ALIAS(__get_errno, libc_geterrno_safe);
 DEFINE_INTERN_ALIAS(libc___get_errno, libc_geterrno);
 INTERN ATTR_SECTION(".text.crt.dos.errno_access.geterrno_safe")
-NOBLOCK errno_t NOTHROW(LIBCCALL libc_geterrno_safe)(void) {
+NOBLOCK ATTR_PURE errno_t NOTHROW(LIBCCALL libc_geterrno_safe)(void) {
 	return *libc_errno_p();
 }
 
@@ -289,7 +289,7 @@ NOBLOCK ATTR_CONST /*dos*/ errno_t *NOTHROW(LIBDCALL libd_errno_p)(void) {
 DEFINE_PUBLIC_ALIAS(__get_doserrno, libd_geterrno);
 DEFINE_INTERN_ALIAS(libc___get_doserrno, libd_geterrno);
 INTERN ATTR_SECTION(".text.crt.dos.errno_access.__get_doserrno")
-NOBLOCK /*dos*/ errno_t NOTHROW(LIBDCALL libd_geterrno)(void) {
+NOBLOCK ATTR_PURE /*dos*/ errno_t NOTHROW(LIBDCALL libd_geterrno)(void) {
 	return *libd_errno_p();
 }
 
@@ -308,8 +308,8 @@ NOBLOCK syscall_slong_t NOTHROW(LIBDCALL libd_seterrno)(/*dos*/ errno_t value) {
 
 DEFINE_PUBLIC_ALIAS(__doserrno, libd_nterrno_p);
 DEFINE_INTERN_ALIAS(libc___doserrno, libd_nterrno_p);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.__doserrno")
-NOBLOCK ATTR_CONST /*nt*/ errno_t *NOTHROW(LIBDCALL libd_nterrno_p)(void) {
+INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.errno_access.__doserrno")
+NOBLOCK /*nt*/ errno_t *NOTHROW(LIBDCALL libd_nterrno_p)(void) {
 	struct libc_errno_desc *result;
 	result = &libc_errno_global;
 	if (result->ed_kind != LIBC_ERRNO_KIND_NT) {
@@ -328,7 +328,7 @@ NOBLOCK ATTR_CONST /*nt*/ errno_t *NOTHROW(LIBDCALL libd_nterrno_p)(void) {
 DEFINE_PUBLIC_ALIAS(__get_nterrno, libd_getnterrno);
 DEFINE_INTERN_ALIAS(libc___get_nterrno, libd_setnterrno);
 INTERN ATTR_SECTION(".text.crt.dos.errno_access.__get_nterrno")
-NOBLOCK /*nt*/ errno_t NOTHROW(LIBDCALL libd_getnterrno)(void) {
+NOBLOCK ATTR_PURE /*nt*/ errno_t NOTHROW(LIBDCALL libd_getnterrno)(void) {
 	return *libd_nterrno_p();
 }
 
@@ -409,7 +409,7 @@ NOBLOCK ATTR_CONST /*cyg*/ errno_t *NOTHROW(LIBDCALL libd_cygerrno_p)(void) {
 DEFINE_PUBLIC_ALIAS(__get_cygerrno, libd_getcygerrno);
 DEFINE_INTERN_ALIAS(libc___get_cygerrno, libd_getcygerrno);
 INTERN ATTR_SECTION(".text.crt.dos.errno_access.__get_cygerrno")
-NOBLOCK /*cyg*/ errno_t NOTHROW(LIBDCALL libd_getcygerrno)(void) {
+NOBLOCK ATTR_PURE /*cyg*/ errno_t NOTHROW(LIBDCALL libd_getcygerrno)(void) {
 	return *libd_cygerrno_p();
 }
 

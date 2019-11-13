@@ -19,13 +19,14 @@
 #ifndef GUARD_LIBVIDEO_CODEC_CODECS_H
 #define GUARD_LIBVIDEO_CODEC_CODECS_H 1
 
+#include "api.h"
+/**/
+
 #include <hybrid/compiler.h>
 
 #include <kos/types.h>
 
 #include <libvideo/codec/codecs.h>
-
-#include "api.h"
 
 DECL_BEGIN
 

@@ -419,7 +419,7 @@ strnlen:([nonnull] char const *__restrict string, $size_t maxlen) -> $size_t {
 %#ifdef __USE_XOPEN2K8
 
 @@Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´
-[crtbuiltin][alias(__stpcpy)]
+[crtbuiltin][alias(__stpcpy)][ATTR_LEAF]
 stpcpy:([nonnull] char *__restrict buf,
         [nonnull] char const *__restrict src)
 	-> [== buf + strlen(src)] char *
@@ -427,7 +427,7 @@ stpcpy:([nonnull] char *__restrict buf,
 	return (char *)mempcpy(buf, src, (strlen(src) + 1) * sizeof(char)) - 1;
 }
 
-[crtbuiltin][alias(__stpncpy)]
+[crtbuiltin][alias(__stpncpy)][ATTR_LEAF]
 stpncpy:([nonnull] char *__restrict buf,
          [nonnull] char const *__restrict src,
          $size_t buflen)
@@ -504,7 +504,7 @@ strdup:([nonnull] char const *__restrict string)
 #ifdef __USE_POSIX
 }
 
-[ATTR_LEAF][alias(strtok_s, __strtok_r)]
+[ATTR_LEAF][alias(strtok_s, __strtok_r)][ATTR_LEAF]
 strtok_r:(char *string,
           [nonnull] char const *delim,
           [nonnull] char **__restrict save_ptr) -> char * {
@@ -570,9 +570,10 @@ strchrnul:([nonnull] char const *__restrict haystack, int needle) -> [nonnull] c
 	[([nonnull] char *__restrict haystack, int needle) -> [nonnull] char *]
 	[([nonnull] char const *__restrict haystack, int needle) -> [nonnull] char const *]
 {
-	for (; *haystack; ++haystack)
+	for (; *haystack; ++haystack) {
 		if (*haystack == (char)needle)
 			break;
+	}
 	return (char *)haystack;
 }
 
@@ -621,7 +622,7 @@ basename:([nullable] char const *filename) -> char *
 
 
 @@Same as `strstr', but ignore casing
-[ATTR_WUNUSED][section(.text.crt.unicode.static.memory)][export_alias(__strcasestr)]
+[ATTR_WUNUSED][section(.text.crt.unicode.static.memory)][export_alias(__strcasestr)][ATTR_PURE]
 strcasestr:([nonnull] char const *haystack, [nonnull] char const *needle) -> char *
 	[([nonnull] char *haystack, [nonnull] char const *needle) -> char *]
 	[([nonnull] char const *haystack, [nonnull] char const *needle) -> char const *]
@@ -754,14 +755,14 @@ memfrob:([nonnull] void *buf, $size_t num_bytes) -> [== buf] void * {
 }
 
 [guard][alias(_stricmp_l)][ATTR_WUNUSED]
-[section(.text.crt.unicode.locale.memory)][export_alias(__strcasecmp_l)]
+[section(.text.crt.unicode.locale.memory)][export_alias(__strcasecmp_l)][ATTR_PURE]
 strcasecmp_l:([nonnull] char const *s1, [nonnull] char const *s2, $locale_t locale) -> int {
 	(void)locale;
 	return strcasecmp(s1, s2);
 }
 
 [guard][alias(_strnicmp_l, _strncmpi_l)][ATTR_WUNUSED]
-[section(.text.crt.unicode.locale.memory)][export_alias(__strncasecmp_l)]
+[section(.text.crt.unicode.locale.memory)][export_alias(__strncasecmp_l)][ATTR_PURE]
 strncasecmp_l:([nonnull] char const *s1, [nonnull] char const *s2, $size_t maxlen, $locale_t locale) -> int {
 	(void)locale;
 	return strncasecmp(s1, s2, maxlen);
@@ -802,7 +803,7 @@ strsep:([nonnull] char **__restrict stringp,
 %[insert:extern(rindex)]
 
 [guard][alias(_stricmp, _strcmpi, stricmp, strcmpi)][export_alias(__strcasecmp)]
-[ATTR_WUNUSED][section(.text.crt.unicode.static.memory)][crtbuiltin]
+[ATTR_WUNUSED][section(.text.crt.unicode.static.memory)][crtbuiltin][ATTR_PURE]
 strcasecmp:([nonnull] char const *s1, [nonnull] char const *s2) -> int {
 	char c1, c2;
 	do {
@@ -812,7 +813,7 @@ strcasecmp:([nonnull] char const *s1, [nonnull] char const *s2) -> int {
 	return 0;
 }
 [guard][alias(_strnicmp, strnicmp, _strncmpi, strncmpi)]
-[ATTR_WUNUSED][section(.text.crt.unicode.static.memory)][crtbuiltin]
+[ATTR_WUNUSED][section(.text.crt.unicode.static.memory)][crtbuiltin][ATTR_PURE]
 strncasecmp:([nonnull] char const *s1, [nonnull] char const *s2, $size_t maxlen) -> int {
 	char c1, c2;
 	do {
@@ -2456,7 +2457,7 @@ mempatq:([nonnull] void *__restrict dst,
 %#endif /* __UINT64_TYPE__ */
 
 [alias(memicmp, _memicmp)][ATTR_WUNUSED]
-[section(.text.crt.unicode.static.memory)]
+[section(.text.crt.unicode.static.memory)][ATTR_PURE]
 memcasecmp:([nonnull] void const *s1,
             [nonnull] void const *s2, $size_t n_bytes) -> int {
 	byte_t *p1 = (byte_t *)s1;
@@ -2518,7 +2519,7 @@ got_candidate:
 }
 
 %#ifdef __USE_XOPEN2K8
-[alias(_memicmp_l)][ATTR_WUNUSED]
+[alias(_memicmp_l)][ATTR_WUNUSED][ATTR_PURE]
 [section(.text.crt.unicode.locale.memory)]
 memcasecmp_l:([nonnull] void const *s1,
               [nonnull] void const *s2,
@@ -2539,7 +2540,7 @@ memcasecmp_l:([nonnull] void const *s1,
 [ATTR_WUNUSED][ATTR_PURE][impl_include(<features.h>)]
 [if(defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias(memcasemem0_l)]
 [if(!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias(memcasemem_l)]
-[section(.text.crt.unicode.locale.memory)]
+[section(.text.crt.unicode.locale.memory)][ATTR_PURE]
 memcasemem_l:([nonnull] void const *haystack, $size_t haystacklen, [nonnull] void const *needle, $size_t needlelen, $locale_t locale) -> void *
 	[([nonnull] void *haystack, $size_t haystacklen, [nonnull] void const *needle, $size_t needlelen, $locale_t locale) -> void *]
 	[([nonnull] void const *haystack, $size_t haystacklen, [nonnull] void const *needle, $size_t needlelen, $locale_t locale) -> void const *]
@@ -2575,7 +2576,7 @@ got_candidate:
 	return NULL;
 }
 
-[ATTR_WUNUSED][section(.text.crt.unicode.locale.memory)]
+[ATTR_WUNUSED][section(.text.crt.unicode.locale.memory)][ATTR_PURE]
 strcasestr_l:([nonnull] char const *haystack, [nonnull] char const *needle, $locale_t locale) -> char *
 	[([nonnull] char *haystack, [nonnull] char const *needle, $locale_t locale) -> char *]
 	[([nonnull] char const *haystack, [nonnull] char const *needle, $locale_t locale) -> char const *]
@@ -2609,7 +2610,7 @@ __LIBC __ATTR_WUNUSED __ATTR_CONST int *(__LIBCCALL __sys_nerr)(void);
 #endif
 #endif /* !___local_sys_errlist_defined */
 )]
-[ATTR_WUNUSED][ATTR_CONST][nothrow][section(.text.crt.errno)]
+[ATTR_WUNUSED][ATTR_CONST][nothrow][section(.text.crt.errno)][ATTR_PURE]
 strerror_s:(int errnum) -> char const * {
 #if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)
 	return (unsigned int)errnum < (unsigned int)@_sys_nerr@ ? @_sys_errlist@[errnum] : NULL;
@@ -3724,7 +3725,7 @@ next:
 	return (int)((unsigned char)*string - (unsigned char)*pattern);
 }
 
-[ATTR_WUNUSED][section(.text.crt.unicode.static.memory)]
+[ATTR_WUNUSED][section(.text.crt.unicode.static.memory)][ATTR_PURE]
 wildstrcasecmp:([nonnull] char const *pattern,
                 [nonnull] char const *string) -> int {
 	char card_post, pattern_ch, string_ch;
@@ -3774,13 +3775,13 @@ next:
 }
 
 [ATTR_WUNUSED][dependency_include(<parts/malloca.h>)]
-[same_impl][requires($has_function(fuzzy_memcmp))][export]
+[same_impl][requires($has_function(fuzzy_memcmp))][export][ATTR_PURE]
 fuzzy_strcmp:([nonnull] char const *s1, [nonnull] char const *s2) -> $size_t {
 	return fuzzy_memcmp(s1, strlen(s1), s2, strlen(s2));
 }
 
 [ATTR_WUNUSED][dependency_include(<parts/malloca.h>)]
-[same_impl][requires($has_function(fuzzy_memcmp))][export]
+[same_impl][requires($has_function(fuzzy_memcmp))][export][ATTR_PURE]
 fuzzy_strncmp:([nonnull] char const *s1, $size_t s1_maxlen,
                [nonnull] char const *s2, $size_t s2_maxlen) -> $size_t {
 	return fuzzy_memcmp(s1, strnlen(s1, s1_maxlen), s2, strnlen(s2, s2_maxlen));
@@ -3788,21 +3789,21 @@ fuzzy_strncmp:([nonnull] char const *s1, $size_t s1_maxlen,
 
 [dependency_include(<parts/malloca.h>)][ATTR_WUNUSED]
 [same_impl][requires($has_function(fuzzy_memcasecmp))][export]
-[section(.text.crt.unicode.static.memory)]
+[section(.text.crt.unicode.static.memory)][ATTR_PURE]
 fuzzy_strcasecmp:([nonnull] char const *s1, [nonnull] char const *s2) -> $size_t {
 	return fuzzy_memcasecmp(s1, strlen(s1), s2, strlen(s2));
 }
 
 [dependency_include(<parts/malloca.h>)][ATTR_WUNUSED]
 [same_impl][requires($has_function(fuzzy_memcasecmp))][export]
-[section(.text.crt.unicode.static.memory)]
+[section(.text.crt.unicode.static.memory)][ATTR_PURE]
 fuzzy_strncasecmp:([nonnull] char const *s1, $size_t s1_maxlen,
                    [nonnull] char const *s2, $size_t s2_maxlen) -> $size_t {
 	return fuzzy_memcasecmp(s1, strnlen(s1, s1_maxlen), s2, strnlen(s2, s2_maxlen));
 }
 
 [dependency_include(<parts/malloca.h>)][ATTR_WUNUSED]
-[same_impl][requires(!defined(__NO_MALLOCA))][export]
+[same_impl][requires(!defined(__NO_MALLOCA))][export][ATTR_PURE]
 fuzzy_memcmp:([nonnull] void const *s1, $size_t s1_bytes,
               [nonnull] void const *s2, $size_t s2_bytes) -> $size_t {
 	size_t *v0, *v1, i, j, cost, temp;
@@ -3857,7 +3858,7 @@ fuzzy_memcmp:([nonnull] void const *s1, $size_t s1_bytes,
 
 [dependency_include(<parts/malloca.h>)][ATTR_WUNUSED]
 [same_impl][requires(!defined(__NO_MALLOCA))][export]
-[section(.text.crt.unicode.static.memory)]
+[section(.text.crt.unicode.static.memory)][ATTR_PURE]
 fuzzy_memcasecmp:([nonnull] void const *s1, $size_t s1_bytes,
                   [nonnull] void const *s2, $size_t s2_bytes) -> $size_t {
 	size_t *v0, *v1, i, j, cost, temp;
@@ -3913,20 +3914,20 @@ fuzzy_memcasecmp:([nonnull] void const *s1, $size_t s1_bytes,
 }
 
 %#ifdef __USE_XOPEN2K8
-[ATTR_WUNUSED][dependency_include(<parts/malloca.h>)]
+[ATTR_WUNUSED][dependency_include(<parts/malloca.h>)][ATTR_PURE]
 [same_impl][requires(!defined(__NO_MALLOCA))][export][section(.text.crt.unicode.locale.memory)]
 fuzzy_strcasecmp_l:([nonnull] char const *s1, [nonnull] char const *s2, $locale_t locale) -> $size_t {
 	return fuzzy_memcasecmp_l(s1, strlen(s1), s2, strlen(s2), locale);
 }
 
-[ATTR_WUNUSED][dependency_include(<parts/malloca.h>)]
+[ATTR_WUNUSED][dependency_include(<parts/malloca.h>)][ATTR_PURE]
 [same_impl][requires(!defined(__NO_MALLOCA))][export][section(.text.crt.unicode.locale.memory)]
 fuzzy_strncasecmp_l:([nonnull] char const *s1, $size_t s1_maxlen,
                      [nonnull] char const *s2, $size_t s2_maxlen, $locale_t locale) -> $size_t {
 	return fuzzy_memcasecmp_l(s1, strnlen(s1, s1_maxlen), s2, strnlen(s2, s2_maxlen), locale);
 }
 
-[ATTR_WUNUSED][section(.text.crt.unicode.locale.memory)]
+[ATTR_WUNUSED][section(.text.crt.unicode.locale.memory)][ATTR_PURE]
 wildstrcasecmp_l:([nonnull] char const *pattern,
                   [nonnull] char const *string, $locale_t locale) -> int {
 	char card_post, pattern_ch, string_ch;
@@ -3975,7 +3976,7 @@ next:
 	return (int)((unsigned char)string_ch - (unsigned char)pattern_ch);
 }
 
-[dependency_include(<parts/malloca.h>)][ATTR_WUNUSED]
+[dependency_include(<parts/malloca.h>)][ATTR_WUNUSED][ATTR_PURE]
 [same_impl][requires(!defined(__NO_MALLOCA))][export][section(.text.crt.unicode.locale.memory)]
 fuzzy_memcasecmp_l:([nonnull] void const *s1, $size_t s1_bytes,
                     [nonnull] void const *s2, $size_t s2_bytes, $locale_t locale) -> $size_t {
@@ -4037,12 +4038,12 @@ fuzzy_memcasecmp_l:([nonnull] void const *s1, $size_t s1_bytes,
 #ifdef __USE_STRING_BWLQ
 }
 
-[noexport][ATTR_WUNUSED]
+[noexport][ATTR_WUNUSED][ATTR_PURE]
 fuzzy_memcmpb:([nonnull] void const *s1, $size_t s1_bytes,
                [nonnull] void const *s2, $size_t s2_bytes) -> $size_t = fuzzy_memcmp;
 
 [dependency_include(<parts/malloca.h>)][ATTR_WUNUSED]
-[same_impl][requires(!defined(__NO_MALLOCA))][export]
+[same_impl][requires(!defined(__NO_MALLOCA))][export][ATTR_PURE]
 fuzzy_memcmpw:([nonnull] void const *s1, $size_t s1_words,
                [nonnull] void const *s2, $size_t s2_words) -> $size_t {
 	size_t *v0, *v1, i, j, cost, temp;
@@ -4096,7 +4097,7 @@ fuzzy_memcmpw:([nonnull] void const *s1, $size_t s1_words,
 }
 
 [dependency_include(<parts/malloca.h>)][ATTR_WUNUSED]
-[same_impl][requires(!defined(__NO_MALLOCA))][export]
+[same_impl][requires(!defined(__NO_MALLOCA))][export][ATTR_PURE]
 fuzzy_memcmpl:([nonnull] void const *s1, $size_t s1_dwords,
                [nonnull] void const *s2, $size_t s2_dwords) -> $size_t {
 	size_t *v0, *v1, i, j, cost, temp;
@@ -4150,7 +4151,7 @@ fuzzy_memcmpl:([nonnull] void const *s1, $size_t s1_dwords,
 
 %#ifdef __UINT64_TYPE__
 [dependency_include(<parts/malloca.h>)][ATTR_WUNUSED]
-[same_impl][requires(!defined(__NO_MALLOCA))][export]
+[same_impl][requires(!defined(__NO_MALLOCA))][export][ATTR_PURE]
 fuzzy_memcmpq:([nonnull] void const *s1, $size_t s1_qwords,
                [nonnull] void const *s2, $size_t s2_qwords) -> $size_t {
 	size_t *v0, *v1, i, j, cost, temp;
@@ -4249,26 +4250,26 @@ strnupr:([nonnull] char *__restrict str, $size_t maxlen) -> [== str] char * {
 
 %#ifdef __USE_XOPEN2K8
 [alias(_strncoll_l)][ATTR_WUNUSED]
-[section(.text.crt.unicode.locale.memory)]
+[section(.text.crt.unicode.locale.memory)][ATTR_PURE]
 strncoll_l:([nonnull] char const *s1, [nonnull] char const *s2, $size_t maxlen, $locale_t locale) -> int {
 	(void)locale;
 	return strncoll(s1, s2, maxlen);
 }
 
 [alias(_stricoll_l)][ATTR_WUNUSED]
-[section(.text.crt.unicode.locale.memory)]
+[section(.text.crt.unicode.locale.memory)][ATTR_PURE]
 strcasecoll_l:([nonnull] char const *s1, [nonnull] char const *s2, $locale_t locale) -> int {
 	return strcasecmp_l(s1, s2, locale);
 }
 
 [alias(_strnicoll_l, strncasecmp_l, _strnicmp_l, _strncmpi_l)]
-[ATTR_WUNUSED][section(.text.crt.unicode.locale.memory)]
+[ATTR_WUNUSED][section(.text.crt.unicode.locale.memory)][ATTR_PURE]
 strncasecoll_l:([nonnull] char const *s1, [nonnull] char const *s2, $size_t maxlen, $locale_t locale) -> int {
 	(void)locale;
 	return strncasecoll(s1, s2, maxlen);
 }
 
-[export_alias(_strlwr_l)][section(.text.crt.unicode.locale.memory)]
+[export_alias(_strlwr_l)][section(.text.crt.unicode.locale.memory)][ATTR_LEAF]
 strlwr_l:([nonnull] char *__restrict str, $locale_t locale) -> [== str] char * {
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
@@ -4276,7 +4277,7 @@ strlwr_l:([nonnull] char *__restrict str, $locale_t locale) -> [== str] char * {
 	return str;
 }
 
-[export_alias(_strupr_l)][section(.text.crt.unicode.locale.memory)]
+[export_alias(_strupr_l)][section(.text.crt.unicode.locale.memory)][ATTR_LEAF]
 strupr_l:([nonnull] char *__restrict str, $locale_t locale) -> [== str] char * {
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
@@ -4284,7 +4285,7 @@ strupr_l:([nonnull] char *__restrict str, $locale_t locale) -> [== str] char * {
 	return str;
 }
 
-[section(.text.crt.unicode.locale.memory)]
+[section(.text.crt.unicode.locale.memory)][ATTR_LEAF]
 strnlwr_l:([nonnull] char *__restrict str, $size_t maxlen, $locale_t locale) -> [== str] char * {
 	char *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
@@ -4292,7 +4293,7 @@ strnlwr_l:([nonnull] char *__restrict str, $size_t maxlen, $locale_t locale) -> 
 	return str;
 }
 
-[section(.text.crt.unicode.locale.memory)]
+[section(.text.crt.unicode.locale.memory)][ATTR_LEAF]
 strnupr_l:([nonnull] char *__restrict str, $size_t maxlen, $locale_t locale) -> [== str] char * {
 	char *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
@@ -4617,7 +4618,7 @@ _strerror:(char const *message) -> char *;
 _strerror_s:([nonnull] char *__restrict buf, $size_t buflen, char const *message) -> $errno_t;
 
 [dependency_include(<parts/errno.h>)]
-[section(.text.crt.dos.unicode.static.memory)]
+[section(.text.crt.dos.unicode.static.memory)][ATTR_LEAF]
 _strlwr_s:(char *buf, $size_t buflen) -> $errno_t {
 	char *iter, ch;
 	if (buf == NULL)
@@ -4629,7 +4630,7 @@ _strlwr_s:(char *buf, $size_t buflen) -> $errno_t {
 	return 0;
 }
 
-[section(.text.crt.dos.unicode.static.memory)]
+[section(.text.crt.dos.unicode.static.memory)][ATTR_LEAF]
 _strupr_s:(char *buf, $size_t buflen) -> $errno_t {
 	char *iter, ch;
 	if (buf == NULL)
@@ -4641,7 +4642,7 @@ _strupr_s:(char *buf, $size_t buflen) -> $errno_t {
 	return 0;
 }
 
-[section(.text.crt.dos.unicode.locale.memory)]
+[section(.text.crt.dos.unicode.locale.memory)][ATTR_LEAF]
 _strlwr_s_l:(char *buf, $size_t buflen, $locale_t locale) -> $errno_t {
 	char *iter, ch;
 	if (buf == NULL)
@@ -4653,7 +4654,7 @@ _strlwr_s_l:(char *buf, $size_t buflen, $locale_t locale) -> $errno_t {
 	return 0;
 }
 
-[section(.text.crt.dos.unicode.locale.memory)]
+[section(.text.crt.dos.unicode.locale.memory)][ATTR_LEAF]
 _strupr_s_l:(char *buf, $size_t buflen, $locale_t locale) -> $errno_t {
 	char *iter, ch;
 	if (buf == NULL)
@@ -4668,7 +4669,7 @@ _strupr_s_l:(char *buf, $size_t buflen, $locale_t locale) -> $errno_t {
 [alias(*)][attribute(*)] _strnicmp:(*) = strncasecmp;
 [alias(*)][attribute(*)] _strnicmp_l:(*) = strncasecmp_l;
 
-[dependency_include(<parts/errno.h>)][section(.text.crt.dos.string.memory)]
+[dependency_include(<parts/errno.h>)][section(.text.crt.dos.string.memory)][ATTR_LEAF]
 _strnset_s:(char *__restrict buf, $size_t buflen, int ch, $size_t maxlen) -> $errno_t {
 @@exec MEMSET = $wchar_function ? "wmemset" : "memset"@@
 @@exec MULTIPLY = $wchar_function ? none : " * sizeof(char)"@@

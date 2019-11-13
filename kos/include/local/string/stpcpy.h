@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd25d683 */
+/* HASH CRC-32:0xd8acac8d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´ */
-__LOCAL_LIBC(stpcpy) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
+__LOCAL_LIBC(stpcpy) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(stpcpy))(char *__restrict __buf,
                                                     char const *__restrict __src) {
 #line 427 "kos/src/libc/magic/string.c"

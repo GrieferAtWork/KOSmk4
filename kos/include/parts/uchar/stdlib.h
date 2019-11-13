@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa47608b7 */
+/* HASH CRC-32:0x6a962bc0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -613,84 +613,84 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32stold_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNU
 
 #ifdef __USE_KOS
 #if defined(__CRT_HAVE_wcsto32) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,c16sto32,(char16_t const *__restrict __nptr, char16_t **__endptr, int __base),wcsto32,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,c16sto32,(char16_t const *__restrict __nptr, char16_t **__endptr, int __base),wcsto32,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcsto32)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,c16sto32,(char16_t const *__restrict __nptr, char16_t **__endptr, int __base),wcsto32,(__nptr,__endptr,__base))
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,c16sto32,(char16_t const *__restrict __nptr, char16_t **__endptr, int __base),wcsto32,(__nptr,__endptr,__base))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcsto32.h>
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT32_TYPE__ __NOTHROW_NCX(__LIBCCALL c16sto32)(char16_t const *__restrict __nptr, char16_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto32))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
+__FORCELOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT32_TYPE__ __NOTHROW_NCX(__LIBCCALL c16sto32)(char16_t const *__restrict __nptr, char16_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto32))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
 #else /* LIBC: c16sto32 */
 #include <local/wchar/c16sto32.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(c16sto32, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT32_TYPE__ __NOTHROW_NCX(__LIBCCALL c16sto32)(char16_t const *__restrict __nptr, char16_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16sto32))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16sto32, __FORCELOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT32_TYPE__ __NOTHROW_NCX(__LIBCCALL c16sto32)(char16_t const *__restrict __nptr, char16_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16sto32))(__nptr, __endptr, __base); })
 #endif /* c16sto32... */
 #if defined(__CRT_HAVE_wcsto32) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,c32sto32,(char32_t const *__restrict __nptr, char32_t **__endptr, int __base),wcsto32,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,c32sto32,(char32_t const *__restrict __nptr, char32_t **__endptr, int __base),wcsto32,(__nptr,__endptr,__base))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcsto32.h>
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT32_TYPE__ __NOTHROW_NCX(__LIBCCALL c32sto32)(char32_t const *__restrict __nptr, char32_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto32))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
+__FORCELOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT32_TYPE__ __NOTHROW_NCX(__LIBCCALL c32sto32)(char32_t const *__restrict __nptr, char32_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto32))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
 #else /* LIBC: c32sto32 */
 #include <local/wchar/c32sto32.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(c32sto32, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT32_TYPE__ __NOTHROW_NCX(__LIBCCALL c32sto32)(char32_t const *__restrict __nptr, char32_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32sto32))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32sto32, __FORCELOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT32_TYPE__ __NOTHROW_NCX(__LIBCCALL c32sto32)(char32_t const *__restrict __nptr, char32_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32sto32))(__nptr, __endptr, __base); })
 #endif /* c32sto32... */
 #if defined(__CRT_HAVE_wcstou32) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,c16stou32,(char16_t const *__restrict __nptr, char16_t **__endptr, int __base),wcstou32,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,c16stou32,(char16_t const *__restrict __nptr, char16_t **__endptr, int __base),wcstou32,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcstou32)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,c16stou32,(char16_t const *__restrict __nptr, char16_t **__endptr, int __base),wcstou32,(__nptr,__endptr,__base))
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,c16stou32,(char16_t const *__restrict __nptr, char16_t **__endptr, int __base),wcstou32,(__nptr,__endptr,__base))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcstou32.h>
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL c16stou32)(char16_t const *__restrict __nptr, char16_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou32))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
+__FORCELOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL c16stou32)(char16_t const *__restrict __nptr, char16_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou32))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
 #else /* LIBC: c16stou32 */
 #include <local/wchar/c16stou32.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(c16stou32, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL c16stou32)(char16_t const *__restrict __nptr, char16_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16stou32))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16stou32, __FORCELOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL c16stou32)(char16_t const *__restrict __nptr, char16_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16stou32))(__nptr, __endptr, __base); })
 #endif /* c16stou32... */
 #if defined(__CRT_HAVE_wcstou32) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,c32stou32,(char32_t const *__restrict __nptr, char32_t **__endptr, int __base),wcstou32,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,c32stou32,(char32_t const *__restrict __nptr, char32_t **__endptr, int __base),wcstou32,(__nptr,__endptr,__base))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcstou32.h>
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL c32stou32)(char32_t const *__restrict __nptr, char32_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou32))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
+__FORCELOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL c32stou32)(char32_t const *__restrict __nptr, char32_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou32))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
 #else /* LIBC: c32stou32 */
 #include <local/wchar/c32stou32.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(c32stou32, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL c32stou32)(char32_t const *__restrict __nptr, char32_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32stou32))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32stou32, __FORCELOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL c32stou32)(char32_t const *__restrict __nptr, char32_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32stou32))(__nptr, __endptr, __base); })
 #endif /* c32stou32... */
 #if defined(__CRT_HAVE_wcsto64) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,c16sto64,(char16_t const *__restrict __nptr, char16_t **__endptr, int __base),wcsto64,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,c16sto64,(char16_t const *__restrict __nptr, char16_t **__endptr, int __base),wcsto64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcsto64)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,c16sto64,(char16_t const *__restrict __nptr, char16_t **__endptr, int __base),wcsto64,(__nptr,__endptr,__base))
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,c16sto64,(char16_t const *__restrict __nptr, char16_t **__endptr, int __base),wcsto64,(__nptr,__endptr,__base))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcsto64.h>
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL c16sto64)(char16_t const *__restrict __nptr, char16_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto64))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
+__FORCELOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL c16sto64)(char16_t const *__restrict __nptr, char16_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto64))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
 #else /* LIBC: c16sto64 */
 #include <local/wchar/c16sto64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(c16sto64, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL c16sto64)(char16_t const *__restrict __nptr, char16_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16sto64))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16sto64, __FORCELOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL c16sto64)(char16_t const *__restrict __nptr, char16_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16sto64))(__nptr, __endptr, __base); })
 #endif /* c16sto64... */
 #if defined(__CRT_HAVE_wcsto64) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,c32sto64,(char32_t const *__restrict __nptr, char32_t **__endptr, int __base),wcsto64,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,c32sto64,(char32_t const *__restrict __nptr, char32_t **__endptr, int __base),wcsto64,(__nptr,__endptr,__base))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcsto64.h>
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL c32sto64)(char32_t const *__restrict __nptr, char32_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto64))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
+__FORCELOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL c32sto64)(char32_t const *__restrict __nptr, char32_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto64))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
 #else /* LIBC: c32sto64 */
 #include <local/wchar/c32sto64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(c32sto64, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL c32sto64)(char32_t const *__restrict __nptr, char32_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32sto64))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32sto64, __FORCELOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL c32sto64)(char32_t const *__restrict __nptr, char32_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32sto64))(__nptr, __endptr, __base); })
 #endif /* c32sto64... */
 #if defined(__CRT_HAVE_wcstou64) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,c16stou64,(char16_t const *__restrict __nptr, char16_t **__endptr, int __base),wcstou64,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,c16stou64,(char16_t const *__restrict __nptr, char16_t **__endptr, int __base),wcstou64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcstou64)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,c16stou64,(char16_t const *__restrict __nptr, char16_t **__endptr, int __base),wcstou64,(__nptr,__endptr,__base))
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,c16stou64,(char16_t const *__restrict __nptr, char16_t **__endptr, int __base),wcstou64,(__nptr,__endptr,__base))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcstou64.h>
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL c16stou64)(char16_t const *__restrict __nptr, char16_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou64))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
+__FORCELOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL c16stou64)(char16_t const *__restrict __nptr, char16_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou64))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
 #else /* LIBC: c16stou64 */
 #include <local/wchar/c16stou64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(c16stou64, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL c16stou64)(char16_t const *__restrict __nptr, char16_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16stou64))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16stou64, __FORCELOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL c16stou64)(char16_t const *__restrict __nptr, char16_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16stou64))(__nptr, __endptr, __base); })
 #endif /* c16stou64... */
 #if defined(__CRT_HAVE_wcstou64) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,c32stou64,(char32_t const *__restrict __nptr, char32_t **__endptr, int __base),wcstou64,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,c32stou64,(char32_t const *__restrict __nptr, char32_t **__endptr, int __base),wcstou64,(__nptr,__endptr,__base))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcstou64.h>
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL c32stou64)(char32_t const *__restrict __nptr, char32_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou64))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
+__FORCELOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL c32stou64)(char32_t const *__restrict __nptr, char32_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou64))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base); }
 #else /* LIBC: c32stou64 */
 #include <local/wchar/c32stou64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(c32stou64, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL c32stou64)(char32_t const *__restrict __nptr, char32_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32stou64))(__nptr, __endptr, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32stou64, __FORCELOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL c32stou64)(char32_t const *__restrict __nptr, char32_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32stou64))(__nptr, __endptr, __base); })
 #endif /* c32stou64... */
 #endif /* __USE_KOS */
 

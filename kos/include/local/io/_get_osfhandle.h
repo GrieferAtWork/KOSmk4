@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd04328e2 */
+/* HASH CRC-32:0xb442e9ab */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,9 +22,10 @@
 #define __local__get_osfhandle_defined 1
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_get_osfhandle) __ATTR_WUNUSED __INTPTR_TYPE__
+__LOCAL_LIBC(_get_osfhandle) __ATTR_PURE __ATTR_WUNUSED __INTPTR_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_get_osfhandle))(__fd_t __fd) {
 #line 271 "kos/src/libc/magic/io.c"
+	__COMPILER_IMPURE();
 	return (__INTPTR_TYPE__)__fd;
 }
 __NAMESPACE_LOCAL_END

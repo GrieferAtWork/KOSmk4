@@ -626,8 +626,9 @@ err:
 }
 /*[[[end:sigset]]]*/
 
-/*[[[head:__libc_current_sigrtmin,hash:CRC-32=0x182ba356]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.__libc_current_sigrtmin") int
+/*[[[head:__libc_current_sigrtmin,hash:CRC-32=0x30c8ad01]]]*/
+INTERN ATTR_CONST
+ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.__libc_current_sigrtmin") int
 NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmin)(void)
 /*[[[body:__libc_current_sigrtmin]]]*/
 {
@@ -635,8 +636,9 @@ NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmin)(void)
 }
 /*[[[end:__libc_current_sigrtmin]]]*/
 
-/*[[[head:__libc_current_sigrtmax,hash:CRC-32=0xcf60aeb5]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.__libc_current_sigrtmax") int
+/*[[[head:__libc_current_sigrtmax,hash:CRC-32=0xe783a0e2]]]*/
+INTERN ATTR_CONST
+ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.__libc_current_sigrtmax") int
 NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void)
 /*[[[body:__libc_current_sigrtmax]]]*/
 {

@@ -177,6 +177,11 @@ glob:([nonnull] char const *__restrict pattern, int flags,
 #elif defined(__CRT_HAVE_glob64)
 	return glob64(pattern, flags, errfunc, (struct __glob64_struct *)pglob);
 #else
+	(void)pattern;
+	(void)flags;
+	(void)errfunc;
+	(void)pglob;
+	COMPILER_IMPURE();
 	return @GLOB_NOSYS@;
 #endif
 }
@@ -193,6 +198,7 @@ globfree:([nonnull] glob_t *pglob) {
 #elif defined(__CRT_HAVE_globfree64)
 	globfree64((struct __glob64_struct *)pglob);
 #else
+	COMPILER_IMPURE();
 	(void)pglob;
 #endif
 }
@@ -206,6 +212,11 @@ glob64:([nonnull] const char *__restrict pattern, int flags,
 #if defined(__CRT_HAVE_glob)
 	return glob32(pattern, flags, errfunc, pglob);
 #else
+	(void)pattern;
+	(void)flags;
+	(void)errfunc;
+	(void)pglob;
+	COMPILER_IMPURE();
 	return @GLOB_NOSYS@;
 #endif
 }
@@ -215,6 +226,7 @@ globfree64:([nonnull] struct __glob64_struct *pglob) {
 #if defined(__CRT_HAVE_globfree)
 	globfree32(pglob);
 #else
+	COMPILER_IMPURE();
 	(void)pglob;
 #endif
 }

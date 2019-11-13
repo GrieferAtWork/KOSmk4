@@ -861,8 +861,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf.vwscanf") __S
 }
 /*[[[end:DOS$vwscanf]]]*/
 
-/*[[[head:wcswidth,hash:CRC-32=0xdbe0a6a8]]]*/
-INTERN WUNUSED NONNULL((1))
+/*[[[head:wcswidth,hash:CRC-32=0x43cfbc9d]]]*/
+INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.mbs.wcswidth") int
 NOTHROW_NCX(LIBCCALL libc_wcswidth)(char32_t const *__restrict string,
                                     size_t num_chars)
@@ -892,8 +892,8 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.putc.putwchar
 }
 /*[[[end:putwchar_unlocked]]]*/
 
-/*[[[head:DOS$wcswidth,hash:CRC-32=0x2fde5102]]]*/
-INTERN WUNUSED NONNULL((1))
+/*[[[head:DOS$wcswidth,hash:CRC-32=0x15525c2c]]]*/
+INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs.wcswidth") int
 NOTHROW_NCX(LIBDCALL libd_wcswidth)(char16_t const *__restrict string,
                                     size_t num_chars)
@@ -914,8 +914,8 @@ NOTHROW_NCX(LIBDCALL libd_wcswidth)(char16_t const *__restrict string,
 /*[[[end:DOS$wcswidth]]]*/
 
 
-/*[[[head:DOS$wcwidth,hash:CRC-32=0x51548f4e]]]*/
-INTERN WUNUSED
+/*[[[head:DOS$wcwidth,hash:CRC-32=0x6a89abf8]]]*/
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs.wcwidth") int
 NOTHROW_NCX(LIBDCALL libd_wcwidth)(char16_t ch)
 /*[[[body:DOS$wcwidth]]]*/
@@ -934,8 +934,8 @@ NOTHROW_NCX(LIBDCALL libd_wcwidth)(char16_t ch)
 /*[[[end:DOS$wcwidth]]]*/
 
 
-/*[[[head:wcwidth,hash:CRC-32=0xe2c925cf]]]*/
-INTERN WUNUSED
+/*[[[head:wcwidth,hash:CRC-32=0x27b4a526]]]*/
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.mbs.wcwidth") int
 NOTHROW_NCX(LIBCCALL libc_wcwidth)(char32_t ch)
 /*[[[body:wcwidth]]]*/

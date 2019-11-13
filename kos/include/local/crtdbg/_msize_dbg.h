@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfcd9110 */
+/* HASH CRC-32:0xa90e2174 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__m
 #endif /* !____localdep__msize_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_msize_dbg) __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
+__LOCAL_LIBC(_msize_dbg) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_msize_dbg))(void *__ptr,
                                                         int __block_type) {
 #line 338 "kos/src/libc/magic/crtdbg.c"

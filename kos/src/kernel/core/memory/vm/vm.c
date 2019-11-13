@@ -580,7 +580,7 @@ NOTHROW(KCALL vm_set_lockendwrite_all)(struct pointer_set *__restrict self) {
 
 
 
-LOCAL NOBLOCK WUNUSED NONNULL((1)) uintptr_t
+LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
 NOTHROW(KCALL pprop_getbit)(uintptr_t const *__restrict base,
                             size_t index) {
 	uintptr_t result;

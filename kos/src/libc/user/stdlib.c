@@ -130,6 +130,7 @@ NOTHROW_NCX(LIBCCALL libc___cxa_atexit)(void (LIBCCALL *func)(void *arg),
 	 *       is some arbitrary pointer apart of the static image of the
 	 *       associated binary (which can be resolved using `dlgethandle()') */
 	/* TODO */
+	COMPILER_IMPURE();
 	return -1;
 }
 

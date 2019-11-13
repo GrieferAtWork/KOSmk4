@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2516d976 */
+/* HASH CRC-32:0xd1a4b7ed */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,17 +23,17 @@
 #ifndef ____localdep_strtoimax_defined
 #define ____localdep_strtoimax_defined 1
 #ifdef __CRT_HAVE_strtoimax
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax,(char const *__restrict __nptr, char **__endptr, int __base),strtoimax,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax,(char const *__restrict __nptr, char **__endptr, int __base),strtoimax,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtol) && (__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__)
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax,(char const *__restrict __nptr, char **__endptr, int __base),strtol,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax,(char const *__restrict __nptr, char **__endptr, int __base),strtol,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoll) && (__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__)
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax,(char const *__restrict __nptr, char **__endptr, int __base),strtoll,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax,(char const *__restrict __nptr, char **__endptr, int __base),strtoll,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoq) && (__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__)
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax,(char const *__restrict __nptr, char **__endptr, int __base),strtoq,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax,(char const *__restrict __nptr, char **__endptr, int __base),strtoq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strto64) && (__SIZEOF_INTMAX_T__ == 8)
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax,(char const *__restrict __nptr, char **__endptr, int __base),strto64,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax,(char const *__restrict __nptr, char **__endptr, int __base),strto64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strto32) && (__SIZEOF_INTMAX_T__ == 4)
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax,(char const *__restrict __nptr, char **__endptr, int __base),strto32,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax,(char const *__restrict __nptr, char **__endptr, int __base),strto32,(__nptr,__endptr,__base))
 #else /* LIBC: strtoimax */
 #include <local/inttypes/strtoimax.h>
 #define __localdep_strtoimax (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoimax))

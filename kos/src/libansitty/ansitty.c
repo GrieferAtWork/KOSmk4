@@ -623,7 +623,7 @@ PRIVATE struct ansi_palette const vga_pal = {
 };
 
 
-PRIVATE size_t CC
+PRIVATE ATTR_CONST WUNUSED size_t CC
 color_distance(uint8_t ra, uint8_t ga, uint8_t ba,
                uint8_t rb, uint8_t gb, uint8_t bb) {
 	unsigned int dist_r = (unsigned int)abs((int)ra - (int)rb);
@@ -635,7 +635,7 @@ color_distance(uint8_t ra, uint8_t ga, uint8_t ba,
 	       (dist_b / 2);
 }
 
-PRIVATE unsigned int CC
+PRIVATE ATTR_CONST WUNUSED unsigned int CC
 get_index_for_color(uint8_t r, uint8_t g, uint8_t b) {
 	unsigned int i, winner_index = 0;
 	size_t winner_distance = (size_t)-1;
@@ -1940,14 +1940,14 @@ nope:
 /* ANSI escape gather parser implementation                                             */
 /* ==================================================================================== */
 
-PRIVATE void CC
+PRIVATE NONNULL((1)) void CC
 ansitty_setstate_text(struct ansitty *__restrict self) {
 	self->at_state = (self->at_ttyflag & ANSITTY_FLAG_INSERT)
 	                 ? (self->at_codepage == CP_UTF8 ? STATE_INSERT_UTF8 : STATE_INSERT)
 	                 : (self->at_codepage == CP_UTF8 ? STATE_TEXT_UTF8 : STATE_TEXT);
 }
 
-PRIVATE char32_t FCALL
+PRIVATE WUNUSED ATTR_PURE NONNULL((2)) char32_t FCALL
 cp_decode(uint8_t ch, struct ansitty *__restrict self) {
 	char32_t result;
 	switch (self->at_codepage) {
@@ -2008,7 +2008,7 @@ cp_decode(uint8_t ch, struct ansitty *__restrict self) {
 	return result;
 }
 
-LOCAL bool CC
+LOCAL NONNULL((1)) bool CC
 handle_control_character(struct ansitty *__restrict self, char32_t ch) {
 	switch (ch) {
 
@@ -2072,7 +2072,7 @@ done:
 	return true;
 }
 
-LOCAL void CC
+LOCAL NONNULL((1)) void CC
 ansitty_do_insert_unicode(struct ansitty *__restrict self, char32_t ch) {
 	switch (self->at_ttyflag & (ANSITTY_FLAG_HEDIT |
 	                            ANSITTY_FLAG_INSDEL_SCRN)) {
@@ -2160,7 +2160,7 @@ ansitty_do_insert_unicode(struct ansitty *__restrict self, char32_t ch) {
 	}
 }
 
-LOCAL void CC
+LOCAL NONNULL((1)) void CC
 ansitty_do_repeat_unicode(struct ansitty *__restrict self, char32_t ch) {
 	unsigned int count;
 	count = STATE_REPEAT_COUNT(self);
@@ -2175,7 +2175,7 @@ ansitty_do_repeat_unicode(struct ansitty *__restrict self, char32_t ch) {
 	}
 }
 
-LOCAL void CC
+LOCAL NONNULL((1)) void CC
 ansitty_pututf8_mbs(struct ansitty *__restrict self, char ch) {
 	char32_t unich;
 	assert(self->at_codepage == CP_UTF8);
@@ -2209,7 +2209,8 @@ do_handle_unich:
 }
 
 
-PRIVATE bool CC ansitty_invoke_string_command(struct ansitty *__restrict self) {
+PRIVATE NONNULL((1)) bool CC
+ansitty_invoke_string_command(struct ansitty *__restrict self) {
 	bool result;
 	self->at_escape[self->at_esclen] = 0;
 	switch (self->at_state) {
@@ -2244,7 +2245,7 @@ PRIVATE bool CC ansitty_invoke_string_command(struct ansitty *__restrict self) {
 	return result;
 }
 
-PRIVATE char CC
+PRIVATE ATTR_CONST char CC
 get_string_command_start_character(uintptr_t state) {
 	char result;
 	switch (state) {

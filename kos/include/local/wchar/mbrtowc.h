@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b8ab3e */
+/* HASH CRC-32:0x46e8cb14 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,15 +19,73 @@
  */
 #ifndef __local_mbrtowc_defined
 #define __local_mbrtowc_defined 1
+#include <parts/errno.h>
+/* Dependency: "unicode_c8toc16" from "unicode" */
+#ifndef ____localdep_unicode_c8toc16_defined
+#define ____localdep_unicode_c8toc16_defined 1
+#ifdef __CRT_HAVE_unicode_c8toc16
+/* @return: *:          Success (*pc16 was filled; the return value is the number of bytes taken from `s')
+ * @return: 0:          Success (*pc16 was filled; `mbs' was modified, but nothing was read from `s'; in this case, a surrogate was written)
+ * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
+ * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
+__CREDIRECT(__ATTR_NONNULL((1, 2, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_unicode_c8toc16,(__CHAR16_TYPE__ *__restrict __pc16, /*utf-8*/ char const *__restrict __s, __SIZE_TYPE__ __n, __mbstate_t *__restrict __mbs),unicode_c8toc16,(__pc16,__s,__n,__mbs))
+#else /* LIBC: unicode_c8toc16 */
+#include <local/unicode/unicode_c8toc16.h>
+/* @return: *:          Success (*pc16 was filled; the return value is the number of bytes taken from `s')
+ * @return: 0:          Success (*pc16 was filled; `mbs' was modified, but nothing was read from `s'; in this case, a surrogate was written)
+ * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
+ * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
+#define __localdep_unicode_c8toc16 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_c8toc16))
+#endif /* unicode_c8toc16... */
+#endif /* !____localdep_unicode_c8toc16_defined */
+
+/* Dependency: "unicode_c8toc32" from "unicode" */
+#ifndef ____localdep_unicode_c8toc32_defined
+#define ____localdep_unicode_c8toc32_defined 1
+#ifdef __CRT_HAVE_unicode_c8toc32
+/* @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
+ * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
+ * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
+__CREDIRECT(__ATTR_NONNULL((1, 2, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_unicode_c8toc32,(__CHAR32_TYPE__ *__restrict __pc32, /*utf-8*/ char const *__restrict __s, __SIZE_TYPE__ __n, __mbstate_t *__restrict __mbs),unicode_c8toc32,(__pc32,__s,__n,__mbs))
+#else /* LIBC: unicode_c8toc32 */
+#include <local/unicode/unicode_c8toc32.h>
+/* @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
+ * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
+ * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
+#define __localdep_unicode_c8toc32 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_c8toc32))
+#endif /* unicode_c8toc32... */
+#endif /* !____localdep_unicode_c8toc32_defined */
+
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(mbrtowc) __ATTR_NONNULL((2)) __SIZE_TYPE__
+#ifndef ____local_mbrtowc_ps_defined
+#define ____local_mbrtowc_ps_defined 1
+__LOCAL_LIBC_DATA(__mbrtowc_ps) __mbstate_t __mbrtowc_ps = __MBSTATE_INIT;
+#endif /* !____local_mbrtowc_ps_defined */
+__LOCAL_LIBC(mbrtowc) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbrtowc))(__WCHAR_TYPE__ *__pwc,
                                                      char const *__restrict __str,
                                                      __SIZE_TYPE__ __maxlen,
                                                      __mbstate_t *__ps) {
-#line 197 "kos/src/libc/magic/wchar.c"
-	/* TODO */
-	return 0;
+#line 222 "kos/src/libc/magic/wchar.c"
+	__SIZE_TYPE__ __error;
+	if (!__ps)
+		__ps = &__mbrtowc_ps;
+	if (!__str) {
+		__ps->__word = 0;
+		return 0;
+	}
+	if (!__maxlen || !*__str)
+		return 0;
+#if __SIZEOF_WCHAR_T__ == 2
+	__error = __localdep_unicode_c8toc16((__CHAR16_TYPE__ *)__pwc, __str, __maxlen, __ps);
+#else
+	__error = __localdep_unicode_c8toc32((__CHAR32_TYPE__ *)__pwc, __str, __maxlen, __ps);
+#endif
+#ifdef __EILSEQ
+	if (__error == (__SIZE_TYPE__)-1)
+		__libc_seterrno(__EILSEQ);
+#endif /* EILSEQ */
+	return __error;
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_mbrtowc_defined */

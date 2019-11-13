@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x341c3f0b */
+/* HASH CRC-32:0x7482fcfe */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #ifndef ____localdep___locale_ctype_ptr_l_defined
 #define ____localdep___locale_ctype_ptr_l_defined 1
 #ifdef __CRT_HAVE___locale_ctype_ptr_l
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__localdep___locale_ctype_ptr_l,(__locale_t __locale),__locale_ctype_ptr_l,(__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__localdep___locale_ctype_ptr_l,(__locale_t __locale),__locale_ctype_ptr_l,(__locale))
 #else /* LIBC: __locale_ctype_ptr_l */
 #undef ____localdep___locale_ctype_ptr_l_defined
 #endif /* __locale_ctype_ptr_l... */
@@ -33,7 +33,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__localdep___
 #ifndef ____localdep__isctype_l_defined
 #define ____localdep__isctype_l_defined 1
 #ifdef __CRT_HAVE__isctype_l
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__isctype_l,(int __ch, int __mask, __locale_t __locale),_isctype_l,(__ch,__mask,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__isctype_l,(int __ch, int __mask, __locale_t __locale),_isctype_l,(__ch,__mask,__locale))
 #else /* LIBC: _isctype_l */
 #undef ____localdep__isctype_l_defined
 #endif /* _isctype_l... */
@@ -56,7 +56,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(isgraph_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(isgraph_l))(int __ch,
                                                        __locale_t __locale) {
-#line 536 "kos/src/libc/magic/ctype.c"
+#line 555 "kos/src/libc/magic/ctype.c"
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <__hybrid/__byteorder.__h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -70,6 +70,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(isgraph_l))(int __ch,
 	return __localdep__isctype_l(__ch, 0x0117, __locale);
 #else
 	(void)__locale;
+	__COMPILER_IMPURE();
 	return __localdep_isgraph(__ch);
 #endif
 }

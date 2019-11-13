@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31408ff1 */
+/* HASH CRC-32:0xc6037c14 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #ifndef ____localdep_mblen_defined
 #define ____localdep_mblen_defined 1
 #ifdef __CRT_HAVE_mblen
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_mblen,(char const *__s, __SIZE_TYPE__ __n),mblen,(__s,__n))
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_mblen,(char const *__str, __SIZE_TYPE__ __maxlen),mblen,(__str,__maxlen))
 #else /* LIBC: mblen */
 #include <local/stdlib/mblen.h>
 #define __localdep_mblen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mblen))
@@ -35,7 +35,7 @@ __LOCAL_LIBC(_mblen_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mblen_l))(char const *__str,
                                                       __SIZE_TYPE__ __maxlen,
                                                       __locale_t __locale) {
-#line 2333 "kos/src/libc/magic/stdlib.c"
+#line 2357 "kos/src/libc/magic/stdlib.c"
 	(void)__locale;
 	return __localdep_mblen(__str, __maxlen);
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7b71bc9 */
+/* HASH CRC-32:0xb2a7bd3e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #ifndef ____localdep___ctype_tolower_loc_defined
 #define ____localdep___ctype_tolower_loc_defined 1
 #ifdef __CRT_HAVE___ctype_tolower_loc
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__INT32_TYPE__ const **,__NOTHROW,__localdep___ctype_tolower_loc,(void),__ctype_tolower_loc,())
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__INT32_TYPE__ const **,__NOTHROW,__localdep___ctype_tolower_loc,(void),__ctype_tolower_loc,())
 #else /* LIBC: __ctype_tolower_loc */
 #undef ____localdep___ctype_tolower_loc_defined
 #endif /* __ctype_tolower_loc... */

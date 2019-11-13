@@ -233,7 +233,7 @@ DEFINE_DBG_BZERO(&PERCPU(x86_cputss_df).t_ecx, sizeof(x86_cputss_df.t_ecx));
 
 
 
-PUBLIC NOBLOCK WUNUSED size_t
+PUBLIC NOBLOCK WUNUSED ATTR_PURE size_t
 NOTHROW(KCALL stack_avail)(void) {
 	vm_virt_t start, end;
 	vm_virt_t sp = (vm_virt_t)__rdsp();
@@ -257,7 +257,7 @@ NOTHROW(KCALL stack_avail)(void) {
 	return 0;
 }
 
-PUBLIC NOBLOCK WUNUSED size_t
+PUBLIC NOBLOCK WUNUSED ATTR_PURE size_t
 NOTHROW(KCALL stack_inuse)(void) {
 	vm_virt_t start, end;
 	vm_virt_t sp = (vm_virt_t)__rdsp();

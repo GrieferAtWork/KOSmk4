@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9cde7865 */
+/* HASH CRC-32:0x1daa3cb9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,16 +39,16 @@ __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fgetc32,(
 #define ____localdep_ferror_defined 1
 #if defined(__CRT_HAVE_ferror_unlocked) && (defined(__USE_STDIO_UNLOCKED))
 /* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE *__restrict __stream),ferror_unlocked,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ferror)
 /* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE *__restrict __stream),ferror,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror,(__stream))
 #elif defined(__CRT_HAVE_ferror_unlocked)
 /* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE *__restrict __stream),ferror_unlocked,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE__IO_ferror)
 /* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE *__restrict __stream),_IO_ferror,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),_IO_ferror,(__stream))
 #else /* LIBC: ferror */
 #undef ____localdep_ferror_defined
 #endif /* ferror... */
@@ -80,7 +80,7 @@ __LOCAL_LIBC(fgetc32s) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __CHAR32_TYPE__ *
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetc32s))(__CHAR32_TYPE__ *__restrict __buf,
                                          __STDC_INT_AS_SIZE_T __bufsize,
                                          __FILE *__restrict __stream) __THROWS(...) {
-#line 413 "kos/src/libc/magic/wchar.c"
+#line 494 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __n;
 	if __unlikely(!__buf || !__bufsize) {
 		/* The buffer cannot be empty! */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf95df067 */
+/* HASH CRC-32:0xb733be75 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -325,14 +325,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sigdelset, __FORCELOCAL __ATTR_NONNULL((1)) int 
 #endif /* sigdelset... */
 #ifdef __CRT_HAVE_sigismember
 /* @param signo: One of `SIG*' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigismember,(sigset_t const *__set, int __signo),(__set,__signo))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigismember,(sigset_t const *__set, int __signo),(__set,__signo))
 #elif defined(__CRT_HAVE___sigismember)
 /* @param signo: One of `SIG*' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigismember,(sigset_t const *__set, int __signo),__sigismember,(__set,__signo))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigismember,(sigset_t const *__set, int __signo),__sigismember,(__set,__signo))
 #else /* LIBC: sigismember */
 #include <local/signal/sigismember.h>
 /* @param signo: One of `SIG*' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigismember, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigismember)(sigset_t const *__set, int __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigismember))(__set, __signo); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigismember, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigismember)(sigset_t const *__set, int __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigismember))(__set, __signo); })
 #endif /* sigismember... */
 #ifdef __CRT_HAVE_sigprocmask
 /* @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
@@ -359,10 +359,10 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sigwait,(sigset_t const *__r
 #endif /* sigwait... */
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_sigisemptyset
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigisemptyset,(sigset_t const *__set),(__set))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigisemptyset,(sigset_t const *__set),(__set))
 #else /* LIBC: sigisemptyset */
 #include <local/signal/sigisemptyset.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigisemptyset, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigisemptyset)(sigset_t const *__set) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigisemptyset))(__set); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigisemptyset, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigisemptyset)(sigset_t const *__set) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigisemptyset))(__set); })
 #endif /* sigisemptyset... */
 #ifdef __CRT_HAVE_sigandset
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,sigandset,(sigset_t *__set, sigset_t const *__left, sigset_t const *__right),(__set,__left,__right))
@@ -467,10 +467,10 @@ __CDECLARE(,__sighandler_t,__NOTHROW_NCX,sigset,(int __signo, __sighandler_t __d
 #endif /* __USE_XOPEN_EXTENDED */
 
 #ifdef __CRT_HAVE___libc_current_sigrtmin
-__CDECLARE(,int,__NOTHROW_NCX,__libc_current_sigrtmin,(void),())
+__CDECLARE(__ATTR_CONST,int,__NOTHROW_NCX,__libc_current_sigrtmin,(void),())
 #endif /* __libc_current_sigrtmin... */
 #ifdef __CRT_HAVE___libc_current_sigrtmax
-__CDECLARE(,int,__NOTHROW_NCX,__libc_current_sigrtmax,(void),())
+__CDECLARE(__ATTR_CONST,int,__NOTHROW_NCX,__libc_current_sigrtmax,(void),())
 #endif /* __libc_current_sigrtmax... */
 
 #endif /* __CC__ */

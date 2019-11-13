@@ -503,6 +503,18 @@
 #define __ATTR_EXTERNALLY_VISIBLE  __attribute__((__externally_visible__))
 #define __ATTR_VISIBILITY(vis)     __attribute__((__visibility__(vis)))
 
+/* Same as the *_P-less variants, however these should be used for function
+ * typedefs, since some compilers don't allow these kinds of attributes on
+ * those. */
+#define __ATTR_LEAF_P   __ATTR_LEAF
+#define __ATTR_PURE_P   __ATTR_PURE
+#define __ATTR_CONST_P  __ATTR_CONST
+
+/* Suppress warnings about `-Wsuggest-attribute=const' or `-Wsuggest-attribute=pure' */
+#define __COMPILER_IMPURE() __asm__("")
+
+
+
 #if __has_attribute(__selectany__)
 #   define __ATTR_SELECTANY        __attribute__((__selectany__))
 #else

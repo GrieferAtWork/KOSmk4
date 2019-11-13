@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86a1a4af */
+/* HASH CRC-32:0x9af77bee */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsnprintf))(char *__restrict __buf,
                                                         __SIZE_TYPE__ __bufsize,
                                                         char const *__restrict __format,
                                                         __builtin_va_list __args) {
-#line 2474 "kos/src/libc/magic/stdio.c"
+#line 2476 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T __result;
 	__result = __localdep_vsnprintf(__buf, __bufsize, __format, __args);
 	if (__result > __bufsize)

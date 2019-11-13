@@ -42,7 +42,7 @@ INTDEF char GDBRemote_CommandBuffer[CONFIG_GDBSERVER_PACKET_MAXLEN];
 PRIVATE char GDBServer_PacketBuffer[CONFIG_GDBSERVER_PACKET_MAXLEN + 4];
 
 /* Begin a new packet, returning a buffer of up to `CONFIG_GDBSERVER_PACKET_MAXLEN' bytes. */
-INTERN char *NOTHROW(FCALL GDBPacket_Start)(void) {
+INTERN ATTR_CONST char *NOTHROW(FCALL GDBPacket_Start)(void) {
 	return GDBServer_PacketBuffer + 1;
 }
 
@@ -106,7 +106,7 @@ done:
 }
 
 /* Calculate and return the checksum for the given memory block. */
-INTERN WUNUSED NONNULL((1)) byte_t
+INTERN WUNUSED ATTR_PURE NONNULL((1)) byte_t
 NOTHROW(KCALL GDBPacket_GetCheckSum)(void const *__restrict buf, size_t buflen) {
 	byte_t result;
 	size_t i;

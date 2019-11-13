@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde8ac18 */
+/* HASH CRC-32:0x27c5a880 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #ifndef ____localdep_wctomb_defined
 #define ____localdep_wctomb_defined 1
 #ifdef __CRT_HAVE_wctomb
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_wctomb,(char *__s, __WCHAR_TYPE__ __wchar),wctomb,(__s,__wchar))
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_wctomb,(char *__str, __WCHAR_TYPE__ __wc),wctomb,(__str,__wc))
 #else /* LIBC: wctomb */
 #include <local/stdlib/wctomb.h>
 #define __localdep_wctomb (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wctomb))
@@ -37,7 +37,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctomb_s))(int *__presult,
                                                       char *__buf,
                                                       __SIZE_TYPE__ __buflen,
                                                       __WCHAR_TYPE__ __wc) {
-#line 2431 "kos/src/libc/magic/stdlib.c"
+#line 2483 "kos/src/libc/magic/stdlib.c"
 	if (!__presult || !__buf)
 		return __EINVAL;
 	if (__buflen < MB_CUR_MAX)

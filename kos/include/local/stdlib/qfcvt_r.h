@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4151c054 */
+/* HASH CRC-32:0x54aa3e0a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,11 +37,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qfcvt_r))(long double __val,
                                                      int *__restrict __sign,
                                                      char *__restrict __buf,
                                                      __SIZE_TYPE__ __len) {
-#line 1150 "kos/src/libc/magic/stdlib.c"
+#line 1165 "kos/src/libc/magic/stdlib.c"
 #if defined(__CRT_HAVE__fcvt_s) && !defined(__BUILDING_LIBC)
 	return __localdep_dos_fcvt_s(__buf, __len, (double)__val, __ndigit, __decptr, __sign) ? -1 : 0;
 #else
 	/* TODO: Implementation */
+	__COMPILER_IMPURE();
 	return 0;
 #endif
 }

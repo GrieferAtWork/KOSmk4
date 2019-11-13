@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4e9819a */
+/* HASH CRC-32:0xbe0ae4b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,10 +57,10 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR32_TYPE__ *,__NOTHROW
 #define ____localdep_c32mempset_defined 1
 #if defined(__CRT_HAVE_wmempset) && (__SIZEOF_WCHAR_T__ == 4)
 /* Same as wmemset, but return a pointer after the last written character */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32mempset,(__CHAR32_TYPE__ *__dst, __CHAR32_TYPE__ __filler, __SIZE_TYPE__ __num_chars),wmempset,(__dst,__filler,__num_chars))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32mempset,(__CHAR32_TYPE__ *__dst, __CHAR32_TYPE__ __filler, __SIZE_TYPE__ __num_chars),wmempset,(__dst,__filler,__num_chars))
 #elif defined(__CRT_HAVE_mempsetl)
 /* Same as wmemset, but return a pointer after the last written character */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32mempset,(__CHAR32_TYPE__ *__dst, __CHAR32_TYPE__ __filler, __SIZE_TYPE__ __num_chars),mempsetl,(__dst,__filler,__num_chars))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32mempset,(__CHAR32_TYPE__ *__dst, __CHAR32_TYPE__ __filler, __SIZE_TYPE__ __num_chars),mempsetl,(__dst,__filler,__num_chars))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wmempset.h>
 /* Same as wmemset, but return a pointer after the last written character */
@@ -74,11 +74,11 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NC
 
 __NAMESPACE_LOCAL_BEGIN
 /* Same as wcsncpy, but return a pointer after the last written character */
-__LOCAL_LIBC(c32pncpy) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__ *
+__LOCAL_LIBC(c32pncpy) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c32pncpy))(__CHAR32_TYPE__ *__restrict __buf,
                                                       __CHAR32_TYPE__ const *__restrict __src,
                                                       __SIZE_TYPE__ __buflen) {
-#line 1258 "kos/src/libc/magic/wchar.c"
+#line 1350 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __srclen = __localdep_c32nlen(__src, __buflen);
 	__localdep_c32memcpy(__buf, __src, __srclen);
 	return __localdep_c32mempset(__buf+__srclen, '\0', __buflen - __srclen);

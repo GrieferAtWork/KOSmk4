@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c409d29 */
+/* HASH CRC-32:0x30f07f23 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -298,6 +298,8 @@
 #define __stub_getutxent 1
 #define __stub_getutxid 1
 #define __stub_getutxline 1
+#define __stub_globfree 1
+#define __stub_globfree64 1
 #define __stub_grantpt 1
 #define __stub_gtty 1
 #define __stub_herror 1

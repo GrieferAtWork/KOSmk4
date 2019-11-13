@@ -255,6 +255,7 @@ local replacement_words: {string: string} = {
 	"va_arg" : "__builtin_va_arg",
 	"bool" : "__BOOL",
 	"NULL" : "__NULLPTR",
+	"COMPILER_IMPURE" : "__COMPILER_IMPURE",
 };
 
 local c_keywords: {string...} = {

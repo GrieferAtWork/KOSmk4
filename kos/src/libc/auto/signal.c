@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xead28900 */
+/* HASH CRC-32:0xa2599cae */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,7 +80,7 @@ NOTHROW_NCX(LIBCCALL libc_sigdelset)(sigset_t *set,
 
 #include <bits/sigset.h>
 /* @param signo: One of `SIG*' */
-INTERN WUNUSED NONNULL((1))
+INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigismember") int
 NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set,
                                        int signo) {
@@ -91,7 +91,7 @@ NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set,
 }
 
 #include <bits/sigset.h>
-INTERN WUNUSED NONNULL((1))
+INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigisemptyset") int
 NOTHROW_NCX(LIBCCALL libc_sigisemptyset)(sigset_t const *set) {
 #line 302 "kos/src/libc/magic/signal.c"

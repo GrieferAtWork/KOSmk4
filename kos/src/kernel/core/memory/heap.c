@@ -279,7 +279,7 @@ NOTHROW(KCALL find_modified_address)(byte_t *start, u32 pattern, size_t num_byte
 	return NULL;
 }
 
-PRIVATE u8
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) u8
 NOTHROW(KCALL mfree_get_checksum)(struct mfree *__restrict self) {
 	u8 sum = 0, *iter, *end;
 	end = (iter = (u8 *)&self->mf_size) + sizeof(self->mf_size);
@@ -288,7 +288,7 @@ NOTHROW(KCALL mfree_get_checksum)(struct mfree *__restrict self) {
 	return 0 - sum;
 }
 
-PRIVATE void
+PRIVATE NONNULL((1)) void
 NOTHROW(KCALL mfree_set_checksum)(struct mfree *__restrict self) {
 	self->mf_szchk = mfree_get_checksum(self);
 }
@@ -324,7 +324,7 @@ NOTHROW(KCALL heap_validate_all)(void) {
 		(heap_validate)(*iter);
 }
 
-PUBLIC NOBLOCK ATTR_NOINLINE void
+PUBLIC NOBLOCK ATTR_NOINLINE NONNULL((1)) void
 NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 	unsigned int i;
 #ifdef CONFIG_HAVE_HEAP_NOVALIDATE
@@ -432,7 +432,7 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 #else /* CONFIG_DEBUG_HEAP */
 #define mfree_set_checksum(self) (void)0
 
-PUBLIC NOBLOCK void
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL heap_validate)(struct heap *__restrict UNUSED(self)) {
 }
 

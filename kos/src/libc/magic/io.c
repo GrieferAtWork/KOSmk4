@@ -266,8 +266,9 @@ umask_s:($mode_t newmode, $mode_t *oldmode) -> errno_t {
 
 [dos_function]
 [requires(!defined(__CRT_DOS))][ATTR_WUNUSED][export]
-[decl_include(<bits/types.h>)]
+[decl_include(<bits/types.h>)][ATTR_PURE]
 _get_osfhandle:($fd_t fd) -> intptr_t {
+	COMPILER_IMPURE();
 	return (intptr_t)fd;
 }
 
@@ -276,6 +277,7 @@ _get_osfhandle:($fd_t fd) -> intptr_t {
 [decl_include(<bits/types.h>)]
 _open_osfhandle:(intptr_t osfd, $oflag_t flags) -> $fd_t {
 	(void)flags;
+	COMPILER_IMPURE();
 	return (fd_t)osfd;
 }
 

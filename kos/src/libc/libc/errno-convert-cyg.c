@@ -36,7 +36,7 @@ DECL_BEGIN
 /************************************************************************/
 
 DEFINE_PUBLIC_ALIAS(errno_cyg2kos, libd_errno_cyg2kos);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_cyg2kos")
+INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.errno_access.errno_cyg2kos")
 NOBLOCK /*kos*/ errno_t NOTHROW(LIBDCALL libd_errno_cyg2kos)(/*cyg*/ errno_t value) {
 	errno_t result;
 	switch (value) {
@@ -176,7 +176,7 @@ NOBLOCK /*kos*/ errno_t NOTHROW(LIBDCALL libd_errno_cyg2kos)(/*cyg*/ errno_t val
 }
 
 DEFINE_PUBLIC_ALIAS(errno_kos2cyg, libd_errno_kos2cyg);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_kos2cyg")
+INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.errno_access.errno_kos2cyg")
 NOBLOCK /*cyg*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2cyg)(/*kos*/ errno_t value) {
 	errno_t result;
 	switch (value) {
@@ -308,25 +308,25 @@ NOBLOCK /*cyg*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2cyg)(/*kos*/ errno_t val
 }
 
 DEFINE_PUBLIC_ALIAS(errno_dos2cyg, libd_errno_dos2cyg);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_dos2cyg")
+INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.errno_access.errno_dos2cyg")
 NOBLOCK /*cyg*/ errno_t NOTHROW(LIBDCALL libd_errno_dos2cyg)(/*dos*/ errno_t value) {
 	return libd_errno_kos2cyg(libd_errno_dos2kos(value));
 }
 
 DEFINE_PUBLIC_ALIAS(errno_nt2cyg, libd_errno_nt2cyg);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_nt2cyg")
+INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.errno_access.errno_nt2cyg")
 NOBLOCK /*cyg*/ errno_t NOTHROW(LIBDCALL libd_errno_nt2cyg)(/*nt*/ errno_t value) {
 	return libd_errno_kos2cyg(libd_errno_nt2kos(value));
 }
 
 DEFINE_PUBLIC_ALIAS(errno_cyg2dos, libd_errno_cyg2dos);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_cyg2dos")
+INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.errno_access.errno_cyg2dos")
 NOBLOCK /*dos*/ errno_t NOTHROW(LIBDCALL libd_errno_cyg2dos)(/*cyg*/ errno_t value) {
 	return libd_errno_kos2dos(libd_errno_cyg2kos(value));
 }
 
 DEFINE_PUBLIC_ALIAS(errno_cyg2nt, libd_errno_cyg2nt);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_cyg2nt")
+INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.errno_access.errno_cyg2nt")
 NOBLOCK /*nt*/ errno_t NOTHROW(LIBDCALL libd_errno_cyg2nt)(/*cyg*/ errno_t value) {
 	return libd_errno_kos2nt(libd_errno_cyg2kos(value));
 }

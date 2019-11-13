@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1d032e6 */
+/* HASH CRC-32:0x18d7ed80 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -537,22 +537,22 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_wsnprintf_printer, __FORCELOCAL __ATTR_NO
 #endif /* format_wsnprintf_printer... */
 #if defined(__CRT_HAVE_format_length) && (__SIZEOF_WCHAR_T__ == 4)
 /* Returns the width (number of characters; not bytes) of the given unicode string */
-__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wwidth,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
+__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wwidth,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_format_wwidth)
 /* Returns the width (number of characters; not bytes) of the given unicode string */
-__CDECLARE(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wwidth,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
+__CDECLARE(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wwidth,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
 #else /* LIBC: format_wwidth */
 #include <local/parts.wchar.format-printer/format_wwidth.h>
 /* Returns the width (number of characters; not bytes) of the given unicode string */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_wwidth, __FORCELOCAL __ATTR_NONNULL((2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_wwidth)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wwidth))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_wwidth, __FORCELOCAL __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_wwidth)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wwidth))(__arg, __data, __datalen); })
 #endif /* format_wwidth... */
 #ifdef __CRT_HAVE_format_length
 /* Always re-return `datalen' and ignore all other arguments */
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,format_wlength,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
+__CREDIRECT(__ATTR_CONST,__SSIZE_TYPE__,__NOTHROW_NCX,format_wlength,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
 #else /* LIBC: format_length */
 #include <local/format-printer/format_length.h>
 /* Always re-return `datalen' and ignore all other arguments */
-__FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_wlength)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_length))(__arg, (/*utf-8*/ char const *)__data, __datalen); }
+__FORCELOCAL __ATTR_CONST __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_wlength)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_length))(__arg, (/*utf-8*/ char const *)__data, __datalen); }
 #endif /* format_wlength... */
 
 #ifndef __format_waprintf_data_defined

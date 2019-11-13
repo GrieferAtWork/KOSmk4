@@ -1765,7 +1765,7 @@ stringSwitch("name",
 
 
 
-INTERN struct elf_dlsection *FCALL
+INTERN WUNUSED struct elf_dlsection *FCALL
 dlsec_builtin_index(size_t sect_index) {
 	struct elf_dlsection *result;
 	switch (sect_index) {
@@ -1791,7 +1791,7 @@ dlsec_builtin_index(size_t sect_index) {
 	return result;
 }
 
-INTERN char const *FCALL
+INTERN WUNUSED ATTR_CONST char const *FCALL
 dlsec_builtin_name(size_t sect_index) {
 	char const *result;
 	switch (sect_index) {
@@ -1809,7 +1809,7 @@ dlsec_builtin_name(size_t sect_index) {
 }
 
 
-INTERN struct elf_dlsection *FCALL
+INTERN WUNUSED ATTR_PURE struct elf_dlsection *FCALL
 dlsec_builtin(char const *__restrict name) {
 	size_t sect_index;
 	char const *sect_name;

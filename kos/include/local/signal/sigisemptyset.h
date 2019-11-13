@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6e5863d */
+/* HASH CRC-32:0x7303f886 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_sigisemptyset_defined 1
 #include <bits/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(sigisemptyset) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(sigisemptyset) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigisemptyset))(struct __sigset_struct const *__set) {
 #line 302 "kos/src/libc/magic/signal.c"
 	__SIZE_TYPE__ __i;

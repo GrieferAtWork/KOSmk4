@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f5487be */
+/* HASH CRC-32:0xb6c50972 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #ifndef ____localdep___ctype_b_loc_defined
 #define ____localdep___ctype_b_loc_defined 1
 #ifdef __CRT_HAVE___ctype_b_loc
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__UINT16_TYPE__ const **,__NOTHROW,__localdep___ctype_b_loc,(void),__ctype_b_loc,())
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__UINT16_TYPE__ const **,__NOTHROW,__localdep___ctype_b_loc,(void),__ctype_b_loc,())
 #else /* LIBC: __ctype_b_loc */
 #undef ____localdep___ctype_b_loc_defined
 #endif /* __ctype_b_loc... */

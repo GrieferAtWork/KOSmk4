@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xebbf587 */
+/* HASH CRC-32:0xa84218f4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -904,10 +904,10 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,struct exception_data *
 #ifdef __USE_KOS_KERNEL
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,struct exception_info *,__NOTHROW_NCX,error_info,(void),())
 #endif /* __USE_KOS_KERNEL */
-__CDECLARE(__ATTR_WUNUSED,error_code_t,__NOTHROW_NCX,error_code,(void),())
-__CDECLARE(__ATTR_WUNUSED,__BOOL,__NOTHROW_NCX,error_active,(void),())
-__CDECLARE(__ATTR_WUNUSED,error_class_t,__NOTHROW_NCX,error_class,(void),())
-__CDECLARE(__ATTR_WUNUSED,error_subclass_t,__NOTHROW_NCX,error_subclass,(void),())
+__CDECLARE(__ATTR_WUNUSED __ATTR_PURE,error_code_t,__NOTHROW_NCX,error_code,(void),())
+__CDECLARE(__ATTR_WUNUSED __ATTR_PURE,__BOOL,__NOTHROW_NCX,error_active,(void),())
+__CDECLARE(__ATTR_WUNUSED __ATTR_PURE,error_class_t,__NOTHROW_NCX,error_class,(void),())
+__CDECLARE(__ATTR_WUNUSED __ATTR_PURE,error_subclass_t,__NOTHROW_NCX,error_subclass,(void),())
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,error_register_state_t *,__NOTHROW_NCX,error_register_state,(void),())
 
 #ifdef __USE_KOS_KERNEL
@@ -933,9 +933,9 @@ __CDECLARE_VOID(__ATTR_NORETURN __ATTR_COLD,,error_rethrow,(void),())
 
 /* Transform the given exception into a posix errno value. */
 #ifdef __KERNEL__
-__CDECLARE(__ATTR_WUNUSED,__errno_t,__NOTHROW,error_as_errno,(struct exception_data const *__restrict data),())
+__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__errno_t,__NOTHROW,error_as_errno,(struct exception_data const *__restrict data),())
 #else /* __KERNEL__ */
-__CDECLARE(__ATTR_WUNUSED,__errno_t,__NOTHROW_NCX,error_as_errno,(struct exception_data const *__restrict data),())
+__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,error_as_errno,(struct exception_data const *__restrict data),())
 #endif /* !__KERNEL__ */
 
 struct __siginfo_struct;
@@ -943,9 +943,9 @@ struct __siginfo_struct;
  * If doing this is possible, fill in `*result' and return `true'.
  * Otherwise, `*result' is left in an undefined state, and `false' is returned. */
 #ifdef __KERNEL__
-__CDECLARE(__ATTR_WUNUSED,__BOOL,__NOTHROW,error_as_signal,(struct exception_data const *__restrict data, struct __siginfo_struct *__restrict result),(data,result))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__BOOL,__NOTHROW,error_as_signal,(struct exception_data const *__restrict data, struct __siginfo_struct *__restrict result),(data,result))
 #else /* __KERNEL__ */
-__CDECLARE(__ATTR_WUNUSED,__BOOL,__NOTHROW_NCX,error_as_signal,(struct exception_data const *__restrict data, struct __siginfo_struct *__restrict result),(data,result))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__BOOL,__NOTHROW_NCX,error_as_signal,(struct exception_data const *__restrict data, struct __siginfo_struct *__restrict result),(data,result))
 #endif /* !__KERNEL__ */
 
 /* Rethrow the last exception */

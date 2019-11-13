@@ -43,7 +43,7 @@ DECL_BEGIN
 INTDEF struct vm_datapart x86_vm_part_lapic;
 INTDEF struct vm_node x86_vm_node_lapic;
 
-PRIVATE ATTR_FREETEXT byte_t
+PRIVATE ATTR_PURE ATTR_FREETEXT byte_t
 NOTHROW(KCALL smp_memsum)(void const *__restrict p, size_t n_bytes) {
 	byte_t result = 0;
 	byte_t *iter, *end;

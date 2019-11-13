@@ -48,7 +48,7 @@ DECL_BEGIN
 
 
 
-PRIVATE char const *FCALL get_interrupt_name(uintptr_t intno) {
+PRIVATE ATTR_CONST char const *FCALL get_interrupt_name(uintptr_t intno) {
 	char const *result;
 	switch (intno & 0xff) {
 

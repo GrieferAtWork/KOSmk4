@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35d91545 */
+/* HASH CRC-32:0xc2e3667a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(isleadbyte) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(isleadbyte))(int __wc) {
-#line 361 "kos/src/libc/magic/wctype.c"
+#line 383 "kos/src/libc/magic/wctype.c"
 	return __wc >= 192 && __wc <= 255;
 }
 __NAMESPACE_LOCAL_END

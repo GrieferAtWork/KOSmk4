@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4468a274 */
+/* HASH CRC-32:0x2a0f964c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,10 +35,10 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(i
 #endif /* !____localdep_tolower_l_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strlwr_l) __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
+__LOCAL_LIBC(strlwr_l) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strlwr_l))(char *__restrict __str,
                                                       __locale_t __locale) {
-#line 4273 "kos/src/libc/magic/string.c"
+#line 4274 "kos/src/libc/magic/string.c"
 	char *__iter, __ch;
 	for (__iter = __str; (__ch = *__iter) != '\0'; ++__iter)
 		*__iter = __localdep_tolower_l(__ch, __locale);

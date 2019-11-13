@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9eceeb04 */
+/* HASH CRC-32:0x6a8a192b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,10 +29,11 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <bits/types.h>
-INTERN WUNUSED
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._get_osfhandle") intptr_t
 NOTHROW_NCX(LIBCCALL libc__get_osfhandle)(fd_t fd) {
 #line 271 "kos/src/libc/magic/io.c"
+	COMPILER_IMPURE();
 	return (intptr_t)fd;
 }
 
@@ -41,8 +42,9 @@ INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._open_osfhandle") fd_t
 NOTHROW_NCX(LIBCCALL libc__open_osfhandle)(intptr_t osfd,
                                            oflag_t flags) {
-#line 278 "kos/src/libc/magic/io.c"
+#line 279 "kos/src/libc/magic/io.c"
 	(void)flags;
+	COMPILER_IMPURE();
 	return (fd_t)osfd;
 }
 

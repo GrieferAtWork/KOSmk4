@@ -51,6 +51,7 @@ NOTHROW_NCX(LIBCCALL libc_glob)(char const *__restrict pattern,
 	(void)flags;
 	(void)errfunc;
 	(void)pglob;
+	COMPILER_IMPURE();
 	/* TODO */
 	return GLOB_NOSYS;
 }
@@ -63,8 +64,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.utility.glob.globfree") void
 NOTHROW_NCX(LIBCCALL libc_globfree)(glob_t *pglob)
 /*[[[body:globfree]]]*/
 {
-	(void)pglob;
-	/* TODO */
+	CRT_UNIMPLEMENTED("globfree"); /* TODO */
+	libc_seterrno(ENOSYS);
 }
 /*[[[end:globfree]]]*/
 
@@ -89,6 +90,7 @@ NOTHROW_NCX(LIBCCALL libc_glob64)(const char *__restrict pattern,
 	(void)flags;
 	(void)errfunc;
 	(void)pglob;
+	COMPILER_IMPURE();
 	/* TODO */
 	return GLOB_NOSYS;
 }
@@ -101,8 +103,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.utility.glob.globfree64") void
 NOTHROW_NCX(LIBCCALL libc_globfree64)(struct __glob64_struct *pglob)
 /*[[[body:globfree64]]]*/
 {
-	(void)pglob;
-	/* TODO */
+	CRT_UNIMPLEMENTED("globfree64"); /* TODO */
+	libc_seterrno(ENOSYS);
 }
 /*[[[end:globfree64]]]*/
 

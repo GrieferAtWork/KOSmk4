@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde1ab80c */
+/* HASH CRC-32:0x1196aabc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,8 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(srand) void
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(srand))(long __seed) {
-#line 782 "kos/src/libc/magic/stdlib.c"
+#line 780 "kos/src/libc/magic/stdlib.c"
+	__COMPILER_IMPURE();
 	/* ... */
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26dc4d31 */
+/* HASH CRC-32:0x195abaad */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,10 +51,10 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 
 __NAMESPACE_LOCAL_BEGIN
 /* Same as wcscpy, but return a pointer after the last written character */
-__LOCAL_LIBC(wcspcpy) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __WCHAR_TYPE__ *
+__LOCAL_LIBC(wcspcpy) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcspcpy))(__WCHAR_TYPE__ *__restrict __buf,
                                                      __WCHAR_TYPE__ const *__restrict __src) {
-#line 1252 "kos/src/libc/magic/wchar.c"
+#line 1344 "kos/src/libc/magic/wchar.c"
 	return __localdep_wmempcpy(__buf, __src, __localdep_wcslen(__src) + 1);
 }
 __NAMESPACE_LOCAL_END

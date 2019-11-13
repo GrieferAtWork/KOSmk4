@@ -2929,11 +2929,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.write.puts_unlocked") __ST
 /*[[[end:puts_unlocked]]]*/
 
 
-/*[[[head:feof,hash:CRC-32=0x508c80ff]]]*/
+/*[[[head:feof,hash:CRC-32=0x242fca39]]]*/
 /* Check if end-of-file has been reached in `STREAM' */
-INTERN WUNUSED NONNULL((1))
+INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.utility.feof") int
-NOTHROW_NCX(LIBCCALL libc_feof)(FILE *__restrict stream)
+NOTHROW_NCX(LIBCCALL libc_feof)(FILE __KOS_FIXED_CONST *__restrict stream)
 /*[[[body:feof]]]*/
 {
 	if unlikely(!stream)
@@ -2942,11 +2942,11 @@ NOTHROW_NCX(LIBCCALL libc_feof)(FILE *__restrict stream)
 }
 /*[[[end:feof]]]*/
 
-/*[[[head:ferror,hash:CRC-32=0x1d53bd3c]]]*/
+/*[[[head:ferror,hash:CRC-32=0x12a3cbe2]]]*/
 /* Check if an I/O error occurred in `STREAM' */
-INTERN WUNUSED NONNULL((1))
+INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.utility.ferror") int
-NOTHROW_NCX(LIBCCALL libc_ferror)(FILE *__restrict stream)
+NOTHROW_NCX(LIBCCALL libc_ferror)(FILE __KOS_FIXED_CONST *__restrict stream)
 /*[[[body:ferror]]]*/
 {
 	if unlikely(!stream)
@@ -4383,10 +4383,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._vfprintf_p")
 		__THROWS(...)
 /*[[[body:_vfprintf_p]]]*/
 /*AUTO*/{
-	/* TODO */
 	(void)stream;
 	(void)format;
 	(void)args;
+	/* TODO */
+	__COMPILER_IMPURE();
 	return 0;
 }
 /*[[[end:_vfprintf_p]]]*/

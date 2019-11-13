@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb318667b */
+/* HASH CRC-32:0x1dcd695d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,17 +29,17 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTERN WUNUSED NONNULL((1))
+INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.cfgetospeed") speed_t
 NOTHROW_NCX(LIBCCALL libc_cfgetospeed)(struct termios const *__restrict termios_p) {
 #line 52 "kos/src/libc/magic/termios.c"
 	return termios_p->c_ospeed;
 }
 
-INTERN WUNUSED NONNULL((1))
+INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.cfgetispeed") speed_t
 NOTHROW_NCX(LIBCCALL libc_cfgetispeed)(struct termios const *__restrict termios_p) {
-#line 56 "kos/src/libc/magic/termios.c"
+#line 57 "kos/src/libc/magic/termios.c"
 	return termios_p->c_ispeed;
 }
 
@@ -47,7 +47,7 @@ INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.cfsetospeed") int
 NOTHROW_NCX(LIBCCALL libc_cfsetospeed)(struct termios *__restrict termios_p,
                                        speed_t speed) {
-#line 59 "kos/src/libc/magic/termios.c"
+#line 61 "kos/src/libc/magic/termios.c"
 	termios_p->c_ospeed = speed;
 	return 0;
 }
@@ -56,7 +56,7 @@ INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.cfsetispeed") int
 NOTHROW_NCX(LIBCCALL libc_cfsetispeed)(struct termios *__restrict termios_p,
                                        speed_t speed) {
-#line 63 "kos/src/libc/magic/termios.c"
+#line 66 "kos/src/libc/magic/termios.c"
 	termios_p->c_ispeed = speed;
 	return 0;
 }
@@ -65,7 +65,7 @@ INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.cfsetspeed") int
 NOTHROW_NCX(LIBCCALL libc_cfsetspeed)(struct termios *__restrict termios_p,
                                       speed_t speed) {
-#line 88 "kos/src/libc/magic/termios.c"
+#line 91 "kos/src/libc/magic/termios.c"
 	termios_p->c_ospeed = speed;
 	termios_p->c_ispeed = speed;
 	return 0;
@@ -77,7 +77,7 @@ NOTHROW_NCX(LIBCCALL libc_cfsetspeed)(struct termios *__restrict termios_p,
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.cfmakeraw") void
 NOTHROW_NCX(LIBCCALL libc_cfmakeraw)(struct termios *__restrict termios_p) {
-#line 97 "kos/src/libc/magic/termios.c"
+#line 100 "kos/src/libc/magic/termios.c"
 	/* As documented here: http://man7.org/linux/man-pages/man3/termios.3.html
 	 * Note that the following additions were made:
 	 *  - Clear `IXOFF' (ensuring that TTY output can be streamed)
@@ -98,7 +98,7 @@ NOTHROW_NCX(LIBCCALL libc_cfmakeraw)(struct termios *__restrict termios_p) {
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.cfmakesane") void
 NOTHROW_NCX(LIBCCALL libc_cfmakesane)(struct termios *__restrict termios_p) {
-#line 118 "kos/src/libc/magic/termios.c"
+#line 121 "kos/src/libc/magic/termios.c"
 	/* Set sane values. */
 	memset(termios_p, 0, sizeof(*termios_p));
 #ifdef TTYDEF_CFLAG

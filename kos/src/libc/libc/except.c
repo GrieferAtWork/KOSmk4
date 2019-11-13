@@ -92,19 +92,19 @@ INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_CONST ATTR_RETNONNULL
 error_register_state_t *NOTHROW_NCX(LIBCCALL libc_error_register_state)(void) {
 	return &my_exception_info.ei_state;
 }
-INTERN SECTION_EXCEPT_TEXT WUNUSED error_code_t
+INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_PURE error_code_t
 NOTHROW_NCX(LIBCCALL libc_error_code)(void) {
 	return my_exception_info.ei_code;
 }
-INTERN SECTION_EXCEPT_TEXT WUNUSED bool
+INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_PURE bool
 NOTHROW_NCX(LIBCCALL libc_error_active)(void) {
 	return my_exception_info.ei_code != E_OK;
 }
-INTERN SECTION_EXCEPT_TEXT WUNUSED error_class_t
+INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_PURE error_class_t
 NOTHROW_NCX(LIBCCALL libc_error_class)(void) {
 	return ERROR_CLASS(my_exception_info.ei_code);
 }
-INTERN SECTION_EXCEPT_TEXT WUNUSED error_subclass_t
+INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_PURE error_subclass_t
 NOTHROW_NCX(LIBCCALL libc_error_subclass)(void) {
 	return ERROR_SUBCLASS(my_exception_info.ei_code);
 }
@@ -249,7 +249,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(__gxx_personality_v0, libc_gxx_personality_v0);
 DEFINE_PUBLIC_WEAK_ALIAS(__cxa_begin_catch, libc_cxa_begin_catch);
 DEFINE_PUBLIC_WEAK_ALIAS(__cxa_end_catch, libc_cxa_end_catch);
 
-INTERN SECTION_EXCEPT_TEXT void *LIBCCALL
+INTERN SECTION_EXCEPT_TEXT ATTR_CONST void *LIBCCALL
 libc_cxa_begin_catch(struct _Unwind_Exception *ptr) {
 	/* This function returns the address that would
 	 * be assigned to the exception storage object:
@@ -374,7 +374,7 @@ libc_gxx_personality_v0(int version /* = 1 */,
 }
 
 
-PRIVATE unsigned int LIBC_ERROR_UNWIND_CC
+PRIVATE unsigned int __ERROR_UNWIND_CC
 unwind_fde(unwind_fde_t const *__restrict fde,
            error_register_state_t *__restrict new_state,
            error_register_state_t const *__restrict old_state, void *pc) {
@@ -498,7 +498,7 @@ try_raise_signal_from_exception(error_register_state_t *__restrict state,
 
 DEFINE_PUBLIC_ALIAS(error_unwind, libc_error_unwind);
 INTERN SECTION_EXCEPT_TEXT WUNUSED error_register_state_t *
-NOTHROW_NCX(LIBC_ERROR_UNWIND_CC libc_error_unwind)(error_register_state_t *__restrict state) {
+NOTHROW_NCX(__ERROR_UNWIND_CC libc_error_unwind)(error_register_state_t *__restrict state) {
 	unsigned int unwind_error;
 	struct _Unwind_Context context;
 	error_register_state_t orig_state;
@@ -629,8 +629,8 @@ err:
 
 
 
-LOCAL _Unwind_Word LIBC_ERROR_UNWIND_CC
-_Unwind_Context_Identify(struct _Unwind_Context *__restrict self) {
+LOCAL ATTR_PURE NONNULL((1)) _Unwind_Word __ERROR_UNWIND_CC
+_Unwind_Context_Identify(struct _Unwind_Context const *__restrict self) {
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 	return libc_Unwind_GetCFA(self) - self->uc_fde.f_sigframe;
 #else /* __ARCH_STACK_GROWS_DOWNWARDS */
@@ -638,7 +638,7 @@ _Unwind_Context_Identify(struct _Unwind_Context *__restrict self) {
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 }
 
-LOCAL error_register_state_t *LIBC_ERROR_UNWIND_CC
+LOCAL error_register_state_t *__ERROR_UNWIND_CC
 apply_state_with_landing_pad_adjustment(error_register_state_t *__restrict state,
                                         error_register_state_t const *__restrict new_state,
                                         unwind_fde_t const *__restrict fde, void *pc) {
@@ -666,8 +666,8 @@ err:
 
 
 LOCAL ATTR_NOINLINE SECTION_EXCEPT_TEXT NONNULL((1)) error_register_state_t *
-NOTHROW_NCX(LIBC_ERROR_UNWIND_CC libc_exception_raise_phase_2)(error_register_state_t *__restrict state,
-                                                               struct _Unwind_Exception *__restrict exception_object) {
+NOTHROW_NCX(__ERROR_UNWIND_CC libc_exception_raise_phase_2)(error_register_state_t *__restrict state,
+                                                            struct _Unwind_Exception *__restrict exception_object) {
 	struct _Unwind_Context context;
 	error_register_state_t oldstate, newstate;
 	unsigned int unwind_error;
@@ -710,8 +710,8 @@ err_unwind__URC_FATAL_PHASE2_ERROR:
 }
 
 LOCAL ATTR_NOINLINE SECTION_EXCEPT_TEXT NONNULL((1)) error_register_state_t *
-NOTHROW_NCX(LIBC_ERROR_UNWIND_CC libc_exception_forceunwind_phase_2)(error_register_state_t *__restrict state,
-                                                                     struct _Unwind_Exception *__restrict exception_object) {
+NOTHROW_NCX(__ERROR_UNWIND_CC libc_exception_forceunwind_phase_2)(error_register_state_t *__restrict state,
+                                                                  struct _Unwind_Exception *__restrict exception_object) {
 	struct _Unwind_Context context;
 	error_register_state_t oldstate, newstate;
 	unsigned int unwind_error;
@@ -768,8 +768,8 @@ err_unwind__URC_FATAL_PHASE2_ERROR:
 }
 
 INTERN SECTION_EXCEPT_TEXT WUNUSED NONNULL((1)) error_register_state_t *
-NOTHROW_NCX(LIBC_ERROR_UNWIND_CC libc_Unwind_Resume_impl)(error_register_state_t *__restrict state,
-                                                          struct _Unwind_Exception *exception_object) {
+NOTHROW_NCX(__ERROR_UNWIND_CC libc_Unwind_Resume_impl)(error_register_state_t *__restrict state,
+                                                       struct _Unwind_Exception *exception_object) {
 	/* Special case: Unwind a KERNKOS exception. */
 	if (!exception_object || exception_object->exception_class == _UEC_KERNKOS)
 		return libc_error_unwind(state);
@@ -779,7 +779,7 @@ NOTHROW_NCX(LIBC_ERROR_UNWIND_CC libc_Unwind_Resume_impl)(error_register_state_t
 }
 
 INTERN SECTION_EXCEPT_TEXT NONNULL((1, 2)) error_register_state_t *
-NOTHROW_NCX(LIBC_ERROR_UNWIND_CC libc_Unwind_RaiseException_impl)(error_register_state_t *__restrict state,
+NOTHROW_NCX(__ERROR_UNWIND_CC libc_Unwind_RaiseException_impl)(error_register_state_t *__restrict state,
                                                                   struct _Unwind_Exception *exception_object) {
 	unsigned int unwind_error;
 	struct _Unwind_Context context;
@@ -832,8 +832,8 @@ err_unwind__URC_FATAL_PHASE1_ERROR:
 
 
 INTERN NONNULL((1, 2)) error_register_state_t *
-NOTHROW_NCX(LIBC_ERROR_UNWIND_CC libc_Unwind_Resume_or_Rethrow_impl)(error_register_state_t *__restrict state,
-                                                                     struct _Unwind_Exception *__restrict exception_object) {
+NOTHROW_NCX(__ERROR_UNWIND_CC libc_Unwind_Resume_or_Rethrow_impl)(error_register_state_t *__restrict state,
+                                                                  struct _Unwind_Exception *__restrict exception_object) {
 	/* Choose between continuing to process _Unwind_RaiseException or _Unwind_ForcedUnwind.  */
 	if unlikely(!exception_object || exception_object->exception_class == _UEC_KERNKOS)
 		return libc_error_unwind(state);
@@ -843,15 +843,15 @@ NOTHROW_NCX(LIBC_ERROR_UNWIND_CC libc_Unwind_Resume_or_Rethrow_impl)(error_regis
 }
 
 INTERN NONNULL((1, 2, 3)) error_register_state_t *
-NOTHROW_NCX(LIBC_ERROR_UNWIND_CC libc_Unwind_ForcedUnwind_impl)(error_register_state_t *__restrict state,
-                                                                struct _Unwind_Exception *__restrict exception_object,
-                                                                _Unwind_Stop_Fn stop, void *stop_arg) {
+NOTHROW_NCX(__ERROR_UNWIND_CC libc_Unwind_ForcedUnwind_impl)(error_register_state_t *__restrict state,
+                                                             struct _Unwind_Exception *__restrict exception_object,
+                                                             _Unwind_Stop_Fn stop, void *stop_arg) {
 	exception_object->private_1 = (_Unwind_Ptr)stop;
 	exception_object->private_2 = (_Unwind_Ptr)stop_arg;
 	return libc_exception_forceunwind_phase_2(state, exception_object);
 }
 
-INTERN NONNULL((1, 2)) _Unwind_Reason_Code LIBC_ERROR_UNWIND_CC
+INTERN NONNULL((1, 2)) _Unwind_Reason_Code __ERROR_UNWIND_CC
 libc_Unwind_Backtrace_impl(error_register_state_t *__restrict state,
                            _Unwind_Trace_Fn func, void *arg) {
 	struct _Unwind_Context context;
@@ -884,8 +884,8 @@ err_unwind:
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_GetCFA, libc_Unwind_GetCFA);
-INTERN WUNUSED NONNULL((1)) _Unwind_Word
-NOTHROW_NCX(LIBCCALL libc_Unwind_GetCFA)(struct _Unwind_Context *__restrict self) {
+INTERN WUNUSED ATTR_PURE NONNULL((1)) _Unwind_Word
+NOTHROW_NCX(LIBCCALL libc_Unwind_GetCFA)(struct _Unwind_Context const *__restrict self) {
 	unsigned int unwind_error;
 	unwind_cfa_value_t cfa;
 	uintptr_t result;
@@ -902,21 +902,23 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_GetCFA)(struct _Unwind_Context *__restrict self
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_GetDataRelBase, libc_Unwind_GetDataRelBase);
-INTERN WUNUSED NONNULL((1)) _Unwind_Ptr
-NOTHROW_NCX(LIBCCALL libc_Unwind_GetDataRelBase)(struct _Unwind_Context *__restrict UNUSED(self)) {
+INTERN WUNUSED ATTR_PURE NONNULL((1)) _Unwind_Ptr
+NOTHROW_NCX(LIBCCALL libc_Unwind_GetDataRelBase)(struct _Unwind_Context const *__restrict UNUSED(self)) {
 	/* Unsupported */
+	COMPILER_IMPURE();
 	return 0;
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_GetTextRelBase, libc_Unwind_GetTextRelBase);
-INTERN WUNUSED NONNULL((1)) _Unwind_Ptr
-NOTHROW_NCX(LIBCCALL libc_Unwind_GetTextRelBase)(struct _Unwind_Context *__restrict UNUSED(self)) {
+INTERN WUNUSED ATTR_PURE NONNULL((1)) _Unwind_Ptr
+NOTHROW_NCX(LIBCCALL libc_Unwind_GetTextRelBase)(struct _Unwind_Context const *__restrict UNUSED(self)) {
 	/* Unsupported */
+	COMPILER_IMPURE();
 	return 0;
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_FindEnclosingFunction, libc_Unwind_FindEnclosingFunction);
-INTERN WUNUSED void *
+INTERN WUNUSED ATTR_PURE void *
 NOTHROW_NCX(LIBCCALL libc_Unwind_FindEnclosingFunction)(void *pc) {
 	unsigned int unwind_error;
 	unwind_fde_t fde;
@@ -940,53 +942,57 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_DeleteException)(struct _Unwind_Exception *__re
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_GetGR, libc_Unwind_GetGR);
-INTERN SECTION_EXCEPT_TEXT WUNUSED NONNULL((1)) uintptr_t
-NOTHROW_NCX(LIBCCALL libc_Unwind_GetGR)(struct _Unwind_Context *__restrict context, int index) {
+INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
+NOTHROW_NCX(LIBCCALL libc_Unwind_GetGR)(struct _Unwind_Context const *__restrict context, int index) {
 	uintptr_t result = 0;
-	if likely(CFI_REGISTER_SIZE(index) <= sizeof(result)) {
+	if likely(CFI_REGISTER_SIZE((uintptr_half_t)index) <= sizeof(result)) {
 		ENSURE_LIBUNWIND_LOADED();
-		unwind_getreg_error_register_state(context->uc_state, index, &result);
+		unwind_getreg_error_register_state(context->uc_state,
+		                                   (uintptr_half_t)index,
+		                                   &result);
 	}
 	return result;
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_SetGR, libc_Unwind_SetGR);
-INTERN SECTION_EXCEPT_TEXT NONNULL((1)) void
+INTERN SECTION_EXCEPT_TEXT ATTR_LEAF NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_Unwind_SetGR)(struct _Unwind_Context *__restrict context,
                                         int index, uintptr_t value) {
-	if likely(CFI_REGISTER_SIZE(index) <= sizeof(value)) {
+	if likely(CFI_REGISTER_SIZE((uintptr_half_t)index) <= sizeof(value)) {
 		ENSURE_LIBUNWIND_LOADED();
-		unwind_setreg_error_register_state(context->uc_state, index, &value);
+		unwind_setreg_error_register_state(context->uc_state,
+		                                   (uintptr_half_t)index,
+		                                   &value);
 	}
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_GetIP, libc_Unwind_GetIP);
-INTERN SECTION_EXCEPT_TEXT WUNUSED NONNULL((1)) uintptr_t
-NOTHROW_NCX(LIBCCALL libc_Unwind_GetIP)(struct _Unwind_Context *__restrict context) {
+INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
+NOTHROW_NCX(LIBCCALL libc_Unwind_GetIP)(struct _Unwind_Context const *__restrict context) {
 	return (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDPC(*context->uc_state);
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_SetIP, libc_Unwind_SetIP);
-INTERN SECTION_EXCEPT_TEXT NONNULL((1)) void
+INTERN SECTION_EXCEPT_TEXT ATTR_LEAF NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_Unwind_SetIP)(struct _Unwind_Context *__restrict context, uintptr_t value) {
 	__ERROR_REGISTER_STATE_TYPE_WRPC(*context->uc_state, value);
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_GetLanguageSpecificData, libc_Unwind_GetLanguageSpecificData);
-INTERN SECTION_EXCEPT_TEXT WUNUSED NONNULL((1)) uintptr_t
-NOTHROW_NCX(LIBCCALL libc_Unwind_GetLanguageSpecificData)(struct _Unwind_Context *__restrict context) {
+INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
+NOTHROW_NCX(LIBCCALL libc_Unwind_GetLanguageSpecificData)(struct _Unwind_Context const *__restrict context) {
 	return (uintptr_t)context->uc_fde.f_lsdaaddr;
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_GetRegionStart, libc_Unwind_GetRegionStart);
-INTERN SECTION_EXCEPT_TEXT WUNUSED NONNULL((1)) uintptr_t
-NOTHROW_NCX(LIBCCALL libc_Unwind_GetRegionStart)(struct _Unwind_Context *__restrict context) {
+INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
+NOTHROW_NCX(LIBCCALL libc_Unwind_GetRegionStart)(struct _Unwind_Context const *__restrict context) {
 	return (uintptr_t)context->uc_fde.f_pcstart;
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_GetIPInfo, libc_Unwind_GetIPInfo);
-INTERN SECTION_EXCEPT_TEXT WUNUSED NONNULL((1, 2)) uintptr_t
-NOTHROW_NCX(LIBCCALL libc_Unwind_GetIPInfo)(struct _Unwind_Context *__restrict context,
+INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_PURE NONNULL((1, 2)) uintptr_t
+NOTHROW_NCX(LIBCCALL libc_Unwind_GetIPInfo)(struct _Unwind_Context const *__restrict context,
                                             int *__restrict ip_before_insn) {
 	*ip_before_insn = (int)context->uc_fde.f_sigframe;
 	return (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDPC(*context->uc_state);

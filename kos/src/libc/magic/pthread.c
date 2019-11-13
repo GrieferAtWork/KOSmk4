@@ -480,7 +480,8 @@ pthread_gettid_np:(pthread_t target_thread) -> $pid_t;
 
 %#ifdef __USE_UNIX98
 @@Determine level of concurrency
-pthread_getconcurrency:(void) -> int;
+[ATTR_PURE] pthread_getconcurrency:() -> int;
+
 %
 @@Set new concurrency level to LEVEL
 pthread_setconcurrency:(int level) -> int;

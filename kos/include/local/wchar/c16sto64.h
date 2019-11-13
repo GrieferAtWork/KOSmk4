@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c6d1f3f */
+/* HASH CRC-32:0x49ee8d83 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,9 @@
 #ifndef ____localdep_c16stou64_defined
 #define ____localdep_c16stou64_defined 1
 #if defined(__CRT_HAVE_wcstou64) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_c16stou64,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstou64,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_c16stou64,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstou64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcstou64)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_c16stou64,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstou64,(__nptr,__endptr,__base))
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_c16stou64,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstou64,(__nptr,__endptr,__base))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcstou64.h>
 #define __localdep_c16stou64(nptr, endptr, base) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou64))((__WCHAR_TYPE__ const *)(nptr), (__WCHAR_TYPE__ **)(endptr), base)
@@ -36,11 +36,11 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__,_
 #endif /* !____localdep_c16stou64_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(c16sto64) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__
+__LOCAL_LIBC(c16sto64) __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16sto64))(__CHAR16_TYPE__ const *__restrict __nptr,
                                                       __CHAR16_TYPE__ **__endptr,
                                                       int __base) {
-#line 1043 "kos/src/libc/magic/stdlib.c"
+#line 1055 "kos/src/libc/magic/stdlib.c"
 	__UINT64_TYPE__ __result;
 	__BOOL __neg = 0;
 	while (*__nptr == '-') {

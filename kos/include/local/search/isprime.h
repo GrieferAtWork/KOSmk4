@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73b01398 */
+/* HASH CRC-32:0xc77436e7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,14 @@ __NAMESPACE_LOCAL_BEGIN
  * algorithm is adequate because
  * a)  the code is (most probably) called a few times per program run and
  * b)  the number is small because the table must fit in the core */
-__LOCAL_LIBC(isprime) int
+__LOCAL_LIBC(isprime) __ATTR_CONST int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(isprime))(unsigned int __number) {
 #line 255 "kos/src/libc/magic/search.c"
 	/* no even number will be passed */
-	for (unsigned int __div = 3; __div <= __number / __div; __div += 2)
+	for (unsigned int __div = 3; __div <= __number / __div; __div += 2) {
 		if (__number % __div == 0)
 			return 0;
+	}
 	return 1;
 }
 __NAMESPACE_LOCAL_END

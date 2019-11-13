@@ -72,6 +72,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_destroy") int
 NOTHROW_NCX(LIBCCALL libc_sem_destroy)(sem_t *sem)
 /*[[[body:sem_destroy]]]*/
 {
+	COMPILER_IMPURE();
 	(void)sem;
 	/* Nothing to do here... */
 	return 0;

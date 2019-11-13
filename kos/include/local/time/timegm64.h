@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29cfcd69 */
+/* HASH CRC-32:0xd6d6ada9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,7 +88,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Like `mktime', but for TP represents Universal Time, not local time */
 __LOCAL_LIBC(timegm64) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __time64_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timegm64))(__STRUCT_TM *__tp) {
-#line 912 "kos/src/libc/magic/time.c"
+#line 913 "kos/src/libc/magic/time.c"
 #if defined(__CRT_HAVE_timegm) && !defined(__BUILDING_LIBC)
 	return (__time64_t)__localdep_timegm32(__tp);
 #else /* __CRT_HAVE_timegm && !__BUILDING_LIBC */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53845e4d */
+/* HASH CRC-32:0xb5930935 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,11 +38,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __
 #ifndef ____localdep_memcasecmp_defined
 #define ____localdep_memcasecmp_defined 1
 #ifdef __CRT_HAVE_memcasecmp
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcasecmp,(__s1,__s2,__n_bytes))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcasecmp,(__s1,__s2,__n_bytes))
 #elif defined(__CRT_HAVE_memicmp)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memicmp,(__s1,__s2,__n_bytes))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memicmp,(__s1,__s2,__n_bytes))
 #elif defined(__CRT_HAVE__memicmp)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),_memicmp,(__s1,__s2,__n_bytes))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),_memicmp,(__s1,__s2,__n_bytes))
 #else /* LIBC: memcasecmp */
 #include <local/string/memcasecmp.h>
 #define __localdep_memcasecmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcasecmp))
@@ -64,7 +64,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcasemem))(void const *__haystack,
                                                         __SIZE_TYPE__ __haystacklen,
                                                         void const *__needle,
                                                         __SIZE_TYPE__ __needlelen) {
-#line 2489 "kos/src/libc/magic/string.c"
+#line 2490 "kos/src/libc/magic/string.c"
 	__BYTE_TYPE__ *__candidate, __marker;
 	__BYTE_TYPE__ *__hayend;
 #if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)

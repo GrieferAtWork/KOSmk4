@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e5c0f95 */
+/* HASH CRC-32:0x6e1033d6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ DECL_BEGIN
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
  * meaning that changes to its data and/or descriptor are written to disk */
 #define libc__commit libc_fsync
-INTDEF WUNUSED intptr_t NOTHROW_NCX(LIBCCALL libc__get_osfhandle)(fd_t fd);
+INTDEF ATTR_PURE WUNUSED intptr_t NOTHROW_NCX(LIBCCALL libc__get_osfhandle)(fd_t fd);
 INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc__open_osfhandle)(intptr_t osfd, oflag_t flags);
 #endif /* !__KERNEL__ */
 

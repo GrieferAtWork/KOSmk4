@@ -49,7 +49,8 @@ INTDEF byte_t __kernel_debug_functions_size[];
 
 /* Search for a debug function matching the given name.
  * @return: NULL: No function exists that matches `name' */
-PUBLIC ATTR_DBGTEXT WUNUSED NONNULL((1)) struct debug_function const *KCALL
+PUBLIC ATTR_DBGTEXT WUNUSED ATTR_PURE NONNULL((1))
+struct debug_function const *KCALL
 dbg_getfunc(char const *__restrict name) {
 	struct debug_function const *iter;
 	/* XXX: Maybe use a hash table? */
@@ -62,7 +63,7 @@ dbg_getfunc(char const *__restrict name) {
 }
 
 /* Search for a debug function matching the given name most closely. */
-PUBLIC ATTR_DBGTEXT WUNUSED NONNULL((1)) struct debug_function const *KCALL
+PUBLIC ATTR_DBGTEXT WUNUSED ATTR_PURE NONNULL((1)) struct debug_function const *KCALL
 dbg_getfunc_fuzzy(char const *__restrict name) {
 	struct debug_function const *result = __kernel_debug_functions_start;
 	struct debug_function const *iter;
@@ -80,7 +81,7 @@ dbg_getfunc_fuzzy(char const *__restrict name) {
 }
 
 /* Search for a debug function who's name starts with `name'. */
-PUBLIC ATTR_DBGTEXT WUNUSED NONNULL((1)) struct debug_function const *KCALL
+PUBLIC ATTR_DBGTEXT WUNUSED ATTR_PURE NONNULL((1)) struct debug_function const *KCALL
 dbg_getfunc_start(char const *__restrict name) {
 	struct debug_function const *result = NULL;
 	struct debug_function const *iter;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x361bd265 */
+/* HASH CRC-32:0x87b7efe7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,29 @@
  */
 #ifndef __local__mbstrnlen_defined
 #define __local__mbstrnlen_defined 1
+/* Dependency: "unicode_readutf8_n" from "unicode" */
+#ifndef ____localdep_unicode_readutf8_n_defined
+#define ____localdep_unicode_readutf8_n_defined 1
+#ifdef __CRT_HAVE_unicode_readutf8_n
+/* Same as `unicode_readutf8()', but don't read past `text_end' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(/*utf-8*/ char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
+#else /* LIBC: unicode_readutf8_n */
+#include <local/unicode/unicode_readutf8_n.h>
+/* Same as `unicode_readutf8()', but don't read past `text_end' */
+#define __localdep_unicode_readutf8_n (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_n))
+#endif /* unicode_readutf8_n... */
+#endif /* !____localdep_unicode_readutf8_n_defined */
+
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_mbstrnlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbstrnlen))(char const *__str,
                                                         __SIZE_TYPE__ __maxlen) {
-#line 2315 "kos/src/libc/magic/stdlib.c"
-	/* TODO */
-	return 0;
+#line 2336 "kos/src/libc/magic/stdlib.c"
+	__SIZE_TYPE__ __result = 0;
+	char const *__endptr = __str + __maxlen;
+	while (__localdep_unicode_readutf8_n((char const **)&__str, __endptr))
+		++__result;
+	return __result;
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local__mbstrnlen_defined */

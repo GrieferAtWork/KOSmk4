@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d600998 */
+/* HASH CRC-32:0x9f0703eb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #include <local/unicode_utf8seqlen.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Returns the width (number of characters; not bytes) of the given unicode string */
-__LOCAL_LIBC(format_width) __ATTR_NONNULL((2)) __SSIZE_TYPE__
+__LOCAL_LIBC(format_width) __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_width))(void *__arg,
                                                           /*utf-8*/ char const *__restrict __data,
                                                           __SIZE_TYPE__ __datalen) {

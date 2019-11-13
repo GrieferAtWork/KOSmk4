@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb9bd866 */
+/* HASH CRC-32:0x3bebd85b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -132,7 +132,7 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t 
  * If the given `target_thread' has already terminated, 0 is returned */
 INTDEF ATTR_CONST WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t target_thread);
 /* Determine level of concurrency */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_getconcurrency)(void);
+INTDEF ATTR_PURE int NOTHROW_NCX(LIBCCALL libc_pthread_getconcurrency)(void);
 /* Set new concurrency level to LEVEL */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_setconcurrency)(int level);
 /* Yield the processor to another thread or process.

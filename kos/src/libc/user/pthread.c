@@ -1256,9 +1256,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t target_thread,
 
 PRIVATE ATTR_SECTION(".bss.crt.sched.pthread.pthread_concurrency_level") int pthread_concurrency_level = 0;
 
-/*[[[head:pthread_getconcurrency,hash:CRC-32=0x885c8e2a]]]*/
+/*[[[head:pthread_getconcurrency,hash:CRC-32=0xca918186]]]*/
 /* Determine level of concurrency */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_getconcurrency") int
+INTERN ATTR_PURE
+ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_getconcurrency") int
 NOTHROW_NCX(LIBCCALL libc_pthread_getconcurrency)(void)
 /*[[[body:pthread_getconcurrency]]]*/
 {

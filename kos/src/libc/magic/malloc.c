@@ -124,6 +124,7 @@ _heapmin:() -> int;
 [section(.text.crt.heap.utility)]
 [libc_impl({
 	/* NO-OP (indicate failure to release memory) */
+	COMPILER_IMPURE();
 	(void)pad;
 	return 0;
 })] malloc_trim:(size_t pad) -> int {
@@ -132,6 +133,7 @@ _heapmin:() -> int;
 	return _heapmin() ? 1 : 0;
 #else
 	/* NO-OP (indicate failure to release memory) */
+	COMPILER_IMPURE();
 	(void)pad;
 	return 0;
 #endif
@@ -145,6 +147,7 @@ malloc_usable_size:(void *__restrict mallptr) -> size_t;
 [section(.text.crt.heap.utility)]
 mallopt:(int parameter_number, int parameter_value) -> int {
 	/* NO-OP */
+	COMPILER_IMPURE();
 	(void)parameter_number;
 	(void)parameter_value;
 	return 0;

@@ -221,5 +221,10 @@ DEFINE_INTERN_ALIAS(libc_malloc_usable_size, dlmalloc_usable_size);
 
 DECL_END
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wsuggest-attribute=pure"
+#pragma GCC diagnostic ignored "-Wsuggest-attribute=const"
+#pragma GCC diagnostic ignored "-Wsuggest-attribute=cold"
+#endif /* __GNUC__ */
 
 #endif /* !GUARD_LIBDLMALLOC_CONFIG_H */

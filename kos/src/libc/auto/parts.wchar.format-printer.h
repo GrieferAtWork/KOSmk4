@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9dec889 */
+/* HASH CRC-32:0xa9200822 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -454,9 +454,9 @@ INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_wsnprintf_printe
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
 INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(/*struct format_wsnprintf_data**/ void *arg, char16_t const *__restrict data, size_t datalen);
 /* Returns the width (number of characters; not bytes) of the given unicode string */
-INTDEF NONNULL((2)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_wwidth)(void *arg, char32_t const *__restrict data, size_t datalen);
+INTDEF ATTR_PURE NONNULL((2)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_wwidth)(void *arg, char32_t const *__restrict data, size_t datalen);
 /* Returns the width (number of characters; not bytes) of the given unicode string */
-INTDEF NONNULL((2)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_wwidth)(void *arg, char16_t const *__restrict data, size_t datalen);
+INTDEF ATTR_PURE NONNULL((2)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_wwidth)(void *arg, char16_t const *__restrict data, size_t datalen);
 #endif /* !__KERNEL__ */
 
 DECL_END

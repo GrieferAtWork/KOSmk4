@@ -1529,9 +1529,9 @@ NOTHROW(LIBCCALL libc_lrintf)(float x)
 
 
 
-/*[[[head:llrintf,hash:CRC-32=0xd062693f]]]*/
+/*[[[head:llrintf,hash:CRC-32=0x47e863e4]]]*/
 /* Round X to nearest integral value according to current rounding direction */
-INTERN WUNUSED
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llrintf") __LONGLONG
 NOTHROW(LIBCCALL libc_llrintf)(float x)
 /*[[[body:llrintf]]]*/

@@ -266,7 +266,7 @@ initialize_con:
 
 
 
-PUBLIC NOBLOCK WUNUSED bool
+PUBLIC NOBLOCK WUNUSED ATTR_CONST bool
 NOTHROW(KCALL task_isconnected)(void) {
 	struct task_connections *mycons;
 	mycons = &PERTASK(_this_cons);

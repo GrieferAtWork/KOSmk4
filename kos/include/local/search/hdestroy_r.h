@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf439b3ce */
+/* HASH CRC-32:0x34e88004 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 __LOCAL_LIBC(hdestroy_r) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hdestroy_r))(struct hsearch_data *__htab) {
-#line 363 "kos/src/libc/magic/search.c"
+#line 364 "kos/src/libc/magic/search.c"
 	if (__htab == __NULLPTR) {
 #ifdef __EINVAL
 		__libc_seterrno(__EINVAL);

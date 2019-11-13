@@ -161,24 +161,28 @@ iswxdigit:(wint_t wc) -> int {
 
 %(std)#ifdef __USE_ISOC99
 %[default_impl_section({.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs})]
-[std][std_guard][ATTR_WUNUSED][ATTR_NONNULL((1))]
+[std][std_guard][ATTR_WUNUSED][ATTR_NONNULL((1))][ATTR_PURE]
 wctrans:(char const *prop) -> wctrans_t {
 	/* TODO */
+	COMPILER_IMPURE();
 	return 0;
 }
-[std][std_guard][ATTR_WUNUSED][export_alias(__towctrans)]
+
+[std][std_guard][ATTR_WUNUSED][export_alias(__towctrans)][ATTR_CONST]
 towctrans:(wint_t wc, wctrans_t desc) -> wint_t {
 	/* TODO */
 	return 0;
 }
 %(std)#endif /* __USE_ISOC99 */
 
-[std][ATTR_WUNUSED][ATTR_NONNULL((1))]
+[std][ATTR_WUNUSED][ATTR_NONNULL((1))][ATTR_PURE]
 wctype:(char const *prop) -> wctype_t {
 	/* TODO */
+	COMPILER_IMPURE();
 	return 0;
 }
-[std][ATTR_WUNUSED][alias(is_wctype)][export_alias(__iswctype)]
+
+[std][ATTR_WUNUSED][alias(is_wctype)][export_alias(__iswctype)][ATTR_CONST]
 iswctype:(wint_t wc, wctype_t desc) -> int {
 	/* TODO */
 	return 0;
@@ -218,90 +222,105 @@ iswascii:($wint_t wc) -> int {
 [ATTR_WUNUSED][ATTR_PURE][alias(_iswalnum_l)][export_alias(__iswalnum_l)]
 iswalnum_l:($wint_t wc, $locale_t locale) -> int {
 	(void)locale;
+	COMPILER_IMPURE();
 	return iswalnum(wc);
 }
 
 [ATTR_WUNUSED][ATTR_PURE][alias(_iswalpha_l)][export_alias(__iswalpha_l)]
 iswalpha_l:($wint_t wc, $locale_t locale) -> int {
 	(void)locale;
+	COMPILER_IMPURE();
 	return iswalpha(wc);
 }
 
 [ATTR_WUNUSED][ATTR_PURE][alias(_iswcntrl_l)][export_alias(__iswcntrl_l)]
 iswcntrl_l:($wint_t wc, $locale_t locale) -> int {
 	(void)locale;
+	COMPILER_IMPURE();
 	return iswcntrl(wc);
 }
 
 [ATTR_WUNUSED][ATTR_PURE][alias(_iswdigit_l)][export_alias(__iswdigit_l)]
 iswdigit_l:($wint_t wc, $locale_t locale) -> int {
 	(void)locale;
+	COMPILER_IMPURE();
 	return iswdigit(wc);
 }
 
 [ATTR_WUNUSED][ATTR_PURE][alias(_iswgraph_l)][export_alias(__iswgraph_l)]
 iswgraph_l:($wint_t wc, $locale_t locale) -> int {
 	(void)locale;
+	COMPILER_IMPURE();
 	return iswgraph(wc);
 }
 
 [ATTR_WUNUSED][ATTR_PURE][alias(_iswlower_l)][export_alias(__iswlower_l)]
 iswlower_l:($wint_t wc, $locale_t locale) -> int {
 	(void)locale;
+	COMPILER_IMPURE();
 	return iswlower(wc);
 }
 
 [ATTR_WUNUSED][ATTR_PURE][alias(_iswprint_l)][export_alias(__iswprint_l)]
 iswprint_l:($wint_t wc, $locale_t locale) -> int {
 	(void)locale;
+	COMPILER_IMPURE();
 	return iswprint(wc);
 }
 
 [ATTR_WUNUSED][ATTR_PURE][alias(_iswpunct_l)][export_alias(__iswpunct_l)]
 iswpunct_l:($wint_t wc, $locale_t locale) -> int {
 	(void)locale;
+	COMPILER_IMPURE();
 	return iswpunct(wc);
 }
 
 [ATTR_WUNUSED][ATTR_PURE][alias(_iswspace_l)][export_alias(__iswspace_l)]
 iswspace_l:($wint_t wc, $locale_t locale) -> int {
 	(void)locale;
+	COMPILER_IMPURE();
 	return iswspace(wc);
 }
 
 [ATTR_WUNUSED][ATTR_PURE][alias(_iswupper_l)][export_alias(__iswupper_l)]
 iswupper_l:($wint_t wc, $locale_t locale) -> int {
 	(void)locale;
+	COMPILER_IMPURE();
 	return iswupper(wc);
 }
 
 [ATTR_WUNUSED][ATTR_PURE][alias(_iswxdigit_l)][export_alias(__iswxdigit_l)]
 iswxdigit_l:($wint_t wc, $locale_t locale) -> int {
 	(void)locale;
+	COMPILER_IMPURE();
 	return iswxdigit(wc);
 }
 
 [ATTR_WUNUSED][ATTR_PURE][alias(_iswblank_l)][export_alias(__iswblank_l)]
 iswblank_l:($wint_t wc, $locale_t locale) -> int {
 	(void)locale;
+	COMPILER_IMPURE();
 	return iswblank(wc);
 }
 
 [ATTR_WUNUSED][ATTR_PURE][alias(_iswctype_l)][export_alias(__iswctype_l)]
 iswctype_l:($wint_t wc, $wctype_t type, $locale_t locale) -> int {
 	(void)locale;
+	COMPILER_IMPURE();
 	return iswctype(wc, type);
 }
 
 [ATTR_WUNUSED][ATTR_PURE][alias(_towupper_l)][export_alias(__towupper_l)]
 towupper_l:($wint_t wc, $locale_t locale) -> $wint_t {
 	(void)locale;
+	COMPILER_IMPURE();
 	return towupper(wc);
 }
 
 [ATTR_WUNUSED][ATTR_PURE][alias(_towlower_l)][export_alias(__towlower_l)]
 towlower_l:($wint_t wc, $locale_t locale) -> $wint_t {
 	(void)locale;
+	COMPILER_IMPURE();
 	return towlower(wc);
 }
 
@@ -309,18 +328,21 @@ towlower_l:($wint_t wc, $locale_t locale) -> $wint_t {
 [ATTR_WUNUSED][ATTR_NONNULL((1))][export_alias(__wctype_l)]
 wctype_l:(char const *prop, $locale_t locale) -> $wctype_t {
 	(void)locale;
+	COMPILER_IMPURE();
 	return wctype(prop);
 }
 
 [ATTR_WUNUSED][ATTR_NONNULL((1))][export_alias(__wctrans_l)]
 wctrans_l:(char const *prop, $locale_t locale) -> $wctrans_t {
 	(void)locale;
+	COMPILER_IMPURE();
 	return wctrans(prop);
 }
 
 [ATTR_WUNUSED][export_alias(__towctrans_l)]
 towctrans_l:($wint_t wc, $wctrans_t desc, $locale_t locale) -> $wint_t {
 	(void)locale;
+	COMPILER_IMPURE();
 	return towctrans(wc, desc);
 }
 
@@ -364,6 +386,7 @@ isleadbyte:(int wc) -> int {
 [ATTR_WUNUSED][ATTR_PURE]
 _isleadbyte_l:(int wc, $locale_t locale) -> int {
 	(void)locale;
+	COMPILER_IMPURE();
 	return isleadbyte(wc);
 }
 %[default_impl_section({.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs})]

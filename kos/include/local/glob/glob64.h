@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f536165 */
+/* HASH CRC-32:0x6aa880a8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,10 +52,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(glob64))(const char *__restrict __pat
                                                     int __flags,
                                                     __glob_errfunc_t __errfunc,
                                                     struct __glob64_struct *__restrict __pglob) {
-#line 206 "kos/src/libc/magic/glob.c"
+#line 212 "kos/src/libc/magic/glob.c"
 #if defined(__CRT_HAVE_glob)
 	return __localdep_glob32(__pattern, __flags, __errfunc, __pglob);
 #else
+	(void)__pattern;
+	(void)__flags;
+	(void)__errfunc;
+	(void)__pglob;
+	__COMPILER_IMPURE();
 	return GLOB_NOSYS;
 #endif
 }

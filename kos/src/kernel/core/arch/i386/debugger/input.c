@@ -966,11 +966,13 @@ PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_ungetuni)(/*utf-32*/ char32_t
 	return true;
 }
 
-PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_hasuni)(void) {
+PUBLIC ATTR_DBGTEXT NOBLOCK WUNUSED ATTR_PURE bool
+NOTHROW(KCALL dbg_hasuni)(void) {
 	return dbg_getuni_pending_cnt != 0;
 }
 
-PUBLIC ATTR_DBGTEXT NOBLOCK void NOTHROW(KCALL dbg_purgeuni)(void) {
+PUBLIC ATTR_DBGTEXT NOBLOCK void
+NOTHROW(KCALL dbg_purgeuni)(void) {
 	dbg_getuni_pending_cnt = 0;
 }
 
@@ -1077,17 +1079,24 @@ again_getkey:
 	return result;
 }
 
-PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_isholding_ctrl)(void) {
+PUBLIC ATTR_DBGTEXT NOBLOCK WUNUSED ATTR_PURE bool
+NOTHROW(KCALL dbg_isholding_ctrl)(void) {
 	return HOLDING_CTRL();
 }
-PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_isholding_shift)(void) {
+
+PUBLIC ATTR_DBGTEXT NOBLOCK WUNUSED ATTR_PURE bool
+NOTHROW(KCALL dbg_isholding_shift)(void) {
 	return ((ps2_keyboard_modifiers & PS2_KEYBOARD_MODIFIER_SHIFT) != 0) !=
 	       ((ps2_keyboard_modifiers & PS2_KEYBOARD_MODIFIER_CAPS) != 0);
 }
-PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_isholding_alt)(void) {
+
+PUBLIC ATTR_DBGTEXT NOBLOCK WUNUSED ATTR_PURE bool
+NOTHROW(KCALL dbg_isholding_alt)(void) {
 	return ps2_keyboard_modifiers & PS2_KEYBOARD_MODIFIER_ALT;
 }
-PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_isholding_altgr)(void) {
+
+PUBLIC ATTR_DBGTEXT NOBLOCK WUNUSED ATTR_PURE bool
+NOTHROW(KCALL dbg_isholding_altgr)(void) {
 	return (ps2_keyboard_modifiers & PS2_KEYBOARD_MODIFIER_ALTGR) ||
 	       (ps2_keyboard_modifiers & (PS2_KEYBOARD_MODIFIER_CTRL | PS2_KEYBOARD_MODIFIER_ALT)) ==
 	       (PS2_KEYBOARD_MODIFIER_CTRL | PS2_KEYBOARD_MODIFIER_ALT);

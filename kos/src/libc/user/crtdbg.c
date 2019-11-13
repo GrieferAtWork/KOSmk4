@@ -351,8 +351,8 @@ NOTHROW_NCX(LIBCCALL libc__free_dbg)(void *ptr,
 }
 /*[[[end:_free_dbg]]]*/
 
-/*[[[head:_msize_dbg,hash:CRC-32=0x735d864d]]]*/
-INTERN WUNUSED NONNULL((1))
+/*[[[head:_msize_dbg,hash:CRC-32=0xc95d3a62]]]*/
+INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._msize_dbg") size_t
 NOTHROW_NCX(LIBCCALL libc__msize_dbg)(void *ptr,
                                       int block_type)
@@ -625,6 +625,7 @@ NOTHROW_NCX(LIBCCALL libc__CrtSetDbgFlag)(int new_flag)
 	return result;
 }
 /*[[[end:_CrtSetDbgFlag]]]*/
+
 
 
 /*[[[end:implementation]]]*/

@@ -152,7 +152,8 @@ make it easy to compose the values of multiple blocks.
 @end deftypefn
 */
 
-INTERN u32 FCALL libiberty_xcrc32(byte_t const *buf, size_t len, u32 crc) {
+INTERN WUNUSED ATTR_PURE u32 FCALL
+libiberty_xcrc32(byte_t const *buf, size_t len, u32 crc) {
 	while (len--) {
 		crc = (crc << 8) ^ crc32_table[((crc >> 24) ^ *buf) & 255];
 		buf++;

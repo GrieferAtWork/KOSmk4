@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x268b3341 */
+/* HASH CRC-32:0x9fdbacfd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
  * any sort of input/output text processing no longer taking place. */
 __LOCAL_LIBC(cfmakeraw) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakeraw))(struct termios *__restrict __termios_p) {
-#line 97 "kos/src/libc/magic/termios.c"
+#line 100 "kos/src/libc/magic/termios.c"
 	/* As documented here: http://man7.org/linux/man-pages/man3/termios.3.html
 	 * Note that the following additions were made:
 	 *  - Clear `IXOFF' (ensuring that TTY output can be streamed)

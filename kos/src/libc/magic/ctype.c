@@ -48,16 +48,16 @@ __SYSDECL_BEGIN
 }
 
 %[default_impl_section(.text.crt.unicode.static.ctype)]
-[ignore][user][ATTR_CONST][ATTR_WUNUSED][nothrow] __locale_ctype_ptr:(void) -> char const *;
+[ignore][user][ATTR_CONST][ATTR_WUNUSED][nothrow] __locale_ctype_ptr:() -> char const *;
 %[default_impl_section(.text.crt.unicode.locale.ctype)]
-[ignore][user][ATTR_CONST][ATTR_WUNUSED] __locale_ctype_ptr_l:($locale_t locale) -> char const *;
+[ignore][user][ATTR_PURE][ATTR_WUNUSED] __locale_ctype_ptr_l:($locale_t locale) -> char const *;
 %[default_impl_section(.text.crt.unicode.static.ctype)]
-[ignore][user][ATTR_CONST][ATTR_WUNUSED][nothrow] __ctype_b_loc:(void) -> $uint16_t const **;
-[ignore][user][ATTR_CONST][ATTR_WUNUSED][nothrow] __ctype_tolower_loc:(void) -> $int32_t const **;
-[ignore][user][ATTR_CONST][ATTR_WUNUSED][nothrow] __ctype_toupper_loc:(void) -> $int32_t const **;
+[ignore][user][ATTR_PURE][ATTR_WUNUSED][nothrow] __ctype_b_loc:() -> $uint16_t const **;
+[ignore][user][ATTR_PURE][ATTR_WUNUSED][nothrow] __ctype_tolower_loc:() -> $int32_t const **;
+[ignore][user][ATTR_PURE][ATTR_WUNUSED][nothrow] __ctype_toupper_loc:() -> $int32_t const **;
 [ignore][user][ATTR_CONST][ATTR_WUNUSED][nothrow] _isctype:(int ch, int mask) -> int;
 %[default_impl_section(.text.crt.unicode.locale.ctype)]
-[ignore][user][ATTR_CONST][ATTR_WUNUSED] _isctype_l:(int ch, int mask, $locale_t locale) -> int;
+[ignore][user][ATTR_PURE][ATTR_WUNUSED] _isctype_l:(int ch, int mask, $locale_t locale) -> int;
 %[default_impl_section(.text.crt.unicode.static.ctype)]
 
 %[insert:std]
@@ -331,6 +331,7 @@ __SYSDECL_BEGIN
 
 [ATTR_PURE][ATTR_WUNUSED][libc_impl({
 	(void)locale;
+	COMPILER_IMPURE();
 	return iscntrl(ch);
 })][export_alias(__iscntrl_l)]
 iscntrl_l:(int ch, __locale_t locale) -> int {
@@ -347,6 +348,7 @@ iscntrl_l:(int ch, __locale_t locale) -> int {
 	return _isctype_l(ch, 0x0020, locale);
 #else
 	(void)locale;
+	COMPILER_IMPURE();
 	return iscntrl(ch);
 #endif
 }
@@ -354,6 +356,7 @@ iscntrl_l:(int ch, __locale_t locale) -> int {
 
 [ATTR_PURE][ATTR_WUNUSED][libc_impl({
 	(void)locale;
+	COMPILER_IMPURE();
 	return isspace(ch);
 })][export_alias(__isspace_l)]
 isspace_l:(int ch, __locale_t locale) -> int {
@@ -370,12 +373,14 @@ isspace_l:(int ch, __locale_t locale) -> int {
 	return _isctype_l(ch, 0x0008, locale);
 #else
 	(void)locale;
+	COMPILER_IMPURE();
 	return isspace(ch);
 #endif
 }
 
 [ATTR_PURE][ATTR_WUNUSED][libc_impl({
 	(void)locale;
+	COMPILER_IMPURE();
 	return isupper(ch);
 })][export_alias(__isupper_l)]
 isupper_l:(int ch, __locale_t locale) -> int {
@@ -392,12 +397,14 @@ isupper_l:(int ch, __locale_t locale) -> int {
 	return _isctype_l(ch, 0x0001, locale);
 #else
 	(void)locale;
+	COMPILER_IMPURE();
 	return isupper(ch);
 #endif
 }
 
 [ATTR_PURE][ATTR_WUNUSED][libc_impl({
 	(void)locale;
+	COMPILER_IMPURE();
 	return islower(ch);
 })][export_alias(__islower_l)]
 islower_l:(int ch, __locale_t locale) -> int {
@@ -414,12 +421,14 @@ islower_l:(int ch, __locale_t locale) -> int {
 	return _isctype_l(ch, 0x0002, locale);
 #else
 	(void)locale;
+	COMPILER_IMPURE();
 	return islower(ch);
 #endif
 }
 
 [ATTR_PURE][ATTR_WUNUSED][libc_impl({
 	(void)locale;
+	COMPILER_IMPURE();
 	return isalpha(ch);
 })][export_alias(__isalpha_l)]
 isalpha_l:(int ch, __locale_t locale) -> int {
@@ -436,12 +445,14 @@ isalpha_l:(int ch, __locale_t locale) -> int {
 	return _isctype_l(ch, 0x0103, locale);
 #else
 	(void)locale;
+	COMPILER_IMPURE();
 	return isalpha(ch);
 #endif
 }
 
 [ATTR_PURE][ATTR_WUNUSED][libc_impl({
 	(void)locale;
+	COMPILER_IMPURE();
 	return isdigit(ch);
 })][export_alias(__isdigit_l)]
 isdigit_l:(int ch, __locale_t locale) -> int {
@@ -458,12 +469,14 @@ isdigit_l:(int ch, __locale_t locale) -> int {
 	return _isctype_l(ch, 0x0004, locale);
 #else
 	(void)locale;
+	COMPILER_IMPURE();
 	return isdigit(ch);
 #endif
 }
 
 [ATTR_PURE][ATTR_WUNUSED][libc_impl({
 	(void)locale;
+	COMPILER_IMPURE();
 	return isxdigit(ch);
 })][export_alias(__isxdigit_l)]
 isxdigit_l:(int ch, __locale_t locale) -> int {
@@ -480,12 +493,14 @@ isxdigit_l:(int ch, __locale_t locale) -> int {
 	return _isctype_l(ch, 0x0080, locale);
 #else
 	(void)locale;
+	COMPILER_IMPURE();
 	return isxdigit(ch);
 #endif
 }
 
 [ATTR_PURE][ATTR_WUNUSED][libc_impl({
 	(void)locale;
+	COMPILER_IMPURE();
 	return isalnum(ch);
 })][export_alias(__isalnum_l)]
 isalnum_l:(int ch, __locale_t locale) -> int {
@@ -502,12 +517,14 @@ isalnum_l:(int ch, __locale_t locale) -> int {
 	return _isctype_l(ch, 0x0107, locale);
 #else
 	(void)locale;
+	COMPILER_IMPURE();
 	return isalnum(ch);
 #endif
 }
 
 [ATTR_PURE][ATTR_WUNUSED][libc_impl({
 	(void)locale;
+	COMPILER_IMPURE();
 	return ispunct(ch);
 })][export_alias(__ispunct_l)]
 ispunct_l:(int ch, __locale_t locale) -> int {
@@ -524,12 +541,14 @@ ispunct_l:(int ch, __locale_t locale) -> int {
 	return _isctype_l(ch, 0x0010, locale);
 #else
 	(void)locale;
+	COMPILER_IMPURE();
 	return ispunct(ch);
 #endif
 }
 
 [ATTR_PURE][ATTR_WUNUSED][libc_impl({
 	(void)locale;
+	COMPILER_IMPURE();
 	return isgraph(ch);
 })][export_alias(__isgraph_l)]
 isgraph_l:(int ch, __locale_t locale) -> int {
@@ -546,12 +565,14 @@ isgraph_l:(int ch, __locale_t locale) -> int {
 	return _isctype_l(ch, 0x0117, locale);
 #else
 	(void)locale;
+	COMPILER_IMPURE();
 	return isgraph(ch);
 #endif
 }
 
 [ATTR_PURE][ATTR_WUNUSED][libc_impl({
 	(void)locale;
+	COMPILER_IMPURE();
 	return isprint(ch);
 })][export_alias(__isprint_l)]
 isprint_l:(int ch, __locale_t locale) -> int {
@@ -568,12 +589,14 @@ isprint_l:(int ch, __locale_t locale) -> int {
 	return _isctype_l(ch, 0x0157, locale);
 #else
 	(void)locale;
+	COMPILER_IMPURE();
 	return isprint(ch);
 #endif
 }
 
 [ATTR_PURE][ATTR_WUNUSED][libc_impl({
 	(void)locale;
+	COMPILER_IMPURE();
 	return isblank(ch);
 })][export_alias(__isblank_l)]
 isblank_l:(int ch, __locale_t locale) -> int {
@@ -588,6 +611,7 @@ isblank_l:(int ch, __locale_t locale) -> int {
 	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 0200) != 0 || ch == '\t';
 #else
 	(void)locale;
+	COMPILER_IMPURE();
 	return isblank(ch);
 #endif
 }
@@ -597,6 +621,7 @@ isblank_l:(int ch, __locale_t locale) -> int {
 tolower_l:(int ch, __locale_t locale) -> int {
 	/* TODO: GLC has a variant for this! */
 	(void)locale;
+	COMPILER_IMPURE();
 	return tolower(ch);
 }
 
@@ -604,6 +629,7 @@ tolower_l:(int ch, __locale_t locale) -> int {
 toupper_l:(int ch, __locale_t locale) -> int {
 	/* TODO: GLC has a variant for this! */
 	(void)locale;
+	COMPILER_IMPURE();
 	return toupper(ch);
 }
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c31c901 */
+/* HASH CRC-32:0x2ed64253 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,27 +19,24 @@
  */
 #ifndef __local_mbstowcs_defined
 #define __local_mbstowcs_defined 1
-/* Dependency: "_mbstowcs_s" from "stdlib" */
-#ifndef ____localdep__mbstowcs_s_defined
-#define ____localdep__mbstowcs_s_defined 1
-#ifdef __CRT_HAVE__mbstowcs_s
-__CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep__mbstowcs_s,(__SIZE_TYPE__ *__presult, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, char const *__src, __SIZE_TYPE__ __maxlen),_mbstowcs_s,(__presult,__buf,__buflen,__src,__maxlen))
-#else /* LIBC: _mbstowcs_s */
-#include <local/stdlib/_mbstowcs_s.h>
-#define __localdep__mbstowcs_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstowcs_s))
-#endif /* _mbstowcs_s... */
-#endif /* !____localdep__mbstowcs_s_defined */
+/* Dependency: "mbsrtowcs" from "wchar" */
+#ifndef ____localdep_mbsrtowcs_defined
+#define ____localdep_mbsrtowcs_defined 1
+#ifdef __CRT_HAVE_mbsrtowcs
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsrtowcs,(__WCHAR_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__ps),mbsrtowcs,(__dst,__psrc,__dstlen,__ps))
+#else /* LIBC: mbsrtowcs */
+#include <local/wchar/mbsrtowcs.h>
+#define __localdep_mbsrtowcs (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbsrtowcs))
+#endif /* mbsrtowcs... */
+#endif /* !____localdep_mbsrtowcs_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mbstowcs) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbstowcs))(__WCHAR_TYPE__ *__restrict __pwcs,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbstowcs))(__WCHAR_TYPE__ *__restrict __dst,
                                                       char const *__restrict __src,
-                                                      __SIZE_TYPE__ __maxlen) {
-#line 694 "kos/src/libc/magic/stdlib.c"
-	__SIZE_TYPE__ __result;
-	if (__localdep__mbstowcs_s(&__result, __pwcs, (__SIZE_TYPE__)-1, __src, __maxlen))
-		__result = 0;
-	return __result;
+                                                      __SIZE_TYPE__ __dstlen) {
+#line 695 "kos/src/libc/magic/stdlib.c"
+	return __localdep_mbsrtowcs(__dst, (char const **)&__src, __dstlen, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_mbstowcs_defined */

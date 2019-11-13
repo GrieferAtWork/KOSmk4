@@ -145,6 +145,15 @@ CC_FLAGS({
 	"-Wno-missing-field-initializers",
 	"-Wno-type-limits",
 
+	"-Wsuggest-attribute=pure",
+	"-Wsuggest-attribute=const",
+	"-Wsuggest-attribute=cold",
+//	"-Wsuggest-attribute=noreturn", /* Causes warnings about functions with `kernel_panic("TODO")', so nope! */
+
+	/* gcc doesn't understand KOS's printf extensions, so disable Wformat
+	 * Maybe one day I'll add this support to the gcc patch... */
+	"-Wno-format",
+
 	/* KOS never assumes _signed_ overflow (only unsigned overflow),
 	 * so turn this warning to max! (most warnings that this causes
 	 * should be fixed by adding appropriate casts to unsigned types,

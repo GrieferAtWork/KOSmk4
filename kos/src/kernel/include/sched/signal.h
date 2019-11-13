@@ -255,8 +255,8 @@ FUNDEF NONNULL((1)) void NOTHROW(KCALL task_disconnect_c)(struct task_connection
  * In case one of them got delivered, return the signal that got. Otherwise, return `NULL' */
 FUNDEF struct sig *NOTHROW(KCALL task_disconnectall)(void);
 
-/* Check if the calling thread is connected to any signal, or to the specified one. */
-FUNDEF NOBLOCK WUNUSED bool NOTHROW(KCALL task_isconnected)(void);
+/* Check if the calling thread is connected to any signal. */
+FUNDEF NOBLOCK WUNUSED ATTR_CONST bool NOTHROW(KCALL task_isconnected)(void);
 
 /* Wait for the first signal to be delivered,
  * disconnecting all connected signals thereafter.

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac36829e */
+/* HASH CRC-32:0x6f65df88 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,13 +52,13 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_
 #define ____localdep_wmempset_defined 1
 #ifdef __CRT_HAVE_wmempset
 /* Same as wmemset, but return a pointer after the last written character */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmempset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),wmempset,(__dst,__filler,__num_chars))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmempset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),wmempset,(__dst,__filler,__num_chars))
 #elif defined(__CRT_HAVE_mempsetw) && (__SIZEOF_WCHAR_T__ == 2)
 /* Same as wmemset, but return a pointer after the last written character */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmempset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),mempsetw,(__dst,__filler,__num_chars))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmempset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),mempsetw,(__dst,__filler,__num_chars))
 #elif defined(__CRT_HAVE_mempsetl) && (__SIZEOF_WCHAR_T__ == 4)
 /* Same as wmemset, but return a pointer after the last written character */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmempset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),mempsetl,(__dst,__filler,__num_chars))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmempset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),mempsetl,(__dst,__filler,__num_chars))
 #else /* LIBC: wmempset */
 #include <local/wchar/wmempset.h>
 /* Same as wmemset, but return a pointer after the last written character */
@@ -68,11 +68,11 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX
 
 __NAMESPACE_LOCAL_BEGIN
 /* Same as wcsncpy, but return a pointer after the last written character */
-__LOCAL_LIBC(wcspncpy) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __WCHAR_TYPE__ *
+__LOCAL_LIBC(wcspncpy) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcspncpy))(__WCHAR_TYPE__ *__restrict __buf,
                                                       __WCHAR_TYPE__ const *__restrict __src,
                                                       __SIZE_TYPE__ __buflen) {
-#line 1258 "kos/src/libc/magic/wchar.c"
+#line 1350 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __srclen = __localdep_wcsnlen(__src, __buflen);
 	__localdep_wmemcpy(__buf, __src, __srclen);
 	return __localdep_wmempset(__buf+__srclen, '\0', __buflen - __srclen);

@@ -113,15 +113,16 @@ DEFINE_HANDLE_APREADV_FROM_PREADV(directoryentry, struct directory_entry)
 
 
 
-LOCAL size_t KCALL
+LOCAL ATTR_PURE NONNULL((1)) size_t KCALL
 directory_entry_usersize(struct directory_entry const *__restrict self) {
 	return offsetof(struct dirent, d_name) + (self->de_namelen + 1) * sizeof(char);
 }
 
-INTERN size_t KCALL
+INTERN NONNULL((1)) size_t KCALL
 handle_directoryentry_readdir(struct directory_entry *__restrict self,
                               USER CHECKED struct dirent *buf, size_t bufsize,
-                              readdir_mode_t UNUSED(readdir_mode), iomode_t UNUSED(mode)) {
+                              readdir_mode_t UNUSED(readdir_mode),
+                              iomode_t UNUSED(mode)) {
 	size_t result;
 	result = directory_entry_usersize(self);
 	if (bufsize >= offsetafter(struct dirent, d_ino64))
@@ -138,7 +139,7 @@ handle_directoryentry_readdir(struct directory_entry *__restrict self,
 	return result;
 }
 
-INTERN void KCALL
+INTERN NONNULL((1)) void KCALL
 handle_directoryentry_stat(struct directory_entry *__restrict self,
                            USER CHECKED struct stat *result) {
 	memset(result, 0, sizeof(*result));
@@ -147,7 +148,7 @@ handle_directoryentry_stat(struct directory_entry *__restrict self,
 	result->st_mode  = DTTOIF(self->de_type);
 }
 
-INTERN poll_mode_t KCALL
+INTERN ATTR_CONST NONNULL((1)) poll_mode_t KCALL
 handle_directoryentry_poll(struct directory_entry *__restrict UNUSED(self),
                            poll_mode_t what) {
 	return what & POLLIN;
@@ -160,7 +161,7 @@ handle_directoryentry_hop(struct directory_entry *__restrict self, syscall_ulong
 
 
 
-PUBLIC WUNUSED NONNULL((1)) uintptr_t KCALL
+PUBLIC WUNUSED ATTR_PURE NONNULL((1)) uintptr_t KCALL
 directory_entry_hash(CHECKED USER /*utf-8*/ char const *__restrict name,
                      u16 namelen) THROWS(E_SEGFAULT) {
 	size_t const *iter, *end;

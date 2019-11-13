@@ -453,15 +453,15 @@ PUBLIC ATTR_PERCPU quantum_diff_t volatile cpu_quantum_length = (quantum_diff_t)
 PUBLIC ATTR_WEAK NOBLOCK ATTR_SECTION(".text.kernel.cpu_disable_preemptive_interrupts") void
 NOTHROW(KCALL cpu_disable_preemptive_interrupts)(void) {
 }
-DEFINE_PUBLIC_WEAK_ALIAS(cpu_enable_preemptive_interrupts,cpu_disable_preemptive_interrupts);
-DEFINE_PUBLIC_WEAK_ALIAS(cpu_quantum_reset,cpu_disable_preemptive_interrupts);
+DEFINE_PUBLIC_WEAK_ALIAS(cpu_enable_preemptive_interrupts, cpu_disable_preemptive_interrupts);
+DEFINE_PUBLIC_WEAK_ALIAS(cpu_quantum_reset, cpu_disable_preemptive_interrupts);
 
 PUBLIC NOBLOCK ATTR_WEAK WUNUSED ATTR_SECTION(".text.kernel.cpu_quantum_elapsed")
-quantum_diff_t NOTHROW(KCALL cpu_quantum_elapsed)(void) {
+ATTR_CONST quantum_diff_t NOTHROW(KCALL cpu_quantum_elapsed)(void) {
 	return 0;
 }
 PUBLIC NOBLOCK ATTR_WEAK WUNUSED ATTR_SECTION(".text.kernel.cpu_quantum_remaining")
-quantum_diff_t NOTHROW(KCALL cpu_quantum_remaining)(void) {
+ATTR_CONST quantum_diff_t NOTHROW(KCALL cpu_quantum_remaining)(void) {
 	return (quantum_diff_t)-1;
 }
 DEFINE_PUBLIC_WEAK_ALIAS(cpu_quantum_elapsed_nopr, cpu_quantum_elapsed);
@@ -922,7 +922,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 
 
 /* Convert to/from quantum time and regular timespecs */
-PUBLIC NOBLOCK WUNUSED struct timespec
+PUBLIC NOBLOCK WUNUSED ATTR_PURE struct timespec
 NOTHROW(FCALL qtime_to_timespec)(qtime_t const *__restrict qtime) {
 	struct timespec result;
 	result.tv_sec = qtime->q_jtime / HZ;
@@ -933,7 +933,7 @@ NOTHROW(FCALL qtime_to_timespec)(qtime_t const *__restrict qtime) {
 	return result;
 }
 
-PUBLIC NOBLOCK WUNUSED qtime_t
+PUBLIC NOBLOCK WUNUSED ATTR_PURE qtime_t
 NOTHROW(FCALL timespec_to_qtime)(struct timespec const *__restrict tms) {
 	qtime_t result;
 	result.q_jtime  = tms->tv_sec * HZ;
@@ -1086,6 +1086,7 @@ NOTHROW(FCALL cpu_schedule_idle_job)(idle_job_t job, void *arg) {
 	(void)job;
 	(void)arg;
 	/* TODO */
+	COMPILER_IMPURE();
 	return false;
 }
 
@@ -1096,6 +1097,7 @@ NOTHROW(FCALL cpu_schedule_idle_job_and_incref)(idle_job_t job, void *arg,
 	(void)arg;
 	(void)refcnt_offset;
 	/* TODO */
+	COMPILER_IMPURE();
 	return false;
 }
 
@@ -1109,6 +1111,7 @@ NOTHROW(FCALL cpu_delete_idle_job)(idle_job_t job, void *arg) {
 	(void)job;
 	(void)arg;
 	/* TODO */
+	COMPILER_IMPURE();
 	return false;
 }
 
@@ -1119,6 +1122,7 @@ NOTHROW(FCALL invoke_simple_idle_job)(void *arg, unsigned int mode) {
 	if (mode == IDLE_JOB_MODE_SERVICE)
 		(*(NOBLOCK void /*NOTHROW*/ (KCALL *)(void))arg)();
 }
+
 PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL cpu_schedule_idle_job_simple)(NOBLOCK void /*NOTHROW*/ (KCALL *func)(void)) {
 	return cpu_schedule_idle_job(&invoke_simple_idle_job, (void *)func);

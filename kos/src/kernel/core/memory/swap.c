@@ -22,6 +22,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
+#include <kernel/panic.h>
 #include <kernel/swap.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
@@ -53,7 +54,8 @@ NOTHROW(KCALL swap_malloc_part)(pagecnt_t min_pages, pagecnt_t max_pages,
 	(void)min_pages;
 	(void)max_pages;
 	(void)res_pages;
-	/* TODO */
+	COMPILER_IMPURE();
+	*res_pages = 0;
 	return SWAPPTR_INVALID;
 }
 
@@ -63,6 +65,7 @@ NOTHROW(KCALL swap_free)(swapptr_t start, pagecnt_t num_pages) {
 	(void)start;
 	(void)num_pages;
 	/* TODO */
+	kernel_panic("TODO");
 }
 
 /* Issue asynchronous comments to read/write physical memory to/from SWAP.
@@ -76,6 +79,7 @@ swap_read(swapptr_t start,
 	(void)start;
 	(void)buffer;
 	(void)num_pages;
+	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
 PUBLIC void KCALL
@@ -85,12 +89,13 @@ swap_write(swapptr_t start,
 	(void)start;
 	(void)buffer;
 	(void)num_pages;
+	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
 /* Wait for all out-standing swap reads/writes to be completed.
  * @throw: E_IOERROR: The swap back-end has issued an I/O error. */
 PUBLIC void KCALL swap_sync(void) THROWS(E_IOERROR) {
-	THROW(E_NOT_IMPLEMENTED_TODO, "Swap <--> disk DMA implementation");
+	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
 #endif /* !CONFIG_NO_SWAP */

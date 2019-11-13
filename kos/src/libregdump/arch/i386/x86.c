@@ -319,7 +319,7 @@ libregdump_do_segment(struct regdump_printer *__restrict self,
 	if (value & 4) {
 		if (!*pldt)
 			*pldt = __sldt();
-		if ((*pldt & ~7) >= tab.dt_limit + 1) {
+		if ((uint16_t)(*pldt & ~7) >= (uint16_t)(tab.dt_limit + 1)) {
 			PRINT("] ");
 			format(REGDUMP_FORMAT_ERROR_PREFIX);
 			printf("CORRUPT LDT: %%ldt(%#.2x) >= %%gdt.size(%#.2x)%s\n",

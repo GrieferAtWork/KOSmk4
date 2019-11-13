@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a636ebe */
+/* HASH CRC-32:0xe9d428cd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -269,7 +269,7 @@ NOTHROW(LIBCCALL libc_fma)(double x,
 }
 
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-INTERN WUNUSED
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llround") __LONGLONG
 NOTHROW(LIBCCALL libc_llround)(double x) {
 #line 556 "kos/src/libc/magic/math.c"
@@ -352,7 +352,7 @@ NOTHROW(LIBCCALL libc_fmaf)(float x,
 }
 
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-INTERN WUNUSED
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llroundf") __LONGLONG
 NOTHROW(LIBCCALL libc_llroundf)(float x) {
 #line 556 "kos/src/libc/magic/math.c"
@@ -425,7 +425,7 @@ NOTHROW(LIBCCALL libc_fminl)(long double x,
 }
 
 /* Multiply-add function computed as a ternary operation */
-INTERN WUNUSED
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmal") long double
 NOTHROW(LIBCCALL libc_fmal)(long double x,
                             long double y,
@@ -435,7 +435,7 @@ NOTHROW(LIBCCALL libc_fmal)(long double x,
 }
 
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-INTERN WUNUSED
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llroundl") __LONGLONG
 NOTHROW(LIBCCALL libc_llroundl)(long double x) {
 #line 556 "kos/src/libc/magic/math.c"

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84771028 */
+/* HASH CRC-32:0x993ddd6a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #ifdef __std___localdep_wctrans_defined
 __NAMESPACE_STD_USING(__localdep_wctrans)
 #elif defined(__CRT_HAVE_wctrans)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__wctrans_t,__NOTHROW_NCX,__localdep_wctrans,(char const *__prop),wctrans,(__prop))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__wctrans_t,__NOTHROW_NCX,__localdep_wctrans,(char const *__prop),wctrans,(__prop))
 #else /* LIBC: wctrans */
 #include <local/wctype/wctrans.h>
 #define __localdep_wctrans (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wctrans))
@@ -36,8 +36,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wctrans_l) __ATTR_WUNUSED __ATTR_NONNULL((1)) __wctrans_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctrans_l))(char const *__prop,
                                                        __locale_t __locale) {
-#line 317 "kos/src/libc/magic/wctype.c"
+#line 337 "kos/src/libc/magic/wctype.c"
 	(void)__locale;
+	__COMPILER_IMPURE();
 	return __localdep_wctrans(__prop);
 }
 __NAMESPACE_LOCAL_END

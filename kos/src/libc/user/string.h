@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabe0a5d */
+/* HASH CRC-32:0x13cf2b99 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_strsignal)(int signo);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strndup)(char const *__restrict string, size_t max_chars);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strdup)(char const *__restrict string);
 INTDEF ATTR_RETNONNULL NONNULL((2)) char *NOTHROW_NCX(LIBCCALL libc_strerror_r)(int errnum, char *buf, size_t buflen);
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strerror_s)(int errnum);
+INTDEF ATTR_CONST ATTR_PURE WUNUSED char const *NOTHROW(LIBCCALL libc_strerror_s)(int errnum);
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strerrorname_s)(int errnum);
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strsignal_s)(int signum);
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string */

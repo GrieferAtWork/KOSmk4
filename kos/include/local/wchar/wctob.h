@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4abdce89 */
+/* HASH CRC-32:0xa282e41f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,11 +20,19 @@
 #ifndef __local_wctob_defined
 #define __local_wctob_defined 1
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wctob) __ATTR_WUNUSED int
+#ifndef __EOF
+#ifdef EOF
+#define __EOF  EOF
+#else /* EOF */
+#define __EOF (-1)
+#endif /* !EOF */
+#endif /* !__EOF */
+__LOCAL_LIBC(wctob) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctob))(__WINT_TYPE__ __ch) {
-#line 190 "kos/src/libc/magic/wchar.c"
-	/* TODO */
-	return __ch;
+#line 208 "kos/src/libc/magic/wchar.c"
+	if (__ch >= 0 && __ch <= 0x7f)
+		return (int)__ch;
+	return __EOF;
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_wctob_defined */

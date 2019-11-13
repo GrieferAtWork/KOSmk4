@@ -899,16 +899,16 @@ done:
 	return result;
 }
 
-PRIVATE ATTR_NOINLINE NOBLOCK unsigned int
-NOTHROW(FCALL handle_manager_get_max_linear_fd_plus_one)(struct handle_manager *__restrict self) {
+PRIVATE ATTR_NOINLINE NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) unsigned int
+NOTHROW(FCALL handle_manager_get_max_linear_fd_plus_one)(struct handle_manager const *__restrict self) {
 	unsigned int result = self->hm_linear.hm_alloc;
 	while (result && self->hm_linear.hm_vector[result - 1].h_type == HANDLE_TYPE_UNDEFINED)
 		--result;
 	return result;
 }
 
-PRIVATE ATTR_NOINLINE NOBLOCK unsigned int
-NOTHROW(FCALL handle_manager_get_max_hashvector_fd_plus_one)(struct handle_manager *__restrict self) {
+PRIVATE ATTR_NOINLINE NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) unsigned int
+NOTHROW(FCALL handle_manager_get_max_hashvector_fd_plus_one)(struct handle_manager const *__restrict self) {
 	unsigned int result = 0;
 	unsigned int i, mask;
 	struct handle_hashent *map;

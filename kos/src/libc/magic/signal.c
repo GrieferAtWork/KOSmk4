@@ -274,7 +274,7 @@ sigdelset:([nonnull] sigset_t *set, int signo) -> int {
 
 @@@param signo: One of `SIG*'
 [decl_include(<bits/sigset.h>)]
-[ATTR_WUNUSED][alias(__sigismember)]
+[ATTR_WUNUSED][ATTR_PURE][alias(__sigismember)]
 sigismember:([nonnull] sigset_t const *set, int signo) -> int {
 	__ULONGPTR_TYPE__ mask = @__sigmask@(signo);
 	__ULONGPTR_TYPE__ word = @__sigword@(signo);
@@ -297,7 +297,7 @@ sigpending:([nonnull] sigset_t *set) -> int;
 [cp] sigwait:([nonnull] sigset_t const *__restrict set, [nonnull] int *__restrict signo) -> int;
 
 %#ifdef __USE_GNU
-[decl_include(<bits/sigset.h>)][ATTR_WUNUSED]
+[decl_include(<bits/sigset.h>)][ATTR_WUNUSED][ATTR_PURE]
 sigisemptyset:([nonnull] sigset_t const *set) -> int {
 	size_t i;
 	for (i = 0; i < sizeof(sigset_t) / sizeof(__ULONGPTR_TYPE__); ++i)
@@ -423,8 +423,8 @@ sigset:(int signo, $sighandler_t disp) -> $sighandler_t;
 %#endif /* __USE_XOPEN_EXTENDED */
 %
 
-__libc_current_sigrtmin:(void) -> int;
-__libc_current_sigrtmax:(void) -> int;
+[ATTR_CONST] __libc_current_sigrtmin:(void) -> int;
+[ATTR_CONST] __libc_current_sigrtmax:(void) -> int;
 
 
 

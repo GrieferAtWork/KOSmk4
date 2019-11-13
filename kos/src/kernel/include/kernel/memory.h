@@ -103,7 +103,8 @@ DATDEF struct pmeminfo minfo; /* Physical memory info. */
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 /* Returns the total number of usable pages of RAM */
-INTDEF FREE size_t NOTHROW(KCALL minfo_usable_ram_pages)(void);
+INTDEF FREE ATTR_PURE size_t
+NOTHROW(KCALL minfo_usable_ram_pages)(void);
 
 /* Add information about a new member bank / region. */
 INTDEF FREE void NOTHROW(KCALL minfo_addbank)(vm_phys_t start, vm_phys_t size, u16 type);
@@ -315,7 +316,7 @@ FUNDEF NOBLOCK WUNUSED bool
 NOTHROW(KCALL page_iszero)(pageptr_t page);
 
 /* Check if all pages of a given physical memory range are mapped as available RAM. */
-FUNDEF NOBLOCK WUNUSED bool
+FUNDEF NOBLOCK WUNUSED ATTR_PURE bool
 NOTHROW(KCALL page_ismapped)(pageptr_t page, pagecnt_t num_pages);
 #endif /* __CC__ */
 

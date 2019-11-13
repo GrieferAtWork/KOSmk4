@@ -47,18 +47,21 @@ typedef __pid_t pid_t;
 
 }
 
-[ATTR_WUNUSED]
+[ATTR_WUNUSED][ATTR_PURE]
 cfgetospeed:([nonnull] struct termios const *__restrict termios_p) -> speed_t {
 	return termios_p->@c_ospeed@;
 }
-[ATTR_WUNUSED]
+
+[ATTR_WUNUSED][ATTR_PURE]
 cfgetispeed:([nonnull] struct termios const *__restrict termios_p) -> speed_t {
 	return termios_p->@c_ispeed@;
 }
+
 cfsetospeed:([nonnull] struct termios *__restrict termios_p, speed_t speed) -> int {
 	termios_p->@c_ospeed@ = speed;
 	return 0;
 }
+
 cfsetispeed:([nonnull] struct termios *__restrict termios_p, speed_t speed) -> int {
 	termios_p->@c_ispeed@ = speed;
 	return 0;

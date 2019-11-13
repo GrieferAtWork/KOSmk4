@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6862003d */
+/* HASH CRC-32:0x5d87b0c2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wfullpath_dbg))(__WCHAR16_TYPE__ *__
                                                             int __block_type,
                                                             char const *__filename,
                                                             int __line) {
-#line 463 "kos/src/libc/magic/crtdbg.c"
+#line 464 "kos/src/libc/magic/crtdbg.c"
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;
@@ -35,6 +35,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wfullpath_dbg))(__WCHAR16_TYPE__ *__
 	(void)__path;
 	(void)__buflen;
 	/* TODO: c16fullpath() */
+	__COMPILER_IMPURE();
 	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END

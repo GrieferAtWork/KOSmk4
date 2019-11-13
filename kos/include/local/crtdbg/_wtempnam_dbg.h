@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbeaf8b35 */
+/* HASH CRC-32:0x29a6bf32 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wtempnam_dbg))(__WCHAR16_TYPE__ cons
 	(void)__dir_name;
 	(void)__file_prefix;
 	/* TODO: c16tempnam() */
+	__COMPILER_IMPURE();
 	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END

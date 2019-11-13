@@ -422,7 +422,7 @@ PUBLIC ATTR_DBGTEXT void NOTHROW(KCALL dbg_endupdate)(bool force) {
 	vga_disable_offscreen_buffer();
 }
 
-PUBLIC ATTR_DBGTEXT u32 NOTHROW(KCALL dbg_getcur)(void) {
+PUBLIC ATTR_DBGTEXT WUNUSED ATTR_PURE u32 NOTHROW(KCALL dbg_getcur)(void) {
 	unsigned int pos;
 	pos = (unsigned int)(vga_terminal_cur -
 	                     vga_terminal_start);
@@ -659,7 +659,8 @@ for (local i,x: util.enumerate(l)) {
 /* Encode the given unicode character `ch' using cp437 (the codepage
  * used by VGA) If the character can't be encoded, return 0 instead.
  * s.a.: https://en.wikipedia.org/wiki/Code_page_437  */
-LOCAL u8 NOTHROW(KCALL cp437_encode)(/*utf-32*/ u32 ch) {
+LOCAL ATTR_CONST u8
+NOTHROW(KCALL cp437_encode)(/*utf-32*/ u32 ch) {
 	u8 result;
 	if (ch <= 0xff) {
 		result = cp437_from_latin1[ch];

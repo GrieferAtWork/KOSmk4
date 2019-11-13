@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x505ad3a5 */
+/* HASH CRC-32:0x2bef7071 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1031,7 +1031,7 @@ NOTHROW_NCX(LIBCCALL libc_format_snprintf_printer)(/*struct format_snprintf_data
 
 #include <local/unicode_utf8seqlen.h>
 /* Returns the width (number of characters; not bytes) of the given unicode string */
-INTERN NONNULL((2))
+INTERN ATTR_PURE NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_width") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_width)(void *arg,
                                         /*utf-8*/ char const *__restrict data,
@@ -1054,7 +1054,8 @@ NOTHROW_NCX(LIBCCALL libc_format_width)(void *arg,
 
 #ifndef __KERNEL__
 /* Always re-return `datalen' and ignore all other arguments */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_length") ssize_t
+INTERN ATTR_CONST
+ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_length") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_length)(void *arg,
                                          /*utf-8*/ char const *__restrict data,
                                          size_t datalen) {

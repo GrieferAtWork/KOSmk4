@@ -141,14 +141,14 @@ FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_ungetc)(/*utf-8*/ char ch);
 FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_ungetuni)(/*utf-32*/ char32_t ch);
 
 /* Check if there are pending unicode characters. */
-FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_hasuni)(void);
+FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(KCALL dbg_hasuni)(void);
 /* Purge pending unicode characters. */
 FUNDEF NOBLOCK void NOTHROW(KCALL dbg_purgeuni)(void);
 
-FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_isholding_ctrl)(void);
-FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_isholding_shift)(void);
-FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_isholding_alt)(void);
-FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_isholding_altgr)(void);
+FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(KCALL dbg_isholding_ctrl)(void);
+FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(KCALL dbg_isholding_shift)(void);
+FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(KCALL dbg_isholding_alt)(void);
+FUNDEF NOBLOCK WUNUSED ATTR_PURE bool NOTHROW(KCALL dbg_isholding_altgr)(void);
 
 
 /* Try to auto-complete whatever was written at `line+num_written',
@@ -378,12 +378,12 @@ FUNDEF void NOTHROW(KCALL dbg_showscreen_end)(void);
 /* Get/Set the current on-screen cursor position.
  * NOTE: Out-of-bounds coords are clamped to their valid ranges. */
 FUNDEF u32 NOTHROW(KCALL dbg_setcur)(int x, int y);
-FUNDEF u32 NOTHROW(KCALL dbg_getcur)(void);
+FUNDEF WUNUSED ATTR_PURE u32 NOTHROW(KCALL dbg_getcur)(void);
 #define DBG_GETCUR_X(val) ((unsigned int)((val)&0xffff))
 #define DBG_GETCUR_Y(val) ((unsigned int)((val) >> 16))
 #define DBG_MAKECUR(x, y) ((u32)(x) | ((u32)(y) << 16))
-LOCAL unsigned int NOTHROW(KCALL dbg_getcur_x)(void) { return DBG_GETCUR_X(dbg_getcur()); }
-LOCAL unsigned int NOTHROW(KCALL dbg_getcur_y)(void) { return DBG_GETCUR_Y(dbg_getcur()); }
+LOCAL WUNUSED ATTR_PURE unsigned int NOTHROW(KCALL dbg_getcur_x)(void) { return DBG_GETCUR_X(dbg_getcur()); }
+LOCAL WUNUSED ATTR_PURE unsigned int NOTHROW(KCALL dbg_getcur_y)(void) { return DBG_GETCUR_Y(dbg_getcur()); }
 
 
 /* TTY color codes. */
@@ -509,15 +509,15 @@ struct debug_function {
 
 /* Search for a debug function matching the given name.
  * @return: NULL: No function exists that matches `name' */
-FUNDEF WUNUSED NONNULL((1)) struct debug_function const *KCALL
+FUNDEF WUNUSED ATTR_PURE NONNULL((1)) struct debug_function const *KCALL
 dbg_getfunc(char const *__restrict name);
 
 /* Search for a debug function matching the given name most closely. */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct debug_function const *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED ATTR_PURE NONNULL((1)) struct debug_function const *KCALL
 dbg_getfunc_fuzzy(char const *__restrict name);
 
 /* Search for a debug function who's name starts with `name'. */
-FUNDEF WUNUSED NONNULL((1)) struct debug_function const *KCALL
+FUNDEF WUNUSED ATTR_PURE NONNULL((1)) struct debug_function const *KCALL
 dbg_getfunc_start(char const *__restrict name);
 
 

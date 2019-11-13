@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda9e048d */
+/* HASH CRC-32:0xc7e3e741 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1826,7 +1826,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(/*struct format_wsnprintf_da
 }
 
 /* Returns the width (number of characters; not bytes) of the given unicode string */
-INTERN NONNULL((2))
+INTERN ATTR_PURE NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_wwidth") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_wwidth)(void *arg,
                                          char32_t const *__restrict data,
@@ -1851,11 +1851,16 @@ NOTHROW_NCX(LIBCCALL libc_format_wwidth)(void *arg,
 #else
 	(void)arg;
 	(void)data;
+	/* XXX: Not necessarily correct, as the 32-bit variant is actually ATTR_CONST.
+	 *      However, magic headers don't support conditional attributes, so we can't just do
+	 *      [if(__SIZEOF_WCHAR_T__ == 2), ATTR_PURE]
+	 *      [if(__SIZEOF_WCHAR_T__ != 2), ATTR_CONST] */
+	COMPILER_IMPURE();
 	return (ssize_t)datalen;
 #endif
 }
 /* Returns the width (number of characters; not bytes) of the given unicode string */
-INTERN NONNULL((2))
+INTERN ATTR_PURE NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_wwidth") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wwidth)(void *arg,
                                          char16_t const *__restrict data,
@@ -1880,6 +1885,11 @@ NOTHROW_NCX(LIBDCALL libd_format_wwidth)(void *arg,
 #else
 	(void)arg;
 	(void)data;
+	/* XXX: Not necessarily correct, as the 32-bit variant is actually ATTR_CONST.
+	 *      However, magic headers don't support conditional attributes, so we can't just do
+	 *      [if(__SIZEOF_WCHAR_T__ == 2), ATTR_PURE]
+	 *      [if(__SIZEOF_WCHAR_T__ != 2), ATTR_CONST] */
+	COMPILER_IMPURE();
 	return (ssize_t)datalen;
 #endif
 }

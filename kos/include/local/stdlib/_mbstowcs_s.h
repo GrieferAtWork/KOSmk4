@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x589cfd4a */
+/* HASH CRC-32:0x83552792 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,15 +19,39 @@
  */
 #ifndef __local__mbstowcs_s_defined
 #define __local__mbstowcs_s_defined 1
+#include <parts/errno.h>
+/* Dependency: "mbstowcs" from "stdlib" */
+#ifndef ____localdep_mbstowcs_defined
+#define ____localdep_mbstowcs_defined 1
+#ifdef __CRT_HAVE_mbstowcs
+__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbstowcs,(__WCHAR_TYPE__ *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __dstlen),mbstowcs,(__dst,__src,__dstlen))
+#else /* LIBC: mbstowcs */
+#include <local/stdlib/mbstowcs.h>
+#define __localdep_mbstowcs (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbstowcs))
+#endif /* mbstowcs... */
+#endif /* !____localdep_mbstowcs_defined */
+
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_mbstowcs_s) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbstowcs_s))(__SIZE_TYPE__ *__presult,
-                                                         __WCHAR_TYPE__ *__buf,
-                                                         __SIZE_TYPE__ __buflen,
+                                                         __WCHAR_TYPE__ *__dst,
+                                                         __SIZE_TYPE__ __dstsize,
                                                          char const *__src,
-                                                         __SIZE_TYPE__ __maxlen) {
-#line 2355 "kos/src/libc/magic/stdlib.c"
-	/* TODO */
+                                                         __SIZE_TYPE__ __dstlen) {
+#line 2380 "kos/src/libc/magic/stdlib.c"
+	__SIZE_TYPE__ __error;
+	if (__dstlen >= __dstsize) {
+		if (!__dstsize)
+			return 0;
+		__dstlen = __dstsize - 1;
+	}
+	__error = __localdep_mbstowcs(__dst, __src, __dstlen);
+	if (__presult)
+		*__presult = __error;
+#ifdef __EILSEQ
+	if (__error == (__SIZE_TYPE__)-1)
+		return __EILSEQ;
+#endif /* EILSEQ */
 	return 0;
 }
 __NAMESPACE_LOCAL_END

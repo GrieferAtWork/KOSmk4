@@ -205,7 +205,7 @@ telldir:([nonnull] DIR *__restrict dirp) -> long int;
 %
 %#ifdef __USE_XOPEN2K8
 @@Return the underlying file descriptor of the given directory stream
-dirfd:([nonnull] DIR *__restrict dirp) -> $fd_t;
+[ATTR_PURE] dirfd:([nonnull] DIR __KOS_FIXED_CONST *__restrict dirp) -> $fd_t;
 
 
 %typedef int (*__scandir_selector_t)(struct dirent const *);

@@ -145,7 +145,7 @@ NOTHROW(KCALL minfo_delete_bank)(size_t bank_index) {
 }
 
 /* Returns the total number of usable pages of RAM */
-INTERN ATTR_FREETEXT size_t
+INTERN ATTR_PURE ATTR_FREETEXT size_t
 NOTHROW(KCALL minfo_usable_ram_pages)(void) {
 	size_t result = 0, i;
 	for (i = 0; i < minfo.mb_bankc; ++i) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd817d93b */
+/* HASH CRC-32:0x2bdc6e50 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,9 @@
 #define __local_wcwidth_defined 1
 #include <libc/unicode.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wcwidth) __ATTR_WUNUSED int
+__LOCAL_LIBC(wcwidth) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcwidth))(__WCHAR_TYPE__ __ch) {
-#line 778 "kos/src/libc/magic/wchar.c"
+#line 870 "kos/src/libc/magic/wchar.c"
 #if __SIZEOF_WCHAR_T__ == 2
 	if (__ch >= 0xd800 &&
 	    __ch <= 0xdfff)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32f3ec4f */
+/* HASH CRC-32:0x2e2d9a9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,9 +38,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(i
 #ifndef ____localdep_memcasecmp_l_defined
 #define ____localdep_memcasecmp_l_defined 1
 #ifdef __CRT_HAVE_memcasecmp_l
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes, __locale_t __locale),memcasecmp_l,(__s1,__s2,__n_bytes,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes, __locale_t __locale),memcasecmp_l,(__s1,__s2,__n_bytes,__locale))
 #elif defined(__CRT_HAVE__memicmp_l)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes, __locale_t __locale),_memicmp_l,(__s1,__s2,__n_bytes,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes, __locale_t __locale),_memicmp_l,(__s1,__s2,__n_bytes,__locale))
 #else /* LIBC: memcasecmp_l */
 #include <local/string/memcasecmp_l.h>
 #define __localdep_memcasecmp_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcasecmp_l))
@@ -57,13 +57,13 @@ __NAMESPACE_LOCAL_BEGIN
  * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
  * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
-__LOCAL_LIBC(memcasemem_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) void *
+__LOCAL_LIBC(memcasemem_l) __ATTR_PURE __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcasemem_l))(void const *__haystack,
                                                           __SIZE_TYPE__ __haystacklen,
                                                           void const *__needle,
                                                           __SIZE_TYPE__ __needlelen,
                                                           __locale_t __locale) {
-#line 2547 "kos/src/libc/magic/string.c"
+#line 2548 "kos/src/libc/magic/string.c"
 	__BYTE_TYPE__ *__candidate, __marker;
 	__BYTE_TYPE__ *__hayend;
 #if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)

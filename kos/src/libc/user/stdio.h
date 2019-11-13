@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x730aaa06 */
+/* HASH CRC-32:0x13609e99 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,9 +78,9 @@ INTDEF NONNULL((1)) void (LIBCCALL libc_rewind)(FILE *__restrict stream) __THROW
 /* Clear the error state of `STREAM', returning the stream to normal operations mode */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_clearerr)(FILE *__restrict stream);
 /* Check if end-of-file has been reached in `STREAM' */
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_feof)(FILE *__restrict stream);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_feof)(FILE __KOS_FIXED_CONST *__restrict stream);
 /* Check if an I/O error occurred in `STREAM' */
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_ferror)(FILE *__restrict stream);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_ferror)(FILE __KOS_FIXED_CONST *__restrict stream);
 /* Print a given `MESSAGE' alongside `strerror(errno)' to stderr:
  * >> if (message) {
  * >>     fprintf(stderr, "%s: %s\n", message, strerror(errno));

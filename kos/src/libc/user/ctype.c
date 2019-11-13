@@ -1301,8 +1301,8 @@ int32_t const *libc___ctype_toupper_loc_pointer = NULL;
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:__ctype_b_loc,hash:CRC-32=0xce2837b9]]]*/
-INTERN ATTR_CONST WUNUSED
+/*[[[head:__ctype_b_loc,hash:CRC-32=0x36d09888]]]*/
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.__ctype_b_loc") uint16_t const **
 NOTHROW(LIBCCALL libc___ctype_b_loc)(void)
 /*[[[body:__ctype_b_loc]]]*/
@@ -1313,8 +1313,8 @@ NOTHROW(LIBCCALL libc___ctype_b_loc)(void)
 }
 /*[[[end:__ctype_b_loc]]]*/
 
-/*[[[head:__ctype_tolower_loc,hash:CRC-32=0x89488a95]]]*/
-INTERN ATTR_CONST WUNUSED
+/*[[[head:__ctype_tolower_loc,hash:CRC-32=0x395f2168]]]*/
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.__ctype_tolower_loc") int32_t const **
 NOTHROW(LIBCCALL libc___ctype_tolower_loc)(void)
 /*[[[body:__ctype_tolower_loc]]]*/
@@ -1325,8 +1325,8 @@ NOTHROW(LIBCCALL libc___ctype_tolower_loc)(void)
 }
 /*[[[end:__ctype_tolower_loc]]]*/
 
-/*[[[head:__ctype_toupper_loc,hash:CRC-32=0xb2fcd8d0]]]*/
-INTERN ATTR_CONST WUNUSED
+/*[[[head:__ctype_toupper_loc,hash:CRC-32=0x2eb732d]]]*/
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.__ctype_toupper_loc") int32_t const **
 NOTHROW(LIBCCALL libc___ctype_toupper_loc)(void)
 /*[[[body:__ctype_toupper_loc]]]*/
@@ -1350,8 +1350,8 @@ NOTHROW(LIBCCALL libc___locale_ctype_ptr)(void)
 }
 /*[[[end:__locale_ctype_ptr]]]*/
 
-/*[[[head:__locale_ctype_ptr_l,hash:CRC-32=0x34410101]]]*/
-INTERN ATTR_CONST WUNUSED
+/*[[[head:__locale_ctype_ptr_l,hash:CRC-32=0x69ac728b]]]*/
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.__locale_ctype_ptr_l") char const *
 NOTHROW_NCX(LIBCCALL libc___locale_ctype_ptr_l)(locale_t locale)
 /*[[[body:__locale_ctype_ptr_l]]]*/
@@ -1375,8 +1375,8 @@ NOTHROW(LIBCCALL libc__isctype)(int ch,
 }
 /*[[[end:_isctype]]]*/
 
-/*[[[head:_isctype_l,hash:CRC-32=0x86159c16]]]*/
-INTERN ATTR_CONST WUNUSED
+/*[[[head:_isctype_l,hash:CRC-32=0xc1733b08]]]*/
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype._isctype_l") int
 NOTHROW_NCX(LIBCCALL libc__isctype_l)(int ch,
                                       int mask,

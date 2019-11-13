@@ -463,8 +463,8 @@ rpc_free_chain(struct rpc_entry *self) {
 	}
 }
 
-PRIVATE NOBLOCK size_t KCALL
-rpc_count_chain(struct rpc_entry *self) {
+PRIVATE NOBLOCK WUNUSED ATTR_PURE size_t KCALL
+rpc_count_chain(struct rpc_entry const *self) {
 	size_t result;
 	for (result = 0; self; self = self->re_next)
 		++result;

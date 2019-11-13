@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5cded81c */
+/* HASH CRC-32:0xcfc9cccb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,8 +35,8 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigaddset)(sigset_t *set, int 
 /* @param signo: One of `SIG*' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigdelset)(sigset_t *set, int signo);
 /* @param signo: One of `SIG*' */
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set, int signo);
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigisemptyset)(sigset_t const *set);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set, int signo);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigisemptyset)(sigset_t const *set);
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_sigandset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_sigorset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
 #endif /* !__KERNEL__ */

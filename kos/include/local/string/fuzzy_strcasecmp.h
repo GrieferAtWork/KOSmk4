@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8bf9252d */
+/* HASH CRC-32:0xd748d0f5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #ifndef ____localdep_fuzzy_memcasecmp_defined
 #define ____localdep_fuzzy_memcasecmp_defined 1
 #ifdef __CRT_HAVE_fuzzy_memcasecmp
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_memcasecmp,(void const *__s1, __SIZE_TYPE__ __s1_bytes, void const *__s2, __SIZE_TYPE__ __s2_bytes),fuzzy_memcasecmp,(__s1,__s1_bytes,__s2,__s2_bytes))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_memcasecmp,(void const *__s1, __SIZE_TYPE__ __s1_bytes, void const *__s2, __SIZE_TYPE__ __s2_bytes),fuzzy_memcasecmp,(__s1,__s1_bytes,__s2,__s2_bytes))
 #elif !defined(__NO_MALLOCA)
 #include <local/string/fuzzy_memcasecmp.h>
 #define __localdep_fuzzy_memcasecmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_memcasecmp))
@@ -48,10 +48,10 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 #endif /* !____localdep_strlen_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fuzzy_strcasecmp) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
+__LOCAL_LIBC(fuzzy_strcasecmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_strcasecmp))(char const *__s1,
                                                               char const *__s2) {
-#line 3793 "kos/src/libc/magic/string.c"
+#line 3794 "kos/src/libc/magic/string.c"
 	return __localdep_fuzzy_memcasecmp(__s1, __localdep_strlen(__s1), __s2, __localdep_strlen(__s2));
 }
 __NAMESPACE_LOCAL_END

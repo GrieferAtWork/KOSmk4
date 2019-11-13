@@ -675,31 +675,29 @@ getenv:([nonnull] char const *varname) -> char *;
 
 %[default_impl_section({.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs})]
 [std]
-mblen:(char const *s, size_t n) -> int {
-	/* TODO */
-	return 0;
+mblen:([inp_opt(maxlen)] char const *str, size_t maxlen) -> int {
+	return mbrlen(str, maxlen, NULL);
 }
+
 [std][wchar]
-mbtowc:(wchar_t *__restrict pwc, char const *__restrict s, size_t n) -> int {
-	/* TODO */
-	return 0;
+mbtowc:(wchar_t *__restrict pwc,
+        [inp_opt(maxlen)] char const *__restrict str, size_t maxlen) -> int {
+	return mbrtowc(pwc, str, maxlen, NULL);
 }
+
 [std][wchar]
-wctomb:(char *s, wchar_t wchar) -> int {
-	/* TODO */
-	return 0;
+wctomb:(char *str, wchar_t wc) -> int {
+	return wcrtomb(str, wc, NULL);
 }
+
 [std][wchar]
-mbstowcs:(wchar_t *__restrict pwcs, char const *__restrict src, size_t maxlen) -> size_t {
-	size_t result;
-	if (_mbstowcs_s(&result, pwcs, (size_t)-1, src, maxlen))
-		result = 0;
-	return result;
+mbstowcs:(wchar_t *__restrict dst, char const *__restrict src, size_t dstlen) -> size_t {
+	return mbsrtowcs(dst, (char const **)&src, dstlen, NULL);
 }
+
 [std][wchar]
-wcstombs:(char *__restrict s, wchar_t const *__restrict pwcs, size_t n) -> size_t {
-	/* TODO */
-	return 0;
+wcstombs:(char *__restrict dst, wchar_t const *__restrict src, size_t dstlen) -> size_t {
+	return wcsrtombs(dst, (wchar_t const **)&src, dstlen, NULL);
 }
 
 [section(.text.crt.fs.exec.system)][cp][std][std_guard]
@@ -772,19 +770,21 @@ calloc:(size_t count, size_t n_bytes) -> void * {
 realloc:(void *mallptr, size_t n_bytes) -> void *;
 
 [std_guard][std][libc][alias(cfree)][crtbuiltin]
-free:(void *mallptr) -> void;
+free:(void *mallptr);
 
 
 %[default_impl_section(.text.crt.random)]
 [nothrow][std][user][same_impl]
 [if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(srandom)]
 srand:(long seed) -> void {
+	COMPILER_IMPURE();
 	/* ... */
 }
 
 [nothrow][std][user][same_impl]
 [if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(random)]
-rand:(void) -> int {
+rand:() -> int {
+	COMPILER_IMPURE();
 	/* https://xkcd.com/221/ */
 	return 4;
 }
@@ -884,23 +884,35 @@ strtoll:([nonnull] char const *__restrict nptr, char **endptr, int base) -> __LO
 atof:([nonnull] char const *__restrict nptr) -> double {
 	return strtod(nptr, NULL);
 }
+
 [std][ATTR_LEAF]
 [if(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias(strtold)]
 strtod:([nonnull] char const *__restrict nptr, char **endptr) -> double {
 	/* TODO */
+	COMPILER_IMPURE();
+	if (endptr)
+		*endptr = (char *)nptr;
 	return 0;
 }
+
 %(std)#ifdef __USE_ISOC99
 [std_guard][std][ATTR_LEAF]
 strtof:([nonnull] char const *__restrict nptr, char **endptr) -> float {
 	/* TODO */
+	COMPILER_IMPURE();
+	if (endptr)
+		*endptr = (char *)nptr;
 	return 0;
 }
+
 %(std)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std_guard][std][ATTR_LEAF]
 [if(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias(strtod)]
 strtold:([nonnull] char const *__restrict nptr, char **endptr) -> long double {
 	/* TODO */
+	COMPILER_IMPURE();
+	if (endptr)
+		*endptr = (char *)nptr;
 	return 0;
 }
 %(std)#endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -1093,6 +1105,7 @@ ecvt_r:(double val, int ndigit,
 	return dos_ecvt_s(buf, len, val, ndigit, decptr, sign) ? -1 : 0;
 #else
 	/* TODO: Implementation */
+	COMPILER_IMPURE();
 	return 0;
 #endif
 }
@@ -1105,6 +1118,7 @@ fcvt_r:(double val, int ndigit,
 	return dos_fcvt_s(buf, len, val, ndigit, decptr, sign) ? -1 : 0;
 #else
 	/* TODO: Implementation */
+	COMPILER_IMPURE();
 	return 0;
 #endif
 }
@@ -1139,6 +1153,7 @@ qecvt_r:(long double val, int ndigit,
 	return dos_ecvt_s(buf, len, (double)val, ndigit, decptr, sign) ? -1 : 0;
 #else
 	/* TODO: Implementation */
+	COMPILER_IMPURE();
 	return 0;
 #endif
 }
@@ -1151,6 +1166,7 @@ qfcvt_r:(long double val, int ndigit,
 	return dos_fcvt_s(buf, len, (double)val, ndigit, decptr, sign) ? -1 : 0;
 #else
 	/* TODO: Implementation */
+	COMPILER_IMPURE();
 	return 0;
 #endif
 }
@@ -1252,7 +1268,9 @@ mkstemps64:([nonnull] char *template_, int suffixlen) -> int;
 %
 %
 %#ifdef __USE_POSIX
-[user] rand_r:([nonnull] unsigned int *__restrict seed) -> int {
+[user]
+rand_r:([nonnull] unsigned int *__restrict seed) -> int {
+	COMPILER_IMPURE();
 	/* https://xkcd.com/221/ */
 	return 4;
 }
@@ -1493,6 +1511,7 @@ getsubopt:([nonnull] char **__restrict optionp,
            [nonnull] char *const *__restrict tokens,
            [nonnull] char **__restrict valuep) -> int {
 	/* TODO: Implement here */
+	COMPILER_IMPURE();
 	return 0;
 }
 
@@ -1633,7 +1652,7 @@ mkostemps64:([nonnull] char *template_, int suffixlen, int flags) -> int;
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_GNU */
 
-/* TODO: All of the different parts/ components */
+/* TODO: All of the different <parts/...> components */
 
 %{
 
@@ -2306,14 +2325,19 @@ _atoi64_l:([nonnull] char const *__restrict nptr, $locale_t locale) -> $s64 {
 
 [ATTR_PURE][ATTR_WUNUSED]
 _mbstrlen:([nonnull] char const *str) -> $size_t {
-	/* TODO */
-	return 0;
+	size_t result = 0;
+	while (unicode_readutf8((char const **)&str))
+		++result;
+	return result;
 }
 
 [ATTR_PURE][ATTR_WUNUSED]
 _mbstrnlen:([nonnull] char const *str, $size_t maxlen) -> $size_t {
-	/* TODO */
-	return 0;
+	size_t result = 0;
+	char const *endptr = str + maxlen;
+	while (unicode_readutf8_n((char const **)&str, endptr))
+		++result;
+	return result;
 }
 
 [ATTR_PURE][ATTR_WUNUSED]
@@ -2340,26 +2364,54 @@ _mbtowc_l:(wchar_t *dst, char const *src,
 	(void)locale;
 	return mbtowc(dst, src, srclen);
 }
+
 [wchar]
-_mbstowcs_l:(wchar_t *buf, char const *src,
-             $size_t maxlen, $locale_t locale) -> $size_t {
-	$size_t result;
-	if (_mbstowcs_s_l(&result, buf, ($size_t)-1, src, maxlen, locale))
-		result = 0;
-	return result;
+_mbstowcs_l:(wchar_t *dst, char const *src,
+             $size_t dstlen, $locale_t locale) -> $size_t {
+	(void)locale;
+	return mbstowcs(dst, src, dstlen);
 }
 
 
-[wchar]
-_mbstowcs_s:($size_t *presult, wchar_t *buf, $size_t buflen, char const *src, $size_t maxlen) -> errno_t {
-	/* TODO */
+[wchar][dependency_include(<parts/errno.h>)]
+_mbstowcs_s:($size_t *presult,
+             wchar_t *dst, $size_t dstsize,
+             char const *src, $size_t dstlen) -> errno_t {
+	size_t error;
+	if (dstlen >= dstsize) {
+		if (!dstsize)
+			return 0;
+		dstlen = dstsize - 1;
+	}
+	error = mbstowcs(dst, src, dstlen);
+	if (presult)
+		*presult = error;
+#ifdef @__EILSEQ@
+	if (error == (size_t)-1)
+		return @__EILSEQ@;
+#endif /* EILSEQ */
 	return 0;
 }
 
 [wchar]
-_mbstowcs_s_l:($size_t *presult, wchar_t *buf, $size_t buflen, char const *src, $size_t maxlen, $locale_t locale) -> errno_t {
-	(void)locale;
-	return _mbstowcs_s(presult, buf, buflen, src, maxlen);
+_mbstowcs_s_l:($size_t *presult,
+               wchar_t *dst, $size_t dstsize,
+               char const *src, $size_t dstlen,
+               $locale_t locale) -> errno_t {
+	size_t error;
+	if (dstlen >= dstsize) {
+		if (!dstsize)
+			return 0;
+		dstlen = dstsize - 1;
+	}
+	error = _mbstowcs_l(dst, src, dstlen, locale);
+	if (presult)
+		*presult = error;
+#ifdef @__EILSEQ@
+	if (error == (size_t)-1)
+		return @__EILSEQ@;
+#endif /* EILSEQ */
+	return 0;
 }
 
 %[default_impl_section(.text.crt.dos.random)]
@@ -2576,7 +2628,7 @@ _aligned_offset_recalloc:(void *mptr, $size_t count, $size_t num_bytes, $size_t 
 	return result;
 }
 
-[ATTR_WUNUSED]
+[ATTR_WUNUSED][ATTR_PURE]
 _aligned_msize:(void *mptr, $size_t min_alignment, $size_t offset) -> $size_t {
 	(void)min_alignment;
 	(void)offset;
@@ -2785,6 +2837,7 @@ _makepath_s:([nonnull] char *buf, $size_t buflen,
              char const *drive, char const *dir,
              char const *file, char const *ext) -> errno_t {
 	/* TODO */
+	COMPILER_IMPURE();
 	return 0;
 }
 
@@ -2795,6 +2848,7 @@ _splitpath_s:([nonnull] char const *__restrict abspath,
               [outp_opt(filelen)] char *file, $size_t filelen,
               [outp_opt(extlen)] char *ext, $size_t extlen) -> errno_t {
 	/* TODO */
+	COMPILER_IMPURE();
 	return 0;
 }
 

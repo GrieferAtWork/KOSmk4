@@ -251,11 +251,12 @@ struct hsearch_data {
 @@algorithm is adequate because
 @@a)  the code is (most probably) called a few times per program run and
 @@b)  the number is small because the table must fit in the core
-[ignore] isprime:(unsigned int number) -> int {
+[ignore][ATTR_CONST] isprime:(unsigned int number) -> int {
 	/* no even number will be passed */
-	for (unsigned int div = 3; div <= number / div; div += 2)
+	for (unsigned int div = 3; div <= number / div; div += 2) {
 		if (number % div == 0)
 			return 0;
+	}
 	return 1;
 }
 

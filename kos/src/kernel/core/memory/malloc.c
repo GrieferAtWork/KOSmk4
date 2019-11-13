@@ -143,8 +143,8 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 
 
 /* Weakly define mall's debug functions are no-ops. */
-PUBLIC ATTR_WEAK NOBLOCK_IF(flags &GFP_ATOMIC) size_t KCALL
-mall_dump_leaks(gfp_t UNUSED(flags)) {
+PUBLIC ATTR_WEAK ATTR_CONST NOBLOCK_IF(flags &GFP_ATOMIC) size_t
+KCALL mall_dump_leaks(gfp_t UNUSED(flags)) {
 	return 0;
 }
 
@@ -152,7 +152,7 @@ PUBLIC ATTR_WEAK NOBLOCK void
 NOTHROW(KCALL mall_validate_padding)(void) {
 }
 
-PUBLIC ATTR_WEAK NOBLOCK_IF(flags &GFP_ATOMIC) void *
+PUBLIC ATTR_WEAK ATTR_CONST NOBLOCK_IF(flags &GFP_ATOMIC) void *
 NOTHROW(KCALL mall_trace_nx)(void *base,
                              size_t UNUSED(num_bytes),
                              gfp_t UNUSED(flags)) {

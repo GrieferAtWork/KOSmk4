@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5abf69f */
+/* HASH CRC-32:0xa9815abe */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -688,19 +688,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_snprintf_printer, __FORCELOCAL __ATTR_NON
 #endif /* format_snprintf_printer... */
 #ifdef __CRT_HAVE_format_width
 /* Returns the width (number of characters; not bytes) of the given unicode string */
-__CDECLARE(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_width,(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
+__CDECLARE(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_width,(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
 #else /* LIBC: format_width */
 #include <local/format-printer/format_width.h>
 /* Returns the width (number of characters; not bytes) of the given unicode string */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_width, __FORCELOCAL __ATTR_NONNULL((2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_width)(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_width))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_width, __FORCELOCAL __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_width)(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_width))(__arg, __data, __datalen); })
 #endif /* format_width... */
 #ifdef __CRT_HAVE_format_length
 /* Always re-return `datalen' and ignore all other arguments */
-__CDECLARE(,__SSIZE_TYPE__,__NOTHROW_NCX,format_length,(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
+__CDECLARE(__ATTR_CONST,__SSIZE_TYPE__,__NOTHROW_NCX,format_length,(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
 #else /* LIBC: format_length */
 #include <local/format-printer/format_length.h>
 /* Always re-return `datalen' and ignore all other arguments */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_length, __FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_length)(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_length))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_length, __FORCELOCAL __ATTR_CONST __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_length)(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_length))(__arg, __data, __datalen); })
 #endif /* format_length... */
 
 #ifndef __format_aprintf_data_defined

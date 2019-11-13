@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8189c3f6 */
+/* HASH CRC-32:0x9ef433c7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,10 +73,10 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_N
 #endif /* !____localdep_memrev_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(c16nrev) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
+__LOCAL_LIBC(c16nrev) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16nrev))(__CHAR16_TYPE__ *__restrict __str,
                                                      __SIZE_TYPE__ __maxlen) {
-#line 1224 "kos/src/libc/magic/wchar.c"
+#line 1316 "kos/src/libc/magic/wchar.c"
 #if 2 == 2
 	return (__CHAR16_TYPE__ *)__localdep_memrevw(__str, __localdep_c16nlen(__str, __maxlen));
 #elif 2 == 4

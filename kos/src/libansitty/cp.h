@@ -31,31 +31,31 @@
 
 DECL_BEGIN
 
-INTDEF WUNUSED char32_t NOTHROW(FCALL libansitty_decode_cp_ldm)(uint8_t byte);
+INTDEF WUNUSED ATTR_CONST char32_t NOTHROW(FCALL libansitty_decode_cp_ldm)(uint8_t byte);
 
-INTDEF WUNUSED char32_t NOTHROW(FCALL libansitty_decode_cp_dutch)(uint8_t byte);
-INTDEF WUNUSED char32_t NOTHROW(FCALL libansitty_decode_cp_finnish)(uint8_t byte);
-INTDEF WUNUSED char32_t NOTHROW(FCALL libansitty_decode_cp_french)(uint8_t byte);
-INTDEF WUNUSED char32_t NOTHROW(FCALL libansitty_decode_cp_french_canadian)(uint8_t byte);
-INTDEF WUNUSED char32_t NOTHROW(FCALL libansitty_decode_cp_german)(uint8_t byte);
-INTDEF WUNUSED char32_t NOTHROW(FCALL libansitty_decode_cp_italian)(uint8_t byte);
-INTDEF WUNUSED char32_t NOTHROW(FCALL libansitty_decode_cp_norwegian)(uint8_t byte); /* Or Danish */
-INTDEF WUNUSED char32_t NOTHROW(FCALL libansitty_decode_cp_portuguese)(uint8_t byte);
-INTDEF WUNUSED char32_t NOTHROW(FCALL libansitty_decode_cp_spanish)(uint8_t byte);
-INTDEF WUNUSED char32_t NOTHROW(FCALL libansitty_decode_cp_swedish)(uint8_t byte);
-INTDEF WUNUSED char32_t NOTHROW(FCALL libansitty_decode_cp_swiss)(uint8_t byte);
+INTDEF WUNUSED ATTR_CONST char32_t NOTHROW(FCALL libansitty_decode_cp_dutch)(uint8_t byte);
+INTDEF WUNUSED ATTR_CONST char32_t NOTHROW(FCALL libansitty_decode_cp_finnish)(uint8_t byte);
+INTDEF WUNUSED ATTR_CONST char32_t NOTHROW(FCALL libansitty_decode_cp_french)(uint8_t byte);
+INTDEF WUNUSED ATTR_CONST char32_t NOTHROW(FCALL libansitty_decode_cp_french_canadian)(uint8_t byte);
+INTDEF WUNUSED ATTR_CONST char32_t NOTHROW(FCALL libansitty_decode_cp_german)(uint8_t byte);
+INTDEF WUNUSED ATTR_CONST char32_t NOTHROW(FCALL libansitty_decode_cp_italian)(uint8_t byte);
+INTDEF WUNUSED ATTR_CONST char32_t NOTHROW(FCALL libansitty_decode_cp_norwegian)(uint8_t byte); /* Or Danish */
+INTDEF WUNUSED ATTR_CONST char32_t NOTHROW(FCALL libansitty_decode_cp_portuguese)(uint8_t byte);
+INTDEF WUNUSED ATTR_CONST char32_t NOTHROW(FCALL libansitty_decode_cp_spanish)(uint8_t byte);
+INTDEF WUNUSED ATTR_CONST char32_t NOTHROW(FCALL libansitty_decode_cp_swedish)(uint8_t byte);
+INTDEF WUNUSED ATTR_CONST char32_t NOTHROW(FCALL libansitty_decode_cp_swiss)(uint8_t byte);
 
-INTDEF WUNUSED uint8_t NOTHROW(FCALL libansitty_encode_cp_dutch)(char32_t ch);
-INTDEF WUNUSED uint8_t NOTHROW(FCALL libansitty_encode_cp_finnish)(char32_t ch);
-INTDEF WUNUSED uint8_t NOTHROW(FCALL libansitty_encode_cp_french)(char32_t ch);
-INTDEF WUNUSED uint8_t NOTHROW(FCALL libansitty_encode_cp_french_canadian)(char32_t ch);
-INTDEF WUNUSED uint8_t NOTHROW(FCALL libansitty_encode_cp_german)(char32_t ch);
-INTDEF WUNUSED uint8_t NOTHROW(FCALL libansitty_encode_cp_italian)(char32_t ch);
-INTDEF WUNUSED uint8_t NOTHROW(FCALL libansitty_encode_cp_norwegian)(char32_t ch); /* Or Danish */
-INTDEF WUNUSED uint8_t NOTHROW(FCALL libansitty_encode_cp_portuguese)(char32_t ch);
-INTDEF WUNUSED uint8_t NOTHROW(FCALL libansitty_encode_cp_spanish)(char32_t ch);
-INTDEF WUNUSED uint8_t NOTHROW(FCALL libansitty_encode_cp_swedish)(char32_t ch);
-INTDEF WUNUSED uint8_t NOTHROW(FCALL libansitty_encode_cp_swiss)(char32_t ch);
+INTDEF WUNUSED ATTR_CONST uint8_t NOTHROW(FCALL libansitty_encode_cp_dutch)(char32_t ch);
+INTDEF WUNUSED ATTR_CONST uint8_t NOTHROW(FCALL libansitty_encode_cp_finnish)(char32_t ch);
+INTDEF WUNUSED ATTR_CONST uint8_t NOTHROW(FCALL libansitty_encode_cp_french)(char32_t ch);
+INTDEF WUNUSED ATTR_CONST uint8_t NOTHROW(FCALL libansitty_encode_cp_french_canadian)(char32_t ch);
+INTDEF WUNUSED ATTR_CONST uint8_t NOTHROW(FCALL libansitty_encode_cp_german)(char32_t ch);
+INTDEF WUNUSED ATTR_CONST uint8_t NOTHROW(FCALL libansitty_encode_cp_italian)(char32_t ch);
+INTDEF WUNUSED ATTR_CONST uint8_t NOTHROW(FCALL libansitty_encode_cp_norwegian)(char32_t ch); /* Or Danish */
+INTDEF WUNUSED ATTR_CONST uint8_t NOTHROW(FCALL libansitty_encode_cp_portuguese)(char32_t ch);
+INTDEF WUNUSED ATTR_CONST uint8_t NOTHROW(FCALL libansitty_encode_cp_spanish)(char32_t ch);
+INTDEF WUNUSED ATTR_CONST uint8_t NOTHROW(FCALL libansitty_encode_cp_swedish)(char32_t ch);
+INTDEF WUNUSED ATTR_CONST uint8_t NOTHROW(FCALL libansitty_encode_cp_swiss)(char32_t ch);
 
 DECL_END
 

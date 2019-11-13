@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xedde242d */
+/* HASH CRC-32:0x5ffa473a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_remque)(void *__restrict elem
  * algorithm is adequate because
  * a)  the code is (most probably) called a few times per program run and
  * b)  the number is small because the table must fit in the core */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_isprime)(unsigned int number);
+INTDEF ATTR_CONST int NOTHROW_NCX(LIBCCALL libc_isprime)(unsigned int number);
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item, ACTION action, ENTRY **retval, struct hsearch_data *htab);
 /* Possibly "split" a node with two red successors, and/or fix up two red

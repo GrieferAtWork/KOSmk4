@@ -308,11 +308,11 @@ err_null:
 }
 /*[[[end:telldir]]]*/
 
-/*[[[head:dirfd,hash:CRC-32=0x540848d2]]]*/
+/*[[[head:dirfd,hash:CRC-32=0xa79788a]]]*/
 /* Return the underlying file descriptor of the given directory stream */
-INTERN NONNULL((1))
+INTERN ATTR_PURE NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.dirfd") fd_t
-NOTHROW_NCX(LIBCCALL libc_dirfd)(DIR *__restrict dirp)
+NOTHROW_NCX(LIBCCALL libc_dirfd)(DIR __KOS_FIXED_CONST *__restrict dirp)
 /*[[[body:dirfd]]]*/
 {
 	return dirp->ds_fd;

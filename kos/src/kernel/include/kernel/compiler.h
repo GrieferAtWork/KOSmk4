@@ -332,43 +332,43 @@ __NAMESPACE_INT_END
 	}
 
 #ifdef __INTELLISENSE__
-#define DEFINE_REFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy)                                    \
-	extern "C++" {                                                                                    \
-	T operator,(T, __NAMESPACE_INT_SYM __refcnt_select_tag);                                          \
-	NOBLOCK WUNUSED NONNULL((1)) __UINTPTR_TYPE__ NOTHROW(KCALL getrefcnt)(T const *__restrict self); \
-	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL isshared)(T const *__restrict self);            \
-	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL tryincref)(T *__restrict self);                 \
-	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL wasdestroyed)(T const *__restrict self);        \
-	NOBLOCK T *NOTHROW(KCALL xincref)(T *__restrict self);                                            \
-	NOBLOCK ATTR_RETNONNULL NONNULL((1)) T *NOTHROW(KCALL incref)(T *__restrict self);                \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL destroy)(T *__restrict self);                             \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref)(T *__restrict self);                              \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_nokill)(T *__restrict self);                       \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_likely)(T *__restrict self);                       \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_unlikely)(T *__restrict self);                     \
-	NOBLOCK void NOTHROW(KCALL xdecref)(T * self);                                                    \
-	NOBLOCK void NOTHROW(KCALL xdecref_nokill)(T * self);                                             \
-	NOBLOCK void NOTHROW(KCALL xdecref_likely)(T * self);                                             \
-	NOBLOCK void NOTHROW(KCALL xdecref_unlikely)(T * self);                                           \
+#define DEFINE_REFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy)                                              \
+	extern "C++" {                                                                                              \
+	T operator,(T, __NAMESPACE_INT_SYM __refcnt_select_tag);                                                    \
+	NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __UINTPTR_TYPE__ NOTHROW(KCALL getrefcnt)(T const *__restrict self); \
+	NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL isshared)(T const *__restrict self);            \
+	NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL wasdestroyed)(T const *__restrict self);        \
+	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL tryincref)(T *__restrict self);                           \
+	NOBLOCK T *NOTHROW(KCALL xincref)(T *__restrict self);                                                      \
+	NOBLOCK ATTR_RETNONNULL NONNULL((1)) T *NOTHROW(KCALL incref)(T *__restrict self);                          \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL destroy)(T *__restrict self);                                       \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref)(T *__restrict self);                                        \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_nokill)(T *__restrict self);                                 \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_likely)(T *__restrict self);                                 \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_unlikely)(T *__restrict self);                               \
+	NOBLOCK void NOTHROW(KCALL xdecref)(T * self);                                                              \
+	NOBLOCK void NOTHROW(KCALL xdecref_nokill)(T * self);                                                       \
+	NOBLOCK void NOTHROW(KCALL xdecref_likely)(T * self);                                                       \
+	NOBLOCK void NOTHROW(KCALL xdecref_unlikely)(T * self);                                                     \
 	}
-#define DEFINE_WEAKREFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy)                                    \
-	extern "C++" {                                                                                        \
-	T operator,(T, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                          \
-	NOBLOCK WUNUSED NONNULL((1)) __UINTPTR_TYPE__ NOTHROW(KCALL getweakrefcnt)(T const *__restrict self); \
-	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL isweakshared)(T *__restrict self);                  \
-	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL tryweakincref)(T *__restrict self);                 \
-	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL wasweakdestroyed)(T const *__restrict self);        \
-	NOBLOCK T *NOTHROW(KCALL xweakincref)(T *__restrict self);                                            \
-	NOBLOCK ATTR_RETNONNULL NONNULL((1)) T *NOTHROW(KCALL weakincref)(T *__restrict self);                \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdestroy)(T *__restrict self);                             \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref)(T *__restrict self);                              \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_nokill)(T *__restrict self);                       \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_likely)(T *__restrict self);                       \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_unlikely)(T *__restrict self);                     \
-	NOBLOCK void NOTHROW(KCALL xweakdecref)(T * self);                                                    \
-	NOBLOCK void NOTHROW(KCALL xweakdecref_nokill)(T * self);                                             \
-	NOBLOCK void NOTHROW(KCALL xweakdecref_likely)(T * self);                                             \
-	NOBLOCK void NOTHROW(KCALL xweakdecref_unlikely)(T * self);                                           \
+#define DEFINE_WEAKREFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy)                                              \
+	extern "C++" {                                                                                                  \
+	T operator,(T, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                                    \
+	NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __UINTPTR_TYPE__ NOTHROW(KCALL getweakrefcnt)(T const *__restrict self); \
+	NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL isweakshared)(T const *__restrict self);            \
+	NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL wasweakdestroyed)(T const *__restrict self);        \
+	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL tryweakincref)(T *__restrict self);                           \
+	NOBLOCK T *NOTHROW(KCALL xweakincref)(T *__restrict self);                                                      \
+	NOBLOCK ATTR_RETNONNULL NONNULL((1)) T *NOTHROW(KCALL weakincref)(T *__restrict self);                          \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdestroy)(T *__restrict self);                                       \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref)(T *__restrict self);                                        \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_nokill)(T *__restrict self);                                 \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_likely)(T *__restrict self);                                 \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_unlikely)(T *__restrict self);                               \
+	NOBLOCK void NOTHROW(KCALL xweakdecref)(T * self);                                                              \
+	NOBLOCK void NOTHROW(KCALL xweakdecref_nokill)(T * self);                                                       \
+	NOBLOCK void NOTHROW(KCALL xweakdecref_likely)(T * self);                                                       \
+	NOBLOCK void NOTHROW(KCALL xweakdecref_unlikely)(T * self);                                                     \
 	}
 #else /* __INTELLISENSE__ */
 
@@ -379,7 +379,7 @@ __NAMESPACE_INT_END
 	template<> class refcnt_methods< T > {                                                           \
 	public:                                                                                          \
 		typedef __typeof__(((T *)0)->field) refcnt_t;                                                \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) refcnt_t                                       \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_PURE NONNULL((1)) refcnt_t                             \
 		(KCALL getrefcnt)(T const *__restrict self) __CXX_NOEXCEPT {                                 \
 			return __hybrid_atomic_load(self->field, __ATOMIC_ACQUIRE);                              \
 		}                                                                                            \
@@ -430,7 +430,7 @@ __NAMESPACE_INT_END
 	template<> class weakrefcnt_methods< T > {                                                       \
 	public:                                                                                          \
 		typedef __typeof__(((T *)0)->field) refcnt_t;                                                \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) refcnt_t                                       \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_PURE NONNULL((1)) refcnt_t                             \
 		(KCALL getrefcnt)(T const *__restrict self) __CXX_NOEXCEPT {                                 \
 			return __hybrid_atomic_load(self->field, __ATOMIC_ACQUIRE);                              \
 		}                                                                                            \
@@ -483,7 +483,7 @@ __NAMESPACE_INT_END
 	template<> class refcnt_methods< T > {                                                                    \
 	public:                                                                                                   \
 		typedef __typeof__(((T *)0)->field) refcnt_t;                                                         \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) refcnt_t                                                \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_PURE NONNULL((1)) refcnt_t                                      \
 		(KCALL getrefcnt)(T const *__restrict self) __CXX_NOEXCEPT {                                          \
 			return __hybrid_atomic_load(self->field, __ATOMIC_ACQUIRE);                                       \
 		}                                                                                                     \
@@ -545,7 +545,7 @@ __NAMESPACE_INT_END
 	template<> class weakrefcnt_methods< T > {                                                                \
 	public:                                                                                                   \
 		typedef __typeof__(((T *)0)->field) refcnt_t;                                                         \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) refcnt_t                                                \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_PURE NONNULL((1)) refcnt_t                                      \
 		(KCALL getrefcnt)(T const *__restrict self) __CXX_NOEXCEPT {                                          \
 			return __hybrid_atomic_load(self->field, __ATOMIC_ACQUIRE);                                       \
 		}                                                                                                     \
@@ -604,19 +604,19 @@ __NAMESPACE_INT_END
 
 
 template<class T>
-FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __UINTPTR_TYPE__
+FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __UINTPTR_TYPE__
 NOTHROW(KCALL getrefcnt)(T const *__restrict self) {
 	return REFCNT_METHODS(T)::getrefcnt(self);
 }
 
 template<class T>
-FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
+FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL
 NOTHROW(KCALL isshared)(T const *__restrict self) {
 	return REFCNT_METHODS(T)::getrefcnt(self) > 1;
 }
 
 template<class T>
-FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
+FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL
 NOTHROW(KCALL wasdestroyed)(T const *__restrict self) {
 	return REFCNT_METHODS(T)::getrefcnt(self) == 0;
 }
@@ -697,19 +697,19 @@ NOTHROW(KCALL xdecref_unlikely)(T *self) {
 
 
 template<class T>
-FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __UINTPTR_TYPE__
+FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __UINTPTR_TYPE__
 NOTHROW(KCALL getweakrefcnt)(T const *__restrict self) {
 	return WEAKREFCNT_METHODS(T)::getrefcnt(self);
 }
 
 template<class T>
-FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
+FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL
 NOTHROW(KCALL isweakshared)(T const *__restrict self) {
 	return WEAKREFCNT_METHODS(T)::getrefcnt(self) > 1;
 }
 
 template<class T>
-FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
+FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL
 NOTHROW(KCALL wasweakdestroyed)(T const *__restrict self) {
 	return WEAKREFCNT_METHODS(T)::getrefcnt(self) == 0;
 }
@@ -816,10 +816,10 @@ public:
 	static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL endread)(T *__restrict self) __CXX_NOEXCEPT;
 	static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL endwrite)(T *__restrict self) __CXX_NOEXCEPT;
 	static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL end)(T *__restrict self) __CXX_NOEXCEPT;
-	static __CXX_FORCEINLINE WUNUSED NOBLOCK NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT;
-	static __CXX_FORCEINLINE WUNUSED NOBLOCK NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT;
-	static __CXX_FORCEINLINE WUNUSED NOBLOCK NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT;
-	static __CXX_FORCEINLINE WUNUSED NOBLOCK NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT;
+	static __CXX_FORCEINLINE WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT;
+	static __CXX_FORCEINLINE WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT;
+	static __CXX_FORCEINLINE WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT;
+	static __CXX_FORCEINLINE WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT;
 };
 #else
 template<class T> class sync_methods;
@@ -921,8 +921,8 @@ __NAMESPACE_INT_END
 	FORCELOCAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endread)(T *__restrict self) { sync_endread(&(self)->field); }                                                     \
 	FORCELOCAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endwrite)(T *__restrict self) { sync_endwrite(&(self)->field); }                                                   \
 	FORCELOCAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_end)(T *__restrict self) { sync_end(&(self)->field); }                                                             \
-	FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict self) { return sync_reading(&(self)->field); }                              \
-	FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict self) { return sync_writing(&(self)->field); }                              \
+	FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict self) { return sync_reading(&(self)->field); }                    \
+	FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict self) { return sync_writing(&(self)->field); }                    \
 	FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return sync_canread(&(self)->field); }                              \
 	FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return sync_canwrite(&(self)->field); }                            \
 	template<> class sync_methods< T > {                                                                                                                                       \
@@ -940,10 +940,10 @@ __NAMESPACE_INT_END
 		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL endread)(T *__restrict self) __CXX_NOEXCEPT { sync_endread(&(self)->field); }                                \
 		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL endwrite)(T *__restrict self) __CXX_NOEXCEPT { sync_endwrite(&(self)->field); }                              \
 		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL end)(T *__restrict self) __CXX_NOEXCEPT { sync_end(&(self)->field); }                                        \
-		static __CXX_FORCEINLINE WUNUSED NOBLOCK NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT { return sync_reading(&(self)->field); }           \
-		static __CXX_FORCEINLINE WUNUSED NOBLOCK NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT { return sync_writing(&(self)->field); }           \
-		static __CXX_FORCEINLINE WUNUSED NOBLOCK NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return sync_canread(&(self)->field); }           \
-		static __CXX_FORCEINLINE WUNUSED NOBLOCK NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return sync_canwrite(&(self)->field); }         \
+		static __CXX_FORCEINLINE WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT { return sync_reading(&(self)->field); } \
+		static __CXX_FORCEINLINE WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT { return sync_writing(&(self)->field); } \
+		static __CXX_FORCEINLINE WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return sync_canread(&(self)->field); } \
+		static __CXX_FORCEINLINE WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return sync_canwrite(&(self)->field); } \
 	};                                                                                                                                                                         \
 	}
 
@@ -975,10 +975,10 @@ __NAMESPACE_INT_END
 	FORCELOCAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endread)(T *__restrict self) { _endread(self); }                                                     \
 	FORCELOCAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endwrite)(T *__restrict self) { _endwrite(self); }                                                   \
 	FORCELOCAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_end)(T *__restrict self) { _end(self); }                                                             \
-	FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict self) { return _reading(self); }                              \
-	FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict self) { return _writing(self); }                              \
-	FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return _canread(self); }                              \
-	FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return _canwrite(self); }                            \
+	FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict self) { return _reading(self); }                    \
+	FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict self) { return _writing(self); }                    \
+	FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return _canread(self); }                    \
+	FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return _canwrite(self); }                  \
 	template<> class sync_methods< T > {                                                                                                                         \
 	public:                                                                                                                                                      \
 		static __CXX_FORCEINLINE NOCONNECT NONNULL((1)) void (KCALL read)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _read(self); }                         \
@@ -994,10 +994,10 @@ __NAMESPACE_INT_END
 		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL endread)(T *__restrict self) __CXX_NOEXCEPT { _endread(self); }                                \
 		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL endwrite)(T *__restrict self) __CXX_NOEXCEPT { _endwrite(self); }                              \
 		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL end)(T *__restrict self) __CXX_NOEXCEPT { _end(self); }                                        \
-		static __CXX_FORCEINLINE WUNUSED NOBLOCK NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT { return _reading(self); }           \
-		static __CXX_FORCEINLINE WUNUSED NOBLOCK NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT { return _writing(self); }           \
-		static __CXX_FORCEINLINE WUNUSED NOBLOCK NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return _canread(self); }           \
-		static __CXX_FORCEINLINE WUNUSED NOBLOCK NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return _canwrite(self); }         \
+		static __CXX_FORCEINLINE WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT { return _reading(self); } \
+		static __CXX_FORCEINLINE WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT { return _writing(self); } \
+		static __CXX_FORCEINLINE WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return _canread(self); } \
+		static __CXX_FORCEINLINE WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return _canwrite(self); } \
 	};                                                                                                                                                           \
 	}
 
@@ -1026,10 +1026,10 @@ __NAMESPACE_INT_END
 	FORCELOCAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endread)(T *__restrict self) { _release(self); }                                              \
 	FORCELOCAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endwrite)(T *__restrict self) { _release(self); }                                             \
 	FORCELOCAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_end)(T *__restrict self) { _release(self); }                                                  \
-	FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict self) { return _acquired(self); }                      \
-	FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict self) { return _acquired(self); }                      \
-	FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return _available(self); }                     \
-	FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return _available(self); }                    \
+	FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict self) { return _acquired(self); }            \
+	FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict self) { return _acquired(self); }            \
+	FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return _available(self); }           \
+	FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return _available(self); }          \
 	template<> class sync_methods< T > {                                                                                                                  \
 	public:                                                                                                                                               \
 		static __CXX_FORCEINLINE NOCONNECT NONNULL((1)) void (KCALL read)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _acquire(self); }               \
@@ -1045,10 +1045,10 @@ __NAMESPACE_INT_END
 		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL endread)(T *__restrict self) __CXX_NOEXCEPT { _release(self); }                         \
 		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL endwrite)(T *__restrict self) __CXX_NOEXCEPT { _release(self); }                        \
 		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL end)(T *__restrict self) __CXX_NOEXCEPT { _release(self); }                             \
-		static __CXX_FORCEINLINE WUNUSED NOBLOCK NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT { return _acquired(self); }   \
-		static __CXX_FORCEINLINE WUNUSED NOBLOCK NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT { return _acquired(self); }   \
-		static __CXX_FORCEINLINE WUNUSED NOBLOCK NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); }  \
-		static __CXX_FORCEINLINE WUNUSED NOBLOCK NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
+		static __CXX_FORCEINLINE WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT { return _acquired(self); } \
+		static __CXX_FORCEINLINE WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT { return _acquired(self); } \
+		static __CXX_FORCEINLINE WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
+		static __CXX_FORCEINLINE WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
 	};                                                                                                                                                    \
 	}
 
@@ -1077,10 +1077,10 @@ __NAMESPACE_INT_END
 	FORCELOCAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endread)(T *__restrict self) { _post(self); }                                                 \
 	FORCELOCAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endwrite)(T *__restrict self) { _post(self); }                                                \
 	FORCELOCAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_end)(T *__restrict self) { _post(self); }                                                     \
-	FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict UNUSED(self)) { return true; }                         \
-	FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict UNUSED(self)) { return true; }                         \
-	FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return _available(self); }                     \
-	FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return _available(self); }                    \
+	FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict UNUSED(self)) { return true; }               \
+	FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict UNUSED(self)) { return true; }               \
+	FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return _available(self); }           \
+	FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return _available(self); }          \
 	template<> class sync_methods< T > {                                                                                                                  \
 	public:                                                                                                                                               \
 		static __CXX_FORCEINLINE NOCONNECT NONNULL((1)) void (KCALL read)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _wait(self); }                  \
@@ -1096,10 +1096,10 @@ __NAMESPACE_INT_END
 		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL endread)(T *__restrict self) __CXX_NOEXCEPT { _post(self); }                            \
 		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL endwrite)(T *__restrict self) __CXX_NOEXCEPT { _post(self); }                           \
 		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL end)(T *__restrict self) __CXX_NOEXCEPT { _post(self); }                                \
-		static __CXX_FORCEINLINE WUNUSED NOBLOCK NONNULL((1)) bool (KCALL reading)(T const *__restrict UNUSED(self)) __CXX_NOEXCEPT { return true; }      \
-		static __CXX_FORCEINLINE WUNUSED NOBLOCK NONNULL((1)) bool (KCALL writing)(T const *__restrict UNUSED(self)) __CXX_NOEXCEPT { return true; }      \
-		static __CXX_FORCEINLINE WUNUSED NOBLOCK NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); }  \
-		static __CXX_FORCEINLINE WUNUSED NOBLOCK NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
+		static __CXX_FORCEINLINE WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL reading)(T const *__restrict UNUSED(self)) __CXX_NOEXCEPT { return true; } \
+		static __CXX_FORCEINLINE WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL writing)(T const *__restrict UNUSED(self)) __CXX_NOEXCEPT { return true; } \
+		static __CXX_FORCEINLINE WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
+		static __CXX_FORCEINLINE WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
 	};                                                                                                                                                    \
 	}
 

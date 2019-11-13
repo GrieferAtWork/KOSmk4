@@ -486,7 +486,7 @@ __NAMESPACE_STD_USING(imaxdiv_t)
 }
 
 
-[std][ATTR_PURE][section(.text.crt.unicode.static.convert)]
+[std][ATTR_LEAF][section(.text.crt.unicode.static.convert)]
 [if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(strtol)]
 [if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(strtoll), alias(strtoq)]
 [if(__SIZEOF_INTMAX_T__ == 8), alias(strto64)]
@@ -500,7 +500,7 @@ strtoimax:([nonnull] char const *__restrict nptr, char **endptr, int base) -> $i
 }
 
 
-[std][ATTR_PURE][section(.text.crt.unicode.static.convert)]
+[std][ATTR_LEAF][section(.text.crt.unicode.static.convert)]
 [if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(strtoul)]
 [if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(strtoull), alias(strtouq)]
 [if(__SIZEOF_INTMAX_T__ == 8), alias(strtou64)]
@@ -514,7 +514,7 @@ strtoumax:([nonnull] char const *__restrict nptr, char ** endptr, int base) -> $
 }
 
 
-[std][wchar][ATTR_PURE]
+[std][wchar][ATTR_LEAF]
 [section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
 [if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(wcstol)]
 [if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(wcstoll), alias(wcstoq)]
@@ -523,7 +523,7 @@ strtoumax:([nonnull] char const *__restrict nptr, char ** endptr, int base) -> $
 wcstoimax:([nonnull] $wchar_t const *__restrict nptr, $wchar_t **endptr, int base) -> $intmax_t
 	%{copy(%auto, str2wcs)}
 
-[std][wchar][ATTR_PURE]
+[std][wchar][ATTR_LEAF]
 [section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
 [if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(wcstoul)]
 [if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(wcstoull), alias(wcstouq)]
@@ -545,7 +545,7 @@ wcstoumax:([nonnull] $wchar_t const *__restrict nptr, $wchar_t **endptr, int bas
 [if(__SIZEOF_INTMAX_T__ == 8), alias(_strtoi64_l)]
 [if(__SIZEOF_INTMAX_T__ == 8), alias(strto64_l)]
 [if(__SIZEOF_INTMAX_T__ == 4), alias(strto32_l)]
-[ATTR_LEAF][alias(_strtoimax_l)]
+[alias(_strtoimax_l)][ATTR_LEAF]
 [section({.text.crt.unicode.locale.convert|.text.crt.dos.unicode.locale.convert})]
 strtoimax_l:([nonnull] char const *__restrict nptr, char **endptr, int base, $locale_t locale) -> $intmax_t {
 	(void)locale;
@@ -558,7 +558,7 @@ strtoimax_l:([nonnull] char const *__restrict nptr, char **endptr, int base, $lo
 [if(__SIZEOF_INTMAX_T__ == 8), alias(_strtoui64_l)]
 [if(__SIZEOF_INTMAX_T__ == 8), alias(strtou64_l)]
 [if(__SIZEOF_INTMAX_T__ == 4), alias(strtou32_l)]
-[ATTR_LEAF][alias(_strtoumax_l)]
+[alias(_strtoumax_l)][ATTR_LEAF]
 [section({.text.crt.unicode.locale.convert|.text.crt.dos.unicode.locale.convert})]
 strtoumax_l:([nonnull] char const *__restrict nptr, char **endptr, int base, $locale_t locale) -> $uintmax_t {
 	(void)locale;
@@ -570,7 +570,7 @@ strtoumax_l:([nonnull] char const *__restrict nptr, char **endptr, int base, $lo
 [if(__SIZEOF_INTMAX_T__ == 8), alias(_wcstoi64_l)]
 [if(__SIZEOF_INTMAX_T__ == 8), alias(wcsto64_l)]
 [if(__SIZEOF_INTMAX_T__ == 4), alias(wcsto32_l)]
-[wchar][ATTR_LEAF][alias(_wcstoimax_l)]
+[wchar][alias(_wcstoimax_l)][ATTR_LEAF]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
 wcstoimax_l:([nonnull] $wchar_t const *__restrict nptr, $wchar_t **endptr, int base, $locale_t locale) -> $intmax_t
 	%{copy(%auto, str2wcs)}
@@ -580,7 +580,7 @@ wcstoimax_l:([nonnull] $wchar_t const *__restrict nptr, $wchar_t **endptr, int b
 [if(__SIZEOF_INTMAX_T__ == 8), alias(_wcstoui64_l)]
 [if(__SIZEOF_INTMAX_T__ == 8), alias(wcstou64_l)]
 [if(__SIZEOF_INTMAX_T__ == 4), alias(wcstou32_l)]
-[wchar][ATTR_LEAF][alias(_wcstoumax_l)]
+[wchar][alias(_wcstoumax_l)][ATTR_LEAF]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
 wcstoumax_l:([nonnull] $wchar_t const *__restrict nptr, $wchar_t **endptr, int base, $locale_t locale) -> $uintmax_t
 	%{copy(%auto, str2wcs)}

@@ -130,7 +130,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL aio_pbuffer_copytovphys)(struct a
 
 
 #ifndef __INTELLISENSE__
-LOCAL NOBLOCK WUNUSED NONNULL((1)) size_t
+LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) size_t
 NOTHROW(KCALL aio_buffer_size)(struct aio_buffer const *__restrict self) {
 	size_t i, result;
 	result = self->ab_last + self->ab_head.ab_size;
@@ -139,7 +139,7 @@ NOTHROW(KCALL aio_buffer_size)(struct aio_buffer const *__restrict self) {
 	return result;
 }
 
-LOCAL NOBLOCK WUNUSED NONNULL((1)) size_t
+LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) size_t
 NOTHROW(KCALL aio_pbuffer_size)(struct aio_pbuffer const *__restrict self) {
 	size_t i, result;
 	result = self->ab_last + self->ab_head.ab_size;

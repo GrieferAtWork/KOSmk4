@@ -117,7 +117,7 @@ format_wsnprintf_printer:([nonnull] /*struct format_wsnprintf_data**/ void *arg,
 	%{copy(format_snprintf_printer, str2wcs)}
 
 
-[doc_alias(format_width)]
+[doc_alias(format_width)][ATTR_PURE]
 [if(__SIZEOF_WCHAR_T__ == 4), preferred_alias(format_length)][wchar]
 format_wwidth:(void *arg, [nonnull] wchar_t const *__restrict data, $size_t datalen) -> $ssize_t {
 #if __SIZEOF_WCHAR_T__ == 2
@@ -139,11 +139,16 @@ format_wwidth:(void *arg, [nonnull] wchar_t const *__restrict data, $size_t data
 #else
 	(void)arg;
 	(void)data;
+	/* XXX: Not necessarily correct, as the 32-bit variant is actually ATTR_CONST.
+	 *      However, magic headers don't support conditional attributes, so we can't just do
+	 *      [if(__SIZEOF_WCHAR_T__ == 2), ATTR_PURE]
+	 *      [if(__SIZEOF_WCHAR_T__ != 2), ATTR_CONST] */
+	COMPILER_IMPURE();
 	return (ssize_t)datalen;
 #endif
 }
 
-[noexport][nocrt][nouser]
+[noexport][nocrt][nouser][ATTR_CONST]
 format_wlength:(void *arg, wchar_t const *__restrict data, $size_t datalen) -> $ssize_t = format_length;
 
 

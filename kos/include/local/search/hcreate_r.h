@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7656ccc */
+/* HASH CRC-32:0x7a5fc0f4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@
  * algorithm is adequate because
  * a)  the code is (most probably) called a few times per program run and
  * b)  the number is small because the table must fit in the core */
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_isprime,(unsigned int __number),isprime,(__number))
+__CREDIRECT(__ATTR_CONST,int,__NOTHROW_NCX,__localdep_isprime,(unsigned int __number),isprime,(__number))
 #else /* LIBC: isprime */
 #include <local/search/isprime.h>
 /* For the used double hash method the table size has to be a prime. To
@@ -66,7 +66,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(hcreate_r) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hcreate_r))(__SIZE_TYPE__ __nel,
                                                        struct hsearch_data *__htab) {
-#line 328 "kos/src/libc/magic/search.c"
+#line 329 "kos/src/libc/magic/search.c"
 	typedef struct {
 		unsigned int __used;
 		ENTRY        __entry;

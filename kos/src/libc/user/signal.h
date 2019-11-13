@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9460408 */
+/* HASH CRC-32:0x6bc97555 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,8 +93,8 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_sigrelse)(int signo);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sigignore)(int signo);
 /* @param signo: One of `SIG*' */
 INTDEF sighandler_t NOTHROW_NCX(LIBCCALL libc_sigset)(int signo, sighandler_t disp);
-INTDEF int NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmin)(void);
-INTDEF int NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void);
+INTDEF ATTR_CONST int NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmin)(void);
+INTDEF ATTR_CONST int NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void);
 
 DECL_END
 

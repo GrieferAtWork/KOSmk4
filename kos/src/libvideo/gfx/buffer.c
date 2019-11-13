@@ -86,6 +86,7 @@ libvideo_buffer_create(unsigned int type, size_t size_x, size_t size_y,
 INTERN WUNUSED /*REF*/ struct video_buffer *CC
 libvideo_buffer_screen(void) {
 	/* TODO */
+	COMPILER_IMPURE();
 	return NULL;
 }
 

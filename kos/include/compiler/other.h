@@ -223,6 +223,7 @@
 #define __COMPILER_BARRIER()       /* nothing */
 #define __COMPILER_READ_BARRIER()  /* nothing */
 #define __COMPILER_WRITE_BARRIER() /* nothing */
+#define __COMPILER_IMPURE()      /* nothing */
 
 #define __NULLPTR                0
 

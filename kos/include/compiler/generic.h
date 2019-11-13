@@ -679,6 +679,7 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #define __COMPILER_BARRIER()       (void)0 /* ??? */
 #define __COMPILER_READ_BARRIER()  (void)0 /* ??? */
 #define __COMPILER_WRITE_BARRIER() (void)0 /* ??? */
+#define __COMPILER_IMPURE()      (void)0
 
 #ifdef __cplusplus
 #ifdef __INTELLISENSE__

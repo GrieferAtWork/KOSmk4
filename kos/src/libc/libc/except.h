@@ -59,48 +59,36 @@ struct exception_info;
 INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL struct exception_info *NOTHROW_NCX(LIBCCALL libc_error_info)(void);
 INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL struct exception_data *NOTHROW_NCX(LIBCCALL libc_error_data)(void);
 INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL error_register_state_t *NOTHROW_NCX(LIBCCALL libc_error_register_state)(void);
-INTDEF WUNUSED error_code_t NOTHROW_NCX(LIBCCALL libc_error_code)(void);
-INTDEF WUNUSED bool NOTHROW_NCX(LIBCCALL libc_error_active)(void);
-INTDEF WUNUSED error_class_t NOTHROW_NCX(LIBCCALL libc_error_class)(void);
-INTDEF WUNUSED error_subclass_t NOTHROW_NCX(LIBCCALL libc_error_subclass)(void);
-INTDEF WUNUSED errno_t NOTHROW_NCX(LIBCCALL libc_error_as_errno)(void);
-
-#if defined(__i386__) && !defined(__x86_64__)
-#define LIBC_ERROR_UNWIND_CC  ATTR_FASTCALL
-#else
-#define LIBC_ERROR_UNWIND_CC  LIBCCALL
-#endif
+INTDEF WUNUSED ATTR_PURE error_code_t NOTHROW_NCX(LIBCCALL libc_error_code)(void);
+INTDEF WUNUSED ATTR_PURE bool NOTHROW_NCX(LIBCCALL libc_error_active)(void);
+INTDEF WUNUSED ATTR_PURE error_class_t NOTHROW_NCX(LIBCCALL libc_error_class)(void);
+INTDEF WUNUSED ATTR_PURE error_subclass_t NOTHROW_NCX(LIBCCALL libc_error_subclass)(void);
 
 /* Functions implemented in assembly. */
 INTDEF ATTR_NORETURN void NOTHROW_NCX(LIBCCALL libc_error_throw_current)(void);
 INTDEF ATTR_NORETURN void NOTHROW_NCX(LIBCCALL libc_error_rethrow)(void);
-#if defined(__i386__) && !defined(__x86_64__)
-INTDEF ATTR_NORETURN void (ATTR_FASTCALL libc_error_throw)(error_code_t code);
-INTDEF ATTR_NORETURN void (ATTR_CDECL libc_error_thrown)(error_code_t code, unsigned int argc, ...);
-#else
-INTDEF ATTR_NORETURN void (LIBCCALL libc_error_throw)(error_code_t code);
-INTDEF ATTR_NORETURN void (LIBCCALL libc_error_thrown)(error_code_t code, unsigned int argc, ...);
-#endif
+INTDEF ATTR_NORETURN void (__ERROR_THROW_CC libc_error_throw)(error_code_t code);
+INTDEF ATTR_NORETURN void (__ERROR_THROWN_CC libc_error_thrown)(error_code_t code, unsigned int argc, ...);
 
 /* Unwind the stack for a KERNKOS exception. */
 INTDEF WUNUSED error_register_state_t *
-NOTHROW_NCX(LIBC_ERROR_UNWIND_CC libc_error_unwind)(error_register_state_t *__restrict state);
+NOTHROW_NCX(__ERROR_UNWIND_CC libc_error_unwind)(error_register_state_t *__restrict state);
 
 #ifndef __KERNEL__
-INTDEF NONNULL((1, 2)) error_register_state_t *NOTHROW_NCX(LIBC_ERROR_UNWIND_CC libc_Unwind_RaiseException_impl)(error_register_state_t *__restrict state, struct _Unwind_Exception *exception_object);
-INTDEF WUNUSED NONNULL((1, 2)) error_register_state_t *NOTHROW_NCX(LIBC_ERROR_UNWIND_CC libc_Unwind_Resume_impl)(error_register_state_t *__restrict state, struct _Unwind_Exception *exception_object);
-INTDEF NONNULL((1, 2)) error_register_state_t *NOTHROW_NCX(LIBC_ERROR_UNWIND_CC libc_Unwind_Resume_or_Rethrow_impl)(error_register_state_t *__restrict state, struct _Unwind_Exception *__restrict exception_object);
-INTDEF NONNULL((1, 2, 3)) error_register_state_t *NOTHROW_NCX(LIBC_ERROR_UNWIND_CC libc_Unwind_ForcedUnwind_impl)(error_register_state_t *__restrict state, struct _Unwind_Exception *__restrict exception_object, _Unwind_Stop_Fn stop, void *stop_arg);
-INTDEF NONNULL((1, 2)) _Unwind_Reason_Code LIBC_ERROR_UNWIND_CC libc_Unwind_Backtrace_impl(error_register_state_t *__restrict state, _Unwind_Trace_Fn func, void *arg);
+INTDEF NONNULL((1, 2)) error_register_state_t *NOTHROW_NCX(__ERROR_UNWIND_CC libc_Unwind_RaiseException_impl)(error_register_state_t *__restrict state, struct _Unwind_Exception *exception_object);
+INTDEF WUNUSED NONNULL((1, 2)) error_register_state_t *NOTHROW_NCX(__ERROR_UNWIND_CC libc_Unwind_Resume_impl)(error_register_state_t *__restrict state, struct _Unwind_Exception *exception_object);
+INTDEF NONNULL((1, 2)) error_register_state_t *NOTHROW_NCX(__ERROR_UNWIND_CC libc_Unwind_Resume_or_Rethrow_impl)(error_register_state_t *__restrict state, struct _Unwind_Exception *__restrict exception_object);
+INTDEF NONNULL((1, 2, 3)) error_register_state_t *NOTHROW_NCX(__ERROR_UNWIND_CC libc_Unwind_ForcedUnwind_impl)(error_register_state_t *__restrict state, struct _Unwind_Exception *__restrict exception_object, _Unwind_Stop_Fn stop, void *stop_arg);
+INTDEF NONNULL((1, 2)) _Unwind_Reason_Code __ERROR_UNWIND_CC libc_Unwind_Backtrace_impl(error_register_state_t *__restrict state, _Unwind_Trace_Fn func, void *arg);
 
 INTDEF NONNULL((1)) _Unwind_Reason_Code NOTHROW_NCX(LIBCCALL libc_Unwind_Resume_or_Rethrow)(struct _Unwind_Exception *__restrict exception_object);
 INTDEF NONNULL((1, 2)) _Unwind_Reason_Code NOTHROW_NCX(LIBCCALL libc_Unwind_ForcedUnwind)(struct _Unwind_Exception *__restrict exception_object, _Unwind_Stop_Fn stop, void *stop_arg);
 INTDEF NONNULL((1)) _Unwind_Reason_Code NOTHROW_NCX(LIBCCALL libc_Unwind_Backtrace)(_Unwind_Trace_Fn func, void *arg);
 
-INTDEF WUNUSED NONNULL((1)) _Unwind_Word NOTHROW_NCX(LIBCCALL libc_Unwind_GetCFA)(struct _Unwind_Context *__restrict self);
-INTDEF WUNUSED NONNULL((1)) _Unwind_Ptr NOTHROW_NCX(LIBCCALL libc_Unwind_GetDataRelBase)(struct _Unwind_Context *__restrict self);
-INTDEF WUNUSED NONNULL((1)) _Unwind_Ptr NOTHROW_NCX(LIBCCALL libc_Unwind_GetTextRelBase)(struct _Unwind_Context *__restrict self);
-INTDEF WUNUSED void *NOTHROW_NCX(LIBCCALL libc_Unwind_FindEnclosingFunction)(void *pc);
+INTDEF WUNUSED ATTR_PURE NONNULL((1)) _Unwind_Word NOTHROW_NCX(LIBCCALL libc_Unwind_GetCFA)(struct _Unwind_Context const *__restrict self);
+INTDEF WUNUSED ATTR_PURE NONNULL((1)) _Unwind_Ptr NOTHROW_NCX(LIBCCALL libc_Unwind_GetDataRelBase)(struct _Unwind_Context const *__restrict self);
+INTDEF WUNUSED ATTR_PURE NONNULL((1)) _Unwind_Ptr NOTHROW_NCX(LIBCCALL libc_Unwind_GetTextRelBase)(struct _Unwind_Context const *__restrict self);
+INTDEF WUNUSED ATTR_PURE void *NOTHROW_NCX(LIBCCALL libc_Unwind_FindEnclosingFunction)(void *pc);
 
 /* Kernel-level exception handling (mode #2/#3 and mode #4). */
 INTDEF error_register_state_t *__EXCEPT_HANDLER_CC libc_except_handler3_impl(error_register_state_t *__restrict state, struct exception_data *__restrict error);
@@ -120,13 +108,13 @@ INTDEF ATTR_NORETURN void __EXCEPT_HANDLER_CC libc_except_handler4(error_registe
 INTDEF NONNULL((1)) _Unwind_Reason_Code NOTHROW_NCX(LIBCCALL libc_Unwind_RaiseException)(struct _Unwind_Exception *__restrict exception_object);
 INTDEF ATTR_NORETURN NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_Unwind_Resume)(struct _Unwind_Exception *__restrict exception_object);
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_Unwind_DeleteException)(struct _Unwind_Exception *__restrict exception_object);
-INTDEF WUNUSED NONNULL((1)) uintptr_t NOTHROW_NCX(LIBCCALL libc_Unwind_GetGR)(struct _Unwind_Context *__restrict context, int index);
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_Unwind_SetGR)(struct _Unwind_Context *__restrict context, int index, uintptr_t value);
-INTDEF WUNUSED NONNULL((1)) uintptr_t NOTHROW_NCX(LIBCCALL libc_Unwind_GetIP)(struct _Unwind_Context *__restrict context);
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_Unwind_SetIP)(struct _Unwind_Context *__restrict context, uintptr_t value);
-INTDEF WUNUSED NONNULL((1)) uintptr_t NOTHROW_NCX(LIBCCALL libc_Unwind_GetLanguageSpecificData)(struct _Unwind_Context *__restrict context);
-INTDEF WUNUSED NONNULL((1)) uintptr_t NOTHROW_NCX(LIBCCALL libc_Unwind_GetRegionStart)(struct _Unwind_Context *__restrict context);
-INTDEF WUNUSED NONNULL((1, 2)) uintptr_t NOTHROW_NCX(LIBCCALL libc_Unwind_GetIPInfo)(struct _Unwind_Context *__restrict context, int *__restrict ip_before_insn);
+INTDEF WUNUSED ATTR_PURE NONNULL((1)) uintptr_t NOTHROW_NCX(LIBCCALL libc_Unwind_GetGR)(struct _Unwind_Context const *__restrict context, int index);
+INTDEF ATTR_LEAF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_Unwind_SetGR)(struct _Unwind_Context *__restrict context, int index, uintptr_t value);
+INTDEF WUNUSED ATTR_PURE NONNULL((1)) uintptr_t NOTHROW_NCX(LIBCCALL libc_Unwind_GetIP)(struct _Unwind_Context const *__restrict context);
+INTDEF ATTR_LEAF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_Unwind_SetIP)(struct _Unwind_Context *__restrict context, uintptr_t value);
+INTDEF WUNUSED ATTR_PURE NONNULL((1)) uintptr_t NOTHROW_NCX(LIBCCALL libc_Unwind_GetLanguageSpecificData)(struct _Unwind_Context const *__restrict context);
+INTDEF WUNUSED ATTR_PURE NONNULL((1)) uintptr_t NOTHROW_NCX(LIBCCALL libc_Unwind_GetRegionStart)(struct _Unwind_Context const *__restrict context);
+INTDEF WUNUSED ATTR_LEAF NONNULL((1, 2)) uintptr_t NOTHROW_NCX(LIBCCALL libc_Unwind_GetIPInfo)(struct _Unwind_Context const *__restrict context, int *__restrict ip_before_insn);
 
 #endif /* __CC__ */
 

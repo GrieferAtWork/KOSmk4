@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xadb52e9c */
+/* HASH CRC-32:0x3de275a2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,24 @@
  */
 #ifndef __local_wcstombs_defined
 #define __local_wcstombs_defined 1
+/* Dependency: "wcsrtombs" from "wchar" */
+#ifndef ____localdep_wcsrtombs_defined
+#define ____localdep_wcsrtombs_defined 1
+#ifdef __CRT_HAVE_wcsrtombs
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsrtombs,(char *__dst, __WCHAR_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__ps),wcsrtombs,(__dst,__psrc,__dstlen,__ps))
+#else /* LIBC: wcsrtombs */
+#include <local/wchar/wcsrtombs.h>
+#define __localdep_wcsrtombs (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsrtombs))
+#endif /* wcsrtombs... */
+#endif /* !____localdep_wcsrtombs_defined */
+
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcstombs) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstombs))(char *__restrict __s,
-                                                      __WCHAR_TYPE__ const *__restrict __pwcs,
-                                                      __SIZE_TYPE__ __n) {
-#line 701 "kos/src/libc/magic/stdlib.c"
-	/* TODO */
-	return 0;
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstombs))(char *__restrict __dst,
+                                                      __WCHAR_TYPE__ const *__restrict __src,
+                                                      __SIZE_TYPE__ __dstlen) {
+#line 700 "kos/src/libc/magic/stdlib.c"
+	return __localdep_wcsrtombs(__dst, (__WCHAR_TYPE__ const **)&__src, __dstlen, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_wcstombs_defined */

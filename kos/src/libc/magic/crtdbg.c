@@ -333,13 +333,13 @@ _free_dbg:([nullable] void *ptr, int block_type) {
 	free(ptr);
 }
 
-[guard][ATTR_WUNUSED][same_impl][requires($has_function(_msize))]
+[guard][ATTR_WUNUSED][same_impl][requires($has_function(_msize))][ATTR_PURE]
 _msize_dbg:([nonnull] void *ptr, int block_type) -> $size_t {
 	(void)block_type;
 	return _msize(ptr);
 }
 
-[guard][ATTR_WUNUSED][same_impl][requires($has_function(_aligned_msize))]
+[guard][ATTR_WUNUSED][same_impl][requires($has_function(_aligned_msize))][ATTR_PURE]
 _aligned_msize_dbg:([nonnull] void *ptr, $size_t min_alignment, $size_t offset) -> $size_t {
 	return _aligned_msize(ptr, min_alignment, offset);
 }
@@ -443,6 +443,7 @@ _wtempnam_dbg:(__WCHAR16_TYPE__ const *dir_name,
 	(void)dir_name;
 	(void)file_prefix;
 	/* TODO: c16tempnam() */
+	COMPILER_IMPURE();
 	return NULL;
 }
 
@@ -467,6 +468,7 @@ _wfullpath_dbg:([outp_opt(buflen)] __WCHAR16_TYPE__ *full_path,
 	(void)path;
 	(void)buflen;
 	/* TODO: c16fullpath() */
+	COMPILER_IMPURE();
 	return NULL;
 }
 
@@ -509,6 +511,7 @@ _wgetdcwd_dbg:(int driveno, [outp_opt(buflen)] __WCHAR16_TYPE__ *buf,
 	(void)buf;
 	(void)buflen;
 	/* TODO: c16getdcwd() */
+	COMPILER_IMPURE();
 	return NULL;
 }
 
@@ -536,29 +539,34 @@ _wdupenv_s_dbg:([nullable] __WCHAR16_TYPE__ **pbuf, [nullable] $size_t *pbuflen,
 	(void)pbuflen;
 	(void)varname;
 	/* TODO: c16dupenv_s() */
+	COMPILER_IMPURE();
 	return 1;
 }
 
 _CrtCheckMemory:() -> int {
+	COMPILER_IMPURE();
 	return 0;
 }
 
 %typedef void (__ATTR_CDECL *_PFNCRTDOFORALLCLIENTOBJECTS)(void *, void *);
 [same_impl]
 _CrtDoForAllClientObjects:([nonnull] _PFNCRTDOFORALLCLIENTOBJECTS pfn, void *context) {
+	COMPILER_IMPURE();
 	(void)pfn;
 	(void)context;
 }
 
-[ATTR_WUNUSED][same_impl]
+[ATTR_WUNUSED][same_impl][ATTR_PURE]
 _CrtIsValidPointer:(void const *ptr, __STDC_UINT_AS_SIZE_T num_bytes, int writable) -> int {
+	COMPILER_IMPURE();
 	(void)num_bytes;
 	(void)writable;
 	return ptr != NULL;
 }
 
-[ATTR_WUNUSED][same_impl]
+[ATTR_WUNUSED][same_impl][ATTR_PURE]
 _CrtIsValidHeapPointer:(void const *heap_ptr) -> int {
+	COMPILER_IMPURE();
 	return heap_ptr != NULL;
 }
 
@@ -578,8 +586,9 @@ _CrtIsMemoryBlock:(void const *ptr, __STDC_UINT_AS_SIZE_T num_bytes,
 	return 0;
 }
 
-[ATTR_WUNUSED][same_impl]
+[ATTR_WUNUSED][same_impl][ATTR_PURE]
 _CrtReportBlockType:(void const *ptr) -> int {
+	COMPILER_IMPURE();
 	return ptr ? 1 /*_NORMAL_BLOCK*/ : 0 /*_FREE_BLOCK*/;
 }
 
@@ -600,26 +609,31 @@ _CrtMemDifference:([nonnull] /*out*/ _CrtMemState *state,
 
 [same_impl]
 _CrtMemDumpAllObjectsSince:([nonnull] _CrtMemState const *state) {
+	COMPILER_IMPURE();
 	(void)state;
 }
 
 [same_impl]
 _CrtMemDumpStatistics:([nonnull] _CrtMemState const *state) {
+	COMPILER_IMPURE();
 	(void)state;
 }
 
 [same_impl]
 _CrtDumpMemoryLeaks:() -> int {
+	COMPILER_IMPURE();
 	return 0;
 }
 
 [same_impl]
 _CrtSetCheckCount:(int check_count) -> int {
+	COMPILER_IMPURE();
 	return 0;
 }
 
-[same_impl]
+[same_impl][ATTR_PURE]
 _CrtGetCheckCount:() -> int {
+	COMPILER_IMPURE();
 	return 0;
 }
 

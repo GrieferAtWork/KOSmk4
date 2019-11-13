@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6292252b */
+/* HASH CRC-32:0xe1148cd3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,7 +20,7 @@
 #ifndef __local_cfgetospeed_defined
 #define __local_cfgetospeed_defined 1
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(cfgetospeed) __ATTR_WUNUSED __ATTR_NONNULL((1)) speed_t
+__LOCAL_LIBC(cfgetospeed) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) speed_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfgetospeed))(struct termios const *__restrict __termios_p) {
 #line 52 "kos/src/libc/magic/termios.c"
 	return __termios_p->c_ospeed;

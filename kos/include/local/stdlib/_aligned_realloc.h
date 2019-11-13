@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a8a25ae */
+/* HASH CRC-32:0x742ada0c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) __ATTR_ALLOC_ALI
 #ifndef ____localdep__aligned_msize_defined
 #define ____localdep__aligned_msize_defined 1
 #ifdef __CRT_HAVE__aligned_msize
-__CREDIRECT(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__aligned_msize,(void *__mptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_msize,(__mptr,__min_alignment,__offset))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__aligned_msize,(void *__mptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_msize,(__mptr,__min_alignment,__offset))
 #else /* LIBC: _aligned_msize */
 #include <local/stdlib/_aligned_msize.h>
 #define __localdep__aligned_msize (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_msize))
@@ -84,7 +84,7 @@ __LOCAL_LIBC(_aligned_realloc) __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLO
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_realloc))(void *__mptr,
                                                               __SIZE_TYPE__ __newsize,
                                                               __SIZE_TYPE__ __min_alignment) {
-#line 2515 "kos/src/libc/magic/stdlib.c"
+#line 2567 "kos/src/libc/magic/stdlib.c"
 	void *__result;
 	__result = __localdep__aligned_malloc(__newsize, __min_alignment);
 	if (__result && __mptr) {

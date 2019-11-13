@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb55d3d95 */
+/* HASH CRC-32:0xee9aded6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #ifndef ____localdep_fuzzy_memcmpw_defined
 #define ____localdep_fuzzy_memcmpw_defined 1
 #ifdef __CRT_HAVE_fuzzy_memcmpw
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_memcmpw,(void const *__s1, __SIZE_TYPE__ __s1_words, void const *__s2, __SIZE_TYPE__ __s2_words),fuzzy_memcmpw,(__s1,__s1_words,__s2,__s2_words))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_memcmpw,(void const *__s1, __SIZE_TYPE__ __s1_words, void const *__s2, __SIZE_TYPE__ __s2_words),fuzzy_memcmpw,(__s1,__s1_words,__s2,__s2_words))
 #elif !defined(__NO_MALLOCA)
 #include <local/string/fuzzy_memcmpw.h>
 #define __localdep_fuzzy_memcmpw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_memcmpw))
@@ -38,7 +38,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__
 #ifndef ____localdep_fuzzy_memcmpl_defined
 #define ____localdep_fuzzy_memcmpl_defined 1
 #ifdef __CRT_HAVE_fuzzy_memcmpl
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_memcmpl,(void const *__s1, __SIZE_TYPE__ __s1_dwords, void const *__s2, __SIZE_TYPE__ __s2_dwords),fuzzy_memcmpl,(__s1,__s1_dwords,__s2,__s2_dwords))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_memcmpl,(void const *__s1, __SIZE_TYPE__ __s1_dwords, void const *__s2, __SIZE_TYPE__ __s2_dwords),fuzzy_memcmpl,(__s1,__s1_dwords,__s2,__s2_dwords))
 #elif !defined(__NO_MALLOCA)
 #include <local/string/fuzzy_memcmpl.h>
 #define __localdep_fuzzy_memcmpl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_memcmpl))
@@ -51,7 +51,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__
 #ifndef ____localdep_fuzzy_memcmp_defined
 #define ____localdep_fuzzy_memcmp_defined 1
 #ifdef __CRT_HAVE_fuzzy_memcmp
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_memcmp,(void const *__s1, __SIZE_TYPE__ __s1_bytes, void const *__s2, __SIZE_TYPE__ __s2_bytes),fuzzy_memcmp,(__s1,__s1_bytes,__s2,__s2_bytes))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_memcmp,(void const *__s1, __SIZE_TYPE__ __s1_bytes, void const *__s2, __SIZE_TYPE__ __s2_bytes),fuzzy_memcmp,(__s1,__s1_bytes,__s2,__s2_bytes))
 #elif !defined(__NO_MALLOCA)
 #include <local/string/fuzzy_memcmp.h>
 #define __localdep_fuzzy_memcmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_memcmp))
@@ -66,7 +66,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(fuzzy_c16memcmp))(__CHAR16_TYPE__ con
                                                              __SIZE_TYPE__ __s1_chars,
                                                              __CHAR16_TYPE__ const *__s2,
                                                              __SIZE_TYPE__ __s2_chars) {
-#line 1359 "kos/src/libc/magic/wchar.c"
+#line 1451 "kos/src/libc/magic/wchar.c"
 #if 2 == 2
 	return __localdep_fuzzy_memcmpw(__s1, __s1_chars, __s2, __s2_chars);
 #elif 2 == 4

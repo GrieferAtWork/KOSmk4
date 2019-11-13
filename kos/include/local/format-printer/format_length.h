@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2aca716a */
+/* HASH CRC-32:0x36720d3a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_format_length_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Always re-return `datalen' and ignore all other arguments */
-__LOCAL_LIBC(format_length) __SSIZE_TYPE__
+__LOCAL_LIBC(format_length) __ATTR_CONST __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_length))(void *__arg,
                                                            /*utf-8*/ char const *__restrict __data,
                                                            __SIZE_TYPE__ __datalen) {

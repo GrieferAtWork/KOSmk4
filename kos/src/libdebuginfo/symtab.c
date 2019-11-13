@@ -51,16 +51,16 @@ DECL_BEGIN
  * @return: * :   A pointer to the symbol's Elf32_Sym or Elf64_Sym structure.
  * @return: NULL: All defined symbols have an address > module_relative_pc
  * @return: NULL: The given symbol table is empty, too small, or corrupted.
- * @return: NULL: The given `table_entsize' is neither `sizeof(Elf32_Sym)', nor `sizeof(Elf64_Sym)' */
-INTERN TEXTSECTION WUNUSED NONNULL((1, 2)) byte_t *
-NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t *__restrict symtab_start,
-                                       byte_t *__restrict symtab_end,
-                                       size_t table_entsize,
+ * @return: NULL: The given `symtab_entsize' is neither `sizeof(Elf32_Sym)', nor `sizeof(Elf64_Sym)' */
+INTERN TEXTSECTION WUNUSED ATTR_PURE NONNULL((1, 2)) byte_t const *
+NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t const *__restrict symtab_start,
+                                       byte_t const *__restrict symtab_end,
+                                       size_t symtab_entsize,
                                        uintptr_t module_relative_pc) {
-	byte_t *result;
+	byte_t const *result;
 	if (symtab_start >= symtab_end)
 		goto done_null;
-	if (table_entsize == sizeof(Elf32_Sym)) {
+	if (symtab_entsize == sizeof(Elf32_Sym)) {
 		Elf32_Sym *iter;
 		Elf32_Addr result_value;
 		symtab_end -= sizeof(Elf32_Sym) - 1;
@@ -89,7 +89,7 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t *__restrict symtab_start,
 				result_value = iter->st_value;
 			}
 		}
-	} else if (table_entsize == sizeof(Elf64_Sym)) {
+	} else if (symtab_entsize == sizeof(Elf64_Sym)) {
 		Elf64_Sym *iter;
 		Elf64_Addr result_value;
 		symtab_end -= sizeof(Elf64_Sym) - 1;

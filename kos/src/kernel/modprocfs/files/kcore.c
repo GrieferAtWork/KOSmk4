@@ -29,7 +29,7 @@ INTERN NONNULL((1, 2)) ssize_t KCALL
 ProcFS_KCore_Printer(struct regular_node *__restrict UNUSED(self),
                      pformatprinter printer, void *arg) {
 	/* TODO: Print a coredump for the kernel core itself */
-	return 0;
+	return (*printer)(arg, "", 0);
 }
 
 DECL_END

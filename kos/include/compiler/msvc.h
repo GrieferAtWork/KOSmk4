@@ -333,6 +333,8 @@ extern void (__cdecl _ReadWriteBarrier)(void);
 } }
 #endif /* __cplusplus */
 
+#define __COMPILER_IMPURE() (void)0
+
 #ifdef __cplusplus
 #ifdef __INTELLISENSE__
 #   define __NULLPTR    nullptr

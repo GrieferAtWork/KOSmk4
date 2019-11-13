@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb096e7f8 */
+/* HASH CRC-32:0x9bdff3f2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,8 +28,8 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF WUNUSED NONNULL((1)) speed_t NOTHROW_NCX(LIBCCALL libc_cfgetospeed)(struct termios const *__restrict termios_p);
-INTDEF WUNUSED NONNULL((1)) speed_t NOTHROW_NCX(LIBCCALL libc_cfgetispeed)(struct termios const *__restrict termios_p);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) speed_t NOTHROW_NCX(LIBCCALL libc_cfgetospeed)(struct termios const *__restrict termios_p);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) speed_t NOTHROW_NCX(LIBCCALL libc_cfgetispeed)(struct termios const *__restrict termios_p);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_cfsetospeed)(struct termios *__restrict termios_p, speed_t speed);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_cfsetispeed)(struct termios *__restrict termios_p, speed_t speed);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_cfsetspeed)(struct termios *__restrict termios_p, speed_t speed);

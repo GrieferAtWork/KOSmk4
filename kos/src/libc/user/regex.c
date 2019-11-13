@@ -161,6 +161,7 @@ NOTHROW_NCX(LIBCCALL libc_re_compile_fastmap)(struct re_pattern_buffer *buffer)
 /*[[[body:re_compile_fastmap]]]*/
 {
 	(void)buffer; /* no-op */
+	COMPILER_IMPURE();
 	return 0;
 }
 /*[[[end:re_compile_fastmap]]]*/

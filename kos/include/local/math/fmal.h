@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2966647 */
+/* HASH CRC-32:0xfd60001b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_fmal_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Multiply-add function computed as a ternary operation */
-__LOCAL_LIBC(fmal) __ATTR_WUNUSED long double
+__LOCAL_LIBC(fmal) __ATTR_CONST __ATTR_WUNUSED long double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmal))(long double __x,
                                               long double __y,
                                               long double __z) {

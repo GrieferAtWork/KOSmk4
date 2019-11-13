@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x792d28d4 */
+/* HASH CRC-32:0x81761174 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,12 +29,12 @@
 DECL_BEGIN
 
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc___locale_ctype_ptr)(void);
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc___locale_ctype_ptr_l)(locale_t locale);
-INTDEF ATTR_CONST WUNUSED uint16_t const **NOTHROW(LIBCCALL libc___ctype_b_loc)(void);
-INTDEF ATTR_CONST WUNUSED int32_t const **NOTHROW(LIBCCALL libc___ctype_tolower_loc)(void);
-INTDEF ATTR_CONST WUNUSED int32_t const **NOTHROW(LIBCCALL libc___ctype_toupper_loc)(void);
+INTDEF ATTR_PURE WUNUSED char const *NOTHROW_NCX(LIBCCALL libc___locale_ctype_ptr_l)(locale_t locale);
+INTDEF ATTR_PURE WUNUSED uint16_t const **NOTHROW(LIBCCALL libc___ctype_b_loc)(void);
+INTDEF ATTR_PURE WUNUSED int32_t const **NOTHROW(LIBCCALL libc___ctype_tolower_loc)(void);
+INTDEF ATTR_PURE WUNUSED int32_t const **NOTHROW(LIBCCALL libc___ctype_toupper_loc)(void);
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc__isctype)(int ch, int mask);
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc__isctype_l)(int ch, int mask, locale_t locale);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc__isctype_l)(int ch, int mask, locale_t locale);
 
 DECL_END
 

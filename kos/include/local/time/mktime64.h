@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ea78b6b */
+/* HASH CRC-32:0x72409e4d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,7 +75,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the `time_t' representation of TP and normalize TP */
 __LOCAL_LIBC(mktime64) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __time64_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime64))(__STRUCT_TM __KOS_FIXED_CONST *__tp) {
-#line 658 "kos/src/libc/magic/time.c"
+#line 659 "kos/src/libc/magic/time.c"
 #if (defined(__CRT_HAVE_mktime) || defined(__CRT_HAVE__mktime32)) && !defined(__BUILDING_LIBC)
 	return (__time64_t)__localdep_mktime32(__tp);
 #else

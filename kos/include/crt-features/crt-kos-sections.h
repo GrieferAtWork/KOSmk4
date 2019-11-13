@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf850882 */
+/* HASH CRC-32:0xbe6d291d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1581,6 +1581,7 @@
 /* .text.crt.dos.wchar.unicode.static.convert.* */
 #define __CRT_DOS_SECTION_wcsto32                           __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert.wcsto32 */
 #define __CRT_DOS_SECTION_wcsto64                           __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert.wcsto64 */
+#define __CRT_DOS_SECTION_wcstod                            __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert.wcstod */
 #define __CRT_DOS_SECTION_wcstof                            __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert.wcstof */
 #define __CRT_DOS_SECTION_wcstoimax                         __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert.wcstoimax */
 #define __CRT_DOS_SECTION_wcstol                            __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert.wcstol */
@@ -1609,6 +1610,7 @@
 #define __CRT_DOS_SECTION__mbstowcs_s_l                     __CRT_SECTINFO_dos_wchar_unicode_static_mbs             /* .text.crt.dos.wchar.unicode.static.mbs._mbstowcs_s_l */
 #define __CRT_DOS_SECTION__mbtowc_l                         __CRT_SECTINFO_dos_wchar_unicode_static_mbs             /* .text.crt.dos.wchar.unicode.static.mbs._mbtowc_l */
 #define __CRT_DOS_SECTION__wctomb_l                         __CRT_SECTINFO_dos_wchar_unicode_static_mbs             /* .text.crt.dos.wchar.unicode.static.mbs._wctomb_l */
+#define __CRT_DOS_SECTION_btowc                             __CRT_SECTINFO_dos_wchar_unicode_static_mbs             /* .text.crt.dos.wchar.unicode.static.mbs.btowc */
 #define __CRT_DOS_SECTION_mbrlen                            __CRT_SECTINFO_dos_wchar_unicode_static_mbs             /* .text.crt.dos.wchar.unicode.static.mbs.mbrlen */
 #define __CRT_DOS_SECTION_mbrtowc                           __CRT_SECTINFO_dos_wchar_unicode_static_mbs             /* .text.crt.dos.wchar.unicode.static.mbs.mbrtowc */
 #define __CRT_DOS_SECTION_mbsnrtowcs                        __CRT_SECTINFO_dos_wchar_unicode_static_mbs             /* .text.crt.dos.wchar.unicode.static.mbs.mbsnrtowcs */
@@ -1618,7 +1620,6 @@
 #define __CRT_DOS_SECTION_wcrtomb                           __CRT_SECTINFO_dos_wchar_unicode_static_mbs             /* .text.crt.dos.wchar.unicode.static.mbs.wcrtomb */
 #define __CRT_DOS_SECTION_wcsnrtombs                        __CRT_SECTINFO_dos_wchar_unicode_static_mbs             /* .text.crt.dos.wchar.unicode.static.mbs.wcsnrtombs */
 #define __CRT_DOS_SECTION_wcsrtombs                         __CRT_SECTINFO_dos_wchar_unicode_static_mbs             /* .text.crt.dos.wchar.unicode.static.mbs.wcsrtombs */
-#define __CRT_DOS_SECTION_wcstod                            __CRT_SECTINFO_dos_wchar_unicode_static_mbs             /* .text.crt.dos.wchar.unicode.static.mbs.wcstod */
 #define __CRT_DOS_SECTION_wcstombs                          __CRT_SECTINFO_dos_wchar_unicode_static_mbs             /* .text.crt.dos.wchar.unicode.static.mbs.wcstombs */
 #define __CRT_DOS_SECTION_wcswidth                          __CRT_SECTINFO_dos_wchar_unicode_static_mbs             /* .text.crt.dos.wchar.unicode.static.mbs.wcswidth */
 #define __CRT_DOS_SECTION_wctomb                            __CRT_SECTINFO_dos_wchar_unicode_static_mbs             /* .text.crt.dos.wchar.unicode.static.mbs.wctomb */
@@ -4020,6 +4021,7 @@
 /* .text.crt.wchar.unicode.static.convert.* */
 #define __CRT_SECTION_wcsto32                               __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert.wcsto32 */
 #define __CRT_SECTION_wcsto64                               __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert.wcsto64 */
+#define __CRT_SECTION_wcstod                                __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert.wcstod */
 #define __CRT_SECTION_wcstof                                __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert.wcstof */
 #define __CRT_SECTION_wcstoimax                             __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert.wcstoimax */
 #define __CRT_SECTION_wcstol                                __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert.wcstol */
@@ -4090,7 +4092,6 @@
 #define __CRT_SECTION_wcrtomb                               __CRT_SECTINFO_wchar_unicode_static_mbs                 /* .text.crt.wchar.unicode.static.mbs.wcrtomb */
 #define __CRT_SECTION_wcsnrtombs                            __CRT_SECTINFO_wchar_unicode_static_mbs                 /* .text.crt.wchar.unicode.static.mbs.wcsnrtombs */
 #define __CRT_SECTION_wcsrtombs                             __CRT_SECTINFO_wchar_unicode_static_mbs                 /* .text.crt.wchar.unicode.static.mbs.wcsrtombs */
-#define __CRT_SECTION_wcstod                                __CRT_SECTINFO_wchar_unicode_static_mbs                 /* .text.crt.wchar.unicode.static.mbs.wcstod */
 #define __CRT_SECTION_wcstombs                              __CRT_SECTINFO_wchar_unicode_static_mbs                 /* .text.crt.wchar.unicode.static.mbs.wcstombs */
 #define __CRT_SECTION_wcstombs_s                            __CRT_SECTINFO_wchar_unicode_static_mbs                 /* .text.crt.wchar.unicode.static.mbs.wcstombs_s */
 #define __CRT_SECTION_wcswidth                              __CRT_SECTINFO_wchar_unicode_static_mbs                 /* .text.crt.wchar.unicode.static.mbs.wcswidth */

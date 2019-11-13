@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a71cab8 */
+/* HASH CRC-32:0x62552421 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,6 +85,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(glob))(char const *__restrict __patte
 #elif defined(__CRT_HAVE_glob64)
 	return __localdep_glob64(__pattern, __flags, __errfunc, (struct __glob64_struct *)__pglob);
 #else
+	(void)__pattern;
+	(void)__flags;
+	(void)__errfunc;
+	(void)__pglob;
+	__COMPILER_IMPURE();
 	return GLOB_NOSYS;
 #endif
 }

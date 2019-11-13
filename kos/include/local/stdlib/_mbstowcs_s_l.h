@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6ef513e */
+/* HASH CRC-32:0x272818c7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,28 +19,40 @@
  */
 #ifndef __local__mbstowcs_s_l_defined
 #define __local__mbstowcs_s_l_defined 1
-/* Dependency: "_mbstowcs_s" from "stdlib" */
-#ifndef ____localdep__mbstowcs_s_defined
-#define ____localdep__mbstowcs_s_defined 1
-#ifdef __CRT_HAVE__mbstowcs_s
-__CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep__mbstowcs_s,(__SIZE_TYPE__ *__presult, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, char const *__src, __SIZE_TYPE__ __maxlen),_mbstowcs_s,(__presult,__buf,__buflen,__src,__maxlen))
-#else /* LIBC: _mbstowcs_s */
-#include <local/stdlib/_mbstowcs_s.h>
-#define __localdep__mbstowcs_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstowcs_s))
-#endif /* _mbstowcs_s... */
-#endif /* !____localdep__mbstowcs_s_defined */
+/* Dependency: "_mbstowcs_l" from "stdlib" */
+#ifndef ____localdep__mbstowcs_l_defined
+#define ____localdep__mbstowcs_l_defined 1
+#ifdef __CRT_HAVE__mbstowcs_l
+__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbstowcs_l,(__WCHAR_TYPE__ *__dst, char const *__src, __SIZE_TYPE__ __dstlen, __locale_t __locale),_mbstowcs_l,(__dst,__src,__dstlen,__locale))
+#else /* LIBC: _mbstowcs_l */
+#include <local/stdlib/_mbstowcs_l.h>
+#define __localdep__mbstowcs_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstowcs_l))
+#endif /* _mbstowcs_l... */
+#endif /* !____localdep__mbstowcs_l_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_mbstowcs_s_l) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbstowcs_s_l))(__SIZE_TYPE__ *__presult,
-                                                           __WCHAR_TYPE__ *__buf,
-                                                           __SIZE_TYPE__ __buflen,
+                                                           __WCHAR_TYPE__ *__dst,
+                                                           __SIZE_TYPE__ __dstsize,
                                                            char const *__src,
-                                                           __SIZE_TYPE__ __maxlen,
+                                                           __SIZE_TYPE__ __dstlen,
                                                            __locale_t __locale) {
-#line 2361 "kos/src/libc/magic/stdlib.c"
-	(void)__locale;
-	return __localdep__mbstowcs_s(__presult, __buf, __buflen, __src, __maxlen);
+#line 2401 "kos/src/libc/magic/stdlib.c"
+	__SIZE_TYPE__ __error;
+	if (__dstlen >= __dstsize) {
+		if (!__dstsize)
+			return 0;
+		__dstlen = __dstsize - 1;
+	}
+	__error = __localdep__mbstowcs_l(__dst, __src, __dstlen, __locale);
+	if (__presult)
+		*__presult = __error;
+#ifdef __EILSEQ
+	if (__error == (__SIZE_TYPE__)-1)
+		return __EILSEQ;
+#endif /* EILSEQ */
+	return 0;
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local__mbstowcs_s_l_defined */

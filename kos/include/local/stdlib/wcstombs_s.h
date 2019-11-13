@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x957c7341 */
+/* HASH CRC-32:0x70d3a66d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #ifndef ____localdep_wcstombs_defined
 #define ____localdep_wcstombs_defined 1
 #ifdef __CRT_HAVE_wcstombs
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcstombs,(char *__restrict __s, __WCHAR_TYPE__ const *__restrict __pwcs, __SIZE_TYPE__ __n),wcstombs,(__s,__pwcs,__n))
+__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcstombs,(char *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __dstlen),wcstombs,(__dst,__src,__dstlen))
 #else /* LIBC: wcstombs */
 #include <local/stdlib/wcstombs.h>
 #define __localdep_wcstombs (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstombs))
@@ -38,7 +38,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstombs_s))(__SIZE_TYPE__ *__presult
                                                         __SIZE_TYPE__ __buflen,
                                                         __WCHAR_TYPE__ const *__src,
                                                         __SIZE_TYPE__ __maxlen) {
-#line 2465 "kos/src/libc/magic/stdlib.c"
+#line 2517 "kos/src/libc/magic/stdlib.c"
 	if (!__presult || !__buf || !__src)
 		return __EINVAL;
 	if (__buflen < __localdep_wcstombs(__NULLPTR, __src, __maxlen))

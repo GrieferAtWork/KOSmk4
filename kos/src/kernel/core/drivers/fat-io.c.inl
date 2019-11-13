@@ -110,7 +110,7 @@ DECL_BEGIN
  * NOTE: These functions must not be used for I/O operations
  *       on the root directory of a FAT12/FAT16 file system.
  * @throw: E_FILESYSTEM_ERROR.ERROR_FS_DISK_FULL: [...] */
-INTERN void KCALL
+INTERN NONNULL((1, 5)) void KCALL
 FUNC1(Fat32_)(struct inode *__restrict self,
               BUFFER_TYPE buf, size_t bufsize, pos_t pos,
               struct aio_multihandle *__restrict aio) {
@@ -208,7 +208,7 @@ FUNC1(Fat32_)(struct inode *__restrict self,
  * @throw: E_FILESYSTEM_ERROR.ERROR_FS_DISK_FULL:
  *         The given `pos + bufsize' extends beyond
  *         the max size of the root directory. */
-INTERN void KCALL
+INTERN NONNULL((1, 5)) void KCALL
 FUNC2(Fat16_)(FatSuperblock *__restrict self,
               BUFFER_TYPE buf, size_t bufsize, pos_t pos,
               struct aio_multihandle *__restrict aio) {
@@ -268,16 +268,14 @@ too_large:
 
 /* Hybrid of the functions above:
  * Determine the type, then read from the INode. */
-INTERN void KCALL
+INTERN NONNULL((1, 5)) void KCALL
 FUNC1(Fat_)(struct inode *__restrict self,
             BUFFER_TYPE buf, size_t bufsize, pos_t pos,
             struct aio_multihandle *__restrict aio) {
 	if (self != self->i_super || ((FatSuperblock *)self)->f_type == FAT32) {
-		FUNC1(Fat32_)
-		(self, buf, bufsize, pos, aio);
+		FUNC1(Fat32_)(self, buf, bufsize, pos, aio);
 	} else {
-		FUNC2(Fat16_)
-		((FatSuperblock *)self, buf, bufsize, pos, aio);
+		FUNC2(Fat16_)((FatSuperblock *)self, buf, bufsize, pos, aio);
 	}
 }
 

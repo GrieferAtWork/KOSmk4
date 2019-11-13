@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a6071b8 */
+/* HASH CRC-32:0x2870790f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,15 +43,15 @@ INTDEF ATTR_CONST WUNUSED ldiv_t NOTHROW_NCX(LIBCCALL libc_ldiv)(long numer, lon
 INTDEF ATTR_CONST WUNUSED lldiv_t NOTHROW_NCX(LIBCCALL libc_lldiv)(__LONGLONG numer, __LONGLONG denom);
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_abs)(int x);
 INTDEF ATTR_CONST WUNUSED struct __div_struct NOTHROW_NCX(LIBCCALL libc_div)(int numer, int denom);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_mblen)(char const *s, size_t n);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_mbtowc)(char32_t *__restrict pwc, char const *__restrict s, size_t n);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_mbtowc)(char16_t *__restrict pwc, char const *__restrict s, size_t n);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_wctomb)(char *s, char32_t wchar);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_wctomb)(char *s, char16_t wchar);
-INTDEF size_t NOTHROW_NCX(LIBCCALL libc_mbstowcs)(char32_t *__restrict pwcs, char const *__restrict src, size_t maxlen);
-INTDEF size_t NOTHROW_NCX(LIBDCALL libd_mbstowcs)(char16_t *__restrict pwcs, char const *__restrict src, size_t maxlen);
-INTDEF size_t NOTHROW_NCX(LIBCCALL libc_wcstombs)(char *__restrict s, char32_t const *__restrict pwcs, size_t n);
-INTDEF size_t NOTHROW_NCX(LIBDCALL libd_wcstombs)(char *__restrict s, char16_t const *__restrict pwcs, size_t n);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_mblen)(char const *str, size_t maxlen);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_mbtowc)(char32_t *__restrict pwc, char const *__restrict str, size_t maxlen);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_mbtowc)(char16_t *__restrict pwc, char const *__restrict str, size_t maxlen);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_wctomb)(char *str, char32_t wc);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_wctomb)(char *str, char16_t wc);
+INTDEF size_t NOTHROW_NCX(LIBCCALL libc_mbstowcs)(char32_t *__restrict dst, char const *__restrict src, size_t dstlen);
+INTDEF size_t NOTHROW_NCX(LIBDCALL libd_mbstowcs)(char16_t *__restrict dst, char const *__restrict src, size_t dstlen);
+INTDEF size_t NOTHROW_NCX(LIBCCALL libc_wcstombs)(char *__restrict dst, char32_t const *__restrict src, size_t dstlen);
+INTDEF size_t NOTHROW_NCX(LIBDCALL libd_wcstombs)(char *__restrict dst, char16_t const *__restrict src, size_t dstlen);
 INTDEF void NOTHROW(LIBCCALL libc_srand)(long seed);
 INTDEF int NOTHROW(LIBCCALL libc_rand)(void);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_atoi)(char const *__restrict nptr);
@@ -121,12 +121,12 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc__mbstrnle
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc__mblen_l)(char const *str, size_t maxlen, locale_t locale);
 INTDEF int NOTHROW_NCX(LIBCCALL libc__mbtowc_l)(char32_t *dst, char const *src, size_t srclen, locale_t locale);
 INTDEF int NOTHROW_NCX(LIBDCALL libd__mbtowc_l)(char16_t *dst, char const *src, size_t srclen, locale_t locale);
-INTDEF size_t NOTHROW_NCX(LIBCCALL libc__mbstowcs_l)(char32_t *buf, char const *src, size_t maxlen, locale_t locale);
-INTDEF size_t NOTHROW_NCX(LIBDCALL libd__mbstowcs_l)(char16_t *buf, char const *src, size_t maxlen, locale_t locale);
-INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__mbstowcs_s)(size_t *presult, char32_t *buf, size_t buflen, char const *src, size_t maxlen);
-INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__mbstowcs_s)(size_t *presult, char16_t *buf, size_t buflen, char const *src, size_t maxlen);
-INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__mbstowcs_s_l)(size_t *presult, char32_t *buf, size_t buflen, char const *src, size_t maxlen, locale_t locale);
-INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__mbstowcs_s_l)(size_t *presult, char16_t *buf, size_t buflen, char const *src, size_t maxlen, locale_t locale);
+INTDEF size_t NOTHROW_NCX(LIBCCALL libc__mbstowcs_l)(char32_t *dst, char const *src, size_t dstlen, locale_t locale);
+INTDEF size_t NOTHROW_NCX(LIBDCALL libd__mbstowcs_l)(char16_t *dst, char const *src, size_t dstlen, locale_t locale);
+INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__mbstowcs_s)(size_t *presult, char32_t *dst, size_t dstsize, char const *src, size_t dstlen);
+INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__mbstowcs_s)(size_t *presult, char16_t *dst, size_t dstsize, char const *src, size_t dstlen);
+INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__mbstowcs_s_l)(size_t *presult, char32_t *dst, size_t dstsize, char const *src, size_t dstlen, locale_t locale);
+INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__mbstowcs_s_l)(size_t *presult, char16_t *dst, size_t dstsize, char const *src, size_t dstlen, locale_t locale);
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_rand_s)(unsigned int *__restrict randval);
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_rand_s)(unsigned int *__restrict randval);
 #define libc__strtol_l libc_strtol_l
@@ -143,7 +143,7 @@ INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc__wctomb_s_l)(int *presu
 INTDEF NONNULL((1, 2, 4)) errno_t NOTHROW_NCX(LIBCCALL libc__wcstombs_s_l)(size_t *presult, char *buf, size_t buflen, char32_t const *src, size_t maxlen, locale_t locale);
 INTDEF NONNULL((1, 2)) size_t NOTHROW_NCX(LIBCCALL libc__wcstombs_l)(char *dst, char32_t const *src, size_t maxlen, locale_t locale);
 INTDEF NONNULL((1, 2, 4)) errno_t NOTHROW_NCX(LIBCCALL libc_wcstombs_s)(size_t *presult, char *buf, size_t buflen, char32_t const *src, size_t maxlen);
-INTDEF WUNUSED size_t NOTHROW_NCX(LIBCCALL libc__aligned_msize)(void *mptr, size_t min_alignment, size_t offset);
+INTDEF ATTR_PURE WUNUSED size_t NOTHROW_NCX(LIBCCALL libc__aligned_msize)(void *mptr, size_t min_alignment, size_t offset);
 INTDEF NONNULL((1, 5, 6)) errno_t NOTHROW_NCX(LIBCCALL libc__ecvt_s)(char *buf, size_t buflen, double val, int ndigit, int *__restrict decptr, int *__restrict sign);
 INTDEF NONNULL((1, 5, 6)) errno_t NOTHROW_NCX(LIBCCALL libc__fcvt_s)(char *buf, size_t buflen, double val, int ndigit, int *__restrict decptr, int *__restrict sign);
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc__gcvt_s)(char *buf, size_t buflen, double val, int ndigit);

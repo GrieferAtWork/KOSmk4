@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5dc3f398 */
+/* HASH CRC-32:0xd5f59c69 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -272,7 +272,7 @@ INTDEF WUNUSED float NOTHROW(LIBCCALL libc_remquof)(float x, float y, int *pquo)
 /* Round X to nearest integral value according to current rounding direction */
 INTDEF WUNUSED long int NOTHROW(LIBCCALL libc_lrintf)(float x);
 /* Round X to nearest integral value according to current rounding direction */
-INTDEF WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llrintf)(float x);
+INTDEF ATTR_CONST WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llrintf)(float x);
 INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_nexttowardl)(long double x, long double y);
 /* Return X times (2 to the Nth power) */
 INTDEF WUNUSED long double NOTHROW(LIBCCALL libc_scalbnl)(long double x, int n);

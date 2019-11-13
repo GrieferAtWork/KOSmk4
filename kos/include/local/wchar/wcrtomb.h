@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94f4bb4f */
+/* HASH CRC-32:0x7128af45 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,13 +20,23 @@
 #ifndef __local_wcrtomb_defined
 #define __local_wcrtomb_defined 1
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wcrtomb) __ATTR_NONNULL((1)) __SIZE_TYPE__
+#ifndef ____local_wcrtomb_ps_defined
+#define ____local_wcrtomb_ps_defined 1
+__LOCAL_LIBC_DATA(__wcrtomb_ps) __mbstate_t __wcrtomb_ps = __MBSTATE_INIT;
+#endif /* !____local_wcrtomb_ps_defined */
+__LOCAL_LIBC(wcrtomb) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcrtomb))(char *__restrict __str,
                                                      __WCHAR_TYPE__ __wc,
                                                      __mbstate_t *__ps) {
-#line 203 "kos/src/libc/magic/wchar.c"
-	/* TODO */
-	return 0;
+#line 251 "kos/src/libc/magic/wchar.c"
+	if (!__ps)
+		__ps = &__wcrtomb_ps;
+	if (!__str) {
+		__ps->__word = 0;
+		return 0;
+	}
+	*__str = (char)__wc;
+	return 1;
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_wcrtomb_defined */

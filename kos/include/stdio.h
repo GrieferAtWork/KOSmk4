@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x444c61c3 */
+/* HASH CRC-32:0x447601cf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1016,16 +1016,16 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,clearerr,(FILE *__restrict __
 #define __std_feof_defined 1
 #if defined(__CRT_HAVE_feof_unlocked) && (defined(__USE_STDIO_UNLOCKED))
 /* Check if end-of-file has been reached in `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof,(FILE *__restrict __stream),feof_unlocked,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof,(FILE __KOS_FIXED_CONST *__restrict __stream),feof_unlocked,(__stream))
 #elif defined(__CRT_HAVE_feof)
 /* Check if end-of-file has been reached in `STREAM' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof,(FILE *__restrict __stream),(__stream))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof,(FILE __KOS_FIXED_CONST *__restrict __stream),(__stream))
 #elif defined(__CRT_HAVE_feof_unlocked)
 /* Check if end-of-file has been reached in `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof,(FILE *__restrict __stream),feof_unlocked,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof,(FILE __KOS_FIXED_CONST *__restrict __stream),feof_unlocked,(__stream))
 #elif defined(__CRT_HAVE__IO_feof)
 /* Check if end-of-file has been reached in `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof,(FILE *__restrict __stream),_IO_feof,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof,(FILE __KOS_FIXED_CONST *__restrict __stream),_IO_feof,(__stream))
 #else /* LIBC: feof */
 #undef __std_feof_defined
 #endif /* feof... */
@@ -1034,16 +1034,16 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof,(FILE *__r
 #define __std_ferror_defined 1
 #if defined(__CRT_HAVE_ferror_unlocked) && (defined(__USE_STDIO_UNLOCKED))
 /* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror,(FILE *__restrict __stream),ferror_unlocked,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror,(FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ferror)
 /* Check if an I/O error occurred in `STREAM' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror,(FILE *__restrict __stream),(__stream))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror,(FILE __KOS_FIXED_CONST *__restrict __stream),(__stream))
 #elif defined(__CRT_HAVE_ferror_unlocked)
 /* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror,(FILE *__restrict __stream),ferror_unlocked,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror,(FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE__IO_ferror)
 /* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror,(FILE *__restrict __stream),_IO_ferror,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror,(FILE __KOS_FIXED_CONST *__restrict __stream),_IO_ferror,(__stream))
 #else /* LIBC: ferror */
 #undef __std_ferror_defined
 #endif /* ferror... */

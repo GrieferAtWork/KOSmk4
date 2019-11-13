@@ -575,6 +575,7 @@ strftime:([outp(bufsize)] char *__restrict buf, size_t bufsize,
 	return crt_strftime_l(buf, bufsize, format, tp, NULL);
 #else
 	/* TODO */
+	COMPILER_IMPURE();
 	return 0;
 #endif
 }
@@ -1394,6 +1395,7 @@ strptime:([nonnull] char const *__restrict s,
 	return crt_strptime_l(s, format, tp, NULL);
 #else
 	/* TODO */
+	COMPILER_IMPURE();
 	return NULL;
 #endif
 }
@@ -1416,6 +1418,7 @@ strptime_l:([nonnull] char const *__restrict s,
 getdate_r:([nonnull] char const *__restrict string,
            [nonnull] __STRUCT_TM *__restrict resbufp) -> int {
 	/* TODO */
+	COMPILER_IMPURE();
 	return 0;
 }
 %#endif /* __USE_GNU */

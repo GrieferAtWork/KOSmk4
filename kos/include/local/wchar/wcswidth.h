@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76dcfecb */
+/* HASH CRC-32:0xbd14fe69 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #ifndef ____localdep_wcwidth_defined
 #define ____localdep_wcwidth_defined 1
 #ifdef __CRT_HAVE_wcwidth
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wcwidth,(__WCHAR_TYPE__ __ch),wcwidth,(__ch))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wcwidth,(__WCHAR_TYPE__ __ch),wcwidth,(__ch))
 #else /* LIBC: wcwidth */
 #include <local/wchar/wcwidth.h>
 #define __localdep_wcwidth (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcwidth))
@@ -31,10 +31,10 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wcwidth,(__WCHAR_TYPE__ 
 #endif /* !____localdep_wcwidth_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wcswidth) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(wcswidth) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcswidth))(__WCHAR_TYPE__ const *__restrict __string,
                                                       __SIZE_TYPE__ __num_chars) {
-#line 793 "kos/src/libc/magic/wchar.c"
+#line 885 "kos/src/libc/magic/wchar.c"
 	int __temp, __result = 0;
 	for (; __num_chars; --__num_chars, ++__string) {
 		__WCHAR_TYPE__ __ch = *__string;

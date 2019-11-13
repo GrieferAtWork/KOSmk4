@@ -161,8 +161,8 @@ FUNDEF NOBLOCK WUNUSED qtime_t NOTHROW(KCALL cpu_quantum_time)(void);
 FUNDEF NOBLOCK WUNUSED qtime_t NOTHROW(KCALL quantum_time)(void);
 
 /* Convert to/from quantum time and regular timespecs */
-FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(FCALL qtime_to_timespec)(qtime_t const *__restrict qtime);
-FUNDEF NOBLOCK WUNUSED qtime_t NOTHROW(FCALL timespec_to_qtime)(struct timespec const *__restrict tms);
+FUNDEF NOBLOCK WUNUSED ATTR_PURE struct timespec NOTHROW(FCALL qtime_to_timespec)(qtime_t const *__restrict qtime);
+FUNDEF NOBLOCK WUNUSED ATTR_PURE qtime_t NOTHROW(FCALL timespec_to_qtime)(struct timespec const *__restrict tms);
 
 /* Convert between global (the boot cpu's) and global (the current cpu's) quantum time.
  * WARNING: Unless the caller has disabled preemption or has set the

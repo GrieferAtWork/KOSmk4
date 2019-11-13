@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e486805 */
+/* HASH CRC-32:0x2157ecef */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,16 +51,16 @@ typedef __pid_t pid_t;
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 
 #ifdef __CRT_HAVE_cfgetospeed
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),speed_t,__NOTHROW_NCX,cfgetospeed,(struct termios const *__restrict __termios_p),(__termios_p))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),speed_t,__NOTHROW_NCX,cfgetospeed,(struct termios const *__restrict __termios_p),(__termios_p))
 #else /* LIBC: cfgetospeed */
 #include <local/termios/cfgetospeed.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(cfgetospeed, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) speed_t __NOTHROW_NCX(__LIBCCALL cfgetospeed)(struct termios const *__restrict __termios_p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfgetospeed))(__termios_p); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(cfgetospeed, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) speed_t __NOTHROW_NCX(__LIBCCALL cfgetospeed)(struct termios const *__restrict __termios_p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfgetospeed))(__termios_p); })
 #endif /* cfgetospeed... */
 #ifdef __CRT_HAVE_cfgetispeed
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),speed_t,__NOTHROW_NCX,cfgetispeed,(struct termios const *__restrict __termios_p),(__termios_p))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),speed_t,__NOTHROW_NCX,cfgetispeed,(struct termios const *__restrict __termios_p),(__termios_p))
 #else /* LIBC: cfgetispeed */
 #include <local/termios/cfgetispeed.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(cfgetispeed, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) speed_t __NOTHROW_NCX(__LIBCCALL cfgetispeed)(struct termios const *__restrict __termios_p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfgetispeed))(__termios_p); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(cfgetispeed, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) speed_t __NOTHROW_NCX(__LIBCCALL cfgetispeed)(struct termios const *__restrict __termios_p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfgetispeed))(__termios_p); })
 #endif /* cfgetispeed... */
 #ifdef __CRT_HAVE_cfsetospeed
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cfsetospeed,(struct termios *__restrict __termios_p, speed_t __speed),(__termios_p,__speed))

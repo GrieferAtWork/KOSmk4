@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x394c0efd */
+/* HASH CRC-32:0x9fc2c1b3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch_r))(ENTRY __item,
                                                        ACTION __action,
                                                        ENTRY **__retval,
                                                        struct hsearch_data *__htab) {
-#line 265 "kos/src/libc/magic/search.c"
+#line 266 "kos/src/libc/magic/search.c"
 	typedef struct {
 		unsigned int __used;
 		ENTRY        __entry;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a6888d2 */
+/* HASH CRC-32:0x441de950 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #ifndef ____localdep_wcstombs_defined
 #define ____localdep_wcstombs_defined 1
 #ifdef __CRT_HAVE_wcstombs
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcstombs,(char *__restrict __s, __WCHAR_TYPE__ const *__restrict __pwcs, __SIZE_TYPE__ __n),wcstombs,(__s,__pwcs,__n))
+__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcstombs,(char *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __dstlen),wcstombs,(__dst,__src,__dstlen))
 #else /* LIBC: wcstombs */
 #include <local/stdlib/wcstombs.h>
 #define __localdep_wcstombs (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstombs))
@@ -36,7 +36,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcstombs_l))(char *__dst,
                                                          __WCHAR_TYPE__ const *__src,
                                                          __SIZE_TYPE__ __maxlen,
                                                          __locale_t __locale) {
-#line 2457 "kos/src/libc/magic/stdlib.c"
+#line 2509 "kos/src/libc/magic/stdlib.c"
 	(void)__locale;
 	return __localdep_wcstombs(__dst, __src, __maxlen);
 }

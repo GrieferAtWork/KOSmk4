@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1542e54 */
+/* HASH CRC-32:0xd019e630 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -177,7 +177,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localde
 #define ____localdep_format_width_defined 1
 #ifdef __CRT_HAVE_format_width
 /* Returns the width (number of characters; not bytes) of the given unicode string */
-__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_width,(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),format_width,(__arg,__data,__datalen))
+__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_width,(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),format_width,(__arg,__data,__datalen))
 #else /* LIBC: format_width */
 #include <local/format-printer/format_width.h>
 /* Returns the width (number of characters; not bytes) of the given unicode string */

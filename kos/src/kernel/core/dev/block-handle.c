@@ -144,12 +144,12 @@ handle_blockdevice_apwritev(struct basic_block_device *__restrict self,
 }
 
 
-LOCAL size_t KCALL
+LOCAL ATTR_PURE NONNULL((1)) size_t KCALL
 block_device_get_readahead(struct basic_block_device *__restrict self) {
 	return self->bd_sector_size;
 }
 
-LOCAL void KCALL
+LOCAL NONNULL((1)) void KCALL
 block_device_set_readahead(struct basic_block_device *__restrict self, size_t value) {
 	/* KOS doesn't implement read-ahead on the block-device layer.
 	 * Instead, read-ahead (if at all) is only done on a per-file
@@ -158,36 +158,36 @@ block_device_set_readahead(struct basic_block_device *__restrict self, size_t va
 	(void)value;
 }
 
-LOCAL size_t KCALL
+LOCAL ATTR_PURE NONNULL((1)) size_t KCALL
 block_device_get_fsreadahead(struct basic_block_device *__restrict self) {
 	return block_device_get_readahead(self);
 }
 
-LOCAL void KCALL
+LOCAL NONNULL((1)) void KCALL
 block_device_set_fsreadahead(struct basic_block_device *__restrict self, size_t value) {
 	block_device_set_readahead(self, value);
 }
 
-LOCAL u16 KCALL
+LOCAL ATTR_PURE NONNULL((1)) u16 KCALL
 block_device_get_max_sectors_per_request(struct basic_block_device *__restrict self) {
 	(void)self;
 	/* XXX: Implement me? */
 	return (u16)-1;
 }
 
-LOCAL void KCALL
+LOCAL NONNULL((1)) void KCALL
 block_device_set_max_sectors_per_request(struct basic_block_device *__restrict self, u16 value) {
 	(void)self;
 	(void)value;
 	/* XXX: Implement me? */
 }
 
-LOCAL size_t KCALL
+LOCAL ATTR_PURE NONNULL((1)) size_t KCALL
 block_device_get_sector_size(struct basic_block_device *__restrict self) {
 	return self->bd_sector_size;
 }
 
-LOCAL void KCALL
+LOCAL NONNULL((1)) void KCALL
 block_device_set_sector_size(struct basic_block_device *__restrict self, size_t value) {
 	/* XXX: Throw some kind of error when `value != self->bd_sector_size' */
 }

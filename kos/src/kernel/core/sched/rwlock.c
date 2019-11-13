@@ -308,7 +308,7 @@ NOTHROW(KCALL rwlock_delete_readlock)(struct read_lock *__restrict rlock) {
 
 
 
-PUBLIC WUNUSED NONNULL((1)) bool
+PUBLIC WUNUSED ATTR_PURE NONNULL((1)) bool
 NOTHROW(KCALL rwlock_reading)(struct rwlock const *__restrict self) {
 	struct read_lock *lock;
 	if (self->rw_scnt == 0)
@@ -320,13 +320,13 @@ NOTHROW(KCALL rwlock_reading)(struct rwlock const *__restrict self) {
 	return lock != NULL;
 }
 
-PUBLIC WUNUSED NONNULL((1)) bool
+PUBLIC WUNUSED ATTR_PURE NONNULL((1)) bool
 NOTHROW(KCALL rwlock_writing)(struct rwlock const *__restrict self) {
 	return (self->rw_mode == RWLOCK_MODE_FWRITING &&
 	        self->rw_xowner == THIS_TASK);
 }
 
-PUBLIC WUNUSED NONNULL((1)) uintptr_t
+PUBLIC WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
 NOTHROW(KCALL rwlock_reading_r)(struct rwlock const *__restrict self) {
 	struct read_lock *lock;
 	if (self->rw_scnt == 0)
@@ -339,7 +339,8 @@ NOTHROW(KCALL rwlock_reading_r)(struct rwlock const *__restrict self) {
 }
 
 /* Return the total number of hold read-locks (or 0 if this is not tracked by the implementation) */
-PUBLIC WUNUSED uintptr_t NOTHROW(KCALL rwlock_reading_any)(void) {
+PUBLIC WUNUSED ATTR_PURE uintptr_t
+NOTHROW(KCALL rwlock_reading_any)(void) {
 	size_t i, result = 0;
 	struct read_locks *locks;
 	locks = &PERTASK(_this_read_locks);
@@ -359,7 +360,7 @@ PUBLIC WUNUSED uintptr_t NOTHROW(KCALL rwlock_reading_any)(void) {
 }
 
 
-PUBLIC WUNUSED NONNULL((1)) uintptr_t
+PUBLIC WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
 NOTHROW(KCALL rwlock_writing_r)(struct rwlock const *__restrict self) {
 	return (self->rw_mode == RWLOCK_MODE_FWRITING &&
 	        self->rw_xowner == THIS_TASK)

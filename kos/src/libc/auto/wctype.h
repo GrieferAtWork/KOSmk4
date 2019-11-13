@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1438b582 */
+/* HASH CRC-32:0x3e59fb7f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,10 +39,10 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswpunct)(wint_t wc);
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswspace)(wint_t wc);
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswupper)(wint_t wc);
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswxdigit)(wint_t wc);
-INTDEF WUNUSED NONNULL((1)) wctrans_t NOTHROW_NCX(LIBCCALL libc_wctrans)(char const *prop);
-INTDEF WUNUSED wint_t NOTHROW_NCX(LIBCCALL libc_towctrans)(wint_t wc, wctrans_t desc);
-INTDEF WUNUSED NONNULL((1)) wctype_t NOTHROW_NCX(LIBCCALL libc_wctype)(char const *prop);
-INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswctype)(wint_t wc, wctype_t desc);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) wctrans_t NOTHROW_NCX(LIBCCALL libc_wctrans)(char const *prop);
+INTDEF ATTR_CONST WUNUSED wint_t NOTHROW_NCX(LIBCCALL libc_towctrans)(wint_t wc, wctrans_t desc);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) wctype_t NOTHROW_NCX(LIBCCALL libc_wctype)(char const *prop);
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswctype)(wint_t wc, wctype_t desc);
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswblank)(wint_t wc);
 INTDEF ATTR_CONST WUNUSED wint_t NOTHROW(LIBCCALL libc_towlower)(wint_t wc);
 INTDEF ATTR_CONST WUNUSED wint_t NOTHROW(LIBCCALL libc_towupper)(wint_t wc);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb09841cf */
+/* HASH CRC-32:0x3436f405 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,7 +87,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_c16aprintf_pack) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16aprintf_pack))(struct format_c16aprintf_data *__restrict __self,
                                                                     __SIZE_TYPE__ *__pstrlen) {
-#line 227 "kos/src/libc/magic/parts.wchar.format-printer.c"
+#line 232 "kos/src/libc/magic/parts.wchar.format-printer.c"
 	/* Free unused buffer memory. */
 	__CHAR16_TYPE__ *__result;
 	if (__self->ap_avail != 0) {

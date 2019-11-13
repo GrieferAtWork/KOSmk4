@@ -50,7 +50,7 @@ PUBLIC vm_phys_t acpi_root = 0;
 PUBLIC size_t acpi_sdt_count = 0;
 
 
-PRIVATE ATTR_FREETEXT byte_t
+PRIVATE ATTR_PURE ATTR_FREETEXT byte_t
 NOTHROW(KCALL acpi_memsum)(void const *__restrict p, size_t n_bytes) {
 	byte_t result = 0;
 	byte_t *iter, *end;
@@ -60,7 +60,7 @@ NOTHROW(KCALL acpi_memsum)(void const *__restrict p, size_t n_bytes) {
 	return result;
 }
 
-PRIVATE ATTR_FREETEXT byte_t
+PRIVATE ATTR_FREETEXT ATTR_PURE byte_t
 NOTHROW(KCALL acpi_memsum_phys)(vm_phys_t p, size_t n_bytes) {
 	u8 buf[256];
 	byte_t result = 0;

@@ -40,7 +40,7 @@ struct __siginfo_struct;
 
 /* Transform the given exception into a posix errno value. */
 DEFINE_PUBLIC_ALIAS(error_as_errno, libc_error_as_errno);
-INTERN WUNUSED errno_t
+INTERN WUNUSED ATTR_PURE NONNULL((1)) errno_t
 NOTHROW_NCX_KERNEL(LIBCCALL libc_error_as_errno)(struct exception_data const *__restrict data) {
 	errno_t result    = EPERM;
 	error_code_t code = data->e_code;

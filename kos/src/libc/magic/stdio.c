@@ -699,15 +699,15 @@ clearerr:([nonnull] FILE *__restrict stream);
 
 %[default_impl_section(.text.crt.FILE.locked.read.utility)]
 @@Check if end-of-file has been reached in `STREAM'
-[std][ATTR_WUNUSED][alias(feof_unlocked)][export_alias(_IO_feof)]
+[std][ATTR_WUNUSED][alias(feof_unlocked)][export_alias(_IO_feof)][ATTR_PURE]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(feof_unlocked)]
-feof:([nonnull] FILE *__restrict stream) -> int;
+feof:([nonnull] FILE __KOS_FIXED_CONST *__restrict stream) -> int;
 
 @@Check if an I/O error occurred in `STREAM'
-%[default_impl_section(.text.crt.FILE.locked.utility)]
+%[default_impl_section(.text.crt.FILE.locked.utility)][ATTR_PURE]
 [std][ATTR_WUNUSED][alias(ferror_unlocked)][export_alias(_IO_ferror)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(ferror_unlocked)]
-ferror:([nonnull] FILE *__restrict stream) -> int;
+ferror:([nonnull] FILE __KOS_FIXED_CONST *__restrict stream) -> int;
 
 @@Print a given `MESSAGE' alongside `strerror(errno)' to stderr:
 @@>> if (message) {
@@ -2289,10 +2289,10 @@ _vsscanf_s_l:([nonnull] char const *__restrict input, [nonnull] char const *__re
 #ifndef __EOF
 #ifdef EOF
 #define __EOF  EOF
-#else
+#else /* EOF */
 #define __EOF (-1)
-#endif
-#endif
+#endif /* !EOF */
+#endif /* !__EOF */
 struct __vsnscanf_data {
 	char const *__ptr;
 	char const *__end;
@@ -2397,6 +2397,7 @@ _vsprintf_p:([outp_opt(min(return,bufsize))] char *__restrict buf, $size_t bufsi
 	(void)format;
 	(void)args;
 	/* TODO */
+	__COMPILER_IMPURE();
 	return 0;
 }
 
@@ -2443,6 +2444,7 @@ _vscprintf_p:([nonnull] char const *__restrict format, $va_list args) -> __STDC_
 	(void)format;
 	(void)args;
 	/* TODO */
+	__COMPILER_IMPURE();
 	return 0;
 }
 
@@ -2586,10 +2588,11 @@ _vfprintf_s_l:([nonnull] $FILE *__restrict stream,
 [section(.text.crt.dos.unicode.static.format.printf)]
 _vfprintf_p:([nonnull] $FILE *__restrict stream,
              [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
-	/* TODO */
 	(void)stream;
 	(void)format;
 	(void)args;
+	/* TODO */
+	__COMPILER_IMPURE();
 	return 0;
 }
 
