@@ -773,6 +773,8 @@ incdir("", "../../include");
 #ifdef __cplusplus
 /* libstdc++ doesn't work in freestanding mode. */
 #ifndef __CRT_FREESTANDING
+/* libstdc++ headers don't work without GNU extensions... */
+#ifdef _GNU_SOURCE
 /* libstdc++ doesn't work in kernel-space:
  *  - missing functions that libstdc++ assumes to be there (locale, etc...)
  *  - The fact that most libc functions are defined as STDCALL,
@@ -820,6 +822,7 @@ incdir("", "../../include");
 #include <typeinfo>
 #include <utility>
 #endif /* !__KERNEL__ */
-#endif /* __CRT_FREESTANDING */
+#endif /* _GNU_SOURCE */
+#endif /* !__CRT_FREESTANDING */
 #endif /* __cplusplus */
 
