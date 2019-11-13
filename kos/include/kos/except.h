@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17fd10c8 */
+/* HASH CRC-32:0xebbf587 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -929,7 +929,7 @@ __NOTHROW_NCX(__ERROR_UNWIND_CC error_unwind)(error_register_state_t *__restrict
 
 /* Throw an exception. */
 __CDECLARE_VOID(__ATTR_NORETURN __ATTR_COLD,,error_throw_current,(void),())
-__CDECLARE_VOID(__ATTR_NORETURN,,error_rethrow,(void),())
+__CDECLARE_VOID(__ATTR_NORETURN __ATTR_COLD,,error_rethrow,(void),())
 
 /* Transform the given exception into a posix errno value. */
 #ifdef __KERNEL__
