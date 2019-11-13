@@ -26,7 +26,7 @@
 /* i386-specific CFI constants. */
 #define CFI_386_UNWIND_REGISTER_SIZE      4
 #define CFI_386_UNWIND_FPU_REGISTER_SIZE  16
-#define CFI_386_UNWIND_IS_FPU_REGISTER(regno) \
+#define CFI_386_UNWIND_IS_FPU_REGISTER(regno)  \
 	((regno) >= CFI_386_UNWIND_REGISTER_ST0 && \
 	 (regno) <= CFI_386_UNWIND_REGISTER_MM7)
 #define CFI_386_REGISTER_SIZE(regno)       \

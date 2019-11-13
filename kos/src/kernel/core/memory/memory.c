@@ -330,7 +330,7 @@ NOTHROW(KCALL set_cfree_word)(uintptr_t *__restrict pword,
 	        "oldval        = %IX\n"
 	        "masked_oldval = %IX\n"
 	        "mask          = %IX\n",
-	        (pageptr_t)(self->mz_start + (pword - self->mz_free) * PAGES_PER_WORD),
+	        (pageptr_t)(self->mz_start + (pagecnt_t)(pword - self->mz_free) * PAGES_PER_WORD),
 	        oldval, oldval & PMEMBITSET_FREEMASK,
 	        mask & PMEMBITSET_FREEMASK);
 }

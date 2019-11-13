@@ -395,7 +395,7 @@ INTERN struct vm_datapart kernel_vm_part_pagedata = {
 };
 
 INTERN struct vm_node kernel_vm_node_pagedata =
-	INIT_NODE(kernel_vm_node_pagedata,0,0,
+	INIT_NODE(kernel_vm_node_pagedata, 0, 0,
 	          VM_PROT_READ | VM_PROT_WRITE,
 	          kernel_vm_part_pagedata);
 

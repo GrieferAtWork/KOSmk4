@@ -101,27 +101,33 @@ locals_format_printer(void *format_arg,
 		format = DF_RESETATTR;
 	else {
 		switch (format_option) {
+
 		case DEBUGINFO_PRINT_FORMAT_KEYWORD_PREFIX:  /* Prefix for `struct', `class', `union', `enum' */
 		case DEBUGINFO_PRINT_FORMAT_MODIFIER_PREFIX: /* Prefix for `const', `volatile', `atomic', `restrict' */
 		case DEBUGINFO_PRINT_FORMAT_BOOL_PREFIX:     /* Prefix for `true' / `false' */
 			format = DF_SETFGCOLOR(DBG_COLOR_AQUA);
 			break;
+
 		case DEBUGINFO_PRINT_FORMAT_STRING_PREFIX:    /* Prefix for `"foobar"' */
 		case DEBUGINFO_PRINT_FORMAT_CHARACTER_PREFIX: /* Prefix for `'f'' */
 			format = DF_SETFGCOLOR(DBG_COLOR_YELLOW);
 			break;
+
 		case DEBUGINFO_PRINT_FORMAT_TYPENAME_PREFIX: /* Prefix for type names */
 			format = DF_SETFGCOLOR(DBG_COLOR_GREEN);
 			break;
+
 		case DEBUGINFO_PRINT_FORMAT_FIELD_PREFIX:   /* Prefix for `.field_name' (in struct initializers) */
 		case DEBUGINFO_PRINT_FORMAT_VARNAME_PREFIX: /* Prefix for variable names */
 		case DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX: /* Prefix for `1234' */
 		case DEBUGINFO_PRINT_FORMAT_FLOAT_PREFIX:   /* Prefix for `1234.5678' */
 			format = DF_SETFGCOLOR(DBG_COLOR_WHITE);
 			break;
+
 		case DEBUGINFO_PRINT_FORMAT_UNKNOWN_PREFIX: /* Prefix for unknown (raw) data */
 			format = DF_SETCOLOR(DBG_COLOR_LIGHT_GRAY, DBG_COLOR_MAROON);
 			break;
+
 		default: return 0;
 		}
 	}

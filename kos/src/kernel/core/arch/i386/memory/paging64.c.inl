@@ -44,7 +44,7 @@
 
 DECL_BEGIN
 
-/* Feature tests for 1GiB and 2Mib pages */
+/* Feature tests helpers */
 #define HAVE_PAGE_GLOBAL_BIT       (__x86_bootcpu_idfeatures.ci_1d & CPUID_1D_PGE)
 #define HAVE_PAGE_ATTRIBUTE_TABLE  (__x86_bootcpu_idfeatures.ci_1d & CPUID_1D_PAT)
 #define HAVE_INSTR_INVLPG          1 /* Always supported on x86_64 */

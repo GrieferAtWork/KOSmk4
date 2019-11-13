@@ -144,7 +144,17 @@ CC_FLAGS({
 	"-Wno-strict-aliasing",
 	"-Wno-missing-field-initializers",
 	"-Wno-type-limits",
-	"-fnon-call-exceptions", /* XXX: Maybe configure GCC to turn this on by default? */
+
+	/* KOS never assumes _signed_ overflow (only unsigned overflow),
+	 * so turn this warning to max! (most warnings that this causes
+	 * should be fixed by adding appropriate casts to unsigned types,
+	 * since it's usually related to array indices being scaled, with
+	 * some kind of integer promotion previously causing those indices
+	 * to become signed) */
+	"-Wstrict-overflow=5",
+
+	/* XXX: Maybe configure GCC to turn this on by default? */
+	"-fnon-call-exceptions",
 })
 LD_FLAGS({
 	"--no-demangle"

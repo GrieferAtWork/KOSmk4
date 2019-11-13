@@ -320,8 +320,8 @@ NOTHROW_NCX(LIBCCALL libc_adjtime64)(struct timeval64 const *delta,
 	if likely(result == 0) {
 		if (olddelta) {
 			if (tntx.offset < 0) {
-				olddelta->tv_usec = -(-tntx.offset % 1000000);
-				olddelta->tv_sec  = -(-tntx.offset / 1000000);
+				olddelta->tv_usec = -(s64)((u64)-tntx.offset % 1000000);
+				olddelta->tv_sec  = -(s64)((u64)-tntx.offset / 1000000);
 			} else {
 				olddelta->tv_usec = tntx.offset % 1000000;
 				olddelta->tv_sec  = tntx.offset / 1000000;

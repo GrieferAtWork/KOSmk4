@@ -102,11 +102,15 @@ LOCAL NONNULL((1, 2)) int CC libvm86_popl(vm86_state_t *__restrict self, uint32_
 LOCAL NONNULL((1)) int CC libvm86_popw_void(vm86_state_t *__restrict self, uint16_t op_flags);
 LOCAL NONNULL((1)) int CC libvm86_popl_void(vm86_state_t *__restrict self, uint16_t op_flags);
 
-#define REG8(id)  (*((id) >= 4 ? ((uint8_t *)(((uint32_t *)&(self)->vr_regs)+((id)-4)))+1 \
-                               : ((uint8_t *)(((uint32_t *)&(self)->vr_regs)+(id)))))
-#define REG16(id) (*(uint16_t *)(((uint32_t *)&(self)->vr_regs)+(id)))
-#define REG32(id) (((uint32_t *)&(self)->vr_regs)[id])
-#define SEG(id)   (((uint16_t *)&(self)->vr_regs.vr_es)[id])
+#define REG8(id)                                                                \
+	(*((id) >= 4 ? ((uint8_t *)(((uint32_t *)&(self)->vr_regs) + ((id)-4))) + 1 \
+	             : ((uint8_t *)(((uint32_t *)&(self)->vr_regs) + (id)))))
+#define REG16(id) \
+	(*(uint16_t *)(((uint32_t *)&(self)->vr_regs) + (id)))
+#define REG32(id) \
+	(((uint32_t *)&(self)->vr_regs)[id])
+#define SEG(id) \
+	(((uint16_t *)&(self)->vr_regs.vr_es)[id])
 
 #define R_AX  0 /* Accumulator. */
 #define R_CX  1 /* Counter register. */
@@ -2283,8 +2287,8 @@ do_rep_instruction:
 		if (op_flags & (F_LOCK))
 			goto err_ilop;
 		error = op_flags & F_OP32
-		        ? libvm86_pushl(self, REG32(opcode - 0x50), op_flags)
-		        : libvm86_pushw(self, REG16(opcode - 0x50), op_flags);
+		        ? libvm86_pushl(self, REG32((uint8_t)(opcode - 0x50)), op_flags)
+		        : libvm86_pushw(self, REG16((uint8_t)(opcode - 0x50)), op_flags);
 		if unlikely(error != VM86_SUCCESS)
 			goto err;
 		break;
@@ -2296,14 +2300,14 @@ do_rep_instruction:
 		if (op_flags & (F_LOCK))
 			goto err_ilop;
 		if (op_flags & F_OP32) {
-			error = libvm86_popl(self, &REG32(opcode - 0x58), op_flags);
+			error = libvm86_popl(self, &REG32((uint8_t)(opcode - 0x58)), op_flags);
 			if unlikely(error != VM86_SUCCESS)
 				goto err;
 		} else {
-			error = libvm86_popw(self, &REG16(opcode - 0x58), op_flags);
+			error = libvm86_popw(self, &REG16((uint8_t)(opcode - 0x58)), op_flags);
 			if unlikely(error != VM86_SUCCESS)
 				goto err;
-			REG32(opcode - 0x58) &= 0xffff;
+			REG32((uint8_t)(opcode - 0x58)) &= 0xffff;
 		}
 		break;
 
@@ -3161,8 +3165,8 @@ do_81h_op16:
 		 * 40+ rd     INC r32     O     N.E.     Valid     Increment doubleword register by 1. */
 		self->vr_regs.vr_flags &= ~(OF | SF | ZF | AF | PF);
 		self->vr_regs.vr_flags |= op_flags & F_OP32
-		                          ? f_addl(REG32(opcode - 0x40)++, (uint32_t)1) & (OF | SF | ZF | AF | PF)
-		                          : f_addw(REG16(opcode - 0x40)++, (uint16_t)1) & (OF | SF | ZF | AF | PF);
+		                          ? f_addl(REG32((uint8_t)(opcode - 0x40))++, (uint32_t)1) & (OF | SF | ZF | AF | PF)
+		                          : f_addw(REG16((uint8_t)(opcode - 0x40))++, (uint16_t)1) & (OF | SF | ZF | AF | PF);
 		break;
 
 	case 0x48 ... 0x4f:
@@ -3170,8 +3174,8 @@ do_81h_op16:
 		 * 40+ rd     DEC r32     O     N.E.     Valid     Decrement doubleword register by 1. */
 		self->vr_regs.vr_flags &= ~(OF | SF | ZF | AF | PF);
 		self->vr_regs.vr_flags |= op_flags & F_OP32
-		                          ? f_addl(REG32(opcode - 0x48)--, (uint32_t)-1) & (OF | SF | ZF | AF | PF)
-		                          : f_addw(REG16(opcode - 0x48)--, (uint16_t)-1) & (OF | SF | ZF | AF | PF);
+		                          ? f_addl(REG32((uint8_t)(opcode - 0x48))--, (uint32_t)-1) & (OF | SF | ZF | AF | PF)
+		                          : f_addw(REG16((uint8_t)(opcode - 0x48))--, (uint16_t)-1) & (OF | SF | ZF | AF | PF);
 		break;
 
 
@@ -3719,7 +3723,7 @@ do_81h_op16:
 
 	case 0xb0 ... 0xb7:
 		/* B0+ rb ib    MOV r8, imm8      OI     Valid     Valid     Move imm8 to r8. */
-		error = libvm86_read_pcbyte(self, &REG8(opcode - 0xb0));
+		error = libvm86_read_pcbyte(self, &REG8((uint8_t)(opcode - 0xb0)));
 		if unlikely(error != VM86_SUCCESS)
 			goto err;
 		break;
@@ -3729,7 +3733,7 @@ do_81h_op16:
 		/* B8+ rw iw    MOV r16, imm16    OI     Valid     Valid     Move imm16 to r16.
 		 * B8+ rd id    MOV r32, imm32    OI     Valid     Valid     Move imm32 to r32. */
 		if (op_flags & F_OP32) {
-			error = libvm86_read_pcdword(self, &REG32(opcode - 0xb8));
+			error = libvm86_read_pcdword(self, &REG32((uint8_t)(opcode - 0xb8)));
 			if unlikely(error != VM86_SUCCESS)
 				goto err;
 		} else {
@@ -4073,13 +4077,13 @@ do_81h_op16:
 		 * 90+rd     XCHG r32, EAX     O     Valid     Valid     Exchange EAX with r32. */
 		if (op_flags & F_OP32) {
 			uint32_t temp;
-			temp                 = REG32(opcode - 0x90);
-			REG32(opcode - 0x90) = self->vr_regs.vr_eax;
+			temp                            = REG32((uint8_t)(opcode - 0x90));
+			REG32((uint8_t)(opcode - 0x90)) = self->vr_regs.vr_eax;
 			self->vr_regs.vr_eax = temp;
 		} else {
 			uint16_t temp;
-			temp                 = REG16(opcode - 0x90);
-			REG32(opcode - 0x90) = (uint32_t)self->vr_regs.vr_ax;
+			temp                            = REG16((uint8_t)(opcode - 0x90));
+			REG32((uint8_t)(opcode - 0x90)) = (uint32_t)self->vr_regs.vr_ax;
 			self->vr_regs.vr_eax = (uint32_t)temp;
 		}
 		break;
