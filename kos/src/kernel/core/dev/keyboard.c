@@ -486,6 +486,106 @@ check_ctrl_dir:
 	return result;
 }
 
+LOCAL NOBLOCK u8
+NOTHROW(KCALL get_control_key)(u8 ch) {
+	/* Playing around with linux, I've noticed some mappings which I can't
+	 * really explain myself, however one of them: CTRL+^ is what allows one
+	 * to generate SIGQUIT with a European keyboard.
+	 *       Second-Key
+	 *            |  Second-Key-Ascii
+	 *            |  |      Produced-ctrl-char
+	 *            |  |         |   References
+	 *            v  v         v     v
+	 *       CTRL+  (0x20) --> 0x00 [1][3]
+	 *       CTRL+" (0x22) --> 0x00 [1]           (Likely an error in the TTY I've tested; "=SHIFT+2)
+	 *       CTRL+2 (0x32) --> 0x00 [1][2][3][6]
+	 *       CTRL+` (0x38) --> 0x00 [3][6]
+	 *       CTRL+3 (0x33) --> 0x1b [1][2][6]
+	 *       CTRL+4 (0x34) --> 0x1c [1][2][5][6]
+	 *       CTRL+^ (0x5e) --> 0x1c [1]
+	 *       CTRL+` (0x38) --> 0x1c [4]           (!!! Collision)
+	 *       CTRL+5 (0x35) --> 0x1d [1][2][6]
+	 *       CTRL+& (0x26) --> 0x1e [1]           (Likely an error in the TTY I've tested; &=SHIFT+6)
+	 *       CTRL+6 (0x36) --> 0x1e [1][2][3][6]
+	 *       CTRL+^ (0x5e) --> 0x1e [6]           (I don't know what to say... My testing shows this to be 0x1c (^\),
+	 *                                             which I know is weird and may not actually be the case, but actually
+	 *                                             be related to diacritics...; 5E->1E would also make more sense than
+	 *                                             5E->1C, since 0x60-0x7f -> 0x00-0x1f)
+	 *       CTRL+- (0x2d) --> 0x1f [1]
+	 *       CTRL+# (0x23) --> 0x1f [1]
+	 *       CTRL+7 (0x37) --> 0x1f [1][2][3][6]
+	 *       CTRL+/ (0x2f) --> 0x1f [3][6]
+	 *       CTRL+8 (0x38) --> 0x7f [1][2][3][6]
+	 *       CTRL+? (0x3f) --> 0x7f [6]
+	 * References:
+	 *  - [1] Own tests using PuTTY
+	 *  - [2] https://unix.stackexchange.com/questions/226327/what-does-ctrl4-and-ctrl-do-in-bash
+	 *  - [3] https://utcc.utoronto.ca/~cks/space/blog/unix/OddControlCharacters
+	 *  - [4] https://superuser.com/a/1155763
+	 *  - [5] https://bash.cyberciti.biz/guide/Shell_signal_values
+	 *  - [6] https://github.com/joejulian/xterm/blob/master/input.c#L263
+	 *
+	 * This page seems to suggest that xterm uses `Xutf8LookupString()' for the CTRL+... translation:
+	 *    https://invisible-island.net/xterm/modified-keys.html
+	 *   ...
+	 *   xterm calls Xutf8LookupString or XmbLookupString to obtain equivalent characters and key symbol
+	 *   Both XKB (keyboard) and the X11 library contribute to the key symbol returned by the *LookupString functions.
+	 *   ...
+	 *   The latter has special cases for certain control keys, e.g., converting control-3 to the escape character.
+	 *   ...
+	 *
+	 * So the rabbit hole still goes deeper...
+	 *
+	 */
+	switch (ch) {
+
+	case ' ':
+	case '2':
+	case '`':
+		ch = 0x00;
+		break;
+
+	case '3':
+		ch = 0x1b;
+		break;
+
+	case '4':
+	case '^':
+		ch = 0x1c;
+		break;
+
+	case '5':
+		ch = 0x1d;
+		break;
+
+	case '6':
+		ch = 0x1e;
+		break;
+
+	case '-':
+	case '#':
+	case '7':
+		ch = 0x1f;
+		break;
+
+	case '8':
+	case '?':
+		ch = 0x7f;
+		break;
+
+	default:
+		if (ch >= 0x40 && ch <= 0x5f)
+			ch -= 0x40;
+		else if (ch >= 0x60 && ch <= 0x7f)
+			ch -= 0x60;
+		else {
+			ch = 0xff;
+		}
+		break;
+	}
+	return ch;
+}
+
 /* Perform key->char translation and store the results in `self->kd_map_pend'
  * Note that unlike `keymap_translate_buf()', this function also takes care of
  * special posix escape sequences (e.g. `\e[11~' for KEY_F1), as well as the
@@ -511,6 +611,7 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 	result = keymap_translate_buf(&self->kd_map, key, mod, self->kd_map_pend,
 	                              COMPILER_LENOF(self->kd_map_pend));
 	if (!result) {
+
 		/* No layout-specific mapping given for this key.
 		 * Check for special mappings of CONTROL character, as well as
 		 * other special keys that should produce escape sequences. */
@@ -519,7 +620,7 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 		/* CTRL+Y     -- 0x19 */
 		/* ALT+Y      -- 0x1b 0x59 */
 		/* CTRL+ALT+Y -- 0x1b 0x19 */
-		if (KEYMOD_ISCTRL_ALT(mod)) {
+		if (KEYMOD_ISCTRL_ALT(mod & ~(KEYMOD_SHIFT))) {
 			result = keymap_translate_buf(&self->kd_map, key,
 			                              mod & ~(KEYMOD_CTRL|KEYMOD_ALT),
 			                              (char *)&ch, 1);
@@ -530,19 +631,15 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 			}
 			/* Transform into a control character,
 			 * and prefix with 0x1b (ESC; aka. `\e') */
-			if (ch >= 0x40 && ch <= 0x5f)
-				ch -= 0x40;
-			else if (ch >= 0x60 && ch <= 0x7f)
-				ch -= 0x60;
-			else {
+			ch = get_control_key(ch);
+			if (ch == 0xff)
 				goto nope;
-			}
 			self->kd_map_pend[0] = (char)0x1b;
 			self->kd_map_pend[1] = (char)ch;
 			result = 2;
 			goto done;
 		}
-		if (KEYMOD_ISCTRL(mod)) {
+		if (KEYMOD_ISCTRL(mod & ~(KEYMOD_SHIFT))) {
 			result = keymap_translate_buf(&self->kd_map, key,
 			                              mod & ~KEYMOD_CTRL,
 			                              (char *)&ch, 1);
@@ -552,18 +649,14 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 				goto nope;
 			}
 			/* Transform into a control character. */
-			if (ch >= 0x40 && ch <= 0x5f)
-				ch -= 0x40;
-			else if (ch >= 0x60 && ch <= 0x7f)
-				ch -= 0x60;
-			else {
+			ch = get_control_key(ch);
+			if (ch == 0xff)
 				goto nope;
-			}
 			self->kd_map_pend[0] = (char)ch;
 			result = 1;
 			goto done;
 		}
-		if (KEYMOD_ISALT(mod)) {
+		if (KEYMOD_ISALT(mod & ~(KEYMOD_SHIFT))) {
 			result = keymap_translate_buf(&self->kd_map, key,
 			                              mod & ~(KEYMOD_CTRL|KEYMOD_ALT),
 			                              &self->kd_map_pend[1],
@@ -578,7 +671,7 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 			goto done;
 		}
 check_misc_key:
-		if (KEYMOD_HASALT(mod)) {
+		if (KEYMOD_HASALT(mod & ~(KEYMOD_SHIFT))) {
 			result = keyboard_device_do_misc_repr(key, mod, &self->kd_map_pend[1]);
 			if (result) {
 				/* Prefix with 0x1b (ESC; aka. `\e') */
@@ -597,22 +690,22 @@ nope:
 
 
 /* Try to read a character from the given keyboard buffer.
- * @return: 0: The buffer is empty. */
-PUBLIC /*utf-8*/ char KCALL
+ * @return: -1: The buffer is empty. */
+PUBLIC /*utf-8*/ int KCALL
 keyboard_device_trygetchar(struct keyboard_device *__restrict self)
 		THROWS(E_IOERROR, ...) {
-	char result;
+	int result;
 again:
 	sync_write(&self->kd_map_lock);
 	if (self->kd_map_pend[0] != 0) {
-		result = self->kd_map_pend[0];
+		result = (int)(unsigned int)(unsigned char)self->kd_map_pend[0];
 		memmove(self->kd_map_pend, self->kd_map_pend + 1,
 		        (COMPILER_LENOF(self->kd_map_pend) - 1) * sizeof(char));
 		self->kd_map_pend[COMPILER_LENOF(self->kd_map_pend) - 1] = 0;
 		sync_endwrite(&self->kd_map_lock);
 	} else {
 		struct keyboard_key_packet key;
-		result = 0;
+		result = -1;
 again_getkey:
 		key = keyboard_device_trygetkey_locked_noled(self);
 		if (key.kp_key != KEY_NONE) {
@@ -621,7 +714,8 @@ again_getkey:
 				goto again_getkey; /* Only generate characters on make-codes */
 			len = keyboard_device_do_translate(self, key.kp_key, key.kp_mod);
 			if (len == 0) {
-unlock_sync_and_again:
+				printk(KERN_DEBUG "[keyboard:%q] translate(%#I16x,%#I16x): <empty>\n",
+				       self->cd_name, key.kp_key, key.kp_mod);
 				sync_endwrite(&self->kd_map_lock);
 				if (key.kp_key == KEY_CAPSLOCK ||
 				    key.kp_key == KEY_NUMLOCK ||
@@ -629,9 +723,10 @@ unlock_sync_and_again:
 					sync_leds(self);
 				goto again;
 			}
-			result = self->kd_map_pend[0];
-			if unlikely(result == 0)
-				goto unlock_sync_and_again;
+			printk(KERN_DEBUG "[keyboard:%q] translate(%#I16x,%#I16x): %$q\n",
+			       self->cd_name, key.kp_key, key.kp_mod,
+			       len, self->kd_map_pend);
+			result = (int)(unsigned int)(unsigned char)self->kd_map_pend[0];
 			if (len == 1)
 				self->kd_map_pend[0] = 0;
 			else {
@@ -652,9 +747,9 @@ unlock_sync_and_again:
 PUBLIC /*utf-8*/ char KCALL
 keyboard_device_getchar(struct keyboard_device *__restrict self)
 		THROWS(E_WOULDBLOCK, E_IOERROR, ...) {
-	char result;
+	int result;
 	assert(!task_isconnected());
-	while ((result = keyboard_device_trygetchar(self)) == 0) {
+	while ((result = keyboard_device_trygetchar(self)) == -1) {
 		task_connect(&self->kd_buf.kb_avail);
 		TRY {
 			result = keyboard_device_trygetchar(self);
@@ -662,13 +757,13 @@ keyboard_device_getchar(struct keyboard_device *__restrict self)
 			task_disconnectall();
 			RETHROW();
 		}
-		if unlikely(result != 0) {
+		if unlikely(result != -1) {
 			task_disconnectall();
 			break;
 		}
 		task_waitfor();
 	}
-	return result;
+	return (char)(unsigned char)(unsigned int)result;
 }
 
 
@@ -718,31 +813,31 @@ keyboard_device_readchars(struct character_device *__restrict self, USER CHECKED
                           size_t num_bytes, iomode_t mode) THROWS(...) {
 	/* Read translated characters. */
 	size_t result;
-	char ch;
+	int ch;
 	struct keyboard_device *me;
 	me = (struct keyboard_device *)self;
 	if unlikely(num_bytes < sizeof(char))
 		goto empty;
 	if (mode & IO_NONBLOCK) {
 		ch = keyboard_device_trygetchar(me);
-		if (ch == 0)
+		if (ch == -1)
 			goto empty;
 	} else {
-		ch = keyboard_device_getchar(me);
-		/*assert(ch != 0);*/
+		ch = (int)(unsigned int)(unsigned char)keyboard_device_getchar(me);
+		assert(ch != -1);
 	}
 	COMPILER_WRITE_BARRIER();
-	*(char *)dst = ch;
+	*(char *)dst = (char)(unsigned char)(unsigned int)ch;
 	COMPILER_WRITE_BARRIER();
 	result = 1;
 	while (num_bytes >= 2 * sizeof(char)) {
 		dst = (byte_t *)dst + sizeof(char);
 		num_bytes -= sizeof(char);
 		ch = keyboard_device_trygetchar(me);
-		if (ch == 0)
+		if (ch == -1)
 			break;
 		COMPILER_WRITE_BARRIER();
-		*(char *)dst = ch;
+		*(char *)dst = (char)(unsigned char)(unsigned int)ch;
 		COMPILER_WRITE_BARRIER();
 		result += sizeof(char);
 	}
@@ -890,13 +985,13 @@ keyboard_device_ioctl(struct character_device *__restrict self,
 	}	break;
 
 	case KBDIO_TRYGETCHAR: {
-		char ch;
+		int ch;
 		validate_writable(arg, sizeof(char));
 		ch = keyboard_device_trygetchar(me);
-		if (!ch)
+		if (ch == -1)
 			return -EAGAIN;
 		COMPILER_WRITE_BARRIER();
-		*(char *)arg = ch;
+		*(char *)arg = (char)(unsigned char)(unsigned int)ch;
 		COMPILER_WRITE_BARRIER();
 	}	break;
 

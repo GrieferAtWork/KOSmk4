@@ -50,6 +50,7 @@
 #include <string.h>
 #include <syslog.h>
 #include <unistd.h>
+#include <termios.h>
 
 DECL_BEGIN
 
@@ -96,6 +97,46 @@ DECL_BEGIN
 /* TODO: Add system header <libintl.h> */
 /* TODO: Add system header <nan.h> */
 /* TODO: Add system header <ftw.h> */
+
+
+
+/************************************************************************/
+int main_rawterm(int argc, char *argv[], char *envp[]) {
+	struct termios oios, nios;
+	char buf[8];
+	tcgetattr(STDIN_FILENO, &oios);
+	nios = oios;
+	cfmakeraw(&nios);
+	tcsetattr(STDIN_FILENO, TCSADRAIN, &nios);
+	printf("type 'q' to exit\n");
+	for (;;) {
+		ssize_t i, buflen;
+		buflen = read(STDIN_FILENO, buf, sizeof(buf));
+		if (buflen <= 0)
+			break;
+		if (buflen == 1 && buf[0] == 'q')
+			break;
+		for (i = 0; i < buflen; ++i) {
+			printf("%s%.2x", i ? " " : "",
+			       (unsigned int)(u8)buf[i]);
+		}
+		for (; i < (ssize_t)sizeof(buf); ++i) {
+			printf("   ");
+		}
+		for (i = 0; i < buflen; ++i) {
+			char c = buf[i];
+			if (!isprint(c))
+				c = '.';
+			printf("%c", c);
+		}
+		printf("\n");
+	}
+	tcsetattr(STDIN_FILENO, TCSADRAIN, &oios);
+	return 0;
+}
+/************************************************************************/
+
+
 
 
 
@@ -292,6 +333,7 @@ PRIVATE DEF defs[] = {
 	{ "signal", &main_signal },
 	{ "prognam", &main_prognam },
 	{ "except", &main_except },
+	{ "rawterm", &main_rawterm },
 	{ NULL, NULL },
 };
 

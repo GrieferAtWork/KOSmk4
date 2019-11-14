@@ -29,16 +29,15 @@
 DECL_BEGIN
 
 int main(int argc, char *argv[]) {
-	/* This program is used to test a problem related to exception unwinding
+	/* This program was used to test a problem related to exception unwinding
 	 * while inside of `task_serve()' (s.a. `LOG_SEGNENT_INCONSISTENCY()' in
 	 * `kos/src/kernel/core/arch/i386/except.c')
 	 * -> Start this program and press CTRL+C a couple of times (which will
 	 *    eventually cause an E_INTERRUPT_USER_RPC to be thrown and propagated
-	 *    through `task_serve()', that demonstratetes a design flaw caused by
+	 *    through `task_serve()', that demonstrateted a design flaw caused by
 	 *    a miss-understanding of how `pushl %<SEGMENT_REGISTER>' works on
 	 *    different CPUs)
-	 * (To exit the program, send SIGQUIT using CTRL+\ (which is CTRL+# on
-	 * European keyboard)) */
+	 * (To exit the program, send SIGQUIT using CTRL+\ (of its alias: CTRL+4)) */
 	signal(SIGINT, SIG_IGN);
 	sysctl(SYSCTL_SYSCALL_SET_TRACING_ENABLED, 0); /* Prevent log spam of tracing methods */
 	for (;;) {

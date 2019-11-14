@@ -158,8 +158,8 @@ FUNDEF struct keyboard_key_packet KCALL keyboard_device_trygetkey(struct keyboar
 FUNDEF struct keyboard_key_packet KCALL keyboard_device_getkey(struct keyboard_device *__restrict self) THROWS(E_WOULDBLOCK, E_IOERROR, ...);
 
 /* Try to read a character from the given keyboard.
- * @return: 0: The buffer is empty. */
-FUNDEF /*utf-8*/ char KCALL keyboard_device_trygetchar(struct keyboard_device *__restrict self) THROWS(E_IOERROR, ...);
+ * @return: -1: The buffer is empty. */
+FUNDEF /*utf-8*/ int KCALL keyboard_device_trygetchar(struct keyboard_device *__restrict self) THROWS(E_IOERROR, ...);
 FUNDEF /*utf-8*/ char KCALL keyboard_device_getchar(struct keyboard_device *__restrict self) THROWS(E_WOULDBLOCK, E_IOERROR, ...);
 
 
