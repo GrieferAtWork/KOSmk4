@@ -34,6 +34,7 @@
 
 #include <libansitty/ansitty.h>
 #include <termios.h>
+#include <hybrid/atomic.h>
 
 #include "ansitty.h"
 #include "cp.h"
@@ -77,10 +78,11 @@ DECL_BEGIN
 #endif
 
 #ifdef __KERNEL__
-#define UNKNOWN_SEQUENCE_WARN(...) printk(KERN_WARNING __VA_ARGS__)
+#define LOG_SYSTEM_WARNING(...) printk(KERN_WARNING __VA_ARGS__)
 #else /* __KERNEL__ */
-#define UNKNOWN_SEQUENCE_WARN(...) syslog(LOG_WARNING, __VA_ARGS__)
+#define LOG_SYSTEM_WARNING(...) syslog(LOG_WARNING, __VA_ARGS__)
 #endif /* !__KERNEL__ */
+#define UNKNOWN_SEQUENCE_WARN LOG_SYSTEM_WARNING
 #define WARN_UNKNOWN_SEQUENCE1(firstch) \
 	UNKNOWN_SEQUENCE_WARN("[ansitty] Unrecognized escape sequence \"\\e%#Q\"\n", firstch)
 #define WARN_UNKNOWN_SEQUENCE2(firstch, lastch) \
@@ -91,6 +93,18 @@ DECL_BEGIN
 	UNKNOWN_SEQUENCE_WARN("[ansitty] Unrecognized escape sequence \"\\e%#Q%#$q%#Q\"\n", firstch, (size_t)(len), ptr, lastch)
 #define WARN_UNKNOWN_SEQUENCE4(firstch, len, ptr, before_lastch, lastch) \
 	UNKNOWN_SEQUENCE_WARN("[ansitty] Unrecognized escape sequence \"\\e%#Q%#$q%#Q%#Q\"\n", firstch, (size_t)(len), ptr, before_lastch, lastch)
+
+
+#if 1
+#define RACE(err)                                                                    \
+	do {                                                                             \
+		LOG_SYSTEM_WARNING("[ansitty] race detected (%s:%d)\n", __FILE__, __LINE__); \
+		goto err;                                                                    \
+	} __WHILE0
+#else
+#define RACE(err) goto err
+#endif
+
 
 #define PUTUNI(uni)                 (*self->at_ops.ato_putc)(self, uni)
 #define GETCURSOR(pxy)              ((*self->at_ops.ato_getcursor)(self, pxy), TRACE_OPERATION("getcur:{%u,%u}\n", (pxy)[0], (pxy)[1]))
@@ -1687,7 +1701,7 @@ done_insert_ansitty_flag_hedit:
 					                                       (uint8_t)g,
 					                                       (uint8_t)b);
 				} else {
-					assert(color_mode == 5);
+					/*assert(color_mode == 5);*/
 					used_color_index = (unsigned int)strtoul(_args_end, &_args_end, 10);
 					if (*_args_end != ';' && _args_end != arg + arglen)
 						goto nope;
@@ -2178,66 +2192,71 @@ ansitty_do_repeat_unicode(struct ansitty *__restrict self, char32_t ch) {
 LOCAL NONNULL((1)) void CC
 ansitty_pututf8_mbs(struct ansitty *__restrict self, char ch) {
 	char32_t unich;
-	assert(self->at_codepage == CP_UTF8);
-	assert(self->at_escwrd[1] < self->at_escwrd[0]);
+	uintptr_half_t count, limit;
 	if (((byte_t)ch & 0xc0) != 0x80) {
+do_handle_this_ch:
 		unich = (char32_t)ch;
 		goto do_handle_unich;
 	}
-	self->at_escape[self->at_escwrd[1]++] = (byte_t)ch;
-	if (self->at_escwrd[1] >= self->at_escwrd[0]) {
-		/* Unicode sequence has been completed. */
-		char const *text;
-		assert(self->at_escwrd[1] == self->at_escwrd[0]);
-		text  = (char *)self->at_escape;
-		unich = unicode_readutf8(&text);
-		assert(text == ((char *)self->at_escape + self->at_escwrd[0]));
+	do {
+		count = ATOMIC_READ(self->at_escwrd[1]);
+		limit = ATOMIC_READ(self->at_escwrd[0]);
+		if unlikely(count >= limit)
+			RACE(do_handle_this_ch); /* Shouldn't happen (race condition guard) */
+		self->at_escape[count] = (byte_t)ch;
+		if (count + 1 >= limit) {
+			/* Unicode sequence has been completed. */
+			char const *text;
+			text  = (char *)self->at_escape;
+			unich = unicode_readutf8(&text);
 do_handle_unich:
-		/* Check for the escape character */
-		if (!handle_control_character(self, unich)) {
-			if (self->at_state == STATE_REPEAT_UTF8_MBS) {
-				ansitty_do_repeat_unicode(self, unich);
-				ansitty_setstate_text(self);
-			} else if (self->at_state == STATE_INSERT_UTF8_MBS) {
-				ansitty_do_insert_unicode(self, unich);
-				self->at_state = STATE_INSERT_UTF8;
-			} else {
-				self->at_state = STATE_TEXT_UTF8;
+			/* Check for the escape character */
+			if (!handle_control_character(self, unich)) {
+				if (self->at_state == STATE_REPEAT_UTF8_MBS) {
+					ansitty_do_repeat_unicode(self, unich);
+					ansitty_setstate_text(self);
+				} else if (self->at_state == STATE_INSERT_UTF8_MBS) {
+					ansitty_do_insert_unicode(self, unich);
+					self->at_state = STATE_INSERT_UTF8;
+				} else {
+					self->at_state = STATE_TEXT_UTF8;
+				}
 			}
+			return;
 		}
-	}
+	} while (!ATOMIC_CMPXCH_WEAK(self->at_escwrd[1], count, count + 1));
 }
 
 
 PRIVATE NONNULL((1)) bool CC
-ansitty_invoke_string_command(struct ansitty *__restrict self) {
+ansitty_invoke_string_command(struct ansitty *__restrict self, size_t len) {
 	bool result;
-	self->at_escape[self->at_esclen] = 0;
+	self->at_escape[len] = 0;
 	switch (self->at_state) {
 
 	case STATE_OSC:
 	case STATE_OSC_ESC:
-		result = ansi_OSC(self, (char *)self->at_escape, self->at_esclen);
+		result = ansi_OSC(self, (char *)self->at_escape, len);
 		break;
 
 	case STATE_DCS:
 	case STATE_DCS_ESC:
-		result = ansi_DCS(self, (char *)self->at_escape, self->at_esclen);
+		result = ansi_DCS(self, (char *)self->at_escape, len);
 		break;
 
 	case STATE_SOS:
 	case STATE_SOS_ESC:
-		result = ansi_SOS(self, (char *)self->at_escape, self->at_esclen);
+		result = ansi_SOS(self, (char *)self->at_escape, len);
 		break;
 
 	case STATE_PM:
 	case STATE_PM_ESC:
-		result = ansi_PM(self, (char *)self->at_escape, self->at_esclen);
+		result = ansi_PM(self, (char *)self->at_escape, len);
 		break;
 
 	case STATE_APC:
 	case STATE_APC_ESC:
-		result = ansi_APC(self, (char *)self->at_escape, self->at_esclen);
+		result = ansi_APC(self, (char *)self->at_escape, len);
 		break;
 
 	default: __builtin_unreachable();
@@ -2311,16 +2330,18 @@ again:
 		case CC_CAN:
 			break; /* Ignore... */
 
-		case 0x80 ... 0xff:
+		case 0x80 ... 0xff: {
+			uint8_t len;
 			/* Begin a new multi-byte character sequence. */
-			self->at_escwrd[0] = unicode_utf8seqlen[(byte_t)ch];
-			if unlikely(!self->at_escwrd[0])
+			len = unicode_utf8seqlen[(byte_t)ch];
+			if unlikely(!len)
 				goto do_putuni; /* Invalid utf-8 byte... (simply re-output, thus ignoring the error) */
-			assert(self->at_escwrd[0] != 1);
+			assert(len != 1);
+			self->at_escwrd[0] = len;
 			self->at_escwrd[1] = 1;
 			self->at_escape[0] = (byte_t)ch;
 			self->at_state     = STATE_TEXT_UTF8_MBS;
-			break;
+		}	break;
 
 		case CC_VT:
 		case CC_FF:
@@ -2354,7 +2375,8 @@ do_putuni:
 		}
 		break;
 
-	case STATE_REPEAT_UTF8:
+	case STATE_REPEAT_UTF8: {
+		uint8_t len;
 		/* Check for the escape character */
 		if (handle_control_character(self, (uint8_t)ch))
 			break;
@@ -2365,16 +2387,18 @@ do_repuni:
 			goto set_text_and_done;
 		}
 		/* Begin a new multi-byte character sequence. */
-		self->at_escwrd[0] = unicode_utf8seqlen[(byte_t)ch];
-		if unlikely(!self->at_escwrd[0])
+		len = unicode_utf8seqlen[(byte_t)ch];
+		if unlikely(!len)
 			goto do_repuni; /* Invalid utf-8 byte... (simply re-output, thus ignoring the error) */
-		assert(self->at_escwrd[0] != 1);
+		assert(len != 1);
+		self->at_escwrd[0] = len;
 		self->at_escwrd[1] = 1;
 		self->at_escape[0] = (byte_t)ch;
 		self->at_state     = STATE_REPEAT_UTF8_MBS;
-		break;
+	}	break;
 
-	case STATE_INSERT_UTF8:
+	case STATE_INSERT_UTF8: {
+		uint8_t len;
 		/* Check for the escape character */
 		if (handle_control_character(self, (uint8_t)ch))
 			break;
@@ -2385,14 +2409,15 @@ do_insuni:
 			break;
 		}
 		/* Begin a new multi-byte character sequence. */
-		self->at_escwrd[0] = unicode_utf8seqlen[(byte_t)ch];
-		if unlikely(!self->at_escwrd[0])
+		len = unicode_utf8seqlen[(byte_t)ch];
+		if unlikely(!len)
 			goto do_insuni; /* Invalid utf-8 byte... (simply re-output, thus ignoring the error) */
-		assert(self->at_escwrd[0] != 1);
+		assert(len != 1);
+		self->at_escwrd[0] = len;
 		self->at_escwrd[1] = 1;
 		self->at_escape[0] = (byte_t)ch;
 		self->at_state     = STATE_INSERT_UTF8_MBS;
-		break;
+	}	break;
 
 	case STATE_TEXT_UTF8_MBS:
 	case STATE_REPEAT_UTF8_MBS:
@@ -2761,15 +2786,18 @@ setcp_USASCII:
 		break;
 
 
-	case STATE_CSI:
-		assert(self->at_esclen < COMPILER_LENOF(self->at_escape));
+	case STATE_CSI: {
+		size_t len;
+		len = self->at_esclen;
+		if unlikely(len >= COMPILER_LENOF(self->at_escape))
+			RACE(set_text_and_done);
 		if (ch >= ANSI_LOW && ch <= ANSI_HIGH) {
 			/* Process escape argument. */
 do_process_csi:
-			self->at_escape[self->at_esclen] = 0;
+			self->at_escape[len] = 0;
 			ansitty_setstate_text(self);
-			if (!ansi_CSI(self, (char *)self->at_escape, self->at_esclen, ch)) {
-				WARN_UNKNOWN_SEQUENCE3('[', self->at_esclen, self->at_escape, ch);
+			if (!ansi_CSI(self, (char *)self->at_escape, len, ch)) {
+				WARN_UNKNOWN_SEQUENCE3('[', len, self->at_escape, ch);
 				goto set_text_and_done;
 			}
 			break;
@@ -2778,24 +2806,27 @@ do_process_csi:
 			goto set_text_and_done;
 		if (ch == CC_NUL) /* Ignored */
 			break;
-		self->at_escape[self->at_esclen] = (byte_t)ch;
-		++self->at_esclen;
-		if unlikely(self->at_esclen >= COMPILER_LENOF(self->at_escape)) {
-			assert(self->at_esclen == COMPILER_LENOF(self->at_escape));
+		self->at_escape[len++] = (byte_t)ch;
+		self->at_esclen = len;
+		if unlikely(len >= COMPILER_LENOF(self->at_escape)) {
+			assert(len == COMPILER_LENOF(self->at_escape));
 			goto do_process_csi;
 		}
-		break;
+	}	break;
 
 	case STATE_OSC_ESC:
 	case STATE_DCS_ESC:
 	case STATE_SOS_ESC:
 	case STATE_PM_ESC:
-	case STATE_APC_ESC:
-		assert(self->at_esclen < COMPILER_LENOF(self->at_escape));
+	case STATE_APC_ESC: {
+		size_t len;
+		len = self->at_esclen;
+		if unlikely(len >= COMPILER_LENOF(self->at_escape))
+			RACE(set_text_and_done);
 		if ((byte_t)ch == '\\') {
-			if (!ansitty_invoke_string_command(self)) {
+			if (!ansitty_invoke_string_command(self, len)) {
 				WARN_UNKNOWN_SEQUENCE4(get_string_command_start_character(self->at_state),
-				                       self->at_esclen, self->at_escape, CC_ESC, ch);
+				                       len, self->at_escape, CC_ESC, ch);
 				goto set_text_and_done;
 			}
 			goto set_text_and_done;
@@ -2804,13 +2835,13 @@ do_process_csi:
 		} else if (ch == CC_NUL) { /* Ignored */
 			break;
 		}
-		self->at_escape[self->at_esclen] = CC_ESC;
-		++self->at_esclen;
-		if unlikely(self->at_esclen >= COMPILER_LENOF(self->at_escape))
+		self->at_escape[len++] = CC_ESC;
+		self->at_esclen = len;
+		if unlikely(len >= COMPILER_LENOF(self->at_escape))
 			goto do_process_string_command;
-		self->at_escape[self->at_esclen] = (byte_t)ch;
-		++self->at_esclen;
-		if unlikely(self->at_esclen >= COMPILER_LENOF(self->at_escape))
+		self->at_escape[len++] = (byte_t)ch;
+		self->at_esclen = len;
+		if unlikely(len >= COMPILER_LENOF(self->at_escape))
 			goto do_process_string_command;
 		self->at_state = STATE_OSC_DEL_ESC(self->at_state);
 		break;
@@ -2820,12 +2851,14 @@ do_process_csi:
 	case STATE_SOS:
 	case STATE_PM:
 	case STATE_APC:
-		assert(self->at_esclen < COMPILER_LENOF(self->at_escape));
+		len = self->at_esclen;
+		if unlikely(len >= COMPILER_LENOF(self->at_escape))
+			RACE(set_text_and_done);
 		if ((byte_t)ch == CC_BEL) {
 do_process_string_command:
-			if (!ansitty_invoke_string_command(self)) {
+			if (!ansitty_invoke_string_command(self, len)) {
 				WARN_UNKNOWN_SEQUENCE3(get_string_command_start_character(self->at_state),
-				                       self->at_esclen, self->at_escape, CC_BEL);
+				                       len, self->at_escape, CC_BEL);
 			}
 			goto set_text_and_done;
 		} else if ((byte_t)ch == CC_ESC) {
@@ -2836,14 +2869,14 @@ do_process_string_command:
 		} else if (ch == CC_NUL) { /* Ignored */
 			break;
 		}
-		self->at_escape[self->at_esclen] = (byte_t)ch;
-		++self->at_esclen;
-		if unlikely(self->at_esclen >= COMPILER_LENOF(self->at_escape)) {
-			assert(self->at_esclen == COMPILER_LENOF(self->at_escape));
+		self->at_escape[len++] = (byte_t)ch;
+		self->at_esclen = len;
+		if unlikely(len >= COMPILER_LENOF(self->at_escape)) {
+			assert(len == COMPILER_LENOF(self->at_escape));
 			goto do_process_string_command;
 		}
-		break;
-
+	}	break;
+	
 	case STATE_ESC_5:
 		if (ch == 'n') {
 			/* VT100: devstat DSR */

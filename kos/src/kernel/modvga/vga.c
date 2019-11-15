@@ -1075,7 +1075,7 @@ NOTHROW(KCALL invert_current_line_colors)(VGA *__restrict self) {
 
 PRIVATE void KCALL do_flash_screen_pause(void) THROWS(E_WOULDBLOCK, ...) {
 	qtime_t tmo = quantum_time();
-	tmo.add_milliseconds(70);
+	tmo.add_milliseconds(50);
 	task_waitfor(&tmo);
 }
 
