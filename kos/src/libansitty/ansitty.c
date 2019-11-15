@@ -481,9 +481,10 @@ setcolor(struct ansitty *__restrict self,
 	if (self->at_color == color)
 		return; /* Unchanged. */
 	self->at_color = color;
-	if (self->at_ttyflag & ANSITTY_FLAG_CONCEIL)
+	if (self->at_ttyflag & ANSITTY_FLAG_CONCEIL) {
 		color = ANSITTY_PALETTE_INDEX(ANSITTY_PALETTE_INDEX_BG(color),
 		                              ANSITTY_PALETTE_INDEX_BG(color));
+	}
 	SETCOLOR(color);
 }
 
@@ -520,16 +521,22 @@ setflags(struct ansitty *__restrict self, uint16_t new_flags) {
 
 
 
-PRIVATE void CC savecursor(struct ansitty *__restrict self) {
+PRIVATE void CC
+savecursor(struct ansitty *__restrict self) {
 	GETCURSOR(self->at_savecur);
 }
-PRIVATE void CC loadcursor(struct ansitty *__restrict self) {
-	SETCURSOR(self->at_savecur[0], self->at_savecur[1], true);
+
+PRIVATE void CC
+loadcursor(struct ansitty *__restrict self) {
+	SETCURSOR(self->at_savecur[0],
+	          self->at_savecur[1],
+	          true);
 }
 
 PRIVATE void CC
 setscrollregion(struct ansitty *__restrict self,
-                ansitty_coord_t sl, ansitty_coord_t el) {
+                ansitty_coord_t sl,
+                ansitty_coord_t el) {
 	if (sl == self->at_scroll_sl &&
 	    el == self->at_scroll_el)
 		return;
@@ -540,7 +547,8 @@ setscrollregion(struct ansitty *__restrict self,
 
 PRIVATE void CC
 setscrollmargin(struct ansitty *__restrict self,
-                ansitty_coord_t sc, ansitty_coord_t ec) {
+                ansitty_coord_t sc,
+                ansitty_coord_t ec) {
 	self->at_scroll_sc = sc;
 	self->at_scroll_ec = ec;
 }
@@ -2216,6 +2224,27 @@ done_insert_ansitty_flag_hedit:
 		                endline);
 	}	break;
 
+	case 'X': {
+		/* CSI Ps X  Erase Ps Character(s) (default = 1) (ECH). */
+		unsigned int count, maxerase;
+		ansitty_coord_t xy[2];
+		ansitty_coord_t sxy[2];
+		if (!arglen)
+			count = 1;
+		else {
+			char *end;
+			count = (unsigned int)strtoul(arg, &end, 10);
+			if (end != arg + arglen)
+				goto nope;
+		}
+		/* Erase the next `count' characters within the current line, */
+		GETCURSOR(xy);
+		GETSIZE(sxy);
+		maxerase = (unsigned int)(sxy[0] - xy[0]);
+		if (count > maxerase)
+			count = maxerase;
+		FILLCELL(' ', count);
+	}	break;
 
 	default:
 		goto nope;
