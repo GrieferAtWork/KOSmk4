@@ -107,6 +107,7 @@ DECL_BEGIN
 
 
 #define PUTUNI(uni)                 (*self->at_ops.ato_putc)(self, uni)
+#define PUTUNILAST(uni)             (self->at_lastch = (uni), PUTUNI(uni))
 #define GETCURSOR(pxy)              ((*self->at_ops.ato_getcursor)(self, pxy), TRACE_OPERATION("getcur:{%u,%u}\n", (pxy)[0], (pxy)[1]))
 #define GETSIZE(pxy)                ((*self->at_ops.ato_getsize)(self, pxy), TRACE_OPERATION("getsiz:{%u,%u}\n", (pxy)[0], (pxy)[1]))
 #define SETCURSOR(x, y, uhwc)       (TRACE_OPERATION("setcur(%u,%u,%s)\n", x, y, uhwc ? "true" : "false"), (*self->at_ops.ato_setcursor)(self, x, y, uhwc))
@@ -162,18 +163,14 @@ DECL_BEGIN
 #define STATE_ESC_5           15 /* After `ESC5' */
 #define STATE_ESC_6           16 /* After `ESC6' */
 #define STATE_ESC_POUND       17 /* After `ESC#' */
-#define STATE_REPEAT          18 /* Repeat the next character `STATE_REPEAT_COUNT(self)' times */
-#define STATE_REPEAT_UTF8     19 /* Repeat the next character `STATE_REPEAT_COUNT(self)' times (in UTF-8 mode) */
-#define STATE_REPEAT_UTF8_MBS 20 /* Repeat the next character `STATE_REPEAT_COUNT(self)' times (in UTF-8 mode, with pending multi-byte character) */
-#define STATE_REPEAT_COUNT(self) (*(unsigned int *)(COMPILER_ENDOF((self)->at_escape) - sizeof(unsigned int)))
-#define STATE_INSERT          21 /* Insertion-mode */
-#define STATE_INSERT_UTF8     22 /* Insertion-mode (in UTF-8 mode) */
-#define STATE_INSERT_UTF8_MBS 23 /* Insertion-mode (in UTF-8 mode, with pending multi-byte character) */
-#define STATE_ESC_Y1          24 /* After `ESCY' */
+#define STATE_INSERT          18 /* Insertion-mode */
+#define STATE_INSERT_UTF8     19 /* Insertion-mode (in UTF-8 mode) */
+#define STATE_INSERT_UTF8_MBS 20 /* Insertion-mode (in UTF-8 mode, with pending multi-byte character) */
+#define STATE_ESC_Y1          21 /* After `ESCY' */
 #define STATE_ESC_Y1_VAL(self) (*(uint8_t *)(COMPILER_ENDOF((self)->at_escape) - sizeof(uint8_t)))
-#define STATE_ESC_Y2          25 /* After `ESCY<ORD>' */
-#define STATE_LPAREN_PERCENT  26 /* After `ESC(%' */
-#define STATE_TEXT            27 /* DEC Special Character and Line Drawing Set, VT100. */
+#define STATE_ESC_Y2          22 /* After `ESCY<ORD>' */
+#define STATE_LPAREN_PERCENT  23 /* After `ESC(%' */
+#define STATE_TEXT            24 /* DEC Special Character and Line Drawing Set, VT100. */
 
 #define STATE_OSC_ADD_ESC(x) ((x)+5)
 #define STATE_OSC_DEL_ESC(x) ((x)-5)
@@ -450,9 +447,8 @@ libansitty_init(struct ansitty *__restrict self,
 	if (!self->at_ops.ato_scroll) {
 		self->at_ops.ato_scroll = &stub_scroll;
 		/* With copycell(), we can do 100% accurate emulation of scroll() */
-		if (self->at_ops.ato_copycell) {
+		if (self->at_ops.ato_copycell)
 			self->at_ops.ato_scroll = &stub_scroll_with_copycell;
-		}
 	}
 	if (!self->at_ops.ato_getsize)
 		self->at_ops.ato_getsize = self->at_ops.ato_getcursor ? &stub_getsize_from_cursor : &stub_getsize;
@@ -475,6 +471,7 @@ libansitty_init(struct ansitty *__restrict self,
 	self->at_state      = STATE_TEXT_UTF8;
 	self->at_codepage   = CP_UTF8;
 	self->at_zero       = 0;
+	self->at_lastch     = ' ';
 }
 
 
@@ -546,6 +543,285 @@ setscrollmargin(struct ansitty *__restrict self,
                 ansitty_coord_t sc, ansitty_coord_t ec) {
 	self->at_scroll_sc = sc;
 	self->at_scroll_ec = ec;
+}
+
+
+
+
+
+
+
+/* ==================================================================================== */
+/* Low-level character output helpers                                                   */
+/* ==================================================================================== */
+
+PRIVATE NONNULL((1)) void CC
+ansitty_setstate_text(struct ansitty *__restrict self) {
+	self->at_state = (self->at_ttyflag & ANSITTY_FLAG_INSERT)
+	                 ? (self->at_codepage == CP_UTF8 ? STATE_INSERT_UTF8 : STATE_INSERT)
+	                 : (self->at_codepage == CP_UTF8 ? STATE_TEXT_UTF8 : STATE_TEXT);
+}
+
+PRIVATE WUNUSED ATTR_PURE NONNULL((2)) char32_t FCALL
+cp_decode(uint8_t ch, struct ansitty *__restrict self) {
+	char32_t result;
+	switch (self->at_codepage) {
+
+	case CP_LDM:
+		result = libansitty_decode_cp_ldm(ch);
+		break;
+
+	case CP_DUTCH:
+		result = libansitty_decode_cp_dutch(ch);
+		break;
+
+	case CP_FINNISH:
+		result = libansitty_decode_cp_finnish(ch);
+		break;
+
+	case CP_FRENCH:
+		result = libansitty_decode_cp_french(ch);
+		break;
+
+	case CP_FRENCH_CANADIAN:
+		result = libansitty_decode_cp_french_canadian(ch);
+		break;
+
+	case CP_GERMAN:
+		result = libansitty_decode_cp_german(ch);
+		break;
+
+	case CP_ITALIAN:
+		result = libansitty_decode_cp_italian(ch);
+		break;
+
+	case CP_NORWEGIAN:
+		result = libansitty_decode_cp_norwegian(ch);
+		break;
+
+	case CP_PORTUGUESE:
+		result = libansitty_decode_cp_portuguese(ch);
+		break;
+
+	case CP_SPANISH:
+		result = libansitty_decode_cp_spanish(ch);
+		break;
+
+	case CP_SWEDISH:
+		result = libansitty_decode_cp_swedish(ch);
+		break;
+
+	case CP_SWISS:
+		result = libansitty_decode_cp_swiss(ch);
+		break;
+
+	case CP_LATIN1:
+	default:
+		result = (char32_t)ch;
+		break;
+	}
+	return result;
+}
+
+LOCAL NONNULL((1)) bool CC
+handle_control_character(struct ansitty *__restrict self, char32_t ch) {
+	switch (ch) {
+
+	case CC_NUL:
+		/* NUL should be ignored by ansi ttys in all situations. */
+		goto done;
+
+	case CC_ENQ:
+		/* Return Terminal Status (which defaults to an empty string) */
+		goto done;
+
+	case CC_BEL:
+	case CC_BS:
+	case CC_TAB:
+	case CC_CR:
+		break;
+
+	case CC_SO:
+	case CC_SI:
+		/* Standard/Alternate character set??? */
+		goto done;
+
+	case CC_CAN:
+		ansitty_setstate_text(self);
+		break;
+
+	case CC_ESC:
+		self->at_state = STATE_ESC;
+		break;
+
+	case CC_VT:
+	case CC_FF:
+		ch = CC_LF;
+		ATTR_FALLTHROUGH
+	case CC_LF:
+		if (self->at_ttyflag & ANSITTY_FLAG_NOLFCR) {
+			/* LF shouldn't set COLUMN=0 */
+			ansitty_coord_t xy[2];
+			GETCURSOR(xy);
+			if (xy[0] != 0) {
+				HIDECURSOR_BEGIN() {
+					/* Current column is non-zero, so we must take special
+					 * action to ensure that the cursor is placed correctly. */
+					PUTUNI(CC_LF);
+					/* Reset the cursor position to the middle of the following line.
+					 * Note that in the case of the previous line being the bottom-most one,
+					 * SETCURSOR() will clamp that coord into the valid display range. */
+					SETCURSOR(xy[0], xy[1] + 1, false);
+				}
+				HIDECURSOR_END();
+				return true;
+			}
+		}
+		break;
+
+	default:
+		return false;
+	}
+	PUTUNI(ch);
+done:
+	return true;
+}
+
+LOCAL NONNULL((1)) void CC
+ansitty_do_insert_unicode(struct ansitty *__restrict self, char32_t ch) {
+	switch (self->at_ttyflag & (ANSITTY_FLAG_HEDIT |
+	                            ANSITTY_FLAG_INSDEL_SCRN)) {
+
+	case 0: {
+		/* 123456789      123456789
+		 * ABCDEFGHI  --> ABCD...EF
+		 * abcdefghi      abcdefghi */
+		ansitty_coord_t xy[2];
+		ansitty_coord_t sxy[2];
+		ansitty_coord_t cells_in_line;
+		GETCURSOR(xy);
+		GETSIZE(sxy);
+		if unlikely(xy[0] >= sxy[0])
+			break;
+		cells_in_line = sxy[0] - xy[0];
+		if (1 >= cells_in_line)
+			break;
+		COPYCELL(1, cells_in_line - 1);
+	}	goto do_putuni_and_break;
+
+	case ANSITTY_FLAG_INSDEL_SCRN:
+		/* 123456789      123456789
+		 * ABCDEFGHI  --> ABCD...EF
+		 * abcdefghi      GHIabcdef */
+		COPYCELL(1, MAXCOORD);
+do_putuni_and_break:
+		PUTUNILAST(ch);
+		break;
+
+	case ANSITTY_FLAG_HEDIT: {
+		ansitty_coord_t xy[2];
+		/* 123456789      123456789
+		 * ABCDEFGHI  --> D...EFGHI
+		 * abcdefghi      abcdefghi */
+		GETCURSOR(xy);
+		if (xy[0] <= 1) {
+			/* Full area shift */
+			if (xy[0] == 0)
+				break;
+			SETCURSOR(0, xy[1], false);
+			goto do_putuni_and_break;
+		}
+		SETCURSOR(1, xy[1], false);
+		COPYCELL(-1, xy[0] - 1);
+		SETCURSOR(xy[0] - 1, xy[1], false);
+	}	goto do_putuni_and_break;
+
+	case ANSITTY_FLAG_HEDIT | ANSITTY_FLAG_INSDEL_SCRN: {
+		ansitty_coord_t xy[2];
+		unsigned int copy_count;
+		/* 123456789      456789ABC
+		 * ABCDEFGHI  --> D...EFGHI
+		 * abcdefghi      abcdefghi */
+		GETCURSOR(xy);
+		if (xy[1] == 0) {
+			if (xy[0] <= 1) {
+				if (xy[0] == 0)
+					break;
+				SETCURSOR(0, 0, false);
+				goto do_putuni_and_break;
+			}
+			copy_count = xy[0];
+		} else {
+			ansitty_coord_t xy2[2];
+			GETSIZE(xy2);
+			copy_count = xy[0] + xy[1] * xy2[0];
+		}
+		SETCURSOR(1, 0, false);
+		COPYCELL(-1, copy_count);
+		if (!xy[0]) {
+			--xy[1];
+			xy[0] = MAXCOORD;
+		} else {
+			--xy[0];
+		}
+		SETCURSOR(xy[0], xy[1], false);
+	}	goto do_putuni_and_break;
+
+	default: __builtin_unreachable();
+	}
+}
+
+LOCAL NONNULL((1)) void CC
+ansitty_do_repeat_unicode(struct ansitty *__restrict self,
+                          char32_t ch, unsigned int count) {
+	assert(count != 0);
+	if (handle_control_character(self, ch)) {
+		while (--count)
+			handle_control_character(self, ch);
+	} else if (self->at_ttyflag & ANSITTY_FLAG_INSERT) {
+		do {
+			ansitty_do_insert_unicode(self, ch);
+		} while (--count);
+	} else {
+		do {
+			PUTUNI(ch);
+		} while (--count);
+	}
+}
+
+LOCAL NONNULL((1)) void CC
+ansitty_pututf8_mbs(struct ansitty *__restrict self, char ch) {
+	char32_t unich;
+	uintptr_half_t count, limit;
+	if (((byte_t)ch & 0xc0) != 0x80) {
+do_handle_this_ch:
+		unich = (char32_t)ch;
+		goto do_handle_unich;
+	}
+	do {
+		count = ATOMIC_READ(self->at_escwrd[1]);
+		limit = ATOMIC_READ(self->at_escwrd[0]);
+		if unlikely(count >= limit)
+			RACE(do_handle_this_ch); /* Shouldn't happen (race condition guard) */
+		self->at_escape[count] = (byte_t)ch;
+		if (count + 1 >= limit) {
+			/* Unicode sequence has been completed. */
+			char const *text;
+			text  = (char *)self->at_escape;
+			unich = unicode_readutf8(&text);
+do_handle_unich:
+			/* Check for the escape character */
+			if (!handle_control_character(self, unich)) {
+				if (self->at_state == STATE_INSERT_UTF8_MBS) {
+					ansitty_do_insert_unicode(self, unich);
+					self->at_state = STATE_INSERT_UTF8;
+				} else {
+					self->at_state = STATE_TEXT_UTF8;
+				}
+			}
+			return;
+		}
+	} while (!ATOMIC_CMPXCH_WEAK(self->at_escwrd[1], count, count + 1));
 }
 
 
@@ -768,6 +1044,7 @@ ansitty_do_hscroll(struct ansitty *__restrict self, int offset) {
 	}
 	SETCURSOR(xy[0], xy[1], false);
 }
+
 
 /* "\e[{arg[arglen]:%s}{lastch}" */
 PRIVATE bool CC
@@ -1116,8 +1393,9 @@ done_insert_ansitty_flag_hedit:
 			 * I implement this one as repeat-the-next-character. */
 			if (n <= 0)
 				break;
-			STATE_REPEAT_COUNT(self) = (unsigned int)n;
-			self->at_state = STATE_REPEAT_UTF8;
+			ansitty_do_repeat_unicode(self,
+			                          self->at_lastch,
+			                          (unsigned int)n);
 			break;
 
 		case '|': { /* DECTTC -- Transmit Termination Character */
@@ -1954,280 +2232,6 @@ nope:
 /* ANSI escape gather parser implementation                                             */
 /* ==================================================================================== */
 
-PRIVATE NONNULL((1)) void CC
-ansitty_setstate_text(struct ansitty *__restrict self) {
-	self->at_state = (self->at_ttyflag & ANSITTY_FLAG_INSERT)
-	                 ? (self->at_codepage == CP_UTF8 ? STATE_INSERT_UTF8 : STATE_INSERT)
-	                 : (self->at_codepage == CP_UTF8 ? STATE_TEXT_UTF8 : STATE_TEXT);
-}
-
-PRIVATE WUNUSED ATTR_PURE NONNULL((2)) char32_t FCALL
-cp_decode(uint8_t ch, struct ansitty *__restrict self) {
-	char32_t result;
-	switch (self->at_codepage) {
-
-	case CP_LDM:
-		result = libansitty_decode_cp_ldm((uint8_t)ch);
-		break;
-
-	case CP_DUTCH:
-		result = libansitty_decode_cp_dutch((uint8_t)ch);
-		break;
-
-	case CP_FINNISH:
-		result = libansitty_decode_cp_finnish((uint8_t)ch);
-		break;
-
-	case CP_FRENCH:
-		result = libansitty_decode_cp_french((uint8_t)ch);
-		break;
-
-	case CP_FRENCH_CANADIAN:
-		result = libansitty_decode_cp_french_canadian((uint8_t)ch);
-		break;
-
-	case CP_GERMAN:
-		result = libansitty_decode_cp_german((uint8_t)ch);
-		break;
-
-	case CP_ITALIAN:
-		result = libansitty_decode_cp_italian((uint8_t)ch);
-		break;
-
-	case CP_NORWEGIAN:
-		result = libansitty_decode_cp_norwegian((uint8_t)ch);
-		break;
-
-	case CP_PORTUGUESE:
-		result = libansitty_decode_cp_portuguese((uint8_t)ch);
-		break;
-
-	case CP_SPANISH:
-		result = libansitty_decode_cp_spanish((uint8_t)ch);
-		break;
-
-	case CP_SWEDISH:
-		result = libansitty_decode_cp_swedish((uint8_t)ch);
-		break;
-
-	case CP_SWISS:
-		result = libansitty_decode_cp_swiss((uint8_t)ch);
-		break;
-
-	case CP_LATIN1:
-	default:
-		result = (char32_t)(uint8_t)ch;
-		break;
-	}
-	return result;
-}
-
-LOCAL NONNULL((1)) bool CC
-handle_control_character(struct ansitty *__restrict self, char32_t ch) {
-	switch (ch) {
-
-	case CC_NUL:
-		/* NUL should be ignored by ansi ttys in all situations. */
-		goto done;
-
-	case CC_ENQ:
-		/* Return Terminal Status (which defaults to an empty string) */
-		goto done;
-
-	case CC_BEL:
-	case CC_BS:
-	case CC_TAB:
-	case CC_CR:
-		break;
-
-	case CC_SO:
-	case CC_SI:
-		/* Standard/Alternate character set??? */
-		goto done;
-
-	case CC_CAN:
-		ansitty_setstate_text(self);
-		break;
-
-	case CC_ESC:
-		self->at_state = STATE_ESC;
-		break;
-
-	case CC_VT:
-	case CC_FF:
-		ch = CC_LF;
-		ATTR_FALLTHROUGH
-	case CC_LF:
-		if (self->at_ttyflag & ANSITTY_FLAG_NOLFCR) {
-			/* LF shouldn't set COLUMN=0 */
-			ansitty_coord_t xy[2];
-			GETCURSOR(xy);
-			if (xy[0] != 0) {
-				HIDECURSOR_BEGIN() {
-					/* Current column is non-zero, so we must take special
-					 * action to ensure that the cursor is placed correctly. */
-					PUTUNI(CC_LF);
-					/* Reset the cursor position to the middle of the following line.
-					 * Note that in the case of the previous line being the bottom-most one,
-					 * SETCURSOR() will clamp that coord into the valid display range. */
-					SETCURSOR(xy[0], xy[1] + 1, false);
-				}
-				HIDECURSOR_END();
-				return true;
-			}
-		}
-		break;
-
-	default:
-		return false;
-	}
-	PUTUNI(ch);
-done:
-	return true;
-}
-
-LOCAL NONNULL((1)) void CC
-ansitty_do_insert_unicode(struct ansitty *__restrict self, char32_t ch) {
-	switch (self->at_ttyflag & (ANSITTY_FLAG_HEDIT |
-	                            ANSITTY_FLAG_INSDEL_SCRN)) {
-
-	case 0: {
-		/* 123456789      123456789
-		 * ABCDEFGHI  --> ABCD...EF
-		 * abcdefghi      abcdefghi */
-		ansitty_coord_t xy[2];
-		ansitty_coord_t sxy[2];
-		ansitty_coord_t cells_in_line;
-		GETCURSOR(xy);
-		GETSIZE(sxy);
-		if unlikely(xy[0] >= sxy[0])
-			break;
-		cells_in_line = sxy[0] - xy[0];
-		if (1 >= cells_in_line)
-			break;
-		COPYCELL(1, cells_in_line - 1);
-		PUTUNI(ch);
-	}	break;
-
-	case ANSITTY_FLAG_INSDEL_SCRN:
-		/* 123456789      123456789
-		 * ABCDEFGHI  --> ABCD...EF
-		 * abcdefghi      GHIabcdef */
-		COPYCELL(1, MAXCOORD);
-		PUTUNI(ch);
-		break;
-
-	case ANSITTY_FLAG_HEDIT: {
-		ansitty_coord_t xy[2];
-		/* 123456789      123456789
-		 * ABCDEFGHI  --> D...EFGHI
-		 * abcdefghi      abcdefghi */
-		GETCURSOR(xy);
-		if (xy[0] <= 1) {
-			/* Full area shift */
-			if (xy[0] == 0)
-				break;
-			SETCURSOR(0, xy[1], false);
-			PUTUNI(ch);
-			break;
-		}
-		SETCURSOR(1, xy[1], false);
-		COPYCELL(-1, xy[0] - 1);
-		SETCURSOR(xy[0] - 1, xy[1], false);
-		PUTUNI(ch);
-	}	break;
-
-	case ANSITTY_FLAG_HEDIT | ANSITTY_FLAG_INSDEL_SCRN: {
-		ansitty_coord_t xy[2];
-		unsigned int copy_count;
-		/* 123456789      456789ABC
-		 * ABCDEFGHI  --> D...EFGHI
-		 * abcdefghi      abcdefghi */
-		GETCURSOR(xy);
-		if (xy[1] == 0) {
-			if (xy[0] <= 1) {
-				if (xy[0] == 0)
-					break;
-				SETCURSOR(0, 0, false);
-				PUTUNI(ch);
-				break;
-			}
-			copy_count = xy[0];
-		} else {
-			ansitty_coord_t xy2[2];
-			GETSIZE(xy2);
-			copy_count = xy[0] + xy[1] * xy2[0];
-		}
-		SETCURSOR(1, 0, false);
-		COPYCELL(-1, copy_count);
-		if (!xy[0]) {
-			--xy[1];
-			xy[0] = MAXCOORD;
-		} else {
-			--xy[0];
-		}
-		SETCURSOR(xy[0], xy[1], false);
-		PUTUNI(ch);
-	}	break;
-
-	default: __builtin_unreachable();
-	}
-}
-
-LOCAL NONNULL((1)) void CC
-ansitty_do_repeat_unicode(struct ansitty *__restrict self, char32_t ch) {
-	unsigned int count;
-	count = STATE_REPEAT_COUNT(self);
-	if (self->at_ttyflag & ANSITTY_FLAG_INSERT) {
-		while (count--) {
-			ansitty_do_insert_unicode(self, ch);
-		}
-	} else {
-		while (count--) {
-			PUTUNI((char32_t)(uint8_t)ch);
-		}
-	}
-}
-
-LOCAL NONNULL((1)) void CC
-ansitty_pututf8_mbs(struct ansitty *__restrict self, char ch) {
-	char32_t unich;
-	uintptr_half_t count, limit;
-	if (((byte_t)ch & 0xc0) != 0x80) {
-do_handle_this_ch:
-		unich = (char32_t)ch;
-		goto do_handle_unich;
-	}
-	do {
-		count = ATOMIC_READ(self->at_escwrd[1]);
-		limit = ATOMIC_READ(self->at_escwrd[0]);
-		if unlikely(count >= limit)
-			RACE(do_handle_this_ch); /* Shouldn't happen (race condition guard) */
-		self->at_escape[count] = (byte_t)ch;
-		if (count + 1 >= limit) {
-			/* Unicode sequence has been completed. */
-			char const *text;
-			text  = (char *)self->at_escape;
-			unich = unicode_readutf8(&text);
-do_handle_unich:
-			/* Check for the escape character */
-			if (!handle_control_character(self, unich)) {
-				if (self->at_state == STATE_REPEAT_UTF8_MBS) {
-					ansitty_do_repeat_unicode(self, unich);
-					ansitty_setstate_text(self);
-				} else if (self->at_state == STATE_INSERT_UTF8_MBS) {
-					ansitty_do_insert_unicode(self, unich);
-					self->at_state = STATE_INSERT_UTF8;
-				} else {
-					self->at_state = STATE_TEXT_UTF8;
-				}
-			}
-			return;
-		}
-	} while (!ATOMIC_CMPXCH_WEAK(self->at_escwrd[1], count, count + 1));
-}
-
-
 PRIVATE NONNULL((1)) bool CC
 ansitty_invoke_string_command(struct ansitty *__restrict self, size_t len) {
 	bool result;
@@ -2366,36 +2370,16 @@ again:
 					break;
 				}
 			}
-			ATTR_FALLTHROUGH
+			PUTUNI((char32_t)(uint8_t)ch);
+			break;
+
 		default:
 			/* Output a regular, old ASCII character. */
 do_putuni:
-			PUTUNI((char32_t)(uint8_t)ch);
+			PUTUNILAST((char32_t)(uint8_t)ch);
 			break;
 		}
 		break;
-
-	case STATE_REPEAT_UTF8: {
-		uint8_t len;
-		/* Check for the escape character */
-		if (handle_control_character(self, (uint8_t)ch))
-			break;
-		if ((uint8_t)ch <= 0x7f) {
-			/* Output a regular, old ASCII character. */
-do_repuni:
-			ansitty_do_repeat_unicode(self, (char32_t)(uint8_t)ch);
-			goto set_text_and_done;
-		}
-		/* Begin a new multi-byte character sequence. */
-		len = unicode_utf8seqlen[(byte_t)ch];
-		if unlikely(!len)
-			goto do_repuni; /* Invalid utf-8 byte... (simply re-output, thus ignoring the error) */
-		assert(len != 1);
-		self->at_escwrd[0] = len;
-		self->at_escwrd[1] = 1;
-		self->at_escape[0] = (byte_t)ch;
-		self->at_state     = STATE_REPEAT_UTF8_MBS;
-	}	break;
 
 	case STATE_INSERT_UTF8: {
 		uint8_t len;
@@ -2420,17 +2404,9 @@ do_insuni:
 	}	break;
 
 	case STATE_TEXT_UTF8_MBS:
-	case STATE_REPEAT_UTF8_MBS:
 	case STATE_INSERT_UTF8_MBS:
 		ansitty_pututf8_mbs(self, ch);
 		break;
-
-	case STATE_REPEAT: {
-		char32_t uni = cp_decode((uint8_t)ch, self);
-		if (handle_control_character(self, uni))
-			break;
-		ansitty_do_repeat_unicode(self, uni);
-	}	goto set_text_and_done;
 
 	case STATE_INSERT: {
 		char32_t uni = cp_decode((uint8_t)ch, self);
@@ -2443,7 +2419,7 @@ do_insuni:
 		char32_t uni = cp_decode((uint8_t)ch, self);
 		if (handle_control_character(self, uni))
 			break;
-		PUTUNI(uni);
+		PUTUNILAST(uni);
 	}	break;
 
 	case STATE_ESC:
@@ -3018,7 +2994,7 @@ libansitty_putuni(struct ansitty *__restrict self, char32_t ch) {
 	/* Simple case: Default state and non-escaping character */
 	if (self->at_state == STATE_TEXT_UTF8) {
 		if (!handle_control_character(self, ch))
-			PUTUNI(ch);
+			PUTUNILAST(ch);
 		return;
 	}
 	/* Encode as utf-8 and use `libansitty_putc()'. */

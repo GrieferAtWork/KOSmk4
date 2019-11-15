@@ -328,6 +328,7 @@ struct ansitty {
 	};
 	__byte_t                  at_escape[256]; /* Escape text buffer (also used for unicode translation). */
 	__byte_t                  at_zero;        /* [const] Always ZERO. */
+	__CHAR32_TYPE__           at_lastch;      /* The last successfully printed character (used for `\e[<n>b'). */
 };
 
 
