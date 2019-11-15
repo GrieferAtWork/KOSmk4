@@ -12298,10 +12298,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 3074 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3074 /* index: 3074 */
+	.weak x86_get_irregs; .long x86_get_irregs
+	.reloc ., R_386_SIZE32, x86_get_irregs; .long 0
+	.long 0xfcc50d3
 	.long .Lname3075 /* index: 3075 */
 	.weak block_device_partition_readv_phys; .long block_device_partition_readv_phys
 	.reloc ., R_386_SIZE32, block_device_partition_readv_phys; .long 0
@@ -19658,6 +19658,8 @@ END(kernel_symbol_table)
 	.string "path_traverse"
 .Lname3072:
 	.string "task_sigstop"
+.Lname3074:
+	.string "x86_get_irregs"
 .Lname3075:
 	.string "block_device_partition_readv_phys"
 .Lname3076:

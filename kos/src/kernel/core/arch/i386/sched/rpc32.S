@@ -42,7 +42,7 @@ END(x86_rpc_redirection_iret)
 	INTERN(x86_rpc_user_redirection_personality)
 	.cfi_personality 0, x86_rpc_user_redirection_personality
 /*[[[deemon
-import compileExpression from ......misc.libgen.cfi.compiler;
+import compileExpression from .......misc.libgen.cfi.compiler;
 for (local reg: ["eip", "cs", "eflags"]) {
 	compileExpression('i386', '%' + reg, r'
 		ifnotimpl "KOS", 1f
@@ -58,9 +58,9 @@ for (local reg: { "es", "ds", "fs", "gs" }) {
 	compileExpression('i386', '%' + reg, r'
 		ifnotimpl "KOS", 1f
 		push_tls_address
-		plus     $@OFFSET_TASK_FLAGS
+		plus     $@(x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS)
 		deref
-		const2u  $@TASK_FX86_VM86
+		const2u  $@EFLAGS_VM
 		and
 		not
 		bra      1f                        # Not a vm86 thread
@@ -82,23 +82,23 @@ __ASM_L(	.cfi_escape 0x16,0x09,0x12,0x2f,0x03,0x00,0x4b,0x4f)
 __ASM_L(	.cfi_escape 0x53,0x2f,0x07,0x00,0xe0,0x23,(x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS),0x06)
 __ASM_L(	.cfi_escape 0x2f,0x02,0x00,0x59,0xf0)
 __ASM_L(	.cfi_escape 0x16,0x28,0x1e,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x12,0x00,0xe0,0x23,OFFSET_TASK_FLAGS,0x06)
-__ASM_L(	.cfi_escape 0x0a,(TASK_FX86_VM86) & 0xff,(TASK_FX86_VM86 >> 8) & 0xff,0x1a,0x20,0x28,0x06,0x00)
+__ASM_L(	.cfi_escape 0x53,0x2f,0x12,0x00,0xe0,0x23,(x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS),0x06)
+__ASM_L(	.cfi_escape 0x0a,(EFLAGS_VM) & 0xff,(EFLAGS_VM >> 8) & 0xff,0x1a,0x20,0x28,0x06,0x00)
 __ASM_L(	.cfi_escape 0x74,(OFFSET_IRREGS_ES - SIZEOF_IRREGS_KERNEL),0x06,0x2f,0x03,0x00,0x90,0x28)
 __ASM_L(	.cfi_escape 0xf0)
 __ASM_L(	.cfi_escape 0x16,0x2b,0x1e,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x12,0x00,0xe0,0x23,OFFSET_TASK_FLAGS,0x06)
-__ASM_L(	.cfi_escape 0x0a,(TASK_FX86_VM86) & 0xff,(TASK_FX86_VM86 >> 8) & 0xff,0x1a,0x20,0x28,0x06,0x00)
+__ASM_L(	.cfi_escape 0x53,0x2f,0x12,0x00,0xe0,0x23,(x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS),0x06)
+__ASM_L(	.cfi_escape 0x0a,(EFLAGS_VM) & 0xff,(EFLAGS_VM >> 8) & 0xff,0x1a,0x20,0x28,0x06,0x00)
 __ASM_L(	.cfi_escape 0x74,(OFFSET_IRREGS_DS - SIZEOF_IRREGS_KERNEL),0x06,0x2f,0x03,0x00,0x90,0x2b)
 __ASM_L(	.cfi_escape 0xf0)
 __ASM_L(	.cfi_escape 0x16,0x2c,0x1e,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x12,0x00,0xe0,0x23,OFFSET_TASK_FLAGS,0x06)
-__ASM_L(	.cfi_escape 0x0a,(TASK_FX86_VM86) & 0xff,(TASK_FX86_VM86 >> 8) & 0xff,0x1a,0x20,0x28,0x06,0x00)
+__ASM_L(	.cfi_escape 0x53,0x2f,0x12,0x00,0xe0,0x23,(x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS),0x06)
+__ASM_L(	.cfi_escape 0x0a,(EFLAGS_VM) & 0xff,(EFLAGS_VM >> 8) & 0xff,0x1a,0x20,0x28,0x06,0x00)
 __ASM_L(	.cfi_escape 0x74,(OFFSET_IRREGS_FS - SIZEOF_IRREGS_KERNEL),0x06,0x2f,0x03,0x00,0x90,0x2c)
 __ASM_L(	.cfi_escape 0xf0)
 __ASM_L(	.cfi_escape 0x16,0x2d,0x1e,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x12,0x00,0xe0,0x23,OFFSET_TASK_FLAGS,0x06)
-__ASM_L(	.cfi_escape 0x0a,(TASK_FX86_VM86) & 0xff,(TASK_FX86_VM86 >> 8) & 0xff,0x1a,0x20,0x28,0x06,0x00)
+__ASM_L(	.cfi_escape 0x53,0x2f,0x12,0x00,0xe0,0x23,(x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS),0x06)
+__ASM_L(	.cfi_escape 0x0a,(EFLAGS_VM) & 0xff,(EFLAGS_VM >> 8) & 0xff,0x1a,0x20,0x28,0x06,0x00)
 __ASM_L(	.cfi_escape 0x74,(OFFSET_IRREGS_GS - SIZEOF_IRREGS_KERNEL),0x06,0x2f,0x03,0x00,0x90,0x2d)
 __ASM_L(	.cfi_escape 0xf0)
 //[[[end]]]
@@ -202,17 +202,17 @@ INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 	movl   %eax, %esp
 
 	/* Check for additional RPC callbacks. */
-	cmpl   $0, %fs:_this_pending_rpcs
+	cmpl   $(0), %fs:_this_pending_rpcs
 	jne    x86_serve_user_rpc_and_propagate_exceptions
 
 	/* Check if an exception has been set for user-space. */
-	cmpl   $0, %fs:_this_exception_code
+	cmpl   $(0), %fs:_this_exception_code
 	je     1f
 
 	/* Check if exceptions are propagated to user-space, or kernel-space */
-	testl  $3, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS(%esp)
+	testl  $(3), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS(%esp)
 	jnz    2f
-	testl  $EFLAGS_VM, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_EFLAGS(%esp)
+	testl  $(EFLAGS_VM), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_EFLAGS(%esp)
 	jnz    2f
 	/* Kernel-space target! */
 
@@ -296,7 +296,7 @@ INTERN_FUNCTION(x86_rpc_kernel_redirection)
 	 * FS:     <SEGMENT_KERNEL_FSBASE>
 	 * GS:     Already restored
 	 * *:      Undefined */
-	pushl  $0   /* `struct rpc_syscall_info *sc_info' */
+	pushl  $(0)   /* `struct rpc_syscall_info *sc_info' */
 	pushl  %ebx /* `unsigned int reason' */
 	call   *%eax
 	movl   %eax, %esp
@@ -349,7 +349,7 @@ INTERN_FUNCTION(x86_rpc_kernel_redirection_handler)
 	 * FS:     <SEGMENT_KERNEL_FSBASE>
 	 * GS:     Already restored
 	 * *:      Undefined */
-	pushl  $0   /* `struct rpc_syscall_info *sc_info' */
+	pushl  $(0)   /* `struct rpc_syscall_info *sc_info' */
 	pushl  %ebx /* reason */
 	call   *%eax
 	movl   %eax, %esp
@@ -399,7 +399,7 @@ INTERN_FUNCTION(x86_rpc_kernel_redirection_c)
 	 * FS:     <SEGMENT_KERNEL_FSBASE>
 	 * GS:     Already restored
 	 * *:      Undefined */
-	pushl  $0   /* `struct rpc_syscall_info *sc_info' */
+	pushl  $(0)   /* `struct rpc_syscall_info *sc_info' */
 	pushl  %ebx /* reason */
 	call   *%eax
 	movl   %eax, %ebx
@@ -454,7 +454,7 @@ INTERN_FUNCTION(x86_rpc_kernel_redirection_c_handler)
 	 * FS:     <SEGMENT_KERNEL_FSBASE>
 	 * GS:     Already restored
 	 * *:      Undefined */
-	pushl  $0   /* `struct rpc_syscall_info *sc_info' */
+	pushl  $(0)   /* `struct rpc_syscall_info *sc_info' */
 	pushl  %ebx /* reason */
 	call   *%eax
 	movl   %eax, %ebx
@@ -693,11 +693,11 @@ PUBLIC_FUNCTION(task_rpc_exec_here)
 	movl   %ecx, %eax                 /* <task_rpc_t func> */
 	movl   %edx, %ecx                 /* <void *arg> */
 	leal   4(%esp), %edx              /* <struct icpustate *state> */
-	pushl  $0                         /* <struct rpc_syscall_info *sc_info> */
+	pushl  $(0)                         /* <struct rpc_syscall_info *sc_info> */
 	pushl_cfi $TASK_RPC_REASON_ASYNC  /* <unsigned int reason> */
 	call   *%eax
 	.cfi_adjust_cfa_offset -8
-	cmpl   $0, 0(%esp)
+	cmpl   $(0), 0(%esp)
 	je     1f
 	movl   %eax, %ebp
 	call   sig_broadcast              /* NOTE: `struct sig' is still in 0(%esp) from the push above  */
@@ -745,7 +745,7 @@ END(task_rpc_exec_here_onexit)
 .section .text
 PUBLIC_FUNCTION(task_serve)
 	.cfi_startproc
-	cmpl   $0, %fs:_this_pending_sync_count
+	cmpl   $(0), %fs:_this_pending_sync_count
 	jne    1f
 #if 1 /* Service blocking cleanup operations. */
 	call   blocking_cleanup_service
@@ -795,7 +795,7 @@ PUBLIC_FUNCTION(task_serve)
 	call   task_serve_one_impl /* Service a single RPC function */
 	movl   %eax, %esp          /* Load the modified register state. */
 	/* Check if there are more pending RPC callbacks. */
-	cmpl   $0, %fs:_this_pending_sync_count
+	cmpl   $(0), %fs:_this_pending_sync_count
 	jne    1b
 
 #if 1 /* Service blocking cleanup operations. */
@@ -821,17 +821,17 @@ END(task_serve)
 .section .text
 PUBLIC_FUNCTION(task_serve_nx)
 	.cfi_startproc
-	cmpl   $0, %fs:_this_pending_sync_count_nx
+	cmpl   $(0), %fs:_this_pending_sync_count_nx
 #if 1
 	je     blocking_cleanup_service
 #else
 	jne    1f
 #if TASK_SERVE_NX_XPENDING == 1
 	xorl   %eax, %eax
-	cmpl   $0, %fs:_this_pending_sync_count
+	cmpl   $(0), %fs:_this_pending_sync_count
 	setne  %al
 #else
-	cmpl   $0, %fs:_this_pending_sync_count
+	cmpl   $(0), %fs:_this_pending_sync_count
 	movl   $TASK_SERVE_NX_DIDRUN, %ecx
 	cmovne %ecx, %eax
 #endif
@@ -873,7 +873,7 @@ PUBLIC_FUNCTION(task_serve_nx)
 	call   task_serve_one_nx_impl /* Service a single RPC function */
 	movl   %eax, %esp             /* Load the modified register state. */
 	/* Check if there are more pending RPC callbacks. */
-	cmpl   $0, %fs:_this_pending_sync_count_nx
+	cmpl   $(0), %fs:_this_pending_sync_count_nx
 	jne    1b
 
 #if 1 /* Service blocking cleanup operations. */
@@ -882,7 +882,7 @@ PUBLIC_FUNCTION(task_serve_nx)
 #endif
 
 	popal_cfi_r
-	cmpl   $0, %fs:_this_pending_sync_count
+	cmpl   $(0), %fs:_this_pending_sync_count
 	je     1f
 	orl    $TASK_SERVE_NX_XPENDING, %eax
 1:

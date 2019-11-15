@@ -422,7 +422,7 @@ DEFINE_DEBUG_FUNCTION(
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	memcpy(&newstate, &dbg_viewstate, sizeof(struct fcpustate));
-	error = unwind((void *)fcpustate_getpc(&dbg_viewstate) - 1,
+	error = unwind((void *)(fcpustate_getpc(&dbg_viewstate) - 1),
 	               &unwind_getreg_fcpustate, &dbg_viewstate,
 	               &unwind_setreg_fcpustate, &newstate);
 	if (error != UNWIND_SUCCESS) {

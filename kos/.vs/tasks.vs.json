@@ -118,6 +118,17 @@
 		},
 
 		{
+			"taskName": "deemon -F",
+			"appliesTo": "*.S",
+			"type": "launch",
+			"contextType": "custom",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"workingDirectory": "${fileDirname}",
+			"command": "deemon",
+			"args": [ "-F", "${file}" ]
+		},
+
+		{
 			"taskName": "autoformat enums",
 			"appliesTo": "*.h",
 			"type": "launch",

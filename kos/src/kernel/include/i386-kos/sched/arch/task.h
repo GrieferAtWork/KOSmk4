@@ -37,15 +37,6 @@ DECL_BEGIN
 
 
 
-/* Arch-specific task flags. */
-#if !defined(CONFIG_NO_VM86) && !defined(__x86_64__)
-#define TASK_FX86_VM86   0x4000 /* [lock(PRIVATE(THIS_TASK))] The thread's IRET tail uses the vm86 format. */
-#define task_isvm86(x) ((x)->t_flags & TASK_FX86_VM86)
-#else /* !CONFIG_NO_VM86 && !__x86_64__ */
-#define task_isvm86(x)   0
-#endif /* CONFIG_NO_VM86 || __x86_64__ */
-
-
 #ifdef __CC__
 #define task_pause()    x86_pause()
 FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_pause)(void) {
@@ -382,6 +373,13 @@ NOTHROW(FCALL irregs_wrss)(struct irregs *__restrict self, u16 value) {
 #else /* __x86_64__ */
 
 DATDEF ATTR_PERTASK struct irregs_kernel x86_rpc_redirection_iret;
+
+struct irregs_user;
+
+/* Return a pointer to the original user-space IRET tail of the calling thread.
+ * This is the pointer to the IRET structure located at the base of the caller's kernel stack. */
+FUNDEF ATTR_CONST ATTR_RETNONNULL NOBLOCK NONNULL((1)) struct irregs_user *
+NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict thread);
 
 /* Safely modify the values of saved registers that may be modified by RPC redirection. */
 FORCELOCAL NOBLOCK WUNUSED uintptr_t

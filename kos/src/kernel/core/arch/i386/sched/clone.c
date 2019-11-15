@@ -226,18 +226,6 @@ again_lock_vm:
 		/* Have `clone()' or `fork()' return `0' in the child thread/process */
 		gpregs_setpax(&state->scs_gpregs, 0);
 
-		/* Check if the child thread/process should be running in vm86-mode */
-#ifdef TASK_FX86_VM86
-#ifdef __x86_64__
-		if (state->scs_irregs.ir_rflags & EFLAGS_VM)
-#else /* __x86_64__ */
-		if (state->scs_irregs.ir_eflags & EFLAGS_VM)
-#endif /* !__x86_64__ */
-		{
-			result->t_flags |= TASK_FX86_VM86;
-		}
-#endif /* TASK_FX86_VM86 */
-
 #if 0
 		if (kernel_debugtrap_enabled()) {
 			/* When debug traps are enabled, trigger a FORK trap

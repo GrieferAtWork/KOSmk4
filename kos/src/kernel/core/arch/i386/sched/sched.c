@@ -50,6 +50,8 @@
 #include <stdarg.h>
 #include <string.h>
 
+#include <libunwind/unwind.h>
+
 DECL_BEGIN
 
 
@@ -501,6 +503,83 @@ NOTHROW(FCALL task_push_asynchronous_srpc)(struct scpustate *__restrict state,
 INTDEF byte_t x86_lcall7_main[];
 INTDEF byte_t x86_lcall7_main_iret[];
 
+PRIVATE ATTR_COLD NOBLOCK u32
+NOTHROW(KCALL get_userspace_eflags)(struct task const *__restrict self) {
+	struct ucpustate st, ost;
+	void *unwind_pc;
+	unsigned int unwind_error;
+	assert(!PREEMPTION_ENABLED());
+	assert(self->t_cpu == THIS_CPU);
+	assert(!(self->t_flags & TASK_FKERNTHREAD));
+	if (self == THIS_TASK) {
+		ucpustate_current(&st);
+	} else {
+		scpustate_to_ucpustate(self->t_sched.s_state, &st);
+	}
+	unwind_pc = (void *)ucpustate_getpc(&st);
+	for (;;) {
+		memcpy(&ost, &st, sizeof(struct ucpustate));
+		unwind_error = unwind(unwind_pc,
+		                      &unwind_getreg_ucpustate, &ost,
+		                      &unwind_setreg_ucpustate, &st);
+		if unlikely(unwind_error != UNWIND_SUCCESS) {
+			/* XXX: There may be cases where this is allowed.
+			 *      Maybe custom task termination protocols? */
+			kernel_panic("Unwind failed: %u", unwind_error);
+		}
+		if (!ucpustate_iskernel(&st))
+			break;
+		unwind_pc = (void *)(ucpustate_getpc(&st) - 1);
+	}
+	return st.ucs_eflags;
+}
+
+/* Return a pointer to the original user-space IRET tail of the calling self.
+ * This is the pointer to the IRET structure located at the base of the caller's kernel stack. */
+PUBLIC ATTR_CONST ATTR_RETNONNULL NOBLOCK NONNULL((1)) struct irregs_user *
+NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
+	struct irregs_user *result;
+	assert(!PREEMPTION_ENABLED());
+	assert(self->t_cpu == THIS_CPU);
+	assert(!(self->t_flags & TASK_FKERNTHREAD));
+#define stacktop() \
+	((byte_t *)VM_PAGE2ADDR((FORTASK((struct task *)self, _this_kernel_stack).vn_node.a_vmax) + 1))
+	result = (struct irregs_user *)(stacktop() - SIZEOF_IRREGS_USER);
+	/* We need to account for the special case of the IRET tail pointing a VM86 thread!
+	 * If this is the case, then fields of `result' are currently mapped as:
+	 *  - ((u32 *)result)[-4] = real_result->ir_eip
+	 *  - ((u32 *)result)[-3] = real_result->ir_cs
+	 *  - ((u32 *)result)[-2] = real_result->ir_eflags
+	 *  - ((u32 *)result)[-1] = real_result->ir_esp
+	 *  - result->ir_eip      = real_result->ir_ss
+	 *  - result->ir_cs       = real_result->ir_es
+	 *  - result->ir_eflags   = real_result->ir_ds
+	 *  - result->ir_esp      = real_result->ir_fs
+	 *  - result->ir_ss       = real_result->ir_gs */
+	if (!(result->ir_esp & 0xffff0000) &&
+	    !(result->ir_eip & 0xffff0000) &&
+	    !(result->ir_eflags & 0xffff0000) &&
+	    (((u32 *)result)[-2] & (EFLAGS_VM | EFLAGS_IF)) == (EFLAGS_VM | EFLAGS_IF) &&
+	    !(((u32 *)result)[-3] & 0xffff0000) &&
+	    ADDR_IS_USER(((u32 *)result)[-4])) {
+		/* There is a very good chance that this is a vm86 thread, however we _really_
+		 * have to be sure about this, and the only way to be 100% sure, is to unwind
+		 * the stack until we hit user-space, at which point we can unwind the %eflags
+		 * register to see if it has the VM bit set. */
+		u32 userspace_eflags;
+		userspace_eflags = get_userspace_eflags(self);
+		if (userspace_eflags & EFLAGS_VM) {
+			/* It _really_ is a vm86 self! */
+			result = (struct irregs_user *)((byte_t *)result -
+			                                (SIZEOF_IRREGS_VM86 -
+			                                 SIZEOF_IRREGS_USER));
+		}
+	}
+#undef stacktop
+	return result;
+}
+
+
 
 /* An arch-specific function used to re-direct the given task's user-space
  * return target to instead point back towards a kernel-space function which is then
@@ -521,10 +600,9 @@ INTDEF byte_t x86_lcall7_main_iret[];
  * @return: false: The given thread has already been redirected. */
 PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
-	struct irregs_kernel *thread_iret;
+	struct irregs_user *thread_iret;
 	assert(!PREEMPTION_ENABLED());
 	assert(self->t_cpu == THIS_CPU);
-	assert(!(self->t_flags & TASK_FTERMINATED));
 	assert(!(self->t_flags & TASK_FKERNTHREAD));
 	/* Check for special case: `self' was interrupted in
 	 * `x86_lcall7_main' before it was able to complete its IRET tail.
@@ -534,7 +612,8 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 	 *       instruction. */
 	if unlikely(self != THIS_TASK &&
 	            self->t_sched.s_state->scs_irregs_k.ir_eip == (uintptr_t)x86_lcall7_main) {
-		byte_t *fixup; u32 eflags;
+		byte_t *fixup;
+		u32 eflags;
 		fixup = (byte_t *)self->t_sched.s_state;
 		assertf((fixup + OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL) ==
 		        (byte_t *)(VM_PAGE2ADDR(FORTASK(self, _this_kernel_stack).vn_node.a_vmax + 1) - 16),
@@ -559,19 +638,10 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 		((u32 *)fixup)[1] = ((u32 *)fixup)[2];
 		((u32 *)fixup)[2] = eflags;
 	}
-	thread_iret = (struct irregs_kernel *)((byte_t *)VM_PAGE2ADDR(FORTASK(self, _this_kernel_stack).vn_node.a_vmax + 1) -
-	                                       (
-#ifndef CONFIG_NO_VM86
-	                                       task_isvm86(self)
-	                                       ? sizeof(struct irregs_vm86)
-	                                       : sizeof(struct irregs_user)
-#else
-	                                       sizeof(struct irregs_user)
-#endif
-	                                       ));
+	thread_iret = x86_get_irregs(self);
 	if (thread_iret->ir_eip == (uintptr_t)&x86_rpc_user_redirection)
 		return false; /* Already redirected. */
-	assertf(task_isvm86(self) || thread_iret->ir_cs == SEGMENT_USER_CODE_RPL,
+	assertf(thread_iret->ir_eflags & EFLAGS_VM || thread_iret->ir_cs == SEGMENT_USER_CODE_RPL,
 	        "User-space IRET with invalid CS (%p)", thread_iret->ir_cs);
 	assertf(thread_iret->ir_eflags & EFLAGS_IF,
 	        "User-space IRET without EFLAGS.IF (%p)", thread_iret->ir_eflags);

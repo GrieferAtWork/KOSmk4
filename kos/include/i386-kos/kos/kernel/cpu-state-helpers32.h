@@ -1002,6 +1002,48 @@ __NOTHROW_NCX(scpustate32_user_to_scpustate32_p)(struct scpustate32 const *__res
 	__libc_memcpy(__COMPILER_REQTYPE(struct ucpustate32 *, result),     \
 	              __COMPILER_REQTYPE(struct ucpustate32 const *, self), \
 	              sizeof(struct ucpustate32))
+#ifndef __x86_64__
+__FORCELOCAL void __FCALL ucpustate32_current(struct ucpustate32 *__restrict __result) {
+	__result->ucs_cs           = SEGMENT_CURRENT_CODE_RPL;
+	__result->ucs_ss           = SEGMENT_CURRENT_DATA_RPL;
+	__result->ucs_sgregs.sg_gs = __rdgs();
+	__result->ucs_sgregs.sg_fs = __rdfs();
+	__result->ucs_sgregs.sg_es = __rdes();
+	__result->ucs_sgregs.sg_ds = __rdds();
+	__asm__("movl %%edi, %0\n\t"
+			"movl %%esi, %1\n\t"
+			"movl %%ebp, %2\n\t"
+			"movl %%esp, %3\n\t"
+			"movl %%ebx, %4\n\t"
+			"movl %%edx, %5\n\t"
+			"movl %%ecx, %6\n\t"
+			"movl %%eax, %7\n\t"
+			"pushfl\n\t"
+			".cfi_adjust_cfa_offset 4\n\t"
+			"popl %8\n\t"
+			".cfi_adjust_cfa_offset -4\n\t"
+#if (defined(__pic__) || defined(__PIC__) || \
+     defined(__pie__) || defined(__PIE__)) && 0
+			"call 991f\n\t"
+			"991: .cfi_adjust_cfa_offset 4\n\t"
+			"popl %9\n\t"
+			".cfi_adjust_cfa_offset -4"
+#else
+			"movl $991f, %9\n\t"
+			"991:"
+#endif
+			: "=m" /*0*/ (__result->ucs_gpregs.gp_edi)
+			, "=m" /*1*/ (__result->ucs_gpregs.gp_esi)
+			, "=m" /*2*/ (__result->ucs_gpregs.gp_ebp)
+			, "=m" /*3*/ (__result->ucs_gpregs.gp_esp)
+			, "=m" /*4*/ (__result->ucs_gpregs.gp_ebx)
+			, "=m" /*5*/ (__result->ucs_gpregs.gp_edx)
+			, "=m" /*6*/ (__result->ucs_gpregs.gp_ecx)
+			, "=m" /*7*/ (__result->ucs_gpregs.gp_eax)
+			, "=r" /*8*/ (__result->ucs_eflags)
+			, "=m" /*9*/ (__result->ucs_eip));
+}
+#endif /* !__x86_64__ */
 __LOCAL __NOBLOCK void
 __NOTHROW_NCX(ucpustate32_to_kcpustate32)(struct ucpustate32 const *__restrict __self,
                                           struct kcpustate32 *__restrict __result) {
@@ -1600,6 +1642,7 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define ucpustate_setsp                     ucpustate32_setesp
 #define ucpustate_getpflags                 ucpustate32_geteflags
 #define ucpustate_setpflags                 ucpustate32_seteflags
+#define ucpustate_current                   ucpustate32_current
 #define ucpustate_to_ucpustate              ucpustate32_to_ucpustate32
 #define ucpustate_to_ucpustate32            ucpustate32_to_ucpustate32
 #define ucpustate32_to_ucpustate            ucpustate32_to_ucpustate32
