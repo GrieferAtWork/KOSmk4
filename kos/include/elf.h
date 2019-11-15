@@ -1,3 +1,40 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef _ELF_H
+#define _ELF_H 1
+
+/* Standard ELF types. */
+#include "__stdinc.h"
+//#include <features.h>
+//#include <bits/elf-types.h>
+
+#ifdef __CC__
+#include <stdint.h>
+#endif /* __CC__ */
+#ifdef __USE_KOS
+#include <bits/elf.h>
+#include <hybrid/host.h>
+#include <hybrid/typecore.h>
+#endif /* __USE_KOS */
+
+__DECL_BEGIN
+
 /* This file defines standard ELF types, structures, and macros.
    Copyright (C) 1995-2003,2004,2005,2006 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -16,28 +53,6 @@
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA. */
-
-#ifndef _ELF_H
-#define _ELF_H 1
-
-/* Standard ELF types. */
-#include "__stdinc.h"
-//#include <features.h>
-//#include <bits/elf-types.h>
-
-#ifdef __CC__
-#include <stdint.h>
-#endif /* __CC__ */
-#ifdef __USE_KOS
-#include <bits/elf.h>
-#include <hybrid/host.h>
-#include <hybrid/typecore.h>
-#endif /* __USE_KOS */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 #define __SIZEOF_ELF32_HALF__     2
 #define __SIZEOF_ELF64_HALF__     2
@@ -272,7 +287,7 @@ typedef struct elf64_ehdr /*[PREFIX(e_)]*/ {
 #define EM_68HC12       53              /* Motorola M68HC12 */
 #define EM_MMA          54              /* Fujitsu MMA Multimedia Accelerator*/
 #define EM_PCP          55              /* Siemens PCP */
-#define EM_NCPU         56              /* Sony nCPU embeeded RISC */
+#define EM_NCPU         56              /* Sony nCPU embedded RISC */
 #define EM_NDR1         57              /* Denso NDR1 microprocessor */
 #define EM_STARCORE     58              /* Motorola Start*Core processor */
 #define EM_ME16         59              /* Toyota ME16 processor */
@@ -2812,8 +2827,6 @@ typedef Elf(Fpregset)  Elf_Fpregset;
 
 #endif /* __USE_KOS */
 
-#ifdef __cplusplus
-}
-#endif
+__DECL_END
 
-#endif  /* elf.h */
+#endif /* !_ELF_H */
