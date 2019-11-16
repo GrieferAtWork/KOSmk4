@@ -1163,19 +1163,20 @@ VGA_Putc(struct ansitty *__restrict self, char32_t ch)
 		case '\r': {
 			/* Return to the start of the current line. */
 			u16 *oldptr;
-			size_t cur_x;
+			size_t cur_x, size_x;
+			size_x = vga->v_textsizex;
 			if ((vga->at_ansi.at_ttymode & ANSITTY_MODE_NEWLINE_CLRFREE) &&
 			    sync_tryread(&vga->v_textlock)) {
 				do {
 					oldptr = ATOMIC_READ(vga->v_textptr);
-					cur_x  = ((size_t)(oldptr - vga->v_textbase) % vga->v_textsizex);
+					cur_x  = ((size_t)(oldptr - vga->v_textbase) % size_x);
 				} while (!ATOMIC_CMPXCH(vga->v_textptr, oldptr, oldptr - cur_x));
-				memsetw(oldptr, VGA_CHR(vga, ' '), vga->v_textsizex - cur_x);
+				memsetw(oldptr, VGA_CHR(vga, ' '), size_x - cur_x);
 				sync_endread(&vga->v_textlock);
 			} else {
 				do {
 					oldptr = ATOMIC_READ(vga->v_textptr);
-					cur_x  = ((size_t)(oldptr - vga->v_textbase) % vga->v_textsizex);
+					cur_x  = ((size_t)(oldptr - vga->v_textbase) % size_x);
 				} while (!ATOMIC_CMPXCH(vga->v_textptr, oldptr, oldptr - cur_x));
 			}
 		}	break;
@@ -1184,9 +1185,10 @@ VGA_Putc(struct ansitty *__restrict self, char32_t ch)
 			if (sync_tryread(&vga->v_textlock)) {
 				for (;;) {
 					u16 *oldptr;
-					size_t cur_x;
+					size_t cur_x, size_x;
+					size_x = vga->v_textsizex;
 					oldptr = ATOMIC_READ(vga->v_textptr);
-					cur_x  = ((size_t)(oldptr - vga->v_textbase) % vga->v_textsizex);
+					cur_x  = ((size_t)(oldptr - vga->v_textbase) % size_x);
 					if (cur_x == 0 && cp437_encode(vga->v_lastch) != 0) {
 						/* Special case: The previous line was filled entirely, and the cursor had to be wrapped
 						 *               to the next line, however the first character then printed was also a
@@ -1197,17 +1199,20 @@ VGA_Putc(struct ansitty *__restrict self, char32_t ch)
 						/* Clear the remainder of the old line */
 						u16 *lline = ATOMIC_READ(vga->v_scrlllin);
 						if (oldptr >= lline) {
-							if (!ATOMIC_CMPXCH(vga->v_textptr, oldptr, lline))
+							size_t offset;
+							offset = oldptr - lline;
+							if (offset > size_x)
+								offset = size_x;
+							if (!ATOMIC_CMPXCH(vga->v_textptr, oldptr, lline + offset))
 								continue;
 							/* Scroll down */
 							memmovew(vga->v_scrlbase, vga->v_scrl2lin, vga->v_scrlsize);
-							memsetw(lline, VGA_CHR(vga, ' '), vga->v_textsizex);
+							memsetw(lline, VGA_CHR(vga, ' '), size_x);
 						} else {
-							size_t tail = (size_t)(vga->v_textsizex - cur_x);
-							if (!ATOMIC_CMPXCH(vga->v_textptr, oldptr, oldptr + tail))
+							if (!ATOMIC_CMPXCH(vga->v_textptr, oldptr, oldptr + size_x))
 								continue;
 							if (vga->at_ansi.at_ttymode & ANSITTY_MODE_NEWLINE_CLRFREE)
-								memsetw(oldptr, VGA_CHR(vga, ' '), tail);
+								memsetw(oldptr, VGA_CHR(vga, ' '), (size_t)(size_x - cur_x));
 						}
 					}
 					break;

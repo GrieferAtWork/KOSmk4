@@ -201,6 +201,7 @@
 #define __CRT_HAVE_callback_list_empty 1
 #define __CRT_HAVE_callback_list_insert 1
 #define __CRT_HAVE_callback_list_remove 1
+#define __CRT_HAVE_cfmakesane 1
 #define __CRT_HAVE_character_device_alloc 1
 #define __CRT_HAVE_character_device_destroy 1
 #define __CRT_HAVE_character_device_ioctl 1

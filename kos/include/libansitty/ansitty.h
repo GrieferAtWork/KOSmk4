@@ -119,9 +119,9 @@
  * Explanation:
  *   - `\030'  -- Cancel (forces the state machine to abort any in-progress sequence and
  *                        reset itself to accept text or the start of an escape sequence)
- *   - `\077c' -- Reset TTY (resets colors, display-attributes, tty-flags and tty-mode)
+ *   - `\033c' -- Reset TTY (resets colors, display-attributes, tty-flags and tty-mode)
  */
-#define ANSITTY_RESET_SEQUENCE  "\030\077c"
+#define ANSITTY_RESET_SEQUENCE  "\030\033c"
 
 
 #define ANSITTY_CLS_AFTER    0 /* Clear everything after the cursor (including the cursor itself). */
@@ -177,7 +177,21 @@ struct termios;
 struct ansitty_operators {
 	/* [1..1] Output a single unicode character.
 	 * This also includes the control control characters `BEL,LF,CR,TAB,BS'
-	 * Note that LF should be interpreted as next-line + carriage-return */
+	 * Note that LF should be interpreted as next-line w/o carriage-return,
+	 * as the LF=CRLF behavior should be implemented using `ONLCR'. Note however
+	 * that LF not resetting the carriage is not mandatory in controlled situations.
+	 * libansitty won't care as to what is the actual behavior, however some user-space
+	 * programs using the terminal may depend on LF not resetting the carriage when
+	 * the terminal is in `cfmakeraw()' mode (such as busybox:hexedit)
+	 * In practice, this means:
+	 *  - Ansitty drivers should implement LF as not resetting CURSOR.X,
+	 *    and so should any other component that feeds input through a
+	 *    configurable `libtermios' layer.
+	 *  - However, the kernel's builtin debugger implements LF as implying
+	 *    CURSOR.X=0, mainly since this is the expected behavior in most
+	 *    cases, and also because `dbg_printf()' doesn't free through the
+	 *    libtermios layer that would normally translate LF->CRLF.
+	 */
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_putc)(struct ansitty *__restrict self,
 	                               __CHAR32_TYPE__ ch);

@@ -107,7 +107,7 @@ DECL_BEGIN
 
 
 #define PUTUNI(uni)                 (*self->at_ops.ato_putc)(self, uni)
-#define PUTUNILAST(uni)             (self->at_lastch = (uni), PUTUNI(uni))
+#define PUTUNILAST(uni)             (PUTUNI(uni), self->at_lastch = (uni))
 #define GETCURSOR(pxy)              ((*self->at_ops.ato_getcursor)(self, pxy), TRACE_OPERATION("getcur:{%u,%u}\n", (pxy)[0], (pxy)[1]))
 #define GETSIZE(pxy)                ((*self->at_ops.ato_getsize)(self, pxy), TRACE_OPERATION("getsiz:{%u,%u}\n", (pxy)[0], (pxy)[1]))
 #define SETCURSOR(x, y, uhwc)       (TRACE_OPERATION("setcur(%u,%u,%s)\n", x, y, uhwc ? "true" : "false"), (*self->at_ops.ato_setcursor)(self, x, y, uhwc))
@@ -135,10 +135,9 @@ DECL_BEGIN
 #define ANSITTY_FLAG_NORMAL       0x0000 /* Normal flags */
 #define ANSITTY_FLAG_CONCEIL      0x0001 /* FLAG: Use background color as foreground */
 #define ANSITTY_FLAG_VT52         0x0002 /* FLAG: VT52 compatibility mode. */
-#define ANSITTY_FLAG_NOLFCR       0x0004 /* FLAG: \n characters should not imply CR. */
-#define ANSITTY_FLAG_HEDIT        0x0008 /* FLAG: Horizontal Editing mode (ICH/DCH/IRM go backwards). */
-#define ANSITTY_FLAG_INSERT       0x0010 /* FLAG: Enable insertion mode. */
-#define ANSITTY_FLAG_INSDEL_SCRN  0x0020 /* FLAG: Insert/Delete affect the entire screen. */
+#define ANSITTY_FLAG_HEDIT        0x0004 /* FLAG: Horizontal Editing mode (ICH/DCH/IRM go backwards). */
+#define ANSITTY_FLAG_INSERT       0x0008 /* FLAG: Enable insertion mode. */
+#define ANSITTY_FLAG_INSDEL_SCRN  0x0010 /* FLAG: Insert/Delete affect the entire screen. */
 #define ANSITTY_FLAG_RENDERMASK  (ANSITTY_FLAG_CONCEIL) /* Mask for flags that affect rendering */
 
 
@@ -647,6 +646,7 @@ handle_control_character(struct ansitty *__restrict self, char32_t ch) {
 	case CC_BS:
 	case CC_TAB:
 	case CC_CR:
+	case CC_LF:
 		break;
 
 	case CC_SO:
@@ -665,26 +665,6 @@ handle_control_character(struct ansitty *__restrict self, char32_t ch) {
 	case CC_VT:
 	case CC_FF:
 		ch = CC_LF;
-		ATTR_FALLTHROUGH
-	case CC_LF:
-		if (self->at_ttyflag & ANSITTY_FLAG_NOLFCR) {
-			/* LF shouldn't set COLUMN=0 */
-			ansitty_coord_t xy[2];
-			GETCURSOR(xy);
-			if (xy[0] != 0) {
-				HIDECURSOR_BEGIN() {
-					/* Current column is non-zero, so we must take special
-					 * action to ensure that the cursor is placed correctly. */
-					PUTUNI(CC_LF);
-					/* Reset the cursor position to the middle of the following line.
-					 * Note that in the case of the previous line being the bottom-most one,
-					 * SETCURSOR() will clamp that coord into the valid display range. */
-					SETCURSOR(xy[0], xy[1] + 1, false);
-				}
-				HIDECURSOR_END();
-				return true;
-			}
-		}
 		break;
 
 	default:
@@ -1448,17 +1428,17 @@ done_insert_ansitty_flag_hedit:
 						goto nope;  /* \e[10;20f --or-- \e[10;f */
 					x = (int)strtol(end + 1, &end, 10);
 				}
-				if unlikely(y < 1)
-					y = 1;
 				if unlikely(end != arg + arglen)
 					goto nope;
+				if unlikely(y < 1)
+					y = 1;
 			}
 			if unlikely(x < 1)
 				x = 1;
 		}
 		SETCURSOR((ansitty_coord_t)(x - 1),
 		          (ansitty_coord_t)(y - 1),
-		          false);
+		          true);
 	}	break;
 
 	/* TODO: case 'I': Horizontal tab emulation */
@@ -1741,28 +1721,20 @@ done_insert_ansitty_flag_hedit:
 //			case 19: /* \e[19h   EBM  Editing Boundry Mode, all of memory affected */
 //			         /* \e[19l        Insert does not overflow to next page EBM */
 
-			case 20: /* \e[20h   LNM  Linefeed Newline Mode, LF interpreted as CR LF */
-			         /* \e[20l        Linefeed does not change horizontal position LNM */
-				if (lastch == 'h') {
-					/* LF == CRLF (default) */
-					self->at_ttyflag &= ~ANSITTY_FLAG_NOLFCR;
-				} else {
-					/* LF == LF */
-					self->at_ttyflag |= ANSITTY_FLAG_NOLFCR;
-				}
+			case 20: /* \e[20h   LNM  Linefeed newline mode (sets the `ONLCR' bit, and clear `ONLRET') */
+			         /* \e[20l        Linefeed normal mode (clear the `ONLCR' bit) */
 				if (self->at_ops.ato_termios) {
 					struct termios oldios, newios;
 					for (;;) {
 						(*self->at_ops.ato_termios)(self, &oldios, NULL);
 						memcpy(&newios, &oldios, sizeof(struct termios));
 						if (lastch == 'h') {
-							newios.c_iflag |= INLCR | ICRNL;
-							newios.c_iflag &= ~IGNCR;
+							newios.c_oflag |= ONLCR;
+							newios.c_oflag &= ~ONLRET;
 						} else {
-							newios.c_iflag |= INLCR;
-							newios.c_iflag &= ~(IGNCR | ICRNL);
+							newios.c_oflag &= ~ONLCR;
 						}
-						if (newios.c_iflag == oldios.c_iflag)
+						if (newios.c_oflag == oldios.c_oflag)
 							break;
 						if ((*self->at_ops.ato_termios)(self, &oldios, &newios))
 							break;
@@ -2380,25 +2352,11 @@ again:
 		case CC_FF:
 			ch = CC_LF;
 			ATTR_FALLTHROUGH
+		case CC_BEL:
+		case CC_BS:
+		case CC_TAB:
+		case CC_CR:
 		case CC_LF:
-			if (self->at_ttyflag & ANSITTY_FLAG_NOLFCR) {
-				/* LF shouldn't set COLUMN=0 */
-				ansitty_coord_t xy[2];
-				GETCURSOR(xy);
-				if (xy[0] != 0) {
-					HIDECURSOR_BEGIN() {
-						/* Current column is non-zero, so we must take special
-						 * action to ensure that the cursor is placed correctly. */
-						PUTUNI(CC_LF);
-						/* Reset the cursor position to the middle of the following line.
-						 * Note that in the case of the previous line being the bottom-most one,
-						 * SETCURSOR() will clamp that coord into the valid display range. */
-						SETCURSOR(xy[0], xy[1] + 1, false);
-					}
-					HIDECURSOR_END();
-					break;
-				}
-			}
 			PUTUNI((char32_t)(uint8_t)ch);
 			break;
 

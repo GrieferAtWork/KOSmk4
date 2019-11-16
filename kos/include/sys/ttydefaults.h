@@ -42,9 +42,9 @@ __SYSDECL_BEGIN
 #define TTYDEF_IFLAG                                                                  \
 	(BRKINT /*| ISTRIP /* Don't turn this on by default... - Ever heard of unicode?*/ \
 	 | ICRNL | IMAXBEL | IXON | IXANY | IUTF8 /* Turn on UTF-8 support by default! */)
-#define TTYDEF_OFLAG                                                                    \
-	(OPOST /*| ONLCR /* Don't turn this on by default. libansitty doesn't need this! */ \
-	 /*| XTABS /* Not needed (apparently this converts tabs to spaces, though I have    \
+#define TTYDEF_OFLAG                                                                 \
+	(OPOST | ONLCR                                                                   \
+	 /*| XTABS /* Not needed (apparently this converts tabs to spaces, though I have \
 	            * no idea how termios should know how many spaces...) */)
 #define TTYDEF_LFLAG                                            \
 	(ECHO | ICANON | ISIG | IEXTEN | ECHOE | ECHOKE | ECHOCTL | \

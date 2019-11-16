@@ -116,7 +116,7 @@ cfmakeraw:([nonnull] struct termios *__restrict termios_p) {
 %#if defined(__USE_KOS) || defined(__USE_BSD)
 @@Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
 @@Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h>
-[dependency_include(<sys/ttydefaults.h>)]
+[dependency_include(<sys/ttydefaults.h>)][kernel]
 cfmakesane:([nonnull] struct termios *__restrict termios_p) {
 	/* Set sane values. */
 	memset(termios_p, 0, sizeof(*termios_p));

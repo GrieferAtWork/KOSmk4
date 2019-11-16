@@ -11734,10 +11734,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak regdump_sgregs_with_cs_ss; .long regdump_sgregs_with_cs_ss
 	.reloc ., R_386_SIZE32, regdump_sgregs_with_cs_ss; .long 0
 	.long 0xe382283
-	.long 0 /* index: 2933 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2933 /* index: 2933 */
+	.weak cfmakesane; .long cfmakesane
+	.reloc ., R_386_SIZE32, cfmakesane; .long 0
+	.long 0x81a0b75
 	.long 0 /* index: 2934 */
 	.long 0
 	.long 0
@@ -19498,6 +19498,8 @@ END(kernel_symbol_table)
 	.string "sys_fdatasync"
 .Lname2932:
 	.string "regdump_sgregs_with_cs_ss"
+.Lname2933:
+	.string "cfmakesane"
 .Lname2937:
 	.string "sys_kfstatat"
 .Lname2943:
