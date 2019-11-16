@@ -1093,7 +1093,7 @@ do_put_cp_ch:
 			break;
 
 		default:
-			cp_ch = '?';
+			cp_ch = 4; /* U+2666 */
 			goto do_put_cp_ch;
 		}
 	}

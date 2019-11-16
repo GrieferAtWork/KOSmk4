@@ -1032,10 +1032,6 @@ vga_update_cursor_pos(VGA *__restrict vga)
 
 #define VGA_CHR(vga, ch) ((u16)(ch) | ((u16)(vga)->at_ansi.at_color << 8))
 
-#define UNENCODABLE_START  "["
-#define UNENCODABLE_END    "]"
-#define UNENCODABLE(x)     UNENCODABLE_START x UNENCODABLE_END
-
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(LIBANSITTY_CC vga_do_putcp437)(VGA *__restrict self, u8 ch) {
 	u16 *oldptr;
@@ -1235,17 +1231,12 @@ VGA_Putc(struct ansitty *__restrict self, char32_t ch)
 			}
 			break;
 
-		default: {
-			size_t i, len;
-			char buf[32];
-			if (ch <= 0x1f) {
-				len = sprintf(buf, "^%c", ch + '@');
-			} else {
-				len = sprintf(buf, UNENCODABLE_START "U+%I32X" UNENCODABLE_END, ch);
-			}
-			for (i = 0; i < len; ++i)
-				vga_putcp437(vga, buf[i]);
-		}	break;
+		default:
+			/* Unicode says we should use `U+FFFD', however that character doesn't
+			 * exist in CP437, however we've got this one that looks somewhat similar. */
+			vga_putcp437(vga, 4); /* U+2666 */
+			break;
+
 		}
 	}
 	if (!(vga->at_ansi.at_ttymode & ANSITTY_MODE_HIDECURSOR))
