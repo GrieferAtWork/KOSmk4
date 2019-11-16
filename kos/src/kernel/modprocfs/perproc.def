@@ -44,9 +44,28 @@
 #endif /* !PERPROC_DIRECTORY_ENTRY */
 
 
+#if defined(__x86_64__) || defined(__i386__)
+#include "arch/i386/perproc.def"
+#else
+/* ... */
+#endif
+
+
+/* Enumerate arch-specific files in /proc/[PID]/attr/... */
+#ifndef ARCH_ENUMERATE_PERPROC_ATTR
+#define ARCH_ENUMERATE_PERPROC_ATTR /* nothing */
+#endif /* !ARCH_ENUMERATE_PERPROC_ATTR */
+
+/* Enumerate arch-specific files in /proc/[PID]/kos/... */
+#ifndef ARCH_ENUMERATE_PERPROC_KOS
+#define ARCH_ENUMERATE_PERPROC_KOS /* nothing */
+#endif /* !ARCH_ENUMERATE_PERPROC_KOS */
+
+
 PERPROC_DIRECTORY_ENTRY("attr", DT_DIR, attr)
 MKDIR(attr, 0333,
       F(attr, "current", DT_REG, attr_current)
+      ARCH_ENUMERATE_PERPROC_ATTR
       F_END)
 
 MKREG_RO(attr_current, 0666, ProcFS_PerProc_Attr_Current_Printer)
@@ -73,6 +92,7 @@ PERPROC_DIRECTORY_ENTRY("kos", DT_DIR, kos)
 MKDIR(kos, 0333,
       F(attr, "drives", DT_DIR, kos_drives)
       F(attr, "dcwd", DT_DIR, kos_dcwd)
+      ARCH_ENUMERATE_PERPROC_KOS
       F_END)
 CUSTOM(kos_drives, S_IFDIR | 0300, ProcFS_PerProc_Kos_Drives_Type)
 CUSTOM(kos_dcwd, S_IFDIR | 0300, ProcFS_PerProc_Kos_DrivesCwd_Type)

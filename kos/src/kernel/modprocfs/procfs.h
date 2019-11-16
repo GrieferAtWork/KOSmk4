@@ -139,24 +139,24 @@ enum {
 	PROCFS_SINGLETON_ROOT = 0, /* /proc  (Must always remain `0') */
 
 #define MKDIR(id, mode, files) PROCFS_SINGLETON_ID_##id,
-#include "singleton.h"
+#include "singleton.def"
 	PROCFS_SINGLETON_START_REG_RO,
 	__PROCFS_SINGLETON_START_REG_RO = PROCFS_SINGLETON_START_REG_RO - 1,
 #define MKREG_RO(id, mode, printer) PROCFS_SINGLETON_ID_##id,
-#include "singleton.h"
+#include "singleton.def"
 	PROCFS_SINGLETON_START_REG_RW,
 	__PROCFS_SINGLETON_START_REG_RW = PROCFS_SINGLETON_START_REG_RW - 1,
 #define MKREG_RW(id, mode, reader, writer) PROCFS_SINGLETON_ID_##id,
-#include "singleton.h"
+#include "singleton.def"
 	PROCFS_SINGLETON_START_LNK_DYN,
 	__PROCFS_SINGLETON_START_LNK_DYN = PROCFS_SINGLETON_START_LNK_DYN - 1,
 #define DYNAMIC_SYMLINK(id, mode, readlink) PROCFS_SINGLETON_ID_##id,
-#include "singleton.h"
+#include "singleton.def"
 #ifndef PROCFS_NO_CUSTOM
 	PROCFS_SINGLETON_START_CUSTOM,
 	__PROCFS_SINGLETON_START_CUSTOM = PROCFS_SINGLETON_START_CUSTOM - 1,
 #define CUSTOM(id, type) PROCFS_SINGLETON_ID_##id,
-#include "singleton.h"
+#include "singleton.def"
 #endif /* !PROCFS_NO_CUSTOM */
 	PROCFS_SINGLETON_COUNT
 };
@@ -165,20 +165,20 @@ enum {
 enum {
 	PROCFS_PERPROC_ROOT = 0, /* /proc/[pid]  (Must always remain `0') */
 #define MKDIR(id, mode, files) PROCFS_PERPROC_ID_##id,
-#include "perproc.h"
+#include "perproc.def"
 	PROCFS_PERPROC_START_REG_RO,
 	__PROCFS_PERPROC_START_REG_RO = PROCFS_PERPROC_START_REG_RO - 1,
 #define MKREG_RO(id, mode, printer) PROCFS_PERPROC_ID_##id,
-#include "perproc.h"
+#include "perproc.def"
 	PROCFS_PERPROC_START_LNK_DYN,
 	__PROCFS_PERPROC_START_LNK_DYN = PROCFS_PERPROC_START_LNK_DYN - 1,
 #define DYNAMIC_SYMLINK(id, mode, readlink) PROCFS_PERPROC_ID_##id,
-#include "perproc.h"
+#include "perproc.def"
 #ifndef PROCFS_PERPROC_NO_CUSTOM
 	PROCFS_PERPROC_START_CUSTOM,
 	__PROCFS_PERPROC_START_CUSTOM = PROCFS_PERPROC_START_CUSTOM - 1,
 #define CUSTOM(id, mode, type) PROCFS_PERPROC_ID_##id,
-#include "perproc.h"
+#include "perproc.def"
 #endif /* !PROCFS_PERPROC_NO_CUSTOM */
 	PROCFS_PERPROC_COUNT
 };
@@ -261,7 +261,7 @@ ProcFS_OpenNode(struct superblock *__restrict self,
 	                                      USER CHECKED void const *buf, size_t buflen);
 #define CUSTOM(id, type) \
 	INTDEF struct inode_type type;
-#include "singleton.h"
+#include "singleton.def"
 
 
 /* Define printer functions used by singleton files */
@@ -274,7 +274,7 @@ ProcFS_OpenNode(struct superblock *__restrict self,
 	                                             pformatprinter printer_, void *arg);
 #define CUSTOM(id, mode, type) \
 	INTDEF struct inode_type type;
-#include "perproc.h"
+#include "perproc.def"
 
 
 DECL_END

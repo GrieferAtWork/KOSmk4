@@ -154,10 +154,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak handle_get_inode; .long handle_get_inode
 	.reloc ., R_386_SIZE32, handle_get_inode; .long 0
 	.long 0x3740025
-	.long 0 /* index: 38 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname38 /* index: 38 */
+	.weak x86_iopl_keep_after_clone; .long x86_iopl_keep_after_clone
+	.reloc ., R_386_SIZE32, x86_iopl_keep_after_clone; .long 0
+	.long 0xcb59555
 	.long .Lname39 /* index: 39 */
 	.weak fs_filesystems_lock_trywrite; .long fs_filesystems_lock_trywrite
 	.reloc ., R_386_SIZE32, fs_filesystems_lock_trywrite; .long 0
@@ -8558,10 +8558,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 2139 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2139 /* index: 2139 */
+	.weak x86_iopl_keep_after_exec; .long x86_iopl_keep_after_exec
+	.reloc ., R_386_SIZE32, x86_iopl_keep_after_exec; .long 0
+	.long 0x1cb14a3
 	.long .Lname2140 /* index: 2140 */
 	.weak vmb_find_first_node_greater_equal; .long vmb_find_first_node_greater_equal
 	.reloc ., R_386_SIZE32, vmb_find_first_node_greater_equal; .long 0
@@ -12910,10 +12910,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 3227 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3227 /* index: 3227 */
+	.weak x86_iopl_keep_after_fork; .long x86_iopl_keep_after_fork
+	.reloc ., R_386_SIZE32, x86_iopl_keep_after_fork; .long 0
+	.long 0x1cb2c9b
 	.long 0 /* index: 3228 */
 	.long 0
 	.long 0
@@ -16428,6 +16428,8 @@ END(kernel_symbol_table)
 	.string "qtime_to_timespec"
 .Lname37:
 	.string "handle_get_inode"
+.Lname38:
+	.string "x86_iopl_keep_after_clone"
 .Lname39:
 	.string "fs_filesystems_lock_trywrite"
 .Lname40:
@@ -18644,6 +18646,8 @@ END(kernel_symbol_table)
 	.string "devfs_lock_downgrade"
 .Lname2137:
 	.string "sys_setsid"
+.Lname2139:
+	.string "x86_iopl_keep_after_exec"
 .Lname2140:
 	.string "vmb_find_first_node_greater_equal"
 .Lname2143:
@@ -19824,6 +19828,8 @@ END(kernel_symbol_table)
 	.string "pagedir_isuserwritable"
 .Lname3225:
 	.string "sys_fchmod"
+.Lname3227:
+	.string "x86_iopl_keep_after_fork"
 .Lname3231:
 	.string "sys_timerfd_settime"
 .Lname3232:

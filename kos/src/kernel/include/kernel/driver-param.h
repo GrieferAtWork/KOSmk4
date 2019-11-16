@@ -308,10 +308,14 @@ struct kernel_commandline_option {
  * >> if (has_option("<parname>=$VALUE")) handler("$VALUE"); */
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 #define DEFINE_CMDLINE_PARAM(handler, parname) \
-	DEFINE_KERNEL_COMMANDLINE_OPTION(varname, KERNEL_COMMANDLINE_OPTION_TYPE_FUNC, parname)
+	DEFINE_KERNEL_COMMANDLINE_OPTION(handler, KERNEL_COMMANDLINE_OPTION_TYPE_FUNC, parname)
 #else /* CONFIG_BUILDING_KERNEL_CORE */
 #define DEFINE_CMDLINE_PARAM(handler, parname) \
-	__DEFINE_CMDLINE_PARAM_STRTOXX(varname, parname, uint64_t, strtou64)
+	DATDEF char __optparam_##handler[] ASMNAME("drv_arg_" parname);  \
+	PRIVATE DRIVER_INIT void __pfunc_init_##handler(void) {          \
+		if (*__optparam_##handler)                                   \
+			handler(__optparam_##handler);                           \
+	}
 #endif /* !CONFIG_BUILDING_KERNEL_CORE */
 
 

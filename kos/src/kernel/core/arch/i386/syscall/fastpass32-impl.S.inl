@@ -19,7 +19,7 @@
  */
 
 #ifdef __INTELLISENSE__
-#include "syscall-fastpass32.S"
+#include "fastpass32.S"
 #define SYSCALL_DEFMODE_INT80 1
 #endif
 
@@ -50,7 +50,12 @@
  *   - execveat()
  *   - clone()
  *   - fork()
+ *   - ... // See the remainder of this file
  */
+
+
+
+
 .section SECT(execveat)
 INTERN_FUNCTION(FUNC(execveat))
 	.cfi_startproc simple
@@ -58,7 +63,6 @@ INTERN_FUNCTION(FUNC(execveat))
 	.cfi_lsda 0, LSDA(SYS_execveat)
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
-
 	/* Must construct a full `struct icpustate' */
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
@@ -66,14 +70,11 @@ INTERN_FUNCTION(FUNC(execveat))
 	.cfi_restore_iret_es_or_offset -8
 	pushl_cfi %fs
 	.cfi_restore_iret_fs_or_offset -12
-
 #ifdef SYSCALL_DEFMODE_SYSENTER
 	cmpl   $KERNEL_BASE, %ebp
 	jae    __asm32_bad_sysenter_extension
 #endif /* SYSCALL_DEFMODE_SYSENTER */
-
 	pushal_cfi_r
-
 	movl   $(SEGMENT_USER_DATA_RPL), %eax
 	movl   %eax, %ds
 	movl   %eax, %es
@@ -83,9 +84,9 @@ INTERN_FUNCTION(FUNC(execveat))
 
 #ifdef SYSCALL_DEFMODE_SYSENTER
 	pushl_cfi 0(%ebp) /* Arg #4 (WARNING: SEGFAULT!) */
-#else
+#else /* SYSCALL_DEFMODE_SYSENTER */
 	pushl_cfi %edi /* Arg #4 */
-#endif
+#endif /* !SYSCALL_DEFMODE_SYSENTER */
 
 	pushl_cfi %esi /* Arg #3 */
 	pushl_cfi %edx /* Arg #2 */
@@ -96,17 +97,15 @@ INTERN_FUNCTION(FUNC(execveat))
 	INTERN(kernel_execveat)
 	call   kernel_execveat
 	.cfi_adjust_cfa_offset -24 /* STDCALL does callee-cleanup */
-
 	movl   %eax, %esp /* Load the new register context stack. */
-	popal_cfi_r
 
+	popal_cfi_r
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
 	.cfi_restore_iret_es
 	popl_cfi %ds
 	.cfi_restore_iret_ds
-
 	IRET
 	.cfi_endproc
 END(FUNC(execveat))
@@ -126,13 +125,13 @@ INTERN_FUNCTION(FUNC(execve))
 	.cfi_restore_iret_es_or_offset -8
 	pushl_cfi %fs
 	.cfi_restore_iret_fs_or_offset -12
-
 	pushal_cfi_r
 	movl   $(SEGMENT_USER_DATA_RPL), %eax
 	movl   %eax, %ds
 	movl   %eax, %es
 	movl   $(SEGMENT_KERNEL_FSBASE), %eax
 	movl   %eax, %fs
+
 	movl   %esp, %eax
 	pushl_cfi $0        /* Arg #4 */
 	pushl_cfi %edx      /* Arg #3 */
@@ -144,15 +143,14 @@ INTERN_FUNCTION(FUNC(execve))
 	call   kernel_execveat
 	.cfi_adjust_cfa_offset -24 /* STDCALL does callee-cleanup */
 	movl   %eax, %esp   /* Load the new register context stack. */
-	popal_cfi_r
 
+	popal_cfi_r
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
 	.cfi_restore_iret_es
 	popl_cfi %ds
 	.cfi_restore_iret_ds
-
 	IRET
 	.cfi_endproc
 END(FUNC(execve))
@@ -165,15 +163,12 @@ INTERN_FUNCTION(FUNC(debugtrap))
 	.cfi_lsda 0, LSDA(SYS_debugtrap)
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
-
-	/* Must construct a full `struct icpustate' */
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
 	pushl_cfi %es
 	.cfi_restore_iret_es_or_offset -8
 	pushl_cfi %fs
 	.cfi_restore_iret_fs_or_offset -12
-
 	pushal_cfi_r
 	movl   $(SEGMENT_USER_DATA_RPL), %eax
 	movl   %eax, %ds
@@ -189,17 +184,54 @@ INTERN_FUNCTION(FUNC(debugtrap))
 	.cfi_adjust_cfa_offset -4
 
 	popal_cfi_r
-
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
 	.cfi_restore_iret_es
 	popl_cfi %ds
 	.cfi_restore_iret_ds
-
 	IRET
 	.cfi_endproc
 END(FUNC(debugtrap))
+
+
+.section SECT(iopl)
+INTERN_FUNCTION(FUNC(iopl))
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality
+	.cfi_lsda 0, LSDA(SYS_iopl)
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+
+	/* Must construct a full `struct icpustate' */
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	pushal_cfi_r
+	movl   $(SEGMENT_USER_DATA_RPL), %eax
+	movl   %eax, %ds
+	movl   %eax, %es
+	movl   $(SEGMENT_KERNEL_FSBASE), %eax
+	movl   %eax, %fs
+
+	movl   %esp, %ecx /* struct icpustate *__restrict state */
+	movl   %ebx, %edx /* syscall_ulong_t level */
+	INTERN(sys_iopl_impl)
+	call   sys_iopl_impl
+
+	popal_cfi_r
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	IRET
+	.cfi_endproc
+END(FUNC(iopl))
 
 
 /* TODO: sigreturn() */

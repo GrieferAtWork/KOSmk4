@@ -16,28 +16,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_CRED_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_CRED_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_IOPL_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_IOPL_H 1
 
 #include <kernel/compiler.h>
 
+#include <kernel/types.h>
+
 DECL_BEGIN
 
-/* Return true if the calling thread is allowed to modify EFLAGS.IOPERM */
-#define cred_allow_hwio() 1 /* TODO */
+#ifdef __CC__
 
-/* Mask of eflags bits that a user-space process is allowed to modify.
- * Attempting to set any non-masked EFLAGS bit will cause an exception:
- *    E_INVALID_ARGUMENT_BAD_VALUE:
- *        E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER:
- *            X86_REGISTER_MISC_EFLAGS:
- *                value
- * to be thrown */
-#define cred_allow_eflags_modify_mask()                                                                      \
-	(cred_allow_hwio() ? (EFLAGS_CF | EFLAGS_PF | EFLAGS_AF | EFLAGS_ZF | EFLAGS_SF | EFLAGS_OF | EFLAGS_ID) \
-	                   : (EFLAGS_CF | EFLAGS_PF | EFLAGS_AF | EFLAGS_ZF | EFLAGS_SF | EFLAGS_OF | EFLAGS_ID | EFLAGS_IOPLMASK))
+/* When true, iopl() is kept after fork() (w/o CLONE_THREAD) */
+DATDEF bool x86_iopl_keep_after_fork;
 
+/* When true, iopl() is kept after clone() (w/ CLONE_THREAD) */
+DATDEF bool x86_iopl_keep_after_clone;
+
+/* When true, iopl() is kept after exec() */
+DATDEF bool x86_iopl_keep_after_exec;
+
+#endif /* __CC__ */
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_CRED_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_IOPL_H */

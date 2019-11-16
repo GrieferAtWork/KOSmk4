@@ -2169,6 +2169,9 @@
 #define __CRT_HAVE_x86_idt_modify_end 1
 #define __CRT_HAVE_x86_idt_modify_start 1
 #define __CRT_HAVE_x86_idt_ptr 1
+#define __CRT_HAVE_x86_iopl_keep_after_clone 1
+#define __CRT_HAVE_x86_iopl_keep_after_exec 1
+#define __CRT_HAVE_x86_iopl_keep_after_fork 1
 #define __CRT_HAVE_x86_lapic_base_address 1
 #define __CRT_HAVE_x86_lapic_id 1
 #define __CRT_HAVE_x86_lapic_version 1

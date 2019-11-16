@@ -149,6 +149,7 @@ typedef Elf(Dyn)  Elf_Dyn;
  *      - `char          drv_argp_${NAME}[]'-- Bound to NAME the commandline argument `NAME' if present, or `NULL' otherwise
  *                                             >> DATDEF char drv_arg_foo[];    // "bar"
  *                                             >> DATDEF char drv_arg_baz[];    // "42"
+ *                                             >> DATDEF char drv_arg_nope[];   // ""
  *                                             >> DATDEF char drv_argp_debug[]; // "debug"
  *                                             >> DATDEF char drv_argp_nope[];  // NULL
  *                                             Loaded with `sysctl_insmod("my_driver", "foo=bar debug baz=42")'

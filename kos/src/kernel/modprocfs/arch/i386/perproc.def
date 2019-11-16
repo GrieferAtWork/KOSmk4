@@ -16,28 +16,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_CRED_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_CRED_H 1
-
-#include <kernel/compiler.h>
-
-DECL_BEGIN
-
-/* Return true if the calling thread is allowed to modify EFLAGS.IOPERM */
-#define cred_allow_hwio() 1 /* TODO */
-
-/* Mask of eflags bits that a user-space process is allowed to modify.
- * Attempting to set any non-masked EFLAGS bit will cause an exception:
- *    E_INVALID_ARGUMENT_BAD_VALUE:
- *        E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER:
- *            X86_REGISTER_MISC_EFLAGS:
- *                value
- * to be thrown */
-#define cred_allow_eflags_modify_mask()                                                                      \
-	(cred_allow_hwio() ? (EFLAGS_CF | EFLAGS_PF | EFLAGS_AF | EFLAGS_ZF | EFLAGS_SF | EFLAGS_OF | EFLAGS_ID) \
-	                   : (EFLAGS_CF | EFLAGS_PF | EFLAGS_AF | EFLAGS_ZF | EFLAGS_SF | EFLAGS_OF | EFLAGS_ID | EFLAGS_IOPLMASK))
 
 
-DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_CRED_H */
+

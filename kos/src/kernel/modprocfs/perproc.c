@@ -63,7 +63,7 @@ DECL_BEGIN
 	                               PROCFS_INOMAKE_PERPROC(0, PROCFS_PERPROC_ID_##id), \
 	                               type, name);
 #define F_END /* nothing */
-#include "perproc.h"
+#include "perproc.def"
 #undef F_END
 #undef F
 
@@ -71,7 +71,7 @@ DECL_BEGIN
 	PRIVATE REF struct directory_entry *prd_fsdata_dir_##id[] = { files };
 #define F(parent_id, name, type, id) &prd_dent_##parent_id##_ent_##id,
 #define F_END NULL /* Sentinel */
-#include "perproc.h"
+#include "perproc.def"
 #undef F_END
 #undef F
 
@@ -81,17 +81,17 @@ ProcFS_PerProc_FsData[PROCFS_PERPROC_COUNT] = {
 	[PROCFS_PERPROC_ROOT] = (void *)ProcFS_PerProcRootDirectory_FsData,
 #define MKDIR(id, mode, files) \
 	[PROCFS_PERPROC_ID_##id] = &prd_fsdata_dir_##id,
-#include "perproc.h"
+#include "perproc.def"
 #define MKREG_RO(id, mode, printer) \
 	[PROCFS_PERPROC_ID_##id] = (void *)&printer,
-#include "perproc.h"
+#include "perproc.def"
 #define DYNAMIC_SYMLINK(id, mode, readlink) \
 	[PROCFS_PERPROC_ID_##id] = (void *)&readlink,
-#include "perproc.h"
+#include "perproc.def"
 #ifndef PROCFS_PERPROC_NO_CUSTOM
 #define CUSTOM(id, mode, type) \
 	[PROCFS_PERPROC_ID_##id] = NULL,
-#include "perproc.h"
+#include "perproc.def"
 #endif /* !PROCFS_PERPROC_NO_CUSTOM */
 };
 
@@ -100,17 +100,17 @@ ProcFS_PerProc_FileMode[PROCFS_PERPROC_COUNT] = {
 	[PROCFS_PERPROC_ROOT] = S_IFDIR | 0333,
 #define MKDIR(id, mode, files) \
 	[PROCFS_PERPROC_ID_##id] = S_IFDIR | mode,
-#include "perproc.h"
+#include "perproc.def"
 #define MKREG_RO(id, mode, printer) \
 	[PROCFS_PERPROC_ID_##id] = S_IFREG | mode,
-#include "perproc.h"
+#include "perproc.def"
 #define DYNAMIC_SYMLINK(id, mode, readlink) \
 	[PROCFS_PERPROC_ID_##id] = S_IFLNK | mode,
-#include "perproc.h"
+#include "perproc.def"
 #ifndef PROCFS_PERPROC_NO_CUSTOM
 #define CUSTOM(id, mode, type) \
 	[PROCFS_PERPROC_ID_##id] = mode,
-#include "perproc.h"
+#include "perproc.def"
 #endif /* !PROCFS_PERPROC_NO_CUSTOM */
 };
 
@@ -120,7 +120,7 @@ INTERN_CONST struct inode_type *const
 ProcFS_PerProc_CustomTypes[PROCFS_PERPROC_COUNT - PROCFS_PERPROC_START_CUSTOM] = {
 #define CUSTOM(id, mode, type) \
 	[PROCFS_PERPROC_ID_##id - PROCFS_PERPROC_START_CUSTOM] = &type,
-#include "perproc.h"
+#include "perproc.def"
 };
 #endif /* !PROCFS_PERPROC_NO_CUSTOM */
 
@@ -297,7 +297,7 @@ INTERN struct inode_type ProcFS_PerProc_DynamicSymlink_Type = {
 /************************************************************************/
 INTERN REF struct directory_entry *ProcFS_PerProcRootDirectory_FsData[] = {
 #define PERPROC_DIRECTORY_ENTRY(name, type, id) &prd_perprocent_##id,
-#include "perproc.h"
+#include "perproc.def"
 	NULL
 };
 

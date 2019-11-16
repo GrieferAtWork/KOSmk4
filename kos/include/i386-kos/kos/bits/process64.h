@@ -31,9 +31,12 @@
 
 #ifdef __KERNEL__
 #include <kernel/compiler.h>
+
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/types.h>
+#include <sched/iopl.h>
+
 #include <kos/kernel/cpu-state64.h>
 #endif /* __KERNEL__ */
 
@@ -138,9 +141,13 @@ exec_initialize_entry64(struct icpustate *__restrict user_state,
 #ifdef __x86_64__
 	irregs_wrsp(&user_state->ics_irregs, (__uint64_t)ustack_base + ustack_size);
 	user_state->ics_gpregs.gp_rbp = (__uint64_t)peb_address;
+	if (!x86_iopl_keep_after_exec)
+		user_state->ics_irregs.ir_pflags &= ~0x3000; /* EFLAGS_IOPLMASK */
 #else /* __x86_64__ */
 	user_state->ics_gpregs.gp_ebp   = (__uint32_t)peb_address;
 	user_state->ics_irregs_u.ir_esp = (__uint32_t)ustack_base + ustack_size;
+	if (!x86_iopl_keep_after_exec)
+		user_state->ics_irregs.ir_eflags &= ~0x3000; /* EFLAGS_IOPLMASK */
 #endif /* !__x86_64__ */
 	return user_state;
 }

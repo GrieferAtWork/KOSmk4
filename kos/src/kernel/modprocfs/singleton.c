@@ -66,7 +66,7 @@ DECL_BEGIN
 	                               PROCFS_INOMAKE_SINGLETON(PROCFS_SINGLETON_ID_##id), \
 	                               type, name);
 #define F_END /* nothing */
-#include "singleton.h"
+#include "singleton.def"
 #undef F_END
 #undef F
 
@@ -113,7 +113,7 @@ DECL_BEGIN
 		/* .psd_gid      = */ 0,                                                     \
 		/* .pss_readlink = */ &readlink,                                             \
 	};
-#include "singleton.h"
+#include "singleton.def"
 #undef F_END
 #undef F
 
@@ -121,7 +121,7 @@ DECL_BEGIN
 #ifndef PROCFS_NO_CUSTOM
 #define CUSTOM(id, type) \
 	INTDEF byte_t __##type##_fsdata[] ASMNAME(#type "_fsdata");
-#include "singleton.h"
+#include "singleton.def"
 #endif /* !PROCFS_NO_CUSTOM */
 
 
@@ -130,20 +130,20 @@ ProcFS_Singleton_FsData[PROCFS_SINGLETON_COUNT] = {
 	[PROCFS_SINGLETON_ROOT] = (struct procfs_singleton_data *)&ProcFS_RootDirectory_FsData,
 #define MKDIR(id, mode, files) \
 	[PROCFS_SINGLETON_ID_##id] = (struct procfs_singleton_data *)&srd_fsdata_dir_##id,
-#include "singleton.h"
+#include "singleton.def"
 #define MKREG_RO(id, mode, printer) \
 	[PROCFS_SINGLETON_ID_##id] = (struct procfs_singleton_data *)&srd_fsdata_reg_ro_##id,
-#include "singleton.h"
+#include "singleton.def"
 #define MKREG_RW(id, mode, reader, writer) \
 	[PROCFS_SINGLETON_ID_##id] = (struct procfs_singleton_data *)&srd_fsdata_reg_rw_##id,
-#include "singleton.h"
+#include "singleton.def"
 #define DYNAMIC_SYMLINK(id, mode, readlink) \
 	[PROCFS_SINGLETON_ID_##id] = (struct procfs_singleton_data *)&srd_fsdata_symlink_##id,
-#include "singleton.h"
+#include "singleton.def"
 #ifndef PROCFS_NO_CUSTOM
 #define CUSTOM(id, type) \
 	[PROCFS_SINGLETON_ID_##id] = (struct procfs_singleton_data *)__##type##_fsdata,
-#include "singleton.h"
+#include "singleton.def"
 #endif /* !PROCFS_NO_CUSTOM */
 };
 
@@ -152,7 +152,7 @@ INTERN_CONST struct inode_type *const
 ProcFS_Singleton_CustomTypes[PROCFS_SINGLETON_COUNT - PROCFS_SINGLETON_START_CUSTOM] = {
 #define CUSTOM(id, mode, type) \
 	[PROCFS_SINGLETON_ID_##id - PROCFS_SINGLETON_START_CUSTOM] = &type,
-#include "singleton.h"
+#include "singleton.def"
 };
 #endif /* !PROCFS_NO_CUSTOM */
 
@@ -404,7 +404,7 @@ INTERN struct procfs_singleton_dir_data ProcFS_RootDirectory_FsData = {
 	/* .psd_gid   = */ 0,
 	/* .pdd_ents  = */ {
 #define ROOT_DIRECTORY_ENTRY(name, type, id) &srd_rootent_##id,
-#include "singleton.h"
+#include "singleton.def"
 		NULL
 	}
 };

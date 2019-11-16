@@ -36,6 +36,7 @@
 #include <kernel/vm/phys.h>
 #include <sched/cpu.h>
 #include <sched/except-handler.h>
+#include <sched/iopl.h>
 #include <sched/pid.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
@@ -222,6 +223,11 @@ again_lock_vm:
 		/* Initial the task's initial CPU state. */
 		kernel_stack = (void *)VM_NODE_ENDADDR(&FORTASK(result, _this_kernel_stack));
 		state        = icpustate_to_scpustate_p(init_state, kernel_stack);
+
+		/* Reset iopl() for the child thread/process */
+		if ((clone_flags & CLONE_THREAD) ? !x86_iopl_keep_after_clone
+		                                 : !x86_iopl_keep_after_fork)
+			state->scs_irregs.ir_eflags &= ~EFLAGS_IOPLMASK;
 
 		/* Have `clone()' or `fork()' return `0' in the child thread/process */
 		gpregs_setpax(&state->scs_gpregs, 0);
