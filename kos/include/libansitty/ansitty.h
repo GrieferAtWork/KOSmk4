@@ -33,7 +33,7 @@
  *  - http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-048.pdf
  *  - https://espterm.github.io/docs/VT100%20escape%20codes.html
  *  - https://www.climagic.org/mirrors/VT100_Escape_Codes.html
- *  - http://real-world-systems.com/docs/ANSIcode.html
+ *  - https://real-world-systems.com/docs/ANSIcode.html
  *  - http://man7.org/linux/man-pages/man1/screen.1.html
  *  - https://vt100.net/docs/vt102-ug/chapter5.html
  *  - https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
@@ -105,13 +105,13 @@
 #define ANSITTY_CL_MAGENTA   5
 #define ANSITTY_CL_CYAN      6
 #define ANSITTY_CL_WHITE     7
-#define ANSITTY_IFSTRONG     0x8 /*< Intensify a given ANSI color. */
-#define ANSITTY_ISSTRONG(x) ((x)&ANSITTY_IFSTRONG)
-#define ANSITTY_TOSTRONG(x) ((x)|ANSITTY_IFSTRONG)
+#define ANSITTY_IFSTRONG     0x8 /* Intensify a given ANSI color. */
+#define ANSITTY_ISSTRONG(x) ((x) & ANSITTY_IFSTRONG)
+#define ANSITTY_TOSTRONG(x) ((x) | ANSITTY_IFSTRONG)
 
-#define ANSITTY_PALETTE_INDEX(fg, bg)  (((bg) << 4)|(fg))
-#define ANSITTY_PALETTE_INDEX_FG(idx)  ((idx) & 0xf)
-#define ANSITTY_PALETTE_INDEX_BG(idx)  ((idx) >> 4)
+#define ANSITTY_PALETTE_INDEX(fg, bg) (((bg) << 4) | (fg))
+#define ANSITTY_PALETTE_INDEX_FG(idx) ((idx) & 0xf)
+#define ANSITTY_PALETTE_INDEX_BG(idx) ((idx) >> 4)
 #define ANSITTY_CL_DEFAULT     ANSITTY_PALETTE_INDEX(ANSITTY_CL_WHITE, ANSITTY_CL_BLACK)
 
 /* Sequence that can be printed at any time to reset the ANSI driver to its default

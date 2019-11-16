@@ -170,6 +170,7 @@ __SYSDECL_BEGIN
 #define VGA_ATC_PALETTED       0x0d
 #define VGA_ATC_PALETTEE       0x0e
 #define VGA_ATC_PALETTEF       0x0f
+#   define VGA_ATC_PALETTEn_FRESERVED 0xc0
 #define VGA_ATC_MODE           0x10
 #   define VGA_AT10_FRESERVED       0x10 /* Mask of reserved registers */
 #   define VGA_AT10_FGRAPHICS       0x01 /* Enable graphics, rather than alphanumeric mode */
@@ -262,8 +263,16 @@ struct __ATTR_PACKED vga_color {
 	__uint8_t   c_blue;      /* Blue color component. */
 };
 
-struct __ATTR_PACKED vga_palette {
+struct __ATTR_PACKED vga_palette256 {
 	struct vga_color vp_pal[256]; /* VGA color palette. */
+};
+
+struct __ATTR_PACKED vga_palette64 {
+	struct vga_color vp_pal[64]; /* VGA color palette. */
+};
+
+struct __ATTR_PACKED vga_palette16 {
+	struct vga_color vp_pal[16]; /* VGA color palette. */
 };
 
 
@@ -281,7 +290,10 @@ struct __ATTR_PACKED vga_mode {
 	__uint8_t vm_att_plane_enable;  /* VGA_ATC_PLANE_ENABLE. */
 	__uint8_t vm_att_pel;           /* VGA_ATC_PEL. */
 	__uint8_t vm_att_color_page;    /* VGA_ATC_COLOR_PAGE. */
+	__uint8_t vm_att_pal[16];       /* VGA_ATC_PALETTEn. */
+
 	__uint8_t vm_mis;               /* VGA_MIS_R / VGA_MIS_W. */
+
 	__uint8_t vm_gfx_sr_value;      /* VGA_GFX_SR_VALUE. */
 	__uint8_t vm_gfx_sr_enable;     /* VGA_GFX_SR_ENABLE. */
 	__uint8_t vm_gfx_compare_value; /* VGA_GFX_COMPARE_VALUE. */
@@ -291,6 +303,7 @@ struct __ATTR_PACKED vga_mode {
 	__uint8_t vm_gfx_misc;          /* VGA_GFX_MISC. */
 	__uint8_t vm_gfx_compare_mask;  /* VGA_GFX_COMPARE_MASK. */
 	__uint8_t vm_gfx_bit_mask;      /* VGA_GFX_BIT_MASK. */
+
 	__uint8_t vm_crt_h_total;       /* VGA_CRTC_H_TOTAL. */
 	__uint8_t vm_crt_h_disp;        /* VGA_CRTC_H_DISP. */
 	__uint8_t vm_crt_h_blank_start; /* VGA_CRTC_H_BLANK_START. */
@@ -301,14 +314,12 @@ struct __ATTR_PACKED vga_mode {
 	__uint8_t vm_crt_overflow;      /* VGA_CRTC_OVERFLOW. */
 	__uint8_t vm_crt_preset_row;    /* VGA_CRTC_PRESET_ROW. */
 	__uint8_t vm_crt_max_scan;      /* VGA_CRTC_MAX_SCAN. */
-
 	__uint8_t vm_crt_cursor_start;  /* VGA_CRTC_CURSOR_START. */
 	__uint8_t vm_crt_cursor_end;    /* VGA_CRTC_CURSOR_END. */
 	__uint8_t vm_crt_start_hi;      /* VGA_CRTC_START_HI. */
 	__uint8_t vm_crt_start_lo;      /* VGA_CRTC_START_LO. */
 	__uint8_t vm_crt_cursor_hi;     /* VGA_CRTC_CURSOR_HI. */
 	__uint8_t vm_crt_cursor_lo;     /* VGA_CRTC_CURSOR_LO. */
-
 	__uint8_t vm_crt_v_sync_start;  /* VGA_CRTC_V_SYNC_START. */
 	__uint8_t vm_crt_v_sync_end;    /* VGA_CRTC_V_SYNC_END. */
 	__uint8_t vm_crt_v_disp_end;    /* VGA_CRTC_V_DISP_END. */
@@ -318,13 +329,75 @@ struct __ATTR_PACKED vga_mode {
 	__uint8_t vm_crt_v_blank_end;   /* VGA_CRTC_V_BLANK_END. */
 	__uint8_t vm_crt_mode;          /* VGA_CRTC_MODE. */
 	__uint8_t vm_crt_line_compare;  /* VGA_CRTC_LINE_COMPARE. */
+
 	__uint8_t vm_seq_clock_mode;    /* VGA_SEQ_CLOCK_MODE. */
 	__uint8_t vm_seq_plane_write;   /* VGA_SEQ_PLANE_WRITE. */
 	__uint8_t vm_seq_character_map; /* VGA_SEQ_CHARACTER_MAP. */
 	__uint8_t vm_seq_memory_mode;   /* VGA_SEQ_MEMORY_MODE. */
 };
 
-#define VGA_MODE_INIT_TEXT_80x25                                                     \
+/* CGA color palette indices for VGA color codes (for `vm_att_pal'). */
+#define VGA_PALINDX_CGA_INIT                          \
+	{ 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, \
+	  0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f }
+
+
+/* NOTE: ANSI tty for VGA requires colors as follows:
+ *     [0x0] = { 0x00, 0x00, 0x00 }, [0x1] = { 0xaa, 0x00, 0x00 },
+ *     [0x2] = { 0x00, 0xaa, 0x00 }, [0x3] = { 0xaa, 0x55, 0x00 },
+ *     [0x4] = { 0x00, 0x00, 0xaa }, [0x5] = { 0xaa, 0x00, 0xaa },
+ *     [0x6] = { 0x00, 0xaa, 0xaa }, [0x7] = { 0xaa, 0xaa, 0xaa },
+ *     [0x8] = { 0x55, 0x55, 0x55 }, [0x9] = { 0xff, 0x55, 0x55 },
+ *     [0xa] = { 0x55, 0xff, 0x55 }, [0xb] = { 0xff, 0xff, 0x55 },
+ *     [0xc] = { 0x55, 0x55, 0xff }, [0xd] = { 0xff, 0x55, 0xff },
+ *     [0xe] = { 0x55, 0xff, 0xff }, [0xf] = { 0xff, 0xff, 0xff },
+ * All of these colors are present in CGA mode, however their indices differ.
+ * As such, use the palette index registers to remap them:
+ *    CGA color palette indices for ANSI color codes (for `vm_att_pal'). */
+#define VGA_PALINDX_CGA_ANSI_INIT             \
+	{ 0x0, 0x4, 0x2, 0x6, 0x1, 0x5, 0x3, 0x7, \
+	  0x8, 0xc, 0xa, 0xe, 0x9, 0xd, 0xb, 0xf }
+
+/* CGA color palette (pal16). */
+#define VGA_PALETTE_CGA_INIT                                                                            \
+	{{                                                                                                  \
+		/* 0 */ { 0x00, 0x00, 0x00 }, { 0x00, 0x00, 0xaa }, { 0x00, 0xaa, 0x00 }, { 0x00, 0xaa, 0xaa }, \
+		/* 4 */ { 0xaa, 0x00, 0x00 }, { 0xaa, 0x00, 0xaa }, { 0xaa, 0x55, 0x00 }, { 0xaa, 0xaa, 0xaa }, \
+		/* 8 */ { 0x55, 0x55, 0x55 }, { 0x55, 0x55, 0xff }, { 0x55, 0xff, 0x55 }, { 0x55, 0xff, 0xff }, \
+		/* c */ { 0xff, 0x55, 0x55 }, { 0xff, 0x55, 0xff }, { 0xff, 0xff, 0x55 }, { 0xff, 0xff, 0xff }, \
+	}}
+
+
+
+/* EGA color palette indices for VGA color codes (for `vm_att_pal'). (NOTE: set by the bios for 80x25 text mode) */
+#define VGA_PALINDX_EGA_INIT                          \
+	{ 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x14, 0x07, \
+	  0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f }
+
+/* EGA color palette (pal64). (NOTE: set by the bios for 80x25 text mode) */
+#define VGA_PALETTE_EGA_INIT                                                                    \
+	{{                                                                                          \
+		{ 0x00, 0x00, 0x00 }, { 0x00, 0x00, 0xaa }, { 0x00, 0xaa, 0x00 }, { 0x00, 0xaa, 0xaa }, \
+		{ 0xaa, 0x00, 0x00 }, { 0xaa, 0x00, 0xaa }, { 0xaa, 0xaa, 0x00 }, { 0xaa, 0xaa, 0xaa }, \
+		{ 0x00, 0x00, 0x55 }, { 0x00, 0x00, 0xff }, { 0x00, 0xaa, 0x55 }, { 0x00, 0xaa, 0xff }, \
+		{ 0xaa, 0x00, 0x55 }, { 0xaa, 0x00, 0xff }, { 0xaa, 0xaa, 0x55 }, { 0xaa, 0xaa, 0xff }, \
+		{ 0x00, 0x55, 0x00 }, { 0x00, 0x55, 0xaa }, { 0x00, 0xff, 0x00 }, { 0x00, 0xff, 0xaa }, \
+		{ 0xaa, 0x55, 0x00 }, { 0xaa, 0x55, 0xaa }, { 0xaa, 0xff, 0x00 }, { 0xaa, 0xff, 0xaa }, \
+		{ 0x00, 0x55, 0x55 }, { 0x00, 0x55, 0xff }, { 0x00, 0xff, 0x55 }, { 0x00, 0xff, 0xff }, \
+		{ 0xaa, 0x55, 0x55 }, { 0xaa, 0x55, 0xff }, { 0xaa, 0xff, 0x55 }, { 0xaa, 0xff, 0xff }, \
+		{ 0x55, 0x00, 0x00 }, { 0x55, 0x00, 0xaa }, { 0x55, 0xaa, 0x00 }, { 0x55, 0xaa, 0xaa }, \
+		{ 0xff, 0x00, 0x00 }, { 0xff, 0x00, 0xaa }, { 0xff, 0xaa, 0x00 }, { 0xff, 0xaa, 0xaa }, \
+		{ 0x55, 0x00, 0x55 }, { 0x55, 0x00, 0xff }, { 0x55, 0xaa, 0x55 }, { 0x55, 0xaa, 0xff }, \
+		{ 0xff, 0x00, 0x55 }, { 0xff, 0x00, 0xff }, { 0xff, 0xaa, 0x55 }, { 0xff, 0xaa, 0xff }, \
+		{ 0x55, 0x55, 0x00 }, { 0x55, 0x55, 0xaa }, { 0x55, 0xff, 0x00 }, { 0x55, 0xff, 0xaa }, \
+		{ 0xff, 0x55, 0x00 }, { 0xff, 0x55, 0xaa }, { 0xff, 0xff, 0x00 }, { 0xff, 0xff, 0xaa }, \
+		{ 0x55, 0x55, 0x55 }, { 0x55, 0x55, 0xff }, { 0x55, 0xff, 0x55 }, { 0x55, 0xff, 0xff }, \
+		{ 0xff, 0x55, 0x55 }, { 0xff, 0x55, 0xff }, { 0xff, 0xff, 0x55 }, { 0xff, 0xff, 0xff }  \
+	}}
+
+/* Initializer for 80x25 text mode.
+ * @param: ...: Something akin to `VGA_PALINDX_EGA_INIT' */
+#define VGA_BIOTEXT80x25_MODE_INIT(...)                                              \
 	{                                                                                \
 		/* BAD! DON'T YOU DARE TO BLINK!                                             \
 		 * Like literally, dis shit is dangerous to look at                          \
@@ -348,6 +421,7 @@ struct __ATTR_PACKED vga_mode {
 		.vm_att_plane_enable  = 0x0f & VGA_AT12_FMASK,                               \
 		.vm_att_pel           = 0x08 & VGA_AT13_FMASK,                               \
 		.vm_att_color_page    = 0x00,                                                \
+		.vm_att_pal           = __VA_ARGS__,                                         \
 		.vm_mis               = VGA_MIS_FCOLOR | VGA_MIS_FENB_MEM_ACCESS |           \
 		                        VGA_MIS_FCLOCK_28322_720 | VGA_MIS_FHSYNCPOL |       \
 		                        VGA_MIS_FSEL_HIGH_PAGE,                              \

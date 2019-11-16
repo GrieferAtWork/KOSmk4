@@ -895,6 +895,7 @@ do_handle_unich:
 					ansitty_do_insert_unicode(self, unich);
 					self->at_state = STATE_INSERT_UTF8;
 				} else {
+					PUTUNILAST(unich);
 					self->at_state = STATE_TEXT_UTF8;
 				}
 			}
@@ -2629,8 +2630,10 @@ again:
 			break;
 
 		case CC_SPC:
-			if (self->at_ttyflag & ANSITTY_FLAG_CRM)
-				ch = 0x2420;
+			if (self->at_ttyflag & ANSITTY_FLAG_CRM) {
+				PUTUNILAST(0x2420);
+				break;
+			}
 			ATTR_FALLTHROUGH
 		default:
 			/* Output a regular, old ASCII character. */

@@ -388,58 +388,56 @@ LOCAL WUNUSED ATTR_PURE unsigned int NOTHROW(KCALL dbg_getcur_y)(void) { return 
 
 /* TTY color codes. */
 #define DBG_COLOR_BLACK   0x0 /* RGB(0x00, 0x00, 0x00) */
-#define DBG_COLOR_NAVY    0x1 /* RGB(0x00, 0x00, 0xa8) */
-#define DBG_COLOR_GREEN   0x2 /* RGB(0x00, 0xa8, 0x00) */
-#define DBG_COLOR_TEAL    0x3 /* RGB(0x00, 0xa8, 0xa8) */
-#define DBG_COLOR_MAROON  0x4 /* RGB(0xa8, 0x00, 0x00) */
-#define DBG_COLOR_PURPLE  0x5 /* RGB(0xa8, 0x00, 0xa8) */
-#define DBG_COLOR_OLIVE   0x6 /* RGB(0xa8, 0x57, 0x00) */
-#define DBG_COLOR_SILVER  0x7 /* RGB(0xa8, 0xa8, 0xa8) */
-#define DBG_COLOR_GREY    0x8 /* RGB(0x57, 0x57, 0x57) */
-#define DBG_COLOR_BLUE    0x9 /* RGB(0x57, 0x57, 0xff) */
-#define DBG_COLOR_LIME    0xa /* RGB(0x57, 0xff, 0x57) */
-#define DBG_COLOR_AQUA    0xb /* RGB(0x57, 0xff, 0xff) */
-#define DBG_COLOR_RED     0xc /* RGB(0xff, 0x57, 0x57) */
-#define DBG_COLOR_FUCHSIA 0xd /* RGB(0xff, 0x57, 0xff) */
-#define DBG_COLOR_YELLOW  0xe /* RGB(0xff, 0xff, 0x57) */
+#define DBG_COLOR_MAROON  0x1 /* RGB(0xaa, 0x00, 0x00) */
+#define DBG_COLOR_GREEN   0x2 /* RGB(0x00, 0xaa, 0x00) */
+#define DBG_COLOR_OLIVE   0x3 /* RGB(0xaa, 0x55, 0x00) */
+#define DBG_COLOR_NAVY    0x4 /* RGB(0x00, 0x00, 0xaa) */
+#define DBG_COLOR_PURPLE  0x5 /* RGB(0xaa, 0x00, 0xaa) */
+#define DBG_COLOR_TEAL    0x6 /* RGB(0x00, 0xaa, 0xaa) */
+#define DBG_COLOR_SILVER  0x7 /* RGB(0xaa, 0xaa, 0xaa) */
+#define DBG_COLOR_GREY    0x8 /* RGB(0x55, 0x55, 0x55) */
+#define DBG_COLOR_RED     0x9 /* RGB(0xff, 0x55, 0x55) */
+#define DBG_COLOR_LIME    0xa /* RGB(0x55, 0xff, 0x55) */
+#define DBG_COLOR_YELLOW  0xb /* RGB(0xff, 0xff, 0x55) */
+#define DBG_COLOR_BLUE    0xc /* RGB(0x55, 0x55, 0xff) */
+#define DBG_COLOR_FUCHSIA 0xd /* RGB(0xff, 0x55, 0xff) */
+#define DBG_COLOR_AQUA    0xe /* RGB(0x55, 0xff, 0xff) */
 #define DBG_COLOR_WHITE   0xf /* RGB(0xff, 0xff, 0xff) */
 #define DBG_COLOR_LIGHT_GRAY    DBG_COLOR_SILVER
 #define DBG_COLOR_DARK_GRAY     DBG_COLOR_GREY
 
-
-
-#define _DBG_PRIVATE_COLORFMT_FG_0x0 "30"  /* DBG_COLOR_BLACK  : RGB(0x00,0x00,0x00) */
-#define _DBG_PRIVATE_COLORFMT_FG_0x1 "31"  /* DBG_COLOR_NAVY   : RGB(0x00,0x00,0xa8) */
-#define _DBG_PRIVATE_COLORFMT_FG_0x2 "32"  /* DBG_COLOR_GREEN  : RGB(0x00,0xa8,0x00) */
-#define _DBG_PRIVATE_COLORFMT_FG_0x3 "33"  /* DBG_COLOR_TEAL   : RGB(0x00,0xa8,0xa8) */
-#define _DBG_PRIVATE_COLORFMT_FG_0x4 "34"  /* DBG_COLOR_MAROON : RGB(0xa8,0x00,0x00) */
-#define _DBG_PRIVATE_COLORFMT_FG_0x5 "35"  /* DBG_COLOR_PURPLE : RGB(0xa8,0x00,0xa8) */
-#define _DBG_PRIVATE_COLORFMT_FG_0x6 "36"  /* DBG_COLOR_OLIVE  : RGB(0xa8,0x57,0x00) */
-#define _DBG_PRIVATE_COLORFMT_FG_0x7 "37"  /* DBG_COLOR_SILVER : RGB(0xa8,0xa8,0xa8) */
-#define _DBG_PRIVATE_COLORFMT_FG_0x8 "90"  /* DBG_COLOR_GREY   : RGB(0x57,0x57,0x57) */
-#define _DBG_PRIVATE_COLORFMT_FG_0x9 "91"  /* DBG_COLOR_BLUE   : RGB(0x57,0x57,0xff) */
-#define _DBG_PRIVATE_COLORFMT_FG_0xa "92"  /* DBG_COLOR_LIME   : RGB(0x57,0xff,0x57) */
-#define _DBG_PRIVATE_COLORFMT_FG_0xb "93"  /* DBG_COLOR_AQUA   : RGB(0x57,0xff,0xff) */
-#define _DBG_PRIVATE_COLORFMT_FG_0xc "94"  /* DBG_COLOR_RED    : RGB(0xff,0x57,0x57) */
-#define _DBG_PRIVATE_COLORFMT_FG_0xd "95"  /* DBG_COLOR_FUCHSIA: RGB(0xff,0x57,0xff) */
-#define _DBG_PRIVATE_COLORFMT_FG_0xe "96"  /* DBG_COLOR_YELLOW : RGB(0xff,0xff,0x57) */
-#define _DBG_PRIVATE_COLORFMT_FG_0xf "97"  /* DBG_COLOR_WHITE  : RGB(0xff,0xff,0xff) */
-#define _DBG_PRIVATE_COLORFMT_BG_0x0 "40"  /* DBG_COLOR_BLACK  : RGB(0x00,0x00,0x00) */
-#define _DBG_PRIVATE_COLORFMT_BG_0x1 "41"  /* DBG_COLOR_NAVY   : RGB(0x00,0x00,0xa8) */
-#define _DBG_PRIVATE_COLORFMT_BG_0x2 "42"  /* DBG_COLOR_GREEN  : RGB(0x00,0xa8,0x00) */
-#define _DBG_PRIVATE_COLORFMT_BG_0x3 "43"  /* DBG_COLOR_TEAL   : RGB(0x00,0xa8,0xa8) */
-#define _DBG_PRIVATE_COLORFMT_BG_0x4 "44"  /* DBG_COLOR_MAROON : RGB(0xa8,0x00,0x00) */
-#define _DBG_PRIVATE_COLORFMT_BG_0x5 "45"  /* DBG_COLOR_PURPLE : RGB(0xa8,0x00,0xa8) */
-#define _DBG_PRIVATE_COLORFMT_BG_0x6 "46"  /* DBG_COLOR_OLIVE  : RGB(0xa8,0x57,0x00) */
-#define _DBG_PRIVATE_COLORFMT_BG_0x7 "47"  /* DBG_COLOR_SILVER : RGB(0xa8,0xa8,0xa8) */
-#define _DBG_PRIVATE_COLORFMT_BG_0x8 "100" /* DBG_COLOR_GREY   : RGB(0x57,0x57,0x57) */
-#define _DBG_PRIVATE_COLORFMT_BG_0x9 "101" /* DBG_COLOR_BLUE   : RGB(0x57,0x57,0xff) */
-#define _DBG_PRIVATE_COLORFMT_BG_0xa "102" /* DBG_COLOR_LIME   : RGB(0x57,0xff,0x57) */
-#define _DBG_PRIVATE_COLORFMT_BG_0xb "103" /* DBG_COLOR_AQUA   : RGB(0x57,0xff,0xff) */
-#define _DBG_PRIVATE_COLORFMT_BG_0xc "104" /* DBG_COLOR_RED    : RGB(0xff,0x57,0x57) */
-#define _DBG_PRIVATE_COLORFMT_BG_0xd "105" /* DBG_COLOR_FUCHSIA: RGB(0xff,0x57,0xff) */
-#define _DBG_PRIVATE_COLORFMT_BG_0xe "106" /* DBG_COLOR_YELLOW : RGB(0xff,0xff,0x57) */
-#define _DBG_PRIVATE_COLORFMT_BG_0xf "107" /* DBG_COLOR_WHITE  : RGB(0xff,0xff,0xff) */
+#define _DBG_PRIVATE_COLORFMT_FG_0x0 "30"  /* DBG_COLOR_BLACK  : RGB(0x00, 0x00, 0x00) */
+#define _DBG_PRIVATE_COLORFMT_FG_0x1 "31"  /* DBG_COLOR_MAROON : RGB(0x00, 0x00, 0xaa) */
+#define _DBG_PRIVATE_COLORFMT_FG_0x2 "32"  /* DBG_COLOR_GREEN  : RGB(0x00, 0xaa, 0x00) */
+#define _DBG_PRIVATE_COLORFMT_FG_0x3 "33"  /* DBG_COLOR_OLIVE  : RGB(0x00, 0xaa, 0xaa) */
+#define _DBG_PRIVATE_COLORFMT_FG_0x4 "34"  /* DBG_COLOR_NAVY   : RGB(0xaa, 0x00, 0x00) */
+#define _DBG_PRIVATE_COLORFMT_FG_0x5 "35"  /* DBG_COLOR_PURPLE : RGB(0xaa, 0x00, 0xaa) */
+#define _DBG_PRIVATE_COLORFMT_FG_0x6 "36"  /* DBG_COLOR_TEAL   : RGB(0xaa, 0x55, 0x00) */
+#define _DBG_PRIVATE_COLORFMT_FG_0x7 "37"  /* DBG_COLOR_SILVER : RGB(0xaa, 0xaa, 0xaa) */
+#define _DBG_PRIVATE_COLORFMT_FG_0x8 "90"  /* DBG_COLOR_GREY   : RGB(0x55, 0x55, 0x55) */
+#define _DBG_PRIVATE_COLORFMT_FG_0x9 "91"  /* DBG_COLOR_RED    : RGB(0x55, 0x55, 0xff) */
+#define _DBG_PRIVATE_COLORFMT_FG_0xa "92"  /* DBG_COLOR_LIME   : RGB(0x55, 0xff, 0x55) */
+#define _DBG_PRIVATE_COLORFMT_FG_0xb "93"  /* DBG_COLOR_YELLOW : RGB(0x55, 0xff, 0xff) */
+#define _DBG_PRIVATE_COLORFMT_FG_0xc "94"  /* DBG_COLOR_BLUE   : RGB(0xff, 0x55, 0x55) */
+#define _DBG_PRIVATE_COLORFMT_FG_0xd "95"  /* DBG_COLOR_FUCHSIA: RGB(0xff, 0x55, 0xff) */
+#define _DBG_PRIVATE_COLORFMT_FG_0xe "96"  /* DBG_COLOR_AQUA   : RGB(0xff, 0xff, 0x55) */
+#define _DBG_PRIVATE_COLORFMT_FG_0xf "97"  /* DBG_COLOR_WHITE  : RGB(0xff, 0xff, 0xff) */
+#define _DBG_PRIVATE_COLORFMT_BG_0x0 "40"  /* DBG_COLOR_BLACK  : RGB(0x00, 0x00, 0x00) */
+#define _DBG_PRIVATE_COLORFMT_BG_0x1 "41"  /* DBG_COLOR_MAROON : RGB(0x00, 0x00, 0xaa) */
+#define _DBG_PRIVATE_COLORFMT_BG_0x2 "42"  /* DBG_COLOR_GREEN  : RGB(0x00, 0xaa, 0x00) */
+#define _DBG_PRIVATE_COLORFMT_BG_0x3 "43"  /* DBG_COLOR_OLIVE  : RGB(0x00, 0xaa, 0xaa) */
+#define _DBG_PRIVATE_COLORFMT_BG_0x4 "44"  /* DBG_COLOR_NAVY   : RGB(0xaa, 0x00, 0x00) */
+#define _DBG_PRIVATE_COLORFMT_BG_0x5 "45"  /* DBG_COLOR_PURPLE : RGB(0xaa, 0x00, 0xaa) */
+#define _DBG_PRIVATE_COLORFMT_BG_0x6 "46"  /* DBG_COLOR_TEAL   : RGB(0xaa, 0x55, 0x00) */
+#define _DBG_PRIVATE_COLORFMT_BG_0x7 "47"  /* DBG_COLOR_SILVER : RGB(0xaa, 0xaa, 0xaa) */
+#define _DBG_PRIVATE_COLORFMT_BG_0x8 "100" /* DBG_COLOR_GREY   : RGB(0x55, 0x55, 0x55) */
+#define _DBG_PRIVATE_COLORFMT_BG_0x9 "101" /* DBG_COLOR_RED    : RGB(0x55, 0x55, 0xff) */
+#define _DBG_PRIVATE_COLORFMT_BG_0xa "102" /* DBG_COLOR_LIME   : RGB(0x55, 0xff, 0x55) */
+#define _DBG_PRIVATE_COLORFMT_BG_0xb "103" /* DBG_COLOR_YELLOW : RGB(0x55, 0xff, 0xff) */
+#define _DBG_PRIVATE_COLORFMT_BG_0xc "104" /* DBG_COLOR_BLUE   : RGB(0xff, 0x55, 0x55) */
+#define _DBG_PRIVATE_COLORFMT_BG_0xd "105" /* DBG_COLOR_FUCHSIA: RGB(0xff, 0x55, 0xff) */
+#define _DBG_PRIVATE_COLORFMT_BG_0xe "106" /* DBG_COLOR_AQUA   : RGB(0xff, 0xff, 0x55) */
+#define _DBG_PRIVATE_COLORFMT_BG_0xf "107" /* DBG_COLOR_WHITE  : RGB(0xff, 0xff, 0xff) */
 
 
 #define _DBG_PRIVATE_FMT_SETCOLOR(fg, bg) "\033[" _DBG_PRIVATE_COLORFMT_FG_##fg ";" _DBG_PRIVATE_COLORFMT_BG_##bg "m"

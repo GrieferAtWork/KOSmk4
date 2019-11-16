@@ -148,17 +148,17 @@ typedef struct
 	char32_t                v_lastch;    /* Last-written text-mode character. */
 } VGA;
 
-INTDEF struct vga_mode    const vga_biosmode; /* 80x25 color text mode (BIOS 3h). */
-INTDEF struct vga_palette const vga_biospal;  /* Palette associated with `vga_biosmode' */
-INTDEF struct vga_mode    const vga_mode_gfx320x200_256;
-INTDEF struct vga_mode    const vga_mode_gfx640x480_16;
-INTDEF struct vga_palette const vga_pal_gfx16;
-INTDEF struct vga_palette const vga_pal_gfx256;
+INTDEF struct vga_mode       const vga_ansitty_mode; /* 80x25 color text mode (w/ modified palette indices). */
+INTDEF struct vga_palette16  const vga_ansitty_pal;  /* Palette for ansi terminal color codes. */
+INTDEF struct vga_mode       const vga_mode_gfx320x200_256;
+INTDEF struct vga_mode       const vga_mode_gfx640x480_16;
+INTDEF struct vga_palette256 const vga_pal_gfx256;
+INTDEF struct vga_palette64  const vga_pal_gfx16;
 
 INTDEF void KCALL VGA_SetMode(VGA *__restrict self, struct vga_mode const *__restrict mode);
 INTDEF void KCALL VGA_GetMode(VGA *__restrict self, struct vga_mode *__restrict mode);
-INTDEF void KCALL VGA_SetPalette(VGA *__restrict self, USER CHECKED struct vga_palette const *__restrict pal);
-INTDEF void KCALL VGA_GetPalette(VGA *__restrict self, USER CHECKED struct vga_palette *__restrict pal);
+INTDEF void KCALL VGA_SetPalette(VGA *__restrict self, USER CHECKED void const *__restrict pal, size_t color_count);
+INTDEF void KCALL VGA_GetPalette(VGA *__restrict self, USER CHECKED void *__restrict pal, size_t color_count);
 INTDEF void KCALL VGA_ScreenOn(VGA *__restrict self);
 INTDEF void KCALL VGA_ScreenOff(VGA *__restrict self);
 

@@ -1298,6 +1298,7 @@ PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_unmap)(void) {
 
 PRIVATE NOBLOCK void
 NOTHROW(KCALL VGA_SetMode)(struct vga_mode const *__restrict mode) {
+	unsigned int i;
 	u8 temp, qr1;
 	qr1 = vga_rseq(VGA_SEQ_CLOCK_MODE);
 
@@ -1317,6 +1318,14 @@ NOTHROW(KCALL VGA_SetMode)(struct vga_mode const *__restrict mode) {
 	vga_r(VGA_IS1_RC), vga_wattr(VGA_ATC_PEL, (temp & VGA_AT13_FRESERVED) | mode->vm_att_pel);
 	vga_r(VGA_IS1_RC), temp = vga_rattr(VGA_ATC_COLOR_PAGE);
 	vga_r(VGA_IS1_RC), vga_wattr(VGA_ATC_COLOR_PAGE, (temp & VGA_AT14_FRESERVED) | mode->vm_att_color_page);
+	for (i = 0; i < 16; ++i) {
+		vga_r(VGA_IS1_RC);
+		temp = vga_rattr(VGA_ATC_PALETTE0 + i);
+		vga_r(VGA_IS1_RC);
+		vga_wattr(VGA_ATC_PALETTE0 + i,
+		          (temp & VGA_ATC_PALETTEn_FRESERVED) |
+		          mode->vm_att_pal[i]);
+	}
 	vga_r(VGA_IS1_RC), vga_w(VGA_ATT_W, 0x20);
 
 	temp = vga_r(VGA_MIS_R);
@@ -1375,12 +1384,17 @@ NOTHROW(KCALL VGA_SetMode)(struct vga_mode const *__restrict mode) {
 
 PRIVATE NOBLOCK void
 NOTHROW(KCALL VGA_GetMode)(struct vga_mode *__restrict mode) {
+	unsigned int i;
 	vga_r(VGA_IS1_RC), vga_w(VGA_ATT_W, 0x00);
 	vga_r(VGA_IS1_RC), mode->vm_att_mode         = vga_rattr(VGA_ATC_MODE) & ~VGA_AT10_FRESERVED;
 	vga_r(VGA_IS1_RC), mode->vm_att_overscan     = vga_rattr(VGA_ATC_OVERSCAN);
 	vga_r(VGA_IS1_RC), mode->vm_att_plane_enable = vga_rattr(VGA_ATC_PLANE_ENABLE) & ~VGA_AT12_FRESERVED;
 	vga_r(VGA_IS1_RC), mode->vm_att_pel          = vga_rattr(VGA_ATC_PEL) & ~VGA_AT13_FRESERVED;
 	vga_r(VGA_IS1_RC), mode->vm_att_color_page   = vga_rattr(VGA_ATC_COLOR_PAGE) & ~VGA_AT14_FRESERVED;
+	for (i = 0; i < 16; ++i) {
+		vga_r(VGA_IS1_RC);
+		mode->vm_att_pal[i] = vga_rattr(VGA_ATC_PALETTE0 + i) & ~VGA_ATC_PALETTEn_FRESERVED;
+	}
 	vga_r(VGA_IS1_RC), vga_w(VGA_ATT_W, 0x20);
 
 	mode->vm_mis               = vga_r(VGA_MIS_R) & ~VGA_MIS_FRESERVED;
@@ -1442,23 +1456,6 @@ NOTHROW(KCALL VGA_GetPalette)(void *__restrict pal, size_t num_bytes) {
 	for (; i < 768; ++i)
 		vga_r(VGA_PEL_D);
 }
-
-struct __ATTR_PACKED vga_palette64 {
-	struct vga_color vp_pal[64]; /* VGA color palette. */
-};
-
-PRIVATE ATTR_DBGRODATA struct vga_palette64 const vga_biospal = {{
-#define C(r,g,b) {r<<2,g<<2,b<<2}
-	C(0x00,0x00,0x00),C(0x00,0x00,0x2a),C(0x00,0x2a,0x00),C(0x00,0x2a,0x2a),C(0x2a,0x00,0x00),C(0x2a,0x00,0x2a),C(0x2a,0x2a,0x00),C(0x2a,0x2a,0x2a),
-	C(0x00,0x00,0x15),C(0x00,0x00,0x3f),C(0x00,0x2a,0x15),C(0x00,0x2a,0x3f),C(0x2a,0x00,0x15),C(0x2a,0x00,0x3f),C(0x2a,0x2a,0x15),C(0x2a,0x2a,0x3f),
-	C(0x00,0x15,0x00),C(0x00,0x15,0x2a),C(0x00,0x3f,0x00),C(0x00,0x3f,0x2a),C(0x2a,0x15,0x00),C(0x2a,0x15,0x2a),C(0x2a,0x3f,0x00),C(0x2a,0x3f,0x2a),
-	C(0x00,0x15,0x15),C(0x00,0x15,0x3f),C(0x00,0x3f,0x15),C(0x00,0x3f,0x3f),C(0x2a,0x15,0x15),C(0x2a,0x15,0x3f),C(0x2a,0x3f,0x15),C(0x2a,0x3f,0x3f),
-	C(0x15,0x00,0x00),C(0x15,0x00,0x2a),C(0x15,0x2a,0x00),C(0x15,0x2a,0x2a),C(0x3f,0x00,0x00),C(0x3f,0x00,0x2a),C(0x3f,0x2a,0x00),C(0x3f,0x2a,0x2a),
-	C(0x15,0x00,0x15),C(0x15,0x00,0x3f),C(0x15,0x2a,0x15),C(0x15,0x2a,0x3f),C(0x3f,0x00,0x15),C(0x3f,0x00,0x3f),C(0x3f,0x2a,0x15),C(0x3f,0x2a,0x3f),
-	C(0x15,0x15,0x00),C(0x15,0x15,0x2a),C(0x15,0x3f,0x00),C(0x15,0x3f,0x2a),C(0x3f,0x15,0x00),C(0x3f,0x15,0x2a),C(0x3f,0x3f,0x00),C(0x3f,0x3f,0x2a),
-	C(0x15,0x15,0x15),C(0x15,0x15,0x3f),C(0x15,0x3f,0x15),C(0x15,0x3f,0x3f),C(0x3f,0x15,0x15),C(0x3f,0x15,0x3f),C(0x3f,0x3f,0x15),C(0x3f,0x3f,0x3f),
-#undef  C
-}};
 
 PRIVATE ATTR_DBGTEXT byte_t *
 NOTHROW(KCALL vga_vram)(u32 vram_offset) {
@@ -1548,11 +1545,12 @@ NOTHROW(KCALL VGA_GetFont)(struct vga_font *__restrict font) {
 
 
 
-PRIVATE ATTR_DBGRODATA struct vga_mode const vga_textmode = VGA_MODE_INIT_TEXT_80x25;
+PRIVATE ATTR_DBGRODATA struct vga_palette16 const vga_biospal = VGA_PALETTE_CGA_INIT;
+PRIVATE ATTR_DBGRODATA struct vga_mode const vga_textmode = VGA_BIOTEXT80x25_MODE_INIT(VGA_PALINDX_CGA_ANSI_INIT);
 PRIVATE ATTR_DBGBSS struct vga_font vga_textfont = {};
 PRIVATE ATTR_DBGBSS struct vga_mode vga_oldmode = {};
 PRIVATE ATTR_DBGBSS struct vga_font vga_oldfont = {};
-PRIVATE ATTR_DBGBSS struct vga_palette vga_oldpal = {};
+PRIVATE ATTR_DBGBSS struct vga_palette256 vga_oldpal = {};
 PRIVATE ATTR_DBGBSS u16 vga_oldtext[VGA_WIDTH * VGA_HEIGHT] = {};
 
 PRIVATE ATTR_DBGBSS bool vga_did_initialized_textfont = false;

@@ -141,6 +141,55 @@ int main_rawterm(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
+int main_color(int argc, char *argv[], char *envp[]) {
+	/* Foreground codes */
+	unsigned int f, b;
+	static unsigned int const f_codes[] = {
+		30, 31, 32, 33, 34, 35, 36, 37,
+		90, 91, 92, 93, 94, 95, 96, 97
+	};
+	/* Background codes */
+	static unsigned int const b_codes[] = {
+		40, 41, 42, 43, 44, 45, 46, 47,
+		100, 101, 102, 103, 104, 105, 106, 107
+	};
+#define SESC "\033" /* \e */
+	printf(SESC "[m");
+	printf("\\e[f;bm:\n"
+	       "b f");
+	for (f = 0; f < COMPILER_LENOF(f_codes); ++f) {
+		printf("%I32c%2u",
+		       f == 0 ? 0x2551 : 0x2502,
+		       f_codes[f]);
+	}
+	printf("\n"
+	       "%I32c%I32c%I32c",
+	       0x2550, 0x2550, 0x2550);
+	for (f = 0; f < COMPILER_LENOF(f_codes); ++f) {
+		printf("%I32c%I32c%I32c",
+		       f == 0 ? 0x256c : 0x256a,
+		       0x2550, 0x2550);
+	}
+	for (b = 0; b < COMPILER_LENOF(b_codes); ++b) {
+		printf("\n%3u", b_codes[b]);
+		for (f = 0; f < COMPILER_LENOF(f_codes); ++f) {
+			printf("%I32c",
+			       f == 0 ? 0x2551 : 0x2502);
+			printf(SESC "[%u;%um%I32c%I32c" SESC "[m",
+			       b_codes[b], f_codes[f],
+			       0x25c4, 0x25ba);
+		}
+	}
+	printf("\n");
+	return 0;
+}
+/************************************************************************/
+
+
+
+
+
+/************************************************************************/
 int main_environ(int argc, char *argv[], char *envp[]) {
 	printf("$PATH: %q\n", getenv("PATH"));
 	printf("envp: %p\n", envp);
@@ -334,6 +383,7 @@ PRIVATE DEF defs[] = {
 	{ "prognam", &main_prognam },
 	{ "except", &main_except },
 	{ "rawterm", &main_rawterm },
+	{ "color", &main_color },
 	{ NULL, NULL },
 };
 
