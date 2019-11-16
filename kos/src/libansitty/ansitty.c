@@ -20,6 +20,9 @@
 #define GUARD_LIBANSITTY_ANSITTY_C 1
 #define _KOS_SOURCE 1
 
+/* NOTE: References used during the implementation of this ansitty
+ *       processor can be found in `/kos/include/libansitty/ansitty.h' */
+
 #include "api.h"
 /**/
 
@@ -50,7 +53,6 @@
 /* Hide the terminal cursor while navigating to gather information
  * about the terminal, or moving it to perform some specific operation. */
 #define CONFIG_HIDE_CURSOR_DURING_NAVIGATION 1
-
 
 DECL_BEGIN
 
@@ -138,7 +140,8 @@ DECL_BEGIN
 #define ANSITTY_FLAG_HEDIT        0x0004 /* FLAG: Horizontal Editing mode (ICH/DCH/IRM go backwards). */
 #define ANSITTY_FLAG_INSERT       0x0008 /* FLAG: Enable insertion mode. */
 #define ANSITTY_FLAG_INSDEL_SCRN  0x0010 /* FLAG: Insert/Delete affect the entire screen. */
-#define ANSITTY_FLAG_RENDERMASK  (ANSITTY_FLAG_CONCEIL) /* Mask for flags that affect rendering */
+#define ANSITTY_FLAG_CRM          0x0020 /* FLAG: Control representation mode (https://en.wikipedia.org/wiki/Unicode_control_characters#Control_pictures) */
+#define ANSITTY_FLAG_RENDERMASK  (ANSITTY_FLAG_CONCEIL | ANSITTY_FLAG_CRM) /* Mask for flags that affect rendering */
 
 
 /* TTY states */
@@ -553,6 +556,40 @@ setscrollmargin(struct ansitty *__restrict self,
 }
 
 
+PRIVATE void CC
+resetterminal(struct ansitty *__restrict self,
+              bool soft_reset) {
+	(void)soft_reset;
+	/* Reset graphics, tabs, font and color. */
+	setflags(self, ANSITTY_FLAG_NORMAL);
+	setattrib(self, ANSITTY_ATTRIB_DEFAULT);
+	setttymode(self, ANSITTY_MODE_DEFAULT);
+	setcolor(self, self->at_defcolor);
+	setscrollregion(self, 0, MAXCOORD);
+	self->at_scroll_sc = 0;
+	self->at_scroll_ec = MAXCOORD;
+	if (self->at_ops.ato_termios) {
+		struct termios oldios, newios;
+		for (;;) {
+			(*self->at_ops.ato_termios)(self, &oldios, NULL);
+			memcpy(&newios, &oldios, sizeof(struct termios));
+			newios.c_oflag |= ONLCR;
+			/* After a reset (or power-on), a terminal is supposed to clear the
+			 * XOFF flag in order to indicate that it has once again gained power.
+			 * We emulate this behavior by clearing the XOFF status flag within
+			 * the IOS structure.
+			 * s.a. `https://vt100.net/docs/vt102-ug/chapter5.html#S5.5.2.27' */
+			newios.c_iflag &= ~IXOFF;
+			if (newios.c_iflag == oldios.c_iflag &&
+			    newios.c_oflag == oldios.c_oflag)
+				break;
+			if ((*self->at_ops.ato_termios)(self, &oldios, &newios))
+				break;
+		}
+	}
+}
+
+
 
 
 
@@ -635,36 +672,90 @@ handle_control_character(struct ansitty *__restrict self, char32_t ch) {
 	switch (ch) {
 
 	case CC_NUL:
+		if (self->at_ttyflag & ANSITTY_FLAG_CRM)
+			PUTUNILAST(0x2400);
 		/* NUL should be ignored by ansi ttys in all situations. */
 		goto done;
 
 	case CC_ENQ:
+		if (self->at_ttyflag & ANSITTY_FLAG_CRM)
+			PUTUNILAST(0x2405);
 		/* Return Terminal Status (which defaults to an empty string) */
 		goto done;
 
-	case CC_BEL:
 	case CC_BS:
+		if (self->at_ttyflag & ANSITTY_FLAG_CRM) {
+			PUTUNI(CC_BS);
+			PUTUNILAST(0x2408);
+		}
+		break;
+
+	case CC_BEL:
+		if (self->at_ttyflag & ANSITTY_FLAG_CRM)
+			PUTUNILAST(0x2400 + (uint8_t)ch);
+		break;
+
 	case CC_TAB:
 	case CC_CR:
 	case CC_LF:
-		break;
-
-	case CC_SO:
-	case CC_SI:
-		/* Standard/Alternate character set??? */
-		goto done;
-
-	case CC_CAN:
-		ansitty_setstate_text(self);
-		break;
-
-	case CC_ESC:
-		self->at_state = STATE_ESC;
+		if (self->at_ttyflag & ANSITTY_FLAG_CRM) {
+			ansitty_coord_t xy[2];
+			GETCURSOR(xy);
+			PUTUNILAST(0x2400 + (uint8_t)ch);
+			SETCURSOR(xy[0], xy[1], false);
+		}
 		break;
 
 	case CC_VT:
 	case CC_FF:
+		if (self->at_ttyflag & ANSITTY_FLAG_CRM) {
+			ansitty_coord_t xy[2];
+			GETCURSOR(xy);
+			PUTUNILAST(0x2400 + (uint8_t)ch);
+			SETCURSOR(xy[0], xy[1], false);
+		}
 		ch = CC_LF;
+		break;
+
+	case CC_SO:
+	case CC_SI:
+		if (self->at_ttyflag & ANSITTY_FLAG_CRM)
+			PUTUNILAST(0x2400 + (uint8_t)ch);
+		/* Standard/Alternate character set??? */
+		goto done;
+
+	case CC_CAN:
+		if (self->at_ttyflag & ANSITTY_FLAG_CRM)
+			PUTUNILAST(0x2418);
+		ansitty_setstate_text(self);
+		break;
+
+	case CC_ESC:
+		if (self->at_ttyflag & ANSITTY_FLAG_CRM)
+			PUTUNILAST(0x241b);
+		self->at_state = STATE_ESC;
+		break;
+
+	case 0x01: case 0x02: case 0x03: case 0x04:
+	case 0x06: case 0x11: case 0x12: case 0x13:
+	case 0x14: case 0x15: case 0x16: case 0x17:
+	case 0x19: case 0x1a: case 0x1c: case 0x1d:
+	case 0x1e: case 0x1f:
+		/* Misc. control characters */
+		if (self->at_ttyflag & ANSITTY_FLAG_CRM)
+			PUTUNILAST(0x2400 + (uint8_t)ch);
+		break;
+
+	case 0x7f: /* DEL */
+		if (self->at_ttyflag & ANSITTY_FLAG_CRM)
+			PUTUNILAST(0x2421);
+		break;
+
+	case CC_SPC:
+		if (self->at_ttyflag & ANSITTY_FLAG_CRM) {
+			PUTUNILAST(0x2421);
+			goto done;
+		}
 		break;
 
 	default:
@@ -1642,10 +1733,42 @@ done_insert_ansitty_flag_hedit:
 
 //			case 1:  /* \e[1h   GATM  Guarded Area Transmit Mode, send all (VT132) */
 //			         /* \e[1l         Transmit only unprotected characters (VT132) GATM */
-//			case 2:  /* \e[2h   KAM   Keyboard Action Mode, disable keyboard input */
-//			         /* \e[2l         Enable input from keyboard KAM */
-//			case 3:  /* \e[3h   CRM   Control Representation Mode, show all control chars */
-//			         /* \e[3l         Control characters are not displayable characters CRM */
+
+			case 2:  /* \e[2h   KAM   Keyboard Action Mode, disable keyboard input */
+			         /* \e[2l         Enable input from keyboard KAM */
+				if (self->at_ops.ato_termios) {
+					struct termios oldios, newios;
+					for (;;) {
+						(*self->at_ops.ato_termios)(self, &oldios, NULL);
+						memcpy(&newios, &oldios, sizeof(struct termios));
+						if (lastch == 'h') {
+							/* Disable __IIOFF */
+							if (!(newios.c_iflag & __IIOFF))
+								break;
+							newios.c_iflag &= ~__IIOFF;
+						} else {
+							/* Enable __IIOFF */
+							if (newios.c_iflag & __IIOFF)
+								break;
+							newios.c_iflag |= __IIOFF;
+						}
+						if ((*self->at_ops.ato_termios)(self, &oldios, &newios))
+							break;
+					}
+				}
+				break;
+
+			case 3:  /* \e[3h   CRM   Control Representation Mode, show all control chars */
+			         /* \e[3l         Control characters are not displayable characters CRM */
+				if (lastch == 'h') {
+					self->at_ttyflag |= ANSITTY_FLAG_CRM;
+				} else {
+					self->at_ttyflag &= ~ANSITTY_FLAG_CRM;
+				}
+				self->at_state = self->at_codepage == CP_UTF8
+				                 ? STATE_TEXT_UTF8
+				                 : STATE_TEXT;
+				break;
 
 			case 4:  /* \e[4h   IRM   Insertion/Replacement Mode, set insert mode (VT102) */
 			         /* \e[4l         Reset to replacement mode (VT102) IRM */
@@ -1655,8 +1778,8 @@ done_insert_ansitty_flag_hedit:
 				} else {
 					self->at_ttyflag &= ~ANSITTY_FLAG_INSERT;
 					self->at_state = self->at_codepage == CP_UTF8
-				                     ? STATE_TEXT_UTF8
-				                     : STATE_TEXT;
+					                 ? STATE_TEXT_UTF8
+					                 : STATE_TEXT;
 				}
 				break;
 
@@ -2056,6 +2179,100 @@ done_insert_ansitty_flag_hedit:
 		}
 		break;
 
+	case 'p':
+		/* TODO: `CSI > Ps p'      Select if/when the mouse pointer should be hidden */
+		/* TODO: `CSI Pl ; Pc " p' DECSCL: Set conformance level */
+		if (arglen == 1 && arg[0] == '!') {
+			/* `CSI ! p'     DECSTR: Soft terminal reset */
+			resetterminal(self, true);
+			break;
+		}
+		if (arglen >= 2 && arg[arglen - 1] == '$') {
+			/* `CSI Ps $ p'      DECRQM: Request ANSI mode */
+			unsigned int name;
+			char *end;
+			name = (unsigned int)strtoul(arg, &end, 10);
+			if (end == arg + arglen - 1) {
+				/* reply DECRPM: `CSI Ps; Pm$ y'
+				 * PS = ECHO `name'
+				 * PM = 0 - not recognized
+				 * PM = 1 - set
+				 * PM = 2 - reset
+				 * PM = 3 - permanently set
+				 * PM = 4 - permanently reset
+				 * NOTE: `PS' is the same as in `\e[<PS>h' and `\e[<PS>l' */
+				size_t len;
+				char buf[32];
+				unsigned int result;
+				switch (name) {
+
+				case 2:  /* KAM */
+					result = 4;
+					if (self->at_ops.ato_termios) {
+						struct termios ios;
+						(*self->at_ops.ato_termios)(self, &ios, NULL);
+						result = ios.c_lflag & __IIOFF ? 1 : 2;
+					}
+					break;
+
+				case 3:  /* CRM */
+					result = self->at_ttyflag & ANSITTY_FLAG_CRM ? 1 : 2;
+					break;
+
+				case 4:  /* IRM */
+					result = self->at_ttyflag & ANSITTY_FLAG_INSERT ? 1 : 2;
+					break;
+
+				case 1:  /* GATM */
+				case 5:  /* SRTM */
+				case 6:  /* ERM */
+				case 7:  /* VEM */
+				case 11: /* PUM */
+				case 13: /* FEAM */
+				case 14: /* FETM */
+				case 15: /* MATM */
+				case 16: /* TTM */
+				case 17: /* SATM */
+				case 18: /* TSM */
+				case 19: /* EBM */
+					result = 4; /* Always disabled */
+					break;
+
+				case 10: /* HEM */
+					result = self->at_ttyflag & ANSITTY_FLAG_HEDIT ? 1 : 2;
+					break;
+
+				case 12: /* SRM */
+					result = 4;
+					if (self->at_ops.ato_termios) {
+						struct termios ios;
+						(*self->at_ops.ato_termios)(self, &ios, NULL);
+						result = ios.c_lflag & ECHO ? 1 : 2;
+					}
+					break;
+
+				case 20: /* \e[20h   LNM  Linefeed newline mode (sets the `ONLCR' bit, and clear `ONLRET') */
+				         /* \e[20l        Linefeed normal mode (clear the `ONLCR' bit) */
+					result = 3;
+					if (self->at_ops.ato_termios) {
+						struct termios ios;
+						(*self->at_ops.ato_termios)(self, &ios, NULL);
+						result = ios.c_oflag & ONLCR ? 1 : 2;
+					}
+					break;
+
+				default:
+					result = 0;
+					break;
+				}
+				len = sprintf(buf, CC_SESC "[%u;%u$y", name, result);
+				DOOUTPUT(buf, len);
+			}
+		}
+
+
+		break;
+
 	case 'y':
 		if (!arglen) {
 			/* Undefined */
@@ -2316,23 +2533,33 @@ again:
 		switch ((uint8_t)ch) {
 
 		case CC_NUL:
+			if unlikely(self->at_ttyflag & ANSITTY_FLAG_CRM)
+				PUTUNILAST(0x2400);
 			/* NUL should be ignored by ansi ttys in all situations. */
 			break;
 
 		case CC_ESC:
+			if unlikely(self->at_ttyflag & ANSITTY_FLAG_CRM)
+				PUTUNILAST(0x241b);
 			self->at_state = STATE_ESC;
 			break;
 
 		case CC_ENQ:
+			if unlikely(self->at_ttyflag & ANSITTY_FLAG_CRM)
+				PUTUNILAST(0x2405);
 			/* Return Terminal Status (which defaults to an empty string) */
 			break;
 
 		case CC_SO:
 		case CC_SI:
+			if unlikely(self->at_ttyflag & ANSITTY_FLAG_CRM)
+				PUTUNILAST(0x2400 + (uint8_t)ch);
 			/* Standard/Alternate character set??? */
 			break;
 
 		case CC_CAN:
+			if unlikely(self->at_ttyflag & ANSITTY_FLAG_CRM)
+				PUTUNILAST(0x2418);
 			break; /* Ignore... */
 
 		case 0x80 ... 0xff: {
@@ -2350,16 +2577,61 @@ again:
 
 		case CC_VT:
 		case CC_FF:
-			ch = CC_LF;
-			ATTR_FALLTHROUGH
-		case CC_BEL:
+			if unlikely(self->at_ttyflag & ANSITTY_FLAG_CRM) {
+				ansitty_coord_t xy[2];
+				GETCURSOR(xy);
+				PUTUNILAST(0x2400 + (uint8_t)ch);
+				SETCURSOR(xy[0], xy[1], false);
+			}
+			PUTUNI(CC_LF);
+			break;
+
 		case CC_BS:
+			if unlikely(self->at_ttyflag & ANSITTY_FLAG_CRM) {
+				PUTUNI(CC_BS);
+				PUTUNILAST(0x2408);
+			}
+			PUTUNI(CC_BS);
+			break;
+
+		case CC_BEL:
+			if unlikely(self->at_ttyflag & ANSITTY_FLAG_CRM)
+				PUTUNILAST(0x2400 + (uint8_t)ch);
+			PUTUNI(CC_BEL);
+			break;
+
 		case CC_TAB:
 		case CC_CR:
 		case CC_LF:
+			if unlikely(self->at_ttyflag & ANSITTY_FLAG_CRM) {
+				ansitty_coord_t xy[2];
+				GETCURSOR(xy);
+				PUTUNILAST(0x2400 + (uint8_t)ch);
+				SETCURSOR(xy[0], xy[1], false);
+			}
 			PUTUNI((char32_t)(uint8_t)ch);
 			break;
 
+
+		case 0x01: case 0x02: case 0x03: case 0x04:
+		case 0x06: case 0x11: case 0x12: case 0x13:
+		case 0x14: case 0x15: case 0x16: case 0x17:
+		case 0x19: case 0x1a: case 0x1c: case 0x1d:
+		case 0x1e: case 0x1f:
+			/* Misc. control characters */
+			if (self->at_ttyflag & ANSITTY_FLAG_CRM)
+				PUTUNILAST(0x2400 + (uint8_t)ch);
+			break;
+
+		case 0x7f: /* DEL */
+			if (self->at_ttyflag & ANSITTY_FLAG_CRM)
+				PUTUNILAST(0x2421);
+			break;
+
+		case CC_SPC:
+			if (self->at_ttyflag & ANSITTY_FLAG_CRM)
+				ch = 0x2420;
+			ATTR_FALLTHROUGH
 		default:
 			/* Output a regular, old ASCII character. */
 do_putuni:
@@ -2595,34 +2867,7 @@ do_insuni:
 
 		case 'c':
 			/* Reset graphics, tabs, font and color. */
-			setflags(self, ANSITTY_FLAG_NORMAL);
-			setattrib(self, ANSITTY_ATTRIB_DEFAULT);
-			setttymode(self, ANSITTY_MODE_DEFAULT);
-			setcolor(self, self->at_defcolor);
-			setscrollregion(self, 0, MAXCOORD);
-			self->at_scroll_sc = 0;
-			self->at_scroll_ec = MAXCOORD;
-			if (self->at_ops.ato_termios) {
-				struct termios oldios, newios;
-				for (;;) {
-					(*self->at_ops.ato_termios)(self, &oldios, NULL);
-					memcpy(&newios, &oldios, sizeof(struct termios));
-					/* Reset the termios flags which may have been changed by `\e[20h' or `\e[20l'
-					 * to their default state after the terminal was originally created. */
-					newios.c_iflag |= ICRNL;
-					newios.c_iflag &= ~(IGNCR | INLCR);
-					/* After a reset (or power-on), a terminal is supposed to clear the
-					 * XOFF flag in order to indicate that it has once again gained power.
-					 * We emulate this behavior by clearing the XOFF status flag within
-					 * the IOS structure.
-					 * s.a. `https://vt100.net/docs/vt102-ug/chapter5.html#S5.5.2.27' */
-					newios.c_iflag &= ~IXOFF;
-					if (newios.c_iflag == oldios.c_iflag)
-						break;
-					if ((*self->at_ops.ato_termios)(self, &oldios, &newios))
-						break;
-				}
-			}
+			resetterminal(self, false);
 			goto set_text_and_done;
 
 		case '[':

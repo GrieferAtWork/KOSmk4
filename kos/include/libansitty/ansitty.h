@@ -36,6 +36,7 @@
  *  - http://real-world-systems.com/docs/ANSIcode.html
  *  - http://man7.org/linux/man-pages/man1/screen.1.html
  *  - https://vt100.net/docs/vt102-ug/chapter5.html
+ *  - https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
  */
 
 /* CR (\r) and LF (\n) behavior throughout the keyboard->termios->ansitty->display chain of sub-systems:
