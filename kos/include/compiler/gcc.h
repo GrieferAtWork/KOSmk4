@@ -563,7 +563,7 @@
 #   define __COMPILER_ALIGNOF      __alignof
 #elif defined(__cplusplus)
 extern "C++" { template<class T> struct __compiler_alignof { char __x; T __y; }; }
-#   define __COMPILER_ALIGNOF(T)   (sizeof(__compiler_alignof< T >)-sizeof(T))
+#   define __COMPILER_ALIGNOF(T)   (sizeof(__compiler_alignof<__typeof__(T)>)-sizeof(T))
 #else
 #   define __COMPILER_ALIGNOF(T)   ((__SIZE_TYPE__)&((struct{ char __x; T __y; } *)0)->__y)
 #endif

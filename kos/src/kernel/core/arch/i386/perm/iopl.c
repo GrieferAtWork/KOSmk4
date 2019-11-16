@@ -28,9 +28,12 @@
 #include <kernel/panic.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
+#include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/iopl.h>
+#include <sched/private.h>
 #include <sched/rpc.h>
+#include <sched/task.h>
 
 #include <hybrid/unaligned.h>
 #include <hybrid/wordbits.h>
@@ -38,6 +41,7 @@
 #include <asm/cpu-flags.h>
 #include <kos/except-inval.h>
 #include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state.h>
 
 #include <stddef.h>
@@ -87,6 +91,84 @@ x86_init_keepiopl(char const *__restrict arg) {
 }
 
 DEFINE_CMDLINE_PARAM(x86_init_keepiopl, "keepiopl");
+
+PRIVATE NOBLOCK NONNULL((2)) void
+NOTHROW(FCALL cpl_getiopl_impl)(void *buf, struct task *__restrict thread) {
+	struct irregs_user *irregs;
+	irregs = x86_get_irregs(thread);
+	if (thread == THIS_TASK) {
+		*(uintptr_t *)buf = irregs_getpflags(irregs);
+	} else {
+		*(uintptr_t *)buf = irregs->ir_eflags;
+	}
+}
+
+struct set_iopl_args {
+	union {
+		unsigned int ia_new_iopl; /* IN:  The new iopl() value */
+		unsigned int ia_old_iopl; /* OUT: The old iopl() value */
+	};
+	union {
+		bool ia_allow_iopl_change; /* `true' if iopl() changes are allowed. */
+		bool ia_was_set;           /* Set to true/false indicating if iopl() was set. (though not necessary changed) */
+	};
+};
+
+PRIVATE NOBLOCK NONNULL((2)) void
+NOTHROW(FCALL cpl_setiopl_impl)(void *buf, struct task *__restrict thread) {
+	struct set_iopl_args *args;
+	struct irregs_user *irregs;
+	uintptr_t old_pflags, new_pflags;
+	unsigned int old_iopl;
+	bool allow_change, was_set;
+	irregs = x86_get_irregs(thread);
+	args   = (struct set_iopl_args *)buf;
+	allow_change = args->ia_allow_iopl_change;
+	old_pflags = thread == THIS_TASK
+	             ? irregs_getpflags(irregs)
+	             : irregs->ir_pflags;
+	old_iopl   = EFLAGS_GTIOPL(old_pflags);
+	if (old_iopl == args->ia_new_iopl)
+		was_set = true;
+	else if (!allow_change)
+		was_set = false;
+	else {
+		new_pflags = (old_pflags & ~EFLAGS_IOPLMASK) | EFLAGS_IOPL(args->ia_new_iopl);
+		was_set = true;
+		if (thread == THIS_TASK) {
+			irregs_setpflags(irregs, new_pflags);
+		} else {
+			irregs->ir_pflags = new_pflags;
+		}
+	}
+	args->ia_old_iopl = old_iopl;
+	args->ia_was_set  = was_set;
+}
+
+/* Get/Set the iopl() value of the given thread.
+ * @return: * : All functions return the iopl() active prior to the call being made. */
+PUBLIC unsigned int KCALL
+x86_getiopl(struct task *__restrict thread) {
+	uintptr_t pflags;
+	cpu_private_function_call(thread, &cpl_getiopl_impl, &pflags);
+	return EFLAGS_GTIOPL(pflags);
+}
+
+PUBLIC unsigned int KCALL
+x86_setiopl(struct task *__restrict thread,
+            unsigned int new_iopl,
+            bool check_creds) {
+	struct set_iopl_args args;
+again:
+	args.ia_new_iopl          = new_iopl;
+	args.ia_allow_iopl_change = !check_creds || cred_has_sys_admin();
+	cpu_private_function_call(thread, &cpl_setiopl_impl, &args);
+	if (!args.ia_was_set) {
+		cred_require_sysadmin();
+		goto again;
+	}
+	return args.ia_old_iopl;
+}
 
 
 

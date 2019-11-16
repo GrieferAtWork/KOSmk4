@@ -31,6 +31,10 @@
 #define MKREG_RO(id, mode, printer)
 #endif /* !MKREG_RO */
 
+#ifndef MKREG_RW
+#define MKREG_RW(id, mode, reader, writer)
+#endif /* !MKREG_RW */
+
 #ifndef DYNAMIC_SYMLINK
 #define DYNAMIC_SYMLINK(id, mode, readlink)
 #endif /* !DYNAMIC_SYMLINK */
@@ -102,5 +106,6 @@ CUSTOM(kos_dcwd, S_IFDIR | 0300, ProcFS_PerProc_Kos_DrivesCwd_Type)
 #undef PERPROC_DIRECTORY_ENTRY
 #undef CUSTOM
 #undef DYNAMIC_SYMLINK
+#undef MKREG_RW
 #undef MKREG_RO
 #undef MKDIR

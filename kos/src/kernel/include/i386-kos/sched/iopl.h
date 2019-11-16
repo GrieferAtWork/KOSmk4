@@ -36,6 +36,19 @@ DATDEF bool x86_iopl_keep_after_clone;
 /* When true, iopl() is kept after exec() */
 DATDEF bool x86_iopl_keep_after_exec;
 
+struct task;
+
+/* Get/Set the iopl() value of the given thread.
+ * @return: * : All functions return the iopl() active prior to the call being made. */
+FUNDEF unsigned int KCALL
+x86_getiopl(struct task *__restrict thread)
+		THROWS(E_WOULDBLOCK);
+FUNDEF unsigned int KCALL
+x86_setiopl(struct task *__restrict thread,
+            unsigned int new_iopl,
+            bool check_creds DFL(true))
+		THROWS(E_WOULDBLOCK, E_INSUFFICIENT_RIGHTS);
+
 #endif /* __CC__ */
 
 DECL_END

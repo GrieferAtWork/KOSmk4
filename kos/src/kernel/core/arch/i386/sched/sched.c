@@ -534,8 +534,10 @@ NOTHROW(KCALL get_userspace_eflags)(struct task const *__restrict self) {
 	return st.ucs_eflags;
 }
 
-/* Return a pointer to the original user-space IRET tail of the calling self.
- * This is the pointer to the IRET structure located at the base of the caller's kernel stack. */
+/* Return a pointer to the original user-space IRET tail of the calling thread.
+ * This is the pointer to the IRET structure located at the base of the caller's kernel stack.
+ * NOTE: The caller must ensure that preemption is disabled,
+ *       and that `thread' is hosted by the calling CPU. */
 PUBLIC ATTR_CONST ATTR_RETNONNULL NOBLOCK NONNULL((1)) struct irregs_user *
 NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 	struct irregs_user *result;

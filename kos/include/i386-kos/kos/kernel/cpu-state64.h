@@ -96,6 +96,10 @@ __SYSDECL_BEGIN
 #define SIZEOF_DRREGS              SIZEOF_DRREGS64
 
 #define irregs64                   irregs
+#define irregs64_kernel            irregs
+#define irregs64_user              irregs
+#define irregs_kernel              irregs
+#define irregs_user                irregs
 #define OFFSET_IRREGS_RIP          OFFSET_IRREGS64_RIP
 #define OFFSET_IRREGS_CS           OFFSET_IRREGS64_CS
 #define OFFSET_IRREGS_RFLAGS       OFFSET_IRREGS64_RFLAGS

@@ -336,7 +336,7 @@ ProcFS_Singleton_RegularRw_Write(struct inode *__restrict self,
 	(*data->psr_writer)((struct regular_node *)self, src, num_bytes);
 }
 
-PRIVATE NONNULL((1)) void KCALL
+INTERN NONNULL((1)) void KCALL
 ProcFS_Singleton_RegularRw_Truncate(struct inode *__restrict UNUSED(self),
                                     pos_t UNUSED(new_size))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION,

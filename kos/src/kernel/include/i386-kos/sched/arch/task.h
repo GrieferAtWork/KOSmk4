@@ -229,9 +229,17 @@ FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_pop)(pflag_t flag) {
  *    comes to the IRET tail. */
 FUNDEF void ASMCALL x86_rpc_user_redirection(void);
 
+
 #ifdef __x86_64__
 
 DATDEF ATTR_PERTASK struct irregs x86_rpc_redirection_iret;
+
+/* Return a pointer to the original user-space IRET tail of the calling thread.
+ * This is the pointer to the IRET structure located at the base of the caller's kernel stack.
+ * NOTE: The caller must ensure that preemption is disabled,
+ *       and that `thread' is hosted by the calling CPU. */
+#define x86_get_irregs(thread) \
+	((struct irregs *)((byte_t *)VM_PAGE2ADDR((FORTASK((struct task *)self, _this_kernel_stack).vn_node.a_vmax) + 1)) - 1)
 
 /* Safely modify the values of saved registers that may be modified by RPC redirection. */
 FORCELOCAL NOBLOCK WUNUSED uintptr_t
@@ -377,7 +385,9 @@ DATDEF ATTR_PERTASK struct irregs_kernel x86_rpc_redirection_iret;
 struct irregs_user;
 
 /* Return a pointer to the original user-space IRET tail of the calling thread.
- * This is the pointer to the IRET structure located at the base of the caller's kernel stack. */
+ * This is the pointer to the IRET structure located at the base of the caller's kernel stack.
+ * NOTE: The caller must ensure that preemption is disabled,
+ *       and that `thread' is hosted by the calling CPU. */
 FUNDEF ATTR_CONST ATTR_RETNONNULL NOBLOCK NONNULL((1)) struct irregs_user *
 NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict thread);
 

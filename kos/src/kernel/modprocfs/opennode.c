@@ -90,6 +90,8 @@ ProcFS_OpenNode(struct superblock *__restrict self,
 		node->db_parts = VM_DATABLOCK_ANONPARTS;
 		if (id >= PROCFS_PERPROC_START_LNK_DYN)
 			node->i_type = &ProcFS_PerProc_DynamicSymlink_Type;
+		else if (id >= PROCFS_PERPROC_START_REG_RW)
+			node->i_type = &ProcFS_PerProc_RegularRw_Type;
 		else if (id >= PROCFS_PERPROC_START_REG_RO)
 			node->i_type = &ProcFS_PerProc_RegularRo_Type;
 		else if (id > PROCFS_PERPROC_ROOT)

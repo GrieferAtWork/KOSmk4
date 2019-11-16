@@ -26,6 +26,7 @@
 #include <kernel/except.h>
 #include <sched/cred.h>
 #include <sched/iopl.h>
+#include <sched/pid.h>
 
 #include <hybrid/atomic.h>
 
@@ -98,6 +99,39 @@ ProcFS_Sys_X86_KeepIopl_Exec_Write(struct regular_node *__restrict UNUSED(self),
                                    USER CHECKED void const *buf,
                                    size_t bufsize) {
 	KeepIopl_Write(buf, bufsize, &x86_iopl_keep_after_exec);
+}
+
+
+
+/* /proc/[PID]/x86/iopl */
+INTERN NONNULL((1)) ssize_t KCALL
+ProcFS_PerProc_X86_Iopl_Print(struct regular_node *__restrict self,
+                              pformatprinter printer, void *arg) {
+	upid_t pid;
+	unsigned int iopl;
+	REF struct task *thread;
+	pid    = (upid_t)(self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK);
+	thread = pidns_lookup_task(THIS_PIDNS, pid);
+	{
+		FINALLY_DECREF_UNLIKELY(thread);
+		iopl = x86_getiopl(thread);
+	}
+	return ProcFS_PrintUInt(printer, arg, iopl);
+}
+
+INTERN NONNULL((1)) void KCALL
+ProcFS_PerProc_X86_Iopl_Write(struct regular_node *__restrict self,
+                              USER CHECKED void const *buf, size_t bufsize) {
+	upid_t pid;
+	REF struct task *thread;
+	unsigned int new_iopl;
+	new_iopl = ProcFS_ParseUInt(buf, bufsize, 0, 3);
+	pid    = (upid_t)(self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK);
+	thread = pidns_lookup_task(THIS_PIDNS, pid);
+	{
+		FINALLY_DECREF_UNLIKELY(thread);
+		x86_setiopl(thread, new_iopl, /* check_creds: */ true);
+	}
 }
 
 

@@ -1634,10 +1634,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak ttybase_device_stat; .long ttybase_device_stat
 	.reloc ., R_386_SIZE32, ttybase_device_stat; .long 0
 	.long 0xb53ee94
-	.long 0 /* index: 408 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname408 /* index: 408 */
+	.weak cpu_private_function_callbuf_ex; .long cpu_private_function_callbuf_ex
+	.reloc ., R_386_SIZE32, cpu_private_function_callbuf_ex; .long 0
+	.long 0x1a95198
 	.long .Lname409 /* index: 409 */
 	.weak krand; .long krand
 	.reloc ., R_386_SIZE32, krand; .long 0
@@ -3514,10 +3514,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak task_getvm; .long task_getvm
 	.reloc ., R_386_SIZE32, task_getvm; .long 0
 	.long 0x15a636d
-	.long 0 /* index: 878 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname878 /* index: 878 */
+	.weak vm_map_subrange; .long vm_map_subrange
+	.reloc ., R_386_SIZE32, vm_map_subrange; .long 0
+	.long 0xda05f45
 	.long .Lname879 /* index: 879 */
 	.weak sys_sched_setaffinity; .long sys_sched_setaffinity
 	.reloc ., R_386_SIZE32, sys_sched_setaffinity; .long 0
@@ -8866,10 +8866,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak memrchrw; .long memrchrw
 	.reloc ., R_386_SIZE32, memrchrw; .long 0
 	.long 0xc4898a7
-	.long 0 /* index: 2216 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2216 /* index: 2216 */
+	.weak cpu_private_function_do_finibuf_ex; .long cpu_private_function_do_finibuf_ex
+	.reloc ., R_386_SIZE32, cpu_private_function_do_finibuf_ex; .long 0
+	.long 0x28858a8
 	.long 0 /* index: 2217 */
 	.long 0
 	.long 0
@@ -8943,9 +8943,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname2235 /* index: 2235 */
-	.weak vm_map_subrange; .long vm_map_subrange
-	.reloc ., R_386_SIZE32, vm_map_subrange; .long 0
-	.long 0xda05f45
+	.weak sys_clone; .long sys_clone
+	.reloc ., R_386_SIZE32, sys_clone; .long 0
+	.long 0x95a6f45
 	.long .Lname2236 /* index: 2236 */
 	.weak memrchrl; .long memrchrl
 	.reloc ., R_386_SIZE32, memrchrl; .long 0
@@ -10290,10 +10290,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak inode_readv_blocking; .long inode_readv_blocking
 	.reloc ., R_386_SIZE32, inode_readv_blocking; .long 0
 	.long 0xd790c57
-	.long 0 /* index: 2572 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2572 /* index: 2572 */
+	.weak x86_setiopl; .long x86_setiopl
+	.reloc ., R_386_SIZE32, x86_setiopl; .long 0
+	.long 0x9b15a0c
 	.long 0 /* index: 2573 */
 	.long 0
 	.long 0
@@ -10843,9 +10843,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, ramfs_dev_type; .long 0
 	.long 0x49b3245
 	.long .Lname2710 /* index: 2710 */
-	.weak sys_clone; .long sys_clone
-	.reloc ., R_386_SIZE32, sys_clone; .long 0
-	.long 0x95a6f45
+	.weak cpu_private_function_callbuf; .long cpu_private_function_callbuf
+	.reloc ., R_386_SIZE32, cpu_private_function_callbuf; .long 0
+	.long 0xf451a96
 	.long .Lname2711 /* index: 2711 */
 	.weak vio_writew; .long vio_writew
 	.reloc ., R_386_SIZE32, vio_writew; .long 0
@@ -13734,10 +13734,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak atomic64_xch; .long atomic64_xch
 	.reloc ., R_386_SIZE32, atomic64_xch; .long 0
 	.long 0x130d68
-	.long 0 /* index: 3433 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3433 /* index: 3433 */
+	.weak x86_getiopl; .long x86_getiopl
+	.reloc ., R_386_SIZE32, x86_getiopl; .long 0
+	.long 0xdb15a3c
 	.long 0 /* index: 3434 */
 	.long 0
 	.long 0
@@ -16820,6 +16820,8 @@ END(kernel_symbol_table)
 	.string "inode_datablock_type"
 .Lname407:
 	.string "ttybase_device_stat"
+.Lname408:
+	.string "cpu_private_function_callbuf_ex"
 .Lname409:
 	.string "krand"
 .Lname411:
@@ -17346,6 +17348,8 @@ END(kernel_symbol_table)
 	.string "sys_gettimeofday64"
 .Lname877:
 	.string "task_getvm"
+.Lname878:
+	.string "vm_map_subrange"
 .Lname879:
 	.string "sys_sched_setaffinity"
 .Lname882:
@@ -18732,6 +18736,8 @@ END(kernel_symbol_table)
 	.string "debuginfo_cu_parser_loadattr_variable"
 .Lname2215:
 	.string "memrchrw"
+.Lname2216:
+	.string "cpu_private_function_do_finibuf_ex"
 .Lname2218:
 	.string "sys_linux_oldlstat"
 .Lname2220:
@@ -18751,7 +18757,7 @@ END(kernel_symbol_table)
 .Lname2233:
 	.string "x86_cpuldt"
 .Lname2235:
-	.string "vm_map_subrange"
+	.string "sys_clone"
 .Lname2236:
 	.string "memrchrl"
 .Lname2239:
@@ -19102,6 +19108,8 @@ END(kernel_symbol_table)
 	.string "mempcpy"
 .Lname2571:
 	.string "inode_readv_blocking"
+.Lname2572:
+	.string "x86_setiopl"
 .Lname2574:
 	.string "x86_rpc_user_redirection"
 .Lname2575:
@@ -19263,7 +19271,7 @@ END(kernel_symbol_table)
 .Lname2709:
 	.string "ramfs_dev_type"
 .Lname2710:
-	.string "sys_clone"
+	.string "cpu_private_function_callbuf"
 .Lname2711:
 	.string "vio_writew"
 .Lname2712:
@@ -20056,6 +20064,8 @@ END(kernel_symbol_table)
 	.string "memrlenw"
 .Lname3432:
 	.string "atomic64_xch"
+.Lname3433:
+	.string "x86_getiopl"
 .Lname3435:
 	.string "pidns_trylookup_task"
 .Lname3437:

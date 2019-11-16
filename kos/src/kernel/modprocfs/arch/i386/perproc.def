@@ -18,5 +18,10 @@
  */
 
 
+PERPROC_DIRECTORY_ENTRY("x86", DT_DIR, x86)
+MKDIR(x86, 0333,
+      F(x86, "iopl", DT_REG, x86_iopl)
+      F_END)
 
+MKREG_RW(x86_iopl, 0622, ProcFS_PerProc_X86_Iopl_Print, ProcFS_PerProc_X86_Iopl_Write)
 

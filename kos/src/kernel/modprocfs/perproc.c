@@ -63,6 +63,11 @@ DECL_BEGIN
 	                               PROCFS_INOMAKE_PERPROC(0, PROCFS_PERPROC_ID_##id), \
 	                               type, name);
 #define F_END /* nothing */
+#define MKREG_RW(id, mode, reader, writer)                               \
+	PRIVATE struct procfs_perproc_reg_rw_data prd_fsdata_reg_rw_##id = { \
+		/* .psr_printer = */ &reader,                                    \
+		/* .psr_writer  = */ &writer,                                    \
+	};
 #include "perproc.def"
 #undef F_END
 #undef F
@@ -85,6 +90,9 @@ ProcFS_PerProc_FsData[PROCFS_PERPROC_COUNT] = {
 #define MKREG_RO(id, mode, printer) \
 	[PROCFS_PERPROC_ID_##id] = (void *)&printer,
 #include "perproc.def"
+#define MKREG_RW(id, mode, reader, writer) \
+	[PROCFS_PERPROC_ID_##id] = &prd_fsdata_reg_rw_##id,
+#include "perproc.def"
 #define DYNAMIC_SYMLINK(id, mode, readlink) \
 	[PROCFS_PERPROC_ID_##id] = (void *)&readlink,
 #include "perproc.def"
@@ -102,6 +110,9 @@ ProcFS_PerProc_FileMode[PROCFS_PERPROC_COUNT] = {
 	[PROCFS_PERPROC_ID_##id] = S_IFDIR | mode,
 #include "perproc.def"
 #define MKREG_RO(id, mode, printer) \
+	[PROCFS_PERPROC_ID_##id] = S_IFREG | mode,
+#include "perproc.def"
+#define MKREG_RW(id, mode, reader, writer) \
 	[PROCFS_PERPROC_ID_##id] = S_IFREG | mode,
 #include "perproc.def"
 #define DYNAMIC_SYMLINK(id, mode, readlink) \
@@ -123,6 +134,20 @@ ProcFS_PerProc_CustomTypes[PROCFS_PERPROC_COUNT - PROCFS_PERPROC_START_CUSTOM] =
 #include "perproc.def"
 };
 #endif /* !PROCFS_PERPROC_NO_CUSTOM */
+
+INTERN NONNULL((1)) void KCALL
+ProcFS_PerProc_LoadAttr(struct inode *__restrict self) {
+	/* XXX: Load attributes from dynamically allocated thread-local storage?
+	 *      NOTE: PID can be accessed by `self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK' */
+	(void)self;
+}
+
+INTERN NONNULL((1)) void KCALL
+ProcFS_PerProc_SaveAttr(struct inode *__restrict self) {
+	/* XXX: Save attributes in dynamically allocated thread-local storage?
+	 *      NOTE: PID can be accessed by `self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK' */
+	(void)self;
+}
 
 
 INTERN NONNULL((1, 2)) REF struct directory_entry *KCALL
@@ -198,23 +223,33 @@ ProcFS_PerProc_Directory_Enum(struct directory_node *__restrict self,
 
 
 PRIVATE NONNULL((1)) size_t KCALL
-ProcFS_PerProc_RegularRo_FlexRead(struct inode *__restrict self,
-                                  USER CHECKED void *dst, size_t num_bytes,
-                                  pos_t file_position)
+ProcFS_PerProc_FlexRead(struct inode *__restrict self,
+                        USER CHECKED void *dst, size_t num_bytes,
+                        pos_t file_position, PROCFS_REG_PRINTER printer)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	PROCFS_REG_PRINTER data;
 	ProcFS_SubStringPrinterData closure;
 #if __SIZEOF_OFF64_T__ > __SIZEOF_SIZE_T__
 	if unlikely(file_position > (pos_t)(size_t)-1)
 		return 0;
 #endif /* __SIZEOF_OFF64_T__ > __SIZEOF_SIZE_T__ */
-	data = (PROCFS_REG_PRINTER)self->i_fsdata;
 	closure.ssp_offset = (size_t)file_position;
 	closure.ssp_buf    = (USER CHECKED char *)dst;
 	closure.ssp_size   = num_bytes;
 	/* Print the contents of the file using a sub-string printer. */
-	(*data)((struct regular_node *)self, &ProcFS_SubStringPrinter, &closure);
+	(*printer)((struct regular_node *)self, &ProcFS_SubStringPrinter, &closure);
 	return (size_t)((USER CHECKED byte_t *)closure.ssp_buf - (USER CHECKED byte_t *)dst);
+}
+
+PRIVATE NONNULL((1)) size_t KCALL
+ProcFS_PerProc_RegularRo_FlexRead(struct inode *__restrict self,
+                                  USER CHECKED void *dst, size_t num_bytes,
+                                  pos_t file_position)
+		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
+	PROCFS_REG_PRINTER printer;
+	printer = (PROCFS_REG_PRINTER)self->i_fsdata;
+	return ProcFS_PerProc_FlexRead(self, dst, num_bytes,
+	                               file_position,
+	                               printer);
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
@@ -227,6 +262,41 @@ ProcFS_SingleTon_DynamicSymlink_Readlink(struct symlink_node *__restrict self,
 	return (*data)(self, buf, bufsize);
 }
 
+PRIVATE NONNULL((1, 5)) void KCALL
+ProcFS_PerProc_RegularRw_Write(struct inode *__restrict self,
+                               USER CHECKED void const *src,
+                               size_t num_bytes, pos_t file_position,
+                               struct aio_multihandle *__restrict aio)
+		THROWS(E_FSERROR_UNSUPPORTED_OPERATION,
+		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
+		       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY,
+		       E_IOERROR, ...) {
+	struct procfs_perproc_reg_rw_data *data;
+	data = (struct procfs_perproc_reg_rw_data *)self->i_fsdata;
+	if (file_position != 0)
+		THROW(E_IOERROR_BADBOUNDS, E_IOERROR_SUBSYSTEM_FILE);
+	(*data->ppr_writer)((struct regular_node *)self, src, num_bytes);
+}
+
+PRIVATE NONNULL((1)) size_t KCALL
+ProcFS_PerProc_RegularRw_FlexRead(struct inode *__restrict self,
+                                  USER CHECKED void *dst, size_t num_bytes,
+                                  pos_t file_position)
+		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
+	struct procfs_perproc_reg_rw_data *data;
+	data = (struct procfs_perproc_reg_rw_data *)self->i_fsdata;
+	return ProcFS_PerProc_FlexRead(self, dst, num_bytes,
+	                               file_position,
+	                               data->ppr_printer);
+}
+
+INTDEF NONNULL((1)) void KCALL
+ProcFS_Singleton_RegularRw_Truncate(struct inode *__restrict self, pos_t new_size)
+		THROWS(E_FSERROR_UNSUPPORTED_OPERATION,
+		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
+		       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY, E_IOERROR, ...);
+#define ProcFS_PerProc_RegularRw_Truncate \
+	ProcFS_Singleton_RegularRw_Truncate
 
 
 
@@ -235,8 +305,8 @@ ProcFS_SingleTon_DynamicSymlink_Readlink(struct symlink_node *__restrict self,
 INTERN struct inode_type ProcFS_PerProc_Directory_Type = {
 	/* .it_fini = */ NULL,
 	/* .it_attr = */ {
-		/* .a_loadattr = */ NULL,
-		/* .a_saveattr = */ NULL,
+		/* .a_loadattr = */ &ProcFS_PerProc_LoadAttr,
+		/* .a_saveattr = */ &ProcFS_PerProc_SaveAttr,
 	},
 	/* .it_file = */ { },
 	{
@@ -254,8 +324,8 @@ INTERN struct inode_type ProcFS_PerProc_Directory_Type = {
 INTERN struct inode_type ProcFS_PerProc_RegularRo_Type = {
 	/* .it_fini = */ NULL,
 	/* .it_attr = */ {
-		/* .a_loadattr = */ NULL,
-		/* .a_saveattr = */ NULL,
+		/* .a_loadattr = */ &ProcFS_PerProc_LoadAttr,
+		/* .a_saveattr = */ &ProcFS_PerProc_SaveAttr,
 	},
 	/* .it_file = */ {
 		/* .f_read     = */ NULL,
@@ -271,13 +341,34 @@ INTERN struct inode_type ProcFS_PerProc_RegularRo_Type = {
 	},
 };
 
+/* Type for general-purpose perproc read/write files */
+INTERN struct inode_type ProcFS_PerProc_RegularRw_Type = {
+	/* .it_fini = */ NULL,
+	/* .it_attr = */ {
+		/* .a_loadattr = */ &ProcFS_PerProc_LoadAttr,
+		/* .a_saveattr = */ &ProcFS_PerProc_SaveAttr,
+	},
+	/* .it_file = */ {
+		/* .f_read     = */ NULL,
+		/* .f_pread    = */ NULL,
+		/* .f_readv    = */ NULL,
+		/* .f_preadv   = */ NULL,
+		/* .f_write    = */ &ProcFS_PerProc_RegularRw_Write,
+		/* .f_pwrite   = */ &inode_file_pwrite_with_write,
+		/* .f_writev   = */ &inode_file_writev_with_write,
+		/* .f_pwritev  = */ &inode_file_pwritev_with_pwrite,
+		/* .f_truncate = */ &ProcFS_PerProc_RegularRw_Truncate,
+		/* .f_flexread = */ &ProcFS_PerProc_RegularRw_FlexRead,
+	},
+};
+
 
 /* Type for general-purpose perproc dynamic symlink files */
 INTERN struct inode_type ProcFS_PerProc_DynamicSymlink_Type = {
 	/* .it_fini = */ NULL,
 	/* .it_attr = */ {
-		/* .a_loadattr = */ NULL,
-		/* .a_saveattr = */ NULL,
+		/* .a_loadattr = */ &ProcFS_PerProc_LoadAttr,
+		/* .a_saveattr = */ &ProcFS_PerProc_SaveAttr,
 	},
 	/* .it_file = */ {
 	},
@@ -304,8 +395,8 @@ INTERN REF struct directory_entry *ProcFS_PerProcRootDirectory_FsData[] = {
 INTERN struct inode_type ProcFS_PerProcRootDirectory_Type = {
 	/* .it_fini = */ NULL,
 	/* .it_attr = */ {
-		/* .a_loadattr = */ NULL,
-		/* .a_saveattr = */ NULL,
+		/* .a_loadattr = */ &ProcFS_PerProc_LoadAttr,
+		/* .a_saveattr = */ &ProcFS_PerProc_SaveAttr,
 	},
 	/* .it_file = */ {
 	},

@@ -261,6 +261,9 @@
 #define __CRT_HAVE_cpu_jiffies 1
 #define __CRT_HAVE_cpu_loadpending 1
 #define __CRT_HAVE_cpu_online_count 1
+#define __CRT_HAVE_cpu_private_function_callbuf 1
+#define __CRT_HAVE_cpu_private_function_callbuf_ex 1
+#define __CRT_HAVE_cpu_private_function_do_finibuf_ex 1
 #define __CRT_HAVE_cpu_quantum_elapsed 1
 #define __CRT_HAVE_cpu_quantum_elapsed_nopr 1
 #define __CRT_HAVE_cpu_quantum_end 1
@@ -2165,6 +2168,7 @@
 #define __CRT_HAVE_x86_fxsave 1
 #define __CRT_HAVE_x86_fxsave_mxcsr_mask 1
 #define __CRT_HAVE_x86_get_irregs 1
+#define __CRT_HAVE_x86_getiopl 1
 #define __CRT_HAVE_x86_idt 1
 #define __CRT_HAVE_x86_idt_modify_end 1
 #define __CRT_HAVE_x86_idt_modify_start 1
@@ -2184,6 +2188,7 @@
 #define __CRT_HAVE_x86_pit_lock 1
 #define __CRT_HAVE_x86_rpc_redirection_iret 1
 #define __CRT_HAVE_x86_rpc_user_redirection 1
+#define __CRT_HAVE_x86_setiopl 1
 #define __CRT_HAVE_x86_spurious_interrupts 1
 #define __CRT_HAVE_x86_syscall_emulate_cdecl 1
 #define __CRT_HAVE_x86_syscall_emulate_cdecl_r 1

@@ -123,6 +123,11 @@ struct procfs_singleton_reg_rw_data {
 	PROCFS_REG_WRITER  psr_writer;  /* [1..1][const] Writer for setting the contents of the file. */
 };
 
+struct procfs_perproc_reg_rw_data {
+	PROCFS_REG_PRINTER ppr_printer; /* [1..1][const] Printer for generating the contents of the file. */
+	PROCFS_REG_WRITER  ppr_writer;  /* [1..1][const] Writer for setting the contents of the file. */
+};
+
 /* Prototype for printer functions defined by `SYMLINK()' */
 typedef NONNULL((2)) size_t (KCALL *PROCFS_SYMLINK_READLINK)(struct symlink_node *__restrict self,
                                                              USER CHECKED /*utf-8*/ char *buf,
@@ -170,6 +175,10 @@ enum {
 	__PROCFS_PERPROC_START_REG_RO = PROCFS_PERPROC_START_REG_RO - 1,
 #define MKREG_RO(id, mode, printer) PROCFS_PERPROC_ID_##id,
 #include "perproc.def"
+	PROCFS_PERPROC_START_REG_RW,
+	__PROCFS_PERPROC_START_REG_RW = PROCFS_PERPROC_START_REG_RW - 1,
+#define MKREG_RW(id, mode, reader, writer) PROCFS_PERPROC_ID_##id,
+#include "perproc.def"
 	PROCFS_PERPROC_START_LNK_DYN,
 	__PROCFS_PERPROC_START_LNK_DYN = PROCFS_PERPROC_START_LNK_DYN - 1,
 #define DYNAMIC_SYMLINK(id, mode, readlink) PROCFS_PERPROC_ID_##id,
@@ -207,6 +216,7 @@ INTDEF struct inode_type *const ProcFS_PerProc_CustomTypes[PROCFS_PERPROC_COUNT 
 #endif /* !PROCFS_PERPROC_NO_CUSTOM */
 INTDEF struct inode_type ProcFS_PerProc_Directory_Type;      /* Type for general-purpose singleton directories */
 INTDEF struct inode_type ProcFS_PerProc_RegularRo_Type;      /* Type for general-purpose singleton read-only files */
+INTDEF struct inode_type ProcFS_PerProc_RegularRw_Type;      /* Type for general-purpose singleton read/write files */
 INTDEF struct inode_type ProcFS_PerProc_DynamicSymlink_Type; /* Type for general-purpose singleton dynamic symlink files */
 
 INTDEF NONNULL((1)) void KCALL ProcFS_Singleton_LoadAttr(struct inode *__restrict self);
@@ -272,6 +282,11 @@ ProcFS_OpenNode(struct superblock *__restrict self,
 #define MKREG_RO(id, mode, printer)                                                    \
 	INTDEF NONNULL((1, 2)) ssize_t KCALL printer(struct regular_node *__restrict self, \
 	                                             pformatprinter printer_, void *arg);
+#define MKREG_RW(id, mode, reader, writer)                                            \
+	INTDEF NONNULL((1, 2)) ssize_t KCALL reader(struct regular_node *__restrict self, \
+	                                            pformatprinter printer_, void *arg);  \
+	INTDEF NONNULL((1)) void KCALL writer(struct regular_node *__restrict self,     \
+	                                      USER CHECKED void const *buf, size_t buflen);
 #define CUSTOM(id, mode, type) \
 	INTDEF struct inode_type type;
 #include "perproc.def"
