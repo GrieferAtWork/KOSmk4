@@ -869,7 +869,8 @@ ansitty_do_repeat_unicode(struct ansitty *__restrict self,
 }
 
 LOCAL NONNULL((1)) void CC
-ansitty_pututf8_mbs(struct ansitty *__restrict self, char ch) {
+ansitty_pututf8_mbs(struct ansitty *__restrict self,
+                    uintptr_half_t state, char ch) {
 	char32_t unich;
 	uintptr_half_t count, limit;
 	if (((byte_t)ch & 0xc0) != 0x80) {
@@ -891,7 +892,7 @@ do_handle_this_ch:
 do_handle_unich:
 			/* Check for the escape character */
 			if (!handle_control_character(self, unich)) {
-				if (self->at_state == STATE_INSERT_UTF8_MBS) {
+				if (state == STATE_INSERT_UTF8_MBS) {
 					ansitty_do_insert_unicode(self, unich);
 					self->at_state = STATE_INSERT_UTF8;
 				} else {
@@ -2452,10 +2453,11 @@ nope:
 /* ==================================================================================== */
 
 PRIVATE NONNULL((1)) bool CC
-ansitty_invoke_string_command(struct ansitty *__restrict self, size_t len) {
+ansitty_invoke_string_command(struct ansitty *__restrict self,
+                              uintptr_half_t state, size_t len) {
 	bool result;
 	self->at_escape[len] = 0;
-	switch (self->at_state) {
+	switch (state) {
 
 	case STATE_OSC:
 	case STATE_OSC_ESC:
@@ -2482,7 +2484,8 @@ ansitty_invoke_string_command(struct ansitty *__restrict self, size_t len) {
 		result = ansi_APC(self, (char *)self->at_escape, len);
 		break;
 
-	default: __builtin_unreachable();
+	default:
+		__builtin_unreachable();
 	}
 	return result;
 }
@@ -2517,7 +2520,8 @@ get_string_command_start_character(uintptr_t state) {
 		result = '_';
 		break;
 
-	default: __builtin_unreachable();
+	default:
+		__builtin_unreachable();
 	}
 	return result;
 }
@@ -2526,8 +2530,10 @@ get_string_command_start_character(uintptr_t state) {
 /* Output a single utf-8 character to the given TTY */
 INTERN NONNULL((1)) void CC
 libansitty_putc(struct ansitty *__restrict self, /*utf-8*/ char ch) {
+	uintptr_half_t state;
 again:
-	switch (__builtin_expect(self->at_state, STATE_TEXT_UTF8)) {
+	state = ATOMIC_READ(self->at_state);
+	switch (__builtin_expect(state, STATE_TEXT_UTF8)) {
 
 	case STATE_TEXT_UTF8:
 		/* Check for the escape character */
@@ -2613,7 +2619,6 @@ again:
 			PUTUNI((char32_t)(uint8_t)ch);
 			break;
 
-
 		case 0x01: case 0x02: case 0x03: case 0x04:
 		case 0x06: case 0x11: case 0x12: case 0x13:
 		case 0x14: case 0x15: case 0x16: case 0x17:
@@ -2667,7 +2672,7 @@ do_insuni:
 
 	case STATE_TEXT_UTF8_MBS:
 	case STATE_INSERT_UTF8_MBS:
-		ansitty_pututf8_mbs(self, ch);
+		ansitty_pututf8_mbs(self, state, ch);
 		break;
 
 	case STATE_INSERT: {
@@ -3035,8 +3040,8 @@ do_process_csi:
 		if unlikely(len >= COMPILER_LENOF(self->at_escape))
 			RACE(set_text_and_done);
 		if ((byte_t)ch == '\\') {
-			if (!ansitty_invoke_string_command(self, len)) {
-				WARN_UNKNOWN_SEQUENCE4(get_string_command_start_character(self->at_state),
+			if (!ansitty_invoke_string_command(self, state, len)) {
+				WARN_UNKNOWN_SEQUENCE4(get_string_command_start_character(state),
 				                       len, self->at_escape, CC_ESC, ch);
 				goto set_text_and_done;
 			}
@@ -3054,7 +3059,7 @@ do_process_csi:
 		self->at_esclen = len;
 		if unlikely(len >= COMPILER_LENOF(self->at_escape))
 			goto do_process_string_command;
-		self->at_state = STATE_OSC_DEL_ESC(self->at_state);
+		self->at_state = STATE_OSC_DEL_ESC(state);
 		break;
 
 	case STATE_OSC:
@@ -3067,13 +3072,13 @@ do_process_csi:
 			RACE(set_text_and_done);
 		if ((byte_t)ch == CC_BEL) {
 do_process_string_command:
-			if (!ansitty_invoke_string_command(self, len)) {
-				WARN_UNKNOWN_SEQUENCE3(get_string_command_start_character(self->at_state),
+			if (!ansitty_invoke_string_command(self, state, len)) {
+				WARN_UNKNOWN_SEQUENCE3(get_string_command_start_character(state),
 				                       len, self->at_escape, CC_BEL);
 			}
 			goto set_text_and_done;
 		} else if ((byte_t)ch == CC_ESC) {
-			self->at_state = STATE_OSC_ADD_ESC(self->at_state);
+			self->at_state = STATE_OSC_ADD_ESC(state);
 			break;
 		} else if (ch == CC_CAN) { /* Cancel */
 			goto set_text_and_done;
