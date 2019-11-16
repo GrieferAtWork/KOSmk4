@@ -31,48 +31,23 @@
 #include <unicode.h>
 
 #include "../procfs.h"
+#include "../util.h"
 
 DECL_BEGIN
 
 INTERN NONNULL((1)) ssize_t KCALL
 ProcFS_Sys_Kernel_RandomizeVaSpace_Print(struct regular_node *__restrict UNUSED(self),
                                          pformatprinter printer, void *arg) {
-	char buf[2];
-	buf[0] = vm_get_aslr_disabled() ? '0' : '2';
-	buf[1] = '\n';
-	return (*printer)(arg, buf, 2);
+	return ProcFS_PrintUInt(printer, arg, vm_get_aslr_disabled() ? 0 : 2);
 }
 
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_Kernel_RandomizeVaSpace_Write(struct regular_node *__restrict UNUSED(self),
                                          USER CHECKED void const *buf,
                                          size_t bufsize) {
-	USER CHECKED char *endp;
-	char mode;
-	endp = (USER CHECKED char *)buf + bufsize;
-	while ((USER CHECKED char *)buf < endp &&
-	       unicode_isspace(((USER CHECKED char *)buf)[0])) {
-		buf = (USER CHECKED char *)buf + 1;
-	}
-	while (endp > (USER CHECKED char *)buf) {
-		if (!unicode_isspace(endp[-1]))
-			break;
-		--endp;
-	}
-	if unlikely((USER CHECKED char *)buf + 1 != endp)
-		goto err_badval;
-	mode = ATOMIC_READ(((USER CHECKED char *)buf)[0]);
-	if (mode == '0') {
-		vm_set_aslr_disabled(true);
-	} else if (mode == '1' || mode == '2') {
-		vm_set_aslr_disabled(false);
-	} else {
-		goto err_badval;
-	}
-	return;
-err_badval:
-	THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-	      E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER);
+	unsigned int mode;
+	mode = ProcFS_ParseUInt(buf, bufsize, 0, 2);
+	vm_set_aslr_disabled(mode == 0);
 }
 
 

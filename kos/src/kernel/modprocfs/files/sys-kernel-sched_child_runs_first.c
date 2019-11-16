@@ -31,48 +31,27 @@
 #include <unicode.h>
 
 #include "../procfs.h"
+#include "../util.h"
 
 DECL_BEGIN
 
 INTERN NONNULL((1)) ssize_t KCALL
 ProcFS_Sys_Kernel_SchedChildRunsFirst_Print(struct regular_node *__restrict UNUSED(self),
                                             pformatprinter printer, void *arg) {
-	char buf[2];
-	buf[0] = (task_start_default_flags & TASK_START_FHIGHPRIO) ? '1' : '0';
-	buf[1] = '\n';
-	return (*printer)(arg, buf, 2);
+	return ProcFS_PrintBool(printer, arg, (task_start_default_flags & TASK_START_FHIGHPRIO) != 0);
 }
 
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_Kernel_SchedChildRunsFirst_Write(struct regular_node *__restrict UNUSED(self),
                                             USER CHECKED void const *buf,
                                             size_t bufsize) {
-	USER CHECKED char *endp;
-	char mode;
-	endp = (USER CHECKED char *)buf + bufsize;
-	while ((USER CHECKED char *)buf < endp &&
-	       unicode_isspace(((USER CHECKED char *)buf)[0])) {
-		buf = (USER CHECKED char *)buf + 1;
-	}
-	while (endp > (USER CHECKED char *)buf) {
-		if (!unicode_isspace(endp[-1]))
-			break;
-		--endp;
-	}
-	if unlikely((USER CHECKED char *)buf + 1 != endp)
-		goto err_badval;
-	mode = ATOMIC_READ(((USER CHECKED char *)buf)[0]);
-	if (mode == '0') {
-		ATOMIC_FETCHAND(task_start_default_flags, ~TASK_START_FHIGHPRIO);
-	} else if (mode == '1') {
+	bool mode;
+	mode = ProcFS_ParseBool(buf, bufsize);
+	if (mode) {
 		ATOMIC_FETCHOR(task_start_default_flags, TASK_START_FHIGHPRIO);
 	} else {
-		goto err_badval;
+		ATOMIC_FETCHAND(task_start_default_flags, ~TASK_START_FHIGHPRIO);
 	}
-	return;
-err_badval:
-	THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-	      E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER);
 }
 
 

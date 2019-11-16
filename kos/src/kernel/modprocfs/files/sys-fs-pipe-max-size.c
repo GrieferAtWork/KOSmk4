@@ -36,47 +36,25 @@
 #include <unicode.h>
 
 #include "../procfs.h"
+#include "../util.h"
 
 DECL_BEGIN
 
 INTERN NONNULL((1)) ssize_t KCALL
 ProcFS_Sys_Fs_PipeMaxSize_Print(struct regular_node *__restrict UNUSED(self),
                                 pformatprinter printer, void *arg) {
-	return format_printf(printer, arg, "%Iu\n",
-	                     ATOMIC_READ(pipe_max_bufsize_unprivileged));
+	return ProcFS_PrintSize(printer, arg, ATOMIC_READ(pipe_max_bufsize_unprivileged));
 }
 
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_Fs_PipeMaxSize_Write(struct regular_node *__restrict UNUSED(self),
                                 USER CHECKED void const *buf,
                                 size_t bufsize) {
-	USER CHECKED char *endp;
 	size_t newsize;
-	while (bufsize && unicode_isspace(((char *)buf)[0])) {
-		buf = (USER CHECKED char *)buf + 1;
-		--bufsize;
-	}
-	if unlikely(!bufsize)
-		goto err_badval;
-#if __SIZEOF_SIZE_T__ > 4
-	newsize = (size_t)strto64((USER CHECKED char *)buf, &endp, 0);
-#else /* __SIZEOF_SIZE_T__ > 4 */
-	newsize = (size_t)strto32((USER CHECKED char *)buf, &endp, 0);
-#endif /* __SIZEOF_SIZE_T__ <= 4 */
-	while (endp < (USER CHECKED char *)buf + bufsize) {
-		if (!unicode_isspace(*endp))
-			goto err_badval;
-		++endp;
-	}
 	/* Setting it lower than the default limit can't be done, since the default
 	 * limit is set regardless of what `pipe_max_bufsize_unprivileged' is set to. */
-	if (newsize < RINGBUFFER_DEFAULT_LIMIT)
-		goto err_badval;
+	newsize = ProcFS_ParseSize(buf, bufsize, RINGBUFFER_DEFAULT_LIMIT, (size_t)-1);
 	ATOMIC_WRITE(pipe_max_bufsize_unprivileged, newsize);
-	return;
-err_badval:
-	THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-	      E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER);
 }
 
 

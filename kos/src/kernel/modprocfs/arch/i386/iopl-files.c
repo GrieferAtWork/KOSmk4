@@ -35,41 +35,14 @@
 #include <unicode.h>
 
 #include "../../procfs.h"
+#include "../../util.h"
 
 DECL_BEGIN
 
-PRIVATE NONNULL((1)) ssize_t KCALL
-KeepIopl_Print(pformatprinter printer, void *arg, bool value) {
-	char buf[2];
-	buf[0] = value ? '1' : '0';
-	buf[1] = '\n';
-	return (*printer)(arg, buf, 2);
-}
-
 PRIVATE NONNULL((1)) void KCALL
-KeepIopl_Write(bool *pvalue, USER CHECKED void const *buf, size_t bufsize) {
-	USER CHECKED char const *endp;
-	char new_mode;
+KeepIopl_Write(USER CHECKED void const *buf, size_t bufsize, bool *pvalue) {
 	bool old_value, new_value;
-	endp = (USER CHECKED char const *)buf + bufsize;
-	while (endp > (USER CHECKED char const *)buf &&
-	       unicode_isspace(endp[-1]))
-		--endp;
-	while ((USER CHECKED char const *)buf < endp &&
-	       unicode_isspace(((char const *)buf)[0]))
-		buf = (char *)buf + 1;
-	bufsize = (size_t)(endp - (USER CHECKED char const *)buf);
-	if (bufsize != 1)
-		THROW(E_BUFFER_TOO_SMALL, bufsize, 1);
-	new_mode = ATOMIC_READ(*(char *)buf);
-	if (new_mode == '0')
-		new_value = false;
-	else if (new_mode == '1')
-		new_value = true;
-	else {
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER);
-	}
+	new_value = ProcFS_ParseBool(buf, bufsize);
 	for (;;) {
 		old_value = ATOMIC_READ(*pvalue);
 		if (old_value == new_value)
@@ -90,13 +63,13 @@ KeepIopl_Write(bool *pvalue, USER CHECKED void const *buf, size_t bufsize) {
 INTERN NONNULL((1)) ssize_t KCALL
 ProcFS_Sys_X86_KeepIopl_Fork_Print(struct regular_node *__restrict UNUSED(self),
                                    pformatprinter printer, void *arg) {
-	return KeepIopl_Print(printer, arg, x86_iopl_keep_after_fork);
+	return ProcFS_PrintBool(printer, arg, x86_iopl_keep_after_fork);
 }
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_X86_KeepIopl_Fork_Write(struct regular_node *__restrict UNUSED(self),
                                    USER CHECKED void const *buf,
                                    size_t bufsize) {
-	KeepIopl_Write(&x86_iopl_keep_after_fork, buf, bufsize);
+	KeepIopl_Write(buf, bufsize, &x86_iopl_keep_after_fork);
 }
 
 
@@ -104,13 +77,13 @@ ProcFS_Sys_X86_KeepIopl_Fork_Write(struct regular_node *__restrict UNUSED(self),
 INTERN NONNULL((1)) ssize_t KCALL
 ProcFS_Sys_X86_KeepIopl_Clone_Print(struct regular_node *__restrict UNUSED(self),
                                     pformatprinter printer, void *arg) {
-	return KeepIopl_Print(printer, arg, x86_iopl_keep_after_clone);
+	return ProcFS_PrintBool(printer, arg, x86_iopl_keep_after_clone);
 }
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_X86_KeepIopl_Clone_Write(struct regular_node *__restrict UNUSED(self),
                                     USER CHECKED void const *buf,
                                     size_t bufsize) {
-	KeepIopl_Write(&x86_iopl_keep_after_clone, buf, bufsize);
+	KeepIopl_Write(buf, bufsize, &x86_iopl_keep_after_clone);
 }
 
 
@@ -118,13 +91,13 @@ ProcFS_Sys_X86_KeepIopl_Clone_Write(struct regular_node *__restrict UNUSED(self)
 INTERN NONNULL((1)) ssize_t KCALL
 ProcFS_Sys_X86_KeepIopl_Exec_Print(struct regular_node *__restrict UNUSED(self),
                                    pformatprinter printer, void *arg) {
-	return KeepIopl_Print(printer, arg, x86_iopl_keep_after_exec);
+	return ProcFS_PrintBool(printer, arg, x86_iopl_keep_after_exec);
 }
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_X86_KeepIopl_Exec_Write(struct regular_node *__restrict UNUSED(self),
                                    USER CHECKED void const *buf,
                                    size_t bufsize) {
-	KeepIopl_Write(&x86_iopl_keep_after_exec, buf, bufsize);
+	KeepIopl_Write(buf, bufsize, &x86_iopl_keep_after_exec);
 }
 
 
