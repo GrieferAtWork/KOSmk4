@@ -371,7 +371,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 		- `__builtin_constant_p(expr)` (may be emulated to always evaluate to `false`)
 			- Also comes with a macro `__NO_builtin_types_compatible_p` if not supported
 		- `__restrict`
-			- Even though stdc now defines a standard keyword `restrict`, many compilers don't yet support it to the point where more compilers natively understand `__restrict` that ones that understand `restrict`
+			- Even though stdc now defines a standard keyword `restrict`, many compilers don't yet support it to the point where more compilers natively understand `__restrict` than ones that understand `restrict`
 		- `__builtin_types_compatible_p(T1, T2)` (Stubbed out to always return `0`)
 			- Also comes with a macro `__NO_builtin_types_compatible_p` if not supported
 - Always try to maintain compatibility with any arbitrary post-STDC C/C++ compiler in headers
@@ -400,7 +400,7 @@ Requirements:
 - binutils: `$PROJPATH/binutils/i386-kos/bin/i686-kos-*[.exe]`
 	- Can be easily downloaded + configured + build by:
 		`bash $PROJPATH/kos/misc/make_toolchain.sh i386-kos`
-- qemu: qemu-system-i386[.exe] (preferrably in $PATH. otherwise, add the location to the `enumerateQEmuInstallationLocations()` function in `$PROJPATH/kos/misc/magicemulator/qemu.dee`)
+- qemu: qemu-system-i386[.exe] (preferrably in `$PATH`. otherwise, add the location to the `enumerateQEmuInstallationLocations()` function in `$PROJPATH/kos/misc/magicemulator/qemu.dee`)
 - On windows: Cygwin
 - On linux: \*shrugs\* - You'll figure it out (Because I couldn't be bothered, to)
 	- Note that at the time of me writing this, there are still a couple of crutial elements unimplemented in deemon. Most importantly, the process API used to spawn new processes has only been implemented for windows, so until I implement it for linux, it will never work because deemon won't know how to invoke gcc in order to build KOS
