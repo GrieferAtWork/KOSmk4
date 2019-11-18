@@ -226,6 +226,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       caches that had become clobbered by our incessant modifications above. */
 	pagedir_syncall();
 
+	/* Initialize the ioperm() sub-system. */
+	x86_initialize_iobm();
+
 	/* Initialize the APIC / PIC */
 	x86_initialize_apic();
 

@@ -174,6 +174,15 @@ INTERN_FUNCTION(x86_load_thread_eax_cpu_ebx)
 1:	movl   %ecx, %cr0
 #endif /* !CONFIG_NO_FPU */
 
+	/* Check if the old thread had its I/O permissions bitmap loaded. */
+	INTERN(_current_ioperm_bitmap)
+	cmpl   $(0), _current_ioperm_bitmap(%ebx)
+	jnz    .Llazy_disable_ioperm_bitmap
+	INTERN(__x86_lazy_disable_ioperm_bitmap_return)
+__x86_lazy_disable_ioperm_bitmap_return:
+
+	.cfi_remember_state
+
 	/* Update the used page directory pointer. */
 	movl   _this_vm(%eax), %ecx
 	movl   _this_vm_pdir_phys_ptr(%ecx), %eax
@@ -199,6 +208,30 @@ INTERN_FUNCTION(x86_load_thread_eax_cpu_ebx)
 	.cfi_restore_iret_ds
 
 	iret
+	.cfi_restore_state
+
+	/* Disable the I/O permissions bitmap. */
+.Llazy_disable_ioperm_bitmap:
+	/* Check if the loaded I/O permissions bitmap is the calling thread's */
+	movl   _this_ioperm_bitmap(%eax), %edx
+	cmpl   %edx, _current_ioperm_bitmap(%ebx)
+	je     __x86_lazy_disable_ioperm_bitmap_return
+	/* Must actually unmap the I/O permissions bitmap! */
+	INTERN(x86_cpu_iobnode_pagedir_identity)
+	movl   x86_cpu_iobnode_pagedir_identity(%ebx), %edx
+	xorl   %ecx, %ecx  /* P32_PAGE_ABSENT / PAE_PAGE_ABSENT */
+	movl   %ecx, _current_ioperm_bitmap(%ebx)
+	movl   %ecx, 0x0(%edx)
+	movl   %ecx, 0x4(%edx)
+#ifndef CONFIG_NO_PAGING_PAE
+INTERN_FUNCTION(__x86_lazy_disable_ioperm_bitmap_pae)
+	/* When PAE paging is disabled, paging initialization overrides this
+	 * instruction location with a `jmp __x86_lazy_disable_ioperm_bitmap_return' */
+	movl   %ecx, 0x8(%edx)
+	movl   %ecx, 0xc(%edx)
+END(__x86_lazy_disable_ioperm_bitmap_pae)
+#endif /* !CONFIG_NO_PAGING_PAE */
+	jmp    __x86_lazy_disable_ioperm_bitmap_return
 	.cfi_endproc
 END(x86_load_thread_eax_cpu_ebx)
 END(x86_idt_preemption)

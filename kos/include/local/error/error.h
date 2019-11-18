@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa185ab7c */
+/* HASH CRC-32:0xffedb6ac */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -234,7 +234,7 @@ __LOCAL_LIBC(error) __ATTR_LIBC_PRINTF(3, 4) void
                                        __errno_t __errnum,
                                        const char *__format,
                                        ...) __THROWS(...) {
-#line 100 "kos/src/libc/magic/error.c"
+#line 103 "kos/src/libc/magic/error.c"
 #ifdef __LOCAL_error_print_progname
 	if (__LOCAL_error_print_progname) {
 		(*__LOCAL_error_print_progname)();

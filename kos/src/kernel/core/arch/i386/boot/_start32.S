@@ -19,16 +19,19 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/paging32.h>
 #include <kernel/cpuid.h>
 #include <kernel/paging.h>
-#include <kernel/arch/paging32.h>
 
-#include <asm/cpu-flags.h>
+#include <hybrid/align.h>
+
 #include <asm/cpu-cpuid.h>
+#include <asm/cpu-flags.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state32.h>
-#include <kos/kernel/segment.h>
 #include <kos/kernel/gdt.h>
+#include <kos/kernel/segment.h>
+#include <kos/kernel/tss.h>
 
 #ifndef CONFIG_NO_PAGING_P32
 #include <kernel/arch/paging32-p32.h>
@@ -38,6 +41,9 @@
 #include <kernel/arch/paging32-pae.h>
 #endif /* !CONFIG_NO_PAGING_PAE */
 
+/**/
+#include "_objects.S"
+/**/
 
 #define P2V(x) ((x) + KERNEL_BASE)
 #define V2P(x) ((x) - KERNEL_BASE)
@@ -52,24 +58,6 @@
 /* Similar to the SHARE indices, but for the identity mapping instead. */
 #define VEC2_IDENTITY_BEGIN  X86_PDIR_VEC2INDEX(X86_PDIR_E1_IDENTITY_BASE)
 #define VEC2_IDENTITY_SIZE  (1024 - VEC2_IDENTITY_BEGIN)
-
-
-#define EXPORT_AS_OBJECT(name) \
-	.type name, @object; \
-	.global name;
-EXPORT_AS_OBJECT(vm_kernel)
-EXPORT_AS_OBJECT(_this_idle)
-EXPORT_AS_OBJECT(_bootcpu)
-EXPORT_AS_OBJECT(_bootidle)
-EXPORT_AS_OBJECT(_boottask)
-EXPORT_AS_OBJECT(pagedir_kernel)
-EXPORT_AS_OBJECT(pagedir_kernel_phys)
-EXPORT_AS_OBJECT(jiffies)
-EXPORT_AS_OBJECT(__x86_bootcpu_features)
-EXPORT_AS_OBJECT(__x86_bootcpu_idfeatures)
-EXPORT_AS_OBJECT(__x86_bootcpu_gdt)
-#undef EXPORT_AS_OBJECT
-
 
 EXTERN(boot_cpustate)
 EXTERN(__kernel_boottask_stack)
@@ -154,29 +142,46 @@ INTERN_FUNCTION(_start)
 	movl   %eax, 0(%esp)
 	popfl
 
-	/* memcpy(&_bootcpu, __kernel_percpu_start, (size_t)__kernel_percpu_size); */
 #ifndef CONFIG_NO_SMP
+	/* memcpy(&_bootcpu, __kernel_percpu_start, (size_t)__kernel_percpu_size); */
 	movl   $(V2P(_bootcpu)), %edi
 	movl   $(V2P(__kernel_percpu_start)), %esi
-	movl   $__kernel_percpu_size, %ecx
+	movl   $(__kernel_percpu_size), %ecx
 	rep;   movsb
+
+	/* memcpy(&_bootcpu_x86_tss, __kernel_percpu_tss, SIZEOF_TSS); */
+	movl   $(V2P(_bootcpu_x86_tss)), %edi
+	movl   $(V2P(__kernel_percpu_tss)), %esi
+#if IS_ALIGNED(SIZEOF_TSS, 4)
+	movl   $(SIZEOF_TSS / 4), %ecx
+	rep;   movsl
+#elif IS_ALIGNED(SIZEOF_TSS, 2)
+	movl   $(SIZEOF_TSS / 2), %ecx
+	rep;   movsw
+#else
+	movl   $(SIZEOF_TSS), %ecx
+	rep;   movsb
+#endif
 #endif /* !CONFIG_NO_SMP */
+
 	/* memcpy(&_bootidle, __kernel_pertask_start, (size_t)__kernel_pertask_size); */
 	movl   $(V2P(_bootidle)), %edi
 	movl   $(V2P(__kernel_pertask_start)), %esi
-	movl   $__kernel_pertask_size, %ecx
+	movl   $(__kernel_pertask_size), %ecx
 	rep;   movsb
+
 	/* memcpy(&_boottask, __kernel_pertask_start, (size_t)__kernel_pertask_size); */
 	PUBLIC(_boottask)
 	movl   $(V2P(_boottask)), %edi
 	movl   $(V2P(__kernel_pertask_start)), %esi
-	movl   $__kernel_pertask_size, %ecx
+	movl   $(__kernel_pertask_size), %ecx
 	rep;   movsb
+
 	/* memcpy((byte_t *)&vm_kernel + PAGEDIR_SIZE, __kernel_pervm_start, (size_t)__kernel_pervm_size); */
 	PUBLIC(vm_kernel)
 	movl   $(V2P(vm_kernel) + PAGEDIR_SIZE), %edi
 	movl   $(V2P(__kernel_pervm_start)), %esi
-	movl   $__kernel_pervm_size, %ecx
+	movl   $(__kernel_pervm_size), %ecx
 	rep;   movsb
 
 

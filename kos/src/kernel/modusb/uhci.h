@@ -33,6 +33,7 @@
 
 #include <kos/io/uhci.h>
 #include <sys/io.h>
+#include <sys/mmio.h>
 
 #include <stdalign.h>
 

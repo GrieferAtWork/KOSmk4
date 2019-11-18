@@ -1004,44 +1004,36 @@ __NOTHROW_NCX(scpustate32_user_to_scpustate32_p)(struct scpustate32 const *__res
 	              sizeof(struct ucpustate32))
 #ifndef __x86_64__
 __FORCELOCAL void __FCALL ucpustate32_current(struct ucpustate32 *__restrict __result) {
+	__asm__("movl %%edi, 0(%1)\n\t"
+			"movl %%esi, 4(%1)\n\t"
+			"movl %%ebp, 8(%1)\n\t"
+			"movl %%esp, 12(%1)\n\t"
+			"movl %%ebx, 16(%1)\n\t"
+			"movl %%edx, 20(%1)\n\t"
+			"movl %%ecx, 24(%1)\n\t"
+			"movl %%eax, 28(%1)\n\t"
+			"pushfl\n\t"
+			".cfi_adjust_cfa_offset 4\n\t"
+			"popl 56(%1)\n\t"
+			".cfi_adjust_cfa_offset -4\n\t"
+#if (defined(__pic__) || defined(__PIC__) || \
+     defined(__pie__) || defined(__PIE__)) && 0
+			"call 991f\n\t"
+			"991: .cfi_adjust_cfa_offset 4\n\t"
+			"popl 60(%1)\n\t"
+			".cfi_adjust_cfa_offset -4"
+#else
+			"movl $991f, 60(%1)\n\t"
+			"991:"
+#endif
+			: "=m" /*0*/ (*__result)
+			: "r" /*1*/ (__result));
 	__result->ucs_cs           = SEGMENT_CURRENT_CODE_RPL;
 	__result->ucs_ss           = SEGMENT_CURRENT_DATA_RPL;
 	__result->ucs_sgregs.sg_gs = __rdgs();
 	__result->ucs_sgregs.sg_fs = __rdfs();
 	__result->ucs_sgregs.sg_es = __rdes();
 	__result->ucs_sgregs.sg_ds = __rdds();
-	__asm__("movl %%edi, %0\n\t"
-			"movl %%esi, %1\n\t"
-			"movl %%ebp, %2\n\t"
-			"movl %%esp, %3\n\t"
-			"movl %%ebx, %4\n\t"
-			"movl %%edx, %5\n\t"
-			"movl %%ecx, %6\n\t"
-			"movl %%eax, %7\n\t"
-			"pushfl\n\t"
-			".cfi_adjust_cfa_offset 4\n\t"
-			"popl %8\n\t"
-			".cfi_adjust_cfa_offset -4\n\t"
-#if (defined(__pic__) || defined(__PIC__) || \
-     defined(__pie__) || defined(__PIE__)) && 0
-			"call 991f\n\t"
-			"991: .cfi_adjust_cfa_offset 4\n\t"
-			"popl %9\n\t"
-			".cfi_adjust_cfa_offset -4"
-#else
-			"movl $991f, %9\n\t"
-			"991:"
-#endif
-			: "=m" /*0*/ (__result->ucs_gpregs.gp_edi)
-			, "=m" /*1*/ (__result->ucs_gpregs.gp_esi)
-			, "=m" /*2*/ (__result->ucs_gpregs.gp_ebp)
-			, "=m" /*3*/ (__result->ucs_gpregs.gp_esp)
-			, "=m" /*4*/ (__result->ucs_gpregs.gp_ebx)
-			, "=m" /*5*/ (__result->ucs_gpregs.gp_edx)
-			, "=m" /*6*/ (__result->ucs_gpregs.gp_ecx)
-			, "=m" /*7*/ (__result->ucs_gpregs.gp_eax)
-			, "=r" /*8*/ (__result->ucs_eflags)
-			, "=m" /*9*/ (__result->ucs_eip));
 }
 #endif /* !__x86_64__ */
 __LOCAL __NOBLOCK void

@@ -21,26 +21,30 @@
 #define _KOS_KERNEL_SOURCE 1
 
 #include <kernel/compiler.h>
-#include <hybrid/limits.h>
-#include <kernel/multiboot.h>
-#include <kernel/paging.h>
-#include <kos/kernel/gdt.h>
-#include <kos/kernel/segment.h>
+
 #include <kernel/gdt.h>
 #include <kernel/idt.h>
+#include <kernel/multiboot.h>
+#include <kernel/paging.h>
 #include <kernel/tss.h>
+
+#include <hybrid/align.h>
+#include <hybrid/limits.h>
+
+#include <kos/kernel/gdt.h>
+#include <kos/kernel/segment.h>
 
 #undef likely
 #undef unlikely
 
 #define IP_ALIGN(x)  . = ALIGN(x)
 #define SECTION(name) \
-	name BLOCK(1) : AT(ADDR(name) - KERNEL_BASE)
+	name BLOCK(1) : AT(ADDR(name) - KERNEL_CORE_BASE)
 
 #define PEROBJECT_SECTION_EX(section_name, name, base_offset, sections) \
 	PROVIDE_HIDDEN(name##_start = ABSOLUTE(.));                         \
 	. = ABSOLUTE(base_offset);                                          \
-	section_name base_offset : AT(name##_start - KERNEL_BASE)           \
+	section_name base_offset : AT(name##_start - KERNEL_CORE_BASE)      \
 		sections                                                        \
 	PROVIDE_HIDDEN(name##_size = ABSOLUTE(. - base_offset));            \
 	. = ABSOLUTE(name##_start + name##_size);                           \
@@ -52,7 +56,7 @@
 ENTRY(_start)
 SECTIONS {
 
-	. = KERNEL_BASE + 0x100000;
+	. = KERNEL_CORE_BASE + 0x100000;
 
 	PROVIDE_HIDDEN(__kernel_start = ABSOLUTE(.));
 
@@ -60,7 +64,7 @@ SECTIONS {
 	SECTION(.x86.boot0) {
 		KEEP(*(.x86.boot0))
 	}
-	. = KERNEL_BASE + 0x100200;
+	. = KERNEL_CORE_BASE + 0x100200;
 #endif /* !CONFIG_NO_BOOT0 */
 
 	/* Boot header */
@@ -173,7 +177,7 @@ SECTIONS {
 #define DEFINE_DEBUG_SECTION(section_name, alignment, name, sections)                      \
 	PROVIDE_HIDDEN(name##_start = ABSOLUTE(ALIGN(alignment)));                             \
 	. = ABSOLUTE(0);                                                                       \
-	section_name 0 : AT(name##_start - KERNEL_BASE) {                                      \
+	section_name 0 : AT(name##_start - KERNEL_CORE_BASE) {                                 \
 		KEEP(sections)                                                                     \
 		PROVIDE_HIDDEN(name##_size = ABSOLUTE(.));                                         \
 	}                                                                                      \
@@ -188,10 +192,10 @@ SECTIONS {
 	DEFINE_DEBUG_SECTION(.debug_loc, 1, __kernel_debug_loc, *(.debug_loc))
 #undef DEFINE_DEBUG_SECTION
 
-#define DEFINE_DEBUG_SECTION_WRAPPER(name)                                    \
-	PROVIDE_HIDDEN(__wrapper_##name##_start = ABSOLUTE(.));                   \
-	. = ABSOLUTE(0);                                                          \
-	.name.wrapper 0 : AT(__wrapper_##name##_start - KERNEL_BASE) { BYTE(0); } \
+#define DEFINE_DEBUG_SECTION_WRAPPER(name)                                         \
+	PROVIDE_HIDDEN(__wrapper_##name##_start = ABSOLUTE(.));                        \
+	. = ABSOLUTE(0);                                                               \
+	.name.wrapper 0 : AT(__wrapper_##name##_start - KERNEL_CORE_BASE) { BYTE(0); } \
 	. += ABSOLUTE(__wrapper_##name##_start);
 	DEFINE_DEBUG_SECTION_WRAPPER(debug_line)
 	DEFINE_DEBUG_SECTION_WRAPPER(debug_info)
@@ -202,27 +206,21 @@ SECTIONS {
 	DEFINE_DEBUG_SECTION_WRAPPER(debug_loc)
 #undef DEFINE_DEBUG_SECTION_WRAPPER
 
-	IP_ALIGN(__SIZEOF_CACHELINE__);
 	PEROBJECT_SECTION(.pertask, __kernel_pertask, {
 		KEEP(*(.data.pertask.head))
 		KEEP(*(.data.pertask.early))
 		KEEP(*(.data.pertask))
 	})
 
-	IP_ALIGN(__SIZEOF_CACHELINE__);
 	PEROBJECT_SECTION_EX(.pervm, __kernel_pervm, PAGEDIR_SIZE, {
 		KEEP(*(.data.pervm.head))
 		KEEP(*(.data.pervm))
 	})
 
 #ifndef CONFIG_NO_SMP
-	IP_ALIGN(__SIZEOF_CACHELINE__);
 	PEROBJECT_SECTION(.percpu, __kernel_percpu, {
 		KEEP(*(.data.percpu.head))
 		KEEP(*(.data.percpu))
-		IP_ALIGN(__SIZEOF_CACHELINE__);
-		PROVIDE(_this_idle = ABSOLUTE(.));
-		. += __kernel_pertask_size;
 	})
 #endif /* !CONFIG_NO_SMP */
 
@@ -251,6 +249,40 @@ SECTIONS {
 		*(.data.unlikely)
 		*(.data.local.*)
 
+#ifdef CONFIG_NO_SMP
+		IP_ALIGN(__SIZEOF_CACHELINE__);
+		PROVIDE_HIDDEN(__kernel_percpu_start = ABSOLUTE(.));
+		PROVIDE(_bootcpu = ABSOLUTE(.));
+		KEEP(*(.data.percpu.head))
+		KEEP(*(.data.percpu))
+		PROVIDE_HIDDEN(__kernel_percpu_end = ABSOLUTE(.));
+		PROVIDE_HIDDEN(__kernel_percpu_size = ABSOLUTE(ABSOLUTE(__kernel_percpu_end) - ABSOLUTE(__kernel_percpu_start)));
+		IP_ALIGN(__SIZEOF_CACHELINE__);
+		PROVIDE(_bootidle = ABSOLUTE(.));
+		PROVIDE(_this_idle = ABSOLUTE(.));
+		. += __kernel_pertask_size;
+		IP_ALIGN(PAGESIZE);
+		PROVIDE(x86_cputss = ABSOLUTE(.));
+		KEEP(*(.data.percpu.tss))
+		STATIC_ASSERT((ABSOLUTE(.) - ABSOLUTE(__kernel_percpu_tss)) == SIZEOF_TSS);
+		IP_ALIGN(PAGESIZE);
+		PROVIDE(x86_cpuiob = ABSOLUTE(.));
+		PROVIDE_HIDDEN(__x86_iob_empty_base = ABSOLUTE(.));
+		PROVIDE_HIDDEN(__x86_iob_empty_vpageno = ABSOLUTE(__x86_iob_empty_base) / PAGESIZE);
+		PROVIDE_HIDDEN(__x86_iob_empty_ppageno = ABSOLUTE(__x86_iob_empty_vpageno) - KERNEL_CORE_PAGE);
+		PROVIDE_HIDDEN(__x86_kernel_data_before_iob_pages = ABSOLUTE(__x86_iob_empty_vpageno - __kernel_data_startpage));
+		. += 8192; /* Make space for the IOBM table. */
+		. += 1;    /* Trailing FFh-byte */
+#else /* CONFIG_NO_SMP */
+		PROVIDE(_this_idle = CEIL_ALIGN(ABSOLUTE(__kernel_percpu_size), __SIZEOF_CACHELINE__));
+		PROVIDE(x86_cputss = CEIL_ALIGN(ABSOLUTE(_this_idle + __kernel_pertask_size), PAGESIZE));
+		PROVIDE(x86_cpuiob = ABSOLUTE(x86_cputss) + PAGESIZE);
+		PROVIDE_HIDDEN(__kernel_percpu_full_pagecnt = CEILDIV(ABSOLUTE(x86_cpuiob) + 8192 + 1, PAGESIZE));
+		PROVIDE_HIDDEN(__x86_cpu_part1_pages = ABSOLUTE(x86_cpuiob) / PAGESIZE);
+/*		PROVIDE_HIDDEN(__x86_cpu_part2_pages = ABSOLUTE(2)); */
+/* 		PROVIDE_HIDDEN(__x86_cpu_part3_pages = ABSOLUTE(1)); */
+#endif /* !CONFIG_NO_SMP */
+
 #ifndef CONFIG_NO_BRANCH_PROFILING
 		PROVIDE_HIDDEN(kernel_profile_branch_start = ABSOLUTE(.));
 		KEEP(*(.data.profile_branch))
@@ -265,23 +297,12 @@ SECTIONS {
 		PROVIDE_HIDDEN(kernel_profile_branch_annotated_end = ABSOLUTE(.));
 #endif /* CONFIG_NO_BRANCH_PROFILING */
 
-#ifdef CONFIG_NO_SMP
-		IP_ALIGN(__SIZEOF_CACHELINE__);
-		PROVIDE_HIDDEN(__kernel_percpu_start = ABSOLUTE(.));
-		PROVIDE(_bootcpu = ABSOLUTE(.));
-		KEEP(*(.data.percpu.head))
-		KEEP(*(.data.percpu))
-		IP_ALIGN(__SIZEOF_CACHELINE__);
-		PROVIDE(_bootidle = ABSOLUTE(.));
-		PROVIDE(_this_idle = ABSOLUTE(.));
-		. += __kernel_pertask_size;
-		PROVIDE_HIDDEN(__kernel_percpu_end = ABSOLUTE(.));
-		PROVIDE_HIDDEN(__kernel_percpu_size = ABSOLUTE(ABSOLUTE(__kernel_percpu_end) - ABSOLUTE(__kernel_percpu_start)));
-#endif /* !CONFIG_NO_SMP */
-
 		IP_ALIGN(PAGESIZE);
 		PROVIDE_HIDDEN(__kernel_data_endpage = ABSOLUTE(.) / PAGESIZE);
 		PROVIDE_HIDDEN(__kernel_data_numpages = ABSOLUTE(ABSOLUTE(__kernel_data_endpage) - ABSOLUTE(__kernel_data_startpage)));
+#ifdef CONFIG_NO_SMP
+		PROVIDE_HIDDEN(__x86_kernel_bata_after_iob_pages = ABSOLUTE(__kernel_bss_endpage - __x86_iob_empty_vpageno));
+#endif /* CONFIG_NO_SMP */
 
 		PROVIDE_HIDDEN(__kernel_xdata_startpage = ABSOLUTE(.) / PAGESIZE);
 		/* PDATA: Memory that remains mapping at VADDR=PADDR within the kernel VM.
@@ -320,12 +341,31 @@ SECTIONS {
 
 		/* Boot CPU/TASK/VM data. */
 #ifndef CONFIG_NO_SMP
-		IP_ALIGN(__SIZEOF_CACHELINE__);
+		IP_ALIGN(PAGESIZE);
 		PROVIDE(_bootcpu = ABSOLUTE(.));
 		. += _this_idle;
 		PROVIDE(_bootidle = ABSOLUTE(.));
 		. += __kernel_pertask_size;
+		STATIC_ASSERT((_bootcpu & (PAGESIZE - 1)) == 0);
+		STATIC_ASSERT((x86_cputss & (PAGESIZE - 1)) == 0);
+		STATIC_ASSERT((x86_cpuiob & (PAGESIZE - 1)) == 0);
+		. = ABSOLUTE(_bootcpu + x86_cputss);
+		PROVIDE_HIDDEN(_bootcpu_x86_tss = ABSOLUTE(.));
+		STATIC_ASSERT((ABSOLUTE(.) & (PAGESIZE - 1)) == 0);
+		. = ABSOLUTE(_bootcpu + x86_cpuiob);
+		/* Re-use the phyiscal memory allocated for _bootcpu's IOB
+		 * vector as the pages used to describe the empty IOB vector. */
+		PROVIDE_HIDDEN(__x86_iob_empty_base = ABSOLUTE(.));
+		PROVIDE_HIDDEN(__x86_iob_empty_vpageno = ABSOLUTE(__x86_iob_empty_base) / PAGESIZE);
+		PROVIDE_HIDDEN(__x86_iob_empty_ppageno = ABSOLUTE(__x86_iob_empty_vpageno) - KERNEL_CORE_PAGE);
+		PROVIDE_HIDDEN(__x86_kernel_bss_before_iob_pages = ABSOLUTE(__x86_iob_empty_vpageno - __kernel_bss_startpage));
+		STATIC_ASSERT((ABSOLUTE(.) & (PAGESIZE - 1)) == 0);
+		. += 8192; /* Make space for the IOBM table. */
+		. += 1;    /* Trailing FFh-byte */
 #endif /* !CONFIG_NO_SMP */
+
+		/* The value stored in `x86_cpuiob.t_iomap' */
+		PROVIDE_HIDDEN(__x86_cputss_iob_offset = ABSOLUTE(x86_cpuiob - x86_cputss));
 
 		IP_ALIGN(__SIZEOF_CACHELINE__);
 		PROVIDE(_boottask = ABSOLUTE(.));
@@ -334,7 +374,7 @@ SECTIONS {
 		IP_ALIGN(PAGEDIR_ALIGN);
 		PROVIDE(vm_kernel = ABSOLUTE(.));
 		PROVIDE(pagedir_kernel = ABSOLUTE(.));
-		PROVIDE(pagedir_kernel_phys = ABSOLUTE(pagedir_kernel) - KERNEL_BASE);
+		PROVIDE(pagedir_kernel_phys = ABSOLUTE(pagedir_kernel) - KERNEL_CORE_BASE);
 		. += PAGEDIR_SIZE;
 		. += __kernel_pervm_size;
 
@@ -355,7 +395,6 @@ SECTIONS {
 		PROVIDE_HIDDEN(__kernel_bootidle_stack_page = ABSOLUTE(ABSOLUTE(.) / PAGESIZE));
 		. += KERNEL_IDLE_STACKSIZE;
 
-
 #ifndef CONFIG_NO_DEBUGGER
 		IP_ALIGN(PAGESIZE);
 		PROVIDE_HIDDEN(__kernel_debug_stack = ABSOLUTE(.));
@@ -373,6 +412,11 @@ SECTIONS {
 	IP_ALIGN(PAGESIZE);
 	PROVIDE_HIDDEN(__kernel_bss_endpage = ABSOLUTE(.) / PAGESIZE);
 	PROVIDE_HIDDEN(__kernel_bss_numpages = ABSOLUTE(ABSOLUTE(__kernel_bss_endpage) - ABSOLUTE(__kernel_bss_startpage)));
+#ifndef CONFIG_NO_SMP
+	PROVIDE_HIDDEN(__x86_kernel_bss_after_iob_pages = ABSOLUTE(__kernel_bss_endpage - __x86_iob_empty_vpageno));
+#endif /* !CONFIG_NO_SMP */
+
+
 	PROVIDE_HIDDEN(__kernel_free_start = ABSOLUTE(.));
 	PROVIDE_HIDDEN(__kernel_free_startpage = ABSOLUTE(.) / PAGESIZE);
 	PROVIDE_HIDDEN(__kernel_size_nofree = ABSOLUTE(ABSOLUTE(__kernel_free_start) - ABSOLUTE(__kernel_start)));
@@ -411,6 +455,12 @@ SECTIONS {
 		KEEP(*(.rodata.fixup.fsgsbase.free))
 		PROVIDE_HIDDEN(__x64_fixup_fsgsbase_end = ABSOLUTE(.));
 #endif /* __x86_64__ */
+
+#ifndef CONFIG_NO_SMP
+		/* PROVIDE_HIDDEN(__kernel_percpu_tss = ABSOLUTE(.)); */
+		KEEP(*(.data.percpu.tss))
+		STATIC_ASSERT((ABSOLUTE(.) - ABSOLUTE(__kernel_percpu_tss)) == SIZEOF_TSS);
+#endif /* !CONFIG_NO_SMP */
 
 		*(.rodata.free)
 		*(.rodata.str.free)
@@ -453,6 +503,10 @@ SECTIONS {
 #define LDT_BASE    _bootcpu + x86_cpuldt
 #endif /* !CONFIG_NO_SMP */
 
+	/* The size of the `struct tss' plus the associated IOB vector addend. */
+#define SIZEOF_TSS_PLUS_IOB_VECTOR \
+	(CEILDIV(SIZEOF_TSS, PAGESIZE) + 2 * PAGESIZE + 1)
+
 	/* Pre-calculate TSS and TLS segment initializers. */
 #ifdef __x86_64__
 #define GDT_L 1
@@ -465,7 +519,7 @@ SECTIONS {
 	PROVIDE_HIDDEN(name##_lo = SEGMENT_##TYPE##_INIT_UL args); \
 	PROVIDE_HIDDEN(name##_hi = SEGMENT_##TYPE##_INIT_UH args);
 #endif /* !__x86_64__ */
-	DEFINE_SEGMENT_SYMBOLS(__x86_gdt_tss, TSS, (TSS_BASE, SIZEOF_TSS - 1, SEGMENT_DESCRIPTOR_TYPE_TSS_AVL, 0, 1, 0, 0))
+	DEFINE_SEGMENT_SYMBOLS(__x86_gdt_tss, TSS, (TSS_BASE, SIZEOF_TSS_PLUS_IOB_VECTOR - 1, SEGMENT_DESCRIPTOR_TYPE_TSS_AVL, 0, 1, 0, 0))
 	DEFINE_SEGMENT_SYMBOLS(__x86_gdt_ldt, LDT, (LDT_BASE, (LDT_SEGMENT_COUNT * SIZEOF_SEGMENT_DESCRIPTOR) - 1, 3, 1, 0, 0))
 #ifndef __x86_64__
 	DEFINE_SEGMENT_SYMBOLS(__x86_ldt_lcall7_main, CALLGATE, (x86_lcall7_main, SEGMENT_KERNEL_CODE, SEGMENT_DESCRIPTOR_TYPE_CALLGATE, 0, 3, 1))
@@ -498,9 +552,9 @@ SECTIONS {
 
 #ifndef __x86_64__
 #ifndef CONFIG_NO_PAGING_P32
-	PROVIDE_HIDDEN(__x86_p32_identity_mapped_text_4mib_index = (ABSOLUTE(__x86_paging_init_identity_mapped_text) - KERNEL_BASE) / 0x400000);
+	PROVIDE_HIDDEN(__x86_p32_identity_mapped_text_4mib_index = (ABSOLUTE(__x86_paging_init_identity_mapped_text) - KERNEL_CORE_BASE) / 0x400000);
 	PROVIDE_HIDDEN(__x86_p32_identity_mapped_text_4mib_e2_word = ABSOLUTE(pagedir_kernel + (__x86_p32_identity_mapped_text_4mib_index * 4)));
-	PROVIDE_HIDDEN(__x86_p32_identity_mapped_text_4mib_ks_share = ABSOLUTE((__x86_pagedir_kernel_share - KERNEL_BASE) + (__x86_p32_identity_mapped_text_4mib_index * 0x1000)));
+	PROVIDE_HIDDEN(__x86_p32_identity_mapped_text_4mib_ks_share = ABSOLUTE((__x86_pagedir_kernel_share - KERNEL_CORE_BASE) + (__x86_p32_identity_mapped_text_4mib_index * 0x1000)));
 #endif /* !CONFIG_NO_PAGING_P32 */
 #endif /* !__x86_64__ */
 

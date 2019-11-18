@@ -53,6 +53,7 @@ opt.append("-Os");
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <sys/io.h>
+#include <sys/mmio.h>
 
 #include <stdint.h>
 #include <string.h>

@@ -38,6 +38,7 @@
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <asm/param.h>
+#include <sys/io.h>
 
 #include <assert.h>
 #include <string.h>

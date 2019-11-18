@@ -43,10 +43,28 @@
 
 DECL_BEGIN
 
+INTDEF byte_t __kernel_bootiob_startpage[] ASMNAME("__x86_iob_empty_vpageno");
 
-INTDEF void ASMCALL _start(void);
-INTDEF byte_t __kernel_boottask_stack[KERNEL_STACKSIZE];
-INTDEF byte_t __x86_bootcpu_df_stack[KERNEL_DF_STACKSIZE];
+/* The VM node used to represent the IOB mapping of the current CPU */
+PUBLIC ATTR_PERCPU struct vm_node x86_cpu_iobnode = {
+	/* .vn_node   = */ { NULL, NULL,
+	                     (vm_vpage_t)__kernel_bootiob_startpage,
+	                     (vm_vpage_t)__kernel_bootiob_startpage + 1 },
+	/* .vn_byaddr = */ LLIST_INITNODE,
+	/* .vn_prot   = */ VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED,
+	/* .vn_flags  = */ VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_KERNPRT,
+	/* .vn_vm     = */ &vm_kernel,
+	/* .vn_part   = */ NULL,
+	/* .vn_block  = */ NULL,
+	/* .vn_link   = */ { NULL, NULL },
+	/* .vn_guard  = */ 0
+};
+
+/* [1..1][const] Page directory identity pointer for unmapping the IOB vector of the current CPU. */
+INTERN ATTR_PERCPU void *x86_cpu_iobnode_pagedir_identity = NULL;
+
+
+
 INTDEF byte_t __x86_bootcpu_df_stackpage[];
 INTDEF struct vm_node __x86_bootcpu_dfstack_node;
 INTDEF struct vm_datapart __x86_bootcpu_dfstack_part;
@@ -106,87 +124,20 @@ PUBLIC ATTR_PERCPU struct vm_node _x86_this_dfstack ASMNAME("x86_this_dfstack") 
 };
 
 
-
-PUBLIC ATTR_PERCPU struct tss x86_cputss = {
-#ifdef __x86_64__
-	.__t_zero0 = 0,
-	.t_rsp0    = (uintptr_t)__kernel_boottask_stack + KERNEL_STACKSIZE,
-	.t_rsp1    = (uintptr_t)__kernel_boottask_stack + KERNEL_STACKSIZE,
-	.t_rsp2    = (uintptr_t)__kernel_boottask_stack + KERNEL_STACKSIZE,
-	.__t_zero1 = 0,
-	.__t_zero2 = 0,
-	{
-		.t_ist = {
-			[0] = (uintptr_t)__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE,
-			[1] = (uintptr_t)__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE,
-			[2] = (uintptr_t)__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE,
-			[3] = (uintptr_t)__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE,
-			[4] = (uintptr_t)__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE,
-			[5] = (uintptr_t)__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE,
-			[6] = (uintptr_t)__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE,
-		}
-	},
-	.__t_zero3 = 0,
-	.__t_zero4 = 0,
-	.__t_zero5 = 0,
-	.t_iomap   = 0
-#else
-	.t_link       = 0,
-	.__t_zero0    = 0,
-	.t_esp0       = (uintptr_t)__kernel_boottask_stack + KERNEL_STACKSIZE,
-	.t_ss0        = SEGMENT_KERNEL_DATA,
-	.__t_zero1    = 0,
-	.t_esp1       = (uintptr_t)__kernel_boottask_stack + KERNEL_STACKSIZE,
-	.t_ss1        = SEGMENT_KERNEL_DATA,
-	.__t_zero2    = 0,
-	.t_esp2       = (uintptr_t)__kernel_boottask_stack + KERNEL_STACKSIZE,
-	.t_ss2        = SEGMENT_KERNEL_DATA,
-	.__t_zero3    = 0,
-	.t_cr3        = (u32)(uintptr_t)&pagedir_kernel_phys,
-	.t_eip        = (u32)(uintptr_t)&_start,
-	.t_eflags     = 0,
-	.t_eax        = 0,
-	.t_ecx        = 0,
-	.t_edx        = 0,
-	.t_ebx        = 0,
-	.t_esp        = (u32)(uintptr_t)__kernel_boottask_stack + KERNEL_STACKSIZE,
-	.t_ebp        = 0,
-	.t_esi        = 0,
-	.t_edi        = 0,
-	.t_es         = SEGMENT_USER_DATA_RPL,
-	.__t_zero4    = 0,
-	.t_cs         = SEGMENT_KERNEL_CODE,
-	.__t_zero5    = 0,
-	.t_ss         = SEGMENT_KERNEL_DATA,
-	.__t_zero6    = 0,
-	.t_ds         = SEGMENT_USER_DATA_RPL,
-	.__t_zero7    = 0,
-	.t_fs         = SEGMENT_KERNEL_FSBASE,
-	.__t_zero8    = 0,
-	.t_gs         = SEGMENT_USER_GSBASE_RPL,
-	.__t_zero9    = 0,
-	.t_ldtr       = SEGMENT_NULL,
-	.__t_zeroa    = 0,
-	{
-		.t_flags  = 0
-	},
-	.t_iomap      = 0
-#endif
-};
-
 #ifndef __x86_64__
 INTDEF void ASMCALL x86_idt_double_fault(void);
+INTDEF byte_t __x86_bootcpu_df_stack[KERNEL_DF_STACKSIZE];
 
 PUBLIC ATTR_PERCPU struct tss x86_cputss_df = {
 	.t_link       = 0,
 	.__t_zero0    = 0,
-	.t_esp0       = (uintptr_t)__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE,
+	.t_esp0       = (uintptr_t)COMPILER_ENDOF(__x86_bootcpu_df_stack),
 	.t_ss0        = SEGMENT_KERNEL_DATA,
 	.__t_zero1    = 0,
-	.t_esp1       = (uintptr_t)__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE,
+	.t_esp1       = (uintptr_t)COMPILER_ENDOF(__x86_bootcpu_df_stack),
 	.t_ss1        = SEGMENT_KERNEL_DATA,
 	.__t_zero2    = 0,
-	.t_esp2       = (uintptr_t)__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE,
+	.t_esp2       = (uintptr_t)COMPILER_ENDOF(__x86_bootcpu_df_stack),
 	.t_ss2        = SEGMENT_KERNEL_DATA,
 	.__t_zero3    = 0,
 	.t_cr3        = (u32)(uintptr_t)&pagedir_kernel_phys,
@@ -198,8 +149,8 @@ PUBLIC ATTR_PERCPU struct tss x86_cputss_df = {
 	                    * Non-zero means the CPU is currently processing a #DF,
 	                    * Greater than 1 means #DF recursion (a ___very___ bad thing) */
 	.t_ebx        = 0,
-	.t_esp        = (uintptr_t)__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE,
-	.t_ebp        = (uintptr_t)__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE,
+	.t_esp        = (uintptr_t)COMPILER_ENDOF(__x86_bootcpu_df_stack),
+	.t_ebp        = (uintptr_t)COMPILER_ENDOF(__x86_bootcpu_df_stack),
 	.t_esi        = (u32)(uintptr_t)&_bootcpu, /* Used by the implementation. */
 	.t_edi        = 0,
 	.t_es         = SEGMENT_USER_DATA_RPL,
@@ -223,13 +174,12 @@ PUBLIC ATTR_PERCPU struct tss x86_cputss_df = {
 };
 
 /* Prevent `get_current_stack()' from thinking that we're running on
-	* the #DF stack by ensuing that x86_cputss_df.t_ecx is set to 0
-	* Separately, note we set override the temporarily override the
-	* pointers inside of `THIS_KERNEL_STACK' whilst in debug-mode,
-	* to instead refer to the start/end of the debugger stack. */
+ * the #DF stack by ensuing that x86_cputss_df.t_ecx is set to 0
+ * Separately, note we set override the temporarily override the
+ * pointers inside of `THIS_KERNEL_STACK' whilst in debug-mode,
+ * to instead refer to the start/end of the debugger stack. */
 DEFINE_DBG_BZERO(&PERCPU(x86_cputss_df).t_ecx, sizeof(x86_cputss_df.t_ecx));
-
-#endif
+#endif /* !__x86_64__ */
 
 
 

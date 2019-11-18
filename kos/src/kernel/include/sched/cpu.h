@@ -114,7 +114,6 @@ struct cpu {
 	                              * Note that any given thread can only ever set itself as override,
 	                              * the general requirement being that setting an override requires
 	                              * `c_override == NULL || c_current == c_override' */
-	size_t           c_heapsize; /* [const] Allocated heap size of this CPU */
 	WEAK u16         c_state;    /* CPU State (one of `CPU_STATE_*') */
 	u16              c_pad[(sizeof(void *)-2)/2]; /* ... */
 	/* Per-CPU data goes here. */

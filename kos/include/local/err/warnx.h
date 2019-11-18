@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x309e5ee5 */
+/* HASH CRC-32:0x42322edd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(warnx) __ATTR_LIBC_PRINTF(1, 2) void
 (__VLIBCCALL __LIBC_LOCAL_NAME(warnx))(char const *__format,
                                        ...) __THROWS(...) {
-#line 61 "kos/src/libc/magic/err.c"
+#line 64 "kos/src/libc/magic/err.c"
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
 	__localdep_vwarnx(__format, __args);

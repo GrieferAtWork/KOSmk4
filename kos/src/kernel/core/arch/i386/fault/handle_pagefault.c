@@ -29,10 +29,13 @@
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
+#include <kernel/tss.h>
 #include <kernel/vio.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
+#include <sched/cpu.h>
 #include <sched/except-handler.h>
+#include <sched/iobm.h>
 #include <sched/pid.h>
 
 #include <hybrid/atomic.h>
@@ -53,6 +56,13 @@
 
 DECL_BEGIN
 
+#ifndef CONFIG_NO_SMP
+#define IF_SMP(...) __VA_ARGS__
+#else /* !CONFIG_NO_SMP */
+#define IF_SMP(...) /* nothing */
+#endif /* CONFIG_NO_SMP */
+
+
 #define PAGEFAULT_F_PRESENT     0x0001 /* FLAG: The accessed page is present (Check for LOA) */
 #define PAGEFAULT_F_WRITING     0x0002 /* FLAG: The fault happened as a result of a memory write (Check for COW) */
 #define PAGEFAULT_F_USERSPACE   0x0004 /* FLAG: The fault occurred while in user-space */
@@ -68,10 +78,162 @@ STATIC_ASSERT(PAGEDIR_MAP_FWRITE == VM_PROT_WRITE);
 STATIC_ASSERT(PAGEDIR_MAP_FREAD == VM_PROT_READ);
 
 
+/* @return: true:  Success
+ * @return: false: Must try again (preemption had to be enabled) */
+LOCAL bool FCALL handle_iob_access(struct cpu *__restrict mycpu,
+                                   bool is_writing,
+                                   bool allow_preemption) {
+#define GET_GFP_FLAGS()                           \
+	(allow_preemption ? (GFP_LOCKED | GFP_PREFLT) \
+	                  : (GFP_LOCKED | GFP_PREFLT | GFP_ATOMIC))
+	struct ioperm_bitmap *iob;
+	assert(!PREEMPTION_ENABLED());
+	iob = THIS_IOPERM_BITMAP;
+	if (!iob) {
+		if (is_writing) {
+			iob = ioperm_bitmap_allocf_nx(GET_GFP_FLAGS());
+			if unlikely(!iob) {
+				if (!allow_preemption)
+					THROW(E_WOULDBLOCK_PREEMPTED);
+				/* Re-attempt the allocation with preemption enabled. */
+				PREEMPTION_ENABLE();
+				iob = ioperm_bitmap_allocf(GFP_LOCKED | GFP_PREFLT);
+				PERTASK_SET(_this_ioperm_bitmap, iob);
+				return false;
+			}
+		} else {
+			iob = incref(&ioperm_bitmap_empty);
+			ATOMIC_FETCHINC(iob->ib_share);
+		}
+		PERTASK_SET(_this_ioperm_bitmap, iob);
+	} else if (is_writing && ATOMIC_READ(iob->ib_share) > 1) {
+		/* Unshare the IOB vector prior to allowing write-access */
+		REF struct ioperm_bitmap *cow;
+		cow = ioperm_bitmap_copyf_nx(iob, GET_GFP_FLAGS());
+		if unlikely(!cow) {
+			if (!allow_preemption)
+				THROW(E_WOULDBLOCK_PREEMPTED);
+			/* Re-attempt the allocation with preemption enabled. */
+			PREEMPTION_ENABLE();
+			cow = ioperm_bitmap_copyf(iob, GFP_LOCKED | GFP_PREFLT);
+			PERTASK_SET(_this_ioperm_bitmap, cow);
+			ATOMIC_FETCHDEC(iob->ib_share);
+			decref(iob);
+			return false;
+		}
+		PERTASK_SET(_this_ioperm_bitmap, cow);
+		ATOMIC_FETCHDEC(iob->ib_share);
+		decref(iob);
+		iob = cow;
+	}
+	pagedir_map(FORCPU(mycpu, x86_cpu_iobnode.vn_node.a_vmin), 2, iob->ib_pages,
+	            is_writing ? (PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE)
+	                       : (PAGEDIR_MAP_FREAD));
+	FORCPU(mycpu, _current_ioperm_bitmap) = iob;
+#undef GET_GFP_FLAGS
+	return true;
+}
+
+
+#ifndef CONFIG_NO_SMP
+/* Check if the given `node' is the IOB vector of some CPU */
+LOCAL NOBLOCK WUNUSED bool
+NOTHROW(FCALL is_iob_node)(struct vm_node *node) {
+	cpuid_t i;
+	for (i = 0; i < cpu_count; ++i) {
+		if (node == &FORCPU(cpu_vector[i], x86_cpu_iobnode))
+			return true;
+	}
+	return false;
+}
+
+/* Check if `*pc' points to some I/O instruction that doesn't
+ * perform a read or write access to `fault_addr'. */
+LOCAL WUNUSED bool FCALL
+is_io_instruction_and_not_memory_access(byte_t *pc,
+                                        struct icpustate *state,
+                                        uintptr_t fault_addr) {
+	byte_t opcode;
+	bool result = true;
+	unsigned int pfx66;
+	COMPILER_BARRIER();
+#ifdef __x86_64__
+	pfx66 = 0;
+#else /* __x86_64__ */
+	pfx66 = (icpustate_getpflags(state) & EFLAGS_VM) ? 1 : 0;
+#endif /* !__x86_64__ */
+	opcode = *pc++;
+	/* Parse prefix bytes. */
+	for (;;) {
+		if (opcode == 0x66) {
+#ifdef __x86_64__
+			pfx66 = 1;
+#else /* __x86_64__ */
+			pfx66 ^= 1;
+#endif /* !__x86_64__ */
+			opcode = *pc++;
+			continue;
+		}
+		if (opcode == 0xf3) { /* rep */
+			opcode = *pc++;
+			continue;
+		}
+		break;
+	}
+
+	switch (opcode) {
+
+	case 0xee: /* out dx, al */
+	case 0xef: /* out dx, ax | out dx, eax */
+	case 0xe6: /* out imm8, al */
+	case 0xe7: /* out imm8, ax | out imm8, eax */
+	case 0xe4: /* in al, imm8 */
+	case 0xe5: /* in ax, imm8 | in eax, imm8 */
+	case 0xec: /* in al, dx */
+	case 0xed: /* in ax, dx | in eax, dx */
+		break;
+
+	case 0x6c: /* insb */
+		if (gpregs_getpdi(&state->ics_gpregs) == fault_addr)
+			goto nope;
+		break;
+
+	case 0x6d: /* insw | insd */
+		if (fault_addr >= gpregs_getpdi(&state->ics_gpregs) &&
+		    fault_addr < gpregs_getpdi(&state->ics_gpregs) + (pfx66 ? 2 : 4))
+			goto nope;
+		break;
+
+	case 0x6e: /* outsb */
+		if (gpregs_getpsi(&state->ics_gpregs) == fault_addr)
+			goto nope;
+		break;
+
+	case 0x6f: /* outsw | outsd */
+		if (fault_addr >= gpregs_getpsi(&state->ics_gpregs) &&
+		    fault_addr < gpregs_getpsi(&state->ics_gpregs) + (pfx66 ? 2 : 4))
+			goto nope;
+		break;
+
+	default:
+nope:
+		result = false;
+		break;
+	}
+
+	COMPILER_BARRIER();
+	return result;
+}
+
+#else /* !CONFIG_NO_SMP */
+
+#define is_iob_node(node) ((node) == &FORCPU(&_bootcpu, x86_cpu_iobnode))
+
+#endif /* CONFIG_NO_SMP */
+
+
 DATDEF byte_t x86_memcpy_nopf_rep_pointer[];
 DATDEF byte_t x86_memcpy_nopf_ret_pointer[];
-
-
 
 
 INTERN struct icpustate *FCALL
@@ -160,10 +322,121 @@ again_lookup_node_already_locked:
 			assert(sync_reading(effective_vm));
 			assert(!sync_writing(effective_vm));
 			/* Lookup the node associated with the given page. */
-			node = vm_getnodeof(effective_vm,
-			                    page);
-			if unlikely(!node || !node->vn_part) {
+			node = vm_getnodeof(effective_vm, page);
+			if unlikely(!node) {
 				sync_endread(effective_vm);
+				if (page >= (vm_vpage_t)KERNEL_BASE_PAGE &&
+				    effective_vm != &vm_kernel && isuser()) {
+					/* This can happen depending on what the CPU does when
+					 * attempting to access the IOB vector associated with
+					 * the calling thread.
+					 * In this case, we must re-attempt the lookup within kernel-space. */
+					sync_read(&vm_kernel);
+					node = vm_getnodeof(&vm_kernel, page);
+					if (node && !node->vn_part) {
+						sync_endread(&vm_kernel);
+						/* Reservation node. */
+						if (is_iob_node(node))
+							goto do_handle_iob_node_access;
+						goto pop_connections_and_throw_segfault;
+					}
+					sync_endread(&vm_kernel);
+				}
+				goto pop_connections_and_throw_segfault;
+			}
+			if unlikely(!node->vn_part) {
+				struct cpu *mycpu;
+				sync_endread(effective_vm);
+				/* Check for special case: `node' may be the `x86_cpu_iobnode' of some CPU */
+do_handle_iob_node_access:
+				mycpu = THIS_CPU;
+				if (node == &FORCPU(mycpu, x86_cpu_iobnode)) {
+					PREEMPTION_DISABLE();
+					IF_SMP(COMPILER_READ_BARRIER();)
+					IF_SMP(mycpu = THIS_CPU;)
+					IF_SMP(if (node == &FORCPU(mycpu, x86_cpu_iobnode))) {
+						bool allow_preemption;
+						assert(FORCPU(mycpu, _current_ioperm_bitmap) == NULL ||
+						       FORCPU(mycpu, _current_ioperm_bitmap) == THIS_IOPERM_BITMAP);
+						/* Make sure to handle any access errors after the ioperm() bitmap
+						 * was already mapped during the current quantum as full segfault. */
+						if unlikely(FORCPU(mycpu, _current_ioperm_bitmap) != NULL) {
+							/* Check for special case: even if the IOPERM bitmap is already
+							 * mapped, allow a mapping upgrade if it was mapped read-only
+							 * before, but is now needed as read-write. */
+							if ((ecode & PAGEFAULT_F_WRITING) && !pagedir_iswritable(page))
+								; /* Upgrade the mapping */
+							else {
+								goto pop_connections_and_throw_segfault;
+							}
+						}
+						/* Most likely case: Accessing the IOB of the current CPU. */
+						allow_preemption = (icpustate_getpflags(state) & EFLAGS_IF) != 0;
+						/* Make special checks if the access itself seems to
+						 * originate from a direct user-space access. */
+						if ((ecode & PAGEFAULT_F_USERSPACE) && isuser()) {
+							/* User-space can never get write-access to the IOB vector. */
+							if (ecode & PAGEFAULT_F_WRITING)
+								goto pop_connections_and_throw_segfault;
+							/* User-space isn't allowed to directly access the IOB vector.
+							 * To not rely on undocumented processor behavior, manually check
+							 * if the access originates from a user-space I/O instruction.
+							 * If not (such as user-space directly trying to read kernel memory),
+							 * then we always deny the access, no matter what! */
+							if (!is_io_instruction_and_not_memory_access((byte_t *)pc, state, (uintptr_t)addr))
+								goto pop_connections_and_throw_segfault;
+						}
+						if (!handle_iob_access(mycpu, (ecode & PAGEFAULT_F_WRITING) != 0, allow_preemption)) {
+							assert(PREEMPTION_ENABLED());
+							goto again_lookup_node;
+						}
+						if (allow_preemption)
+							__sti();
+						goto done_before_pop_connections;
+					}
+					IF_SMP(if (icpustate_getpflags(state) & EFLAGS_IF) __sti());
+				}
+				/* Either this is an access to the IOB vector of a different CPU,
+				 * or the accessed node is just some random, reservation node.
+				 * In the former case, we must take care to deal with a race condition
+				 * which may happen in an SMP system where our current thread has been
+				 * moved to a different CPU since we've re-enabled preemption at the
+				 * start of this function, and before getting here. In that case, the
+				 * access is still going to reference the IOB of the old CPU, and we
+				 * have to alter our behavior depending on the access happening because
+				 * of the some invalid access to a different CPU's IOB vector, or the
+				 * access being caused by the CPU itself, and a CPU-transfer happening
+				 * at just the wrong moment. */
+#ifndef CONFIG_NO_SMP
+				if (is_iob_node(node)) {
+					/* If we didn't actually re-enable preemption, then no cpu-transfer could have happened! */
+					if (!(icpustate_getpflags(state) & EFLAGS_IF))
+						goto pop_connections_and_throw_segfault;
+					if (!isuser())
+						goto pop_connections_and_throw_segfault;
+					/* If the calling thread couldn't have changed CPUs, then this is an access to  */
+					if (THIS_TASK->t_flags & TASK_FKEEPCORE)
+						goto pop_connections_and_throw_segfault;
+					/* The calling thread is capable of being migrated between different CPUs,
+					 * and the accessed node _is_ the IOB vector of a different CPU. However with
+					 * all of these factors, there still exists the possibility that the access
+					 * happened because the CPU itself accessed the vector, as may be triggered
+					 * by use of the `(in|out)(b|w|l)' instructions.
+					 * To make sure that we can handle those cases as well, as can check the
+					 * memory to which `icpustate_getpc(state)' points for being one of these
+					 * instructions.
+					 * To prevent the possibility of repeating the access to the IOB vector during
+					 * this check (in case a bad jump caused IP to end up within the IOB vector),
+					 * also make sure that `pc' isn't apart of said vector! */
+					if (pc >= (uintptr_t)VM_NODE_MINADDR(node) &&
+					    pc <= (uintptr_t)VM_NODE_MAXADDR(node))
+						goto pop_connections_and_throw_segfault;
+					/* If we got here cause of an I/O instruction, just return to the caller and
+					 * have them attempt the access once again, hopefully without accessing  */
+					if (is_io_instruction_and_not_memory_access((byte_t *)pc, state, (uintptr_t)addr))
+						goto done_before_pop_connections;
+				}
+#endif /* !CONFIG_NO_SMP */
 				goto pop_connections_and_throw_segfault;
 			}
 			if (node->vn_guard) {
@@ -301,13 +574,11 @@ vio_failure_throw_segfault:
 							 * to copy a single page, too, minimizing memory use. */
 do_unshare_cow:
 							if (vpage_offset != 0) {
-								sync_endread(part);
 								xdecref(vm_datapart_split(part, vpage_offset));
 								decref_unlikely(part);
 								goto again_lookup_node;
 							}
 							if (vm_datapart_numvpages(part) != 1) {
-								sync_endread(part);
 								xdecref(vm_datapart_split(part, 1));
 								decref_unlikely(part);
 								goto again_lookup_node;

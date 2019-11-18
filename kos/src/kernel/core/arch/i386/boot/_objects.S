@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x4918626a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,30 +16,34 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_Rmdir_defined
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt)
-#define __local_Rmdir_defined 1
-#include <kos/anno.h>
-/* Dependency: "UnlinkAt" */
-#ifndef ____localdep_UnlinkAt_defined
-#define ____localdep_UnlinkAt_defined 1
-#ifdef __CRT_HAVE_UnlinkAt
-/* >> unlinkat(2)
- * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
-__CREDIRECT_VOID(__ATTR_NONNULL((2)),,__localdep_UnlinkAt,(__fd_t __dfd, char const *__name, __atflag_t __flags),UnlinkAt,(__dfd,__name,__flags)) __THROWS(...)
-#else /* LIBC: UnlinkAt */
-#undef ____localdep_UnlinkAt_defined
-#endif /* UnlinkAt... */
-#endif /* !____localdep_UnlinkAt_defined */
 
-__NAMESPACE_LOCAL_BEGIN
-/* >> rmdir(2)
- * Remove a directory referred to by `PATH' */
-__LOCAL_LIBC(Rmdir) __ATTR_NONNULL((1)) void
-(__LIBCCALL __LIBC_LOCAL_NAME(Rmdir))(char const *__path) __THROWS(...) {
-#line 246 "kos/src/libc/magic/kos.unistd.c"
-	__localdep_UnlinkAt(__CRT_AT_FDCWD, __path, 0x0200); /* AT_REMOVEDIR */
-}
-__NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt) */
-#endif /* !__local_Rmdir_defined */
+#include <kernel/compiler.h>
+
+#include <kernel/cpuid.h>
+#include <kernel/paging.h>
+
+#include <kos/kernel/gdt.h>
+#include <kos/kernel/tss.h>
+
+#define EXPORT_AS_OBJECT(name) \
+	.type name, @object;       \
+	.global name;
+#define EXPORT_AS_OBJECT_EX(name, size_) \
+	EXPORT_AS_OBJECT(name)               \
+	.size name, size_;
+EXPORT_AS_OBJECT(vm_kernel)
+EXPORT_AS_OBJECT(_this_idle)
+EXPORT_AS_OBJECT(_bootcpu)
+EXPORT_AS_OBJECT(_bootidle)
+EXPORT_AS_OBJECT(_boottask)
+EXPORT_AS_OBJECT_EX(x86_cputss, SIZEOF_TSS)
+EXPORT_AS_OBJECT_EX(x86_cpuiob, 8192)
+EXPORT_AS_OBJECT_EX(pagedir_kernel, PAGEDIR_SIZE)
+EXPORT_AS_OBJECT_EX(pagedir_kernel_phys, PAGEDIR_SIZE)
+EXPORT_AS_OBJECT_EX(jiffies, 8)
+EXPORT_AS_OBJECT_EX(__x86_bootcpu_features, 2)
+EXPORT_AS_OBJECT_EX(__x86_bootcpu_idfeatures, SIZEOF_CPUID_CPUINFO)
+#undef EXPORT_AS_OBJECT_EX
+#undef EXPORT_AS_OBJECT
+
+

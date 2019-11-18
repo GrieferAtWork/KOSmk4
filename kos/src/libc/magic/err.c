@@ -24,6 +24,9 @@
 
 }
 %#ifdef __CC__
+%
+%__SYSDECL_BEGIN
+%
 
 @@Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n'
 [ATTR_LIBC_PRINTF(1, 2)][cp_stdio]
@@ -37,7 +40,7 @@ warn:(char const *format, ...) %{auto_block(printf(vwarn))}
 [requires(!defined(__NO_STDSTREAMS) && defined(__LOCAL_program_invocation_short_name) &&
           $has_function(fprintf) && $has_function(vfprintf) &&
           $has_function(strerror))]
-vwarn:(char const *format, va_list args) {
+vwarn:(char const *format, $va_list args) {
 	int errval = @__libc_geterrno_or@(0);
 #if (@@yield $has_function("flockfile")@@) && (@@yield $has_function("funlockfile")@@)
 	flockfile(@__LOCAL_stderr@);
@@ -64,7 +67,7 @@ warnx:(char const *format, ...) %{auto_block(printf(vwarnx))}
 [requires_include(<local/program_invocation_name.h>)]
 [requires(!defined(__NO_STDSTREAMS) && defined(__LOCAL_program_invocation_short_name) &&
           $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc))]
-vwarnx:(char const *format, va_list args) {
+vwarnx:(char const *format, $va_list args) {
 #if (@@yield $has_function("flockfile")@@) && (@@yield $has_function("funlockfile")@@)
 	flockfile(@__LOCAL_stderr@);
 #endif
@@ -84,7 +87,7 @@ err:(int status, char const *format, ...) %{auto_block(printf(verr))}
 
 [doc_alias(err)][ATTR_NORETURN][ATTR_LIBC_PRINTF(2, 0)][same_impl][throws]
 [requires($has_function(vwarn) && $has_function(exit))]
-verr:(int status, char const *format, va_list args) {
+verr:(int status, char const *format, $va_list args) {
 	vwarn(format, args);
 	exit(status);
 }
@@ -95,12 +98,14 @@ errx:(int status, char const *format, ...) %{auto_block(printf(verrx))}
 
 [doc_alias(err)][ATTR_NORETURN][ATTR_LIBC_PRINTF(2, 0)][same_impl][throws]
 [requires($has_function(vwarnx) && $has_function(exit))]
-verrx:(int status, char const *format, va_list args) {
+verrx:(int status, char const *format, $va_list args) {
 	vwarnx(format, args);
 	exit(status);
 }
 
-
+%
+%__SYSDECL_END
+%
 %#endif /* __CC__ */
 %{
 

@@ -30,6 +30,7 @@
 #include <kos/kernel/cpu-state.h>
 
 #include <kernel/syscall.h>
+#include <kernel/arch/paging64.h>
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
@@ -175,6 +176,15 @@ INTERN_FUNCTION(x86_load_thread_rax_cpu_rbx)
 1:	movq   %rcx, %cr0
 #endif /* !CONFIG_NO_FPU */
 
+	/* Check if the old thread had its I/O permissions bitmap loaded. */
+	INTERN(_current_ioperm_bitmap)
+	cmpq   $0, _current_ioperm_bitmap(%ebx)
+	jnz    .Llazy_disable_ioperm_bitmap
+.Llazy_disable_ioperm_bitmap_return:
+
+	.cfi_remember_state
+
+
 	/* Update the used page directory pointer. */
 	movq   _this_vm(%rax), %rcx
 	movq   _this_vm_pdir_phys_ptr(%rcx), %rax
@@ -211,6 +221,22 @@ INTERN_FUNCTION(x86_load_thread_rax_cpu_rbx)
 	popq_cfi_r %rax                 /* [C] Accumulator register */
 
 	intr_exit
+	.cfi_restore_state
+
+	/* Disable the I/O permissions bitmap. */
+.Llazy_disable_ioperm_bitmap:
+	/* Check if the loaded I/O permissions bitmap is the calling thread's */
+	movq   _this_ioperm_bitmap(%rax), %rdx
+	cmpq   %rdx, _current_ioperm_bitmap(%rbx)
+	je     .Llazy_disable_ioperm_bitmap_return
+	/* Must actually unmap the I/O permissions bitmap! */
+	INTERN(x86_cpu_iobnode_pagedir_identity)
+	movq   x86_cpu_iobnode_pagedir_identity(%rbx), %rdx
+	movl   $(P64_PAGE_FPREPARED), %ecx
+	movq   $(0), _current_ioperm_bitmap(%rbx)
+	movq   %rcx, 0x0(%rdx)
+	movq   %rcx, 0x8(%rdx)
+	jmp    .Llazy_disable_ioperm_bitmap_return
 	.cfi_endproc
 END(x86_load_thread_rax_cpu_rbx)
 END(x86_idt_preemption)

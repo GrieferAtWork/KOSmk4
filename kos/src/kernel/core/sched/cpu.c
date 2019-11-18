@@ -429,8 +429,6 @@ PUBLIC cpuid_t cpu_online_count = 1;
 PUBLIC struct cpu *_cpu_vector[CONFIG_MAX_CPU_COUNT] ASMNAME("cpu_vector") = { &_bootcpu };
 
 
-INTDEF byte_t __kernel_percpu_size[];
-
 PRIVATE ATTR_USED ATTR_SECTION(".data.percpu.head")
 struct cpu cpu_header = {
 	/*.c_id       = */ 0,
@@ -440,7 +438,6 @@ struct cpu cpu_header = {
 	/*.c_pending  = */ CPU_PENDING_ENDOFCHAIN,
 #endif /* !CONFIG_NO_SMP */
 	/*.c_override = */ NULL,
-	/*.c_heapsize = */ (size_t)__kernel_percpu_size,
 	/*.c_state    = */ CPU_STATE_RUNNING
 };
 

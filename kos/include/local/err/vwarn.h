@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97e34122 */
+/* HASH CRC-32:0x4ac733af */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -148,7 +148,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vwarn) __ATTR_LIBC_PRINTF(1, 0) void
 (__LIBCCALL __LIBC_LOCAL_NAME(vwarn))(char const *__format,
                                       __builtin_va_list __args) __THROWS(...) {
-#line 41 "kos/src/libc/magic/err.c"
+#line 44 "kos/src/libc/magic/err.c"
 	int __errval = __libc_geterrno_or(0);
 #if (defined(__CRT_HAVE_flockfile) || defined(__CRT_HAVE__lock_file) || defined(__CRT_HAVE__IO_flockfile)) && (defined(__CRT_HAVE_funlockfile) || defined(__CRT_HAVE__unlock_file) || defined(__CRT_HAVE__IO_funlockfile))
 	__localdep_flockfile(__LOCAL_stderr);

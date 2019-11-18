@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x644e567 */
+/* HASH CRC-32:0xa821d9be */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,6 +34,9 @@
 #include <bits/types.h>
 
 #ifdef __CC__
+
+__SYSDECL_BEGIN
+
 #ifdef __fast_error_defined
 #ifdef __cplusplus
 __NAMESPACE_FAST_USING(error)
@@ -130,6 +133,9 @@ __LIBC int error_one_per_line;
 #define error_one_per_line error_one_per_line
 #endif /* __CRT_HAVE_error_one_per_line */
 #endif /* !error_one_per_line */
+
+
+__SYSDECL_END
 
 #endif /* __CC__ */
 

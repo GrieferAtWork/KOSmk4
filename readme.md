@@ -120,6 +120,9 @@ All ported applications can be installed onto your KOS disk image by using `bash
 		- Supports atomic (aka. lock-less) allocation of physical memory frames
 		- Zone-based, with actual zones being determined, allocated and initialized entirely at runtime
 			- Usually, it ends up being 2 zones (low memory before the bios, and high memory where the kernel gets mapped)
+- IO
+	- User-space support for `iopl()` and `ioperm()` (allowing all `65536` ports to be controlled on a per-thread basis)
+		- Note that `ioperm()` isn't implemented as it is in linux, using a memcpy() whenever a thread is preempted. Instead, KOS uses lazy page directory mappings to re-map the `TSS.IOBM` memory region when switching between different threads, meaning that the overhead of using `ioperm()` is both minimal, and doesn't increase if greater-numbered ioports are managed.
 - MMU
 	- Support for
 		- `invpcid` (selected using `cpuid`)

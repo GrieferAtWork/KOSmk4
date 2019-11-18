@@ -184,7 +184,9 @@ FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copytophys_onepage_nopf)(PHYS vm_
 FUNDEF void KCALL vm_pagefromphys(USER CHECKED void *dst, PHYS vm_ppage_t src) THROWS(E_SEGFAULT);
 FUNDEF void KCALL vm_pagetophys(PHYS vm_ppage_t dst, USER CHECKED void const *src) THROWS(E_SEGFAULT);
 FUNDEF NOBLOCK void NOTHROW(KCALL vm_pageinphys)(PHYS vm_ppage_t dst, PHYS vm_ppage_t src);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_pagesinphys)(PHYS vm_ppage_t dst, PHYS vm_ppage_t src, size_t num_pages);
 FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphyspage)(PHYS vm_ppage_t dst, int byte);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphyspages)(PHYS vm_ppage_t dst, int byte, size_t num_pages);
 FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_pagefromphys_nopf)(USER CHECKED void *dst, PHYS vm_ppage_t src);
 FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_pagetophys_nopf)(PHYS vm_ppage_t dst, USER CHECKED void const *src);
 

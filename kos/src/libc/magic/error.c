@@ -24,6 +24,9 @@
 #include <bits/types.h>
 
 #ifdef __CC__
+
+__SYSDECL_BEGIN
+
 }
 
 %[define(DEFINE_LOCAL_error_print_progname =
@@ -221,6 +224,9 @@ __LIBC int error_one_per_line;
 }
 
 %{
+
+__SYSDECL_END
+
 #endif /* __CC__ */
 
 }

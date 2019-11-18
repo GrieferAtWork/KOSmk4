@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x4918626a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,30 +16,27 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_Rmdir_defined
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt)
-#define __local_Rmdir_defined 1
-#include <kos/anno.h>
-/* Dependency: "UnlinkAt" */
-#ifndef ____localdep_UnlinkAt_defined
-#define ____localdep_UnlinkAt_defined 1
-#ifdef __CRT_HAVE_UnlinkAt
-/* >> unlinkat(2)
- * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
-__CREDIRECT_VOID(__ATTR_NONNULL((2)),,__localdep_UnlinkAt,(__fd_t __dfd, char const *__name, __atflag_t __flags),UnlinkAt,(__dfd,__name,__flags)) __THROWS(...)
-#else /* LIBC: UnlinkAt */
-#undef ____localdep_UnlinkAt_defined
-#endif /* UnlinkAt... */
-#endif /* !____localdep_UnlinkAt_defined */
 
-__NAMESPACE_LOCAL_BEGIN
-/* >> rmdir(2)
- * Remove a directory referred to by `PATH' */
-__LOCAL_LIBC(Rmdir) __ATTR_NONNULL((1)) void
-(__LIBCCALL __LIBC_LOCAL_NAME(Rmdir))(char const *__path) __THROWS(...) {
-#line 246 "kos/src/libc/magic/kos.unistd.c"
-	__localdep_UnlinkAt(__CRT_AT_FDCWD, __path, 0x0200); /* AT_REMOVEDIR */
+%[define_replacement(fd_t = __fd_t)]
+%[default_impl_section(.text.crt.system.ioperm)]
+
+%{
+#include <hybrid/typecore.h>
+
+__SYSDECL_BEGIN
+
+#ifdef __CC__
 }
-__NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt) */
-#endif /* !__local_Rmdir_defined */
+
+@@Change I/O port permissions for a specific I/O port range
+ioperm:(__ULONGPTR_TYPE__ from, __ULONGPTR_TYPE__ num, int turn_on) -> int;
+
+@@Change I/O port permissions for all I/O ports
+iopl:(int level) -> int;
+
+%{
+#endif /* __CC__ */
+
+__SYSDECL_END
+
+}

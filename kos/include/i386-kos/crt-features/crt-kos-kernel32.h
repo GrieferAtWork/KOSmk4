@@ -57,7 +57,7 @@
 #define __CRT_HAVE__this_fpustate 1
 #define __CRT_HAVE__this_fs 1
 #define __CRT_HAVE__this_handle_manager 1
-#define __CRT_HAVE__this_idle 1
+#define __CRT_HAVE__this_ioperm_bitmap 1
 #define __CRT_HAVE__this_kernel_stack 1
 #define __CRT_HAVE__this_kernel_stack_part 1
 #define __CRT_HAVE__this_library_listdef 1
@@ -687,6 +687,15 @@
 #define __CRT_HAVE_instruction_succ 1
 #define __CRT_HAVE_instruction_trypred 1
 #define __CRT_HAVE_instruction_trysucc 1
+#define __CRT_HAVE_ioperm_bitmap_alloc 1
+#define __CRT_HAVE_ioperm_bitmap_allocf 1
+#define __CRT_HAVE_ioperm_bitmap_allocf_nx 1
+#define __CRT_HAVE_ioperm_bitmap_copy 1
+#define __CRT_HAVE_ioperm_bitmap_copyf 1
+#define __CRT_HAVE_ioperm_bitmap_copyf_nx 1
+#define __CRT_HAVE_ioperm_bitmap_destroy 1
+#define __CRT_HAVE_ioperm_bitmap_empty 1
+#define __CRT_HAVE_ioperm_bitmap_setrange 1
 #define __CRT_HAVE_isr_register 1
 #define __CRT_HAVE_isr_register_at 1
 #define __CRT_HAVE_isr_register_greedy 1
@@ -953,7 +962,6 @@
 #define __CRT_HAVE_pagedir_iswritable 1
 #define __CRT_HAVE_pagedir_iswritable_p 1
 #define __CRT_HAVE_pagedir_kernel 1
-#define __CRT_HAVE_pagedir_kernel_phys 1
 #define __CRT_HAVE_pagedir_map 1
 #define __CRT_HAVE_pagedir_map_p 1
 #define __CRT_HAVE_pagedir_maphint 1
@@ -2047,6 +2055,7 @@
 #define __CRT_HAVE_vm_memsetphys 1
 #define __CRT_HAVE_vm_memsetphys_onepage 1
 #define __CRT_HAVE_vm_memsetphyspage 1
+#define __CRT_HAVE_vm_memsetphyspages 1
 #define __CRT_HAVE_vm_node_destroy 1
 #define __CRT_HAVE_vm_node_free 1
 #define __CRT_HAVE_vm_node_insert 1
@@ -2059,6 +2068,7 @@
 #define __CRT_HAVE_vm_pagefromphys 1
 #define __CRT_HAVE_vm_pagefromphys_nopf 1
 #define __CRT_HAVE_vm_pageinphys 1
+#define __CRT_HAVE_vm_pagesinphys 1
 #define __CRT_HAVE_vm_pagetophys 1
 #define __CRT_HAVE_vm_pagetophys_nopf 1
 #define __CRT_HAVE_vm_prefault 1
@@ -2144,7 +2154,9 @@
 #define __CRT_HAVE_vsprintf 1
 #define __CRT_HAVE_vsprintf_s 1
 #define __CRT_HAVE_x86_asm_except_personality 1
+#define __CRT_HAVE_x86_cpu_iobnode 1
 #define __CRT_HAVE_x86_cpugdt 1
+#define __CRT_HAVE_x86_cpuiob 1
 #define __CRT_HAVE_x86_cpuldt 1
 #define __CRT_HAVE_x86_cputss 1
 #define __CRT_HAVE_x86_cputss_df 1

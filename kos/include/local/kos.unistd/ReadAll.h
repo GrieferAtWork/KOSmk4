@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa085bc35 */
+/* HASH CRC-32:0x1339995b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,7 +82,7 @@ __LOCAL_LIBC(ReadAll) __ATTR_NONNULL((2)) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(ReadAll))(__fd_t __fd,
                                         void *__buf,
                                         __SIZE_TYPE__ __bufsize) __THROWS(...) {
-#line 155 "kos/src/libc/magic/kos.unistd.c"
+#line 161 "kos/src/libc/magic/kos.unistd.c"
 	__SIZE_TYPE__ __result, __temp;
 	__result = __localdep_Read(__fd, __buf, __bufsize);
 	if (__result != 0 && __result < __bufsize) {

@@ -29,7 +29,7 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 
-#include <sys/io.h>
+#include <sys/mmio.h>
 
 #include <assert.h>
 #include <string.h>

@@ -732,6 +732,19 @@ use_whole_page_buffer:
 }
 
 PUBLIC NOBLOCK void
+NOTHROW(KCALL vm_pagesinphys)(PHYS vm_ppage_t dst,
+                              PHYS vm_ppage_t src,
+                              size_t num_pages) {
+	while (num_pages) {
+		vm_pageinphys(dst, src);
+		--num_pages;
+		++dst;
+		++src;
+	}
+}
+
+
+PUBLIC NOBLOCK void
 NOTHROW(KCALL vm_memsetphyspage)(PHYS vm_ppage_t dst, int byte) {
 	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
@@ -748,6 +761,37 @@ NOTHROW(KCALL vm_memsetphyspage)(PHYS vm_ppage_t dst, int byte) {
 	pagedir_syncone(tramp);
 	/* Fill memory. */
 	memset((void *)VM_PAGE2ADDR(tramp), byte, pagesize);
+	pagedir_pop_mapone(tramp, backup);
+}
+
+PUBLIC NOBLOCK void
+NOTHROW(KCALL vm_memsetphyspages)(PHYS vm_ppage_t dst, int byte, size_t num_pages) {
+	pagedir_pushval_t backup;
+	vm_vpage_t tramp;
+	size_t pagesize;
+	if unlikely(!num_pages)
+		return;
+	pagesize = pagedir_pagesize();
+#ifndef NO_PHYS_IDENTITY
+	while (PHYS_IS_IDENTITY_PAGE(dst)) {
+		memset(PHYS_TO_IDENTITY_PAGE(dst), byte, pagesize);
+		if (!--num_pages)
+			return;
+		++dst;
+	}
+#endif /* !NO_PHYS_IDENTITY */
+	tramp  = THIS_TRAMPOLINE_PAGE;
+	backup = pagedir_push_mapone(tramp, dst, PAGEDIR_MAP_FWRITE);
+	pagedir_syncone(tramp);
+	/* Fill memory. */
+	memset((void *)VM_PAGE2ADDR(tramp), byte, pagesize);
+	while (num_pages >= 2) {
+		++dst;
+		pagedir_mapone(tramp, dst, PAGEDIR_MAP_FWRITE);
+		pagedir_syncone(tramp);
+		memset((void *)VM_PAGE2ADDR(tramp), byte, pagesize);
+		--num_pages;
+	}
 	pagedir_pop_mapone(tramp, backup);
 }
 

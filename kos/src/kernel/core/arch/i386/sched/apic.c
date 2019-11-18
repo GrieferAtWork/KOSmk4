@@ -30,8 +30,9 @@
 #include <kernel/driver-param.h>
 #include <kernel/gdt.h>
 #include <kernel/handle.h>
-#include <kernel/heap.h>
+#include <kernel/malloc.h>
 #include <kernel/memory.h>
+#include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/pic.h>
 #include <kernel/pit.h>
@@ -270,8 +271,10 @@ INTDEF u32 x86_smp_gdt_pointer_base;
 
 INTDEF byte_t __kernel_percpu_start[];
 INTDEF byte_t __kernel_percpu_size[];
+INTDEF byte_t __kernel_percpu_full_pagecnt[];
 INTDEF byte_t __kernel_pertask_start[];
 INTDEF byte_t __kernel_pertask_size[];
+INTDEF FREE struct tss __kernel_percpu_tss;
 
 typedef void (KCALL *pertask_init_t)(struct task *__restrict self);
 INTDEF pertask_init_t __kernel_pertask_init_start[];
@@ -292,8 +295,248 @@ DATDEF ATTR_PERTASK struct vm_datapart __this_kernel_stack_part ASMNAME("_this_k
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
+DATDEF ATTR_PERCPU byte_t _x86_cpuiob[] ASMNAME("x86_cpuiob");
+
+PRIVATE ATTR_FREETEXT REF struct vm_datapart *KCALL
+vm_datapart_alloc_locked_ram(size_t num_pages) {
+	REF struct vm_datapart *result;
+	result = (struct vm_datapart *)kmalloc(sizeof(struct vm_datapart),
+	                                       GFP_LOCKED | GFP_PREFLT);
+	result->dp_refcnt = 1;
+	shared_rwlock_init(&result->dp_lock);
+#ifndef NDEBUG
+	memset(&result->dp_tree.a_min, 0xcc, sizeof(result->dp_tree.a_min));
+	memset(&result->dp_tree.a_max, 0xcc, sizeof(result->dp_tree.a_max));
+#endif /* !NDEBUG */
+	result->dp_tree.a_vmin = 0;
+	result->dp_tree.a_vmax = (vm_dpage_t)(num_pages - 1);
+	result->dp_crefs = NULL;
+#ifndef NDEBUG
+/*	memset(&result->dp_srefs, 0xcc, sizeof(result->dp_srefs)); */ /* Initialized by the caller */
+#endif /* !NDEBUG */
+	result->dp_stale = NULL;
+	result->dp_block = incref(&vm_datablock_anonymous_zero);
+	result->dp_flags = VM_DATAPART_FLAG_LOCKED | VM_DATAPART_FLAG_HEAPPPP | VM_DATAPART_FLAG_KERNPRT;
+	result->dp_state = VM_DATAPART_STATE_LOCKED;
+	result->dp_pprop_p = NULL;
+	result->dp_futex   = NULL;
+	/* Allocate RAM for the new datapart. */
+	TRY {
+		vm_datapart_do_allocram(result);
+	} EXCEPT {
+		kfree(result);
+		RETHROW();
+	}
+	return result;
+}
+
+PRIVATE ATTR_FREETEXT struct vm_node *KCALL
+vm_node_alloc_locked_ram(size_t num_pages) {
+	struct vm_node *result;
+	REF struct vm_datapart *part;
+	part = vm_datapart_alloc_locked_ram(num_pages);
+	TRY {
+		result = (struct vm_node *)kmalloc(sizeof(struct vm_node),
+		                                   GFP_LOCKED | GFP_PREFLT);
+	} EXCEPT {
+		decref_likely(part);
+		RETHROW();
+	}
+	result->vn_prot = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED;
+	part->dp_srefs  = result;
+	result->vn_link.ln_pself = &part->dp_srefs;
+	result->vn_link.ln_next  = NULL;
+	result->vn_flags = VM_NODE_FLAG_KERNPRT | VM_NODE_FLAG_NOMERGE;
+	result->vn_vm    = &vm_kernel;
+	result->vn_part  = part;
+	result->vn_block = incref(&vm_datablock_anonymous_zero);
+	result->vn_guard = 0;
+	return result;
+}
+
 PRIVATE NOBLOCK ATTR_FREETEXT void
-NOTHROW(KCALL x86_destroy_cpu)(struct cpu *__restrict self) {
+NOTHROW(KCALL vm_node_destroy_locked_ram)(struct vm_node *__restrict self) {
+	assert(self->vn_block);
+	assert(self->vn_part);
+	decref_unlikely(self->vn_block);
+	decref_likely(self->vn_part);
+	kfree(self);
+}
+
+INTDEF byte_t __x86_cpu_part1_pages[];
+
+#ifdef __x86_64__
+INTDEF FREE union p64_pdir_e1 *NOTHROW(FCALL x86_get_cpu_iob_pointer_p64)(struct cpu *__restrict self);
+#define x86_get_cpu_iob_pointer  x86_get_cpu_iob_pointer_p64
+#else /* __x86_64__ */
+#ifndef CONFIG_NO_PAGING_P32
+INTDEF FREE union p32_pdir_e1 *NOTHROW(FCALL x86_get_cpu_iob_pointer_p32)(struct cpu *__restrict self);
+#endif /* !CONFIG_NO_PAGING_P32 */
+#ifndef CONFIG_NO_PAGING_PAE
+INTDEF FREE union pae_pdir_e1 *NOTHROW(FCALL x86_get_cpu_iob_pointer_pae)(struct cpu *__restrict self);
+#endif /* !CONFIG_NO_PAGING_PAE */
+
+#ifdef CONFIG_NO_PAGING_P32
+#define x86_get_cpu_iob_pointer  x86_get_cpu_iob_pointer_p32
+#elif defined(CONFIG_NO_PAGING_PAE)
+#define x86_get_cpu_iob_pointer  x86_get_cpu_iob_pointer_pae
+#else
+#define x86_get_cpu_iob_pointer(self)                                   \
+	(X86_PAGEDIR_USES_P32() ? (void *)x86_get_cpu_iob_pointer_p32(self) \
+	                        : (void *)x86_get_cpu_iob_pointer_pae(self))
+#endif
+#endif /* !__x86_64__ */
+
+
+PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
+	/* A CPU structure is quite complicated, since it contains an in-line
+	 * memory hole spanning two pages at an offset of `+(uintptr_t)x86_cpuiob'
+	 * bytes form the start of the CPU structure, that is then followed by
+	 * 1 additional page that is really only needed for the single 0xff byte
+	 * at its start, as mandated by the Intel developer manual for termination
+	 * of the IOB vector.
+	 * As such, the cpu structure itself consists of 3 consecutive VM nodes
+	 * describing the memory mappings before, for, and after the 2-page hole. */
+	struct vm_node *cpu_node1;
+	struct vm_node *cpu_node2;
+	struct vm_node *cpu_node3;
+	vm_vpage_t cpu_basepage;
+	struct cpu *result;
+	cpu_node1 = vm_node_alloc_locked_ram((size_t)__x86_cpu_part1_pages);
+	TRY {
+		cpu_node3 = vm_node_alloc_locked_ram(1);
+		TRY {
+			sync_write(&vm_kernel);
+			cpu_basepage = vm_getfree(&vm_kernel,
+			                          (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_ALTIDLE),
+			                          (size_t)__kernel_percpu_full_pagecnt, 1,
+			                          HINT_GETMODE(KERNEL_VMHINT_ALTIDLE));
+			if unlikely(cpu_basepage == VM_GETFREE_ERROR) {
+				sync_endwrite(&vm_kernel);
+				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
+				      (size_t)__kernel_percpu_full_pagecnt);
+			}
+#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+			/* Make sure that the NODE2 portion of the CPU descriptor is always prepared. */
+			if (!pagedir_prepare_map(cpu_basepage + (size_t)__x86_cpu_part1_pages, 2))
+				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+		} EXCEPT {
+			vm_node_destroy_locked_ram(cpu_node3);
+			RETHROW();
+		}
+	} EXCEPT {
+		vm_node_destroy_locked_ram(cpu_node1);
+		RETHROW();
+	}
+	/* Fill in address ranges for CPU nodes. */
+	cpu_node1->vn_node.a_vmin = cpu_basepage;
+	cpu_node1->vn_node.a_vmax = cpu_basepage + (size_t)__x86_cpu_part1_pages - 1;
+	cpu_node3->vn_node.a_vmin = cpu_node1->vn_node.a_vmax + 3;
+	cpu_node3->vn_node.a_vmax = cpu_node3->vn_node.a_vmin;
+
+	/* Insert the CPU nodes into the kernel VM. */
+	vm_node_insert(cpu_node1);
+	vm_node_insert(cpu_node3);
+	sync_endwrite(&vm_kernel);
+
+	result = (struct cpu *)VM_PAGE2ADDR(cpu_basepage);
+
+	/* Copy the CPU template. */
+	memcpy(result, __kernel_percpu_start, (size_t)__kernel_percpu_size);
+
+	/* Copy the thread-template into the cpu's IDLE thread. */
+	memcpy(&FORCPU(result, _this_idle), __kernel_pertask_start, (size_t)__kernel_pertask_size);
+
+	/* Copy the TSS template. */
+	memcpy(&FORCPU(result, x86_cputss), &__kernel_percpu_tss, SIZEOF_TSS);
+
+#ifndef NDEBUG
+	/* Also fill the area before _this_idle with CCh bytes. */
+	memset((byte_t *)result + (uintptr_t)__kernel_percpu_size, 0xcc,
+	       (size_t)&_this_idle - (size_t)__kernel_percpu_size);
+
+	/* Also fill the area between _this_idle and x86_cputss with CCh bytes. */
+	memset((byte_t *)result + ((uintptr_t)&_this_idle + (size_t)__kernel_pertask_size), 0xcc,
+	       (uintptr_t)&x86_cputss - ((uintptr_t)&_this_idle +
+	                                 (size_t)__kernel_pertask_size));
+#endif /* !NDEBUG */
+
+	/* Fill in the IOB node mapping for this CPU. */
+	result = (struct cpu *)VM_PAGE2ADDR(cpu_basepage);
+	cpu_node2 = &FORCPU(result, x86_cpu_iobnode);
+	cpu_node2->vn_node.a_vmin = cpu_basepage + (size_t)__x86_cpu_part1_pages;
+	cpu_node2->vn_node.a_vmax = cpu_node2->vn_node.a_vmin + 1;
+	cpu_node2->vn_prot  = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_PRIVATE;
+	cpu_node2->vn_flags = VM_NODE_FLAG_KERNPRT | VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED;
+	cpu_node2->vn_vm    = &vm_kernel;
+	cpu_node2->vn_part  = NULL; /* Reservation */
+	cpu_node2->vn_block = NULL; /* Reservation */
+	cpu_node2->vn_guard = 0;
+#ifndef NDEBUG
+	memset(&cpu_node2->vn_link, 0xcc, sizeof(cpu_node2->vn_link));
+#endif /* !NDEBUG */
+
+	/* Insert the IOB VM node into the kernel VM. */
+	sync_write(&vm_kernel); /* Never throws due to early-boot guaranties. */
+	vm_node_insert(cpu_node2);
+	sync_endwrite(&vm_kernel);
+
+	/* Make sure that the IOB is terminated by a byte containing all ones
+	 * NOTE: The remainder of the last page (which is `cpu_node3') is left
+	 *       uninitialized, as it is (currently) unused. */
+	FORCPU(result, _x86_cpuiob[65536/8]) = 0xff;
+
+#ifndef NDEBUG
+	/* Fill unused memory with CCh so that unintended access problems are reproducible. */
+	memset(&FORCPU(result, _x86_cpuiob[(65536/8) + 1]), 0xcc, PAGESIZE - 1);
+#endif /* !NDEBUG */
+
+	/* Initialize the CPU's pagedir_identity:iob pointer. */
+	FORCPU(result, x86_cpu_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer(result);
+
+	return result;
+}
+
+PRIVATE ATTR_FREETEXT void
+NOTHROW(KCALL cpu_free)(struct cpu *__restrict self) {
+	/* Release the CPU structure back to the heap. */
+	struct vm_node *cpu_node1;
+	struct vm_node *cpu_node2;
+	struct vm_node *cpu_node3;
+	vm_vpage_t cpu_basepage;
+	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
+	cpu_basepage = VM_ADDR2PAGE((vm_virt_t)self);
+	sync_write(&vm_kernel); /* Never throws due to early-boot guaranties. */
+	cpu_node1 = vm_node_remove(&vm_kernel, cpu_basepage);
+	cpu_node2 = vm_node_remove(&vm_kernel, cpu_basepage + (size_t)__x86_cpu_part1_pages);
+	cpu_node3 = vm_node_remove(&vm_kernel, cpu_basepage + (size_t)__x86_cpu_part1_pages + 2);
+#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+	if (!pagedir_prepare_map(cpu_basepage, (size_t)__x86_cpu_part1_pages + 3))
+		kernel_panic(FREESTR("Failed to prepare pagedir for unmapping CPU descriptor"));
+#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+	pagedir_unmap(cpu_basepage, (size_t)__x86_cpu_part1_pages + 3);
+#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+	pagedir_unprepare_map(cpu_basepage, (size_t)__x86_cpu_part1_pages + 3);
+#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+	sync_endwrite(&vm_kernel);
+	assert(cpu_node1);
+	assert(cpu_node2);
+	assert(cpu_node3);
+	assert(VM_NODE_MIN(cpu_node1) == cpu_basepage);
+	assert(VM_NODE_MAX(cpu_node1) == cpu_basepage + (size_t)__x86_cpu_part1_pages - 1);
+	assert(VM_NODE_MIN(cpu_node2) == cpu_node1->vn_node.a_vmax + 1);
+	assert(VM_NODE_MAX(cpu_node2) == cpu_node2->vn_node.a_vmin + 1);
+	assert(VM_NODE_MIN(cpu_node3) == cpu_node2->vn_node.a_vmax + 1);
+	assert(VM_NODE_MAX(cpu_node3) == cpu_node3->vn_node.a_vmin);
+	assert(cpu_node2 == &FORCPU(self, x86_cpu_iobnode));
+	vm_node_destroy_locked_ram(cpu_node1);
+	vm_node_destroy_locked_ram(cpu_node3);
+}
+
+
+PRIVATE ATTR_FREETEXT void
+NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 	struct task *myidle;
 	myidle = &FORCPU(self, _this_idle);
 	{
@@ -332,12 +575,8 @@ NOTHROW(KCALL x86_destroy_cpu)(struct cpu *__restrict self) {
 	/* Finalize the associated data parts, freeing up backing physical memory. */
 	vm_datapart_freeram(&FORCPU(self, _x86_this_dfstack_part), false);
 	vm_datapart_freeram(&FORTASK(myidle, __this_kernel_stack_part), false);
-
 	LLIST_REMOVE(myidle, t_vm_tasks);
-
-	/* Release the CPU structure back to the heap it came from. */
-	heap_free(&kernel_locked_heap, self,
-	          self->c_heapsize, GFP_LOCKED);
+	cpu_free(self);
 }
 
 
@@ -350,19 +589,10 @@ i386_allocate_secondary_cores(void) {
 	for (i = 1; i < _cpu_count; ++i) {
 		struct cpu *altcore;
 		struct task *altidle;
-		struct heapptr ptr;
 		/* Allocate an initialize the alternative core. */
-		ptr = heap_align(&kernel_locked_heap,
-		                 __SIZEOF_CACHELINE__,
-		                 0,
-		                 (size_t)__kernel_percpu_size,
-		                 GFP_LOCKED | GFP_PREFLT);
-		altcore = (struct cpu *)ptr.hp_ptr;
+		altcore = cpu_alloc();
 		altidle = &FORCPU(altcore, _this_idle);
-		memcpy(altcore, __kernel_percpu_start, (size_t)__kernel_percpu_size);
-		memcpy(altidle, __kernel_pertask_start, (size_t)__kernel_pertask_size);
 		/* Decode information previously encoded in `smp.c' */
-		altcore->c_heapsize = ptr.hp_siz;
 		FORCPU(altcore, _x86_lapic_id)      = (uintptr_t)_cpu_vector[i] & 0xff;
 		FORCPU(altcore, _x86_lapic_version) = ((uintptr_t)_cpu_vector[i] & 0xff00) >> 8;
 		_cpu_vector[i] = altcore;
@@ -781,7 +1011,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 				printk(FREESTR(KERN_ERR "[apic] CPU with LAPIC id %#.2I8x doesn't want to "
 				                        "come online (removing it from the configuration)\n"),
 				       i, FORCPU(_cpu_vector[i], x86_lapic_id));
-				x86_destroy_cpu(_cpu_vector[i]);
+				cpu_destroy(_cpu_vector[i]);
 				/* Remove the CPU from the vector. */
 				--_cpu_count;
 				memmove(&_cpu_vector[i], &_cpu_vector[i + 1],

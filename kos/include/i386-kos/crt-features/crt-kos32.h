@@ -2446,6 +2446,8 @@
 #define __CRT_HAVE_innetgr 1
 #define __CRT_HAVE_insque 1
 #define __CRT_HAVE_ioctl 1
+#define __CRT_HAVE_ioperm 1
+#define __CRT_HAVE_iopl 1
 #define __CRT_HAVE_iruserok 1
 #define __CRT_HAVE_iruserok_af 1
 #define __CRT_HAVE_is_wctype 1

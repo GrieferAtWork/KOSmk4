@@ -21,7 +21,7 @@
 
 #include <kernel/compiler.h>
 #include <bits/types.h>
-#include <sys/io.h>
+#include <sys/mmio.h>
 
 DECL_BEGIN
 

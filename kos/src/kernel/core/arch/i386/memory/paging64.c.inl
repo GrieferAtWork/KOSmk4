@@ -30,8 +30,10 @@
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
+#include <kernel/tss.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
+#include <sched/cpu.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -1824,6 +1826,18 @@ DEFINE_PUBLIC_ALIAS(pagedir_haschanged, p64_pagedir_haschanged);
 DEFINE_PUBLIC_ALIAS(pagedir_unsetchanged, p64_pagedir_unsetchanged);
 
 
+INTERN ATTR_FREETEXT ATTR_CONST union p64_pdir_e1 *
+NOTHROW(FCALL x86_get_cpu_iob_pointer_p64)(struct cpu *__restrict self) {
+	union p64_pdir_e1 *e1_pointer;
+	uintptr_t iobp;
+	iobp       = (uintptr_t)&FORCPU(self, x86_cpuiob[0]);
+	e1_pointer = &P64_PDIR_E1_IDENTITY[P64_PDIR_VEC4INDEX(iobp)]
+	                                  [P64_PDIR_VEC3INDEX(iobp)]
+	                                  [P64_PDIR_VEC2INDEX(iobp)]
+	                                  [P64_PDIR_VEC1INDEX(iobp)];
+	return e1_pointer;
+}
+
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_paging)(void) {
@@ -1835,6 +1849,8 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 		for (i = 0; i < COMPILER_LENOF(p64_pageperm_matrix); ++i)
 			p64_pageperm_matrix[i] &= ~P64_PAGE_FNOEXEC;
 	}
+	/* Initialize the `_bootcpu.x86_cpu_iobnode_pagedir_identity' pointer. */
+	FORCPU(&_bootcpu, x86_cpu_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer_p64(&_bootcpu);
 }
 
 

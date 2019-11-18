@@ -147,6 +147,8 @@ enum {
 	                                                                * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was false, but the `LFUTEX_WAIT_FLAG_TIMEOUT_*' bits were set.
 	                                                                * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was true, but unused flag bits were set. */
 	E_INVALID_ARGUMENT_CONTEXT_IOPL_LEVEL,                         /* E_INVALID_ARGUMENT_BAD_VALUE: The `level' argument passed to `iopl()' was negative, or greater than `3' */
+	E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE,                       /* E_INVALID_ARGUMENT_BAD_VALUE: At least one of the ports specified by the given range lies outside the valid port bounds */
+	E_INVALID_ARGUMENT_CONTEXT_IOPERM_TURNON,                      /* E_INVALID_ARGUMENT_BAD_VALUE: The `turn_on' argument is neither `0' nor `1' */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -270,6 +272,8 @@ enum {
                                                                                                                                      * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was false, but the `LFUTEX_WAIT_FLAG_TIMEOUT_*' bits were set.
                                                                                                                                      * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was true, but unused flag bits were set. */
 #define E_INVALID_ARGUMENT_CONTEXT_IOPL_LEVEL                         E_INVALID_ARGUMENT_CONTEXT_IOPL_LEVEL                         /* E_INVALID_ARGUMENT_BAD_VALUE: The `level' argument passed to `iopl()' was negative, or greater than `3' */
+#define E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE                       E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE                       /* E_INVALID_ARGUMENT_BAD_VALUE: At least one of the ports specified by the given range lies outside the valid port bounds */
+#define E_INVALID_ARGUMENT_CONTEXT_IOPERM_TURNON                      E_INVALID_ARGUMENT_CONTEXT_IOPERM_TURNON                      /* E_INVALID_ARGUMENT_BAD_VALUE: The `turn_on' argument is neither `0' nor `1' */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_OFLAG                        1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `F_SETFD' */
@@ -390,6 +394,8 @@ enum {
                                                                            * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was false, but the `LFUTEX_WAIT_FLAG_TIMEOUT_*' bits were set.
                                                                            * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was true, but unused flag bits were set. */
 #define E_INVALID_ARGUMENT_CONTEXT_IOPL_LEVEL                         104 /* E_INVALID_ARGUMENT_BAD_VALUE: The `level' argument passed to `iopl()' was negative, or greater than `3' */
+#define E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE                       105 /* E_INVALID_ARGUMENT_BAD_VALUE: At least one of the ports specified by the given range lies outside the valid port bounds */
+#define E_INVALID_ARGUMENT_CONTEXT_IOPERM_TURNON                      106 /* E_INVALID_ARGUMENT_BAD_VALUE: The `turn_on' argument is neither `0' nor `1' */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

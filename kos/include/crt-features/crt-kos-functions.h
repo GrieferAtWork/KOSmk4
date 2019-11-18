@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc36e6116 */
+/* HASH CRC-32:0x77a047e5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1188,6 +1188,8 @@ __CRT_FUNCTION(initstate_r,0,(),4,(unsigned int,seed,char *__restrict,statebuf,s
 __CRT_FUNCTION(innetgr,0,(),4,(char const *,netgroup,char const *,host,char const *,user,char const *,domain),int)
 __CRT_FUNCTION(insque,0,(),2,(void *__restrict,elem,void *,prev),void)
 __CRT_FUNCTION(ioctl,0,(),VA(2),(fd_t,fd,unsigned long int,request),__STDC_INT_AS_SSIZE_T)
+__CRT_FUNCTION(ioperm,0,(),3,(__ULONGPTR_TYPE__,from,__ULONGPTR_TYPE__,num,int,turn_on),int)
+__CRT_FUNCTION(iopl,0,(),1,(int,level),int)
 __CRT_FUNCTION(iruserok,0,(),4,(uint32_t,raddr,int,suser,char const *,remuser,char const *,locuser),int)
 __CRT_FUNCTION(iruserok_af,0,(),5,(void const *,raddr,int,suser,char const *,remuser,char const *,locuser,sa_family_t,af),int)
 __CRT_FUNCTION(isalnum,0,(),1,(int,ch),int)

@@ -17,6 +17,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
+%[crt_feature(environ, _environ, __environ)]
+%[crt_feature(__peb, __argc, __argv, _pgmptr)]
+%[crt_feature(program_invocation_name, __progname_full)]
+%[crt_feature(program_invocation_short_name, __progname)]
+
+
 %{
 #include <features.h>
 #include <unistd.h>

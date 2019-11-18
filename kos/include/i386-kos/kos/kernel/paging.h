@@ -113,6 +113,7 @@
 
 /* VM hints for where to map different, dynamic kernel components. */
 #ifdef __x86_64__
+/* TODO: Adjust these hints to work better in a 64-bit address space */
 #define KERNEL_VMHINT_HEAP         (0xe1200, VM_GETFREE_ABOVE) /* Hint for the regular kernel heap. */
 #define KERNEL_VMHINT_LHEAP        (0xe1a00, VM_GETFREE_ABOVE) /* Hint for the locked kernel heap. */
 #define KERNEL_VMHINT_SLAB         (0xe8000, VM_GETFREE_BELOW) /* Hint for the slab allocator. */
@@ -122,6 +123,7 @@
 #define KERNEL_VMHINT_LAPIC        (0xf0000, VM_GETFREE_BELOW) /* Hint for the LAPIC (if present). */
 #define KERNEL_VMHINT_TRAMPOLINE   (0xeffe0, VM_GETFREE_BELOW) /* Hint for per-task trampoline pages. */
 #define KERNEL_VMHINT_KERNSTACK    (0xeb000, VM_GETFREE_BELOW) /* Hint for kernel stacks. */
+#define KERNEL_VMHINT_ALTIDLE      (0xeeeee, VM_GETFREE_ABOVE) /* Hint for secondary CPU control structures. */
 #define KERNEL_VMHINT_IDLESTACK    (0xf0000, VM_GETFREE_BELOW) /* Hint for per-cpu IDLE stacks. */
 #define KERNEL_VMHINT_DFSTACK      (0xf0000, VM_GETFREE_BELOW) /* Hint for per-cpu #DF stacks. */
 #define KERNEL_VMHINT_DRIVER       (0xd0000, VM_GETFREE_ABOVE) /* Hint for the custom kernel-space drivers. */
@@ -142,6 +144,7 @@
 #define KERNEL_VMHINT_LAPIC        (0xf0000, VM_GETFREE_BELOW) /* Hint for the LAPIC (if present). */
 #define KERNEL_VMHINT_TRAMPOLINE   (0xeffe0, VM_GETFREE_BELOW) /* Hint for per-task trampoline pages. */
 #define KERNEL_VMHINT_KERNSTACK    (0xeb000, VM_GETFREE_BELOW) /* Hint for kernel stacks. */
+#define KERNEL_VMHINT_ALTIDLE      (0xeeeee, VM_GETFREE_ABOVE) /* Hint for secondary CPU control structures. */
 #define KERNEL_VMHINT_IDLESTACK    (0xf0000, VM_GETFREE_BELOW) /* Hint for per-cpu IDLE stacks. */
 #define KERNEL_VMHINT_DFSTACK      (0xf0000, VM_GETFREE_BELOW) /* Hint for per-cpu #DF stacks. */
 #define KERNEL_VMHINT_DRIVER       (0xd0000, VM_GETFREE_ABOVE) /* Hint for the custom kernel-space drivers. */

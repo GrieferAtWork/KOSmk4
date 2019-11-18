@@ -193,7 +193,7 @@ DECL_BEGIN
 #define __gfp_t_defined 1
 typedef unsigned int gfp_t;
 #endif /* !__gfp_t_defined */
-#endif
+#endif /* __CC__ */
 
 #define __GFP_HEAPMASK  0x0001
 #define __GFP_HEAPCOUNT 2

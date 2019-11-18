@@ -496,8 +496,7 @@ template<class T> struct xatomic_weaklyref {
 
 	/* Atomic compare-exchange */
 	__CXX_CLASSMEMBER NOBLOCK_IF(!PREEMPTION_ENABLED())
-	bool KCALL cmpxch(T *__restrict old_pointer,
-	                  T *__restrict new_pointer) __CXX_NOEXCEPT {
+	bool KCALL cmpxch(T *old_pointer, T *new_pointer) __CXX_NOEXCEPT {
 #ifdef CONFIG_NO_SMP
 		pflag_t was;
 #endif /* CONFIG_NO_SMP */

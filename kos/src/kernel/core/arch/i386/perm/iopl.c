@@ -40,10 +40,11 @@
 
 #include <asm/cpu-flags.h>
 #include <kos/except-inval.h>
-#include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state-compat.h>
+#include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <errno.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -191,6 +192,7 @@ sys_iopl_impl(struct icpustate *__restrict state,
 	 * the updated IOPL permissions level. */
 	pflags = (pflags & ~EFLAGS_IOPLMASK) | EFLAGS_IOPL(level);
 	icpustate_setpflags(state, pflags);
+	gpregs_setpax(&state->ics_gpregs, -EOK);
 	return state;
 }
 

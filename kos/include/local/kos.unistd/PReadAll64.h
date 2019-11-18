@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9c131e7 */
+/* HASH CRC-32:0xace6b2cc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __LOCAL_LIBC(PReadAll64) __ATTR_NONNULL((2)) __SIZE_TYPE__
                                            void *__buf,
                                            __SIZE_TYPE__ __bufsize,
                                            __pos64_t __offset) __THROWS(...) {
-#line 357 "kos/src/libc/magic/kos.unistd.c"
+#line 363 "kos/src/libc/magic/kos.unistd.c"
 	__SIZE_TYPE__ __result, __temp;
 	__result = __localdep_PRead64(__fd, __buf, __bufsize, __offset);
 	if (__result != 0 && (__SIZE_TYPE__)__result < __bufsize) {

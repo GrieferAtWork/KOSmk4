@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa695f422 */
+/* HASH CRC-32:0x82c0d7f9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -268,7 +268,7 @@ __LOCAL_LIBC(error_at_line) __ATTR_LIBC_PRINTF(5, 6) void
                                                unsigned int __line,
                                                char const *__format,
                                                ...) __THROWS(...) {
-#line 144 "kos/src/libc/magic/error.c"
+#line 147 "kos/src/libc/magic/error.c"
 #ifdef __LOCAL_error_one_per_line
 	static char const *__last_filename = __NULLPTR;
 	static unsigned int __last_line = 0;

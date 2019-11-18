@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeab7b42d */
+/* HASH CRC-32:0x9b7281f6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -495,6 +495,8 @@
 #define __CRT_HAVE___acosl 1
 #define __CRT_HAVE___adjtimex 1
 #define __CRT_HAVE___adjtimex64 1
+#define __CRT_HAVE___argc 1
+#define __CRT_HAVE___argv 1
 #define __CRT_HAVE___argz_add 1
 #define __CRT_HAVE___argz_add_sep 1
 #define __CRT_HAVE___argz_append 1
@@ -562,6 +564,7 @@
 #define __CRT_HAVE___dup2 1
 #define __CRT_HAVE___duplocale 1
 #define __CRT_HAVE___endmntent 1
+#define __CRT_HAVE___environ 1
 #define __CRT_HAVE___erf 1
 #define __CRT_HAVE___erfc 1
 #define __CRT_HAVE___erfcf 1
@@ -772,6 +775,7 @@
 #define __CRT_HAVE___p__wpgmptr 1
 #define __CRT_HAVE___p_program_invocation_name 1
 #define __CRT_HAVE___p_program_invocation_short_name 1
+#define __CRT_HAVE___peb 1
 #define __CRT_HAVE___pipe 1
 #define __CRT_HAVE___poll 1
 #define __CRT_HAVE___posix_getopt 1
@@ -782,6 +786,8 @@
 #define __CRT_HAVE___powf 1
 #define __CRT_HAVE___powl 1
 #define __CRT_HAVE___pread64 1
+#define __CRT_HAVE___progname 1
+#define __CRT_HAVE___progname_full 1
 #define __CRT_HAVE___pthread_cleanup_routine 1
 #define __CRT_HAVE___pthread_register_cancel 1
 #define __CRT_HAVE___pthread_register_cancel_defer 1
@@ -1008,6 +1014,7 @@
 #define __CRT_HAVE__ecvt_s 1
 #define __CRT_HAVE__endthread 1
 #define __CRT_HAVE__endthreadex 1
+#define __CRT_HAVE__environ 1
 #define __CRT_HAVE__eof 1
 #define __CRT_HAVE__errno 1
 #define __CRT_HAVE__execl 1
@@ -1196,6 +1203,7 @@
 #define __CRT_HAVE__open 1
 #define __CRT_HAVE__open_osfhandle 1
 #define __CRT_HAVE__pclose 1
+#define __CRT_HAVE__pgmptr 1
 #define __CRT_HAVE__pipe 1
 #define __CRT_HAVE__popen 1
 #define __CRT_HAVE__printf_l 1
@@ -1742,6 +1750,7 @@
 #define __CRT_HAVE_endusershell 1
 #define __CRT_HAVE_endutent 1
 #define __CRT_HAVE_endutxent 1
+#define __CRT_HAVE_environ 1
 #define __CRT_HAVE_envz_add 1
 #define __CRT_HAVE_envz_entry 1
 #define __CRT_HAVE_envz_get 1
@@ -2388,6 +2397,8 @@
 #define __CRT_HAVE_innetgr 1
 #define __CRT_HAVE_insque 1
 #define __CRT_HAVE_ioctl 1
+#define __CRT_HAVE_ioperm 1
+#define __CRT_HAVE_iopl 1
 #define __CRT_HAVE_iruserok 1
 #define __CRT_HAVE_iruserok_af 1
 #define __CRT_HAVE_is_wctype 1
@@ -2851,6 +2862,8 @@
 #define __CRT_HAVE_process_vm_readv 1
 #define __CRT_HAVE_process_vm_writev 1
 #define __CRT_HAVE_profil 1
+#define __CRT_HAVE_program_invocation_name 1
+#define __CRT_HAVE_program_invocation_short_name 1
 #define __CRT_HAVE_pselect 1
 #define __CRT_HAVE_pselect64 1
 #define __CRT_HAVE_psiginfo 1

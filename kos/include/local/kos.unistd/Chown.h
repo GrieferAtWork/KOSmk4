@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x861089eb */
+/* HASH CRC-32:0x25d98da */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __LOCAL_LIBC(Chown) __ATTR_NONNULL((1)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(Chown))(char const *__file,
                                       __uid_t __owner,
                                       __gid_t __group) __THROWS(...) {
-#line 125 "kos/src/libc/magic/kos.unistd.c"
+#line 131 "kos/src/libc/magic/kos.unistd.c"
 	__localdep_FChownAt(__CRT_AT_FDCWD, __file, __owner, __group, 0);
 }
 __NAMESPACE_LOCAL_END

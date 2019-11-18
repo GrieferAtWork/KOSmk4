@@ -33,24 +33,29 @@
 #include <kos/syscalls.h>
 #include <kos/sysctl.h>
 #include <kos/types.h>
-#include <kos/unistd.h>
 #include <kos/ukern.h>
-#include <sys/syscall.h>
+#include <kos/unistd.h>
+#include <sys/io.h>
+#include <sys/mmio.h>
 #include <sys/syscall-proto.h>
+#include <sys/syscall.h>
 
 #include <assert.h>
 #include <ctype.h>
+#include <err.h>
 #include <errno.h>
 #include <format-printer.h>
 #include <malloc.h>
+#include <sched.h>
 #include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/wait.h>
 #include <string.h>
 #include <syslog.h>
-#include <unistd.h>
 #include <termios.h>
+#include <unistd.h>
 
 DECL_BEGIN
 
@@ -181,6 +186,111 @@ int main_color(int argc, char *argv[], char *envp[]) {
 		}
 	}
 	printf("\n");
+	return 0;
+}
+/************************************************************************/
+
+
+
+
+
+/************************************************************************/
+int main_ioperm(int argc, char *argv[], char *envp[]) {
+	u16 portno = 0x3f8;
+	char const *s = "\n"
+	                "HELLO QEMU DEBUG PORT\n"
+	                "HELLO QEMU DEBUG PORT\n"
+	                "HELLO QEMU DEBUG PORT\n"
+	                "\n";
+	TRY {
+		/* Make sure that outsb() doesn't work by default */
+		outsb(portno, s, strlen(s));
+		printf("[unexpected] outsb:defl: ok\n");
+	} EXCEPT {
+		printf("[expected] outsb:defl: error_code(): %I#x\n", error_code());
+	}
+	TRY {
+		/* Make sure outsb() works with IOPL=3 */
+		if (iopl(3))
+			err(1, "[unexpected] iopl(3) failed");
+		outsb(portno, s, strlen(s));
+		printf("[expected] outsb:iopl(3): ok\n");
+	} EXCEPT {
+		printf("[unexpected] outsb:iopl(3): error_code(): %I#x\n", error_code());
+	}
+	TRY {
+		/* Make sure outsb() doesn't work with IOPL=0 */
+		if (iopl(0))
+			err(1, "[unexpected] iopl(0) failed");
+		outsb(portno, s, strlen(s));
+		printf("[unexpected] outsb:iopl(0): ok\n");
+	} EXCEPT {
+		printf("[expected] outsb:iopl(0): error_code(): %I#x\n", error_code());
+	}
+	TRY {
+		/* Make sure ioperm() can be used to enable access to ports */
+		if (ioperm(portno, 1, 1))
+			err(1, "ioperm(%#I16x, 1, 1) failed", portno);
+		outsb(portno, s, strlen(s));
+		printf("[expected] outsb:ioperm(1): ok\n");
+	} EXCEPT {
+		printf("[unexpected] outsb:ioperm(1): error_code(): %I#x\n", error_code());
+	}
+	TRY {
+		pid_t cpid = fork();
+		if (cpid == 0) {
+			printf("[expected] In child process\n");
+			/* Make sure that the child process inherited the ioperm() */
+			TRY {
+				outsb(portno, s, strlen(s));
+				printf("[expected] child:outsb:ioperm(1): ok\n");
+			} EXCEPT {
+				printf("[unexpected] child:outsb:ioperm(1): error_code(): %I#x\n", error_code());
+			}
+			TRY {
+				/* Turn off permissions within the child process. */
+				if (ioperm(portno, 1, 0))
+					err(1, "child:ioperm(%#I16x, 1, 1) failed", portno);
+				outsb(portno, s, strlen(s));
+				printf("[unexpected] child:outsb:ioperm(0): ok\n");
+			} EXCEPT {
+				printf("[expected] child:outsb:ioperm(0): error_code(): %I#x\n", error_code());
+			}
+			_Exit(0);
+		}
+		if (cpid < 0)
+			err(1, "fork() failed");
+		/* Wait for the child process, thus ensuring that our own
+		 * thread got preempted at least once */
+		errno = 0;
+		while (waitpid(cpid, NULL, 0) != cpid) {
+			if (errno)
+				err(1, "[unexpected] waitpid(%d) failed", cpid);
+		}
+		/* Make sure that ioperm() continues to work after fork() and preemption
+		 * This part is crucial, since this is where the CPU itself accesses a
+		 * kernel-space structure without letting user-space know. */
+		outsb(portno, s, strlen(s));
+		printf("[expected] outsb:ioperm(1): ok\n");
+	} EXCEPT {
+		printf("[unexpected] outsb:ioperm(1): error_code(): %I#x\n", error_code());
+	}
+	TRY {
+		/* Make sure ioperm() only enables access to the specified ports */
+		outsb(portno + 1, s, strlen(s));
+		printf("[unexpected] outsb:ioperm+1: ok\n");
+	} EXCEPT {
+		printf("[expected] outsb:ioperm+1: error_code(): %I#x\n", error_code());
+	}
+	TRY {
+		/* Make sure ioperm() can also be used to turn off permissions */
+		if (ioperm(portno, 1, 0))
+			err(1, "ioperm(%#I16x, 1, 1) failed", portno);
+		outsb(portno, s, strlen(s));
+		printf("[unexpected] outsb:ioperm(0): ok\n");
+	} EXCEPT {
+		printf("[expected] outsb:ioperm(0): error_code(): %I#x\n", error_code());
+	}
 	return 0;
 }
 /************************************************************************/
@@ -384,6 +494,7 @@ PRIVATE DEF defs[] = {
 	{ "except", &main_except },
 	{ "rawterm", &main_rawterm },
 	{ "color", &main_color },
+	{ "ioperm", &main_ioperm },
 	{ NULL, NULL },
 };
 
