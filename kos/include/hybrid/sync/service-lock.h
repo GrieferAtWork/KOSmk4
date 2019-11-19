@@ -27,6 +27,7 @@
  * from being non-blocking releases said lock. Additionally, to deal with some corner
  * cases where doing so improves performance, servicing is also checked when a lock is
  * acquired.
+ *
  * >> struct foo;
  * >> PRIVATE DEFINE_ATOMIC_RWLOCK(foolock);
  * >> PRIVATE WEAK struct foo *dead_foo = NULL;

@@ -149,6 +149,7 @@ again_read:
 		task_waitfor();
 		goto again_getslave;
 	}
+	decref_unlikely(slave);
 	return result;
 }
 
@@ -286,6 +287,8 @@ LOCAL REF struct pty_slave *KCALL pty_slave_alloc(void) {
 	/* Override device operators. */
 	result->cd_type.ct_fini  = &pty_slave_fini;
 	result->cd_type.ct_ioctl = &pty_slave_ioctl;
+	/* Initialize the output buffer. */
+	ringbuffer_cinit(&result->ps_obuf);
 	return result;
 }
 
@@ -356,12 +359,12 @@ pty_alloc(REF struct pty_master **__restrict pmaster,
 }
 
 
-DEFINE_SYSCALL5(errno_t,openpty,
-                USER UNCHECKED fd_t *,amaster,
-                USER UNCHECKED fd_t *,aslave,
-                USER UNCHECKED char *,name,
-                USER UNCHECKED struct termios const *,termp,
-                USER UNCHECKED struct winsize const *,winp) {
+DEFINE_SYSCALL5(errno_t, openpty,
+                USER UNCHECKED fd_t *, amaster,
+                USER UNCHECKED fd_t *, aslave,
+                USER UNCHECKED char *, name,
+                USER UNCHECKED struct termios const *, termp,
+                USER UNCHECKED struct winsize const *, winp) {
 	struct handle temp;
 	fd_t fdmaster, fdslave;
 	REF struct pty_master *master;

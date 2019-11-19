@@ -2148,13 +2148,31 @@ NOTHROW(KCALL directory_addentry)(struct directory_node *__restrict self,
 	}
 }
 
-#if 1
+LOCAL NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL directory_delentry_bypos)(struct directory_node *__restrict self,
+                                        struct directory_entry *__restrict entry) {
+	/* Remove the entry from the by-position chain. */
+	if (entry == self->d_bypos_end) {
+		if (entry == self->d_bypos) {
+			/* Remove the last entry. */
+			assert(entry->de_bypos.ln_pself == &self->d_bypos);
+			assert(entry->de_bypos.ln_next  == NULL);
+			self->d_bypos_end = NULL;
+		} else {
+			/* Update `d_bypos_end' to point to the previous entry. */
+			self->d_bypos_end = LLIST_PREV(struct directory_entry, entry, de_bypos);
+		}
+	}
+	/* Unlink the entry from the parent directory. */
+	LLIST_REMOVE(entry, de_bypos);
+}
+
 INTERN NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL directory_delentry)(struct directory_node *__restrict self,
                                   /*out*/ REF struct directory_entry *__restrict entry) {
 	struct directory_entry **pdirent, *iter;
-	/* Remove the entry from the by-pos chain of entries. */
-	LLIST_REMOVE(entry, de_bypos);
+	/* Remove the entry from the by-position chain. */
+	directory_delentry_bypos(self, entry);
 	/* Add the new entry to the hash-map. */
 	assert(self->d_map);
 	pdirent = &self->d_map[entry->de_hash & self->d_mask];
@@ -2178,7 +2196,6 @@ NOTHROW(KCALL directory_delentry)(struct directory_node *__restrict self,
 	memset(&entry->de_next, 0xcc, sizeof(entry->de_next));
 #endif
 }
-#endif
 
 
 
@@ -2237,19 +2254,7 @@ NOTHROW(KCALL remove_dirent_from_directory)(struct directory_node *__restrict se
 	assert(self->d_size >= 1);
 	assert((self->d_bypos != NULL) == (self->d_bypos_end != NULL));
 	/* Remove the entry from the by-position chain. */
-	if (entry == self->d_bypos_end) {
-		if (entry == self->d_bypos) {
-			/* Remove the last entry. */
-			assert(entry->de_bypos.ln_pself == &self->d_bypos);
-			assert(entry->de_bypos.ln_next  == NULL);
-			self->d_bypos_end = NULL;
-		} else {
-			/* Update `d_bypos_end' to point to the previous entry. */
-			self->d_bypos_end = LLIST_PREV(struct directory_entry, entry, de_bypos);
-		}
-	}
-	/* Unlink the entry from the parent directory. */
-	LLIST_REMOVE(entry, de_bypos);
+	directory_delentry_bypos(self, entry);
 	/* Update the directory entry counter. */
 	--self->d_size;
 	/* Do some integrity checks. */
@@ -2925,7 +2930,7 @@ acquire_sourcedir_writelock:
 						assert(source_directory->d_size >= 1);
 						--source_directory->d_size;
 						/* Remove the entry from the by-position chain. */
-						LLIST_REMOVE(source_entry, de_bypos);
+						directory_delentry_bypos(source_directory, source_entry);
 						if (source_directory->d_size <= (source_directory->d_mask / 3)) {
 							assert(source_directory->d_mask != 0);
 							directory_rehash_smaller_nx(source_directory);

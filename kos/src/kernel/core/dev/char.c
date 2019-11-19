@@ -96,11 +96,13 @@ NOTHROW(KCALL character_device_free)(struct character_device *__restrict self) {
 LOCAL NOBLOCK void
 NOTHROW(KCALL remove_character_device_from_tree)(struct character_device *__restrict self) {
 	struct character_device *removed;
-	removed = cdev_tree_remove(&character_device_tree,
-	                           character_device_devno(self));
-	if unlikely(removed != self) {
-		if likely(removed)
-			cdev_tree_insert(&character_device_tree, removed);
+	if (self->cd_devlink.a_vaddr != DEV_UNSET) {
+		removed = cdev_tree_remove(&character_device_tree,
+								   character_device_devno(self));
+		if unlikely(removed != self) {
+			if likely(removed)
+				cdev_tree_insert(&character_device_tree, removed);
+		}
 	}
 }
 
@@ -137,7 +139,6 @@ NOTHROW(KCALL character_device_destroy)(struct character_device *__restrict self
 	/* Invoke a custom finalizer callback */
 	if (self->cd_type.ct_fini)
 		(*self->cd_type.ct_fini)(self);
-	assert(self->cd_devlink.a_vaddr == DEV_UNSET);
 	/* Check if the device should be removed from devfs, and drop
 	 * the references held to its INode and directory entry. */
 	if (self->cd_devfs_inode) {
@@ -147,21 +148,25 @@ NOTHROW(KCALL character_device_destroy)(struct character_device *__restrict self
 		decref_likely(self->cd_devfs_entry);
 	}
 	if (self->cd_flags & CHARACTER_DEVICE_FLAG_WEAKREG) {
-		if (cdl_trywrite()) {
-			remove_character_device_from_tree(self);
-			cdl_endwrite();
-		} else {
-			struct character_device *next;
-			/* Add the device to the chain of devices that are pending to be removed. */
-			do {
-				next = ATOMIC_READ(dead_character_devices);
-				ATOMIC_WRITE(dead_character_devices_NEXTP(self), next);
-			} while (!ATOMIC_CMPXCH_WEAK(dead_character_devices, next, self));
-			/* Try to service the chain of pending devices (in case we've
-			 * added ours after the tree had already been unlocked again) */
-			cdl_service();
-			return;
+		if (self->cd_devlink.a_vaddr != DEV_UNSET) {
+			if (cdl_trywrite()) {
+				remove_character_device_from_tree(self);
+				cdl_endwrite();
+			} else {
+				struct character_device *next;
+				/* Add the device to the chain of devices that are pending to be removed. */
+				do {
+					next = ATOMIC_READ(dead_character_devices);
+					ATOMIC_WRITE(dead_character_devices_NEXTP(self), next);
+				} while (!ATOMIC_CMPXCH_WEAK(dead_character_devices, next, self));
+				/* Try to service the chain of pending devices (in case we've
+				 * added ours after the tree had already been unlocked again) */
+				cdl_service();
+				return;
+			}
 		}
+	} else {
+		assert(self->cd_devlink.a_vaddr == DEV_UNSET);
 	}
 	character_device_free(self);
 }
