@@ -338,6 +338,7 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 	.cfi_restore_state
 .Lillegal_task_yield:
 	movq   $(ERROR_CODEOF(E_WOULDBLOCK_PREEMPTED)), %rdi
+	PUBLIC(error_throw)
 	call   error_throw
 END(X86_ASMSYSCALL64(sched_yield))
 END(task_yield)

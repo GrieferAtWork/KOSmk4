@@ -402,6 +402,7 @@ IU(	pushfl_cfi_r)
 IU(	pushal_cfi_r)
 IU(	INTERN(libc_error_info))
 IU(	call   libc_error_info)
+IU(	movl   OFFSET_GPREGS_ECX(%esp), %ecx) /* Reload %ecx, which may have been clobbered by `libc_error_info()' */
 	movl   %ecx, FIELD_ERROR_CODE
 #if EXCEPTION_DATA_POINTERS != 0
 	.Lindex = 0

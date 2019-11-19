@@ -304,6 +304,7 @@ PUBLIC_FUNCTION(task_yield)
 	.cfi_restore_state
 .Lillegal_task_yield:
 	movl   $(ERROR_CODEOF(E_WOULDBLOCK_PREEMPTED)), %ecx
+	PUBLIC(error_throw)
 	call   error_throw
 END(task_yield)
 .cfi_endproc

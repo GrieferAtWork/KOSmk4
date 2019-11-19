@@ -443,9 +443,9 @@ int main_except(int argc, char *argv[], char *envp[]) {
 	 */
 	TRY {
 		Pipe(NULL);
-		printf("syscall: Shouldn't get here!\n");
+		printf("[unexpected] syscall: Shouldn't get here!\n");
 	} EXCEPT {
-		printf("syscall: error_code(): %I#x\n", error_code());
+		printf("[expected] syscall: error_code(): %I#x\n", error_code());
 	}
 	/* Also make sure that ukern system calls _can_ work */
 	{
@@ -459,28 +459,28 @@ int main_except(int argc, char *argv[], char *envp[]) {
 	}
 	TRY {
 		userkern_Syscall(userkern_self(), pipe)(NULL);
-		printf("syscall: Shouldn't get here! (useg)\n");
+		printf("[unexpected] syscall: Shouldn't get here! (useg)\n");
 	} EXCEPT {
-		printf("syscall: error_code(): %I#x (useg)\n", error_code());
+		printf("[expected] syscall: error_code(): %I#x (useg)\n", error_code());
 	}
 	/* TODO: Manually invoke: lcall $7 */
 	/* TODO: Manually invoke: int $0x80 */
 	/* TODO: Manually invoke: sysenter */
 	TRY {
 		THROW(E_DIVIDE_BY_ZERO);
-		printf("THROW(): Shouldn't get here!\n");
+		printf("[unexpected] THROW(): Shouldn't get here!\n");
 	} EXCEPT {
-		printf("THROW(): error_code(): %I#x\n", error_code());
+		printf("[expected] THROW(): error_code(): %I#x\n", error_code());
 	}
 	TRY {
 		static volatile int x = 10;
 		static volatile int y = 0;
 		static volatile int z;
 		z = x / y;
-		printf("usfault: Shouldn't get here!\n");
+		printf("[unexpected] usfault: Shouldn't get here!\n");
 		x = z; /* Suppress z set, but not used */
 	} EXCEPT {
-		printf("usfault: error_code(): %I#x\n", error_code());
+		printf("[expected] usfault: error_code(): %I#x\n", error_code());
 	}
 	return 0;
 }
@@ -538,7 +538,7 @@ int main_dprint(int argc, char *argv[], char *envp[]) {
 	 * doesn't seem to be a way to prevent the `cmd: ' prefix for those.
 	 * Now why do I care? Well: Because of that prefix, it is impossible for me
 	 * to output file paths in such a way that they become clickable so-as to
-	 * allow be to immediately go to the associated source location.
+	 * allow me to immediately go to the associated source location.
 	 */
 	format_printf(&debug_printer, NULL,
 	              "a = %s\n"
