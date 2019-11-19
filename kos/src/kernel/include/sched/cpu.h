@@ -312,9 +312,16 @@ DATDEF ATTR_PERTASK struct cpu *this_cpu;
  *   - When no other thread is running on the associated CPU, the IDLE
  *     thread will be the thread in `c_current'
  *   - Calling `task_pause()' is called from the IDLE thread will always
- *     return after the next sporadic interrupt (always returning `false')
- */
+ *     return after the next sporadic interrupt (always returning `false') */
 DATDEF ATTR_PERCPU struct task thiscpu_idle;
+
+DATDEF ATTR_PERCPU cpuid_t thiscpu_id;            /* ALIAS:THIS_CPU->c_id */
+DATDEF ATTR_PERCPU struct task *thiscpu_current;  /* ALIAS:THIS_CPU->c_current */
+DATDEF ATTR_PERCPU struct task *thiscpu_override; /* ALIAS:THIS_CPU->c_override */
+#ifndef CONFIG_NO_SMP
+DATDEF ATTR_PERCPU struct task *thiscpu_pending; /* ALIAS:THIS_CPU->c_pending */
+#endif /* !CONFIG_NO_SMP */
+
 
 #ifdef CONFIG_NO_SMP
 #undef THIS_CPU

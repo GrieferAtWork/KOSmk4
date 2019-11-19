@@ -370,7 +370,7 @@ NOTHROW(KCALL print_exception_desc_of)(struct exception_data const *__restrict d
 
 PRIVATE void
 NOTHROW(KCALL print_exception_desc)(pformatprinter printer, void *arg) {
-	print_exception_desc_of(&PERTASK(this_exception_info).ei_data, printer, arg);
+	print_exception_desc_of(&THIS_EXCEPTION_DATA, printer, arg);
 }
 
 INTDEF ssize_t LIBREGDUMP_CC
@@ -385,7 +385,7 @@ NOTHROW(KCALL print_unhandled_exception)(pformatprinter printer, void *arg,
 	unsigned int i;
 	bool is_first_pointer;
 	char const *name;
-	struct exception_info *info = &PERTASK(this_exception_info);
+	struct exception_info *info = &THIS_EXCEPTION_INFO;
 	struct regdump_printer rd_printer;
 
 	/* Dump the exception that occurred. */
@@ -514,7 +514,7 @@ panic_uhe_dbg_main(void *arg) {
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 #if EXCEPT_BACKTRACE_SIZE != 0
 	{
-		struct exception_info *info = &PERTASK(this_exception_info);
+		struct exception_info *info = &THIS_EXCEPTION_INFO;
 		uintptr_t prev_last_pc;
 		unsigned int i;
 		uintptr_t my_last_pc = args->last_pc;
@@ -559,7 +559,7 @@ halt_unhandled_exception(unsigned int unwind_error,
 	print_unhandled_exception(&kprinter, (void *)KERN_EMERG,
 	                          &kprinter, (void *)KERN_RAW,
 	                          NULL, NULL);
-	info = &PERTASK(this_exception_info);
+	info = &THIS_EXCEPTION_INFO;
 #if EXCEPT_BACKTRACE_SIZE != 0
 	{
 		uintptr_t prev_last_pc;
@@ -765,16 +765,16 @@ search_fde:
 
 #if EXCEPT_BACKTRACE_SIZE != 0
 	/* Remember the current state PC as a new entry in the exception's traceback. */
-	if (PERTASK_GET(this_exception_info.ei_trace[EXCEPT_BACKTRACE_SIZE - 1]) == NULL) {
+	if (PERTASK_GET(this_exception_trace[EXCEPT_BACKTRACE_SIZE - 1]) == NULL) {
 #if EXCEPT_BACKTRACE_SIZE > 1
 		unsigned int i;
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE - 1; ++i) {
-			if (!PERTASK_GET(this_exception_info.ei_trace[i]))
+			if (!PERTASK_GET(this_exception_trace[i]))
 				break;
 		}
-		PERTASK_SET(this_exception_info.ei_trace[i], (void *)kcpustate_getpc(state));
+		PERTASK_SET(this_exception_trace[i], (void *)kcpustate_getpc(state));
 #else /* EXCEPT_BACKTRACE_SIZE > 1 */
-		PERTASK_SET(this_exception_info.ei_trace[0], (void *)kcpustate_getpc(state));
+		PERTASK_SET(this_exception_trace[0], (void *)kcpustate_getpc(state));
 #endif /* EXCEPT_BACKTRACE_SIZE <= 1 */
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -844,11 +844,7 @@ NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
 				 * implementation detail of the runtime, but rather stored in an exposed, per-task variable.
 				 * So while what we write here really doesn't matter at all, let's just put in something
 				 * that at the very least makes a bit of sense. */
-#ifdef __x86_64__
-				state->kcs_gpregs.gp_rax = (uintptr_t)&PERTASK(this_exception_info);
-#else /* __x86_64__ */
-				state->kcs_gpregs.gp_eax = (uintptr_t)&PERTASK(this_exception_info);
-#endif /* !__x86_64__ */
+				gpregs_setpax(&state->kcs_gpregs, (uintptr_t)&THIS_EXCEPTION_INFO);
 			}
 			return DWARF_PERSO_EXECUTE_HANDLER;
 		}
@@ -924,10 +920,11 @@ PUBLIC void __cxa_end_catch(void) {
 
 	/* For our purposes, we only get here when an EXCEPT block reaches
 	 * its end, and we delete the exception if it wasn't re-thrown. */
-	struct exception_info *info = &PERTASK(this_exception_info);
-	if (!(info->ei_flags & EXCEPT_FRETHROW))
-		info->ei_code = E_OK;
-	info->ei_flags &= ~EXCEPT_FRETHROW;
+	uintptr_t flags;
+	flags = PERTASK_GET(this_exception_flags);
+	if (!(flags & EXCEPT_FRETHROW))
+		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OK));
+	PERTASK_SET(this_exception_flags, flags & ~EXCEPT_FRETHROW);
 }
 
 

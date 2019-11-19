@@ -113,7 +113,7 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 	/* Fill in user-space context information */
 	icpustate_user_to_kcpustate64(state, user_state);
 	/* Copy exception data onto the user-space stack. */
-	mydata = &THIS_EXCEPTION_INFO.ei_data;
+	mydata = &THIS_EXCEPTION_DATA;
 	user_error->e_code = (error_code64_t)mydata->e_code;
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		user_error->e_pointers[i] = (u64)mydata->e_pointers[i];
@@ -175,7 +175,7 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 	/* Fill in user-space context information */
 	icpustate_user_to_kcpustate32(state, user_state);
 	/* Copy exception data onto the user-space stack. */
-	mydata = &THIS_EXCEPTION_INFO.ei_data;
+	mydata = &THIS_EXCEPTION_DATA;
 	user_error->e_code = (error_code32_t)mydata->e_code;
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		user_error->e_pointers[i] = (u32)mydata->e_pointers[i];
@@ -483,7 +483,7 @@ terminate_app:
 	__builtin_unreachable();
 done:
 	/* Delete the currently set exception. */
-	PERTASK_SET(this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_OK));
+	PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OK));
 	return result;
 }
 

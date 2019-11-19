@@ -2977,7 +2977,7 @@ kernel_exec_rpc_func(void *arg, struct icpustate *__restrict state,
 		                           data->er_argv,
 		                           data->er_envp);
 	} EXCEPT {
-		memcpy(&data->er_path, &THIS_EXCEPTION_INFO, sizeof(old_exception_info));
+		memcpy(&data->er_except, &THIS_EXCEPTION_INFO, sizeof(data->er_except));
 		goto restore_exception;
 	}
 	/* Success! -> In this case _we_ must inherit the given RPC data packet,
@@ -2989,8 +2989,7 @@ kernel_exec_rpc_func(void *arg, struct icpustate *__restrict state,
 	kfree(data);
 	return state;
 restore_exception:
-	memcpy(&THIS_EXCEPTION_INFO,
-	       &old_exception_info,
+	memcpy(&THIS_EXCEPTION_INFO, &old_exception_info,
 	       sizeof(old_exception_info));
 done_signal_exception:
 	if (sig_broadcast(&data->er_error) == 0) {
@@ -3118,7 +3117,7 @@ kernel_execveat(struct icpustate *__restrict state,
 #endif
 			/* We only get here if the exec() failed, in which case the reason will have
 			 * been stored in `data->er_except'. */
-			memcpy(&THIS_EXCEPTION_INFO.ei_data,
+			memcpy(&THIS_EXCEPTION_DATA,
 			       &data->er_except, sizeof(data->er_except));
 			/* On error, we re-inherit the arguments structure, however the
 			 * references within are always inherited by the RPC callback! */

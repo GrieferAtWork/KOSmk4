@@ -422,7 +422,7 @@ user_rpc_callback(void *arg, struct icpustate *__restrict state,
 	struct user_rpc_data *data;
 	struct exception_data old_except;
 	data = (struct user_rpc_data *)arg;
-	memcpy(&old_except, &THIS_EXCEPTION_INFO.ei_data, sizeof(old_except));
+	memcpy(&old_except, &THIS_EXCEPTION_DATA, sizeof(old_except));
 	TRY {
 		uintptr_t *futex_pointer = UNUSED_FUTEX_POINTER;
 		/* Make sure that the arguments pointer is located in user-space.
@@ -881,7 +881,7 @@ done:
 	decref_likely(data);
 	return state;
 restore_old_except:
-	memcpy(&THIS_EXCEPTION_INFO.ei_data, &old_except, sizeof(old_except));
+	memcpy(&THIS_EXCEPTION_DATA, &old_except, sizeof(old_except));
 	goto done;
 }
 

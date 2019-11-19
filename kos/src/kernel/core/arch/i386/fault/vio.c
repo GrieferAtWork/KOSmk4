@@ -4478,23 +4478,22 @@ undefined_instruction:
 			if (fixed_pc > (uintptr_t)end_pc)
 				end_pc = (byte_t *)fixed_pc;
 			irregs_wrip(&state->ics_irregs, (uintptr_t)end_pc);
-			PERTASK_SET(this_exception_info.ei_code,
-			            (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_VIO_UNRECOGNIZED));
-			PERTASK_SET(this_exception_info.ei_data.e_pointers[0], (uintptr_t)opcode);
-			PERTASK_SET(this_exception_info.ei_data.e_pointers[1], (uintptr_t)cr2);
+			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_VIO_UNRECOGNIZED));
+			PERTASK_SET(this_exception_pointers[0], (uintptr_t)opcode);
+			PERTASK_SET(this_exception_pointers[1], (uintptr_t)cr2);
 			for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
-				PERTASK_SET(this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
+				PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 #if EXCEPT_BACKTRACE_SIZE != 0
 			for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-				PERTASK_SET(this_exception_info.ei_trace[i], (void *)0);
+				PERTASK_SET(this_exception_trace[i], (void *)0);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-			PERTASK_SET(this_exception_info.ei_data.e_faultaddr, (void *)orig_pc);
+			PERTASK_SET(this_exception_faultaddr, (void *)orig_pc);
 			cleanup_and_unwind_interrupt(args, state);
 		}
 done:
 		irregs_wrip(&state->ics_irregs, (uintptr_t)pc);
 	} EXCEPT {
-		PERTASK_SET(this_exception_info.ei_data.e_faultaddr, (void *)orig_pc);
+		PERTASK_SET(this_exception_faultaddr, (void *)orig_pc);
 		cleanup_and_unwind_interrupt(args, state);
 	}
 	decref_unlikely(args->ma_args.va_block);
@@ -4531,7 +4530,7 @@ do_pop_value_2_4_kernel_sp:
 			WR_VIOL((u32)value);
 		}
 	} EXCEPT {
-		PERTASK_SET(this_exception_info.ei_data.e_faultaddr, (void *)orig_pc);
+		PERTASK_SET(this_exception_faultaddr, (void *)orig_pc);
 		cleanup_and_unwind_interrupt(args, state);
 	}
 	decref_unlikely(args->ma_args.va_block);

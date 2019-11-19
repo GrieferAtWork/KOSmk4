@@ -59,9 +59,10 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL aio_handle_generic_func_)(struct aio_handle_generic *__restrict self,
                                         unsigned int status) {
 	self->hg_status = status;
-	if (status == AIO_COMPLETION_FAILURE)
-		memcpy(&self->hg_error, &THIS_EXCEPTION_INFO.ei_data,
+	if (status == AIO_COMPLETION_FAILURE) {
+		memcpy(&self->hg_error, &THIS_EXCEPTION_DATA,
 		       sizeof(struct exception_data));
+	}
 	COMPILER_WRITE_BARRIER();
 	sig_broadcast(&self->hg_signal);
 }
@@ -363,7 +364,7 @@ NOTHROW(KCALL aio_handle_multiple_func_)(struct aio_handle_multiple *__restrict 
 	/* Must store the current context. */
 	if (status == AIO_COMPLETION_FAILURE && (old_status & AIO_MULTIHANDLE_STATUS_STATUSMASK) <
 	                                        ((uintptr_t)AIO_COMPLETION_FAILURE << AIO_MULTIHANDLE_STATUS_STATUSSHFT))
-		memcpy(&hand->am_error, &THIS_EXCEPTION_INFO.ei_data, sizeof(hand->am_error));
+		memcpy(&hand->am_error, &THIS_EXCEPTION_DATA, sizeof(hand->am_error));
 	if (!(old_status & AIO_MULTIHANDLE_STATUS_ALLRUNNING))
 		return; /* Premature completion (don't invoke the callback, yet) */
 	if ((old_status & AIO_MULTIHANDLE_STATUS_RUNMASK) == 1) {
@@ -371,7 +372,7 @@ NOTHROW(KCALL aio_handle_multiple_func_)(struct aio_handle_multiple *__restrict 
 		unsigned int final_status;
 		final_status = (new_status & AIO_MULTIHANDLE_STATUS_STATUSMASK) >> AIO_MULTIHANDLE_STATUS_STATUSSHFT;
 		if (final_status == AIO_COMPLETION_FAILURE)
-			memcpy(&THIS_EXCEPTION_INFO.ei_data, &hand->am_error, sizeof(hand->am_error));
+			memcpy(&THIS_EXCEPTION_DATA, &hand->am_error, sizeof(hand->am_error));
 		(*hand->am_func)(hand, final_status);
 	}
 }
@@ -565,7 +566,7 @@ NOTHROW(KCALL aio_multihandle_done)(struct aio_multihandle *__restrict self) {
 		/* All handles have already completed. */
 		status = (old_status & AIO_MULTIHANDLE_STATUS_STATUSMASK) >> AIO_MULTIHANDLE_STATUS_STATUSSHFT;
 		if (status == AIO_COMPLETION_FAILURE)
-			memcpy(&THIS_EXCEPTION_INFO.ei_data, &self->am_error, sizeof(self->am_error));
+			memcpy(&THIS_EXCEPTION_DATA, &self->am_error, sizeof(self->am_error));
 		/* Invoke the completion callback. */
 		(*self->am_func)(self, status);
 	}
@@ -594,9 +595,9 @@ NOTHROW(KCALL aio_multihandle_fail)(struct aio_multihandle *__restrict self) {
 	/* Copy active exception information. */
 	if ((old_status & (uintptr_t)AIO_MULTIHANDLE_STATUS_STATUSMASK) <
 	    ((uintptr_t)AIO_COMPLETION_FAILURE << AIO_MULTIHANDLE_STATUS_STATUSSHFT))
-		memcpy(&self->am_error, &THIS_EXCEPTION_INFO.ei_data, sizeof(self->am_error));
+		memcpy(&self->am_error, &THIS_EXCEPTION_DATA, sizeof(self->am_error));
 	/* Invoke the completion function. */
-	memcpy(&THIS_EXCEPTION_INFO.ei_data, &self->am_error, sizeof(self->am_error));
+	memcpy(&THIS_EXCEPTION_DATA, &self->am_error, sizeof(self->am_error));
 	(*self->am_func)(self, AIO_COMPLETION_FAILURE);
 }
 

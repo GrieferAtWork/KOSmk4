@@ -1152,7 +1152,7 @@ check_handle_state_for_save:
 	
 			case AIO_COMPLETION_FAILURE:
 				/* Propagate errors as exceptions. */
-				memcpy(&THIS_EXCEPTION_INFO.ei_data,
+				memcpy(&THIS_EXCEPTION_DATA,
 				       &handle.hg_error,
 				       sizeof(handle.hg_error));
 				error_throw_current();
@@ -1205,7 +1205,7 @@ check_handle_state_for_load:
 	
 		case AIO_COMPLETION_FAILURE:
 			/* Propagate errors as exceptions. */
-			memcpy(&THIS_EXCEPTION_INFO.ei_data,
+			memcpy(&THIS_EXCEPTION_DATA,
 			       &handle.hg_error,
 			       sizeof(handle.hg_error));
 			error_throw_current();

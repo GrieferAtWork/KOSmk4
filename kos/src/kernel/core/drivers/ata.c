@@ -595,7 +595,7 @@ PRIVATE NOBLOCK ATTR_NOINLINE void
 NOTHROW(FCALL handle_completion_ioerror)(struct aio_handle *__restrict self,
                                          errr_t errr) {
 	struct exception_data old_data;
-	struct exception_data *mydata = &THIS_EXCEPTION_INFO.ei_data;
+	struct exception_data *mydata = &THIS_EXCEPTION_DATA;
 	memcpy(&old_data, mydata, sizeof(struct exception_data));
 	memset(mydata, 0, sizeof(struct exception_data));
 	mydata->e_code        = ERROR_CODE(ERRR_C(errr), ERRR_S(errr));
@@ -611,7 +611,7 @@ PRIVATE NOBLOCK ATTR_NOINLINE void
 NOTHROW(FCALL handle_completion_ioerror_generic)(struct aio_handle *__restrict self,
                                                  errr_t errr) {
 	struct exception_data old_data;
-	struct exception_data *mydata = &THIS_EXCEPTION_INFO.ei_data;
+	struct exception_data *mydata = &THIS_EXCEPTION_DATA;
 	assert(self->ah_type == &Ata_DmaHandleType ||
 	       self->ah_type == &aio_noop_type);
 	memcpy(&old_data, mydata, sizeof(struct exception_data));

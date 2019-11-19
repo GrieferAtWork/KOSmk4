@@ -853,15 +853,13 @@ upgrade_and_recheck_vm_for_node:
 endread_and_decref_part_and_set_readonly:
 					sync_endread(part);
 					decref_unlikely(part);
-					PERTASK_SET(this_exception_info.ei_code,
-					            ERROR_CODEOF(E_SEGFAULT_READONLY));
+					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_READONLY));
 					goto pop_connections_and_set_exception_pointers;
 				}
 				if unlikely(!(node->vn_prot & VM_PROT_READ) &&
 				            !(ecode & PAGEFAULT_F_WRITING)) {
 					/* Write-only memory */
-					PERTASK_SET(this_exception_info.ei_code,
-					            ERROR_CODEOF(E_SEGFAULT_NOTREADABLE));
+					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTREADABLE));
 					sync_endread(part);
 					decref_unlikely(part);
 					goto pop_connections_and_set_exception_pointers;
@@ -872,8 +870,7 @@ endread_and_decref_part_and_set_readonly:
 endread_and_decref_part_and_set_noexec:
 						sync_endread(part);
 						decref_unlikely(part);
-						PERTASK_SET(this_exception_info.ei_code,
-						            ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
+						PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
 						goto pop_connections_and_set_exception_pointers;
 					}
 				}
@@ -987,7 +984,7 @@ done_before_pop_connections:
 			task_disconnectall();
 			task_popconnections(&con);
 			if (isuser())
-				PERTASK_SET(this_exception_info.ei_data.e_faultaddr, (void *)pc);
+				PERTASK_SET(this_exception_faultaddr, (void *)pc);
 			RETHROW();
 		}
 		task_popconnections(&con);
@@ -1016,7 +1013,7 @@ throw_segfault:
 		} EXCEPT {
 			if (!was_thrown(E_SEGFAULT)) {
 				if (isuser())
-					PERTASK_SET(this_exception_info.ei_data.e_faultaddr, (void *)pc);
+					PERTASK_SET(this_exception_faultaddr, (void *)pc);
 				RETHROW();
 			}
 			goto not_a_badcall;
@@ -1041,16 +1038,16 @@ throw_segfault:
 			                                    SIZEOF_IRREGS_KERNEL);
 		}
 #endif /* !__x86_64__ */
-		PERTASK_SET(this_exception_info.ei_data.e_faultaddr, (void *)old_eip);
-		PERTASK_SET(this_exception_info.ei_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
-		PERTASK_SET(this_exception_info.ei_data.e_pointers[0], (uintptr_t)addr);
+		PERTASK_SET(this_exception_faultaddr, (void *)old_eip);
+		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
+		PERTASK_SET(this_exception_pointers[0], (uintptr_t)addr);
 #if PAGEFAULT_F_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
 PAGEFAULT_F_WRITING == E_SEGFAULT_CONTEXT_WRITING
-		PERTASK_SET(this_exception_info.ei_data.e_pointers[1],
+		PERTASK_SET(this_exception_pointers[1],
 		            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
 		            (uintptr_t)(ecode & (PAGEFAULT_F_USERSPACE | PAGEFAULT_F_WRITING)));
 #else
-		PERTASK_SET(this_exception_info.ei_data.e_pointers[1],
+		PERTASK_SET(this_exception_pointers[1],
 		            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
 		            (uintptr_t)(ecode & PAGEFAULT_F_USERSPACE ? E_SEGFAULT_CONTEXT_USERCODE : 0) |
 		            (uintptr_t)(ecode & PAGEFAULT_F_WRITING ? E_SEGFAULT_CONTEXT_WRITING : 0));
@@ -1058,28 +1055,28 @@ PAGEFAULT_F_WRITING == E_SEGFAULT_CONTEXT_WRITING
 		{
 			unsigned int i;
 			for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
-				PERTASK_SET(this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
+				PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 		}
 		goto do_unwind_state;
 	}
 not_a_badcall:
 	if ((ecode & (PAGEFAULT_F_PRESENT | PAGEFAULT_F_WRITING)) == (PAGEFAULT_F_PRESENT | PAGEFAULT_F_WRITING)) {
-		PERTASK_SET(this_exception_info.ei_code, ERROR_CODEOF(E_SEGFAULT_READONLY));
+		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_READONLY));
 	} else if ((ecode & PAGEFAULT_F_PRESENT) && ((ecode & PAGEFAULT_F_INSTRFETCH) ||
 	                                             (pc == (uintptr_t)addr))) {
-		PERTASK_SET(this_exception_info.ei_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
+		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
 	} else {
-		PERTASK_SET(this_exception_info.ei_code, ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
+		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
 	}
 set_exception_pointers:
-	PERTASK_SET(this_exception_info.ei_data.e_pointers[0], (uintptr_t)addr);
+	PERTASK_SET(this_exception_pointers[0], (uintptr_t)addr);
 #if PAGEFAULT_F_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
     PAGEFAULT_F_WRITING == E_SEGFAULT_CONTEXT_WRITING
-	PERTASK_SET(this_exception_info.ei_data.e_pointers[1],
+	PERTASK_SET(this_exception_pointers[1],
 	            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
 	            (uintptr_t)(ecode & (PAGEFAULT_F_USERSPACE | PAGEFAULT_F_WRITING)));
 #else
-	PERTASK_SET(this_exception_info.ei_data.e_pointers[1],
+	PERTASK_SET(this_exception_pointers[1],
 	            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
 	            (uintptr_t)(ecode & PAGEFAULT_F_USERSPACE ? E_SEGFAULT_CONTEXT_USERCODE : 0) |
 	            (uintptr_t)(ecode & PAGEFAULT_F_WRITING ? E_SEGFAULT_CONTEXT_WRITING : 0));
@@ -1087,14 +1084,14 @@ set_exception_pointers:
 	{
 		unsigned int i;
 		for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
-			PERTASK_SET(this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
+			PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 #if EXCEPT_BACKTRACE_SIZE != 0
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-			PERTASK_SET(this_exception_info.ei_trace[i], (void *)0);
+			PERTASK_SET(this_exception_trace[i], (void *)0);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	}
 	/* Always make the state point to the instruction _after_ the one causing the problem. */
-	PERTASK_SET(this_exception_info.ei_data.e_faultaddr, (void *)pc);
+	PERTASK_SET(this_exception_faultaddr, (void *)pc);
 	pc = (uintptr_t)instruction_trysucc((void const *)pc);
 #if 1
 	printk(KERN_DEBUG "Segmentation fault at %p (page %p) [pc=%p,%p] [ecode=%#x] [pid=%u]\n",

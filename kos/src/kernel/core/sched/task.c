@@ -249,22 +249,29 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	DEFINE_PUBLIC_SYMBOL(this_sched_state, offsetof(struct task, t_sched.s_state), sizeof(struct scpustate *));
 	DEFINE_PUBLIC_SYMBOL(this_sched_runprv, offsetof(struct task, t_sched.s_running.sr_runprv), sizeof(struct task *));
 	DEFINE_PUBLIC_SYMBOL(this_sched_runnxt, offsetof(struct task, t_sched.s_running.sr_runnxt), sizeof(struct task *));
-	DEFINE_PUBLIC_SYMBOL(thiscpu_id, offsetof(struct cpu, c_id), sizeof(cpuid_t));
-	DEFINE_PUBLIC_SYMBOL(thiscpu_current, offsetof(struct cpu, c_current), sizeof(struct task *));
-	DEFINE_PUBLIC_SYMBOL(thiscpu_override, offsetof(struct cpu, c_override), sizeof(struct task *));
-	DEFINE_PUBLIC_SYMBOL(thiscpu_pending, offsetof(struct cpu, c_pending), sizeof(struct task *));
-	DEFINE_PUBLIC_SYMBOL(thisvm_pdir_phys_ptr, offsetof(struct vm, v_pdir_phys_ptr), sizeof(vm_phys_t));
-	DEFINE_PUBLIC_SYMBOL(thiscpu_state, offsetof(struct cpu, c_state), sizeof(u16));
 	DEFINE_PUBLIC_SYMBOL(this_exception_code, &this_exception_info.ei_code, sizeof(this_exception_info.ei_code));
 	DEFINE_PUBLIC_SYMBOL(this_exception_data, &this_exception_info.ei_data, sizeof(this_exception_info.ei_data));
 	DEFINE_PUBLIC_SYMBOL(this_exception_state, &this_exception_info.ei_state, sizeof(this_exception_info.ei_state));
-	DEFINE_PUBLIC_SYMBOL(this_exception_pointers, &this_exception_info.ei_data.e_pointers, sizeof(this_exception_info.ei_data.e_pointers));
+	DEFINE_PUBLIC_SYMBOL(this_exception_class, &this_exception_info.ei_class, sizeof(this_exception_info.ei_class));
+	DEFINE_PUBLIC_SYMBOL(this_exception_subclass, &this_exception_info.ei_subclass, sizeof(this_exception_info.ei_subclass));
+	DEFINE_PUBLIC_SYMBOL(this_exception_pointers, &this_exception_info.ei_data.e_pointers[0], sizeof(this_exception_info.ei_data.e_pointers));
 	DEFINE_PUBLIC_SYMBOL(this_exception_flags, &this_exception_info.ei_flags, sizeof(this_exception_info.ei_flags));
+	DEFINE_PUBLIC_SYMBOL(this_exception_faultaddr, &this_exception_info.ei_data.e_faultaddr, sizeof(this_exception_info.ei_data.e_faultaddr));
 #if EXCEPT_BACKTRACE_SIZE != 0
 	DEFINE_PUBLIC_SYMBOL(this_exception_trace, &this_exception_info.ei_trace[0], sizeof(this_exception_info.ei_trace));
 #else /* EXCEPT_BACKTRACE_SIZE != 0 */
-	DEFINE_PUBLIC_SYMBOL(this_exception_trace, &this_exception_info, 0);
+	DEFINE_PUBLIC_SYMBOL(this_exception_trace, 0, 0);
 #endif /* EXCEPT_BACKTRACE_SIZE == 0 */
+	DEFINE_PUBLIC_SYMBOL(thiscpu_id, offsetof(struct cpu, c_id), sizeof(cpuid_t));
+	DEFINE_PUBLIC_SYMBOL(thiscpu_current, offsetof(struct cpu, c_current), sizeof(struct task *));
+	DEFINE_PUBLIC_SYMBOL(thiscpu_override, offsetof(struct cpu, c_override), sizeof(struct task *));
+#ifndef CONFIG_NO_SMP
+	DEFINE_PUBLIC_SYMBOL(thiscpu_pending, offsetof(struct cpu, c_pending), sizeof(struct task *));
+#else /* !CONFIG_NO_SMP */
+	DEFINE_PUBLIC_SYMBOL(thiscpu_pending, 0, 0);
+#endif /* CONFIG_NO_SMP */
+	DEFINE_PUBLIC_SYMBOL(thiscpu_state, offsetof(struct cpu, c_state), sizeof(u16));
+	DEFINE_PUBLIC_SYMBOL(thisvm_pdir_phys_ptr, offsetof(struct vm, v_pdir_phys_ptr), sizeof(vm_phys_t));
 
 	assert(_boottask.t_refcnt == 1);
 	assert(_bootidle.t_refcnt == 1);

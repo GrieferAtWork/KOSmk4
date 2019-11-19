@@ -455,7 +455,7 @@ struct aio_handle_type {
 #define AIO_COMPLETION_SUCCESS  1 /* AIO operation has successfully completed. */
 #define AIO_COMPLETION_CANCEL   2 /* AIO operation was canceled manually. */
 #define AIO_COMPLETION_FAILURE  3 /* AIO operation has failed.
-                                   * When this status is passed, `THIS_EXCEPTION_INFO->ei_data'
+                                   * When this status is passed, `THIS_EXCEPTION_DATA'
                                    * has been filled with more details on what exactly
                                    * has went wrong, at which point it is the callback's
                                    * job to take that information and do with it as it
@@ -582,7 +582,7 @@ LOCAL NONNULL((1)) void KCALL
 aio_handle_generic_checkerror(struct aio_handle_generic *__restrict self)
 		THROWS(E_IOERROR, ...) {
 	if unlikely(self->hg_status == AIO_COMPLETION_FAILURE) {
-		__libc_memcpy(&THIS_EXCEPTION_INFO.ei_data,
+		__libc_memcpy(&THIS_EXCEPTION_DATA,
 		              &self->hg_error, sizeof(self->hg_error));
 		error_throw_current();
 	}
@@ -792,7 +792,7 @@ LOCAL NONNULL((1)) void KCALL
 aio_multimultihandle_generic_checkerror(struct aio_multihandle_generic *__restrict self)
 		THROWS(E_IOERROR, ...) {
 	if unlikely((self->am_status & ~(AIO_MULTIHANDLE_STATUS_ALLRUNNING | AIO_MULTIHANDLE_STATUS_FAILED)) == AIO_COMPLETION_FAILURE) {
-		__libc_memcpy(&THIS_EXCEPTION_INFO.ei_data,
+		__libc_memcpy(&THIS_EXCEPTION_DATA,
 		              &self->am_error, sizeof(self->am_error));
 		error_throw_current();
 	}
@@ -826,7 +826,7 @@ aio_multihandle_generic_checkerror(struct aio_multihandle_generic *__restrict se
 		THROWS(E_IOERROR, ...) {
 	if unlikely((self->am_status & AIO_MULTIHANDLE_STATUS_STATUSMASK) ==
 	           ((uintptr_t)AIO_COMPLETION_FAILURE << AIO_MULTIHANDLE_STATUS_STATUSSHFT)) {
-		__libc_memcpy(&THIS_EXCEPTION_INFO.ei_data, &self->am_error, sizeof(self->am_error));
+		__libc_memcpy(&THIS_EXCEPTION_DATA, &self->am_error, sizeof(self->am_error));
 		error_throw_current();
 	}
 }

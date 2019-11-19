@@ -1359,9 +1359,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, vio_xorb; .long 0
 	.long 0x56f152
 	.long .Lname339 /* index: 339 */
-	.weak vm_pagefromphys; .long vm_pagefromphys
-	.reloc ., R_386_SIZE32, vm_pagefromphys; .long 0
-	.long 0xf43cae3
+	.weak vfs_clearmounts; .long vfs_clearmounts
+	.reloc ., R_386_SIZE32, vfs_clearmounts; .long 0
+	.long 0x27cf2e3
 	.long .Lname340 /* index: 340 */
 	.weak sys_mount; .long sys_mount
 	.reloc ., R_386_SIZE32, sys_mount; .long 0
@@ -2959,9 +2959,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, format_snprintf_printer; .long 0
 	.long 0x587f2e2
 	.long .Lname739 /* index: 739 */
-	.weak vfs_clearmounts; .long vfs_clearmounts
-	.reloc ., R_386_SIZE32, vfs_clearmounts; .long 0
-	.long 0x27cf2e3
+	.weak this_exception_subclass; .long this_exception_subclass
+	.reloc ., R_386_SIZE32, this_exception_subclass; .long 0
+	.long 0x4dc42e3
 	.long .Lname740 /* index: 740 */
 	.weak cpu_add_quantum_offset; .long cpu_add_quantum_offset
 	.reloc ., R_386_SIZE32, cpu_add_quantum_offset; .long 0
@@ -4662,10 +4662,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 1165 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1165 /* index: 1165 */
+	.weak this_exception_faultaddr; .long this_exception_faultaddr
+	.reloc ., R_386_SIZE32, this_exception_faultaddr; .long 0
+	.long 0xf1ce8c2
 	.long 0 /* index: 1166 */
 	.long 0
 	.long 0
@@ -7134,10 +7134,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_pagetophys_nopf; .long vm_pagetophys_nopf
 	.reloc ., R_386_SIZE32, vm_pagetophys_nopf; .long 0
 	.long 0xab056f6
-	.long 0 /* index: 1783 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1783 /* index: 1783 */
+	.weak vm_pagefromphys; .long vm_pagefromphys
+	.reloc ., R_386_SIZE32, vm_pagefromphys; .long 0
+	.long 0xf43cae3
 	.long 0 /* index: 1784 */
 	.long 0
 	.long 0
@@ -13838,10 +13838,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_pipe2; .long sys_pipe2
 	.reloc ., R_386_SIZE32, sys_pipe2; .long 0
 	.long 0x9677d82
-	.long 0 /* index: 3459 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3459 /* index: 3459 */
+	.weak this_exception_class; .long this_exception_class
+	.reloc ., R_386_SIZE32, this_exception_class; .long 0
+	.long 0x698dd83
 	.long .Lname3460 /* index: 3460 */
 	.weak sys_getdents64; .long sys_getdents64
 	.reloc ., R_386_SIZE32, sys_getdents64; .long 0
@@ -16743,7 +16743,7 @@ END(kernel_symbol_table)
 .Lname338:
 	.string "vio_xorb"
 .Lname339:
-	.string "vm_pagefromphys"
+	.string "vfs_clearmounts"
 .Lname340:
 	.string "sys_mount"
 .Lname341:
@@ -17211,7 +17211,7 @@ END(kernel_symbol_table)
 .Lname738:
 	.string "format_snprintf_printer"
 .Lname739:
-	.string "vfs_clearmounts"
+	.string "this_exception_subclass"
 .Lname740:
 	.string "cpu_add_quantum_offset"
 .Lname741:
@@ -17678,6 +17678,8 @@ END(kernel_symbol_table)
 	.string "regdump_gpreg"
 .Lname1161:
 	.string "tty_device_poll"
+.Lname1165:
+	.string "this_exception_faultaddr"
 .Lname1167:
 	.string "task_setvm"
 .Lname1168:
@@ -18324,6 +18326,8 @@ END(kernel_symbol_table)
 	.string "get_stack_inuse"
 .Lname1782:
 	.string "vm_pagetophys_nopf"
+.Lname1783:
+	.string "vm_pagefromphys"
 .Lname1785:
 	.string "pidns_root"
 .Lname1787:
@@ -20152,6 +20156,8 @@ END(kernel_symbol_table)
 	.string "memcmp"
 .Lname3458:
 	.string "sys_pipe2"
+.Lname3459:
+	.string "this_exception_class"
 .Lname3460:
 	.string "sys_getdents64"
 .Lname3461:

@@ -36,37 +36,37 @@ DECL_BEGIN
 
 INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL struct exception_info *
 NOTHROW_NCX(__LIBCCALL libc_error_info)(void) {
-	return &PERTASK(this_exception_info);
+	return &THIS_EXCEPTION_INFO;
 }
 
 INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL struct exception_data *
 NOTHROW_NCX(__LIBCCALL libc_error_data)(void) {
-	return &PERTASK(this_exception_info.ei_data);
+	return &THIS_EXCEPTION_DATA;
 }
 
 INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL error_register_state_t *
 NOTHROW_NCX(__LIBCCALL libc_error_register_state)(void) {
-	return &PERTASK(this_exception_info.ei_state);
+	return &THIS_EXCEPTION_STATE;
 }
 
 INTERN WUNUSED ATTR_PURE error_code_t
 NOTHROW_NCX(__LIBCCALL libc_error_code)(void) {
-	return PERTASK_GET(this_exception_info.ei_code);
+	return PERTASK_GET(this_exception_code);
 }
 
 INTERN WUNUSED ATTR_PURE bool
 NOTHROW_NCX(__LIBCCALL libc_error_active)(void) {
-	return PERTASK_GET(this_exception_info.ei_code) != E_OK;
+	return PERTASK_GET(this_exception_code) != E_OK;
 }
 
 INTERN WUNUSED ATTR_PURE error_class_t
 NOTHROW_NCX(__LIBCCALL libc_error_class)(void) {
-	return ERROR_CLASS(PERTASK_GET(this_exception_info.ei_code));
+	return PERTASK_GET(this_exception_class);
 }
 
 INTERN WUNUSED ATTR_PURE error_subclass_t
 NOTHROW_NCX(__LIBCCALL libc_error_subclass)(void) {
-	return ERROR_SUBCLASS(PERTASK_GET(this_exception_info.ei_code));
+	return PERTASK_GET(this_exception_subclass);
 }
 
 DEFINE_PUBLIC_ALIAS(error_info, libc_error_info);
@@ -76,7 +76,6 @@ DEFINE_PUBLIC_ALIAS(error_code, libc_error_code);
 DEFINE_PUBLIC_ALIAS(error_active, libc_error_active);
 DEFINE_PUBLIC_ALIAS(error_class, libc_error_class);
 DEFINE_PUBLIC_ALIAS(error_subclass, libc_error_subclass);
-
 
 DECL_END
 

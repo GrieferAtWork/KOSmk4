@@ -128,6 +128,9 @@ struct task {
 	/* per-task data goes here. */
 };
 
+DATDEF ATTR_PERTASK struct scpustate *this_sched_state; /* ALIAS:THIS_TASK->t_sched.s_state */
+DATDEF ATTR_PERTASK struct task *this_sched_runprv;     /* ALIAS:THIS_TASK->t_sched.s_running.sr_runprv */
+DATDEF ATTR_PERTASK struct task *this_sched_runnxt;     /* ALIAS:THIS_TASK->t_sched.s_running.sr_runnxt */
 
 
 /* Allocate + initialize a new task.

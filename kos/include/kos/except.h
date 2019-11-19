@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa84218f4 */
+/* HASH CRC-32:0xf130dbd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -746,13 +746,13 @@ __DECL_BEGIN
 
 
 #if __SIZEOF_POINTER__ == 4
-#define ERROR_CODE(class,subclass) (__CCAST(__UINT32_TYPE__)(class) | __CCAST(__UINT32_TYPE__)(subclass) << 16)
-#define ERROR_CLASS(code)          ((code) & __UINT16_C(0xffff))
-#define ERROR_SUBCLASS(code)       ((code) >> 16)
+#define ERROR_CODE(class, subclass) (__CCAST(__UINT32_TYPE__)(class) | __CCAST(__UINT32_TYPE__)(subclass) << 16)
+#define ERROR_CLASS(code)           ((code) & __UINT16_C(0xffff))
+#define ERROR_SUBCLASS(code)        ((code) >> 16)
 #elif __SIZEOF_POINTER__ == 8
-#define ERROR_CODE(class,subclass) (__CCAST(__UINT64_TYPE__)(class) | __CCAST(__UINT64_TYPE__)(subclass) << 32)
-#define ERROR_CLASS(code)          ((code) & __UINT32_C(0xffffffff))
-#define ERROR_SUBCLASS(code)       ((code) >> 32)
+#define ERROR_CODE(class, subclass) (__CCAST(__UINT64_TYPE__)(class) | __CCAST(__UINT64_TYPE__)(subclass) << 32)
+#define ERROR_CLASS(code)           ((code) & __UINT32_C(0xffffffff))
+#define ERROR_SUBCLASS(code)        ((code) >> 32)
 #else
 #error "Unsupported sizeof(void *)"
 #endif
@@ -761,7 +761,7 @@ __DECL_BEGIN
 /* Return the code for a given error code, class or sub-class */
 #define ERROR_CODEOF(code) __PRIVATE_ERROR_CODEOF_PACKAGE_CODE code
 
-#define __PRIVATE_ERROR_CODEOF_PACKAGE_CODE1(code)  code
+#define __PRIVATE_ERROR_CODEOF_PACKAGE_CODE1(code)  __CCAST(__UINTPTR_TYPE__)code
 #define __PRIVATE_ERROR_CODEOF_PACKAGE_CODE2        ERROR_CODE
 #define __PRIVATE_ERROR_CODEOF_PACKAGE_CODEN2(n)    __PRIVATE_ERROR_CODEOF_PACKAGE_CODE##n
 #define __PRIVATE_ERROR_CODEOF_PACKAGE_CODEN(n)     __PRIVATE_ERROR_CODEOF_PACKAGE_CODEN2(n)

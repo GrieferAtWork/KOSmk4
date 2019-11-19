@@ -942,8 +942,8 @@ kill_rwlock_reader(struct task *__restrict thread,
 	ASSERT_VECTOR_INITIALIZED(locks);
 	if (!locks->rls_use)
 		goto done; /* This thread isn't using any R/W-locks */
-	if (FORTASK(thread, this_exception_info).ei_code == ERROR_CODEOF(__E_RETRY_RWLOCK) &&
-	    FORTASK(thread, this_exception_info).ei_data.e_pointers[0] == (uintptr_t)lock)
+	if (FORTASK(thread, this_exception_code) == ERROR_CODEOF(__E_RETRY_RWLOCK) &&
+	    FORTASK(thread, this_exception_pointers)[0] == (uintptr_t)lock)
 		goto done; /* This thread is already in the process of dropping this read-lock. */
 	if (locks->rls_vec == locks->rls_sbuf) {
 		unsigned int i;
@@ -1571,8 +1571,8 @@ NOTHROW(KCALL __os_rwlock_end)(struct rwlock *__restrict self) {
 
 			/* Deal with parallel-upgrade exceptions. */
 			if (was_thrown(__E_RETRY_RWLOCK) &&
-			    PERTASK_GET(this_exception_info.ei_data.e_pointers[0]) == (uintptr_t)self) {
-				PERTASK_SET(this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_OK));
+			    PERTASK_GET(this_exception_pointers[0]) == (uintptr_t)self) {
+				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OK));
 				/* Try to yield to the task that is waiting for the lock to become available.
 				 * NOTE: By using `task_tryyield()' here, we can remain non-blocking! */
 				task_tryyield();

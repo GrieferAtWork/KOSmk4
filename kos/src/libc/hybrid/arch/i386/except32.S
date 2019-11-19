@@ -38,14 +38,14 @@ EXTERN(this_exception_code)
 EXTERN(this_exception_flags)
 EXTERN(this_exception_trace)
 EXTERN(this_exception_pointers)
-EXTERN(this_exception_data)
+EXTERN(this_exception_faultaddr)
 EXTERN(this_exception_state)
 
 #define FIELD_ERROR_CODE           %fs:this_exception_code
 #define FIELD_ERROR_FLAGS          %fs:this_exception_flags
 #define FIELD_ERROR_TRACE(off)     %fs:this_exception_trace + (off)
 #define FIELD_ERROR_POINTERS(off)  %fs:this_exception_pointers + (off)
-#define FIELD_ERROR_FAULTADDR      %fs:this_exception_data + __OFFSET_EXCEPTION_DATA_FAULTADDR
+#define FIELD_ERROR_FAULTADDR      %fs:this_exception_faultaddr
 #define FIELD_ERROR_REGISTERS(off) %fs:this_exception_state + (off)
 #define S_EXCEPT_TEXT(name)    .text
 #define S_EXCEPT_DATA(name)    .data

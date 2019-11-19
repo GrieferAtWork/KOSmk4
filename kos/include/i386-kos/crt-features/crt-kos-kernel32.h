@@ -1710,12 +1710,15 @@
 #define __CRT_HAVE_terminal_poll_owrite 1
 #define __CRT_HAVE_terminal_setios 1
 #define __CRT_HAVE_this_cpu 1
+#define __CRT_HAVE_this_exception_class 1
 #define __CRT_HAVE_this_exception_code 1
 #define __CRT_HAVE_this_exception_data 1
+#define __CRT_HAVE_this_exception_faultaddr 1
 #define __CRT_HAVE_this_exception_flags 1
 #define __CRT_HAVE_this_exception_info 1
 #define __CRT_HAVE_this_exception_pointers 1
 #define __CRT_HAVE_this_exception_state 1
+#define __CRT_HAVE_this_exception_subclass 1
 #define __CRT_HAVE_this_exception_trace 1
 #define __CRT_HAVE_this_fs 1
 #define __CRT_HAVE_this_handle_manager 1
