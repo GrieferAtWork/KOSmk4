@@ -95,9 +95,9 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 	struct exception_data *mydata;
 	unsigned int i;
 	/* Call the user-space exception handler */
-	mode    = PERTASK_GET(_this_user_except_handler.ueh_mode);
-	handler = (__except_handler64_t)(uintptr_t)(void *)PERTASK_GET(_this_user_except_handler.ueh_handler);
-	stack   = PERTASK_GET(_this_user_except_handler.ueh_stack);
+	mode    = PERTASK_GET(this_user_except_handler.ueh_mode);
+	handler = (__except_handler64_t)(uintptr_t)(void *)PERTASK_GET(this_user_except_handler.ueh_handler);
+	stack   = PERTASK_GET(this_user_except_handler.ueh_stack);
 	if unlikely(!(mode & EXCEPT_HANDLER_FLAG_SETHANDLER))
 		return NULL; /* No handler defined */
 	if (stack == EXCEPT_HANDLER_SP_CURRENT)
@@ -130,7 +130,7 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 	COMPILER_WRITE_BARRIER();
 	/* Disable exception handling in one-shot mode. */
 	if (mode & EXCEPT_HANDLER_FLAG_ONESHOT) {
-		PERTASK_SET(_this_user_except_handler.ueh_mode,
+		PERTASK_SET(this_user_except_handler.ueh_mode,
 		            (mode & ~EXCEPT_HANDLER_MODE_MASK) |
 		            EXCEPT_HANDLER_MODE_DISABLED);
 	}
@@ -157,9 +157,9 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 	struct exception_data *mydata;
 	unsigned int i;
 	/* Call the user-space exception handler */
-	mode    = PERTASK_GET(_this_user_except_handler.ueh_mode);
-	handler = (__except_handler32_t)(uintptr_t)(void *)PERTASK_GET(_this_user_except_handler.ueh_handler);
-	stack   = PERTASK_GET(_this_user_except_handler.ueh_stack);
+	mode    = PERTASK_GET(this_user_except_handler.ueh_mode);
+	handler = (__except_handler32_t)(uintptr_t)(void *)PERTASK_GET(this_user_except_handler.ueh_handler);
+	stack   = PERTASK_GET(this_user_except_handler.ueh_stack);
 	if unlikely(!(mode & EXCEPT_HANDLER_FLAG_SETHANDLER))
 		return NULL; /* No handler defined */
 	if (stack == EXCEPT_HANDLER_SP_CURRENT)
@@ -192,7 +192,7 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 	COMPILER_WRITE_BARRIER();
 	/* Disable exception handling in one-shot mode. */
 	if (mode & EXCEPT_HANDLER_FLAG_ONESHOT) {
-		PERTASK_SET(_this_user_except_handler.ueh_mode,
+		PERTASK_SET(this_user_except_handler.ueh_mode,
 		            (mode & ~EXCEPT_HANDLER_MODE_MASK) |
 		            EXCEPT_HANDLER_MODE_DISABLED);
 	}
@@ -439,7 +439,7 @@ x86_userexcept_propagate(struct icpustate *__restrict state,
 			/* System call exceptions are enabled. */
 			TRY {
 				/* Propagate the exception to user-space if handlers are enabled. */
-				if ((PERTASK_GET(_this_user_except_handler.ueh_mode) &
+				if ((PERTASK_GET(this_user_except_handler.ueh_mode) &
 				     EXCEPT_HANDLER_MODE_MASK) != EXCEPT_HANDLER_MODE_DISABLED) {
 					result = x86_userexcept_callhandler(state, sc_info);
 					if likely(result)
@@ -461,7 +461,7 @@ x86_userexcept_propagate(struct icpustate *__restrict state,
 
 	TRY {
 		/* Check if signal exceptions should be propagated in non-syscall scenarios. */
-		if ((PERTASK_GET(_this_user_except_handler.ueh_mode) &
+		if ((PERTASK_GET(this_user_except_handler.ueh_mode) &
 		     EXCEPT_HANDLER_MODE_MASK) == EXCEPT_HANDLER_MODE_SIGHAND) {
 			result = x86_userexcept_callhandler(state, sc_info);
 			if likely(result)
@@ -483,7 +483,7 @@ terminate_app:
 	__builtin_unreachable();
 done:
 	/* Delete the currently set exception. */
-	PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_OK));
+	PERTASK_SET(this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_OK));
 	return result;
 }
 
@@ -512,11 +512,10 @@ PUBLIC ATTR_NORETURN void FCALL
 x86_userexcept_unwind(struct ucpustate *__restrict ustate,
                       struct rpc_syscall_info *sc_info) {
 	struct icpustate *return_state;
-	assert(!(THIS_TASK->t_flags & TASK_FKERNTHREAD));
+	assert(!(PERTASK_GET(this_task.t_flags) & TASK_FKERNTHREAD));
 	/* Disable interrupts to prevent Async-RPCs from doing even more re-directions! */
 	__cli();
-#define kernel_stack_top() \
-	((byte_t *)VM_PAGE2ADDR(PERTASK_GET((*(struct vm_node *)&_this_kernel_stack).vn_node.a_vmax) + 1))
+#define kernel_stack_top() ((byte_t *)PERTASK_GET(*(uintptr_t *)&this_x86_kernel_psp0))
 	/* Figure out where the return icpustate needs to go. */
 	return_state = (struct icpustate *)(kernel_stack_top() -
 	                                    (
@@ -531,8 +530,8 @@ x86_userexcept_unwind(struct ucpustate *__restrict ustate,
 	/* Check if user-space got redirected (if so, we need to follow some custom unwinding rules). */
 	if (return_state->ics_irregs.ir_pip == (uintptr_t)&x86_rpc_user_redirection) {
 		/* A re-direction may have happened whilst we were unwinding. - Adjust for that now!
-		 * HINT: The actual user-space return location is stored in `x86_rpc_redirection_iret' */
-		assert(PERTASK_GET(x86_rpc_redirection_iret.ir_pip) != (uintptr_t)&x86_rpc_user_redirection);
+		 * HINT: The actual user-space return location is stored in `this_x86_rpc_redirection_iret' */
+		assert(PERTASK_GET(this_x86_rpc_redirection_iret.ir_pip) != (uintptr_t)&x86_rpc_user_redirection);
 		assert(return_state->ics_irregs.ir_pflags == 0);
 		assert(return_state->ics_irregs.ir_cs == SEGMENT_KERNEL_CODE);
 		/* Manually unwind additional FLAGS registers.
@@ -555,15 +554,15 @@ x86_userexcept_unwind(struct ucpustate *__restrict ustate,
 #endif /* !__x86_64__ */
 
 #ifdef __x86_64__
-		return_state->ics_irregs.ir_rip    = PERTASK_GET(x86_rpc_redirection_iret.ir_rip);
-		return_state->ics_irregs.ir_cs     = PERTASK_GET(x86_rpc_redirection_iret.ir_cs16);
-		return_state->ics_irregs.ir_rflags = PERTASK_GET(x86_rpc_redirection_iret.ir_rflags);
-		return_state->ics_irregs.ir_rsp    = PERTASK_GET(x86_rpc_redirection_iret.ir_rsp);
-		return_state->ics_irregs.ir_ss     = PERTASK_GET(x86_rpc_redirection_iret.ir_ss16);
+		return_state->ics_irregs.ir_rip    = PERTASK_GET(this_x86_rpc_redirection_iret.ir_rip);
+		return_state->ics_irregs.ir_cs     = PERTASK_GET(this_x86_rpc_redirection_iret.ir_cs16);
+		return_state->ics_irregs.ir_rflags = PERTASK_GET(this_x86_rpc_redirection_iret.ir_rflags);
+		return_state->ics_irregs.ir_rsp    = PERTASK_GET(this_x86_rpc_redirection_iret.ir_rsp);
+		return_state->ics_irregs.ir_ss     = PERTASK_GET(this_x86_rpc_redirection_iret.ir_ss16);
 #else /* __x86_64__ */
-		return_state->ics_irregs_u.ir_eip    = PERTASK_GET(x86_rpc_redirection_iret.ir_eip);
-		return_state->ics_irregs_u.ir_cs     = PERTASK_GET(x86_rpc_redirection_iret.ir_cs16);
-		return_state->ics_irregs_u.ir_eflags = PERTASK_GET(x86_rpc_redirection_iret.ir_eflags);
+		return_state->ics_irregs_u.ir_eip    = PERTASK_GET(this_x86_rpc_redirection_iret.ir_eip);
+		return_state->ics_irregs_u.ir_cs     = PERTASK_GET(this_x86_rpc_redirection_iret.ir_cs16);
+		return_state->ics_irregs_u.ir_eflags = PERTASK_GET(this_x86_rpc_redirection_iret.ir_eflags);
 #if 0 /* Still initialized correctly... */
 		return_state->ics_irregs_u.ir_ss     = return_state->ics_irregs_u.ir_ss16;
 		return_state->ics_irregs_u.ir_esp    = return_state->ics_irregs_u.ir_esp;

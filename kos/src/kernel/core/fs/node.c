@@ -863,9 +863,9 @@ inode_truncate(struct inode *__restrict self, pos_t new_size)
 				(*tp_self->it_file.f_truncate)(self, new_size);
 			} EXCEPT {
 				if (was_thrown(E_IOERROR_BADBOUNDS))
-					PERTASK_SET(_this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_DISK_FULL));
+					PERTASK_SET(this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_DISK_FULL));
 				if (was_thrown(E_IOERROR_READONLY))
-					PERTASK_SET(_this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_READONLY));
+					PERTASK_SET(this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_READONLY));
 				RETHROW();
 			}
 			self->i_filesize = new_size;
@@ -2511,7 +2511,7 @@ again:
 			} EXCEPT {
 				decref(node);
 				if (was_thrown(E_IOERROR_READONLY))
-					PERTASK_SET(_this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_READONLY));
+					PERTASK_SET(this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_READONLY));
 				RETHROW();
 			}
 		} EXCEPT {
@@ -2941,9 +2941,9 @@ after_directories_updated:
 				} EXCEPT {
 					/* Translate exception codes. */
 					if (was_thrown(E_IOERROR_BADBOUNDS))
-						PERTASK_SET(_this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_DISK_FULL));
+						PERTASK_SET(this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_DISK_FULL));
 					if (was_thrown(E_IOERROR_READONLY))
-						PERTASK_SET(_this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_READONLY));
+						PERTASK_SET(this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_READONLY));
 					sync_endwrite(source_inode);
 					decref(source_inode);
 					RETHROW();
@@ -3111,9 +3111,9 @@ directory_link(struct directory_node *__restrict target_directory,
 	} EXCEPT {
 		decref(target_dirent);
 		if (was_thrown(E_IOERROR_BADBOUNDS))
-			PERTASK_SET(_this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_DISK_FULL));
+			PERTASK_SET(this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_DISK_FULL));
 		if (was_thrown(E_IOERROR_READONLY))
-			PERTASK_SET(_this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_READONLY));
+			PERTASK_SET(this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_READONLY));
 		RETHROW();
 	}
 	if (ptarget_dirent)
@@ -4359,9 +4359,9 @@ superblock_open(struct superblock_type *__restrict type,
 				decref_unlikely(result->s_device);
 				if (was_thrown(E_IOERROR_BADBOUNDS) || was_thrown(E_DIVIDE_BY_ZERO) ||
 				    was_thrown(E_OVERFLOW) || was_thrown(E_INDEX_ERROR))
-					PERTASK_SET(_this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_CORRUPTED_FILE_SYSTEM));
+					PERTASK_SET(this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_CORRUPTED_FILE_SYSTEM));
 				if (was_thrown(E_IOERROR_READONLY))
-					PERTASK_SET(_this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_READONLY));
+					PERTASK_SET(this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_READONLY));
 				RETHROW();
 			}
 		} EXCEPT {

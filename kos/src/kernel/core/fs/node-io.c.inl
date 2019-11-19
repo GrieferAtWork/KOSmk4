@@ -202,9 +202,9 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 					(*self->i_type->it_file.f_truncate)(self, write_end);
 				} EXCEPT {
 					if (was_thrown(E_IOERROR_BADBOUNDS))
-						PERTASK_SET(_this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_DISK_FULL));
+						PERTASK_SET(this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_DISK_FULL));
 					if (was_thrown(E_IOERROR_READONLY))
-						PERTASK_SET(_this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_READONLY));
+						PERTASK_SET(this_exception_info.ei_code, ERROR_CODEOF(E_FSERROR_READONLY));
 					RETHROW();
 				}
 				self->i_filesize = write_end;
@@ -245,9 +245,9 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 #endif
 			} EXCEPT {
 				if (was_thrown(E_IOERROR_BADBOUNDS))
-					PERTASK_SET(_this_exception_info.ei_code, (error_code_t)E_FSERROR_DISK_FULL);
+					PERTASK_SET(this_exception_info.ei_code, (error_code_t)E_FSERROR_DISK_FULL);
 				if (was_thrown(E_IOERROR_READONLY))
-					PERTASK_SET(_this_exception_info.ei_code, (error_code_t)E_FSERROR_READONLY);
+					PERTASK_SET(this_exception_info.ei_code, (error_code_t)E_FSERROR_READONLY);
 				RETHROW();
 			}
 #endif

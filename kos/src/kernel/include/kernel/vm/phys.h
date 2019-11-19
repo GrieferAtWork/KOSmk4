@@ -197,16 +197,14 @@ FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_pagetophys_nopf)(PHYS vm_ppage_t 
  * NOTE: Because this page is unique for each thread, the user is not
  *       required to acquire a lock to the kernel VM when wishing to
  *       map something at this location! */
-DATDEF ATTR_PERTASK vm_vpage_t _this_trampoline_page;
+DATDEF ATTR_PERTASK vm_vpage_t this_trampoline_page;
 
 /* TODO: Go through all uses of `THIS_TRAMPOLINE_PAGE' and add
  *       optimizations for supporting `PHYS_IS_IDENTITY()' */
-#define THIS_TRAMPOLINE_PAGE PERTASK_GET(_this_trampoline_page)
+#define THIS_TRAMPOLINE_PAGE PERTASK_GET(this_trampoline_page)
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
-/* A data part used to describe a single, reserved page. */
-INTDEF ATTR_PERTASK struct vm_node _this_trampoline_node;
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+/* A VM node used to describe a single, reserved page. */
+DATDEF ATTR_PERTASK struct vm_node this_trampoline_node;
 
 
 /* Helper for unifying `PHYS_IS_IDENTITY()' and `pagedir_push_mapone(THIS_TRAMPOLINE)' */

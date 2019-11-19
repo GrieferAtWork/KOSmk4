@@ -108,8 +108,8 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 	movl   $(S(boot0_gdt_ptr)), %eax
 	lgdtl  (%eax)
 
-	INTERN(__kernel_sector_count)
-	movw   $__kernel_sector_count, %cx
+	EXTERN(__kernel_sector_count)
+	movw   $(__kernel_sector_count), %cx
 	movl   $0x00100000, %edi /* DESTPTR */
 	movw   $0, %ax           /* SECNO */
 1:

@@ -1640,7 +1640,7 @@ send_empty:
 				ERROR(err_ESRCH);
 			}
 #else /* __x86_64__ */
-			addr = ATOMIC_READ(FORTASK(newThread.ts_thread, x86_this_user_gsbase));
+			addr = ATOMIC_READ(FORTASK(newThread.ts_thread, this_x86_user_gsbase));
 #endif /* !__x86_64__ */
 			GDBThreadSel_Fini(&newThread);
 			o += sprintf(o, "%p", addr);

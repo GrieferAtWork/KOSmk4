@@ -50,13 +50,13 @@ DEFINE_PERVM_FINI(pervm_fini_execinfo);
 INTERN NONNULL((1)) void
 NOTHROW(KCALL pervm_fini_execinfo)(struct vm *__restrict self) {
 	struct vm_execinfo_struct *execinfo;
-	execinfo = &FORVM(self, vm_execinfo);
+	execinfo = &FORVM(self, thisvm_execinfo);
 	xdecref(execinfo->ei_node);
 	xdecref(execinfo->ei_dent);
 	xdecref(execinfo->ei_path);
 }
 
-PUBLIC ATTR_PERVM struct vm_execinfo_struct vm_execinfo = {
+PUBLIC ATTR_PERVM struct vm_execinfo_struct thisvm_execinfo = {
 	/* .ei_node = */ NULL,
 	/* .ei_dent = */ NULL,
 	/* .ei_path = */ NULL
@@ -500,7 +500,7 @@ err_overlap:
 			/* Initialize the library definitions list to use the PEB
 			 * NOTE: When libdl was linked into the mix (see line above), then
 			 *       it will override this fairly early on with its own version. */
-			struct library_listdef *lld = &FORVM(effective_vm, _this_library_listdef);
+			struct library_listdef *lld = &FORVM(effective_vm, thisvm_library_listdef);
 			memcpy(lld, &peb_based_library_list, sizeof(struct library_listdef));
 			lld->lld_first = (USER void *)VM_PAGE2ADDR(peb_page);
 			lld->lld_module_offsetof_loadstart = loadstart;

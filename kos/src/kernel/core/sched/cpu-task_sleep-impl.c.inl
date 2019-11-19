@@ -108,7 +108,7 @@ do_return_false:
 	if likely(me->t_sched.s_running.sr_runnxt == me) {
 		struct task *idle;
 		/* Special case: blocking call made by the IDLE thread. */
-		if unlikely(me == &FORCPU(mycpu, _this_idle)) {
+		if unlikely(me == &FORCPU(mycpu, thiscpu_idle)) {
 wait_a_bit:
 			/* Wait for the next interrupt. */
 			PREEMPTION_ENABLE_WAIT();
@@ -116,7 +116,7 @@ wait_a_bit:
 			return false;
 		}
 		/* Check if the IDLE thread had been sleeping. */
-		idle = &FORCPU(mycpu, _this_idle);
+		idle = &FORCPU(mycpu, thiscpu_idle);
 		if (idle->t_sched.s_asleep.ss_pself) {
 			/* The IDLE thread had been sleeping (time it out) */
 			ATOMIC_FETCHOR(idle->t_flags, TASK_FTIMEOUT);

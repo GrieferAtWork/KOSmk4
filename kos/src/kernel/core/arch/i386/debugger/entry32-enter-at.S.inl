@@ -165,17 +165,17 @@ PUBLIC_FUNCTION(FUNCNAM)
 	/* Figure out our LAPIC ID so we can try to acquire `dbg_activator_lapic_id',
 	 * and check if the debugger was invoked recursively. */
 L(acquire_lapic_lock):
-	movl   %ss:x86_lapic_base_address, %eax
+	movl   %ss:x86_lapicbase, %eax
 	testl  %eax, %eax
 	jz     1f  /* No LAPIC --> We're the only CPU! */
 	movl   %ss:APIC_ID(%eax), %eax
 	andl   $APIC_ID_FMASK, %eax
 	shrl   $APIC_ID_FSHIFT, %eax
 	movl   %ecx, %ss:dbg_cpu_temporary(,%eax,4)
-	INTERN(__x86_dbg_cpu_temporary_b0)
-	INTERN(__x86_dbg_cpu_temporary_b1)
-	INTERN(__x86_dbg_cpu_temporary_b2)
-	INTERN(__x86_dbg_cpu_temporary_b3)
+	EXTERN(__x86_dbg_cpu_temporary_b0)
+	EXTERN(__x86_dbg_cpu_temporary_b1)
+	EXTERN(__x86_dbg_cpu_temporary_b2)
+	EXTERN(__x86_dbg_cpu_temporary_b3)
 #ifdef CFA_OFFSET
 	/* Encode an expression to load the new CFA */
 	.cfi_escape DW_CFA_def_cfa_expression
@@ -304,7 +304,7 @@ L(acquire_lapic_lock):
 	 * where to return (this is what happens when the user pressed CTRL+C when the debugger
 	 * command-line driver is active, allowing them to soft-reset the debugger commandline
 	 * in case the current command gets into a loop) */
-	INTERN(dbg_active)
+	EXTERN(dbg_active)
 	cmpl   $0, %ss:dbg_active
 	jne    .Lcommon_recursive_debugger
 
@@ -547,7 +547,7 @@ L(copy_common_iret_regs):
 
 	movl   4(%esp), %eax  /* void *arg = 4(%esp) */
 
-	INTERN(__kernel_debug_stack)
+	EXTERN(__kernel_debug_stack)
 	movl   $(__kernel_debug_stack + KERNEL_DEBUG_STACKSIZE), %esp
 
 	pushl  %eax           /* void *arg */
@@ -558,11 +558,11 @@ L(copy_common_iret_regs):
 	cmpl   $0, dbg_active
 	jne    1f
 	movl   $1, dbg_active /* Indicate that the debugger is now active */
-	INTERN(dbg_init)
+	EXTERN(dbg_init)
 	call   dbg_init       /* Initialize first time around */
 1:
 	/* Reset the current debugger state. */
-	INTERN(dbg_reset)
+	EXTERN(dbg_reset)
 	call   dbg_reset
 
 	/* Enable interrupts while in debugger-mode */

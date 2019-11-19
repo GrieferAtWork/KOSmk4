@@ -30,11 +30,11 @@ DECL_BEGIN
 
 /* Basic CPU feature flags (Set of `CPU_BASIC_FEATURE_F*') */
 #ifdef __x86_64__
-PUBLIC ATTR_PERCPU u16 cpu_features_ ASMNAME("cpu_features") = CPU_FEATURE_FCPUID;
+PUBLIC ATTR_PERCPU u16 _thiscpu_x86_cpufeatures ASMNAME("thiscpu_x86_cpufeatures") = CPU_FEATURE_FCPUID;
 #else /* __x86_64__ */
-PUBLIC ATTR_PERCPU u16 cpu_features_ ASMNAME("cpu_features") = CPU_FEATURE_FNONE;
+PUBLIC ATTR_PERCPU u16 _thiscpu_x86_cpufeatures ASMNAME("thiscpu_x86_cpufeatures") = CPU_FEATURE_FNONE;
 #endif /* !__x86_64__ */
-PUBLIC ATTR_PERCPU struct cpuinfo cpuid_features_ ASMNAME("cpuid_features") = {};
+PUBLIC ATTR_PERCPU struct cpuinfo _thiscpu_x86_cpuid ASMNAME("thiscpu_x86_cpuid") = {};
 
 STATIC_ASSERT(OFFSET_CPUID_0A        == offsetof(struct cpuinfo, ci_0a));
 STATIC_ASSERT(OFFSET_CPUID_80000000A == offsetof(struct cpuinfo, ci_80000000a));

@@ -86,11 +86,11 @@ struct task {
 	WEAK refcnt_t   t_refcnt;     /* Task reference counter. */
 	WEAK uintptr_t  t_flags;      /* Thread state & flags (Set of `TASK_F*'). */
 	struct cpu     *t_cpu;        /* [1..1][lock(PRIVATE)] The CPU that this task is being hosted by.
-	                               * NOTE: Also accessible via the `_this_cpu' field. */
+	                               * NOTE: Also accessible via the `this_cpu' field. */
 	REF struct vm  *t_vm;         /* [1..1][lock(read(THIS_TASK || INTERN(lock)),
 	                               *             write(THIS_TASK && INTERN(lock)))]
 	                               * The VM used to host this task.
-	                               * NOTE: Also accessible via the `_this_vm' field. */
+	                               * NOTE: Also accessible via the `this_vm' field. */
 	LLIST_NODE(struct task) t_vm_tasks; /* [lock(t_vm->v_tasklock)] Chain of tasks using `t_vm' */
 	size_t          t_heapsz;     /* [const] Allocated heap size of this task. */
 	struct {
@@ -192,7 +192,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread) {
 #endif /* __cplusplus */
 
 
-DATDEF ATTR_PERTASK struct task _this_task; /* The current task (for use with `PERTASK') */
+DATDEF ATTR_PERTASK struct task this_task; /* The current task (for use with `PERTASK') */
 DATDEF struct task _boottask;  /* The boot task (aka. /proc/0) */
 DATDEF struct task _bootidle;  /* The idle thread for the boot CPU */
 
@@ -203,10 +203,10 @@ DATDEF struct task _bootidle;  /* The idle thread for the boot CPU */
  *          require execution on a separate stack (such as the #DF-stack on x86)
  *          To determine available/used stack memory, use the function below.
  */
-DATDEF ATTR_PERTASK struct vm_node const _this_kernel_stack;
-DATDEF ATTR_PERTASK struct vm_datapart const _this_kernel_stack_part;
-#define THIS_KERNEL_STACK       (&PERTASK(_this_kernel_stack))
-#define THIS_KERNEL_STACK_PART  (&PERTASK(_this_kernel_stack_part))
+DATDEF ATTR_PERTASK struct vm_node const this_kernel_stacknode;
+DATDEF ATTR_PERTASK struct vm_datapart const this_kernel_stackpart;
+#define THIS_KERNEL_STACK       (&PERTASK(this_kernel_stacknode))
+#define THIS_KERNEL_STACK_PART  (&PERTASK(this_kernel_stackpart))
 
 /* Return some rough estimates for the available/used stack memory.
  * These `get_stack_avail()' is usually called prior to `alloca()' in order

@@ -44,7 +44,7 @@ DECL_BEGIN
 
 /* Library listing information, as set by user-space.
  * When unavailable, `lld_size' is set to ZERO(0). */
-PUBLIC ATTR_PERVM struct library_listdef _this_library_listdef = { 0 };
+PUBLIC ATTR_PERVM struct library_listdef thisvm_library_listdef = { 0 };
 
 
 typedef struct anonymous_module_struct MODULE;
@@ -88,7 +88,7 @@ vm_library_enumerate(struct vm *__restrict effective_vm,
 	bool filename_maybe_relative;
 	if unlikely(!maxcount)
 		goto done;
-	memcpy(&libdef, &FORVM(effective_vm, _this_library_listdef),
+	memcpy(&libdef, &FORVM(effective_vm, thisvm_library_listdef),
 	       sizeof(struct library_listdef));
 	if unlikely(!libdef.lld_size)
 		goto done;

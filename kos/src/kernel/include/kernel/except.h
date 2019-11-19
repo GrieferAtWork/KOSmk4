@@ -32,8 +32,8 @@ DECL_BEGIN
 
 #ifdef __CC__
 
-DATDEF ATTR_PERTASK struct exception_info _this_exception_info;
-#define THIS_EXCEPTION_INFO  PERTASK(_this_exception_info)
+DATDEF ATTR_PERTASK struct exception_info this_exception_info;
+#define THIS_EXCEPTION_INFO  PERTASK(this_exception_info)
 
 #ifndef __INTELLISENSE__
 #undef error_info
@@ -42,12 +42,12 @@ DATDEF ATTR_PERTASK struct exception_info _this_exception_info;
 #undef error_code
 #undef error_class
 #undef error_subclass
-#define error_info()    (&PERTASK(_this_exception_info))
-#define error_data()    (&PERTASK(_this_exception_info).ei_data)
-#define error_active()   (PERTASK_GET(_this_exception_info.ei_code) != 0)
-#define error_code()      PERTASK_GET(_this_exception_info.ei_code)
-#define error_class()     PERTASK_GET(_this_exception_info.ei_class)
-#define error_subclass()  PERTASK_GET(_this_exception_info.ei_subclass)
+#define error_info()    (&PERTASK(this_exception_info))
+#define error_data()    (&PERTASK(this_exception_info).ei_data)
+#define error_active()   (PERTASK_GET(this_exception_info.ei_code) != 0)
+#define error_code()      PERTASK_GET(this_exception_info.ei_code)
+#define error_class()     PERTASK_GET(this_exception_info.ei_class)
+#define error_subclass()  PERTASK_GET(this_exception_info.ei_subclass)
 #endif /* !__INTELLISENSE__ */
 
 /* Dump the current exception to printk(), using the target prefixed by `reason' */

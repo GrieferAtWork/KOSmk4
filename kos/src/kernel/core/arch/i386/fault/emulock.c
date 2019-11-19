@@ -70,13 +70,13 @@ DECL_BEGIN
 #define bus_releaselock()     COMPILER_BARRIER()
 #else /* CONFIG_NO_SMP */
 PRIVATE ATTR_CACHELINE_ALIGNED bool volatile bus_flags[CONFIG_MAX_CPU_COUNT];
-PRIVATE ATTR_PERCPU bool bus_line7 = false;
+PRIVATE ATTR_PERCPU bool thiscpu_busline7 = false;
 
 PRIVATE NOBLOCK bool
 NOTHROW(KCALL bus_tryacquirelock)(void) {
 	struct cpu *me = THIS_CPU;
 	cpuid_t i, myid = me->c_id;
-	if (!FORCPU(me, bus_line7)) {
+	if (!FORCPU(me, thiscpu_busline7)) {
 		COMPILER_BARRIER();
 		bus_flags[myid] = false; /* down */
 		COMPILER_BARRIER();
@@ -92,7 +92,7 @@ NOTHROW(KCALL bus_tryacquirelock)(void) {
 				return false;
 		}
 		COMPILER_BARRIER();
-		FORCPU(me, bus_line7) = true;
+		FORCPU(me, thiscpu_busline7) = true;
 		COMPILER_BARRIER();
 	}
 	COMPILER_BARRIER();
@@ -113,7 +113,7 @@ NOTHROW(KCALL bus_releaselock)(void) {
 	struct cpu *me = THIS_CPU;
 	cpuid_t myid   = me->c_id;
 	COMPILER_BARRIER();
-	FORCPU(me, bus_line7) = false;
+	FORCPU(me, thiscpu_busline7) = false;
 	COMPILER_BARRIER();
 	bus_flags[myid] = false;
 	COMPILER_BARRIER();

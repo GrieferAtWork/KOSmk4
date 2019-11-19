@@ -94,23 +94,23 @@ struct kernel_sigmask {
 
 DEFINE_REFCOUNT_FUNCTIONS(struct kernel_sigmask, sm_refcnt, kfree)
 
-/* An empty signal mask used to initialize `_this_sigmask' */
+/* An empty signal mask used to initialize `this_sigmask' */
 DATDEF struct kernel_sigmask empty_kernel_sigmask;
 
 /* [0..1][lock(READ(ATOMIC), WRITE(THIS_TASK))]
  * Reference to the signal mask (set of signals being blocked) in the current thread.
  * NOTE: Only ever NULL for kernel-space threads! */
-DATDEF ATTR_PERTASK ATOMIC_REF(struct kernel_sigmask) _this_sigmask;
+DATDEF ATTR_PERTASK ATOMIC_REF(struct kernel_sigmask) this_sigmask;
 
 /* Return a pointer to the signal mask of the calling thread. */
 #ifdef __INTELLISENSE__
 FUNDEF ATTR_RETNONNULL WUNUSED struct kernel_sigmask *KCALL sigmask_getrd(void);
 #else
-#define sigmask_getrd() PERTASK_GET(_this_sigmask.m_pointer)
+#define sigmask_getrd() PERTASK_GET(this_sigmask.m_pointer)
 #endif
 
-/* Make sure that `_this_sigmask' is allocated, and isn't being shared.
- * Then, always return `PERTASK_GET(_this_sigmask)' */
+/* Make sure that `this_sigmask' is allocated, and isn't being shared.
+ * Then, always return `PERTASK_GET(this_sigmask)' */
 FUNDEF ATTR_RETNONNULL WUNUSED struct kernel_sigmask *KCALL sigmask_getwr(void) THROWS(E_BADALLOC);
 
 /* Check for pending signals that are no longer being masked. */
@@ -236,8 +236,8 @@ DEFINE_REFCOUNT_FUNCTIONS(struct sighand_ptr, sp_refcnt, sighand_ptr_destroy)
 
 /* [0..1][valid_if(!TASK_FKERNTHREAD)][lock(PRIVATE(THIS_TASK))]
  * User-space signal handlers for the calling thread. */
-DATDEF ATTR_PERTASK REF struct sighand_ptr *_this_sighand_ptr;
-#define THIS_SIGHAND_PTR        PERTASK_GET(_this_sighand_ptr)
+DATDEF ATTR_PERTASK REF struct sighand_ptr *this_sighand_ptr;
+#define THIS_SIGHAND_PTR        PERTASK_GET(this_sighand_ptr)
 
 
 

@@ -201,7 +201,7 @@ NOTHROW(FCALL cpu_delrunningtask)(/*out*/ REF struct task *__restrict thread) {
 	struct cpu *me = thread->t_cpu;
 	assert(!PREEMPTION_ENABLED());
 	assert(me == THIS_CPU);
-	assertf(thread != &FORCPU(me, _this_idle),
+	assertf(thread != &FORCPU(me, thiscpu_idle),
 	        "Cannot remove the IDLE thread from a CPU");
 	assert(thread->t_sched.s_running.sr_runnxt != NULL);
 	assert(thread->t_sched.s_running.sr_runprv != NULL);
@@ -213,7 +213,7 @@ NOTHROW(FCALL cpu_delrunningtask)(/*out*/ REF struct task *__restrict thread) {
 			struct task *idle;
 			assert(thread->t_sched.s_running.sr_runnxt == thread);
 			assert(thread->t_sched.s_running.sr_runprv == thread);
-			idle = &FORCPU(me, _this_idle);
+			idle = &FORCPU(me, thiscpu_idle);
 			/* Check if the IDLE thread had been sleeping. */
 			if (idle->t_sched.s_asleep.ss_pself) {
 				/* The IDLE thread had been sleeping (time it out) */
@@ -431,8 +431,8 @@ NOTHROW(FCALL task_wake)(struct task *__restrict thread,
 	uintptr_t old_flags;
 	pflag_t was;
 	struct cpu *mycpu;
-	assert(THIS_TASK->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv == THIS_TASK &&
-	       THIS_TASK->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt == THIS_TASK);
+	assert(PERTASK_GET(this_task.t_sched.s_running.sr_runnxt)->t_sched.s_running.sr_runprv == THIS_TASK &&
+	       PERTASK_GET(this_task.t_sched.s_running.sr_runprv)->t_sched.s_running.sr_runnxt == THIS_TASK);
 	do {
 		old_flags = ATOMIC_READ(thread->t_flags);
 		if (old_flags & TASK_FTERMINATED) {
@@ -565,13 +565,13 @@ unset_waking:
 
 PUBLIC void NOTHROW(KCALL cpu_deepsleep)(void) {
 	struct cpu *me = THIS_CPU;
-	assertf(THIS_TASK == &FORCPU(me, _this_idle),
+	assertf(THIS_TASK == &FORCPU(me, thiscpu_idle),
 	        "cpu_deepsleep() may only be called form a cpu's IDLE thread!");
-	assertf(me->c_current == &FORCPU(me, _this_idle),
+	assertf(me->c_current == &FORCPU(me, thiscpu_idle),
 	        "cpu_deepsleep() may only be called form a cpu's IDLE thread!");
 	assertf(me->c_override == NULL,
 	        "cpu_deepsleep() cannot be called while a scheduling override is active");
-	assert(FORCPU(me, _this_idle).t_flags & TASK_FRUNNING);
+	assert(FORCPU(me, thiscpu_idle).t_flags & TASK_FRUNNING);
 	assert(me->c_state == CPU_STATE_RUNNING);
 again:
 	PREEMPTION_DISABLE();
@@ -583,9 +583,9 @@ again_already_disabled:
 	if (cpu_loadpending())
 		goto yield_and_return;
 #endif /* !CONFIG_NO_SMP */
-	assert((FORCPU(me, _this_idle).t_sched.s_running.sr_runnxt == &FORCPU(me, _this_idle)) ==
-	       (FORCPU(me, _this_idle).t_sched.s_running.sr_runprv == &FORCPU(me, _this_idle)));
-	if (FORCPU(me, _this_idle).t_sched.s_running.sr_runnxt != &FORCPU(me, _this_idle))
+	assert((FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runnxt == &FORCPU(me, thiscpu_idle)) ==
+	       (FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runprv == &FORCPU(me, thiscpu_idle)));
+	if (FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runnxt != &FORCPU(me, thiscpu_idle))
 		goto yield_and_return; /* There are other threads that are pending. */
 #ifndef CONFIG_NO_SMP
 	/* Check if there are IPIs that are pending
@@ -604,7 +604,7 @@ again_already_disabled:
 #endif /* !PREEMPTION_ENABLE_P */
 		goto again;
 	}
-	/* TODO: Check `ipi_inuse' for allocated, but  */
+	/* TODO: Check `thiscpu_x86_ipi_inuse' for allocated, but  */
 
 #endif /* !CONFIG_NO_SMP */
 
@@ -726,20 +726,20 @@ yield_and_return:
 	cpu_quantum_end();
 	/* Remove the IDLE thread from the running-ring. */
 	cpu_assert_integrity();
-	me->c_current = FORCPU(me, _this_idle).t_sched.s_running.sr_runnxt;
-	assert(FORCPU(me, _this_idle).t_flags & TASK_FRUNNING);
-	ATOMIC_FETCHAND(FORCPU(me, _this_idle).t_flags, ~TASK_FRUNNING);
-	assert(me->c_current != &FORCPU(me, _this_idle));
-	FORCPU(me, _this_idle).t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = FORCPU(me, _this_idle).t_sched.s_running.sr_runprv;
-	FORCPU(me, _this_idle).t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = FORCPU(me, _this_idle).t_sched.s_running.sr_runnxt;
+	me->c_current = FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runnxt;
+	assert(FORCPU(me, thiscpu_idle).t_flags & TASK_FRUNNING);
+	ATOMIC_FETCHAND(FORCPU(me, thiscpu_idle).t_flags, ~TASK_FRUNNING);
+	assert(me->c_current != &FORCPU(me, thiscpu_idle));
+	FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runprv;
+	FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runnxt;
 	/* Without the RUNNING flag, setup a special case of sleeping (outside of the chain) */
-	FORCPU(me, _this_idle).t_sched.s_asleep.ss_pself           = NULL;
-	FORCPU(me, _this_idle).t_sched.s_asleep.ss_tmonxt          = NULL;
-	FORCPU(me, _this_idle).t_sched.s_asleep.ss_timeout.q_jtime = (jtime_t)-1;
+	FORCPU(me, thiscpu_idle).t_sched.s_asleep.ss_pself           = NULL;
+	FORCPU(me, thiscpu_idle).t_sched.s_asleep.ss_tmonxt          = NULL;
+	FORCPU(me, thiscpu_idle).t_sched.s_asleep.ss_timeout.q_jtime = (jtime_t)-1;
 	cpu_assert_integrity(/*ignored_thread:*/ THIS_TASK);
 	/* Switch context to the next task. */
-	cpu_run_current_and_remember(&FORCPU(me, _this_idle));
-	assert(FORCPU(me, _this_idle).t_flags & TASK_FRUNNING);
+	cpu_run_current_and_remember(&FORCPU(me, thiscpu_idle));
+	assert(FORCPU(me, thiscpu_idle).t_flags & TASK_FRUNNING);
 }
 
 

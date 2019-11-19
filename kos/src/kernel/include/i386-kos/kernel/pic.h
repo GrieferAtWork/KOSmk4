@@ -88,15 +88,15 @@ struct x86_spurious_interrupts {
 /* Tracking information about spurious interrupts.
  * >> Useful for detecting faulty software that sends EOI commands at the
  *    wrong time, or for tracking problems in hardware, such as line noise. */
-DATDEF ATTR_PERCPU struct x86_spurious_interrupts x86_spurious_interrupts;
+DATDEF ATTR_PERCPU struct x86_spurious_interrupts thiscpu_x86_spurious_interrupts;
 
 
 /* Get/Set the mask of disabled interrupt lines.
  * >> `INTNO_PIC1_STMASK()' disables irq_t: 0x20...0x27
  * >> `INTNO_PIC2_STMASK()' disables irq_t: 0x28...0x2f */
-#define X86_PIC1_GTMASK()   inb_p(X86_PIC1_DATA)
+#define X86_PIC1_GTMASK()  inb_p(X86_PIC1_DATA)
 #define X86_PIC1_STMASK(m) outb_p(X86_PIC1_DATA, m)
-#define X86_PIC2_GTMASK()   inb_p(X86_PIC2_DATA)
+#define X86_PIC2_GTMASK()  inb_p(X86_PIC2_DATA)
 #define X86_PIC2_STMASK(m) outb_p(X86_PIC2_DATA, m)
 #endif /* __CC__ */
 

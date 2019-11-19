@@ -160,7 +160,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	usp = (USER CHECKED byte_t *)irregs_rdsp(&state->ics_irregs);
 	/* Check if sigaltstack should be used. */
 	if (action->sa_flags & SIGACTION_SA_ONSTACK)
-		usp = (USER CHECKED byte_t *)PERTASK_GET(_this_user_except_handler.ueh_stack);
+		usp = (USER CHECKED byte_t *)PERTASK_GET(this_user_except_handler.ueh_stack);
 
 	/* At this point, the following options affect how we need to set up the stack:
 	 *  - sc_info:                                  When non-NULL, we must restart an interrupted system call
@@ -199,7 +199,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 			user_ucontext->uc_mcontext.mc_cr2 = (__ULONGPTR_TYPE__)siginfo->si_addr;
 			user_ucontext->uc_mcontext.mc_flags |= __MCONTEXT_FLAG_HAVECR2;
 		}
-		if (PERTASK_GET(_this_fpustate)) {
+		if (PERTASK_GET(this_x86_fpustate)) {
 			user_fpustate = &user_ucontext->uc_mcontext.mc_fpu;
 			fpustate_saveinto32(user_fpustate);
 			user_ucontext->uc_mcontext.mc_flags |= x86_fpustate_variant == FPU_STATE_SSTATE
@@ -220,7 +220,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		user_ucontext->uc_mcontext.mc_context.ucs_gpregs.gp_esp = (u32)(uintptr_t)usp;
 		usp -= sizeof(struct ucpustate32);
 		/* Only save the FPU state if it is in use. */
-		if (PERTASK_GET(_this_fpustate)) {
+		if (PERTASK_GET(this_x86_fpustate)) {
 			/* Only allocate what we need for the used FPU state */
 			usp -= x86_fpustate_variant == FPU_STATE_SSTATE
 			       ? sizeof(struct sfpustate)

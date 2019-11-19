@@ -47,13 +47,13 @@
 DECL_BEGIN
 
 /* Feature tests helpers */
-#define HAVE_PAGE_GLOBAL_BIT       (__x86_bootcpu_idfeatures.ci_1d & CPUID_1D_PGE)
-#define HAVE_PAGE_ATTRIBUTE_TABLE  (__x86_bootcpu_idfeatures.ci_1d & CPUID_1D_PAT)
+#define HAVE_PAGE_GLOBAL_BIT       (x86_bootcpu_cpuid.ci_1d & CPUID_1D_PGE)
+#define HAVE_PAGE_ATTRIBUTE_TABLE  (x86_bootcpu_cpuid.ci_1d & CPUID_1D_PAT)
 #define HAVE_INSTR_INVLPG          1 /* Always supported on x86_64 */
-#define HAVE_INSTR_INVPCID         (__x86_bootcpu_idfeatures.ci_7b & CPUID_7B_INVPCID)
-#define HAVE_1GIB_PAGES            (__x86_bootcpu_idfeatures.ci_80000001d & CPUID_80000001D_PSE)
+#define HAVE_INSTR_INVPCID         (x86_bootcpu_cpuid.ci_7b & CPUID_7B_INVPCID)
+#define HAVE_1GIB_PAGES            (x86_bootcpu_cpuid.ci_80000001d & CPUID_80000001D_PSE)
 #define HAVE_2MIB_PAGES            1 /* Always available! (and also assumed to be by code below!) */
-#define HAVE_EXECUTE_DISABLE       (__x86_bootcpu_idfeatures.ci_80000001d & CPUID_80000001D_NX)
+#define HAVE_EXECUTE_DISABLE       (x86_bootcpu_cpuid.ci_80000001d & CPUID_80000001D_NX)
 
 INTERN u64 used_pxx_page_fglobal = P64_PAGE_FGLOBAL;
 #define USED_P64_PAGE_FGLOBAL used_pxx_page_fglobal
@@ -1407,7 +1407,7 @@ NOTHROW(FCALL p64_pagedir_map)(VIRT vm_vpage_t virt_page, size_t num_pages,
 
 /* Special variants of `pagedir_mapone()' that should be used to
  * temporary override the mapping of a single, prepared page.
- * These functions are mainly intended for use with `_this_trampoline_page', allowing
+ * These functions are mainly intended for use with `this_trampoline_page', allowing
  * each thread to push/pop its trampoline page, with doing so actually being an atomic
  * operation in the sense that the data is entirely thread-private, while modifications
  * do not require any kind of lock.
@@ -1830,7 +1830,7 @@ INTERN ATTR_FREETEXT ATTR_CONST union p64_pdir_e1 *
 NOTHROW(FCALL x86_get_cpu_iob_pointer_p64)(struct cpu *__restrict self) {
 	union p64_pdir_e1 *e1_pointer;
 	uintptr_t iobp;
-	iobp       = (uintptr_t)&FORCPU(self, x86_cpuiob[0]);
+	iobp       = (uintptr_t)&FORCPU(self, thiscpu_x86_iob[0]);
 	e1_pointer = &P64_PDIR_E1_IDENTITY[P64_PDIR_VEC4INDEX(iobp)]
 	                                  [P64_PDIR_VEC3INDEX(iobp)]
 	                                  [P64_PDIR_VEC2INDEX(iobp)]
@@ -1849,8 +1849,8 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 		for (i = 0; i < COMPILER_LENOF(p64_pageperm_matrix); ++i)
 			p64_pageperm_matrix[i] &= ~P64_PAGE_FNOEXEC;
 	}
-	/* Initialize the `_bootcpu.x86_cpu_iobnode_pagedir_identity' pointer. */
-	FORCPU(&_bootcpu, x86_cpu_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer_p64(&_bootcpu);
+	/* Initialize the `_bootcpu.thiscpu_x86_iobnode_pagedir_identity' pointer. */
+	FORCPU(&_bootcpu, thiscpu_x86_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer_p64(&_bootcpu);
 }
 
 

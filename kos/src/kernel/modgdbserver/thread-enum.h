@@ -33,7 +33,7 @@ typedef ssize_t /*NOTHROW*/ (FCALL PTHREAD_ENUM_CALLBACK)(void *arg, struct task
  *  - In EVERY_CPU->c_running
  *  - In EVERY_CPU->c_sleeping
  *  - In EVERY_CPU->c_pending
- *  - In FORCPU(EVERY_CPU, _this_idle)
+ *  - In FORCPU(EVERY_CPU, thiscpu_idle)
  * @return: >= 0: The total sum of return values of `callback'
  * @return: <  0: The first negative return value of `callback' */
 INTDEF ssize_t NOTHROW(FCALL GDBThread_Enumerate)(PTHREAD_ENUM_CALLBACK callback, void *arg);

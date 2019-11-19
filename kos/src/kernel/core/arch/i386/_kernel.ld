@@ -49,8 +49,8 @@
 	PROVIDE_HIDDEN(name##_size = ABSOLUTE(. - base_offset));            \
 	. = ABSOLUTE(name##_start + name##_size);                           \
 	PROVIDE_HIDDEN(name##_end = ABSOLUTE(.));
-#define PEROBJECT_SECTION(section_name,name,sections) \
-	PEROBJECT_SECTION_EX(section_name,name,0,sections)
+#define PEROBJECT_SECTION(section_name, name, sections) \
+	PEROBJECT_SECTION_EX(section_name, name, 0, sections)
 
 
 ENTRY(_start)
@@ -221,6 +221,13 @@ SECTIONS {
 	PEROBJECT_SECTION(.percpu, __kernel_percpu, {
 		KEEP(*(.data.percpu.head))
 		KEEP(*(.data.percpu))
+		PROVIDE(thiscpu_idle = ABSOLUTE(ALIGN(__SIZEOF_CACHELINE__)));
+		PROVIDE(thiscpu_x86_tss = CEIL_ALIGN(ABSOLUTE(thiscpu_idle + __kernel_pertask_size), PAGESIZE));
+		PROVIDE(thiscpu_x86_iob = ABSOLUTE(thiscpu_x86_tss) + PAGESIZE);
+		PROVIDE_HIDDEN(__kernel_percpu_full_pagecnt = CEILDIV(ABSOLUTE(thiscpu_x86_iob) + 8192 + 1, PAGESIZE));
+		PROVIDE_HIDDEN(__x86_cpu_part1_pages = ABSOLUTE(thiscpu_x86_iob) / PAGESIZE);
+/*		PROVIDE_HIDDEN(__x86_cpu_part2_pages = ABSOLUTE(2)); */
+/*		PROVIDE_HIDDEN(__x86_cpu_part3_pages = ABSOLUTE(1)); */
 	})
 #endif /* !CONFIG_NO_SMP */
 
@@ -259,29 +266,21 @@ SECTIONS {
 		PROVIDE_HIDDEN(__kernel_percpu_size = ABSOLUTE(ABSOLUTE(__kernel_percpu_end) - ABSOLUTE(__kernel_percpu_start)));
 		IP_ALIGN(__SIZEOF_CACHELINE__);
 		PROVIDE(_bootidle = ABSOLUTE(.));
-		PROVIDE(_this_idle = ABSOLUTE(.));
+		PROVIDE(thiscpu_idle = ABSOLUTE(.));
 		. += __kernel_pertask_size;
 		IP_ALIGN(PAGESIZE);
-		PROVIDE(x86_cputss = ABSOLUTE(.));
+		PROVIDE(thiscpu_x86_tss = ABSOLUTE(.));
 		KEEP(*(.data.percpu.tss))
 		STATIC_ASSERT((ABSOLUTE(.) - ABSOLUTE(__kernel_percpu_tss)) == SIZEOF_TSS);
 		IP_ALIGN(PAGESIZE);
-		PROVIDE(x86_cpuiob = ABSOLUTE(.));
+		PROVIDE(thiscpu_x86_iob = ABSOLUTE(.));
 		PROVIDE_HIDDEN(__x86_iob_empty_base = ABSOLUTE(.));
 		PROVIDE_HIDDEN(__x86_iob_empty_vpageno = ABSOLUTE(__x86_iob_empty_base) / PAGESIZE);
 		PROVIDE_HIDDEN(__x86_iob_empty_ppageno = ABSOLUTE(__x86_iob_empty_vpageno) - KERNEL_CORE_PAGE);
 		PROVIDE_HIDDEN(__x86_kernel_data_before_iob_pages = ABSOLUTE(__x86_iob_empty_vpageno - __kernel_data_startpage));
 		. += 8192; /* Make space for the IOBM table. */
 		. += 1;    /* Trailing FFh-byte */
-#else /* CONFIG_NO_SMP */
-		PROVIDE(_this_idle = CEIL_ALIGN(ABSOLUTE(__kernel_percpu_size), __SIZEOF_CACHELINE__));
-		PROVIDE(x86_cputss = CEIL_ALIGN(ABSOLUTE(_this_idle + __kernel_pertask_size), PAGESIZE));
-		PROVIDE(x86_cpuiob = ABSOLUTE(x86_cputss) + PAGESIZE);
-		PROVIDE_HIDDEN(__kernel_percpu_full_pagecnt = CEILDIV(ABSOLUTE(x86_cpuiob) + 8192 + 1, PAGESIZE));
-		PROVIDE_HIDDEN(__x86_cpu_part1_pages = ABSOLUTE(x86_cpuiob) / PAGESIZE);
-/*		PROVIDE_HIDDEN(__x86_cpu_part2_pages = ABSOLUTE(2)); */
-/* 		PROVIDE_HIDDEN(__x86_cpu_part3_pages = ABSOLUTE(1)); */
-#endif /* !CONFIG_NO_SMP */
+#endif /* CONFIG_NO_SMP */
 
 #ifndef CONFIG_NO_BRANCH_PROFILING
 		PROVIDE_HIDDEN(kernel_profile_branch_start = ABSOLUTE(.));
@@ -343,16 +342,16 @@ SECTIONS {
 #ifndef CONFIG_NO_SMP
 		IP_ALIGN(PAGESIZE);
 		PROVIDE(_bootcpu = ABSOLUTE(.));
-		. += _this_idle;
+		. += thiscpu_idle;
 		PROVIDE(_bootidle = ABSOLUTE(.));
 		. += __kernel_pertask_size;
 		STATIC_ASSERT((_bootcpu & (PAGESIZE - 1)) == 0);
-		STATIC_ASSERT((x86_cputss & (PAGESIZE - 1)) == 0);
-		STATIC_ASSERT((x86_cpuiob & (PAGESIZE - 1)) == 0);
-		. = ABSOLUTE(_bootcpu + x86_cputss);
+		STATIC_ASSERT((thiscpu_x86_tss & (PAGESIZE - 1)) == 0);
+		STATIC_ASSERT((thiscpu_x86_iob & (PAGESIZE - 1)) == 0);
+		. = ABSOLUTE(_bootcpu + thiscpu_x86_tss);
 		PROVIDE_HIDDEN(_bootcpu_x86_tss = ABSOLUTE(.));
 		STATIC_ASSERT((ABSOLUTE(.) & (PAGESIZE - 1)) == 0);
-		. = ABSOLUTE(_bootcpu + x86_cpuiob);
+		. = ABSOLUTE(_bootcpu + thiscpu_x86_iob);
 		/* Re-use the phyiscal memory allocated for _bootcpu's IOB
 		 * vector as the pages used to describe the empty IOB vector. */
 		PROVIDE_HIDDEN(__x86_iob_empty_base = ABSOLUTE(.));
@@ -364,8 +363,8 @@ SECTIONS {
 		. += 1;    /* Trailing FFh-byte */
 #endif /* !CONFIG_NO_SMP */
 
-		/* The value stored in `x86_cpuiob.t_iomap' */
-		PROVIDE_HIDDEN(__x86_cputss_iob_offset = ABSOLUTE(x86_cpuiob - x86_cputss));
+		/* The value stored in `thiscpu_x86_iob.t_iomap' */
+		PROVIDE_HIDDEN(__x86_cputss_iob_offset = ABSOLUTE(thiscpu_x86_iob - thiscpu_x86_tss));
 
 		IP_ALIGN(__SIZEOF_CACHELINE__);
 		PROVIDE(_boottask = ABSOLUTE(.));
@@ -479,28 +478,28 @@ SECTIONS {
 		PROVIDE_HIDDEN(__kernel_free_numpages = ABSOLUTE(ABSOLUTE(__kernel_free_endpage) - ABSOLUTE(__kernel_free_startpage)));
 	}
 
-	PROVIDE(jiffies = ABSOLUTE(_bootcpu + cpu_jiffies));
+	PROVIDE(jiffies = ABSOLUTE(_bootcpu + thiscpu_jiffies));
 
-	PROVIDE_HIDDEN(__x86_template_gdt = ABSOLUTE(__kernel_percpu_start + x86_cpugdt));
-	PROVIDE_HIDDEN(__x86_bootcpu_dfstack_node = ABSOLUTE(_bootcpu + x86_this_dfstack));
-	PROVIDE_HIDDEN(__x86_bootcpu_dfstack_part = ABSOLUTE(_bootcpu + x86_this_dfstack_part));
+	PROVIDE_HIDDEN(__x86_template_gdt = ABSOLUTE(__kernel_percpu_start + thiscpu_x86_gdt));
+	PROVIDE_HIDDEN(__x86_bootcpu_dfstack_node = ABSOLUTE(_bootcpu + thiscpu_x86_dfstacknode));
+	PROVIDE_HIDDEN(__x86_bootcpu_dfstack_part = ABSOLUTE(_bootcpu + thiscpu_x86_dfstackpart));
 	PROVIDE_HIDDEN(__x86_bootcpu_df_stackpage = ABSOLUTE(__x86_bootcpu_df_stack / PAGESIZE));
-	PROVIDE(__x86_bootcpu_features = ABSOLUTE(_bootcpu + cpu_features));
-	PROVIDE(__x86_bootcpu_idfeatures = ABSOLUTE(_bootcpu + cpuid_features));
-	PROVIDE(__x86_bootcpu_gdt = ABSOLUTE(_bootcpu + x86_cpugdt));
+	PROVIDE(x86_bootcpu_cpufeatures = ABSOLUTE(_bootcpu + thiscpu_x86_cpufeatures));
+	PROVIDE(x86_bootcpu_cpuid = ABSOLUTE(_bootcpu + thiscpu_x86_cpuid));
+	PROVIDE(x86_bootcpu_gdt = ABSOLUTE(_bootcpu + thiscpu_x86_gdt));
 
 #ifndef CONFIG_NO_BOOT0
 	PROVIDE_HIDDEN(__kernel_sector_count = ABSOLUTE((__kernel_size + 511) / 512));
 #endif /* !CONFIG_NO_BOOT0 */
 
 #ifdef CONFIG_NO_SMP
-#define TSS_BASE    x86_cputss
-#define TSS_DF_BASE x86_cputss_df
-#define LDT_BASE    x86_cpuldt
+#define TSS_BASE    thiscpu_x86_tss
+#define TSS_DF_BASE thiscpu_x86_tssdf
+#define LDT_BASE    thiscpu_x86_ldt
 #else /* CONFIG_NO_SMP */
-#define TSS_BASE    _bootcpu + x86_cputss
-#define TSS_DF_BASE _bootcpu + x86_cputss_df
-#define LDT_BASE    _bootcpu + x86_cpuldt
+#define TSS_BASE    _bootcpu + thiscpu_x86_tss
+#define TSS_DF_BASE _bootcpu + thiscpu_x86_tssdf
+#define LDT_BASE    _bootcpu + thiscpu_x86_ldt
 #endif /* !CONFIG_NO_SMP */
 
 	/* The size of the `struct tss' plus the associated IOB vector addend. */
@@ -533,8 +532,8 @@ SECTIONS {
 
 	PROVIDE_HIDDEN(__x86_kernel_ld_elf_startpage = ABSOLUTE(kernel_ld_elf) / PAGESIZE);
 	PROVIDE_HIDDEN(__x86_kernel_ld_elf_numpages  = ABSOLUTE(__x86_kernel_ld_elf_size) / PAGESIZE);
-	PROVIDE_HIDDEN(_this_idle_sched_state = ABSOLUTE(ABSOLUTE(_this_idle) + ABSOLUTE(_this_sched_state)));
-	PROVIDE_HIDDEN(_this_idle_x86_this_kernel_sp0 = ABSOLUTE(ABSOLUTE(_this_idle) + ABSOLUTE(x86_this_kernel_sp0)));
+	PROVIDE(this_idle_sched_state = ABSOLUTE(ABSOLUTE(thiscpu_idle) + ABSOLUTE(this_sched_state)));
+	PROVIDE(this_idle_x86_kernel_psp0 = ABSOLUTE(ABSOLUTE(thiscpu_idle) + ABSOLUTE(this_x86_kernel_psp0)));
 
 	PROVIDE_HIDDEN(__x86_dbg_cpu_temporary_b0 = (ABSOLUTE(dbg_cpu_temporary) & 0x000000ff) >> 0);
 	PROVIDE_HIDDEN(__x86_dbg_cpu_temporary_b1 = (ABSOLUTE(dbg_cpu_temporary) & 0x0000ff00) >> 8);
@@ -545,10 +544,10 @@ SECTIONS {
 	PROVIDE_HIDDEN(__x86_dbg_exitstate_temporary_b2 = (ABSOLUTE(dbg_exitstate) & 0x00ff0000) >> 16);
 	PROVIDE_HIDDEN(__x86_dbg_exitstate_temporary_b3 = (ABSOLUTE(dbg_exitstate) & 0xff000000) >> 24);
 
-	PROVIDE_HIDDEN(__x86_cputss_b0 = (ABSOLUTE(x86_cputss) & 0x000000ff) >> 0);
-	PROVIDE_HIDDEN(__x86_cputss_b1 = (ABSOLUTE(x86_cputss) & 0x0000ff00) >> 8);
-	PROVIDE_HIDDEN(__x86_cputss_b2 = (ABSOLUTE(x86_cputss) & 0x00ff0000) >> 16);
-	PROVIDE_HIDDEN(__x86_cputss_b3 = (ABSOLUTE(x86_cputss) & 0xff000000) >> 24);
+	PROVIDE_HIDDEN(__x86_cputss_b0 = (ABSOLUTE(thiscpu_x86_tss) & 0x000000ff) >> 0);
+	PROVIDE_HIDDEN(__x86_cputss_b1 = (ABSOLUTE(thiscpu_x86_tss) & 0x0000ff00) >> 8);
+	PROVIDE_HIDDEN(__x86_cputss_b2 = (ABSOLUTE(thiscpu_x86_tss) & 0x00ff0000) >> 16);
+	PROVIDE_HIDDEN(__x86_cputss_b3 = (ABSOLUTE(thiscpu_x86_tss) & 0xff000000) >> 24);
 
 #ifndef __x86_64__
 #ifndef CONFIG_NO_PAGING_P32

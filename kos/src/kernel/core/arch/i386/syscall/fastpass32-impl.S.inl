@@ -94,7 +94,7 @@ INTERN_FUNCTION(FUNC(execveat))
 	pushl_cfi %ebx /* Arg #0 */
 	pushl_cfi %eax /* struct icpustate *__restrict state */
 
-	INTERN(kernel_execveat)
+	EXTERN(kernel_execveat)
 	call   kernel_execveat
 	.cfi_adjust_cfa_offset -24 /* STDCALL does callee-cleanup */
 	movl   %eax, %esp /* Load the new register context stack. */
@@ -139,7 +139,7 @@ INTERN_FUNCTION(FUNC(execve))
 	pushl_cfi %ebx      /* Arg #1 */
 	pushl_cfi $AT_FDCWD /* Arg #0 */
 	pushl_cfi %eax      /* struct icpustate *__restrict state */
-	INTERN(kernel_execveat)
+	EXTERN(kernel_execveat)
 	call   kernel_execveat
 	.cfi_adjust_cfa_offset -24 /* STDCALL does callee-cleanup */
 	movl   %eax, %esp   /* Load the new register context stack. */
@@ -179,7 +179,7 @@ INTERN_FUNCTION(FUNC(debugtrap))
 	pushl_cfi %ecx        /* Arg #2 (USER UNCHECKED struct debugtrap_reason const *ureason) */
 	movl   %ebx, %edx     /* Arg #1 (USER UNCHECKED struct ucpustate const *state) */
 	leal   4(%esp), %ecx  /* struct icpustate *__restrict return_state */
-	INTERN(sys_debugtrap32_impl)
+	EXTERN(sys_debugtrap32_impl)
 	call   sys_debugtrap32_impl
 	.cfi_adjust_cfa_offset -4
 
@@ -219,7 +219,7 @@ INTERN_FUNCTION(FUNC(iopl))
 
 	movl   %esp, %ecx /* struct icpustate *__restrict state */
 	movl   %ebx, %edx /* syscall_ulong_t level */
-	INTERN(sys_iopl_impl)
+	EXTERN(sys_iopl_impl)
 	call   sys_iopl_impl
 
 	popal_cfi_r

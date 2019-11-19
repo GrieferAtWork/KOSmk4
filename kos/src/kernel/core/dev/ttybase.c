@@ -99,11 +99,11 @@ kernel_terminal_check_sigttou(struct terminal *__restrict self) {
 	assert(character_device_isattybase(term));
 	my_leader = task_getprocessgroupleader();
 	FINALLY_DECREF_UNLIKELY(my_leader);
-	if unlikely(FORTASK(my_leader, _this_taskpid) != ATOMIC_READ(term->t_fproc.m_pointer)) {
+	if unlikely(FORTASK(my_leader, this_taskpid) != ATOMIC_READ(term->t_fproc.m_pointer)) {
 		struct taskpid *my_leader_pid;
 		REF struct task *oldproc;
 		REF struct taskpid *oldpid;
-		my_leader_pid = FORTASK(my_leader, _this_taskpid);
+		my_leader_pid = FORTASK(my_leader, this_taskpid);
 again_set_myleader_as_fproc:
 		if (term->t_fproc.cmpxch(NULL, my_leader_pid))
 			goto done; /* Lazily set the caller as the initial foreground process */
@@ -442,7 +442,7 @@ do_TCSETA: {
 			FINALLY_DECREF_UNLIKELY(newthread);
 			newgroup = task_getprocessgroupleader_of(newthread);
 		}
-		newpid = incref(FORTASK(newgroup, _this_taskpid));
+		newpid = incref(FORTASK(newgroup, this_taskpid));
 		decref_unlikely(newgroup);
 		printk(KERN_INFO "[tty:%q] Set foreground process group to %p [tid=%u]\n",
 		       me->cd_name, newgroup, (unsigned int)taskpid_getrootpid(newpid));
@@ -748,9 +748,9 @@ NOTHROW(KCALL ttybase_device_setctty)(struct ttybase_device *__restrict self,
 	FINALLY_DECREF_UNLIKELY(session);
 	if unlikely(session != proc && caller_must_be_leader)
 		return TTYBASE_DEVICE_SETCTTY_NOTLEADER;
-	session_pid = FORTASK(session, _this_taskpid);
+	session_pid = FORTASK(session, this_taskpid);
 again_check_tg_ctty:
-	if (ATOMIC_READ(FORTASK(session, _this_taskgroup).tg_ctty.m_pointer) != NULL) {
+	if (ATOMIC_READ(FORTASK(session, this_taskgroup).tg_ctty.m_pointer) != NULL) {
 		auto &my_ctty_pointer = __TASK_CTTY_FIELD(session);
 		REF struct ttybase_device *old_ctty;
 		old_ctty = my_ctty_pointer.get();
@@ -851,7 +851,7 @@ again_check_t_cproc:
 		/* Set the TTY link of the session task descriptor. */
 		auto &my_ctty_pointer = __TASK_CTTY_FIELD(session);
 		if unlikely(!my_ctty_pointer.cmpxch(NULL, self)) {
-			self->t_cproc.cmpxch(FORTASK(session, _this_taskpid), NULL);
+			self->t_cproc.cmpxch(FORTASK(session, this_taskpid), NULL);
 			goto again_check_tg_ctty;
 		}
 		ttybase_log_setsession(self, session, session_pid);
@@ -876,7 +876,7 @@ NOTHROW(KCALL ttybase_device_hupctty)(struct ttybase_device *required_old_ctty,
 	FINALLY_DECREF_UNLIKELY(session);
 	if unlikely(session != proc && caller_must_be_leader)
 		return TTYBASE_DEVICE_HUPCTTY_NOTLEADER;
-	session_pid = FORTASK(session, _this_taskpid);
+	session_pid = FORTASK(session, this_taskpid);
 	if (required_old_ctty) {
 		auto &my_ctty_pointer = __TASK_CTTY_FIELD(session);
 again_my_ctty_pointer_cmpxch:

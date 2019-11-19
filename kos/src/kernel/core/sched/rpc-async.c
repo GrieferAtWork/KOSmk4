@@ -149,7 +149,7 @@ NOTHROW(FCALL ipi_schedule_asynchronous_rpc_lp)(struct icpustate *__restrict sta
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if unlikely(!target->t_sched.s_asleep.ss_pself) {
 			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
-			assert(target == &FORCPU(mycpu, _this_idle));
+			assert(target == &FORCPU(mycpu, thiscpu_idle));
 		} else {
 			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -222,7 +222,7 @@ insert_target_after_caller:
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if unlikely(!target->t_sched.s_asleep.ss_pself) {
 			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
-			assert(target == &FORCPU(mycpu, _this_idle));
+			assert(target == &FORCPU(mycpu, thiscpu_idle));
 		} else {
 			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -291,7 +291,7 @@ insert_target_after_caller:
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if unlikely(!target->t_sched.s_asleep.ss_pself) {
 			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
-			assert(target == &FORCPU(mycpu, _this_idle));
+			assert(target == &FORCPU(mycpu, thiscpu_idle));
 		} else {
 			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -351,7 +351,7 @@ NOTHROW(FCALL ipi_redirect_usercode_rpc_lp)(struct icpustate *__restrict state,
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if unlikely(!target->t_sched.s_asleep.ss_pself) {
 			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
-			assert(target == &FORCPU(mycpu, _this_idle));
+			assert(target == &FORCPU(mycpu, thiscpu_idle));
 		} else {
 			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -410,7 +410,7 @@ insert_target_after_caller:
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if unlikely(!target->t_sched.s_asleep.ss_pself) {
 			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
-			assert(target == &FORCPU(mycpu, _this_idle));
+			assert(target == &FORCPU(mycpu, thiscpu_idle));
 		} else {
 			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -464,7 +464,7 @@ insert_target_after_caller:
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if unlikely(!target->t_sched.s_asleep.ss_pself) {
 			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
-			assert(target == &FORCPU(mycpu, _this_idle));
+			assert(target == &FORCPU(mycpu, thiscpu_idle));
 		} else {
 			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -556,9 +556,9 @@ insert_target_after_caller:
 			if unlikely(!target->t_sched.s_asleep.ss_pself) {
 				/* Special case: The IDLE thread can sleep outside of the sleepers chain */
 #ifndef CONFIG_NO_SMP
-				assert(target == &FORCPU(mycpu, _this_idle));
+				assert(target == &FORCPU(mycpu, thiscpu_idle));
 #else /* !CONFIG_NO_SMP */
-				assert(target == &PERCPU(_this_idle));
+				assert(target == &PERCPU(thiscpu_idle));
 #endif /* CONFIG_NO_SMP */
 			} else {
 				if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
@@ -665,9 +665,9 @@ insert_target_after_caller:
 			if unlikely(!target->t_sched.s_asleep.ss_pself) {
 				/* Special case: The IDLE thread can sleep outside of the sleepers chain */
 #ifndef CONFIG_NO_SMP
-				assert(target == &FORCPU(mycpu, _this_idle));
+				assert(target == &FORCPU(mycpu, thiscpu_idle));
 #else /* !CONFIG_NO_SMP */
-				assert(target == &PERCPU(_this_idle));
+				assert(target == &PERCPU(thiscpu_idle));
 #endif /* CONFIG_NO_SMP */
 			} else {
 				if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
@@ -757,7 +757,7 @@ NOTHROW(FCALL ipi_schedule_asynchronous_srpc_lp)(struct icpustate *__restrict st
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if unlikely(!target->t_sched.s_asleep.ss_pself) {
 			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
-			assert(target == &FORCPU(mycpu, _this_idle));
+			assert(target == &FORCPU(mycpu, thiscpu_idle));
 		} else {
 			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -825,7 +825,7 @@ insert_target_after_caller:
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if unlikely(!target->t_sched.s_asleep.ss_pself) {
 			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
-			assert(target == &FORCPU(mycpu, _this_idle));
+			assert(target == &FORCPU(mycpu, thiscpu_idle));
 		} else {
 			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -892,7 +892,7 @@ insert_target_after_caller:
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if unlikely(!target->t_sched.s_asleep.ss_pself) {
 			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
-			assert(target == &FORCPU(mycpu, _this_idle));
+			assert(target == &FORCPU(mycpu, thiscpu_idle));
 		} else {
 			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -994,9 +994,9 @@ insert_target_after_caller:
 			if unlikely(!target->t_sched.s_asleep.ss_pself) {
 				/* Special case: The IDLE thread can sleep outside of the sleepers chain */
 #ifndef CONFIG_NO_SMP
-				assert(target == &FORCPU(mycpu, _this_idle));
+				assert(target == &FORCPU(mycpu, thiscpu_idle));
 #else /* !CONFIG_NO_SMP */
-				assert(target == &PERCPU(_this_idle));
+				assert(target == &PERCPU(thiscpu_idle));
 #endif /* CONFIG_NO_SMP */
 			} else {
 				if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
@@ -1100,7 +1100,7 @@ insert_target_after_caller:
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if unlikely(!target->t_sched.s_asleep.ss_pself) {
 			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
-			assert(target == &FORCPU(mycpu, _this_idle));
+			assert(target == &FORCPU(mycpu, thiscpu_idle));
 		} else {
 			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -1207,7 +1207,7 @@ insert_target_after_caller:
 			assert(target->t_sched.s_asleep.ss_pself);
 			if unlikely(!target->t_sched.s_asleep.ss_pself) {
 				/* Special case: The IDLE thread can sleep outside of the sleepers chain */
-				assert(target == &FORCPU(mycpu, _this_idle));
+				assert(target == &FORCPU(mycpu, thiscpu_idle));
 			} else {
 				if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 					target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -1299,7 +1299,7 @@ insert_target_after_caller:
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if unlikely(!target->t_sched.s_asleep.ss_pself) {
 			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
-			assert(target == &FORCPU(mycpu, _this_idle));
+			assert(target == &FORCPU(mycpu, thiscpu_idle));
 		} else {
 			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -1407,7 +1407,7 @@ insert_target_after_caller:
 			ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 			if unlikely(!target->t_sched.s_asleep.ss_pself) {
 				/* Special case: The IDLE thread can sleep outside of the sleepers chain */
-				assert(target == &FORCPU(mycpu, _this_idle));
+				assert(target == &FORCPU(mycpu, thiscpu_idle));
 			} else {
 				if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 					target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -1511,7 +1511,7 @@ insert_target_after_caller:
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if unlikely(!target->t_sched.s_asleep.ss_pself) {
 			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
-			assert(target == &FORCPU(mycpu, _this_idle));
+			assert(target == &FORCPU(mycpu, thiscpu_idle));
 		} else {
 			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -1628,9 +1628,9 @@ insert_target_after_caller:
 			if unlikely(!target->t_sched.s_asleep.ss_pself) {
 				/* Special case: The IDLE thread can sleep outside of the sleepers chain */
 #ifndef CONFIG_NO_SMP
-				assert(target == &FORCPU(mycpu, _this_idle));
+				assert(target == &FORCPU(mycpu, thiscpu_idle));
 #else /* !CONFIG_NO_SMP */
-				assert(target == &PERCPU(_this_idle));
+				assert(target == &PERCPU(thiscpu_idle));
 #endif /* CONFIG_NO_SMP */
 			} else {
 				if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)

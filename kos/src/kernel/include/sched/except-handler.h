@@ -39,11 +39,11 @@ struct user_except_handler {
 };
 
 /* User-space exception handler mode for the current thread. */
-DATDEF ATTR_PERTASK struct user_except_handler _this_user_except_handler;
+DATDEF ATTR_PERTASK struct user_except_handler this_user_except_handler;
 
 /* [0..1] User-space TID address used to implement functionality such as `pthread_join()'
  *        When the associated thread exits, it will:
- *        >> pid_t *addr = PERTASK_GET(_this_tid_address);
+ *        >> pid_t *addr = PERTASK_GET(this_tid_address);
  *        >> if (addr) {
  *        >>     TRY {
  *        >>         *addr = 0;
@@ -55,10 +55,10 @@ DATDEF ATTR_PERTASK struct user_except_handler _this_user_except_handler;
  *        >>     }
  *        >> }
  * When a new thread is created by clone(), the `CLONE_CHILD_CLEARTID' flag will cause
- * the given `ctid' to be used as the initial value for `_this_tid_address', while the
+ * the given `ctid' to be used as the initial value for `this_tid_address', while the
  * `CLONE_CHILD_SETTID' flag will cause the same address to be filled with the thread's
  * TID. */
-DATDEF ATTR_PERTASK USER CHECKED pid_t *_this_tid_address;
+DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
 
 #endif /* __CC__ */
 

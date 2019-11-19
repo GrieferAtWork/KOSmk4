@@ -1616,7 +1616,7 @@ function generate_386_kernel_syscall_wrappers(
 			fp << "EXTERN(sys_" << sc.name << ")\n";
 		fp << "\n\n\n";
 		fp << "INTERN(__asm32_bad_sysenter_extension)\n";
-		fp << "INTERN(x86_syscall_personality)\n";
+		fp << "EXTERN(x86_syscall_personality)\n";
 		fp << "\n\n\n";
 		function do_restore_registers(restore_registers, sc: Syscall) {
 			function is_none_reg(x) {
@@ -1883,7 +1883,7 @@ function generate_x86_64_kernel_syscall_wrappers(
 		}
 		fp << "\n\n\n";
 		fp << "INTERN(__asm32_bad_sysenter_extension)\n";
-		fp << "INTERN(x86_syscall_personality)\n";
+		fp << "EXTERN(x86_syscall_personality)\n";
 		fp << "\n\n\n";
 		function print_x64_wrapper(sc: Syscall) {
 			fp << "\tpushq_cfi_r %rcx\n";

@@ -205,7 +205,7 @@ again:
 		task_yield();
 		goto again;
 	}
-	oldvm = FORTASK(me, _this_vm);
+	oldvm = FORTASK(me, this_vm);
 	if likely(oldvm != newvm) {
 		if unlikely(!vm_tasklock_trywrite(newvm)) {
 			PREEMPTION_POP(was);
@@ -232,7 +232,7 @@ again:
 		}
 		LLIST_INSERT(newvm->v_tasks, me, t_vm_tasks);
 		vm_tasklock_endwrite(newvm);
-		FORTASK(me, _this_vm) = incref(newvm);
+		FORTASK(me, this_vm) = incref(newvm);
 		pagedir_set(newvm->v_pdir_phys_ptr);
 		sync_endwrite(&change_vm_lock);
 		PREEMPTION_POP(was);

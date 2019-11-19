@@ -48,17 +48,17 @@ DATDEF struct ioperm_bitmap ioperm_bitmap_empty;
 /* [0..1][lock(WRITE_ONCE)]
  * The I/O permissions bitmap of the calling thread.
  * Lazily allocated during `ioperm()' and `#PF' (s.a. documentation in <kernel/tss.h>) */
-DATDEF ATTR_PERTASK REF struct ioperm_bitmap *_this_ioperm_bitmap;
-#define THIS_IOPERM_BITMAP PERTASK_GET(_this_ioperm_bitmap)
+DATDEF ATTR_PERTASK REF struct ioperm_bitmap *this_x86_ioperm_bitmap;
+#define THIS_X86_IOPERM_BITMAP PERTASK_GET(this_x86_ioperm_bitmap)
 
-/* [0..1][== NULL || == THIS_IOPERM_BITMAP]
+/* [0..1][== NULL || == THIS_X86_IOPERM_BITMAP]
  * The currently mapped I/O permissions bitmap within the current CPU.
  * During preemption, this variable is checked and cleared to `NULL' if it
- * was found to be non-NULL, and during the first access made to `x86_cpuiob' during
- * the life-time of thread, this variable will be filled with `THIS_IOPERM_BITMAP'.
- * It's main purpose is to keep track of the is-mapped state of the `x86_cpuiob'
+ * was found to be non-NULL, and during the first access made to `thiscpu_x86_iob' during
+ * the life-time of thread, this variable will be filled with `THIS_X86_IOPERM_BITMAP'.
+ * It's main purpose is to keep track of the is-mapped state of the `thiscpu_x86_iob'
  * memory area for the duration of some thread's quantum. */
-DATDEF ATTR_PERCPU struct ioperm_bitmap *_current_ioperm_bitmap;
+DATDEF ATTR_PERCPU struct ioperm_bitmap *thiscpu_x86_ioperm_bitmap;
 
 
 /* Destroy the given I/O permissions bitmap. */

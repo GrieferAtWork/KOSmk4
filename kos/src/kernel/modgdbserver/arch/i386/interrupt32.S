@@ -46,7 +46,7 @@ INTERN_FUNCTION(GDBX86Interrupt_AsmInt1Handler)
 	movw   %ax, %fs
 
 	movl   %esp, %ecx
-	INTERN(GDBX86Interrupt_Int1Handler)
+	EXTERN(GDBX86Interrupt_Int1Handler)
 	call   GDBX86Interrupt_Int1Handler
 	movl   %eax, %esp
 
@@ -84,7 +84,7 @@ INTERN_FUNCTION(GDBX86Interrupt_AsmInt3Handler)
 	movw   %ax, %fs
 
 	movl   %esp, %ecx
-	INTERN(GDBX86Interrupt_Int3Handler)
+	EXTERN(GDBX86Interrupt_Int3Handler)
 	call   GDBX86Interrupt_Int3Handler
 	movl   %eax, %esp
 

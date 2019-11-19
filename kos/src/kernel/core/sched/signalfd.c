@@ -158,7 +158,7 @@ no_perthread_pending:
 /* Connect to the signal queue signals of the calling thread and process. */
 LOCAL void KCALL connect_to_my_signal_queues(void) {
 	struct sigqueue *pqueue, *tqueue;
-	pqueue = &FORTASK(task_getprocess(), _this_taskgroup).tg_proc_signals.psq_queue;
+	pqueue = &FORTASK(task_getprocess(), this_taskgroup).tg_proc_signals.psq_queue;
 	tqueue = &THIS_SIGQUEUE;
 	task_connect(&pqueue->sq_newsig);
 	task_connect(&tqueue->sq_newsig);
@@ -299,7 +299,7 @@ update_signalfd(unsigned int fd,
 		 * Oh well... Just mirror what linux does... */
 		{
 			struct sigqueue *pqueue, *tqueue;
-			pqueue = &FORTASK(task_getprocess(), _this_taskgroup).tg_proc_signals.psq_queue;
+			pqueue = &FORTASK(task_getprocess(), this_taskgroup).tg_proc_signals.psq_queue;
 			tqueue = &THIS_SIGQUEUE;
 			sig_broadcast(&pqueue->sq_newsig);
 			sig_broadcast(&tqueue->sq_newsig);

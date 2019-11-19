@@ -99,9 +99,9 @@ NOTHROW(KCALL taskpid_getrootpid)(struct taskpid const *__restrict self);
 
 /* [1..1][valid_if(!TASK_FKERNTHREAD)][const] The PID associated with the calling thread.
  * NOTE: `NULL' (though assume UNDEFINED if the choice comes up) for kernel threads. */
-DATDEF ATTR_PERTASK struct taskpid *_this_taskpid;
-#define THIS_TASKPID    PERTASK_GET(_this_taskpid)
-#define THIS_PIDNS     (PERTASK_GET(_this_taskpid)->tp_pidns)
+DATDEF ATTR_PERTASK struct taskpid *this_taskpid;
+#define THIS_TASKPID    PERTASK_GET(this_taskpid)
+#define THIS_PIDNS     (PERTASK_GET(this_taskpid)->tp_pidns)
 
 
 /* For `posix-signal' */
@@ -129,13 +129,13 @@ FUNDEF NOBLOCK void NOTHROW(KCALL sigqueue_fini)(struct sigqueue *__restrict sel
 /* [valid_if(!TASK_FKERNTHREAD)]
  * [lock(LINKED_LIST(APPEND(ATOMIC),CLEAR(THIS_TASK)))]
  * Pending signals for the calling thread. */
-DATDEF ATTR_PERTASK struct sigqueue _this_sigqueue;
-#define THIS_SIGQUEUE       PERTASK(_this_sigqueue)
+DATDEF ATTR_PERTASK struct sigqueue this_sigqueue;
+#define THIS_SIGQUEUE       PERTASK(this_sigqueue)
 
 /* [valid_if(!TASK_FKERNTHREAD)]
  * Pending signals for the calling process. */
 #define THIS_PROCESS_SIGQUEUE \
-	FORTASK(task_getprocess(), _this_taskgroup.tg_proc_signals)
+	FORTASK(task_getprocess(), this_taskgroup.tg_proc_signals)
 
 struct ttybase_device;
 struct taskgroup {
@@ -144,7 +144,7 @@ struct taskgroup {
 	REF struct task             *tg_process;             /* [1..1][ref_if(!= THIS_TASK)][const]
 	                                                      * Process leader (the main-thread of the associated process).
 	                                                      * When this thread terminates, all other threads within the process also die.
-	                                                      * @assume(tg_process == FORTASK(tg_process,_this_taskgroup).tg_process)
+	                                                      * @assume(tg_process == FORTASK(tg_process,this_taskgroup).tg_process)
 	                                                      * NOTE:
 	                                                      *   - When set to `THIS_TASK', the calling thread is a process leader,
 	                                                      *     also meaning that the `tp_siblings' chain within its PID structure
@@ -169,14 +169,14 @@ struct taskgroup {
 	                                                      *      `struct taskpid *' of the child which has changed state. */
 	struct atomic_rwlock         tg_proc_parent_lock;    /* Lock for `tg_proc_parent' */
 	WEAK struct task            *tg_proc_parent;         /* [0..1][const] The parent of this process.
-	                                                      * @assume(tg_proc_parent == FORTASK(tg_proc_parent,_this_taskgroup).tg_process)
+	                                                      * @assume(tg_proc_parent == FORTASK(tg_proc_parent,this_taskgroup).tg_process)
 	                                                      * In the event that this process has a parent, `THIS_TASKPID->tp_siblings'
 	                                                      * is a link within `tg_proc_parent->tp_thread->tg_proc_threads'.
 	                                                      * In the event that the parent process terminates before its child, this field
 	                                                      * gets set to `NULL', at which point `THIS_TASKPID->tp_siblings' is unbound. */
 	struct atomic_rwlock         tg_proc_group_lock;     /* Lock for `tg_proc_group' */
 	REF struct task             *tg_proc_group;          /* [1..1][ref_if(!= THIS_TASK)][lock(tg_proc_group_lock)]
-	                                                      * @assume(tg_proc_procgroup == FORTASK(tg_proc_procgroup,_this_taskgroup).tg_proc_procgroup)
+	                                                      * @assume(tg_proc_procgroup == FORTASK(tg_proc_procgroup,this_taskgroup).tg_proc_procgroup)
 	                                                      * The leader of the associated process group.
 	                                                      * When set to `THIS_TASK', then the calling thread is a process group leader. */
 	LLIST_NODE(WEAK struct task) tg_proc_group_siblings; /* [0..1][lock(tg_proc_group->tg_pgrp_processes_lock)]
@@ -192,7 +192,7 @@ struct taskgroup {
 	                                                      *       new processes from being added to the process group. */
 	struct atomic_rwlock         tg_pgrp_session_lock;   /* Lock for `tg_pgrp_session' */
 	REF struct task             *tg_pgrp_session;        /* [1..1][ref_if(!= THIS_TASK)][const_if(== THIS_TASK)][lock(tg_pgrp_session_lock)]
-	                                                      * @assume(tg_pgrp_session == FORTASK(tg_pgrp_session,_this_taskgroup).tg_pgrp_session)
+	                                                      * @assume(tg_pgrp_session == FORTASK(tg_pgrp_session,this_taskgroup).tg_pgrp_session)
 	                                                      * The session leader of the this process group.
 	                                                      * When set to `THIS_TASK', then the calling thread is that leader. */
 	/* All of the following fields are only valid when `tg_pgrp_session == THIS_TASK' (Otherwise, they are all `[0..1][const]') */
@@ -201,8 +201,8 @@ struct taskgroup {
 };
 
 
-DATDEF ATTR_PERTASK struct taskgroup _this_taskgroup;
-#define THIS_TASKGROUP       PERTASK(_this_taskgroup)
+DATDEF ATTR_PERTASK struct taskgroup this_taskgroup;
+#define THIS_TASKGROUP       PERTASK(this_taskgroup)
 
 #ifdef __INTELLISENSE__
 /* Returns a pointer to the process associated with the calling/given thread.
@@ -212,10 +212,10 @@ FORCELOCAL WUNUSED /*ATTR_RETNONNULL*/ ATTR_CONST struct taskpid *KCALL task_get
 FORCELOCAL WUNUSED /*ATTR_RETNONNULL*/ ATTR_CONST NONNULL((1)) struct task *KCALL task_getprocess_of(struct task *__restrict thread);
 FORCELOCAL WUNUSED /*ATTR_RETNONNULL*/ ATTR_CONST NONNULL((1)) struct taskpid *KCALL task_getprocesspid_of(struct task *__restrict thread);
 #else /* __INTELLISENSE__ */
-#define task_getprocess()              ((struct task *)PERTASK_GET(_this_taskgroup.tg_process))
-#define task_getprocesspid()           FORTASK(task_getprocess(), _this_taskpid)
-#define task_getprocess_of(thread)     ((struct task *)FORTASK(thread, _this_taskgroup).tg_process)
-#define task_getprocesspid_of(thread)  FORTASK(task_getprocess_of(thread), _this_taskpid)
+#define task_getprocess()              ((struct task *)PERTASK_GET(this_taskgroup.tg_process))
+#define task_getprocesspid()           FORTASK(task_getprocess(), this_taskpid)
+#define task_getprocess_of(thread)     ((struct task *)FORTASK(thread, this_taskgroup).tg_process)
+#define task_getprocesspid_of(thread)  FORTASK(task_getprocess_of(thread), this_taskpid)
 #endif /* !__INTELLISENSE__ */
 
 /* Returns a reference to the parent of the calling/given process.
@@ -294,17 +294,17 @@ FORCELOCAL NOBLOCK WUNUSED ATTR_PURE upid_t NOTHROW(KCALL task_getrootpid_s)(voi
  * With that in mind, the non-*_s variants will cause kernel panic/undefined behavior for any
  * for the following situations:
  * task_gettid_of:
- *   - FORTASK(thread,_this_taskpid) == NULL                                  (`thread' is a kernel thread)
+ *   - FORTASK(thread,this_taskpid) == NULL                                  (`thread' is a kernel thread)
  *   - THIS_TASKPID == NULL                                                   (The caller is a kernel thread)
  * task_getroottid_of:
- *   - FORTASK(thread,_this_taskpid) == NULL                                  (`thread' is a kernel thread)
+ *   - FORTASK(thread,this_taskpid) == NULL                                  (`thread' is a kernel thread)
  * task_getpid_of:
  *   - FORTASK(thread,_this_group.tg_process) == NULL                         (`thread' is a kernel thread)
- *   - FORTASK(FORTASK(thread,_this_group.tg_process),_this_taskpid) == NULL  (The process leader of `thread' is a kernel thread)
+ *   - FORTASK(FORTASK(thread,_this_group.tg_process),this_taskpid) == NULL  (The process leader of `thread' is a kernel thread)
  *   - THIS_TASKPID == NULL                                                   (The caller is a kernel thread)
  * task_getrootpid_of:
  *   - FORTASK(thread,_this_group.tg_process) == NULL                         (`thread' is a kernel thread)
- *   - FORTASK(FORTASK(thread,_this_group.tg_process),_this_taskpid) == NULL  (The process leader of `thread' is a kernel thread)
+ *   - FORTASK(FORTASK(thread,_this_group.tg_process),this_taskpid) == NULL  (The process leader of `thread' is a kernel thread)
  */
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_gettid_of)(struct task const *__restrict thread);
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_gettid_of_s)(struct task const *__restrict thread);
@@ -575,11 +575,11 @@ FORCELOCAL WUNUSED REF struct task *KCALL
 task_getprocessparent(void) THROWS(E_WOULDBLOCK) {
 	REF struct task *result;
 	struct task *proc = task_getprocess();
-	sync_read(&FORTASK(proc, _this_taskgroup).tg_proc_parent_lock);
-	result = FORTASK(proc, _this_taskgroup).tg_proc_parent;
+	sync_read(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock);
+	result = FORTASK(proc, this_taskgroup).tg_proc_parent;
 	if (result && !tryincref(result))
 		result = NULL;
-	sync_endread(&FORTASK(proc, _this_taskgroup).tg_proc_parent_lock);
+	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock);
 	return result;
 }
 
@@ -587,11 +587,11 @@ FORCELOCAL WUNUSED NONNULL((1)) REF struct task *KCALL
 task_getprocessparent_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
 	REF struct task *result;
 	struct task *proc = task_getprocess_of(thread);
-	sync_read(&FORTASK(proc, _this_taskgroup).tg_proc_parent_lock);
-	result = FORTASK(proc, _this_taskgroup).tg_proc_parent;
+	sync_read(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock);
+	result = FORTASK(proc, this_taskgroup).tg_proc_parent;
 	if (result && !tryincref(result))
 		result = NULL;
-	sync_endread(&FORTASK(proc, _this_taskgroup).tg_proc_parent_lock);
+	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock);
 	return result;
 }
 
@@ -599,12 +599,12 @@ FORCELOCAL WUNUSED REF struct task *
 NOTHROW(KCALL task_getprocessparent_nx)(void) {
 	REF struct task *result;
 	struct task *proc = task_getprocess();
-	if unlikely(!sync_read_nx(&FORTASK(proc, _this_taskgroup).tg_proc_parent_lock))
+	if unlikely(!sync_read_nx(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock))
 		return __NULLPTR;
-	result = FORTASK(proc, _this_taskgroup).tg_proc_parent;
+	result = FORTASK(proc, this_taskgroup).tg_proc_parent;
 	if (result && !tryincref(result))
 		result = NULL;
-	sync_endread(&FORTASK(proc, _this_taskgroup).tg_proc_parent_lock);
+	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock);
 	return result;
 }
 
@@ -612,12 +612,12 @@ FORCELOCAL WUNUSED NONNULL((1)) REF struct task *
 NOTHROW(KCALL task_getprocessparent_of_nx)(struct task *__restrict thread) {
 	REF struct task *result;
 	struct task *proc = task_getprocess_of(thread);
-	if unlikely(!sync_read_nx(&FORTASK(proc, _this_taskgroup).tg_proc_parent_lock))
+	if unlikely(!sync_read_nx(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock))
 		return __NULLPTR;
-	result = FORTASK(proc, _this_taskgroup).tg_proc_parent;
+	result = FORTASK(proc, this_taskgroup).tg_proc_parent;
 	if (result && !tryincref(result))
 		result = NULL;
-	sync_endread(&FORTASK(proc, _this_taskgroup).tg_proc_parent_lock);
+	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock);
 	return result;
 }
 
@@ -628,7 +628,7 @@ task_getprocessparentpid(void) THROWS(E_WOULDBLOCK) {
 	result_thread = task_getprocessparent();
 	if unlikely(!result_thread)
 		return __NULLPTR;
-	result = incref(FORTASK(result_thread, _this_taskpid));
+	result = incref(FORTASK(result_thread, this_taskpid));
 	decref_unlikely(result_thread);
 	return result;
 }
@@ -640,7 +640,7 @@ task_getprocessparentpid_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK)
 	result_thread = task_getprocessparent_of(thread);
 	if unlikely(!result_thread)
 		return __NULLPTR;
-	result = incref(FORTASK(result_thread, _this_taskpid));
+	result = incref(FORTASK(result_thread, this_taskpid));
 	decref_unlikely(result_thread);
 	return result;
 }
@@ -652,7 +652,7 @@ NOTHROW(KCALL task_getprocessparentpid_nx)(void) {
 	result_thread = task_getprocessparent_nx();
 	if unlikely(!result_thread)
 		return __NULLPTR;
-	result = incref(FORTASK(result_thread, _this_taskpid));
+	result = incref(FORTASK(result_thread, this_taskpid));
 	decref_unlikely(result_thread);
 	return result;
 }
@@ -664,7 +664,7 @@ NOTHROW(KCALL task_getprocessparentpid_of_nx)(struct task *__restrict thread) {
 	result_thread = task_getprocessparent_of_nx(thread);
 	if unlikely(!result_thread)
 		return __NULLPTR;
-	result = incref(FORTASK(result_thread, _this_taskpid));
+	result = incref(FORTASK(result_thread, this_taskpid));
 	decref_unlikely(result_thread);
 	return result;
 }
@@ -674,9 +674,9 @@ FORCELOCAL WUNUSED ATTR_RETNONNULL REF struct task *KCALL
 task_getprocessgroupleader(void) THROWS(E_WOULDBLOCK) {
 	REF struct task *result;
 	struct task *proc = task_getprocess();
-	sync_read(&FORTASK(proc, _this_taskgroup).tg_proc_group_lock);
-	result = incref(FORTASK(proc, _this_taskgroup).tg_proc_group);
-	sync_endread(&FORTASK(proc, _this_taskgroup).tg_proc_group_lock);
+	sync_read(&FORTASK(proc, this_taskgroup).tg_proc_group_lock);
+	result = incref(FORTASK(proc, this_taskgroup).tg_proc_group);
+	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_group_lock);
 	return result;
 }
 
@@ -684,9 +684,9 @@ FORCELOCAL WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct task *KCALL
 task_getprocessgroupleader_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
 	REF struct task *result;
 	struct task *proc = task_getprocess_of(thread);
-	sync_read(&FORTASK(proc, _this_taskgroup).tg_proc_group_lock);
-	result = incref(FORTASK(proc, _this_taskgroup).tg_proc_group);
-	sync_endread(&FORTASK(proc, _this_taskgroup).tg_proc_group_lock);
+	sync_read(&FORTASK(proc, this_taskgroup).tg_proc_group_lock);
+	result = incref(FORTASK(proc, this_taskgroup).tg_proc_group);
+	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_group_lock);
 	return result;
 }
 
@@ -694,10 +694,10 @@ FORCELOCAL WUNUSED REF struct task *
 NOTHROW(KCALL task_getprocessgroupleader_nx)(void) {
 	REF struct task *result;
 	struct task *proc = task_getprocess();
-	if unlikely(!sync_read_nx(&FORTASK(proc, _this_taskgroup).tg_proc_group_lock))
+	if unlikely(!sync_read_nx(&FORTASK(proc, this_taskgroup).tg_proc_group_lock))
 		return __NULLPTR;
-	result = incref(FORTASK(proc, _this_taskgroup).tg_proc_group);
-	sync_endread(&FORTASK(proc, _this_taskgroup).tg_proc_group_lock);
+	result = incref(FORTASK(proc, this_taskgroup).tg_proc_group);
+	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_group_lock);
 	return result;
 }
 
@@ -705,10 +705,10 @@ FORCELOCAL WUNUSED NONNULL((1)) REF struct task *
 NOTHROW(KCALL task_getprocessgroupleader_of_nx)(struct task *__restrict thread) {
 	REF struct task *result;
 	struct task *proc = task_getprocess_of(thread);
-	if unlikely(!sync_read_nx(&FORTASK(proc, _this_taskgroup).tg_proc_group_lock))
+	if unlikely(!sync_read_nx(&FORTASK(proc, this_taskgroup).tg_proc_group_lock))
 		return __NULLPTR;
-	result = incref(FORTASK(proc, _this_taskgroup).tg_proc_group);
-	sync_endread(&FORTASK(proc, _this_taskgroup).tg_proc_group_lock);
+	result = incref(FORTASK(proc, this_taskgroup).tg_proc_group);
+	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_group_lock);
 	return result;
 }
 
@@ -717,7 +717,7 @@ task_getprocessgroupleaderpid(void) THROWS(E_WOULDBLOCK) {
 	REF struct taskpid *result;
 	REF struct task *result_thread;
 	result_thread = task_getprocessgroupleader();
-	result = incref(FORTASK(result_thread, _this_taskpid));
+	result = incref(FORTASK(result_thread, this_taskpid));
 	decref_unlikely(result_thread);
 	return result;
 }
@@ -727,7 +727,7 @@ task_getprocessgroupleaderpid_of(struct task *__restrict thread) THROWS(E_WOULDB
 	REF struct taskpid *result;
 	REF struct task *result_thread;
 	result_thread = task_getprocessgroupleader_of(thread);
-	result = incref(FORTASK(result_thread, _this_taskpid));
+	result = incref(FORTASK(result_thread, this_taskpid));
 	decref_unlikely(result_thread);
 	return result;
 }
@@ -739,7 +739,7 @@ NOTHROW(KCALL task_getprocessgroupleaderpid_nx)(void) {
 	result_thread = task_getprocessgroupleader_nx();
 	if unlikely(!result_thread)
 		return __NULLPTR;
-	result = incref(FORTASK(result_thread, _this_taskpid));
+	result = incref(FORTASK(result_thread, this_taskpid));
 	decref_unlikely(result_thread);
 	return result;
 }
@@ -751,7 +751,7 @@ NOTHROW(KCALL task_getprocessgroupleaderpid_of_nx)(struct task *__restrict threa
 	result_thread = task_getprocessgroupleader_of_nx(thread);
 	if unlikely(!result_thread)
 		return __NULLPTR;
-	result = incref(FORTASK(result_thread, _this_taskpid));
+	result = incref(FORTASK(result_thread, this_taskpid));
 	decref_unlikely(result_thread);
 	return result;
 }
@@ -762,9 +762,9 @@ task_getsessionleader(void) THROWS(E_WOULDBLOCK) {
 	grp = task_getprocessgroupleader();
 	{
 		FINALLY_DECREF_UNLIKELY(grp);
-		sync_read(&FORTASK(grp, _this_taskgroup).tg_pgrp_session_lock);
-		result = incref(FORTASK(grp, _this_taskgroup).tg_pgrp_session);
-		sync_endread(&FORTASK(grp, _this_taskgroup).tg_pgrp_session_lock);
+		sync_read(&FORTASK(grp, this_taskgroup).tg_pgrp_session_lock);
+		result = incref(FORTASK(grp, this_taskgroup).tg_pgrp_session);
+		sync_endread(&FORTASK(grp, this_taskgroup).tg_pgrp_session_lock);
 	}
 	return result;
 }
@@ -775,9 +775,9 @@ task_getsessionleader_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
 	grp = task_getprocessgroupleader_of(thread);
 	{
 		FINALLY_DECREF_UNLIKELY(grp);
-		sync_read(&FORTASK(grp, _this_taskgroup).tg_pgrp_session_lock);
-		result = incref(FORTASK(grp, _this_taskgroup).tg_pgrp_session);
-		sync_endread(&FORTASK(grp, _this_taskgroup).tg_pgrp_session_lock);
+		sync_read(&FORTASK(grp, this_taskgroup).tg_pgrp_session_lock);
+		result = incref(FORTASK(grp, this_taskgroup).tg_pgrp_session);
+		sync_endread(&FORTASK(grp, this_taskgroup).tg_pgrp_session_lock);
 	}
 	return result;
 }
@@ -788,12 +788,12 @@ NOTHROW(KCALL task_getsessionleader_nx)(void) {
 	grp = task_getprocessgroupleader_nx();
 	if unlikely(!grp)
 		return __NULLPTR;
-	if unlikely(!sync_read_nx(&FORTASK(grp, _this_taskgroup).tg_pgrp_session_lock)) {
+	if unlikely(!sync_read_nx(&FORTASK(grp, this_taskgroup).tg_pgrp_session_lock)) {
 		decref_unlikely(grp);
 		return __NULLPTR;
 	}
-	result = incref(FORTASK(grp, _this_taskgroup).tg_pgrp_session);
-	sync_endread(&FORTASK(grp, _this_taskgroup).tg_pgrp_session_lock);
+	result = incref(FORTASK(grp, this_taskgroup).tg_pgrp_session);
+	sync_endread(&FORTASK(grp, this_taskgroup).tg_pgrp_session_lock);
 	decref_unlikely(grp);
 	return result;
 }
@@ -804,12 +804,12 @@ NOTHROW(KCALL task_getsessionleader_of_nx)(struct task *__restrict thread) {
 	grp = task_getprocessgroupleader_of_nx(thread);
 	if unlikely(!grp)
 		return __NULLPTR;
-	if unlikely(!sync_read_nx(&FORTASK(grp, _this_taskgroup).tg_pgrp_session_lock)) {
+	if unlikely(!sync_read_nx(&FORTASK(grp, this_taskgroup).tg_pgrp_session_lock)) {
 		decref_unlikely(grp);
 		return __NULLPTR;
 	}
-	result = incref(FORTASK(grp, _this_taskgroup).tg_pgrp_session);
-	sync_endread(&FORTASK(grp, _this_taskgroup).tg_pgrp_session_lock);
+	result = incref(FORTASK(grp, this_taskgroup).tg_pgrp_session);
+	sync_endread(&FORTASK(grp, this_taskgroup).tg_pgrp_session_lock);
 	decref_unlikely(grp);
 	return result;
 }
@@ -819,7 +819,7 @@ task_getsessionleaderpid(void) THROWS(E_WOULDBLOCK) {
 	REF struct taskpid *result;
 	REF struct task *result_thread;
 	result_thread = task_getsessionleader();
-	result = incref(FORTASK(result_thread, _this_taskpid));
+	result = incref(FORTASK(result_thread, this_taskpid));
 	decref_unlikely(result_thread);
 	return result;
 }
@@ -829,7 +829,7 @@ task_getsessionleaderpid_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK)
 	REF struct taskpid *result;
 	REF struct task *result_thread;
 	result_thread = task_getsessionleader_of(thread);
-	result = incref(FORTASK(result_thread, _this_taskpid));
+	result = incref(FORTASK(result_thread, this_taskpid));
 	decref_unlikely(result_thread);
 	return result;
 }
@@ -842,7 +842,7 @@ NOTHROW(KCALL task_getsessionleaderpid_nx)(void) {
 	result_thread = task_getsessionleader_nx();
 	if unlikely(!result_thread)
 		return __NULLPTR;
-	result = incref(FORTASK(result_thread, _this_taskpid));
+	result = incref(FORTASK(result_thread, this_taskpid));
 	decref_unlikely(result_thread);
 	return result;
 }
@@ -854,7 +854,7 @@ NOTHROW(KCALL task_getsessionleaderpid_of_nx)(struct task *__restrict thread) {
 	result_thread = task_getsessionleader_of_nx(thread);
 	if unlikely(!result_thread)
 		return __NULLPTR;
-	result = incref(FORTASK(result_thread, _this_taskpid));
+	result = incref(FORTASK(result_thread, this_taskpid));
 	decref_unlikely(result_thread);
 	return result;
 }
@@ -864,34 +864,34 @@ NOTHROW(KCALL task_getsessionleaderpid_of_nx)(struct task *__restrict thread) {
 
 FORCELOCAL WUNUSED ATTR_CONST bool
 NOTHROW(KCALL task_isprocessleader)(void) {
-	return PERTASK(_this_taskgroup.tg_process) == THIS_TASK;
+	return PERTASK(this_taskgroup.tg_process) == THIS_TASK;
 }
 
 FORCELOCAL WUNUSED ATTR_PURE NONNULL((1)) bool
 NOTHROW(KCALL task_isprocessleader_p)(struct task const *__restrict thread) {
-	return FORTASK(thread, _this_taskgroup.tg_process) == thread;
+	return FORTASK(thread, this_taskgroup.tg_process) == thread;
 }
 
 
 FORCELOCAL WUNUSED ATTR_PURE bool
 NOTHROW(KCALL task_isprocessgroupleader)(void) {
-	return PERTASK(_this_taskgroup.tg_proc_group) == THIS_TASK;
+	return PERTASK(this_taskgroup.tg_proc_group) == THIS_TASK;
 }
 
 FORCELOCAL WUNUSED ATTR_PURE NONNULL((1)) bool
 NOTHROW(KCALL task_isprocessgroupleader_p)(struct task const *__restrict thread) {
-	return __hybrid_atomic_load(FORTASK(thread, _this_taskgroup.tg_proc_group),
+	return __hybrid_atomic_load(FORTASK(thread, this_taskgroup.tg_proc_group),
 	                            __ATOMIC_ACQUIRE) == thread;
 }
 
 FORCELOCAL WUNUSED ATTR_PURE bool
 NOTHROW(KCALL task_issessionleader)(void) {
-	return PERTASK(_this_taskgroup.tg_pgrp_session) == THIS_TASK;
+	return PERTASK(this_taskgroup.tg_pgrp_session) == THIS_TASK;
 }
 
 FORCELOCAL WUNUSED ATTR_PURE NONNULL((1)) bool
 NOTHROW(KCALL task_issessionleader_p)(struct task const *__restrict thread) {
-	return __hybrid_atomic_load(FORTASK(thread, _this_taskgroup.tg_pgrp_session),
+	return __hybrid_atomic_load(FORTASK(thread, this_taskgroup.tg_pgrp_session),
 	                            __ATOMIC_ACQUIRE) == thread;
 }
 
@@ -926,7 +926,7 @@ NOTHROW(KCALL task_getpid)(void) {
 	struct taskpid *pid;
 	struct task *leader = task_getprocess();
 	__hybrid_assertf(leader, "task_getpid() called by a kernel thread");
-	pid = FORTASK(leader, _this_taskpid);
+	pid = FORTASK(leader, this_taskpid);
 	__hybrid_assertf(pid, "task_getpid() called by a thread within a kernel process");
 	return pid->tp_pids[pid->tp_pidns->pn_indirection];
 }
@@ -937,7 +937,7 @@ NOTHROW(KCALL task_getpid_s)(void) {
 	struct task *leader = task_getprocess();
 	if unlikely(!leader)
 		return 0;
-	pid = FORTASK(leader, _this_taskpid);
+	pid = FORTASK(leader, this_taskpid);
 	return likely(pid) ? pid->tp_pids[pid->tp_pidns->pn_indirection] : 0;
 }
 
@@ -946,7 +946,7 @@ NOTHROW(KCALL task_getrootpid)(void) {
 	struct taskpid *pid;
 	struct task *leader = task_getprocess();
 	__hybrid_assertf(leader, "task_getrootpid() called by a kernel thread");
-	pid = FORTASK(leader, _this_taskpid);
+	pid = FORTASK(leader, this_taskpid);
 	__hybrid_assertf(pid, "task_getrootpid() called by a thread within a kernel process");
 	return pid->tp_pids[0];
 }
@@ -957,13 +957,13 @@ NOTHROW(KCALL task_getrootpid_s)(void) {
 	struct task *leader = task_getprocess();
 	if unlikely(!leader)
 		return 0;
-	pid = FORTASK(leader, _this_taskpid);
+	pid = FORTASK(leader, this_taskpid);
 	return likely(pid) ? pid->tp_pids[0] : 0;
 }
 
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
 NOTHROW(KCALL task_gettid_of)(struct task const *__restrict thread) {
-	struct taskpid *pid   = FORTASK(thread, _this_taskpid);
+	struct taskpid *pid   = FORTASK(thread, this_taskpid);
 	struct taskpid *mypid = THIS_TASKPID;
 	__hybrid_assertf(pid, "task_gettid_of(%p) is a kernel thread", thread);
 	__hybrid_assertf(mypid, "task_gettid_of(%p) called from a kernel thread", thread);
@@ -974,7 +974,7 @@ NOTHROW(KCALL task_gettid_of)(struct task const *__restrict thread) {
 
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
 NOTHROW(KCALL task_gettid_of_s)(struct task const *__restrict thread) {
-	struct taskpid *pid   = FORTASK(thread, _this_taskpid);
+	struct taskpid *pid   = FORTASK(thread, this_taskpid);
 	struct taskpid *mypid = THIS_TASKPID;
 	return likely(pid && mypid && mypid->tp_pidns->pn_indirection <= pid->tp_pidns->pn_indirection)
 	       ? pid->tp_pids[mypid->tp_pidns->pn_indirection]
@@ -983,14 +983,14 @@ NOTHROW(KCALL task_gettid_of_s)(struct task const *__restrict thread) {
 
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
 NOTHROW(KCALL task_getroottid_of)(struct task const *__restrict thread) {
-	struct taskpid *pid = FORTASK(thread, _this_taskpid);
+	struct taskpid *pid = FORTASK(thread, this_taskpid);
 	__hybrid_assertf(pid, "task_getroottid_of(%p) is a kernel thread", thread);
 	return pid->tp_pids[0];
 }
 
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
 NOTHROW(KCALL task_getroottid_of_s)(struct task const *__restrict thread) {
-	struct taskpid *pid = FORTASK(thread, _this_taskpid);
+	struct taskpid *pid = FORTASK(thread, this_taskpid);
 	return likely(pid) ? pid->tp_pids[0] : 0;
 }
 
@@ -1001,7 +1001,7 @@ NOTHROW(KCALL task_getpid_of)(struct task const *__restrict thread) {
 	struct task *leader   = task_getprocess_of(thread);
 	__hybrid_assertf(leader, "task_getpid_of(%p) is a kernel thread", thread);
 	__hybrid_assertf(mypid, "task_getpid_of(%p) called from a kernel thread", thread);
-	pid = FORTASK(leader, _this_taskpid);
+	pid = FORTASK(leader, this_taskpid);
 	__hybrid_assertf(pid, "task_getpid_of(%p) is a thread within a kernel process", thread);
 	__hybrid_assertf(mypid->tp_pidns->pn_indirection <= pid->tp_pidns->pn_indirection,
 	                 "task_getpid_of(%p) PID cannot be represented in the caller's namespace", thread);
@@ -1015,7 +1015,7 @@ NOTHROW(KCALL task_getpid_of_s)(struct task const *__restrict thread) {
 	struct taskpid *mypid = THIS_TASKPID;
 	if unlikely(!leader || !mypid)
 		return 0;
-	pid = FORTASK(leader, _this_taskpid);
+	pid = FORTASK(leader, this_taskpid);
 	return likely(pid && mypid && mypid->tp_pidns->pn_indirection <= pid->tp_pidns->pn_indirection)
 	       ? pid->tp_pids[mypid->tp_pidns->pn_indirection]
 	       : 0;
@@ -1026,7 +1026,7 @@ NOTHROW(KCALL task_getrootpid_of)(struct task const *__restrict thread) {
 	struct taskpid *pid;
 	struct task *leader = task_getprocess_of(thread);
 	__hybrid_assertf(leader, "task_getrootpid_of(%p) is a kernel thread", thread);
-	pid = FORTASK(leader, _this_taskpid);
+	pid = FORTASK(leader, this_taskpid);
 	__hybrid_assertf(pid, "task_getrootpid_of(%p) is a thread within a kernel process", thread);
 	return pid->tp_pids[0];
 }
@@ -1037,7 +1037,7 @@ NOTHROW(KCALL task_getrootpid_of_s)(struct task const *__restrict thread) {
 	struct task *leader = task_getprocess_of(thread);
 	if unlikely(!leader)
 		return 0;
-	pid = FORTASK(leader, _this_taskpid);
+	pid = FORTASK(leader, this_taskpid);
 	return likely(pid) ? pid->tp_pids[0] : 0;
 }
 

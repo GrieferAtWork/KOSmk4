@@ -897,8 +897,8 @@ NOTHROW(KCALL mall_search_task_scpustate)(struct task *__restrict thread,
 		/* Search general-purpose registers. */
 		for (i = 0; i < (sizeof(struct gpregs) / sizeof(void *)); ++i)
 			mall_reachable_pointer(((void **)&context->scs_gpregs)[i]);
-		stack_min = VM_NODE_MINADDR(&FORTASK(thread, _this_kernel_stack));
-		stack_end = VM_NODE_ENDADDR(&FORTASK(thread, _this_kernel_stack));
+		stack_min = VM_NODE_MINADDR(&FORTASK(thread, this_kernel_stacknode));
+		stack_end = VM_NODE_ENDADDR(&FORTASK(thread, this_kernel_stacknode));
 #ifdef scpustate_getkernelpsp
 		sp = (vm_virt_t)scpustate_getkernelpsp(context);
 #else /* scpustate_getkernelpsp */ 
@@ -930,8 +930,8 @@ NOTHROW(KCALL mall_search_task_icpustate)(struct task *__restrict thread,
 		/* Search general-purpose registers. */
 		for (i = 0; i < (sizeof(struct gpregs) / sizeof(void *)); ++i)
 			mall_reachable_pointer(((void **)&context->ics_gpregs)[i]);
-		stack_min = VM_NODE_MINADDR(&FORTASK(thread, _this_kernel_stack));
-		stack_end = VM_NODE_ENDADDR(&FORTASK(thread, _this_kernel_stack));
+		stack_min = VM_NODE_MINADDR(&FORTASK(thread, this_kernel_stacknode));
+		stack_end = VM_NODE_ENDADDR(&FORTASK(thread, this_kernel_stacknode));
 		sp = (vm_virt_t)irregs_getkernelpsp(&context->ics_irregs);
 		if (sp > stack_min && sp <= stack_end) {
 			/* Search the used portion of the kernel stack. */
@@ -1075,7 +1075,7 @@ NOTHROW(KCALL mall_search_leaks_impl)(void) {
 		iter = chain = c->c_current;
 		do {
 			if (iter != THIS_TASK) {
-				if (iter == &FORCPU(c, _this_idle))
+				if (iter == &FORCPU(c, thiscpu_idle))
 					did_check_idle = true;
 #ifndef CONFIG_NO_SMP
 				/* NOTE: Must check if mall_other_cpu_states[i] != NULL, in
@@ -1094,7 +1094,7 @@ NOTHROW(KCALL mall_search_leaks_impl)(void) {
 		} while ((iter = iter->t_sched.s_running.sr_runnxt) != chain);
 		for (chain = c->c_sleeping; chain;
 		     chain = chain->t_sched.s_asleep.ss_tmonxt) {
-			if (chain == &FORCPU(c, _this_idle))
+			if (chain == &FORCPU(c, thiscpu_idle))
 				did_check_idle = true;
 			mall_search_task_scpustate(chain, chain->t_sched.s_state);
 		}
@@ -1104,8 +1104,8 @@ NOTHROW(KCALL mall_search_leaks_impl)(void) {
 			mall_search_task_scpustate(chain, chain->t_sched.s_state);
 #endif /* !CONFIG_NO_SMP */
 		if (!did_check_idle) {
-			mall_search_task_scpustate(&FORCPU(c, _this_idle),
-			                           FORCPU(c, _this_idle).t_sched.s_state);
+			mall_search_task_scpustate(&FORCPU(c, thiscpu_idle),
+			                           FORCPU(c, thiscpu_idle).t_sched.s_state);
 		}
 	}
 	PRINT_LEAKS_SEARCH_PHASE("Phase #2.1: Scan the calling thread\n");

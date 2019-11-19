@@ -41,7 +41,7 @@ INTERN_FUNCTION(GDB_MainWithAlternateStack)
 
 	/* Load the alternate stack and call the regular GDB_Main() function. */
 	movl   $(GDB_Main_alternate_stack + KERNEL_DEBUG_STACKSIZE), %esp
-	INTERN(GDB_Main)
+	EXTERN(GDB_Main)
 	call   GDB_Main
 
 	leave

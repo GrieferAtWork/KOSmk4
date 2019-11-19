@@ -73,7 +73,7 @@ INTDEF FREE void NOTHROW(KCALL x86_initialize_fpu)(void);
 #endif /* !CONFIG_NO_FPU */
 #ifndef CONFIG_NO_USERKERN_SEGMENT
 #ifdef __x86_64__
-INTDEF uintptr_t NOTHROW(KCALL x86_this_userkern_init)(void);
+INTDEF uintptr_t NOTHROW(KCALL init_this_x86_userkern)(void);
 #endif /* __x86_64__ */
 #endif /* !CONFIG_NO_USERKERN_SEGMENT */
 #ifndef __x86_64__

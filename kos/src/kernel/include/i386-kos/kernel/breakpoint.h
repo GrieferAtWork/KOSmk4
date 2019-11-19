@@ -34,11 +34,11 @@ DECL_BEGIN
  *       any changes made will become lost the next time the VM
  *       is changed.
  * NOTE: These fields are _NOT_ inherited during `vm_clone()'! */
-DATDEF ATTR_PERVM uintptr_t _this_x86_dr0;
-DATDEF ATTR_PERVM uintptr_t _this_x86_dr1;
-DATDEF ATTR_PERVM uintptr_t _this_x86_dr2;
-DATDEF ATTR_PERVM uintptr_t _this_x86_dr3;
-DATDEF ATTR_PERVM uintptr_t _this_x86_dr7;
+DATDEF ATTR_PERVM uintptr_t thisvm_x86_dr0;
+DATDEF ATTR_PERVM uintptr_t thisvm_x86_dr1;
+DATDEF ATTR_PERVM uintptr_t thisvm_x86_dr2;
+DATDEF ATTR_PERVM uintptr_t thisvm_x86_dr3;
+DATDEF ATTR_PERVM uintptr_t thisvm_x86_dr7;
 
 /* Add/Remove a local hardware breakpoint to the given VM.
  * @param: br_size: Breakpoint size (One of `DR_S(1|2|4|8)')
@@ -63,27 +63,27 @@ NOTHROW(KCALL vm_clrhwbreak)(struct vm *__restrict self);
 
 #ifdef __ASSEMBLER__
 .macro reload_x86_debug_registers this_vm_reg:req, scratch_reg1:req, scratch_reg2:req, disable_local:req
-	mov    _this_x86_dr7(\this_vm_reg), \scratch_reg1
+	mov    thisvm_x86_dr7(\this_vm_reg), \scratch_reg1
 	test   $(DR7_L0|DR7_G0|DR7_L1|DR7_G1|DR7_L2|DR7_G2|DR7_L3|DR7_G3), \scratch_reg1
 	jz     991f
 	test   $(DR7_L0|DR7_G0), \scratch_reg1
 	jz     992f
-	mov    _this_x86_dr0(\this_vm_reg), \scratch_reg2
+	mov    thisvm_x86_dr0(\this_vm_reg), \scratch_reg2
 	mov    \scratch_reg2, %dr0
 992:
 	test   $(DR7_L1|DR7_G1), \scratch_reg1
 	jz     992f
-	mov    _this_x86_dr1(\this_vm_reg), \scratch_reg2
+	mov    thisvm_x86_dr1(\this_vm_reg), \scratch_reg2
 	mov    \scratch_reg2, %dr1
 992:
 	test   $(DR7_L2|DR7_G2), \scratch_reg1
 	jz     992f
-	mov    _this_x86_dr2(\this_vm_reg), \scratch_reg2
+	mov    thisvm_x86_dr2(\this_vm_reg), \scratch_reg2
 	mov    \scratch_reg2, %dr2
 992:
 	test   $(DR7_L3|DR7_G3), \scratch_reg1
 	jz     992f
-	mov    _this_x86_dr2(\this_vm_reg), \scratch_reg2
+	mov    thisvm_x86_dr2(\this_vm_reg), \scratch_reg2
 	mov    \scratch_reg2, %dr3
 992:
 	mov    \scratch_reg1, %dr7

@@ -131,22 +131,22 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL cpu_assert_sleeping)(struct task 
 #endif /* NDEBUG */
 
 /* The per-cpu / global jiffies counters. */
-DATDEF ATTR_PERCPU jtime_t volatile cpu_jiffies;
+DATDEF ATTR_PERCPU jtime_t volatile thiscpu_jiffies;
 
-/* [< cpu_quantum_length]
- * A sub-quantum offset that must be added to `cpu_jiffies' in
+/* [< thiscpu_quantum_length]
+ * A sub-quantum offset that must be added to `thiscpu_jiffies' in
  * order to determine the true start of the current quantum (in ticks). */
-DATDEF ATTR_PERCPU quantum_diff_t volatile cpu_quantum_offset;
+DATDEF ATTR_PERCPU quantum_diff_t volatile thiscpu_quantum_offset;
 
 /* The length of a single quantum (the number of ticks
- * that need to pass before `cpu_jiffies' is incremented)
+ * that need to pass before `thiscpu_jiffies' is incremented)
  * HINT: On x86, this the LAPIC reload value! */
-DATDEF ATTR_PERCPU quantum_diff_t volatile cpu_quantum_length;
+DATDEF ATTR_PERCPU quantum_diff_t volatile thiscpu_quantum_length;
 
 /* Returns the number of ticks that have passed since the start
  * of the current quantum. - The true current CPU-local time
  * (in ticks) can then be calculated as:
- * >> (cpu_jiffies * PERCPU(cpu_quantum_length)) + PERCPU(cpu_quantum_offset) + cpu_quantum_elapsed();
+ * >> (thiscpu_jiffies * PERCPU(thiscpu_quantum_length)) + PERCPU(thiscpu_quantum_offset) + cpu_quantum_elapsed();
  * NOTE: The `*_nopr' variants may only be called when preemption is disabled! */
 FUNDEF NOBLOCK WUNUSED quantum_diff_t NOTHROW(KCALL cpu_quantum_elapsed)(void);
 FUNDEF NOBLOCK WUNUSED quantum_diff_t NOTHROW(KCALL cpu_quantum_elapsed_nopr)(void);
@@ -175,16 +175,16 @@ FUNDEF NOBLOCK WUNUSED ATTR_PURE qtime_t NOTHROW(FCALL timespec_to_qtime)(struct
 FUNDEF NOBLOCK NONNULL((1)) qtime_t NOTHROW(FCALL quantum_local_to_global)(qtime_t *__restrict tmp);
 FUNDEF NOBLOCK NONNULL((1)) qtime_t NOTHROW(FCALL quantum_global_to_local)(qtime_t *__restrict tmp);
 
-/* Increment `cpu_quantum_offset' by `diff' incrementing the `cpu_jiffies' counter
- * when the resulting value turns out to be greater than `cpu_quantum_length',
+/* Increment `thiscpu_quantum_offset' by `diff' incrementing the `thiscpu_jiffies' counter
+ * when the resulting value turns out to be greater than `thiscpu_quantum_length',
  * in which case the value will also be truncated.
- * When `cpu_jiffies' is incremented, also check if this causes additional
+ * When `thiscpu_jiffies' is incremented, also check if this causes additional
  * tasks to time out, and if so, re-schedule them for execution.
  * WARNING: This function may only be called when preemption is disabled!
- * @return: * : Always returns `PERCPU(cpu_quantum_length)' */
+ * @return: * : Always returns `PERCPU(thiscpu_quantum_length)' */
 FUNDEF NOBLOCK quantum_diff_t NOTHROW(FCALL cpu_add_quantum_offset)(quantum_diff_t diff);
 
-/* == FORCPU(&_bootcpu,cpu_jiffies)
+/* == FORCPU(&_bootcpu,thiscpu_jiffies)
  * The global jiffies counter, aliasing the one from the boot CPU. */
 DATDEF jtime_t volatile jiffies;
 
@@ -295,7 +295,7 @@ DATDEF cpuset_t const __cpuset_full_mask; /* [== (1 << cpu_count) - 1] */
 
 DATDEF struct cpu _bootcpu;
 DATDEF struct task _bootidle;
-DATDEF ATTR_PERTASK struct cpu *_this_cpu;
+DATDEF ATTR_PERTASK struct cpu *this_cpu;
 
 /* NOTE: When it comes to scheduling, the IDLE thread is special in that:
  *   - It doesn't necessarily have to be apart of any chain (`c_current' or `c_sleeping'),
@@ -314,7 +314,7 @@ DATDEF ATTR_PERTASK struct cpu *_this_cpu;
  *   - Calling `task_pause()' is called from the IDLE thread will always
  *     return after the next sporadic interrupt (always returning `false')
  */
-DATDEF ATTR_PERCPU struct task _this_idle;
+DATDEF ATTR_PERCPU struct task thiscpu_idle;
 
 #ifdef CONFIG_NO_SMP
 #undef THIS_CPU
@@ -323,10 +323,10 @@ DATDEF ATTR_PERCPU struct task _this_idle;
 #define THIS_IDLE  (&_bootidle)
 #else /* CONFIG_NO_SMP */
 #ifndef THIS_CPU
-#define THIS_CPU   PERTASK_GET(_this_cpu)
+#define THIS_CPU   PERTASK_GET(this_cpu)
 #endif /* !THIS_CPU */
 #ifndef THIS_IDLE
-#define THIS_IDLE  (&PERCPU(_this_idle))
+#define THIS_IDLE  (&PERCPU(thiscpu_idle))
 #endif /* !THIS_IDLE */
 #endif /* !CONFIG_NO_SMP */
 
@@ -391,7 +391,7 @@ FUNDEF void NOTHROW(KCALL cpu_deepsleep)(void);
 #ifndef CONFIG_NO_SMP
 /* MUST ONLY BE CALLED FROM AN IDLE TAST!
  * This function does the following:
- * >> FORCPU(me,_this_idle).t_sched.s_state = PUSH_CPU_STATE_FOR_RETURNING_TO_CALLER();
+ * >> FORCPU(me,thiscpu_idle).t_sched.s_state = PUSH_CPU_STATE_FOR_RETURNING_TO_CALLER();
  * >> ATOMIC_WRITE(caller->c_state,CPU_STATE_DREAMING);
  * >> PREEMPTION_DEEPHALT();
  * NOTE: Do not call this function directly. - Use `cpu_deepsleep()' instead,

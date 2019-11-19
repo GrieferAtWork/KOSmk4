@@ -87,7 +87,7 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 		dbg_print(DBGSTR("\t_boottask"));
 	else if (thread == &_bootidle)
 		dbg_print(DBGSTR("\t_bootidle"));
-	else if (thread == &FORCPU(thread->t_cpu, _this_idle)) {
+	else if (thread == &FORCPU(thread->t_cpu, thiscpu_idle)) {
 		dbg_printf(DBGSTR("\t_idle[%u]"), (unsigned int)thread->t_cpu->c_id);
 	}
 	dbg_putc('\n');
@@ -100,7 +100,7 @@ LOCAL bool KCALL verify_thread_address_nopid(struct task *p) {
 	for (cpuid = 0; cpuid < cpu_count; ++cpuid) {
 		struct task *iter;
 		struct cpu *c = cpu_vector[cpuid];
-		if (p == &FORCPU(c, _this_idle))
+		if (p == &FORCPU(c, thiscpu_idle))
 			return true;
 		iter = c->c_current;
 		do {
@@ -165,14 +165,14 @@ DEFINE_DEBUG_FUNCTION(
 			assert(iter->t_cpu == c);
 			assert(iter->t_flags & TASK_FRUNNING);
 			enum_thread(iter, THREAD_STATE_RUNNING);
-			if (iter == &FORCPU(c, _this_idle))
+			if (iter == &FORCPU(c, thiscpu_idle))
 				did_idle = true;
 		} while ((iter = iter->t_sched.s_running.sr_runnxt) != c->c_current);
 		for (iter = c->c_sleeping; iter; iter = iter->t_sched.s_asleep.ss_tmonxt) {
 			assert(iter->t_cpu == c);
 			assert(!(iter->t_flags & TASK_FRUNNING));
 			enum_thread(iter, THREAD_STATE_SLEEPING);
-			if (iter == &FORCPU(c, _this_idle))
+			if (iter == &FORCPU(c, thiscpu_idle))
 				did_idle = true;
 		}
 #ifndef CONFIG_NO_SMP
@@ -181,12 +181,12 @@ DEFINE_DEBUG_FUNCTION(
 			assert(iter->t_cpu == c);
 			assert(iter->t_flags & TASK_FPENDING);
 			assert(!(iter->t_flags & TASK_FRUNNING));
-			assert(iter != &FORCPU(c, _this_idle));
+			assert(iter != &FORCPU(c, thiscpu_idle));
 			enum_thread(iter, THREAD_STATE_PENDING);
 		}
 #endif /* !CONFIG_NO_SMP */
 		if (!did_idle)
-			enum_thread(&FORCPU(c, _this_idle), THREAD_STATE_IDLING);
+			enum_thread(&FORCPU(c, thiscpu_idle), THREAD_STATE_IDLING);
 	}
 	/* Also enumerate threads found in PID namespaces. */
 	{

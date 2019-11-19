@@ -204,7 +204,7 @@ INTDEF byte_t x86_sysenter_main_traced[];
 PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL syscall_tracing_ipi)(struct icpustate *__restrict state,
                                    void *args[CPU_IPI_ARGCOUNT]) {
-	if (CPUID_FEATURES.ci_1d & CPUID_1D_SEP) {
+	if (CURRENT_X86_CPUID.ci_1d & CPUID_1D_SEP) {
 		/* Also re-direct the `sysenter' instruction */
 		__wrmsr(IA32_SYSENTER_EIP,
 		        args[0] ? (uintptr_t)x86_sysenter_main_traced
@@ -257,7 +257,7 @@ PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
 	                         CPU_IPI_FWAKEUP
 #endif
 	                         );
-	if (CPUID_FEATURES.ci_1d & CPUID_1D_SEP) {
+	if (CURRENT_X86_CPUID.ci_1d & CPUID_1D_SEP) {
 		__wrmsr(IA32_SYSENTER_EIP,
 		        enable ? (uintptr_t)x86_sysenter_main_traced
 		               : (uintptr_t)x86_sysenter_main);
@@ -316,10 +316,10 @@ NOTHROW(KCALL x86_syscall_lcall7_personality)(struct unwind_fde_struct *__restri
 	if (kcpustate_getpc(state) != (uintptr_t)x86_lcall7_syscall_guard)
 		return DWARF_PERSO_CONTINUE_UNWIND;
 	data = (struct x86_lcall7_syscall_data *)kcpustate_getsp(state);
-	assertf((uintptr_t)(data + 1) == (uintptr_t)VM_PAGE2ADDR(PERTASK_GET((*(struct vm_node *)&_this_kernel_stack).vn_node.a_vmax) + 1),
+	assertf((uintptr_t)(data + 1) == PERTASK_GET(*(uintptr_t *)&this_x86_kernel_psp0),
 	        "%p != %p",
 	        (uintptr_t)(data + 1),
-	        (uintptr_t)VM_PAGE2ADDR(PERTASK_GET((*(struct vm_node *)&_this_kernel_stack).vn_node.a_vmax) + 1));
+	        PERTASK_GET(*(uintptr_t *)&this_x86_kernel_psp0));
 
 	/* TODO: Custom unwind handler. */
 
@@ -417,13 +417,13 @@ err_nosys:
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_sysenter)(void) {
-	if (CPUID_FEATURES.ci_1d & CPUID_1D_SEP) {
+	if (CURRENT_X86_CPUID.ci_1d & CPUID_1D_SEP) {
 		/* Configure support for the `sysenter' instruction. */
 		__wrmsr(IA32_SYSENTER_CS, SEGMENT_KERNEL_CODE);
 #ifdef __x86_64__
-		__wrmsr(IA32_SYSENTER_ESP, (uintptr_t)&FORCPU(&_bootcpu, x86_cputss).t_rsp0);
+		__wrmsr(IA32_SYSENTER_ESP, (uintptr_t)&FORCPU(&_bootcpu, thiscpu_x86_tss).t_rsp0);
 #else /* __x86_64__ */
-		__wrmsr(IA32_SYSENTER_ESP, (uintptr_t)&FORCPU(&_bootcpu, x86_cputss).t_esp0);
+		__wrmsr(IA32_SYSENTER_ESP, (uintptr_t)&FORCPU(&_bootcpu, thiscpu_x86_tss).t_esp0);
 #endif /* !__x86_64__ */
 		__wrmsr(IA32_SYSENTER_EIP, (uintptr_t)x86_sysenter_main);
 	}

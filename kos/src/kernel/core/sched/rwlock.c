@@ -80,7 +80,7 @@ DECL_BEGIN
 	             THIS_TASK, __builtin_return_address(0))
 
 
-INTERN ATTR_PERTASK struct read_locks _this_read_locks = {
+INTERN ATTR_PERTASK struct read_locks this_read_locks = {
 	/* .rls_sbuf = */ { },
 	/* .rls_use  = */ 0,
 	/* .rls_cnt  = */ 0,
@@ -93,14 +93,14 @@ DEFINE_PERTASK_FINI(pertask_readlocks_fini);
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pertask_readlocks_init)(struct task *__restrict thread) {
 	struct read_locks *locks;
-	locks          = &FORTASK(thread, _this_read_locks);
+	locks          = &FORTASK(thread, this_read_locks);
 	locks->rls_vec = locks->rls_sbuf;
 }
 
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pertask_readlocks_fini)(struct task *__restrict thread) {
 	struct read_locks *locks;
-	locks = &FORTASK(thread, _this_read_locks);
+	locks = &FORTASK(thread, this_read_locks);
 	ASSERT_VECTOR_INITIALIZED(locks);
 	assertf(locks->rls_use == 0,
 	        "Thread %p died with read locks still held\n"
@@ -120,7 +120,7 @@ NOTHROW(KCALL rwlock_find_readlock)(struct rwlock const *__restrict lock) {
 	uintptr_t i, perturb;
 	struct read_locks *locks;
 	struct read_lock *lockdesc;
-	locks = &PERTASK(_this_read_locks);
+	locks = &PERTASK(this_read_locks);
 	ASSERT_VECTOR_INITIALIZED(locks);
 	assert(locks->rls_use <= locks->rls_cnt);
 	assert(locks->rls_cnt <= locks->rls_msk);
@@ -142,7 +142,7 @@ rwlock_get_readlock(struct rwlock *__restrict lock) THROWS(E_BADALLOC) {
 	struct read_locks *locks;
 	struct read_lock *lockdesc;
 	struct read_lock *result;
-	locks = &PERTASK(_this_read_locks);
+	locks = &PERTASK(this_read_locks);
 again:
 	ASSERT_VECTOR_INITIALIZED(locks);
 	assert(locks->rls_use <= locks->rls_cnt);
@@ -221,7 +221,7 @@ NOTHROW(KCALL rwlock_get_readlock_nx)(struct rwlock *__restrict lock) {
 	struct read_locks *locks;
 	struct read_lock *lockdesc;
 	struct read_lock *result;
-	locks = &PERTASK(_this_read_locks);
+	locks = &PERTASK(this_read_locks);
 again:
 	ASSERT_VECTOR_INITIALIZED(locks);
 	assert(locks->rls_use <= locks->rls_cnt);
@@ -298,12 +298,12 @@ again:
 /* Delete the given rlock. */
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL rwlock_delete_readlock)(struct read_lock *__restrict rlock) {
-	assert(PERTASK_TEST(_this_read_locks.rls_use));
-	assert(PERTASK_TEST(_this_read_locks.rls_cnt));
-	assert(rlock >= PERTASK_GET(_this_read_locks.rls_vec));
-	assert(rlock <= PERTASK_GET(_this_read_locks.rls_vec) + PERTASK_GET(_this_read_locks.rls_msk));
+	assert(PERTASK_TEST(this_read_locks.rls_use));
+	assert(PERTASK_TEST(this_read_locks.rls_cnt));
+	assert(rlock >= PERTASK_GET(this_read_locks.rls_vec));
+	assert(rlock <= PERTASK_GET(this_read_locks.rls_vec) + PERTASK_GET(this_read_locks.rls_msk));
 	rlock->rl_rwlock = READLOCK_DUMMYLOCK;
-	PERTASK_DEC(_this_read_locks.rls_use);
+	PERTASK_DEC(this_read_locks.rls_use);
 }
 
 
@@ -343,7 +343,7 @@ PUBLIC WUNUSED ATTR_PURE uintptr_t
 NOTHROW(KCALL rwlock_reading_any)(void) {
 	size_t i, result = 0;
 	struct read_locks *locks;
-	locks = &PERTASK(_this_read_locks);
+	locks = &PERTASK(this_read_locks);
 	ASSERT_VECTOR_INITIALIZED(locks);
 	if (!locks->rls_use)
 		return 0;
@@ -938,12 +938,12 @@ kill_rwlock_reader(struct task *__restrict thread,
 	struct read_locks *locks;
 	if (thread == THIS_TASK)
 		goto done; /* Skip our own thread. */
-	locks = &FORTASK(thread, _this_read_locks);
+	locks = &FORTASK(thread, this_read_locks);
 	ASSERT_VECTOR_INITIALIZED(locks);
 	if (!locks->rls_use)
 		goto done; /* This thread isn't using any R/W-locks */
-	if (FORTASK(thread, _this_exception_info).ei_code == ERROR_CODEOF(__E_RETRY_RWLOCK) &&
-	    FORTASK(thread, _this_exception_info).ei_data.e_pointers[0] == (uintptr_t)lock)
+	if (FORTASK(thread, this_exception_info).ei_code == ERROR_CODEOF(__E_RETRY_RWLOCK) &&
+	    FORTASK(thread, this_exception_info).ei_data.e_pointers[0] == (uintptr_t)lock)
 		goto done; /* This thread is already in the process of dropping this read-lock. */
 	if (locks->rls_vec == locks->rls_sbuf) {
 		unsigned int i;
@@ -1333,11 +1333,11 @@ again:
 		assertf(desc,
 		        "You're not holding any read-locks\n"
 		        "self                          = %p\n"
-		        "PERTASK(_this_read_locks).rls_use = %Iu\n"
-		        "PERTASK(_this_read_locks).rls_cnt = %Iu",
+		        "PERTASK(this_read_locks).rls_use = %Iu\n"
+		        "PERTASK(this_read_locks).rls_cnt = %Iu",
 		        self,
-		        PERTASK_GET(_this_read_locks.rls_use),
-		        PERTASK_GET(_this_read_locks.rls_cnt));
+		        PERTASK_GET(this_read_locks.rls_use),
+		        PERTASK_GET(this_read_locks.rls_cnt));
 		assertf(self->rw_scnt >= 1,
 		        "Noone is holding read-locks");
 		assert(desc->rl_recursion != 0);
@@ -1543,11 +1543,11 @@ NOTHROW(KCALL __os_rwlock_end)(struct rwlock *__restrict self) {
 		assertf(desc,
 		        "You're not holding any read-locks\n"
 		        "self                          = %p\n"
-		        "PERTASK(_this_read_locks).rls_use = %Iu\n"
-		        "PERTASK(_this_read_locks).rls_cnt = %Iu",
+		        "PERTASK(this_read_locks).rls_use = %Iu\n"
+		        "PERTASK(this_read_locks).rls_cnt = %Iu",
 		        self,
-		        PERTASK_GET(_this_read_locks.rls_use),
-		        PERTASK_GET(_this_read_locks.rls_cnt));
+		        PERTASK_GET(this_read_locks.rls_use),
+		        PERTASK_GET(this_read_locks.rls_cnt));
 		assertf(self->rw_scnt >= 1,
 		        "Noone is holding read-locks");
 		assert(desc->rl_recursion != 0);
@@ -1571,8 +1571,8 @@ NOTHROW(KCALL __os_rwlock_end)(struct rwlock *__restrict self) {
 
 			/* Deal with parallel-upgrade exceptions. */
 			if (was_thrown(__E_RETRY_RWLOCK) &&
-			    PERTASK_GET(_this_exception_info.ei_data.e_pointers[0]) == (uintptr_t)self) {
-				PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_OK));
+			    PERTASK_GET(this_exception_info.ei_data.e_pointers[0]) == (uintptr_t)self) {
+				PERTASK_SET(this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_OK));
 				/* Try to yield to the task that is waiting for the lock to become available.
 				 * NOTE: By using `task_tryyield()' here, we can remain non-blocking! */
 				task_tryyield();

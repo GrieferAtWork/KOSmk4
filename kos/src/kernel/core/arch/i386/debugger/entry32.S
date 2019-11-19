@@ -31,7 +31,7 @@
 #include <libunwind/cfi.h>
 
 
-INTERN(__kernel_debug_stack)
+EXTERN(__kernel_debug_stack)
 
 .section .rodata.cold
 PRIVATE_OBJECT(dbg_gdt_pointer)
@@ -62,10 +62,10 @@ END(dbg_cpu_temporary)
 
 .section .text.cold
 	/* Define register locations for CFI unwinding (mainly so that GDB unwinding works) */
-	INTERN(__x86_dbg_exitstate_temporary_b0)
-	INTERN(__x86_dbg_exitstate_temporary_b1)
-	INTERN(__x86_dbg_exitstate_temporary_b2)
-	INTERN(__x86_dbg_exitstate_temporary_b3)
+	EXTERN(__x86_dbg_exitstate_temporary_b0)
+	EXTERN(__x86_dbg_exitstate_temporary_b1)
+	EXTERN(__x86_dbg_exitstate_temporary_b2)
+	EXTERN(__x86_dbg_exitstate_temporary_b3)
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %esp, 0
@@ -161,19 +161,19 @@ PUBLIC_FUNCTION(dbg_exit)
 	.cfi_rel_offset %fs, OFFSET_FCPUSTATE_FS
 	.cfi_rel_offset %gs, OFFSET_FCPUSTATE_GS
 
-	INTERN(__kernel_debug_stack)
+	EXTERN(__kernel_debug_stack)
 	movl   $(__kernel_debug_stack + KERNEL_DEBUG_STACKSIZE), %esp
 
 	/* Finalize debugger mode. */
-	INTERN(dbg_fini)
+	EXTERN(dbg_fini)
 	call   dbg_fini
 
 	/* Copy `dbg_exitstate' */
 #ifndef CONFIG_NO_SMP
-	INTERN(debug_mycpu)
+	EXTERN(debug_mycpu)
 	movl   debug_mycpu, %edi
-	INTERN(_this_idle_x86_this_kernel_sp0)
-	movl   _this_idle_x86_this_kernel_sp0(%edi), %edi
+	EXTERN(this_idle_x86_kernel_psp0)
+	movl   this_idle_x86_kernel_psp0(%edi), %edi
 	addl   $(SIZEOF_IRREGS_VM86), %edi /* Worst-cast stack requirement for IRET */
 	movl   $(SIZEOF_FCPUSTATE/4), %ecx
 	rep;   movsl   /* Copy the exit-state to the end of the calling CPU's IDLE-thread's stack */
@@ -181,10 +181,12 @@ PUBLIC_FUNCTION(dbg_exit)
 #endif /* !CONFIG_NO_SMP */
 
 	/* Indicate that debugger mode has ended. */
-	movl   $0, dbg_active
-	movl   $0, dbg_activator_lapic_id
+	EXTERN(dbg_active)
+	movl   $(0), dbg_active
+	EXTERN(dbg_activator_lapic_id)
+	movl   $(0), dbg_activator_lapic_id
 #ifndef CONFIG_NO_SMP
-	INTERN(dbg_wake_other_cpus)
+	EXTERN(dbg_wake_other_cpus)
 	call   dbg_wake_other_cpus
 #endif /* !CONFIG_NO_SMP */
 

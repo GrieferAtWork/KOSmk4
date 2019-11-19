@@ -63,7 +63,7 @@ INTDEF byte_t __x86_gdt_kernel_tls_hi[];
 #endif /* !__x86_64__ */
 
 
-PUBLIC ATTR_PERCPU struct segment x86_cpugdt[SEGMENT_COUNT] = {
+PUBLIC ATTR_PERCPU struct segment thiscpu_x86_gdt[SEGMENT_COUNT] = {
 	[SEGMENT_INDEX(SEGMENT_NULL)]          = SEGMENT_DESCRIPTOR_INIT(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),                                           /* NULL segment */
 	[SEGMENT_INDEX(SEGMENT_KERNEL_CODE)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 0, 1, 0, GDT_L, 1, 1), /* Kernel code segment */
 	[SEGMENT_INDEX(SEGMENT_KERNEL_DATA)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 0, 1, 0, GDT_L, 1, 1), /* Kernel data segment */
@@ -83,19 +83,19 @@ PUBLIC ATTR_PERCPU struct segment x86_cpugdt[SEGMENT_COUNT] = {
 
 INTDEF byte_t __x86_ldt_lcall7_main_lo[];
 INTDEF byte_t __x86_ldt_lcall7_main_hi[];
-PUBLIC ATTR_PERCPU struct segment x86_cpuldt[LDT_SEGMENT_COUNT] = {
+PUBLIC ATTR_PERCPU struct segment thiscpu_x86_ldt[LDT_SEGMENT_COUNT] = {
 	DEFINE_LOHI_SEGMENT(LDT_SEGMENT_SYSCALL, __x86_ldt_lcall7_main_lo, __x86_ldt_lcall7_main_hi),
 };
 
 
 /* The per-task value written to `t_esp0' / `t_rsp0' during scheduler preemption. */
-PUBLIC ATTR_PERTASK uintptr_t _x86_this_kernel_sp0 ASMNAME("x86_this_kernel_sp0") = 0;
+PUBLIC ATTR_PERTASK uintptr_t _this_x86_kernel_psp0 ASMNAME("this_x86_kernel_psp0") = 0;
 
-DEFINE_PERTASK_INIT(x86_init_this_kernel_sp);
+DEFINE_PERTASK_INIT(init_this_x86_kernel_psp0);
 INTERN NOBLOCK void
-NOTHROW(KCALL x86_init_this_kernel_sp)(struct task *__restrict self) {
+NOTHROW(KCALL init_this_x86_kernel_psp0)(struct task *__restrict self) {
 	/* Initialize the kernel-sp0 valued to-be written during preemption. */
-	FORTASK(self, _x86_this_kernel_sp0) = (uintptr_t)VM_NODE_ENDADDR(&FORTASK(self, _this_kernel_stack));
+	FORTASK(self, _this_x86_kernel_psp0) = (uintptr_t)VM_NODE_ENDADDR(&FORTASK(self, this_kernel_stacknode));
 }
 
 
@@ -103,19 +103,19 @@ NOTHROW(KCALL x86_init_this_kernel_sp)(struct task *__restrict self) {
 /* The per-task values with which the `SEGMENT_USER_FSBASE' and
  * `SEGMENT_USER_GSBASE' segments are populated during scheduler
  * preemption. */
-PUBLIC ATTR_PERTASK uintptr_t x86_this_user_fsbase = 0;
-PUBLIC ATTR_PERTASK uintptr_t x86_this_user_gsbase = 0;
+PUBLIC ATTR_PERTASK uintptr_t this_x86_user_fsbase = 0;
+PUBLIC ATTR_PERTASK uintptr_t this_x86_user_gsbase = 0;
 #endif /* !__x86_64__ */
 
 #ifndef CONFIG_NO_USERKERN_SEGMENT
 
 #ifdef __x86_64__
 INTERN NOBLOCK uintptr_t /* Returns the initial value for `%fs_base' */
-NOTHROW(KCALL x86_this_userkern_init)(void)
+NOTHROW(KCALL init_this_x86_userkern)(void)
 #else /* __x86_64__ */
-DEFINE_PERTASK_INIT(x86_this_userkern_init);
+DEFINE_PERTASK_INIT(init_this_x86_userkern);
 INTERN NOBLOCK void /* Needs to be INTERN because used by boot.c */
-NOTHROW(KCALL x86_this_userkern_init)(struct task *__restrict self)
+NOTHROW(KCALL init_this_x86_userkern)(struct task *__restrict self)
 #endif /* !__x86_64__ */
 {
 	uintptr_t offset;
@@ -127,7 +127,7 @@ NOTHROW(KCALL x86_this_userkern_init)(struct task *__restrict self)
 #ifdef __x86_64__
 	return offset;
 #else /* __x86_64__ */
-	FORTASK(self, x86_this_user_fsbase) = offset;
+	FORTASK(self, this_x86_user_fsbase) = offset;
 #endif /* !__x86_64__ */
 }
 

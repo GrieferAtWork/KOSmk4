@@ -402,9 +402,9 @@ NOTHROW(FCALL task_push_asynchronous_srpc)(struct scpustate *__restrict state,
  * return target to instead point back towards a kernel-space function which is then
  * able to service RPC functions scheduled using `task_(schedule|exec)_user_[s]rpc()'
  * On x86, this is done by modifying the IRET tail at the top of the target thread's stack:
- *   >> FORTASK(self,x86_rpc_redirection_iret).ir_eip    = GET_USERCODE_IRET(self)->ir_eip;
- *   >> FORTASK(self,x86_rpc_redirection_iret).ir_cs     = GET_USERCODE_IRET(self)->ir_cs;
- *   >> FORTASK(self,x86_rpc_redirection_iret).ir_eflags = GET_USERCODE_IRET(self)->ir_eflags;
+ *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_eip    = GET_USERCODE_IRET(self)->ir_eip;
+ *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_cs     = GET_USERCODE_IRET(self)->ir_cs;
+ *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_eflags = GET_USERCODE_IRET(self)->ir_eflags;
  *   >> GET_USERCODE_IRET(self)->ir_eip                  = &x86_rpc_user_redirection;
  *   >> GET_USERCODE_IRET(self)->ir_cs                   = SEGMENT_KERNEL_CODE;
  *   >> GET_USERCODE_IRET(self)->ir_eflags               = 0;

@@ -120,7 +120,7 @@ ProcFS_PerProc_Stat_Printer(struct regular_node *__restrict self,
 	if (v) {
 		REF struct directory_entry *exec_dent;
 		sync_read(v);
-		exec_dent = xincref(FORVM(v, vm_execinfo).ei_dent);
+		exec_dent = xincref(FORVM(v, thisvm_execinfo).ei_dent);
 		sync_endread(v);
 		if (!exec_dent)
 			goto no_exec;

@@ -348,8 +348,8 @@ handle_remove_write_error:
 	/* Copy execinfo */
 	{
 		struct vm_execinfo_struct *dst, *src;
-		dst = &FORVM(result, vm_execinfo);
-		src = &FORVM(self, vm_execinfo);
+		dst = &FORVM(result, thisvm_execinfo);
+		src = &FORVM(self, thisvm_execinfo);
 		dst->ei_node = (REF struct inode *)xincref(src->ei_node);
 		dst->ei_dent = xincref(src->ei_dent);
 		dst->ei_path = xincref(src->ei_path);

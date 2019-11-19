@@ -2107,17 +2107,17 @@ NOTHROW(KCALL fs_destroy)(struct fs *__restrict self) {
 
 /* [1..1] Per-thread filesystem information.
  * NOTE: Initialized to NULL. - Must be initialized before the task is started. */
-PUBLIC ATTR_PERTASK REF struct fs *_this_fs = NULL;
+PUBLIC ATTR_PERTASK REF struct fs *this_fs = NULL;
 
-DEFINE_PERTASK_FINI(pertask_this_fs_fini);
+DEFINE_PERTASK_FINI(fini_this_fs);
 INTERN NONNULL((1)) NOBLOCK void
-NOTHROW(KCALL pertask_this_fs_fini)(struct task *__restrict self) {
-	xdecref(FORTASK(self, _this_fs));
+NOTHROW(KCALL fini_this_fs)(struct task *__restrict self) {
+	xdecref(FORTASK(self, this_fs));
 }
 
-DEFINE_PERTASK_CLONE(pertask_this_fs_clone);
+DEFINE_PERTASK_CLONE(clone_this_fs);
 INTERN NONNULL((1)) void KCALL
-pertask_this_fs_clone(struct task *__restrict new_thread, uintptr_t flags) {
+clone_this_fs(struct task *__restrict new_thread, uintptr_t flags) {
 	struct fs *f;
 	f = THIS_FS;
 	if (flags & CLONE_FS) {
@@ -2126,8 +2126,8 @@ pertask_this_fs_clone(struct task *__restrict new_thread, uintptr_t flags) {
 		/* Clone the old fs. */
 		f = fs_clone(f, (flags & CLONE_NEWNS) != 0);
 	}
-	assert(!FORTASK(new_thread, _this_fs));
-	FORTASK(new_thread, _this_fs) = f; /* Inherit reference */
+	assert(!FORTASK(new_thread, this_fs));
+	FORTASK(new_thread, this_fs) = f; /* Inherit reference */
 }
 
 DECL_END

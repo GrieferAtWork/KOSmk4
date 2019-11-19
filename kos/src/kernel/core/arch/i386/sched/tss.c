@@ -46,7 +46,7 @@ DECL_BEGIN
 INTDEF byte_t __kernel_bootiob_startpage[] ASMNAME("__x86_iob_empty_vpageno");
 
 /* The VM node used to represent the IOB mapping of the current CPU */
-PUBLIC ATTR_PERCPU struct vm_node x86_cpu_iobnode = {
+PUBLIC ATTR_PERCPU struct vm_node thiscpu_x86_iobnode = {
 	/* .vn_node   = */ { NULL, NULL,
 	                     (vm_vpage_t)__kernel_bootiob_startpage,
 	                     (vm_vpage_t)__kernel_bootiob_startpage + 1 },
@@ -61,7 +61,7 @@ PUBLIC ATTR_PERCPU struct vm_node x86_cpu_iobnode = {
 };
 
 /* [1..1][const] Page directory identity pointer for unmapping the IOB vector of the current CPU. */
-INTERN ATTR_PERCPU void *x86_cpu_iobnode_pagedir_identity = NULL;
+INTERN ATTR_PERCPU void *thiscpu_x86_iobnode_pagedir_identity = NULL;
 
 
 
@@ -70,8 +70,8 @@ INTDEF struct vm_node __x86_bootcpu_dfstack_node;
 INTDEF struct vm_datapart __x86_bootcpu_dfstack_part;
 
 PUBLIC ATTR_PERCPU struct vm_datapart
-_x86_this_dfstack_part ASMNAME("x86_this_dfstack_part") = {
-	/* .dp_refcnt = */ 2, /* `x86_this_dfstack_part', `x86_this_dfstack' */
+_current_x86_dfstackpart ASMNAME("thiscpu_x86_dfstackpart") = {
+	/* .dp_refcnt = */ 2, /* `thiscpu_x86_dfstackpart', `thiscpu_x86_dfstacknode' */
 	.dp_lock   = SHARED_RWLOCK_INIT,
 	{
 		/* .dp_tree = */ { NULL, NULL, 0, CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) - 1 }
@@ -106,7 +106,7 @@ _x86_this_dfstack_part ASMNAME("x86_this_dfstack_part") = {
 	},
 };
 
-PUBLIC ATTR_PERCPU struct vm_node _x86_this_dfstack ASMNAME("x86_this_dfstack") = {
+PUBLIC ATTR_PERCPU struct vm_node _thiscpu_x86_dfstacknode ASMNAME("thiscpu_x86_dfstacknode") = {
 	.vn_node = {
 		NULL,
 		NULL,
@@ -128,7 +128,7 @@ PUBLIC ATTR_PERCPU struct vm_node _x86_this_dfstack ASMNAME("x86_this_dfstack") 
 INTDEF void ASMCALL x86_idt_double_fault(void);
 INTDEF byte_t __x86_bootcpu_df_stack[KERNEL_DF_STACKSIZE];
 
-PUBLIC ATTR_PERCPU struct tss x86_cputss_df = {
+PUBLIC ATTR_PERCPU struct tss thiscpu_x86_tssdf = {
 	.t_link       = 0,
 	.__t_zero0    = 0,
 	.t_esp0       = (uintptr_t)COMPILER_ENDOF(__x86_bootcpu_df_stack),
@@ -174,11 +174,11 @@ PUBLIC ATTR_PERCPU struct tss x86_cputss_df = {
 };
 
 /* Prevent `get_current_stack()' from thinking that we're running on
- * the #DF stack by ensuing that x86_cputss_df.t_ecx is set to 0
+ * the #DF stack by ensuing that thiscpu_x86_tssdf.t_ecx is set to 0
  * Separately, note we set override the temporarily override the
  * pointers inside of `THIS_KERNEL_STACK' whilst in debug-mode,
  * to instead refer to the start/end of the debugger stack. */
-DEFINE_DBG_BZERO(&PERCPU(x86_cputss_df).t_ecx, sizeof(x86_cputss_df.t_ecx));
+DEFINE_DBG_BZERO(&PERCPU(thiscpu_x86_tssdf).t_ecx, sizeof(thiscpu_x86_tssdf.t_ecx));
 #endif /* !__x86_64__ */
 
 
@@ -189,9 +189,9 @@ NOTHROW(KCALL get_stack_avail)(void) {
 	vm_virt_t sp = (vm_virt_t)__rdsp();
 #ifndef __x86_64__
 	struct cpu *c = THIS_CPU;
-	if unlikely(FORCPU(c, x86_cputss_df.t_ecx)) {
+	if unlikely(FORCPU(c, thiscpu_x86_tssdf.t_ecx)) {
 		struct vm_node const *node;
-		node  = &FORCPU(c, x86_this_dfstack);
+		node  = &FORCPU(c, thiscpu_x86_dfstacknode);
 		start = VM_NODE_STARTADDR(node);
 		end   = VM_NODE_ENDADDR(node);
 	} else
@@ -216,9 +216,9 @@ NOTHROW(KCALL get_stack_inuse)(void) {
 	vm_virt_t sp = (vm_virt_t)__rdsp();
 #ifndef __x86_64__
 	struct cpu *c = THIS_CPU;
-	if unlikely(FORCPU(c, x86_cputss_df.t_ecx)) {
+	if unlikely(FORCPU(c, thiscpu_x86_tssdf.t_ecx)) {
 		struct vm_node const *node;
-		node  = &FORCPU(c, x86_this_dfstack);
+		node  = &FORCPU(c, thiscpu_x86_dfstacknode);
 		start = VM_NODE_STARTADDR(node);
 		end   = VM_NODE_ENDADDR(node);
 	} else
@@ -242,9 +242,9 @@ NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp) {
 	vm_virt_t start, end;
 #ifndef __x86_64__
 	struct cpu *c = THIS_CPU;
-	if unlikely(FORCPU(c, x86_cputss_df.t_ecx)) {
+	if unlikely(FORCPU(c, thiscpu_x86_tssdf.t_ecx)) {
 		struct vm_node const *node;
-		node  = &FORCPU(c, x86_this_dfstack);
+		node  = &FORCPU(c, thiscpu_x86_dfstacknode);
 		start = VM_NODE_STARTADDR(node);
 		end   = VM_NODE_ENDADDR(node);
 	} else

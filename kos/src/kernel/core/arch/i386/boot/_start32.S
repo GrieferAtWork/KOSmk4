@@ -61,8 +61,8 @@
 
 EXTERN(boot_cpustate)
 EXTERN(__kernel_boottask_stack)
-EXTERN(__x86_bootcpu_features)
-EXTERN(__x86_bootcpu_idfeatures)
+EXTERN(x86_bootcpu_cpufeatures)
+EXTERN(x86_bootcpu_cpuid)
 
 #ifndef CONFIG_NO_BOOT0
 #include "_boot0.S"
@@ -117,7 +117,7 @@ INTERN_FUNCTION(_start)
 	/* Prematurely load our GDT, so we can manually set valid segments for %ds, %es and %ss,
 	 * as we only want to rely on the boot loader to have set up a valid %ds and %cs */
 	movw   $(SEGMENT_COUNT * 8 - 1), %ds:-6(%esp)
-	INTERN(__x86_template_gdt)
+	EXTERN(__x86_template_gdt)
 	/* Load from template, as the boot cpu's hasn't been initialized, yet. */
 	movl   $(V2P(__x86_template_gdt)), %ds:-4(%esp)
 	lgdtl  %ds:-6(%esp)
@@ -198,14 +198,14 @@ INTERN_FUNCTION(_start)
 	jz    .Lno_cpuid
 
 
-	orl    $(CPU_FEATURE_FCPUID), V2P(__x86_bootcpu_features)
+	orl    $(CPU_FEATURE_FCPUID), V2P(x86_bootcpu_cpufeatures)
 
 	movl   $1, %eax
 	cpuid
-	movl   %eax, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_1A
-	movl   %ebx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_1B
-	movl   %edx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_1D
-	movl   %ecx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_1C
+	movl   %eax, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1A
+	movl   %ebx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1B
+	movl   %edx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1D
+	movl   %ecx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1C
 
 	/* if (Family == 6 && Model < 3 && Stepping < 3)
 	 *     OFFSET_CPUID_1D &= ~CPUID_1D_SEP; */
@@ -230,62 +230,62 @@ INTERN_FUNCTION(_start)
 	cmpl   $3, %ecx
 	/* if (Stepping >= 3) goto 1f; */
 	jae    1f
-	andl   $~CPUID_1D_SEP, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_1D
+	andl   $~CPUID_1D_SEP, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1D
 1:
 
 	/* Query additional CPUID features. */
 	movl   $0, %eax
 	cpuid
-	movl   %eax, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_0A
-	movl   %ebx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_0B
-	movl   %edx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_0D
-	movl   %ecx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_0C
+	movl   %eax, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_0A
+	movl   %ebx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_0B
+	movl   %edx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_0D
+	movl   %ecx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_0C
 	cmpl   $7, %eax
 	jnae   1f
 	movl   $7, %eax
 	movl   $0, %ecx /* Sub-leaf:0 */
 	cpuid
-	movl   %edx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_7D
-	movl   %ecx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_7C
-	movl   %ebx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_7B
+	movl   %edx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_7D
+	movl   %ecx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_7C
+	movl   %ebx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_7B
 1:	movl   $0x80000000, %eax
 	cpuid
-	movl   %eax, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000000A
+	movl   %eax, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000000A
 	cmpl   $0x80000001, %eax
 	jnae   2f
 	movl   $0x80000001, %eax
 	cpuid
-	movl   %ecx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000001C
-	movl   %edx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000001D
-	movl   V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000000A, %eax
+	movl   %ecx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000001C
+	movl   %edx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000001D
+	movl   V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000000A, %eax
 	cmpl   $0x80000004, %eax
 	jnae   3f
 	movl   $0x80000004, %eax
 	cpuid
-	movl   %eax, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000004A
-	movl   %ebx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000004B
-	movl   %ecx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000004C
-	movl   %edx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000004D
+	movl   %eax, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000004A
+	movl   %ebx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000004B
+	movl   %ecx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000004C
+	movl   %edx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000004D
 	movl   $0x80000003, %eax
 	cpuid
-	movl   %eax, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000003A
-	movl   %ebx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000003B
-	movl   %ecx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000003C
-	movl   %edx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000003D
+	movl   %eax, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000003A
+	movl   %ebx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000003B
+	movl   %ecx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000003C
+	movl   %edx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000003D
 	movl   $0x80000002, %eax
 	cpuid
-	movl   %eax, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000002A
-	movl   %ebx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000002B
-	movl   %ecx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000002C
-	movl   %edx, V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_80000002D
+	movl   %eax, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000002A
+	movl   %ebx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000002B
+	movl   %ecx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000002C
+	movl   %edx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000002D
 3:  /* ci_80000000a < 0x80000004 */
 2:  /* ci_80000000a < 0x80000001 */
 .Lno_cpuid:
 
 	/* Check for page-global support
 	 * If not supported, clear out the used GLOBAL bit */
-	INTERN(used_pxx_page_fglobal)
-	testl  $(CPUID_1D_PGE), V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_1D
+	EXTERN(used_pxx_page_fglobal)
+	testl  $(CPUID_1D_PGE), V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1D
 	jnz    1f
 	movl   $0,   V2P(used_pxx_page_fglobal)
 #if !defined(CONFIG_NO_PAGING_PAE) && (PAE_PAGE_FGLOBAL > 0xffffffff)
@@ -304,10 +304,10 @@ INTERN_FUNCTION(_start)
 #endif /* !CONFIG_NO_PAGING_P32 */
 
 
-	INTERN(__x86_pagedir_kernel_share)
+	EXTERN(__x86_pagedir_kernel_share)
 #ifdef HYBRID_PAGING_MODE
 	/* Check which paging mode we should enable. */
-	testl  $(CPUID_1D_PAE), V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_1D
+	testl  $(CPUID_1D_PAE), V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1D
 #if 0
 	jmp    .Linit_paging_p32
 #else
@@ -332,7 +332,7 @@ INTERN_FUNCTION(_start)
 	 * seem likely that it would also expose this functionality in the firs tof providing this
 	 * very instruction, but still though: it can't hurt to be save and disable PAE if CX8 isn't
 	 * available. */
-	testl  $(CPUID_1D_CX8), V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_1D
+	testl  $(CPUID_1D_CX8), V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1D
 	jz     .Linit_paging_p32
 	/* TODO: Check if using PAE would even give us any form of advantage:
 	 *  - CPUID.80000008H:EAX[7:0]:
@@ -435,7 +435,7 @@ INTERN_FUNCTION(_start)
 	 * Make their live a bit easier by allowing for such a simple hack and act like the cpu
 	 * told us that PAE wasn't supported.
 	 * Also: The check for `CPUID_1D_CX8' assumes that we clear the PAE bit for it. */
-	andl   $(~CPUID_1D_PAE), V2P(__x86_bootcpu_idfeatures) + OFFSET_CPUID_1D
+	andl   $(~CPUID_1D_PAE), V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1D
 #endif /* HYBRID_PAGING_MODE */
 	/*
 	 * >> VECTOR_FLAGS = P32_PAGE_FACCESSED | P32_PAGE_FWRITE | P32_PAGE_FPRESENT;
@@ -480,8 +480,8 @@ INTERN_FUNCTION(_start)
 	loop   1b
 	/* >> i = __x86_p32_identity_mapped_text_4mib_index;
 	 * >> pagedir_kernel.pd_p32.p_e2[i].p_word = PHYS_ADDR(&ks_share[i][0]) | VECTOR_FLAGS; */
-	INTERN(__x86_p32_identity_mapped_text_4mib_e2_word)  /* == &P32_PAGEDIR_KERNEL_P_E2(__x86_p32_identity_mapped_text_4mib_index) */
-	INTERN(__x86_p32_identity_mapped_text_4mib_ks_share) /* == P32_KS_SHARE(__x86_p32_identity_mapped_text_4mib_index, 0) */
+	EXTERN(__x86_p32_identity_mapped_text_4mib_e2_word)  /* == &P32_PAGEDIR_KERNEL_P_E2(__x86_p32_identity_mapped_text_4mib_index) */
+	EXTERN(__x86_p32_identity_mapped_text_4mib_ks_share) /* == P32_KS_SHARE(__x86_p32_identity_mapped_text_4mib_index, 0) */
 	movl   $(__x86_p32_identity_mapped_text_4mib_ks_share + VECTOR_FLAGS), V2P(__x86_p32_identity_mapped_text_4mib_e2_word)
 #undef PAGE_FLAGS
 #undef VECTOR_FLAGS
@@ -533,7 +533,7 @@ END(__x86_paging_init_identity_mapped_text)
 
 #ifdef HYBRID_PAGING_MODE
 	/* Check which paging mode we should enable. */
-	testl  $(CPUID_1D_PAE), (__x86_bootcpu_idfeatures + OFFSET_CPUID_1D)
+	testl  $(CPUID_1D_PAE), (x86_bootcpu_cpuid + OFFSET_CPUID_1D)
 	jz     .Lcleanup_paging_p32
 	/* Fallthrough to `.Lcleanup_paging_pae' */
 #endif /* HYBRID_PAGING_MODE */
@@ -562,8 +562,8 @@ END(__x86_paging_init_identity_mapped_text)
 	.pushsection .rodata.free
 		.align 2
 1:		.word  (SEGMENT_COUNT * 8) - 1
-		INTERN(__x86_bootcpu_gdt)
-		.long  __x86_bootcpu_gdt
+		EXTERN(x86_bootcpu_gdt)
+		.long  x86_bootcpu_gdt
 	.popsection
 	lgdtl  1b
 

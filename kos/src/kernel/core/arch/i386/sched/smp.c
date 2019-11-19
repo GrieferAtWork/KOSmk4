@@ -106,12 +106,12 @@ done:
 }
 
 
-PUBLIC ATTR_PERCPU u8 _x86_lapic_id ASMNAME("x86_lapic_id") = 0;
-PUBLIC ATTR_PERCPU u8 _x86_lapic_version ASMNAME("x86_lapic_version") = 0;
+PUBLIC ATTR_PERCPU u8 _thiscpu_x86_lapicid ASMNAME("thiscpu_x86_lapicid") = 0;
+PUBLIC ATTR_PERCPU u8 _thiscpu_x86_lapicversion ASMNAME("thiscpu_x86_lapicversion") = 0;
 DATDEF cpuid_t _cpu_count ASMNAME("cpu_count");
 DATDEF struct cpu *_cpu_vector[CONFIG_MAX_CPU_COUNT] ASMNAME("cpu_vector");
 
-PUBLIC VIRT byte_t volatile *x86_lapic_base_address_ ASMNAME("x86_lapic_base_address") = NULL;
+PUBLIC VIRT byte_t volatile *_x86_lapicbase ASMNAME("x86_lapicbase") = NULL;
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_smp)(void) {
@@ -132,8 +132,8 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_size  = 1;
 		x86_vm_part_lapic.dp_tree.a_vmin                = (vm_dpage_t)0;
 		x86_vm_part_lapic.dp_tree.a_vmax                = (vm_dpage_t)0;
-		FORCPU(&_bootcpu, _x86_lapic_id)                  = 0xff; /* Read later using the LAPIC */
-		FORCPU(&_bootcpu, _x86_lapic_version)             = fps->mp_defcfg > 4 ? APICVER_INTEGRATED : APICVER_82489DX;
+		FORCPU(&_bootcpu, _thiscpu_x86_lapicid)                  = 0xff; /* Read later using the LAPIC */
+		FORCPU(&_bootcpu, _thiscpu_x86_lapicversion)             = fps->mp_defcfg > 4 ? APICVER_INTEGRATED : APICVER_82489DX;
 		return;
 	}
 	/* Check pointer location. */
@@ -148,7 +148,7 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 		return;
 	/* Remember the LAPIC base address. */
 	if (table->tab_lapicaddr & (PAGESIZE - 1)) {
-		x86_lapic_base_address_ = (byte_t *)(uintptr_t)(table->tab_lapicaddr & (PAGESIZE - 1));
+		_x86_lapicbase = (byte_t *)(uintptr_t)(table->tab_lapicaddr & (PAGESIZE - 1));
 		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_start = VM_ADDR2PAGE((vm_phys_t)table->tab_lapicaddr);
 		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_size  = 2;
 		x86_vm_part_lapic.dp_tree.a_vmin                = (vm_dpage_t)0;
@@ -175,7 +175,7 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 					if (entry->mp_processor.p_cpuflag & MP_PROCESSOR_FBOOTPROCESSOR) {
 						printk(FREESTR(KERN_INFO "Found boot processor with lapic id %#.2I8x\n"),
 						       entry->mp_processor.p_lapicid);
-						FORCPU(&_bootcpu, _x86_lapic_id) = entry->mp_processor.p_lapicid;
+						FORCPU(&_bootcpu, _thiscpu_x86_lapicid) = entry->mp_processor.p_lapicid;
 					}
 #ifndef CONFIG_NO_SMP
 					else if unlikely(_cpu_count >= CONFIG_MAX_CPU_COUNT) {

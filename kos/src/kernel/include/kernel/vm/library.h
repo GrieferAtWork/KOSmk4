@@ -31,8 +31,8 @@ DECL_BEGIN
  * WARNING: Aside from `lld_size', fields of this structure must be validated
  *          when used! - The set_library_listdef(2) system call does _NOT_
  *          structure fields other than `lld_size'! */
-DATDEF ATTR_PERVM struct library_listdef _this_library_listdef;
-#define THIS_LIBRARY_LISTDEF       PERVM(_this_library_listdef)
+DATDEF ATTR_PERVM struct library_listdef thisvm_library_listdef;
+#define THIS_LIBRARY_LISTDEF       PERVM(thisvm_library_listdef)
 
 
 

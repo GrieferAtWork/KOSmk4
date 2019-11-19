@@ -209,7 +209,7 @@ FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_pop)(pflag_t flag) {
  * >>     } else {
  * >>         irr = GET_KERNEL_STACK_BASE() - sizeof(struct irregs_user);
  * >>     }
- * >>     memcpy(&PERTASK(x86_rpc_redirection_iret),irr,
+ * >>     memcpy(&PERTASK(this_x86_rpc_redirection_iret),irr,
  * >>            sizeof(struct irregs_kernel));
  * >>     irr->ir_eip    = &x86_rpc_user_redirectionS;
  * >>     irr->ir_cs     = SEGMENT_KERNEL_CS;
@@ -232,21 +232,28 @@ FUNDEF void ASMCALL x86_rpc_user_redirection(void);
 
 #ifdef __x86_64__
 
-DATDEF ATTR_PERTASK struct irregs x86_rpc_redirection_iret;
+DATDEF ATTR_PERTASK struct irregs this_x86_rpc_redirection_iret;
+
+#ifndef ___this_x86_kernel_psp0_defined
+#define ___this_x86_kernel_psp0_defined 1
+/* [== VM_NODE_ENDADDR(THIS_KERNEL_STACK)]
+ * The per-task value written to `t_esp0' / `t_rsp0' during scheduler preemption. */
+DATDEF ATTR_PERTASK uintptr_t const this_x86_kernel_psp0;
+#endif /* !___this_x86_kernel_psp0_defined */
 
 /* Return a pointer to the original user-space IRET tail of the calling thread.
  * This is the pointer to the IRET structure located at the base of the caller's kernel stack.
  * NOTE: The caller must ensure that preemption is disabled,
  *       and that `thread' is hosted by the calling CPU. */
 #define x86_get_irregs(thread) \
-	((struct irregs *)((byte_t *)VM_PAGE2ADDR((FORTASK((struct task *)self, _this_kernel_stack).vn_node.a_vmax) + 1)) - 1)
+	((struct irregs *)FORTASK(thread, *(uintptr_t *)&this_x86_kernel_psp0) - 1)
 
 /* Safely modify the values of saved registers that may be modified by RPC redirection. */
 FORCELOCAL NOBLOCK WUNUSED uintptr_t
 NOTHROW(FCALL irregs_rdip)(struct irregs const *__restrict self) {
 	uintptr_t result = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
 	if (result == (uintptr_t)&x86_rpc_user_redirection)
-		result = PERTASK_GET(x86_rpc_redirection_iret.ir_rip);
+		result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_rip);
 	return result;
 }
 
@@ -256,7 +263,7 @@ NOTHROW(FCALL irregs_rdcs)(struct irregs const *__restrict self) {
 	u16 result    = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
 	uintptr_t eip = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
 	if (eip == (uintptr_t)&x86_rpc_user_redirection)
-		result = PERTASK_GET(x86_rpc_redirection_iret.ir_cs16);
+		result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_cs16);
 	return result;
 }
 
@@ -266,7 +273,7 @@ NOTHROW(FCALL irregs_rdflags)(struct irregs const *__restrict self) {
 	uintptr_t result = __hybrid_atomic_load(self->ir_rflags, __ATOMIC_ACQUIRE);
 	uintptr_t eip    = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
 	if (eip == (uintptr_t)&x86_rpc_user_redirection)
-		result = PERTASK_GET(x86_rpc_redirection_iret.ir_rflags);
+		result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_rflags);
 	return result;
 }
 
@@ -292,7 +299,7 @@ NOTHROW(FCALL irregs_rdsp)(struct irregs const *__restrict self) {
 	uintptr_t result = __hybrid_atomic_load(self->ir_rsp, __ATOMIC_ACQUIRE);
 	uintptr_t eip    = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
 	if (eip == (uintptr_t)&x86_rpc_user_redirection)
-		result = PERTASK_GET(x86_rpc_redirection_iret.ir_rsp);
+		result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_rsp);
 	return result;
 }
 
@@ -302,7 +309,7 @@ NOTHROW(FCALL irregs_rdss)(struct irregs const *__restrict self) {
 	u16 result    = __hybrid_atomic_load(self->ir_ss16, __ATOMIC_ACQUIRE);
 	uintptr_t eip = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
 	if (eip == (uintptr_t)&x86_rpc_user_redirection)
-		result = PERTASK_GET(x86_rpc_redirection_iret.ir_ss16);
+		result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_ss16);
 	return result;
 }
 
@@ -312,7 +319,7 @@ NOTHROW(FCALL irregs_wrip)(struct irregs *__restrict self, uintptr_t value) {
 	do {
 		oldval = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
 		if (oldval == (uintptr_t)&x86_rpc_user_redirection) {
-			PERTASK_SET(x86_rpc_redirection_iret.ir_rip, value);
+			PERTASK_SET(this_x86_rpc_redirection_iret.ir_rip, value);
 			break;
 		}
 	} while (!__hybrid_atomic_cmpxch_weak(self->ir_rip, oldval, value,
@@ -324,7 +331,7 @@ FORCELOCAL NOBLOCK void
 NOTHROW(FCALL irregs_wrcs)(struct irregs *__restrict self, u16 value) {
 	pflag_t was = PREEMPTION_PUSHOFF();
 	if (self->ir_rip == (uintptr_t)&x86_rpc_user_redirection) {
-		PERTASK_SET(x86_rpc_redirection_iret.ir_cs, (uintptr_t)value);
+		PERTASK_SET(this_x86_rpc_redirection_iret.ir_cs, (uintptr_t)value);
 	} else {
 		self->ir_cs = (uintptr_t)value;
 	}
@@ -335,7 +342,7 @@ FORCELOCAL NOBLOCK void
 NOTHROW(FCALL irregs_wrflags)(struct irregs *__restrict self, uintptr_t value) {
 	pflag_t was = PREEMPTION_PUSHOFF();
 	if (self->ir_rip == (uintptr_t)&x86_rpc_user_redirection) {
-		PERTASK_SET(x86_rpc_redirection_iret.ir_rflags, value);
+		PERTASK_SET(this_x86_rpc_redirection_iret.ir_rflags, value);
 	} else {
 		self->ir_rflags = value;
 	}
@@ -347,8 +354,8 @@ NOTHROW(FCALL irregs_mskflags)(struct irregs *__restrict self, uintptr_t mask, u
 	pflag_t was = PREEMPTION_PUSHOFF();
 	if (self->ir_rip == (uintptr_t)&x86_rpc_user_redirection) {
 		uintptr_t newval;
-		newval = PERTASK_GET(x86_rpc_redirection_iret.ir_rflags);
-		PERTASK_SET(x86_rpc_redirection_iret.ir_rflags, (newval & mask) | flags);
+		newval = PERTASK_GET(this_x86_rpc_redirection_iret.ir_rflags);
+		PERTASK_SET(this_x86_rpc_redirection_iret.ir_rflags, (newval & mask) | flags);
 	} else {
 		self->ir_rflags &= mask;
 		self->ir_rflags |= flags;
@@ -360,7 +367,7 @@ FORCELOCAL NOBLOCK void
 NOTHROW(FCALL irregs_wrsp)(struct irregs *__restrict self, uintptr_t value) {
 	pflag_t was = PREEMPTION_PUSHOFF();
 	if (self->ir_rip == (uintptr_t)&x86_rpc_user_redirection) {
-		PERTASK_SET(x86_rpc_redirection_iret.ir_rsp, value);
+		PERTASK_SET(this_x86_rpc_redirection_iret.ir_rsp, value);
 	} else {
 		self->ir_rsp = value;
 	}
@@ -371,7 +378,7 @@ FORCELOCAL NOBLOCK void
 NOTHROW(FCALL irregs_wrss)(struct irregs *__restrict self, u16 value) {
 	pflag_t was = PREEMPTION_PUSHOFF();
 	if (self->ir_rip == (uintptr_t)&x86_rpc_user_redirection) {
-		PERTASK_SET(x86_rpc_redirection_iret.ir_ss, (uintptr_t)value);
+		PERTASK_SET(this_x86_rpc_redirection_iret.ir_ss, (uintptr_t)value);
 	} else {
 		self->ir_ss = (uintptr_t)value;
 	}
@@ -380,7 +387,7 @@ NOTHROW(FCALL irregs_wrss)(struct irregs *__restrict self, u16 value) {
 
 #else /* __x86_64__ */
 
-DATDEF ATTR_PERTASK struct irregs_kernel x86_rpc_redirection_iret;
+DATDEF ATTR_PERTASK struct irregs_kernel this_x86_rpc_redirection_iret;
 
 struct irregs_user;
 
@@ -396,7 +403,7 @@ FORCELOCAL NOBLOCK WUNUSED uintptr_t
 NOTHROW(FCALL irregs_rdip)(struct irregs_kernel const *__restrict self) {
 	uintptr_t result = __hybrid_atomic_load(self->ir_eip, __ATOMIC_ACQUIRE);
 	if (result == (uintptr_t)&x86_rpc_user_redirection)
-		result = PERTASK_GET(x86_rpc_redirection_iret.ir_eip);
+		result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_eip);
 	return result;
 }
 
@@ -406,7 +413,7 @@ NOTHROW(FCALL irregs_rdcs)(struct irregs_kernel const *__restrict self) {
 	u16 result    = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
 	uintptr_t eip = __hybrid_atomic_load(self->ir_eip, __ATOMIC_ACQUIRE);
 	if (eip == (uintptr_t)&x86_rpc_user_redirection)
-		result = PERTASK_GET(x86_rpc_redirection_iret.ir_cs16);
+		result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_cs16);
 	return result;
 }
 
@@ -416,7 +423,7 @@ NOTHROW(FCALL irregs_rdflags)(struct irregs_kernel const *__restrict self) {
 	uintptr_t result = __hybrid_atomic_load(self->ir_eflags, __ATOMIC_ACQUIRE);
 	uintptr_t eip    = __hybrid_atomic_load(self->ir_eip, __ATOMIC_ACQUIRE);
 	if (eip == (uintptr_t)&x86_rpc_user_redirection)
-		result = PERTASK_GET(x86_rpc_redirection_iret.ir_eflags);
+		result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_eflags);
 	return result;
 }
 
@@ -461,7 +468,7 @@ NOTHROW(FCALL irregs_isvm86)(struct irregs_kernel const *__restrict self) {
 		return 1;
 	eip = __hybrid_atomic_load(self->ir_eip, __ATOMIC_ACQUIRE);
 	if (eip == (uintptr_t)&x86_rpc_user_redirection) {
-		eflags = PERTASK_GET(x86_rpc_redirection_iret.ir_eflags);
+		eflags = PERTASK_GET(this_x86_rpc_redirection_iret.ir_eflags);
 		if (eflags & 0x20000)
 			return 1;
 	}
@@ -486,7 +493,7 @@ NOTHROW(FCALL irregs_wrip)(struct irregs_kernel *__restrict self, uintptr_t valu
 	do {
 		oldval = __hybrid_atomic_load(self->ir_eip, __ATOMIC_ACQUIRE);
 		if (oldval == (uintptr_t)&x86_rpc_user_redirection) {
-			PERTASK_SET(x86_rpc_redirection_iret.ir_eip, value);
+			PERTASK_SET(this_x86_rpc_redirection_iret.ir_eip, value);
 			break;
 		}
 	} while (!__hybrid_atomic_cmpxch_weak(self->ir_eip, oldval, value, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
@@ -497,7 +504,7 @@ FORCELOCAL NOBLOCK void
 NOTHROW(FCALL irregs_wrcs)(struct irregs_kernel *__restrict self, u16 value) {
 	pflag_t was = PREEMPTION_PUSHOFF();
 	if (self->ir_eip == (uintptr_t)&x86_rpc_user_redirection) {
-		PERTASK_SET(x86_rpc_redirection_iret.ir_cs, (uintptr_t)value);
+		PERTASK_SET(this_x86_rpc_redirection_iret.ir_cs, (uintptr_t)value);
 	} else {
 		self->ir_cs = (uintptr_t)value;
 	}
@@ -508,7 +515,7 @@ FORCELOCAL NOBLOCK void
 NOTHROW(FCALL irregs_wrflags)(struct irregs_kernel *__restrict self, uintptr_t value) {
 	pflag_t was = PREEMPTION_PUSHOFF();
 	if (self->ir_eip == (uintptr_t)&x86_rpc_user_redirection) {
-		PERTASK_SET(x86_rpc_redirection_iret.ir_eflags, value);
+		PERTASK_SET(this_x86_rpc_redirection_iret.ir_eflags, value);
 	} else {
 		self->ir_eflags = value;
 	}
@@ -520,8 +527,8 @@ NOTHROW(FCALL irregs_mskflags)(struct irregs_kernel *__restrict self, uintptr_t 
 	pflag_t was = PREEMPTION_PUSHOFF();
 	if (self->ir_eip == (uintptr_t)&x86_rpc_user_redirection) {
 		uintptr_t newval;
-		newval = PERTASK_GET(x86_rpc_redirection_iret.ir_eflags);
-		PERTASK_SET(x86_rpc_redirection_iret.ir_eflags, (newval & mask) | flags);
+		newval = PERTASK_GET(this_x86_rpc_redirection_iret.ir_eflags);
+		PERTASK_SET(this_x86_rpc_redirection_iret.ir_eflags, (newval & mask) | flags);
 	} else {
 		self->ir_eflags &= mask;
 		self->ir_eflags |= flags;

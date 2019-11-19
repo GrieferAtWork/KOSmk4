@@ -65,7 +65,7 @@ INTERN_FUNCTION(x86_realmode_interrupt)
 	jmp    1f - KERNEL_BASE
 1:	leal   -KERNEL_BASE(%esp), %esp
 
-	INTERN(x86_realmode_gdt)
+	EXTERN(x86_realmode_gdt)
 	movw   $(RM_SEGMENT_COUNT - 1),           0(%esp) /* LIMIT */
 	movl   $(x86_realmode_gdt - KERNEL_BASE), 2(%esp) /* BASE */
 	lgdtl  (%esp)

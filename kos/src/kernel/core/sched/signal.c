@@ -52,7 +52,7 @@ DECL_BEGIN
 DEFINE_PREALLOCATION_CACHE(PRIVATE, connection, struct task_connection, 64);
 
 
-INTERN ATTR_PERTASK struct task_connections _this_cons = {
+INTERN ATTR_PERTASK struct task_connections this_cons = {
 	.tc_signals = {
 		.ts_thread = NULL,
 		.ts_cons   = NULL,
@@ -104,7 +104,7 @@ DEFINE_PERTASK_ONEXIT(task_disconnectall); /* Disconnect all remaining connectio
 INTERN NOBLOCK void
 NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self) {
 	struct task_connections *cons;
-	cons                       = &FORTASK(self, _this_cons);
+	cons                       = &FORTASK(self, this_cons);
 	cons->tc_static_v          = cons->tc_static;
 	cons->tc_signals.ts_thread = self;
 }
@@ -137,7 +137,7 @@ task_connect(struct sig *__restrict target) THROWS(E_BADALLOC) {
 	uintptr_t flags = 0;
 	assertf(IS_ALIGNED((uintptr_t)target, 2),
 	        "target = %p", target);
-	mycons = &PERTASK(_this_cons);
+	mycons = &PERTASK(this_cons);
 	for (i = 0; i < CONFIG_TASK_STATIC_CONNECTIONS; ++i) {
 		con = &mycons->tc_static_v[i];
 		if (con->tc_signal == TASK_CONNECTION_DISCONNECTED)
@@ -174,7 +174,7 @@ task_connect_ghost(struct sig *__restrict target) THROWS(E_BADALLOC) {
 	unsigned int i;
 	uintptr_t flags = 0;
 	assert(IS_ALIGNED((uintptr_t)target, 2));
-	mycons          = &PERTASK(_this_cons);
+	mycons          = &PERTASK(this_cons);
 	for (i = 0; i < CONFIG_TASK_STATIC_CONNECTIONS; ++i) {
 		con = &mycons->tc_static_v[i];
 		if (con->tc_signal == TASK_CONNECTION_DISCONNECTED)
@@ -210,7 +210,7 @@ NOTHROW(KCALL task_connect_c)(struct task_connection *__restrict con,
 	struct task_connection *chain;
 	struct task_connections *mycons;
 	assert(IS_ALIGNED((uintptr_t)target, 2));
-	mycons = &PERTASK(_this_cons);
+	mycons = &PERTASK(this_cons);
 #ifdef SIG_TEMPLOCK
 initialize_con:
 #endif /* SIG_TEMPLOCK */
@@ -240,7 +240,7 @@ NOTHROW(KCALL task_connect_ghost_c)(struct task_connection *__restrict con,
 	struct task_connection *chain;
 	struct task_connections *mycons;
 	assert(IS_ALIGNED((uintptr_t)target, 2));
-	mycons = &PERTASK(_this_cons);
+	mycons = &PERTASK(this_cons);
 #ifdef SIG_TEMPLOCK
 initialize_con:
 #endif /* SIG_TEMPLOCK */
@@ -269,7 +269,7 @@ initialize_con:
 PUBLIC NOBLOCK WUNUSED ATTR_CONST bool
 NOTHROW(KCALL task_isconnected)(void) {
 	struct task_connections *mycons;
-	mycons = &PERTASK(_this_cons);
+	mycons = &PERTASK(this_cons);
 	return mycons->tc_signals.ts_cons != NULL;
 }
 
@@ -280,7 +280,7 @@ PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL task_isconnected_to)(struct sig *__restrict signal) {
 	struct task_connections *mycons;
 	struct task_connection *con;
-	mycons = &PERTASK(_this_cons);
+	mycons = &PERTASK(this_cons);
 	for (con = mycons->tc_signals.ts_cons; con;
 	     con = ((struct task_connection *)((uintptr_t)con & ~1))->tc_connext) {
 		if (((uintptr_t)con->tc_signal & ~1) == (uintptr_t)signal)
@@ -426,7 +426,7 @@ PUBLIC NONNULL((1)) void
 NOTHROW(KCALL task_disconnect_c)(struct task_connection *__restrict con) {
 	struct task_connection **pcon, *iter;
 	/* Remove the given connection from the chain of per-task linked connections. */
-	pcon = &PERTASK(_this_cons.tc_signals.ts_cons);
+	pcon = &PERTASK(this_cons.tc_signals.ts_cons);
 	for (;;) {
 		iter = *pcon;
 		assertf(iter, "Not connected with task-connection at %p", con);
@@ -447,7 +447,7 @@ PUBLIC NONNULL((1)) void
 NOTHROW(KCALL task_disconnect)(struct sig *__restrict target) {
 	struct task_connections *mycons;
 	struct task_connection **pcon, *con;
-	mycons = &PERTASK(_this_cons);
+	mycons = &PERTASK(this_cons);
 	for (pcon = &mycons->tc_signals.ts_cons;
 	     (con = *pcon) != NULL; pcon = &con->tc_connext) {
 		if (((uintptr_t)con->tc_signal & ~1) == (uintptr_t)target) {
@@ -471,7 +471,7 @@ NOTHROW(KCALL task_disconnectall)(void) {
 	struct sig *result;
 	struct task_connection *con, *next;
 	struct task_connections *mycons;
-	mycons = &PERTASK(_this_cons);
+	mycons = &PERTASK(this_cons);
 	con    = mycons->tc_signals.ts_cons;
 	if unlikely(!con)
 		return NULL; /* No active connections. */
@@ -511,7 +511,7 @@ NOTHROW(KCALL task_pushconnections)(struct task_connections *__restrict cons) {
 	struct task_connection *con;
 	unsigned int i;
 	IF_REENTRANT(pflag_t was);
-	mycons = &PERTASK(_this_cons);
+	mycons = &PERTASK(this_cons);
 	assertf(mycons->tc_static_v != cons->tc_static,
 	        "Connection %p set was already pushed", cons); /* Why does this fail? */
 	/* Initialize the static connection vector. */
@@ -558,7 +558,7 @@ NOTHROW(KCALL task_popconnections)(struct task_connections *__restrict cons) {
 	struct task_connection *con;
 	struct task_connections *mycons;
 	IF_REENTRANT(pflag_t was);
-	mycons = &PERTASK(_this_cons);
+	mycons = &PERTASK(this_cons);
 	assertf(cons->tc_signals.ts_thread == NULL,
 	        "Invalid saved connection set");
 	assertf(mycons->tc_static_v == cons->tc_static,
@@ -596,7 +596,7 @@ NOTHROW(KCALL task_popconnections)(struct task_connections *__restrict cons) {
 PUBLIC NOBLOCK struct sig *NOTHROW(KCALL task_trywait)(void) {
 	struct task_connections *mycons;
 	struct sig *result;
-	mycons = &PERTASK(_this_cons);
+	mycons = &PERTASK(this_cons);
 	result = mycons->tc_signals.ts_dlvr;
 	if (result) {
 		task_disconnectall();
@@ -611,7 +611,7 @@ PUBLIC struct sig *KCALL
 task_waitfor(qtime_t const *abs_timeout) THROWS(E_WOULDBLOCK,...) {
 	struct task_connections *mycons;
 	struct sig *result;
-	mycons = &PERTASK(_this_cons);
+	mycons = &PERTASK(this_cons);
 again:
 	result = mycons->tc_signals.ts_dlvr;
 	if (result) {
@@ -648,7 +648,7 @@ PUBLIC WUNUSED struct sig *
 NOTHROW(KCALL task_waitfor_nx)(qtime_t const *abs_timeout) {
 	struct task_connections *mycons;
 	struct sig *result;
-	mycons = &PERTASK(_this_cons);
+	mycons = &PERTASK(this_cons);
 again:
 	result = mycons->tc_signals.ts_dlvr;
 	if (result) {
@@ -689,7 +689,7 @@ PUBLIC struct sig *
 NOTHROW(KCALL task_waitfor_norpc_nx)(qtime_t const *abs_timeout) {
 	struct task_connections *mycons;
 	struct sig *result;
-	mycons = &PERTASK(_this_cons);
+	mycons = &PERTASK(this_cons);
 again:
 	result = mycons->tc_signals.ts_dlvr;
 	if (result) {
@@ -721,7 +721,7 @@ PUBLIC struct sig *KCALL
 task_waitfor_norpc(qtime_t const *abs_timeout) THROWS(E_WOULDBLOCK) {
 	struct task_connections *mycons;
 	struct sig *result;
-	mycons = &PERTASK(_this_cons);
+	mycons = &PERTASK(this_cons);
 again:
 	result = mycons->tc_signals.ts_dlvr;
 	if (result) {

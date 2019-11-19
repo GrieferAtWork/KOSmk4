@@ -80,7 +80,7 @@ INTDEF __UINT8_TYPE__ ___bootcpu[] ASMNAME("_bootcpu");
 DECL_END
 #define PERCPU(x)   (*(__typeof__(&(x)))(___bootcpu+(__UINTPTR_TYPE__)&(x)))
 #else
-DATDEF __UINTPTR_TYPE__ ___this_cpu ASMNAME("_this_cpu");
+DATDEF __UINTPTR_TYPE__ ___this_cpu ASMNAME("this_cpu");
 #define PERCPU(x)   (*(__typeof__(&(x)))(PERTASK_GET(___this_cpu)+(__UINTPTR_TYPE__)&(x)))
 #endif
 #endif /* !PERCPU */

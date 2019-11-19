@@ -344,7 +344,7 @@ NOTHROW(KCALL simple_insert_and_activate)(struct vm_node *__restrict node,
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
-DATDEF VIRT byte_t volatile *x86_lapic_base_address_ ASMNAME("x86_lapic_base_address");
+DATDEF VIRT byte_t volatile *_x86_lapicbase ASMNAME("x86_lapicbase");
 
 
 INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
@@ -391,7 +391,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 	simple_insert_and_activate(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS1], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 	simple_insert_and_activate(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS2], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 #endif /* !X86_KERNEL_VMMAPPING_CORE_BSS */
-	vm_node_insert(&FORCPU(&_bootcpu, x86_cpu_iobnode));
+	vm_node_insert(&FORCPU(&_bootcpu, thiscpu_x86_iobnode));
 	vm_node_insert(&x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE]);
 	vm_node_insert(&x86_kernel_vm_node_free);
 	vm_node_insert(&kernel_vm_node_pagedata);
@@ -428,7 +428,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 		simple_insert_and_activate(&x86_vm_node_lapic,
 		                           PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 		/* Remember where we mapped the LAPIC */
-		x86_lapic_base_address_ += (uintptr_t)VM_PAGE2ADDR(x86_vm_node_lapic.vn_node.a_vmin);
+		_x86_lapicbase += (uintptr_t)VM_PAGE2ADDR(x86_vm_node_lapic.vn_node.a_vmin);
 	}
 
 	{

@@ -25,12 +25,24 @@
 
 #if defined(__x86_64__) && defined(__CC__) && !defined(syscall_iscompat)
 #include <sched/pertask.h> /* PERTASK_GET() */
-#include <sched/task.h>    /* _this_kernel_stack */
+#include <sched/task.h>    /* this_kernel_stacknode */
 
 #include <kos/kernel/cpu-state-helpers64.h> /* irregs_iscompat() */
+
+DECL_BEGIN
+
+#ifndef ___this_x86_kernel_psp0_defined
+#define ___this_x86_kernel_psp0_defined 1
+/* [== VM_NODE_ENDADDR(THIS_KERNEL_STACK)]
+ * The per-task value written to `t_esp0' / `t_rsp0' during scheduler preemption. */
+DATDEF ATTR_PERTASK uintptr_t const this_x86_kernel_psp0;
+#endif /* !___this_x86_kernel_psp0_defined */
+
 #define syscall_irregs() \
-	((struct irregs64 *)VM_PAGE2ADDR(PERTASK_GET((*(struct vm_node *)&_this_kernel_stack).vn_node.a_vmax) + 1) - 1)
+	((struct irregs64 *)PERTASK_GET(*(uintptr_t *)&this_x86_kernel_psp0) - 1)
 #define syscall_iscompat() irregs_iscompat(syscall_irregs())
+
+DECL_END
 #endif /* __x86_64__ && __CC__ && !syscall_iscompat */
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_COMPAT_H */

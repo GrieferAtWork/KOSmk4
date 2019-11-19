@@ -62,7 +62,7 @@ IDT_HANDLER_BEGIN
 #endif
 
 	/* Invoke the C-level ISR handler */
-	INTERN(PP_CAT2(kernel_isr_, IDT_VECTOR_NAME))
+	EXTERN(PP_CAT2(kernel_isr_, IDT_VECTOR_NAME))
 	call   PP_CAT2(kernel_isr_, IDT_VECTOR_NAME)
 
 	/* Signal EOI */
@@ -101,10 +101,10 @@ IDT_HANDLER_BEGIN
 	.cfi_rel_offset %edx, 0
 99:	pushl_cfi $98b
 #if IDT_VECTOR_ID == 0xf7
-	INTERN(x86_pic1_spur)
+	EXTERN(x86_pic1_spur)
 	jmp    x86_pic1_spur
 #else /* IDT_VECTOR_ID == 0xf7 */
-	INTERN(x86_pic2_spur)
+	EXTERN(x86_pic2_spur)
 	jmp    x86_pic2_spur
 #endif /* IDT_VECTOR_ID != 0xf7 */
 #endif /* HAVE_SPURIOUS_FAULT */

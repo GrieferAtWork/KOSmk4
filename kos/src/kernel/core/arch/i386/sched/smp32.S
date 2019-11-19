@@ -39,8 +39,6 @@
 
 #ifndef CONFIG_NO_SMP
 
-INTERN(x86_load_thread_eax_cpu_ebx)
-
 .section .text
 PUBLIC_FUNCTION(cpu_ipi_service)
 	.cfi_startproc
@@ -80,7 +78,8 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	 * have already been able to acknowledge the IPI, preventing
 	 * the LAPIC of another CPU to be starved by never unsetting
 	 * the `APIC_ICR0_FPENDING' bit. */
-	movl   x86_lapic_base_address, %eax
+	EXTERN(x86_lapicbase)
+	movl   x86_lapicbase, %eax
 	movl   $(APIC_EOI_FSIGNAL), APIC_EOI(%eax)
 
 	/* Reset the used action mode. */
@@ -112,7 +111,8 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	 * XXX: Add some way to have high-priority tasks be switched
 	 *      to immediately, rather than having the previous task
 	 *      complete its quantum. */
-2:	call   cpu_loadpending
+2:	EXTERN(cpu_loadpending)
+	call   cpu_loadpending
 
 	/* Check for more pending IPIs by looking at the first word
 	 * of the IPI in-use bitset. - The same check is also done by
@@ -121,11 +121,14 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	 * assumption that no interrupt has to be fired on the target
 	 * core, in which case it is expected that we handle that IPI. */
 	movl   %fs:0, %eax
-	movl   _this_cpu(%eax), %eax
-	cmpl   $0, ipi_inuse(%eax)
+	EXTERN(this_cpu)
+	movl   this_cpu(%eax), %eax
+	EXTERN(thiscpu_x86_ipi_inuse)
+	cmpl   $0, thiscpu_x86_ipi_inuse(%eax)
 	jne    1b
 
 	/* Resume execution, as requested */
+	PRIVATE(ipi_action_table)
 	jmp    *ipi_action_table(,%ebp,4)
 
 .Lipi_resume:
@@ -151,14 +154,19 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	pushal_cfi_r
 
 	movl   %fs:0, %esi
-	movl   _this_cpu(%esi), %ebx
-	movl   %esp, _this_sched_state(%esi)
+	EXTERN(this_cpu)
+	movl   this_cpu(%esi), %ebx
+	EXTERN(this_sched_state)
+	movl   %esp, this_sched_state(%esi)
 
 	/* Prematurely end the current quantum */
+	EXTERN(cpu_quantum_end)
 	call   cpu_quantum_end
 
 	/* Load the new CPU state */
-	movl   _this_cpu_current(%ebx), %eax
+	EXTERN(thiscpu_current)
+	movl   thiscpu_current(%ebx), %eax
+	EXTERN(x86_load_thread_eax_cpu_ebx)
 	jmp    x86_load_thread_eax_cpu_ebx
 	.cfi_endproc
 END(x86_idt_apic_ipi)
@@ -260,12 +268,6 @@ END(x86_execute_direct_ipi)
 
 
 
-INTERN(x86_smp_entry_gdt_segment)
-INTERN(x86_smp_entry_gdt_offset)
-INTERN(x86_smp_gdt_pointer_base)
-INTERN(x86_load_thread_eax_cpu_ebx)
-INTERN(x86_altcore_initapic)
-
 /* 16-bit (real-mode) bootstrap code executed by secondary cores.
  * All this code does is load a GDT and use it to jump
  * into 32-bit mode at `x86_smp_entry32' */
@@ -277,12 +279,12 @@ INTERN_FUNCTION(x86_smp_entry)
 	/* Load the GDT below. */
 	/* movw $(*x86_smp_entry_gdt_segment), %sp */
 	.byte  0xbc
-x86_smp_entry_gdt_segment:
+INTERN_LABEL(x86_smp_entry_gdt_segment):
 	.word  0x1234
 	movw   %sp, %ds
 /*	lgdtl  %ds:(*x86_smp_entry_gdt_offset) */
 	.byte  0x0f, 0x01, 0x16
-x86_smp_entry_gdt_offset:
+INTERN_LABEL(x86_smp_entry_gdt_offset):
 	.word  0x5678
 	movl   %cr0, %esp
 	orw    $(CR0_PE), %sp
@@ -291,7 +293,7 @@ x86_smp_entry_gdt_offset:
 	ljmpl  $8, $(x86_smp_entry32 - KERNEL_BASE)
 INTERN_OBJECT(x86_smp_gdt)
 	.word  (3 * SIZEOF_SEGMENT_DESCRIPTOR) - 1
-x86_smp_gdt_pointer_base:
+INTERN_LABEL(x86_smp_gdt_pointer_base):
 	.long  1f - x86_smp_entry
 #define DEFINE_SEGMENT_DESCRIPTOR(TYPE, args) \
 	.long  SEGMENT_##TYPE##_INIT_UL args; \
@@ -302,8 +304,7 @@ x86_smp_gdt_pointer_base:
 #undef DEFINE_SEGMENT_DESCRIPTOR
 END(x86_smp_gdt)
 
-INTERN(x86_smp_entry_size)
-	x86_smp_entry_size = . - x86_smp_entry
+INTERN_CONST(x86_smp_entry_size, . - x86_smp_entry)
 END(x86_smp_entry)
 .code32
 
@@ -326,14 +327,14 @@ INTERN_FUNCTION(x86_smp_entry32)
 #ifndef CONFIG_NO_PAGING_PAE
 	/* Enable PAE support (if necessary for setting the page directory) */
 #ifndef CONFIG_NO_PAGING_P32
-	EXTERN(__x86_bootcpu_idfeatures)
-	testl  $(CPUID_1D_PAE), ((__x86_bootcpu_idfeatures - KERNEL_BASE) + OFFSET_CPUID_1D)
+	EXTERN(x86_bootcpu_cpuid)
+	testl  $(CPUID_1D_PAE), ((x86_bootcpu_cpuid - KERNEL_BASE) + OFFSET_CPUID_1D)
 	jz     1f
 #endif /* !CONFIG_NO_PAGING_P32 */
 	orl    $(CR4_PAE), %esp
 	/* Enable NX support (if necessary for setting the page directory) */
-	EXTERN(__x86_bootcpu_idfeatures)
-	testl  $(CPUID_80000001D_NX), ((__x86_bootcpu_idfeatures - KERNEL_BASE) + OFFSET_CPUID_80000001D)
+	EXTERN(x86_bootcpu_cpuid)
+	testl  $(CPUID_80000001D_NX), ((x86_bootcpu_cpuid - KERNEL_BASE) + OFFSET_CPUID_80000001D)
 	jz     1f
 	movl   $(IA32_EFER), %ecx
 	rdmsr
@@ -342,7 +343,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 1:
 #endif /* !CONFIG_NO_PAGING_PAE */
 	/* Enable PGE support (if necessary for setting the page directory) */
-	testl  $(CPUID_1D_PGE), ((__x86_bootcpu_idfeatures - KERNEL_BASE) + OFFSET_CPUID_1D)
+	testl  $(CPUID_1D_PGE), ((x86_bootcpu_cpuid - KERNEL_BASE) + OFFSET_CPUID_1D)
 	jz     1f
 	orl    $(CR4_PGE), %esp
 1:	movl   %esp, %cr4
@@ -362,7 +363,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 	movl   %esp, %cr0
 
 	/* Figure out who we actually are by looking at our LAPIC id. */
-	movl   x86_lapic_base_address, %esp
+	movl   x86_lapicbase, %esp
 	movl   APIC_ID(%esp), %esp
 	shrl   $(APIC_ID_FSHIFT), %esp
 
@@ -373,22 +374,24 @@ INTERN_FUNCTION(x86_smp_entry32)
 	movl   cpu_count, %ecx
 	decl   %ecx
 1:	movl   cpu_vector(,%ecx,4), R_CPU
-	movzbw x86_lapic_id(R_CPU), %dx
+	movzbw thiscpu_x86_lapicid(R_CPU), %dx
 	cmpw   %dx, %sp
 	je     1f
 	loop   1b
 	jmp    .Lx86_smp_kill
 1:
 	/* Change CPU state to indicate that we're going to initialize! */
-	movl   $CPU_STATE_RUNNING, _this_cpu_state(R_CPU)
+	EXTERN(thiscpu_state)
+	movl   $(CPU_STATE_RUNNING), thiscpu_state(R_CPU)
+	EXTERN(cpu_online_count)
 	lock;  incl cpu_online_count
 
 	/* Found our CPU (now stored in R_CPU) */
-	movl   _this_cpu_current(R_CPU),  R_TASK /* TARGET task. */
-	movl   _this_sched_state(R_TASK), %esp   /* stack */
+	movl   thiscpu_current(R_CPU),  R_TASK /* TARGET task. */
+	movl   this_sched_state(R_TASK), %esp   /* stack */
 
 	/* Load the GDT of our new CPU */
-	leal   x86_cpugdt(R_CPU), %ecx
+	leal   thiscpu_x86_gdt(R_CPU), %ecx
 	pushl  %ecx
 	pushw  $((SEGMENT_COUNT * SIZEOF_SEGMENT_DESCRIPTOR) - 1)
 	lgdt   (%esp)
@@ -396,7 +399,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 
 	/* Load the Task register. */
 	/* SEGMENTS[SEGMENT_CPU_TSS].busy = 0;  // Required for `ltr' */
-	andb   $0b11111101, x86_cpugdt + SEGMENT_CPU_TSS + 5(R_CPU)
+	andb   $0b11111101, thiscpu_x86_gdt + SEGMENT_CPU_TSS + 5(R_CPU)
 	movw   $(SEGMENT_CPU_TSS), %cx
 	ltrw   %cx
 
@@ -415,7 +418,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 1:
 
 	/* Load the interrupt descriptor table. */
-	PUBLIC(x86_idt_ptr)
+	EXTERN(x86_idt_ptr)
 	lidtl  x86_idt_ptr
 
 	/* ============== Configure cpuid features ============== */
@@ -423,10 +426,10 @@ INTERN_FUNCTION(x86_smp_entry32)
 	 * R_TASK: THIS_TASK */
 
 	/* Clear out our CPUID features table. */
-	movw  $(CPU_FEATURE_FNONE), cpu_features(R_CPU)
+	movw  $(CPU_FEATURE_FNONE), thiscpu_x86_cpufeatures(R_CPU)
 
 	pushl %edi
-	leal  cpuid_features(R_CPU), %edi
+	leal  thiscpu_x86_cpuid(R_CPU), %edi
 	xorl  %eax, %eax
 #if (SIZEOF_CPUID_CPUINFO % 4) == 0
 	movl  $(SIZEOF_CPUID_CPUINFO / 4), %ecx
@@ -450,14 +453,14 @@ INTERN_FUNCTION(x86_smp_entry32)
 	jz    .Ldone_cpuid
 
 	/* The `cpuid' instruction is available. */
-	orw   $(CPU_FEATURE_FCPUID), cpu_features(R_CPU)
+	orw   $(CPU_FEATURE_FCPUID), thiscpu_x86_cpufeatures(R_CPU)
 
 	movl  $1, %eax
 	cpuid
-	movl  %eax, cpuid_features + OFFSET_CPUID_1A(R_CPU)
-	movl  %ebx, cpuid_features + OFFSET_CPUID_1B(R_CPU)
-	movl  %edx, cpuid_features + OFFSET_CPUID_1D(R_CPU)
-	movl  %ecx, cpuid_features + OFFSET_CPUID_1C(R_CPU)
+	movl  %eax, thiscpu_x86_cpuid + OFFSET_CPUID_1A(R_CPU)
+	movl  %ebx, thiscpu_x86_cpuid + OFFSET_CPUID_1B(R_CPU)
+	movl  %edx, thiscpu_x86_cpuid + OFFSET_CPUID_1D(R_CPU)
+	movl  %ecx, thiscpu_x86_cpuid + OFFSET_CPUID_1C(R_CPU)
 
 	/* if (Family == 6 && Model < 3 && Stepping < 3)
 	 *     OFFSET_CPUID_1D &= ~CPUID_1D_SEP; */
@@ -482,54 +485,54 @@ INTERN_FUNCTION(x86_smp_entry32)
 	cmpl   $3, %ecx
 	/* if (Stepping >= 3) goto 1f; */
 	jae    1f
-	andl   $(~CPUID_1D_SEP), cpuid_features + OFFSET_CPUID_1D(R_CPU)
+	andl   $(~CPUID_1D_SEP), thiscpu_x86_cpuid + OFFSET_CPUID_1D(R_CPU)
 1:
 
 	movl  $0, %eax
 	cpuid
-	movl  %eax, cpuid_features + OFFSET_CPUID_0A(R_CPU)
-	movl  %ebx, cpuid_features + OFFSET_CPUID_0B(R_CPU)
-	movl  %edx, cpuid_features + OFFSET_CPUID_0D(R_CPU)
-	movl  %ecx, cpuid_features + OFFSET_CPUID_0C(R_CPU)
+	movl  %eax, thiscpu_x86_cpuid + OFFSET_CPUID_0A(R_CPU)
+	movl  %ebx, thiscpu_x86_cpuid + OFFSET_CPUID_0B(R_CPU)
+	movl  %edx, thiscpu_x86_cpuid + OFFSET_CPUID_0D(R_CPU)
+	movl  %ecx, thiscpu_x86_cpuid + OFFSET_CPUID_0C(R_CPU)
 
 	cmpl   $7, %eax
 	jnae   1f
 	movl   $7, %eax
 	movl   $0, %ecx /* Sub-leaf:0 */
 	cpuid
-	movl   %edx, cpuid_features + OFFSET_CPUID_7D(R_CPU)
-	movl   %ecx, cpuid_features + OFFSET_CPUID_7C(R_CPU)
-	movl   %ebx, cpuid_features + OFFSET_CPUID_7B(R_CPU)
+	movl   %edx, thiscpu_x86_cpuid + OFFSET_CPUID_7D(R_CPU)
+	movl   %ecx, thiscpu_x86_cpuid + OFFSET_CPUID_7C(R_CPU)
+	movl   %ebx, thiscpu_x86_cpuid + OFFSET_CPUID_7B(R_CPU)
 1:	movl   $0x80000000, %eax
 	cpuid
-	movl   %eax, cpuid_features + OFFSET_CPUID_80000000A(R_CPU)
+	movl   %eax, thiscpu_x86_cpuid + OFFSET_CPUID_80000000A(R_CPU)
 	cmpl   $0x80000001, %eax
 	jnae   2f
 	movl   $0x80000001, %eax
 	cpuid
-	movl   %ecx, cpuid_features + OFFSET_CPUID_80000001C(R_CPU)
-	movl   %edx, cpuid_features + OFFSET_CPUID_80000001D(R_CPU)
-	movl   cpuid_features + OFFSET_CPUID_80000000A(R_CPU), %eax
+	movl   %ecx, thiscpu_x86_cpuid + OFFSET_CPUID_80000001C(R_CPU)
+	movl   %edx, thiscpu_x86_cpuid + OFFSET_CPUID_80000001D(R_CPU)
+	movl   thiscpu_x86_cpuid + OFFSET_CPUID_80000000A(R_CPU), %eax
 	cmpl   $0x80000004, %eax
 	jnae   3f
 	movl   $0x80000004, %eax
 	cpuid
-	movl   %eax, cpuid_features + OFFSET_CPUID_80000004A(R_CPU)
-	movl   %ebx, cpuid_features + OFFSET_CPUID_80000004B(R_CPU)
-	movl   %ecx, cpuid_features + OFFSET_CPUID_80000004C(R_CPU)
-	movl   %edx, cpuid_features + OFFSET_CPUID_80000004D(R_CPU)
+	movl   %eax, thiscpu_x86_cpuid + OFFSET_CPUID_80000004A(R_CPU)
+	movl   %ebx, thiscpu_x86_cpuid + OFFSET_CPUID_80000004B(R_CPU)
+	movl   %ecx, thiscpu_x86_cpuid + OFFSET_CPUID_80000004C(R_CPU)
+	movl   %edx, thiscpu_x86_cpuid + OFFSET_CPUID_80000004D(R_CPU)
 	movl   $0x80000003, %eax
 	cpuid
-	movl   %eax, cpuid_features + OFFSET_CPUID_80000003A(R_CPU)
-	movl   %ebx, cpuid_features + OFFSET_CPUID_80000003B(R_CPU)
-	movl   %ecx, cpuid_features + OFFSET_CPUID_80000003C(R_CPU)
-	movl   %edx, cpuid_features + OFFSET_CPUID_80000003D(R_CPU)
+	movl   %eax, thiscpu_x86_cpuid + OFFSET_CPUID_80000003A(R_CPU)
+	movl   %ebx, thiscpu_x86_cpuid + OFFSET_CPUID_80000003B(R_CPU)
+	movl   %ecx, thiscpu_x86_cpuid + OFFSET_CPUID_80000003C(R_CPU)
+	movl   %edx, thiscpu_x86_cpuid + OFFSET_CPUID_80000003D(R_CPU)
 	movl   $0x80000002, %eax
 	cpuid
-	movl   %eax, cpuid_features + OFFSET_CPUID_80000002A(R_CPU)
-	movl   %ebx, cpuid_features + OFFSET_CPUID_80000002B(R_CPU)
-	movl   %ecx, cpuid_features + OFFSET_CPUID_80000002C(R_CPU)
-	movl   %edx, cpuid_features + OFFSET_CPUID_80000002D(R_CPU)
+	movl   %eax, thiscpu_x86_cpuid + OFFSET_CPUID_80000002A(R_CPU)
+	movl   %ebx, thiscpu_x86_cpuid + OFFSET_CPUID_80000002B(R_CPU)
+	movl   %ecx, thiscpu_x86_cpuid + OFFSET_CPUID_80000002C(R_CPU)
+	movl   %edx, thiscpu_x86_cpuid + OFFSET_CPUID_80000002D(R_CPU)
 3:  /* ci_80000000a < 0x80000004 */
 2:  /* ci_80000000a < 0x80000001 */
 .Ldone_cpuid:
@@ -545,21 +548,21 @@ INTERN_FUNCTION(x86_smp_entry32)
 	movl   $(IA32_SYSENTER_CS), %ecx
 	wrmsr
 
-	/* __wrmsr(IA32_SYSENTER_ESP, (uintptr_t)&PERCPU(x86_cputss).t_esp0); */
+	/* __wrmsr(IA32_SYSENTER_ESP, (uintptr_t)&PERCPU(thiscpu_x86_tss).t_esp0); */
 	xorl   %edx, %edx
-	leal   (x86_cputss + OFFSET_TSS_ESP0)(R_CPU), %eax
+	leal   (thiscpu_x86_tss + OFFSET_TSS_ESP0)(R_CPU), %eax
 	movl   $(IA32_SYSENTER_ESP), %ecx
 	wrmsr
 
 	/* __wrmsr(IA32_SYSENTER_EIP, (uintptr_t)x86_sysenter_main[_traced]); */
 	xorl   %edx, %edx
-	INTERN(x86_sysenter_main)
+	EXTERN(x86_sysenter_main)
 	movl   $(x86_sysenter_main), %eax
 #ifndef CONFIG_NO_SYSCALL_TRACING
-	INTERN(syscall_tracing_enabled)
+	EXTERN(syscall_tracing_enabled)
 	cmpb   $0, syscall_tracing_enabled
 	je     1f
-	INTERN(x86_sysenter_main_traced)
+	EXTERN(x86_sysenter_main_traced)
 	movl   $(x86_sysenter_main_traced), %eax
 1:
 #endif /* !CONFIG_NO_SYSCALL_TRACING */
@@ -569,11 +572,12 @@ INTERN_FUNCTION(x86_smp_entry32)
 
 
 	/* Load the VM of the target task. */
-	movl   _this_vm(R_TASK), %ecx
-	PUBLIC(vm_kernel)
+	movl   this_vm(R_TASK), %ecx
+	EXTERN(vm_kernel)
 	cmpl   $vm_kernel, %ecx
 	je     1f
-	movl   _this_vm_pdir_phys_ptr(%ecx), %ecx
+	EXTERN(thisvm_pdir_phys_ptr)
+	movl   thisvm_pdir_phys_ptr(%ecx), %ecx
 	movl   %ecx, %cr3
 1:
 	/* Set up tracing to appear as though we're nothing but an interrupt originating
@@ -607,23 +611,31 @@ INTERN_FUNCTION(x86_smp_entry32)
 
 	/* Check for, and load all threads that are pending execution by our CPU. */
 	movl   $(CPU_PENDING_ENDOFCHAIN), %edx
-	lock;  xchgl %edx, _this_cpu_pending(R_CPU)
+	EXTERN(thiscpu_pending)
+	lock;  xchgl %edx, thiscpu_pending(R_CPU)
 	cmpl   $(CPU_PENDING_ENDOFCHAIN), %edx
 	jz     1f
 	movl   R_CPU, %ecx
+	EXTERN(cpu_loadpending_chain)
 	call   cpu_loadpending_chain
 1:
 
 	/* Enable preemptive interrupts. */
 	movl   R_CPU, %ecx
+	EXTERN(x86_altcore_initapic)
 	call   x86_altcore_initapic
 
-	movl   _this_sched_state(R_TASK), %esp
-	/* Load other scheduler-related register values. */
-	movl   x86_this_kernel_sp0(R_TASK), %ecx
-	movl   %ecx, x86_cputss + OFFSET_TSS_ESP0(R_CPU)
+	EXTERN(this_sched_state)
+	movl   this_sched_state(R_TASK), %esp
 
-#define GDT(x) x + x86_cpugdt(R_CPU)
+	/* Load other scheduler-related register values. */
+	EXTERN(this_x86_kernel_psp0)
+	movl   this_x86_kernel_psp0(R_TASK), %ecx
+	EXTERN(thiscpu_x86_tss)
+	movl   %ecx, thiscpu_x86_tss + OFFSET_TSS_ESP0(R_CPU)
+
+	EXTERN(thiscpu_x86_gdt)
+#define GDT(x) x + thiscpu_x86_gdt(R_CPU)
 	/* SEGMENT_KERNEL_FSBASE */
 	movl   R_TASK, %ecx
 	movl   R_TASK, %edx
@@ -634,7 +646,8 @@ INTERN_FUNCTION(x86_smp_entry32)
 	movb   %cl,         OFFSET_SEGMENT_DESCRIPTOR_BASE2 + GDT(SEGMENT_KERNEL_FSBASE) /* Set base_hi */
 
 	/* SEGMENT_USER_FSBASE */
-	movl   x86_this_user_fsbase(R_TASK), %ecx
+	EXTERN(this_x86_user_fsbase)
+	movl   this_x86_user_fsbase(R_TASK), %ecx
 	movl   %ecx, %edx
 	shrl   $24,  %ecx
 	andl   $0x00ffffff, %edx
@@ -643,7 +656,8 @@ INTERN_FUNCTION(x86_smp_entry32)
 	movb   %cl,         OFFSET_SEGMENT_DESCRIPTOR_BASE2 + GDT(SEGMENT_USER_FSBASE) /* Set base_hi */
 
 	/* SEGMENT_USER_GSBASE */
-	movl   x86_this_user_gsbase(R_TASK), %ecx
+	EXTERN(this_x86_user_gsbase)
+	movl   this_x86_user_gsbase(R_TASK), %ecx
 	movl   %ecx, %edx
 	shrl   $24,  %ecx
 	andl   $0x00ffffff, %edx
@@ -660,7 +674,8 @@ INTERN_FUNCTION(x86_smp_entry32)
 	/* Also: Indicate that no task is currently holding an FPU context.
 	 * NOTE: Technically, we could also move this part into `cpu_enter_deepsleep()',
 	 *       however it's safer to unconditionally do this during initialization! */
-	movl   $0, x86_fpu_current(R_CPU)
+	EXTERN(thiscpu_x86_fputhread)
+	movl   $0, thiscpu_x86_fputhread(R_CPU)
 #endif /* !CONFIG_NO_FPU */
 
 	/* (Partially) load the underlying CPU state */
@@ -732,34 +747,39 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	/* With the CPU about to go OFFLINE, make sure to also save the current
 	 * FPU state (if the FPU was used), so-as to not lose that information
 	 * and have it still be available when we go back online. */
-	movl   x86_fpu_current(%ecx), %eax
+	EXTERN(thiscpu_x86_fputhread)
+	movl   thiscpu_x86_fputhread(%ecx), %eax
 	testl  %eax, %eax
 	jz     1f
 	clts   /* Make sure FPU access is allowed. */
-	/* Save the current FPU context into `_this_fpustate(%eax)' */
+	/* Save the current FPU context into `this_x86_fpustate(%eax)' */
 	movl   %ecx, %ebx /* Preserve THIS_CPU */
-	movl   _this_fpustate(%eax), %ecx
+	EXTERN(this_x86_fpustate)
+	movl   this_x86_fpustate(%eax), %ecx
+	EXTERN(x86_fpustate_save)
 	call   x86_fpustate_save
 	movl   %ebx, %ecx /* Restore THIS_CPU */
 1:
 #endif /* !CONFIG_NO_FPU */
 
 	/* Decrement the cpu-online counter. */
+	EXTERN(cpu_online_count)
 	lock;  decl cpu_online_count
 
-	INTERN(_this_idle_sched_state)
-	movl   %esp, _this_idle_sched_state(%ecx)
+	EXTERN(this_idle_sched_state)
+	movl   %esp, this_idle_sched_state(%ecx)
 
 	/* Flush all caches before actually commiting to beginning to dream */
 	wbinvd /* TODO: Only available since 486. - Must be replaced with `nop' no 386 */
-	movl   $(CPU_STATE_DREAMING), _this_cpu_state(%ecx)
+	EXTERN(thiscpu_state)
+	movl   $(CPU_STATE_DREAMING), thiscpu_state(%ecx)
 
 	/* We're now dreaming, meaning that our core may get reset at any moment,
 	 * and there is nothing we can do to undo this ourself, or prevent such a
 	 * reset from happening.
 	 * However, in the interest of ensuring that everyone got the memo, invalidate
 	 * caches one more time (although this time it should only be caches related
-	 * to us setting `_this_cpu_state' to `CPU_STATE_DREAMING') */
+	 * to us setting `thiscpu_state' to `CPU_STATE_DREAMING') */
 
 	wbinvd /* TODO: Only available since 486. - Must be replaced with `nop' no 386 */
 
@@ -773,7 +793,8 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	 *    hardware interrupts to CPU#0, so if we can still
 	 *    handle INIT normally, there's no reason to stay
 	 *    alive in order to do all of the other stuff! */
-	movl   x86_lapic_base_address, %eax
+	EXTERN(x86_lapicbase)
+	movl   x86_lapicbase, %eax
 	movl   $0, APIC_SPURIOUS(%eax)
 
 

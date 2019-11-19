@@ -65,7 +65,7 @@ ProcFS_PerProc_Kos_Drives_Lookup(struct directory_node *__restrict self,
 		struct fs *threadfs;
 		struct vfs *threadvfs;
 		FINALLY_DECREF_UNLIKELY(thread);
-		threadfs = FORTASK(thread, _this_fs);
+		threadfs = FORTASK(thread, this_fs);
 		if unlikely(!threadfs)
 			goto err;
 		threadvfs = threadfs->f_vfs;
@@ -109,7 +109,7 @@ PRIVATE u32 KCALL get_bound_drives(upid_t pid) {
 		struct fs *threadfs;
 		struct vfs *threadvfs;
 		FINALLY_DECREF_UNLIKELY(thread);
-		threadfs = FORTASK(thread, _this_fs);
+		threadfs = FORTASK(thread, this_fs);
 		if unlikely(!threadfs)
 			goto done;
 		threadvfs = threadfs->f_vfs;
@@ -229,7 +229,7 @@ ProcFS_PerProc_Kos_Drives_Entry_Readlink(struct symlink_node *__restrict self,
 		struct fs *threadfs;
 		struct vfs *threadvfs;
 		FINALLY_DECREF_UNLIKELY(thread);
-		threadfs = FORTASK(thread, _this_fs);
+		threadfs = FORTASK(thread, this_fs);
 		if unlikely(!threadfs)
 			goto err;
 		threadvfs = threadfs->f_vfs;
@@ -267,7 +267,7 @@ ProcFS_PerProc_Kos_Dcwd_Entry_Readlink(struct symlink_node *__restrict self,
 	{
 		struct fs *threadfs;
 		FINALLY_DECREF_UNLIKELY(thread);
-		threadfs = FORTASK(thread, _this_fs);
+		threadfs = FORTASK(thread, this_fs);
 		if unlikely(!threadfs)
 			goto err;
 		sync_read(&threadfs->f_pathlock);

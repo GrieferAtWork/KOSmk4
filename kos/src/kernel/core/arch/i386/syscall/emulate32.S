@@ -64,7 +64,7 @@
 .section .text
 PUBLIC_FUNCTION(syscall_emulate_r)
 	.cfi_startproc simple
-	INTERN(syscall_emulate_r_personality)
+	EXTERN(syscall_emulate_r_personality)
 	.cfi_personality 0, syscall_emulate_r_personality
 	.cfi_iret_signal_frame
 	.cfi_def_cfa  %ecx, OFFSET_ICPUSTATE_IRREGS
@@ -94,8 +94,7 @@ PUBLIC_FUNCTION(syscall_emulate_r)
 	 * 0(%esp):                                                 struct rpc_syscall_info sc_info;
 	 * SIZEOF_RPC_SYSCALL_INFO(%esp):                           struct icpustate state;
 	 * SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS(%esp): <END-OF-STACK> */
-INTERN(__x86_syscall_emulate_r_protect_start)
-__x86_syscall_emulate_r_protect_start:
+INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 
 	/* Figure out which system call is actually being invoked. */
 	movl   OFFSET_RPC_SYSCALL_INFO_SYSNO(%esp), %eax
@@ -111,7 +110,7 @@ __x86_syscall_emulate_r_protect_start:
 	cmpl   $(__NR_syscall_max), %eax
 	ja     .Lcall_sysex
 	pushl_cfi $.Lnormal_return
-	INTERN(__c32_syscallrouter)
+	EXTERN(__c32_syscallrouter)
 	jmpl   *__c32_syscallrouter(,%eax,4)
 	.cfi_adjust_cfa_offset -4
 .Lbad_sysno:
@@ -138,13 +137,12 @@ __x86_syscall_emulate_r_protect_start:
 	jb     .Lbad_sysno
 	cmpl   $(__NR_exsyscall_max), %eax
 	ja     .Lbad_sysno
-	INTERN(__c32_exsyscallrouter)
+	EXTERN(__c32_exsyscallrouter)
 	calll  *(__c32_exsyscallrouter - ((__NR_exsyscall_min * 4) & 0xffffffff))(,%eax,4)
 .Lnormal_return:
 
 
-INTERN(__x86_syscall_emulate_r_protect_end)
-__x86_syscall_emulate_r_protect_end:
+INTERN_LABEL(__x86_syscall_emulate_r_protect_end):
 	/* Return to user-space. */
 	addl   $(SIZEOF_RPC_SYSCALL_INFO), %esp
 	.cfi_adjust_cfa_offset -SIZEOF_RPC_SYSCALL_INFO

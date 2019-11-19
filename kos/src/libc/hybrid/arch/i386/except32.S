@@ -34,17 +34,19 @@
 #endif /* !__KERNEL__ */
 
 #ifdef __KERNEL__
-EXTERN(_this_exception_code)
-EXTERN(_this_exception_data)
-EXTERN(_this_exception_state)
-EXTERN(_this_exception_pointers)
+EXTERN(this_exception_code)
+EXTERN(this_exception_flags)
+EXTERN(this_exception_trace)
+EXTERN(this_exception_pointers)
+EXTERN(this_exception_data)
+EXTERN(this_exception_state)
 
-#define FIELD_ERROR_CODE           %fs:_this_exception_code
-#define FIELD_ERROR_FLAGS          %fs:_this_exception_flags
-#define FIELD_ERROR_TRACE(off)     %fs:_this_exception_trace + (off)
-#define FIELD_ERROR_POINTERS(off)  %fs:_this_exception_pointers + (off)
-#define FIELD_ERROR_FAULTADDR      %fs:_this_exception_data + __OFFSET_EXCEPTION_DATA_FAULTADDR
-#define FIELD_ERROR_REGISTERS(off) %fs:_this_exception_state + (off)
+#define FIELD_ERROR_CODE           %fs:this_exception_code
+#define FIELD_ERROR_FLAGS          %fs:this_exception_flags
+#define FIELD_ERROR_TRACE(off)     %fs:this_exception_trace + (off)
+#define FIELD_ERROR_POINTERS(off)  %fs:this_exception_pointers + (off)
+#define FIELD_ERROR_FAULTADDR      %fs:this_exception_data + __OFFSET_EXCEPTION_DATA_FAULTADDR
+#define FIELD_ERROR_REGISTERS(off) %fs:this_exception_state + (off)
 #define S_EXCEPT_TEXT(name)    .text
 #define S_EXCEPT_DATA(name)    .data
 #define S_EXCEPT_RODATA(name)  .rodata
@@ -359,14 +361,14 @@ IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_E
 	/* Copy exception information. */
 	movl   $(EXCEPT_FNORMAL), FIELD_ERROR_FLAGS
 	leal   SIZEOF_KCPUSTATE(%esp), %esi /* %esi = &code */
-IK(	movl   $(_this_exception_code), %edi)
-IK(	addl   %fs:0, %edi                            /* %edi = &%fs:_this_exception_code */)
+IK(	movl   $(this_exception_code), %edi)
+IK(	addl   %fs:0, %edi                            /* %edi = &%fs:this_exception_code */)
 IU(	leal   OFFSET_EXCEPTION_INFO_CODE(%eax), %edi /* %edi = &libc_error_info()->ei_code */)
 #if EXCEPT_BACKTRACE_SIZE != 0
 IU(	pushl_cfi %eax)
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	lodsl  /* %eax = code */
-	stosl  /* %fs:_this_exception_code = code */
+	stosl  /* %fs:this_exception_code = code */
 	movl   %edi, %edx
 	lodsl  /* %eax = argc */
 	movl   %eax, %ecx
@@ -378,7 +380,7 @@ IU(	pushl_cfi %eax)
 2:	/* Fill in undefined pointers with NULL */
 	movl   %edi, %eax
 	subl   %edx, %eax
-	shrl   $2,   %eax  /* EAX = (P - _this_exception_pointers) / 4 */
+	shrl   $2,   %eax  /* EAX = (P - this_exception_pointers) / 4 */
 	movl   $EXCEPTION_DATA_POINTERS, %ecx
 	subl   %eax, %ecx  /* ECX = EXCEPTION_DATA_POINTERS - EAX; (Number of unset pointers) */
 	xorl   %eax, %eax
@@ -526,7 +528,7 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_kernel_esp)
 #if EXCEPT_BACKTRACE_SIZE != 0
 	.Lindex = 0
 	.rept EXCEPT_BACKTRACE_SIZE-1
-	movl   $0, %fs:_this_exception_trace + .Lindex
+	movl   $0, %fs:this_exception_trace + .Lindex
 	.Lindex = .Lindex + 4
 	.endr
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -534,7 +536,7 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_kernel_esp)
 	/* Turn the icpustate into a kcpustate and set it as exception origin */
 #define COPYSTATE(reg, src, dst)                  \
 	movl   src(%esp), %eax;                       \
-	movl   %eax, %fs:_this_exception_state + dst; \
+	movl   %eax, %fs:this_exception_state + dst; \
 .if src != dst;                                   \
 	.cfi_rel_offset reg, dst;                     \
 	movl   %eax, dst(%esp);                       \
@@ -545,7 +547,7 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_kernel_esp)
 	COPYSTATE(%esi, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ESI, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESI)
 	COPYSTATE(%ebp, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBP, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBP)
 	leal   OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL(%esp), %eax /* ESP */
-	movl   %eax, %fs:_this_exception_state + OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP
+	movl   %eax, %fs:this_exception_state + OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP
 	movl   %eax, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%esp)
 	COPYSTATE(%ebx, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBX, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBX)
 	COPYSTATE(%edx, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDX, OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX)

@@ -123,17 +123,17 @@ struct cpuinfo {
 };
 
 /* Basic CPU feature flags (Set of `CPU_FEATURE_F*') */
-DATDEF ATTR_PERCPU u16 const cpu_features;
+DATDEF ATTR_PERCPU u16 const thiscpu_x86_cpufeatures;
 
 /* [valid_if(cpu_basic_features & CPU_FEATURE_FCPUID)]
  * NOTE: When `CPU_FEATURE_FCPUID' isn't set, all members are ZERO-initialized.
  * Information gathered from `cpuid' */
-DATDEF ATTR_PERCPU struct cpuinfo const cpuid_features;
-#define CPUID_FEATURES     PERCPU(cpuid_features)
+DATDEF ATTR_PERCPU struct cpuinfo const thiscpu_x86_cpuid;
+#define CURRENT_X86_CPUID PERCPU(thiscpu_x86_cpuid)
 
 
-DATDEF u16                  __x86_bootcpu_features;
-DATDEF struct cpuinfo const __x86_bootcpu_idfeatures;
+DATDEF u16 const x86_bootcpu_cpufeatures;
+DATDEF struct cpuinfo const x86_bootcpu_cpuid;
 
 #endif /* __CC__ */
 

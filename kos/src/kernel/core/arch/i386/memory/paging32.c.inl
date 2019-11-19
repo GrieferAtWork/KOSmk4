@@ -270,15 +270,15 @@ INTERN ATTR_FREETEXT ATTR_CONST union p32_pdir_e1 *
 NOTHROW(FCALL x86_get_cpu_iob_pointer_p32)(struct cpu *__restrict self) {
 	union p32_pdir_e1 *e1_pointer;
 	uintptr_t iobp;
-	iobp       = (uintptr_t)&FORCPU(self, x86_cpuiob[0]);
+	iobp       = (uintptr_t)&FORCPU(self, thiscpu_x86_iob[0]);
 	e1_pointer = &P32_PDIR_E1_IDENTITY[P32_PDIR_VEC2INDEX(iobp)]
 	                                  [P32_PDIR_VEC1INDEX(iobp)];
 	return e1_pointer;
 }
 LOCAL ATTR_FREETEXT void
 NOTHROW(KCALL ioperm_preemption_set_p32_unmap)(void) {
-	/* Initialize the `_bootcpu.x86_cpu_iobnode_pagedir_identity' pointer. */
-	FORCPU(&_bootcpu, x86_cpu_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer_p32(&_bootcpu);
+	/* Initialize the `_bootcpu.thiscpu_x86_iobnode_pagedir_identity' pointer. */
+	FORCPU(&_bootcpu, thiscpu_x86_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer_p32(&_bootcpu);
 #ifndef CONFIG_NO_PAGING_PAE
 	/* Re-write the assembly of `__x86_lazy_disable_ioperm_bitmap_pae', as
 	 * found in `arch/i386/sched/sched32.S' to only clear 8 bytes of memory
@@ -302,7 +302,7 @@ INTERN ATTR_FREETEXT ATTR_CONST union pae_pdir_e1 *
 NOTHROW(FCALL x86_get_cpu_iob_pointer_pae)(struct cpu *__restrict self) {
 	union pae_pdir_e1 *e1_pointer;
 	uintptr_t iobp;
-	iobp       = (uintptr_t)&FORCPU(self, x86_cpuiob[0]);
+	iobp       = (uintptr_t)&FORCPU(self, thiscpu_x86_iob[0]);
 	e1_pointer = &PAE_PDIR_E1_IDENTITY[PAE_PDIR_VEC3INDEX(iobp)]
 	                                  [PAE_PDIR_VEC2INDEX(iobp)]
 	                                  [PAE_PDIR_VEC1INDEX(iobp)];
@@ -310,8 +310,8 @@ NOTHROW(FCALL x86_get_cpu_iob_pointer_pae)(struct cpu *__restrict self) {
 }
 LOCAL ATTR_FREETEXT void
 NOTHROW(KCALL ioperm_preemption_set_pae_unmap)(void) {
-	/* Initialize the `_bootcpu.x86_cpu_iobnode_pagedir_identity' pointer. */
-	FORCPU(&_bootcpu, x86_cpu_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer_pae(&_bootcpu);
+	/* Initialize the `_bootcpu.thiscpu_x86_iobnode_pagedir_identity' pointer. */
+	FORCPU(&_bootcpu, thiscpu_x86_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer_pae(&_bootcpu);
 }
 #endif /* !CONFIG_NO_PAGING_PAE */
 

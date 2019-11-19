@@ -30,16 +30,16 @@
 
 
 .section .data.pertask.early
-PUBLIC_OBJECT(x86_rpc_redirection_iret)
+PUBLIC_OBJECT(this_x86_rpc_redirection_iret)
 	.long  0  /* ir_eip */
 	.long  0  /* ir_cs */
 	.long  0  /* ir_eflags */
-END(x86_rpc_redirection_iret)
+END(this_x86_rpc_redirection_iret)
 
 .section .text
 	.cfi_startproc simple
 	.cfi_signal_frame
-	INTERN(x86_rpc_user_redirection_personality)
+	EXTERN(x86_rpc_user_redirection_personality)
 	.cfi_personality 0, x86_rpc_user_redirection_personality
 /*[[[deemon
 import compileExpression from .......misc.libgen.cfi.compiler;
@@ -47,7 +47,7 @@ for (local reg: ["eip", "cs", "eflags"]) {
 	compileExpression('i386', '%' + reg, r'
 		ifnotimpl "KOS", 1f
 		push_tls_address
-		plus     $@(x86_rpc_redirection_iret + OFFSET_IRREGS_' + reg.upper() + r')
+		plus     $@(this_x86_rpc_redirection_iret + OFFSET_IRREGS_' + reg.upper() + r')
 		deref
 		skip     2f
 	1:	push     %' + reg + r'
@@ -58,7 +58,7 @@ for (local reg: { "es", "ds", "fs", "gs" }) {
 	compileExpression('i386', '%' + reg, r'
 		ifnotimpl "KOS", 1f
 		push_tls_address
-		plus     $@(x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS)
+		plus     $@(this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS)
 		deref
 		const2u  $@EFLAGS_VM
 		and
@@ -73,31 +73,31 @@ for (local reg: { "es", "ds", "fs", "gs" }) {
 }
 ]]]*/
 __ASM_L(	.cfi_escape 0x16,0x08,0x12,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x07,0x00,0xe0,0x23,(x86_rpc_redirection_iret + OFFSET_IRREGS_EIP),0x06)
+__ASM_L(	.cfi_escape 0x53,0x2f,0x07,0x00,0xe0,0x23,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_EIP),0x06)
 __ASM_L(	.cfi_escape 0x2f,0x02,0x00,0x58,0xf0)
 __ASM_L(	.cfi_escape 0x16,0x29,0x13,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x07,0x00,0xe0,0x23,(x86_rpc_redirection_iret + OFFSET_IRREGS_CS),0x06)
+__ASM_L(	.cfi_escape 0x53,0x2f,0x07,0x00,0xe0,0x23,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_CS),0x06)
 __ASM_L(	.cfi_escape 0x2f,0x03,0x00,0x90,0x29,0xf0)
 __ASM_L(	.cfi_escape 0x16,0x09,0x12,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x07,0x00,0xe0,0x23,(x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS),0x06)
+__ASM_L(	.cfi_escape 0x53,0x2f,0x07,0x00,0xe0,0x23,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS),0x06)
 __ASM_L(	.cfi_escape 0x2f,0x02,0x00,0x59,0xf0)
 __ASM_L(	.cfi_escape 0x16,0x28,0x1e,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x12,0x00,0xe0,0x23,(x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS),0x06)
+__ASM_L(	.cfi_escape 0x53,0x2f,0x12,0x00,0xe0,0x23,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS),0x06)
 __ASM_L(	.cfi_escape 0x0a,(EFLAGS_VM) & 0xff,(EFLAGS_VM >> 8) & 0xff,0x1a,0x20,0x28,0x06,0x00)
 __ASM_L(	.cfi_escape 0x74,(OFFSET_IRREGS_ES - SIZEOF_IRREGS_KERNEL),0x06,0x2f,0x03,0x00,0x90,0x28)
 __ASM_L(	.cfi_escape 0xf0)
 __ASM_L(	.cfi_escape 0x16,0x2b,0x1e,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x12,0x00,0xe0,0x23,(x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS),0x06)
+__ASM_L(	.cfi_escape 0x53,0x2f,0x12,0x00,0xe0,0x23,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS),0x06)
 __ASM_L(	.cfi_escape 0x0a,(EFLAGS_VM) & 0xff,(EFLAGS_VM >> 8) & 0xff,0x1a,0x20,0x28,0x06,0x00)
 __ASM_L(	.cfi_escape 0x74,(OFFSET_IRREGS_DS - SIZEOF_IRREGS_KERNEL),0x06,0x2f,0x03,0x00,0x90,0x2b)
 __ASM_L(	.cfi_escape 0xf0)
 __ASM_L(	.cfi_escape 0x16,0x2c,0x1e,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x12,0x00,0xe0,0x23,(x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS),0x06)
+__ASM_L(	.cfi_escape 0x53,0x2f,0x12,0x00,0xe0,0x23,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS),0x06)
 __ASM_L(	.cfi_escape 0x0a,(EFLAGS_VM) & 0xff,(EFLAGS_VM >> 8) & 0xff,0x1a,0x20,0x28,0x06,0x00)
 __ASM_L(	.cfi_escape 0x74,(OFFSET_IRREGS_FS - SIZEOF_IRREGS_KERNEL),0x06,0x2f,0x03,0x00,0x90,0x2c)
 __ASM_L(	.cfi_escape 0xf0)
 __ASM_L(	.cfi_escape 0x16,0x2d,0x1e,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x12,0x00,0xe0,0x23,(x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS),0x06)
+__ASM_L(	.cfi_escape 0x53,0x2f,0x12,0x00,0xe0,0x23,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS),0x06)
 __ASM_L(	.cfi_escape 0x0a,(EFLAGS_VM) & 0xff,(EFLAGS_VM >> 8) & 0xff,0x1a,0x20,0x28,0x06,0x00)
 __ASM_L(	.cfi_escape 0x74,(OFFSET_IRREGS_GS - SIZEOF_IRREGS_KERNEL),0x06,0x2f,0x03,0x00,0x90,0x2d)
 __ASM_L(	.cfi_escape 0xf0)
@@ -121,19 +121,19 @@ PUBLIC_FUNCTION(x86_rpc_user_redirection)
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
 
-	movl   %fs:x86_rpc_redirection_iret + 8, %eax
+	movl   %fs:this_x86_rpc_redirection_iret + 8, %eax
 	pushl  %eax     /* ir_eflags */
 	.cfi_reg_offset %esp, 4, %esp
 	.cfi_reg_offset %ss, 4, %esp
 	.cfi_reg_offset %eax, (4 + OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EAX - (SIZEOF_IRREGS_KERNEL + OFFSET_ICPUSTATE_IRREGS)), %esp
 	.cfi_reg_offset %fs, (4 + OFFSET_ICPUSTATE_FS - (SIZEOF_IRREGS_KERNEL + OFFSET_ICPUSTATE_IRREGS)), %esp
-	movl   %fs:x86_rpc_redirection_iret + 4, %eax
+	movl   %fs:this_x86_rpc_redirection_iret + 4, %eax
 	pushl  %eax     /* ir_cs */
 	.cfi_reg_offset %esp, 8, %esp
 	.cfi_reg_offset %ss, 4, %esp
 	.cfi_reg_offset %eax, (8 + OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EAX - (SIZEOF_IRREGS_KERNEL + OFFSET_ICPUSTATE_IRREGS)), %esp
 	.cfi_reg_offset %fs, (8 + OFFSET_ICPUSTATE_FS - (SIZEOF_IRREGS_KERNEL + OFFSET_ICPUSTATE_IRREGS)), %esp
-	movl   %fs:x86_rpc_redirection_iret + 0, %eax
+	movl   %fs:this_x86_rpc_redirection_iret + 0, %eax
 	pushl  %eax     /* ir_eip */
 	.cfi_reg_offset %esp, 12, %esp
 	.cfi_reg_offset %ss, 8, %esp
@@ -197,16 +197,16 @@ INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 	movl   %esp, %ecx
 
 	/* System call interrupts do their own user-RPC handling. */
-	INTERN(rpc_serve_async_user_redirection)
+	EXTERN(rpc_serve_async_user_redirection)
 	call   rpc_serve_async_user_redirection
 	movl   %eax, %esp
 
 	/* Check for additional RPC callbacks. */
-	cmpl   $(0), %fs:_this_pending_rpcs
+	cmpl   $(0), %fs:this_rpcs_pending
 	jne    x86_serve_user_rpc_and_propagate_exceptions
 
 	/* Check if an exception has been set for user-space. */
-	cmpl   $(0), %fs:_this_exception_code
+	cmpl   $(0), %fs:this_exception_code
 	je     1f
 
 	/* Check if exceptions are propagated to user-space, or kernel-space */
@@ -226,13 +226,13 @@ INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 	 * getting here while the current IRET tail still points into
 	 * userspace when `x86_userexcept_propagate()' is invoked! */
 	je     1f
-	PUBLIC(x86_userexcept_unwind_interrupt_kernel_esp)
+	EXTERN(x86_userexcept_unwind_interrupt_kernel_esp)
 	jmp    x86_userexcept_unwind_interrupt_kernel_esp
 
 2:	/* User-space target */
 	movl   %esp, %ecx /* struct icpustate *__restrict state */
 	xorl   %edx, %edx /* struct rpc_syscall_info *sc_info */
-	PUBLIC(x86_userexcept_propagate)
+	EXTERN(x86_userexcept_propagate)
 	call   x86_userexcept_propagate
 	movl   %eax, %esp
 
@@ -278,7 +278,7 @@ END(x86_rpc_user_redirection)
 	.cfi_restore_iret_es_or_offset (OFFSET_ICPUSTATE_ES - OFFSET_ICPUSTATE_IRREGS)
 	.cfi_restore_iret_ds_or_offset (OFFSET_ICPUSTATE_DS - OFFSET_ICPUSTATE_IRREGS)
 
-	INTERN(x86_rpc_kernel_redirection_personality)
+	EXTERN(x86_rpc_kernel_redirection_personality)
 	.cfi_personality 0, x86_rpc_kernel_redirection_personality
 	nop /* Required to allow for detection during unwinding. */
 INTERN_FUNCTION(x86_rpc_kernel_redirection)
@@ -354,7 +354,7 @@ INTERN_FUNCTION(x86_rpc_kernel_redirection_handler)
 	call   *%eax
 	movl   %eax, %esp
 	/* Continue unwinding the exception that brought us here. */
-	INTERN(x86_userexcept_unwind_interrupt_esp)
+	EXTERN(x86_userexcept_unwind_interrupt_esp)
 	jmp    x86_userexcept_unwind_interrupt_esp
 END(x86_rpc_kernel_redirection_handler)
 .cfi_endproc
@@ -381,7 +381,7 @@ END(x86_rpc_kernel_redirection_handler)
 	.cfi_restore_iret_fs_or_offset (OFFSET_ICPUSTATE_FS - OFFSET_ICPUSTATE_IRREGS)
 	.cfi_restore_iret_es_or_offset (OFFSET_ICPUSTATE_ES - OFFSET_ICPUSTATE_IRREGS)
 	.cfi_restore_iret_ds_or_offset (OFFSET_ICPUSTATE_DS - OFFSET_ICPUSTATE_IRREGS)
-	INTERN(x86_rpc_kernel_redirection_c_personality)
+	EXTERN(x86_rpc_kernel_redirection_c_personality)
 	.cfi_personality 0, x86_rpc_kernel_redirection_c_personality
 	nop /* Required to allow for detection during unwinding. */
 INTERN_FUNCTION(x86_rpc_kernel_redirection_c)
@@ -463,7 +463,7 @@ INTERN_FUNCTION(x86_rpc_kernel_redirection_c_handler)
 	movl   %ebx, %esp
 	.cfi_def_cfa_register %esp
 	/* Continue unwinding the exception that brought us here. */
-	PUBLIC(x86_userexcept_unwind_interrupt_esp)
+	EXTERN(x86_userexcept_unwind_interrupt_esp)
 	jmp    x86_userexcept_unwind_interrupt_esp
 END(x86_rpc_kernel_redirection_handler)
 .cfi_endproc
@@ -485,7 +485,7 @@ END(x86_rpc_kernel_redirection_handler)
 	.cfi_restore_iret_fs_or_offset (12 - 24)
 	.cfi_restore_iret_es_or_offset (16 - 24)
 	.cfi_restore_iret_ds_or_offset (20 - 24)
-	INTERN(x86_srpc_kernel_redirection_personality)
+	EXTERN(x86_srpc_kernel_redirection_personality)
 	.cfi_personality 0, x86_srpc_kernel_redirection_personality
 	nop /* Required to allow for detection during unwinding. */
 INTERN_FUNCTION(x86_srpc_kernel_redirection)
@@ -550,7 +550,7 @@ INTERN_FUNCTION(x86_srpc_kernel_redirection_handler)
 	popl_cfi_r %eax
 	pushal_cfi_r
 	/* Continue unwinding the exception that brought us here. */
-	PUBLIC(x86_userexcept_unwind_interrupt_esp)
+	EXTERN(x86_userexcept_unwind_interrupt_esp)
 	jmp    x86_userexcept_unwind_interrupt_esp
 END(x86_srpc_kernel_redirection_handler)
 .cfi_endproc
@@ -571,7 +571,7 @@ END(x86_srpc_kernel_redirection_handler)
 	.cfi_restore_iret_fs_or_offset (16 - 28)
 	.cfi_restore_iret_es_or_offset (20 - 28)
 	.cfi_restore_iret_ds_or_offset (24 - 28)
-	INTERN(x86_srpc_kernel_redirection_c_personality)
+	EXTERN(x86_srpc_kernel_redirection_c_personality)
 	.cfi_personality 0, x86_srpc_kernel_redirection_c_personality
 	nop    /* Required to allow for detection during unwinding. */
 INTERN_FUNCTION(x86_srpc_kernel_redirection_c)
@@ -642,7 +642,7 @@ INTERN_FUNCTION(x86_srpc_kernel_redirection_c_handler)
 	popl_cfi_r %eax
 	pushal_cfi_r
 	/* Continue unwinding the exception that brought us here. */
-	PUBLIC(x86_userexcept_unwind_interrupt_esp)
+	EXTERN(x86_userexcept_unwind_interrupt_esp)
 	jmp    x86_userexcept_unwind_interrupt_esp
 END(x86_srpc_kernel_redirection_c_handler)
 .cfi_endproc
@@ -745,7 +745,7 @@ END(task_rpc_exec_here_onexit)
 .section .text
 PUBLIC_FUNCTION(task_serve)
 	.cfi_startproc
-	cmpl   $(0), %fs:_this_pending_sync_count
+	cmpl   $(0), %fs:this_rpc_pending_sync_count
 	jne    1f
 #if 1 /* Service blocking cleanup operations. */
 	call   blocking_cleanup_service
@@ -795,7 +795,7 @@ PUBLIC_FUNCTION(task_serve)
 	call   task_serve_one_impl /* Service a single RPC function */
 	movl   %eax, %esp          /* Load the modified register state. */
 	/* Check if there are more pending RPC callbacks. */
-	cmpl   $(0), %fs:_this_pending_sync_count
+	cmpl   $(0), %fs:this_rpc_pending_sync_count
 	jne    1b
 
 #if 1 /* Service blocking cleanup operations. */
@@ -821,17 +821,17 @@ END(task_serve)
 .section .text
 PUBLIC_FUNCTION(task_serve_nx)
 	.cfi_startproc
-	cmpl   $(0), %fs:_this_pending_sync_count_nx
+	cmpl   $(0), %fs:this_rpc_pending_sync_count_nx
 #if 1
 	je     blocking_cleanup_service
 #else
 	jne    1f
 #if TASK_SERVE_NX_XPENDING == 1
 	xorl   %eax, %eax
-	cmpl   $(0), %fs:_this_pending_sync_count
+	cmpl   $(0), %fs:this_rpc_pending_sync_count
 	setne  %al
 #else
-	cmpl   $(0), %fs:_this_pending_sync_count
+	cmpl   $(0), %fs:this_rpc_pending_sync_count
 	movl   $TASK_SERVE_NX_DIDRUN, %ecx
 	cmovne %ecx, %eax
 #endif
@@ -873,7 +873,7 @@ PUBLIC_FUNCTION(task_serve_nx)
 	call   task_serve_one_nx_impl /* Service a single RPC function */
 	movl   %eax, %esp             /* Load the modified register state. */
 	/* Check if there are more pending RPC callbacks. */
-	cmpl   $(0), %fs:_this_pending_sync_count_nx
+	cmpl   $(0), %fs:this_rpc_pending_sync_count_nx
 	jne    1b
 
 #if 1 /* Service blocking cleanup operations. */
@@ -882,7 +882,7 @@ PUBLIC_FUNCTION(task_serve_nx)
 #endif
 
 	popal_cfi_r
-	cmpl   $(0), %fs:_this_pending_sync_count
+	cmpl   $(0), %fs:this_rpc_pending_sync_count
 	je     1f
 	orl    $TASK_SERVE_NX_XPENDING, %eax
 1:

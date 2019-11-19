@@ -1115,6 +1115,11 @@ PRIVATE void KCALL flash_current_line(VGA *__restrict self) THROWS(E_WOULDBLOCK,
 	invert_current_line_colors(self);
 }
 
+#undef CONFIG_VGA_LESS_LINE_FEEDS
+#if 1
+#define CONFIG_VGA_LESS_LINE_FEEDS 1
+#endif
+
 PRIVATE NONNULL((1)) void LIBANSITTY_CC
 VGA_Putc(struct ansitty *__restrict self, char32_t ch)
 		THROWS(E_WOULDBLOCK, ...) {
@@ -1199,13 +1204,16 @@ VGA_Putc(struct ansitty *__restrict self, char32_t ch)
 					size_x = vga->v_textsizex;
 					oldptr = ATOMIC_READ(vga->v_textptr);
 					cur_x  = ((size_t)(oldptr - vga->v_textbase) % size_x);
+#ifdef CONFIG_VGA_LESS_LINE_FEEDS
 					if (cur_x == 0 && cp437_encode(vga->v_lastch) != 0) {
 						/* Special case: The previous line was filled entirely, and the cursor had to be wrapped
 						 *               to the next line, however the first character then printed was also a
 						 *               linefeed. - In this case, don't wrap the line, as the linefeed requested
 						 *               by the caller already happened implicitly, thus not creating an entirely
 						 *               empty line and wasting what little screen space we only have. */
-					} else {
+					} else
+#endif /* CONFIG_VGA_LESS_LINE_FEEDS */
+					{
 						/* Clear the remainder of the old line */
 						u16 *lline = ATOMIC_READ(vga->v_scrlllin);
 						if (oldptr >= lline) {

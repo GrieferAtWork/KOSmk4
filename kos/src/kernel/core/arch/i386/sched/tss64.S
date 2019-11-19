@@ -25,13 +25,13 @@
 .section .data.percpu.tss
 INTERN_OBJECT(__kernel_percpu_tss)
 	/* u32 __t_zero0; */ .int  0
-	INTERN(__kernel_boottask_stack)
+	EXTERN(__kernel_boottask_stack)
 	/* u64   t_rsp0;  */ .quad (__kernel_boottask_stack + KERNEL_STACKSIZE)
 	/* u64   t_rsp1;  */ .quad (__kernel_boottask_stack + KERNEL_STACKSIZE)
 	/* u64   t_rsp2;  */ .quad (__kernel_boottask_stack + KERNEL_STACKSIZE)
 	/* u32 __t_zero1; */ .int  0
 	/* u32 __t_zero2; */ .int  0
-	INTERN(__x86_bootcpu_df_stack)
+	EXTERN(__x86_bootcpu_df_stack)
 	/* u64   t_ist0;  */ .quad (__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE)
 	/* u64   t_ist1;  */ .quad (__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE)
 	/* u64   t_ist2;  */ .quad (__x86_bootcpu_df_stack + KERNEL_DF_STACKSIZE)
@@ -42,6 +42,6 @@ INTERN_OBJECT(__kernel_percpu_tss)
 	/* u32 __t_zero3; */ .int  0
 	/* u32 __t_zero4; */ .int  0
 	/* u16 __t_zero5; */ .word 0
-	INTERN(__x86_cputss_iob_offset)
+	EXTERN(__x86_cputss_iob_offset)
 	/* u16   t_iomap; */  .word __x86_cputss_iob_offset
 END(__kernel_percpu_tss)

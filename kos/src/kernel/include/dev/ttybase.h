@@ -67,7 +67,7 @@ struct ttybase_device
 	struct terminal                   t_term;  /* The associated terminal driver controller. */
 	XATOMIC_WEAKLYREF(struct taskpid) t_cproc; /* [0..1] Controlling terminal support.
 	                                            * When non-NULL, points to a session leader thread, such that
-	                                            * `FORTASK(taskpid_gettask(t_cproc), _this_taskgroup).tg_ctty == self'
+	                                            * `FORTASK(taskpid_gettask(t_cproc), this_taskgroup).tg_ctty == self'
 	                                            * is the case. */
 	XATOMIC_REF(struct taskpid)       t_fproc; /* [0..1] PID of the foreground process group leader.
 	                                            * This process is usually apart of the same session as `t_cproc' */

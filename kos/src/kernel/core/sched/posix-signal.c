@@ -64,11 +64,11 @@ PUBLIC struct kernel_sigmask empty_kernel_sigmask = {
 
 /* [0..1][lock(READ(ATOMIC), WRITE(THIS_TASK))]
  * Reference to the signal mask (set of signals being blocked) in the current thread. */
-PUBLIC ATTR_PERTASK ATOMIC_REF(struct kernel_sigmask) _this_sigmask = ATOMIC_REF_INIT(&empty_kernel_sigmask);
+PUBLIC ATTR_PERTASK ATOMIC_REF(struct kernel_sigmask) this_sigmask = ATOMIC_REF_INIT(&empty_kernel_sigmask);
 
 /* [0..1][valid_if(!TASK_FKERNTHREAD)][lock(PRIVATE(THIS_TASK))]
  * User-space signal handlers for the calling thread. */
-PUBLIC ATTR_PERTASK REF struct sighand_ptr *_this_sighand_ptr = NULL;
+PUBLIC ATTR_PERTASK REF struct sighand_ptr *this_sighand_ptr = NULL;
 
 
 DEFINE_PERTASK_CLONE(clone_posix_signals);
@@ -79,17 +79,17 @@ clone_posix_signals(struct task *__restrict new_thread, uintptr_t flags) {
 		/* Nothing to do here! */
 	} else {
 		REF struct kernel_sigmask *mask;
-		mask = PERTASK(_this_sigmask).get();
+		mask = PERTASK(this_sigmask).get();
 		assert(mask != &empty_kernel_sigmask);
 		ATOMIC_FETCHINC(mask->sm_share);
 		COMPILER_WRITE_BARRIER();
-		FORTASK(new_thread, _this_sigmask).m_pointer = mask; /* Inherit reference. */
+		FORTASK(new_thread, this_sigmask).m_pointer = mask; /* Inherit reference. */
 		COMPILER_WRITE_BARRIER();
 	}
 	if (flags & CLONE_SIGHAND) {
 		/* Must share signal handlers. */
 		REF struct sighand_ptr *myptr;
-		myptr = PERTASK_GET(_this_sighand_ptr);
+		myptr = PERTASK_GET(this_sighand_ptr);
 		if (!myptr) {
 			/* Must allocate the signal handler table pointer so we can share it! */
 			myptr = (REF struct sighand_ptr *)kmalloc(sizeof(struct sighand_ptr),
@@ -97,16 +97,16 @@ clone_posix_signals(struct task *__restrict new_thread, uintptr_t flags) {
 			myptr->sp_refcnt = 2;
 			atomic_rwlock_init(&myptr->sp_lock);
 			myptr->sp_hand = NULL;
-			assert(!PERTASK_GET(_this_sighand_ptr));
-			PERTASK_SET(_this_sighand_ptr, myptr);
+			assert(!PERTASK_GET(this_sighand_ptr));
+			PERTASK_SET(this_sighand_ptr, myptr);
 		} else {
 			incref(myptr);
 		}
-		FORTASK(new_thread, _this_sighand_ptr) = myptr;
+		FORTASK(new_thread, this_sighand_ptr) = myptr;
 	} else {
 		/* Set signal handlers of the thread as a copy of the caller. */
 		struct sighand_ptr *myptr;
-		myptr = PERTASK_GET(_this_sighand_ptr);
+		myptr = PERTASK_GET(this_sighand_ptr);
 		if (!myptr) {
 			/* No handlers -> Nothing to copy (the new thread will also use default handlers!) */
 		} else {
@@ -142,7 +142,7 @@ again_lock_myptr:
 				kfree(newptr);
 				RETHROW();
 			}
-			FORTASK(new_thread, _this_sighand_ptr) = newptr;
+			FORTASK(new_thread, this_sighand_ptr) = newptr;
 		}
 	}
 }
@@ -152,16 +152,16 @@ DEFINE_PERTASK_FINI(fini_posix_signals);
 PRIVATE NOBLOCK ATTR_USED void
 NOTHROW(KCALL fini_posix_signals)(struct task *__restrict thread) {
 	struct kernel_sigmask *mask;
-	mask = FORTASK(thread, _this_sigmask).m_pointer;
+	mask = FORTASK(thread, this_sigmask).m_pointer;
 	if (mask != &empty_kernel_sigmask)
 		decref(mask);
-	xdecref(FORTASK(thread, _this_sighand_ptr));
+	xdecref(FORTASK(thread, this_sighand_ptr));
 }
 
 
 
-/* Make sure that `_this_sigmask' is allocated, and isn't being shared.
- * Then, always return `PERTASK_GET(_this_sigmask)' */
+/* Make sure that `this_sigmask' is allocated, and isn't being shared.
+ * Then, always return `PERTASK_GET(this_sigmask)' */
 PUBLIC ATTR_RETNONNULL WUNUSED struct kernel_sigmask *KCALL
 sigmask_getwr(void) THROWS(E_BADALLOC) {
 	struct kernel_sigmask *result;
@@ -174,7 +174,7 @@ sigmask_getwr(void) THROWS(E_BADALLOC) {
 		memcpy(&copy->sm_mask, &result->sm_mask, sizeof(copy->sm_mask));
 		copy->sm_refcnt = 1;
 		copy->sm_share  = 1;
-		result = PERTASK(_this_sigmask).exchange_inherit_new(copy);
+		result = PERTASK(this_sigmask).exchange_inherit_new(copy);
 		if (result != &empty_kernel_sigmask) {
 			ATOMIC_FETCHDEC(result->sm_share);
 			decref_unlikely(result);
@@ -260,7 +260,7 @@ again_read_thread_ptr:
 		result->sh_share = 1;
 		ptr->sp_refcnt = 1;
 		atomic_rwlock_init(&ptr->sp_lock);
-		if (!ATOMIC_CMPXCH(PERTASK(_this_sighand_ptr), NULL, ptr)) {
+		if (!ATOMIC_CMPXCH(PERTASK(this_sighand_ptr), NULL, ptr)) {
 			COMPILER_READ_BARRIER();
 			/* Race condition: someone else already allocated the sighand_ptr for `thread' */
 			kfree(result);
@@ -486,7 +486,7 @@ NOTHROW(KCALL task_sigcont)(struct task *__restrict thread) {
 	printk(KERN_DEBUG "[sig] Resume execution of thread %u\n",
 	       (unsigned int)task_getrootpid_of_s(thread));
 	/* Now we must wake up the thread! */
-	pid = FORTASK(thread, _this_taskpid);
+	pid = FORTASK(thread, this_taskpid);
 	ATOMIC_STORE(pid->tp_status.w_status, __W_CONTINUED);
 	sig_broadcast(&pid->tp_changed);
 	return true;
@@ -1191,7 +1191,7 @@ NOTHROW(KCALL is_thread_masking_signal)(struct task *__restrict thread,
 	bool result;
 	REF struct kernel_sigmask *mask;
 	assert(!(thread->t_flags & TASK_FKERNTHREAD));
-	mask = FORTASK(thread, _this_sigmask).get();
+	mask = FORTASK(thread, this_sigmask).get();
 	result = sigismember(&mask->sm_mask, signo);
 	decref_unlikely(mask);
 	return result;
@@ -1211,7 +1211,7 @@ STATIC_ASSERT(SIGACTION_SA_RESETHAND == SA_RESETHAND);
 DEFINE_PERVM_ONEXEC(onexec_posix_signals_reset_action);
 INTERN void KCALL onexec_posix_signals_reset_action(void) {
 	struct sighand_ptr *handptr;
-	handptr = ATOMIC_XCH(PERTASK(_this_sighand_ptr), NULL);
+	handptr = ATOMIC_XCH(PERTASK(this_sighand_ptr), NULL);
 	xdecref(handptr);
 }
 
@@ -1548,7 +1548,7 @@ DEFINE_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, sigmask) {
 
 
 LOCAL size_t KCALL get_pid_indirection(struct task *__restrict thread) {
-	struct taskpid *pid = FORTASK(thread, _this_taskpid);
+	struct taskpid *pid = FORTASK(thread, this_taskpid);
 	return likely(pid) ? pid->tp_pidns->pn_indirection : 0;
 }
 

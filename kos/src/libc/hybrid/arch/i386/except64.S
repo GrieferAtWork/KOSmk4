@@ -37,17 +37,17 @@
 #endif /* !__KERNEL__ */
 
 #ifdef __KERNEL__
-EXTERN(_this_exception_code)
-EXTERN(_this_exception_data)
-EXTERN(_this_exception_state)
-EXTERN(_this_exception_pointers)
+EXTERN(this_exception_code)
+EXTERN(this_exception_data)
+EXTERN(this_exception_state)
+EXTERN(this_exception_pointers)
 
-#define FIELD_ERROR_CODE           %gs:_this_exception_code
-#define FIELD_ERROR_FLAGS          %gs:_this_exception_flags
-#define FIELD_ERROR_TRACE(off)     %gs:_this_exception_trace + (off)
-#define FIELD_ERROR_POINTERS(off)  %gs:_this_exception_pointers + (off)
-#define FIELD_ERROR_FAULTADDR      %gs:_this_exception_data + __OFFSET_EXCEPTION_DATA_FAULTADDR
-#define FIELD_ERROR_REGISTERS(off) %gs:_this_exception_state + (off)
+#define FIELD_ERROR_CODE           %gs:this_exception_code
+#define FIELD_ERROR_FLAGS          %gs:this_exception_flags
+#define FIELD_ERROR_TRACE(off)     %gs:this_exception_trace + (off)
+#define FIELD_ERROR_POINTERS(off)  %gs:this_exception_pointers + (off)
+#define FIELD_ERROR_FAULTADDR      %gs:this_exception_data + __OFFSET_EXCEPTION_DATA_FAULTADDR
+#define FIELD_ERROR_REGISTERS(off) %gs:this_exception_state + (off)
 #define S_EXCEPT_TEXT(name)    .text
 #define S_EXCEPT_DATA(name)    .data
 #define S_EXCEPT_RODATA(name)  .rodata
@@ -416,8 +416,8 @@ IU(	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R9(%rsp), %r9)
 	/* assume(%rsi >= 5); */
 	/* Copy any remaining arguments. */
 	leaq   SIZEOF_KCPUSTATE(%rsp), %rsi /* %rsi = &ptr4 */
-IK(	movq   $(_this_exception_pointers), %rdi)
-IK(	addq   %gs:0, %rdi  /* %rdi = &%gs:_this_exception_pointers */)
+IK(	movq   $(this_exception_pointers), %rdi)
+IK(	addq   %gs:0, %rdi  /* %rdi = &%gs:this_exception_pointers */)
 IU(	leaq   OFFSET_EXCEPTION_INFO_POINTERS(%rax), %rdi /* %rdi = &libc_error_info()->ei_pointers */)
 	leaq   -4(%rsi), %rcx
 	rep;   movsq
@@ -428,8 +428,8 @@ IU(	leaq   OFFSET_EXCEPTION_INFO_POINTERS(%rax), %rdi /* %rdi = &libc_error_info
 	cmpq   $(EXCEPTION_DATA_POINTERS), %rsi
 	jae    .Ldo_unwind_rsp_maybe_fill_trace
 
-IK(	movq   $(_this_exception_pointers), %rdi)
-IK(	addq   %gs:0, %rdi                                /* %rdi = &%gs:_this_exception_pointers */)
+IK(	movq   $(this_exception_pointers), %rdi)
+IK(	addq   %gs:0, %rdi                                /* %rdi = &%gs:this_exception_pointers */)
 IU(	leaq   OFFSET_EXCEPTION_INFO_POINTERS(%rax), %rdi /* %rdi = &libc_error_info()->ei_pointers */)
 	leaq   (%rdi, %rsi, 8), %rdi
 	movq   $(EXCEPTION_DATA_POINTERS), %rcx
@@ -515,8 +515,6 @@ END(libc_error_throw)
 
 #ifdef __KERNEL__
 
-/* EDI: <struct icpustate *> */
-INTERN(x86_serve_user_rpc_and_propagate_exceptions)
 
 .section .text
 PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt)
@@ -533,7 +531,8 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt)
 	.cfi_def_cfa_register %rsp
 PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_esp)
 	/* Check if the interrupt state points into user-space. */
-	testq  $3, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS(%rsp)
+	testq  $(3), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS(%rsp)
+	EXTERN(x86_serve_user_rpc_and_propagate_exceptions)
 	jnz    x86_serve_user_rpc_and_propagate_exceptions
 	.cfi_endproc
 
@@ -557,7 +556,7 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_kernel_esp)
 #if EXCEPT_BACKTRACE_SIZE != 0
 	.Lindex = 0
 	.rept EXCEPT_BACKTRACE_SIZE-1
-	movq   $0, %gs:_this_exception_trace + .Lindex
+	movq   $0, %gs:this_exception_trace + .Lindex
 	.Lindex = .Lindex + 8
 	.endr
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -565,7 +564,7 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_kernel_esp)
 	/* Turn the icpustate into a kcpustate and set it as exception origin */
 #define COPYSTATE(reg, src, dst)                  \
 	movq   src(%rsp), %rax;                       \
-	movq   %rax, %gs:_this_exception_state + dst; \
+	movq   %rax, %gs:this_exception_state + dst; \
 .if src != dst;                                   \
 	.cfi_rel_offset reg, dst;                     \
 	movq   %rax, dst(%rsp);                       \

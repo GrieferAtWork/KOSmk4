@@ -80,7 +80,7 @@ PRIVATE_FUNCTION(x86_idt_unused_common)
 	subl   $4, %esp   /* VECNO */
 	.cfi_adjust_cfa_offset 4
 
-	INTERN(x86_handle_unhandled_idt)
+	EXTERN(x86_handle_unhandled_idt)
 	call   x86_handle_unhandled_idt
 	movl   %eax, %esp
 

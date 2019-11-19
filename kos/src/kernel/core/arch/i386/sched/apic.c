@@ -70,12 +70,12 @@ INTDEF byte_t x86_debug_pic_acknowledge[];
 
 #ifdef __x86_64__
 PRIVATE ATTR_FREERODATA u8 const x86_ack_apic[18] = {
-	//TODO: movq x86_lapic_base_address, %rax
+	//TODO: movq x86_lapicbase, %rax
 	//TODO: movl $(APIC_EOI_FSIGNAL), APIC_EOI(%rax)
 };
 #else /* __x86_64__ */
 struct __ATTR_PACKED x86_ack_apic_data {
-	/* movl x86_lapic_base_address, %eax */
+	/* movl x86_lapicbase, %eax */
 	u8  b_a1;
 	u32 l_x86_lapic_base_address;
 	/* movl $(APIC_EOI_FSIGNAL), APIC_EOI(%eax) */
@@ -85,9 +85,9 @@ struct __ATTR_PACKED x86_ack_apic_data {
 	u32 l_APIC_EOI_FSIGNAL;
 };
 PRIVATE ATTR_FREERODATA struct x86_ack_apic_data const x86_ack_apic = {
-	/* movl x86_lapic_base_address, %eax */
+	/* movl x86_lapicbase, %eax */
 	0xa1,
-	(u32)&x86_lapic_base_address,
+	(u32)&x86_lapicbase,
 	/* movl $(APIC_EOI_FSIGNAL), APIC_EOI(%eax) */
 	0xc7,
 	0x80,
@@ -118,9 +118,9 @@ PRIVATE ATTR_FREERODATA u8 const x86_ack_pic[15] = {
 STATIC_ASSERT(sizeof(x86_ack_apic) == sizeof(x86_ack_pic));
 
 
-DATDEF ATTR_PERCPU quantum_diff_t _cpu_quantum_length ASMNAME("cpu_quantum_length");
-DATDEF ATTR_PERCPU u8 _x86_lapic_id ASMNAME("x86_lapic_id");
-DATDEF ATTR_PERCPU u8 _x86_lapic_version ASMNAME("x86_lapic_version");
+DATDEF ATTR_PERCPU quantum_diff_t _thiscpu_quantum_length ASMNAME("thiscpu_quantum_length");
+DATDEF ATTR_PERCPU u8 _thiscpu_x86_lapicid ASMNAME("thiscpu_x86_lapicid");
+DATDEF ATTR_PERCPU u8 _thiscpu_x86_lapicversion ASMNAME("thiscpu_x86_lapicversion");
 DATDEF size_t _cpu_count ASMNAME("cpu_count");
 DATDEF struct cpu *_cpu_vector[CONFIG_MAX_CPU_COUNT] ASMNAME("cpu_vector");
 
@@ -219,7 +219,7 @@ PRIVATE /*ATTR_FREETEXT*/ void KCALL x86_altcore_entry(void) {
 	num_ticks /= HZ;
 	if unlikely(!num_ticks)
 		num_ticks = 1;
-	/* TODO: If `num_ticks' differs from `FORCPU(&_bootcpu,_cpu_quantum_length)'
+	/* TODO: If `num_ticks' differs from `FORCPU(&_bootcpu,_thiscpu_quantum_length)'
 	 *       by more than 1%, re-try the calibration up to 2 more times.
 	 *    -> Mainly affects emulators when the bus-clock is based on real
 	 *       time, but the emulator itself may have been preempted while
@@ -227,7 +227,7 @@ PRIVATE /*ATTR_FREETEXT*/ void KCALL x86_altcore_entry(void) {
 	 *    -> This is something I've seen happening a couple of times, leaving
 	 *       secondary cores to arbitrarily have tick counters off by _a_ _lot_. */
 
-	FORCPU(me, _cpu_quantum_length) = num_ticks;
+	FORCPU(me, _thiscpu_quantum_length) = num_ticks;
 
 	/* Enable the LAPIC for real this time. */
 	lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F16);
@@ -250,7 +250,7 @@ NOTHROW(FCALL x86_altcore_initapic)(struct cpu *__restrict me) {
 	            X86_INTNO_PIC1_PIT |
 	            APIC_TIMER_MODE_FPERIODIC |
 	            APIC_TIMER_SOURCE_FDIV);
-	lapic_write(APIC_TIMER_INITIAL, FORCPU(me, _cpu_quantum_length));
+	lapic_write(APIC_TIMER_INITIAL, FORCPU(me, _thiscpu_quantum_length));
 }
 
 
@@ -285,17 +285,17 @@ INTDEF pertask_fini_t __kernel_pertask_fini_start[];
 INTDEF pertask_fini_t __kernel_pertask_fini_end[];
 
 
-DATDEF ATTR_PERCPU struct vm_node _x86_this_dfstack ASMNAME("x86_this_dfstack");
-DATDEF ATTR_PERCPU struct vm_datapart _x86_this_dfstack_part ASMNAME("x86_this_dfstack_part");
-DATDEF ATTR_PERTASK struct vm_node __this_kernel_stack ASMNAME("_this_kernel_stack");
-DATDEF ATTR_PERTASK struct vm_datapart __this_kernel_stack_part ASMNAME("_this_kernel_stack_part");
+DATDEF ATTR_PERCPU struct vm_node _thiscpu_x86_dfstacknode ASMNAME("thiscpu_x86_dfstacknode");
+DATDEF ATTR_PERCPU struct vm_datapart _current_x86_dfstackpart ASMNAME("thiscpu_x86_dfstackpart");
+DATDEF ATTR_PERTASK struct vm_node _this_kernel_stacknode ASMNAME("this_kernel_stacknode");
+DATDEF ATTR_PERTASK struct vm_datapart _this_kernel_stackpart ASMNAME("this_kernel_stackpart");
 
 #define HINT_ADDR(x, y) x
 #define HINT_MODE(x, y) y
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
-DATDEF ATTR_PERCPU byte_t _x86_cpuiob[] ASMNAME("x86_cpuiob");
+DATDEF ATTR_PERCPU byte_t _current_x86_iob[] ASMNAME("thiscpu_x86_iob");
 
 PRIVATE ATTR_FREETEXT REF struct vm_datapart *KCALL
 vm_datapart_alloc_locked_ram(size_t num_pages) {
@@ -390,7 +390,7 @@ INTDEF FREE union pae_pdir_e1 *NOTHROW(FCALL x86_get_cpu_iob_pointer_pae)(struct
 
 PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 	/* A CPU structure is quite complicated, since it contains an in-line
-	 * memory hole spanning two pages at an offset of `+(uintptr_t)x86_cpuiob'
+	 * memory hole spanning two pages at an offset of `+(uintptr_t)thiscpu_x86_iob'
 	 * bytes form the start of the CPU structure, that is then followed by
 	 * 1 additional page that is really only needed for the single 0xff byte
 	 * at its start, as mandated by the Intel developer manual for termination
@@ -446,25 +446,25 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 	memcpy(result, __kernel_percpu_start, (size_t)__kernel_percpu_size);
 
 	/* Copy the thread-template into the cpu's IDLE thread. */
-	memcpy(&FORCPU(result, _this_idle), __kernel_pertask_start, (size_t)__kernel_pertask_size);
+	memcpy(&FORCPU(result, thiscpu_idle), __kernel_pertask_start, (size_t)__kernel_pertask_size);
 
 	/* Copy the TSS template. */
-	memcpy(&FORCPU(result, x86_cputss), &__kernel_percpu_tss, SIZEOF_TSS);
+	memcpy(&FORCPU(result, thiscpu_x86_tss), &__kernel_percpu_tss, SIZEOF_TSS);
 
 #ifndef NDEBUG
-	/* Also fill the area before _this_idle with CCh bytes. */
+	/* Also fill the area before thiscpu_idle with CCh bytes. */
 	memset((byte_t *)result + (uintptr_t)__kernel_percpu_size, 0xcc,
-	       (size_t)&_this_idle - (size_t)__kernel_percpu_size);
+	       (size_t)&thiscpu_idle - (size_t)__kernel_percpu_size);
 
-	/* Also fill the area between _this_idle and x86_cputss with CCh bytes. */
-	memset((byte_t *)result + ((uintptr_t)&_this_idle + (size_t)__kernel_pertask_size), 0xcc,
-	       (uintptr_t)&x86_cputss - ((uintptr_t)&_this_idle +
+	/* Also fill the area between thiscpu_idle and thiscpu_x86_tss with CCh bytes. */
+	memset((byte_t *)result + ((uintptr_t)&thiscpu_idle + (size_t)__kernel_pertask_size), 0xcc,
+	       (uintptr_t)&thiscpu_x86_tss - ((uintptr_t)&thiscpu_idle +
 	                                 (size_t)__kernel_pertask_size));
 #endif /* !NDEBUG */
 
 	/* Fill in the IOB node mapping for this CPU. */
 	result = (struct cpu *)VM_PAGE2ADDR(cpu_basepage);
-	cpu_node2 = &FORCPU(result, x86_cpu_iobnode);
+	cpu_node2 = &FORCPU(result, thiscpu_x86_iobnode);
 	cpu_node2->vn_node.a_vmin = cpu_basepage + (size_t)__x86_cpu_part1_pages;
 	cpu_node2->vn_node.a_vmax = cpu_node2->vn_node.a_vmin + 1;
 	cpu_node2->vn_prot  = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_PRIVATE;
@@ -485,15 +485,15 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 	/* Make sure that the IOB is terminated by a byte containing all ones
 	 * NOTE: The remainder of the last page (which is `cpu_node3') is left
 	 *       uninitialized, as it is (currently) unused. */
-	FORCPU(result, _x86_cpuiob[65536/8]) = 0xff;
+	FORCPU(result, _current_x86_iob[65536/8]) = 0xff;
 
 #ifndef NDEBUG
 	/* Fill unused memory with CCh so that unintended access problems are reproducible. */
-	memset(&FORCPU(result, _x86_cpuiob[(65536/8) + 1]), 0xcc, PAGESIZE - 1);
+	memset(&FORCPU(result, _current_x86_iob[(65536/8) + 1]), 0xcc, PAGESIZE - 1);
 #endif /* !NDEBUG */
 
 	/* Initialize the CPU's pagedir_identity:iob pointer. */
-	FORCPU(result, x86_cpu_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer(result);
+	FORCPU(result, thiscpu_x86_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer(result);
 
 	return result;
 }
@@ -529,7 +529,7 @@ NOTHROW(KCALL cpu_free)(struct cpu *__restrict self) {
 	assert(VM_NODE_MAX(cpu_node2) == cpu_node2->vn_node.a_vmin + 1);
 	assert(VM_NODE_MIN(cpu_node3) == cpu_node2->vn_node.a_vmax + 1);
 	assert(VM_NODE_MAX(cpu_node3) == cpu_node3->vn_node.a_vmin);
-	assert(cpu_node2 == &FORCPU(self, x86_cpu_iobnode));
+	assert(cpu_node2 == &FORCPU(self, thiscpu_x86_iobnode));
 	vm_node_destroy_locked_ram(cpu_node1);
 	vm_node_destroy_locked_ram(cpu_node3);
 }
@@ -538,43 +538,43 @@ NOTHROW(KCALL cpu_free)(struct cpu *__restrict self) {
 PRIVATE ATTR_FREETEXT void
 NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 	struct task *myidle;
-	myidle = &FORCPU(self, _this_idle);
+	myidle = &FORCPU(self, thiscpu_idle);
 	{
 		/* Run finalizers for the IDLE task. */
 		pertask_fini_t *iter;
 		iter = __kernel_pertask_fini_start;
 		for (; iter < __kernel_pertask_fini_end; ++iter)
-			(**iter)(&FORCPU(self, _this_idle));
+			(**iter)(&FORCPU(self, thiscpu_idle));
 	}
 	/* Unmap, sync, & unprepare the mappings for the CPU's IDLE and #DF stacks.
 	 * NOTE: Because these mappings are private the the CPU itself, we don't
 	 *       need to be holding a lock to the kernel VM for this part! */
-	pagedir_unmap(VM_NODE_MIN(&FORCPU(self, _x86_this_dfstack)), VM_NODE_SIZE(&FORCPU(self, _x86_this_dfstack)));
-	pagedir_sync(VM_NODE_MIN(&FORCPU(self, _x86_this_dfstack)), VM_NODE_SIZE(&FORCPU(self, _x86_this_dfstack)));
+	pagedir_unmap(VM_NODE_MIN(&FORCPU(self, _thiscpu_x86_dfstacknode)), VM_NODE_SIZE(&FORCPU(self, _thiscpu_x86_dfstacknode)));
+	pagedir_sync(VM_NODE_MIN(&FORCPU(self, _thiscpu_x86_dfstacknode)), VM_NODE_SIZE(&FORCPU(self, _thiscpu_x86_dfstacknode)));
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_map(VM_NODE_MIN(&FORCPU(self, _x86_this_dfstack)), VM_NODE_SIZE(&FORCPU(self, _x86_this_dfstack)));
+	pagedir_unprepare_map(VM_NODE_MIN(&FORCPU(self, _thiscpu_x86_dfstacknode)), VM_NODE_SIZE(&FORCPU(self, _thiscpu_x86_dfstacknode)));
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-	pagedir_unmap(VM_NODE_MIN(&FORTASK(myidle, __this_kernel_stack)), VM_NODE_SIZE(&FORTASK(myidle, __this_kernel_stack)));
-	pagedir_sync(VM_NODE_MIN(&FORTASK(myidle, __this_kernel_stack)), VM_NODE_SIZE(&FORTASK(myidle, __this_kernel_stack)));
+	pagedir_unmap(VM_NODE_MIN(&FORTASK(myidle, _this_kernel_stacknode)), VM_NODE_SIZE(&FORTASK(myidle, _this_kernel_stacknode)));
+	pagedir_sync(VM_NODE_MIN(&FORTASK(myidle, _this_kernel_stacknode)), VM_NODE_SIZE(&FORTASK(myidle, _this_kernel_stacknode)));
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_map(VM_NODE_MIN(&FORTASK(myidle, __this_kernel_stack)), VM_NODE_SIZE(&FORTASK(myidle, __this_kernel_stack)));
+	pagedir_unprepare_map(VM_NODE_MIN(&FORTASK(myidle, _this_kernel_stacknode)), VM_NODE_SIZE(&FORTASK(myidle, _this_kernel_stacknode)));
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-	pagedir_unmapone(VM_NODE_MIN(&FORTASK(myidle, _this_trampoline_node)));
-	pagedir_syncone(VM_NODE_MIN(&FORTASK(myidle, _this_trampoline_node)));
+	pagedir_unmapone(VM_NODE_MIN(&FORTASK(myidle, this_trampoline_node)));
+	pagedir_syncone(VM_NODE_MIN(&FORTASK(myidle, this_trampoline_node)));
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_mapone(VM_NODE_MIN(&FORTASK(myidle, _this_trampoline_node)));
+	pagedir_unprepare_mapone(VM_NODE_MIN(&FORTASK(myidle, this_trampoline_node)));
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Remove the #DF and IDLE stack nodes from the kernel VM */
 	while (!sync_trywrite(&vm_kernel.v_treelock))
 		__pause();
-	vm_node_remove(&vm_kernel, FORCPU(self, _x86_this_dfstack).vn_node.a_vmin);
-	vm_node_remove(&vm_kernel, FORTASK(myidle, __this_kernel_stack).vn_node.a_vmin);
-	vm_node_remove(&vm_kernel, FORTASK(myidle, _this_trampoline_node).vn_node.a_vmin);
+	vm_node_remove(&vm_kernel, FORCPU(self, _thiscpu_x86_dfstacknode).vn_node.a_vmin);
+	vm_node_remove(&vm_kernel, FORTASK(myidle, _this_kernel_stacknode).vn_node.a_vmin);
+	vm_node_remove(&vm_kernel, FORTASK(myidle, this_trampoline_node).vn_node.a_vmin);
 	sync_endwrite(&vm_kernel.v_treelock);
 	/* Finalize the associated data parts, freeing up backing physical memory. */
-	vm_datapart_freeram(&FORCPU(self, _x86_this_dfstack_part), false);
-	vm_datapart_freeram(&FORTASK(myidle, __this_kernel_stack_part), false);
+	vm_datapart_freeram(&FORCPU(self, _current_x86_dfstackpart), false);
+	vm_datapart_freeram(&FORTASK(myidle, _this_kernel_stackpart), false);
 	LLIST_REMOVE(myidle, t_vm_tasks);
 	cpu_free(self);
 }
@@ -591,10 +591,10 @@ i386_allocate_secondary_cores(void) {
 		struct task *altidle;
 		/* Allocate an initialize the alternative core. */
 		altcore = cpu_alloc();
-		altidle = &FORCPU(altcore, _this_idle);
+		altidle = &FORCPU(altcore, thiscpu_idle);
 		/* Decode information previously encoded in `smp.c' */
-		FORCPU(altcore, _x86_lapic_id)      = (uintptr_t)_cpu_vector[i] & 0xff;
-		FORCPU(altcore, _x86_lapic_version) = ((uintptr_t)_cpu_vector[i] & 0xff00) >> 8;
+		FORCPU(altcore, _thiscpu_x86_lapicid)      = (uintptr_t)_cpu_vector[i] & 0xff;
+		FORCPU(altcore, _thiscpu_x86_lapicversion) = ((uintptr_t)_cpu_vector[i] & 0xff00) >> 8;
 		_cpu_vector[i] = altcore;
 
 		altcore->c_id                        = i;
@@ -610,11 +610,11 @@ i386_allocate_secondary_cores(void) {
 		LLIST_INSERT(vm_kernel.v_tasks, altidle, t_vm_tasks);
 
 		/* Allocate & map stacks for this cpu's IDLE task, as well as the #DF stack. */
-		FORCPU(altcore, _x86_this_dfstack_part).dp_tree.a_vmax  = (vm_dpage_t)(CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) - 1);
-		FORCPU(altcore, _x86_this_dfstack).vn_part              = &FORCPU(altcore, _x86_this_dfstack_part);
-		FORCPU(altcore, _x86_this_dfstack).vn_link.ln_pself     = &LLIST_HEAD(FORCPU(altcore, _x86_this_dfstack_part).dp_srefs);
-		FORCPU(altcore, _x86_this_dfstack_part).dp_srefs        = &FORCPU(altcore, _x86_this_dfstack);
-		vm_datapart_do_allocram(&FORCPU(altcore, _x86_this_dfstack_part));
+		FORCPU(altcore, _current_x86_dfstackpart).dp_tree.a_vmax  = (vm_dpage_t)(CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) - 1);
+		FORCPU(altcore, _thiscpu_x86_dfstacknode).vn_part              = &FORCPU(altcore, _current_x86_dfstackpart);
+		FORCPU(altcore, _thiscpu_x86_dfstacknode).vn_link.ln_pself     = &LLIST_HEAD(FORCPU(altcore, _current_x86_dfstackpart).dp_srefs);
+		FORCPU(altcore, _current_x86_dfstackpart).dp_srefs        = &FORCPU(altcore, _thiscpu_x86_dfstacknode);
+		vm_datapart_do_allocram(&FORCPU(altcore, _current_x86_dfstackpart));
 		{
 			vm_vpage_t addr;
 			addr = vm_getfree(&vm_kernel,
@@ -623,25 +623,25 @@ i386_allocate_secondary_cores(void) {
 			                  HINT_GETMODE(KERNEL_VMHINT_DFSTACK));
 			if unlikely(addr == VM_GETFREE_ERROR)
 				kernel_panic(FREESTR("Failed to find suitable location for CPU #%u's #DF stack"), (unsigned int)i);
-			FORCPU(altcore, _x86_this_dfstack).vn_node.a_vmin = addr;
-			FORCPU(altcore, _x86_this_dfstack).vn_node.a_vmax = addr + CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) - 1;
+			FORCPU(altcore, _thiscpu_x86_dfstacknode).vn_node.a_vmin = addr;
+			FORCPU(altcore, _thiscpu_x86_dfstacknode).vn_node.a_vmax = addr + CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) - 1;
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if (!pagedir_prepare_map(addr, CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE)))
 				kernel_panic(FREESTR("Failed to map CPU #%u's #DF stack"), (unsigned int)i);
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-			vm_datapart_map_ram(&FORCPU(altcore, _x86_this_dfstack_part),
+			vm_datapart_map_ram(&FORCPU(altcore, _current_x86_dfstackpart),
 			                    addr,
 			                    PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
-			vm_node_insert(&FORCPU(altcore, _x86_this_dfstack));
+			vm_node_insert(&FORCPU(altcore, _thiscpu_x86_dfstacknode));
 		}
 
-		FORTASK(altidle, __this_kernel_stack_part).dp_tree.a_vmax = (vm_dpage_t)(CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1);
+		FORTASK(altidle, _this_kernel_stackpart).dp_tree.a_vmax = (vm_dpage_t)(CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1);
 		/* The stack of IDLE threads is executable in order to allow for hacking around .free restrictions. */
-		FORTASK(altidle, __this_kernel_stack).vn_prot = (VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ);
-		*(uintptr_t *)&FORTASK(altidle, __this_kernel_stack).vn_part += (uintptr_t)altidle;
-		*(uintptr_t *)&FORTASK(altidle, __this_kernel_stack).vn_link.ln_pself += (uintptr_t)altidle;
-		*(uintptr_t *)&FORTASK(altidle, __this_kernel_stack_part).dp_srefs += (uintptr_t)altidle;
-		vm_datapart_do_allocram(&FORTASK(altidle, __this_kernel_stack_part));
+		FORTASK(altidle, _this_kernel_stacknode).vn_prot = (VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ);
+		*(uintptr_t *)&FORTASK(altidle, _this_kernel_stacknode).vn_part += (uintptr_t)altidle;
+		*(uintptr_t *)&FORTASK(altidle, _this_kernel_stacknode).vn_link.ln_pself += (uintptr_t)altidle;
+		*(uintptr_t *)&FORTASK(altidle, _this_kernel_stackpart).dp_srefs += (uintptr_t)altidle;
+		vm_datapart_do_allocram(&FORTASK(altidle, _this_kernel_stackpart));
 		{
 			vm_vpage_t addr;
 			addr = vm_getfree(&vm_kernel,
@@ -650,16 +650,16 @@ i386_allocate_secondary_cores(void) {
 			                  HINT_GETMODE(KERNEL_VMHINT_IDLESTACK));
 			if unlikely(addr == VM_GETFREE_ERROR)
 				kernel_panic(FREESTR("Failed to find suitable location for CPU #%u's IDLE stack"), (unsigned int)i);
-			FORTASK(altidle, __this_kernel_stack).vn_node.a_vmin = addr;
-			FORTASK(altidle, __this_kernel_stack).vn_node.a_vmax = addr + CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1;
+			FORTASK(altidle, _this_kernel_stacknode).vn_node.a_vmin = addr;
+			FORTASK(altidle, _this_kernel_stacknode).vn_node.a_vmax = addr + CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1;
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if (!pagedir_prepare_map(addr, CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE)))
 				kernel_panic(FREESTR("Failed to map CPU #%u's IDLE stack"), (unsigned int)i);
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-			vm_datapart_map_ram(&FORTASK(altidle, __this_kernel_stack_part),
+			vm_datapart_map_ram(&FORTASK(altidle, _this_kernel_stackpart),
 			                    addr,
 			                    PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
-			vm_node_insert(&FORTASK(altidle, __this_kernel_stack));
+			vm_node_insert(&FORTASK(altidle, _this_kernel_stacknode));
 		}
 
 		{
@@ -669,17 +669,17 @@ i386_allocate_secondary_cores(void) {
 			                  HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
 			if unlikely(addr == VM_GETFREE_ERROR)
 				kernel_panic(FREESTR("Failed to find suitable location for CPU #%u's IDLE trampoline"), (unsigned int)i);
-			FORTASK(altidle, _this_trampoline_node).vn_node.a_vmin = addr;
-			FORTASK(altidle, _this_trampoline_node).vn_node.a_vmax = addr;
+			FORTASK(altidle, this_trampoline_node).vn_node.a_vmin = addr;
+			FORTASK(altidle, this_trampoline_node).vn_node.a_vmax = addr;
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if unlikely(!pagedir_prepare_mapone(addr))
 				kernel_panic(FREESTR("Failed to prepare CPU #%u's IDLE trampoline"), (unsigned int)i);
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-			vm_node_insert(&FORTASK(altidle, _this_trampoline_node));
+			vm_node_insert(&FORTASK(altidle, this_trampoline_node));
 		}
 
-		FORTASK(altidle, _this_fs)             = incref(&fs_kernel);
-		FORTASK(altidle, _this_handle_manager) = incref(&handle_manager_kernel);
+		FORTASK(altidle, this_fs)             = incref(&fs_kernel);
+		FORTASK(altidle, this_handle_manager) = incref(&handle_manager_kernel);
 
 		/* Set up the boot-strap CPU state for the new CPU.
 		 * -> When a CPU is started by using an INIT IPI, it will perform internal
@@ -692,7 +692,7 @@ i386_allocate_secondary_cores(void) {
 		 *    some future point in time when the CPU will be used again. */
 		{
 			struct scpustate *init_state;
-			init_state = (struct scpustate *)(VM_PAGE2ADDR(FORTASK(altidle, __this_kernel_stack).vn_node.a_vmax + 1) -
+			init_state = (struct scpustate *)(VM_PAGE2ADDR(FORTASK(altidle, _this_kernel_stacknode).vn_node.a_vmax + 1) -
 			                                  (offsetafter(struct scpustate, scs_irregs) + sizeof(void *)));
 			memset(init_state, 0, offsetafter(struct scpustate, scs_irregs));
 			/* Set the return address to execute the IDLE main loop. */
@@ -726,18 +726,18 @@ i386_allocate_secondary_cores(void) {
 		}
 
 		/* Setup additional properties of the CPU */
-		segment_wrbaseX(&FORCPU(altcore, x86_cpugdt[SEGMENT_INDEX(SEGMENT_CPU_TSS)]),
-		                (uintptr_t)&FORCPU(altcore, x86_cputss));
-		segment_wrbaseX(&FORCPU(altcore, x86_cpugdt[SEGMENT_INDEX(SEGMENT_CPU_LDT)]),
-		                (uintptr_t)&FORCPU(altcore, x86_cpuldt));
+		segment_wrbaseX(&FORCPU(altcore, thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_CPU_TSS)]),
+		                (uintptr_t)&FORCPU(altcore, thiscpu_x86_tss));
+		segment_wrbaseX(&FORCPU(altcore, thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_CPU_LDT)]),
+		                (uintptr_t)&FORCPU(altcore, thiscpu_x86_ldt));
 #ifdef __x86_64__
-		FORCPU(altcore, x86_cputss).t_rsp0 = FORTASK(altidle, x86_this_kernel_sp0);
+		FORCPU(altcore, thiscpu_x86_tss).t_rsp0 = FORTASK(altidle, this_x86_kernel_psp0);
 #else /* __x86_64__ */
-		segment_wrbaseX(&FORCPU(altcore, x86_cpugdt[SEGMENT_INDEX(SEGMENT_CPU_TSS_DF)]),
-		                (uintptr_t)&FORCPU(altcore, x86_cputss_df));
-		segment_wrbaseX(&FORCPU(altcore, x86_cpugdt[SEGMENT_INDEX(SEGMENT_KERNEL_FSBASE)]),
+		segment_wrbaseX(&FORCPU(altcore, thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_CPU_TSS_DF)]),
+		                (uintptr_t)&FORCPU(altcore, thiscpu_x86_tssdf));
+		segment_wrbaseX(&FORCPU(altcore, thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_KERNEL_FSBASE)]),
 		                (uintptr_t)altidle);
-		FORCPU(altcore, x86_cputss).t_esp0 = FORTASK(altidle, x86_this_kernel_sp0);
+		FORCPU(altcore, thiscpu_x86_tss).t_esp0 = FORTASK(altidle, this_x86_kernel_psp0);
 #endif /* !__x86_64__ */
 	}
 }
@@ -823,22 +823,14 @@ DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(x86_config_noapic,
                                             KERNEL_COMMANDLINE_OPTION_TYPE_BOOL,
                                             "noapic");
 
-DATDEF VIRT byte_t volatile *x86_lapic_base_address_ ASMNAME("x86_lapic_base_address");
+DATDEF VIRT byte_t volatile *_x86_lapicbase ASMNAME("x86_lapicbase");
 
 INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
-#ifndef CONFIG_NO_SMP
-	DEFINE_INTERN_SYMBOL(_this_vm_pdir_phys_ptr,
-	                     offsetof(struct vm, v_pdir_phys_ptr),
-	                     sizeof(vm_phys_t));
-	DEFINE_INTERN_SYMBOL(_this_cpu_state,
-	                     offsetof(struct cpu, c_state),
-	                     sizeof(u16));
-#endif /* !CONFIG_NO_SMP */
 
 	/* Initialize the regular PIC */
 	x86_initialize_pic();
 #define MAKE_DWORD(a, b, c, d) ((u32)(a) | ((u32)(b) << 8) | ((u32)(c) << 16) | ((u32)(d) << 24))
-	if (__x86_bootcpu_idfeatures.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H'))
+	if (x86_bootcpu_cpuid.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H'))
 		x86_config_noapic = true; /* FIXME: Work-around for weird timing... */
 
 	/* Check if we should make use of the LAPIC */
@@ -894,9 +886,9 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 #endif /* !CONFIG_NO_DEBUGGER */
 
 		/* Read out the boot cpu's LAPIC id if it couldn't be determined before now. */
-		if (FORCPU(&_bootcpu, _x86_lapic_id) == 0xff) {
+		if (FORCPU(&_bootcpu, _thiscpu_x86_lapicid) == 0xff) {
 			u32 id = lapic_read(APIC_ID);
-			FORCPU(&_bootcpu, _x86_lapic_id) = (u8)(id >> APIC_ID_FSHIFT);
+			FORCPU(&_bootcpu, _thiscpu_x86_lapicid) = (u8)(id >> APIC_ID_FSHIFT);
 		}
 
 		/* Disable the PIT interrupt if we're going to use the LAPIC timer. */
@@ -913,7 +905,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 		/* Send INIT commands to all CPUs. */
 		for (i = 1; i < _cpu_count; ++i) {
 			cpu_offline_mask[i / 8] |= 1 << (i % 8); /* Mark the CPU as offline */
-			apic_send_init(FORCPU(cpu_vector[i], x86_lapic_id));
+			apic_send_init(FORCPU(cpu_vector[i], thiscpu_x86_lapicid));
 		}
 		/* NOTE: The APIC specs require us to wait for 10ms
 		 *       before we should send `APIC_ICR0_TYPE_FSIPI'
@@ -941,7 +933,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 #ifndef CONFIG_NO_SMP
 		/* Send start IPIs to all APs. */
 		for (i = 1; i < _cpu_count; ++i) {
-			apic_send_startup(FORCPU(cpu_vector[i], x86_lapic_id),
+			apic_send_startup(FORCPU(cpu_vector[i], thiscpu_x86_lapicid),
 			                  (u8)entry_page);
 		}
 #endif /* !CONFIG_NO_SMP */
@@ -958,7 +950,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 		            APIC_TIMER_MODE_FPERIODIC |
 		            APIC_TIMER_SOURCE_FDIV);
 		lapic_write(APIC_TIMER_INITIAL, num_ticks);
-		FORCPU(&_bootcpu, _cpu_quantum_length) = num_ticks;
+		FORCPU(&_bootcpu, _thiscpu_quantum_length) = num_ticks;
 		PREEMPTION_ENABLE();
 
 #ifndef CONFIG_NO_SMP
@@ -985,8 +977,8 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 				if (!(ATOMIC_READ(cpu_offline_mask[i / 8]) & (1 << (i % 8))))
 					continue;
 				printk(FREESTR(KERN_WARNING "[apic] Re-attempting startup of processor #%u (LAPIC id %#.2I8x)\n"),
-				       i, FORCPU(cpu_vector[i], x86_lapic_id));
-				apic_send_startup(FORCPU(cpu_vector[i], x86_lapic_id),
+				       i, FORCPU(cpu_vector[i], thiscpu_x86_lapicid));
+				apic_send_startup(FORCPU(cpu_vector[i], thiscpu_x86_lapicid),
 				                  (u8)entry_page);
 			}
 			/* Wait up to a full second for the (possibly slow?) CPUs to come online. */
@@ -1010,7 +1002,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 				}
 				printk(FREESTR(KERN_ERR "[apic] CPU with LAPIC id %#.2I8x doesn't want to "
 				                        "come online (removing it from the configuration)\n"),
-				       i, FORCPU(_cpu_vector[i], x86_lapic_id));
+				       i, FORCPU(_cpu_vector[i], thiscpu_x86_lapicid));
 				cpu_destroy(_cpu_vector[i]);
 				/* Remove the CPU from the vector. */
 				--_cpu_count;
@@ -1028,7 +1020,7 @@ all_online:
 		printk(FREESTR(KERN_INFO "[apic] LAPIC unavailable or disabled. Using PIC for timings\n"));
 
 		/* Clear out the lapic pointer when disabled. */
-		x86_lapic_base_address_ = NULL;
+		_x86_lapicbase = NULL;
 
 		/* Ensure that we're configured for only a single CPU */
 		_cpu_count = 1;
@@ -1046,7 +1038,7 @@ all_online:
 		memcpy(x86_debug_pic_acknowledge, x86_ack_pic, sizeof(x86_ack_pic));
 #endif /* !CONFIG_NO_DEBUGGER */
 
-		FORCPU(&_bootcpu, _cpu_quantum_length) = PIT_HZ_DIV(HZ);
+		FORCPU(&_bootcpu, _thiscpu_quantum_length) = PIT_HZ_DIV(HZ);
 
 		/* Set the PIC speed. */
 		outb(PIT_COMMAND,

@@ -142,7 +142,7 @@ BEGIN
 	final local KERNEL_EXPORTS_SOURCE =
 		"/kos/src/kernel/include/" + TARGET_XARCH + "-kos/kernel/arch/core-symbols" + CONFIG_FEATURE_FILE_SUFFIX + ".h";
 
-	BEGIN GROUP("kernel") { LINK, MCOPY, ELF_DIHACK, /* ELF_FLATTEN, */
+	BEGIN GROUP("kernel") { LINK, MCOPY, ELF_DIHACK,
 			enumerateSymbolsStep(
 				elfBinary: KERNEL_BINARY,
 				callback: [](self: BoundStep, symbols: {(string, string, string, string, string)...}) {
@@ -248,20 +248,6 @@ BEGIN
 				KERNEL_EXPORTS_SOURCE,
 			}),
 		};
-
-//		options[OPT_ELF_FLATTEN_OUTPUT] = KERNEL_FLAT_BINARY;
-//		if (TARGET_ARCH == "i386") {
-//			options[OPT_ELF_FLATTEN_PHYS_BASE] = 0x00100000; /* 1M */
-//			options[OPT_ELF_FLATTEN_VIRT_BASE] = 0xc0100000; /* 3G + 1M */
-//		} else if (TARGET_ARCH == "x86_64") {
-//			options[OPT_ELF_FLATTEN_PHYS_BASE] = 0;  /* TODO */
-//			options[OPT_ELF_FLATTEN_VIRT_BASE] = 0;  /* TODO */
-//		} else {
-//			options[OPT_ELF_FLATTEN_PHYS_BASE] = 0;
-//			options[OPT_ELF_FLATTEN_VIRT_BASE] = 0;
-//		}
-//		options[OPT_ELF_FLATTEN_KEEP_BSS] = true;
-//		options[OPT_ELF_FLATTEN_OVERRIDE_ENTRY] = true;
 
 		LINKER_SCRIPT("arch/" + TARGET_XARCH + "/_kernel.ld")
 		SET_OUTPUT(KERNEL_BINARY)

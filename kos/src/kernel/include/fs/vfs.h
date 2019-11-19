@@ -842,9 +842,9 @@ DATDEF struct vfs vfs_kernel;
 
 /* [1..1] Per-thread filesystem information.
  * NOTE: Initialized to NULL. - Must be initialized before the task is started. */
-DATDEF ATTR_PERTASK REF struct fs *_this_fs;
-#define THIS_FS     PERTASK_GET(_this_fs)
-#define THIS_VFS   (PERTASK_GET(_this_fs)->f_vfs)
+DATDEF ATTR_PERTASK REF struct fs *this_fs;
+#define THIS_FS     PERTASK_GET(this_fs)
+#define THIS_VFS   (PERTASK_GET(this_fs)->f_vfs)
 
 #define fs_getuid(f) (f)->f_fsuid
 #define fs_getgid(f) (f)->f_fsgid

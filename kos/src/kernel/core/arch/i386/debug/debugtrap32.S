@@ -50,7 +50,7 @@ END(kernel_debugtrap)
 .section .text
 INTERN_FUNCTION(driver_invoke_initializer)
 	.cfi_startproc
-	INTERN(driver_initializer_personality)
+	EXTERN(driver_initializer_personality)
 	.cfi_personality 0, driver_initializer_personality
 	call   *%ecx
 	ret

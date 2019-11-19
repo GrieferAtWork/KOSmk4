@@ -85,7 +85,7 @@ NOTHROW(FCALL GDBThread_ShouldEnumerate)(struct task *__restrict thread) {
  *  - In EVERY_CPU->c_running
  *  - In EVERY_CPU->c_sleeping
  *  - In EVERY_CPU->c_pending
- *  - In FORCPU(EVERY_CPU, _this_idle)
+ *  - In FORCPU(EVERY_CPU, thiscpu_idle)
  * @return: >= 0: The total sum of return values of `callback'
  * @return: <  0: The first negative return value of `callback' */
 INTDEF ssize_t
@@ -132,7 +132,7 @@ again_check_must_stop:
 					goto err;
 				result += temp;
 			}
-			if (iter == &FORCPU(c, _this_idle))
+			if (iter == &FORCPU(c, thiscpu_idle))
 				didThisIdle = true;
 			assert(iter->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv == iter);
 			assert(iter->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt == iter);
@@ -146,7 +146,7 @@ again_check_must_stop:
 					goto err;
 				result += temp;
 			}
-			if (iter == &FORCPU(c, _this_idle))
+			if (iter == &FORCPU(c, thiscpu_idle))
 				didThisIdle = true;
 		}
 #ifndef CONFIG_NO_SMP
@@ -154,7 +154,7 @@ again_check_must_stop:
 		     iter != CPU_PENDING_ENDOFCHAIN;
 		     iter = iter->t_sched.s_pending.ss_pennxt) {
 			if (GDBThread_ShouldEnumerate(iter)) {
-				assert(iter != &FORCPU(c, _this_idle));
+				assert(iter != &FORCPU(c, thiscpu_idle));
 				temp = (*callback)(arg, iter);
 				if unlikely(temp < 0)
 					goto err;
@@ -164,7 +164,7 @@ again_check_must_stop:
 #endif /* !CONFIG_NO_SMP */
 		if (!didThisIdle &&
 		    (GDBServer_Features & GDB_SERVER_FEATURE_SHOWKERNEL)) {
-			temp = (*callback)(arg, &FORCPU(c, _this_idle));
+			temp = (*callback)(arg, &FORCPU(c, thiscpu_idle));
 			if unlikely(temp < 0)
 				goto err;
 			result += temp;

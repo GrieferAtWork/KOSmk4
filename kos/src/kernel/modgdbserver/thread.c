@@ -769,7 +769,7 @@ NOTHROW(FCALL GDBThread_StopProcess)(struct task *__restrict thread,
 		return;
 	}
 	proc = task_getprocess_of(thread);
-	group = &FORTASK(proc, _this_taskgroup);
+	group = &FORTASK(proc, this_taskgroup);
 	/* FIXME: Must use a timeout here, and switch to all-stop mode
 	 *        in case one of the already stopped threads is currently
 	 *        holding this lock. */

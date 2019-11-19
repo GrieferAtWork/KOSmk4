@@ -50,7 +50,7 @@ INTERN_FUNCTION(x86_dbgidt_pagefault)
 	movw   %ax, %fs
 	movl   -4(%esp), %edx /* ECODE */
 	movl   %esp, %ecx
-	INTERN(x86_handle_dbg_pagefault)
+	EXTERN(x86_handle_dbg_pagefault)
 	call   x86_handle_dbg_pagefault
 	movl   %eax, %esp
 	popal_cfi_r
@@ -118,7 +118,7 @@ INTERN_FUNCTION(x86_dbgidt_specific_00h) /* ISR_X86_f1 */
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
 
-	INTERN(x86_handle_dbg_ps2_interrupt)
+	EXTERN(x86_handle_dbg_ps2_interrupt)
 	call   x86_handle_dbg_ps2_interrupt
 
 	/* outb(X86_PIC1_CMD,X86_PIC_CMD_EOI); */

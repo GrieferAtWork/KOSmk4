@@ -474,7 +474,7 @@ again_get_oldpath:
 		struct handle temp;
 		temp.h_type = HANDLE_TYPE_TASK;
 		temp.h_mode = IO_RDWR;
-		temp.h_data = FORTASK(&_boottask, _this_taskpid);
+		temp.h_data = FORTASK(&_boottask, this_taskpid);
 		handle_installhop((struct hop_openfd *)arg, temp);
 	}	break;
 

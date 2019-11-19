@@ -239,18 +239,18 @@ NOTHROW(FCALL x86_idt_modify_end)(bool discard_changes) {
 
 
 PUBLIC ATTR_PERCPU struct x86_spurious_interrupts
-x86_spurious_interrupts = { 0, 0, 0 };
+thiscpu_x86_spurious_interrupts = { 0, 0, 0 };
 
 INTERN void KCALL x86_pic1_spur(void) {
-	++PERCPU(x86_spurious_interrupts).sp_pic1;
+	++PERCPU(thiscpu_x86_spurious_interrupts).sp_pic1;
 }
 
 INTERN void KCALL x86_pic2_spur(void) {
-	++PERCPU(x86_spurious_interrupts).sp_pic2;
+	++PERCPU(thiscpu_x86_spurious_interrupts).sp_pic2;
 }
 
 INTERN void KCALL x86_apic_spur(void) {
-	++PERCPU(x86_spurious_interrupts).sp_apic;
+	++PERCPU(thiscpu_x86_spurious_interrupts).sp_apic;
 }
 
 

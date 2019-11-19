@@ -36,7 +36,7 @@ INTERN_FUNCTION(GDBX86Interrupt_AsmInt1Handler)
 	ASM_PUSH_GPREGSNSP_CFI_R
 
 	movq   %rsp, %rdi
-	INTERN(GDBX86Interrupt_Int1Handler)
+	EXTERN(GDBX86Interrupt_Int1Handler)
 	call   GDBX86Interrupt_Int1Handler
 	movq   %rax, %rsp
 
@@ -56,7 +56,7 @@ INTERN_FUNCTION(GDBX86Interrupt_AsmInt3Handler)
 	ASM_PUSH_GPREGSNSP_CFI_R
 
 	movq   %rsp, %rdi
-	INTERN(GDBX86Interrupt_Int3Handler)
+	EXTERN(GDBX86Interrupt_Int3Handler)
 	call   GDBX86Interrupt_Int3Handler
 	movq   %rax, %rsp
 

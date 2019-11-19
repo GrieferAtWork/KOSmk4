@@ -37,15 +37,15 @@ DECL_BEGIN
 INTERN struct icpustate *FCALL
 x86_handle_overflow(struct icpustate *__restrict state) {
 	unsigned int i;
-	PERTASK_SET(_this_exception_info.ei_code,
+	PERTASK_SET(this_exception_info.ei_code,
 	            (error_code_t)ERROR_CODEOF(E_OVERFLOW));
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
-		PERTASK_SET(_this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
+		PERTASK_SET(this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
 #if EXCEPT_BACKTRACE_SIZE != 0
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-		PERTASK_SET(_this_exception_info.ei_trace[i], (void *)0);
+		PERTASK_SET(this_exception_info.ei_trace[i], (void *)0);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	PERTASK_SET(_this_exception_info.ei_data.e_faultaddr,
+	PERTASK_SET(this_exception_info.ei_data.e_faultaddr,
 	            (void *)icpustate_getpc(state));
 	x86_userexcept_unwind_interrupt(state);
 }

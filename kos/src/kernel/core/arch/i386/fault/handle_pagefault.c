@@ -88,7 +88,7 @@ LOCAL bool FCALL handle_iob_access(struct cpu *__restrict mycpu,
 	                  : (GFP_LOCKED | GFP_PREFLT | GFP_ATOMIC))
 	struct ioperm_bitmap *iob;
 	assert(!PREEMPTION_ENABLED());
-	iob = THIS_IOPERM_BITMAP;
+	iob = THIS_X86_IOPERM_BITMAP;
 	if (!iob) {
 		if (is_writing) {
 			iob = ioperm_bitmap_allocf_nx(GET_GFP_FLAGS());
@@ -98,14 +98,14 @@ LOCAL bool FCALL handle_iob_access(struct cpu *__restrict mycpu,
 				/* Re-attempt the allocation with preemption enabled. */
 				PREEMPTION_ENABLE();
 				iob = ioperm_bitmap_allocf(GFP_LOCKED | GFP_PREFLT);
-				PERTASK_SET(_this_ioperm_bitmap, iob);
+				PERTASK_SET(this_x86_ioperm_bitmap, iob);
 				return false;
 			}
 		} else {
 			iob = incref(&ioperm_bitmap_empty);
 			ATOMIC_FETCHINC(iob->ib_share);
 		}
-		PERTASK_SET(_this_ioperm_bitmap, iob);
+		PERTASK_SET(this_x86_ioperm_bitmap, iob);
 	} else if (is_writing && ATOMIC_READ(iob->ib_share) > 1) {
 		/* Unshare the IOB vector prior to allowing write-access */
 		REF struct ioperm_bitmap *cow;
@@ -116,20 +116,20 @@ LOCAL bool FCALL handle_iob_access(struct cpu *__restrict mycpu,
 			/* Re-attempt the allocation with preemption enabled. */
 			PREEMPTION_ENABLE();
 			cow = ioperm_bitmap_copyf(iob, GFP_LOCKED | GFP_PREFLT);
-			PERTASK_SET(_this_ioperm_bitmap, cow);
+			PERTASK_SET(this_x86_ioperm_bitmap, cow);
 			ATOMIC_FETCHDEC(iob->ib_share);
 			decref(iob);
 			return false;
 		}
-		PERTASK_SET(_this_ioperm_bitmap, cow);
+		PERTASK_SET(this_x86_ioperm_bitmap, cow);
 		ATOMIC_FETCHDEC(iob->ib_share);
 		decref(iob);
 		iob = cow;
 	}
-	pagedir_map(FORCPU(mycpu, x86_cpu_iobnode.vn_node.a_vmin), 2, iob->ib_pages,
+	pagedir_map(FORCPU(mycpu, thiscpu_x86_iobnode.vn_node.a_vmin), 2, iob->ib_pages,
 	            is_writing ? (PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE)
 	                       : (PAGEDIR_MAP_FREAD));
-	FORCPU(mycpu, _current_ioperm_bitmap) = iob;
+	FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) = iob;
 #undef GET_GFP_FLAGS
 	return true;
 }
@@ -141,7 +141,7 @@ LOCAL NOBLOCK WUNUSED bool
 NOTHROW(FCALL is_iob_node)(struct vm_node *node) {
 	cpuid_t i;
 	for (i = 0; i < cpu_count; ++i) {
-		if (node == &FORCPU(cpu_vector[i], x86_cpu_iobnode))
+		if (node == &FORCPU(cpu_vector[i], thiscpu_x86_iobnode))
 			return true;
 	}
 	return false;
@@ -227,7 +227,7 @@ nope:
 
 #else /* !CONFIG_NO_SMP */
 
-#define is_iob_node(node) ((node) == &FORCPU(&_bootcpu, x86_cpu_iobnode))
+#define is_iob_node(node) ((node) == &FORCPU(&_bootcpu, thiscpu_x86_iobnode))
 
 #endif /* CONFIG_NO_SMP */
 
@@ -347,20 +347,20 @@ again_lookup_node_already_locked:
 			if unlikely(!node->vn_part) {
 				struct cpu *mycpu;
 				sync_endread(effective_vm);
-				/* Check for special case: `node' may be the `x86_cpu_iobnode' of some CPU */
+				/* Check for special case: `node' may be the `thiscpu_x86_iobnode' of some CPU */
 do_handle_iob_node_access:
 				mycpu = THIS_CPU;
-				if (node == &FORCPU(mycpu, x86_cpu_iobnode)) {
+				if (node == &FORCPU(mycpu, thiscpu_x86_iobnode)) {
 					PREEMPTION_DISABLE();
 					IF_SMP(COMPILER_READ_BARRIER();)
 					IF_SMP(mycpu = THIS_CPU;)
-					IF_SMP(if (node == &FORCPU(mycpu, x86_cpu_iobnode))) {
+					IF_SMP(if (node == &FORCPU(mycpu, thiscpu_x86_iobnode))) {
 						bool allow_preemption;
-						assert(FORCPU(mycpu, _current_ioperm_bitmap) == NULL ||
-						       FORCPU(mycpu, _current_ioperm_bitmap) == THIS_IOPERM_BITMAP);
+						assert(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == NULL ||
+						       FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == THIS_X86_IOPERM_BITMAP);
 						/* Make sure to handle any access errors after the ioperm() bitmap
 						 * was already mapped during the current quantum as full segfault. */
-						if unlikely(FORCPU(mycpu, _current_ioperm_bitmap) != NULL) {
+						if unlikely(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) != NULL) {
 							/* Check for special case: even if the IOPERM bitmap is already
 							 * mapped, allow a mapping upgrade if it was mapped read-only
 							 * before, but is now needed as read-write. */
@@ -415,7 +415,7 @@ do_handle_iob_node_access:
 					if (!isuser())
 						goto pop_connections_and_throw_segfault;
 					/* If the calling thread couldn't have changed CPUs, then this is an access to  */
-					if (THIS_TASK->t_flags & TASK_FKEEPCORE)
+					if (PERTASK_GET(this_task.t_flags) & TASK_FKEEPCORE)
 						goto pop_connections_and_throw_segfault;
 					/* The calling thread is capable of being migrated between different CPUs,
 					 * and the accessed node _is_ the IOB vector of a different CPU. However with
@@ -853,14 +853,14 @@ upgrade_and_recheck_vm_for_node:
 endread_and_decref_part_and_set_readonly:
 					sync_endread(part);
 					decref_unlikely(part);
-					PERTASK_SET(_this_exception_info.ei_code,
+					PERTASK_SET(this_exception_info.ei_code,
 					            ERROR_CODEOF(E_SEGFAULT_READONLY));
 					goto pop_connections_and_set_exception_pointers;
 				}
 				if unlikely(!(node->vn_prot & VM_PROT_READ) &&
 				            !(ecode & PAGEFAULT_F_WRITING)) {
 					/* Write-only memory */
-					PERTASK_SET(_this_exception_info.ei_code,
+					PERTASK_SET(this_exception_info.ei_code,
 					            ERROR_CODEOF(E_SEGFAULT_NOTREADABLE));
 					sync_endread(part);
 					decref_unlikely(part);
@@ -872,7 +872,7 @@ endread_and_decref_part_and_set_readonly:
 endread_and_decref_part_and_set_noexec:
 						sync_endread(part);
 						decref_unlikely(part);
-						PERTASK_SET(_this_exception_info.ei_code,
+						PERTASK_SET(this_exception_info.ei_code,
 						            ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
 						goto pop_connections_and_set_exception_pointers;
 					}
@@ -987,7 +987,7 @@ done_before_pop_connections:
 			task_disconnectall();
 			task_popconnections(&con);
 			if (isuser())
-				PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)pc);
+				PERTASK_SET(this_exception_info.ei_data.e_faultaddr, (void *)pc);
 			RETHROW();
 		}
 		task_popconnections(&con);
@@ -1016,7 +1016,7 @@ throw_segfault:
 		} EXCEPT {
 			if (!was_thrown(E_SEGFAULT)) {
 				if (isuser())
-					PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)pc);
+					PERTASK_SET(this_exception_info.ei_data.e_faultaddr, (void *)pc);
 				RETHROW();
 			}
 			goto not_a_badcall;
@@ -1041,16 +1041,16 @@ throw_segfault:
 			                                    SIZEOF_IRREGS_KERNEL);
 		}
 #endif /* !__x86_64__ */
-		PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)old_eip);
-		PERTASK_SET(_this_exception_info.ei_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
-		PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)addr);
+		PERTASK_SET(this_exception_info.ei_data.e_faultaddr, (void *)old_eip);
+		PERTASK_SET(this_exception_info.ei_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
+		PERTASK_SET(this_exception_info.ei_data.e_pointers[0], (uintptr_t)addr);
 #if PAGEFAULT_F_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
 PAGEFAULT_F_WRITING == E_SEGFAULT_CONTEXT_WRITING
-		PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+		PERTASK_SET(this_exception_info.ei_data.e_pointers[1],
 		            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
 		            (uintptr_t)(ecode & (PAGEFAULT_F_USERSPACE | PAGEFAULT_F_WRITING)));
 #else
-		PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+		PERTASK_SET(this_exception_info.ei_data.e_pointers[1],
 		            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
 		            (uintptr_t)(ecode & PAGEFAULT_F_USERSPACE ? E_SEGFAULT_CONTEXT_USERCODE : 0) |
 		            (uintptr_t)(ecode & PAGEFAULT_F_WRITING ? E_SEGFAULT_CONTEXT_WRITING : 0));
@@ -1058,28 +1058,28 @@ PAGEFAULT_F_WRITING == E_SEGFAULT_CONTEXT_WRITING
 		{
 			unsigned int i;
 			for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
-				PERTASK_SET(_this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
+				PERTASK_SET(this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
 		}
 		goto do_unwind_state;
 	}
 not_a_badcall:
 	if ((ecode & (PAGEFAULT_F_PRESENT | PAGEFAULT_F_WRITING)) == (PAGEFAULT_F_PRESENT | PAGEFAULT_F_WRITING)) {
-		PERTASK_SET(_this_exception_info.ei_code, ERROR_CODEOF(E_SEGFAULT_READONLY));
+		PERTASK_SET(this_exception_info.ei_code, ERROR_CODEOF(E_SEGFAULT_READONLY));
 	} else if ((ecode & PAGEFAULT_F_PRESENT) && ((ecode & PAGEFAULT_F_INSTRFETCH) ||
 	                                             (pc == (uintptr_t)addr))) {
-		PERTASK_SET(_this_exception_info.ei_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
+		PERTASK_SET(this_exception_info.ei_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
 	} else {
-		PERTASK_SET(_this_exception_info.ei_code, ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
+		PERTASK_SET(this_exception_info.ei_code, ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
 	}
 set_exception_pointers:
-	PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)addr);
+	PERTASK_SET(this_exception_info.ei_data.e_pointers[0], (uintptr_t)addr);
 #if PAGEFAULT_F_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
     PAGEFAULT_F_WRITING == E_SEGFAULT_CONTEXT_WRITING
-	PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+	PERTASK_SET(this_exception_info.ei_data.e_pointers[1],
 	            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
 	            (uintptr_t)(ecode & (PAGEFAULT_F_USERSPACE | PAGEFAULT_F_WRITING)));
 #else
-	PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+	PERTASK_SET(this_exception_info.ei_data.e_pointers[1],
 	            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
 	            (uintptr_t)(ecode & PAGEFAULT_F_USERSPACE ? E_SEGFAULT_CONTEXT_USERCODE : 0) |
 	            (uintptr_t)(ecode & PAGEFAULT_F_WRITING ? E_SEGFAULT_CONTEXT_WRITING : 0));
@@ -1087,14 +1087,14 @@ set_exception_pointers:
 	{
 		unsigned int i;
 		for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
+			PERTASK_SET(this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
 #if EXCEPT_BACKTRACE_SIZE != 0
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-			PERTASK_SET(_this_exception_info.ei_trace[i], (void *)0);
+			PERTASK_SET(this_exception_info.ei_trace[i], (void *)0);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	}
 	/* Always make the state point to the instruction _after_ the one causing the problem. */
-	PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)pc);
+	PERTASK_SET(this_exception_info.ei_data.e_faultaddr, (void *)pc);
 	pc = (uintptr_t)instruction_trysucc((void const *)pc);
 #if 1
 	printk(KERN_DEBUG "Segmentation fault at %p (page %p) [pc=%p,%p] [ecode=%#x] [pid=%u]\n",

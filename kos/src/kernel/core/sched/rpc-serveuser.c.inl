@@ -53,7 +53,7 @@ NOTHROW(FCALL rpc_serve_async_user_redirection)(struct icpustate *__restrict sta
 	tls_error = error_info();
 	memcpy(&last_error, tls_error, sizeof(last_error));
 again_capture_chain:
-	chain = ATOMIC_XCH(PERTASK(_this_pending_rpcs), NULL);
+	chain = ATOMIC_XCH(PERTASK(this_rpcs_pending), NULL);
 again_chain:
 	if (chain) {
 		/* Service _all_ pending RPC functions (except for `RPC_KIND_USER_SYNC' without `RPC_KIND_CANSERVE'). */
@@ -69,7 +69,7 @@ again_chain:
 				struct rpc_entry *temp, **pchain;
 restore_rpc:
 				more   = chain->re_next;
-				pchain = &PERTASK(_this_pending_rpcs);
+				pchain = &PERTASK(this_rpcs_pending);
 				do {
 					temp = ATOMIC_READ(*pchain);
 					chain->re_next = temp;
@@ -98,8 +98,8 @@ restore_rpc:
 #endif /* RPC_SERVE_ALL */
 		if ((chain->re_kind & RPC_KIND_MASK) != RPC_KIND_USER) {
 			if (chain->re_kind & RPC_KIND_NOTHROW)
-				ATOMIC_FETCHDEC(PERTASK(_this_pending_sync_count_nx));
-			ATOMIC_FETCHDEC(PERTASK(_this_pending_sync_count));
+				ATOMIC_FETCHDEC(PERTASK(this_rpc_pending_sync_count_nx));
+			ATOMIC_FETCHDEC(PERTASK(this_rpc_pending_sync_count));
 		}
 		{
 			struct rpc_entry *more, *last;

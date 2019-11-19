@@ -114,12 +114,12 @@ DEFINE_SYSCALL3(errno_t, ioperm,
 		      E_INVALID_ARGUMENT_CONTEXT_IOPERM_TURNON,
 		      turn_on);
 	}
-	/* Manipulate the IOBM of our own thread through use of the `x86_cpuiob' vector.
+	/* Manipulate the IOBM of our own thread through use of the `thiscpu_x86_iob' vector.
 	 * Access to said vector is directly granted so-long as we keep the TASK_FKEEPCORE flag set. */
 	old_thread_flags = ATOMIC_FETCHOR(THIS_TASK->t_flags, TASK_FKEEPCORE);
 	TRY {
 		mycpu = THIS_CPU;
-		iob   = &FORCPU(mycpu, x86_cpuiob[0]);
+		iob   = &FORCPU(mycpu, thiscpu_x86_iob[0]);
 		/* Update bits for the given range. */
 		iob_setrange(iob,
 		             (u16)from,

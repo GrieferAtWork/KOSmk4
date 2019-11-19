@@ -86,7 +86,7 @@ INTERN void
 NOTHROW(FCALL GDBSerial_PutData)(void const *buf, size_t bufsize) {
 #if defined(__i386__) || defined(__x86_64__)
 #define MAKE_DWORD(a, b, c, d) ((u32)(a) | ((u32)(b) << 8) | ((u32)(c) << 16) | ((u32)(d) << 24))
-	if (__x86_bootcpu_idfeatures.ci_80000002a == MAKE_DWORD('Q', 'E', 'M', 'U')) {
+	if (x86_bootcpu_cpuid.ci_80000002a == MAKE_DWORD('Q', 'E', 'M', 'U')) {
 		/* Slight optimization: QEMU doesn't care about transmit-empty.
 		 * -> To make debugging with QEMU faster, write all data at once. */
 		outsb(SERIAL_IOADDR_THR(GDBSerial_IO_PortBase), buf, bufsize);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa8711bb */
+/* HASH CRC-32:0xbf202845 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -393,7 +393,7 @@ EXTERN(sys_recvmmsg64)
 
 
 INTERN(__asm32_bad_sysenter_extension)
-INTERN(x86_syscall_personality)
+EXTERN(x86_syscall_personality)
 
 
 

@@ -26,7 +26,7 @@
 INTERN_OBJECT(__kernel_percpu_tss)
 	/* u16   t_link; */   .word 0
 	/* u16 __t_zero0; */  .word 0
-	INTERN(__kernel_boottask_stack)
+	EXTERN(__kernel_boottask_stack)
 	/* u32   t_esp0 */    .long (__kernel_boottask_stack + KERNEL_STACKSIZE)
 	/* u16   t_ss0; */    .word SEGMENT_KERNEL_DATA
 	/* u16 __t_zero1; */  .word 0
@@ -36,9 +36,9 @@ INTERN_OBJECT(__kernel_percpu_tss)
 	/* u32   t_esp2; */   .long (__kernel_boottask_stack + KERNEL_STACKSIZE)
 	/* u16   t_ss2; */    .word SEGMENT_KERNEL_DATA
 	/* u16 __t_zero3; */  .word 0
-	INTERN(pagedir_kernel_phys)
+	EXTERN(pagedir_kernel_phys)
 	/* u32   t_cr3; */    .long pagedir_kernel_phys
-	INTERN(_start)
+	EXTERN(_start)
 	/* u32   t_eip; */    .long _start
 	/* u32   t_eflags; */ .long 0
 	/* u32   t_eax; */    .long 0
@@ -64,6 +64,6 @@ INTERN_OBJECT(__kernel_percpu_tss)
 	/* u16   t_ldtr; */   .word SEGMENT_NULL
 	/* u16 __t_zeroa; */  .word 0
 	/* u16   t_flags; */  .word 0
-	INTERN(__x86_cputss_iob_offset)
+	EXTERN(__x86_cputss_iob_offset)
 	/* u16   t_iomap; */  .word __x86_cputss_iob_offset
 END(__kernel_percpu_tss)

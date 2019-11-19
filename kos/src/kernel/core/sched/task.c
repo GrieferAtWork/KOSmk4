@@ -97,14 +97,14 @@ INTDEF byte_t __kernel_boottask_stack_page[];
 INTDEF byte_t __kernel_bootidle_stack_page[];
 
 PUBLIC ATTR_PERTASK struct vm_datapart
-__this_kernel_stack_part ASMNAME("_this_kernel_stack_part") = {
+_this_kernel_stackpart ASMNAME("this_kernel_stackpart") = {
 	/* .dp_refcnt = */ 1,
 	/* .dp_lock   = */ SHARED_RWLOCK_INIT,
 	{
 		/* .dp_tree = */ { NULL, NULL, 0, CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1 }
 	},
 	/* .dp_crefs = */ LLIST_INIT,
-	/* .dp_srefs = */ (struct vm_node *)&_this_kernel_stack,
+	/* .dp_srefs = */ (struct vm_node *)&this_kernel_stacknode,
 	/* .dp_stale = */ NULL,
 	/* .dp_block = */ &vm_datablock_anonymous,
 #if CEILDIV(KERNEL_STACKSIZE, PAGESIZE) > (BITS_PER_POINTER / VM_DATAPART_PPP_BITS)
@@ -115,7 +115,7 @@ __this_kernel_stack_part ASMNAME("_this_kernel_stack_part") = {
 	/* .dp_state = */ VM_DATAPART_STATE_LOCKED,
 	{
 		/* .dp_ramdata = */ {
-			/* .rd_blockv = */ &__this_kernel_stack_part.dp_ramdata.rd_block0,
+			/* .rd_blockv = */ &_this_kernel_stackpart.dp_ramdata.rd_block0,
 			{
 				/* .rd_block0 = */ {
 					/* .rb_start = */ 0, /* Filled later. */
@@ -133,15 +133,15 @@ __this_kernel_stack_part ASMNAME("_this_kernel_stack_part") = {
 	},
 };
 PUBLIC ATTR_PERTASK struct vm_node
-__this_kernel_stack ASMNAME("_this_kernel_stack") = {
+_this_kernel_stacknode ASMNAME("this_kernel_stacknode") = {
 	/* .vn_node      = */ { NULL, NULL, 0, 0 },
 	/* .vn_byaddr    = */ LLIST_INITNODE,
 	/* .vn_prot      = */ VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED,
 	/* .vn_flags     = */ VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED,
 	/* .vn_vm        = */ &vm_kernel,
-	/* .vn_part      = */ &__this_kernel_stack_part,
+	/* .vn_part      = */ &_this_kernel_stackpart,
 	/* .vn_block     = */ &vm_datablock_anonymous,
-	/* .vn_link      = */ { NULL, &LLIST_HEAD(__this_kernel_stack_part.dp_srefs) },
+	/* .vn_link      = */ { NULL, &LLIST_HEAD(_this_kernel_stackpart.dp_srefs) },
 	/* .vn_guard     = */ 0
 };
 
@@ -223,11 +223,11 @@ INTDEF FREE void KCALL kernel_initialize_scheduler_arch(void);
 LOCAL ATTR_FREETEXT void
 NOTHROW(KCALL initialize_predefined_vm_trampoline)(struct task *__restrict self,
                                                    vm_vpage_t vpage) {
-	FORTASK(self, _this_trampoline_node).vn_node.a_vmin = vpage;
-	FORTASK(self, _this_trampoline_node).vn_node.a_vmax = vpage;
+	FORTASK(self, this_trampoline_node).vn_node.a_vmin = vpage;
+	FORTASK(self, this_trampoline_node).vn_node.a_vmax = vpage;
 	/* Load the trampoline node into the kernel VM. */
-	assert(FORTASK(self, _this_trampoline_node).vn_vm == &vm_kernel);
-	vm_node_insert(&FORTASK(self, _this_trampoline_node));
+	assert(FORTASK(self, this_trampoline_node).vn_vm == &vm_kernel);
+	vm_node_insert(&FORTASK(self, this_trampoline_node));
 }
 
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
@@ -238,20 +238,34 @@ INTDEF NOBLOCK FREE vm_vpage_t
 NOTHROW(FCALL kernel_initialize_boot_trampolines)(void);
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
+PUBLIC ATTR_PERTASK struct exception_info this_exception_info = {};
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	vm_vpage_t boot_trampoline_pages;
-	DEFINE_PUBLIC_SYMBOL(_this_task, offsetof(struct task, t_self), sizeof(struct task));
-	DEFINE_PUBLIC_SYMBOL(_this_cpu, offsetof(struct task, t_cpu), sizeof(struct cpu *));
-	DEFINE_PUBLIC_SYMBOL(_this_vm, offsetof(struct task, t_vm), sizeof(struct vm *));
-	DEFINE_INTERN_SYMBOL(_this_sched_state, offsetof(struct task, t_sched.s_state), sizeof(struct scpustate *));
-	DEFINE_INTERN_SYMBOL(_this_sched_runprv, offsetof(struct task, t_sched.s_running.sr_runprv), sizeof(struct task *));
-	DEFINE_INTERN_SYMBOL(_this_sched_runnxt, offsetof(struct task, t_sched.s_running.sr_runnxt), sizeof(struct task *));
-	DEFINE_INTERN_SYMBOL(_this_cpu_id, offsetof(struct cpu, c_id), sizeof(cpuid_t));
-	DEFINE_INTERN_SYMBOL(_this_cpu_current, offsetof(struct cpu, c_current), sizeof(struct task *));
-	DEFINE_INTERN_SYMBOL(_this_cpu_override, offsetof(struct cpu, c_override), sizeof(struct task *));
-	DEFINE_INTERN_SYMBOL(_this_cpu_pending, offsetof(struct cpu, c_pending), sizeof(struct task *));
+	DEFINE_PUBLIC_SYMBOL(this_task, offsetof(struct task, t_self), sizeof(struct task));
+	DEFINE_PUBLIC_SYMBOL(this_cpu, offsetof(struct task, t_cpu), sizeof(struct cpu *));
+	DEFINE_PUBLIC_SYMBOL(this_vm, offsetof(struct task, t_vm), sizeof(struct vm *));
+	DEFINE_PUBLIC_SYMBOL(this_sched_state, offsetof(struct task, t_sched.s_state), sizeof(struct scpustate *));
+	DEFINE_PUBLIC_SYMBOL(this_sched_runprv, offsetof(struct task, t_sched.s_running.sr_runprv), sizeof(struct task *));
+	DEFINE_PUBLIC_SYMBOL(this_sched_runnxt, offsetof(struct task, t_sched.s_running.sr_runnxt), sizeof(struct task *));
+	DEFINE_PUBLIC_SYMBOL(thiscpu_id, offsetof(struct cpu, c_id), sizeof(cpuid_t));
+	DEFINE_PUBLIC_SYMBOL(thiscpu_current, offsetof(struct cpu, c_current), sizeof(struct task *));
+	DEFINE_PUBLIC_SYMBOL(thiscpu_override, offsetof(struct cpu, c_override), sizeof(struct task *));
+	DEFINE_PUBLIC_SYMBOL(thiscpu_pending, offsetof(struct cpu, c_pending), sizeof(struct task *));
+	DEFINE_PUBLIC_SYMBOL(thisvm_pdir_phys_ptr, offsetof(struct vm, v_pdir_phys_ptr), sizeof(vm_phys_t));
+	DEFINE_PUBLIC_SYMBOL(thiscpu_state, offsetof(struct cpu, c_state), sizeof(u16));
+	DEFINE_PUBLIC_SYMBOL(this_exception_code, &this_exception_info.ei_code, sizeof(this_exception_info.ei_code));
+	DEFINE_PUBLIC_SYMBOL(this_exception_data, &this_exception_info.ei_data, sizeof(this_exception_info.ei_data));
+	DEFINE_PUBLIC_SYMBOL(this_exception_state, &this_exception_info.ei_state, sizeof(this_exception_info.ei_state));
+	DEFINE_PUBLIC_SYMBOL(this_exception_pointers, &this_exception_info.ei_data.e_pointers, sizeof(this_exception_info.ei_data.e_pointers));
+	DEFINE_PUBLIC_SYMBOL(this_exception_flags, &this_exception_info.ei_flags, sizeof(this_exception_info.ei_flags));
+#if EXCEPT_BACKTRACE_SIZE != 0
+	DEFINE_PUBLIC_SYMBOL(this_exception_trace, &this_exception_info.ei_trace[0], sizeof(this_exception_info.ei_trace));
+#else /* EXCEPT_BACKTRACE_SIZE != 0 */
+	DEFINE_PUBLIC_SYMBOL(this_exception_trace, &this_exception_info, 0);
+#endif /* EXCEPT_BACKTRACE_SIZE == 0 */
+
 	assert(_boottask.t_refcnt == 1);
 	assert(_bootidle.t_refcnt == 1);
 
@@ -270,31 +284,31 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	initialize_predefined_vm_trampoline(&_boottask, boot_trampoline_pages + 0);
 	initialize_predefined_vm_trampoline(&_bootidle, boot_trampoline_pages + 1);
 
-	*(uintptr_t *)&FORTASK(&_boottask, __this_kernel_stack).vn_part += (uintptr_t)&_boottask;
-	*(uintptr_t *)&FORTASK(&_boottask, __this_kernel_stack).vn_link.ln_pself += (uintptr_t)&_boottask;
-	*(uintptr_t *)&FORTASK(&_boottask, __this_kernel_stack).vn_node.a_vmin = (uintptr_t)__kernel_boottask_stack_page;
-	*(uintptr_t *)&FORTASK(&_boottask, __this_kernel_stack).vn_node.a_vmax = (uintptr_t)__kernel_boottask_stack_page + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1;
-	*(uintptr_t *)&FORTASK(&_boottask, __this_kernel_stack_part).dp_srefs += (uintptr_t)&_boottask;
-	*(uintptr_t *)&FORTASK(&_boottask, __this_kernel_stack_part).dp_ramdata.rd_blockv += (uintptr_t)&_boottask;
-	*(uintptr_t *)&FORTASK(&_boottask, __this_kernel_stack_part).dp_ramdata.rd_block0.rb_start = VM_ADDR2PAGE((uintptr_t)__kernel_boottask_stack_page - KERNEL_BASE);
+	*(uintptr_t *)&FORTASK(&_boottask, _this_kernel_stacknode).vn_part += (uintptr_t)&_boottask;
+	*(uintptr_t *)&FORTASK(&_boottask, _this_kernel_stacknode).vn_link.ln_pself += (uintptr_t)&_boottask;
+	*(uintptr_t *)&FORTASK(&_boottask, _this_kernel_stacknode).vn_node.a_vmin = (uintptr_t)__kernel_boottask_stack_page;
+	*(uintptr_t *)&FORTASK(&_boottask, _this_kernel_stacknode).vn_node.a_vmax = (uintptr_t)__kernel_boottask_stack_page + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1;
+	*(uintptr_t *)&FORTASK(&_boottask, _this_kernel_stackpart).dp_srefs += (uintptr_t)&_boottask;
+	*(uintptr_t *)&FORTASK(&_boottask, _this_kernel_stackpart).dp_ramdata.rd_blockv += (uintptr_t)&_boottask;
+	*(uintptr_t *)&FORTASK(&_boottask, _this_kernel_stackpart).dp_ramdata.rd_block0.rb_start = VM_ADDR2PAGE((uintptr_t)__kernel_boottask_stack_page - KERNEL_BASE);
 
-	*(uintptr_t *)&FORTASK(&_bootidle, __this_kernel_stack).vn_part += (uintptr_t)&_bootidle;
-	*(uintptr_t *)&FORTASK(&_bootidle, __this_kernel_stack).vn_link.ln_pself += (uintptr_t)&_bootidle;
-	*(uintptr_t *)&FORTASK(&_bootidle, __this_kernel_stack_part).dp_srefs += (uintptr_t)&_bootidle;
-	*(uintptr_t *)&FORTASK(&_bootidle, __this_kernel_stack).vn_node.a_vmin = (uintptr_t)__kernel_bootidle_stack_page;
-	*(uintptr_t *)&FORTASK(&_bootidle, __this_kernel_stack).vn_node.a_vmax = (uintptr_t)__kernel_bootidle_stack_page + CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1;
-	*(uintptr_t *)&FORTASK(&_bootidle, __this_kernel_stack_part).dp_ramdata.rd_blockv += (uintptr_t)&_bootidle;
-	*(uintptr_t *)&FORTASK(&_bootidle, __this_kernel_stack_part).dp_ramdata.rd_block0.rb_start = VM_ADDR2PAGE((uintptr_t)__kernel_bootidle_stack_page - KERNEL_BASE);
-	*(uintptr_t *)&FORTASK(&_bootidle, __this_kernel_stack_part).dp_tree.a_vmax                = CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1;
-	*(uintptr_t *)&FORTASK(&_bootidle, __this_kernel_stack_part).dp_ramdata.rd_block0.rb_size  = CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE);
+	*(uintptr_t *)&FORTASK(&_bootidle, _this_kernel_stacknode).vn_part += (uintptr_t)&_bootidle;
+	*(uintptr_t *)&FORTASK(&_bootidle, _this_kernel_stacknode).vn_link.ln_pself += (uintptr_t)&_bootidle;
+	*(uintptr_t *)&FORTASK(&_bootidle, _this_kernel_stackpart).dp_srefs += (uintptr_t)&_bootidle;
+	*(uintptr_t *)&FORTASK(&_bootidle, _this_kernel_stacknode).vn_node.a_vmin = (uintptr_t)__kernel_bootidle_stack_page;
+	*(uintptr_t *)&FORTASK(&_bootidle, _this_kernel_stacknode).vn_node.a_vmax = (uintptr_t)__kernel_bootidle_stack_page + CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1;
+	*(uintptr_t *)&FORTASK(&_bootidle, _this_kernel_stackpart).dp_ramdata.rd_blockv += (uintptr_t)&_bootidle;
+	*(uintptr_t *)&FORTASK(&_bootidle, _this_kernel_stackpart).dp_ramdata.rd_block0.rb_start = VM_ADDR2PAGE((uintptr_t)__kernel_bootidle_stack_page - KERNEL_BASE);
+	*(uintptr_t *)&FORTASK(&_bootidle, _this_kernel_stackpart).dp_tree.a_vmax                = CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1;
+	*(uintptr_t *)&FORTASK(&_bootidle, _this_kernel_stackpart).dp_ramdata.rd_block0.rb_size  = CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE);
 
-	FORTASK(&_boottask, _this_fs)             = &fs_kernel;
-	FORTASK(&_bootidle, _this_fs)             = &fs_kernel;
-	FORTASK(&_boottask, _this_handle_manager) = &handle_manager_kernel;
-	FORTASK(&_bootidle, _this_handle_manager) = &handle_manager_kernel;
+	FORTASK(&_boottask, this_fs)             = &fs_kernel;
+	FORTASK(&_bootidle, this_fs)             = &fs_kernel;
+	FORTASK(&_boottask, this_handle_manager) = &handle_manager_kernel;
+	FORTASK(&_bootidle, this_handle_manager) = &handle_manager_kernel;
 
 	/* The stack of IDLE threads is executable in order to allow for hacking around .free restrictions. */
-	FORTASK(&_bootidle, __this_kernel_stack).vn_prot = (VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ);
+	FORTASK(&_bootidle, _this_kernel_stacknode).vn_prot = (VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ);
 
 	vm_kernel.v_tasks             = &_boottask;
 	_boottask.t_vm_tasks.ln_pself = &vm_kernel.v_tasks;
@@ -335,8 +349,8 @@ NOTHROW(KCALL kernel_initialize_scheduler_callbacks)(void) {
 
 
 
-DATDEF ATTR_PERTASK struct vm_datapart __this_kernel_stack_part ASMNAME("_this_kernel_stack_part");
-DATDEF ATTR_PERTASK struct vm_node __this_kernel_stack ASMNAME("_this_kernel_stack");
+DATDEF ATTR_PERTASK struct vm_datapart _this_kernel_stackpart ASMNAME("this_kernel_stackpart");
+DATDEF ATTR_PERTASK struct vm_node _this_kernel_stacknode ASMNAME("this_kernel_stacknode");
 
 INTERN NOBLOCK void
 NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
@@ -351,12 +365,12 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 	assert(sync_writing(&vm_kernel.v_treelock));
 
 	/* Unlink + unmap the trampoline node. */
-	node = vm_node_remove(&vm_kernel, FORTASK(self, _this_trampoline_node).vn_node.a_vmin);
-	assertf(node == &FORTASK(self, _this_trampoline_node),
+	node = vm_node_remove(&vm_kernel, FORTASK(self, this_trampoline_node).vn_node.a_vmin);
+	assertf(node == &FORTASK(self, this_trampoline_node),
 	        "node                                 = %p\n"
-	        "&FORTASK(self,_this_trampoline_node) = %p\n"
+	        "&FORTASK(self,this_trampoline_node) = %p\n"
 	        "self                                 = %p\n",
-	        node, &FORTASK(self, _this_trampoline_node), self);
+	        node, &FORTASK(self, this_trampoline_node), self);
 	pagedir_unmapone(node->vn_node.a_vmin);
 	pagedir_syncone(node->vn_node.a_vmin);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
@@ -364,12 +378,12 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Unlink + unmap the stack node. */
-	node = vm_node_remove(&vm_kernel, FORTASK(self, __this_kernel_stack).vn_node.a_vmin);
-	assertf(node == &FORTASK(self, __this_kernel_stack),
+	node = vm_node_remove(&vm_kernel, FORTASK(self, _this_kernel_stacknode).vn_node.a_vmin);
+	assertf(node == &FORTASK(self, _this_kernel_stacknode),
 	        "node                               = %p\n"
-	        "&FORTASK(self,__this_kernel_stack) = %p\n"
+	        "&FORTASK(self,_this_kernel_stacknode) = %p\n"
 	        "self                               = %p\n",
-	        node, &FORTASK(self, __this_kernel_stack), self);
+	        node, &FORTASK(self, _this_kernel_stacknode), self);
 	pagedir_unmap(VM_NODE_START(node), VM_NODE_SIZE(node));
 	pagedir_sync(VM_NODE_START(node), VM_NODE_SIZE(node));
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
@@ -377,7 +391,7 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Deallocate the kernel stack. */
-	vm_datapart_do_freeram(&FORTASK(self, __this_kernel_stack_part));
+	vm_datapart_do_freeram(&FORTASK(self, _this_kernel_stackpart));
 
 	{
 		REF struct vm *myvm = self->t_vm;
@@ -461,13 +475,13 @@ PUBLIC WUNUSED ATTR_MALLOC ATTR_RETNONNULL REF struct task *
 	memcpy(result, __kernel_pertask_start, (size_t)__kernel_pertask_size);
 	result->t_heapsz = resptr.hp_siz;
 	result->t_self   = result;
-	incref(&vm_datablock_anonymous); /* FORTASK(result,__this_kernel_stack).vn_block */
-	incref(&vm_datablock_anonymous); /* FORTASK(result,__this_kernel_stack_part).dp_block */
-	*(uintptr_t *)&FORTASK(result, __this_kernel_stack).vn_part += (uintptr_t)result;
-	*(uintptr_t *)&FORTASK(result, __this_kernel_stack).vn_link.ln_pself += (uintptr_t)result;
-	*(uintptr_t *)&FORTASK(result, __this_kernel_stack_part).dp_srefs += (uintptr_t)result;
+	incref(&vm_datablock_anonymous); /* FORTASK(result,_this_kernel_stacknode).vn_block */
+	incref(&vm_datablock_anonymous); /* FORTASK(result,_this_kernel_stackpart).dp_block */
+	*(uintptr_t *)&FORTASK(result, _this_kernel_stacknode).vn_part += (uintptr_t)result;
+	*(uintptr_t *)&FORTASK(result, _this_kernel_stacknode).vn_link.ln_pself += (uintptr_t)result;
+	*(uintptr_t *)&FORTASK(result, _this_kernel_stackpart).dp_srefs += (uintptr_t)result;
 	TRY {
-		vm_datapart_do_allocram(&FORTASK(result, __this_kernel_stack_part));
+		vm_datapart_do_allocram(&FORTASK(result, _this_kernel_stackpart));
 		TRY {
 			vm_vpage_t stack_page;
 			vm_vpage_t trampoline_page;
@@ -485,15 +499,15 @@ again_lock_vm:
 				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 				      (uintptr_t)CEILDIV(KERNEL_STACKSIZE, PAGESIZE));
 			}
-			FORTASK(result, __this_kernel_stack).vn_node.a_vmin = stack_page;
-			FORTASK(result, __this_kernel_stack).vn_node.a_vmax = stack_page + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1;
+			FORTASK(result, _this_kernel_stacknode).vn_node.a_vmin = stack_page;
+			FORTASK(result, _this_kernel_stacknode).vn_node.a_vmax = stack_page + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1;
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if unlikely(!pagedir_prepare_map(stack_page, CEILDIV(KERNEL_STACKSIZE, PAGESIZE))) {
 				vm_kernel_treelock_endwrite();
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, (uintptr_t)1);
 			}
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-			vm_node_insert(&FORTASK(result, __this_kernel_stack));
+			vm_node_insert(&FORTASK(result, _this_kernel_stacknode));
 
 			/* Map the trampoline node. */
 			trampoline_page = vm_getfree(&vm_kernel,
@@ -506,26 +520,26 @@ again_lock_vm:
 					goto again_lock_vm;
 				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, (uintptr_t)1);
 			}
-			FORTASK(result, _this_trampoline_node).vn_node.a_vmin = trampoline_page;
-			FORTASK(result, _this_trampoline_node).vn_node.a_vmax = trampoline_page;
+			FORTASK(result, this_trampoline_node).vn_node.a_vmin = trampoline_page;
+			FORTASK(result, this_trampoline_node).vn_node.a_vmax = trampoline_page;
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if unlikely(!pagedir_prepare_mapone(trampoline_page))
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, (uintptr_t)1);
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			/* Load the trampoline node into the kernel VM. */
-			vm_node_insert(&FORTASK(result, _this_trampoline_node));
+			vm_node_insert(&FORTASK(result, this_trampoline_node));
 
 			/* Map the stack into memory */
-			vm_datapart_map_ram(&FORTASK(result, __this_kernel_stack_part), stack_page,
+			vm_datapart_map_ram(&FORTASK(result, _this_kernel_stackpart), stack_page,
 			                    PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 			vm_kernel_treelock_endwrite();
 		} EXCEPT {
-			vm_datapart_do_ccfreeram(&FORTASK(result, __this_kernel_stack_part));
+			vm_datapart_do_ccfreeram(&FORTASK(result, _this_kernel_stackpart));
 			RETHROW();
 		}
 	} EXCEPT {
-		decref_nokill(&vm_datablock_anonymous); /* FORTASK(result,__this_kernel_stack_part).dp_block */
-		decref_nokill(&vm_datablock_anonymous); /* FORTASK(result,__this_kernel_stack).vn_block */
+		decref_nokill(&vm_datablock_anonymous); /* FORTASK(result,_this_kernel_stackpart).dp_block */
+		decref_nokill(&vm_datablock_anonymous); /* FORTASK(result,_this_kernel_stacknode).vn_block */
 		heap_free(&kernel_locked_heap,
 		          resptr.hp_ptr,
 		          resptr.hp_siz,

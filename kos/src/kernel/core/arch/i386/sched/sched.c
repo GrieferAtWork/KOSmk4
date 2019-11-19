@@ -97,7 +97,7 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
 	struct scpustate *state;
 	va_list args; byte_t *dest;
 	va_start(args, argc);
-	dest = (byte_t *)FORTASK(thread, x86_this_kernel_sp0);
+	dest = (byte_t *)FORTASK(thread, this_x86_kernel_psp0);
 	*(u64 *)(dest -= 8) = (u64)(void *)((void *)(void(FCALL *)(int))&task_exit);
 	if (argc > 6)
 		dest -= (argc - 6) * 8;
@@ -133,7 +133,7 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
 			((u64 *)dest)[i] = va_arg(args, u64);
 	}
 #else /* __x86_64__ */
-	byte_t *dest = (byte_t *)FORTASK(thread, x86_this_kernel_sp0);
+	byte_t *dest = (byte_t *)FORTASK(thread, this_x86_kernel_psp0);
 	struct scpustate *state;
 #define PUSH(x) (dest -= sizeof(u32), *(u32 *)dest = (x))
 	dest -= argc * sizeof(void *);
@@ -156,10 +156,10 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
 	/* TODO: Must also execute thread startup callbacks! */
 	ATOMIC_FETCHOR(thread->t_flags, TASK_FKERNTHREAD);
 	thread->t_sched.s_state = state;
-	if (!FORTASK(thread, _this_fs))
-		FORTASK(thread, _this_fs) = incref(&fs_kernel);
-	if (!FORTASK(thread, _this_handle_manager))
-		FORTASK(thread, _this_handle_manager) = incref(&handle_manager_kernel);
+	if (!FORTASK(thread, this_fs))
+		FORTASK(thread, this_fs) = incref(&fs_kernel);
+	if (!FORTASK(thread, this_handle_manager))
+		FORTASK(thread, this_handle_manager) = incref(&handle_manager_kernel);
 	return thread;
 }
 
@@ -173,7 +173,7 @@ INTDEF NOBLOCK void NOTHROW(KCALL x86_cpu_enable_preemptive_interrupts_nopr)(voi
 PUBLIC NOBLOCK void
 NOTHROW(KCALL cpu_disable_preemptive_interrupts)(void) {
 	assert(!PREEMPTION_ENABLED() ||
-	       (PERTASK_GET(_this_task.t_flags) & (TASK_FKEEPCORE | TASK_FTERMINATING)));
+	       (PERTASK_GET(this_task.t_flags) & (TASK_FKEEPCORE | TASK_FTERMINATING)));
 	x86_cpu_disable_preemptive_interrupts();
 	/* TODO: Track the time that passes between here and the
 	 *       next call to `cpu_enable_preemptive_interrupts()' */
@@ -191,7 +191,7 @@ NOTHROW(KCALL cpu_disable_preemptive_interrupts_nopr)(void) {
 PUBLIC NOBLOCK void
 NOTHROW(KCALL cpu_enable_preemptive_interrupts)(void) {
 	assert(!PREEMPTION_ENABLED() ||
-	       (PERTASK_GET(_this_task.t_flags) & (TASK_FKEEPCORE | TASK_FTERMINATING)));
+	       (PERTASK_GET(this_task.t_flags) & (TASK_FKEEPCORE | TASK_FTERMINATING)));
 	/* TODO: Track the time that passes between here and the
 	 *       last call to `cpu_disable_preemptive_interrupts()' */
 	x86_cpu_enable_preemptive_interrupts();
@@ -245,9 +245,9 @@ NOTHROW(FCALL task_push_asynchronous_srpc)(struct scpustate *__restrict state,
  * return target to instead point back towards a kernel-space function which is then
  * able to service RPC functions scheduled using `task_(schedule|exec)_user_[s]rpc()'
  * On x86, this is done by modifying the IRET tail at the top of the target thread's stack:
- *   >> FORTASK(self,x86_rpc_redirection_iret).ir_eip    = GET_USERCODE_IRET(self)->ir_eip;
- *   >> FORTASK(self,x86_rpc_redirection_iret).ir_cs     = GET_USERCODE_IRET(self)->ir_cs;
- *   >> FORTASK(self,x86_rpc_redirection_iret).ir_eflags = GET_USERCODE_IRET(self)->ir_eflags;
+ *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_eip    = GET_USERCODE_IRET(self)->ir_eip;
+ *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_cs     = GET_USERCODE_IRET(self)->ir_cs;
+ *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_eflags = GET_USERCODE_IRET(self)->ir_eflags;
  *   >> GET_USERCODE_IRET(self)->ir_eip                  = &x86_rpc_user_redirection;
  *   >> GET_USERCODE_IRET(self)->ir_cs                   = SEGMENT_KERNEL_CODE;
  *   >> GET_USERCODE_IRET(self)->ir_eflags               = 0;
@@ -545,7 +545,7 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 	assert(self->t_cpu == THIS_CPU);
 	assert(!(self->t_flags & TASK_FKERNTHREAD));
 #define stacktop() \
-	((byte_t *)VM_PAGE2ADDR((FORTASK((struct task *)self, _this_kernel_stack).vn_node.a_vmax) + 1))
+	((byte_t *)PERTASK_GET(*(uintptr_t *)&this_x86_kernel_psp0))
 	result = (struct irregs_user *)(stacktop() - SIZEOF_IRREGS_USER);
 	/* We need to account for the special case of the IRET tail pointing a VM86 thread!
 	 * If this is the case, then fields of `result' are currently mapped as:
@@ -587,9 +587,9 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
  * return target to instead point back towards a kernel-space function which is then
  * able to service RPC functions scheduled using `task_(schedule|exec)_user_[s]rpc()'
  * On x86, this is done by modifying the IRET tail at the top of the target thread's stack:
- *   >> FORTASK(self,x86_rpc_redirection_iret).ir_eip    = GET_USERCODE_IRET(self)->ir_eip;
- *   >> FORTASK(self,x86_rpc_redirection_iret).ir_cs     = GET_USERCODE_IRET(self)->ir_cs;
- *   >> FORTASK(self,x86_rpc_redirection_iret).ir_eflags = GET_USERCODE_IRET(self)->ir_eflags;
+ *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_eip    = GET_USERCODE_IRET(self)->ir_eip;
+ *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_cs     = GET_USERCODE_IRET(self)->ir_cs;
+ *   >> FORTASK(self,this_x86_rpc_redirection_iret).ir_eflags = GET_USERCODE_IRET(self)->ir_eflags;
  *   >> GET_USERCODE_IRET(self)->ir_eip                  = &x86_rpc_user_redirection;
  *   >> GET_USERCODE_IRET(self)->ir_cs                   = SEGMENT_KERNEL_CODE;
  *   >> GET_USERCODE_IRET(self)->ir_eflags               = 0;
@@ -618,10 +618,10 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 		u32 eflags;
 		fixup = (byte_t *)self->t_sched.s_state;
 		assertf((fixup + OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL) ==
-		        (byte_t *)(VM_PAGE2ADDR(FORTASK(self, _this_kernel_stack).vn_node.a_vmax + 1) - 16),
+		        (byte_t *)(FORTASK(self, this_x86_kernel_psp0) - 16),
 		        "Fixup(%p) itn't placed 16 bytes below stack_end(%p) (16 == { IP,CS,SP,SS })",
 		        (fixup + OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL),
-		        (byte_t *)VM_PAGE2ADDR(FORTASK(self, _this_kernel_stack).vn_node.a_vmax + 1));
+		        (byte_t *)FORTASK(self, this_x86_kernel_psp0));
 		/* Allocate 4 additional bytes. */
 		fixup = (byte_t *)memmove(fixup - 4, fixup,
 		                          OFFSET_SCPUSTATE_IRREGS +
@@ -647,9 +647,9 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 	        "User-space IRET with invalid CS (%p)", thread_iret->ir_cs);
 	assertf(thread_iret->ir_eflags & EFLAGS_IF,
 	        "User-space IRET without EFLAGS.IF (%p)", thread_iret->ir_eflags);
-	FORTASK(self, x86_rpc_redirection_iret).ir_eip    = thread_iret->ir_eip;
-	FORTASK(self, x86_rpc_redirection_iret).ir_cs     = thread_iret->ir_cs;
-	FORTASK(self, x86_rpc_redirection_iret).ir_eflags = thread_iret->ir_eflags;
+	FORTASK(self, this_x86_rpc_redirection_iret).ir_eip    = thread_iret->ir_eip;
+	FORTASK(self, this_x86_rpc_redirection_iret).ir_cs     = thread_iret->ir_cs;
+	FORTASK(self, this_x86_rpc_redirection_iret).ir_eflags = thread_iret->ir_eflags;
 	/* NOTE: The write-order of all of these is highly important,
 	 *       so just put a write-barrier around every write.
 	 *       For more information, see `irregs_rdip()' and friends. */

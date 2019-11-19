@@ -214,7 +214,7 @@
 #define __CRT_HAVE_cpu_quantum_elapsed 1
 #define __CRT_HAVE_cpu_quantum_elapsed_nopr 1
 #define __CRT_HAVE_cpu_quantum_end 1
-#define __CRT_HAVE_cpu_quantum_length 1
+#define __CRT_HAVE_thiscpu_quantum_length 1
 #define __CRT_HAVE_cpu_quantum_offset 1
 #define __CRT_HAVE_cpu_quantum_remaining 1
 #define __CRT_HAVE_cpu_quantum_remaining_nopr 1

@@ -174,26 +174,25 @@ INTDEF dbg_callback_t const __kernel_dbg_fini_end[];
 
 
 
-INTDEF void NOTHROW(KCALL x86_init_this_kernel_sp)(struct task *__restrict self);
+INTDEF void NOTHROW(KCALL init_this_x86_kernel_psp0)(struct task *__restrict self);
 #ifndef __x86_64__
-INTDEF void NOTHROW(KCALL x86_this_userkern_init)(struct task *__restrict self);
+INTDEF void NOTHROW(KCALL init_this_x86_userkern)(struct task *__restrict self);
 #endif /* !__x86_64__ */
 INTDEF NOBLOCK void NOTHROW(KCALL pertask_readlocks_init)(struct task *__restrict thread);
 INTDEF NOBLOCK void NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self);
 
-INTDEF ATTR_PERTASK struct task_connections _this_cons;
-
+INTDEF ATTR_PERTASK struct task_connections this_cons;
 INTDEF void NOTHROW(KCALL x86_initialize_pic)(void);
 
 
 PRIVATE ATTR_DBGTEXT NOBLOCK void
 NOTHROW(KCALL dbg_ensure_initialized_pertask)(struct task *__restrict self) {
-	if (!FORTASK(self, x86_this_kernel_sp0))
-		x86_init_this_kernel_sp(self);
-	if (!FORTASK(self, _this_read_locks).rls_vec)
+	if (!FORTASK(self, this_x86_kernel_psp0))
+		init_this_x86_kernel_psp0(self);
+	if (!FORTASK(self, this_read_locks).rls_vec)
 		pertask_readlocks_init(self);
-	if (!FORTASK(self, _this_cons).tc_static_v ||
-	    FORTASK(self, _this_cons).tc_signals.ts_thread != self)
+	if (!FORTASK(self, this_cons).tc_static_v ||
+	    FORTASK(self, this_cons).tc_signals.ts_thread != self)
 		pertask_init_task_connections(self);
 }
 
@@ -232,13 +231,13 @@ NOTHROW(KCALL cpu_broadcastipi_notthis_early_boot_aware)(cpu_ipi_t func,
 INTERN ATTR_DBGTEXT void KCALL dbg_fix_segments(void) {
 
 	/* Setup kernel segment bases. */
-	segment_wrbaseX(&x86_debug_gdt[SEGMENT_INDEX(SEGMENT_CPU_TSS)], (uintptr_t)&FORCPU(debug_mycpu, x86_cputss));
-	segment_wrbaseX(&x86_debug_gdt[SEGMENT_INDEX(SEGMENT_CPU_LDT)], (uintptr_t)&FORCPU(debug_mycpu, x86_cpuldt));
+	segment_wrbaseX(&x86_debug_gdt[SEGMENT_INDEX(SEGMENT_CPU_TSS)], (uintptr_t)&FORCPU(debug_mycpu, thiscpu_x86_tss));
+	segment_wrbaseX(&x86_debug_gdt[SEGMENT_INDEX(SEGMENT_CPU_LDT)], (uintptr_t)&FORCPU(debug_mycpu, thiscpu_x86_ldt));
 #ifndef __x86_64__
-	segment_wrbaseX(&x86_debug_gdt[SEGMENT_INDEX(SEGMENT_CPU_TSS_DF)], (uintptr_t)&FORCPU(debug_mycpu, x86_cputss_df));
+	segment_wrbaseX(&x86_debug_gdt[SEGMENT_INDEX(SEGMENT_CPU_TSS_DF)], (uintptr_t)&FORCPU(debug_mycpu, thiscpu_x86_tssdf));
 	segment_wrbaseX(&x86_debug_gdt[SEGMENT_INDEX(SEGMENT_KERNEL_FSBASE)], (uintptr_t)debug_original_thread_);
-	segment_wrbaseX(&x86_debug_gdt[SEGMENT_INDEX(SEGMENT_USER_FSBASE)], (uintptr_t)FORTASK(debug_original_thread_, x86_this_user_fsbase));
-	segment_wrbaseX(&x86_debug_gdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)], (uintptr_t)FORTASK(debug_original_thread_, x86_this_user_gsbase));
+	segment_wrbaseX(&x86_debug_gdt[SEGMENT_INDEX(SEGMENT_USER_FSBASE)], (uintptr_t)FORTASK(debug_original_thread_, this_x86_user_fsbase));
+	segment_wrbaseX(&x86_debug_gdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)], (uintptr_t)FORTASK(debug_original_thread_, this_x86_user_gsbase));
 #endif /* !__x86_64__ */
 	x86_debug_gdt[SEGMENT_INDEX(SEGMENT_CPU_TSS)].s_tss.t_type_bits.ttb_busy = 0; /* BUSY=0 */
 	__ltr(SEGMENT_CPU_TSS);
@@ -273,7 +272,7 @@ INTERN ATTR_DBGTEXT void KCALL dbg_init(void) {
 		u8 id = (u8)(lapic_read(APIC_ID) >> APIC_ID_FSHIFT);
 		debug_mycpu = &_bootcpu;
 		for (i = 0; i < cpu_count; ++i) {
-			if (FORCPU(cpu_vector[i], x86_lapic_id) == id) {
+			if (FORCPU(cpu_vector[i], thiscpu_x86_lapicid) == id) {
 				debug_mycpu = cpu_vector[i];
 				break;
 			}
@@ -299,7 +298,7 @@ INTERN ATTR_DBGTEXT void KCALL dbg_init(void) {
 
 	/* Preserve active exception information. */
 	memcpy(&debug_old_exception_info,
-	       &FORTASK(debug_original_thread_, _this_exception_info),
+	       &FORTASK(debug_original_thread_, this_exception_info),
 	       sizeof(debug_old_exception_info));
 
 	/* Ensure that pertask scheduler variables are initialized
@@ -308,7 +307,7 @@ INTERN ATTR_DBGTEXT void KCALL dbg_init(void) {
 	 * be the case, however other parts of the debugger rely on
 	 * components that require these variables to be initialized. */
 	dbg_ensure_initialized_pertask(debug_original_thread_);
-	dbg_ensure_initialized_pertask(&FORCPU(debug_mycpu, _this_idle));
+	dbg_ensure_initialized_pertask(&FORCPU(debug_mycpu, thiscpu_idle));
 	dbg_ensure_initialized_pertask(&_boottask);
 	dbg_ensure_initialized_pertask(&_bootidle);
 
@@ -350,7 +349,7 @@ INTERN ATTR_DBGTEXT void KCALL dbg_fini(void) {
 	dbg_finalize_tty();
 
 	/* Restore active exception information. */
-	memcpy(&FORTASK(debug_original_thread_, _this_exception_info),
+	memcpy(&FORTASK(debug_original_thread_, this_exception_info),
 	       &debug_old_exception_info,
 	       sizeof(debug_old_exception_info));
 	assert(debug_original_thread_ == debug_mycpu->c_current);

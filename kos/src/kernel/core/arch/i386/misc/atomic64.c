@@ -68,7 +68,7 @@ NOTHROW(FCALL install_jmp)(void *redirection_addr,
 /* Initialize the atomic64 configuration */
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_atomic64)(void) {
-	if (__x86_bootcpu_idfeatures.ci_1d & CPUID_1D_CX8) {
+	if (x86_bootcpu_cpuid.ci_1d & CPUID_1D_CX8) {
 		/* Machine has native 64-bit atomic support. */
 	} else {
 		/* Must use the 64-bit atomic emulation. */

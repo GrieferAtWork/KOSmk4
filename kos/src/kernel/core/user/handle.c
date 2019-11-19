@@ -430,15 +430,15 @@ DEFINE_DBG_BZERO_IF(THIS_HANDLE_MANAGER != NULL,
 
 
 /* [1..1][lock(PRIVATE(THIS_TASK))] Handle manager of the calling thread. */
-PUBLIC ATTR_PERTASK struct handle_manager *_this_handle_manager = NULL;
-DEFINE_PERTASK_FINI(finalize_this_handle_manager);
-PRIVATE ATTR_USED NOBLOCK void
-NOTHROW(KCALL finalize_this_handle_manager)(struct task *__restrict self) {
-	xdecref(FORTASK(self, _this_handle_manager));
+PUBLIC ATTR_PERTASK struct handle_manager *this_handle_manager = NULL;
+DEFINE_PERTASK_FINI(fini_this_handle_manager);
+INTERN NOBLOCK void
+NOTHROW(KCALL fini_this_handle_manager)(struct task *__restrict self) {
+	xdecref(FORTASK(self, this_handle_manager));
 }
 
 DEFINE_PERTASK_CLONE(clone_this_handle_manager);
-PRIVATE ATTR_USED void KCALL
+INTERN void KCALL
 clone_this_handle_manager(struct task *__restrict new_thread, uintptr_t flags) {
 	struct handle_manager *hman;
 	hman = THIS_HANDLE_MANAGER;
@@ -449,12 +449,12 @@ clone_this_handle_manager(struct task *__restrict new_thread, uintptr_t flags) {
 		/* Clone the old handle manager. */
 		hman = handle_manager_clone(hman);
 	}
-	assert(!FORTASK(new_thread, _this_handle_manager));
-	FORTASK(new_thread, _this_handle_manager) = hman; /* Inherit reference */
+	assert(!FORTASK(new_thread, this_handle_manager));
+	FORTASK(new_thread, this_handle_manager) = hman; /* Inherit reference */
 }
 
 
-/* Lock for accessing any remote thread's _this_handle_manager field */
+/* Lock for accessing any remote thread's this_handle_manager field */
 PRIVATE struct atomic_rwlock handle_manager_change_lock = ATOMIC_RWLOCK_INIT;
 DEFINE_DBG_BZERO_OBJECT(handle_manager_change_lock);
 
@@ -464,8 +464,8 @@ NOTHROW(FCALL task_gethandlemanager)(struct task *__restrict thread) {
 	REF struct handle_manager *result;
 	while unlikely(!sync_tryread(&handle_manager_change_lock))
 		task_pause();
-	assert(FORTASK(thread, _this_handle_manager));
-	result = incref(FORTASK(thread, _this_handle_manager));
+	assert(FORTASK(thread, this_handle_manager));
+	result = incref(FORTASK(thread, this_handle_manager));
 	sync_endread(&handle_manager_change_lock);
 	return result;
 }
@@ -483,8 +483,8 @@ again:
 		task_yield();
 		goto again;
 	}
-	result = PERTASK(_this_handle_manager);
-	PERTASK(_this_handle_manager) = incref(newman);
+	result = PERTASK(this_handle_manager);
+	PERTASK(this_handle_manager) = incref(newman);
 	sync_endwrite(&handle_manager_change_lock);
 	PREEMPTION_POP(was);
 	assert(result);

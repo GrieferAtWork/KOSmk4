@@ -93,14 +93,14 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *      <cpuid: brand_string="BOCHS         Intel(R) Pentium(R) 4 CPU        ">
 	 *       in your .bxrc file
 	 */
-	if (__x86_bootcpu_idfeatures.ci_80000002a == MAKE_DWORD('Q', 'E', 'M', 'U'))
+	if (x86_bootcpu_cpuid.ci_80000002a == MAKE_DWORD('Q', 'E', 'M', 'U'))
 		debug_port = (port_t)0x3f8;
-	else if (__x86_bootcpu_idfeatures.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H')) {
+	else if (x86_bootcpu_cpuid.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H')) {
 		debug_port = (port_t)0xe9;
 	}
 
 	printk(FREESTR(KERN_NOTICE "[boot] Begin kernel initialization\n"));
-	printk(FREESTR(KERN_INFO "[boot] CPU brand: %q\n"), __x86_bootcpu_idfeatures.ci_brand);
+	printk(FREESTR(KERN_INFO "[boot] CPU brand: %q\n"), x86_bootcpu_cpuid.ci_brand);
 
 	/* Initialize the paging configuration */
 	x86_initialize_paging();
@@ -244,7 +244,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 #ifndef CONFIG_NO_USERKERN_SEGMENT
 #ifdef __x86_64__
-	__wrgsbase((void *)x86_this_userkern_init());
+	__wrgsbase((void *)init_this_x86_userkern());
 #else /* __x86_64__ */
 	update_user_fsbase();
 #endif /* !__x86_64__ */

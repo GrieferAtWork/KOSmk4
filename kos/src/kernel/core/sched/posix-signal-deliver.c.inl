@@ -85,14 +85,14 @@ task_raisesignalthread(struct task *__restrict target,
 	{
 		bool ismember;
 		REF struct kernel_sigmask *mask;
-		mask = FORTASK(target, _this_sigmask).get();
+		mask = FORTASK(target, this_sigmask).get();
 		ismember = sigismember(&mask->sm_mask, entry->sqe_info.si_signo);
 		decref_unlikely(mask);
 		if (ismember) {
 			/* Schedule the signal as pending within the target thread. */
 			struct sigqueue *pending;
 			struct sigqueue_entry *next;
-			pending = &FORTASK(target, _this_sigqueue);
+			pending = &FORTASK(target, this_sigqueue);
 			do {
 				next = ATOMIC_READ(pending->sq_queue);
 				if unlikely(next == SIGQUEUE_SQ_QUEUE_TERMINATED) {
@@ -108,7 +108,7 @@ task_raisesignalthread(struct task *__restrict target,
 			 * unmasked before we inserted our new signal into the queue, in which case the
 			 * target thread may not know about it. - Because of this, send an RPC to have
 			 * the target thread manually check for unmasked signals. */
-			mask = FORTASK(target, _this_sigmask).get();
+			mask = FORTASK(target, this_sigmask).get();
 			ismember = sigismember(&mask->sm_mask, entry->sqe_info.si_signo);
 			decref_unlikely(mask);
 			if unlikely(!ismember) {
@@ -193,7 +193,7 @@ NOTHROW_NX(KCALL FUNC(find_thread_in_process_with_unmasked_signal))(struct task 
 	if (!is_thread_masking_signal(process_leader, kernel_signo)) {
 		return IFELSE(incref(process_leader), (*presult = incref(process_leader), 0));
 	}
-	group = &FORTASK(process_leader, _this_taskgroup);
+	group = &FORTASK(process_leader, this_taskgroup);
 #ifdef DELIVER_NX
 	if (!sync_read_nx(&group->tg_proc_threads_lock))
 		return TASK_RAISESIGNALTHREAD_NX_WOULDBLOCK;
@@ -313,7 +313,7 @@ NOTHROW_NX(KCALL FUNC(deliver_signal_to_some_thread_in_process))(struct task *__
 
 	/* No thread seems to exist that isn't masking the given signal.
 	 * Schedule the signal as pending within the process signal queue. */
-	procqueue = &FORTASK(process_leader, _this_taskgroup.tg_proc_signals);
+	procqueue = &FORTASK(process_leader, this_taskgroup.tg_proc_signals);
 #ifdef DELIVER_NX
 	if (!sync_write_nx(procqueue)) {
 		kfree(info);
@@ -496,16 +496,16 @@ load_more_threads:
 			pending_delivery_procc = 0;
 			there_are_more_procs = false;
 #ifdef DELIVER_NX
-			if unlikely(sync_read_nx(&FORTASK(pgroup, _this_taskgroup).tg_pgrp_processes_lock)) {
+			if unlikely(sync_read_nx(&FORTASK(pgroup, this_taskgroup).tg_pgrp_processes_lock)) {
 				pointer_set_fini(&ps);
 				decref_unlikely(pgroup);
 				return TASK_RAISESIGNALPROCESSGROUP_NX_WOULDBLOCK;
 			}
 #else /* DELIVER_NX */
-			sync_read(&FORTASK(pgroup, _this_taskgroup).tg_pgrp_processes_lock);
+			sync_read(&FORTASK(pgroup, this_taskgroup).tg_pgrp_processes_lock);
 #endif /* !DELIVER_NX */
-			for (iter = FORTASK(pgroup, _this_taskgroup).tg_pgrp_processes;
-			     iter; iter = FORTASK(iter, _this_taskgroup).tg_proc_group_siblings.ln_next) {
+			for (iter = FORTASK(pgroup, this_taskgroup).tg_pgrp_processes;
+			     iter; iter = FORTASK(iter, this_taskgroup).tg_proc_group_siblings.ln_next) {
 				assert(iter != pgroup);
 				if (pointer_set_contains(&ps, iter))
 					continue;
@@ -514,12 +514,12 @@ load_more_threads:
 				pending_delivery_procv[pending_delivery_procc] = iter;
 				++pending_delivery_procc;
 				if (pending_delivery_procc >= COMPILER_LENOF(pending_delivery_procv)) {
-					if (FORTASK(iter, _this_taskgroup).tg_proc_group_siblings.ln_next != NULL)
+					if (FORTASK(iter, this_taskgroup).tg_proc_group_siblings.ln_next != NULL)
 						there_are_more_procs = true;
 					break;
 				}
 			}
-			sync_endread(&FORTASK(pgroup, _this_taskgroup).tg_pgrp_processes_lock);
+			sync_endread(&FORTASK(pgroup, this_taskgroup).tg_pgrp_processes_lock);
 #ifndef DELIVER_NX
 			TRY
 #endif /* !DELIVER_NX */

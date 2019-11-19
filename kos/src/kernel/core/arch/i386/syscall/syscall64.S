@@ -33,8 +33,7 @@
 #include <kos/kernel/gdt.h>
 
 .section .text.hot
-INTERN(__x86_idtdpl_syscall)
-	__x86_idtdpl_syscall = 3
+INTERN_CONST(__x86_idtdpl_syscall, 3)
 INTERN_FUNCTION(x86_idt_syscall)
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
@@ -78,7 +77,7 @@ INTERN_FUNCTION(x86_idt_syscall_traced)
 	pushq_cfi_r %rax /* SYSNO */
 
 	movl   %esp, %ecx
-	INTERN(syscall_trace_compat)
+	EXTERN(syscall_trace_compat)
 	call   syscall_trace_compat
 
 	popq_cfi_r %rax /* SYSNO */

@@ -3074,7 +3074,7 @@ kernel_execveat(struct icpustate *__restrict state,
 					 * termination signal manually (since we may not have received
 					 * it before in case our thread had been detached). */
 					union wait status;
-					status = FORTASK(caller, _this_taskpid)->tp_status;
+					status = FORTASK(caller, this_taskpid)->tp_status;
 					THROW(E_EXIT_THREAD, status.w_status);
 				}
 			} EXCEPT {

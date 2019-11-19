@@ -1436,8 +1436,8 @@ struct vm {
 DATDEF struct vm vm_kernel;
 
 /* The VM that is currently active within the calling thread */
-DATDEF ATTR_PERTASK REF struct vm *_this_vm;
-#define THIS_VM  PERTASK_GET(_this_vm)
+DATDEF ATTR_PERTASK REF struct vm *this_vm;
+#define THIS_VM  PERTASK_GET(this_vm)
 #define PERVM(x) (*(__typeof__(&(x)))((uintptr_t)THIS_VM + (uintptr_t)&(x)))
 
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_free)(struct vm *__restrict self);

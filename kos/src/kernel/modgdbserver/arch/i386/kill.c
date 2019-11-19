@@ -38,12 +38,12 @@ DECL_BEGIN
 INTERN ATTR_NORETURN void NOTHROW(FCALL GDBThread_KillKernel)(void) {
 	printk(KERN_INFO "[gdb] Shutdown via GDB stub\n");
 	/* Emulator-specific shutdown control codes. */
-	if (CPUID_FEATURES.ci_80000002a == MAKE_DWORD('Q', 'E', 'M', 'U')) {
+	if (CURRENT_X86_CPUID.ci_80000002a == MAKE_DWORD('Q', 'E', 'M', 'U')) {
 		/* `qemu -device isa-debug-exit,iobase=0xf4,iosize=0x04'
 		 * TODO: Make this configurable! */
 		outb((port_t)0xf4, 0x00);
 		outw((port_t)0x604, 0x2000);
-	} else if (CPUID_FEATURES.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H')) {
+	} else if (CURRENT_X86_CPUID.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H')) {
 		outw((port_t)0xB004, 0x2000);
 	}
 	PREEMPTION_HALT();

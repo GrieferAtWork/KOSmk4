@@ -28,6 +28,8 @@
 #undef EXTERN
 #undef BEGIN
 #undef END
+#undef INTERN_CONST
+#undef PUBLIC_CONST
 
 #define PRIVATE(sym)  .local sym;
 #define INTERN(sym)   .global sym; .hidden sym;
@@ -43,13 +45,21 @@
 #define INTERN_BEGIN(sym)  INTERN(sym) BEGIN(sym)
 #define PUBLIC_BEGIN(sym)  PUBLIC(sym) BEGIN(sym)
 
-#define PRIVATE_FUNCTION(sym) PRIVATE(sym) FUNCTION(sym)
-#define INTERN_FUNCTION(sym)  INTERN(sym) FUNCTION(sym)
-#define PUBLIC_FUNCTION(sym)  PUBLIC(sym) FUNCTION(sym)
+#define PRIVATE_FUNCTION(sym)   PRIVATE(sym) FUNCTION(sym)
+#define INTERN_FUNCTION(sym)    INTERN(sym) FUNCTION(sym)
+#define PUBLIC_FUNCTION(sym)    PUBLIC(sym) FUNCTION(sym)
 
-#define PRIVATE_OBJECT(sym)   PRIVATE(sym) OBJECT(sym)
-#define INTERN_OBJECT(sym)    INTERN(sym) OBJECT(sym)
-#define PUBLIC_OBJECT(sym)    PUBLIC(sym) OBJECT(sym)
+#define PRIVATE_OBJECT(sym)     PRIVATE(sym) OBJECT(sym)
+#define INTERN_OBJECT(sym)      INTERN(sym) OBJECT(sym)
+#define PUBLIC_OBJECT(sym)      PUBLIC(sym) OBJECT(sym)
+
+#define PRIVATE_LABEL(sym)      PRIVATE(sym) sym
+#define INTERN_LABEL(sym)       INTERN(sym) sym
+#define PUBLIC_LABEL(sym)       PUBLIC(sym) sym
+
+#define PRIVATE_CONST(sym, val) PRIVATE(sym) .set sym, val;
+#define INTERN_CONST(sym, val)  INTERN(sym) .set sym, val;
+#define PUBLIC_CONST(sym, val)  PUBLIC(sym) .set sym, val;
 #endif /* __ASSEMBLER__ */
 
 

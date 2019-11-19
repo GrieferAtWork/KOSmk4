@@ -69,7 +69,7 @@ typedef __ATTR_NONNULL((1)) __ssize_t
  * >>	MY_TERMINAL *term = container_of(self, MY_TERMINAL, t_term);
  * >>	REF struct task *my_leader = task_getprocessgroupleader();
  * >>	FINALLY_DECREF_UNLIKELY(my_leader);
- * >>	if unlikely(FORTASK(my_leader, _this_taskpid) != ATOMIC_READ(term->t_fproc)) {
+ * >>	if unlikely(FORTASK(my_leader, this_taskpid) != ATOMIC_READ(term->t_fproc)) {
  * >>		task_raisesignalprocessgroup(my_leader, SIGTTOU);
  * >>		// We might get here if the calling process changed its process group
  * >>		// in the mean time. - In this case, just re-raise `SIGTTOU' within the

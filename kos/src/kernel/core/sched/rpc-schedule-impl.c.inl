@@ -190,26 +190,26 @@ PUBLIC NONNULL((1, 2)) bool (KCALL task_schedule_synchronous_rpc)(RPC_FUNCTION_A
 
 	/* Add the RPC entry to the target thread. */
 	do {
-		next = ATOMIC_READ(FORTASK(target, _this_pending_rpcs));
+		next = ATOMIC_READ(FORTASK(target, this_rpcs_pending));
 		if unlikely(next == RPC_PENDING_TERMINATED) {
 			/* The thread has terminated while we were allocating the RPC. */
 			rpcentry_free(entry);
 			return TARGET_HAS_TERMINATED_RETURN_VALUE;
 		}
 		entry->re_next = next;
-	} while (!ATOMIC_CMPXCH_WEAK(FORTASK(target, _this_pending_rpcs), next, entry));
+	} while (!ATOMIC_CMPXCH_WEAK(FORTASK(target, this_rpcs_pending), next, entry));
 
 	/* Increment the target thread's counter for pending, synchronous RPCs */
 #ifdef RPC_USER
 	if (mode & TASK_USER_RPC_FINTR) {
 		if (mode & TASK_USER_RPC_FNOTHROW)
-			ATOMIC_FETCHINC(FORTASK(target, _this_pending_sync_count_nx));
-		ATOMIC_FETCHINC(FORTASK(target, _this_pending_sync_count));
+			ATOMIC_FETCHINC(FORTASK(target, this_rpc_pending_sync_count_nx));
+		ATOMIC_FETCHINC(FORTASK(target, this_rpc_pending_sync_count));
 	}
 #else /* RPC_USER */
 	if (mode & TASK_SYNC_RPC_FNOTHROW)
-		ATOMIC_FETCHINC(FORTASK(target, _this_pending_sync_count_nx));
-	ATOMIC_FETCHINC(FORTASK(target, _this_pending_sync_count));
+		ATOMIC_FETCHINC(FORTASK(target, this_rpc_pending_sync_count_nx));
+	ATOMIC_FETCHINC(FORTASK(target, this_rpc_pending_sync_count));
 #endif /* !RPC_USER */
 
 	/* At this point our RPC has been scheduled and
@@ -230,14 +230,14 @@ PUBLIC NONNULL((1, 2)) bool (KCALL task_schedule_synchronous_rpc)(RPC_FUNCTION_A
 
 	/* Always return SUCCESS at this point, as a failed `task_redirect_usercode_rpc()' still
 	 * means that the RPC will be serviced, since we managed to schedule it as
-	 * pending (i.e. `_this_pending_rpcs' wasn't `RPC_PENDING_TERMINATED'). */
+	 * pending (i.e. `this_rpcs_pending' wasn't `RPC_PENDING_TERMINATED'). */
 	return SUCCESS_RETURN_VALUE;
 #else /* RPC_USER */
 	task_wake(target, mode & TASK_WAKE_FMASK);
 
 	/* Always return SUCCESS at this point, as a failed `task_wake()' still means
 	 * that the RPC will be serviced, since we managed to schedule it as
-	 * pending (i.e. `_this_pending_rpcs' wasn't `RPC_PENDING_TERMINATED'). */
+	 * pending (i.e. `this_rpcs_pending' wasn't `RPC_PENDING_TERMINATED'). */
 	return SUCCESS_RETURN_VALUE;
 #endif /* !RPC_USER */
 }

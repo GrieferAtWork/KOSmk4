@@ -36,7 +36,7 @@ struct vm_execinfo_struct {
 };
 
 /* VM exec() information */
-DATDEF ATTR_PERVM struct vm_execinfo_struct vm_execinfo;
+DATDEF ATTR_PERVM struct vm_execinfo_struct thisvm_execinfo;
 
 
 DECL_END

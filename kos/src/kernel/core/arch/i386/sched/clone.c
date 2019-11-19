@@ -75,8 +75,8 @@ INTDEF pertask_clone_t __kernel_pertask_clone_end[];
 INTDEF byte_t __kernel_pertask_start[];
 INTDEF byte_t __kernel_pertask_size[];
 
-DATDEF ATTR_PERTASK struct vm_node __this_kernel_stack ASMNAME("_this_kernel_stack");
-DATDEF ATTR_PERTASK struct vm_datapart __this_kernel_stack_part ASMNAME("_this_kernel_stack_part");
+DATDEF ATTR_PERTASK struct vm_node _this_kernel_stacknode ASMNAME("this_kernel_stacknode");
+DATDEF ATTR_PERTASK struct vm_datapart _this_kernel_stackpart ASMNAME("this_kernel_stackpart");
 
 #define HINT_ADDR(x, y) x
 #define HINT_MODE(x, y) y
@@ -140,13 +140,13 @@ x86_task_clone(struct icpustate const *__restrict init_state,
 		memcpy(result, __kernel_pertask_start, (size_t)__kernel_pertask_size);
 		result->t_heapsz = resptr.hp_siz;
 		result->t_self   = result;
-		incref(&vm_datablock_anonymous); /* FORTASK(result,__this_kernel_stack).vn_block */
-		incref(&vm_datablock_anonymous); /* FORTASK(result,__this_kernel_stack_part).dp_block */
-		*(uintptr_t *)&FORTASK(result, __this_kernel_stack).vn_part += (uintptr_t)result;
-		*(uintptr_t *)&FORTASK(result, __this_kernel_stack).vn_link.ln_pself += (uintptr_t)result;
-		*(uintptr_t *)&FORTASK(result, __this_kernel_stack_part).dp_srefs += (uintptr_t)result;
+		incref(&vm_datablock_anonymous); /* FORTASK(result,_this_kernel_stacknode).vn_block */
+		incref(&vm_datablock_anonymous); /* FORTASK(result,_this_kernel_stackpart).dp_block */
+		*(uintptr_t *)&FORTASK(result, _this_kernel_stacknode).vn_part += (uintptr_t)result;
+		*(uintptr_t *)&FORTASK(result, _this_kernel_stacknode).vn_link.ln_pself += (uintptr_t)result;
+		*(uintptr_t *)&FORTASK(result, _this_kernel_stackpart).dp_srefs += (uintptr_t)result;
 		TRY {
-			vm_datapart_do_allocram(&FORTASK(result, __this_kernel_stack_part));
+			vm_datapart_do_allocram(&FORTASK(result, _this_kernel_stackpart));
 			TRY {
 				uintptr_t cache_version;
 				vm_vpage_t stack_page;
@@ -165,15 +165,15 @@ again_lock_vm:
 					THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 					      (uintptr_t)CEILDIV(KERNEL_STACKSIZE, PAGESIZE));
 				}
-				FORTASK(result, __this_kernel_stack).vn_node.a_vmin = stack_page;
-				FORTASK(result, __this_kernel_stack).vn_node.a_vmax = stack_page + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1;
+				FORTASK(result, _this_kernel_stacknode).vn_node.a_vmin = stack_page;
+				FORTASK(result, _this_kernel_stacknode).vn_node.a_vmax = stack_page + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1;
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 				if unlikely(!pagedir_prepare_map(stack_page, CEILDIV(KERNEL_STACKSIZE, PAGESIZE))) {
 					sync_endwrite(&vm_kernel.v_treelock);
 					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, (uintptr_t)1);
 				}
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-				vm_node_insert(&FORTASK(result, __this_kernel_stack));
+				vm_node_insert(&FORTASK(result, _this_kernel_stacknode));
 
 				/* Map the trampoline node. */
 				trampoline_page = vm_getfree(&vm_kernel,
@@ -186,26 +186,26 @@ again_lock_vm:
 						goto again_lock_vm;
 					THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, (uintptr_t)1);
 				}
-				FORTASK(result, _this_trampoline_node).vn_node.a_vmin = trampoline_page;
-				FORTASK(result, _this_trampoline_node).vn_node.a_vmax = trampoline_page;
+				FORTASK(result, this_trampoline_node).vn_node.a_vmin = trampoline_page;
+				FORTASK(result, this_trampoline_node).vn_node.a_vmax = trampoline_page;
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 				if unlikely(!pagedir_prepare_mapone(trampoline_page))
 					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, (uintptr_t)1);
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 				/* Load the trampoline node into the kernel VM. */
-				vm_node_insert(&FORTASK(result, _this_trampoline_node));
+				vm_node_insert(&FORTASK(result, this_trampoline_node));
 
 				/* Map the stack into memory */
-				vm_datapart_map_ram(&FORTASK(result, __this_kernel_stack_part), stack_page,
+				vm_datapart_map_ram(&FORTASK(result, _this_kernel_stackpart), stack_page,
 				                    PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 				sync_endwrite(&vm_kernel.v_treelock);
 			} EXCEPT {
-				vm_datapart_do_ccfreeram(&FORTASK(result, __this_kernel_stack_part));
+				vm_datapart_do_ccfreeram(&FORTASK(result, _this_kernel_stackpart));
 				RETHROW();
 			}
 		} EXCEPT {
-			decref_nokill(&vm_datablock_anonymous); /* FORTASK(result,__this_kernel_stack_part).dp_block */
-			decref_nokill(&vm_datablock_anonymous); /* FORTASK(result,__this_kernel_stack).vn_block */
+			decref_nokill(&vm_datablock_anonymous); /* FORTASK(result,_this_kernel_stackpart).dp_block */
+			decref_nokill(&vm_datablock_anonymous); /* FORTASK(result,_this_kernel_stacknode).vn_block */
 			heap_free(&kernel_locked_heap,
 			          resptr.hp_ptr,
 			          resptr.hp_siz,
@@ -221,7 +221,7 @@ again_lock_vm:
 		struct scpustate *state;
 		void *kernel_stack;
 		/* Initial the task's initial CPU state. */
-		kernel_stack = (void *)VM_NODE_ENDADDR(&FORTASK(result, _this_kernel_stack));
+		kernel_stack = (void *)VM_NODE_ENDADDR(&FORTASK(result, this_kernel_stacknode));
 		state        = icpustate_to_scpustate_p(init_state, kernel_stack);
 
 		/* Reset iopl() for the child thread/process */
@@ -254,8 +254,8 @@ again_lock_vm:
 
 #ifndef __x86_64__
 	/* Assign the used TLS segment bases. */
-	FORTASK(result, x86_this_user_gsbase) = clone_flags & CLONE_SETTLS ? newtls : get_user_gsbase();
-	FORTASK(result, x86_this_user_fsbase) = get_user_fsbase();
+	FORTASK(result, this_x86_user_gsbase) = clone_flags & CLONE_SETTLS ? newtls : get_user_gsbase();
+	FORTASK(result, this_x86_user_fsbase) = get_user_fsbase();
 #endif /* !__x86_64__ */
 
 	result->t_vm = result_vm; /* Inherit reference. */
@@ -291,7 +291,7 @@ again_lock_vm:
 			ATOMIC_WRITE(*parent_tidptr, result_pid);
 		if (clone_flags & CLONE_CHILD_CLEARTID) {
 			/* `set_tid_address(child_tidptr)' */
-			FORTASK(result, _this_tid_address) = child_tidptr;
+			FORTASK(result, this_tid_address) = child_tidptr;
 		}
 
 #if 0 /* XXX: Remove me (only here to force & verify use of IPI mechanisms in multi-core situations)

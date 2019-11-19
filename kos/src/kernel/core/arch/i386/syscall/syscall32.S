@@ -73,11 +73,11 @@ PUBLIC_FUNCTION(x86_syscall_emulate_int80h_r)
 	/* Check if our user-space return location got re-directed.
 	 * If it was, we need to apply the register override at the
 	 * saved return location, rather than the active one. */
-	PUBLIC(x86_rpc_user_redirection)
+	EXTERN(x86_rpc_user_redirection)
 	cmpl   $x86_rpc_user_redirection, 12+OFFSET_IRREGS_EIP(%esp)
 	jne    1f
-	PUBLIC(x86_rpc_redirection_iret)
-	movl   %edi, %fs:x86_rpc_redirection_iret+OFFSET_IRREGS_EIP /* EIP := EDI */
+	EXTERN(this_x86_rpc_redirection_iret)
+	movl   %edi, %fs:this_x86_rpc_redirection_iret+OFFSET_IRREGS_EIP /* EIP := EDI */
 	jmp    2f
 1:	movl   %edi, 12+OFFSET_IRREGS_EIP(%esp) /* EIP := EDI */
 2:	movl   %ebp, 12+OFFSET_IRREGS_ESP(%esp) /* ESP := EBP */
@@ -100,7 +100,7 @@ PUBLIC_FUNCTION(x86_syscall_emulate_int80h_r)
 	 *    the same assembly-level wrappers that would normally be used for
 	 *    routing a real sysenter system call invocation. */
 #ifndef CONFIG_NO_SYSCALL_TRACING
-	INTERN(syscall_tracing_enabled)
+	EXTERN(syscall_tracing_enabled)
 	cmpb   $0, %ss:syscall_tracing_enabled
 	jne    x86_idt_syscall_traced /* With tracing enabled... */
 #endif
@@ -138,11 +138,11 @@ PUBLIC_FUNCTION(x86_syscall_emulate_sysenter_r)
 	/* Check if our user-space return location got re-directed.
 	 * If it was, we need to apply the register override at the
 	 * saved return location, rather than the active one. */
-	PUBLIC(x86_rpc_user_redirection)
+	EXTERN(x86_rpc_user_redirection)
 	cmpl  $x86_rpc_user_redirection, 12+OFFSET_IRREGS_EIP(%esp)
 	jne    1f
-	PUBLIC(x86_rpc_redirection_iret)
-	movl   %edi, %fs:x86_rpc_redirection_iret+OFFSET_IRREGS_EIP /* EIP := EDI */
+	EXTERN(this_x86_rpc_redirection_iret)
+	movl   %edi, %fs:this_x86_rpc_redirection_iret+OFFSET_IRREGS_EIP /* EIP := EDI */
 	jmp    2f
 1:	movl   %edi, 12+OFFSET_IRREGS_EIP(%esp) /* EIP := EDI */
 2:	movl   %ebp, 12+OFFSET_IRREGS_ESP(%esp) /* ESP := EBP */
@@ -165,8 +165,8 @@ PUBLIC_FUNCTION(x86_syscall_emulate_sysenter_r)
 	 *    the same assembly-level wrappers that would normally be used for
 	 *    routing a real sysenter system call invocation. */
 #ifndef CONFIG_NO_SYSCALL_TRACING
-	INTERN(syscall_tracing_enabled)
-	cmpb   $0, %ss:syscall_tracing_enabled
+	EXTERN(syscall_tracing_enabled)
+	cmpb   $(0), %ss:syscall_tracing_enabled
 	jne    .Ldo_prepared_sysenter_traced /* With tracing enabled... */
 #endif
 	jmp    .Ldo_prepared_sysenter
@@ -225,7 +225,7 @@ INTERN_FUNCTION(x86_lcall7_main_iret)
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
-	INTERN(x86_syscall_lcall7_personality)
+	EXTERN(x86_syscall_lcall7_personality)
 	.cfi_personality 0, x86_syscall_lcall7_personality
 	.cfi_lsda 0, -1
 	pushl_cfi %ds
@@ -272,10 +272,9 @@ INTERN_FUNCTION(x86_lcall7_main_iret)
 	pushl_cfi %edx
 	movl   %esp, %ecx
 
-	INTERN(x86_lcall7_syscall_main)
+	EXTERN(x86_lcall7_syscall_main)
 	call   x86_lcall7_syscall_main
-	INTERN(x86_lcall7_syscall_guard)
-x86_lcall7_syscall_guard = .
+INTERN_CONST(x86_lcall7_syscall_guard, .)
 
 	popl_cfi   %ecx  /* popl <void> */
 	popl_cfi_r %edx
@@ -339,8 +338,7 @@ INTERN_FUNCTION(x86_sysenter_main)
 END(x86_sysenter_main)
 
 .section .text.hot
-INTERN(__x86_idtdpl_syscall)
-	__x86_idtdpl_syscall = 3
+INTERN_CONST(__x86_idtdpl_syscall, 3)
 INTERN_FUNCTION(x86_idt_syscall)
 	.cfi_startproc simple
 	.cfi_iret_signal_frame

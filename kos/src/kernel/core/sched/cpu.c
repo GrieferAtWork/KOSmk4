@@ -90,7 +90,7 @@ NOTHROW(FCALL cpu_do_assert_running)(struct task *__restrict thread,
 	        thread->t_cpu, (unsigned int)thread->t_cpu->c_id,
 	        thread, task_getroottid_of_s(thread));
 	/* Special case: The IDLE thread doesn't need to be part of the active chain! */
-	if (thread == &FORCPU(me, _this_idle))
+	if (thread == &FORCPU(me, thiscpu_idle))
 		return true;
 	if (__assertion_checkf("thread in THIS_CPU->c_current",
 	                       "Thread %p [tid=%u] is not running on cpu %p [cid=%u]\n",
@@ -127,7 +127,7 @@ NOTHROW(FCALL cpu_do_assert_sleeping)(struct task *__restrict thread,
 	        thread->t_cpu, (unsigned int)thread->t_cpu->c_id,
 	        thread, task_getroottid_of_s(thread));
 	/* Special case: The IDLE thread doesn't need to be part of the active chain! */
-	if (thread == &FORCPU(me, _this_idle))
+	if (thread == &FORCPU(me, thiscpu_idle))
 		return true;
 	if (__assertion_checkf("thread in THIS_CPU->c_sleeping",
 	                       "Thread %p [tid=%u] is not running on cpu %p [cid=%u]\n",
@@ -441,9 +441,9 @@ struct cpu cpu_header = {
 	/*.c_state    = */ CPU_STATE_RUNNING
 };
 
-PUBLIC ATTR_PERCPU jtime_t volatile cpu_jiffies = 0;
-PUBLIC ATTR_PERCPU quantum_diff_t volatile cpu_quantum_offset = 0;
-PUBLIC ATTR_PERCPU quantum_diff_t volatile cpu_quantum_length = (quantum_diff_t)-1;
+PUBLIC ATTR_PERCPU jtime_t volatile thiscpu_jiffies = 0;
+PUBLIC ATTR_PERCPU quantum_diff_t volatile thiscpu_quantum_offset = 0;
+PUBLIC ATTR_PERCPU quantum_diff_t volatile thiscpu_quantum_length = (quantum_diff_t)-1;
 
 
 /* Weakly implement preemptive interrupt disabling as no-ops. */
@@ -473,9 +473,9 @@ NOTHROW(KCALL cpu_quantum_time)(void) {
 	quantum_diff_t elapsed;
 	was = PREEMPTION_PUSHOFF();
 	me             = THIS_CPU;
-	result.q_jtime = FORCPU(me, cpu_jiffies);
-	result.q_qtime = FORCPU(me, cpu_quantum_offset);
-	result.q_qsize = FORCPU(me, cpu_quantum_length);
+	result.q_jtime = FORCPU(me, thiscpu_jiffies);
+	result.q_qtime = FORCPU(me, thiscpu_quantum_offset);
+	result.q_qsize = FORCPU(me, thiscpu_quantum_length);
 	elapsed        = cpu_quantum_elapsed_nopr();
 	PREEMPTION_POP(was);
 	if (OVERFLOW_UADD(result.q_qtime, elapsed, &result.q_qtime)) {
@@ -499,11 +499,11 @@ NOTHROW(KCALL quantum_time)(void) {
 	/* BOOT_JIFFIES + (BOOT_QUANTUM_OFFSET - MY_QUANTUM_OFFSET + cpu_quantum_elapsed()) */
 	was = PREEMPTION_PUSHOFF();
 	me             = THIS_CPU;
-	result.q_jtime = FORCPU(&_bootcpu, cpu_jiffies);
-	result.q_qtime = FORCPU(&_bootcpu, cpu_quantum_offset);
-	result.q_qsize = FORCPU(&_bootcpu, cpu_quantum_length);
-	my_qoff        = FORCPU(me, cpu_quantum_offset);
-	my_qlen        = FORCPU(me, cpu_quantum_length);
+	result.q_jtime = FORCPU(&_bootcpu, thiscpu_jiffies);
+	result.q_qtime = FORCPU(&_bootcpu, thiscpu_quantum_offset);
+	result.q_qsize = FORCPU(&_bootcpu, thiscpu_quantum_length);
+	my_qoff        = FORCPU(me, thiscpu_quantum_offset);
+	my_qlen        = FORCPU(me, thiscpu_quantum_length);
 	elapsed        = cpu_quantum_elapsed_nopr();
 	PREEMPTION_POP(was);
 	if (my_qlen > result.q_qsize) {
@@ -536,9 +536,9 @@ NOTHROW(FCALL quantum_local_to_global)(qtime_t *__restrict tmp) {
 	qtime_t boot_time, locl_time;
 	struct cpu *me = THIS_CPU;
 	quantum_diff_t elapsed;
-	locl_time.q_jtime = FORCPU(me, cpu_jiffies);
-	locl_time.q_qtime = FORCPU(me, cpu_quantum_offset);
-	locl_time.q_qsize = FORCPU(me, cpu_quantum_length);
+	locl_time.q_jtime = FORCPU(me, thiscpu_jiffies);
+	locl_time.q_qtime = FORCPU(me, thiscpu_quantum_offset);
+	locl_time.q_qsize = FORCPU(me, thiscpu_quantum_length);
 	elapsed           = cpu_quantum_elapsed_nopr();
 	if (OVERFLOW_UADD(locl_time.q_qtime, elapsed, &locl_time.q_qtime)) {
 		locl_time.q_jtime += ((quantum_diff_t)-1) / locl_time.q_qsize;
@@ -547,9 +547,9 @@ NOTHROW(FCALL quantum_local_to_global)(qtime_t *__restrict tmp) {
 	}
 	if (me == &_bootcpu)
 		return locl_time;
-	boot_time.q_jtime = FORCPU(&_bootcpu, cpu_jiffies);
-	boot_time.q_qtime = FORCPU(&_bootcpu, cpu_quantum_offset);
-	boot_time.q_qsize = FORCPU(&_bootcpu, cpu_quantum_length);
+	boot_time.q_jtime = FORCPU(&_bootcpu, thiscpu_jiffies);
+	boot_time.q_qtime = FORCPU(&_bootcpu, thiscpu_quantum_offset);
+	boot_time.q_qsize = FORCPU(&_bootcpu, thiscpu_quantum_length);
 	if (locl_time.q_qtime >= locl_time.q_qsize) {
 		locl_time.q_jtime += locl_time.q_qtime / locl_time.q_qsize;
 		locl_time.q_qtime = locl_time.q_qtime % locl_time.q_qsize;
@@ -595,9 +595,9 @@ NOTHROW(FCALL quantum_global_to_local)(qtime_t *__restrict tmp) {
 	qtime_t boot_time, locl_time;
 	struct cpu *me = THIS_CPU;
 	quantum_diff_t elapsed;
-	locl_time.q_jtime = FORCPU(me, cpu_jiffies);
-	locl_time.q_qtime = FORCPU(me, cpu_quantum_offset);
-	locl_time.q_qsize = FORCPU(me, cpu_quantum_length);
+	locl_time.q_jtime = FORCPU(me, thiscpu_jiffies);
+	locl_time.q_qtime = FORCPU(me, thiscpu_quantum_offset);
+	locl_time.q_qsize = FORCPU(me, thiscpu_quantum_length);
 	elapsed = cpu_quantum_elapsed_nopr();
 	if (OVERFLOW_UADD(locl_time.q_qtime, elapsed, &locl_time.q_qtime)) {
 		locl_time.q_jtime += ((quantum_diff_t)-1) / locl_time.q_qsize;
@@ -606,9 +606,9 @@ NOTHROW(FCALL quantum_global_to_local)(qtime_t *__restrict tmp) {
 	}
 	if (me == &_bootcpu)
 		return locl_time;
-	boot_time.q_jtime = FORCPU(&_bootcpu, cpu_jiffies);
-	boot_time.q_qtime = FORCPU(&_bootcpu, cpu_quantum_offset);
-	boot_time.q_qsize = FORCPU(&_bootcpu, cpu_quantum_length);
+	boot_time.q_jtime = FORCPU(&_bootcpu, thiscpu_jiffies);
+	boot_time.q_qtime = FORCPU(&_bootcpu, thiscpu_quantum_offset);
+	boot_time.q_qsize = FORCPU(&_bootcpu, thiscpu_quantum_length);
 	if (locl_time.q_qtime >= locl_time.q_qsize) {
 		locl_time.q_jtime += locl_time.q_qtime / locl_time.q_qsize;
 		locl_time.q_qtime = locl_time.q_qtime % locl_time.q_qsize;
@@ -652,31 +652,31 @@ NOTHROW(FCALL quantum_global_to_local)(qtime_t *__restrict tmp) {
 
 
 
-/* Increment `cpu_quantum_offset' by `diff' incrementing the `cpu_jiffies' counter
- * when the resulting value turns out to be greater than `cpu_quantum_length',
+/* Increment `thiscpu_quantum_offset' by `diff' incrementing the `thiscpu_jiffies' counter
+ * when the resulting value turns out to be greater than `thiscpu_quantum_length',
  * in which case the value will also be truncated.
- * When `cpu_jiffies' is incremented, also check if this causes additional
+ * When `thiscpu_jiffies' is incremented, also check if this causes additional
  * tasks to time out, and if so, re-schedule them for execution. */
 PUBLIC NOBLOCK quantum_diff_t
 NOTHROW(FCALL cpu_add_quantum_offset)(quantum_diff_t diff) {
 	struct cpu *me = THIS_CPU;
 	quantum_diff_t new_diff, more_jiffies = 0;
-	quantum_diff_t length = FORCPU(me, cpu_quantum_length);
+	quantum_diff_t length = FORCPU(me, thiscpu_quantum_length);
 	assert(!PREEMPTION_ENABLED());
-	if (OVERFLOW_UADD(FORCPU(me, cpu_quantum_offset), diff, &new_diff)) {
+	if (OVERFLOW_UADD(FORCPU(me, thiscpu_quantum_offset), diff, &new_diff)) {
 		more_jiffies = ((quantum_diff_t)-1 / length);
-		new_diff     = (FORCPU(me, cpu_quantum_offset) + diff) - ((quantum_diff_t)-1);
+		new_diff     = (FORCPU(me, thiscpu_quantum_offset) + diff) - ((quantum_diff_t)-1);
 	}
 	if (new_diff >= length) {
 		more_jiffies += new_diff / length;
 		new_diff = new_diff % length;
 	}
-	FORCPU(me, cpu_quantum_offset) = new_diff;
+	FORCPU(me, thiscpu_quantum_offset) = new_diff;
 	if (more_jiffies) {
 		struct task *sleeper, *last_sleeper, *next;
 		jtime_t new_jiffies;
-		new_jiffies             = FORCPU(me, cpu_jiffies) + more_jiffies;
-		FORCPU(me, cpu_jiffies) = new_jiffies;
+		new_jiffies             = FORCPU(me, thiscpu_jiffies) + more_jiffies;
+		FORCPU(me, thiscpu_jiffies) = new_jiffies;
 		if ((sleeper = me->c_sleeping) != NULL) {
 			if (sleeper->t_sched.s_asleep.ss_timeout.q_jtime > new_jiffies)
 				goto done_wakeup;
@@ -757,7 +757,7 @@ NOTHROW(FCALL cpu_scheduler_interrupt)(struct cpu *__restrict caller,
 	cpu_assert_running(thread);
 	/* Keep track of the cpu-local time, as well
 	 * as the previous thread's active-time. */
-	++FORCPU(caller, cpu_jiffies);
+	++FORCPU(caller, thiscpu_jiffies);
 	++thread->t_atime.q_jtime;
 	/* Check for a scheduling override */
 	next = caller->c_override;
@@ -768,13 +768,13 @@ NOTHROW(FCALL cpu_scheduler_interrupt)(struct cpu *__restrict caller,
 		return next;
 	}
 	if ((sleeper = caller->c_sleeping) != NULL) {
-		jtime_t now = FORCPU(caller, cpu_jiffies);
+		jtime_t now = FORCPU(caller, thiscpu_jiffies);
 		quantum_diff_t diff, length;
 		if (sleeper->t_sched.s_asleep.ss_timeout.q_jtime > now)
 			goto done_wakeup;
 		if (sleeper->t_sched.s_asleep.ss_timeout.q_jtime == now) {
-			diff   = FORCPU(caller, cpu_quantum_offset);
-			length = FORCPU(caller, cpu_quantum_length);
+			diff   = FORCPU(caller, thiscpu_quantum_offset);
+			length = FORCPU(caller, thiscpu_quantum_length);
 			if (((u64)sleeper->t_sched.s_asleep.ss_timeout.q_qtime *
 			     sleeper->t_sched.s_asleep.ss_timeout.q_qsize) >
 			    ((u64)diff * length))
@@ -788,8 +788,8 @@ NOTHROW(FCALL cpu_scheduler_interrupt)(struct cpu *__restrict caller,
 			if (next->t_sched.s_asleep.ss_timeout.q_jtime > now)
 				break;
 			if (next->t_sched.s_asleep.ss_timeout.q_jtime == now) {
-				diff   = FORCPU(caller, cpu_quantum_offset);
-				length = FORCPU(caller, cpu_quantum_length);
+				diff   = FORCPU(caller, thiscpu_quantum_offset);
+				length = FORCPU(caller, thiscpu_quantum_length);
 				if (((u64)next->t_sched.s_asleep.ss_timeout.q_qtime *
 				     next->t_sched.s_asleep.ss_timeout.q_qsize) >
 				    ((u64)diff * length))
@@ -871,7 +871,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	mycpu = caller->t_cpu;
 	assertf(mycpu->c_current == caller, "Inconsistent scheduler state");
 	assertf(mycpu->c_override != caller, "Cannot exit while being the scheduling override");
-	assertf(caller != &FORCPU(mycpu, _this_idle), "The IDLE task cannot be terminated");
+	assertf(caller != &FORCPU(mycpu, thiscpu_idle), "The IDLE task cannot be terminated");
 	cpu_assert_integrity();
 
 	/* Indicate the end of the current quantum. */
@@ -879,10 +879,10 @@ NOTHROW(FCALL task_exit)(int w_status) {
 
 	if (caller->t_sched.s_running.sr_runnxt == caller) {
 		/* Last caller (load the IDLE caller now). */
-		FORCPU(mycpu, _this_idle).t_sched.s_running.sr_runprv = &FORCPU(mycpu, _this_idle);
-		FORCPU(mycpu, _this_idle).t_sched.s_running.sr_runnxt = &FORCPU(mycpu, _this_idle);
-		ATOMIC_FETCHOR(FORCPU(mycpu, _this_idle).t_flags, TASK_FRUNNING);
-		mycpu->c_current = next = &FORCPU(mycpu, _this_idle);
+		FORCPU(mycpu, thiscpu_idle).t_sched.s_running.sr_runprv = &FORCPU(mycpu, thiscpu_idle);
+		FORCPU(mycpu, thiscpu_idle).t_sched.s_running.sr_runnxt = &FORCPU(mycpu, thiscpu_idle);
+		ATOMIC_FETCHOR(FORCPU(mycpu, thiscpu_idle).t_flags, TASK_FRUNNING);
+		mycpu->c_current = next = &FORCPU(mycpu, thiscpu_idle);
 	} else {
 		/* Unlink and load the next task. */
 		mycpu->c_current = next = caller->t_sched.s_running.sr_runnxt;
@@ -970,11 +970,11 @@ INTERN struct timespec rtc_getres(void) {
 }
 
 
-PRIVATE ATTR_PERCPU struct timespec resync_prev_rtc; /* RTC time at the previous resync */
-PRIVATE ATTR_PERCPU struct timespec resync_prev_cpu; /* CPU time at the previous resync */
+PRIVATE ATTR_PERCPU struct timespec current_resync_prev_rtc; /* RTC time at the previous resync */
+PRIVATE ATTR_PERCPU struct timespec current_resync_prev_cpu; /* CPU time at the previous resync */
 
 /* Timestamp (in per-cpu jiffies) of when the next re-sync should take place the soonest. */
-PRIVATE ATTR_PERCPU jtime_t rtc_resync_next_jiffies;
+PRIVATE ATTR_PERCPU jtime_t current_rtc_resync_next_jiffies;
 
 /* Min interval between jiffi resync timings. */
 PRIVATE jtime_t rtc_resync_interval = 2;
@@ -988,7 +988,7 @@ NOTHROW(FCALL cpu_idlemain)(void) {
 #endif /* CONFIG_AUTOADJUST_QUANTUM_DRIFT */
 	for (;;) {
 #ifdef CONFIG_AUTOADJUST_QUANTUM_DRIFT
-		if (FORCPU(me, cpu_jiffies) >= FORCPU(me, rtc_resync_next_jiffies)) {
+		if (FORCPU(me, thiscpu_jiffies) >= FORCPU(me, current_rtc_resync_next_jiffies)) {
 			qtime_t cpqtime;
 			struct timespec cputime, rtctime;
 			struct timespec cpudiff, rtcdiff;
@@ -1002,12 +1002,12 @@ again_resync:
 				goto done_rtc; /* No RTC available... */
 			cputime = qtime_to_timespec(&cpqtime);
 			cputime -= cputime % rtc_getres();
-			cpudiff = cputime - FORCPU(me, resync_prev_cpu);
+			cpudiff = cputime - FORCPU(me, current_resync_prev_cpu);
 			/* Truncate the CPU time diff to the RTC resolution. */
-			rtcdiff = rtctime - FORCPU(me, resync_prev_rtc);
+			rtcdiff = rtctime - FORCPU(me, current_resync_prev_rtc);
 			drift   = cpudiff - rtcdiff;
 			if (drift.get_nanoseconds() >= (__NSECS_PER_SEC / 8)) {
-				/* Must fix the drift by adjusting `cpu_quantum_length'. */
+				/* Must fix the drift by adjusting `thiscpu_quantum_length'. */
 				typedef __CRT_PRIVATE_SINT(__SIZEOF_JTIME_T__) sjtime_t;
 				typedef __CRT_PRIVATE_UINT(__SIZEOF_QUANTUM_DIFF_T__) squantum_diff_t;
 				qtime_t qdrift  = timespec_to_qtime(&drift); /* Total drift in quantum time. */
@@ -1018,22 +1018,22 @@ again_resync:
 				squantum_diff_t total_quantum_adjust;
 				assert(qdrift.q_qsize == qpassd.q_qsize);
 				assert(qdrift.q_qsize == __NSECS_PER_SEC);
-				old_qlen = FORCPU(me, cpu_quantum_length);
+				old_qlen = FORCPU(me, thiscpu_quantum_length);
 				qdrift.q_qtime = (qdrift.q_qtime * old_qlen) / __NSECS_PER_SEC;
 				qpassd.q_qtime = (qpassd.q_qtime * old_qlen) / __NSECS_PER_SEC;
 				total_quantum_drift = ((s64)(sjtime_t)qdrift.q_jtime * (u64)old_qlen) + (squantum_diff_t)qdrift.q_qtime;
 				total_quantum_passd = ((u64)qpassd.q_jtime * (u64)old_qlen) + (u64)qpassd.q_qtime;
 				if unlikely(!total_quantum_passd)
 					goto done_rtc;
-				/* Must adjust `cpu_quantum_length' by subtracting `total_quantum_drift / total_quantum_passd' */
+				/* Must adjust `thiscpu_quantum_length' by subtracting `total_quantum_drift / total_quantum_passd' */
 				total_quantum_adjust = (squantum_diff_t)(total_quantum_drift / total_quantum_passd);
 				if (total_quantum_adjust != 0) {
-					if (!ATOMIC_CMPXCH(*(quantum_diff_t *)&FORCPU(me, cpu_quantum_length), old_qlen, total_quantum_adjust))
+					if (!ATOMIC_CMPXCH(*(quantum_diff_t *)&FORCPU(me, thiscpu_quantum_length), old_qlen, total_quantum_adjust))
 						goto again_resync;
 					COMPILER_BARRIER();
-					FORCPU(me, resync_prev_rtc) = rtctime;
-					FORCPU(me, resync_prev_cpu) = cputime;
-					FORCPU(me, rtc_resync_next_jiffies) = FORCPU(me, cpu_jiffies) + rtc_resync_interval;
+					FORCPU(me, current_resync_prev_rtc) = rtctime;
+					FORCPU(me, current_resync_prev_cpu) = cputime;
+					FORCPU(me, current_rtc_resync_next_jiffies) = FORCPU(me, thiscpu_jiffies) + rtc_resync_interval;
 					COMPILER_BARRIER();
 					printk(KERN_INFO "Adjust cpu#%u quantum length by %I32d (%I32u -> %I32u) to account for drift\n",
 					       (unsigned int)me->c_id,

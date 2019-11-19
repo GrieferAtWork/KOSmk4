@@ -97,7 +97,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 		struct fpustate64 *fpu;
 		if (thread == THIS_TASK)
 			fpustate_save();
-		fpu = FORTASK(thread, _this_fpustate);
+		fpu = FORTASK(thread, this_x86_fpustate);
 		if (!fpu) {
 #ifdef GET_REGISTER
 			size_t result;
@@ -117,7 +117,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			fpu = fpustate_alloc_nx();
 			if unlikely(!fpu)
 				return 0;
-			FORTASK(thread, _this_fpustate) = fpu;
+			FORTASK(thread, this_x86_fpustate) = fpu;
 #endif /* ... */
 		}
 		switch (regno) {

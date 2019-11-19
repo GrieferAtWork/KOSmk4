@@ -49,7 +49,7 @@ struct read_locks {
 	                            * As hash-index, use `RWLOCK_HASH()' */
 };
 
-INTDEF ATTR_PERTASK struct read_locks _this_read_locks;
+INTDEF ATTR_PERTASK struct read_locks this_read_locks;
 
 /* Find an existing read-lock descriptor for `lock', or return NULL. */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) struct read_lock *

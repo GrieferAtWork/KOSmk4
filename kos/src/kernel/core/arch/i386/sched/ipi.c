@@ -87,7 +87,7 @@ NOTHROW(KCALL send_init_ipi)(struct cpu *__restrict target) {
 		__pause();
 
 	/* Send an INIT IPI to the target CPU. */
-	apic_send_init(FORCPU(target, x86_lapic_id));
+	apic_send_init(FORCPU(target, thiscpu_x86_lapicid));
 
 	/* Wait for 10 milliseconds. */
 	was = PREEMPTION_PUSHOFF();
@@ -114,7 +114,7 @@ NOTHROW(KCALL send_init_ipi)(struct cpu *__restrict target) {
 	sync_endwrite(&x86_pit_lock);
 	PREEMPTION_POP(was);
 	/* Send the startup IPI */
-	apic_send_startup(FORCPU(target, x86_lapic_id), x86_smp_entry_page);
+	apic_send_startup(FORCPU(target, thiscpu_x86_lapicid), x86_smp_entry_page);
 
 	/* Wait for the other CPU to come online. */
 #if 1 /* Best case: The CPU comes online without us having to do another PIT-wait */
@@ -168,7 +168,7 @@ done_ppop:
 	if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 		return;
 	/* Send the startup IPI again */
-	apic_send_startup(FORCPU(target, x86_lapic_id), x86_smp_entry_page);
+	apic_send_startup(FORCPU(target, thiscpu_x86_lapicid), x86_smp_entry_page);
 	/* Wait for up to 1 second. */
 	was = PREEMPTION_PUSHOFF();
 	while (!sync_trywrite(&x86_pit_lock)) {
@@ -217,13 +217,13 @@ struct pending_ipi {
 };
 
 /* Vector of pending IPI. */
-PRIVATE ATTR_PERCPU struct pending_ipi ipi_pending[CPU_IPI_BUFFER_SIZE];
+PRIVATE ATTR_PERCPU struct pending_ipi thiscpu_x86_ipi_pending[CPU_IPI_BUFFER_SIZE];
 
-/* [lock(SET(ATOMIC,IF_SET_IN(ipi_alloc)),CLEAR(ATOMIC,THIS_CPU))] Bitset of fully initialized IPIs. */
-INTERN ATTR_PERCPU WEAK uintptr_t ipi_inuse[CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER)] = { 0, };
+/* [lock(SET(ATOMIC,IF_SET_IN(thiscpu_x86_ipi_alloc)),CLEAR(ATOMIC,THIS_CPU))] Bitset of fully initialized IPIs. */
+INTERN ATTR_PERCPU WEAK uintptr_t thiscpu_x86_ipi_inuse[CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER)] = { 0, };
 
 /* [lock(SET(ATOMIC),CLEAR(ATOMIC,THIS_CPU))] Bitset of allocated IPIs. */
-PRIVATE ATTR_PERCPU WEAK uintptr_t ipi_alloc[CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER)] = { 0, };
+PRIVATE ATTR_PERCPU WEAK uintptr_t thiscpu_x86_ipi_alloc[CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER)] = { 0, };
 
 
 /* Check if there are any non-interrupting software-based IPIs pending. */
@@ -233,7 +233,7 @@ NOTHROW(KCALL cpu_swipi_pending)(void) {
 	struct cpu *me = THIS_CPU;
 	assert(!PREEMPTION_ENABLED());
 	for (i = 0; i < CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER); ++i) {
-		if (ATOMIC_READ(FORCPU(me, ipi_inuse[i])) != 0)
+		if (ATOMIC_READ(FORCPU(me, thiscpu_x86_ipi_inuse[i])) != 0)
 			return true;
 	}
 	return false;
@@ -249,7 +249,7 @@ NOTHROW(FCALL x86_serve_ipi)(struct icpustate *__restrict state) {
 	IPI_DEBUG("x86_serve_ipi\n");
 	for (i = 0; i < CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER); ++i) {
 		uintptr_t bits, mask;
-		bits = ATOMIC_XCH(FORCPU(me, ipi_inuse[i]), 0);
+		bits = ATOMIC_XCH(FORCPU(me, thiscpu_x86_ipi_inuse[i]), 0);
 		if (!bits)
 			continue;
 		for (j = 0, mask = 1; bits; ++j, mask <<= 1) {
@@ -257,8 +257,8 @@ NOTHROW(FCALL x86_serve_ipi)(struct icpustate *__restrict state) {
 			if (!(bits & mask))
 				continue;
 			/* Deallocate this IPI. */
-			memcpy(&ipi, &FORCPU(me, ipi_pending[i]), sizeof(ipi));
-			ATOMIC_FETCHAND(FORCPU(me, ipi_alloc[i]), ~mask);
+			memcpy(&ipi, &FORCPU(me, thiscpu_x86_ipi_pending[i]), sizeof(ipi));
+			ATOMIC_FETCHAND(FORCPU(me, thiscpu_x86_ipi_alloc[i]), ~mask);
 			/* Execute the IPI callback. */
 			IPI_DEBUG("x86_serve_ipi:%p\n", ipi.pi_func);
 			new_state = (*ipi.pi_func)(state, ipi.pi_args);
@@ -319,7 +319,7 @@ again:
 		uintptr_t word, mask;
 		unsigned int j;
 again_i:
-		word = ATOMIC_READ(FORCPU(target, ipi_alloc[i]));
+		word = ATOMIC_READ(FORCPU(target, thiscpu_x86_ipi_alloc[i]));
 		if unlikely(word == (uintptr_t)-1)
 			continue; /* Word is fully allocated. */
 		j    = 0;
@@ -328,15 +328,15 @@ again_i:
 			++j;
 			mask <<= 1;
 		}
-		if (!ATOMIC_CMPXCH_WEAK(FORCPU(target, ipi_alloc[i]), word, word | mask)) {
+		if (!ATOMIC_CMPXCH_WEAK(FORCPU(target, thiscpu_x86_ipi_alloc[i]), word, word | mask)) {
 			attempt = 0;
 			goto again_i;
 		}
 		/* Successfully allocated a slot. */
 		slot = i * BITS_PER_POINTER + j;
 		COMPILER_WRITE_BARRIER();
-		FORCPU(target, ipi_pending[slot].pi_func) = func;
-		memcpy(FORCPU(target, ipi_pending[slot]).pi_args,
+		FORCPU(target, thiscpu_x86_ipi_pending[slot].pi_func) = func;
+		memcpy(FORCPU(target, thiscpu_x86_ipi_pending[slot]).pi_args,
 		       args, CPU_IPI_ARGCOUNT * sizeof(void *));
 		COMPILER_WRITE_BARRIER();
 
@@ -346,14 +346,14 @@ again_i:
 		if (i == 0 && word == 0) {
 			if (target->c_state == CPU_STATE_RUNNING) {
 				/* Indicate that the IPI is now ready for handling by the core. */
-				ATOMIC_FETCHOR(FORCPU(target, ipi_inuse[i]), mask);
+				ATOMIC_FETCHOR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
 do_send_ipi:
 				IPI_DEBUG("cpu_sendipi:do_send_ipi\n");
 				/* Make sure that no other IPI is still pending to be delivered by our LAPIC */
 				while (lapic_read(APIC_ICR0) & APIC_ICR0_FPENDING)
 					__pause();
 				/* There were no other IPIs already, meaning it's our job to send the first! */
-				lapic_write(APIC_ICR1, APIC_ICR1_MKDEST(FORCPU(target, x86_lapic_id)));
+				lapic_write(APIC_ICR1, APIC_ICR1_MKDEST(FORCPU(target, thiscpu_x86_lapicid)));
 				lapic_write(APIC_ICR0,
 				            X86_INTERRUPT_APIC_IPI |
 				            APIC_ICR0_TYPE_FNORMAL |
@@ -366,19 +366,19 @@ do_send_ipi:
 				}
 			} else if (flags & CPU_IPI_FWAKEUP) {
 				/* Indicate that the IPI is now ready for handling by the core. */
-				ATOMIC_FETCHOR(FORCPU(target, ipi_inuse[i]), mask);
+				ATOMIC_FETCHOR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
 do_wake_target:
 				IPI_DEBUG("cpu_sendipi:cpu_wake\n");
 				cpu_wake(target);
 			} else {
 				/* Failed to wake the task (deallocate the IPI) */
-				ATOMIC_FETCHAND(FORCPU(target, ipi_alloc[i]), ~mask);
+				ATOMIC_FETCHAND(FORCPU(target, thiscpu_x86_ipi_alloc[i]), ~mask);
 				goto done_failure;
 			}
 		} else {
 			/* Indicate that the IPI is now ready for handling by the core. */
 			IPI_DEBUG("cpu_sendipi:secondary_ipi\n");
-			ATOMIC_FETCHOR(FORCPU(target, ipi_inuse[i]), mask);
+			ATOMIC_FETCHOR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
 			if (flags & CPU_IPI_FWAITFOR) {
 				/* Must still synchronize with the target CPU's reception of the IPI... */
 				if (target->c_state == CPU_STATE_RUNNING)
@@ -487,13 +487,13 @@ NOTHROW(KCALL cpu_wake)(struct cpu *__restrict target) {
 			 *       the CPU will have already gotten an interrupt (or has manually
 			 *       switched its state back to RUNNING, in which case it will have
 			 *       checked for pending IPIs) */
-			if (ATOMIC_READ(FORCPU(target, ipi_inuse[0])) == 0) {
+			if (ATOMIC_READ(FORCPU(target, thiscpu_x86_ipi_inuse[0])) == 0) {
 				/* Make sure that no other IPI is still pending to be delivered by our LAPIC */
 				while (lapic_read(APIC_ICR0) & APIC_ICR0_FPENDING)
 					__pause();
 				/* Send an IPI to the CPU, forcing it to load pending tasks. */
 				IPI_DEBUG("cpu_sendipi:deliver_ipi\n");
-				lapic_write(APIC_ICR1, APIC_ICR1_MKDEST(FORCPU(target, x86_lapic_id)));
+				lapic_write(APIC_ICR1, APIC_ICR1_MKDEST(FORCPU(target, thiscpu_x86_lapicid)));
 				lapic_write(APIC_ICR0, X86_INTERRUPT_APIC_IPI |
 				                       APIC_ICR0_TYPE_FNORMAL |
 				                       APIC_ICR0_DEST_PHYSICAL |

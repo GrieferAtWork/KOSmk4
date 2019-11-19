@@ -129,12 +129,12 @@ NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,
 		 *        We should have some kind of timeout here, and switch to all-stop
 		 *        mode if the timeout expires. */
 		if (GDBThread_IsAllStopModeActive) {
-			dent = xincref(FORVM(v, vm_execinfo).ei_dent);
-			path = xincref(FORVM(v, vm_execinfo).ei_path);
+			dent = xincref(FORVM(v, thisvm_execinfo).ei_dent);
+			path = xincref(FORVM(v, thisvm_execinfo).ei_path);
 		} else {
 			sync_read(v);
-			dent = xincref(FORVM(v, vm_execinfo).ei_dent);
-			path = xincref(FORVM(v, vm_execinfo).ei_path);
+			dent = xincref(FORVM(v, thisvm_execinfo).ei_dent);
+			path = xincref(FORVM(v, thisvm_execinfo).ei_path);
 			sync_endread(v);
 		}
 		if (filename_only && (dent || path)) {
@@ -381,7 +381,7 @@ NOTHROW(FCALL GDBInfo_PrintThreadList_Callback)(void *closure,
 		description = "terminated";
 	else if (flags & TASK_FTERMINATING)
 		description = "terminating";
-	else if (thread == &FORCPU(thread->t_cpu, _this_idle))
+	else if (thread == &FORCPU(thread->t_cpu, thiscpu_idle))
 		description = "idle";
 	else if (flags & TASK_FRUNNING)
 		description = "running";

@@ -65,7 +65,7 @@ PUBLIC_FUNCTION(dbg)
 	 * NOTE: When LAPIC is disabled, we can assume that there are no other cores
 	 *       that may already be locking debugger mode. */
 L(acquire_lapic_lock):
-	movl   %ss:x86_lapic_base_address, %eax
+	movl   %ss:x86_lapicbase, %eax
 	testl  %eax, %eax
 	jz     1f  /* No LAPIC --> We're the only CPU! */
 	movl   %ss:APIC_ID(%eax), %eax
@@ -104,7 +104,7 @@ L(acquire_lapic_lock):
 	 * where to return (this is what happens when the user holds F12 when the debugger
 	 * command-line driver is active, allowing them to soft-reset the debugger commandline
 	 * in case the current command gets stuck inside of a loop) */
-	INTERN(dbg_active)
+	EXTERN(dbg_active)
 	cmpl   $0, %ss:dbg_active
 	jne    L(recursive_debugger)
 
@@ -221,7 +221,7 @@ L(recursive_debugger):
 	movw   $(SEGMENT_CPU_LDT), %ax
 	lldtw  %ax
 
-	INTERN(__kernel_debug_stack)
+	EXTERN(__kernel_debug_stack)
 	movl   $(__kernel_debug_stack + KERNEL_DEBUG_STACKSIZE), %esp
 #ifdef ENTER_HERE
 	pushl  %edx       /* void *arg */
@@ -233,12 +233,12 @@ L(recursive_debugger):
 	cmpl   $0, dbg_active
 	jne    1f
 	movl   $1, dbg_active /* Indicate that the debugger is now active */
-	INTERN(dbg_init)
+	EXTERN(dbg_init)
 	call   dbg_init       /* Initialize first time around */
 1:
 
 	/* Reset the current debugger state. */
-	INTERN(dbg_reset)
+	EXTERN(dbg_reset)
 	call   dbg_reset
 
 	/* Enable interrupts while in debugger-mode */
@@ -249,7 +249,7 @@ L(recursive_debugger):
 #else /* ENTER_HERE */
 	pushl  $1         /* uintptr_t show_welcome */
 	pushl  $dbg_exit  /* Return address... */
-	INTERN(dbg_main)
+	EXTERN(dbg_main)
 	jmp    dbg_main
 #endif /* !ENTER_HERE */
 	.cfi_endproc

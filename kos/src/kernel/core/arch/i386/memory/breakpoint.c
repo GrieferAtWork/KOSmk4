@@ -35,28 +35,28 @@ DECL_BEGIN
  *       must also update these fields accordingly. - Otherwise,
  *       any changes made will become lost the next time the VM
  *       is changed. */
-PUBLIC ATTR_PERVM uintptr_t _this_x86_dr0 = 0;
-PUBLIC ATTR_PERVM uintptr_t _this_x86_dr1 = 0;
-PUBLIC ATTR_PERVM uintptr_t _this_x86_dr2 = 0;
-PUBLIC ATTR_PERVM uintptr_t _this_x86_dr3 = 0;
-PUBLIC ATTR_PERVM uintptr_t _this_x86_dr7 = 0;
+PUBLIC ATTR_PERVM uintptr_t thisvm_x86_dr0 = 0;
+PUBLIC ATTR_PERVM uintptr_t thisvm_x86_dr1 = 0;
+PUBLIC ATTR_PERVM uintptr_t thisvm_x86_dr2 = 0;
+PUBLIC ATTR_PERVM uintptr_t thisvm_x86_dr3 = 0;
+PUBLIC ATTR_PERVM uintptr_t thisvm_x86_dr7 = 0;
 
-#define _this_x86_drN(n) (*_this_x86_drN_impl(n))
-LOCAL uintptr_t *KCALL _this_x86_drN_impl(unsigned int n) {
+#define thisvm_x86_drN(n) (*thisvm_x86_drN_impl(n))
+LOCAL uintptr_t *KCALL thisvm_x86_drN_impl(unsigned int n) {
 	uintptr_t *result;
 	switch (n) {
 
 	case 0:
-		result = &_this_x86_dr0;
+		result = &thisvm_x86_dr0;
 		break;
 	case 1:
-		result = &_this_x86_dr1;
+		result = &thisvm_x86_dr1;
 		break;
 	case 2:
-		result = &_this_x86_dr2;
+		result = &thisvm_x86_dr2;
 		break;
 	case 3:
-		result = &_this_x86_dr3;
+		result = &thisvm_x86_dr3;
 		break;
 
 	default: __builtin_unreachable();
@@ -130,7 +130,7 @@ NOTHROW(KCALL vm_addhwbreak)(struct vm *__restrict self,
 #endif /* !__x86_64__ */
 	assert(br_size == DR_S1 || br_size == DR_S2 ||
 	       br_size == DR_S4 || br_size == DR_S8);
-	dr7 = FORVM(self, _this_x86_dr7);
+	dr7 = FORVM(self, thisvm_x86_dr7);
 	for (i = 0; i < DR7_BREAKPOINT_COUNT; ++i) {
 		if (dr7 & (DR7_LN(i) | DR7_GN(i)))
 			continue; /* Already in use */
@@ -138,8 +138,8 @@ NOTHROW(KCALL vm_addhwbreak)(struct vm *__restrict self,
 		dr7 &= ~(DR7_CN(i) | DR7_SN(i));
 		dr7 |= br_cond << DR7_CN_SHIFT(i);
 		dr7 |= br_size << DR7_SN_SHIFT(i);
-		FORVM(self, _this_x86_drN(i)) = (uintptr_t)addr;
-		FORVM(self, _this_x86_dr7) = dr7;
+		FORVM(self, thisvm_x86_drN(i)) = (uintptr_t)addr;
+		FORVM(self, thisvm_x86_dr7) = dr7;
 		if (self == THIS_VM) {
 			/* Activate the breakpoint. */
 			__wrdrN0123(i, (uintptr_t)addr);
@@ -169,12 +169,12 @@ NOTHROW(KCALL vm_delhwbreak)(struct vm *__restrict self,
 #endif /* !__x86_64__ */
 	assert(br_size == DR_S1 || br_size == DR_S2 ||
 	       br_size == DR_S4 || br_size == DR_S8);
-	dr7 = FORVM(self, _this_x86_dr7);
+	dr7 = FORVM(self, thisvm_x86_dr7);
 	for (i = 0; i < DR7_BREAKPOINT_COUNT; ++i) {
 		uintptr_t br_addr;
 		if (!(dr7 & DR7_LN(i)))
 			continue; /* unused */
-		br_addr = FORVM(self, _this_x86_drN(i));
+		br_addr = FORVM(self, thisvm_x86_drN(i));
 		if (br_addr != (uintptr_t)addr)
 			continue; /* Different address. */
 		if (((dr7 & DR7_CN(i)) >> DR7_CN_SHIFT(i)) != br_cond)
@@ -183,7 +183,7 @@ NOTHROW(KCALL vm_delhwbreak)(struct vm *__restrict self,
 			continue; /* Different breakpoint size. */
 		/* Found it! */
 		dr7 &= ~DR7_LN(i);
-		FORVM(self, _this_x86_dr7) = dr7;
+		FORVM(self, thisvm_x86_dr7) = dr7;
 		if (self == THIS_VM) {
 			/* Deactivate the breakpoint. */
 			__wrdr7(dr7);
@@ -198,9 +198,9 @@ NOTHROW(KCALL vm_delhwbreak)(struct vm *__restrict self,
 PUBLIC NOBLOCK void
 NOTHROW(KCALL vm_clrhwbreak)(struct vm *__restrict self) {
 	uintptr_t dr7;
-	dr7 = FORVM(self, _this_x86_dr7);
+	dr7 = FORVM(self, thisvm_x86_dr7);
 	dr7 &= ~(DR7_L0 | DR7_L1 | DR7_L2 | DR7_L3);
-	FORVM(self, _this_x86_dr7) = dr7;
+	FORVM(self, thisvm_x86_dr7) = dr7;
 	if (self == THIS_VM)
 		__wrdr7(dr7);
 }

@@ -141,8 +141,8 @@ NOTHROW(KCALL ioctl_complete_exception_info)(unsigned int fd) {
 	switch (code) {
 
 	case ERROR_CODEOF(E_INVALID_HANDLE_OPERATION):
-		if (!PERTASK_GET(_this_exception_info.ei_data.e_pointers[0])) /* fd */
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)fd);
+		if (!PERTASK_GET(this_exception_info.ei_data.e_pointers[0])) /* fd */
+			PERTASK_SET(this_exception_info.ei_data.e_pointers[0], (uintptr_t)fd);
 		break;
 
 	default: break;
@@ -270,7 +270,7 @@ DEFINE_SYSCALL3(syscall_slong_t, ioctl,
 		                      arg);
 	} EXCEPT {
 		if (was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) &&
-		    PERTASK_GET(_this_exception_info.ei_data.e_pointers[0]) == E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND) {
+		    PERTASK_GET(this_exception_info.ei_data.e_pointers[0]) == E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND) {
 			TRY {
 				if (ioctl_generic(command, fd, &hand, arg, &result))
 					goto done;
@@ -625,15 +625,15 @@ NOTHROW(KCALL hop_complete_exception_info)(struct handle *__restrict hand,
 	error_code_t code = error_code();
 	switch (code) {
 	case ERROR_CODEOF(E_INVALID_HANDLE_FILETYPE):
-		if (!PERTASK_GET(_this_exception_info.ei_data.e_pointers[0])) /* fd */
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)fd);
-		if (!PERTASK_GET(_this_exception_info.ei_data.e_pointers[2])) /* actual_handle_type */
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)hand->h_type);
-		if (!PERTASK_GET(_this_exception_info.ei_data.e_pointers[4])) /* actual_handle_kind */
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[4], (uintptr_t)handle_typekind(hand));
+		if (!PERTASK_GET(this_exception_info.ei_data.e_pointers[0])) /* fd */
+			PERTASK_SET(this_exception_info.ei_data.e_pointers[0], (uintptr_t)fd);
+		if (!PERTASK_GET(this_exception_info.ei_data.e_pointers[2])) /* actual_handle_type */
+			PERTASK_SET(this_exception_info.ei_data.e_pointers[2], (uintptr_t)hand->h_type);
+		if (!PERTASK_GET(this_exception_info.ei_data.e_pointers[4])) /* actual_handle_kind */
+			PERTASK_SET(this_exception_info.ei_data.e_pointers[4], (uintptr_t)handle_typekind(hand));
 		break;
 	case ERROR_CODEOF(E_INVALID_ARGUMENT_UNKNOWN_COMMAND):
-		if (PERTASK_GET(_this_exception_info.ei_data.e_pointers[0]) != E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND)
+		if (PERTASK_GET(this_exception_info.ei_data.e_pointers[0]) != E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND)
 			break;
 		if ((hop_command >> 16) == HANDLE_TYPE_UNDEFINED ||
 		    (hop_command >> 16) >= HANDLE_TYPE_COUNT)
@@ -641,12 +641,12 @@ NOTHROW(KCALL hop_complete_exception_info)(struct handle *__restrict hand,
 		/* If the command does actually exist, but simply cannot be applied to the
 		 * associated handle type, translate the exception to `E_INVALID_HANDLE_FILETYPE',
 		 * with the required file type set there. */
-		PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_INVALID_HANDLE_FILETYPE));
-		PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)fd);
-		PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)(hop_command >> 16)); /* HOP Commands encode the required type like this */
-		PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)hand->h_type);
-		PERTASK_SET(_this_exception_info.ei_data.e_pointers[4], (uintptr_t)handle_typekind(hand));
-		PERTASK_SET(_this_exception_info.ei_data.e_pointers[3], (uintptr_t)HANDLE_TYPEKIND_GENERIC); /* XXX: Not necessarily correct... */
+		PERTASK_SET(this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_INVALID_HANDLE_FILETYPE));
+		PERTASK_SET(this_exception_info.ei_data.e_pointers[0], (uintptr_t)fd);
+		PERTASK_SET(this_exception_info.ei_data.e_pointers[1], (uintptr_t)(hop_command >> 16)); /* HOP Commands encode the required type like this */
+		PERTASK_SET(this_exception_info.ei_data.e_pointers[2], (uintptr_t)hand->h_type);
+		PERTASK_SET(this_exception_info.ei_data.e_pointers[4], (uintptr_t)handle_typekind(hand));
+		PERTASK_SET(this_exception_info.ei_data.e_pointers[3], (uintptr_t)HANDLE_TYPEKIND_GENERIC); /* XXX: Not necessarily correct... */
 		break;
 
 	default: break;
@@ -725,7 +725,7 @@ DEFINE_SYSCALL4(syscall_slong_t, ioctlf,
 		                       mode);
 	} EXCEPT {
 		if (was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) &&
-		    PERTASK_GET(_this_exception_info.ei_data.e_pointers[0]) == E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND) {
+		    PERTASK_GET(this_exception_info.ei_data.e_pointers[0]) == E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND) {
 			TRY {
 				if (ioctl_generic(command, fd, &hand, arg, &result))
 					goto done;

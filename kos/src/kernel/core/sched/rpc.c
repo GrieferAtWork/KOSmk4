@@ -65,11 +65,11 @@ DEFINE_PREALLOCATION_CACHE_ALLOC_NX(INTERN, rpcentry, struct rpc_entry)
  * Chain of pending RPC functions.
  * When set to `RPC_PENDING_TERMINATED', no further RPC functions
  * may be scheduled (this is done during task cleanup) */
-INTERN ATTR_PERTASK WEAK struct rpc_entry *_this_pending_rpcs = NULL;
+INTERN ATTR_PERTASK WEAK struct rpc_entry *this_rpcs_pending = NULL;
 /* Amount of pending, synchronous RPCs (not counting non-interrupting user-RPCs) */
-INTERN ATTR_PERTASK WEAK size_t _this_pending_sync_count = 0;
+INTERN ATTR_PERTASK WEAK size_t this_rpc_pending_sync_count = 0;
 /* Amount of pending, synchronous no-except RPCs (not counting non-interrupting user-RPCs) */
-INTERN ATTR_PERTASK WEAK size_t _this_pending_sync_count_nx = 0;
+INTERN ATTR_PERTASK WEAK size_t this_rpc_pending_sync_count_nx = 0;
 
 
 DEFINE_PERTASK_ONEXIT(cleanup_pending_rpcs);
@@ -77,7 +77,7 @@ PRIVATE ATTR_USED void
 NOTHROW(KCALL cleanup_pending_rpcs)(void) {
 	struct rpc_entry *chain, *next;
 	/* Serve all remaining RPC functions, discarding all exceptions they may throw. */
-	chain = ATOMIC_XCH(PERTASK(_this_pending_rpcs), RPC_PENDING_TERMINATED);
+	chain = ATOMIC_XCH(PERTASK(this_rpcs_pending), RPC_PENDING_TERMINATED);
 	assert(chain != RPC_PENDING_TERMINATED);
 	while (chain) {
 		next = chain->re_next;
@@ -108,10 +108,10 @@ NOTHROW(KCALL reinsert_pending_rpcs)(struct rpc_entry *__restrict chain,
                                      struct rpc_entry *__restrict chain_end) {
 	struct rpc_entry *next;
 	do {
-		next = ATOMIC_READ(PERTASK(_this_pending_rpcs));
+		next = ATOMIC_READ(PERTASK(this_rpcs_pending));
 		chain_end->re_next = next;
 		COMPILER_WRITE_BARRIER();
-	} while (!ATOMIC_CMPXCH_WEAK(PERTASK(_this_pending_rpcs), next, chain));
+	} while (!ATOMIC_CMPXCH_WEAK(PERTASK(this_rpcs_pending), next, chain));
 }
 
 
@@ -121,9 +121,9 @@ INTERN struct icpustate *FCALL
 task_serve_one_impl(struct icpustate *__restrict state) {
 	struct rpc_entry *chain, **piter, *iter, *my_entry;
 	assert(PREEMPTION_ENABLED());
-	assert(PERTASK_TEST(_this_pending_sync_count));
+	assert(PERTASK_TEST(this_rpc_pending_sync_count));
 	/* Service synchronous RPC functions. */
-	chain = ATOMIC_XCH(PERTASK(_this_pending_rpcs), NULL);
+	chain = ATOMIC_XCH(PERTASK(this_rpcs_pending), NULL);
 	piter = &chain;
 	for (;;) {
 		iter = *piter;
@@ -174,8 +174,8 @@ task_serve_one_impl(struct icpustate *__restrict state) {
 	 * are visible in nested calls to `task_serve()' */
 	reinsert_pending_rpcs(chain, iter);
 	if (my_entry->re_kind & RPC_KIND_NOTHROW)
-		ATOMIC_FETCHDEC(PERTASK(_this_pending_sync_count_nx));
-	ATOMIC_FETCHDEC(PERTASK(_this_pending_sync_count));
+		ATOMIC_FETCHDEC(PERTASK(this_rpc_pending_sync_count_nx));
+	ATOMIC_FETCHDEC(PERTASK(this_rpc_pending_sync_count));
 	TRY {
 		/* Service the RPC. */
 		if likely(my_entry->re_kind & RPC_KIND_SRPC) {
@@ -203,10 +203,10 @@ INTERN struct icpustate *
 NOTHROW(FCALL task_serve_one_nx_impl)(struct icpustate *__restrict state) {
 	struct rpc_entry *chain, **piter, *iter, *my_entry;
 	assert(PREEMPTION_ENABLED());
-	assert(PERTASK_TEST(_this_pending_sync_count_nx));
-	assert(PERTASK_TEST(_this_pending_sync_count));
+	assert(PERTASK_TEST(this_rpc_pending_sync_count_nx));
+	assert(PERTASK_TEST(this_rpc_pending_sync_count));
 	/* Service synchronous RPC functions. */
-	chain = ATOMIC_XCH(PERTASK(_this_pending_rpcs), NULL);
+	chain = ATOMIC_XCH(PERTASK(this_rpcs_pending), NULL);
 	piter = &chain;
 	for (;;) {
 		iter = *piter;
@@ -223,8 +223,8 @@ NOTHROW(FCALL task_serve_one_nx_impl)(struct icpustate *__restrict state) {
 	/* Re-schedule all other pending RPCs, so they
 	 * are visible in nested calls to `task_serve()' */
 	reinsert_pending_rpcs(chain, iter);
-	ATOMIC_FETCHDEC(PERTASK(_this_pending_sync_count_nx));
-	ATOMIC_FETCHDEC(PERTASK(_this_pending_sync_count));
+	ATOMIC_FETCHDEC(PERTASK(this_rpc_pending_sync_count_nx));
+	ATOMIC_FETCHDEC(PERTASK(this_rpc_pending_sync_count));
 	/* Service the RPC. */
 	if likely(my_entry->re_kind & RPC_KIND_SRPC) {
 		(*my_entry->re_sfunc)(my_entry->re_arg);
@@ -288,11 +288,11 @@ NOTHROW(KCALL task_deliver_rpc)(struct task *__restrict target,
 
 	/* Add the RPC entry to the target thread. */
 	do {
-		next = ATOMIC_READ(FORTASK(target, _this_pending_rpcs));
+		next = ATOMIC_READ(FORTASK(target, this_rpcs_pending));
 		if unlikely(next == RPC_PENDING_TERMINATED)
 			return TASK_DELIVER_RPC_TERMINATED;
 		rpc->re_next = next;
-	} while (!ATOMIC_CMPXCH_WEAK(FORTASK(target, _this_pending_rpcs),
+	} while (!ATOMIC_CMPXCH_WEAK(FORTASK(target, this_rpcs_pending),
 	                             next, rpc));
 
 	/* Increment the target thread's counter for pending, synchronous RPCs
@@ -300,8 +300,8 @@ NOTHROW(KCALL task_deliver_rpc)(struct task *__restrict target,
 	if ((rpc_mode & RPC_KIND_MASK) != RPC_KIND_USER) {
 		/* `RPC_KIND_SYNC', `RPC_KIND_USER_INTR' or `RPC_KIND_USER_INTR_SYNC' */
 		if (rpc_mode & RPC_KIND_NOTHROW)
-			ATOMIC_FETCHINC(FORTASK(target, _this_pending_sync_count_nx));
-		ATOMIC_FETCHINC(FORTASK(target, _this_pending_sync_count));
+			ATOMIC_FETCHINC(FORTASK(target, this_rpc_pending_sync_count_nx));
+		ATOMIC_FETCHINC(FORTASK(target, this_rpc_pending_sync_count));
 	}
 	/* At this point our RPC has been scheduled and
 	 * can potentially be executed at any moment. */
@@ -319,7 +319,7 @@ NOTHROW(KCALL task_deliver_rpc)(struct task *__restrict target,
 	}
 	/* Always return SUCCESS at this point, as a failed `task_wake()' / `task_redirect_usercode_rpc()'
 	 * still means that the RPC will be serviced, since we managed to schedule it as
-	 * pending (i.e. `_this_pending_rpcs' wasn't `RPC_PENDING_TERMINATED'). */
+	 * pending (i.e. `this_rpcs_pending' wasn't `RPC_PENDING_TERMINATED'). */
 	return TASK_DELIVER_RPC_SUCCESS;
 }
 

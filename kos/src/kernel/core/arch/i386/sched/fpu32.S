@@ -117,7 +117,7 @@ PUBLIC_FUNCTION(x86_fxsave)
 	 * >>         res |= 1 << i;
 	 * >> } */
 	pushl_cfi_r %ecx
-	INTERN(x86_fxsave_compress_ftw)
+	EXTERN(x86_fxsave_compress_ftw)
 	call   x86_fxsave_compress_ftw
 	popl_cfi_r %ecx
 	movb   %al, OFFSET_XFPUSTATE_FTW(%ecx)
@@ -207,7 +207,7 @@ PUBLIC_FUNCTION(x86_fxrstor)
 	movzwl OFFSET_XFPUSTATE_FSW(%ecx), %eax
 	movl   %eax, OFFSET_SFPUSTATE_FSW(%esp)
 	pushl_cfi_r %ecx
-	INTERN(x86_fxsave_decompress_ftw)
+	EXTERN(x86_fxsave_decompress_ftw)
 	call   x86_fxsave_decompress_ftw
 	popl_cfi_r %ecx
 	movl   %eax, OFFSET_SFPUSTATE_FTW(%esp)

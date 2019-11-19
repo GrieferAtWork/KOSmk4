@@ -36,12 +36,16 @@ DECL_BEGIN
 
 #ifdef __CC__
 /* The per-cpu GDT vector. */
-DATDEF ATTR_PERCPU struct segment x86_cpugdt[SEGMENT_COUNT];
-DATDEF ATTR_PERCPU struct segment x86_cpuldt[LDT_SEGMENT_COUNT];
+DATDEF ATTR_PERCPU struct segment thiscpu_x86_gdt[SEGMENT_COUNT];
+DATDEF ATTR_PERCPU struct segment thiscpu_x86_ldt[LDT_SEGMENT_COUNT];
+DATDEF struct segment x86_bootcpu_gdt[SEGMENT_COUNT];
 
+#ifndef ___this_x86_kernel_psp0_defined
+#define ___this_x86_kernel_psp0_defined 1
 /* [== VM_NODE_ENDADDR(THIS_KERNEL_STACK)]
  * The per-task value written to `t_esp0' / `t_rsp0' during scheduler preemption. */
-DATDEF ATTR_PERTASK uintptr_t const x86_this_kernel_sp0;
+DATDEF ATTR_PERTASK uintptr_t const this_x86_kernel_psp0;
+#endif /* !___this_x86_kernel_psp0_defined */
 
 /* Get/Set the user-space FS/GS base for the current thread. */
 #ifdef __x86_64__
@@ -78,16 +82,16 @@ FORCELOCAL void KCALL update_user_gsbase(void) {
 /* The per-task values with which the `SEGMENT_USER_FSBASE' and
  * `SEGMENT_USER_GSBASE' segments are populated during scheduler
  * preemption. */
-DATDEF ATTR_PERTASK uintptr_t x86_this_user_fsbase;
-DATDEF ATTR_PERTASK uintptr_t x86_this_user_gsbase;
+DATDEF ATTR_PERTASK uintptr_t this_x86_user_fsbase;
+DATDEF ATTR_PERTASK uintptr_t this_x86_user_gsbase;
 
 FORCELOCAL WUNUSED uintptr_t KCALL get_user_fsbase(void) {
-	return PERTASK_GET(x86_this_user_fsbase);
+	return PERTASK_GET(this_x86_user_fsbase);
 }
 
 FORCELOCAL void KCALL set_user_fsbase(uintptr_t value) {
-	PERTASK_SET(x86_this_user_fsbase, value);
-	segment_wrbaseX(&PERCPU(x86_cpugdt[SEGMENT_INDEX(SEGMENT_USER_FSBASE)]), value);
+	PERTASK_SET(this_x86_user_fsbase, value);
+	segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_FSBASE)]), value);
 #ifndef SEGMENT_KERNEL_FSBASE
 	{
 		__register uintptr_t temp;
@@ -102,8 +106,8 @@ FORCELOCAL void KCALL set_user_fsbase(uintptr_t value) {
 }
 
 FORCELOCAL void KCALL update_user_fsbase(void) {
-	segment_wrbaseX(&PERCPU(x86_cpugdt[SEGMENT_INDEX(SEGMENT_USER_FSBASE)]),
-	                PERTASK_GET(x86_this_user_fsbase));
+	segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_FSBASE)]),
+	                PERTASK_GET(this_x86_user_fsbase));
 #ifndef SEGMENT_KERNEL_FSBASE
 	{
 		__register uintptr_t temp;
@@ -118,12 +122,12 @@ FORCELOCAL void KCALL update_user_fsbase(void) {
 }
 
 FORCELOCAL WUNUSED uintptr_t KCALL get_user_gsbase(void) {
-	return PERTASK_GET(x86_this_user_gsbase);
+	return PERTASK_GET(this_x86_user_gsbase);
 }
 
 FORCELOCAL void KCALL set_user_gsbase(uintptr_t value) {
-	PERTASK_SET(x86_this_user_gsbase, value);
-	segment_wrbaseX(&PERCPU(x86_cpugdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]), value);
+	PERTASK_SET(this_x86_user_gsbase, value);
+	segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]), value);
 #ifndef SEGMENT_KERNEL_GSBASE
 	{
 		/* Reload the GS register, which likely wouldn't be done without this. */
@@ -138,8 +142,8 @@ FORCELOCAL void KCALL set_user_gsbase(uintptr_t value) {
 }
 
 FORCELOCAL void KCALL update_user_gsbase(void) {
-	segment_wrbaseX(&PERCPU(x86_cpugdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]),
-	                PERTASK_GET(x86_this_user_gsbase));
+	segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]),
+	                PERTASK_GET(this_x86_user_gsbase));
 #ifndef SEGMENT_KERNEL_GSBASE
 	{
 		/* Reload the GS register, which likely wouldn't be done without this. */

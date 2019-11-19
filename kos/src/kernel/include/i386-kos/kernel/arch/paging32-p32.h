@@ -323,7 +323,7 @@ INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_map)(VIRT vm_vpage_t virt_page, si
 
 /* Special variants of `pagedir_mapone()' that should be used to
  * temporary override the mapping of a single, prepared page.
- * These functions are mainly intended for use with `_this_trampoline_page', allowing
+ * These functions are mainly intended for use with `this_trampoline_page', allowing
  * each thread to push/pop its trampoline page, with doing so actually being an atomic
  * operation in the sense that the data is entirely thread-private, while modifications
  * do not require any kind of lock.

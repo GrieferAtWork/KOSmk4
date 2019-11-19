@@ -730,10 +730,10 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 					} else {
 						/* Don't allow user-space to set the bases of any other segment.
 						 * As such, throw an exception indicating a privileged register (which SOME_SEGMENT.base is) */
-						PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-						PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
-						PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_FS);
-						PERTASK_SET(_this_exception_info.ei_data.e_pointers[3], (uintptr_t)val);
+						PERTASK_SET(this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+						PERTASK_SET(this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
+						PERTASK_SET(this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_FS);
+						PERTASK_SET(this_exception_info.ei_data.e_pointers[3], (uintptr_t)val);
 						goto set_generic_illegal_instruction_4;
 					}
 				}
@@ -769,10 +769,10 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 					} else {
 						/* Don't allow user-space to set the bases of any other segment.
 						 * As such, throw an exception indicating a privileged register (which SOME_SEGMENT.base is) */
-						PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-						PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
-						PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_GS);
-						PERTASK_SET(_this_exception_info.ei_data.e_pointers[3], (uintptr_t)val);
+						PERTASK_SET(this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+						PERTASK_SET(this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
+						PERTASK_SET(this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_GS);
+						PERTASK_SET(this_exception_info.ei_data.e_pointers[3], (uintptr_t)val);
 						goto set_generic_illegal_instruction_4;
 					}
 				}
@@ -817,7 +817,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 		case 0x0fa2: {
 			struct cpuinfo const *info;
 			/* CPUID */
-			info = &CPUID_FEATURES;
+			info = &CURRENT_X86_CPUID;
 			switch (get_eax()) {
 
 			case 0:
@@ -1026,21 +1026,21 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 		case 0x0f32: /* RDMSR */
 			if (op_flags & (F_AD16 | F_LOCK | F_REP | F_REPNE))
 				goto e_bad_prefix;
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+			PERTASK_SET(this_exception_info.ei_data.e_pointers[1],
 			            isuser() ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV
 			                      : (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDINV);
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[4], (uintptr_t)0);
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[5], (uintptr_t)0);
+			PERTASK_SET(this_exception_info.ei_data.e_pointers[4], (uintptr_t)0);
+			PERTASK_SET(this_exception_info.ei_data.e_pointers[5], (uintptr_t)0);
 			goto e_bad_msr_regno;
 
 		case 0x0f30: /* WRMSR */
 			if (op_flags & (F_AD16 | F_LOCK | F_REP | F_REPNE))
 				goto e_bad_prefix;
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[1],
+			PERTASK_SET(this_exception_info.ei_data.e_pointers[1],
 			            isuser() ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV
 			                      : (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRINV);
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[4], (uintptr_t)get_eax());
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[5], (uintptr_t)get_edx());
+			PERTASK_SET(this_exception_info.ei_data.e_pointers[4], (uintptr_t)get_eax());
+			PERTASK_SET(this_exception_info.ei_data.e_pointers[5], (uintptr_t)get_edx());
 			goto e_bad_msr_regno;
 
 
@@ -1331,11 +1331,11 @@ e_unknown_instruction:
 		}
 	} EXCEPT {
 		if (was_thrown(E_ILLEGAL_INSTRUCTION) &&
-		    PERTASK_GET(_this_exception_info.ei_data.e_pointers[0]) == 0) {
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)opcode);
-			PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)orig_pc);
+		    PERTASK_GET(this_exception_info.ei_data.e_pointers[0]) == 0) {
+			PERTASK_SET(this_exception_info.ei_data.e_pointers[0], (uintptr_t)opcode);
+			PERTASK_SET(this_exception_info.ei_data.e_faultaddr, (void *)orig_pc);
 		} else if (isuser()) {
-			PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)orig_pc);
+			PERTASK_SET(this_exception_info.ei_data.e_faultaddr, (void *)orig_pc);
 		}
 		icpustate_setpc(state, (uintptr_t)pc);
 		RETHROW();
@@ -1346,33 +1346,33 @@ done:
 	{
 		unsigned int i;
 e_bad_msr_regno:
-		PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-		PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_MSR);
-		PERTASK_SET(_this_exception_info.ei_data.e_pointers[3], (uintptr_t)get_ecx());
+		PERTASK_SET(this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+		PERTASK_SET(this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_MSR);
+		PERTASK_SET(this_exception_info.ei_data.e_pointers[3], (uintptr_t)get_ecx());
 		i = 6;
 		goto set_generic_illegal_instruction;
 e_bad_operand_addrmode:
-		PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND));
-		PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE);
+		PERTASK_SET(this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND));
+		PERTASK_SET(this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE);
 		i = 2;
 		goto set_generic_illegal_instruction;
 set_generic_illegal_instruction_4:
 		i = 4;
 		goto set_generic_illegal_instruction;
 e_privileged_instruction:
-		PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE));
+		PERTASK_SET(this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE));
 		i = 1;
 		goto set_generic_illegal_instruction;
 e_unsupported_instruction:
-		PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE));
+		PERTASK_SET(this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE));
 		i = 1;
 		goto set_generic_illegal_instruction;
 e_bad_prefix:
-		PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX));
+		PERTASK_SET(this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX));
 		i = 1;
 		goto set_generic_illegal_instruction;
 e_instruction_too_long:
-		PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_TOO_LONG));
+		PERTASK_SET(this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_TOO_LONG));
 		i = 1;
 		goto set_generic_illegal_instruction;
 generic_illegal_instruction:
@@ -1506,19 +1506,19 @@ generic_illegal_instruction:
 			default: goto e_bad_prefix;
 			}
 		}
-		PERTASK_SET(_this_exception_info.ei_code,
+		PERTASK_SET(this_exception_info.ei_code,
 		            (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPCODE));
 		i = 1;
 set_generic_illegal_instruction:
-		PERTASK_SET(_this_exception_info.ei_data.e_pointers[0], (uintptr_t)opcode);
+		PERTASK_SET(this_exception_info.ei_data.e_pointers[0], (uintptr_t)opcode);
 		for (; i < EXCEPTION_DATA_POINTERS; ++i)
-			PERTASK_SET(_this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
+			PERTASK_SET(this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
 #if EXCEPT_BACKTRACE_SIZE != 0
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-			PERTASK_SET(_this_exception_info.ei_trace[i], (void *)0);
+			PERTASK_SET(this_exception_info.ei_trace[i], (void *)0);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	}
-	PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)orig_pc);
+	PERTASK_SET(this_exception_info.ei_data.e_faultaddr, (void *)orig_pc);
 	icpustate_setpc(state, (uintptr_t)pc);
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_ILLEGAL_INSTRUCTION))

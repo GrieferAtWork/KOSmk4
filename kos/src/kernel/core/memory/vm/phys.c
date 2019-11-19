@@ -35,7 +35,7 @@
 DECL_BEGIN
 
 /* A data part used to describe a single, reserved page. */
-INTERN ATTR_PERTASK struct vm_node _this_trampoline_node = {
+PUBLIC ATTR_PERTASK struct vm_node this_trampoline_node = {
 	/* .vn_node   = */ { NULL, NULL, 0, 0 },
 	/* .vn_byaddr = */ LLIST_INITNODE,
 	/* .vn_prot   = */ VM_PROT_PRIVATE,
@@ -64,8 +64,8 @@ vm_copyfromphys(USER CHECKED void *dst,
 	}
 #endif /* !NO_PHYS_IDENTITY */
 	if unlikely(!num_bytes) {
-		DEFINE_PUBLIC_SYMBOL(_this_trampoline_page,
-		                     &_this_trampoline_node.vn_node.a_vmin,
+		DEFINE_PUBLIC_SYMBOL(this_trampoline_page,
+		                     &this_trampoline_node.vn_node.a_vmin,
 		                     sizeof(vm_vpage_t));
 		return;
 	}

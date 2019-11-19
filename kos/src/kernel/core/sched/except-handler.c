@@ -42,7 +42,7 @@
 DECL_BEGIN
 
 /* User-space exception handler mode for the current thread. */
-PUBLIC ATTR_PERTASK struct user_except_handler _this_user_except_handler = {
+PUBLIC ATTR_PERTASK struct user_except_handler this_user_except_handler = {
 	/* .ueh_mode    = */ EXCEPT_HANDLER_MODE_DISABLED,
 	/* .ueh_handler = */ NULL,
 	/* .ueh_stack   = */ EXCEPT_HANDLER_SP_CURRENT,
@@ -50,7 +50,7 @@ PUBLIC ATTR_PERTASK struct user_except_handler _this_user_except_handler = {
 
 /* [0..1] User-space TID address used to implement functionality such as `pthread_join()'
  *        When the associated thread exits, it will:
- *        >> pid_t *addr = PERTASK_GET(_this_tid_address);
+ *        >> pid_t *addr = PERTASK_GET(this_tid_address);
  *        >> if (addr) {
  *        >>     TRY {
  *        >>         *addr = 0;
@@ -62,13 +62,13 @@ PUBLIC ATTR_PERTASK struct user_except_handler _this_user_except_handler = {
  *        >>     }
  *        >> }
  * When a new thread is created by clone(), the `CLONE_CHILD_CLEARTID' flag will cause
- * the given `ctid' to be used as the initial value for `_this_tid_address', while the
+ * the given `ctid' to be used as the initial value for `this_tid_address', while the
  * `CLONE_CHILD_SETTID' flag will cause the same address to be filled with the thread's
  * TID. */
-PUBLIC ATTR_PERTASK USER CHECKED pid_t *_this_tid_address = NULL;
-DEFINE_PERTASK_ONEXIT(pertask_onexit_broadcast_tid_address);
-INTERN ATTR_USED void NOTHROW(KCALL pertask_onexit_broadcast_tid_address)(void) {
-	pid_t *addr = PERTASK_GET(_this_tid_address);
+PUBLIC ATTR_PERTASK USER CHECKED pid_t *this_tid_address = NULL;
+DEFINE_PERTASK_ONEXIT(onexit_this_tid_address);
+INTERN ATTR_USED void NOTHROW(KCALL onexit_this_tid_address)(void) {
+	pid_t *addr = PERTASK_GET(this_tid_address);
 	if (addr) {
 		TRY {
 			*addr = 0;
@@ -92,8 +92,8 @@ DEFINE_PERTASK_CLONE(clone_user_except_handler);
 PRIVATE ATTR_USED NOBLOCK void
 NOTHROW(KCALL clone_user_except_handler)(struct task *__restrict new_thread,
                                          uintptr_t UNUSED(flags)) {
-	memcpy(&FORTASK(new_thread, _this_user_except_handler),
-	       &PERTASK(_this_user_except_handler),
+	memcpy(&FORTASK(new_thread, this_user_except_handler),
+	       &PERTASK(this_user_except_handler),
 	       sizeof(struct user_except_handler));
 }
 
@@ -101,11 +101,11 @@ DEFINE_PERVM_ONEXEC(reset_user_except_handler);
 PRIVATE ATTR_USED NOBLOCK void
 NOTHROW(KCALL reset_user_except_handler)(void) {
 	struct user_except_handler *hand;
-	hand            = &PERTASK(_this_user_except_handler);
+	hand            = &PERTASK(this_user_except_handler);
 	hand->ueh_mode  = EXCEPT_HANDLER_MODE_DISABLED;
 	hand->ueh_stack = EXCEPT_HANDLER_SP_CURRENT;
 	/* Reset the TID address of the calling thread. */
-	PERTASK_SET(_this_tid_address, (pid_t *)NULL);
+	PERTASK_SET(this_tid_address, (pid_t *)NULL);
 }
 
 
@@ -114,7 +114,7 @@ DEFINE_SYSCALL3(errno_t, set_exception_handler,
                 USER UNCHECKED except_handler_t, handler,
                 USER UNCHECKED void *, handler_sp) {
 	struct user_except_handler *exc;
-	exc = &PERTASK(_this_user_except_handler);
+	exc = &PERTASK(this_user_except_handler);
 	if ((mode & EXCEPT_HANDLER_MODE_MASK) > EXCEPT_HANDLER_MODE_SIGHAND)
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_SET_EXCEPTION_HANDLER_MODE,
@@ -154,7 +154,7 @@ DEFINE_SYSCALL3(errno_t, get_exception_handler,
                 USER UNCHECKED except_handler_t *, phandler,
                 USER UNCHECKED void **, phandler_sp) {
 	struct user_except_handler *exc;
-	exc = &PERTASK(_this_user_except_handler);
+	exc = &PERTASK(this_user_except_handler);
 	if (pmode) {
 		validate_writable(pmode, sizeof(*pmode));
 		COMPILER_WRITE_BARRIER();
@@ -180,7 +180,7 @@ DEFINE_SYSCALL2(errno_t, sigaltstack,
 	if (oss) {
 		validate_writable(oss, sizeof(*oss));
 		COMPILER_WRITE_BARRIER();
-		sp            = PERTASK_GET(_this_user_except_handler.ueh_stack);
+		sp            = PERTASK_GET(this_user_except_handler.ueh_stack);
 		oss->ss_flags = 0;
 		if (sp == EXCEPT_HANDLER_SP_CURRENT) {
 			oss->ss_sp   = NULL;
@@ -232,7 +232,7 @@ DEFINE_SYSCALL2(errno_t, sigaltstack,
 			validate_writable(sp, 1);
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 		}
-		PERTASK_SET(_this_user_except_handler.ueh_stack, sp);
+		PERTASK_SET(this_user_except_handler.ueh_stack, sp);
 	}
 	return -EOK;
 }
@@ -240,7 +240,7 @@ DEFINE_SYSCALL2(errno_t, sigaltstack,
 DEFINE_SYSCALL1(pid_t, set_tid_address,
                 USER UNCHECKED pid_t *, tidptr) {
 	validate_writable(tidptr, sizeof(*tidptr));
-	PERTASK_SET(_this_tid_address, tidptr);
+	PERTASK_SET(this_tid_address, tidptr);
 	return task_gettid();
 }
 

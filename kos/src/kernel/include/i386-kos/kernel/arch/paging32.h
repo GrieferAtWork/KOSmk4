@@ -114,7 +114,7 @@ DECL_END
 #include "paging32-pae.h"
 /**/
 
-#include <kernel/cpuid.h>  /* __x86_bootcpu_idfeatures */
+#include <kernel/cpuid.h>  /* x86_bootcpu_cpuid */
 #include <asm/cpu-cpuid.h> /* CPUID_1D_PAE */
 
 DECL_BEGIN
@@ -126,8 +126,8 @@ DECL_BEGIN
 #undef CONFIG_PAGEDIR_INIT_IS_NOEXCEPT /* `pae_pagedir_init()' may throw `E_BADALLOC' (but `p32_pagedir_init()' is noexcept) */
 
 
-#define X86_PAGEDIR_USES_PAE()    (__x86_bootcpu_idfeatures.ci_1d & CPUID_1D_PAE)
-#define X86_PAGEDIR_USES_P32()  (!(__x86_bootcpu_idfeatures.ci_1d & CPUID_1D_PAE))
+#define X86_PAGEDIR_USES_PAE()    (x86_bootcpu_cpuid.ci_1d & CPUID_1D_PAE)
+#define X86_PAGEDIR_USES_P32()  (!(x86_bootcpu_cpuid.ci_1d & CPUID_1D_PAE))
 
 #if P32_VM_KERNEL_PDIR_RESERVED_BASE == PAE_VM_KERNEL_PDIR_RESERVED_BASE && \
     P32_VM_KERNEL_PDIR_RESERVED_SIZE == PAE_VM_KERNEL_PDIR_RESERVED_SIZE

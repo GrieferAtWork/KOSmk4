@@ -49,7 +49,7 @@ err:
 	}
 	{
 		FINALLY_DECREF_UNLIKELY(thread);
-		threadfs = FORTASK(thread, _this_fs);
+		threadfs = FORTASK(thread, this_fs);
 		if unlikely(!threadfs)
 			goto err;
 		sync_read(&threadfs->f_pathlock);

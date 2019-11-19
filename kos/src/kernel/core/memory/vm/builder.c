@@ -473,7 +473,7 @@ rpc_count_chain(struct rpc_entry const *self) {
 
 PRIVATE void FCALL
 vmb_apply_terminate_thread(void *UNUSED(arg)) {
-	if (!(THIS_TASK->t_flags & TASK_FTERMINATING))
+	if (!(PERTASK_GET(this_task.t_flags) & TASK_FTERMINATING))
 		THROW(E_EXIT_THREAD, W_EXITCODE(0, 0));
 }
 
@@ -860,8 +860,8 @@ handle_remove_write_error:
 	}
 	/* Set the given execinfo if the caller wants us to do so. */
 	if (additional_actions & VMB_APPLY_AA_SETEXECINFO) {
-		memcpy(&old_execinfo, &FORVM(target, vm_execinfo), sizeof(struct vm_execinfo_struct));
-		memcpy(&FORVM(target, vm_execinfo), execinfo, sizeof(struct vm_execinfo_struct));
+		memcpy(&old_execinfo, &FORVM(target, thisvm_execinfo), sizeof(struct vm_execinfo_struct));
+		memcpy(&FORVM(target, thisvm_execinfo), execinfo, sizeof(struct vm_execinfo_struct));
 		xincref(execinfo->ei_node);
 		xincref(execinfo->ei_dent);
 		xincref(execinfo->ei_path);

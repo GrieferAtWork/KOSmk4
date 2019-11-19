@@ -29,10 +29,10 @@ DECL_BEGIN
 #ifdef __CC__
 
 /* The PER-cpu TSS descriptor. */
-DATDEF ATTR_PERCPU struct tss x86_cputss;
+DATDEF ATTR_PERCPU struct tss thiscpu_x86_tss;
 
 /* Mapping for the currently used I/O permissions bitmap
- * Lazily updated to always be mapped to the calling thread's `THIS_IOPERM_BITMAP'
+ * Lazily updated to always be mapped to the calling thread's `THIS_X86_IOPERM_BITMAP'
  * WARNING: Accessing this array is _only_ allowed while preemption is disabled, or
  *          the TASK_FKEEPCORE flag is set. Accessing this array at any other time
  *          may lead to a kernel panic within the pagefault handler (note that user-space
@@ -41,14 +41,14 @@ DATDEF ATTR_PERCPU struct tss x86_cputss;
  *          Also note that in case of a write-access, if the calling thread doesn't already
  *          have its own IOB allocated, accessing this vector will lazily allocate said IOB,
  *          meaning that write-access may also cause `E_BADALLOC' and `E_WOULDBLOCK'. */
-DATDEF ATTR_PERCPU u8 x86_cpuiob[65536 / 8];
+DATDEF ATTR_PERCPU u8 thiscpu_x86_iob[65536 / 8];
 
 /* The VM node used to represent the IOB mapping of the current CPU */
-DATDEF ATTR_PERCPU struct vm_node x86_cpu_iobnode;
+DATDEF ATTR_PERCPU struct vm_node thiscpu_x86_iobnode;
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 /* [1..1][const] Page directory identity pointer for unmapping the IOB vector of the current CPU. */
-INTDEF ATTR_PERCPU void *x86_cpu_iobnode_pagedir_identity;
+INTDEF ATTR_PERCPU void *thiscpu_x86_iobnode_pagedir_identity;
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 
@@ -58,26 +58,26 @@ INTDEF ATTR_PERCPU void *x86_cpu_iobnode_pagedir_identity;
  * During preemption:
  *     >> if (OLD_THREAD->IOPERM_BITMAP != NEW_THREAD->IOPERM_BITMAP &&
  *     >>     IS_IOPERM_BITMAP_LOADED(THIS_CPU)) {
- *     >>     pagedir_unmap(VM_ADDR2PAGE((uintptr_t)&x86_cputss) + 1, 2);
- *     >>     pagedir_sync(VM_ADDR2PAGE((uintptr_t)&x86_cputss) + 1, 2);
+ *     >>     pagedir_unmap(VM_ADDR2PAGE((uintptr_t)&thiscpu_x86_tss) + 1, 2);
+ *     >>     pagedir_sync(VM_ADDR2PAGE((uintptr_t)&thiscpu_x86_tss) + 1, 2);
  *     >>     SET_IOPERM_BITMAP_LOADED(THIS_CPU, false);
  *     >> }
  * During #PF handling:
- *     >> if (CR2 >= (((uintptr_t)&x86_cputss) + 1 * PAGESIZE) &&
- *     >>     CR2 <  (((uintptr_t)&x86_cputss) + 3 * PAGESIZE)) {
+ *     >> if (CR2 >= (((uintptr_t)&thiscpu_x86_tss) + 1 * PAGESIZE) &&
+ *     >>     CR2 <  (((uintptr_t)&thiscpu_x86_tss) + 3 * PAGESIZE)) {
  *     >>     struct ioperm_bitmap *iob;
- *     >>     iob = PERTASK_GET(_this_ioperm_bitmap);
+ *     >>     iob = PERTASK_GET(this_x86_ioperm_bitmap);
  *     >>     if (!iob) {
  *     >>         iob = incref(ioperm_bitmap_getempty());
- *     >>         PERTASK_SET(_this_ioperm_bitmap, iob);
+ *     >>         PERTASK_SET(this_x86_ioperm_bitmap, iob);
  *     >>     }
- *     >>     pagedir_map(VM_ADDR2PAGE((uintptr_t)&x86_cputss) + 1, 2, iob->ib_pages, PAGEDIR_MAP_FREAD);
+ *     >>     pagedir_map(VM_ADDR2PAGE((uintptr_t)&thiscpu_x86_tss) + 1, 2, iob->ib_pages, PAGEDIR_MAP_FREAD);
  *     >>     SET_IOPERM_BITMAP_LOADED(THIS_CPU, true);
  *     >>     return;
  *     >> }
  * Within ioperm():
  *     >> struct ioperm_bitmap *iob;
- *     >> iob = PERTASK_GET(_this_ioperm_bitmap);
+ *     >> iob = PERTASK_GET(this_x86_ioperm_bitmap);
  *     >> if (!iob)
  *     >>     iob = ioperm_bitmap_alloc();
  *     >> else if (isshared(iob)) {
@@ -95,29 +95,29 @@ INTDEF ATTR_PERCPU void *x86_cpu_iobnode_pagedir_identity;
  * With all of this in mind, the TSS in memory looks like this:
  *
  * 0 ... SIZEOF_TSS32 - 1:  struct tss
- *    NOTE: x86_cputss.t_iomap == CEIL_ALIGN((uintptr_t)&x86_cputss +
+ *    NOTE: thiscpu_x86_tss.t_iomap == CEIL_ALIGN((uintptr_t)&thiscpu_x86_tss +
  *                                           SIZEOF_TSS32 +
  *                                           SIZEOF_INTERRUPT_REDIRECTION_BITMAP,
- *                                           4096) - (uintptr_t)&x86_cputss
+ *                                           4096) - (uintptr_t)&thiscpu_x86_tss
  *          -> Meaning that it points to the first page boundry following
  *             the TSS, leaving enough space for the interrupt redirection bitmap.
  *
- * IOBM = (uintptr_t)&x86_cputss + x86_cputss.t_iomap = x86_cpuiob;
- * VM_ADDR2PAGE(IOBM) + 0: Either unmapped memory, or mapped to `PERTASK_GET(_this_ioperm_bitmap)->ib_pages + 0'
- * VM_ADDR2PAGE(IOBM) + 1: Either unmapped memory, or mapped to `PERTASK_GET(_this_ioperm_bitmap)->ib_pages + 1'
+ * IOBM = (uintptr_t)&thiscpu_x86_tss + thiscpu_x86_tss.t_iomap = thiscpu_x86_iob;
+ * VM_ADDR2PAGE(IOBM) + 0: Either unmapped memory, or mapped to `PERTASK_GET(this_x86_ioperm_bitmap)->ib_pages + 0'
+ * VM_ADDR2PAGE(IOBM) + 1: Either unmapped memory, or mapped to `PERTASK_GET(this_x86_ioperm_bitmap)->ib_pages + 1'
  * VM_ADDR2PAGE(IOBM) + 2: The continuation of ATTR_PERCPU data, with the first byte being a const `0xff'
  *
  * And the GDT entry for the TSS looks like this:
- * GDT[SEGMENT_CPU_TSS].base  = &x86_cputss
- * GDT[SEGMENT_CPU_TSS].limit = ((IOBM - (uintptr_t)&x86_cputss) + 2 * 4096 + 1) - 1;
+ * GDT[SEGMENT_CPU_TSS].base  = &thiscpu_x86_tss
+ * GDT[SEGMENT_CPU_TSS].limit = ((IOBM - (uintptr_t)&thiscpu_x86_tss) + 2 * 4096 + 1) - 1;
  */
 
 
 #ifndef CONFIG_NO_SMP
 /* VM node & datapart describing the #DF stack of the current CPU.
  * WARNING: These structures for the boot CPU are not actually part of the kernel VM! */
-DATDEF ATTR_PERCPU struct vm_node const x86_this_dfstack;
-DATDEF ATTR_PERCPU struct vm_datapart const x86_this_dfstack_part;
+DATDEF ATTR_PERCPU struct vm_node const thiscpu_x86_dfstacknode;
+DATDEF ATTR_PERCPU struct vm_datapart const thiscpu_x86_dfstackpart;
 #endif /* !CONFIG_NO_SMP */
 
 
@@ -128,7 +128,7 @@ DATDEF ATTR_PERCPU struct vm_datapart const x86_this_dfstack_part;
  * possibly even recover)
  * This is (e.g.) how the kernel is able to deal with Stack Overflows
  * that occur within kernel-space itself. */
-DATDEF ATTR_PERCPU struct tss x86_cputss_df;
+DATDEF ATTR_PERCPU struct tss thiscpu_x86_tssdf;
 #endif /* !__x86_64__ */
 
 #endif /* __CC__ */

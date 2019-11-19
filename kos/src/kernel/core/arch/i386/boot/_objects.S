@@ -32,17 +32,21 @@
 	EXPORT_AS_OBJECT(name)               \
 	.size name, size_;
 EXPORT_AS_OBJECT(vm_kernel)
-EXPORT_AS_OBJECT(_this_idle)
+EXPORT_AS_OBJECT(thiscpu_idle)
 EXPORT_AS_OBJECT(_bootcpu)
 EXPORT_AS_OBJECT(_bootidle)
 EXPORT_AS_OBJECT(_boottask)
-EXPORT_AS_OBJECT_EX(x86_cputss, SIZEOF_TSS)
-EXPORT_AS_OBJECT_EX(x86_cpuiob, 8192)
 EXPORT_AS_OBJECT_EX(pagedir_kernel, PAGEDIR_SIZE)
 EXPORT_AS_OBJECT_EX(pagedir_kernel_phys, PAGEDIR_SIZE)
 EXPORT_AS_OBJECT_EX(jiffies, 8)
-EXPORT_AS_OBJECT_EX(__x86_bootcpu_features, 2)
-EXPORT_AS_OBJECT_EX(__x86_bootcpu_idfeatures, SIZEOF_CPUID_CPUINFO)
+EXPORT_AS_OBJECT_EX(thiscpu_x86_tss, SIZEOF_TSS)
+EXPORT_AS_OBJECT_EX(thiscpu_x86_iob, 8192)
+EXPORT_AS_OBJECT_EX(this_x86_kernel_psp0, __SIZEOF_POINTER__)
+EXPORT_AS_OBJECT_EX(x86_bootcpu_cpufeatures, 2)
+EXPORT_AS_OBJECT_EX(x86_bootcpu_cpuid, SIZEOF_CPUID_CPUINFO)
+EXPORT_AS_OBJECT_EX(x86_bootcpu_gdt, SEGMENT_COUNT * 8)
+EXPORT_AS_OBJECT_EX(this_idle_sched_state, __SIZEOF_POINTER__)
+EXPORT_AS_OBJECT_EX(this_idle_x86_kernel_psp0, __SIZEOF_POINTER__)
 #undef EXPORT_AS_OBJECT_EX
 #undef EXPORT_AS_OBJECT
 

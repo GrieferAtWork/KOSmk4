@@ -38,16 +38,16 @@ INTERN struct icpustate *FCALL
 x86_handle_divide_by_zero(struct icpustate *__restrict state) {
 	byte_t *pc, *next_pc;
 	unsigned int i;
-	PERTASK_SET(_this_exception_info.ei_code,
+	PERTASK_SET(this_exception_info.ei_code,
 	            (error_code_t)ERROR_CODEOF(E_DIVIDE_BY_ZERO));
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
-		PERTASK_SET(_this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
+		PERTASK_SET(this_exception_info.ei_data.e_pointers[i], (uintptr_t)0);
 #if EXCEPT_BACKTRACE_SIZE != 0
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
-		PERTASK_SET(_this_exception_info.ei_trace[i], (void *)0);
+		PERTASK_SET(this_exception_info.ei_trace[i], (void *)0);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	pc = (byte_t *)icpustate_getpc(state);
-	PERTASK_SET(_this_exception_info.ei_data.e_faultaddr, (void *)pc);
+	PERTASK_SET(this_exception_info.ei_data.e_faultaddr, (void *)pc);
 	next_pc = (byte_t *)instruction_succ(pc);
 	if (next_pc)
 		icpustate_setpc(state, (uintptr_t)next_pc);
