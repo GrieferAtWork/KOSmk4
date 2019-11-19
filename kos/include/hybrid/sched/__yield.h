@@ -34,15 +34,17 @@
 #define __KOS_VERSION__ 200 /* Legacy model. */
 #endif /* !__KOS_VERSION__ */
 
-#ifndef __task_yield_defined
-#define __task_yield_defined 1
 #if __KOS_VERSION__ >= 400
 /************************************************************************/
 /* KOS mk4                                                              */
 /************************************************************************/
 
 #include <__crt.h>
-#if defined(__CRT_HAVE_task_yield) && defined(__CRT_HAVE_task_yield_nx)
+#ifdef __task_yield_defined
+#define __hybrid_yield()    task_yield()
+#define __hybrid_yield_nx() task_yield_nx()
+#elif defined(__CRT_HAVE_task_yield) && defined(__CRT_HAVE_task_yield_nx)
+#define __task_yield_defined 1
 __DECL_BEGIN
 #ifdef THROWS
 __PUBDEF void (__KCALL task_yield)(void) THROWS(E_WOULDBLOCK_PREEMPTED);
@@ -55,9 +57,7 @@ __PUBDEF __BOOL __NOTHROW(__KCALL task_yield_nx)(void);
 #define __hybrid_yield()    task_yield()
 #define __hybrid_yield_nx() task_yield_nx()
 __DECL_END
-#else /* __CRT_HAVE_task_yield */
-#undef __task_yield_defined
-#endif /* !__CRT_HAVE_task_yield */
+#endif
 
 #elif __KOS_VERSION__ >= 300
 /************************************************************************/
@@ -65,7 +65,10 @@ __DECL_END
 /************************************************************************/
 
 __DECL_BEGIN
+#ifndef __task_yield_defined
+#define __task_yield_defined 1
 __PUBDEF void (__KCALL task_yield)(void);
+#endif /* !__task_yield_defined */
 #define __hybrid_yield() task_yield()
 __DECL_END
 
@@ -79,6 +82,9 @@ __DECL_BEGIN
 #define __errno_t_defined 1
 typedef int errno_t;
 #endif /* !__errno_t_defined */
+
+#ifndef __task_yield_defined
+#define __task_yield_defined 1
 /* Yield the remainder of the caller's quantum to the next
  * scheduled task (no-op if no task to switch to exists).
  * HINT: All registers but EAX are preserved across a call to this function.
@@ -98,10 +104,10 @@ __PUBDEF errno_t (__KCALL task_yield)(void);
 		__XRETURN __y_err;                       \
 	})
 #endif
+#endif /* !__task_yield_defined */
 #define __hybrid_yield() task_yield()
 __DECL_END
 #endif
-#endif /* !__task_yield_defined */
 
 #elif defined(__BUILDING_LIBC) && defined(__KOS__)
 /************************************************************************/

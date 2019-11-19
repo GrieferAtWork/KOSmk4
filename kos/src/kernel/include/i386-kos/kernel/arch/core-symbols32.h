@@ -2498,10 +2498,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak validate_writable_opt; .long validate_writable_opt
 	.reloc ., R_386_SIZE32, validate_writable_opt; .long 0
 	.long 0xd3aba34
-	.long 0 /* index: 624 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname624 /* index: 624 */
+	.weak vm_tasklock_upgrade; .long vm_tasklock_upgrade
+	.reloc ., R_386_SIZE32, vm_tasklock_upgrade; .long 0
+	.long 0x14dce35
 	.long .Lname625 /* index: 625 */
 	.weak vm_datapart_read_nopf; .long vm_datapart_read_nopf
 	.reloc ., R_386_SIZE32, vm_datapart_read_nopf; .long 0
@@ -4495,9 +4495,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sys_readdir; .long 0
 	.long 0x8cca462
 	.long .Lname1123 /* index: 1123 */
-	.weak pty_master_alloc; .long pty_master_alloc
-	.reloc ., R_386_SIZE32, pty_master_alloc; .long 0
-	.long 0x26a0463
+	.weak task_alloc_user_srpc; .long task_alloc_user_srpc
+	.reloc ., R_386_SIZE32, task_alloc_user_srpc; .long 0
+	.long 0x79c9463
 	.long 0 /* index: 1124 */
 	.long 0
 	.long 0
@@ -4943,9 +4943,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname1235 /* index: 1235 */
-	.weak pty_slave_alloc; .long pty_slave_alloc
-	.reloc ., R_386_SIZE32, pty_slave_alloc; .long 0
-	.long 0x63e8e23
+	.weak task_alloc_synchronous_rpc; .long task_alloc_synchronous_rpc
+	.reloc ., R_386_SIZE32, task_alloc_synchronous_rpc; .long 0
+	.long 0x9aea623
 	.long 0 /* index: 1236 */
 	.long 0
 	.long 0
@@ -7055,9 +7055,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sys_set_exception_handler; .long 0
 	.long 0xa9f56e2
 	.long .Lname1763 /* index: 1763 */
-	.weak vm_tasklock_upgrade; .long vm_tasklock_upgrade
-	.reloc ., R_386_SIZE32, vm_tasklock_upgrade; .long 0
-	.long 0x14dce35
+	.weak pty_alloc; .long pty_alloc
+	.reloc ., R_386_SIZE32, pty_alloc; .long 0
+	.long 0xf5866e3
 	.long .Lname1764 /* index: 1764 */
 	.weak sys_clock_getres64; .long sys_clock_getres64
 	.reloc ., R_386_SIZE32, sys_clock_getres64; .long 0
@@ -8010,10 +8010,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_library_enumerate; .long vm_library_enumerate
 	.reloc ., R_386_SIZE32, vm_library_enumerate; .long 0
 	.long 0x1c12ea5
-	.long .Lname2002 /* index: 2002 */
-	.weak task_connect_c; .long task_connect_c
-	.reloc ., R_386_SIZE32, task_connect_c; .long 0
-	.long 0xdeaca53
+	.long 0 /* index: 2002 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname2003 /* index: 2003 */
 	.weak task_pause; .long task_pause
 	.reloc ., R_386_SIZE32, task_pause; .long 0
@@ -8518,10 +8518,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak __asm32_syscallrouter_int80; .long __asm32_syscallrouter_int80
 	.reloc ., R_386_SIZE32, __asm32_syscallrouter_int80; .long 0
 	.long 0x8610850
-	.long .Lname2129 /* index: 2129 */
-	.weak task_alloc_synchronous_rpc; .long task_alloc_synchronous_rpc
-	.reloc ., R_386_SIZE32, task_alloc_synchronous_rpc; .long 0
-	.long 0x9aea623
+	.long 0 /* index: 2129 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname2130 /* index: 2130 */
 	.weak cpu_enable_preemptive_interrupts_nopr; .long cpu_enable_preemptive_interrupts_nopr
 	.reloc ., R_386_SIZE32, cpu_enable_preemptive_interrupts_nopr; .long 0
@@ -9782,10 +9782,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_kernel; .long vm_kernel
 	.reloc ., R_386_SIZE32, vm_kernel; .long 0
 	.long 0x61d098c
-	.long .Lname2445 /* index: 2445 */
-	.weak pty_register; .long pty_register
-	.reloc ., R_386_SIZE32, pty_register; .long 0
-	.long 0xcbb5c42
+	.long 0 /* index: 2445 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 2446 */
 	.long 0
 	.long 0
@@ -10575,9 +10575,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, dbg_isholding_altgr; .long 0
 	.long 0xab9ea52
 	.long .Lname2643 /* index: 2643 */
-	.weak task_alloc_user_srpc; .long task_alloc_user_srpc
-	.reloc ., R_386_SIZE32, task_alloc_user_srpc; .long 0
-	.long 0x79c9463
+	.weak task_connect_c; .long task_connect_c
+	.reloc ., R_386_SIZE32, task_connect_c; .long 0
+	.long 0xdeaca53
 	.long .Lname2644 /* index: 2644 */
 	.weak json_parser_unyield; .long json_parser_unyield
 	.reloc ., R_386_SIZE32, json_parser_unyield; .long 0
@@ -17096,6 +17096,8 @@ END(kernel_symbol_table)
 	.string "sys_mlockall"
 .Lname623:
 	.string "validate_writable_opt"
+.Lname624:
+	.string "vm_tasklock_upgrade"
 .Lname625:
 	.string "vm_datapart_read_nopf"
 .Lname627:
@@ -17629,7 +17631,7 @@ END(kernel_symbol_table)
 .Lname1122:
 	.string "sys_readdir"
 .Lname1123:
-	.string "pty_master_alloc"
+	.string "task_alloc_user_srpc"
 .Lname1125:
 	.string "driver_clear_fde_cache"
 .Lname1129:
@@ -17753,7 +17755,7 @@ END(kernel_symbol_table)
 .Lname1231:
 	.string "minfo"
 .Lname1235:
-	.string "pty_slave_alloc"
+	.string "task_alloc_synchronous_rpc"
 .Lname1237:
 	.string "fpustate_savecpu"
 .Lname1240:
@@ -18285,7 +18287,7 @@ END(kernel_symbol_table)
 .Lname1762:
 	.string "sys_set_exception_handler"
 .Lname1763:
-	.string "vm_tasklock_upgrade"
+	.string "pty_alloc"
 .Lname1764:
 	.string "sys_clock_getres64"
 .Lname1765:
@@ -18518,8 +18520,6 @@ END(kernel_symbol_table)
 	.string "sys_swapon"
 .Lname2001:
 	.string "vm_library_enumerate"
-.Lname2002:
-	.string "task_connect_c"
 .Lname2003:
 	.string "task_pause"
 .Lname2004:
@@ -18652,8 +18652,6 @@ END(kernel_symbol_table)
 	.string "task_gethandlemanager"
 .Lname2128:
 	.string "__asm32_syscallrouter_int80"
-.Lname2129:
-	.string "task_alloc_synchronous_rpc"
 .Lname2130:
 	.string "cpu_enable_preemptive_interrupts_nopr"
 .Lname2131:
@@ -18988,8 +18986,6 @@ END(kernel_symbol_table)
 	.string "vm_datapart_lock_tryupgrade"
 .Lname2444:
 	.string "vm_kernel"
-.Lname2445:
-	.string "pty_register"
 .Lname2447:
 	.string "sys_sendfile64"
 .Lname2450:
@@ -19205,7 +19201,7 @@ END(kernel_symbol_table)
 .Lname2642:
 	.string "dbg_isholding_altgr"
 .Lname2643:
-	.string "task_alloc_user_srpc"
+	.string "task_connect_c"
 .Lname2644:
 	.string "json_parser_unyield"
 .Lname2645:

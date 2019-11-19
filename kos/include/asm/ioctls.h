@@ -30,10 +30,10 @@
 #define TIOCSTI             _IO('T', 0x12) /* [char const *byte] Insert the given byte in the input queue. */
 #define TIOCGWINSZ          _IO('T', 0x13) /* [struct winsize *arg] Get the window size */
 #define TIOCSWINSZ          _IO('T', 0x14) /* [struct winsize const *arg] Set the window size */
-#define TIOCMGET            _IO('T', 0x15)
-#define TIOCMBIS            _IO('T', 0x16)
-#define TIOCMBIC            _IO('T', 0x17)
-#define TIOCMSET            _IO('T', 0x18)
+#define TIOCMGET            _IO('T', 0x15) /* [unsigned int *argp] Get status of modem bits (set of `TIOCM_*' from <bits/ioctl-types.h>) */
+#define TIOCMBIS            _IO('T', 0x16) /* [unsigned int *argp] Enable modem bits (bits |= *argp) (set of `TIOCM_*' from <bits/ioctl-types.h>) */
+#define TIOCMBIC            _IO('T', 0x17) /* [unsigned int *argp] Clear modem bits (bits &= ~*argp) (set of `TIOCM_*' from <bits/ioctl-types.h>) */
+#define TIOCMSET            _IO('T', 0x18) /* [unsigned int *argp] Set modem bits (bits = *argp) (set of `TIOCM_*' from <bits/ioctl-types.h>) */
 
 #define TIOCGSOFTCAR        _IO('T', 0x19) /* [int *arg] Get the state of `termios::c_cflag::CLOCAL'. */
 #define TIOCSSOFTCAR        _IO('T', 0x1a) /* [int const *arg] Set the state of `termios::c_cflag::CLOCAL'. */

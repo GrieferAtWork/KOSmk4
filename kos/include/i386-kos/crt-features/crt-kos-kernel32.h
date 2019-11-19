@@ -1087,9 +1087,7 @@
 #define __CRT_HAVE_pipe_writer_destroy 1
 #define __CRT_HAVE_pmembank_type_names 1
 #define __CRT_HAVE_printk 1
-#define __CRT_HAVE_pty_master_alloc 1
-#define __CRT_HAVE_pty_register 1
-#define __CRT_HAVE_pty_slave_alloc 1
+#define __CRT_HAVE_pty_alloc 1
 #define __CRT_HAVE_qtime_to_timespec 1
 #define __CRT_HAVE_quantum_global_to_local 1
 #define __CRT_HAVE_quantum_local_to_global 1

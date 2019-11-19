@@ -20,9 +20,10 @@
 #define GUARD_KERNEL_INCLUDE_DEV_TTY_H 1
 
 #include <kernel/compiler.h>
+
 #include <dev/ttybase.h>
-#include <sched/mutex.h>
 #include <misc/atomic-ref.h>
+#include <sched/mutex.h>
 
 DECL_BEGIN
 
@@ -32,7 +33,7 @@ DECL_BEGIN
  * that implements an ansi-compliant display port (using libansitty)
  *
  * An actual `struct tty' shouldn't actually be something that gets created
- * implicitly, but should be created explicitly (maybe using a sysctl()) by
+ * implicitly, but should be created explicitly (using the mktty() syscall) by
  * combining 2 arbitrary file descriptors, one providing a read-operator and
  * presumably being implemented by something like the ps2 driver, and the
  * other providing a write-operator and presumably being implemented by
@@ -44,6 +45,8 @@ DECL_BEGIN
  *
  * On-top of this, it would then also be possible to allow the tty objects to
  * react to the CTRL+ALT+F{1-NN} key combinations to switch between each other.
+ *
+ * The common base-class of this and PTY objects is `struct ttybase_device'
  */
 
 #ifdef __CC__

@@ -40,6 +40,8 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 
+#include <hybrid/atomic.h>
+
 #include <kos/dev.h>
 #include <kos/except-inval.h>
 #include <sys/stat.h>
@@ -69,6 +71,65 @@ DECL_BEGIN
 #define CHARACTER_DEVICE_HEAP   &kernel_default_heap
 #endif
 
+
+/* The tree used to quickly look up a character device from its ID */
+PRIVATE /*REF_IF(!(->cd_flags & CHARACTER_DEVICE_FLAG_WEAKREG))*/
+ATREE_HEAD(struct character_device) character_device_tree = NULL;
+PRIVATE dev_t character_device_next_auto = MKDEV(DEV_MAJOR_AUTO,0);
+PRIVATE DEFINE_ATOMIC_RWLOCK(character_device_lock);
+DEFINE_DBG_BZERO_OBJECT(character_device_lock);
+
+/* [0..1] Chain of weakly referenced, dead character devices.
+ * These are serviced whenever a lock to `character_device_lock' is acquired. */
+PRIVATE WEAK struct character_device *dead_character_devices = NULL;
+#define dead_character_devices_NEXTP(x) (*(struct character_device **)&(x)->cd_type.ct_fini)
+
+LOCAL NOBLOCK void
+NOTHROW(KCALL character_device_free)(struct character_device *__restrict self) {
+	decref(self->cd_type.ct_driver);
+	heap_free(CHARACTER_DEVICE_HEAP,
+	          self,
+	          self->cd_heapsize,
+	          GFP_NORMAL);
+}
+
+LOCAL NOBLOCK void
+NOTHROW(KCALL remove_character_device_from_tree)(struct character_device *__restrict self) {
+	struct character_device *removed;
+	removed = cdev_tree_remove(&character_device_tree,
+	                           character_device_devno(self));
+	if unlikely(removed != self) {
+		if likely(removed)
+			cdev_tree_insert(&character_device_tree, removed);
+	}
+}
+
+#define must_service_dead_character_devices() \
+	(ATOMIC_READ(dead_character_devices) != NULL)
+PRIVATE ATTR_COLD NOBLOCK void
+NOTHROW(KCALL service_dead_character_devices)(void) {
+	struct character_device *chain, *next;
+	chain = ATOMIC_XCH(dead_character_devices, NULL);
+	while (chain) {
+		next = dead_character_devices_NEXTP(chain);
+		/* Remove the device from the tree. */
+		remove_character_device_from_tree(chain);
+		character_device_free(chain);
+		chain = next;
+	}
+}
+
+DECL_END
+
+/* Define the LOCK api for accessing `character_device_lock' */
+#define SERLOCK(name)         cdl_##name
+#define SERLOCK_LOCK          &character_device_lock
+#define SERLOCK_SERVICE()     service_dead_character_devices()
+#define SERLOCK_MUSTSERVICE() must_service_dead_character_devices()
+#include <hybrid/sync/service-lock.h>
+
+DECL_BEGIN
+
 /* Destroy a given character device. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL character_device_destroy)(struct character_device *__restrict self) {
@@ -85,11 +146,24 @@ NOTHROW(KCALL character_device_destroy)(struct character_device *__restrict self
 		decref_likely(self->cd_devfs_inode);
 		decref_likely(self->cd_devfs_entry);
 	}
-	decref(self->cd_type.ct_driver);
-	heap_free(CHARACTER_DEVICE_HEAP,
-	          self,
-	          self->cd_heapsize,
-	          GFP_NORMAL);
+	if (self->cd_flags & CHARACTER_DEVICE_FLAG_WEAKREG) {
+		if (cdl_trywrite()) {
+			remove_character_device_from_tree(self);
+			cdl_endwrite();
+		} else {
+			struct character_device *next;
+			/* Add the device to the chain of devices that are pending to be removed. */
+			do {
+				next = ATOMIC_READ(dead_character_devices);
+				ATOMIC_WRITE(dead_character_devices_NEXTP(self), next);
+			} while (!ATOMIC_CMPXCH_WEAK(dead_character_devices, next, self));
+			/* Try to service the chain of pending devices (in case we've
+			 * added ours after the tree had already been unlocked again) */
+			cdl_service();
+			return;
+		}
+	}
+	character_device_free(self);
 }
 
 /* Allocate and initialize a new character device.
@@ -122,24 +196,17 @@ character_device_alloc(struct driver *__restrict owner,
 	return result;
 }
 
-/* The tree used to quickly look up a character device from its ID */
-PRIVATE REF ATREE_HEAD(struct character_device) character_device_tree = NULL;
-PRIVATE dev_t character_device_next_auto = MKDEV(DEV_MAJOR_AUTO,0);
-PRIVATE DEFINE_ATOMIC_RWLOCK(character_device_lock);
-DEFINE_DBG_BZERO_OBJECT(character_device_lock);
-
-
 /* Lookup a character device associated with `devno' and return a reference to it.
  * When no character device is associated that device number, return `NULL' instead. */
 PUBLIC WUNUSED REF struct character_device *KCALL
 character_device_lookup(dev_t devno) THROWS(E_WOULDBLOCK) {
 	REF struct character_device *result;
-	sync_read(&character_device_lock);
+	cdl_read();
 	result = cdev_tree_locate(character_device_tree, devno);
 	/* Try to acquire a reference to the character device. */
 	if (result && unlikely(!tryincref(result)))
 		result = NULL;
-	sync_endread(&character_device_lock);
+	cdl_endread();
 	return result;
 }
 
@@ -148,13 +215,13 @@ character_device_lookup(dev_t devno) THROWS(E_WOULDBLOCK) {
 PUBLIC WUNUSED REF struct character_device *
 NOTHROW(KCALL character_device_lookup_nx)(dev_t devno) {
 	REF struct character_device *result;
-	if (!sync_read_nx(&character_device_lock))
+	if (!cdl_read_nx())
 		return NULL;
 	result = cdev_tree_locate(character_device_tree, devno);
 	/* Try to acquire a reference to the character device. */
 	if (result && unlikely(!tryincref(result)))
 		result = NULL;
-	sync_endread(&character_device_lock);
+	cdl_endread();
 	return result;
 }
 
@@ -209,11 +276,10 @@ character_device_lookup_name(USER CHECKED char const *name)
 		return NULL; /* Name is too long */
 	memcpy(name_buf, name, name_len);
 	name_buf[name_len] = '\0';
-	sync_read(&character_device_lock);
-	if likely(character_device_tree) {
+	cdl_read();
+	if likely(character_device_tree)
 		result = cdev_tree_search_name(character_device_tree, name_buf);
-	}
-	sync_endread(&character_device_lock);
+	cdl_endread();
 	return result;
 }
 
@@ -258,18 +324,19 @@ character_device_unregister(struct character_device *__restrict self)
 	struct character_device *pop_dev;
 	printk(KERN_INFO "Removing character-device `/dev/%s'\n", self->cd_name);
 	if likely(self->cd_devlink.a_vaddr != DEV_UNSET) {
-		sync_write(&character_device_lock);
+		cdl_write();
 		COMPILER_READ_BARRIER();
 		if likely(self->cd_devlink.a_vaddr != DEV_UNSET) {
 			pop_dev = cdev_tree_remove(&character_device_tree,
 			                           self->cd_devlink.a_vaddr);
 			assert(pop_dev == self);
 			self->cd_devlink.a_vaddr = DEV_UNSET;
-			sync_endwrite(&character_device_lock);
-			decref(self);
+			cdl_endwrite();
+			if (!(self->cd_flags & CHARACTER_DEVICE_FLAG_WEAKREG))
+				decref_nokill(self);
 			result = true;
 		} else {
-			sync_endwrite(&character_device_lock);
+			cdl_endwrite();
 		}
 	}
 	if (self->cd_devfs_inode) {
@@ -286,24 +353,26 @@ PUBLIC NONNULL((1)) void KCALL
 character_device_register(struct character_device *__restrict self, dev_t devno)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	//assert(self->cd_type.ct_driver);
-	sync_write(&character_device_lock);
+	cdl_write();
 	/* Insert the new device into the character-device tree. */
 	self->cd_devlink.a_vaddr = devno;
-	cdev_tree_insert(&character_device_tree, incref(self));
-	sync_endwrite(&character_device_lock);
+	if (!(self->cd_flags & CHARACTER_DEVICE_FLAG_WEAKREG))
+		incref(self);
+	cdev_tree_insert(&character_device_tree, self);
+	cdl_endwrite();
 	TRY {
 		character_device_add_to_devfs(self);
 	} EXCEPT {
 		struct character_device *pop_dev;
-		sync_write(&character_device_lock);
+		cdl_write();
 		pop_dev = cdev_tree_remove(&character_device_tree, devno);
 		if likely(pop_dev == self) {
-			sync_endwrite(&character_device_lock);
+			cdl_endwrite();
 			self->cd_devlink.a_vaddr = DEV_UNSET;
 			decref_nokill(self); /* The caller still has a reference */
 		} else {
 			cdev_tree_insert(&character_device_tree, pop_dev);
-			sync_endwrite(&character_device_lock);
+			cdl_endwrite();
 		}
 		RETHROW();
 	}
@@ -344,18 +413,18 @@ pty_assign_name(struct character_device *__restrict self,
 
 /* Register a PTY master/slave pair within devfs, as well
  * as assign matching character device numbers to each. */
-PUBLIC void KCALL
+INTERN void KCALL
 pty_register(struct pty_master *__restrict master,
              struct pty_slave *__restrict slave)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	minor_t used_minor;
-	sync_write(&character_device_lock);
+	cdl_write();
 	/* Insert the new device into the character-device tree. */
 	used_minor = 0;
 	while (cdev_tree_locate(character_device_tree, MKDEV(MAJOR(PTY_MASTER(0)), used_minor)) ||
 	       cdev_tree_locate(character_device_tree, MKDEV(MAJOR(PTY_SLAVE(0)), used_minor))) {
 		if unlikely(used_minor == (minor_t)-1) {
-			sync_endwrite(&character_device_lock);
+			cdl_endwrite();
 			THROW(E_BADALLOC_INSUFFICIENT_DEVICE_NUMBERS,
 			      E_NO_DEVICE_KIND_CHARACTER_DEVICE);
 		}
@@ -365,9 +434,13 @@ pty_register(struct pty_master *__restrict master,
 	slave->cd_devlink.a_vaddr  = MKDEV(MAJOR(PTY_SLAVE(0)), used_minor);
 	pty_assign_name(master, 'p', used_minor);
 	pty_assign_name(slave, 't', used_minor);
-	cdev_tree_insert(&character_device_tree, incref(master));
-	cdev_tree_insert(&character_device_tree, incref(slave));
-	sync_endwrite(&character_device_lock);
+	if (!(master->cd_flags & CHARACTER_DEVICE_FLAG_WEAKREG))
+		incref(master);
+	cdev_tree_insert(&character_device_tree, master);
+	if (!(slave->cd_flags & CHARACTER_DEVICE_FLAG_WEAKREG))
+		incref(slave);
+	cdev_tree_insert(&character_device_tree, slave);
+	cdl_endwrite();
 	TRY {
 		character_device_add_to_devfs_impl(master);
 		TRY {
@@ -382,7 +455,7 @@ pty_register(struct pty_master *__restrict master,
 	} EXCEPT {
 		struct character_device *pop_dev_a;
 		struct character_device *pop_dev_b;
-		sync_write(&character_device_lock);
+		cdl_write();
 		pop_dev_a = cdev_tree_remove(&character_device_tree, master->cd_devlink.a_vaddr);
 		pop_dev_b = cdev_tree_remove(&character_device_tree, slave->cd_devlink.a_vaddr);
 		if unlikely(pop_dev_a != master) {
@@ -391,14 +464,16 @@ pty_register(struct pty_master *__restrict master,
 		if unlikely(pop_dev_b != slave) {
 			cdev_tree_insert(&character_device_tree, pop_dev_b);
 		}
-		sync_endwrite(&character_device_lock);
+		cdl_endwrite();
 		if likely(pop_dev_a == master) {
 			master->cd_devlink.a_vaddr = DEV_UNSET;
-			decref_nokill(master); /* The caller still has a reference */
+			if (!(master->cd_flags & CHARACTER_DEVICE_FLAG_WEAKREG))
+				decref_nokill(master); /* The caller still has a reference */
 		}
 		if likely(pop_dev_b == slave) {
 			slave->cd_devlink.a_vaddr = DEV_UNSET;
-			decref_nokill(slave); /* The caller still has a reference */
+			if (!(slave->cd_flags & CHARACTER_DEVICE_FLAG_WEAKREG))
+				decref_nokill(slave); /* The caller still has a reference */
 		}
 		RETHROW();
 	}
@@ -412,27 +487,29 @@ PUBLIC NONNULL((1)) void KCALL
 character_device_register_auto(struct character_device *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	dev_t devno;
-	sync_write(&character_device_lock);
+	cdl_write();
 	devno = character_device_next_auto;
 	character_device_next_auto += MKDEV(1, 0);
 	self->cd_devlink.a_vaddr = devno;
 
 	/* Insert the new device into the character-device tree. */
-	cdev_tree_insert(&character_device_tree, incref(self));
-	sync_endwrite(&character_device_lock);
+	if (!(self->cd_flags & CHARACTER_DEVICE_FLAG_WEAKREG))
+		incref(self);
+	cdev_tree_insert(&character_device_tree, self);
+	cdl_endwrite();
 	TRY {
 		character_device_add_to_devfs(self);
 	} EXCEPT {
 		struct character_device *pop_dev;
-		sync_write(&character_device_lock);
+		cdl_write();
 		pop_dev = cdev_tree_remove(&character_device_tree, devno);
 		if likely(pop_dev == self) {
 			self->cd_devlink.a_vaddr = DEV_UNSET;
-			sync_endwrite(&character_device_lock);
+			cdl_endwrite();
 			decref_nokill(self); /* The caller still has a reference */
 		} else {
 			cdev_tree_insert(&character_device_tree, pop_dev);
-			sync_endwrite(&character_device_lock);
+			cdl_endwrite();
 		}
 		RETHROW();
 	}

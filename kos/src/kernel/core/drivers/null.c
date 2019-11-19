@@ -425,7 +425,8 @@ urandom_mmap(struct character_device *__restrict self,
 			/* .ct_stat      = */ stat,                                        \
 			/* .ct_poll      = */ poll                                         \
 		},                                                                     \
-		/* .cd_devlink  = */ { NULL, NULL, mkdev },                            \
+		/* .cd_devlink     = */ { NULL, NULL, mkdev },                         \
+		/* .cd_flags       = */ CHARACTER_DEVICE_FLAG_NORMAL,                  \
 		/* .cd_devfs_inode = */ NULL,                                          \
 		/* .cd_devfs_entry = */ NULL,                                          \
 		/* .cd_name     = */ name                                              \

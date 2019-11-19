@@ -269,7 +269,9 @@ int main_ioperm(int argc, char *argv[], char *envp[]) {
 		}
 		/* Make sure that ioperm() continues to work after fork() and preemption
 		 * This part is crucial, since this is where the CPU itself accesses a
-		 * kernel-space structure without letting user-space know. */
+		 * kernel-space structure as-per instruction from user-space (essentially
+		 * meaning that it is user-space that accesses kernel-space memory in a
+		 * certain way) */
 		outsb(portno, s, strlen(s));
 		printf("[expected] outsb:ioperm(1): ok\n");
 	} EXCEPT {

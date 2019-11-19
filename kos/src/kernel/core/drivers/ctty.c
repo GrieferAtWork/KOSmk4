@@ -152,6 +152,7 @@ PUBLIC struct character_device dev_tty = {
 		/* .ct_poll   = */ &ctty_poll,
 	},
 	/* .cd_devlink     = */ { NULL, NULL, 0 },
+	/* .cd_flags       = */ CHARACTER_DEVICE_FLAG_NORMAL,
 	/* .cd_devfs_inode = */ NULL,
 	/* .cd_devfs_entry = */ NULL,
 	/* .cd_name        = */ "tty"

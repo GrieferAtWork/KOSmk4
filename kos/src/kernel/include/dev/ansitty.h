@@ -34,11 +34,11 @@ DECL_BEGIN
 struct ansitty_device
 #ifdef __cplusplus
 	: character_device
-#endif
+#endif /* __cplusplus */
 {
 #ifndef __cplusplus
 	struct character_device              at_cdev; /* The underling character-device */
-#endif
+#endif /* !__cplusplus */
 	struct ansitty                       at_ansi; /* Ansi TTY support. */
 	XATOMIC_WEAKLYREF(struct tty_device) at_tty;  /* [0..1] Weak reference to a connected TTY (used for injecting keyboard input) */
 };

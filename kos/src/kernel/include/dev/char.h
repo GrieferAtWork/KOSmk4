@@ -51,12 +51,19 @@ struct character_device_type {
 	NONNULL((1)) poll_mode_t (KCALL *ct_poll)(struct character_device *__restrict self, poll_mode_t what);
 };
 
+#define CHARACTER_DEVICE_FLAG_NORMAL  0x0000 /* Normal flags. */
+#define CHARACTER_DEVICE_FLAG_WEAKREG 0x0001 /* [const] The device is weakly registered within the character device tree.
+                                              * This means that the character device tree does not hold a reference
+                                              * to the device, and that the device will automatically be removed from
+                                              * the character device tree once all other references go away. */
+
 struct character_device {
 	WEAK refcnt_t                cd_refcnt;      /* Reference counter. */
 	size_t                       cd_heapsize;    /* [const] Allocated heap-size of this character-device. */
 	struct character_device_type cd_type;        /* [1..1] Character device type. */
 	ATREE_NODE_SINGLE(struct character_device, dev_t)
 	                             cd_devlink;     /* [lock(WRITE_ONCE)] Device number / tree (`DEV_UNSET' if unset). */
+	uintptr_t                    cd_flags;       /* Character device flags (Set of `CHARACTER_DEVICE_FLAG_*') */
 	REF struct inode            *cd_devfs_inode; /* [lock(WRITE_ONCE)][0..1] Device INode under /dev, or NULL if not created */
 	REF struct directory_entry  *cd_devfs_entry; /* [lock(WRITE_ONCE)][1..1][valid_if(cd_devfs_inode)] Directory entry under /dev */
 	char                         cd_name[16];    /* [const] Name of the device (auto-generated when unset during device registration)
@@ -81,12 +88,11 @@ character_device_alloc(struct driver *__restrict owner,
                        size_t structure_size DFL(sizeof(struct character_device)),
                        size_t structure_align DFL(COMPILER_ALIGNOF(struct character_device)))
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
-#define CHARACTER_DEVICE_ALLOC(T) ((REF T *)character_device_alloc(&drv_self, sizeof(T), COMPILER_ALIGNOF(T)))
-
+#define CHARACTER_DEVICE_ALLOC(T) \
+	((REF T *)character_device_alloc(&drv_self, sizeof(T), COMPILER_ALIGNOF(T)))
 
 /* Returns the device number of `self', or `DEV_UNSET' if not set. */
 #define character_device_devno(self) ((self)->cd_devlink.a_vaddr)
-
 
 /* Lookup a character device associated with `devno' and return a reference to it.
  * When no character device is associated that device number, return `NULL' instead. */

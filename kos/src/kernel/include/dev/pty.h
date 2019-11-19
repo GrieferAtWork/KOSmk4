@@ -20,13 +20,17 @@
 #define GUARD_KERNEL_INCLUDE_DEV_PTY_H 1
 
 #include <kernel/compiler.h>
-#include <kernel/types.h>
+
 #include <dev/char.h>
 #include <dev/ttybase.h>
-#include <libbuffer/linebuffer.h>
-#include <libbuffer/ringbuffer.h>
+#include <kernel/types.h>
+#include <misc/atomic-ref.h>
+
 #include <kos/dev.h>
-#include <termio.h>
+
+#include <termios.h>
+
+#include <libbuffer/ringbuffer.h>
 
 DECL_BEGIN
 
@@ -37,77 +41,62 @@ DECL_BEGIN
  * NOTE: To register a pty master/slave pair for `openpty()', use `pty_register' below.
  */
 #define PTY_DEVCNT    256
-#define PTY_MASTER(n) MKDEV(2,n)
-#define PTY_SLAVE(n)  MKDEV(3,n)
-#define PTY_EXTCNT   (1 << MINORBITS) /* Total number of unique PTY devices. */
+#define PTY_MASTER(n) MKDEV(2, n)
+#define PTY_SLAVE(n)  MKDEV(3, n)
+#define PTY_EXTCNT    (1 << MINORBITS) /* Total number of unique PTY devices. */
 
 
 #ifdef __CC__
-struct taskpid;
+
+struct pty_master;
+struct pty_slave;
+
+struct pty_slave
+#ifdef __cplusplus
+    : ttybase_device
+#endif /* __cplusplus */
+{
+#ifndef __cplusplus
+	struct ttybase_device                ps_base;   /* The underlying base-tty */
+#endif /* !__cplusplus */
+	struct ringbuffer                    ps_obuf;   /* Output buffer (use the PTY master to read from this) */
+	WEAK struct winsize                  ps_wsize;  /* Terminal window size. */
+	XATOMIC_WEAKLYREF(struct pty_master) ps_master; /* [0..1] The terminal's master side (cleared when destroyed) */
+};
+DEFINE_REFCOUNT_TYPE_SUBCLASS(pty_slave, ttybase_device);
+
 struct pty_master
 #ifdef __cplusplus
-	: ttybase_device
-#endif
+    : character_device
+#endif /* __cplusplus */
 {
-	/* PTY Master device */
 #ifndef __cplusplus
-	struct ttybase_device pm_tty;   /* The underling TTY */
-#endif
-	struct ringbuffer     pm_obuf;  /* Output buffer (use the PTY master to read from this) */
-	WEAK struct winsize   pm_size;  /* Terminal window size. */
+	struct character_device             pm_base;  /* The underlying base-tty */
+#endif /* !__cplusplus */
+	XATOMIC_WEAKLYREF(struct pty_slave) pm_slave; /* [0..1] The terminal's slave side (cleared when destroyed) */
 };
-DEFINE_REFCOUNT_TYPE_SUBCLASS(pty_master, ttybase_device);
+DEFINE_REFCOUNT_TYPE_SUBCLASS(pty_master, character_device);
 
-/* Check if a given TTY/character device is a PTY object. */
+/* Check if a given TTY/character device is a `struct pty_slave'. */
 #define ttybase_isapty(self) \
 	((self)->t_term.t_oprint == &kernel_pty_oprinter)
 #define character_device_isapty(self) \
 	(character_device_isattybase(self) && ttybase_isapty((struct ttybase_device *)(self)))
 
-/* oprinter callback for PTY tty objects. */
+/* oprinter callback for `struct pty_slave' tty objects. */
 FUNDEF ssize_t LIBTERM_CC
 kernel_pty_oprinter(struct terminal *__restrict term,
                     void const *__restrict src,
                     size_t num_bytes, iomode_t mode);
 
-
-
-struct pty_slave
-#ifdef __cplusplus
-	: character_device
-#endif
-{
-	/* TODO: The PTY slave should implement TTY interface.
-	 *       This is required, since otherwise, the slave won't count
-	 *       as a TTY device and assigning a PTY will not set a valid
-	 *       controlling terminal! */
-	/* PTY Slave device */
-#ifndef __cplusplus
-	struct character_device ps_cdev;   /* The underling character-device. */
-#endif
-	REF struct pty_master  *ps_master; /* [1..1][const] The associated master. */
-};
-DEFINE_REFCOUNT_TYPE_SUBCLASS(pty_slave, character_device);
-
-
-/* Allocate a new PTY master/slave
- * NOTE: The caller must still register the devices in devfs,
- *       perferably using the pty_register() function. */
-FUNDEF WUNUSED ATTR_RETNONNULL ATTR_MALLOC REF struct pty_master *
-KCALL pty_master_alloc(void) THROWS(E_BADALLOC);
-FUNDEF WUNUSED ATTR_RETNONNULL ATTR_MALLOC NONNULL((1)) REF struct pty_slave *
-KCALL pty_slave_alloc(struct pty_master *__restrict master) THROWS(E_BADALLOC);
-
-
-/* Register a PTY master/slave pair within devfs, as well
- * as assign matching character device numbers to each. */
-FUNDEF void KCALL
-pty_register(struct pty_master *__restrict master,
-             struct pty_slave *__restrict slave)
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
-
-
-
+/* Allocate a new PTY master/slave pair.
+ * Note that the device pair will have already been registered. */
+FUNDEF NONNULL((1, 2)) void KCALL
+pty_alloc(REF struct pty_master **__restrict pmaster,
+          REF struct pty_slave **__restrict pslave,
+          USER CHECKED struct termios const *termp,
+          USER CHECKED struct winsize const *winp)
+		THROWS(E_BADALLOC);
 
 #endif /* __CC__ */
 
