@@ -26,13 +26,18 @@
 
 DECL_BEGIN
 
+#undef CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE
+#if defined(__GNUC__) || 1
+#define CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE 1
+#endif
+
 #ifdef __x86_64__
-#define X86_PERTASK_SEGMENT     %gs
-#define X86_PERTASK_SEGMENT_S  "%gs"
+#define X86_PERTASK_SEGMENT   %gs
+#define X86_PERTASK_SEGMENT_S "%gs"
 #define X86_PERTASK_SEGMENT_F "%%gs"
 #else /* __x86_64__ */
-#define X86_PERTASK_SEGMENT     %fs
-#define X86_PERTASK_SEGMENT_S  "%fs"
+#define X86_PERTASK_SEGMENT   %fs
+#define X86_PERTASK_SEGMENT_S "%fs"
 #define X86_PERTASK_SEGMENT_F "%%fs"
 #endif /* !__x86_64__ */
 
@@ -90,71 +95,214 @@ void *NOTHROW(KCALL __get_per_task)(void *__ptr) {
 	return __result;
 }
 
-extern ATTR_ERROR("Invalid per-task object size") void __invalid_pertask_object_size(void);
 #ifdef __X86_SEG_TASK
 #define PERTASK_GET(x)    (*((__X86_SEG_TASK __typeof__(x) const *)(__UINTPTR_TYPE__)&(x)))
-#define PERTASK_SET(x, v) (*((__X86_SEG_TASK __typeof__(x) *)(__UINTPTR_TYPE__)&(x)) = (v))
-#elif defined(__x86_64__)
-#define PERTASK_GET(x)                                                  \
-	XBLOCK({                                                            \
-		__typeof__(x) __pt_res;                                         \
-		if __untraced(sizeof(__pt_res) == 1) {                          \
-			__asm__("movb %%gs:%p1, %b0" : "=q" (__pt_res) : "mi" (x)); \
-		} else if __untraced(sizeof(__pt_res) == 2) {                   \
-			__asm__("movw %%gs:%p1, %w0" : "=r" (__pt_res) : "mi" (x)); \
-		} else if __untraced(sizeof(__pt_res) == 4) {                   \
-			__asm__("movl %%gs:%p1, %k0" : "=r" (__pt_res) : "mi" (x)); \
-		} else if __untraced(sizeof(__pt_res) == 8) {                   \
-			__asm__("movq %%gs:%p1, %q0" : "=r" (__pt_res) : "mi" (x)); \
-		} else {                                                        \
-			__invalid_pertask_object_size();                            \
-		}                                                               \
-		XRETURN __pt_res;                                               \
-	})
-#define PERTASK_SET(x, v)                                        \
-	XBLOCK({                                                     \
-		if __untraced(sizeof(x) == 1) {                          \
-			__asm__("movb %b0, %%gs:%p1" : : "q" (v), "mi" (x)); \
-		} else if __untraced(sizeof(x) == 2) {                   \
-			__asm__("movw %w0, %%gs:%p1" : : "r" (v), "mi" (x)); \
-		} else if __untraced(sizeof(x) == 4) {                   \
-			__asm__("movl %k0, %%gs:%p1" : : "r" (v), "mi" (x)); \
-		} else if __untraced(sizeof(x) == 8) {                   \
-			__asm__("movq %q0, %%gs:%p1" : : "r" (v), "mi" (x)); \
-		} else {                                                 \
-			__invalid_pertask_object_size();                     \
-		}                                                        \
-		(void)0;                                                 \
-	})
+#define PERTASK_SET(x, v) (void)(*((__X86_SEG_TASK __typeof__(x) *)(__UINTPTR_TYPE__)&(x)) = (v))
+#else /* __X86_SEG_TASK */
+extern ATTR_ERROR("Invalid per-task object size") void __invalid_pertask_object_size(void);
+
+#ifdef __x86_64__
+#define __pertask_get8_r(x, result)  __asm__("movb %%gs:%p1, %b0" : "=q" (result) : "mi" (x))
+#define __pertask_get16_r(x, result) __asm__("movw %%gs:%p1, %w0" : "=r" (result) : "mi" (x))
+#define __pertask_get32_r(x, result) __asm__("movl %%gs:%p1, %k0" : "=r" (result) : "mi" (x))
+#define __pertask_get64_r(x, result) __asm__("movl %%gs:%p1, %q0" : "=r" (result) : "mi" (x))
+#define __pertask_set8(x, v)         __asm__("movb %b0, %%gs:%p1" : : "q" (v), "mi" (x))
+#define __pertask_set16(x, v)        __asm__("movw %w0, %%gs:%p1" : : "r" (v), "mi" (x))
+#define __pertask_set32(x, v)        __asm__("movl %k0, %%gs:%p1" : : "r" (v), "mi" (x))
+#define __pertask_set64(x, v)        __asm__("movq %q0, %%gs:%p1" : : "r" (v), "mi" (x))
 #else /* __x86_64__ */
-#define PERTASK_GET(x)                                                  \
-	XBLOCK({                                                            \
-		__typeof__(x) __pt_res;                                         \
-		if __untraced(sizeof(__pt_res) == 1) {                          \
-			__asm__("movb %%fs:%p1, %b0" : "=q" (__pt_res) : "mi" (x)); \
-		} else if __untraced(sizeof(__pt_res) == 2) {                   \
-			__asm__("movw %%fs:%p1, %w0" : "=r" (__pt_res) : "mi" (x)); \
-		} else if __untraced(sizeof(__pt_res) == 4) {                   \
-			__asm__("movl %%fs:%p1, %k0" : "=r" (__pt_res) : "mi" (x)); \
-		} else {                                                        \
-			__invalid_pertask_object_size();                            \
-		}                                                               \
-		XRETURN __pt_res;                                               \
-	})
-#define PERTASK_SET(x, v)                                        \
-	XBLOCK({                                                     \
-		if __untraced(sizeof(x) == 1) {                          \
-			__asm__("movb %b0, %%fs:%p1" : : "q" (v), "mi" (x)); \
-		} else if __untraced(sizeof(x) == 2) {                   \
-			__asm__("movw %w0, %%fs:%p1" : : "r" (v), "mi" (x)); \
-		} else if __untraced(sizeof(x) == 4) {                   \
-			__asm__("movl %k0, %%fs:%p1" : : "r" (v), "mi" (x)); \
-		} else {                                                 \
-			__invalid_pertask_object_size();                     \
-		}                                                        \
-		(void)0;                                                 \
-	})
+#define __pertask_get8_r(x, result)  __asm__("movb %%fs:%p1, %b0" : "=q" (result) : "mi" (x))
+#define __pertask_get16_r(x, result) __asm__("movw %%fs:%p1, %w0" : "=r" (result) : "mi" (x))
+#define __pertask_get32_r(x, result) __asm__("movl %%fs:%p1, %k0" : "=r" (result) : "mi" (x))
+#define __pertask_set8(x, v)         __asm__("movb %b0, %%fs:%p1" : : "q" (v), "mi" (x))
+#define __pertask_set16(x, v)        __asm__("movw %w0, %%fs:%p1" : : "r" (v), "mi" (x))
+#define __pertask_set32(x, v)        __asm__("movl %k0, %%fs:%p1" : : "r" (v), "mi" (x))
 #endif /* !__x86_64__ */
+
+/************************************************************************/
+/* Define PERTASK_GET()                                                 */
+/************************************************************************/
+#ifndef __NO_builtin_choose_expr
+#define __pertask_get8(x)  XBLOCK({ __UINT8_TYPE__ __pt_res; __pertask_get8_r(x, __pt_res); XRETURN __pt_res; })
+#define __pertask_get16(x) XBLOCK({ __UINT16_TYPE__ __pt_res; __pertask_get16_r(x, __pt_res); XRETURN __pt_res; })
+#define __pertask_get32(x) XBLOCK({ __UINT32_TYPE__ __pt_res; __pertask_get32_r(x, __pt_res); XRETURN __pt_res; })
+#ifdef __pertask_get64_r
+#define __pertask_get64(x) XBLOCK({ __UINT64_TYPE__ __pt_res; __pertask_get64_r(x, __pt_res); XRETURN __pt_res; })
+#define PERTASK_GET(x)                                                        \
+	((__typeof__(x))__builtin_choose_expr(sizeof(x) == 1, __pertask_get8(x),  \
+	                __builtin_choose_expr(sizeof(x) == 2, __pertask_get16(x), \
+	                __builtin_choose_expr(sizeof(x) == 4, __pertask_get32(x), \
+	                __builtin_choose_expr(sizeof(x) == 8, __pertask_get64(x), \
+	                (__invalid_pertask_object_size(), 0))))))
+#else /* __pertask_get64_r */
+#define PERTASK_GET(x)                                                        \
+	((__typeof__(x))__builtin_choose_expr(sizeof(x) == 1, __pertask_get8(x),  \
+	                __builtin_choose_expr(sizeof(x) == 2, __pertask_get16(x), \
+	                __builtin_choose_expr(sizeof(x) == 4, __pertask_get32(x), \
+	                (__invalid_pertask_object_size(), 0)))))
+#endif /* !__pertask_get64_r */
+#elif defined(__cplusplus)
+
+extern "C++" {
+__NAMESPACE_INT_BEGIN
+template<class __T> struct __pt_remove_cv { typedef __T __type; };
+template<class __T> struct __pt_remove_cv<__T const> { typedef __T __type; };
+template<class __T> struct __pt_remove_cv<__T volatile> { typedef __T __type; };
+template<class __T> struct __pt_remove_cv<__T const volatile> { typedef __T __type; };
+template<class __T> using __pt_remove_cv_t = typename __pt_remove_cv<__T>::__type;
+__NAMESPACE_INT_END
+}
+
+#ifdef CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE
+#ifdef __pertask_get64_r
+#define PERTASK_GET(x)                                                \
+	XBLOCK({                                                          \
+		__NAMESPACE_INT_SYM __pt_remove_cv_t<__typeof__(x)> __pt_res; \
+		switch (sizeof(x)) {                                          \
+		case 1: __pertask_get8_r(x, __pt_res); break;                 \
+		case 2: __pertask_get16_r(x, __pt_res); break;                \
+		case 4: __pertask_get32_r(x, __pt_res); break;                \
+		case 8: __pertask_get64_r(x, __pt_res); break;                \
+		default: __invalid_pertask_object_size();                     \
+		}                                                             \
+		XRETURN __pt_res;                                             \
+	})
+#else /* __pertask_get64_r */
+#define PERTASK_GET(x)                                                \
+	XBLOCK({                                                          \
+		__NAMESPACE_INT_SYM __pt_remove_cv_t<__typeof__(x)> __pt_res; \
+		switch (sizeof(x)) {                                          \
+		case 1: __pertask_get8_r(x, __pt_res); break;                 \
+		case 2: __pertask_get16_r(x, __pt_res); break;                \
+		case 4: __pertask_get32_r(x, __pt_res); break;                \
+		default: __invalid_pertask_object_size();                     \
+		}                                                             \
+		XRETURN __pt_res;                                             \
+	})
+#endif /* !__pertask_get64_r */
+#else /* CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE */
+#ifdef __pertask_get64_r
+#define PERTASK_GET(x)                                                \
+	XBLOCK({                                                          \
+		__NAMESPACE_INT_SYM __pt_remove_cv_t<__typeof__(x)> __pt_res; \
+		if __untraced(sizeof(x) == 1) {                               \
+			__pertask_get8_r(x, __pt_res);                            \
+		} else if __untraced(sizeof(x) == 2) {                        \
+			__pertask_get16_r(x, __pt_res);                           \
+		} else if __untraced(sizeof(x) == 4) {                        \
+			__pertask_get32_r(x, __pt_res);                           \
+		} else if __untraced(sizeof(x) == 8) {                        \
+			__pertask_get64_r(x, __pt_res);                           \
+		} else {                                                      \
+			__invalid_pertask_object_size();                          \
+		}                                                             \
+		XRETURN __pt_res;                                             \
+	})
+#else /* __pertask_get64_r */
+#define PERTASK_GET(x)                                                \
+	XBLOCK({                                                          \
+		__NAMESPACE_INT_SYM __pt_remove_cv_t<__typeof__(x)> __pt_res; \
+		if __untraced(sizeof(x) == 1) {                               \
+			__pertask_get8_r(x, __pt_res);                            \
+		} else if __untraced(sizeof(x) == 2) {                        \
+			__pertask_get16_r(x, __pt_res);                           \
+		} else if __untraced(sizeof(x) == 4) {                        \
+			__pertask_get32_r(x, __pt_res);                           \
+		} else {                                                      \
+			__invalid_pertask_object_size();                          \
+		}                                                             \
+		XRETURN __pt_res;                                             \
+	})
+#endif /* !__pertask_get64_r */
+#endif /* !CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE */
+
+
+#else /* __cplusplus */
+
+#define __pertask_get8(x)  XBLOCK({ __UINT8_TYPE__ __pt_res; __pertask_get8_r(x, __pt_res); XRETURN __pt_res; })
+#define __pertask_get16(x) XBLOCK({ __UINT16_TYPE__ __pt_res; __pertask_get16_r(x, __pt_res); XRETURN __pt_res; })
+#define __pertask_get32(x) XBLOCK({ __UINT32_TYPE__ __pt_res; __pertask_get32_r(x, __pt_res); XRETURN __pt_res; })
+#ifdef __pertask_get64_r
+#define __pertask_get64(x) XBLOCK({ __UINT64_TYPE__ __pt_res; __pertask_get64_r(x, __pt_res); XRETURN __pt_res; })
+#define PERTASK_GET(x)                                     \
+	((__typeof__(x))(sizeof(x) == 1 ? __pertask_get8(x) :  \
+	                 sizeof(x) == 2 ? __pertask_get16(x) : \
+	                 sizeof(x) == 4 ? __pertask_get32(x) : \
+	                 sizeof(x) == 8 ? __pertask_get64(x) : \
+	                 (__invalid_pertask_object_size(), 0)))
+#else /* __pertask_get64_r */
+#define PERTASK_GET(x)                                     \
+	((__typeof__(x))(sizeof(x) == 1 ? __pertask_get8(x) :  \
+	                 sizeof(x) == 2 ? __pertask_get16(x) : \
+	                 sizeof(x) == 4 ? __pertask_get32(x) : \
+	                 (__invalid_pertask_object_size(), 0)))
+#endif /* !__pertask_get64_r */
+#endif /* !__cplusplus */
+
+/************************************************************************/
+/* Define PERTASK_SET()                                                 */
+/************************************************************************/
+#ifdef CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE
+#ifdef __pertask_set64
+#define PERTASK_SET(x, v)                         \
+	XBLOCK({                                      \
+		switch (sizeof(x)) {                      \
+		case 1: __pertask_set8(x, v); break;      \
+		case 2: __pertask_set16(x, v); break;     \
+		case 4: __pertask_set32(x, v); break;     \
+		case 8: __pertask_set64(x, v); break;     \
+		default: __invalid_pertask_object_size(); \
+		}                                         \
+		(void)0;                                  \
+	})
+#else /* __pertask_set64 */
+#define PERTASK_SET(x, v)                         \
+	XBLOCK({                                      \
+		switch (sizeof(x)) {                      \
+		case 1: __pertask_set8(x, v); break;      \
+		case 2: __pertask_set16(x, v); break;     \
+		case 4: __pertask_set32(x, v); break;     \
+		default: __invalid_pertask_object_size(); \
+		}                                         \
+		(void)0;                                  \
+	})
+#endif /* !__pertask_set64 */
+#else /* CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE */
+#ifdef __pertask_set64
+#define PERTASK_SET(x, v)                      \
+	XBLOCK({                                   \
+		if __untraced(sizeof(x) == 1) {        \
+			__pertask_set8(x, v);              \
+		} else if __untraced(sizeof(x) == 2) { \
+			__pertask_set16(x, v);             \
+		} else if __untraced(sizeof(x) == 4) { \
+			__pertask_set32(x, v);             \
+		} else if __untraced(sizeof(x) == 8) { \
+			__pertask_set64(x, v);             \
+		} else {                               \
+			__invalid_pertask_object_size();   \
+		}                                      \
+		(void)0;                               \
+	})
+#else /* __pertask_set64 */
+#define PERTASK_SET(x, v)                      \
+	XBLOCK({                                   \
+		if __untraced(sizeof(x) == 1) {        \
+			__pertask_set8(x, v);              \
+		} else if __untraced(sizeof(x) == 2) { \
+			__pertask_set16(x, v);             \
+		} else if __untraced(sizeof(x) == 4) { \
+			__pertask_set32(x, v);             \
+		} else {                               \
+			__invalid_pertask_object_size();   \
+		}                                      \
+		(void)0;                               \
+	})
+#endif /* !__pertask_set64 */
+#endif /* !CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE */
+
+
+#endif /* !__X86_SEG_TASK */
 #endif /* __CC__ */
 
 DECL_END

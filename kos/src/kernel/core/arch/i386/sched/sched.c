@@ -31,6 +31,7 @@
 #include <kernel/panic.h>
 #include <kernel/pic.h>
 #include <kernel/pit.h>
+#include <kernel/printk.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/cpu.h>
@@ -544,8 +545,7 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 	assert(!PREEMPTION_ENABLED());
 	assert(self->t_cpu == THIS_CPU);
 	assert(!(self->t_flags & TASK_FKERNTHREAD));
-#define stacktop() \
-	((byte_t *)PERTASK_GET(*(uintptr_t *)&this_x86_kernel_psp0))
+#define stacktop() ((byte_t *)FORTASK(self, this_x86_kernel_psp0))
 	result = (struct irregs_user *)(stacktop() - SIZEOF_IRREGS_USER);
 	/* We need to account for the special case of the IRET tail pointing a VM86 thread!
 	 * If this is the case, then fields of `result' are currently mapped as:
@@ -575,9 +575,28 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 			result = (struct irregs_user *)((byte_t *)result -
 			                                (SIZEOF_IRREGS_VM86 -
 			                                 SIZEOF_IRREGS_USER));
+			assertf(result->ir_eflags == userspace_eflags ||
+			        (!(result->ir_eflags & EFLAGS_VM) &&
+			         result->ir_eip == (uintptr_t)&x86_rpc_user_redirection &&
+			         result->ir_cs == SEGMENT_KERNEL_CODE),
+			        "Unexpected eflags at %p (found: %#Ix, expected: %#Ix)",
+			        &result->ir_eflags, result->ir_eflags, userspace_eflags);
+			printk(KERN_TRACE "[x86] Detected iret.vm86 tail at %p\n", result);
 		}
 	}
 #undef stacktop
+#ifndef NDEBUG
+	if (result->ir_eflags & EFLAGS_VM) {
+		assertf(result->ir_eflags & EFLAGS_IF,
+		        "User-space IRET without EFLAGS.IF (%p)", result->ir_eflags);
+	} else if (result->ir_eip != (uintptr_t)&x86_rpc_user_redirection ||
+	           result->ir_cs != SEGMENT_KERNEL_CODE) {
+		assertf(SEGMENT_IS_VALID_USERCODE(result->ir_cs),
+		        "User-space IRET with invalid CS (%p)", result->ir_cs);
+		assertf(result->ir_eflags & EFLAGS_IF,
+		        "User-space IRET without EFLAGS.IF (%p)", result->ir_eflags);
+	}
+#endif /* !NDEBUG */
 	return result;
 }
 
@@ -643,10 +662,6 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 	thread_iret = x86_get_irregs(self);
 	if (thread_iret->ir_eip == (uintptr_t)&x86_rpc_user_redirection)
 		return false; /* Already redirected. */
-	assertf(thread_iret->ir_eflags & EFLAGS_VM || thread_iret->ir_cs == SEGMENT_USER_CODE_RPL,
-	        "User-space IRET with invalid CS (%p)", thread_iret->ir_cs);
-	assertf(thread_iret->ir_eflags & EFLAGS_IF,
-	        "User-space IRET without EFLAGS.IF (%p)", thread_iret->ir_eflags);
 	FORTASK(self, this_x86_rpc_redirection_iret).ir_eip    = thread_iret->ir_eip;
 	FORTASK(self, this_x86_rpc_redirection_iret).ir_cs     = thread_iret->ir_cs;
 	FORTASK(self, this_x86_rpc_redirection_iret).ir_eflags = thread_iret->ir_eflags;

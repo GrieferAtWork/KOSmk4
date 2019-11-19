@@ -320,10 +320,10 @@ NOTHROW(KCALL x86_syscall_lcall7_personality)(struct unwind_fde_struct *__restri
 	if (kcpustate_getpc(state) != (uintptr_t)x86_lcall7_syscall_guard)
 		return DWARF_PERSO_CONTINUE_UNWIND;
 	data = (struct x86_lcall7_syscall_data *)kcpustate_getsp(state);
-	assertf((uintptr_t)(data + 1) == PERTASK_GET(*(uintptr_t *)&this_x86_kernel_psp0),
+	assertf((uintptr_t)(data + 1) == PERTASK_GET(this_x86_kernel_psp0),
 	        "%p != %p",
 	        (uintptr_t)(data + 1),
-	        PERTASK_GET(*(uintptr_t *)&this_x86_kernel_psp0));
+	        PERTASK_GET(this_x86_kernel_psp0));
 
 	/* TODO: Custom unwind handler. */
 

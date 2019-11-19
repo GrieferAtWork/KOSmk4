@@ -195,7 +195,11 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread) {
 #endif /* __cplusplus */
 
 
+#ifndef __this_task_defined
+#define __this_task_defined 1
 DATDEF ATTR_PERTASK struct task this_task; /* The current task (for use with `PERTASK') */
+#endif /* !__this_task_defined */
+
 DATDEF struct task _boottask;  /* The boot task (aka. /proc/0) */
 DATDEF struct task _bootidle;  /* The idle thread for the boot CPU */
 

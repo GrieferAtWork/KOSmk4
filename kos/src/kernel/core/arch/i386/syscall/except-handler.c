@@ -515,17 +515,17 @@ x86_userexcept_unwind(struct ucpustate *__restrict ustate,
 	assert(!(PERTASK_GET(this_task.t_flags) & TASK_FKERNTHREAD));
 	/* Disable interrupts to prevent Async-RPCs from doing even more re-directions! */
 	__cli();
-#define kernel_stack_top() ((byte_t *)PERTASK_GET(*(uintptr_t *)&this_x86_kernel_psp0))
+#define kernel_stack_top() ((byte_t *)PERTASK_GET(this_x86_kernel_psp0))
 	/* Figure out where the return icpustate needs to go. */
 	return_state = (struct icpustate *)(kernel_stack_top() -
 	                                    (
 #ifdef __x86_64__
 	                                    SIZEOF_ICPUSTATE64
-#else
+#else /* __x86_64__ */
 	                                    ucpustate_isvm86(ustate)
 	                                    ? OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_VM86
 	                                    : OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_USER
-#endif
+#endif /* !__x86_64__ */
 	                                    ));
 	/* Check if user-space got redirected (if so, we need to follow some custom unwinding rules). */
 	if (return_state->ics_irregs.ir_pip == (uintptr_t)&x86_rpc_user_redirection) {

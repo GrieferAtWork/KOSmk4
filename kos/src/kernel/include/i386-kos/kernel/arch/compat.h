@@ -39,7 +39,7 @@ DATDEF ATTR_PERTASK uintptr_t const this_x86_kernel_psp0;
 #endif /* !___this_x86_kernel_psp0_defined */
 
 #define syscall_irregs() \
-	((struct irregs64 *)PERTASK_GET(*(uintptr_t *)&this_x86_kernel_psp0) - 1)
+	((struct irregs64 *)PERTASK_GET(this_x86_kernel_psp0) - 1)
 #define syscall_iscompat() irregs_iscompat(syscall_irregs())
 
 DECL_END
