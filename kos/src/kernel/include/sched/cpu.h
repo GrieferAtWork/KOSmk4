@@ -76,7 +76,7 @@ DECL_BEGIN
                                          * core is currently in the process of startup up.
                                          * This state is transitioned to `CPU_STATE_RUNNING' at the end of
                                          * the internal CPU initialization phase (the i386 variant of which
-                                         * is implemented in `/arch/i386/smp32.S') */
+                                         * is implemented in `arch/i386/sched/smp32.S') */
 
 
 #ifndef CONFIG_NO_SMP

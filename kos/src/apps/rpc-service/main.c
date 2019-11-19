@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 	 *    through `task_serve()', that demonstrateted a design flaw caused by
 	 *    a miss-understanding of how `pushl %<SEGMENT_REGISTER>' works on
 	 *    different CPUs)
-	 * (To exit the program, send SIGQUIT using CTRL+\ (of its alias: CTRL+4)) */
+	 * (To exit the program, send SIGQUIT using CTRL+\ (or its alias: CTRL+4)) */
 	signal(SIGINT, SIG_IGN);
 	sysctl(SYSCTL_SYSCALL_SET_TRACING_ENABLED, 0); /* Prevent log spam of tracing methods */
 	for (;;) {

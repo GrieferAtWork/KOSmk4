@@ -105,8 +105,8 @@
  * NOTE: In x86_64, the 386 symbols refer to the symbols that are
  *       called by a process in 32-bit compatibility-mode.
  * For the default implementations, see:
- *  - /src/kernel/core/arch/i386/syscall_wrappers32.S
- *  - /src/kernel/core/arch/i386/syscall_wrappers64.S
+ *  - /src/kernel/core/arch/i386/syscall/wrappers32.S
+ *  - /src/kernel/core/arch/i386/syscall/wrappers64.S
  * Register state upon entry:
  *     X86_ASMSYSCALL32_INT80:
  *         i386:    Unchanged (all registers are the same)
@@ -119,8 +119,8 @@
  *         x86_64:  TODO: Not yet decided
  * HINT: The low-level interrupt/entry handlers
  *       for system calls are implemented in:
- *        - /src/kernel/core/arch/i386/syscall32.S
- *        - /src/kernel/core/arch/i386/syscall64.S
+ *        - /src/kernel/core/arch/i386/syscall/syscall32.S
+ *        - /src/kernel/core/arch/i386/syscall/syscall64.S
  */
 #define X86_ASMSYSCALL32_INT80(name)         __asm32_int80_##name     /* Section: .text.x86.asm32_syscall_int80.<name> */
 #define X86_ASMSYSCALL32_SYSENTER(name)      __asm32_sysenter_##name  /* Section: .text.x86.asm32_syscall_sysenter.<name> */
