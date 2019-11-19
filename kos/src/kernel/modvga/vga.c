@@ -1185,6 +1185,10 @@ VGA_Putc(struct ansitty *__restrict self, char32_t ch)
 				do {
 					oldptr = ATOMIC_READ(vga->v_textptr);
 					cur_x  = ((size_t)(oldptr - vga->v_textbase) % size_x);
+#ifdef CONFIG_VGA_LESS_LINE_FEEDS
+					if (cur_x == 0 && cp437_encode(vga->v_lastch) != 0)
+						cur_x = size_x;
+#endif /* CONFIG_VGA_LESS_LINE_FEEDS */
 				} while (!ATOMIC_CMPXCH(vga->v_textptr, oldptr, oldptr - cur_x));
 				memsetw(oldptr, VGA_CHR(vga, ' '), size_x - cur_x);
 				sync_endread(&vga->v_textlock);
@@ -1192,6 +1196,10 @@ VGA_Putc(struct ansitty *__restrict self, char32_t ch)
 				do {
 					oldptr = ATOMIC_READ(vga->v_textptr);
 					cur_x  = ((size_t)(oldptr - vga->v_textbase) % size_x);
+#ifdef CONFIG_VGA_LESS_LINE_FEEDS
+					if (cur_x == 0 && cp437_encode(vga->v_lastch) != 0)
+						cur_x = size_x;
+#endif /* CONFIG_VGA_LESS_LINE_FEEDS */
 				} while (!ATOMIC_CMPXCH(vga->v_textptr, oldptr, oldptr - cur_x));
 			}
 		}	break;
