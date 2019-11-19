@@ -26,7 +26,7 @@
 #include <kernel/idt.h>
 #include <kernel/multiboot.h>
 #include <kernel/paging.h>
-#include <kernel/tss.h>
+#include <sched/tss.h>
 
 #include <hybrid/align.h>
 #include <hybrid/limits.h>

@@ -18,27 +18,27 @@
  */
 
 #include <kernel/compiler.h>
+
+#include <kernel/apic.h>
+#include <kernel/arch/paging64.h>
+#include <kernel/breakpoint.h>
+#include <kernel/except.h>
+#include <kernel/fpu.h>
+#include <kernel/gdt.h>
 #include <kernel/pic.h>
 #include <kernel/pit.h>
-#include <kernel/gdt.h>
-#include <kernel/apic.h>
-#include <kernel/fpu.h>
-#include <kernel/breakpoint.h>
-#include <kernel/tss.h>
-#include <kernel/except.h>
-#include <sched/task.h>
-#include <kos/kernel/cpu-state.h>
-
 #include <kernel/syscall.h>
-#include <kernel/arch/paging64.h>
+#include <sched/task.h>
+#include <sched/tss.h>
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
 #include <asm/cpu-msr.h>
-#include <asm/param.h>
 #include <asm/instr/fsgsbase.h>
 #include <asm/instr/interrupt.h>
 #include <asm/instr/movzxq.h>
+#include <asm/param.h>
+#include <kos/kernel/cpu-state.h>
 
 
 /* Push `IA32_KERNEL_GS_BASE' onto the stack

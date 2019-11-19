@@ -25,6 +25,17 @@
 
 DECL_BEGIN
 
+/* Makeup of `ecode' passed to `x86_handle_pagefault()' */
+#define X86_PAGEFAULT_ECODE_PRESENT     0x0001 /* FLAG: The accessed page is present (Check for LOA) */
+#define X86_PAGEFAULT_ECODE_WRITING     0x0002 /* FLAG: The fault happened as a result of a memory write (Check for COW) */
+#define X86_PAGEFAULT_ECODE_USERSPACE   0x0004 /* FLAG: The fault occurred while in user-space */
+#define X86_PAGEFAULT_ECODE_RESBIT      0x0008 /* FLAG: A reserved page bit is set */
+#define X86_PAGEFAULT_ECODE_INSTRFETCH  0x0010 /* FLAG: The fault happened while fetching instructions.
+                                                * NOTE: This flag isn't guarantied to be set, though an
+                                                *       instruction-fetch fault can also easily be detected
+                                                *       by comparing `%eip' with `%cr2' */
+
+
 #ifdef __CC__
 
 /* Helpers and prototypes for c-level hardware fault handlers. */

@@ -25,11 +25,11 @@
 
 #include <kernel/except.h>
 #include <kernel/syscall.h>
-#include <kernel/tss.h>
 #include <kernel/types.h>
 #include <sched/cpu.h>
 #include <sched/iobm.h>
 #include <sched/task.h>
+#include <sched/tss.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>

@@ -29,7 +29,6 @@
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
-#include <kernel/tss.h>
 #include <kernel/vio.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
@@ -37,6 +36,7 @@
 #include <sched/except-handler.h>
 #include <sched/iobm.h>
 #include <sched/pid.h>
+#include <sched/tss.h>
 
 #include <hybrid/atomic.h>
 
@@ -61,17 +61,6 @@ DECL_BEGIN
 #else /* !CONFIG_NO_SMP */
 #define IF_SMP(...) /* nothing */
 #endif /* CONFIG_NO_SMP */
-
-
-#define PAGEFAULT_F_PRESENT     0x0001 /* FLAG: The accessed page is present (Check for LOA) */
-#define PAGEFAULT_F_WRITING     0x0002 /* FLAG: The fault happened as a result of a memory write (Check for COW) */
-#define PAGEFAULT_F_USERSPACE   0x0004 /* FLAG: The fault occurred while in user-space */
-#define PAGEFAULT_F_RESBIT      0x0008 /* FLAG: A reserved page bit is set */
-#define PAGEFAULT_F_INSTRFETCH  0x0010 /* FLAG: The fault happened while fetching instructions.
-                                        * NOTE: This flag isn't guarantied to be set, though an
-                                        *       instruction-fetch fault can also easily be detected
-                                        *       by comparing `%eip' with `%cr2' */
-
 
 STATIC_ASSERT(PAGEDIR_MAP_FEXEC == VM_PROT_EXEC);
 STATIC_ASSERT(PAGEDIR_MAP_FWRITE == VM_PROT_WRITE);
@@ -239,7 +228,7 @@ DATDEF byte_t x86_memcpy_nopf_ret_pointer[];
 INTERN struct icpustate *FCALL
 x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 #if 1
-#define isuser() (ecode & PAGEFAULT_F_USERSPACE)
+#define isuser() (ecode & X86_PAGEFAULT_ECODE_USERSPACE)
 #else
 #define isuser() icpustate_isuser(state)
 #endif
@@ -268,7 +257,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	       pc, icpustate_getsp(*state), ecode,
 	       (unsigned int)task_getroottid_s());
 #endif
-	if ((ecode & (PAGEFAULT_F_PRESENT | PAGEFAULT_F_USERSPACE)) == 0 &&
+	if ((ecode & (X86_PAGEFAULT_ECODE_PRESENT | X86_PAGEFAULT_ECODE_USERSPACE)) == 0 &&
 	    page >= (vm_vpage_t)KERNEL_BASE_PAGE &&
 	    /* Check if a hint was defined for this page. */
 	    (node = (struct vm_node *)pagedir_gethint(page)) != NULL) {
@@ -291,7 +280,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 		assert(node->vn_block->db_parts == VM_DATABLOCK_ANONPARTS);
 		assert(node->vn_part->dp_flags & VM_DATAPART_FLAG_LOCKED);
 		assert(node->vn_part->dp_state == VM_DATAPART_STATE_LOCKED);
-		has_changed = ecode & PAGEFAULT_F_WRITING;
+		has_changed = ecode & X86_PAGEFAULT_ECODE_WRITING;
 		/* Load the affected page into the core. */
 		ppage = vm_datapart_loadpage(node->vn_part,
 		                             (size_t)(page - VM_NODE_MIN(node)),
@@ -364,7 +353,7 @@ do_handle_iob_node_access:
 							/* Check for special case: even if the IOPERM bitmap is already
 							 * mapped, allow a mapping upgrade if it was mapped read-only
 							 * before, but is now needed as read-write. */
-							if ((ecode & PAGEFAULT_F_WRITING) && !pagedir_iswritable(page))
+							if ((ecode & X86_PAGEFAULT_ECODE_WRITING) && !pagedir_iswritable(page))
 								; /* Upgrade the mapping */
 							else {
 								goto pop_connections_and_throw_segfault;
@@ -374,9 +363,9 @@ do_handle_iob_node_access:
 						allow_preemption = (icpustate_getpflags(state) & EFLAGS_IF) != 0;
 						/* Make special checks if the access itself seems to
 						 * originate from a direct user-space access. */
-						if ((ecode & PAGEFAULT_F_USERSPACE) && isuser()) {
+						if ((ecode & X86_PAGEFAULT_ECODE_USERSPACE) && isuser()) {
 							/* User-space can never get write-access to the IOB vector. */
-							if (ecode & PAGEFAULT_F_WRITING)
+							if (ecode & X86_PAGEFAULT_ECODE_WRITING)
 								goto pop_connections_and_throw_segfault;
 							/* User-space isn't allowed to directly access the IOB vector.
 							 * To not rely on undocumented processor behavior, manually check
@@ -386,7 +375,7 @@ do_handle_iob_node_access:
 							if (!is_io_instruction_and_not_memory_access((byte_t *)pc, state, (uintptr_t)addr))
 								goto pop_connections_and_throw_segfault;
 						}
-						if (!handle_iob_access(mycpu, (ecode & PAGEFAULT_F_WRITING) != 0, allow_preemption)) {
+						if (!handle_iob_access(mycpu, (ecode & X86_PAGEFAULT_ECODE_WRITING) != 0, allow_preemption)) {
 							assert(PREEMPTION_ENABLED());
 							goto again_lookup_node;
 						}
@@ -446,7 +435,7 @@ do_handle_iob_node_access:
 			part         = incref(node->vn_part);
 			vpage_offset = (size_t)(page - VM_NODE_MIN(node));
 			assert(VM_NODE_SIZE(node) == vm_datapart_numvpages(part));
-			has_changed = ecode & PAGEFAULT_F_WRITING;
+			has_changed = ecode & X86_PAGEFAULT_ECODE_WRITING;
 			/* Acquire a lock to the affected data part. */
 			TRY {
 				/* Need at least a read-lock for part initialization */
@@ -543,7 +532,7 @@ do_handle_iob_node_access:
 					}
 do_normal_vio:
 					/* Make sure that the segment was mapped with the proper protection */
-					if unlikely((ecode & PAGEFAULT_F_WRITING)
+					if unlikely((ecode & X86_PAGEFAULT_ECODE_WRITING)
 						         ? !(nodeprot & VM_PROT_WRITE) /* Write to read-only VIO segment */
 						         : !(nodeprot & VM_PROT_READ)  /* Read from non-readable VIO segment */
 						         ) {
@@ -612,7 +601,7 @@ do_unshare_cow:
 							if unlikely(!(node->vn_prot & VM_PROT_WRITE))
 								goto endread_and_decref_part_and_set_readonly;
 							if (!(node->vn_prot & VM_PROT_EXEC)) {
-								if unlikely((ecode & PAGEFAULT_F_INSTRFETCH) || (uintptr_t)addr == pc)
+								if unlikely((ecode & X86_PAGEFAULT_ECODE_INSTRFETCH) || (uintptr_t)addr == pc)
 									goto endread_and_decref_part_and_set_noexec;
 							}
 
@@ -848,7 +837,7 @@ upgrade_and_recheck_vm_for_node:
 
 				/* Make sure the desired user-space access is actually allowed! */
 				if unlikely(!(node->vn_prot & VM_PROT_WRITE) &&
-				            (ecode & PAGEFAULT_F_WRITING)) {
+				            (ecode & X86_PAGEFAULT_ECODE_WRITING)) {
 					/* Read-only memory */
 endread_and_decref_part_and_set_readonly:
 					sync_endread(part);
@@ -857,7 +846,7 @@ endread_and_decref_part_and_set_readonly:
 					goto pop_connections_and_set_exception_pointers;
 				}
 				if unlikely(!(node->vn_prot & VM_PROT_READ) &&
-				            !(ecode & PAGEFAULT_F_WRITING)) {
+				            !(ecode & X86_PAGEFAULT_ECODE_WRITING)) {
 					/* Write-only memory */
 					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTREADABLE));
 					sync_endread(part);
@@ -865,7 +854,7 @@ endread_and_decref_part_and_set_readonly:
 					goto pop_connections_and_set_exception_pointers;
 				}
 				if (!(node->vn_prot & VM_PROT_EXEC)) {
-					if unlikely((ecode & PAGEFAULT_F_INSTRFETCH) || (uintptr_t)addr == pc) {
+					if unlikely((ecode & X86_PAGEFAULT_ECODE_INSTRFETCH) || (uintptr_t)addr == pc) {
 						/* Non-executable memory */
 endread_and_decref_part_and_set_noexec:
 						sync_endread(part);
@@ -910,7 +899,7 @@ endread_and_decref_part_and_set_noexec:
 				 * but did so after we checked this above (aka.: during the time
 				 * when we had to release our VM lock to initialize the associated
 				 * data part page) */
-				if ((ecode & PAGEFAULT_F_WRITING) &&
+				if ((ecode & X86_PAGEFAULT_ECODE_WRITING) &&
 				    !(node->vn_prot & VM_PROT_SHARED) &&
 				    !(/* The part is anonymous */
 				      ATOMIC_READ(part->dp_block->db_parts) == VM_DATABLOCK_ANONPARTS &&
@@ -935,8 +924,8 @@ endread_and_decref_part_and_set_noexec:
 				 *       tracking. */
 				if (node->vn_part->dp_flags & VM_DATAPART_FLAG_TRKCHNG && !has_changed)
 					prot &= ~PAGEDIR_MAP_FWRITE;
-				else if ((prot & PAGEDIR_MAP_FWRITE) && !(ecode & PAGEFAULT_F_WRITING)) {
-					/* When `PAGEFAULT_F_WRITING' wasn't set, we didn't actually unshare the part, so if
+				else if ((prot & PAGEDIR_MAP_FWRITE) && !(ecode & X86_PAGEFAULT_ECODE_WRITING)) {
+					/* When `X86_PAGEFAULT_ECODE_WRITING' wasn't set, we didn't actually unshare the part, so if
 					 * we're mapping it with write permissions, we must delete those in case of a PRIVATE
 					 * memory mapping when the part isn't anonymous, or mapped by other SHARED or PRIVATE
 					 * mappings. */
@@ -959,9 +948,9 @@ endread_and_decref_part_and_set_noexec:
 				/* Actually map the accessed page! */
 				pagedir_mapone(page, ppage, prot);
 
-				assertf(ecode & PAGEFAULT_F_WRITING
-				        ? (ecode & PAGEFAULT_F_USERSPACE ? pagedir_isuserwritable(page) : pagedir_iswritable(page))
-				        : (ecode & PAGEFAULT_F_USERSPACE ? pagedir_isuseraccessible(page) : pagedir_ismapped(page)),
+				assertf(ecode & X86_PAGEFAULT_ECODE_WRITING
+				        ? (ecode & X86_PAGEFAULT_ECODE_USERSPACE ? pagedir_isuserwritable(page) : pagedir_iswritable(page))
+				        : (ecode & X86_PAGEFAULT_ECODE_USERSPACE ? pagedir_isuseraccessible(page) : pagedir_ismapped(page)),
 				        "ecode         = %p\n"
 				        "prot          = %p\n"
 				        "node->vn_prot = %p\n"
@@ -1041,16 +1030,16 @@ throw_segfault:
 		PERTASK_SET(this_exception_faultaddr, (void *)old_eip);
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
 		PERTASK_SET(this_exception_pointers[0], (uintptr_t)addr);
-#if PAGEFAULT_F_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
-PAGEFAULT_F_WRITING == E_SEGFAULT_CONTEXT_WRITING
+#if X86_PAGEFAULT_ECODE_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
+X86_PAGEFAULT_ECODE_WRITING == E_SEGFAULT_CONTEXT_WRITING
 		PERTASK_SET(this_exception_pointers[1],
 		            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
-		            (uintptr_t)(ecode & (PAGEFAULT_F_USERSPACE | PAGEFAULT_F_WRITING)));
+		            (uintptr_t)(ecode & (X86_PAGEFAULT_ECODE_USERSPACE | X86_PAGEFAULT_ECODE_WRITING)));
 #else
 		PERTASK_SET(this_exception_pointers[1],
 		            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
-		            (uintptr_t)(ecode & PAGEFAULT_F_USERSPACE ? E_SEGFAULT_CONTEXT_USERCODE : 0) |
-		            (uintptr_t)(ecode & PAGEFAULT_F_WRITING ? E_SEGFAULT_CONTEXT_WRITING : 0));
+		            (uintptr_t)(ecode & X86_PAGEFAULT_ECODE_USERSPACE ? E_SEGFAULT_CONTEXT_USERCODE : 0) |
+		            (uintptr_t)(ecode & X86_PAGEFAULT_ECODE_WRITING ? E_SEGFAULT_CONTEXT_WRITING : 0));
 #endif
 		{
 			unsigned int i;
@@ -1060,9 +1049,9 @@ PAGEFAULT_F_WRITING == E_SEGFAULT_CONTEXT_WRITING
 		goto do_unwind_state;
 	}
 not_a_badcall:
-	if ((ecode & (PAGEFAULT_F_PRESENT | PAGEFAULT_F_WRITING)) == (PAGEFAULT_F_PRESENT | PAGEFAULT_F_WRITING)) {
+	if ((ecode & (X86_PAGEFAULT_ECODE_PRESENT | X86_PAGEFAULT_ECODE_WRITING)) == (X86_PAGEFAULT_ECODE_PRESENT | X86_PAGEFAULT_ECODE_WRITING)) {
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_READONLY));
-	} else if ((ecode & PAGEFAULT_F_PRESENT) && ((ecode & PAGEFAULT_F_INSTRFETCH) ||
+	} else if ((ecode & X86_PAGEFAULT_ECODE_PRESENT) && ((ecode & X86_PAGEFAULT_ECODE_INSTRFETCH) ||
 	                                             (pc == (uintptr_t)addr))) {
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
 	} else {
@@ -1070,16 +1059,16 @@ not_a_badcall:
 	}
 set_exception_pointers:
 	PERTASK_SET(this_exception_pointers[0], (uintptr_t)addr);
-#if PAGEFAULT_F_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
-    PAGEFAULT_F_WRITING == E_SEGFAULT_CONTEXT_WRITING
+#if X86_PAGEFAULT_ECODE_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
+    X86_PAGEFAULT_ECODE_WRITING == E_SEGFAULT_CONTEXT_WRITING
 	PERTASK_SET(this_exception_pointers[1],
 	            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
-	            (uintptr_t)(ecode & (PAGEFAULT_F_USERSPACE | PAGEFAULT_F_WRITING)));
+	            (uintptr_t)(ecode & (X86_PAGEFAULT_ECODE_USERSPACE | X86_PAGEFAULT_ECODE_WRITING)));
 #else
 	PERTASK_SET(this_exception_pointers[1],
 	            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
-	            (uintptr_t)(ecode & PAGEFAULT_F_USERSPACE ? E_SEGFAULT_CONTEXT_USERCODE : 0) |
-	            (uintptr_t)(ecode & PAGEFAULT_F_WRITING ? E_SEGFAULT_CONTEXT_WRITING : 0));
+	            (uintptr_t)(ecode & X86_PAGEFAULT_ECODE_USERSPACE ? E_SEGFAULT_CONTEXT_USERCODE : 0) |
+	            (uintptr_t)(ecode & X86_PAGEFAULT_ECODE_WRITING ? E_SEGFAULT_CONTEXT_WRITING : 0));
 #endif
 	{
 		unsigned int i;

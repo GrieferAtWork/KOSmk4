@@ -37,12 +37,12 @@
 #include <kernel/pic.h>
 #include <kernel/pit.h>
 #include <kernel/printk.h>
-#include <kernel/tss.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
 #include <sched/cpu.h>
 #include <sched/smp.h>
 #include <sched/task.h>
+#include <sched/tss.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>

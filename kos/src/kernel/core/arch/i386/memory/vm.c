@@ -27,9 +27,9 @@
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
-#include <kernel/tss.h>
 #include <kernel/vm.h>
 #include <sched/cpu.h>
+#include <sched/tss.h>
 
 #include <hybrid/atomic.h>
 

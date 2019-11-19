@@ -31,7 +31,6 @@
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/syscall.h>
-#include <kernel/tss.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
@@ -42,6 +41,7 @@
 #include <sched/posix-signal.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
+#include <sched/tss.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/host.h>
@@ -87,8 +87,6 @@ NOTHROW(FCALL rpc_serve_user_redirection_all)(struct icpustate *__restrict state
 INTDEF void FCALL
 halt_unhandled_exception(unsigned int error,
                          struct kcpustate *__restrict unwind_state);
-
-#define X86_SYSCALL_PERSONALITY_LSDA_SYSENTER_FLAG   ((uintptr_t)UINT32_C(0x40000000))
 
 LOCAL void FCALL
 scinfo_get32_int80h(struct rpc_syscall_info *__restrict self,
@@ -149,6 +147,11 @@ INTERN unsigned int
 NOTHROW(KCALL x86_syscall_personality)(struct unwind_fde_struct *__restrict fde,
                                        struct kcpustate *__restrict state,
                                        byte_t *__restrict lsda) {
+	/* TODO: This function needs to be split such that each syscall method has its own personality
+	 *       function, so we can get rid of `X86_SYSCALL_PERSONALITY_LSDA_SYSENTER_FLAG'.
+	 *       Also: Get rid of the rule that `lsda & 0x7fffffff == 0x7fffffff' means that
+	 *       the system call number is given via state->EAX and add dedicated personality
+	 *       functions for those cases, as well! */
 	struct ucpustate ustate;
 	unsigned int error;
 	struct rpc_syscall_info info;
@@ -175,6 +178,7 @@ NOTHROW(KCALL x86_syscall_personality)(struct unwind_fde_struct *__restrict fde,
 	 * on special actions to perform based on the called function, as well as
 	 * inform user-space of which function caused the exception, as well as
 	 * implement system call restarting. */
+#define X86_SYSCALL_PERSONALITY_LSDA_SYSENTER_FLAG   ((uintptr_t)UINT32_C(0x40000000))
 	if (((uintptr_t)lsda & ~X86_SYSCALL_PERSONALITY_LSDA_SYSENTER_FLAG) !=
 	    ((uintptr_t)-1 & ~X86_SYSCALL_PERSONALITY_LSDA_SYSENTER_FLAG))
 		gpregs_setpax(&ustate.ucs_gpregs, (uintptr_t)lsda & ~X86_SYSCALL_PERSONALITY_LSDA_SYSENTER_FLAG);

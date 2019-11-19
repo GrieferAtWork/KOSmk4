@@ -28,7 +28,6 @@
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
-#include <kernel/tss.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
 #include <misc/atomic-ref.h>
@@ -36,6 +35,7 @@
 #include <sched/iobm.h>
 #include <sched/pertask.h>
 #include <sched/task.h>
+#include <sched/tss.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -49,7 +49,7 @@ DECL_BEGIN
 
 /* [0..1][lock(WRITE_ONCE)]
  * The I/O permissions bitmap of the calling thread.
- * Lazily allocated during `ioperm()' and `#PF' (s.a. documentation in <kernel/tss.h>) */
+ * Lazily allocated during `ioperm()' and `#PF' (s.a. documentation in <sched/tss.h>) */
 PUBLIC ATTR_PERTASK REF struct ioperm_bitmap *this_x86_ioperm_bitmap = NULL;
 
 /* [0..1][lock(THIS_CPU && !PREEMPTION_ENABLED())]

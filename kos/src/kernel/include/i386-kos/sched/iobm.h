@@ -47,7 +47,7 @@ DATDEF struct ioperm_bitmap ioperm_bitmap_empty;
 
 /* [0..1][lock(WRITE_ONCE)]
  * The I/O permissions bitmap of the calling thread.
- * Lazily allocated during `ioperm()' and `#PF' (s.a. documentation in <kernel/tss.h>) */
+ * Lazily allocated during `ioperm()' and `#PF' (s.a. documentation in <sched/tss.h>) */
 DATDEF ATTR_PERTASK REF struct ioperm_bitmap *this_x86_ioperm_bitmap;
 #define THIS_X86_IOPERM_BITMAP PERTASK_GET(this_x86_ioperm_bitmap)
 

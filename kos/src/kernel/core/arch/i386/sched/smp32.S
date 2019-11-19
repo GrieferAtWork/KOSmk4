@@ -18,22 +18,23 @@
  */
 #define _KOS_KERNEL_SOURCE 1
 
-#include <kernel/apic.h>
 #include <kernel/compiler.h>
+
+#include <kernel/apic.h>
+#include <kernel/breakpoint.h>
 #include <kernel/cpuid.h>
 #include <kernel/gdt.h>
 #include <kernel/paging.h>
-#include <kernel/breakpoint.h>
 #include <kernel/pic.h>
-#include <kernel/tss.h>
 #include <sched/cpu.h>
 #include <sched/smp.h>
 #include <sched/task.h>
+#include <sched/tss.h>
 
 #include <asm/cfi.h>
+#include <asm/cpu-cpuid.h>
 #include <asm/cpu-flags.h>
 #include <asm/cpu-msr.h>
-#include <asm/cpu-cpuid.h>
 #include <kos/kernel/cpu-state.h>
 
 

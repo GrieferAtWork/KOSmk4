@@ -32,27 +32,27 @@ if (gcc_opt.remove("-O3"))
 
 #ifndef CONFIG_NO_DEBUGGER
 #include <kernel/apic.h>
-#include <kernel/vm.h>
 #include <kernel/except.h>
 #include <kernel/gdt.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
-#include <kernel/tss.h>
+#include <kernel/vm.h>
 #include <sched/cpu.h>
-#include <sched/task.h>
 #include <sched/signal.h>
+#include <sched/task.h>
+#include <sched/tss.h>
 
+#include <hybrid/align.h>
 #include <hybrid/atomic.h>
 
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
-#include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
 
 #include <assert.h>
 #include <string.h>
-#include <hybrid/align.h>
 
 #include "../../../sched/rwlock.h" /* struct read_locks */
 

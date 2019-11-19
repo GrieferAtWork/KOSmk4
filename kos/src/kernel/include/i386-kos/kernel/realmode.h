@@ -94,12 +94,12 @@ INTDEF FREE void NOTHROW(KCALL x86_realmode_finalize)(void);
 /* A small data buffer usable for input/output of realmode data. */
 INTDEF byte_t *x86_realmode_buffer_addr;
 #ifdef __INTELLISENSE__
-INTDEF u16 x86_realmode_buffer_offset;
-INTDEF u16 x86_realmode_buffer_segment;
-#else
+INTDEF u16 const x86_realmode_buffer_offset;
+INTDEF u16 const x86_realmode_buffer_segment;
+#else /* __INTELLISENSE__ */
 #define x86_realmode_buffer_offset  ((u16)((uintptr_t)x86_realmode_buffer_addr & 0xffff))
 #define x86_realmode_buffer_segment ((u16)(((uintptr_t)x86_realmode_buffer_addr & 0xf0000) >> 4))
-#endif
+#endif /* !__INTELLISENSE__ */
 
 #endif /* __CC__ */
 

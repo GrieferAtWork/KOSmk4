@@ -30,10 +30,10 @@
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
-#include <kernel/tss.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
 #include <sched/cpu.h>
+#include <sched/tss.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>

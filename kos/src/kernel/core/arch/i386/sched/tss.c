@@ -27,12 +27,12 @@
 #include <kernel/gdt.h>
 #include <kernel/memory.h>
 #include <kernel/paging.h>
-#include <kernel/tss.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/pertask.h>
 #include <sched/task.h>
+#include <sched/tss.h>
 
 #include <hybrid/align.h>
 
