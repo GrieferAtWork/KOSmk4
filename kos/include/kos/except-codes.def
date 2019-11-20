@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51cade20 */
+/* HASH CRC-32:0x54ebabf0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ END
 CLASS(E_INVALID_HANDLE,MESSAGE("Bad file descriptor"),ERRNO(EBADF),())
 	SUBCLASS(E_INVALID_HANDLE_FILE,MESSAGE("The given file descriptor is invalid"),NO_ERRNO,(MEMBER(unsigned int,fd) MEMBER(unsigned int,reason) MEMBER(unsigned int,fd_max) MEMBER(unsigned int,fd_limit)))
 	SUBCLASS(E_INVALID_HANDLE_FILETYPE,MESSAGE("Invalid file handle type"),ERRNO(EBADFD),(MEMBER(unsigned int,fd) MEMBER(unsigned int,needed_handle_type) MEMBER(unsigned int,actual_handle_type) MEMBER(unsigned int,needed_handle_kind) MEMBER(unsigned int,actual_handle_kind)))
-	SUBCLASS(E_INVALID_HANDLE_OPERATION,MESSAGE("Invalid handle operation"),ERRNO(EPERM),(MEMBER(unsigned int,fd) MEMBER(unsigned int,op) MEMBER(iomode_t,handle_mode)))
+	SUBCLASS(E_INVALID_HANDLE_OPERATION,MESSAGE("Invalid handle operation"),ERRNO(EINVAL),(MEMBER(unsigned int,fd) MEMBER(unsigned int,op) MEMBER(iomode_t,handle_mode)))
 END
 CLASS(E_WOULDBLOCK,MESSAGE("A blocking call was attempted when non-blocking behavior was requested"),ERRNO(EAGAIN),())
 	SUBCLASS(E_WOULDBLOCK_PREEMPTED,NO_MESSAGE,NO_ERRNO,())
@@ -107,7 +107,9 @@ CLASS(E_FSERROR,MESSAGE("Filesystem error"),NO_ERRNO,())
 	SUBCLASS(E_FSERROR_PATH_ALREADY_MOUNTED,MESSAGE("Path has already been mounted"),ERRNO(EBUSY),())
 	SUBCLASS(E_FSERROR_NOT_A_MOUNTING_POINT,MESSAGE("Path hasn\'t been mounted"),ERRNO(EINVAL),())
 	SUBCLASS(E_FSERROR_IS_A_MOUNTING_POINT,MESSAGE("Path is a mounting point"),ERRNO(ENOTDIR),())
-	SUBCLASS(E_FSERROR_UNSUPPORTED_OPERATION,MESSAGE("Unsupported filesystem operation"),ERRNO(GET_EXCEPTION_POINTER(0) == E_FILESYSTEM_OPERATION_SEEK ? ESPIPE : EPERM),(MEMBER(uintptr_t,operation_id)))
+	SUBCLASS(E_FSERROR_UNSUPPORTED_OPERATION,MESSAGE("Unsupported filesystem operation"),ERRNO(GET_EXCEPTION_POINTER(0) == E_FILESYSTEM_OPERATION_SEEK ? ESPIPE :
+      (GET_EXCEPTION_POINTER(0) == E_FILESYSTEM_OPERATION_READ || GET_EXCEPTION_POINTER(0) == E_FILESYSTEM_OPERATION_WRITE ||
+       GET_EXCEPTION_POINTER(0) == E_FILESYSTEM_OPERATION_TRUNC || GET_EXCEPTION_POINTER(0) == E_FILESYSTEM_OPERATION_READDIR) ? EINVAL : EPERM),(MEMBER(uintptr_t,operation_id)))
 END
 CLASS(E_NET_ERROR,MESSAGE("Network error"),NO_ERRNO,())
 END

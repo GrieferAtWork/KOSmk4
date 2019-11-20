@@ -173,7 +173,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 		size_t max_io_bytes;
 #ifdef DEFINE_IO_VECTOR
 		uintptr_t buf_offset;
-#endif
+#endif /* DEFINE_IO_VECTOR */
 #ifndef DEFINE_IO_READ
 		SCOPED_WRITELOCK((struct vm_datablock *)self);
 #ifdef DEFINE_IO_PHYS
@@ -211,7 +211,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 				inode_changed(self, INODE_FATTRCHANGED);
 			}
 		}
-#endif
+#endif /* !DEFINE_IO_READ */
 		if unlikely(self->db_parts == VM_DATABLOCK_ANONPARTS) {
 			/* The INode uses anonymous parts. -> Use read-through / write-through */
 #ifdef DEFINE_IO_READ
@@ -232,7 +232,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 				THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
 			(*self->i_type->it_file.f_read)(self, buf, num_bytes, file_position, aio);
 #endif
-#else
+#else /* DEFINE_IO_READ */
 			TRY {
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
 				(*self->i_type->it_file.f_pwritev)(self, buf, num_bytes, file_position, aio);
@@ -250,7 +250,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_FSERROR_READONLY));
 				RETHROW();
 			}
-#endif
+#endif /* !DEFINE_IO_READ */
 			return;
 		}
 #ifdef CONFIG_VIO
@@ -324,7 +324,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 
 #ifdef DEFINE_IO_VECTOR
 		buf_offset = 0;
-#endif
+#endif /* DEFINE_IO_VECTOR */
 load_next_part:
 
 		/* Locate the part concerning the requested IO, while trying to automatically
@@ -338,10 +338,10 @@ load_next_part:
 #ifdef DEFINE_IO_PHYS
 			struct aio_pbuffer view;
 			aio_pbuffer_init_view_after(&view, buf, buf_offset);
-#else
+#else /* DEFINE_IO_PHYS */
 			struct aio_buffer view;
 			aio_buffer_init_view_after(&view, buf, buf_offset);
-#endif
+#endif /* !DEFINE_IO_PHYS */
 #ifdef DEFINE_IO_READ
 			max_io_bytes = FUNC0(vm_datapart_read)(part, &view, part_offset);
 #else /* DEFINE_IO_READ */
@@ -609,8 +609,9 @@ again_check_size:
 			              num_bytes,
 			              file_position
 #ifdef DEFINE_IO_ASYNC
-			              , aio
-#endif
+			              ,
+			              aio
+#endif /* DEFINE_IO_ASYNC */
 			              );
 		} EXCEPT {
 			if (rwlock_endread(&self->db_lock))
@@ -625,7 +626,7 @@ again_check_size:
 		aio_multihandle_fail(aio);
 	}
 	return 0;
-#endif
+#endif /* DEFINE_IO_ASYNC */
 }
 
 
@@ -711,7 +712,8 @@ again_check_size:
 		              num_bytes,
 		              file_position
 #ifdef DEFINE_IO_ASYNC
-		              , aio
+		              ,
+		              aio
 #endif /* DEFINE_IO_ASYNC */
 		              );
 	} EXCEPT {

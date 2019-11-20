@@ -61,6 +61,17 @@ NOTHROW(KCALL file_destroy)(struct file *__restrict self) {
 #undef CONFIG_BLOCKING_REGULAR_FILE_READ
 //#define CONFIG_BLOCKING_REGULAR_FILE_READ 1
 
+LOCAL NOBLOCK void
+NOTHROW(KCALL translate_read_exceptions)(struct file *__restrict self) {
+	if (error_code() == ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION) &&
+	    PERTASK_GET(this_exception_pointers[0]) == E_FILESYSTEM_OPERATION_READ &&
+	    INODE_ISDIR(self->f_node)) {
+		/* Posix wants us to return -EISDIR when trying to read from a directory... */
+		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_FSERROR_IS_A_DIRECTORY));
+		PERTASK_SET(this_exception_pointers[0], (uintptr_t)E_FILESYSTEM_IS_A_DIRECTORY_READ);
+	}
+}
+
 DEFINE_HANDLE_REFCNT_FUNCTIONS(file, struct file)
 INTERN size_t KCALL
 handle_file_read(struct file *__restrict self,
@@ -69,16 +80,21 @@ handle_file_read(struct file *__restrict self,
                  iomode_t mode) {
 	pos_t old_pos;
 	size_t result;
-	do {
-		old_pos = ATOMIC_READ(self->f_offset);
+	TRY {
+		do {
+			old_pos = ATOMIC_READ(self->f_offset);
 #ifndef CONFIG_BLOCKING_REGULAR_FILE_READ
-		result  = inode_read(self->f_node, dst, num_bytes, old_pos);
+			result  = inode_read(self->f_node, dst, num_bytes, old_pos);
 #else /* !CONFIG_BLOCKING_REGULAR_FILE_READ */
-		result  = mode & IO_NONBLOCK
-		         ? inode_read(self->f_node, dst, num_bytes, old_pos)
-		         : inode_read_blocking(self->f_node, dst, num_bytes, old_pos);
+			result  = mode & IO_NONBLOCK
+			         ? inode_read(self->f_node, dst, num_bytes, old_pos)
+			         : inode_read_blocking(self->f_node, dst, num_bytes, old_pos);
 #endif /* CONFIG_BLOCKING_REGULAR_FILE_READ */
-	} while (unlikely(!ATOMIC_CMPXCH(self->f_offset, old_pos, old_pos + result)) && result);
+		} while (unlikely(!ATOMIC_CMPXCH(self->f_offset, old_pos, old_pos + result)) && result);
+	} EXCEPT {
+		translate_read_exceptions(self);
+		RETHROW();
+	}
 	return result;
 }
 
@@ -103,13 +119,20 @@ handle_file_pread(struct file *__restrict self,
                   USER CHECKED void *dst,
                   size_t num_bytes,
                   pos_t addr, iomode_t mode) {
+	size_t result;
+	TRY {
 #ifndef CONFIG_BLOCKING_REGULAR_FILE_READ
-	return inode_read(self->f_node, dst, num_bytes, addr);
+		result = inode_read(self->f_node, dst, num_bytes, addr);
 #else /* !CONFIG_BLOCKING_REGULAR_FILE_READ */
-	return mode & IO_NONBLOCK
-	       ? inode_read(self->f_node, dst, num_bytes, addr)
-	       : inode_read_blocking(self->f_node, dst, num_bytes, addr);
+		result = mode & IO_NONBLOCK
+		         ? inode_read(self->f_node, dst, num_bytes, addr)
+		         : inode_read_blocking(self->f_node, dst, num_bytes, addr);
 #endif /* CONFIG_BLOCKING_REGULAR_FILE_READ */
+	} EXCEPT {
+		translate_read_exceptions(self);
+		RETHROW();
+	}
+	return result;
 }
 
 INTERN size_t KCALL
@@ -130,16 +153,21 @@ handle_file_readv(struct file *__restrict self,
                   iomode_t mode) {
 	pos_t old_pos;
 	size_t result;
-	do {
-		old_pos = ATOMIC_READ(self->f_offset);
+	TRY {
+		do {
+			old_pos = ATOMIC_READ(self->f_offset);
 #ifndef CONFIG_BLOCKING_REGULAR_FILE_READ
-		result  = inode_readv(self->f_node, dst, num_bytes, old_pos);
+			result  = inode_readv(self->f_node, dst, num_bytes, old_pos);
 #else /* !CONFIG_BLOCKING_REGULAR_FILE_READ */
-		result  = mode & IO_NONBLOCK
-		         ? inode_readv(self->f_node, dst, num_bytes, old_pos)
-		         : inode_readv_blocking(self->f_node, dst, num_bytes, old_pos);
+			result  = mode & IO_NONBLOCK
+			         ? inode_readv(self->f_node, dst, num_bytes, old_pos)
+			         : inode_readv_blocking(self->f_node, dst, num_bytes, old_pos);
 #endif /* CONFIG_BLOCKING_REGULAR_FILE_READ */
-	} while (unlikely(!ATOMIC_CMPXCH(self->f_offset, old_pos, old_pos + result)) && result);
+		} while (unlikely(!ATOMIC_CMPXCH(self->f_offset, old_pos, old_pos + result)) && result);
+	} EXCEPT {
+		translate_read_exceptions(self);
+		RETHROW();
+	}
 	return result;
 }
 
@@ -164,13 +192,20 @@ handle_file_preadv(struct file *__restrict self,
                    struct aio_buffer *__restrict dst,
                    size_t num_bytes,
                    pos_t addr, iomode_t mode) {
+	size_t result;
+	TRY {
 #ifndef CONFIG_BLOCKING_REGULAR_FILE_READ
-	return inode_readv(self->f_node, dst, num_bytes, addr);
-#else /* !CONFIG_BLOCKING_REGULAR_FILE_READ */
-	return mode & IO_NONBLOCK
-	       ? inode_readv(self->f_node, dst, num_bytes, addr)
-	       : inode_readv_blocking(self->f_node, dst, num_bytes, addr);
+		result = inode_readv(self->f_node, dst, num_bytes, addr);
+#else  /* !CONFIG_BLOCKING_REGULAR_FILE_READ */
+		result = mode & IO_NONBLOCK
+		         ? inode_readv(self->f_node, dst, num_bytes, addr)
+		         : inode_readv_blocking(self->f_node, dst, num_bytes, addr);
 #endif /* CONFIG_BLOCKING_REGULAR_FILE_READ */
+	} EXCEPT {
+		translate_read_exceptions(self);
+		RETHROW();
+	}
+	return result;
 }
 
 INTERN size_t KCALL
@@ -193,11 +228,16 @@ handle_file_aread(struct file *__restrict self,
                   struct aio_multihandle *__restrict aio) {
 	pos_t old_pos;
 	size_t result;
-	(void)mode;
-	old_pos = ATOMIC_READ(self->f_offset);
-	result  = inode_aread(self->f_node, dst, num_bytes, old_pos, aio);
-	if (unlikely(!ATOMIC_CMPXCH(self->f_offset, old_pos, old_pos + result)) && result) {
-		/* XXX: What now? */
+	TRY {
+		(void)mode;
+		old_pos = ATOMIC_READ(self->f_offset);
+		result  = inode_aread(self->f_node, dst, num_bytes, old_pos, aio);
+		if (unlikely(!ATOMIC_CMPXCH(self->f_offset, old_pos, old_pos + result)) && result) {
+			/* XXX: What now? */
+		}
+	} EXCEPT {
+		translate_read_exceptions(self);
+		RETHROW();
 	}
 	return result;
 }
@@ -226,8 +266,15 @@ handle_file_apread(struct file *__restrict self,
                    size_t num_bytes,
                    pos_t addr, iomode_t mode,
                    struct aio_multihandle *__restrict aio) {
-	(void)mode;
-	return inode_aread(self->f_node, dst, num_bytes, addr, aio);
+	size_t result;
+	TRY {
+		(void)mode;
+		result = inode_aread(self->f_node, dst, num_bytes, addr, aio);
+	} EXCEPT {
+		translate_read_exceptions(self);
+		RETHROW();
+	}
+	return result;
 }
 
 INTERN size_t KCALL
@@ -250,10 +297,15 @@ handle_file_areadv(struct file *__restrict self,
                    struct aio_multihandle *__restrict aio) {
 	pos_t old_pos;
 	size_t result;
-	old_pos = ATOMIC_READ(self->f_offset);
-	result  = inode_areadv(self->f_node, dst, num_bytes, old_pos, aio);
-	if (unlikely(!ATOMIC_CMPXCH(self->f_offset, old_pos, old_pos + result)) && result) {
-		/* XXX: What now? */
+	TRY {
+		old_pos = ATOMIC_READ(self->f_offset);
+		result  = inode_areadv(self->f_node, dst, num_bytes, old_pos, aio);
+		if (unlikely(!ATOMIC_CMPXCH(self->f_offset, old_pos, old_pos + result)) && result) {
+			/* XXX: What now? */
+		}
+	} EXCEPT {
+		translate_read_exceptions(self);
+		RETHROW();
 	}
 	return result;
 }
@@ -282,8 +334,15 @@ handle_file_apreadv(struct file *__restrict self,
                     size_t num_bytes,
                     pos_t addr, iomode_t mode,
                     struct aio_multihandle *__restrict aio) {
-	(void)mode;
-	return inode_areadv(self->f_node, dst, num_bytes, addr, aio);
+	size_t result;
+	TRY {
+		(void)mode;
+		result = inode_areadv(self->f_node, dst, num_bytes, addr, aio);
+	} EXCEPT {
+		translate_read_exceptions(self);
+		RETHROW();
+	}
+	return result;
 }
 
 INTERN size_t KCALL
@@ -1022,6 +1081,22 @@ read_entry_pos_0:
 DEFINE_HANDLE_REFCNT_FUNCTIONS(oneshot_directory_file, struct oneshot_directory_file)
 /* TODO: Other handle operators */
 
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_read, handle_file_read);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_write, handle_file_write);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_pread, handle_file_pread);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_pwrite, handle_file_pwrite);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_readv, handle_file_readv);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_writev, handle_file_writev);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_preadv, handle_file_preadv);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_pwritev, handle_file_pwritev);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_aread, handle_file_aread);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_awrite, handle_file_awrite);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_apread, handle_file_apread);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_apwrite, handle_file_apwrite);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_areadv, handle_file_areadv);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_awritev, handle_file_awritev);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_apreadv, handle_file_apreadv);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_apwritev, handle_file_apwritev);
 DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_mmap, handle_file_mmap);
 DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_sync, handle_file_sync);
 DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_datasync, handle_file_datasync);

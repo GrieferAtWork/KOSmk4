@@ -61,7 +61,7 @@
 #define TIOCGRS485          _IO('T', 0x2e)
 #ifndef TIOCSRS485
 #define TIOCSRS485          _IO('T', 0x2f)
-#endif
+#endif /* !TIOCSRS485 */
 #define TIOCGPTN           _IOR('T', 0x30, unsigned int) /* Get Pty Number (of pty-mux device) */
 #define TIOCSPTLCK         _IOW('T', 0x31, int)  /* Lock/unlock Pty */
 #define TIOCGDEV           _IOR('T', 0x32, unsigned int) /* Get primary device node of /dev/console */

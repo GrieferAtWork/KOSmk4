@@ -326,7 +326,7 @@ class E_INVALID_HANDLE_FILETYPE: E_INVALID_HANDLE = 0x0002 {
 	member actual_handle_kind: unsigned int;
 }
 
-[errno(EPERM)]
+[errno(EINVAL)]
 [message("Invalid handle operation")]
 class E_INVALID_HANDLE_OPERATION: E_INVALID_HANDLE = 0x0003 {
 	@@The FD number that was accessed
@@ -567,6 +567,8 @@ class E_FSERROR_IS_A_DIRECTORY: E_FSERROR = 0x000b {
 const E_FILESYSTEM_IS_A_DIRECTORY_UNLINK = 0x0001;
 @@Thrown as the result of `exec(path)', where `path' is a directory
 const E_FILESYSTEM_IS_A_DIRECTORY_EXEC = 0x0002;
+@@Thrown as the result of attempting to read from a directory
+const E_FILESYSTEM_IS_A_DIRECTORY_READ = 0x0003;
 
 [errno(ENOENT)]
 [message("Expected a symbolic link")]
@@ -647,7 +649,9 @@ class E_FSERROR_NOT_A_MOUNTING_POINT   : E_FSERROR = 0x0019 {}
 @@Attempted to rmdir() or rename() a mounting point
 class E_FSERROR_IS_A_MOUNTING_POINT: E_FSERROR = 0x001a {}
 
-[errno({ptr0} == E_FILESYSTEM_OPERATION_SEEK ? ESPIPE : EPERM)]
+[errno({ptr0} == E_FILESYSTEM_OPERATION_SEEK ? ESPIPE :
+      ({ptr0} == E_FILESYSTEM_OPERATION_READ || {ptr0} == E_FILESYSTEM_OPERATION_WRITE ||
+       {ptr0} == E_FILESYSTEM_OPERATION_TRUNC || {ptr0} == E_FILESYSTEM_OPERATION_READDIR) ? EINVAL : EPERM)]
 [message("Unsupported filesystem operation")]
 @@The object does not support the operation
 class E_FSERROR_UNSUPPORTED_OPERATION: E_FSERROR = 0x0100 {

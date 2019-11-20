@@ -401,20 +401,24 @@ do_TCSETA: {
 	case TCFLSH:
 		/* Discard data received, but not read (aka. what the driver send) */
 		switch ((uintptr_t)arg) {
+
 		case TCIFLUSH:
 			linebuffer_clear(&me->t_term.t_ipend);
 			ringbuffer_setwritten(&me->t_term.t_ibuf, 0);
 			break;
+
 		case TCOFLUSH:
 			linebuffer_clear(&me->t_term.t_opend);
 			/* DRIVER: CLEAR_NON_TRANSMITTED_OUTPUT_BUFFER(); */
 			break;
+
 		case TCIOFLUSH:
 			linebuffer_clear(&me->t_term.t_ipend);
 			ringbuffer_setwritten(&me->t_term.t_ibuf, 0);
 			linebuffer_clear(&me->t_term.t_opend);
 			/* DRIVER: CLEAR_NON_TRANSMITTED_OUTPUT_BUFFER(); */
 			break;
+
 		default:
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 			      E_INVALID_ARGUMENT_CONTEXT_TCFLSH_COMMAND,
@@ -516,20 +520,25 @@ do_TCSETA: {
 
 	case TCXONC:
 		switch ((uintptr_t)arg) {
+
 		case TCOOFF:
 			ATOMIC_FETCHOR(me->t_term.t_ios.c_iflag, IXOFF);
 			break;
+
 		case TCOON:
 			if (ATOMIC_FETCHAND(me->t_term.t_ios.c_iflag, ~IXOFF) & IXOFF)
 				sig_broadcast(&me->t_term.t_opend.lb_nful);
 			break;
+
 		case TCIOFF:
 			ATOMIC_FETCHOR(me->t_term.t_ios.c_iflag, __IIOFF);
 			break;
+
 		case TCION:
 			if (ATOMIC_FETCHAND(me->t_term.t_ios.c_iflag, ~__IIOFF) & __IIOFF)
 				sig_broadcast(&me->t_term.t_ibuf.rb_nfull);
 			break;
+
 		default:
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 			      E_INVALID_ARGUMENT_CONTEXT_TCXONC_COMMAND,

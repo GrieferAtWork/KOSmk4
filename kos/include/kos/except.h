@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf130dbd */
+/* HASH CRC-32:0x72a2c551 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -406,6 +406,8 @@ __DECL_BEGIN
 #define E_FILESYSTEM_IS_A_DIRECTORY_UNLINK 0x0001
 /* Thrown as the result of `exec(path)', where `path' is a directory */
 #define E_FILESYSTEM_IS_A_DIRECTORY_EXEC 0x0002
+/* Thrown as the result of attempting to read from a directory */
+#define E_FILESYSTEM_IS_A_DIRECTORY_READ 0x0003
 /* A symbolic link was expected when something else was found
  * 	@@The context in which a filesystem component was required to be a symlink, but was one (One of `E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_*')
  * 	member action_context: uintptr_t; */

@@ -28,14 +28,14 @@ __DECL_BEGIN
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-	EPOLL_CLOEXEC = 02000000
+	EPOLL_CLOEXEC = 0x80000
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #define EPOLL_CLOEXEC EPOLL_CLOEXEC
 #else /* __COMPILER_PREFERR_ENUMS */
-#define EPOLL_CLOEXEC 02000000
+#define EPOLL_CLOEXEC 0x80000
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
