@@ -1068,7 +1068,7 @@ NOTHROW(FCALL pae_pagedir_gethint)(VIRT vm_vpage_t virt_page) {
 	vec1 = PAE_PDIR_VEC1INDEX_VPAGE(virt_page);
 	/* NOTE: Only read as much as fits into a pointer, thus subverting
 	 *       the problem of possibly reading a corrupted value on i386 */
-	word = ATOMIC_READ(PAE_PDIR_E1_IDENTITY[vec3][vec2][vec1].p_word);
+	word = ATOMIC_READ64(PAE_PDIR_E1_IDENTITY[vec3][vec2][vec1].p_word);
 	if unlikely(!PAE_PDIR_E1_ISHINT(word))
 		return NULL;
 	return (void *)(uintptr_t)(word & (uintptr_t)PAE_PAGE_FHINT);
