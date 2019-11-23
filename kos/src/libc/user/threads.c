@@ -47,7 +47,7 @@ NOTHROW_NCX(LIBCCALL libc_thrd_create)(thrd_t *thr,
 	int error;
 	STATIC_ASSERT(sizeof(int) <= sizeof(void *));
 	error = libc_pthread_create((pthread_t *)thr, NULL,
-	                       *(__pthread_start_routine_t *)&func,
+	                       (__pthread_start_routine_t)(void *)func,
 	                       arg);
 	if likely(!error)
 		return 0; /* thrd_success */

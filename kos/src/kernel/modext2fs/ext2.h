@@ -122,7 +122,7 @@ typedef struct ATTR_PACKED {
 	le16    bg_free_blocks;      /* Number of unallocated blocks in group */
 	le16    bg_free_inodes;      /* Number of unallocated inodes in group */
 	le16    bg_num_dirs;         /* Number of directories in group */
-/*  u8    __bg_unused[14];       /* ... */
+/*	u8    __bg_unused[14];        * ... */
 } Ext2DiskBlockGroup;
 #define EXT2_BLOCKGROUP_SIZE   32
 

@@ -124,7 +124,7 @@ for (local h_name, none: handle_types) {
 }
 
 print "PUBLIC_CONST struct handle_types const handle_type_db = {";
-print "\t/* .h_typename = *" "/ {";
+print "\t/" "* .h_typename = *" "/ {";
 local is_first = true;
 for (local h_name, h_typ: handle_types) {
 	if (!is_first)

@@ -31,7 +31,6 @@
 
 DECL_BEGIN
 
-
 /* Declare support for signal-driven poll operations
  * >> bool pollread(MyType *self) {
  * >>     if (sync_canread(self))
@@ -41,14 +40,14 @@ DECL_BEGIN
  * >> }
  */
 #if defined(__cplusplus) && defined(__CC__)
-#define __DEFINE_SYNC_POLL(T, _pollread, _pollwrite) \
-extern "C++" { \
-FORCELOCAL WUNUSED NONNULL((1)) __BOOL (KCALL sync_pollread)(T *__restrict self) THROWS(E_BADALLOC) { return _pollread(self); } \
-FORCELOCAL WUNUSED NONNULL((1)) __BOOL (KCALL sync_pollwrite)(T *__restrict self) THROWS(E_BADALLOC) { return _pollwrite(self); } \
-}
-#else
-#define __DEFINE_SYNC_POLL(T,_pollread,_pollwrite) /* nothing */
-#endif
+#define __DEFINE_SYNC_POLL(T, _pollread, _pollwrite)                                                                                  \
+	extern "C++" {                                                                                                                    \
+	FORCELOCAL WUNUSED NONNULL((1)) __BOOL (KCALL sync_pollread)(T *__restrict self) THROWS(E_BADALLOC) { return _pollread(self); }   \
+	FORCELOCAL WUNUSED NONNULL((1)) __BOOL (KCALL sync_pollwrite)(T *__restrict self) THROWS(E_BADALLOC) { return _pollwrite(self); } \
+	}
+#else /* __cplusplus && __CC__ */
+#define __DEFINE_SYNC_POLL(T, _pollread, _pollwrite) /* nothing */
+#endif /* !__cplusplus || !__CC__ */
 
 
 #ifdef __CC__
@@ -57,7 +56,7 @@ struct task_connection;
 struct task_connections;
 
 #ifndef CONFIG_NO_SMP
-/* A special (and very rarely seend) value for `struct sig::s_ptr' that
+/* A special (and very rarely seen) value for `struct sig::s_ptr' that
  * is used to indicate that another CPU is currently invoking `sig_send()',
  * and has removed the pending chain of connections, though has not yet
  * re-scheduled the remaining connections that will won't be signaled.
@@ -293,12 +292,13 @@ NOTHROW(KCALL task_waitfor_norpc_nx)(struct __qtime const *abs_timeout DFL(__NUL
 
 /* Configuration option for standard synchronization primitives.
  * Before connecting to a signal, try to yield a couple of times
- * to try and get other threads to release some kind of lock,
- * as `task_yield()' is a much faster operation than connect()+wait().
+ * to try and get other threads to release some kind of lock, as
+ * `task_yield()' is a much faster operation than task_connect()+task_wait().
  * Doing this may improve performance, especially on single-core machines.
  * Note however that this option does not affect the behavior of
- * low-level `struct sig' objects, but instead primitives found
- * in <sched/*.h>, such as `struct mutex', `struct rwlock' and `struct semaphore'
+ * low-level `struct sig' objects, but instead primitives found in
+ * <sched/[...].h>, such as `struct mutex', `struct rwlock',
+ * `struct semaphore' and `struct shared_rwlock'
  * NOTE: The number that this is defined to describes the
  *       max number of times `task_yield()' is attempted
  *      (implementing a kind-of spin-locking mechanism),
@@ -306,14 +306,14 @@ NOTHROW(KCALL task_waitfor_norpc_nx)(struct __qtime const *abs_timeout DFL(__NUL
 #ifndef CONFIG_YIELD_BEFORE_CONNECT
 #ifndef CONFIG_NO_YIELD_BEFORE_CONNECT
 #define CONFIG_YIELD_BEFORE_CONNECT  4
-#endif
+#endif /* !CONFIG_NO_YIELD_BEFORE_CONNECT */
 #elif defined(CONFIG_NO_YIELD_BEFORE_CONNECT)
 #undef CONFIG_YIELD_BEFORE_CONNECT
 #endif
 
 #if defined(CONFIG_YIELD_BEFORE_CONNECT) && (CONFIG_YIELD_BEFORE_CONNECT+0) == 0
 #undef CONFIG_YIELD_BEFORE_CONNECT
-#endif
+#endif /* CONFIG_YIELD_BEFORE_CONNECT && (CONFIG_YIELD_BEFORE_CONNECT+0) == 0 */
 
 
 /* Helper macro to implement spin-locking before connecting a signal:

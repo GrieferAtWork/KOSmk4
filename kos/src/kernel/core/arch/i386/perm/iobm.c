@@ -96,7 +96,7 @@ NOTHROW(KCALL clone_this_ioperm_bitmap)(struct task *__restrict new_thread,
 	struct ioperm_bitmap *iob;
 	/* The ioperm() permissions bitmap is always inherited by child threads!
 	 * Only the iopl() level is not inherited in certain cases (as
-	 * configurable via `/proc/sys/x86/keepiopl/*') */
+	 * configurable via `/proc/sys/x86/keepiopl/(clone|exec|fork)') */
 	iob = THIS_X86_IOPERM_BITMAP;
 	/* unlikely, since this isn't really something that modern applications
 	 * commonly make use of! */

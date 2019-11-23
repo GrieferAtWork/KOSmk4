@@ -100,7 +100,7 @@ thrd_create:(thrd_t *thr, thrd_start_t func, void *arg) -> int {
 	int error;
 	STATIC_ASSERT(sizeof(int) <= sizeof(void *));
 	error = pthread_create((pthread_t *)thr, NULL,
-	                       *(__pthread_start_routine_t *)&func,
+	                       (__pthread_start_routine_t)(void *)func,
 	                       arg);
 	if likely(!error)
 		return 0; /* thrd_success */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69a83f63 */
+/* HASH CRC-32:0x36a9d3b3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thrd_create))(__thrd_t *__thr,
 	int __error;
 	__STATIC_ASSERT(sizeof(int) <= sizeof(void *));
 	__error = __localdep_pthread_create((__pthread_t *)__thr, __NULLPTR,
-	                       *(__pthread_start_routine_t *)&__func,
+	                       (__pthread_start_routine_t)(void *)__func,
 	                       __arg);
 	if __likely(!__error)
 		return 0; /* thrd_success */
