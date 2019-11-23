@@ -122,12 +122,36 @@ extern ATTR_ERROR("Invalid per-task object size") void __invalid_pertask_object_
 /************************************************************************/
 /* Define PERTASK_GET()                                                 */
 /************************************************************************/
-#ifndef __NO_builtin_choose_expr
-#define __pertask_get8(x)  XBLOCK({ __UINT8_TYPE__ __pt_res; __pertask_get8_r(x, __pt_res); XRETURN __pt_res; })
-#define __pertask_get16(x) XBLOCK({ __UINT16_TYPE__ __pt_res; __pertask_get16_r(x, __pt_res); XRETURN __pt_res; })
-#define __pertask_get32(x) XBLOCK({ __UINT32_TYPE__ __pt_res; __pertask_get32_r(x, __pt_res); XRETURN __pt_res; })
+#ifdef __NO_XBLOCK
+
+/* Without XBLOCK support */
+#ifdef __cplusplus
+extern "C++" {
+#define __pertask_get8 __pertask_get8
+#define __pertask_get16 __pertask_get16
+#define __pertask_get32 __pertask_get32
+template<class __T> __UINT8_TYPE__ (__pertask_get8)(__T const &__x) { __UINT8_TYPE__ __res; __pertask_get8_r(__x, __res); XRETURN __res; }
+template<class __T> __UINT16_TYPE__ (__pertask_get16)(__T const &__x) { __UINT16_TYPE__ __res; __pertask_get16_r(__x, __res); XRETURN __res; }
+template<class __T> __UINT32_TYPE__ (__pertask_get32)(__T const &__x) { __UINT32_TYPE__ __res; __pertask_get32_r(__x, __res); XRETURN __res; }
 #ifdef __pertask_get64_r
-#define __pertask_get64(x) XBLOCK({ __UINT64_TYPE__ __pt_res; __pertask_get64_r(x, __pt_res); XRETURN __pt_res; })
+#define __pertask_get64 __pertask_get64
+template<class __T> __UINT64_TYPE__ (__pertask_get64)(__T const &__x) { __UINT64_TYPE__ __res; __pertask_get64_r(__x, __res); XRETURN __res; }
+#endif /* __pertask_get64_r */
+}
+#else /* __cplusplus */
+#define __pertask_get8(x) __pertask_get8(&(x))
+#define __pertask_get16(x) __pertask_get16(&(x))
+#define __pertask_get32(x) __pertask_get32(&(x))
+__UINT8_TYPE__ (__pertask_get8)(void const *__px) { __UINT8_TYPE__ __res; __pertask_get8_r(*(__UINT8_TYPE__ const *), __res); XRETURN __res; }
+__UINT16_TYPE__ (__pertask_get16)(void const &__px) { __UINT16_TYPE__ __res; __pertask_get16_r(*(__UINT16_TYPE__ const *)__px, __res); XRETURN __res; }
+__UINT32_TYPE__ (__pertask_get32)(void const &__px) { __UINT32_TYPE__ __res; __pertask_get32_r(*(__UINT32_TYPE__ const *)__px, __res); XRETURN __res; }
+#ifdef __pertask_get64_r
+#define __pertask_get64(x) __pertask_get64(&(x))
+__UINT64_TYPE__ (__pertask_get64)(void const &__px) { __UINT64_TYPE__ __res; __pertask_get64_r(*(__UINT64_TYPE__ const *)__px, __res); XRETURN __res; }
+#endif /* __pertask_get64_r */
+#endif /* !__cplusplus */
+
+#ifdef __pertask_get64
 #define PERTASK_GET(x)                                                        \
 	((__typeof__(x))__builtin_choose_expr(sizeof(x) == 1, __pertask_get8(x),  \
 	                __builtin_choose_expr(sizeof(x) == 2, __pertask_get16(x), \
@@ -141,7 +165,60 @@ extern ATTR_ERROR("Invalid per-task object size") void __invalid_pertask_object_
 	                __builtin_choose_expr(sizeof(x) == 4, __pertask_get32(x), \
 	                (__invalid_pertask_object_size(), 0)))))
 #endif /* !__pertask_get64_r */
-#elif defined(__cplusplus)
+
+#elif !defined(__NO_builtin_choose_expr)
+#ifdef __NO_XBLOCK
+/* Without XBLOCK support */
+#ifdef __cplusplus
+extern "C++" {
+#define __pertask_get8 __pertask_get8
+#define __pertask_get16 __pertask_get16
+#define __pertask_get32 __pertask_get32
+template<class __T> __UINT8_TYPE__ (__pertask_get8)(__T const &__x) { __UINT8_TYPE__ __res; __pertask_get8_r(__x, __res); XRETURN __res; }
+template<class __T> __UINT16_TYPE__ (__pertask_get16)(__T const &__x) { __UINT16_TYPE__ __res; __pertask_get16_r(__x, __res); XRETURN __res; }
+template<class __T> __UINT32_TYPE__ (__pertask_get32)(__T const &__x) { __UINT32_TYPE__ __res; __pertask_get32_r(__x, __res); XRETURN __res; }
+#ifdef __pertask_get64_r
+#define __pertask_get64 __pertask_get64
+template<class __T> __UINT64_TYPE__ (__pertask_get64)(__T const &__x) { __UINT64_TYPE__ __res; __pertask_get64_r(__x, __res); XRETURN __res; }
+#endif /* __pertask_get64_r */
+}
+#else /* __cplusplus */
+
+#define __pertask_get8(x) __pertask_get8(&(x))
+#define __pertask_get16(x) __pertask_get16(&(x))
+#define __pertask_get32(x) __pertask_get32(&(x))
+__UINT8_TYPE__ (__pertask_get8)(void const *__px) { __UINT8_TYPE__ __res; __pertask_get8_r(*(__UINT8_TYPE__ const *), __res); XRETURN __res; }
+__UINT16_TYPE__ (__pertask_get16)(void const &__px) { __UINT16_TYPE__ __res; __pertask_get16_r(*(__UINT16_TYPE__ const *)__px, __res); XRETURN __res; }
+__UINT32_TYPE__ (__pertask_get32)(void const &__px) { __UINT32_TYPE__ __res; __pertask_get32_r(*(__UINT32_TYPE__ const *)__px, __res); XRETURN __res; }
+#ifdef __pertask_get64_r
+#define __pertask_get64(x) __pertask_get64(&(x))
+__UINT64_TYPE__ (__pertask_get64)(void const &__px) { __UINT64_TYPE__ __res; __pertask_get64_r(*(__UINT64_TYPE__ const *)__px, __res); XRETURN __res; }
+#endif /* __pertask_get64_r */
+#endif /* !__cplusplus */
+#else /* __NO_XBLOCK */
+/* With XBLOCK support */
+#define __pertask_get8(x)  XBLOCK({ __UINT8_TYPE__ __pt_res; __pertask_get8_r(x, __pt_res); XRETURN __pt_res; })
+#define __pertask_get16(x) XBLOCK({ __UINT16_TYPE__ __pt_res; __pertask_get16_r(x, __pt_res); XRETURN __pt_res; })
+#define __pertask_get32(x) XBLOCK({ __UINT32_TYPE__ __pt_res; __pertask_get32_r(x, __pt_res); XRETURN __pt_res; })
+#ifdef __pertask_get64_r
+#define __pertask_get64(x) XBLOCK({ __UINT64_TYPE__ __pt_res; __pertask_get64_r(x, __pt_res); XRETURN __pt_res; })
+#endif /* __pertask_get64_r */
+#endif /* !__NO_XBLOCK */
+#ifdef __pertask_get64
+#define PERTASK_GET(x)                                                        \
+	((__typeof__(x))__builtin_choose_expr(sizeof(x) == 1, __pertask_get8(x),  \
+	                __builtin_choose_expr(sizeof(x) == 2, __pertask_get16(x), \
+	                __builtin_choose_expr(sizeof(x) == 4, __pertask_get32(x), \
+	                __builtin_choose_expr(sizeof(x) == 8, __pertask_get64(x), \
+	                (__invalid_pertask_object_size(), 0))))))
+#else /* __pertask_get64_r */
+#define PERTASK_GET(x)                                                        \
+	((__typeof__(x))__builtin_choose_expr(sizeof(x) == 1, __pertask_get8(x),  \
+	                __builtin_choose_expr(sizeof(x) == 2, __pertask_get16(x), \
+	                __builtin_choose_expr(sizeof(x) == 4, __pertask_get32(x), \
+	                (__invalid_pertask_object_size(), 0)))))
+#endif /* !__pertask_get64_r */
+#elif defined(__cplusplus) && !defined(__NO_XBLOCK)
 
 extern "C++" {
 __NAMESPACE_INT_BEGIN
@@ -242,7 +319,22 @@ __NAMESPACE_INT_END
 /************************************************************************/
 /* Define PERTASK_SET()                                                 */
 /************************************************************************/
-#ifdef CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE
+#ifdef __NO_XBLOCK
+#ifdef __pertask_get64
+#define PERTASK_SET(x, v)                                                           \
+	__builtin_choose_expr(sizeof(x) == 1, __pertask_set8(x, (__UINT8_TYPE__)(v)),   \
+	__builtin_choose_expr(sizeof(x) == 2, __pertask_set16(x, (__UINT16_TYPE__)(v)), \
+	__builtin_choose_expr(sizeof(x) == 4, __pertask_set32(x, (__UINT32_TYPE__)(v)), \
+	__builtin_choose_expr(sizeof(x) == 8, __pertask_set64(x, (__UINT64_TYPE__)(v)), \
+	                     (__invalid_pertask_object_size(), 0)))))
+#else /* __pertask_get64_r */
+#define PERTASK_SET(x, v)                                                           \
+	__builtin_choose_expr(sizeof(x) == 1, __pertask_set8(x, (__UINT8_TYPE__)(v)),   \
+	__builtin_choose_expr(sizeof(x) == 2, __pertask_set16(x, (__UINT16_TYPE__)(v)), \
+	__builtin_choose_expr(sizeof(x) == 4, __pertask_set32(x, (__UINT32_TYPE__)(v)), \
+	                     (__invalid_pertask_object_size(), 0))))
+#endif /* !__pertask_get64_r */
+#elif defined(CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE)
 #ifdef __pertask_set64
 #define PERTASK_SET(x, v)                         \
 	XBLOCK({                                      \
