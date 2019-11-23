@@ -88,10 +88,10 @@ kprinter_impl(void *level_id,
 #if 0
 	return (ssize_t)datalen;
 #else
-	size_t print_len;
 	ssize_t result = (ssize_t)datalen;
 	/* TODO: Replace `__outsb()' with a portable, arch-specific API. */
 	while (datalen) {
+		size_t print_len;
 		print_len = memlen(data, '\n', datalen);
 		if (print_len) {
 			if (!(ATOMIC_FETCHOR(level_states[(uintptr_t)level_id].ls_flags, LEVEL_FINLINE) & LEVEL_FINLINE)) {

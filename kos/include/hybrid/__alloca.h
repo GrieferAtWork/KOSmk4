@@ -39,8 +39,9 @@ __SYSDECL_END
 #define __hybrid_alloca(s)  alloca(s)
 #endif
 #endif /* !__NO_has_include && !__KOS_SYSTEM_HEADERS__ */
+
 #ifndef __hybrid_alloca
-#if 0
+#if 1
 #include "typecore.h"
 __SYSDECL_BEGIN
 extern __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *(alloca)(__SIZE_TYPE__ __n_bytes);

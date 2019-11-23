@@ -45,12 +45,27 @@
 /* Define atomic memory order constants. */
 #ifndef __ATOMIC_RELAXED
 #define __ATOMIC_RELAXED 0
-#define __ATOMIC_CONSUME 1
-#define __ATOMIC_ACQUIRE 2
-#define __ATOMIC_RELEASE 3
-#define __ATOMIC_ACQ_REL 4
-#define __ATOMIC_SEQ_CST 5
 #endif /* !__ATOMIC_RELAXED */
+
+#ifndef __ATOMIC_CONSUME
+#define __ATOMIC_CONSUME 1
+#endif /* !__ATOMIC_CONSUME */
+
+#ifndef __ATOMIC_ACQUIRE
+#define __ATOMIC_ACQUIRE 2
+#endif /* !__ATOMIC_ACQUIRE */
+
+#ifndef __ATOMIC_RELEASE
+#define __ATOMIC_RELEASE 3
+#endif /* !__ATOMIC_RELEASE */
+
+#ifndef __ATOMIC_ACQ_REL
+#define __ATOMIC_ACQ_REL 4
+#endif /* !__ATOMIC_ACQ_REL */
+
+#ifndef __ATOMIC_SEQ_CST
+#define __ATOMIC_SEQ_CST 5
+#endif /* !__ATOMIC_SEQ_CST */
 
 __SYSDECL_BEGIN
 

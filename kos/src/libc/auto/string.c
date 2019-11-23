@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xedae7fa2 */
+/* HASH CRC-32:0x818fcdb3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1459,9 +1459,9 @@ INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strfry") char *
 NOTHROW_NCX(LIBCCALL libc_strfry)(char *__restrict string) {
 #line 736 "kos/src/libc/magic/string.c"
-	char temp;
 	size_t i, count = libc_strlen(string);
 	for (i = 0; i < count; ++i) {
+		char temp;
 		size_t j = libc_rand();
 		j = i + (j % (count - i));
 		/* Swap these 2 characters. */

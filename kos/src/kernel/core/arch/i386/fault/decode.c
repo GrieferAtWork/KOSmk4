@@ -392,10 +392,10 @@ modrm_setrmb(struct icpustate *__restrict state,
              struct modrm *__restrict modrm,
              op_flag_t flags, u8 value)
 		THROWS(E_SEGFAULT) {
-	uintptr_t addr;
 	if (modrm->mi_type == MODRM_REGISTER) {
 		x86_icpustate_set8(state, modrm->mi_rm, value);
 	} else {
+		uintptr_t addr;
 		addr = x86_decode_modrmgetmem(state, modrm, flags);
 		if (irregs_isuser(IRREGS(state)))
 			validate_writable((void *)addr, 1);
@@ -420,10 +420,10 @@ modrm_setrmw(struct icpustate *__restrict state,
              struct modrm *__restrict modrm,
              op_flag_t flags, u16 value)
 		THROWS(E_SEGFAULT) {
-	uintptr_t addr;
 	if (modrm->mi_type == MODRM_REGISTER) {
 		x86_icpustate_set16(state, modrm->mi_rm, value);
 	} else {
+		uintptr_t addr;
 		addr = x86_decode_modrmgetmem(state, modrm, flags);
 		if (irregs_isuser(IRREGS(state)))
 			validate_writable((void *)addr, 2);
@@ -448,10 +448,10 @@ modrm_setrml(struct icpustate *__restrict state,
              struct modrm *__restrict modrm,
              op_flag_t flags, u32 value)
 		THROWS(E_SEGFAULT) {
-	uintptr_t addr;
 	if (modrm->mi_type == MODRM_REGISTER) {
 		x86_icpustate_set32(state, modrm->mi_rm, value);
 	} else {
+		uintptr_t addr;
 		addr = x86_decode_modrmgetmem(state, modrm, flags);
 		if (irregs_isuser(IRREGS(state)))
 			validate_writable((void *)addr, 4);
@@ -477,10 +477,10 @@ modrm_setrmq(struct icpustate *__restrict state,
              struct modrm *__restrict modrm,
              op_flag_t flags, u64 value)
 		THROWS(E_SEGFAULT) {
-	uintptr_t addr;
 	if (modrm->mi_type == MODRM_REGISTER) {
 		x86_icpustate_set64(state, modrm->mi_rm, value);
 	} else {
+		uintptr_t addr;
 		addr = x86_decode_modrmgetmem(state, modrm, flags);
 		if (irregs_isuser(IRREGS(state)))
 			validate_writable((void *)addr, 8);

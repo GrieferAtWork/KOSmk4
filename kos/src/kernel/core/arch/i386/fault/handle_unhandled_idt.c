@@ -183,9 +183,10 @@ panic_uhi_dbg_main(void *arg) {
 	if (args->ecode)
 		dbg_printf(" [ecode=" DF_WHITE("%#.8I32x") "]", (u32)args->ecode);
 	{
-		char const *name, *desc;
+		char const *name;
 		name = get_interrupt_name(args->intno);
 		if (name) {
+			char const *desc;
 			desc = get_interrupt_desc(args->intno, args->ecode);
 			dbg_printf(" [" DF_WHITE("%s"), name);
 			if (desc)

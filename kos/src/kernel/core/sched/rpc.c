@@ -130,7 +130,6 @@ task_serve_one_impl(struct icpustate *__restrict state) {
 		assertf(iter != NULL, "Then why was the sync-RPC counter non-zero?");
 		if ((iter->re_kind & RPC_KIND_MASK) == RPC_KIND_SYNC)
 			break; /* Got a synchronous RPC which we must handle now. */
-		if ((iter->re_kind & RPC_KIND_INTERRUPT)
 #if 0 /* Technically, we'd need to do this to prevent an IDLE-loop when a           \
        * system call that isn't a cancelation point calls task_serve() while        \
        * a non-syscall user-space RPC has been scheduled.                           \
@@ -140,10 +139,13 @@ task_serve_one_impl(struct icpustate *__restrict state) {
        *  #2: By looping back to have the call be re-started, the component that is \
        *      blocking should eventually resolve itself.                            \
        */
+		if ((iter->re_kind & RPC_KIND_INTERRUPT)
 		    && !(iter->re_kind & RPC_KIND_NONSYSCALL)
-		    && !is_cancelation_point(current_system_call())
+		    && !is_cancelation_point(current_system_call()))
+#else
+		if ((iter->re_kind & RPC_KIND_INTERRUPT))
 #endif
-		    ) {
+		{
 			/* Set the `RPC_KIND_CANSERVE' flag for all user-sync RPCs.
 			 * -> These types of RPCs can only be handled when returning to
 			 *    user-space _after_ their associated thread has called

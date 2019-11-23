@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce004807 */
+/* HASH CRC-32:0x9e993304 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2256,9 +2256,9 @@ INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.memory.wcsfry") char32_t *
 NOTHROW_NCX(LIBCCALL libc_wcsfry)(char32_t *__restrict string) {
 #line 736 "kos/src/libc/magic/string.c"
-	char32_t temp;
 	size_t i, count = libc_wcslen(string);
 	for (i = 0; i < count; ++i) {
+		char32_t temp;
 		size_t j = libc_rand();
 		j = i + (j % (count - i));
 		/* Swap these 2 characters. */
@@ -2272,9 +2272,9 @@ INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.memory.wcsfry") char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsfry)(char16_t *__restrict string) {
 #line 736 "kos/src/libc/magic/string.c"
-	char16_t temp;
 	size_t i, count = libd_wcslen(string);
 	for (i = 0; i < count; ++i) {
+		char16_t temp;
 		size_t j = libc_rand();
 		j = i + (j % (count - i));
 		/* Swap these 2 characters. */

@@ -2945,11 +2945,12 @@ NOTHROW(KCALL vm_node_destroy)(struct vm_node *__restrict self) {
 			if (self->vn_vm != &vm_kernel) /* Preparations are meaningless within kernel-space. */
 #endif /* !CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			{
-				if (self->vn_vm == THIS_VM
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-				    || PAGE_IS_KERNEL(VM_NODE_START(self))
-#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-				    ) {
+				if (self->vn_vm == THIS_VM || PAGE_IS_KERNEL(VM_NODE_START(self)))
+#else /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+				if (self->vn_vm == THIS_VM)
+#endif /* !CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+				{
 					pagedir_unprepare_map_p(PAGEDIR_P_SELFOFVM(self->vn_vm),
 					                        VM_NODE_START(self),
 					                        VM_NODE_SIZE(self));

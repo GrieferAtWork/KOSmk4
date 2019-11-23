@@ -165,7 +165,7 @@ __SYSDECL_BEGIN
 #if __SIZEOF_SYSCALL_LONG_T__ > 4
 #define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { struct __timespec32 st_xtim; struct __timespec32 st_xtimespec; struct { __time32_t st_xtime; __UINT32_TYPE__ __##st_xtime##_pad; __syscall_ulong_t st_xtimensec; }; };
-#define __DEFINE_TIMESPEC64_NO32(st_xtim, st_xtime, st_xtimensec) \
+#define __DEFINE_TIMESPEC64_NO32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \
 	union { __time32_t st_xtime; __time64_t __#st_xtime##64; }; __syscall_ulong_t st_xtimensec;
 #else /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
 #define __DEFINE_TIMESPEC32(st_xtim, st_xtimespec, st_xtime, st_xtimensec) \

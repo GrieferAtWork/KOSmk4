@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="1">
+	<builddir>../../../build/cppcheck-i386-kos-kernel</builddir>
+	<platform>unix32</platform>
+	<analyze-all-vs-configs>false</analyze-all-vs-configs>
+	<check-headers>true</check-headers>
+	<check-unused-templates>false</check-unused-templates>
+	<max-ctu-depth>10</max-ctu-depth>
+	<includedir>
+		<dir name="../../src/kernel/include/i386-kos/"/>
+		<dir name="../../src/kernel/include/"/>
+		<dir name="../../include/i386-kos/"/>
+		<dir name="../../include/"/>
+	</includedir>
+	<defines>
+		<define name="__i386__"/>
+		<define name="__KERNEL__"/>
+		<define name="__KOS__"/>
+		<define name="CONFIG_BUILDING_KERNEL_CORE"/>
+	</defines>
+	<paths>
+		<dir name="../../src/kernel/core"/>
+	</paths>
+	<exclude>
+		<path name="__ice__"/>
+		<path name="__ice__*"/>
+		<path name="__ice__**"/>
+		<path name="__ice__/"/>
+		<path name="__ice__/*"/>
+		<path name="__ice__/**"/>
+		<path name="*__ice__"/>
+		<path name="*__ice__*"/>
+		<path name="*__ice__**"/>
+		<path name="*__ice__/"/>
+		<path name="*__ice__/*"/>
+		<path name="*__ice__/**"/>
+		<path name="*/__ice__"/>
+		<path name="*/__ice__*"/>
+		<path name="*/__ice__**"/>
+		<path name="*/__ice__/"/>
+		<path name="*/__ice__/*"/>
+		<path name="*/__ice__/**"/>
+		<path name="**/__ice__"/>
+		<path name="**/__ice__*"/>
+		<path name="**/__ice__**"/>
+		<path name="**/__ice__/"/>
+		<path name="**/__ice__/*"/>
+		<path name="**/__ice__/**"/>
+	</exclude>
+</project>

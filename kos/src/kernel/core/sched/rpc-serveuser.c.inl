@@ -83,12 +83,14 @@ restore_rpc:
 			 * it as pending (this can happen if we got here during a #PF)
 			 * Also: Don't service in the case of a system call that isn't
 			 *       a cancellation point. */
-			if (!(chain->re_kind & RPC_KIND_NONSYSCALL)
 #ifdef RPC_SERVE_ALL
-			    && (reason != TASK_RPC_REASON_SYSCALL ||
-			        !SYSCALL_IS_CANCELLATION_POINT(sc_info->rsi_sysno))
-#endif
-			    ) {
+			if (!(chain->re_kind & RPC_KIND_NONSYSCALL) &&
+			    (reason != TASK_RPC_REASON_SYSCALL ||
+			     !SYSCALL_IS_CANCELLATION_POINT(sc_info->rsi_sysno)))
+#else /* RPC_SERVE_ALL */
+			if (!(chain->re_kind & RPC_KIND_NONSYSCALL))
+#endif /* !RPC_SERVE_ALL */
+			{
 				chain->re_kind &= ~RPC_KIND_CANSERVE;
 				goto restore_rpc;
 			}

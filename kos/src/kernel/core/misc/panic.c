@@ -246,12 +246,15 @@ PRIVATE ATTR_COLDBSS uintptr_t always_ignored_assertions[64] = { 0 };
 PRIVATE ATTR_COLDTEXT void KCALL
 panic_assert_chk_dbg_main(void *arg) {
 	struct assert_args *args;
-	unsigned int i, option;
+	unsigned int option;
 	args = (struct assert_args *)arg;
-	for (i = 0; i < COMPILER_LENOF(always_ignored_assertions); ++i) {
-		if (fcpustate_getpc(&dbg_exitstate) == always_ignored_assertions[i]) {
-			option = ASSERTION_OPTION_IGNORE;
-			goto handle_retry_or_ignore;
+	{
+		unsigned int i;
+		for (i = 0; i < COMPILER_LENOF(always_ignored_assertions); ++i) {
+			if (fcpustate_getpc(&dbg_exitstate) == always_ignored_assertions[i]) {
+				option = ASSERTION_OPTION_IGNORE;
+				goto handle_retry_or_ignore;
+			}
 		}
 	}
 

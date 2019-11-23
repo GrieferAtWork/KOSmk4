@@ -63,7 +63,7 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 			/* If the interrupt originated for user-space, make sure to validate
 			 * the address bounds structure, so-as not to leak kernel memory. */
 			if (icpustate_isuser(state))
-				validate_readable(addr, flags & F_OP16 ? 4 : 8);
+				validate_readable(addr, (flags & F_OP16) ? 4 : 8);
 			if (flags & F_OP16) {
 				bound_index = modrm_getregw(state, &mod, flags);
 				bound_min   = *(u16 *)(addr + 0);

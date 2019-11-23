@@ -404,21 +404,19 @@ again_service_io:
 			outb(bus->b_busio + ATA_ADDRESS1, (u8)addr);
 			outb(bus->b_busio + ATA_ADDRESS2, (u8)(addr >> 8));
 			outb(bus->b_busio + ATA_ADDRESS3, (u8)(addr >> 16));
-			outb(bus->b_busio + ATA_COMMAND,
 #ifdef DEFINE_IO_READ
 #ifdef DEFINE_IO_LBA48
-			     ATA_COMMAND_READ_PIO_EXT
+			outb(bus->b_busio + ATA_COMMAND, ATA_COMMAND_READ_PIO_EXT);
 #else /* DEFINE_IO_LBA48 */
-			     ATA_COMMAND_READ_PIO
+			outb(bus->b_busio + ATA_COMMAND, ATA_COMMAND_READ_PIO);
 #endif /* !DEFINE_IO_LBA48 */
-#else
+#else /* DEFINE_IO_READ */
 #ifdef DEFINE_IO_LBA48
-			     ATA_COMMAND_WRITE_PIO_EXT
+			outb(bus->b_busio + ATA_COMMAND, ATA_COMMAND_WRITE_PIO_EXT);
 #else /* DEFINE_IO_LBA48 */
-			     ATA_COMMAND_WRITE_PIO
+			outb(bus->b_busio + ATA_COMMAND, ATA_COMMAND_WRITE_PIO);
 #endif /* !DEFINE_IO_LBA48 */
-#endif
-			     );
+#endif /* !DEFINE_IO_READ */
 #endif /* !DEFINE_IO_CHS */
 
 			/* Transfer sectors! */

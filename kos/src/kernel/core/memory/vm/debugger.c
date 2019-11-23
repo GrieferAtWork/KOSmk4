@@ -106,36 +106,36 @@ DEFINE_DEBUG_FUNCTION(
 			dbg_printf("%p-%p [%c%c%c%c] [%c%c%c%c%c%c] reserved\n",
 			           VM_NODE_MINADDR(iter),
 			           VM_NODE_MAXADDR(iter),
-			           iter->vn_prot & VM_PROT_READ ? 'r' : '-',
-			           iter->vn_prot & VM_PROT_WRITE ? 'w' : '-',
-			           iter->vn_prot & VM_PROT_EXEC ? 'x' : '-',
-			           iter->vn_prot & VM_PROT_SHARED ? 's' : '-',
-			           iter->vn_flags & VM_NODE_FLAG_PREPARED ? 'p' : '-',
-			           iter->vn_flags & VM_NODE_FLAG_PARTITIONED ? 'P' : '-',
-			           iter->vn_flags & VM_NODE_FLAG_GROWSUP ? 'G' : '-',
-			           iter->vn_flags & VM_NODE_FLAG_HINTED ? 'h' : '-',
-			           iter->vn_flags & VM_NODE_FLAG_NOMERGE ? 'M' : '-',
-			           iter->vn_flags & VM_NODE_FLAG_KERNPRT ? 'k' : '-');
+			           (iter->vn_prot & VM_PROT_READ) ? 'r' : '-',
+			           (iter->vn_prot & VM_PROT_WRITE) ? 'w' : '-',
+			           (iter->vn_prot & VM_PROT_EXEC) ? 'x' : '-',
+			           (iter->vn_prot & VM_PROT_SHARED) ? 's' : '-',
+			           (iter->vn_flags & VM_NODE_FLAG_PREPARED) ? 'p' : '-',
+			           (iter->vn_flags & VM_NODE_FLAG_PARTITIONED) ? 'P' : '-',
+			           (iter->vn_flags & VM_NODE_FLAG_GROWSUP) ? 'G' : '-',
+			           (iter->vn_flags & VM_NODE_FLAG_HINTED) ? 'h' : '-',
+			           (iter->vn_flags & VM_NODE_FLAG_NOMERGE) ? 'M' : '-',
+			           (iter->vn_flags & VM_NODE_FLAG_KERNPRT) ? 'k' : '-');
 			continue;
 		}
 		block = iter->vn_block;
 		dbg_printf("%p-%p [%c%c%c%c] [%c%c%c%c%c%c] [%c%c%c%c] ",
 		           VM_NODE_MINADDR(iter),
 		           VM_NODE_MAXADDR(iter),
-		           iter->vn_prot & VM_PROT_READ ? 'r' : '-',
-		           iter->vn_prot & VM_PROT_WRITE ? 'w' : '-',
-		           iter->vn_prot & VM_PROT_EXEC ? 'x' : '-',
-		           iter->vn_prot & VM_PROT_SHARED ? 's' : '-',
-		           iter->vn_flags & VM_NODE_FLAG_PREPARED ? 'p' : '-',
-		           iter->vn_flags & VM_NODE_FLAG_PARTITIONED ? 'P' : '-',
-		           iter->vn_flags & VM_NODE_FLAG_GROWSUP ? 'G' : '-',
-		           iter->vn_flags & VM_NODE_FLAG_HINTED ? 'h' : '-',
-		           iter->vn_flags & VM_NODE_FLAG_NOMERGE ? 'M' : '-',
-		           iter->vn_flags & VM_NODE_FLAG_KERNPRT ? 'k' : '-',
-		           part->dp_flags & VM_DATAPART_FLAG_LOCKED ? 'l' : '-',
-		           part->dp_flags & VM_DATAPART_FLAG_CHANGED ? 'c' : '-',
-		           part->dp_flags & VM_DATAPART_FLAG_TRKCHNG ? 't' : '-',
-		           part->dp_flags & VM_DATAPART_FLAG_KERNPRT ? 'k' : '-');
+		           (iter->vn_prot & VM_PROT_READ) ? 'r' : '-',
+		           (iter->vn_prot & VM_PROT_WRITE) ? 'w' : '-',
+		           (iter->vn_prot & VM_PROT_EXEC) ? 'x' : '-',
+		           (iter->vn_prot & VM_PROT_SHARED) ? 's' : '-',
+		           (iter->vn_flags & VM_NODE_FLAG_PREPARED) ? 'p' : '-',
+		           (iter->vn_flags & VM_NODE_FLAG_PARTITIONED) ? 'P' : '-',
+		           (iter->vn_flags & VM_NODE_FLAG_GROWSUP) ? 'G' : '-',
+		           (iter->vn_flags & VM_NODE_FLAG_HINTED) ? 'h' : '-',
+		           (iter->vn_flags & VM_NODE_FLAG_NOMERGE) ? 'M' : '-',
+		           (iter->vn_flags & VM_NODE_FLAG_KERNPRT) ? 'k' : '-',
+		           (part->dp_flags & VM_DATAPART_FLAG_LOCKED) ? 'l' : '-',
+		           (part->dp_flags & VM_DATAPART_FLAG_CHANGED) ? 'c' : '-',
+		           (part->dp_flags & VM_DATAPART_FLAG_TRKCHNG) ? 't' : '-',
+		           (part->dp_flags & VM_DATAPART_FLAG_KERNPRT) ? 'k' : '-');
 		switch (part->dp_state) {
 		case VM_DATAPART_STATE_ABSENT: state_name = "absent"; break;
 		case VM_DATAPART_STATE_INCORE: state_name = "incore"; break;
@@ -181,18 +181,18 @@ do_print_part_position:
 		case VM_DATAPART_STATE_INCORE:
 		case VM_DATAPART_STATE_LOCKED:
 			if (part->dp_ramdata.rd_blockv == &part->dp_ramdata.rd_block0) {
-				vm_phys_t maxaddr;
-				maxaddr = VM_PPAGE2ADDR(part->dp_ramdata.rd_block0.rb_start +
+				vm_phys_t maxphys;
+				maxphys = VM_PPAGE2ADDR(part->dp_ramdata.rd_block0.rb_start +
 				                        part->dp_ramdata.rd_block0.rb_size) -
 				          1;
-				if (maxaddr <= (vm_phys_t)UINTPTR_MAX) {
+				if (maxphys <= (vm_phys_t)UINTPTR_MAX) {
 					dbg_printf(" @%p-%p\n",
 					           (uintptr_t)VM_PPAGE2ADDR(part->dp_ramdata.rd_block0.rb_start),
-					           maxaddr);
+					           maxphys);
 				} else {
 					dbg_printf(" @%I64p-%I64p\n",
 					           (u64)VM_PPAGE2ADDR(part->dp_ramdata.rd_block0.rb_start),
-					           (u64)maxaddr);
+					           (u64)maxphys);
 				}
 			} else {
 				size_t i;

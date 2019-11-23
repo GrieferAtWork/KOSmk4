@@ -733,9 +733,9 @@ mempcpy:([nonnull] void *__restrict dst,
 
 [ATTR_LEAF]
 strfry:([nonnull] char *__restrict string) -> [== string] char * {
-	char temp;
 	size_t i, count = strlen(string);
 	for (i = 0; i < count; ++i) {
+		char temp;
 		size_t j = rand();
 		j = i + (j % (count - i));
 		/* Swap these 2 characters. */

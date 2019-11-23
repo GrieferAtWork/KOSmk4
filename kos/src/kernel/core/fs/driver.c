@@ -880,36 +880,34 @@ PUBLIC struct driver kernel_driver = {
 	/* .d_shstrtab_end         = */ kernel_shstrtab_data + sizeof(struct kernel_shstrtab),
 #endif /* !__INTELLISENSE__ */
 	/* .d_phnum                = */ 2,
+#ifdef PAGESIZE
+#define KERNEL_PHDR_ALIGN PAGESIZE
+#else /* PAGESIZE */
+#define KERNEL_PHDR_ALIGN __ALIGNOF_MAX_ALIGN_T__
+#endif /* !PAGESIZE */
 	{
 		/* [0] = */ ELF_PHDR_INIT(
-			/* .p_type   = */PT_LOAD,
+			/* .p_type   = */ PT_LOAD,
 			/* .p_offset = */ 0, /* Doesn't matter... */
 			/* .p_vaddr  = */ (uintptr_t)__kernel_start,
 			/* .p_paddr  = */ (uintptr_t)__kernel_start - KERNEL_BASE,
 			/* .p_filesz = */ (uintptr_t)__kernel_size_nofree,
 			/* .p_memsz  = */ (uintptr_t)__kernel_size_nofree,
-			/* .p_flags  = */PF_X|PF_W|PF_R,
-#ifdef PAGESIZE
-			/* .p_align  = */PAGESIZE
-#else /* PAGESIZE */
-			/* .p_align  = */ __ALIGNOF_MAX_ALIGN_T__
-#endif /* !PAGESIZE */
+			/* .p_flags  = */ PF_X|PF_W|PF_R,
+			/* .p_align  = */ KERNEL_PHDR_ALIGN
 		),
 		/* [1] = */ ELF_PHDR_INIT(
-			/* .p_type   = */PT_LOAD,
+			/* .p_type   = */ PT_LOAD,
 			/* .p_offset = */ 0, /* Doesn't matter... */
 			/* .p_vaddr  = */ (uintptr_t)__kernel_free_start,
 			/* .p_paddr  = */ (uintptr_t)__kernel_free_start - KERNEL_BASE,
 			/* .p_filesz = */ (uintptr_t)__kernel_free_size,
 			/* .p_memsz  = */ (uintptr_t)__kernel_free_size,
-			/* .p_flags  = */PF_X|PF_W|PF_R,
-#ifdef PAGESIZE
-			/* .p_align  = */PAGESIZE
-#else /* PAGESIZE */
-			/* .p_align  = */ __ALIGNOF_MAX_ALIGN_T__
-#endif /* !PAGESIZE */
+			/* .p_flags  = */ PF_X|PF_W|PF_R,
+			/* .p_align  = */ KERNEL_PHDR_ALIGN
 		)
 	}
+#undef KERNEL_PHDR_ALIGN
 };
 
 

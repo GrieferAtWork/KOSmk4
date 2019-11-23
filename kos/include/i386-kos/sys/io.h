@@ -308,7 +308,7 @@ __FORCELOCAL void __NOTHROW(__LIBCCALL io_delay)(void) { __IO_SLOWDOWN }
 #undef __IO_SLOWDOWN
 #undef __IO_SLOWDOWN_IMPL
 
-#define inb(port)                              ((__NAMESPACE_INT_SYM __inbyte)(port)
+#define inb(port)                              ((__NAMESPACE_INT_SYM __inbyte)(port))
 #define inw(port)                              ((__NAMESPACE_INT_SYM __inword)(port))
 #define inl(port)             ((__UINT32_TYPE__)(__NAMESPACE_INT_SYM __indword)(port))
 #define insb(port, addr, n_bytes)              ((__NAMESPACE_INT_SYM __inbytestring)(port, (__UINT8_TYPE__ *)(addr), (__LONGSIZE_TYPE__)(n_bytes)))

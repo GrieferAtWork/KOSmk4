@@ -1,4 +1,3 @@
-/* HASH 0x93f678da */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,12 +27,12 @@
 
 #ifdef __x86_64__
 #define __ARCH_SYSCALLCC __ATTR_SYSVABI
-#else
+#else /* __x86_64__ */
 #define __ARCH_SYSCALLCC __ATTR_CDECL
-#endif
+#endif /* !__x86_64__ */
 
-#define __CDECLARE_SC(attr,Treturn,name,param,args)  __PUBDEF attr Treturn (__ARCH_SYSCALLCC sys_##name) param;
-#define __CDECLARE_VOID_SC(attr,name,param,args)     __PUBDEF attr void (__ARCH_SYSCALLCC sys_##name) param;
+#define __CDECLARE_SC(attr, Treturn, name, param, args) __PUBDEF attr Treturn (__ARCH_SYSCALLCC sys_##name) param;
+#define __CDECLARE_VOID_SC(attr, name, param, args)     __PUBDEF attr void (__ARCH_SYSCALLCC sys_##name) param;
 
 #define __X86_SYSCALL_EXISTS_PLACEHOLDER_0    ,
 #define __X86_SYSCALL_EXISTS_PLACEHOLDER_1    ,
@@ -42,35 +41,36 @@
 #define __X86_SYSCALL_EXISTS_PLACEHOLDER_4    ,
 #define __X86_SYSCALL_EXISTS_PLACEHOLDER_5    ,
 #define __X86_SYSCALL_EXISTS_PLACEHOLDER_6    ,
-#define __X86_SYSCALL_EXISTS_ARG_IMPL(x,val,...) val
-#define __X86_SYSCALL_EXISTS_ARG(x)  __X86_SYSCALL_EXISTS_ARG_IMPL x
-#define __X86_SYSCALL_EXISTS3(x)     __X86_SYSCALL_EXISTS_ARG((x 1,0))
-#define __X86_SYSCALL_EXISTS2(x)     __X86_SYSCALL_EXISTS3(__X86_SYSCALL_EXISTS_PLACEHOLDER_##x)
-#define __X86_SYSCALL_EXISTS(x)      __X86_SYSCALL_EXISTS2(x)
+#define __X86_SYSCALL_EXISTS_ARG_IMPL(x, val, ...) val
+#define __X86_SYSCALL_EXISTS_ARG(x) __X86_SYSCALL_EXISTS_ARG_IMPL x
+#define __X86_SYSCALL_EXISTS3(...)  __X86_SYSCALL_EXISTS_ARG((__VA_ARGS__ 1, 0))
+#define __X86_SYSCALL_EXISTS2(x)    __X86_SYSCALL_EXISTS3(__X86_SYSCALL_EXISTS_PLACEHOLDER_##x)
+#define __X86_SYSCALL_EXISTS(x)     __X86_SYSCALL_EXISTS2(x)
+
 #if defined(__WANT_SYSCALL_ARGUMENT_COUNT)
-#define __CRT_HAVE_SC(name)          __X86_SYSCALL_EXISTS(__NRAC_##name)
+#define __CRT_HAVE_SC(name) __X86_SYSCALL_EXISTS(__NRAC_##name)
 #ifndef _ASM_UNISTD_H
 #include <asm/unistd.h>
 #endif /* !_ASM_UNISTD_H */
 #elif defined(__WANT_SYSCALL_ARGUMENT_COUNT_386) && !defined(__x86_64__)
-#define __CRT_HAVE_SC(name)          __X86_SYSCALL_EXISTS(__NRAC386_##name)
+#define __CRT_HAVE_SC(name) __X86_SYSCALL_EXISTS(__NRAC386_##name)
 #ifndef _ASM_UNISTD_H
 #include <asm/unistd.h>
 #endif /* !_ASM_UNISTD_H */
 #elif defined(__x86_64__)
 #define __WANT_SYSCALL_ARGUMENT_COUNT 1
 #include <asm/syscalls64_d.inl>
-#define __CRT_HAVE_SC(name)          __X86_SYSCALL_EXISTS(__NRAC_##name)
+#define __CRT_HAVE_SC(name) __X86_SYSCALL_EXISTS(__NRAC_##name)
 #else /* ... */
 #define __WANT_SYSCALL_ARGUMENT_COUNT_386 1
 #include <asm/syscalls32_d.inl>
-#define __CRT_HAVE_SC(name)          __X86_SYSCALL_EXISTS(__NRAC386_##name)
+#define __CRT_HAVE_SC(name) __X86_SYSCALL_EXISTS(__NRAC386_##name)
 #endif /* !... */
 
 /* Within the kernel, syscall functions _all_ can throw errors! */
-#define __CDECLARE_XSC(attr,Treturn,name,param,args) /* nothing */
-#define __CDECLARE_VOID_XSC(attr,name,param,args)    /* nothing */
-#define __CRT_HAVE_XSC(name)         0
+#define __CDECLARE_XSC(attr, Treturn, name, param, args) /* nothing */
+#define __CDECLARE_VOID_XSC(attr, name, param, args)     /* nothing */
+#define __CRT_HAVE_XSC(name) 0
 
 #else /* __KERNEL__ */
 #undef __HAVE_INLINE_SYSCALLS
