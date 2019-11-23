@@ -693,7 +693,7 @@ again_follow_symlink:
 						if (symlink_node_load(sl_node)) {
 							REF struct directory_node *new_containing_directory;
 							REF struct path *new_containing_path;
-							uintptr_t hash;
+							uintptr_t symlink_hash;
 							new_containing_path = path_traverse_ex_recent(filesystem,
 							                                              containing_path,
 							                                              root,
@@ -704,14 +704,14 @@ again_follow_symlink:
 							                                              &remaining_symlinks);
 							decref(containing_path);
 							containing_path = new_containing_path;
-							hash = directory_entry_hash(last_seg, last_seglen);
+							symlink_hash = directory_entry_hash(last_seg, last_seglen);
 							COMPILER_READ_BARRIER();
 							/* Check for mounting points & cached paths. */
 							result_path = mode & FS_MODE_FDOSPATH
 							              ? path_getcasechild_and_parent_inode(containing_path, last_seg, last_seglen,
-							                                                   hash, &new_containing_directory)
+							                                                   symlink_hash, &new_containing_directory)
 							              : path_getchild_and_parent_inode(containing_path, last_seg, last_seglen,
-							                                               hash, &new_containing_directory);
+							                                               symlink_hash, &new_containing_directory);
 							if (result_path) {
 								decref(containing_directory);
 								containing_directory = new_containing_directory;
@@ -725,9 +725,11 @@ again_follow_symlink:
 								/* Lookup the last path segment within the associated directory. */
 								new_result = mode & FS_MODE_FDOSPATH
 								             ? directory_getcasenode(new_containing_directory, last_seg,
-								                                     last_seglen, hash, pcontaining_dirent)
+								                                     last_seglen, symlink_hash,
+								                                     pcontaining_dirent)
 								             : directory_getnode(new_containing_directory, last_seg,
-								                                 last_seglen, hash, pcontaining_dirent);
+								                                 last_seglen, symlink_hash,
+								                                 pcontaining_dirent);
 								if unlikely(!new_result)
 									THROW(E_FSERROR_FILE_NOT_FOUND);
 							} EXCEPT {

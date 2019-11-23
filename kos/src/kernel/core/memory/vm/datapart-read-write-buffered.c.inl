@@ -71,13 +71,14 @@ vm_datapart_write_buffered(struct vm_datapart *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...)
 {
 	byte_t *temp_buf;
-	size_t temp, bufsize;
+	size_t bufsize;
 	size_t result = 0;
 	bufsize = CONFIG_VM_DATABLOCK_BUFFEREDIO_MAXBUFSIZE;
 	if (bufsize > num_bytes)
 		bufsize = num_bytes;
 	temp_buf = (byte_t *)alloca(bufsize);
 	while (num_bytes) {
+		size_t temp;
 		if (bufsize > num_bytes)
 			bufsize = num_bytes;
 		assert(bufsize <= num_bytes);

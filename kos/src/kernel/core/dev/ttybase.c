@@ -148,13 +148,13 @@ done:
 PUBLIC ssize_t LIBTERM_CC
 kernel_terminal_raise(struct terminal *__restrict self,
                       unsigned int signo) {
-	REF struct task *fg;
 	REF struct taskpid *fg_pid;
 	struct ttybase_device *term;
 	term = container_of(self, struct ttybase_device, t_term);
 	assert(character_device_isattybase(term));
 	fg_pid = ttybase_device_getfproc(term);
 	if (fg_pid) {
+		REF struct task *fg;
 		FINALLY_DECREF_UNLIKELY(fg_pid);
 		fg = taskpid_gettask(fg_pid);
 		if likely(fg) {
@@ -593,12 +593,12 @@ do_TCSETA: {
 
 	case TIOCSSOFTCAR:
 	case _IOW(_IOC_TYPE(TIOCSSOFTCAR), _IOC_NR(TIOCSSOFTCAR), int): {
-		int mode;
+		int lcmode;
 		validate_writable(arg, sizeof(int));
 		COMPILER_READ_BARRIER();
-		mode = *(USER CHECKED int *)arg;
+		lcmode = *(USER CHECKED int *)arg;
 		COMPILER_READ_BARRIER();
-		if (mode) {
+		if (lcmode) {
 			ATOMIC_FETCHOR(me->t_term.t_ios.c_cflag, CLOCAL);
 		} else {
 			ATOMIC_FETCHAND(me->t_term.t_ios.c_cflag, ~CLOCAL);

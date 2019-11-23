@@ -1177,7 +1177,6 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 				THROW(E_NO_SUCH_BLOCKDEVICE);
 			result_handle.h_mode = mode;
 			result_handle.h_type = HANDLE_TYPE_BLOCKDEVICE;
-			(struct superblock *)self;
 			return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
 		}
 		break;
@@ -1217,7 +1216,6 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			result_handle.h_data = ((struct superblock *)self)->s_driver;
 			result_handle.h_mode = mode;
 			result_handle.h_type = HANDLE_TYPE_DRIVER;
-			(struct superblock *)self;
 			return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
 		}
 		break;

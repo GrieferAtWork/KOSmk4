@@ -1341,12 +1341,12 @@ do_compat_hdio_getgeo:
 
 	case HDIO_SET_WCACHE:
 	case _IOW(_IOC_TYPE(HDIO_SET_WCACHE), _IOC_NR(HDIO_SET_WCACHE), int): {
-		int mode;
+		int cache_mode;
 		validate_readable(arg, sizeof(int));
 		COMPILER_READ_BARRIER();
-		mode = *(int *)arg;
+		cache_mode = *(int *)arg;
 		COMPILER_READ_BARRIER();
-		if (mode) {
+		if (cache_mode) {
 			/* WARNING: The drive may not actually support this... */
 			ATOMIC_FETCHOR(self->d_features, ATA_DRIVE_FEATURE_FFLUSH);
 		} else {

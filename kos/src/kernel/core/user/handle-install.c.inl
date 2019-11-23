@@ -228,7 +228,8 @@ got_result_slot:
 #endif /* HANDLE_TYPE_UNDEFINED == 0 */
 			                                          );
 #if HANDLE_TYPE_UNDEFINED == 0
-			assert(new_vector[new_alloc - 1].h_type == HANDLE_TYPE_UNDEFINED);
+			assert(!new_vector ||
+			       new_vector[new_alloc - 1].h_type == HANDLE_TYPE_UNDEFINED);
 #endif /* HANDLE_TYPE_UNDEFINED == 0 */
 			if unlikely(!new_vector) {
 				/* Try again with a smaller increment. */

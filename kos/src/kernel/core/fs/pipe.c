@@ -226,7 +226,7 @@ again:
 
 	case HOP_PIPE_VWRITESOME: {
 		USER CHECKED struct hop_pipe_vwritesome *data;
-		size_t i, struct_size, result, temp;
+		size_t i, struct_size, result;
 		USER UNCHECKED struct iovec const *buf;
 		size_t buflen;
 		if ((mode & IO_ACCMODE) == IO_RDONLY)
@@ -243,6 +243,7 @@ again:
 		result = 0;
 		for (i = 0; i < buflen; ++i) {
 			struct iovec ent;
+			size_t temp;
 			ent.iov_base = ATOMIC_READ(buf[i].iov_base);
 			ent.iov_len  = ATOMIC_READ(buf[i].iov_len);
 			validate_readable(ent.iov_base, ent.iov_len);

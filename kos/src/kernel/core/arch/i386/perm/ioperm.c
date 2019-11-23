@@ -66,12 +66,13 @@ iob_maskbyte_c(byte_t *pbyte,
 LOCAL void KCALL
 iob_setrange(byte_t *iob, u16 minport, u16 maxport, bool turn_on) {
 	size_t minbyte, maxbyte;
-	unsigned int minbit, bitcnt;
+	unsigned int minbit;
 	assert(maxport >= minport);
 	minbyte = FLOORDIV(minport, 8);
 	maxbyte = CEILDIV(maxport + 1, 8) - 1;
 	assert(maxbyte >= minbyte);
 	if (maxbyte == minbyte) {
+		unsigned int bitcnt;
 		/* Special case: only a single byte is getting modified. */
 		minbit = minport & 7;
 		bitcnt = (maxport - minport) + 1;

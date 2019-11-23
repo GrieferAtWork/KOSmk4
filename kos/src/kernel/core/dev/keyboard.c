@@ -343,8 +343,8 @@ STATIC_ASSERT(KEYBOARD_LED_SCROLLLOCK == KEYMOD_SCROLLLOCK);
 PRIVATE void KCALL
 sync_leds(struct keyboard_device *__restrict self)
 		THROWS(E_IOERROR, ...) {
-	u16 curmod, oldled, newled;
 	for (;;) {
+		u16 curmod, oldled, newled;
 		curmod = ATOMIC_READ(self->kd_mods);
 		oldled = ATOMIC_READ(self->kd_leds);
 		newled = (oldled & ~KEYMOD_LEDMASK) | (curmod & KEYMOD_LEDMASK);
@@ -967,19 +967,19 @@ keyboard_device_ioctl(struct character_device *__restrict self,
 		break;
 
 	case KBDIO_SETRDKEY: {
-		int mode;
+		int rdmode;
 		validate_readable(arg, sizeof(int));
 		COMPILER_READ_BARRIER();
-		mode = *(int *)arg;
+		rdmode = *(int *)arg;
 		COMPILER_READ_BARRIER();
-		if (mode == 0) {
+		if (rdmode == 0) {
 			ATOMIC_FETCHAND(me->kd_flags, ~KEYBOARD_DEVICE_FLAG_RDKEYS);
-		} else if (mode == 1) {
+		} else if (rdmode == 1) {
 			ATOMIC_FETCHOR(me->kd_flags, KEYBOARD_DEVICE_FLAG_RDKEYS);
 		} else {
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 			      E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBDIO_SETRDKEY_BADMODE,
-			      mode);
+			      rdmode);
 		}
 		sig_broadcast(&me->kd_buf.kb_avail);
 	}	break;
@@ -1311,22 +1311,22 @@ continue_copy_keymap:
 	}	break;
 
 	case KBDIO_SETDBGF12: {
-		int mode;
+		int f12_mode;
 		validate_readable(arg, sizeof(int));
 		COMPILER_READ_BARRIER();
-		mode = *(int *)arg;
+		f12_mode = *(int *)arg;
 		COMPILER_READ_BARRIER();
-		if (mode == 0) {
+		if (f12_mode == 0) {
 #ifdef KEYBOARD_DEVICE_FLAG_DBGF12
 			ATOMIC_FETCHAND(me->kd_flags, ~(KEYBOARD_DEVICE_FLAG_DBGF12 |
 			                                KEYBOARD_DEVICE_FLAG_DBGF12_MASK));
-		} else if (mode == 1) {
+		} else if (f12_mode == 1) {
 			ATOMIC_FETCHOR(me->kd_flags, KEYBOARD_DEVICE_FLAG_DBGF12);
 #endif /* KEYBOARD_DEVICE_FLAG_DBGF12 */
 		} else {
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 			      E_INVALID_ARGUMENT_CONTEXT_IOCTL_KBDIO_SETDBGF12_BADDMODE,
-			      mode);
+			      f12_mode);
 		}
 	}	break;
 

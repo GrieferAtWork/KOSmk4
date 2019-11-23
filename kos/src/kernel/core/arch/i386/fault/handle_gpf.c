@@ -731,16 +731,16 @@ done_noncanon_check:
 			}
 			{
 				u8 buf[2 + sizeof(uintptr_t)];
-				uintptr_t addr = x86_decode_modrmgetmem(state, &mod, flags);
+				byte_t *addr = (byte_t *)x86_decode_modrmgetmem(state, &mod, flags);
 				if (isuser()) {
-					validate_readable((void *)addr, sizeof(buf));
+					validate_readable(addr, sizeof(buf));
 					PERTASK_SET(this_exception_pointers[1],
 					            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
 				} else {
 					PERTASK_SET(this_exception_pointers[1],
 					            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
 				}
-				memcpy(buf, (void *)addr, sizeof(buf));
+				memcpy(buf, addr, sizeof(buf));
 				PERTASK_SET(this_exception_pointers[3], (uintptr_t)*(u16 *)(buf + 0));
 				PERTASK_SET(this_exception_pointers[4], *(uintptr_t *)(buf + 2));
 			}

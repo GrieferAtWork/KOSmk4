@@ -473,7 +473,6 @@ Ext2_ReadSymLink(struct symlink_node *__restrict self) {
 	TRY {
 		struct inode_data *node;
 		node = self->i_fsdata;
-		if (textlen * sizeof(char) <= (EXT2_DIRECT_BLOCK_COUNT + 3) * 4
 #if 0 /* XXX: ASCII data is usually written in a way that causes this check to succeed, \
        *      but what about 1 or 2-character links? This is little endian after all,   \
        *      so that would end up with a really small number that might be lower       \
@@ -484,9 +483,12 @@ Ext2_ReadSymLink(struct symlink_node *__restrict self) {
        *        blocks, what isn't stated is anything about how to differentiate        \
        *        these two cases other than the link size (which is ambiguous for small
        *        links). */
-		    && node->i_dblock[0] >= ((Ext2Superblock *)self->i_super)->sd_total_blocks
+		if (textlen * sizeof(char) <= (EXT2_DIRECT_BLOCK_COUNT + 3) * 4 &&
+		    node->i_dblock[0] >= ((Ext2Superblock *)self->i_super)->sd_total_blocks)
+#else
+		if (textlen * sizeof(char) <= (EXT2_DIRECT_BLOCK_COUNT + 3) * 4)
 #endif
-			) {
+		{
 			/* XXX: Is this really how we discern between the 2 methods?
 			 *      Shouldn't there be some kind of flag somewhere? */
 			memcpy(text, &node->i_dblock, textlen*sizeof(char));

@@ -326,12 +326,12 @@ PUBLIC NONNULL((1)) bool KCALL
 character_device_unregister(struct character_device *__restrict self)
 		THROWS(E_WOULDBLOCK) {
 	bool result = false;
-	struct character_device *pop_dev;
 	printk(KERN_INFO "Removing character-device `/dev/%s'\n", self->cd_name);
 	if likely(self->cd_devlink.a_vaddr != DEV_UNSET) {
 		cdl_write();
 		COMPILER_READ_BARRIER();
 		if likely(self->cd_devlink.a_vaddr != DEV_UNSET) {
+			struct character_device *pop_dev;
 			pop_dev = cdev_tree_remove(&character_device_tree,
 			                           self->cd_devlink.a_vaddr);
 			assert(pop_dev == self);
@@ -644,9 +644,10 @@ handle_characterdevice_preadv(struct character_device *__restrict self,
                               struct aio_buffer *__restrict dst,
                               size_t num_bytes, pos_t addr, iomode_t mode) {
 	struct aio_buffer_entry ent;
-	size_t temp, result = 0;
+	size_t result = 0;
 	if (self->cd_type.ct_pread) {
 		AIO_BUFFER_FOREACH(ent, dst) {
+			size_t temp;
 			temp = (*self->cd_type.ct_pread)(self,
 			                                 ent.ab_base,
 			                                 ent.ab_size,
@@ -669,9 +670,10 @@ handle_characterdevice_pwritev(struct character_device *__restrict self,
                                struct aio_buffer *__restrict src,
                                size_t num_bytes, pos_t addr, iomode_t mode) {
 	struct aio_buffer_entry ent;
-	size_t temp, result = 0;
+	size_t result = 0;
 	if (self->cd_type.ct_pwrite) {
 		AIO_BUFFER_FOREACH(ent, src) {
+			size_t temp;
 			temp = (*self->cd_type.ct_pwrite)(self,
 			                                  ent.ab_base,
 			                                  ent.ab_size,

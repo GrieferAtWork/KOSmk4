@@ -141,7 +141,6 @@ KCALL vm_datablock_write
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...)
 #endif /* !DEFINE_IO_PHYS */
 {
-	REF struct vm_datapart *part;
 #ifdef DEFINE_IO_VECTOR
 #ifdef DEFINE_IO_PHYS
 	struct aio_pbuffer view,view2;
@@ -163,6 +162,7 @@ KCALL vm_datablock_write
 #endif /* !CONFIG_NO_VIO */
 	for (;;) {
 		size_t temp;
+		REF struct vm_datapart *part;
 		part = vm_datablock_locatepart(self,
 		                               (vm_vpage64_t)(src_offset >> VM_DATABLOCK_ADDRSHIFT(self)),
 		                               CEILDIV(num_bytes + (src_offset & (VM_DATABLOCK_PAGESIZE(self) - 1)),

@@ -72,9 +72,6 @@ FUNC0(vm_datapart_do_)(struct vm_datapart *__restrict self,
 #endif /* !DEFINE_IO_PHYS */
 {
 	size_t data_pagesize;
-#ifdef DEFINE_IO_NOPF
-	size_t transferr_error;
-#endif /* DEFINE_IO_NOPF */
 	assert(sync_reading(self) || !isshared(self) ||
 	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
 	assert(self->dp_state == VM_DATAPART_STATE_INCORE ||
@@ -82,6 +79,9 @@ FUNC0(vm_datapart_do_)(struct vm_datapart *__restrict self,
 	data_pagesize = VM_DATABLOCK_PAGESIZE(self->dp_block);
 	if likely(num_bytes) {
 		for (;;) {
+#ifdef DEFINE_IO_NOPF
+			size_t transferr_error;
+#endif /* DEFINE_IO_NOPF */
 			size_t max_io, page_offset;
 			vm_phys_t data_base;
 			page_offset = (size_t)(offset & (data_pagesize - 1));
@@ -229,7 +229,6 @@ vm_datapart_write_unsafe(struct vm_datapart *__restrict self,
 {
 	size_t result;
 #ifdef DEFINE_IO_NOPF
-	size_t transferr_error;
 	assert(num_bytes <= (size_t)SSIZE_MAX);
 #endif /* DEFINE_IO_NOPF */
 	vm_datapart_lockread_setcore(self);
@@ -291,6 +290,9 @@ do_has_part:
 		if unlikely(offset >= (vm_daddr_t)vm_datapart_numbytes(self))
 			result = 0;
 		else {
+#ifdef DEFINE_IO_NOPF
+			size_t transferr_error;
+#endif /* DEFINE_IO_NOPF */
 #if __SIZEOF_SIZE_T__ >= 8
 			result = (size_t)((vm_daddr_t)vm_datapart_numbytes(self) - offset);
 #else /* __SIZEOF_SIZE_T__ >= 8 */

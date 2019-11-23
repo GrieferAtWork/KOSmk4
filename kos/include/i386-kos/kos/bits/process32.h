@@ -161,7 +161,7 @@ exec_initialize_elf_rtld32(struct icpustate *__restrict user_state,
                            KERNEL Elf32_Phdr *__restrict phdr_vec,
                            Elf32_Half phdr_cnt) {
 	USER struct process_rtld_elf32 *dl_data;
-	__size_t reqlen, buflen;
+	__size_t buflen;
 	/* The application-level entry point is stored
 	 * stored at the base of the user-space stack. */
 	uintptr_t user_state_sp;
@@ -176,6 +176,7 @@ exec_initialize_elf_rtld32(struct icpustate *__restrict user_state,
 	/* Print the application filename to the user-space stack. */
 	buflen = 0;
 	for (;;) {
+		__size_t reqlen;
 		reqlen = path_sprintent((USER char *)user_state_sp - buflen,
 		                        buflen,
 		                        exec_path,

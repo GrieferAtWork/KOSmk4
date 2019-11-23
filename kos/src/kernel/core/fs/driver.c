@@ -1663,7 +1663,6 @@ driver_delmod(USER CHECKED char const *driver_name,
 	ds = current_driver_state.get();
 	if (first_char == '/') {
 		for (i = 0; i < ds->ds_count; ++i) {
-			bool success;
 			int compare;
 			struct driver *d;
 			d = ds->ds_drivers[i];
@@ -1676,6 +1675,7 @@ driver_delmod(USER CHECKED char const *driver_name,
 				RETHROW();
 			}
 			if (compare == 0) {
+				bool success;
 				/* Found it! */
 				incref(d);
 				decref_unlikely(ds);
@@ -1694,7 +1694,6 @@ driver_delmod(USER CHECKED char const *driver_name,
 		}
 	} else {
 		for (i = 0; i < ds->ds_count; ++i) {
-			bool success;
 			int compare;
 			struct driver *d;
 			d = ds->ds_drivers[i];
@@ -1705,6 +1704,7 @@ driver_delmod(USER CHECKED char const *driver_name,
 				RETHROW();
 			}
 			if (compare == 0) {
+				bool success;
 				/* Found it! */
 				incref(d);
 				decref_unlikely(ds);
@@ -1762,8 +1762,9 @@ driver_delmod_inode(struct inode *__restrict driver_node,
 
 LOCAL u32 KCALL
 elf_symhash(USER CHECKED char const *name) {
-	u32 h = 0, g;
+	u32 h = 0;
 	while (*name) {
+		u32 g;
 		h = (h << 4) + *name++;
 		g = h & 0xf0000000;
 		if (g)
@@ -2615,7 +2616,6 @@ split_cmdline(char *__restrict cmdline,
               size_t *__restrict pargc) {
 	/* TODO: Use `libcmdline' instead! */
 	size_t argc, i;
-	size_t cmdline_len;
 	char **result;
 	size_t arga;
 	/* Skip leading space. */
@@ -2628,6 +2628,7 @@ split_cmdline(char *__restrict cmdline,
 	result = (char **)kmalloc((arga + 1) * sizeof(char *),
 	                          GFP_LOCKED | GFP_PREFLT);
 	TRY {
+		size_t cmdline_len;
 		result[0]   = cmdline;
 		cmdline_len = strlen(cmdline);
 		for (;;) {

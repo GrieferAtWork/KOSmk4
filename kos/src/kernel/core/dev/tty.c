@@ -108,7 +108,6 @@ tty_device_iread(struct character_device *__restrict self,
 
 PUBLIC NONNULL((1)) poll_mode_t KCALL
 tty_device_poll(struct character_device *__restrict self, poll_mode_t what) THROWS(...) {
-	poll_mode_t temp;
 	struct tty_device *me;
 	int error;
 	me = (struct tty_device *)self;
@@ -118,21 +117,24 @@ tty_device_poll(struct character_device *__restrict self, poll_mode_t what) THRO
 		if (error == TERMINAL_POLL_NONBLOCK)
 			return POLLIN;
 #if 0
-		error = terminal_poll_iwrite(&me->t_term);
-		if (error == TERMINAL_POLL_MAYBLOCK)
-			goto done_read; /* Writing additional input will block because buffers are full. */
-		if (error == TERMINAL_POLL_MAYBLOCK_UNDERLYING) {
-			/* Because terminal input is being echoed, we must poll if we're
-			 * able to write output when we actually just want to read input. */
-			temp = (*handle_type_db.h_poll[me->t_ohandle_typ])(me->t_ohandle_ptr,
-			                                                   POLLOUT);
-			if (!temp)
-				goto done_read;
+		{
+			poll_mode_t result;
+			error = terminal_poll_iwrite(&me->t_term);
+			if (error == TERMINAL_POLL_MAYBLOCK)
+				goto done_read; /* Writing additional input will block because buffers are full. */
+			if (error == TERMINAL_POLL_MAYBLOCK_UNDERLYING) {
+				/* Because terminal input is being echoed, we must poll if we're
+				 * able to write output when we actually just want to read input. */
+				result = (*handle_type_db.h_poll[me->t_ohandle_typ])(me->t_ohandle_ptr,
+				                                                   POLLOUT);
+				if (!result)
+					goto done_read;
+			}
+			/* Actually check if reading additional input would block. */
+			result = (*handle_type_db.h_poll[me->t_ihandle_typ])(me->t_ihandle_ptr, POLLIN);
+			if (result)
+				return result; /* No, it wouldn't! */
 		}
-		/* Actually check if reading additional input would block. */
-		temp = (*handle_type_db.h_poll[me->t_ihandle_typ])(me->t_ihandle_ptr, POLLIN);
-		if (temp)
-			return temp; /* No, it wouldn't! */
 #endif
 	}
 /*done_read:*/
@@ -142,10 +144,11 @@ tty_device_poll(struct character_device *__restrict self, poll_mode_t what) THRO
 		if (error == TERMINAL_POLL_NONBLOCK)
 			return POLLOUT;
 		if (error == TERMINAL_POLL_MAYBLOCK_UNDERLYING) {
+			poll_mode_t result;
 			/* Check if writing to the display would block. */
-			temp = (*handle_type_db.h_poll[me->t_ohandle_typ])(me->t_ohandle_ptr,
-			                                                   POLLOUT);
-			return temp;
+			result = (*handle_type_db.h_poll[me->t_ohandle_typ])(me->t_ohandle_ptr,
+			                                                     POLLOUT);
+			return result;
 		}
 	}
 	return 0;

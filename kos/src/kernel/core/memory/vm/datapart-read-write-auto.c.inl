@@ -73,11 +73,11 @@ vm_datapart_write(struct vm_datapart *__restrict self,
 	 * This is required because `vm_datapart_(read|write)_nopf()' must
 	 * not be called with buffer sizes that are larger than a SSIZE_MAX */
 	if unlikely(num_bytes > SSIZE_MAX) {
-		size_t result;
-		result = IFELSE_RW(vm_datapart_read(self, buf, (size_t)SSIZE_MAX, part_offset),
-		                   vm_datapart_write(self, buf, (size_t)SSIZE_MAX, split_bytes, part_offset));
-		assert(result <= (size_t)SSIZE_MAX);
-		if (result == (size_t)SSIZE_MAX) {
+		size_t large_result;
+		large_result = IFELSE_RW(vm_datapart_read(self, buf, (size_t)SSIZE_MAX, part_offset),
+		                         vm_datapart_write(self, buf, (size_t)SSIZE_MAX, split_bytes, part_offset));
+		assert(large_result <= (size_t)SSIZE_MAX);
+		if (large_result == (size_t)SSIZE_MAX) {
 			/* Transfer the remainder.
 			 * We know that 2 steps are always sufficient to handle
 			 * this, because of the following static assertion: */
@@ -86,17 +86,17 @@ vm_datapart_write(struct vm_datapart *__restrict self,
 			if (OVERFLOW_USUB(split_bytes, (size_t)SSIZE_MAX, &split_bytes))
 				split_bytes = 0;
 #endif /* DEFINE_IO_WRITE */
-			result += IFELSE_RW(vm_datapart_read(self,
-			                                     (byte_t *)buf + (size_t)SSIZE_MAX,
-			                                     num_bytes - (size_t)SSIZE_MAX,
-			                                     part_offset + (size_t)SSIZE_MAX),
-			                    vm_datapart_write(self,
-			                                      (byte_t const *)buf + (size_t)SSIZE_MAX,
-			                                      num_bytes - (size_t)SSIZE_MAX,
-			                                      split_bytes,
-			                                      part_offset + (size_t)SSIZE_MAX));
+			large_result += IFELSE_RW(vm_datapart_read(self,
+			                                           (byte_t *)buf + (size_t)SSIZE_MAX,
+			                                           num_bytes - (size_t)SSIZE_MAX,
+			                                           part_offset + (size_t)SSIZE_MAX),
+			                          vm_datapart_write(self,
+			                                            (byte_t const *)buf + (size_t)SSIZE_MAX,
+			                                            num_bytes - (size_t)SSIZE_MAX,
+			                                            split_bytes,
+			                                            part_offset + (size_t)SSIZE_MAX));
 		}
-		return result;
+		return large_result;
 	}
 	/* Try to perform direct I/O by default, thus optimizing for
 	 * the likely case where the entire transfer can be performed

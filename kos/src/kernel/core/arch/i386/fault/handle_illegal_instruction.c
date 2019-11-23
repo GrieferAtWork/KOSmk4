@@ -1225,7 +1225,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				} else) {
 					WR_REGL(PEXT(RD_VEXREGL(), RD_RML()));
 				}
-			} else if (op_flags & F_f3) {
+			} else if (op_flags & F_f2) {
 				/* VEX.LZ.F2.0F38.W0 F5 /r PDEP r32a, r32b, r/m32         RVM         V/V         BMI2         Parallel deposit of bits from r32b using mask in r/m32, result is written to r32a.
 				 * VEX.LZ.F2.0F38.W1 F5 /r PDEP r64a, r64b, r/m64         RVM         V/N.E.         BMI2         Parallel deposit of bits from r64b using mask in r/m64, result is written to r64a. */
 				IF_X86_64(if (op_flags & F_REX_W) {

@@ -28,5 +28,8 @@
 	</exclude>
 	<suppressions>
 		<suppression>unusedFunction</suppression>
+		<suppression>unusedStructMember</suppression>
+		<suppression>clarifyCalculation</suppression>
+		<suppression>comparePointers</suppression>
 	</suppressions>
 </project>

@@ -1644,10 +1644,11 @@ openat_create_follow_symlink_dynamic_impl(struct fs *__restrict f,
 	REF struct path *new_result_containing_path;
 	REF struct directory_node *new_result_containing_directory;
 	REF struct directory_entry *new_result_containing_dirent;
-	size_t reqsize, bufsize = *pbufsize;
+	size_t bufsize = *pbufsize;
 	char *buf;
 	buf = (char *)malloca(bufsize);
 	TRY {
+		size_t reqsize;
 		assert(sl_node->i_type->it_symlink.sl_readlink_dynamic);
 		reqsize = (*sl_node->i_type->it_symlink.sl_readlink_dynamic)(sl_node,
 		                                                             buf,

@@ -210,10 +210,10 @@ handle_blockdevice_ioctl(struct basic_block_device *__restrict self,
 
 	case BLKROGET:
 	case _IOR(_IOC_TYPE(BLKROGET), _IOC_NR(BLKROGET), int): {
-		int value;
-		validate_writable(arg, sizeof(value));
-		value       = ATOMIC_READ(self->bd_flags) & BLOCK_DEVICE_FLAG_READONLY ? 1 : 0;
-		*(int *)arg = value;
+		int retval;
+		validate_writable(arg, sizeof(retval));
+		retval = ATOMIC_READ(self->bd_flags) & BLOCK_DEVICE_FLAG_READONLY ? 1 : 0;
+		*(int *)arg = retval;
 	}	break;
 
 	case BLKRRPART:

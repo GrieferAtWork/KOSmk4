@@ -1476,11 +1476,11 @@ Fat_GenerateFileEntries(FatFile *__restrict buffer,
 	/* Generate the extension */
 	if (extsize) {
 		char *dst, *iter, *end;
-		u32 ch;
 		dst = dos83.f_nameext + 8;
 		end = (iter = extstart) + MIN(extsize, 3);
 		dos83.f_ntflags |= NTFLAG_LOWEXT;
 		while (iter < end) {
+			char32_t ch;
 			ch = unicode_readutf8_n((char const **)&iter, end);
 			if unlikely(ch > 0xff) {
 				*dst++   = '~';
@@ -1507,11 +1507,11 @@ Fat_GenerateFileEntries(FatFile *__restrict buffer,
 	/* Confirm that the name and extension fit DOS8.3 */
 	if (basesize <= 8 && extsize <= 3 && !need_lfn) {
 		char *iter, *end, *dst;
-		u32 ch;
 		/* We can generate a (possibly mixed-case) 8.3-compatible filename */
 		end = (iter = name) + basesize, dst = dos83.f_name;
 		dos83.f_ntflags |= NTFLAG_LOWBASE;
 		while (iter < end) {
+			char32_t ch;
 			ch = unicode_readutf8_n((char const **)&iter, end);
 			if unlikely(ch > 0xff) {
 				/* Unicode character. */
@@ -1549,7 +1549,7 @@ Fat_GenerateFileEntries(FatFile *__restrict buffer,
 	{
 		unsigned int matchsize;
 		unsigned int retry_hex, retry_dig;
-		char *dst, *iter, *end, ch;
+		char *dst, *iter, *end;
 		dos83.f_ntflags = NTFLAG_NONE;
 		/* Must generate a long filename, also taking
 		 * the value of 'retry' into consideration.
@@ -1565,12 +1565,15 @@ Fat_GenerateFileEntries(FatFile *__restrict buffer,
 			matchsize = basesize;
 		end = (iter = name) + matchsize, dst = dos83.f_nameext;
 		while (iter < end) {
+			char32_t ch;
 			ch = unicode_readutf8_n((char const **)&iter, end);
 			if (ch > 0xff)
 				*dst++ = '~';
 			else {
-				ch     = toupper((u8)ch);
-				*dst++ = (char)(dos8dot3_isvalid((u8)ch) ? (u8)ch : (u8)'~');
+				ch = toupper((unsigned char)(u32)ch);
+				if (!dos8dot3_isvalid((unsigned char)(u32)ch))
+					ch = '~';
+				*dst++ = (char)(unsigned char)(u32)ch;
 			}
 		}
 		if (retry_hex) {
@@ -1730,7 +1733,6 @@ Fat_AddFileToDirectory(struct directory_node *__restrict target_directory,
 		       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY,
 		       E_IOERROR, ...) {
 	FatFile buffer[4], *files;
-	u32 target_index;
 	pos_t target_position;
 	u32 file_count = COMPILER_LENOF(buffer);
 	bool is_directory_end;
@@ -1740,7 +1742,7 @@ Fat_AddFileToDirectory(struct directory_node *__restrict target_directory,
 	                                    target_dirent,
 	                                    new_node);
 	TRY {
-		u32 first_cluster;
+		u32 first_cluster, target_index;
 		struct inode_data *data;
 		data = new_node->i_fsdata;
 		assert(data);
@@ -2636,15 +2638,16 @@ Fat_StatSuperblock(FatSuperblock *__restrict self,
 PRIVATE NONNULL((1)) void KCALL
 Fat_SynchronizeSuperblock(FatSuperblock *__restrict self)
 		THROWS(E_IOERROR, ...) {
-	FatSectorIndex changed_begin, changed_end;
 	if (!(self->f_flags & FAT_FCHANGED))
 		return;
 	SCOPED_WRITELOCK(&self->f_fat_lock);
 	COMPILER_READ_BARRIER();
 	if (self->f_flags & FAT_FCHANGED) {
+		FatSectorIndex changed_begin;
 		/* Let's do this! */
 		changed_begin = 0;
 		for (;;) {
+			FatSectorIndex changed_end;
 			/* Search for chains for changed FAT entries and save them. */
 			while (changed_begin != self->f_sec4fat &&
 			       !FAT_META_GTCHNG(self, changed_begin))

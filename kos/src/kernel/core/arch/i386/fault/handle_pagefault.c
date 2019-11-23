@@ -630,11 +630,12 @@ do_unshare_cow:
 							 * Also: If this page isn't marked as initialized, the
 							 *       duplicated part won't be set as such, either! */
 							{
-								unsigned int i, count, state;
+								unsigned int i, count;
 								count = VM_DATABLOCK_PAGEALIGN(part->dp_block);
 								for (i = 0; i < count; ++i) {
-									state = VM_DATAPART_GETSTATE(part, i);
-									if (VM_DATAPART_PPP_ISINITIALIZED(state))
+									unsigned int part_state;
+									part_state = VM_DATAPART_GETSTATE(part, i);
+									if (VM_DATAPART_PPP_ISINITIALIZED(part_state))
 										continue;
 									/* Must initialize the part's first page! */
 									TRY {
@@ -948,9 +949,14 @@ endread_and_decref_part_and_set_noexec:
 				/* Actually map the accessed page! */
 				pagedir_mapone(page, ppage, prot);
 
+				/* Make sure that the performed access can now succeed */
 				assertf(ecode & X86_PAGEFAULT_ECODE_WRITING
-				        ? (ecode & X86_PAGEFAULT_ECODE_USERSPACE ? pagedir_isuserwritable(page) : pagedir_iswritable(page))
-				        : (ecode & X86_PAGEFAULT_ECODE_USERSPACE ? pagedir_isuseraccessible(page) : pagedir_ismapped(page)),
+				        ? (ecode & X86_PAGEFAULT_ECODE_USERSPACE
+				           ? pagedir_isuserwritable(page)
+				           : pagedir_iswritable(page))
+				        : (ecode & X86_PAGEFAULT_ECODE_USERSPACE
+				           ? pagedir_isuseraccessible(page)
+				           : pagedir_ismapped(page)),
 				        "ecode         = %p\n"
 				        "prot          = %p\n"
 				        "node->vn_prot = %p\n"
@@ -958,8 +964,15 @@ endread_and_decref_part_and_set_noexec:
 				        "phys          = %I64p (page %I64p)\n"
 				        "effective_vm  = %p\n"
 				        "has_changed   = %u\n",
-				        (uintptr_t)ecode, (uintptr_t)prot, (uintptr_t)node->vn_prot, (uintptr_t)addr, (uintptr_t)page, (u64)VM_PPAGE2ADDR(ppage), (u64)ppage, (uintptr_t)effective_vm, (unsigned int)has_changed);
-
+				        (uintptr_t)ecode,
+				        (uintptr_t)prot,
+				        (uintptr_t)node->vn_prot,
+				        (uintptr_t)addr,
+				        (uintptr_t)page,
+				        (u64)VM_PPAGE2ADDR(ppage),
+				        (u64)ppage,
+				        (uintptr_t)effective_vm,
+				        (unsigned int)has_changed);
 				sync_endwrite(effective_vm);
 				sync_endread(part);
 			} EXCEPT {

@@ -3421,11 +3421,11 @@ again_lock_all_parts:
 				 * >>  LLIST_INSERT(part->dp_crefs,node,vn_link);
 				 * >> } */
 				for (i = 0; i < info->pv_cnt; ++i) {
-					struct vm_datapart *part;
+					struct vm_datapart *vecpart;
 					unsigned int error;
 					REF struct vm *blocking_vm;
-					part = info->pv_vec[i].pn_part;
-					if (part->dp_crefs == NULL) {
+					vecpart = info->pv_vec[i].pn_part;
+					if (vecpart->dp_crefs == NULL) {
 						struct vm_node *iter;
 						/* The addition of the first copy-on-write mapping requires
 						 * that all existing SHARED memory mappings be updated to
@@ -3433,7 +3433,7 @@ again_lock_all_parts:
 						 * That way, a #PF will be triggered which will then unshare
 						 * our own data part, preventing writes to the shared mapping
 						 * from leaking into private mappings. */
-						for (iter = part->dp_srefs; iter;
+						for (iter = vecpart->dp_srefs; iter;
 						     iter = iter->vn_link.ln_next) {
 							error = vm_node_update_write_access(iter);
 							if unlikely(error != VM_NODE_UPDATE_WRITE_ACCESS_SUCCESS) {
@@ -3441,14 +3441,14 @@ again_lock_all_parts:
 								goto handle_remove_write_error;
 							}
 						}
-					} else if (part->dp_crefs->vn_link.ln_next == NULL &&
+					} else if (vecpart->dp_crefs->vn_link.ln_next == NULL &&
 					           /* If this is the second copy-on-write mapping of an anonymous data part,
 					            * then the first one may have had write permissions which must now be
 					            * unshared (this is the case for general purpose RAM during fork()) */
-					           ATOMIC_READ(part->dp_block->db_parts) == VM_DATABLOCK_ANONPARTS) {
-						error = vm_node_update_write_access(part->dp_crefs);
+					           ATOMIC_READ(vecpart->dp_block->db_parts) == VM_DATABLOCK_ANONPARTS) {
+						error = vm_node_update_write_access(vecpart->dp_crefs);
 						if unlikely(error != VM_NODE_UPDATE_WRITE_ACCESS_SUCCESS) {
-							blocking_vm = part->dp_crefs->vn_vm;
+							blocking_vm = vecpart->dp_crefs->vn_vm;
 handle_remove_write_error:
 							if (error == VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC) {
 								partnode_pair_vector_endwrite_parts(info);

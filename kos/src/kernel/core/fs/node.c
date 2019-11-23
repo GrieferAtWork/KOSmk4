@@ -1035,13 +1035,14 @@ inode_chmod(struct inode *__restrict self,
             mode_t perm_mask, mode_t perm_flag)
 		THROWS(E_FSERROR_DELETED, E_FSERROR_READONLY,
 		       E_FSERROR_UNSUPPORTED_OPERATION, ...) {
-	mode_t old_mode, new_mode;
+	mode_t old_mode;
 	bool was_changed           = false;
 	struct inode_type *tp_self = self->i_type;
 	if (!tp_self->it_attr.a_saveattr)
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_WRATTR);
 	inode_loadattr_and_check_deleted(self);
 	{
+		mode_t new_mode;
 		SCOPED_WRITELOCK((struct vm_datablock *)self);
 		old_mode = self->i_filemode & 07777;
 		new_mode = (old_mode & perm_mask) | perm_flag;
@@ -1948,7 +1949,6 @@ directory_getcaseentry_p(struct directory_node *__restrict self,
 	if unlikely(!self->d_size)
 		goto read_directory;
 	assert(self->d_map);
-	result  = self->d_map[hash & self->d_mask];
 	presult = &self->d_map[hash & self->d_mask];
 	for (; (result = *presult) != NULL; presult = &result->de_next) {
 		/* Check hash and name-length. */

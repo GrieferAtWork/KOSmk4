@@ -126,7 +126,6 @@ again:
 	peb_temp_base = (byte_t *)VM_PAGE2ADDR(peb_temp_page);
 	TRY {
 		byte_t *writer;
-		size_t i;
 		USER uintptr_t *peb_argv;
 		USER uintptr_t *peb_envp;
 		size_t strings_total_copied;

@@ -514,17 +514,16 @@ panic_uhe_dbg_main(void *arg) {
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 #if EXCEPT_BACKTRACE_SIZE != 0
 	{
-		struct exception_info *info = &THIS_EXCEPTION_INFO;
 		uintptr_t prev_last_pc;
-		unsigned int i;
 		uintptr_t my_last_pc = args->last_pc;
-		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
+		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i) {
 			if (!info->ei_trace[i])
 				break;
+		}
 		prev_last_pc = i ? (uintptr_t)info->ei_trace[i - 1] : kcpustate_getpc(&info->ei_state);
-		if (!my_last_pc)
+		if (!my_last_pc) {
 			my_last_pc = prev_last_pc;
-		else if (my_last_pc != prev_last_pc) {
+		} else if (my_last_pc != prev_last_pc) {
 			dbg_print("...\n");
 			addr2line_printf(&kprinter, (void *)KERN_RAW,
 			                 (uintptr_t)instruction_trypred((void const *)my_last_pc),

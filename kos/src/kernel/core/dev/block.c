@@ -565,7 +565,6 @@ PUBLIC NONNULL((1)) bool KCALL
 block_device_unregister(struct basic_block_device *__restrict self)
 		THROWS(E_WOULDBLOCK) {
 	bool result = false;
-	struct basic_block_device *pop_dev;
 	/* FIXME: Running `partprobe /dev/hda' causes the a soft-lock where the
 	 *        kernel will continuously print `Removing block-device `/dev/hda1'' */
 	printk(KERN_INFO "[blk] Removing block-device `/dev/%s'\n", self->bd_name);
@@ -573,6 +572,7 @@ block_device_unregister(struct basic_block_device *__restrict self)
 		sync_write(&block_device_lock);
 		COMPILER_READ_BARRIER();
 		if likely(self->bd_devlink.a_vaddr != DEV_UNSET) {
+			struct basic_block_device *pop_dev;
 			pop_dev = bdev_tree_remove(&block_device_tree,
 			                           self->bd_devlink.a_vaddr);
 			assert(pop_dev == self);
@@ -1437,10 +1437,10 @@ _block_device_read(struct block_device *__restrict self,
 again_read_cache:
 	rwlock_read(&self->bd_cache_lock);
 	TRY {
-		lba_t block_lba;
-		size_t block_offset, block_size;
-		unsigned int cache_index;
 		for (;;) {
+			lba_t block_lba;
+			size_t block_offset, block_size;
+			unsigned int cache_index;
 			block_lba    = (lba_t)(device_position / self->bd_sector_size);
 			block_offset = (size_t)(device_position % self->bd_sector_size);
 			block_size   = self->bd_sector_size - block_offset;
@@ -1497,11 +1497,11 @@ _block_device_write(struct block_device *__restrict self,
 			THROW(E_IOERROR_READONLY, (uintptr_t)E_IOERROR_SUBSYSTEM_HARDDISK);
 	}
 	{
-		lba_t block_lba;
-		size_t block_offset, block_size;
-		unsigned int cache_index;
 		SCOPED_WRITELOCK(&self->bd_cache_lock);
 		for (;;) {
+			lba_t block_lba;
+			size_t block_offset, block_size;
+			unsigned int cache_index;
 			block_lba    = (lba_t)(device_position / self->bd_sector_size);
 			block_offset = (size_t)(device_position % self->bd_sector_size);
 			block_size   = self->bd_sector_size - block_offset;

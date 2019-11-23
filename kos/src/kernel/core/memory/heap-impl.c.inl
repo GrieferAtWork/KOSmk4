@@ -123,13 +123,13 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 	corepair.cp_node->vn_prot   = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED;
 	corepair.cp_node->vn_vm     = &vm_kernel;
 	corepair.cp_part->dp_block  = flags & GFP_CALLOC
-	                             ? &vm_datablock_anonymous_zero
+	                              ? &vm_datablock_anonymous_zero
 #ifdef CONFIG_DEBUG_HEAP
-	                             : &vm_datablock_debugheap
-#else /* CONFIG_DEBUG_HEAP */
-	                             : &vm_datablock_anonymous
+	                              : &vm_datablock_debugheap
+#else  /* CONFIG_DEBUG_HEAP */
+	                              : &vm_datablock_anonymous
 #endif /* !CONFIG_DEBUG_HEAP */
-	                             ;
+	                              ;
 	incref(corepair.cp_part->dp_block);
 	corepair.cp_node->vn_block = incref(corepair.cp_part->dp_block);
 	corepair.cp_node->vn_flags |= VM_NODE_FLAG_PREPARED;
@@ -1089,7 +1089,6 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 		alloc_bytes = HEAP_MINSIZE;
 #if 1
 	{
-		struct heapptr result;
 		struct mfree **iter, **end;
 		iter = &self->h_size[HEAP_BUCKET_OF(alloc_bytes)];
 		end  = COMPILER_ENDOF(self->h_size);

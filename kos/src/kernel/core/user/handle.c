@@ -362,7 +362,6 @@ check_new_alloc_linear:
 			result->hm_hashvector.hm_hashmsk = count;
 			result->hm_minfree               = self->hm_minfree;
 			if (self->hm_clofork_count) {
-				unsigned int i;
 				/* Delete all entries referring to handles
 				 * that were closed due to forking. */
 				for (i = 0; i <= count; ++i) {
@@ -515,8 +514,7 @@ handle_manager_cloexec(struct handle_manager *__restrict self)
 	handle_manager_assert_integrity(self);
 	cloexec_count = self->hm_cloexec_count;
 	if unlikely(cloexec_count >= self->hm_count) {
-		unsigned int i, alloc;
-		struct handle *vec;
+		unsigned int alloc;
 		struct handle_hashent *hashvec = NULL;
 		assert(self->hm_clofork_count <= self->hm_cloexec_count);
 		/* We an just close everything! */
@@ -1182,7 +1180,6 @@ handle_manage_rehash(struct handle_manager *__restrict self)
 	unsigned int result;
 	unsigned int threshold;
 	unsigned int count;
-	unsigned int i, j, perturb;
 	assert(sync_writing(&self->hm_lock));
 	assert(self->hm_mode == HANDLE_MANAGER_MODE_HASHVECTOR);
 	/* Check if rehashing is even required, as opposed to the hash-table
@@ -1216,6 +1213,7 @@ handle_manage_rehash(struct handle_manager *__restrict self)
 	memset(new_map, 0xff, (used_mask + 1) * sizeof(struct handle_hashent));
 	assert(self->hm_count <= self->hm_hashvector.hm_alloc);
 	if likely(self->hm_hashvector.hm_hashvec) {
+		unsigned int i, j, perturb;
 		for (i = 0; i <= self->hm_hashvector.hm_hashmsk; ++i) {
 			struct handle_hashent ent;
 			ent = self->hm_hashvector.hm_hashvec[i];

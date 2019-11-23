@@ -532,7 +532,9 @@ hop_do_generic_operation(struct handle *__restrict hand,
 		st.hs_refcnt      = (*handle_type_db.h_refcnt[hand->h_type])(hand->h_data);
 		st.hs_address     = MANGLE_HANDLE_DATA_POINTER(hand->h_data);
 		name              = handle_type_db.h_typename[hand->h_type];
-		memcpy(st.hs_typename, name, strnlen(name, COMPILER_LENOF(st.hs_typename) - 1));
+		memcpy(st.hs_typename, name,
+		       strnlen(name, COMPILER_LENOF(st.hs_typename) - 1) *
+		       sizeof(char));
 		COMPILER_BARRIER();
 		{
 			struct hop_handle_stat *info;

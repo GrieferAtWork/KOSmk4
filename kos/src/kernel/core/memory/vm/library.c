@@ -82,9 +82,6 @@ vm_library_enumerate(struct vm *__restrict effective_vm,
 		THROWS(E_SEGFAULT, E_BADALLOC) {
 	ssize_t temp, result = 0;
 	struct library_listdef libdef;
-	USER char *filename;
-	USER void *loadaddr;
-	USER void *loadstart;
 	bool filename_maybe_relative;
 	if unlikely(!maxcount)
 		goto done;
@@ -134,6 +131,8 @@ vm_library_enumerate(struct vm *__restrict effective_vm,
 		if (libdef.lld_flags & LIBRARY_LISTDEF_FPFIRST)
 			getuser(effective_vm, &module_vector, module_vector, sizeof(byte_t *));
 		for (i = 0; i < count; ++i) {
+			USER char *filename;
+			USER void *loadaddr, *loadstart;
 			MODULE *mod;
 			mod = (MODULE *)(module_vector + i * libdef.lld_entry_offsetof_next);
 			if (libdef.lld_flags & LIBRARY_LISTDEF_FPELEMENT) {
@@ -165,6 +164,8 @@ vm_library_enumerate(struct vm *__restrict effective_vm,
 			if (libdef.lld_flags & LIBRARY_LISTDEF_FPFIRST)
 				getuser(effective_vm, &modent, modent, sizeof(MODULE_ENTRY *));
 			while (modent && maxcount) {
+				USER char *filename;
+				USER void *loadaddr, *loadstart;
 				MODULE *mod;
 				/* Keep a set of all enumerated modules to prevent duplicates */
 				if unlikely(!pointer_set_insert(&enumerated_modules, modent))

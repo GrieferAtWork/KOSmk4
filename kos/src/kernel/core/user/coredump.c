@@ -122,7 +122,7 @@ coredump_create(struct ucpustate const *curr_ustate,
                 struct __siginfo_struct const *reason_signal,
                 unsigned int unwind_error)
 		THROWS(...) {
-	size_t i;
+	size_t tbi;
 	assert(curr_ustate != NULL);
 	assert(orig_ustate != NULL);
 	assert(memcmp(curr_ustate, orig_ustate, sizeof(ucpustate)) == 0
@@ -159,14 +159,14 @@ coredump_create(struct ucpustate const *curr_ustate,
 #define VINFO_FORMAT  "%[vinfo:%p [%Rf:%l,%c:%n]]"
 	if (orig_kstate)
 		printk(KERN_RAW VINFO_FORMAT " orig_kstate\n", kcpustate_getpc(orig_kstate));
-	for (i = 0; i < ktraceback_length; ++i) {
+	for (tbi = 0; tbi < ktraceback_length; ++tbi) {
 		printk(KERN_RAW VINFO_FORMAT " ktraceback_vector[%Iu]\n",
-		       ktraceback_vector[i], i);
+		       ktraceback_vector[tbi], tbi);
 	}
 	printk(KERN_RAW VINFO_FORMAT " orig_ustate\n", ucpustate_getpc(orig_ustate));
-	for (i = 0; i < traceback_length; ++i) {
+	for (tbi = 0; tbi < traceback_length; ++tbi) {
 		printk(KERN_RAW VINFO_FORMAT " traceback_vector[%Iu]\n",
-		       traceback_vector[i], i);
+		       traceback_vector[tbi], tbi);
 	}
 	if (ucpustate_getpc(curr_ustate) != ucpustate_getpc(orig_ustate) &&
 	    (traceback_length == 0 || ucpustate_getpc(curr_ustate) != (uintptr_t)traceback_vector[traceback_length - 1])) {
