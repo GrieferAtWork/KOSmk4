@@ -194,7 +194,7 @@ path_expandchild(struct path *__restrict parent_path,
 		 * If no more links are allowed, throw an exception. */
 		if unlikely(!*premaining_links)
 			THROW(E_FSERROR_TOO_MANY_SYMBOLIC_LINKS);
-		*--premaining_links;
+		--*premaining_links;
 
 		/* Traverse symbolic links! */
 		if (symlink_node_load((struct symlink_node *)child_node)) {

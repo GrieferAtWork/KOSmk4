@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf2d51f8 */
+/* HASH CRC-32:0xc783210f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -136,7 +136,10 @@ typedef __io_read_fn cookie_read_function_t;
 typedef __io_write_fn cookie_write_function_t;
 typedef __io_seek_fn cookie_seek_function_t;
 typedef __io_close_fn cookie_close_function_t;
+#ifndef __cookie_io_functions_t_defined
+#define __cookie_io_functions_t_defined 1
 typedef _IO_cookie_io_functions_t cookie_io_functions_t;
+#endif /* !__cookie_io_functions_t_defined */
 #endif /* __USE_GNU */
 
 

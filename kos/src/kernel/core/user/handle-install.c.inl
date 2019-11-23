@@ -216,7 +216,7 @@ got_result_slot:
 #endif /* !INSTALL_AT && !INSTALL_IN */
 			new_alloc = dst_fd + 16;
 			if unlikely(new_alloc > self->hm_maxlimit)
-				new_alloc > self->hm_maxlimit;
+				new_alloc = self->hm_maxlimit;
 			assert(new_alloc > dst_fd);
 			new_vector = (struct handle *)krealloc_nx(self->hm_linear.hm_vector,
 			                                          new_alloc * sizeof(struct handle),

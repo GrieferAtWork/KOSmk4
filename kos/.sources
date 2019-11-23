@@ -137,7 +137,6 @@ GCC_FLAGS({
 CC_FLAGS({
 	"-Wall",
 	"-Wextra",
-	"-Wno-unused-value",
 	"-Wno-nonnull-compare",
 	"-Wno-unused-parameter",
 	"-Wno-comment",
