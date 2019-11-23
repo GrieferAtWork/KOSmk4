@@ -26,6 +26,15 @@
 
 DECL_BEGIN
 
+/* TODO: Get rid of the `completed' signal! It's never really used, since
+ *       doing so is unsafe in all cases except when the signal is a global
+ *       variable, which doesn't really make much sense. And besides: It's
+ *       always possible to pass a signal that gets broadcast after the
+ *       RPC via the RPC function's arg-pointer (in which case the signal
+ *       can be allocated in the heap and be reference counted and freed
+ *       regardless of the sender dying, or the servicing thread reaching
+ *       the signal) */
+
 
 /* RPCs are served under the following, different circumstantial conditions.
  * NOTE: The order in which RPCs are executed (irregardless of their type)

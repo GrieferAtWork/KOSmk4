@@ -78,14 +78,14 @@ null_poll(struct character_device *__restrict UNUSED(self),
 }
 
 PRIVATE NONNULL((1)) REF struct vm_datablock *KCALL
-phys_mmap(struct character_device *__restrict self,
+phys_mmap(struct character_device *__restrict UNUSED(self),
           vm_vpage64_t *__restrict UNUSED(pminpage),
           vm_vpage64_t *__restrict UNUSED(pmaxpage)) THROWS(...) {
 	return incref(&vm_datablock_physical);
 }
 
 PRIVATE NONNULL((1)) REF struct vm_datablock *KCALL
-zero_mmap(struct character_device *__restrict self,
+zero_mmap(struct character_device *__restrict UNUSED(self),
           vm_vpage64_t *__restrict UNUSED(pminpage),
           vm_vpage64_t *__restrict UNUSED(pmaxpage)) THROWS(...) {
 	return incref(&vm_datablock_anonymous_zero);
@@ -231,9 +231,9 @@ PRIVATE u8 KCALL krand8_nondeterministic(void) {
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-random_read(struct character_device *__restrict self,
+random_read(struct character_device *__restrict UNUSED(self),
             USER CHECKED void *dst, size_t num_bytes,
-            iomode_t mode) THROWS(...) {
+            iomode_t UNUSED(mode)) THROWS(...) {
 	size_t result = num_bytes;
 	while (num_bytes >= 4) {
 		UNALIGNED_SET32((u32 *)dst, krand32_nondeterministic());
@@ -326,7 +326,7 @@ PRIVATE struct vm_datablock port_datablock = VM_DATABLOCK_INIT_VIO(&port_vio);
 
 #define PORT_MMAP_POINTER (&port_mmap)
 PRIVATE NONNULL((1)) REF struct vm_datablock *KCALL
-port_mmap(struct character_device *__restrict self,
+port_mmap(struct character_device *__restrict UNUSED(self),
           vm_vpage64_t *__restrict UNUSED(pminpage),
           vm_vpage64_t *__restrict pmaxpage) THROWS(...) {
 	vm_vpage_t port_count = ((vm_vpage_t)((port_t)-1)+1);
@@ -361,7 +361,7 @@ PRIVATE struct vm_datablock random_datablock = VM_DATABLOCK_INIT_VIO(&random_vio
 
 #define RANDOM_MMAP_POINTER (&random_mmap)
 PRIVATE NONNULL((1)) REF struct vm_datablock *KCALL
-random_mmap(struct character_device *__restrict self,
+random_mmap(struct character_device *__restrict UNUSED(self),
             vm_vpage64_t *__restrict UNUSED(pminpage),
             vm_vpage64_t *__restrict UNUSED(pmaxpage)) THROWS(...) {
 	return incref(&random_datablock);
@@ -393,7 +393,7 @@ PRIVATE struct vm_datablock urandom_datablock = VM_DATABLOCK_INIT_VIO(&urandom_v
 
 #define URANDOM_MMAP_POINTER (&urandom_mmap)
 PRIVATE NONNULL((1)) REF struct vm_datablock *KCALL
-urandom_mmap(struct character_device *__restrict self,
+urandom_mmap(struct character_device *__restrict UNUSED(self),
              vm_vpage64_t *__restrict UNUSED(pminpage),
              vm_vpage64_t *__restrict UNUSED(pmaxpage)) THROWS(...) {
 	return incref(&urandom_datablock);

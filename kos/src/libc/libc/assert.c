@@ -51,7 +51,7 @@ PRIVATE void LIBCCALL trap(struct kcpustate *__restrict state,
 	struct ucpustate ustate;
 	struct debugtrap_reason r;
 	kcpustate_to_ucpustate(state, &ustate);
-	r.dtr_signo  = SIGABRT;
+	r.dtr_signo  = trapno;
 	r.dtr_reason = DEBUGTRAP_REASON_NONE;
 	sys_debugtrap(&ustate, &r);
 }

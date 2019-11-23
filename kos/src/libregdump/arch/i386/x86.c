@@ -670,18 +670,26 @@ libregdump_dr7(struct regdump_printer *__restrict self,
 
 
 #ifdef __KERNEL__
-#define SEGMENTS_BEGIN \
+#define SEGMENTS_BEGIN      \
 	{                       \
 		struct desctab gdt; \
 		uint16_t ldt = 0;   \
 		__sgdt(&gdt);
 #define SEGMENTS_END \
 	}
+#define SEGMENTS_BEGIN_NOLDT \
+	{                        \
+		struct desctab gdt;  \
+		__sgdt(&gdt);
+#define SEGMENTS_END_NOLDT \
+	}
 #define SEGMENTS_ARGS  , &gdt, &ldt
 #else /* __KERNEL__ */
-#define SEGMENTS_BEGIN /* nothing */
-#define SEGMENTS_END   /* nothing */
-#define SEGMENTS_ARGS  /* nothing */
+#define SEGMENTS_BEGIN       /* nothing */
+#define SEGMENTS_END         /* nothing */
+#define SEGMENTS_BEGIN_NOLDT /* nothing */
+#define SEGMENTS_END_NOLDT   /* nothing */
+#define SEGMENTS_ARGS        /* nothing */
 #endif /* !__KERNEL__ */
 
 
@@ -744,7 +752,7 @@ libregdump_sgregs_with_cs_ss_tr_ldt(struct regdump_printer *__restrict self,
                                     uint16_t cs, uint16_t ss,
                                     uint16_t tr, uint16_t ldt) {
 	BEGIN;
-	SEGMENTS_BEGIN
+	SEGMENTS_BEGIN_NOLDT
 #ifdef __KERNEL__
 	format(REGDUMP_FORMAT_INDENT);
 	DO(libregdump_do_segment(self, 'e', data->sg_es16 SEGMENTS_ARGS));
@@ -773,7 +781,7 @@ libregdump_sgregs_with_cs_ss_tr_ldt(struct regdump_printer *__restrict self,
 	format(REGDUMP_FORMAT_INDENT);
 	DO(libregdump_do_segment(self, 'l', ldt SEGMENTS_ARGS));
 	PRINT("\n");
-	SEGMENTS_END
+	SEGMENTS_END_NOLDT
 	END;
 }
 

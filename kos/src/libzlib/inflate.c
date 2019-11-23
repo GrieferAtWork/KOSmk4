@@ -160,6 +160,7 @@ enum{ _zl_startid = __COUNTER__ };
 PRIVATE __NOBLOCK NONNULL((1)) void
 NOTHROW_NCX(CC zlib_tree_construct_cache)(struct zlib_tree *__restrict tree) {
 	/* TODO */
+	(void)tree;
 }
 
 PRIVATE __NOBLOCK NONNULL((1)) void

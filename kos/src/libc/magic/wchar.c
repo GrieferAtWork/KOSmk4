@@ -553,6 +553,8 @@ wcsftime:([outp(min(return,buflen))] wchar_t *__restrict buf, size_t buflen,
 	if (buflen)
 		*buf = 0;
 	/* TODO */
+	(void)format;
+	(void)tp;
 	return 0;
 }
 
@@ -619,6 +621,8 @@ wmemchr:([inp(num_chars)] wchar_t const *__restrict haystack, wchar_t needle, si
 [std][std_guard]
 [section({.text.crt.wchar.FILE.locked.utility|.text.crt.dos.wchar.FILE.locked.utility})]
 fwide:([nonnull] FILE *fp, int mode) -> int {
+	(void)fp;
+	(void)mode;
 	COMPILER_IMPURE();
 	return 0;
 }
@@ -672,6 +676,8 @@ vswprintf:([outp_opt(min(return+1,buflen))] wchar_t *__restrict buf, size_t bufl
 	if (buflen)
 		*buf = 0;
 	/* TODO: format_wprintf() */
+	(void)format;
+	(void)args;
 	return 0;
 }
 
@@ -736,6 +742,9 @@ vwscanf:([nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_IN
 vswscanf:([nonnull] wchar_t const *__restrict src,
           [nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	/* TODO: format_wscanf() */
+	(void)src;
+	(void)format;
+	(void)args;
 	COMPILER_IMPURE();
 	return 0;
 }
@@ -1815,10 +1824,10 @@ _scwprintf:([nonnull] wchar_t const *format, ...)
 
 [guard][wchar][ATTR_WUNUSED]
 _vscwprintf_p:([nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	/* TODO */
 	(void)format;
 	(void)args;
 	COMPILER_IMPURE();
-	/* TODO */
 	return 0;
 }
 
@@ -1874,11 +1883,11 @@ _snwprintf_s:([outp_opt(min(return,bufsize,buflen))] wchar_t *buf, $size_t bufsi
 [guard][wchar][cp_stdio]
 _vfwprintf_p:([nonnull] $FILE *stream,
               [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	/* TODO */
 	(void)stream;
 	(void)format;
 	(void)args;
 	COMPILER_IMPURE();
-	/* TODO */
 	return 0;
 }
 
@@ -1901,12 +1910,12 @@ _wprintf_p:([nonnull] wchar_t const *format, ...)
 [guard][wchar]
 _vswprintf_p:([outp(bufsize)] wchar_t *buf, $size_t bufsize,
               [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	/* TODO */
 	(void)buf;
 	(void)bufsize;
 	(void)format;
 	(void)args;
 	COMPILER_IMPURE();
-	/* TODO */
 	return 0;
 }
 
@@ -2105,12 +2114,12 @@ _swscanf_l:([nonnull] wchar_t const *src,
 [ignore][wchar][ATTR_WUNUSED]
 _vsnwscanf:([inp(bufsize)] wchar_t const *src, $size_t bufsize,
             [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	/* TODO */
 	(void)src;
 	(void)bufsize;
 	(void)format;
 	(void)args;
 	COMPILER_IMPURE();
-	/* TODO */
 	return 0;
 }
 

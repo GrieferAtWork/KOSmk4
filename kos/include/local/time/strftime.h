@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7dfa80 */
+/* HASH CRC-32:0xab39fa3f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,6 +85,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strftime))(char *__restrict __buf,
 	return __localdep_crt_strftime_l(__buf, __bufsize, __format, __tp, __NULLPTR);
 #else
 	/* TODO */
+	(void)__buf;
+	(void)__bufsize;
+	(void)__format;
+	(void)__tp;
 	__COMPILER_IMPURE();
 	return 0;
 #endif

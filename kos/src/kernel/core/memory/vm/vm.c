@@ -4342,6 +4342,7 @@ NOTHROW(FCALL ipi_invtlb)(struct icpustate *__restrict state,
 PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL ipi_invtlb_all)(struct icpustate *__restrict state,
                               void *args[CPU_IPI_ARGCOUNT]) {
+	(void)args;
 	pagedir_syncall();
 	return state;
 }

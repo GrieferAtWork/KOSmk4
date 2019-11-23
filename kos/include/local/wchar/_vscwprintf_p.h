@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb7e7cc3 */
+/* HASH CRC-32:0x4b74c34f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,11 +23,11 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_vscwprintf_p) __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vscwprintf_p))(__WCHAR_TYPE__ const *__format,
                                                            __builtin_va_list __args) {
-#line 1818 "kos/src/libc/magic/wchar.c"
+#line 1827 "kos/src/libc/magic/wchar.c"
+	/* TODO */
 	(void)__format;
 	(void)__args;
 	__COMPILER_IMPURE();
-	/* TODO */
 	return 0;
 }
 __NAMESPACE_LOCAL_END

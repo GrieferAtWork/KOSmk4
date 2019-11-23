@@ -47,6 +47,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.getttynam") struct ttyent *
 NOTHROW_RPC_KOS(LIBCCALL libc_getttynam)(char const *tty)
 /*[[[body:getttynam]]]*/
 {
+	(void)tty;
 	CRT_UNIMPLEMENTED("getttynam"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;

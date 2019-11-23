@@ -50,6 +50,9 @@ NOTHROW_RPC(LIBCCALL libc_openlog)(char const *ident,
                                    int facility)
 /*[[[body:openlog]]]*/
 {
+	(void)ident;
+	(void)option;
+	(void)facility;
 	CRT_UNIMPLEMENTED("openlog"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -60,6 +63,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.syslog.setlogmask") int
 NOTHROW_NCX(LIBCCALL libc_setlogmask)(int mask)
 /*[[[body:setlogmask]]]*/
 {
+	(void)mask;
 	CRT_UNIMPLEMENTED("setlogmask"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

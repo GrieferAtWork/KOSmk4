@@ -556,7 +556,7 @@ NOTHROW_RPC(LIBCCALL libc_fmkdirat)(fd_t dirfd,
 /*[[[body:fmkdirat]]]*/
 {
 	errno_t result;
-	result = sys_fmkdirat(AT_FDCWD,
+	result = sys_fmkdirat(dirfd,
 	                      pathname,
 	                      mode,
 	                      flags);
@@ -576,7 +576,7 @@ NOTHROW_RPC(LIBCCALL libc_fmknodat)(fd_t dirfd,
 /*[[[body:fmknodat]]]*/
 {
 	errno_t result;
-	result = sys_fmknodat(AT_FDCWD,
+	result = sys_fmknodat(dirfd,
 	                      nodename,
 	                      mode,
 	                      dev,

@@ -240,6 +240,9 @@ NOTHROW_RPC(LIBCCALL libc_readdir_r)(DIR *__restrict dirp,
                                      struct dirent **__restrict result)
 /*[[[body:readdir_r]]]*/
 {
+	(void)dirp;
+	(void)entry;
+	(void)result;
 	CRT_UNIMPLEMENTED("readdir_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -261,6 +264,9 @@ NOTHROW_RPC(LIBCCALL libc_readdir64_r)(DIR *__restrict dirp,
                                        struct dirent64 **__restrict result)
 /*[[[body:readdir64_r]]]*/
 {
+	(void)dirp;
+	(void)entry;
+	(void)result;
 	CRT_UNIMPLEMENTED("readdir64_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -329,6 +335,10 @@ NOTHROW_RPC(LIBCCALL libc_scandir)(char const *__restrict dir,
                                    __scandir_cmp_t cmp)
 /*[[[body:scandir]]]*/
 {
+	(void)dir;
+	(void)namelist;
+	(void)selector;
+	(void)cmp;
 	CRT_UNIMPLEMENTED("scandir"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -346,6 +356,11 @@ NOTHROW_RPC(LIBCCALL libc_scandirat)(fd_t dirfd,
                                      __scandir_cmp_t cmp)
 /*[[[body:scandirat]]]*/
 {
+	(void)dirfd;
+	(void)dir;
+	(void)namelist;
+	(void)selector;
+	(void)cmp;
 	CRT_UNIMPLEMENTED("scandirat"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

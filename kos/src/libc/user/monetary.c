@@ -39,6 +39,9 @@ NOTHROW_NCX(VLIBCCALL libc_strfmon)(char *__restrict s,
                                     ...)
 /*[[[body:strfmon]]]*/
 {
+	(void)s;
+	(void)maxsize;
+	(void)format;
 	CRT_UNIMPLEMENTED("strfmon"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -55,6 +58,10 @@ NOTHROW_NCX(VLIBCCALL libc_strfmon_l)(char *__restrict s,
                                       ...)
 /*[[[body:strfmon_l]]]*/
 {
+	(void)s;
+	(void)maxsize;
+	(void)loc;
+	(void)format;
 	CRT_UNIMPLEMENTED("strfmon_l"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

@@ -271,6 +271,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.property.FPathConf") long int
 		__THROWS(...)
 /*[[[body:FPathConf]]]*/
 {
+	(void)fd;
+	(void)name;
 	CRT_UNIMPLEMENTED("FPathConf"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -288,6 +290,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.property.PathConf") long int
 		__THROWS(...)
 /*[[[body:PathConf]]]*/
 {
+	(void)path;
+	(void)name;
 	CRT_UNIMPLEMENTED("PathConf"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

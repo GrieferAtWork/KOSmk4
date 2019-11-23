@@ -39,6 +39,8 @@ NOTHROW_RPC(LIBCCALL libc_setmntent)(char const *file,
                                      char const *mode)
 /*[[[body:setmntent]]]*/
 {
+	(void)file;
+	(void)mode;
 	CRT_UNIMPLEMENTED("setmntent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -53,6 +55,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.database.mntent.getmntent") struct mntent *
 NOTHROW_RPC(LIBCCALL libc_getmntent)(FILE *stream)
 /*[[[body:getmntent]]]*/
 {
+	(void)stream;
 	CRT_UNIMPLEMENTED("getmntent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -69,6 +72,10 @@ NOTHROW_RPC(LIBCCALL libc_getmntent_r)(FILE *__restrict stream,
                                        __STDC_INT_AS_SIZE_T bufsize)
 /*[[[body:getmntent_r]]]*/
 {
+	(void)stream;
+	(void)result;
+	(void)buffer;
+	(void)bufsize;
 	CRT_UNIMPLEMENTED("getmntent_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -84,6 +91,8 @@ NOTHROW_RPC(LIBCCALL libc_addmntent)(FILE *__restrict stream,
                                      struct mntent const *__restrict mnt)
 /*[[[body:addmntent]]]*/
 {
+	(void)stream;
+	(void)mnt;
 	CRT_UNIMPLEMENTED("addmntent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -97,6 +106,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.database.mntent.endmntent") int
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream)
 /*[[[body:endmntent]]]*/
 {
+	(void)stream;
 	CRT_UNIMPLEMENTED("endmntent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

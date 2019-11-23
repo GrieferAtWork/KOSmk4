@@ -36,6 +36,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.interface.if_nametoindex") unsigned
 NOTHROW_RPC_KOS(LIBCCALL libc_if_nametoindex)(char const *ifname)
 /*[[[body:if_nametoindex]]]*/
 {
+	(void)ifname;
 	CRT_UNIMPLEMENTED("if_nametoindex"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -49,6 +50,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_if_indextoname)(unsigned int ifindex,
                                               char *ifname)
 /*[[[body:if_indextoname]]]*/
 {
+	(void)ifindex;
+	(void)ifname;
 	CRT_UNIMPLEMENTED("if_indextoname"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -73,6 +76,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.interface.if_freenameindex") void
 NOTHROW_NCX(LIBCCALL libc_if_freenameindex)(struct if_nameindex *ptr)
 /*[[[body:if_freenameindex]]]*/
 {
+	(void)ptr;
 	CRT_UNIMPLEMENTED("if_freenameindex"); /* TODO */
 	libc_seterrno(ENOSYS);
 }

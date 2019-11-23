@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd107a007 */
+/* HASH CRC-32:0x63669275 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(clock_getres) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_getres))(__clockid_t __clock_id,
                                                           struct __TM_TYPE(timespec) *__res) {
-#line 979 "kos/src/libc/magic/time.c"
+#line 983 "kos/src/libc/magic/time.c"
 #ifdef __CRT_HAVE_clock_getres
 	int __result;
 	struct __timespec32 __res32;

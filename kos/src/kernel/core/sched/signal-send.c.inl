@@ -42,6 +42,9 @@ NOTHROW(KCALL sig_broadcast)(struct sig *__restrict self)
 	size_t result = 0;
 #endif /* !DEFINE_SINGLE */
 	struct task_connection *c;
+#ifdef DEFINE_ALTERNATE
+	assert(sender != NULL);
+#endif /* !DEFINE_ALTERNATE */
 #ifdef DEFINE_SINGLE
 	{
 		pflag_t was;
@@ -119,7 +122,12 @@ again:
 				COMPILER_READ_BARRIER();
 				set = ATOMIC_XCH(c->tc_cons, NULL);
 				if (set) {
-					if (ATOMIC_CMPXCH(set->ts_dlvr, NULL, self)) {
+#ifdef DEFINE_ALTERNATE
+					if (ATOMIC_CMPXCH(set->ts_dlvr, NULL, sender))
+#else /* DEFINE_ALTERNATE */
+					if (ATOMIC_CMPXCH(set->ts_dlvr, NULL, self))
+#endif /* !DEFINE_ALTERNATE */
+					{
 						struct task *thread;
 						thread = set->ts_thread;
 						if (!thread || task_wake(thread)) {

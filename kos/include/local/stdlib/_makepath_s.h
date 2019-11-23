@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9968a0b4 */
+/* HASH CRC-32:0x51449ce1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,8 +28,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_makepath_s))(char *__buf,
                                                          char const *__dir,
                                                          char const *__file,
                                                          char const *__ext) {
-#line 2839 "kos/src/libc/magic/stdlib.c"
+#line 2868 "kos/src/libc/magic/stdlib.c"
 	/* TODO */
+	(void)__buf;
+	(void)__buflen;
+	(void)__drive;
+	(void)__dir;
+	(void)__file;
+	(void)__ext;
 	__COMPILER_IMPURE();
 	return 0;
 }

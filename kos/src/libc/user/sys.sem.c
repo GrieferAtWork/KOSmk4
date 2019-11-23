@@ -39,6 +39,9 @@ NOTHROW_NCX(VLIBCCALL libc_semctl)(int semid,
                                    ...)
 /*[[[body:semctl]]]*/
 {
+	(void)semid;
+	(void)semnum;
+	(void)cmd;
 	CRT_UNIMPLEMENTED("semctl"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -53,6 +56,9 @@ NOTHROW_NCX(LIBCCALL libc_semget)(key_t key,
                                   int semflg)
 /*[[[body:semget]]]*/
 {
+	(void)key;
+	(void)nsems;
+	(void)semflg;
 	CRT_UNIMPLEMENTED("semget"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -67,6 +73,9 @@ NOTHROW_NCX(LIBCCALL libc_semop)(int semid,
                                  size_t nsops)
 /*[[[body:semop]]]*/
 {
+	(void)semid;
+	(void)sops;
+	(void)nsops;
 	CRT_UNIMPLEMENTED("semop"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -82,6 +91,10 @@ NOTHROW_NCX(LIBCCALL libc_semtimedop)(int semid,
                                       struct timespec const *timeout)
 /*[[[body:semtimedop]]]*/
 {
+	(void)semid;
+	(void)sops;
+	(void)nsops;
+	(void)timeout;
 	CRT_UNIMPLEMENTED("semtimedop"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

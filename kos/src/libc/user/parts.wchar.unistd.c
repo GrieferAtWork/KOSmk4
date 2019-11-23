@@ -51,6 +51,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wttyname") char32_t *
 NOTHROW_RPC(LIBCCALL libc_wttyname)(fd_t fd)
 /*[[[body:wttyname]]]*/
 {
+	(void)fd;
 	CRT_UNIMPLEMENTED("wttyname"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -65,6 +66,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wttyname") char16_t *
 NOTHROW_RPC(LIBDCALL libd_wttyname)(fd_t fd)
 /*[[[body:DOS$wttyname]]]*/
 {
+	(void)fd;
 	CRT_UNIMPLEMENTED("wttyname"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -81,6 +83,9 @@ NOTHROW_RPC(LIBCCALL libc_wttyname_r)(fd_t fd,
                                       size_t buflen)
 /*[[[body:wttyname_r]]]*/
 {
+	(void)fd;
+	(void)buf;
+	(void)buflen;
 	CRT_UNIMPLEMENTED("wttyname_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -97,6 +102,9 @@ NOTHROW_RPC(LIBDCALL libd_wttyname_r)(fd_t fd,
                                       size_t buflen)
 /*[[[body:DOS$wttyname_r]]]*/
 {
+	(void)fd;
+	(void)buf;
+	(void)buflen;
 	CRT_UNIMPLEMENTED("wttyname_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -560,6 +568,11 @@ NOTHROW_RPC(LIBCCALL libc_wfreadlinkat)(fd_t dfd,
                                         atflag_t flags)
 /*[[[body:wfreadlinkat]]]*/
 {
+	(void)dfd;
+	(void)path;
+	(void)buf;
+	(void)buflen;
+	(void)flags;
 	CRT_UNIMPLEMENTED("wfreadlinkat"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -579,6 +592,11 @@ NOTHROW_RPC(LIBDCALL libd_wfreadlinkat)(fd_t dfd,
                                         atflag_t flags)
 /*[[[body:DOS$wfreadlinkat]]]*/
 {
+	(void)dfd;
+	(void)path;
+	(void)buf;
+	(void)buflen;
+	(void)flags;
 	CRT_UNIMPLEMENTED("wfreadlinkat"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -634,6 +652,8 @@ NOTHROW_RPC(LIBCCALL libc_wgetlogin_r)(char32_t *name,
                                        size_t name_len)
 /*[[[body:wgetlogin_r]]]*/
 {
+	(void)name;
+	(void)name_len;
 	CRT_UNIMPLEMENTED("wgetlogin_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -647,6 +667,8 @@ NOTHROW_RPC(LIBDCALL libd_wgetlogin_r)(char16_t *name,
                                        size_t name_len)
 /*[[[body:DOS$wgetlogin_r]]]*/
 {
+	(void)name;
+	(void)name_len;
 	CRT_UNIMPLEMENTED("wgetlogin_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

@@ -36,6 +36,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.adjtimex") int
 NOTHROW_NCX(LIBCCALL libc_adjtimex)(struct timex *__restrict ntx)
 /*[[[body:adjtimex]]]*/
 {
+	(void)ntx;
 	CRT_UNIMPLEMENTED("adjtimex"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -48,6 +49,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.ntp_adjtime") int
 NOTHROW_NCX(LIBCCALL libc_ntp_adjtime)(struct timex *__restrict tntx)
 /*[[[body:ntp_adjtime]]]*/
 {
+	(void)tntx;
 	CRT_UNIMPLEMENTED("ntp_adjtime"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -63,6 +65,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.adjtimex64") int
 NOTHROW_NCX(LIBCCALL libc_adjtimex64)(struct timex64 *__restrict ntx)
 /*[[[body:adjtimex64]]]*/
 {
+	(void)ntx;
 	CRT_UNIMPLEMENTED("adjtimex64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -79,6 +82,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.ntp_adjtime64") int
 NOTHROW_NCX(LIBCCALL libc_ntp_adjtime64)(struct timex64 *__restrict tntx)
 /*[[[body:ntp_adjtime64]]]*/
 {
+	(void)tntx;
 	CRT_UNIMPLEMENTED("ntp_adjtime64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -92,6 +96,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.ntp_gettime") int
 NOTHROW_NCX(LIBCCALL libc_ntp_gettime)(struct ntptimeval *__restrict ntv)
 /*[[[body:ntp_gettime]]]*/
 {
+	(void)ntv;
 	CRT_UNIMPLEMENTED("ntp_gettime"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -107,6 +112,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.ntp_gettime64") int
 NOTHROW_NCX(LIBCCALL libc_ntp_gettime64)(struct ntptimeval64 *__restrict ntv)
 /*[[[body:ntp_gettime64]]]*/
 {
+	(void)ntv;
 	CRT_UNIMPLEMENTED("ntp_gettime64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

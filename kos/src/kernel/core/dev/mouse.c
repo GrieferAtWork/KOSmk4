@@ -826,6 +826,7 @@ mouse_device_ioctl(struct character_device *__restrict self,
                    syscall_ulong_t cmd, USER UNCHECKED void *arg,
                    iomode_t mode) THROWS(...) {
 	struct mouse_device *me;
+	(void)mode;
 	me = (struct mouse_device *)self;
 	switch (cmd) {
 

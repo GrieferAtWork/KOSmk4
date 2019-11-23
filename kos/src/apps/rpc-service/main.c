@@ -29,6 +29,8 @@
 DECL_BEGIN
 
 int main(int argc, char *argv[]) {
+	(void)argc;
+	(void)argv;
 	/* This program was used to test a problem related to exception unwinding
 	 * while inside of `task_serve()' (s.a. `LOG_SEGNENT_INCONSISTENCY()' in
 	 * `kos/src/kernel/core/arch/i386/except.c')

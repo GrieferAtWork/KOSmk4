@@ -143,6 +143,10 @@ NOTHROW(KCALL task_propagate_exit_status_to_worker_thread)(struct task *__restri
                                                            struct taskpid *__restrict origin_pid) {
 	/* TODO: Send an RPC callback to `worker' to propagate the exit status
 	 *       that caused the task associated with `origin_pid' to exit. */
+	(void)worker;
+	(void)worker_pid;
+	(void)origin;
+	(void)origin_pid;
 }
 
 #undef CONFIG_TERMINATE_PROCESS_GROUP_WHEN_GROUP_LEADER_DIES
@@ -166,6 +170,9 @@ NOTHROW(KCALL task_send_sigcld_to_parent_process)(struct task *__restrict parent
 	sig_altbroadcast(&FORTASK(parent, this_taskgroup).tg_proc_threads_change,
 	                (struct sig *)origin_pid);
 	/* TODO: Send a SIGCLD to `parent' */
+	(void)parent;
+	(void)origin;
+	(void)origin_pid;
 }
 
 
@@ -2189,6 +2196,7 @@ handle_task_stat(struct taskpid *__restrict self,
 	/* TODO: st_ctim: Thread creation time? */
 	/* TODO: st_atim: End of the latest quantum */
 	/* TODO: st_mtim: Start of the latest quantum */
+	(void)self;
 }
 
 INTERN poll_mode_t KCALL
@@ -2561,6 +2569,9 @@ handle_pidns_hop(struct pidns *__restrict self,
                  syscall_ulong_t cmd,
                  USER UNCHECKED void *arg,
                  iomode_t mode) {
+	(void)self;
+	(void)arg;
+	(void)mode;
 	switch (cmd) {
 
 	/* TODO */

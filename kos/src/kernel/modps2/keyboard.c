@@ -356,7 +356,7 @@ ps2_keyboard_send_command_byte_and_wait_for_ack(struct ps2_keyboard *__restrict 
 	unsigned int attempt = 0;
 again:
 	ATOMIC_WRITE(self->pk_errors, 0);
-	ps2_write_data(self->pk_portno, PS2_KEYBOARD_CMD_SETLED);
+	ps2_write_data(self->pk_portno, command_byte);
 	while ((errors = ATOMIC_READ(self->pk_errors)) == 0) {
 		qtime_t tmo;
 		task_connect(&self->pk_errors_sig);

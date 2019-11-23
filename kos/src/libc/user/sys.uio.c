@@ -41,6 +41,12 @@ NOTHROW_RPC(LIBCCALL libc_process_vm_readv)(pid_t pid,
                                             unsigned long int flags)
 /*[[[body:process_vm_readv]]]*/
 {
+	(void)pid;
+	(void)llocal_iov;
+	(void)liovcnt;
+	(void)remote_iov;
+	(void)riovcnt;
+	(void)flags;
 	CRT_UNIMPLEMENTED("process_vm_readv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -57,6 +63,12 @@ NOTHROW_RPC(LIBCCALL libc_process_vm_writev)(pid_t pid,
                                              unsigned long int flags)
 /*[[[body:process_vm_writev]]]*/
 {
+	(void)pid;
+	(void)local_iov;
+	(void)liovcnt;
+	(void)remote_iov;
+	(void)riovcnt;
+	(void)flags;
 	CRT_UNIMPLEMENTED("process_vm_writev"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -71,6 +83,9 @@ NOTHROW_RPC(LIBCCALL libc_readv)(fd_t fd,
                                  __STDC_INT_AS_SIZE_T count)
 /*[[[body:readv]]]*/
 {
+	(void)fd;
+	(void)iovec;
+	(void)count;
 	CRT_UNIMPLEMENTED("readv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -85,6 +100,9 @@ NOTHROW_RPC(LIBCCALL libc_writev)(fd_t fd,
                                   __STDC_INT_AS_SIZE_T count)
 /*[[[body:writev]]]*/
 {
+	(void)fd;
+	(void)iovec;
+	(void)count;
 	CRT_UNIMPLEMENTED("writev"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -100,6 +118,10 @@ NOTHROW_RPC(LIBCCALL libc_preadv)(fd_t fd,
                                   off_t offset)
 /*[[[body:preadv]]]*/
 {
+	(void)fd;
+	(void)iovec;
+	(void)count;
+	(void)offset;
 	CRT_UNIMPLEMENTED("preadv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -115,6 +137,10 @@ NOTHROW_RPC(LIBCCALL libc_pwritev)(fd_t fd,
                                    off_t offset)
 /*[[[body:pwritev]]]*/
 {
+	(void)fd;
+	(void)iovec;
+	(void)count;
+	(void)offset;
 	CRT_UNIMPLEMENTED("pwritev"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -133,6 +159,10 @@ NOTHROW_RPC(LIBCCALL libc_preadv64)(fd_t fd,
                                     off64_t offset)
 /*[[[body:preadv64]]]*/
 {
+	(void)fd;
+	(void)iovec;
+	(void)count;
+	(void)offset;
 	CRT_UNIMPLEMENTED("preadv64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -152,6 +182,10 @@ NOTHROW_RPC(LIBCCALL libc_pwritev64)(fd_t fd,
                                      off64_t offset)
 /*[[[body:pwritev64]]]*/
 {
+	(void)fd;
+	(void)iovec;
+	(void)count;
+	(void)offset;
 	CRT_UNIMPLEMENTED("pwritev64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

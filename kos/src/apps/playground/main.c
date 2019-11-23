@@ -116,6 +116,7 @@ DECL_BEGIN
 int main_rawterm(int argc, char *argv[], char *envp[]) {
 	struct termios oios, nios;
 	char buf[8];
+	(void)argc, (void)argv, (void)envp;
 	tcgetattr(STDIN_FILENO, &oios);
 	nios = oios;
 	cfmakeraw(&nios);
@@ -165,6 +166,7 @@ int main_color(int argc, char *argv[], char *envp[]) {
 		40, 41, 42, 43, 44, 45, 46, 47,
 		100, 101, 102, 103, 104, 105, 106, 107
 	};
+	(void)argc, (void)argv, (void)envp;
 #define SESC "\033" /* \e */
 	printf(SESC "[m");
 	printf("\\e[f;bm:\n"
@@ -209,6 +211,7 @@ int main_ioperm(int argc, char *argv[], char *envp[]) {
 	                "HELLO QEMU DEBUG PORT\n"
 	                "HELLO QEMU DEBUG PORT\n"
 	                "\n";
+	(void)argc, (void)argv, (void)envp;
 	TRY {
 		/* Make sure that outsb() doesn't work by default */
 		outsb(portno, s, strlen(s));
@@ -316,6 +319,7 @@ int main_pty(int argc, char *argv[], char *envp[]) {
 	struct stat st;
 	ssize_t error;
 	pid_t cpid;
+	(void)argc, (void)argv, (void)envp;
 	if (openpty(&master, &slave, name, NULL, NULL))
 		err(1, "openpty() failed");
 	printf("[expected] Created PTY (master: %q)\n", name);
@@ -381,6 +385,7 @@ int main_pty(int argc, char *argv[], char *envp[]) {
 
 /************************************************************************/
 int main_environ(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
 	printf("$PATH: %q\n", getenv("PATH"));
 	printf("envp: %p\n", envp);
 	if (envp) {
@@ -398,6 +403,7 @@ int main_environ(int argc, char *argv[], char *envp[]) {
 
 /************************************************************************/
 int main_prognam(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
 	printf("program_invocation_name       = %q\n", program_invocation_name);
 	printf("program_invocation_short_name = %q\n", program_invocation_short_name);
 	return 0;
@@ -410,6 +416,7 @@ int main_prognam(int argc, char *argv[], char *envp[]) {
 
 /************************************************************************/
 int main_ctype(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
 	assert(isalpha('s'));
 	COMPILER_IMPURE();
 	return 0;
@@ -428,6 +435,7 @@ PRIVATE void myhand(int signo) {
 }
 
 int main_signal(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
 	syslog(LOG_DEBUG, "sp:%p\n", __rdsp());
 	signal(SIGUSR1, &myhand);
 	raise(SIGUSR1);
@@ -441,6 +449,7 @@ int main_signal(int argc, char *argv[], char *envp[]) {
 
 /************************************************************************/
 int main_except(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
 	/* Test all 3 ways in which an exception can be thrown:
 	 *  - syscall
 	 *  - THROW()
@@ -508,6 +517,7 @@ debug_printer(void *UNUSED(arg), char const *message, size_t len) {
 }
 
 int main_dprint(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
 	/* XXX: While this ~does~ work to do exactly what it's supposed to do,
 	 *      Visual Studio's MIEngine doesn't seem to understand the protocol
 	 *      that GDB uses to transmit generic, human-readable strings

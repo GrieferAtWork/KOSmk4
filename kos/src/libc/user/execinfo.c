@@ -35,6 +35,8 @@ NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array,
                                      int size)
 /*[[[body:backtrace]]]*/
 {
+	(void)array;
+	(void)size;
 	CRT_UNIMPLEMENTED("backtrace"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -50,6 +52,8 @@ NOTHROW_NCX(LIBCCALL libc_backtrace_symbols)(void *const *array,
                                              int size)
 /*[[[body:backtrace_symbols]]]*/
 {
+	(void)array;
+	(void)size;
 	CRT_UNIMPLEMENTED("backtrace_symbols"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -66,6 +70,9 @@ NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array,
                                                 fd_t fd)
 /*[[[body:backtrace_symbols_fd]]]*/
 {
+	(void)array;
+	(void)size;
+	(void)fd;
 	CRT_UNIMPLEMENTED("backtrace_symbols_fd"); /* TODO */
 	libc_seterrno(ENOSYS);
 }

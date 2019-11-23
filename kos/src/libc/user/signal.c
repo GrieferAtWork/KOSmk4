@@ -181,6 +181,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigreturn") void
 NOTHROW_NCX(LIBCCALL libc_sigreturn)(struct sigcontext const *scp)
 /*[[[body:sigreturn]]]*/
 {
+	(void)scp;
 	CRT_UNIMPLEMENTED("sigreturn"); /* TODO */
 	libc_seterrno(ENOSYS);
 	for (;;) {
@@ -469,6 +470,8 @@ NOTHROW_NCX(LIBCCALL libc_psignal)(int signo,
                                    char const *s)
 /*[[[body:psignal]]]*/
 {
+	(void)signo;
+	(void)s;
 	CRT_UNIMPLEMENTED("psignal"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -480,6 +483,8 @@ NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
                                     char const *s)
 /*[[[body:psiginfo]]]*/
 {
+	(void)pinfo;
+	(void)s;
 	CRT_UNIMPLEMENTED("psiginfo"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -553,7 +558,7 @@ set_single_signal_action(int sig, int how) {
 	sigset_t set;
 	libc_sigemptyset(&set);
 	libc_sigaddset(&set, sig);
-	return libc_sigprocmask(SIG_BLOCK, &set, NULL);
+	return libc_sigprocmask(how, &set, NULL);
 }
 
 /*[[[head:sighold,hash:CRC-32=0xfb16e1a7]]]*/

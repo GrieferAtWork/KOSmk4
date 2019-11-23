@@ -38,6 +38,8 @@ NOTHROW_RPC(LIBCCALL libc_ftok)(char const *pathname,
                                 int proj_id)
 /*[[[body:ftok]]]*/
 {
+	(void)pathname;
+	(void)proj_id;
 	CRT_UNIMPLEMENTED("ftok"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;

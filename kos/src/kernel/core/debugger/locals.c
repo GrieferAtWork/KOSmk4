@@ -93,7 +93,7 @@ PRIVATE di_enum_locals_sections_t const kernel_enum_locals_sections = {
 };
 
 PRIVATE ATTR_DBGTEXT ssize_t LIBDEBUGINFO_CC
-locals_format_printer(void *format_arg,
+locals_format_printer(void *UNUSED(format_arg),
                       pformatprinter printer, void *arg,
                       unsigned int format_option) {
 	char const *format;
@@ -137,7 +137,7 @@ locals_format_printer(void *format_arg,
 
 /* @return: * : UNWIND_* */
 PRIVATE ATTR_DBGTEXT ATTR_NOINLINE unsigned int LIBDEBUGINFO_CC
-do_print_local(void *arg,
+do_print_local(void *UNUSED(arg),
                di_debuginfo_cu_parser_t const *__restrict parser,
                di_enum_locals_sections_t const *__restrict sections,
                di_debuginfo_compile_unit_t *__restrict cu,
@@ -259,6 +259,9 @@ DEFINE_DEBUG_FUNCTION(
 		"locals\n"
 		"List the names, types and values of locally defined C variables at the current source location\n"
 		, argc, argv) {
+	if (argc != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
 	/* Enumerate location variables. */
 	debuginfo_enum_locals(&kernel_enum_locals_sections,
 	                      fcpustate_getpc(&dbg_viewstate),
@@ -294,6 +297,9 @@ DEFINE_DEBUG_FUNCTION(
 		"first, and are also aligned alongside each other\n"
 		, argc, argv) {
 	size_t maxlen = 0;
+	if (argc != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
 	/* Enumerate location variables. */
 	debuginfo_enum_locals(&kernel_enum_locals_sections,
 	                      fcpustate_getpc(&dbg_viewstate),

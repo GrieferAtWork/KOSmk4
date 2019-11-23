@@ -78,6 +78,7 @@ DlModule_GetLocalSymbol(DlModule *__restrict self,
 		goto nosym;
 	}
 	/* TODO: GNU hash table support */
+	(void)phash_gnu;
 
 nosym:
 	return NULL;

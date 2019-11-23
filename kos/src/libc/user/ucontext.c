@@ -37,6 +37,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.getcontext") int
 NOTHROW_NCX(LIBCCALL libc_getcontext)(ucontext_t *__restrict ucp)
 /*[[[body:getcontext]]]*/
 {
+	(void)ucp;
 	CRT_UNIMPLEMENTED("getcontext"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -50,6 +51,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.setcontext") int
 NOTHROW_NCX(LIBCCALL libc_setcontext)(ucontext_t const *__restrict ucp)
 /*[[[body:setcontext]]]*/
 {
+	(void)ucp;
 	CRT_UNIMPLEMENTED("setcontext"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -65,6 +67,8 @@ NOTHROW_NCX(LIBCCALL libc_swapcontext)(ucontext_t *__restrict oucp,
                                        ucontext_t const *__restrict ucp)
 /*[[[body:swapcontext]]]*/
 {
+	(void)oucp;
+	(void)ucp;
 	CRT_UNIMPLEMENTED("swapcontext"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -85,6 +89,9 @@ NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
                                         ...)
 /*[[[body:makecontext]]]*/
 {
+	(void)ucp;
+	(void)func;
+	(void)argc;
 	CRT_UNIMPLEMENTED("makecontext"); /* TODO */
 	libc_seterrno(ENOSYS);
 }

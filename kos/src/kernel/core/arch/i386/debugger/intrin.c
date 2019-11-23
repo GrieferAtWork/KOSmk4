@@ -99,6 +99,7 @@ DEFINE_DEBUG_FUNCTION(
 		, argc, argv) {
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
 	dbg_printf(DBGSTR("cli EFLAGS.IF = 0 (was %u)\n"),
 	           dbg_viewstate.fcs_Xflags & EFLAGS_IF ? 1 : 0);
 	dbg_viewstate.fcs_Xflags &= ~EFLAGS_IF;
@@ -111,6 +112,7 @@ DEFINE_DEBUG_FUNCTION(
 		, argc, argv) {
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
 	dbg_printf(DBGSTR("sti EFLAGS.IF = 1 (was %u)\n"),
 	           dbg_viewstate.fcs_Xflags & EFLAGS_IF ? 1 : 0);
 	dbg_viewstate.fcs_Xflags |= EFLAGS_IF;
@@ -123,6 +125,7 @@ DEFINE_DEBUG_FUNCTION(
 		, argc, argv) {
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
 	dbg_printf(DBGSTR("cld EFLAGS.DF = 0 (was %u)\n"),
 	           dbg_viewstate.fcs_Xflags & EFLAGS_DF ? 1 : 0);
 	dbg_viewstate.fcs_Xflags &= ~EFLAGS_DF;
@@ -135,6 +138,7 @@ DEFINE_DEBUG_FUNCTION(
 		, argc, argv) {
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
 	dbg_printf(DBGSTR("std EFLAGS.DF = 1 (was %u)\n"),
 	           dbg_viewstate.fcs_Xflags & EFLAGS_DF ? 1 : 0);
 	dbg_viewstate.fcs_Xflags |= EFLAGS_DF;
@@ -147,6 +151,7 @@ DEFINE_DEBUG_FUNCTION(
 		, argc, argv) {
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
 	dbg_printf(DBGSTR("clc EFLAGS.CF = 0 (was %u)\n"),
 	           dbg_viewstate.fcs_Xflags & EFLAGS_CF ? 1 : 0);
 	dbg_viewstate.fcs_Xflags &= ~EFLAGS_CF;
@@ -159,6 +164,7 @@ DEFINE_DEBUG_FUNCTION(
 		, argc, argv) {
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
 	dbg_printf(DBGSTR("stc EFLAGS.CF = 1 (was %u)\n"),
 	           dbg_viewstate.fcs_Xflags & EFLAGS_CF ? 1 : 0);
 	dbg_viewstate.fcs_Xflags |= EFLAGS_CF;
@@ -171,6 +177,7 @@ DEFINE_DEBUG_FUNCTION(
 		, argc, argv) {
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
 	dbg_printf(DBGSTR("stc EFLAGS.CF = %u (was %u)\n"),
 	           dbg_viewstate.fcs_Xflags & EFLAGS_CF ? 0 : 1,
 	           dbg_viewstate.fcs_Xflags & EFLAGS_CF ? 1 : 0);
@@ -201,6 +208,7 @@ DEFINE_DEBUG_FUNCTION(
 		, argc, argv) {
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
 	dbg_printf(DBGSTR("sgdt %#.4I16x (%I16u), %p\n"),
 	           dbg_viewstate.fcs_gdt.dt_limit,
 	           dbg_viewstate.fcs_gdt.dt_limit,
@@ -232,6 +240,7 @@ DEFINE_DEBUG_FUNCTION(
 		, argc, argv) {
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
 	dbg_printf(DBGSTR("sidt %#.4I16x (%I16u), %p\n"),
 	           dbg_viewstate.fcs_idt.dt_limit,
 	           dbg_viewstate.fcs_idt.dt_limit,
@@ -244,22 +253,28 @@ debug_regdump_print_format(struct regdump_printer *__restrict self,
                            unsigned int format_option) {
 #define PRINT(x) (*self->rdp_printer)(self->rdp_printer_arg, DBGSTR(x), COMPILER_STRLEN(x))
 	switch (format_option) {
+
 	case REGDUMP_FORMAT_INDENT:
 		return PRINT("    ");
+
 	case REGDUMP_FORMAT_REGISTER_PREFIX:
 		return PRINT(DF_SETBLUE);
+
 	case REGDUMP_FORMAT_VALUE_PREFIX:
 	case REGDUMP_FORMAT_OFFSET_PREFIX:
 	case REGDUMP_FORMAT_FLAG_PREFIX:
 		return PRINT(DF_SETWHITE);
+
 	case REGDUMP_FORMAT_ERROR_PREFIX:
 		return PRINT(DF_SETMAROON);
+
 	case REGDUMP_FORMAT_REGISTER_SUFFIX:
 	case REGDUMP_FORMAT_VALUE_SUFFIX:
 	case REGDUMP_FORMAT_OFFSET_SUFFIX:
 	case REGDUMP_FORMAT_FLAG_SUFFIX:
 	case REGDUMP_FORMAT_ERROR_SUFFIX:
 		return PRINT(DF_RESETATTR);
+
 	default:
 		break;
 	}
@@ -276,6 +291,7 @@ DEFINE_DEBUG_FUNCTION(
 	struct regdump_printer re_printer;
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
 	re_printer.rdp_printer     = &dbg_printer;
 	re_printer.rdp_printer_arg = NULL;
 	re_printer.rdp_format      = &debug_regdump_print_format;

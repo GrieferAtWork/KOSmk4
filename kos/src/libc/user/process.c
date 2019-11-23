@@ -45,6 +45,9 @@ NOTHROW_NCX(LIBCCALL libc__beginthread)(__dos_beginthread_entry_t entry,
                                         void *arg)
 /*[[[body:_beginthread]]]*/
 {
+	(void)entry;
+	(void)stacksz;
+	(void)arg;
 	CRT_UNIMPLEMENTED("_beginthread"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -61,6 +64,12 @@ NOTHROW_NCX(LIBCCALL libc__beginthreadex)(void *sec,
                                           u32 *threadaddr)
 /*[[[body:_beginthreadex]]]*/
 {
+	(void)sec;
+	(void)stacksz;
+	(void)entry;
+	(void)arg;
+	(void)flags;
+	(void)threadaddr;
 	CRT_UNIMPLEMENTED("_beginthreadex"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -82,6 +91,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.sched.thread._endthreadex") void
 NOTHROW_NCX(LIBCCALL libc__endthreadex)(u32 exitcode)
 /*[[[body:_endthreadex]]]*/
 {
+	(void)exitcode;
 	CRT_UNIMPLEMENTED("_endthreadex"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -165,6 +175,9 @@ NOTHROW_RPC(LIBCCALL libc_spawnv)(int mode,
                                   __TARGV)
 /*[[[body:spawnv]]]*/
 {
+	(void)mode;
+	(void)path;
+	(void)___argv;
 	CRT_UNIMPLEMENTED("spawnv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -180,6 +193,10 @@ NOTHROW_RPC(LIBCCALL libc_spawnve)(int mode,
                                    __TENVP)
 /*[[[body:spawnve]]]*/
 {
+	(void)mode;
+	(void)path;
+	(void)___argv;
+	(void)___envp;
 	CRT_UNIMPLEMENTED("spawnve"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -194,6 +211,9 @@ NOTHROW_RPC(LIBCCALL libc_spawnvp)(int mode,
                                    __TARGV)
 /*[[[body:spawnvp]]]*/
 {
+	(void)mode;
+	(void)file;
+	(void)___argv;
 	CRT_UNIMPLEMENTED("spawnvp"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -209,6 +229,10 @@ NOTHROW_RPC(LIBCCALL libc_spawnvpe)(int mode,
                                     __TENVP)
 /*[[[body:spawnvpe]]]*/
 {
+	(void)mode;
+	(void)file;
+	(void)___argv;
+	(void)___envp;
 	CRT_UNIMPLEMENTED("spawnvpe"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -224,6 +248,9 @@ NOTHROW_RPC(VLIBCCALL libc_spawnl)(int mode,
                                    ... /*, (char *)NULL*/)
 /*[[[body:spawnl]]]*/
 {
+	(void)mode;
+	(void)path;
+	(void)args;
 	CRT_UNIMPLEMENTED("spawnl"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -239,6 +266,9 @@ NOTHROW_RPC(VLIBCCALL libc_spawnle)(int mode,
                                     ... /*, (char *)NULL, char **environ*/)
 /*[[[body:spawnle]]]*/
 {
+	(void)mode;
+	(void)path;
+	(void)args;
 	CRT_UNIMPLEMENTED("spawnle"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -254,6 +284,9 @@ NOTHROW_RPC(VLIBCCALL libc_spawnlp)(int mode,
                                     ... /*, (char *)NULL*/)
 /*[[[body:spawnlp]]]*/
 {
+	(void)mode;
+	(void)file;
+	(void)args;
 	CRT_UNIMPLEMENTED("spawnlp"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -269,6 +302,9 @@ NOTHROW_RPC(VLIBCCALL libc_spawnlpe)(int mode,
                                      ... /*, (char *)NULL, char **environ*/)
 /*[[[body:spawnlpe]]]*/
 {
+	(void)mode;
+	(void)file;
+	(void)args;
 	CRT_UNIMPLEMENTED("spawnlpe"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

@@ -36,6 +36,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.modify.wremove") int
 NOTHROW_NCX(LIBCCALL libc_wremove)(char32_t const *filename)
 /*[[[body:wremove]]]*/
 {
+	(void)filename;
 	CRT_UNIMPLEMENTED("wremove"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -48,6 +49,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.modify.wremove") int
 NOTHROW_NCX(LIBDCALL libd_wremove)(char16_t const *filename)
 /*[[[body:DOS$wremove]]]*/
 {
+	(void)filename;
 	CRT_UNIMPLEMENTED("wremove"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -61,6 +63,8 @@ NOTHROW_NCX(LIBCCALL libc_wfopen)(char32_t const *filename,
                                   char32_t const *mode)
 /*[[[body:wfopen]]]*/
 {
+	(void)filename;
+	(void)mode;
 	CRT_UNIMPLEMENTED("wfopen"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -74,6 +78,8 @@ NOTHROW_NCX(LIBDCALL libd_wfopen)(char16_t const *filename,
                                   char16_t const *mode)
 /*[[[body:DOS$wfopen]]]*/
 {
+	(void)filename;
+	(void)mode;
 	CRT_UNIMPLEMENTED("wfopen"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -88,6 +94,9 @@ NOTHROW_NCX(LIBCCALL libc_wfreopen)(char32_t const *filename,
                                     FILE *stream)
 /*[[[body:wfreopen]]]*/
 {
+	(void)filename;
+	(void)mode;
+	(void)stream;
 	CRT_UNIMPLEMENTED("wfreopen"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -102,6 +111,9 @@ NOTHROW_NCX(LIBDCALL libd_wfreopen)(char16_t const *filename,
                                     FILE *stream)
 /*[[[body:DOS$wfreopen]]]*/
 {
+	(void)filename;
+	(void)mode;
+	(void)stream;
 	CRT_UNIMPLEMENTED("wfreopen"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -115,6 +127,8 @@ NOTHROW_NCX(LIBCCALL libc_wpopen)(char32_t const *command,
                                   char32_t const *mode)
 /*[[[body:wpopen]]]*/
 {
+	(void)command;
+	(void)mode;
 	CRT_UNIMPLEMENTED("wpopen"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -128,6 +142,8 @@ NOTHROW_NCX(LIBDCALL libd_wpopen)(char16_t const *command,
                                   char16_t const *mode)
 /*[[[body:DOS$wpopen]]]*/
 {
+	(void)command;
+	(void)mode;
 	CRT_UNIMPLEMENTED("wpopen"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;

@@ -54,7 +54,7 @@ DECL_BEGIN
 
 #ifdef CONFIG_JSON_GENERATOR_PRINTS_WARNINGS
 #define MESSAGE(...) libjson_output_message(writer, __VA_ARGS__)
-INTERN NONNULL((1, 2)) int CC
+PRIVATE NONNULL((1, 2)) int CC
 libjson_output_message(struct json_writer *__restrict writer,
                        char const *__restrict format, ...) {
 	ssize_t temp;
@@ -90,13 +90,14 @@ err_printer:
 #define GENFLAG_OPTIONAL 0x0001
 
 
-INTERN NONNULL((1, 2, 3, 4)) int CC
+PRIVATE NONNULL((1, 2, 3, 4)) int CC
 libjson_encode_INTO(struct json_writer *__restrict writer,
                     byte_t **__restrict preader,
                     void const *__restrict src_base,
                     void const *__restrict src,
                     uint8_t type, unsigned int gen_flags) {
 	int result;
+	(void)gen_flags;
 	switch (type) {
 
 	case JSON_TYPE_BOOLBIT(0) ... JSON_TYPE_BOOLBIT(7): {
@@ -224,7 +225,7 @@ libjson_encode_ARRAY(struct json_writer *__restrict writer,
  *   - JGEN_BEGINARRAY
  *   - JGEN_INTO
  */
-INTERN NONNULL((1, 2, 3)) int CC
+PRIVATE NONNULL((1, 2, 3)) int CC
 libjson_encode_designator(struct json_writer *__restrict writer,
                           byte_t **__restrict preader,
                           void const *__restrict src,

@@ -31,7 +31,7 @@
 DECL_BEGIN
 
 INTERN NONNULL((1)) size_t KCALL
-ProcFS_ThreadSelf_Printer(struct symlink_node *__restrict self,
+ProcFS_ThreadSelf_Printer(struct symlink_node *__restrict UNUSED(self),
                           USER CHECKED /*utf-8*/ char *buf,
                           size_t bufsize) {
 	upid_t mypid = task_getpid_s();

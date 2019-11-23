@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ed369dd */
+/* HASH CRC-32:0xb34efba */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(iswpunct_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswpunct_l))(__WINT_TYPE__ __wc,
                                                         __locale_t __locale) {
-#line 273 "kos/src/libc/magic/wctype.c"
+#line 279 "kos/src/libc/magic/wctype.c"
 	(void)__locale;
 	__COMPILER_IMPURE();
 	return __localdep_iswpunct(__wc);

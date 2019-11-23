@@ -33,11 +33,12 @@
 DECL_BEGIN
 
 #define DEFAULT_ATA_SECTOR_SIZE     512
+
 #if defined(__INTELLISENSE__) || 0
 #define CONFIG_ATA_DYNAMIC_SECTOR_SIZE 1
-#define ATA_SECTOR_SIZE(drive)     ((drive)->bd_sector_size)
+#define ATA_SECTOR_SIZE(drive) ((drive)->bd_sector_size)
 #else
-#define ATA_SECTOR_SIZE(drive)     512
+#define ATA_SECTOR_SIZE(drive) ((void)(drive), DEFAULT_ATA_SECTOR_SIZE)
 #endif
 
 

@@ -38,6 +38,8 @@ NOTHROW_NCX(LIBCCALL libc_gtty)(fd_t fd,
                                 struct sgttyb *params)
 /*[[[body:gtty]]]*/
 {
+	(void)fd;
+	(void)params;
 	CRT_UNIMPLEMENTED("gtty"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -52,6 +54,8 @@ NOTHROW_NCX(LIBCCALL libc_stty)(fd_t fd,
                                 struct sgttyb const *params)
 /*[[[body:stty]]]*/
 {
+	(void)fd;
+	(void)params;
 	CRT_UNIMPLEMENTED("stty"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

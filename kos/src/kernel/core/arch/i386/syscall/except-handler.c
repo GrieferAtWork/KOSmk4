@@ -369,6 +369,7 @@ x86_userexcept_seterrno(struct icpustate *__restrict state,
                         struct rpc_syscall_info *__restrict sc_info) {
 	errno_t errval;
 	struct exception_data *data;
+	(void)sc_info;
 	data   = error_data();
 	errval = -error_as_errno(data);
 #if 1

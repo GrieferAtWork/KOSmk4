@@ -923,7 +923,7 @@ ansi_OSC(struct ansitty *__restrict self,
 	char *pos;
 	unsigned int code;
 	code = (unsigned int)strtoul(arg, &pos, 10);
-	if (*pos == ';') {
+	if (*pos == ';' && pos + 1 == arg + arglen) {
 		switch (code) {
 
 		case 0: /* Set icon name and window title */
@@ -945,6 +945,9 @@ PRIVATE bool CC
 ansi_DCS(struct ansitty *__restrict self,
          char *__restrict arg, size_t arglen) {
 	/* TODO */
+	(void)self;
+	(void)arg;
+	(void)arglen;
 	return false;
 }
 
@@ -953,6 +956,9 @@ PRIVATE bool CC
 ansi_SOS(struct ansitty *__restrict self,
          char *__restrict arg, size_t arglen) {
 	/* TODO */
+	(void)self;
+	(void)arg;
+	(void)arglen;
 	return false;
 }
 
@@ -961,6 +967,9 @@ PRIVATE bool CC
 ansi_PM(struct ansitty *__restrict self,
         char *__restrict arg, size_t arglen) {
 	/* TODO */
+	(void)self;
+	(void)arg;
+	(void)arglen;
 	return false;
 }
 
@@ -969,6 +978,9 @@ PRIVATE bool CC
 ansi_APC(struct ansitty *__restrict self,
          char *__restrict arg, size_t arglen) {
 	/* TODO */
+	(void)self;
+	(void)arg;
+	(void)arglen;
 	return false;
 }
 

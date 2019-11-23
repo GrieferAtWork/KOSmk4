@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf24f680b */
+/* HASH CRC-32:0xe76efad7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,9 @@
 #ifndef ____localdep_c32execve_defined
 #define ____localdep_c32execve_defined 1
 #if defined(__CRT_HAVE_wexecve) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_c32execve,(__CHAR32_TYPE__ const *__restrict __path, __T32ARGV, __T32ENVP),wexecve,(__path, ___argv, ___envp))
+__CREDIRECT(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_c32execve,(__CHAR32_TYPE__ const *__restrict __path, __T32ARGV, __T32ENVP),wexecve,(__path,___argv,___envp))
 #elif defined(__CRT_HAVE__wexecve) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_c32execve,(__CHAR32_TYPE__ const *__restrict __path, __T32ARGV, __T32ENVP),_wexecve,(__path, ___argv, ___envp))
+__CREDIRECT(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_c32execve,(__CHAR32_TYPE__ const *__restrict __path, __T32ARGV, __T32ENVP),_wexecve,(__path,___argv,___envp))
 #else /* LIBC: c32execve */
 #undef ____localdep_c32execve_defined
 #endif /* c32execve... */

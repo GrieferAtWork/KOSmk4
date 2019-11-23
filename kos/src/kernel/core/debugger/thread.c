@@ -155,6 +155,9 @@ DEFINE_DEBUG_FUNCTION(
 		"\tList all threads running on the system\n",
 		argc, argv) {
 	cpuid_t cpuid;
+	if (argc != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
 	dbg_printf("ID       pid\tstate\tcpu\tpc\tsp\tname\n");
 	for (cpuid = 0; cpuid < cpu_count; ++cpuid) {
 		struct task *iter;

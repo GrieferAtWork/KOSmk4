@@ -178,6 +178,10 @@ vm_forcefault(struct vm *__restrict effective_vm,
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
 
 	kernel_panic("TODO");
+	(void)effective_vm;
+	(void)minpage;
+	(void)maxpage;
+	(void)for_writing;
 
 	return 0;
 }

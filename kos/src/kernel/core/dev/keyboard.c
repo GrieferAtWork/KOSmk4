@@ -958,6 +958,7 @@ keyboard_device_ioctl(struct character_device *__restrict self,
                       syscall_ulong_t cmd, USER UNCHECKED void *arg,
                       iomode_t mode) THROWS(...) {
 	struct keyboard_device *me;
+	(void)mode;
 	me = (struct keyboard_device *)self;
 	switch (cmd) {
 

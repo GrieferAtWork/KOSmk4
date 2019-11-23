@@ -51,6 +51,8 @@ INTERN size_t KCALL
 handle_blockdevice_pread(struct basic_block_device *__restrict self,
                          USER CHECKED void *dst, size_t num_bytes,
                          pos_t addr, iomode_t mode) {
+	/* TODO: IO_NONBLOCK */
+	(void)mode;
 	block_device_read(self,
 	                  dst,
 	                  num_bytes,
@@ -62,6 +64,8 @@ INTERN size_t KCALL
 handle_blockdevice_pwrite(struct basic_block_device *__restrict self,
                           USER CHECKED void const *src, size_t num_bytes,
                           pos_t addr, iomode_t mode) {
+	/* TODO: IO_NONBLOCK */
+	(void)mode;
 	block_device_write(self,
 	                   src,
 	                   num_bytes,
@@ -73,6 +77,8 @@ INTERN size_t KCALL
 handle_blockdevice_preadv(struct basic_block_device *__restrict self,
                           struct aio_buffer *__restrict dst, size_t num_bytes,
                           pos_t addr, iomode_t mode) {
+	/* TODO: IO_NONBLOCK */
+	(void)mode;
 	block_device_readv(self,
 	                   dst,
 	                   num_bytes,
@@ -84,6 +90,8 @@ INTERN size_t KCALL
 handle_blockdevice_pwritev(struct basic_block_device *__restrict self,
                            struct aio_buffer *__restrict src, size_t num_bytes,
                            pos_t addr, iomode_t mode) {
+	/* TODO: IO_NONBLOCK */
+	(void)mode;
 	block_device_writev(self,
 	                    src,
 	                    num_bytes,
@@ -96,6 +104,8 @@ handle_blockdevice_apread(struct basic_block_device *__restrict self,
                           USER CHECKED void *dst, size_t num_bytes,
                           pos_t addr, iomode_t mode,
                           struct aio_multihandle *__restrict aio) {
+	/* TODO: IO_NONBLOCK */
+	(void)mode;
 	block_device_aread(self,
 	                   dst,
 	                   num_bytes,
@@ -109,6 +119,8 @@ handle_blockdevice_apwrite(struct basic_block_device *__restrict self,
                            USER CHECKED void const *src, size_t num_bytes,
                            pos_t addr, iomode_t mode,
                            struct aio_multihandle *__restrict aio) {
+	/* TODO: IO_NONBLOCK */
+	(void)mode;
 	block_device_awrite(self,
 	                    src,
 	                    num_bytes,
@@ -122,6 +134,8 @@ handle_blockdevice_apreadv(struct basic_block_device *__restrict self,
                            struct aio_buffer *__restrict dst, size_t num_bytes,
                            pos_t addr, iomode_t mode,
                            struct aio_multihandle *__restrict aio) {
+	/* TODO: IO_NONBLOCK */
+	(void)mode;
 	block_device_areadv(self,
 	                    dst,
 	                    num_bytes,
@@ -135,6 +149,8 @@ handle_blockdevice_apwritev(struct basic_block_device *__restrict self,
                             struct aio_buffer *__restrict src, size_t num_bytes,
                             pos_t addr, iomode_t mode,
                             struct aio_multihandle *__restrict aio) {
+	/* TODO: IO_NONBLOCK */
+	(void)mode;
 	block_device_awritev(self,
 	                     src,
 	                     num_bytes,
@@ -190,6 +206,8 @@ block_device_get_sector_size(struct basic_block_device *__restrict self) {
 LOCAL NONNULL((1)) void KCALL
 block_device_set_sector_size(struct basic_block_device *__restrict self, size_t value) {
 	/* XXX: Throw some kind of error when `value != self->bd_sector_size' */
+	(void)self;
+	(void)value;
 }
 
 

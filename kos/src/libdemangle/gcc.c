@@ -1064,6 +1064,8 @@ PRIVATE char const *CC
 itanium_demangle_prefix(struct itanium_printer *self,
                         char const *__restrict text) {
 	/* TODO */
+	(void)self;
+	(void)text;
 	return NULL;
 }
 
@@ -1071,6 +1073,8 @@ PRIVATE char const *CC
 itanium_demangle_template_prefix(struct itanium_printer *self,
                                  char const *__restrict text) {
 	/* TODO */
+	(void)self;
+	(void)text;
 	return NULL;
 }
 
@@ -1078,6 +1082,8 @@ PRIVATE char const *CC
 itanium_demangle_expression(struct itanium_printer *self,
                             char const *__restrict text) {
 	/* TODO */
+	(void)self;
+	(void)text;
 	return NULL;
 }
 
@@ -1085,6 +1091,8 @@ PRIVATE char const *CC
 itanium_demangle_expr_primary(struct itanium_printer *self,
                               char const *__restrict text) {
 	/* TODO */
+	(void)self;
+	(void)text;
 	return NULL;
 }
 

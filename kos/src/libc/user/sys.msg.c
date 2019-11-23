@@ -38,6 +38,9 @@ NOTHROW_NCX(LIBCCALL libc_msgctl)(int msqid,
                                   struct msqid_ds *buf)
 /*[[[body:msgctl]]]*/
 {
+	(void)msqid;
+	(void)cmd;
+	(void)buf;
 	CRT_UNIMPLEMENTED("msgctl"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -51,6 +54,8 @@ NOTHROW_NCX(LIBCCALL libc_msgget)(key_t key,
                                   int msgflg)
 /*[[[body:msgget]]]*/
 {
+	(void)key;
+	(void)msgflg;
 	CRT_UNIMPLEMENTED("msgget"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -67,6 +72,11 @@ NOTHROW_RPC(LIBCCALL libc_msgrcv)(int msqid,
                                   int msgflg)
 /*[[[body:msgrcv]]]*/
 {
+	(void)msqid;
+	(void)msgp;
+	(void)msgsz;
+	(void)msgtyp;
+	(void)msgflg;
 	CRT_UNIMPLEMENTED("msgrcv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -82,6 +92,10 @@ NOTHROW_RPC(LIBCCALL libc_msgsnd)(int msqid,
                                   int msgflg)
 /*[[[body:msgsnd]]]*/
 {
+	(void)msqid;
+	(void)msgp;
+	(void)msgsz;
+	(void)msgflg;
 	CRT_UNIMPLEMENTED("msgsnd"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

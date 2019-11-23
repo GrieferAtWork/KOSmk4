@@ -164,6 +164,7 @@ iswxdigit:(wint_t wc) -> int {
 [std][std_guard][ATTR_WUNUSED][ATTR_NONNULL((1))][ATTR_PURE]
 wctrans:(char const *prop) -> wctrans_t {
 	/* TODO */
+	(void)prop;
 	COMPILER_IMPURE();
 	return 0;
 }
@@ -171,6 +172,8 @@ wctrans:(char const *prop) -> wctrans_t {
 [std][std_guard][ATTR_WUNUSED][export_alias(__towctrans)][ATTR_CONST]
 towctrans:(wint_t wc, wctrans_t desc) -> wint_t {
 	/* TODO */
+	(void)wc;
+	(void)desc;
 	return 0;
 }
 %(std)#endif /* __USE_ISOC99 */
@@ -178,6 +181,7 @@ towctrans:(wint_t wc, wctrans_t desc) -> wint_t {
 [std][ATTR_WUNUSED][ATTR_NONNULL((1))][ATTR_PURE]
 wctype:(char const *prop) -> wctype_t {
 	/* TODO */
+	(void)prop;
 	COMPILER_IMPURE();
 	return 0;
 }
@@ -185,6 +189,8 @@ wctype:(char const *prop) -> wctype_t {
 [std][ATTR_WUNUSED][alias(is_wctype)][export_alias(__iswctype)][ATTR_CONST]
 iswctype:(wint_t wc, wctype_t desc) -> int {
 	/* TODO */
+	(void)wc;
+	(void)desc;
 	return 0;
 }
 

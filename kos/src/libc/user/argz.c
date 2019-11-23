@@ -441,6 +441,8 @@ NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz,
 			/* Simple case: The replacement string has the same length as the find-string */
 			pos = (char *)mempcpy(pos, with, repllen * sizeof(char));
 		}
+		if (replace_count)
+			++*replace_count;
 	}
 	return 0;
 }

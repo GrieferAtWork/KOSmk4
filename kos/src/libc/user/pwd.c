@@ -36,6 +36,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.pwd.getpwuid") struct passwd *
 NOTHROW_RPC(LIBCCALL libc_getpwuid)(uid_t uid)
 /*[[[body:getpwuid]]]*/
 {
+	(void)uid;
 	CRT_UNIMPLEMENTED("getpwuid"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -49,6 +50,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.database.pwd.getpwnam") struct passwd *
 NOTHROW_RPC(LIBCCALL libc_getpwnam)(const char *name)
 /*[[[body:getpwnam]]]*/
 {
+	(void)name;
 	CRT_UNIMPLEMENTED("getpwnam"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -96,6 +98,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.database.pwd.fgetpwent") struct passwd *
 NOTHROW_RPC(LIBCCALL libc_fgetpwent)(FILE *__restrict stream)
 /*[[[body:fgetpwent]]]*/
 {
+	(void)stream;
 	CRT_UNIMPLEMENTED("fgetpwent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -109,6 +112,8 @@ NOTHROW_RPC(LIBCCALL libc_putpwent)(struct passwd const *__restrict p,
                                     FILE *__restrict f)
 /*[[[body:putpwent]]]*/
 {
+	(void)p;
+	(void)f;
 	CRT_UNIMPLEMENTED("putpwent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -126,6 +131,11 @@ NOTHROW_RPC(LIBCCALL libc_getpwuid_r)(__uid_t __uid,
                                       struct passwd **__restrict result)
 /*[[[body:getpwuid_r]]]*/
 {
+	(void)__uid;
+	(void)resultbuf;
+	(void)buffer;
+	(void)buflen;
+	(void)result;
 	CRT_UNIMPLEMENTED("getpwuid_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -143,6 +153,11 @@ NOTHROW_RPC(LIBCCALL libc_getpwnam_r)(const char *__restrict name,
                                       struct passwd **__restrict result)
 /*[[[body:getpwnam_r]]]*/
 {
+	(void)name;
+	(void)resultbuf;
+	(void)buffer;
+	(void)buflen;
+	(void)result;
 	CRT_UNIMPLEMENTED("getpwnam_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -159,6 +174,10 @@ NOTHROW_RPC(LIBCCALL libc_getpwent_r)(struct passwd *__restrict resultbuf,
                                       struct passwd **__restrict result)
 /*[[[body:getpwent_r]]]*/
 {
+	(void)resultbuf;
+	(void)buffer;
+	(void)buflen;
+	(void)result;
 	CRT_UNIMPLEMENTED("getpwent_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -176,6 +195,11 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwent_r)(FILE *__restrict stream,
                                        struct passwd **__restrict result)
 /*[[[body:fgetpwent_r]]]*/
 {
+	(void)stream;
+	(void)resultbuf;
+	(void)buffer;
+	(void)buflen;
+	(void)result;
 	CRT_UNIMPLEMENTED("fgetpwent_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -191,6 +215,8 @@ NOTHROW_RPC(LIBCCALL libc_getpw)(__uid_t uid,
                                  char *buffer)
 /*[[[body:getpw]]]*/
 {
+	(void)uid;
+	(void)buffer;
 	CRT_UNIMPLEMENTED("getpw"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

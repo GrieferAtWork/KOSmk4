@@ -36,6 +36,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.feclearexcept") int
 NOTHROW(LIBCCALL libc_feclearexcept)(int excepts)
 /*[[[body:feclearexcept]]]*/
 {
+	(void)excepts;
 	CRT_UNIMPLEMENTED("feclearexcept"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -50,6 +51,8 @@ NOTHROW_NCX(LIBCCALL libc_fegetexceptflag)(fexcept_t *flagp,
                                            int excepts)
 /*[[[body:fegetexceptflag]]]*/
 {
+	(void)flagp;
+	(void)excepts;
 	CRT_UNIMPLEMENTED("fegetexceptflag"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -62,6 +65,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.feraiseexcept") int
 NOTHROW(LIBCCALL libc_feraiseexcept)(int excepts)
 /*[[[body:feraiseexcept]]]*/
 {
+	(void)excepts;
 	CRT_UNIMPLEMENTED("feraiseexcept"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -76,6 +80,8 @@ NOTHROW_NCX(LIBCCALL libc_fesetexceptflag)(fexcept_t const *flagp,
                                            int excepts)
 /*[[[body:fesetexceptflag]]]*/
 {
+	(void)flagp;
+	(void)excepts;
 	CRT_UNIMPLEMENTED("fesetexceptflag"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -89,6 +95,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.fetestexcept") int
 NOTHROW(LIBCCALL libc_fetestexcept)(int excepts)
 /*[[[body:fetestexcept]]]*/
 {
+	(void)excepts;
 	CRT_UNIMPLEMENTED("fetestexcept"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -114,6 +121,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.fesetround") int
 NOTHROW(LIBCCALL libc_fesetround)(int rounding_direction)
 /*[[[body:fesetround]]]*/
 {
+	(void)rounding_direction;
 	CRT_UNIMPLEMENTED("fesetround"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -126,6 +134,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.fegetenv") int
 NOTHROW_NCX(LIBCCALL libc_fegetenv)(fenv_t *envp)
 /*[[[body:fegetenv]]]*/
 {
+	(void)envp;
 	CRT_UNIMPLEMENTED("fegetenv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -139,6 +148,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.feholdexcept") int
 NOTHROW_NCX(LIBCCALL libc_feholdexcept)(fenv_t *envp)
 /*[[[body:feholdexcept]]]*/
 {
+	(void)envp;
 	CRT_UNIMPLEMENTED("feholdexcept"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -151,6 +161,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.fesetenv") int
 NOTHROW_NCX(LIBCCALL libc_fesetenv)(fenv_t const *envp)
 /*[[[body:fesetenv]]]*/
 {
+	(void)envp;
 	CRT_UNIMPLEMENTED("fesetenv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -165,6 +176,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.feupdateenv") int
 NOTHROW_NCX(LIBCCALL libc_feupdateenv)(fenv_t const *envp)
 /*[[[body:feupdateenv]]]*/
 {
+	(void)envp;
 	CRT_UNIMPLEMENTED("feupdateenv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -179,6 +191,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.feenableexcept") int
 NOTHROW(LIBCCALL libc_feenableexcept)(int excepts)
 /*[[[body:feenableexcept]]]*/
 {
+	(void)excepts;
 	CRT_UNIMPLEMENTED("feenableexcept"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -193,6 +206,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.fedisableexcept") int
 NOTHROW(LIBCCALL libc_fedisableexcept)(int excepts)
 /*[[[body:fedisableexcept]]]*/
 {
+	(void)excepts;
 	CRT_UNIMPLEMENTED("fedisableexcept"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

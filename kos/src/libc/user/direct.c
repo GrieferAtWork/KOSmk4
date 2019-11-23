@@ -109,6 +109,8 @@ NOTHROW_RPC(LIBCCALL libc__getdiskfree)(unsigned int drive,
                                         struct _diskfree_t *diskfree)
 /*[[[body:_getdiskfree]]]*/
 {
+	(void)drive;
+	(void)diskfree;
 	CRT_UNIMPLEMENTED("_getdiskfree"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;

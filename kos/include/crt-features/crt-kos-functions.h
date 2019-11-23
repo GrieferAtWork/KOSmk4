@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61ea11f */
+/* HASH CRC-32:0xd3b8881b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1766,7 +1766,7 @@ __CRT_FUNCTION(qsort_r,0,(),5,(void *,pbase,size_t,item_count,size_t,item_size,_
 __CRT_FUNCTION(qsort_s,0,(),5,(void *,base,size_t,nmemb,size_t,size,__dos_compar_d_fn_t,compar,void *,arg),void)
 __CRT_FUNCTION(quick_exit,0,(),1,(int,status),void)
 __CRT_FUNCTION(rand,0,(),0,(),int)
-__CRT_FUNCTION(rand_r,0,(),1,(unsigned int *__restrict,seed),int)
+__CRT_FUNCTION(rand_r,0,(),1,(unsigned int *__restrict,pseed),int)
 __CRT_FUNCTION(random,0,(),0,(),long)
 __CRT_FUNCTION(random_r,0,(),2,(struct random_data *__restrict,buf,int32_t *__restrict,result),int)
 __CRT_FUNCTION(rawmemchr,0,(),2,(void const *__restrict,haystack,int,needle),void *)

@@ -72,6 +72,8 @@ NOTHROW_RPC(LIBCCALL libc_thrd_sleep)(struct timespec const *time_point,
                                       struct timespec *remaining)
 /*[[[body:thrd_sleep]]]*/
 {
+	(void)time_point;
+	(void)remaining;
 	CRT_UNIMPLEMENTED("thrd_sleep"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -94,6 +96,8 @@ NOTHROW_RPC(LIBCCALL libc_thrd_sleep64)(struct timespec64 const *time_point,
                                         struct timespec64 *remaining)
 /*[[[body:thrd_sleep64]]]*/
 {
+	(void)time_point;
+	(void)remaining;
 	CRT_UNIMPLEMENTED("thrd_sleep64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

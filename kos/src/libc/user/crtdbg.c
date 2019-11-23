@@ -93,6 +93,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtSetReportHook
 NOTHROW_NCX(LIBCCALL libc__CrtSetReportHook)(_CRT_REPORT_HOOK pfn_new_hook)
 /*[[[body:_CrtSetReportHook]]]*/
 {
+	(void)pfn_new_hook;
 	CRT_UNIMPLEMENTED("_CrtSetReportHook"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -105,6 +106,8 @@ NOTHROW_NCX(LIBCCALL libc__CrtSetReportHook2)(int mode,
                                               _CRT_REPORT_HOOK pfn_new_hook)
 /*[[[body:_CrtSetReportHook2]]]*/
 {
+	(void)mode;
+	(void)pfn_new_hook;
 	CRT_UNIMPLEMENTED("_CrtSetReportHook2"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -117,6 +120,8 @@ NOTHROW_NCX(LIBCCALL libc__CrtSetReportHookW2)(int mode,
                                                _CRT_REPORT_HOOKW pfn_new_hook)
 /*[[[body:_CrtSetReportHookW2]]]*/
 {
+	(void)mode;
+	(void)pfn_new_hook;
 	CRT_UNIMPLEMENTED("_CrtSetReportHookW2"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -139,6 +144,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtSetAllocHook"
 NOTHROW_NCX(LIBCCALL libc__CrtSetAllocHook)(_CRT_ALLOC_HOOK pfn_new_hook)
 /*[[[body:_CrtSetAllocHook]]]*/
 {
+	(void)pfn_new_hook;
 	CRT_UNIMPLEMENTED("_CrtSetAllocHook"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -161,6 +167,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtSetDumpClient
 NOTHROW_NCX(LIBCCALL libc__CrtSetDumpClient)(_CRT_DUMP_CLIENT pfn_new_dump)
 /*[[[body:_CrtSetDumpClient]]]*/
 {
+	(void)pfn_new_dump;
 	CRT_UNIMPLEMENTED("_CrtSetDumpClient"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -173,6 +180,8 @@ NOTHROW_NCX(LIBCCALL libc__CrtSetReportMode)(int report_type,
                                              int report_mode)
 /*[[[body:_CrtSetReportMode]]]*/
 {
+	(void)report_type;
+	(void)report_mode;
 	CRT_UNIMPLEMENTED("_CrtSetReportMode"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -185,6 +194,8 @@ NOTHROW_NCX(LIBCCALL libc__CrtSetReportFile)(int report_type,
                                              _HFILE report_file)
 /*[[[body:_CrtSetReportFile]]]*/
 {
+	(void)report_type;
+	(void)report_file;
 	CRT_UNIMPLEMENTED("_CrtSetReportFile"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -201,6 +212,11 @@ NOTHROW_NCX(VLIBCCALL libc__CrtDbgReport)(int report_type,
                                           ...)
 /*[[[body:_CrtDbgReport]]]*/
 {
+	(void)report_type;
+	(void)filename;
+	(void)line;
+	(void)module_name;
+	(void)format;
 	CRT_UNIMPLEMENTED("_CrtDbgReport"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -212,6 +228,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtSetDebugFillT
 NOTHROW_NCX(LIBCCALL libc__CrtSetDebugFillThreshold)(size_t new_debug_fill_threshold)
 /*[[[body:_CrtSetDebugFillThreshold]]]*/
 {
+	(void)new_debug_fill_threshold;
 	CRT_UNIMPLEMENTED("_CrtSetDebugFillThreshold"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -228,6 +245,11 @@ NOTHROW_NCX(VLIBCCALL libc__CrtDbgReportW)(int report_type,
                                            ...)
 /*[[[body:_CrtDbgReportW]]]*/
 {
+	(void)report_type;
+	(void)filename;
+	(void)line;
+	(void)module_name;
+	(void)format;
 	CRT_UNIMPLEMENTED("_CrtDbgReportW"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -249,6 +271,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtSetBreakAlloc
 NOTHROW_NCX(LIBCCALL libc__CrtSetBreakAlloc)(__LONG32_TYPE__ break_alloc)
 /*[[[body:_CrtSetBreakAlloc]]]*/
 {
+	(void)break_alloc;
 	CRT_UNIMPLEMENTED("_CrtSetBreakAlloc"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;

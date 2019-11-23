@@ -266,7 +266,7 @@ PRIVATE NONNULL((1, 5)) void KCALL
 ProcFS_PerProc_RegularRw_Write(struct inode *__restrict self,
                                USER CHECKED void const *src,
                                size_t num_bytes, pos_t file_position,
-                               struct aio_multihandle *__restrict aio)
+                               struct aio_multihandle *__restrict UNUSED(aio))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
 		       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY,

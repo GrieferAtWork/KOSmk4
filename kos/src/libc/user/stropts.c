@@ -36,6 +36,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.stropts.isastream") int
 NOTHROW(LIBCCALL libc_isastream)(fd_t fildes)
 /*[[[body:isastream]]]*/
 {
+	(void)fildes;
 	CRT_UNIMPLEMENTED("isastream"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -51,6 +52,10 @@ NOTHROW_RPC(LIBCCALL libc_getmsg)(fd_t fildes,
                                   int *__restrict flagsp)
 /*[[[body:getmsg]]]*/
 {
+	(void)fildes;
+	(void)ctlptr;
+	(void)dataptr;
+	(void)flagsp;
 	CRT_UNIMPLEMENTED("getmsg"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -67,6 +72,11 @@ NOTHROW_RPC(LIBCCALL libc_getpmsg)(fd_t fildes,
                                    int *__restrict flagsp)
 /*[[[body:getpmsg]]]*/
 {
+	(void)fildes;
+	(void)ctlptr;
+	(void)dataptr;
+	(void)bandp;
+	(void)flagsp;
 	CRT_UNIMPLEMENTED("getpmsg"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -82,6 +92,10 @@ NOTHROW_RPC(LIBCCALL libc_putmsg)(fd_t fildes,
                                   int flags)
 /*[[[body:putmsg]]]*/
 {
+	(void)fildes;
+	(void)ctlptr;
+	(void)dataptr;
+	(void)flags;
 	CRT_UNIMPLEMENTED("putmsg"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -98,6 +112,11 @@ NOTHROW_RPC(LIBCCALL libc_putpmsg)(fd_t fildes,
                                    int flags)
 /*[[[body:putpmsg]]]*/
 {
+	(void)fildes;
+	(void)ctlptr;
+	(void)dataptr;
+	(void)band;
+	(void)flags;
 	CRT_UNIMPLEMENTED("putpmsg"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -112,6 +131,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_fattach)(fd_t fildes,
                                        char const *__restrict path)
 /*[[[body:fattach]]]*/
 {
+	(void)fildes;
+	(void)path;
 	CRT_UNIMPLEMENTED("fattach"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -125,6 +146,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.io.stropts.fdetach") int
 NOTHROW_RPC_KOS(LIBCCALL libc_fdetach)(char const *__restrict path)
 /*[[[body:fdetach]]]*/
 {
+	(void)path;
 	CRT_UNIMPLEMENTED("fdetach"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

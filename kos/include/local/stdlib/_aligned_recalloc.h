@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd20b31da */
+/* HASH CRC-32:0x13f190a0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -104,7 +104,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_recalloc))(void *__mptr,
                                                                __SIZE_TYPE__ __count,
                                                                __SIZE_TYPE__ __num_bytes,
                                                                __SIZE_TYPE__ __min_alignment) {
-#line 2583 "kos/src/libc/magic/stdlib.c"
+#line 2612 "kos/src/libc/magic/stdlib.c"
 	void *__result;
 	__num_bytes *= __count;
 	__result = __localdep__aligned_malloc(__num_bytes, __min_alignment);

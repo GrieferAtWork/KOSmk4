@@ -40,11 +40,13 @@ cred_require_mount(void) THROWS(E_INSUFFICIENT_RIGHTS) {
 
 PUBLIC void KCALL
 cred_require_vmread(struct vm *__restrict target_vm) THROWS(E_INSUFFICIENT_RIGHTS) {
+	(void)target_vm;
 	/* TODO */
 }
 
 PUBLIC void KCALL
 cred_require_vmwrite(struct vm *__restrict target_vm) THROWS(E_INSUFFICIENT_RIGHTS) {
+	(void)target_vm;
 	/* TODO */
 }
 

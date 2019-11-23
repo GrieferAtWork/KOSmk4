@@ -2346,7 +2346,7 @@ again_enum_name:
 					nosys_errno = none;
 					break;
 				case "argument_names":
-					argument_names = Tuple(get_tag_operand().split(","));
+					argument_names = Tuple(get_tag_operand().split(",").each.strip());
 					break;
 				case "doc":
 					if (doc)
@@ -4633,6 +4633,14 @@ do_return_crt:
 		if (name !in unimplemented_functions)
 			unimplemented_functions.insert(name);
 		fp << "{\n";
+		for (local i = 0; i < #args; ++i) {
+			local nm = args[i][1];
+			if (!nm && argument_names !is none && i < #argument_names)
+				nm = argument_names[i];
+			if (!nm)
+				continue;
+			fp << "\t(void)" << nm << ";\n";
+		}
 		fp << "\tCRT_UNIMPLEMENTED(" << repr(name) << "); /* TO"  "DO */\n";
 		if (nosys_errno !is none)
 			fp << "\tlibc_seterrno(" << nosys_errno << ");\n";
@@ -7128,6 +7136,19 @@ continue_strip_body:
 		if (newbody.startswith("/* TODO */")) {
 			body = newbody[#"/* TODO */":];
 			continue;
+		}
+		if (newbody.startswith("(void)")) {
+			local semi = newbody.find(";", 6);
+			if (semi >= 0) {
+				local word = newbody[6:semi].strip();
+				if (word.startswith("&"))
+					word = word[1:].lstrip();
+				if (word.issymbol()) {
+					/* Unused-argument-suppression */
+					body = newbody[semi+1:];
+					goto continue_strip_body;
+				}
+			}
 		}
 		for (local f: ignored_function_calls) {
 			if (newbody.startswith(f + "(")) {

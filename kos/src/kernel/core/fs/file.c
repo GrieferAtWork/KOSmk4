@@ -77,7 +77,7 @@ INTERN size_t KCALL
 handle_file_read(struct file *__restrict self,
                  USER CHECKED void *dst,
                  size_t num_bytes,
-                 iomode_t mode) {
+                 iomode_t UNUSED(mode)) {
 	pos_t old_pos;
 	size_t result;
 	TRY {
@@ -117,8 +117,8 @@ handle_file_write(struct file *__restrict self,
 INTERN size_t KCALL
 handle_file_pread(struct file *__restrict self,
                   USER CHECKED void *dst,
-                  size_t num_bytes,
-                  pos_t addr, iomode_t mode) {
+                  size_t num_bytes, pos_t addr,
+                  iomode_t UNUSED(mode)) {
 	size_t result;
 	TRY {
 #ifndef CONFIG_BLOCKING_REGULAR_FILE_READ
@@ -150,7 +150,7 @@ INTERN size_t KCALL
 handle_file_readv(struct file *__restrict self,
                   struct aio_buffer *__restrict dst,
                   size_t num_bytes,
-                  iomode_t mode) {
+                  iomode_t UNUSED(mode)) {
 	pos_t old_pos;
 	size_t result;
 	TRY {
@@ -190,8 +190,8 @@ handle_file_writev(struct file *__restrict self,
 INTERN size_t KCALL
 handle_file_preadv(struct file *__restrict self,
                    struct aio_buffer *__restrict dst,
-                   size_t num_bytes,
-                   pos_t addr, iomode_t mode) {
+                   size_t num_bytes, pos_t addr,
+                   iomode_t UNUSED(mode)) {
 	size_t result;
 	TRY {
 #ifndef CONFIG_BLOCKING_REGULAR_FILE_READ
@@ -292,8 +292,7 @@ handle_file_apwrite(struct file *__restrict self,
 INTERN size_t KCALL
 handle_file_areadv(struct file *__restrict self,
                    struct aio_buffer *__restrict dst,
-                   size_t num_bytes,
-                   iomode_t mode,
+                   size_t num_bytes, iomode_t UNUSED(mode),
                    struct aio_multihandle *__restrict aio) {
 	pos_t old_pos;
 	size_t result;
@@ -453,7 +452,7 @@ handle_file_readdir(struct file *__restrict self,
                     USER CHECKED struct dirent *buf,
                     size_t bufsize,
                     readdir_mode_t readdir_mode,
-                    iomode_t mode) {
+                    iomode_t UNUSED(mode)) {
 	struct directory_entry *entry, *orig_entry;
 	size_t result;
 	pos_t dirpos, req_index, entry_pos;
@@ -464,7 +463,7 @@ again:
 	for (;;) {
 		dirpos = ATOMIC_READ(self->f_offset);
 		if (dirpos < (pos_t)2) {
-			if (mode & READDIR_SKIPREL) {
+			if (readdir_mode & READDIR_SKIPREL) {
 				/* Skip special entries. */
 				ATOMIC_CMPXCH_WEAK(self->f_offset, dirpos, 2);
 				continue;
@@ -512,18 +511,18 @@ again:
 				bufsize -= offsetof(struct dirent, d_name);
 				if (bufsize >= (size_t)(namelen + 1))
 					bufsize = (size_t)(namelen + 1);
-				else if ((mode & READDIR_MODEMASK) == READDIR_DEFAULT) {
+				else if ((readdir_mode & READDIR_MODEMASK) == READDIR_DEFAULT) {
 					req_index = dirpos;
 				}
 				/* Copy the name to user-space.
 				 * CAUTION: E_SEGFAULT */
 				memcpy(buf->d_name, name, bufsize * sizeof(char));
 				COMPILER_WRITE_BARRIER();
-				if ((mode & READDIR_MODEMASK) == READDIR_PEEK)
+				if ((readdir_mode & READDIR_MODEMASK) == READDIR_PEEK)
 					req_index = dirpos;
 				COMPILER_WRITE_BARRIER();
 			} else {
-				if ((mode & READDIR_MODEMASK) != READDIR_CONTINUE)
+				if ((readdir_mode & READDIR_MODEMASK) != READDIR_CONTINUE)
 					req_index = dirpos;
 			}
 			if (!ATOMIC_CMPXCH_WEAK(self->f_offset, dirpos, dirpos + 1))
@@ -657,7 +656,7 @@ got_next_entry:
 				bufsize -= offsetof(struct dirent, d_name);
 				if (bufsize >= (size_t)(entry->de_namelen + 1))
 					bufsize = (size_t)(entry->de_namelen + 1);
-				else if ((mode & READDIR_MODEMASK) == READDIR_DEFAULT) {
+				else if ((readdir_mode & READDIR_MODEMASK) == READDIR_DEFAULT) {
 					req_index = dirpos;
 				}
 				/* Copy the entry name to user-space.
@@ -665,10 +664,10 @@ got_next_entry:
 				memcpy(buf->d_name, entry->de_name,
 				       bufsize * sizeof(char));
 				COMPILER_WRITE_BARRIER();
-				if ((mode & READDIR_MODEMASK) == READDIR_PEEK)
+				if ((readdir_mode & READDIR_MODEMASK) == READDIR_PEEK)
 					req_index = dirpos;
 			} else {
-				if ((mode & READDIR_MODEMASK) != READDIR_CONTINUE)
+				if ((readdir_mode & READDIR_MODEMASK) != READDIR_CONTINUE)
 					req_index = dirpos;
 			}
 		} EXCEPT {
@@ -909,7 +908,7 @@ handle_oneshot_directory_file_readdir(struct oneshot_directory_file *__restrict 
                                       USER CHECKED struct dirent *buf,
                                       size_t bufsize,
                                       readdir_mode_t readdir_mode,
-                                      iomode_t mode) {
+                                      iomode_t UNUSED(mode)) {
 	struct oneshot_directory_buffer *old_buffer, *buffer;
 	struct dirent *old_entry, *entry;
 	size_t result;
@@ -919,7 +918,7 @@ again:
 	for (;;) {
 		dirpos = ATOMIC_READ(self->d_offset);
 		if (dirpos < (pos_t)2) {
-			if (mode & READDIR_SKIPREL) {
+			if (readdir_mode & READDIR_SKIPREL) {
 				/* Skip special entries. */
 				ATOMIC_CMPXCH_WEAK(self->d_offset, dirpos, 2);
 				continue;
@@ -965,18 +964,18 @@ again:
 				bufsize -= offsetof(struct dirent, d_name);
 				if (bufsize >= (size_t)(namelen + 1))
 					bufsize = (size_t)(namelen + 1);
-				else if ((mode & READDIR_MODEMASK) == READDIR_DEFAULT) {
+				else if ((readdir_mode & READDIR_MODEMASK) == READDIR_DEFAULT) {
 					req_index = dirpos;
 				}
 				/* Copy the name to user-space.
 				 * CAUTION: E_SEGFAULT */
 				memcpy(buf->d_name, name, bufsize * sizeof(char));
 				COMPILER_WRITE_BARRIER();
-				if ((mode & READDIR_MODEMASK) == READDIR_PEEK)
+				if ((readdir_mode & READDIR_MODEMASK) == READDIR_PEEK)
 					req_index = dirpos;
 				COMPILER_WRITE_BARRIER();
 			} else {
-				if ((mode & READDIR_MODEMASK) != READDIR_CONTINUE)
+				if ((readdir_mode & READDIR_MODEMASK) != READDIR_CONTINUE)
 					req_index = dirpos;
 			}
 			if (!ATOMIC_CMPXCH_WEAK(self->d_offset, dirpos, dirpos + 1))
@@ -1060,11 +1059,11 @@ read_entry_pos_0:
 		result    = (offsetof(struct dirent, d_name) + (entry->d_namlen + 1) * sizeof(char));
 		if (bufsize >= result) {
 			memcpy(buf, entry, result);
-			if ((mode & READDIR_MODEMASK) == READDIR_PEEK)
+			if ((readdir_mode & READDIR_MODEMASK) == READDIR_PEEK)
 				req_index = dirpos;
 		} else {
 			memcpy(buf, entry, bufsize);
-			if ((mode & READDIR_MODEMASK) != READDIR_CONTINUE)
+			if ((readdir_mode & READDIR_MODEMASK) != READDIR_CONTINUE)
 				req_index = dirpos;
 		}
 		/* Save the new stream position.

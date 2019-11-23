@@ -73,7 +73,7 @@ NOTHROW(KCALL aio_multihandle_generic_func_)(struct aio_multihandle_generic *__r
 		ASMNAME("aio_multihandle_generic_func");
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL aio_multihandle_generic_func_)(struct aio_multihandle_generic *__restrict self,
-                                             unsigned int status) {
+                                             unsigned int UNUSED(status)) {
 	sig_broadcast(&self->mg_signal);
 }
 

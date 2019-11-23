@@ -36,6 +36,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.ether.ether_ntoa") char *
 NOTHROW_RPC_KOS(LIBCCALL libc_ether_ntoa)(struct ether_addr const *addr)
 /*[[[body:ether_ntoa]]]*/
 {
+	(void)addr;
 	CRT_UNIMPLEMENTED("ether_ntoa"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -49,6 +50,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_ether_ntoa_r)(struct ether_addr const *addr,
                                             char *buf)
 /*[[[body:ether_ntoa_r]]]*/
 {
+	(void)addr;
+	(void)buf;
 	CRT_UNIMPLEMENTED("ether_ntoa_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -61,6 +64,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.ether.ether_aton") struct ether_add
 NOTHROW_RPC_KOS(LIBCCALL libc_ether_aton)(char const *asc)
 /*[[[body:ether_aton]]]*/
 {
+	(void)asc;
 	CRT_UNIMPLEMENTED("ether_aton"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -74,6 +78,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_ether_aton_r)(char const *asc,
                                             struct ether_addr *addr)
 /*[[[body:ether_aton_r]]]*/
 {
+	(void)asc;
+	(void)addr;
 	CRT_UNIMPLEMENTED("ether_aton_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -87,6 +93,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_ether_ntohost)(char *hostname,
                                              struct ether_addr const *addr)
 /*[[[body:ether_ntohost]]]*/
 {
+	(void)hostname;
+	(void)addr;
 	CRT_UNIMPLEMENTED("ether_ntohost"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -100,6 +108,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_ether_hostton)(char const *hostname,
                                              struct ether_addr *addr)
 /*[[[body:ether_hostton]]]*/
 {
+	(void)hostname;
+	(void)addr;
 	CRT_UNIMPLEMENTED("ether_hostton"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -114,6 +124,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_ether_line)(char const *line,
                                           char *hostname)
 /*[[[body:ether_line]]]*/
 {
+	(void)line;
+	(void)addr;
+	(void)hostname;
 	CRT_UNIMPLEMENTED("ether_line"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

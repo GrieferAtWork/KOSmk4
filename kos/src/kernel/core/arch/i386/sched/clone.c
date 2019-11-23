@@ -387,6 +387,11 @@ DEFINE_SYSCALL5(pid_t, clone,
 #endif /* !__x86_64__ */
 {
 	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
+	(void)flags;
+	(void)child_stack;
+	(void)ptid;
+	(void)ctid;
+	(void)newtls;
 	task_schedule_user_rpc(THIS_TASK,
 	                       &task_clone_rpc,
 	                       NULL,

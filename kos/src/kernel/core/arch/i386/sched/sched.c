@@ -401,6 +401,10 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
 	struct buffer regbuf;
 	byte_t *dest;
 	void *argbuffer;
+	(void)completed;
+	assertf(completed == NULL,
+	        "Not implemented for `completed != NULL'. Also: The `completed' "
+	        "signal is deprecated and scheduled to be removed");
 	memcpy(&regbuf, state, sizeof(regbuf));
 	dest = (byte_t *)state + sizeof(regbuf);
 #define SUBSP(x) (dest -= (x))
@@ -682,7 +686,7 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 
 /* Personality functions for RPC wrappers. */
 INTERN unsigned int
-NOTHROW(KCALL x86_rpc_user_redirection_personality)(struct unwind_fde_struct *__restrict fde,
+NOTHROW(KCALL x86_rpc_user_redirection_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
                                                     struct kcpustate *__restrict state,
                                                     byte_t *__restrict UNUSED(reader)) {
 	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
@@ -693,7 +697,7 @@ NOTHROW(KCALL x86_rpc_user_redirection_personality)(struct unwind_fde_struct *__
 }
 
 INTERN unsigned int
-NOTHROW(KCALL x86_rpc_kernel_redirection_personality)(struct unwind_fde_struct *__restrict fde,
+NOTHROW(KCALL x86_rpc_kernel_redirection_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
                                                       struct kcpustate *__restrict state,
                                                       byte_t *__restrict UNUSED(reader)) {
 	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
@@ -706,7 +710,7 @@ NOTHROW(KCALL x86_rpc_kernel_redirection_personality)(struct unwind_fde_struct *
 }
 
 INTERN unsigned int
-NOTHROW(KCALL x86_rpc_kernel_redirection_c_personality)(struct unwind_fde_struct *__restrict fde,
+NOTHROW(KCALL x86_rpc_kernel_redirection_c_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
                                                         struct kcpustate *__restrict state,
                                                         byte_t *__restrict UNUSED(reader)) {
 	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
@@ -719,7 +723,7 @@ NOTHROW(KCALL x86_rpc_kernel_redirection_c_personality)(struct unwind_fde_struct
 }
 
 INTERN unsigned int
-NOTHROW(KCALL x86_srpc_kernel_redirection_personality)(struct unwind_fde_struct *__restrict fde,
+NOTHROW(KCALL x86_srpc_kernel_redirection_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
                                                        struct kcpustate *__restrict state,
                                                        byte_t *__restrict UNUSED(reader)) {
 	/* When unwinding directly into `x86_rpc_user_redirection', still execute that

@@ -37,6 +37,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_addr") in_addr_t
 NOTHROW_RPC_KOS(LIBCCALL libc_inet_addr)(char const *cp)
 /*[[[body:inet_addr]]]*/
 {
+	(void)cp;
 	CRT_UNIMPLEMENTED("inet_addr"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -49,6 +50,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_lnaof") in_addr_t
 NOTHROW_RPC_KOS(LIBCCALL libc_inet_lnaof)(struct in_addr inaddr)
 /*[[[body:inet_lnaof]]]*/
 {
+	(void)inaddr;
 	CRT_UNIMPLEMENTED("inet_lnaof"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -64,6 +66,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_makeaddr)(in_addr_t net,
 /*[[[body:inet_makeaddr]]]*/
 {
 	struct in_addr result;
+	(void)net;
+	(void)host;
 	CRT_UNIMPLEMENTED("inet_makeaddr"); /* TODO */
 	result.s_addr = 0;
 	libc_seterrno(ENOSYS);
@@ -77,6 +81,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_netof") in_addr_t
 NOTHROW_RPC_KOS(LIBCCALL libc_inet_netof)(struct in_addr inaddr)
 /*[[[body:inet_netof]]]*/
 {
+	(void)inaddr;
 	CRT_UNIMPLEMENTED("inet_netof"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -90,6 +95,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_network") in_addr_t
 NOTHROW_RPC_KOS(LIBCCALL libc_inet_network)(char const *cp)
 /*[[[body:inet_network]]]*/
 {
+	(void)cp;
 	CRT_UNIMPLEMENTED("inet_network"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -103,6 +109,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_ntoa") char *
 NOTHROW_RPC_KOS(LIBCCALL libc_inet_ntoa)(struct in_addr inaddr)
 /*[[[body:inet_ntoa]]]*/
 {
+	(void)inaddr;
 	CRT_UNIMPLEMENTED("inet_ntoa"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -119,6 +126,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_pton)(int af,
                                          void *__restrict buf)
 /*[[[body:inet_pton]]]*/
 {
+	(void)af;
+	(void)cp;
+	(void)buf;
 	CRT_UNIMPLEMENTED("inet_pton"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -136,6 +146,10 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_ntop)(int af,
                                          socklen_t len)
 /*[[[body:inet_ntop]]]*/
 {
+	(void)af;
+	(void)cp;
+	(void)buf;
+	(void)len;
 	CRT_UNIMPLEMENTED("inet_ntop"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -150,6 +164,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_aton)(char const *cp,
                                          struct in_addr *inp)
 /*[[[body:inet_aton]]]*/
 {
+	(void)cp;
+	(void)inp;
 	CRT_UNIMPLEMENTED("inet_aton"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -165,6 +181,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_neta)(in_addr_t net,
                                          size_t len)
 /*[[[body:inet_neta]]]*/
 {
+	(void)net;
+	(void)buf;
+	(void)len;
 	CRT_UNIMPLEMENTED("inet_neta"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -183,6 +202,11 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_net_ntop)(int af,
                                              size_t len)
 /*[[[body:inet_net_ntop]]]*/
 {
+	(void)af;
+	(void)cp;
+	(void)bits;
+	(void)buf;
+	(void)len;
 	CRT_UNIMPLEMENTED("inet_net_ntop"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -200,6 +224,10 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_net_pton)(int af,
                                              size_t len)
 /*[[[body:inet_net_pton]]]*/
 {
+	(void)af;
+	(void)cp;
+	(void)buf;
+	(void)len;
 	CRT_UNIMPLEMENTED("inet_net_pton"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -216,6 +244,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_nsap_addr)(char const *cp,
                                               int len)
 /*[[[body:inet_nsap_addr]]]*/
 {
+	(void)cp;
+	(void)buf;
+	(void)len;
 	CRT_UNIMPLEMENTED("inet_nsap_addr"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -231,6 +262,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_nsap_ntoa)(int len,
                                               char *buf)
 /*[[[body:inet_nsap_ntoa]]]*/
 {
+	(void)len;
+	(void)cp;
+	(void)buf;
 	CRT_UNIMPLEMENTED("inet_nsap_ntoa"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;

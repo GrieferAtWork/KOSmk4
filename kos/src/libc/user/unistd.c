@@ -704,6 +704,8 @@ NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name,
                                       size_t name_len)
 /*[[[body:getlogin_r]]]*/
 {
+	(void)name;
+	(void)name_len;
 	CRT_UNIMPLEMENTED("getlogin_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -728,6 +730,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.setlogin") int
 NOTHROW_NCX(LIBCCALL libc_setlogin)(char const *name)
 /*[[[body:setlogin]]]*/
 {
+	(void)name;
 	CRT_UNIMPLEMENTED("setlogin"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1985,6 +1988,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.revoke") int
 NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file)
 /*[[[body:revoke]]]*/
 {
+	(void)file;
 	CRT_UNIMPLEMENTED("revoke"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2027,6 +2031,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.getpass") char *
 NOTHROW_RPC(LIBCCALL libc_getpass)(char const *__restrict prompt)
 /*[[[body:getpass]]]*/
 {
+	(void)prompt;
 	CRT_UNIMPLEMENTED("getpass"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -2177,6 +2182,8 @@ NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
                                      int name)
 /*[[[body:fpathconf]]]*/
 {
+	(void)fd;
+	(void)name;
 	CRT_UNIMPLEMENTED("fpathconf"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2194,6 +2201,8 @@ NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path,
                                     int name)
 /*[[[body:pathconf]]]*/
 {
+	(void)path;
+	(void)name;
 	CRT_UNIMPLEMENTED("pathconf"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

@@ -856,7 +856,7 @@ NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
 
 
 PUBLIC unsigned int
-NOTHROW(KCALL x86_asm_except_personality)(struct unwind_fde_struct *__restrict fde,
+NOTHROW(KCALL x86_asm_except_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
                                           struct kcpustate *__restrict state,
                                           void *lsda) {
 	struct x86_asm_except_entry *ent;

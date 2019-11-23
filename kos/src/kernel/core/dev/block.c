@@ -1589,6 +1589,9 @@ DEFINE_DEBUG_FUNCTION(
 		"lsblk\n"
 		"\tList all defined block devices\n"
 		, argc, argv) {
+	if (argc != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
 	dbg_print("     name\tdevno\tdriver\tsize\tsectors\tsector-size\n");
 	if (block_device_tree)
 		dump_block_device(block_device_tree);

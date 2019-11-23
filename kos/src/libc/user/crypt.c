@@ -38,6 +38,8 @@ NOTHROW_NCX(LIBCCALL libc_crypt)(char const *key,
                                  char const *salt)
 /*[[[body:crypt]]]*/
 {
+	(void)key;
+	(void)salt;
 	CRT_UNIMPLEMENTED("crypt"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -51,6 +53,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.encrypt.setkey") void
 NOTHROW_NCX(LIBCCALL libc_setkey)(char const *key)
 /*[[[body:setkey]]]*/
 {
+	(void)key;
 	CRT_UNIMPLEMENTED("setkey"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -64,6 +67,8 @@ NOTHROW_NCX(LIBCCALL libc_encrypt)(char *glibc_block,
                                    int edflag)
 /*[[[body:encrypt]]]*/
 {
+	(void)glibc_block;
+	(void)edflag;
 	CRT_UNIMPLEMENTED("encrypt"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -78,6 +83,9 @@ NOTHROW_NCX(LIBCCALL libc_crypt_r)(char const *key,
                                    struct crypt_data *__restrict data)
 /*[[[body:crypt_r]]]*/
 {
+	(void)key;
+	(void)salt;
+	(void)data;
 	CRT_UNIMPLEMENTED("crypt_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -91,6 +99,8 @@ NOTHROW_NCX(LIBCCALL libc_setkey_r)(char const *key,
                                     struct crypt_data *__restrict data)
 /*[[[body:setkey_r]]]*/
 {
+	(void)key;
+	(void)data;
 	CRT_UNIMPLEMENTED("setkey_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -105,6 +115,9 @@ NOTHROW_NCX(LIBCCALL libc_encrypt_r)(char *glibc_block,
                                      struct crypt_data *__restrict data)
 /*[[[body:encrypt_r]]]*/
 {
+	(void)glibc_block;
+	(void)edflag;
+	(void)data;
 	CRT_UNIMPLEMENTED("encrypt_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 }

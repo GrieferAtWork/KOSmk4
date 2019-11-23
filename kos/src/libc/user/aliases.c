@@ -74,6 +74,10 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent_r)(struct aliasent *__restrict result_
                                              struct aliasent **__restrict result)
 /*[[[body:getaliasent_r]]]*/
 {
+	(void)result_buf;
+	(void)buffer;
+	(void)buflen;
+	(void)result;
 	CRT_UNIMPLEMENTED("getaliasent_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -87,6 +91,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.database.aliases.getaliasbyname") struct alias
 NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname)(char const *name)
 /*[[[body:getaliasbyname]]]*/
 {
+	(void)name;
 	CRT_UNIMPLEMENTED("getaliasbyname"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -104,6 +109,11 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname_r)(char const *__restrict name,
                                                 struct aliasent **__restrict result)
 /*[[[body:getaliasbyname_r]]]*/
 {
+	(void)name;
+	(void)result_buf;
+	(void)buffer;
+	(void)buflen;
+	(void)result;
 	CRT_UNIMPLEMENTED("getaliasbyname_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

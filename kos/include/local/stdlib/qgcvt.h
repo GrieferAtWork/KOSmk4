@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47a8e781 */
+/* HASH CRC-32:0x29de2c2d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __LOCAL_LIBC(qgcvt) __ATTR_NONNULL((3)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qgcvt))(long double __val,
                                                    int __ndigit,
                                                    char *__buf) {
-#line 1130 "kos/src/libc/magic/stdlib.c"
+#line 1143 "kos/src/libc/magic/stdlib.c"
 #ifndef __LDBG_NDIGIT_MAX
 #if __LDBL_MANT_DIG__ == 53
 #define __LDBG_NDIGIT_MAX 17

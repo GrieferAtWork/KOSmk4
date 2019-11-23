@@ -2229,6 +2229,7 @@ driver_local_symbol(struct driver *__restrict self,
 		goto nosym;
 	}
 	/* TODO: GNU hash table support */
+	(void)phash_gnu;
 nosym:
 	return NULL;
 nosym_no_elf_ht:
@@ -4410,6 +4411,9 @@ DEFINE_DEBUG_FUNCTION(
 		, argc, argv) {
 	size_t i, longest_name, longest_cmdl;
 	REF struct driver_state *ds;
+	if (argc != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
 	ds = driver_get_state();
 	longest_name = 4;
 	longest_cmdl = 7;

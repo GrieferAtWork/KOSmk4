@@ -164,7 +164,7 @@ LOCAL errr_t
 				return ATA_GetErrrForStatusRegister(status);
 			if (num_sectors != 1)
 				task_connect(&bus->b_piointr);
-			Ata_WaitForDrq(bus->b_busio, bus->b_ctrlio);
+			Ata_WaitForDrq(bus->b_ctrlio);
 #if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_READ)
 #define DO_IO(port, buf, count) vm_insw_phys(port, buf, count)
 #elif defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_WRITE)

@@ -130,6 +130,9 @@ NOTHROW_NCX(LIBCCALL libc___cxa_atexit)(void (LIBCCALL *func)(void *arg),
 	 *       is some arbitrary pointer apart of the static image of the
 	 *       associated binary (which can be resolved using `dlgethandle()') */
 	/* TODO */
+	(void)func;
+	(void)arg;
+	(void)dso_handle;
 	COMPILER_IMPURE();
 	return -1;
 }
@@ -183,14 +186,14 @@ NOTHROW(LIBCCALL libc_rand)(void)
 }
 /*[[[end:rand]]]*/
 
-/*[[[head:rand_r,hash:CRC-32=0xf9a72780]]]*/
+/*[[[head:rand_r,hash:CRC-32=0x50d01815]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.random.rand_r") int
-NOTHROW_NCX(LIBCCALL libc_rand_r)(unsigned int *__restrict seed)
+NOTHROW_NCX(LIBCCALL libc_rand_r)(unsigned int *__restrict pseed)
 /*[[[body:rand_r]]]*/
 {
 	unsigned int result;
-	result = libc_do_random(seed);
+	result = libc_do_random(pseed);
 #if IS_POWER_OF_TWO(RAND_MAX + 1)
 	return (int)(result & RAND_MAX);
 #else
@@ -612,6 +615,9 @@ NOTHROW_NCX(LIBCCALL libc__dupenv_s)(char **__restrict pbuf,
                                      char const *varname)
 /*[[[body:_dupenv_s]]]*/
 {
+	(void)pbuf;
+	(void)pbuflen;
+	(void)varname;
 	CRT_UNIMPLEMENTED("_dupenv_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -627,6 +633,10 @@ NOTHROW_NCX(LIBCCALL libc_getenv_s)(size_t *psize,
                                     char const *varname)
 /*[[[body:getenv_s]]]*/
 {
+	(void)psize;
+	(void)buf;
+	(void)bufsize;
+	(void)varname;
 	CRT_UNIMPLEMENTED("getenv_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -642,6 +652,10 @@ NOTHROW_RPC(LIBCCALL libc__searchenv_s)(char const *file,
                                         size_t buflen)
 /*[[[body:_searchenv_s]]]*/
 {
+	(void)file;
+	(void)envvar;
+	(void)resultpath;
+	(void)buflen;
 	CRT_UNIMPLEMENTED("_searchenv_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -734,6 +748,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.process.atexit") int
 NOTHROW_NCX(LIBCCALL libc_atexit)(__atexit_func_t func)
 /*[[[body:atexit]]]*/
 {
+	(void)func;
 	CRT_UNIMPLEMENTED("atexit"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -759,6 +774,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.process.at_quick_exit") int
 NOTHROW_NCX(LIBCCALL libc_at_quick_exit)(__atexit_func_t func)
 /*[[[body:at_quick_exit]]]*/
 {
+	(void)func;
 	CRT_UNIMPLEMENTED("at_quick_exit"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -782,6 +798,8 @@ NOTHROW_NCX(LIBCCALL libc_drand48_r)(struct drand48_data *__restrict buffer,
                                      double *__restrict result)
 /*[[[body:drand48_r]]]*/
 {
+	(void)buffer;
+	(void)result;
 	CRT_UNIMPLEMENTED("drand48_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -796,6 +814,9 @@ NOTHROW_NCX(LIBCCALL libc_erand48_r)(unsigned short xsubi[3],
                                      double *__restrict result)
 /*[[[body:erand48_r]]]*/
 {
+	(void)xsubi;
+	(void)buffer;
+	(void)result;
 	CRT_UNIMPLEMENTED("erand48_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -809,6 +830,8 @@ NOTHROW_NCX(LIBCCALL libc_lrand48_r)(struct drand48_data *__restrict buffer,
                                      long *__restrict result)
 /*[[[body:lrand48_r]]]*/
 {
+	(void)buffer;
+	(void)result;
 	CRT_UNIMPLEMENTED("lrand48_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -823,6 +846,9 @@ NOTHROW_NCX(LIBCCALL libc_nrand48_r)(unsigned short xsubi[3],
                                      long *__restrict result)
 /*[[[body:nrand48_r]]]*/
 {
+	(void)xsubi;
+	(void)buffer;
+	(void)result;
 	CRT_UNIMPLEMENTED("nrand48_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -836,6 +862,8 @@ NOTHROW_NCX(LIBCCALL libc_mrand48_r)(struct drand48_data *__restrict buffer,
                                      long *__restrict result)
 /*[[[body:mrand48_r]]]*/
 {
+	(void)buffer;
+	(void)result;
 	CRT_UNIMPLEMENTED("mrand48_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -850,6 +878,9 @@ NOTHROW_NCX(LIBCCALL libc_jrand48_r)(unsigned short xsubi[3],
                                      long *__restrict result)
 /*[[[body:jrand48_r]]]*/
 {
+	(void)xsubi;
+	(void)buffer;
+	(void)result;
 	CRT_UNIMPLEMENTED("jrand48_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -863,6 +894,8 @@ NOTHROW_NCX(LIBCCALL libc_srand48_r)(long seedval,
                                      struct drand48_data *buffer)
 /*[[[body:srand48_r]]]*/
 {
+	(void)seedval;
+	(void)buffer;
 	CRT_UNIMPLEMENTED("srand48_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -876,6 +909,8 @@ NOTHROW_NCX(LIBCCALL libc_seed48_r)(unsigned short seed16v[3],
                                     struct drand48_data *buffer)
 /*[[[body:seed48_r]]]*/
 {
+	(void)seed16v;
+	(void)buffer;
 	CRT_UNIMPLEMENTED("seed48_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -889,6 +924,8 @@ NOTHROW_NCX(LIBCCALL libc_lcong48_r)(unsigned short param[7],
                                      struct drand48_data *buffer)
 /*[[[body:lcong48_r]]]*/
 {
+	(void)param;
+	(void)buffer;
 	CRT_UNIMPLEMENTED("lcong48_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -902,6 +939,8 @@ NOTHROW_NCX(LIBCCALL libc_random_r)(struct random_data *__restrict buf,
                                     int32_t *__restrict result)
 /*[[[body:random_r]]]*/
 {
+	(void)buf;
+	(void)result;
 	CRT_UNIMPLEMENTED("random_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -915,6 +954,8 @@ NOTHROW_NCX(LIBCCALL libc_srandom_r)(unsigned int seed,
                                      struct random_data *buf)
 /*[[[body:srandom_r]]]*/
 {
+	(void)seed;
+	(void)buf;
 	CRT_UNIMPLEMENTED("srandom_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -930,6 +971,10 @@ NOTHROW_NCX(LIBCCALL libc_initstate_r)(unsigned int seed,
                                        struct random_data *__restrict buf)
 /*[[[body:initstate_r]]]*/
 {
+	(void)seed;
+	(void)statebuf;
+	(void)statelen;
+	(void)buf;
 	CRT_UNIMPLEMENTED("initstate_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -943,6 +988,8 @@ NOTHROW_NCX(LIBCCALL libc_setstate_r)(char *__restrict statebuf,
                                       struct random_data *__restrict buf)
 /*[[[body:setstate_r]]]*/
 {
+	(void)statebuf;
+	(void)buf;
 	CRT_UNIMPLEMENTED("setstate_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -956,6 +1003,8 @@ NOTHROW_NCX(LIBCCALL libc_on_exit)(__on_exit_func_t func,
                                    void *arg)
 /*[[[body:on_exit]]]*/
 {
+	(void)func;
+	(void)arg;
 	CRT_UNIMPLEMENTED("on_exit"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -969,6 +1018,8 @@ NOTHROW_NCX(LIBCCALL libc_mkstemps)(char *template_,
                                     int suffixlen)
 /*[[[body:mkstemps]]]*/
 {
+	(void)template_;
+	(void)suffixlen;
 	CRT_UNIMPLEMENTED("mkstemps"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -981,6 +1032,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.fs.utility.rpmatch") int
 NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response)
 /*[[[body:rpmatch]]]*/
 {
+	(void)response;
 	CRT_UNIMPLEMENTED("rpmatch"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -997,6 +1049,8 @@ NOTHROW_NCX(LIBCCALL libc_mkstemps64)(char *template_,
                                       int suffixlen)
 /*[[[body:mkstemps64]]]*/
 {
+	(void)template_;
+	(void)suffixlen;
 	CRT_UNIMPLEMENTED("mkstemps64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1010,6 +1064,8 @@ NOTHROW_RPC(LIBCCALL libc_getloadavg)(double loadavg[],
                                       int nelem)
 /*[[[body:getloadavg]]]*/
 {
+	(void)loadavg;
+	(void)nelem;
 	CRT_UNIMPLEMENTED("getloadavg"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1055,6 +1111,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.random.erand48") double
 NOTHROW_NCX(LIBCCALL libc_erand48)(unsigned short xsubi[3])
 /*[[[body:erand48]]]*/
 {
+	(void)xsubi;
 	CRT_UNIMPLEMENTED("erand48"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1067,6 +1124,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.random.nrand48") long
 NOTHROW_NCX(LIBCCALL libc_nrand48)(unsigned short xsubi[3])
 /*[[[body:nrand48]]]*/
 {
+	(void)xsubi;
 	CRT_UNIMPLEMENTED("nrand48"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1079,6 +1137,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.random.jrand48") long
 NOTHROW_NCX(LIBCCALL libc_jrand48)(unsigned short xsubi[3])
 /*[[[body:jrand48]]]*/
 {
+	(void)xsubi;
 	CRT_UNIMPLEMENTED("jrand48"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1090,6 +1149,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.random.srand48") void
 NOTHROW_NCX(LIBCCALL libc_srand48)(long seedval)
 /*[[[body:srand48]]]*/
 {
+	(void)seedval;
 	CRT_UNIMPLEMENTED("srand48"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -1101,6 +1161,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.random.seed48") unsigned short *
 NOTHROW_NCX(LIBCCALL libc_seed48)(unsigned short seed16v[3])
 /*[[[body:seed48]]]*/
 {
+	(void)seed16v;
 	CRT_UNIMPLEMENTED("seed48"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1113,6 +1174,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.random.lcong48") void
 NOTHROW_NCX(LIBCCALL libc_lcong48)(unsigned short param[7])
 /*[[[body:lcong48]]]*/
 {
+	(void)param;
 	CRT_UNIMPLEMENTED("lcong48"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -1126,6 +1188,9 @@ NOTHROW_NCX(LIBCCALL libc_initstate)(unsigned int seed,
                                      size_t statelen)
 /*[[[body:initstate]]]*/
 {
+	(void)seed;
+	(void)statebuf;
+	(void)statelen;
 	CRT_UNIMPLEMENTED("initstate"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1138,6 +1203,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.random.setstate") char *
 NOTHROW_NCX(LIBCCALL libc_setstate)(char *statebuf)
 /*[[[body:setstate]]]*/
 {
+	(void)statebuf;
 	CRT_UNIMPLEMENTED("setstate"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1150,6 +1216,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.encrypt.l64a") char *
 NOTHROW_NCX(LIBCCALL libc_l64a)(long n)
 /*[[[body:l64a]]]*/
 {
+	(void)n;
 	CRT_UNIMPLEMENTED("l64a"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1162,6 +1229,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.encrypt.a64l") long
 NOTHROW_NCX(LIBCCALL libc_a64l)(char const *s)
 /*[[[body:a64l]]]*/
 {
+	(void)s;
 	CRT_UNIMPLEMENTED("a64l"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1363,6 +1431,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.fs.utility.mktemp") char *
 NOTHROW_NCX(LIBCCALL libc_mktemp)(char *template_)
 /*[[[body:mktemp]]]*/
 {
+	(void)template_;
 	CRT_UNIMPLEMENTED("mktemp"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1375,6 +1444,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.fs.utility.mkstemp") int
 NOTHROW_NCX(LIBCCALL libc_mkstemp)(char *template_)
 /*[[[body:mkstemp]]]*/
 {
+	(void)template_;
 	CRT_UNIMPLEMENTED("mkstemp"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1387,6 +1457,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.fs.utility.mkdtemp") char *
 NOTHROW_NCX(LIBCCALL libc_mkdtemp)(char *template_)
 /*[[[body:mkdtemp]]]*/
 {
+	(void)template_;
 	CRT_UNIMPLEMENTED("mkdtemp"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1399,6 +1470,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.setkey") void
 NOTHROW_NCX(LIBCCALL libc_setkey)(char const *key)
 /*[[[body:setkey]]]*/
 {
+	(void)key;
 	CRT_UNIMPLEMENTED("setkey"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -1409,6 +1481,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.grantpt") int
 NOTHROW_NCX(LIBCCALL libc_grantpt)(fd_t fd)
 /*[[[body:grantpt]]]*/
 {
+	(void)fd;
 	CRT_UNIMPLEMENTED("grantpt"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1420,6 +1493,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.unlockpt") int
 NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd)
 /*[[[body:unlockpt]]]*/
 {
+	(void)fd;
 	CRT_UNIMPLEMENTED("unlockpt"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1432,6 +1506,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.ptsname") char *
 NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd)
 /*[[[body:ptsname]]]*/
 {
+	(void)fd;
 	CRT_UNIMPLEMENTED("ptsname"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1444,6 +1519,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.posix_openpt") int
 NOTHROW_RPC(LIBCCALL libc_posix_openpt)(oflag_t oflags)
 /*[[[body:posix_openpt]]]*/
 {
+	(void)oflags;
 	CRT_UNIMPLEMENTED("posix_openpt"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1469,6 +1545,9 @@ NOTHROW_NCX(LIBCCALL libc_ptsname_r)(fd_t fd,
                                      size_t buflen)
 /*[[[body:ptsname_r]]]*/
 {
+	(void)fd;
+	(void)buf;
+	(void)buflen;
 	CRT_UNIMPLEMENTED("ptsname_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1494,6 +1573,8 @@ NOTHROW_RPC(LIBCCALL libc_mkostemp)(char *template_,
                                     int flags)
 /*[[[body:mkostemp]]]*/
 {
+	(void)template_;
+	(void)flags;
 	CRT_UNIMPLEMENTED("mkostemp"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1508,6 +1589,9 @@ NOTHROW_RPC(LIBCCALL libc_mkostemps)(char *template_,
                                      int flags)
 /*[[[body:mkostemps]]]*/
 {
+	(void)template_;
+	(void)suffixlen;
+	(void)flags;
 	CRT_UNIMPLEMENTED("mkostemps"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1524,6 +1608,8 @@ NOTHROW_RPC(LIBCCALL libc_mkostemp64)(char *template_,
                                       int flags)
 /*[[[body:mkostemp64]]]*/
 {
+	(void)template_;
+	(void)flags;
 	CRT_UNIMPLEMENTED("mkostemp64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1542,6 +1628,9 @@ NOTHROW_RPC(LIBCCALL libc_mkostemps64)(char *template_,
                                        int flags)
 /*[[[body:mkostemps64]]]*/
 {
+	(void)template_;
+	(void)suffixlen;
+	(void)flags;
 	CRT_UNIMPLEMENTED("mkostemps64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1623,6 +1712,8 @@ NOTHROW_NCX(LIBCCALL libc__aligned_malloc)(size_t num_bytes,
                                            size_t min_alignment)
 /*[[[body:_aligned_malloc]]]*/
 {
+	(void)num_bytes;
+	(void)min_alignment;
 	CRT_UNIMPLEMENTED("_aligned_malloc"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1734,6 +1825,9 @@ NOTHROW_RPC(LIBCCALL libc__fullpath)(char *buf,
                                      size_t buflen)
 /*[[[body:_fullpath]]]*/
 {
+	(void)buf;
+	(void)path;
+	(void)buflen;
 	CRT_UNIMPLEMENTED("_fullpath"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1745,6 +1839,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap._aligned_free") void
 NOTHROW_NCX(LIBCCALL libc__aligned_free)(void *mptr)
 /*[[[body:_aligned_free]]]*/
 {
+	(void)mptr;
 	CRT_UNIMPLEMENTED("_aligned_free"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -1759,6 +1854,10 @@ NOTHROW_NCX(LIBCCALL libc__aligned_recalloc)(void *mptr,
                                              size_t min_alignment)
 /*[[[body:_aligned_recalloc]]]*/
 {
+	(void)mptr;
+	(void)count;
+	(void)num_bytes;
+	(void)min_alignment;
 	CRT_UNIMPLEMENTED("_aligned_recalloc"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1774,6 +1873,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._seterrormode") void
 NOTHROW_NCX(LIBCCALL libc__seterrormode)(int mode)
 /*[[[body:_seterrormode]]]*/
 {
+	(void)mode;
 	CRT_UNIMPLEMENTED("_seterrormode"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -1784,6 +1884,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._set_error_mode") int
 NOTHROW_NCX(LIBCCALL libc__set_error_mode)(int mode)
 /*[[[body:_set_error_mode]]]*/
 {
+	(void)mode;
 	CRT_UNIMPLEMENTED("_set_error_mode"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1798,6 +1899,9 @@ NOTHROW_NCX(LIBCCALL libc__aligned_offset_malloc)(size_t num_bytes,
                                                   size_t offset)
 /*[[[body:_aligned_offset_malloc]]]*/
 {
+	(void)num_bytes;
+	(void)min_alignment;
+	(void)offset;
 	CRT_UNIMPLEMENTED("_aligned_offset_malloc"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1813,6 +1917,10 @@ NOTHROW_NCX(LIBCCALL libc__aligned_offset_realloc)(void *mptr,
                                                    size_t offset)
 /*[[[body:_aligned_offset_realloc]]]*/
 {
+	(void)mptr;
+	(void)newsize;
+	(void)min_alignment;
+	(void)offset;
 	CRT_UNIMPLEMENTED("_aligned_offset_realloc"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1829,6 +1937,11 @@ NOTHROW_NCX(LIBCCALL libc__aligned_offset_recalloc)(void *mptr,
                                                     size_t offset)
 /*[[[body:_aligned_offset_recalloc]]]*/
 {
+	(void)mptr;
+	(void)count;
+	(void)num_bytes;
+	(void)min_alignment;
+	(void)offset;
 	CRT_UNIMPLEMENTED("_aligned_offset_recalloc"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1843,6 +1956,9 @@ NOTHROW_NCX(LIBCCALL libc__recalloc)(void *mptr,
                                      size_t num_bytes)
 /*[[[body:_recalloc]]]*/
 {
+	(void)mptr;
+	(void)count;
+	(void)num_bytes;
 	CRT_UNIMPLEMENTED("_recalloc"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1857,6 +1973,9 @@ NOTHROW_NCX(LIBCCALL libc__aligned_realloc)(void *mptr,
                                             size_t min_alignment)
 /*[[[body:_aligned_realloc]]]*/
 {
+	(void)mptr;
+	(void)newsize;
+	(void)min_alignment;
 	CRT_UNIMPLEMENTED("_aligned_realloc"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1868,6 +1987,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert.onexit") onexit_
 NOTHROW_NCX(LIBCCALL libc_onexit)(onexit_t func)
 /*[[[body:onexit]]]*/
 {
+	(void)func;
 	CRT_UNIMPLEMENTED("onexit"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1880,6 +2000,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._wperror") void
 NOTHROW_RPC(LIBCCALL libc__wperror)(char32_t const *errmsg)
 /*[[[body:_wperror]]]*/
 {
+	(void)errmsg;
 	CRT_UNIMPLEMENTED("_wperror"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -1891,6 +2012,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._wperror") void
 NOTHROW_RPC(LIBDCALL libd__wperror)(char16_t const *errmsg)
 /*[[[body:DOS$_wperror]]]*/
 {
+	(void)errmsg;
 	CRT_UNIMPLEMENTED("_wperror"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -1902,6 +2024,8 @@ NOTHROW_NCX(LIBCCALL libc__beep)(unsigned int freq,
                                  unsigned int duration)
 /*[[[body:_beep]]]*/
 {
+	(void)freq;
+	(void)duration;
 	CRT_UNIMPLEMENTED("_beep"); /* TODO */
 	libc_seterrno(ENOSYS);
 }

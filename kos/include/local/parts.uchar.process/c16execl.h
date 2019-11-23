@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa81d83da */
+/* HASH CRC-32:0xf960c1cf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,13 @@
 #ifndef ____localdep_c16execv_defined
 #define ____localdep_c16execv_defined 1
 #if defined(__CRT_HAVE_wexecv) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2)) __ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c16execv,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV),wexecv,(__path, ___argv))
+__CREDIRECT(__ATTR_NONNULL((2)) __ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c16execv,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV),wexecv,(__path,___argv))
 #elif defined(__CRT_HAVE__wexecv) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2)) __ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c16execv,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wexecv,(__path, ___argv))
+__CREDIRECT(__ATTR_NONNULL((2)) __ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c16execv,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wexecv,(__path,___argv))
 #elif defined(__CRT_HAVE_DOS$_wexecv)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)) __ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c16execv,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wexecv,(__path, ___argv))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)) __ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c16execv,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wexecv,(__path,___argv))
 #elif defined(__CRT_HAVE_DOS$_wexecv)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)) __ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c16execv,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wexecv,(__path, ___argv))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)) __ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c16execv,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wexecv,(__path,___argv))
 #else /* LIBC: c16execv */
 #undef ____localdep_c16execv_defined
 #endif /* c16execv... */

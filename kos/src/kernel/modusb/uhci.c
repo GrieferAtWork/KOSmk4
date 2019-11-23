@@ -749,7 +749,7 @@ NOTHROW(FCALL uhci_osqh_aio_docomplete)(struct aio_handle *__restrict aio,
 }
 
 PRIVATE ATTR_NOINLINE NOBLOCK void
-NOTHROW(FCALL uhci_osqh_completed_ioerror)(struct uhci_controller *__restrict self,
+NOTHROW(FCALL uhci_osqh_completed_ioerror)(struct uhci_controller *__restrict UNUSED(self),
                                            struct uhci_osqh *__restrict osqh,
                                            error_code_t code,
                                            uintptr_t io_reason,

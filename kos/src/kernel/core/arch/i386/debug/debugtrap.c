@@ -59,9 +59,9 @@ DECL_BEGIN
 
 /* Exception handler for unhandled exceptions thrown by  */
 INTERN ATTR_USED NONNULL((1, 2)) unsigned int
-NOTHROW(KCALL driver_initializer_personality)(struct unwind_fde_struct *__restrict fde,
-                                              struct kcpustate *__restrict state,
-                                              void *lsda) {
+NOTHROW(KCALL driver_initializer_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
+                                              struct kcpustate *__restrict UNUSED(state),
+                                              void *UNUSED(lsda)) {
 	if (kernel_debugtrap_enabled() &&
 	    (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_DRIVER_INIT_FAILURE)) {
 		siginfo_t si;

@@ -40,6 +40,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.getifaddrs") int
 NOTHROW_NCX(LIBCCALL libc_getifaddrs)(struct ifaddrs **ifap)
 /*[[[body:getifaddrs]]]*/
 {
+	(void)ifap;
 	CRT_UNIMPLEMENTED("getifaddrs"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -52,6 +53,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.freeifaddrs") void
 NOTHROW_NCX(LIBCCALL libc_freeifaddrs)(struct ifaddrs *ifa)
 /*[[[body:freeifaddrs]]]*/
 {
+	(void)ifa;
 	CRT_UNIMPLEMENTED("freeifaddrs"); /* TODO */
 	libc_seterrno(ENOSYS);
 }

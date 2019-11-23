@@ -34,6 +34,7 @@ DECL_BEGIN
 INTERN ATTR_FREETEXT void KCALL
 usb_probe_ohci(struct pci_device *__restrict dev) {
 	printk(FREESTR(KERN_WARNING "[usb] Not implemented: ohci support\n"));
+	(void)dev;
 }
 
 DECL_END

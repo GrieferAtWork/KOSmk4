@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc91f95c4 */
+/* HASH CRC-32:0x30969eb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(iswalnum_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswalnum_l))(__WINT_TYPE__ __wc,
                                                         __locale_t __locale) {
-#line 224 "kos/src/libc/magic/wctype.c"
+#line 230 "kos/src/libc/magic/wctype.c"
 	(void)__locale;
 	__COMPILER_IMPURE();
 	return __localdep_iswalnum(__wc);

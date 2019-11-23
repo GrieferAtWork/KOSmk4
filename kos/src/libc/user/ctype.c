@@ -1356,6 +1356,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.__locale_ctype_ptr_l") ch
 NOTHROW_NCX(LIBCCALL libc___locale_ctype_ptr_l)(locale_t locale)
 /*[[[body:__locale_ctype_ptr_l]]]*/
 {
+	(void)locale;
 	CRT_UNIMPLEMENTED("__locale_ctype_ptr_l"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1369,6 +1370,8 @@ NOTHROW(LIBCCALL libc__isctype)(int ch,
                                 int mask)
 /*[[[body:_isctype]]]*/
 {
+	(void)ch;
+	(void)mask;
 	CRT_UNIMPLEMENTED("_isctype"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1383,6 +1386,9 @@ NOTHROW_NCX(LIBCCALL libc__isctype_l)(int ch,
                                       locale_t locale)
 /*[[[body:_isctype_l]]]*/
 {
+	(void)ch;
+	(void)mask;
+	(void)locale;
 	CRT_UNIMPLEMENTED("_isctype_l"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

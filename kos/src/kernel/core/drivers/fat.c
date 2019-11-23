@@ -403,6 +403,8 @@ LOCAL NONNULL((1)) void KCALL
 zero_initialize_cluster(FatSuperblock *__restrict fat,
                         FatClusterIndex cluster) {
 	/* TODO */
+	(void)fat;
+	(void)cluster;
 }
 
 
@@ -602,12 +604,17 @@ PRIVATE NONNULL((1)) void
 NOTHROW(KCALL FatDirectory_AddFreeRange)(struct directory_node *__restrict self,
                                          u32 first_entry_number, u32 entry_count) {
 	/* XXX: Mark the given range as free, and panic of any entry is already marked as free. */
+	(void)self;
+	(void)first_entry_number;
+	(void)entry_count;
 }
 
 PRIVATE NONNULL((1)) void
 NOTHROW(KCALL FatDirectory_AddFreeFile)(struct directory_node *__restrict self,
                                         u32 entry_number) {
 	/* XXX: Mark `entry_number' as free, but don't do anything if it was already marked as such. */
+	(void)self;
+	(void)entry_number;
 }
 
 PRIVATE NONNULL((1)) void
@@ -1227,8 +1234,9 @@ PRIVATE NONNULL((1)) intptr_t KCALL
 Fat_PathConf(struct inode *__restrict self, unsigned int name)
 		THROWS(...) {
 	intptr_t result;
-	//FatSuperblock *super;
-	//super = (FatSuperblock *)self->i_super;
+	/*FatSuperblock *super;
+	super = (FatSuperblock *)self->i_super;*/
+	(void)self;
 	switch (name) {
 
 	case _PC_NAME_MAX:
@@ -1246,6 +1254,7 @@ PRIVATE NONNULL((1)) syscall_slong_t KCALL
 Fat_Ioctl(struct inode *__restrict self, syscall_ulong_t cmd,
           USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(...) {
+	(void)mode;
 	switch (cmd) {
 
 #if 0 /* TODO */
@@ -2566,6 +2575,7 @@ Fat_OpenINode(FatSuperblock *__restrict self,
               struct directory_node *__restrict parent_directory,
               struct directory_entry *__restrict parent_directory_entry)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
+	(void)parent_directory_entry;
 	switch (node->i_filemode & S_IFMT) {
 
 	case S_IFREG:

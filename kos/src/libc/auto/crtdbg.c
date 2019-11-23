@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9df007d9 */
+/* HASH CRC-32:0xb9833f1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -225,6 +225,7 @@ NOTHROW_NCX(LIBCCALL libc__CrtDumpMemoryLeaks)(void) {
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtSetCheckCount") int
 NOTHROW_NCX(LIBCCALL libc__CrtSetCheckCount)(int check_count) {
 #line 630 "kos/src/libc/magic/crtdbg.c"
+	(void)check_count;
 	COMPILER_IMPURE();
 	return 0;
 }
@@ -232,7 +233,7 @@ NOTHROW_NCX(LIBCCALL libc__CrtSetCheckCount)(int check_count) {
 INTERN ATTR_PURE
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtGetCheckCount") int
 NOTHROW_NCX(LIBCCALL libc__CrtGetCheckCount)(void) {
-#line 636 "kos/src/libc/magic/crtdbg.c"
+#line 637 "kos/src/libc/magic/crtdbg.c"
 	COMPILER_IMPURE();
 	return 0;
 }

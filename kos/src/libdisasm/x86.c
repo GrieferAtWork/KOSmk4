@@ -2921,6 +2921,16 @@ libda_select_jcc(struct disassembler *__restrict self,
 }
 #endif /* CONFIG_AUTOSELECT_JCC */
 
+#ifdef __GNUC__
+/* GCC emits a false warning about `self->d_pad1[0] = (void *)(uintptr_t)whole_opcode' supposedly
+ * using the uninitialized variable `opcode'. Now mind you that this isn't a typo. - That expression
+ * is neither using the variable `opcode', nor is opcode uninitialized at the time that piece of
+ * code is reached, nor is this is the first time that `opcode' is accessed within any of the control
+ * paths that lead to said statement. */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif /* __GNUC__ */
+
 
 INTERN NONNULL((1)) void CC
 libda_single_x86(struct disassembler *__restrict self) {
@@ -3481,6 +3491,10 @@ unknown_opcode:
 	self->d_pc = text_start;
 	goto print_byte;
 }
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif /* __GNUC__ */
 
 
 DECL_END

@@ -543,9 +543,7 @@ vio_failure_throw_segfault:
 						decref_unlikely(args.ma_args.va_part);
 						goto pop_connections_and_throw_segfault;
 					}
-					return x86_vio_main(&args,
-					                    (uintptr_t)addr,
-					                    ecode);
+					return x86_vio_main(&args, (uintptr_t)addr);
 				}
 #endif /* CONFIG_VIO */
 				sync_endread(effective_vm);

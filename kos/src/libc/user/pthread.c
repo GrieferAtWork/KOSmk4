@@ -1402,6 +1402,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_once") int
 		__THROWS(...)
 /*[[[body:pthread_once]]]*/
 {
+	(void)once_control;
+	(void)init_routine;
 	CRT_UNIMPLEMENTED("pthread_once"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1416,6 +1418,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setcancelstate)(int state,
                                                   int *oldstate)
 /*[[[body:pthread_setcancelstate]]]*/
 {
+	(void)state;
+	(void)oldstate;
 	CRT_UNIMPLEMENTED("pthread_setcancelstate"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1430,6 +1434,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setcanceltype)(int type,
                                                  int *oldtype)
 /*[[[body:pthread_setcanceltype]]]*/
 {
+	(void)type;
+	(void)oldtype;
 	CRT_UNIMPLEMENTED("pthread_setcanceltype"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1491,6 +1497,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.__pthread_unregister_cancel") vo
 NOTHROW_NCX(LIBCCALL libc___pthread_unregister_cancel)(__pthread_unwind_buf_t *buf)
 /*[[[body:__pthread_unregister_cancel]]]*/
 {
+	(void)buf;
 	CRT_UNIMPLEMENTED("__pthread_unregister_cancel"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -1502,6 +1509,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.__pthread_unregister_cancel_rest
 NOTHROW_NCX(LIBCCALL libc___pthread_unregister_cancel_restore)(__pthread_unwind_buf_t *buf)
 /*[[[body:__pthread_unregister_cancel_restore]]]*/
 {
+	(void)buf;
 	CRT_UNIMPLEMENTED("__pthread_unregister_cancel_restore"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -1514,6 +1522,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.__pthread_unwind_next") void
 NOTHROW_NCX(LIBCCALL libc___pthread_unwind_next)(__pthread_unwind_buf_t *buf)
 /*[[[body:__pthread_unwind_next]]]*/
 {
+	(void)buf;
 	CRT_UNIMPLEMENTED("__pthread_unwind_next"); /* TODO */
 	libc_seterrno(ENOSYS);
 	for (;;) {
@@ -1530,6 +1539,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_init)(pthread_mutex_t *mutex,
                                               pthread_mutexattr_t const *mutexattr)
 /*[[[body:pthread_mutex_init]]]*/
 {
+	(void)mutex;
+	(void)mutexattr;
 	CRT_UNIMPLEMENTED("pthread_mutex_init"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1543,6 +1554,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutex_destroy") int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_destroy)(pthread_mutex_t *mutex)
 /*[[[body:pthread_mutex_destroy]]]*/
 {
+	(void)mutex;
 	CRT_UNIMPLEMENTED("pthread_mutex_destroy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1556,6 +1568,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutex_trylock") int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_trylock)(pthread_mutex_t *mutex)
 /*[[[body:pthread_mutex_trylock]]]*/
 {
+	(void)mutex;
 	CRT_UNIMPLEMENTED("pthread_mutex_trylock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1569,6 +1582,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutex_lock") int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_lock)(pthread_mutex_t *mutex)
 /*[[[body:pthread_mutex_lock]]]*/
 {
+	(void)mutex;
 	CRT_UNIMPLEMENTED("pthread_mutex_lock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1583,6 +1597,8 @@ NOTHROW_RPC(LIBCCALL libc_pthread_mutex_timedlock)(pthread_mutex_t *__restrict m
                                                    struct timespec const *__restrict abstime)
 /*[[[body:pthread_mutex_timedlock]]]*/
 {
+	(void)mutex;
+	(void)abstime;
 	CRT_UNIMPLEMENTED("pthread_mutex_timedlock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1596,6 +1612,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutex_unlock") int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_unlock)(pthread_mutex_t *mutex)
 /*[[[body:pthread_mutex_unlock]]]*/
 {
+	(void)mutex;
 	CRT_UNIMPLEMENTED("pthread_mutex_unlock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1610,6 +1627,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_getprioceiling)(pthread_mutex_t const *_
                                                         int *__restrict prioceiling)
 /*[[[body:pthread_mutex_getprioceiling]]]*/
 {
+	(void)mutex;
+	(void)prioceiling;
 	CRT_UNIMPLEMENTED("pthread_mutex_getprioceiling"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1626,6 +1645,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_setprioceiling)(pthread_mutex_t *__restr
                                                         int *__restrict old_ceiling)
 /*[[[body:pthread_mutex_setprioceiling]]]*/
 {
+	(void)mutex;
+	(void)prioceiling;
+	(void)old_ceiling;
 	CRT_UNIMPLEMENTED("pthread_mutex_setprioceiling"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1639,6 +1661,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutex_consistent") int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_consistent)(pthread_mutex_t *mutex)
 /*[[[body:pthread_mutex_consistent]]]*/
 {
+	(void)mutex;
 	CRT_UNIMPLEMENTED("pthread_mutex_consistent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1651,6 +1674,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutex_consistent_np") in
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_consistent_np)(pthread_mutex_t *mutex)
 /*[[[body:pthread_mutex_consistent_np]]]*/
 {
+	(void)mutex;
 	CRT_UNIMPLEMENTED("pthread_mutex_consistent_np"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1664,6 +1688,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutexattr_init") int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_init)(pthread_mutexattr_t *attr)
 /*[[[body:pthread_mutexattr_init]]]*/
 {
+	(void)attr;
 	CRT_UNIMPLEMENTED("pthread_mutexattr_init"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1677,6 +1702,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutexattr_destroy") int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_destroy)(pthread_mutexattr_t *attr)
 /*[[[body:pthread_mutexattr_destroy]]]*/
 {
+	(void)attr;
 	CRT_UNIMPLEMENTED("pthread_mutexattr_destroy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1691,6 +1717,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getpshared)(pthread_mutexattr_t cons
                                                         int *__restrict pshared)
 /*[[[body:pthread_mutexattr_getpshared]]]*/
 {
+	(void)attr;
+	(void)pshared;
 	CRT_UNIMPLEMENTED("pthread_mutexattr_getpshared"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1705,6 +1733,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setpshared)(pthread_mutexattr_t *att
                                                         int pshared)
 /*[[[body:pthread_mutexattr_setpshared]]]*/
 {
+	(void)attr;
+	(void)pshared;
 	CRT_UNIMPLEMENTED("pthread_mutexattr_setpshared"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1719,6 +1749,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_gettype)(pthread_mutexattr_t const *
                                                      int *__restrict kind)
 /*[[[body:pthread_mutexattr_gettype]]]*/
 {
+	(void)attr;
+	(void)kind;
 	CRT_UNIMPLEMENTED("pthread_mutexattr_gettype"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1734,6 +1766,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_settype)(pthread_mutexattr_t *attr,
                                                      int kind)
 /*[[[body:pthread_mutexattr_settype]]]*/
 {
+	(void)attr;
+	(void)kind;
 	CRT_UNIMPLEMENTED("pthread_mutexattr_settype"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1748,6 +1782,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getprotocol)(pthread_mutexattr_t con
                                                          int *__restrict protocol)
 /*[[[body:pthread_mutexattr_getprotocol]]]*/
 {
+	(void)attr;
+	(void)protocol;
 	CRT_UNIMPLEMENTED("pthread_mutexattr_getprotocol"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1763,6 +1799,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setprotocol)(pthread_mutexattr_t *at
                                                          int protocol)
 /*[[[body:pthread_mutexattr_setprotocol]]]*/
 {
+	(void)attr;
+	(void)protocol;
 	CRT_UNIMPLEMENTED("pthread_mutexattr_setprotocol"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1777,6 +1815,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getprioceiling)(pthread_mutexattr_t 
                                                             int *__restrict prioceiling)
 /*[[[body:pthread_mutexattr_getprioceiling]]]*/
 {
+	(void)attr;
+	(void)prioceiling;
 	CRT_UNIMPLEMENTED("pthread_mutexattr_getprioceiling"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1791,6 +1831,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setprioceiling)(pthread_mutexattr_t 
                                                             int prioceiling)
 /*[[[body:pthread_mutexattr_setprioceiling]]]*/
 {
+	(void)attr;
+	(void)prioceiling;
 	CRT_UNIMPLEMENTED("pthread_mutexattr_setprioceiling"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1805,6 +1847,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getrobust)(pthread_mutexattr_t const
                                                        int *robustness)
 /*[[[body:pthread_mutexattr_getrobust]]]*/
 {
+	(void)attr;
+	(void)robustness;
 	CRT_UNIMPLEMENTED("pthread_mutexattr_getrobust"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1818,6 +1862,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getrobust_np)(pthread_mutexattr_t co
                                                           int *robustness)
 /*[[[body:pthread_mutexattr_getrobust_np]]]*/
 {
+	(void)attr;
+	(void)robustness;
 	CRT_UNIMPLEMENTED("pthread_mutexattr_getrobust_np"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1832,6 +1878,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setrobust)(pthread_mutexattr_t *attr
                                                        int robustness)
 /*[[[body:pthread_mutexattr_setrobust]]]*/
 {
+	(void)attr;
+	(void)robustness;
 	CRT_UNIMPLEMENTED("pthread_mutexattr_setrobust"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1845,6 +1893,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setrobust_np)(pthread_mutexattr_t *a
                                                           int robustness)
 /*[[[body:pthread_mutexattr_setrobust_np]]]*/
 {
+	(void)attr;
+	(void)robustness;
 	CRT_UNIMPLEMENTED("pthread_mutexattr_setrobust_np"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1860,6 +1910,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_init)(pthread_rwlock_t *__restrict rwlo
                                                pthread_rwlockattr_t const *__restrict attr)
 /*[[[body:pthread_rwlock_init]]]*/
 {
+	(void)rwlock;
+	(void)attr;
 	CRT_UNIMPLEMENTED("pthread_rwlock_init"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1873,6 +1925,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_destroy") int
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_destroy)(pthread_rwlock_t *rwlock)
 /*[[[body:pthread_rwlock_destroy]]]*/
 {
+	(void)rwlock;
 	CRT_UNIMPLEMENTED("pthread_rwlock_destroy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1886,6 +1939,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_rdlock") int
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_rdlock)(pthread_rwlock_t *rwlock)
 /*[[[body:pthread_rwlock_rdlock]]]*/
 {
+	(void)rwlock;
 	CRT_UNIMPLEMENTED("pthread_rwlock_rdlock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1899,6 +1953,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_tryrdlock") int
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_tryrdlock)(pthread_rwlock_t *rwlock)
 /*[[[body:pthread_rwlock_tryrdlock]]]*/
 {
+	(void)rwlock;
 	CRT_UNIMPLEMENTED("pthread_rwlock_tryrdlock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1913,6 +1968,8 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restri
                                                       struct timespec const *__restrict abstime)
 /*[[[body:pthread_rwlock_timedrdlock]]]*/
 {
+	(void)rwlock;
+	(void)abstime;
 	CRT_UNIMPLEMENTED("pthread_rwlock_timedrdlock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1926,6 +1983,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_wrlock") int
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_wrlock)(pthread_rwlock_t *rwlock)
 /*[[[body:pthread_rwlock_wrlock]]]*/
 {
+	(void)rwlock;
 	CRT_UNIMPLEMENTED("pthread_rwlock_wrlock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1939,6 +1997,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_trywrlock") int
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_trywrlock)(pthread_rwlock_t *rwlock)
 /*[[[body:pthread_rwlock_trywrlock]]]*/
 {
+	(void)rwlock;
 	CRT_UNIMPLEMENTED("pthread_rwlock_trywrlock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1953,6 +2012,8 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restri
                                                       struct timespec const *__restrict abstime)
 /*[[[body:pthread_rwlock_timedwrlock]]]*/
 {
+	(void)rwlock;
+	(void)abstime;
 	CRT_UNIMPLEMENTED("pthread_rwlock_timedwrlock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1966,6 +2027,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_unlock") int
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_unlock)(pthread_rwlock_t *rwlock)
 /*[[[body:pthread_rwlock_unlock]]]*/
 {
+	(void)rwlock;
 	CRT_UNIMPLEMENTED("pthread_rwlock_unlock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1979,6 +2041,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlockattr_init") int
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_init)(pthread_rwlockattr_t *attr)
 /*[[[body:pthread_rwlockattr_init]]]*/
 {
+	(void)attr;
 	CRT_UNIMPLEMENTED("pthread_rwlockattr_init"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1992,6 +2055,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlockattr_destroy") int
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_destroy)(pthread_rwlockattr_t *attr)
 /*[[[body:pthread_rwlockattr_destroy]]]*/
 {
+	(void)attr;
 	CRT_UNIMPLEMENTED("pthread_rwlockattr_destroy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2006,6 +2070,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_getpshared)(pthread_rwlockattr_t co
                                                          int *__restrict pshared)
 /*[[[body:pthread_rwlockattr_getpshared]]]*/
 {
+	(void)attr;
+	(void)pshared;
 	CRT_UNIMPLEMENTED("pthread_rwlockattr_getpshared"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2020,6 +2086,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_setpshared)(pthread_rwlockattr_t *a
                                                          int pshared)
 /*[[[body:pthread_rwlockattr_setpshared]]]*/
 {
+	(void)attr;
+	(void)pshared;
 	CRT_UNIMPLEMENTED("pthread_rwlockattr_setpshared"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2034,6 +2102,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_getkind_np)(pthread_rwlockattr_t co
                                                          int *__restrict pref)
 /*[[[body:pthread_rwlockattr_getkind_np]]]*/
 {
+	(void)attr;
+	(void)pref;
 	CRT_UNIMPLEMENTED("pthread_rwlockattr_getkind_np"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2048,6 +2118,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_setkind_np)(pthread_rwlockattr_t *a
                                                          int pref)
 /*[[[body:pthread_rwlockattr_setkind_np]]]*/
 {
+	(void)attr;
+	(void)pref;
 	CRT_UNIMPLEMENTED("pthread_rwlockattr_setkind_np"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2063,6 +2135,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cond_init)(pthread_cond_t *__restrict cond,
                                              pthread_condattr_t const *__restrict cond_attr)
 /*[[[body:pthread_cond_init]]]*/
 {
+	(void)cond;
+	(void)cond_attr;
 	CRT_UNIMPLEMENTED("pthread_cond_init"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2076,6 +2150,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_cond_destroy") int
 NOTHROW_NCX(LIBCCALL libc_pthread_cond_destroy)(pthread_cond_t *cond)
 /*[[[body:pthread_cond_destroy]]]*/
 {
+	(void)cond;
 	CRT_UNIMPLEMENTED("pthread_cond_destroy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2089,6 +2164,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_cond_signal") int
 NOTHROW_NCX(LIBCCALL libc_pthread_cond_signal)(pthread_cond_t *cond)
 /*[[[body:pthread_cond_signal]]]*/
 {
+	(void)cond;
 	CRT_UNIMPLEMENTED("pthread_cond_signal"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2102,6 +2178,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_cond_broadcast") int
 NOTHROW_NCX(LIBCCALL libc_pthread_cond_broadcast)(pthread_cond_t *cond)
 /*[[[body:pthread_cond_broadcast]]]*/
 {
+	(void)cond;
 	CRT_UNIMPLEMENTED("pthread_cond_broadcast"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2117,6 +2194,8 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_wait)(pthread_cond_t *__restrict cond,
                                              pthread_mutex_t *__restrict mutex)
 /*[[[body:pthread_cond_wait]]]*/
 {
+	(void)cond;
+	(void)mutex;
 	CRT_UNIMPLEMENTED("pthread_cond_wait"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2135,6 +2214,9 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait)(pthread_cond_t *__restrict con
                                                   struct timespec const *__restrict abstime)
 /*[[[body:pthread_cond_timedwait]]]*/
 {
+	(void)cond;
+	(void)mutex;
+	(void)abstime;
 	CRT_UNIMPLEMENTED("pthread_cond_timedwait"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2148,6 +2230,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_condattr_init") int
 NOTHROW_NCX(LIBCCALL libc_pthread_condattr_init)(pthread_condattr_t *attr)
 /*[[[body:pthread_condattr_init]]]*/
 {
+	(void)attr;
 	CRT_UNIMPLEMENTED("pthread_condattr_init"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2161,6 +2244,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_condattr_destroy") int
 NOTHROW_NCX(LIBCCALL libc_pthread_condattr_destroy)(pthread_condattr_t *attr)
 /*[[[body:pthread_condattr_destroy]]]*/
 {
+	(void)attr;
 	CRT_UNIMPLEMENTED("pthread_condattr_destroy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2175,6 +2259,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_condattr_getpshared)(pthread_condattr_t const 
                                                        int *__restrict pshared)
 /*[[[body:pthread_condattr_getpshared]]]*/
 {
+	(void)attr;
+	(void)pshared;
 	CRT_UNIMPLEMENTED("pthread_condattr_getpshared"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2189,6 +2275,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_condattr_setpshared)(pthread_condattr_t *attr,
                                                        int pshared)
 /*[[[body:pthread_condattr_setpshared]]]*/
 {
+	(void)attr;
+	(void)pshared;
 	CRT_UNIMPLEMENTED("pthread_condattr_setpshared"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2203,6 +2291,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_condattr_getclock)(pthread_condattr_t const *_
                                                      clockid_t *__restrict clock_id)
 /*[[[body:pthread_condattr_getclock]]]*/
 {
+	(void)attr;
+	(void)clock_id;
 	CRT_UNIMPLEMENTED("pthread_condattr_getclock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2217,6 +2307,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_condattr_setclock)(pthread_condattr_t *attr,
                                                      clockid_t clock_id)
 /*[[[body:pthread_condattr_setclock]]]*/
 {
+	(void)attr;
+	(void)clock_id;
 	CRT_UNIMPLEMENTED("pthread_condattr_setclock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2232,6 +2324,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_init)(pthread_spinlock_t *lock,
                                              int pshared)
 /*[[[body:pthread_spin_init]]]*/
 {
+	(void)lock;
+	(void)pshared;
 	CRT_UNIMPLEMENTED("pthread_spin_init"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2245,6 +2339,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_spin_destroy") int
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_destroy)(pthread_spinlock_t *lock)
 /*[[[body:pthread_spin_destroy]]]*/
 {
+	(void)lock;
 	CRT_UNIMPLEMENTED("pthread_spin_destroy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2258,6 +2353,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_spin_lock") int
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_lock)(pthread_spinlock_t *lock)
 /*[[[body:pthread_spin_lock]]]*/
 {
+	(void)lock;
 	CRT_UNIMPLEMENTED("pthread_spin_lock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2271,6 +2367,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_spin_trylock") int
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *lock)
 /*[[[body:pthread_spin_trylock]]]*/
 {
+	(void)lock;
 	CRT_UNIMPLEMENTED("pthread_spin_trylock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2284,6 +2381,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_spin_unlock") int
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *lock)
 /*[[[body:pthread_spin_unlock]]]*/
 {
+	(void)lock;
 	CRT_UNIMPLEMENTED("pthread_spin_unlock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2300,6 +2398,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_barrier_init)(pthread_barrier_t *__restrict ba
                                                 unsigned int count)
 /*[[[body:pthread_barrier_init]]]*/
 {
+	(void)barrier;
+	(void)attr;
+	(void)count;
 	CRT_UNIMPLEMENTED("pthread_barrier_init"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2313,6 +2414,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_barrier_destroy") int
 NOTHROW_NCX(LIBCCALL libc_pthread_barrier_destroy)(pthread_barrier_t *barrier)
 /*[[[body:pthread_barrier_destroy]]]*/
 {
+	(void)barrier;
 	CRT_UNIMPLEMENTED("pthread_barrier_destroy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2326,6 +2428,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_barrier_wait") int
 NOTHROW_RPC(LIBCCALL libc_pthread_barrier_wait)(pthread_barrier_t *barrier)
 /*[[[body:pthread_barrier_wait]]]*/
 {
+	(void)barrier;
 	CRT_UNIMPLEMENTED("pthread_barrier_wait"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2339,6 +2442,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_barrierattr_init") int
 NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_init)(pthread_barrierattr_t *attr)
 /*[[[body:pthread_barrierattr_init]]]*/
 {
+	(void)attr;
 	CRT_UNIMPLEMENTED("pthread_barrierattr_init"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2352,6 +2456,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_barrierattr_destroy") in
 NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_destroy)(pthread_barrierattr_t *attr)
 /*[[[body:pthread_barrierattr_destroy]]]*/
 {
+	(void)attr;
 	CRT_UNIMPLEMENTED("pthread_barrierattr_destroy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2366,6 +2471,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_getpshared)(pthread_barrierattr_t 
                                                           int *__restrict pshared)
 /*[[[body:pthread_barrierattr_getpshared]]]*/
 {
+	(void)attr;
+	(void)pshared;
 	CRT_UNIMPLEMENTED("pthread_barrierattr_getpshared"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2380,6 +2487,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_setpshared)(pthread_barrierattr_t 
                                                           int pshared)
 /*[[[body:pthread_barrierattr_setpshared]]]*/
 {
+	(void)attr;
+	(void)pshared;
 	CRT_UNIMPLEMENTED("pthread_barrierattr_setpshared"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2399,6 +2508,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_key_create)(pthread_key_t *key,
                                               __pthread_destr_function_t destr_function)
 /*[[[body:pthread_key_create]]]*/
 {
+	(void)key;
+	(void)destr_function;
 	CRT_UNIMPLEMENTED("pthread_key_create"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2411,6 +2522,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_key_delete") int
 NOTHROW_NCX(LIBCCALL libc_pthread_key_delete)(pthread_key_t key)
 /*[[[body:pthread_key_delete]]]*/
 {
+	(void)key;
 	CRT_UNIMPLEMENTED("pthread_key_delete"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2423,6 +2535,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_getspecific") voi
 NOTHROW_NCX(LIBCCALL libc_pthread_getspecific)(pthread_key_t key)
 /*[[[body:pthread_getspecific]]]*/
 {
+	(void)key;
 	CRT_UNIMPLEMENTED("pthread_getspecific"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -2436,6 +2549,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setspecific)(pthread_key_t key,
                                                void const *pointer)
 /*[[[body:pthread_setspecific]]]*/
 {
+	(void)key;
+	(void)pointer;
 	CRT_UNIMPLEMENTED("pthread_setspecific"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2450,6 +2565,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getcpuclockid)(pthread_t pthread_id,
                                                  clockid_t *clock_id)
 /*[[[body:pthread_getcpuclockid]]]*/
 {
+	(void)pthread_id;
+	(void)clock_id;
 	CRT_UNIMPLEMENTED("pthread_getcpuclockid"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2473,6 +2590,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_atfork)(__pthread_atfork_func_t prepare,
                                           __pthread_atfork_func_t child)
 /*[[[body:pthread_atfork]]]*/
 {
+	(void)prepare;
+	(void)parent;
+	(void)child;
 	CRT_UNIMPLEMENTED("pthread_atfork"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2485,6 +2605,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.__pthread_register_cancel") void
 NOTHROW_NCX(LIBCCALL libc___pthread_register_cancel)(__pthread_unwind_buf_t *buf)
 /*[[[body:__pthread_register_cancel]]]*/
 {
+	(void)buf;
 	CRT_UNIMPLEMENTED("__pthread_register_cancel"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -2496,6 +2617,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.__pthread_register_cancel_defer"
 NOTHROW_NCX(LIBCCALL libc___pthread_register_cancel_defer)(__pthread_unwind_buf_t *buf)
 /*[[[body:__pthread_register_cancel_defer]]]*/
 {
+	(void)buf;
 	CRT_UNIMPLEMENTED("__pthread_register_cancel_defer"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -2512,6 +2634,8 @@ NOTHROW_RPC(LIBCCALL libc_pthread_mutex_timedlock64)(pthread_mutex_t *__restrict
                                                      struct timespec64 const *__restrict abstime)
 /*[[[body:pthread_mutex_timedlock64]]]*/
 {
+	(void)mutex;
+	(void)abstime;
 	CRT_UNIMPLEMENTED("pthread_mutex_timedlock64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2534,6 +2658,9 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait64)(pthread_cond_t *__restrict c
                                                     struct timespec64 const *__restrict abstime)
 /*[[[body:pthread_cond_timedwait64]]]*/
 {
+	(void)cond;
+	(void)mutex;
+	(void)abstime;
 	CRT_UNIMPLEMENTED("pthread_cond_timedwait64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2554,6 +2681,9 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin64_np)(pthread_t pthread,
                                                   struct timespec64 const *abstime)
 /*[[[body:pthread_timedjoin64_np]]]*/
 {
+	(void)pthread;
+	(void)thread_return;
+	(void)abstime;
 	CRT_UNIMPLEMENTED("pthread_timedjoin64_np"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2572,6 +2702,8 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__rest
                                                         struct timespec64 const *__restrict abstime)
 /*[[[body:pthread_rwlock_timedrdlock64]]]*/
 {
+	(void)rwlock;
+	(void)abstime;
 	CRT_UNIMPLEMENTED("pthread_rwlock_timedrdlock64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2590,6 +2722,8 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__rest
                                                         struct timespec64 const *__restrict abstime)
 /*[[[body:pthread_rwlock_timedwrlock64]]]*/
 {
+	(void)rwlock;
+	(void)abstime;
 	CRT_UNIMPLEMENTED("pthread_rwlock_timedwrlock64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

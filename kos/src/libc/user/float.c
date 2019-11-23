@@ -47,6 +47,8 @@ NOTHROW_NCX(LIBCCALL libc__controlfp)(uint32_t newval,
                                       uint32_t mask)
 /*[[[body:_controlfp]]]*/
 {
+	(void)newval;
+	(void)mask;
 	CRT_UNIMPLEMENTED("_controlfp"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -59,6 +61,8 @@ NOTHROW_NCX(LIBCCALL libc__set_controlfp)(uint32_t newval,
                                           uint32_t mask)
 /*[[[body:_set_controlfp]]]*/
 {
+	(void)newval;
+	(void)mask;
 	CRT_UNIMPLEMENTED("_set_controlfp"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -71,6 +75,9 @@ NOTHROW_NCX(LIBCCALL libc__controlfp_s)(uint32_t *pcurrent,
                                         uint32_t mask)
 /*[[[body:_controlfp_s]]]*/
 {
+	(void)pcurrent;
+	(void)newval;
+	(void)mask;
 	CRT_UNIMPLEMENTED("_controlfp_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -95,6 +102,8 @@ NOTHROW_NCX(LIBCCALL libc__statusfp2)(uint32_t *x86_stat,
                                       uint32_t *sse2_stat)
 /*[[[body:_statusfp2]]]*/
 {
+	(void)x86_stat;
+	(void)sse2_stat;
 	CRT_UNIMPLEMENTED("_statusfp2"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -106,6 +115,8 @@ NOTHROW_NCX(LIBCCALL libc__control87)(uint32_t newval,
                                       uint32_t mask)
 /*[[[body:_control87]]]*/
 {
+	(void)newval;
+	(void)mask;
 	CRT_UNIMPLEMENTED("_control87"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -120,6 +131,10 @@ NOTHROW_NCX(LIBCCALL libc___control87_2)(uint32_t newval,
                                          uint32_t *sse2_control_word)
 /*[[[body:__control87_2]]]*/
 {
+	(void)newval;
+	(void)mask;
+	(void)x86_control_word;
+	(void)sse2_control_word;
 	CRT_UNIMPLEMENTED("__control87_2"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -150,6 +165,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.float._fpclass") int
 NOTHROW(LIBCCALL libc__fpclass)(double x)
 /*[[[body:_fpclass]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("_fpclass"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

@@ -272,8 +272,7 @@ NOTHROW(KCALL cleanup_and_unwind_interrupt)(/*inherit(always)*/ vio_main_args_t 
 
 
 INTERN struct icpustate *
-NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args,
-                            uintptr_t cr2, uintptr_t ecode) {
+NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args, uintptr_t cr2) {
 	/* Exceptions always point to the instruction _after_ the faulting one! */
 	byte_t *orig_pc, *pc;
 	vm_daddr_t vio_addr;

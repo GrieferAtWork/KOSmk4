@@ -1708,7 +1708,9 @@ dbg_printf(/*utf-8*/ char const *__restrict format, ...) {
 }
 
 PUBLIC ATTR_DBGTEXT ssize_t KCALL
-dbg_printer(void *ignored, /*utf-8*/ char const *__restrict data, size_t datalen) {
+dbg_printer(void *UNUSED(ignored),
+            /*utf-8*/ char const *__restrict data,
+            size_t datalen) {
 	return ansitty_printer(&vga_tty, data, datalen);
 }
 

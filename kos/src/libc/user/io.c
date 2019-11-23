@@ -58,6 +58,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._findclose") int
 NOTHROW_NCX(LIBCCALL libc__findclose)(intptr_t findfd)
 /*[[[body:_findclose]]]*/
 {
+	(void)findfd;
 	CRT_UNIMPLEMENTED("_findclose"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -71,6 +72,8 @@ NOTHROW_RPC(LIBCCALL libc__findfirst32)(char const *__restrict filename,
                                         struct _finddata32_t *__restrict finddata)
 /*[[[body:_findfirst32]]]*/
 {
+	(void)filename;
+	(void)finddata;
 	CRT_UNIMPLEMENTED("_findfirst32"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -84,6 +87,8 @@ NOTHROW_RPC(LIBCCALL libc__findfirst32i64)(char const *__restrict filename,
                                            struct _finddata32i64_t *__restrict finddata)
 /*[[[body:_findfirst32i64]]]*/
 {
+	(void)filename;
+	(void)finddata;
 	CRT_UNIMPLEMENTED("_findfirst32i64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -97,6 +102,8 @@ NOTHROW_RPC(LIBCCALL libc__findnext32)(intptr_t findfd,
                                        struct _finddata32_t *__restrict finddata)
 /*[[[body:_findnext32]]]*/
 {
+	(void)findfd;
+	(void)finddata;
 	CRT_UNIMPLEMENTED("_findnext32"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -110,6 +117,8 @@ NOTHROW_RPC(LIBCCALL libc__findnext32i64)(intptr_t findfd,
                                           struct _finddata32i64_t *__restrict finddata)
 /*[[[body:_findnext32i64]]]*/
 {
+	(void)findfd;
+	(void)finddata;
 	CRT_UNIMPLEMENTED("_findnext32i64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -123,6 +132,8 @@ NOTHROW_RPC(LIBCCALL libc__findfirst64i32)(char const *__restrict filename,
                                            struct _finddata64i32_t *__restrict finddata)
 /*[[[body:_findfirst64i32]]]*/
 {
+	(void)filename;
+	(void)finddata;
 	CRT_UNIMPLEMENTED("_findfirst64i32"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -136,6 +147,8 @@ NOTHROW_RPC(LIBCCALL libc__findnext64)(intptr_t findfd,
                                        struct __finddata64_t *__restrict finddata)
 /*[[[body:_findnext64]]]*/
 {
+	(void)findfd;
+	(void)finddata;
 	CRT_UNIMPLEMENTED("_findnext64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -173,6 +186,8 @@ NOTHROW_NCX(LIBCCALL libc__mktemp_s)(char *template_,
                                      size_t size)
 /*[[[body:_mktemp_s]]]*/
 {
+	(void)template_;
+	(void)size;
 	CRT_UNIMPLEMENTED("_mktemp_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;

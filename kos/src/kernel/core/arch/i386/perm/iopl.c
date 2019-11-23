@@ -208,6 +208,7 @@ sys_iopl_rpc(void *UNUSED(arg), struct icpustate *__restrict state,
 }
 
 DEFINE_SYSCALL1(errno_t, iopl, syscall_ulong_t, level) {
+	(void)level;
 	task_schedule_user_rpc(THIS_TASK,
 	                       &sys_iopl_rpc,
 	                       NULL,

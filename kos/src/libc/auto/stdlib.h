@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2870790f */
+/* HASH CRC-32:0xd31cd265 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,7 +75,7 @@ INTDEF NONNULL((3, 4, 5)) int NOTHROW_NCX(LIBCCALL libc_qecvt_r)(long double val
 INTDEF NONNULL((3, 4, 5)) int NOTHROW_NCX(LIBCCALL libc_qfcvt_r)(long double val, int ndigit, int *__restrict decptr, int *__restrict sign, char *__restrict buf, size_t len);
 INTDEF WUNUSED NONNULL((3, 4)) char *NOTHROW_NCX(LIBCCALL libc_qecvt)(long double val, int ndigit, int *__restrict decptr, int *__restrict sign);
 INTDEF WUNUSED NONNULL((3, 4)) char *NOTHROW_NCX(LIBCCALL libc_qfcvt)(long double val, int ndigit, int *__restrict decptr, int *__restrict sign);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_rand_r)(unsigned int *__restrict seed);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_rand_r)(unsigned int *__restrict pseed);
 INTDEF long NOTHROW_NCX(LIBCCALL libc_random)(void);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_srandom)(unsigned int seed);
 INTDEF WUNUSED NONNULL((3, 4)) char *NOTHROW_NCX(LIBCCALL libc_ecvt)(double val, int ndigit, int *__restrict decptr, int *__restrict sign);

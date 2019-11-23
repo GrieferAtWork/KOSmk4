@@ -44,6 +44,10 @@ NOTHROW_RPC(LIBCCALL libc_posix_spawn)(pid_t *__restrict pid,
                                        __TENVP)
 /*[[[body:posix_spawn]]]*/
 {
+	(void)pid;
+	(void)path;
+	(void)file_actions;
+	(void)attrp;
 	CRT_UNIMPLEMENTED("posix_spawn"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -63,6 +67,10 @@ NOTHROW_RPC(LIBCCALL libc_posix_spawnp)(pid_t *__restrict pid,
                                         __TENVP)
 /*[[[body:posix_spawnp]]]*/
 {
+	(void)pid;
+	(void)file;
+	(void)file_actions;
+	(void)attrp;
 	CRT_UNIMPLEMENTED("posix_spawnp"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -76,6 +84,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawnattr_init") int
 NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_init)(posix_spawnattr_t *__restrict attr)
 /*[[[body:posix_spawnattr_init]]]*/
 {
+	(void)attr;
 	CRT_UNIMPLEMENTED("posix_spawnattr_init"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -89,6 +98,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawnattr_destroy") 
 NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_destroy)(posix_spawnattr_t *__restrict attr)
 /*[[[body:posix_spawnattr_destroy]]]*/
 {
+	(void)attr;
 	CRT_UNIMPLEMENTED("posix_spawnattr_destroy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -103,6 +113,8 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getsigdefault)(posix_spawnattr_t const
                                                          sigset_t *__restrict sigdefault)
 /*[[[body:posix_spawnattr_getsigdefault]]]*/
 {
+	(void)attr;
+	(void)sigdefault;
 	CRT_UNIMPLEMENTED("posix_spawnattr_getsigdefault"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -117,6 +129,8 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setsigdefault)(posix_spawnattr_t *__re
                                                          sigset_t const *__restrict sigdefault)
 /*[[[body:posix_spawnattr_setsigdefault]]]*/
 {
+	(void)attr;
+	(void)sigdefault;
 	CRT_UNIMPLEMENTED("posix_spawnattr_setsigdefault"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -131,6 +145,8 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getsigmask)(posix_spawnattr_t const *_
                                                       sigset_t *__restrict sigmask)
 /*[[[body:posix_spawnattr_getsigmask]]]*/
 {
+	(void)attr;
+	(void)sigmask;
 	CRT_UNIMPLEMENTED("posix_spawnattr_getsigmask"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -145,6 +161,8 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setsigmask)(posix_spawnattr_t *__restr
                                                       sigset_t const *__restrict sigmask)
 /*[[[body:posix_spawnattr_setsigmask]]]*/
 {
+	(void)attr;
+	(void)sigmask;
 	CRT_UNIMPLEMENTED("posix_spawnattr_setsigmask"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -159,6 +177,8 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getflags)(posix_spawnattr_t const *__r
                                                     int16_t *__restrict flags)
 /*[[[body:posix_spawnattr_getflags]]]*/
 {
+	(void)attr;
+	(void)flags;
 	CRT_UNIMPLEMENTED("posix_spawnattr_getflags"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -173,6 +193,8 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setflags)(posix_spawnattr_t *__restric
                                                     short int flags)
 /*[[[body:posix_spawnattr_setflags]]]*/
 {
+	(void)attr;
+	(void)flags;
 	CRT_UNIMPLEMENTED("posix_spawnattr_setflags"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -187,6 +209,8 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getpgroup)(posix_spawnattr_t const *__
                                                      pid_t *__restrict pgroup)
 /*[[[body:posix_spawnattr_getpgroup]]]*/
 {
+	(void)attr;
+	(void)pgroup;
 	CRT_UNIMPLEMENTED("posix_spawnattr_getpgroup"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -201,6 +225,8 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setpgroup)(posix_spawnattr_t *__restri
                                                      pid_t pgroup)
 /*[[[body:posix_spawnattr_setpgroup]]]*/
 {
+	(void)attr;
+	(void)pgroup;
 	CRT_UNIMPLEMENTED("posix_spawnattr_setpgroup"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -215,6 +241,8 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getschedpolicy)(posix_spawnattr_t cons
                                                           int *__restrict schedpolicy)
 /*[[[body:posix_spawnattr_getschedpolicy]]]*/
 {
+	(void)attr;
+	(void)schedpolicy;
 	CRT_UNIMPLEMENTED("posix_spawnattr_getschedpolicy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -229,6 +257,8 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setschedpolicy)(posix_spawnattr_t *__r
                                                           int schedpolicy)
 /*[[[body:posix_spawnattr_setschedpolicy]]]*/
 {
+	(void)attr;
+	(void)schedpolicy;
 	CRT_UNIMPLEMENTED("posix_spawnattr_setschedpolicy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -243,6 +273,8 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getschedparam)(posix_spawnattr_t const
                                                          struct sched_param *__restrict schedparam)
 /*[[[body:posix_spawnattr_getschedparam]]]*/
 {
+	(void)attr;
+	(void)schedparam;
 	CRT_UNIMPLEMENTED("posix_spawnattr_getschedparam"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -257,6 +289,8 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setschedparam)(posix_spawnattr_t *__re
                                                          struct sched_param const *__restrict schedparam)
 /*[[[body:posix_spawnattr_setschedparam]]]*/
 {
+	(void)attr;
+	(void)schedparam;
 	CRT_UNIMPLEMENTED("posix_spawnattr_setschedparam"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -270,6 +304,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawn_file_actions_i
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_init)(posix_spawn_file_actions_t *__restrict file_actions)
 /*[[[body:posix_spawn_file_actions_init]]]*/
 {
+	(void)file_actions;
 	CRT_UNIMPLEMENTED("posix_spawn_file_actions_init"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -283,6 +318,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawn_file_actions_d
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_destroy)(posix_spawn_file_actions_t *__restrict file_actions)
 /*[[[body:posix_spawn_file_actions_destroy]]]*/
 {
+	(void)file_actions;
 	CRT_UNIMPLEMENTED("posix_spawn_file_actions_destroy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -301,6 +337,11 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addopen)(posix_spawn_file_act
                                                             mode_t mode)
 /*[[[body:posix_spawn_file_actions_addopen]]]*/
 {
+	(void)file_actions;
+	(void)fd;
+	(void)path;
+	(void)oflags;
+	(void)mode;
 	CRT_UNIMPLEMENTED("posix_spawn_file_actions_addopen"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -316,6 +357,8 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addclose)(posix_spawn_file_ac
                                                              fd_t fd)
 /*[[[body:posix_spawn_file_actions_addclose]]]*/
 {
+	(void)file_actions;
+	(void)fd;
 	CRT_UNIMPLEMENTED("posix_spawn_file_actions_addclose"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -332,6 +375,9 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_adddup2)(posix_spawn_file_act
                                                             fd_t newfd)
 /*[[[body:posix_spawn_file_actions_adddup2]]]*/
 {
+	(void)file_actions;
+	(void)fd;
+	(void)newfd;
 	CRT_UNIMPLEMENTED("posix_spawn_file_actions_adddup2"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

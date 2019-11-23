@@ -72,6 +72,9 @@ PRIVATE void console_sane_ios(void) {
 
 
 int main(int argc, char *argv[], char *envp[]) {
+	(void)argc;
+	(void)argv;
+	(void)envp;
 	syslog(LOG_NOTICE, "[init] Init started\n");
 
 	/* Mount the /dev filesystem. */

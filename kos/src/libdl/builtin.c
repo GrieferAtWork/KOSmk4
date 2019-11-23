@@ -1225,6 +1225,7 @@ libdl_dlauxinfo(DlModule *self, unsigned int type, void *buf, size_t *pauxvlen) 
 		elf_setdlerrorf("Invalid module handle");
 		goto err;
 	}
+	(void)buf;
 	switch (type) {
 
 	case DLAUXINFO_ELF_PHDR:

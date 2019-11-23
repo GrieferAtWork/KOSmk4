@@ -198,6 +198,8 @@ PRIVATE NONNULL((1)) void KCALL
 Iso9660_StatFs(Iso9660Superblock *__restrict self,
                USER CHECKED struct statfs *result)
 		THROWS(E_IOERROR, E_SEGFAULT, ...) {
+	(void)self;
+	(void)result;
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -270,6 +272,9 @@ Iso9660_OpenSuperblock(Iso9660Superblock *__restrict self, UNCHECKED USER char *
 	VolumeDescriptor volume;
 	pos_t offset               = (pos_t)0x8000;
 	pos_t second_volume_offset = (pos_t)-1;
+	/* XXX: Mount arguments for iso9660? */
+	(void)args;
+
 	/* Search for the `VOLUME_DESCRIPTOR_TYPE_PRIMARY_VOLUME' descriptor. */
 	for (;;) {
 		memset(&volume,0xcc,sizeof(volume));

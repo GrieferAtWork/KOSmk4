@@ -309,7 +309,7 @@ termiox_to_termios(USER CHECKED struct termios *__restrict dst,
 
 PUBLIC NONNULL((1)) syscall_slong_t KCALL /* @return: -EINVAL: Unsupported `cmd' */
 ttybase_device_tryioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
-                        USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+                        USER UNCHECKED void *arg, iomode_t UNUSED(mode)) THROWS(...) {
 	struct ttybase_device *me;
 	assert(character_device_isattybase(self));
 	me = (struct ttybase_device *)self;

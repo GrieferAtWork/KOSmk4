@@ -198,9 +198,10 @@ NOTHROW(FCALL GDB_DelSwBreak)(struct vm *__restrict effective_vm, byte_t *addr) 
  * @return: ENOENT:   [GDB_DelBreak] The specified breakpoint doesn't exist. */
 INTERN WUNUSED errno_t
 NOTHROW(FCALL GDB_VM_AddBreak)(struct vm *__restrict effective_vm,
-                               unsigned int type,
-                               vm_virt_t addr, unsigned int kind) {
+                               unsigned int type, vm_virt_t addr,
+                               unsigned int kind) {
 	unsigned int cond;
+	(void)kind;
 	if (type == GDB_BREAKPOINT_TYPE_SWBREAK)
 		return GDB_AddSwBreak(effective_vm, (byte_t *)addr);
 	if (type == GDB_BREAKPOINT_TYPE_HWBREAK)
@@ -217,9 +218,10 @@ NOTHROW(FCALL GDB_VM_AddBreak)(struct vm *__restrict effective_vm,
 
 INTERN WUNUSED errno_t
 NOTHROW(FCALL GDB_VM_DelBreak)(struct vm *__restrict effective_vm,
-                               unsigned int type,
-                               vm_virt_t addr, unsigned int kind) {
+                               unsigned int type, vm_virt_t addr,
+                               unsigned int kind) {
 	unsigned int cond;
+	(void)kind;
 	if (type == GDB_BREAKPOINT_TYPE_SWBREAK)
 		return GDB_DelSwBreak(effective_vm, (byte_t *)addr);
 	if (type == GDB_BREAKPOINT_TYPE_HWBREAK)

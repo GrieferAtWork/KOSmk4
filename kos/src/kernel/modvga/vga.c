@@ -390,7 +390,7 @@ invalid_mode:
 
 
 INTERN void KCALL
-VGA_DoGetMode(VGA *__restrict self,
+VGA_DoGetMode(VGA *__restrict UNUSED(self),
               struct vga_mode *__restrict mode) {
 	unsigned int i;
 	vga_r(VGA_IS1_RC), vga_w(VGA_ATT_W, 0x00);
@@ -451,7 +451,7 @@ VGA_GetMode(VGA *__restrict self,
 
 
 INTERN void KCALL
-VGA_DoSetPalette(VGA *__restrict self,
+VGA_DoSetPalette(VGA *__restrict UNUSED(self),
                  USER CHECKED void const *__restrict pal,
                  size_t color_count)
 		THROWS(E_WOULDBLOCK) {

@@ -511,11 +511,12 @@ DEFINE_SYSCALL1(errno_t, fdatasync, fd_t, fd) {
 
 
 
-PRIVATE syscall_slong_t KCALL
-hop_do_generic_operation(struct handle *__restrict hand,
-                         uintptr_t hop_command,
-                         unsigned int fd,
-                         USER UNCHECKED void *arg) {
+#define hop_do_generic_operation(hand, hop_command, fd, arg) \
+	hop_do_generic_operation(hand, hop_command, arg)
+PRIVATE syscall_slong_t
+(KCALL hop_do_generic_operation)(struct handle *__restrict hand,
+                                 uintptr_t hop_command,
+                                 USER UNCHECKED void *arg) {
 	switch (hop_command) {
 
 #define MANGLE_HANDLE_DATA_POINTER(p) \

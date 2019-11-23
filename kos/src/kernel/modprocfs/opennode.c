@@ -31,7 +31,7 @@
 DECL_BEGIN
 
 INTERN NONNULL((1, 2, 3, 4)) void KCALL
-ProcFS_OpenNode(struct superblock *__restrict self,
+ProcFS_OpenNode(struct superblock *__restrict UNUSED(self),
                 struct inode *__restrict node,
                 struct directory_node *__restrict UNUSED(parent_directory),
                 struct directory_entry *__restrict UNUSED(parent_directory_entry))

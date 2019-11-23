@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaacb5147 */
+/* HASH CRC-32:0x3a19731e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,8 +24,11 @@ __LOCAL_LIBC(getsubopt) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getsubopt))(char **__restrict __optionp,
                                                        char *const *__restrict __tokens,
                                                        char **__restrict __valuep) {
-#line 1513 "kos/src/libc/magic/stdlib.c"
+#line 1539 "kos/src/libc/magic/stdlib.c"
 	/* TODO: Implement here */
+	(void)__optionp;
+	(void)__tokens;
+	(void)__valuep;
 	__COMPILER_IMPURE();
 	return 0;
 }

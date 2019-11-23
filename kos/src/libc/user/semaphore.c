@@ -53,6 +53,7 @@ NOTHROW_NCX(LIBCCALL libc_sem_init)(sem_t *sem,
 /*[[[body:sem_init]]]*/
 {
 	struct sem *self;
+	(void)pshared;
 	self = (struct sem *)sem;
 #if __SIZEOF_INT__ >= __SIZEOF_POINTER__
 	if (value > LFUTEX_WAIT_LOCK_TIDMASK) {

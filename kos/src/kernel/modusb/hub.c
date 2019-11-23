@@ -160,6 +160,9 @@ usb_hub_probe(struct usb_controller *__restrict self,
 		printk(KERN_ERR "[usb] HUB doesn't have any ports\n");
 		return false;
 	}
+	/* XXX: Validate the proper amount/kinds of end-points? */
+	(void)endpc;
+	(void)endpv;
 
 	result = CHARACTER_DEVICE_ALLOC(struct usb_hub_device);
 	result->uh_ctrl         = (REF struct usb_controller *)incref(self);

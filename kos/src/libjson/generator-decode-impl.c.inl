@@ -64,6 +64,7 @@ NOTHROW_NCX(CC FUNC(libjson_decode_INTO))(IF_DECODE(struct json_parser *__restri
                                           uint8_t type
                                           IF_DECODE(, unsigned int gen_flags)) {
 	IF_DECODE(int result;)
+	IF_DECODE((void)gen_flags;)
 	switch (type) {
 
 	case JSON_TYPE_BOOLBIT(0) ... JSON_TYPE_BOOLBIT(7): {

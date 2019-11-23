@@ -53,6 +53,8 @@ DEFINE_DEBUG_FUNCTION(
 		"freeze\n"
 		"\tFree the debugger in an infinite loop (used to test the F12-reset function)\n",
 		argc, argv) {
+	(void)argc;
+	(void)argv;
 	for (;;)
 		PREEMPTION_WAIT();
 	return 0;
@@ -66,6 +68,7 @@ DEFINE_DEBUG_FUNCTION(
 		, argc, argv) {
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
 	dbg_applyreg();
 	return 0;
 }
@@ -77,6 +80,7 @@ DEFINE_DEBUG_FUNCTION(
 		, argc, argv) {
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
 	if (THIS_TASK != debug_original_thread)
 		dbg_impersonate_thread(debug_original_thread);
 	memcpy(&dbg_viewstate, &dbg_origstate, sizeof(dbg_origstate));
@@ -259,7 +263,7 @@ NOTHROW(KCALL is_pc)(uintptr_t pc) {
 }
 
 PRIVATE ATTR_DBGTEXT NONNULL((1)) ssize_t __LIBCCALL
-debug_da_formater(struct disassembler *__restrict self,
+debug_da_formater(struct disassembler *__restrict UNUSED(self),
                   unsigned int format_option) {
 	char const *string;
 	if (DISASSEMBLER_FORMAT_ISSUFFIX(format_option))
@@ -350,6 +354,7 @@ DEFINE_DEBUG_FUNCTION(
 #endif /* LOG_STACK_REMAINDER */
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
 	fcpustate_to_ucpustate(&dbg_viewstate, &state);
 #ifdef LOG_STACK_REMAINDER
 	last_good_sp = ucpustate_getsp(&state);
@@ -421,6 +426,7 @@ DEFINE_DEBUG_FUNCTION(
 	unsigned int error;
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
 	memcpy(&newstate, &dbg_viewstate, sizeof(struct fcpustate));
 	error = unwind((void *)(fcpustate_getpc(&dbg_viewstate) - 1),
 	               &unwind_getreg_fcpustate, &dbg_viewstate,

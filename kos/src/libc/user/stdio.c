@@ -3565,6 +3565,8 @@ NOTHROW_RPC(LIBCCALL libc_popen)(char const *command,
                                  char const *modes)
 /*[[[body:popen]]]*/
 {
+	(void)command;
+	(void)modes;
 	CRT_UNIMPLEMENTED("popen"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -3596,6 +3598,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.fs.utility.tmpnam_r") char *
 NOTHROW_NCX(LIBCCALL libc_tmpnam_r)(char *buf)
 /*[[[body:tmpnam_r]]]*/
 {
+	(void)buf;
 	CRT_UNIMPLEMENTED("tmpnam_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -4001,6 +4004,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.fs.utility.tmpnam") char *
 NOTHROW_NCX(LIBCCALL libc_tmpnam)(char *buf)
 /*[[[body:tmpnam]]]*/
 {
+	(void)buf;
 	CRT_UNIMPLEMENTED("tmpnam"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -4014,6 +4018,8 @@ NOTHROW_NCX(LIBCCALL libc_tempnam)(char const *dir,
                                    char const *pfx)
 /*[[[body:tempnam]]]*/
 {
+	(void)dir;
+	(void)pfx;
 	CRT_UNIMPLEMENTED("tempnam"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -4129,6 +4135,9 @@ NOTHROW_NCX(LIBCCALL libc_obstack_vprintf)(struct obstack *__restrict obstack_,
                                            va_list args)
 /*[[[body:obstack_vprintf]]]*/
 {
+	(void)obstack_;
+	(void)format;
+	(void)args;
 	CRT_UNIMPLEMENTED("obstack_vprintf"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -4850,6 +4859,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.utility._set_output_format") u
 NOTHROW_NCX(LIBCCALL libc__set_output_format)(uint32_t format)
 /*[[[body:_set_output_format]]]*/
 {
+	(void)format;
 	CRT_UNIMPLEMENTED("_set_output_format"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -4873,6 +4883,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.utility._setmaxstdio") int
 NOTHROW_NCX(LIBCCALL libc__setmaxstdio)(int val)
 /*[[[body:_setmaxstdio]]]*/
 {
+	(void)val;
 	CRT_UNIMPLEMENTED("_setmaxstdio"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -4896,6 +4907,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.utility._set_printf_count_outp
 NOTHROW_NCX(LIBCCALL libc__set_printf_count_output)(int val)
 /*[[[body:_set_printf_count_output]]]*/
 {
+	(void)val;
 	CRT_UNIMPLEMENTED("_set_printf_count_output"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

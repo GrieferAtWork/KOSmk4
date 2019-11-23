@@ -38,6 +38,9 @@ int main(int argc, char *argv[]) {
 	struct termios oios, nios;
 	pid_t cpid;
 	int status;
+	(void)argc;
+	(void)argv;
+
 	srand(time(NULL));
 	tcgetattr(STDOUT_FILENO, &oios);
 	nios = oios;

@@ -37,6 +37,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.login_tty") int
 NOTHROW_RPC_KOS(LIBCCALL libc_login_tty)(fd_t fd)
 /*[[[body:login_tty]]]*/
 {
+	(void)fd;
 	CRT_UNIMPLEMENTED("login_tty"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -50,6 +51,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.database.utmp.login") void
 NOTHROW_RPC_KOS(LIBCCALL libc_login)(struct utmp const *entry)
 /*[[[body:login]]]*/
 {
+	(void)entry;
 	CRT_UNIMPLEMENTED("login"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -62,6 +64,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.database.utmp.logout") int
 NOTHROW_RPC_KOS(LIBCCALL libc_logout)(char const *ut_line)
 /*[[[body:logout]]]*/
 {
+	(void)ut_line;
 	CRT_UNIMPLEMENTED("logout"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -77,6 +80,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_logwtmp)(char const *ut_line,
                                        char const *ut_host)
 /*[[[body:logwtmp]]]*/
 {
+	(void)ut_line;
+	(void)ut_name;
+	(void)ut_host;
 	CRT_UNIMPLEMENTED("logwtmp"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -90,6 +96,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_updwtmp)(char const *wtmp_file,
                                        struct utmp const *utmp)
 /*[[[body:updwtmp]]]*/
 {
+	(void)wtmp_file;
+	(void)utmp;
 	CRT_UNIMPLEMENTED("updwtmp"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -102,6 +110,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.database.utmp.utmpname") int
 NOTHROW_RPC_KOS(LIBCCALL libc_utmpname)(char const *file)
 /*[[[body:utmpname]]]*/
 {
+	(void)file;
 	CRT_UNIMPLEMENTED("utmpname"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -150,6 +159,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.database.utmp.getutid") struct utmp *
 NOTHROW_RPC_KOS(LIBCCALL libc_getutid)(struct utmp const *id)
 /*[[[body:getutid]]]*/
 {
+	(void)id;
 	CRT_UNIMPLEMENTED("getutid"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -164,6 +174,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.database.utmp.getutline") struct utmp *
 NOTHROW_RPC_KOS(LIBCCALL libc_getutline)(struct utmp const *line)
 /*[[[body:getutline]]]*/
 {
+	(void)line;
 	CRT_UNIMPLEMENTED("getutline"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -177,6 +188,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.database.utmp.pututline") struct utmp *
 NOTHROW_RPC_KOS(LIBCCALL libc_pututline)(struct utmp const *utmp_ptr)
 /*[[[body:pututline]]]*/
 {
+	(void)utmp_ptr;
 	CRT_UNIMPLEMENTED("pututline"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -191,6 +203,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getutent_r)(struct utmp *buffer,
                                           struct utmp **result)
 /*[[[body:getutent_r]]]*/
 {
+	(void)buffer;
+	(void)result;
 	CRT_UNIMPLEMENTED("getutent_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -206,6 +220,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getutid_r)(struct utmp const *id,
                                          struct utmp **result)
 /*[[[body:getutid_r]]]*/
 {
+	(void)id;
+	(void)buffer;
+	(void)result;
 	CRT_UNIMPLEMENTED("getutid_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -221,6 +238,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getutline_r)(struct utmp const *line,
                                            struct utmp **result)
 /*[[[body:getutline_r]]]*/
 {
+	(void)line;
+	(void)buffer;
+	(void)result;
 	CRT_UNIMPLEMENTED("getutline_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

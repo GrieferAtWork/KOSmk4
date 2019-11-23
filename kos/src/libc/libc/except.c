@@ -417,6 +417,7 @@ done:
 PRIVATE error_register_state_t *LIBCCALL
 handle_special_exception(error_register_state_t *__restrict state,
                          struct exception_data *__restrict error) {
+	(void)state;
 	switch (error->e_code) {
 
 	case ERROR_CODEOF(E_EXIT_THREAD):

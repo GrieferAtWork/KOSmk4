@@ -182,6 +182,7 @@ coredump_create(struct ucpustate const *curr_ustate,
 		curr_ustate = kernel_debugtrap_r((struct ucpustate *)curr_ustate, siginfo.si_signo);
 	}
 	/* TODO */
+	(void)unwind_error;
 }
 
 

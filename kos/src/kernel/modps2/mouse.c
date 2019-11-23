@@ -30,12 +30,13 @@
 
 DECL_BEGIN
 
-/* TODO */
 
 INTERN ATTR_FREETEXT void KCALL
 ps2_mouse_create(struct ps2_probe_data *__restrict probe_data,
                  ps2_portid_t portno) {
 	printk(KERN_INFO "[ps2] Detected mouse on port #%u\n", portno + 1);
+	/* TODO */
+	(void)probe_data;
 }
 
 DECL_END

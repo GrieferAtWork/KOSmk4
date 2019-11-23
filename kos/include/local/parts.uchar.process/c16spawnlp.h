@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25592041 */
+/* HASH CRC-32:0xd2b7f2c8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,13 @@
 #ifndef ____localdep_c16spawnvp_defined
 #define ____localdep_c16spawnvp_defined 1
 #if defined(__CRT_HAVE_wspawnvp) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_c16spawnvp,(int __mode, __CHAR16_TYPE__ const *__restrict __path, __T16ARGV),wspawnvp,(__mode,__path, ___argv))
+__CREDIRECT(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_c16spawnvp,(int __mode, __CHAR16_TYPE__ const *__restrict __path, __T16ARGV),wspawnvp,(__mode,__path,___argv))
 #elif defined(__CRT_HAVE__wspawnvp) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_c16spawnvp,(int __mode, __CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wspawnvp,(__mode,__path, ___argv))
+__CREDIRECT(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_c16spawnvp,(int __mode, __CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wspawnvp,(__mode,__path,___argv))
 #elif defined(__CRT_HAVE_DOS$_wspawnvp)
-__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_c16spawnvp,(int __mode, __CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wspawnvp,(__mode,__path, ___argv))
+__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_c16spawnvp,(int __mode, __CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wspawnvp,(__mode,__path,___argv))
 #elif defined(__CRT_HAVE_DOS$_wspawnvp)
-__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_c16spawnvp,(int __mode, __CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wspawnvp,(__mode,__path, ___argv))
+__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_c16spawnvp,(int __mode, __CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wspawnvp,(__mode,__path,___argv))
 #else /* LIBC: c16spawnvp */
 #undef ____localdep_c16spawnvp_defined
 #endif /* c16spawnvp... */

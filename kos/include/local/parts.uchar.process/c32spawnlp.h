@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe91f95a */
+/* HASH CRC-32:0xec05f00c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,9 @@
 #ifndef ____localdep_c32spawnvp_defined
 #define ____localdep_c32spawnvp_defined 1
 #if defined(__CRT_HAVE_wspawnvp) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_c32spawnvp,(int __mode, __CHAR32_TYPE__ const *__restrict __path, __T32ARGV),wspawnvp,(__mode,__path, ___argv))
+__CREDIRECT(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_c32spawnvp,(int __mode, __CHAR32_TYPE__ const *__restrict __path, __T32ARGV),wspawnvp,(__mode,__path,___argv))
 #elif defined(__CRT_HAVE__wspawnvp) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_c32spawnvp,(int __mode, __CHAR32_TYPE__ const *__restrict __path, __T32ARGV),_wspawnvp,(__mode,__path, ___argv))
+__CREDIRECT(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_c32spawnvp,(int __mode, __CHAR32_TYPE__ const *__restrict __path, __T32ARGV),_wspawnvp,(__mode,__path,___argv))
 #else /* LIBC: c32spawnvp */
 #undef ____localdep_c32spawnvp_defined
 #endif /* c32spawnvp... */

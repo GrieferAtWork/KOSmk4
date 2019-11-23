@@ -397,6 +397,10 @@ NOTHROW_NCX(LIBCCALL libc_posix_fadvise64)(fd_t fd,
                                            int advise)
 /*[[[body:posix_fadvise64]]]*/
 {
+	(void)fd;
+	(void)offset;
+	(void)length;
+	(void)advise;
 	CRT_UNIMPLEMENTED("posix_fadvise64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -414,6 +418,9 @@ NOTHROW_NCX(LIBCCALL libc_posix_fallocate64)(fd_t fd,
                                              off64_t length)
 /*[[[body:posix_fallocate64]]]*/
 {
+	(void)fd;
+	(void)offset;
+	(void)length;
 	CRT_UNIMPLEMENTED("posix_fallocate64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -442,6 +449,9 @@ NOTHROW_RPC(LIBCCALL libc_lockf64)(fd_t fd,
                                    off64_t length)
 /*[[[body:lockf64]]]*/
 {
+	(void)fd;
+	(void)cmd;
+	(void)length;
 	CRT_UNIMPLEMENTED("lockf64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

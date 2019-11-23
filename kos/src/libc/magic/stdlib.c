@@ -777,8 +777,9 @@ free:(void *mallptr);
 [nothrow][std][user][same_impl]
 [if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(srandom)]
 srand:(long seed) -> void {
-	COMPILER_IMPURE();
 	/* ... */
+	(void)seed;
+	COMPILER_IMPURE();
 }
 
 [nothrow][std][user][same_impl]
@@ -1105,6 +1106,12 @@ ecvt_r:(double val, int ndigit,
 	return dos_ecvt_s(buf, len, val, ndigit, decptr, sign) ? -1 : 0;
 #else
 	/* TODO: Implementation */
+	(void)val;
+	(void)ndigit;
+	(void)decptr;
+	(void)sign;
+	(void)buf;
+	(void)len;
 	COMPILER_IMPURE();
 	return 0;
 #endif
@@ -1118,6 +1125,12 @@ fcvt_r:(double val, int ndigit,
 	return dos_fcvt_s(buf, len, val, ndigit, decptr, sign) ? -1 : 0;
 #else
 	/* TODO: Implementation */
+	(void)val;
+	(void)ndigit;
+	(void)decptr;
+	(void)sign;
+	(void)buf;
+	(void)len;
 	COMPILER_IMPURE();
 	return 0;
 #endif
@@ -1153,6 +1166,12 @@ qecvt_r:(long double val, int ndigit,
 	return dos_ecvt_s(buf, len, (double)val, ndigit, decptr, sign) ? -1 : 0;
 #else
 	/* TODO: Implementation */
+	(void)val;
+	(void)ndigit;
+	(void)decptr;
+	(void)sign;
+	(void)buf;
+	(void)len;
 	COMPILER_IMPURE();
 	return 0;
 #endif
@@ -1166,6 +1185,12 @@ qfcvt_r:(long double val, int ndigit,
 	return dos_fcvt_s(buf, len, (double)val, ndigit, decptr, sign) ? -1 : 0;
 #else
 	/* TODO: Implementation */
+	(void)val;
+	(void)ndigit;
+	(void)decptr;
+	(void)sign;
+	(void)buf;
+	(void)len;
 	COMPILER_IMPURE();
 	return 0;
 #endif
@@ -1269,7 +1294,8 @@ mkstemps64:([nonnull] char *template_, int suffixlen) -> int;
 %
 %#ifdef __USE_POSIX
 [user]
-rand_r:([nonnull] unsigned int *__restrict seed) -> int {
+rand_r:([nonnull] unsigned int *__restrict pseed) -> int {
+	(void)pseed;
 	COMPILER_IMPURE();
 	/* https://xkcd.com/221/ */
 	return 4;
@@ -1511,6 +1537,9 @@ getsubopt:([nonnull] char **__restrict optionp,
            [nonnull] char *const *__restrict tokens,
            [nonnull] char **__restrict valuep) -> int {
 	/* TODO: Implement here */
+	(void)optionp;
+	(void)tokens;
+	(void)valuep;
 	COMPILER_IMPURE();
 	return 0;
 }
@@ -2837,6 +2866,12 @@ _makepath_s:([nonnull] char *buf, $size_t buflen,
              char const *drive, char const *dir,
              char const *file, char const *ext) -> errno_t {
 	/* TODO */
+	(void)buf;
+	(void)buflen;
+	(void)drive;
+	(void)dir;
+	(void)file;
+	(void)ext;
 	COMPILER_IMPURE();
 	return 0;
 }
@@ -2848,6 +2883,15 @@ _splitpath_s:([nonnull] char const *__restrict abspath,
               [outp_opt(filelen)] char *file, $size_t filelen,
               [outp_opt(extlen)] char *ext, $size_t extlen) -> errno_t {
 	/* TODO */
+	(void)abspath;
+	(void)drive;
+	(void)drivelen;
+	(void)dir;
+	(void)dirlen;
+	(void)file;
+	(void)filelen;
+	(void)ext;
+	(void)extlen;
 	COMPILER_IMPURE();
 	return 0;
 }

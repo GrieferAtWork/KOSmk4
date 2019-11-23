@@ -124,6 +124,8 @@ NOTHROW_NCX(LIBCCALL libc_getrlimit64)(__rlimit_resource_t resource,
                                        struct rlimit64 *rlimits)
 /*[[[body:getrlimit64]]]*/
 {
+	(void)resource;
+	(void)rlimits;
 	CRT_UNIMPLEMENTED("getrlimit64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -144,6 +146,8 @@ NOTHROW_NCX(LIBCCALL libc_setrlimit64)(__rlimit_resource_t resource,
                                        struct rlimit64 const *rlimits)
 /*[[[body:setrlimit64]]]*/
 {
+	(void)resource;
+	(void)rlimits;
 	CRT_UNIMPLEMENTED("setrlimit64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

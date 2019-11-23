@@ -74,6 +74,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.getspnam") struct spwd *
 NOTHROW_RPC(LIBCCALL libc_getspnam)(char const *__restrict name)
 /*[[[body:getspnam]]]*/
 {
+	(void)name;
 	CRT_UNIMPLEMENTED("getspnam"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -88,6 +89,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.sgetspent") struct spwd *
 NOTHROW_RPC(LIBCCALL libc_sgetspent)(char const *__restrict string)
 /*[[[body:sgetspent]]]*/
 {
+	(void)string;
 	CRT_UNIMPLEMENTED("sgetspent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -102,6 +104,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.fgetspent") struct spwd *
 NOTHROW_RPC(LIBCCALL libc_fgetspent)(FILE *__restrict stream)
 /*[[[body:fgetspent]]]*/
 {
+	(void)stream;
 	CRT_UNIMPLEMENTED("fgetspent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -117,6 +120,8 @@ NOTHROW_RPC(LIBCCALL libc_putspent)(struct spwd const *__restrict p,
                                     FILE *__restrict stream)
 /*[[[body:putspent]]]*/
 {
+	(void)p;
+	(void)stream;
 	CRT_UNIMPLEMENTED("putspent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -134,6 +139,10 @@ NOTHROW_RPC(LIBCCALL libc_getspent_r)(struct spwd *__restrict result_buf,
                                       struct spwd **__restrict result)
 /*[[[body:getspent_r]]]*/
 {
+	(void)result_buf;
+	(void)buffer;
+	(void)buflen;
+	(void)result;
 	CRT_UNIMPLEMENTED("getspent_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -152,6 +161,11 @@ NOTHROW_RPC(LIBCCALL libc_getspnam_r)(char const *__restrict name,
                                       struct spwd **__restrict result)
 /*[[[body:getspnam_r]]]*/
 {
+	(void)name;
+	(void)result_buf;
+	(void)buffer;
+	(void)buflen;
+	(void)result;
 	CRT_UNIMPLEMENTED("getspnam_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -170,6 +184,11 @@ NOTHROW_RPC(LIBCCALL libc_sgetspent_r)(char const *__restrict string,
                                        struct spwd **__restrict result)
 /*[[[body:sgetspent_r]]]*/
 {
+	(void)string;
+	(void)result_buf;
+	(void)buffer;
+	(void)buflen;
+	(void)result;
 	CRT_UNIMPLEMENTED("sgetspent_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -188,6 +207,11 @@ NOTHROW_RPC(LIBCCALL libc_fgetspent_r)(FILE *__restrict stream,
                                        struct spwd **__restrict result)
 /*[[[body:fgetspent_r]]]*/
 {
+	(void)stream;
+	(void)result_buf;
+	(void)buffer;
+	(void)buflen;
+	(void)result;
 	CRT_UNIMPLEMENTED("fgetspent_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

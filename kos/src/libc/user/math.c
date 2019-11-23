@@ -37,6 +37,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.acos") double
 NOTHROW(LIBCCALL libc_acos)(double x)
 /*[[[body:acos]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("acos"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -50,6 +51,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.asin") double
 NOTHROW(LIBCCALL libc_asin)(double x)
 /*[[[body:asin]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("asin"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -63,6 +65,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.atan") double
 NOTHROW(LIBCCALL libc_atan)(double x)
 /*[[[body:atan]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("atan"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -77,6 +80,8 @@ NOTHROW(LIBCCALL libc_atan2)(double y,
                              double x)
 /*[[[body:atan2]]]*/
 {
+	(void)y;
+	(void)x;
 	CRT_UNIMPLEMENTED("atan2"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -90,6 +95,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.cos") double
 NOTHROW(LIBCCALL libc_cos)(double x)
 /*[[[body:cos]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("cos"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -103,6 +109,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.sin") double
 NOTHROW(LIBCCALL libc_sin)(double x)
 /*[[[body:sin]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("sin"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -116,6 +123,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.tan") double
 NOTHROW(LIBCCALL libc_tan)(double x)
 /*[[[body:tan]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("tan"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -285,6 +293,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.cosh") double
 NOTHROW(LIBCCALL libc_cosh)(double x)
 /*[[[body:cosh]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("cosh"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -298,6 +307,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.sinh") double
 NOTHROW(LIBCCALL libc_sinh)(double x)
 /*[[[body:sinh]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("sinh"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -311,6 +321,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.tanh") double
 NOTHROW(LIBCCALL libc_tanh)(double x)
 /*[[[body:tanh]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("tanh"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -390,6 +401,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.acosh") double
 NOTHROW(LIBCCALL libc_acosh)(double x)
 /*[[[body:acosh]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("acosh"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -403,6 +415,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.asinh") double
 NOTHROW(LIBCCALL libc_asinh)(double x)
 /*[[[body:asinh]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("asinh"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -416,6 +429,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.atanh") double
 NOTHROW(LIBCCALL libc_atanh)(double x)
 /*[[[body:atanh]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("atanh"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -495,6 +509,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.exp") double
 NOTHROW(LIBCCALL libc_exp)(double x)
 /*[[[body:exp]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("exp"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -509,6 +524,8 @@ NOTHROW_NCX(LIBCCALL libc_frexp)(double x,
                                  int *pexponent)
 /*[[[body:frexp]]]*/
 {
+	(void)x;
+	(void)pexponent;
 	CRT_UNIMPLEMENTED("frexp"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -523,6 +540,8 @@ NOTHROW(LIBCCALL libc_ldexp)(double x,
                              int exponent)
 /*[[[body:ldexp]]]*/
 {
+	(void)x;
+	(void)exponent;
 	CRT_UNIMPLEMENTED("ldexp"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -536,6 +555,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.log") double
 NOTHROW(LIBCCALL libc_log)(double x)
 /*[[[body:log]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("log"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -549,6 +569,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.log10") double
 NOTHROW(LIBCCALL libc_log10)(double x)
 /*[[[body:log10]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("log10"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -563,6 +584,8 @@ NOTHROW_NCX(LIBCCALL libc_modf)(double x,
                                 double *iptr)
 /*[[[body:modf]]]*/
 {
+	(void)x;
+	(void)iptr;
 	CRT_UNIMPLEMENTED("modf"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -722,6 +745,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.expm1") double
 NOTHROW(LIBCCALL libc_expm1)(double x)
 /*[[[body:expm1]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("expm1"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -735,6 +759,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.log1p") double
 NOTHROW(LIBCCALL libc_log1p)(double x)
 /*[[[body:log1p]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("log1p"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -748,6 +773,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.logb") double
 NOTHROW(LIBCCALL libc_logb)(double x)
 /*[[[body:logb]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("logb"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -827,6 +853,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.exp2") double
 NOTHROW(LIBCCALL libc_exp2)(double x)
 /*[[[body:exp2]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("exp2"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -840,6 +867,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.log2") double
 NOTHROW(LIBCCALL libc_log2)(double x)
 /*[[[body:log2]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("log2"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -898,6 +926,8 @@ NOTHROW(LIBCCALL libc_pow)(double x,
                            double y)
 /*[[[body:pow]]]*/
 {
+	(void)x;
+	(void)y;
 	CRT_UNIMPLEMENTED("pow"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -911,6 +941,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.sqrt") double
 NOTHROW(LIBCCALL libc_sqrt)(double x)
 /*[[[body:sqrt]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("sqrt"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -971,6 +1002,8 @@ NOTHROW(LIBCCALL libc_hypot)(double x,
                              double y)
 /*[[[body:hypot]]]*/
 {
+	(void)x;
+	(void)y;
 	CRT_UNIMPLEMENTED("hypot"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1008,6 +1041,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.cbrt") double
 NOTHROW(LIBCCALL libc_cbrt)(double x)
 /*[[[body:cbrt]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("cbrt"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1044,6 +1078,8 @@ NOTHROW(LIBCCALL libc_fmod)(double x,
                             double y)
 /*[[[body:fmod]]]*/
 {
+	(void)x;
+	(void)y;
 	CRT_UNIMPLEMENTED("fmod"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1080,6 +1116,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.erf") double
 NOTHROW(LIBCCALL libc_erf)(double x)
 /*[[[body:erf]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("erf"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1092,6 +1129,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.erfc") double
 NOTHROW(LIBCCALL libc_erfc)(double x)
 /*[[[body:erfc]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("erfc"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1104,6 +1142,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lgamma") double
 NOTHROW(LIBCCALL libc_lgamma)(double x)
 /*[[[body:lgamma]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("lgamma"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1177,6 +1216,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.tgamma") double
 NOTHROW(LIBCCALL libc_tgamma)(double x)
 /*[[[body:tgamma]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("tgamma"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1212,6 +1252,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.rint") double
 NOTHROW(LIBCCALL libc_rint)(double x)
 /*[[[body:rint]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("rint"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1226,6 +1267,8 @@ NOTHROW(LIBCCALL libc_nextafter)(double x,
                                  double y)
 /*[[[body:nextafter]]]*/
 {
+	(void)x;
+	(void)y;
 	CRT_UNIMPLEMENTED("nextafter"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1240,6 +1283,8 @@ NOTHROW(LIBCCALL libc_remainder)(double x,
                                  double y)
 /*[[[body:remainder]]]*/
 {
+	(void)x;
+	(void)y;
 	CRT_UNIMPLEMENTED("remainder"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1253,6 +1298,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.ilogb") int
 NOTHROW(LIBCCALL libc_ilogb)(double x)
 /*[[[body:ilogb]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("ilogb"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1358,6 +1404,8 @@ NOTHROW(LIBCCALL libc_nexttoward)(double x,
                                   long double y)
 /*[[[body:nexttoward]]]*/
 {
+	(void)x;
+	(void)y;
 	CRT_UNIMPLEMENTED("nexttoward"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1372,6 +1420,8 @@ NOTHROW(LIBCCALL libc_scalbn)(double x,
                               int n)
 /*[[[body:scalbn]]]*/
 {
+	(void)x;
+	(void)n;
 	CRT_UNIMPLEMENTED("scalbn"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1386,6 +1436,8 @@ NOTHROW(LIBCCALL libc_scalbln)(double x,
                                long int n)
 /*[[[body:scalbln]]]*/
 {
+	(void)x;
+	(void)n;
 	CRT_UNIMPLEMENTED("scalbln"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1400,6 +1452,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nearbyint") double
 NOTHROW(LIBCCALL libc_nearbyint)(double x)
 /*[[[body:nearbyint]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("nearbyint"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1417,6 +1470,9 @@ NOTHROW(LIBCCALL libc_remquo)(double x,
                               int *pquo)
 /*[[[body:remquo]]]*/
 {
+	(void)x;
+	(void)y;
+	(void)pquo;
 	CRT_UNIMPLEMENTED("remquo"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1430,6 +1486,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lrint") long int
 NOTHROW(LIBCCALL libc_lrint)(double x)
 /*[[[body:lrint]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("lrint"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -1446,6 +1503,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llrint") __LONGLONG
 NOTHROW(LIBCCALL libc_llrint)(double x)
 /*[[[body:llrint]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("llrint"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1638,6 +1696,9 @@ NOTHROW(LIBCCALL libc_sincos)(double x,
                               double *pcosx)
 /*[[[body:sincos]]]*/
 {
+	(void)x;
+	(void)psinx;
+	(void)pcosx;
 	CRT_UNIMPLEMENTED("sincos"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -1650,6 +1711,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.exp10") double
 NOTHROW(LIBCCALL libc_exp10)(double x)
 /*[[[body:exp10]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("exp10"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1663,6 +1725,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.pow10") double
 NOTHROW(LIBCCALL libc_pow10)(double x)
 /*[[[body:pow10]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("pow10"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1753,6 +1816,8 @@ NOTHROW(LIBCCALL libc_drem)(double x,
                             double y)
 /*[[[body:drem]]]*/
 {
+	(void)x;
+	(void)y;
 	CRT_UNIMPLEMENTED("drem"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1766,6 +1831,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.significand") double
 NOTHROW(LIBCCALL libc_significand)(double x)
 /*[[[body:significand]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("significand"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1824,6 +1890,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.j0") double
 NOTHROW(LIBCCALL libc_j0)(double x)
 /*[[[body:j0]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("j0"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1836,6 +1903,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.j1") double
 NOTHROW(LIBCCALL libc_j1)(double x)
 /*[[[body:j1]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("j1"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1849,6 +1917,8 @@ NOTHROW(LIBCCALL libc_jn)(int n,
                           double x)
 /*[[[body:jn]]]*/
 {
+	(void)n;
+	(void)x;
 	CRT_UNIMPLEMENTED("jn"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1861,6 +1931,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.y0") double
 NOTHROW(LIBCCALL libc_y0)(double x)
 /*[[[body:y0]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("y0"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1873,6 +1944,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.y1") double
 NOTHROW(LIBCCALL libc_y1)(double x)
 /*[[[body:y1]]]*/
 {
+	(void)x;
 	CRT_UNIMPLEMENTED("y1"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1886,6 +1958,8 @@ NOTHROW(LIBCCALL libc_yn)(int n,
                           double x)
 /*[[[body:yn]]]*/
 {
+	(void)n;
+	(void)x;
 	CRT_UNIMPLEMENTED("yn"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -2026,6 +2100,8 @@ NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
                                     int *signgamp)
 /*[[[body:lgamma_r]]]*/
 {
+	(void)x;
+	(void)signgamp;
 	CRT_UNIMPLEMENTED("lgamma_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -2068,6 +2144,8 @@ NOTHROW(LIBCCALL libc_scalb)(double x,
                              double n)
 /*[[[body:scalb]]]*/
 {
+	(void)x;
+	(void)n;
 	CRT_UNIMPLEMENTED("scalb"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -2104,6 +2182,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__fpclassify") int
 NOTHROW(LIBCCALL libc___fpclassify)(double val)
 /*[[[body:__fpclassify]]]*/
 {
+	(void)val;
 	CRT_UNIMPLEMENTED("__fpclassify"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2116,6 +2195,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbit") int
 NOTHROW(LIBCCALL libc___signbit)(double val)
 /*[[[body:__signbit]]]*/
 {
+	(void)val;
 	CRT_UNIMPLEMENTED("__signbit"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -2168,6 +2248,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__issignaling") int
 NOTHROW(LIBCCALL libc___issignaling)(double val)
 /*[[[body:__issignaling]]]*/
 {
+	(void)val;
 	CRT_UNIMPLEMENTED("__issignaling"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

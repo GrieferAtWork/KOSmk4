@@ -36,8 +36,7 @@ typedef struct {
 
 /* Main function for VIO instruction emulation. */
 INTDEF struct icpustate *
-NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args,
-                            uintptr_t cr2, uintptr_t ecode);
+NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args, uintptr_t cr2);
 
 DECL_END
 #endif /* CONFIG_VIO */

@@ -37,6 +37,7 @@ if (gcc_opt.remove("-O3"))
 #include <kos/kernel/cpu-state.h>
 
 #include <ctype.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -56,9 +57,25 @@ DECL_BEGIN
 PRIVATE ATTR_DBGBSS char const *ev_current_expression = NULL;
 
 PRIVATE ATTR_DBGTEXT bool
+NOTHROW(KCALL ev_verrorf)(unsigned int flags,
+                          char const *format,
+                          va_list args) {
+	/* TODO */
+	(void)flags;
+	(void)format;
+	(void)args;
+	return false;
+}
+
+PRIVATE ATTR_DBGTEXT bool
 NOTHROW(VCALL ev_errorf)(unsigned int flags,
                          char const *format, ...) {
-	return false;
+	bool result;
+	va_list args;
+	va_start(args, format);
+	result = ev_verrorf(flags, format, args);
+	va_end(args);
+	return result;
 }
 
 

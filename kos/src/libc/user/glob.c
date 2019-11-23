@@ -64,6 +64,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.utility.glob.globfree") void
 NOTHROW_NCX(LIBCCALL libc_globfree)(glob_t *pglob)
 /*[[[body:globfree]]]*/
 {
+	(void)pglob;
 	CRT_UNIMPLEMENTED("globfree"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -103,6 +104,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.utility.glob.globfree64") void
 NOTHROW_NCX(LIBCCALL libc_globfree64)(struct __glob64_struct *pglob)
 /*[[[body:globfree64]]]*/
 {
+	(void)pglob;
 	CRT_UNIMPLEMENTED("globfree64"); /* TODO */
 	libc_seterrno(ENOSYS);
 }

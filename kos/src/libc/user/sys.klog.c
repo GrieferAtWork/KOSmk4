@@ -41,6 +41,9 @@ NOTHROW_NCX(LIBCCALL libc_klogctl)(int type,
                                    int len)
 /*[[[body:klogctl]]]*/
 {
+	(void)type;
+	(void)bufp;
+	(void)len;
 	CRT_UNIMPLEMENTED("klogctl"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

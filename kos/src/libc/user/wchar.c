@@ -371,6 +371,8 @@ NOTHROW_NCX(LIBCCALL libc_open_wmemstream)(char32_t **bufloc,
                                            size_t *sizeloc)
 /*[[[body:open_wmemstream]]]*/
 {
+	(void)bufloc;
+	(void)sizeloc;
 	CRT_UNIMPLEMENTED("open_wmemstream"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -383,6 +385,8 @@ NOTHROW_NCX(LIBDCALL libd_open_wmemstream)(char16_t **bufloc,
                                            size_t *sizeloc)
 /*[[[body:DOS$open_wmemstream]]]*/
 {
+	(void)bufloc;
+	(void)sizeloc;
 	CRT_UNIMPLEMENTED("open_wmemstream"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -773,6 +777,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf.vfwscanf_unlock
 		__THROWS(...)
 /*[[[body:vfwscanf_unlocked]]]*/
 {
+	(void)stream;
+	(void)format;
+	(void)args;
 	CRT_UNIMPLEMENTED("vfwscanf_unlocked"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -788,6 +795,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf.vfwscanf_un
 		__THROWS(...)
 /*[[[body:DOS$vfwscanf_unlocked]]]*/
 {
+	(void)stream;
+	(void)format;
+	(void)args;
 	CRT_UNIMPLEMENTED("vfwscanf_unlocked"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -803,6 +813,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.FILE.locked.read.scanf.vfwscanf") __STDC
 		__THROWS(...)
 /*[[[body:vfwscanf]]]*/
 {
+	(void)stream;
+	(void)format;
+	(void)args;
 	CRT_UNIMPLEMENTED("vfwscanf"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -818,6 +831,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf.vfwscanf") __
 		__THROWS(...)
 /*[[[body:DOS$vfwscanf]]]*/
 {
+	(void)stream;
+	(void)format;
+	(void)args;
 	CRT_UNIMPLEMENTED("vfwscanf"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1438,6 +1454,11 @@ NOTHROW_NCX(LIBDCALL libd_wcsnrtombs)(char *dst,
                                       mbstate_t *ps)
 /*[[[body:DOS$wcsnrtombs]]]*/
 {
+	(void)dst;
+	(void)psrc;
+	(void)nwc;
+	(void)len;
+	(void)ps;
 	CRT_UNIMPLEMENTED("wcsnrtombs"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1454,6 +1475,11 @@ NOTHROW_NCX(LIBCCALL libc_wcsnrtombs)(char *dst,
                                       mbstate_t *ps)
 /*[[[body:wcsnrtombs]]]*/
 {
+	(void)dst;
+	(void)psrc;
+	(void)nwc;
+	(void)len;
+	(void)ps;
 	CRT_UNIMPLEMENTED("wcsnrtombs"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1470,6 +1496,11 @@ NOTHROW_NCX(LIBCCALL libc_mbsnrtowcs)(char32_t *dst,
                                       mbstate_t *ps)
 /*[[[body:mbsnrtowcs]]]*/
 {
+	(void)dst;
+	(void)psrc;
+	(void)nmc;
+	(void)len;
+	(void)ps;
 	CRT_UNIMPLEMENTED("mbsnrtowcs"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1486,6 +1517,11 @@ NOTHROW_NCX(LIBDCALL libd_mbsnrtowcs)(char16_t *dst,
                                       mbstate_t *ps)
 /*[[[body:DOS$mbsnrtowcs]]]*/
 {
+	(void)dst;
+	(void)psrc;
+	(void)nmc;
+	(void)len;
+	(void)ps;
 	CRT_UNIMPLEMENTED("mbsnrtowcs"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1500,6 +1536,9 @@ NOTHROW_NCX(LIBCCALL libc__wcserror_s)(char32_t *buf,
                                        int errno_value)
 /*[[[body:_wcserror_s]]]*/
 {
+	(void)buf;
+	(void)bufsize;
+	(void)errno_value;
 	CRT_UNIMPLEMENTED("_wcserror_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1513,6 +1552,9 @@ NOTHROW_NCX(LIBDCALL libd__wcserror_s)(char16_t *buf,
                                        int errno_value)
 /*[[[body:DOS$_wcserror_s]]]*/
 {
+	(void)buf;
+	(void)bufsize;
+	(void)errno_value;
 	CRT_UNIMPLEMENTED("_wcserror_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1524,6 +1566,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.errno._wcserror") char32_t *
 NOTHROW_NCX(LIBCCALL libc__wcserror)(int errno_value)
 /*[[[body:_wcserror]]]*/
 {
+	(void)errno_value;
 	CRT_UNIMPLEMENTED("_wcserror"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1535,6 +1578,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.errno._wcserror") char16_t *
 NOTHROW_NCX(LIBDCALL libd__wcserror)(int errno_value)
 /*[[[body:DOS$_wcserror]]]*/
 {
+	(void)errno_value;
 	CRT_UNIMPLEMENTED("_wcserror"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1546,6 +1590,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.errno.__wcserror") char32_t *
 NOTHROW_NCX(LIBCCALL libc___wcserror)(char32_t const *message)
 /*[[[body:__wcserror]]]*/
 {
+	(void)message;
 	CRT_UNIMPLEMENTED("__wcserror"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1557,6 +1602,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.errno.__wcserror") char16_t *
 NOTHROW_NCX(LIBDCALL libd___wcserror)(char16_t const *message)
 /*[[[body:DOS$__wcserror]]]*/
 {
+	(void)message;
 	CRT_UNIMPLEMENTED("__wcserror"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1570,6 +1616,9 @@ NOTHROW_NCX(LIBCCALL libc___wcserror_s)(char32_t *buf,
                                         char32_t const *message)
 /*[[[body:__wcserror_s]]]*/
 {
+	(void)buf;
+	(void)bufsize;
+	(void)message;
 	CRT_UNIMPLEMENTED("__wcserror_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1583,6 +1632,9 @@ NOTHROW_NCX(LIBDCALL libd___wcserror_s)(char16_t *buf,
                                         char16_t const *message)
 /*[[[body:DOS$__wcserror_s]]]*/
 {
+	(void)buf;
+	(void)bufsize;
+	(void)message;
 	CRT_UNIMPLEMENTED("__wcserror_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1745,6 +1797,9 @@ NOTHROW_NCX(LIBCCALL libc__wfsopen)(char32_t const *filename,
                                     int sh_flag)
 /*[[[body:_wfsopen]]]*/
 {
+	(void)filename;
+	(void)mode;
+	(void)sh_flag;
 	CRT_UNIMPLEMENTED("_wfsopen"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1759,6 +1814,9 @@ NOTHROW_NCX(LIBDCALL libd__wfsopen)(char16_t const *filename,
                                     int sh_flag)
 /*[[[body:DOS$_wfsopen]]]*/
 {
+	(void)filename;
+	(void)mode;
+	(void)sh_flag;
 	CRT_UNIMPLEMENTED("_wfsopen"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1772,6 +1830,8 @@ NOTHROW_NCX(LIBCCALL libc__wfdopen)(fd_t fd,
                                     char32_t const *mode)
 /*[[[body:_wfdopen]]]*/
 {
+	(void)fd;
+	(void)mode;
 	CRT_UNIMPLEMENTED("_wfdopen"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1785,6 +1845,8 @@ NOTHROW_NCX(LIBDCALL libd__wfdopen)(fd_t fd,
                                     char16_t const *mode)
 /*[[[body:DOS$_wfdopen]]]*/
 {
+	(void)fd;
+	(void)mode;
 	CRT_UNIMPLEMENTED("_wfdopen"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1803,6 +1865,9 @@ NOTHROW_NCX(LIBCCALL libc__wfopen_s)(FILE **pstream,
                                      char32_t const *mode)
 /*[[[body:_wfopen_s]]]*/
 {
+	(void)pstream;
+	(void)filename;
+	(void)mode;
 	CRT_UNIMPLEMENTED("_wfopen_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1817,6 +1882,9 @@ NOTHROW_NCX(LIBDCALL libd__wfopen_s)(FILE **pstream,
                                      char16_t const *mode)
 /*[[[body:DOS$_wfopen_s]]]*/
 {
+	(void)pstream;
+	(void)filename;
+	(void)mode;
 	CRT_UNIMPLEMENTED("_wfopen_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1832,6 +1900,10 @@ NOTHROW_NCX(LIBCCALL libc__wfreopen_s)(FILE **pstream,
                                        FILE *stream)
 /*[[[body:_wfreopen_s]]]*/
 {
+	(void)pstream;
+	(void)filename;
+	(void)mode;
+	(void)stream;
 	CRT_UNIMPLEMENTED("_wfreopen_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1847,6 +1919,10 @@ NOTHROW_NCX(LIBDCALL libd__wfreopen_s)(FILE **pstream,
                                        FILE *stream)
 /*[[[body:DOS$_wfreopen_s]]]*/
 {
+	(void)pstream;
+	(void)filename;
+	(void)mode;
+	(void)stream;
 	CRT_UNIMPLEMENTED("_wfreopen_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1900,6 +1976,8 @@ NOTHROW_NCX(LIBCCALL libc__wtempnam)(char32_t const *directory,
                                      char32_t const *file_prefix)
 /*[[[body:_wtempnam]]]*/
 {
+	(void)directory;
+	(void)file_prefix;
 	CRT_UNIMPLEMENTED("_wtempnam"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1913,6 +1991,8 @@ NOTHROW_NCX(LIBDCALL libd__wtempnam)(char16_t const *directory,
                                      char16_t const *file_prefix)
 /*[[[body:DOS$_wtempnam]]]*/
 {
+	(void)directory;
+	(void)file_prefix;
 	CRT_UNIMPLEMENTED("_wtempnam"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1924,6 +2004,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.errno.utility._wperror") void
 NOTHROW_NCX(LIBCCALL libc__wperror)(char32_t const *errmsg)
 /*[[[body:_wperror]]]*/
 {
+	(void)errmsg;
 	CRT_UNIMPLEMENTED("_wperror"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -1934,6 +2015,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.errno.utility._wperror") void
 NOTHROW_NCX(LIBDCALL libd__wperror)(char16_t const *errmsg)
 /*[[[body:DOS$_wperror]]]*/
 {
+	(void)errmsg;
 	CRT_UNIMPLEMENTED("_wperror"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -1948,6 +2030,8 @@ NOTHROW_NCX(LIBCCALL libc__wtmpnam_s)(char32_t *dst,
                                       size_t wchar_count)
 /*[[[body:_wtmpnam_s]]]*/
 {
+	(void)dst;
+	(void)wchar_count;
 	CRT_UNIMPLEMENTED("_wtmpnam_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -1961,6 +2045,8 @@ NOTHROW_NCX(LIBDCALL libd__wtmpnam_s)(char16_t *dst,
                                       size_t wchar_count)
 /*[[[body:DOS$_wtmpnam_s]]]*/
 {
+	(void)dst;
+	(void)wchar_count;
 	CRT_UNIMPLEMENTED("_wtmpnam_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;

@@ -290,6 +290,7 @@ GDBThread_StopRPC(void *arg,
 PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL GDBThread_StopAllCpusIPI)(struct icpustate *__restrict state,
                                         void *args[CPU_IPI_ARGCOUNT]) {
+	(void)args;
 	return GDBThread_StopRPCImpl(GDBTHREAD_STOPRPCIMPL_F_STOPCPU, state);
 }
 

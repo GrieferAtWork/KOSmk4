@@ -402,6 +402,8 @@ usb_unregister_interface_probe(PUSB_INTERFACE_PROBE func)
 PRIVATE void KCALL
 usb_create_strange_device_nowarn(struct usb_controller *__restrict self,
                                  struct usb_device *__restrict dev) {
+	(void)self;
+	(void)dev;
 	/* TODO */
 }
 

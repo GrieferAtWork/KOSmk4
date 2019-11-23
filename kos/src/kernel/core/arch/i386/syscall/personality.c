@@ -42,9 +42,9 @@ INTDEF byte_t __x86_syscall_emulate_r_protect_end[];
  * system calls. - Specifically, the special handling that is required for
  * servicing an RPC as `rpc_serve_user_redirection_all' */
 INTERN NONNULL((1, 2, 3)) unsigned int
-NOTHROW(KCALL syscall_emulate_r_personality)(struct unwind_fde_struct *__restrict fde,
+NOTHROW(KCALL syscall_emulate_r_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
                                              struct kcpustate *__restrict state,
-                                             byte_t *__restrict lsda) {
+                                             byte_t *__restrict UNUSED(lsda)) {
 	struct icpustate *return_cpustate;
 	struct rpc_syscall_info *sc_info;
 	COMPILER_IMPURE(); /* ??? */

@@ -128,7 +128,7 @@ handle_eventfd_sema_read(struct eventfd *__restrict self,
 INTERN size_t KCALL
 handle_eventfd_fence_write(struct eventfd *__restrict self,
                            USER CHECKED void const *src,
-                           size_t num_bytes, iomode_t mode) {
+                           size_t num_bytes, iomode_t UNUSED(mode)) {
 	u64 val, oldval, newval;
 	if unlikely(num_bytes < 8) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,

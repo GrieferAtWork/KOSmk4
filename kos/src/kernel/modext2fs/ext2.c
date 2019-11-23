@@ -45,6 +45,10 @@ INTERN void KCALL
 Ext2_VReadFromINode(struct inode *__restrict self,
                     CHECKED USER void *buf,
                     size_t bufsize, pos_t pos) {
+	(void)self;
+	(void)buf;
+	(void)bufsize;
+	(void)pos;
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -52,6 +56,10 @@ INTERN void KCALL
 Ext2_VWriteToINode(struct inode *__restrict self,
                    CHECKED USER void const *buf,
                    size_t bufsize, pos_t pos) {
+	(void)self;
+	(void)buf;
+	(void)bufsize;
+	(void)pos;
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -59,6 +67,11 @@ INTERN void KCALL
 Ext2_ReadFromINode(struct inode *__restrict self,
                    CHECKED USER void *buf, size_t bufsize,
                    pos_t pos, struct aio_multihandle *__restrict aio) {
+	(void)self;
+	(void)buf;
+	(void)bufsize;
+	(void)pos;
+	(void)aio;
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -66,6 +79,11 @@ INTERN void KCALL
 Ext2_WriteToINode(struct inode *__restrict self,
                   CHECKED USER void const *buf, size_t bufsize,
                   pos_t pos, struct aio_multihandle *__restrict aio) {
+	(void)self;
+	(void)buf;
+	(void)bufsize;
+	(void)pos;
+	(void)aio;
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -73,6 +91,11 @@ INTERN void KCALL
 Ext2_ReadFromINodePhys(struct inode *__restrict self,
                        vm_phys_t dst, size_t bufsize,
                        pos_t pos, struct aio_multihandle *__restrict aio) {
+	(void)self;
+	(void)dst;
+	(void)bufsize;
+	(void)pos;
+	(void)aio;
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -80,6 +103,11 @@ INTERN void KCALL
 Ext2_WriteToINodePhys(struct inode *__restrict self,
                       vm_phys_t src, size_t bufsize,
                       pos_t pos, struct aio_multihandle *__restrict aio) {
+	(void)self;
+	(void)src;
+	(void)bufsize;
+	(void)pos;
+	(void)aio;
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -87,6 +115,11 @@ INTERN void KCALL
 Ext2_ReadFromINodeVector(struct inode *__restrict self,
                          struct aio_buffer *__restrict buf, size_t bufsize,
                          pos_t pos, struct aio_multihandle *__restrict aio) {
+	(void)self;
+	(void)buf;
+	(void)bufsize;
+	(void)pos;
+	(void)aio;
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -94,6 +127,11 @@ INTERN void KCALL
 Ext2_WriteToINodeVector(struct inode *__restrict self,
                         struct aio_buffer *__restrict buf, size_t bufsize,
                         pos_t pos, struct aio_multihandle *__restrict aio) {
+	(void)self;
+	(void)buf;
+	(void)bufsize;
+	(void)pos;
+	(void)aio;
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -101,6 +139,11 @@ INTERN void KCALL
 Ext2_ReadFromINodeVectorPhys(struct inode *__restrict self,
                              struct aio_pbuffer *__restrict buf, size_t bufsize,
                              pos_t pos, struct aio_multihandle *__restrict aio) {
+	(void)self;
+	(void)buf;
+	(void)bufsize;
+	(void)pos;
+	(void)aio;
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -108,6 +151,11 @@ INTERN void KCALL
 Ext2_WriteToINodeVectorPhys(struct inode *__restrict self,
                             struct aio_pbuffer *__restrict buf, size_t bufsize,
                             pos_t pos, struct aio_multihandle *__restrict aio) {
+	(void)self;
+	(void)buf;
+	(void)bufsize;
+	(void)pos;
+	(void)aio;
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -611,6 +659,9 @@ Ext2_OpenSuperblock(Ext2Superblock *__restrict self, UNCHECKED USER char *args)
 	u32 num_block_groups, temp;
 	bool must_mount_ro = false;
 
+	/* XXX: Mount arguments? */
+	(void)args;
+
 	/* Read the Ext2 disk header. */
 	block_device_read(self->s_device, &super, sizeof(super),
 	                 (pos_t)EXT2_SUPERBLOCK_OFFSET);
@@ -719,10 +770,10 @@ NOTHROW(KCALL Ext2_FinalizeSuperblock)(Ext2Superblock *__restrict self) {
 }
 
 INTERN void KCALL
-Ext2_OpenINode(Ext2Superblock *__restrict self,
+Ext2_OpenINode(Ext2Superblock *__restrict UNUSED(self),
                struct inode *__restrict node,
-               struct directory_node *__restrict parent_directory,
-               struct directory_entry *__restrict parent_directory_entry)
+               struct directory_node *__restrict UNUSED(parent_directory),
+               struct directory_entry *__restrict UNUSED(parent_directory_entry))
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	switch (node->i_filemode & S_IFMT) {
 
@@ -753,6 +804,8 @@ INTERN NONNULL((1)) void KCALL
 Ext2_StatSuperblock(Ext2Superblock *__restrict self,
                     USER CHECKED struct statfs *result)
 		THROWS(E_IOERROR, E_SEGFAULT, ...) {
+	(void)self;
+	(void)result;
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 

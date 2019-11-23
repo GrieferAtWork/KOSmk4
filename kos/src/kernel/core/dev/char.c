@@ -574,9 +574,11 @@ handle_characterdevice_pwrite(struct character_device *__restrict self,
 INTERN size_t KCALL
 handle_characterdevice_readv(struct character_device *__restrict self,
                              struct aio_buffer *__restrict dst,
-                             size_t UNUSED(num_bytes), iomode_t mode) {
+                             size_t num_bytes, iomode_t mode) {
 	struct aio_buffer_entry ent;
 	size_t temp, result = 0;
+	assert(num_bytes == aio_buffer_size(dst));
+	(void)num_bytes;
 	if (self->cd_type.ct_read) {
 		AIO_BUFFER_FOREACH(ent, dst) {
 			temp = (*self->cd_type.ct_read)(self,
@@ -611,6 +613,8 @@ handle_characterdevice_writev(struct character_device *__restrict self,
                               size_t num_bytes, iomode_t mode) {
 	struct aio_buffer_entry ent;
 	size_t temp, result = 0;
+	assert(num_bytes == aio_buffer_size(src));
+	(void)num_bytes;
 	if (self->cd_type.ct_write) {
 		AIO_BUFFER_FOREACH(ent, src) {
 			temp = (*self->cd_type.ct_write)(self,
@@ -645,6 +649,8 @@ handle_characterdevice_preadv(struct character_device *__restrict self,
                               size_t num_bytes, pos_t addr, iomode_t mode) {
 	struct aio_buffer_entry ent;
 	size_t result = 0;
+	assert(num_bytes == aio_buffer_size(dst));
+	(void)num_bytes;
 	if (self->cd_type.ct_pread) {
 		AIO_BUFFER_FOREACH(ent, dst) {
 			size_t temp;
@@ -671,6 +677,8 @@ handle_characterdevice_pwritev(struct character_device *__restrict self,
                                size_t num_bytes, pos_t addr, iomode_t mode) {
 	struct aio_buffer_entry ent;
 	size_t result = 0;
+	assert(num_bytes == aio_buffer_size(src));
+	(void)num_bytes;
 	if (self->cd_type.ct_pwrite) {
 		AIO_BUFFER_FOREACH(ent, src) {
 			size_t temp;
@@ -754,6 +762,9 @@ handle_characterdevice_hop(struct character_device *__restrict self,
                            syscall_ulong_t cmd,
                            USER UNCHECKED void *arg,
                            iomode_t mode) {
+	(void)self;
+	(void)arg;
+	(void)mode;
 	switch (cmd) {
 
 		/* TODO */
@@ -831,6 +842,9 @@ DEFINE_DEBUG_FUNCTION(
 		"lschr\n"
 		"\tList all defined character devices\n"
 		, argc, argv) {
+	if (argc != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
 	dbg_print("     name\tdevno\tdriver\tkind\tfeatures\n");
 	if (character_device_tree)
 		dump_character_device(character_device_tree);

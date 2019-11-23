@@ -62,6 +62,12 @@ DEFINE_SYSCALL6(syscall_slong_t, futex,
                 USER UNCHECKED struct __timespec32 const *, timeout_or_val2,
                 USER UNCHECKED uint32_t *, uaddr2,
                 uint32_t, val3) {
+	(void)uaddr;
+	(void)futex_op;
+	(void)val;
+	(void)timeout_or_val2;
+	(void)uaddr2;
+	(void)val3;
 	kernel_panic("TODO");
 }
 
@@ -357,6 +363,11 @@ DEFINE_SYSCALL5(errno_t, lfutexexpr,
                 USER UNCHECKED struct lfutexexpr const *, exprv,
                 USER UNCHECKED struct timespec64 const *, timeout,
                 syscall_ulong_t, timeout_flags) {
+	(void)base;
+	(void)exprc;
+	(void)exprv;
+	(void)timeout;
+	(void)timeout_flags;
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -367,6 +378,12 @@ DEFINE_SYSCALL6(errno_t, lfutexlockexpr,
                 USER UNCHECKED struct lfutexexpr const *, exprv,
                 USER UNCHECKED struct timespec64 const *, timeout,
                 syscall_ulong_t, timeout_flags) {
+	(void)ulockaddr;
+	(void)base;
+	(void)exprc;
+	(void)exprv;
+	(void)timeout;
+	(void)timeout_flags;
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 

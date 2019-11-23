@@ -36,6 +36,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.group.getgrgid") struct group 
 NOTHROW_RPC(LIBCCALL libc_getgrgid)(gid_t gid)
 /*[[[body:getgrgid]]]*/
 {
+	(void)gid;
 	CRT_UNIMPLEMENTED("getgrgid"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -49,6 +50,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.database.group.getgrnam") struct group *
 NOTHROW_RPC(LIBCCALL libc_getgrnam)(char const *__restrict name)
 /*[[[body:getgrnam]]]*/
 {
+	(void)name;
 	CRT_UNIMPLEMENTED("getgrnam"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -97,6 +99,8 @@ NOTHROW_RPC(LIBCCALL libc_putgrent)(struct group const *__restrict entry,
                                     FILE *__restrict stream)
 /*[[[body:putgrent]]]*/
 {
+	(void)entry;
+	(void)stream;
 	CRT_UNIMPLEMENTED("putgrent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -114,6 +118,11 @@ NOTHROW_RPC(LIBCCALL libc_getgrgid_r)(gid_t gid,
                                       struct group **__restrict result)
 /*[[[body:getgrgid_r]]]*/
 {
+	(void)gid;
+	(void)resultbuf;
+	(void)buffer;
+	(void)buflen;
+	(void)result;
 	CRT_UNIMPLEMENTED("getgrgid_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -131,6 +140,11 @@ NOTHROW_RPC(LIBCCALL libc_getgrnam_r)(char const *__restrict name,
                                       struct group **__restrict result)
 /*[[[body:getgrnam_r]]]*/
 {
+	(void)name;
+	(void)resultbuf;
+	(void)buffer;
+	(void)buflen;
+	(void)result;
 	CRT_UNIMPLEMENTED("getgrnam_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -147,6 +161,10 @@ NOTHROW_RPC(LIBCCALL libc_getgrent_r)(struct group *__restrict resultbuf,
                                       struct group **__restrict result)
 /*[[[body:getgrent_r]]]*/
 {
+	(void)resultbuf;
+	(void)buffer;
+	(void)buflen;
+	(void)result;
 	CRT_UNIMPLEMENTED("getgrent_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -164,6 +182,11 @@ NOTHROW_RPC(LIBCCALL libc_fgetgrent_r)(FILE *__restrict stream,
                                        struct group **__restrict result)
 /*[[[body:fgetgrent_r]]]*/
 {
+	(void)stream;
+	(void)resultbuf;
+	(void)buffer;
+	(void)buflen;
+	(void)result;
 	CRT_UNIMPLEMENTED("fgetgrent_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -177,6 +200,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.database.group.fgetgrent") struct group *
 NOTHROW_RPC(LIBCCALL libc_fgetgrent)(FILE *__restrict stream)
 /*[[[body:fgetgrent]]]*/
 {
+	(void)stream;
 	CRT_UNIMPLEMENTED("fgetgrent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -190,6 +214,8 @@ NOTHROW_RPC(LIBCCALL libc_setgroups)(size_t count,
                                      gid_t const *groups)
 /*[[[body:setgroups]]]*/
 {
+	(void)count;
+	(void)groups;
 	CRT_UNIMPLEMENTED("setgroups"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -208,6 +234,10 @@ NOTHROW_RPC(LIBCCALL libc_getgrouplist)(char const *user,
                                         int *ngroups)
 /*[[[body:getgrouplist]]]*/
 {
+	(void)user;
+	(void)group;
+	(void)groups;
+	(void)ngroups;
 	CRT_UNIMPLEMENTED("getgrouplist"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -224,6 +254,8 @@ NOTHROW_RPC(LIBCCALL libc_initgroups)(char const *user,
                                       gid_t group)
 /*[[[body:initgroups]]]*/
 {
+	(void)user;
+	(void)group;
 	CRT_UNIMPLEMENTED("initgroups"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

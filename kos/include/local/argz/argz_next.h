@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc43c14f */
+/* HASH CRC-32:0x146b304 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __LOCAL_LIBC(argz_next) __ATTR_PURE __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_next))(char const *__restrict __argz,
                                                        __SIZE_TYPE__ __argz_len,
                                                        char const *__restrict __entry) {
-#line 548 "kos/src/libc/magic/argz.c"
+#line 550 "kos/src/libc/magic/argz.c"
 	char const *__argz_end;
 	if (!__entry)
 		return __argz_len ? (char *)__argz : __NULLPTR;

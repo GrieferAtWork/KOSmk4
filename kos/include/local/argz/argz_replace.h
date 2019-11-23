@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd4bdfc1 */
+/* HASH CRC-32:0x34768b1a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -208,6 +208,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_replace))(char **__restrict __pa
 			/* Simple case: The replacement string has the same length as the find-string */
 			__pos = (char *)__localdep_mempcpy(__pos, __with, __repllen * sizeof(char));
 		}
+		if (__replace_count)
+			++*__replace_count;
 	}
 	return 0;
 }

@@ -35,6 +35,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.rpc.setrpcent") void
 NOTHROW_RPC_KOS(LIBCCALL libc_setrpcent)(int stayopen)
 /*[[[body:setrpcent]]]*/
 {
+	(void)stayopen;
 	CRT_UNIMPLEMENTED("setrpcent"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -55,6 +56,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.rpc.getrpcbyname") struct rpcent *
 NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbyname)(char const *name)
 /*[[[body:getrpcbyname]]]*/
 {
+	(void)name;
 	CRT_UNIMPLEMENTED("getrpcbyname"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -66,6 +68,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.rpc.getrpcbynumber") struct rpcent 
 NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbynumber)(int number)
 /*[[[body:getrpcbynumber]]]*/
 {
+	(void)number;
 	CRT_UNIMPLEMENTED("getrpcbynumber"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -92,6 +95,11 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbyname_r)(char const *name,
                                               struct rpcent **result)
 /*[[[body:getrpcbyname_r]]]*/
 {
+	(void)name;
+	(void)result_buf;
+	(void)buffer;
+	(void)buflen;
+	(void)result;
 	CRT_UNIMPLEMENTED("getrpcbyname_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -107,6 +115,11 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbynumber_r)(int number,
                                                 struct rpcent **result)
 /*[[[body:getrpcbynumber_r]]]*/
 {
+	(void)number;
+	(void)result_buf;
+	(void)buffer;
+	(void)buflen;
+	(void)result;
 	CRT_UNIMPLEMENTED("getrpcbynumber_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -121,6 +134,10 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getrpcent_r)(struct rpcent *result_buf,
                                            struct rpcent **result)
 /*[[[body:getrpcent_r]]]*/
 {
+	(void)result_buf;
+	(void)buffer;
+	(void)buflen;
+	(void)result;
 	CRT_UNIMPLEMENTED("getrpcent_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

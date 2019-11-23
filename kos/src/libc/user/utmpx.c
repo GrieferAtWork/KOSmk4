@@ -70,6 +70,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.getutxid") struct utmpx 
 NOTHROW_RPC(LIBCCALL libc_getutxid)(struct utmpx const *id)
 /*[[[body:getutxid]]]*/
 {
+	(void)id;
 	CRT_UNIMPLEMENTED("getutxid"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -82,6 +83,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.getutxline") struct utmp
 NOTHROW_RPC(LIBCCALL libc_getutxline)(struct utmpx const *line)
 /*[[[body:getutxline]]]*/
 {
+	(void)line;
 	CRT_UNIMPLEMENTED("getutxline"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -94,6 +96,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.pututxline") struct utmp
 NOTHROW_RPC(LIBCCALL libc_pututxline)(struct utmpx const *utmpx)
 /*[[[body:pututxline]]]*/
 {
+	(void)utmpx;
 	CRT_UNIMPLEMENTED("pututxline"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -107,6 +110,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.utmpxname") int
 NOTHROW_RPC(LIBCCALL libc_utmpxname)(char const *file)
 /*[[[body:utmpxname]]]*/
 {
+	(void)file;
 	CRT_UNIMPLEMENTED("utmpxname"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -121,6 +125,8 @@ NOTHROW_RPC(LIBCCALL libc_updwtmpx)(char const *wtmpx_file,
                                     struct utmpx const *utmpx)
 /*[[[body:updwtmpx]]]*/
 {
+	(void)wtmpx_file;
+	(void)utmpx;
 	CRT_UNIMPLEMENTED("updwtmpx"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -134,6 +140,8 @@ NOTHROW_RPC(LIBCCALL libc_getutmp)(struct utmpx const *utmpx,
                                    struct utmp *utmp)
 /*[[[body:getutmp]]]*/
 {
+	(void)utmpx;
+	(void)utmp;
 	CRT_UNIMPLEMENTED("getutmp"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -147,6 +155,8 @@ NOTHROW_RPC(LIBCCALL libc_getutmpx)(struct utmp const *utmp,
                                     struct utmpx *utmpx)
 /*[[[body:getutmpx]]]*/
 {
+	(void)utmp;
+	(void)utmpx;
 	CRT_UNIMPLEMENTED("getutmpx"); /* TODO */
 	libc_seterrno(ENOSYS);
 }

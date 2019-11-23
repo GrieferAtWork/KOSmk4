@@ -50,7 +50,7 @@ struct wall_clock;
 INTERN NONNULL((1, 2)) REF struct directory_entry *KCALL
 ProcFS_PerProc_Fd_Lookup(struct directory_node *__restrict self,
                          CHECKED USER /*utf-8*/ char const *__restrict name,
-                         u16 namelen, uintptr_t hash, fsmode_t mode)
+                         u16 namelen, uintptr_t UNUSED(hash), fsmode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_FSERROR_FILE_NOT_FOUND,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
 	/* Evaluate running process PIDs */

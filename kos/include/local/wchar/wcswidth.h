@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd14fe69 */
+/* HASH CRC-32:0x6df615e8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcswidth) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcswidth))(__WCHAR_TYPE__ const *__restrict __string,
                                                       __SIZE_TYPE__ __num_chars) {
-#line 885 "kos/src/libc/magic/wchar.c"
+#line 894 "kos/src/libc/magic/wchar.c"
 	int __temp, __result = 0;
 	for (; __num_chars; --__num_chars, ++__string) {
 		__WCHAR_TYPE__ __ch = *__string;

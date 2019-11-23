@@ -627,6 +627,7 @@ _CrtDumpMemoryLeaks:() -> int {
 
 [same_impl]
 _CrtSetCheckCount:(int check_count) -> int {
+	(void)check_count;
 	COMPILER_IMPURE();
 	return 0;
 }

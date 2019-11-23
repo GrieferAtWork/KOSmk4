@@ -102,8 +102,8 @@ handle_datablock_pwritev(struct vm_datablock *__restrict self,
 
 INTERN size_t KCALL
 handle_datablock_apread(struct vm_datablock *__restrict self,
-                        USER CHECKED void *dst,
-                        size_t num_bytes, pos_t addr, iomode_t mode,
+                        USER CHECKED void *dst, size_t num_bytes,
+                        pos_t addr, iomode_t UNUSED(mode),
                         struct aio_multihandle *__restrict aio) {
 	if (vm_datablock_isinode(self)) {
 		/* Support for `IO_NONBLOCK'??? */
@@ -115,8 +115,8 @@ handle_datablock_apread(struct vm_datablock *__restrict self,
 
 INTERN size_t KCALL
 handle_datablock_apwrite(struct vm_datablock *__restrict self,
-                         USER CHECKED void const *src,
-                         size_t num_bytes, pos_t addr, iomode_t mode,
+                         USER CHECKED void const *src, size_t num_bytes,
+                         pos_t addr, iomode_t UNUSED(mode),
                          struct aio_multihandle *__restrict aio) {
 	if (vm_datablock_isinode(self)) {
 		/* Support for `IO_NONBLOCK'??? */
@@ -130,7 +130,8 @@ handle_datablock_apwrite(struct vm_datablock *__restrict self,
 INTERN size_t KCALL
 handle_datablock_apreadv(struct vm_datablock *__restrict self,
                          struct aio_buffer *__restrict dst, size_t num_bytes,
-                         pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
+                         pos_t addr, iomode_t UNUSED(mode),
+                         struct aio_multihandle *__restrict aio) {
 	if (vm_datablock_isinode(self)) {
 		/* Support for `IO_NONBLOCK'??? */
 		return inode_areadv((struct inode *)self, dst, num_bytes, addr, aio);
@@ -142,7 +143,8 @@ handle_datablock_apreadv(struct vm_datablock *__restrict self,
 INTERN size_t KCALL
 handle_datablock_apwritev(struct vm_datablock *__restrict self,
                           struct aio_buffer *__restrict src, size_t num_bytes,
-                          pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
+                          pos_t addr, iomode_t UNUSED(mode),
+                          struct aio_multihandle *__restrict aio) {
 	if (vm_datablock_isinode(self)) {
 		/* Support for `IO_NONBLOCK'??? */
 		inode_awritev((struct inode *)self, src, num_bytes, addr, aio);

@@ -983,9 +983,10 @@ done:
 
 PRIVATE NONNULL((1)) void KCALL
 rwlock_kill_readers(struct rwlock *__restrict self) {
-	/* Enumerate all running threads to find (and kill)
-	 * those that are using our R/W-lock. */
+	/* Enumerate all running threads to find (and kill; aka.
+	 * `rwlock_endread()') those that are using our R/W-lock. */
 	(void)kill_rwlock_reader;
+	(void)self;
 #if 0 /* TODO */
 	task_foreach_weak_running((bool(KCALL *)(struct task *__restrict,void*))&kill_rwlock_reader, self);
 #endif

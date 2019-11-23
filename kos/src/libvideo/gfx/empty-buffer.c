@@ -135,7 +135,9 @@ empty_video_buffer_gfx_stretch(struct video_buffer_gfx *__restrict self,
 
 PRIVATE void LIBVIDEO_GFX_CC
 empty_video_buffer_destroy(struct video_buffer *__restrict self) {
-	assertf(0, "Must never get here!");
+	(void)self;
+	__assertion_failedf("empty_video_buffer_destroy()",
+	                    "Must never get here!");
 }
 
 PRIVATE NONNULL((1, 2)) int CC

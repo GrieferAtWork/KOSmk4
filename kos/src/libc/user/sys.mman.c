@@ -172,6 +172,9 @@ NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name,
                                     mode_t mode)
 /*[[[body:shm_open]]]*/
 {
+	(void)name;
+	(void)oflags;
+	(void)mode;
 	CRT_UNIMPLEMENTED("shm_open"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -184,6 +187,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.shm_unlink") int
 NOTHROW_RPC(LIBCCALL libc_shm_unlink)(char const *name)
 /*[[[body:shm_unlink]]]*/
 {
+	(void)name;
 	CRT_UNIMPLEMENTED("shm_unlink"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -274,6 +278,9 @@ NOTHROW_NCX(LIBCCALL libc_posix_madvise)(void *addr,
                                          int advice)
 /*[[[body:posix_madvise]]]*/
 {
+	(void)addr;
+	(void)len;
+	(void)advice;
 	CRT_UNIMPLEMENTED("posix_madvise"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

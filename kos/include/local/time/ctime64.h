@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc025e3a */
+/* HASH CRC-32:0x1e8e1d34 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Equivalent to `asctime (localtime (timer))' */
 __LOCAL_LIBC(ctime64) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctime64))(__time64_t const *__timer) {
-#line 693 "kos/src/libc/magic/time.c"
+#line 697 "kos/src/libc/magic/time.c"
 #if (defined(__CRT_HAVE_ctime) || defined(__CRT_HAVE__ctime32)) && !defined(__BUILDING_LIBC)
 	__time32_t __tm32 = (__time32_t)*__timer;
 	return __localdep_ctime32(&__tm32);

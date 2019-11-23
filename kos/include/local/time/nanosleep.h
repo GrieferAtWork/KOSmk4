@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ec097ad */
+/* HASH CRC-32:0xee04e757 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(nanosleep) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(nanosleep))(struct __TM_TYPE(timespec) const *__requested_time,
                                                        struct __TM_TYPE(timespec) *__remaining) {
-#line 945 "kos/src/libc/magic/time.c"
+#line 949 "kos/src/libc/magic/time.c"
 #ifdef __CRT_HAVE_nanosleep
 	int __result;
 	struct __timespec32 __req32, __rem32;

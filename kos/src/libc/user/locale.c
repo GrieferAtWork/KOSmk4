@@ -37,6 +37,8 @@ NOTHROW_NCX(LIBCCALL libc_setlocale)(int category,
                                      char const *locale)
 /*[[[body:setlocale]]]*/
 {
+	(void)category;
+	(void)locale;
 	CRT_UNIMPLEMENTED("setlocale"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -66,6 +68,9 @@ NOTHROW_NCX(LIBCCALL libc_newlocale)(int category_mask,
                                      locale_t base)
 /*[[[body:newlocale]]]*/
 {
+	(void)category_mask;
+	(void)locale;
+	(void)base;
 	CRT_UNIMPLEMENTED("newlocale"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -79,6 +84,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.duplocale") locale_t
 NOTHROW_NCX(LIBCCALL libc_duplocale)(locale_t dataset)
 /*[[[body:duplocale]]]*/
 {
+	(void)dataset;
 	CRT_UNIMPLEMENTED("duplocale"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -92,6 +98,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.freelocale") void
 NOTHROW_NCX(LIBCCALL libc_freelocale)(locale_t dataset)
 /*[[[body:freelocale]]]*/
 {
+	(void)dataset;
 	CRT_UNIMPLEMENTED("freelocale"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
@@ -107,6 +114,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.uselocale") locale_t
 NOTHROW_NCX(LIBCCALL libc_uselocale)(locale_t dataset)
 /*[[[body:uselocale]]]*/
 {
+	(void)dataset;
 	CRT_UNIMPLEMENTED("uselocale"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;

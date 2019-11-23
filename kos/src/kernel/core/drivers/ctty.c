@@ -42,7 +42,7 @@ getctty(void) THROWS(E_WOULDBLOCK, E_NO_CTTY) {
 
 
 PRIVATE NONNULL((1)) size_t KCALL
-ctty_read(struct character_device *__restrict self,
+ctty_read(struct character_device *__restrict UNUSED(self),
           USER CHECKED void *dst, size_t num_bytes,
           iomode_t mode) THROWS(...) {
 	size_t result;
@@ -53,7 +53,7 @@ ctty_read(struct character_device *__restrict self,
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-ctty_write(struct character_device *__restrict self,
+ctty_write(struct character_device *__restrict UNUSED(self),
            USER CHECKED void const *src, size_t num_bytes,
            iomode_t mode) THROWS(...) {
 	size_t result;
@@ -64,7 +64,7 @@ ctty_write(struct character_device *__restrict self,
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-ctty_pread(struct character_device *__restrict self,
+ctty_pread(struct character_device *__restrict UNUSED(self),
            USER CHECKED void *dst, size_t num_bytes,
            pos_t addr, iomode_t mode) THROWS(...) {
 	size_t result;
@@ -75,7 +75,7 @@ ctty_pread(struct character_device *__restrict self,
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-ctty_pwrite(struct character_device *__restrict self,
+ctty_pwrite(struct character_device *__restrict UNUSED(self),
             USER CHECKED void const *src, size_t num_bytes,
             pos_t addr, iomode_t mode) THROWS(...) {
 	size_t result;
@@ -86,7 +86,7 @@ ctty_pwrite(struct character_device *__restrict self,
 }
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
-ctty_ioctl(struct character_device *__restrict self,
+ctty_ioctl(struct character_device *__restrict UNUSED(self),
            syscall_ulong_t cmd,
            USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	syscall_slong_t result;
@@ -97,7 +97,7 @@ ctty_ioctl(struct character_device *__restrict self,
 }
 
 PRIVATE NONNULL((1)) REF struct vm_datablock *KCALL
-ctty_mmap(struct character_device *__restrict self,
+ctty_mmap(struct character_device *__restrict UNUSED(self),
           vm_vpage64_t *__restrict pminpage,
           vm_vpage64_t *__restrict pmaxpage) THROWS(...) {
 	REF struct vm_datablock *result;
@@ -108,14 +108,14 @@ ctty_mmap(struct character_device *__restrict self,
 }
 
 PRIVATE NONNULL((1)) void KCALL
-ctty_sync(struct character_device *__restrict self) THROWS(...) {
+ctty_sync(struct character_device *__restrict UNUSED(self)) THROWS(...) {
 	REF struct ttybase_device *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
 	character_device_sync(ctty);
 }
 
 PRIVATE NONNULL((1)) void KCALL
-ctty_stat(struct character_device *__restrict self,
+ctty_stat(struct character_device *__restrict UNUSED(self),
           USER CHECKED struct stat *result) THROWS(...) {
 	REF struct ttybase_device *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
@@ -123,7 +123,7 @@ ctty_stat(struct character_device *__restrict self,
 }
 
 PRIVATE NONNULL((1)) poll_mode_t KCALL
-ctty_poll(struct character_device *__restrict self, poll_mode_t what) {
+ctty_poll(struct character_device *__restrict UNUSED(self), poll_mode_t what) {
 	poll_mode_t result;
 	REF struct ttybase_device *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);

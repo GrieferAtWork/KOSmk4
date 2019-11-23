@@ -79,6 +79,9 @@ INTERN NONNULL((1)) syscall_slong_t KCALL
 handle_vm_hop(struct vm *__restrict self, syscall_ulong_t cmd,
               USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(...) {
+	(void)self;
+	(void)arg;
+	(void)mode;
 	switch (cmd) {
 
 	/* TODO */

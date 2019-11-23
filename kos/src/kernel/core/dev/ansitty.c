@@ -43,7 +43,7 @@ DECL_BEGIN
 PUBLIC NONNULL((1)) size_t KCALL
 ansitty_device_write(struct character_device *__restrict self,
                      USER CHECKED void const *src,
-                     size_t num_bytes, iomode_t mode) THROWS(...) {
+                     size_t num_bytes, iomode_t UNUSED(mode)) THROWS(...) {
 	struct ansitty_device *me = (struct ansitty_device *)self;
 #if !defined(NDEBUG) && 1
 	printk(KERN_DEBUG "[ansitty_device_write] %$q\n", num_bytes, src);
@@ -53,7 +53,7 @@ ansitty_device_write(struct character_device *__restrict self,
 
 PUBLIC NONNULL((1)) syscall_slong_t KCALL
 ansitty_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
-                     USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+                     USER UNCHECKED void *arg, iomode_t UNUSED(mode)) THROWS(...) {
 	struct ansitty_device *me = (struct ansitty_device *)self;
 	switch (cmd) {
 

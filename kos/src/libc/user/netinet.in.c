@@ -37,6 +37,8 @@ NOTHROW_RPC(LIBCCALL libc_bindresvport)(fd_t sockfd,
                                         struct sockaddr_in *sock_in)
 /*[[[body:bindresvport]]]*/
 {
+	(void)sockfd;
+	(void)sock_in;
 	CRT_UNIMPLEMENTED("bindresvport"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -50,6 +52,8 @@ NOTHROW_RPC(LIBCCALL libc_bindresvport6)(fd_t sockfd,
                                          struct sockaddr_in6 *sock_in)
 /*[[[body:bindresvport6]]]*/
 {
+	(void)sockfd;
+	(void)sock_in;
 	CRT_UNIMPLEMENTED("bindresvport6"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -63,6 +67,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_2292.inet6_option_space") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_space)(int nbytes)
 /*[[[body:inet6_option_space]]]*/
 {
+	(void)nbytes;
 	CRT_UNIMPLEMENTED("inet6_option_space"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -78,6 +83,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_init)(void *bp,
                                                  int type)
 /*[[[body:inet6_option_init]]]*/
 {
+	(void)bp;
+	(void)cmsgp;
+	(void)type;
 	CRT_UNIMPLEMENTED("inet6_option_init"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -94,6 +102,10 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_append)(struct cmsghdr *cmsg,
                                                    int plusy)
 /*[[[body:inet6_option_append]]]*/
 {
+	(void)cmsg;
+	(void)typep;
+	(void)multx;
+	(void)plusy;
 	CRT_UNIMPLEMENTED("inet6_option_append"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -110,6 +122,10 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_alloc)(struct cmsghdr *cmsg,
                                                   int plusy)
 /*[[[body:inet6_option_alloc]]]*/
 {
+	(void)cmsg;
+	(void)datalen;
+	(void)multx;
+	(void)plusy;
 	CRT_UNIMPLEMENTED("inet6_option_alloc"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -124,6 +140,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_next)(struct cmsghdr const *cmsg,
                                                  uint8_t **tptrp)
 /*[[[body:inet6_option_next]]]*/
 {
+	(void)cmsg;
+	(void)tptrp;
 	CRT_UNIMPLEMENTED("inet6_option_next"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -139,6 +157,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_find)(struct cmsghdr const *cmsg,
                                                  int type)
 /*[[[body:inet6_option_find]]]*/
 {
+	(void)cmsg;
+	(void)tptrp;
+	(void)type;
 	CRT_UNIMPLEMENTED("inet6_option_find"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -152,6 +173,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_init)(void *extbuf,
                                               socklen_t extlen)
 /*[[[body:inet6_opt_init]]]*/
 {
+	(void)extbuf;
+	(void)extlen;
 	CRT_UNIMPLEMENTED("inet6_opt_init"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -170,6 +193,13 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_append)(void *extbuf,
                                                 void **databufp)
 /*[[[body:inet6_opt_append]]]*/
 {
+	(void)extbuf;
+	(void)extlen;
+	(void)offset;
+	(void)type;
+	(void)len;
+	(void)align;
+	(void)databufp;
 	CRT_UNIMPLEMENTED("inet6_opt_append"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -184,6 +214,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_finish)(void *extbuf,
                                                 int offset)
 /*[[[body:inet6_opt_finish]]]*/
 {
+	(void)extbuf;
+	(void)extlen;
+	(void)offset;
 	CRT_UNIMPLEMENTED("inet6_opt_finish"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -199,6 +232,10 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_set_val)(void *databuf,
                                                  socklen_t vallen)
 /*[[[body:inet6_opt_set_val]]]*/
 {
+	(void)databuf;
+	(void)offset;
+	(void)val;
+	(void)vallen;
 	CRT_UNIMPLEMENTED("inet6_opt_set_val"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -216,6 +253,12 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_next)(void *extbuf,
                                               void **databufp)
 /*[[[body:inet6_opt_next]]]*/
 {
+	(void)extbuf;
+	(void)extlen;
+	(void)offset;
+	(void)typep;
+	(void)lenp;
+	(void)databufp;
 	CRT_UNIMPLEMENTED("inet6_opt_next"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -233,6 +276,12 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_find)(void *extbuf,
                                               void **databufp)
 /*[[[body:inet6_opt_find]]]*/
 {
+	(void)extbuf;
+	(void)extlen;
+	(void)offset;
+	(void)type;
+	(void)lenp;
+	(void)databufp;
 	CRT_UNIMPLEMENTED("inet6_opt_find"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -248,6 +297,10 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_get_val)(void *databuf,
                                                  socklen_t vallen)
 /*[[[body:inet6_opt_get_val]]]*/
 {
+	(void)databuf;
+	(void)offset;
+	(void)val;
+	(void)vallen;
 	CRT_UNIMPLEMENTED("inet6_opt_get_val"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -261,6 +314,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_space)(int type,
                                                int segments)
 /*[[[body:inet6_rth_space]]]*/
 {
+	(void)type;
+	(void)segments;
 	CRT_UNIMPLEMENTED("inet6_rth_space"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -276,6 +331,10 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_init)(void *bp,
                                               int segments)
 /*[[[body:inet6_rth_init]]]*/
 {
+	(void)bp;
+	(void)bp_len;
+	(void)type;
+	(void)segments;
 	CRT_UNIMPLEMENTED("inet6_rth_init"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -289,6 +348,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_add)(void *bp,
                                              struct in6_addr const *addr)
 /*[[[body:inet6_rth_add]]]*/
 {
+	(void)bp;
+	(void)addr;
 	CRT_UNIMPLEMENTED("inet6_rth_add"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -302,6 +363,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_reverse)(void const *in,
                                                  void *out)
 /*[[[body:inet6_rth_reverse]]]*/
 {
+	(void)in;
+	(void)out;
 	CRT_UNIMPLEMENTED("inet6_rth_reverse"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -314,6 +377,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_rth_segments"
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_segments)(void const *bp)
 /*[[[body:inet6_rth_segments]]]*/
 {
+	(void)bp;
 	CRT_UNIMPLEMENTED("inet6_rth_segments"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -327,6 +391,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_getaddr)(void const *bp,
                                                  int index)
 /*[[[body:inet6_rth_getaddr]]]*/
 {
+	(void)bp;
+	(void)index;
 	CRT_UNIMPLEMENTED("inet6_rth_getaddr"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -344,6 +410,12 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getipv4sourcefilter)(fd_t sockfd,
                                                    struct in_addr *slist)
 /*[[[body:getipv4sourcefilter]]]*/
 {
+	(void)sockfd;
+	(void)interface_addr;
+	(void)group;
+	(void)fmode;
+	(void)numsrc;
+	(void)slist;
 	CRT_UNIMPLEMENTED("getipv4sourcefilter"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -361,6 +433,12 @@ NOTHROW_RPC_KOS(LIBCCALL libc_setipv4sourcefilter)(fd_t sockfd,
                                                    const struct in_addr *slist)
 /*[[[body:setipv4sourcefilter]]]*/
 {
+	(void)sockfd;
+	(void)interface_addr;
+	(void)group;
+	(void)fmode;
+	(void)numsrc;
+	(void)slist;
 	CRT_UNIMPLEMENTED("setipv4sourcefilter"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -379,6 +457,13 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getsourcefilter)(fd_t sockfd,
                                                struct sockaddr_storage *slist)
 /*[[[body:getsourcefilter]]]*/
 {
+	(void)sockfd;
+	(void)interface_addr;
+	(void)group;
+	(void)grouplen;
+	(void)fmode;
+	(void)numsrc;
+	(void)slist;
 	CRT_UNIMPLEMENTED("getsourcefilter"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -397,6 +482,13 @@ NOTHROW_RPC_KOS(LIBCCALL libc_setsourcefilter)(fd_t sockfd,
                                                const struct sockaddr_storage *slist)
 /*[[[body:setsourcefilter]]]*/
 {
+	(void)sockfd;
+	(void)interface_addr;
+	(void)group;
+	(void)grouplen;
+	(void)fmode;
+	(void)numsrc;
+	(void)slist;
 	CRT_UNIMPLEMENTED("setsourcefilter"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

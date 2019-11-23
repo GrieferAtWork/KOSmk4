@@ -107,6 +107,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.time.getdate") __STRUCT_TM *
 NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string)
 /*[[[body:getdate]]]*/
 {
+	(void)string;
 	CRT_UNIMPLEMENTED("getdate"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -125,6 +126,8 @@ NOTHROW_NCX(LIBCCALL libc_getdate_r)(const char *__restrict string,
                                      __STRUCT_TM *__restrict resbufp)
 /*[[[body:getdate_r]]]*/
 {
+	(void)string;
+	(void)resbufp;
 	CRT_UNIMPLEMENTED("getdate_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -139,6 +142,8 @@ NOTHROW_NCX(LIBCCALL libc_timespec_get)(struct timespec *ts,
                                         int base)
 /*[[[body:timespec_get]]]*/
 {
+	(void)ts;
+	(void)base;
 	CRT_UNIMPLEMENTED("timespec_get"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -289,6 +294,8 @@ NOTHROW_NCX(LIBCCALL libc_clock_getcpuclockid)(pid_t pid,
                                                clockid_t *clock_id)
 /*[[[body:clock_getcpuclockid]]]*/
 {
+	(void)pid;
+	(void)clock_id;
 	CRT_UNIMPLEMENTED("clock_getcpuclockid"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

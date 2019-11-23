@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9dee788 */
+/* HASH CRC-32:0x37a1537 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,13 @@
 #ifndef ____localdep_c16execvpe_defined
 #define ____localdep_c16execvpe_defined 1
 #if defined(__CRT_HAVE_wexecvpe) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_c16execvpe,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV, __T16ENVP),wexecvpe,(__path, ___argv, ___envp))
+__CREDIRECT(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_c16execvpe,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV, __T16ENVP),wexecvpe,(__path,___argv,___envp))
 #elif defined(__CRT_HAVE__wexecvpe) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_c16execvpe,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV, __T16ENVP),_wexecvpe,(__path, ___argv, ___envp))
+__CREDIRECT(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_c16execvpe,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV, __T16ENVP),_wexecvpe,(__path,___argv,___envp))
 #elif defined(__CRT_HAVE_DOS$_wexecvpe)
-__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_c16execvpe,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV, __T16ENVP),_wexecvpe,(__path, ___argv, ___envp))
+__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_c16execvpe,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV, __T16ENVP),_wexecvpe,(__path,___argv,___envp))
 #elif defined(__CRT_HAVE_DOS$_wexecvpe)
-__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_c16execvpe,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV, __T16ENVP),_wexecvpe,(__path, ___argv, ___envp))
+__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_c16execvpe,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV, __T16ENVP),_wexecvpe,(__path,___argv,___envp))
 #else /* LIBC: c16execvpe */
 #undef ____localdep_c16execvpe_defined
 #endif /* c16execvpe... */

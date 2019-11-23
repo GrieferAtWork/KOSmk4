@@ -506,7 +506,7 @@ NOTHROW(KCALL Ata_WaitForBusyTimeout)(port_t ctrl) {
 }
 
 PRIVATE errr_t
-NOTHROW(KCALL Ata_WaitForDrq)(port_t bus, port_t ctrl) {
+NOTHROW(KCALL Ata_WaitForDrq)(port_t ctrl) {
 	u8 status;
 	jtime_t abs_timeout;
 	if (((status = inb(ctrl)) & ATA_DCR_BSY) == 0) {
@@ -1248,7 +1248,7 @@ INTERN NONNULL((1)) syscall_slong_t KCALL
 Ata_Ioctl(struct ata_drive *__restrict self,
           struct block_device *__restrict partition,
           syscall_ulong_t cmd, USER UNCHECKED void *arg,
-          iomode_t mode) THROWS(...) {
+          iomode_t UNUSED(mode)) THROWS(...) {
 	switch (cmd) {
 
 
@@ -1306,7 +1306,7 @@ do_compat_hdio_getgeo:
 				if (!signal)
 					THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HARDDISK);
 			}
-			if (Ata_WaitForDrq(bus->b_busio, bus->b_ctrlio) != ERRR_OK)
+			if (Ata_WaitForDrq(bus->b_ctrlio) != ERRR_OK)
 				THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HARDDISK);
 			insw(bus->b_busio + ATA_DATA, &specs, 256);
 			outb(bus->b_busio + ATA_FEATURES, 0); /* ??? */
@@ -1482,7 +1482,7 @@ reset_bus_and_fail:
 						return false;
 					}
 				}
-				if (Ata_WaitForDrq(bus->b_busio, bus->b_ctrlio) != ERRR_OK)
+				if (Ata_WaitForDrq(bus->b_ctrlio) != ERRR_OK)
 					goto reset_bus_and_fail;
 				insw(bus->b_busio + ATA_DATA, &specs, 256);
 				outb(bus->b_busio + ATA_FEATURES, 0); /* ??? */

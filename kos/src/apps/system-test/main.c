@@ -46,6 +46,9 @@ int main(int argc, char *argv[], char *envp[]) {
 	/* A special application who's sole purpose is to perform a series of
 	 * automated system tests to ensure that the various sub-systems of
 	 * KOS are functioning properly. */
+	(void)argc;
+	(void)argv;
+	(void)envp;
 
 	run_all_tests();
 	printf("All tests OK\n");

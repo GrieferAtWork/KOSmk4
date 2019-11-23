@@ -38,6 +38,10 @@ NOTHROW_NCX(LIBCCALL libc_prlimit)(pid_t pid,
                                    struct rlimit *old_limit)
 /*[[[body:prlimit]]]*/
 {
+	(void)pid;
+	(void)resource;
+	(void)new_limit;
+	(void)old_limit;
 	CRT_UNIMPLEMENTED("prlimit"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -55,6 +59,10 @@ NOTHROW_NCX(LIBCCALL libc_prlimit64)(pid_t pid,
                                      struct rlimit64 *old_limit)
 /*[[[body:prlimit64]]]*/
 {
+	(void)pid;
+	(void)resource;
+	(void)new_limit;
+	(void)old_limit;
 	CRT_UNIMPLEMENTED("prlimit64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

@@ -37,6 +37,9 @@ NOTHROW_NCX(LIBCCALL libc_shmctl)(int shmid,
                                   struct shmid_ds *buf)
 /*[[[body:shmctl]]]*/
 {
+	(void)shmid;
+	(void)cmd;
+	(void)buf;
 	CRT_UNIMPLEMENTED("shmctl"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -50,6 +53,9 @@ NOTHROW_NCX(LIBCCALL libc_shmget)(key_t key,
                                   int shmflg)
 /*[[[body:shmget]]]*/
 {
+	(void)key;
+	(void)size;
+	(void)shmflg;
 	CRT_UNIMPLEMENTED("shmget"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -63,6 +69,9 @@ NOTHROW_NCX(LIBCCALL libc_shmat)(int shmid,
                                  int shmflg)
 /*[[[body:shmat]]]*/
 {
+	(void)shmid;
+	(void)shmaddr;
+	(void)shmflg;
 	CRT_UNIMPLEMENTED("shmat"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -74,6 +83,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.shm.shmdt") int
 NOTHROW_NCX(LIBCCALL libc_shmdt)(void const *shmaddr)
 /*[[[body:shmdt]]]*/
 {
+	(void)shmaddr;
 	CRT_UNIMPLEMENTED("shmdt"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
