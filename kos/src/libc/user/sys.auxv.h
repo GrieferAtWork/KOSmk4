@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x943546b2 */
+/* HASH CRC-32:0x1a0c2e22 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ DECL_BEGIN
 /* Return the value associated with an Elf*_auxv_t type from the auxv list
  * passed to the program on startup.  If TYPE was not present in the auxv
  * list, returns zero and sets errno to ENOENT */
-INTDEF __ULONGPTR_TYPE__ NOTHROW_NCX(LIBCCALL libc_getauxval)(__ULONGPTR_TYPE__ type);
+INTDEF ulongptr_t NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type);
 
 DECL_END
 

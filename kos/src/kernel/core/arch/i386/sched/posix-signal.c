@@ -196,7 +196,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		user_sigset = (USER CHECKED sigset_t *)memcpy(&user_ucontext->uc_sigmask,
 		                                              &old_sigmask, sizeof(sigset_t));
 		if (signo == SIGSEGV) {
-			user_ucontext->uc_mcontext.mc_cr2 = (__ULONGPTR_TYPE__)siginfo->si_addr;
+			user_ucontext->uc_mcontext.mc_cr2 = (ulongptr_t)siginfo->si_addr;
 			user_ucontext->uc_mcontext.mc_flags |= __MCONTEXT_FLAG_HAVECR2;
 		}
 		if (PERTASK_GET(this_x86_fpustate)) {

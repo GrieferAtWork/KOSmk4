@@ -35,11 +35,11 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:ioperm,hash:CRC-32=0xa7b7be04]]]*/
+/*[[[head:ioperm,hash:CRC-32=0x30acde48]]]*/
 /* Change I/O port permissions for a specific I/O port range */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.ioperm.ioperm") int
-NOTHROW_NCX(LIBCCALL libc_ioperm)(__ULONGPTR_TYPE__ from,
-                                  __ULONGPTR_TYPE__ num,
+NOTHROW_NCX(LIBCCALL libc_ioperm)(ulongptr_t from,
+                                  ulongptr_t num,
                                   int turn_on)
 /*[[[body:ioperm]]]*/
 {

@@ -20,9 +20,10 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_PROFILER_H 1
 
 #include <kernel/compiler.h>
-#include <kernel/types.h>
-#include <kernel/compiler-branch-tracer.h>
+
 #include <kernel/arch/profiler.h>
+#include <kernel/compiler-branch-tracer.h>
+#include <kernel/types.h>
 
 #ifdef __CC__
 DECL_BEGIN
@@ -30,7 +31,7 @@ DECL_BEGIN
 /* Kernel branch profiling. */
 
 #ifndef __BRANCH_PREDITION_ADDRESS_TYPE
-#define __BRANCH_PREDITION_ADDRESS_TYPE __ULONGPTR_TYPE__
+#define __BRANCH_PREDITION_ADDRESS_TYPE ulongptr_t
 #endif /* !__BRANCH_PREDITION_ADDRESS_TYPE */
 
 #ifndef __BRANCH_PREDITION_ADDRESS_BASE
@@ -42,7 +43,7 @@ DECL_BEGIN
 #endif /* !__BRANCH_PREDITION_EXPECTED_TYPE */
 
 #ifndef __BRANCH_PREDITION_RIGHT_WRONG_TYPE
-#define __BRANCH_PREDITION_RIGHT_WRONG_TYPE __ULONGPTR_TYPE__
+#define __BRANCH_PREDITION_RIGHT_WRONG_TYPE ulongptr_t
 #endif /* !__BRANCH_PREDITION_RIGHT_WRONG_TYPE */
 
 #ifndef __branch_prediction_defined

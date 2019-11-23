@@ -18,6 +18,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
+%[define_replacement(ulongptr_t = __ULONGPTR_TYPE__)]
 %[default_impl_section(.text.crt.system.ioperm)]
 
 %{
@@ -29,7 +30,7 @@ __SYSDECL_BEGIN
 }
 
 @@Change I/O port permissions for a specific I/O port range
-ioperm:(__ULONGPTR_TYPE__ from, __ULONGPTR_TYPE__ num, int turn_on) -> int;
+ioperm:($ulongptr_t from, $ulongptr_t num, int turn_on) -> int;
 
 @@Change I/O port permissions for all I/O ports
 iopl:(int level) -> int;

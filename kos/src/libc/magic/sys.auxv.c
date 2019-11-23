@@ -17,7 +17,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[define_replacement(pid_t = __pid_t)]
+%[define_replacement(ulongptr_t = __ULONGPTR_TYPE__)]
 %[default_impl_section(.text.crt.system)]
 
 %{
@@ -35,7 +35,7 @@ __SYSDECL_BEGIN
 @@passed to the program on startup.  If TYPE was not present in the auxv
 @@list, returns zero and sets errno to ENOENT
 [export_alias(__getauxval)]
-getauxval:(__ULONGPTR_TYPE__ type) -> __ULONGPTR_TYPE__;
+getauxval:($ulongptr_t type) -> $ulongptr_t;
 
 %{
 

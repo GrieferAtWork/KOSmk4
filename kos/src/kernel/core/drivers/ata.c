@@ -1266,7 +1266,7 @@ Ata_Ioctl(struct ata_drive *__restrict self,
 		data->heads     = self->d_chs_number_of_heads;
 		data->cylinders = self->d_chs_cylinders;
 		data->sectors   = self->d_chs_sectors_per_track;
-		data->start     = (__ULONGPTR_TYPE__)Ata_GetPartitionStart(partition);
+		data->start     = (ulongptr_t)Ata_GetPartitionStart(partition);
 		COMPILER_WRITE_BARRIER();
 	}	break;
 

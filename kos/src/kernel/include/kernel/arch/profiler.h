@@ -20,6 +20,7 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_ARCH_PROFILER_H 1
 
 #include <hybrid/compiler.h>
+
 #include <hybrid/typecore.h>
 
 #ifndef __BRANCH_PREDITION_ADDRESS_BASE

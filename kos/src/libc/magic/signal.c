@@ -18,6 +18,8 @@
  */
 
 %[define_ccompat_header(csignal)]
+%[define_replacement(longptr_t    = __LONGPTR_TYPE__)]
+%[define_replacement(ulongptr_t   = __ULONGPTR_TYPE__)]
 %[define_replacement(sighandler_t = __sighandler_t)]
 %[define_replacement(sigset_t     = struct __sigset_struct)]
 %[define_replacement(pid_t        = __pid_t)]
@@ -240,7 +242,7 @@ kill:($pid_t pid, int signo) -> int;
 [decl_include(<bits/sigset.h>)]
 sigemptyset:([nonnull] sigset_t *set) -> int {
 	size_t cnt;
-	cnt = sizeof(__sigset_t) / sizeof(__ULONGPTR_TYPE__);
+	cnt = sizeof(__sigset_t) / sizeof(ulongptr_t);
 	while (cnt--)
 		set->@__val@[cnt] = 0;
 	return 0;
@@ -248,7 +250,7 @@ sigemptyset:([nonnull] sigset_t *set) -> int {
 [decl_include(<bits/sigset.h>)]
 sigfillset:([nonnull] sigset_t *set) -> int {
 	size_t cnt;
-	cnt = sizeof(__sigset_t) / sizeof(__ULONGPTR_TYPE__);
+	cnt = sizeof(__sigset_t) / sizeof(ulongptr_t);
 	while (cnt--)
 		set->@__val@[cnt] = ~0ul;
 	return 0;
@@ -257,8 +259,8 @@ sigfillset:([nonnull] sigset_t *set) -> int {
 @@@param signo: One of `SIG*'
 [decl_include(<bits/sigset.h>)][alias(__sigaddset)]
 sigaddset:([nonnull] sigset_t *set, int signo) -> int {
-	__ULONGPTR_TYPE__ mask = @__sigmask@(signo);
-	__ULONGPTR_TYPE__ word = @__sigword@(signo);
+	ulongptr_t mask = @__sigmask@(signo);
+	ulongptr_t word = @__sigword@(signo);
 	set->@__val@[word] |= mask;
 	return 0;
 }
@@ -266,8 +268,8 @@ sigaddset:([nonnull] sigset_t *set, int signo) -> int {
 @@@param signo: One of `SIG*'
 [decl_include(<bits/sigset.h>)][alias(__sigdelset)]
 sigdelset:([nonnull] sigset_t *set, int signo) -> int {
-	__ULONGPTR_TYPE__ mask = @__sigmask@(signo);
-	__ULONGPTR_TYPE__ word = @__sigword@(signo);
+	ulongptr_t mask = @__sigmask@(signo);
+	ulongptr_t word = @__sigword@(signo);
 	set->@__val@[word] &= ~mask;
 	return 0;
 }
@@ -276,8 +278,8 @@ sigdelset:([nonnull] sigset_t *set, int signo) -> int {
 [decl_include(<bits/sigset.h>)]
 [ATTR_WUNUSED][ATTR_PURE][alias(__sigismember)]
 sigismember:([nonnull] sigset_t const *set, int signo) -> int {
-	__ULONGPTR_TYPE__ mask = @__sigmask@(signo);
-	__ULONGPTR_TYPE__ word = @__sigword@(signo);
+	ulongptr_t mask = @__sigmask@(signo);
+	ulongptr_t word = @__sigword@(signo);
 	return (set->@__val@[word] & mask) != 0;
 }
 
@@ -300,7 +302,7 @@ sigpending:([nonnull] sigset_t *set) -> int;
 [decl_include(<bits/sigset.h>)][ATTR_WUNUSED][ATTR_PURE]
 sigisemptyset:([nonnull] sigset_t const *set) -> int {
 	size_t i;
-	for (i = 0; i < sizeof(sigset_t) / sizeof(__ULONGPTR_TYPE__); ++i)
+	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i)
 		if (set->@__val@[i])
 			return 0;
 	return 1;
@@ -310,7 +312,7 @@ sigandset:([nonnull] sigset_t *set,
            [nonnull] sigset_t const *left,
            [nonnull] sigset_t const *right) -> int {
 	size_t i;
-	for (i = 0; i < sizeof(__sigset_t) / sizeof(__ULONGPTR_TYPE__); ++i)
+	for (i = 0; i < sizeof(__sigset_t) / sizeof(ulongptr_t); ++i)
 		set->@__val@[i] = left->@__val@[i] & right->@__val@[i];
 	return 0;
 }
@@ -320,7 +322,7 @@ sigorset:([nonnull] sigset_t *set,
           [nonnull] sigset_t const *left,
           [nonnull] sigset_t const *right) -> int {
 	size_t i;
-	for (i = 0; i < sizeof(__sigset_t) / sizeof(__ULONGPTR_TYPE__); ++i)
+	for (i = 0; i < sizeof(__sigset_t) / sizeof(ulongptr_t); ++i)
 		set->@__val@[i] = left->@__val@[i] | right->@__val@[i];
 	return 0;
 }

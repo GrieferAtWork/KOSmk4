@@ -77,15 +77,15 @@ PRIVATE bool LIBCCALL libc_has_kernel64(void) {
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:getauxval,hash:CRC-32=0x669846f2]]]*/
+/*[[[head:getauxval,hash:CRC-32=0x2c70736a]]]*/
 /* Return the value associated with an Elf*_auxv_t type from the auxv list
  * passed to the program on startup.  If TYPE was not present in the auxv
  * list, returns zero and sets errno to ENOENT */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.getauxval") __ULONGPTR_TYPE__
-NOTHROW_NCX(LIBCCALL libc_getauxval)(__ULONGPTR_TYPE__ type)
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.getauxval") ulongptr_t
+NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 /*[[[body:getauxval]]]*/
 {
-	__ULONGPTR_TYPE__ result;
+	ulongptr_t result;
 	switch (type) {
 	case AT_IGNORE:
 		result = 0;
@@ -96,7 +96,7 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(__ULONGPTR_TYPE__ type)
 		break;
 
 	case AT_PHDR:
-		result = (__ULONGPTR_TYPE__)dlauxinfo(NULL, DLAUXINFO_ELF_PHDR, NULL, NULL);
+		result = (ulongptr_t)dlauxinfo(NULL, DLAUXINFO_ELF_PHDR, NULL, NULL);
 		break;
 
 	case AT_PHENT:
@@ -107,7 +107,7 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(__ULONGPTR_TYPE__ type)
 		size_t count;
 		if (!dlauxinfo(NULL, DLAUXINFO_ELF_PHDR, NULL, &count))
 			count = 0;
-		result = (__ULONGPTR_TYPE__)count;
+		result = (ulongptr_t)count;
 	}	break;
 
 	case AT_PAGESZ:
@@ -117,7 +117,7 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(__ULONGPTR_TYPE__ type)
 	case AT_BASE: {
 		void *libdl;
 		libdl  = dlgetmodule("libdl", DLGETHANDLE_FINCREF);
-		result = (__ULONGPTR_TYPE__)dlmodulebase(libdl);
+		result = (ulongptr_t)dlmodulebase(libdl);
 		dlclose(libdl);
 	}	break;
 
@@ -215,14 +215,14 @@ is_not_elf:
 #if defined(__i386__) && !defined(__x86_64__)
 		/* Special case: On i386, we may be running in compatibility mode. */
 		if (libc_has_kernel64()) {
-			result = (__ULONGPTR_TYPE__)(void *)elf_host_platform_string_x86_64;
+			result = (ulongptr_t)(void *)elf_host_platform_string_x86_64;
 			break;
 		}
 		ATTR_FALLTHROUGH
 #endif /* __i386__ && !__x86_64__ */
 
 	case AT_PLATFORM:
-		result = (__ULONGPTR_TYPE__)(void *)elf_host_platform_string;
+		result = (ulongptr_t)(void *)elf_host_platform_string;
 		break;
 
 	default:

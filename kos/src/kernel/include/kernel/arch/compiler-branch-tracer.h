@@ -20,9 +20,11 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_ARCH_COMPILER_BRANCH_TRACER_H 1
 
 #include <hybrid/compiler.h>
-#include <hybrid/typecore.h>
-#include <hybrid/__atomic.h>
+
 #include <kernel/arch/profiler.h>
+
+#include <hybrid/__atomic.h>
+#include <hybrid/typecore.h>
 
 #ifndef __BRANCH_PREDITION_RIGHT_WRONG_TYPE
 #define __BRANCH_PREDITION_RIGHT_WRONG_TYPE __UINTPTR_TYPE__

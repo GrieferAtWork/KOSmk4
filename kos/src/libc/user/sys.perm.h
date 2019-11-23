@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0bb88eb */
+/* HASH CRC-32:0x521ec6fa */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 DECL_BEGIN
 
 /* Change I/O port permissions for a specific I/O port range */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_ioperm)(__ULONGPTR_TYPE__ from, __ULONGPTR_TYPE__ num, int turn_on);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_ioperm)(ulongptr_t from, ulongptr_t num, int turn_on);
 /* Change I/O port permissions for all I/O ports */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_iopl)(int level);
 

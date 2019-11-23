@@ -24,11 +24,15 @@
 #define _KOS_KERNEL_SOURCE 1
 
 #include <hybrid/compiler.h>
-#include <stddef.h>
-#include <stdalign.h>
-#include <sys/types.h>
-#include <hybrid/typecore.h>
+
 #include <hybrid/floatcore.h>
+#include <hybrid/typecore.h>
+
+#include <kos/types.h>
+#include <sys/types.h>
+
+#include <stdalign.h>
+#include <stddef.h>
 
 STATIC_ASSERT(sizeof(char) == __SIZEOF_CHAR__);
 STATIC_ASSERT(sizeof(signed char) == __SIZEOF_CHAR__);
@@ -131,6 +135,8 @@ STATIC_ASSERT(sizeof(uint64_t) == 8);
 
 STATIC_ASSERT(__builtin_types_compatible_p(intptr_t, __INTPTR_TYPE__));
 STATIC_ASSERT(__builtin_types_compatible_p(uintptr_t, __UINTPTR_TYPE__));
+STATIC_ASSERT(__builtin_types_compatible_p(longptr_t, __LONGPTR_TYPE__));
+STATIC_ASSERT(__builtin_types_compatible_p(ulongptr_t, __ULONGPTR_TYPE__));
 STATIC_ASSERT(sizeof(__INTPTR_TYPE__) == __SIZEOF_POINTER__);
 STATIC_ASSERT(sizeof(__UINTPTR_TYPE__) == __SIZEOF_POINTER__);
 STATIC_ASSERT(sizeof(__LONGPTR_TYPE__) == __SIZEOF_POINTER__);
