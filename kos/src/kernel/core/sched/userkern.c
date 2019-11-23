@@ -237,13 +237,13 @@ err_invalid_addr:
 PUBLIC struct vm_datablock_type_vio userkern_segment_vio = {
 	/* .dtv_read   = */ INIT_OPERATION_PTR(read),
 	/* .dtv_write  = */ INIT_OPERATION_PTR(write),
-	/* .dtv_cmpxch = */ INIT_OPERATION_PTR_NULL,
-	/* .dtv_xch    = */ INIT_OPERATION_PTR_NULL,
-	/* .dtv_add    = */ INIT_OPERATION_PTR_NULL,
-	/* .dtv_sub    = */ INIT_OPERATION_PTR_NULL,
-	/* .dtv_and    = */ INIT_OPERATION_PTR_NULL,
-	/* .dtv_or     = */ INIT_OPERATION_PTR_NULL,
-	/* .dtv_xor    = */ INIT_OPERATION_PTR_NULL,
+	/* .dtv_cmpxch = */ VM_DATABLOCK_TYPE_VIO_INIT_CMPXCH(NULL, NULL, NULL, NULL, NULL),
+	/* .dtv_xch    = */ VM_DATABLOCK_TYPE_VIO_INIT_XCH(NULL, NULL, NULL, NULL),
+	/* .dtv_add    = */ VM_DATABLOCK_TYPE_VIO_INIT_ADD(NULL, NULL, NULL, NULL),
+	/* .dtv_sub    = */ VM_DATABLOCK_TYPE_VIO_INIT_SUB(NULL, NULL, NULL, NULL),
+	/* .dtv_and    = */ VM_DATABLOCK_TYPE_VIO_INIT_AND(NULL, NULL, NULL, NULL),
+	/* .dtv_or     = */ VM_DATABLOCK_TYPE_VIO_INIT_OR(NULL, NULL, NULL, NULL),
+	/* .dtv_xor    = */ VM_DATABLOCK_TYPE_VIO_INIT_XOR(NULL, NULL, NULL, NULL),
 	/* .dtv_call   = */ &userkern_segment_call
 };
 #undef INIT_OPERATION_PTR
@@ -267,10 +267,8 @@ PUBLIC struct vm_datapart userkern_segment_part = {
 	/* .dp_srefs  = */ LLIST_INIT,
 	/* .dp_stale  = */ NULL,
 	/* .dp_block  = */ &userkern_segment_block,
-	/* .dp_flags  = */ (VM_DATAPART_FLAG_LOCKED |
-	                    VM_DATAPART_FLAG_CHANGED |
-	                    VM_DATAPART_FLAG_KEEPRAM |
-	                    VM_DATAPART_FLAG_HEAPPPP |
+	/* .dp_flags  = */ (VM_DATAPART_FLAG_LOCKED | VM_DATAPART_FLAG_CHANGED |
+	                    VM_DATAPART_FLAG_KEEPRAM | VM_DATAPART_FLAG_HEAPPPP |
 	                    VM_DATAPART_FLAG_KERNPRT),
 	/* .dp_state  = */ VM_DATAPART_STATE_VIOPRT,
 	{

@@ -81,6 +81,8 @@ struct pmembank {
 	u16            mb_type;     /* Memory bank type. (One of `PMEMBANK_TYPE_*') */
 	u16            mb_pad[(sizeof(vm_phys_t)-2)/2]; /* ... */
 };
+#define PMEMBANK_INIT(startptr, type) { { startptr }, type, { } }
+
 #define PMEMBANK_TYPE_START(x)     ((x).mb_start)
 #define PMEMBANK_TYPE_MIN(x)       ((x).mb_start)
 #define PMEMBANK_TYPE_MAX(x)       ((&(x))[1].mb_start-1)

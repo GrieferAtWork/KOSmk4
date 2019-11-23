@@ -473,6 +473,7 @@ PUBLIC ATTR_PERTASK struct taskgroup this_taskgroup = {
 	/* .tg_pgrp_processes      = */ LLIST_INIT,
 	/* .tg_pgrp_session_lock   = */ ATOMIC_RWLOCK_INIT,
 	/* .tg_pgrp_session        = */ NULL,                /* Initialized by `task_setprocess()' */
+	/* .tg_ctty                = */ XATOMIC_REF_INIT(NULL)
 };
 
 

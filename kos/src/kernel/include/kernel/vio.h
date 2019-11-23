@@ -121,6 +121,7 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, vm_daddr_t addr, u64 newvalue, bool atomic);
 #endif /* CONFIG_VIO_HAS_QWORD */
 	} dtv_xch;
+
 	struct {
 		/* Return the old value (prior to be `value' being added) */
 		NONNULL((1)) u8  (KCALL *f_byte)(struct vio_args *__restrict args, vm_daddr_t addr, u8 value, bool atomic);
@@ -130,6 +131,7 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, vm_daddr_t addr, u64 value, bool atomic);
 #endif /* CONFIG_VIO_HAS_QWORD */
 	} dtv_add;
+
 	struct {
 		/* Return the old value (prior to be `value' being subtracted) */
 		NONNULL((1)) u8  (KCALL *f_byte)(struct vio_args *__restrict args, vm_daddr_t addr, u8 value, bool atomic);
@@ -139,6 +141,7 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, vm_daddr_t addr, u64 value, bool atomic);
 #endif /* CONFIG_VIO_HAS_QWORD */
 	} dtv_sub;
+
 	struct {
 		/* Return the old value (prior to be `mask' being anded) */
 		NONNULL((1)) u8  (KCALL *f_byte)(struct vio_args *__restrict args, vm_daddr_t addr, u8 mask, bool atomic);
@@ -148,6 +151,7 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, vm_daddr_t addr, u64 mask, bool atomic);
 #endif /* CONFIG_VIO_HAS_QWORD */
 	} dtv_and;
+
 	struct {
 		/* Return the old value (prior to be `mask' being or'd) */
 		NONNULL((1)) u8  (KCALL *f_byte)(struct vio_args *__restrict args, vm_daddr_t addr, u8 mask, bool atomic);
@@ -157,6 +161,7 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, vm_daddr_t addr, u64 mask, bool atomic);
 #endif /* CONFIG_VIO_HAS_QWORD */
 	} dtv_or;
+
 	struct {
 		/* Return the old value (prior to be `mask' being xor'd) */
 		NONNULL((1)) u8  (KCALL *f_byte)(struct vio_args *__restrict args, vm_daddr_t addr, u8 mask, bool atomic);
@@ -194,6 +199,44 @@ struct vm_datablock_type_vio {
 	                                    struct icpustate *__restrict regs,
 	                                    vm_daddr_t addr);
 };
+
+/* Initializers for VIO callbacks */
+#ifdef CONFIG_VIO_HAS_QWORD
+#define VM_DATABLOCK_TYPE_VIO_INIT_READ(b, w, l, q)  { b, w, l, q }
+#define VM_DATABLOCK_TYPE_VIO_INIT_WRITE(b, w, l, q) { b, w, l, q }
+#define VM_DATABLOCK_TYPE_VIO_INIT_XCH(b, w, l, q)   { b, w, l, q }
+#define VM_DATABLOCK_TYPE_VIO_INIT_ADD(b, w, l, q)   { b, w, l, q }
+#define VM_DATABLOCK_TYPE_VIO_INIT_SUB(b, w, l, q)   { b, w, l, q }
+#define VM_DATABLOCK_TYPE_VIO_INIT_AND(b, w, l, q)   { b, w, l, q }
+#define VM_DATABLOCK_TYPE_VIO_INIT_OR(b, w, l, q)    { b, w, l, q }
+#define VM_DATABLOCK_TYPE_VIO_INIT_XOR(b, w, l, q)   { b, w, l, q }
+#else /* CONFIG_VIO_HAS_QWORD */
+#define VM_DATABLOCK_TYPE_VIO_INIT_READ(b, w, l, q)  { b, w, l }
+#define VM_DATABLOCK_TYPE_VIO_INIT_WRITE(b, w, l, q) { b, w, l }
+#define VM_DATABLOCK_TYPE_VIO_INIT_XCH(b, w, l, q)   { b, w, l }
+#define VM_DATABLOCK_TYPE_VIO_INIT_ADD(b, w, l, q)   { b, w, l }
+#define VM_DATABLOCK_TYPE_VIO_INIT_SUB(b, w, l, q)   { b, w, l }
+#define VM_DATABLOCK_TYPE_VIO_INIT_AND(b, w, l, q)   { b, w, l }
+#define VM_DATABLOCK_TYPE_VIO_INIT_OR(b, w, l, q)    { b, w, l }
+#define VM_DATABLOCK_TYPE_VIO_INIT_XOR(b, w, l, q)   { b, w, l }
+#endif /* !CONFIG_VIO_HAS_QWORD */
+
+
+#if defined(CONFIG_VIO_HAS_QWORD) || defined(CONFIG_VIO_HAS_QWORD_CMPXCH)
+#ifdef CONFIG_VIO_HAS_INT128_CMPXCH
+#define VM_DATABLOCK_TYPE_VIO_INIT_CMPXCH(b, w, l, q, i128) { b, w, l, q, i128 }
+#else /* CONFIG_VIO_HAS_INT128_CMPXCH */
+#define VM_DATABLOCK_TYPE_VIO_INIT_CMPXCH(b, w, l, q, i128) { b, w, l, q }
+#endif /* !CONFIG_VIO_HAS_INT128_CMPXCH */
+#else /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
+#ifdef CONFIG_VIO_HAS_INT128_CMPXCH
+#define VM_DATABLOCK_TYPE_VIO_INIT_CMPXCH(b, w, l, q, i128) { b, w, l, i128 }
+#else /* CONFIG_VIO_HAS_INT128_CMPXCH */
+#define VM_DATABLOCK_TYPE_VIO_INIT_CMPXCH(b, w, l, q, i128) { b, w, l }
+#endif /* !CONFIG_VIO_HAS_INT128_CMPXCH */
+#endif /* !CONFIG_VIO_HAS_QWORD && !CONFIG_VIO_HAS_QWORD_CMPXCH */
+
+
 
 /* Invoke VIO callbacks, automatically substituting operators for one-another.
  * If an operation is impossible, these functions will throw a SEGFAULT exception.

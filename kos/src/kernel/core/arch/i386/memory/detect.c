@@ -38,22 +38,35 @@ INTDEF byte_t __kernel_start[];
 INTDEF byte_t __kernel_free_start[];
 INTDEF byte_t __kernel_end[];
 
+#define V2P(x) ((uintptr_t)(x) - KERNEL_BASE)
 PRIVATE ATTR_FREERODATA struct pmembank const default_memory_banks[] = {
-	{ { 0x00000000 }, PMEMBANK_TYPE_ALLOCATED },  /* Keep the first page as allocated */
-	{ { 0x00001000 }, PMEMBANK_TYPE_UNDEF },
-	{ { 0x000a0000 }, PMEMBANK_TYPE_DEVICE },     /* VGA display buffer (Not defined by BIOS functions) */
-	{ { 0x00100000 }, PMEMBANK_TYPE_UNDEF },
-	{ { (uintptr_t)__kernel_start - KERNEL_BASE }, PMEMBANK_TYPE_KERNEL },
-	{ { (uintptr_t)__kernel_free_start - KERNEL_BASE }, PMEMBANK_TYPE_KFREE },
-	{ { (uintptr_t)__kernel_end - KERNEL_BASE }, PMEMBANK_TYPE_UNDEF },
-	{ { 0x00000000 }, PMEMBANK_TYPE_UNDEF }
+	PMEMBANK_INIT(0x00000000, PMEMBANK_TYPE_ALLOCATED),  /* Keep the first page as allocated */
+	PMEMBANK_INIT(0x00001000, PMEMBANK_TYPE_UNDEF),
+	PMEMBANK_INIT(0x000a0000, PMEMBANK_TYPE_DEVICE),     /* VGA display buffer (Not defined by BIOS functions) */
+	PMEMBANK_INIT(0x00100000, PMEMBANK_TYPE_UNDEF),
+	PMEMBANK_INIT(V2P(__kernel_start), PMEMBANK_TYPE_KERNEL),
+	PMEMBANK_INIT(V2P(__kernel_free_start), PMEMBANK_TYPE_KFREE),
+	PMEMBANK_INIT(V2P(__kernel_end), PMEMBANK_TYPE_UNDEF),
+	PMEMBANK_INIT(0x00000000, PMEMBANK_TYPE_UNDEF)
 };
+#undef V2P
 
 INTDEF struct pmembank kernel_membanks_initial[];
 PUBLIC ATTR_COLDDATA struct pmeminfo minfo = {
-	.mb_total = { 0 }, /* TODO: This total is incorrect! */
-	.mb_bankc = COMPILER_LENOF(default_memory_banks) - 1,
-	.mb_banks = kernel_membanks_initial
+	 .mb_total = {
+		/* TODO: These totals are incorrect! (they have to match the banks defined by `default_memory_banks') */
+		/* [PMEMBANK_TYPE_UNDEF]     = */ (vm_phys_t)(0),
+		/* [PMEMBANK_TYPE_RAM]       = */ (vm_phys_t)(0),
+		/* [PMEMBANK_TYPE_PRESERVE]  = */ (vm_phys_t)(0),
+		/* [PMEMBANK_TYPE_ALLOCATED] = */ (vm_phys_t)(0),
+		/* [PMEMBANK_TYPE_KFREE]     = */ (vm_phys_t)(0),
+		/* [PMEMBANK_TYPE_KERNEL]    = */ (vm_phys_t)(0),
+		/* [PMEMBANK_TYPE_NVS]       = */ (vm_phys_t)(0),
+		/* [PMEMBANK_TYPE_DEVICE]    = */ (vm_phys_t)(0),
+		/* [PMEMBANK_TYPE_BADRAM]    = */ (vm_phys_t)(0),
+	},
+	 .mb_bankc = COMPILER_LENOF(default_memory_banks) - 1,
+	 .mb_banks = kernel_membanks_initial
 };
 
 INTERN ATTR_FREETEXT void
