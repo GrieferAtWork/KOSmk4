@@ -177,64 +177,64 @@ __HYBRID_DEFINE_LIBATOMIC_FUNCTIONS(__UINT128_TYPE__, 16)
 
 #ifdef __cplusplus
 #ifdef __UINT128_TYPE__
-#define __HYBRID_DEFINE_LIBATOMIC_SELECTOR(return_type, name, params, getargs, return_, ...)           \
-	return_type(name) params {                                                                         \
-		__STATIC_IF(sizeof(__T) == 1) {                                                                \
-			return_(__NAMESPACE_INT_SYM name##_1) getargs(__UINT8_TYPE__, __VA_ARGS__);                \
-		}                                                                                              \
-		__STATIC_ELSE(sizeof(__T) == 1) {                                                              \
-			__STATIC_IF(sizeof(__T) == 2) {                                                            \
-				return_(__NAMESPACE_INT_SYM name##_2) getargs(__UINT16_TYPE__, __VA_ARGS__);           \
-			}                                                                                          \
-			__STATIC_ELSE(sizeof(__T) == 2) {                                                          \
-				__STATIC_IF(sizeof(__T) == 4) {                                                        \
-					return_(__NAMESPACE_INT_SYM name##_4) getargs(__UINT32_TYPE__, __VA_ARGS__);       \
-				}                                                                                      \
-				__STATIC_ELSE(sizeof(__T) == 4) {                                                      \
-					__STATIC_IF(sizeof(__T) == 8) {                                                    \
-						return_(__NAMESPACE_INT_SYM name##_8) getargs(__UINT64_TYPE__, __VA_ARGS__);   \
-					}                                                                                  \
-					__STATIC_ELSE(sizeof(__T) == 8) {                                                  \
-						return_(__NAMESPACE_INT_SYM name##_16) getargs(__UINT128_TYPE__, __VA_ARGS__); \
-					}                                                                                  \
-				}                                                                                      \
-			}                                                                                          \
-		}                                                                                              \
+#define __HYBRID_DEFINE_LIBATOMIC_SELECTOR(return_type, name, params, getargs, return_, ...)            \
+	return_type(name) params {                                                                          \
+		__STATIC_IF(sizeof(__T) == 1) {                                                                 \
+			return_((__NAMESPACE_INT_SYM name##_1)getargs(__UINT8_TYPE__, __VA_ARGS__));                \
+		}                                                                                               \
+		__STATIC_ELSE(sizeof(__T) == 1) {                                                               \
+			__STATIC_IF(sizeof(__T) == 2) {                                                             \
+				return_((__NAMESPACE_INT_SYM name##_2)getargs(__UINT16_TYPE__, __VA_ARGS__));           \
+			}                                                                                           \
+			__STATIC_ELSE(sizeof(__T) == 2) {                                                           \
+				__STATIC_IF(sizeof(__T) == 4) {                                                         \
+					return_((__NAMESPACE_INT_SYM name##_4)getargs(__UINT32_TYPE__, __VA_ARGS__));       \
+				}                                                                                       \
+				__STATIC_ELSE(sizeof(__T) == 4) {                                                       \
+					__STATIC_IF(sizeof(__T) == 8) {                                                     \
+						return_((__NAMESPACE_INT_SYM name##_8)getargs(__UINT64_TYPE__, __VA_ARGS__));   \
+					}                                                                                   \
+					__STATIC_ELSE(sizeof(__T) == 8) {                                                   \
+						return_((__NAMESPACE_INT_SYM name##_16)getargs(__UINT128_TYPE__, __VA_ARGS__)); \
+					}                                                                                   \
+				}                                                                                       \
+			}                                                                                           \
+		}                                                                                               \
 	}
 #elif defined(__UINT64_TYPE__)
-#define __HYBRID_DEFINE_LIBATOMIC_SELECTOR(return_type, name, params, getargs, return_, ...)     \
-	return_type(name) params {                                                                   \
-		__STATIC_IF(sizeof(__T) == 1) {                                                          \
-			return_(__NAMESPACE_INT_SYM name##_1) getargs(__UINT8_TYPE__, __VA_ARGS__);          \
-		}                                                                                        \
-		__STATIC_ELSE(sizeof(__T) == 1) {                                                        \
-			__STATIC_IF(sizeof(__T) == 2) {                                                      \
-				return_(__NAMESPACE_INT_SYM name##_2) getargs(__UINT16_TYPE__, __VA_ARGS__);     \
-			}                                                                                    \
-			__STATIC_ELSE(sizeof(__T) == 2) {                                                    \
-				__STATIC_IF(sizeof(__T) == 4) {                                                  \
-					return_(__NAMESPACE_INT_SYM name##_4) getargs(__UINT32_TYPE__, __VA_ARGS__); \
-				}                                                                                \
-				__STATIC_ELSE(sizeof(__T) == 4) {                                                \
-					return_(__NAMESPACE_INT_SYM name##_8) getargs(__UINT64_TYPE__, __VA_ARGS__); \
-				}                                                                                \
-			}                                                                                    \
-		}                                                                                        \
+#define __HYBRID_DEFINE_LIBATOMIC_SELECTOR(return_type, name, params, getargs, return_, ...)      \
+	return_type(name) params {                                                                    \
+		__STATIC_IF(sizeof(__T) == 1) {                                                           \
+			return_((__NAMESPACE_INT_SYM name##_1)getargs(__UINT8_TYPE__, __VA_ARGS__));          \
+		}                                                                                         \
+		__STATIC_ELSE(sizeof(__T) == 1) {                                                         \
+			__STATIC_IF(sizeof(__T) == 2) {                                                       \
+				return_((__NAMESPACE_INT_SYM name##_2)getargs(__UINT16_TYPE__, __VA_ARGS__));     \
+			}                                                                                     \
+			__STATIC_ELSE(sizeof(__T) == 2) {                                                     \
+				__STATIC_IF(sizeof(__T) == 4) {                                                   \
+					return_((__NAMESPACE_INT_SYM name##_4)getargs(__UINT32_TYPE__, __VA_ARGS__)); \
+				}                                                                                 \
+				__STATIC_ELSE(sizeof(__T) == 4) {                                                 \
+					return_((__NAMESPACE_INT_SYM name##_8)getargs(__UINT64_TYPE__, __VA_ARGS__)); \
+				}                                                                                 \
+			}                                                                                     \
+		}                                                                                         \
 	}
 #else
-#define __HYBRID_DEFINE_LIBATOMIC_SELECTOR(return_type, name, params, getargs, return_, ...) \
-	return_type(name) params {                                                               \
-		__STATIC_IF(sizeof(__T) == 1) {                                                      \
-			return_(__NAMESPACE_INT_SYM name##_1) getargs(__UINT8_TYPE__, __VA_ARGS__);      \
-		}                                                                                    \
-		__STATIC_ELSE(sizeof(__T) == 1) {                                                    \
-			__STATIC_IF(sizeof(__T) == 2) {                                                  \
-				return_(__NAMESPACE_INT_SYM name##_2) getargs(__UINT16_TYPE__, __VA_ARGS__); \
-			}                                                                                \
-			__STATIC_ELSE(sizeof(__T) == 2) {                                                \
-				return_(__NAMESPACE_INT_SYM name##_4) getargs(__UINT32_TYPE__, __VA_ARGS__); \
-			}                                                                                \
-		}                                                                                    \
+#define __HYBRID_DEFINE_LIBATOMIC_SELECTOR(return_type, name, params, getargs, return_, ...)  \
+	return_type(name) params {                                                                \
+		__STATIC_IF(sizeof(__T) == 1) {                                                       \
+			return_((__NAMESPACE_INT_SYM name##_1)getargs(__UINT8_TYPE__, __VA_ARGS__));      \
+		}                                                                                     \
+		__STATIC_ELSE(sizeof(__T) == 1) {                                                     \
+			__STATIC_IF(sizeof(__T) == 2) {                                                   \
+				return_((__NAMESPACE_INT_SYM name##_2)getargs(__UINT16_TYPE__, __VA_ARGS__)); \
+			}                                                                                 \
+			__STATIC_ELSE(sizeof(__T) == 2) {                                                 \
+				return_((__NAMESPACE_INT_SYM name##_4)getargs(__UINT32_TYPE__, __VA_ARGS__)); \
+			}                                                                                 \
+		}                                                                                     \
 	}
 #endif
 
@@ -284,150 +284,188 @@ __HYBRID_DEFINE_LIBATOMIC_FUNCTIONS(__UINT128_TYPE__, 16)
 
 #endif /* !__cplusplus */
 
-#define __hybrid_atomic_getargs_load(T, x, order)     (T *)&(x), order
-#define __hybrid_atomic_getargs_store(T, x, v, order) (T *)&(x), (T)(v), order
-#define __hybrid_atomic_getargs_cmpxch(T, x, poldv, newv, weak, succ, fail) \
-	(T *)&(x), (T *)poldv, (T)(newv), weak, succ, fail
-
-
 #ifdef __cplusplus
-extern "C++" {
-template<class __T>
-__HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_load,
-                                   (__T &__x, int __order),
-                                   __hybrid_atomic_getargs_load,
-                                   return, __x, __order)
 
-template<class __T, class __VT>
+extern "C++" {
+
+template<class __To> struct __hybrid_atomic_castto {
+	template<class __T>
+	static __ATTR_FORCEINLINE __To (__doit)(__T __v) {
+		return (__To)__v;
+	}
+};
+template<class __To> struct __hybrid_atomic_castto<__To *> {
+	template<class __T>
+	static __ATTR_FORCEINLINE __To *(__doit)(__T __v) {
+		return (__To *)(__UINTPTR_TYPE__)__v;
+	}
+};
+template<class __From, class __To> struct __hybrid_atomic_castfrom {
+	static __ATTR_FORCEINLINE __To (__doit)(__From __v) {
+		return (__To)__v;
+	}
+};
+template<class __From, class __To> struct __hybrid_atomic_castfrom<__From *, __To> {
+	static __ATTR_FORCEINLINE __To (__doit)(__From *__v) {
+		return (__To)(__UINTPTR_TYPE__)__v;
+	}
+};
+
+#define __hybrid_atomic_getargs_load(T, x, order) \
+	((T *)x, order)
+#define __hybrid_atomic_getargs_store(T, x, v, order) \
+	((T *)x, __hybrid_atomic_castfrom<__VT, T>::__doit(v), order)
+#define __hybrid_atomic_getargs_cmpxch(T, x, poldv, newv, succ, fail) \
+	((T *)x, (T *)poldv, __hybrid_atomic_castfrom<__VT, T>::__doit(newv), succ, fail)
+
+template<class __T> __ATTR_FORCEINLINE __ATTR_LEAF __ATTR_NONNULL((1))
+__HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_load,
+                                   (__T *__x, int __order),
+                                   __hybrid_atomic_getargs_load,
+                                   return __hybrid_atomic_castto<__T>::__doit,
+                                   __x, __order)
+
+template<class __T, class __VT> __ATTR_FORCEINLINE __ATTR_LEAF __ATTR_NONNULL((1))
 __HYBRID_DEFINE_LIBATOMIC_SELECTOR(void, __hybrid_atomic_store,
-                                   (__T &__x, __VT __v, int __order),
+                                   (__T *__x, __VT __v, int __order),
                                    __hybrid_atomic_getargs_store,
                                    , __x, __v, __order)
 
-template<class __T, class __VT>
+template<class __T, class __VT> __ATTR_FORCEINLINE __ATTR_LEAF __ATTR_NONNULL((1))
 __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_exchange,
-                                   (__T &__x, __VT __v, int __order),
+                                   (__T *__x, __VT __v, int __order),
                                    __hybrid_atomic_getargs_store,
-                                   return, __x, __v, __order)
+                                   return __hybrid_atomic_castto<__T>::__doit,
+                                   __x, __v, __order)
 
-template<class __T, class __OV, class __NV>
+template<class __T, class __VT> __ATTR_FORCEINLINE __ATTR_LEAF __ATTR_NONNULL((1, 2))
 __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__BOOL, __hybrid_atomic_compare_exchange,
-                                   (__T &__x, __T *__pov, __T __nv, __BOOL __isweak, int __succ, int __fail),
+                                   (__T *__x, __T *__pov, __VT __nv, int __succ, int __fail),
                                    __hybrid_atomic_getargs_cmpxch,
-                                   return, __x, __pov, __nv, __isweak, __succ, __fail)
+                                   return, __x, __pov, __nv, __succ, __fail)
 
-template<class __T, class __VT>
+template<class __T, class __VT> __ATTR_FORCEINLINE __ATTR_LEAF __ATTR_NONNULL((1))
 __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_add_fetch,
-                                   (__T &__x, __VT __v, int __order),
+                                   (__T *__x, __VT __v, int __order),
                                    __hybrid_atomic_getargs_store,
-                                   return, __x, __v, __order)
+                                   return __hybrid_atomic_castto<__T>::__doit,
+                                   __x, __v, __order)
 
-template<class __T, class __VT>
+template<class __T, class __VT> __ATTR_FORCEINLINE __ATTR_LEAF __ATTR_NONNULL((1))
 __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_sub_fetch,
-                                   (__T &__x, __VT __v, int __order),
+                                   (__T *__x, __VT __v, int __order),
                                    __hybrid_atomic_getargs_store,
-                                   return, __x, __v, __order)
+                                   return __hybrid_atomic_castto<__T>::__doit,
+                                   __x, __v, __order)
 
-template<class __T, class __VT>
+template<class __T, class __VT> __ATTR_FORCEINLINE __ATTR_LEAF __ATTR_NONNULL((1))
 __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_and_fetch,
-                                   (__T &__x, __VT __v, int __order),
+                                   (__T *__x, __VT __v, int __order),
                                    __hybrid_atomic_getargs_store,
-                                   return, __x, __v, __order)
+                                   return __hybrid_atomic_castto<__T>::__doit,
+                                   __x, __v, __order)
 
-template<class __T, class __VT>
+template<class __T, class __VT> __ATTR_FORCEINLINE __ATTR_LEAF __ATTR_NONNULL((1))
 __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_or_fetch,
-                                   (__T &__x, __VT __v, int __order),
+                                   (__T *__x, __VT __v, int __order),
                                    __hybrid_atomic_getargs_store,
-                                   return, __x, __v, __order)
+                                   return __hybrid_atomic_castto<__T>::__doit,
+                                   __x, __v, __order)
 
-template<class __T, class __VT>
+template<class __T, class __VT> __ATTR_FORCEINLINE __ATTR_LEAF __ATTR_NONNULL((1))
 __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_xor_fetch,
-                                   (__T &__x, __VT __v, int __order),
+                                   (__T *__x, __VT __v, int __order),
                                    __hybrid_atomic_getargs_store,
-                                   return, __x, __v, __order)
+                                   return __hybrid_atomic_castto<__T>::__doit,
+                                   __x, __v, __order)
 
-template<class __T, class __VT>
+template<class __T, class __VT> __ATTR_FORCEINLINE __ATTR_LEAF __ATTR_NONNULL((1))
 __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_nand_fetch,
-                                   (__T &__x, __VT __v, int __order),
+                                   (__T *__x, __VT __v, int __order),
                                    __hybrid_atomic_getargs_store,
-                                   return, __x, __v, __order)
+                                   return __hybrid_atomic_castto<__T>::__doit,
+                                   __x, __v, __order)
 
-template<class __T, class __VT>
+template<class __T, class __VT> __ATTR_FORCEINLINE __ATTR_LEAF __ATTR_NONNULL((1))
 __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_fetch_add,
-                                   (__T &__x, __VT __v, int __order),
+                                   (__T *__x, __VT __v, int __order),
                                    __hybrid_atomic_getargs_store,
-                                   return, __x, __v, __order)
+                                   return __hybrid_atomic_castto<__T>::__doit,
+                                   __x, __v, __order)
 
-template<class __T, class __VT>
+template<class __T, class __VT> __ATTR_FORCEINLINE __ATTR_LEAF __ATTR_NONNULL((1))
 __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_fetch_sub,
-                                   (__T &__x, __VT __v, int __order),
+                                   (__T *__x, __VT __v, int __order),
                                    __hybrid_atomic_getargs_store,
-                                   return, __x, __v, __order)
+                                   return __hybrid_atomic_castto<__T>::__doit,
+                                   __x, __v, __order)
 
-template<class __T, class __VT>
+template<class __T, class __VT> __ATTR_FORCEINLINE __ATTR_LEAF __ATTR_NONNULL((1))
 __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_fetch_and,
-                                   (__T &__x, __VT __v, int __order),
+                                   (__T *__x, __VT __v, int __order),
                                    __hybrid_atomic_getargs_store,
-                                   return, __x, __v, __order)
+                                   return __hybrid_atomic_castto<__T>::__doit,
+                                   __x, __v, __order)
 
-template<class __T, class __VT>
+template<class __T, class __VT> __ATTR_FORCEINLINE __ATTR_LEAF __ATTR_NONNULL((1))
 __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_fetch_or,
-                                   (__T &__x, __VT __v, int __order),
+                                   (__T *__x, __VT __v, int __order),
                                    __hybrid_atomic_getargs_store,
-                                   return, __x, __v, __order)
+                                   return __hybrid_atomic_castto<__T>::__doit,
+                                   __x, __v, __order)
 
-template<class __T, class __VT>
+template<class __T, class __VT> __ATTR_FORCEINLINE __ATTR_LEAF __ATTR_NONNULL((1))
 __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_fetch_xor,
-                                   (__T &__x, __VT __v, int __order),
+                                   (__T *__x, __VT __v, int __order),
                                    __hybrid_atomic_getargs_store,
-                                   return, __x, __v, __order)
+                                   return __hybrid_atomic_castto<__T>::__doit,
+                                   __x, __v, __order)
 
-template<class __T, class __VT>
+template<class __T, class __VT> __ATTR_FORCEINLINE __ATTR_LEAF __ATTR_NONNULL((1))
 __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_fetch_nand,
-                                   (__T &__x, __VT __v, int __order),
+                                   (__T *__x, __VT __v, int __order),
                                    __hybrid_atomic_getargs_store,
-                                   return, __x, __v, __order)
+                                   return __hybrid_atomic_castto<__T>::__doit,
+                                   __x, __v, __order)
 #undef __HYBRID_DEFINE_LIBATOMIC_SELECTOR
+#undef __hybrid_atomic_getargs_load
+#undef __hybrid_atomic_getargs_store
+#undef __hybrid_atomic_getargs_cmpxch
 }
-#define __hybrid_atomic_load(x, order)     (__NAMESPACE_INT_SYM __hybrid_atomic_load)(x, order)
-#define __hybrid_atomic_store(x, v, order) (__NAMESPACE_INT_SYM __hybrid_atomic_store)(x, v, order)
-#define __hybrid_atomic_xch(x, v, order)   (__NAMESPACE_INT_SYM __hybrid_atomic_exchange)(x, v, order)
+#define __hybrid_atomic_load(x, order)     (__NAMESPACE_INT_SYM __hybrid_atomic_load)(&(x), order)
+#define __hybrid_atomic_store(x, v, order) (__NAMESPACE_INT_SYM __hybrid_atomic_store)(&(x), v, order)
+#define __hybrid_atomic_xch(x, v, order)   (__NAMESPACE_INT_SYM __hybrid_atomic_exchange)(&(x), v, order)
 #define __hybrid_atomic_cmpxch(x, oldv, newv, succ, fail)                                                 \
 	__XBLOCK({                                                                                            \
 		__typeof__(x) __oldv = (oldv);                                                                    \
-		__XRETURN(__NAMESPACE_INT_SYM __hybrid_atomic_compare_exchange)(x, &__oldv, newv, 0, succ, fail); \
-	})
-#define __hybrid_atomic_cmpxch_weak(x, oldv, newv, succ, fail)                                            \
-	__XBLOCK({                                                                                            \
-		__typeof__(x) __oldv = (oldv);                                                                    \
-		__XRETURN(__NAMESPACE_INT_SYM __hybrid_atomic_compare_exchange)(x, &__oldv, newv, 1, succ, fail); \
+		__XRETURN(__NAMESPACE_INT_SYM __hybrid_atomic_compare_exchange)(&(x), &__oldv, newv, succ, fail); \
 	})
 #define __hybrid_atomic_cmpxch_val(x, oldv, newv, succ, fail)                                    \
 	__XBLOCK({                                                                                   \
 		__typeof__(x) __oldv = (oldv);                                                           \
-		(__NAMESPACE_INT_SYM __hybrid_atomic_compare_exchange)(x, &__oldv, newv, 0, succ, fail); \
+		(__NAMESPACE_INT_SYM __hybrid_atomic_compare_exchange)(&(x), &__oldv, newv, succ, fail); \
 		__XRETURN __oldv;                                                                        \
 	})
-#define __hybrid_atomic_cmpxch_val_weak(x, oldv, newv, succ, fail)                               \
-	__XBLOCK({                                                                                   \
-		__typeof__(x) __oldv = (oldv);                                                           \
-		(__NAMESPACE_INT_SYM __hybrid_atomic_compare_exchange)(x, &__oldv, newv, 1, succ, fail); \
-		__XRETURN __oldv;                                                                        \
-	})
-#define __hybrid_atomic_addfetch(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_add_fetch)(x, v, order)
-#define __hybrid_atomic_subfetch(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_sub_fetch)(x, v, order)
-#define __hybrid_atomic_andfetch(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_and_fetch)(x, v, order)
-#define __hybrid_atomic_orfetch(x, v, order)   (__NAMESPACE_INT_SYM __hybrid_atomic_or_fetch)(x, v, order)
-#define __hybrid_atomic_xorfetch(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_xor_fetch)(x, v, order)
-#define __hybrid_atomic_nandfetch(x, v, order) (__NAMESPACE_INT_SYM __hybrid_atomic_nand_fetch)(x, v, order)
-#define __hybrid_atomic_fetchadd(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_fetch_add)(x, v, order)
-#define __hybrid_atomic_fetchsub(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_fetch_sub)(x, v, order)
-#define __hybrid_atomic_fetchand(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_fetch_and)(x, v, order)
-#define __hybrid_atomic_fetchor(x, v, order)   (__NAMESPACE_INT_SYM __hybrid_atomic_fetch_or)(x, v, order)
-#define __hybrid_atomic_fetchxor(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_fetch_xor)(x, v, order)
-#define __hybrid_atomic_fetchnand(x, v, order) (__NAMESPACE_INT_SYM __hybrid_atomic_fetch_nand)(x, v, order)
+#define __hybrid_atomic_addfetch(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_add_fetch)(&(x), v, order)
+#define __hybrid_atomic_subfetch(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_sub_fetch)(&(x), v, order)
+#define __hybrid_atomic_andfetch(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_and_fetch)(&(x), v, order)
+#define __hybrid_atomic_orfetch(x, v, order)   (__NAMESPACE_INT_SYM __hybrid_atomic_or_fetch)(&(x), v, order)
+#define __hybrid_atomic_xorfetch(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_xor_fetch)(&(x), v, order)
+#define __hybrid_atomic_nandfetch(x, v, order) (__NAMESPACE_INT_SYM __hybrid_atomic_nand_fetch)(&(x), v, order)
+#define __hybrid_atomic_fetchadd(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_fetch_add)(&(x), v, order)
+#define __hybrid_atomic_fetchsub(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_fetch_sub)(&(x), v, order)
+#define __hybrid_atomic_fetchand(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_fetch_and)(&(x), v, order)
+#define __hybrid_atomic_fetchor(x, v, order)   (__NAMESPACE_INT_SYM __hybrid_atomic_fetch_or)(&(x), v, order)
+#define __hybrid_atomic_fetchxor(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_fetch_xor)(&(x), v, order)
+#define __hybrid_atomic_fetchnand(x, v, order) (__NAMESPACE_INT_SYM __hybrid_atomic_fetch_nand)(&(x), v, order)
 
 #else /* __cplusplus */
+
+#define __hybrid_atomic_getargs_load(T, x, order)     ((T *)&(x), order)
+#define __hybrid_atomic_getargs_store(T, x, v, order) ((T *)&(x), (T)(v), order)
+#define __hybrid_atomic_getargs_cmpxch(T, x, poldv, newv, succ, fail) \
+	((T *)&(x), (T *)poldv, (T)(newv), succ, fail)
+
 #define __hybrid_atomic_load(x, order) \
 	__ATOMIC_RECAST(x, __HYBRID_CALL_LIBATOMIC_SELECTOR(__hybrid_atomic_load, sizeof(x), __hybrid_atomic_getargs_load, x, order))
 #define __hybrid_atomic_store(x, v, order) \
@@ -439,29 +477,14 @@ __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_fetch_nand,
 		__typeof__(x) __oldv = (oldv);                                                               \
 		__XRETURN __HYBRID_CALL_LIBATOMIC_SELECTOR(__hybrid_atomic_compare_exchange, sizeof(__oldv), \
 		                                           __hybrid_atomic_getargs_cmpxch, x, &__oldv, newv, \
-		                                           0, succ, fail);                                   \
-	})
-#define __hybrid_atomic_cmpxch_weak(x, oldv, newv, succ, fail)                                       \
-	__XBLOCK({                                                                                       \
-		__typeof__(x) __oldv = (oldv);                                                               \
-		__XRETURN __HYBRID_CALL_LIBATOMIC_SELECTOR(__hybrid_atomic_compare_exchange, sizeof(__oldv), \
-		                                           __hybrid_atomic_getargs_cmpxch, x, &__oldv, newv, \
-		                                           1, succ, fail);                                   \
+		                                           succ, fail);                                      \
 	})
 #define __hybrid_atomic_cmpxch_val(x, oldv, newv, succ, fail)                              \
 	__XBLOCK({                                                                             \
 		__typeof__(x) __oldv = (oldv);                                                     \
 		__HYBRID_CALL_LIBATOMIC_SELECTOR(__hybrid_atomic_compare_exchange, sizeof(__oldv), \
 		                                 __hybrid_atomic_getargs_cmpxch, x, &__oldv, newv, \
-		                                 0, succ, fail);                                   \
-		__XRETURN __oldv;                                                                  \
-	})
-#define __hybrid_atomic_cmpxch_val_weak(x, oldv, newv, succ, fail)                         \
-	__XBLOCK({                                                                             \
-		__typeof__(x) __oldv = (oldv);                                                     \
-		__HYBRID_CALL_LIBATOMIC_SELECTOR(__hybrid_atomic_compare_exchange, sizeof(__oldv), \
-		                                 __hybrid_atomic_getargs_cmpxch, x, &__oldv, newv, \
-		                                 1, succ, fail);                                   \
+		                                 succ, fail);                                      \
 		__XRETURN __oldv;                                                                  \
 	})
 #define __hybrid_atomic_addfetch(x, v, order)  __ATOMIC_RECAST(x, __HYBRID_CALL_LIBATOMIC_SELECTOR(__hybrid_atomic_add_fetch, sizeof(x), __hybrid_atomic_getargs_store, x, v, order))
@@ -477,6 +500,11 @@ __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_fetch_nand,
 #define __hybrid_atomic_fetchxor(x, v, order)  __ATOMIC_RECAST(x, __HYBRID_CALL_LIBATOMIC_SELECTOR(__hybrid_atomic_fetch_xor, sizeof(x), __hybrid_atomic_getargs_store, x, v, order))
 #define __hybrid_atomic_fetchnand(x, v, order) __ATOMIC_RECAST(x, __HYBRID_CALL_LIBATOMIC_SELECTOR(__hybrid_atomic_fetch_nand, sizeof(x), __hybrid_atomic_getargs_store, x, v, order))
 #endif /* !__cplusplus */
+#define __hybrid_atomic_cmpxch_weak(x, oldv, newv, succ, fail) \
+	__hybrid_atomic_cmpxch(x, oldv, newv, succ, fail)
+#define __hybrid_atomic_cmpxch_val_weak(x, oldv, newv, succ, fail) \
+	__hybrid_atomic_cmpxch_val(x, oldv, newv, succ, fail)
+
 
 __NAMESPACE_INT_END
 
