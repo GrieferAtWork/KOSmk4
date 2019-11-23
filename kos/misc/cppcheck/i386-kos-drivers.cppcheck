@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="1">
+	<builddir>../../../build/cppcheck-i386-kos-drivers</builddir>
+	<platform>unix32</platform>
+	<analyze-all-vs-configs>false</analyze-all-vs-configs>
+	<check-headers>true</check-headers>
+	<check-unused-templates>false</check-unused-templates>
+	<max-ctu-depth>10</max-ctu-depth>
+	<includedir>
+		<dir name="../../src/kernel/include/i386-kos/"/>
+		<dir name="../../src/kernel/include/"/>
+		<dir name="../../include/i386-kos/"/>
+		<dir name="../../include/"/>
+	</includedir>
+	<defines>
+		<define name="__i386__"/>
+		<define name="__KERNEL__"/>
+		<define name="__KOS__"/>
+	</defines>
+	<paths>
+		<dir name="../../src/kernel/modext2fs"/>
+		<dir name="../../src/kernel/modgdbserver"/>
+		<dir name="../../src/kernel/modiso9660"/>
+		<dir name="../../src/kernel/modprocfs"/>
+		<dir name="../../src/kernel/modps2"/>
+		<dir name="../../src/kernel/modusb"/>
+		<dir name="../../src/kernel/modusb-hid"/>
+		<dir name="../../src/kernel/modusb-storage"/>
+		<dir name="../../src/kernel/modvga"/>
+	</paths>
+	<exclude>
+		<path name="__ice__/"/>
+		<path name="__ice__/*"/>
+		<path name="__ice__/**"/>
+	</exclude>
+	<suppressions>
+		<suppression>unusedFunction</suppression>
+		<suppression>unusedStructMember</suppression>
+		<suppression>clarifyCalculation</suppression>
+		<suppression>comparePointers</suppression>
+	</suppressions>
+</project>

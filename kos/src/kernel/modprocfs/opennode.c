@@ -142,7 +142,6 @@ badino:
 		                        : E_FILESYSTEM_DELETED_FILE);
 		break;
 	}
-	node->i_filenlink = 0;
 }
 
 

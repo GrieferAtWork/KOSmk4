@@ -2284,7 +2284,7 @@ uhci_interrupt_frameentry_init(struct uhci_interrupt_frameentry *__restrict self
 		self->ife_bufsize = ptr.hp_siz;
 	} else {
 		/* Large buffer. */
-		size_t i, num_pages;
+		size_t num_pages;
 		void *buf;
 		num_pages = CEILDIV(buflen, PAGESIZE);
 		/* NOTE: Unlink the heap allocation functions, vpage_alloc() is guarantied to
@@ -2294,6 +2294,7 @@ uhci_interrupt_frameentry_init(struct uhci_interrupt_frameentry *__restrict self
 		                           GFP_LOCKED | GFP_PREFLT); /* TODO: GFP_32BIT */
 		assert(IS_ALIGNED((uintptr_t)self->ife_buf, PAGESIZE));
 		TRY {
+			size_t i;
 			i = 0;
 			while (i < num_pages) {
 				vm_ppage_t start;

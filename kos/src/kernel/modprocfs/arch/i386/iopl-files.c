@@ -42,9 +42,10 @@ DECL_BEGIN
 
 PRIVATE NONNULL((1)) void KCALL
 KeepIopl_Write(USER CHECKED void const *buf, size_t bufsize, bool *pvalue) {
-	bool old_value, new_value;
+	bool new_value;
 	new_value = ProcFS_ParseBool(buf, bufsize);
 	for (;;) {
+		bool old_value;
 		old_value = ATOMIC_READ(*pvalue);
 		if (old_value == new_value)
 			break; /* Nothing to do here! */

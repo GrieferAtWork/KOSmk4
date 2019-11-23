@@ -429,7 +429,6 @@ usb_interface_discovered(struct usb_controller *__restrict self,
                          size_t endpc, struct usb_endpoint *const endpv[]) {
 	size_t i;
 	REF struct usb_probe_vector *probes, *new_probes;
-	REF struct usb_unknown_interface *unknown;
 	printk(KERN_NOTICE "[usb] Discovered device %q:%q:%q with interface "
 	                   "%q(%#x.%#x.%#x) (config %q) and %Iu endpoints",
 	       intf->ui_device->ud_str_vendor,
@@ -455,6 +454,7 @@ usb_interface_discovered(struct usb_controller *__restrict self,
 	/* Go through loaded drivers and try to have drivers bind the interface. */
 	probes = probe_interface.get();
 	TRY {
+		REF struct usb_unknown_interface *unknown;
 		/* Try to probe the device for matching one of the builtin interfaces (e.g. a HUB) */
 		if (usb_probe_builtin_interfaces(self, intf, endpc, endpv))
 			return;
@@ -1035,11 +1035,12 @@ usb_device_discovered(struct usb_controller *__restrict self,
 			/* USB language codes can be found here:
 			 * https://web.archive.org/web/20120417075804/http://www.usb.org/developers/docs/USB_LANGIDs.pdf
 			 * ... And for some reason, the original page no longer exists... */
-			size_t i, count = (buf[0] - 2) / 2;
+			size_t count = (buf[0] - 2) / 2;
 			dev->ud_lang_used = *(u16 *)(buf + 2);
 #define LANG_EN_US 0x0409
 			/* Try to make use of English (if available) */
 			if (count > 1 && dev->ud_lang_used != LANG_EN_US) {
+				size_t i;
 				for (i = 1; i < count; ++i) {
 					u16 l = ((u16 *)(buf + 2))[i];
 					if (l == LANG_EN_US) {
@@ -1101,9 +1102,8 @@ strange_device_without_configs:
 	}
 
 	used_conf = 0;
+	/* Handle multi-purpose devices (e.g. a printer/scanner combo). */
 	if (dev->ud_configc != 1) {
-		/* Handle multi-purpose devices (e.g. a printer/scanner combo). */
-		u8 i;
 		/* A device class of 0 indicates that the device's different classes operate independently. */
 		if (dev->ud_dev_class != 0) {
 			size_t i;
@@ -1138,9 +1138,12 @@ did_find_correct_config:
 		used_conf = 0; /* ??? (Maybe prioritize certain options over others?) */
 		printk(KERN_WARNING "[usb] Multi-function device %q:%q:%q not recognized. Available configurations are:\n",
 		       dev->ud_str_vendor, dev->ud_str_product, dev->ud_str_serial);
-		for (i = 0; i < dev->ud_configc; ++i) {
-			printk(KERN_WARNING "[usb] Config#%u: %q\n",
-			       i, dev->ud_configv[i].uc_desc);
+		{
+			u8 i;
+			for (i = 0; i < dev->ud_configc; ++i) {
+				printk(KERN_WARNING "[usb] Config#%u: %q\n",
+				       i, dev->ud_configv[i].uc_desc);
+			}
 		}
 		printk(KERN_WARNING "[usb] Configuring as %q\n",
 		       dev->ud_configv[used_conf].uc_desc);

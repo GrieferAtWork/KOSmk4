@@ -195,7 +195,7 @@ GDB_PrintRemoteVMString(pformatprinter printer, void *arg,
                         USER CHECKED char const *string,
                         bool print_repr) {
 	char buf[256];
-	size_t temp, result = 0;
+	ssize_t temp, result = 0;
 	size_t pagesize = pagedir_pagesize_p(PAGEDIR_P_SELFOFVM(effective_vm));
 	for (;;) {
 		size_t partlen, maxread;

@@ -190,11 +190,10 @@ usb_hub_probe(struct usb_controller *__restrict self,
 		/* Enable power to all ports. */
 		if ((result->uh_attrib & USB_HUB_ATTRIB_PSMM) == USB_HUB_ATTRIB_PSM_INDIV) {
 			for (i = 0; i < result->uh_num_ports; ++i) {
-				struct usb_request req;
 				req.ur_reqtype = USB_REQUEST_RETYPE_DEST_DEV |
 				                 USB_REQUEST_RETYPE_TYPE_CLS |
 				                 USB_REQUEST_RETYPE_DIR_H2D;
-				req.ur_reqtype = USB_REQUEST_SET_FEATURE;
+				req.ur_request = USB_REQUEST_SET_FEATURE;
 				req.ur_value   = 8; /* Port power */
 				req.ur_index   = i + 1;
 				req.ur_length  = 0;
