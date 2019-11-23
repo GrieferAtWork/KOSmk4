@@ -24,10 +24,11 @@
 #define PHDR(x) 
 #else
 PHDRS {
-	text    PT_LOAD;
-	data    PT_LOAD;
-	rel     PT_LOAD;
-	dynamic PT_DYNAMIC;
+	/* s.a. `.sources:OPT_ELF_FLATTEN_ALLOWED_HEADERS' for program headers that are kept. */
+	text    PT_LOAD;    /* Kept during flattening */
+	data    PT_LOAD;    /* Kept during flattening */
+	rel     PT_LOAD;    /* Discarded during flattening */
+	dynamic PT_DYNAMIC; /* Discarded during flattening */
 }
 #define PHDR(x) :x
 #endif

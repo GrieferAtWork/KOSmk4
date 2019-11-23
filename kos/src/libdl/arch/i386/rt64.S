@@ -43,7 +43,6 @@ INTERN(require_global)
 		pushq_cfi_r %r11;                                 \
 		leaq   991b(%rip), %rdi;                          \
 		call   require_global;                            \
-		.cfi_register %rip, %rax;                         \
 		movq   %rax, 80(%rsp); /* RETURN_PC_OVERRIDE */   \
 		.cfi_rel_offset %rip, 80;                         \
 		popq_cfi_r %r11;                                  \

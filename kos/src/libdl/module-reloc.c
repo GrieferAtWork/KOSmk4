@@ -371,7 +371,7 @@ libdl_bind_lazy_relocation(DlModule *__restrict self,
 		sys_exit_group(EXIT_FAILURE);
 	}
 	rel = (Elf_Rel *)((uintptr_t)self->dm_jmprel + jmp_rel_offset);
-	if unlikely(ELF32_R_TYPE(rel->r_info) != R_JMP_SLOT) {
+	if unlikely(ELF_R_TYPE(rel->r_info) != R_JMP_SLOT) {
 #ifdef ELF_HOST_RELA_UNUSED
 		syslog(LOG_ERROR, "[ld] Invalid jmp-relocation at DT_JMPREL+%Iu "
 		                  "[r_offset=%#Ix,r_info=%#I32x] isn't `" PP_PRIVATE_STR(R_JMP_SLOT) "' in %q\n",

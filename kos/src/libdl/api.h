@@ -28,7 +28,7 @@
  *   - Free-standing
  *   - Custom CRT feature functions (see __CRT_HAVE_* below)
  *   - Functions are linked as INTERN
- *   - Substitute the rest locally */
+ *   - Substitute the rest using implementations from <local/xxx/yyy.h> */
 #define __CRT_FREESTANDING 1
 #ifndef __LIBC
 #define __LIBC    __INTDEF
@@ -48,14 +48,18 @@
  * against parts of the libc source tree, as well as add an unnecessary
  * page-fault when the first system call is invoked. - libdl should have
  * minimal startup time, and be optimized for size; not performance, both
- * of which are followed more closely by always using int80) */
+ * of which are followed more closely by always just using `int 80h') */
 #define __WANT_INLINE_SYSCALLS 1
 
 /* Prevent the global variable `__peb' from being defined prematurely
  * (and breaking the visibility of us exporting that variable for real) */
 #define ____peb_defined 1
 
+/* Commit our custom configuration by using it to setup-CRT definitions. */
 #include <__crt.h>
+
+/* Define CRT features which may be exposed in
+ * headers, that we are explicitly implementing. */
 
 /* Functions defined through dlmalloc */
 #define __CRT_HAVE_malloc 1
@@ -95,36 +99,45 @@
 #include <hybrid/host.h>
 #include <kos/types.h>
 
-#define LIBDL_FILENAME   "/lib/libdl.so"
+#define LIBDL_FILENAME "/lib/libdl.so"
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define CC   ATTR_STDCALL
 #define VCC  ATTR_CDECL
-#else
+#else /* __i386__ && !__x86_64__ */
 #define CC   /* nothing */
 #define VCC  /* nothing */
-#endif
+#endif /* !__i386__ || __x86_64__ */
 
 #ifndef FCALL
 #define FCALL __FCALL
-#endif
+#endif /* FCALL */
 #define WEAK      /* nothing */
 #define REF       /* nothing */
 #define REF_IF(x) /* nothing */
 #ifndef LIBCCALL
 #define LIBCCALL  __LIBCCALL
-#endif
+#endif /* !LIBCCALL */
 #ifndef LIBDCALL
 #define LIBDCALL  __LIBDCALL
-#endif
+#endif /* !LIBDCALL */
 #ifndef VLIBCCALL
 #define VLIBCCALL __VLIBCCALL
-#endif
+#endif /* !VLIBCCALL */
 #ifndef VLIBDCALL
 #define VLIBDCALL __VLIBDCALL
-#endif
+#endif /* !VLIBDCALL */
 
-
+/* Addressable sections of the RTLD driver itself.
+ * Of note here are mostly the .eh_frame and .gcc_except_table
+ * sections, which are required for allowing exceptions to work
+ * properly when being propagated through the callbacks invoked
+ * by the RTLD driver.
+ * NOTE: Each search has 2 symbols defined by the linker script:
+ *       `__rtld_<name>_start' and `__rtld_<name>_end', that are
+ *       used to lazily fill in section information as-per the
+ *       request of a call to `dllocksection()' when given a handle
+ *       for the RTLD core library. */
 #define BUILTIN_SECTIONS_COUNT 6
 #define BUILTIN_SECTIONS_ENUMERATE(callback)           \
 	callback(0, ".text", text)                         \
@@ -158,6 +171,15 @@
 	callback(__cxa_end_catch)               \
 	callback(__cxa_rethrow)                 \
 	callback(_Unwind_Resume)
+
+
+/* TODO: Add a way of extending the RTLD driver with custom executable format
+ *       back-ends, such as (once again) allowing PE binaries to be loaded.
+ * -> There should be a seperate shared librariy `libdl-pe.so' similar to
+ *    `libdl.so' that can simply be loaded using `dlopen()' and contains
+ *    everything that's necessary to implement dynamic linking of PE binaries.
+ *    As such, `DlModule' also needs to be given an optional v-table that can
+ *    be filled with overrides for functions such as dlsym() or dllocksection(). */
 
 
 #endif /* !GUARD_LIBDL_API_H */
