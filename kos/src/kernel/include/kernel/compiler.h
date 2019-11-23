@@ -1109,6 +1109,7 @@ __NAMESPACE_INT_END
 #else /* __cplusplus */
 #define DEFINE_REFCOUNT_FUNCTIONS(T, field, destroy)                   /* nothing */
 #define DEFINE_REFCOUNT_FUNCTIONS_EX(T, field, destroy, Tdestroy)      /* nothing */
+#define DEFINE_REFCOUNT_TYPE_SUBCLASS(subclass, baseclass)             /* nothing */
 #define DEFINE_WEAKREFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy) /* nothing */
 #define DEFINE_WEAKREFCOUNT_FUNCTIONS(T, field, destroy_)              /* nothing */
 #define __DEFINE_SYNC_PROXY(T, field)                                  /* nothing */

@@ -25,6 +25,10 @@
 #include <misc/atomic-ref.h>
 #include <sched/mutex.h>
 
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 DECL_BEGIN
 
 /* Terminal display drivers such as VGA should not implement the
@@ -73,6 +77,9 @@ struct tty_device
 };
 
 DEFINE_REFCOUNT_TYPE_SUBCLASS(tty_device, ttybase_device);
+
+#define TTY_DEVICE_FORWARD(self) \
+	((XATOMIC_REF(struct tty_device_forward) &)(self)->t_forward)
 
 struct tty_device_forward {
 	/* Reading keyboard input only when read() is called doesn't work:

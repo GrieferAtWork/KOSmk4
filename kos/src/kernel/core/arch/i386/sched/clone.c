@@ -142,9 +142,11 @@ x86_task_clone(struct icpustate const *__restrict init_state,
 		result->t_self   = result;
 		incref(&vm_datablock_anonymous); /* FORTASK(result,_this_kernel_stacknode).vn_block */
 		incref(&vm_datablock_anonymous); /* FORTASK(result,_this_kernel_stackpart).dp_block */
-		*(uintptr_t *)&FORTASK(result, _this_kernel_stacknode).vn_part += (uintptr_t)result;
-		*(uintptr_t *)&FORTASK(result, _this_kernel_stacknode).vn_link.ln_pself += (uintptr_t)result;
-		*(uintptr_t *)&FORTASK(result, _this_kernel_stackpart).dp_srefs += (uintptr_t)result;
+#define REL(x) ((x) = (__typeof__(x))(uintptr_t)((byte_t *)(x) + (uintptr_t)result))
+		REL(FORTASK(result, _this_kernel_stacknode).vn_part);
+		REL(FORTASK(result, _this_kernel_stacknode).vn_link.ln_pself);
+		REL(FORTASK(result, _this_kernel_stackpart).dp_srefs);
+#undef REL
 		TRY {
 			vm_datapart_do_allocram(&FORTASK(result, _this_kernel_stackpart));
 			TRY {

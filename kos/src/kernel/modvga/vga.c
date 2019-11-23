@@ -1500,15 +1500,17 @@ again:
 			memcpy(textbuf, self->v_textbase, textsize);
 			diff = (intptr_t)textbuf - (intptr_t)self->v_textbase;
 			assert(!self->v_savedfont);
-			*(intptr_t *)&self->v_textbase += diff;
-			*(intptr_t *)&self->v_text2line += diff;
-			*(intptr_t *)&self->v_textlline += diff;
-			*(intptr_t *)&self->v_textend += diff;
-			*(intptr_t *)&self->v_textptr += diff;
-			*(intptr_t *)&self->v_scrlbase += diff;
-			*(intptr_t *)&self->v_scrl2lin += diff;
-			*(intptr_t *)&self->v_scrlllin += diff;
-			*(intptr_t *)&self->v_scrlend += diff;
+#define REL(x) ((x) = (__typeof__(x))(uintptr_t)((intptr_t)(x) + diff))
+			REL(self->v_textbase);
+			REL(self->v_text2line);
+			REL(self->v_textlline);
+			REL(self->v_textend);
+			REL(self->v_textptr);
+			REL(self->v_scrlbase);
+			REL(self->v_scrl2lin);
+			REL(self->v_scrlllin);
+			REL(self->v_scrlend);
+#undef REL
 			if (oldfont)
 				VGA_DoGetFont(self, oldfont);
 			VGA_DoSetMode(self, &vga_mode_gfx320x200_256);
@@ -1541,15 +1543,17 @@ VGA_DisableGraphicsMode(VGA *__restrict self) {
 		diff     = (intptr_t)self->v_textbase_real - (intptr_t)textbuf;
 		self->v_savedfont = NULL;
 		assert(diff != 0);
-		*(intptr_t *)&self->v_textbase += diff;
-		*(intptr_t *)&self->v_text2line += diff;
-		*(intptr_t *)&self->v_textlline += diff;
-		*(intptr_t *)&self->v_textend += diff;
-		*(intptr_t *)&self->v_textptr += diff;
-		*(intptr_t *)&self->v_scrlbase += diff;
-		*(intptr_t *)&self->v_scrl2lin += diff;
-		*(intptr_t *)&self->v_scrlllin += diff;
-		*(intptr_t *)&self->v_scrlend += diff;
+#define REL(x) ((x) = (__typeof__(x))(uintptr_t)((intptr_t)(x) + diff))
+		REL(self->v_textbase);
+		REL(self->v_text2line);
+		REL(self->v_textlline);
+		REL(self->v_textend);
+		REL(self->v_textptr);
+		REL(self->v_scrlbase);
+		REL(self->v_scrl2lin);
+		REL(self->v_scrlllin);
+		REL(self->v_scrlend);
+#undef REL
 		if (oldfont)
 			VGA_DoSetFont(self, oldfont);
 		VGA_DoSetMode(self, &vga_ansitty_mode);

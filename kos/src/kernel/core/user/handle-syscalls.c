@@ -850,7 +850,7 @@ DEFINE_SYSCALL5(ssize_t, pwrite64f,
 }
 
 DEFINE_SYSCALL4(ssize_t, kreaddir,
-                fd_t, fd, struct dirent *, buf,
+                fd_t, fd, USER UNCHECKED struct dirent *, buf,
                 size_t, bufsize, syscall_ulong_t, mode) {
 	size_t result;
 	struct handle hand;
@@ -889,7 +889,7 @@ DEFINE_SYSCALL4(ssize_t, kreaddir,
 					break;
 				}
 				/* Move the buffer past this entry. */
-				*(uintptr_t *)&buf += partial;
+				buf = (USER struct dirent *)((byte_t *)buf + partial);
 				bufsize -= partial;
 				result += partial;
 				/* Align the buffer by INodes (8 bytes). */
@@ -898,7 +898,7 @@ DEFINE_SYSCALL4(ssize_t, kreaddir,
 					alignoff = sizeof(ino64_t) - alignoff;
 					if (bufsize < alignoff)
 						break;
-					*(uintptr_t *)&buf += alignoff;
+					buf = (USER struct dirent *)((byte_t *)buf + alignoff);
 					bufsize -= alignoff;
 					result += alignoff;
 				}
@@ -964,7 +964,7 @@ DEFINE_SYSCALL5(ssize_t, kreaddirf,
 					break;
 				}
 				/* Move the buffer past this entry. */
-				*(uintptr_t *)&buf += partial;
+				buf = (USER struct dirent *)((byte_t *)buf + partial);
 				bufsize -= partial;
 				result += partial;
 				/* Align the buffer by INodes (8 bytes). */
@@ -973,7 +973,7 @@ DEFINE_SYSCALL5(ssize_t, kreaddirf,
 					alignoff = sizeof(ino64_t) - alignoff;
 					if (bufsize < alignoff)
 						break;
-					*(uintptr_t *)&buf += alignoff;
+					buf = (USER struct dirent *)((byte_t *)buf + alignoff);
 					bufsize -= alignoff;
 					result += alignoff;
 				}

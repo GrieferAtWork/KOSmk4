@@ -1053,15 +1053,14 @@ restore_pending:
 				/* Check if we must switch from `ATA_BUS_STATE_READY' to `ATA_BUS_STATE_INDMA',
 				 * now that we've added additional pending DMA commands to the bus. */
 				for (;;) {
-					COMPILER_READ_BARRIER();
-					state = *ATA_BUSATA_BUS_STATE_AND_FLAGS(bus);
+					state.b_word = ATOMIC_READ(ATA_BUSATA_BUS_STATE_AND_FLAGS_WORD(bus));
 					if (state.b_state != ATA_BUS_STATE_READY)
 						break; /* Only start DMAing when the bus is in its ready state */
 					if (state.b_flags & ATA_BUS_FSUSPEND)
 						break; /* Don't start DMAing when the bus is being suspended */
 					newstate.b_state = ATA_BUS_STATE_INDMA_SWITCH;
 					newstate.b_flags = state.b_flags;
-					if (!ATOMIC_CMPXCH_WEAK(*(uintptr_t *)ATA_BUSATA_BUS_STATE_AND_FLAGS(bus),
+					if (!ATOMIC_CMPXCH_WEAK(ATA_BUSATA_BUS_STATE_AND_FLAGS_WORD(bus),
 					                        state.b_word, newstate.b_word))
 						continue;
 					ata_check_suspended_and_load_future(bus);
@@ -1131,8 +1130,7 @@ AtaBus_LockPIO(struct ata_bus *__restrict self) THROWS(E_WOULDBLOCK,...) {
 	union ata_bus_state_and_flags state, newstate;
 	assert(!task_isconnected());
 	for (;;) {
-		COMPILER_READ_BARRIER();
-		state = *ATA_BUSATA_BUS_STATE_AND_FLAGS(self);
+		state.b_word = ATOMIC_READ(ATA_BUSATA_BUS_STATE_AND_FLAGS_WORD(self));
 		if (state.b_state == ATA_BUS_STATE_READY &&
 		    (state.b_flags & ATA_BUS_FSUSPEND) == 0) {
 			/* The bus is available. - immediately try to switch to PIO mode.
@@ -1158,7 +1156,7 @@ AtaBus_LockPIO(struct ata_bus *__restrict self) THROWS(E_WOULDBLOCK,...) {
 		}
 		newstate.b_flags = state.b_flags + 1; /* +1 more thread waiting for suspension */
 		newstate.b_state = state.b_state;
-		if (ATOMIC_CMPXCH_WEAK(*(uintptr_t *)ATA_BUSATA_BUS_STATE_AND_FLAGS(self),
+		if (ATOMIC_CMPXCH_WEAK(ATA_BUSATA_BUS_STATE_AND_FLAGS_WORD(self),
 		                       state.b_word, newstate.b_word))
 			break;
 	}
@@ -1177,7 +1175,7 @@ AtaBus_LockPIO(struct ata_bus *__restrict self) THROWS(E_WOULDBLOCK,...) {
 	} EXCEPT {
 		/* Drop 1 from the suspend-requested counter. */
 		for (;;) {
-			state = *ATA_BUSATA_BUS_STATE_AND_FLAGS(self);
+			state.b_word = ATOMIC_READ(ATA_BUSATA_BUS_STATE_AND_FLAGS_WORD(self));
 			assert((state.b_flags & ATA_BUS_FSUSPEND) != 0);
 			newstate = state;
 			--newstate.b_flags;
@@ -1187,13 +1185,13 @@ AtaBus_LockPIO(struct ata_bus *__restrict self) THROWS(E_WOULDBLOCK,...) {
 			if (newstate.b_state == ATA_BUS_STATE_READY &&
 			    (newstate.b_flags & ATA_BUS_FSUSPEND) == 0) {
 				newstate.b_state = ATA_BUS_STATE_INDMA_SWITCH;
-				if (!ATOMIC_CMPXCH_WEAK(*(uintptr_t *)ATA_BUSATA_BUS_STATE_AND_FLAGS(self),
+				if (!ATOMIC_CMPXCH_WEAK(ATA_BUSATA_BUS_STATE_AND_FLAGS_WORD(self),
 				                        state.b_word, newstate.b_word))
 					continue;
 				ata_check_suspended_and_load_future(self);
 				break;
 			}
-			if (ATOMIC_CMPXCH_WEAK(*(uintptr_t *)ATA_BUSATA_BUS_STATE_AND_FLAGS(self),
+			if (ATOMIC_CMPXCH_WEAK(ATA_BUSATA_BUS_STATE_AND_FLAGS_WORD(self),
 			                       state.b_word, newstate.b_word))
 				break;
 		}
@@ -1210,13 +1208,12 @@ INTERN NOBLOCK void
 NOTHROW(KCALL AtaBus_UnlockPIO)(struct ata_bus *__restrict self) {
 	union ata_bus_state_and_flags state, newstate;
 	for (;;) {
-		COMPILER_READ_BARRIER();
-		state = *ATA_BUSATA_BUS_STATE_AND_FLAGS(self);
+		state.b_word = ATOMIC_READ(ATA_BUSATA_BUS_STATE_AND_FLAGS_WORD(self));
 		newstate.b_flags = state.b_flags;
 		newstate.b_state = ATA_BUS_STATE_READY;
 		if (ATOMIC_READ(self->b_dma_future) && !(state.b_flags & ATA_BUS_FSUSPEND))
 			newstate.b_state = ATA_BUS_STATE_INDMA_SWITCH;
-		if (ATOMIC_CMPXCH_WEAK(*(uintptr_t *)ATA_BUSATA_BUS_STATE_AND_FLAGS(self),
+		if (ATOMIC_CMPXCH_WEAK(ATA_BUSATA_BUS_STATE_AND_FLAGS_WORD(self),
 		                       state.b_word, newstate.b_word))
 			break;
 	}

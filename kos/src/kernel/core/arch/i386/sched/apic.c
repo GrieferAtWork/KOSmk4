@@ -610,10 +610,10 @@ i386_allocate_secondary_cores(void) {
 		LLIST_INSERT(vm_kernel.v_tasks, altidle, t_vm_tasks);
 
 		/* Allocate & map stacks for this cpu's IDLE task, as well as the #DF stack. */
-		FORCPU(altcore, _current_x86_dfstackpart).dp_tree.a_vmax  = (vm_dpage_t)(CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) - 1);
-		FORCPU(altcore, _thiscpu_x86_dfstacknode).vn_part              = &FORCPU(altcore, _current_x86_dfstackpart);
-		FORCPU(altcore, _thiscpu_x86_dfstacknode).vn_link.ln_pself     = &LLIST_HEAD(FORCPU(altcore, _current_x86_dfstackpart).dp_srefs);
-		FORCPU(altcore, _current_x86_dfstackpart).dp_srefs        = &FORCPU(altcore, _thiscpu_x86_dfstacknode);
+		FORCPU(altcore, _current_x86_dfstackpart).dp_tree.a_vmax   = (vm_dpage_t)(CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) - 1);
+		FORCPU(altcore, _thiscpu_x86_dfstacknode).vn_part          = &FORCPU(altcore, _current_x86_dfstackpart);
+		FORCPU(altcore, _thiscpu_x86_dfstacknode).vn_link.ln_pself = &LLIST_HEAD(FORCPU(altcore, _current_x86_dfstackpart).dp_srefs);
+		FORCPU(altcore, _current_x86_dfstackpart).dp_srefs         = &FORCPU(altcore, _thiscpu_x86_dfstacknode);
 		vm_datapart_do_allocram(&FORCPU(altcore, _current_x86_dfstackpart));
 		{
 			vm_vpage_t addr;
@@ -638,9 +638,12 @@ i386_allocate_secondary_cores(void) {
 		FORTASK(altidle, _this_kernel_stackpart).dp_tree.a_vmax = (vm_dpage_t)(CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1);
 		/* The stack of IDLE threads is executable in order to allow for hacking around .free restrictions. */
 		FORTASK(altidle, _this_kernel_stacknode).vn_prot = (VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ);
-		*(uintptr_t *)&FORTASK(altidle, _this_kernel_stacknode).vn_part += (uintptr_t)altidle;
-		*(uintptr_t *)&FORTASK(altidle, _this_kernel_stacknode).vn_link.ln_pself += (uintptr_t)altidle;
-		*(uintptr_t *)&FORTASK(altidle, _this_kernel_stackpart).dp_srefs += (uintptr_t)altidle;
+
+#define REL(x) ((x) = (__typeof__(x))(uintptr_t)((byte_t *)(x) + (uintptr_t)altidle))
+		REL(FORTASK(altidle, _this_kernel_stacknode).vn_part);
+		REL(FORTASK(altidle, _this_kernel_stacknode).vn_link.ln_pself);
+		REL(FORTASK(altidle, _this_kernel_stackpart).dp_srefs);
+#undef REL
 		vm_datapart_do_allocram(&FORTASK(altidle, _this_kernel_stackpart));
 		{
 			vm_vpage_t addr;

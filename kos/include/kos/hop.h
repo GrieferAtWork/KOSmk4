@@ -26,6 +26,18 @@
 
 __SYSDECL_BEGIN
 
+#if defined(__KERNEL__) && __SIZEOF_SIZE_T__ < 8
+#define __HOP_SIZE64_FIELD(name) union { __size_t name; __uint64_t __##name##64; }
+#else /* __KERNEL__ */
+/* For compatibility, user-space must always write the full 64-bit field,
+ * while the kernel will only ever read a size_t-sized field.
+ * This is required when a 32-bit application is running under a 64-bit kernel,
+ * allowing the kernel to not have to look out for user-space running in
+ * compatibility mode, but can instead always read the full 64-bit value,
+ * with is simply zero-extended from 32-bit by user-space. */
+#define __HOP_SIZE64_FIELD(name) __uint64_t name
+#endif /* !__KERNEL__ */
+
 /* Special HandleOPeration control codes for extended handle types.
  * These are function codes with may be used alongside the `hop()'
  * system call provided by the KOSmk4 kernel.
@@ -878,7 +890,7 @@ struct hop_pipe_skipdata /*[PREFIX(psd_)]*/ {
 	                                          * this value is too small or doesn't match any recognized
 	                                          * structure version. */
 	__uint32_t          __psd_pad1;          /* ... */
-	__uint64_t            psd_num_bytes;     /* [IN] The max number of bytes to skip. */
+	__HOP_SIZE64_FIELD   (psd_num_bytes);    /* [IN] The max number of bytes to skip. */
 	__uint64_t            psd_skipped;       /* [OUT] The number of skipped bytes */
 	__uint64_t            psd_rdpos;         /* [OUT] The total number of read/skipped bytes since the buffer was last re-sized */
 };
@@ -896,7 +908,7 @@ struct hop_pipe_unread /*[PREFIX(pur_)]*/ {
 	                                          * this value is too small or doesn't match any recognized
 	                                          * structure version. */
 	__uint32_t          __pur_pad1;          /* ... */
-	__uint64_t            pur_num_bytes;     /* [IN] The max number of bytes to unread. */
+	__HOP_SIZE64_FIELD   (pur_num_bytes);    /* [IN] The max number of bytes to unread. */
 	__uint64_t            pur_unread;        /* [OUT] The number of unread bytes */
 	__uint64_t            pur_rdpos;         /* [OUT] The total number of read/skipped bytes since the buffer was last re-sized */
 };
@@ -914,7 +926,7 @@ struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
 	                                          * this value is too small or doesn't match any recognized
 	                                          * structure version. */
 	__uint32_t          __puw_pad1;          /* ... */
-	__uint64_t            puw_num_bytes;     /* [IN] The max number of bytes to unwrite. */
+	__HOP_SIZE64_FIELD   (puw_num_bytes);    /* [IN] The max number of bytes to unwrite. */
 	__uint64_t            puw_unwritten;     /* [OUT] The number of unwritten bytes */
 	__uint64_t            puw_wrpos;         /* [OUT] The total number of written bytes since the buffer was last re-sized */
 };
@@ -969,6 +981,7 @@ struct hop_datapart_stat /*[PREFIX(ds_)]*/ {
 #endif /* __CC__ */
 
 
+#undef __HOP_SIZE64_FIELD
 #undef __HOP_PAD_POINTER
 
 

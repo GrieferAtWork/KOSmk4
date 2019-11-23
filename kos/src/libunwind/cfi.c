@@ -427,7 +427,7 @@ libuw_unwind_emulator_write_to_piece(unwind_emulator_t *__restrict self,
 		if unlikely(!self->ue_regset)
 			ERROR(err_not_writable);
 		if unlikely(num_bits > CFI_REGISTER_SIZE(ste->s_register) * 8)
-			num_bits > CFI_REGISTER_SIZE(ste->s_register) * 8;
+			num_bits = CFI_REGISTER_SIZE(ste->s_register) * 8;
 		/* Write to a register. */
 		if (target_left_shift == 0 &&
 		    num_bits == CFI_REGISTER_SIZE(ste->s_register) * 8) {

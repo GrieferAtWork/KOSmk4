@@ -410,7 +410,8 @@
 #define XATOMIC_WEAKLYREF(...)    xatomic_weaklyref< __VA_ARGS__ >
 #define CALLBACK_LIST(PROTOTYPE)  callback_list< PROTOTYPE >
 
-#define __HOP_PAD_POINTER(name) __uint32_t name;
+#define __HOP_SIZE64_FIELD(name) __size_t name;
+#define __HOP_PAD_POINTER(name)  __uint32_t name;
 
 #define _GLIBCXX_PURE
 #define _GLIBCXX_CONST

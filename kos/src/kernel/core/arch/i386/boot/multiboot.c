@@ -430,7 +430,8 @@ NOTHROW(KCALL x86_load_mb2info)(PHYS u32 info) {
 	              PMEMBANK_TYPE_PRESERVE);
 
 	for (tag_iter = tag_begin; tag_iter < tag_end;
-	     *(uintptr_t *)&tag_iter += CEIL_ALIGN(tag_iter->size, MB2_TAG_ALIGN)) {
+	     tag_iter = (struct mb2_tag *)((byte_t *)tag_iter +
+	                                   CEIL_ALIGN(tag_iter->size, MB2_TAG_ALIGN))) {
 #define TAG(T) ((struct T *)tag_iter)
 		TRY {
 			switch (tag_iter->type) {
@@ -463,8 +464,9 @@ NOTHROW(KCALL x86_load_mb2info)(PHYS u32 info) {
 				if likely(TAG(mb2_tag_mmap)->entry_size) {
 					mb2_memory_map_t *iter, *end;
 					iter = TAG(mb2_tag_mmap)->entries;
-					end  = (mb2_memory_map_t *)((uintptr_t)TAG(mb2_tag_mmap) + TAG(mb2_tag_mmap)->size);
-					for (; iter < end; *(uintptr_t *)&iter += TAG(mb2_tag_mmap)->entry_size) {
+					end  = (mb2_memory_map_t *)((byte_t *)TAG(mb2_tag_mmap) + TAG(mb2_tag_mmap)->size);
+					for (; iter < end;
+					     iter = (mb2_memory_map_t *)((byte_t *)iter + TAG(mb2_tag_mmap)->entry_size)) {
 						if (iter->type >= COMPILER_LENOF(memtype_bios_matrix))
 							iter->type = 0;
 						if (memtype_bios_matrix[iter->type] >= PMEMBANK_TYPE_COUNT)

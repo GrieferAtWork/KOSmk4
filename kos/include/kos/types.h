@@ -21,6 +21,9 @@
 
 #include <__stdinc.h>
 #include <features.h>
+
+#include <hybrid/typecore.h>
+
 #include <bits/types.h>
 
 __DECL_BEGIN
@@ -66,6 +69,16 @@ typedef __intptr_t intptr_t;
 #define __uintptr_t_defined 1
 typedef __uintptr_t uintptr_t;
 #endif /* !__uintptr_t_defined */
+
+#ifndef __longptr_t_defined
+#define __longptr_t_defined 1
+typedef __LONGPTR_TYPE__ longptr_t;
+#endif /* !__longptr_t_defined */
+
+#ifndef __ulongptr_t_defined
+#define __ulongptr_t_defined 1
+typedef __ULONGPTR_TYPE__ ulongptr_t;
+#endif /* !__ulongptr_t_defined */
 
 #ifndef __ptrdiff_t_defined
 #define __ptrdiff_t_defined 1

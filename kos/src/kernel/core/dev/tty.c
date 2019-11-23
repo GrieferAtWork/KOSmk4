@@ -53,8 +53,6 @@ NOTHROW(KCALL tty_device_forward_destroy)(struct tty_device_forward *__restrict 
 	kfree(self);
 }
 
-#define FORWARD(me) (*(XATOMIC_REF(struct tty_device_forward) *)&(me)->t_forward)
-
 PRIVATE ssize_t LIBTERM_CC
 tty_device_oprinter(struct terminal *__restrict term,
                     void const *__restrict src,
@@ -72,7 +70,7 @@ NOTHROW(KCALL tty_device_fini)(struct character_device *__restrict self) {
 	REF struct tty_device_forward *fwd;
 	me = (struct tty_device *)self;
 	/* Stop the associated forwarding thread (if one is running) */
-	fwd = FORWARD(me).exchange(NULL);
+	fwd = TTY_DEVICE_FORWARD(me).exchange(NULL);
 	if (fwd) {
 		fwd->tf_device.clear();
 		sig_broadcast(&fwd->tf_cancel);
@@ -235,7 +233,7 @@ tty_device_startfwd(struct tty_device *__restrict self)
 	fwd->tf_thread = thread;
 	xatomic_weaklyref_init(&fwd->tf_device, self);
 	task_setup_kernel(thread, (thread_main_t)&tty_device_fwd_main, 1, fwd);
-	if unlikely(!FORWARD(self).cmpxch_inherit_new(NULL, fwd)) {
+	if unlikely(!TTY_DEVICE_FORWARD(self).cmpxch_inherit_new(NULL, fwd)) {
 		fwd->tf_device.clear();
 		sig_broadcast(&fwd->tf_cancel);
 		destroy(fwd);
@@ -251,7 +249,7 @@ tty_device_startfwd(struct tty_device *__restrict self)
 PUBLIC NOBLOCK bool
 NOTHROW(KCALL tty_device_stopfwd)(struct tty_device *__restrict self) {
 	REF struct tty_device_forward *fwd;
-	fwd = FORWARD(self).exchange(NULL);
+	fwd = TTY_DEVICE_FORWARD(self).exchange(NULL);
 	if (!fwd)
 		return false;
 	fwd->tf_device.clear();

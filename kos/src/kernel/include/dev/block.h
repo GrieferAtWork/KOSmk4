@@ -208,6 +208,7 @@ struct block_device
 	u8                                   bd_pad[sizeof(void *)-1]; /* ... */
 };
 
+
 /* Acquire / release a read/write lock to part-list of a given block-device. */
 FUNDEF NONNULL((1)) void KCALL block_device_acquire_partlock_read(struct block_device *__restrict self) THROWS(E_WOULDBLOCK);
 FUNDEF NONNULL((1)) void KCALL block_device_acquire_partlock_write(struct block_device *__restrict self) THROWS(E_WOULDBLOCK);
@@ -253,6 +254,8 @@ FUNDEF NONNULL((1)) syscall_slong_t KCALL block_device_partition_ioctl(struct bl
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL block_device_destroy)(struct basic_block_device *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct basic_block_device, bd_refcnt, block_device_destroy)
+DEFINE_REFCOUNT_TYPE_SUBCLASS(block_device, basic_block_device)
+DEFINE_REFCOUNT_TYPE_SUBCLASS(block_device_partition, basic_block_device)
 
 /* Allocate and initialize a new block device.
  * The caller must still initialize:

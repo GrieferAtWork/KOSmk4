@@ -1449,7 +1449,7 @@ NOTHROW(KCALL mallnode_verify_padding)(struct mallnode *__restrict self) {
 			word = CONFIG_MALL_TAIL_PATTERN;
 			base += i;
 			while (*(u8 *)base == ((u8 *)&word)[(uintptr_t)base & 3])
-				++*(uintptr_t *)&base;
+				base = (u32 *)((byte_t *)base + 1);
 			printk(KERN_CRIT
 			       "\n\nCorrupted MALL tail in at %p (offset %Id from %p...%p; offset %Iu from end of usable memory)\n",
 			       base, (uintptr_t)base - (self->m_tree.a_vmin + (CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_PREFIX_SIZE)),

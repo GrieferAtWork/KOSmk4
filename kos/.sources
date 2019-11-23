@@ -140,7 +140,6 @@ CC_FLAGS({
 	"-Wno-nonnull-compare",
 	"-Wno-unused-parameter",
 	"-Wno-comment",
-	"-Wno-strict-aliasing",
 	"-Wno-missing-field-initializers",
 	"-Wno-type-limits",
 

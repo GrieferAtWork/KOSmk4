@@ -49,9 +49,10 @@ union mouse_buffer_state {
 		uintptr_half_t s_used;  /* Number of used packets. */
 	} bs_state;
 };
+
 struct mouse_buffer {
 	union mouse_buffer_state mb_bufstate; /* Buffer state */
-	WEAK struct mouse_packet mb_buffer[CONFIG_MOUSE_BUFFER_SIZE]; /* Buffer of unread mouse inputs. */
+	WEAK mouse_packet_t      mb_buffer[CONFIG_MOUSE_BUFFER_SIZE]; /* Buffer of unread mouse inputs. */
 	struct sig               mb_avail;    /* Signal broadcast when the buffer becomes non-empty. */
 };
 
@@ -109,8 +110,8 @@ FUNDEF NONNULL((1)) void KCALL mouse_device_stat(struct character_device *__rest
 FUNDEF NONNULL((1)) poll_mode_t KCALL mouse_device_poll(struct character_device *__restrict self, poll_mode_t what);
 
 /* Read packets from a given mouse device buffer. */
-FUNDEF NOBLOCK struct mouse_packet NOTHROW(KCALL mouse_buffer_trygetpacket)(struct mouse_buffer *__restrict self);
-FUNDEF struct mouse_packet KCALL mouse_buffer_getpacket(struct mouse_buffer *__restrict self) THROWS(E_WOULDBLOCK);
+FUNDEF NOBLOCK mouse_packet_t NOTHROW(KCALL mouse_buffer_trygetpacket)(struct mouse_buffer *__restrict self);
+FUNDEF mouse_packet_t KCALL mouse_buffer_getpacket(struct mouse_buffer *__restrict self) THROWS(E_WOULDBLOCK);
 
 /* Generate mouse input packets
  * Note that when generating event packets, the motion

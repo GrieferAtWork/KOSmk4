@@ -195,10 +195,12 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 					}
 #endif /* !CONFIG_NO_SMP */
 				}
-				*(uintptr_t *)&entry += 20;
+				entry = (MpConfigurationEntry *)((byte_t *)entry + 20);
 				break;
 
-			default: *(uintptr_t *)&entry += 8; break;
+			default:
+				entry = (MpConfigurationEntry *)((byte_t *)entry + 8);
+				break;
 			}
 		}
 	}

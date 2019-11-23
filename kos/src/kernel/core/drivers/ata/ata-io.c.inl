@@ -149,17 +149,15 @@ FUNC2(
 #endif
 	for (;;) {
 		union ata_bus_state_and_flags state, newstate;
-		COMPILER_READ_BARRIER();
 		/* Try to switch from READ --> INDMA to immediately start a DMA I/O operation. */
-		state = *ATA_BUSATA_BUS_STATE_AND_FLAGS(bus);
-		COMPILER_READ_BARRIER();
+		state.b_word = ATOMIC_READ(ATA_BUSATA_BUS_STATE_AND_FLAGS_WORD(bus));
 		if (state.b_state != ATA_BUS_STATE_READY)
 			break; /* The bus isn't ready to start DMAing immediately. */
 		if (state.b_flags & ATA_BUS_FSUSPEND)
 			break; /* The bus has been suspended */
 		newstate.b_state = ATA_BUS_STATE_INDMA_SWITCH;
 		newstate.b_flags = state.b_flags;
-		if (!ATOMIC_CMPXCH_WEAK(*(uintptr_t *)ATA_BUSATA_BUS_STATE_AND_FLAGS(bus),
+		if (!ATOMIC_CMPXCH_WEAK(ATA_BUSATA_BUS_STATE_AND_FLAGS_WORD(bus),
 		                        state.b_word, newstate.b_word))
 			continue;
 		/* Don't kfree() `hd_prd_vector' */
@@ -308,16 +306,14 @@ again_init_prdv:
 			union ata_bus_state_and_flags state;
 			union ata_bus_state_and_flags newstate;
 			for (;;) {
-				COMPILER_READ_BARRIER();
-				state = *ATA_BUSATA_BUS_STATE_AND_FLAGS(bus);
-				COMPILER_READ_BARRIER();
+				state.b_word = ATOMIC_READ(ATA_BUSATA_BUS_STATE_AND_FLAGS_WORD(bus));
 				if (state.b_state != ATA_BUS_STATE_READY)
 					break; /* The bus isn't ready */
 				if (state.b_flags & ATA_BUS_FSUSPEND)
 					break; /* There are pending suspension requests (don't start DMAing now) */
 				newstate.b_state = ATA_BUS_STATE_INDMA_SWITCH;
 				newstate.b_flags = state.b_flags;
-				if (!ATOMIC_CMPXCH_WEAK(*(uintptr_t *)ATA_BUSATA_BUS_STATE_AND_FLAGS(bus),
+				if (!ATOMIC_CMPXCH_WEAK(ATA_BUSATA_BUS_STATE_AND_FLAGS_WORD(bus),
 				                        state.b_word, newstate.b_word))
 					continue;
 				/* Start DMAing now. */

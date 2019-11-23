@@ -20,8 +20,11 @@
 #define GUARD_LIBC_USER_SYS_STATVFS_C 1
 
 #include "../api.h"
-#include "sys.statvfs.h"
+/**/
+
 #include <sys/statfs.h>
+
+#include "sys.statvfs.h"
 
 DECL_BEGIN
 
@@ -37,7 +40,14 @@ statfs_to_statvfs(struct statvfs *__restrict dst,
 	dst->f_files   = src->f_files;
 	dst->f_ffree   = src->f_ffree;
 	dst->f_favail  = src->f_ffree; /* ??? */
-	dst->f_fsid    = *(__ULONGPTR_TYPE__ *)&src->f_fsid;
+	{
+		union {
+			ulongptr_t ptr;
+			__fsid_t   fsid;
+		} temp;
+		temp.fsid   = src->f_fsid;
+		dst->f_fsid = temp.ptr;
+	}
 	dst->f_flag    = src->f_flags;
 	dst->f_namemax = src->f_namelen;
 }
@@ -53,7 +63,14 @@ statfs64_to_statvfs64(struct statvfs64 *__restrict dst,
 	dst->f_files   = src->f_files;
 	dst->f_ffree   = src->f_ffree;
 	dst->f_favail  = src->f_ffree; /* ??? */
-	dst->f_fsid    = *(__ULONGPTR_TYPE__ *)&src->f_fsid;
+	{
+		union {
+			ulongptr_t ptr;
+			__fsid_t   fsid;
+		} temp;
+		temp.fsid   = src->f_fsid;
+		dst->f_fsid = temp.ptr;
+	}
 	dst->f_flag    = src->f_flags;
 	dst->f_namemax = src->f_namelen;
 }

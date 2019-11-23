@@ -37,6 +37,10 @@
 
 #include <stdalign.h>
 
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 DECL_BEGIN
 
 union uhci_iobase {
@@ -214,12 +218,15 @@ struct uhci_controller: usb_controller {
 	                                               * interrupt where ISO interrupts where checked for completion. */
 	u8                         uc_portnum;        /* [const] # of available ports. */
 };
+DEFINE_REFCOUNT_TYPE_SUBCLASS(uhci_controller, usb_controller)
 
 struct uhci_powerctl {
 	WEAK refcnt_t                                    up_refcnt; /* Reference counter. */
 	XATOMIC_WEAKLYREF_STRUCT(struct uhci_controller) up_ctrl;   /* Weak reference to the controller (cleared when the controller dies) */
 };
 DEFINE_REFCOUNT_FUNCTIONS(struct uhci_powerctl, up_refcnt, kfree)
+#define UHCI_POWERCTL_CTRL(x) \
+	((XATOMIC_WEAKLYREF(struct uhci_controller) &)(x)->up_ctrl)
 
 
 

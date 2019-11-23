@@ -696,14 +696,14 @@ NOTHROW(KCALL minfo_relocate_appropriate)(void) {
 	            kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start,
 	            PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 	/* Now apply relocations. */
-#define REL(x) (*(uintptr_t *)&(x) += relocation_offset)
+#define REL(x) ((x) = (__typeof__(x))((byte_t *)(x) + relocation_offset))
 	REL(minfo.mb_banks);
 	REL(mzones.pm_last);
 	REL(mzones.pm_zones);
 	{
 		size_t i;
 		for (i = 0; i < mzones.pm_zonec; ++i) {
-			REL(mzones.pm_zones[i]);
+			REL(*(struct pmemzone **)&mzones.pm_zones[i]);
 			REL(mzones.pm_zones[i]->mz_prev);
 			REL(mzones.pm_zones[i]->mz_next);
 		}

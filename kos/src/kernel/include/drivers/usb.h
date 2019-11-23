@@ -36,6 +36,10 @@
 
 /* To use this header, you must add `LIB(":usb")' to your driver's linker group. */
 
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 DECL_BEGIN
 
 struct usb_device;
@@ -205,11 +209,14 @@ struct usb_interrupt {
 	REF struct usb_endpoint *ui_endp;    /* [const][1..1] The endpoint that is being polled. */
 	PUSB_INTERRUPT_HANDLER   ui_handler; /* [const][1..1] Interrupt handler callback. */
 	union {
-		XATOMIC_WEAKLYREF_STRUCT(struct character_device) ui_chr; /* [0..1] The pointed-to device. */
-		XATOMIC_WEAKLYREF_STRUCT(struct block_device)     ui_blk; /* [0..1] The pointed-to device. */
+		XATOMIC_WEAKLYREF_STRUCT(struct character_device)   ui_chr; /* [0..1] The pointed-to device. */
+		XATOMIC_WEAKLYREF_STRUCT(struct basic_block_device) ui_blk; /* [0..1] The pointed-to device. */
 	}                        ui_bind;   /* The bound interrupt handler callback. */
 	/* Controller-specific data goes here. */
 };
+#define USB_INTERRUPT_BINDCHR(self) ((XATOMIC_WEAKLYREF(struct character_device) &)(self)->ui_bind.ui_chr)
+#define USB_INTERRUPT_BINDBLK(self) ((XATOMIC_WEAKLYREF(struct basic_block_device) &)(self)->ui_bind.ui_blk)
+
 
 /* Destroy the given USB interrupt descriptor. */
 FUNDEF NOBLOCK void NOTHROW(KCALL usb_interrupt_destroy)(struct usb_interrupt *__restrict self);
@@ -309,6 +316,7 @@ struct usb_controller
 	                      PUSB_INTERRUPT_HANDLER handler, void *__restrict character_or_block_device,
 	                      size_t buflen, uintptr_t flags, unsigned int poll_interval_in_milliseconds);
 };
+DEFINE_REFCOUNT_TYPE_SUBCLASS(usb_controller, character_device)
 
 #define usb_controller_cinit(self)                  \
 	(atomic_rwlock_cinit(&(self)->uc_devslock),     \

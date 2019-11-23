@@ -47,56 +47,115 @@ __DECL_BEGIN
                                 * Calculated as: X = 6 FOR X in 12*X >= 64 && 6*X >= 32 */
 
 #ifdef __CC__
-struct __ATTR_ALIGNED(2) __ATTR_PACKED mouse_packet {
-	/* Mouse packet. - This is the structure that is returned when `read(2)'-ing from a mouse device.
-	 * Prior to being usable, this structure should be processed using `mouse_packet_sequence()', in
-	 * order to safely handle packet sequences. */
-	unsigned int mp_type   : 4; /* Mouse packet type. */
-	unsigned int mp_seqnum : 4; /* Packet sequence number.
-	                             * 0: The last packet of a sequence
-	                             * N: This packet is followed by N-1 more packets
-	                             * NOTE: The current implementation never produces more than `MOUSE_PACKET_SEQMAX'
-	                             *       packets within the same sequence, however KOS reserves the right to later
-	                             *       define additional meaning for sequence numbers that are greater.
-	                             * Example: { 3, 2, 1, 0 } (4-packet sequence) */
-	union __ATTR_PACKED {
-		/* NOTE: Sign-extension is done based on the most significant bit
-		 *       of the sequence packet with the greatest sequence number. */
-		struct __ATTR_PACKED {
-			/* PACKET: RELX |= mm_relx << (mp_seqnum * 12);
-			 *         RELY |= mm_rely << (mp_seqnum * 12); */
-			signed int mm_relx : 12; /* Relative mouse movement in X (negative: left; positive: right) */
-			signed int mm_rely : 12; /* Relative mouse movement in Y (negative: down; positive: up) */
-		} md_motion; /* MOUSE_PACKET_TYPE_MOTION */
-		struct __ATTR_PACKED {
-			/* PACKET: PRESSED |= mb_pressed << (mp_seqnum * 12);
-			 *         CHANGED |= mb_changed << (mp_seqnum * 12); */
-			signed int mb_pressed : 12; /* Set of `MOUSE_BUTTON_*', describing which buttons are currently being held down */
-			signed int mb_changed : 12; /* Set of `MOUSE_BUTTON_*', describing which buttons have changed state. */
-		} md_button; /* MOUSE_PACKET_TYPE_BUTTON */
-		struct __ATTR_PACKED {
-			/* PACKET: LINES |= ms_lines << (mp_seqnum * 12); */
-			signed int ms_pad   : 12; /* ... */
-			signed int ms_lines : 12; /* Number of lines scrolled (negative: scroll-up/left, positive: scroll-down/right) */
-		} md_scroll; /* MOUSE_PACKET_TYPE_(V|H)SCROLL */
-		struct __ATTR_PACKED {
-			/* PACKET: POSX |= mm_posx << (mp_seqnum * 6);
-			 *         POSY |= mm_posy << (mp_seqnum * 6);
-			 *         RELX |= mm_relx << (mp_seqnum * 6);
-			 *         RELY |= mm_rely << (mp_seqnum * 6); */
-			signed int mm_posx : 6; /* Absolute mouse position in X (0: left screen border; N-1: right screen border) */
-			signed int mm_posy : 6; /* Absolute mouse position in Y (0: lower screen border; N-1: upper screen border) */
-			signed int mm_relx : 6; /* Relative mouse movement in X (negative: left; positive: right) */
-			signed int mm_rely : 6; /* Relative mouse movement in Y (negative: down; positive: up) */
-		} md_moved; /* MOUSE_PACKET_TYPE_MOVED */
-	} mp_data;
-};
-union mouse_packet_sequence_data {
-	__int64_t psd_data64[2]; /* MOUSE_PACKET_TYPE_MOTION, MOUSE_PACKET_TYPE_BUTTON,
-	                          * MOUSE_PACKET_TYPE_VSCROLL, MOUSE_PACKET_TYPE_HSCROLL */
-	__int32_t psd_data32[4]; /* MOUSE_PACKET_TYPE_MOVED { posx, posy, relx, rely } */
-	__intptr_t _psd_ptr[16/__SIZEOF_POINTER__];
-};
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("mp_word")
+#pragma push_macro("mp_type")
+#pragma push_macro("mp_seqnum")
+#pragma push_macro("mm_relx")
+#pragma push_macro("mm_rely")
+#pragma push_macro("md_motion")
+#pragma push_macro("mb_pressed")
+#pragma push_macro("mb_changed")
+#pragma push_macro("md_button")
+#pragma push_macro("ms_pad")
+#pragma push_macro("ms_lines")
+#pragma push_macro("md_scroll")
+#pragma push_macro("mm_posx")
+#pragma push_macro("mm_posy")
+#pragma push_macro("md_moved")
+#pragma push_macro("mp_data")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef mp_word
+#undef mp_type
+#undef mp_seqnum
+#undef mm_relx
+#undef mm_rely
+#undef md_motion
+#undef mb_pressed
+#undef mb_changed
+#undef md_button
+#undef ms_pad
+#undef ms_lines
+#undef md_scroll
+#undef mm_posx
+#undef mm_posy
+#undef md_moved
+#undef mp_data
+
+typedef union __ATTR_ALIGNED(2) __ATTR_PACKED {
+	__uint32_t mp_word; /* Packet control word */
+	struct __ATTR_PACKED {
+		/* Mouse packet. - This is the structure that is returned when `read(2)'-ing from a mouse device.
+		 * Prior to being usable, this structure should be processed using `mouse_packet_sequence()', in
+		 * order to safely handle packet sequences. */
+		unsigned int mp_type   : 4; /* Mouse packet type. */
+		unsigned int mp_seqnum : 4; /* Packet sequence number.
+		                             * 0: The last packet of a sequence
+		                             * N: This packet is followed by N-1 more packets
+		                             * NOTE: The current implementation never produces more than `MOUSE_PACKET_SEQMAX'
+		                             *       packets within the same sequence, however KOS reserves the right to later
+		                             *       define additional meaning for sequence numbers that are greater.
+		                             * Example: { 3, 2, 1, 0 } (4-packet sequence) */
+		union __ATTR_PACKED {
+
+			/* NOTE: Sign-extension is done based on the most significant bit
+			 *       of the sequence packet with the greatest sequence number. */
+			struct __ATTR_PACKED {
+				/* PACKET: RELX |= mm_relx << (mp_seqnum * 12);
+				 *         RELY |= mm_rely << (mp_seqnum * 12); */
+				signed int mm_relx : 12; /* Relative mouse movement in X (negative: left; positive: right) */
+				signed int mm_rely : 12; /* Relative mouse movement in Y (negative: down; positive: up) */
+			} md_motion; /* MOUSE_PACKET_TYPE_MOTION */
+
+			struct __ATTR_PACKED {
+				/* PACKET: PRESSED |= mb_pressed << (mp_seqnum * 12);
+				 *         CHANGED |= mb_changed << (mp_seqnum * 12); */
+				signed int mb_pressed : 12; /* Set of `MOUSE_BUTTON_*', describing which buttons are currently being held down */
+				signed int mb_changed : 12; /* Set of `MOUSE_BUTTON_*', describing which buttons have changed state. */
+			} md_button; /* MOUSE_PACKET_TYPE_BUTTON */
+
+			struct __ATTR_PACKED {
+				/* PACKET: LINES |= ms_lines << (mp_seqnum * 12); */
+				signed int ms_pad   : 12; /* ... */
+				signed int ms_lines : 12; /* Number of lines scrolled (negative: scroll-up/left, positive: scroll-down/right) */
+			} md_scroll; /* MOUSE_PACKET_TYPE_(V|H)SCROLL */
+
+			struct __ATTR_PACKED {
+				/* PACKET: POSX |= mm_posx << (mp_seqnum * 6);
+				 *         POSY |= mm_posy << (mp_seqnum * 6);
+				 *         RELX |= mm_relx << (mp_seqnum * 6);
+				 *         RELY |= mm_rely << (mp_seqnum * 6); */
+				signed int mm_posx : 6; /* Absolute mouse position in X (0: left screen border; N-1: right screen border) */
+				signed int mm_posy : 6; /* Absolute mouse position in Y (0: lower screen border; N-1: upper screen border) */
+				signed int mm_relx : 6; /* Relative mouse movement in X (negative: left; positive: right) */
+				signed int mm_rely : 6; /* Relative mouse movement in Y (negative: down; positive: up) */
+			} md_moved; /* MOUSE_PACKET_TYPE_MOVED */
+
+		} mp_data;
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("mp_data")
+#pragma pop_macro("mp_seqnum")
+#pragma pop_macro("mp_type")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+	}
+#ifndef __COMPILER_HAVE_TRANSPARENT_STRUCT
+	__mp_fields
+#undef mp_data
+#undef mp_seqnum
+#undef mp_type
+#define mp_type   __mp_fields.mp_type
+#define mp_seqnum __mp_fields.mp_seqnum
+#define mp_data   __mp_fields.mp_data
+#endif /* !__COMPILER_HAVE_TRANSPARENT_STRUCT */
+	;
+} mouse_packet_t;
+
+typedef union {
+	__int64_t   psd_data64[2]; /* MOUSE_PACKET_TYPE_MOTION, MOUSE_PACKET_TYPE_BUTTON,
+	                            * MOUSE_PACKET_TYPE_VSCROLL, MOUSE_PACKET_TYPE_HSCROLL */
+	__int32_t   psd_data32[4]; /* MOUSE_PACKET_TYPE_MOVED { posx, posy, relx, rely } */
+	__intptr_t _psd_ptr[16 / __SIZEOF_POINTER__];
+} mouse_packet_sequence_data_t;
 
 /* Add a given `packet' to a mouse packet sequence
  * @param: data:         Combined sequence data.
@@ -104,8 +163,8 @@ union mouse_packet_sequence_data {
  * @return: true:        Sequence is complete
  * @return: false:       Sequence is incomplete */
 __LOCAL __BOOL
-mouse_packet_sequence(union mouse_packet_sequence_data *__restrict data,
-                      struct mouse_packet const *__restrict packet,
+mouse_packet_sequence(mouse_packet_sequence_data_t *__restrict data,
+                      mouse_packet_t const *__restrict packet,
                       __BOOL first_packet) {
 	unsigned int seqnum = packet->mp_seqnum;
 	if (MOUSE_PACKET_TYPE_IS4FIELD(packet->mp_type)) {
@@ -166,6 +225,22 @@ struct mouse_fake_button {
 	__uint32_t mfb_old_buttons;
 	__uint32_t mfb_new_buttons;
 };
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("md_moved")
+#pragma pop_macro("mm_posy")
+#pragma pop_macro("mm_posx")
+#pragma pop_macro("md_scroll")
+#pragma pop_macro("ms_lines")
+#pragma pop_macro("ms_pad")
+#pragma pop_macro("md_button")
+#pragma pop_macro("mb_changed")
+#pragma pop_macro("mb_pressed")
+#pragma pop_macro("md_motion")
+#pragma pop_macro("mm_rely")
+#pragma pop_macro("mm_relx")
+#pragma pop_macro("mp_seqnum")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* __CC__ */
 
 /* Mouse device I/O functions. */

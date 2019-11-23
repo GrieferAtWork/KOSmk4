@@ -874,14 +874,14 @@ do_stop:
 		result = USB_INTERRUPT_HANDLER_RETURN_STOP;
 	} else if (intflags & USB_INTERRUPT_FLAG_ISABLK) {
 		REF struct basic_block_device *dev;
-		dev = ((XATOMIC_WEAKLYREF(struct basic_block_device) *)&ui->ui_bind.ui_blk)->get();
+		dev = USB_INTERRUPT_BINDBLK(ui).get();
 		if unlikely(!dev)
 			goto do_stop;
 		result = (*ui->ui_handler)(dev, status, data, datalen);
 		decref_unlikely(dev);
 	} else {
 		REF struct character_device *dev;
-		dev = ((XATOMIC_WEAKLYREF(struct character_device) *)&ui->ui_bind.ui_chr)->get();
+		dev = USB_INTERRUPT_BINDCHR(ui).get();
 		if unlikely(!dev)
 			goto do_stop;
 		result = (*ui->ui_handler)(dev, status, data, datalen);
@@ -2759,7 +2759,7 @@ uhci_powerctl_main(REF struct uhci_powerctl *__restrict ctl) {
 		uintptr_t flags;
 		REF struct uhci_controller *uc;
 		bool egsm_ok;
-#define READ_CTRL() ((REF struct uhci_controller *)((XATOMIC_WEAKLYREF(struct character_device) *)&ctl->up_ctrl)->get())
+#define READ_CTRL() UHCI_POWERCTL_CTRL(ctl).get()
 		uc = READ_CTRL();
 		if unlikely(!uc)
 			break;

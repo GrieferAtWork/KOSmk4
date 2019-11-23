@@ -270,7 +270,7 @@ again:
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_pipe_skipdata), struct_size);
 		COMPILER_BARRIER();
 		result = ringbuffer_skipread(&self->p_buffer,
-		                             ATOMIC_READ(*(size_t *)&data->psd_num_bytes),
+		                             ATOMIC_READ(data->psd_num_bytes),
 		                             &new_rdpos);
 		ATOMIC_WRITE(data->psd_rdpos, new_rdpos);
 		ATOMIC_WRITE(data->psd_skipped, result);
@@ -289,7 +289,7 @@ again:
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_pipe_unread), struct_size);
 		COMPILER_BARRIER();
 		result = ringbuffer_unread(&self->p_buffer,
-		                           ATOMIC_READ(*(size_t *)&data->pur_num_bytes),
+		                           ATOMIC_READ(data->pur_num_bytes),
 		                           &new_rdpos);
 		ATOMIC_WRITE(data->pur_rdpos, new_rdpos);
 		ATOMIC_WRITE(data->pur_unread, result);
@@ -308,7 +308,7 @@ again:
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_pipe_unwrite), struct_size);
 		COMPILER_BARRIER();
 		result = ringbuffer_unread(&self->p_buffer,
-		                           ATOMIC_READ(*(size_t *)&data->puw_num_bytes),
+		                           ATOMIC_READ(data->puw_num_bytes),
 		                           &new_wrpos);
 		ATOMIC_WRITE(data->puw_wrpos, new_wrpos);
 		ATOMIC_WRITE(data->puw_unwritten, result);

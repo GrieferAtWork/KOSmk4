@@ -44,21 +44,13 @@
 
 DECL_BEGIN
 
-typedef u32 mouse_packet_word_t;
-STATIC_ASSERT(sizeof(struct mouse_packet) == sizeof(mouse_packet_word_t));
-
 
 PUBLIC NOBLOCK bool
 NOTHROW(KCALL mouse_buffer_putpacket_nopr)(struct mouse_buffer *__restrict self,
-                                           struct mouse_packet packet) {
+                                           mouse_packet_t packet) {
 	union mouse_buffer_state oldstate, newstate;
-	union {
-		struct mouse_packet packet;
-		mouse_packet_word_t word;
-	} packet_data;
-	packet_data.packet = packet;
 	assert(!PREEMPTION_ENABLED());
-	assert(packet_data.packet.mp_type != MOUSE_PACKET_TYPE_NONE);
+	assert(packet.mp_type != MOUSE_PACKET_TYPE_NONE);
 	for (;;) {
 		size_t index;
 		oldstate.bs_word = ATOMIC_READ(self->mb_bufstate.bs_word);
@@ -67,7 +59,7 @@ NOTHROW(KCALL mouse_buffer_putpacket_nopr)(struct mouse_buffer *__restrict self,
 		index = (oldstate.bs_state.s_start +
 		         oldstate.bs_state.s_used) %
 		        CONFIG_MOUSE_BUFFER_SIZE;
-		if (!ATOMIC_CMPXCH(*(mouse_packet_word_t *)&self->mb_buffer[index], 0, packet_data.word))
+		if (!ATOMIC_CMPXCH_WEAK(self->mb_buffer[index].mp_word, 0, packet.mp_word))
 			continue;
 		newstate = oldstate;
 		++newstate.bs_state.s_used;
@@ -76,12 +68,12 @@ NOTHROW(KCALL mouse_buffer_putpacket_nopr)(struct mouse_buffer *__restrict self,
 		                       newstate.bs_word))
 			break;
 #ifdef NDEBUG
-		ATOMIC_WRITE(self->mb_buffer[index], 0);
+		ATOMIC_WRITE(self->mb_buffer[index].mp_word, 0);
 #else /* NDEBUG */
 		{
-			mouse_packet_word_t oldword;
-			oldword = ATOMIC_XCH(*(mouse_packet_word_t *)&self->mb_buffer[index], 0);
-			assert(oldword == packet_data.word);
+			mouse_packet_t oldpacket;
+			oldpacket.mp_word = ATOMIC_XCH(self->mb_buffer[index].mp_word, 0);
+			assert(oldpacket.mp_word == packet.mp_word);
 		}
 #endif /* !NDEBUG */
 	}
@@ -92,7 +84,7 @@ NOTHROW(KCALL mouse_buffer_putpacket_nopr)(struct mouse_buffer *__restrict self,
 
 PUBLIC NOBLOCK bool
 NOTHROW(KCALL mouse_buffer_putpackets_nopr)(struct mouse_buffer *__restrict self,
-                                            struct mouse_packet *__restrict packetv,
+                                            mouse_packet_t *__restrict packetv,
                                             uintptr_half_t packetc) {
 	union mouse_buffer_state oldstate, newstate;
 	assert(packetc != 0);
@@ -106,17 +98,16 @@ NOTHROW(KCALL mouse_buffer_putpackets_nopr)(struct mouse_buffer *__restrict self
 			return false;
 		for (i = 0; i < packetc; ++i) {
 			index = (oldstate.bs_state.s_start + oldstate.bs_state.s_used + i) % CONFIG_MOUSE_BUFFER_SIZE;
-			if (!ATOMIC_CMPXCH(*(mouse_packet_word_t *)&self->mb_buffer[index], 0,
-			                   *(mouse_packet_word_t *)&packetv[i])) {
+			if (!ATOMIC_CMPXCH(self->mb_buffer[index].mp_word, 0, packetv[i].mp_word)) {
 				while (i--) {
 					index = (oldstate.bs_state.s_start + oldstate.bs_state.s_used + i) % CONFIG_MOUSE_BUFFER_SIZE;
 #ifdef NDEBUG
-					ATOMIC_WRITE(self->mb_buffer[index], 0);
+					ATOMIC_WRITE(self->mb_buffer[index].mp_word, 0);
 #else /* NDEBUG */
 					{
-						mouse_packet_word_t oldword;
-						oldword = ATOMIC_XCH(*(mouse_packet_word_t *)&self->mb_buffer[index], 0);
-						assert(oldword == *(mouse_packet_word_t *)&packetv[i]);
+						mouse_packet_t oldpacket;
+						oldpacket.mp_word = ATOMIC_XCH(self->mb_buffer[index].mp_word, 0);
+						assert(oldpacket.mp_word == packetv[i].mp_word);
 					}
 #endif /* !NDEBUG */
 				}
@@ -131,14 +122,15 @@ NOTHROW(KCALL mouse_buffer_putpackets_nopr)(struct mouse_buffer *__restrict self
 			break;
 		i = packetc;
 		while (i--) {
+			index = (oldstate.bs_state.s_start + oldstate.bs_state.s_used + i) % CONFIG_MOUSE_BUFFER_SIZE;
 #ifdef NDEBUG
-			index = (oldstate.bs_state.s_start + oldstate.bs_state.s_used + i) % CONFIG_MOUSE_BUFFER_SIZE;
-			ATOMIC_WRITE(self->mb_buffer[index], 0);
+			ATOMIC_WRITE(self->mb_buffer[index].mp_word, 0);
 #else /* NDEBUG */
-			mouse_packet_word_t oldword;
-			index = (oldstate.bs_state.s_start + oldstate.bs_state.s_used + i) % CONFIG_MOUSE_BUFFER_SIZE;
-			oldword = ATOMIC_XCH(*(mouse_packet_word_t *)&self->mb_buffer[index], 0);
-			assert(oldword == *(mouse_packet_word_t *)&packetv[i]);
+			{
+				mouse_packet_t oldpacket;
+				oldpacket.mp_word = ATOMIC_XCH(self->mb_buffer[index].mp_word, 0);
+				assert(oldpacket.mp_word == packetv[i].mp_word);
+			}
 #endif /* !NDEBUG */
 		}
 	}
@@ -176,7 +168,7 @@ NOTHROW(KCALL mouse_device_do_post_s32s32s32s32)(struct mouse_device *__restrict
 	    (data2 >= INT6_MIN && data2 <= INT6_MAX) &&
 	    (data3 >= INT6_MIN && data3 <= INT6_MAX) &&
 	    (data4 >= INT6_MIN && data4 <= INT6_MAX)) {
-		struct mouse_packet packet;
+		mouse_packet_t packet;
 		/* Single packet. */
 		packet.mp_type                  = type;
 		packet.mp_seqnum                = 0;
@@ -190,7 +182,7 @@ NOTHROW(KCALL mouse_device_do_post_s32s32s32s32)(struct mouse_device *__restrict
 	    (data2 >= INT12_MIN && data2 <= INT12_MAX) &&
 	    (data3 >= INT12_MIN && data3 <= INT12_MAX) &&
 	    (data4 >= INT12_MIN && data4 <= INT12_MAX)) {
-		struct mouse_packet packet[2];
+		mouse_packet_t packet[2];
 		/* 2 packets. */
 		packet[0].mp_type                   = type;
 		packet[0].mp_seqnum                 = 1;
@@ -210,7 +202,7 @@ NOTHROW(KCALL mouse_device_do_post_s32s32s32s32)(struct mouse_device *__restrict
 	    (data2 >= INT18_MIN && data2 <= INT18_MAX) &&
 	    (data3 >= INT18_MIN && data3 <= INT18_MAX) &&
 	    (data4 >= INT18_MIN && data4 <= INT18_MAX)) {
-		struct mouse_packet packet[3];
+		mouse_packet_t packet[3];
 		/* 3 packets. */
 		packet[0].mp_type                   = type;
 		packet[0].mp_seqnum                 = 2;
@@ -236,7 +228,7 @@ NOTHROW(KCALL mouse_device_do_post_s32s32s32s32)(struct mouse_device *__restrict
 	    (data2 >= INT24_MIN && data2 <= INT24_MAX) &&
 	    (data3 >= INT24_MIN && data3 <= INT24_MAX) &&
 	    (data4 >= INT24_MIN && data4 <= INT24_MAX)) {
-		struct mouse_packet packet[4];
+		mouse_packet_t packet[4];
 		/* 4 packets. */
 		packet[0].mp_type                   = type;
 		packet[0].mp_seqnum                 = 3;
@@ -268,7 +260,7 @@ NOTHROW(KCALL mouse_device_do_post_s32s32s32s32)(struct mouse_device *__restrict
 	    (data2 >= INT30_MIN && data2 <= INT30_MAX) &&
 	    (data3 >= INT30_MIN && data3 <= INT30_MAX) &&
 	    (data4 >= INT30_MIN && data4 <= INT30_MAX)) {
-		struct mouse_packet packet[5];
+		mouse_packet_t packet[5];
 		/* 5 packets. */
 		packet[0].mp_type                   = type;
 		packet[0].mp_seqnum                 = 4;
@@ -303,7 +295,7 @@ NOTHROW(KCALL mouse_device_do_post_s32s32s32s32)(struct mouse_device *__restrict
 		return mouse_buffer_putpackets_nopr(&self->md_buf, packet, 5);
 	}
 	{
-		struct mouse_packet packet[6];
+		mouse_packet_t packet[6];
 		/* 6 packets. */
 		packet[0].mp_type                   = type;
 		packet[0].mp_seqnum                 = 5;
@@ -351,7 +343,7 @@ NOTHROW(KCALL mouse_device_do_post_s32s32)(struct mouse_device *__restrict self,
 	assert(!MOUSE_PACKET_TYPE_IS4FIELD(type));
 	if ((data1 >= INT12_MIN && data1 <= INT12_MAX) &&
 	    (data2 >= INT12_MIN && data2 <= INT12_MAX)) {
-		struct mouse_packet packet;
+		mouse_packet_t packet;
 		/* Single packet. */
 		packet.mp_type                   = type;
 		packet.mp_seqnum                 = 0;
@@ -361,7 +353,7 @@ NOTHROW(KCALL mouse_device_do_post_s32s32)(struct mouse_device *__restrict self,
 	}
 	if ((data1 >= INT24_MIN && data1 <= INT24_MAX) &&
 	    (data2 >= INT24_MIN && data2 <= INT24_MAX)) {
-		struct mouse_packet packet[2];
+		mouse_packet_t packet[2];
 		/* 2 packets. */
 		packet[0].mp_type                   = type;
 		packet[0].mp_seqnum                 = 1;
@@ -374,7 +366,7 @@ NOTHROW(KCALL mouse_device_do_post_s32s32)(struct mouse_device *__restrict self,
 		return mouse_buffer_putpackets_nopr(&self->md_buf, packet, 2);
 	}
 	{
-		struct mouse_packet packet[3];
+		mouse_packet_t packet[3];
 		/* 3 packets. */
 		packet[0].mp_type                   = type;
 		packet[0].mp_seqnum                 = 2;
@@ -455,17 +447,14 @@ NOTHROW(KCALL mouse_device_do_moveto_nopr_locked)(struct mouse_device *__restric
 
 
 /* Read packets from a given mouse device buffer. */
-PUBLIC NOBLOCK struct mouse_packet
+PUBLIC NOBLOCK mouse_packet_t
 NOTHROW(KCALL mouse_buffer_trygetpacket)(struct mouse_buffer *__restrict self) {
-	union {
-		struct mouse_packet packet;
-		mouse_packet_word_t word;
-	} result;
+	mouse_packet_t result;
 	for (;;) {
 		union mouse_buffer_state oldstate, newstate;
 		oldstate.bs_word = ATOMIC_READ(self->mb_bufstate.bs_word);
 		if (oldstate.bs_state.s_used == 0) {
-			result.word = 0;
+			result.mp_word = 0;
 			break;
 		}
 		assert(oldstate.bs_state.s_start < CONFIG_MOUSE_BUFFER_SIZE);
@@ -482,18 +471,18 @@ NOTHROW(KCALL mouse_buffer_trygetpacket)(struct mouse_buffer *__restrict self) {
 		                        oldstate.bs_word,
 		                        newstate.bs_word))
 			continue;
-		result.word = ATOMIC_XCH(*(mouse_packet_word_t *)&self->mb_buffer[oldstate.bs_state.s_start], 0);
-		if likely(result.word != 0) {
-			assert(result.packet.mp_type != MOUSE_PACKET_TYPE_NONE);
+		result.mp_word = ATOMIC_XCH(self->mb_buffer[oldstate.bs_state.s_start].mp_word, 0);
+		if likely(result.mp_word != 0) {
+			assert(result.mp_type != MOUSE_PACKET_TYPE_NONE);
 			break;
 		}
 	}
-	return result.packet;
+	return result;
 }
 
-PUBLIC struct mouse_packet KCALL
+PUBLIC mouse_packet_t KCALL
 mouse_buffer_getpacket(struct mouse_buffer *__restrict self) THROWS(E_WOULDBLOCK) {
-	struct mouse_packet result;
+	mouse_packet_t result;
 	assert(!task_isconnected());
 	for (;;) {
 		result = mouse_buffer_trygetpacket(self);
@@ -767,10 +756,10 @@ mouse_device_read(struct character_device *__restrict self,
                   iomode_t mode) THROWS(...) {
 	size_t result;
 	struct mouse_device *me;
-	struct mouse_packet packet;
-	if unlikely(num_bytes < sizeof(struct mouse_packet)) {
+	mouse_packet_t packet;
+	if unlikely(num_bytes < sizeof(mouse_packet_t)) {
 		if (num_bytes != 0)
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct mouse_packet), num_bytes);
+			THROW(E_BUFFER_TOO_SMALL, sizeof(mouse_packet_t), num_bytes);
 		goto empty;
 	}
 	me = (struct mouse_device *)self;
@@ -782,18 +771,18 @@ mouse_device_read(struct character_device *__restrict self,
 		packet = mouse_buffer_getpacket(&me->md_buf);
 		assert(packet.mp_type != MOUSE_PACKET_TYPE_NONE);
 	}
-	memcpy(dst, &packet, sizeof(struct mouse_packet));
-	result = sizeof(struct mouse_packet);
-	while (num_bytes >= 2 * sizeof(struct mouse_packet)) {
-		dst = (byte_t *)dst + sizeof(struct mouse_packet);
-		num_bytes -= sizeof(struct mouse_packet);
+	memcpy(dst, &packet, sizeof(mouse_packet_t));
+	result = sizeof(mouse_packet_t);
+	while (num_bytes >= 2 * sizeof(mouse_packet_t)) {
+		dst = (byte_t *)dst + sizeof(mouse_packet_t);
+		num_bytes -= sizeof(mouse_packet_t);
 		packet = mouse_buffer_trygetpacket(&me->md_buf);
 		if (packet.mp_type == MOUSE_PACKET_TYPE_NONE)
 			break;
 		COMPILER_WRITE_BARRIER();
-		memcpy(dst, &packet, sizeof(struct mouse_packet));
+		memcpy(dst, &packet, sizeof(mouse_packet_t));
 		COMPILER_WRITE_BARRIER();
-		result += sizeof(struct mouse_packet);
+		result += sizeof(mouse_packet_t);
 	}
 empty:
 	return 0;
@@ -804,9 +793,9 @@ mouse_device_stat(struct character_device *__restrict self,
                   USER CHECKED struct stat *result) THROWS(...) {
 	struct mouse_device *me;
 	me = (struct mouse_device *)self;
-	result->st_blksize = sizeof(struct mouse_packet);
+	result->st_blksize = sizeof(mouse_packet_t);
 	result->st_size = (ATOMIC_READ(me->md_buf.mb_bufstate.bs_state.s_used) *
-	                   sizeof(struct mouse_packet));
+	                   sizeof(mouse_packet_t));
 }
 
 LOCAL bool KCALL
@@ -1009,7 +998,7 @@ mouse_device_ioctl(struct character_device *__restrict self,
 	}	break;
 
 	case MOUSEIO_FLUSHPENDING: {
-		struct mouse_packet packet;
+		mouse_packet_t packet;
 		for (;;) {
 			packet = mouse_buffer_trygetpacket(&me->md_buf);
 			if (packet.mp_type == MOUSE_PACKET_TYPE_NONE)

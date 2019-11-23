@@ -28,6 +28,10 @@
 #include <dev/ttybase.h>
 #endif /* !GUARD_KERNEL_INCLUDE_DEV_TTYBASE_H */
 
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
 DECL_BEGIN
 
 #ifdef __CC__
@@ -44,7 +48,8 @@ FORCELOCAL WUNUSED REF struct ttybase_device *NOTHROW(KCALL task_getctty_of_nx)(
  * to the TTY character device addressable through `task_getctty()' */
 DATDEF struct character_device dev_tty;
 
-#define __TASK_CTTY_FIELD(thread) ((XATOMIC_REF(struct ttybase_device) &)FORTASK(thread, this_taskgroup).tg_ctty)
+#define __TASK_CTTY_FIELD(thread) \
+	((XATOMIC_WEAKLYREF(struct ttybase_device) &)FORTASK(thread, this_taskgroup).tg_ctty)
 
 #ifndef __INTELLISENSE__
 

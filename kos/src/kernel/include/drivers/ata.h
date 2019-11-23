@@ -318,7 +318,8 @@ union ATTR_PACKED ata_bus_state_and_flags {
 	};
 };
 
-#define ATA_BUSATA_BUS_STATE_AND_FLAGS(bus) ((union ata_bus_state_and_flags *)&(bus)->b_state)
+#define ATA_BUSATA_BUS_STATE_AND_FLAGS(bus)      ((union ata_bus_state_and_flags *)&(bus)->b_state)
+#define ATA_BUSATA_BUS_STATE_AND_FLAGS_WORD(bus) (ATA_BUSATA_BUS_STATE_AND_FLAGS(bus)->b_word)
 struct ata_bus {
 	struct ata_bus     *b_nextbus;   /* [0..1][const] Another bus that is bound to the same interrupt as this one. */
 	WEAK uintptr_half_t b_state;     /* The current bus state (One of `ATA_BUS_STATE_*') */

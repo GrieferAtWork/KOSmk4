@@ -291,23 +291,25 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	initialize_predefined_vm_trampoline(&_boottask, boot_trampoline_pages + 0);
 	initialize_predefined_vm_trampoline(&_bootidle, boot_trampoline_pages + 1);
 
-	*(uintptr_t *)&FORTASK(&_boottask, _this_kernel_stacknode).vn_part += (uintptr_t)&_boottask;
-	*(uintptr_t *)&FORTASK(&_boottask, _this_kernel_stacknode).vn_link.ln_pself += (uintptr_t)&_boottask;
-	*(uintptr_t *)&FORTASK(&_boottask, _this_kernel_stacknode).vn_node.a_vmin = (uintptr_t)__kernel_boottask_stack_page;
-	*(uintptr_t *)&FORTASK(&_boottask, _this_kernel_stacknode).vn_node.a_vmax = (uintptr_t)__kernel_boottask_stack_page + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1;
-	*(uintptr_t *)&FORTASK(&_boottask, _this_kernel_stackpart).dp_srefs += (uintptr_t)&_boottask;
-	*(uintptr_t *)&FORTASK(&_boottask, _this_kernel_stackpart).dp_ramdata.rd_blockv += (uintptr_t)&_boottask;
-	*(uintptr_t *)&FORTASK(&_boottask, _this_kernel_stackpart).dp_ramdata.rd_block0.rb_start = VM_ADDR2PAGE((uintptr_t)__kernel_boottask_stack_page - KERNEL_BASE);
+#define REL(x, offset) ((x) = (__typeof__(x))(uintptr_t)((byte_t *)(x) + (uintptr_t)(offset)))
+	REL(FORTASK(&_boottask, _this_kernel_stacknode).vn_part, &_boottask);
+	REL(FORTASK(&_boottask, _this_kernel_stacknode).vn_link.ln_pself, &_boottask);
+	REL(FORTASK(&_boottask, _this_kernel_stackpart).dp_srefs, &_boottask);
+	REL(FORTASK(&_boottask, _this_kernel_stackpart).dp_ramdata.rd_blockv, &_boottask);
+	FORTASK(&_boottask, _this_kernel_stacknode).vn_node.a_vmin = (vm_vpage_t)((uintptr_t)__kernel_boottask_stack_page);
+	FORTASK(&_boottask, _this_kernel_stacknode).vn_node.a_vmax = (vm_vpage_t)((uintptr_t)__kernel_boottask_stack_page + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1);
+	FORTASK(&_boottask, _this_kernel_stackpart).dp_ramdata.rd_block0.rb_start = (vm_ppage_t)VM_ADDR2PAGE((uintptr_t)__kernel_boottask_stack_page - KERNEL_BASE);
 
-	*(uintptr_t *)&FORTASK(&_bootidle, _this_kernel_stacknode).vn_part += (uintptr_t)&_bootidle;
-	*(uintptr_t *)&FORTASK(&_bootidle, _this_kernel_stacknode).vn_link.ln_pself += (uintptr_t)&_bootidle;
-	*(uintptr_t *)&FORTASK(&_bootidle, _this_kernel_stackpart).dp_srefs += (uintptr_t)&_bootidle;
-	*(uintptr_t *)&FORTASK(&_bootidle, _this_kernel_stacknode).vn_node.a_vmin = (uintptr_t)__kernel_bootidle_stack_page;
-	*(uintptr_t *)&FORTASK(&_bootidle, _this_kernel_stacknode).vn_node.a_vmax = (uintptr_t)__kernel_bootidle_stack_page + CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1;
-	*(uintptr_t *)&FORTASK(&_bootidle, _this_kernel_stackpart).dp_ramdata.rd_blockv += (uintptr_t)&_bootidle;
-	*(uintptr_t *)&FORTASK(&_bootidle, _this_kernel_stackpart).dp_ramdata.rd_block0.rb_start = VM_ADDR2PAGE((uintptr_t)__kernel_bootidle_stack_page - KERNEL_BASE);
-	*(uintptr_t *)&FORTASK(&_bootidle, _this_kernel_stackpart).dp_tree.a_vmax                = CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1;
-	*(uintptr_t *)&FORTASK(&_bootidle, _this_kernel_stackpart).dp_ramdata.rd_block0.rb_size  = CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE);
+	REL(FORTASK(&_bootidle, _this_kernel_stacknode).vn_part, &_bootidle);
+	REL(FORTASK(&_bootidle, _this_kernel_stacknode).vn_link.ln_pself, &_bootidle);
+	REL(FORTASK(&_bootidle, _this_kernel_stackpart).dp_srefs, &_bootidle);
+	REL(FORTASK(&_bootidle, _this_kernel_stackpart).dp_ramdata.rd_blockv, &_bootidle);
+	FORTASK(&_bootidle, _this_kernel_stacknode).vn_node.a_vmin = (vm_vpage_t)((uintptr_t)__kernel_bootidle_stack_page);
+	FORTASK(&_bootidle, _this_kernel_stacknode).vn_node.a_vmax = (vm_vpage_t)((uintptr_t)__kernel_bootidle_stack_page + CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1);
+	FORTASK(&_bootidle, _this_kernel_stackpart).dp_ramdata.rd_block0.rb_start = (vm_ppage_t)VM_ADDR2PAGE((uintptr_t)__kernel_bootidle_stack_page - KERNEL_BASE);
+	FORTASK(&_bootidle, _this_kernel_stackpart).dp_tree.a_vmax                = CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1;
+	FORTASK(&_bootidle, _this_kernel_stackpart).dp_ramdata.rd_block0.rb_size  = CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE);
+#undef REL
 
 	FORTASK(&_boottask, this_fs)             = &fs_kernel;
 	FORTASK(&_bootidle, this_fs)             = &fs_kernel;
@@ -484,9 +486,11 @@ PUBLIC WUNUSED ATTR_MALLOC ATTR_RETNONNULL REF struct task *
 	result->t_self   = result;
 	incref(&vm_datablock_anonymous); /* FORTASK(result,_this_kernel_stacknode).vn_block */
 	incref(&vm_datablock_anonymous); /* FORTASK(result,_this_kernel_stackpart).dp_block */
-	*(uintptr_t *)&FORTASK(result, _this_kernel_stacknode).vn_part += (uintptr_t)result;
-	*(uintptr_t *)&FORTASK(result, _this_kernel_stacknode).vn_link.ln_pself += (uintptr_t)result;
-	*(uintptr_t *)&FORTASK(result, _this_kernel_stackpart).dp_srefs += (uintptr_t)result;
+#define REL(x) ((x) = (__typeof__(x))(uintptr_t)((byte_t *)(x) + (uintptr_t)(result)))
+	REL(FORTASK(result, _this_kernel_stacknode).vn_part);
+	REL(FORTASK(result, _this_kernel_stacknode).vn_link.ln_pself);
+	REL(FORTASK(result, _this_kernel_stackpart).dp_srefs);
+#undef REL
 	TRY {
 		vm_datapart_do_allocram(&FORTASK(result, _this_kernel_stackpart));
 		TRY {

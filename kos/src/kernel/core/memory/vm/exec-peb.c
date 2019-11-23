@@ -128,6 +128,7 @@ again:
 		byte_t *writer;
 		USER uintptr_t *peb_argv;
 		USER uintptr_t *peb_envp;
+		USER struct process_peb *peb;
 		size_t strings_total_copied;
 
 		/* Initialize the PEB. */
@@ -136,10 +137,11 @@ again:
 		writer += (argc_inject + argc_user + 1) * sizeof(USER char *);
 		peb_envp = (USER uintptr_t *)writer;
 		writer += (envc_user + 1) * sizeof(USER char *);
-		((struct process_peb *)peb_temp_base)->pp_argc                = argc_inject + argc_user;
-		*(uintptr_t *)&((struct process_peb *)peb_temp_base)->pp_argv = (uintptr_t)peb_argv - (uintptr_t)peb_temp_base;
-		((struct process_peb *)peb_temp_base)->pp_envc                = envc_user;
-		*(uintptr_t *)&((struct process_peb *)peb_temp_base)->pp_envp = (uintptr_t)peb_envp - (uintptr_t)peb_temp_base;
+		peb = (USER struct process_peb *)peb_temp_base;
+		peb->pp_argc = argc_inject + argc_user;
+		peb->pp_argv = (char **)((byte_t *)peb_argv - (uintptr_t)peb_temp_base);
+		peb->pp_envc = envc_user;
+		peb->pp_envp = (char **)((byte_t *)peb_envp - (uintptr_t)peb_temp_base);
 
 		/* Copy strings. */
 		strings_total_copied = 0;
@@ -197,8 +199,8 @@ string_size_changed:
 			uintptr_t relbase;
 			relbase = (uintptr_t)VM_PAGE2ADDR(result);
 			/* Relocate pointers within the PEB to make them absolute */
-			*(uintptr_t *)&((struct process_peb *)peb_temp_base)->pp_argv += relbase;
-			*(uintptr_t *)&((struct process_peb *)peb_temp_base)->pp_envp += relbase;
+			peb->pp_argv = (char **)((byte_t *)peb->pp_argv + relbase);
+			peb->pp_envp = (char **)((byte_t *)peb->pp_envp + relbase);
 			for (i = 0; i < argc_inject + argc_user; ++i)
 				peb_argv[i] += relbase;
 			for (i = 0; i < envc_user; ++i)
