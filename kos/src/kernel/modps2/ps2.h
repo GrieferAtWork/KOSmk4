@@ -59,7 +59,8 @@ LOCAL bool NOTHROW(KCALL ps2_waitfor_infull0_nx)(void) {
 }
 
 /* Wait until `PS2_STATUS_OUTFULL' is set */
-LOCAL bool NOTHROW(KCALL ps2_waitfor_outfull1_nx)(void) {
+LOCAL WUNUSED bool
+NOTHROW(KCALL ps2_waitfor_outfull1_nx)(void) {
 	jtime_t jtm_end = jiffies + ps2_outfull_timeout;
 	while (!(inb_p(PS2_STATUS) & PS2_STATUS_OUTFULL)) {
 		if unlikely(jiffies > jtm_end)
@@ -69,25 +70,32 @@ LOCAL bool NOTHROW(KCALL ps2_waitfor_outfull1_nx)(void) {
 	return true;
 }
 
-LOCAL bool NOTHROW(KCALL ps2_write_cmd_nx)(u8 cmd) {
+LOCAL WUNUSED bool
+NOTHROW(KCALL ps2_write_cmd_nx)(u8 cmd) {
 	if unlikely(!ps2_waitfor_infull0_nx())
 		return false;
 	outb_p(PS2_CMD, cmd);
 	return true;
 }
-LOCAL bool NOTHROW(KCALL ps2_read_cmddata_nx)(u8 *__restrict presult) {
+
+LOCAL WUNUSED NONNULL((1)) bool
+NOTHROW(KCALL ps2_read_cmddata_nx)(u8 *__restrict presult) {
 	if unlikely(!ps2_waitfor_outfull1_nx())
 		return false;
 	*presult = inb_p(PS2_DATA);
 	return true;
 }
-LOCAL bool NOTHROW(KCALL ps2_write_cmddata_nx)(u8 data) {
+
+LOCAL WUNUSED bool
+NOTHROW(KCALL ps2_write_cmddata_nx)(u8 data) {
 	if unlikely(!ps2_waitfor_infull0_nx())
 		return false;
 	outb_p(PS2_DATA, data);
 	return true;
 }
-LOCAL bool NOTHROW(KCALL ps2_write_data_nx)(ps2_portid_t portno, u8 data) {
+
+LOCAL WUNUSED bool
+NOTHROW(KCALL ps2_write_data_nx)(ps2_portid_t portno, u8 data) {
 	if (portno == PS2_PORT2) {
 		if unlikely(!ps2_waitfor_infull0_nx())
 			return false;
@@ -105,16 +113,19 @@ LOCAL void KCALL ps2_write_cmd(u8 cmd) THROWS(E_IOERROR) {
 	if unlikely(!ps2_write_cmd_nx(cmd))
 		THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HID);
 }
-LOCAL u8 KCALL ps2_read_cmddata(void) THROWS(E_IOERROR) {
+
+LOCAL WUNUSED u8 KCALL ps2_read_cmddata(void) THROWS(E_IOERROR) {
 	u8 result;
 	if unlikely(!ps2_read_cmddata_nx(&result))
 		THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HID);
 	return result;
 }
+
 LOCAL void KCALL ps2_write_cmddata(u8 data) THROWS(E_IOERROR) {
 	if unlikely(!ps2_write_cmddata_nx(data))
 		THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HID);
 }
+
 LOCAL void KCALL ps2_write_data(ps2_portid_t portno, u8 data) THROWS(E_IOERROR) {
 	if unlikely(!ps2_write_data_nx(portno, data))
 		THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HID);

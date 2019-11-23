@@ -1177,7 +1177,7 @@ read_opcode:
 			 * 0F 8E cw     JLE rel16    D     N.S.    Valid     Jump near if less or equal (ZF=1 or SF≠ OF). Not supported in 64-bit mode.
 			 * 0F 8F cd     JG rel32     D     Valid   Valid     Jump near if greater (ZF=0 and SF=OF).
 			 * 0F 8F cw     JG rel16     D     N.S.    Valid     Jump near if greater (ZF=0 and SF=OF). Not supported in 64-bit mode. */
-#define DEFINE_Jcc(opc, cond) \
+#define DEFINE_Jcc(opc, cond)                                                       \
 			case opc & 0xff:                                                        \
 				if (cond) {                                                         \
 					if (op_flags & F_OP32) {                                        \
