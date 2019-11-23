@@ -57,7 +57,7 @@
 #define NO_MALLINFO 0
 #define MALLINFO_FIELD_TYPE size_t
 #define NO_MALLOC_STATS 1 /* Disable to prevent relocation against `stderr' */
-#define ABORT  assert(0)
+#define ABORT __assertion_failed("abort()")
 #undef REALLOC_ZERO_BYTES_FREES
 #undef DEFAULT_GRANULARITY
 #undef DEFAULT_TRIM_THRESHOLD

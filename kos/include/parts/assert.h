@@ -16,100 +16,151 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __assertion_failed
-#include "../__stdinc.h"
-#ifndef __CC__
-#define __assertion_failed(expr_str)                            /* nothing */
-#define __assertion_failedf(expr_str, ...)                      /* nothing */
-#define __assertion_failed_at(expr_str, file, line, func)       /* nothing */
-#define __assertion_failedf_at(expr_str, file, line, func, ...) /* nothing */
-#else /* !__CC__ */
+#ifndef __do_assert
+#include "assert-failed.h"
+
+#ifndef NDEBUG
 #include "../features.h"
-#include "../__crt.h"
-__SYSDECL_BEGIN
-__NAMESPACE_INT_BEGIN
-#ifdef __INTELLISENSE__
-extern void (__check_assertion)(__BOOL __expr);
-extern void (__check_assertionf)(__BOOL __expr, char const *__restrict __format, ...);
-#endif /* __INTELLISENSE__ */
-#if defined(__CRT_HAVE___afail) && !defined(__NO_FUNCTION__)
-__CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__afail,(char const *__expr, char const *__file, unsigned int __line, char const *__func),(__expr,__file,__line,__func))
-#define __assertion_failed(expr_str) (__NAMESPACE_INT_SYM __afail)(expr_str, __FILE__, __LINE__, __FUNCTION__)
-#define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __afail)(expr_str, file, line, func)
-#elif defined(__CRT_HAVE___assert_fail) && !defined(__NO_FUNCTION__)
-__CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__assert_fail,(char const *__restrict __expr, char const *__restrict __file, unsigned int __line, char const *__func),(__expr,__file,__line,__func))
-#define __assertion_failed(expr_str) (__NAMESPACE_INT_SYM __assert_fail)(expr_str, __FILE__, __LINE__, __FUNCTION__)
-#define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __assert_fail)(expr_str, file, line, func)
-#elif defined(__CRT_HAVE___assert_func) && !defined(__NO_FUNCTION__)
-__CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__assert_func,(char const *__file, unsigned int __line, char const *__func, char const *__expr),(__file,__line,__func,__expr))
-#define __assertion_failed(expr_str) (__NAMESPACE_INT_SYM __assert_func)(__FILE__, __LINE__, __FUNCTION__, expr_str)
-#define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __assert_func)(file, line, func, expr_str)
-#elif defined(__CRT_HAVE___assertfail) && !defined(__NO_FUNCTION__)
-#include <hybrid/typecore.h>
-__CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__assertfail,(char const *__expr, char const *__file, unsigned int __line, char const *__func, __SIZE_TYPE__ __charsize),(__expr,__file,__line,__func,__charsize))
-#define __assertion_failed(expr_str) (__NAMESPACE_INT_SYM __assertfail)(expr_str, __FILE__, __LINE__, __FUNCTION__, sizeof(char))
-#define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __assertfail)(expr_str, file, line, func, sizeof(char))
-#elif defined(__CRT_HAVE__assert)
-__CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,_assert,(char const *__restrict __expr, char const *__restrict __file, unsigned int __line),(__expr,__file,__line))
-#define __assertion_failed(expr_str) (__NAMESPACE_INT_SYM _assert)(expr_str, __FILE__, __LINE__)
-#define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM _assert)(expr_str, file, line)
-#elif defined(__CRT_HAVE___assert)
-__CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__assert,(char const *__restrict __file, unsigned int __line, char const *__restrict __expr),(__file,__line,__expr))
-#define __assertion_failed(expr_str) (__NAMESPACE_INT_SYM __assert)(__FILE__, __LINE__, expr_str)
-#define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __assert)(file, line, expr_str)
-#elif defined(__CRT_HAVE___afail)
-__CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__afail,(char const *__expr, char const *__file, unsigned int __line, char const *__func),(__expr,__file,__line,__func))
-#define __assertion_failed(expr_str) (__NAMESPACE_INT_SYM __afail)(expr_str, __FILE__, __LINE__, __NULLPTR)
-#define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __afail)(expr_str, file, line, func)
-#elif defined(__CRT_HAVE___assert_fail)
-__CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__assert_fail,(char const *__restrict __expr, char const *__restrict __file, unsigned int __line, char const *__func),(__expr,__file,__line,__func))
-#define __assertion_failed(expr_str) (__NAMESPACE_INT_SYM __assert_fail)(expr_str, __FILE__, __LINE__, __NULLPTR)
-#define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __assert_fail)(expr_str, file, line, func)
-#elif defined(__CRT_HAVE___assert_func)
-__CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__assert_func,(char const *__file, unsigned int __line, char const *__func, char const *__expr),(__file,__line,__func,__expr))
-#define __assertion_failed(expr_str) (__NAMESPACE_INT_SYM __assert_func)(__FILE__, __LINE__, __NULLPTR, expr_str)
-#define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __assert_func)(file, line, func, func, expr_str)
-#elif defined(__CRT_HAVE___assertfail)
-#include <hybrid/typecore.h>
-__CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__assertfail,(char const *__expr, char const *__file, unsigned int __line, char const *__func, __SIZE_TYPE__ __charsize),(__expr,__file,__line,__func,__charsize))
-#define __assertion_failed(expr_str) (__NAMESPACE_INT_SYM __assertfail)(expr_str, __FILE__, __LINE__, __NULLPTR, sizeof(char))
-#define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __assertfail)(expr_str, file, line, func, sizeof(char))
-#else /* ... */
-#define __assertion_failed(expr_str) (__NAMESPACE_INT_SYM __fallback_assert_fail)()
-#define __assertion_failed_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __fallback_assert_fail)()
-__LOCAL_LIBC(__fallback_assert_fail) __ATTR_COLD __ATTR_NORETURN
-void (__LIBCCALL __fallback_assert_fail)(void) {
-	/* This is the best we can do here... */
-	for (;;) {
-	}
-}
-#endif /* !... */
 
-#ifdef __CRT_HAVE___acheck
-__CDECLARE(__ATTR_COLD,__BOOL,,__acheck,(char const *__expr, char const *__file, unsigned int __line, char const *__func),(__expr,__file,__line,__func))
-#define __assertion_check(expr_str) (__NAMESPACE_INT_SYM __acheck)(expr_str, __FILE__, __LINE__, __FUNCTION__)
-#define __assertion_check_at(expr_str, file, line, func) (__NAMESPACE_INT_SYM __acheck)(expr_str, file, line, func)
-#endif /* __CRT_HAVE___acheck */
+/* Need KOS extensions for compile-time `assert()' support.
+ * STDC-compliant code is allowed to use `assert(0)' as an alias for `abort()',
+ * however with this compile-time assert extension, such code can no longer
+ * be compiled (which is intentional, and the whole purpose of this extension),
+ * meaning that this behavior has to be opt-in, which it is by use of _KOS_SOURCE
+ * or _KOS_KERNEL_SOURCE, or simply being apart of the kernel core, or a driver
+ * module to-be loaded into the KOS kernel. */
+#undef __do_cassert_wrapper
+#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+#if !defined(__NO_builtin_choose_expr) && \
+    !defined(__NO_builtin_constant_p) && 0 /* This one doesn't seem to work... */
+/************************************************************************
+ * Compile-time assert support:                                         *
+ * __builtin_choose_expr(__builtin_constant_p(...),                     *
+ *                       ({ static_assert(...) }),                      *
+ *                       runtime_assert(...))                           *
+ ************************************************************************/
+#ifndef __NO_XBLOCK
+#define __do_cassert_wrapper(expr, expr_str, rassert) \
+	__builtin_choose_expr(__builtin_constant_p(!!(expr)), __XBLOCK({ __STATIC_ASSERT_MSG(expr, expr_str); (void)0; }), rassert)
+#else /* __NO_XBLOCK */
+#define __do_cassert_wrapper(expr, expr_str, rassert) \
+	__builtin_choose_expr(__builtin_constant_p(!!(expr)), (void)sizeof(int[(expr) ? 1 : -1]), rassert)
+#endif /* !__NO_XBLOCK */
+#elif defined(__COMPILER_HAVE_VARIABLE_LENGTH_ARRAYS) && !defined(__NO_XBLOCK)
+/************************************************************************
+ * Compile-time assert support:                                         *
+ * (0 ? (int(*)[(...) ? 1 : -1])0 : runtime_assert(...))                *
+ ************************************************************************/
+/* NOTE: The VLA assertion must be wrapped in an expression-block.
+ *       Otherwise, the vla-array-size-expression will be assembled, despite
+ *       being apart of a head branch. (s.a. the following but report which
+ *       I've submitted: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92641) */
+#ifndef __NO_builtin_constant_p
+#define __do_cassert_wrapper(expr, expr_str, rassert) \
+	(__builtin_constant_p(expr) ? (0 ? __XBLOCK({ (void)(int(*)[(expr) ? 1 : -1])0; }) : (void)0) : rassert)
+#else /* !__NO_builtin_constant_p */
+#define __do_cassert_wrapper(expr, expr_str, rassert) \
+	(0 ? __XBLOCK({ (void)(int(*)[(expr) ? 1 : -1])0; }) : rassert)
+#endif /* __NO_builtin_constant_p */
+#endif /* compile-time-assert... */
+#endif /* __USE_KOS || __USE_KOS_KERNEL */
 
-#ifdef __CRT_HAVE___acheckf
-__LIBC __ATTR_COLD __BOOL (__VLIBCCALL __acheckf)(char const *__expr, char const *__file, unsigned int __line, char const *__func, char const *__format, ...) __CASMNAME_SAME("__acheckf");
-#define __assertion_checkf(expr_str, ...) (__NAMESPACE_INT_SYM __acheckf)(expr_str, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__)
-#define __assertion_checkf_at(expr_str, file, line, func, ...) (__NAMESPACE_INT_SYM __acheckf)(expr_str, file, line, func, __VA_ARGS__)
-#elif defined(__assertion_check)
-#define __assertion_checkf(expr_str, ...) __assertion_check(expr_str)
-#define __assertion_checkf_at(expr_str, file, line, func, ...) __assertion_check_at(expr_str, file, line, func)
-#endif /* __CRT_HAVE___acheckf */
+#ifdef __do_cassert_wrapper
+#if defined(__USE_KOS_KERNEL) && defined(__assertion_check) && !defined(__NO_XBLOCK)
+#ifdef __NO_builtin_expect
+#define __do_assert(expr, expr_str)        __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_check(expr_str)); (void)0; }))
+#define __do_assert0(expr, expr_str)       __do_cassert_wrapper(expr, expr_str, (void)(!!(expr) || (__assertion_failed(expr_str), 0)))
+#define __do_asserta(expr, expr_str)       __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_check(expr_str)); (void)0; }))
+#define __do_assertf(expr, expr_str, ...)  __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_checkf(expr_str, __VA_ARGS__)); (void)0; }))
+#define __do_assert0f(expr, expr_str, ...) __do_cassert_wrapper(expr, expr_str, (void)(!!(expr) || (__assertion_failedf(expr_str, __VA_ARGS__), 0)))
+#define __do_assertaf(expr, expr_str, ...) __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_checkf(expr_str, __VA_ARGS__)); (void)0; }))
+#else /* __NO_builtin_expect */
+#define __do_assert(expr, expr_str)        __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(__builtin_expect(!!(expr), 1)) break; while __untraced(__assertion_check(expr_str)); (void)0; }))
+#define __do_assert0(expr, expr_str)       __do_cassert_wrapper(expr, expr_str, (void)(__builtin_expect(!!(expr), 1) || (__assertion_failed(expr_str), 0)))
+#define __do_asserta(expr, expr_str)       __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(__builtin_expect(!!(expr), 1)) break; while __untraced(__assertion_check(expr_str)); (void)0; }))
+#define __do_assertf(expr, expr_str, ...)  __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(__builtin_expect(!!(expr), 1)) break; while __untraced(__assertion_checkf(expr_str, __VA_ARGS__)); (void)0; }))
+#define __do_assert0f(expr, expr_str, ...) __do_cassert_wrapper(expr, expr_str, (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, __VA_ARGS__), 0)))
+#define __do_assertaf(expr, expr_str, ...) __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(__builtin_expect(!!(expr), 1)) break; while __untraced(__assertion_checkf(expr_str, __VA_ARGS__)); (void)0; }))
+#endif /* !__NO_builtin_expect */
+#else /* __USE_KOS_KERNEL */
+#ifdef __NO_builtin_expect
+#define __do_assert(expr, expr_str)        __do_cassert_wrapper(expr, expr_str, (void)(!!(expr) || (__assertion_failed(expr_str), 0)))
+#define __do_assert0(expr, expr_str)       __do_cassert_wrapper(expr, expr_str, (void)(!!(expr) || (__assertion_failed(expr_str), 0)))
+#define __do_asserta(expr, expr_str)       __do_cassert_wrapper(expr, expr_str, (void)(!!(expr) || (__assertion_failed(expr_str), 0)))
+#define __do_assertf(expr, expr_str, ...)  __do_cassert_wrapper(expr, expr_str, (void)(!!(expr) || (__assertion_failedf(expr_str, __VA_ARGS__), 0)))
+#define __do_assertaf(expr, expr_str, ...) __do_cassert_wrapper(expr, expr_str, (void)(!!(expr) || (__assertion_failedf(expr_str, __VA_ARGS__), 0)))
+#else /* __NO_builtin_expect */
+#define __do_assert(expr, expr_str)        __do_cassert_wrapper(expr, expr_str, (void)(__builtin_expect(!!(expr), 1) || (__assertion_failed(expr_str), 0)))
+#define __do_assert0(expr, expr_str)       __do_cassert_wrapper(expr, expr_str, (void)(__builtin_expect(!!(expr), 1) || (__assertion_failed(expr_str), 0)))
+#define __do_asserta(expr, expr_str)       __do_cassert_wrapper(expr, expr_str, (void)(__builtin_expect(!!(expr), 1) || (__assertion_failed(expr_str), 0)))
+#define __do_assertf(expr, expr_str, ...)  __do_cassert_wrapper(expr, expr_str, (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, __VA_ARGS__), 0)))
+#define __do_assert0f(expr, expr_str, ...) __do_cassert_wrapper(expr, expr_str, (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, __VA_ARGS__), 0)))
+#define __do_assertaf(expr, expr_str, ...) __do_cassert_wrapper(expr, expr_str, (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, __VA_ARGS__), 0)))
+#endif /* !__NO_builtin_expect */
+#endif /* !__USE_KOS_KERNEL */
+#else /* __do_cassert_wrapper */
+#if defined(__USE_KOS_KERNEL) && defined(__assertion_check) && !defined(__NO_XBLOCK)
+#ifdef __NO_builtin_expect
+#define __do_assert(expr, expr_str)        __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_check(expr_str)); (void)0; })
+#define __do_assert0(expr, expr_str)       (void)(!!(expr) || (__assertion_failed(expr_str), 0))
+#define __do_asserta(expr, expr_str)       __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_check(expr_str)); (void)0; })
+#define __do_assertf(expr, expr_str, ...)  __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_checkf(expr_str, __VA_ARGS__)); (void)0; })
+#define __do_assert0f(expr, expr_str, ...) (void)(!!(expr) || (__assertion_failedf(expr_str, __VA_ARGS__), 0))
+#define __do_assertaf(expr, expr_str, ...) __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_checkf(expr_str, __VA_ARGS__)); (void)0; })
+#else /* __NO_builtin_expect */
+#define __do_assert(expr, expr_str)        __XBLOCK({ do if __untraced(__builtin_expect(!!(expr), 1)) break; while __untraced(__assertion_check(expr_str)); (void)0; })
+#define __do_assert0(expr, expr_str)       (void)(__builtin_expect(!!(expr), 1) || (__assertion_failed(expr_str), 0))
+#define __do_asserta(expr, expr_str)       __XBLOCK({ do if __untraced(__builtin_expect(!!(expr), 1)) break; while __untraced(__assertion_check(expr_str)); (void)0; })
+#define __do_assertf(expr, expr_str, ...)  __XBLOCK({ do if __untraced(__builtin_expect(!!(expr), 1)) break; while __untraced(__assertion_checkf(expr_str, __VA_ARGS__)); (void)0; })
+#define __do_assert0f(expr, expr_str, ...) (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, __VA_ARGS__), 0))
+#define __do_assertaf(expr, expr_str, ...) __XBLOCK({ do if __untraced(__builtin_expect(!!(expr), 1)) break; while __untraced(__assertion_checkf(expr_str, __VA_ARGS__)); (void)0; })
+#endif /* !__NO_builtin_expect */
+#else /* __USE_KOS_KERNEL */
+#ifdef __NO_builtin_expect
+#define __do_assert(expr, expr_str)        (void)(!!(expr) || (__assertion_failed(expr_str), 0))
+#define __do_assert0(expr, expr_str)       (void)(!!(expr) || (__assertion_failed(expr_str), 0))
+#define __do_asserta(expr, expr_str)       (void)(!!(expr) || (__assertion_failed(expr_str), 0))
+#define __do_assertf(expr, expr_str, ...)  (void)(!!(expr) || (__assertion_failedf(expr_str, __VA_ARGS__), 0))
+#define __do_assertaf(expr, expr_str, ...) (void)(!!(expr) || (__assertion_failedf(expr_str, __VA_ARGS__), 0))
+#else /* __NO_builtin_expect */
+#define __do_assert(expr, expr_str)        (void)(__builtin_expect(!!(expr), 1) || (__assertion_failed(expr_str), 0))
+#define __do_assert0(expr, expr_str)       (void)(__builtin_expect(!!(expr), 1) || (__assertion_failed(expr_str), 0))
+#define __do_asserta(expr, expr_str)       (void)(__builtin_expect(!!(expr), 1) || (__assertion_failed(expr_str), 0))
+#define __do_assertf(expr, expr_str, ...)  (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, __VA_ARGS__), 0))
+#define __do_assert0f(expr, expr_str, ...) (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, __VA_ARGS__), 0))
+#define __do_assertaf(expr, expr_str, ...) (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, __VA_ARGS__), 0))
+#endif /* !__NO_builtin_expect */
+#endif /* !__USE_KOS_KERNEL */
+#endif /* !__do_cassert_wrapper */
 
-#ifdef __CRT_HAVE___afailf
-__LIBC __ATTR_COLD __ATTR_NORETURN void (__VLIBCCALL __afailf)(char const *__expr, char const *__file, unsigned int __line, char const *__func, char const *__format, ...) __CASMNAME_SAME("__afailf");
-#define __assertion_failedf(expr_str, ...) (__NAMESPACE_INT_SYM __afailf)(expr_str, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__)
-#define __assertion_failedf_at(expr_str, file, line, func, ...) (__NAMESPACE_INT_SYM __afailf)(expr_str, file, line, func, __VA_ARGS__)
-#else /* __CRT_HAVE___afailf */
-#define __assertion_failedf(expr_str, ...) __assertion_failed(expr_str)
-#define __assertion_failedf_at(expr_str, file, line, func, ...) __assertion_failed_at(expr_str, file, line, func)
-#endif /* !__CRT_HAVE___afailf */
 
-__NAMESPACE_INT_END
-__SYSDECL_END
-#endif /* __CC__ */
-#endif /* !__assertion_failed */
+#elif !defined(__NO_builtin_assume)
+
+#if defined(CONFIG_ASSERT_ASSUME_EVERYTHING) || defined(ASSERT_ASSUME_EVERYTHING)
+#define __do_assert(expr, expr_str)        __builtin_assume(!!(expr))
+#define __do_assert0(expr, expr_str)       __builtin_assume(!!(expr))
+#define __do_asserta(expr, expr_str)       __builtin_assume(!!(expr))
+#define __do_assertf(expr, expr_str, ...)  __builtin_assume(!!(expr))
+#define __do_assert0f(expr, expr_str, ...) __builtin_assume(!!(expr))
+#define __do_assertaf(expr, expr_str, ...) __builtin_assume(!!(expr))
+#else /* CONFIG_ASSERT_ASSUME_EVERYTHING || ASSERT_ASSUME_EVERYTHING */
+#define __do_assert(expr, expr_str)        (void)0
+#define __do_assert0(expr, expr_str)       (void)0
+#define __do_asserta(expr, expr_str)       __builtin_assume(!!(expr))
+#define __do_assertf(expr, expr_str, ...)  (void)0
+#define __do_assert0f(expr, expr_str, ...) (void)0
+#define __do_assertaf(expr, expr_str, ...) __builtin_assume(!!(expr))
+#endif /* !CONFIG_ASSERT_ASSUME_EVERYTHING && !ASSERT_ASSUME_EVERYTHING */
+
+#else
+
+#define __do_assert(expr, expr_str)        (void)0
+#define __do_assert0(expr, expr_str)       (void)0
+#define __do_asserta(expr, expr_str)       (void)0
+#define __do_assertf(expr, expr_str, ...)  (void)0
+#define __do_assert0f(expr, expr_str, ...) (void)0
+#define __do_assertaf(expr, expr_str, ...) (void)0
+
+#endif /* !NDEBUG */
+
+#endif /* !__do_assert */

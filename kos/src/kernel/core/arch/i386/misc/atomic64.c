@@ -19,6 +19,7 @@
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_ATOMIC64_C
 #define GUARD_KERNEL_CORE_ARCH_I386_ATOMIC64_C 1
 #define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -95,15 +96,15 @@ NOTHROW(KCALL x86_initialize_atomic64)(void) {
 #if !defined(NDEBUG) && 1
 	{
 		struct atomic64 a = ATOMIC64_INIT(16);
-		assert(atomic64_read(&a) == 16);
+		assertf(atomic64_read(&a) == 16, "%I64u", a.a_value);
 		atomic64_write(&a, 12);
-		assert(atomic64_read(&a) == 12);
-		assert(atomic64_cmpxch_val(&a, 12, 14) == 12);
-		assert(atomic64_cmpxch_val(&a, 12, 14) == 14);
-		assert(atomic64_cmpxch(&a, 14, 13) == true);
-		assert(atomic64_cmpxch(&a, 14, 13) == false);
-		assert(atomic64_fetchadd(&a, 7) == 13);
-		assert(atomic64_read(&a) == 20);
+		assertf(atomic64_read(&a) == 12, "%I64u", a.a_value);
+		assertf(atomic64_cmpxch_val(&a, 12, 14) == 12, "%I64u", a.a_value);
+		assertf(atomic64_cmpxch_val(&a, 12, 14) == 14, "%I64u", a.a_value);
+		assertf(atomic64_cmpxch(&a, 14, 13) == true, "%I64u", a.a_value);
+		assertf(atomic64_cmpxch(&a, 14, 13) == false, "%I64u", a.a_value);
+		assertf(atomic64_fetchadd(&a, 7) == 13, "%I64u", a.a_value);
+		assertf(atomic64_read(&a) == 20, "%I64u", a.a_value);
 	}
 #endif
 }

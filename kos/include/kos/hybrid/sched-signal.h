@@ -76,13 +76,13 @@ __BOOL sched_signal_send(sched_signal_t *__self);
 #ifdef __CRT_HAVE_futexlock_wakeall
 #define sched_signal_broadcast futexlock_wakeall
 #else /* __CRT_HAVE_futexlock_wakeall */
-#define sched_signal_broadcast(self) __hybrid_assert(!"Missing CRT feature: __CRT_HAVE_futexlock_wakeall")
+#define sched_signal_broadcast(self) __hybrid_assertion_failed("Missing CRT feature: __CRT_HAVE_futexlock_wakeall")
 #endif /* !__CRT_HAVE_futexlock_wakeall */
 
 #ifdef __CRT_HAVE_futexlock_wake
 #define sched_signal_send(self) futexlock_wake(self, 1)
 #else /* __CRT_HAVE_futexlock_wake */
-#define sched_signal_send(self) __hybrid_assert(!"Missing CRT feature: __CRT_HAVE_futexlock_wake")
+#define sched_signal_send(self) __hybrid_assertion_failed("Missing CRT feature: __CRT_HAVE_futexlock_wake")
 #endif /* !__CRT_HAVE_futexlock_wake */
 
 #endif /* !__KERNEL__ */

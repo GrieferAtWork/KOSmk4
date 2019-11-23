@@ -653,6 +653,10 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #else
 #   define __restrict_arr /* Not supported.  */
 #endif
+
+#if 0 /* TODO: Depend on __STDC_VERSION__ for this! */
+#define __COMPILER_HAVE_VARIABLE_LENGTH_ARRAYS 1
+#endif
 #define __COMPILER_FLEXIBLE_ARRAY(T,x) T x[1024]
 
 #ifdef __cplusplus

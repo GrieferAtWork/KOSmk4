@@ -199,7 +199,7 @@ NOTHROW(KCALL shared_rwlock_trywrite)(struct shared_rwlock *__restrict self) {
 LOCAL void
 (KCALL shared_rwlock_read)(struct shared_rwlock *__restrict self)
 		THROWS(E_WOULDBLOCK) {
-	assert(!task_isconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!shared_rwlock_tryread(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (shared_rwlock_tryread(self))
@@ -219,7 +219,7 @@ success:
 LOCAL void
 (KCALL shared_rwlock_write)(struct shared_rwlock *__restrict self)
 		THROWS(E_WOULDBLOCK) {
-	assert(!task_isconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!shared_rwlock_trywrite(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (shared_rwlock_trywrite(self))
@@ -238,7 +238,7 @@ success:
 
 LOCAL __BOOL
 NOTHROW(KCALL shared_rwlock_read_nx)(struct shared_rwlock *__restrict self) {
-	assert(!task_isconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!shared_rwlock_tryread(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (shared_rwlock_tryread(self))
@@ -259,7 +259,7 @@ success:
 
 LOCAL __BOOL
 NOTHROW(KCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict self) {
-	assert(!task_isconnected());
+	__hybrid_assert(!task_isconnected());
 	while (!shared_rwlock_trywrite(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (shared_rwlock_trywrite(self))

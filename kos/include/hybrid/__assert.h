@@ -43,12 +43,24 @@ __NAMESPACE_INT_END
 #elif defined(assertf)
 #define __hybrid_assertf        assertf
 #endif
+#ifdef __assertion_failed
+#define __hybrid_assertion_failed __assertion_failed
+#endif /* __assertion_failed */
+#ifdef __assertion_failedf
+#define __hybrid_assertion_failedf __assertion_failedf
+#endif /* __assertion_failedf */
 #endif /* !NDEBUG */
 #ifndef __hybrid_assertf
-#define __hybrid_assertf(expr,...)  __hybrid_assert(expr)
+#define __hybrid_assertf(expr, ...) __hybrid_assert(expr)
 #endif /* !__hybrid_assertf */
 #endif /* !__hybrid_assert */
 
+#ifndef __hybrid_assertion_failed
+#define __hybrid_assertion_failed(message) __hybrid_assert(!message)
+#endif /* !__hybrid_assertion_failed */
+#ifndef __hybrid_assertion_failedf
+#define __hybrid_assertion_failedf(message, ...) __hybrid_assertf(!message, __VA_ARGS__)
+#endif /* !__hybrid_assertion_failedf */
 
 
 #endif /* !__GUARD_HYBRID___ASSERT_H */

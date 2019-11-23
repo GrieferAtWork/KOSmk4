@@ -618,6 +618,7 @@ __extension__ typedef unsigned long long __ulonglong_t;
 #else
 #   define __restrict_arr /* Nothing */
 #endif
+#define __COMPILER_HAVE_VARIABLE_LENGTH_ARRAYS 1
 #if 1
 #define __COMPILER_FLEXIBLE_ARRAY(T,x) T x[]
 #elif 1

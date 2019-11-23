@@ -233,6 +233,7 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 #define __NO_builtin_constant_p  1
 #define __builtin_constant_p(x)  (__LINE__ == -1)
 #define __restrict_arr           __restrict
+#define __COMPILER_HAVE_VARIABLE_LENGTH_ARRAYS 1
 #define __COMPILER_FLEXIBLE_ARRAY(T, x) T x[1024]
 #define __attribute__(x)         /* Nothing */
 #define __NO_COMPILER_IGNORE_UNINITIALIZED 1

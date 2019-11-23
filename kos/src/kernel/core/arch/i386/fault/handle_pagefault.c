@@ -126,7 +126,7 @@ LOCAL bool FCALL handle_iob_access(struct cpu *__restrict mycpu,
 
 #ifndef CONFIG_NO_SMP
 /* Check if the given `node' is the IOB vector of some CPU */
-LOCAL NOBLOCK WUNUSED bool
+LOCAL NOBLOCK WUNUSED ATTR_CONST bool
 NOTHROW(FCALL is_iob_node)(struct vm_node *node) {
 	cpuid_t i;
 	for (i = 0; i < cpu_count; ++i) {
@@ -236,7 +236,6 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	uintptr_t pc;
 	vm_vpage_t page;
 	struct vm *effective_vm;
-	struct vm_node *node;
 	uintptr_half_t prot;
 	vm_ppage_t ppage;
 	bool has_changed;
@@ -258,43 +257,45 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	       (unsigned int)task_getroottid_s());
 #endif
 	if ((ecode & (X86_PAGEFAULT_ECODE_PRESENT | X86_PAGEFAULT_ECODE_USERSPACE)) == 0 &&
-	    page >= (vm_vpage_t)KERNEL_BASE_PAGE &&
+	    page >= (vm_vpage_t)KERNEL_BASE_PAGE) {
 	    /* Check if a hint was defined for this page. */
-	    (node = (struct vm_node *)pagedir_gethint(page)) != NULL) {
-		/* This is a hinted node (perform assertions on all
-		 * of the requirements documented for such a node) */
-		assert(node->vn_flags & VM_NODE_FLAG_HINTED);
-		assert(node->vn_prot & VM_PROT_SHARED);
-		assert(node->vn_flags & VM_NODE_FLAG_PREPARED);
-		assert(!(node->vn_flags & VM_NODE_FLAG_PARTITIONED));
-		assert(node->vn_vm == &vm_kernel);
-		assert(node->vn_part != NULL);
-		assert(node->vn_block != NULL);
-		assert(node->vn_guard == 0);
-		assert(node->vn_part->dp_srefs == node);
-		assert(node->vn_link.ln_pself == &node->vn_part->dp_srefs);
-		assert(node->vn_link.ln_next == NULL);
-		assert(node->vn_part->dp_crefs == NULL);
-		assert(!isshared(node->vn_part));
-		assert(node->vn_part->dp_block == node->vn_block);
-		assert(node->vn_block->db_parts == VM_DATABLOCK_ANONPARTS);
-		assert(node->vn_part->dp_flags & VM_DATAPART_FLAG_LOCKED);
-		assert(node->vn_part->dp_state == VM_DATAPART_STATE_LOCKED);
-		has_changed = ecode & X86_PAGEFAULT_ECODE_WRITING;
-		/* Load the affected page into the core. */
-		ppage = vm_datapart_loadpage(node->vn_part,
-		                             (size_t)(page - VM_NODE_MIN(node)),
-		                             &has_changed);
-		/* Map the affected page, overriding the mapping hint that originally got us here. */
-		prot = node->vn_prot & (PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
-		/* Unset so we're able to track changes.
-		 * NOTE: The actual tracking of changes isn't something that can be done atomically,
-		 *       however atomic kernel pages do not impose any restrictions on use of change
-		 *       tracking. */
-		if ((node->vn_part->dp_flags & VM_DATAPART_FLAG_TRKCHNG) && !has_changed)
-			prot &= ~PAGEDIR_MAP_FWRITE;
-		pagedir_mapone(page, ppage, prot);
-		goto done;
+		struct vm_node *hinted_node;
+		if ((hinted_node = (struct vm_node *)pagedir_gethint(page)) != NULL) {
+			/* This is a hinted node (perform assertions on all
+			 * of the requirements documented for such a node) */
+			assert(hinted_node->vn_flags & VM_NODE_FLAG_HINTED);
+			assert(hinted_node->vn_prot & VM_PROT_SHARED);
+			assert(hinted_node->vn_flags & VM_NODE_FLAG_PREPARED);
+			assert(!(hinted_node->vn_flags & VM_NODE_FLAG_PARTITIONED));
+			assert(hinted_node->vn_vm == &vm_kernel);
+			assert(hinted_node->vn_part != NULL);
+			assert(hinted_node->vn_block != NULL);
+			assert(hinted_node->vn_guard == 0);
+			assert(hinted_node->vn_part->dp_srefs == hinted_node);
+			assert(hinted_node->vn_link.ln_pself == &hinted_node->vn_part->dp_srefs);
+			assert(hinted_node->vn_link.ln_next == NULL);
+			assert(hinted_node->vn_part->dp_crefs == NULL);
+			assert(!isshared(hinted_node->vn_part));
+			assert(hinted_node->vn_part->dp_block == hinted_node->vn_block);
+			assert(hinted_node->vn_block->db_parts == VM_DATABLOCK_ANONPARTS);
+			assert(hinted_node->vn_part->dp_flags & VM_DATAPART_FLAG_LOCKED);
+			assert(hinted_node->vn_part->dp_state == VM_DATAPART_STATE_LOCKED);
+			has_changed = ecode & X86_PAGEFAULT_ECODE_WRITING;
+			/* Load the affected page into the core. */
+			ppage = vm_datapart_loadpage(hinted_node->vn_part,
+			                             (size_t)(page - VM_NODE_MIN(hinted_node)),
+			                             &has_changed);
+			/* Map the affected page, overriding the mapping hint that originally got us here. */
+			prot = hinted_node->vn_prot & (PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+			/* Unset so we're able to track changes.
+			 * NOTE: The actual tracking of changes isn't something that can be done atomically,
+			 *       however atomic kernel pages do not impose any restrictions on use of change
+			 *       tracking. */
+			if ((hinted_node->vn_part->dp_flags & VM_DATAPART_FLAG_TRKCHNG) && !has_changed)
+				prot &= ~PAGEDIR_MAP_FWRITE;
+			pagedir_mapone(page, ppage, prot);
+			goto done;
+		}
 	}
 	effective_vm = &vm_kernel;
 	if (page < (vm_vpage_t)KERNEL_BASE_PAGE || isuser())
@@ -304,6 +305,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 		size_t vpage_offset; /* Offset (in vpages) of the accessed page from the start of `node' */
 		task_pushconnections(&con);
 		TRY {
+			struct vm_node *node;
 			struct vm_datapart *part;
 again_lookup_node:
 			sync_read(effective_vm);

@@ -16,9 +16,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __assertion_failed
+#ifndef __do_assert
 #include "parts/assert.h"
-#endif /* !__assertion_failed */
+#endif /* !__do_assert */
 
 /* Undef the old assert definition to allow for re-definitions! (mandated by the C standard) */
 #undef assert      /* Regular STD-C assert (with optional retry extension) */
@@ -28,14 +28,14 @@
 #undef __assertaf  /* Assert + assume + printf-like message */
 #undef __assert0f  /* Same as `__assertf', but noreturn when condition fails */
 #ifdef __USE_KOS
-#undef assert0     /* Alias for `__assert0' */
-#undef asserta     /* Alias for `__asserta' */
-#undef assertf     /* Alias for `__assertf' */
-#undef assert0f    /* Alias for `__assert0f' */
-#undef assertaf    /* Alias for `__assertaf' */
+#undef assert0  /* Alias for `__assert0' */
+#undef asserta  /* Alias for `__asserta' */
+#undef assertf  /* Alias for `__assertf' */
+#undef assert0f /* Alias for `__assert0f' */
+#undef assertaf /* Alias for `__assertaf' */
 #endif /* __USE_KOS */
 
-#ifdef __INTELLISENSE__
+#if defined(__INTELLISENSE__)
 #define assert        __NAMESPACE_INT_SYM __check_assertion
 #define __assert0     __NAMESPACE_INT_SYM __check_assertion
 #define __asserta     __NAMESPACE_INT_SYM __check_assertion
@@ -47,112 +47,19 @@
 #define assert0f      __NAMESPACE_INT_SYM __check_assertionf
 #define assertaf      __NAMESPACE_INT_SYM __check_assertionf
 #endif /* __USE_KOS */
-#elif !defined(NDEBUG)
-#if defined(__USE_KOS_KERNEL) && defined(__assertion_check) && !defined(__NO_XBLOCK)
-#ifdef __NO_builtin_expect
-#define assert(expr)         __XBLOCK({do if __untraced(expr)break;while __untraced(__assertion_check(#expr));(void)0;})
-#define __assert0(expr)      (void)(!!(expr) || (__assertion_failed(#expr),0))
-#define __asserta(expr)      __XBLOCK({do if __untraced(expr)break;while __untraced(__assertion_check(#expr));(void)0;})
-#define __assertf(expr, ...) __XBLOCK({do if __untraced(expr)break;while __untraced(__assertion_checkf(#expr,__VA_ARGS__));(void)0;})
-#define __assert0f(expr, ...)(void)(!!(expr) || (__assertion_failedf(#expr,__VA_ARGS__),0))
-#define __assertaf(expr, ...)__XBLOCK({do if __untraced(expr)break;while __untraced(__assertion_checkf(#expr,__VA_ARGS__));(void)0;})
+#else /* __INTELLISENSE__ */
+#define assert(expr)          __do_assert(expr, #expr)
+#define __assert0(expr)       __do_assert0(expr, #expr)
+#define __asserta(expr)       __do_asserta(expr, #expr)
+#define __assertf(expr, ...)  __do_assertf(expr, #expr, __VA_ARGS__)
+#define __assertaf(expr, ...) __do_assertaf(expr, #expr, __VA_ARGS__)
 #ifdef __USE_KOS
-#define assert0(expr)        (void)(!!(expr) || (__assertion_failed(#expr),0))
-#define asserta(expr)        __XBLOCK({do if __untraced(expr)break;while __untraced(__assertion_check(#expr));(void)0;})
-#define assertf(expr, ...)   __XBLOCK({do if __untraced(expr)break;while __untraced(__assertion_checkf(#expr,__VA_ARGS__));(void)0;})
-#define assert0f(expr, ...)  (void)(!!(expr) || (__assertion_failedf(#expr,__VA_ARGS__),0))
-#define assertaf(expr, ...)  __XBLOCK({do if __untraced(expr)break;while __untraced(__assertion_checkf(#expr,__VA_ARGS__));(void)0;})
+#define assert0(expr)         __do_assert0(expr, #expr)
+#define asserta(expr)         __do_asserta(expr, #expr)
+#define assertf(expr, ...)    __do_assertf(expr, #expr, __VA_ARGS__)
+#define assertaf(expr, ...)   __do_assertaf(expr, #expr, __VA_ARGS__)
 #endif /* __USE_KOS */
-#else /* __NO_builtin_expect */
-#define assert(expr)         __XBLOCK({do if __untraced(__builtin_expect(!!(expr),1))break;while __untraced(__assertion_check(#expr));(void)0;})
-#define __assert0(expr)      (void)(__builtin_expect(!!(expr),1) || (__assertion_failed(#expr),0))
-#define __asserta(expr)      __XBLOCK({do if __untraced(__builtin_expect(!!(expr),1))break;while __untraced(__assertion_check(#expr));(void)0;})
-#define __assertf(expr, ...) __XBLOCK({do if __untraced(__builtin_expect(!!(expr),1))break;while __untraced(__assertion_checkf(#expr,__VA_ARGS__));(void)0;})
-#define __assert0f(expr, ...)(void)(__builtin_expect(!!(expr),1) || (__assertion_failedf(#expr,__VA_ARGS__),0))
-#define __assertaf(expr, ...)__XBLOCK({do if __untraced(__builtin_expect(!!(expr),1))break;while __untraced(__assertion_checkf(#expr,__VA_ARGS__));(void)0;})
-#ifdef __USE_KOS
-#define assert0(expr)        (void)(__builtin_expect(!!(expr),1) || (__assertion_failed(#expr),0))
-#define asserta(expr)        __XBLOCK({do if __untraced(__builtin_expect(!!(expr),1))break;while __untraced(__assertion_check(#expr));(void)0;})
-#define assertf(expr, ...)   __XBLOCK({do if __untraced(__builtin_expect(!!(expr),1))break;while __untraced(__assertion_checkf(#expr,__VA_ARGS__));(void)0;})
-#define assert0f(expr, ...)  (void)(__builtin_expect(!!(expr),1) || (__assertion_failedf(#expr,__VA_ARGS__),0))
-#define assertaf(expr, ...)  __XBLOCK({do if __untraced(__builtin_expect(!!(expr),1))break;while __untraced(__assertion_checkf(#expr,__VA_ARGS__));(void)0;})
-#endif /* __USE_KOS */
-#endif /* !__NO_builtin_expect */
-#else /* __USE_KOS_KERNEL */
-#ifdef __NO_builtin_expect
-#define assert(expr)         (void)(!!(expr) || (__assertion_failed(#expr),0))
-#define __assert0(expr)      (void)(!!(expr) || (__assertion_failed(#expr),0))
-#define __asserta(expr)      (void)(!!(expr) || (__assertion_failed(#expr),0))
-#define __assertf(expr, ...) (void)(!!(expr) || (__assertion_failedf(#expr,__VA_ARGS__),0))
-#define __assertaf(expr, ...)(void)(!!(expr) || (__assertion_failedf(#expr,__VA_ARGS__),0))
-#ifdef __USE_KOS
-#define assert0(expr)        (void)(!!(expr) || (__assertion_failed(#expr),0))
-#define asserta(expr)        (void)(!!(expr) || (__assertion_failed(#expr),0))
-#define assertf(expr, ...)   (void)(!!(expr) || (__assertion_failedf(#expr,__VA_ARGS__),0))
-#define assert0f(expr, ...)  (void)(!!(expr) || (__assertion_failedf(#expr,__VA_ARGS__),0))
-#define assertaf(expr, ...)  (void)(!!(expr) || (__assertion_failedf(#expr,__VA_ARGS__),0))
-#endif /* __USE_KOS */
-#else /* __NO_builtin_expect */
-#define assert(expr)         (void)(__builtin_expect(!!(expr),1) || (__assertion_failed(#expr),0))
-#define __assert0(expr)      (void)(__builtin_expect(!!(expr),1) || (__assertion_failed(#expr),0))
-#define __asserta(expr)      (void)(__builtin_expect(!!(expr),1) || (__assertion_failed(#expr),0))
-#define __assertf(expr, ...) (void)(__builtin_expect(!!(expr),1) || (__assertion_failedf(#expr,__VA_ARGS__),0))
-#define __assert0f(expr, ...)(void)(__builtin_expect(!!(expr),1) || (__assertion_failedf(#expr,__VA_ARGS__),0))
-#define __assertaf(expr, ...)(void)(__builtin_expect(!!(expr),1) || (__assertion_failedf(#expr,__VA_ARGS__),0))
-#ifdef __USE_KOS
-#define assert0(expr)        (void)(__builtin_expect(!!(expr),1) || (__assertion_failed(#expr),0))
-#define asserta(expr)        (void)(__builtin_expect(!!(expr),1) || (__assertion_failed(#expr),0))
-#define assertf(expr, ...)   (void)(__builtin_expect(!!(expr),1) || (__assertion_failedf(#expr,__VA_ARGS__),0))
-#define assert0f(expr, ...)  (void)(__builtin_expect(!!(expr),1) || (__assertion_failedf(#expr,__VA_ARGS__),0))
-#define assertaf(expr, ...)  (void)(__builtin_expect(!!(expr),1) || (__assertion_failedf(#expr,__VA_ARGS__),0))
-#endif /* __USE_KOS */
-#endif /* !__NO_builtin_expect */
-#endif /* !__USE_KOS_KERNEL */
-#elif !defined(__NO_builtin_assume)
-#if defined(CONFIG_ASSERT_ASSUME_EVERYTHING) || defined(ASSERT_ASSUME_EVERYTHING)
-#define assert(expr)         __builtin_assume(!!(expr))
-#define __assert0(expr)      __builtin_assume(!!(expr))
-#define __asserta(expr)      __builtin_assume(!!(expr))
-#define __assertf(expr, ...) __builtin_assume(!!(expr))
-#define __assert0f(expr, ...)__builtin_assume(!!(expr))
-#define __assertaf(expr, ...)__builtin_assume(!!(expr))
-#ifdef __USE_KOS
-#define assert0(expr)        __builtin_assume(!!(expr))
-#define asserta(expr)        __builtin_assume(!!(expr))
-#define assertf(expr, ...)   __builtin_assume(!!(expr))
-#define assert0f(expr, ...)  __builtin_assume(!!(expr))
-#define assertaf(expr, ...)  __builtin_assume(!!(expr))
-#endif /* __USE_KOS */
-#else /* CONFIG_ASSERT_ASSUME_EVERYTHING || ASSERT_ASSUME_EVERYTHING */
-#define assert(expr)         (void)0
-#define __assert0(expr)      (void)0
-#define __asserta(expr)      __builtin_assume(!!(expr))
-#define __assertf(expr, ...) (void)0
-#define __assert0f(expr, ...)(void)0
-#define __assertaf(expr, ...)__builtin_assume(!!(expr))
-#ifdef __USE_KOS
-#define assert0(expr)        (void)0
-#define asserta(expr)        __builtin_assume(!!(expr))
-#define assertf(expr, ...)   (void)0
-#define assert0f(expr, ...)  (void)0
-#define assertaf(expr, ...)  __builtin_assume(!!(expr))
-#endif /* __USE_KOS */
-#endif /* !CONFIG_ASSERT_ASSUME_EVERYTHING && !ASSERT_ASSUME_EVERYTHING */
-#else
-#define assert(expr)         (void)0
-#define __assert0(expr)      (void)0
-#define __asserta(expr)      (void)0
-#define __assertf(expr, ...) (void)0
-#define __assert0f(expr, ...)(void)0
-#define __assertaf(expr, ...)(void)0
-#ifdef __USE_KOS
-#define assert0(expr)        (void)0
-#define asserta(expr)        (void)0
-#define assertf(expr, ...)   (void)0
-#define assert0f(expr, ...)  (void)0
-#define assertaf(expr, ...)  (void)0
-#endif /* __USE_KOS */
-#endif /* !NDEBUG */
+#endif /* !__INTELLISENSE__ */
 
 
 
