@@ -52,21 +52,23 @@
 #define __ATOMIC_SEQ_CST 5
 #endif /* !__ATOMIC_RELAXED */
 
-#ifdef _MSC_VER
-#ifdef __cplusplus
-#pragma warning(push)           /* Keep `4197' disabled in C because of its use in macros. */
-#endif /* __cplusplus */
-#pragma warning(disable : 4197) /* Casting away `volatile' */
-#pragma warning(disable : 4047) /* Differing number of dereferences. */
-
-#include "__atomic-msvc.h"
-#endif /* _MSC_VER */
-
 __SYSDECL_BEGIN
 
 #if defined(__CC__) || defined(__DEEMON__)
 
-#if __GCC_VERSION(4, 7, 0) || defined(____INTELLISENSE_STDINC_COMMON_H)
+#ifdef __HYBRID_ATOMIC_USE_LIBATOMIC
+
+/************************************************************************/
+/* libatomic:__atomic_xxx()                                             */
+/************************************************************************/
+__SYSDECL_END
+#include "__atomic-libatomic.h"
+__SYSDECL_BEGIN
+#elif __GCC_VERSION(4, 7, 0) || defined(____INTELLISENSE_STDINC_COMMON_H)
+
+/************************************************************************/
+/* __atomic_xxx()                                                       */
+/************************************************************************/
 #define __hybrid_atomic_load(x, order)                             __atomic_load_n(&(x), order)
 #define __hybrid_atomic_store(x, v, order)                         __atomic_store_n(&(x), v, order)
 #define __hybrid_atomic_xch(x, v, order)                           __atomic_exchange_n(&(x), v, order)
@@ -90,6 +92,10 @@ __SYSDECL_BEGIN
 #define __hybrid_atomic_signal_fence(order)                        __atomic_signal_fence(order)
 #define __hybrid_atomic_lockfree(x)                                __atomic_is_lock_free(sizeof(x), &(x))
 #elif __has_extension(c_atomic) || __has_extension(cxx_atomic) /* clang */
+
+/************************************************************************/
+/* __c11_atomic_xxx()                                                   */
+/************************************************************************/
 #define __hybrid_atomic_load(x, order)                             __c11_atomic_load(&(x), order)
 #define __hybrid_atomic_store(x, v, order)                         __c11_atomic_store(&(x), v, order)
 #define __hybrid_atomic_xch(x, v, order)                           __c11_atomic_exchange(&(x), v, order)
@@ -108,6 +114,10 @@ __SYSDECL_BEGIN
 #else /* Modern GCC... */
 
 #if defined(__GNUC__) || defined(__DCC_VERSION__)
+
+/************************************************************************/
+/* __sync_xxx()                                                         */
+/************************************************************************/
 #define __impl_hybrid_atomic_addfetch_seqcst(x, v)  __sync_add_and_fetch(&(x), v)
 #define __impl_hybrid_atomic_subfetch_seqcst(x, v)  __sync_sub_and_fetch(&(x), v)
 #define __impl_hybrid_atomic_orfetch_seqcst(x, v)   __sync_or_and_fetch(&(x), v)
@@ -125,9 +135,38 @@ __SYSDECL_BEGIN
 #define __impl_hybrid_atomic_cmpxch_seqcst(x, oldv, newv) __sync_bool_compare_and_swap(&(x), oldv, newv)
 #define __impl_hybrid_atomic_cmpxch_val_seqcst(x, oldv, newv) __sync_val_compare_and_swap(&(x), oldv, newv)
 #define __hybrid_atomic_thread_fence(order) ((void)(order), __sync_synchronize())
-#elif defined(__COMPILER_HAVE_GCC_ASM)
+#else
 __SYSDECL_END
+#ifdef __COMPILER_HAVE_GCC_ASM
+#include "host.h"
+#endif /* __COMPILER_HAVE_GCC_ASM */
+
+#if defined(_MSC_VER)
+
+/************************************************************************/
+/* _InterlockedXXX()                                                    */
+/************************************************************************/
+#ifdef __cplusplus
+#define __HYBRID_ATOMIC_DID_PUSH_MSVC_WARNINGS
+#pragma warning(push)           /* Keep `4197' disabled in C because of its use in macros. */
+#endif /* __cplusplus */
+#pragma warning(disable : 4197) /* Casting away `volatile' */
+#pragma warning(disable : 4047) /* Differing number of dereferences. */
+#include "__atomic-msvc.h"
+#elif defined(__COMPILER_HAVE_GCC_ASM) && (defined(__x86_64__) || defined(__i386__))
+
+/************************************************************************/
+/* __asm__("lock; cmpxchg")                                             */
+/************************************************************************/
 #include "__atomic-gasm.h"
+#else
+
+/************************************************************************/
+/* libatomic:__atomic_xxx()                                             */
+/************************************************************************/
+#include "__atomic-libatomic.h"
+#endif
+
 __SYSDECL_BEGIN
 #endif
 
@@ -178,7 +217,7 @@ __FORCELOCAL __T __NOTHROW_NCX(__hybrid_atomic_cmpxch_val)(__T &__x, __OV __oldv
 	(__hybrid_atomic_cmpxch_val(x, oldv, newv, succ, fail) == (oldv))
 #else /* __hybrid_atomic_cmpxch_val */
 /* Need at least `__hybrid_atomic_cmpxch()' or `__hybrid_atomic_cmpxch_val()' */
-#error "ERROR: Not atomic support by this compiler/on this platform."
+#error "ERROR: No atomic support with this compiler/on this platform."
 #endif /* !__hybrid_atomic_cmpxch_val */
 #endif /* !__hybrid_atomic_cmpxch */
 #endif /* !GCC... */
@@ -478,11 +517,11 @@ __FORCELOCAL void __NOTHROW_NCX(__hybrid_atomic_store)(__T &__x, __V __v, int __
 		return __res;                                                                           \
 	}
 #ifndef __cplusplus
-#define __INLINE_hybrid_atomic_fetchop_seqcst(name, opfun)  \
-	__DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, 8)  \
-	__DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, 16) \
-	__DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, 32) \
-	__DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, 64)
+#define __INLINE_hybrid_atomic_fetchop_seqcst(name, opfun)         \
+	__DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, 8, opfun)  \
+	__DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, 16, opfun) \
+	__DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, 32, opfun) \
+	__DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, 64, opfun)
 #define __CALL_hybrid_atomic_fetchop_seqcst(name, opfun, x, v) \
 	__ATOMIC_RECAST(x, sizeof(x) == 1 ? __impl_hybrid_atomic_fetch##name##8_seqcst((void *)&(x), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(v)) : sizeof(x) == 2 ? __impl_hybrid_atomic_fetch##name##16_seqcst((void *)&(x), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(v)) : sizeof(x) == 4 ? __impl_hybrid_atomic_fetch##name##32_seqcst((void *)&(x), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(v)) : __impl_hybrid_atomic_fetch##name##64_seqcst((void *)&(x), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(v)))
 #else /* !__cplusplus */
@@ -695,11 +734,11 @@ __NAMESPACE_INT_END
 
 __SYSDECL_END
 
-#ifdef _MSC_VER
-#ifdef __cplusplus
+#ifdef __HYBRID_ATOMIC_DID_PUSH_MSVC_WARNINGS
+#undef __HYBRID_ATOMIC_DID_PUSH_MSVC_WARNINGS
 #pragma warning(pop)
-#endif /* __cplusplus */
-#endif
+#endif /* __HYBRID_ATOMIC_DID_PUSH_MSVC_WARNINGS */
+
 #endif /* __CC__ */
 
 #endif /* !__GUARD_HYBRID___ATOMIC_H */

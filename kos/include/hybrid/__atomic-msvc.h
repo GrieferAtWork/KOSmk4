@@ -85,9 +85,9 @@ __T __FORCELOCAL __NOTHROW_NCX(__impl_hybrid_atomic_cmpxch_val_seqcst)(__T &__x,
 #else /* __cplusplus */
 #define __impl_hybrid_atomic_cmpxch_val_seqcst(x, oldv, newv)                                                                                                     \
 	__ATOMIC_RECAST(x, sizeof(x) == 1 ? (__UINT8_TYPE__)__NAMESPACE_INT_SYM _InterlockedCompareExchange8((char volatile *)&(x), (char)(newv), (char)(oldv)) :     \
-	                  sizeof(x) == 2 ? (__UINT16_TYPE__)__NAMESPACE_INT_SYM _InterlockedCompareExchange16((short volatile *)&(x), (short)(newv), (short)(oldv)) : \
-	                  sizeof(x) == 4 ? (__UINT32_TYPE__)__NAMESPACE_INT_SYM _InterlockedCompareExchange((long volatile *)&(x), (long)(newv), (long)(oldv)) :      \
-	                                   (__UINT64_TYPE__)__NAMESPACE_INT_SYM _InterlockedCompareExchange64((__int64 volatile *)&(x), (__int64)(newv), (__int64)(oldv)))
+	                   sizeof(x) == 2 ? (__UINT16_TYPE__)__NAMESPACE_INT_SYM _InterlockedCompareExchange16((short volatile *)&(x), (short)(newv), (short)(oldv)) : \
+	                   sizeof(x) == 4 ? (__UINT32_TYPE__)__NAMESPACE_INT_SYM _InterlockedCompareExchange((long volatile *)&(x), (long)(newv), (long)(oldv)) :      \
+	                                    (__UINT64_TYPE__)__NAMESPACE_INT_SYM _InterlockedCompareExchange64((__int64 volatile *)&(x), (__int64)(newv), (__int64)(oldv)))
 #endif /* !__cplusplus */
 
 #ifdef __arm__
