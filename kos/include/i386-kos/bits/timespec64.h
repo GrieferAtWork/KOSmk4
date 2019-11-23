@@ -38,6 +38,7 @@
 #define __OFFSET_TIMESPEC64_NSEC __OFFSET_TIMESPECX64_NSEC
 #define __SIZEOF_TIMESPEC64      __SIZEOF_TIMESPECX64
 #endif /* __USE_TIME64 */
+#define __timespec_defined 1
 #endif /* __x86_64__ */
 
 

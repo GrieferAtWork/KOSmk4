@@ -30,6 +30,7 @@ __SYSDECL_BEGIN
 #ifndef __sigval_t_defined
 #define __sigval_t_defined 1
 #define __SIZEOF_SIGVAL __SIZEOF_SIGVAL32
+#define __sigval_defined 1
 #define sigval32        sigval
 #define sigval32_t      sigval_t
 #endif /* !__sigval_t_defined */

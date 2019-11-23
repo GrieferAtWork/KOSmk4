@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e33d125 */
+/* HASH CRC-32:0xc7e5939e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,14 @@
 #ifndef _ERRNO_H
 #define _ERRNO_H 1
 
+#ifdef _CXX_STDONLY_CERRNO
+#ifdef __CXX_SYSTEM_HEADER
+#undef _ERRNO_H /* Allow the C-header to be re-included to import all std::-symbols into the global namespace. */
+#else /* __CXX_SYSTEM_HEADER */
+/* Import all symbols into the global namespace when re-including "errno.h" after "cerrno" */
+#undef _CXX_STDONLY_CERRNO
+#endif /* !__CXX_SYSTEM_HEADER */
+#else /* _CXX_STDONLY_CERRNO */
 #include "__stdinc.h"
 #include "__crt.h"
 
@@ -666,4 +674,9 @@ __SYSDECL_END
 
 #endif /* __CC__ */
 
+#ifdef __CXX_SYSTEM_HEADER
+#define _CXX_STDONLY_CERRNO 1
+#undef _ERRNO_H
+#endif /* __CXX_SYSTEM_HEADER */
+#endif /* !_CXX_STDONLY_CERRNO */
 #endif /* !_ERRNO_H */

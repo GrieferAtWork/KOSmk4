@@ -86,7 +86,10 @@ function incdir(prefix, path) {
 		}
 		if ("." !in x || x in ["__stdcxx.h"]) {
 			// c++ header
-		} else if (x !in ["atree-abi.h", "__atomic-gasm.h", "__atomic-msvc.h"]) {
+		} else if (x !in [
+			"atree-abi.h", "__atomic-gasm.h", "__atomic-msvc.h",
+			"__atomic-libatomic.h", "service-lock.h"
+		]) {
 			if (x.endswith(".h") && !x.endswith("-impl.h")) {
 				local full;
 				if (".." in prefix) {
@@ -325,6 +328,7 @@ incdir("", "../../include");
 #include <hybrid/__pointer.h>
 #include <hybrid/__rotate.h>
 #include <hybrid/__unaligned.h>
+#include <hybrid/__va_size.h>
 #include <hybrid/__wordbits.h>
 #include <hybrid/align.h>
 #include <hybrid/alloca.h>
@@ -336,6 +340,7 @@ incdir("", "../../include");
 #include <hybrid/debug-alignment.h>
 #include <hybrid/floatcore.h>
 #include <hybrid/host.h>
+#include <hybrid/int128.h>
 #include <hybrid/limitcore.h>
 #include <hybrid/limits.h>
 #include <hybrid/minmax.h>
@@ -359,6 +364,7 @@ incdir("", "../../include");
 #include <hybrid/wordbits.h>
 #include <ieee754.h>
 #include <ifaddrs.h>
+#include <int128.h>
 #include <inttypes.h>
 #include <io.h>
 #include <iso646.h>
@@ -681,6 +687,7 @@ incdir("", "../../include");
 #include <sys/msg.h>
 #include <sys/param.h>
 #include <sys/pci.h>
+#include <sys/perm.h>
 #include <sys/poll.h>
 #include <sys/procfs.h>
 #include <sys/ptrace.h>
@@ -700,7 +707,11 @@ incdir("", "../../include");
 #include <sys/stropts.h>
 #include <sys/swap.h>
 #include <sys/syscall-proto.h>
+#include <sys/syscall-proto32.h>
+#include <sys/syscall-proto64.h>
 #include <sys/syscall-trace.h>
+#include <sys/syscall-trace32.h>
+#include <sys/syscall-trace64.h>
 #include <sys/syscall.h>
 #include <sys/sysinfo.h>
 #include <sys/syslog.h>

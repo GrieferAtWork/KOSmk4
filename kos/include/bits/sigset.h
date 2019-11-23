@@ -56,7 +56,10 @@ __SYSDECL_BEGIN
 #define ____sig_atomic_t_defined 1
 typedef __SIG_ATOMIC_TYPE__ __sig_atomic_t;
 #endif /* !____sig_atomic_t_defined */
+#ifndef ____sigset_t_defined
+#define ____sigset_t_defined 1
 typedef struct __sigset_struct { __ULONGPTR_TYPE__ __val[_SIGSET_NWORDS]; } __sigset_t;
+#endif /* !____sigset_t_defined */
 #define __SIGSET_INIT_NONE    {{ [0 ... _SIGSET_NWORDS-1] = 0 }}
 #define __SIGSET_INIT_FULL    {{ [0 ... _SIGSET_NWORDS-1] = (__ULONGPTR_TYPE__)-1 }}
 #endif /* __CC__ */

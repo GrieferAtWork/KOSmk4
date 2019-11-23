@@ -28,6 +28,7 @@
 #include <bits/sigval32.h>    /* union sigval32 */
 
 #if !defined(__CRT_CYG_PRIMARY) && !defined(__x86_64__)
+#define __sigevent_t_defined 1
 #define sigevent32                          sigevent
 #define sigevent32_t                        sigevent_t
 #define __SIGEV_MAX_SIZE                    __SIGEV32_MAX_SIZE

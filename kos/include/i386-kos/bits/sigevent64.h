@@ -27,6 +27,7 @@
 #include <bits/sigval64.h>    /* union sigval64 */
 
 #if !defined(__CRT_CYG_PRIMARY) && defined(__x86_64__)
+#define __sigevent_t_defined 1
 #define sigevent64                          sigevent
 #define sigevent64_t                        sigevent_t
 #define __SIGEV_MAX_SIZE                    __SIGEV64_MAX_SIZE

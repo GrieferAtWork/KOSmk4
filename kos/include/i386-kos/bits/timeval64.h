@@ -38,6 +38,7 @@
 #define __OFFSET_TIMEVAL64_USEC __OFFSET_TIMEVALX64_USEC
 #define __SIZEOF_TIMEVAL64      __SIZEOF_TIMEVALX64
 #endif /* __USE_TIME64 */
+#define __timeval_defined 1
 #endif /* __x86_64__ */
 
 

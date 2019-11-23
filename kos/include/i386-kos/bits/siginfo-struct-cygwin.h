@@ -29,6 +29,7 @@
 #ifdef __CRT_CYG_PRIMARY
 #define __siginfo_cygwin_struct __siginfo_struct
 #define siginfo_cygwin_t        siginfo_t
+#define __siginfo_t_defined     1
 #endif /* __CRT_CYG_PRIMARY */
 
 

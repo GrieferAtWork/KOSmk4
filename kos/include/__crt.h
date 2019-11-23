@@ -425,14 +425,14 @@
 
 #ifdef __CC__
 #ifndef __FILE
-#define __FILE     struct __NAMESPACE_STD_SYM __IO_FILE
+#define __FILE struct __NAMESPACE_STD_SYM __IO_FILE
 __NAMESPACE_STD_BEGIN
 struct __IO_FILE;
 __NAMESPACE_STD_END
 #endif /* !__FILE */
 #ifndef __LOCALE_T
 typedef void *__locale_t;
-#endif
+#endif /* !__LOCALE_T */
 #endif /* ... */
 
 

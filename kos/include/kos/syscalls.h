@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc95dba68 */
+/* HASH CRC-32:0xc844ebcb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,18 +53,18 @@ typedef int __idtype_t;
 
 #ifndef __CDECLARE_SC
 #if 1 /* TODO: cancellation_point-system calls aren't nothrow! - All others are. */
-#define __CDECLARE_SC(attr, Treturn, name, param, args)  __CDECLARE(attr, Treturn, , sys_##name, param, args)
-#define __CDECLARE_VOID_SC(attr, name, param, args)      __CDECLARE_VOID(attr, , sys_##name, param, args)
+#define __CDECLARE_SC(attr, Treturn, name, param, args)  __CDECLARE(attr,Treturn,,sys_##name,param,args)
+#define __CDECLARE_VOID_SC(attr, name, param, args)      __CDECLARE_VOID(attr,,sys_##name,param,args)
 #else
-#define __CDECLARE_SC(attr, Treturn, name, param, args)  __CDECLARE(attr, Treturn, __NOTHROW, sys_##name, param, args)
-#define __CDECLARE_VOID_SC(attr, name, param, args)      __CDECLARE_VOID(attr, __NOTHROW, sys_##name, param, args)
+#define __CDECLARE_SC(attr, Treturn, name, param, args)  __CDECLARE(attr,Treturn,__NOTHROW,sys_##name,param,args)
+#define __CDECLARE_VOID_SC(attr, name, param, args)      __CDECLARE_VOID(attr,__NOTHROW,sys_##name,param,args)
 #endif
-#define __CDECLARE_XSC(attr, Treturn, name, param, args) __CDECLARE(attr, Treturn, , sys_X##name, param, args)
-#define __CDECLARE_VOID_XSC(attr, name, param, args)     __CDECLARE_VOID(attr, , sys_X##name, param, args)
-#define __PRIVATE_CRT_HAVE_PLACEHOLDER_1    ,
-#define __PRIVATE_CRT_HAVE_ARG_IMPL(x,val,...) val
+#define __CDECLARE_XSC(attr, Treturn, name, param, args) __CDECLARE(attr,Treturn,,sys_X##name,param,args)
+#define __CDECLARE_VOID_XSC(attr, name, param, args)     __CDECLARE_VOID(attr,,sys_X##name,param,args)
+#define __PRIVATE_CRT_HAVE_PLACEHOLDER_1         ,
+#define __PRIVATE_CRT_HAVE_ARG_IMPL(x, val, ...) val
 #define __PRIVATE_CRT_HAVE_ARG(x)  __PRIVATE_CRT_HAVE_ARG_IMPL x
-#define __PRIVATE_CRT_HAVE3(x)     __PRIVATE_CRT_HAVE_ARG((x 1,0))
+#define __PRIVATE_CRT_HAVE3(...)   __PRIVATE_CRT_HAVE_ARG((__VA_ARGS__ 1,0))
 #define __PRIVATE_CRT_HAVE2(x)     __PRIVATE_CRT_HAVE3(__PRIVATE_CRT_HAVE_PLACEHOLDER_##x)
 #define __PRIVATE_CRT_ISDEFINED(x) __PRIVATE_CRT_HAVE2(x)
 #define __CRT_HAVE_SC(name)        __PRIVATE_CRT_ISDEFINED(__CRT_HAVE_sys_##name)

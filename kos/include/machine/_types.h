@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _MACHINE__DEFAULT_TYPES_H
-#define _MACHINE__DEFAULT_TYPES_H 1
+#ifndef _MACHINE__TYPES_H
+#define _MACHINE__TYPES_H 1
 
 #include <__stdinc.h>
 #include <features.h>
@@ -56,4 +56,4 @@ typedef __uint16_t __sa_family_t;
 
 __DECL_END
 
-#endif /* !_MACHINE__DEFAULT_TYPES_H */
+#endif /* !_MACHINE__TYPES_H */

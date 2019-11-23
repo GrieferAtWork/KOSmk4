@@ -65,6 +65,7 @@
 #define __SIZEOF_TIMEVAL64      __SIZEOF_TIMEVAL32_64
 
 #endif /* !__USE_TIME_BITS64 */
+#define __timeval_defined 1
 #endif /* !__x86_64__ */
 
 

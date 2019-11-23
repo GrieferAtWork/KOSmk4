@@ -65,6 +65,7 @@
 #define __SIZEOF_TIMESPEC64      __SIZEOF_TIMESPEC32_64
 
 #endif /* !__USE_TIME_BITS64 */
+#define __timespec_defined 1
 #endif /* !__x86_64__ */
 
 

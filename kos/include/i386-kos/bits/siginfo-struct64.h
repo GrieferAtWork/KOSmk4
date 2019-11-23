@@ -59,6 +59,7 @@ __SYSDECL_BEGIN
 #define __SIZEOF_SIGINFO           __SIZEOF_SIGINFO64
 #define __siginfo64_struct         __siginfo_struct
 #define siginfo64_t                siginfo_t
+#define __siginfo_t_defined        1
 #endif /* !__CRT_CYG_PRIMARY && !__x86_64__ */
 
 

@@ -19,6 +19,7 @@
 
 %[define_replacement(errno_t = __errno_t)]
 %[default_impl_section(.text.crt.errno.utility)]
+%[define_ccompat_header(cerrno)]
 
 %{
 #include <features.h>
