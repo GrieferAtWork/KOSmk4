@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="1">
+	<builddir>../../../build/cppcheck-i386-kos-userspace</builddir>
+	<platform>unix32</platform>
+	<analyze-all-vs-configs>false</analyze-all-vs-configs>
+	<check-headers>true</check-headers>
+	<check-unused-templates>false</check-unused-templates>
+	<max-ctu-depth>10</max-ctu-depth>
+	<includedir>
+		<dir name="../../include/i386-kos/"/>
+		<dir name="../../include/"/>
+	</includedir>
+	<defines>
+		<define name="__i386__"/>
+		<define name="__KOS__"/>
+	</defines>
+	<paths>
+		<dir name="../../src/_verify"/>
+		<dir name="../../src/apps"/>
+		<dir name="../../src/crt0"/>
+		<dir name="../../src/libansitty"/>
+		<dir name="../../src/libbuffer"/>
+		<dir name="../../src/libc"/>
+		<dir name="../../src/libcmdline"/>
+		<dir name="../../src/libcpustate"/>
+		<dir name="../../src/libdebuginfo"/>
+		<dir name="../../src/libdemangle"/>
+		<dir name="../../src/libdisasm"/>
+		<dir name="../../src/libdl"/>
+		<dir name="../../src/libdlmalloc"/>
+		<dir name="../../src/libinstrlen"/>
+		<dir name="../../src/libjson"/>
+		<dir name="../../src/libkeymap"/>
+		<dir name="../../src/libm"/>
+		<dir name="../../src/libregdump"/>
+		<dir name="../../src/libregex"/>
+		<dir name="../../src/librpc"/>
+		<dir name="../../src/libssp"/>
+		<dir name="../../src/libterm"/>
+		<dir name="../../src/libunwind"/>
+		<dir name="../../src/libvideo"/>
+		<dir name="../../src/libvm86"/>
+		<dir name="../../src/libzlib"/>
+	</paths>
+	<exclude>
+		<path name="__ice__/"/>
+		<path name="__ice__/*"/>
+		<path name="__ice__/**"/>
+		<path name="libc/magic"/>
+	</exclude>
+	<suppressions>
+		<suppression>unusedFunction</suppression>
+		<suppression>unusedStructMember</suppression>
+		<suppression>clarifyCalculation</suppression>
+		<suppression>comparePointers</suppression>
+	</suppressions>
+</project>
