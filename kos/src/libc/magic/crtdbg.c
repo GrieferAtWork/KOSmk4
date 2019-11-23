@@ -414,7 +414,7 @@ _strdup_dbg:(char const *string, int block_type, char const *filename, int line)
 	return strdup(string);
 }
 
-[guard][ATTR_WUNUSED][same_impl][requires($has_function(c16dup))]
+[ATTR_MALLOC][guard][ATTR_WUNUSED][same_impl][requires($has_function(c16dup))]
 _wcsdup_dbg:(__WCHAR16_TYPE__ const *string,
              int block_type, char const *filename, int line) -> __WCHAR16_TYPE__ * {
 	(void)block_type;

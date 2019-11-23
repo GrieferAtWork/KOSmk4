@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69c2df66 */
+/* HASH CRC-32:0x4745d9b5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __CREDIRECT_DOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_
 #endif /* !____localdep_c16dup_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_wcsdup_dbg) __ATTR_WUNUSED __WCHAR16_TYPE__ *
+__LOCAL_LIBC(_wcsdup_dbg) __ATTR_MALLOC __ATTR_WUNUSED __WCHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcsdup_dbg))(__WCHAR16_TYPE__ const *__string,
                                                          int __block_type,
                                                          char const *__filename,

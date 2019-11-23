@@ -511,8 +511,8 @@ NOTHROW_NCX(LIBCCALL libc__strdup_dbg)(char const *string,
 }
 /*[[[end:_strdup_dbg]]]*/
 
-/*[[[head:_wcsdup_dbg,hash:CRC-32=0xffd9f074]]]*/
-INTERN WUNUSED
+/*[[[head:_wcsdup_dbg,hash:CRC-32=0x8658f470]]]*/
+INTERN ATTR_MALLOC WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._wcsdup_dbg") __WCHAR16_TYPE__ *
 NOTHROW_NCX(LIBCCALL libc__wcsdup_dbg)(__WCHAR16_TYPE__ const *string,
                                        int block_type,

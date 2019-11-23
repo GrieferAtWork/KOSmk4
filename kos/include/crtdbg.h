@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43d34067 */
+/* HASH CRC-32:0xb615e5f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -510,10 +510,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_strdup_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_W
 #ifndef ___wcsdup_dbg_defined
 #define ___wcsdup_dbg_defined 1
 #ifdef __CRT_HAVE__wcsdup_dbg
-__CDECLARE(__ATTR_WUNUSED,__WCHAR16_TYPE__ *,__NOTHROW_NCX,_wcsdup_dbg,(__WCHAR16_TYPE__ const *__string, int __block_type, char const *__filename, int __line),(__string,__block_type,__filename,__line))
+__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED,__WCHAR16_TYPE__ *,__NOTHROW_NCX,_wcsdup_dbg,(__WCHAR16_TYPE__ const *__string, int __block_type, char const *__filename, int __line),(__string,__block_type,__filename,__line))
 #elif (defined(__CRT_HAVE_wcsdup) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_c16dup) || (defined(__CRT_HAVE__wcsdup) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wcsdup) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
 #include <local/crtdbg/_wcsdup_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wcsdup_dbg, __FORCELOCAL __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBCCALL _wcsdup_dbg)(__WCHAR16_TYPE__ const *__string, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wcsdup_dbg))(__string, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wcsdup_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBCCALL _wcsdup_dbg)(__WCHAR16_TYPE__ const *__string, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wcsdup_dbg))(__string, __block_type, __filename, __line); })
 #else /* CUSTOM: _wcsdup_dbg */
 #undef ___wcsdup_dbg_defined
 #endif /* _wcsdup_dbg... */

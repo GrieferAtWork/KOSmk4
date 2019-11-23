@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c5253b7 */
+/* HASH CRC-32:0x61225960 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ INTDEF WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc__aligned_off
 INTDEF WUNUSED ATTR_ALLOC_SIZE((2, 3)) void *NOTHROW_NCX(LIBCCALL libc__aligned_offset_recalloc_dbg)(void *ptr, size_t count, size_t num_bytes, size_t min_alignment, size_t offset, char const *filename, int line);
 INTDEF void NOTHROW_NCX(LIBCCALL libc__aligned_free_dbg)(void *ptr);
 INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_NCX(LIBCCALL libc__strdup_dbg)(char const *string, int block_type, char const *filename, int line);
-INTDEF WUNUSED __WCHAR16_TYPE__ *NOTHROW_NCX(LIBCCALL libc__wcsdup_dbg)(__WCHAR16_TYPE__ const *string, int block_type, char const *filename, int line);
+INTDEF ATTR_MALLOC WUNUSED __WCHAR16_TYPE__ *NOTHROW_NCX(LIBCCALL libc__wcsdup_dbg)(__WCHAR16_TYPE__ const *string, int block_type, char const *filename, int line);
 INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_NCX(LIBCCALL libc__tempnam_dbg)(char const *dir_name, char const *file_prefix, int block_type, char const *filename, int line);
 INTDEF WUNUSED NONNULL((2)) char *NOTHROW_NCX(LIBCCALL libc__fullpath_dbg)(char *full_path, char const *path, size_t bufsize, int block_type, char const *filename, int line);
 INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc__getcwd_dbg)(char *buf, __STDC_INT_AS_SIZE_T bufsize, int block_type, char const *filename, int line);
