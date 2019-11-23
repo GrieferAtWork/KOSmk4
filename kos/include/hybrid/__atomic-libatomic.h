@@ -431,10 +431,22 @@ __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_fetch_nand,
 #undef __hybrid_atomic_getargs_load
 #undef __hybrid_atomic_getargs_store
 #undef __hybrid_atomic_getargs_cmpxch
+
+#ifdef __NO_XBLOCK
+template<class __T, class __TN> __ATTR_FORCEINLINE __ATTR_LEAF __ATTR_NONNULL((1)) __BOOL
+(__hybrid_atomic_cmpxch)(__T *__x, __T __ov, __TN __nv, int __succ, int __fail) {
+	return __hybrid_atomic_compare_exchange(__x, &__ov, __nv, __succ, __fail);
 }
-#define __hybrid_atomic_load(x, order)     (__NAMESPACE_INT_SYM __hybrid_atomic_load)(&(x), order)
-#define __hybrid_atomic_store(x, v, order) (__NAMESPACE_INT_SYM __hybrid_atomic_store)(&(x), v, order)
-#define __hybrid_atomic_xch(x, v, order)   (__NAMESPACE_INT_SYM __hybrid_atomic_exchange)(&(x), v, order)
+template<class __T, class __TN> __ATTR_FORCEINLINE __ATTR_LEAF __ATTR_NONNULL((1)) __T
+(__hybrid_atomic_cmpxch_val)(__T *__x, __T __ov, __TN __nv, int __succ, int __fail) {
+	__hybrid_atomic_compare_exchange(__x, &__ov, __nv, __succ, __fail);
+	return __ov;
+}
+#define __hybrid_atomic_cmpxch(x, oldv, newv, succ, fail) \
+	(__NAMESPACE_INT_SYM __hybrid_atomic_cmpxch)(&(x), oldv, newv, succ, fail)
+#define __hybrid_atomic_cmpxch_val(x, oldv, newv, succ, fail) \
+	(__NAMESPACE_INT_SYM __hybrid_atomic_cmpxch_val)(&(x), oldv, newv, succ, fail)
+#else /* __NO_XBLOCK */
 #define __hybrid_atomic_cmpxch(x, oldv, newv, succ, fail)                                                 \
 	__XBLOCK({                                                                                            \
 		__typeof__(x) __oldv = (oldv);                                                                    \
@@ -446,6 +458,12 @@ __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_fetch_nand,
 		(__NAMESPACE_INT_SYM __hybrid_atomic_compare_exchange)(&(x), &__oldv, newv, succ, fail); \
 		__XRETURN __oldv;                                                                        \
 	})
+#endif /* !__NO_XBLOCK */
+
+}
+#define __hybrid_atomic_load(x, order)     (__NAMESPACE_INT_SYM __hybrid_atomic_load)(&(x), order)
+#define __hybrid_atomic_store(x, v, order) (__NAMESPACE_INT_SYM __hybrid_atomic_store)(&(x), v, order)
+#define __hybrid_atomic_xch(x, v, order)   (__NAMESPACE_INT_SYM __hybrid_atomic_exchange)(&(x), v, order)
 #define __hybrid_atomic_addfetch(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_add_fetch)(&(x), v, order)
 #define __hybrid_atomic_subfetch(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_sub_fetch)(&(x), v, order)
 #define __hybrid_atomic_andfetch(x, v, order)  (__NAMESPACE_INT_SYM __hybrid_atomic_and_fetch)(&(x), v, order)
@@ -463,8 +481,6 @@ __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_fetch_nand,
 
 #define __hybrid_atomic_getargs_load(T, x, order)     ((T *)&(x), order)
 #define __hybrid_atomic_getargs_store(T, x, v, order) ((T *)&(x), (T)(v), order)
-#define __hybrid_atomic_getargs_cmpxch(T, x, poldv, newv, succ, fail) \
-	((T *)&(x), (T *)poldv, (T)(newv), succ, fail)
 
 #define __hybrid_atomic_load(x, order) \
 	__ATOMIC_RECAST(x, __HYBRID_CALL_LIBATOMIC_SELECTOR(__hybrid_atomic_load, sizeof(x), __hybrid_atomic_getargs_load, x, order))
@@ -472,6 +488,41 @@ __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_fetch_nand,
 	__HYBRID_CALL_LIBATOMIC_SELECTOR(__hybrid_atomic_store, sizeof(x), __hybrid_atomic_getargs_store, x, v, order)
 #define __hybrid_atomic_xch(x, v, order) \
 	__ATOMIC_RECAST(x, __HYBRID_CALL_LIBATOMIC_SELECTOR(__hybrid_atomic_exchange, sizeof(x), __hybrid_atomic_getargs_store, x, v, order))
+
+#ifdef __NO_XBLOCK
+/* Work-around for compilers without expression block support */
+#define __HYBRID_DEFINE_ATOMIC_CMPXCH_N(T, n)                                           \
+	__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __BOOL                                 \
+	(__hybrid_atomic_cmpxch_##n)(T * __x, T __ov, T __nv, int __succ, int __fail) {     \
+		return __hybrid_atomic_compare_exchange_##n(__x, &__ov, __nv, __succ, __fail);  \
+	}                                                                                   \
+	__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) T                                      \
+	(__hybrid_atomic_cmpxch_val_##n)(T * __x, T __ov, T __nv, int __succ, int __fail) { \
+		__hybrid_atomic_compare_exchange_##n(__x, &__ov, __nv, __succ, __fail);         \
+		return __ov;                                                                    \
+	}
+__HYBRID_DEFINE_ATOMIC_CMPXCH_N(__UINT8_TYPE__, 1)
+__HYBRID_DEFINE_ATOMIC_CMPXCH_N(__UINT16_TYPE__, 2)
+__HYBRID_DEFINE_ATOMIC_CMPXCH_N(__UINT32_TYPE__, 4)
+#ifdef __UINT64_TYPE__
+__HYBRID_DEFINE_ATOMIC_CMPXCH_N(__UINT64_TYPE__, 8)
+#ifdef __UINT128_TYPE__
+__HYBRID_DEFINE_ATOMIC_CMPXCH_N(__UINT128_TYPE__, 16)
+#endif /* __UINT128_TYPE__ */
+#endif /* __UINT64_TYPE__ */
+#undef __HYBRID_DEFINE_ATOMIC_CMPXCH_N
+#define __hybrid_atomic_getargs_cmpxch(T, x, oldv, newv, succ, fail) \
+	((T *)&(x), (T)(oldv), (T)(newv), succ, fail)
+#define __hybrid_atomic_cmpxch(x, oldv, newv, succ, fail) \
+	__HYBRID_CALL_LIBATOMIC_SELECTOR(__hybrid_atomic_cmpxch, sizeof(x), __hybrid_atomic_getargs_cmpxch, x, oldv, newv, succ, fail)
+#define __hybrid_atomic_cmpxch_val(x, oldv, newv, succ, fail) \
+	__ATOMIC_RECAST(x, __HYBRID_CALL_LIBATOMIC_SELECTOR(__hybrid_atomic_cmpxch_val, sizeof(x), __hybrid_atomic_getargs_cmpxch, x, oldv, newv, succ, fail))
+
+#else /* __NO_XBLOCK */
+
+/* Simple case: Implement compare-exchange support using expression blocks */
+#define __hybrid_atomic_getargs_cmpxch(T, x, poldv, newv, succ, fail) \
+	((T *)&(x), (T *)poldv, (T)(newv), succ, fail)
 #define __hybrid_atomic_cmpxch(x, oldv, newv, succ, fail)                                            \
 	__XBLOCK({                                                                                       \
 		__typeof__(x) __oldv = (oldv);                                                               \
@@ -487,6 +538,7 @@ __HYBRID_DEFINE_LIBATOMIC_SELECTOR(__T, __hybrid_atomic_fetch_nand,
 		                                 succ, fail);                                      \
 		__XRETURN __oldv;                                                                  \
 	})
+#endif /* !__NO_XBLOCK */
 #define __hybrid_atomic_addfetch(x, v, order)  __ATOMIC_RECAST(x, __HYBRID_CALL_LIBATOMIC_SELECTOR(__hybrid_atomic_add_fetch, sizeof(x), __hybrid_atomic_getargs_store, x, v, order))
 #define __hybrid_atomic_subfetch(x, v, order)  __ATOMIC_RECAST(x, __HYBRID_CALL_LIBATOMIC_SELECTOR(__hybrid_atomic_sub_fetch, sizeof(x), __hybrid_atomic_getargs_store, x, v, order))
 #define __hybrid_atomic_andfetch(x, v, order)  __ATOMIC_RECAST(x, __HYBRID_CALL_LIBATOMIC_SELECTOR(__hybrid_atomic_and_fetch, sizeof(x), __hybrid_atomic_getargs_store, x, v, order))
