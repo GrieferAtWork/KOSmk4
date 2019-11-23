@@ -22,29 +22,11 @@
 		<dir name="../../src/kernel/core"/>
 	</paths>
 	<exclude>
-		<path name="__ice__"/>
-		<path name="__ice__*"/>
-		<path name="__ice__**"/>
 		<path name="__ice__/"/>
 		<path name="__ice__/*"/>
 		<path name="__ice__/**"/>
-		<path name="*__ice__"/>
-		<path name="*__ice__*"/>
-		<path name="*__ice__**"/>
-		<path name="*__ice__/"/>
-		<path name="*__ice__/*"/>
-		<path name="*__ice__/**"/>
-		<path name="*/__ice__"/>
-		<path name="*/__ice__*"/>
-		<path name="*/__ice__**"/>
-		<path name="*/__ice__/"/>
-		<path name="*/__ice__/*"/>
-		<path name="*/__ice__/**"/>
-		<path name="**/__ice__"/>
-		<path name="**/__ice__*"/>
-		<path name="**/__ice__**"/>
-		<path name="**/__ice__/"/>
-		<path name="**/__ice__/*"/>
-		<path name="**/__ice__/**"/>
 	</exclude>
+	<suppressions>
+		<suppression>unusedFunction</suppression>
+	</suppressions>
 </project>

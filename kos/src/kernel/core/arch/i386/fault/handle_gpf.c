@@ -734,14 +734,14 @@ done_noncanon_check:
 				uintptr_t addr = x86_decode_modrmgetmem(state, &mod, flags);
 				if (isuser()) {
 					validate_readable((void *)addr, sizeof(buf));
-					memcpy(buf, (void *)addr, sizeof(buf));
 					PERTASK_SET(this_exception_pointers[1],
 					            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
 				} else {
 					PERTASK_SET(this_exception_pointers[1],
 					            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
 				}
-				PERTASK_SET(this_exception_pointers[3], (uintptr_t) * (u16 *)(buf + 0));
+				memcpy(buf, (void *)addr, sizeof(buf));
+				PERTASK_SET(this_exception_pointers[3], (uintptr_t)*(u16 *)(buf + 0));
 				PERTASK_SET(this_exception_pointers[4], *(uintptr_t *)(buf + 2));
 			}
 			goto unwind_state;
