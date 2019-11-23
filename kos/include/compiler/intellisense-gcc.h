@@ -112,7 +112,7 @@ static_assert(sizeof(__UINT_FAST64_TYPE__) == __SIZEOF_FAST64_TYPE__, "WTF Intel
 #define __UINT_FAST64_TYPE__ unsigned long long int
 
 #endif
-#endif
+#endif /* __x86_64__ */
 
 
 #if 0 /* How can Intellisense be this stupid? - I mean: this is linux 101! */
@@ -144,7 +144,7 @@ static_assert(sizeof(wchar_t) == __SIZEOF_WCHAR_T__, "WTF Intellisense?");
 #define __cplusplus 201402L
 #endif
 
-#if __cplusplus ==201402L
+#if __cplusplus == 201402L
 #undef __cpp_deduction_guides
 #endif
 
@@ -152,23 +152,23 @@ static_assert(sizeof(wchar_t) == __SIZEOF_WCHAR_T__, "WTF Intellisense?");
 namespace __intern {
 
 unsigned short __override_builtin_bswap16(unsigned short);
-____intellisense_endianint<4321,unsigned short> __override_builtin_bswap16(____intellisense_endianint<1234,unsigned short>);
-____intellisense_endianint<1234,unsigned short> __override_builtin_bswap16(____intellisense_endianint<4321,unsigned short>);
+____intellisense_endianint<4321, unsigned short> __override_builtin_bswap16(____intellisense_endianint<1234, unsigned short>);
+____intellisense_endianint<1234, unsigned short> __override_builtin_bswap16(____intellisense_endianint<4321, unsigned short>);
 unsigned int __override_builtin_bswap32(unsigned int);
-____intellisense_endianint<4321,unsigned int> __override_builtin_bswap32(____intellisense_endianint<1234,unsigned int>);
-____intellisense_endianint<1234,unsigned int> __override_builtin_bswap32(____intellisense_endianint<4321,unsigned int>);
+____intellisense_endianint<4321, unsigned int> __override_builtin_bswap32(____intellisense_endianint<1234, unsigned int>);
+____intellisense_endianint<1234, unsigned int> __override_builtin_bswap32(____intellisense_endianint<4321, unsigned int>);
 #if defined(__i386__) || defined(__arm__)
 unsigned long __override_builtin_bswap32(unsigned long);
-____intellisense_endianint<4321,unsigned long> __override_builtin_bswap32(____intellisense_endianint<1234,unsigned long>);
-____intellisense_endianint<1234,unsigned long> __override_builtin_bswap32(____intellisense_endianint<4321,unsigned long>);
+____intellisense_endianint<4321, unsigned long> __override_builtin_bswap32(____intellisense_endianint<1234, unsigned long>);
+____intellisense_endianint<1234, unsigned long> __override_builtin_bswap32(____intellisense_endianint<4321, unsigned long>);
 #else
 unsigned long __override_builtin_bswap64(unsigned long);
-____intellisense_endianint<4321,unsigned long> __override_builtin_bswap64(____intellisense_endianint<1234,unsigned long>);
-____intellisense_endianint<1234,unsigned long> __override_builtin_bswap64(____intellisense_endianint<4321,unsigned long>);
+____intellisense_endianint<4321, unsigned long> __override_builtin_bswap64(____intellisense_endianint<1234, unsigned long>);
+____intellisense_endianint<1234, unsigned long> __override_builtin_bswap64(____intellisense_endianint<4321, unsigned long>);
 #endif
 unsigned long long __override_builtin_bswap64(unsigned long long);
-____intellisense_endianint<4321,unsigned long long> __override_builtin_bswap64(____intellisense_endianint<1234,unsigned long long>);
-____intellisense_endianint<1234,unsigned long long> __override_builtin_bswap64(____intellisense_endianint<4321,unsigned long long>);
+____intellisense_endianint<4321, unsigned long long> __override_builtin_bswap64(____intellisense_endianint<1234, unsigned long long>);
+____intellisense_endianint<1234, unsigned long long> __override_builtin_bswap64(____intellisense_endianint<4321, unsigned long long>);
 #define __builtin_bswap16 ::__intern::__override_builtin_bswap16
 #define __builtin_bswap32 ::__intern::__override_builtin_bswap32
 #define __builtin_bswap32 ::__intern::__override_builtin_bswap32
@@ -176,31 +176,31 @@ ____intellisense_endianint<1234,unsigned long long> __override_builtin_bswap64(_
 
 
 
-template<class T> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value,T>::__type __intellisense_atomic_load_n(T const volatile *ptr, int memorder);
-template<class T> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value,void>::__type __intellisense_atomic_load(T const volatile *ptr, T *ret, int memorder);
-template<class T> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value,void>::__type __intellisense_atomic_load(T const volatile *ptr, T volatile *ret, int memorder);
-template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value,void>::__type __intellisense_atomic_store_n(T volatile *ptr, S val, int memorder);
-template<class T> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value,void>::__type __intellisense_atomic_store(T volatile *ptr, T *val, int memorder);
-template<class T> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value,void>::__type __intellisense_atomic_store(T volatile *ptr, T volatile *val, int memorder);
-template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value,T>::__type __intellisense_atomic_exchange_n(T volatile *ptr, S val, int memorder);
-template<class T> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value,void>::__type __intellisense_atomic_exchange(T volatile *ptr, T *val, T *ret, int memorder);
-template<class T> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value,void>::__type __intellisense_atomic_exchange(T volatile *ptr, T volatile *val, T volatile *ret, int memorder);
-template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value,bool>::__type __intellisense_atomic_compare_exchange_n(T volatile *ptr, T *expected, S desired, bool weak, int success_memorder, int failure_memorder);
-template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value,bool>::__type __intellisense_atomic_compare_exchange_n(T volatile *ptr, T volatile *expected, S desired, bool weak, int success_memorder, int failure_memorder);
-template<class T> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value,bool>::__type __intellisense_atomic_compare_exchange(T volatile *ptr, T *expected, T *desired, bool weak, int success_memorder, int failure_memorder);
-template<class T> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value,bool>::__type __intellisense_atomic_compare_exchange(T volatile *ptr, T volatile *expected, T volatile *desired, bool weak, int success_memorder, int failure_memorder);
-template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value,T>::__type __intellisense_atomic_add_fetch(T volatile *ptr, S val, int memorder);
-template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value,T>::__type __intellisense_atomic_sub_fetch(T volatile *ptr, S val, int memorder);
-template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value,T>::__type __intellisense_atomic_and_fetch(T volatile *ptr, S val, int memorder);
-template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value,T>::__type __intellisense_atomic_xor_fetch(T volatile *ptr, S val, int memorder);
-template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value,T>::__type __intellisense_atomic_or_fetch(T volatile *ptr, S val, int memorder);
-template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value,T>::__type __intellisense_atomic_nand_fetch(T volatile *ptr, S val, int memorder);
-template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value,T>::__type __intellisense_atomic_fetch_add(T volatile *ptr, S val, int memorder);
-template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value,T>::__type __intellisense_atomic_fetch_sub(T volatile *ptr, S val, int memorder);
-template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value,T>::__type __intellisense_atomic_fetch_and(T volatile *ptr, S val, int memorder);
-template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value,T>::__type __intellisense_atomic_fetch_xor(T volatile *ptr, S val, int memorder);
-template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value,T>::__type __intellisense_atomic_fetch_or(T volatile *ptr, S val, int memorder);
-template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value,T>::__type __intellisense_atomic_fetch_nand(T volatile *ptr, S val, int memorder);
+template<class T> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value, T>::__type __intellisense_atomic_load_n(T const volatile *ptr, int memorder);
+template<class T> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value, void>::__type __intellisense_atomic_load(T const volatile *ptr, T *ret, int memorder);
+template<class T> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value, void>::__type __intellisense_atomic_load(T const volatile *ptr, T volatile *ret, int memorder);
+template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value, void>::__type __intellisense_atomic_store_n(T volatile *ptr, S val, int memorder);
+template<class T> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value, void>::__type __intellisense_atomic_store(T volatile *ptr, T *val, int memorder);
+template<class T> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value, void>::__type __intellisense_atomic_store(T volatile *ptr, T volatile *val, int memorder);
+template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value, T>::__type __intellisense_atomic_exchange_n(T volatile *ptr, S val, int memorder);
+template<class T> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value, void>::__type __intellisense_atomic_exchange(T volatile *ptr, T *val, T *ret, int memorder);
+template<class T> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value, void>::__type __intellisense_atomic_exchange(T volatile *ptr, T volatile *val, T volatile *ret, int memorder);
+template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value, bool>::__type __intellisense_atomic_compare_exchange_n(T volatile *ptr, T *expected, S desired, bool weak, int success_memorder, int failure_memorder);
+template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value, bool>::__type __intellisense_atomic_compare_exchange_n(T volatile *ptr, T volatile *expected, S desired, bool weak, int success_memorder, int failure_memorder);
+template<class T> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value, bool>::__type __intellisense_atomic_compare_exchange(T volatile *ptr, T *expected, T *desired, bool weak, int success_memorder, int failure_memorder);
+template<class T> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value, bool>::__type __intellisense_atomic_compare_exchange(T volatile *ptr, T volatile *expected, T volatile *desired, bool weak, int success_memorder, int failure_memorder);
+template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value, T>::__type __intellisense_atomic_add_fetch(T volatile *ptr, S val, int memorder);
+template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value, T>::__type __intellisense_atomic_sub_fetch(T volatile *ptr, S val, int memorder);
+template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value, T>::__type __intellisense_atomic_and_fetch(T volatile *ptr, S val, int memorder);
+template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value, T>::__type __intellisense_atomic_xor_fetch(T volatile *ptr, S val, int memorder);
+template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value, T>::__type __intellisense_atomic_or_fetch(T volatile *ptr, S val, int memorder);
+template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value, T>::__type __intellisense_atomic_nand_fetch(T volatile *ptr, S val, int memorder);
+template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value, T>::__type __intellisense_atomic_fetch_add(T volatile *ptr, S val, int memorder);
+template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value, T>::__type __intellisense_atomic_fetch_sub(T volatile *ptr, S val, int memorder);
+template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value, T>::__type __intellisense_atomic_fetch_and(T volatile *ptr, S val, int memorder);
+template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value, T>::__type __intellisense_atomic_fetch_xor(T volatile *ptr, S val, int memorder);
+template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value, T>::__type __intellisense_atomic_fetch_or(T volatile *ptr, S val, int memorder);
+template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_isarith<T>::__value && ____INTELLISENSE_isarith<S>::__value, T>::__type __intellisense_atomic_fetch_nand(T volatile *ptr, S val, int memorder);
 
 #define __atomic_load_n             ::__intern::__intellisense_atomic_load_n
 #define __atomic_load               ::__intern::__intellisense_atomic_load

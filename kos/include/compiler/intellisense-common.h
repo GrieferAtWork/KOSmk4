@@ -121,39 +121,39 @@ public:
 };
 
 
-template<class T> struct ____INTELLISENSE_isarith { enum{__value=false}; };
-template<class T> struct ____INTELLISENSE_issigned { enum{__value=false}; };
-template<class T> struct ____INTELLISENSE_isunsigned { enum{__value=false}; };
-template<> struct ____INTELLISENSE_isarith<bool> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_isarith<wchar_t> { enum{__value=true}; };
+template<class T> struct ____INTELLISENSE_isarith { enum { __value = false }; };
+template<class T> struct ____INTELLISENSE_issigned { enum { __value = false }; };
+template<class T> struct ____INTELLISENSE_isunsigned { enum { __value = false }; };
+template<> struct ____INTELLISENSE_isarith<bool> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isarith<wchar_t> { enum { __value = true }; };
 #if defined(_WCHAR_T_DEFINED) || defined(__GNUC__)
-template<> struct ____INTELLISENSE_isarith<char16_t> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_isarith<char32_t> { enum{__value=true}; };
+template<> struct ____INTELLISENSE_isarith<char16_t> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isarith<char32_t> { enum { __value = true }; };
 #endif
-template<> struct ____INTELLISENSE_isarith<char> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_isarith<signed char> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_isarith<unsigned char> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_isarith<short> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_isarith<unsigned short> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_isarith<int> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_isarith<unsigned int> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_isarith<long> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_isarith<unsigned long> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_isarith<long long> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_isarith<unsigned long long> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_isarith<decltype(nullptr)> { enum{__value=true}; };
-template<class T> struct ____INTELLISENSE_isarith<T *> { enum{__value=true}; };
+template<> struct ____INTELLISENSE_isarith<char> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isarith<signed char> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isarith<unsigned char> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isarith<short> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isarith<unsigned short> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isarith<int> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isarith<unsigned int> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isarith<long> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isarith<unsigned long> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isarith<long long> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isarith<unsigned long long> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isarith<decltype(nullptr)> { enum { __value = true }; };
+template<class T> struct ____INTELLISENSE_isarith<T *> { enum { __value = true }; };
 
-template<> struct ____INTELLISENSE_issigned<signed char> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_isunsigned<unsigned char> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_issigned<short> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_isunsigned<unsigned short> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_issigned<int> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_isunsigned<unsigned int> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_issigned<long> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_isunsigned<unsigned long> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_issigned<long long> { enum{__value=true}; };
-template<> struct ____INTELLISENSE_isunsigned<unsigned long long> { enum{__value=true}; };
+template<> struct ____INTELLISENSE_issigned<signed char> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isunsigned<unsigned char> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_issigned<short> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isunsigned<unsigned short> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_issigned<int> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isunsigned<unsigned int> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_issigned<long> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isunsigned<unsigned long> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_issigned<long long> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isunsigned<unsigned long long> { enum { __value = true }; };
 
 template<unsigned int uid, class T> struct ____INTELLISENSE_isarith<____intellisense_altint<uid,T> > { enum{__value=____INTELLISENSE_isarith<T>::__value}; };
 template<unsigned int uid, class T> struct ____INTELLISENSE_issigned<____intellisense_altint<uid,T> > { enum{__value=____INTELLISENSE_issigned<T>::__value}; };
@@ -226,7 +226,7 @@ template<> struct ____INTELLISENSE_promote<unsigned long long> { typedef unsigne
 template<int endian,class T> class ____intellisense_endianint {
 	T __v;
 public:
-//bool operator ! (void) const;
+/*	bool operator ! () const; */
 	explicit operator bool() const throw();
 	explicit operator char() const throw();
 	explicit operator short() const throw();
@@ -264,28 +264,28 @@ public:
 
 #pragma pack(pop)
 
-unsigned short __intellisense_leswap16(__intern::____intellisense_endianint<__ORDER_LITTLE_ENDIAN__,unsigned short>);
-unsigned short __intellisense_beswap16(__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,unsigned short>);
-unsigned int __intellisense_leswap32(__intern::____intellisense_endianint<__ORDER_LITTLE_ENDIAN__,unsigned int>);
-unsigned int __intellisense_beswap32(__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,unsigned int>);
-unsigned long __intellisense_leswap32(__intern::____intellisense_endianint<__ORDER_LITTLE_ENDIAN__,unsigned long>);
-unsigned long __intellisense_beswap32(__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,unsigned long>);
-unsigned long long __intellisense_leswap64(__intern::____intellisense_endianint<__ORDER_LITTLE_ENDIAN__,unsigned long long>);
-unsigned long long __intellisense_beswap64(__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,unsigned long long>);
+unsigned short __intellisense_leswap16(__intern::____intellisense_endianint<__ORDER_LITTLE_ENDIAN__, unsigned short>);
+unsigned short __intellisense_beswap16(__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__, unsigned short>);
+unsigned int __intellisense_leswap32(__intern::____intellisense_endianint<__ORDER_LITTLE_ENDIAN__, unsigned int>);
+unsigned int __intellisense_beswap32(__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__, unsigned int>);
+unsigned long __intellisense_leswap32(__intern::____intellisense_endianint<__ORDER_LITTLE_ENDIAN__, unsigned long>);
+unsigned long __intellisense_beswap32(__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__, unsigned long>);
+unsigned long long __intellisense_leswap64(__intern::____intellisense_endianint<__ORDER_LITTLE_ENDIAN__, unsigned long long>);
+unsigned long long __intellisense_beswap64(__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__, unsigned long long>);
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 unsigned short __intellisense_leswap16(unsigned short);
 unsigned int __intellisense_leswap32(unsigned int);
 unsigned long __intellisense_leswap32(unsigned long);
 unsigned long long __intellisense_leswap64(unsigned long long);
-__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,unsigned short> __intellisense_beswap16(unsigned short);
-__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,unsigned int> __intellisense_beswap32(unsigned int);
-__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,unsigned long> __intellisense_beswap32(unsigned long);
-__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,unsigned long long> __intellisense_beswap64(unsigned long long);
+__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__, unsigned short> __intellisense_beswap16(unsigned short);
+__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__, unsigned int> __intellisense_beswap32(unsigned int);
+__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__, unsigned long> __intellisense_beswap32(unsigned long);
+__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__, unsigned long long> __intellisense_beswap64(unsigned long long);
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,unsigned short> __intellisense_leswap16(unsigned short);
-__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,unsigned int> __intellisense_leswap32(unsigned int);
-__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,unsigned long> __intellisense_leswap32(unsigned long);
-__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,unsigned long long> __intellisense_leswap64(unsigned long long);
+__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__, unsigned short> __intellisense_leswap16(unsigned short);
+__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__, unsigned int> __intellisense_leswap32(unsigned int);
+__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__, unsigned long> __intellisense_leswap32(unsigned long);
+__intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__, unsigned long long> __intellisense_leswap64(unsigned long long);
 unsigned short __intellisense_beswap16(unsigned short);
 unsigned int __intellisense_beswap32(unsigned int);
 unsigned long __intellisense_beswap32(unsigned long);
@@ -297,14 +297,14 @@ unsigned long long __intellisense_beswap64(unsigned long long);
 #ifdef __INTELLISENSE_GCC__
 /* ... */
 #else /* __INTELLISENSE_GCC__ */
-::__intern::____intellisense_endianint<4321,unsigned short> __builtin_bswap16(__intern::____intellisense_endianint<1234,unsigned short>);
-::__intern::____intellisense_endianint<1234,unsigned short> __builtin_bswap16(__intern::____intellisense_endianint<4321,unsigned short>);
-::__intern::____intellisense_endianint<4321,unsigned int> __builtin_bswap32(__intern::____intellisense_endianint<1234,unsigned int>);
-::__intern::____intellisense_endianint<1234,unsigned int> __builtin_bswap32(__intern::____intellisense_endianint<4321,unsigned int>);
-::__intern::____intellisense_endianint<4321,unsigned long> __builtin_bswap32(__intern::____intellisense_endianint<1234,unsigned long>);
-::__intern::____intellisense_endianint<1234,unsigned long> __builtin_bswap32(__intern::____intellisense_endianint<4321,unsigned long>);
-::__intern::____intellisense_endianint<4321,unsigned long long> __builtin_bswap64(__intern::____intellisense_endianint<1234,unsigned long long>);
-::__intern::____intellisense_endianint<1234,unsigned long long> __builtin_bswap64(__intern::____intellisense_endianint<4321,unsigned long long>);
+::__intern::____intellisense_endianint<4321, unsigned short> __builtin_bswap16(__intern::____intellisense_endianint<1234, unsigned short>);
+::__intern::____intellisense_endianint<1234, unsigned short> __builtin_bswap16(__intern::____intellisense_endianint<4321, unsigned short>);
+::__intern::____intellisense_endianint<4321, unsigned int> __builtin_bswap32(__intern::____intellisense_endianint<1234, unsigned int>);
+::__intern::____intellisense_endianint<1234, unsigned int> __builtin_bswap32(__intern::____intellisense_endianint<4321, unsigned int>);
+::__intern::____intellisense_endianint<4321, unsigned long> __builtin_bswap32(__intern::____intellisense_endianint<1234, unsigned long>);
+::__intern::____intellisense_endianint<1234, unsigned long> __builtin_bswap32(__intern::____intellisense_endianint<4321, unsigned long>);
+::__intern::____intellisense_endianint<4321, unsigned long long> __builtin_bswap64(__intern::____intellisense_endianint<1234, unsigned long long>);
+::__intern::____intellisense_endianint<1234, unsigned long long> __builtin_bswap64(__intern::____intellisense_endianint<4321, unsigned long long>);
 #endif /* !__INTELLISENSE_GCC__ */
 
 template<unsigned int uid, class T, class S> typename __intern::____INTELLISENSE_promote<S>::__type operator + (S,__intern::____intellisense_altint<uid, T>);
