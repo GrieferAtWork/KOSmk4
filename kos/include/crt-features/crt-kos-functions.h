@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf50c47d2 */
+/* HASH CRC-32:0x61ea11f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1494,7 +1494,7 @@ __CRT_FUNCTION(mrand48_r,0,(),2,(struct drand48_data *__restrict,buffer,long *__
 __CRT_FUNCTION(mremap,0,(),VA(4),(void *,addr,size_t,old_len,size_t,new_len,int,flags),void *)
 __CRT_FUNCTION(msgctl,0,(),3,(int,msqid,int,cmd,struct msqid_ds *,buf),int)
 __CRT_FUNCTION(msgget,0,(),2,(key_t,key,int,msgflg),int)
-__CRT_FUNCTION(msgrcv,0,(),5,(int,msqid,void *,msgp,size_t,msgsz,__LONGPTR_TYPE__,msgtyp,int,msgflg),ssize_t)
+__CRT_FUNCTION(msgrcv,0,(),5,(int,msqid,void *,msgp,size_t,msgsz,longptr_t,msgtyp,int,msgflg),ssize_t)
 __CRT_FUNCTION(msgsnd,0,(),4,(int,msqid,const void *,msgp,size_t,msgsz,int,msgflg),int)
 __CRT_FUNCTION(msync,0,(),3,(void *,addr,size_t,len,int,flags),int)
 __CRT_FUNCTION(mtx_init,0,(),2,(mtx_t *__restrict,mutex,int,type),int)

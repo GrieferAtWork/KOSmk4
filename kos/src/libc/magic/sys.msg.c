@@ -18,6 +18,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
+%[define_replacement(longptr_t = __LONGPTR_TYPE__)]
 %[default_impl_section(.text.crt.sched.msg)]
 
 %{
@@ -94,7 +95,7 @@ msgctl:(int msqid, int cmd, struct msqid_ds *buf) -> int;
 msgget:(key_t key, int msgflg) -> int;
 
 @@Receive message from message queue
-[cp] msgrcv:(int msqid, void *msgp, size_t msgsz, __LONGPTR_TYPE__ msgtyp, int msgflg) -> ssize_t;
+[cp] msgrcv:(int msqid, void *msgp, size_t msgsz, $longptr_t msgtyp, int msgflg) -> ssize_t;
 
 @@Send message to message queue
 [cp] msgsnd:(int msqid, const void *msgp, size_t msgsz, int msgflg) -> int;

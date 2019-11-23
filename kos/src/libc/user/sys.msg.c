@@ -57,13 +57,13 @@ NOTHROW_NCX(LIBCCALL libc_msgget)(key_t key,
 }
 /*[[[end:msgget]]]*/
 
-/*[[[head:msgrcv,hash:CRC-32=0xad686d23]]]*/
+/*[[[head:msgrcv,hash:CRC-32=0xf3780846]]]*/
 /* Receive message from message queue */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.msg.msgrcv") ssize_t
 NOTHROW_RPC(LIBCCALL libc_msgrcv)(int msqid,
                                   void *msgp,
                                   size_t msgsz,
-                                  __LONGPTR_TYPE__ msgtyp,
+                                  longptr_t msgtyp,
                                   int msgflg)
 /*[[[body:msgrcv]]]*/
 {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbedfe5bf */
+/* HASH CRC-32:0xdc957c94 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,7 +93,7 @@ INTDEF NONNULL((1)) __STRUCT_TM *NOTHROW_NCX(LIBCCALL libc_getdate)(const char *
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_getdate_r)(const char *__restrict string, __STRUCT_TM *__restrict resbufp);
 INTDEF char *libc_tzname[2];
 INTDEF int libc_daylight;
-INTDEF __LONGPTR_TYPE__ libc_timezone;
+INTDEF longptr_t libc_timezone;
 
 DECL_END
 

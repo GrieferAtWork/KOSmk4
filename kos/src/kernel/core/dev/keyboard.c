@@ -1381,9 +1381,9 @@ continue_copy_keymap:
 			goto do_KDGKBMODE_compat;
 		ATTR_FALLTHROUGH
 #endif /* __ARCH_HAVE_COMPAT */
-	case _IOR(_IOC_TYPE(KDGKBMODE), _IOC_NR(KDGKBMODE), __LONGPTR_TYPE__):
-		validate_writable(arg, sizeof(__LONGPTR_TYPE__));
-		*(__LONGPTR_TYPE__ *)arg = linux_keyboard_getmode(me);
+	case _IOR(_IOC_TYPE(KDGKBMODE), _IOC_NR(KDGKBMODE), longptr_t):
+		validate_writable(arg, sizeof(longptr_t));
+		*(longptr_t *)arg = linux_keyboard_getmode(me);
 		break;
 #ifdef __ARCH_HAVE_COMPAT
 	case _IOR(_IOC_TYPE(KDGKBMODE), _IOC_NR(KDGKBMODE), __ARCH_COMPAT_LONGPTR_TYPE):
@@ -1399,9 +1399,9 @@ do_KDGKBMODE_compat:
 			goto do_KDSKBMODE_compat;
 		ATTR_FALLTHROUGH
 #endif /* __ARCH_HAVE_COMPAT */
-	case _IOW(_IOC_TYPE(KDSKBMODE), _IOC_NR(KDSKBMODE), __LONGPTR_TYPE__):
-		validate_readable(arg, sizeof(__LONGPTR_TYPE__));
-		linux_keyboard_setmode(me, (unsigned int)(int)*(__LONGPTR_TYPE__ *)arg);
+	case _IOW(_IOC_TYPE(KDSKBMODE), _IOC_NR(KDSKBMODE), longptr_t):
+		validate_readable(arg, sizeof(longptr_t));
+		linux_keyboard_setmode(me, (unsigned int)(int)*(longptr_t *)arg);
 		break;
 #ifdef __ARCH_HAVE_COMPAT
 	case _IOR(_IOC_TYPE(KDSKBMODE), _IOC_NR(KDSKBMODE), __ARCH_COMPAT_LONGPTR_TYPE):
@@ -1417,9 +1417,9 @@ do_KDSKBMODE_compat:
 			goto do_KDGKBMETA_compat;
 		ATTR_FALLTHROUGH
 #endif /* __ARCH_HAVE_COMPAT */
-	case _IOR(_IOC_TYPE(KDGKBMETA), _IOC_NR(KDGKBMETA), __LONGPTR_TYPE__):
-		validate_writable(arg, sizeof(__LONGPTR_TYPE__));
-		*(__LONGPTR_TYPE__ *)arg = linux_keyboard_getmeta(me);
+	case _IOR(_IOC_TYPE(KDGKBMETA), _IOC_NR(KDGKBMETA), longptr_t):
+		validate_writable(arg, sizeof(longptr_t));
+		*(longptr_t *)arg = linux_keyboard_getmeta(me);
 		break;
 #ifdef __ARCH_HAVE_COMPAT
 	case _IOR(_IOC_TYPE(KDGKBMETA), _IOC_NR(KDGKBMETA), __ARCH_COMPAT_LONGPTR_TYPE):
@@ -1435,9 +1435,9 @@ do_KDGKBMETA_compat:
 			goto do_KDSKBMETA_compat;
 		ATTR_FALLTHROUGH
 #endif /* __ARCH_HAVE_COMPAT */
-	case _IOW(_IOC_TYPE(KDSKBMETA), _IOC_NR(KDSKBMETA), __LONGPTR_TYPE__):
-		validate_readable(arg, sizeof(__LONGPTR_TYPE__));
-		linux_keyboard_setmeta(me, (unsigned int)(int)*(__LONGPTR_TYPE__ *)arg);
+	case _IOW(_IOC_TYPE(KDSKBMETA), _IOC_NR(KDSKBMETA), longptr_t):
+		validate_readable(arg, sizeof(longptr_t));
+		linux_keyboard_setmeta(me, (unsigned int)(int)*(longptr_t *)arg);
 		break;
 #ifdef __ARCH_HAVE_COMPAT
 	case _IOR(_IOC_TYPE(KDSKBMETA), _IOC_NR(KDSKBMETA), __ARCH_COMPAT_LONGPTR_TYPE):

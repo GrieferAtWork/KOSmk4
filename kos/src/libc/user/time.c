@@ -33,15 +33,15 @@ DECL_BEGIN
 #undef __timezone
 #undef daylight
 #undef __daylight
-PUBLIC ATTR_SECTION(".bss.crt.time.timezone.tzname") char *tzname[2]             = { NULL, NULL };
-PUBLIC ATTR_SECTION(".bss.crt.time.timezone.timezone") __LONGPTR_TYPE__ timezone = 0;
-PUBLIC ATTR_SECTION(".bss.crt.time.timezone.daylight") int daylight              = 0;
+PUBLIC ATTR_SECTION(".bss.crt.time.timezone.tzname") char *tzname[2]      = { NULL, NULL };
+PUBLIC ATTR_SECTION(".bss.crt.time.timezone.timezone") longptr_t timezone = 0;
+PUBLIC ATTR_SECTION(".bss.crt.time.timezone.daylight") int daylight       = 0;
 DEFINE_PUBLIC_ALIAS(__tzname, tzname);
 DEFINE_PUBLIC_ALIAS(__timezone, timezone);
 DEFINE_PUBLIC_ALIAS(__daylight, daylight);
 
 DEFINE_NOREL_GLOBAL_META(char *, tzname, ".crt.time.timezone.tzname");
-DEFINE_NOREL_GLOBAL_META(__LONGPTR_TYPE__, timezone, ".crt.time.timezone.timezone");
+DEFINE_NOREL_GLOBAL_META(longptr_t, timezone, ".crt.time.timezone.timezone");
 DEFINE_NOREL_GLOBAL_META(int, daylight, ".crt.time.timezone.daylight");
 #define tzname     GET_NOREL_GLOBAL(tzname)
 #define timezone   GET_NOREL_GLOBAL(timezone)
@@ -60,7 +60,7 @@ NOTHROW_NCX(libd___daylight)(void) {
 }
 
 DEFINE_PUBLIC_ALIAS(DOS$__timezone, libd___timezone);
-INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.time.timezone.__daylight") __LONGPTR_TYPE__ *
+INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.time.timezone.__daylight") longptr_t *
 NOTHROW_NCX(libd___timezone)(void) {
 	return &timezone;
 }

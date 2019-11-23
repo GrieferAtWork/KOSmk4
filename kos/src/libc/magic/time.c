@@ -1359,7 +1359,7 @@ getdate_r:([nonnull] const char *__restrict string,
 
 %(user)INTDEF char *libc_tzname[2];
 %(user)INTDEF int libc_daylight;
-%(user)INTDEF __LONGPTR_TYPE__ libc_timezone;
+%(user)INTDEF longptr_t libc_timezone;
 
 
 %
