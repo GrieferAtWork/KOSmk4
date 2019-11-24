@@ -88,7 +88,8 @@ libcmdline_decode_argv(/*utf-8*/ char *__restrict cmdline, size_t *pargc) {
 		goto err;
 	/* Try to free unused memory. */
 	realloc_in_place(buf.aad_argv,
-	                 (buf.aad_argc + 1) * sizeof(char *));
+	                 (buf.aad_argc + 1) *
+	                 sizeof(char *));
 	/* Terminate with argument vector with NULL */
 	buf.aad_argv[buf.aad_argc] = NULL;
 	if (pargc)
@@ -159,7 +160,7 @@ parse_next_ch:
 			if (next_ch >= cmdline_end)
 				goto done_cmdline;
 			memmovedown(cmdline, next_ch,
-			            (size_t)(cmdline_end - next_ch) *
+			            (size_t)(cmdline_end - next_ch),
 			            sizeof(char));
 			cmdline_end -= (size_t)(next_ch - cmdline);
 			next_ch = cmdline;
@@ -173,7 +174,7 @@ parse_next_ch:
 			if (next_ch >= cmdline_end)
 				goto done_cmdline;
 			memmovedown(cmdline, next_ch,
-			            (size_t)(cmdline_end - next_ch) *
+			            (size_t)(cmdline_end - next_ch),
 			            sizeof(char));
 			cmdline_end -= (size_t)(next_ch - cmdline);
 			next_ch = cmdline;
@@ -186,7 +187,7 @@ parse_next_ch:
 					if (next_ch >= cmdline_end)
 						goto done_cmdline;
 					memmovedown(cmdline, next_ch,
-					            (size_t)(cmdline_end - next_ch) *
+					            (size_t)(cmdline_end - next_ch),
 					            sizeof(char));
 					cmdline_end -= (size_t)(next_ch - cmdline);
 					next_ch = cmdline;
@@ -202,7 +203,7 @@ parse_next_ch:
 					if (next_ch >= cmdline_end)
 						goto done_cmdline;
 					memmovedown(cmdline, next_ch,
-					            (size_t)(cmdline_end - next_ch) *
+					            (size_t)(cmdline_end - next_ch),
 					            sizeof(char));
 					cmdline_end -= (size_t)(next_ch - cmdline);
 					next_ch = cmdline;
@@ -293,7 +294,7 @@ cmdline_flatten_callback(void *arg,
                          size_t datalen) {
 	char *dst = *(char **)arg;
 	if (dst != data) /* Flatten arguments. */
-		memmovedown(dst, data, (datalen + 1) * sizeof(char));
+		memmovedown(dst, data, datalen + 1, sizeof(char));
 	dst += datalen + 1;
 	*(char **)arg = dst;
 	return 1;

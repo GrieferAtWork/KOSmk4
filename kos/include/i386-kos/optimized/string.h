@@ -30,7 +30,7 @@
 #endif /* !_LIBC_SLOW_STRING_H */
 #ifndef __COMPILER_HAVE_GCC_ASM
 #include <asm/intrin.h>
-#endif
+#endif /* !__COMPILER_HAVE_GCC_ASM */
 
 __SYSDECL_BEGIN
 __NAMESPACE_FAST_BEGIN
