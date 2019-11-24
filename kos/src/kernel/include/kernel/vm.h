@@ -1142,6 +1142,19 @@ NOTHROW(KCALL vm_datablock_haschanged)(struct vm_datablock *__restrict self,
                                        vm_dpage_t maxpage DFL((vm_dpage_t)-1));
 
 
+/* Construct a new datapart for the given address range.
+ * NOTES:
+ *  - The data part is _not_ inserted into the part-tree of `self',
+ *    and it is the caller's task to do so, or to ensure that the
+ *    given datablock is anonymous.
+ *  - The data part is created as `VM_DATAPART_STATE_ABSENT', or
+ *    `VM_DATAPART_STATE_VIOPRT' in the event that the data part
+ *    refers to a VIO mapping. Additionally, all data pages are
+ *    initialized as `VM_DATAPART_PPP_UNINITIALIZED'. */
+FUNDEF ATTR_RETNONNULL NONNULL((1)) REF struct vm_datapart *KCALL
+vm_datablock_createpart(struct vm_datablock *__restrict self,
+                        vm_vpage64_t pageno, size_t num_vpages)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* Lookup and return a reference the data part containing the given `pageno'
  * NOTE: When `self' is an anonymous data block (`self->db_parts == VM_DATABLOCK_ANONPARTS'),

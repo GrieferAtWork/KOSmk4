@@ -27,6 +27,7 @@
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
+#include <sched/cred.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -643,11 +644,18 @@ DEFINE_SYSCALL6(void *, mmap,
 	/* Load the requested data block. */
 	file_minpage = 0;
 	file_maxpage = (vm_vpage64_t)-1;
-	datablock = flags & MAP_ANONYMOUS
-	            ? (flags & MAP_UNINITIALIZED
-	               ? incref(&vm_datablock_anonymous) /* TODO: This must require additional permissions! */
-	               : incref(&vm_datablock_anonymous_zero))
-	            : getdatablock_from_handle(fd, &file_minpage, &file_maxpage);
+	/* Figure out which datablock should be mapped. */
+	if (!(flags & MAP_ANONYMOUS)) {
+		/* File mapping */
+		datablock = getdatablock_from_handle(fd, &file_minpage, &file_maxpage);
+	} else if (!(flags & MAP_UNINITIALIZED)) {
+		/* Zero-initialized, anonymous memory */
+		datablock = incref(&vm_datablock_anonymous_zero);
+	} else {
+		/* Uninitialized, anonymous memory */
+		cred_require_mmap_uninitialized();
+		datablock = incref(&vm_datablock_anonymous);
+	}
 	TRY {
 		size_t num_pages, guard;
 		uintptr_half_t node_flags;

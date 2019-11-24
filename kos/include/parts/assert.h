@@ -32,7 +32,13 @@
 #undef __do_cassert_wrapper
 #if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
 #if !defined(__NO_builtin_choose_expr) && \
-    !defined(__NO_builtin_constant_p) && 0 /* This one doesn't seem to work... */
+    !defined(__NO_builtin_constant_p) && 0
+/* This one doesn't seem to work... Apparently, GCC won't evaluate the
+ * expression not chosen, however it will still compile it, meaning that
+ * static_assert() with a non-constant expression will produce a compiler
+ * error. I guess I can live with that, given that `__builtin_choose_expr()'
+ * is a GCC extension, it stands to reason that GCC is allowed to decide
+ * what can and what cannot be done with it. */
 /************************************************************************
  * Compile-time assert support:                                         *
  * __builtin_choose_expr(__builtin_constant_p(...),                     *
@@ -53,7 +59,7 @@
  ************************************************************************/
 /* NOTE: The VLA assertion must be wrapped in an expression-block.
  *       Otherwise, the vla-array-size-expression will be assembled, despite
- *       being apart of a head branch. (s.a. the following but report which
+ *       being apart of a dead branch. (s.a. the following bug report which
  *       I've submitted: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92641) */
 #ifndef __NO_builtin_constant_p
 #define __do_cassert_wrapper(expr, expr_str, rassert) \

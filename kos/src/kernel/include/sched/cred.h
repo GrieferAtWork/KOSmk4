@@ -60,6 +60,7 @@ FUNDEF void KCALL cred_require_resource(void) THROWS(E_INSUFFICIENT_RIGHTS); /* 
 FUNDEF void KCALL cred_require_sysadmin(void) THROWS(E_INSUFFICIENT_RIGHTS); /* `CAP_SYS_ADMIN' */
 FUNDEF void KCALL cred_require_driveroot(void) THROWS(E_INSUFFICIENT_RIGHTS); /* Caller is allowed to change DOS drive roots */
 FUNDEF void KCALL cred_require_debugtrap(void) THROWS(E_INSUFFICIENT_RIGHTS); /* Caller is allowed to trigger arbitrary debug traps */
+FUNDEF void KCALL cred_require_mmap_uninitialized(void) THROWS(E_INSUFFICIENT_RIGHTS); /* Caller is allowed to use `MAP_UNINITIALIZED' */
 
 /* TODO: Go through all system calls already defined and add credential checks where necessary. */
 /* TODO: Add credential checks for individual sysctl() and hop() commands */

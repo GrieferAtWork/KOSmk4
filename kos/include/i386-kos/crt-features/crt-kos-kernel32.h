@@ -257,6 +257,7 @@
 #define __CRT_HAVE_cred_require_debugtrap 1
 #define __CRT_HAVE_cred_require_driveroot 1
 #define __CRT_HAVE_cred_require_hwio 1
+#define __CRT_HAVE_cred_require_mmap_uninitialized 1
 #define __CRT_HAVE_cred_require_mount 1
 #define __CRT_HAVE_cred_require_resource 1
 #define __CRT_HAVE_cred_require_sysadmin 1
@@ -1939,6 +1940,7 @@
 #define __CRT_HAVE_vm_datablock_anonymous_zero_type 1
 #define __CRT_HAVE_vm_datablock_anonymous_zero_type_vec 1
 #define __CRT_HAVE_vm_datablock_anonymous_zero_vec 1
+#define __CRT_HAVE_vm_datablock_createpart 1
 #define __CRT_HAVE_vm_datablock_debugheap 1
 #define __CRT_HAVE_vm_datablock_debugheap_type 1
 #define __CRT_HAVE_vm_datablock_destroy 1

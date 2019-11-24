@@ -70,6 +70,11 @@ cred_require_debugtrap(void) THROWS(E_INSUFFICIENT_RIGHTS) {
 	/* Caller is allowed to trigger arbitrary debug traps */
 }
 
+PUBLIC void KCALL
+cred_require_mmap_uninitialized(void) THROWS(E_INSUFFICIENT_RIGHTS) {
+	/* Caller is allowed to use `MAP_UNINITIALIZED' */
+}
+
 
 DECL_END
 

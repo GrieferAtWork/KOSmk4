@@ -5830,10 +5830,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_datapart_map_ram_p; .long vm_datapart_map_ram_p
 	.reloc ., R_386_SIZE32, vm_datapart_map_ram_p; .long 0
 	.long 0x95af5b0
-	.long 0 /* index: 1457 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1457 /* index: 1457 */
+	.weak vm_writephysw_unaligned; .long vm_writephysw_unaligned
+	.reloc ., R_386_SIZE32, vm_writephysw_unaligned; .long 0
+	.long 0xff358d4
 	.long .Lname1458 /* index: 1458 */
 	.weak __asm32_exsyscallrouter_sysenter; .long __asm32_exsyscallrouter_sysenter
 	.reloc ., R_386_SIZE32, __asm32_exsyscallrouter_sysenter; .long 0
@@ -9043,9 +9043,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, block_device_alloc; .long 0
 	.long 0xa69c8d3
 	.long .Lname2260 /* index: 2260 */
-	.weak vm_writephysl_unaligned; .long vm_writephysl_unaligned
-	.reloc ., R_386_SIZE32, vm_writephysl_unaligned; .long 0
-	.long 0xfd858d4
+	.weak vm_datablock_createpart; .long vm_datablock_createpart
+	.reloc ., R_386_SIZE32, vm_datablock_createpart; .long 0
+	.long 0xa4308d4
 	.long .Lname2261 /* index: 2261 */
 	.weak ringbuffer_writesome; .long ringbuffer_writesome
 	.reloc ., R_386_SIZE32, ringbuffer_writesome; .long 0
@@ -12626,10 +12626,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak task_waitfor_norpc; .long task_waitfor_norpc
 	.reloc ., R_386_SIZE32, task_waitfor_norpc; .long 0
 	.long 0xecd6763
-	.long 0 /* index: 3156 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3156 /* index: 3156 */
+	.weak cred_require_mmap_uninitialized; .long cred_require_mmap_uninitialized
+	.reloc ., R_386_SIZE32, cred_require_mmap_uninitialized; .long 0
+	.long 0xf8d8c54
 	.long 0 /* index: 3157 */
 	.long 0
 	.long 0
@@ -12687,9 +12687,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sys_setregid32; .long 0
 	.long 0x82b6c62
 	.long .Lname3171 /* index: 3171 */
-	.weak vm_writephysw_unaligned; .long vm_writephysw_unaligned
-	.reloc ., R_386_SIZE32, vm_writephysw_unaligned; .long 0
-	.long 0xff358d4
+	.weak vm_writephysq_unaligned; .long vm_writephysq_unaligned
+	.reloc ., R_386_SIZE32, vm_writephysq_unaligned; .long 0
+	.long 0xffd58d4
 	.long .Lname3172 /* index: 3172 */
 	.weak task_connect_ghost; .long task_connect_ghost
 	.reloc ., R_386_SIZE32, task_connect_ghost; .long 0
@@ -14047,9 +14047,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname3511 /* index: 3511 */
-	.weak vm_writephysq_unaligned; .long vm_writephysq_unaligned
-	.reloc ., R_386_SIZE32, vm_writephysq_unaligned; .long 0
-	.long 0xffd58d4
+	.weak vm_writephysl_unaligned; .long vm_writephysl_unaligned
+	.reloc ., R_386_SIZE32, vm_writephysl_unaligned; .long 0
+	.long 0xfd858d4
 	.long .Lname3512 /* index: 3512 */
 	.weak __cxa_begin_catch; .long __cxa_begin_catch
 	.reloc ., R_386_SIZE32, __cxa_begin_catch; .long 0
@@ -17996,6 +17996,8 @@ END(kernel_symbol_table)
 	.string "vm_mapat"
 .Lname1456:
 	.string "vm_datapart_map_ram_p"
+.Lname1457:
+	.string "vm_writephysw_unaligned"
 .Lname1458:
 	.string "__asm32_exsyscallrouter_sysenter"
 .Lname1459:
@@ -18825,7 +18827,7 @@ END(kernel_symbol_table)
 .Lname2259:
 	.string "block_device_alloc"
 .Lname2260:
-	.string "vm_writephysl_unaligned"
+	.string "vm_datablock_createpart"
 .Lname2261:
 	.string "ringbuffer_writesome"
 .Lname2262:
@@ -19820,6 +19822,8 @@ END(kernel_symbol_table)
 	.string "sys_mkdir"
 .Lname3155:
 	.string "task_waitfor_norpc"
+.Lname3156:
+	.string "cred_require_mmap_uninitialized"
 .Lname3159:
 	.string "inode_readk_blocking"
 .Lname3160:
@@ -19835,7 +19839,7 @@ END(kernel_symbol_table)
 .Lname3170:
 	.string "sys_setregid32"
 .Lname3171:
-	.string "vm_writephysw_unaligned"
+	.string "vm_writephysq_unaligned"
 .Lname3172:
 	.string "task_connect_ghost"
 .Lname3173:
@@ -20215,7 +20219,7 @@ END(kernel_symbol_table)
 .Lname3509:
 	.string "handle_close"
 .Lname3511:
-	.string "vm_writephysq_unaligned"
+	.string "vm_writephysl_unaligned"
 .Lname3512:
 	.string "__cxa_begin_catch"
 .Lname3513:
