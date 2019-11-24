@@ -21,20 +21,18 @@
 #undef NDEBUG /* We can't have assertions be disabled! */
 
 #include "api.h"
-#include <assert.h>
+#include <hybrid/__assert.h>
 
 #ifndef __INSIDE_LIBTEST
 #error "Only include this file from within *.ctest files that are apart of /bin/system-test"
 #endif /* __INSIDE_LIBTEST */
 
-
 #define ASSERT_COMPARE(a, cmp, b) \
-	__assertf((a) cmp (b), #a "(%Iu) " #cmp " " #b "(%Iu)", (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b))
+	__hybrid_assertf((a) cmp (b), #a "(%Iu) " #cmp " " #b "(%Iu)", (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b))
 
 #define ASSERT_EQUAL(a, b)      ASSERT_COMPARE(a, ==, b)
-#define ASSERT_STREQUAL(a, b)   __assertf(strcmp(a, b) == 0, #a "(%q) == " #b "(%q)", a, b)
+#define ASSERT_STREQUAL(a, b)   __hybrid_assertf(strcmp(a, b) == 0, #a "(%q) == " #b "(%q)", a, b)
 #define ASSERT_NOT_EQUAL(a, b)  ASSERT_COMPARE(a, !=, b)
-
 
 
 #ifdef __CC__

@@ -33,6 +33,7 @@
 #undef assertf  /* Alias for `__assertf' */
 #undef assert0f /* Alias for `__assert0f' */
 #undef assertaf /* Alias for `__assertaf' */
+#undef assert_failed
 #endif /* __USE_KOS */
 
 #if defined(__INTELLISENSE__)
@@ -46,6 +47,7 @@
 #define assertf       __NAMESPACE_INT_SYM __check_assertionf
 #define assert0f      __NAMESPACE_INT_SYM __check_assertionf
 #define assertaf      __NAMESPACE_INT_SYM __check_assertionf
+#define assert_failed(...) __assertion_failedf(__NULLPTR, __VA_ARGS__)
 #endif /* __USE_KOS */
 #else /* __INTELLISENSE__ */
 #define assert(expr)          __do_assert(expr, #expr)
@@ -58,6 +60,7 @@
 #define asserta(expr)         __do_asserta(expr, #expr)
 #define assertf(expr, ...)    __do_assertf(expr, #expr, __VA_ARGS__)
 #define assertaf(expr, ...)   __do_assertaf(expr, #expr, __VA_ARGS__)
+#define assert_failed(...)    __assertion_failedf(__NULLPTR, __VA_ARGS__)
 #endif /* __USE_KOS */
 #endif /* !__INTELLISENSE__ */
 
