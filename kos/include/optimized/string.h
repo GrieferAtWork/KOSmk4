@@ -8570,11 +8570,33 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmoveup))(/*aligned(1)*/ void *__ds
 	                                                    __SIZE_TYPE__ __elem_size) {           \
 		if (__builtin_constant_p(__elem_size)) {                                               \
 			switch (__elem_size) {                                                             \
+			case 1: return (memcpy)(__dst, __src, __elem_count);                               \
 			case 2: return (memcpyw)(__dst, __src, __elem_count);                              \
 			case 4: return (memcpyl)(__dst, __src, __elem_count);                              \
 			case 8: return (memcpyq)(__dst, __src, __elem_count);                              \
 			default: break;                                                                    \
 			}                                                                                  \
+			if (__elem_size >= 8 && (__elem_size & 7) == 0)                                    \
+				return (memcpyq)(__dst, __src, __elem_count * (__elem_size / 8));              \
+			if (__elem_size >= 4 && (__elem_size & 3) == 0)                                    \
+				return (memcpyl)(__dst, __src, __elem_count * (__elem_size / 4));              \
+			if (__elem_size >= 2 && (__elem_size & 1) == 0)                                    \
+				return (memcpyl)(__dst, __src, __elem_count * (__elem_size / 2));              \
+		}                                                                                      \
+		if (__builtin_constant_p(__elem_count)) {                                              \
+			switch (__elem_count) {                                                            \
+			case 1: return (memcpy)(__dst, __src, __elem_size);                                \
+			case 2: return (memcpyw)(__dst, __src, __elem_size);                               \
+			case 4: return (memcpyl)(__dst, __src, __elem_size);                               \
+			case 8: return (memcpyq)(__dst, __src, __elem_size);                               \
+			default: break;                                                                    \
+			}                                                                                  \
+			if (__elem_count >= 8 && (__elem_count & 7) == 0)                                  \
+				return (memcpyq)(__dst, __src, __elem_size * (__elem_count / 8));              \
+			if (__elem_count >= 4 && (__elem_count & 3) == 0)                                  \
+				return (memcpyl)(__dst, __src, __elem_size * (__elem_count / 4));              \
+			if (__elem_count >= 2 && (__elem_count & 1) == 0)                                  \
+				return (memcpyl)(__dst, __src, __elem_size * (__elem_count / 2));              \
 		}                                                                                      \
 		return (memcpy)(__dst, __src, __elem_count * __elem_size);                             \
 	}
@@ -8587,15 +8609,33 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmoveup))(/*aligned(1)*/ void *__ds
 	                                                    __SIZE_TYPE__ __elem_size) {           \
 		if (__builtin_constant_p(__elem_size)) {                                               \
 			switch (__elem_size) {                                                             \
+			case 1: return (memcpy)(__dst, __src, __elem_count);                               \
 			case 2: return (memcpyw)(__dst, __src, __elem_count);                              \
 			case 4: return (memcpyl)(__dst, __src, __elem_count);                              \
 			default: break;                                                                    \
 			}                                                                                  \
+			if (__elem_size >= 4 && (__elem_size & 3) == 0)                                    \
+				return (memcpyl)(__dst, __src, __elem_count * (__elem_size / 4));              \
+			if (__elem_size >= 2 && (__elem_size & 1) == 0)                                    \
+				return (memcpyl)(__dst, __src, __elem_count * (__elem_size / 2));              \
+		}                                                                                      \
+		if (__builtin_constant_p(__elem_count)) {                                              \
+			switch (__elem_count) {                                                            \
+			case 1: return (memcpy)(__dst, __src, __elem_size);                                \
+			case 2: return (memcpyw)(__dst, __src, __elem_size);                               \
+			case 4: return (memcpyl)(__dst, __src, __elem_size);                               \
+			default: break;                                                                    \
+			}                                                                                  \
+			if (__elem_count >= 4 && (__elem_count & 3) == 0)                                  \
+				return (memcpyl)(__dst, __src, __elem_size * (__elem_count / 4));              \
+			if (__elem_count >= 2 && (__elem_count & 1) == 0)                                  \
+				return (memcpyl)(__dst, __src, __elem_size * (__elem_count / 2));              \
 		}                                                                                      \
 		return (memcpy)(__dst, __src, __elem_count * __elem_size);                             \
 	}
 #endif /* !__UINT64_TYPE__ */
-#elif defined(__OPTIMIZE_SIZE__)
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+#if defined(__OPTIMIZE_SIZE__)
 #define __DEFINE_FAST_MEMCPYC_FUNCTION(memcpyc, memcpy, memcpyw, memcpyl, memcpyq, __restrict) \
 	__FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *                               \
 	__NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpyc))(void *__restrict __dst,                \
@@ -8613,7 +8653,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmoveup))(/*aligned(1)*/ void *__ds
 		}                                                                                      \
 		return (__libc_slow_##memcpyc)(__dst, __src, __elem_count, __elem_size);               \
 	}
-#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+#else /* __OPTIMIZE_SIZE__ */
 #define __DEFINE_FAST_MEMCPYC_FUNCTION(memcpyc, memcpy, memcpyw, memcpyl, memcpyq, __restrict) \
 	__FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *                               \
 	__NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpyc))(void *__restrict __dst,                \
@@ -8622,6 +8662,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmoveup))(/*aligned(1)*/ void *__ds
 	                                                    __SIZE_TYPE__ __elem_size) {           \
 		return (memcpy)(__dst, __src, __elem_count * __elem_size);                             \
 	}
+#endif /* !__OPTIMIZE_SIZE__ */
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 
 #ifndef __fast_memcpyc_defined
@@ -8651,7 +8692,7 @@ __DEFINE_FAST_MEMCPYC_FUNCTION(memmovec,
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovew),
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovel),
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveq),
-                               __restrict)
+                               /*__restrict*/)
 #endif /* !__fast_memmovec_defined */
 
 #ifndef __fast_mempmovec_defined
@@ -8661,7 +8702,7 @@ __DEFINE_FAST_MEMCPYC_FUNCTION(mempmovec,
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovew),
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovel),
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveq),
-                               __restrict)
+                               /*__restrict*/)
 #endif /* !__fast_mempmovec_defined */
 
 #ifndef __fast_memmoveupc_defined
@@ -8671,7 +8712,7 @@ __DEFINE_FAST_MEMCPYC_FUNCTION(memmoveupc,
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveupw),
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveupl),
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveupq),
-                               __restrict)
+                               /*__restrict*/)
 #endif /* !__fast_memmoveupc_defined */
 
 #ifndef __fast_mempmoveupc_defined
@@ -8681,7 +8722,7 @@ __DEFINE_FAST_MEMCPYC_FUNCTION(mempmoveupc,
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupw),
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupl),
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupq),
-                               __restrict)
+                               /*__restrict*/)
 #endif /* !__fast_mempmoveupc_defined */
 
 #ifndef __fast_memmovedownc_defined
@@ -8691,7 +8732,7 @@ __DEFINE_FAST_MEMCPYC_FUNCTION(memmovedownc,
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedownw),
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedownl),
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedownq),
-                               __restrict)
+                               /*__restrict*/)
 #endif /* !__fast_memmovedownc_defined */
 
 #ifndef __fast_mempmovedownc_defined
@@ -8701,7 +8742,7 @@ __DEFINE_FAST_MEMCPYC_FUNCTION(mempmovedownc,
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownw),
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownl),
                                __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownq),
-                               __restrict)
+                               /*__restrict*/)
 #endif /* !__fast_mempmovedownc_defined */
 
 #undef __DEFINE_FAST_MEMCPYC_FUNCTION
