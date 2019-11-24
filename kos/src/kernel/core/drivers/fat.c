@@ -778,9 +778,9 @@ continue_reading:
 					++index;
 					continue;
 				}
-				memmove(lfn_name, lfn_name + UNICODE_16TO8_MAXBUF(LFN_NAME),
-				        ((LFN_SEQNUM_MAXCOUNT - 1) - index) *
-				        UNICODE_16TO8_MAXBUF(LFN_NAME));
+				memmovedown(lfn_name, lfn_name + UNICODE_16TO8_MAXBUF(LFN_NAME),
+				            ((LFN_SEQNUM_MAXCOUNT - 1) - index) *
+				            UNICODE_16TO8_MAXBUF(LFN_NAME));
 				lfn_valid |= mask;
 				lfn_valid >>= 1;
 			}
@@ -2353,11 +2353,14 @@ Fat_DeleteClusterChain(FatSuperblock *__restrict self,
 PRIVATE NONNULL((1)) void KCALL
 trimspecstring(char *__restrict buf, size_t size) {
 	while (size && FAT_ISSPACE(*buf)) {
-		memmove(buf, buf + 1, --size);
+		--size;
+		memmovedown(buf, buf + 1, size);
 		buf[size] = '\0';
 	}
-	while (size && FAT_ISSPACE(buf[size - 1]))
-		buf[--size] = '\0';
+	while (size && FAT_ISSPACE(buf[size - 1])) {
+		--size;
+		buf[size] = '\0';
+	}
 }
 
 

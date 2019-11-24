@@ -261,6 +261,7 @@
 #define ATTR_PERCPU
 #define ATTR_PERVM
 #define ATTR_PERTASK
+#define FREESTR
 
 #define __CXX_NOEXCEPT
 #define __CXX_NOEXCEPT_IF(expr)
@@ -500,3 +501,12 @@
 #define DEFINE_CMDLINE_PARAM_UINTPTR_VAR(varname, parname, defl) uintptr_t varname;
 
 #define CASE(x) case x:
+
+#define ATTR_DBGTEXT
+#define ATTR_DBGRODATA
+#define ATTR_DBGDATA
+#define ATTR_DBGBSS
+#define DBGSTR
+#define DEBUG_CALL
+#define DEFINE_DEBUG_FUNCTION(name, help, argc, argv) uintptr_t _debug_main_xxx(size_t argc, char *argv[])
+

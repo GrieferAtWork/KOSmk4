@@ -163,10 +163,10 @@ NOTHROW(KCALL vm_datapart_truncate_leading)(struct vm_datapart *__restrict self,
 			if (i != 0) {
 				/* Remove leading parts. */
 				self->dp_ramdata.rd_blockc -= i;
-				memmove(&self->dp_ramdata.rd_blockv[0],
-				        &self->dp_ramdata.rd_blockv[i],
-				        self->dp_ramdata.rd_blockc *
-				        sizeof(struct vm_ramblock));
+				memmovedown(&self->dp_ramdata.rd_blockv[0],
+				            &self->dp_ramdata.rd_blockv[i],
+				            self->dp_ramdata.rd_blockc *
+				            sizeof(struct vm_ramblock));
 				/* Try to trim unused memory from the ram-block vector. */
 				krealloc_in_place_nx(self->dp_ramdata.rd_blockv,
 				                     self->dp_ramdata.rd_blockc *
@@ -205,10 +205,10 @@ NOTHROW(KCALL vm_datapart_truncate_leading)(struct vm_datapart *__restrict self,
 			if (i != 0) {
 				/* Remove leading parts. */
 				self->dp_swpdata.sd_blockc -= i;
-				memmove(&self->dp_swpdata.sd_blockv[0],
-				        &self->dp_swpdata.sd_blockv[i],
-				        self->dp_swpdata.sd_blockc *
-				        sizeof(struct vm_swpblock));
+				memmovedown(&self->dp_swpdata.sd_blockv[0],
+				            &self->dp_swpdata.sd_blockv[i],
+				            self->dp_swpdata.sd_blockc *
+				            sizeof(struct vm_swpblock));
 				/* Try to trim unused memory from the swp-block vector. */
 				krealloc_in_place_nx(self->dp_swpdata.sd_blockv,
 				                     self->dp_swpdata.sd_blockc *

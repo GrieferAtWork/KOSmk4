@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0f8511f */
+/* HASH CRC-32:0xb59b126c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #define ____localdep_rawmemrxchrw_defined 1
 #ifdef __CRT_HAVE_rawmemrxchrw
 /* Same as `rawmemrchrw', but search for non-matching locations. */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_rawmemrxchrw,(void const *__restrict __haystack, __UINT16_TYPE__ __word),rawmemrxchrw,(__haystack,__word))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_rawmemrxchrw,(/*aligned(2)*/ void const *__restrict __haystack, __UINT16_TYPE__ __word),rawmemrxchrw,(__haystack,__word))
 #else /* LIBC: rawmemrxchrw */
 #include <local/string/rawmemrxchrw.h>
 /* Same as `rawmemrchrw', but search for non-matching locations. */
@@ -35,9 +35,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__U
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `rawmemrlenw', but search for non-matching locations. */
 __LOCAL_LIBC(rawmemrxlenw) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemrxlenw))(void const *__restrict __haystack,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemrxlenw))(/*aligned(2)*/ void const *__restrict __haystack,
                                                           __UINT16_TYPE__ __word) {
-#line 2019 "kos/src/libc/magic/string.c"
+#line 2229 "kos/src/libc/magic/string.c"
 	return (__SIZE_TYPE__)(__localdep_rawmemrxchrw(__haystack, __word) - (__UINT16_TYPE__ *)__haystack);
 }
 __NAMESPACE_LOCAL_END

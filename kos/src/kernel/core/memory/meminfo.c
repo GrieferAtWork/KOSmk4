@@ -125,10 +125,10 @@ NOTHROW(KCALL minfo_split_bank)(size_t bank_index, vm_phys_t start) {
 	        bank_index, start,
 	        PMEMBANK_TYPE_START(kernel_membanks_initial[bank_index]),
 	        PMEMBANK_TYPE_MAX(kernel_membanks_initial[bank_index]));
-	memmove(&kernel_membanks_initial[bank_index + 1],
-	        &kernel_membanks_initial[bank_index],
-	        (minfo.mb_bankc - bank_index) *
-	        sizeof(struct pmembank));
+	memmoveup(&kernel_membanks_initial[bank_index + 1],
+	          &kernel_membanks_initial[bank_index],
+	          (minfo.mb_bankc - bank_index) *
+	          sizeof(struct pmembank));
 	kernel_membanks_initial[bank_index + 1].mb_start = start;
 	++minfo.mb_bankc;
 	kernel_membanks_initial[minfo.mb_bankc].mb_start = 0;
@@ -137,10 +137,10 @@ NOTHROW(KCALL minfo_split_bank)(size_t bank_index, vm_phys_t start) {
 LOCAL ATTR_FREETEXT void
 NOTHROW(KCALL minfo_delete_bank)(size_t bank_index) {
 	--minfo.mb_bankc;
-	memmove(&kernel_membanks_initial[bank_index],
-	        &kernel_membanks_initial[bank_index + 1],
-	        (minfo.mb_bankc - bank_index) *
-	        sizeof(struct pmembank));
+	memmovedown(&kernel_membanks_initial[bank_index],
+	            &kernel_membanks_initial[bank_index + 1],
+	            (minfo.mb_bankc - bank_index) *
+	            sizeof(struct pmembank));
 	kernel_membanks_initial[minfo.mb_bankc].mb_start = 0;
 }
 
@@ -395,10 +395,10 @@ again:
 		if (candy_phys_max < PMEMBANK_TYPE_MAX(kernel_membanks_initial[candy_bank])) {
 			/* Split the bank above to keep information about unused memory. */
 			++minfo.mb_bankc; /* Inc before to account for trailing sentinel bank. */
-			memmove(&kernel_membanks_initial[candy_bank + 1],
-			        &kernel_membanks_initial[candy_bank],
-			        (minfo.mb_bankc - candy_bank) *
-			        sizeof(struct pmembank));
+			memmoveup(&kernel_membanks_initial[candy_bank + 1],
+			          &kernel_membanks_initial[candy_bank],
+			          (minfo.mb_bankc - candy_bank) *
+			          sizeof(struct pmembank));
 			kernel_membanks_initial[candy_bank + 1].mb_start = candy_phys_max + 1;
 		}
 		assert(candy_phys_max == PMEMBANK_TYPE_MAX(kernel_membanks_initial[candy_bank]));
@@ -407,10 +407,10 @@ again:
 			kernel_membanks_initial[candy_bank].mb_type = PMEMBANK_TYPE_ALLOCATED;
 		} else {
 			++minfo.mb_bankc; /* Inc before to account for trailing sentinel bank. */
-			memmove(&kernel_membanks_initial[candy_bank + 1],
-			        &kernel_membanks_initial[candy_bank],
-			        (minfo.mb_bankc - candy_bank) *
-			        sizeof(struct pmembank));
+			memmoveup(&kernel_membanks_initial[candy_bank + 1],
+			          &kernel_membanks_initial[candy_bank],
+			          (minfo.mb_bankc - candy_bank) *
+			          sizeof(struct pmembank));
 			kernel_membanks_initial[candy_bank + 1].mb_start = candy_phys;
 			kernel_membanks_initial[candy_bank + 1].mb_type  = PMEMBANK_TYPE_ALLOCATED;
 		}
@@ -792,10 +792,10 @@ use_floordiv_maxpage:
 		/* Delete the bank at `minfo.mb_banks[i]',
 		 * thus merging it with its predecessor. */
 		--minfo.mb_bankc;
-		memmove(&minfo.mb_banks[i],
-		        &minfo.mb_banks[i + 1],
-		        (minfo.mb_bankc - i) *
-		        sizeof(struct pmembank));
+		memmovedown(&minfo.mb_banks[i],
+		            &minfo.mb_banks[i + 1],
+		            (minfo.mb_bankc - i) *
+		            sizeof(struct pmembank));
 	}
 }
 

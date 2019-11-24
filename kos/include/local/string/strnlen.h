@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab85be06 */
+/* HASH CRC-32:0xd133723c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,11 +23,11 @@
 #ifndef ____localdep_strnend_defined
 #define ____localdep_strnend_defined 1
 #ifdef __CRT_HAVE_strnend
-/* Same as `STR+strnlen(STR, MAX_CHARS)' */
+/* Same as `STR + strnlen(STR, MAX_CHARS)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strnend,(char const *__restrict __string, __SIZE_TYPE__ __maxlen),strnend,(__string,__maxlen))
 #else /* LIBC: strnend */
 #include <local/string/strnend.h>
-/* Same as `STR+strnlen(STR, MAX_CHARS)' */
+/* Same as `STR + strnlen(STR, MAX_CHARS)' */
 #define __localdep_strnend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnend))
 #endif /* strnend... */
 #endif /* !____localdep_strnend_defined */
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strnlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnlen))(char const *__restrict __string,
                                                      __SIZE_TYPE__ __maxlen) {
-#line 415 "kos/src/libc/magic/string.c"
+#line 438 "kos/src/libc/magic/string.c"
 	return (__SIZE_TYPE__)(__localdep_strnend(__string, __maxlen) - __string);
 }
 __NAMESPACE_LOCAL_END

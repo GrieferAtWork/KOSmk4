@@ -122,9 +122,9 @@ NOTHROW(FCALL x86_handle_dbg_pagefault)(struct icpustate *__restrict state, uint
 			if (old_pip < KERNEL_BASE)
 				goto not_a_badcall;
 			state->ics_irregs_k.ir_eip = old_pip;
-			state = (struct icpustate *)memmove((byte_t *)state + sizeof(void *), state,
-			                                    OFFSET_ICPUSTATE_IRREGS +
-			                                    SIZEOF_IRREGS_KERNEL);
+			state = (struct icpustate *)memmoveup((byte_t *)state + sizeof(void *), state,
+			                                      OFFSET_ICPUSTATE_IRREGS +
+			                                      SIZEOF_IRREGS_KERNEL);
 		}
 #endif /* !__x86_64__ */
 		PERTASK_SET(this_exception_faultaddr, (void *)old_pip);

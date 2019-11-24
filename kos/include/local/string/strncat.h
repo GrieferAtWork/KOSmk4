@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65ffde9c */
+/* HASH CRC-32:0x6756468e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,11 +42,11 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 #ifndef ____localdep_strend_defined
 #define ____localdep_strend_defined 1
 #ifdef __CRT_HAVE_strend
-/* Same as `STR+strlen(STR)' */
+/* Same as `STR + strlen(STR)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __string),strend,(__string))
 #else /* LIBC: strend */
 #include <local/string/strend.h>
-/* Same as `STR+strlen(STR)' */
+/* Same as `STR + strlen(STR)' */
 #define __localdep_strend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strend))
 #endif /* strend... */
 #endif /* !____localdep_strend_defined */
@@ -75,7 +75,7 @@ __LOCAL_LIBC(strncat) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char 
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strncat))(char *__restrict __buf,
                                                      char const *__restrict __src,
                                                      __SIZE_TYPE__ __buflen) {
-#line 320 "kos/src/libc/magic/string.c"
+#line 343 "kos/src/libc/magic/string.c"
 	__SIZE_TYPE__ __srclen = __localdep_strnlen(__src, __buflen);
 	char *__dst = __localdep_strend(__buf);
 	__localdep_memcpy(__dst, __src, __srclen * sizeof(char));

@@ -248,14 +248,14 @@ NOTHROW(FCALL GDB_DecodeEscapedBinary)(char *buf, char *endptr) {
 		num_unescaped = (size_t)((buf - 1) - flush_start);
 		ch = *buf++;
 		if (dst != flush_start)
-			memmove(dst, flush_start, num_unescaped);
+			memmovedown(dst, flush_start, num_unescaped);
 		dst += num_unescaped;
 		*dst++ = ch ^ 0x20;
 		flush_start = buf;
 		--result;
 	}
 	if (dst != flush_start)
-		memmove(dst, flush_start, (size_t)(endptr - flush_start));
+		memmovedown(dst, flush_start, (size_t)(endptr - flush_start));
 	return result;
 }
 
@@ -1144,7 +1144,7 @@ handle_set_register_error:
 			if (reqlen > reglen) {
 				/* zero-extend */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-				memmove(regbuf, regbuf + (reqlen - reglen), reglen);
+				memmoveup(regbuf, regbuf + (reqlen - reglen), reglen);
 				memset(regbuf, 0, reqlen - reglen);
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
 				memset(regbuf + reglen, 0, reqlen - reglen);
@@ -1172,7 +1172,7 @@ handle_set_register_error:
 					/* Sign-extension */
 					do {
 						--reglen;
-						memmove(regbuf, regbuf + 1, reglen);
+						memmovedown(regbuf, regbuf + 1, reglen);
 					} while (reglen > reqlen && regbuf[0] == 0xff);
 					if (!(regbuf[0] & 0x80))
 						ERROR(err_invalid_register_size); /* Wasn't sign-extended */
@@ -1180,7 +1180,7 @@ handle_set_register_error:
 					/* Zero-extension */
 					do {
 						--reglen;
-						memmove(regbuf, regbuf + 1, reglen);
+						memmovedown(regbuf, regbuf + 1, reglen);
 					} while (reglen > reqlen && regbuf[0] == 0x00);
 				} else {
 					ERROR(err_invalid_register_size);

@@ -25,6 +25,7 @@ opt.append("-Os");
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_FAULT_VIO_C
 #define GUARD_KERNEL_CORE_ARCH_I386_FAULT_VIO_C 1
 #define DISABLE_BRANCH_PROFILING 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -4505,16 +4506,16 @@ do_push_value_2_4_kernel_sp:
 	decref_unlikely(args->ma_args.va_part);
 	task_popconnections(args->ma_oldcons);
 	if (op_flags & F_OP16) {
-		memmove((byte_t *)state - 2,
-		        (byte_t *)state,
-		        OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL);
-		state = (struct icpustate *)((byte_t *)state - 2);
+		state = (struct icpustate *)memmovedown((byte_t *)state - 2,
+		                                        (byte_t *)state,
+		                                        OFFSET_ICPUSTATE_IRREGS +
+		                                        SIZEOF_IRREGS_KERNEL);
 		*(u16 *)((byte_t *)state + OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL) = (u16)value;
 	} else {
-		memmove((byte_t *)state - 4,
-		        (byte_t *)state,
-		        OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL);
-		state = (struct icpustate *)((byte_t *)state - 4);
+		state = (struct icpustate *)memmovedown((byte_t *)state - 4,
+		                                        (byte_t *)state,
+		                                        OFFSET_ICPUSTATE_IRREGS +
+		                                        SIZEOF_IRREGS_KERNEL);
 		*(u32 *)((byte_t *)state + OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL) = (u32)value;
 	}
 	return state;
@@ -4536,15 +4537,15 @@ do_pop_value_2_4_kernel_sp:
 	decref_unlikely(args->ma_args.va_part);
 	task_popconnections(args->ma_oldcons);
 	if (op_flags & F_OP16) {
-		memmove((byte_t *)state + 2,
-		        (byte_t *)state,
-		         OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL);
-		state = (struct icpustate *)((byte_t *)state + 2);
+		state = (struct icpustate *)memmoveup((byte_t *)state + 2,
+		                                      (byte_t *)state,
+		                                      OFFSET_ICPUSTATE_IRREGS +
+		                                      SIZEOF_IRREGS_KERNEL);
 	} else {
-		memmove((byte_t *)state + 4,
-		        (byte_t *)state,
-		        OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL);
-		state = (struct icpustate *)((byte_t *)state + 4);
+		state = (struct icpustate *)memmoveup((byte_t *)state + 4,
+		                                      (byte_t *)state,
+		                                      OFFSET_ICPUSTATE_IRREGS +
+		                                      SIZEOF_IRREGS_KERNEL);
 	}
 	return state;
 #endif /* !__x86_64__ */

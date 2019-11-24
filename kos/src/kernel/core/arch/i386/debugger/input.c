@@ -1242,9 +1242,9 @@ again:
 	if (dbg_getc_pending_cnt) {
 		uint8_t result = dbg_getc_pending[0];
 		--dbg_getc_pending_cnt;
-		memmove(dbg_getc_pending,
-		        dbg_getc_pending + 1,
-		        dbg_getc_pending_cnt);
+		memmovedown(dbg_getc_pending,
+		            dbg_getc_pending + 1,
+		            dbg_getc_pending_cnt);
 		return result;
 	} else {
 		uint32_t ch;
@@ -1263,9 +1263,9 @@ again:
 	if (dbg_getc_pending_cnt) {
 		uint8_t result = dbg_getc_pending[0];
 		--dbg_getc_pending_cnt;
-		memmove(dbg_getc_pending,
-		        dbg_getc_pending + 1,
-		        dbg_getc_pending_cnt);
+		memmovedown(dbg_getc_pending,
+		            dbg_getc_pending + 1,
+		            dbg_getc_pending_cnt);
 		return result;
 	} else {
 		uint32_t ch;

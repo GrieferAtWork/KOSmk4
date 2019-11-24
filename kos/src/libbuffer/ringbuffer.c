@@ -69,9 +69,9 @@ NOTHROW(CC ringbuffer_defragment)(struct ringbuffer *__restrict self) {
 		hi = self->rb_size - self->rb_rptr;
 		if (hi >= self->rb_avail) {
 			/* Simple case: Buffer data is linear -> Just memmove() it to the base. */
-			memmove(self->rb_data,
-			        self->rb_data + self->rb_rptr,
-			        self->rb_avail);
+			memmovedown(self->rb_data,
+			            self->rb_data + self->rb_rptr,
+			            self->rb_avail);
 		} else {
 			lo = self->rb_avail - hi;
 			/* Complicated case: The buffer current looks like this:
@@ -91,7 +91,9 @@ NOTHROW(CC ringbuffer_defragment)(struct ringbuffer *__restrict self) {
 				do {
 					byte_t temp;
 					temp = self->rb_data[self->rb_size - 1];
-					memmove(self->rb_data + 1, self->rb_data, self->rb_size - 1);
+					memmoveup(self->rb_data + 1,
+					          self->rb_data,
+					          self->rb_size - 1);
 					self->rb_data[0] = temp;
 				} while (--hi);
 			} else {
@@ -99,16 +101,18 @@ NOTHROW(CC ringbuffer_defragment)(struct ringbuffer *__restrict self) {
 				do {
 					byte_t temp;
 					temp = self->rb_data[0];
-					memmove(self->rb_data, self->rb_data + 1, self->rb_size - 1);
+					memmovedown(self->rb_data,
+					            self->rb_data + 1,
+					            self->rb_size - 1);
 					self->rb_data[self->rb_size - 1] = temp;
 				} while (--hi);
 				/* The buffer now looks like this:
 				 *  ?????????ABCDEFGHIJKLMN
 				 *           <hi---><lo--->
 				 */
-				memmove(self->rb_data,
-				        self->rb_data + (self->rb_size - self->rb_avail),
-				        self->rb_avail);
+				memmovedown(self->rb_data,
+				            self->rb_data + (self->rb_size - self->rb_avail),
+				            self->rb_avail);
 			}
 		}
 		self->rb_rptr  = 0;

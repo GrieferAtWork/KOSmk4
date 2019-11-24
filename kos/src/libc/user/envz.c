@@ -148,7 +148,7 @@ NOTHROW_NCX(LIBCCALL libc_envz_strip)(char **__restrict penvz,
 		/* Remove this entry. */
 		next = libc_strend(next) + 1;
 		partlen = (size_t)(end - next);
-		memmove(ptr, next, partlen * sizeof(char));
+		memmovedown(ptr, next, partlen * sizeof(char));
 		end -= partlen;
 	}
 	newlen = (size_t)(end - start);

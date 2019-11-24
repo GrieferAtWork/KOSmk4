@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8098291d */
+/* HASH CRC-32:0x4ef4f0aa */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,11 +23,11 @@
 #ifndef ____localdep_strnrchrnul_defined
 #define ____localdep_strnrchrnul_defined 1
 #ifdef __CRT_HAVE_strnrchrnul
-/* Same as `strnrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `strnrchr', but return `STR - 1', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strnrchrnul,(char const *__restrict __haystack, int __needle, __SIZE_TYPE__ __maxlen),strnrchrnul,(__haystack,__needle,__maxlen))
 #else /* LIBC: strnrchrnul */
 #include <local/string/strnrchrnul.h>
-/* Same as `strnrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `strnrchr', but return `STR - 1', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __localdep_strnrchrnul (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnrchrnul))
 #endif /* strnrchrnul... */
 #endif /* !____localdep_strnrchrnul_defined */
@@ -38,7 +38,7 @@ __LOCAL_LIBC(strnroff) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYP
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnroff))(char const *__restrict __haystack,
                                                       int __needle,
                                                       __SIZE_TYPE__ __maxlen) {
-#line 2263 "kos/src/libc/magic/string.c"
+#line 2503 "kos/src/libc/magic/string.c"
 	return (__SIZE_TYPE__)(__localdep_strnrchrnul(__haystack, __needle, __maxlen) - __haystack);
 }
 __NAMESPACE_LOCAL_END

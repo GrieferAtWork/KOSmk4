@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4006784 */
+/* HASH CRC-32:0x30c6adb1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 #define __localdep_mempmovew (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovew))
 #elif defined(__CRT_HAVE_mempmovew)
 /* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovew,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),mempmovew,(__dst,__src,__n_words))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovew,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words),mempmovew,(__dst,__src,__n_words))
 #else /* LIBC: mempmovew */
 #include <local/string/mempmovew.h>
 /* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' */
@@ -46,7 +46,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__
 #define __localdep_mempmovel (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovel))
 #elif defined(__CRT_HAVE_mempmovel)
 /* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovel,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),mempmovel,(__dst,__src,__n_dwords))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovel,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords),mempmovel,(__dst,__src,__n_dwords))
 #else /* LIBC: mempmovel */
 #include <local/string/mempmovel.h>
 /* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' */

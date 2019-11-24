@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0ed3972 */
+/* HASH CRC-32:0x9e90eb47 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 #define __localdep_memsetq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memsetq))
 #elif defined(__CRT_HAVE_memsetq)
 /* Fill memory with a given qword */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memsetq,(void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),memsetq,(__dst,__qword,__n_qwords))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memsetq,(/*aligned(8)*/ void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),memsetq,(__dst,__qword,__n_qwords))
 #else /* LIBC: memsetq */
 #include <local/string/memsetq.h>
 /* Fill memory with a given qword */
@@ -41,10 +41,10 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memsetq', but return `DST+N_QWORDS', rather than `DST' */
 __LOCAL_LIBC(mempsetq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT64_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempsetq))(void *__restrict __dst,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempsetq))(/*aligned(8)*/ void *__restrict __dst,
                                                       __UINT64_TYPE__ __qword,
                                                       __SIZE_TYPE__ __n_qwords) {
-#line 1501 "kos/src/libc/magic/string.c"
+#line 1711 "kos/src/libc/magic/string.c"
 	return (__UINT64_TYPE__ *)__localdep_memsetq(__dst, __qword, __n_qwords) + __n_qwords;
 }
 __NAMESPACE_LOCAL_END

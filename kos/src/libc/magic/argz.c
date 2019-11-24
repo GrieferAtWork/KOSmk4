@@ -365,9 +365,9 @@ argz_delete:([nonnull] char **__restrict pargz,
 		*pargz = NULL;
 		return;
 	}
-	memmove(entry, entry + entrylen,
-	        (newlen - (size_t)(entry - *pargz)) *
-	        sizeof(char));
+	memmovedown(entry, entry + entrylen,
+	            (newlen - (size_t)(entry - *pargz)) *
+	            sizeof(char));
 }
 
 [alias(*)][attribute(*)] __argz_delete:(*) = argz_delete;
@@ -426,9 +426,9 @@ argz_insert:([nonnull] char **__restrict pargz, [nonnull] size_t *__restrict par
 	*pargz     = argz;
 	*pargz_len = argz_len;
 	/* Make space for the new entry. */
-	memmove(argz + insert_offset + entry_len,
-	        argz + insert_offset,
-	        (argz_len - (insert_offset + entry_len)) * sizeof(char));
+	memmoveup(argz + insert_offset + entry_len,
+	          argz + insert_offset,
+	          (argz_len - (insert_offset + entry_len)) * sizeof(char));
 	/* Insert the new entry. */
 	memcpy(argz + insert_offset,
 	       entry,
@@ -488,7 +488,7 @@ argz_replace:([nonnull] char **__restrict pargz,
 			*pargz_len -= diff;
 			old_argz = *pargz;
 			trailing_characters = *pargz_len - (size_t)(pos - old_argz);
-			memmove(pos, pos + diff, trailing_characters * sizeof(char));
+			memmovedown(pos, pos + diff, trailing_characters * sizeof(char));
 			new_argz = (char *)realloc(old_argz, *pargz_len * sizeof(char));
 			if likely(new_argz) {
 				pos    = new_argz + (pos - old_argz);
@@ -514,9 +514,9 @@ argz_replace:([nonnull] char **__restrict pargz,
 			pos = new_argz + (pos - old_argz);
 			/* Make space for extra data */
 			trailing_characters = new_argzlen - ((pos + repllen) - new_argz);
-			memmove(pos + repllen,
-			        pos + findlen,
-			        trailing_characters * sizeof(char));
+			memmoveup(pos + repllen,
+			          pos + findlen,
+			          trailing_characters * sizeof(char));
 			/* Fill in the replacement string. */
 			pos = (char *)mempcpy(pos, with, repllen * sizeof(char));
 		} else {

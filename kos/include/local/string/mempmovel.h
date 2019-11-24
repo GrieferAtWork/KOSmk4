@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ea6ca8f */
+/* HASH CRC-32:0x46a34ab7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,10 +30,10 @@
 #define __localdep_memmovel (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovel))
 #elif defined(__CRT_HAVE_memmovel)
 /* Move memory between potentially overlapping memory blocks. */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmovel,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),memmovel,(__dst,__src,__n_dwords))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmovel,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords),memmovel,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_wmemmove) && (__SIZEOF_WCHAR_T__ == 4)
 /* Move memory between potentially overlapping memory blocks. */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmovel,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),wmemmove,(__dst,__src,__n_dwords))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmovel,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords),wmemmove,(__dst,__src,__n_dwords))
 #else /* LIBC: memmovel */
 #include <local/string/memmovel.h>
 /* Move memory between potentially overlapping memory blocks. */
@@ -44,10 +44,10 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' */
 __LOCAL_LIBC(mempmovel) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmovel))(void *__restrict __dst,
-                                                       void const *__restrict __src,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmovel))(/*aligned(4)*/ void *__dst,
+                                                       /*aligned(4)*/ void const *__src,
                                                        __SIZE_TYPE__ __n_dwords) {
-#line 1048 "kos/src/libc/magic/string.c"
+#line 1066 "kos/src/libc/magic/string.c"
 	return (__UINT32_TYPE__ *)__localdep_memmovel(__dst, __src, __n_dwords) + __n_dwords;
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc75f39a6 */
+/* HASH CRC-32:0x63814ecc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,33 +39,33 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),cha
 #ifndef ____localdep_strend_defined
 #define ____localdep_strend_defined 1
 #ifdef __CRT_HAVE_strend
-/* Same as `STR+strlen(STR)' */
+/* Same as `STR + strlen(STR)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __string),strend,(__string))
 #else /* LIBC: strend */
 #include <local/string/strend.h>
-/* Same as `STR+strlen(STR)' */
+/* Same as `STR + strlen(STR)' */
 #define __localdep_strend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strend))
 #endif /* strend... */
 #endif /* !____localdep_strend_defined */
 
-/* Dependency: "memmove" from "string" */
-#ifndef ____localdep_memmove_defined
-#define ____localdep_memmove_defined 1
-#ifdef __fast_memmove_defined
-/* Move memory between potentially overlapping memory blocks.
+/* Dependency: "memmovedown" from "string" */
+#ifndef ____localdep_memmovedown_defined
+#define ____localdep_memmovedown_defined 1
+#ifdef __fast_memmovedown_defined
+/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
-#define __localdep_memmove (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmove))
-#elif defined(__CRT_HAVE_memmove)
-/* Move memory between potentially overlapping memory blocks.
+#define __localdep_memmovedown (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedown))
+#elif defined(__CRT_HAVE_memmovedown)
+/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmove,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmove,(__dst,__src,__n_bytes))
-#else /* LIBC: memmove */
-#include <local/string/memmove.h>
-/* Move memory between potentially overlapping memory blocks.
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmovedown,(__dst,__src,__n_bytes))
+#else /* LIBC: memmovedown */
+#include <local/string/memmovedown.h>
+/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
-#define __localdep_memmove (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmove))
-#endif /* memmove... */
-#endif /* !____localdep_memmove_defined */
+#define __localdep_memmovedown (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedown))
+#endif /* memmovedown... */
+#endif /* !____localdep_memmovedown_defined */
 
 /* Dependency: "realloc" */
 #ifndef ____localdep_realloc_defined
@@ -102,7 +102,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_strip))(char **__restrict __penv
 		/* Remove this entry. */
 		__next = __localdep_strend(__next) + 1;
 		__partlen = (__SIZE_TYPE__)(__end - __next);
-		__localdep_memmove(__ptr, __next, __partlen * sizeof(char));
+		__localdep_memmovedown(__ptr, __next, __partlen * sizeof(char));
 		__end -= __partlen;
 	}
 	__newlen = (__SIZE_TYPE__)(__end - __start);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa89010c */
+/* HASH CRC-32:0xe68c15c7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,19 +22,19 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks. */
 __LOCAL_LIBC(memmovel) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmovel))(void *__dst,
-                                                      void const *__src,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmovel))(/*aligned(4)*/ void *__dst,
+                                                      /*aligned(4)*/ void const *__src,
                                                       __SIZE_TYPE__ __n_dwords) {
-#line 1028 "kos/src/libc/magic/string.c"
+#line 1046 "kos/src/libc/magic/string.c"
 	__UINT32_TYPE__ *__pdst, *__psrc;
-	if (__dst < __src) {
-		__psrc = (__UINT32_TYPE__ *)__src;
+	if (__dst <= __src) {
 		__pdst = (__UINT32_TYPE__ *)__dst;
+		__psrc = (__UINT32_TYPE__ *)__src;
 		while (__n_dwords--)
 			*__pdst++ = *__psrc++;
 	} else {
-		__psrc = (__UINT32_TYPE__ *)__src + __n_dwords;
 		__pdst = (__UINT32_TYPE__ *)__dst + __n_dwords;
+		__psrc = (__UINT32_TYPE__ *)__src + __n_dwords;
 		while (__n_dwords--)
 			*--__pdst = *--__psrc;
 	}

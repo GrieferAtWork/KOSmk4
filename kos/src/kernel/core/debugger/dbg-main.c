@@ -255,10 +255,10 @@ split_cmdline(char *__restrict cmdline,
 		/* Escaped characters. */
 		if (ch == '\\') {
 			--cmdline_len;
-			memmove(&cmdline[i],
-			        &cmdline[i + 1],
-			        (cmdline_len - i) *
-			        sizeof(char));
+			memmovedown(&cmdline[i],
+			            &cmdline[i + 1],
+			            (cmdline_len - i) *
+			            sizeof(char));
 			++i;
 			if (i >= cmdline_len)
 				break;
@@ -268,18 +268,18 @@ split_cmdline(char *__restrict cmdline,
 		if (ch == '\'' || ch == '\"') {
 			char end_ch = ch;
 			--cmdline_len;
-			memmove(&cmdline[i],
-			        &cmdline[i + 1],
-			        (cmdline_len - i) *
-			        sizeof(char));
+			memmovedown(&cmdline[i],
+			            &cmdline[i + 1],
+			            (cmdline_len - i) *
+			            sizeof(char));
 			while (i < cmdline_len) {
 				ch = cmdline[i];
 				if (ch == '\\') {
 					--cmdline_len;
-					memmove(&cmdline[i],
-					        &cmdline[i + 1],
-					        (cmdline_len - i) *
-					        sizeof(char));
+					memmovedown(&cmdline[i],
+					            &cmdline[i + 1],
+					            (cmdline_len - i) *
+					            sizeof(char));
 					++i;
 					if (i >= cmdline_len)
 						break;
@@ -287,10 +287,10 @@ split_cmdline(char *__restrict cmdline,
 				}
 				if (ch == end_ch) {
 					--cmdline_len;
-					memmove(&cmdline[i],
-					        &cmdline[i + 1],
-					        (cmdline_len - i) *
-					        sizeof(char));
+					memmovedown(&cmdline[i],
+					            &cmdline[i + 1],
+					            (cmdline_len - i) *
+					            sizeof(char));
 					break;
 				}
 				++i;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc619ea9 */
+/* HASH CRC-32:0xad621c47 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 #define __localdep_mempsetl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetl))
 #elif defined(__CRT_HAVE_mempsetl)
 /* Same as `memsetl', but return `DST+N_DWORDS', rather than `DST' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),mempsetl,(__dst,__dword,__n_dwords))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetl,(/*aligned(4)*/ void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),mempsetl,(__dst,__dword,__n_dwords))
 #else /* LIBC: mempsetl */
 #include <local/string/mempsetl.h>
 /* Same as `memsetl', but return `DST+N_DWORDS', rather than `DST' */
@@ -45,7 +45,7 @@ __LOCAL_LIBC(mempatl) __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempatl))(void *__restrict __dst,
                                                      __UINT32_TYPE__ __pattern,
                                                      __SIZE_TYPE__ __n_bytes) {
-#line 2435 "kos/src/libc/magic/string.c"
+#line 2687 "kos/src/libc/magic/string.c"
 	__BYTE_TYPE__ *__iter = (__BYTE_TYPE__ *)__dst;
 	for (; __n_bytes && (__UINTPTR_TYPE__)__iter & 3; ++__iter, --__n_bytes)
 		*__iter = __INT32_BYTE(__pattern, (__UINTPTR_TYPE__)__iter & 3);

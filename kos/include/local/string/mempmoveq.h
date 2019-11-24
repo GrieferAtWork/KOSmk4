@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f090a4d */
+/* HASH CRC-32:0x9809897c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 #define __localdep_memmoveq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveq))
 #elif defined(__CRT_HAVE_memmoveq)
 /* Move memory between potentially overlapping memory blocks. */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveq,(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords),memmoveq,(__dst,__src,__n_qwords))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveq,(/*aligned(8)*/ void *__dst, /*aligned(8)*/ void const *__src, __SIZE_TYPE__ __n_qwords),memmoveq,(__dst,__src,__n_qwords))
 #else /* LIBC: memmoveq */
 #include <local/string/memmoveq.h>
 /* Move memory between potentially overlapping memory blocks. */
@@ -41,10 +41,10 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' */
 __LOCAL_LIBC(mempmoveq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmoveq))(void *__restrict __dst,
-                                                       void const *__restrict __src,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmoveq))(/*aligned(8)*/ void *__restrict __dst,
+                                                       /*aligned(8)*/ void const *__restrict __src,
                                                        __SIZE_TYPE__ __n_qwords) {
-#line 1484 "kos/src/libc/magic/string.c"
+#line 1621 "kos/src/libc/magic/string.c"
 	return (__UINT64_TYPE__ *)__localdep_memmoveq(__dst, __src, __n_qwords) + __n_qwords;
 }
 __NAMESPACE_LOCAL_END

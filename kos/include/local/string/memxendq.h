@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97d750f3 */
+/* HASH CRC-32:0x4176b7cf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,10 +22,10 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memendq', but search for non-matching locations. */
 __LOCAL_LIBC(memxendq) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memxendq))(void const *__restrict __haystack,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memxendq))(/*aligned(8)*/ void const *__restrict __haystack,
                                                       __UINT64_TYPE__ __qword,
                                                       __SIZE_TYPE__ __n_bytes) {
-#line 2094 "kos/src/libc/magic/string.c"
+#line 2304 "kos/src/libc/magic/string.c"
 	__UINT64_TYPE__ *__result = (__UINT64_TYPE__ *)__haystack;
 	for (; __n_bytes--; ++__result) {
 		if __unlikely(*__result != __qword)

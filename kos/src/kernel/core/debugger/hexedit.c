@@ -24,6 +24,7 @@ if (gcc_opt.remove("-O3"))
 #ifndef GUARD_KERNEL_SRC_DEBUGGER_HEXEDIT_C
 #define GUARD_KERNEL_SRC_DEBUGGER_HEXEDIT_C 1
 #define DISABLE_BRANCH_PROFILING 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -174,8 +175,8 @@ NOTHROW(FCALL hd_changes_append)(byte_t *addr, byte_t value) {
 				/* Must shift future changes before we can append to this one. */
 				if (&last_change->hc_data[sizeof(void *)] > COMPILER_ENDOF(hd_change_buffer))
 					return false;
-				memmove((byte_t *)next + sizeof(void *), next,
-				        (size_t)((byte_t *)last_change - (byte_t *)next));
+				memmoveup((byte_t *)next + sizeof(void *), next,
+				          (size_t)((byte_t *)last_change - (byte_t *)next));
 			}
 			iter->hc_data[iter->hc_length++] = value;
 			return true;

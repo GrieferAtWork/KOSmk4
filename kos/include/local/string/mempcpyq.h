@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37ae29eb */
+/* HASH CRC-32:0xb1f8cf78 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 #define __localdep_memcpyq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyq))
 #elif defined(__CRT_HAVE_memcpyq)
 /* Copy memory between non-overlapping memory blocks. */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),memcpyq,(__dst,__src,__n_qwords))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyq,(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords),memcpyq,(__dst,__src,__n_qwords))
 #else /* LIBC: memcpyq */
 #include <local/string/memcpyq.h>
 /* Copy memory between non-overlapping memory blocks. */
@@ -41,10 +41,10 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memcpyq', but return `DST+N_QWORDS', rather than `DST' */
 __LOCAL_LIBC(mempcpyq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempcpyq))(void *__restrict __dst,
-                                                      void const *__restrict __src,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempcpyq))(/*aligned(8)*/ void *__restrict __dst,
+                                                      /*aligned(8)*/ void const *__restrict __src,
                                                       __SIZE_TYPE__ __n_qwords) {
-#line 1437 "kos/src/libc/magic/string.c"
+#line 1574 "kos/src/libc/magic/string.c"
 	return (__UINT64_TYPE__ *)__localdep_memcpyq(__dst, __src, __n_qwords) + __n_qwords;
 }
 __NAMESPACE_LOCAL_END

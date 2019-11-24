@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x318d0f86 */
+/* HASH CRC-32:0x6bdfffd6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #define ____localdep_memrxendl_defined 1
 #ifdef __CRT_HAVE_memrxendl
 /* Same as `memrendl', but search for non-matching locations. */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memrxendl,(void const *__restrict __haystack, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),memrxendl,(__haystack,__dword,__n_dwords))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memrxendl,(/*aligned(4)*/ void const *__restrict __haystack, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),memrxendl,(__haystack,__dword,__n_dwords))
 #else /* LIBC: memrxendl */
 #include <local/string/memrxendl.h>
 /* Same as `memrendl', but search for non-matching locations. */
@@ -35,10 +35,10 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__U
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memrlenl', but search for non-matching locations. */
 __LOCAL_LIBC(memrxlenl) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrxlenl))(void const *__restrict __haystack,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrxlenl))(/*aligned(4)*/ void const *__restrict __haystack,
                                                        __UINT32_TYPE__ __dword,
                                                        __SIZE_TYPE__ __n_dwords) {
-#line 1990 "kos/src/libc/magic/string.c"
+#line 2200 "kos/src/libc/magic/string.c"
 	return (__SIZE_TYPE__)(__localdep_memrxendl(__haystack, __dword, __n_dwords) - (__UINT32_TYPE__ *)__haystack);
 }
 __NAMESPACE_LOCAL_END

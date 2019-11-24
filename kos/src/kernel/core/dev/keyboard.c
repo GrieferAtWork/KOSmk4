@@ -699,8 +699,8 @@ again:
 	sync_write(&self->kd_map_lock);
 	if (self->kd_map_pend[0] != 0) {
 		result = (int)(unsigned int)(unsigned char)self->kd_map_pend[0];
-		memmove(self->kd_map_pend, self->kd_map_pend + 1,
-		        (COMPILER_LENOF(self->kd_map_pend) - 1) * sizeof(char));
+		memmovedown(self->kd_map_pend, self->kd_map_pend + 1,
+		            (COMPILER_LENOF(self->kd_map_pend) - 1) * sizeof(char));
 		self->kd_map_pend[COMPILER_LENOF(self->kd_map_pend) - 1] = 0;
 		sync_endwrite(&self->kd_map_lock);
 	} else {
@@ -730,8 +730,8 @@ again_getkey:
 			if (len == 1)
 				self->kd_map_pend[0] = 0;
 			else {
-				memmove(self->kd_map_pend, self->kd_map_pend + 1,
-				        (len - 1) * sizeof(char));
+				memmovedown(self->kd_map_pend, self->kd_map_pend + 1,
+				            (len - 1) * sizeof(char));
 				self->kd_map_pend[len - 1] = 0;
 			}
 		}

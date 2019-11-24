@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb95a6b8 */
+/* HASH CRC-32:0x2899bf66 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,115 +67,145 @@ INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) void *NOTHROW_NCX(LIBCCALL
 /* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_mempcpy)(void *__restrict dst, void const *__restrict src, size_t n_bytes);
 /* Copy memory between non-overlapping memory blocks. */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memcpyw)(void *__restrict dst, void const *__restrict src, size_t n_words);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memcpyw)(/*aligned(2)*/ void *__restrict dst, /*aligned(2)*/ void const *__restrict src, size_t n_words);
 /* Same as `memcpyw', but return `DST+N_WORDS', rather than `DST' */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_mempcpyw)(void *__restrict dst, void const *__restrict src, size_t n_words);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_mempcpyw)(/*aligned(2)*/ void *__restrict dst, /*aligned(2)*/ void const *__restrict src, size_t n_words);
 /* Copy memory between non-overlapping memory blocks. */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memcpyl)(void *__restrict dst, void const *__restrict src, size_t n_dwords);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memcpyl)(/*aligned(4)*/ void *__restrict dst, /*aligned(4)*/ void const *__restrict src, size_t n_dwords);
 /* Same as `memcpyl', but return `DST+N_DWORDS', rather than `DST' */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *NOTHROW_NCX(LIBCCALL libc_mempcpyl)(void *__restrict dst, void const *__restrict src, size_t n_dwords);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *NOTHROW_NCX(LIBCCALL libc_mempcpyl)(/*aligned(4)*/ void *__restrict dst, /*aligned(4)*/ void const *__restrict src, size_t n_dwords);
 /* Move memory between potentially overlapping memory blocks. */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memmovew)(void *dst, void const *src, size_t n_words);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memmovew)(/*aligned(2)*/ void *dst, /*aligned(2)*/ void const *src, size_t n_words);
 /* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_mempmovew)(void *__restrict dst, void const *__restrict src, size_t n_words);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_mempmovew)(/*aligned(2)*/ void *dst, /*aligned(2)*/ void const *src, size_t n_words);
 /* Move memory between potentially overlapping memory blocks. */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memmovel)(void *dst, void const *src, size_t n_dwords);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memmovel)(/*aligned(4)*/ void *dst, /*aligned(4)*/ void const *src, size_t n_dwords);
 /* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *NOTHROW_NCX(LIBCCALL libc_mempmovel)(void *__restrict dst, void const *__restrict src, size_t n_dwords);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *NOTHROW_NCX(LIBCCALL libc_mempmovel)(/*aligned(4)*/ void *dst, /*aligned(4)*/ void const *src, size_t n_dwords);
+/* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_mempmoveupw)(/*aligned(2)*/ void *dst, /*aligned(2)*/ void const *src, size_t n_words);
+/* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS') */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_mempmovedownw)(/*aligned(2)*/ void *dst, /*aligned(2)*/ void const *src, size_t n_words);
+/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS') */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memmoveupl)(/*aligned(4)*/ void *dst, /*aligned(4)*/ void const *src, size_t n_dwords);
+/* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_DWORDS') */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memmovedownl)(/*aligned(4)*/ void *dst, /*aligned(4)*/ void const *src, size_t n_dwords);
+/* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *NOTHROW_NCX(LIBCCALL libc_mempmoveupl)(/*aligned(4)*/ void *dst, /*aligned(4)*/ void const *src, size_t n_dwords);
+/* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS') */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *NOTHROW_NCX(LIBCCALL libc_mempmovedownl)(/*aligned(4)*/ void *dst, /*aligned(4)*/ void const *src, size_t n_dwords);
 /* Fill memory with a given word */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memsetw)(void *__restrict dst, uint16_t word, size_t n_words);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memsetw)(/*aligned(2)*/ void *__restrict dst, uint16_t word, size_t n_words);
 /* Same as `memsetw', but return `DST+N_WORDS', rather than `DST' */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_mempsetw)(void *__restrict dst, uint16_t word, size_t n_words);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_mempsetw)(/*aligned(2)*/ void *__restrict dst, uint16_t word, size_t n_words);
 /* Fill memory with a given dword */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memsetl)(void *__restrict dst, uint32_t dword, size_t n_dwords);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memsetl)(/*aligned(4)*/ void *__restrict dst, uint32_t dword, size_t n_dwords);
 /* Same as `memsetl', but return `DST+N_DWORDS', rather than `DST' */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_mempsetl)(void *__restrict dst, uint32_t dword, size_t n_dwords);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_mempsetl)(/*aligned(4)*/ void *__restrict dst, uint32_t dword, size_t n_dwords);
 /* Compare memory buffers and return the difference of the first non-matching word */
-INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int16_t NOTHROW_NCX(LIBCCALL libc_memcmpw)(void const *s1, void const *s2, size_t n_words);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int16_t NOTHROW_NCX(LIBCCALL libc_memcmpw)(/*aligned(2)*/ void const *s1, /*aligned(2)*/ void const *s2, size_t n_words);
 /* Compare memory buffers and return the difference of the first non-matching dword */
-INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int32_t NOTHROW_NCX(LIBCCALL libc_memcmpl)(void const *s1, void const *s2, size_t n_dwords);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int32_t NOTHROW_NCX(LIBCCALL libc_memcmpl)(/*aligned(4)*/ void const *s1, /*aligned(4)*/ void const *s2, size_t n_dwords);
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memchrw)(void const *__restrict haystack, uint16_t word, size_t n_words);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memchrw)(/*aligned(2)*/ void const *__restrict haystack, uint16_t word, size_t n_words);
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memchrl)(void const *__restrict haystack, uint32_t dword, size_t n_dwords);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memchrl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword, size_t n_dwords);
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_WORDS'. - Return `NULL' if `NEEDLE' wasn't found. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memrchrw)(void const *__restrict haystack, uint16_t word, size_t n_words);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memrchrw)(/*aligned(2)*/ void const *__restrict haystack, uint16_t word, size_t n_words);
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_DWORDS'. - Return `NULL' if `NEEDLE' wasn't found. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memrchrl)(void const *__restrict haystack, uint32_t dword, size_t n_dwords);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memrchrl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword, size_t n_dwords);
 /* Same as `memchrw' with a search limit of `(size_t)-1 / 2' */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_rawmemchrw)(void const *__restrict haystack, uint16_t word);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_rawmemchrw)(/*aligned(2)*/ void const *__restrict haystack, uint16_t word);
 /* Same as `memchrl' with a search limit of `(size_t)-1 / 4' */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_rawmemchrl)(void const *__restrict haystack, uint32_t dword);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_rawmemchrl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword);
 /* Same as `memrchrw' without a search limit, starting at `(byte_t *)HAYSTACK-2' */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_rawmemrchrw)(void const *__restrict haystack, uint16_t word);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_rawmemrchrw)(/*aligned(2)*/ void const *__restrict haystack, uint16_t word);
 /* Same as `memrchrl' without a search limit, starting at `(byte_t *)HAYSTACK-4' */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_rawmemrchrl)(void const *__restrict haystack, uint32_t dword);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_rawmemrchrl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword);
 /* Same as `memchrw', but return `HAYSTACK+N_WORDS', rather than `NULL' if `NEEDLE' wasn't found. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memendw)(void const *__restrict haystack, uint16_t word, size_t n_bytes);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memendw)(/*aligned(2)*/ void const *__restrict haystack, uint16_t word, size_t n_bytes);
 /* Same as `memchrl', but return `HAYSTACK+N_DWORDS', rather than `NULL' if `NEEDLE' wasn't found. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memendl)(void const *__restrict haystack, uint32_t dword, size_t n_bytes);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memendl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword, size_t n_bytes);
 /* Same as `memrchrw', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memrendw)(void const *__restrict haystack, uint16_t word, size_t n_words);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memrendw)(/*aligned(2)*/ void const *__restrict haystack, uint16_t word, size_t n_words);
 /* Same as `memrchrl', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memrendl)(void const *__restrict haystack, uint32_t dword, size_t n_dwords);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memrendl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword, size_t n_dwords);
 /* Same as `memendw', but return the offset from `HAYSTACK', rather than the actual address. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memlenw)(void const *__restrict haystack, uint16_t word, size_t n_words);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memlenw)(/*aligned(2)*/ void const *__restrict haystack, uint16_t word, size_t n_words);
 /* Same as `memendl', but return the offset from `HAYSTACK', rather than the actual address. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memlenl)(void const *__restrict haystack, uint32_t dword, size_t n_dwords);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memlenl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword, size_t n_dwords);
 /* Same as `memrendw', but return the offset from `HAYSTACK', rather than the actual address. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memrlenw)(void const *__restrict haystack, uint16_t word, size_t n_words);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memrlenw)(/*aligned(2)*/ void const *__restrict haystack, uint16_t word, size_t n_words);
 /* Same as `memrendl', but return the offset from `HAYSTACK', rather than the actual address. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memrlenl)(void const *__restrict haystack, uint32_t dword, size_t n_dwords);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memrlenl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword, size_t n_dwords);
 /* Same as `rawmemchrw', but return the offset from `HAYSTACK', rather than the actual address. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemlenw)(void const *__restrict haystack, uint16_t word);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemlenw)(/*aligned(2)*/ void const *__restrict haystack, uint16_t word);
 /* Same as `rawmemchrl', but return the offset from `HAYSTACK', rather than the actual address. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemlenl)(void const *__restrict haystack, uint32_t dword);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemlenl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword);
 /* Same as `rawmemrchrw', but return the offset from `HAYSTACK', rather than the actual address. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemrlenw)(void const *__restrict haystack, uint16_t word);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemrlenw)(/*aligned(2)*/ void const *__restrict haystack, uint16_t word);
 /* Same as `rawmemrchrl', but return the offset from `HAYSTACK', rather than the actual address. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemrlenl)(void const *__restrict haystack, uint32_t dword);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemrlenl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword);
 /* Copy memory between non-overlapping memory blocks. */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memcpyq)(void *__restrict dst, void const *__restrict src, size_t n_qwords);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memcpyq)(/*aligned(8)*/ void *__restrict dst, /*aligned(8)*/ void const *__restrict src, size_t n_qwords);
 /* Same as `memcpyq', but return `DST+N_QWORDS', rather than `DST' */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *NOTHROW_NCX(LIBCCALL libc_mempcpyq)(void *__restrict dst, void const *__restrict src, size_t n_qwords);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *NOTHROW_NCX(LIBCCALL libc_mempcpyq)(/*aligned(8)*/ void *__restrict dst, /*aligned(8)*/ void const *__restrict src, size_t n_qwords);
 /* Move memory between potentially overlapping memory blocks. */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memmoveq)(void *dst, void const *src, size_t n_qwords);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memmoveq)(/*aligned(8)*/ void *dst, /*aligned(8)*/ void const *src, size_t n_qwords);
 /* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *NOTHROW_NCX(LIBCCALL libc_mempmoveq)(void *__restrict dst, void const *__restrict src, size_t n_qwords);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *NOTHROW_NCX(LIBCCALL libc_mempmoveq)(/*aligned(8)*/ void *__restrict dst, /*aligned(8)*/ void const *__restrict src, size_t n_qwords);
+/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS') */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memmoveupq)(/*aligned(8)*/ void *dst, /*aligned(8)*/ void const *src, size_t n_qwords);
+/* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS') */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memmovedownq)(/*aligned(8)*/ void *dst, /*aligned(8)*/ void const *src, size_t n_qwords);
+/* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *NOTHROW_NCX(LIBCCALL libc_mempmoveupq)(/*aligned(8)*/ void *__restrict dst, /*aligned(8)*/ void const *__restrict src, size_t n_qwords);
+/* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS') */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *NOTHROW_NCX(LIBCCALL libc_mempmovedownq)(/*aligned(8)*/ void *__restrict dst, /*aligned(8)*/ void const *__restrict src, size_t n_qwords);
 /* Fill memory with a given qword */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memsetq)(void *__restrict dst, uint64_t qword, size_t n_qwords);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memsetq)(/*aligned(8)*/ void *__restrict dst, uint64_t qword, size_t n_qwords);
 /* Same as `memsetq', but return `DST+N_QWORDS', rather than `DST' */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_mempsetq)(void *__restrict dst, uint64_t qword, size_t n_qwords);
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_mempsetq)(/*aligned(8)*/ void *__restrict dst, uint64_t qword, size_t n_qwords);
 /* Compare memory buffers and return the difference of the first non-matching qword */
-INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int64_t NOTHROW_NCX(LIBCCALL libc_memcmpq)(void const *s1, void const *s2, size_t n_dwords);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int64_t NOTHROW_NCX(LIBCCALL libc_memcmpq)(/*aligned(8)*/ void const *s1, /*aligned(8)*/ void const *s2, size_t n_dwords);
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memchrq)(void const *__restrict haystack, uint64_t qword, size_t n_qwords);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memchrq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword, size_t n_qwords);
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_QWORDS'. - Return `NULL' if `NEEDLE' wasn't found. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memrchrq)(void const *__restrict haystack, uint64_t qword, size_t n_qwords);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memrchrq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword, size_t n_qwords);
 /* Same as `memchrq' with a search limit of `(size_t)-1 / 8' */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_rawmemchrq)(void const *__restrict haystack, uint64_t qword);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_rawmemchrq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword);
 /* Same as `memrchrq' without a search limit, starting at `(byte_t *)HAYSTACK-8' */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_rawmemrchrq)(void const *__restrict haystack, uint64_t qword);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_rawmemrchrq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword);
 /* Same as `memchrq', but return `HAYSTACK+N_QWORDS', rather than `NULL' if `NEEDLE' wasn't found. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memendq)(void const *__restrict haystack, uint64_t qword, size_t n_bytes);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memendq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword, size_t n_bytes);
 /* Same as `memrchrq', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memrendq)(void const *__restrict haystack, uint64_t qword, size_t n_qwords);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memrendq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword, size_t n_qwords);
 /* Same as `memendq', but return the offset from `HAYSTACK', rather than the actual address. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memlenq)(void const *__restrict haystack, uint64_t qword, size_t n_qwords);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memlenq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword, size_t n_qwords);
 /* Same as `memrendq', but return the offset from `HAYSTACK', rather than the actual address. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memrlenq)(void const *__restrict haystack, uint64_t qword, size_t n_qwords);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memrlenq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword, size_t n_qwords);
 /* Same as `rawmemchrq', but return the offset from `HAYSTACK', rather than the actual address. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemlenq)(void const *__restrict haystack, uint64_t qword);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemlenq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword);
 /* Same as `rawmemrchrq', but return the offset from `HAYSTACK', rather than the actual address. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemrlenq)(void const *__restrict haystack, uint64_t qword);
-/* Same as `STR+strlen(STR)' */
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemrlenq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword);
+/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
+ * @return: * : Always re-returns `dst' */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_memmoveup)(void *dst, void const *src, size_t n_bytes);
+/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
+ * @return: * : Always re-returns `dst' */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_memmovedown)(void *dst, void const *src, size_t n_bytes);
+/* Same as `STR + strlen(STR)' */
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strend)(char const *__restrict string);
-/* Same as `STR+strnlen(STR, MAX_CHARS)' */
+/* Same as `STR + strnlen(STR, MAX_CHARS)' */
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strnend)(char const *__restrict string, size_t maxlen);
 /* Same as `memset', but return `DST+N_BYTES', rather than `DST' */
 INTDEF ATTR_RETNONNULL NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_mempset)(void *__restrict dst, int byte, size_t n_bytes);
 /* Same as `memmove', but return `DST+N_BYTES', rather than `DST' */
 INTDEF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_mempmove)(void *dst, void const *src, size_t n_bytes);
+/* Same as `memmoveup', but return `DST+N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
+INTDEF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_mempmoveup)(void *dst, void const *src, size_t n_bytes);
+/* Same as `memmovedown', but return `DST+N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
+INTDEF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_mempmovedown)(void *dst, void const *src, size_t n_bytes);
 /* Same as `memrchr' without a search limit, starting at `HAYSTACK-1' */
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_rawmemrchr)(void const *__restrict haystack, int needle);
 /* Same as `memchr', but return `HAYSTACK+N_BYTES', rather than `NULL' if `NEEDLE' wasn't found. */
@@ -254,6 +284,10 @@ INTDEF ATTR_LEAF NONNULL((1, 2)) size_t NOTHROW_NCX(LIBCCALL libc_strlcpy)(char 
 INTDEF ATTR_LEAF NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_memccpy)(void *__restrict dst, void const *__restrict src, int needle, size_t num_bytes);
 #define libc___bzero libc_bzero
 #define libc___strtok_r libc_strtok_r
+/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_WORDS') */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memmoveupw)(/*aligned(2)*/ void *dst, /*aligned(2)*/ void const *src, size_t n_words);
+/* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_WORDS') */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memmovedownw)(/*aligned(2)*/ void *dst, /*aligned(2)*/ void const *src, size_t n_words);
 /* Same as `memchr', but search for non-matching locations. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_memxchr)(void const *__restrict haystack, int needle, size_t n_bytes);
 /* Same as `memrchr', but search for non-matching locations. */
@@ -275,74 +309,74 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemxle
 /* Same as `rawmemrlen', but search for non-matching locations. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemrxlen)(void const *__restrict haystack, int needle);
 /* Same as `memchrw', but search for non-matching locations. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memxchrw)(void const *__restrict haystack, uint16_t word, size_t n_words);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memxchrw)(/*aligned(2)*/ void const *__restrict haystack, uint16_t word, size_t n_words);
 /* Same as `memchrl', but search for non-matching locations. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memxchrl)(void const *__restrict haystack, uint32_t dword, size_t n_dwords);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memxchrl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword, size_t n_dwords);
 /* Same as `memrchrw', but search for non-matching locations. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memrxchrw)(void const *__restrict haystack, uint16_t word, size_t n_words);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memrxchrw)(/*aligned(2)*/ void const *__restrict haystack, uint16_t word, size_t n_words);
 /* Same as `memrchrl', but search for non-matching locations. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memrxchrl)(void const *__restrict haystack, uint32_t dword, size_t n_dwords);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memrxchrl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword, size_t n_dwords);
 /* Same as `rawmemchrw', but search for non-matching locations. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_rawmemxchrw)(void const *__restrict haystack, uint16_t word);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_rawmemxchrw)(/*aligned(2)*/ void const *__restrict haystack, uint16_t word);
 /* Same as `rawmemchrl', but search for non-matching locations. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_rawmemxchrl)(void const *__restrict haystack, uint32_t dword);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_rawmemxchrl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword);
 /* Same as `rawmemrchrw', but search for non-matching locations. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_rawmemrxchrw)(void const *__restrict haystack, uint16_t word);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_rawmemrxchrw)(/*aligned(2)*/ void const *__restrict haystack, uint16_t word);
 /* Same as `rawmemrchrl', but search for non-matching locations. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_rawmemrxchrl)(void const *__restrict haystack, uint32_t dword);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_rawmemrxchrl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword);
 /* Same as `memendw', but search for non-matching locations. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memxendw)(void const *__restrict haystack, uint16_t word, size_t n_bytes);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memxendw)(/*aligned(2)*/ void const *__restrict haystack, uint16_t word, size_t n_bytes);
 /* Same as `memendl', but search for non-matching locations. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memxendl)(void const *__restrict haystack, uint32_t dword, size_t n_bytes);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memxendl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword, size_t n_bytes);
 /* Same as `memrendw', but search for non-matching locations. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memrxendw)(void const *__restrict haystack, uint16_t word, size_t n_words);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memrxendw)(/*aligned(2)*/ void const *__restrict haystack, uint16_t word, size_t n_words);
 /* Same as `memrendl', but search for non-matching locations. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memrxendl)(void const *__restrict haystack, uint32_t dword, size_t n_dwords);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memrxendl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword, size_t n_dwords);
 /* Same as `memlenw', but search for non-matching locations. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memxlenw)(void const *__restrict haystack, uint16_t word, size_t n_words);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memxlenw)(/*aligned(2)*/ void const *__restrict haystack, uint16_t word, size_t n_words);
 /* Same as `memlenl', but search for non-matching locations. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memxlenl)(void const *__restrict haystack, uint32_t dword, size_t n_dwords);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memxlenl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword, size_t n_dwords);
 /* Same as `memrlenw', but search for non-matching locations. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memrxlenw)(void const *__restrict haystack, uint16_t word, size_t n_words);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memrxlenw)(/*aligned(2)*/ void const *__restrict haystack, uint16_t word, size_t n_words);
 /* Same as `memrlenl', but search for non-matching locations. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memrxlenl)(void const *__restrict haystack, uint32_t dword, size_t n_dwords);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memrxlenl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword, size_t n_dwords);
 /* Same as `rawmemlenw', but search for non-matching locations. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemxlenw)(void const *__restrict haystack, uint16_t word);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemxlenw)(/*aligned(2)*/ void const *__restrict haystack, uint16_t word);
 /* Same as `rawmemlenl', but search for non-matching locations. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemxlenl)(void const *__restrict haystack, uint32_t dword);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemxlenl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword);
 /* Same as `rawmemrlenw', but search for non-matching locations. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemrxlenw)(void const *__restrict haystack, uint16_t word);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemrxlenw)(/*aligned(2)*/ void const *__restrict haystack, uint16_t word);
 /* Same as `rawmemrlenl', but search for non-matching locations. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemrxlenl)(void const *__restrict haystack, uint32_t dword);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemrxlenl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword);
 /* Same as `memchrq', but search for non-matching locations. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memxchrq)(void const *__restrict haystack, uint64_t qword, size_t n_qwords);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memxchrq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword, size_t n_qwords);
 /* Same as `memrchrq', but search for non-matching locations. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memrxchrq)(void const *__restrict haystack, uint64_t qword, size_t n_qwords);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memrxchrq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword, size_t n_qwords);
 /* Same as `rawmemchrq', but search for non-matching locations. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_rawmemxchrq)(void const *__restrict haystack, uint64_t qword);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_rawmemxchrq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword);
 /* Same as `rawmemrchrq', but search for non-matching locations. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_rawmemrxchrq)(void const *__restrict haystack, uint64_t qword);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_rawmemrxchrq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword);
 /* Same as `memendq', but search for non-matching locations. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memxendq)(void const *__restrict haystack, uint64_t qword, size_t n_bytes);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memxendq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword, size_t n_bytes);
 /* Same as `memrendq', but search for non-matching locations. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memrxendq)(void const *__restrict haystack, uint64_t qword, size_t n_qwords);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memrxendq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword, size_t n_qwords);
 /* Same as `memlenq', but search for non-matching locations. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memxlenq)(void const *__restrict haystack, uint64_t qword, size_t n_qwords);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memxlenq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword, size_t n_qwords);
 /* Same as `memrlenq', but search for non-matching locations. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memrxlenq)(void const *__restrict haystack, uint64_t qword, size_t n_qwords);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memrxlenq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword, size_t n_qwords);
 /* Same as `rawmemlenq', but search for non-matching locations. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemxlenq)(void const *__restrict haystack, uint64_t qword);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemxlenq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword);
 /* Same as `rawmemrlenq', but search for non-matching locations. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemrxlenq)(void const *__restrict haystack, uint64_t qword);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemrxlenq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword);
 /* Same as `strchr', but don't exceed `MAX_CHARS' characters. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strnchr)(char const *__restrict haystack, int needle, size_t maxlen);
 /* Same as `strrchr', but don't exceed `MAX_CHARS' characters. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strnrchr)(char const *__restrict haystack, int needle, size_t maxlen);
-/* Same as `strrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `strrchr', but return `STR - 1', rather than `NULL' if `NEEDLE' wasn't found. */
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strrchrnul)(char const *__restrict haystack, int needle);
 /* Same as `strnchr', but return `strnend(STR, MAX_CHARS)', rather than `NULL' if `NEEDLE' wasn't found. */
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strnchrnul)(char const *__restrict haystack, int needle, size_t maxlen);
-/* Same as `strnrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
+/* Same as `strnrchr', but return `STR - 1', rather than `NULL' if `NEEDLE' wasn't found. */
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strnrchrnul)(char const *__restrict haystack, int needle, size_t maxlen);
 /* Same as `strchrnul', but return the offset from `STR', rather than the actual address */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_stroff)(char const *__restrict haystack, int needle);

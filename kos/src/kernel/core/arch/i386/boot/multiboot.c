@@ -445,10 +445,10 @@ NOTHROW(KCALL x86_load_mb2info)(PHYS u32 info) {
 					                                     offsetof(struct mb2_tag_string, string)) /
 					                                    sizeof(char));
 					if unlikely(kernel_driver.d_cmdline[x86_kernel_cmdline_length] != 0) {
-						kernel_driver.d_cmdline = (char *)memmove(kernel_driver.d_cmdline - 1,
-						                                          kernel_driver.d_cmdline,
-						                                          x86_kernel_cmdline_length *
-						                                          sizeof(char));
+						kernel_driver.d_cmdline = (char *)memmovedown(kernel_driver.d_cmdline - 1,
+						                                              kernel_driver.d_cmdline,
+						                                              x86_kernel_cmdline_length *
+						                                              sizeof(char));
 						kernel_driver.d_cmdline[x86_kernel_cmdline_length] = 0;
 					}
 					kernel_driver.d_argc = cmdline_split(kernel_driver.d_cmdline, NULL);

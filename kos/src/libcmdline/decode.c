@@ -158,8 +158,9 @@ parse_next_ch:
 		if (cmdline_isbslsh(ch)) {
 			if (next_ch >= cmdline_end)
 				goto done_cmdline;
-			memmove(cmdline, next_ch,
-			        (size_t)(cmdline_end - next_ch) * sizeof(char));
+			memmovedown(cmdline, next_ch,
+			            (size_t)(cmdline_end - next_ch) *
+			            sizeof(char));
 			cmdline_end -= (size_t)(next_ch - cmdline);
 			next_ch = cmdline;
 			ch      = unicode_readutf8(&next_ch); /* Skip the next character */
@@ -171,8 +172,9 @@ parse_next_ch:
 			char32_t end_ch = ch;
 			if (next_ch >= cmdline_end)
 				goto done_cmdline;
-			memmove(cmdline, next_ch,
-			        (size_t)(cmdline_end - next_ch) * sizeof(char));
+			memmovedown(cmdline, next_ch,
+			            (size_t)(cmdline_end - next_ch) *
+			            sizeof(char));
 			cmdline_end -= (size_t)(next_ch - cmdline);
 			next_ch = cmdline;
 			for (;;) {
@@ -183,8 +185,9 @@ parse_next_ch:
 				if (cmdline_isbslsh(ch)) {
 					if (next_ch >= cmdline_end)
 						goto done_cmdline;
-					memmove(cmdline, next_ch,
-					        (size_t)(cmdline_end - next_ch) * sizeof(char));
+					memmovedown(cmdline, next_ch,
+					            (size_t)(cmdline_end - next_ch) *
+					            sizeof(char));
 					cmdline_end -= (size_t)(next_ch - cmdline);
 					next_ch = cmdline;
 					ch      = unicode_readutf8(&next_ch); /* Skip the next character */
@@ -198,8 +201,9 @@ parse_next_ch:
 				if (ch == end_ch) {
 					if (next_ch >= cmdline_end)
 						goto done_cmdline;
-					memmove(cmdline, next_ch,
-					        (size_t)(cmdline_end - next_ch) * sizeof(char));
+					memmovedown(cmdline, next_ch,
+					            (size_t)(cmdline_end - next_ch) *
+					            sizeof(char));
 					cmdline_end -= (size_t)(next_ch - cmdline);
 					next_ch = cmdline;
 					if (next_ch >= cmdline_end) {
@@ -219,10 +223,11 @@ parse_next_ch:
 						/* To keep all strings apart of the given cmdline, reclaim 1 character
 						 * which we can then set to \0. - Note that we are guarantied to have at
 						 * least 2 bytes available, due to the 2 " or '-characters */
-						memmove(arg_start + 1, arg_start,
-						        (size_t)(cmdline_end - arg_start) * sizeof(char));
+						memmoveup(arg_start + 1, arg_start,
+						          (size_t)(cmdline_end - arg_start) *
+						          sizeof(char));
 						arg_start[0] = '\0';
-						temp         = (*arg_printer)(arg_printer_arg, arg_start, 0);
+						temp = (*arg_printer)(arg_printer_arg, arg_start, 0);
 						if unlikely(temp < 0)
 							goto err;
 						result += temp;
@@ -288,7 +293,7 @@ cmdline_flatten_callback(void *arg,
                          size_t datalen) {
 	char *dst = *(char **)arg;
 	if (dst != data) /* Flatten arguments. */
-		memmove(dst, data, (datalen + 1) * sizeof(char));
+		memmovedown(dst, data, (datalen + 1) * sizeof(char));
 	dst += datalen + 1;
 	*(char **)arg = dst;
 	return 1;

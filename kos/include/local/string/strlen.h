@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x349c0fdd */
+/* HASH CRC-32:0xf3682a2c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,11 +23,11 @@
 #ifndef ____localdep_strend_defined
 #define ____localdep_strend_defined 1
 #ifdef __CRT_HAVE_strend
-/* Same as `STR+strlen(STR)' */
+/* Same as `STR + strlen(STR)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __string),strend,(__string))
 #else /* LIBC: strend */
 #include <local/string/strend.h>
-/* Same as `STR+strlen(STR)' */
+/* Same as `STR + strlen(STR)' */
 #define __localdep_strend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strend))
 #endif /* strend... */
 #endif /* !____localdep_strend_defined */
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __LOCAL_LIBC(strlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strlen))(char const *__restrict __string) {
-#line 220 "kos/src/libc/magic/string.c"
+#line 243 "kos/src/libc/magic/string.c"
 	return (__SIZE_TYPE__)(__localdep_strend(__string) - __string);
 }
 __NAMESPACE_LOCAL_END

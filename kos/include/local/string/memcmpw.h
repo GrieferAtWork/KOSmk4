@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5fa4817 */
+/* HASH CRC-32:0xdd811ed2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,10 +22,10 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Compare memory buffers and return the difference of the first non-matching word */
 __LOCAL_LIBC(memcmpw) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __INT16_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcmpw))(void const *__s1,
-                                                     void const *__s2,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcmpw))(/*aligned(2)*/ void const *__s1,
+                                                     /*aligned(2)*/ void const *__s2,
                                                      __SIZE_TYPE__ __n_words) {
-#line 1106 "kos/src/libc/magic/string.c"
+#line 1243 "kos/src/libc/magic/string.c"
 	__INT16_TYPE__ *__p1 = (__INT16_TYPE__ *)__s1;
 	__INT16_TYPE__ *__p2 = (__INT16_TYPE__ *)__s2;
 	__INT16_TYPE__ __v1, __v2;

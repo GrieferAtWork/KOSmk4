@@ -2573,10 +2573,10 @@ uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpo
 			}
 			/* Adjust our `ui_iso' vector for the given offset. */
 			if (winner_offset != 0) {
-				memmove(result->ui_iso + winner_offset,
-				        result->ui_iso,
-				        (1024 - (interval - 1)) *
-				        sizeof(struct uhci_interrupt_frameentry *));
+				memmoveup(result->ui_iso + winner_offset,
+				          result->ui_iso,
+				          (1024 - (interval - 1)) *
+				          sizeof(struct uhci_interrupt_frameentry *));
 				result->ui_iso[0] = NULL;
 			}
 

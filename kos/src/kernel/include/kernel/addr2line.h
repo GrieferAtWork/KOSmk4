@@ -22,7 +22,6 @@
 #include <kernel/compiler.h>
 #include <kernel/types.h>
 
-#include <stdbool.h>
 #include <features.h>
 #include <libdebuginfo/addr2line.h>
 #include <bits/format-printer.h>

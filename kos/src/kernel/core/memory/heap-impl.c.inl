@@ -241,8 +241,8 @@ err_blocks:
 				/* Insert new blocks in the front, thus optimizing to better allocate
 				 * memory in its proper order, following the assumption that page_malloc()
 				 * will prefer allocating memory in top-down priority ordering. */
-				memmove(&blocks[1], &blocks[0],
-				        blockc * sizeof(struct vm_ramblock));
+				memmoveup(&blocks[1], &blocks[0],
+				          blockc * sizeof(struct vm_ramblock));
 				blocks[0].rb_start = block0_addr;
 				blocks[0].rb_size  = new_block_size;
 #else

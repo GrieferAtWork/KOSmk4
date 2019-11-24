@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7af1948d */
+/* HASH CRC-32:0x939d9c99 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,9 +22,9 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memchrl' with a search limit of `(size_t)-1 / 4' */
 __LOCAL_LIBC(rawmemchrl) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemchrl))(void const *__restrict __haystack,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemchrl))(/*aligned(4)*/ void const *__restrict __haystack,
                                                         __UINT32_TYPE__ __dword) {
-#line 1224 "kos/src/libc/magic/string.c"
+#line 1361 "kos/src/libc/magic/string.c"
 	__UINT32_TYPE__ *__iter = (__UINT32_TYPE__ *)__haystack;
 	for (;; ++__iter) {
 		if __unlikely(*__iter == __dword)

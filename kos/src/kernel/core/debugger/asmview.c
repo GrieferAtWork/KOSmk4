@@ -24,6 +24,7 @@ if (gcc_opt.remove("-O3"))
 #ifndef GUARD_KERNEL_SRC_DEBUGGER_ASMVIEW_C
 #define GUARD_KERNEL_SRC_DEBUGGER_ASMVIEW_C 1
 #define DISABLE_BRANCH_PROFILING 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -294,8 +295,8 @@ NOTHROW(FCALL av_lock_sections)(uintptr_t symbol_addr) {
 	if (!resent) {
 		debug_dlunlocksections(&av_sections_cache[0].sl_dlsect);
 		decref_unlikely(av_sections_cache[0].sl_driver);
-		memmove(&av_sections_cache[0], &av_sections_cache[1],
-		        sizeof(av_sections_cache) - sizeof(av_sections_cache[0]));
+		memmovedown(&av_sections_cache[0], &av_sections_cache[1],
+		            sizeof(av_sections_cache) - sizeof(av_sections_cache[0]));
 		resent = COMPILER_ENDOF(av_sections_cache) - 1;
 	}
 	resent->sl_driver = NULL;
@@ -355,8 +356,8 @@ NOTHROW(FCALL av_lookup_symbol)(uintptr_t symbol_addr) {
 		return &av_symbol_cache[i];
 	}
 	if (!resent) {
-		memmove(&av_symbol_cache[0], &av_symbol_cache[1],
-		        sizeof(av_symbol_cache) - sizeof(av_symbol_cache[0]));
+		memmovedown(&av_symbol_cache[0], &av_symbol_cache[1],
+		            sizeof(av_symbol_cache) - sizeof(av_symbol_cache[0]));
 		resent = COMPILER_ENDOF(av_symbol_cache) - 1;
 	}
 	resent->s_name = NULL;

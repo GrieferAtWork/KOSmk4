@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a65b707 */
+/* HASH CRC-32:0x7e428489 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -364,9 +364,9 @@
 /* Same as `rawmemrchrq', but return the offset from `HAYSTACK', rather than the actual address. */
 #define __libc_rawmemrlenq __libc_slow_rawmemrlenq
 #endif /* !__fast_rawmemrlenq_defined */
-/* Same as `STR+strlen(STR)' */
+/* Same as `STR + strlen(STR)' */
 #define __libc_strend __libc_slow_strend
-/* Same as `STR+strnlen(STR, MAX_CHARS)' */
+/* Same as `STR + strnlen(STR, MAX_CHARS)' */
 #define __libc_strnend __libc_slow_strnend
 #ifdef __fast_mempset_defined
 /* Same as `memset', but return `DST+N_BYTES', rather than `DST' */

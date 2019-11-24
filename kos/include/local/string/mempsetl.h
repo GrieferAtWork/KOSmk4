@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1e0a735 */
+/* HASH CRC-32:0x3b9c53f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 #define __localdep_memsetl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memsetl))
 #elif defined(__CRT_HAVE_memsetl)
 /* Fill memory with a given dword */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),memsetl,(__dst,__dword,__n_dwords))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memsetl,(/*aligned(4)*/ void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),memsetl,(__dst,__dword,__n_dwords))
 #else /* LIBC: memsetl */
 #include <local/string/memsetl.h>
 /* Fill memory with a given dword */
@@ -41,10 +41,10 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memsetl', but return `DST+N_DWORDS', rather than `DST' */
 __LOCAL_LIBC(mempsetl) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT32_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempsetl))(void *__restrict __dst,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempsetl))(/*aligned(4)*/ void *__restrict __dst,
                                                       __UINT32_TYPE__ __dword,
                                                       __SIZE_TYPE__ __n_dwords) {
-#line 1092 "kos/src/libc/magic/string.c"
+#line 1229 "kos/src/libc/magic/string.c"
 	return (__UINT32_TYPE__ *)__localdep_memsetl(__dst, __dword, __n_dwords) + __n_dwords;
 }
 __NAMESPACE_LOCAL_END

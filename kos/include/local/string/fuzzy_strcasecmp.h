@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd748d0f5 */
+/* HASH CRC-32:0x6b4e110f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fuzzy_strcasecmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_strcasecmp))(char const *__s1,
                                                               char const *__s2) {
-#line 3794 "kos/src/libc/magic/string.c"
+#line 4103 "kos/src/libc/magic/string.c"
 	return __localdep_fuzzy_memcasecmp(__s1, __localdep_strlen(__s1), __s2, __localdep_strlen(__s2));
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8de2fdb4 */
+/* HASH CRC-32:0x541da018 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,35 +22,35 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks. */
 __LOCAL_LIBC(memmoveq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmoveq))(void *__dst,
-                                                      void const *__src,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmoveq))(/*aligned(8)*/ void *__dst,
+                                                      /*aligned(8)*/ void const *__src,
                                                       __SIZE_TYPE__ __n_qwords) {
-#line 1445 "kos/src/libc/magic/string.c"
+#line 1582 "kos/src/libc/magic/string.c"
 #if __SIZEOF_POINTER__ >= 8
 	__UINT64_TYPE__ *__pdst, *__psrc;
-	if (__dst < __src) {
-		__psrc = (__UINT64_TYPE__ *)__src;
+	if (__dst <= __src) {
 		__pdst = (__UINT64_TYPE__ *)__dst;
+		__psrc = (__UINT64_TYPE__ *)__src;
 		while (__n_qwords--)
 			*__pdst++ = *__psrc++;
 	} else {
-		__psrc = (__UINT64_TYPE__ *)__src + __n_qwords;
 		__pdst = (__UINT64_TYPE__ *)__dst + __n_qwords;
+		__psrc = (__UINT64_TYPE__ *)__src + __n_qwords;
 		while (__n_qwords--)
 			*--__pdst = *--__psrc;
 	}
 #else /* __SIZEOF_POINTER__ >= 8 */
 	__UINT32_TYPE__ *__pdst, *__psrc;
-	if (__dst < __src) {
-		__psrc = (__UINT32_TYPE__ *)__src;
+	if (__dst <= __src) {
 		__pdst = (__UINT32_TYPE__ *)__dst;
+		__psrc = (__UINT32_TYPE__ *)__src;
 		while (__n_qwords--) {
 			*__pdst++ = *__psrc++;
 			*__pdst++ = *__psrc++;
 		}
 	} else {
-		__psrc = (__UINT32_TYPE__ *)__src + (__n_qwords * 2);
 		__pdst = (__UINT32_TYPE__ *)__dst + (__n_qwords * 2);
+		__psrc = (__UINT32_TYPE__ *)__src + (__n_qwords * 2);
 		while (__n_qwords--) {
 			*--__pdst = *--__psrc;
 			*--__pdst = *--__psrc;

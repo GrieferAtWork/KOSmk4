@@ -504,9 +504,9 @@ do_handle_iob_node_access:
 								if (callsite_eip < KERNEL_BASE)
 									goto do_normal_vio;
 								state->ics_irregs_k.ir_eip = callsite_eip;
-								state = (struct icpustate *)memmove((byte_t *)state + sizeof(void *), state,
-								                                    OFFSET_ICPUSTATE_IRREGS +
-								                                    SIZEOF_IRREGS_KERNEL);
+								state = (struct icpustate *)memmoveup((byte_t *)state + sizeof(void *), state,
+								                                      OFFSET_ICPUSTATE_IRREGS +
+								                                      SIZEOF_IRREGS_KERNEL);
 							}
 #endif /* !__x86_64__ */
 							/* Figure out the exact VIO address that got called. */
@@ -1035,9 +1035,9 @@ throw_segfault:
 			if (old_eip < KERNEL_BASE)
 				goto not_a_badcall;
 			state->ics_irregs_k.ir_eip = old_eip;
-			state = (struct icpustate *)memmove((byte_t *)state + sizeof(void *), state,
-			                                    OFFSET_ICPUSTATE_IRREGS +
-			                                    SIZEOF_IRREGS_KERNEL);
+			state = (struct icpustate *)memmoveup((byte_t *)state + sizeof(void *), state,
+			                                      OFFSET_ICPUSTATE_IRREGS +
+			                                      SIZEOF_IRREGS_KERNEL);
 		}
 #endif /* !__x86_64__ */
 		PERTASK_SET(this_exception_faultaddr, (void *)old_eip);

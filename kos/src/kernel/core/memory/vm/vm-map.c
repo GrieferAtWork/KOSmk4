@@ -131,9 +131,10 @@ partnode_pair_vector_insertpart(struct partnode_pair_vector *__restrict self, si
 	partnode_pair_vector_reserve1(self);
 	new_node = (struct vm_node *)kmalloc(sizeof(struct vm_node),
 	                                     GFP_LOCKED | GFP_PREFLT | GFP_VCBASE);
-	memmove(&self->pv_vec[index + 1],
-	        &self->pv_vec[index],
-	        (self->pv_cnt - index) * sizeof(struct partnode_pair));
+	memmoveup(&self->pv_vec[index + 1],
+	          &self->pv_vec[index],
+	          (self->pv_cnt - index) *
+	          sizeof(struct partnode_pair));
 	self->pv_vec[index].pn_node = new_node; /* Inherit */
 	self->pv_vec[index].pn_part = part;     /* Inherit reference */
 	++self->pv_cnt;

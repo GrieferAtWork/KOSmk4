@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d8dbe8c */
+/* HASH CRC-32:0x16761eef */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,10 +22,10 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memchrw', but search for non-matching locations. */
 __LOCAL_LIBC(memxchrw) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memxchrw))(void const *__restrict __haystack,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memxchrw))(/*aligned(2)*/ void const *__restrict __haystack,
                                                       __UINT16_TYPE__ __word,
                                                       __SIZE_TYPE__ __n_words) {
-#line 1759 "kos/src/libc/magic/string.c"
+#line 1969 "kos/src/libc/magic/string.c"
 	__UINT16_TYPE__ *__hay_iter = (__UINT16_TYPE__ *)__haystack;
 	for (; __n_words--; ++__hay_iter) {
 		if __unlikely(*__hay_iter != __word)

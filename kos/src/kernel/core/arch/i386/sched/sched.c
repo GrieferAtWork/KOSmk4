@@ -646,9 +646,9 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 		        (fixup + OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL),
 		        (byte_t *)FORTASK(self, this_x86_kernel_psp0));
 		/* Allocate 4 additional bytes. */
-		fixup = (byte_t *)memmove(fixup - 4, fixup,
-		                          OFFSET_SCPUSTATE_IRREGS +
-		                          SIZEOF_IRREGS_KERNEL);
+		fixup = (byte_t *)memmovedown(fixup - 4, fixup,
+		                              OFFSET_SCPUSTATE_IRREGS +
+		                              SIZEOF_IRREGS_KERNEL);
 		self->t_sched.s_state = (struct scpustate *)fixup;
 		/* Read the original user-space EFLAGS value. */
 		eflags = ((struct scpustate *)fixup)->scs_irregs_k.ir_eflags;

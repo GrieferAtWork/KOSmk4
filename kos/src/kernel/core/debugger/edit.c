@@ -133,7 +133,9 @@ NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
 						--newend;
 					n = (unsigned int)(pos - newend);
 				}
-				memmove(pos - n, pos, (size_t)(endptr - pos) * sizeof(char));
+				memmovedown(pos - n, pos,
+				            (size_t)(endptr - pos) *
+				            sizeof(char));
 				pos -= n;
 				endptr -= n;
 				*endptr = 0;
@@ -154,7 +156,9 @@ NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
 						++newend;
 					n = (unsigned int)(newend - pos);
 				}
-				memmove(pos, pos + n, (size_t)(endptr - pos) * sizeof(char));
+				memmovedown(pos, pos + n,
+				            (size_t)(endptr - pos) *
+				            sizeof(char));
 				endptr -= n;
 				*endptr = 0;
 			}	continue;
@@ -228,7 +232,9 @@ NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
 			dbg_bell();
 			continue; /* Buffer is full */
 		}
-		memmove(pos + 1, pos, (size_t)(endptr - pos) * sizeof(char));
+		memmoveup(pos + 1, pos,
+		          (size_t)(endptr - pos) *
+		          sizeof(char));
 		*pos++ = ch;
 		++endptr;
 		*endptr = 0;
