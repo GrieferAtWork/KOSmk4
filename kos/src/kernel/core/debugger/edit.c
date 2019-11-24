@@ -134,7 +134,7 @@ NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
 					n = (unsigned int)(pos - newend);
 				}
 				memmovedown(pos - n, pos,
-				            (size_t)(endptr - pos) *
+				            (size_t)(endptr - pos),
 				            sizeof(char));
 				pos -= n;
 				endptr -= n;
@@ -157,7 +157,7 @@ NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
 					n = (unsigned int)(newend - pos);
 				}
 				memmovedown(pos, pos + n,
-				            (size_t)(endptr - pos) *
+				            (size_t)(endptr - pos),
 				            sizeof(char));
 				endptr -= n;
 				*endptr = 0;
@@ -233,7 +233,7 @@ NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
 			continue; /* Buffer is full */
 		}
 		memmoveup(pos + 1, pos,
-		          (size_t)(endptr - pos) *
+		          (size_t)(endptr - pos),
 		          sizeof(char));
 		*pos++ = ch;
 		++endptr;
@@ -241,12 +241,16 @@ NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
 	}
 }
 
+
+
 /* Same as `dbg_editfield()', but only draw the edit field. */
 PUBLIC ATTR_DBGTEXT void
 NOTHROW(FCALL dbg_draweditfield)(int x, int y, unsigned int field_width,
                                  char *buf, size_t buflen) {
 	char *endptr;
 	size_t onscreen;
+
+
 	if unlikely(field_width < 2)
 		field_width = 2;
 	if unlikely(buflen < 2) {

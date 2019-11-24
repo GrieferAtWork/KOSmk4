@@ -2970,6 +2970,47 @@ again_enum_name:
 						if (user_impl is none)
 							user_impl = block;
 						break;
+					case "memcpyc": {
+						local pattern =
+						"{{\n"
+						"#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS\n"
+						"	switch (elem_size) {{\n"
+						"\n"
+						"	case 1:\n"
+						"		return {name}(dst, src, elem_count);\n"
+						"\n"
+						"	case 2:\n"
+						"		return {name}w(dst, src, elem_count);\n"
+						"\n"
+						"	case 4:\n"
+						"		return {name}l(dst, src, elem_count);\n"
+						"\n"
+						"#ifdef __UINT64_TYPE__\n"
+						"	case 8:\n"
+						"		return {name}q(dst, src, elem_count);\n"
+						"#endif /* __UINT64_TYPE__ */\n"
+						"\n"
+						"	default:\n"
+						"		break;\n"
+						"	}}\n"
+						"#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */\n"
+						"	return {name}(dst, src, elem_count * elem_size);\n"
+						"}}\n";
+						if (dependency_prefix)
+							dependency_prefix += "\n";
+						dependency_prefix += "#include @<hybrid/host.h>@\n";
+						local base_function = get_mode_arg();
+						if (base_function == "%auto") {
+							if (!funname.endswith("c"))
+								err(i, "Unable to determine underlying memory function for {!r}".format({ funname }));
+							base_function = funname[:-1];
+						}
+						block = pattern.format({ "name" : base_function });
+						if (libc_impl is none)
+							libc_impl = block;
+						if (user_impl is none)
+							user_impl = block;
+					}	break;
 					case "printf": {
 						local vprintf_function = get_mode_arg();
 						if (vprintf_function == "%auto") {
@@ -3267,23 +3308,25 @@ again_enum_name:
 #endif /* WARN_KNOWN_BUILTINS */
 #ifdef WARN_KNOWN_ALIASES
 			if (block !is UndefinedFunctionAlias) {
-				local ka = known_aliases.get(funname);
-				if (ka !is none && ka !in alternate_names) {
-					/* Check if the alias is defined as a regular alias. */
-					for (local none, name: aliases) {
-						if (name == ka)
-							goto known_alias_declared;
+				if (!overload_alias) {
+					local ka = known_aliases.get(funname);
+					if (ka !is none && ka !in alternate_names) {
+						/* Check if the alias is defined as a regular alias. */
+						for (local none, name: aliases) {
+							if (name == ka)
+								goto known_alias_declared;
+						}
+						for (local none, name: preferred_aliases) {
+							if (name == ka)
+								goto known_alias_declared;
+						}
+						print getFilenameForLog(filename),;
+						print "(",;
+						print 1+text.count("\n", 0, funname_start),;
+						print ") : Warning : Missing, known alias [export_alias(",;
+						print ka,;
+						print ")] for", repr(funname);
 					}
-					for (local none, name: preferred_aliases) {
-						if (name == ka)
-							goto known_alias_declared;
-					}
-					print getFilenameForLog(filename),;
-					print "(",;
-					print 1+text.count("\n", 0, funname_start),;
-					print ") : Warning : Missing, known alias [export_alias(",;
-					print ka,;
-					print ")] for", repr(funname);
 				}
 			} else {
 				local ka = known_aliases.get(block.name);

@@ -255,14 +255,14 @@
 #define __NAMESPACE_FAST_USING(x)           using ::__optimized_imp::x;
 #define __NAMESPACE_FAST_USING_OR_IMPL(x,i) using ::__optimized_imp::x;
 #define __LIBC_FAST_NAME(x)                 x
-#else
+#else /* __cplusplus */
 #define __NAMESPACE_FAST_BEGIN              /* nothing */
 #define __NAMESPACE_FAST_END                /* nothing */
 #define __NAMESPACE_FAST_SYM                /* nothing */
 #define __NAMESPACE_FAST_USING(x)           /* nothing */
 #define __NAMESPACE_FAST_USING_OR_IMPL(x,i) i
 #define __LIBC_FAST_NAME(x)                 __FAST_##x
-#endif
+#endif /* !__cplusplus */
 
 /* Automatic namespacing for header-local implementations of functions. */
 #ifdef __cplusplus
@@ -272,14 +272,14 @@
 #define __NAMESPACE_LOCAL_USING(x)           using ::__local_imp::x;
 #define __NAMESPACE_LOCAL_USING_OR_IMPL(x,i) using ::__local_imp::x;
 #define __LIBC_LOCAL_NAME(x)                 x
-#else
+#else /* __cplusplus */
 #define __NAMESPACE_LOCAL_BEGIN              /* nothing */
 #define __NAMESPACE_LOCAL_END                /* nothing */
 #define __NAMESPACE_LOCAL_SYM                /* nothing */
 #define __NAMESPACE_LOCAL_USING(x)           /* nothing */
 #define __NAMESPACE_LOCAL_USING_OR_IMPL(x,i) i
 #define __LIBC_LOCAL_NAME(x)                 __LOCAL_##x
-#endif
+#endif /* !__cplusplus */
 
 #ifndef __FCALL
 #if defined(__x86_64__)
@@ -331,12 +331,12 @@
 #ifdef __CRT_KOS_KERNEL
 #   define __LIBCCALL  __KCALL /* STDCALL */
 #   define __LIBDCALL  __KCALL /* STDCALL */
-#else
+#else /* __CRT_KOS_KERNEL */
 #   define __LIBCCALL_CALLER_CLEANUP  1
 #   define __LIBCCALL  __ATTR_CDECL
 #   define __LIBDCALL_CALLER_CLEANUP  1
 #   define __LIBDCALL  __ATTR_CDECL
-#endif
+#endif /* !__CRT_KOS_KERNEL */
 #   define __VLIBCCALL __ATTR_CDECL
 #   define __VLIBCCALL_CALLER_CLEANUP 1
 #   define __VLIBDCALL __ATTR_CDECL
@@ -359,7 +359,7 @@
 #endif /* !__LIBCCALL */
 
 #ifndef __LIBC
-#define __LIBC    __IMPDEF
+#define __LIBC __IMPDEF
 #endif /* !__LIBC */
 
 

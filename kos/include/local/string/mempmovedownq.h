@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf860d3e9 */
+/* HASH CRC-32:0x265ff4e7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,12 +42,12 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__
 #endif /* !____localdep_memmovedownq_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS') */
+/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS') */
 __LOCAL_LIBC(mempmovedownq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmovedownq))(/*aligned(8)*/ void *__restrict __dst,
                                                            /*aligned(8)*/ void const *__restrict __src,
                                                            __SIZE_TYPE__ __n_qwords) {
-#line 1691 "kos/src/libc/magic/string.c"
+#line 1712 "kos/src/libc/magic/string.c"
 	return (__UINT64_TYPE__ *)__localdep_memmovedownq(__dst, __src, __n_qwords) + __n_qwords;
 }
 __NAMESPACE_LOCAL_END

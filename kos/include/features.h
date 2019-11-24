@@ -117,6 +117,7 @@
 #define __USE_KOS 1
 #define __USE_STRING_BWLQ 1
 #define __USE_STRING_XCHR 1
+#define __USE_STRING_OVERLOADS 1
 #endif /* _KOS_SOURCE */
 
 #if defined(_KOS_KERNEL_SOURCE) || \

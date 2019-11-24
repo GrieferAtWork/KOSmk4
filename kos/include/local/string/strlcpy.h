@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29b3135f */
+/* HASH CRC-32:0x1107bb59 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __LOCAL_LIBC(strlcpy) __ATTR_LEAF __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strlcpy))(char *__restrict __dst,
                                                      char const *__restrict __src,
                                                      __SIZE_TYPE__ __bufsize) {
-#line 909 "kos/src/libc/magic/string.c"
+#line 930 "kos/src/libc/magic/string.c"
 	__SIZE_TYPE__ __result = __localdep_strlen(__src);
 	__SIZE_TYPE__ __copy_size = __result < __bufsize ? __result : __bufsize - 1;
 	__localdep_memcpy(__dst, __src, __copy_size*sizeof(char));

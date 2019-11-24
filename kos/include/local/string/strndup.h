@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93c28d65 */
+/* HASH CRC-32:0x55b3c4a4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,17 +60,17 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLO
 #ifndef ____localdep_mempcpy_defined
 #define ____localdep_mempcpy_defined 1
 #ifdef __fast_mempcpy_defined
-/* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 #define __localdep_mempcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))
 #elif defined(__CRT_HAVE_mempcpy)
-/* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE___mempcpy)
-/* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
 #else /* LIBC: mempcpy */
 #include <local/string/mempcpy.h>
-/* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 #define __localdep_mempcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpy))
 #endif /* mempcpy... */
 #endif /* !____localdep_mempcpy_defined */
@@ -79,7 +79,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strndup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strndup))(char const *__restrict __string,
                                                      __SIZE_TYPE__ __max_chars) {
-#line 496 "kos/src/libc/magic/string.c"
+#line 510 "kos/src/libc/magic/string.c"
 	__SIZE_TYPE__ __resultlen = __localdep_strnlen(__string, __max_chars);
 	char *__result = (char *)__localdep_malloc((__resultlen + 1) * sizeof(char));
 	if __likely(__result)

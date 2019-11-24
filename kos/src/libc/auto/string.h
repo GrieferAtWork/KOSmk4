@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2899bf66 */
+/* HASH CRC-32:0xad90130e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,43 +64,47 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_strnlen)(
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_memrchr)(void const *__restrict haystack, int needle, size_t n_bytes);
 /* Same as `memchr' with a search limit of `(size_t)-1' */
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_rawmemchr)(void const *__restrict haystack, int needle);
-/* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_mempcpy)(void *__restrict dst, void const *__restrict src, size_t n_bytes);
 /* Copy memory between non-overlapping memory blocks. */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memcpyw)(/*aligned(2)*/ void *__restrict dst, /*aligned(2)*/ void const *__restrict src, size_t n_words);
-/* Same as `memcpyw', but return `DST+N_WORDS', rather than `DST' */
+/* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_mempcpyw)(/*aligned(2)*/ void *__restrict dst, /*aligned(2)*/ void const *__restrict src, size_t n_words);
 /* Copy memory between non-overlapping memory blocks. */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memcpyl)(/*aligned(4)*/ void *__restrict dst, /*aligned(4)*/ void const *__restrict src, size_t n_dwords);
-/* Same as `memcpyl', but return `DST+N_DWORDS', rather than `DST' */
+/* Same as `memcpyl', but return `DST + N_DWORDS', rather than `DST' */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *NOTHROW_NCX(LIBCCALL libc_mempcpyl)(/*aligned(4)*/ void *__restrict dst, /*aligned(4)*/ void const *__restrict src, size_t n_dwords);
 /* Move memory between potentially overlapping memory blocks. */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memmovew)(/*aligned(2)*/ void *dst, /*aligned(2)*/ void const *src, size_t n_words);
-/* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' */
+/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_mempmovew)(/*aligned(2)*/ void *dst, /*aligned(2)*/ void const *src, size_t n_words);
 /* Move memory between potentially overlapping memory blocks. */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memmovel)(/*aligned(4)*/ void *dst, /*aligned(4)*/ void const *src, size_t n_dwords);
-/* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' */
+/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *NOTHROW_NCX(LIBCCALL libc_mempmovel)(/*aligned(4)*/ void *dst, /*aligned(4)*/ void const *src, size_t n_dwords);
-/* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
+/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_WORDS') */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memmoveupw)(/*aligned(2)*/ void *dst, /*aligned(2)*/ void const *src, size_t n_words);
+/* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_WORDS') */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memmovedownw)(/*aligned(2)*/ void *dst, /*aligned(2)*/ void const *src, size_t n_words);
+/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_mempmoveupw)(/*aligned(2)*/ void *dst, /*aligned(2)*/ void const *src, size_t n_words);
-/* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS') */
+/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS') */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_mempmovedownw)(/*aligned(2)*/ void *dst, /*aligned(2)*/ void const *src, size_t n_words);
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS') */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memmoveupl)(/*aligned(4)*/ void *dst, /*aligned(4)*/ void const *src, size_t n_dwords);
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_DWORDS') */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memmovedownl)(/*aligned(4)*/ void *dst, /*aligned(4)*/ void const *src, size_t n_dwords);
-/* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
+/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *NOTHROW_NCX(LIBCCALL libc_mempmoveupl)(/*aligned(4)*/ void *dst, /*aligned(4)*/ void const *src, size_t n_dwords);
-/* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS') */
+/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS') */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *NOTHROW_NCX(LIBCCALL libc_mempmovedownl)(/*aligned(4)*/ void *dst, /*aligned(4)*/ void const *src, size_t n_dwords);
 /* Fill memory with a given word */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memsetw)(/*aligned(2)*/ void *__restrict dst, uint16_t word, size_t n_words);
-/* Same as `memsetw', but return `DST+N_WORDS', rather than `DST' */
+/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint16_t *NOTHROW_NCX(LIBCCALL libc_mempsetw)(/*aligned(2)*/ void *__restrict dst, uint16_t word, size_t n_words);
 /* Fill memory with a given dword */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memsetl)(/*aligned(4)*/ void *__restrict dst, uint32_t dword, size_t n_dwords);
-/* Same as `memsetl', but return `DST+N_DWORDS', rather than `DST' */
+/* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_mempsetl)(/*aligned(4)*/ void *__restrict dst, uint32_t dword, size_t n_dwords);
 /* Compare memory buffers and return the difference of the first non-matching word */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int16_t NOTHROW_NCX(LIBCCALL libc_memcmpw)(/*aligned(2)*/ void const *s1, /*aligned(2)*/ void const *s2, size_t n_words);
@@ -148,23 +152,23 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemrle
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemrlenl)(/*aligned(4)*/ void const *__restrict haystack, uint32_t dword);
 /* Copy memory between non-overlapping memory blocks. */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memcpyq)(/*aligned(8)*/ void *__restrict dst, /*aligned(8)*/ void const *__restrict src, size_t n_qwords);
-/* Same as `memcpyq', but return `DST+N_QWORDS', rather than `DST' */
+/* Same as `memcpyq', but return `DST + N_QWORDS', rather than `DST' */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *NOTHROW_NCX(LIBCCALL libc_mempcpyq)(/*aligned(8)*/ void *__restrict dst, /*aligned(8)*/ void const *__restrict src, size_t n_qwords);
 /* Move memory between potentially overlapping memory blocks. */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memmoveq)(/*aligned(8)*/ void *dst, /*aligned(8)*/ void const *src, size_t n_qwords);
-/* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' */
+/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *NOTHROW_NCX(LIBCCALL libc_mempmoveq)(/*aligned(8)*/ void *__restrict dst, /*aligned(8)*/ void const *__restrict src, size_t n_qwords);
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS') */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memmoveupq)(/*aligned(8)*/ void *dst, /*aligned(8)*/ void const *src, size_t n_qwords);
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS') */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memmovedownq)(/*aligned(8)*/ void *dst, /*aligned(8)*/ void const *src, size_t n_qwords);
-/* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
+/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *NOTHROW_NCX(LIBCCALL libc_mempmoveupq)(/*aligned(8)*/ void *__restrict dst, /*aligned(8)*/ void const *__restrict src, size_t n_qwords);
-/* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS') */
+/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS') */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *NOTHROW_NCX(LIBCCALL libc_mempmovedownq)(/*aligned(8)*/ void *__restrict dst, /*aligned(8)*/ void const *__restrict src, size_t n_qwords);
 /* Fill memory with a given qword */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memsetq)(/*aligned(8)*/ void *__restrict dst, uint64_t qword, size_t n_qwords);
-/* Same as `memsetq', but return `DST+N_QWORDS', rather than `DST' */
+/* Same as `memsetq', but return `DST + N_QWORDS', rather than `DST' */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_mempsetq)(/*aligned(8)*/ void *__restrict dst, uint64_t qword, size_t n_qwords);
 /* Compare memory buffers and return the difference of the first non-matching qword */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int64_t NOTHROW_NCX(LIBCCALL libc_memcmpq)(/*aligned(8)*/ void const *s1, /*aligned(8)*/ void const *s2, size_t n_dwords);
@@ -198,14 +202,14 @@ INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strend)(char const *__restrict string);
 /* Same as `STR + strnlen(STR, MAX_CHARS)' */
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strnend)(char const *__restrict string, size_t maxlen);
-/* Same as `memset', but return `DST+N_BYTES', rather than `DST' */
-INTDEF ATTR_RETNONNULL NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_mempset)(void *__restrict dst, int byte, size_t n_bytes);
-/* Same as `memmove', but return `DST+N_BYTES', rather than `DST' */
-INTDEF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_mempmove)(void *dst, void const *src, size_t n_bytes);
-/* Same as `memmoveup', but return `DST+N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
-INTDEF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_mempmoveup)(void *dst, void const *src, size_t n_bytes);
-/* Same as `memmovedown', but return `DST+N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
-INTDEF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_mempmovedown)(void *dst, void const *src, size_t n_bytes);
+/* Same as `memset', but return `DST + N_BYTES', rather than `DST' */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_mempset)(void *__restrict dst, int byte, size_t n_bytes);
+/* Same as `memmove', but return `DST + N_BYTES', rather than `DST' */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_mempmove)(void *dst, void const *src, size_t n_bytes);
+/* Same as `memmoveup', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_mempmoveup)(void *dst, void const *src, size_t n_bytes);
+/* Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_mempmovedown)(void *dst, void const *src, size_t n_bytes);
 /* Same as `memrchr' without a search limit, starting at `HAYSTACK-1' */
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_rawmemrchr)(void const *__restrict haystack, int needle);
 /* Same as `memchr', but return `HAYSTACK+N_BYTES', rather than `NULL' if `NEEDLE' wasn't found. */
@@ -267,7 +271,7 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strcase
  * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 3)) void *NOTHROW_NCX(LIBCCALL libc_memmem)(void const *haystack, size_t haystacklen, void const *needle, size_t needlelen);
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strverscmp)(char const *s1, char const *s2);
-/* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 #define libc___mempcpy libc_mempcpy
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strfry)(char *__restrict string);
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_memfrob)(void *buf, size_t num_bytes);
@@ -284,10 +288,6 @@ INTDEF ATTR_LEAF NONNULL((1, 2)) size_t NOTHROW_NCX(LIBCCALL libc_strlcpy)(char 
 INTDEF ATTR_LEAF NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_memccpy)(void *__restrict dst, void const *__restrict src, int needle, size_t num_bytes);
 #define libc___bzero libc_bzero
 #define libc___strtok_r libc_strtok_r
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_WORDS') */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memmoveupw)(/*aligned(2)*/ void *dst, /*aligned(2)*/ void const *src, size_t n_words);
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_WORDS') */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *NOTHROW_NCX(LIBCCALL libc_memmovedownw)(/*aligned(2)*/ void *dst, /*aligned(2)*/ void const *src, size_t n_words);
 /* Same as `memchr', but search for non-matching locations. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_memxchr)(void const *__restrict haystack, int needle, size_t n_bytes);
 /* Same as `memrchr', but search for non-matching locations. */
@@ -368,6 +368,26 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memrxlenq
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemxlenq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword);
 /* Same as `rawmemrlenq', but search for non-matching locations. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_rawmemrxlenq)(/*aligned(8)*/ void const *__restrict haystack, uint64_t qword);
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_memcpyc)(void *__restrict dst, void const *__restrict src, size_t elem_count, size_t elem_size);
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_mempcpyc)(void *__restrict dst, void const *__restrict src, size_t elem_count, size_t elem_size);
+/* Move memory between potentially overlapping memory blocks
+ * @return: * : Always re-returns `dst' */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_memmovec)(void *dst, void const *src, size_t elem_count, size_t elem_size);
+/* Same as `memmovec', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_mempmovec)(void *dst, void const *src, size_t elem_count, size_t elem_size);
+/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
+ * @return: * : Always re-returns `dst' */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_memmoveupc)(void *dst, void const *src, size_t elem_count, size_t elem_size);
+/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_mempmoveupc)(void *dst, void const *src, size_t elem_count, size_t elem_size);
+/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
+ * @return: * : Always re-returns `dst' */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_memmovedownc)(void *dst, void const *src, size_t elem_count, size_t elem_size);
+/* Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_mempmovedownc)(void *dst, void const *src, size_t elem_count, size_t elem_size);
 /* Same as `strchr', but don't exceed `MAX_CHARS' characters. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strnchr)(char const *__restrict haystack, int needle, size_t maxlen);
 /* Same as `strrchr', but don't exceed `MAX_CHARS' characters. */

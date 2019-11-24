@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa612fb03 */
+/* HASH CRC-32:0xe92d2e89 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ __LOCAL_LIBC(wildc32casecmp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2))
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildc32casecmp_l))(__CHAR32_TYPE__ const *__pattern,
                                                               __CHAR32_TYPE__ const *__string,
                                                               __locale_t __locale) {
-#line 4242 "kos/src/libc/magic/string.c"
+#line 4345 "kos/src/libc/magic/string.c"
 	__CHAR32_TYPE__ __card_post, __pattern_ch, __wcsing_ch;
 	for (;;) {
 		if (!*__string) {

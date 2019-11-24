@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaeda0557 */
+/* HASH CRC-32:0x715de470 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,6 +80,9 @@ __NAMESPACE_STD_USING(strerror)
 #include <parts/errno.h>
 #include <crtdefs.h>
 #endif /* __USE_DOS */
+#if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+#include <hybrid/pp/__va_nargs.h>
+#endif /* !__cplusplus && __USE_STRING_OVERLOADS */
 
 __SYSDECL_BEGIN
 
@@ -590,6 +593,46 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(strerror, __FORCELOCAL __ATTR_RETNONNULL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL strerror)(int __errnum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror))(__errnum); })
 #endif /* strerror... */
+#if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+extern "C++" {
+#ifdef __fast_memcpyc_defined
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+__FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memcpy)(void *__restrict __dst, void const *__restrict __src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyc))(__dst, __src, __elem_count, __elem_size); }
+#elif defined(__CRT_HAVE_memcpyc)
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,memcpy,(void *__restrict __dst, void const *__restrict __src, size_t __elem_count, size_t __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: memcpyc */
+} /* extern "C++" { */
+__NAMESPACE_STD_END
+#include <local/string/memcpyc.h>
+__NAMESPACE_STD_BEGIN
+extern "C++" {
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+__FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memcpy)(void *__restrict __dst, void const *__restrict __src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyc))(__dst, __src, __elem_count, __elem_size); }
+#endif /* memcpy... */
+#ifdef __fast_memmovec_defined
+/* Move memory between potentially overlapping memory blocks
+ * @return: * : Always re-returns `dst' */
+__FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memmove)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovec))(__dst, __src, __elem_count, __elem_size); }
+#elif defined(__CRT_HAVE_memmovec)
+/* Move memory between potentially overlapping memory blocks
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,memmove,(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size),memmovec,(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: memmovec */
+} /* extern "C++" { */
+__NAMESPACE_STD_END
+#include <local/string/memmovec.h>
+__NAMESPACE_STD_BEGIN
+extern "C++" {
+/* Move memory between potentially overlapping memory blocks
+ * @return: * : Always re-returns `dst' */
+__FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memmove)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovec))(__dst, __src, __elem_count, __elem_size); }
+#endif /* memmove... */
+} /* extern "C++" */
+#endif /* __cplusplus && __USE_STRING_OVERLOADS */
 __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
@@ -616,6 +659,10 @@ __NAMESPACE_STD_USING(strcoll)
 __NAMESPACE_STD_USING(strxfrm)
 __NAMESPACE_STD_USING(strerror)
 #endif /* !__CXX_SYSTEM_HEADER */
+#if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+extern "C++" {
+} /* extern "C++" */
+#endif /* __cplusplus && __USE_STRING_OVERLOADS */
 
 #ifdef _MSC_VER
 __NAMESPACE_STD_BEGIN
@@ -1008,33 +1055,50 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 __NAMESPACE_LOCAL_USING_OR_IMPL(strverscmp, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL strverscmp)(char const *__s1, char const *__s2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strverscmp))(__s1, __s2); })
 #endif /* strverscmp... */
 #ifdef __fast_mempcpy_defined
-/* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempcpy)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))(__dst, __src, __n_bytes); }
 #elif defined(__CRT_HAVE_mempcpy)
-/* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE___mempcpy)
-/* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),(__dst,__src,__n_bytes))
 #else /* LIBC: mempcpy */
 #include <local/string/mempcpy.h>
-/* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempcpy)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpy))(__dst, __src, __n_bytes); }
 #endif /* __mempcpy... */
 #ifdef __fast_mempcpy_defined
-/* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __NAMESPACE_FAST_USING_OR_IMPL(mempcpy, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempcpy)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))(__dst, __src, __n_bytes); })
 #elif defined(__CRT_HAVE_mempcpy)
-/* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE___mempcpy)
-/* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
 #else /* LIBC: mempcpy */
 #include <local/string/mempcpy.h>
-/* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mempcpy, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempcpy)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpy))(__dst, __src, __n_bytes); })
 #endif /* mempcpy... */
+#if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+extern "C++" {
+#ifdef __fast_mempcpyc_defined
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+__FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempcpy)(void *__restrict __dst, void const *__restrict __src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpyc))(__dst, __src, __elem_count, __elem_size); }
+#elif defined(__CRT_HAVE_mempcpyc)
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempcpy,(void *__restrict __dst, void const *__restrict __src, size_t __elem_count, size_t __elem_size),mempcpyc,(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: mempcpyc */
+} /* extern "C++" { */
+#include <local/string/mempcpyc.h>
+extern "C++" {
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+__FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempcpy)(void *__restrict __dst, void const *__restrict __src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyc))(__dst, __src, __elem_count, __elem_size); }
+#endif /* mempcpy... */
+} /* extern "C++" */
+#endif /* __cplusplus && __USE_STRING_OVERLOADS */
 #ifdef __CRT_HAVE_strfry
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,strfry,(char *__restrict __string),(__string))
 #else /* LIBC: strfry */
@@ -1357,14 +1421,14 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT8_TYPE__ 
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT8_TYPE__ *__NOTHROW_NCX(__LIBCCALL memcpyb)(/*aligned(1)*/ void *__restrict __dst, /*aligned(1)*/ void const *__restrict __src, __SIZE_TYPE__ __n_bytes) { return (__UINT8_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy))((void *)__dst, (void const *)__src, __n_bytes); }
 #endif /* memcpyb... */
 #ifdef __fast_mempcpy_defined
-/* Same as `memcpyb', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memcpyb', but return `DST + N_BYTES', rather than `DST' */
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT8_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempcpyb)(/*aligned(1)*/ void *__restrict __dst, /*aligned(1)*/ void const *__restrict __src, __SIZE_TYPE__ __n_bytes) { return (__UINT8_TYPE__ *)(__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))((void *)__dst, (void const *)__src, __n_bytes); }
 #elif defined(__CRT_HAVE_mempcpy)
-/* Same as `memcpyb', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memcpyb', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT8_TYPE__ *,__NOTHROW_NCX,mempcpyb,(/*aligned(1)*/ void *__restrict __dst, /*aligned(1)*/ void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
 #else /* LIBC: mempcpy */
 #include <local/string/mempcpy.h>
-/* Same as `memcpyb', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memcpyb', but return `DST + N_BYTES', rather than `DST' */
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT8_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempcpyb)(/*aligned(1)*/ void *__restrict __dst, /*aligned(1)*/ void const *__restrict __src, __SIZE_TYPE__ __n_bytes) { return (__UINT8_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpy))((void *)__dst, (void const *)__src, __n_bytes); }
 #endif /* mempcpyb... */
 #ifdef __fast_memcpyw_defined
@@ -1382,17 +1446,17 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__
 __NAMESPACE_LOCAL_USING_OR_IMPL(memcpyw, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL memcpyw)(/*aligned(2)*/ void *__restrict __dst, /*aligned(2)*/ void const *__restrict __src, __SIZE_TYPE__ __n_words) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyw))(__dst, __src, __n_words); })
 #endif /* memcpyw... */
 #ifdef __fast_mempcpyw_defined
-/* Same as `memcpyw', but return `DST+N_WORDS', rather than `DST' */
+/* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
 __NAMESPACE_FAST_USING_OR_IMPL(mempcpyw, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempcpyw)(/*aligned(2)*/ void *__restrict __dst, /*aligned(2)*/ void const *__restrict __src, __SIZE_TYPE__ __n_words) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpyw))(__dst, __src, __n_words); })
 #elif defined(__CRT_HAVE_mempcpyw)
-/* Same as `memcpyw', but return `DST+N_WORDS', rather than `DST' */
+/* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,mempcpyw,(/*aligned(2)*/ void *__restrict __dst, /*aligned(2)*/ void const *__restrict __src, __SIZE_TYPE__ __n_words),(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_wmempcpy) && (__SIZEOF_WCHAR_T__ == 2)
-/* Same as `memcpyw', but return `DST+N_WORDS', rather than `DST' */
+/* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,mempcpyw,(/*aligned(2)*/ void *__restrict __dst, /*aligned(2)*/ void const *__restrict __src, __SIZE_TYPE__ __n_words),wmempcpy,(__dst,__src,__n_words))
 #else /* LIBC: mempcpyw */
 #include <local/string/mempcpyw.h>
-/* Same as `memcpyw', but return `DST+N_WORDS', rather than `DST' */
+/* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mempcpyw, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempcpyw)(/*aligned(2)*/ void *__restrict __dst, /*aligned(2)*/ void const *__restrict __src, __SIZE_TYPE__ __n_words) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyw))(__dst, __src, __n_words); })
 #endif /* mempcpyw... */
 #ifdef __fast_memcpyl_defined
@@ -1410,17 +1474,17 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__
 __NAMESPACE_LOCAL_USING_OR_IMPL(memcpyl, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL memcpyl)(/*aligned(4)*/ void *__restrict __dst, /*aligned(4)*/ void const *__restrict __src, __SIZE_TYPE__ __n_dwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyl))(__dst, __src, __n_dwords); })
 #endif /* memcpyl... */
 #ifdef __fast_mempcpyl_defined
-/* Same as `memcpyl', but return `DST+N_DWORDS', rather than `DST' */
+/* Same as `memcpyl', but return `DST + N_DWORDS', rather than `DST' */
 __NAMESPACE_FAST_USING_OR_IMPL(mempcpyl, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempcpyl)(/*aligned(4)*/ void *__restrict __dst, /*aligned(4)*/ void const *__restrict __src, __SIZE_TYPE__ __n_dwords) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpyl))(__dst, __src, __n_dwords); })
 #elif defined(__CRT_HAVE_mempcpyl)
-/* Same as `memcpyl', but return `DST+N_DWORDS', rather than `DST' */
+/* Same as `memcpyl', but return `DST + N_DWORDS', rather than `DST' */
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,mempcpyl,(/*aligned(4)*/ void *__restrict __dst, /*aligned(4)*/ void const *__restrict __src, __SIZE_TYPE__ __n_dwords),(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_wmempcpy) && (__SIZEOF_WCHAR_T__ == 4)
-/* Same as `memcpyl', but return `DST+N_DWORDS', rather than `DST' */
+/* Same as `memcpyl', but return `DST + N_DWORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,mempcpyl,(/*aligned(4)*/ void *__restrict __dst, /*aligned(4)*/ void const *__restrict __src, __SIZE_TYPE__ __n_dwords),wmempcpy,(__dst,__src,__n_dwords))
 #else /* LIBC: mempcpyl */
 #include <local/string/mempcpyl.h>
-/* Same as `memcpyl', but return `DST+N_DWORDS', rather than `DST' */
+/* Same as `memcpyl', but return `DST + N_DWORDS', rather than `DST' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mempcpyl, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempcpyl)(/*aligned(4)*/ void *__restrict __dst, /*aligned(4)*/ void const *__restrict __src, __SIZE_TYPE__ __n_dwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyl))(__dst, __src, __n_dwords); })
 #endif /* mempcpyl... */
 #ifdef __fast_memmove_defined
@@ -1435,14 +1499,14 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT8_TYPE__ 
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT8_TYPE__ *__NOTHROW_NCX(__LIBCCALL memmoveb)(/*aligned(1)*/ void *__dst, /*aligned(1)*/ void const *__src, __SIZE_TYPE__ __n_bytes) { return (__UINT8_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmove))((void *)__dst, (void const *)__src, __n_bytes); }
 #endif /* memmoveb... */
 #ifdef __fast_mempmove_defined
-/* Same as `memmoveb', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memmoveb', but return `DST + N_BYTES', rather than `DST' */
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT8_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmoveb)(/*aligned(1)*/ void *__dst, /*aligned(1)*/ void const *__src, __SIZE_TYPE__ __n_bytes) { return (__UINT8_TYPE__ *)(__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmove))((void *)__dst, (void const *)__src, __n_bytes); }
 #elif defined(__CRT_HAVE_mempmove)
-/* Same as `memmoveb', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memmoveb', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT8_TYPE__ *,__NOTHROW_NCX,mempmoveb,(/*aligned(1)*/ void *__dst, /*aligned(1)*/ void const *__src, __SIZE_TYPE__ __n_bytes),mempmove,(__dst,__src,__n_bytes))
 #else /* LIBC: mempmove */
 #include <local/string/mempmove.h>
-/* Same as `memmoveb', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memmoveb', but return `DST + N_BYTES', rather than `DST' */
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT8_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmoveb)(/*aligned(1)*/ void *__dst, /*aligned(1)*/ void const *__src, __SIZE_TYPE__ __n_bytes) { return (__UINT8_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmove))((void *)__dst, (void const *)__src, __n_bytes); }
 #endif /* mempmoveb... */
 #ifdef __fast_memmovew_defined
@@ -1460,14 +1524,14 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__
 __NAMESPACE_LOCAL_USING_OR_IMPL(memmovew, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL memmovew)(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovew))(__dst, __src, __n_words); })
 #endif /* memmovew... */
 #ifdef __fast_mempmovew_defined
-/* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' */
+/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' */
 __NAMESPACE_FAST_USING_OR_IMPL(mempmovew, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmovew)(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovew))(__dst, __src, __n_words); })
 #elif defined(__CRT_HAVE_mempmovew)
-/* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' */
+/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' */
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,mempmovew,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words),(__dst,__src,__n_words))
 #else /* LIBC: mempmovew */
 #include <local/string/mempmovew.h>
-/* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' */
+/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mempmovew, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmovew)(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovew))(__dst, __src, __n_words); })
 #endif /* mempmovew... */
 #ifdef __fast_memmovel_defined
@@ -1485,14 +1549,14 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__
 __NAMESPACE_LOCAL_USING_OR_IMPL(memmovel, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL memmovel)(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovel))(__dst, __src, __n_dwords); })
 #endif /* memmovel... */
 #ifdef __fast_mempmovel_defined
-/* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' */
+/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' */
 __NAMESPACE_FAST_USING_OR_IMPL(mempmovel, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmovel)(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovel))(__dst, __src, __n_dwords); })
 #elif defined(__CRT_HAVE_mempmovel)
-/* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' */
+/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' */
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,mempmovel,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords),(__dst,__src,__n_dwords))
 #else /* LIBC: mempmovel */
 #include <local/string/mempmovel.h>
-/* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' */
+/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mempmovel, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmovel)(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovel))(__dst, __src, __n_dwords); })
 #endif /* mempmovel... */
 #ifdef __USE_KOS
@@ -1519,25 +1583,25 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT8_TYPE__ 
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT8_TYPE__ *__NOTHROW_NCX(__LIBCCALL memmovedownb)(/*aligned(1)*/ void *__dst, /*aligned(1)*/ void const *__src, __SIZE_TYPE__ __n_bytes) { return (__UINT8_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedown))((void *)__dst, (void const *)__src, __n_bytes); }
 #endif /* memmovedownb... */
 #ifdef __fast_mempmoveup_defined
-/* Same as `memmoveb', but return `DST+N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
+/* Same as `memmoveb', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT8_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmoveupb)(/*aligned(1)*/ void *__dst, /*aligned(1)*/ void const *__src, __SIZE_TYPE__ __n_bytes) { return (__UINT8_TYPE__ *)(__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveup))((void *)__dst, (void const *)__src, __n_bytes); }
 #elif defined(__CRT_HAVE_mempmoveup)
-/* Same as `memmoveb', but return `DST+N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
+/* Same as `memmoveb', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT8_TYPE__ *,__NOTHROW_NCX,mempmoveupb,(/*aligned(1)*/ void *__dst, /*aligned(1)*/ void const *__src, __SIZE_TYPE__ __n_bytes),mempmoveup,(__dst,__src,__n_bytes))
 #else /* LIBC: mempmoveup */
 #include <local/string/mempmoveup.h>
-/* Same as `memmoveb', but return `DST+N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
+/* Same as `memmoveb', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT8_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmoveupb)(/*aligned(1)*/ void *__dst, /*aligned(1)*/ void const *__src, __SIZE_TYPE__ __n_bytes) { return (__UINT8_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveup))((void *)__dst, (void const *)__src, __n_bytes); }
 #endif /* mempmoveupb... */
 #ifdef __fast_mempmovedown_defined
-/* Same as `memmoveb', but return `DST+N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
+/* Same as `memmoveb', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT8_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmovedownb)(/*aligned(1)*/ void *__dst, /*aligned(1)*/ void const *__src, __SIZE_TYPE__ __n_bytes) { return (__UINT8_TYPE__ *)(__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedown))((void *)__dst, (void const *)__src, __n_bytes); }
 #elif defined(__CRT_HAVE_mempmovedown)
-/* Same as `memmoveb', but return `DST+N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
+/* Same as `memmoveb', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT8_TYPE__ *,__NOTHROW_NCX,mempmovedownb,(/*aligned(1)*/ void *__dst, /*aligned(1)*/ void const *__src, __SIZE_TYPE__ __n_bytes),mempmovedown,(__dst,__src,__n_bytes))
 #else /* LIBC: mempmovedown */
 #include <local/string/mempmovedown.h>
-/* Same as `memmoveb', but return `DST+N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
+/* Same as `memmoveb', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT8_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmovedownb)(/*aligned(1)*/ void *__dst, /*aligned(1)*/ void const *__src, __SIZE_TYPE__ __n_bytes) { return (__UINT8_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedown))((void *)__dst, (void const *)__src, __n_bytes); }
 #endif /* mempmovedownb... */
 #ifdef __fast_memmoveupw_defined
@@ -1575,31 +1639,31 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__
 __NAMESPACE_LOCAL_USING_OR_IMPL(memmovedownw, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL memmovedownw)(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedownw))(__dst, __src, __n_words); })
 #endif /* memmovedownw... */
 #ifdef __fast_mempmoveupw_defined
-/* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
+/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
 __NAMESPACE_FAST_USING_OR_IMPL(mempmoveupw, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmoveupw)(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupw))(__dst, __src, __n_words); })
 #elif defined(__CRT_HAVE_mempmoveupw)
-/* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
+/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,mempmoveupw,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words),(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_mempmovew)
-/* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
+/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,mempmoveupw,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words),mempmovew,(__dst,__src,__n_words))
 #else /* LIBC: mempmoveupw */
 #include <local/string/mempmoveupw.h>
-/* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
+/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mempmoveupw, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmoveupw)(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupw))(__dst, __src, __n_words); })
 #endif /* mempmoveupw... */
 #ifdef __fast_mempmovedownw_defined
-/* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS') */
+/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS') */
 __NAMESPACE_FAST_USING_OR_IMPL(mempmovedownw, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmovedownw)(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownw))(__dst, __src, __n_words); })
 #elif defined(__CRT_HAVE_mempmovedownw)
-/* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS') */
+/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS') */
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,mempmovedownw,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words),(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_mempmovew)
-/* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS') */
+/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,mempmovedownw,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words),mempmovew,(__dst,__src,__n_words))
 #else /* LIBC: mempmovedownw */
 #include <local/string/mempmovedownw.h>
-/* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS') */
+/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mempmovedownw, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmovedownw)(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedownw))(__dst, __src, __n_words); })
 #endif /* mempmovedownw... */
 #ifdef __fast_memmoveupl_defined
@@ -1637,31 +1701,31 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__
 __NAMESPACE_LOCAL_USING_OR_IMPL(memmovedownl, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL memmovedownl)(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedownl))(__dst, __src, __n_dwords); })
 #endif /* memmovedownl... */
 #ifdef __fast_mempmoveupl_defined
-/* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
+/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
 __NAMESPACE_FAST_USING_OR_IMPL(mempmoveupl, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmoveupl)(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupl))(__dst, __src, __n_dwords); })
 #elif defined(__CRT_HAVE_mempmoveupl)
-/* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
+/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,mempmoveupl,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords),(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_mempmovel)
-/* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
+/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,mempmoveupl,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords),mempmovel,(__dst,__src,__n_dwords))
 #else /* LIBC: mempmoveupl */
 #include <local/string/mempmoveupl.h>
-/* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
+/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mempmoveupl, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmoveupl)(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupl))(__dst, __src, __n_dwords); })
 #endif /* mempmoveupl... */
 #ifdef __fast_mempmovedownl_defined
-/* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS') */
+/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS') */
 __NAMESPACE_FAST_USING_OR_IMPL(mempmovedownl, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmovedownl)(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownl))(__dst, __src, __n_dwords); })
 #elif defined(__CRT_HAVE_mempmovedownl)
-/* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS') */
+/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS') */
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,mempmovedownl,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords),(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_mempmovel)
-/* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS') */
+/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,mempmovedownl,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords),mempmovel,(__dst,__src,__n_dwords))
 #else /* LIBC: mempmovedownl */
 #include <local/string/mempmovedownl.h>
-/* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS') */
+/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mempmovedownl, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmovedownl)(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedownl))(__dst, __src, __n_dwords); })
 #endif /* mempmovedownl... */
 #endif /* __USE_KOS */
@@ -1677,14 +1741,14 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT8_TYPE__ *,_
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT8_TYPE__ *__NOTHROW_NCX(__LIBCCALL memsetb)(/*aligned(1)*/ void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes) { return (__UINT8_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memset))((void *)__dst, __byte, __n_bytes); }
 #endif /* memsetb... */
 #ifdef __fast_mempset_defined
-/* Same as `memsetb', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memsetb', but return `DST + N_BYTES', rather than `DST' */
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT8_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempsetb)(/*aligned(1)*/ void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes) { return (__UINT8_TYPE__ *)(__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempset))((void *)__dst, __byte, __n_bytes); }
 #elif defined(__CRT_HAVE_mempset)
-/* Same as `memsetb', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memsetb', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT8_TYPE__ *,__NOTHROW_NCX,mempsetb,(/*aligned(1)*/ void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),mempset,(__dst,__byte,__n_bytes))
 #else /* LIBC: mempset */
 #include <local/string/mempset.h>
-/* Same as `memsetb', but return `DST+N_BYTES', rather than `DST' */
+/* Same as `memsetb', but return `DST + N_BYTES', rather than `DST' */
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT8_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempsetb)(/*aligned(1)*/ void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes) { return (__UINT8_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempset))((void *)__dst, __byte, __n_bytes); }
 #endif /* mempsetb... */
 #ifdef __fast_memsetw_defined
@@ -1699,14 +1763,14 @@ __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,_
 __NAMESPACE_LOCAL_USING_OR_IMPL(memsetw, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL memsetw)(/*aligned(2)*/ void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memsetw))(__dst, __word, __n_words); })
 #endif /* memsetw... */
 #ifdef __fast_mempsetw_defined
-/* Same as `memsetw', but return `DST+N_WORDS', rather than `DST' */
+/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
 __NAMESPACE_FAST_USING_OR_IMPL(mempsetw, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempsetw)(/*aligned(2)*/ void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetw))(__dst, __word, __n_words); })
 #elif defined(__CRT_HAVE_mempsetw)
-/* Same as `memsetw', but return `DST+N_WORDS', rather than `DST' */
+/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,mempsetw,(/*aligned(2)*/ void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),(__dst,__word,__n_words))
 #else /* LIBC: mempsetw */
 #include <local/string/mempsetw.h>
-/* Same as `memsetw', but return `DST+N_WORDS', rather than `DST' */
+/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mempsetw, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempsetw)(/*aligned(2)*/ void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempsetw))(__dst, __word, __n_words); })
 #endif /* mempsetw... */
 #ifdef __fast_memsetl_defined
@@ -1721,14 +1785,14 @@ __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,_
 __NAMESPACE_LOCAL_USING_OR_IMPL(memsetl, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL memsetl)(/*aligned(4)*/ void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memsetl))(__dst, __dword, __n_dwords); })
 #endif /* memsetl... */
 #ifdef __fast_mempsetl_defined
-/* Same as `memsetl', but return `DST+N_DWORDS', rather than `DST' */
+/* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
 __NAMESPACE_FAST_USING_OR_IMPL(mempsetl, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempsetl)(/*aligned(4)*/ void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetl))(__dst, __dword, __n_dwords); })
 #elif defined(__CRT_HAVE_mempsetl)
-/* Same as `memsetl', but return `DST+N_DWORDS', rather than `DST' */
+/* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,mempsetl,(/*aligned(4)*/ void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),(__dst,__dword,__n_dwords))
 #else /* LIBC: mempsetl */
 #include <local/string/mempsetl.h>
-/* Same as `memsetl', but return `DST+N_DWORDS', rather than `DST' */
+/* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mempsetl, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempsetl)(/*aligned(4)*/ void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempsetl))(__dst, __dword, __n_dwords); })
 #endif /* mempsetl... */
 #ifdef __fast_memcmp_defined
@@ -2525,14 +2589,14 @@ __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ 
 __NAMESPACE_LOCAL_USING_OR_IMPL(memcpyq, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL memcpyq)(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyq))(__dst, __src, __n_qwords); })
 #endif /* memcpyq... */
 #ifdef __fast_mempcpyq_defined
-/* Same as `memcpyq', but return `DST+N_QWORDS', rather than `DST' */
+/* Same as `memcpyq', but return `DST + N_QWORDS', rather than `DST' */
 __NAMESPACE_FAST_USING_OR_IMPL(mempcpyq, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempcpyq)(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpyq))(__dst, __src, __n_qwords); })
 #elif defined(__CRT_HAVE_mempcpyq)
-/* Same as `memcpyq', but return `DST+N_QWORDS', rather than `DST' */
+/* Same as `memcpyq', but return `DST + N_QWORDS', rather than `DST' */
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,mempcpyq,(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords),(__dst,__src,__n_qwords))
 #else /* LIBC: mempcpyq */
 #include <local/string/mempcpyq.h>
-/* Same as `memcpyq', but return `DST+N_QWORDS', rather than `DST' */
+/* Same as `memcpyq', but return `DST + N_QWORDS', rather than `DST' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mempcpyq, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempcpyq)(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyq))(__dst, __src, __n_qwords); })
 #endif /* mempcpyq... */
 #ifdef __fast_memmoveq_defined
@@ -2547,14 +2611,14 @@ __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ 
 __NAMESPACE_LOCAL_USING_OR_IMPL(memmoveq, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL memmoveq)(/*aligned(8)*/ void *__dst, /*aligned(8)*/ void const *__src, __SIZE_TYPE__ __n_qwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveq))(__dst, __src, __n_qwords); })
 #endif /* memmoveq... */
 #ifdef __fast_mempmoveq_defined
-/* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' */
+/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' */
 __NAMESPACE_FAST_USING_OR_IMPL(mempmoveq, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmoveq)(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveq))(__dst, __src, __n_qwords); })
 #elif defined(__CRT_HAVE_mempmoveq)
-/* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' */
+/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' */
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,mempmoveq,(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords),(__dst,__src,__n_qwords))
 #else /* LIBC: mempmoveq */
 #include <local/string/mempmoveq.h>
-/* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' */
+/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mempmoveq, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmoveq)(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveq))(__dst, __src, __n_qwords); })
 #endif /* mempmoveq... */
 #ifdef __USE_KOS
@@ -2587,31 +2651,31 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__
 __NAMESPACE_LOCAL_USING_OR_IMPL(memmovedownq, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL memmovedownq)(/*aligned(8)*/ void *__dst, /*aligned(8)*/ void const *__src, __SIZE_TYPE__ __n_qwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedownq))(__dst, __src, __n_qwords); })
 #endif /* memmovedownq... */
 #ifdef __fast_mempmoveupq_defined
-/* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
+/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
 __NAMESPACE_FAST_USING_OR_IMPL(mempmoveupq, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmoveupq)(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupq))(__dst, __src, __n_qwords); })
 #elif defined(__CRT_HAVE_mempmoveupq)
-/* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
+/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,mempmoveupq,(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords),(__dst,__src,__n_qwords))
 #elif defined(__CRT_HAVE_mempmoveq)
-/* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
+/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,mempmoveupq,(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempmoveq,(__dst,__src,__n_qwords))
 #else /* LIBC: mempmoveupq */
 #include <local/string/mempmoveupq.h>
-/* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
+/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mempmoveupq, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmoveupq)(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupq))(__dst, __src, __n_qwords); })
 #endif /* mempmoveupq... */
 #ifdef __fast_mempmovedownq_defined
-/* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS') */
+/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS') */
 __NAMESPACE_FAST_USING_OR_IMPL(mempmovedownq, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmovedownq)(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownq))(__dst, __src, __n_qwords); })
 #elif defined(__CRT_HAVE_mempmovedownq)
-/* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS') */
+/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS') */
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,mempmovedownq,(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords),(__dst,__src,__n_qwords))
 #elif defined(__CRT_HAVE_mempmoveq)
-/* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS') */
+/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,mempmovedownq,(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempmoveq,(__dst,__src,__n_qwords))
 #else /* LIBC: mempmovedownq */
 #include <local/string/mempmovedownq.h>
-/* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS') */
+/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mempmovedownq, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempmovedownq)(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedownq))(__dst, __src, __n_qwords); })
 #endif /* mempmovedownq... */
 #endif /* __USE_KOS */
@@ -2627,14 +2691,14 @@ __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,_
 __NAMESPACE_LOCAL_USING_OR_IMPL(memsetq, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL memsetq)(/*aligned(8)*/ void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memsetq))(__dst, __qword, __n_qwords); })
 #endif /* memsetq... */
 #ifdef __fast_mempsetq_defined
-/* Same as `memsetq', but return `DST+N_QWORDS', rather than `DST' */
+/* Same as `memsetq', but return `DST + N_QWORDS', rather than `DST' */
 __NAMESPACE_FAST_USING_OR_IMPL(mempsetq, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempsetq)(/*aligned(8)*/ void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetq))(__dst, __qword, __n_qwords); })
 #elif defined(__CRT_HAVE_mempsetq)
-/* Same as `memsetq', but return `DST+N_QWORDS', rather than `DST' */
+/* Same as `memsetq', but return `DST + N_QWORDS', rather than `DST' */
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,mempsetq,(/*aligned(8)*/ void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),(__dst,__qword,__n_qwords))
 #else /* LIBC: mempsetq */
 #include <local/string/mempsetq.h>
-/* Same as `memsetq', but return `DST+N_QWORDS', rather than `DST' */
+/* Same as `memsetq', but return `DST + N_QWORDS', rather than `DST' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mempsetq, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL mempsetq)(/*aligned(8)*/ void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempsetq))(__dst, __qword, __n_qwords); })
 #endif /* mempsetq... */
 #ifdef __fast_memcmpq_defined
@@ -3908,6 +3972,106 @@ __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW
  * @return: * : Always re-returns `dst' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(memmovedown, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memmovedown)(void *__dst, void const *__src, size_t __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedown))(__dst, __src, __n_bytes); })
 #endif /* memmovedown... */
+#ifdef __fast_memcpyc_defined
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+__NAMESPACE_FAST_USING_OR_IMPL(memcpyc, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memcpyc)(void *__restrict __dst, void const *__restrict __src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyc))(__dst, __src, __elem_count, __elem_size); })
+#elif defined(__CRT_HAVE_memcpyc)
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,memcpyc,(void *__restrict __dst, void const *__restrict __src, size_t __elem_count, size_t __elem_size),(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: memcpyc */
+#include <local/string/memcpyc.h>
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(memcpyc, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memcpyc)(void *__restrict __dst, void const *__restrict __src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyc))(__dst, __src, __elem_count, __elem_size); })
+#endif /* memcpyc... */
+#ifdef __fast_mempcpyc_defined
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+__NAMESPACE_FAST_USING_OR_IMPL(mempcpyc, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempcpyc)(void *__restrict __dst, void const *__restrict __src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpyc))(__dst, __src, __elem_count, __elem_size); })
+#elif defined(__CRT_HAVE_mempcpyc)
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempcpyc,(void *__restrict __dst, void const *__restrict __src, size_t __elem_count, size_t __elem_size),(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: mempcpyc */
+#include <local/string/mempcpyc.h>
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(mempcpyc, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempcpyc)(void *__restrict __dst, void const *__restrict __src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyc))(__dst, __src, __elem_count, __elem_size); })
+#endif /* mempcpyc... */
+#ifdef __fast_memmovec_defined
+/* Move memory between potentially overlapping memory blocks
+ * @return: * : Always re-returns `dst' */
+__NAMESPACE_FAST_USING_OR_IMPL(memmovec, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memmovec)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovec))(__dst, __src, __elem_count, __elem_size); })
+#elif defined(__CRT_HAVE_memmovec)
+/* Move memory between potentially overlapping memory blocks
+ * @return: * : Always re-returns `dst' */
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,memmovec,(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size),(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: memmovec */
+#include <local/string/memmovec.h>
+/* Move memory between potentially overlapping memory blocks
+ * @return: * : Always re-returns `dst' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(memmovec, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memmovec)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovec))(__dst, __src, __elem_count, __elem_size); })
+#endif /* memmovec... */
+#ifdef __fast_mempmovec_defined
+/* Same as `memmovec', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+__NAMESPACE_FAST_USING_OR_IMPL(mempmovec, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmovec)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovec))(__dst, __src, __elem_count, __elem_size); })
+#elif defined(__CRT_HAVE_mempmovec)
+/* Same as `memmovec', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempmovec,(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size),(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: mempmovec */
+#include <local/string/mempmovec.h>
+/* Same as `memmovec', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(mempmovec, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmovec)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovec))(__dst, __src, __elem_count, __elem_size); })
+#endif /* mempmovec... */
+#ifdef __fast_memmoveupc_defined
+/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
+ * @return: * : Always re-returns `dst' */
+__NAMESPACE_FAST_USING_OR_IMPL(memmoveupc, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memmoveupc)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveupc))(__dst, __src, __elem_count, __elem_size); })
+#elif defined(__CRT_HAVE_memmoveupc)
+/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
+ * @return: * : Always re-returns `dst' */
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,memmoveupc,(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size),(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: memmoveupc */
+#include <local/string/memmoveupc.h>
+/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
+ * @return: * : Always re-returns `dst' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(memmoveupc, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memmoveupc)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveupc))(__dst, __src, __elem_count, __elem_size); })
+#endif /* memmoveupc... */
+#ifdef __fast_mempmoveupc_defined
+/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+__NAMESPACE_FAST_USING_OR_IMPL(mempmoveupc, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmoveupc)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupc))(__dst, __src, __elem_count, __elem_size); })
+#elif defined(__CRT_HAVE_mempmoveupc)
+/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempmoveupc,(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size),(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: mempmoveupc */
+#include <local/string/mempmoveupc.h>
+/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(mempmoveupc, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmoveupc)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupc))(__dst, __src, __elem_count, __elem_size); })
+#endif /* mempmoveupc... */
+#ifdef __fast_memmovedownc_defined
+/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
+ * @return: * : Always re-returns `dst' */
+__NAMESPACE_FAST_USING_OR_IMPL(memmovedownc, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memmovedownc)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedownc))(__dst, __src, __elem_count, __elem_size); })
+#elif defined(__CRT_HAVE_memmovedownc)
+/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
+ * @return: * : Always re-returns `dst' */
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,memmovedownc,(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size),(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: memmovedownc */
+#include <local/string/memmovedownc.h>
+/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
+ * @return: * : Always re-returns `dst' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(memmovedownc, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memmovedownc)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedownc))(__dst, __src, __elem_count, __elem_size); })
+#endif /* memmovedownc... */
+#ifdef __fast_mempmovedownc_defined
+/* Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+__NAMESPACE_FAST_USING_OR_IMPL(mempmovedownc, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmovedownc)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownc))(__dst, __src, __elem_count, __elem_size); })
+#elif defined(__CRT_HAVE_mempmovedownc)
+/* Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempmovedownc,(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size),(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: mempmovedownc */
+#include <local/string/mempmovedownc.h>
+/* Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(mempmovedownc, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmovedownc)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedownc))(__dst, __src, __elem_count, __elem_size); })
+#endif /* mempmovedownc... */
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 #ifdef __CRT_HAVE_strend
 extern "C++" {
@@ -4130,49 +4294,124 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHRO
 __NAMESPACE_LOCAL_USING_OR_IMPL(strnroff, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL strnroff)(char const *__restrict __haystack, int __needle, __SIZE_TYPE__ __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnroff))(__haystack, __needle, __maxlen); })
 #endif /* strnroff... */
 #ifdef __fast_mempset_defined
-/* Same as `memset', but return `DST+N_BYTES', rather than `DST' */
-__NAMESPACE_FAST_USING_OR_IMPL(mempset, __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBCCALL mempset)(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempset))(__dst, __byte, __n_bytes); })
+/* Same as `memset', but return `DST + N_BYTES', rather than `DST' */
+__NAMESPACE_FAST_USING_OR_IMPL(mempset, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBCCALL mempset)(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempset))(__dst, __byte, __n_bytes); })
 #elif defined(__CRT_HAVE_mempset)
-/* Same as `memset', but return `DST+N_BYTES', rather than `DST' */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,mempset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),(__dst,__byte,__n_bytes))
+/* Same as `memset', but return `DST + N_BYTES', rather than `DST' */
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,mempset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),(__dst,__byte,__n_bytes))
 #else /* LIBC: mempset */
 #include <local/string/mempset.h>
-/* Same as `memset', but return `DST+N_BYTES', rather than `DST' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(mempset, __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBCCALL mempset)(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempset))(__dst, __byte, __n_bytes); })
+/* Same as `memset', but return `DST + N_BYTES', rather than `DST' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(mempset, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBCCALL mempset)(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempset))(__dst, __byte, __n_bytes); })
 #endif /* mempset... */
 #ifdef __fast_mempmove_defined
-/* Same as `memmove', but return `DST+N_BYTES', rather than `DST' */
-__NAMESPACE_FAST_USING_OR_IMPL(mempmove, __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmove)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmove))(__dst, __src, __n_bytes); })
+/* Same as `memmove', but return `DST + N_BYTES', rather than `DST' */
+__NAMESPACE_FAST_USING_OR_IMPL(mempmove, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmove)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmove))(__dst, __src, __n_bytes); })
 #elif defined(__CRT_HAVE_mempmove)
-/* Same as `memmove', but return `DST+N_BYTES', rather than `DST' */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempmove,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),(__dst,__src,__n_bytes))
+/* Same as `memmove', but return `DST + N_BYTES', rather than `DST' */
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempmove,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),(__dst,__src,__n_bytes))
 #else /* LIBC: mempmove */
 #include <local/string/mempmove.h>
-/* Same as `memmove', but return `DST+N_BYTES', rather than `DST' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(mempmove, __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmove)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmove))(__dst, __src, __n_bytes); })
+/* Same as `memmove', but return `DST + N_BYTES', rather than `DST' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(mempmove, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmove)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmove))(__dst, __src, __n_bytes); })
 #endif /* mempmove... */
 #ifdef __fast_mempmoveup_defined
-/* Same as `memmoveup', but return `DST+N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
-__NAMESPACE_FAST_USING_OR_IMPL(mempmoveup, __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmoveup)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveup))(__dst, __src, __n_bytes); })
+/* Same as `memmoveup', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
+__NAMESPACE_FAST_USING_OR_IMPL(mempmoveup, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmoveup)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveup))(__dst, __src, __n_bytes); })
 #elif defined(__CRT_HAVE_mempmoveup)
-/* Same as `memmoveup', but return `DST+N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),(__dst,__src,__n_bytes))
+/* Same as `memmoveup', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),(__dst,__src,__n_bytes))
 #else /* LIBC: mempmoveup */
 #include <local/string/mempmoveup.h>
-/* Same as `memmoveup', but return `DST+N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(mempmoveup, __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmoveup)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveup))(__dst, __src, __n_bytes); })
+/* Same as `memmoveup', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(mempmoveup, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmoveup)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveup))(__dst, __src, __n_bytes); })
 #endif /* mempmoveup... */
 #ifdef __fast_mempmovedown_defined
-/* Same as `memmovedown', but return `DST+N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
-__NAMESPACE_FAST_USING_OR_IMPL(mempmovedown, __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmovedown)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedown))(__dst, __src, __n_bytes); })
+/* Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
+__NAMESPACE_FAST_USING_OR_IMPL(mempmovedown, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmovedown)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedown))(__dst, __src, __n_bytes); })
 #elif defined(__CRT_HAVE_mempmovedown)
-/* Same as `memmovedown', but return `DST+N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),(__dst,__src,__n_bytes))
+/* Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),(__dst,__src,__n_bytes))
 #else /* LIBC: mempmovedown */
 #include <local/string/mempmovedown.h>
-/* Same as `memmovedown', but return `DST+N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(mempmovedown, __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmovedown)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedown))(__dst, __src, __n_bytes); })
+/* Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(mempmovedown, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmovedown)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedown))(__dst, __src, __n_bytes); })
 #endif /* mempmovedown... */
+#if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+extern "C++" {
+#ifdef __fast_mempmovec_defined
+/* Same as `memmovec', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+__FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmove)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovec))(__dst, __src, __elem_count, __elem_size); }
+#elif defined(__CRT_HAVE_mempmovec)
+/* Same as `memmovec', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempmove,(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size),mempmovec,(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: mempmovec */
+} /* extern "C++" { */
+#include <local/string/mempmovec.h>
+extern "C++" {
+/* Same as `memmovec', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+__FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmove)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovec))(__dst, __src, __elem_count, __elem_size); }
+#endif /* mempmove... */
+#ifdef __fast_mempmoveupc_defined
+/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+__FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmoveup)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupc))(__dst, __src, __elem_count, __elem_size); }
+#elif defined(__CRT_HAVE_mempmoveupc)
+/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempmoveup,(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size),mempmoveupc,(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: mempmoveupc */
+} /* extern "C++" { */
+#include <local/string/mempmoveupc.h>
+extern "C++" {
+/* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+__FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmoveup)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupc))(__dst, __src, __elem_count, __elem_size); }
+#endif /* mempmoveup... */
+#ifdef __fast_mempmovedownc_defined
+/* Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+__FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmovedown)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownc))(__dst, __src, __elem_count, __elem_size); }
+#elif defined(__CRT_HAVE_mempmovedownc)
+/* Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempmovedown,(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size),mempmovedownc,(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: mempmovedownc */
+} /* extern "C++" { */
+#include <local/string/mempmovedownc.h>
+extern "C++" {
+/* Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE') */
+__FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmovedown)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedownc))(__dst, __src, __elem_count, __elem_size); }
+#endif /* mempmovedown... */
+#ifdef __fast_memmoveupc_defined
+/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
+ * @return: * : Always re-returns `dst' */
+__FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memmoveup)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveupc))(__dst, __src, __elem_count, __elem_size); }
+#elif defined(__CRT_HAVE_memmoveupc)
+/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,memmoveup,(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size),memmoveupc,(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: memmoveupc */
+} /* extern "C++" { */
+#include <local/string/memmoveupc.h>
+extern "C++" {
+/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
+ * @return: * : Always re-returns `dst' */
+__FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memmoveup)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveupc))(__dst, __src, __elem_count, __elem_size); }
+#endif /* memmoveup... */
+#ifdef __fast_memmovedownc_defined
+/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
+ * @return: * : Always re-returns `dst' */
+__FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memmovedown)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedownc))(__dst, __src, __elem_count, __elem_size); }
+#elif defined(__CRT_HAVE_memmovedownc)
+/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,memmovedown,(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size),memmovedownc,(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: memmovedownc */
+} /* extern "C++" { */
+#include <local/string/memmovedownc.h>
+extern "C++" {
+/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
+ * @return: * : Always re-returns `dst' */
+__FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memmovedown)(void *__dst, void const *__src, size_t __elem_count, size_t __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedownc))(__dst, __src, __elem_count, __elem_size); }
+#endif /* memmovedown... */
+} /* extern "C++" */
+#endif /* __cplusplus && __USE_STRING_OVERLOADS */
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 #ifdef __CRT_HAVE_rawmemrchr
 extern "C++" {
@@ -6415,6 +6654,56 @@ __NOTHROW_NCX(__LIBCCALL __strndupa_init)(void *__restrict __buf, char const *__
 #endif /* !__NO_XBLOCK */
 #endif /* __USE_GNU && __hybrid_alloca */
 
+
+#if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+/* In C, we can use argument-count overload macros to implement these overloads! */
+#ifdef __USE_KOS
+#define __PRIVATE_memcpy_4  memcpyc
+#define __PRIVATE_memmove_4 memmovec
+#ifdef __USE_GNU
+#define __PRIVATE_mempcpy_4 mempcpyc
+#endif /* __USE_GNU */
+#else /* __USE_KOS */
+__SYSDECL_END
+#include <libc/string.h>
+__SYSDECL_BEGIN
+#define __PRIVATE_memcpy_4  __libc_memcpyc
+#define __PRIVATE_memmove_4 __libc_memmovec
+#ifdef __USE_GNU
+#define __PRIVATE_mempcpy_4 __libc_mempcpyc
+#endif /* __USE_GNU */
+#endif /* !__USE_KOS */
+#define __PRIVATE_memcpy_3  (memcpy)
+#define __PRIVATE_memmove_3 (memmove)
+#undef memcpy
+#undef memmove
+#define memcpy(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memcpy_, (__VA_ARGS__))(__VA_ARGS__)
+#define memmove(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmove_, (__VA_ARGS__))(__VA_ARGS__)
+#ifdef __USE_GNU
+#define __PRIVATE_mempcpy_3 (mempcpy)
+#undef mempcpy
+#define mempcpy(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempcpy_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* __USE_GNU */
+#ifdef __USE_KOS
+#define __PRIVATE_mempmove_4     mempmovec
+#define __PRIVATE_mempmoveup_4   mempmoveupc
+#define __PRIVATE_mempmovedown_4 mempmovedownc
+#define __PRIVATE_memmoveup_4    memmoveupc
+#define __PRIVATE_memmovedown_4  memmovedownc
+#define __PRIVATE_mempmove_3     (mempmove)
+#define __PRIVATE_mempmoveup_3   (mempmoveup)
+#define __PRIVATE_mempmovedown_3 (mempmovedown)
+#define __PRIVATE_memmoveup_3    (memmoveup)
+#define __PRIVATE_memmovedown_3  (memmovedown)
+#define mempmove(...)     __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmove_, (__VA_ARGS__))(__VA_ARGS__)
+#define mempmoveup(...)   __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmoveup_, (__VA_ARGS__))(__VA_ARGS__)
+#define mempmovedown(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmovedown_, (__VA_ARGS__))(__VA_ARGS__)
+#define memmoveup(...)    __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmoveup_, (__VA_ARGS__))(__VA_ARGS__)
+#define memmovedown(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmovedown_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* __USE_KOS */
+#endif /* !__cplusplus && __USE_STRING_OVERLOADS */
+
+
 #endif /* __CC__ */
 
 __SYSDECL_END
@@ -6422,7 +6711,7 @@ __SYSDECL_END
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_STRING_H)
 #include <parts/uchar/string.h>
-#endif
+#endif /* _UCHAR_H && !_PARTS_UCHAR_STRING_H */
 #endif /* __USE_UTF */
 
 #ifdef __CXX_SYSTEM_HEADER

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9c41426 */
+/* HASH CRC-32:0x2e3e662b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcasecmp_l))(void const *__s1,
                                                           void const *__s2,
                                                           __SIZE_TYPE__ __n_bytes,
                                                           __locale_t __locale) {
-#line 2779 "kos/src/libc/magic/string.c"
+#line 2882 "kos/src/libc/magic/string.c"
 	(void)__locale;
 	return __localdep_memcasecmp(__s1, __s2, __n_bytes);
 }

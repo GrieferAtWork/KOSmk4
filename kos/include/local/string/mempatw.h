@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9ac686a */
+/* HASH CRC-32:0xd1faa82 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,14 +27,14 @@
 #ifndef ____localdep_mempsetw_defined
 #define ____localdep_mempsetw_defined 1
 #ifdef __fast_mempsetw_defined
-/* Same as `memsetw', but return `DST+N_WORDS', rather than `DST' */
+/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
 #define __localdep_mempsetw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetw))
 #elif defined(__CRT_HAVE_mempsetw)
-/* Same as `memsetw', but return `DST+N_WORDS', rather than `DST' */
+/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetw,(/*aligned(2)*/ void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),mempsetw,(__dst,__word,__n_words))
 #else /* LIBC: mempsetw */
 #include <local/string/mempsetw.h>
-/* Same as `memsetw', but return `DST+N_WORDS', rather than `DST' */
+/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
 #define __localdep_mempsetw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempsetw))
 #endif /* mempsetw... */
 #endif /* !____localdep_mempsetw_defined */
@@ -45,7 +45,7 @@ __LOCAL_LIBC(mempatw) __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempatw))(void *__restrict __dst,
                                                      __UINT16_TYPE__ __pattern,
                                                      __SIZE_TYPE__ __n_bytes) {
-#line 2671 "kos/src/libc/magic/string.c"
+#line 2774 "kos/src/libc/magic/string.c"
 	__BYTE_TYPE__ *__iter = (__BYTE_TYPE__ *)__dst;
 	if (__n_bytes && (__UINTPTR_TYPE__)__iter & 1) {
 		*__iter = __INT16_BYTE(__pattern, 1);

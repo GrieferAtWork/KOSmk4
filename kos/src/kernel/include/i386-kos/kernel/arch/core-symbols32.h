@@ -222,10 +222,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 55 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname55 /* index: 55 */
+	.weak memmoveupw; .long memmoveupw
+	.reloc ., R_386_SIZE32, memmoveupw; .long 0
+	.long 0x46bf037
 	.long 0 /* index: 56 */
 	.long 0
 	.long 0
@@ -2531,9 +2531,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname632 /* index: 632 */
-	.weak task_tryyield; .long task_tryyield
-	.reloc ., R_386_SIZE32, task_tryyield; .long 0
-	.long 0x485eee4
+	.weak sys_pwrite64; .long sys_pwrite64
+	.reloc ., R_386_SIZE32, sys_pwrite64; .long 0
+	.long 0x9403ee4
 	.long .Lname633 /* index: 633 */
 	.weak mouse_device_read; .long mouse_device_read
 	.reloc ., R_386_SIZE32, mouse_device_read; .long 0
@@ -2922,10 +2922,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak thiscpu_x86_ldt; .long thiscpu_x86_ldt
 	.reloc ., R_386_SIZE32, thiscpu_x86_ldt; .long 0
 	.long 0xb226324
-	.long 0 /* index: 730 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname730 /* index: 730 */
+	.weak x86_emulock_cmpxchg16; .long x86_emulock_cmpxchg16
+	.reloc ., R_386_SIZE32, x86_emulock_cmpxchg16; .long 0
+	.long 0xe3483a6
 	.long 0 /* index: 731 */
 	.long 0
 	.long 0
@@ -6039,9 +6039,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, path_traverse_at; .long 0
 	.long 0x2f555e4
 	.long .Lname1509 /* index: 1509 */
-	.weak x86_emulock_cmpxchg16; .long x86_emulock_cmpxchg16
-	.reloc ., R_386_SIZE32, x86_emulock_cmpxchg16; .long 0
-	.long 0xe3483a6
+	.weak this_sched_runnxt; .long this_sched_runnxt
+	.reloc ., R_386_SIZE32, this_sched_runnxt; .long 0
+	.long 0x796ee4
 	.long 0 /* index: 1510 */
 	.long 0
 	.long 0
@@ -12647,9 +12647,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sys_fmknodat; .long 0
 	.long 0x5b5cf54
 	.long .Lname3161 /* index: 3161 */
-	.weak this_sched_runnxt; .long this_sched_runnxt
-	.reloc ., R_386_SIZE32, this_sched_runnxt; .long 0
-	.long 0x796ee4
+	.weak task_tryyield; .long task_tryyield
+	.reloc ., R_386_SIZE32, task_tryyield; .long 0
+	.long 0x485eee4
 	.long 0 /* index: 3162 */
 	.long 0
 	.long 0
@@ -13615,9 +13615,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname3403 /* index: 3403 */
-	.weak sys_pwrite64; .long sys_pwrite64
-	.reloc ., R_386_SIZE32, sys_pwrite64; .long 0
-	.long 0x9403ee4
+	.weak memmovedownw; .long memmovedownw
+	.reloc ., R_386_SIZE32, memmovedownw; .long 0
+	.long 0xb872a37
 	.long .Lname3404 /* index: 3404 */
 	.weak unwind_cfa_apply; .long unwind_cfa_apply
 	.reloc ., R_386_SIZE32, unwind_cfa_apply; .long 0
@@ -16446,6 +16446,8 @@ END(kernel_symbol_table)
 	.string "driver_finalized_callbacks"
 .Lname52:
 	.string "page_ismapped"
+.Lname55:
+	.string "memmoveupw"
 .Lname57:
 	.string "path_recent"
 .Lname62:
@@ -17113,7 +17115,7 @@ END(kernel_symbol_table)
 .Lname630:
 	.string "sys_kreaddirf"
 .Lname632:
-	.string "task_tryyield"
+	.string "sys_pwrite64"
 .Lname633:
 	.string "mouse_device_read"
 .Lname634:
@@ -17216,6 +17218,8 @@ END(kernel_symbol_table)
 	.string "sys_linux_lstat64"
 .Lname729:
 	.string "thiscpu_x86_ldt"
+.Lname730:
+	.string "x86_emulock_cmpxchg16"
 .Lname732:
 	.string "__predict_update_al"
 .Lname738:
@@ -18069,7 +18073,7 @@ END(kernel_symbol_table)
 .Lname1508:
 	.string "path_traverse_at"
 .Lname1509:
-	.string "x86_emulock_cmpxchg16"
+	.string "this_sched_runnxt"
 .Lname1512:
 	.string "sys_ftime"
 .Lname1513:
@@ -19855,7 +19859,7 @@ END(kernel_symbol_table)
 .Lname3160:
 	.string "sys_fmknodat"
 .Lname3161:
-	.string "this_sched_runnxt"
+	.string "task_tryyield"
 .Lname3164:
 	.string "keyboard_device_ioctl"
 .Lname3167:
@@ -20121,7 +20125,7 @@ END(kernel_symbol_table)
 .Lname3400:
 	.string "pidns_read_nx"
 .Lname3403:
-	.string "sys_pwrite64"
+	.string "memmovedownw"
 .Lname3404:
 	.string "unwind_cfa_apply"
 .Lname3412:

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa9ee942 */
+/* HASH CRC-32:0xdf6d9ed1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,7 +103,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_memcmp))(void const *__s1,
                                                           __SIZE_TYPE__ __s1_bytes,
                                                           void const *__s2,
                                                           __SIZE_TYPE__ __s2_bytes) {
-#line 4118 "kos/src/libc/magic/string.c"
+#line 4221 "kos/src/libc/magic/string.c"
 	__SIZE_TYPE__ *__v0, *__v1, __i, __j, __cost, __temp;
 	if __unlikely(!__s1_bytes)
 		return __s2_bytes;

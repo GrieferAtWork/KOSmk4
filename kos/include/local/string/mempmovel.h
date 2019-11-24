@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46a34ab7 */
+/* HASH CRC-32:0xc6f4765c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,12 +42,12 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__
 #endif /* !____localdep_memmovel_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' */
+/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' */
 __LOCAL_LIBC(mempmovel) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmovel))(/*aligned(4)*/ void *__dst,
                                                        /*aligned(4)*/ void const *__src,
                                                        __SIZE_TYPE__ __n_dwords) {
-#line 1066 "kos/src/libc/magic/string.c"
+#line 1087 "kos/src/libc/magic/string.c"
 	return (__UINT32_TYPE__ *)__localdep_memmovel(__dst, __src, __n_dwords) + __n_dwords;
 }
 __NAMESPACE_LOCAL_END

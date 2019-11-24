@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1f8cf78 */
+/* HASH CRC-32:0x65a4beae */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,12 +39,12 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__
 #endif /* !____localdep_memcpyq_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memcpyq', but return `DST+N_QWORDS', rather than `DST' */
+/* Same as `memcpyq', but return `DST + N_QWORDS', rather than `DST' */
 __LOCAL_LIBC(mempcpyq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempcpyq))(/*aligned(8)*/ void *__restrict __dst,
                                                       /*aligned(8)*/ void const *__restrict __src,
                                                       __SIZE_TYPE__ __n_qwords) {
-#line 1574 "kos/src/libc/magic/string.c"
+#line 1595 "kos/src/libc/magic/string.c"
 	return (__UINT64_TYPE__ *)__localdep_memcpyq(__dst, __src, __n_qwords) + __n_qwords;
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51525ecc */
+/* HASH CRC-32:0xc6eac736 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __LOCAL_LIBC(memcmpl) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __INT32_
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcmpl))(/*aligned(4)*/ void const *__s1,
                                                      /*aligned(4)*/ void const *__s2,
                                                      __SIZE_TYPE__ __n_dwords) {
-#line 1256 "kos/src/libc/magic/string.c"
+#line 1277 "kos/src/libc/magic/string.c"
 	__INT32_TYPE__ *__p1 = (__INT32_TYPE__ *)__s1;
 	__INT32_TYPE__ *__p2 = (__INT32_TYPE__ *)__s2;
 	__INT32_TYPE__ __v1, __v2;

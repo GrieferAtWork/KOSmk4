@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2b4254b */
+/* HASH CRC-32:0xfee58439 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3167,6 +3167,7 @@
 #define __CRT_SECTION_memcmpq                               __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memcmpq */
 #define __CRT_SECTION_memcmpw                               __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memcmpw */
 #define __CRT_SECTION_memcpy                                __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memcpy */
+#define __CRT_SECTION_memcpyc                               __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memcpyc */
 #define __CRT_SECTION_memcpyl                               __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memcpyl */
 #define __CRT_SECTION_memcpyq                               __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memcpyq */
 #define __CRT_SECTION_memcpyw                               __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memcpyw */
@@ -3181,13 +3182,16 @@
 #define __CRT_SECTION_memlenw                               __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memlenw */
 #define __CRT_SECTION_memmem                                __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memmem */
 #define __CRT_SECTION_memmove                               __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memmove */
+#define __CRT_SECTION_memmovec                              __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memmovec */
 #define __CRT_SECTION_memmovedown                           __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memmovedown */
+#define __CRT_SECTION_memmovedownc                          __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memmovedownc */
 #define __CRT_SECTION_memmovedownl                          __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memmovedownl */
 #define __CRT_SECTION_memmovedownq                          __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memmovedownq */
 #define __CRT_SECTION_memmovedownw                          __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memmovedownw */
 #define __CRT_SECTION_memmovel                              __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memmovel */
 #define __CRT_SECTION_memmoveq                              __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memmoveq */
 #define __CRT_SECTION_memmoveup                             __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memmoveup */
+#define __CRT_SECTION_memmoveupc                            __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memmoveupc */
 #define __CRT_SECTION_memmoveupl                            __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memmoveupl */
 #define __CRT_SECTION_memmoveupq                            __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memmoveupq */
 #define __CRT_SECTION_memmoveupw                            __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memmoveupw */
@@ -3196,17 +3200,21 @@
 #define __CRT_SECTION_mempatq                               __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempatq */
 #define __CRT_SECTION_mempatw                               __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempatw */
 #define __CRT_SECTION_mempcpy                               __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempcpy */
+#define __CRT_SECTION_mempcpyc                              __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempcpyc */
 #define __CRT_SECTION_mempcpyl                              __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempcpyl */
 #define __CRT_SECTION_mempcpyq                              __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempcpyq */
 #define __CRT_SECTION_mempcpyw                              __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempcpyw */
 #define __CRT_SECTION_mempmove                              __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempmove */
+#define __CRT_SECTION_mempmovec                             __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempmovec */
 #define __CRT_SECTION_mempmovedown                          __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempmovedown */
+#define __CRT_SECTION_mempmovedownc                         __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempmovedownc */
 #define __CRT_SECTION_mempmovedownl                         __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempmovedownl */
 #define __CRT_SECTION_mempmovedownq                         __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempmovedownq */
 #define __CRT_SECTION_mempmovedownw                         __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempmovedownw */
 #define __CRT_SECTION_mempmovel                             __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempmovel */
 #define __CRT_SECTION_mempmoveq                             __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempmoveq */
 #define __CRT_SECTION_mempmoveup                            __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempmoveup */
+#define __CRT_SECTION_mempmoveupc                           __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempmoveupc */
 #define __CRT_SECTION_mempmoveupl                           __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempmoveupl */
 #define __CRT_SECTION_mempmoveupq                           __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempmoveupq */
 #define __CRT_SECTION_mempmoveupw                           __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.mempmoveupw */

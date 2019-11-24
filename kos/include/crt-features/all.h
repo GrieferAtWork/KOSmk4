@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5955b15c */
+/* HASH CRC-32:0x9155d11b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2614,6 +2614,7 @@
 #define __CRT_HAVE_memcmpw 1
 #define __CRT_HAVE_memcpy 1
 #define __CRT_HAVE_memcpy_s 1
+#define __CRT_HAVE_memcpyc 1
 #define __CRT_HAVE_memcpyl 1
 #define __CRT_HAVE_memcpyq 1
 #define __CRT_HAVE_memcpyw 1
@@ -2633,13 +2634,16 @@
 #define __CRT_HAVE_memmem0 1
 #define __CRT_HAVE_memmove 1
 #define __CRT_HAVE_memmove_s 1
+#define __CRT_HAVE_memmovec 1
 #define __CRT_HAVE_memmovedown 1
+#define __CRT_HAVE_memmovedownc 1
 #define __CRT_HAVE_memmovedownl 1
 #define __CRT_HAVE_memmovedownq 1
 #define __CRT_HAVE_memmovedownw 1
 #define __CRT_HAVE_memmovel 1
 #define __CRT_HAVE_memmoveq 1
 #define __CRT_HAVE_memmoveup 1
+#define __CRT_HAVE_memmoveupc 1
 #define __CRT_HAVE_memmoveupl 1
 #define __CRT_HAVE_memmoveupq 1
 #define __CRT_HAVE_memmoveupw 1
@@ -2648,17 +2652,21 @@
 #define __CRT_HAVE_mempatq 1
 #define __CRT_HAVE_mempatw 1
 #define __CRT_HAVE_mempcpy 1
+#define __CRT_HAVE_mempcpyc 1
 #define __CRT_HAVE_mempcpyl 1
 #define __CRT_HAVE_mempcpyq 1
 #define __CRT_HAVE_mempcpyw 1
 #define __CRT_HAVE_mempmove 1
+#define __CRT_HAVE_mempmovec 1
 #define __CRT_HAVE_mempmovedown 1
+#define __CRT_HAVE_mempmovedownc 1
 #define __CRT_HAVE_mempmovedownl 1
 #define __CRT_HAVE_mempmovedownq 1
 #define __CRT_HAVE_mempmovedownw 1
 #define __CRT_HAVE_mempmovel 1
 #define __CRT_HAVE_mempmoveq 1
 #define __CRT_HAVE_mempmoveup 1
+#define __CRT_HAVE_mempmoveupc 1
 #define __CRT_HAVE_mempmoveupl 1
 #define __CRT_HAVE_mempmoveupq 1
 #define __CRT_HAVE_mempmoveupw 1

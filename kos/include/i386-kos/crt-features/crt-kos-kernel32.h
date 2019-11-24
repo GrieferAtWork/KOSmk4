@@ -850,11 +850,13 @@
 #define __CRT_HAVE_memmovedown 1
 #define __CRT_HAVE_memmovedownl 1
 #define __CRT_HAVE_memmovedownq 1
+#define __CRT_HAVE_memmovedownw 1
 #define __CRT_HAVE_memmovel 1
 #define __CRT_HAVE_memmoveq 1
 #define __CRT_HAVE_memmoveup 1
 #define __CRT_HAVE_memmoveupl 1
 #define __CRT_HAVE_memmoveupq 1
+#define __CRT_HAVE_memmoveupw 1
 #define __CRT_HAVE_memmovew 1
 #define __CRT_HAVE_mempatl 1
 #define __CRT_HAVE_mempatq 1

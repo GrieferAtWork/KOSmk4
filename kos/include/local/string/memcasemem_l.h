@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe31dbf17 */
+/* HASH CRC-32:0xb99f7f3b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,7 +63,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcasemem_l))(void const *__haystack
                                                           void const *__needle,
                                                           __SIZE_TYPE__ __needlelen,
                                                           __locale_t __locale) {
-#line 2800 "kos/src/libc/magic/string.c"
+#line 2903 "kos/src/libc/magic/string.c"
 	__BYTE_TYPE__ *__candidate, __marker;
 	__BYTE_TYPE__ *__hayend;
 #if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)

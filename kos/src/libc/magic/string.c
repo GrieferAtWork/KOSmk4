@@ -41,6 +41,9 @@
 #include <parts/errno.h>
 #include <crtdefs.h>
 #endif /* __USE_DOS */
+#if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+#include <hybrid/pp/__va_nargs.h>
+#endif /* !__cplusplus && __USE_STRING_OVERLOADS */
 
 __SYSDECL_BEGIN
 
@@ -214,7 +217,8 @@ memcmp:([nonnull] void const *s1, [nonnull] void const *s2, size_t n_bytes) -> i
 	byte_t *p2 = (byte_t *)s2;
 	byte_t v1, v2;
 	v1 = v2 = 0;
-	while (n_bytes-- && ((v1 = *p1++) == (v2 = *p2++)));
+	while (n_bytes-- && ((v1 = *p1++) == (v2 = *p2++)))
+		;
 	return (int)v1 - (int)v2;
 }
 
@@ -250,9 +254,10 @@ strchr:([nonnull] char const *__restrict haystack, int needle) -> char *
 	[([nonnull] char *__restrict haystack, int needle) -> char *]
 	[([nonnull] char const *__restrict haystack, int needle) -> char const *]
 {
-	for (; *haystack; ++haystack)
-		if (*haystack == (char)needle)
+	for (; *haystack; ++haystack) {
+		if unlikely(*haystack == (char)needle)
 			return (char *)haystack;
+	}
 	return NULL;
 }
 
@@ -263,9 +268,10 @@ strrchr:([nonnull] char const *__restrict haystack, int needle) -> char *
 	[([nonnull] char const *__restrict haystack, int needle) -> char const *]
 {
 	char const *result = NULL;
-	for (; *haystack; ++haystack)
-		if (*haystack == (char)needle)
+	for (; *haystack; ++haystack) {
+		if unlikely(*haystack == (char)needle)
 			result = haystack;
+	}
 	return (char *)result;
 }
 
@@ -418,6 +424,14 @@ strerror:(int errnum) -> [nonnull] char * {
 	}
 	return result;
 }
+
+%(std, c)#if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+%(std, c)extern "C++" {
+[std][overload_alias] memcpy:(*) = memcpyc;
+[std][overload_alias] memmove:(*) = memmovec;
+%(std, c)} /* extern "C++" */
+%(std, c)#endif /* __cplusplus && __USE_STRING_OVERLOADS */
+
 
 
 %{
@@ -742,7 +756,7 @@ strverscmp:([nonnull] char const *s1, [nonnull] char const *s2) -> int {
 
 [alias(*)][attribute(*)] __mempcpy:(*) = mempcpy;
 
-@@Same as `memcpy', but return `DST+N_BYTES', rather than `DST'
+@@Same as `memcpy', but return `DST + N_BYTES', rather than `DST'
 [libc][kernel][fast][nobuiltin][export_alias(__mempcpy)][ATTR_LEAF]
 mempcpy:([nonnull] void *__restrict dst,
          [nonnull] void const *__restrict src,
@@ -753,6 +767,13 @@ mempcpy:([nonnull] void *__restrict dst,
 		*pdst++ = *psrc++;
 	return pdst;
 }
+
+%#if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+%extern "C++" {
+[overload_alias] mempcpy:(*) = mempcpyc;
+%} /* extern "C++" */
+%#endif /* __cplusplus && __USE_STRING_OVERLOADS */
+
 
 [ATTR_LEAF]
 strfry:([nonnull] char *__restrict string) -> [== string] char * {
@@ -951,7 +972,7 @@ memcpyb:([nonnull] /*aligned(1)*/ void *__restrict dst,
          [nonnull] /*aligned(1)*/ void const *__restrict src,
          $size_t n_bytes) -> [== dst] $uint8_t * = memcpy;
 
-@@Same as `memcpyb', but return `DST+N_BYTES', rather than `DST'
+@@Same as `memcpyb', but return `DST + N_BYTES', rather than `DST'
 [nocrt][noexport][ATTR_LEAF]
 mempcpyb:([nonnull] /*aligned(1)*/ void *__restrict dst,
           [nonnull] /*aligned(1)*/ void const *__restrict src,
@@ -969,7 +990,7 @@ memcpyw:([nonnull] /*aligned(2)*/ void *__restrict dst,
 	return (u16 *)dst;
 }
 
-@@Same as `memcpyw', but return `DST+N_WORDS', rather than `DST'
+@@Same as `memcpyw', but return `DST + N_WORDS', rather than `DST'
 [fast][libc][kernel][if(__SIZEOF_WCHAR_T__ == 2), alias(wmempcpy)][ATTR_LEAF]
 mempcpyw:([nonnull] /*aligned(2)*/ void *__restrict dst,
           [nonnull] /*aligned(2)*/ void const *__restrict src,
@@ -989,7 +1010,7 @@ memcpyl:([nonnull] /*aligned(4)*/ void *__restrict dst,
 	return (u32 *)dst;
 }
 
-@@Same as `memcpyl', but return `DST+N_DWORDS', rather than `DST'
+@@Same as `memcpyl', but return `DST + N_DWORDS', rather than `DST'
 [fast][libc][kernel][if(__SIZEOF_WCHAR_T__ == 4), alias(wmempcpy)][ATTR_LEAF]
 mempcpyl:([nonnull] /*aligned(4)*/ void *__restrict dst,
           [nonnull] /*aligned(4)*/ void const *__restrict src,
@@ -1004,7 +1025,7 @@ memmoveb:([nonnull] /*aligned(1)*/ void *dst,
           [nonnull] /*aligned(1)*/ void const *src,
           $size_t n_bytes) -> [== dst] $uint8_t * = memmove;
 
-@@Same as `memmoveb', but return `DST+N_BYTES', rather than `DST'
+@@Same as `memmoveb', but return `DST + N_BYTES', rather than `DST'
 [nocrt][noexport][ATTR_LEAF]
 mempmoveb:([nonnull] /*aligned(1)*/ void *dst,
            [nonnull] /*aligned(1)*/ void const *src,
@@ -1030,7 +1051,7 @@ memmovew:([nonnull] /*aligned(2)*/ void *dst,
 	return (u16 *)dst;
 }
 
-@@Same as `memmovew', but return `DST+N_WORDS', rather than `DST'
+@@Same as `memmovew', but return `DST + N_WORDS', rather than `DST'
 [fast][libc][kernel][ATTR_LEAF]
 mempmovew:([nonnull] /*aligned(2)*/ void *dst,
            [nonnull] /*aligned(2)*/ void const *src,
@@ -1058,7 +1079,7 @@ memmovel:([nonnull] /*aligned(4)*/ void *dst,
 	return (u32 *)dst;
 }
 
-@@Same as `memmovew', but return `DST+N_DWORDS', rather than `DST'
+@@Same as `memmovew', but return `DST + N_DWORDS', rather than `DST'
 [fast][libc][kernel][ATTR_LEAF]
 mempmovel:([nonnull] /*aligned(4)*/ void *dst,
            [nonnull] /*aligned(4)*/ void const *src,
@@ -1079,20 +1100,20 @@ memmovedownb:([nonnull] /*aligned(1)*/ void *dst,
               [nonnull] /*aligned(1)*/ void const *src,
               $size_t n_bytes) -> [== dst] $uint8_t * = memmovedown;
 
-@@Same as `memmoveb', but return `DST+N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES')
+@@Same as `memmoveb', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES')
 [nocrt][noexport][ATTR_LEAF][alias(*)]
 mempmoveupb:([nonnull] /*aligned(1)*/ void *dst,
              [nonnull] /*aligned(1)*/ void const *src,
              $size_t n_bytes) -> [== dst + n_bytes] $uint8_t * = mempmoveup;
 
-@@Same as `memmoveb', but return `DST+N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES')
+@@Same as `memmoveb', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES')
 [nocrt][noexport][ATTR_LEAF][alias(*)]
 mempmovedownb:([nonnull] /*aligned(1)*/ void *dst,
                [nonnull] /*aligned(1)*/ void const *src,
                $size_t n_bytes) -> [== dst + n_bytes] $uint8_t * = mempmovedown;
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_WORDS')
-[fast][ATTR_LEAF][alias(memmovew)][if(__SIZEOF_WCHAR_T__ == 2), alias(wmemmove)]
+[fast][libc][kernel][ATTR_LEAF][alias(memmovew)][if(__SIZEOF_WCHAR_T__ == 2), alias(wmemmove)]
 [dependency_include(<hybrid/__assert.h>)]
 memmoveupw:([nonnull] /*aligned(2)*/ void *dst,
             [nonnull] /*aligned(2)*/ void const *src,
@@ -1107,7 +1128,7 @@ memmoveupw:([nonnull] /*aligned(2)*/ void *dst,
 }
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_WORDS')
-[fast][ATTR_LEAF][alias(memmovew)][if(__SIZEOF_WCHAR_T__ == 2), alias(wmemmove)]
+[fast][libc][kernel][ATTR_LEAF][alias(memmovew)][if(__SIZEOF_WCHAR_T__ == 2), alias(wmemmove)]
 [dependency_include(<hybrid/__assert.h>)]
 memmovedownw:([nonnull] /*aligned(2)*/ void *dst,
               [nonnull] /*aligned(2)*/ void const *src,
@@ -1121,16 +1142,16 @@ memmovedownw:([nonnull] /*aligned(2)*/ void *dst,
 	return (u16 *)dst;
 }
 
-@@Same as `memmovew', but return `DST+N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS')
-[fast][kernel][ATTR_LEAF][alias(mempmovew)]
+@@Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS')
+[fast][libc][kernel][ATTR_LEAF][alias(mempmovew)]
 mempmoveupw:([nonnull] /*aligned(2)*/ void *dst,
              [nonnull] /*aligned(2)*/ void const *src,
              $size_t n_words) -> [== dst + n_words * 2] $uint16_t * {
 	return (u16 *)memmoveupw(dst, src, n_words) + n_words;
 }
 
-@@Same as `memmovew', but return `DST+N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS')
-[fast][kernel][ATTR_LEAF][alias(mempmovew)]
+@@Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS')
+[fast][libc][kernel][ATTR_LEAF][alias(mempmovew)]
 mempmovedownw:([nonnull] /*aligned(2)*/ void *dst,
                [nonnull] /*aligned(2)*/ void const *src,
                $size_t n_words) -> [== dst + n_words * 2] $uint16_t * {
@@ -1138,7 +1159,7 @@ mempmovedownw:([nonnull] /*aligned(2)*/ void *dst,
 }
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS')
-[fast][kernel][if(__SIZEOF_WCHAR_T__ == 4), alias(wmemmove)][alias(memmovel)][ATTR_LEAF]
+[fast][libc][kernel][if(__SIZEOF_WCHAR_T__ == 4), alias(wmemmove)][alias(memmovel)][ATTR_LEAF]
 [dependency_include(<hybrid/__assert.h>)]
 memmoveupl:([nonnull] /*aligned(4)*/ void *dst,
             [nonnull] /*aligned(4)*/ void const *src,
@@ -1153,7 +1174,7 @@ memmoveupl:([nonnull] /*aligned(4)*/ void *dst,
 }
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_DWORDS')
-[fast][kernel][if(__SIZEOF_WCHAR_T__ == 4), alias(wmemmove)][alias(memmovel)][ATTR_LEAF]
+[fast][libc][kernel][if(__SIZEOF_WCHAR_T__ == 4), alias(wmemmove)][alias(memmovel)][ATTR_LEAF]
 memmovedownl:([nonnull] /*aligned(4)*/ void *dst,
               [nonnull] /*aligned(4)*/ void const *src,
               $size_t n_dwords) -> [== dst] $uint32_t * {
@@ -1166,16 +1187,16 @@ memmovedownl:([nonnull] /*aligned(4)*/ void *dst,
 	return (u32 *)dst;
 }
 
-@@Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS')
-[fast][kernel][ATTR_LEAF][alias(mempmovel)]
+@@Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS')
+[fast][libc][kernel][ATTR_LEAF][alias(mempmovel)]
 mempmoveupl:([nonnull] /*aligned(4)*/ void *dst,
              [nonnull] /*aligned(4)*/ void const *src,
              $size_t n_dwords) -> [== dst + n_dwords * 4] $uint32_t * {
 	return (u32 *)memmoveupl(dst, src, n_dwords) + n_dwords;
 }
 
-@@Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS')
-[fast][kernel][ATTR_LEAF][alias(mempmovel)]
+@@Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS')
+[fast][libc][kernel][ATTR_LEAF][alias(mempmovel)]
 mempmovedownl:([nonnull] /*aligned(4)*/ void *dst,
                [nonnull] /*aligned(4)*/ void const *src,
                $size_t n_dwords) -> [== dst + n_dwords * 4] $uint32_t * {
@@ -1190,7 +1211,7 @@ mempmovedownl:([nonnull] /*aligned(4)*/ void *dst,
 memsetb:([nonnull] /*aligned(1)*/ void *__restrict dst,
          int byte, $size_t n_bytes) -> [== dst] $uint8_t * = memset;
 
-@@Same as `memsetb', but return `DST+N_BYTES', rather than `DST'
+@@Same as `memsetb', but return `DST + N_BYTES', rather than `DST'
 [nocrt][noexport][ATTR_LEAF]
 mempsetb:([nonnull] /*aligned(1)*/ void *__restrict dst,
           int byte, $size_t n_bytes) -> [== dst + n_bytes] $uint8_t * = mempset;
@@ -1205,7 +1226,7 @@ memsetw:([nonnull] /*aligned(2)*/ void *__restrict dst,
 	return (u16 *)dst;
 }
 
-@@Same as `memsetw', but return `DST+N_WORDS', rather than `DST'
+@@Same as `memsetw', but return `DST + N_WORDS', rather than `DST'
 [fast][libc][kernel][ATTR_LEAF]
 mempsetw:([nonnull] /*aligned(2)*/ void *__restrict dst,
           $uint16_t word, $size_t n_words) -> [== dst + n_words * 2] $uint16_t * {
@@ -1222,7 +1243,7 @@ memsetl:([nonnull] /*aligned(4)*/ void *__restrict dst,
 	return (u32 *)dst;
 }
 
-@@Same as `memsetl', but return `DST+N_DWORDS', rather than `DST'
+@@Same as `memsetl', but return `DST + N_DWORDS', rather than `DST'
 [fast][libc][kernel][ATTR_LEAF]
 mempsetl:([nonnull] /*aligned(4)*/ void *__restrict dst,
           $uint32_t dword, $size_t n_dwords) -> [== dst + n_dwords * 4] $uint32_t * {
@@ -1566,7 +1587,7 @@ memcpyq:([nonnull] /*aligned(8)*/ void *__restrict dst,
 	return (u64 *)dst;
 }
 
-@@Same as `memcpyq', but return `DST+N_QWORDS', rather than `DST'
+@@Same as `memcpyq', but return `DST + N_QWORDS', rather than `DST'
 [fast][libc][kernel][ATTR_LEAF]
 mempcpyq:([nonnull] /*aligned(8)*/ void *__restrict dst,
           [nonnull] /*aligned(8)*/ void const *__restrict src,
@@ -1613,7 +1634,7 @@ memmoveq:([nonnull] /*aligned(8)*/ void *dst,
 	return (u64 *)dst;
 }
 
-@@Same as `memmovew', but return `DST+N_QWORDS', rather than `DST'
+@@Same as `memmovew', but return `DST + N_QWORDS', rather than `DST'
 [fast][libc][kernel][ATTR_LEAF]
 mempmoveq:([nonnull] /*aligned(8)*/ void *__restrict dst,
            [nonnull] /*aligned(8)*/ void const *__restrict src,
@@ -1624,7 +1645,7 @@ mempmoveq:([nonnull] /*aligned(8)*/ void *__restrict dst,
 %#ifdef __USE_KOS
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS')
-[fast][kernel][ATTR_LEAF][alias(memmoveq)]
+[fast][libc][kernel][ATTR_LEAF][alias(memmoveq)]
 [dependency_include(<hybrid/__assert.h>)]
 memmoveupq:([nonnull] /*aligned(8)*/ void *dst,
             [nonnull] /*aligned(8)*/ void const *src,
@@ -1650,7 +1671,7 @@ memmoveupq:([nonnull] /*aligned(8)*/ void *dst,
 }
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS')
-[fast][kernel][ATTR_LEAF][alias(memmoveq)]
+[fast][libc][kernel][ATTR_LEAF][alias(memmoveq)]
 [dependency_include(<hybrid/__assert.h>)]
 memmovedownq:([nonnull] /*aligned(8)*/ void *dst,
               [nonnull] /*aligned(8)*/ void const *src,
@@ -1675,16 +1696,16 @@ memmovedownq:([nonnull] /*aligned(8)*/ void *dst,
 	return (u64 *)dst;
 }
 
-@@Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS')
-[fast][kernel][ATTR_LEAF][alias(mempmoveq)]
+@@Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS')
+[fast][libc][kernel][ATTR_LEAF][alias(mempmoveq)]
 mempmoveupq:([nonnull] /*aligned(8)*/ void *__restrict dst,
              [nonnull] /*aligned(8)*/ void const *__restrict src,
              $size_t n_qwords) -> [== dst + n_qwords * 8] $uint64_t * {
 	return (u64 *)memmoveupq(dst, src, n_qwords) + n_qwords;
 }
 
-@@Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS')
-[fast][kernel][ATTR_LEAF][alias(mempmoveq)]
+@@Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS')
+[fast][libc][kernel][ATTR_LEAF][alias(mempmoveq)]
 mempmovedownq:([nonnull] /*aligned(8)*/ void *__restrict dst,
                [nonnull] /*aligned(8)*/ void const *__restrict src,
                $size_t n_qwords) -> [== dst + n_qwords * 8] $uint64_t * {
@@ -1704,7 +1725,7 @@ memsetq:([nonnull] /*aligned(8)*/ void *__restrict dst,
 	return (u64 *)dst;
 }
 
-@@Same as `memsetq', but return `DST+N_QWORDS', rather than `DST'
+@@Same as `memsetq', but return `DST + N_QWORDS', rather than `DST'
 [fast][libc][kernel][ATTR_LEAF]
 mempsetq:([nonnull] /*aligned(8)*/ void *__restrict dst,
           $uint64_t qword, $size_t n_qwords) -> [== dst + n_qwords * 8] $uint64_t * {
@@ -2361,7 +2382,7 @@ rawmemrxlenq:([nonnull] /*aligned(8)*/ void const *__restrict haystack, $uint64_
 
 @@Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
 @@@return: * : Always re-returns `dst'
-[fast][kernel][ATTR_LEAF]
+[fast][libc][kernel][ATTR_LEAF]
 [dependency_include(<hybrid/__assert.h>)]
 memmoveup:([nonnull] void *dst, [nonnull] void const *src, size_t n_bytes) -> [== dst] void * {
 	byte_t *pdst, *psrc;
@@ -2375,7 +2396,7 @@ memmoveup:([nonnull] void *dst, [nonnull] void const *src, size_t n_bytes) -> [=
 
 @@Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
 @@@return: * : Always re-returns `dst'
-[fast][kernel][ATTR_LEAF]
+[fast][libc][kernel][ATTR_LEAF]
 [dependency_include(<hybrid/__assert.h>)]
 memmovedown:([nonnull] void *dst, [nonnull] void const *src, size_t n_bytes) -> [== dst] void * {
 	byte_t *pdst, *psrc;
@@ -2386,6 +2407,77 @@ memmovedown:([nonnull] void *dst, [nonnull] void const *src, size_t n_bytes) -> 
 		*pdst++ = *psrc++;
 	return dst;
 }
+
+
+
+
+@@Copy memory between non-overlapping memory blocks.
+@@@return: * : Always re-returns `dst'
+[fast][libc][ATTR_LEAF]
+memcpyc:([nonnull] void *__restrict dst,
+         [nonnull] void const *__restrict src,
+         size_t elem_count, size_t elem_size)
+	-> [== dst] void *
+	%{auto_block(memcpyc(%auto))}
+
+@@Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST'
+[fast][libc][ATTR_LEAF]
+mempcpyc:([nonnull] void *__restrict dst,
+          [nonnull] void const *__restrict src,
+          size_t elem_count, size_t elem_size)
+	-> [== dst + (elem_count * elem_size)] void *
+	%{auto_block(memcpyc(%auto))}
+
+@@Move memory between potentially overlapping memory blocks
+@@@return: * : Always re-returns `dst'
+[fast][libc][ATTR_LEAF]
+memmovec:([nonnull] void *dst,
+          [nonnull] void const *src,
+          size_t elem_count, size_t elem_size)
+	-> [== dst] void *
+	%{auto_block(memcpyc(%auto))}
+
+@@Same as `memmovec', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST'
+[fast][libc][ATTR_LEAF]
+mempmovec:([nonnull] void *dst,
+           [nonnull] void const *src,
+           size_t elem_count, size_t elem_size)
+	-> [== dst + (elem_count * elem_size)] void *
+	%{auto_block(memcpyc(%auto))}
+
+@@Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
+@@@return: * : Always re-returns `dst'
+[fast][libc][ATTR_LEAF]
+memmoveupc:([nonnull] void *dst,
+            [nonnull] void const *src,
+            size_t elem_count, size_t elem_size)
+	-> [== dst] void *
+	%{auto_block(memcpyc(%auto))}
+
+@@Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
+[fast][libc][ATTR_LEAF][dependency_include(<hybrid/host.h>)]
+mempmoveupc:([nonnull] void *dst,
+             [nonnull] void const *src,
+             size_t elem_count, size_t elem_size)
+	-> [== dst + (elem_count * elem_size)] void *
+	%{auto_block(memcpyc(%auto))}
+
+@@Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
+@@@return: * : Always re-returns `dst'
+[fast][libc][ATTR_LEAF]
+memmovedownc:([nonnull] void *dst,
+              [nonnull] void const *src,
+              size_t elem_count, size_t elem_size)
+	-> [== dst] void *
+	%{auto_block(memcpyc(%auto))}
+
+@@Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
+[fast][libc][ATTR_LEAF]
+mempmovedownc:([nonnull] void *dst,
+               [nonnull] void const *src,
+               size_t elem_count, size_t elem_size)
+	-> [== dst + (elem_count * elem_size)] void *
+	%{auto_block(memcpyc(%auto))}
 
 
 
@@ -2504,29 +2596,40 @@ strnroff:([nonnull] char const *__restrict haystack, int needle, $size_t maxlen)
 }
 
 
-@@Same as `memset', but return `DST+N_BYTES', rather than `DST'
-[fast][libc][kernel]
+@@Same as `memset', but return `DST + N_BYTES', rather than `DST'
+[fast][libc][kernel][ATTR_LEAF]
 mempset:([nonnull] void *__restrict dst, int byte, $size_t n_bytes) -> [nonnull] void * {
 	return (void *)((byte_t *)memset(dst, byte, n_bytes) + n_bytes);
 }
 
-@@Same as `memmove', but return `DST+N_BYTES', rather than `DST'
-[fast][libc][kernel]
+@@Same as `memmove', but return `DST + N_BYTES', rather than `DST'
+[fast][libc][kernel][ATTR_LEAF]
 mempmove:([nonnull] void *dst, [nonnull] void const *src, $size_t n_bytes) -> [nonnull] void * {
 	return (void *)((byte_t *)memmove(dst, src, n_bytes) + n_bytes);
 }
 
-@@Same as `memmoveup', but return `DST+N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES')
-[fast][kernel]
+@@Same as `memmoveup', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES')
+[fast][libc][kernel][ATTR_LEAF]
 mempmoveup:([nonnull] void *dst, [nonnull] void const *src, $size_t n_bytes) -> [nonnull] void * {
 	return (void *)((byte_t *)memmoveup(dst, src, n_bytes) + n_bytes);
 }
 
-@@Same as `memmovedown', but return `DST+N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES')
-[fast][kernel]
+@@Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES')
+[fast][libc][kernel][ATTR_LEAF]
 mempmovedown:([nonnull] void *dst, [nonnull] void const *src, $size_t n_bytes) -> [nonnull] void * {
 	return (void *)((byte_t *)memmovedown(dst, src, n_bytes) + n_bytes);
 }
+
+%#if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+%extern "C++" {
+[overload_alias] mempmove:(*) = mempmovec;
+[overload_alias] mempmoveup:(*) = mempmoveupc;
+[overload_alias] mempmovedown:(*) = mempmovedownc;
+[overload_alias] memmoveup:(*) = memmoveupc;
+[overload_alias] memmovedown:(*) = memmovedownc;
+%} /* extern "C++" */
+%#endif /* __cplusplus && __USE_STRING_OVERLOADS */
+
 
 @@Same as `memrchr' without a search limit, starting at `HAYSTACK-1'
 [kernel][ATTR_WUNUSED][ATTR_PURE]
@@ -5160,6 +5263,56 @@ __NOTHROW_NCX(__LIBCCALL __strndupa_init)(void *__restrict __buf, char const *__
 #endif /* !__NO_XBLOCK */
 #endif /* __USE_GNU && __hybrid_alloca */
 
+
+#if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+/* In C, we can use argument-count overload macros to implement these overloads! */
+#ifdef __USE_KOS
+#define __PRIVATE_memcpy_4  memcpyc
+#define __PRIVATE_memmove_4 memmovec
+#ifdef __USE_GNU
+#define __PRIVATE_mempcpy_4 mempcpyc
+#endif /* __USE_GNU */
+#else /* __USE_KOS */
+__SYSDECL_END
+#include <libc/string.h>
+__SYSDECL_BEGIN
+#define __PRIVATE_memcpy_4  __libc_memcpyc
+#define __PRIVATE_memmove_4 __libc_memmovec
+#ifdef __USE_GNU
+#define __PRIVATE_mempcpy_4 __libc_mempcpyc
+#endif /* __USE_GNU */
+#endif /* !__USE_KOS */
+#define __PRIVATE_memcpy_3  (memcpy)
+#define __PRIVATE_memmove_3 (memmove)
+#undef memcpy
+#undef memmove
+#define memcpy(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memcpy_, (__VA_ARGS__))(__VA_ARGS__)
+#define memmove(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmove_, (__VA_ARGS__))(__VA_ARGS__)
+#ifdef __USE_GNU
+#define __PRIVATE_mempcpy_3 (mempcpy)
+#undef mempcpy
+#define mempcpy(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempcpy_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* __USE_GNU */
+#ifdef __USE_KOS
+#define __PRIVATE_mempmove_4     mempmovec
+#define __PRIVATE_mempmoveup_4   mempmoveupc
+#define __PRIVATE_mempmovedown_4 mempmovedownc
+#define __PRIVATE_memmoveup_4    memmoveupc
+#define __PRIVATE_memmovedown_4  memmovedownc
+#define __PRIVATE_mempmove_3     (mempmove)
+#define __PRIVATE_mempmoveup_3   (mempmoveup)
+#define __PRIVATE_mempmovedown_3 (mempmovedown)
+#define __PRIVATE_memmoveup_3    (memmoveup)
+#define __PRIVATE_memmovedown_3  (memmovedown)
+#define mempmove(...)     __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmove_, (__VA_ARGS__))(__VA_ARGS__)
+#define mempmoveup(...)   __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmoveup_, (__VA_ARGS__))(__VA_ARGS__)
+#define mempmovedown(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmovedown_, (__VA_ARGS__))(__VA_ARGS__)
+#define memmoveup(...)    __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmoveup_, (__VA_ARGS__))(__VA_ARGS__)
+#define memmovedown(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmovedown_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* __USE_KOS */
+#endif /* !__cplusplus && __USE_STRING_OVERLOADS */
+
+
 #endif /* __CC__ */
 
 __SYSDECL_END
@@ -5167,7 +5320,7 @@ __SYSDECL_END
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_STRING_H)
 #include <parts/uchar/string.h>
-#endif
+#endif /* _UCHAR_H && !_PARTS_UCHAR_STRING_H */
 #endif /* __USE_UTF */
 
 }

@@ -70,10 +70,10 @@
 #endif /* !__HYBRID_PP_VA_NARGS */
 
 #ifndef __HYBRID_PP_VA_OVERLOAD
-#define __HYBRID_PP_PRIVATE_VA_OVERLOAD2(func,n) func##n
-#define __HYBRID_PP_PRIVATE_VA_OVERLOAD(func,n) __HYBRID_PP_PRIVATE_VA_OVERLOAD2(func,n)
-#define __HYBRID_PP_VA_OVERLOAD(func,args)      __HYBRID_PP_PRIVATE_VA_OVERLOAD(func,__HYBRID_PP_VA_NARGS args)
-#endif
+#define __HYBRID_PP_PRIVATE_VA_OVERLOAD2(func, n) func##n
+#define __HYBRID_PP_PRIVATE_VA_OVERLOAD(func, n)  __HYBRID_PP_PRIVATE_VA_OVERLOAD2(func, n)
+#define __HYBRID_PP_VA_OVERLOAD(func, args)       __HYBRID_PP_PRIVATE_VA_OVERLOAD(func, __HYBRID_PP_VA_NARGS args)
+#endif /* !__HYBRID_PP_VA_OVERLOAD */
 
 #endif /* __PREPROCESSOR_HAVE_VA_ARGS */
 

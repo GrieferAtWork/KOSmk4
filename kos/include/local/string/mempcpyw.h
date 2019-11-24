@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97710c91 */
+/* HASH CRC-32:0x2e32669e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,12 +42,12 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__
 #endif /* !____localdep_memcpyw_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memcpyw', but return `DST+N_WORDS', rather than `DST' */
+/* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
 __LOCAL_LIBC(mempcpyw) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempcpyw))(/*aligned(2)*/ void *__restrict __dst,
                                                       /*aligned(2)*/ void const *__restrict __src,
                                                       __SIZE_TYPE__ __n_words) {
-#line 977 "kos/src/libc/magic/string.c"
+#line 998 "kos/src/libc/magic/string.c"
 	return (__UINT16_TYPE__ *)__localdep_memcpyw(__dst, __src, __n_words) + __n_words;
 }
 __NAMESPACE_LOCAL_END
