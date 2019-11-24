@@ -38,12 +38,12 @@
 DECL_BEGIN
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define GET_LEBE(x)  (x##_le)
+#define GET_LEBE(x) (x##_le)
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define GET_LEBE(x)  (x##_be)
+#define GET_LEBE(x) (x##_be)
 #endif
 
-#define INODE_GETADDR(self,pos) \
+#define INODE_GETADDR(self, pos) \
 	(((pos_t)(u32)(uintptr_t)(self)->i_fsdata << VM_DATABLOCK_ADDRSHIFT(self)) + (pos))
 
 
@@ -55,7 +55,7 @@ Iso9660_ReadFromINode(struct inode *__restrict self,
 	block_device_aread(self->i_super->s_device,
 	                   buf,
 	                   bufsize,
-	                   INODE_GETADDR(self,pos),
+	                   INODE_GETADDR(self, pos),
 	                   aio_multihandle_allochandle(aio));
 }
 
@@ -66,7 +66,7 @@ Iso9660_ReadFromINodePhys(struct inode *__restrict self,
 	block_device_aread_phys(self->i_super->s_device,
 	                        dst,
 	                        bufsize,
-	                        INODE_GETADDR(self,pos),
+	                        INODE_GETADDR(self, pos),
 	                        aio_multihandle_allochandle(aio));
 }
 
@@ -78,7 +78,7 @@ Iso9660_ReadFromINodeVector(struct inode *__restrict self,
 	block_device_areadv(self->i_super->s_device,
 	                    buf,
 	                    bufsize,
-	                    INODE_GETADDR(self,pos),
+	                    INODE_GETADDR(self, pos),
 	                    aio_multihandle_allochandle(aio));
 }
 
@@ -90,7 +90,7 @@ Iso9660_ReadFromINodeVectorPhys(struct inode *__restrict self,
 	block_device_areadv_phys(self->i_super->s_device,
 	                         buf,
 	                         bufsize,
-	                         INODE_GETADDR(self,pos),
+	                         INODE_GETADDR(self, pos),
 	                         aio_multihandle_allochandle(aio));
 }
 
@@ -102,7 +102,7 @@ Iso9660INode_LoadAttr(struct inode *__restrict self) {
 	block_device_read(self->i_super->s_device,
 	                  dent_data,
 	                  sizeof(dent_data),
-	                 (pos_t)self->i_fileino);
+	                  (pos_t)self->i_fileino);
 	self->i_filesize = (pos_t)(u32)GET_LEBE(dent->de_datasiz);
 	self->i_filemode = S_IFREG | 0555;
 	if (dent->de_fileflags & FILE_FLAG_DIRECTORY)
@@ -130,8 +130,8 @@ again:
 	if (entry_pos >= self->i_filesize)
 		return NULL; /* End of directory */
 	/* Read the next directory entry. */
-	block_device_read(self->i_super->s_device,&ent,256,
-	                  INODE_GETADDR(self,entry_pos));
+	block_device_read(self->i_super->s_device, &ent, 256,
+	                  INODE_GETADDR(self, entry_pos));
 	if (ent.de_length == 0)
 		return NULL; /* End of directory */
 	if unlikely(ent.de_namelen > 223)
@@ -150,7 +150,7 @@ again:
 	*(u32 *)&result->de_fsdata.de_data[4] = (u32)GET_LEBE(ent.de_datasiz);
 	if (ent.de_fileflags & FILE_FLAG_DIRECTORY)
 		result->de_type = DT_DIR;
-	memcpy(result->de_name,ent.de_name,ent.de_namelen);
+	memcpy(result->de_name, ent.de_name, ent.de_namelen, sizeof(char));
 
 	/* Ensure NUL-termination, and generate the hash. */
 	result->de_hash = directory_entry_hash(result->de_name,
@@ -266,9 +266,9 @@ INTERN struct inode_type Iso9660_DirType = {
 
 INTERN void KCALL
 Iso9660_OpenSuperblock(Iso9660Superblock *__restrict self, UNCHECKED USER char *args)
-		THROWS(E_FSERROR_WRONG_FILE_SYSTEM,E_FSERROR_CORRUPTED_FILE_SYSTEM,
-		       E_IOERROR_BADBOUNDS,E_DIVIDE_BY_ZERO,E_OVERFLOW,E_INDEX_ERROR,
-		       E_IOERROR,E_SEGFAULT,...) {
+		THROWS(E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_CORRUPTED_FILE_SYSTEM,
+		       E_IOERROR_BADBOUNDS, E_DIVIDE_BY_ZERO, E_OVERFLOW, E_INDEX_ERROR,
+		       E_IOERROR, E_SEGFAULT, ...) {
 	VolumeDescriptor volume;
 	pos_t offset               = (pos_t)0x8000;
 	pos_t second_volume_offset = (pos_t)-1;
@@ -277,8 +277,8 @@ Iso9660_OpenSuperblock(Iso9660Superblock *__restrict self, UNCHECKED USER char *
 
 	/* Search for the `VOLUME_DESCRIPTOR_TYPE_PRIMARY_VOLUME' descriptor. */
 	for (;;) {
-		memset(&volume,0xcc,sizeof(volume));
-		block_device_read(self->s_device,&volume,sizeof(volume),offset);
+		memset(&volume, 0xcc, sizeof(volume));
+		block_device_read(self->s_device, &volume, sizeof(volume), offset);
 		if (volume.vd_ident[0] != 'C' || volume.vd_ident[1] != 'D' ||
 		    volume.vd_ident[2] != '0' || volume.vd_ident[3] != '0' ||
 		    volume.vd_ident[4] != '1' || volume.vd_version != 0x01)
@@ -288,7 +288,7 @@ Iso9660_OpenSuperblock(Iso9660Superblock *__restrict self, UNCHECKED USER char *
 				/* Fallback to using the second volume. */
 				offset = second_volume_offset;
 				block_device_read(self->s_device,
-				                 &volume,
+				                  &volume,
 				                  sizeof(volume),
 				                  offset);
 				break;

@@ -98,7 +98,7 @@ sys_debugtrap64_impl(struct icpustate *__restrict return_state,
 				THROW(E_BUFFER_TOO_SMALL, MAXLEN, namelen);
 			namebuf = (char *)malloca((namelen + 1) * sizeof(char));
 			TRY {
-				memcpy(namebuf, reason.dtr_strarg, namelen * sizeof(char));
+				memcpy(namebuf, reason.dtr_strarg, namelen, sizeof(char));
 				namebuf[namelen]  = '\0';
 				reason.dtr_strarg = namebuf;
 				return_state = IFELSE3264(sys_do_debugtrap32_impl(return_state, ustate, &reason),

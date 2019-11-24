@@ -58,13 +58,13 @@ NOTHROW(KCALL ProcFS_SubStringPrinter)(void *arg,
 		closure->ssp_offset = 0;
 	}
 	if (datalen >= closure->ssp_size) {
-		memcpy(closure->ssp_buf, data, closure->ssp_size);
+		memcpy(closure->ssp_buf, data, closure->ssp_size, sizeof(char));
 		closure->ssp_buf += closure->ssp_size;
 		closure->ssp_size = 0;
 		return __SSIZE_MIN__; /* Stop printing (we've gotten everything) */
 	}
 	/* Print everything */
-	memcpy(closure->ssp_buf, data, datalen);
+	memcpy(closure->ssp_buf, data, datalen, sizeof(char));
 	closure->ssp_size -= datalen;
 	closure->ssp_buf  += datalen;
 done:

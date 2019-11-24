@@ -238,9 +238,9 @@ DlModule_OpenFilenameInPath(char const *__restrict path,
 		elf_setdlerror_nomem();
 		return NULL;
 	}
-	memcpy(buf, path, pathlen * sizeof(char));
+	memcpy(buf, path, pathlen, sizeof(char));
 	buf[pathlen] = '/';
-	memcpy(buf + pathlen + 1, filename, filenamelen * sizeof(char));
+	memcpy(buf + pathlen + 1, filename, filenamelen, sizeof(char));
 	buf[pathlen + 1 + filenamelen] = '\0';
 	result = DlModule_OpenFilename(buf, mode);
 	freea(buf);
@@ -262,9 +262,9 @@ DlModule_FindFilenameInPathFromAll(char const *__restrict path,
 		elf_setdlerror_nomem();
 		return NULL;
 	}
-	memcpy(buf, path, pathlen * sizeof(char));
+	memcpy(buf, path, pathlen, sizeof(char));
 	buf[pathlen] = '/';
-	memcpy(buf + pathlen + 1, filename, filenamelen * sizeof(char));
+	memcpy(buf + pathlen + 1, filename, filenamelen, sizeof(char));
 	buf[pathlen + 1 + filenamelen] = '\0';
 	result = DlModule_FindFromFilename(buf);
 	freea(buf);
@@ -470,7 +470,7 @@ DlModule_OpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict 
 	                                (pnum * sizeof(Elf_Phdr)));
 	if unlikely(!result)
 		goto err_nomem;
-	memcpy(result->dm_phdr, phdr, pnum * sizeof(Elf_Phdr));
+	memcpy(result->dm_phdr, phdr, pnum, sizeof(Elf_Phdr));
 	result->dm_loadstart = (uintptr_t)-1;
 	/*result->dm_loadend = 0;*/
 	for (pidx = 0; pidx < pnum; ++pidx) {

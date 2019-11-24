@@ -516,7 +516,7 @@ again:
 				}
 				/* Copy the name to user-space.
 				 * CAUTION: E_SEGFAULT */
-				memcpy(buf->d_name, name, bufsize * sizeof(char));
+				memcpy(buf->d_name, name, bufsize, sizeof(char));
 				COMPILER_WRITE_BARRIER();
 				if ((readdir_mode & READDIR_MODEMASK) == READDIR_PEEK)
 					req_index = dirpos;
@@ -662,7 +662,7 @@ got_next_entry:
 				/* Copy the entry name to user-space.
 				 * CAUTION: E_SEGFAULT */
 				memcpy(buf->d_name, entry->de_name,
-				       bufsize * sizeof(char));
+				       bufsize, sizeof(char));
 				COMPILER_WRITE_BARRIER();
 				if ((readdir_mode & READDIR_MODEMASK) == READDIR_PEEK)
 					req_index = dirpos;
@@ -845,7 +845,7 @@ oneshot_enum_callback(struct oneshot_generator_data *__restrict data,
 	new_entry->d_ino    = (__ino64_t)ino;
 	new_entry->d_namlen = namelen;
 	new_entry->d_type   = type;
-	memcpy(new_entry->d_name, name, namelen * sizeof(char));
+	memcpy(new_entry->d_name, name, namelen, sizeof(char));
 	new_entry->d_name[namelen] = '\0';
 }
 
@@ -969,7 +969,7 @@ again:
 				}
 				/* Copy the name to user-space.
 				 * CAUTION: E_SEGFAULT */
-				memcpy(buf->d_name, name, bufsize * sizeof(char));
+				memcpy(buf->d_name, name, bufsize, sizeof(char));
 				COMPILER_WRITE_BARRIER();
 				if ((readdir_mode & READDIR_MODEMASK) == READDIR_PEEK)
 					req_index = dirpos;

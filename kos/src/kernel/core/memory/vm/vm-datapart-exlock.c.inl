@@ -376,7 +376,8 @@ again_scan_nodes:
 			if (copy->dp_flags & VM_DATAPART_FLAG_HEAPPPP) {
 				assert(self->dp_flags & VM_DATAPART_FLAG_HEAPPPP);
 				memcpy(copy->dp_pprop_p, self->dp_pprop_p,
-				       CEILDIV(num_dpages, BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS) * sizeof(uintptr_t));
+				       CEILDIV(num_dpages, BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS),
+				       sizeof(uintptr_t));
 			} else {
 				copy->dp_pprop = self->dp_flags & VM_DATAPART_FLAG_HEAPPPP
 				                 ? self->dp_pprop_p[0]

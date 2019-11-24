@@ -224,7 +224,7 @@ parse_next_ch:
 						 * which we can then set to \0. - Note that we are guarantied to have at
 						 * least 2 bytes available, due to the 2 " or '-characters */
 						memmoveup(arg_start + 1, arg_start,
-						          (size_t)(cmdline_end - arg_start) *
+						          (size_t)(cmdline_end - arg_start),
 						          sizeof(char));
 						arg_start[0] = '\0';
 						temp = (*arg_printer)(arg_printer_arg, arg_start, 0);

@@ -1010,7 +1010,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 				/* Remove the CPU from the vector. */
 				--_cpu_count;
 				memmovedown(&_cpu_vector[i], &_cpu_vector[i + 1],
-				            (_cpu_count - i) * sizeof(struct cpu *));
+				            _cpu_count - i, sizeof(struct cpu *));
 			}
 		}
 all_online:

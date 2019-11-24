@@ -165,7 +165,7 @@ NOTHROW(KCALL vm_datapart_truncate_leading)(struct vm_datapart *__restrict self,
 				self->dp_ramdata.rd_blockc -= i;
 				memmovedown(&self->dp_ramdata.rd_blockv[0],
 				            &self->dp_ramdata.rd_blockv[i],
-				            self->dp_ramdata.rd_blockc *
+				            self->dp_ramdata.rd_blockc,
 				            sizeof(struct vm_ramblock));
 				/* Try to trim unused memory from the ram-block vector. */
 				krealloc_in_place_nx(self->dp_ramdata.rd_blockv,
@@ -207,7 +207,7 @@ NOTHROW(KCALL vm_datapart_truncate_leading)(struct vm_datapart *__restrict self,
 				self->dp_swpdata.sd_blockc -= i;
 				memmovedown(&self->dp_swpdata.sd_blockv[0],
 				            &self->dp_swpdata.sd_blockv[i],
-				            self->dp_swpdata.sd_blockc *
+				            self->dp_swpdata.sd_blockc,
 				            sizeof(struct vm_swpblock));
 				/* Try to trim unused memory from the swp-block vector. */
 				krealloc_in_place_nx(self->dp_swpdata.sd_blockv,
@@ -670,7 +670,7 @@ page_properties_updated:
 						assert((req_block_trailing - 1) == (part->dp_ramdata.rd_blockc - (i + 1)));
 						memcpy(&hi_blocks[1],
 						       &part->dp_ramdata.rd_blockv[i + 1],
-						       (req_block_trailing - 1) * sizeof(struct vm_ramblock));
+						       req_block_trailing - 1, sizeof(struct vm_ramblock));
 						part->dp_ramdata.rd_blockc = i;
 						part->dp_ramdata.rd_blockv[i].rb_size -= num_pages_from_first;
 					}
@@ -746,7 +746,7 @@ page_properties_updated:
 						assert((req_block_trailing - 1) == (part->dp_swpdata.sd_blockc - (i + 1)));
 						memcpy(&hi_blocks[1],
 						       &part->dp_swpdata.sd_blockv[i + 1],
-						       (req_block_trailing - 1) * sizeof(struct vm_swpblock));
+						       req_block_trailing - 1, sizeof(struct vm_swpblock));
 						part->dp_swpdata.sd_blockc = i;
 						part->dp_swpdata.sd_blockv[i].sb_size -= num_pages_from_first;
 					}

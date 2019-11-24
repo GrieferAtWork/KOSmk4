@@ -540,7 +540,7 @@ tdelete:(void const *__restrict key, void **__restrict vrootp, __compar_fn_t com
 	p = *rootp;
 	if (p == NULL)
 		return NULL;
-	nodestack = (node **)@malloca@(sizeof(node *)*stacksize);
+	nodestack = (node **)@malloca@(sizeof(node *) * stacksize);
 	if unlikely(!nodestack)
 		return NULL;
 	root = p;
@@ -548,12 +548,12 @@ tdelete:(void const *__restrict key, void **__restrict vrootp, __compar_fn_t com
 		if (sp == stacksize) {
 			node **newstack;
 			stacksize += 20;
-			newstack = (node **)malloca(sizeof(node *)*stacksize);
+			newstack = (node **)@malloca@(sizeof(node *) * stacksize);
 			if unlikely(!newstack) {
 				retval = NULL;
 				goto done;
 			}
-			memcpy(newstack, nodestack, sp*sizeof(node *));
+			memcpyc(newstack, nodestack, sp, sizeof(node *));
 			@freea@(nodestack);
 			nodestack = newstack;
 		}
@@ -580,12 +580,12 @@ tdelete:(void const *__restrict key, void **__restrict vrootp, __compar_fn_t com
 			if (sp == stacksize) {
 				node **newstack;
 				stacksize += 20;
-				newstack = (node **)malloca(sizeof(node *)*stacksize);
+				newstack = (node **)@malloca@(sizeof(node *) * stacksize);
 				if unlikely(!newstack) {
 					retval = NULL;
 					goto done;
 				}
-				memcpy(newstack, nodestack, sp*sizeof(node *));
+				memcpyc(newstack, nodestack, sp, sizeof(node *));
 				@freea@(nodestack);
 				nodestack = newstack;
 			}

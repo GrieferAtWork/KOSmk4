@@ -780,7 +780,8 @@ continue_reading:
 				}
 				memmovedown(lfn_name, lfn_name + UNICODE_16TO8_MAXBUF(LFN_NAME),
 				            ((LFN_SEQNUM_MAXCOUNT - 1) - index) *
-				            UNICODE_16TO8_MAXBUF(LFN_NAME));
+				            UNICODE_16TO8_MAXBUF(LFN_NAME),
+				            sizeof(char));
 				lfn_valid |= mask;
 				lfn_valid >>= 1;
 			}
@@ -793,7 +794,7 @@ continue_reading:
 			for (; src < end;) {
 				size_t off = strnlen(src, (size_t)(end - src));
 				if (dst != src)
-					memcpy(dst, src, off * sizeof(char));
+					memcpy(dst, src, off, sizeof(char));
 				dst += off;
 				/* Skip ahead to the next segment. */
 				off += (size_t)(src - lfn_name);
@@ -812,7 +813,9 @@ continue_reading:
 			result->de_ino = (ino_t)Fat_GetAbsDiskPos(self, result->de_fsdata.de_start);
 			/* Copy the dos 8.3 filename. */
 			memcpy(FAT_DIRECTORY_ENTRY83(result),
-			       fatfile.f_nameext, (8 + 3) * sizeof(char));
+			       fatfile.f_nameext,
+			       8 + 3,
+			       sizeof(char));
 		}
 		assertf(!memchr(result->de_name, 0, result->de_namelen),
 		        "%$[hex]", (size_t)result->de_namelen, result->de_name);
@@ -825,7 +828,10 @@ continue_reading:
 		char entry_name[8 + 1 + 3 + 1];
 		u16 name_length;
 dos_8dot3:
-		memcpy(orig_name, fatfile.f_nameext, (8 + 3) * sizeof(char));
+		memcpy(orig_name,
+		       fatfile.f_nameext,
+		       8 + 3,
+		       sizeof(char));
 		/* Fix lowercase filenames. */
 		if (fatfile.f_ntflags & NTFLAG_LOWBASE) {
 			for (i = 0; i < 8; ++i)
@@ -883,7 +889,9 @@ dos_8dot3:
 		result->de_ino = (ino_t)Fat_GetAbsDiskPos(self, result->de_pos);
 		/* Copy the unmodified, original DOS 8.3 filename. */
 		memcpy(FAT_DIRECTORY_ENTRY83(result),
-		       orig_name, (8 + 3) * sizeof(char));
+		       orig_name,
+		       8 + 3,
+		       sizeof(char));
 		assertf(!memchr(result->de_name, 0, result->de_namelen),
 		        "%$[hex]\n"
 		        "orig_name:\n%$[hex]\n",
@@ -2354,7 +2362,7 @@ PRIVATE NONNULL((1)) void KCALL
 trimspecstring(char *__restrict buf, size_t size) {
 	while (size && FAT_ISSPACE(*buf)) {
 		--size;
-		memmovedown(buf, buf + 1, size);
+		memmovedown(buf, buf + 1, size, sizeof(char));
 		buf[size] = '\0';
 	}
 	while (size && FAT_ISSPACE(buf[size - 1])) {
@@ -2517,7 +2525,7 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 	COMPILER_WRITE_BARRIER();
 	self->i_fsdata = &self->f_root;
 
-	memcpy(&self->f_oem, disk_header.bpb.bpb_oem, 8 * sizeof(char));
+	memcpy(&self->f_oem, disk_header.bpb.bpb_oem, 8, sizeof(char));
 	self->f_fat_size = (size_t)self->f_sec4fat << FAT_SECTORSHIFT(self);
 	trimspecstring(self->f_oem, 8);
 	trimspecstring(self->f_label, 11);

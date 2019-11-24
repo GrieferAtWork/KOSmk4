@@ -136,7 +136,7 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_printer)(/*struct format_aprintf_data *
 		buf->ap_base  = newbuf;
 		buf->ap_avail = new_alloc - buf->ap_used;
 	}
-	memcpy(buf->ap_base + buf->ap_used, data, datalen * sizeof(char));
+	memcpyc(buf->ap_base + buf->ap_used, data, datalen, sizeof(char));
 	buf->ap_avail -= datalen;
 	buf->ap_used  += datalen;
 	return (ssize_t)datalen;

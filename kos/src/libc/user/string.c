@@ -258,7 +258,7 @@ NOTHROW_NCX(LIBCCALL libc_strerror_r)(int errnum,
 	}
 	if (string) {
 		/* Copy the descriptor text. */
-		size_t msg_len = (strlen(string) + 1) * sizeof(char);
+		size_t msg_len = strlen(string) + 1;
 		if (msg_len > buflen) {
 			buf    = strerror_buf;
 			buflen = COMPILER_LENOF(strerror_buf);
@@ -267,7 +267,7 @@ NOTHROW_NCX(LIBCCALL libc_strerror_r)(int errnum,
 				buf[msg_len] = '\0';
 			}
 		}
-		memcpy(buf, string, msg_len);
+		memcpy(buf, string, msg_len, sizeof(char));
 	} else {
 again_unknown:
 		if (snprintf(buf, buflen, unknown_error_format, errnum) >= buflen) {
@@ -295,10 +295,10 @@ NOTHROW_NCX(LIBCCALL libc___xpg_strerror_r)(int errnum,
 	if (!string)
 		return EINVAL;
 	/* Copy the descriptor text. */
-	msg_len = (strlen(string) + 1) * sizeof(char);
+	msg_len = strlen(string) + 1;
 	if (msg_len > buflen)
 		return ERANGE;
-	memcpy(buf, string, msg_len);
+	memcpy(buf, string, msg_len, sizeof(char));
 	return EOK;
 }
 

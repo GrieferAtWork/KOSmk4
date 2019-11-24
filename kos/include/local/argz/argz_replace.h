@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92173db1 */
+/* HASH CRC-32:0x92b4fa23 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,43 +71,40 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_N
 #endif /* memmem... */
 #endif /* !____localdep_memmem_defined */
 
-/* Dependency: "mempcpy" from "string" */
-#ifndef ____localdep_mempcpy_defined
-#define ____localdep_mempcpy_defined 1
-#ifdef __fast_mempcpy_defined
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-#define __localdep_mempcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))
-#elif defined(__CRT_HAVE_mempcpy)
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
-#elif defined(__CRT_HAVE___mempcpy)
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
-#else /* LIBC: mempcpy */
-#include <local/string/mempcpy.h>
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-#define __localdep_mempcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpy))
-#endif /* mempcpy... */
-#endif /* !____localdep_mempcpy_defined */
+/* Dependency: "mempcpyc" from "string" */
+#ifndef ____localdep_mempcpyc_defined
+#define ____localdep_mempcpyc_defined 1
+#ifdef __fast_mempcpyc_defined
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+#define __localdep_mempcpyc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpyc))
+#elif defined(__CRT_HAVE_mempcpyc)
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempcpyc,(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: mempcpyc */
+#include <local/string/mempcpyc.h>
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+#define __localdep_mempcpyc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyc))
+#endif /* mempcpyc... */
+#endif /* !____localdep_mempcpyc_defined */
 
-/* Dependency: "memmovedown" from "string" */
-#ifndef ____localdep_memmovedown_defined
-#define ____localdep_memmovedown_defined 1
-#ifdef __fast_memmovedown_defined
-/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
+/* Dependency: "memmovedownc" from "string" */
+#ifndef ____localdep_memmovedownc_defined
+#define ____localdep_memmovedownc_defined 1
+#ifdef __fast_memmovedownc_defined
+/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
-#define __localdep_memmovedown (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedown))
-#elif defined(__CRT_HAVE_memmovedown)
-/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
+#define __localdep_memmovedownc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedownc))
+#elif defined(__CRT_HAVE_memmovedownc)
+/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmovedown,(__dst,__src,__n_bytes))
-#else /* LIBC: memmovedown */
-#include <local/string/memmovedown.h>
-/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedownc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmovedownc,(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: memmovedownc */
+#include <local/string/memmovedownc.h>
+/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
-#define __localdep_memmovedown (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedown))
-#endif /* memmovedown... */
-#endif /* !____localdep_memmovedown_defined */
+#define __localdep_memmovedownc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedownc))
+#endif /* memmovedownc... */
+#endif /* !____localdep_memmovedownc_defined */
 
 /* Dependency: "realloc" */
 #ifndef ____localdep_realloc_defined
@@ -123,24 +120,24 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 #endif /* realloc... */
 #endif /* !____localdep_realloc_defined */
 
-/* Dependency: "memmoveup" from "string" */
-#ifndef ____localdep_memmoveup_defined
-#define ____localdep_memmoveup_defined 1
-#ifdef __fast_memmoveup_defined
-/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
+/* Dependency: "memmoveupc" from "string" */
+#ifndef ____localdep_memmoveupc_defined
+#define ____localdep_memmoveupc_defined 1
+#ifdef __fast_memmoveupc_defined
+/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
-#define __localdep_memmoveup (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveup))
-#elif defined(__CRT_HAVE_memmoveup)
-/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
+#define __localdep_memmoveupc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveupc))
+#elif defined(__CRT_HAVE_memmoveupc)
+/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmoveup,(__dst,__src,__n_bytes))
-#else /* LIBC: memmoveup */
-#include <local/string/memmoveup.h>
-/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmoveupc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmoveupc,(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: memmoveupc */
+#include <local/string/memmoveupc.h>
+/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
-#define __localdep_memmoveup (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveup))
-#endif /* memmoveup... */
-#endif /* !____localdep_memmoveup_defined */
+#define __localdep_memmoveupc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveupc))
+#endif /* memmoveupc... */
+#endif /* !____localdep_memmoveupc_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 /* Replace any occurrences of the string `STR' in `PARGZ' with `WITH', reallocating
@@ -152,7 +149,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_replace))(char **__restrict __pa
                                                           char const *__restrict __str,
                                                           char const *__restrict __with,
                                                           unsigned int *__restrict __replace_count) {
-#line 452 "kos/src/libc/magic/argz.c"
+#line 453 "kos/src/libc/magic/argz.c"
 	__SIZE_TYPE__ __findlen, __repllen;
 	__SIZE_TYPE__ __find_offset;
 	if __unlikely(!__str)
@@ -187,12 +184,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_replace))(char **__restrict __pa
 			/* Simple case: The replacement string is smaller than the find-string */
 			char *__old_argz, *__new_argz;
 			__SIZE_TYPE__ __diff, __trailing_characters;
-			__pos  = (char *)__localdep_mempcpy(__pos, __with, __repllen * sizeof(char));
+			__pos  = (char *)__localdep_mempcpyc(__pos, __with, __repllen, sizeof(char));
 			__diff = __findlen - __repllen;
 			*__pargz_len -= __diff;
 			__old_argz = *__pargz;
 			__trailing_characters = *__pargz_len - (__SIZE_TYPE__)(__pos - __old_argz);
-			__localdep_memmovedown(__pos, __pos + __diff, __trailing_characters * sizeof(char));
+			__localdep_memmovedownc(__pos, __pos + __diff, __trailing_characters, sizeof(char));
 			__new_argz = (char *)__localdep_realloc(__old_argz, *__pargz_len * sizeof(char));
 			if __likely(__new_argz) {
 				__pos    = __new_argz + (__pos - __old_argz);
@@ -218,14 +215,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_replace))(char **__restrict __pa
 			__pos = __new_argz + (__pos - __old_argz);
 			/* Make space for extra data */
 			__trailing_characters = __new_argzlen - ((__pos + __repllen) - __new_argz);
-			__localdep_memmoveup(__pos + __repllen,
-			          __pos + __findlen,
-			          __trailing_characters * sizeof(char));
+			__localdep_memmoveupc(__pos + __repllen,
+			           __pos + __findlen,
+			           __trailing_characters,
+			           sizeof(char));
 			/* Fill in the replacement string. */
-			__pos = (char *)__localdep_mempcpy(__pos, __with, __repllen * sizeof(char));
+			__pos = (char *)__localdep_mempcpyc(__pos, __with, __repllen, sizeof(char));
 		} else {
 			/* Simple case: The replacement string has the same length as the find-string */
-			__pos = (char *)__localdep_mempcpy(__pos, __with, __repllen * sizeof(char));
+			__pos = (char *)__localdep_mempcpyc(__pos, __with, __repllen, sizeof(char));
 		}
 		if (__replace_count)
 			++*__replace_count;

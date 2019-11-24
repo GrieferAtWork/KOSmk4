@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf476f9a4 */
+/* HASH CRC-32:0x89b4bd2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,24 +82,21 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 #endif /* realloc... */
 #endif /* !____localdep_realloc_defined */
 
-/* Dependency: "mempcpy" from "string" */
-#ifndef ____localdep_mempcpy_defined
-#define ____localdep_mempcpy_defined 1
-#ifdef __fast_mempcpy_defined
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-#define __localdep_mempcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))
-#elif defined(__CRT_HAVE_mempcpy)
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
-#elif defined(__CRT_HAVE___mempcpy)
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
-#else /* LIBC: mempcpy */
-#include <local/string/mempcpy.h>
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-#define __localdep_mempcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpy))
-#endif /* mempcpy... */
-#endif /* !____localdep_mempcpy_defined */
+/* Dependency: "mempcpyc" from "string" */
+#ifndef ____localdep_mempcpyc_defined
+#define ____localdep_mempcpyc_defined 1
+#ifdef __fast_mempcpyc_defined
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+#define __localdep_mempcpyc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpyc))
+#elif defined(__CRT_HAVE_mempcpyc)
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempcpyc,(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: mempcpyc */
+#include <local/string/mempcpyc.h>
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+#define __localdep_mempcpyc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyc))
+#endif /* mempcpyc... */
+#endif /* !____localdep_mempcpyc_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 /* Adds an entry for `NAME' with value `VALUE' to `ENVZ & ENVZ_LEN'. If an entry
@@ -134,9 +131,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_add))(char **__restrict __penvz,
 	*__penvz = __new_envz;
 	__new_envz += *__penvz_len;
 	*__penvz_len += __morelen;
-	__new_envz = (char *)__localdep_mempcpy(__new_envz, __name, __namelen * sizeof(char));
+	__new_envz = (char *)__localdep_mempcpyc(__new_envz, __name, __namelen, sizeof(char));
 	*__new_envz++ = '=';
-	__new_envz = (char *)__localdep_mempcpy(__new_envz, __value, __valuelen * sizeof(char));
+	__new_envz = (char *)__localdep_mempcpyc(__new_envz, __value, __valuelen, sizeof(char));
 	*__new_envz = '\0';
 	return 0;
 }

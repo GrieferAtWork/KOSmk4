@@ -249,8 +249,6 @@ NOTHROW(FCALL dbg_draweditfield)(int x, int y, unsigned int field_width,
                                  char *buf, size_t buflen) {
 	char *endptr;
 	size_t onscreen;
-
-
 	if unlikely(field_width < 2)
 		field_width = 2;
 	if unlikely(buflen < 2) {

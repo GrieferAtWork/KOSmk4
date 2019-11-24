@@ -257,7 +257,7 @@ split_cmdline(char *__restrict cmdline,
 			--cmdline_len;
 			memmovedown(&cmdline[i],
 			            &cmdline[i + 1],
-			            (cmdline_len - i) *
+			            cmdline_len - i,
 			            sizeof(char));
 			++i;
 			if (i >= cmdline_len)
@@ -270,7 +270,7 @@ split_cmdline(char *__restrict cmdline,
 			--cmdline_len;
 			memmovedown(&cmdline[i],
 			            &cmdline[i + 1],
-			            (cmdline_len - i) *
+			            cmdline_len - i,
 			            sizeof(char));
 			while (i < cmdline_len) {
 				ch = cmdline[i];
@@ -278,7 +278,7 @@ split_cmdline(char *__restrict cmdline,
 					--cmdline_len;
 					memmovedown(&cmdline[i],
 					            &cmdline[i + 1],
-					            (cmdline_len - i) *
+					            cmdline_len - i,
 					            sizeof(char));
 					++i;
 					if (i >= cmdline_len)
@@ -289,7 +289,7 @@ split_cmdline(char *__restrict cmdline,
 					--cmdline_len;
 					memmovedown(&cmdline[i],
 					            &cmdline[i + 1],
-					            (cmdline_len - i) *
+					            cmdline_len - i,
 					            sizeof(char));
 					break;
 				}

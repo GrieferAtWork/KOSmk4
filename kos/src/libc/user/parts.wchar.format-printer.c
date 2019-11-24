@@ -205,7 +205,7 @@ NOTHROW_NCX(LIBCCALL libc_format_waprintf_printer)(/*struct format_waprintf_data
 		buf->ap_base  = newbuf;
 		buf->ap_avail = new_alloc - buf->ap_used;
 	}
-	memcpy(buf->ap_base + buf->ap_used, data, datalen * sizeof(char32_t));
+	memcpyc(buf->ap_base + buf->ap_used, data, datalen, sizeof(char32_t));
 	buf->ap_avail -= datalen;
 	buf->ap_used  += datalen;
 	return (ssize_t)datalen;
@@ -247,7 +247,7 @@ NOTHROW_NCX(LIBDCALL libd_format_waprintf_printer)(/*struct format_waprintf_data
 		buf->ap_base  = newbuf;
 		buf->ap_avail = new_alloc - buf->ap_used;
 	}
-	libc_memcpy(buf->ap_base + buf->ap_used, data, datalen * sizeof(char16_t));
+	libc_memcpyc(buf->ap_base + buf->ap_used, data, datalen, sizeof(char16_t));
 	buf->ap_avail -= datalen;
 	buf->ap_used  += datalen;
 	return (ssize_t)datalen;

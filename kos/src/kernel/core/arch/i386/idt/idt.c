@@ -18,6 +18,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_IDT_IDT_C
 #define GUARD_KERNEL_CORE_ARCH_I386_IDT_IDT_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -212,7 +213,7 @@ PUBLIC ATTR_COLDTEXT void FCALL x86_idt_modify_start(void)
 	}
 	assert(!x86_idt_modify_copy);
 	/* Fill in the IDT copy. */
-	memcpy(copy, x86_dbgidt, 256 * sizeof(struct idt_segment));
+	memcpy(copy, x86_dbgidt, 256, sizeof(struct idt_segment));
 	x86_idt_modify_copy = copy;
 	/* Set the IDT copy as the IDT exclusively used everywhere */
 	dt.dt_base  = (uintptr_t)copy;
@@ -228,7 +229,7 @@ NOTHROW(FCALL x86_idt_modify_end)(bool discard_changes) {
 	copy = x86_idt_modify_copy;
 	/* Check if we're supposed to discard any changes made. */
 	if (discard_changes)
-		memcpy(x86_dbgidt, copy, 256 * sizeof(struct idt_segment));
+		memcpy(x86_dbgidt, copy, 256, sizeof(struct idt_segment));
 	/* Restore the used IDT within all CPUs */
 	x86_idt_setcurrent(&x86_idt_ptr);
 	/* Release the IDT modifications lock. */

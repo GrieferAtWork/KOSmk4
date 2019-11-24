@@ -18,6 +18,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MISC_SYSCTL_C
 #define GUARD_KERNEL_SRC_MISC_SYSCTL_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -391,7 +392,7 @@ DEFINE_SYSCALL2(syscall_slong_t, sysctl, syscall_ulong_t, command,
 			                                                                  (newpath_len + 1) * sizeof(char),
 			                                                                  GFP_LOCKED | GFP_PREFLT);
 			TRY {
-				memcpy(newpath_string, newpath, newpath_len * sizeof(char));
+				memcpy(newpath_string, newpath, newpath_len, sizeof(char));
 				newpath_string->dlp_path[newpath_len] = '\0';
 				newpath_string->dlp_refcnt = 1;
 				COMPILER_BARRIER();

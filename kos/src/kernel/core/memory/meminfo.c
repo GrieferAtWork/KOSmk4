@@ -127,7 +127,7 @@ NOTHROW(KCALL minfo_split_bank)(size_t bank_index, vm_phys_t start) {
 	        PMEMBANK_TYPE_MAX(kernel_membanks_initial[bank_index]));
 	memmoveup(&kernel_membanks_initial[bank_index + 1],
 	          &kernel_membanks_initial[bank_index],
-	          (minfo.mb_bankc - bank_index) *
+	          minfo.mb_bankc - bank_index,
 	          sizeof(struct pmembank));
 	kernel_membanks_initial[bank_index + 1].mb_start = start;
 	++minfo.mb_bankc;
@@ -139,7 +139,7 @@ NOTHROW(KCALL minfo_delete_bank)(size_t bank_index) {
 	--minfo.mb_bankc;
 	memmovedown(&kernel_membanks_initial[bank_index],
 	            &kernel_membanks_initial[bank_index + 1],
-	            (minfo.mb_bankc - bank_index) *
+	            minfo.mb_bankc - bank_index,
 	            sizeof(struct pmembank));
 	kernel_membanks_initial[minfo.mb_bankc].mb_start = 0;
 }
@@ -397,7 +397,7 @@ again:
 			++minfo.mb_bankc; /* Inc before to account for trailing sentinel bank. */
 			memmoveup(&kernel_membanks_initial[candy_bank + 1],
 			          &kernel_membanks_initial[candy_bank],
-			          (minfo.mb_bankc - candy_bank) *
+			          minfo.mb_bankc - candy_bank,
 			          sizeof(struct pmembank));
 			kernel_membanks_initial[candy_bank + 1].mb_start = candy_phys_max + 1;
 		}
@@ -409,7 +409,7 @@ again:
 			++minfo.mb_bankc; /* Inc before to account for trailing sentinel bank. */
 			memmoveup(&kernel_membanks_initial[candy_bank + 1],
 			          &kernel_membanks_initial[candy_bank],
-			          (minfo.mb_bankc - candy_bank) *
+			          minfo.mb_bankc - candy_bank,
 			          sizeof(struct pmembank));
 			kernel_membanks_initial[candy_bank + 1].mb_start = candy_phys;
 			kernel_membanks_initial[candy_bank + 1].mb_type  = PMEMBANK_TYPE_ALLOCATED;
@@ -627,7 +627,8 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
 	        VM_PAGE2ADDR(kernel_vm_node_pagedata.vn_node.a_vmin),
 	        VM_PAGE2ADDR(kernel_vm_node_pagedata.vn_node.a_vmin) + req_bytes - 1);
 	memcpy(buffer, kernel_membanks_initial,
-	       (minfo.mb_bankc + 1) * sizeof(struct pmembank));
+	       minfo.mb_bankc + 1,
+	       sizeof(struct pmembank));
 }
 
 
@@ -794,7 +795,7 @@ use_floordiv_maxpage:
 		--minfo.mb_bankc;
 		memmovedown(&minfo.mb_banks[i],
 		            &minfo.mb_banks[i + 1],
-		            (minfo.mb_bankc - i) *
+		            minfo.mb_bankc - i,
 		            sizeof(struct pmembank));
 	}
 }

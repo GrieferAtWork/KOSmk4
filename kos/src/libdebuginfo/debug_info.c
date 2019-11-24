@@ -281,7 +281,8 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__res
 		}
 		self->dua_stcache[self->dua_cache_next].ace_code = abbrev_code;
 		memcpy(&self->dua_stcache[self->dua_cache_next].ace_comp,
-		       result, sizeof(di_debuginfo_component_t));
+		       result,
+		       sizeof(di_debuginfo_component_t));
 		++self->dua_cache_next;
 		if (self->dua_cache_size < self->dua_cache_next)
 			self->dua_cache_size = self->dua_cache_next;
@@ -340,7 +341,8 @@ do_lookup_for_dynamic_cache:
 do_fill_dynamic_cache:
 		list[self->dua_cache_next].ace_code = abbrev_code;
 		memcpy(&list[self->dua_cache_next].ace_comp,
-		       result, sizeof(di_debuginfo_component_t));
+		       result,
+		       sizeof(di_debuginfo_component_t));
 		++self->dua_cache_next;
 	}
 	return true;

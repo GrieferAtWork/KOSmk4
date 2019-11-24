@@ -761,16 +761,10 @@ NOTHROW(FCALL start_dma_operation)(struct ata_bus *__restrict self,
 		self->b_prdt[0].p_flags   = PRD_FLAST;
 	} else {
 		assert(data->hd_prd_count <= ATA_PRD_MAXCOUNT);
-#if SIZEOF_ATAPRD == 8
-		memcpyq(self->b_prdt,
-		        data->hd_prd_vector,
-		        data->hd_prd_count);
-#else
 		memcpy(self->b_prdt,
 		       data->hd_prd_vector,
-		       data->hd_prd_count *
+		       data->hd_prd_count,
 		       sizeof(AtaPRD));
-#endif
 	}
 	return dostart_dma_operation(self, handle);
 }

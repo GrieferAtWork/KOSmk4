@@ -361,7 +361,7 @@ wmemcpy:([outp(num_chars)] wchar_t *__restrict dst,
 #elif __SIZEOF_WCHAR_T__ == 4
 	return (wchar_t *)memcpyl(dst, src, num_chars);
 #else
-	return (wchar_t *)memcpy(dst, src, num_chars * sizeof(wchar_t));
+	return (wchar_t *)memcpyc(dst, src, num_chars, sizeof(wchar_t));
 #endif
 }
 

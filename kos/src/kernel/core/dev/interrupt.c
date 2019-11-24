@@ -120,7 +120,8 @@ isr_try_register_at_impl(/*inherit(on_success)*/ REF struct driver *__restrict f
 		new_state->ivs_greedy_cnt = 0;
 		memcpy(new_state->ivs_handv,
 		       old_state->ivs_handv,
-		       old_state->ivs_handc * sizeof(struct isr_vector_handler));
+		       old_state->ivs_handc,
+		       sizeof(struct isr_vector_handler));
 		for (i = 0; i < old_state->ivs_handc; ++i) {
 			incref(new_state->ivs_handv[i].ivh_drv);
 		}
@@ -136,7 +137,8 @@ isr_try_register_at_impl(/*inherit(on_success)*/ REF struct driver *__restrict f
 		new_state->ivs_handv[0].ivh_drv = incref(func_driver);
 		memcpy(new_state->ivs_handv + 1,
 		       old_state->ivs_handv,
-		       old_state->ivs_handc * sizeof(struct isr_vector_handler));
+		       old_state->ivs_handc,
+		       sizeof(struct isr_vector_handler));
 		for (i = 1; i < new_state->ivs_handc; ++i)
 			incref(new_state->ivs_handv[i].ivh_drv);
 	}
@@ -318,7 +320,8 @@ again:
 			new_state->ivs_greedy_drv = NULL;
 			new_state->ivs_greedy_cnt = 0;
 			memcpy(new_state->ivs_handv, old_state->ivs_handv,
-			       old_state->ivs_handc * sizeof(struct isr_vector_handler));
+			       old_state->ivs_handc,
+			       sizeof(struct isr_vector_handler));
 			for (i = 0; i < new_state->ivs_handc; ++i) {
 				incref(new_state->ivs_handv[i].ivh_drv);
 			}
@@ -357,10 +360,10 @@ assign_new_state:
 			/* Copy handlers, but leave out the one at index=`i' */
 			memcpy(&new_state->ivs_handv[0],
 			       &old_state->ivs_handv[0],
-			       i * sizeof(struct isr_vector_handler));
+			       i, sizeof(struct isr_vector_handler));
 			memcpy(&new_state->ivs_handv[i],
 			       &old_state->ivs_handv[i + 1],
-			       (new_state->ivs_handc - i) *
+			       new_state->ivs_handc - i,
 			       sizeof(struct isr_vector_handler));
 			for (i = 0; i < new_state->ivs_handc; ++i) {
 				incref(new_state->ivs_handv[i].ivh_drv);
@@ -522,7 +525,8 @@ NOTHROW(KCALL isr_try_reorder_handlers)(size_t vector_index,
 	 * AB       */
 	memcpy(&new_state->ivs_handv[0],
 		   &old_state->ivs_handv[0],
-	       dst_handler_index * sizeof(struct isr_vector_handler));
+	       dst_handler_index,
+	       sizeof(struct isr_vector_handler));
 	/*   d  s   *
 	 * ABCDEFG  *
 	 * ABF      */
@@ -534,13 +538,15 @@ NOTHROW(KCALL isr_try_reorder_handlers)(size_t vector_index,
 	 * ABFCDE   */
 	memcpy(&new_state->ivs_handv[dst_handler_index + 1],
 	       &old_state->ivs_handv[dst_handler_index],
-	       (src_handler_index - dst_handler_index) * sizeof(struct isr_vector_handler));
+	       src_handler_index - dst_handler_index,
+	       sizeof(struct isr_vector_handler));
 	/*   d  s   *
 	 * ABCDEFG  *
 	 * ABFCDEG  */
 	memcpy(&new_state->ivs_handv[src_handler_index + 1],
 	       &old_state->ivs_handv[src_handler_index + 1],
-	       (new_state->ivs_handc - src_handler_index) * sizeof(struct isr_vector_handler));
+	       new_state->ivs_handc - src_handler_index,
+	       sizeof(struct isr_vector_handler));
 	/* Update reference counts to backing drivers. */
 	for (i = 0; i < new_state->ivs_handc; ++i) {
 		incref(new_state->ivs_handv[i].ivh_drv);

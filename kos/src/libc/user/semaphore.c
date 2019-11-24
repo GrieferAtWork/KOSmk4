@@ -116,7 +116,7 @@ NOTHROW_RPC_KOS(VLIBCCALL libc_sem_open)(char const *name,
 		goto err;
 	memcpy(filename, named_prefix, sizeof(named_prefix) - sizeof(char));
 	memcpy(filename + COMPILER_STRLEN(named_prefix),
-	       name, (name_length + 1) * sizeof(char));
+	       name, name_length + 1, sizeof(char));
 	fd = open(filename, oflags, mode);
 	freea(filename);
 	if unlikely(fd < 0)
@@ -168,7 +168,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_sem_unlink)(const char *name)
 		goto err;
 	memcpy(filename, named_prefix, sizeof(named_prefix) - sizeof(char));
 	memcpy(filename + COMPILER_STRLEN(named_prefix),
-	       name, (name_length + 1) * sizeof(char));
+	       name, name_length + 1, sizeof(char));
 	result = unlink(filename);
 	freea(filename);
 	return result;

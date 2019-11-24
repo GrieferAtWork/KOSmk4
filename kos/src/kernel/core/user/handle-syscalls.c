@@ -534,7 +534,7 @@ PRIVATE syscall_slong_t
 		st.hs_address     = MANGLE_HANDLE_DATA_POINTER(hand->h_data);
 		name              = handle_type_db.h_typename[hand->h_type];
 		memcpy(st.hs_typename, name,
-		       strnlen(name, COMPILER_LENOF(st.hs_typename) - 1) *
+		       strnlen(name, COMPILER_LENOF(st.hs_typename) - 1),
 		       sizeof(char));
 		COMPILER_BARRIER();
 		{

@@ -495,20 +495,10 @@ generic_handle_node:
 		hinode->m_tree.a_vmin = end_addr;
 		node->m_tree.a_vmax   = (uintptr_t)ptr - 1;
 		hinode->m_flags       = node->m_flags;
-#if __SIZEOF_POINTER__ == 4
-		memcpyl(hinode->m_trace, node->m_trace,
-		        MIN(MALLNODE_TRACESZ(hinode),
-		            MALLNODE_TRACESZ(node)));
-#elif __SIZEOF_POINTER__ == 8
-		memcpyq(hinode->m_trace, node->m_trace,
-		        MIN(MALLNODE_TRACESZ(hinode),
-		            MALLNODE_TRACESZ(node)));
-#else
 		memcpy(hinode->m_trace, node->m_trace,
 		       MIN(MALLNODE_TRACESZ(hinode),
-		           MALLNODE_TRACESZ(node)) *
+		           MALLNODE_TRACESZ(node)),
 		       sizeof(void *));
-#endif
 		/* Now just insert both nodes into the MALL tree, and we're done! */
 		mallnode_tree_insert(&mall_tree, node);
 		mallnode_tree_insert(&mall_tree, hinode);
@@ -1635,20 +1625,10 @@ NOTHROW(KCALL mall_insert_tree)(struct mallnode *__restrict node) {
 				hinode->m_tree.a_vmax        = existing_node->m_tree.a_vmax;
 				existing_node->m_tree.a_vmax = existing_node->m_tree.a_vmin - 1;
 				hinode->m_flags              = existing_node->m_flags;
-#if __SIZEOF_POINTER__ == 4
-				memcpyl(hinode->m_trace, existing_node->m_trace,
-				        MIN(MALLNODE_TRACESZ(hinode),
-				            MALLNODE_TRACESZ(existing_node)));
-#elif __SIZEOF_POINTER__ == 8
-				memcpyq(hinode->m_trace, existing_node->m_trace,
-				        MIN(MALLNODE_TRACESZ(hinode),
-				            MALLNODE_TRACESZ(existing_node)));
-#else
 				memcpy(hinode->m_trace, existing_node->m_trace,
 				       MIN(MALLNODE_TRACESZ(hinode),
-				           MALLNODE_TRACESZ(existing_node)) *
+				           MALLNODE_TRACESZ(existing_node)),
 				       sizeof(void *));
-#endif
 				/* Insert both the existing, as well as the higher-order node into the tree. */
 				mallnode_tree_insert(&mall_tree, existing_node);
 				mallnode_tree_insert(&mall_tree, hinode);

@@ -352,7 +352,7 @@ linecopy24(byte_t *__restrict dst_line, uintptr_t dst_x,
            size_t num_pixels) {
 	memcpy((u8 *)dst_line + dst_x * 3,
 	       (u8 *)src_line + src_x * 3,
-	        num_pixels * 3);
+	        num_pixels, 3);
 }
 
 PRIVATE void CC

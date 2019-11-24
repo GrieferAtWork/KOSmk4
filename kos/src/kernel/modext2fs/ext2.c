@@ -539,7 +539,7 @@ Ext2_ReadSymLink(struct symlink_node *__restrict self) {
 		{
 			/* XXX: Is this really how we discern between the 2 methods?
 			 *      Shouldn't there be some kind of flag somewhere? */
-			memcpy(text, &node->i_dblock, textlen*sizeof(char));
+			memcpy(text, &node->i_dblock, textlen, sizeof(char));
 		} else {
 			/* Read the symlink text. */
 			Ext2_VReadFromINode(self, text, textlen, 0);

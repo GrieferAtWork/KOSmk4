@@ -982,7 +982,7 @@ format_snprintf_printer:([nonnull] /*struct format_snprintf_data**/ void *arg,
 @@if $wchar_function@@
 	wmemcpy(ctrl->sd_buffer, data, result);
 @@else@@
-	memcpy(ctrl->sd_buffer, data, result * sizeof(char));
+	memcpyc(ctrl->sd_buffer, data, result, sizeof(char));
 @@endif@@
 	ctrl->sd_buffer += datalen;
 	ctrl->sd_bufsiz -= result;
@@ -1164,7 +1164,7 @@ format_aprintf_printer:([nonnull] /*struct format_aprintf_data **/ void *arg,
 		buf->ap_base  = newbuf;
 		buf->ap_avail = new_alloc - buf->ap_used;
 	}
-	memcpy(buf->ap_base + buf->ap_used, data, datalen * sizeof(char));
+	memcpyc(buf->ap_base + buf->ap_used, data, datalen, sizeof(char));
 	buf->ap_avail -= datalen;
 	buf->ap_used  += datalen;
 	return (ssize_t)datalen;

@@ -159,7 +159,7 @@ ProcFS_PerProc_MakeDirent(struct directory_node *__restrict self,
 	result->de_ino  = ent->de_ino | (self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK);
 	result->de_hash = ent->de_hash;
 	result->de_type = ent->de_type;
-	memcpy(result->de_name, ent->de_name, ent->de_namelen * sizeof(char));
+	memcpy(result->de_name, ent->de_name, ent->de_namelen, sizeof(char));
 	return result;
 }
 

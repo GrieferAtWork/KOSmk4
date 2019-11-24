@@ -261,12 +261,12 @@ NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file,
 				fullpath_alloc = full_len + 1;
 			}
 			/* Construct the full-path string. */
-			memcpy(fullpath, env_path, seg_len * sizeof(char));
+			memcpy(fullpath, env_path, seg_len, sizeof(char));
 			if (need_trail) {
 				fullpath[seg_len] = '/';
-				memcpy(fullpath + seg_len + 1, file, taillen * sizeof(char));
+				memcpy(fullpath + seg_len + 1, file, taillen, sizeof(char));
 			} else {
-				memcpy(fullpath + seg_len, file, taillen * sizeof(char));
+				memcpy(fullpath + seg_len, file, taillen, sizeof(char));
 			}
 			fullpath[full_len] = '\0';
 			execve(fullpath, ___argv, ___envp);
@@ -615,7 +615,7 @@ NOTHROW_RPC(LIBCCALL libc_ttyname_r)(fd_t fd,
 		return libc_geterrno();
 	if ((dirstream = opendir(devpath)) == NULL)
 		return libc_geterrno();
-	memcpy(buf, devpath, COMPILER_STRLEN(devpath) * sizeof(char));
+	memcpy(buf, devpath, COMPILER_STRLEN(devpath), sizeof(char));
 	buf[COMPILER_STRLEN(devpath)] = '/';
 	buflen -= (COMPILER_STRLEN(devpath) + 1) * sizeof(char);
 	safe = libc_geterrno();
@@ -650,7 +650,8 @@ NOTHROW_RPC(LIBCCALL libc_ttyname_r)(fd_t fd,
 		}
 		memcpy(&buf[sizeof(devpath)],
 		       d->d_name,
-		       (needed + 1) * sizeof(char));
+		       needed + 1,
+		       sizeof(char));
 		if (stat64(buf, &st) != 0)
 			continue;
 		if (st.st_rdev != rdev)
@@ -1816,7 +1817,7 @@ NOTHROW_NCX(LIBCCALL libc_gethostname)(char *name,
 			/* EINVAL For getdomainname() under libc: name is NULL or name is longer than len bytes. */
 			return (int)libc_seterrno(EINVAL);
 		}
-		memcpy(name, uts.nodename, len * sizeof(char));
+		memcpy(name, uts.nodename, len, sizeof(char));
 		name[len] = '\0';
 	}
 	return result;
@@ -1855,7 +1856,7 @@ NOTHROW_NCX(LIBCCALL libc_getdomainname)(char *name,
 			/* EINVAL For getdomainname() under libc: name is NULL or name is longer than len bytes. */
 			return (int)libc_seterrno(EINVAL);
 		}
-		memcpy(name, uts.domainname, len * sizeof(char));
+		memcpy(name, uts.domainname, len, sizeof(char));
 		name[len] = '\0';
 	}
 	return result;
@@ -2314,9 +2315,9 @@ NOTHROW_NCX(LIBCCALL libc_confstr)(int name,
 	result = strlen(result_string) + 1;
 	if (buflen && buf) {
 		if (buflen >= result) {
-			memcpy(buf, result_string, result * sizeof(char));
+			memcpy(buf, result_string, result, sizeof(char));
 		} else {
-			memcpy(buf, result_string, (buflen - 1) * sizeof(char));
+			memcpy(buf, result_string, buflen - 1, sizeof(char));
 			buf[buflen - 1] = '\0';
 		}
 	}

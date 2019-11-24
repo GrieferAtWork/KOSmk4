@@ -469,7 +469,7 @@ DEFINE_SYSCALL4(fd_t, mktty,
 			                       hdisplay.h_type, hdisplay.h_data);
 			TRY {
 				/* Assign a name to the new device. */
-				memcpy(tty->cd_name, name, namelen * sizeof(char));
+				memcpy(tty->cd_name, name, namelen, sizeof(char));
 				assert(tty->cd_name[namelen] == '\0');
 				/* Register the device, and add it to the devfs. */
 				character_device_register_auto(tty);

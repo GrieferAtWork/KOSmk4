@@ -288,8 +288,10 @@ again:
 		decref_unlikely(ovec);
 		RETHROW();
 	}
-	memcpy(nvec->upv_elem, ovec->upv_elem,
-	       ovec->upv_count * sizeof(struct usb_probe_entry));
+	memcpy(nvec->upv_elem,
+	       ovec->upv_elem,
+	       ovec->upv_count,
+	       sizeof(struct usb_probe_entry));
 	/* Update reference counts of copied drivers. */
 	for (i = 0; i < ovec->upv_count; ++i)
 		incref(ovec->upv_elem[i].c_driver);
@@ -336,11 +338,14 @@ found_index:
 	}
 	nvec->upv_refcnt = 1;
 	nvec->upv_count  = ovec->upv_count - 1;
-	memcpy(nvec->upv_elem, ovec->upv_elem,
-	       del_index * sizeof(struct usb_probe_entry));
+	memcpy(nvec->upv_elem,
+	       ovec->upv_elem,
+	       del_index,
+	       sizeof(struct usb_probe_entry));
 	memcpy(nvec->upv_elem + del_index,
 	       ovec->upv_elem + (del_index + 1),
-	       (nvec->upv_count - del_index) * sizeof(struct usb_probe_entry));
+	       nvec->upv_count - del_index,
+	       sizeof(struct usb_probe_entry));
 	/* Update reference counts of copied drivers. */
 	for (i = 0; i < nvec->upv_count; ++i)
 		incref(nvec->upv_elem[i].c_driver);
@@ -476,7 +481,8 @@ usb_interface_discovered(struct usb_controller *__restrict self,
 		unknown->uui_ctrl   = (REF struct usb_controller *)incref(self);
 		unknown->uui_intf   = (REF struct usb_interface *)incref(intf);
 		unknown->uui_endpc  = endpc;
-		memcpy(unknown->uui_endpv, endpv, endpc * sizeof(REF struct usb_endpoint *));
+		memcpy(unknown->uui_endpv, endpv,
+		       endpc, sizeof(REF struct usb_endpoint *));
 		for (i = 0; i < endpc; ++i)
 			incref(unknown->uui_endpv[i]);
 	
@@ -779,7 +785,8 @@ heap_printer(/*struct heap_printer_data **/ void *arg,
 		buf->ap_base  = newbuf;
 		buf->ap_avail = new_alloc - buf->ap_used;
 	}
-	memcpy(buf->ap_base + buf->ap_used, data, datalen * sizeof(char));
+	memcpy(buf->ap_base + buf->ap_used, data,
+	       datalen, sizeof(char));
 	buf->ap_avail -= datalen;
 	buf->ap_used  += datalen;
 	return (ssize_t)datalen;

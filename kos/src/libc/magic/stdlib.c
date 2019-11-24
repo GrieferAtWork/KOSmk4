@@ -1467,7 +1467,7 @@ unsetenv:([nonnull] char const *varname) -> int {
 	copy = (char *)@__malloca@((namelen + 2) * sizeof(char));
 	if unlikely(!copy)
 		return -1;
-	memcpy(copy, varname, namelen * sizeof(char));
+	memcpyc(copy, varname, namelen, sizeof(char));
 	copy[namelen] = '=';
 	copy[namelen + 1] = '\0';
 	result = putenv(copy);

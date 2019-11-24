@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0ba8974 */
+/* HASH CRC-32:0x3eb94be5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,24 +38,24 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 #endif /* realloc... */
 #endif /* !____localdep_realloc_defined */
 
-/* Dependency: "memcpy" from "string" */
-#ifndef ____localdep_memcpy_defined
-#define ____localdep_memcpy_defined 1
-#ifdef __fast_memcpy_defined
+/* Dependency: "memcpyc" from "string" */
+#ifndef ____localdep_memcpyc_defined
+#define ____localdep_memcpyc_defined 1
+#ifdef __fast_memcpyc_defined
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __localdep_memcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))
-#elif defined(__CRT_HAVE_memcpy)
+#define __localdep_memcpyc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyc))
+#elif defined(__CRT_HAVE_memcpyc)
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
-#else /* LIBC: memcpy */
-#include <local/string/memcpy.h>
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: memcpyc */
+#include <local/string/memcpyc.h>
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __localdep_memcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy))
-#endif /* memcpy... */
-#endif /* !____localdep_memcpy_defined */
+#define __localdep_memcpyc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyc))
+#endif /* memcpyc... */
+#endif /* !____localdep_memcpyc_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
@@ -90,7 +90,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c32aprintf_printer))(/*struct 
 		__buf->__ap_base  = __newbuf;
 		__buf->__ap_avail = __new_alloc - __buf->__ap_used;
 	}
-	__localdep_memcpy(__buf->__ap_base + __buf->__ap_used, __data, __datalen * sizeof(__CHAR32_TYPE__));
+	__localdep_memcpyc(__buf->__ap_base + __buf->__ap_used, __data, __datalen, sizeof(__CHAR32_TYPE__));
 	__buf->__ap_avail -= __datalen;
 	__buf->__ap_used  += __datalen;
 	return (__SSIZE_TYPE__)__datalen;

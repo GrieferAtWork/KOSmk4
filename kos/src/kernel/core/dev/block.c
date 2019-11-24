@@ -449,7 +449,7 @@ block_device_lookup_name(USER CHECKED char const *name)
 	name_len = strnlen(name, COMPILER_LENOF(name_buf));
 	if unlikely(name_len >= COMPILER_LENOF(name_buf))
 		return NULL; /* Name is too long */
-	memcpy(name_buf, name, name_len);
+	memcpy(name_buf, name, name_len, sizeof(char));
 	name_buf[name_len] = '\0';
 	sync_read(&block_device_lock);
 	if likely(block_device_tree)
@@ -786,10 +786,11 @@ block_device_makepart(struct basic_block_device *__restrict master,
 	result->bp_max                 = part_max;
 	result->bp_sysid               = part_sysid;
 
-	if (part_label)
+	if (part_label) {
 		memcpy(result->bp_label, part_label,
-		       MIN(part_label_size, COMPILER_LENOF(result->bp_label) - 1) *
+		       MIN(part_label_size, COMPILER_LENOF(result->bp_label) - 1),
 		       sizeof(char));
+	}
 	if (part_typeguid)
 		memcpy(&result->bp_typeguid, part_typeguid, sizeof(guid_t));
 	if (part_partguid)
@@ -1456,9 +1457,7 @@ again_read_cache:
 			}
 			/* Copy sector data. */
 			memcpy(dst,
-			       self->bd_cache_base +
-			       (cache_index * self->bd_cache_ssiz) +
-			       block_offset,
+			       self->bd_cache_base + (cache_index * self->bd_cache_ssiz) + block_offset,
 			       block_size);
 			if (block_size >= num_bytes)
 				break;
@@ -1515,11 +1514,8 @@ _block_device_write(struct block_device *__restrict self,
 			}
 			assert(self->bd_cache[cache_index].cs_flags & BD_CACHED_SECTOR_FPRESENT);
 			/* Copy sector data. */
-			memcpy(self->bd_cache_base +
-			       (cache_index * self->bd_cache_ssiz) +
-			       block_offset,
-			       src,
-			       block_size);
+			memcpy(self->bd_cache_base + (cache_index * self->bd_cache_ssiz) + block_offset,
+			       src, block_size);
 			/* Set the was-modified flag. */
 			self->bd_cache[cache_index].cs_flags |= BD_CACHED_SECTOR_FCHANGED;
 			if (block_size >= num_bytes)

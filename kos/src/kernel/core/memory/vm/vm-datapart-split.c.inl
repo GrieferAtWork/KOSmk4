@@ -437,12 +437,12 @@ again_lock_datapart:
 						                  : (struct vm_node **)krealloc(vm_node_vector, vm_node_reqcount * sizeof(struct vm_node *), GFP_LOCKED | GFP_PREFLT | GFP_VCBASE);
 #endif /* !SPLIT_NX */
 						if (vm_node_vector == vm_node_buffer)
-							memcpy(new_node_vector, vm_node_buffer, vm_node_count * sizeof(struct vm_node *));
+							memcpy(new_node_vector, vm_node_buffer, vm_node_count, sizeof(struct vm_node *));
 						vm_node_vector = new_node_vector;
 						goto again_lock_datapart;
 					}
 					if (vm_node_vector == vm_node_buffer)
-						memcpy(new_node_vector, vm_node_buffer, vm_node_count * sizeof(struct vm_node *));
+						memcpy(new_node_vector, vm_node_buffer, vm_node_count, sizeof(struct vm_node *));
 					vm_node_vector = new_node_vector;
 				}
 				do {
@@ -748,7 +748,7 @@ again_lock_datapart:
 					assert(result_blocks != NULL);
 					memcpy(result_blocks,
 					       blocks + (self->dp_ramdata.rd_blockc - req_blockc),
-					       req_blockc * sizeof(struct vm_ramblock));
+					       req_blockc, sizeof(struct vm_ramblock));
 					if (total != vpage_offset) {
 						/* Adjust the initial duplicate part to properly feature the sub-part split. */
 						assert(vpage_offset > total);

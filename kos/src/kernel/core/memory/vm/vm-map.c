@@ -102,7 +102,7 @@ partnode_pair_vector_reserve1(struct partnode_pair_vector *__restrict self)
 			                                                GFP_LOCKED | GFP_PREFLT | GFP_VCBASE);
 		}
 		if (self->pv_vec == self->pv_buf)
-			memcpy(new_vector, self->pv_buf, self->pv_cnt * sizeof(struct partnode_pair));
+			memcpy(new_vector, self->pv_buf, self->pv_cnt, sizeof(struct partnode_pair));
 		self->pv_alc = new_alloc;
 		self->pv_vec = new_vector;
 	}
@@ -133,7 +133,7 @@ partnode_pair_vector_insertpart(struct partnode_pair_vector *__restrict self, si
 	                                     GFP_LOCKED | GFP_PREFLT | GFP_VCBASE);
 	memmoveup(&self->pv_vec[index + 1],
 	          &self->pv_vec[index],
-	          (self->pv_cnt - index) *
+	          self->pv_cnt - index,
 	          sizeof(struct partnode_pair));
 	self->pv_vec[index].pn_node = new_node; /* Inherit */
 	self->pv_vec[index].pn_part = part;     /* Inherit reference */

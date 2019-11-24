@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2bef7071 */
+/* HASH CRC-32:0x837d6c5b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1022,7 +1022,7 @@ NOTHROW_NCX(LIBCCALL libc_format_snprintf_printer)(/*struct format_snprintf_data
 
 
 
-	memcpy(ctrl->sd_buffer, data, result * sizeof(char));
+	memcpyc(ctrl->sd_buffer, data, result, sizeof(char));
 
 	ctrl->sd_buffer += datalen;
 	ctrl->sd_bufsiz -= result;

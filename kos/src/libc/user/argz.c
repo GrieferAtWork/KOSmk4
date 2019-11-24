@@ -158,7 +158,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_append)(char **__restrict pargz,
 		return 1;
 #endif /* !__ENOMEM */
 	}
-	memcpy(newargz + oldlen, buf, buf_len * sizeof(char));
+	memcpyc(newargz + oldlen, buf, buf_len, sizeof(char));
 	*pargz     = newargz;
 	*pargz_len = newlen;
 	return 0;
@@ -278,9 +278,9 @@ NOTHROW_NCX(LIBCCALL libc_argz_delete)(char **__restrict pargz,
 		*pargz = NULL;
 		return;
 	}
-	memmovedown(entry, entry + entrylen,
-	            (newlen - (size_t)(entry - *pargz)) *
-	            sizeof(char));
+	memmovedownc(entry, entry + entrylen,
+	             (newlen - (size_t)(entry - *pargz)),
+	             sizeof(char));
 }
 /*[[[end:argz_delete]]]*/
 
@@ -343,13 +343,14 @@ NOTHROW_NCX(LIBCCALL libc_argz_insert)(char **__restrict pargz,
 	*pargz     = argz;
 	*pargz_len = argz_len;
 	/* Make space for the new entry. */
-	memmoveup(argz + insert_offset + entry_len,
-	          argz + insert_offset,
-	          (argz_len - (insert_offset + entry_len)) * sizeof(char));
+	memmoveupc(argz + insert_offset + entry_len,
+	           argz + insert_offset,
+	           (argz_len - (insert_offset + entry_len)),
+	           sizeof(char));
 	/* Insert the new entry. */
-	memcpy(argz + insert_offset,
-	       entry,
-	       entry_len * sizeof(char));
+	memcpyc(argz + insert_offset,
+	        entry, entry_len,
+	        sizeof(char));
 	return 0;
 }
 /*[[[end:argz_insert]]]*/
@@ -401,12 +402,12 @@ NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz,
 			/* Simple case: The replacement string is smaller than the find-string */
 			char *old_argz, *new_argz;
 			size_t diff, trailing_characters;
-			pos  = (char *)mempcpy(pos, with, repllen * sizeof(char));
+			pos  = (char *)mempcpyc(pos, with, repllen, sizeof(char));
 			diff = findlen - repllen;
 			*pargz_len -= diff;
 			old_argz = *pargz;
 			trailing_characters = *pargz_len - (size_t)(pos - old_argz);
-			memmovedown(pos, pos + diff, trailing_characters * sizeof(char));
+			memmovedownc(pos, pos + diff, trailing_characters, sizeof(char));
 			new_argz = (char *)libc_realloc(old_argz, *pargz_len * sizeof(char));
 			if likely(new_argz) {
 				pos    = new_argz + (pos - old_argz);
@@ -432,14 +433,15 @@ NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz,
 			pos = new_argz + (pos - old_argz);
 			/* Make space for extra data */
 			trailing_characters = new_argzlen - ((pos + repllen) - new_argz);
-			memmoveup(pos + repllen,
-			          pos + findlen,
-			          trailing_characters * sizeof(char));
+			memmoveupc(pos + repllen,
+			           pos + findlen,
+			           trailing_characters,
+			           sizeof(char));
 			/* Fill in the replacement string. */
-			pos = (char *)mempcpy(pos, with, repllen * sizeof(char));
+			pos = (char *)mempcpyc(pos, with, repllen, sizeof(char));
 		} else {
 			/* Simple case: The replacement string has the same length as the find-string */
-			pos = (char *)mempcpy(pos, with, repllen * sizeof(char));
+			pos = (char *)mempcpyc(pos, with, repllen, sizeof(char));
 		}
 		if (replace_count)
 			++*replace_count;

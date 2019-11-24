@@ -115,12 +115,12 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execvpe") void
 				fullpath_alloc = full_len + 1;
 			}
 			/* Construct the full-path string. */
-			memcpy(fullpath, env_path, seg_len * sizeof(char));
+			memcpy(fullpath, env_path, seg_len, sizeof(char));
 			if (need_trail) {
 				fullpath[seg_len] = '/';
-				memcpy(fullpath + seg_len + 1, file, taillen * sizeof(char));
+				memcpy(fullpath + seg_len + 1, file, taillen, sizeof(char));
 			} else {
-				memcpy(fullpath + seg_len, file, taillen * sizeof(char));
+				memcpy(fullpath + seg_len, file, taillen, sizeof(char));
 			}
 			fullpath[full_len] = '\0';
 			execve(fullpath, ___argv, ___envp);
@@ -602,7 +602,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.system.configuration.GetHostName") void
 	len = strnlen(uts.nodename, _UTSNAME_NODENAME_LENGTH);
 	if (buflen <= len)
 		THROW(E_BUFFER_TOO_SMALL, len, buflen);
-	memcpy(name, uts.nodename, len * sizeof(char));
+	memcpy(name, uts.nodename, len, sizeof(char));
 	name[len] = '\0';
 }
 /*[[[end:GetHostName]]]*/
@@ -623,7 +623,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.system.configuration.GetDomainName") vo
 	len = strnlen(uts.domainname, _UTSNAME_DOMAIN_LENGTH);
 	if (buflen <= len)
 		THROW(E_BUFFER_TOO_SMALL, len, buflen);
-	memcpy(name, uts.domainname, len * sizeof(char));
+	memcpy(name, uts.domainname, len, sizeof(char));
 	name[len] = '\0';
 }
 /*[[[end:GetDomainName]]]*/

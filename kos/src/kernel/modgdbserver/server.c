@@ -248,14 +248,14 @@ NOTHROW(FCALL GDB_DecodeEscapedBinary)(char *buf, char *endptr) {
 		num_unescaped = (size_t)((buf - 1) - flush_start);
 		ch = *buf++;
 		if (dst != flush_start)
-			memmovedown(dst, flush_start, num_unescaped);
+			memmovedown(dst, flush_start, num_unescaped, sizeof(char));
 		dst += num_unescaped;
 		*dst++ = ch ^ 0x20;
 		flush_start = buf;
 		--result;
 	}
 	if (dst != flush_start)
-		memmovedown(dst, flush_start, (size_t)(endptr - flush_start));
+		memmovedown(dst, flush_start, (size_t)(endptr - flush_start), sizeof(char));
 	return result;
 }
 

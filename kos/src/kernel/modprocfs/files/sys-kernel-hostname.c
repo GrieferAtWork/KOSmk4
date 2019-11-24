@@ -60,7 +60,7 @@ ProcFS_Sys_Kernel_Hostname_Write(struct regular_node *__restrict UNUSED(self),
 	if (bufsize > _UTSNAME_NODENAME_LENGTH)
 		THROW(E_BUFFER_TOO_SMALL, bufsize, _UTSNAME_NODENAME_LENGTH);
 	cred_require_sysadmin();
-	memcpy(temp, buf, bufsize * sizeof(char));
+	memcpy(temp, buf, bufsize, sizeof(char));
 	memset(temp + bufsize, 0, (_UTSNAME_NODENAME_LENGTH - bufsize) * sizeof(char));
 	COMPILER_READ_BARRIER();
 	memcpy(kernel_uname.nodename, temp, sizeof(temp));

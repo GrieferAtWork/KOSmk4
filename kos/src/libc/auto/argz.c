@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd45e5e76 */
+/* HASH CRC-32:0x76b3a116 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -109,7 +109,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.argz.argz_next") char *
 NOTHROW_NCX(LIBCCALL libc_argz_next)(char const *__restrict argz,
                                      size_t argz_len,
                                      char const *__restrict entry) {
-#line 550 "kos/src/libc/magic/argz.c"
+#line 552 "kos/src/libc/magic/argz.c"
 	char const *argz_end;
 	if (!entry)
 		return argz_len ? (char *)argz : NULL;

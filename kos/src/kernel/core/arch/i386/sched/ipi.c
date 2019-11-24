@@ -337,7 +337,7 @@ again_i:
 		COMPILER_WRITE_BARRIER();
 		FORCPU(target, thiscpu_x86_ipi_pending[slot].pi_func) = func;
 		memcpy(FORCPU(target, thiscpu_x86_ipi_pending[slot]).pi_args,
-		       args, CPU_IPI_ARGCOUNT * sizeof(void *));
+		       args, CPU_IPI_ARGCOUNT, sizeof(void *));
 		COMPILER_WRITE_BARRIER();
 
 		/* If we haven't seen any other IPIs, tell the caller that they will have

@@ -216,7 +216,7 @@ NOTHROW_NCX(LIBCCALL libc_tdelete)(void const *__restrict key,
 	p = *rootp;
 	if (p == NULL)
 		return NULL;
-	nodestack = (node **)malloca(sizeof(node *)*stacksize);
+	nodestack = (node **)malloca(sizeof(node *) * stacksize);
 	if unlikely(!nodestack)
 		return NULL;
 	root = p;
@@ -224,12 +224,12 @@ NOTHROW_NCX(LIBCCALL libc_tdelete)(void const *__restrict key,
 		if (sp == stacksize) {
 			node **newstack;
 			stacksize += 20;
-			newstack = (node **)malloca(sizeof(node *)*stacksize);
+			newstack = (node **)malloca(sizeof(node *) * stacksize);
 			if unlikely(!newstack) {
 				retval = NULL;
 				goto done;
 			}
-			memcpy(newstack, nodestack, sp*sizeof(node *));
+			memcpyc(newstack, nodestack, sp, sizeof(node *));
 			freea(nodestack);
 			nodestack = newstack;
 		}
@@ -256,12 +256,12 @@ NOTHROW_NCX(LIBCCALL libc_tdelete)(void const *__restrict key,
 			if (sp == stacksize) {
 				node **newstack;
 				stacksize += 20;
-				newstack = (node **)malloca(sizeof(node *)*stacksize);
+				newstack = (node **)malloca(sizeof(node *) * stacksize);
 				if unlikely(!newstack) {
 					retval = NULL;
 					goto done;
 				}
-				memcpy(newstack, nodestack, sp*sizeof(node *));
+				memcpyc(newstack, nodestack, sp, sizeof(node *));
 				freea(nodestack);
 				nodestack = newstack;
 			}

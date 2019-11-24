@@ -283,7 +283,7 @@ got_result_slot:
 #endif /* HANDLE_TYPE_UNDEFINED != 0 */
 						memcpy(new_vector,
 						       self->hm_linear.hm_vector,
-						       self->hm_linear.hm_alloc *
+						       self->hm_linear.hm_alloc,
 						       sizeof(struct handle));
 						/* Install the new vector and free the old one. */
 						assert(new_vector != self->hm_linear.hm_vector);
@@ -390,7 +390,7 @@ install_hash_handle:
 #endif /* HANDLE_TYPE_UNDEFINED != 0 */
 						memcpy(new_vector,
 						       self->hm_hashvector.hm_vector,
-						       self->hm_hashvector.hm_alloc *
+						       self->hm_hashvector.hm_alloc,
 						       sizeof(struct handle));
 						/* Install the new vector and free the old one. */
 						assert(new_vector != self->hm_hashvector.hm_vector);

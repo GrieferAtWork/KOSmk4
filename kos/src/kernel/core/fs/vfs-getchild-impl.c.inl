@@ -198,7 +198,7 @@ find_name_with_kernel_copy:
 		kernel_name = (char *)alloca(namelen * sizeof(char));
 	}
 	TRY {
-		memcpy(kernel_name, name, namelen * sizeof(char));
+		memcpy(kernel_name, name, namelen, sizeof(char));
 		sync_read(self);
 	} EXCEPT {
 		if (kernel_name_is_heap)

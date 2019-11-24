@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8be13af9 */
+/* HASH CRC-32:0xd9b9b43b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -395,7 +395,7 @@ NOTHROW_NCX(LIBCCALL libc_wmemcpy)(char32_t *__restrict dst,
 #elif 4 == 4
 	return (char32_t *)memcpyl(dst, src, num_chars);
 #else
-	return (char32_t *)memcpy(dst, src, num_chars * sizeof(char32_t));
+	return (char32_t *)memcpyc(dst, src, num_chars, sizeof(char32_t));
 #endif
 }
 INTERN ATTR_RETNONNULL NONNULL((1, 2))
@@ -409,7 +409,7 @@ NOTHROW_NCX(LIBDCALL libd_wmemcpy)(char16_t *__restrict dst,
 #elif 2 == 4
 	return (char16_t *)libc_memcpyl(dst, src, num_chars);
 #else
-	return (char16_t *)libc_memcpy(dst, src, num_chars * sizeof(char16_t));
+	return (char16_t *)libc_memcpyc(dst, src, num_chars, sizeof(char16_t));
 #endif
 }
 

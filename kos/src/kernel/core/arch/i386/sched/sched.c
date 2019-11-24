@@ -138,7 +138,7 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
 	struct scpustate *state;
 #define PUSH(x) (dest -= sizeof(u32), *(u32 *)dest = (x))
 	dest -= argc * sizeof(void *);
-	memcpy(dest, &argc + 1, argc * sizeof(void *));
+	memcpy(dest, &argc + 1, argc, sizeof(void *));
 	PUSH((u32)(void *)(void(FCALL *)(int)) & task_exit); /* Return address */
 	dest -= OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL;
 	state = (struct scpustate *)dest;

@@ -279,7 +279,7 @@ character_device_lookup_name(USER CHECKED char const *name)
 	name_len = strnlen(name, COMPILER_LENOF(name_buf));
 	if unlikely(name_len >= COMPILER_LENOF(name_buf))
 		return NULL; /* Name is too long */
-	memcpy(name_buf, name, name_len);
+	memcpy(name_buf, name, name_len, sizeof(char));
 	name_buf[name_len] = '\0';
 	cdl_read();
 	if likely(character_device_tree)

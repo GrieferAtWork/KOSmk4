@@ -135,7 +135,7 @@ libregdump_gpregs_with_sp(struct regdump_printer *__restrict self,
 		char name[2 + GPREGS_MAXLEN];
 		name[0] = '%';
 		name[1] = GPREGS_FIRSTCH;
-		memcpy(name + 2, gpregs_names[i], GPREGS_MAXLEN * sizeof(char));
+		memcpy(name + 2, gpregs_names[i], GPREGS_MAXLEN, sizeof(char));
 		format(REGDUMP_FORMAT_REGISTER_PREFIX);
 		print(name, 2 + GPREGS_LEN(i));
 		format(REGDUMP_FORMAT_REGISTER_SUFFIX);

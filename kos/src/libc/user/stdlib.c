@@ -315,9 +315,9 @@ NOTHROW_NCX(LIBCCALL libc_setenv)(char const *varname,
 	                                        (namelen + 1 + vallen + 1) * sizeof(char));
 	if unlikely(!line)
 		return -1;
-	memcpy(line->ehs_text, varname, namelen * sizeof(char));
+	memcpy(line->ehs_text, varname, namelen, sizeof(char));
 	line->ehs_text[namelen] = '=';
-	memcpy(line->ehs_text + namelen + 1, val, vallen * sizeof(char));
+	memcpy(line->ehs_text + namelen + 1, val, vallen, sizeof(char));
 	line->ehs_text[namelen + 1 + vallen] = '\0';
 	new_envp = NULL;
 	new_enva = 0;

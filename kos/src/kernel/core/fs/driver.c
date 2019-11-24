@@ -2641,7 +2641,7 @@ split_cmdline(char *__restrict cmdline,
 				--cmdline_len;
 				memmovedown(&cmdline[i],
 				            &cmdline[i + 1],
-				            (cmdline_len - i) *
+				            cmdline_len - i,
 				            sizeof(char));
 				++i;
 				if (i >= cmdline_len)
@@ -2654,7 +2654,7 @@ split_cmdline(char *__restrict cmdline,
 				--cmdline_len;
 				memmovedown(&cmdline[i],
 				            &cmdline[i + 1],
-				            (cmdline_len - i) *
+				            cmdline_len - i,
 				            sizeof(char));
 				while (i < cmdline_len) {
 					ch = cmdline[i];
@@ -2662,7 +2662,7 @@ split_cmdline(char *__restrict cmdline,
 						--cmdline_len;
 						memmovedown(&cmdline[i],
 						            &cmdline[i + 1],
-						            (cmdline_len - i) *
+						            cmdline_len - i,
 						            sizeof(char));
 						++i;
 						if (i >= cmdline_len)
@@ -2673,7 +2673,7 @@ split_cmdline(char *__restrict cmdline,
 						--cmdline_len;
 						memmovedown(&cmdline[i],
 						            &cmdline[i + 1],
-						            (cmdline_len - i) *
+						            cmdline_len - i,
 						            sizeof(char));
 						break;
 					}
@@ -2728,7 +2728,7 @@ driver_parse_cmdline(struct driver *__restrict self,
 	cmdline_copy   = (char *)kmalloc((cmdline_length + 2) * sizeof(char),
                                    GFP_LOCKED | GFP_PREFLT);
 	TRY {
-		memcpy(cmdline_copy, cmdline, cmdline_length * sizeof(char));
+		memcpy(cmdline_copy, cmdline, cmdline_length, sizeof(char));
 		/* Add a double-NUL terminator to allow this string
 		 * to always be conveted into a NUL-NUL string-list */
 		cmdline_copy[cmdline_length + 0] = '\0';
@@ -2813,7 +2813,8 @@ got_dependency:
 		/* Copy the vector of dependencies all at once. */
 		memcpy(self->d_depvec,
 		       depvec,
-		       self->d_depcnt * sizeof(REF struct driver *));
+		       self->d_depcnt,
+		       sizeof(REF struct driver *));
 	}
 	/* Inherit dependencies. */
 	freea(depvec);
@@ -3589,7 +3590,7 @@ done_tags_for_soname:
 	                                      GFP_LOCKED | GFP_CALLOC | GFP_PREFLT);
 	TRY {
 		/* Copy program headers. */
-		memcpy(result->d_phdr, phdrv, phdrc * sizeof(Elf_Phdr));
+		memcpy(result->d_phdr, phdrv, phdrc, sizeof(Elf_Phdr));
 		result->d_refcnt = 2; /* 2: +1:<return-value>, +1:Not setting the `DRIVER_FLAG_FINALIZED' flag */
 		result->d_phnum  = phdrc;
 		atomic_rwlock_cinit(&result->d_eh_frame_cache_lock);
@@ -3622,8 +3623,9 @@ done_tags_for_soname:
 			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHOFF);
 		/* Load the sections header into memory. */
 		result->d_shdr = (Elf_Shdr *)kmalloc(result->d_shnum * sizeof(Elf_Shdr), GFP_PREFLT);
-		memcpy((Elf_Shdr *)result->d_shdr, base + result->d_shoff,
-		       result->d_shnum * sizeof(Elf_Shdr));
+		memcpy((Elf_Shdr *)result->d_shdr,
+		       base + result->d_shoff,
+		       result->d_shnum, sizeof(Elf_Shdr));
 		{
 			Elf_Shdr const *shstrtab;
 			size_t shstrtab_size;
@@ -3642,7 +3644,7 @@ done_tags_for_soname:
 				--shstrtab_size;
 			/* Load the .shstrtab section into memory. */
 			result->d_shstrtab = (char *)kmalloc((shstrtab_size + 1) * sizeof(char), GFP_PREFLT);
-			memcpy((char *)result->d_shstrtab, shstrtab_base, shstrtab_size);
+			memcpy((char *)result->d_shstrtab, shstrtab_base, shstrtab_size, sizeof(char));
 			((char *)result->d_shstrtab)[shstrtab_size] = '\0';
 			result->d_shstrtab_end = result->d_shstrtab + shstrtab_size;
 		}
@@ -4118,9 +4120,9 @@ driver_insmod_loadlib_at(char const *__restrict path_start, size_t path_length,
 		++driver_name, --driver_name_length;
 	buf = (char *)malloca((path_length + driver_name_length + 2) * sizeof(char));
 	TRY {
-		memcpy(buf, path_start, path_length * sizeof(char));
+		memcpy(buf, path_start, path_length, sizeof(char));
 		buf[path_length] = '/';
-		memcpy(buf + path_length + 1, driver_name, driver_name_length * sizeof(char));
+		memcpy(buf + path_length + 1, driver_name, driver_name_length, sizeof(char));
 		buf[path_length + 1 + driver_name_length] = '\0';
 		if (second_phase) {
 			/* Second-phase (actually load new drivers) */
@@ -4297,7 +4299,7 @@ again_sort:
 						 *    on it. */
 						memmoveup(&buf[i + 1],
 						          &buf[i],
-						          (k - i) *
+						          k - i,
 						          sizeof(REF struct driver *));
 						buf[i]            = dep;
 						sort_must_restart = true;

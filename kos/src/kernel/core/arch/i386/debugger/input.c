@@ -1244,7 +1244,8 @@ again:
 		--dbg_getc_pending_cnt;
 		memmovedown(dbg_getc_pending,
 		            dbg_getc_pending + 1,
-		            dbg_getc_pending_cnt);
+		            dbg_getc_pending_cnt,
+		            sizeof(uint8_t));
 		return result;
 	} else {
 		uint32_t ch;
@@ -1265,7 +1266,8 @@ again:
 		--dbg_getc_pending_cnt;
 		memmovedown(dbg_getc_pending,
 		            dbg_getc_pending + 1,
-		            dbg_getc_pending_cnt);
+		            dbg_getc_pending_cnt,
+		            sizeof(uint8_t));
 		return result;
 	} else {
 		uint32_t ch;

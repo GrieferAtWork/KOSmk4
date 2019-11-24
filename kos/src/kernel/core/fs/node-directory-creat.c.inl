@@ -246,7 +246,7 @@ again:
 			TRY {
 				//TODO:result->i_fileatime = wall_gettime(self->i_super->s_wall);
 #ifdef DEFINE_DIRECTORY_SYMLINK
-				memcpy(result->sl_stext, link_text, link_text_size * sizeof(char));
+				memcpy(result->sl_stext, link_text, link_text_size, sizeof(char));
 #elif defined(DEFINE_DIRECTORY_MKDIR)
 				result->d_map = (REF struct directory_entry **)kmalloc((DIRECTORY_DEFAULT_MASK + 1) *
 				                                                       sizeof(REF struct directory_entry *),

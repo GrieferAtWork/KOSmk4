@@ -93,7 +93,7 @@ handle_directoryentry_pread(struct directory_entry *__restrict self,
 	result = ((self->de_namelen - (u16)addr) + 1) * sizeof(char);
 	if (result > num_bytes)
 		result = num_bytes;
-	memcpy(dst, self->de_name + (u16)addr, result * sizeof(char));
+	memcpy(dst, self->de_name + (u16)addr, result);
 	return result;
 }
 
@@ -259,7 +259,7 @@ directory_entry_alloc_s(USER CHECKED /*utf-8*/ char const *name, u16 namelen)
 	REF struct directory_entry *result;
 	result = directory_entry_alloc(namelen);
 	TRY {
-		memcpy(result->de_name, name, namelen * sizeof(char));
+		memcpy(result->de_name, name, namelen, sizeof(char));
 	} EXCEPT {
 		directory_entry_destroy(result);
 		RETHROW();
@@ -1350,8 +1350,8 @@ symlink_node_readlink(struct symlink_node *__restrict self,
 	size_t result;
 	if (symlink_node_load(self)) {
 		/* Copy from the static link buffer. */
-		result = (size_t)self->i_filesize * sizeof(char);
-		memcpy(buf, self->sl_text, MIN(result, buflen));
+		result = (size_t)self->i_filesize;
+		memcpy(buf, self->sl_text, MIN(result, buflen), sizeof(char));
 	} else {
 		/* Use the static interface */
 		result = (*self->i_type->it_symlink.sl_readlink_dynamic)(self,
@@ -4212,7 +4212,7 @@ lookup_filesystem_type(USER CHECKED char const *name)
 	if unlikely(namelen == SUPERBLOCK_TYPE_NAME_MAX - 1 &&
 	            name[SUPERBLOCK_TYPE_NAME_MAX - 1] != 0)
 		return NULL;
-	memcpy(kernel_name, name, namelen * sizeof(char));
+	memcpy(kernel_name, name, namelen, sizeof(char));
 	kernel_name[namelen] = 0;
 	atomic_rwlock_read(&fs_filesystem_types.ft_typelock);
 	result = fs_filesystem_types.ft_types;

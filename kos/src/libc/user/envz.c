@@ -71,9 +71,9 @@ NOTHROW_NCX(LIBCCALL libc_envz_add)(char **__restrict penvz,
 	*penvz = new_envz;
 	new_envz += *penvz_len;
 	*penvz_len += morelen;
-	new_envz = (char *)mempcpy(new_envz, name, namelen * sizeof(char));
+	new_envz = (char *)mempcpyc(new_envz, name, namelen, sizeof(char));
 	*new_envz++ = '=';
-	new_envz = (char *)mempcpy(new_envz, value, valuelen * sizeof(char));
+	new_envz = (char *)mempcpyc(new_envz, value, valuelen, sizeof(char));
 	*new_envz = '\0';
 	return 0;
 }
@@ -148,7 +148,7 @@ NOTHROW_NCX(LIBCCALL libc_envz_strip)(char **__restrict penvz,
 		/* Remove this entry. */
 		next = libc_strend(next) + 1;
 		partlen = (size_t)(end - next);
-		memmovedown(ptr, next, partlen * sizeof(char));
+		memmovedownc(ptr, next, partlen, sizeof(char));
 		end -= partlen;
 	}
 	newlen = (size_t)(end - start);

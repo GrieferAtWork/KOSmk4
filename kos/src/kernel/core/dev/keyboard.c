@@ -700,7 +700,7 @@ again:
 	if (self->kd_map_pend[0] != 0) {
 		result = (int)(unsigned int)(unsigned char)self->kd_map_pend[0];
 		memmovedown(self->kd_map_pend, self->kd_map_pend + 1,
-		            (COMPILER_LENOF(self->kd_map_pend) - 1) * sizeof(char));
+		            COMPILER_LENOF(self->kd_map_pend) - 1, sizeof(char));
 		self->kd_map_pend[COMPILER_LENOF(self->kd_map_pend) - 1] = 0;
 		sync_endwrite(&self->kd_map_lock);
 	} else {
@@ -731,7 +731,7 @@ again_getkey:
 				self->kd_map_pend[0] = 0;
 			else {
 				memmovedown(self->kd_map_pend, self->kd_map_pend + 1,
-				            (len - 1) * sizeof(char));
+				            len - 1, sizeof(char));
 				self->kd_map_pend[len - 1] = 0;
 			}
 		}
@@ -1281,7 +1281,7 @@ continue_copy_keymap:
 			avail = COMPILER_LENOF(me->kd_map_pend) - i;
 			if (avail > data.ks_size)
 				avail = data.ks_size;
-			memcpy(&me->kd_map_pend[i], new_buf, avail * sizeof(char));
+			memcpy(&me->kd_map_pend[i], new_buf, avail, sizeof(char));
 			i += avail;
 			if (i < COMPILER_LENOF(me->kd_map_pend))
 				me->kd_map_pend[i] = 0;

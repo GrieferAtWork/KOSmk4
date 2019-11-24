@@ -242,7 +242,7 @@ err_blocks:
 				 * memory in its proper order, following the assumption that page_malloc()
 				 * will prefer allocating memory in top-down priority ordering. */
 				memmoveup(&blocks[1], &blocks[0],
-				          blockc * sizeof(struct vm_ramblock));
+				          blockc, sizeof(struct vm_ramblock));
 				blocks[0].rb_start = block0_addr;
 				blocks[0].rb_size  = new_block_size;
 #else

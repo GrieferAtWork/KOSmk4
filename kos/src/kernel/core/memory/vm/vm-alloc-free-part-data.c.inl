@@ -145,7 +145,7 @@ vm_do_allocram(struct vm_ramblock *__restrict pblock0,
 			 * memory in its proper order, following the assumption that page_malloc()
 			 * will prefer allocating memory in top-down priority ordering. */
 			memmoveup(&blocks[1], &blocks[0],
-			          blockc * sizeof(struct vm_ramblock));
+			          blockc, sizeof(struct vm_ramblock));
 			blocks[0].PART_RB_START = block0_addr;
 			blocks[0].PART_RB_SIZE  = new_block_size;
 			block0_size += new_block_size;
@@ -301,7 +301,7 @@ realloc_without_locks:
 					 * memory in its proper order, following the assumption that page_malloc()
 					 * will prefer allocating memory in top-down priority ordering. */
 					memmoveup(&blocks[1], &blocks[0],
-					          blockc * sizeof(PART_STRUCT_VM_BLOCK));
+					          blockc, sizeof(PART_STRUCT_VM_BLOCK));
 					blocks[0].PART_RB_START = block0_addr;
 					blocks[0].PART_RB_SIZE  = new_block_size;
 					block0_size += new_block_size;
@@ -395,7 +395,7 @@ err_blocks:
 				 * memory in its proper order, following the assumption that page_malloc()
 				 * will prefer allocating memory in top-down priority ordering. */
 				memmoveup(&blocks[1], &blocks[0],
-				          blockc * sizeof(PART_STRUCT_VM_BLOCK));
+				          blockc, sizeof(PART_STRUCT_VM_BLOCK));
 				blocks[0].PART_RB_START = block0_addr;
 				blocks[0].PART_RB_SIZE  = new_block_size;
 				block0_size += new_block_size;
