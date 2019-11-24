@@ -36,7 +36,7 @@ __FORCELOCAL __ATTR_LIBC_PRINTF(3, 4) void
                                       const char *__format, ...) {
 	__libc_slow_error(__status, __errnum, __format, __builtin_va_arg_pack());
 	/* Allow the compiler to detect the error() calls that don't return. */
-	if (__builtin_constant_p(__status) && __status != 0)
+	if __untraced(__builtin_constant_p(__status) && __status != 0)
 		__builtin_unreachable();
 }
 #endif /* !__fast_error_defined && ____libc_slow_error_defined */
@@ -49,7 +49,7 @@ __FORCELOCAL __ATTR_LIBC_PRINTF(5, 6) void
                                               char const *__format, ...) {
 	__libc_slow_error_at_line(__status, __errnum, __filename, __line, __format, __builtin_va_arg_pack());
 	/* Allow the compiler to detect the error_at_line() calls that don't return. */
-	if (__builtin_constant_p(__status) && __status != 0)
+	if __untraced(__builtin_constant_p(__status) && __status != 0)
 		__builtin_unreachable();
 }
 #endif /* !__fast_error_at_line_defined && ____libc_slow_error_at_line_defined */

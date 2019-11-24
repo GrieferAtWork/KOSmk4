@@ -35,6 +35,22 @@
 __SYSDECL_BEGIN
 __NAMESPACE_FAST_BEGIN
 
+#ifndef __ASSERT_MEMCPY_CT
+#if !defined(NDEBUG) && 0 /* Doesn't work... */
+extern __ATTR_ERROR("memcpy(): The `DST' and `SRC' buffers overlap - Use `memmove()' instead") void __memcpy_overlapping_buffers(void);
+/* Compile-time overlap assertions */
+#define __ASSERT_MEMCPY_CT_DOES_OVERLAP(dst, src, num_bytes) \
+	((dst) + (num_bytes) > (src) &&                          \
+	 (src) + (num_bytes) > (dst))
+#define __ASSERT_MEMCPY_CT(dst, src, num_bytes)                                                 \
+	if __untraced(__builtin_constant_p(__ASSERT_MEMCPY_CT_DOES_OVERLAP(dst, src, num_bytes)) && \
+	              __ASSERT_MEMCPY_CT_DOES_OVERLAP(dst, src, num_bytes))                         \
+		__memcpy_overlapping_buffers()
+#else /* !NDEBUG */
+#define __ASSERT_MEMCPY_CT(dst, src, num_bytes) /* nothing */
+#endif /* NDEBUG */
+#endif /* !__ASSERT_MEMCPY_CT */
+
 
 #define __fast_memcpy_defined 1
 /* Copy memory between non-overlapping memory blocks. */
@@ -42,10 +58,11 @@ __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
                                                    void const *__restrict __src,
                                                    __SIZE_TYPE__ __n_bytes) {
+	__ASSERT_MEMCPY_CT(__dst, __src, __n_bytes);
 #if 1 /* Work-around for a weird GCC-bug... */
-	if (__builtin_constant_p(__n_bytes*2))
+	if __untraced(__builtin_constant_p(__n_bytes * 2))
 #else
-	if (__builtin_constant_p(__n_bytes))
+	if __untraced(__builtin_constant_p(__n_bytes))
 #endif
 	{
 		switch (__n_bytes) {
@@ -118,7 +135,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 			__register __ULONGPTR_TYPE__ __386_esi = (__ULONGPTR_TYPE__)__src;
 			__register __ULONGPTR_TYPE__ __386_edi = (__ULONGPTR_TYPE__)__dst;
 #ifdef __x86_64__
-			if (__n_bytes >= 5 * 8) {
+			if __untraced(__n_bytes >= 5 * 8) {
 				__register __ULONGPTR_TYPE__ __386_ecx;
 				__asm__ __volatile__(
 #ifdef __KERNEL__
@@ -180,7 +197,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 				                     );
 			}
 #else /* __x86_64__ */
-			if (__n_bytes >= 5 * 4) {
+			if __untraced(__n_bytes >= 5 * 4) {
 				__register __ULONGPTR_TYPE__ __386_ecx;
 				__asm__ __volatile__(
 #ifdef __KERNEL__
@@ -250,10 +267,11 @@ __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
                                                     void const *__restrict __src,
                                                     __SIZE_TYPE__ __n_bytes) {
+	__ASSERT_MEMCPY_CT(__dst, __src, __n_bytes);
 #if 1 /* Work-around for a weird GCC-bug... */
-	if (__builtin_constant_p(__n_bytes*2))
+	if __untraced(__builtin_constant_p(__n_bytes * 2))
 #else
-	if (__builtin_constant_p(__n_bytes))
+	if __untraced(__builtin_constant_p(__n_bytes))
 #endif
 	{
 		switch (__n_bytes) {
@@ -301,7 +319,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 			__register __ULONGPTR_TYPE__ __386_esi = (__ULONGPTR_TYPE__)__src;
 			__register __ULONGPTR_TYPE__ __386_edi = (__ULONGPTR_TYPE__)__dst;
 #ifdef __x86_64__
-			if (__n_bytes >= 5 * 8) {
+			if __untraced(__n_bytes >= 5 * 8) {
 				__register __ULONGPTR_TYPE__ __386_ecx;
 				__asm__ __volatile__(
 #ifdef __KERNEL__
@@ -363,7 +381,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 				                     );
 			}
 #else /* __x86_64__ */
-			if (__n_bytes >= 5 * 4) {
+			if __untraced(__n_bytes >= 5 * 4) {
 				__register __ULONGPTR_TYPE__ __386_ecx;
 				__asm__ __volatile__(
 #ifdef __KERNEL__

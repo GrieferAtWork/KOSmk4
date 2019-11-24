@@ -324,6 +324,31 @@ global class GCCToolchain: Toolchain {
 							continue;
 						} catch (...) {
 						}
+					} else if (l.startswith("    inlined from")) {
+						try {
+							local fundecl, filename, line, column;
+							try {
+								fundecl, filename, line, column =
+									l.scanf(" inlined from '%[^']' at %[^:]:%[^:]:%[^:]:")...;
+								column = column.strip().rstrip(",").rstrip();
+							} catch (...) {
+								fundecl, filename, line =
+									l.scanf(" inlined from '%[^']' at %[^:]:%[^:]:")...;
+								column = none;
+							}
+							print normalizeFilenameForLog(filename.decode("utf-8")),;
+							print "(",;
+							print line.strip(),;
+							if (column) {
+								print ",",;
+								print column,;
+							}
+							print "): inlined from '",;
+							print fundecl,;
+							print "':";
+							continue;
+						} catch (...) {
+						}
 					}
 					local col = l.find(":");
 					if (col >= 0 && !l.isanyspace(0, col)) {
