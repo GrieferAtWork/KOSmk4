@@ -61,7 +61,7 @@ BEGIN
 	USELIB("libc")
 	STATIC_USELIBGCC()
 	STATIC_USELIB("libssp")
-#define DEFINE_SIMPLE_LIBRARY(name, ...) \
+#define DEFINE_SIMPLE_LIBRARY(name, ...)                         \
 	BEGIN GROUP("libs." name) { COMPILE, LINK, ARCHIVE, MCOPY }; \
 		SET_OUTPUT_DLL("/" + BINPATH + "/lib/" name)             \
 		SET_STATIC_OUTPUT("/" + BINPATH + "/lib/" name ".a")     \
@@ -69,7 +69,7 @@ BEGIN
 		SOURCE({ name "/" "*.c" })                               \
 		__VA_ARGS__                                              \
 	END
-#define DEFINE_SIMPLE_ARCH_LIBRARY(name, ...) \
+#define DEFINE_SIMPLE_ARCH_LIBRARY(name, ...)                                                \
 	BEGIN GROUP("libs." name) { COMPILE };                                                   \
 		SET_LANGUAGE("assembler-with-cpp")                                                   \
 		SOURCE({ name "/arch/" + TARGET_XARCH + "/" "*" + TARGET_BITS_PER_POINTER + ".S", }) \

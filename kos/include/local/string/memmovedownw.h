@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52832290 */
+/* HASH CRC-32:0x642fbdc7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmovedownw))(/*aligned(2)*/ void *_
 	__UINT16_TYPE__ *__pdst, *__psrc;
 	__pdst = (__UINT16_TYPE__ *)__dst;
 	__psrc = (__UINT16_TYPE__ *)__src;
-	__hybrid_assert(__pdst <= __psrc || !__n_words);
+	__hybrid_assertf(__pdst <= __psrc || !__n_words, "%p > %p (count:%Iu)", __dst, __src, __n_words);
 	while (__n_words--)
 		*__pdst++ = *__psrc++;
 	return (__UINT16_TYPE__ *)__dst;

@@ -1121,7 +1121,7 @@ memmoveupw:([nonnull] /*aligned(2)*/ void *dst,
 	u16 *pdst, *psrc;
 	pdst = (u16 *)dst + n_words;
 	psrc = (u16 *)src + n_words;
-	@__hybrid_assert@(pdst >= psrc || !n_words);
+	@__hybrid_assertf@(pdst >= psrc || !n_words, "%p < %p (count:%Iu)", dst, src, n_words);
 	while (n_words--)
 		*--pdst = *--psrc;
 	return (u16 *)dst;
@@ -1136,7 +1136,7 @@ memmovedownw:([nonnull] /*aligned(2)*/ void *dst,
 	u16 *pdst, *psrc;
 	pdst = (u16 *)dst;
 	psrc = (u16 *)src;
-	@__hybrid_assert@(pdst <= psrc || !n_words);
+	@__hybrid_assertf@(pdst <= psrc || !n_words, "%p > %p (count:%Iu)", dst, src, n_words);
 	while (n_words--)
 		*pdst++ = *psrc++;
 	return (u16 *)dst;
@@ -1167,7 +1167,7 @@ memmoveupl:([nonnull] /*aligned(4)*/ void *dst,
 	u32 *pdst, *psrc;
 	pdst = (u32 *)dst + n_dwords;
 	psrc = (u32 *)src + n_dwords;
-	@__hybrid_assert@(pdst >= psrc || !n_dwords);
+	@__hybrid_assertf@(pdst >= psrc || !n_dwords, "%p < %p (count:%Iu)", dst, src, n_dwords);
 	while (n_dwords--)
 		*--pdst = *--psrc;
 	return (u32 *)dst;
@@ -1181,7 +1181,7 @@ memmovedownl:([nonnull] /*aligned(4)*/ void *dst,
 	u32 *pdst, *psrc;
 	pdst = (u32 *)dst;
 	psrc = (u32 *)src;
-	@__hybrid_assert@(pdst <= psrc || !n_dwords);
+	@__hybrid_assertf@(pdst <= psrc || !n_dwords, "%p > %p (count:%Iu)", dst, src, n_dwords);
 	while (n_dwords--)
 		*pdst++ = *psrc++;
 	return (u32 *)dst;
@@ -1654,14 +1654,14 @@ memmoveupq:([nonnull] /*aligned(8)*/ void *dst,
 	u64 *pdst, *psrc;
 	pdst = (u64 *)dst + n_qwords;
 	psrc = (u64 *)src + n_qwords;
-	@__hybrid_assert@(pdst >= psrc || !n_qwords);
+	@__hybrid_assertf@(pdst >= psrc || !n_qwords, "%p < %p (count:%Iu)", dst, src, n_qwords);
 	while (n_qwords--)
 		*--pdst = *--psrc;
 #else /* __SIZEOF_POINTER__ >= 8 */
 	u32 *pdst, *psrc;
 	pdst = (u32 *)dst + (n_qwords * 2);
 	psrc = (u32 *)src + (n_qwords * 2);
-	@__hybrid_assert@(pdst >= psrc);
+	@__hybrid_assertf@(pdst >= psrc || !n_qwords, "%p < %p (count:%Iu)", dst, src, n_qwords);
 	while (n_qwords--) {
 		*--pdst = *--psrc;
 		*--pdst = *--psrc;
@@ -1680,14 +1680,14 @@ memmovedownq:([nonnull] /*aligned(8)*/ void *dst,
 	u64 *pdst, *psrc;
 	pdst = (u64 *)dst;
 	psrc = (u64 *)src;
-	@__hybrid_assert@(pdst <= psrc || !n_qwords);
+	@__hybrid_assertf@(pdst <= psrc || !n_qwords, "%p > %p (count:%Iu)", dst, src, n_qwords);
 	while (n_qwords--)
 		*pdst++ = *psrc++;
 #else /* __SIZEOF_POINTER__ >= 8 */
 	u32 *pdst, *psrc;
 	pdst = (u32 *)dst;
 	psrc = (u32 *)src;
-	@__hybrid_assert@(pdst <= psrc || !n_qwords);
+	@__hybrid_assertf@(pdst <= psrc || !n_qwords, "%p > %p (count:%Iu)", dst, src, n_qwords);
 	while (n_qwords--) {
 		*pdst++ = *psrc++;
 		*pdst++ = *psrc++;
@@ -2388,7 +2388,7 @@ memmoveup:([nonnull] void *dst, [nonnull] void const *src, size_t n_bytes) -> [=
 	byte_t *pdst, *psrc;
 	pdst = (byte_t *)dst + n_bytes;
 	psrc = (byte_t *)src + n_bytes;
-	@__hybrid_assert@(pdst >= psrc || !n_bytes);
+	@__hybrid_assertf@(pdst >= psrc || !n_bytes, "%p < %p (count:%Iu)", dst, src, n_bytes);
 	while (n_bytes--)
 		*--pdst = *--psrc;
 	return dst;
@@ -2402,7 +2402,7 @@ memmovedown:([nonnull] void *dst, [nonnull] void const *src, size_t n_bytes) -> 
 	byte_t *pdst, *psrc;
 	pdst = (byte_t *)dst;
 	psrc = (byte_t *)src;
-	@__hybrid_assert@(pdst <= psrc || !n_bytes);
+	@__hybrid_assertf@(pdst <= psrc || !n_bytes, "%p > %p (count:%Iu)", dst, src, n_bytes);
 	while (n_bytes--)
 		*pdst++ = *psrc++;
 	return dst;

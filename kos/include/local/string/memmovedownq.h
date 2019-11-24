@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70ccfddf */
+/* HASH CRC-32:0x5b42b015 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,14 +31,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmovedownq))(/*aligned(8)*/ void *_
 	__UINT64_TYPE__ *__pdst, *__psrc;
 	__pdst = (__UINT64_TYPE__ *)__dst;
 	__psrc = (__UINT64_TYPE__ *)__src;
-	__hybrid_assert(__pdst <= __psrc || !__n_qwords);
+	__hybrid_assertf(__pdst <= __psrc || !__n_qwords, "%p > %p (count:%Iu)", __dst, __src, __n_qwords);
 	while (__n_qwords--)
 		*__pdst++ = *__psrc++;
 #else /* __SIZEOF_POINTER__ >= 8 */
 	__UINT32_TYPE__ *__pdst, *__psrc;
 	__pdst = (__UINT32_TYPE__ *)__dst;
 	__psrc = (__UINT32_TYPE__ *)__src;
-	__hybrid_assert(__pdst <= __psrc || !__n_qwords);
+	__hybrid_assertf(__pdst <= __psrc || !__n_qwords, "%p > %p (count:%Iu)", __dst, __src, __n_qwords);
 	while (__n_qwords--) {
 		*__pdst++ = *__psrc++;
 		*__pdst++ = *__psrc++;

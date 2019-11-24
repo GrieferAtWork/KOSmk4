@@ -98,9 +98,9 @@ __FORCELOCAL void (__wrbx)(__UINTPTR_TYPE__ __val) { __asm__ __volatile__("movl 
 #endif /* !__COMPILER_HAVE_REGISTER_VARS */
 #if defined(__PIC__) || defined(__PIE__) || defined(__pic__) || defined(__pie__)
 __FORCELOCAL __ATTR_WUNUSED __UINTPTR_TYPE__ (__rdip)(void) { __UINTPTR_TYPE__ __res; __asm__ __volatile__("call 1f; 1: popl %0" : "=g" (__res)); return __res; }
-#else
+#else /* __PIC__ || __PIE__ || __pic__ || __pie__ */
 __FORCELOCAL __ATTR_WUNUSED __UINTPTR_TYPE__ (__rdip)(void) { __UINTPTR_TYPE__ __res; __asm__ __volatile__("movl $., %k0" : "=g" (__res)); return __res; }
-#endif
+#endif /* !__PIC__ && !__PIE__ && !__pic__ && !__pie__ */
 __FORCELOCAL __ATTR_WUNUSED __UINTPTR_TYPE__ (__rdflags)(void) { __UINTPTR_TYPE__ __result; __asm__ __volatile__("pushfl; popl %0" : "=g" (__result)); return __result; }
 __FORCELOCAL void (__wrflags)(__UINTPTR_TYPE__ __fl) { __asm__ __volatile__("pushl %k0; popfl" : : "g" (__fl) : "cc"); }
 #endif /* !__x86_64__ */
