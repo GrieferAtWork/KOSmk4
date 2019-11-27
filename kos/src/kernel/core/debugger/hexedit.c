@@ -803,21 +803,26 @@ NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
 			is_readonly = !is_readonly;
 			continue;
 
-		case KEY_F4:
-			if (hd_hex_le == HD_LE_DEFAULT && hd_nibbles_per_word > 2) {
-				hd_hex_le = !HD_LE_DEFAULT;
-				continue;
+		case KEY_F4: {
+			unsigned int i, n = 1;
+			if (dbg_isholding_shift())
+				n = 6;
+			for (i = 0; i < n; ++i) {
+				if (hd_hex_le == HD_LE_DEFAULT && hd_nibbles_per_word > 2) {
+					hd_hex_le = !HD_LE_DEFAULT;
+					continue;
+				}
+				hd_hex_le           = HD_LE_DEFAULT;
+				hd_nibbles_per_word = hd_nibbles_per_word * 2;
+				if (hd_nibbles_per_word > 16)
+					hd_nibbles_per_word = 2;
+				hd_hex_nibble += ((uintptr_t)addr & (hd_bytes_per_word - 1)) * 2;
+				addr = (byte_t *)((uintptr_t)addr & ~(hd_bytes_per_word - 1));
+				addr = (byte_t *)addr + (hd_hex_nibble & ~(hd_nibbles_per_word - 1)) / 2;
+				hd_hex_nibble &= (hd_nibbles_per_word - 1);
+				dbg_calculate_linesize();
 			}
-			hd_hex_le           = HD_LE_DEFAULT;
-			hd_nibbles_per_word = hd_nibbles_per_word * 2;
-			if (hd_nibbles_per_word > 16)
-				hd_nibbles_per_word = 2;
-			hd_hex_nibble += ((uintptr_t)addr & (hd_bytes_per_word - 1)) * 2;
-			addr = (byte_t *)((uintptr_t)addr & ~(hd_bytes_per_word - 1));
-			addr = (byte_t *)addr + (hd_hex_nibble & ~(hd_nibbles_per_word - 1)) / 2;
-			hd_hex_nibble &= (hd_nibbles_per_word - 1);
-			dbg_calculate_linesize();
-			break;
+		}	continue;
 
 		case KEY_F3:
 		case KEY_F7 ... KEY_F8:
