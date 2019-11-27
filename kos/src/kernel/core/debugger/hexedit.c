@@ -883,9 +883,9 @@ done:
 
 PRIVATE ATTR_DBGTEXT unsigned int
 NOTHROW(FCALL dbg_get_used_cells)(void) {
-	return (sizeof(void *) * 2) +                       /* Address column */
-	       (hd_linewords * (hd_nibbles_per_word + 1)) + /* Hex column (+1 for spaces between words) */
-	       hd_linesize;                                 /* Ascii column */
+	return (sizeof(void *) * 2) +                           /* Address column */
+	       (hd_linewords * (hd_nibbles_per_word + 1)) - 1 + /* Hex column (+1 for spaces between words) */
+	       hd_linesize;                                     /* Ascii column */
 }
 
 PRIVATE ATTR_DBGTEXT void
