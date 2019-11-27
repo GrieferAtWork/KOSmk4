@@ -368,7 +368,7 @@ INTERN void NOTHROW(KCALL GDBFallbackHost_Main)(void) {
 			GDBThread_StopAllCpus();
 
 		/* Invoke the GDB main() function. */
-		GDB_Main();
+		GDB_MainWithAlternateStack();
 
 		/* Resume system execution if we were in all-stop mode. */
 		if (GDBThread_IsAllStopModeActive)

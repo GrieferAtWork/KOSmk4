@@ -1405,7 +1405,16 @@ done_vCont:
 			/* Make sure that full-stop mode has been activated. */
 			GDBThread_StopAllCpus();
 			goto send_ok;
-//		} else if (ISNAME("Kill") && *nameEnd == ';') { // TODO
+		} else if (ISNAME("Kill") && *nameEnd == ';') {
+			upid_t pid;
+			pid = (upid_t)strto32(nameEnd + 1, &nameEnd, 16);
+			if (nameEnd != endptr)
+				ERROR(err_syntax);
+			/* "vKill;1" and "vKill;7fffffff" both need to kill the kernel.
+			 * PID=1 is required because we make GDB think that the initial process is PID=1 */
+			if (pid == 1 || pid == GDB_KERNEL_PID)
+				GDBThread_KillKernel();
+			GDB_DEBUG("[gdb] TODO: kill(%#I32x)\n", pid);
 		} else if (ISNAME("MustReplyEmpty")) {
 			if (nameEnd != endptr)
 				ERROR(err_syntax);

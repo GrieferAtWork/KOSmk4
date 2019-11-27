@@ -36,6 +36,9 @@ if (gcc_opt.remove("-O3"))
 #include <kernel/vm/phys.h>
 
 #include <hybrid/align.h>
+#include <hybrid/byteorder.h>
+#include <hybrid/byteswap.h>
+#include <hybrid/unaligned.h>
 
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
@@ -47,13 +50,18 @@ if (gcc_opt.remove("-O3"))
 
 DECL_BEGIN
 
-#define HD_REGION_ADDR  0 /* Address column is selected. */
-#define HD_REGION_HEX   1 /* Low nibble is selected */
-#define HD_REGION_HEX2  2 /* High nibble is selected */
-#define HD_REGION_ASCII 3 /* Ascii representation is selected */
-
+#define HD_REGION_ADDR 0  /* Address column is selected. */
+#define HD_REGION_HEX 1   /* Low nibble is selected */
+#define HD_REGION_ASCII 2 /* Ascii representation is selected */
 
 #define HD_MAXLINESIZE 64
+
+
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define HD_LE_DEFAULT 1
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+#define HD_LE_DEFAULT 0
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 
 
 PRIVATE ATTR_DBGTEXT bool
@@ -61,9 +69,8 @@ NOTHROW(FCALL hd_setbyte)(void *addr, byte_t value) {
 	TRY {
 		*(byte_t *)addr = value;
 		return true;
-	} EXCEPT {
 	}
-	{
+	EXCEPT {} {
 		vm_vpage_t page;
 		page = VM_ADDR2PAGE((vm_virt_t)addr);
 		/* Try to force write-access to the associated page by directly
@@ -84,9 +91,8 @@ NOTHROW(FCALL hd_getbyte)(void *addr, byte_t *pvalue) {
 	TRY {
 		*pvalue = *(byte_t *)addr;
 		return true;
-	} EXCEPT {
 	}
-	{
+	EXCEPT {} {
 		vm_vpage_t page;
 		page = VM_ADDR2PAGE((vm_virt_t)addr);
 		/* Try to force write-access to the associated page by directly
@@ -104,9 +110,9 @@ NOTHROW(FCALL hd_getbyte)(void *addr, byte_t *pvalue) {
 
 
 struct hd_change {
-	byte_t                         *hc_start;  /* Starting address */
-	u8                              hc_length; /* Number of changed bytes */
-	COMPILER_FLEXIBLE_ARRAY(byte_t, hc_data);  /* [hc_length] The actual changed data. */
+	byte_t *hc_start;                         /* Starting address */
+	u8 hc_length;                             /* Number of changed bytes */
+	COMPILER_FLEXIBLE_ARRAY(byte_t, hc_data); /* [hc_length] The actual changed data. */
 };
 
 #define HD_CHANGE_NEXT(x) (struct hd_change *)((x)->hc_data + CEIL_ALIGN((x)->hc_length, sizeof(void *)))
@@ -133,7 +139,7 @@ PRIVATE ATTR_DBGTEXT bool
 NOTHROW(FCALL hd_changes_commit)(void) {
 	struct hd_change *iter;
 	bool result = true;
-	iter = (struct hd_change *)hd_change_buffer;
+	iter        = (struct hd_change *)hd_change_buffer;
 	while (iter->hc_length) {
 		size_t i;
 		for (i = 0; i < iter->hc_length; ++i) {
@@ -168,7 +174,7 @@ NOTHROW(FCALL hd_changes_append)(byte_t *addr, byte_t value) {
 	iter = (struct hd_change *)hd_change_buffer;
 	while (iter->hc_length) {
 		struct hd_change *next = HD_CHANGE_NEXT(iter);
-		block_end = iter->hc_start + iter->hc_length;
+		block_end              = iter->hc_start + iter->hc_length;
 		if (addr == block_end) {
 			/* Append at the end of this change-block */
 			if (&iter->hc_data[iter->hc_length] >= (byte_t *)next) {
@@ -190,8 +196,8 @@ NOTHROW(FCALL hd_changes_append)(byte_t *addr, byte_t value) {
 	last_change->hc_start   = addr;
 	last_change->hc_length  = 1;
 	last_change->hc_data[0] = value;
-	last_change = HD_CHANGE_NEXT(last_change);
-	last_change->hc_length = 0;
+	last_change             = HD_CHANGE_NEXT(last_change);
+	last_change->hc_length  = 0;
 	return true;
 }
 
@@ -199,7 +205,7 @@ PRIVATE ATTR_DBGTEXT void
 NOTHROW(FCALL hd_changes_applyto)(byte_t *addr, byte_t *buf, size_t buflen, u64 *pchanged) {
 	struct hd_change *iter;
 	byte_t *endaddr = addr + buflen;
-	iter = (struct hd_change *)hd_change_buffer;
+	iter            = (struct hd_change *)hd_change_buffer;
 	while (iter->hc_length) {
 		byte_t *block_start, *block_end;
 		block_start = iter->hc_start;
@@ -223,7 +229,7 @@ NOTHROW(FCALL hd_changes_applyto)(byte_t *addr, byte_t *buf, size_t buflen, u64 
 }
 
 
-#define HD_SETDATA_LOW  0 /* Write low nibble */
+#define HD_SETDATA_LOW 0  /* Write low nibble */
 #define HD_SETDATA_HIGH 1 /* Write high nibble */
 #define HD_SETDATA_BOTH 2 /* Write low & high nibble */
 
@@ -248,10 +254,20 @@ NOTHROW(FCALL hd_setdata)(void *addr, unsigned int how, byte_t value) {
 	return NULL;
 }
 
-PRIVATE ATTR_DBGBSS unsigned int hd_linesize  = 0; /* Number of bytes per line */
+PRIVATE ATTR_DBGBSS bool hd_hex_le = false; /* View hex in little-endian */
+
+PRIVATE ATTR_DBGBSS unsigned int hd_hex_nibble       = 0; /* The current hex nibble (< hd_nibbles_per_word) */
+PRIVATE ATTR_DBGBSS unsigned int hd_nibbles_per_word = 0; /* Max number of nibbles per word (2, 4, 8 or 16) */
+#define hd_bytes_per_word (hd_nibbles_per_word / 2)
+PRIVATE ATTR_DBGBSS unsigned int hd_linewords = 0; /* Number of words per line */
+PRIVATE ATTR_DBGBSS unsigned int hd_linesize  = 0; /* Number of bytes per line (== hd_linewords * hd_bytes_per_word) */
 PRIVATE ATTR_DBGBSS unsigned int hd_linealign = 0; /* Lowest power-of-two number which may be used to align an address */
 PRIVATE ATTR_DBGBSS unsigned int hd_hexpad    = 0; /* Number of empty cells before the hex view */
 PRIVATE ATTR_DBGBSS unsigned int hd_asciipad  = 0; /* Number of empty cells before the ascii view */
+
+
+PRIVATE ATTR_DBGTEXT void
+NOTHROW(FCALL dbg_calculate_linesize)(void);
 
 
 /* Get the bytes for a given line of hex data.
@@ -262,7 +278,8 @@ hd_getline(void *start_addr, byte_t data[HD_MAXLINESIZE], u64 *pchanged) {
 		COMPILER_READ_BARRIER();
 		memcpy(data, start_addr, hd_linesize);
 		COMPILER_READ_BARRIER();
-	} EXCEPT {
+	}
+	EXCEPT {
 		goto tryhard;
 	}
 	hd_changes_applyto((byte_t *)start_addr, data, hd_linesize, pchanged);
@@ -277,13 +294,23 @@ tryhard:
 				COMPILER_READ_BARRIER();
 				data[i] = ((byte_t *)start_addr)[i];
 				COMPILER_READ_BARRIER();
-			} EXCEPT {
+			}
+			EXCEPT {
 				result &= ~((u64)1 << i);
 			}
 		}
 		hd_changes_applyto((byte_t *)start_addr, data, hd_linesize, pchanged);
 		return result;
 	}
+}
+
+
+/* Convert a nibble index */
+LOCAL ATTR_DBGTEXT unsigned int FCALL
+hd_convnibble(unsigned int nibble, unsigned int sel_region) {
+	if (hd_hex_le && sel_region == HD_REGION_HEX)
+		nibble = (((hd_bytes_per_word - 1) - (nibble / 2)) * 2) + (nibble & 1);
+	return nibble;
 }
 
 LOCAL ATTR_DBGTEXT char FCALL
@@ -304,15 +331,17 @@ hd_printscreen(void *start_addr, void *sel_addr,
                unsigned int sel_region,
                char const *status,
                bool is_readonly) {
-	unsigned int i, line, column, sel_column;
+	unsigned int i, line, column_word, sel_byte, sel_column;
 	byte_t line_data[HD_MAXLINESIZE];
 	u64 line_valid, line_changed;
-	u32 dst_cursor_pos = (u32)-1;
-	byte_t sel_byte = 0;
+	u32 dst_cursor_pos     = (u32)-1;
+	byte_t sel_word[8]     = { 0, 0, 0, 0, 0, 0, 0, 0 };
 	bool sel_byte_is_valid = true;
-	sel_column = (unsigned int)((uintptr_t)((byte_t *)sel_addr -
+	sel_byte   = (unsigned int)((uintptr_t)((byte_t *)sel_addr -
 	                                        (byte_t *)start_addr) %
 	                            hd_linesize);
+	sel_column = sel_byte / hd_bytes_per_word;
+	sel_byte += hd_hex_nibble / 2;
 	/* Always hide the cursor during rendering. */
 	dbg_setcur_visible(DBG_SETCUR_VISIBLE_HIDE);
 	for (line = 0; line < dbg_screen_height - 1; ++line) {
@@ -321,8 +350,8 @@ hd_printscreen(void *start_addr, void *sel_addr,
 		is_line_selected = (byte_t *)sel_addr >= (byte_t *)line_addr &&
 		                   (byte_t *)sel_addr < (byte_t *)line_addr + hd_linesize;
 		line_changed = 0;
-		line_valid = hd_getline(line_addr, line_data, &line_changed);
-		dbg_attr = dbg_default_attr;
+		line_valid   = hd_getline(line_addr, line_data, &line_changed);
+		dbg_attr     = dbg_default_attr;
 		if (sel_region == HD_REGION_ADDR) {
 			if (is_line_selected) {
 				dbg_setcolor(DBG_COLOR_BLACK, DBG_COLOR_LIGHT_GRAY);
@@ -338,15 +367,24 @@ hd_printscreen(void *start_addr, void *sel_addr,
 		for (i = 0; i < hd_hexpad; ++i)
 			dbg_putc(' ');
 		/* Print the hex representation */
-		for (column = 0; column < hd_linesize; ++column) {
-			bool is_valid = (line_valid & ((u64)1 << column)) != 0;
-			bool was_changed = (line_changed & ((u64)1 << column)) != 0;
-			byte_t b = line_data[column];
-			if (column != 0)
+		for (column_word = 0; column_word < hd_linewords; ++column_word) {
+#define VALID_BYTE(i) ((line_valid & ((u64)1 << (i))) != 0)
+#define CHANGED_BYTE(i) (line_changed & ((u64)1 << (i))) != 0
+			bool is_valid = VALID_BYTE(column_word * hd_bytes_per_word);
+			unsigned int nibble_byte;
+			byte_t *pb = &line_data[column_word * hd_bytes_per_word];
+			for (nibble_byte = 1; nibble_byte < hd_nibbles_per_word; ++nibble_byte) {
+				if (!VALID_BYTE((column_word * hd_bytes_per_word) + nibble_byte)) {
+					is_valid = false;
+					break;
+				}
+			}
+#undef VALID_BYTE
+			if (column_word != 0)
 				dbg_putc(' ');
 			dbg_attr = dbg_default_attr;
-			if (sel_region == HD_REGION_HEX || sel_region == HD_REGION_HEX2) {
-				if (column == sel_column || is_line_selected) {
+			if (sel_region == HD_REGION_HEX) {
+				if (column_word == sel_column || is_line_selected) {
 					dbg_setcolor(DBG_COLOR_BLACK, DBG_COLOR_LIGHT_GRAY);
 				} else {
 					dbg_setbgcolor(DBG_COLOR_DARK_GRAY);
@@ -354,48 +392,79 @@ hd_printscreen(void *start_addr, void *sel_addr,
 			} else {
 				dbg_setbgcolor(DBG_COLOR_BLACK);
 			}
-			if (was_changed)
-				dbg_setfgcolor(DBG_COLOR_RED);
-			if (((byte_t *)line_addr + column) == (byte_t *)sel_addr) {
+			if ((byte_t *)sel_addr >= ((byte_t *)line_addr + (column_word * hd_bytes_per_word)) &&
+			    (byte_t *)sel_addr < ((byte_t *)line_addr + ((column_word + 1) * hd_bytes_per_word))) {
+				/* This is the currently selected word! */
 				dbg_attr_t temp;
-				sel_byte          = b;
+				memcpy(sel_word, pb, hd_bytes_per_word);
 				sel_byte_is_valid = is_valid;
-				if (sel_region == HD_REGION_HEX) {
-					temp = dbg_attr;
-					dbg_setcolor(DBG_COLOR_GREEN, DBG_COLOR_BLACK);
-					dst_cursor_pos = dbg_getcur();
-					dbg_putc(hd_tohex(b >> 4, is_valid));
-					dbg_attr = temp;
-					dbg_putc(hd_tohex(b & 0xf, is_valid));
-				} else if (sel_region == HD_REGION_HEX2) {
-					dbg_putc(hd_tohex(b >> 4, is_valid));
-					temp = dbg_attr;
-					dbg_setcolor(DBG_COLOR_GREEN, DBG_COLOR_BLACK);
-					dst_cursor_pos = dbg_getcur();
-					dbg_putc(hd_tohex(b & 0xf, is_valid));
-					dbg_attr = temp;
-				} else {
-					dbg_setcolor(DBG_COLOR_GREEN, DBG_COLOR_BLACK);
-					dbg_putc(hd_tohex(b >> 4, is_valid));
-					dbg_putc(hd_tohex(b & 0xf, is_valid));
+				for (nibble_byte = 0; nibble_byte < hd_bytes_per_word; ++nibble_byte) {
+					byte_t b;
+					dbg_attr_t old_attr;
+					unsigned int nibble_byte_index = nibble_byte;
+					if (hd_hex_le)
+						nibble_byte_index = (hd_bytes_per_word - 1) - nibble_byte;
+					old_attr = dbg_attr;
+					b        = pb[nibble_byte_index];
+					if (CHANGED_BYTE(column_word * hd_bytes_per_word + nibble_byte_index))
+						dbg_setfgcolor(DBG_COLOR_RED);
+					if (sel_region == HD_REGION_HEX) {
+						if (nibble_byte_index == (hd_hex_nibble / 2)) {
+							if (hd_hex_nibble & 1) {
+								dbg_putc(hd_tohex(b >> 4, is_valid));
+								temp = dbg_attr;
+								dbg_setcolor(DBG_COLOR_GREEN, DBG_COLOR_BLACK);
+								dst_cursor_pos = dbg_getcur();
+								dbg_putc(hd_tohex(b & 0xf, is_valid));
+								dbg_attr = temp;
+							} else {
+								temp = dbg_attr;
+								dbg_setcolor(DBG_COLOR_GREEN, DBG_COLOR_BLACK);
+								dst_cursor_pos = dbg_getcur();
+								dbg_putc(hd_tohex(b >> 4, is_valid));
+								dbg_attr = temp;
+								dbg_putc(hd_tohex(b & 0xf, is_valid));
+							}
+						} else {
+							dbg_putc(hd_tohex(b >> 4, is_valid));
+							dbg_putc(hd_tohex(b & 0xf, is_valid));
+						}
+					} else {
+						dbg_setcolor(DBG_COLOR_GREEN, DBG_COLOR_BLACK);
+						dbg_putc(hd_tohex(b >> 4, is_valid));
+						dbg_putc(hd_tohex(b & 0xf, is_valid));
+					}
+					dbg_attr = old_attr;
 				}
 			} else {
-				dbg_putc(hd_tohex(b >> 4, is_valid));
-				dbg_putc(hd_tohex(b & 0xf, is_valid));
+				for (nibble_byte = 0; nibble_byte < hd_bytes_per_word; ++nibble_byte) {
+					byte_t b;
+					dbg_attr_t old_attr;
+					unsigned int nibble_byte_index = nibble_byte;
+					if (hd_hex_le)
+						nibble_byte_index = (hd_bytes_per_word - 1) - nibble_byte;
+					b        = pb[nibble_byte_index];
+					old_attr = dbg_attr;
+					if (CHANGED_BYTE(column_word * hd_bytes_per_word + nibble_byte_index))
+						dbg_setfgcolor(DBG_COLOR_RED);
+					dbg_putc(hd_tohex(b >> 4, is_valid));
+					dbg_putc(hd_tohex(b & 0xf, is_valid));
+					dbg_attr = old_attr;
+				}
 			}
 		}
 		/* Print the ascii representation */
 		dbg_attr = dbg_default_attr;
 		for (i = 0; i < hd_asciipad; ++i)
 			dbg_putc(' ');
-		for (column = 0; column < hd_linesize; ++column) {
-			byte_t b = line_data[column];
-			bool is_valid = (line_valid & ((u64)1 << column)) != 0;
-			bool was_changed = (line_changed & ((u64)1 << column)) != 0;
-			char ch = !is_valid ? '.' : (isprint(b) ? (char)b : '.');
-			dbg_attr = dbg_default_attr;
+		for (i = 0; i < hd_linesize; ++i) {
+			byte_t b         = line_data[i];
+			bool is_valid    = (line_valid & ((u64)1 << i)) != 0;
+			bool was_changed = (line_changed & ((u64)1 << i)) != 0;
+			char ch          = !is_valid ? '.' : (isprint(b) ? (char)b : '.');
+			dbg_attr         = dbg_default_attr;
 			if (sel_region == HD_REGION_ASCII) {
-				if (column == sel_column || is_line_selected) {
+				if (i == sel_byte || is_line_selected) {
 					dbg_setcolor(DBG_COLOR_BLACK, DBG_COLOR_LIGHT_GRAY);
 				} else {
 					dbg_setbgcolor(DBG_COLOR_DARK_GRAY);
@@ -405,7 +474,7 @@ hd_printscreen(void *start_addr, void *sel_addr,
 			}
 			if (was_changed)
 				dbg_setfgcolor(DBG_COLOR_RED);
-			if (((byte_t *)line_addr + column) == (byte_t *)sel_addr) {
+			if (((byte_t *)line_addr + i) == (byte_t *)sel_addr + hd_hex_nibble / 2) {
 				if (sel_region == HD_REGION_ASCII) {
 					dbg_attr_t temp;
 					temp = dbg_attr;
@@ -427,9 +496,44 @@ hd_printscreen(void *start_addr, void *sel_addr,
 	dbg_setcur(0, dbg_screen_height - 1);
 	dbg_printf(DBGSTR("%p:"), sel_addr);
 	if (sel_byte_is_valid) {
-		dbg_printf(DBGSTR("%.2I8x"), sel_byte);
+		switch (hd_bytes_per_word) {
+
+		default:
+			dbg_printf(DBGSTR("%.2I8x"), *(u8 *)sel_word);
+			break;
+
+		case 2:
+			dbg_printf(DBGSTR("%.4I16x"),
+			           hd_hex_le
+			           ? UNALIGNED_GETLE16((u16 *)sel_word)
+			           : UNALIGNED_GETBE16((u16 *)sel_word));
+			break;
+
+		case 4:
+			dbg_printf(DBGSTR("%.8I32x"),
+			           hd_hex_le
+			           ? UNALIGNED_GETLE32((u32 *)sel_word)
+			           : UNALIGNED_GETBE32((u32 *)sel_word));
+			break;
+
+		case 8:
+			dbg_printf(DBGSTR("%.16I64x"),
+			           hd_hex_le
+			           ? UNALIGNED_GETLE64((u64 *)sel_word)
+			           : UNALIGNED_GETBE64((u64 *)sel_word));
+			break;
+		}
 	} else {
-		dbg_print(DBGSTR("??"));
+		for (i = 0; i < hd_bytes_per_word; ++i)
+			dbg_print(DBGSTR("??"));
+	}
+	/* Print the current display mode. */
+	if (hd_nibbles_per_word <= 2) {
+		dbg_print(DBGSTR(" u8"));
+	} else {
+		dbg_printf(DBGSTR(" %ce%u"),
+		           hd_hex_le ? 'l' : 'b',
+		           hd_nibbles_per_word * 4);
 	}
 	if (is_readonly)
 		dbg_print(DBGSTR(" [ro]"));
@@ -451,13 +555,13 @@ hd_printscreen(void *start_addr, void *sel_addr,
 INTERN ATTR_DBGTEXT bool
 NOTHROW(FCALL dbg_hd_addrdiag)(uintptr_t *paddr) {
 	PRIVATE ATTR_DBGRODATA char const diag_title[] = "Go to address";
-	unsigned int edit_width = dbg_screen_width / 3;
-	unsigned int edit_x = (dbg_screen_width - edit_width) / 2;
-	unsigned int diag_x = edit_x - 2;
+	unsigned int edit_width  = dbg_screen_width / 3;
+	unsigned int edit_x      = (dbg_screen_width - edit_width) / 2;
+	unsigned int diag_x      = edit_x - 2;
 	unsigned int diag_height = 5;
-	unsigned int diag_width = edit_width + 4;
-	unsigned int diag_y = ((dbg_screen_height - diag_height) / 2);
-	unsigned int edit_y = diag_y + 2;
+	unsigned int diag_width  = edit_width + 4;
+	unsigned int diag_y      = ((dbg_screen_height - diag_height) / 2);
+	unsigned int edit_y      = diag_y + 2;
 	char exprbuf[256];
 	unsigned int what;
 	dbg_setcolor(DBG_COLOR_BLACK, DBG_COLOR_LIGHT_GRAY);
@@ -466,9 +570,14 @@ NOTHROW(FCALL dbg_hd_addrdiag)(uintptr_t *paddr) {
 	dbg_pprint(diag_x + (diag_width - COMPILER_STRLEN(diag_title)) / 2, diag_y, diag_title);
 	exprbuf[0] = 0;
 	dbg_setcolor(DBG_COLOR_WHITE, DBG_COLOR_BLACK);
-	do what = dbg_editfield(edit_x, edit_y, edit_width, exprbuf, sizeof(exprbuf));
-	while (what != DBG_EDITFIELD_RETURN_ENTER &&
-	       what != DBG_EDITFIELD_RETURN_ESC);
+	do {
+		what = dbg_editfield(edit_x,
+		                     edit_y,
+		                     edit_width,
+		                     exprbuf,
+		                     sizeof(exprbuf));
+	} while (what != DBG_EDITFIELD_RETURN_ENTER &&
+	         what != DBG_EDITFIELD_RETURN_ESC);
 	if (what == DBG_EDITFIELD_RETURN_ESC)
 		return false;
 	return dbg_evaladdr(exprbuf, paddr);
@@ -483,20 +592,19 @@ PRIVATE ATTR_DBGRODATA char const hd_help[] =
 "0-9,a-f,A-F: Set Hex Nibble  Any ascii key:       Set character\n"
 "Esc/F1:      Close Help      F12:                 Toggle readonly\n"
 "CTRL+S       Save changes    CTRL+Z/Y             Discard changes\n"
-"F2:          Go to address"
-;
+"F2:          Go to address   F4:                  Cycle display mode";
 
-#define ADDRSPACE_HALFSIZE ((((size_t)-1)/2)+1)
+#define ADDRSPACE_HALFSIZE ((((size_t)-1) / 2) + 1)
 
 PRIVATE ATTR_DBGTEXT void *
 NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
 	void *start_addr, *end_addr;
 	unsigned int sel_region;
 	char const *status = NULL;
-	start_addr = (void *)(((uintptr_t)addr & ~(hd_linealign - 1)) -
-	                      ((dbg_screen_height - 1) / 2) * hd_linesize);
-	end_addr = (void *)((uintptr_t)start_addr + (hd_linesize * (dbg_screen_height - 1)));
-	sel_region = HD_REGION_HEX;
+	start_addr         = (void *)(((uintptr_t)addr & ~(hd_linealign - 1)) -
+                          ((dbg_screen_height - 1) / 2) * hd_linesize);
+	end_addr           = (void *)((uintptr_t)start_addr + (hd_linesize * (dbg_screen_height - 1)));
+	sel_region         = HD_REGION_HEX;
 	for (;;) {
 		u32 uni;
 		unsigned int key;
@@ -518,7 +626,7 @@ NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
 		} while (key & KEY_FRELEASED);
 		status = NULL;
 		switch (key) {
-#define ADDRESS_COLUMN   (((uintptr_t)addr - (uintptr_t)start_addr) % hd_linesize)
+#define ADDRESS_COLUMN (((uintptr_t)addr - (uintptr_t)start_addr) % hd_linesize)
 
 		case KEY_UP:
 			if (dbg_isholding_ctrl()) {
@@ -539,49 +647,65 @@ NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
 			continue;
 
 		case KEY_LEFT:
-			if (sel_region == HD_REGION_HEX2) {
-				sel_region = HD_REGION_HEX;
-				continue;
+			hd_hex_nibble = hd_convnibble(hd_hex_nibble, sel_region);
+			if (sel_region == HD_REGION_HEX && hd_hex_nibble != 0) {
+				--hd_hex_nibble;
+			} else if (sel_region == HD_REGION_ASCII && hd_hex_nibble >= 2) {
+				hd_hex_nibble -= 2;
+				hd_hex_nibble &= ~1;
+			} else if (ADDRESS_COLUMN != 0) {
+				if (sel_region == HD_REGION_ASCII) {
+					addr          = (byte_t *)addr - hd_bytes_per_word;
+					hd_hex_nibble = hd_nibbles_per_word - 2;
+				} else if (sel_region == HD_REGION_HEX) {
+					addr          = (byte_t *)addr - hd_bytes_per_word;
+					hd_hex_nibble = hd_nibbles_per_word - 1;
+				}
 			}
-			if (ADDRESS_COLUMN == 0)
-				continue;
-			if (sel_region == HD_REGION_ASCII) {
-				addr = (byte_t *)addr - 1;
-			} else if (sel_region == HD_REGION_HEX) {
-				addr = (byte_t *)addr - 1;
-				sel_region = HD_REGION_HEX2;
-			}
+			hd_hex_nibble = hd_convnibble(hd_hex_nibble, sel_region);
 			continue;
 
 		case KEY_RIGHT:
+			hd_hex_nibble = hd_convnibble(hd_hex_nibble, sel_region);
 			if (sel_region == HD_REGION_HEX) {
-				sel_region = HD_REGION_HEX2;
-				continue;
+				if (hd_hex_nibble < hd_nibbles_per_word - 1) {
+					++hd_hex_nibble;
+				} else if (ADDRESS_COLUMN < hd_linesize - hd_bytes_per_word) {
+					addr          = (byte_t *)addr + hd_bytes_per_word;
+					hd_hex_nibble = 0;
+				}
+			} else if (sel_region == HD_REGION_ASCII) {
+				if (((((uintptr_t)addr + (hd_hex_nibble / 2)) -
+				      (uintptr_t)start_addr) %
+				     hd_linesize) < hd_linesize - 1) {
+					hd_hex_nibble += 2;
+					hd_hex_nibble &= ~1;
+					if (hd_hex_nibble >= hd_nibbles_per_word) {
+						addr = (byte_t *)addr + hd_bytes_per_word;
+						hd_hex_nibble = 0;
+					}
+				}
 			}
-			if (ADDRESS_COLUMN == hd_linesize - 1)
-				continue;
-			if (sel_region == HD_REGION_ASCII) {
-				addr = (byte_t *)addr + 1;
-			} else if (sel_region == HD_REGION_HEX2) {
-				addr = (byte_t *)addr + 1;
-				sel_region = HD_REGION_HEX;
-			}
+			hd_hex_nibble = hd_convnibble(hd_hex_nibble, sel_region);
 			continue;
 
 		case KEY_HOME:
 			if (sel_region == HD_REGION_ADDR)
 				continue;
 			addr = (byte_t *)addr - ADDRESS_COLUMN;
-			if (sel_region == HD_REGION_HEX2)
-				sel_region = HD_REGION_HEX;
+			if (sel_region == HD_REGION_HEX || sel_region == HD_REGION_ASCII)
+				hd_hex_nibble = hd_convnibble(0, sel_region);
 			continue;
 
 		case KEY_END:
 			if (sel_region == HD_REGION_ADDR)
 				continue;
-			addr = ((byte_t *)addr - ADDRESS_COLUMN) + (hd_linesize - 1);
-			if (sel_region == HD_REGION_HEX)
-				sel_region = HD_REGION_HEX2;
+			addr = ((byte_t *)addr - ADDRESS_COLUMN) + (hd_linesize - hd_bytes_per_word);
+			if (sel_region == HD_REGION_HEX) {
+				hd_hex_nibble = hd_convnibble(hd_nibbles_per_word - 1, sel_region);
+			} else if (sel_region == HD_REGION_ASCII) {
+				hd_hex_nibble = hd_convnibble(hd_nibbles_per_word - 2, sel_region);
+			}
 			continue;
 
 		case KEY_PAGEUP:
@@ -614,16 +738,12 @@ NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
 					sel_region = HD_REGION_ASCII;
 				else {
 					--sel_region;
-					if (sel_region == HD_REGION_HEX)
-						sel_region = HD_REGION_ADDR;
 				}
 			} else {
 				if (sel_region == HD_REGION_ASCII)
 					sel_region = HD_REGION_ADDR;
 				else {
 					++sel_region;
-					if (sel_region == HD_REGION_HEX2)
-						sel_region = HD_REGION_ASCII;
 				}
 			}
 			continue;
@@ -658,7 +778,8 @@ NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
 			uintptr_t newaddr;
 			if (dbg_hd_addrdiag(&newaddr))
 				addr = (void *)newaddr;
-		}	continue;
+		}
+			continue;
 
 		case KEY_Z:
 		case KEY_Y:
@@ -680,7 +801,23 @@ NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
 			is_readonly = !is_readonly;
 			continue;
 
-		case KEY_F3 ... KEY_F4:
+		case KEY_F4:
+			if (hd_hex_le == HD_LE_DEFAULT && hd_nibbles_per_word > 2) {
+				hd_hex_le = !HD_LE_DEFAULT;
+				continue;
+			}
+			hd_hex_le           = HD_LE_DEFAULT;
+			hd_nibbles_per_word = hd_nibbles_per_word * 2;
+			if (hd_nibbles_per_word > 16)
+				hd_nibbles_per_word = 2;
+			hd_hex_nibble += ((uintptr_t)addr & (hd_bytes_per_word - 1)) * 2;
+			addr = (byte_t *)((uintptr_t)addr & ~(hd_bytes_per_word - 1));
+			addr = (byte_t *)addr + (hd_hex_nibble & ~(hd_nibbles_per_word - 1)) / 2;
+			hd_hex_nibble &= (hd_nibbles_per_word - 1);
+			dbg_calculate_linesize();
+			break;
+
+		case KEY_F3:
 		case KEY_F7 ... KEY_F8:
 		case KEY_F10 ... KEY_F11:
 		case KEY_F13 ... KEY_F24:
@@ -701,10 +838,17 @@ NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
 				continue;
 			}
 			if (sel_region == HD_REGION_ASCII) {
-				status = hd_setdata(addr, HD_SETDATA_BOTH, (byte_t)uni);
-				if (!status)
-					addr = (byte_t *)addr + 1;
-			} else {
+				status = hd_setdata((byte_t *)addr + (hd_hex_nibble / 2),
+				                    HD_SETDATA_BOTH, (byte_t)uni);
+				if (!status) {
+					hd_hex_nibble += 2;
+					hd_hex_nibble &= ~1;
+					if (hd_hex_nibble >= hd_nibbles_per_word) {
+						addr          = (byte_t *)addr + hd_bytes_per_word;
+						hd_hex_nibble = 0;
+					}
+				}
+			} else if (sel_region == HD_REGION_HEX) {
 				byte_t nibble;
 				if (uni >= '0' && uni <= '9')
 					nibble = uni - '0';
@@ -715,16 +859,18 @@ NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
 				else {
 					continue;
 				}
-				if (sel_region == HD_REGION_HEX2) {
-					status = hd_setdata(addr, HD_SETDATA_HIGH, nibble);
-					if (!status) {
-						addr = (byte_t *)addr + 1;
-						sel_region = HD_REGION_HEX;
+				status = hd_setdata((byte_t *)addr + (hd_hex_nibble / 2),
+				                    hd_hex_nibble & 1 ? HD_SETDATA_HIGH
+				                                      : HD_SETDATA_LOW,
+				                    nibble);
+				if (!status) {
+					hd_hex_nibble = hd_convnibble(hd_hex_nibble, sel_region);
+					++hd_hex_nibble;
+					if (hd_hex_nibble >= hd_nibbles_per_word) {
+						addr          = (byte_t *)addr + hd_bytes_per_word;
+						hd_hex_nibble = 0;
 					}
-				} else {
-					status = hd_setdata(addr, HD_SETDATA_LOW, nibble);
-					if (!status)
-						sel_region = HD_REGION_HEX2;
+					hd_hex_nibble = hd_convnibble(hd_hex_nibble, sel_region);
 				}
 			}
 		}
@@ -735,35 +881,47 @@ done:
 
 PRIVATE ATTR_DBGTEXT unsigned int
 NOTHROW(FCALL dbg_get_used_cells)(void) {
-	return (sizeof(void *) * 2) + /* Address column */
-	       (hd_linesize * 3) +    /* Hex column (+1 for leading padding space) */
-	       (hd_linesize + 1);     /* Ascii column (+1 for leading padding space) */
+	return (sizeof(void *) * 2) +                       /* Address column */
+	       (hd_linewords * (hd_nibbles_per_word + 1)) + /* Hex column (+1 for spaces between words) */
+	       hd_linesize;                                 /* Ascii column */
 }
 
 PRIVATE ATTR_DBGTEXT void
 NOTHROW(FCALL dbg_calculate_linesize)(void) {
 	unsigned int usedcells, unused_cells;
-	hd_linesize = 1;
-	hd_hexpad   = 1;
-	hd_asciipad = 1;
+	hd_linewords = 1;
+	hd_linesize  = 1 * hd_bytes_per_word;
+	hd_hexpad    = 1;
+	hd_asciipad  = 1;
 	for (;;) {
 		usedcells = dbg_get_used_cells();
 		if (usedcells >= dbg_screen_width)
 			break;
-		++hd_linesize;
+		++hd_linewords;
+		hd_linesize += hd_bytes_per_word;
 	}
-	if unlikely(hd_linesize > HD_MAXLINESIZE)
-		hd_linesize = HD_MAXLINESIZE;
-	if (usedcells > dbg_screen_width)
-		--hd_linesize;
-	if unlikely(hd_linesize & 1)
-		--hd_linesize;
+	if
+		unlikely(hd_linewords > HD_MAXLINESIZE / hd_bytes_per_word)
+	hd_linewords = HD_MAXLINESIZE / hd_bytes_per_word;
+	if (dbg_get_used_cells() > dbg_screen_width)
+		--hd_linewords;
+	if
+		unlikely(hd_linewords & 1)
+	--hd_linewords;
 	hd_linealign = 2;
+	hd_linesize  = hd_linewords * hd_bytes_per_word;
 	while (hd_linealign < hd_linesize && !(hd_linesize & (hd_linealign - 1)))
 		hd_linealign <<= 1;
-	unused_cells = usedcells - (dbg_get_used_cells() - 2);
-	hd_hexpad   = unused_cells / 2;
-	hd_asciipad = unused_cells - hd_hexpad;
+	/* Try to get 8-byte alignment */
+	if (hd_linesize > 8 && hd_linewords >= 8) {
+		hd_linealign = 8;
+		hd_linewords = (hd_linesize & ~7) / hd_bytes_per_word;
+		hd_linesize  = hd_linewords * hd_bytes_per_word;
+	}
+	usedcells    = dbg_get_used_cells();
+	unused_cells = dbg_screen_width >= usedcells ? dbg_screen_width - usedcells : 0;
+	hd_hexpad    = unused_cells / 2;
+	hd_asciipad  = unused_cells - hd_hexpad;
 }
 
 
@@ -775,18 +933,37 @@ NOTHROW(FCALL dbg_hexedit)(void *addr, bool is_readonly) {
 	void *buf, *result;
 	u32 oldcur;
 	dbg_attr_t oldattr;
+	u8 old_hex_nibble;
+	u8 old_nibbles_per_word;
+	bool old_show_le;
+
 	/* Save terminal settings and display contents. */
 	was_cursor_visible = dbg_setcur_visible(DBG_SETCUR_VISIBLE_TEST);
 	dbg_setcur_visible(DBG_SETCUR_VISIBLE_HIDE);
-	buf = alloca(dbg_screen_width * dbg_screen_height * dbg_screen_cellsize);
-	oldcur = dbg_getcur();
+	buf     = alloca(dbg_screen_width * dbg_screen_height * dbg_screen_cellsize);
+	oldcur  = dbg_getcur();
 	oldattr = dbg_attr;
 	dbg_getscreendata(0, 0, dbg_screen_width, dbg_screen_height, buf);
+
+	/* Configure hexedit settings */
+	old_hex_nibble       = hd_hex_nibble;
+	old_nibbles_per_word = hd_nibbles_per_word;
+	old_show_le          = hd_hex_le;
+	hd_hex_nibble        = 0;
+	hd_nibbles_per_word  = 2;
+	hd_hex_le            = HD_LE_DEFAULT;
 
 	/* Figure out how many bytes we want to display on each line. */
 	dbg_calculate_linesize();
 	hd_change_buffer_init();
 	result = hd_main(addr, is_readonly);
+
+	/* Restore hexedit settings */
+	hd_hex_nibble       = old_hex_nibble;
+	hd_nibbles_per_word = old_nibbles_per_word;
+	hd_hex_le           = old_show_le;
+	hd_change_buffer_init(); /* XXX: During a recursive call, changes made are lost! */
+	dbg_calculate_linesize();
 
 	/* Restore display contents and terminal settings. */
 	dbg_setscreendata(0, 0, dbg_screen_width, dbg_screen_height, buf);
@@ -799,10 +976,10 @@ NOTHROW(FCALL dbg_hexedit)(void *addr, bool is_readonly) {
 
 
 DEFINE_DEBUG_FUNCTION(
-		"h",
-		"h [ADDR=pc]\n"
-		"\tOpen an interactive hex editor at ADDR\n",
-		argc, argv) {
+"h",
+"h [ADDR=pc]\n"
+"\tOpen an interactive hex editor at ADDR\n",
+argc, argv) {
 	void *addr = (void *)fcpustate_getpc(&dbg_viewstate);
 	if (argc >= 2) {
 		if (!dbg_evaladdr(argv[1], (uintptr_t *)&addr))

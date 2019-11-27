@@ -49,7 +49,11 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 	} EXCEPT {
 		assert_error_code(E_SEGFAULT);
 	}
-	/* Also make sure that ukern system calls _can_ work */
+	/* Also make sure that ukern system calls _can_ work
+	 * Note that these are exception-enabled system calls,
+	 * so if anything went wrong in here, the kernel would
+	 * throw an exception that'd cause libc to trigger a
+	 * coredump when it couldn't find an exception handler. */
 	{
 		fd_t fds[2];
 		fds[0] = fds[1] = -1;

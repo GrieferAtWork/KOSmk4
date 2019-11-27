@@ -318,7 +318,7 @@ PRIVATE DEF defs[] = {
 int main(int argc, char *argv[], char *envp[]) {
 	unsigned int i;
 	if (argc < 2) {
-		fprintf(stderr, "Usage: %s NAME OPTIONS\n", argv[0]);
+		fprintf(stderr, "Usage: %s NAME [ARGS...]\n", argv[0]);
 		fprintf(stderr, "Possible values for NAME:\n");
 		for (i = 0; defs[i].n; ++i)
 			fprintf(stderr, "\t%s\n", defs[i].n);
