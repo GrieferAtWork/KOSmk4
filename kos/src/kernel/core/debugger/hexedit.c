@@ -50,8 +50,8 @@ if (gcc_opt.remove("-O3"))
 
 DECL_BEGIN
 
-#define HD_REGION_ADDR 0  /* Address column is selected. */
-#define HD_REGION_HEX 1   /* Low nibble is selected */
+#define HD_REGION_ADDR  0 /* Address column is selected. */
+#define HD_REGION_HEX   1 /* Low nibble is selected */
 #define HD_REGION_ASCII 2 /* Ascii representation is selected */
 
 #define HD_MAXLINESIZE 64
@@ -69,8 +69,9 @@ NOTHROW(FCALL hd_setbyte)(void *addr, byte_t value) {
 	TRY {
 		*(byte_t *)addr = value;
 		return true;
+	} EXCEPT {
 	}
-	EXCEPT {} {
+	{
 		vm_vpage_t page;
 		page = VM_ADDR2PAGE((vm_virt_t)addr);
 		/* Try to force write-access to the associated page by directly
@@ -91,8 +92,9 @@ NOTHROW(FCALL hd_getbyte)(void *addr, byte_t *pvalue) {
 	TRY {
 		*pvalue = *(byte_t *)addr;
 		return true;
+	} EXCEPT {
 	}
-	EXCEPT {} {
+	{
 		vm_vpage_t page;
 		page = VM_ADDR2PAGE((vm_virt_t)addr);
 		/* Try to force write-access to the associated page by directly
@@ -110,17 +112,19 @@ NOTHROW(FCALL hd_getbyte)(void *addr, byte_t *pvalue) {
 
 
 struct hd_change {
-	byte_t *hc_start;                         /* Starting address */
-	u8 hc_length;                             /* Number of changed bytes */
-	COMPILER_FLEXIBLE_ARRAY(byte_t, hc_data); /* [hc_length] The actual changed data. */
+	byte_t                         *hc_start;  /* Starting address */
+	u8                              hc_length; /* Number of changed bytes */
+	COMPILER_FLEXIBLE_ARRAY(byte_t, hc_data);  /* [hc_length] The actual changed data. */
 };
 
-#define HD_CHANGE_NEXT(x) (struct hd_change *)((x)->hc_data + CEIL_ALIGN((x)->hc_length, sizeof(void *)))
+#define HD_CHANGE_NEXT(x) \
+	(struct hd_change *)((x)->hc_data + CEIL_ALIGN((x)->hc_length, sizeof(void *)))
 
 
 /* Buffer of pending memory changes. */
 PRIVATE ATTR_DBGBSS byte_t hd_change_buffer[1024];
-#define hd_change_buffer_init() memset(hd_change_buffer, 0, offsetof(struct hd_change, hc_data))
+#define hd_change_buffer_init() \
+	memset(hd_change_buffer, 0, offsetof(struct hd_change, hc_data))
 
 
 PRIVATE ATTR_DBGTEXT bool
@@ -139,7 +143,7 @@ PRIVATE ATTR_DBGTEXT bool
 NOTHROW(FCALL hd_changes_commit)(void) {
 	struct hd_change *iter;
 	bool result = true;
-	iter        = (struct hd_change *)hd_change_buffer;
+	iter = (struct hd_change *)hd_change_buffer;
 	while (iter->hc_length) {
 		size_t i;
 		for (i = 0; i < iter->hc_length; ++i) {
@@ -174,7 +178,7 @@ NOTHROW(FCALL hd_changes_append)(byte_t *addr, byte_t value) {
 	iter = (struct hd_change *)hd_change_buffer;
 	while (iter->hc_length) {
 		struct hd_change *next = HD_CHANGE_NEXT(iter);
-		block_end              = iter->hc_start + iter->hc_length;
+		block_end = iter->hc_start + iter->hc_length;
 		if (addr == block_end) {
 			/* Append at the end of this change-block */
 			if (&iter->hc_data[iter->hc_length] >= (byte_t *)next) {
@@ -190,7 +194,8 @@ NOTHROW(FCALL hd_changes_append)(byte_t *addr, byte_t value) {
 		iter = next;
 	}
 	/* Check if we can append a new change-block at the end. */
-	if (((byte_t *)&last_change->hc_data + 1 + offsetof(struct hd_change, hc_data)) >=
+	if (((byte_t *)&last_change->hc_data + 1 +
+	     offsetof(struct hd_change, hc_data)) >=
 	    COMPILER_ENDOF(hd_change_buffer))
 		return false;
 	last_change->hc_start   = addr;
@@ -205,7 +210,7 @@ PRIVATE ATTR_DBGTEXT void
 NOTHROW(FCALL hd_changes_applyto)(byte_t *addr, byte_t *buf, size_t buflen, u64 *pchanged) {
 	struct hd_change *iter;
 	byte_t *endaddr = addr + buflen;
-	iter            = (struct hd_change *)hd_change_buffer;
+	iter = (struct hd_change *)hd_change_buffer;
 	while (iter->hc_length) {
 		byte_t *block_start, *block_end;
 		block_start = iter->hc_start;
@@ -278,8 +283,7 @@ hd_getline(void *start_addr, byte_t data[HD_MAXLINESIZE], u64 *pchanged) {
 		COMPILER_READ_BARRIER();
 		memcpy(data, start_addr, hd_linesize);
 		COMPILER_READ_BARRIER();
-	}
-	EXCEPT {
+	} EXCEPT {
 		goto tryhard;
 	}
 	hd_changes_applyto((byte_t *)start_addr, data, hd_linesize, pchanged);
@@ -294,8 +298,7 @@ tryhard:
 				COMPILER_READ_BARRIER();
 				data[i] = ((byte_t *)start_addr)[i];
 				COMPILER_READ_BARRIER();
-			}
-			EXCEPT {
+			} EXCEPT {
 				result &= ~((u64)1 << i);
 			}
 		}
@@ -368,8 +371,8 @@ hd_printscreen(void *start_addr, void *sel_addr,
 			dbg_putc(' ');
 		/* Print the hex representation */
 		for (column_word = 0; column_word < hd_linewords; ++column_word) {
-#define VALID_BYTE(i) ((line_valid & ((u64)1 << (i))) != 0)
-#define CHANGED_BYTE(i) (line_changed & ((u64)1 << (i))) != 0
+#define VALID_BYTE(i)   ((line_valid & ((u64)1 << (i))) != 0)
+#define CHANGED_BYTE(i) ((line_changed & ((u64)1 << (i))) != 0)
 			bool is_valid = VALID_BYTE(column_word * hd_bytes_per_word);
 			unsigned int nibble_byte;
 			byte_t *pb = &line_data[column_word * hd_bytes_per_word];
@@ -405,7 +408,7 @@ hd_printscreen(void *start_addr, void *sel_addr,
 					if (hd_hex_le)
 						nibble_byte_index = (hd_bytes_per_word - 1) - nibble_byte;
 					old_attr = dbg_attr;
-					b        = pb[nibble_byte_index];
+					b = pb[nibble_byte_index];
 					if (CHANGED_BYTE(column_word * hd_bytes_per_word + nibble_byte_index))
 						dbg_setfgcolor(DBG_COLOR_RED);
 					if (sel_region == HD_REGION_HEX) {
@@ -443,7 +446,7 @@ hd_printscreen(void *start_addr, void *sel_addr,
 					unsigned int nibble_byte_index = nibble_byte;
 					if (hd_hex_le)
 						nibble_byte_index = (hd_bytes_per_word - 1) - nibble_byte;
-					b        = pb[nibble_byte_index];
+					b = pb[nibble_byte_index];
 					old_attr = dbg_attr;
 					if (CHANGED_BYTE(column_word * hd_bytes_per_word + nibble_byte_index))
 						dbg_setfgcolor(DBG_COLOR_RED);
@@ -458,11 +461,11 @@ hd_printscreen(void *start_addr, void *sel_addr,
 		for (i = 0; i < hd_asciipad; ++i)
 			dbg_putc(' ');
 		for (i = 0; i < hd_linesize; ++i) {
-			byte_t b         = line_data[i];
-			bool is_valid    = (line_valid & ((u64)1 << i)) != 0;
+			byte_t b = line_data[i];
+			bool is_valid = (line_valid & ((u64)1 << i)) != 0;
 			bool was_changed = (line_changed & ((u64)1 << i)) != 0;
-			char ch          = !is_valid ? '.' : (isprint(b) ? (char)b : '.');
-			dbg_attr         = dbg_default_attr;
+			char ch = is_valid && isprint(b) ? (char)b : '.';
+			dbg_attr = dbg_default_attr;
 			if (sel_region == HD_REGION_ASCII) {
 				if (i == sel_byte || is_line_selected) {
 					dbg_setcolor(DBG_COLOR_BLACK, DBG_COLOR_LIGHT_GRAY);
@@ -601,10 +604,10 @@ NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
 	void *start_addr, *end_addr;
 	unsigned int sel_region;
 	char const *status = NULL;
-	start_addr         = (void *)(((uintptr_t)addr & ~(hd_linealign - 1)) -
-                          ((dbg_screen_height - 1) / 2) * hd_linesize);
-	end_addr           = (void *)((uintptr_t)start_addr + (hd_linesize * (dbg_screen_height - 1)));
-	sel_region         = HD_REGION_HEX;
+	start_addr = (void *)(((uintptr_t)addr & ~(hd_linealign - 1)) -
+                  ((dbg_screen_height - 1) / 2) * hd_linesize);
+	end_addr   = (void *)((uintptr_t)start_addr + (hd_linesize * (dbg_screen_height - 1)));
+	sel_region = HD_REGION_HEX;
 	for (;;) {
 		u32 uni;
 		unsigned int key;
@@ -778,8 +781,7 @@ NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
 			uintptr_t newaddr;
 			if (dbg_hd_addrdiag(&newaddr))
 				addr = (void *)newaddr;
-		}
-			continue;
+		}	continue;
 
 		case KEY_Z:
 		case KEY_Y:
@@ -900,14 +902,12 @@ NOTHROW(FCALL dbg_calculate_linesize)(void) {
 		++hd_linewords;
 		hd_linesize += hd_bytes_per_word;
 	}
-	if
-		unlikely(hd_linewords > HD_MAXLINESIZE / hd_bytes_per_word)
-	hd_linewords = HD_MAXLINESIZE / hd_bytes_per_word;
+	if unlikely(hd_linewords > HD_MAXLINESIZE / hd_bytes_per_word)
+		hd_linewords = HD_MAXLINESIZE / hd_bytes_per_word;
 	if (dbg_get_used_cells() > dbg_screen_width)
 		--hd_linewords;
-	if
-		unlikely(hd_linewords & 1)
-	--hd_linewords;
+	if unlikely(hd_linewords & 1)
+		--hd_linewords;
 	hd_linealign = 2;
 	hd_linesize  = hd_linewords * hd_bytes_per_word;
 	while (hd_linealign < hd_linesize && !(hd_linesize & (hd_linealign - 1)))
@@ -976,10 +976,10 @@ NOTHROW(FCALL dbg_hexedit)(void *addr, bool is_readonly) {
 
 
 DEFINE_DEBUG_FUNCTION(
-"h",
-"h [ADDR=pc]\n"
-"\tOpen an interactive hex editor at ADDR\n",
-argc, argv) {
+		"h",
+		"h [ADDR=pc]\n"
+		"\tOpen an interactive hex editor at ADDR\n",
+		argc, argv) {
 	void *addr = (void *)fcpustate_getpc(&dbg_viewstate);
 	if (argc >= 2) {
 		if (!dbg_evaladdr(argv[1], (uintptr_t *)&addr))
