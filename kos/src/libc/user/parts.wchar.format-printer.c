@@ -20,11 +20,15 @@
 #define GUARD_LIBC_USER_PARTS_WCHAR_FORMAT_PRINTER_C 1
 
 #include "../api.h"
-#include "parts.wchar.format-printer.h"
-#include "malloc.h"
-#include "string.h"
-#include "stdlib.h"
+/**/
+
 #include <string.h>
+
+#include "malloc.h"
+#include "parts.wchar.format-printer.h"
+#include "stdlib.h"
+#include "string.h"
+#include "wchar.h"
 
 DECL_BEGIN
 
@@ -34,12 +38,12 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:format_waprintf_pack,hash:CRC-32=0x407f357e]]]*/
+/*[[[head:format_waprintf_pack,hash:CRC-32=0xfb24fc97]]]*/
 /* Pack and finalize a given aprintf format printer
  * Together with `format_waprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
  * >> char *result; ssize_t error;
- * >> struct format_aprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
+ * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
  * >> error = format_wprintf(&format_waprintf_printer, &p, L"%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
  * >>     format_waprintf_data_fini(&p);
@@ -102,12 +106,12 @@ NOTHROW_NCX(LIBCCALL libc_format_waprintf_pack)(struct format_c32aprintf_data *_
 }
 /*[[[end:format_waprintf_pack]]]*/
 
-/*[[[head:DOS$format_waprintf_pack,hash:CRC-32=0x6a99b474]]]*/
+/*[[[head:DOS$format_waprintf_pack,hash:CRC-32=0x5a6cf992]]]*/
 /* Pack and finalize a given aprintf format printer
  * Together with `format_waprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
  * >> char *result; ssize_t error;
- * >> struct format_aprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
+ * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
  * >> error = format_wprintf(&format_waprintf_printer, &p, L"%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
  * >>     format_waprintf_data_fini(&p);
@@ -179,35 +183,11 @@ NOTHROW_NCX(LIBCCALL libc_format_waprintf_printer)(/*struct format_waprintf_data
                                                    size_t datalen)
 /*[[[body:format_waprintf_printer]]]*/
 /*AUTO*/{
-	struct __format_aprintf_data {
-		char32_t         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-		__SIZE_TYPE__ ap_avail; /* Unused buffer size */
-		__SIZE_TYPE__ ap_used;  /* Used buffer size */
-	};
-	struct __format_aprintf_data *buf;
-	buf = (struct __format_aprintf_data *)arg;
-	if (buf->ap_avail < datalen) {
-		char32_t *newbuf;
-		size_t min_alloc = buf->ap_used + datalen;
-		size_t new_alloc = buf->ap_used + buf->ap_avail;
-		if (!new_alloc)
-			new_alloc = 8;
-		while (new_alloc < min_alloc)
-			new_alloc *= 2;
-		newbuf = (char32_t *)libc_realloc(buf->ap_base, (new_alloc + 1) * sizeof(char32_t));
-		if unlikely(!newbuf) {
-			new_alloc = min_alloc;
-			newbuf    = (char32_t *)libc_realloc(buf->ap_base, (new_alloc + 1) * sizeof(char32_t));
-			if unlikely(!newbuf)
-				return -1;
-		}
-		__hybrid_assert(new_alloc >= buf->ap_used + datalen);
-		buf->ap_base  = newbuf;
-		buf->ap_avail = new_alloc - buf->ap_used;
-	}
-	memcpyc(buf->ap_base + buf->ap_used, data, datalen, sizeof(char32_t));
-	buf->ap_avail -= datalen;
-	buf->ap_used  += datalen;
+	char32_t *buf;
+	buf = libc_format_waprintf_alloc((struct format_c32aprintf_data *)arg, datalen);
+	if unlikely(!buf)
+		return -1;
+	libc_wmemcpy(buf, data, datalen);
 	return (ssize_t)datalen;
 }
 /*[[[end:format_waprintf_printer]]]*/
@@ -221,46 +201,102 @@ NOTHROW_NCX(LIBDCALL libd_format_waprintf_printer)(/*struct format_waprintf_data
                                                    size_t datalen)
 /*[[[body:DOS$format_waprintf_printer]]]*/
 /*AUTO*/{
-	struct __format_aprintf_data {
-		char16_t         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-		__SIZE_TYPE__ ap_avail; /* Unused buffer size */
-		__SIZE_TYPE__ ap_used;  /* Used buffer size */
-	};
-	struct __format_aprintf_data *buf;
-	buf = (struct __format_aprintf_data *)arg;
-	if (buf->ap_avail < datalen) {
-		char16_t *newbuf;
-		size_t min_alloc = buf->ap_used + datalen;
-		size_t new_alloc = buf->ap_used + buf->ap_avail;
+	char16_t *buf;
+	buf = libd_format_waprintf_alloc((struct format_c16aprintf_data *)arg, datalen);
+	if unlikely(!buf)
+		return -1;
+	libd_wmemcpy(buf, data, datalen);
+	return (ssize_t)datalen;
+}
+/*[[[end:DOS$format_waprintf_printer]]]*/
+
+/*[[[head:format_waprintf_alloc,hash:CRC-32=0x2a1ef99a]]]*/
+/* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_waprintf_alloc") char32_t *
+NOTHROW_NCX(LIBCCALL libc_format_waprintf_alloc)(struct format_c32aprintf_data *__restrict self,
+                                                 size_t num_wchars)
+/*[[[body:format_waprintf_alloc]]]*/
+/*AUTO*/{
+	char32_t *result;
+	if (self->ap_avail < num_wchars) {
+		char32_t *newbuf;
+		size_t min_alloc = self->ap_used + num_wchars;
+		size_t new_alloc = self->ap_used + self->ap_avail;
 		if (!new_alloc)
 			new_alloc = 8;
 		while (new_alloc < min_alloc)
 			new_alloc *= 2;
-		newbuf = (char16_t *)libc_realloc(buf->ap_base, (new_alloc + 1) * sizeof(char16_t));
+		newbuf = (char32_t *)libc_realloc(self->ap_base, (new_alloc + 1) * sizeof(char32_t));
 		if unlikely(!newbuf) {
 			new_alloc = min_alloc;
-			newbuf    = (char16_t *)libc_realloc(buf->ap_base, (new_alloc + 1) * sizeof(char16_t));
+			newbuf    = (char32_t *)libc_realloc(self->ap_base, (new_alloc + 1) * sizeof(char32_t));
 			if unlikely(!newbuf)
-				return -1;
+				return NULL;
 		}
-		__hybrid_assert(new_alloc >= buf->ap_used + datalen);
-		buf->ap_base  = newbuf;
-		buf->ap_avail = new_alloc - buf->ap_used;
+		__hybrid_assert(new_alloc >= self->ap_used + num_wchars);
+		self->ap_base  = newbuf;
+		self->ap_avail = new_alloc - self->ap_used;
 	}
-	libc_memcpyc(buf->ap_base + buf->ap_used, data, datalen, sizeof(char16_t));
-	buf->ap_avail -= datalen;
-	buf->ap_used  += datalen;
-	return (ssize_t)datalen;
+	result = self->ap_base + self->ap_used;
+	self->ap_avail -= num_wchars;
+	self->ap_used  += num_wchars;
+	return result;
 }
-/*[[[end:DOS$format_waprintf_printer]]]*/
+/*[[[end:format_waprintf_alloc]]]*/
+
+/*[[[head:DOS$format_waprintf_alloc,hash:CRC-32=0x8fd56030]]]*/
+/* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_waprintf_alloc") char16_t *
+NOTHROW_NCX(LIBDCALL libd_format_waprintf_alloc)(struct format_c16aprintf_data *__restrict self,
+                                                 size_t num_wchars)
+/*[[[body:DOS$format_waprintf_alloc]]]*/
+/*AUTO*/{
+	char16_t *result;
+	if (self->ap_avail < num_wchars) {
+		char16_t *newbuf;
+		size_t min_alloc = self->ap_used + num_wchars;
+		size_t new_alloc = self->ap_used + self->ap_avail;
+		if (!new_alloc)
+			new_alloc = 8;
+		while (new_alloc < min_alloc)
+			new_alloc *= 2;
+		newbuf = (char16_t *)libc_realloc(self->ap_base, (new_alloc + 1) * sizeof(char16_t));
+		if unlikely(!newbuf) {
+			new_alloc = min_alloc;
+			newbuf    = (char16_t *)libc_realloc(self->ap_base, (new_alloc + 1) * sizeof(char16_t));
+			if unlikely(!newbuf)
+				return NULL;
+		}
+		__hybrid_assert(new_alloc >= self->ap_used + num_wchars);
+		self->ap_base  = newbuf;
+		self->ap_avail = new_alloc - self->ap_used;
+	}
+	result = self->ap_base + self->ap_used;
+	self->ap_avail -= num_wchars;
+	self->ap_used  += num_wchars;
+	return result;
+}
+/*[[[end:DOS$format_waprintf_alloc]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xafecefb8]]]*/
+/*[[[start:exports,hash:CRC-32=0xf7c0034b]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(format_waprintf_pack, libc_format_waprintf_pack);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$format_waprintf_pack, libd_format_waprintf_pack);
+DEFINE_PUBLIC_WEAK_ALIAS(format_waprintf_alloc, libc_format_waprintf_alloc);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$format_waprintf_alloc, libd_format_waprintf_alloc);
 DEFINE_PUBLIC_WEAK_ALIAS(format_waprintf_printer, libc_format_waprintf_printer);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$format_waprintf_printer, libd_format_waprintf_printer);
 /*[[[end:exports]]]*/

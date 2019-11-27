@@ -2436,58 +2436,6 @@ again_enum_name:
 				case "no_uchar32_function_name":
 					uchar32_function_name = none;
 					break;
-				case "time64_variant_of": {
-					local base_func = get_tag_operand();
-					intern_aliases.append((
-						"__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__",
-						Cell(base_func)
-					));
-					aliases.append((
-						"__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__",
-						base_func
-					));
-					if (doc is string && doc == "")
-						doc = CopyFunctionBody(base_func, identitiyConverter);
-				}	break;
-				case "off64_variant_of": {
-					local base_func = get_tag_operand();
-					intern_aliases.append((
-						"__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__",
-						Cell(base_func)
-					));
-					aliases.append((
-						"__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__",
-						base_func
-					));
-					if (doc is string && doc == "")
-						doc = CopyFunctionBody(base_func, identitiyConverter);
-				}	break;
-				case "largefile64_variant_of": {
-					local base_func = get_tag_operand();
-					intern_aliases.append((
-						"!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0",
-						Cell(base_func)
-					));
-					aliases.append((
-						"!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0",
-						base_func
-					));
-					if (doc is string && doc == "")
-						doc = CopyFunctionBody(base_func, identitiyConverter);
-				}	break;
-				case "dirent64_variant_of": {
-					local base_func = get_tag_operand();
-					intern_aliases.append((
-						"defined(_DIRENT_MATCHES_DIRENT64)",
-						Cell(base_func)
-					));
-					aliases.append((
-						"defined(_DIRENT_MATCHES_DIRENT64)",
-						base_func
-					));
-					if (doc is string && doc == "")
-						doc = CopyFunctionBody(base_func, identitiyConverter);
-				}	break;
 				case "intern_alias":
 					for (local x: get_tag_operand().split(","))
 						intern_aliases.append((" && ".join(conditions), x.strip()));
@@ -2671,6 +2619,22 @@ again_enum_name:
 					if (attr_name.startswith("ATTR_")) {
 						function_attributes.append(attr_name + tag_block);
 					} else {
+						local final simpleVariantOfMapping = {
+							"rlim64_variant_of" : "__SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__",
+							"time64_variant_of" : "__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__",
+							"off64_variant_of" : "__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__",
+							"largefile64_variant_of" : "!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0",
+							"dirent64_variant_of" : "defined(_DIRENT_MATCHES_DIRENT64)",
+						};
+						local alt = simpleVariantOfMapping.get(attr_name);
+						if (alt !is none) {
+							local base_func = get_tag_operand();
+							intern_aliases.append(( alt, Cell(base_func) ));
+							aliases.append((alt, base_func));
+							if (doc is string && doc == "")
+								doc = CopyFunctionBody(base_func, identitiyConverter);
+							break;
+						}
 						err(tag_start, "Unknown tag: " + repr tag_name);
 					}
 				}	break;

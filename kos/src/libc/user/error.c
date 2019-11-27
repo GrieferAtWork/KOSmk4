@@ -23,10 +23,10 @@
 /**/
 
 #include "error.h"
+#include "stdio-api.h"
+#include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
-#include "stdio.h"
-#include "stdio-api.h"
 
 DECL_BEGIN
 

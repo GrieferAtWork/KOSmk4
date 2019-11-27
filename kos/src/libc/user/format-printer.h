@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1d4b439 */
+/* HASH CRC-32:0x268f8dd0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,14 @@ DECL_BEGIN
  *                  printed to the aprintf-printer at one point.
  *                  (e.g. `format_aprintf_printer(&my_printer, "\0", 1)') */
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_format_aprintf_pack)(struct format_aprintf_data *__restrict self, size_t *pstrlen);
-/* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
+/* Allocate a buffer of `num_chars' characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) ATTR_ALLOC_SIZE((2)) char *NOTHROW_NCX(LIBCCALL libc_format_aprintf_alloc)(struct format_aprintf_data *__restrict self, size_t num_chars);
+/* Print data to a dynamically allocated heap buffer. On error, -1 is returned
+ * This function is intended to be used as a pformatprinter-compatibile printer sink */
 INTDEF WUNUSED NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_aprintf_printer)(/*struct format_aprintf_data **/ void *arg, /*utf-8*/ char const *__restrict data, size_t datalen);
 
 DECL_END

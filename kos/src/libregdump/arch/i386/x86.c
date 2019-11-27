@@ -1003,18 +1003,18 @@ libregdump_flags(struct regdump_printer *__restrict self,
 }
 
 #ifndef __KERNEL__
-PRIVATE void *libinstrlen  = NULL;
-PRIVATE void *libdebuginfo = NULL;
-PRIVATE void *libdisasm    = NULL;
+PRIVATE void *pdyn_libinstrlen  = NULL;
+PRIVATE void *pdyn_libdebuginfo = NULL;
+PRIVATE void *pdyn_libdisasm    = NULL;
 
 PRIVATE __attribute__((__destructor__))
 void fini_libraries(void) {
-	if (libinstrlen && libinstrlen != (void *)-1)
-		dlclose(libinstrlen);
-	if (libdebuginfo && libdebuginfo != (void *)-1)
-		dlclose(libdebuginfo);
-	if (libdisasm && libdisasm != (void *)-1)
-		dlclose(libdisasm);
+	if (pdyn_libinstrlen && pdyn_libinstrlen != (void *)-1)
+		dlclose(pdyn_libinstrlen);
+	if (pdyn_libdebuginfo && pdyn_libdebuginfo != (void *)-1)
+		dlclose(pdyn_libdebuginfo);
+	if (pdyn_libdisasm && pdyn_libdisasm != (void *)-1)
+		dlclose(pdyn_libdisasm);
 }
 
 #define DEFINE_LIBRARY_OPEN(open_libname, libname, LIBNAME_LIBRARY_NAME) \
@@ -1036,9 +1036,9 @@ void fini_libraries(void) {
 			result = NULL;                                               \
 		return result;                                                   \
 	}
-DEFINE_LIBRARY_OPEN(open_libinstrlen, libinstrlen, LIBINSTRLEN_LIBRARY_NAME)
-DEFINE_LIBRARY_OPEN(open_libdebuginfo, libdebuginfo, LIBDEBUGINFO_LIBRARY_NAME)
-DEFINE_LIBRARY_OPEN(open_libdisasm, libdisasm, LIBDISASM_LIBRARY_NAME)
+DEFINE_LIBRARY_OPEN(open_libinstrlen, pdyn_libinstrlen, LIBINSTRLEN_LIBRARY_NAME)
+DEFINE_LIBRARY_OPEN(open_libdebuginfo, pdyn_libdebuginfo, LIBDEBUGINFO_LIBRARY_NAME)
+DEFINE_LIBRARY_OPEN(open_libdisasm, pdyn_libdisasm, LIBDISASM_LIBRARY_NAME)
 #undef DEFINE_LIBRARY_OPEN
 
 PRIVATE PDEBUG_DLLOCKSECTIONS     pdyn_debug_dllocksections     = NULL;

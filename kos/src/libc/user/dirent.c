@@ -20,13 +20,16 @@
 #define GUARD_LIBC_USER_DIRENT_C 1
 
 #include "../api.h"
-#include "dirent.h"
+/**/
+
+#include <kos/syscalls.h>
 
 #include <fcntl.h>
-#include <kos/syscalls.h>
 #include <malloc.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+#include "dirent.h"
 
 DECL_BEGIN
 
@@ -37,20 +40,22 @@ struct __dirstream {
 	size_t         ds_bufsize; /* Size of the directory stream buffer (`ds_buf') in bytes. */
 	struct dirent *ds_next;    /* [1..1][in(ds_buf)] Pointer to the next directory yet to-be read. */
 	struct dirent *ds_buf;     /* [1..ds_bufsize][owned_if(!= ds_sbuf)] Directory entry buffer. */
-	byte_t         ds_sbuf[offsetof(struct dirent,d_name) + 512]; /* Pre-allocated static dirent buffer.
-	                                                               * NOTE: When a dynamic buffer has to be used,
-	                                                               *      `realloc_in_place()' is used to attempt
-	                                                               *       to free this buffer. */
+	byte_t         ds_sbuf[offsetof(struct dirent, d_name) + 512]; /* Pre-allocated static dirent buffer.
+	                                                                * NOTE: When a dynamic buffer has to be used,
+	                                                                *      `realloc_in_place()' is used to attempt
+	                                                                *       to free this buffer. */
 };
 
-#define dirstream_init(self, fd) \
+#define dirstream_init(self, fd)                            \
 	((self)->ds_fd      = fd,                               \
 	 (self)->ds_lodsize = 0,                                \
 	 (self)->ds_bufsize = sizeof((self)->ds_sbuf),          \
 	 (self)->ds_next    = (struct dirent *)(self)->ds_sbuf, \
 	 (self)->ds_buf     = (struct dirent *)(self)->ds_sbuf)
-#define dirstream_fini(self) \
-	(((self)->ds_buf != (struct dirent *)(self)->ds_sbuf) ? free((self)->ds_buf) : (void)0, \
+#define dirstream_fini(self)                              \
+	(((self)->ds_buf != (struct dirent *)(self)->ds_sbuf) \
+	 ? free((self)->ds_buf)                               \
+	 : (void)0,                                           \
 	 sys_close((self)->ds_fd))
 
 

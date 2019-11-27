@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9815abe */
+/* HASH CRC-32:0x56a4623 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -784,12 +784,30 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNU
  *                  (e.g. `format_aprintf_printer(&my_printer, "\0", 1)') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_aprintf_pack, __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL format_aprintf_pack)(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_aprintf_pack))(__self, __pstrlen); })
 #endif /* format_aprintf_pack... */
-#ifdef __CRT_HAVE_format_aprintf_printer
-/* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_aprintf_printer,(/*struct format_aprintf_data **/ void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
+#ifdef __CRT_HAVE_format_aprintf_alloc
+/* Allocate a buffer of `num_chars' characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)),char *,__NOTHROW_NCX,format_aprintf_alloc,(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ __num_chars),(__self,__num_chars))
 #elif defined(__CRT_HAVE_realloc)
+#include <local/format-printer/format_aprintf_alloc.h>
+/* Allocate a buffer of `num_chars' characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_aprintf_alloc, __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)) char *__NOTHROW_NCX(__LIBCCALL format_aprintf_alloc)(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ __num_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_aprintf_alloc))(__self, __num_chars); })
+#endif /* format_aprintf_alloc... */
+#ifdef __CRT_HAVE_format_aprintf_printer
+/* Print data to a dynamically allocated heap buffer. On error, -1 is returned
+ * This function is intended to be used as a pformatprinter-compatibile printer sink */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_aprintf_printer,(/*struct format_aprintf_data **/ void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
+#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc)
 #include <local/format-printer/format_aprintf_printer.h>
-/* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
+/* Print data to a dynamically allocated heap buffer. On error, -1 is returned
+ * This function is intended to be used as a pformatprinter-compatibile printer sink */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_aprintf_printer, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_aprintf_printer)(/*struct format_aprintf_data **/ void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_aprintf_printer))(__arg, __data, __datalen); })
 #endif /* format_aprintf_printer... */
 
@@ -799,13 +817,13 @@ __SYSDECL_END
 #ifdef __USE_KOS
 #if defined(_WCHAR_H) && !defined(_PARTS_WCHAR_FORMAT_PRINTER_H)
 #include <parts/wchar/format-printer.h>
-#endif
+#endif /* _WCHAR_H && !_PARTS_WCHAR_FORMAT_PRINTER_H */
 #endif /* __USE_KOS */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_FORMAT_PRINTER_H)
 #include <parts/uchar/format-printer.h>
-#endif
+#endif /* _UCHAR_H && !_PARTS_UCHAR_FORMAT_PRINTER_H */
 #endif /* __USE_UTF */
 
 #endif /* !_FORMAT_PRINTER_H */

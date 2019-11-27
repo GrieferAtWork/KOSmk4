@@ -20,17 +20,17 @@
 #define GUARD_LIBC_USER_BITS_SCHED_C 1
 
 #include "../api.h"
-#include "bits.sched.h"
+/**/
+
 #include <kos/syscalls.h>
-#include <dlfcn.h>
 #include <kos/thread.h>
 #include <sys/syscall.h>
 
+#include <dlfcn.h>
+
+#include "bits.sched.h"
+
 DECL_BEGIN
-
-
-
-
 
 /*[[[start:implementation]]]*/
 
@@ -72,10 +72,10 @@ NOTHROW_NCX(LIBCCALL libc_unshare)(int flags)
 }
 /*[[[end:unshare]]]*/
 
-/*[[[head:sched_getcpu,hash:CRC-32=0xee1dd0c1]]]*/
+/*[[[head:sched_getcpu,hash:CRC-32=0x3f296be5]]]*/
 /* >> sched_getcpu(3)
  * Returns the number of the CPU for the calling thread.
- * Note that due to unforseeable scheduling conditions, this may change at any
+ * Note that due to unforeseeable scheduling conditions, this may change at any
  * moment, even before this function returns, or before the caller was able to
  * act on its return value. For that reason, this function must only be taken
  * as a hint */
@@ -83,9 +83,15 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.utility.sched_getcpu") int
 NOTHROW_NCX(LIBCCALL libc_sched_getcpu)(void)
 /*[[[body:sched_getcpu]]]*/
 {
-	CRT_UNIMPLEMENTED("sched_getcpu"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	errno_t error;
+	uint32_t res;
+	/* XXX: Figure out how linux implements `struct getcpu_cache' */
+	error = sys_getcpu(&res, NULL, NULL);
+	if (E_ISERR(error)) {
+		libc_seterrno(-error);
+		return -1;
+	}
+	return (int)(unsigned int)res;
 }
 /*[[[end:sched_getcpu]]]*/
 

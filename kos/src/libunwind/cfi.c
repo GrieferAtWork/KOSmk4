@@ -159,7 +159,7 @@ NOTHROW(CC guarded_memcpy)(void *dst, void const *src, size_t num_bytes) {
 
 
 #ifndef __KERNEL__
-PRIVATE void *libdebuginfo                                              = NULL;
+PRIVATE void *pdyn_libdebuginfo                                              = NULL;
 PRIVATE PDEBUGINFO_CU_ABBREV_FINI     pdyn_debuginfo_cu_abbrev_fini     = NULL;
 PRIVATE PDEBUGINFO_CU_PARSER_LOADUNIT pdyn_debuginfo_cu_parser_loadunit = NULL;
 PRIVATE PDEBUGINFO_CU_PARSER_SKIPFORM pdyn_debuginfo_cu_parser_skipform = NULL;
@@ -171,44 +171,45 @@ PRIVATE PDEBUGINFO_CU_PARSER_GETEXPR  pdyn_debuginfo_cu_parser_getexpr  = NULL;
 
 PRIVATE __attribute__((__destructor__))
 void libuw_unload_libdebuginfo(void) {
-	/* libdebuginfo.so was loaded by us, unload it when our library gets destroyed. */
-	if (libdebuginfo && libdebuginfo != (void *)-1)
-		dlclose(libdebuginfo);
+	/* pdyn_libdebuginfo.so was loaded by us, unload it when our library gets destroyed. */
+	if (pdyn_libdebuginfo && pdyn_libdebuginfo != (void *)-1)
+		dlclose(pdyn_libdebuginfo);
 }
 
 PRIVATE WUNUSED bool
 NOTHROW_NCX(CC libuw_load_libdebuginfo)(void) {
-	void *libdebuginfo;
+	void *pdyn_libdebuginfo;
 again:
-	if (libdebuginfo == (void *)-1)
+	if (pdyn_libdebuginfo == (void *)-1)
 		return false; /* Cannot be loaded... */
-	libdebuginfo = dlopen(LIBDEBUGINFO_LIBRARY_NAME, RTLD_LOCAL);
-	if (!libdebuginfo)
+	pdyn_libdebuginfo = dlopen(LIBDEBUGINFO_LIBRARY_NAME, RTLD_LOCAL);
+	if (!pdyn_libdebuginfo)
 		goto err;
-	*(void **)&pdyn_debuginfo_cu_parser_getexpr  = dlsym(libdebuginfo, "debuginfo_cu_parser_getexpr");
+	*(void **)&pdyn_debuginfo_cu_parser_getexpr  = dlsym(pdyn_libdebuginfo, "debuginfo_cu_parser_getexpr");
 	if unlikely(!pdyn_debuginfo_cu_parser_getexpr)
 		goto err_close;
-	*(void **)&pdyn_debuginfo_cu_parser_skipform = dlsym(libdebuginfo, "debuginfo_cu_parser_skipform");
+	*(void **)&pdyn_debuginfo_cu_parser_skipform = dlsym(pdyn_libdebuginfo, "debuginfo_cu_parser_skipform");
 	if unlikely(!pdyn_debuginfo_cu_parser_skipform)
 		goto err_close;
-	*(void **)&pdyn_debuginfo_cu_parser_loadunit = dlsym(libdebuginfo, "debuginfo_cu_parser_loadunit");
+	*(void **)&pdyn_debuginfo_cu_parser_loadunit = dlsym(pdyn_libdebuginfo, "debuginfo_cu_parser_loadunit");
 	if unlikely(!pdyn_debuginfo_cu_parser_loadunit)
 		goto err_close;
-	COMPILER_WRITE_BARRIER(); /* This one has to be loaded last, since it's
-	                           * used as the fast-pass for already-loaded */
-	*(void **)&pdyn_debuginfo_cu_abbrev_fini = dlsym(libdebuginfo, "debuginfo_cu_abbrev_fini");
+	COMPILER_WRITE_BARRIER();
+	/* This one has to be loaded last, since it's
+	 * used as the fast-pass for already-loaded */
+	*(void **)&pdyn_debuginfo_cu_abbrev_fini = dlsym(pdyn_libdebuginfo, "debuginfo_cu_abbrev_fini");
 	if unlikely(!pdyn_debuginfo_cu_abbrev_fini)
 		goto err_close;
-	if (!ATOMIC_CMPXCH(libdebuginfo, NULL, libdebuginfo)) {
-		dlclose(libdebuginfo);
-		if (ATOMIC_READ(libdebuginfo) == (void *)-1)
+	if (!ATOMIC_CMPXCH(pdyn_libdebuginfo, NULL, pdyn_libdebuginfo)) {
+		dlclose(pdyn_libdebuginfo);
+		if (ATOMIC_READ(pdyn_libdebuginfo) == (void *)-1)
 			return false;
 	}
 	return true;
 err_close:
-	dlclose(libdebuginfo);
+	dlclose(pdyn_libdebuginfo);
 err:
-	if (!ATOMIC_CMPXCH(libdebuginfo, NULL, (void *)-1))
+	if (!ATOMIC_CMPXCH(pdyn_libdebuginfo, NULL, (void *)-1))
 		goto again;
 	return false;
 }
@@ -280,7 +281,7 @@ libuw_unwind_call_function(unwind_emulator_t *__restrict self,
 	if unlikely(!self->ue_sectinfo)
 		ERROR(err_invalid_function);
 #ifndef __KERNEL__
-	/* Lazily load libdebuginfo.so, so we can parser the .debug_info section */
+	/* Lazily load pdyn_libdebuginfo.so, so we can parser the .debug_info section */
 	if (!pdyn_debuginfo_cu_abbrev_fini && unlikely(libuw_load_libdebuginfo()))
 		ERROR(err_invalid_function);
 	COMPILER_READ_BARRIER();

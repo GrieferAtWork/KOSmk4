@@ -127,7 +127,7 @@ DEFINE_PUBLIC_ALIAS(error_subclass, libc_error_subclass);
 /* Exception support. */
 
 /* Dynamically loaded dependencies to libunwind.so */
-PRIVATE SECTION_EXCEPT_BSS void                                   *pdyn_libunwind = NULL;
+INTERN SECTION_EXCEPT_BSS void                                    *pdyn_libunwind = NULL;
 PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_FIND                        pdyn_unwind_fde_find = NULL;
 PRIVATE SECTION_EXCEPT_BSS PUNWIND_GETREG_ERROR_REGISTER_STATE     pdyn_unwind_getreg_error_register_state = NULL;
 PRIVATE SECTION_EXCEPT_BSS PUNWIND_SETREG_ERROR_REGISTER_STATE     pdyn_unwind_setreg_error_register_state = NULL;
@@ -158,7 +158,7 @@ PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_sigframe_apply[] = "unw
 #endif /* !CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS */
 
 
-PRIVATE SECTION_EXCEPT_TEXT ATTR_NOINLINE
+INTERN SECTION_EXCEPT_TEXT ATTR_NOINLINE
 void LIBCCALL initialize_libunwind(void) {
 	void *handle;
 	handle = dlopen(name_libunwind_so, RTLD_LOCAL);

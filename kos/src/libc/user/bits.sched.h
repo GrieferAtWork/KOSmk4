@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2bf16613 */
+/* HASH CRC-32:0x483d128b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,7 @@ INTDEF NONNULL((1)) pid_t NOTHROW_NCX(VLIBCCALL libc_clone)(__clone_func_t fn, v
 INTDEF int NOTHROW_NCX(LIBCCALL libc_unshare)(int flags);
 /* >> sched_getcpu(3)
  * Returns the number of the CPU for the calling thread.
- * Note that due to unforseeable scheduling conditions, this may change at any
+ * Note that due to unforeseeable scheduling conditions, this may change at any
  * moment, even before this function returns, or before the caller was able to
  * act on its return value. For that reason, this function must only be taken
  * as a hint */

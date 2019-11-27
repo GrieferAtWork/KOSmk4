@@ -220,18 +220,18 @@ libda_single_generic(struct disassembler *__restrict self) {
 
 #ifdef CONFIG_LOOKUP_SYMBOL_NAME
 #ifndef __KERNEL__
-PRIVATE void *libdebuginfo = NULL;
+PRIVATE void *pdyn_libdebuginfo = NULL;
 PRIVATE ATTR_NOINLINE WUNUSED void *CC get_libdebuginfo(void) {
 	void *result;
 again:
-	result = ATOMIC_READ(libdebuginfo);
+	result = ATOMIC_READ(pdyn_libdebuginfo);
 	if (result == (void *)-1)
 		return NULL;
 	if (!result) {
 		result = dlopen(LIBDEBUGINFO_LIBRARY_NAME, RTLD_LOCAL);
 		if (!result)
 			result = (void *)-1;
-		if (!ATOMIC_CMPXCH(libdebuginfo, NULL, result)) {
+		if (!ATOMIC_CMPXCH(pdyn_libdebuginfo, NULL, result)) {
 			if (result != (void *)-1)
 				dlclose(result);
 			goto again;
@@ -271,8 +271,8 @@ PRIVATE ATTR_NOINLINE WUNUSED bool CC init_libdebuginfo(void) {
 
 __attribute__((__destructor__))
 PRIVATE void fini_libdebuginfo() {
-	if (libdebuginfo && libdebuginfo != (void *)-1)
-		dlclose(libdebuginfo);
+	if (pdyn_libdebuginfo && pdyn_libdebuginfo != (void *)-1)
+		dlclose(pdyn_libdebuginfo);
 };
 
 #endif /* !__KERNEL__ */
@@ -303,7 +303,7 @@ libda_disasm_print_symbol(struct disassembler *__restrict self,
 			__IF1
 #endif /* __KERNEL__ */
 			{
-				/* Use libdebuginfo as source for symbol names. */
+				/* Use pdyn_libdebuginfo as source for symbol names. */
 				di_debug_addr2line_t a2l_info;
 				di_debug_sections_t dbg_sect;
 				di_dl_debug_sections_t dl_sect;

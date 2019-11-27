@@ -20,6 +20,8 @@
 #define GUARD_LIBC_USER_CRYPT_C 1
 
 #include "../api.h"
+/**/
+
 #include "crypt.h"
 
 DECL_BEGIN

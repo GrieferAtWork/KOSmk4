@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36d7df08 */
+/* HASH CRC-32:0x6af60d74 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,7 +87,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_aprintf_pack) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_pack))(struct format_aprintf_data *__restrict __self,
                                                                  __SIZE_TYPE__ *__pstrlen) {
-#line 1096 "kos/src/libc/magic/format-printer.c"
+#line 1098 "kos/src/libc/magic/format-printer.c"
 	/* Free unused buffer memory. */
 	char *__result;
 	if (__self->ap_avail != 0) {

@@ -482,7 +482,7 @@ unshare:(int flags) -> int;
 
 @@>> sched_getcpu(3)
 @@Returns the number of the CPU for the calling thread.
-@@Note that due to unforseeable scheduling conditions, this may change at any
+@@Note that due to unforeseeable scheduling conditions, this may change at any
 @@moment, even before this function returns, or before the caller was able to
 @@act on its return value. For that reason, this function must only be taken
 @@as a hint

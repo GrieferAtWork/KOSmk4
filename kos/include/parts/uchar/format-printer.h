@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55049c3e */
+/* HASH CRC-32:0x11864e68 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1780,7 +1780,7 @@ struct format_c32aprintf_data {
  * Together with `format_c16aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
  * >> char *result; ssize_t error;
- * >> struct format_aprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
+ * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
  * >> error = format_c16printf(&format_c16aprintf_printer, &p, L"%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
  * >>     format_waprintf_data_fini(&p);
@@ -1802,7 +1802,7 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONN
  * Together with `format_c16aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
  * >> char *result; ssize_t error;
- * >> struct format_aprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
+ * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
  * >> error = format_c16printf(&format_c16aprintf_printer, &p, L"%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
  * >>     format_waprintf_data_fini(&p);
@@ -1826,7 +1826,7 @@ __CREDIRECT_DOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_
  * Together with `format_c16aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
  * >> char *result; ssize_t error;
- * >> struct format_aprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
+ * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
  * >> error = format_c16printf(&format_c16aprintf_printer, &p, L"%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
  * >>     format_waprintf_data_fini(&p);
@@ -1849,7 +1849,7 @@ __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NON
  * Together with `format_c16aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
  * >> char *result; ssize_t error;
- * >> struct format_aprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
+ * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
  * >> error = format_c16printf(&format_c16aprintf_printer, &p, L"%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
  * >>     format_waprintf_data_fini(&p);
@@ -1873,7 +1873,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_c16aprintf_pack, __FORCELOCAL __ATTR_MALL
  * Together with `format_c32aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
  * >> char *result; ssize_t error;
- * >> struct format_aprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
+ * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
  * >> error = format_c32printf(&format_c32aprintf_printer, &p, L"%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
  * >>     format_waprintf_data_fini(&p);
@@ -1897,7 +1897,7 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONN
  * Together with `format_c32aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
  * >> char *result; ssize_t error;
- * >> struct format_aprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
+ * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
  * >> error = format_c32printf(&format_c32aprintf_printer, &p, L"%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
  * >>     format_waprintf_data_fini(&p);
@@ -1920,7 +1920,7 @@ __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NON
  * Together with `format_c32aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
  * >> char *result; ssize_t error;
- * >> struct format_aprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
+ * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
  * >> error = format_c32printf(&format_c32aprintf_printer, &p, L"%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
  * >>     format_waprintf_data_fini(&p);
@@ -1939,13 +1939,72 @@ __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NON
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_c32aprintf_pack, __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) char32_t *__NOTHROW_NCX(__LIBCCALL format_c32aprintf_pack)(struct format_c32aprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c32aprintf_pack))(__self, __pstrlen); })
 #endif /* LIBC: format_c32aprintf_pack */
 #endif /* format_c32aprintf_pack... */
+#if defined(__CRT_HAVE_format_waprintf_alloc) && (__SIZEOF_WCHAR_T__ == 2)
+/* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,format_c16aprintf_alloc,(struct format_c16aprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars),format_waprintf_alloc,(__self,__num_wchars))
+#elif defined(__CRT_HAVE_DOS$format_waprintf_alloc)
+/* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,format_c16aprintf_alloc,(struct format_c16aprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars),format_waprintf_alloc,(__self,__num_wchars))
+#elif defined(__CRT_HAVE_realloc)
+#if __SIZEOF_WCHAR_T__ == 2
+#include <local/parts.wchar.format-printer/format_waprintf_alloc.h>
+/* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+__FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) char16_t *__NOTHROW_NCX(__LIBCCALL format_c16aprintf_alloc)(struct format_c16aprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars) { return (char16_t *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_waprintf_alloc))((struct format_waprintf_data *)__self, __num_wchars); }
+#else /* LIBC: format_c16aprintf_alloc */
+#include <local/parts.wchar.format-printer/format_c16aprintf_alloc.h>
+/* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_c16aprintf_alloc, __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) char16_t *__NOTHROW_NCX(__LIBCCALL format_c16aprintf_alloc)(struct format_c16aprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c16aprintf_alloc))(__self, __num_wchars); })
+#endif /* LIBC: format_c16aprintf_alloc */
+#endif /* format_c16aprintf_alloc... */
+#if defined(__CRT_HAVE_format_waprintf_alloc) && (__SIZEOF_WCHAR_T__ == 4)
+/* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,format_c32aprintf_alloc,(struct format_c32aprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars),format_waprintf_alloc,(__self,__num_wchars))
+#elif defined(__CRT_HAVE_realloc)
+#if __SIZEOF_WCHAR_T__ == 4
+#include <local/parts.wchar.format-printer/format_waprintf_alloc.h>
+/* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+__FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) char32_t *__NOTHROW_NCX(__LIBCCALL format_c32aprintf_alloc)(struct format_c32aprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars) { return (char32_t *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_waprintf_alloc))((struct format_waprintf_data *)__self, __num_wchars); }
+#else /* LIBC: format_c32aprintf_alloc */
+#include <local/parts.wchar.format-printer/format_c32aprintf_alloc.h>
+/* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_c32aprintf_alloc, __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) char32_t *__NOTHROW_NCX(__LIBCCALL format_c32aprintf_alloc)(struct format_c32aprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c32aprintf_alloc))(__self, __num_wchars); })
+#endif /* LIBC: format_c32aprintf_alloc */
+#endif /* format_c32aprintf_alloc... */
 #if defined(__CRT_HAVE_format_waprintf_printer) && (__SIZEOF_WCHAR_T__ == 2)
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_c16aprintf_printer,(/*struct format_waprintf_data **/ void *__arg, char16_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_waprintf_printer,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_waprintf_printer)
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_c16aprintf_printer,(/*struct format_waprintf_data **/ void *__arg, char16_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_waprintf_printer,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_waprintf_alloc)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/parts.wchar.format-printer/format_waprintf_printer.h>
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
@@ -1959,7 +2018,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_c16aprintf_printer, __FORCELOCAL __ATTR_W
 #if defined(__CRT_HAVE_format_waprintf_printer) && (__SIZEOF_WCHAR_T__ == 4)
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_c32aprintf_printer,(/*struct format_waprintf_data **/ void *__arg, char32_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_waprintf_printer,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_waprintf_alloc)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/parts.wchar.format-printer/format_waprintf_printer.h>
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */

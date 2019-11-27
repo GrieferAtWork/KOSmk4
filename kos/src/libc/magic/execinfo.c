@@ -17,6 +17,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
+%[default_impl_section(.text.crt.debug)]
+
 %{
 #include <features.h>
 #include <bits/types.h>

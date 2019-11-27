@@ -22,11 +22,11 @@
 #include "../api.h"
 /**/
 
-#include "stdio.h"
-#include "stdio-api.h"
-#include "string.h"
-#include "stdlib.h"
 #include "err.h"
+#include "stdio-api.h"
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
 
 DECL_BEGIN
 

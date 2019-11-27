@@ -20,12 +20,15 @@
 #define GUARD_LIBC_USER_DIRECT_C 1
 
 #include "../api.h"
-#include "direct.h"
+/**/
+
+#include <kos/syscalls.h>
 
 #include <fcntl.h>
-#include <kos/syscalls.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+#include "direct.h"
 
 DECL_BEGIN
 

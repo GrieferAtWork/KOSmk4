@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30f07f23 */
+/* HASH CRC-32:0xd18dc632 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -124,8 +124,6 @@
 #define __stub_atan2 1
 #define __stub_atanh 1
 #define __stub_atexit 1
-#define __stub_backtrace 1
-#define __stub_backtrace_symbols 1
 #define __stub_backtrace_symbols_fd 1
 #define __stub_bindresvport 1
 #define __stub_bindresvport6 1
@@ -441,8 +439,6 @@
 #define __stub_pow10 1
 #define __stub_preadv 1
 #define __stub_preadv64 1
-#define __stub_prlimit 1
-#define __stub_prlimit64 1
 #define __stub_process_vm_readv 1
 #define __stub_process_vm_writev 1
 #define __stub_psiginfo 1
@@ -562,7 +558,6 @@
 #define __stub_scalbn 1
 #define __stub_scandir 1
 #define __stub_scandirat 1
-#define __stub_sched_getcpu 1
 #define __stub_seed48 1
 #define __stub_seed48_r 1
 #define __stub_semctl 1

@@ -193,6 +193,8 @@ struct format_c32aprintf_data {
 
 [alias(*)][attribute(*)] format_c16aprintf_pack:(*) %{uchar(format_waprintf_pack)}
 [alias(*)][attribute(*)] format_c32aprintf_pack:(*) %{uchar(format_waprintf_pack)}
+[alias(*)][attribute(*)] format_c16aprintf_alloc:(*) %{uchar(format_waprintf_alloc)}
+[alias(*)][attribute(*)] format_c32aprintf_alloc:(*) %{uchar(format_waprintf_alloc)}
 [alias(*)][attribute(*)] format_c16aprintf_printer:(*) %{uchar(format_waprintf_printer)}
 [alias(*)][attribute(*)] format_c32aprintf_printer:(*) %{uchar(format_waprintf_printer)}
 

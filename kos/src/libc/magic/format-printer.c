@@ -1056,6 +1056,17 @@ struct format_aprintf_data {
 
 }
 
+%[define(DEFINE_FORMAT_APRINTF_DATA =
+#ifndef __format_aprintf_data_defined
+#define __format_aprintf_data_defined 1
+struct format_aprintf_data {
+	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
+	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+};
+#endif /* !__format_aprintf_data_defined */
+)]
+
 
 @@Pack and finalize a given aprintf format printer
 @@Together with `format_aprintf_printer()', the aprintf
@@ -1081,16 +1092,7 @@ struct format_aprintf_data {
 [dependency_include(<hybrid/__assert.h>)]
 [dependency_include(<hybrid/typecore.h>)]
 [ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC]
-[dependency_prefix(
-#ifndef __format_aprintf_data_defined
-#define __format_aprintf_data_defined 1
-struct format_aprintf_data {
-	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
-	__SIZE_TYPE__ ap_used;  /* Used buffer size */
-};
-#endif /* !__format_aprintf_data_defined */
-)]
+[dependency_prefix(DEFINE_FORMAT_APRINTF_DATA)]
 format_aprintf_pack:([nonnull] struct format_aprintf_data *__restrict self,
                      [nullable] $size_t *pstrlen) -> char * {
 	/* Free unused buffer memory. */
@@ -1133,40 +1135,54 @@ format_aprintf_pack:([nonnull] struct format_aprintf_data *__restrict self,
 	return result;
 }
 
-@@Print data to a dynamically allocated heap buffer. On error, -1 is returned
+@@Allocate a buffer of `num_chars' characters at the end of `self'
+@@The returned pointer remains valid until the next time this function is called,
+@@the format_aprintf buffer `self' is finalized, or some other function is used
+@@to append additional data to the end of `self'
+@@@return: NULL: Failed to allocate additional memory
 [requires($has_function(realloc))][same_impl]
 [dependency_include(<hybrid/__assert.h>)][ATTR_WUNUSED]
-format_aprintf_printer:([nonnull] /*struct format_aprintf_data **/ void *arg,
-                        [nonnull] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
-	struct @__format_aprintf_data@ {
-		char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-		__SIZE_TYPE__ ap_avail; /* Unused buffer size */
-		__SIZE_TYPE__ ap_used;  /* Used buffer size */
-	};
-	struct @__format_aprintf_data@ *buf;
-	buf = (struct @__format_aprintf_data@ *)arg;
-	if (buf->ap_avail < datalen) {
+[dependency_prefix(DEFINE_FORMAT_APRINTF_DATA)]
+format_aprintf_alloc:([nonnull] struct format_aprintf_data *__restrict self,
+                      $size_t num_chars) -> [malloc(num_chars)] char * {
+	char *result;
+	if (self->@ap_avail@ < num_chars) {
 		char *newbuf;
-		size_t min_alloc = buf->ap_used + datalen;
-		size_t new_alloc = buf->ap_used + buf->ap_avail;
+		size_t min_alloc = self->@ap_used@ + num_chars;
+		size_t new_alloc = self->@ap_used@ + self->@ap_avail@;
 		if (!new_alloc)
 			new_alloc = 8;
 		while (new_alloc < min_alloc)
 			new_alloc *= 2;
-		newbuf = (char *)realloc(buf->ap_base, (new_alloc + 1) * sizeof(char));
+		newbuf = (char *)realloc(self->@ap_base@, (new_alloc + 1) * sizeof(char));
 		if unlikely(!newbuf) {
 			new_alloc = min_alloc;
-			newbuf    = (char *)realloc(buf->ap_base, (new_alloc + 1) * sizeof(char));
+			newbuf    = (char *)realloc(self->@ap_base@, (new_alloc + 1) * sizeof(char));
 			if unlikely(!newbuf)
-				return -1;
+				return NULL;
 		}
-		__hybrid_assert(new_alloc >= buf->ap_used + datalen);
-		buf->ap_base  = newbuf;
-		buf->ap_avail = new_alloc - buf->ap_used;
+		__hybrid_assert(new_alloc >= self->@ap_used@ + num_chars);
+		self->@ap_base@  = newbuf;
+		self->@ap_avail@ = new_alloc - self->@ap_used@;
 	}
-	memcpyc(buf->ap_base + buf->ap_used, data, datalen, sizeof(char));
-	buf->ap_avail -= datalen;
-	buf->ap_used  += datalen;
+	result = self->@ap_base@ + self->@ap_used@;
+	self->@ap_avail@ -= num_chars;
+	self->@ap_used@  += num_chars;
+	return result;
+}
+
+
+@@Print data to a dynamically allocated heap buffer. On error, -1 is returned
+@@This function is intended to be used as a pformatprinter-compatibile printer sink
+[requires($has_function(format_aprintf_alloc))][same_impl][ATTR_WUNUSED]
+format_aprintf_printer:([nonnull] /*struct format_aprintf_data **/ void *arg,
+                        [nonnull] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
+	char *buf;
+	buf = format_aprintf_alloc((struct @format_aprintf_data@ *)arg,
+	                           datalen);
+	if unlikely(!buf)
+		return -1;
+	memcpyc(buf, data, datalen, sizeof(char));
 	return (ssize_t)datalen;
 }
 
@@ -1179,13 +1195,13 @@ __SYSDECL_END
 #ifdef __USE_KOS
 #if defined(_WCHAR_H) && !defined(_PARTS_WCHAR_FORMAT_PRINTER_H)
 #include <parts/wchar/format-printer.h>
-#endif
+#endif /* _WCHAR_H && !_PARTS_WCHAR_FORMAT_PRINTER_H */
 #endif /* __USE_KOS */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_FORMAT_PRINTER_H)
 #include <parts/uchar/format-printer.h>
-#endif
+#endif /* _UCHAR_H && !_PARTS_UCHAR_FORMAT_PRINTER_H */
 #endif /* __USE_UTF */
 
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7e3e741 */
+/* HASH CRC-32:0xbaade05a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1831,7 +1831,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_wwidth") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_wwidth)(void *arg,
                                          char32_t const *__restrict data,
                                          size_t datalen) {
-#line 123 "kos/src/libc/magic/parts.wchar.format-printer.c"
+#line 124 "kos/src/libc/magic/parts.wchar.format-printer.c"
 #if 4 == 2
 	size_t result = 0;
 	char32_t const *iter, *end;
@@ -1865,7 +1865,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_wwidth") ssize_
 NOTHROW_NCX(LIBDCALL libd_format_wwidth)(void *arg,
                                          char16_t const *__restrict data,
                                          size_t datalen) {
-#line 123 "kos/src/libc/magic/parts.wchar.format-printer.c"
+#line 124 "kos/src/libc/magic/parts.wchar.format-printer.c"
 #if 2 == 2
 	size_t result = 0;
 	char16_t const *iter, *end;

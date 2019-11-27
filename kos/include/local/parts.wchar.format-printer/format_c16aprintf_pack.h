@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3436f405 */
+/* HASH CRC-32:0xdc338251 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,7 +68,7 @@ __NAMESPACE_LOCAL_BEGIN
  * Together with `format_c16aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
  * >> char *result; ssize_t error;
- * >> struct format_aprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
+ * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
  * >> error = format_c16printf(&format_c16aprintf_printer, &p, L"%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
  * >>     format_waprintf_data_fini(&p);
@@ -87,7 +87,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_c16aprintf_pack) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16aprintf_pack))(struct format_c16aprintf_data *__restrict __self,
                                                                     __SIZE_TYPE__ *__pstrlen) {
-#line 232 "kos/src/libc/magic/parts.wchar.format-printer.c"
+#line 236 "kos/src/libc/magic/parts.wchar.format-printer.c"
 	/* Free unused buffer memory. */
 	__CHAR16_TYPE__ *__result;
 	if (__self->ap_avail != 0) {

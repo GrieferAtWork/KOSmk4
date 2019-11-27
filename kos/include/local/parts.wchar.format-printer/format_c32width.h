@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ba7a606 */
+/* HASH CRC-32:0x4b0511fc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __LOCAL_LIBC(format_c32width) __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c32width))(void *__arg,
                                                              __CHAR32_TYPE__ const *__restrict __data,
                                                              __SIZE_TYPE__ __datalen) {
-#line 123 "kos/src/libc/magic/parts.wchar.format-printer.c"
+#line 124 "kos/src/libc/magic/parts.wchar.format-printer.c"
 #if 4 == 2
 	__SIZE_TYPE__ __result = 0;
 	__CHAR32_TYPE__ const *__iter, *__end;

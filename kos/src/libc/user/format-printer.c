@@ -101,8 +101,9 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_pack)(struct format_aprintf_data *__res
 }
 /*[[[end:format_aprintf_pack]]]*/
 
-/*[[[head:format_aprintf_printer,hash:CRC-32=0x91067bd0]]]*/
-/* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
+/*[[[head:format_aprintf_printer,hash:CRC-32=0x27da08f9]]]*/
+/* Print data to a dynamically allocated heap buffer. On error, -1 is returned
+ * This function is intended to be used as a pformatprinter-compatibile printer sink */
 INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_aprintf_printer") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_aprintf_printer)(/*struct format_aprintf_data **/ void *arg,
@@ -110,45 +111,62 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_printer)(/*struct format_aprintf_data *
                                                   size_t datalen)
 /*[[[body:format_aprintf_printer]]]*/
 /*AUTO*/{
-	struct __format_aprintf_data {
-		char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-		__SIZE_TYPE__ ap_avail; /* Unused buffer size */
-		__SIZE_TYPE__ ap_used;  /* Used buffer size */
-	};
-	struct __format_aprintf_data *buf;
-	buf = (struct __format_aprintf_data *)arg;
-	if (buf->ap_avail < datalen) {
+	char *buf;
+	buf = libc_format_aprintf_alloc((struct format_aprintf_data *)arg,
+	                           datalen);
+	if unlikely(!buf)
+		return -1;
+	memcpyc(buf, data, datalen, sizeof(char));
+	return (ssize_t)datalen;
+}
+/*[[[end:format_aprintf_printer]]]*/
+
+/*[[[head:format_aprintf_alloc,hash:CRC-32=0x2120489]]]*/
+/* Allocate a buffer of `num_chars' characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) ATTR_ALLOC_SIZE((2))
+ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_aprintf_alloc") char *
+NOTHROW_NCX(LIBCCALL libc_format_aprintf_alloc)(struct format_aprintf_data *__restrict self,
+                                                size_t num_chars)
+/*[[[body:format_aprintf_alloc]]]*/
+/*AUTO*/{
+	char *result;
+	if (self->ap_avail < num_chars) {
 		char *newbuf;
-		size_t min_alloc = buf->ap_used + datalen;
-		size_t new_alloc = buf->ap_used + buf->ap_avail;
+		size_t min_alloc = self->ap_used + num_chars;
+		size_t new_alloc = self->ap_used + self->ap_avail;
 		if (!new_alloc)
 			new_alloc = 8;
 		while (new_alloc < min_alloc)
 			new_alloc *= 2;
-		newbuf = (char *)libc_realloc(buf->ap_base, (new_alloc + 1) * sizeof(char));
+		newbuf = (char *)libc_realloc(self->ap_base, (new_alloc + 1) * sizeof(char));
 		if unlikely(!newbuf) {
 			new_alloc = min_alloc;
-			newbuf    = (char *)libc_realloc(buf->ap_base, (new_alloc + 1) * sizeof(char));
+			newbuf    = (char *)libc_realloc(self->ap_base, (new_alloc + 1) * sizeof(char));
 			if unlikely(!newbuf)
-				return -1;
+				return NULL;
 		}
-		__hybrid_assert(new_alloc >= buf->ap_used + datalen);
-		buf->ap_base  = newbuf;
-		buf->ap_avail = new_alloc - buf->ap_used;
+		__hybrid_assert(new_alloc >= self->ap_used + num_chars);
+		self->ap_base  = newbuf;
+		self->ap_avail = new_alloc - self->ap_used;
 	}
-	memcpyc(buf->ap_base + buf->ap_used, data, datalen, sizeof(char));
-	buf->ap_avail -= datalen;
-	buf->ap_used  += datalen;
-	return (ssize_t)datalen;
+	result = self->ap_base + self->ap_used;
+	self->ap_avail -= num_chars;
+	self->ap_used  += num_chars;
+	return result;
 }
-/*[[[end:format_aprintf_printer]]]*/
+/*[[[end:format_aprintf_alloc]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xc53cf32b]]]*/
+/*[[[start:exports,hash:CRC-32=0x914031f8]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(format_aprintf_pack, libc_format_aprintf_pack);
+DEFINE_PUBLIC_WEAK_ALIAS(format_aprintf_alloc, libc_format_aprintf_alloc);
 DEFINE_PUBLIC_WEAK_ALIAS(format_aprintf_printer, libc_format_aprintf_printer);
 /*[[[end:exports]]]*/
 

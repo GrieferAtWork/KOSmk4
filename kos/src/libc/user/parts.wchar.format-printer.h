@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e3ca30d */
+/* HASH CRC-32:0x41942fbe */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ DECL_BEGIN
  * Together with `format_waprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
  * >> char *result; ssize_t error;
- * >> struct format_aprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
+ * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
  * >> error = format_wprintf(&format_waprintf_printer, &p, L"%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
  * >>     format_waprintf_data_fini(&p);
@@ -53,7 +53,7 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char32_t *NOTH
  * Together with `format_waprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
  * >> char *result; ssize_t error;
- * >> struct format_aprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
+ * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
  * >> error = format_wprintf(&format_waprintf_printer, &p, L"%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
  * >>     format_waprintf_data_fini(&p);
@@ -70,6 +70,18 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char32_t *NOTH
  *                  printed to the waprintf-printer at one point.
  *                  (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)') */
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *NOTHROW_NCX(LIBDCALL libd_format_waprintf_pack)(struct format_c16aprintf_data *__restrict self, size_t *pstrlen);
+/* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char32_t *NOTHROW_NCX(LIBCCALL libc_format_waprintf_alloc)(struct format_c32aprintf_data *__restrict self, size_t num_wchars);
+/* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *NOTHROW_NCX(LIBDCALL libd_format_waprintf_alloc)(struct format_c16aprintf_data *__restrict self, size_t num_wchars);
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 INTDEF WUNUSED NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_waprintf_printer)(/*struct format_waprintf_data **/ void *arg, char32_t const *__restrict data, size_t datalen);
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */

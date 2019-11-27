@@ -20,9 +20,11 @@
 #define GUARD_LIBC_USER_DOS_C 1
 
 #include "../api.h"
-#include "dos.h"
+/**/
 
 #include <unistd.h>
+
+#include "dos.h"
 
 DECL_BEGIN
 

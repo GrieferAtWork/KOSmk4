@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9155d11b */
+/* HASH CRC-32:0xe61b8022 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -122,6 +122,7 @@
 #define __CRT_HAVE_DOS$file_wprinter 1
 #define __CRT_HAVE_DOS$file_wprinter_unlocked 1
 #define __CRT_HAVE_DOS$format_vwprintf 1
+#define __CRT_HAVE_DOS$format_waprintf_alloc 1
 #define __CRT_HAVE_DOS$format_waprintf_pack 1
 #define __CRT_HAVE_DOS$format_waprintf_printer 1
 #define __CRT_HAVE_DOS$format_wescape 1
@@ -1932,6 +1933,7 @@
 #define __CRT_HAVE_format_32to8 1
 #define __CRT_HAVE_format_8to16 1
 #define __CRT_HAVE_format_8to32 1
+#define __CRT_HAVE_format_aprintf_alloc 1
 #define __CRT_HAVE_format_aprintf_pack 1
 #define __CRT_HAVE_format_aprintf_printer 1
 #define __CRT_HAVE_format_escape 1
@@ -1946,6 +1948,7 @@
 #define __CRT_HAVE_format_vprintf 1
 #define __CRT_HAVE_format_vscanf 1
 #define __CRT_HAVE_format_vwprintf 1
+#define __CRT_HAVE_format_waprintf_alloc 1
 #define __CRT_HAVE_format_waprintf_pack 1
 #define __CRT_HAVE_format_waprintf_printer 1
 #define __CRT_HAVE_format_wescape 1

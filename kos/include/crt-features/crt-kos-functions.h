@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeade3784 */
+/* HASH CRC-32:0xb1ee80f4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -780,6 +780,7 @@ __CRT_FUNCTION(format_32to16,0,(),3,(/*struct format_32to16_data **/ void *,arg,
 __CRT_FUNCTION(format_32to8,0,(),3,(/*struct format_32to8_data **/ void *,arg,char32_t const *,data,size_t,datalen),ssize_t)
 __CRT_FUNCTION(format_8to16,0,(),3,(/*struct format_8to16_data **/ void *,arg,/*utf-8*/ char const *,data,size_t,datalen),ssize_t)
 __CRT_FUNCTION(format_8to32,0,(),3,(/*struct format_8to32_data **/ void *,arg,/*utf-8*/ char const *,data,size_t,datalen),ssize_t)
+__CRT_FUNCTION(format_aprintf_alloc,0,(),2,(struct format_aprintf_data *__restrict,self,size_t,num_chars),char *)
 __CRT_FUNCTION(format_aprintf_pack,0,(),2,(struct format_aprintf_data *__restrict,self,size_t *,pstrlen),char *)
 __CRT_FUNCTION(format_aprintf_printer,0,(),3,(/*struct format_aprintf_data **/ void *,arg,/*utf-8*/ char const *__restrict,data,size_t,datalen),ssize_t)
 __CRT_FUNCTION(format_escape,0,(),5,(pformatprinter,printer,void *,arg,/*utf-8*/ char const *__restrict,text,size_t,textlen,unsigned int,flags),ssize_t)
@@ -1622,7 +1623,7 @@ __CRT_FUNCTION(preadv64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,preadv),4,(f
 __CRT_FUNCTION(printf,0,(),VA(1),(char const *__restrict,format),__STDC_INT_AS_SSIZE_T)
 __CRT_FUNCTION(printf_unlocked,0,(),VA(1),(char const *__restrict,format),__STDC_INT_AS_SSIZE_T)
 __CRT_FUNCTION(prlimit,0,(),4,(pid_t,pid,__rlimit_resource_t,resource,struct rlimit const *,new_limit,struct rlimit *,old_limit),int)
-__CRT_FUNCTION(prlimit64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,prlimit),4,(pid_t,pid,__rlimit_resource_t,resource,struct rlimit64 const *,new_limit,struct rlimit64 *,old_limit),int)
+__CRT_FUNCTION(prlimit64,1,(__SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__,prlimit),4,(pid_t,pid,__rlimit_resource_t,resource,struct rlimit64 const *,new_limit,struct rlimit64 *,old_limit),int)
 __CRT_FUNCTION(process_vm_readv,0,(),6,(pid_t,pid,struct iovec const *,llocal_iov,unsigned long int,liovcnt,struct iovec const *,remote_iov,unsigned long int,riovcnt,unsigned long int,flags),ssize_t)
 __CRT_FUNCTION(process_vm_writev,0,(),6,(pid_t,pid,struct iovec const *,local_iov,unsigned long int,liovcnt,struct iovec const *,remote_iov,unsigned long int,riovcnt,unsigned long int,flags),ssize_t)
 __CRT_FUNCTION(profil,0,(),4,(unsigned short int *,sample_buffer,size_t,size,size_t,offset,unsigned int,scale),int)
@@ -3214,6 +3215,7 @@ __CRT_FAKE_FUNCTION(file_c32printer,0,(),3,(void *,arg,char32_t const *__restric
 __CRT_FAKE_FUNCTION(file_c32printer_unlocked,0,(),3,(void *,arg,char32_t const *__restrict,data,size_t,datalen),ssize_t)
 __CRT_FAKE_FUNCTION(fileno_unlocked,0,(),1,(FILE *__restrict,stream),fd_t)
 __CRT_FAKE_FUNCTION(flushall,0,(),0,(),int)
+__CRT_FAKE_FUNCTION(format_c16aprintf_alloc,0,(),2,(struct format_c16aprintf_data *__restrict,self,size_t,num_wchars),char16_t *)
 __CRT_FAKE_FUNCTION(format_c16aprintf_pack,0,(),2,(struct format_c16aprintf_data *__restrict,self,size_t *,pstrlen),char16_t *)
 __CRT_FAKE_FUNCTION(format_c16aprintf_printer,0,(),3,(/*struct format_waprintf_data **/ void *,arg,char16_t const *__restrict,data,size_t,datalen),ssize_t)
 __CRT_FAKE_FUNCTION(format_c16escape,0,(),5,(pc16formatprinter,printer,void *,arg,/*utf-8*/ char16_t const *__restrict,text,size_t,textlen,unsigned int,flags),ssize_t)
@@ -3224,6 +3226,7 @@ __CRT_FAKE_FUNCTION(format_c16repeat,0,(),4,(pc16formatprinter,printer,void *,ar
 __CRT_FAKE_FUNCTION(format_c16snprintf_printer,0,(),3,(/*struct format_wsnprintf_data**/ void *,arg,char16_t const *__restrict,data,size_t,datalen),ssize_t)
 __CRT_FAKE_FUNCTION(format_c16sprintf_printer,0,(),3,(/*char16_t ***/ void *,arg,char16_t const *__restrict,data,size_t,datalen),ssize_t)
 __CRT_FAKE_FUNCTION(format_c16width,0,(),3,(void *,arg,char16_t const *__restrict,data,size_t,datalen),ssize_t)
+__CRT_FAKE_FUNCTION(format_c32aprintf_alloc,0,(),2,(struct format_c32aprintf_data *__restrict,self,size_t,num_wchars),char32_t *)
 __CRT_FAKE_FUNCTION(format_c32aprintf_pack,0,(),2,(struct format_c32aprintf_data *__restrict,self,size_t *,pstrlen),char32_t *)
 __CRT_FAKE_FUNCTION(format_c32aprintf_printer,0,(),3,(/*struct format_waprintf_data **/ void *,arg,char32_t const *__restrict,data,size_t,datalen),ssize_t)
 __CRT_FAKE_FUNCTION(format_c32escape,0,(),5,(pc32formatprinter,printer,void *,arg,/*utf-8*/ char32_t const *__restrict,text,size_t,textlen,unsigned int,flags),ssize_t)
@@ -3541,6 +3544,7 @@ __CRT_KOS_WCHAR_FUNCTION(fgetws_unlocked,0,(),3,(char32_t *__restrict,buf,__STDC
 __CRT_KOS_WCHAR_FUNCTION(file_wprinter,0,(),3,(void *,arg,char32_t const *__restrict,data,size_t,datalen),ssize_t)
 __CRT_KOS_WCHAR_FUNCTION(file_wprinter_unlocked,0,(),3,(void *,arg,char32_t const *__restrict,data,size_t,datalen),ssize_t)
 __CRT_KOS_WCHAR_FUNCTION(format_vwprintf,0,(),4,(pc32formatprinter,printer,void *,arg,char32_t const *__restrict,format,__builtin_va_list,args),ssize_t)
+__CRT_KOS_WCHAR_FUNCTION(format_waprintf_alloc,0,(),2,(struct format_c32aprintf_data *__restrict,self,size_t,num_wchars),char32_t *)
 __CRT_KOS_WCHAR_FUNCTION(format_waprintf_pack,0,(),2,(struct format_c32aprintf_data *__restrict,self,size_t *,pstrlen),char32_t *)
 __CRT_KOS_WCHAR_FUNCTION(format_waprintf_printer,0,(),3,(/*struct format_waprintf_data **/ void *,arg,char32_t const *__restrict,data,size_t,datalen),ssize_t)
 __CRT_KOS_WCHAR_FUNCTION(format_wescape,0,(),5,(pc32formatprinter,printer,void *,arg,/*utf-8*/ char32_t const *__restrict,text,size_t,textlen,unsigned int,flags),ssize_t)
@@ -3864,6 +3868,7 @@ __CRT_DOS_WCHAR_FUNCTION(fgetws_unlocked,0,(),3,(char16_t *__restrict,buf,__STDC
 __CRT_DOS_WCHAR_FUNCTION(file_wprinter,0,(),3,(void *,arg,char16_t const *__restrict,data,size_t,datalen),ssize_t)
 __CRT_DOS_WCHAR_FUNCTION(file_wprinter_unlocked,0,(),3,(void *,arg,char16_t const *__restrict,data,size_t,datalen),ssize_t)
 __CRT_DOS_WCHAR_FUNCTION(format_vwprintf,0,(),4,(pc16formatprinter,printer,void *,arg,char16_t const *__restrict,format,__builtin_va_list,args),ssize_t)
+__CRT_DOS_WCHAR_FUNCTION(format_waprintf_alloc,0,(),2,(struct format_c16aprintf_data *__restrict,self,size_t,num_wchars),char16_t *)
 __CRT_DOS_WCHAR_FUNCTION(format_waprintf_pack,0,(),2,(struct format_c16aprintf_data *__restrict,self,size_t *,pstrlen),char16_t *)
 __CRT_DOS_WCHAR_FUNCTION(format_waprintf_printer,0,(),3,(/*struct format_waprintf_data **/ void *,arg,char16_t const *__restrict,data,size_t,datalen),ssize_t)
 __CRT_DOS_WCHAR_FUNCTION(format_wescape,0,(),5,(pc16formatprinter,printer,void *,arg,/*utf-8*/ char16_t const *__restrict,text,size_t,textlen,unsigned int,flags),ssize_t)

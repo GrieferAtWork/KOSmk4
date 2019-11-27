@@ -597,7 +597,6 @@ PRIVATE ATTR_DBGRODATA char const hd_help[] =
 "CTRL+S       Save changes    CTRL+Z/Y             Discard changes\n"
 "F2:          Go to address   F4:                  Cycle display mode";
 
-#define ADDRSPACE_HALFSIZE ((((size_t)-1) / 2) + 1)
 
 PRIVATE ATTR_DBGTEXT void *
 NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {

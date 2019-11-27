@@ -190,7 +190,7 @@ struct rusage {
 %
 prlimit:($pid_t pid, __rlimit_resource_t resource, struct rlimit const *new_limit, struct rlimit *old_limit) -> int;
 %#ifdef __USE_LARGEFILE64
-[off64_variant_of(prlimit)]
+[rlim64_variant_of(prlimit)]
 prlimit64:($pid_t pid, __rlimit_resource_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit) -> int;
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_GNU */

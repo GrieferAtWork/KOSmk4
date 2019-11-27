@@ -23,18 +23,18 @@
 /**/
 
 #include "crtdbg.h"
+#include "direct.h"
 #include "malloc.h"
+#include "parts.wchar.unistd.h"
+#include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
-#include "wchar.h"
-#include "direct.h"
-#include "stdio.h"
 #include "unistd.h"
-#include "parts.wchar.unistd.h"
+#include "wchar.h"
 
-#define libc_c16dup libd_wcsdup
+#define libc_c16dup    libd_wcsdup
 #define libc_c16getcwd libd_wgetcwd
-#define libc__msize libc_malloc_usable_size
+#define libc__msize    libc_malloc_usable_size
 
 DECL_BEGIN
 

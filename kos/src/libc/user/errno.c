@@ -20,6 +20,8 @@
 #define GUARD_LIBC_USER_ERRNO_C 1
 
 #include "../api.h"
+/**/
+
 #include "errno.h"
 
 DECL_BEGIN

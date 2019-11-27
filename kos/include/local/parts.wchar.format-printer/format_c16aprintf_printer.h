@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9430d92 */
+/* HASH CRC-32:0x927e5eaf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,44 +18,65 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_format_c16aprintf_printer_defined
-#ifdef __CRT_HAVE_realloc
+#if defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_waprintf_alloc)
 #define __local_format_c16aprintf_printer_defined 1
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <hybrid/__assert.h>
-/* Dependency: "realloc" */
-#ifndef ____localdep_realloc_defined
-#define ____localdep_realloc_defined 1
-#ifdef __std___localdep_realloc_defined
-__NAMESPACE_STD_USING(__localdep_realloc)
-#elif __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
-__FORCELOCAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL __localdep_realloc)(void *__mallptr, __SIZE_TYPE__ __n_bytes) { return __builtin_realloc(__mallptr, __n_bytes); }
+/* Dependency: "format_waprintf_alloc" from "parts.wchar.format-printer" */
+#ifndef ____localdep_format_c16aprintf_alloc_defined
+#define ____localdep_format_c16aprintf_alloc_defined 1
+#if defined(__CRT_HAVE_format_waprintf_alloc) && (__SIZEOF_WCHAR_T__ == 2)
+/* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_format_c16aprintf_alloc,(struct format_c16aprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars),format_waprintf_alloc,(__self,__num_wchars))
+#elif defined(__CRT_HAVE_DOS$format_waprintf_alloc)
+/* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_format_c16aprintf_alloc,(struct format_c16aprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars),format_waprintf_alloc,(__self,__num_wchars))
 #elif defined(__CRT_HAVE_realloc)
-__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __n_bytes),realloc,(__mallptr,__n_bytes))
-#else /* LIBC: realloc */
-#undef ____localdep_realloc_defined
-#endif /* realloc... */
-#endif /* !____localdep_realloc_defined */
+#if __SIZEOF_WCHAR_T__ == 2
+#include <local/parts.wchar.format-printer/format_waprintf_alloc.h>
+/* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+#define __localdep_format_c16aprintf_alloc(self, num_wchars) (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_waprintf_alloc))((struct format_waprintf_data *)(self), num_wchars)
+#else /* LIBC: format_c16aprintf_alloc */
+#include <local/parts.wchar.format-printer/format_c16aprintf_alloc.h>
+/* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+#define __localdep_format_c16aprintf_alloc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c16aprintf_alloc))
+#endif /* LIBC: format_c16aprintf_alloc */
+#else /* CUSTOM: format_waprintf_alloc */
+#undef ____localdep_format_c16aprintf_alloc_defined
+#endif /* format_c16aprintf_alloc... */
+#endif /* !____localdep_format_c16aprintf_alloc_defined */
 
-/* Dependency: "memcpyc" from "string" */
-#ifndef ____localdep_memcpyc_defined
-#define ____localdep_memcpyc_defined 1
-#ifdef __fast_memcpyc_defined
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-#define __localdep_memcpyc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyc))
-#elif defined(__CRT_HAVE_memcpyc)
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
-#else /* LIBC: memcpyc */
-#include <local/string/memcpyc.h>
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-#define __localdep_memcpyc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyc))
-#endif /* memcpyc... */
-#endif /* !____localdep_memcpyc_defined */
+/* Dependency: "wmemcpy" from "wchar" */
+#ifndef ____localdep_c16memcpy_defined
+#define ____localdep_c16memcpy_defined 1
+#if defined(__CRT_HAVE_wmemcpy) && (__SIZEOF_WCHAR_T__ == 2)
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16memcpy,(__CHAR16_TYPE__ *__restrict __dst, __CHAR16_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmemcpy,(__dst,__src,__num_chars))
+#elif defined(__CRT_HAVE_memcpyw)
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16memcpy,(__CHAR16_TYPE__ *__restrict __dst, __CHAR16_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyw,(__dst,__src,__num_chars))
+#elif defined(__CRT_HAVE_DOS$wmemcpy)
+__CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16memcpy,(__CHAR16_TYPE__ *__restrict __dst, __CHAR16_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmemcpy,(__dst,__src,__num_chars))
+#elif __SIZEOF_WCHAR_T__ == 2
+#include <local/wchar/wmemcpy.h>
+#define __localdep_c16memcpy(dst, src, num_chars) (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemcpy))((__WCHAR_TYPE__ *)(dst), (__WCHAR_TYPE__ const *)(src), num_chars)
+#else /* LIBC: c16memcpy */
+#include <local/wchar/c16memcpy.h>
+#define __localdep_c16memcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16memcpy))
+#endif /* c16memcpy... */
+#endif /* !____localdep_c16memcpy_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
@@ -63,38 +84,14 @@ __LOCAL_LIBC(format_c16aprintf_printer) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16aprintf_printer))(/*struct format_waprintf_data **/ void *__arg,
                                                                        __CHAR16_TYPE__ const *__restrict __data,
                                                                        __SIZE_TYPE__ __datalen) {
-#line 1141 "kos/src/libc/magic/format-printer.c"
-	struct __format_aprintf_data {
-		__CHAR16_TYPE__         *__ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-		__SIZE_TYPE__ __ap_avail; /* Unused buffer size */
-		__SIZE_TYPE__ __ap_used;  /* Used buffer size */
-	};
-	struct __format_aprintf_data *__buf;
-	__buf = (struct __format_aprintf_data *)__arg;
-	if (__buf->__ap_avail < __datalen) {
-		__CHAR16_TYPE__ *__newbuf;
-		__SIZE_TYPE__ __min_alloc = __buf->__ap_used + __datalen;
-		__SIZE_TYPE__ __new_alloc = __buf->__ap_used + __buf->__ap_avail;
-		if (!__new_alloc)
-			__new_alloc = 8;
-		while (__new_alloc < __min_alloc)
-			__new_alloc *= 2;
-		__newbuf = (__CHAR16_TYPE__ *)__localdep_realloc(__buf->__ap_base, (__new_alloc + 1) * sizeof(__CHAR16_TYPE__));
-		if __unlikely(!__newbuf) {
-			__new_alloc = __min_alloc;
-			__newbuf    = (__CHAR16_TYPE__ *)__localdep_realloc(__buf->__ap_base, (__new_alloc + 1) * sizeof(__CHAR16_TYPE__));
-			if __unlikely(!__newbuf)
-				return -1;
-		}
-		__hybrid_assert(__new_alloc >= __buf->__ap_used + __datalen);
-		__buf->__ap_base  = __newbuf;
-		__buf->__ap_avail = __new_alloc - __buf->__ap_used;
-	}
-	__localdep_memcpyc(__buf->__ap_base + __buf->__ap_used, __data, __datalen, sizeof(__CHAR16_TYPE__));
-	__buf->__ap_avail -= __datalen;
-	__buf->__ap_used  += __datalen;
+#line 317 "kos/src/libc/magic/parts.wchar.format-printer.c"
+	__CHAR16_TYPE__ *__buf;
+	__buf = __localdep_format_c16aprintf_alloc((struct format_c16aprintf_data *)__arg, __datalen);
+	if __unlikely(!__buf)
+		return -1;
+	__localdep_c16memcpy(__buf, __data, __datalen);
 	return (__SSIZE_TYPE__)__datalen;
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_realloc) */
+#endif /* defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_waprintf_alloc) */
 #endif /* !__local_format_c16aprintf_printer_defined */

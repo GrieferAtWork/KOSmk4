@@ -27,6 +27,7 @@
 %[define_wchar_replacement(pwformatprinter = pc16formatprinter, pc32formatprinter)]
 %[define_wchar_replacement(__pwformatprinter = __pc16formatprinter, __pc32formatprinter)]
 %[define_wchar_replacement(format_wsnprintf_data = format_c16snprintf_data, format_c32snprintf_data)]
+%[define_wchar_replacement(__format_waprintf_data_defined = __format_c16aprintf_data_defined, __format_c32aprintf_data_defined)]
 %[default_impl_section({.text.crt.wchar.string.format|.text.crt.dos.wchar.string.format})]
 
 
@@ -193,11 +194,23 @@ struct format_waprintf_data {
 }
 
 
+%[define(DEFINE_FORMAT_WAPRINTF_DATA =
+#ifndef __format_waprintf_data_defined
+#define __format_waprintf_data_defined 1
+struct format_waprintf_data {
+	wchar_t      *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
+	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+};
+#endif /* !__format_waprintf_data_defined */
+)]
+
+
 @@Pack and finalize a given aprintf format printer
 @@Together with `format_waprintf_printer()', the aprintf
 @@format printer sub-system should be used as follows:
 @@>> char *result; ssize_t error;
-@@>> struct format_aprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
+@@>> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
 @@>> error = format_wprintf(&format_waprintf_printer, &p, L"%s %s", "Hello", "World");
 @@>> if unlikely(error < 0) {
 @@>>     format_waprintf_data_fini(&p);
@@ -217,16 +230,7 @@ struct format_waprintf_data {
 [dependency_include(<hybrid/__assert.h>)]
 [dependency_include(<hybrid/typecore.h>)][wchar]
 [ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC]
-[dependency_prefix(
-#ifndef __format_waprintf_data_defined
-#define __format_waprintf_data_defined 1
-struct format_waprintf_data {
-	wchar_t      *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
-	__SIZE_TYPE__ ap_used;  /* Used buffer size */
-};
-#endif /* !__format_waprintf_data_defined */
-)]
+[dependency_prefix(DEFINE_FORMAT_WAPRINTF_DATA)]
 format_waprintf_pack:([nonnull] struct format_waprintf_data *__restrict self,
                       [nullable] $size_t *pstrlen) -> wchar_t * {
 	/* Free unused buffer memory. */
@@ -270,12 +274,53 @@ format_waprintf_pack:([nonnull] struct format_waprintf_data *__restrict self,
 }
 
 
-@@Print data to a dynamically allocated heap buffer. On error, -1 is returned
-[requires($has_function(realloc))][same_impl][user][wchar]
+@@Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+@@The returned pointer remains valid until the next time this function is called,
+@@the format_aprintf buffer `self' is finalized, or some other function is used
+@@to append additional data to the end of `self'
+@@@return: NULL: Failed to allocate additional memory
+[requires($has_function(realloc))][same_impl][wchar]
 [dependency_include(<hybrid/__assert.h>)][ATTR_WUNUSED]
+[dependency_prefix(DEFINE_FORMAT_WAPRINTF_DATA)]
+format_waprintf_alloc:([nonnull] struct format_waprintf_data *__restrict self,
+                       $size_t num_wchars) -> [malloc(num_wchars * sizeof(wchar_t))] wchar_t * {
+	wchar_t *result;
+	if (self->@ap_avail@ < num_wchars) {
+		wchar_t *newbuf;
+		size_t min_alloc = self->@ap_used@ + num_wchars;
+		size_t new_alloc = self->@ap_used@ + self->@ap_avail@;
+		if (!new_alloc)
+			new_alloc = 8;
+		while (new_alloc < min_alloc)
+			new_alloc *= 2;
+		newbuf = (wchar_t *)realloc(self->@ap_base@, (new_alloc + 1) * sizeof(wchar_t));
+		if unlikely(!newbuf) {
+			new_alloc = min_alloc;
+			newbuf    = (wchar_t *)realloc(self->@ap_base@, (new_alloc + 1) * sizeof(wchar_t));
+			if unlikely(!newbuf)
+				return NULL;
+		}
+		__hybrid_assert(new_alloc >= self->@ap_used@ + num_wchars);
+		self->@ap_base@  = newbuf;
+		self->@ap_avail@ = new_alloc - self->@ap_used@;
+	}
+	result = self->@ap_base@ + self->@ap_used@;
+	self->@ap_avail@ -= num_wchars;
+	self->@ap_used@  += num_wchars;
+	return result;
+}
+
+@@Print data to a dynamically allocated heap buffer. On error, -1 is returned
+[requires($has_function(format_waprintf_alloc))][same_impl][wchar][ATTR_WUNUSED]
 format_waprintf_printer:([nonnull] /*struct format_waprintf_data **/ void *arg,
-                         [nonnull] wchar_t const *__restrict data, $size_t datalen) -> $ssize_t
-	%{copy(format_aprintf_printer, str2wcs)}
+                         [nonnull] wchar_t const *__restrict data, $size_t datalen) -> $ssize_t {
+	wchar_t *buf;
+	buf = format_waprintf_alloc((struct $format_waprintf_data *)arg, datalen);
+	if unlikely(!buf)
+		return -1;
+	wmemcpy(buf, data, datalen);
+	return (ssize_t)datalen;
+}
 
 
 

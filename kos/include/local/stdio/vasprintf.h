@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6077ae30 */
+/* HASH CRC-32:0xf943e2bc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_vasprintf_defined
-#if (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_pack)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
+#if (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_pack)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #define __local_vasprintf_defined 1
 #include <kos/anno.h>
 #include <bits/format-printer.h>
@@ -290,11 +290,13 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONN
 #ifndef ____localdep_format_aprintf_printer_defined
 #define ____localdep_format_aprintf_printer_defined 1
 #ifdef __CRT_HAVE_format_aprintf_printer
-/* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
+/* Print data to a dynamically allocated heap buffer. On error, -1 is returned
+ * This function is intended to be used as a pformatprinter-compatibile printer sink */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_aprintf_printer,(/*struct format_aprintf_data **/ void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),format_aprintf_printer,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc)
 #include <local/format-printer/format_aprintf_printer.h>
-/* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
+/* Print data to a dynamically allocated heap buffer. On error, -1 is returned
+ * This function is intended to be used as a pformatprinter-compatibile printer sink */
 #define __localdep_format_aprintf_printer (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_aprintf_printer))
 #else /* CUSTOM: format_aprintf_printer */
 #undef ____localdep_format_aprintf_printer_defined
@@ -327,5 +329,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vasprintf))(char **__restrict __pstr,
 	return (__STDC_INT_AS_SSIZE_T)__error;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_pack)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)) */
+#endif /* (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_pack)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)) */
 #endif /* !__local_vasprintf_defined */

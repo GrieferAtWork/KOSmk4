@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94a1c9e4 */
+/* HASH CRC-32:0xb25b8e2e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1808,8 +1808,10 @@
 #define __CRT_ATTR_NOTHROW_NCX_format_32to8 1
 #define __CRT_ATTR_NOTHROW_NCX_format_8to16 1
 #define __CRT_ATTR_NOTHROW_NCX_format_8to32 1
+#define __CRT_ATTR_NOTHROW_NCX_format_aprintf_alloc 1
 #define __CRT_ATTR_NOTHROW_NCX_format_aprintf_pack 1
 #define __CRT_ATTR_NOTHROW_NCX_format_aprintf_printer 1
+#define __CRT_ATTR_NOTHROW_NCX_format_c16aprintf_alloc 1
 #define __CRT_ATTR_NOTHROW_NCX_format_c16aprintf_pack 1
 #define __CRT_ATTR_NOTHROW_NCX_format_c16aprintf_printer 1
 #define __CRT_ATTR_NOTHROW_NCX_format_c16escape 1
@@ -1820,6 +1822,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_format_c16snprintf_printer 1
 #define __CRT_ATTR_NOTHROW_NCX_format_c16sprintf_printer 1
 #define __CRT_ATTR_NOTHROW_NCX_format_c16width 1
+#define __CRT_ATTR_NOTHROW_NCX_format_c32aprintf_alloc 1
 #define __CRT_ATTR_NOTHROW_NCX_format_c32aprintf_pack 1
 #define __CRT_ATTR_NOTHROW_NCX_format_c32aprintf_printer 1
 #define __CRT_ATTR_NOTHROW_NCX_format_c32escape 1
@@ -1836,6 +1839,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_format_vc16printf 1
 #define __CRT_ATTR_NOTHROW_NCX_format_vc32printf 1
 #define __CRT_ATTR_NOTHROW_NCX_format_vwprintf 1
+#define __CRT_ATTR_NOTHROW_NCX_format_waprintf_alloc 1
 #define __CRT_ATTR_NOTHROW_NCX_format_waprintf_pack 1
 #define __CRT_ATTR_NOTHROW_NCX_format_waprintf_printer 1
 #define __CRT_ATTR_NOTHROW_NCX_format_wescape 1

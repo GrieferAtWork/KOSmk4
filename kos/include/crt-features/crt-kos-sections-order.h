@@ -165,6 +165,7 @@
 	.obstack*                         # obstack
 	.utility*                         # Misc. utility functions
 	.system*                          # Misc. system functions
+	.debug*                           # Misc. debug functions
 	.fs*                              # All other filesystem functions
 	.sched.resource*                  # Resource limit functions
 	.sched.msg*                       # <sys/msg.h>
@@ -266,6 +267,7 @@
 	CB(PREFIX.obstack.*) \
 	CB(PREFIX.utility.glob.* PREFIX.utility.klog.* PREFIX.utility.monetary.* PREFIX.utility.regex.* PREFIX.utility.search.* PREFIX.utility.shm.* PREFIX.utility.stdlib.*) \
 	CB(PREFIX.system.*) \
+	CB(PREFIX.debug.*) \
 	CB(PREFIX.sched.resource.*) \
 	CB(PREFIX.sched.msg.*) \
 	CB(PREFIX.string.encrypt.*) \
