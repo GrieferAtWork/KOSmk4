@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22a888f1 */
+/* HASH CRC-32:0xe8198d30 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,5 +76,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lutimes))(char const *__file,
 #endif /* !__CRT_HAVE_utimes */
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_lutimes) || defined(__CRT_HAVE_lutimes64) */
+#endif /* __CRT_HAVE_lutimes || __CRT_HAVE_lutimes64 */
 #endif /* !__local_lutimes_defined */

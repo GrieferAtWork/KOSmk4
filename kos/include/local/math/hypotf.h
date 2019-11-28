@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc8b977f */
+/* HASH CRC-32:0xd541b953 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,5 +46,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(hypotf))(float __x,
 	return (float)__localdep_hypot((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot) */
+#endif /* __CRT_HAVE_hypot || __CRT_HAVE___hypot */
 #endif /* !__local_hypotf_defined */

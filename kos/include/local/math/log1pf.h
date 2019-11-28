@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37d0e9d3 */
+/* HASH CRC-32:0xa6d93ddc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,5 +45,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(log1pf))(float __x) {
 	return (float)__localdep_log1p((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p) */
+#endif /* __CRT_HAVE_log1p || __CRT_HAVE___log1p */
 #endif /* !__local_log1pf_defined */

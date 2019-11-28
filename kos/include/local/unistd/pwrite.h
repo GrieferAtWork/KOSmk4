@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8453270 */
+/* HASH CRC-32:0x488fb4f4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,11 +48,11 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwrite64
 /* Dependency: "lseek" from "unistd" */
 #ifndef ____localdep_lseek_defined
 #define ____localdep_lseek_defined 1
-#if defined(__CRT_HAVE_lseek64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_lseek64) && defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __off64_t __offset, int __whence),lseek64,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE__lseeki64) && (defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE__lseeki64) && defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __off64_t __offset, int __whence),_lseeki64,(__fd,__offset,__whence))
@@ -143,5 +143,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwrite))(__fd_t __fd,
 #endif
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_pwrite64) || ((defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))) */
+#endif /* __CRT_HAVE_pwrite64 || ((__CRT_HAVE_write || __CRT_HAVE__write) && (__CRT_HAVE_lseek || __CRT_HAVE_lseek64 || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE__lseeki64)) */
 #endif /* !__local_pwrite_defined */

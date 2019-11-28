@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa90e2174 */
+/* HASH CRC-32:0xe3e3a48e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,5 +41,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_msize_dbg))(void *__ptr,
 	return __localdep__msize(__ptr);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE__msize) || defined(__CRT_HAVE_malloc_usable_size) */
+#endif /* __CRT_HAVE__msize || __CRT_HAVE_malloc_usable_size */
 #endif /* !__local__msize_dbg_defined */

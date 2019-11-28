@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2679044 */
+/* HASH CRC-32:0x46db6ee4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,5 +67,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sched_rr_get_interval))(__pid_t __pid
 #endif /* !__CRT_HAVE_sched_rr_get_interval */
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_sched_rr_get_interval) || defined(__CRT_HAVE_sched_rr_get_interval64) */
+#endif /* __CRT_HAVE_sched_rr_get_interval || __CRT_HAVE_sched_rr_get_interval64 */
 #endif /* !__local_sched_rr_get_interval_defined */

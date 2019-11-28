@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69cb791c */
+/* HASH CRC-32:0x3352e139 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,5 +44,5 @@ __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(obstack_printf))(struct obstack *__r
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_obstack_vprintf) */
+#endif /* __CRT_HAVE_obstack_vprintf */
 #endif /* !__local_obstack_printf_defined */

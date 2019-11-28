@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0a357cd */
+/* HASH CRC-32:0x69160792 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,5 +56,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setitimer64))(__itimer_which_t __whic
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_setitimer) */
+#endif /* __CRT_HAVE_setitimer */
 #endif /* !__local_setitimer64_defined */

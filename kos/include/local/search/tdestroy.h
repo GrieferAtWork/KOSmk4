@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab85ed1e */
+/* HASH CRC-32:0x63f84160 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,5 +62,5 @@ __again:
 	}
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) */
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 #endif /* !__local_tdestroy_defined */

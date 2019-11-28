@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ab78e7e */
+/* HASH CRC-32:0xe6bfbc79 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#if defined(__CRT_HAVE_sendfile64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_sendfile64) && defined(__USE_FILE_OFFSET64)
 /* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
  * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
  * read bytes. If OFFSET is a null pointer, use the normal file position instead.

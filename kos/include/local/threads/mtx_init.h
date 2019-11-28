@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e11d28f */
+/* HASH CRC-32:0xfb231d4a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,5 +98,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mtx_init))(__mtx_t *__restrict __mute
 	return 2; /* thrd_error */
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_pthread_mutex_init) */
+#endif /* __CRT_HAVE_pthread_mutex_init */
 #endif /* !__local_mtx_init_defined */

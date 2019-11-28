@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6b62c4f */
+/* HASH CRC-32:0x8e508bc9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,writev,(__fd_t __fd, struct
 #endif /* writev... */
 
 #ifdef __USE_MISC
-#if defined(__CRT_HAVE_preadv64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_preadv64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,preadv,(__fd_t __fd, struct iovec const *__iovec, __STDC_INT_AS_SIZE_T __count, __FS_TYPE(off) __offset),preadv64,(__fd,__iovec,__count,__offset))
 #elif defined(__CRT_HAVE_preadv) && (!defined(__USE_FILE_OFFSET64))
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,preadv,(__fd_t __fd, struct iovec const *__iovec, __STDC_INT_AS_SIZE_T __count, __FS_TYPE(off) __offset),(__fd,__iovec,__count,__offset))
@@ -61,7 +61,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,preadv,(__fd
 #include <local/sys.uio/preadv.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(preadv, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) ssize_t __NOTHROW_RPC(__LIBCCALL preadv)(__fd_t __fd, struct iovec const *__iovec, __STDC_INT_AS_SIZE_T __count, __FS_TYPE(off) __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(preadv))(__fd, __iovec, __count, __offset); })
 #endif /* preadv... */
-#if defined(__CRT_HAVE_pwritev64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_pwritev64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwritev,(__fd_t __fd, struct iovec const *__iovec, __STDC_INT_AS_SIZE_T __count, __FS_TYPE(off) __offset),pwritev64,(__fd,__iovec,__count,__offset))
 #elif defined(__CRT_HAVE_pwritev) && (!defined(__USE_FILE_OFFSET64))
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwritev,(__fd_t __fd, struct iovec const *__iovec, __STDC_INT_AS_SIZE_T __count, __FS_TYPE(off) __offset),(__fd,__iovec,__count,__offset))

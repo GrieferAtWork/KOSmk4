@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c734dd1 */
+/* HASH CRC-32:0x55a97457 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,5 +52,5 @@ __LOCAL_LIBC(c32scanf_unlocked) __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_S
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((defined(__CRT_HAVE_vfwscanf_unlocked) || defined(__CRT_HAVE_vfwscanf)) && !defined(__NO_STDSTREAMS)) || defined(__CRT_HAVE_vwscanf_unlocked) */
+#endif /* ((__CRT_HAVE_vfwscanf_unlocked || __CRT_HAVE_vfwscanf) && !__NO_STDSTREAMS) || __CRT_HAVE_vwscanf_unlocked */
 #endif /* !__local_c32scanf_unlocked_defined */

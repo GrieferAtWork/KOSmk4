@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10824b55 */
+/* HASH CRC-32:0xb38142ee */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,5 +54,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lgammaf_r))(float __x,
 	return (float)__localdep_lgamma_r((double)__x, __signgamp);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) */
+#endif /* __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r */
 #endif /* !__local_lgammaf_r_defined */

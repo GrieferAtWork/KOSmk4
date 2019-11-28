@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64e84627 */
+/* HASH CRC-32:0x29baff58 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -212,5 +212,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutexexpr))(void *__base,
 #endif /* !__CRT_HAVE_lfutexexpr */
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_lfutexexpr) || defined(__CRT_HAVE_lfutexexpr64) */
+#endif /* __CRT_HAVE_lfutexexpr || __CRT_HAVE_lfutexexpr64 */
 #endif /* !__local_lfutexexpr_defined */

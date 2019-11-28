@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15d8090 */
+/* HASH CRC-32:0x55d7c2d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -617,7 +617,7 @@ __CDECLARE(,int,__NOTHROW_RPC,getnameinfo,(struct sockaddr const *__restrict __s
  * cancellation point */
 __CDECLARE(,int,__NOTHROW_RPC,getaddrinfo_a,(int __mode, struct gaicb *__list[__restrict_arr], int __ent, struct sigevent *__restrict __sig),(__mode,__list,__ent,__sig))
 #endif /* getaddrinfo_a... */
-#if defined(__CRT_HAVE_gai_suspend64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_gai_suspend64) && defined(__USE_TIME_BITS64)
 /* Suspend execution of the thread until at least one of the ENT requests
  * in LIST is handled. If TIMEOUT is not a null pointer it specifies the
  * longest time the function keeps waiting before returning with an error.

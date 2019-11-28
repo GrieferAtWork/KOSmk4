@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50d71c78 */
+/* HASH CRC-32:0x43aa053b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@
 #define ____localdep_fgetws_defined 1
 #ifdef __std___localdep_fgetws_defined
 __NAMESPACE_STD_USING(__localdep_fgetws)
-#elif defined(__CRT_HAVE_fgetws_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+#elif defined(__CRT_HAVE_fgetws_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__WCHAR_TYPE__ *,,__localdep_fgetws,(__WCHAR_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE__fgetws_nolock) && (defined(__USE_STDIO_UNLOCKED))
+#elif defined(__CRT_HAVE__fgetws_nolock) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__WCHAR_TYPE__ *,,__localdep_fgetws,(__WCHAR_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fgetws)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__WCHAR_TYPE__ *,,__localdep_fgetws,(__WCHAR_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws,(__buf,__bufsize,__stream)) __THROWS(...)
@@ -52,5 +52,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_getws_s))(__WCHAR_TYPE__ *__buf,
 	return __localdep_fgetws(__buf, __buflen, __LOCAL_stdin);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (((defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE__IO_ferror))) || defined(__CRT_HAVE_fgetws) || defined(__CRT_HAVE_fgetws_unlocked) || defined(__CRT_HAVE__fgetws_nolock)) && !defined(__NO_STDSTREAMS) */
+#endif /* (((__CRT_HAVE_fgetwc || __CRT_HAVE_getwc) && (__CRT_HAVE_ungetwc || __CRT_HAVE_ungetwc_unlocked) && (__CRT_HAVE_ferror || __CRT_HAVE_ferror_unlocked || __CRT_HAVE__IO_ferror)) || __CRT_HAVE_fgetws || __CRT_HAVE_fgetws_unlocked || __CRT_HAVE__fgetws_nolock) && !__NO_STDSTREAMS */
 #endif /* !__local__getws_s_defined */

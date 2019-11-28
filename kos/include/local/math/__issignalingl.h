@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd50ab66d */
+/* HASH CRC-32:0xfb60b42f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,5 +37,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__issignalingl))(long double __val) {
 	return (int)__localdep___issignaling((double)__val);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE___issignaling) */
+#endif /* __CRT_HAVE___issignaling */
 #endif /* !__local___issignalingl_defined */

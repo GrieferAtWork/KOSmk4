@@ -274,7 +274,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_delete)(char **__restrict pargz,
 	if unlikely(newlen == 0) {
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 		libc_free(*pargz);
-#endif /* defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) */
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 		*pargz = NULL;
 		return;
 	}

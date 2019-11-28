@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99904e70 */
+/* HASH CRC-32:0x5fb8ad84 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,5 +40,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwritev64))(__fd_t __fd,
 	return __localdep_pwritev32(__fd, __iovec, __count, (__off32_t)__offset);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_pwritev) */
+#endif /* __CRT_HAVE_pwritev */
 #endif /* !__local_pwritev64_defined */

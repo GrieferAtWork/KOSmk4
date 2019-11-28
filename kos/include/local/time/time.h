@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fb3f7e3 */
+/* HASH CRC-32:0x1dc22cb0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,5 +73,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(time))(__TM_TYPE(time) *__timer) {
 #endif /* !__USE_TIME_BITS64 */
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE__time32) */
+#endif /* __CRT_HAVE_time64 || __CRT_HAVE__time64 || __CRT_HAVE_time || __CRT_HAVE__time32 */
 #endif /* !__local_time_defined */

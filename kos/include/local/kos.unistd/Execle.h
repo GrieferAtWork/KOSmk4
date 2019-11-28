@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2de064f */
+/* HASH CRC-32:0x20a91ec0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,5 +47,5 @@ __LOCAL_LIBC(Execle) __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) vo
 	__REDIRECT_XEXECLE(char, __localdep_Execve, __path, __args)
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_Execve) */
+#endif /* __CRT_HAVE_Execve */
 #endif /* !__local_Execle_defined */

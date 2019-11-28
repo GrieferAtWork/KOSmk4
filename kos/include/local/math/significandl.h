@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd53c42a */
+/* HASH CRC-32:0x2e9fbb99 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,5 +45,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(significandl))(long double __x) {
 	return (long double)__localdep_significand((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand) */
+#endif /* __CRT_HAVE_significand || __CRT_HAVE___significand */
 #endif /* !__local_significandl_defined */

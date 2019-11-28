@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16f80449 */
+/* HASH CRC-32:0x5fc696e7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,5 +46,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(dreml))(long double __x,
 	return (long double)__localdep_drem((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem) */
+#endif /* __CRT_HAVE_drem || __CRT_HAVE___drem */
 #endif /* !__local_dreml_defined */

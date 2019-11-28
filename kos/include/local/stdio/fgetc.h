@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x376b3b42 */
+/* HASH CRC-32:0x14050fd1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,11 +34,11 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep__filbuf,(__FILE *__restrict __st
 /* Dependency: "crt_fread" from "stdio" */
 #ifndef ____localdep_crt_fread_defined
 #define ____localdep_crt_fread_defined 1
-#if defined(__CRT_HAVE_fread_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+#if defined(__CRT_HAVE_fread_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,__localdep_crt_fread,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread_unlocked,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE__fread_nolock) && (defined(__USE_STDIO_UNLOCKED))
+#elif defined(__CRT_HAVE__fread_nolock) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,__localdep_crt_fread,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_fread_nolock,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE__IO_fread) && (defined(__USE_STDIO_UNLOCKED))
+#elif defined(__CRT_HAVE__IO_fread) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,__localdep_crt_fread,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_IO_fread,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fread)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,__localdep_crt_fread,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
@@ -71,5 +71,5 @@ __LOCAL_LIBC(fgetc) __ATTR_NONNULL((1)) int
 #endif
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) */
+#endif /* (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock || __CRT_HAVE__IO_fread */
 #endif /* !__local_fgetc_defined */

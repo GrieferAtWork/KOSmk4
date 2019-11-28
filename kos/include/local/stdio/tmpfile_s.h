@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc4308d5 */
+/* HASH CRC-32:0x273eaa06 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "tmpfile" */
 #ifndef ____localdep_tmpfile_defined
 #define ____localdep_tmpfile_defined 1
-#if defined(__CRT_HAVE_tmpfile64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_tmpfile64) && defined(__USE_FILE_OFFSET64)
 /* Create and return a new file-stream for accessing a temporary file for reading/writing */
 __CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_RPC,__localdep_tmpfile,(void),tmpfile64,())
 #elif defined(__CRT_HAVE_tmpfile)
@@ -50,5 +50,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(tmpfile_s))(__FILE **__pstream) {
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_tmpfile) || defined(__CRT_HAVE_tmpfile64) */
+#endif /* __CRT_HAVE_tmpfile || __CRT_HAVE_tmpfile64 */
 #endif /* !__local_tmpfile_s_defined */

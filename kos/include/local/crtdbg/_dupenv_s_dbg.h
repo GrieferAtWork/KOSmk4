@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf54f5361 */
+/* HASH CRC-32:0x87aaf77c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,5 +45,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_dupenv_s_dbg))(char **__pbuf,
 	return __localdep__dupenv_s(__pbuf, __pbufsize, __varname);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE__dupenv_s) */
+#endif /* __CRT_HAVE__dupenv_s */
 #endif /* !__local__dupenv_s_dbg_defined */

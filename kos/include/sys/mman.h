@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f520a0 */
+/* HASH CRC-32:0xda308c4e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -273,7 +273,7 @@ typedef __mode_t mode_t;
 
 
 #ifdef __CC__
-#if defined(__CRT_HAVE_mmap64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_mmap64) && defined(__USE_FILE_OFFSET64)
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|

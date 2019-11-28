@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6f9b516 */
+/* HASH CRC-32:0xf61e79bd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,5 +65,5 @@ __LOCAL_LIBC(fputc_unlocked) __ATTR_NONNULL((2)) int
 #endif
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) */
+#endif /* (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite || __CRT_HAVE_fwrite_s */
 #endif /* !__local_fputc_unlocked_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc0bdcaa */
+/* HASH CRC-32:0xcb60afd9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,5 +45,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sqrtf))(float __x) {
 	return (float)__localdep_sqrt((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt) */
+#endif /* __CRT_HAVE_sqrt || __CRT_HAVE___sqrt */
 #endif /* !__local_sqrtf_defined */

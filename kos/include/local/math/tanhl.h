@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6448806 */
+/* HASH CRC-32:0xe5ad1d35 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,5 +45,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(tanhl))(long double __x) {
 	return (long double)__localdep_tanh((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) */
+#endif /* __CRT_HAVE_tanh || __CRT_HAVE___tanh */
 #endif /* !__local_tanhl_defined */

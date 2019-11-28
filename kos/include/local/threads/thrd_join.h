@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf732fc20 */
+/* HASH CRC-32:0xe835309e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,5 +62,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_join))(__thrd_t __thr,
 	return 2; /* thrd_error */
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_pthread_join) */
+#endif /* __CRT_HAVE_pthread_join */
 #endif /* !__local_thrd_join_defined */

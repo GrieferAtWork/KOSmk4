@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x883f767b */
+/* HASH CRC-32:0x9bd35f0e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,5 +41,5 @@ __LOCAL_LIBC(_vwprintf_p) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
 	return __localdep__vfwprintf_p(__LOCAL_stdout, __format, __args);
 }
 __NAMESPACE_LOCAL_END
-#endif /* !defined(__NO_STDSTREAMS) */
+#endif /* !__NO_STDSTREAMS */
 #endif /* !__local__vwprintf_p_defined */

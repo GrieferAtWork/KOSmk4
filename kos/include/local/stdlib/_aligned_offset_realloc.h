@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4a19596 */
+/* HASH CRC-32:0x7f7e45b2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,5 +98,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_offset_realloc))(void *__mpt
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE__aligned_offset_malloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE__aligned_free)) */
+#endif /* (__CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_posix_memalign || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_malloc || __CRT_HAVE__aligned_offset_malloc) && (__CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE__aligned_free) */
 #endif /* !__local__aligned_offset_realloc_defined */

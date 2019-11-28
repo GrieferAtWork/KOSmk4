@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17d13846 */
+/* HASH CRC-32:0xc78fcd98 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,5 +37,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tmpnam_r))(char *__buf) {
 	return __buf ? __localdep_tmpnam(__buf) : __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_tmpnam) */
+#endif /* __CRT_HAVE_tmpnam */
 #endif /* !__local_tmpnam_r_defined */

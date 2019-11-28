@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8026485 */
+/* HASH CRC-32:0xd75cb7ce */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,5 +45,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_getdcwd_dbg))(int __driveno,
 	return __localdep__getdcwd(__driveno, __buf, __bufsize);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE__getdcwd) */
+#endif /* __CRT_HAVE__getdcwd */
 #endif /* !__local__getdcwd_dbg_defined */

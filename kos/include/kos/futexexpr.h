@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa268994 */
+/* HASH CRC-32:0x248a8c10 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -168,7 +168,7 @@ __NAMESPACE_INT_END
 	(__NAMESPACE_INT_SYM __LFutexExprOffset(offset))
 #endif /* __cplusplus */
 
-#if defined(__CRT_HAVE_lfutexexpr64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_lfutexexpr64) && defined(__USE_TIME_BITS64)
 /* >> lfutexexpr(2)
  * The lfutexexpr() system call can be used to specify arbitrarily complex
  * expressions that must atomically (in relation to other futex operations)
@@ -257,7 +257,7 @@ __CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,lfutexexpr,(void *__base, __SIZ
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lfutexexpr, __FORCELOCAL __ATTR_NONNULL((3)) int __NOTHROW_RPC(__LIBCCALL lfutexexpr)(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutexexpr))(__base, __exprc, __exprv, __timeout, __timeout_flags); })
 #endif /* lfutexexpr... */
-#if defined(__CRT_HAVE_lfutexlockexpr64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_lfutexlockexpr64) && defined(__USE_TIME_BITS64)
 /* >> lfutexlockexpr(2)
  * A function that is similar to `lfutexexpr()', but allows for the use of one central
  * locking futex that is used for waiting and may be distinct from any other given futex

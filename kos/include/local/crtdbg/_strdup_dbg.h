@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe420125d */
+/* HASH CRC-32:0xa1f82aa2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,5 +52,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_strdup_dbg))(char const *__string,
 	return __localdep_strdup(__string);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_strdup) || defined(__CRT_HAVE__strdup) || defined(__CRT_HAVE___strdup) */
+#endif /* __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_posix_memalign || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_malloc || __CRT_HAVE_strdup || __CRT_HAVE__strdup || __CRT_HAVE___strdup */
 #endif /* !__local__strdup_dbg_defined */

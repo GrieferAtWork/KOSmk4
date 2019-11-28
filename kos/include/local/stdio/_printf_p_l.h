@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94a2d68 */
+/* HASH CRC-32:0x4ca5d545 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,5 +48,5 @@ __LOCAL_LIBC(_printf_p_l) __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF_P(1, 3) __STDC_
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (!defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE__vfprintf_p))) || defined(__CRT_HAVE__vprintf_p) || defined(__CRT_HAVE__vprintf_p_l) */
+#endif /* (!__NO_STDSTREAMS && ((__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || __CRT_HAVE__vfprintf_p)) || __CRT_HAVE__vprintf_p || __CRT_HAVE__vprintf_p_l */
 #endif /* !__local__printf_p_l_defined */

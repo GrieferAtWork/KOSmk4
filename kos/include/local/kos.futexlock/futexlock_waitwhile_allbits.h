@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf51ce30b */
+/* HASH CRC-32:0x4c4b2819 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -132,5 +132,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_waitwhile_allbits))(__uintp
 	return __localdep_lfutexlock64(__ulockaddr, __uaddr, LFUTEX_WAIT_WHILE_BITMASK, __bitmask, (struct __timespec64 const *)__NULLPTR, __bitmask);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_lfutexlock64) || defined(__CRT_HAVE_lfutexlock) */
+#endif /* __CRT_HAVE_lfutexlock64 || __CRT_HAVE_lfutexlock */
 #endif /* !__local_futexlock_waitwhile_allbits_defined */

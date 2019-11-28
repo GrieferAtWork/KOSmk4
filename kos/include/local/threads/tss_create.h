@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x656ba94a */
+/* HASH CRC-32:0xa829ba7e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,5 +58,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tss_create))(__tss_t *__tss_id,
 	return 2; /* thrd_error */
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_pthread_key_create) */
+#endif /* __CRT_HAVE_pthread_key_create */
 #endif /* !__local_tss_create_defined */

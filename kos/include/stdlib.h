@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39c0dfbf */
+/* HASH CRC-32:0x6e09d906 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1402,7 +1402,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,on_exit,(__on_exit_func_t __fun
 #ifdef __CRT_HAVE_clearenv
 __CDECLARE(,int,__NOTHROW_NCX,clearenv,(void),())
 #endif /* clearenv... */
-#if defined(__CRT_HAVE_mkstemps64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_mkstemps64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemps,(char *__template_, int __suffixlen),mkstemps64,(__template_,__suffixlen))
 #elif defined(__CRT_HAVE_mkstemps)
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemps,(char *__template_, int __suffixlen),(__template_,__suffixlen))
@@ -1702,7 +1702,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,getsubopt,
 #include <local/stdlib/getsubopt.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(getsubopt, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBCCALL getsubopt)(char **__restrict __optionp, char *const *__restrict __tokens, char **__restrict __valuep) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getsubopt))(__optionp, __tokens, __valuep); })
 #endif /* getsubopt... */
-#if defined(__CRT_HAVE_mkstemp64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_mkstemp64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemp,(char *__template_),mkstemp64,(__template_))
 #elif defined(__CRT_HAVE_mkstemp)
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemp,(char *__template_),(__template_))
@@ -1900,14 +1900,14 @@ __CDECLARE(,int,__NOTHROW_RPC,getpt,(void),())
  * Upon error, `NULL' is returned instead */
 __CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,canonicalize_file_name,(char const *__filename),(__filename))
 #endif /* canonicalize_file_name... */
-#if defined(__CRT_HAVE_mkostemp64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_mkostemp64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkostemp,(char *__template_, int __flags),mkostemp64,(__template_,__flags))
 #elif defined(__CRT_HAVE_mkostemp)
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkostemp,(char *__template_, int __flags),(__template_,__flags))
 #elif defined(__CRT_HAVE_mkostemp64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkostemp,(char *__template_, int __flags),mkostemp64,(__template_,__flags))
 #endif /* mkostemp... */
-#if defined(__CRT_HAVE_mkostemps64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_mkostemps64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkostemps,(char *__template_, int __suffixlen, int __flags),mkostemps64,(__template_,__suffixlen,__flags))
 #elif defined(__CRT_HAVE_mkostemps)
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkostemps,(char *__template_, int __suffixlen, int __flags),(__template_,__suffixlen,__flags))

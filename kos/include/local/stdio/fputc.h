@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24a50a2c */
+/* HASH CRC-32:0x79c8ce64 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,11 +34,11 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,,__localdep__flsbuf,(int __ch, __FILE *__res
 /* Dependency: "crt_fwrite" from "stdio" */
 #ifndef ____localdep_crt_fwrite_defined
 #define ____localdep_crt_fwrite_defined 1
-#if defined(__CRT_HAVE_fwrite_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+#if defined(__CRT_HAVE_fwrite_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,__localdep_crt_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite_unlocked,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE__fwrite_nolock) && (defined(__USE_STDIO_UNLOCKED))
+#elif defined(__CRT_HAVE__fwrite_nolock) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,__localdep_crt_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_fwrite_nolock,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE__IO_fwrite) && (defined(__USE_STDIO_UNLOCKED))
+#elif defined(__CRT_HAVE__IO_fwrite) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,__localdep_crt_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_IO_fwrite,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fwrite)
 __CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,__localdep_crt_fwrite,(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fwrite,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
@@ -72,5 +72,5 @@ __LOCAL_LIBC(fputc) __ATTR_NONNULL((2)) int
 #endif
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) */
+#endif /* (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock || __CRT_HAVE__IO_fwrite */
 #endif /* !__local_fputc_defined */

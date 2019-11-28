@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26944ed6 */
+/* HASH CRC-32:0x55adaa8c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,14 +66,14 @@ typedef __FS_TYPE(fsfilcnt) fsfilcnt_t; /* Type to count file system inodes.  */
 #if defined(__CRT_HAVE_statvfs) && (!defined(__USE_FILE_OFFSET64))
 /* Return information about the filesystem on which FILE resides */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,statvfs,(char const *__file, struct statvfs *__buf),(__file,__buf))
-#elif defined(__CRT_HAVE_statvfs64) && (defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_statvfs64) && defined(__USE_FILE_OFFSET64)
 /* Return information about the filesystem on which FILE resides */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,statvfs,(char const *__file, struct statvfs *__buf),statvfs64,(__file,__buf))
 #endif /* statvfs... */
 #if defined(__CRT_HAVE_fstatvfs) && (!defined(__USE_FILE_OFFSET64))
 /* Return information about the filesystem containing the file FILDES refers to */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstatvfs,(__fd_t __filedes, struct statvfs *__buf),(__filedes,__buf))
-#elif defined(__CRT_HAVE_fstatvfs64) && (defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_fstatvfs64) && defined(__USE_FILE_OFFSET64)
 /* Return information about the filesystem containing the file FILDES refers to */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstatvfs,(__fd_t __filedes, struct statvfs *__buf),fstatvfs64,(__filedes,__buf))
 #endif /* fstatvfs... */

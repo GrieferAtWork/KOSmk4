@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa650fb2c */
+/* HASH CRC-32:0xd359d0e5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #ifdef __CRT_HAVE_scandirat64
 /* 64-bit variant of `scandirat()' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,__localdep_scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, __scandir64_selector_t __selector, __scandir64_cmp_t __cmp),scandirat64,(__dirfd,__dir,__namelist,__selector,__cmp))
-#elif defined(__CRT_HAVE_scandirat) && (defined(_DIRENT_MATCHES_DIRENT64))
+#elif defined(__CRT_HAVE_scandirat) && defined(_DIRENT_MATCHES_DIRENT64)
 /* 64-bit variant of `scandirat()' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,__localdep_scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, __scandir64_selector_t __selector, __scandir64_cmp_t __cmp),scandirat,(__dirfd,__dir,__namelist,__selector,__cmp))
 #else /* LIBC: scandirat64 */
@@ -45,5 +45,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(scandir64))(char const *__restrict __
 	return __localdep_scandirat64(__CRT_AT_FDCWD, __dir, __namelist, __selector, __cmp);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_scandirat64) || (defined(__CRT_HAVE_scandirat) && defined(_DIRENT_MATCHES_DIRENT64))) */
+#endif /* __CRT_AT_FDCWD && (__CRT_HAVE_scandirat64 || (__CRT_HAVE_scandirat && _DIRENT_MATCHES_DIRENT64)) */
 #endif /* !__local_scandir64_defined */

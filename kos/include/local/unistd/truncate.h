@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc39f3f73 */
+/* HASH CRC-32:0xec1c7eb7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_truncate32,(char co
 /* Dependency: "open" from "fcntl" */
 #ifndef ____localdep_open_defined
 #define ____localdep_open_defined 1
-#if defined(__CRT_HAVE_open64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) && (!defined(__USE_FILE_OFFSET64))
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
@@ -76,11 +76,11 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_
 /* Dependency: "ftruncate" from "unistd" */
 #ifndef ____localdep_ftruncate_defined
 #define ____localdep_ftruncate_defined 1
-#if defined(__CRT_HAVE_ftruncate64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_ftruncate64) && defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),ftruncate64,(__fd,__length))
-#elif defined(__CRT_HAVE__chsize_s) && (defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE__chsize_s) && defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),_chsize_s,(__fd,__length))
@@ -159,10 +159,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(truncate))(char const *__file,
 	__result = __localdep_ftruncate(__fd, __length);
 #if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)
 	__localdep_close(__fd);
-#endif /* defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close) */
+#endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close */
 	return __result;
 #endif
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_truncate64) || defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE__open)) && (defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE_ftruncate64))) */
+#endif /* __CRT_HAVE_truncate64 || __CRT_HAVE_truncate || ((__CRT_HAVE_open || __CRT_HAVE_open64 || __CRT_HAVE__open) && (__CRT_HAVE__chsize_s || __CRT_HAVE__chsize || __CRT_HAVE_ftruncate || __CRT_HAVE_ftruncate64)) */
 #endif /* !__local_truncate_defined */

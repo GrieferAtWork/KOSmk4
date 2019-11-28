@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x873d6338 */
+/* HASH CRC-32:0xca0d1399 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,5 +58,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_wakeall))(__uintptr_t *__ul
 	return __localdep_futex_wakeall(__ulockaddr);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_futex_wakeall) */
+#endif /* __CRT_HAVE_futex_wake || __CRT_HAVE_lfutex64 || __CRT_HAVE_lfutex || __CRT_HAVE_futex_wakeall */
 #endif /* !__local_futexlock_wakeall_defined */

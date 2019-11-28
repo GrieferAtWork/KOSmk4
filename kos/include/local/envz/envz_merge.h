@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x472808c */
+/* HASH CRC-32:0x23a2f00c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -120,5 +120,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_merge))(char **__restrict __penv
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_argz_append) || defined(__CRT_HAVE___argz_create_sep) */
+#endif /* __CRT_HAVE_realloc || __CRT_HAVE_argz_append || __CRT_HAVE___argz_create_sep */
 #endif /* !__local_envz_merge_defined */

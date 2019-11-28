@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e71ac0c */
+/* HASH CRC-32:0x872cde40 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,5 +54,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(preadall))(__fd_t __fd,
 	return __localdep_preadall64(__fd, __buf, __bufsize, (__PIO_OFFSET64)__offset);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))) || defined(__CRT_HAVE_pread64) || defined(__CRT_HAVE___pread64) || defined(__CRT_HAVE_preadall64) || (defined(__CRT_HAVE_preadall) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) */
+#endif /* __CRT_HAVE_pread || ((__CRT_HAVE_read || __CRT_HAVE__read) && (__CRT_HAVE_lseek || __CRT_HAVE_lseek64 || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE__lseeki64)) || __CRT_HAVE_pread64 || __CRT_HAVE___pread64 || __CRT_HAVE_preadall64 || (__CRT_HAVE_preadall && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) */
 #endif /* !__local_preadall_defined */

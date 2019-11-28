@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59d30797 */
+/* HASH CRC-32:0xca3e3de7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "clearerr" */
 #ifndef ____localdep_clearerr_defined
 #define ____localdep_clearerr_defined 1
-#if defined(__CRT_HAVE_clearerr_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+#if defined(__CRT_HAVE_clearerr_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Clear the error state of `STREAM', returning the stream to normal operations mode */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_clearerr,(__FILE *__restrict __stream),clearerr_unlocked,(__stream))
 #elif defined(__CRT_HAVE_clearerr)
@@ -48,5 +48,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clearerr_s))(__FILE *__restrict __str
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_clearerr) || defined(__CRT_HAVE_clearerr_unlocked) */
+#endif /* __CRT_HAVE_clearerr || __CRT_HAVE_clearerr_unlocked */
 #endif /* !__local_clearerr_s_defined */

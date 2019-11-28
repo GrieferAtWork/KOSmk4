@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b1accbf */
+/* HASH CRC-32:0xf1c23ceb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 /* Dependency: "lfutexlock" from "kos.futexlock" */
 #ifndef ____localdep_lfutexlock_defined
 #define ____localdep_lfutexlock_defined 1
-#if defined(__CRT_HAVE_lfutexlock64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_lfutexlock64) && defined(__USE_TIME_BITS64)
 /* >> lfutexlock(3)
  * Helper function to implement the behavior of `lfutexlockexpr()' for only a single futex.
  * This function behaves identical to the lfutex() system call, except that it takes
@@ -134,5 +134,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_timedwaituntil))(__uintptr_
 	return __localdep_lfutexlock(__ulockaddr, __uaddr, LFUTEX_WAIT_UNTIL, __not_equal_to_value, __rel_timeout);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_lfutexlock) || defined(__CRT_HAVE_lfutexlock64) */
+#endif /* __CRT_HAVE_lfutexlock || __CRT_HAVE_lfutexlock64 */
 #endif /* !__local_futexlock_timedwaituntil_defined */

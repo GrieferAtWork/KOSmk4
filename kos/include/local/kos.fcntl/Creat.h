@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8bfecd35 */
+/* HASH CRC-32:0xf2e7d0a2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 /* Dependency: "Open" from "kos.fcntl" */
 #ifndef ____localdep_Open_defined
 #define ____localdep_Open_defined 1
-#if defined(__CRT_HAVE_Open64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_Open64) && defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,__localdep_Open,(char const *__filename, __oflag_t __oflags),Open64,(__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)
 #elif defined(__CRT_HAVE_Open) && (!defined(__USE_FILE_OFFSET64))
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,__localdep_Open,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)
@@ -47,5 +47,5 @@ __LOCAL_LIBC(Creat) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 	return __localdep_Open(__filename, O_CREAT|O_WRONLY|O_TRUNC, __mode);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_Open64) || defined(__CRT_HAVE_Open) */
+#endif /* __CRT_HAVE_Open64 || __CRT_HAVE_Open */
 #endif /* !__local_Creat_defined */

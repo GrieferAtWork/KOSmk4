@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4bdda60 */
+/* HASH CRC-32:0x6e46919b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@
 #define ____localdep_fputws_defined 1
 #ifdef __std___localdep_fputws_defined
 __NAMESPACE_STD_USING(__localdep_fputws)
-#elif defined(__CRT_HAVE_fputws_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+#elif defined(__CRT_HAVE_fputws_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,,__localdep_fputws,(__WCHAR_TYPE__ const *__restrict __string, __FILE *__restrict __stream),fputws_unlocked,(__string,__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE__fputws_nolock) && (defined(__USE_STDIO_UNLOCKED))
+#elif defined(__CRT_HAVE__fputws_nolock) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,,__localdep_fputws,(__WCHAR_TYPE__ const *__restrict __string, __FILE *__restrict __stream),_fputws_nolock,(__string,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fputws)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,,__localdep_fputws,(__WCHAR_TYPE__ const *__restrict __string, __FILE *__restrict __stream),fputws,(__string,__stream)) __THROWS(...)
@@ -51,5 +51,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_putws))(__WCHAR_TYPE__ const *__stri
 	return __localdep_fputws(__string, __LOCAL_stdout);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputws) || defined(__CRT_HAVE_fputws_unlocked) || defined(__CRT_HAVE__fputws_nolock)) && !defined(__NO_STDSTREAMS) */
+#endif /* (__CRT_HAVE_fputwc || __CRT_HAVE_putwc || __CRT_HAVE_file_wprinter || __CRT_HAVE_file_wprinter_unlocked || __CRT_HAVE_fputws || __CRT_HAVE_fputws_unlocked || __CRT_HAVE__fputws_nolock) && !__NO_STDSTREAMS */
 #endif /* !__local__putws_defined */

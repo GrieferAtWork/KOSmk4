@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92e8be11 */
+/* HASH CRC-32:0x24816407 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,5 +44,5 @@ __LOCAL_LIBC(_vfwscanf_l) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SS
 	return __localdep_vfwscanf(__stream, __format, __args);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_vfwscanf) */
+#endif /* __CRT_HAVE_vfwscanf */
 #endif /* !__local__vfwscanf_l_defined */

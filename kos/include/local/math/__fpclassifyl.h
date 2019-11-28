@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81f4698b */
+/* HASH CRC-32:0x480333d1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,5 +39,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__fpclassifyl))(long double __val) {
 	return (int)__localdep___fpclassify((double)__val);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE___fpclassify) || defined(__CRT_HAVE__dclass) */
+#endif /* __CRT_HAVE___fpclassify || __CRT_HAVE__dclass */
 #endif /* !__local___fpclassifyl_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x148fdb77 */
+/* HASH CRC-32:0x688847a8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,5 +46,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(locking))(__fd_t __fd,
 	return __localdep_lockf64(__fd, __lockmode, (__off64_t)__length);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_lockf64) */
+#endif /* __CRT_HAVE_lockf64 */
 #endif /* !__local_locking_defined */

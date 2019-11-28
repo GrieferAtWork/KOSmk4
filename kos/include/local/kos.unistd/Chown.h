@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25d98da */
+/* HASH CRC-32:0x7d615f3f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,5 +44,5 @@ __LOCAL_LIBC(Chown) __ATTR_NONNULL((1)) void
 	__localdep_FChownAt(__CRT_AT_FDCWD, __file, __owner, __group, 0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_FChownAt) */
+#endif /* __CRT_AT_FDCWD && __CRT_HAVE_FChownAt */
 #endif /* !__local_Chown_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8705e8b5 */
+/* HASH CRC-32:0x94ab3bc7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,5 +45,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_futime32))(__fd_t __fd,
 	return __localdep_crt_futime64(__fd,&__buf64);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE__futime64) || defined(__CRT_HAVE_futime64) */
+#endif /* __CRT_HAVE__futime64 || __CRT_HAVE_futime64 */
 #endif /* !__local__futime32_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5cffaad1 */
+/* HASH CRC-32:0x85c85bed */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -122,9 +122,9 @@ struct __ntptimeval_alt {
 #pragma pop_macro("time")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
-#if defined(__CRT_HAVE_adjtimex64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_adjtimex64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__adjtimex,(struct timex *__restrict __ntx),adjtimex64,(__ntx))
-#elif defined(__CRT_HAVE___adjtimex64) && (defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE___adjtimex64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__adjtimex,(struct timex *__restrict __ntx),__adjtimex64,(__ntx))
 #elif defined(__CRT_HAVE_adjtimex) && (!defined(__USE_TIME_BITS64))
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__adjtimex,(struct timex *__restrict __ntx),adjtimex,(__ntx))
@@ -134,9 +134,9 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__adjtimex,(struct timex *__res
 #include <local/sys.timex/adjtimex.h>
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __adjtimex)(struct timex *__restrict __ntx) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(adjtimex))(__ntx); }
 #endif /* __adjtimex... */
-#if defined(__CRT_HAVE_adjtimex64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_adjtimex64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,adjtimex,(struct timex *__restrict __ntx),adjtimex64,(__ntx))
-#elif defined(__CRT_HAVE___adjtimex64) && (defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE___adjtimex64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,adjtimex,(struct timex *__restrict __ntx),__adjtimex64,(__ntx))
 #elif defined(__CRT_HAVE_adjtimex) && (!defined(__USE_TIME_BITS64))
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,adjtimex,(struct timex *__restrict __ntx),(__ntx))
@@ -146,7 +146,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,adjtimex,(struct timex *__rest
 #include <local/sys.timex/adjtimex.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(adjtimex, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL adjtimex)(struct timex *__restrict __ntx) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(adjtimex))(__ntx); })
 #endif /* adjtimex... */
-#if defined(__CRT_HAVE_ntp_gettimex64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_ntp_gettimex64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ntp_gettime,(struct ntptimeval *__restrict __ntv),ntp_gettimex64,(__ntv))
 #elif defined(__CRT_HAVE_ntp_gettimex) && (!defined(__USE_TIME_BITS64))
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ntp_gettime,(struct ntptimeval *__restrict __ntv),ntp_gettimex,(__ntv))
@@ -154,7 +154,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ntp_gettime,(struct ntptimeval
 #include <local/sys.timex/ntp_gettime.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(ntp_gettime, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL ntp_gettime)(struct ntptimeval *__restrict __ntv) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntp_gettime))(__ntv); })
 #endif /* ntp_gettime... */
-#if defined(__CRT_HAVE_ntp_adjtime64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_ntp_adjtime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ntp_adjtime,(struct timex *__restrict __tntx),ntp_adjtime64,(__tntx))
 #elif defined(__CRT_HAVE_ntp_adjtime) && (!defined(__USE_TIME_BITS64))
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ntp_adjtime,(struct timex *__restrict __tntx),(__tntx))

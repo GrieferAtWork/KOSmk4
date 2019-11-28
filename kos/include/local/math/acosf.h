@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc21aa569 */
+/* HASH CRC-32:0x23681322 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,5 +45,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(acosf))(float __x) {
 	return (float)__localdep_acos((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) */
+#endif /* __CRT_HAVE_acos || __CRT_HAVE___acos */
 #endif /* !__local_acosf_defined */

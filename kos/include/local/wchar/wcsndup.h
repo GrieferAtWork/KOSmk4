@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46546ac1 */
+/* HASH CRC-32:0x92c620ed */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,5 +81,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsndup))(__WCHAR_TYPE__ const *__res
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc) */
+#endif /* __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_posix_memalign || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_malloc */
 #endif /* !__local_wcsndup_defined */

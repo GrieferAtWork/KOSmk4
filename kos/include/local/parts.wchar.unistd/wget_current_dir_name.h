@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e62c175 */
+/* HASH CRC-32:0x7fdcf3cb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,5 +43,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wget_current_dir_name))(void) {
 	return __localdep_wgetcwd(__NULLPTR, 0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_wgetcwd) || defined(__CRT_HAVE__wgetcwd) */
+#endif /* __CRT_HAVE_wgetcwd || __CRT_HAVE__wgetcwd */
 #endif /* !__local_wget_current_dir_name_defined */

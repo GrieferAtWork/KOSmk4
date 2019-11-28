@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f130e7b */
+/* HASH CRC-32:0x397d78a7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,9 +58,9 @@ typedef __TM_TYPE(time) time_t;
  * fd_t fd   64    futime64    _futime64       _futime64  ---
  */
 
-#if defined(__CRT_HAVE_utime64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_utime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,utime,(char const *__filename, struct utimbuf const *__file_times),utime64,(__filename,__file_times))
-#elif defined(__CRT_HAVE__utime64) && (defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE__utime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,utime,(char const *__filename, struct utimbuf const *__file_times),_utime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE_utime) && (!defined(__USE_TIME_BITS64))
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,utime,(char const *__filename, struct utimbuf const *__file_times),(__filename,__file_times))
@@ -86,9 +86,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(utime64, __FORCELOCAL __ATTR_NONNULL((1)) int __
 
 
 #ifdef __USE_KOS
-#if defined(__CRT_HAVE_futime64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_futime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(,int,__NOTHROW_RPC,futime,(__fd_t __fd, struct utimbuf const *__file_times),futime64,(__fd,__file_times))
-#elif defined(__CRT_HAVE__futime64) && (defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE__futime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(,int,__NOTHROW_RPC,futime,(__fd_t __fd, struct utimbuf const *__file_times),_futime64,(__fd,__file_times))
 #elif defined(__CRT_HAVE_futime) && (!defined(__USE_TIME_BITS64))
 __CDECLARE(,int,__NOTHROW_RPC,futime,(__fd_t __fd, struct utimbuf const *__file_times),(__fd,__file_times))
@@ -120,9 +120,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(futime64, __FORCELOCAL int __NOTHROW_RPC(__LIBCC
 #define __wchar_t_defined 1
 typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
-#if defined(__CRT_HAVE_utime64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_utime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_utime,(char const *__filename, struct _utimbuf __KOS_FIXED_CONST *__file_times),utime64,(__filename,__file_times))
-#elif defined(__CRT_HAVE__utime64) && (defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE__utime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_utime,(char const *__filename, struct _utimbuf __KOS_FIXED_CONST *__file_times),_utime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE_utime) && (!defined(__USE_TIME_BITS64))
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_utime,(char const *__filename, struct _utimbuf __KOS_FIXED_CONST *__file_times),utime,(__filename,__file_times))
@@ -132,9 +132,9 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_utime,(char const *__filename
 #include <local/utime/utime.h>
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _utime)(char const *__filename, struct _utimbuf __KOS_FIXED_CONST *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(utime))(__filename, (struct utimbuf const *)__file_times); }
 #endif /* _utime... */
-#if defined(__CRT_HAVE_futime64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_futime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(,int,__NOTHROW_RPC,_futime,(__fd_t __fd, struct _utimbuf __KOS_FIXED_CONST *__file_times),futime64,(__fd,__file_times))
-#elif defined(__CRT_HAVE__futime64) && (defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE__futime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(,int,__NOTHROW_RPC,_futime,(__fd_t __fd, struct _utimbuf __KOS_FIXED_CONST *__file_times),_futime64,(__fd,__file_times))
 #elif defined(__CRT_HAVE_futime) && (!defined(__USE_TIME_BITS64))
 __CREDIRECT(,int,__NOTHROW_RPC,_futime,(__fd_t __fd, struct _utimbuf __KOS_FIXED_CONST *__file_times),futime,(__fd,__file_times))
@@ -176,9 +176,9 @@ __CREDIRECT(,int,__NOTHROW_RPC,_futime64,(__fd_t __fd, struct utimbuf64 const *_
 #include <local/utime/futime64.h>
 __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL _futime64)(__fd_t __fd, struct utimbuf64 const *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futime64))(__fd, __file_times); }
 #endif /* _futime64... */
-#if defined(__CRT_HAVE_wutime64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_wutime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_wutime,(wchar_t const *__filename, struct _utimbuf __KOS_FIXED_CONST *__file_times),wutime64,(__filename,__file_times))
-#elif defined(__CRT_HAVE__wutime64) && (defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE__wutime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_wutime,(wchar_t const *__filename, struct _utimbuf __KOS_FIXED_CONST *__file_times),_wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE_wutime) && (!defined(__USE_TIME_BITS64))
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_wutime,(wchar_t const *__filename, struct _utimbuf __KOS_FIXED_CONST *__file_times),wutime,(__filename,__file_times))

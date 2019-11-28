@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1df5bbe0 */
+/* HASH CRC-32:0x387a09e0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -177,5 +177,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftime))(struct timeb *__timebuf) {
 #endif
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE_ftime64) */
+#endif /* __CRT_HAVE__ftime32_s || __CRT_HAVE__ftime64_s || __CRT_HAVE__ftime32 || __CRT_HAVE__ftime64 || __CRT_HAVE_ftime || __CRT_HAVE_ftime64 */
 #endif /* !__local_ftime_defined */

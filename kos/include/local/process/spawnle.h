@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80744466 */
+/* HASH CRC-32:0xba5e70fe */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,5 +43,5 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(spawnle))(int __mode,
 	__REDIRECT_SPAWNLE(char, __localdep_spawnve, __mode, __path, __args)
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve) */
+#endif /* __CRT_HAVE_spawnve || __CRT_HAVE__spawnve */
 #endif /* !__local_spawnle_defined */

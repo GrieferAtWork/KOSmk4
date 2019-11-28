@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa357401e */
+/* HASH CRC-32:0xd44790c8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "fopen" */
 #ifndef ____localdep_fopen_defined
 #define ____localdep_fopen_defined 1
-#if defined(__CRT_HAVE_fopen64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_fopen64) && defined(__USE_FILE_OFFSET64)
 /* Create and return a new file-stream for accessing `FILENAME' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen,(char const *__restrict __filename, char const *__restrict __modes),fopen64,(__filename,__modes))
 #elif defined(__CRT_HAVE_fopen)
@@ -50,5 +50,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_fsopen))(char const *__filename,
 	return __localdep_fopen(__filename, __modes);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_fopen) || defined(__CRT_HAVE__IO_fopen) || defined(__CRT_HAVE_fopen64) */
+#endif /* __CRT_HAVE_fopen || __CRT_HAVE__IO_fopen || __CRT_HAVE_fopen64 */
 #endif /* !__local__fsopen_defined */

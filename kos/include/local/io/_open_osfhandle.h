@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a45cd77 */
+/* HASH CRC-32:0x4266f88a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,5 +31,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_open_osfhandle))(__INTPTR_TYPE__ __o
 	return (__fd_t)__osfd;
 }
 __NAMESPACE_LOCAL_END
-#endif /* !defined(__CRT_DOS) */
+#endif /* !__CRT_DOS */
 #endif /* !__local__open_osfhandle_defined */

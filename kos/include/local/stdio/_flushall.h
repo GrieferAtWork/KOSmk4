@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2e51ee */
+/* HASH CRC-32:0xf21f5112 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,10 +23,10 @@
 /* Dependency: "fflush" from "stdio" */
 #ifndef ____localdep_fflush_defined
 #define ____localdep_fflush_defined 1
-#if defined(__CRT_HAVE_fflush_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+#if defined(__CRT_HAVE_fflush_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
 __CREDIRECT(,int,,__localdep_fflush,(__FILE *__stream),fflush_unlocked,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE__fflush_nolock) && (defined(__USE_STDIO_UNLOCKED))
+#elif defined(__CRT_HAVE__fflush_nolock) && defined(__USE_STDIO_UNLOCKED)
 /* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
 __CREDIRECT(,int,,__localdep_fflush,(__FILE *__stream),_fflush_nolock,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fflush)

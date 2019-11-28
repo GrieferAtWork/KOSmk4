@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c823c1 */
+/* HASH CRC-32:0x2501a431 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -132,7 +132,7 @@ __CDECLARE(,int,__NOTHROW_RPC,name_to_handle_at,(__fd_t __dirfd, char const *__n
 #ifdef __CRT_HAVE_open_by_handle_at
 __CDECLARE(,__fd_t,__NOTHROW_RPC,open_by_handle_at,(__fd_t __mountdirfd, struct file_handle *__handle, int __flags),(__mountdirfd,__handle,__flags))
 #endif /* open_by_handle_at... */
-#if defined(__CRT_HAVE_fallocate64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_fallocate64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(,int,__NOTHROW_NCX,fallocate,(__fd_t __fd, int __mode, __off64_t __offset, __off64_t __length),fallocate64,(__fd,__mode,__offset,__length))
 #elif defined(__CRT_HAVE_fallocate) && (!defined(__USE_FILE_OFFSET64))
 __CDECLARE(,int,__NOTHROW_NCX,fallocate,(__fd_t __fd, int __mode, __off32_t __offset, __off32_t __length),(__fd,__mode,__offset,__length))
@@ -163,7 +163,7 @@ __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,fcntl,(__fd_t __fd, int __cmd)
 #endif /* !__fcntl_defined */
 #ifndef __open_defined
 #define __open_defined 1
-#if defined(__CRT_HAVE_open64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) && (!defined(__USE_FILE_OFFSET64))
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL open)(char const *__filename, __oflag_t __oflags, ...) __CASMNAME_SAME("open");
@@ -184,7 +184,7 @@ __NAMESPACE_LOCAL_USING(open)
 #endif /* !__open_defined */
 #ifndef __creat_defined
 #define __creat_defined 1
-#if defined(__CRT_HAVE_creat64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_creat64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),creat64,(__filename,__mode))
 #elif defined(__CRT_HAVE_creat) && (!defined(__USE_FILE_OFFSET64))
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),(__filename,__mode))
@@ -235,7 +235,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(creat64, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONN
 #ifdef __USE_ATFILE
 #ifndef __openat_defined
 #define __openat_defined 1
-#if defined(__CRT_HAVE_openat64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_openat64) && defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_openat) && (!defined(__USE_FILE_OFFSET64))
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t __NOTHROW_RPC(__VLIBCCALL openat)(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, ...) __CASMNAME_SAME("openat");
@@ -272,7 +272,7 @@ __NAMESPACE_LOCAL_USING(openat64)
 #endif /* __USE_ATFILE */
 
 #ifdef __USE_XOPEN2K
-#if defined(__CRT_HAVE_posix_fadvise64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_posix_fadvise64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(,int,__NOTHROW_NCX,posix_fadvise,(__fd_t __fd, __off64_t __offset, __off64_t __length, int __advise),posix_fadvise64,(__fd,__offset,__length,__advise))
 #elif defined(__CRT_HAVE_posix_fadvise) && (!defined(__USE_FILE_OFFSET64))
 __CDECLARE(,int,__NOTHROW_NCX,posix_fadvise,(__fd_t __fd, __off32_t __offset, __off32_t __length, int __advise),(__fd,__offset,__length,__advise))
@@ -280,7 +280,7 @@ __CDECLARE(,int,__NOTHROW_NCX,posix_fadvise,(__fd_t __fd, __off32_t __offset, __
 #include <local/fcntl/posix_fadvise.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(posix_fadvise, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL posix_fadvise)(__fd_t __fd, __FS_TYPE(off) __offset, __FS_TYPE(off) __length, int __advise) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_fadvise))(__fd, __offset, __length, __advise); })
 #endif /* posix_fadvise... */
-#if defined(__CRT_HAVE_posix_fallocate64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_posix_fallocate64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(,int,__NOTHROW_NCX,posix_fallocate,(__fd_t __fd, __off64_t __offset, __off64_t __length),posix_fallocate64,(__fd,__offset,__length))
 #elif defined(__CRT_HAVE_posix_fallocate) && (!defined(__USE_FILE_OFFSET64))
 __CDECLARE(,int,__NOTHROW_NCX,posix_fallocate,(__fd_t __fd, __off32_t __offset, __off32_t __length),(__fd,__offset,__length))
@@ -317,7 +317,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(posix_fallocate64, __FORCELOCAL int __NOTHROW_NC
 #endif /* !F_LOCK */
 #ifndef __lockf_defined
 #define __lockf_defined 1
-#if defined(__CRT_HAVE_lockf64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_lockf64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, int __cmd, __off64_t __length),lockf64,(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE_lockf) && (!defined(__USE_FILE_OFFSET64))
 __CDECLARE(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, int __cmd, __off32_t __length),(__fd,__cmd,__length))

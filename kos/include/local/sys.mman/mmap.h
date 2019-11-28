@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57a7a6f8 */
+/* HASH CRC-32:0x259010f6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,5 +86,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mmap))(void *__addr,
 #endif /* !__CRT_HAVE_mmap64 */
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_mmap) || defined(__CRT_HAVE_mmap64) */
+#endif /* __CRT_HAVE_mmap || __CRT_HAVE_mmap64 */
 #endif /* !__local_mmap_defined */

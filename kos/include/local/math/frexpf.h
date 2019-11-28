@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ee7ad32 */
+/* HASH CRC-32:0x30d7b354 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,5 +46,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(frexpf))(float __x,
 	return (float)__localdep_frexp((double)__x, __pexponent);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp) */
+#endif /* __CRT_HAVE_frexp || __CRT_HAVE___frexp */
 #endif /* !__local_frexpf_defined */

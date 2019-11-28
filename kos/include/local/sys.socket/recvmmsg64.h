@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1cd21692 */
+/* HASH CRC-32:0x7da658a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,5 +50,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(recvmmsg64))(__fd_t __sockfd,
 	return __localdep_recvmmsg32(__sockfd,__vmessages,__vlen,__flags,&__tmo32);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_recvmmsg) */
+#endif /* __CRT_HAVE_recvmmsg */
 #endif /* !__local_recvmmsg64_defined */

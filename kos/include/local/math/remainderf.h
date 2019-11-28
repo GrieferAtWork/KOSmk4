@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b0ff63c */
+/* HASH CRC-32:0xc145b546 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,5 +46,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remainderf))(float __x,
 	return (float)__localdep_remainder((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder) */
+#endif /* __CRT_HAVE_remainder || __CRT_HAVE___remainder */
 #endif /* !__local_remainderf_defined */

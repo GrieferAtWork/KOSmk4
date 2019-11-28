@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6992b8d1 */
+/* HASH CRC-32:0xa6160bd8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -956,7 +956,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strcasestr, __FORCELOCAL __ATTR_PURE __ATTR_WUNU
 #endif /* strcasestr... */
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
-#if defined(__CRT_HAVE_memmem0) && (defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL))
+#if defined(__CRT_HAVE_memmem0) && defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
 extern "C++" {
 /* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
@@ -1016,7 +1016,7 @@ __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) void const *__NOT
 }
 #endif /* memmem... */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-#if defined(__CRT_HAVE_memmem0) && (defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL))
+#if defined(__CRT_HAVE_memmem0) && defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
 /* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
@@ -4552,7 +4552,7 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHRO
 __NAMESPACE_LOCAL_USING_OR_IMPL(rawmemrlen, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL rawmemrlen)(void const *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rawmemrlen))(__haystack, __needle); })
 #endif /* rawmemrlen... */
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
-#if defined(__CRT_HAVE_memrmem0) && (defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL))
+#if defined(__CRT_HAVE_memrmem0) && defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
 extern "C++" {
 /* Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
@@ -4612,7 +4612,7 @@ __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) void const *__NOT
 }
 #endif /* memrmem... */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-#if defined(__CRT_HAVE_memrmem0) && (defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL))
+#if defined(__CRT_HAVE_memrmem0) && defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
 /* Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
@@ -4699,7 +4699,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 __NAMESPACE_LOCAL_USING_OR_IMPL(memcasecmp, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL memcasecmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcasecmp))(__s1, __s2, __n_bytes); })
 #endif /* memcasecmp... */
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
-#if defined(__CRT_HAVE_memcasemem0) && (defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL))
+#if defined(__CRT_HAVE_memcasemem0) && defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
 extern "C++" {
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * During comprisons, casing of character is ignored (s.a. `memmem()')
@@ -4765,7 +4765,7 @@ __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) void const *__NOT
 }
 #endif /* memcasemem... */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-#if defined(__CRT_HAVE_memcasemem0) && (defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL))
+#if defined(__CRT_HAVE_memcasemem0) && defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * During comprisons, casing of character is ignored (s.a. `memmem()')
  * If no such sub-string exists, return `NULL' instead.
@@ -4808,7 +4808,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 __NAMESPACE_LOCAL_USING_OR_IMPL(memcasecmp_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL memcasecmp_l)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcasecmp_l))(__s1, __s2, __n_bytes, __locale); })
 #endif /* memcasecmp_l... */
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
-#if defined(__CRT_HAVE_memcasemem0_l) && (defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL))
+#if defined(__CRT_HAVE_memcasemem0_l) && defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
 extern "C++" {
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * During comprisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
@@ -4874,7 +4874,7 @@ __FORCELOCAL __ATTR_PURE __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) void 
 }
 #endif /* memcasemem_l... */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-#if defined(__CRT_HAVE_memcasemem0_l) && (defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL))
+#if defined(__CRT_HAVE_memcasemem0_l) && defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * During comprisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
  * If no such sub-string exists, return `NULL' instead.

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e2ab586 */
+/* HASH CRC-32:0x2a4a6ebc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -152,7 +152,7 @@ __CDECLARE(,thrd_t,__NOTHROW_NCX,thrd_current,(void),())
  * s.a. `pthread_self()' */
 __CREDIRECT(,thrd_t,__NOTHROW_NCX,thrd_current,(void),pthread_self,())
 #endif /* thrd_current... */
-#if defined(__CRT_HAVE_thrd_sleep64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_thrd_sleep64) && defined(__USE_TIME_BITS64)
 /* Block current thread execution for at least the time pointed by TIME_POINT.
  * The current thread may resume if receives a signal. In that case, if REMAINING
  * is not NULL, the remaining time is stored in the object pointed by it
@@ -289,7 +289,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mtx_lock,(mtx_t *__restrict __m
  * s.a. `pthread_mutex_lock()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mtx_lock, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL mtx_lock)(mtx_t *__restrict __mutex) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_lock))(__mutex); })
 #endif /* mtx_lock... */
-#if defined(__CRT_HAVE_mtx_timedlock64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_mtx_timedlock64) && defined(__USE_TIME_BITS64)
 /* Block the current thread until the mutex pointed by MUTEX
  * is unlocked or time pointed by TIME_POINT is reached.
  * In case the mutex is unlock, the current thread will not be blocked
@@ -421,7 +421,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,cnd_wait,(cnd_t *__restrict 
  * s.a. `pthread_cond_wait()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_wait, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL cnd_wait)(cnd_t *__restrict __cond, mtx_t *__restrict __mutex) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_wait))(__cond, __mutex); })
 #endif /* cnd_wait... */
-#if defined(__CRT_HAVE_cnd_timedwait64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_cnd_timedwait64) && defined(__USE_TIME_BITS64)
 /* Block current thread on the condition variable until condition variable
  * pointed by COND is signaled or time pointed by TIME_POINT is reached
  * s.a. `pthread_cond_timedwait()' */

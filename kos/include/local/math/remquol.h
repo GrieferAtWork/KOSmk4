@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcdab6170 */
+/* HASH CRC-32:0xf57ffaab */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,5 +55,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remquol))(long double __x,
 	return (long double)__localdep_remquo((double)__x, (double)__y, __pquo);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo) */
+#endif /* __CRT_HAVE_remquo || __CRT_HAVE___remquo */
 #endif /* !__local_remquol_defined */

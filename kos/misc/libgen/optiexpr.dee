@@ -28,6 +28,40 @@ global PPBranchNot;
 global PPBranchAnd;
 global PPBranchOr;
 
+function optimizeStringBranch(x: string): string {
+	/* Try to get rid of unnecessary parenthesis */
+	while (x.startswith("(") && x.endswith(")") && x.findmatch("(", ")", 1) == #x - 1) {
+		local inner = x[1:-1].strip();
+		local i = 0, len = #inner;
+		/* Make sure that `inner' doesn't contain any top-level unhandled operators! */
+		for (i = 0; i < len; ++i) {
+			local ch = inner[i];
+			if (ch in "({[") {
+				i = inner.findmatch(ch, {
+					"(" : ")",
+					"{" : "}",
+					"[" : "]",
+				}[ch], i + 1);
+				if (i < 0)
+					goto done;
+				++i;
+				continue;
+			}
+			if (ch.issymcont())
+				continue;
+			if (ch.isspace())
+				continue;
+			/* non-symbol, non-space, and non-matching-paren character encountered.
+			 * This may be something like `(FOO + 2)', which we don't understand, so
+			 * just don't touch it! */
+			goto done;
+		}
+		x = inner;
+	}
+done:
+	return x;
+}
+
 function equalPPBranches(a: Object, b: Object): bool {
 	if (type(a) !== type(b))
 		return false;
@@ -102,6 +136,40 @@ function optimizePPBranch(b: Object): Object {
 			break;
 		}
 		break;
+	}
+	return b;
+}
+
+function replaceDefinedInString(x: string): string {
+	local i = 0;
+	for (;;) {
+		i = x.find("defined(", i);
+		if (i < 0)
+			break;
+		if (i != 0 && x.issymcont(i - 1)) {
+			i += 8;
+			continue;
+		}
+		local s = i + 8;
+		local e = x.findmatch("(", ")", s);
+		if (e < 0)
+			break;
+		x = x[:i] + x[s:e].strip() + x[e + 1:];
+		i = 0;
+	}
+	return x;
+}
+
+function replaceDefinedBranches(b: Object): Object {
+	if (b is PPBranchNot) {
+		b.branch = replaceDefinedBranches(b.branch);
+	} else if (b is PPBranchAnd || b is PPBranchOr) {
+		local c = b.conditions;
+		local i, len = #c;
+		for (i = 0; i < len; ++i)
+			c[i] = replaceDefinedBranches(c[i]);
+	} else if (b is string) {
+		b = replaceDefinedInString(b);
 	}
 	return b;
 }
@@ -339,11 +407,14 @@ function parsePPBranchUnary(parser: PPBranchParser): Object {
 		throw Error(
 			"Expected expression `)' after `(' (got {!r} in {!r})"
 				.format({ parser.tok, parser.expr }));
+		break;
 
 	case "!": {
 		parser.next();
 		local inner = parsePPBranchUnary(parser);
-		inner = inner is string ? "!" + inner : PPBranchNot(inner);
+		inner = inner is string
+			? "!" + inner
+			: PPBranchNot(inner);
 		return inner;
 	}	break;
 
@@ -364,7 +435,7 @@ function parsePPBranchUnary(parser: PPBranchParser): Object {
 			if (!inner.startswith("(") ||
 			    !inner.endswith(")") ||
 			    inner.findmatch("(", ")", 1) != #inner - 1)
-				inner = "({})".format({ inner });
+				inner = optimizeStringBranch("({})".format({ inner }));
 		}
 		return inner;
 	}	break;
@@ -400,7 +471,8 @@ handle_generic_expression:
 			}
 		}
 	}
-	return parser.expr[start:parser.pos - #parser.tok].strip();
+	return optimizeStringBranch(
+		parser.expr[start:parser.pos - #parser.tok].strip());
 }
 
 function parsePPBranchAnd(parser: PPBranchParser): Object {
@@ -447,6 +519,24 @@ function optimizePreprocessorExpression(expr: string): string {
 	return str(branch);
 }
 
+@@Same as `optimizePreprocessorExpression()', but also replace `defined(ABC)' with `ABC'
+function optimizePreprocessorExpressionAndRemoveDefined(expr: string): string {
+	local parser = PPBranchParser(expr.strip());
+	if (!parser.next())
+		return "1";
+	local branch = parsePPBranch(parser);
+	while (parser.pos < parser.end && parser.expr.isspace(parser.pos))
+		++parser.pos;
+	if (parser.pos < parser.end) {
+		throw Error(
+			"Unused tail {!r} in expression {!r}".format({
+				parser.expr[parser.pos:parser.end], parser.expr }));
+	}
+	branch = optimizePPBranch(branch);
+	branch = replaceDefinedBranches(branch);
+	return str(branch);
+}
+
 @@Returns either `#ifdef FOO' or `#if COMPLICATED_EXPR'
 function wrapProcessorExpressionForIf(expr: string): string {
 	if (expr.startswith("defined")) {
@@ -474,6 +564,7 @@ function optimizeAndWrapProcessorExpressionForIf(expr: string): string {
 }
 
 assert optimizePreprocessorExpression("") == "1";
+assert optimizePreprocessorExpression("(foo)") == "foo";
 assert optimizePreprocessorExpression("(defined(foo) || defined(bar))") == "defined(foo) || defined(bar)";
 assert optimizePreprocessorExpression("foo || bar") == "foo || bar";
 assert optimizePreprocessorExpression("foo || bar && 1") == "foo || bar";

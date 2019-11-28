@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x564ea318 */
+/* HASH CRC-32:0x4d388e64 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,5 +48,5 @@ __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16lchown))(__CHAR16_TYPE__ const *__
 	return __localdep_c16fchownat(__CRT_AT_FDCWD, __file, __owner, __group, 0x0100); /* AT_SYMLINK_NOFOLLOW */
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wfchownat) */
+#endif /* __CRT_AT_FDCWD && __CRT_HAVE_wfchownat */
 #endif /* !__local_c16lchown_defined */

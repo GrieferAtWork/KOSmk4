@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4550fe81 */
+/* HASH CRC-32:0xb53d1acd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,5 +71,5 @@ __LOCAL_LIBC(Memcdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNUL
 	return __localdep_Memdup(__ptr, __num_bytes);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_Malloc) || defined(__CRT_HAVE_Memdup) */
+#endif /* __CRT_HAVE_Malloc || __CRT_HAVE_Memdup */
 #endif /* !__local_Memcdup_defined */

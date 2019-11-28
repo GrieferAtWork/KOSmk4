@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4745d9b5 */
+/* HASH CRC-32:0x53b7cff1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,5 +57,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcsdup_dbg))(__WCHAR16_TYPE__ const 
 	return (__WCHAR16_TYPE__ *)__localdep_c16dup((__CHAR16_TYPE__ const *)__string);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_wcsdup) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_c16dup) || (defined(__CRT_HAVE__wcsdup) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wcsdup) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc) */
+#endif /* (__CRT_HAVE_wcsdup && __SIZEOF_WCHAR_T__ == 2) || __CRT_HAVE_c16dup || (__CRT_HAVE__wcsdup && __SIZEOF_WCHAR_T__ == 2) || __CRT_HAVE_DOS$_wcsdup || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_posix_memalign || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_malloc */
 #endif /* !__local__wcsdup_dbg_defined */

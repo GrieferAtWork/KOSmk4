@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f22f2c7 */
+/* HASH CRC-32:0x5923bae0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,5 +66,5 @@ __LOCAL_LIBC(Memdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_Malloc) */
+#endif /* __CRT_HAVE_Malloc */
 #endif /* !__local_Memdup_defined */

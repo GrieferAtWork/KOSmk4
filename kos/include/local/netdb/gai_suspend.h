@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd992b0bc */
+/* HASH CRC-32:0x253affc5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,5 +93,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(gai_suspend))(struct gaicb const *con
 #endif
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_gai_suspend64) || defined(__CRT_HAVE_gai_suspend) */
+#endif /* __CRT_HAVE_gai_suspend64 || __CRT_HAVE_gai_suspend */
 #endif /* !__local_gai_suspend_defined */

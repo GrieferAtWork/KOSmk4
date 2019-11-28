@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3f44e31 */
+/* HASH CRC-32:0x509277ec */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,5 +77,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock))(__pthrea
 #endif /* !__CRT_HAVE_pthread_rwlock_timedwrlock */
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_pthread_rwlock_timedwrlock) || defined(__CRT_HAVE_pthread_rwlock_timedwrlock64) */
+#endif /* __CRT_HAVE_pthread_rwlock_timedwrlock || __CRT_HAVE_pthread_rwlock_timedwrlock64 */
 #endif /* !__local_pthread_rwlock_timedwrlock_defined */

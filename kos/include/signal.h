@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb733be75 */
+/* HASH CRC-32:0x6f74d78f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -381,7 +381,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sigorset, __FORCELOCAL __ATTR_NONNULL((1, 2, 3))
 #ifdef __CRT_HAVE_sigwaitinfo
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigwaitinfo,(sigset_t const *__restrict __set, siginfo_t *__restrict __info),(__set,__info))
 #endif /* sigwaitinfo... */
-#if defined(__CRT_HAVE_sigtimedwait64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_sigtimedwait64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigtimedwait,(sigset_t const *__restrict __set, siginfo_t *__restrict __info, struct timespec const *__timeout),sigtimedwait64,(__set,__info,__timeout))
 #elif defined(__CRT_HAVE_sigtimedwait) && (!defined(__USE_TIME_BITS64))
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigtimedwait,(sigset_t const *__restrict __set, siginfo_t *__restrict __info, struct timespec const *__timeout),(__set,__info,__timeout))

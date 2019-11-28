@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba3c7d5f */
+/* HASH CRC-32:0x2f7b9af9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@
 /* Dependency: "fileno" */
 #ifndef ____localdep_fileno_defined
 #define ____localdep_fileno_defined 1
-#if defined(__CRT_HAVE_fileno_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+#if defined(__CRT_HAVE_fileno_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Return the underlying file descriptor number used by `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fileno)
@@ -53,11 +53,11 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_f
 /* Dependency: "ftruncate" from "unistd" */
 #ifndef ____localdep_ftruncate_defined
 #define ____localdep_ftruncate_defined 1
-#if defined(__CRT_HAVE_ftruncate64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_ftruncate64) && defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),ftruncate64,(__fd,__length))
-#elif defined(__CRT_HAVE__chsize_s) && (defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE__chsize_s) && defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),_chsize_s,(__fd,__length))
@@ -101,5 +101,5 @@ __LOCAL_LIBC(fftruncate) __ATTR_NONNULL((1)) int
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64))) && (defined(__CRT_HAVE_fileno) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno_unlocked)) */
+#endif /* (__CRT_HAVE_ftruncate || __CRT_HAVE__chsize || __CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s || (__CRT_HAVE_chsize && !__USE_FILE_OFFSET64)) && (__CRT_HAVE_fileno || __CRT_HAVE__fileno || __CRT_HAVE_fileno_unlocked) */
 #endif /* !__local_fftruncate_defined */

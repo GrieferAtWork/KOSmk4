@@ -49,7 +49,8 @@ import hash from hashlib;
 import
 	optimizePreprocessorExpression,
 	wrapProcessorExpressionForIf,
-	optimizeAndWrapProcessorExpressionForIf
+	optimizeAndWrapProcessorExpressionForIf,
+	optimizePreprocessorExpressionAndRemoveDefined
 from ..libgen.optiexpr;
 
 
@@ -625,7 +626,8 @@ function split_words(
 							directive = directive[1:-1].strip();
 							yield split_words(
 								"#else /* {} */".format({
-									form_has_function_expression(directive)
+									optimizePreprocessorExpressionAndRemoveDefined(
+										form_has_function_expression(directive))
 								}), env, for_copy)...;
 						}
 						did_encounter_else_if_has_function = true;
@@ -638,9 +640,10 @@ function split_words(
 								throw Error("Argument of @@endif_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
 							directive = form_has_function_expression(directive[1:-1].strip());
 							if (did_encounter_else_if_has_function)
-								directive = optimizePreprocessorExpression("!({})".format({ directive }));
+								directive = "!({})".format({ directive });
 							yield split_words(
-								"#endif /* {} */".format({ directive }),
+								"#endif /* {} */".format({
+									optimizePreprocessorExpressionAndRemoveDefined(directive) }),
 								env, for_copy)...;
 						}
 						break;
@@ -4567,7 +4570,7 @@ class Function {
 			fp << "#endif /* ";
 			File.Writer tempfp;
 			format_define_require_string_comment(tempfp, define_require_string);
-			fp << optimizePreprocessorExpression(tempfp.string);
+			fp << optimizePreprocessorExpressionAndRemoveDefined(tempfp.string);
 			fp << " */\n";
 		}
 		fp << "#endif /* !__local_" << used_name << "_defined */\n";

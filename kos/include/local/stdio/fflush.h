@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x670d9e80 */
+/* HASH CRC-32:0xd07af62 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __LOCAL_LIBC(fflush) int
 #if defined(__CRT_HAVE__flushall) || defined(__CRT_HAVE__IO_flush_all)
 	if (!__stream)
 		return __localdep_crt_flushall();
-#endif /* defined(__CRT_HAVE__flushall) || defined(__CRT_HAVE__IO_flush_all) */
+#endif /* __CRT_HAVE__flushall || __CRT_HAVE__IO_flush_all */
 	(void)__stream;
 	return 0;
 }

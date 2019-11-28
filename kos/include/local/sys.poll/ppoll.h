@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab4987d7 */
+/* HASH CRC-32:0xbeb80868 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,5 +69,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(ppoll))(struct pollfd *__fds,
 #endif
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_ppoll) || defined(__CRT_HAVE_ppoll64) */
+#endif /* __CRT_HAVE_ppoll || __CRT_HAVE_ppoll64 */
 #endif /* !__local_ppoll_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3b8b0ee */
+/* HASH CRC-32:0xea819cb8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,5 +45,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(tgammal))(long double __x) {
 	return (long double)__localdep_tgamma((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma) */
+#endif /* __CRT_HAVE_tgamma || __CRT_HAVE___tgamma */
 #endif /* !__local_tgammal_defined */

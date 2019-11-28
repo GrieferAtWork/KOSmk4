@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a8a30e1 */
+/* HASH CRC-32:0x34634a73 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "crt_fseeko" from "stdio" */
 #ifndef ____localdep_crt_fseeko_defined
 #define ____localdep_crt_fseeko_defined 1
-#if defined(__CRT_HAVE_fseeko_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+#if defined(__CRT_HAVE_fseeko_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko_unlocked,(__stream,__off,__whence)) __THROWS(...)
 #elif defined(__CRT_HAVE_fseeko)
 __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko,(__stream,__off,__whence)) __THROWS(...)
@@ -38,9 +38,9 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_crt_fseeko,(__FILE *__restrict _
 /* Dependency: "crt_fseek" from "stdio" */
 #ifndef ____localdep_crt_fseek_defined
 #define ____localdep_crt_fseek_defined 1
-#if defined(__CRT_HAVE_fseek_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+#if defined(__CRT_HAVE_fseek_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek_unlocked,(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE__fseek_nolock) && (defined(__USE_STDIO_UNLOCKED))
+#elif defined(__CRT_HAVE__fseek_nolock) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),_fseek_nolock,(__stream,__off,__whence)) __THROWS(...)
 #elif defined(__CRT_HAVE_fseek)
 __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek,(__stream,__off,__whence)) __THROWS(...)
@@ -62,10 +62,10 @@ __LOCAL_LIBC(fseeko64) __ATTR_NONNULL((1)) int
 #line 1603 "kos/src/libc/magic/stdio.c"
 #if defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked)
 	return __localdep_crt_fseeko(__stream, (__off32_t)__off, __whence);
-#else /* defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) */
+#else /* __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked */
 	return __localdep_crt_fseek(__stream, (long int)__off, __whence);
-#endif /* !defined(__CRT_HAVE_fseeko) && !defined(__CRT_HAVE_fseeko_unlocked) */
+#endif /* !__CRT_HAVE_fseeko && !__CRT_HAVE_fseeko_unlocked */
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock) */
+#endif /* __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock */
 #endif /* !__local_fseeko64_defined */

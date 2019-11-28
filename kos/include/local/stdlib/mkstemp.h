@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x415859a3 */
+/* HASH CRC-32:0x850a4f22 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,5 +41,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mkstemp))(char *__template_) {
 	return __localdep_mktemp(__template_) ? 0 : -1;
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_mktemp) || defined(__CRT_HAVE__mktemp) || defined(__CRT_HAVE___mktemp) */
+#endif /* __CRT_HAVE_mktemp || __CRT_HAVE__mktemp || __CRT_HAVE___mktemp */
 #endif /* !__local_mkstemp_defined */

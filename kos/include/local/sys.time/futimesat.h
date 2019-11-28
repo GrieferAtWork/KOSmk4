@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x750435f5 */
+/* HASH CRC-32:0xf5084695 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,5 +77,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimesat))(__fd_t __fd,
 #endif /* !__CRT_HAVE_utimes */
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_futimesat) || defined(__CRT_HAVE_futimesat64) */
+#endif /* __CRT_HAVE_futimesat || __CRT_HAVE_futimesat64 */
 #endif /* !__local_futimesat_defined */

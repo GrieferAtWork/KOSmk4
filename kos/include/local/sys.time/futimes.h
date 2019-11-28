@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c4fcc71 */
+/* HASH CRC-32:0x8973476f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,5 +76,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimes))(__fd_t __fd,
 #endif /* !__CRT_HAVE_utimes */
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_futimes) || defined(__CRT_HAVE_futimes64) */
+#endif /* __CRT_HAVE_futimes || __CRT_HAVE_futimes64 */
 #endif /* !__local_futimes_defined */

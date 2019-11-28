@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf59aec0f */
+/* HASH CRC-32:0x30385512 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,5 +41,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(c32rmdir))(__CHAR32_TYPE__ const *__p
 	return __localdep_c32unlinkat(__CRT_AT_FDCWD, __path, 0x0200); /* AT_REMOVEDIR */
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wunlinkat) */
+#endif /* __CRT_AT_FDCWD && __CRT_HAVE_wunlinkat */
 #endif /* !__local_c32rmdir_defined */

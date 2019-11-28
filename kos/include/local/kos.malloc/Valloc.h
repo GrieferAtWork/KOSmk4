@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c355c67 */
+/* HASH CRC-32:0x2c5ffa29 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,5 +59,5 @@ __LOCAL_LIBC(Valloc) __ATTR_MALLOC __ATTR_MALL_PAGEALIGNED __ATTR_RETNONNULL __A
 	return __localdep_Memalign(__localdep_getpagesize(), __num_bytes);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_Memalign) */
+#endif /* __CRT_HAVE_Memalign */
 #endif /* !__local_Valloc_defined */

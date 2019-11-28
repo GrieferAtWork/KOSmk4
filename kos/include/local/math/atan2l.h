@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x444b10f */
+/* HASH CRC-32:0xe69e1ff8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,5 +46,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atan2l))(long double __y,
 	return (long double)__localdep_atan2((double)__y, (double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2) */
+#endif /* __CRT_HAVE_atan2 || __CRT_HAVE___atan2 */
 #endif /* !__local_atan2l_defined */

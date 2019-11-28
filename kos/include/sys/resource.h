@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a2c2dc2 */
+/* HASH CRC-32:0xb2a7771f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,7 +68,7 @@ typedef int __rusage_who_t;
 typedef int __priority_which_t;
 #endif /* !__USE_GNU || !__COMPILER_PREFERR_ENUMS */
 
-#if defined(__CRT_HAVE_getrlimit64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_getrlimit64) && defined(__USE_FILE_OFFSET64)
 /* Put the soft and hard limits for RESOURCE in *RLIMITS.
  * Returns 0 if successful, -1 if not (and sets errno) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit,(__rlimit_resource_t __resource, struct rlimit *__rlimits),getrlimit64,(__resource,__rlimits))
@@ -81,7 +81,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit,(__rlimit_resource_t 
  * Returns 0 if successful, -1 if not (and sets errno) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit,(__rlimit_resource_t __resource, struct rlimit *__rlimits),__getrlimit,(__resource,__rlimits))
 #endif /* getrlimit... */
-#if defined(__CRT_HAVE_setrlimit64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_setrlimit64) && defined(__USE_FILE_OFFSET64)
 /* Set the soft and hard limits for RESOURCE to *RLIMITS.
  * Only the super-user can increase hard limits.
  * Return 0 if successful, -1 if not (and sets errno) */

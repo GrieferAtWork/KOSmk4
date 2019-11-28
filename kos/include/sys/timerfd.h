@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb5f6abe */
+/* HASH CRC-32:0x5275047 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,7 +68,7 @@ enum {
 /* Return file descriptor for new interval timer source */
 __CDECLARE(,__fd_t,__NOTHROW,timerfd_create,(clockid_t __clock_id, int __flags),(__clock_id,__flags))
 #endif /* timerfd_create... */
-#if defined(__CRT_HAVE_timerfd_settime64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_timerfd_settime64) && defined(__USE_TIME_BITS64)
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
  * is absolute. Optionally return the old expiration time in OTMR */
@@ -85,7 +85,7 @@ __CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,timerfd_settime,(__fd_t __ufd, 
  * is absolute. Optionally return the old expiration time in OTMR */
 __NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_settime, __FORCELOCAL __ATTR_NONNULL((3)) int __NOTHROW_NCX(__LIBCCALL timerfd_settime)(__fd_t __ufd, int __flags, struct itimerspec const *__utmr, struct itimerspec *__otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_settime))(__ufd, __flags, __utmr, __otmr); })
 #endif /* timerfd_settime... */
-#if defined(__CRT_HAVE_timerfd_gettime64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_timerfd_gettime64) && defined(__USE_TIME_BITS64)
 /* Return the next expiration time of UFD */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,timerfd_gettime,(__fd_t __ufd, struct itimerspec *__restrict __otmr),timerfd_gettime64,(__ufd,__otmr))
 #elif defined(__CRT_HAVE_timerfd_gettime) && (!defined(__USE_TIME_BITS64))

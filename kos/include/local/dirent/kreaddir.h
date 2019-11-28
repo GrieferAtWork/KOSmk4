@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3443203f */
+/* HASH CRC-32:0x3b286064 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@
  * @return: 0 : The end of the directory has been reached.
  * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
 __CREDIRECT(__ATTR_WUNUSED,__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_kreaddirf,(__fd_t __fd, struct dirent *__buf, __SIZE_TYPE__ __bufsize, unsigned int __mode, __oflag_t __flags),kreaddirf,(__fd,__buf,__bufsize,__mode,__flags))
-#elif defined(__CRT_HAVE_kreaddirf64) && (defined(_DIRENT_MATCHES_DIRENT64))
+#elif defined(__CRT_HAVE_kreaddirf64) && defined(_DIRENT_MATCHES_DIRENT64)
 /* The KOS-specific system call for reading a single directory entry
  * from a file descriptor referring to an open directory stream.
  * @param: MODE: One of `READDIR_*' (See below)
@@ -66,5 +66,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(kreaddir))(__fd_t __fd,
 	return __localdep_kreaddirf(__fd, __buf, __bufsize, __mode, 0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_kreaddirf) || (defined(__CRT_HAVE_kreaddirf64) && defined(_DIRENT_MATCHES_DIRENT64)) */
+#endif /* __CRT_HAVE_kreaddirf || (__CRT_HAVE_kreaddirf64 && _DIRENT_MATCHES_DIRENT64) */
 #endif /* !__local_kreaddir_defined */

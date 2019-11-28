@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26bbfd25 */
+/* HASH CRC-32:0x882f3dd0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 /* Dependency: "pthread_cond_timedwait" from "pthread" */
 #ifndef ____localdep_pthread_cond_timedwait_defined
 #define ____localdep_pthread_cond_timedwait_defined 1
-#if defined(__CRT_HAVE_pthread_cond_timedwait64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_pthread_cond_timedwait64) && defined(__USE_TIME_BITS64)
 /* Wait for condition variable COND to be signaled or broadcast until
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch
@@ -74,5 +74,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(cnd_timedwait))(__cnd_t *__restrict _
 	return 2; /* thrd_error */
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_pthread_cond_timedwait) || defined(__CRT_HAVE_pthread_cond_timedwait64) */
+#endif /* __CRT_HAVE_pthread_cond_timedwait || __CRT_HAVE_pthread_cond_timedwait64 */
 #endif /* !__local_cnd_timedwait_defined */

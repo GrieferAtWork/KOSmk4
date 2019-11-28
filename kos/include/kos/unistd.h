@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e08bfef */
+/* HASH CRC-32:0xdb193f99 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -277,7 +277,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ReadAll, __FORCELOCAL __ATTR_NONNULL((2)) size_t
 #endif /* ReadAll... */
 #endif /* __USE_KOS */
 
-#if defined(__CRT_HAVE_LSeek64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_LSeek64) && defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__pos64_t,,LSeek,(__fd_t __fd, __off64_t __offset, int __whence),LSeek64,(__fd,__offset,__whence)) __THROWS(...)
@@ -410,7 +410,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(LSeek64, __FORCELOCAL __pos64_t (__LIBCCALL LSee
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 
-#if defined(__CRT_HAVE_PRead64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_PRead64) && defined(__USE_FILE_OFFSET64)
 /* >> pread(2)
  * Read data from a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),size_t,,PRead,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),PRead64,(__fd,__buf,__bufsize,__offset)) __THROWS(...)
@@ -424,7 +424,7 @@ __CDECLARE(__ATTR_NONNULL((2)),size_t,,PRead,(__fd_t __fd, void *__buf, size_t _
  * Read data from a file at a specific offset */
 __NAMESPACE_LOCAL_USING_OR_IMPL(PRead, __FORCELOCAL __ATTR_NONNULL((2)) size_t (__LIBCCALL PRead)(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PRead))(__fd, __buf, __bufsize, __offset); })
 #endif /* PRead... */
-#if defined(__CRT_HAVE_PWrite64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_PWrite64) && defined(__USE_FILE_OFFSET64)
 /* >> pwrite(2)
  * Write data to a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),size_t,,PWrite,(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset),PWrite64,(__fd,__buf,__bufsize,__offset)) __THROWS(...)
@@ -440,7 +440,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(PWrite, __FORCELOCAL __ATTR_NONNULL((2)) size_t 
 #endif /* PWrite... */
 
 #ifdef __USE_KOS
-#if defined(__CRT_HAVE_PReadAll64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_PReadAll64) && defined(__USE_FILE_OFFSET64)
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 __CREDIRECT(__ATTR_NONNULL((2)),size_t,,PReadAll,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),PReadAll64,(__fd,__buf,__bufsize,__offset)) __THROWS(...)
@@ -591,7 +591,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(LChown, __FORCELOCAL __ATTR_NONNULL((1)) void (_
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 
-#if defined(__CRT_HAVE_Truncate64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_Truncate64) && defined(__USE_FILE_OFFSET64)
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),,Truncate,(char const *__file, pos_t __length),Truncate64,(__file,__length)) __THROWS(...)
@@ -782,7 +782,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),,ChRoot,(char const *__restrict __path),(__p
 #endif /* ... */
 
 #if defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
-#if defined(__CRT_HAVE_FTruncate64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_FTruncate64) && defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT_VOID(,,FTruncate,(__fd_t __fd, pos_t __length),FTruncate64,(__fd,__length)) __THROWS(...)

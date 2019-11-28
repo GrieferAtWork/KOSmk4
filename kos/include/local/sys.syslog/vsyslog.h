@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd36d091a */
+/* HASH CRC-32:0x4cb4e5bf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -230,5 +230,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(vsyslog))(int __level,
 	               __args);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_syslog_printer) */
+#endif /* __CRT_HAVE_syslog_printer */
 #endif /* !__local_vsyslog_defined */

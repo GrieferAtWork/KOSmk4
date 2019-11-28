@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14ea72f3 */
+/* HASH CRC-32:0x4bc01429 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,7 +83,7 @@ typedef __fd_mask fd_mask;
 #define FD_ISSET(fd, fdsetp) __FD_ISSET(fd, fdsetp)
 #define FD_ZERO(fdsetp)      __FD_ZERO(fdsetp)
 
-#if defined(__CRT_HAVE_select64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_select64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,select,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timeval *__restrict __timeout),select64,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #elif defined(__CRT_HAVE_select) && (!defined(__USE_TIME_BITS64))
 __CDECLARE(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,select,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timeval *__restrict __timeout),(__nfds,__readfds,__writefds,__exceptfds,__timeout))
@@ -94,7 +94,7 @@ __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,select,(__STDC_INT_AS_SIZE_T __
 __NAMESPACE_LOCAL_USING_OR_IMPL(select, __FORCELOCAL __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL select)(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timeval *__restrict __timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(select))(__nfds, __readfds, __writefds, __exceptfds, __timeout); })
 #endif /* select... */
 #ifdef __USE_XOPEN2K
-#if defined(__CRT_HAVE_pselect64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_pselect64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,pselect,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timespec const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect64,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
 #elif defined(__CRT_HAVE_pselect) && (!defined(__USE_TIME_BITS64))
 __CDECLARE(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,pselect,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timespec const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))

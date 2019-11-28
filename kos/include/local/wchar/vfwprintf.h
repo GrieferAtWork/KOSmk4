@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76fa7689 */
+/* HASH CRC-32:0xf628704c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -211,7 +211,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0),__SSIZE_TYPE__,__NOT
 /* Dependency: "file_wprinter" from "wchar" */
 #ifndef ____localdep_file_wprinter_defined
 #define ____localdep_file_wprinter_defined 1
-#if defined(__CRT_HAVE_file_wprinter_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+#if defined(__CRT_HAVE_file_wprinter_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,,__localdep_file_wprinter,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen)) __THROWS(...)
 #elif defined(__CRT_HAVE_file_wprinter)
@@ -238,5 +238,5 @@ __LOCAL_LIBC(vfwprintf) __ATTR_NONNULL((1, 2)) __ATTR_LIBC_WPRINTF(2, 0) __STDC_
 	return (__STDC_INT_AS_SSIZE_T)__localdep_format_vwprintf(&__localdep_file_wprinter, __stream, __format, __args);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) */
+#endif /* __CRT_HAVE_fputwc || __CRT_HAVE_putwc || __CRT_HAVE_file_wprinter || __CRT_HAVE_file_wprinter_unlocked */
 #endif /* !__local_vfwprintf_defined */

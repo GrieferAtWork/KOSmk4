@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf63a5fb3 */
+/* HASH CRC-32:0xc5b4c6ad */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,5 +54,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwriteall))(__fd_t __fd,
 	return __localdep_pwriteall64(__fd, __buf, __bufsize, (__PIO_OFFSET64)__offset);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))) || defined(__CRT_HAVE_pwrite64) || (defined(__CRT_HAVE_pwrite) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE___pwrite64) || defined(__CRT_HAVE_pwriteall64) || (defined(__CRT_HAVE_pwriteall) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) */
+#endif /* __CRT_HAVE_pread || ((__CRT_HAVE_write || __CRT_HAVE__write) && (__CRT_HAVE_lseek || __CRT_HAVE_lseek64 || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE__lseeki64)) || __CRT_HAVE_pwrite64 || (__CRT_HAVE_pwrite && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || __CRT_HAVE___pwrite64 || __CRT_HAVE_pwriteall64 || (__CRT_HAVE_pwriteall && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) */
 #endif /* !__local_pwriteall_defined */

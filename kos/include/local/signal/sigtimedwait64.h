@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaedda74b */
+/* HASH CRC-32:0xbc642e90 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,5 +44,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sigtimedwait64))(struct __sigset_stru
 	return __localdep_sigtimedwait32(__set, __info, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_sigtimedwait) */
+#endif /* __CRT_HAVE_sigtimedwait */
 #endif /* !__local_sigtimedwait64_defined */

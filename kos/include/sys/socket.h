@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e52a4d7 */
+/* HASH CRC-32:0xef4bcd16 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -273,7 +273,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,sendmmsg,(__fd_t __sockfd, stru
  * Returns the number of datagrams successfully written or -1 for errors */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,sendmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, unsigned int __vlen, int __flags),__sendmmsg,(__sockfd,__vmessages,__vlen,__flags))
 #endif /* sendmmsg... */
-#if defined(__CRT_HAVE_recvmmsg64) && (defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_recvmmsg64) && defined(__USE_TIME_BITS64)
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors. */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, unsigned int __vlen, int __flags, struct timespec *__tmo),recvmmsg64,(__sockfd,__vmessages,__vlen,__flags,__tmo))

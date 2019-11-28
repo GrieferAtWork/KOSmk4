@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ede7a70 */
+/* HASH CRC-32:0x6d32473d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,5 +39,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__signbitl))(long double __val) {
 	return (int)__localdep___signbit((double)__val);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE___signbit) || defined(__CRT_HAVE__dsign) */
+#endif /* __CRT_HAVE___signbit || __CRT_HAVE__dsign */
 #endif /* !__local___signbitl_defined */

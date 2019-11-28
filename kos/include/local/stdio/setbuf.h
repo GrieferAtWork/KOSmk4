@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce823dc8 */
+/* HASH CRC-32:0xf98cde72 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "setvbuf" */
 #ifndef ____localdep_setvbuf_defined
 #define ____localdep_setvbuf_defined 1
-#if defined(__CRT_HAVE_setvbuf_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+#if defined(__CRT_HAVE_setvbuf_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Set the buffer and buffer-mode to-be used by the given `STREAM'
  * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setvbuf,(__FILE *__restrict __stream, char *__restrict __buf, int __modes, __SIZE_TYPE__ __bufsize),setvbuf_unlocked,(__stream,__buf,__modes,__bufsize))
@@ -71,5 +71,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setbuf))(__FILE *__restrict __stream,
 	        __buf ? __BUFSIZ : 0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked) */
+#endif /* __CRT_HAVE_setvbuf || __CRT_HAVE__IO_setvbuf || __CRT_HAVE_setvbuf_unlocked */
 #endif /* !__local_setbuf_defined */

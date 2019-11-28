@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa84bcb2a */
+/* HASH CRC-32:0x68a1e8c5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,5 +46,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(dremf))(float __x,
 	return (float)__localdep_drem((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem) */
+#endif /* __CRT_HAVE_drem || __CRT_HAVE___drem */
 #endif /* !__local_dremf_defined */

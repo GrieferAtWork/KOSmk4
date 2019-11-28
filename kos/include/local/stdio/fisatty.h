@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb9b161e */
+/* HASH CRC-32:0xb945bc44 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isatty,(__fd_t __fd),_is
 /* Dependency: "fileno" */
 #ifndef ____localdep_fileno_defined
 #define ____localdep_fileno_defined 1
-#if defined(__CRT_HAVE_fileno_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+#if defined(__CRT_HAVE_fileno_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Return the underlying file descriptor number used by `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fileno)
@@ -67,5 +67,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fisatty))(__FILE *__restrict __stream
 	return __localdep_isatty(__localdep_fileno(__stream));
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_isatty) || defined(__CRT_HAVE__isatty)) && (defined(__CRT_HAVE_fileno) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno_unlocked)) */
+#endif /* (__CRT_HAVE_isatty || __CRT_HAVE__isatty) && (__CRT_HAVE_fileno || __CRT_HAVE__fileno || __CRT_HAVE_fileno_unlocked) */
 #endif /* !__local_fisatty_defined */

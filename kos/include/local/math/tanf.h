@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8fa8fc7 */
+/* HASH CRC-32:0x7f839d16 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,5 +45,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(tanf))(float __x) {
 	return (float)__localdep_tan((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan) */
+#endif /* __CRT_HAVE_tan || __CRT_HAVE___tan */
 #endif /* !__local_tanf_defined */

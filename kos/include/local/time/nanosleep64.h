@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48404d86 */
+/* HASH CRC-32:0xfceafa3a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,5 +52,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(nanosleep64))(struct __timespec64 con
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) */
+#endif /* __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep */
 #endif /* !__local_nanosleep64_defined */

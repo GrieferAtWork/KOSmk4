@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb33dc07e */
+/* HASH CRC-32:0xa906626f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "open" from "fcntl" */
 #ifndef ____localdep_open_defined
 #define ____localdep_open_defined 1
-#if defined(__CRT_HAVE_open64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) && (!defined(__USE_FILE_OFFSET64))
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
@@ -57,5 +57,5 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(sopen))(char const *__filename,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat) || defined(__CRT_HAVE_openat64))) || (defined(__CRT_HAVE_open) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE__open) */
+#endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || (__CRT_AT_FDCWD && (__CRT_HAVE_openat || __CRT_HAVE_openat64)) || (__CRT_HAVE_open && !__USE_FILE_OFFSET64) || __CRT_HAVE___open || __CRT_HAVE__open */
 #endif /* !__local_sopen_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x156072db */
+/* HASH CRC-32:0xa4a78e83 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,5 +75,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(preadall64))(__fd_t __fd,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))) || defined(__CRT_HAVE_pread64) || defined(__CRT_HAVE___pread64) */
+#endif /* __CRT_HAVE_pread || ((__CRT_HAVE_read || __CRT_HAVE__read) && (__CRT_HAVE_lseek || __CRT_HAVE_lseek64 || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE__lseeki64)) || __CRT_HAVE_pread64 || __CRT_HAVE___pread64 */
 #endif /* !__local_preadall64_defined */

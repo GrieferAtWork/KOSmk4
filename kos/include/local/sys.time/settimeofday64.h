@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90c02d7e */
+/* HASH CRC-32:0x1dc6e2f1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,5 +47,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(settimeofday64))(struct __timeval64 c
 	return __localdep_settimeofday32(&__tv32, __tz);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_settimeofday) */
+#endif /* __CRT_HAVE_settimeofday */
 #endif /* !__local_settimeofday64_defined */

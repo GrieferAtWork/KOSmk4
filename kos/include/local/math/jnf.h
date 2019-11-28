@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x456bd477 */
+/* HASH CRC-32:0xc9240b60 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,5 +42,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(jnf))(int __n,
 	return (float)__localdep_jn(__n, (double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_jn) || defined(__CRT_HAVE___jn) */
+#endif /* __CRT_HAVE_jn || __CRT_HAVE___jn */
 #endif /* !__local_jnf_defined */

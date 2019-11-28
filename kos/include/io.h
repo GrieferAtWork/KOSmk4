@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba1797f0 */
+/* HASH CRC-32:0xd0e03129 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -127,7 +127,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_NONNULL((1)) int __N
 #endif /* !__unlink_defined */
 #ifndef __open_defined
 #define __open_defined 1
-#if defined(__CRT_HAVE_open64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) && (!defined(__USE_FILE_OFFSET64))
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL open)(char const *__filename, __oflag_t __oflags, ...) __CASMNAME_SAME("open");
@@ -148,7 +148,7 @@ __NAMESPACE_LOCAL_USING(open)
 #endif /* !__open_defined */
 #ifndef __creat_defined
 #define __creat_defined 1
-#if defined(__CRT_HAVE_creat64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_creat64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),creat64,(__filename,__mode))
 #elif defined(__CRT_HAVE_creat) && (!defined(__USE_FILE_OFFSET64))
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),(__filename,__mode))
@@ -263,11 +263,11 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,isatty,(__fd_t __fd),_isatty,(__fd)
 #endif /* !__isatty_defined */
 #ifndef __lseek_defined
 #define __lseek_defined 1
-#if defined(__CRT_HAVE_lseek64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_lseek64) && defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,lseek,(__fd_t __fd, __off64_t __offset, int __whence),lseek64,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE__lseeki64) && (defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE__lseeki64) && defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,lseek,(__fd_t __fd, __off64_t __offset, int __whence),_lseeki64,(__fd,__offset,__whence))
@@ -370,7 +370,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,_access,(char c
  * Test for access to the specified file `FILE', testing for `TYPE' */
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _access)(char const *__filename, int __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(access))(__filename, __type); }
 #endif /* _access... */
-#if defined(__CRT_HAVE_creat64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_creat64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_creat,(char const *__filename, __mode_t __mode),creat64,(__filename,__mode))
 #elif defined(__CRT_HAVE_creat) && (!defined(__USE_FILE_OFFSET64))
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_creat,(char const *__filename, __mode_t __mode),creat,(__filename,__mode))
@@ -547,7 +547,7 @@ __CDECLARE(,ssize_t,__NOTHROW_RPC,_write,(__fd_t __fd, void const *__buf, size_t
  * Write data to a given file descriptor `FD' and return the number of bytes written */
 __CREDIRECT(,ssize_t,__NOTHROW_RPC,_write,(__fd_t __fd, void const *__buf, size_t __bufsize),write,(__fd,__buf,__bufsize))
 #endif /* _write... */
-#if defined(__CRT_HAVE_open64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) && (!defined(__USE_FILE_OFFSET64))
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_open,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))

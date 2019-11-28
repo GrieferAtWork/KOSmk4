@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc69b8bca */
+/* HASH CRC-32:0x809be36e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,5 +68,5 @@ __LOCAL_LIBC(FTruncate) void
 #endif
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_FTruncate) || defined(__CRT_HAVE_FTruncate64) */
+#endif /* __CRT_HAVE_FTruncate || __CRT_HAVE_FTruncate64 */
 #endif /* !__local_FTruncate_defined */

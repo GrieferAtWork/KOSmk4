@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa633639 */
+/* HASH CRC-32:0x8141d4e5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -121,5 +121,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_waitwhile_aboveequal))(__uintpt
 	return __localdep_lfutex64(__uaddr, LFUTEX_WAIT_WHILE_ABOVE, __above_equal_value - 1, (struct __timespec64 const *)__NULLPTR);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex) */
+#endif /* __CRT_HAVE_lfutex64 || __CRT_HAVE_lfutex */
 #endif /* !__local_futex_waitwhile_aboveequal_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe929c9a2 */
+/* HASH CRC-32:0x8929584d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,5 +53,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_cond_timedwait64))(__pthread_
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_pthread_cond_timedwait) */
+#endif /* __CRT_HAVE_pthread_cond_timedwait */
 #endif /* !__local_pthread_cond_timedwait64_defined */

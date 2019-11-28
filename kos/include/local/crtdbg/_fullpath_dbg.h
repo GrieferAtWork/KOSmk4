@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x957cbfed */
+/* HASH CRC-32:0x6ff96683 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,5 +45,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_fullpath_dbg))(char *__full_path,
 	return __localdep__fullpath(__full_path, __path, __bufsize);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE__fullpath) */
+#endif /* __CRT_HAVE__fullpath */
 #endif /* !__local__fullpath_dbg_defined */

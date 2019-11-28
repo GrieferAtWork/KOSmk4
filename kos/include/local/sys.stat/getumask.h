@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x402b5d40 */
+/* HASH CRC-32:0x1473f32a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,5 +44,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getumask))(void) {
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask) */
+#endif /* __CRT_HAVE_umask || __CRT_HAVE__umask */
 #endif /* !__local_getumask_defined */

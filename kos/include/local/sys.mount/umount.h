@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x991020bf */
+/* HASH CRC-32:0xf3eb402 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,5 +37,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(umount))(char const *__special_file) 
 	return __localdep_umount2(__special_file, 0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_umount2) */
+#endif /* __CRT_HAVE_umount2 */
 #endif /* !__local_umount_defined */

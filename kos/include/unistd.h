@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22978625 */
+/* HASH CRC-32:0x2e79c8ed */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -840,11 +840,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(writeall, __FORCELOCAL __ATTR_NONNULL((2)) ssize
 
 #ifndef __lseek_defined
 #define __lseek_defined 1
-#if defined(__CRT_HAVE_lseek64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_lseek64) && defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,lseek,(__fd_t __fd, __off64_t __offset, int __whence),lseek64,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE__lseeki64) && (defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE__lseeki64) && defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,lseek,(__fd_t __fd, __off64_t __offset, int __whence),_lseeki64,(__fd,__offset,__whence))
@@ -1046,7 +1046,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,euidaccess,(char
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,euidaccess,(char const *__file, int __type),eaccess,(__file,__type))
-#elif defined(__CRT_HAVE__access) && (defined(__CRT_DOS))
+#elif defined(__CRT_HAVE__access) && defined(__CRT_DOS)
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
@@ -1167,7 +1167,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lseek64, __FORCELOCAL __off64_t __NOTHROW_NCX(__
 #endif /* !__USE_KOS */
 #endif /* !__PIO_OFFSET */
 
-#if defined(__CRT_HAVE_pread64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_pread64) && defined(__USE_FILE_OFFSET64)
 /* >> pread(2)
  * Read data from a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pread,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),pread64,(__fd,__buf,__bufsize,__offset))
@@ -1181,7 +1181,7 @@ __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pread,(__fd_t __fd, void *_
  * Read data from a file at a specific offset */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pread, __FORCELOCAL __ATTR_NONNULL((2)) ssize_t __NOTHROW_RPC(__LIBCCALL pread)(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pread))(__fd, __buf, __bufsize, __offset); })
 #endif /* pread... */
-#if defined(__CRT_HAVE_pwrite64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_pwrite64) && defined(__USE_FILE_OFFSET64)
 /* >> pwrite(2)
  * Write data to a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwrite,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),pwrite64,(__fd,__buf,__bufsize,__offset))
@@ -1197,7 +1197,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pwrite, __FORCELOCAL __ATTR_NONNULL((2)) ssize_t
 #endif /* pwrite... */
 
 #ifdef __USE_KOS
-#if defined(__CRT_HAVE_preadall64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_preadall64) && defined(__USE_FILE_OFFSET64)
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,preadall,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),preadall64,(__fd,__buf,__bufsize,__offset))
@@ -1211,7 +1211,7 @@ __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,preadall,(__fd_t __fd, void
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(preadall, __FORCELOCAL __ATTR_NONNULL((2)) ssize_t __NOTHROW_RPC(__LIBCCALL preadall)(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(preadall))(__fd, __buf, __bufsize, __offset); })
 #endif /* preadall... */
-#if defined(__CRT_HAVE_pwriteall64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_pwriteall64) && defined(__USE_FILE_OFFSET64)
 /* >> pwriteall(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwriteall,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),pwriteall64,(__fd,__buf,__bufsize,__offset))
@@ -1458,7 +1458,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lchown, __FORCELOCAL __ATTR_NONNULL((1)) int __N
 #endif /* !__USE_KOS */
 #endif /* !__PIO_OFFSET */
 
-#if defined(__CRT_HAVE_truncate64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_truncate64) && defined(__USE_FILE_OFFSET64)
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,truncate,(char const *__file, __PIO_OFFSET __length),truncate64,(__file,__length))
@@ -1841,11 +1841,11 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpass,(char
 #endif /* ... */
 
 #if defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
-#if defined(__CRT_HAVE_ftruncate64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_ftruncate64) && defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,ftruncate,(__fd_t __fd, __PIO_OFFSET __length),ftruncate64,(__fd,__length))
-#elif defined(__CRT_HAVE__chsize_s) && (defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE__chsize_s) && defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,ftruncate,(__fd_t __fd, __PIO_OFFSET __length),_chsize_s,(__fd,__length))
@@ -2020,7 +2020,7 @@ __CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW_NCX,sysconf,(int __name),__sysconf
 #endif /* !F_LOCK */
 #ifndef __lockf_defined
 #define __lockf_defined 1
-#if defined(__CRT_HAVE_lockf64) && (defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_lockf64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, int __cmd, __off64_t __length),lockf64,(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE_lockf) && (!defined(__USE_FILE_OFFSET64))
 __CDECLARE(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, int __cmd, __off32_t __length),(__fd,__cmd,__length))

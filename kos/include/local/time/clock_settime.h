@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3798a85a */
+/* HASH CRC-32:0xe5a01e02 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,5 +71,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_settime))(__clockid_t __clock_i
 #endif
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE_clock_settime64) */
+#endif /* __CRT_HAVE_clock_settime || __CRT_HAVE_clock_settime64 */
 #endif /* !__local_clock_settime_defined */
