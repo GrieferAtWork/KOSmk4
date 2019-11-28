@@ -150,7 +150,7 @@ NOTHROW_NCX(LIBCCALL libc_envz_strip)(char **__restrict penvz,
 	newlen = (size_t)(end - start);
 	if (newlen < oldlen) {
 		*penvz_len = newlen;
-#if defined(__CRT_HAVE_realloc)
+#ifdef __CRT_HAVE_realloc
 		start = (char *)libc_realloc(start, newlen);
 		if likely(start)
 			*penvz = start;

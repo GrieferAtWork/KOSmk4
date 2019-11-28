@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x750acbc0 */
+/* HASH CRC-32:0x812925f1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,7 +101,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Fill in TIMEBUF with information about the current time */
 __LOCAL_LIBC(_ftime64) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ftime64))(struct __timeb64 *__timebuf) {
-#line 150 "kos/src/libc/magic/sys.timeb.c"
+#line 151 "kos/src/libc/magic/sys.timeb.c"
 #if defined(__CRT_HAVE__ftime64_s)
 	if __unlikely(__localdep_crt_ftime64_s(__timebuf))
 		__localdep_memset(__timebuf,0,sizeof(*__timebuf));
@@ -117,13 +117,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ftime64))(struct __timeb64 *__timebu
 	__timebuf->dstflag  = __temp.dstflag;
 #else
 	struct __timeb32 __temp;
-#if defined(__CRT_HAVE__ftime32_s)
+#ifdef __CRT_HAVE__ftime32_s
 	if __unlikely(__localdep_crt_ftime32_s(&__temp))
-#else
+#else /* defined(__CRT_HAVE__ftime32_s) */
 	if __unlikely(__localdep_crt_ftime32(&__temp))
-#endif
-		__localdep_memset(__timebuf,0,sizeof(*__timebuf));
-	else {
+#endif /* !(defined(__CRT_HAVE__ftime32_s)) */
+	{
+		__localdep_memset(__timebuf, 0, sizeof(*__timebuf));
+	} else {
 		__timebuf->time     = (__time64_t)__temp.time;
 		__timebuf->millitm  = __temp.millitm;
 		__timebuf->timezone = __temp.timezone;

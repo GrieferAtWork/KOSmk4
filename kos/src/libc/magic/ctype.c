@@ -287,7 +287,7 @@ __SYSDECL_BEGIN
 [ATTR_CONST][ATTR_WUNUSED][libc][nothrow][libc_impl({
 	return isupper(ch) ? ((u8)ch+0x20) : ch;
 })][crtbuiltin][std][export_alias(_tolower)] tolower:(int ch) -> int {
-#if (@@yield $has_function("__ctype_tolower_loc")@@) && defined(__CRT_CYG)
+#if (@@has_function(__ctype_tolower_loc)@@) && defined(__CRT_CYG)
 	return ch >= -128 && ch < 256 ? (*__ctype_tolower_loc())[ch] : ch;
 #else
 	return isupper(ch) ? ((u8)ch+0x20) : ch;
@@ -296,7 +296,7 @@ __SYSDECL_BEGIN
 [ATTR_CONST][ATTR_WUNUSED][libc][nothrow][libc_impl({
 	return islower(ch) ? ((u8)ch-0x20) : ch;
 })][crtbuiltin][std][export_alias(_toupper)] toupper:(int ch) -> int {
-#if (@@yield $has_function("__ctype_toupper_loc")@@) && defined(__CRT_CYG)
+#if (@@has_function(__ctype_toupper_loc)@@) && defined(__CRT_CYG)
 	return ch >= -128 && ch < 256 ? (*__ctype_toupper_loc())[ch] : ch;
 #else
 	return islower(ch) ? ((u8)ch-0x20) : ch;

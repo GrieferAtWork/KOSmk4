@@ -359,9 +359,9 @@ argz_delete:([nonnull] char **__restrict pargz,
 	newlen    = *pargz_len - entrylen;
 	*pargz_len = newlen;
 	if unlikely(newlen == 0) {
-#if @@yield $has_function("free")@@
+@@if_has_function(free)@@
 		free(*pargz);
-#endif @@yield "/* " + $has_function("free") + " */"@@
+@@endif_has_function(free)@@
 		*pargz = NULL;
 		return;
 	}

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44fa3deb */
+/* HASH CRC-32:0xcd3d0294 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -108,7 +108,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_strip))(char **__restrict __penv
 	__newlen = (__SIZE_TYPE__)(__end - __start);
 	if (__newlen < __oldlen) {
 		*__penvz_len = __newlen;
-#if defined(__CRT_HAVE_realloc)
+#ifdef __CRT_HAVE_realloc
 		__start = (char *)__localdep_realloc(__start, __newlen);
 		if __likely(__start)
 			*__penvz = __start;

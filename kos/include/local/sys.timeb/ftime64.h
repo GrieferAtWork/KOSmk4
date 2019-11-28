@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14215f46 */
+/* HASH CRC-32:0x2076e968 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,7 +80,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Fill in TIMEBUF with information about the current time */
 __LOCAL_LIBC(ftime64) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftime64))(struct timeb64 *__timebuf) {
-#line 360 "kos/src/libc/magic/sys.timeb.c"
+#line 362 "kos/src/libc/magic/sys.timeb.c"
 #if defined(__CRT_HAVE__ftime64_s)
 	__errno_t __error = __localdep_crt_ftime64_s(__timebuf);
 	if __unlikely(__error) {

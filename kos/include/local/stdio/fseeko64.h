@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb4e8595 */
+/* HASH CRC-32:0x2a8a30e1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,9 +62,9 @@ __LOCAL_LIBC(fseeko64) __ATTR_NONNULL((1)) int
 #line 1603 "kos/src/libc/magic/stdio.c"
 #if defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked)
 	return __localdep_crt_fseeko(__stream, (__off32_t)__off, __whence);
-#else
+#else /* defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) */
 	return __localdep_crt_fseek(__stream, (long int)__off, __whence);
-#endif
+#endif /* !defined(__CRT_HAVE_fseeko) && !defined(__CRT_HAVE_fseeko_unlocked) */
 }
 __NAMESPACE_LOCAL_END
 #endif /* defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock) */

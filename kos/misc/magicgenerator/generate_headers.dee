@@ -485,7 +485,7 @@ function form_has_function_expression(name: string): string {
 	throw "Unknown function " + repr name;
 }
 
-global DirectivesEnvironmentFunctions = {
+global directivesEnvironmentFunctions = {
 	"has_function" : form_has_function_expression
 };
 
@@ -500,8 +500,8 @@ class DirectivesEnvironment {
 	operator [](key: Object): Object {
 		if (key is string && key.startswith("$")) {
 			local name = key[1:];
-			if (name in DirectivesEnvironmentFunctions)
-				return DirectivesEnvironmentFunctions[name];
+			if (name in directivesEnvironmentFunctions)
+				return directivesEnvironmentFunctions[name];
 			return self.operator . (name);
 		}
 		return values[key];
@@ -530,6 +530,7 @@ function split_words(
 	@@0: After if == true or elif == true
 	@@1: After if == false + else
 	local conditions_stack: {int...} = [];
+	local did_encounter_else_if_has_function = false;
 	local saved_env: Cell with DirectivesEnvironment = Cell();
 	function execExpression(expr: string): Object {
 		local used_env;
@@ -584,23 +585,76 @@ function split_words(
 						execExpression(directive);
 						break;
 					case "yield": {
-						if (env is Function)
-							env = env.defaultEnv;
 						local val = execExpression(directive);
 						if (val !is none)
 							yield split_words(str val, env, for_copy)...;
 					}	break;
+					case "has_function":
+						if (!directive.startswith("(") || !directive.endswith(")"))
+							throw Error("Argument of @@has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
+						directive = directive[1:-1].strip();
+						yield split_words(
+							form_has_function_expression(directive),
+							env, for_copy)...;
+						break;
+					case "if_has_function":
+						if (!directive.startswith("(") || !directive.endswith(")"))
+							throw Error("Argument of @@if_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
+						directive = directive[1:-1].strip();
+						yield split_words(
+							wrapProcessorExpressionForIf(
+								form_has_function_expression(directive)),
+							env, for_copy)...;
+						did_encounter_else_if_has_function = false;
+						break;
+					case "elif_has_function":
+						if (!directive.startswith("(") || !directive.endswith(")"))
+							throw Error("Argument of @@elif_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
+						directive = directive[1:-1].strip();
+						yield split_words(
+							"#elif " + form_has_function_expression(directive),
+							env, for_copy)...;
+						did_encounter_else_if_has_function = false;
+						break;
+					case "else_has_function":
+						if (!directive) {
+							yield split_words("#else", env, for_copy)...;
+						} else {
+							if (!directive.startswith("(") || !directive.endswith(")"))
+								throw Error("Argument of @@else_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
+							directive = directive[1:-1].strip();
+							yield split_words(
+								"#else /* {} */".format({
+									form_has_function_expression(directive)
+								}), env, for_copy)...;
+						}
+						did_encounter_else_if_has_function = true;
+						break;
+					case "endif_has_function":
+						if (!directive) {
+							yield split_words("#endif", env, for_copy)...;
+						} else {
+							if (!directive.startswith("(") || !directive.endswith(")"))
+								throw Error("Argument of @@endif_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
+							directive = form_has_function_expression(directive[1:-1].strip());
+							if (did_encounter_else_if_has_function)
+								directive = optimizePreprocessorExpression("!({})".format({ directive }));
+							yield split_words(
+								"#endif /* {} */".format({ directive }),
+								env, for_copy)...;
+						}
+						break;
 					case "endif":
 						if (!conditions_stack)
-							throw "@@endif@@ without @@if ...@@ (in {!r})".format({ text });
+							throw Error("@@endif@@ without @@if ...@@ (in {!r})".format({ text }));
 						conditions_stack.popback();
 						break;
 					case "elif":
 					case "else": {
 						if (!conditions_stack)
-							throw "@@elif ...@@ or @@else@@ without @@if ...@@ (in {!r})".format({ text });
+							throw Error("@@elif ...@@ or @@else@@ without @@if ...@@ (in {!r})".format({ text }));
 						if (conditions_stack.last == 1)
-							throw "@@elif ...@@ or @@else@@ after @@else@@ (in {!r})".format({ text });
+							throw Error("@@elif ...@@ or @@else@@ after @@else@@ (in {!r})".format({ text }));
 						local start_i = i;
 						for (;;) {
 							i = text.find("@@", i);

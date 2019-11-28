@@ -389,10 +389,10 @@ fclose:([nonnull] FILE *__restrict stream) -> int;
 })] fflush:([nullable] FILE *stream) -> int {
 	/* NO-OP (When not implemented by the CRT, assume no
 	 * buffering being done, meaning this function isn't needed) */
-#if @@yield $has_function("crt_flushall")@@
+@@if_has_function(crt_flushall)@@
 	if (!stream)
 		return crt_flushall();
-#endif @@yield "/* " + $has_function("crt_flushall") + " */"@@
+@@endif_has_function(crt_flushall)@@
 	(void)stream;
 	return 0;
 }
@@ -441,8 +441,8 @@ setvbuf:([nonnull] FILE *__restrict stream,
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fgetc_unlocked, getc_unlocked)]
 [requires((defined(__CRT_DOS) && $has_function(_filbuf)) || $has_function(crt_fread))]
 fgetc:([nonnull] FILE *__restrict stream) -> int {
-#if defined(__CRT_DOS) && (@@yield $has_function("_filbuf")@@) && \
-  (!defined(__USE_STDIO_UNLOCKED) || !(@@yield $has_function("crt_fread")@@))
+#if defined(__CRT_DOS) && (@@has_function(_filbuf)@@) && \
+  (!defined(__USE_STDIO_UNLOCKED) || !(@@has_function(crt_fread)@@))
 	return --stream->@__f_cnt@ >= 0 ? (int)((__UINT8_TYPE__)*stream->@__f_ptr@++) : _filbuf(stream);
 #else
 	char ch;
@@ -472,8 +472,8 @@ getchar:() -> int {
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fputc_unlocked, putc_unlocked)]
 [requires((defined(__CRT_DOS) && $has_function(_flsbuf)) || $has_function(crt_fwrite))]
 fputc:(int ch, [nonnull] FILE *__restrict stream) -> int {
-#if defined(__CRT_DOS) && (@@yield $has_function("_flsbuf")@@) && \
-  (!defined(__USE_STDIO_UNLOCKED) || !(@@yield $has_function("crt_fwrite")@@))
+#if defined(__CRT_DOS) && (@@has_function(_flsbuf)@@) && \
+  (!defined(__USE_STDIO_UNLOCKED) || !(@@has_function(crt_fwrite)@@))
 	return --stream->@__f_cnt@ >= 0 ? (int)((__UINT8_TYPE__)(*stream->@__f_ptr@++ = (char)ch)) : _flsbuf(ch, stream);
 #else
 	unsigned char byte = (unsigned char)(unsigned int)ch;
@@ -640,9 +640,9 @@ done:
 [if(__SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(fseeko64, _fseeki64)]
 [requires($has_function(crt_fseeko) || $has_function(crt_fseeko64))]
 fseek:([nonnull] FILE *__restrict stream, long int off, int whence) -> int {
-#if __SIZEOF_OFF64_T__ == __SIZEOF_LONG__ && (@@yield $has_function("crt_fseeko64")@@)
+#if __SIZEOF_OFF64_T__ == __SIZEOF_LONG__ && (@@has_function(crt_fseeko64)@@)
 	return crt_fseeko64(stream, (off64_t)off, whence);
-#elif (@@yield $has_function("crt_fseeko")@@)
+#elif (@@has_function(crt_fseeko)@@)
 	return crt_fseeko(stream, (off32_t)off, whence);
 #else
 	return crt_fseeko64(stream, (off64_t)off, whence);
@@ -658,21 +658,21 @@ fseek:([nonnull] FILE *__restrict stream, long int off, int whence) -> int {
 [if(__SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias(ftello64, _ftelli64)]
 [requires($has_function(crt_fgetpos64) || $has_function(crt_fgetpos) || $has_function(crt_ftello64) || $has_function(crt_ftello))]
 ftell:([nonnull] FILE *__restrict stream) -> long int {
-#if (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__) && (@@yield $has_function("crt_fgetpos64")@@)
+#if (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__) && (@@has_function(crt_fgetpos64)@@)
 	pos64_t pos;
 	if (crt_fgetpos64(stream, &pos))
 		return -1;
 	return (long int)(off64_t)pos;
-#elif (__SIZEOF_LONG__ == __SIZEOF_OFF32_T__) && (@@yield $has_function("crt_fgetpos")@@)
+#elif (__SIZEOF_LONG__ == __SIZEOF_OFF32_T__) && (@@has_function(crt_fgetpos)@@)
 	pos32_t pos;
 	if (crt_fgetpos(stream, &pos))
 		return -1;
 	return (long int)(off32_t)pos;
-#elif @@yield $has_function("crt_ftello64")@@
+#elif @@has_function(crt_ftello64)@@
 	return (long int)crt_ftello64(stream);
-#elif @@yield $has_function("crt_ftello")@@
+#elif @@has_function(crt_ftello)@@
 	return (long int)crt_ftello(stream);
-#elif @@yield $has_function("crt_fgetpos64")@@
+#elif @@has_function(crt_fgetpos64)@@
 	pos64_t pos;
 	if (crt_fgetpos64(stream, &pos))
 		return -1;
@@ -753,23 +753,23 @@ freopen:([nonnull] char const *__restrict filename,
           $has_function(crt_ftello) || $has_function(crt_ftell))]
 [stdio_throws][std][export_alias(_IO_fgetpos)]
 fgetpos:([nonnull] FILE *__restrict stream, [nonnull] fpos_t *__restrict pos) -> int {
-#if defined(__USE_FILE_OFFSET64) && (@@yield $has_function("crt_ftello64")@@)
+#if defined(__USE_FILE_OFFSET64) && (@@has_function(crt_ftello64)@@)
 	return (int32_t)(*pos = (fpos_t)crt_ftello64(stream)) < 0 ? -1 : 0;
-#elif @@yield $has_function("crt_fgetpos")@@
+#elif @@has_function(crt_fgetpos)@@
 	pos32_t pos32;
 	int result = crt_fgetpos(stream, &pos32);
 	if (!result)
 		*pos = (fpos_t)pos32;
 	return result;
-#elif @@yield $has_function("crt_fgetpos64")@@
+#elif @@has_function(crt_fgetpos64)@@
 	fpos64_t pos64;
 	int result = crt_fgetpos64(stream, &pos64);
 	if (!result)
 		*pos = (fpos_t)pos64;
 	return result;
-#elif @@yield $has_function("crt_ftello64")@@
+#elif @@has_function(crt_ftello64)@@
 	return (int32_t)(*pos = (fpos_t)crt_ftello64(stream)) < 0 ? -1 : 0;
-#elif @@yield $has_function("crt_ftello")@@
+#elif @@has_function(crt_ftello)@@
 	return (int32_t)(*pos = (fpos_t)crt_ftello(stream)) < 0 ? -1 : 0;
 #else
 	return (int32_t)(*pos = (fpos_t)crt_ftell(stream)) < 0 ? -1 : 0;
@@ -786,17 +786,17 @@ fgetpos:([nonnull] FILE *__restrict stream, [nonnull] fpos_t *__restrict pos) ->
           $has_function(crt_fseek))]
 [stdio_throws][std][export_alias(_IO_fsetpos)]
 fsetpos:([nonnull] FILE *__restrict stream, [nonnull] fpos_t const *__restrict pos) -> int {
-#if defined(__USE_FILE_OFFSET64) && (@@yield $has_function("crt_fseeko64")@@)
+#if defined(__USE_FILE_OFFSET64) && (@@has_function(crt_fseeko64)@@)
 	return crt_fseeko64(stream, (off64_t)*pos, SEEK_SET);
-#elif @@yield $has_function("crt_fsetpos")@@
+#elif @@has_function(crt_fsetpos)@@
 	pos32_t pos32 = (pos32_t)*pos;
 	return crt_fsetpos(stream, &pos32);
-#elif @@yield $has_function("crt_fsetpos64")@@
+#elif @@has_function(crt_fsetpos64)@@
 	fpos64_t pos64 = (fpos64_t)*pos;
 	return crt_fsetpos64(stream, &pos64);
-#elif @@yield $has_function("crt_fseeko64")@@
+#elif @@has_function(crt_fseeko64)@@
 	return crt_fseeko64(stream, (off64_t)*pos, SEEK_SET);
-#elif @@yield $has_function("crt_fseeko")@@
+#elif @@has_function(crt_fseeko)@@
 	return crt_fseeko(stream, (off32_t)*pos, SEEK_SET);
 #else
 	return crt_fseek(stream, (long int)*pos, SEEK_SET);
@@ -1122,10 +1122,10 @@ setlinebuf:([nonnull] $FILE *__restrict stream) {
 fflush_unlocked:([nullable] $FILE *stream) -> int {
 	/* NO-OP (When not implemented by the CRT, assume no
 	 * buffering being done, meaning this function isn't needed) */
-#if @@yield $has_function("crt_flushall")@@
+@@if_has_function(crt_flushall)@@
 	if (!stream)
 		return crt_flushall();
-#endif @@yield "/* " + $has_function("crt_flushall") + " */"@@
+@@endif_has_function(crt_flushall)@@
 	(void)stream;
 	return 0;
 }
@@ -1196,7 +1196,7 @@ fileno_unlocked:([nonnull] $FILE *__restrict stream) -> $fd_t = fileno;
 [if(!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf)), alias(getc, fgetc, _IO_getc)]
 [requires((defined(__CRT_DOS) && $has_function(_filbuf)) || $has_function(crt_fread_unlocked))]
 fgetc_unlocked:([nonnull] $FILE *__restrict stream) -> int {
-#if defined(__CRT_DOS) && @@yield $has_function("_filbuf")@@
+#if defined(__CRT_DOS) && @@has_function(_filbuf)@@
 	return --stream->@__f_cnt@ >= 0 ? (int)((__UINT8_TYPE__)*stream->@__f_ptr@++) : _filbuf(stream);
 #else
 	char ch;
@@ -1213,7 +1213,7 @@ fgetc_unlocked:([nonnull] $FILE *__restrict stream) -> int {
 [if(!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf)), alias(putc, fputc, _IO_putc)][crtbuiltin]
 [requires((defined(__CRT_DOS) && $has_function(_flsbuf)) || $has_function(crt_fwrite_unlocked))]
 fputc_unlocked:(int ch, [nonnull] $FILE *__restrict stream) -> int {
-#if defined(__CRT_DOS) && (@@yield $has_function("_flsbuf")@@)
+#if defined(__CRT_DOS) && (@@has_function(_flsbuf)@@)
 	return --stream->@__f_cnt@ >= 0 ? (int)((__UINT8_TYPE__)(*stream->@__f_ptr@++ = (char)ch)) : _flsbuf(ch, stream);
 #else
 	unsigned char byte = (unsigned char)(unsigned int)ch;
@@ -1534,13 +1534,13 @@ obstack_printf:([nonnull] struct obstack *__restrict obstack_,
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(fseeko_unlocked)]
 [requires($has_function(crt_fseeko64) || $has_function(crt_fseeko) || $has_function(crt_fseek))]
 fseeko:([nonnull] $FILE *__restrict stream, $off_t off, int whence) -> int {
-#if @@yield $has_function("crt_fseeko64")@@
+@@if_has_function(crt_fseeko64)@@
 	return crt_fseeko64(stream, (off64_t)off, whence);
-#elif @@yield $has_function("crt_fseeko")@@
+@@elif_has_function(crt_fseeko)@@
 	return crt_fseeko(stream, (off32_t)off, whence);
-#else
+@@else_has_function@@
 	return crt_fseek(stream, (long int)off, whence);
-#endif
+@@endif_has_function@@
 }
 
 @@Return the current in-file position of `STREAM'
@@ -1555,26 +1555,26 @@ fseeko:([nonnull] $FILE *__restrict stream, $off_t off, int whence) -> int {
           $has_function(crt_ftello64) || $has_function(crt_ftello) ||
           $has_function(crt_ftell))]
 ftello:([nonnull] $FILE *__restrict stream) -> $off_t {
-#if defined(__USE_FILE_OFFSET64) && (@@yield $has_function("crt_fgetpos64")@@)
+#if defined(__USE_FILE_OFFSET64) && (@@has_function(crt_fgetpos64)@@)
 	pos64_t pos;
 	if (crt_fgetpos64(stream, &pos))
 		return -1;
 	return (off64_t)pos;
-#elif !defined(__USE_FILE_OFFSET64) && (@@yield $has_function("crt_fgetpos")@@)
+#elif !defined(__USE_FILE_OFFSET64) && (@@has_function(crt_fgetpos)@@)
 	pos32_t pos;
 	if (crt_fgetpos(stream, &pos))
 		return -1;
 	return (off32_t)pos;
-#elif @@yield $has_function("crt_ftello64")@@
+#elif @@has_function(crt_ftello64)@@
 	return (off_t)crt_ftello64(stream);
-#elif @@yield $has_function("crt_ftello")@@
+#elif @@has_function(crt_ftello)@@
 	return (off_t)crt_ftello(stream);
-#elif @@yield $has_function("crt_fgetpos64")@@
+#elif @@has_function(crt_fgetpos64)@@
 	pos64_t pos;
 	if (crt_fgetpos64(stream, &pos))
 		return -1;
 	return (off_t)(off64_t)pos;
-#elif @@yield $has_function("crt_fgetpos")@@
+#elif @@has_function(crt_fgetpos)@@
 	pos32_t pos;
 	if (crt_fgetpos(stream, &pos))
 		return -1;
@@ -1600,11 +1600,11 @@ ftello:([nonnull] $FILE *__restrict stream) -> $off_t {
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fseeko64_unlocked, _fseeki64_nolock)]
 [requires($has_function(crt_fseeko) || $has_function(crt_fseek))]
 fseeko64:([nonnull] $FILE *__restrict stream, $off64_t off, int whence) -> int {
-#if @@yield $has_function("crt_fseeko")@@
+@@if_has_function(crt_fseeko)@@
 	return crt_fseeko(stream, (off32_t)off, whence);
-#else
+@@else_has_function(crt_fseeko)@@
 	return crt_fseek(stream, (long int)off, whence);
-#endif
+@@endif_has_function(crt_fseeko)@@
 }
 
 @@64-bit variant of `ftello'
@@ -1615,21 +1615,21 @@ fseeko64:([nonnull] $FILE *__restrict stream, $off64_t off, int whence) -> int {
 [requires($has_function(crt_fgetpos64) || $has_function(crt_fgetpos) ||
           $has_function(crt_ftello) || $has_function(crt_ftell))]
 ftello64:([nonnull] $FILE *__restrict stream) -> $off64_t {
-#if @@yield $has_function("crt_fgetpos64")@@
+@@if_has_function(crt_fgetpos64)@@
 	pos64_t pos;
 	if (crt_fgetpos64(stream, &pos))
 		return -1;
 	return (off64_t)pos;
-#elif @@yield $has_function("crt_fgetpos")@@
+@@elif_has_function(crt_fgetpos)@@
 	pos32_t pos;
 	if (crt_fgetpos(stream, &pos))
 		return -1;
 	return (off64_t)(off32_t)pos;
-#elif @@yield $has_function("crt_ftello")@@
+@@elif_has_function(crt_ftello)@@
 	return (off64_t)crt_ftello(stream);
-#else
+@@else_has_function@@
 	return (off64_t)crt_ftell(stream);
-#endif
+@@endif_has_function@@
 }
 
 %[default_impl_section(.text.crt.FILE.locked.access)]
@@ -1656,19 +1656,19 @@ freopen64:([nonnull] char const *__restrict filename,
 [requires($has_function(crt_ftello64) || $has_function(crt_fgetpos) ||
           $has_function(crt_ftello) || $has_function(crt_ftell))]
 fgetpos64:([nonnull] $FILE *__restrict stream, [nonnull] fpos64_t *__restrict pos) -> int {
-#if @@yield $has_function("crt_ftello64")@@
+@@if_has_function(crt_ftello64)@@
 	return (int64_t)(*pos = (fpos64_t)crt_ftello64(stream)) < 0 ? -1 : 0;
-#elif @@yield $has_function("crt_fgetpos")@@
+@@elif_has_function(crt_fgetpos)@@
 	pos32_t pos32;
 	int result = crt_fgetpos(stream, &pos32);
 	if (!result)
 		*pos = (fpos64_t)pos32;
 	return result;
-#elif @@yield $has_function("crt_ftello")@@
+@@elif_has_function(crt_ftello)@@
 	return (int64_t)(*pos = (fpos64_t)crt_ftello(stream)) < 0 ? -1 : 0;
-#else
+@@else_has_function@@
 	return (int64_t)(*pos = (fpos64_t)crt_ftell(stream)) < 0 ? -1 : 0;
-#endif
+@@endif_has_function@@
 }
 
 @@64-bit variant of `fsetpos'
@@ -1678,16 +1678,16 @@ fgetpos64:([nonnull] $FILE *__restrict stream, [nonnull] fpos64_t *__restrict po
 [requires($has_function(crt_fseeko64) || $has_function(crt_fsetpos) ||
           $has_function(crt_fseeko) || $has_function(crt_fseek))]
 fsetpos64:([nonnull] $FILE *__restrict stream, [nonnull] fpos64_t const *__restrict pos) -> int {
-#if @@yield $has_function("crt_fseeko64")@@
+@@if_has_function(crt_fseeko64)@@
 	return crt_fseeko64(stream, (off64_t)*pos, @SEEK_SET@);
-#elif @@yield $has_function("crt_fsetpos")@@
+@@elif_has_function(crt_fsetpos)@@
 	pos32_t pos32 = (pos32_t)*pos;
 	return crt_fsetpos(stream, &pos32);
-#elif @@yield $has_function("crt_fseeko")@@
+@@elif_has_function(crt_fseeko)@@
 	return crt_fseeko(stream, (off32_t)*pos, @SEEK_SET@);
-#else
+@@else_has_function@@
 	return crt_fseek(stream, (long int)*pos, @SEEK_SET@);
-#endif
+@@endif_has_function@@
 }
 
 %#endif /* __USE_LARGEFILE64 */

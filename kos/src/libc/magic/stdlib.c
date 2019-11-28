@@ -737,15 +737,15 @@ crt_calloc:(size_t count, size_t n_bytes) -> void * = calloc?;
 [std_guard][std][libc][ATTR_WUNUSED]
 [ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC]
 [ATTR_ALLOC_SIZE((1))][noexport][crtbuiltin]
-[requires(defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || $has_function(memalign))]
+[requires($has_function(crt_calloc) || $has_function(realloc) || $has_function(memalign))]
 malloc:(size_t n_bytes) -> void * {
-#ifdef __CRT_HAVE_calloc
+@@if_has_function(crt_calloc)@@
 	return crt_calloc(1, n_bytes);
-#elif defined(__CRT_HAVE_realloc)
+@@elif_has_function(realloc)@@
 	return realloc(NULL, n_bytes);
-#else
+@@else_has_function@@
 	return memalign(__LIBC_MALLOC_ALIGNMENT, n_bytes);
-#endif
+@@endif_has_function@@
 }
 
 [std_guard][std][libc]

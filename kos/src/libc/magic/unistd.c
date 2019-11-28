@@ -1265,9 +1265,9 @@ truncate:([notnull] char const *file, __PIO_OFFSET length) -> int {
 	if __unlikely(fd < 0)
 		return -1;
 	result = ftruncate(fd, length);
-#if @@yield $has_function("close")@@
+@@if_has_function(close)@@
 	close(fd);
-#endif @@yield "/* " + $has_function("close") + " */"@@
+@@endif_has_function(close)@@
 	return result;
 #endif
 }

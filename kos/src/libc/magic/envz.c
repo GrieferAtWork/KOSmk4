@@ -183,11 +183,11 @@ envz_strip:([nonnull] char **__restrict penvz,
 	newlen = (size_t)(end - start);
 	if (newlen < oldlen) {
 		*penvz_len = newlen;
-#if @@yield $has_function("realloc")@@
+@@if_has_function(realloc)@@
 		start = (char *)realloc(start, newlen);
 		if likely(start)
 			*penvz = start;
-#endif @@yield "/* " + $has_function("realloc") + " */"@@
+@@endif_has_function(realloc)@@
 	}
 }
 

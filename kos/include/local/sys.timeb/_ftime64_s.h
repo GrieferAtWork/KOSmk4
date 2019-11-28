@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b63404 */
+/* HASH CRC-32:0x375066f1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,19 +80,19 @@ __NAMESPACE_LOCAL_BEGIN
 /* Fill in TIMEBUF with information about the current time */
 __LOCAL_LIBC(_ftime64_s) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ftime64_s))(struct __timeb64 *__timebuf) {
-#line 223 "kos/src/libc/magic/sys.timeb.c"
+#line 225 "kos/src/libc/magic/sys.timeb.c"
 #if defined(__CRT_HAVE_ftime64)
 	return __localdep_crt_ftime64(__timebuf) ? 0 : __libc_geterrno_or(EPERM);
 #elif defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE_ftime)
 	struct __timeb32 __temp;
-#if defined(__CRT_HAVE__ftime32_s)
+#ifdef __CRT_HAVE__ftime32_s
 	__errno_t __error = __localdep_crt_ftime32_s(&__temp);
 	if (__error)
 		return __error;
 #else /* defined(__CRT_HAVE__ftime32_s) */
 	if (__localdep_crt_ftime32(&__temp))
 		return __libc_geterrno_or(EPERM);
-#endif /* !defined(__CRT_HAVE__ftime32_s) */
+#endif /* !(defined(__CRT_HAVE__ftime32_s)) */
 	__timebuf->time     = (__time64_t)__temp.time;
 	__timebuf->millitm  = __temp.millitm;
 	__timebuf->timezone = __temp.timezone;
