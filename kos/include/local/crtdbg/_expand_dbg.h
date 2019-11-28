@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50208faf */
+/* HASH CRC-32:0xa7e5911a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_expand_dbg))(void *__ptr,
                                                          int __block_type,
                                                          char const *__filename,
                                                          int __line) {
-#line 324 "kos/src/libc/magic/crtdbg.c"
+#line 325 "kos/src/libc/magic/crtdbg.c"
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;

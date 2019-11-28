@@ -18,7 +18,7 @@
  */
 
 
-#define __CRT_HAVE_$Q_CrtDbgReportW$A$AYAHHPEBGH00ZZ 1
+#define __CRT_HAVE_$Q_CrtDbgReportW$A$AYAHHPBGH00ZZ 1
 #define __CRT_HAVE_$Qterminate$A$AYAXXZ 1
 #define __CRT_HAVE_Calloc 1
 #define __CRT_HAVE_ChRoot 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8d87d87 */
+/* HASH CRC-32:0x87a6199e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_CrtDoForAllClientObjects) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtDoForAllClientObjects))(_PFNCRTDOFORALLCLIENTOBJECTS __pfn,
                                                                        void *__context) {
-#line 554 "kos/src/libc/magic/crtdbg.c"
+#line 555 "kos/src/libc/magic/crtdbg.c"
 	__COMPILER_IMPURE();
 	(void)__pfn;
 	(void)__context;

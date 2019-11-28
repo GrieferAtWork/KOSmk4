@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb221fbf5 */
+/* HASH CRC-32:0x8550730d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_recalloc_dbg))(void *__ptr,
                                                                    __SIZE_TYPE__ __min_alignment,
                                                                    char const *__filename,
                                                                    int __line) {
-#line 369 "kos/src/libc/magic/crtdbg.c"
+#line 370 "kos/src/libc/magic/crtdbg.c"
 	(void)__filename;
 	(void)__line;
 	return __localdep__aligned_recalloc(__ptr, __count, __num_bytes, __min_alignment);

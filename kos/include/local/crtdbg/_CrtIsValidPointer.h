@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x845aed92 */
+/* HASH CRC-32:0x8d98fbde */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@ __LOCAL_LIBC(_CrtIsValidPointer) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtIsValidPointer))(void const *__ptr,
                                                                 __STDC_UINT_AS_SIZE_T __num_bytes,
                                                                 int __writable) {
-#line 561 "kos/src/libc/magic/crtdbg.c"
+#line 562 "kos/src/libc/magic/crtdbg.c"
 	__COMPILER_IMPURE();
 	(void)__num_bytes;
 	(void)__writable;

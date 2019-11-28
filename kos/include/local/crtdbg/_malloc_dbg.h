@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc27b08f */
+/* HASH CRC-32:0xec5e6ffc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_malloc_dbg))(__SIZE_TYPE__ __num_byt
                                                          int __block_type,
                                                          char const *__filename,
                                                          int __line) {
-#line 284 "kos/src/libc/magic/crtdbg.c"
+#line 285 "kos/src/libc/magic/crtdbg.c"
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;

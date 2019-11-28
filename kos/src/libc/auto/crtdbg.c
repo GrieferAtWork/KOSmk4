@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9833f1 */
+/* HASH CRC-32:0x56b75be0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._aligned_msize_dbg") siz
 NOTHROW_NCX(LIBCCALL libc__aligned_msize_dbg)(void *ptr,
                                               size_t min_alignment,
                                               size_t offset) {
-#line 344 "kos/src/libc/magic/crtdbg.c"
+#line 345 "kos/src/libc/magic/crtdbg.c"
 	return libc__aligned_msize(ptr, min_alignment, offset);
 }
 
@@ -46,7 +46,7 @@ NOTHROW_NCX(LIBCCALL libc__wtempnam_dbg)(__WCHAR16_TYPE__ const *dir_name,
                                          int block_type,
                                          char const *filename,
                                          int line) {
-#line 440 "kos/src/libc/magic/crtdbg.c"
+#line 441 "kos/src/libc/magic/crtdbg.c"
 	(void)block_type;
 	(void)filename;
 	(void)line;
@@ -65,7 +65,7 @@ NOTHROW_NCX(LIBCCALL libc__wfullpath_dbg)(__WCHAR16_TYPE__ *full_path,
                                           int block_type,
                                           char const *filename,
                                           int line) {
-#line 464 "kos/src/libc/magic/crtdbg.c"
+#line 465 "kos/src/libc/magic/crtdbg.c"
 	(void)block_type;
 	(void)filename;
 	(void)line;
@@ -85,7 +85,7 @@ NOTHROW_NCX(LIBCCALL libc__wgetdcwd_dbg)(int driveno,
                                          int block_type,
                                          char const *filename,
                                          int line) {
-#line 507 "kos/src/libc/magic/crtdbg.c"
+#line 508 "kos/src/libc/magic/crtdbg.c"
 	(void)block_type;
 	(void)filename;
 	(void)line;
@@ -105,7 +105,7 @@ NOTHROW_NCX(LIBCCALL libc__wdupenv_s_dbg)(__WCHAR16_TYPE__ **pbuf,
                                           int block_type,
                                           char const *filename,
                                           int line) {
-#line 535 "kos/src/libc/magic/crtdbg.c"
+#line 536 "kos/src/libc/magic/crtdbg.c"
 	(void)block_type;
 	(void)filename;
 	(void)line;
@@ -119,7 +119,7 @@ NOTHROW_NCX(LIBCCALL libc__wdupenv_s_dbg)(__WCHAR16_TYPE__ **pbuf,
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtCheckMemory") int
 NOTHROW_NCX(LIBCCALL libc__CrtCheckMemory)(void) {
-#line 547 "kos/src/libc/magic/crtdbg.c"
+#line 548 "kos/src/libc/magic/crtdbg.c"
 	COMPILER_IMPURE();
 	return 0;
 }
@@ -128,7 +128,7 @@ INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtDoForAllClientObjects") void
 NOTHROW_NCX(LIBCCALL libc__CrtDoForAllClientObjects)(_PFNCRTDOFORALLCLIENTOBJECTS pfn,
                                                      void *context) {
-#line 554 "kos/src/libc/magic/crtdbg.c"
+#line 555 "kos/src/libc/magic/crtdbg.c"
 	COMPILER_IMPURE();
 	(void)pfn;
 	(void)context;
@@ -139,7 +139,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtIsValidPointer") int
 NOTHROW_NCX(LIBCCALL libc__CrtIsValidPointer)(void const *ptr,
                                               __STDC_UINT_AS_SIZE_T num_bytes,
                                               int writable) {
-#line 561 "kos/src/libc/magic/crtdbg.c"
+#line 562 "kos/src/libc/magic/crtdbg.c"
 	COMPILER_IMPURE();
 	(void)num_bytes;
 	(void)writable;
@@ -149,7 +149,7 @@ NOTHROW_NCX(LIBCCALL libc__CrtIsValidPointer)(void const *ptr,
 INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtIsValidHeapPointer") int
 NOTHROW_NCX(LIBCCALL libc__CrtIsValidHeapPointer)(void const *heap_ptr) {
-#line 569 "kos/src/libc/magic/crtdbg.c"
+#line 570 "kos/src/libc/magic/crtdbg.c"
 	COMPILER_IMPURE();
 	return heap_ptr != NULL;
 }
@@ -160,7 +160,7 @@ NOTHROW_NCX(LIBCCALL libc__CrtIsMemoryBlock)(void const *ptr,
                                              __LONG32_TYPE__ *prequest_number,
                                              char **filename,
                                              int *line) {
-#line 578 "kos/src/libc/magic/crtdbg.c"
+#line 579 "kos/src/libc/magic/crtdbg.c"
 	(void)ptr;
 	(void)num_bytes;
 	if (prequest_number)
@@ -175,7 +175,7 @@ NOTHROW_NCX(LIBCCALL libc__CrtIsMemoryBlock)(void const *ptr,
 INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtReportBlockType") int
 NOTHROW_NCX(LIBCCALL libc__CrtReportBlockType)(void const *ptr) {
-#line 591 "kos/src/libc/magic/crtdbg.c"
+#line 592 "kos/src/libc/magic/crtdbg.c"
 	COMPILER_IMPURE();
 	return ptr ? 1 /*_NORMAL_BLOCK*/ : 0 /*_FREE_BLOCK*/;
 }
@@ -183,7 +183,7 @@ NOTHROW_NCX(LIBCCALL libc__CrtReportBlockType)(void const *ptr) {
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtMemCheckpoint") void
 NOTHROW_NCX(LIBCCALL libc__CrtMemCheckpoint)(/*out*/ _CrtMemState *state) {
-#line 597 "kos/src/libc/magic/crtdbg.c"
+#line 598 "kos/src/libc/magic/crtdbg.c"
 	memset(state, 0, sizeof(*state));
 }
 
@@ -192,7 +192,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtMemDifference") int
 NOTHROW_NCX(LIBCCALL libc__CrtMemDifference)(/*out*/ _CrtMemState *state,
                                              _CrtMemState const *old_state,
                                              _CrtMemState const *new_state) {
-#line 604 "kos/src/libc/magic/crtdbg.c"
+#line 605 "kos/src/libc/magic/crtdbg.c"
 	(void)old_state;
 	(void)new_state;
 	memset(state, 0, sizeof(*state));
@@ -202,7 +202,7 @@ NOTHROW_NCX(LIBCCALL libc__CrtMemDifference)(/*out*/ _CrtMemState *state,
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtMemDumpAllObjectsSince") void
 NOTHROW_NCX(LIBCCALL libc__CrtMemDumpAllObjectsSince)(_CrtMemState const *state) {
-#line 612 "kos/src/libc/magic/crtdbg.c"
+#line 613 "kos/src/libc/magic/crtdbg.c"
 	COMPILER_IMPURE();
 	(void)state;
 }
@@ -210,21 +210,21 @@ NOTHROW_NCX(LIBCCALL libc__CrtMemDumpAllObjectsSince)(_CrtMemState const *state)
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtMemDumpStatistics") void
 NOTHROW_NCX(LIBCCALL libc__CrtMemDumpStatistics)(_CrtMemState const *state) {
-#line 618 "kos/src/libc/magic/crtdbg.c"
+#line 619 "kos/src/libc/magic/crtdbg.c"
 	COMPILER_IMPURE();
 	(void)state;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtDumpMemoryLeaks") int
 NOTHROW_NCX(LIBCCALL libc__CrtDumpMemoryLeaks)(void) {
-#line 624 "kos/src/libc/magic/crtdbg.c"
+#line 625 "kos/src/libc/magic/crtdbg.c"
 	COMPILER_IMPURE();
 	return 0;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtSetCheckCount") int
 NOTHROW_NCX(LIBCCALL libc__CrtSetCheckCount)(int check_count) {
-#line 630 "kos/src/libc/magic/crtdbg.c"
+#line 631 "kos/src/libc/magic/crtdbg.c"
 	(void)check_count;
 	COMPILER_IMPURE();
 	return 0;
@@ -233,7 +233,7 @@ NOTHROW_NCX(LIBCCALL libc__CrtSetCheckCount)(int check_count) {
 INTERN ATTR_PURE
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtGetCheckCount") int
 NOTHROW_NCX(LIBCCALL libc__CrtGetCheckCount)(void) {
-#line 637 "kos/src/libc/magic/crtdbg.c"
+#line 638 "kos/src/libc/magic/crtdbg.c"
 	COMPILER_IMPURE();
 	return 0;
 }

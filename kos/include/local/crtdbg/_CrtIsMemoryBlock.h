@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9273fe52 */
+/* HASH CRC-32:0xbcbd0bb6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtIsMemoryBlock))(void const *__ptr
                                                                __LONG32_TYPE__ *__prequest_number,
                                                                char **__filename,
                                                                int *__line) {
-#line 578 "kos/src/libc/magic/crtdbg.c"
+#line 579 "kos/src/libc/magic/crtdbg.c"
 	(void)__ptr;
 	(void)__num_bytes;
 	if (__prequest_number)
