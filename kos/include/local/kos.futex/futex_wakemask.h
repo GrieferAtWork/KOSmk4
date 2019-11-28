@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d353404 */
+/* HASH CRC-32:0x3452b994 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futex_wakemask_defined
-#if defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
+#if defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64)
 #define __local_futex_wakemask_defined 1
 #include <bits/types.h>
 #include <bits/types.h>
@@ -114,9 +114,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futex_wakemask))(__uintptr_t *__uaddr
                                                             __SIZE_TYPE__ __max_wake,
                                                             __uintptr_t __mask_and,
                                                             __uintptr_t __mask_or) {
-#line 356 "kos/src/libc/magic/kos.futex.c"
+#line 354 "kos/src/libc/magic/kos.futex.c"
 	return __localdep_lfutex64(__uaddr, LFUTEX_WAKEMASK, __max_wake, __mask_and, __mask_or);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_lfutex64 || __CRT_HAVE_lfutex */
+#endif /* __CRT_HAVE_lfutex || __CRT_HAVE_lfutex64 */
 #endif /* !__local_futex_wakemask_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc05f45c */
+/* HASH CRC-32:0xfd0ceb23 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -130,7 +130,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_timedwaitwhile_above))(__ui
                                                                             __uintptr_t *__uaddr,
                                                                             __uintptr_t __above_value,
                                                                             struct __TM_TYPE(timespec) const *__rel_timeout) {
-#line 337 "kos/src/libc/magic/kos.futexlock.c"
+#line 335 "kos/src/libc/magic/kos.futexlock.c"
 	return __localdep_lfutexlock(__ulockaddr, __uaddr, LFUTEX_WAIT_WHILE_ABOVE, __above_value, __rel_timeout);
 }
 __NAMESPACE_LOCAL_END

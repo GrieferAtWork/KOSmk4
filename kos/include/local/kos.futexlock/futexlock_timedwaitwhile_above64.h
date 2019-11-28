@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb957415a */
+/* HASH CRC-32:0x78a87309 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futexlock_timedwaitwhile_above64_defined
-#if defined(__CRT_HAVE_lfutexlock64) || defined(__CRT_HAVE_lfutexlock)
+#if defined(__CRT_HAVE_lfutexlock) || defined(__CRT_HAVE_lfutexlock64)
 #define __local_futexlock_timedwaitwhile_above64_defined 1
 #include <bits/types.h>
 #include <bits/types.h>
@@ -130,9 +130,9 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_timedwaitwhile_above64))(__
                                                                               __uintptr_t *__uaddr,
                                                                               __uintptr_t __above_value,
                                                                               struct __timespec64 const *__rel_timeout) {
-#line 487 "kos/src/libc/magic/kos.futexlock.c"
+#line 485 "kos/src/libc/magic/kos.futexlock.c"
 	return __localdep_lfutexlock64(__ulockaddr, __uaddr, LFUTEX_WAIT_WHILE_ABOVE, __above_value, __rel_timeout);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_lfutexlock64 || __CRT_HAVE_lfutexlock */
+#endif /* __CRT_HAVE_lfutexlock || __CRT_HAVE_lfutexlock64 */
 #endif /* !__local_futexlock_timedwaitwhile_above64_defined */

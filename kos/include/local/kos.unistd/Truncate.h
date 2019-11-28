@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3290c9d */
+/* HASH CRC-32:0xbe519ddd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Truncate_defined
-#if defined(__CRT_HAVE_Truncate64) || defined(__CRT_HAVE_Truncate)
+#if defined(__CRT_HAVE_Truncate) || defined(__CRT_HAVE_Truncate64)
 #define __local_Truncate_defined 1
 #include <kos/anno.h>
 /* Dependency: "Truncate64" from "kos.unistd" */
@@ -60,13 +60,13 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(Truncate) __ATTR_NONNULL((1)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(Truncate))(char const *__file,
                                          __FS_TYPE(pos) __length) __THROWS(...) {
-#line 461 "kos/src/libc/magic/kos.unistd.c"
-#ifdef __CRT_HAVE_truncate64
+#line 474 "kos/src/libc/magic/kos.unistd.c"
+#ifdef __CRT_HAVE_Truncate
 	__localdep_Truncate64(__file, (__pos64_t)__length);
-#else /* __CRT_HAVE_truncate64 */
+#else /* __CRT_HAVE_Truncate */
 	__localdep_Truncate32(__file, (__pos32_t)__length);
-#endif /* !__CRT_HAVE_truncate64 */
+#endif /* !__CRT_HAVE_Truncate */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_Truncate64 || __CRT_HAVE_Truncate */
+#endif /* __CRT_HAVE_Truncate || __CRT_HAVE_Truncate64 */
 #endif /* !__local_Truncate_defined */

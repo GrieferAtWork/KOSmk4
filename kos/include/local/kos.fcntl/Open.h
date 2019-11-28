@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf63995c5 */
+/* HASH CRC-32:0x5cc7ffe6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Open_defined
-#if defined(__CRT_HAVE_Open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64)))
+#if (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64))) || defined(__CRT_HAVE_Open) || defined(__CRT_HAVE_Open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64) || (defined(__CRT_HAVE_Openat64) && defined(__USE_FILE_OFFSET64))))
 #define __local_Open_defined 1
 #include <kos/anno.h>
 #include <bits/types.h>
@@ -30,7 +30,7 @@
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,__localdep_Open64,(char const *__filename, __oflag_t __oflags),Open64,(__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)
 #elif defined(__CRT_HAVE_Open) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,__localdep_Open64,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)
-#elif defined(__CRT_HAVE_Open)
+#elif (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64))) || defined(__CRT_HAVE_Open)
 #include <local/kos.fcntl/Open64.h>
 #define __localdep_Open64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Open64))
 #else /* CUSTOM: Open64 */
@@ -45,7 +45,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,__localdep_Open64,(char 
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,,__localdep_OpenAt,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),Openat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)
 #elif defined(__CRT_HAVE_OpenAt) && (!defined(__USE_FILE_OFFSET64))
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,,__localdep_OpenAt,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)
-#elif defined(__CRT_HAVE_OpenAt64)
+#elif defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64)
 #include <local/kos.fcntl/OpenAt.h>
 #define __localdep_OpenAt (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(OpenAt))
 #else /* CUSTOM: OpenAt */
@@ -58,18 +58,18 @@ __LOCAL_LIBC(Open) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 (__VLIBCCALL __LIBC_LOCAL_NAME(Open))(char const *__filename,
                                       __oflag_t __oflags,
                                       ...) __THROWS(...) {
-#line 41 "kos/src/libc/magic/kos.fcntl.c"
+#line 44 "kos/src/libc/magic/kos.fcntl.c"
 	__fd_t __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __oflags);
-#ifdef __CRT_HAVE_Open64
+#if (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64))) || defined(__CRT_HAVE_Open) || defined(__CRT_HAVE_Open64)
 	__result = __localdep_Open64(__filename, __oflags, __builtin_va_arg(__args, __mode_t));
-#else /* __CRT_HAVE_Open64 */
+#else /* (__CRT_AT_FDCWD && (__CRT_HAVE_OpenAt || __CRT_HAVE_OpenAt64)) || __CRT_HAVE_Open || __CRT_HAVE_Open64 */
 	__result = __localdep_OpenAt(__CRT_AT_FDCWD, __filename, __oflags, __builtin_va_arg(__args, __mode_t));
-#endif /* !__CRT_HAVE_Open64 */
+#endif /* (!__CRT_AT_FDCWD || (!__CRT_HAVE_OpenAt && !__CRT_HAVE_OpenAt64)) && !__CRT_HAVE_Open && !__CRT_HAVE_Open64 */
 	__builtin_va_end(__args);
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_Open64 || (__CRT_AT_FDCWD && (__CRT_HAVE_OpenAt || __CRT_HAVE_OpenAt64)) */
+#endif /* (__CRT_AT_FDCWD && (__CRT_HAVE_OpenAt || __CRT_HAVE_OpenAt64)) || __CRT_HAVE_Open || __CRT_HAVE_Open64 || (__CRT_AT_FDCWD && (__CRT_HAVE_OpenAt || __CRT_HAVE_OpenAt64 || (__CRT_HAVE_Openat64 && __USE_FILE_OFFSET64))) */
 #endif /* !__local_Open_defined */

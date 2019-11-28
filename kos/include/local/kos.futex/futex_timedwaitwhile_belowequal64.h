@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf46a03e7 */
+/* HASH CRC-32:0x9553ba2f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futex_timedwaitwhile_belowequal64_defined
-#if defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
+#if defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64)
 #define __local_futex_timedwaitwhile_belowequal64_defined 1
 #include <bits/types.h>
 #include <bits/types.h>
@@ -117,11 +117,11 @@ __LOCAL_LIBC(futex_timedwaitwhile_belowequal64) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_timedwaitwhile_belowequal64))(__uintptr_t *__uaddr,
                                                                                __uintptr_t __below_equal_value,
                                                                                struct __timespec64 const *__rel_timeout) {
-#line 812 "kos/src/libc/magic/kos.futex.c"
+#line 810 "kos/src/libc/magic/kos.futex.c"
 	if __unlikely(__below_equal_value == (__uintptr_t)-1)
 		return __localdep_lfutex64(__uaddr, LFUTEX_WAIT, 0, __rel_timeout);
 	return __localdep_lfutex64(__uaddr, LFUTEX_WAIT_WHILE_BELOW, __below_equal_value + 1, __rel_timeout);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_lfutex64 || __CRT_HAVE_lfutex */
+#endif /* __CRT_HAVE_lfutex || __CRT_HAVE_lfutex64 */
 #endif /* !__local_futex_timedwaitwhile_belowequal64_defined */

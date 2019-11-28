@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc90c5eb */
+/* HASH CRC-32:0x50a0a724 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futexlock_timedwaitwhile_aboveequal64_defined
-#if defined(__CRT_HAVE_lfutexlock64) || defined(__CRT_HAVE_lfutexlock)
+#if defined(__CRT_HAVE_lfutexlock) || defined(__CRT_HAVE_lfutexlock64)
 #define __local_futexlock_timedwaitwhile_aboveequal64_defined 1
 #include <bits/types.h>
 #include <bits/types.h>
@@ -130,11 +130,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_timedwaitwhile_aboveequal64
                                                                                    __uintptr_t *__uaddr,
                                                                                    __uintptr_t __above_equal_value,
                                                                                    struct __timespec64 const *__rel_timeout) {
-#line 503 "kos/src/libc/magic/kos.futexlock.c"
+#line 501 "kos/src/libc/magic/kos.futexlock.c"
 	if __unlikely(!__above_equal_value)
 		return __localdep_lfutexlock64(__ulockaddr, __uaddr, LFUTEX_WAIT, 0, __rel_timeout);
 	return __localdep_lfutexlock64(__ulockaddr, __uaddr, LFUTEX_WAIT_WHILE_ABOVE, __above_equal_value - 1, __rel_timeout);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_lfutexlock64 || __CRT_HAVE_lfutexlock */
+#endif /* __CRT_HAVE_lfutexlock || __CRT_HAVE_lfutexlock64 */
 #endif /* !__local_futexlock_timedwaitwhile_aboveequal64_defined */

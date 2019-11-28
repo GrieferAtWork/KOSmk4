@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb193f99 */
+/* HASH CRC-32:0xa26151d1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -285,7 +285,7 @@ __CREDIRECT(,__pos64_t,,LSeek,(__fd_t __fd, __off64_t __offset, int __whence),LS
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CDECLARE(,__pos32_t,,LSeek,(__fd_t __fd, __off32_t __offset, int __whence),(__fd,__offset,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_LSeek64) || defined(__CRT_HAVE_LSeek)
+#elif defined(__CRT_HAVE_LSeek) || defined(__CRT_HAVE_LSeek64)
 #include <local/kos.unistd/LSeek.h>
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
@@ -418,7 +418,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),size_t,,PRead,(__fd_t __fd, void *__buf, size_t 
 /* >> pread(2)
  * Read data from a file at a specific offset */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,,PRead,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset)) __THROWS(...)
-#elif defined(__CRT_HAVE_PRead64)
+#elif defined(__CRT_HAVE_PRead) || defined(__CRT_HAVE_PRead64)
 #include <local/kos.unistd/PRead.h>
 /* >> pread(2)
  * Read data from a file at a specific offset */
@@ -432,7 +432,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),size_t,,PWrite,(__fd_t __fd, void const *__buf, 
 /* >> pwrite(2)
  * Write data to a file at a specific offset */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,,PWrite,(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset)) __THROWS(...)
-#elif defined(__CRT_HAVE_PWrite64)
+#elif defined(__CRT_HAVE_PWrite) || defined(__CRT_HAVE_PWrite64)
 #include <local/kos.unistd/PWrite.h>
 /* >> pwrite(2)
  * Write data to a file at a specific offset */
@@ -448,7 +448,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),size_t,,PReadAll,(__fd_t __fd, void *__buf, size
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,,PReadAll,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset)) __THROWS(...)
-#elif defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))) || defined(__CRT_HAVE_pread64) || defined(__CRT_HAVE___pread64) || defined(__CRT_HAVE_preadall64) || (defined(__CRT_HAVE_preadall) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_PReadAll) || defined(__CRT_HAVE_PRead) || defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PReadAll64) || (defined(__CRT_HAVE_preadall) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 #include <local/kos.unistd/PReadAll.h>
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
@@ -599,7 +599,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),,Truncate,(char const *__file, pos_t __leng
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),,Truncate,(char const *__file, pos_t __length),(__file,__length)) __THROWS(...)
-#elif defined(__CRT_HAVE_Truncate64) || defined(__CRT_HAVE_Truncate)
+#elif defined(__CRT_HAVE_Truncate) || defined(__CRT_HAVE_Truncate64)
 #include <local/kos.unistd/Truncate.h>
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */

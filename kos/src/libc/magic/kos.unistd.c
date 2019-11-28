@@ -201,15 +201,14 @@ LSeek32:($fd_t fd, $off32_t offset, int whence) -> $pos32_t = LSeek?;
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(LSeek)]
 [alias_args(LSeek64:($fd_t fd, $off64_t offset, int whence) -> $pos64_t)]
 [alias_args(LSeek:($fd_t fd, $off32_t offset, int whence) -> $pos32_t)]
-[requires(defined(__CRT_HAVE_LSeek64) || defined(__CRT_HAVE_LSeek))]
-[dependency_string(defined(__CRT_HAVE_LSeek) || defined(__CRT_HAVE_LSeek64))]
+[requires($has_function(LSeek32) || $has_function(LSeek64))]
 [section(.text.crt.except.io.seek)]
 LSeek:($fd_t fd, $off_t offset, int whence) -> $pos_t {
-#ifdef __CRT_HAVE_LSeek
+@@if_has_function(LSeek32)@@
 	return LSeek32(fd, ($off32_t)offset, whence);
-#else /* __CRT_HAVE_LSeek */
+@@else_has_function(LSeek32)@@
 	return LSeek64(fd, ($off64_t)offset, whence);
-#endif /* !__CRT_HAVE_LSeek */
+@@endif_has_function(LSeek32)@@
 }
 
 %
@@ -289,7 +288,6 @@ UnlinkAt:($fd_t dfd, [notnull] char const *name, $atflag_t flags);
 %#ifdef __USE_LARGEFILE64
 [throws][doc_alias(lseek64)]
 [off64_variant_of(LSeek)][noexport][requires($has_function(LSeek32))]
-[dependency_string(defined(__CRT_HAVE_LSeek64) || defined(__CRT_HAVE_LSeek))]
 [section(.text.crt.except.io.large.seek)]
 LSeek64:($fd_t fd, $off64_t offset, int whence) -> $pos64_t {
 	return LSeek32(fd, (__off32_t)offset, whence);
@@ -305,19 +303,27 @@ LSeek64:($fd_t fd, $off64_t offset, int whence) -> $pos64_t {
 [throws][cp][noexport][doc_alias(pread)]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(PRead64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(PRead)]
-[requires(defined(__CRT_HAVE_PRead64))]
+[requires($has_function(PRead32) || $has_function(PRead64))]
 [section(.text.crt.except.io.read)]
 PRead:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, pos_t offset) -> size_t {
+@@if_has_function(PRead32)@@
+	return PRead32(fd, buf, bufsize, (pos32_t)offset);
+@@else_has_function(PRead32)@@
 	return PRead64(fd, buf, bufsize, (pos64_t)offset);
+@@endif_has_function(PRead32)@@
 }
 
 [throws][cp][noexport][doc_alias(pwrite)]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(PWrite64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(PWrite)]
+[requires($has_function(PWrite32) || $has_function(PWrite64))]
 [section(.text.crt.except.io.write)]
-[requires(defined(__CRT_HAVE_PWrite64))]
 PWrite:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize, pos_t offset) -> size_t {
+@@if_has_function(PWrite32)@@
+	return PWrite32(fd, buf, bufsize, (pos32_t)offset);
+@@else_has_function(PWrite32)@@
 	return PWrite64(fd, buf, bufsize, (pos64_t)offset);
+@@endif_has_function(PWrite32)@@
 }
 
 
@@ -326,11 +332,15 @@ PWrite:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize, pos_t offset) 
 [throws][cp][doc_alias(preadall)]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(PReadAll64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(PReadAll)]
-[requires($has_function(preadall64))]
+[requires($has_function(PReadAll32) || $has_function(PReadAll64))]
 [dependency_include(<parts/errno.h>)]
 [section(.text.crt.except.io.read)]
 PReadAll:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, pos_t offset) -> size_t {
+@@if_has_function(PReadAll32)@@
+	return PReadAll32(fd, buf, bufsize, (pos32_t)offset);
+@@else_has_function(PReadAll32)@@
 	return PReadAll64(fd, buf, bufsize, (pos64_t)offset);
+@@endif_has_function(PReadAll32)@@
 }
 %#endif /* __USE_KOS */
 
@@ -342,20 +352,23 @@ PReadAll:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, pos_t offset) -> 
 
 [throws][doc_alias(pread64)]
 [off64_variant_of(PRead)][cp][noexport][section(.text.crt.except.io.large.read)]
-[requires(defined(__CRT_HAVE_PRead))]
+[requires($has_function(PRead32))]
 PRead64:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, pos64_t offset) -> size_t {
 	return PRead32(fd, buf, bufsize, (pos32_t)offset);
 }
 
 [throws][doc_alias(pwrite64)]
 [off64_variant_of(PWrite)][cp][noexport][section(.text.crt.except.io.large.write)]
-[requires(defined(__CRT_HAVE_PWrite))]
+[requires($has_function(PWrite32))]
 PWrite64:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, pos64_t offset) -> size_t {
 	return PWrite32(fd, buf, bufsize, (pos32_t)offset);
 }
 
 %
 %#ifdef __USE_KOS
+[throws][section(.text.crt.except.io.read)][cp][ignore]
+PReadAll32:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, $pos32_t offset) -> size_t = PReadAll?;
+
 [throws][doc_alias(preadall64)]
 [off64_variant_of(preadall)][cp][requires($has_function(PRead64))]
 [section(.text.crt.except.io.large.read)]
@@ -456,13 +469,13 @@ LChown:([notnull] char const *file, $uid_t owner, $gid_t group) {
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(Truncate64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(Truncate)]
 [section(.text.crt.except.fs.modify)]
-[requires(defined(__CRT_HAVE_Truncate64) || defined(__CRT_HAVE_Truncate))]
+[requires($has_function(Truncate32) || $has_function(Truncate64))]
 Truncate:([notnull] char const *file, pos_t length) {
-#ifdef __CRT_HAVE_truncate64
+@@if_has_function(Truncate32)@@
 	Truncate64(file, (__pos64_t)length);
-#else /* __CRT_HAVE_truncate64 */
+@@else_has_function(Truncate32)@@
 	Truncate32(file, (__pos32_t)length);
-#endif /* !__CRT_HAVE_truncate64 */
+@@endif_has_function(Truncate32)@@
 }
 
 [throws][doc_alias(Truncate)][section(.text.crt.except.fs.modify)]
@@ -473,7 +486,7 @@ Truncate:([notnull] char const *file, pos_t length) {
 [throws][doc_alias(truncate64)]
 [off64_variant_of(Truncate)][noexport]
 [section(.text.crt.except.fs.modify)]
-[requires(defined(__CRT_HAVE_Truncate))]
+[requires($has_function(Truncate32))]
 Truncate64:([notnull] char const *file, pos64_t length) {
 	Truncate32(file, (__pos32_t)length);
 }
@@ -586,21 +599,21 @@ FTruncate32:($fd_t fd, __pos32_t length) -> int = FTruncate?;
 [throws][doc_alias(ftruncate)][noexport]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(FTruncate64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(FTruncate)]
-[requires(defined(__CRT_HAVE_FTruncate) || defined(__CRT_HAVE_FTruncate64))]
+[requires($has_function(FTruncate32) || $has_function(FTruncate64))]
 [section(.text.crt.except.io.write)]
 FTruncate:($fd_t fd, pos_t length) {
-#ifdef __CRT_HAVE_FTruncate
+@@if_has_function(FTruncate32)@@
 	FTruncate32(fd, (__pos32_t)length);
-#else
+@@else_has_function(FTruncate32)@@
 	FTruncate64(fd, (__pos64_t)length);
-#endif
+@@endif_has_function(FTruncate32)@@
 }
 
 %
 %#ifdef __USE_LARGEFILE64
 [throws][doc_alias(ftruncate64)]
 [off64_variant_of(FTruncate)][noexport]
-[requires(defined(__CRT_HAVE_FTruncate))]
+[requires($has_function(FTruncate32))]
 [section(.text.crt.except.io.large.write)]
 FTruncate64:($fd_t fd, pos64_t length) {
 	FTruncate32(fd, (pos32_t)length);

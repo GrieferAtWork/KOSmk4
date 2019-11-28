@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50a1da99 */
+/* HASH CRC-32:0xb8151481 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __LOCAL_LIBC(LSeek64) __pos64_t
 (__LIBCCALL __LIBC_LOCAL_NAME(LSeek64))(__fd_t __fd,
                                         __off64_t __offset,
                                         int __whence) __THROWS(...) {
-#line 295 "kos/src/libc/magic/kos.unistd.c"
+#line 293 "kos/src/libc/magic/kos.unistd.c"
 	return __localdep_LSeek32(__fd, (__off32_t)__offset, __whence);
 }
 __NAMESPACE_LOCAL_END

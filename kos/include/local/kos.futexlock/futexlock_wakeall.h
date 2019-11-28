@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca0d1399 */
+/* HASH CRC-32:0xdf709c9b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futexlock_wakeall_defined
-#if defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_futex_wakeall)
+#if defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_futex_wakeall)
 #define __local_futexlock_wakeall_defined 1
 #include <bits/types.h>
 #include <bits/types.h>
@@ -33,7 +33,7 @@
  * @return: * : The number of woken threads
  * @return: -1:EFAULT: A faulty pointer was given */
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_futex_wakeall,(__uintptr_t *__uaddr),futex_wakeall,(__uaddr))
-#elif defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
+#elif defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_futex_wake)
 #include <local/kos.futex/futex_wakeall.h>
 /* Wake all threads waiting for `*UADDR' (same as `futex_wake(uaddr, (size_t)-1)')
  * @return: * : The number of woken threads
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
  * system call when no thread is waiting on the given lock */
 __LOCAL_LIBC(futexlock_wakeall) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_wakeall))(__uintptr_t *__ulockaddr) {
-#line 160 "kos/src/libc/magic/kos.futexlock.c"
+#line 158 "kos/src/libc/magic/kos.futexlock.c"
 	if (!(__hybrid_atomic_load(*__ulockaddr, __ATOMIC_ACQUIRE) & __LFUTEX_WAIT_LOCK_WAITERS))
 		return 0; /* No waiting threads. */
 	if (!(__hybrid_atomic_fetchand(*__ulockaddr, ~__LFUTEX_WAIT_LOCK_WAITERS, __ATOMIC_SEQ_CST) & __LFUTEX_WAIT_LOCK_WAITERS))
@@ -58,5 +58,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_wakeall))(__uintptr_t *__ul
 	return __localdep_futex_wakeall(__ulockaddr);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_futex_wake || __CRT_HAVE_lfutex64 || __CRT_HAVE_lfutex || __CRT_HAVE_futex_wakeall */
+#endif /* __CRT_HAVE_lfutex || __CRT_HAVE_lfutex64 || __CRT_HAVE_futex_wake || __CRT_HAVE_futex_wakeall */
 #endif /* !__local_futexlock_wakeall_defined */

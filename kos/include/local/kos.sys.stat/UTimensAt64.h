@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6da7a1 */
+/* HASH CRC-32:0x71e0a2a0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __LOCAL_LIBC(UTimensAt64) __ATTR_NONNULL((2)) void
 		}
 		__localdep_UTimensAt32(__dirfd, __filename, __tms, __flags);
 	}
-#else
+#else /* __KOS__ && __KOS_VERSION__ >= 300 */
 	struct __timespec32 __tms[2];
 	if (!__times) {
 		__localdep_UTimensAt32(__dirfd, __filename, __NULLPTR, __flags);
@@ -66,7 +66,7 @@ __LOCAL_LIBC(UTimensAt64) __ATTR_NONNULL((2)) void
 		__tms[1].tv_nsec = __times[1].tv_nsec;
 		__localdep_UTimensAt32(__dirfd, __filename, __tms, __flags);
 	}
-#endif
+#endif /* !__KOS__ || __KOS_VERSION__ < 300 */
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_UTimensAt */

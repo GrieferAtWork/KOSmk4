@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f05500d */
+/* HASH CRC-32:0x12dad31 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futexlock_timedwaitlock64_defined
-#if defined(__CRT_HAVE_lfutexlock64) || defined(__CRT_HAVE_lfutexlock)
+#if defined(__CRT_HAVE_lfutexlock) || defined(__CRT_HAVE_lfutexlock64)
 #define __local_futexlock_timedwaitlock64_defined 1
 #include <bits/types.h>
 #include <bits/types.h>
@@ -129,9 +129,9 @@ __LOCAL_LIBC(futexlock_timedwaitlock64) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_timedwaitlock64))(__uintptr_t *__ulockaddr,
                                                                        __uintptr_t *__uaddr,
                                                                        struct __timespec64 const *__rel_timeout) {
-#line 541 "kos/src/libc/magic/kos.futexlock.c"
+#line 539 "kos/src/libc/magic/kos.futexlock.c"
 	return __localdep_lfutexlock64(__ulockaddr, __uaddr, LFUTEX_WAIT_LOCK, 0, __rel_timeout);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_lfutexlock64 || __CRT_HAVE_lfutexlock */
+#endif /* __CRT_HAVE_lfutexlock || __CRT_HAVE_lfutexlock64 */
 #endif /* !__local_futexlock_timedwaitlock64_defined */

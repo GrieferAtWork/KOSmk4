@@ -76,14 +76,13 @@ lfutexlock32:([nonnull] lfutex_t *ulockaddr, [nonnull] lfutex_t *uaddr,
 @@@return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out
 [cp][vartypes(void *, $uintptr_t)]
 [decl_include(<bits/types.h>)][dependency_include(<bits/timespec.h>)]
-[requires(defined(__CRT_HAVE_lfutexlock) || defined(__CRT_HAVE_lfutexlock64))]
-[dependency_string(defined(__CRT_HAVE_lfutexlock) || defined(__CRT_HAVE_lfutexlock64))]
+[requires($has_function(lfutexlock32) || $has_function(lfutexlock64))]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(lfutexlock64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(lfutexlock)]
 lfutexlock:([nonnull] lfutex_t *ulockaddr, [nonnull] lfutex_t *uaddr,
             $syscall_ulong_t futex_op, lfutex_t val,
             /*struct timespec const *timeout, lfutex_t val2*/...) -> $ssize_t {
-#ifdef __CRT_HAVE_lfutexlock
+@@if_has_function(lfutexlock32)@@
 	va_list args;
 	lfutex_t val2;
 	struct timespec32 tms32;
@@ -97,7 +96,7 @@ lfutexlock:([nonnull] lfutex_t *ulockaddr, [nonnull] lfutex_t *uaddr,
 	tms32.@tv_sec@  = (__time32_t)timeout->@tv_sec@;
 	tms32.@tv_nsec@ = timeout->@tv_nsec@;
 	return lfutexlock32(ulockaddr, uaddr, futex_op, val, &tms32, val2);
-#else /* __CRT_HAVE_lfutexlock */
+@@else_has_function(lfutexlock32)@@
 	va_list args;
 	lfutex_t val2;
 	struct timespec64 tms64;
@@ -111,7 +110,7 @@ lfutexlock:([nonnull] lfutex_t *ulockaddr, [nonnull] lfutex_t *uaddr,
 	tms64.@tv_sec@  = (__time64_t)timeout->@tv_sec@;
 	tms64.@tv_nsec@ = timeout->@tv_nsec@;
 	return lfutexlock64(ulockaddr, uaddr, futex_op, val, &tms64, val2);
-#endif /* !__CRT_HAVE_lfutexlock */
+@@endif_has_function(lfutexlock32)@@
 }
 
 
@@ -119,8 +118,7 @@ lfutexlock:([nonnull] lfutex_t *ulockaddr, [nonnull] lfutex_t *uaddr,
 %#ifdef __USE_TIME64
 [cp][time64_variant_of(lfutexlock)][vartypes(void *, $uintptr_t)]
 [decl_include(<bits/types.h>)][dependency_include(<bits/timespec.h>)]
-[requires(defined(__CRT_HAVE_lfutexlock))]
-[dependency_string(defined(__CRT_HAVE_lfutexlock64) || defined(__CRT_HAVE_lfutexlock))]
+[requires($has_function(lfutexlock32))]
 lfutexlock64:([nonnull] lfutex_t *ulockaddr, [nonnull] lfutex_t *uaddr, $syscall_ulong_t futex_op, lfutex_t val, /*struct timespec64 const *timeout, lfutex_t val2*/...) -> $ssize_t {
 	va_list args;
 	lfutex_t val2;

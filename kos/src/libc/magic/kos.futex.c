@@ -265,13 +265,12 @@ lfutex32:([nonnull] lfutex_t *uaddr, $syscall_ulong_t futex_op, lfutex_t val, /*
 @@@return: -1:EINTR:     A blocking futex-wait operation was interrupted
 @@@return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out
 [cp][vartypes(void *, $uintptr_t)]
-[requires(defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64))]
-[dependency_string(defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64))]
+[requires($has_function(lfutex32) || $has_function(lfutex64))]
 [decl_include(<bits/types.h>)][dependency_include(<bits/timespec.h>)]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(lfutex64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(lfutex)]
 lfutex:([nonnull] lfutex_t *uaddr, $syscall_ulong_t futex_op, lfutex_t val, /*struct timespec const *timeout, lfutex_t val2*/...) -> $ssize_t {
-#ifdef __CRT_HAVE_lfutex
+@@if_has_function(lfutex32)@@
 	va_list args;
 	lfutex_t val2;
 	struct timespec32 tms32;
@@ -285,7 +284,7 @@ lfutex:([nonnull] lfutex_t *uaddr, $syscall_ulong_t futex_op, lfutex_t val, /*st
 	tms32.@tv_sec@  = (__time32_t)timeout->@tv_sec@;
 	tms32.@tv_nsec@ = timeout->@tv_nsec@;
 	return lfutex32(uaddr, futex_op, val, &tms32, val2);
-#else /* __CRT_HAVE_lfutex */
+@@else_has_function(lfutex32)@@
 	va_list args;
 	lfutex_t val2;
 	struct timespec64 tms64;
@@ -299,15 +298,14 @@ lfutex:([nonnull] lfutex_t *uaddr, $syscall_ulong_t futex_op, lfutex_t val, /*st
 	tms64.@tv_sec@  = (__time64_t)timeout->@tv_sec@;
 	tms64.@tv_nsec@ = timeout->@tv_nsec@;
 	return lfutex64(uaddr, futex_op, val, &tms64, val2);
-#endif /* !__CRT_HAVE_lfutex */
+@@endif_has_function(lfutex32)@@
 }
 
 %
 %#ifdef __USE_TIME64
 [cp][time64_variant_of(lfutex)][vartypes(void *, $uintptr_t)]
 [decl_include(<bits/types.h>)][dependency_include(<bits/timespec.h>)]
-[requires(defined(__CRT_HAVE_lfutex))]
-[dependency_string(defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex))]
+[requires($has_function(lfutex32))]
 lfutex64:([nonnull] lfutex_t *uaddr, $syscall_ulong_t futex_op, lfutex_t val, /*struct timespec64 const *timeout, lfutex_t val2*/...) -> $ssize_t {
 	va_list args;
 	lfutex_t val2;
@@ -338,7 +336,7 @@ futex_wake:([nonnull] lfutex_t *uaddr, $size_t max_wake) -> $ssize_t {
 @@Wake all threads waiting for `*UADDR' (same as `futex_wake(uaddr, (size_t)-1)')
 @@@return: * : The number of woken threads
 @@@return: -1:EFAULT: A faulty pointer was given
-[requires(defined(__CRT_HAVE_futex_wake) || $has_function(lfutex64))]
+[requires($has_function(futex_wake))]
 [decl_include(<bits/types.h>)]
 futex_wakeall:([nonnull] lfutex_t *uaddr) -> $ssize_t {
 	return futex_wake(uaddr, ($size_t)-1);

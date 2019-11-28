@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55687f85 */
+/* HASH CRC-32:0x8d441bc9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,7 @@ __LOCAL_LIBC(UTimensAt) __ATTR_NONNULL((2)) void
 		}
 		__localdep_UTimensAt64(__dirfd, __filename, __tms, __flags);
 	}
-#else
+#else /* __KOS__ && __KOS_VERSION__ >= 300 */
 	struct __timespec64 __tms[2];
 	if (!__times) {
 		__localdep_UTimensAt64(__dirfd, __filename, __NULLPTR, __flags);
@@ -85,7 +85,7 @@ __LOCAL_LIBC(UTimensAt) __ATTR_NONNULL((2)) void
 		__tms[1].tv_nsec = __times[1].tv_nsec;
 		__localdep_UTimensAt64(__dirfd, __filename, __tms, __flags);
 	}
-#endif
+#endif /* !__KOS__ || __KOS_VERSION__ < 300 */
 #else /* __CRT_HAVE_UTimensAt64 */
 #if defined(__KOS__) && __KOS_VERSION__ >= 300
 	struct __timespec32 __tms[3];
@@ -102,7 +102,7 @@ __LOCAL_LIBC(UTimensAt) __ATTR_NONNULL((2)) void
 		}
 		__localdep_UTimensAt32(__dirfd, __filename, __tms, __flags);
 	}
-#else
+#else /* __KOS__ && __KOS_VERSION__ >= 300 */
 	struct __timespec32 __tms[2];
 	if (!__times) {
 		__localdep_UTimensAt32(__dirfd, __filename, __NULLPTR, __flags);
@@ -113,7 +113,7 @@ __LOCAL_LIBC(UTimensAt) __ATTR_NONNULL((2)) void
 		__tms[1].tv_nsec = __times[1].tv_nsec;
 		__localdep_UTimensAt32(__dirfd, __filename, __tms, __flags);
 	}
-#endif
+#endif /* !__KOS__ || __KOS_VERSION__ < 300 */
 #endif /* !__CRT_HAVE_UTimensAt64 */
 }
 __NAMESPACE_LOCAL_END

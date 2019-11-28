@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ff478f3 */
+/* HASH CRC-32:0x76fdf8a2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,15 +39,15 @@ __LOCAL_LIBC(OpenAt64) __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t
                                           char const *__filename,
                                           __oflag_t __oflags,
                                           ...) __THROWS(...) {
-#line 117 "kos/src/libc/magic/kos.fcntl.c"
+#line 128 "kos/src/libc/magic/kos.fcntl.c"
 	__fd_t __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __oflags);
 #ifdef __O_LARGEFILE
 	__result = __localdep_OpenAt32(__dirfd, __filename, __oflags|__O_LARGEFILE, __builtin_va_arg(__args, __mode_t));
-#else
+#else /* __O_LARGEFILE */
 	__result = __localdep_OpenAt32(__dirfd, __filename, __oflags, __builtin_va_arg(__args, __mode_t));
-#endif
+#endif /* !__O_LARGEFILE */
 	__builtin_va_end(__args);
 	return __result;
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a875916 */
+/* HASH CRC-32:0x14b3c4df */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_LSeek_defined
-#if defined(__CRT_HAVE_LSeek64) || defined(__CRT_HAVE_LSeek)
+#if defined(__CRT_HAVE_LSeek) || defined(__CRT_HAVE_LSeek64)
 #define __local_LSeek_defined 1
 #include <kos/anno.h>
 /* Dependency: "LSeek32" from "kos.unistd" */
@@ -61,7 +61,7 @@ __LOCAL_LIBC(LSeek) __FS_TYPE(pos)
 (__LIBCCALL __LIBC_LOCAL_NAME(LSeek))(__fd_t __fd,
                                       __FS_TYPE(off) __offset,
                                       int __whence) __THROWS(...) {
-#line 208 "kos/src/libc/magic/kos.unistd.c"
+#line 207 "kos/src/libc/magic/kos.unistd.c"
 #ifdef __CRT_HAVE_LSeek
 	return __localdep_LSeek32(__fd, (__off32_t)__offset, __whence);
 #else /* __CRT_HAVE_LSeek */
@@ -69,5 +69,5 @@ __LOCAL_LIBC(LSeek) __FS_TYPE(pos)
 #endif /* !__CRT_HAVE_LSeek */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_LSeek64 || __CRT_HAVE_LSeek */
+#endif /* __CRT_HAVE_LSeek || __CRT_HAVE_LSeek64 */
 #endif /* !__local_LSeek_defined */

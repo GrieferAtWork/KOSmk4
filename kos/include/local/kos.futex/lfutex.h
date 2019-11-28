@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa740d004 */
+/* HASH CRC-32:0xed4d4eaa */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -164,7 +164,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutex))(__uintptr_t *__uaddr,
                                                     __syscall_ulong_t __futex_op,
                                                     __uintptr_t __val,
                                                     /*struct timespec const *timeout, lfutex_t val2*/...) {
-#line 274 "kos/src/libc/magic/kos.futex.c"
+#line 273 "kos/src/libc/magic/kos.futex.c"
 #ifdef __CRT_HAVE_lfutex
 	__builtin_va_list __args;
 	__uintptr_t __val2;

@@ -33,19 +33,22 @@ Fcntl:($fd_t fd, int cmd, ...) -> __STDC_INT_AS_SSIZE_T;
 
 %[default_impl_section(.text.crt.except.io.access)]
 
+[cp][ATTR_WUNUSED][noexport][vartypes($mode_t)][throws][ignore][decl_include(<bits/types.h>)]
+Open32:([nonnull] char const *filename, $oflag_t oflags, ...) -> $fd_t = Open?;
+
 [cp][guard][ATTR_WUNUSED][noexport][vartypes($mode_t)][throws]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(Open64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(Open)][decl_include(<bits/types.h>)]
-[requires(defined(__CRT_HAVE_Open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64))))]
+[requires($has_function(Open64) || (defined(__CRT_AT_FDCWD) && $has_function(OpenAt)))]
 Open:([nonnull] char const *filename, $oflag_t oflags, ...) -> $fd_t {
 	$fd_t result;
 	va_list args;
 	va_start(args, oflags);
-#ifdef __CRT_HAVE_Open64
+@@if_has_function(Open64)@@
 	result = Open64(filename, oflags, va_arg(args, mode_t));
-#else /* __CRT_HAVE_Open64 */
+@@else_has_function(Open64)@@
 	result = OpenAt(__CRT_AT_FDCWD, filename, oflags, va_arg(args, mode_t));
-#endif /* !__CRT_HAVE_Open64 */
+@@endif_has_function(Open64)@@
 	va_end(args);
 	return result;
 }
@@ -53,39 +56,43 @@ Open:([nonnull] char const *filename, $oflag_t oflags, ...) -> $fd_t {
 [cp][guard][ATTR_WUNUSED][throws]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(Creat64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(Creat)]
-[requires(defined(__CRT_HAVE_Open64) || defined(__CRT_HAVE_Open))]
+[requires($has_function(Open))]
 [dependency_include(<bits/fcntl.h>)][noexport]
 [decl_include(<bits/types.h>)]
 Creat:([nonnull] char const *filename, $mode_t mode) -> $fd_t {
-	return Open(filename, @O_CREAT@|@O_WRONLY@|@O_TRUNC@, mode);
+	return Open(filename, @O_CREAT@ | @O_WRONLY@ | @O_TRUNC@, mode);
 }
 
 %
 %#ifdef __USE_LARGEFILE64
 [cp][noexport][vartypes($mode_t)][throws]
 [ATTR_WUNUSED][largefile64_variant_of(Open)]
-[requires(defined(__CRT_HAVE_Open))]
+[requires((defined(__CRT_AT_FDCWD) && $has_function(OpenAt64)) || $has_function(Open32))]
 [dependency_include(<bits/fcntl.h>)]
 [decl_include(<bits/types.h>)]
 Open64:([nonnull] char const *filename, $oflag_t oflags, ...) -> $fd_t {
 	$fd_t result;
 	va_list args;
 	va_start(args, oflags);
+#if defined(__CRT_AT_FDCWD) && @@has_function(OpenAt64)@@
+	result = OpenAt64(__CRT_AT_FDCWD, filename, oflags, va_arg(args, mode_t));
+#else /* __CRT_AT_FDCWD && OpenAt64... */
 #ifdef @__O_LARGEFILE@
-	result = Open(filename, oflags, va_arg(args, mode_t));
-#else
-	result = Open(filename, oflags|@__O_LARGEFILE@, va_arg(args, mode_t));
-#endif
+	result = Open32(filename, oflags|@__O_LARGEFILE@, va_arg(args, mode_t));
+#else /* __O_LARGEFILE */
+	result = Open32(filename, oflags, va_arg(args, mode_t));
+#endif /* !__O_LARGEFILE */
+#endif /* !__CRT_AT_FDCWD || !OpenAt64... */
 	va_end(args);
 	return result;
 }
 
 [cp][noexport][guard]
 [ATTR_WUNUSED][largefile64_variant_of(Creat)][throws]
-[requires(defined(__CRT_HAVE_Open64) || defined(__CRT_HAVE_Open))]
+[requires($has_function(Open64))]
 [dependency_include(<bits/fcntl.h>)][decl_include(<bits/types.h>)]
 Creat64:([nonnull] char const *filename, $mode_t mode) -> $fd_t {
-	return Open64(filename, @O_CREAT@|@O_WRONLY@|@O_TRUNC@, mode);
+	return Open64(filename, @O_CREAT@ | @O_WRONLY@ | @O_TRUNC@, mode);
 }
 %#endif /* __USE_LARGEFILE64 */
 %
@@ -97,21 +104,25 @@ OpenAt32:($fd_t dirfd, [nonnull] char const *filename, $oflag_t oflags, ...) -> 
 [cp][guard][noexport][vartypes($mode_t)][ATTR_WUNUSED]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(Openat64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(OpenAt)]
-[requires(defined(__CRT_HAVE_OpenAt64))][throws]
+[requires($has_function(OpenAt32) || $has_function(OpenAt64))][throws]
 [dependency_include(<bits/fcntl.h>)]
 [decl_include(<bits/types.h>)]
 OpenAt:($fd_t dirfd, [nonnull] char const *filename, $oflag_t oflags, ...) -> $fd_t {
 	$fd_t result;
 	va_list args;
 	va_start(args, oflags);
+@@if_has_function(OpenAt64)@@
 	result = OpenAt64(dirfd, filename, oflags, va_arg(args, mode_t));
+@@else_has_function(OpenAt64)@@
+	result = OpenAt32(dirfd, filename, oflags, va_arg(args, mode_t));
+@@endif_has_function(OpenAt64)@@
 	va_end(args);
 	return result;
 }
 %#ifdef __USE_LARGEFILE64
 [cp][guard][noexport][vartypes($mode_t)][ATTR_WUNUSED]
 [largefile64_variant_of(OpenAt)][throws]
-[requires(defined(__CRT_HAVE_OpenAt))]
+[requires($has_function(OpenAt32))]
 [decl_include(<bits/types.h>)]
 OpenAt64:($fd_t dirfd, [nonnull] char const *filename, $oflag_t oflags, ...) -> $fd_t {
 	$fd_t result;
@@ -119,9 +130,9 @@ OpenAt64:($fd_t dirfd, [nonnull] char const *filename, $oflag_t oflags, ...) -> 
 	va_start(args, oflags);
 #ifdef @__O_LARGEFILE@
 	result = OpenAt32(dirfd, filename, oflags|@__O_LARGEFILE@, va_arg(args, mode_t));
-#else
+#else /* __O_LARGEFILE */
 	result = OpenAt32(dirfd, filename, oflags, va_arg(args, mode_t));
-#endif
+#endif /* !__O_LARGEFILE */
 	va_end(args);
 	return result;
 }

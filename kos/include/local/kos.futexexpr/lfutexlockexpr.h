@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc79dc318 */
+/* HASH CRC-32:0x511dfb31 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -196,7 +196,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutexlockexpr))(__uintptr_t *__ulock
                                                             struct lfutexexpr const *__exprv,
                                                             struct __TM_TYPE(timespec) const *__timeout,
                                                             unsigned int __timeout_flags) {
-#line 278 "kos/src/libc/magic/kos.futexexpr.c"
+#line 276 "kos/src/libc/magic/kos.futexexpr.c"
 #ifdef __CRT_HAVE_lfutexlockexpr
 	struct __timespec32 __tms32;
 	if (!__timeout)

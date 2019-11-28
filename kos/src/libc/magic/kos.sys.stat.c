@@ -177,7 +177,7 @@ UTimensAt:($fd_t dirfd, [nonnull] char const *filename,
 		}
 		UTimensAt64(dirfd, filename, tms, flags);
 	}
-#else
+#else /* __KOS__ && __KOS_VERSION__ >= 300 */
 	struct timespec64 tms[2];
 	if (!times) {
 		UTimensAt64(dirfd, filename, NULL, flags);
@@ -188,7 +188,7 @@ UTimensAt:($fd_t dirfd, [nonnull] char const *filename,
 		tms[1].@tv_nsec@ = times[1].@tv_nsec@;
 		UTimensAt64(dirfd, filename, tms, flags);
 	}
-#endif
+#endif /* !__KOS__ || __KOS_VERSION__ < 300 */
 #else /* __CRT_HAVE_UTimensAt64 */
 #if defined(__KOS__) && __KOS_VERSION__ >= 300
 	struct @__timespec32@ tms[3];
@@ -205,7 +205,7 @@ UTimensAt:($fd_t dirfd, [nonnull] char const *filename,
 		}
 		UTimensAt32(dirfd, filename, tms, flags);
 	}
-#else
+#else /* __KOS__ && __KOS_VERSION__ >= 300 */
 	struct @__timespec32@ tms[2];
 	if (!times) {
 		UTimensAt32(dirfd, filename, NULL, flags);
@@ -216,7 +216,7 @@ UTimensAt:($fd_t dirfd, [nonnull] char const *filename,
 		tms[1].@tv_nsec@ = times[1].@tv_nsec@;
 		UTimensAt32(dirfd, filename, tms, flags);
 	}
-#endif
+#endif /* !__KOS__ || __KOS_VERSION__ < 300 */
 #endif /* !__CRT_HAVE_UTimensAt64 */
 }
 
@@ -240,7 +240,7 @@ UTimensAt64:($fd_t dirfd, [nonnull] char const *filename,
 		}
 		UTimensAt32(dirfd, filename, tms, flags);
 	}
-#else
+#else /* __KOS__ && __KOS_VERSION__ >= 300 */
 	struct timespec32 tms[2];
 	if (!times) {
 		UTimensAt32(dirfd, filename, NULL, flags);
@@ -251,7 +251,7 @@ UTimensAt64:($fd_t dirfd, [nonnull] char const *filename,
 		tms[1].@tv_nsec@ = times[1].@tv_nsec@;
 		UTimensAt32(dirfd, filename, tms, flags);
 	}
-#endif
+#endif /* !__KOS__ || __KOS_VERSION__ < 300 */
 }
 %#endif /* __USE_TIME64 */
 %#endif /* __USE_ATFILE */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18cce4b7 */
+/* HASH CRC-32:0xf346ef5d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,9 +18,19 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_PWrite_defined
-#ifdef __CRT_HAVE_PWrite64
+#if defined(__CRT_HAVE_PWrite) || defined(__CRT_HAVE_PWrite64)
 #define __local_PWrite_defined 1
 #include <kos/anno.h>
+/* Dependency: "PWrite32" from "kos.unistd" */
+#ifndef ____localdep_PWrite32_defined
+#define ____localdep_PWrite32_defined 1
+#ifdef __CRT_HAVE_PWrite
+__CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,,__localdep_PWrite32,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),PWrite,(__fd,__buf,__bufsize,__offset)) __THROWS(...)
+#else /* LIBC: PWrite */
+#undef ____localdep_PWrite32_defined
+#endif /* PWrite32... */
+#endif /* !____localdep_PWrite32_defined */
+
 /* Dependency: "PWrite64" from "kos.unistd" */
 #ifndef ____localdep_PWrite64_defined
 #define ____localdep_PWrite64_defined 1
@@ -50,9 +60,13 @@ __LOCAL_LIBC(PWrite) __ATTR_NONNULL((2)) __SIZE_TYPE__
                                        void const *__buf,
                                        __SIZE_TYPE__ __bufsize,
                                        __FS_TYPE(pos) __offset) __THROWS(...) {
-#line 320 "kos/src/libc/magic/kos.unistd.c"
+#line 322 "kos/src/libc/magic/kos.unistd.c"
+#ifdef __CRT_HAVE_PWrite
+	return __localdep_PWrite32(__fd, __buf, __bufsize, (__pos32_t)__offset);
+#else /* __CRT_HAVE_PWrite */
 	return __localdep_PWrite64(__fd, __buf, __bufsize, (__pos64_t)__offset);
+#endif /* !__CRT_HAVE_PWrite */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_PWrite64 */
+#endif /* __CRT_HAVE_PWrite || __CRT_HAVE_PWrite64 */
 #endif /* !__local_PWrite_defined */
