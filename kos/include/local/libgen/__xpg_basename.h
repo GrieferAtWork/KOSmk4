@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5db7653 */
+/* HASH CRC-32:0x705349e8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__xpg_basename) __ATTR_RETNONNULL char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__xpg_basename))(char *__filename) {
 #line 91 "kos/src/libc/magic/libgen.c"
-	/* NOTE: This implementation is taken form GLibc */
+	/* NOTE: This implementation is taken from GLibc */
 	/* Return basename of given pathname according to the weird XPG specification.
 	   Copyright (C) 1997-2017 Free Software Foundation, Inc.
 	   This file is part of the GNU C Library.

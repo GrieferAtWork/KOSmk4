@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97e520fd */
+/* HASH CRC-32:0xfb040143 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ INTERN ATTR_RETNONNULL
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.dirname") char *
 NOTHROW_NCX(LIBCCALL libc_dirname)(char *path) {
 #line 33 "kos/src/libc/magic/libgen.c"
-	/* NOTE: This implementation is taken form GLibc */
+	/* NOTE: This implementation is taken from GLibc */
 	/* dirname - return directory part of PATH.
 	   Copyright (C) 1996-2017 Free Software Foundation, Inc.
 	   This file is part of the GNU C Library.
@@ -95,7 +95,7 @@ INTERN ATTR_RETNONNULL
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.__xpg_basename") char *
 NOTHROW_NCX(LIBCCALL libc___xpg_basename)(char *filename) {
 #line 91 "kos/src/libc/magic/libgen.c"
-	/* NOTE: This implementation is taken form GLibc */
+	/* NOTE: This implementation is taken from GLibc */
 	/* Return basename of given pathname according to the weird XPG specification.
 	   Copyright (C) 1997-2017 Free Software Foundation, Inc.
 	   This file is part of the GNU C Library.

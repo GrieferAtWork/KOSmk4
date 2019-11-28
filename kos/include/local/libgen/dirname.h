@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa21eea62 */
+/* HASH CRC-32:0x188b3635 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(dirname) __ATTR_RETNONNULL char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dirname))(char *__path) {
 #line 33 "kos/src/libc/magic/libgen.c"
-	/* NOTE: This implementation is taken form GLibc */
+	/* NOTE: This implementation is taken from GLibc */
 	/* dirname - return directory part of PATH.
 	   Copyright (C) 1996-2017 Free Software Foundation, Inc.
 	   This file is part of the GNU C Library.
