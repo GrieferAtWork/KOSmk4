@@ -36,6 +36,143 @@ diff -Naur binutils-2.32-orig/bfd/elf64-x86-64.c binutils-2.32/bfd/elf64-x86-64.
  	      && ((bfd_link_executable (info)
  		   && ((h->root.type == bfd_link_hash_undefweak
  			&& !resolved_to_zero)
+diff -Naur binutils-2.32-orig/bfd/elflink.c binutils-2.32/bfd/elflink.c
+--- binutils-2.32-orig/bfd/elflink.c	2019-01-19 17:01:33.000000000 +0100
++++ binutils-2.32/bfd/elflink.c	2019-11-28 18:44:14.984322400 +0100
+@@ -543,13 +543,18 @@
+ 	 table.  */
+       name = h->root.root.string;
+       p = strchr (name, ELF_VER_CHR);
+-      if (p != NULL)
+-	/* We know that the p points into writable memory.  In fact,
+-	   there are only a few symbols that have read-only names, being
+-	   those like _GLOBAL_OFFSET_TABLE_ that are created specially
+-	   by the backends.  Most symbols will have names pointing into
+-	   an ELF string table read from a file, or to objalloc memory.  */
+-	*p = 0;
++      if (p != NULL) {
++		  if (name[0] == '?')
++			  p = NULL;
++		  else {
++			/* We know that the p points into writable memory.  In fact,
++			there are only a few symbols that have read-only names, being
++			those like _GLOBAL_OFFSET_TABLE_ that are created specially
++			by the backends.  Most symbols will have names pointing into
++			an ELF string table read from a file, or to objalloc memory.  */
++			*p = 0;
++		  }
++	  }
+ 
+       indx = _bfd_elf_strtab_add (dynstr, name, p != NULL);
+ 
+@@ -623,7 +628,7 @@
+     {
+       /* Set versioned if symbol version is unknown.  */
+       char *version = strrchr (name, ELF_VER_CHR);
+-      if (version)
++      if (version && name[0] != '?')
+ 	{
+ 	  if (version > name && version[-1] != ELF_VER_CHR)
+ 	    h->versioned = versioned_hidden;
+@@ -1085,6 +1090,8 @@
+     {
+       /* Symbol version is unknown or versioned.  */
+       new_version = strrchr (name, ELF_VER_CHR);
++	  if (new_version && name[0] == '?')
++		  new_version = NULL;
+       if (new_version)
+ 	{
+ 	  if (h->versioned == unknown)
+@@ -1856,6 +1863,8 @@
+      decorated name.  This will cause external references which do not
+      specify a version to be bound to this version of the symbol.  */
+   p = strchr (name, ELF_VER_CHR);
++  if (p && name[0] == '?')
++	  p = NULL;
+   if (h->versioned == unknown)
+     {
+       if (p == NULL)
+@@ -2257,7 +2266,7 @@
+ 	    return FALSE;
+ 	  memcpy (alc, h->root.root.string, len - 1);
+ 	  alc[len - 1] = '\0';
+-	  if (alc[len - 2] == ELF_VER_CHR)
++	  if (alc[len - 2] == ELF_VER_CHR && alc[0] != '?')
+ 	    alc[len - 2] = '\0';
+ 
+ 	  h->verinfo.vertree = t;
+@@ -2304,6 +2313,8 @@
+     return TRUE;
+ 
+   p = strchr (h->root.root.string, ELF_VER_CHR);
++  if (p && h->root.root.string[0] == '?')
++	  p = NULL;
+   if (p != NULL && h->verinfo.vertree == NULL)
+     {
+       struct bfd_elf_version_tree *t;
+@@ -2383,6 +2394,8 @@
+ 
+   hide = FALSE;
+   p = strchr (h->root.root.string, ELF_VER_CHR);
++  if (p && h->root.root.string[0] == '?')
++	  p = NULL;
+   if (p != NULL && h->verinfo.vertree == NULL)
+     {
+       struct bfd_elf_version_tree *t;
+@@ -4980,7 +4993,7 @@
+ 	  if (definition && !dynamic)
+ 	    {
+ 	      char *p = strchr (name, ELF_VER_CHR);
+-	      if (p != NULL && p[1] != ELF_VER_CHR)
++	      if (p != NULL && p[1] != ELF_VER_CHR && name[0] != '?')
+ 		{
+ 		  /* Queue non-default versions so that .symver x, x@FOO
+ 		     aliases can be checked.  */
+@@ -5248,6 +5261,8 @@
+ 	      || (h->root.type != bfd_link_hash_defined
+ 		  && h->root.type != bfd_link_hash_defweak))
+ 	    continue;
++	  if (h->root.root.string[0] == '?')
++	    continue;
+ 
+ 	  amt = p - h->root.root.string;
+ 	  shortname = (char *) bfd_malloc (amt + 1);
+@@ -5539,6 +5554,8 @@
+   p = strchr (name, ELF_VER_CHR);
+   if (p == NULL || p[1] != ELF_VER_CHR)
+     return h;
++  if (name[0] == '?')
++    return h;
+ 
+   /* First check with only one `@'.  */
+   len = strlen (name);
+@@ -5771,7 +5788,7 @@
+   if (h->versioned >= versioned)
+     {
+       char *p = strchr (name, ELF_VER_CHR);
+-      if (p != NULL)
++      if (p != NULL && name[0] != '?')
+ 	{
+ 	  alc = (char *) bfd_malloc (p - name + 1);
+ 	  if (alc == NULL)
+@@ -5845,7 +5862,7 @@
+   if (h->versioned >= versioned)
+     {
+       char *p = strchr (name, ELF_VER_CHR);
+-      if (p != NULL)
++      if (p != NULL && name[0] != '?')
+ 	{
+ 	  alc = (char *) bfd_malloc (p - name + 1);
+ 	  if (alc == NULL)
+@@ -10059,7 +10076,7 @@
+ 	{
+ 	  char *p = strrchr (h->root.root.string, ELF_VER_CHR);
+ 
+-	  if (p && p [1] != '\0')
++	  if (p && p [1] != '\0' && h->root.root.string[0] != '?')
+ 	    {
+ 	      _bfd_error_handler
+ 		/* xgettext:c-format */
 diff -Naur binutils-2.32-orig/config.sub binutils-2.32/config.sub
 --- binutils-2.32-orig/config.sub	2019-01-19 17:01:33.000000000 +0100
 +++ binutils-2.32/config.sub	2019-03-17 10:50:26.187357500 +0100
