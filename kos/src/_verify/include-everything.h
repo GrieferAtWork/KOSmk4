@@ -156,6 +156,8 @@ incdir("", "../../include");
 #include <bits/epoll.h>
 #include <bits/eventfd.h>
 #include <bits/fcntl.h>
+#include <bits/fenv-inline.h>
+#include <bits/fenv.h>
 #include <bits/format-printer.h>
 #include <bits/huge_val.h>
 #include <bits/huge_valf.h>
@@ -595,12 +597,14 @@ incdir("", "../../include");
 #include <netinet/udp.h>
 #include <netpacket/packet.h>
 #include <newlib.h>
-#include <optimized/string.h>
 #include <optimized/error.h>
+#include <optimized/fenv.h>
+#include <optimized/string.h>
 #include <osfcn.h>
 #if __has_include(<panel.h>)
 #include <panel.h>
 #endif /* __has_include(<panel.h>) */
+#include <parts/assert-failed.h>
 #include <parts/assert.h>
 #include <parts/cyg/errno.h>
 #include <parts/dos/errno.h>
