@@ -705,7 +705,7 @@ system:([nullable] char const *__restrict command) -> int;
 
 
 %[default_impl_section(.text.crt.application.exit)]
-[crtbuiltin][std][std_guard][ATTR_NORETURN][alias(_ZSt9terminatev)][throws()] abort:();
+[crtbuiltin][std][std_guard][ATTR_NORETURN][export_alias(_ZSt9terminatev, ?terminate@@YAXXZ)][throws()] abort:();
 [crtbuiltin][std][std_guard][alias(quick_exit)][alias(_exit)][alias(_Exit)][ATTR_NORETURN]
 [throws] exit:(int status);
 

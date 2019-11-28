@@ -73,6 +73,17 @@ function getFilenameForLog(filename: string): string {
 	return fs.abspath(filename);
 }
 
+function crt_have_encode(x: string): string {
+	if (x.startswith("?"))
+		return x.replace("?", "$Q").replace("@", "$A");
+	return x;
+}
+function crt_have_decode(x: string): string {
+	if (x.startswith("$Q"))
+		return x.replace("$Q", "?").replace("$A", "@");
+	return x;
+}
+
 
 #ifdef WARN_KNOWN_BUILTINS
 global final known_builtins: {string: bool} = Dict();
@@ -93,7 +104,9 @@ with (local fp = try File.open("include/i386-kos/crt-features/crt-glc.h", "r") c
 	for (local l: fp) {
 		try {
 			local n = l.scanf(" # define __CRT_HAVE_%[^ ]")...;
-			known_functions.insert(n.strip().decode("utf-8"));
+			known_functions.insert(
+				crt_have_decode(
+					n.strip().decode("utf-8")));
 		} catch (...) {
 		}
 	}
@@ -179,11 +192,45 @@ function key_libd_is_export(x: string): string {
 	return x.startswith("DOS$");
 }
 global all_crt_features: {string...} = HashSet();
+
+@@Returns @true if @x requires an extended pp expression to become a viable alias
+function key_crt_have_is_extended(x: string): bool {
+	return x.startswith("?");
+}
+
+function key_asmname(x: string): bool {
+	/* Extended symbol names need to be wrapped in "...", in order
+	 * to get GAS to interpret the symbol as beginning with `?'.
+	 * If we didn't do this, we'd get an assembler error stating
+	 * that an unrecognized character `?' was encountered. */
+	if (key_crt_have_is_extended(x))
+		return "\"{}\"".format({ x });
+	return x;
+}
+
 function key_crt_have(x: string): string {
+	assert x;
 	all_crt_features.insert(x);
+	if (key_crt_have_is_extended(x)) {
+		/* Need to require __KOS__ to ensure that ld knows of the
+		 * extension where a symbol starting with `?' mustn't be
+		 * considered as a symver-like symbol, but instead as a
+		 * regular, old symbol.
+		 * Also need `!__NO_ASMNAME', since linking against such
+		 * a symbol is only possible when using `__ASMNAME()', since
+		 * a symbol such as this contains characters that are invalid
+		 * when used inside of a c-like symbol name. */
+		return "defined(__KOS__) && !defined(__NO_ASMNAME) && "
+		       "defined(__CRT_HAVE_{})".format({
+			x.replace("?", "$Q").replace("@", "$A")
+		});
+	}
 	return "defined(__CRT_HAVE_{})".format({ x });
 }
+
 function key_crt_have_pp(x: string): string {
+	assert !key_crt_have_is_extended(x);
+	assert x;
 	all_crt_features.insert(x);
 	return "__CRT_HAVE_{}".format({ x });
 }
@@ -383,8 +430,11 @@ function printIfdefCond(
 function printIfdefCrtHaveAndCond(
 		fp: File, isFirst: bool, haveSymbolName: string, cond: string = none): File {
 	if (isFirst) {
-		if (!cond)
+		if (!cond) {
+			if (key_crt_have_is_extended(haveSymbolName))
+				return fp << "#if " << key_crt_have(haveSymbolName) << "\n";
 			return fp << "#ifdef " << key_crt_have_pp(haveSymbolName) << "\n";
+		}
 		return fp << optimizeAndWrapProcessorExpressionForIf(
 			"{} && ({})".format({ key_crt_have(haveSymbolName),
 			cond
@@ -1635,8 +1685,11 @@ got_section_prefix:
 					if (directive[defend + 1:].strip() != "")
 						err(directive_begin, "Trailing text after `%[crt_feature(...)': " + repr directive[defend:].strip());
 					directive = directive[1:defend].strip();
-					for (local x: directive.split(","))
-						all_crt_features.insert(x.strip());
+					for (local x: directive.split(",")) {
+						x = x.strip();
+						if (x)
+							all_crt_features.insert(x);
+					}
 				} else if (directive.startswith("define_wchar_replacement")) {
 					directive = directive[#"define_wchar_replacement":].lstrip();
 					if (!directive.startswith("("))
@@ -2237,8 +2290,6 @@ again_enum_name:
 						err(tag_start, "The `export_alias' tag cannot be used conditionally");
 					for (local x: get_tag_operand().split(",")) {
 						x = x.strip();
-						if ("?" in x || "@" in x)
-							continue; /* Ignore (for now...) */
 						if (x !in alternate_names)
 							alternate_names.append(x);
 						aliases.append(("", x));
@@ -2449,18 +2500,12 @@ again_enum_name:
 					nocrt = true;
 					break;
 				case "alias":       /* [alias(foo)] Define the name of an alias of the function */
-					for (local x: get_tag_operand().split(",")) {
-						if ("?" in x || "@" in x)
-							continue; /* Ignore (for now...) */
+					for (local x: get_tag_operand().split(","))
 						aliases.append((" && ".join(conditions), x.strip()));
-					}
 					break;
 				case "preferred_alias":
-					for (local x: get_tag_operand().split(",")) {
-						if ("?" in x || "@" in x)
-							continue; /* Ignore (for now...) */
+					for (local x: get_tag_operand().split(","))
 						preferred_aliases.append((" && ".join(conditions), x.strip()));
-					}
 					break;
 				case "alias_args": {
 					local op = get_tag_operand();
@@ -3775,9 +3820,10 @@ class Function {
 		if (!skip_self_alias)
 			yield (symbol_name, key_crt_have(symbol_name));
 		for (local cond, alias_name: aliases) {
-			if (cond in ["", "1"])
+			assert alias_name, "Empty alias name in {!r}".format({ this });
+			if (cond in ["", "1"]) {
 				yield (alias_name, key_crt_have(alias_name));
-			else {
+			} else {
 				yield (alias_name, "{} && {}".format({
 					key_crt_have(alias_name),
 					add_paren_if_necessary(cond, true)
@@ -4684,7 +4730,9 @@ do_return_crt:
 				if (alias_name is Cell)
 					alias_name = key(alias_name.value);
 				fp << " " << cond << "\n";
-				fp << "DEFINE_INTERN_ALIAS(" << myname << ", " << alias_name << ");\n";
+				fp << "DEFINE_INTERN_ALIAS("
+				   << key_asmname(myname) << ", "
+				   << alias_name << ");\n";
 				fp << "#el";
 			}
 			fp << "se\n";
@@ -4895,7 +4943,7 @@ do_return_crt:
 							fp << "__";
 						fp << is_nothrow << "," << my_name << ",(";
 						print_argument_list(fp, args, key_underscore, "", transform_argument_types);
-						fp << ")," << asmname << ",(";
+						fp << ")," << key_asmname(asmname) << ",(";
 						print_argument_name_list(fp, args, key_underscore);
 						fp << "))";
 						printThrowsAnnotation(fp);
@@ -5432,7 +5480,7 @@ skip_alias_redirections:
 					fp << "," << my_name << ",(";
 					local a = args_for(alias_name);
 					print_argument_list(fp, a, key_underscore, "", transform_argument_types);
-					fp << ")," << asmname << ",(";
+					fp << ")," << key_asmname(asmname) << ",(";
 					print_argument_name_list(fp, a, key_underscore, false);
 					fp << "))";
 					printThrowsAnnotation(fp);
@@ -7030,30 +7078,37 @@ function write_libc_user_header(fp: File, comnam: string, funcs: {Function...}) 
 function generate_libc_user_exports(fp: File, comnam: string, funcs: {Function...}) {
 	for (local f: enum_user_header_functions(comnam, funcs, false, false)) {
 		if (f.allow_macros || f.args_is_varargs) {
-			if (!f.nocrt)
-				fp << "#undef " << f.name << "\n";
-			for (local alt: f.alternate_names)
-				fp << "#undef " << alt << "\n";
+			if (!f.nocrt) {
+				if (!key_crt_have_is_extended(f.name))
+					fp << "#undef " << f.name << "\n";
+			}
+			for (local alt: f.alternate_names) {
+				if (!key_crt_have_is_extended(alt))
+					fp << "#undef " << alt << "\n";
+			}
 //			if (f.wchar_function) {
-//				for (local name: f.dosnames)
-//					fp << "#undef " << name << "\n";
+//				for (local name: f.dosnames) {
+//					if (!key_crt_have_is_extended(name))
+//						fp << "#undef " << name << "\n";
+//				}
 //			}
 		}
 	}
 	for (local f: enum_user_header_functions(comnam, funcs, false, false)) {
 		if (!f.nocrt) {
-			fp << "DEFINE_PUBLIC_WEAK_ALIAS(";
-			fp << f.name << ", ";
-			fp << key_libc_internal(f.name) << ");\n";
+			fp << "DEFINE_PUBLIC_WEAK_ALIAS("
+			   << key_asmname(f.name) << ", "
+			   << key_libc_internal(f.name) << ");\n";
 		}
 		for (local alt: f.alternate_names) {
-			fp << "DEFINE_PUBLIC_WEAK_ALIAS(";
-			fp << alt << ", ";
-			fp << key_libc_internal(f.name) << ");\n";
+			fp << "DEFINE_PUBLIC_WEAK_ALIAS("
+			   << key_asmname(alt) << ", "
+			   << key_libc_internal(f.name) << ");\n";
 		}
 		if (f.wchar_function) {
 			for (local n: f.dosnames) {
-				fp << "DEFINE_PUBLIC_WEAK_ALIAS(" << n << ", "
+				fp << "DEFINE_PUBLIC_WEAK_ALIAS("
+				   << key_asmname(n) << ", "
 				   << key_libd_internal(f.name) << ");\n";
 			}
 		}
@@ -7685,9 +7740,12 @@ function write_libc_auto_implementation(
 		if (f.helper_function)
 			continue;
 		if (f.allow_macros || f.args_is_varargs) {
-			fp << "#undef " << f.name << "\n";
-			for (local alt: f.alternate_names)
-				fp << "#undef " << alt << "\n";
+			if (!key_crt_have_is_extended(f.name))
+				fp << "#undef " << f.name << "\n";
+			for (local alt: f.alternate_names) {
+				if (!key_crt_have_is_extended(alt))
+					fp << "#undef " << alt << "\n";
+			}
 		}
 	}
 	for (local f: kernel_funcs) {
@@ -7697,12 +7755,12 @@ function write_libc_auto_implementation(
 			continue;
 		if (!f.nocrt) {
 			fp << "DEFINE_PUBLIC_WEAK_ALIAS(";
-			fp << f.name << ", ";
+			fp << key_asmname(f.name) << ", ";
 			fp << key_libc_internal(f.name) << ");\n";
 		}
 		for (local alt: f.alternate_names) {
 			fp << "DEFINE_PUBLIC_WEAK_ALIAS("
-			   << alt << ", "
+			   << key_asmname(alt) << ", "
 			   << key_libc_internal(f.name) << ");\n";
 		}
 	}
@@ -7715,8 +7773,10 @@ function write_libc_auto_implementation(
 //				continue;
 //			if (f.allow_macros || f.args_is_varargs) {
 //				if (f.wchar_function) {
-//					for (local n: f.dosnames)
-//						fp << "#undef " << n << "\n";
+//					for (local n: f.dosnames) {
+//						if (!key_crt_have_is_extended(n))
+//							fp << "#undef " << n << "\n";
+//					}
 //				}
 //			}
 //		}
@@ -7727,7 +7787,8 @@ function write_libc_auto_implementation(
 				continue;
 			if (f.wchar_function) {
 				for (local n: f.dosnames) {
-					fp << "DEFINE_PUBLIC_WEAK_ALIAS(" << n << ", "
+					fp << "DEFINE_PUBLIC_WEAK_ALIAS("
+					   << key_asmname(n) << ", "
 					   << key_libd_internal(f.name) << ");\n";
 				}
 			}
@@ -7738,12 +7799,17 @@ function write_libc_auto_implementation(
 			if (f.helper_function)
 				continue;
 			if (f.allow_macros || f.args_is_varargs) {
-				fp << "#undef " << f.name << "\n";
-				for (local alt: f.alternate_names)
-					fp << "#undef " << alt << "\n";
+				if (!key_crt_have_is_extended(f.name))
+					fp << "#undef " << f.name << "\n";
+				for (local alt: f.alternate_names) {
+					if (!key_crt_have_is_extended(alt))
+						fp << "#undef " << alt << "\n";
+				}
 //				if (f.wchar_function) {
-//					for (local n: f.dosnames)
-//						fp << "#undef " << n << "\n";
+//					for (local n: f.dosnames) {
+//						if (!key_crt_have_is_extended(n))
+//							fp << "#undef " << n << "\n";
+//					}
 //				}
 			}
 		}
@@ -7756,17 +7822,18 @@ function write_libc_auto_implementation(
 				continue;
 			if (!f.nocrt) {
 				fp << "DEFINE_PUBLIC_WEAK_ALIAS(";
-				fp << f.name << ", ";
+				fp << key_asmname(f.name) << ", ";
 				fp << key_libc_internal(f.name) << ");\n";
 			}
 			for (local alt: f.alternate_names) {
 				fp << "DEFINE_PUBLIC_WEAK_ALIAS(";
-				fp << alt << ", ";
+				fp << key_asmname(alt) << ", ";
 				fp << key_libc_internal(f.name) << ");\n";
 			}
 			if (f.wchar_function) {
 				for (local n: f.dosnames) {
-					fp << "DEFINE_PUBLIC_WEAK_ALIAS(" << n << ", "
+					fp << "DEFINE_PUBLIC_WEAK_ALIAS("
+					   << key_asmname(n) << ", "
 					   << key_libd_internal(f.name) << ");\n";
 				}
 			}
@@ -7816,7 +7883,7 @@ write_hashed_file_l("include/crt-features/all.h", [](fp: File) {
 	feat.sort();
 	fp << copyright << "\n\n\n";
 	for (local f: feat)
-		fp << "#define __CRT_HAVE_" << f << " 1\n";
+		fp << "#define __CRT_HAVE_" << crt_have_encode(f) << " 1\n";
 });
 
 

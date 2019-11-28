@@ -655,7 +655,7 @@ NOTHROW_NCX(LIBCCALL libc__CrtSetDbgFlag)(int new_flag)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xf9884bac]]]*/
+/*[[[start:exports,hash:CRC-32=0x2809388e]]]*/
 #undef _CrtDbgReport
 #undef _CrtDbgReportW
 DEFINE_PUBLIC_WEAK_ALIAS(__p__crtAssertBusy, libc___p__crtAssertBusy);
@@ -675,6 +675,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(_CrtSetReportFile, libc__CrtSetReportFile);
 DEFINE_PUBLIC_WEAK_ALIAS(_CrtSetDebugFillThreshold, libc__CrtSetDebugFillThreshold);
 DEFINE_PUBLIC_WEAK_ALIAS(_CrtDbgReport, libc__CrtDbgReport);
 DEFINE_PUBLIC_WEAK_ALIAS(_CrtDbgReportW, libc__CrtDbgReportW);
+DEFINE_PUBLIC_WEAK_ALIAS("?_CrtDbgReportW@@YAHHPEBGH00ZZ", libc__CrtDbgReportW);
 DEFINE_PUBLIC_WEAK_ALIAS(_CrtDbgBreak, libc__CrtDbgBreak);
 DEFINE_PUBLIC_WEAK_ALIAS(_CrtSetBreakAlloc, libc__CrtSetBreakAlloc);
 DEFINE_PUBLIC_WEAK_ALIAS(_malloc_dbg, libc__malloc_dbg);

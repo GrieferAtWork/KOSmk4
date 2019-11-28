@@ -2040,10 +2040,12 @@ NOTHROW_NCX(LIBCCALL libc__beep)(unsigned int freq,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x324e9465]]]*/
+/*[[[start:exports,hash:CRC-32=0x8683d69]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_WEAK_ALIAS(system, libc_system);
 DEFINE_PUBLIC_WEAK_ALIAS(abort, libc_abort);
+DEFINE_PUBLIC_WEAK_ALIAS(_ZSt9terminatev, libc_abort);
+DEFINE_PUBLIC_WEAK_ALIAS("?terminate@@YAXXZ", libc_abort);
 DEFINE_PUBLIC_WEAK_ALIAS(exit, libc_exit);
 DEFINE_PUBLIC_WEAK_ALIAS(atexit, libc_atexit);
 DEFINE_PUBLIC_WEAK_ALIAS(quick_exit, libc_quick_exit);

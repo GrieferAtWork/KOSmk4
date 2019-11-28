@@ -1153,7 +1153,7 @@ done:
 }
 
 @@Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM'
-[cp_stdio][alias(_fwrite_nolock)][export_alias(_IO_fwrite)][alias(, fwrite, fwrite_s)]
+[cp_stdio][alias(_fwrite_nolock)][export_alias(_IO_fwrite)][alias(fwrite, fwrite_s)]
 [requires($has_function(fputc_unlocked))][crtbuiltin]
 [section(.text.crt.FILE.unlocked.write.printf)]
 fwrite_unlocked:([inp(min(return*elemsize,elemcount*elemsize))] void const *__restrict buf,

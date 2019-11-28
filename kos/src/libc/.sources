@@ -102,8 +102,15 @@ BEGIN
 					symbols_set.update(CRT_DLSUBST_GLOBALS);
 					updateFileContents(self.group.fixFilename(LIBC_FEATURES_HEADER),[](fp: File){
 						fp << COPYRIGHT << "\n\n\n";
-						for (local x: symbols_set.sorted())
-							fp << "#define __CRT_HAVE_" << x << " 1\n";
+						for (local x: symbols_set.sorted()) {
+							if (x.startswith("?")) {
+								fp << "#define __CRT_HAVE_"
+									<< x.replace("?", "$Q").replace("@", "$A")
+									<< " 1\n";
+							} else {
+								fp << "#define __CRT_HAVE_" << x << " 1\n";
+							}
+						}
 					});
 				}
 			).withMaybeModifiedOutputFiles({

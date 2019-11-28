@@ -270,7 +270,7 @@ _CrtSetDebugFillThreshold:($size_t new_debug_fill_threshold) -> $size_t;
 
 [guard]
 _CrtDbgReport:(int report_type, char const *filename, int line, char const *module_name, char const *format, ...) -> int;
-[guard][alias(?_CrtDbgReportW@@YAHHPEBGH00ZZ)]
+[guard][export_alias(?_CrtDbgReportW@@YAHHPEBGH00ZZ)]
 _CrtDbgReportW:(int report_type, __WCHAR16_TYPE__ const *filename, int line, __WCHAR16_TYPE__ const *module_name, __WCHAR16_TYPE__ const *format, ...) -> int;
 
 [guard] _CrtDbgBreak:();

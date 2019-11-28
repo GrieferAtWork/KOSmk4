@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77df90a1 */
+/* HASH CRC-32:0xbf613e75 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -130,6 +130,8 @@ __FORCELOCAL __ATTR_NORETURN void (__LIBCCALL abort)(void) { __builtin_abort(); 
 __CDECLARE_VOID(__ATTR_NORETURN,,abort,(void),())
 #elif defined(__CRT_HAVE__ZSt9terminatev)
 __CREDIRECT_VOID(__ATTR_NORETURN,,abort,(void),_ZSt9terminatev,())
+#elif defined(__KOS__) && !defined(__NO_ASMNAME) && defined(__CRT_HAVE_$Qterminate$A$AYAXXZ)
+__CREDIRECT_VOID(__ATTR_NORETURN,,abort,(void),"?terminate@@YAXXZ",())
 #else /* LIBC: abort */
 #undef __abort_defined
 #endif /* abort... */

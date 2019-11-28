@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb615e5f */
+/* HASH CRC-32:0x7ff73464 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -318,6 +318,8 @@ __LIBC int __NOTHROW_NCX(__VLIBCCALL _CrtDbgReport)(int __report_type, char cons
 #define ___CrtDbgReportW_defined 1
 #ifdef __CRT_HAVE__CrtDbgReportW
 __LIBC int __NOTHROW_NCX(__VLIBCCALL _CrtDbgReportW)(int __report_type, __WCHAR16_TYPE__ const *__filename, int __line, __WCHAR16_TYPE__ const *__module_name, __WCHAR16_TYPE__ const *__format, ...) __CASMNAME_SAME("_CrtDbgReportW");
+#elif defined(__KOS__) && !defined(__NO_ASMNAME) && defined(__CRT_HAVE_$Q_CrtDbgReportW$A$AYAHHPEBGH00ZZ) && (!defined(__NO_ASMNAME))
+__LIBC int __NOTHROW_NCX(__VLIBCCALL _CrtDbgReportW)(int __report_type, __WCHAR16_TYPE__ const *__filename, int __line, __WCHAR16_TYPE__ const *__module_name, __WCHAR16_TYPE__ const *__format, ...) __CASMNAME("?_CrtDbgReportW@@YAHHPEBGH00ZZ");
 #else /* LIBC: _CrtDbgReportW */
 #undef ___CrtDbgReportW_defined
 #endif /* _CrtDbgReportW... */

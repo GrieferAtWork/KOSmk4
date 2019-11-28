@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe61b8022 */
+/* HASH CRC-32:0xf9bf987a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,8 @@
  */
 
 
-#define __CRT_HAVE_ 1
+#define __CRT_HAVE_$Q_CrtDbgReportW$A$AYAHHPEBGH00ZZ 1
+#define __CRT_HAVE_$Qterminate$A$AYAXXZ 1
 #define __CRT_HAVE_Calloc 1
 #define __CRT_HAVE_ChRoot 1
 #define __CRT_HAVE_Chdir 1

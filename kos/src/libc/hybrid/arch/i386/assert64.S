@@ -63,7 +63,7 @@ END(__stack_chk_fail)
 DEFINE_INTERN_ALIAS(__stack_chk_fail_local, __stack_chk_fail)
 
 .section ASSERTION_SECTION(abort)
-PUBLIC_FUNCTION(abort)
+INTERN_FUNCTION(libc_abort)
 	.cfi_startproc
 	/* Generate a full `struct kcpustate' */
 	pushfq_cfi_r
@@ -89,13 +89,16 @@ PUBLIC_FUNCTION(abort)
 	INTERN(libc_abort_failure_core)
 	call   libc_abort_failure_core
 	.cfi_endproc
-END(abort)
+END(libc_abort)
 
-DEFINE_PUBLIC_ALIAS(_ZSt9terminatev, abort) /* std::terminate(void) */
-DEFINE_INTERN_ALIAS(libc_abort, abort)
+DEFINE_PUBLIC_ALIAS(_ZSt9terminatev, libc_abort) /* std::terminate(void) */
+DEFINE_PUBLIC_ALIAS(abort, libc_abort)
 /* Provide debugging facilities for __builtin_unreachable() (s.a. <__crt.h>) */
 DEFINE_PUBLIC_ALIAS(__crt_unreachable, libc_abort)
 DEFINE_INTERN_ALIAS(libc___crt_unreachable, libc_abort)
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS("?terminate@@YAXXZ", libc_abort) /* std::terminate(void) */
+#endif /* !__KERNEL__ */
 
 
 
