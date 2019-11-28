@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67d904ee */
+/* HASH CRC-32:0xfa05f28e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -124,7 +124,6 @@
 #define __CRT_STUB_atan2 1
 #define __CRT_STUB_atanh 1
 #define __CRT_STUB_atexit 1
-#define __CRT_STUB_backtrace_symbols_fd 1
 #define __CRT_STUB_bindresvport 1
 #define __CRT_STUB_bindresvport6 1
 #define __CRT_STUB_cbrt 1
@@ -173,20 +172,6 @@
 #define __CRT_STUB_expm1 1
 #define __CRT_STUB_fattach 1
 #define __CRT_STUB_fdetach 1
-#define __CRT_STUB_feclearexcept 1
-#define __CRT_STUB_fedisableexcept 1
-#define __CRT_STUB_feenableexcept 1
-#define __CRT_STUB_fegetenv 1
-#define __CRT_STUB_fegetexcept 1
-#define __CRT_STUB_fegetexceptflag 1
-#define __CRT_STUB_fegetround 1
-#define __CRT_STUB_feholdexcept 1
-#define __CRT_STUB_feraiseexcept 1
-#define __CRT_STUB_fesetenv 1
-#define __CRT_STUB_fesetexceptflag 1
-#define __CRT_STUB_fesetround 1
-#define __CRT_STUB_fetestexcept 1
-#define __CRT_STUB_feupdateenv 1
 #define __CRT_STUB_fgetgrent 1
 #define __CRT_STUB_fgetgrent_r 1
 #define __CRT_STUB_fgetpwent 1

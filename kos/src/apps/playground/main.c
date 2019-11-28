@@ -26,6 +26,8 @@
 
 #include <hybrid/compiler.h>
 
+#include <asm/cpu-flags.h>
+#include <asm/intrin-fpu.h>
 #include <asm/intrin.h>
 #include <kos/debugtrap.h>
 #include <kos/except.h>
@@ -204,6 +206,29 @@ int main_color(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
+int main_fpu(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
+	printf("mxcsr=%#.8I32x\n", __stmxcsr());
+	printf("fcw=%#.4I16x\n", __fnstcw());
+	printf("fsw=%#.4I16x\n", __fnstsw());
+	__fldcw(FCW_IM | FCW_DM | FCW_ZM | FCW_OM | FCW_UM | FCW_PM |
+	        FCW_PC_EXTEND | FCW_RC_NEAREST);
+	printf("mxcsr=%#.8I32x\n", __stmxcsr());
+	printf("fcw=%#.4I16x\n", __fnstcw());
+	printf("fsw=%#.4I16x\n", __fnstsw());
+	__fldcw(FCW_PC_EXTEND | FCW_RC_NEAREST);
+	printf("mxcsr=%#.8I32x\n", __stmxcsr());
+	printf("fcw=%#.4I16x\n", __fnstcw());
+	printf("fsw=%#.4I16x\n", __fnstsw());
+	return 0;
+}
+/************************************************************************/
+
+
+
+
+
+/************************************************************************/
 int main_environ(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	printf("$PATH: %q\n", getenv("PATH"));
@@ -311,6 +336,7 @@ PRIVATE DEF defs[] = {
 	{ "prognam", &main_prognam },
 	{ "rawterm", &main_rawterm },
 	{ "color", &main_color },
+	{ "fpu", &main_fpu },
 	{ NULL, NULL },
 };
 

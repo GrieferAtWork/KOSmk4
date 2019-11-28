@@ -48,7 +48,8 @@ __FORCELOCAL void (__fnclex)(void) { __asm__ __volatile__("fnclex"); }
 /* emms: FPUTagWord = FFFFH (FTW_EMPTY) */
 __FORCELOCAL void (__emms)(void) { __asm__ __volatile__("emms"); }
 
-/* Load/Store the FPU environment */
+/* Load/Store the FPU environment
+ * NOTE: Storing the FPU environment also causes all FPU exceptions to be masked! */
 __FORCELOCAL void (__fstenv)(struct sfpuenv *__restrict __dst) { __asm__ __volatile__("fstenv %0" : "=m" (__COMPILER_ASM_BUFFER(__BYTE_TYPE__, 28, __dst))); }
 __FORCELOCAL void (__fnstenv)(struct sfpuenv *__restrict __dst) { __asm__ __volatile__("fnstenv %0" : "=m" (__COMPILER_ASM_BUFFER(__BYTE_TYPE__, 28, __dst))); }
 __FORCELOCAL void (__fldenv)(struct sfpuenv const *__restrict __src) { __asm__ __volatile__("fldenv %0" : : "m" (__COMPILER_ASM_BUFFER(__BYTE_TYPE__, 28, __src))); }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb25b8e2e */
+/* HASH CRC-32:0x9110950c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -364,7 +364,6 @@
 #define __CRT_ATTR_NOTHROW_feenableexcept 1
 #define __CRT_ATTR_NOTHROW_fegetexcept 1
 #define __CRT_ATTR_NOTHROW_fegetround 1
-#define __CRT_ATTR_NOTHROW_feraiseexcept 1
 #define __CRT_ATTR_NOTHROW_fesetround 1
 #define __CRT_ATTR_NOTHROW_fetestexcept 1
 #define __CRT_ATTR_NOTHROW_ffs 1
@@ -4130,9 +4129,11 @@
 #define __CRT_ATTR_PURE_dirfd 1
 #define __CRT_ATTR_PURE_envz_entry 1
 #define __CRT_ATTR_PURE_envz_get 1
+#define __CRT_ATTR_PURE_fegetexcept 1
 #define __CRT_ATTR_PURE_fegetround 1
 #define __CRT_ATTR_PURE_feof 1
 #define __CRT_ATTR_PURE_ferror 1
+#define __CRT_ATTR_PURE_fetestexcept 1
 #define __CRT_ATTR_PURE_fnmatch 1
 #define __CRT_ATTR_PURE_format_c16width 1
 #define __CRT_ATTR_PURE_format_c32width 1

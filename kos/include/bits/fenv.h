@@ -16,34 +16,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_BITS_FENV_H
-#define _I386_KOS_BITS_FENV_H 1
+#ifndef _BITS_FENV_H
+#define _BITS_FENV_H 1
 
 #include <__stdinc.h>
 
-#include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
 __SYSDECL_BEGIN
-
-/* Documentation comments are taken from glibc /usr/include/i386-linux-gnu/bits/fenv.h */
-/* Copyright (C) 1997-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
 
 /*[[[enum]]]*/
 #ifdef __CC__
@@ -82,9 +62,9 @@ enum {
 #ifdef __CC__
 enum {
 	FE_TONEAREST  = 0x0000, /* == FCW_RC_NEAREST */
-	FE_DOWNWARD   = 0x0400, /* == FCW_RC_DOWN */
-	FE_UPWARD     = 0x0800, /* == FCW_RC_UP */
-	FE_TOWARDZERO = 0x0c00  /* == FCW_RC_TRUNC */
+	FE_DOWNWARD   = 0x0001, /* == FCW_RC_DOWN */
+	FE_UPWARD     = 0x0002, /* == FCW_RC_UP */
+	FE_TOWARDZERO = 0x0003  /* == FCW_RC_TRUNC */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -95,37 +75,17 @@ enum {
 #define FE_TOWARDZERO FE_TOWARDZERO /* == FCW_RC_TRUNC */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define FE_TONEAREST  0x0000 /* == FCW_RC_NEAREST */
-#define FE_DOWNWARD   0x0400 /* == FCW_RC_DOWN */
-#define FE_UPWARD     0x0800 /* == FCW_RC_UP */
-#define FE_TOWARDZERO 0x0c00 /* == FCW_RC_TRUNC */
+#define FE_DOWNWARD   0x0001 /* == FCW_RC_DOWN */
+#define FE_UPWARD     0x0002 /* == FCW_RC_UP */
+#define FE_TOWARDZERO 0x0003 /* == FCW_RC_TRUNC */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
 
 #ifdef __CC__
-typedef __UINT16_TYPE__ __fexcept_t;
-/* Type representing floating-point environment.
- * This structure corresponds to the layout of the block written by
- * the `fstenv' instruction and has additional fields for the contents
- * of the MXCSR register as written by the `stmxcsr' instruction.
- * HINT: Under KOS, this structure also exists as `struct sfpuenv' */
+typedef __UINTPTR_TYPE__ __fexcept_t;
 struct __fenv_struct {
-	__UINT16_TYPE__ __control_word;        /* struct sfpuenv::fe_fcw (Set of `FCW_*') */
-	__UINT16_TYPE__ __glibc_reserved1;     /* ... */
-	__UINT16_TYPE__ __status_word;         /* struct sfpuenv::fe_fsw (Set of `FSW_*') */
-	__UINT16_TYPE__ __glibc_reserved2;     /* ... */
-	__UINT16_TYPE__ __tags;                /* struct sfpuenv::fe_ftw (Set of `FTW_*') */
-	__UINT16_TYPE__ __glibc_reserved3;     /* ... */
-	__UINT32_TYPE__ __eip;                 /* struct sfpuenv::fe_fpuip */
-	__UINT16_TYPE__ __cs_selector;         /* struct sfpuenv::fe_fpucs */
-	unsigned int    __opcode : 11;         /* struct sfpuenv::fe_fop */
-	unsigned int    __glibc_reserved4 : 5; /* ... */
-	__UINT32_TYPE__ __data_offset;         /* struct sfpuenv::fe_fpudp */
-	__UINT16_TYPE__ __data_selector;       /* struct sfpuenv::fe_fpuds */
-	__UINT16_TYPE__ __glibc_reserved5;     /* ... */
-#ifdef __x86_64__
-	__UINT32_TYPE__ __mxcsr; /* Not actually found in `struct sfpuenv' */
-#endif /* __x86_64__ */
+	__UINTPTR_TYPE__ __opaque[64];
 };
 #endif /* __CC__ */
 
@@ -138,4 +98,4 @@ struct __fenv_struct {
 
 __SYSDECL_END
 
-#endif /* !_I386_KOS_BITS_FENV_H */
+#endif /* !_BITS_FENV_H */

@@ -119,6 +119,18 @@ __FORCELOCAL void (__sti)(void) { __asm__ __volatile__("sti" : : : "memory"); }
 __FORCELOCAL void (__clflush)(void *__p) { struct __cl { __BYTE_TYPE__ __b[64]; }; __asm__ __volatile__("clflush %0" : : "m" (*(struct __cl *)__p)); }
 __FORCELOCAL void (__cpuid)(__UINT32_TYPE__ __leaf_eax, __UINT32_TYPE__ *__peax, __UINT32_TYPE__ *__pecx, __UINT32_TYPE__ *__pedx, __UINT32_TYPE__ *__pebx) { __asm__("cpuid" : "=a" (*__peax), "=c" (*__pecx), "=d" (*__pedx), "=b" (*__pebx) : "a" (__leaf_eax)); }
 __FORCELOCAL void (__cpuid2)(__UINT32_TYPE__ __leaf_eax, __UINT32_TYPE__ __leaf_ecx, __UINT32_TYPE__ *__peax, __UINT32_TYPE__ *__pecx, __UINT32_TYPE__ *__pedx, __UINT32_TYPE__ *__pebx) { __asm__("cpuid" : "=a" (*__peax), "=c" (*__pecx), "=d" (*__pedx), "=b" (*__pebx) : "a" (__leaf_eax), "c" (__leaf_ecx)); }
+/* NOTE: There may be cases where cpuid returns different values between
+ *       multiple invocations, however in the most common case this doesn't
+ *       happen, which is the case of using it as a feature test helper.
+ *       So to optimize for this case, annotate these functions are ATTR_CONST. */
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __UINT32_TYPE__ (__cpuid_eax)(__UINT32_TYPE__ __leaf_eax) { __UINT32_TYPE__ __res; __asm__("cpuid" : "=a" (__res) : "a" (__leaf_eax) : "ecx", "edx", "ebx"); return __res; }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __UINT32_TYPE__ (__cpuid_ecx)(__UINT32_TYPE__ __leaf_eax) { __UINT32_TYPE__ __res, __eax; __asm__("cpuid" : "=c" (__res), "=a" (__eax) : "a" (__leaf_eax) : "edx", "ebx"); return __res; }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __UINT32_TYPE__ (__cpuid_edx)(__UINT32_TYPE__ __leaf_eax) { __UINT32_TYPE__ __res, __eax; __asm__("cpuid" : "=d" (__res), "=a" (__eax) : "a" (__leaf_eax) : "ecx", "ebx"); return __res; }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __UINT32_TYPE__ (__cpuid_ebx)(__UINT32_TYPE__ __leaf_eax) { __UINT32_TYPE__ __res, __eax; __asm__("cpuid" : "=b" (__res), "=a" (__eax) : "a" (__leaf_eax) : "ecx", "edx"); return __res; }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __UINT32_TYPE__ (__cpuid2_eax)(__UINT32_TYPE__ __leaf_eax, __UINT32_TYPE__ __leaf_ecx) { __UINT32_TYPE__ __res, __ecx; __asm__("cpuid" : "=a" (__res), "=c" (__ecx) : "a" (__leaf_eax), "c" (__leaf_ecx) : "edx", "ebx"); return __res; }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __UINT32_TYPE__ (__cpuid2_ecx)(__UINT32_TYPE__ __leaf_eax, __UINT32_TYPE__ __leaf_ecx) { __UINT32_TYPE__ __res, __eax; __asm__("cpuid" : "=c" (__res), "=a" (__eax) : "a" (__leaf_eax), "c" (__leaf_ecx) : "edx", "ebx"); return __res; }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __UINT32_TYPE__ (__cpuid2_edx)(__UINT32_TYPE__ __leaf_eax, __UINT32_TYPE__ __leaf_ecx) { __UINT32_TYPE__ __res, __eax, __ecx; __asm__("cpuid" : "=d" (__res), "=a" (__eax), "=c" (__ecx) : "a" (__leaf_eax), "c" (__leaf_ecx) : "ebx"); return __res; }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __UINT32_TYPE__ (__cpuid2_ebx)(__UINT32_TYPE__ __leaf_eax, __UINT32_TYPE__ __leaf_ecx) { __UINT32_TYPE__ __res, __eax, __ecx; __asm__("cpuid" : "=b" (__res), "=a" (__eax), "=c" (__ecx) : "a" (__leaf_eax), "c" (__leaf_ecx) : "edx"); return __res; }
 __FORCELOCAL __ATTR_WUNUSED __UINT8_TYPE__ (__daa)(__UINT8_TYPE__ __x) { __UINT8_TYPE__ __result; __asm__("daa" : "=a" (__result) : "0" (__x) : "cc"); return __result; }
 __FORCELOCAL __ATTR_WUNUSED __UINT8_TYPE__ (__dal)(__UINT8_TYPE__ __x) { __UINT8_TYPE__ __result; __asm__("dal" : "=a" (__result) : "0" (__x) : "cc"); return __result; }
 __FORCELOCAL __ATTR_NORETURN void (__rsm)(void) { __asm__ __volatile__("rsm" : : : "memory"); __builtin_unreachable(); }
