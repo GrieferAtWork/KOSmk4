@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bb6a534 */
+/* HASH CRC-32:0x3a340d36 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ __CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,__xpg_basename,(char *__filena
  * version available under the real name */
 __NAMESPACE_LOCAL_USING_OR_IMPL(__xpg_basename, __FORCELOCAL __ATTR_RETNONNULL char *__NOTHROW_NCX(__LIBCCALL __xpg_basename)(char *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__xpg_basename))(__filename); })
 #endif /* __xpg_basename... */
-#define basename(path)  __xpg_basename(path)
+#define basename(path) __xpg_basename(path)
 
 #endif /* __CC__ */
 

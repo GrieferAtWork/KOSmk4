@@ -17,6 +17,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
+/* Symbols exported from `msvcr120d.dll' */
 #define __CRT_HAVE_$I10_OUTPUT 1
 #define __CRT_HAVE_$Q$Q0$Q$_SpinWait$A$00$Adetails$AConcurrency$A$AQAE$AP6AXXZ$AZ 1
 #define __CRT_HAVE_$Q$Q0$Q$_SpinWait$A$0A$A$Adetails$AConcurrency$A$AQAE$AP6AXXZ$AZ 1

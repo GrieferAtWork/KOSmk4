@@ -132,7 +132,7 @@ __xpg_basename:(char *filename) -> [nonnull] char * {
 	return result;
 }
 
-%#define basename(path)  __xpg_basename(path)
+%#define basename(path) __xpg_basename(path)
 
 
 %{
