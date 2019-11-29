@@ -596,7 +596,7 @@ So here are your options:
 
 Notes:
 
-- When opening KOS using Visual Studio, do _not_ just open `$PROJPATH`, but open `$PROJPATH/kos` instead. - Opening the former will not work properly and Visual Studio may even crash after a while since (at least for me) it seem unable to coax with the thousands of source files apart of binutils and gcc, and despite all of the methods that (supposedly) exist to have Visual Studio ignore certain paths within your source tree, all them only function to hide folders from the Solution Explorer (despite their documentation claiming to also hide them from the source code scanners). So my solution was to move everything that's actually interesting to me into the `$PROJPATH/kos` sub-folder and always open that one when programming.
+- When opening KOS using Visual Studio, do _not_ just open `$PROJPATH`, but open `$PROJPATH/kos` instead. - Opening the former will not work properly and Visual Studio may even crash after a while since (at least for me) it seems unable to coax with the thousands of source files apart of binutils and gcc, and despite all of the methods that (supposedly) exist to have Visual Studio ignore certain paths within your source tree, all them only function to hide folders from the Solution Explorer (despite their documentation claiming to also hide them from the source code scanners). So my solution was to move everything that's actually interesting to me into the `$PROJPATH/kos` sub-folder and always open that one when programming.
 - Before debugging with Visual Studio for the first time, make sure to have already run `make_toolchain.sh` at least once to ensure that it was able to generate the file `$PROJPATH/kos/.vs/launch.vs.json` (this has to be done dynamically since it must contain some absolute paths depending on where your `$PROJPATH` is located at) (for this purpose, it's likely to work even if `make_toolchain.sh` fails, since the creation of this file is one of the first things it does)
 
 
@@ -621,7 +621,7 @@ Now assuming that some functionality is missing from linked libraries, this mani
 
 With these substitutions in place, libraries and the kernel can still be built, however will result in below-optimal code being generated, simple due to the rediculous amount of redundancies.
 
-For more information about the header substitution system, and how it makes it possible to use KOS's headers for toolchains other than KOS itself (requiring only minor, to no modifications at all), take a look at the second on [Automatic System Headers](#headers)
+For more information about the header substitution system, and how it makes it possible to use KOS's headers for toolchains other than KOS itself (requiring only minor, to no modifications at all), take a look at the section on [Automatic System Headers](#headers)
 
 
 
