@@ -105,7 +105,7 @@ extern ATTR_ERROR("Invalid per-task object size") void __invalid_pertask_object_
 #define __pertask_get8_r(x, result)  __asm__("movb %%gs:%p1, %b0" : "=q" (result) : "mi" (x))
 #define __pertask_get16_r(x, result) __asm__("movw %%gs:%p1, %w0" : "=r" (result) : "mi" (x))
 #define __pertask_get32_r(x, result) __asm__("movl %%gs:%p1, %k0" : "=r" (result) : "mi" (x))
-#define __pertask_get64_r(x, result) __asm__("movl %%gs:%p1, %q0" : "=r" (result) : "mi" (x))
+#define __pertask_get64_r(x, result) __asm__("movq %%gs:%p1, %q0" : "=r" (result) : "mi" (x))
 #define __pertask_set8(x, v)         __asm__("movb %b0, %%gs:%p1" : : "q" (v), "mi" (x))
 #define __pertask_set16(x, v)        __asm__("movw %w0, %%gs:%p1" : : "r" (v), "mi" (x))
 #define __pertask_set32(x, v)        __asm__("movl %k0, %%gs:%p1" : : "r" (v), "mi" (x))

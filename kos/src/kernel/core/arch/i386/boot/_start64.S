@@ -19,7 +19,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/paging32.h>
+#include <kernel/arch/paging64.h>
 #include <kernel/cpuid.h>
 #include <kernel/paging.h>
 
@@ -31,6 +31,7 @@
 #include <asm/instr/interrupt.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state32.h>
+#include <kos/kernel/cpu-state64.h>
 #include <kos/kernel/gdt.h>
 #include <kos/kernel/segment.h>
 #include <kos/kernel/tss.h>

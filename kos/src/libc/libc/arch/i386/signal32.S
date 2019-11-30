@@ -58,8 +58,8 @@ INTERN_FUNCTION(libc_sig_restore)
 	 *       that will get loaded by the sigreturn() system call.
 	 */
 
-	movl  $SYS_sigreturn, %eax
-	int   $0x80
+	movl  $(SYS_sigreturn), %eax
+	int   $(0x80)
 	.cfi_endproc
 END(libc_sig_restore)
 

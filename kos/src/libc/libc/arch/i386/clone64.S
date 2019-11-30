@@ -44,7 +44,7 @@ INTERN_FUNCTION(libc_clone)
 
 	/* Transform arguments for the system call. */
 	movq   %rdx,    %rdi /* flags */
-/*	movq   %rsi,    %rsi /* void *child_stack */
+/*	movq   %rsi,    %rsi  * void *child_stack */
 	movq   %r8,     %rdx /* ptid */
 	movq   8(%rsp), %r10 /* ctid */
 	movq   %r9,     %r8  /* newtls */

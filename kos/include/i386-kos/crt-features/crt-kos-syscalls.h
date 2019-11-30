@@ -17,8 +17,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-
 #include <hybrid/host.h>
+
 #ifdef __x86_64__
 #include "crt-kos-syscalls64.h"
 #else /* __x86_64__ */

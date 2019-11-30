@@ -23,6 +23,8 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
+#include <kernel/syscall-properties.h>
+#include <kernel/syscall-tables.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/except-handler.h>
@@ -30,7 +32,7 @@
 
 #include <hybrid/atomic.h>
 
-#include <asm/syscalls32.inl>
+#include <asm/syscalls32_d.h>
 #include <asm/unistd.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state-helpers32.h>
@@ -83,7 +85,7 @@ scinfo_get32_sysenter(struct rpc_syscall_info *__restrict self,
 	self->rsi_args[1] = gpregs_getpcx(&state->ics_gpregs);
 	self->rsi_args[2] = gpregs_getpdx(&state->ics_gpregs);
 	self->rsi_args[3] = gpregs_getpsi(&state->ics_gpregs);
-	regcount = SYSCALL32_REGISTER_COUNT(self->rsi_sysno);
+	regcount = kernel_syscall32_regcnt(self->rsi_sysno);
 	if (regcount >= 5) {
 		u32 *ebp = (u32 *)(uintptr_t)(u32)gpregs_getpbp(&state->ics_gpregs);
 		validate_readable(ebp, 4);
@@ -106,7 +108,7 @@ scinfo_get32_cdecl(struct rpc_syscall_info *__restrict self,
 	if (enable_except)
 		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	self->rsi_sysno = sysno;
-	regcount = SYSCALL32_REGISTER_COUNT(sysno);
+	regcount = kernel_syscall32_regcnt(sysno);
 	if unlikely(!regcount)
 		return;
 	esp = (u32 *)(uintptr_t)(u32)icpustate_getuserpsp(state);
@@ -245,13 +247,6 @@ x86_syscall_emulate64_sysvabi_r(struct icpustate *__restrict state,
 
 typedef syscall_ulong_t (__ARCH_SYSCALLCC *syscall_proto_t)(syscall_ulong_t arg0, syscall_ulong_t arg1, syscall_ulong_t arg2, syscall_ulong_t arg3, syscall_ulong_t arg4, syscall_ulong_t arg5);
 typedef u64 (__ARCH_SYSCALLCC *syscall_proto64_t)(syscall_ulong_t arg0, syscall_ulong_t arg1, syscall_ulong_t arg2, syscall_ulong_t arg3, syscall_ulong_t arg4, syscall_ulong_t arg5);
-INTDEF syscall_proto_t const __c32_syscallrouter[];
-INTDEF syscall_proto_t const __c32_exsyscallrouter[];
-#ifdef __x86_64__
-INTDEF syscall_proto_t const __c64_syscallrouter[];
-INTDEF syscall_proto_t const __c64_exsyscallrouter[];
-#endif /* __x86_64__ */
-
 
 INTDEF struct icpustate *
 NOTHROW(FCALL rpc_serve_user_redirection_all)(struct icpustate *__restrict state,
@@ -278,16 +273,16 @@ syscall_emulate(struct icpustate *__restrict state,
 PUBLIC ATTR_RETNONNULL WUNUSED struct icpustate *FCALL
 syscall_emulate64(struct icpustate *__restrict state,
                   struct rpc_syscall_info *__restrict sc_info) {
-	syscall_proto_t proto;
+	void *proto;
 	syscall_ulong_t sysno;
 	assert(icpustate_isuser(state));
 again:
 	sysno = sc_info->rsi_sysno;
 	TRY {
-		if (sysno < __NR32_syscall_max) {
+		if (sysno < __NR32_syscall0_max) {
 			u64 result;
 			/* Normal system call */
-			proto = __c64_syscallrouter[sysno];
+			proto = x86_sysroute0_c[sysno];
 do_syscall:
 			result = (*(syscall_proto64_t)proto)(sc_info->rsi_args[0],
 			                                     sc_info->rsi_args[1],
@@ -296,9 +291,9 @@ do_syscall:
 			                                     sc_info->rsi_args[4],
 			                                     sc_info->rsi_args[5]);
 			gpregs_setpax(&state->ics_gpregs, result);
-		} else if (sysno >= __NR_exsyscall_min && sysno <= __NR_exsyscall_max) {
+		} else if (sysno >= __NR_syscall1_min && sysno <= __NR_syscall1_max) {
 			/* Extended system call */
-			proto = __c64_exsyscallrouter[sysno - __NR_exsyscall_min];
+			proto = x86_sysroute1_c[sysno - __NR_syscall1_min];
 			goto do_syscall;
 		} else {
 			/* Invalid system call */
@@ -356,42 +351,42 @@ syscall_emulate(struct icpustate *__restrict state,
                 struct rpc_syscall_info *__restrict sc_info)
 #endif /* !__x86_64__ */
 {
-	syscall_proto_t proto;
+	void *proto;
 	syscall_ulong_t sysno;
 	assert(icpustate_isuser(state));
 	/* TODO: This function doesn't (yet) do any form of system call tracing! */
 again:
 	sysno = sc_info->rsi_sysno;
 	TRY {
-		if (sysno < __NR32_syscall_max) {
+		if (sysno < __NR32_syscall0_max) {
 			/* Normal system call */
-			proto = __c32_syscallrouter[sysno];
-			if (x86_syscall_double_wide_get(x86_syscall32_register_count, sysno)) {
+			proto = x86_sysroute0_c32[sysno];
+			if (__kernel_syscall_regcnt(kernel_syscall0_regcnt, sysno)) {
 				u64 result;
 do_syscall64:
-				result = (*(syscall_proto64_t)(void *)proto)(sc_info->rsi_args[0],
-				                                             sc_info->rsi_args[1],
-				                                             sc_info->rsi_args[2],
-				                                             sc_info->rsi_args[3],
-				                                             sc_info->rsi_args[4],
-				                                             sc_info->rsi_args[5]);
+				result = (*(syscall_proto64_t)proto)(sc_info->rsi_args[0],
+				                                     sc_info->rsi_args[1],
+				                                     sc_info->rsi_args[2],
+				                                     sc_info->rsi_args[3],
+				                                     sc_info->rsi_args[4],
+				                                     sc_info->rsi_args[5]);
 				gpregs_setpax(&state->ics_gpregs, (u32)(result));
 				gpregs_setpdx(&state->ics_gpregs, (u32)(result >> 32));
 			} else {
 				u32 result;
 do_syscall32:
-				result = (*proto)(sc_info->rsi_args[0],
-				                  sc_info->rsi_args[1],
-				                  sc_info->rsi_args[2],
-				                  sc_info->rsi_args[3],
-				                  sc_info->rsi_args[4],
-				                  sc_info->rsi_args[5]);
+				result = (*(syscall_proto_t)proto)(sc_info->rsi_args[0],
+				                                   sc_info->rsi_args[1],
+				                                   sc_info->rsi_args[2],
+				                                   sc_info->rsi_args[3],
+				                                   sc_info->rsi_args[4],
+				                                   sc_info->rsi_args[5]);
 				gpregs_setpax(&state->ics_gpregs, result);
 			}
-		} else if (sysno >= __NR_exsyscall_min && sysno <= __NR_exsyscall_max) {
+		} else if (sysno >= __NR_syscall1_min && sysno <= __NR_syscall1_max) {
 			/* Extended system call */
-			proto = __c32_exsyscallrouter[sysno - __NR_exsyscall_min];
-			if (x86_syscall_double_wide_get(x86_exsyscall32_register_count, sysno - __NR_exsyscall_min))
+			proto = x86_sysroute1_c32[sysno - __NR_syscall1_min];
+			if (__kernel_syscall_doublewide(kernel_syscall1_regcnt, sysno - __NR_syscall1_min))
 				goto do_syscall64;
 			goto do_syscall32;
 		} else {
@@ -433,7 +428,7 @@ do_syscall32:
 			RETHROW();
 		/* Store the errno variant of the current exception
 		 * in the user-space register context. */
-		if (SYSCALL32_DOUBLE_WIDE(sysno))
+		if (kernel_syscall32_doublewide(sysno))
 			gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
 		gpregs_setpax(&state->ics_gpregs, (uintptr_t)-error_as_errno(data));
 		data->e_code = (error_code_t)ERROR_CODEOF(E_OK);

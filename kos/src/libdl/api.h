@@ -112,7 +112,9 @@
 #ifndef FCALL
 #define FCALL __FCALL
 #endif /* FCALL */
+#ifndef WEAK
 #define WEAK      /* nothing */
+#endif /* !WEAK */
 #define REF       /* nothing */
 #define REF_IF(x) /* nothing */
 #ifndef LIBCCALL

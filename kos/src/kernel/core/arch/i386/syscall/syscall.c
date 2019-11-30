@@ -30,6 +30,8 @@
 #include <kernel/idt.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
+#include <kernel/syscall-properties.h>
+#include <kernel/syscall-tables.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
@@ -125,7 +127,7 @@ scinfo_get32_sysenter(struct rpc_syscall_info *__restrict self,
 	self->rsi_args[1] = gpregs_getpcx(&state->ucs_gpregs);
 	self->rsi_args[2] = gpregs_getpdx(&state->ucs_gpregs);
 	self->rsi_args[3] = gpregs_getpsi(&state->ucs_gpregs);
-	regcount = SYSCALL32_REGISTER_COUNT(self->rsi_sysno);
+	regcount = kernel_syscall32_regcnt(self->rsi_sysno);
 	if (regcount >= 5) {
 		u32 *ebp = (u32 *)(uintptr_t)(u32)gpregs_getpbp(&state->ucs_gpregs);
 		validate_readable(ebp, 4);
@@ -291,10 +293,6 @@ typedef syscall_ulong_t (__ARCH_SYSCALLCC *syscall_proto_t)(syscall_ulong_t arg0
 typedef u64 (__ARCH_SYSCALLCC *syscall_proto64_t)(syscall_ulong_t arg0, syscall_ulong_t arg1,
                                                   syscall_ulong_t arg2, syscall_ulong_t arg3,
                                                   syscall_ulong_t arg4, syscall_ulong_t arg5);
-INTDEF syscall_proto_t const __c32_syscallrouter[];
-INTDEF syscall_proto_t const __c32_exsyscallrouter[];
-
-
 
 /* GCC doesn't like our casts to `syscall_proto64_t' */
 #pragma GCC diagnostic ignored "-Wcast-function-type"
@@ -338,17 +336,17 @@ x86_lcall7_syscall_main(struct x86_lcall7_syscall_data *__restrict data,
 	syscall_ulong_t argv[6];
 	USER syscall_ulong_t *usp;
 	bool double_wide;
-	syscall_proto_t proto;
+	void *proto;
 	memset(argv, 0, sizeof(argv));
 	usp = (USER syscall_ulong_t *)data->iret.ir_esp;
-	if (sysno <= __NR_syscall_max) {
-		proto       = __c32_syscallrouter[sysno];
-		argc        = x86_syscall_register_count_get(x86_syscall_register_count, sysno);
-		double_wide = x86_syscall_double_wide_get(x86_syscall_register_count, sysno);
-	} else if (sysno >= __NR_exsyscall_min && sysno <= __NR_exsyscall_max) {
-		proto       = __c32_exsyscallrouter[sysno - __NR_exsyscall_min];
-		argc        = x86_syscall_register_count_get(x86_exsyscall_register_count, sysno - __NR_exsyscall_min);
-		double_wide = x86_syscall_double_wide_get(x86_exsyscall_register_count, sysno - __NR_exsyscall_min);
+	if (sysno <= __NR_syscall0_max) {
+		proto       = x86_sysroute0_c32[sysno];
+		argc        = __kernel_syscall_regcnt(kernel_syscall0_regcnt, sysno);
+		double_wide = __kernel_syscall_doublewide(kernel_syscall0_regcnt, sysno);
+	} else if (sysno >= __NR_syscall1_min && sysno <= __NR_syscall1_max) {
+		proto       = x86_sysroute1_c32[sysno - __NR_syscall1_min];
+		argc        = __kernel_syscall_regcnt(kernel_syscall1_regcnt, sysno - __NR_syscall1_min);
+		double_wide = __kernel_syscall_doublewide(kernel_syscall1_regcnt, sysno - __NR_syscall1_min);
 	} else {
 		goto err_nosys;
 	}
@@ -388,9 +386,9 @@ x86_lcall7_syscall_main(struct x86_lcall7_syscall_data *__restrict data,
 		data->saved_edx = (u32)(result64 >> 32);
 		result = (u32)result64;
 	} else {
-		result = (*proto)(argv[0], argv[1],
-		                  argv[2], argv[3],
-		                  argv[4], argv[5]);
+		result = (*(syscall_proto_t)proto)(argv[0], argv[1],
+		                                   argv[2], argv[3],
+		                                   argv[4], argv[5]);
 	}
 	return result;
 err_nosys:

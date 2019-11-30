@@ -40,18 +40,27 @@ INTERN_FUNCTION(x86_idt_syscall)
 	.cfi_def_cfa %rsp, 0
 	/* Only get here from user-space, so we can do an unconditional swapgs on entry! */
 	swapgs
+	/* Check if we got here from compatibility mode.
+	 * Note that this check must be done before re-enabling interrupts, since
+	 * once that is done, our iret tail may have already been redirected! */
+	cmpq   $(SEGMENT_USER_CODE32_RPL), OFFSET_IRREGS64_CS(%rsp)
 	/* Unconditionally re-enable interrupts (only get here from user-space) */
 	sti
+	je     .Ldo_asm32_syscall_int80 /* Compatibility mode! */
+
+	jmpq   *__asm64_syscallrouter(,%rax,4)
+
+.Ldo_asm32_syscall_int80:
 	movzlq %eax, %rax
-.Ldo_handle_syscall_int80:
-	cmpq   $(__NR32_syscall_max), %rax
+.Ldo_asm32_syscall_int80_rax:
+	cmpq   $(__NR32_syscall0_max), %rax
 	ja     1f
-	jmpq   *__asm32_syscallrouter_int80(,%rax,4)
-1:	cmpq   $(__NR32_exsyscall_min), %rax
-	jb     __asm32_int80_invalid
-	cmpq   $(__NR32_exsyscall_max), %rax
-	ja     __asm32_int80_invalid
-	jmpq   *(__asm32_exsyscallrouter_int80 - ((__NR32_exsyscall_min * 8) & 0xffffffffffffffff))(,%rax,4)
+	jmpq   *x86_sysroute0_asm32_int80(,%rax,4)
+1:	cmpq   $(__NR32_syscall1_min), %rax
+	jb     __x86_asm32_int80_break
+	cmpq   $(__NR32_syscall1_max), %rax
+	ja     __x86_asm32_int80_break
+	jmpq   *(x86_sysroute1_asm32_int80 - ((__NR32_syscall1_min * 8) & 0xffffffffffffffff))(,%rax,4)
 	.cfi_endproc
 END(x86_idt_syscall)
 
@@ -88,7 +97,7 @@ INTERN_FUNCTION(x86_idt_syscall_traced)
 	popq_cfi_r %rdi /* ARG[4] */
 	popq_cfi_r %rbp /* ARG[5] */
 
-	jmp    .Ldo_handle_syscall_int80
+	jmp    .Ldo_asm32_syscall_int80_rax
 	.cfi_endproc
 END(x86_idt_syscall_traced)
 #endif /* !CONFIG_NO_SYSCALL_TRACING */

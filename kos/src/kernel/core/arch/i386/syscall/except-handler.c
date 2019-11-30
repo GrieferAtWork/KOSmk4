@@ -25,6 +25,7 @@
 #include <kernel/coredump.h>
 #include <kernel/except.h>
 #include <kernel/printk.h>
+#include <kernel/syscall-properties.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
@@ -398,12 +399,12 @@ x86_userexcept_seterrno(struct icpustate *__restrict state,
 	 * can sign-extend the error code if necessary. */
 #ifdef __x86_64__
 	if (icpustate_is64bit(state)) {
-		if (SYSCALL64_DOUBLE_WIDE(gpregs_getpax(&state->ics_gpregs)))
+		if (kernel_syscall64_doublewide(gpregs_getpax(&state->ics_gpregs)))
 			gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
 	} else
 #endif /* __x86_64__ */
 	{
-		if (SYSCALL32_DOUBLE_WIDE(gpregs_getpax(&state->ics_gpregs)))
+		if (kernel_syscall32_doublewide(gpregs_getpax(&state->ics_gpregs)))
 			gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
 	}
 	return state;

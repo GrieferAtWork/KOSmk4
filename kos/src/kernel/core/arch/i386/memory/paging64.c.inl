@@ -469,6 +469,7 @@ NOTHROW(FCALL p64_create_e2_vector_from_e3_word_and_e1_vector)(struct vm_ptram *
 		{
 			memsetq(e2_p, P64_PAGE_ABSENT, 512);
 		}
+		e2.p_word = 0;
 	}
 	/* Set the E1-vector pointer in `E2[vec2]'. */
 	e2.p_word &= (P64_PAGE_FUSER | P64_PAGE_FPWT |
@@ -989,9 +990,9 @@ err2:
 		--vec4;
 		p64_pagedir_unprepare_impl_flatten_v3(vec4, 0, 511, 0, 511, 0, 511);
 	}
-	p64_pagedir_unprepare_impl_flatten_v3(vec4, 0, vec3_max, 0, vec2_max, 0, vec1_max);
+	p64_pagedir_unprepare_impl_flatten_v3(vec4_max, 0, vec3_max, 0, vec2_max, 0, vec1_max);
 err1:
-	p64_pagedir_unprepare_impl_flatten_v3(vec4, vec3_min, 511, vec2_min, 511, vec1_min, 511);
+	p64_pagedir_unprepare_impl_flatten_v3(vec4_min, vec3_min, 511, vec2_min, 511, vec1_min, 511);
 err:
 	return false;
 }

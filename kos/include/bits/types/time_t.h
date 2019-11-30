@@ -23,7 +23,7 @@
 #define __time_t_defined 1
 #ifdef __CC__
 __DECL_BEGIN
-typedef __time_t time_t;
+typedef __TM_TYPE(time) time_t;
 __DECL_END
 #endif /* __CC__ */
 #endif /* !__time_t_defined */

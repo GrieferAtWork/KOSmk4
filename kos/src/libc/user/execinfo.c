@@ -271,7 +271,7 @@ NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array,
 		PRIVATE SECTION_DEBUG_STRING("debug_unknown_name") char const debug_unknown_name[1] = { '?' };
 		error = print_function_name(array[i],
 		                            (pformatprinter)(void *)&write,
-		                            (void *)(unsigned int)fd);
+		                            (void *)(uintptr_t)(unsigned int)fd);
 		if unlikely(error < 0)
 			break;
 		if (!error)

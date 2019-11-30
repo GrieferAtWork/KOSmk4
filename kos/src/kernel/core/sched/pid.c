@@ -2114,7 +2114,7 @@ next_candidate:
 
 
 DEFINE_SYSCALL5(pid_t, waitid,
-                idtype_t, which, id_t, upid,
+                syscall_ulong_t, which, id_t, upid,
                 USER UNCHECKED siginfo_t *, infop,
                 syscall_ulong_t, options,
                 USER UNCHECKED struct rusage *, ru) {
@@ -2128,13 +2128,13 @@ DEFINE_SYSCALL5(pid_t, waitid,
 		      options,
 		      WEXITED | WSTOPPED | WCONTINUED,
 		      0);
-	if ((unsigned int)which > P_PGID)
+	if (which > P_PGID)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_WAITID_WHICH,
-		      (unsigned int)which);
+		      which);
 	validate_writable_opt(infop, SIZEOF_USER_SIGINFO_T);
 	validate_writable_opt(ru, sizeof(struct rusage));
-	result = posix_waitfor(which, upid, NULL,
+	result = posix_waitfor((idtype_t)which, upid, NULL,
 	                       infop, options, ru);
 	return result;
 }

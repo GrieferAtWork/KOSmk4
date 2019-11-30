@@ -1,0 +1,525 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from .generate_syscalls;
+
+class SyscallArch {
+	this = default;
+
+	@@name of the platform (e.g. `i386-kos')
+	member platformName: string;
+
+	@@Architecture of the platform (e.g. `i386')
+	member platformArch: string;
+
+	@@Optional suffix for platform files (for use with multi-arch platforms)
+	member platformSuffix: string = "";
+
+	@@Size of general-purpose registers used for passing system call arguments (in bits)
+	member platformGpRegisterSizeInBits: int;
+
+	@@The number of registers used to pass system call arguments
+	member platformSyscallRegisterCount: int;
+
+	@@Endian of the platform (either "le" or "be")
+	member platformEndian: string;
+
+	@@Number of system call tables used by this platform
+	member platformSyscallTableCount: int;
+
+	@@The max possibly system call number (usually `(1 << platformGpRegisterSizeInBits) - 1')
+	member platformMaxPossibleSysno: int;
+
+	@@Print common code which may be used by @platformLibcSyscallWrapper
+	@@This is a @function(fp: File)
+	member platformLibcSyscallCommon: Callable = none;
+
+	@@Print assembly for invoking
+	@@This is a @function(fp: File, f: Function, sysno: int, enableExcept: bool)
+	member platformLibcSyscallWrapper: Callable;
+
+	@@Print common code which may be used by @platformKernelSyscallWrappers
+	@@This is a @function(fp: File)
+	member platformKernelSyscallWrappersCommon: Callable = none;
+
+	@@Mapping of known system call wrappers.
+	@@@key:   The prefix to be pre-pended before the wrappers's name
+	@@        e.g. when `__fooasm_', one symbol might be `__fooasm_exit'
+	@@@value: A tuple @(visibility,
+	@@                  section,
+	@@                  function(fp: File, f: Function, sysno: int),
+	@@                  arch_origin_name)
+	@@        This function should print the assembly body for servicing
+	@@        the system call in the context in which this wrapper might
+	@@        be called. The given `f' is the function that is being defined.
+	@@        @arch_origin_name is the name of the ARCH who's system calls
+	@@        should be wrapped. Normally this is the same name as the
+	@@        current arch, however in order to allow for multi-arch
+	@@        compatibility mode (such as x86_64's IA32-mode), one is
+	@@        allowed to specify a different arch who's system calls
+	@@        are then going to be wrapped.
+	@@        @visibility is the visibility of wrapper functions and should
+	@@        be one of `PRIVATE', `INTERN' or `PUBLIC', following the usual
+	@@        meanings of these. (though admittedly, `PRIVATE' doesn't make
+	@@        very much sense...)
+	member platformKernelSyscallWrappers: {string: (string, string, Callable, string)};
+
+	formatPath(f: string): string {
+		return f.format({
+			.name   = platformName,
+			.arch   = platformArch,
+			.suffix = platformSuffix,
+		});
+	}
+}
+
+/************************************************************************/
+/* I386                                                                 */
+/************************************************************************/
+final global i386SyscallArgumentRegisters = { "%ebx", "%ecx", "%edx", "%esi", "%edi", "%ebp" };
+function i386_printLibcSyscallSysenterCdeclInvocation(
+		fp: File, registerCount: int, enableExcept: bool) {
+	local preservedRegisters = ["%edi", "%ebp"];
+	if (registerCount > 0)
+		preservedRegisters.append("%ebx");
+	if (registerCount > 3)
+		preservedRegisters.append("%esi");
+	local spOffset = 4 * (1 + #preservedRegisters);
+	for (local x: preservedRegisters)
+		fp << "	" << "pushl_cfi_r " << x << "\n";
+	if (registerCount > 0) fp << "	" << "movl   " << (spOffset + 0) << "(%esp), %ebx\n";
+	if (registerCount > 1) fp << "	" << "movl   " << (spOffset + 4) << "(%esp), %ecx\n";
+	if (registerCount > 2) fp << "	" << "movl   " << (spOffset + 8) << "(%esp), %edx\n";
+	if (registerCount > 3) fp << "	" << "movl   " << (spOffset + 12) << "(%esp), %esi\n";
+	if (registerCount > 5) {
+		fp << "	" << "pushl_cfi " << (spOffset + 20) << "(%esp)\n";
+		fp << "	" << "pushl_cfi " << (spOffset + 20) << "(%esp)\n";
+	} else if (registerCount > 4) {
+		fp << "	" << "pushl_cfi " << (spOffset + 16) << "(%esp)\n";
+	}
+	fp << "	call   libc_x86_sysenter_";
+	if (enableExcept) fp << "X";
+	fp << "common\n";
+	if (registerCount > 4) {
+		local off = 4 * (registerCount - 4);
+		fp << "	" << "addl   $" << off << ", %esp\n";
+		fp << "	.cfi_adjust_cfa_offset -" << off << "\n";
+	}
+	for (local x: preservedRegisters.reversed())
+		fp << "	" << "popl_cfi_r " << x << "\n";
+}
+
+function i386_printLibcSyscallInt80CdeclInvocation(
+		fp: File, registerCount: int, enableExcept: bool) {
+	local preservedRegisters = [];
+	if (registerCount > 0)
+		preservedRegisters.append("%ebx");
+	if (registerCount > 3)
+		preservedRegisters.append("%esi");
+	if (registerCount > 4)
+		preservedRegisters.append("%edi");
+	if (registerCount > 5)
+		preservedRegisters.append("%ebp");
+	local sp_offset = 4 * (1 + #preservedRegisters);
+	for (local x: preservedRegisters)
+		fp << "	" << "pushl_cfi_r " << x << "\n";
+	for (local i: [:registerCount])
+		fp << "	" << "movl   " << (sp_offset + i * 4) << "(%esp), " << i386SyscallArgumentRegisters[i] << "\n";
+	fp << (enableExcept ? "	stc\n" : "	clc\n");
+	fp << "	int    $0x80\n";
+	for (local x: preservedRegisters.reversed())
+		fp << "	" << "popl_cfi_r " << x << "\n";
+}
+
+function i386_printLibcSyscallWrapperCommon(fp: File) {
+	fp << "#include <asm/cfi.h>\n";
+	fp << "\n";
+	fp << "EXTERN(libc_x86_sysenter_common)\n";
+	fp << "EXTERN(libc_x86_sysenter_Xcommon)\n";
+	fp << "EXTERN(libc_x86_syscall_check_sysenter)\n";
+	fp << "\n";
+	for (local enableExcept: { false, true }) {
+		local conditionalX = enableExcept ? "X" : "";
+		for (local registerCount: [1:6+1]) {
+			local name = "x86_exec_{}syscall{}".format({ conditionalX, registerCount });
+			fp << "#ifdef __OPTIMIZE_SIZE__\n";
+			fp << ".section .text.crt.syscall." << name << ", \"ax\"\n";
+			fp << "#else /* __OPTIMIZE_SIZE__ */\n";
+			fp << ".section .xdata.crt.syscall." << name << ", \"awx\"\n";
+			fp << "#endif /* !__OPTIMIZE_SIZE__ */\n";
+			fp << "INTERN_FUNCTION(libc_" << name << ")\n";
+			fp << "	.cfi_startproc\n";
+			fp << "#ifndef __OPTIMIZE_SIZE__\n";
+			fp << "	call   libc_x86_syscall_check_sysenter\n";
+			fp << "	.byte  0x74\n";
+			fp << "	.reloc ., R_386_PC8, 1f\n";
+			fp << "	.byte  0xff /* jz 1f */\n";
+			i386_printLibcSyscallSysenterCdeclInvocation(fp, registerCount, enableExcept);
+			fp << "	ret\n";
+			fp << "1:\n";
+			fp << "#endif /* !__OPTIMIZE_SIZE__ */\n";
+			i386_printLibcSyscallInt80CdeclInvocation(fp, registerCount, enableExcept);
+			fp << "	ret\n";
+			fp << "	.cfi_endproc\n";
+			fp << "END(libc_" << name << ")\n";
+			
+		}
+	}
+}
+
+function i386_printLibcSyscallWrapper(fp: File, f: Function, sysno: int, enableExcept: bool) {
+	local registerCount = f.getArgumentRegisterCount(32);
+	local conditionalX = enableExcept ? "X" : "";
+	fp << "	movl   $" << sysno.hex() << ", %eax\n";
+	fp << "	jmp    ";
+	if (registerCount == 0) {
+		fp << "libc___i386_" << conditionalX << "syscall\n";
+	} else {
+		fp << "libc_x86_exec_" << conditionalX << "syscall" << registerCount << "\n";
+	}
+}
+
+function i386_printKernelSyscallWrapperCommon(fp: File) {
+	fp << "#include <asm/cfi.h>\n";
+	fp << "#include <kos/kernel/gdt.h>\n";
+	fp << "#include <kos/kernel/paging.h>\n";
+	fp << "#include <kernel/arch/syscall.h>\n";
+}
+
+function i386_restoreSyscallRegisters(fp: File, restoreRegisters: {string...}) {
+	function isNoneRegister(x) {
+		return x is none || x.startswith("!");
+	}
+	while (restoreRegisters) {
+		local reg = restoreRegisters.pop();
+		if (reg.startswith("!")) {
+			if (restoreRegisters && isNoneRegister(restoreRegisters[#restoreRegisters - 1]))
+				reg = none;
+			else {
+				reg = reg[1:];
+			}
+		}
+		if (reg is none) {
+			local count = 1;
+			while (restoreRegisters && isNoneRegister(restoreRegisters[#restoreRegisters - 1])) {
+				restoreRegisters.pop();
+				++count;
+			}
+			if (count == 1 && restoreRegisters) {
+				local reg = restoreRegisters.first;
+				fp << "	popl_cfi " << reg << " /* addl $4, %esp */\n";
+			} else {
+				fp << "	addl   $" << (count * 4) << ", %esp\n";
+				fp << "	.cfi_adjust_cfa_offset -" << (count * 4) << "\n";
+			}
+		} else {
+			fp << "	popl_cfi_r " << reg << "\n";
+		}
+	}
+}
+
+function i386_printKernelSyscallWrapper_int80(fp: File, f: Function, sysno: int) {
+	fp << "	.cfi_startproc simple\n";
+	fp << "	.cfi_personality 0, x86_syscall_personality_asm32_int80\n";
+	fp << "	.cfi_lsda 0, " << sysno.hex() << "\n";
+	fp << "	.cfi_iret_signal_frame\n";
+	fp << "	.cfi_def_cfa %esp, 0\n";
+	fp << "	pushl_cfi %ds\n";
+	fp << "	.cfi_restore_iret_ds_or_offset -4\n";
+	fp << "	pushl_cfi %es\n";
+	fp << "	.cfi_restore_iret_es_or_offset -8\n";
+	fp << "	pushl_cfi %fs\n";
+	fp << "	.cfi_restore_iret_fs_or_offset -12\n";
+	fp << "	movw   $(SEGMENT_USER_DATA_RPL), %ax\n";
+	fp << "	movw   %ax, %ds\n";
+	fp << "	movw   %ax, %es\n";
+	fp << "	movw   $(SEGMENT_KERNEL_FSBASE), %ax\n";
+	fp << "	movw   %ax, %fs\n";
+	local registerCount = f.getArgumentRegisterCount(32);
+	local restoreRegisters = [];
+	switch (registerCount) {
+	case 0:
+	case 1:
+		if (!f.isNoReturn) {
+			fp << "	pushl_cfi_r %ecx\n";
+			restoreRegisters.append("%ecx");
+			if (!(f.returnType.isReg64 || f.returnType.isReg128)) {
+				fp << "	pushl_cfi_r %edx\n";
+				restoreRegisters.append("%edx");
+			}
+		}
+		if (registerCount == 1) {
+			fp << "	pushl_cfi_r %ebx  /* Arg #0 */\n";
+			restoreRegisters.append("!%ebx");
+		}
+		break;
+	case 2:
+		if (!(f.returnType.isReg64 || f.returnType.isReg128)) {
+			fp << "	pushl_cfi_r %edx\n";
+			restoreRegisters.append("%edx");
+		}
+		fp << "	pushl_cfi_r %ecx  /* Arg #1 */\n";
+		restoreRegisters.append("%ecx");
+		fp << "	pushl_cfi_r %ebx  /* Arg #0 */\n";
+		restoreRegisters.append("!%ebx");
+		break;
+	case 6:
+		fp << "	pushl_cfi_r %ebp  /* Arg #5 */\n";
+		restoreRegisters.append("!%ebp");
+		/* FALLTHRU */
+	case 5:
+		fp << "	pushl_cfi_r %edi  /* Arg #4 */\n";
+		restoreRegisters.append("!%edi");
+		/* FALLTHRU */
+	case 4:
+		fp << "	pushl_cfi_r %esi  /* Arg #3 */\n";
+		restoreRegisters.append("!%esi");
+		/* FALLTHRU */
+	case 3:
+		fp << "	pushl_cfi_r %edx  /* Arg #2 */\n";
+		restoreRegisters.append((
+			f.returnType.isReg64 ||
+			f.returnType.isReg128)
+			? none
+			: "%edx");
+		fp << "	pushl_cfi_r %ecx  /* Arg #1 */\n";
+		restoreRegisters.append("%ecx");
+		fp << "	pushl_cfi_r %ebx  /* Arg #0 */\n";
+		restoreRegisters.append("!%ebx");
+		break;
+	default:
+		break;
+	}
+	fp << "	EXTERN(sys_" << f.name << ")\n";
+	fp << "	call   sys_" << f.name << "\n";
+	if (!f.isNoReturn) {
+		i386_restoreSyscallRegisters(fp, restoreRegisters);
+		fp << "	popl_cfi %fs\n";
+		fp << "	.cfi_restore_iret_fs\n";
+		fp << "	popl_cfi %es\n";
+		fp << "	.cfi_restore_iret_es\n";
+		fp << "	popl_cfi %ds\n";
+		fp << "	.cfi_restore_iret_ds\n";
+		fp << "	iret\n";
+	}
+	fp << "	.cfi_endproc\n";
+}
+
+function i386_printKernelSyscallWrapper_sysenter(fp: File, f: Function, sysno: int) {
+	fp << "	.cfi_startproc simple\n";
+	fp << "	.cfi_personality 0, x86_syscall_personality_asm32_sysenter\n";
+	fp << "	.cfi_lsda 0, " << sysno.hex() << "\n";
+	fp << "	.cfi_iret_signal_frame\n";
+	fp << "	.cfi_def_cfa %esp, 0\n";
+	fp << "	pushl_cfi %ds\n";
+	fp << "	.cfi_restore_iret_ds_or_offset -4\n";
+	fp << "	pushl_cfi %es\n";
+	fp << "	.cfi_restore_iret_es_or_offset -8\n";
+	fp << "	pushl_cfi %fs\n";
+	fp << "	.cfi_restore_iret_fs_or_offset -12\n";
+	fp << "	movw   $(SEGMENT_USER_DATA_RPL), %ax\n";
+	fp << "	movw   %ax, %ds\n";
+	fp << "	movw   %ax, %es\n";
+	fp << "	movw   $(SEGMENT_KERNEL_FSBASE), %ax\n";
+	fp << "	movw   %ax, %fs\n";
+	local registerCount = f.getArgumentRegisterCount(32);
+	local restoreRegisters = [];
+	switch (registerCount) {
+	case 0:
+	case 1:
+		if (!f.isNoReturn) {
+			fp << "	pushl_cfi_r %ecx\n";
+			restoreRegisters.append("%ecx");
+			if (!(f.returnType.isReg64 || f.returnType.isReg128)) {
+				fp << "	pushl_cfi_r %edx\n";
+				restoreRegisters.append("%edx");
+			}
+		}
+		if (registerCount == 1) {
+			fp << "	pushl_cfi_r %ebx  /* Arg #0 */\n";
+			restoreRegisters.append("!%ebx");
+		}
+		break;
+	case 2:
+		if (!(f.returnType.isReg64 || f.returnType.isReg128)) {
+			fp << "	pushl_cfi_r %edx\n";
+			restoreRegisters.append("%edx");
+		}
+		fp << "	pushl_cfi_r %ecx  /* Arg #1 */\n";
+		restoreRegisters.append("%ecx");
+		fp << "	pushl_cfi_r %ebx  /* Arg #0 */\n";
+		restoreRegisters.append("!%ebx");
+		break;
+	case 6:
+	case 5:
+		fp << "	cmpl   $(KERNEL_BASE), %ebp\n";
+		fp << "	jae    __asm32_bad_sysenter_extension\n";
+		if (registerCount == 6) {
+			fp << "	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */\n";
+			restoreRegisters.append(none);
+		}
+		/* FALLTHRU */
+		fp << "	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */\n";
+		restoreRegisters.append(none);
+		/* FALLTHRU */
+	case 4:
+		fp << "	pushl_cfi_r %esi  /* Arg #3 */\n";
+		restoreRegisters.append("!%esi");
+		/* FALLTHRU */
+	case 3:
+		fp << "	pushl_cfi_r %edx  /* Arg #2 */\n";
+		restoreRegisters.append((
+			f.returnType.isReg64 ||
+			f.returnType.isReg128)
+			? none
+			: "%edx");
+		fp << "	pushl_cfi_r %ecx  /* Arg #1 */\n";
+		restoreRegisters.append("%ecx");
+		fp << "	pushl_cfi_r %ebx  /* Arg #0 */\n";
+		restoreRegisters.append("!%ebx");
+		break;
+	default:
+		break;
+	}
+	fp << "	EXTERN(sys_" << f.name << ")\n";
+	fp << "	call   sys_" << f.name << "\n";
+	if (!f.isNoReturn) {
+		i386_restoreSyscallRegisters(fp, restoreRegisters);
+		fp << "	popl_cfi %fs\n";
+		fp << "	.cfi_restore_iret_fs\n";
+		fp << "	popl_cfi %es\n";
+		fp << "	.cfi_restore_iret_es\n";
+		fp << "	popl_cfi %ds\n";
+		fp << "	.cfi_restore_iret_ds\n";
+		/* Can only use sysexit if not double-wide!
+		 * Double-wide system calls return via EDX,
+		 * which gets clobbered if we use sysexit. */
+		if (!((f.returnType.isReg64 || f.returnType.isReg128))) {
+			fp << "	X86_IRET_BUT_PREFER_SYSEXIT\n";
+		} else {
+			fp << "	iret\n";
+		}
+	}
+	fp << "	.cfi_endproc\n";
+}
+
+
+
+/************************************************************************/
+/* X86_64                                                               */
+/************************************************************************/
+function x86_64_printLibcSyscallWrapperCommon(fp: File) {
+	fp << "/* TODO: x86_64_printLibcSyscallWrapperCommon() */\n";
+}
+
+function x86_64_printLibcSyscallWrapper(fp: File, f: Function, sysno: int, enableExcept: bool) {
+	fp << "/* TODO: x86_64_printLibcSyscallWrapper() */\n";
+}
+
+function x86_64_printKernelSyscallWrapperCommon(fp: File) {
+	fp << "/* TODO: x86_64_printKernelSyscallWrapperCommon() */\n";
+}
+
+function x86_64_printKernelSyscallWrapper_asm64_syscall(fp: File, f: Function, sysno: int) {
+	fp << "/* TODO: x86_64_printKernelSyscallWrapper_asm64_syscall() */\n";
+}
+
+function x86_64_printKernelSyscallWrapper_asm32_int80(fp: File, f: Function, sysno: int) {
+	fp << "/* TODO: x86_64_printKernelSyscallWrapper_asm32_int80() */\n";
+}
+
+function x86_64_printKernelSyscallWrapper_asm32_sysenter(fp: File, f: Function, sysno: int) {
+	fp << "/* TODO: x86_64_printKernelSyscallWrapper_asm32_sysenter() */\n";
+}
+
+@@Listing of supported system call architectures, as well
+@@as arch-specific configuration options, and code generators.
+global ARCH: {string: SyscallArch} = {
+
+	"i386" : SyscallArch(
+		platformName: "i386-kos",
+		platformArch: "i386",
+		platformSuffix: "32",
+		platformGpRegisterSizeInBits: 32,
+		platformSyscallRegisterCount: 6,
+		platformEndian: "le",
+		platformSyscallTableCount: 2,
+		platformMaxPossibleSysno: 0xffffffff,
+		platformLibcSyscallCommon: i386_printLibcSyscallWrapperCommon,
+		platformLibcSyscallWrapper: i386_printLibcSyscallWrapper,
+		platformKernelSyscallWrappersCommon: i386_printKernelSyscallWrapperCommon,
+		platformKernelSyscallWrappers: {
+			"__x86_asm32_int80_" : (
+				"INTERN_WEAK", ".text.x86.asm32_syscall_int80.{name}",
+				i386_printKernelSyscallWrapper_int80,
+				"i386"),
+			"__x86_asm32_sysenter_" : (
+				"INTERN_WEAK", ".text.x86.asm32_syscall_sysenter.{name}",
+				i386_printKernelSyscallWrapper_sysenter,
+				"i386"),
+		},
+	),
+
+	"x86_64" : SyscallArch(
+		platformName: "i386-kos",
+		platformArch: "i386",
+		platformSuffix: "64",
+		platformGpRegisterSizeInBits: 64,
+		platformSyscallRegisterCount: 6,
+		platformEndian: "le",
+		platformSyscallTableCount: 2,
+		platformMaxPossibleSysno: 0xffffffffffffffff,
+		platformLibcSyscallCommon: x86_64_printLibcSyscallWrapperCommon,
+		platformLibcSyscallWrapper: x86_64_printLibcSyscallWrapper,
+		platformKernelSyscallWrappersCommon: x86_64_printKernelSyscallWrapperCommon,
+		platformKernelSyscallWrappers: {
+			"__x86_asm64_syscall_" : (
+				"INTERN_WEAK", ".text.x86.asm64_syscall.{name}",
+				x86_64_printKernelSyscallWrapper_asm64_syscall,
+				"x86_64"),
+			"__x86_asm32_int80_" : (
+				"INTERN_WEAK", ".text.x86.asm32_syscall_int80.{name}",
+				x86_64_printKernelSyscallWrapper_asm32_int80,
+				"i386"),
+			"__x86_asm32_sysenter_" : (
+				"INTERN_WEAK", ".text.x86.asm32_syscall_sysenter.{name}",
+				x86_64_printKernelSyscallWrapper_asm32_sysenter,
+				"i386"),
+		},
+	),
+
+//	"arm" : SyscallArch(
+//		platformName: "arm-kos",
+//		platformArch: "arm",
+//		platformGpRegisterSizeInBits: 32,
+//		platformSyscallRegisterCount: 6,
+//		platformEndian: "le",
+//		platformSyscallTableCount: 2,
+//		platformMaxPossibleSysno: 0xffffffff,
+//		platformLibcSyscallCommon: arm_printLibcSyscallWrapperCommon,
+//		platformLibcSyscallWrapper: arm_printLibcSyscallWrapper,
+//		platformKernelSyscallWrappersCommon: arm_printKernelSyscallWrapperCommon,
+//		platformKernelSyscallWrappers: {
+//			"__arm_syscall_" : ("INTERN", "arm", arm_printKernelSyscallWrapper),
+//		},
+//	),
+};
+
+

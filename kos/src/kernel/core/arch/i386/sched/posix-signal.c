@@ -26,6 +26,7 @@
 #include <kernel/fpu.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
+#include <kernel/syscall-properties.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
@@ -119,7 +120,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	if (sc_info) {
 		/* Figure out if we should really start a system call. */
 		int rmode;
-		rmode = SYSCALL_RESTART_MODE(sc_info->rsi_sysno);
+		rmode = kernel_syscall_restartmode(sc_info->rsi_sysno);
 		if (rmode == SYSCALL_RESTART_MODE_MUST)
 			; /* Always restart */
 		else if (rmode == SYSCALL_RESTART_MODE_DONT)
@@ -263,7 +264,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		unsigned int argc;
 		size_t ob_size;
 		/* Only copy data up to the first unused argument. */
-		for (argc = SYSCALL_REGISTER_COUNT(sc_info->rsi_sysno); argc; --argc) {
+		for (argc = kernel_syscall_regcnt(sc_info->rsi_sysno); argc; --argc) {
 			if (sc_info->rsi_flags & RPC_SYSCALL_INFO_FARGVALID(argc - 1))
 				break;
 		}

@@ -344,7 +344,10 @@ DEFINE_SYSCALL4(errno_t, fallocate,
 }
 
 #ifdef __NR_fallocate64
-DEFINE_SYSCALL4(errno_t, fallocate, fd_t, fd, syscall_ulong_t, mode, uint32_t, offset, uint32_t, length) {
+DEFINE_SYSCALL4(errno_t, fallocate,
+                fd_t, fd, syscall_ulong_t, mode,
+                syscall_ulong_t, offset,
+                syscall_ulong_t, length) {
 	return sys_fallocate64(fd, mode, (uint64_t)offset, (uint64_t)length);
 }
 #endif /* __NR_fallocate64 */
@@ -380,14 +383,14 @@ DEFINE_SYSCALL3(int64_t, lseek,
 }
 
 #if defined(__NR_lseek64) && defined(__NR_lseek)
-DEFINE_SYSCALL3(int32_t, lseek,
-                fd_t, fd, int32_t, offset,
+DEFINE_SYSCALL3(syscall_slong_t, lseek,
+                fd_t, fd, syscall_slong_t, offset,
                 syscall_ulong_t, whence) {
 	uint64_t result;
 	result = (uint64_t)sys_lseek64(fd, offset, whence);
 	if unlikely(result > UINT32_MAX)
 		THROW(E_OVERFLOW);
-	return (int32_t)(uint32_t)result;
+	return (syscall_slong_t)(uint32_t)result;
 }
 #endif /* __NR_lseek64 && __NR_lseek */
 

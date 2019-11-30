@@ -136,22 +136,22 @@ __DECL_BEGIN
 	              sizeof(struct lcpustate32))
 #ifndef __x86_64__
 __FORCELOCAL void __FCALL lcpustate32_current(struct lcpustate32 *__restrict __result) {
-	__asm__("movl %%edi, 0(%0)\n\t"
-			"movl %%esi, 4(%0)\n\t"
-			"movl %%ebp, 8(%0)\n\t"
-			"movl %%esp, 12(%0)\n\t"
-			"movl %%ebx, 16(%0)\n\t"
+	__asm__("movl %%edi, 0(%1)\n\t"
+			"movl %%esi, 4(%1)\n\t"
+			"movl %%ebp, 8(%1)\n\t"
+			"movl %%esp, 12(%1)\n\t"
+			"movl %%ebx, 16(%1)\n\t"
 #if defined(__pic__) || defined(__PIC__) || defined(__pie__) || defined(__PIE__)
 			"call 991f\n\t"
 			"991: .cfi_adjust_cfa_offset 4\n\t"
-			"popl 20(%0)\n\t"
+			"popl 20(%1)\n\t"
 			".cfi_adjust_cfa_offset -4"
 #else
-			"movl $991f, 20(%0)\n\t"
+			"movl $991f, 20(%1)\n\t"
 			"991:"
 #endif
-			: "=r" (__result)
-			, "=m" (*__result));
+			: "=m" /*0*/ (*__result)
+			: "r" /*1*/ (__result));
 }
 #endif /* !__x86_64__ */
 __LOCAL __NOBLOCK void

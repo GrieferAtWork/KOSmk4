@@ -36,7 +36,7 @@ INTERN_FUNCTION(linker_entry)
 	 *                                             // marking the base of the user-space stack
 	 *   %edx:  uintptr_t                loadaddr; // Loadaddr (load offset) of the main binary (usually
 	 *                                             // 0, since that binary probably can't be relocated)
-	 *   %ebx:  struct process_peb      *peb;      // Points to the process environment block (contains argc+argv[] and environ[])
+	 *   %ebp:  struct process_peb      *peb;      // Points to the process environment block (contains argc+argv[] and environ[])
 	 */
 
 	pushl  %ebp        /* struct process_peb *%ebp */

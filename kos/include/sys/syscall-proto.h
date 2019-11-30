@@ -19,34 +19,68 @@
 #ifndef _SYS_SYSCALL_PROTO_H
 #define _SYS_SYSCALL_PROTO_H 1
 
-/* If <sym/unistd.h> was already included, reset its guard
- * if we didn't get everything we needed the previous time. */
-#ifdef _ASM_UNISTD_H
-#if !defined(__WANT_SYSCALL_ARGUMENT_COUNT) || \
-    !defined(__WANT_SYSCALL_ARGUMENT_TYPES) || \
-    !defined(__WANT_SYSCALL_RETURN_TYPES)
-#undef _ASM_UNISTD_H
-#endif /* !... */
-#endif /* _ASM_UNISTD_H */
+#include <__crt.h>
+
+#if !defined(__NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT) || \
+    !defined(__NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES) || \
+    !defined(__NRFEAT_DEFINED_SYSCALL_RETURN_TYPES)
+#undef __WANT_SYSCALL_ARGUMENT_COUNT
+#undef __WANT_SYSCALL_ARGUMENT_TYPES
+#undef __WANT_SYSCALL_RETURN_TYPES
 #define __WANT_SYSCALL_ARGUMENT_COUNT 1
 #define __WANT_SYSCALL_ARGUMENT_TYPES 1
 #define __WANT_SYSCALL_RETURN_TYPES   1
+#include <asm/syscalls-proto.h>
+#endif /* !... */
 
-#include <__crt.h>
+#ifndef __NRFEAT_SYSCALL_TABLE_COUNT
+#include <asm/syscalls.h>
+#endif /* !__NRFEAT_SYSCALL_TABLE_COUNT */
 
-#include <asm/unistd.h>
-#include <bits/syscall.h>
+#ifndef __PRIVATE_SYSCALL_GET_ESCAPED_TYPE
+#define __PRIVATE_SYSCALL_GET_ESCAPED_TYPE2(a, b) b
+#define __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(t) __PRIVATE_SYSCALL_GET_ESCAPED_TYPE2 t
+#endif /* !__PRIVATE_SYSCALL_GET_ESCAPED_TYPE */
 
-#define __PRIVATE_SYSCALL_PROTO_0(name, decl) __NRRT_##name decl(void)
-#define __PRIVATE_SYSCALL_PROTO_1(name, decl) __NRRT_##name decl(__NRAT0_##name)
-#define __PRIVATE_SYSCALL_PROTO_2(name, decl) __NRRT_##name decl(__NRAT0_##name, __NRAT1_##name)
-#define __PRIVATE_SYSCALL_PROTO_3(name, decl) __NRRT_##name decl(__NRAT0_##name, __NRAT1_##name, __NRAT2_##name)
-#define __PRIVATE_SYSCALL_PROTO_4(name, decl) __NRRT_##name decl(__NRAT0_##name, __NRAT1_##name, __NRAT2_##name, __NRAT3_##name)
-#define __PRIVATE_SYSCALL_PROTO_5(name, decl) __NRRT_##name decl(__NRAT0_##name, __NRAT1_##name, __NRAT2_##name, __NRAT3_##name, __NRAT4_##name)
-#define __PRIVATE_SYSCALL_PROTO_6(name, decl) __NRRT_##name decl(__NRAT0_##name, __NRAT1_##name, __NRAT2_##name, __NRAT3_##name, __NRAT4_##name, __NRAT5_##name)
+#define __PRIVATE_SYSCALL_PROTO_0(name, decl)         \
+	__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name) \
+	decl(void)
+#define __PRIVATE_SYSCALL_PROTO_1(name, decl)         \
+	__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name) \
+	decl(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT0_##name))
+#define __PRIVATE_SYSCALL_PROTO_2(name, decl)                \
+	__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name)        \
+	decl(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT0_##name), \
+	     __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_##name))
+#define __PRIVATE_SYSCALL_PROTO_3(name, decl)                \
+	__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name)        \
+	decl(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT0_##name), \
+	     __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_##name), \
+	     __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_##name))
+#define __PRIVATE_SYSCALL_PROTO_4(name, decl)                \
+	__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name)        \
+	decl(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT0_##name), \
+	     __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_##name), \
+	     __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_##name), \
+	     __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT3_##name))
+#define __PRIVATE_SYSCALL_PROTO_5(name, decl)                \
+	__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name)        \
+	decl(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT0_##name), \
+	     __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_##name), \
+	     __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_##name), \
+	     __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT3_##name), \
+	     __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT4_##name))
+#define __PRIVATE_SYSCALL_PROTO_6(name, decl)                \
+	__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name)        \
+	decl(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT0_##name), \
+	     __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_##name), \
+	     __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_##name), \
+	     __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT3_##name), \
+	     __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT4_##name), \
+	     __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT5_##name))
 
 #define __PRIVATE_SYSCALL_PROTO2(name, argc, decl) __PRIVATE_SYSCALL_PROTO_##argc(name, decl)
-#define __PRIVATE_SYSCALL_PROTO(name, argc, decl)  __PRIVATE_SYSCALL_PROTO2(name, argc, decl)
+#define __PRIVATE_SYSCALL_PROTO(name, argc, decl) __PRIVATE_SYSCALL_PROTO2(name, argc, decl)
 
 /* Construct a prototype for a given system call:
  * >> SYSCALL_PROTO(open, KCALL open_proto) // Expands to `fd_t KCALL open_proto(char const *, oflag_t, mode_t)' */

@@ -134,10 +134,14 @@ incdir("", "../../include");
 #include <asm/intrin.h>
 #include <asm/ioctl.h>
 #include <asm/ioctls.h>
+#include <asm/ls-syscalls.h>
 #include <asm/param.h>
 #include <asm/posix_types.h>
 #include <asm/socket.h>
 #include <asm/sockios.h>
+#include <asm/syscalls-proto.h>
+#include <asm/syscalls-trace.h>
+#include <asm/syscalls.h>
 #include <asm/termbits.h>
 #include <asm/termios.h>
 #include <asm/types.h>
@@ -217,7 +221,7 @@ incdir("", "../../include");
 #include <bits/statvfs.h>
 #include <bits/stdio_lim.h>
 #include <bits/stropts.h>
-#include <bits/syscall.h>
+#include <bits/syscalls.h>
 #include <bits/syslog-path.h>
 #include <bits/termios.h>
 #include <bits/threads.h>
@@ -382,6 +386,7 @@ incdir("", "../../include");
 #include <kos/bits/library.h>
 #include <kos/bits/peb.h>
 #include <kos/bits/process.h>
+#include <kos/bits/syscalls.h>
 #include <kos/bits/thread.h>
 #include <kos/bits/ukern-struct.h>
 #include <kos/bits/ukern.h>
@@ -711,11 +716,7 @@ incdir("", "../../include");
 #include <sys/stropts.h>
 #include <sys/swap.h>
 #include <sys/syscall-proto.h>
-#include <sys/syscall-proto32.h>
-#include <sys/syscall-proto64.h>
 #include <sys/syscall-trace.h>
-#include <sys/syscall-trace32.h>
-#include <sys/syscall-trace64.h>
 #include <sys/syscall.h>
 #include <sys/sysinfo.h>
 #include <sys/syslog.h>

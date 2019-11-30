@@ -27,6 +27,12 @@
 #include <asm/unistd.h>
 #include <bits/types.h>
 
+#ifdef __ASSEMBLER__
+#include <asm/cpu-flags.h>
+#include <kos/kernel/cpu-state.h>
+#include <kos/kernel/gdt.h>
+#endif /* __ASSEMBLER__ */
+
 #ifdef __x86_64__
 #include <asm/syscalls32.inl>
 #endif /* __x86_64__ */
@@ -194,162 +200,6 @@ syscall_emulate64(struct icpustate *__restrict state,
 #define syscall_emulate32 syscall_emulate
 #endif /* !__x86_64__ */
 
-
-
-#define SYSCALL_RESTART_MODE_AUTO 0 /* Automatic restarting */
-#define SYSCALL_RESTART_MODE_DONT 1 /* Don't restart */
-#define SYSCALL_RESTART_MODE_MUST 2 /* Always restart */
-
-
-/* System call restart mode / cancellation point configuration */
-DATDEF __UINT8_TYPE__ const x86_syscall_restart_mode[];            /* 0 ... __NR_syscall_max */
-DATDEF __UINT8_TYPE__ const x86_exsyscall_restart_mode[];          /* __NR_exsyscall_min ... __NR_exsyscall_max */
-DATDEF __UINT8_TYPE__ const x86_syscall_is_cancellation_point[];   /* 0 ... __NR_syscall_max */
-DATDEF __UINT8_TYPE__ const x86_exsyscall_is_cancellation_point[]; /* __NR_exsyscall_min ... __NR_exsyscall_max */
-#ifdef __x86_64__ /* Argument counts of 386 compatibility mode system calls. */
-DATDEF __UINT8_TYPE__ const x86_syscall32_restart_mode[];            /* 0 ... __NR32_syscall_max */
-DATDEF __UINT8_TYPE__ const x86_exsyscall32_restart_mode[];          /* __NR32_exsyscall_min ... __NR32_exsyscall_max */
-DATDEF __UINT8_TYPE__ const x86_syscall32_is_cancellation_point[];   /* 0 ... __NR_syscall_max */
-DATDEF __UINT8_TYPE__ const x86_exsyscall32_is_cancellation_point[]; /* __NR_exsyscall_min ... __NR_exsyscall_max */
-#define x86_syscall64_restart_mode            x86_syscall_restart_mode
-#define x86_exsyscall64_restart_mode          x86_exsyscall_restart_mode
-#define x86_syscall64_is_cancellation_point   x86_syscall_is_cancellation_point
-#define x86_exsyscall64_is_cancellation_point x86_exsyscall_is_cancellation_point
-#else /* __x86_64__ */
-#define x86_syscall32_restart_mode            x86_syscall_restart_mode
-#define x86_exsyscall32_restart_mode          x86_exsyscall_restart_mode
-#define x86_syscall32_is_cancellation_point   x86_syscall_is_cancellation_point
-#define x86_exsyscall32_is_cancellation_point x86_exsyscall_is_cancellation_point
-#endif /* !__x86_64__ */
-
-FORCELOCAL ATTR_CONST NOBLOCK __UINT8_TYPE__
-NOTHROW(KCALL x86_syscall_restart_mode_get)(__UINT8_TYPE__ const *__restrict base,
-                                            __REGISTER_TYPE__ rel_sysno) {
-	return (base[rel_sysno / 4] >> (2 * (rel_sysno % 4))) & 3;
-}
-
-FORCELOCAL ATTR_CONST NOBLOCK __BOOL
-NOTHROW(KCALL x86_exsyscall_is_cancellation_point_get)(__UINT8_TYPE__ const *__restrict base,
-                                                       __REGISTER_TYPE__ rel_sysno) {
-	return (base[rel_sysno / 8] >> (rel_sysno % 8)) & 1;
-}
-
-#define SYSCALL_RESTART_MODE_EX(sysno, error)                                                 \
-	((sysno) <= __NR_syscall_max                                                              \
-	 ? x86_syscall_restart_mode_get(x86_syscall_restart_mode, sysno)                          \
-	 : ((sysno) >= __NR_exsyscall_min && (sysno) <= __NR_exsyscall_max)                       \
-	   ? x86_syscall_restart_mode_get(x86_exsyscall_restart_mode, (sysno)-__NR_exsyscall_min) \
-	   : (error))
-#define SYSCALL_RESTART_MODE(sysno) \
-	SYSCALL_RESTART_MODE_EX(sysno, SYSCALL_RESTART_MODE_AUTO)
-#define SYSCALL_IS_CANCELLATION_POINT_EX(sysno, error)                                                            \
-	((sysno) <= __NR_syscall_max                                                                                  \
-	 ? x86_exsyscall_is_cancellation_point_get(x86_syscall_is_cancellation_point, sysno)                          \
-	 : ((sysno) >= __NR_exsyscall_min && (sysno) <= __NR_exsyscall_max)                                           \
-	   ? x86_exsyscall_is_cancellation_point_get(x86_exsyscall_is_cancellation_point, (sysno)-__NR_exsyscall_min) \
-	   : (error))
-#define SYSCALL_IS_CANCELLATION_POINT(sysno) \
-	SYSCALL_IS_CANCELLATION_POINT_EX(sysno, 1)
-#ifdef __x86_64__ /* Argument counts of 386 compatibility mode system calls. */
-#define SYSCALL32_RESTART_MODE_EX(sysno, error)                                                   \
-	((sysno) <= __NR32_syscall_max                                                                \
-	 ? x86_syscall_restart_mode_get(x86_syscall32_restart_mode, sysno)                            \
-	 : ((sysno) >= __NR32_exsyscall_min && (sysno) <= __NR32_exsyscall_max)                       \
-	   ? x86_syscall_restart_mode_get(x86_exsyscall32_restart_mode, (sysno)-__NR32_exsyscall_min) \
-	   : (error))
-#define SYSCALL32_RESTART_MODE(sysno) \
-	SYSCALL32_RESTART_MODE_EX(sysno, SYSCALL_RESTART_MODE_AUTO)
-#define SYSCALL32_IS_CANCELLATION_POINT_EX(sysno, error)                                                              \
-	((sysno) <= __NR32_syscall_max                                                                                    \
-	 ? x86_exsyscall_is_cancellation_point_get(x86_syscall32_is_cancellation_point, sysno)                            \
-	 : ((sysno) >= __NR32_exsyscall_min && (sysno) <= __NR32_exsyscall_max)                                           \
-	   ? x86_exsyscall_is_cancellation_point_get(x86_exsyscall32_is_cancellation_point, (sysno)-__NR32_exsyscall_min) \
-	   : (error))
-#define SYSCALL32_IS_CANCELLATION_POINT(sysno) \
-	SYSCALL32_IS_CANCELLATION_POINT_EX(sysno, 1)
-#define SYSCALL64_RESTART_MODE_EX          SYSCALL_RESTART_MODE_EX
-#define SYSCALL64_RESTART_MODE             SYSCALL_RESTART_MODE
-#define SYSCALL64_IS_CANCELLATION_POINT_EX SYSCALL_IS_CANCELLATION_POINT_EX
-#define SYSCALL64_IS_CANCELLATION_POINT    SYSCALL_IS_CANCELLATION_POINT
-#else /* __x86_64__ */
-#define SYSCALL32_RESTART_MODE_EX          SYSCALL_RESTART_MODE_EX
-#define SYSCALL32_RESTART_MODE             SYSCALL_RESTART_MODE
-#define SYSCALL32_IS_CANCELLATION_POINT_EX SYSCALL_IS_CANCELLATION_POINT_EX
-#define SYSCALL32_IS_CANCELLATION_POINT    SYSCALL_IS_CANCELLATION_POINT
-#endif /* !__x86_64__ */
-
-
-/* System call argument count (adjusted for the number of used registers) */
-DATDEF __UINT8_TYPE__ const x86_syscall_register_count[];   /* 0 ... __NR_syscall_max */
-DATDEF __UINT8_TYPE__ const x86_exsyscall_register_count[]; /* __NR_exsyscall_min ... __NR_exsyscall_max */
-#ifdef __x86_64__ /* Argument counts of 386 compatibility mode system calls. */
-DATDEF __UINT8_TYPE__ const x86_syscall32_register_count[];   /* 0 ... __NR32_syscall_max */
-DATDEF __UINT8_TYPE__ const x86_exsyscall32_register_count[]; /* __NR32_exsyscall_min ... __NR32_exsyscall_max */
-#define x86_syscall64_register_count   x86_syscall_register_count
-#define x86_exsyscall64_register_count x86_exsyscall_register_count
-#else /* __x86_64__ */
-#define x86_syscall32_register_count   x86_syscall_register_count
-#define x86_exsyscall32_register_count x86_exsyscall_register_count
-#endif /* !__x86_64__ */
-
-FORCELOCAL ATTR_CONST NOBLOCK __UINT8_TYPE__
-NOTHROW(KCALL x86_syscall_register_count_get)(__UINT8_TYPE__ const *__restrict base,
-                                              __REGISTER_TYPE__ rel_sysno) {
-	return rel_sysno & 1
-	       ? (base[rel_sysno / 2] & 0x70) >> 4
-	       : (base[rel_sysno / 2] & 0x07);
-}
-FORCELOCAL ATTR_CONST NOBLOCK bool
-NOTHROW(KCALL x86_syscall_double_wide_get)(__UINT8_TYPE__ const *__restrict base,
-                                           __REGISTER_TYPE__ rel_sysno) {
-	return rel_sysno & 1
-	       ? (base[rel_sysno / 2] & 0x80) != 0
-	       : (base[rel_sysno / 2] & 0x08) != 0;
-}
-
-/* Evaluate the number of registers used by a given system call. */
-#define SYSCALL_REGISTER_COUNT(sysno) \
-	SYSCALL_REGISTER_COUNT_EX(sysno, 0)
-#define SYSCALL_REGISTER_COUNT_EX(sysno, error)                                                   \
-	((sysno) <= __NR_syscall_max                                                                  \
-	 ? x86_syscall_register_count_get(x86_syscall_register_count, sysno)                          \
-	 : ((sysno) >= __NR_exsyscall_min && (sysno) <= __NR_exsyscall_max)                           \
-	   ? x86_syscall_register_count_get(x86_exsyscall_register_count, (sysno)-__NR_exsyscall_min) \
-	   : (error))
-#define SYSCALL_DOUBLE_WIDE(sysno) \
-	SYSCALL_DOUBLE_WIDE_EX(sysno, 0)
-#define SYSCALL_DOUBLE_WIDE_EX(sysno, error)                                                   \
-	((sysno) <= __NR_syscall_max                                                               \
-	 ? x86_syscall_double_wide_get(x86_syscall_register_count, sysno)                          \
-	 : ((sysno) >= __NR_exsyscall_min && (sysno) <= __NR_exsyscall_max)                        \
-	   ? x86_syscall_double_wide_get(x86_exsyscall_register_count, (sysno)-__NR_exsyscall_min) \
-	   : (error))
-#ifdef __x86_64__ /* Argument counts of 386 compatibility mode system calls. */
-#define SYSCALL32_REGISTER_COUNT(sysno) \
-	SYSCALL32_REGISTER_COUNT_EX(sysno, 0)
-#define SYSCALL32_REGISTER_COUNT_EX(sysno, error)                                                     \
-	((sysno) <= __NR32_syscall_max                                                                    \
-	 ? x86_syscall_register_count_get(x86_syscall32_register_count, sysno)                            \
-	 : ((sysno) >= __NR32_exsyscall_min && (sysno) <= __NR32_exsyscall_max)                           \
-	   ? x86_syscall_register_count_get(x86_exsyscall32_register_count, (sysno)-__NR32_exsyscall_min) \
-	   : (error))
-#define SYSCALL32_DOUBLE_WIDE(sysno) \
-	SYSCALL32_DOUBLE_WIDE_EX(sysno, 0)
-#define SYSCALL32_DOUBLE_WIDE_EX(sysno, error)                                                     \
-	((sysno) <= __NR32_syscall_max                                                                 \
-	 ? x86_syscall_double_wide_get(x86_syscall32_register_count, sysno)                            \
-	 : ((sysno) >= __NR32_exsyscall_min && (sysno) <= __NR32_exsyscall_max)                        \
-	   ? x86_syscall_double_wide_get(x86_exsyscall32_register_count, (sysno)-__NR32_exsyscall_min) \
-	   : (error))
-#define SYSCALL64_DOUBLE_WIDE    SYSCALL_DOUBLE_WIDE
-#define SYSCALL64_DOUBLE_WIDE_EX SYSCALL_DOUBLE_WIDE_EX
-#else /* __x86_64__ */
-#define SYSCALL32_REGISTER_COUNT    SYSCALL_REGISTER_COUNT
-#define SYSCALL32_REGISTER_COUNT_EX SYSCALL_REGISTER_COUNT_EX
-#define SYSCALL32_DOUBLE_WIDE       SYSCALL_DOUBLE_WIDE
-#define SYSCALL32_DOUBLE_WIDE_EX    SYSCALL_DOUBLE_WIDE_EX
-#endif /* !__x86_64__ */
-
 DECL_END
 
 
@@ -359,61 +209,65 @@ DECL_END
 /* When defining a 64-bit system call, weakly alias the 32-bit variant onto it, thus
  * implementing system calls without dedicated compatibility-mode variants by calling
  * forward to their 64-bit (regular) variants. */
+#ifndef __PRIVATE_SYSCALL_GET_ESCAPED_TYPE
+#define __PRIVATE_SYSCALL_GET_ESCAPED_TYPE2(a, b) b
+#define __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(t) __PRIVATE_SYSCALL_GET_ESCAPED_TYPE2 t
+#endif /* !__PRIVATE_SYSCALL_GET_ESCAPED_TYPE */
 
-#define DEFINE_SYSCALL32_0(return_type, name)                                            \
-	STATIC_ASSERT(__NR32AC_##name == 0);                                                 \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32RT_##name, return_type));           \
-	FUNDEF return_type __ARCH_SYSCALLCC impl_sys32_##name(void) ASMNAME("sys32_" #name); \
+#define DEFINE_SYSCALL32_0(return_type, name)                                                                      \
+	STATIC_ASSERT(__NR32AC_##name == 0);                                                                           \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32RT_##name), return_type)); \
+	FUNDEF return_type __ARCH_SYSCALLCC impl_sys32_##name(void) ASMNAME("sys32_" #name);                           \
 	PUBLIC ATTR_SECTION_SYSCALL32(name) return_type __ARCH_SYSCALLCC impl_sys32_##name(void)
-#define DEFINE_SYSCALL32_1(return_type, name, T0, N0)                                     \
-	STATIC_ASSERT(__NR32AC_##name == 1);                                                  \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32RT_##name, return_type));            \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT0_##name, T0));                    \
-	FUNDEF return_type __ARCH_SYSCALLCC impl_sys32_##name(T0 N0) ASMNAME("sys32_" #name); \
+#define DEFINE_SYSCALL32_1(return_type, name, T0, N0)                                                              \
+	STATIC_ASSERT(__NR32AC_##name == 1);                                                                           \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32RT_##name), return_type)); \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT0_##name), T0));         \
+	FUNDEF return_type __ARCH_SYSCALLCC impl_sys32_##name(T0 N0) ASMNAME("sys32_" #name);                          \
 	PUBLIC ATTR_SECTION_SYSCALL32(name) return_type __ARCH_SYSCALLCC impl_sys32_##name(T0 N0)
-#define DEFINE_SYSCALL32_2(return_type, name, T0, N0, T1, N1)                                    \
-	STATIC_ASSERT(__NR32AC_##name == 2);                                                         \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32RT_##name, return_type));                   \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT0_##name, T0));                           \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT1_##name, T1));                           \
-	FUNDEF return_type __ARCH_SYSCALLCC impl_sys32_##name(T0 N0, T1 N1) ASMNAME("sys32_" #name); \
+#define DEFINE_SYSCALL32_2(return_type, name, T0, N0, T1, N1)                                                      \
+	STATIC_ASSERT(__NR32AC_##name == 2);                                                                           \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32RT_##name), return_type)); \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT0_##name), T0));         \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT1_##name), T1));         \
+	FUNDEF return_type __ARCH_SYSCALLCC impl_sys32_##name(T0 N0, T1 N1) ASMNAME("sys32_" #name);                   \
 	PUBLIC ATTR_SECTION_SYSCALL32(name) return_type __ARCH_SYSCALLCC impl_sys32_##name(T0 N0, T1 N1)
-#define DEFINE_SYSCALL32_3(return_type, name, T0, N0, T1, N1, T2, N2)                                   \
-	STATIC_ASSERT(__NR32AC_##name == 3);                                                                \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32RT_##name, return_type));                          \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT0_##name, T0));                                  \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT1_##name, T1));                                  \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT2_##name, T2));                                  \
-	FUNDEF return_type __ARCH_SYSCALLCC impl_sys32_##name(T0 N0, T1 N1, T2 N2) ASMNAME("sys32_" #name); \
+#define DEFINE_SYSCALL32_3(return_type, name, T0, N0, T1, N1, T2, N2)                                              \
+	STATIC_ASSERT(__NR32AC_##name == 3);                                                                           \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32RT_##name), return_type)); \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT0_##name), T0));         \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT1_##name), T1));         \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT2_##name), T2));         \
+	FUNDEF return_type __ARCH_SYSCALLCC impl_sys32_##name(T0 N0, T1 N1, T2 N2) ASMNAME("sys32_" #name);            \
 	PUBLIC ATTR_SECTION_SYSCALL32(name) return_type __ARCH_SYSCALLCC impl_sys32_##name(T0 N0, T1 N1, T2 N2)
-#define DEFINE_SYSCALL32_4(return_type, name, T0, N0, T1, N1, T2, N2, T3, N3)                                  \
-	STATIC_ASSERT(__NR32AC_##name == 4);                                                                       \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32RT_##name, return_type));                                 \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT0_##name, T0));                                         \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT1_##name, T1));                                         \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT2_##name, T2));                                         \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT3_##name, T3));                                         \
-	FUNDEF return_type __ARCH_SYSCALLCC impl_sys32_##name(T0 N0, T1 N1, T2 N2, T3 N3) ASMNAME("sys32_" #name); \
+#define DEFINE_SYSCALL32_4(return_type, name, T0, N0, T1, N1, T2, N2, T3, N3)                                      \
+	STATIC_ASSERT(__NR32AC_##name == 4);                                                                           \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32RT_##name), return_type)); \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT0_##name), T0));         \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT1_##name), T1));         \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT2_##name), T2));         \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT3_##name), T3));         \
+	FUNDEF return_type __ARCH_SYSCALLCC impl_sys32_##name(T0 N0, T1 N1, T2 N2, T3 N3) ASMNAME("sys32_" #name);     \
 	PUBLIC ATTR_SECTION_SYSCALL32(name) return_type __ARCH_SYSCALLCC impl_sys32_##name(T0 N0, T1 N1, T2 N2, T3 N3)
 #define DEFINE_SYSCALL32_5(return_type, name, T0, N0, T1, N1, T2, N2, T3, N3, T4, N4)                                 \
 	STATIC_ASSERT(__NR32AC_##name == 5);                                                                              \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32RT_##name, return_type));                                        \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT0_##name, T0));                                                \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT1_##name, T1));                                                \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT2_##name, T2));                                                \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT3_##name, T3));                                                \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT4_##name, T4));                                                \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32RT_##name), return_type));    \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT0_##name), T0));            \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT1_##name), T1));            \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT2_##name), T2));            \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT3_##name), T3));            \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT4_##name), T4));            \
 	FUNDEF return_type __ARCH_SYSCALLCC impl_sys32_##name(T0 N0, T1 N1, T2 N2, T3 N3, T4 N4) ASMNAME("sys32_" #name); \
 	PUBLIC ATTR_SECTION_SYSCALL32(name) return_type __ARCH_SYSCALLCC impl_sys32_##name(T0 N0, T1 N1, T2 N2, T3 N3, T4 N4)
 #define DEFINE_SYSCALL32_6(return_type, name, T0, N0, T1, N1, T2, N2, T3, N3, T4, N4, T5, N5)                                \
 	STATIC_ASSERT(__NR32AC_##name == 6);                                                                                     \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32RT_##name, return_type));                                               \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT0_##name, T0));                                                       \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT1_##name, T1));                                                       \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT2_##name, T2));                                                       \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT3_##name, T3));                                                       \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT4_##name, T4));                                                       \
-	STATIC_ASSERT(__builtin_types_compatible_p(__NR32AT5_##name, T5));                                                       \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32RT_##name), return_type));           \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT0_##name), T0));                   \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT1_##name), T1));                   \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT2_##name), T2));                   \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT3_##name), T3));                   \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT4_##name), T4));                   \
+	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32AT5_##name), T5));                   \
 	FUNDEF return_type __ARCH_SYSCALLCC impl_sys32_##name(T0 N0, T1 N1, T2 N2, T3 N3, T4 N4, T5 N5) ASMNAME("sys32_" #name); \
 	PUBLIC ATTR_SECTION_SYSCALL32(name) return_type __ARCH_SYSCALLCC impl_sys32_##name(T0 N0, T1 N1, T2 N2, T3 N3, T4 N4, T5 N5)
 #define DEFINE_SYSCALL64_0 DEFINE_SYSCALL0
@@ -459,9 +313,9 @@ DECL_END
 #elif !defined(CONFIG_NO_VM86)
 #define X86_IRET_BUT_PREFER_SYSEXIT                                           \
 	cli;                                                                      \
-	cmpl   $SEGMENT_USER_CODE, OFFSET_IRREGS_CS(%esp);                        \
+	cmpl   $(SEGMENT_USER_CODE), OFFSET_IRREGS_CS(%esp);                      \
 	jne    99f;                                                               \
-	testl  $EFLAGS_VM, OFFSET_IRREGS_EFLAGS(%esp);                            \
+	testl  $(EFLAGS_VM), OFFSET_IRREGS_EFLAGS(%esp);                          \
 	jnz    99f;                                                               \
 	movl   OFFSET_IRREGS_ESP(%esp), %ecx;                                     \
 	movl   OFFSET_IRREGS_EIP(%esp), %edx;                                     \
@@ -472,7 +326,7 @@ DECL_END
 	 * at a time where registers it would modify were already loaded.         \
 	 * This race condition doesn't happen with IRET, because it executes      \
 	 * atomically (or rather: without interrupts). */                         \
-	andl   $~EFLAGS_IF, (%esp);                                               \
+	andl   $(~EFLAGS_IF), (%esp);                                             \
 	popfl;                                                                    \
 	/* Enable interrupts in a way that delays its execution for 1             \
 	 * additional instruction, meaning that no interrupts can occur           \

@@ -17,7 +17,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-
 #include <hybrid/compiler.h>
 
 #include <kernel/except.h>
@@ -37,13 +36,12 @@
 #include <syscall.h>
 
 
-
-EXTERN(__asm32_int80_invalid)
-EXTERN(__asm32_sysenter_invalid)
-EXTERN(__asm32_syscallrouter_int80)
-EXTERN(__asm32_exsyscallrouter_int80)
-EXTERN(__asm32_syscallrouter_sysenter)
-EXTERN(__asm32_exsyscallrouter_sysenter)
+EXTERN(__x86_asm32_int80_break)
+EXTERN(__x86_asm32_sysenter_break)
+EXTERN(x86_sysroute0_asm32_int80)
+EXTERN(x86_sysroute1_asm32_int80)
+EXTERN(x86_sysroute0_asm32_sysenter)
+EXTERN(x86_sysroute1_asm32_sysenter)
 
 
 .section .text
@@ -326,14 +324,14 @@ INTERN_FUNCTION(x86_sysenter_main)
 	/* Enable interrupts. */
 	sti
 .Ldo_prepared_sysenter:
-	cmpl   $(__NR_syscall_max), %eax
+	cmpl   $(__NR_syscall0_max), %eax
 	ja     1f
-	jmpl   *%ss:__asm32_syscallrouter_sysenter(,%eax,4)
-1:	cmpl   $(__NR_exsyscall_min), %eax
-	jb     __asm32_sysenter_invalid
-	cmpl   $(__NR_exsyscall_max), %eax
-	ja     __asm32_sysenter_invalid
-	jmpl   *%ss:__asm32_exsyscallrouter_sysenter - ((__NR_exsyscall_min * 4) & 0xffffffff)(,%eax,4)
+	jmpl   *%ss:x86_sysroute0_asm32_sysenter(,%eax,4)
+1:	cmpl   $(__NR_syscall1_min), %eax
+	jb     __x86_asm32_sysenter_break
+	cmpl   $(__NR_syscall1_max), %eax
+	ja     __x86_asm32_sysenter_break
+	jmpl   *%ss:x86_sysroute1_asm32_sysenter - ((__NR_syscall1_min * 4) & 0xffffffff)(,%eax,4)
 	.cfi_endproc
 END(x86_sysenter_main)
 
@@ -343,31 +341,31 @@ INTERN_FUNCTION(x86_idt_syscall)
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
-	cmpl   $(__NR_syscall_max), %eax
+	cmpl   $(__NR_syscall0_max), %eax
 	ja     1f
-	jmpl   *%ss:__asm32_syscallrouter_int80(,%eax,4)
-1:	cmpl   $(__NR_exsyscall_min), %eax
-	jb     __asm32_int80_invalid
-	cmpl   $(__NR_exsyscall_max), %eax
-	ja     __asm32_int80_invalid
-	jmpl   *%ss:(__asm32_exsyscallrouter_int80 - ((__NR_exsyscall_min * 4) & 0xffffffff))(,%eax,4)
+	jmpl   *%ss:x86_sysroute0_asm32_int80(,%eax,4)
+1:	cmpl   $(__NR_syscall1_min), %eax
+	jb     __x86_asm32_int80_break
+	cmpl   $(__NR_syscall1_max), %eax
+	ja     __x86_asm32_int80_break
+	jmpl   *%ss:(x86_sysroute1_asm32_int80 - ((__NR_syscall1_min * 4) & 0xffffffff))(,%eax,4)
 	.cfi_endproc
 END(x86_idt_syscall)
 
 
 #define TEST_DOUBLE_WIDE(sysno_reg, tempreg_l, tempreg_b, segment_prefix)        \
-	cmpl   $(__NR_syscall_max), sysno_reg;                                       \
+	cmpl   $(__NR_syscall0_max), sysno_reg;                                       \
 	ja     1234f;                                                                \
 	movl   sysno_reg, tempreg_l;                                                 \
 	shrl   $1, tempreg_l;                                                        \
-	EXTERN(x86_syscall_register_count);                                          \
-	movb   segment_prefix x86_syscall_register_count(,tempreg_l,1), tempreg_b;   \
+	EXTERN(kernel_syscall0_regcnt);                                          \
+	movb   segment_prefix kernel_syscall0_regcnt(,tempreg_l,1), tempreg_b;   \
 	jmp    1235f;                                                                \
 1234:                                                                            \
-	leal   -__NR_exsyscall_min(sysno_reg), tempreg_l;                            \
+	leal   -__NR_syscall1_min(sysno_reg), tempreg_l;                            \
 	shrl   $1, tempreg_l;                                                        \
-	EXTERN(x86_exsyscall_register_count);                                        \
-	movb   segment_prefix x86_exsyscall_register_count(,tempreg_l,1), tempreg_b; \
+	EXTERN(kernel_syscall1_regcnt);                                        \
+	movb   segment_prefix kernel_syscall1_regcnt(,tempreg_l,1), tempreg_b; \
 1235:                                                                            \
 	testl  $1, sysno_reg;                                                        \
 	jz     1234f;                                                                \
@@ -436,21 +434,21 @@ INTERN_FUNCTION(x86_sysenter_main_traced)
 	movl   %ecx, %fs
 
 	/* Load ARG[4] / ARG[5] if necessary */
-	cmpl   $(__NR_syscall_max), %eax
+	cmpl   $(__NR_syscall0_max), %eax
 	ja     1f
 	movl   %eax, %ecx
 	shrl   $1, %ecx
-	EXTERN(x86_syscall_register_count)
-	movb   x86_syscall_register_count(,%ecx,1), %cl
+	EXTERN(kernel_syscall0_regcnt)
+	movb   kernel_syscall0_regcnt(,%ecx,1), %cl
 	jmp   .Lgot_mask
-1:	subl   $(__NR_exsyscall_min), %eax
+1:	subl   $(__NR_syscall1_min), %eax
 	jb    .Lgot_sysenter_args
-	cmpl   $(__NR_exsyscall_max - __NR_exsyscall_min), %eax
+	cmpl   $(__NR_syscall1_max - __NR_syscall1_min), %eax
 	ja    .Lgot_sysenter_args
 	movl   %eax, %ecx
 	shrl   $1, %ecx
-	EXTERN(x86_exsyscall_register_count)
-	movb   x86_exsyscall_register_count(,%ecx,1), %cl
+	EXTERN(kernel_syscall1_regcnt)
+	movb   kernel_syscall1_regcnt(,%ecx,1), %cl
 .Lgot_mask:
 	testl  $1, %eax
 	jz     1f
@@ -492,14 +490,14 @@ INTERN_FUNCTION(x86_sysenter_main_traced)
 
 	popfl_cfi_r
 
-	cmpl   $(__NR_syscall_max), %eax
+	cmpl   $(__NR_syscall0_max), %eax
 	ja     1f
-	jmpl   *%ss:__asm32_syscallrouter_sysenter(,%eax,4)
-1:	cmpl   $(__NR_exsyscall_min), %eax
-	jb     __asm32_sysenter_invalid
-	cmpl   $(__NR_exsyscall_max), %eax
-	ja     __asm32_sysenter_invalid
-	jmpl   *%ss:__asm32_exsyscallrouter_sysenter - ((__NR_exsyscall_min * 4) & 0xffffffff)(,%eax,4)
+	jmpl   *%ss:x86_sysroute0_asm32_sysenter(,%eax,4)
+1:	cmpl   $(__NR_syscall1_min), %eax
+	jb     __x86_asm32_sysenter_break
+	cmpl   $(__NR_syscall1_max), %eax
+	ja     __x86_asm32_sysenter_break
+	jmpl   *%ss:x86_sysroute1_asm32_sysenter - ((__NR_syscall1_min * 4) & 0xffffffff)(,%eax,4)
 	.cfi_restore_state
 .Lbad_args_pointer:
 	popl_cfi_r %eax /* SYSNO */
@@ -566,14 +564,14 @@ INTERN_FUNCTION(x86_idt_syscall_traced)
 
 	popfl_cfi_r
 
-	cmpl   $(__NR_syscall_max), %eax
+	cmpl   $(__NR_syscall0_max), %eax
 	ja     1f
-	jmpl   *%ss:__asm32_syscallrouter_int80(,%eax,4)
-1:	cmpl   $(__NR_exsyscall_min), %eax
-	jb     __asm32_int80_invalid
-	cmpl   $(__NR_exsyscall_max), %eax
-	ja     __asm32_int80_invalid
-	jmpl   *%ss:__asm32_exsyscallrouter_int80 - ((__NR_exsyscall_min * 4) & 0xffffffff)(,%eax,4)
+	jmpl   *%ss:x86_sysroute0_asm32_int80(,%eax,4)
+1:	cmpl   $(__NR_syscall1_min), %eax
+	jb     __x86_asm32_int80_break
+	cmpl   $(__NR_syscall1_max), %eax
+	ja     __x86_asm32_int80_break
+	jmpl   *%ss:x86_sysroute1_asm32_int80 - ((__NR_syscall1_min * 4) & 0xffffffff)(,%eax,4)
 	.cfi_endproc
 END(x86_idt_syscall_traced)
 #endif /* !CONFIG_NO_SYSCALL_TRACING */
@@ -599,7 +597,7 @@ INTERN_FUNCTION(__asm32_bad_sysenter_extension)
 	.cfi_restore_iret_ds_or_offset -12
 
 	/* Check IRET.EFLAGS.CF if an exception should be thrown */
-	testl  $EFLAGS_CF, %ss:12 + OFFSET_IRREGS_EFLAGS(%esp)
+	testl  $(EFLAGS_CF), %ss:12 + OFFSET_IRREGS_EFLAGS(%esp)
 	jnz    1f
 
 	/* Check if we must sign-extend the error return value. */
@@ -644,7 +642,7 @@ END(__asm32_bad_sysenter_extension)
 
 
 .section .text.cold
-INTERN_FUNCTION(__asm32_int80_invalid)
+INTERN_FUNCTION(__x86_asm32_int80_break)
 	/* For `int 80h' system calls:
 	 *   Called when a system call number hasn't been assigned (%eax:sysno) */
 	.cfi_startproc simple
@@ -654,7 +652,7 @@ INTERN_FUNCTION(__asm32_int80_invalid)
 	.cfi_def_cfa %esp, 0
 
 	/* Check IRET.EFLAGS.CF if an exception should be thrown */
-	testl  $EFLAGS_CF, %ss:OFFSET_IRREGS_EFLAGS(%esp)
+	testl  $(EFLAGS_CF), %ss:OFFSET_IRREGS_EFLAGS(%esp)
 	jnz    1f
 	movl   $-ENOSYS, %eax
 	iret
@@ -685,7 +683,7 @@ INTERN_FUNCTION(__asm32_int80_invalid)
 	pushl_cfi $ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)
 	call   error_thrown
 	.cfi_endproc
-END(__asm32_int80_invalid)
+END(__x86_asm32_int80_break)
 
 
 .section .text.cold
@@ -712,7 +710,7 @@ PRIVATE_FUNCTION(copy_extended_user_arguments)
 END(copy_extended_user_arguments)
 
 .section .text.cold
-INTERN_FUNCTION(__asm32_sysenter_invalid)
+INTERN_FUNCTION(__x86_asm32_sysenter_break)
 	/* For `sysenter' system calls:
 	 *   Called when a system call number hasn't been assigned (%eax:sysno) */
 	.cfi_startproc simple
@@ -721,7 +719,7 @@ INTERN_FUNCTION(__asm32_sysenter_invalid)
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	/* Check IRET.EFLAGS.CF if an exception should be thrown */
-	testl  $EFLAGS_CF, %ss:OFFSET_IRREGS_EFLAGS(%esp)
+	testl  $(EFLAGS_CF), %ss:OFFSET_IRREGS_EFLAGS(%esp)
 	jnz    1f
 	movl   $-ENOSYS, %eax
 	iret
@@ -755,7 +753,7 @@ INTERN_FUNCTION(__asm32_sysenter_invalid)
 	pushl_cfi $ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)
 	call   error_thrown
 	.cfi_endproc
-END(__asm32_sysenter_invalid)
+END(__x86_asm32_sysenter_break)
 
 
 
@@ -801,5 +799,18 @@ INTERN_FUNCTION(sys_invalid6)
 END(sys_invalid6)
 .cfi_endproc
 
-#include "unimplemented32.c.inl"
+
+#ifndef __NR32FEAT_DEFINED_SYSCALL_REGISTER_COUNT
+#undef __WANT_SYSCALL_REGISTER_COUNT
+#define __WANT_SYSCALL_REGISTER_COUNT 1
+#include <asm/syscalls32_d.h>
+#endif /* !__NR32FEAT_DEFINED_SYSCALL_REGISTER_COUNT */
+
+/* Define all unimplemented system calls as weak aliases
+ * of `sys_invalidN', where N is the register count */
+#define __SYSINVALID_OF2(register_count) sys_invalid##register_count
+#define __SYSINVALID_OF(register_count) __SYSINVALID_OF2(register_count)
+#define __SYSCALL(name) \
+	DEFINE_PUBLIC_WEAK_ALIAS(sys_##name, __SYSINVALID_OF(__NR32RC_##name))
+#include <asm/ls-syscalls32.h>
 

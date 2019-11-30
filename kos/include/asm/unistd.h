@@ -19,4 +19,6 @@
 #ifndef _ASM_UNISTD_H
 #define _ASM_UNISTD_H 1
 
+#include <asm/syscalls.h>
+
 #endif /* !_ASM_UNISTD_H */

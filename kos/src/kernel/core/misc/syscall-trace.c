@@ -46,6 +46,7 @@
 #include <sys/socket.h>        /* SHUT_*, SOL_*, SOCK_*, MSG_* */
 #include <sys/swap.h>          /* SWAP_FLAG_* */
 #include <sys/syscall-trace.h> /* SYSCALL_TRACE_* */
+#include <sys/syscall.h>       /* SYS_* */
 #include <sys/wait.h>          /* W* */
 
 #include <fcntl.h>          /* O_* */
@@ -108,15 +109,15 @@ syscall_printtrace(pformatprinter printer, void *arg,
 		                     arg,                                        \
 		                     #name "(" SYSCALL_TRACE_ARGS_FORMAT_L(name) \
 		                     SYSCALL_TRACE_ARGS_ARGS(name,               \
-		                         (__NRAM_##name(args->ta_arg0,           \
-		                                        args->ta_arg1,           \
-		                                        args->ta_arg2,           \
-		                                        args->ta_arg3,           \
-		                                        args->ta_arg4,           \
-		                                        args->ta_arg5))          \
+		                         (__NRAM_##name(args->ta_args[0],        \
+		                                        args->ta_args[1],        \
+		                                        args->ta_args[2],        \
+		                                        args->ta_args[3],        \
+		                                        args->ta_args[4],        \
+		                                        args->ta_args[5]))       \
 		                     ));                                         \
 		break;
-#include <asm/ls_syscalls.h>
+#include <asm/ls-syscalls.h>
 #undef __SYSCALL
 
 	default:
@@ -167,12 +168,12 @@ syscall_printtrace_compat(pformatprinter printer, void *arg,
 		                     arg,                                                 \
 		                     #name "(" COMPAT_SYSCALL(_TRACE_ARGS_FORMAT_L)(name) \
 		                     COMPAT_SYSCALL(_TRACE_ARGS_ARGS)(name,               \
-		                         (COMPAT_NR(AM_##name)(args->ta_arg0,             \
-		                                               args->ta_arg1,             \
-		                                               args->ta_arg2,             \
-		                                               args->ta_arg3,             \
-		                                               args->ta_arg4,             \
-		                                               args->ta_arg5))            \
+		                         (COMPAT_NR(AM_##name)(args->ta_args[0],          \
+		                                               args->ta_args[1],          \
+		                                               args->ta_args[2],          \
+		                                               args->ta_args[3],          \
+		                                               args->ta_args[4],          \
+		                                               args->ta_args[5]))         \
 		                     ));                                                  \
 		break;
 #include COMPAT_LS_SYSCALLS

@@ -19,21 +19,29 @@
 #ifndef _SYS_SYSCALL_TRACE_H
 #define _SYS_SYSCALL_TRACE_H 1
 
-/* If <sym/unistd.h> was already included, reset its guard
- * if we didn't get everything we needed the previous time. */
-#ifdef _ASM_UNISTD_H
-#if !defined(__WANT_SYSCALL_ARGUMENT_COUNT) || \
-    !defined(__WANT_SYSCALL_ARGUMENT_FORMAT) || \
-    !defined(__WANT_SYSCALL_ARGUMENT_NAMES)
-#undef _ASM_UNISTD_H
-#endif /* !... */
-#endif /* _ASM_UNISTD_H */
+#include <__stdinc.h>
+
+#ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT
+#undef __WANT_SYSCALL_ARGUMENT_COUNT
 #define __WANT_SYSCALL_ARGUMENT_COUNT  1
+#include <asm/syscalls-proto.h>
+#endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT */
+
+#if !defined(__NRFEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT) || \
+    !defined(__NRFEAT_DEFINED_SYSCALL_ARGUMENT_NAMES)
+#undef __WANT_SYSCALL_ARGUMENT_FORMAT
+#undef __WANT_SYSCALL_ARGUMENT_NAMES
 #define __WANT_SYSCALL_ARGUMENT_FORMAT 1
 #define __WANT_SYSCALL_ARGUMENT_NAMES  1
+#include <asm/syscalls-trace.h>
+#endif /* !... */
 
-#include <asm/unistd.h>
-#include <bits/syscall.h>
+#ifndef __NRFEAT_SYSCALL_TABLE_COUNT
+#include <asm/syscalls.h>
+#endif /* !__NRFEAT_SYSCALL_TABLE_COUNT */
+
+#define __PRIVATE_SYSCALL_TRACE_STR2(name) #name
+#define __PRIVATE_SYSCALL_TRACE_STR(name) __PRIVATE_SYSCALL_TRACE_STR2(name)
 
 #define __PRIVATE_SYSCALL_TRACE_FORMAT_0(name)      ""
 #define __PRIVATE_SYSCALL_TRACE_FORMAT_1(name)      __NRATRF0_##name
@@ -46,12 +54,12 @@
 #define __PRIVATE_SYSCALL_TRACE_FORMAT(name, argc)  __PRIVATE_SYSCALL_TRACE_FORMAT2(name, argc)
 
 #define __PRIVATE_SYSCALL_TRACE_LFORMAT_0(name)      ""
-#define __PRIVATE_SYSCALL_TRACE_LFORMAT_1(name)      __NRAN0_##name ": " __NRATRF0_##name
-#define __PRIVATE_SYSCALL_TRACE_LFORMAT_2(name)      __PRIVATE_SYSCALL_TRACE_LFORMAT_1(name) ", " __NRAN1_##name ": " __NRATRF1_##name
-#define __PRIVATE_SYSCALL_TRACE_LFORMAT_3(name)      __PRIVATE_SYSCALL_TRACE_LFORMAT_2(name) ", " __NRAN2_##name ": " __NRATRF2_##name
-#define __PRIVATE_SYSCALL_TRACE_LFORMAT_4(name)      __PRIVATE_SYSCALL_TRACE_LFORMAT_3(name) ", " __NRAN3_##name ": " __NRATRF3_##name
-#define __PRIVATE_SYSCALL_TRACE_LFORMAT_5(name)      __PRIVATE_SYSCALL_TRACE_LFORMAT_4(name) ", " __NRAN4_##name ": " __NRATRF4_##name
-#define __PRIVATE_SYSCALL_TRACE_LFORMAT_6(name)      __PRIVATE_SYSCALL_TRACE_LFORMAT_5(name) ", " __NRAN5_##name ": " __NRATRF5_##name
+#define __PRIVATE_SYSCALL_TRACE_LFORMAT_1(name)      __PRIVATE_SYSCALL_TRACE_STR(__NRAN0_##name) ": " __NRATRF0_##name
+#define __PRIVATE_SYSCALL_TRACE_LFORMAT_2(name)      __PRIVATE_SYSCALL_TRACE_LFORMAT_1(name) ", " __PRIVATE_SYSCALL_TRACE_STR(__NRAN1_##name) ": " __NRATRF1_##name
+#define __PRIVATE_SYSCALL_TRACE_LFORMAT_3(name)      __PRIVATE_SYSCALL_TRACE_LFORMAT_2(name) ", " __PRIVATE_SYSCALL_TRACE_STR(__NRAN2_##name) ": " __NRATRF2_##name
+#define __PRIVATE_SYSCALL_TRACE_LFORMAT_4(name)      __PRIVATE_SYSCALL_TRACE_LFORMAT_3(name) ", " __PRIVATE_SYSCALL_TRACE_STR(__NRAN3_##name) ": " __NRATRF3_##name
+#define __PRIVATE_SYSCALL_TRACE_LFORMAT_5(name)      __PRIVATE_SYSCALL_TRACE_LFORMAT_4(name) ", " __PRIVATE_SYSCALL_TRACE_STR(__NRAN4_##name) ": " __NRATRF4_##name
+#define __PRIVATE_SYSCALL_TRACE_LFORMAT_6(name)      __PRIVATE_SYSCALL_TRACE_LFORMAT_5(name) ", " __PRIVATE_SYSCALL_TRACE_STR(__NRAN5_##name) ": " __NRATRF5_##name
 #define __PRIVATE_SYSCALL_TRACE_LFORMAT2(name, argc) __PRIVATE_SYSCALL_TRACE_LFORMAT_##argc(name)
 #define __PRIVATE_SYSCALL_TRACE_LFORMAT(name, argc)  __PRIVATE_SYSCALL_TRACE_LFORMAT2(name, argc)
 
@@ -76,8 +84,8 @@
  * comma, meaning a fully correct operation then looks like this:
  * >> printf("sys_open(" SYSCALL_TRACE_ARGS_FORMAT_L(open) ")\n"
  * >>        SYSCALL_TRACE_ARGS_ARGS(open,(get_filename(),
- * >>                                      get_oflags(),
- * >>                                      get_mode()))
+ * >>                                        get_oflags(),
+ * >>                                        get_mode()))
  * >>        );
  */
 #define SYSCALL_TRACE_ARGS_FORMAT(name)     __PRIVATE_SYSCALL_TRACE_FORMAT(name, __NRAC_##name)

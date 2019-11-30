@@ -193,7 +193,12 @@ done_procfs:
 			/* Become the foreground process of /dev/console */
 			console_set_fgproc();
 			execle("/bin/busybox", "bash", (char *)NULL, init_envp);
-			Execle("/bin/sh", "sh", (char *)NULL, init_envp);
+			execle("/bin/sh", "sh", (char *)NULL, init_envp);
+			dprintf(STDOUT_FILENO, "Failed to launch shell: %s\n", strerror(errno));
+			for (;;) {
+				char buf[1];
+				read(STDIN_FILENO, buf, sizeof(buf));
+			}
 		}
 
 		/* Wait for the user-shell to die. */

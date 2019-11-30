@@ -131,7 +131,7 @@ DEFINE_SYSCALL2(ssize_t, getcwd,
 
 DEFINE_SYSCALL5(errno_t, fmknodat, fd_t, dirfd,
                 USER UNCHECKED char const *, nodename,
-                mode_t, mode, dev_t, dev, atflag_t, flags) {
+                mode_t, mode, __dev_t, dev, atflag_t, flags) {
 	char const *last_seg;
 	u16 last_seglen;
 	struct fs *f = THIS_FS;
@@ -175,7 +175,7 @@ DEFINE_SYSCALL5(errno_t, fmknodat, fd_t, dirfd,
 		                              mode,
 		                              fs_getuid(f),
 		                              fs_getgid(f),
-		                              dev,
+		                              (dev_t)dev,
 		                              fsmode & FS_MODE_FDOSPATH ? DIRECTORY_MKNOD_FNOCASE
 		                                                        : DIRECTORY_MKNOD_FNORMAL,
 		                              NULL);
@@ -186,14 +186,14 @@ DEFINE_SYSCALL5(errno_t, fmknodat, fd_t, dirfd,
 
 DEFINE_SYSCALL4(errno_t, mknodat, fd_t, dirfd,
                 USER UNCHECKED char const *, nodename,
-                mode_t, mode, dev_t, dev) {
-	return sys_fmknodat(dirfd, nodename, mode, (__dev_t)dev, 0);
+                mode_t, mode, __dev_t, dev) {
+	return sys_fmknodat(dirfd, nodename, mode, dev, 0);
 }
 
 DEFINE_SYSCALL3(errno_t, mknod,
                 USER UNCHECKED char const *, nodename,
-                mode_t, mode, dev_t, dev) {
-	return sys_fmknodat(AT_FDCWD, nodename, mode, (__dev_t)dev, 0);
+                mode_t, mode, __dev_t, dev) {
+	return sys_fmknodat(AT_FDCWD, nodename, mode, dev, 0);
 }
 
 
@@ -3136,10 +3136,10 @@ kernel_execveat(struct icpustate *__restrict state,
 
 
 PRIVATE struct icpustate *FCALL
-syscall_execvat_rpc(void *UNUSED(arg),
-                    struct icpustate *__restrict state,
-                    unsigned int reason,
-                    struct rpc_syscall_info const *sc_info) {
+syscall_execveat_rpc(void *UNUSED(arg),
+                     struct icpustate *__restrict state,
+                     unsigned int reason,
+                     struct rpc_syscall_info const *sc_info) {
 	if (reason == TASK_RPC_REASON_SYSCALL) {
 		/* Actually service the exec() system call. */
 		state = kernel_execveat(state,
@@ -3165,7 +3165,7 @@ DEFINE_SYSCALL5(errno_t, execveat, fd_t, dirfd,
 	(void)flags;
 	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
 	task_schedule_user_rpc(THIS_TASK,
-	                       &syscall_execvat_rpc,
+	                       &syscall_execveat_rpc,
 	                       NULL,
 	                       TASK_RPC_FHIGHPRIO |
 	                       TASK_USER_RPC_FINTR,
@@ -3175,11 +3175,41 @@ DEFINE_SYSCALL5(errno_t, execveat, fd_t, dirfd,
 	return -EOK;
 }
 
+PRIVATE struct icpustate *FCALL
+syscall_execve_rpc(void *UNUSED(arg),
+                   struct icpustate *__restrict state,
+                   unsigned int reason,
+                   struct rpc_syscall_info const *sc_info) {
+	if (reason == TASK_RPC_REASON_SYSCALL) {
+		/* Actually service the exec() system call. */
+		state = kernel_execveat(state,
+		                        AT_FDCWD,
+		                        (USER UNCHECKED char const *)sc_info->rsi_args[0],
+		                        (USER UNCHECKED char const *USER UNCHECKED const *)sc_info->rsi_args[1],
+		                        (USER UNCHECKED char const *USER UNCHECKED const *)sc_info->rsi_args[2],
+		                        0);
+	}
+	return state;
+}
+
+
 DEFINE_SYSCALL3(errno_t, execve,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED char const *USER UNCHECKED const *, argv,
                 USER UNCHECKED char const *USER UNCHECKED const *, envp) {
-	return sys_execveat(AT_FDCWD, filename, argv, envp, 0);
+	(void)filename;
+	(void)argv;
+	(void)envp;
+	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
+	task_schedule_user_rpc(THIS_TASK,
+	                       &syscall_execve_rpc,
+	                       NULL,
+	                       TASK_RPC_FHIGHPRIO |
+	                       TASK_USER_RPC_FINTR,
+	                       NULL,
+	                       GFP_NORMAL);
+	/* Shouldn't get here... */
+	return -EOK;
 }
 
 DEFINE_SYSCALL0(syscall_slong_t, getdrives) {

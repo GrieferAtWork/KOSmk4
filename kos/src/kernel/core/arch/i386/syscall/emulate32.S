@@ -31,18 +31,18 @@
 
 
 #define TEST_DOUBLE_WIDE(sysno_reg, tempreg_l, tempreg_b, segment_prefix)        \
-	cmpl   $(__NR_syscall_max), sysno_reg;                                       \
+	cmpl   $(__NR_syscall0_max), sysno_reg;                                       \
 	ja     1234f;                                                                \
 	movl   sysno_reg, tempreg_l;                                                 \
 	shrl   $1, tempreg_l;                                                        \
-	EXTERN(x86_syscall_register_count);                                          \
-	movb   segment_prefix x86_syscall_register_count(,tempreg_l,1), tempreg_b;   \
+	EXTERN(kernel_syscall0_regcnt);                                          \
+	movb   segment_prefix kernel_syscall0_regcnt(,tempreg_l,1), tempreg_b;   \
 	jmp    1235f;                                                                \
 1234:                                                                            \
-	leal   -__NR_exsyscall_min(sysno_reg), tempreg_l;                            \
+	leal   -__NR_syscall1_min(sysno_reg), tempreg_l;                            \
 	shrl   $1, tempreg_l;                                                        \
-	EXTERN(x86_exsyscall_register_count);                                        \
-	movb   segment_prefix x86_exsyscall_register_count(,tempreg_l,1), tempreg_b; \
+	EXTERN(kernel_syscall1_regcnt);                                        \
+	movb   segment_prefix kernel_syscall1_regcnt(,tempreg_l,1), tempreg_b; \
 1235:                                                                            \
 	testl  $1, sysno_reg;                                                        \
 	jz     1234f;                                                                \
@@ -107,11 +107,11 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 	pushl_cfi ((5*4)+OFFSET_RPC_SYSCALL_INFO_ARG(1))(%esp)
 	pushl_cfi ((6*4)+OFFSET_RPC_SYSCALL_INFO_ARG(0))(%esp)
 
-	cmpl   $(__NR_syscall_max), %eax
+	cmpl   $(__NR_syscall0_max), %eax
 	ja     .Lcall_sysex
 	pushl_cfi $.Lnormal_return
-	EXTERN(__c32_syscallrouter)
-	jmpl   *__c32_syscallrouter(,%eax,4)
+	EXTERN(x86_sysroute0_c)
+	jmpl   *x86_sysroute0_c(,%eax,4)
 	.cfi_adjust_cfa_offset -4
 .Lbad_sysno:
 	/* %eax is a system call number that doesn't exist. */
@@ -133,12 +133,12 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 	jmp    .Lnormal_return
 
 .Lcall_sysex:
-	cmpl   $(__NR_exsyscall_min), %eax
+	cmpl   $(__NR_syscall1_min), %eax
 	jb     .Lbad_sysno
-	cmpl   $(__NR_exsyscall_max), %eax
+	cmpl   $(__NR_syscall1_max), %eax
 	ja     .Lbad_sysno
-	EXTERN(__c32_exsyscallrouter)
-	calll  *(__c32_exsyscallrouter - ((__NR_exsyscall_min * 4) & 0xffffffff))(,%eax,4)
+	EXTERN(x86_sysroute1_c)
+	calll  *(x86_sysroute1_c - ((__NR_syscall1_min * 4) & 0xffffffff))(,%eax,4)
 .Lnormal_return:
 
 

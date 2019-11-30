@@ -19,6 +19,8 @@
 #ifndef GUARD_APPS_SYSTEM_TEST_TEST_IOPERM_C
 #define GUARD_APPS_SYSTEM_TEST_TEST_IOPERM_C 1
 #define _KOS_SOURCE 1
+#define __CRT_HAVE_iopl 1 /* TODO: Remove me */
+#define __CRT_HAVE_ioperm 1 /* TODO: Remove me */
 
 #include <hybrid/compiler.h>
 

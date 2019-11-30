@@ -68,11 +68,12 @@ function runGenerateErrors(xarch_path: string): (string, ipc.Process) | none {
 	);
 }
 
-function runGenerateSyscalls(xarch_path: string): (string, ipc.Process) | none {
+function runGenerateSyscalls(xarch_path: string, targetSuffix: string): (string, ipc.Process) | none {
 	return doRunDeemonScriptIfFilesAreOutOfDate(
 		script: "kos/misc/magicgenerator/generate_syscalls.dee",
 		inputs: {
-			xarch_path + "/asm/syscalls.def",
+			"kos/include/asm/syscalls.def",
+			"{}/asm/syscalls{}.def".format({ xarch_path, targetSuffix }),
 		}
 	);
 }
@@ -84,7 +85,8 @@ function runGenerateHeaders(): (string, ipc.Process) | none {
 	);
 }
 
-function updateAutomaticSourcesOnDemand(TARGET_XARCH: string, TARGET_ARCH: string, TARGET_POINTER_SIZE: int) {
+function updateAutomaticSourcesOnDemand(
+		TARGET_XARCH: string, TARGET_ARCH: string, TARGET_POINTER_SIZE: int) {
 	local autoScripts: {(string, ipc.Process)...} = [];
 	function collect(x: (string, ipc.Process) | none) {
 		if (x !is none)
@@ -93,7 +95,7 @@ function updateAutomaticSourcesOnDemand(TARGET_XARCH: string, TARGET_ARCH: strin
 	local xarch_path = "kos/include/{}-kos".format({ TARGET_XARCH });
 
 	collect(runGenerateErrors(xarch_path));
-	collect(runGenerateSyscalls(xarch_path));
+	collect(runGenerateSyscalls(xarch_path, str(TARGET_POINTER_SIZE * 8)));
 	collect(runGenerateHeaders());
 
 	while (autoScripts) {

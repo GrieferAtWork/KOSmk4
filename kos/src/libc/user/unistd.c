@@ -1906,6 +1906,10 @@ NOTHROW_NCX(LIBCCALL libc_profil)(unsigned short int *sample_buffer,
 	                    (syscall_ulong_t)scale);
 	return libc_seterrno_syserr(result);
 #else /* __NR_profil */
+	(void)sample_buffer;
+	(void)size;
+	(void)offset;
+	(void)scale;
 	libc_seterrno(ENOSYS);
 	return -1;
 #endif /* !__NR_profil */
