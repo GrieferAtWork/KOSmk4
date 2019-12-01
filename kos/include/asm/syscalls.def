@@ -22,12 +22,12 @@
 
 
 /* Syscall definition syntax
- * >> sysno:name[:sys_name=name]
+ * >> sysno:name
  * This is used as:
- * >> #define __NR_<name>     <sysno>     // In <asm/unistd.h>
- * >> #define SYS_<sys_name>  __NR_<name> // In <sys/syscall.h>
- * >> DEFINE_SYSCALLn(int, <name>, ...)   // Somewhere in kernel-space
- * >> int <name>(...);                    // In <kos/syscalls.h>
+ * >> #define __NR_<name>  <sysno>      // In <asm/unistd.h>
+ * >> #define SYS_<name>   __NR_<name>  // In <sys/syscall.h>
+ * >> DEFINE_SYSCALLn(int, <name>, ...) // Somewhere in kernel-space
+ * >> int <name>(...);                  // In <kos/syscalls.h>
  */
 
 %[typeorg(<hybrid/typecore.h>: __UINT8_TYPE__, __INT8_TYPE__)]
