@@ -20,28 +20,142 @@
 #include <hybrid/compiler.h>
 
 #include <kernel/except.h>
-#include <kernel/paging.h>
-#include <kernel/syscall.h>
-#include <sched/rpc.h>
 
 #include <asm/cfi.h>
-#include <asm/cpu-flags.h>
-#include <asm/cpu-msr.h>
 #include <asm/unistd.h>
-#include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
 
 #include <errno.h>
-#include <fcntl.h>
-#include <syscall.h>
 
 #include <librpc/rpc.h>
 
-EXTERN(__x86_asm32_int80_break)
-EXTERN(x86_sysroute0_asm32_int80)
-EXTERN(x86_sysroute1_asm32_int80)
 
 
+
+
+
+
+
+/************************************************************************/
+/* INT 80H ENTRY                                                        */
+/************************************************************************/
+.section .text.hot
+INTERN_CONST(__x86_idtdpl_syscall, 3)
+PUBLIC_FUNCTION(x86_idt_syscall)
+	.cfi_startproc simple
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	cmpl   $(__NR_syscall0_max), %eax
+	ja     1f
+	EXTERN(x86_sysroute0_asm32_int80)
+	jmpl   *%ss:x86_sysroute0_asm32_int80(,%eax,4)
+1:	cmpl   $(__NR_syscall1_min), %eax
+	EXTERN(__x86_asm32_int80_break)
+	jb     __x86_asm32_int80_break
+	cmpl   $(__NR_syscall1_max), %eax
+	ja     __x86_asm32_int80_break
+	EXTERN(x86_sysroute1_asm32_int80)
+	jmpl   *%ss:(x86_sysroute1_asm32_int80 - ((__NR_syscall1_min * 4) & 0xffffffff))(,%eax,4)
+	.cfi_endproc
+END(x86_idt_syscall)
+
+
+
+
+
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* INT 80H TRACED ENTRY                                                 */
+/************************************************************************/
+#ifndef CONFIG_NO_SYSCALL_TRACING
+.section .text.hot
+PUBLIC_FUNCTION(x86_idt_syscall_traced)
+	.cfi_startproc simple
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	/* Trace this system call invocation! */
+	pushfl_cfi_r
+
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -8
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -12
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -16
+
+	pushl_cfi_r %ebp /* ARG[5] */
+	pushl_cfi_r %edi /* ARG[4] */
+	pushl_cfi_r %esi /* ARG[3] */
+	pushl_cfi_r %edx /* ARG[2] */
+	pushl_cfi_r %ecx /* ARG[1] */
+	pushl_cfi_r %ebx /* ARG[0] */
+	pushl_cfi_r %eax /* SYSNO */
+
+	/* Load kernel segments. */
+	movl   $(SEGMENT_USER_DATA_RPL), %eax
+	movl   %eax, %ds
+	movl   %eax, %es
+	movl   $(SEGMENT_KERNEL_FSBASE), %eax
+	movl   %eax, %fs
+
+	movl   %esp, %ecx
+	EXTERN(syscall_trace)
+	call   syscall_trace
+
+	popl_cfi_r %eax /* SYSNO */
+	popl_cfi_r %ebx /* ARG[0] */
+	popl_cfi_r %ecx /* ARG[1] */
+	popl_cfi_r %edx /* ARG[2] */
+	popl_cfi_r %esi /* ARG[3] */
+	popl_cfi_r %edi /* ARG[4] */
+	popl_cfi_r %ebp /* ARG[5] */
+
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+
+	popfl_cfi_r
+
+	cmpl   $(__NR_syscall0_max), %eax
+	ja     1f
+	EXTERN(x86_sysroute0_asm32_int80)
+	jmpl   *%ss:x86_sysroute0_asm32_int80(,%eax,4)
+1:	cmpl   $(__NR_syscall1_min), %eax
+	EXTERN(__x86_asm32_int80_break)
+	jb     __x86_asm32_int80_break
+	cmpl   $(__NR_syscall1_max), %eax
+	ja     __x86_asm32_int80_break
+	EXTERN(x86_sysroute1_asm32_int80)
+	jmpl   *%ss:x86_sysroute1_asm32_int80 - ((__NR_syscall1_min * 4) & 0xffffffff)(,%eax,4)
+	.cfi_endproc
+END(x86_idt_syscall_traced)
+#endif /* !CONFIG_NO_SYSCALL_TRACING */
+
+
+
+
+
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* INT 80H EMULATION ENTRY                                              */
+/************************************************************************/
 .section .text
 PUBLIC_FUNCTION(x86_syscall_emulate_int80h_r)
 	.cfi_startproc simple
@@ -84,95 +198,13 @@ PUBLIC_FUNCTION(x86_syscall_emulate_int80h_r)
 #ifndef CONFIG_NO_SYSCALL_TRACING
 	EXTERN(syscall_tracing_enabled)
 	cmpb   $0, %ss:syscall_tracing_enabled
+	EXTERN(x86_idt_syscall_traced)
 	jne    x86_idt_syscall_traced /* With tracing enabled... */
 #endif /* !CONFIG_NO_SYSCALL_TRACING */
+	EXTERN(x86_idt_syscall)
 	jmp    x86_idt_syscall
 	.cfi_endproc
 END(x86_syscall_emulate_int80h_r)
-
-
-
-
-.section .text.hot
-INTERN_CONST(__x86_idtdpl_syscall, 3)
-INTERN_FUNCTION(x86_idt_syscall)
-	.cfi_startproc simple
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	cmpl   $(__NR_syscall0_max), %eax
-	ja     1f
-	jmpl   *%ss:x86_sysroute0_asm32_int80(,%eax,4)
-1:	cmpl   $(__NR_syscall1_min), %eax
-	jb     __x86_asm32_int80_break
-	cmpl   $(__NR_syscall1_max), %eax
-	ja     __x86_asm32_int80_break
-	jmpl   *%ss:(x86_sysroute1_asm32_int80 - ((__NR_syscall1_min * 4) & 0xffffffff))(,%eax,4)
-	.cfi_endproc
-END(x86_idt_syscall)
-
-
-#ifndef CONFIG_NO_SYSCALL_TRACING
-.section .text.hot
-INTERN_FUNCTION(x86_idt_syscall_traced)
-	.cfi_startproc simple
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	/* Trace this system call invocation! */
-	pushfl_cfi_r
-
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -8
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -12
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -16
-
-	pushl_cfi_r %ebp /* ARG[5] */
-	pushl_cfi_r %edi /* ARG[4] */
-	pushl_cfi_r %esi /* ARG[3] */
-	pushl_cfi_r %edx /* ARG[2] */
-	pushl_cfi_r %ecx /* ARG[1] */
-	pushl_cfi_r %ebx /* ARG[0] */
-	pushl_cfi_r %eax /* SYSNO */
-
-	/* Load kernel segments. */
-	movl   $(SEGMENT_USER_DATA_RPL), %eax
-	movl   %eax, %ds
-	movl   %eax, %es
-	movl   $(SEGMENT_KERNEL_FSBASE), %eax
-	movl   %eax, %fs
-
-	movl   %esp, %ecx
-	call   syscall_trace
-
-	popl_cfi_r %eax /* SYSNO */
-	popl_cfi_r %ebx /* ARG[0] */
-	popl_cfi_r %ecx /* ARG[1] */
-	popl_cfi_r %edx /* ARG[2] */
-	popl_cfi_r %esi /* ARG[3] */
-	popl_cfi_r %edi /* ARG[4] */
-	popl_cfi_r %ebp /* ARG[5] */
-
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-
-	popfl_cfi_r
-
-	cmpl   $(__NR_syscall0_max), %eax
-	ja     1f
-	jmpl   *%ss:x86_sysroute0_asm32_int80(,%eax,4)
-1:	cmpl   $(__NR_syscall1_min), %eax
-	jb     __x86_asm32_int80_break
-	cmpl   $(__NR_syscall1_max), %eax
-	ja     __x86_asm32_int80_break
-	jmpl   *%ss:x86_sysroute1_asm32_int80 - ((__NR_syscall1_min * 4) & 0xffffffff)(,%eax,4)
-	.cfi_endproc
-END(x86_idt_syscall_traced)
-#endif /* !CONFIG_NO_SYSCALL_TRACING */
 
 
 .section .text.cold
@@ -219,75 +251,11 @@ INTERN_FUNCTION(__x86_asm32_int80_break)
 	            RPC_SYSCALL_INFO_FARGVALID(4) | RPC_SYSCALL_INFO_FARGVALID(5))
 	pushl_cfi $(8)
 	pushl_cfi $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL))
+	EXTERN(error_thrown)
 	call   error_thrown
 	.cfi_endproc
 END(__x86_asm32_int80_break)
 
 
-.section .text.cold
-#define SYS_INVALID_ENCODE_COUNT(count) (count+2)
 
-/* Called when a system call is recognized, but hasn't been implemented yet */
-INTERN_FUNCTION(sys_invalid0)
-	.cfi_startproc
-	movl   $(SYS_INVALID_ENCODE_COUNT(0)), %ecx
-.Lsys_invalid_common:
-	xchgl  0(%esp), %eax
-	.cfi_register %eip, %eax
-	pushl_cfi $(0) /* flags (filled in later) */
-	pushl_cfi %ecx /* argc */
-	/* *(u32 *)(ESP + 4) = (RPC_SYSCALL_INFO_METHOD_OTHER_32 | RPC_SYSCALL_INFO_FEXCEPT |
-	 *                      ((1 << (%ecx - 2)) - 1) << RPC_SYSCALL_INFO_FARGVALID_SHIFT); */
-	subl   $(2), %ecx
-	movl   $1, %edx
-	shll   %cl, %edx
-	decl   %edx
-	shll   $(RPC_SYSCALL_INFO_FARGVALID_SHIFT), %edx
-	orl    $(RPC_SYSCALL_INFO_METHOD_OTHER_32 | RPC_SYSCALL_INFO_FEXCEPT), %edx
-	movl   %edx, 4(%esp) /* flags */
-	pushl_cfi $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL))
-	call   error_thrown
-	.cfi_endproc
-END(sys_invalid0)
-.cfi_startproc
-INTERN_FUNCTION(sys_invalid1)
-	movl   $(SYS_INVALID_ENCODE_COUNT(1)), %ecx
-	jmp    .Lsys_invalid_common
-END(sys_invalid1)
-INTERN_FUNCTION(sys_invalid2)
-	movl   $(SYS_INVALID_ENCODE_COUNT(2)), %ecx
-	jmp    .Lsys_invalid_common
-END(sys_invalid2)
-INTERN_FUNCTION(sys_invalid3)
-	movl   $(SYS_INVALID_ENCODE_COUNT(3)), %ecx
-	jmp    .Lsys_invalid_common
-END(sys_invalid3)
-INTERN_FUNCTION(sys_invalid4)
-	movl   $(SYS_INVALID_ENCODE_COUNT(4)), %ecx
-	jmp    .Lsys_invalid_common
-END(sys_invalid4)
-INTERN_FUNCTION(sys_invalid5)
-	movl   $(SYS_INVALID_ENCODE_COUNT(5)), %ecx
-	jmp    .Lsys_invalid_common
-END(sys_invalid5)
-INTERN_FUNCTION(sys_invalid6)
-	movl   $(SYS_INVALID_ENCODE_COUNT(6)), %ecx
-	jmp    .Lsys_invalid_common
-END(sys_invalid6)
-.cfi_endproc
-
-
-#ifndef __NR32FEAT_DEFINED_SYSCALL_REGISTER_COUNT
-#undef __WANT_SYSCALL_REGISTER_COUNT
-#define __WANT_SYSCALL_REGISTER_COUNT 1
-#include <asm/syscalls32_d.h>
-#endif /* !__NR32FEAT_DEFINED_SYSCALL_REGISTER_COUNT */
-
-/* Define all unimplemented system calls as weak aliases
- * of `sys_invalidN', where N is the register count */
-#define __SYSINVALID_OF2(register_count) sys_invalid##register_count
-#define __SYSINVALID_OF(register_count) __SYSINVALID_OF2(register_count)
-#define __SYSCALL(name) \
-	DEFINE_PUBLIC_WEAK_ALIAS(sys_##name, __SYSINVALID_OF(__NR32RC_##name))
-#include <asm/ls-syscalls32.h>
 

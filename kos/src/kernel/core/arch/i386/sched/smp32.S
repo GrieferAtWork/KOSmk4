@@ -555,16 +555,16 @@ INTERN_FUNCTION(x86_smp_entry32)
 	movl   $(IA32_SYSENTER_ESP), %ecx
 	wrmsr
 
-	/* __wrmsr(IA32_SYSENTER_EIP, (uintptr_t)x86_syscall_sysenter[_traced]); */
+	/* __wrmsr(IA32_SYSENTER_EIP, (uintptr_t)x86_syscall32_sysenter[_traced]); */
 	xorl   %edx, %edx
-	EXTERN(x86_syscall_sysenter)
-	movl   $(x86_syscall_sysenter), %eax
+	EXTERN(x86_syscall32_sysenter)
+	movl   $(x86_syscall32_sysenter), %eax
 #ifndef CONFIG_NO_SYSCALL_TRACING
 	EXTERN(syscall_tracing_enabled)
 	cmpb   $0, syscall_tracing_enabled
 	je     1f
-	EXTERN(x86_syscall_sysenter_traced)
-	movl   $(x86_syscall_sysenter_traced), %eax
+	EXTERN(x86_syscall32_sysenter_traced)
+	movl   $(x86_syscall32_sysenter_traced), %eax
 1:
 #endif /* !CONFIG_NO_SYSCALL_TRACING */
 	movl   $(IA32_SYSENTER_EIP), %ecx

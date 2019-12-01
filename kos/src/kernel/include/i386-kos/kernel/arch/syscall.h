@@ -56,30 +56,6 @@
 
 /* System call calling conventions:
  *
- * i386: int $0x80
- *   - SYSNO:     %eax
- *   - ARG0:      %ebx
- *   - ARG1:      %ecx
- *   - ARG2:      %edx
- *   - ARG3:      %esi
- *   - ARG4:      %edi
- *   - ARG5:      %ebp
- *   - RET0:      %eax
- *   - RET1:      %edx
- *
- * i386: sysenter
- *   - SYSNO:     %eax
- *   - ARG0:      %ebx
- *   - ARG1:      %ecx
- *   - ARG2:      %edx
- *   - ARG3:      %esi
- *   - ARG4:    0(%ebp)
- *   - ARG5:    4(%ebp)
- *   - RET0:      %eax
- *   - RET1:      %edx
- *   - RET(%eip): %edi
- *   - RET(%esp): %ebp
- *
  * i386: lcall $7, $MAYBE_SYSNO
  *   - SYSNO:     MAYBE_SYSNO != 0 ? MAYBE_SYSNO : %eax
  *   - ARG0:      0(%esp)  // NOTE: Only accessed if used

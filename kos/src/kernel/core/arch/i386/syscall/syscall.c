@@ -200,9 +200,6 @@ err:
 PRIVATE ATTR_COLDBSS struct mutex syscall_tracing_lock = MUTEX_INIT;
 INTERN ATTR_COLDBSS bool syscall_tracing_enabled = false;
 
-INTDEF byte_t x86_idt_syscall[];
-INTDEF byte_t x86_idt_syscall_traced[];
-
 
 PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL syscall_tracing_ipi)(struct icpustate *__restrict state,
@@ -210,8 +207,8 @@ NOTHROW(FCALL syscall_tracing_ipi)(struct icpustate *__restrict state,
 	if (CURRENT_X86_CPUID.ci_1d & CPUID_1D_SEP) {
 		/* Also re-direct the `sysenter' instruction */
 		__wrmsr(IA32_SYSENTER_EIP,
-		        (u64)(uintptr_t)(args[0] ? (void *)x86_syscall_sysenter_traced
-		                                 : (void *)&x86_syscall_sysenter));
+		        (u64)(uintptr_t)(args[0] ? (void *)&x86_syscall32_sysenter_traced
+		                                 : (void *)&x86_syscall32_sysenter));
 	}
 	__lidt_p(&x86_idt_ptr);
 	return state;
@@ -224,17 +221,17 @@ PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
 	bool result;
 	void *argv[CPU_IPI_ARGCOUNT];
 	struct idt_segment newsyscall;
-	uintptr_t addr;
+	void *addr;
 	SCOPED_WRITELOCK(&syscall_tracing_lock);
 	argv[0] = (void *)(enable ? (uintptr_t)1 : (uintptr_t)0);
-	addr = enable ? (uintptr_t)x86_idt_syscall
-	              : (uintptr_t)x86_idt_syscall_traced;
+	addr = enable ? (void *)&x86_syscall32_int80
+	              : (void *)&x86_syscall32_int80_traced;
 #ifdef __x86_64__
-	newsyscall.i_seg.s_u = SEGMENT_INTRGATE_INIT_U(addr, SEGMENT_KERNEL_CODE, 0, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
-	newsyscall.i_ext.s_u = SEGMENT_INTRGATE_HI_INIT_U(addr, SEGMENT_KERNEL_CODE, 0, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
+	newsyscall.i_seg.s_u = SEGMENT_INTRGATE_INIT_U((uintptr_t)addr, SEGMENT_KERNEL_CODE, 0, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
+	newsyscall.i_ext.s_u = SEGMENT_INTRGATE_HI_INIT_U((uintptr_t)addr, SEGMENT_KERNEL_CODE, 0, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
 #else /* __x86_64__ */
-	newsyscall.i_seg.s_ul = SEGMENT_INTRGATE_INIT_UL(addr, SEGMENT_KERNEL_CODE, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
-	newsyscall.i_seg.s_uh = SEGMENT_INTRGATE_INIT_UH(addr, SEGMENT_KERNEL_CODE, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
+	newsyscall.i_seg.s_ul = SEGMENT_INTRGATE_INIT_UL((uintptr_t)addr, SEGMENT_KERNEL_CODE, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
+	newsyscall.i_seg.s_uh = SEGMENT_INTRGATE_INIT_UH((uintptr_t)addr, SEGMENT_KERNEL_CODE, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
 #endif /* !__x86_64__ */
 	/* TODO: This method of changing the IDT is racy.
 	 *       A proper solution would be to:
@@ -262,8 +259,8 @@ PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
 	                         );
 	if (CURRENT_X86_CPUID.ci_1d & CPUID_1D_SEP) {
 		__wrmsr(IA32_SYSENTER_EIP,
-		        enable ? (uintptr_t)x86_syscall_sysenter_traced
-		               : (uintptr_t)x86_syscall_sysenter);
+		        enable ? (uintptr_t)&x86_syscall32_sysenter_traced
+		               : (uintptr_t)&x86_syscall32_sysenter);
 	}
 	__lidt_p(&x86_idt_ptr);
 	return result;
@@ -433,7 +430,7 @@ NOTHROW(KCALL x86_initialize_sysenter)(void) {
 #else /* __x86_64__ */
 		__wrmsr(IA32_SYSENTER_ESP, (u64)(uintptr_t)(void *)&FORCPU(&_bootcpu, thiscpu_x86_tss).t_esp0);
 #endif /* !__x86_64__ */
-		__wrmsr(IA32_SYSENTER_EIP, (u64)(uintptr_t)(void *)&x86_syscall_sysenter);
+		__wrmsr(IA32_SYSENTER_EIP, (u64)(uintptr_t)(void *)&x86_syscall32_sysenter);
 	}
 }
 

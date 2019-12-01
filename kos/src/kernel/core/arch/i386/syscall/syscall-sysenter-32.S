@@ -44,7 +44,7 @@
 /* SYSENTER ENTRY                                                       */
 /************************************************************************/
 .section .text.hot
-PUBLIC_FUNCTION(x86_syscall_sysenter)
+PUBLIC_FUNCTION(x86_syscall32_sysenter)
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %esp, 0
@@ -87,7 +87,7 @@ PUBLIC_FUNCTION(x86_syscall_sysenter)
 	EXTERN(x86_sysroute1_asm32_sysenter)
 	jmpl   *%ss:x86_sysroute1_asm32_sysenter - ((__NR_syscall1_min * 4) & 0xffffffff)(,%eax,4)
 	.cfi_endproc
-END(x86_syscall_sysenter)
+END(x86_syscall32_sysenter)
 
 
 
@@ -102,11 +102,11 @@ END(x86_syscall_sysenter)
 
 
 /************************************************************************/
-/* SYSENTER-TRACED ENTRY                                                */
+/* SYSENTER TRACED ENTRY                                                */
 /************************************************************************/
 #ifndef CONFIG_NO_SYSCALL_TRACING
 .section .text.hot
-PUBLIC_FUNCTION(x86_syscall_sysenter_traced)
+PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %esp, 0
@@ -200,6 +200,7 @@ PUBLIC_FUNCTION(x86_syscall_sysenter_traced)
 
 	/* Actually call through to the system call tracer. */
 	movl   %esp, %ecx
+	EXTERN(syscall_trace)
 	call   syscall_trace
 
 	.cfi_remember_state
@@ -239,7 +240,7 @@ PUBLIC_FUNCTION(x86_syscall_sysenter_traced)
 	.cfi_adjust_cfa_offset -8
 	jmp    __asm32_bad_sysenter_extension
 	.cfi_endproc
-END(x86_syscall_sysenter_traced)
+END(x86_syscall32_sysenter_traced)
 #endif /* !CONFIG_NO_SYSCALL_TRACING */
 
 
@@ -255,7 +256,7 @@ END(x86_syscall_sysenter_traced)
 
 
 /************************************************************************/
-/* SYSENTER-EMULATION ENTRY                                             */
+/* SYSENTER EMULATION ENTRY                                             */
 /************************************************************************/
 .section .text
 PUBLIC_FUNCTION(x86_syscall_emulate_sysenter_r)
@@ -405,10 +406,11 @@ INTERN_FUNCTION(__asm32_bad_sysenter_extension)
 	movl   $(SEGMENT_KERNEL_FSBASE), %eax
 	movl   %eax, %fs
 	/* Throw an E_SEGFAULT exception! */
-	pushl_cfi $E_SEGFAULT_CONTEXT_FAULT
+	pushl_cfi $(E_SEGFAULT_CONTEXT_FAULT)
 	pushl_cfi %ebp
 	pushl_cfi $2
 	pushl_cfi $ERROR_CODEOF(E_SEGFAULT_UNMAPPED)
+	EXTERN(error_thrown)
 	call   error_thrown
 	.cfi_endproc
 END(__asm32_bad_sysenter_extension)
@@ -492,6 +494,7 @@ INTERN_FUNCTION(__x86_asm32_sysenter_break)
 	pushl_cfi %eax /* Returned by `copy_extended_user_arguments()' */
 	pushl_cfi $(8)
 	pushl_cfi $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL))
+	EXTERN(error_thrown)
 	call   error_thrown
 	.cfi_endproc
 END(__x86_asm32_sysenter_break)

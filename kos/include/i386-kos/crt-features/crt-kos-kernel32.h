@@ -2318,6 +2318,8 @@
 #define __CRT_HAVE_x86_idt_modify_end 1
 #define __CRT_HAVE_x86_idt_modify_start 1
 #define __CRT_HAVE_x86_idt_ptr 1
+#define __CRT_HAVE_x86_idt_syscall 1
+#define __CRT_HAVE_x86_idt_syscall_traced 1
 #define __CRT_HAVE_x86_iopl_keep_after_clone 1
 #define __CRT_HAVE_x86_iopl_keep_after_exec 1
 #define __CRT_HAVE_x86_iopl_keep_after_fork 1
@@ -2331,14 +2333,14 @@
 #define __CRT_HAVE_x86_pit_lock 1
 #define __CRT_HAVE_x86_rpc_user_redirection 1
 #define __CRT_HAVE_x86_setiopl 1
+#define __CRT_HAVE_x86_syscall32_sysenter 1
+#define __CRT_HAVE_x86_syscall32_sysenter_traced 1
 #define __CRT_HAVE_x86_syscall_emulate_cdecl 1
 #define __CRT_HAVE_x86_syscall_emulate_cdecl_r 1
 #define __CRT_HAVE_x86_syscall_emulate_int80h 1
 #define __CRT_HAVE_x86_syscall_emulate_int80h_r 1
 #define __CRT_HAVE_x86_syscall_emulate_sysenter 1
 #define __CRT_HAVE_x86_syscall_emulate_sysenter_r 1
-#define __CRT_HAVE_x86_syscall_sysenter 1
-#define __CRT_HAVE_x86_syscall_sysenter_traced 1
 #define __CRT_HAVE_x86_sysroute0_asm32_int80 1
 #define __CRT_HAVE_x86_sysroute0_asm32_sysenter 1
 #define __CRT_HAVE_x86_sysroute0_c 1

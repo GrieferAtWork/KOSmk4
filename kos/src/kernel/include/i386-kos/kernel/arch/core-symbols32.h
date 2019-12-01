@@ -362,10 +362,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak pagedir_ismapped; .long pagedir_ismapped
 	.reloc ., R_386_SIZE32, pagedir_ismapped; .long 0
 	.long 0x38f5564
-	.long .Lname90 /* index: 90 */
-	.weak x86_syscall_sysenter_traced; .long x86_syscall_sysenter_traced
-	.reloc ., R_386_SIZE32, x86_syscall_sysenter_traced; .long 0
-	.long 0x346ccd4
+	.long 0 /* index: 90 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 91 */
 	.long 0
 	.long 0
@@ -4006,10 +4006,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak path_traversen_ex; .long path_traversen_ex
 	.reloc ., R_386_SIZE32, path_traversen_ex; .long 0
 	.long 0xf5643e8
-	.long 0 /* index: 1001 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1001 /* index: 1001 */
+	.weak x86_pagedir_syncall_maybe_global; .long x86_pagedir_syncall_maybe_global
+	.reloc ., R_386_SIZE32, x86_pagedir_syncall_maybe_global; .long 0
+	.long 0x3e6c5fc
 	.long 0 /* index: 1002 */
 	.long 0
 	.long 0
@@ -4594,10 +4594,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 1148 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1148 /* index: 1148 */
+	.weak x86_idt_syscall_traced; .long x86_idt_syscall_traced
+	.reloc ., R_386_SIZE32, x86_idt_syscall_traced; .long 0
+	.long 0x3dd19c4
 	.long 0 /* index: 1149 */
 	.long 0
 	.long 0
@@ -6131,9 +6131,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname1532 /* index: 1532 */
-	.weak x86_pagedir_syncall_maybe_global; .long x86_pagedir_syncall_maybe_global
-	.reloc ., R_386_SIZE32, x86_pagedir_syncall_maybe_global; .long 0
-	.long 0x3e6c5fc
+	.weak x86_idt_syscall; .long x86_idt_syscall
+	.reloc ., R_386_SIZE32, x86_idt_syscall; .long 0
+	.long 0x75655fc
 	.long 0 /* index: 1533 */
 	.long 0
 	.long 0
@@ -8374,10 +8374,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_readphysl; .long vm_readphysl
 	.reloc ., R_386_SIZE32, vm_readphysl; .long 0
 	.long 0x65a82c
-	.long 0 /* index: 2093 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2093 /* index: 2093 */
+	.weak x86_syscall32_sysenter; .long x86_syscall32_sysenter
+	.reloc ., R_386_SIZE32, x86_syscall32_sysenter; .long 0
+	.long 0x4db3eb2
 	.long 0 /* index: 2094 */
 	.long 0
 	.long 0
@@ -11818,10 +11818,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak driver_destroy; .long driver_destroy
 	.reloc ., R_386_SIZE32, driver_destroy; .long 0
 	.long 0x3c67b89
-	.long 0 /* index: 2954 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2954 /* index: 2954 */
+	.weak x86_syscall32_sysenter_traced; .long x86_syscall32_sysenter_traced
+	.reloc ., R_386_SIZE32, x86_syscall32_sysenter_traced; .long 0
+	.long 0xb0b92f4
 	.long .Lname2955 /* index: 2955 */
 	.weak task_pushconnections; .long task_pushconnections
 	.reloc ., R_386_SIZE32, task_pushconnections; .long 0
@@ -12106,10 +12106,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname3026 /* index: 3026 */
-	.weak x86_syscall_sysenter; .long x86_syscall_sysenter
-	.reloc ., R_386_SIZE32, x86_syscall_sysenter; .long 0
-	.long 0x25feb52
+	.long 0 /* index: 3026 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname3027 /* index: 3027 */
 	.weak regdump_flags; .long regdump_flags
 	.reloc ., R_386_SIZE32, regdump_flags; .long 0
@@ -16488,8 +16488,6 @@ END(kernel_symbol_table)
 	.string "sys_open_by_handle_at"
 .Lname89:
 	.string "pagedir_ismapped"
-.Lname90:
-	.string "x86_syscall_sysenter_traced"
 .Lname92:
 	.string "error_as_signal"
 .Lname94:
@@ -17564,6 +17562,8 @@ END(kernel_symbol_table)
 	.string "task_setprocess"
 .Lname1000:
 	.string "path_traversen_ex"
+.Lname1001:
+	.string "x86_pagedir_syncall_maybe_global"
 .Lname1003:
 	.string "x86_pit_lock"
 .Lname1005:
@@ -17720,6 +17720,8 @@ END(kernel_symbol_table)
 	.string "sys_acct"
 .Lname1146:
 	.string "vpage_ffree"
+.Lname1148:
+	.string "x86_idt_syscall_traced"
 .Lname1151:
 	.string "pipe_create"
 .Lname1152:
@@ -18153,7 +18155,7 @@ END(kernel_symbol_table)
 .Lname1529:
 	.string "pagedir_fini"
 .Lname1532:
-	.string "x86_pagedir_syncall_maybe_global"
+	.string "x86_idt_syscall"
 .Lname1534:
 	.string "x86_memcpy_nopf_ret_pointer"
 .Lname1535:
@@ -18752,6 +18754,8 @@ END(kernel_symbol_table)
 	.string "vsprintf"
 .Lname2092:
 	.string "vm_readphysl"
+.Lname2093:
+	.string "x86_syscall32_sysenter"
 .Lname2095:
 	.string "vm_memsetphys_onepage"
 .Lname2098:
@@ -19724,6 +19728,8 @@ END(kernel_symbol_table)
 	.string "linebuffer_writesome"
 .Lname2953:
 	.string "driver_destroy"
+.Lname2954:
+	.string "x86_syscall32_sysenter_traced"
 .Lname2955:
 	.string "task_pushconnections"
 .Lname2956:
@@ -19806,8 +19812,6 @@ END(kernel_symbol_table)
 	.string "sys_fchown32"
 .Lname3024:
 	.string "sys_getsockname"
-.Lname3026:
-	.string "x86_syscall_sysenter"
 .Lname3027:
 	.string "regdump_flags"
 .Lname3028:
