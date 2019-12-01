@@ -270,6 +270,7 @@ syscall_emulate(struct icpustate *__restrict state,
 	}
 	return result;
 }
+
 PUBLIC ATTR_RETNONNULL WUNUSED struct icpustate *FCALL
 syscall_emulate64(struct icpustate *__restrict state,
                   struct rpc_syscall_info *__restrict sc_info) {
@@ -306,6 +307,7 @@ do_syscall:
 						args[i] = 0;
 				}
 				THROW(E_UNKNOWN_SYSTEMCALL,
+				      sc_info->rsi_flags,
 				      sc_info->rsi_sysno,
 				      args[0], args[1], args[2],
 				      args[3], args[4], args[5]);
@@ -334,7 +336,7 @@ do_syscall:
 			RETHROW();
 		/* Store the errno variant of the current exception
 		 * in the user-space register context. */
-		if (SYSCALL64_DOUBLE_WIDE(sysno))
+		if (kernel_syscall64_doublewide(sysno))
 			gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
 		gpregs_setpax(&state->ics_gpregs, (uintptr_t)-error_as_errno(data));
 		data->e_code = (error_code_t)ERROR_CODEOF(E_OK);
@@ -400,6 +402,7 @@ do_syscall32:
 						args[i] = 0;
 				}
 				THROW(E_UNKNOWN_SYSTEMCALL,
+				      sc_info->rsi_flags,
 				      sc_info->rsi_sysno,
 				      args[0], args[1], args[2],
 				      args[3], args[4], args[5]);

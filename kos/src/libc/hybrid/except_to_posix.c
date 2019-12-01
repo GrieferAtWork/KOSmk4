@@ -122,7 +122,7 @@ NOTHROW_NCX_KERNEL(LIBCCALL libc_error_as_signal)(struct exception_data const *_
 	case E_UNKNOWN_SYSTEMCALL:
 		result->si_signo   = SIGSYS;
 		result->si_errno   = ENOSYS;
-		result->si_syscall = data->e_pointers[0];
+		result->si_syscall = data->e_pointers[1];
 		break;
 
 	case E_DIVIDE_BY_ZERO:

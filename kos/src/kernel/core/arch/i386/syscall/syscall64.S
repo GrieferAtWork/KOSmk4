@@ -32,6 +32,8 @@
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
 
+#include <librpc/rpc.h>
+
 .section .text.hot
 INTERN_CONST(__x86_idtdpl_syscall, 3)
 INTERN_FUNCTION(x86_idt_syscall)
@@ -47,20 +49,42 @@ INTERN_FUNCTION(x86_idt_syscall)
 	/* Unconditionally re-enable interrupts (only get here from user-space) */
 	sti
 	je     .Ldo_asm32_syscall_int80 /* Compatibility mode! */
-
-	jmpq   *__asm64_syscallrouter(,%rax,4)
+.Ldo_asm64_syscall_int80:
+	/* Route a 64-bit system call. */
+	EXTERN(__x86_asm64_syscall_break)
+#if __NR64_syscall0_min != 0
+	cmpq   $(__NR64_syscall0_min), %rax
+	jb     __x86_asm64_syscall_break
+#endif /* __NR64_syscall0_min != 0 */
+	cmpq   $(__NR64_syscall0_max), %rax
+	ja     1f
+	EXTERN(x86_sysroute0_asm64_syscall)
+	jmpq   *(x86_sysroute0_asm64_syscall - ((__NR64_syscall0_min * 8) & 0xffffffffffffffff))(,%rax,8)
+1:	cmpq   $(__NR64_syscall1_min), %rax
+	jb     __x86_asm64_syscall_break
+	cmpq   $(__NR64_syscall1_max), %rax
+	ja     __x86_asm64_syscall_break
+	EXTERN(x86_sysroute1_asm64_syscall)
+	jmpq   *(x86_sysroute1_asm64_syscall - ((__NR64_syscall1_min * 8) & 0xffffffffffffffff))(,%rax,8)
 
 .Ldo_asm32_syscall_int80:
 	movzlq %eax, %rax
 .Ldo_asm32_syscall_int80_rax:
+	EXTERN(__x86_asm32_int80_break)
+#if __NR64_syscall0_min != 0
+	cmpq   $(__NR64_syscall0_min), %rax
+	jb     __x86_asm32_int80_break
+#endif /* __NR64_syscall0_min != 0 */
 	cmpq   $(__NR32_syscall0_max), %rax
 	ja     1f
-	jmpq   *x86_sysroute0_asm32_int80(,%rax,4)
+	EXTERN(x86_sysroute0_asm32_int80)
+	jmpq   *x86_sysroute0_asm32_int80(,%rax,8)
 1:	cmpq   $(__NR32_syscall1_min), %rax
 	jb     __x86_asm32_int80_break
 	cmpq   $(__NR32_syscall1_max), %rax
 	ja     __x86_asm32_int80_break
-	jmpq   *(x86_sysroute1_asm32_int80 - ((__NR32_syscall1_min * 8) & 0xffffffffffffffff))(,%rax,4)
+	EXTERN(x86_sysroute1_asm32_int80)
+	jmpq   *(x86_sysroute1_asm32_int80 - ((__NR32_syscall1_min * 8) & 0xffffffffffffffff))(,%rax,8)
 	.cfi_endproc
 END(x86_idt_syscall)
 
@@ -73,10 +97,44 @@ INTERN_FUNCTION(x86_idt_syscall_traced)
 	.cfi_def_cfa %rsp, 0
 	/* Only get here from user-space, so we can do an unconditional swapgs on entry! */
 	swapgs
+	/* Check if we got here from compatibility mode.
+	 * Note that this check must be done before re-enabling interrupts, since
+	 * once that is done, our iret tail may have already been redirected! */
+	cmpq   $(SEGMENT_USER_CODE32_RPL), OFFSET_IRREGS64_CS(%rsp)
 	/* Unconditionally re-enable interrupts (only get here from user-space) */
 	sti
-	movzlq %eax, %rax
+	je     1f /* Compatibility mode */
 
+	pushq_cfi_r %rcx
+	pushq_cfi_r %r11
+	pushq_cfi_r %r9  /* ARG[5] */
+	pushq_cfi_r %r8  /* ARG[4] */
+	pushq_cfi_r %r10 /* ARG[3] */
+	pushq_cfi_r %rdx /* ARG[2] */
+	pushq_cfi_r %rsi /* ARG[1] */
+	pushq_cfi_r %rdi /* ARG[0] */
+	pushq_cfi_r %rax /* SYSNO */
+
+	movq   %rsp, %rdi
+	EXTERN(syscall_trace)
+	call   syscall_trace
+
+	popq_cfi_r %rax /* SYSNO */
+	popq_cfi_r %rdi /* ARG[0] */
+	popq_cfi_r %rsi /* ARG[1] */
+	popq_cfi_r %rdx /* ARG[2] */
+	popq_cfi_r %r10 /* ARG[3] */
+	popq_cfi_r %r8  /* ARG[4] */
+	popq_cfi_r %r9  /* ARG[5] */
+	popq_cfi_r %r11
+	popq_cfi_r %rcx
+	jmp    .Ldo_asm64_syscall_int80
+
+1:	movzlq %eax, %rax
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
 	pushq_cfi_r %rbp /* ARG[5] */
 	pushq_cfi_r %rdi /* ARG[4] */
 	pushq_cfi_r %rsi /* ARG[3] */
@@ -85,7 +143,7 @@ INTERN_FUNCTION(x86_idt_syscall_traced)
 	pushq_cfi_r %rbx /* ARG[0] */
 	pushq_cfi_r %rax /* SYSNO */
 
-	movl   %esp, %ecx
+	movq   %rsp, %rdi
 	EXTERN(syscall_trace_compat)
 	call   syscall_trace_compat
 
@@ -96,7 +154,10 @@ INTERN_FUNCTION(x86_idt_syscall_traced)
 	popq_cfi_r %rsi /* ARG[3] */
 	popq_cfi_r %rdi /* ARG[4] */
 	popq_cfi_r %rbp /* ARG[5] */
-
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
 	jmp    .Ldo_asm32_syscall_int80_rax
 	.cfi_endproc
 END(x86_idt_syscall_traced)
@@ -106,92 +167,202 @@ END(x86_idt_syscall_traced)
 
 
 
-.section .text.cold
-#define SYS_INVALID_ENCODE_COUNT(count) (count+1)
 
-__LIBC __ATTR_NORETURN __ATTR_COLD void
-(__LIBCCALL error_thrown)(error_code_t __code, unsigned int ___argc, ...) __CASMNAME_SAME("error_thrown");
+.section .text.cold
+/* SyscallInvalidFlags(Count) */
+#define SIF(c) \
+	(RPC_SYSCALL_INFO_METHOD_OTHER_64 | RPC_SYSCALL_INFO_FEXCEPT | \
+	 ((1 << (c)) - 1) << RPC_SYSCALL_INFO_FARGVALID_SHIFT)
 
 /* Called when a system call is recognized, but hasn't been implemented yet */
 .cfi_startproc
 INTERN_FUNCTION(sys_invalid0)
-	movq   %rax, %rdx  /* pointers[0] = sysno */
-	movq   $(1), %rsi                                  /* argc */
+	movq   %rax, %rcx      /* pointers[1] = sysno */
+	movq   $(SIF(0)), %rdx /* pointers[0] = flags */
+	movq   $(2), %rsi                                  /* argc */
 .Lsys_include_common:
 	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
 	call   error_thrown
 END(sys_invalid0)
 
 INTERN_FUNCTION(sys_invalid1)
-	movq   %rdi, %rcx  /* pointers[1] = arg[0] */
-	movq   %rax, %rdx  /* pointers[0] = sysno */
-	movq   $(2), %rsi                                  /* argc */
+	movq   %rdi, %r8       /* pointers[2] = arg[0] */
+	movq   %rax, %rcx      /* pointers[1] = sysno */
+	movq   $(SIF(1)), %rdx /* pointers[0] = flags */
+	movq   $(3), %rsi                                  /* argc */
 	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
 	call   error_thrown
 END(sys_invalid1)
 
 INTERN_FUNCTION(sys_invalid2)
-	movq   %rsi, %r8   /* pointers[2] = arg[1] */
-	movq   %rdi, %rcx  /* pointers[1] = arg[0] */
-	movq   %rax, %rdx  /* pointers[0] = sysno */
-	movq   $(3), %rsi                                  /* argc */
+	movq   %rsi, %r9       /* pointers[3] = arg[1] */
+	movq   %rdi, %r8       /* pointers[2] = arg[0] */
+	movq   %rax, %rcx      /* pointers[1] = sysno */
+	movq   $(SIF(2)), %rdx /* pointers[0] = flags */
+	movq   $(4), %rsi                                  /* argc */
 	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
 	call   error_thrown
 END(sys_invalid2)
 
 INTERN_FUNCTION(sys_invalid3)
-	movq   %rdx, %r9   /* pointers[3] = arg[2] */
-	movq   %rsi, %r8   /* pointers[2] = arg[1] */
-	movq   %rdi, %rcx  /* pointers[1] = arg[0] */
-	movq   %rax, %rdx  /* pointers[0] = sysno */
-	movq   $(4), %rsi                                  /* argc */
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
-	call   error_thrown
-END(sys_invalid3)
-
-INTERN_FUNCTION(sys_invalid4)
-	pushq_cfi %rcx     /* pointers[4] = arg[3] */
-	movq   %rdx, %r9   /* pointers[3] = arg[2] */
-	movq   %rsi, %r8   /* pointers[2] = arg[1] */
-	movq   %rdi, %rcx  /* pointers[1] = arg[0] */
-	movq   %rax, %rdx  /* pointers[0] = sysno */
+	pushq_cfi %rdx         /* pointers[4] = arg[2] */
+	movq   %rsi, %r9       /* pointers[3] = arg[1] */
+	movq   %rdi, %r8       /* pointers[2] = arg[0] */
+	movq   %rax, %rcx      /* pointers[1] = sysno */
+	movq   $(SIF(3)), %rdx /* pointers[0] = flags */
 	movq   $(5), %rsi                                  /* argc */
 	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
 	call   error_thrown
 	.cfi_adjust_cfa_offset -8
-END(sys_invalid4)
+END(sys_invalid3)
 
-INTERN_FUNCTION(sys_invalid5)
-	pushq_cfi %r8      /* pointers[5] = arg[4] */
-	pushq_cfi %rcx     /* pointers[4] = arg[3] */
-	movq   %rdx, %r9   /* pointers[3] = arg[2] */
-	movq   %rsi, %r8   /* pointers[2] = arg[1] */
-	movq   %rdi, %rcx  /* pointers[1] = arg[0] */
-	movq   %rax, %rdx  /* pointers[0] = sysno */
+INTERN_FUNCTION(sys_invalid4)
+	pushq_cfi %rcx         /* pointers[5] = arg[3] */
+	pushq_cfi %rdx         /* pointers[4] = arg[2] */
+	movq   %rsi, %r9       /* pointers[3] = arg[1] */
+	movq   %rdi, %r8       /* pointers[2] = arg[0] */
+	movq   %rax, %rcx      /* pointers[1] = sysno */
+	movq   $(SIF(4)), %rdx /* pointers[0] = flags */
 	movq   $(6), %rsi                                  /* argc */
 	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
 	call   error_thrown
 	.cfi_adjust_cfa_offset -16
-END(sys_invalid5)
+END(sys_invalid4)
 
-INTERN_FUNCTION(sys_invalid6)
-	pushq_cfi %r9      /* pointers[6] = arg[5] */
-	pushq_cfi %r8      /* pointers[5] = arg[4] */
-	pushq_cfi %rcx     /* pointers[4] = arg[3] */
-	movq   %rdx, %r9   /* pointers[3] = arg[2] */
-	movq   %rsi, %r8   /* pointers[2] = arg[1] */
-	movq   %rdi, %rcx  /* pointers[1] = arg[0] */
-	movq   %rax, %rdx  /* pointers[0] = sysno */
+INTERN_FUNCTION(sys_invalid5)
+	pushq_cfi %r8          /* pointers[6] = arg[4] */
+	pushq_cfi %rcx         /* pointers[5] = arg[3] */
+	pushq_cfi %rdx         /* pointers[4] = arg[2] */
+	movq   %rsi, %r9       /* pointers[3] = arg[1] */
+	movq   %rdi, %r8       /* pointers[2] = arg[0] */
+	movq   %rax, %rcx      /* pointers[1] = sysno */
+	movq   $(SIF(5)), %rdx /* pointers[0] = flags */
 	movq   $(7), %rsi                                  /* argc */
 	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
 	call   error_thrown
 	.cfi_adjust_cfa_offset -24
+END(sys_invalid5)
+
+INTERN_FUNCTION(sys_invalid6)
+	pushq_cfi %r9          /* pointers[7] = arg[5] */
+	pushq_cfi %r8          /* pointers[6] = arg[4] */
+	pushq_cfi %rcx         /* pointers[5] = arg[3] */
+	pushq_cfi %rdx         /* pointers[4] = arg[2] */
+	movq   %rsi, %r9       /* pointers[3] = arg[1] */
+	movq   %rdi, %r8       /* pointers[2] = arg[0] */
+	movq   %rax, %rcx      /* pointers[1] = sysno */
+	movq   $(SIF(6)), %rdx /* pointers[0] = flags */
+	movq   $(8), %rsi                                  /* argc */
+	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   error_thrown
+	.cfi_adjust_cfa_offset -32
 END(sys_invalid6)
 
 .cfi_endproc
+#undef SIF
 
 #define __SYSCALL(name) \
 	DEFINE_PUBLIC_WEAK_ALIAS(sys_##name, PP_CAT2(sys_invalid, __NR64AC_##name));
+#include <asm/ls-syscalls64.h>
+#undef __SYSCALL
+
+
+
+.section .text.cold
+/* SyscallInvalidFlags(Count) */
+#define SIF(c) \
+	(RPC_SYSCALL_INFO_METHOD_OTHER_32 | RPC_SYSCALL_INFO_FEXCEPT | \
+	 ((1 << (c)) - 1) << RPC_SYSCALL_INFO_FARGVALID_SHIFT)
+
+/* Called when a system call is recognized, but hasn't been implemented yet */
+.cfi_startproc
+INTERN_FUNCTION(sys32_invalid0)
+	movq   %rax, %rcx      /* pointers[1] = sysno */
+	movq   $(SIF(0)), %rdx /* pointers[0] = flags */
+	movq   $(2), %rsi                                  /* argc */
+.Lsys_include_common:
+	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   error_thrown
+END(sys32_invalid0)
+
+INTERN_FUNCTION(sys32_invalid1)
+	movq   %rdi, %r8       /* pointers[2] = arg[0] */
+	movq   %rax, %rcx      /* pointers[1] = sysno */
+	movq   $(SIF(1)), %rdx /* pointers[0] = flags */
+	movq   $(3), %rsi                                  /* argc */
+	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   error_thrown
+END(sys32_invalid1)
+
+INTERN_FUNCTION(sys32_invalid2)
+	movq   %rsi, %r9       /* pointers[3] = arg[1] */
+	movq   %rdi, %r8       /* pointers[2] = arg[0] */
+	movq   %rax, %rcx      /* pointers[1] = sysno */
+	movq   $(SIF(2)), %rdx /* pointers[0] = flags */
+	movq   $(4), %rsi                                  /* argc */
+	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   error_thrown
+END(sys32_invalid2)
+
+INTERN_FUNCTION(sys32_invalid3)
+	pushq_cfi %rdx         /* pointers[4] = arg[2] */
+	movq   %rsi, %r9       /* pointers[3] = arg[1] */
+	movq   %rdi, %r8       /* pointers[2] = arg[0] */
+	movq   %rax, %rcx      /* pointers[1] = sysno */
+	movq   $(SIF(3)), %rdx /* pointers[0] = flags */
+	movq   $(5), %rsi                                  /* argc */
+	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   error_thrown
+	.cfi_adjust_cfa_offset -8
+END(sys32_invalid3)
+
+INTERN_FUNCTION(sys32_invalid4)
+	pushq_cfi %rcx         /* pointers[5] = arg[3] */
+	pushq_cfi %rdx         /* pointers[4] = arg[2] */
+	movq   %rsi, %r9       /* pointers[3] = arg[1] */
+	movq   %rdi, %r8       /* pointers[2] = arg[0] */
+	movq   %rax, %rcx      /* pointers[1] = sysno */
+	movq   $(SIF(4)), %rdx /* pointers[0] = flags */
+	movq   $(6), %rsi                                  /* argc */
+	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   error_thrown
+	.cfi_adjust_cfa_offset -16
+END(sys32_invalid4)
+
+INTERN_FUNCTION(sys32_invalid5)
+	pushq_cfi %r8          /* pointers[6] = arg[4] */
+	pushq_cfi %rcx         /* pointers[5] = arg[3] */
+	pushq_cfi %rdx         /* pointers[4] = arg[2] */
+	movq   %rsi, %r9       /* pointers[3] = arg[1] */
+	movq   %rdi, %r8       /* pointers[2] = arg[0] */
+	movq   %rax, %rcx      /* pointers[1] = sysno */
+	movq   $(SIF(5)), %rdx /* pointers[0] = flags */
+	movq   $(7), %rsi                                  /* argc */
+	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   error_thrown
+	.cfi_adjust_cfa_offset -24
+END(sys32_invalid5)
+
+INTERN_FUNCTION(sys32_invalid6)
+	pushq_cfi %r9          /* pointers[7] = arg[5] */
+	pushq_cfi %r8          /* pointers[6] = arg[4] */
+	pushq_cfi %rcx         /* pointers[5] = arg[3] */
+	pushq_cfi %rdx         /* pointers[4] = arg[2] */
+	movq   %rsi, %r9       /* pointers[3] = arg[1] */
+	movq   %rdi, %r8       /* pointers[2] = arg[0] */
+	movq   %rax, %rcx      /* pointers[1] = sysno */
+	movq   $(SIF(6)), %rdx /* pointers[0] = flags */
+	movq   $(8), %rsi                                  /* argc */
+	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
+	call   error_thrown
+	.cfi_adjust_cfa_offset -32
+END(sys32_invalid6)
+
+.cfi_endproc
+#undef SIF
+
+#define __SYSCALL(name) \
+	DEFINE_PUBLIC_WEAK_ALIAS(sys32_##name, PP_CAT2(sys32_invalid, __NR32AC_##name));
 #include <asm/ls-syscalls64.h>
 #undef __SYSCALL
 

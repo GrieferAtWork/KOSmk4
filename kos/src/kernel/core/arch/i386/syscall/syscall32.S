@@ -35,6 +35,8 @@
 #include <fcntl.h>
 #include <syscall.h>
 
+#include <librpc/rpc.h>
+
 
 EXTERN(__x86_asm32_int80_break)
 EXTERN(__x86_asm32_sysenter_break)
@@ -353,24 +355,24 @@ INTERN_FUNCTION(x86_idt_syscall)
 END(x86_idt_syscall)
 
 
-#define TEST_DOUBLE_WIDE(sysno_reg, tempreg_l, tempreg_b, segment_prefix)        \
-	cmpl   $(__NR_syscall0_max), sysno_reg;                                       \
-	ja     1234f;                                                                \
-	movl   sysno_reg, tempreg_l;                                                 \
-	shrl   $1, tempreg_l;                                                        \
-	EXTERN(kernel_syscall0_regcnt);                                          \
-	movb   segment_prefix kernel_syscall0_regcnt(,tempreg_l,1), tempreg_b;   \
-	jmp    1235f;                                                                \
-1234:                                                                            \
-	leal   -__NR_syscall1_min(sysno_reg), tempreg_l;                            \
-	shrl   $1, tempreg_l;                                                        \
+#define TEST_DOUBLE_WIDE(sysno_reg, tempreg_l, tempreg_b, segment_prefix)  \
+	cmpl   $(__NR_syscall0_max), sysno_reg;                                \
+	ja     1234f;                                                          \
+	movl   sysno_reg, tempreg_l;                                           \
+	shrl   $1, tempreg_l;                                                  \
+	EXTERN(kernel_syscall0_regcnt);                                        \
+	movb   segment_prefix kernel_syscall0_regcnt(,tempreg_l,1), tempreg_b; \
+	jmp    1235f;                                                          \
+1234:                                                                      \
+	leal   -__NR_syscall1_min(sysno_reg), tempreg_l;                       \
+	shrl   $1, tempreg_l;                                                  \
 	EXTERN(kernel_syscall1_regcnt);                                        \
 	movb   segment_prefix kernel_syscall1_regcnt(,tempreg_l,1), tempreg_b; \
-1235:                                                                            \
-	testl  $1, sysno_reg;                                                        \
-	jz     1234f;                                                                \
-	shrb   $4, tempreg_b;                                                        \
-1234:                                                                            \
+1235:                                                                      \
+	testl  $1, sysno_reg;                                                  \
+	jz     1234f;                                                          \
+	shrb   $4, tempreg_b;                                                  \
+1234:                                                                      \
 	testb  $0x8, tempreg_b;
 
 
@@ -679,8 +681,12 @@ INTERN_FUNCTION(__x86_asm32_int80_break)
 	movl   %eax, %fs
 
 	/* Throw an `E_UNKNOWN_SYSTEMCALL' exception */
-	pushl_cfi $7
-	pushl_cfi $ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)
+	pushl_cfi $(RPC_SYSCALL_INFO_METHOD_INT80H_32 | RPC_SYSCALL_INFO_FEXCEPT |  \
+	            RPC_SYSCALL_INFO_FARGVALID(0) | RPC_SYSCALL_INFO_FARGVALID(1) | \
+	            RPC_SYSCALL_INFO_FARGVALID(2) | RPC_SYSCALL_INFO_FARGVALID(3) | \
+	            RPC_SYSCALL_INFO_FARGVALID(4) | RPC_SYSCALL_INFO_FARGVALID(5))
+	pushl_cfi $(8)
+	pushl_cfi $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL))
 	call   error_thrown
 	.cfi_endproc
 END(__x86_asm32_int80_break)
@@ -696,14 +702,19 @@ PRIVATE_FUNCTION(copy_extended_user_arguments)
 			.Lsysenter_guard_end,
 			.Lsysenter_guard_entry)
 	EXCEPT_HANDLERS_END
-	cmpl   $KERNEL_BASE, %ebp
+	movl   $(RPC_SYSCALL_INFO_METHOD_SYSENTER_32 | RPC_SYSCALL_INFO_FEXCEPT |  \
+	         RPC_SYSCALL_INFO_FARGVALID(0) | RPC_SYSCALL_INFO_FARGVALID(1) |   \
+	         RPC_SYSCALL_INFO_FARGVALID(2) | RPC_SYSCALL_INFO_FARGVALID(3)), %eax
+	cmpl   $(KERNEL_BASE), %ebp
 	jae    1f
 .Lsysenter_guard_start:
-	movl   0(%ebp), %eax
-	movl   %eax, 24(%esp) /* ARG[4] */
-	movl   4(%ebp), %eax
+	movl   0(%ebp), %ecx
+	movl   %ecx, 24(%esp) /* ARG[4] */
+	orl    $(RPC_SYSCALL_INFO_FARGVALID(4)), %eax
+	movl   4(%ebp), %ecx
 .Lsysenter_guard_end:
-	movl   %eax, 28(%esp) /* ARG[5] */
+	movl   %ecx, 28(%esp) /* ARG[5] */
+	orl    $(RPC_SYSCALL_INFO_FARGVALID(5)), %eax
 .Lsysenter_guard_entry:
 1:	ret
 	.cfi_endproc
@@ -749,8 +760,9 @@ INTERN_FUNCTION(__x86_asm32_sysenter_break)
 	call   copy_extended_user_arguments
 
 	/* Throw an `E_UNKNOWN_SYSTEMCALL' exception */
-	pushl_cfi $7
-	pushl_cfi $ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)
+	pushl_cfi %eax /* Returned by `copy_extended_user_arguments()' */
+	pushl_cfi $(8)
+	pushl_cfi $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL))
 	call   error_thrown
 	.cfi_endproc
 END(__x86_asm32_sysenter_break)
@@ -758,7 +770,7 @@ END(__x86_asm32_sysenter_break)
 
 
 .section .text.cold
-#define SYS_INVALID_ENCODE_COUNT(count) (count+1)
+#define SYS_INVALID_ENCODE_COUNT(count) (count+2)
 
 /* Called when a system call is recognized, but hasn't been implemented yet */
 INTERN_FUNCTION(sys_invalid0)
@@ -767,8 +779,18 @@ INTERN_FUNCTION(sys_invalid0)
 .Lsys_invalid_common:
 	xchgl  0(%esp), %eax
 	.cfi_register %eip, %eax
-	pushl_cfi %ecx
-	pushl_cfi $ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)
+	pushl_cfi $(0) /* flags (filled in later) */
+	pushl_cfi %ecx /* argc */
+	/* *(u32 *)(ESP + 4) = (RPC_SYSCALL_INFO_METHOD_OTHER_32 | RPC_SYSCALL_INFO_FEXCEPT |
+	 *                      ((1 << (%ecx - 2)) - 1) << RPC_SYSCALL_INFO_FARGVALID_SHIFT); */
+	subl   $(2), %ecx
+	movl   $1, %edx
+	shll   %cl, %edx
+	decl   %edx
+	shll   $(RPC_SYSCALL_INFO_FARGVALID_SHIFT), %edx
+	orl    $(RPC_SYSCALL_INFO_METHOD_OTHER_32 | RPC_SYSCALL_INFO_FEXCEPT), %edx
+	movl   %edx, 4(%esp) /* flags */
+	pushl_cfi $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL))
 	call   error_thrown
 	.cfi_endproc
 END(sys_invalid0)

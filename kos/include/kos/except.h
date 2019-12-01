@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72a2c551 */
+/* HASH CRC-32:0xc0285fdc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -304,6 +304,8 @@ __DECL_BEGIN
 
 
 /* Attempted to execute an unknown system call
+ * 	@@System call invocation flags (Set of `RPC_SYSCALL_INFO_*')
+ * 	member flags: uintptr_t;
  * 	member sysno: uintptr_t;
  * 	member arg0: uintptr_t;
  * 	member arg1: uintptr_t;

@@ -420,17 +420,26 @@ PUBLIC WUNUSED ATTR_RETNONNULL struct icpustate *FCALL
 x86_userexcept_propagate(struct icpustate *__restrict state,
                          struct rpc_syscall_info *sc_info) {
 	struct icpustate *result;
-	struct exception_info *einfo;
-	einfo = error_info();
 
 	/* Handle special exception codes */
-	switch (einfo->ei_code) {
+	switch (PERTASK_GET(this_exception_code)) {
 
 	case ERROR_CODEOF(E_EXIT_PROCESS):
-		process_exit((int)einfo->ei_data.e_pointers[0]);
+		process_exit((int)PERTASK_GET(this_exception_pointers[0]));
 
 	case ERROR_CODEOF(E_EXIT_THREAD):
-		task_exit((int)einfo->ei_data.e_pointers[0]);
+		task_exit((int)PERTASK_GET(this_exception_pointers[0]));
+
+	case ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL): {
+		enum { MMASK = RPC_SYSCALL_INFO_FMETHOD & ~RPC_SYSCALL_INFO_METHOD_F3264 };
+		uintptr_t flags;
+		/* Amend missing information about how a system call was invoked. */
+		flags = PERTASK_GET(this_exception_pointers[0]);
+		if ((flags & MMASK) == (RPC_SYSCALL_INFO_METHOD_OTHER & ~RPC_SYSCALL_INFO_METHOD_F3264)) {
+			flags = (flags & ~MMASK) | (sc_info->rsi_flags & MMASK);
+			PERTASK_SET(this_exception_pointers[0], flags);
+		}
+	}	break;
 
 	default: break;
 	}

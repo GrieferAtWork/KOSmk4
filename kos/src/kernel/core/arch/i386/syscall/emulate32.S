@@ -120,7 +120,8 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 
 	/* Throw an actual `E_UNKNOWN_SYSTEMCALL' exception! */
 	pushl_cfi %eax                                  /* sysno */
-	pushl_cfi $(7)                                  /* argc */
+	pushl_cfi ((8*4)+OFFSET_RPC_SYSCALL_INFO_FLAGS)(%esp) /* flags */
+	pushl_cfi $(8)                                  /* argc */
 	pushl_cfi $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)) /* ecode */
 	call   error_thrown
 	.cfi_adjust_cfa_offset -12

@@ -394,18 +394,27 @@ x86_lcall7_syscall_main(struct x86_lcall7_syscall_data *__restrict data,
 err_nosys:
 	if (!(data->iret.ir_eflags & EFLAGS_CF))
 		return (syscall_ulong_t)-ENOSYS;
+	argc = 0;
 	if likely(ADDR_IS_USER(usp)) {
 		TRY {
-			argv[5] = ATOMIC_READ(usp[5]);
-			argv[4] = ATOMIC_READ(usp[4]);
-			argv[3] = ATOMIC_READ(usp[3]);
-			argv[2] = ATOMIC_READ(usp[2]);
-			argv[1] = ATOMIC_READ(usp[1]);
 			argv[0] = ATOMIC_READ(usp[0]);
+			argc |= RPC_SYSCALL_INFO_FARGVALID(0);
+			argv[1] = ATOMIC_READ(usp[1]);
+			argc |= RPC_SYSCALL_INFO_FARGVALID(1);
+			argv[2] = ATOMIC_READ(usp[2]);
+			argc |= RPC_SYSCALL_INFO_FARGVALID(2);
+			argv[3] = ATOMIC_READ(usp[3]);
+			argc |= RPC_SYSCALL_INFO_FARGVALID(3);
+			argv[4] = ATOMIC_READ(usp[4]);
+			argc |= RPC_SYSCALL_INFO_FARGVALID(4);
+			argv[5] = ATOMIC_READ(usp[5]);
+			argc |= RPC_SYSCALL_INFO_FARGVALID(5);
 		} EXCEPT {
 		}
 	}
 	THROW(E_UNKNOWN_SYSTEMCALL,
+	      RPC_SYSCALL_INFO_METHOD_LCALL7_32 |
+	      RPC_SYSCALL_INFO_FEXCEPT | argc,
 	      sysno,
 	      argv[0], argv[1], argv[2],
 	      argv[3], argv[4], argv[5]);

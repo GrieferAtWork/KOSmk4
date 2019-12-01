@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54ebabf0 */
+/* HASH CRC-32:0x69b81ae3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,7 +69,7 @@ CLASS(E_PROCESS_EXITED,MESSAGE("A process has exited"),ERRNO(ESRCH),(MEMBER(pid_
 END
 CLASS(E_NO_DEVICE,MESSAGE("The named device doesn\'t exist"),ERRNO(ENODEV),(MEMBER(uintptr_t,kind) MEMBER(dev_t,devno)))
 END
-CLASS(E_UNKNOWN_SYSTEMCALL,MESSAGE("Attempted to execute an unknown system call"),ERRNO(ENOSYS),(MEMBER(uintptr_t,sysno) MEMBER(uintptr_t,arg0) MEMBER(uintptr_t,arg1) MEMBER(uintptr_t,arg2) MEMBER(uintptr_t,arg3) MEMBER(uintptr_t,arg4) MEMBER(uintptr_t,arg5)))
+CLASS(E_UNKNOWN_SYSTEMCALL,MESSAGE("Attempted to execute an unknown system call"),ERRNO(ENOSYS),(MEMBER(uintptr_t,flags) MEMBER(uintptr_t,sysno) MEMBER(uintptr_t,arg0) MEMBER(uintptr_t,arg1) MEMBER(uintptr_t,arg2) MEMBER(uintptr_t,arg3) MEMBER(uintptr_t,arg4) MEMBER(uintptr_t,arg5)))
 END
 CLASS(E_NO_SUCH_OBJECT,MESSAGE("The specified object doesn\'t exist"),NO_ERRNO,())
 	SUBCLASS(E_NO_SUCH_BLOCKDEVICE,MESSAGE("No block device has been bound"),NO_ERRNO,())

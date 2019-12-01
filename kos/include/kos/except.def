@@ -411,6 +411,9 @@ const E_NO_DEVICE_KIND_CHARACTER_DEVICE = 2;
 [errno(ENOSYS)]
 [message("Attempted to execute an unknown system call")]
 class E_UNKNOWN_SYSTEMCALL = 0x0008 {
+	@@System call invocation flags (Set of `RPC_SYSCALL_INFO_*')
+	[tostr(select("RPC_SYSCALL_INFO_*"))]
+	member flags: uintptr_t;
 	member sysno: uintptr_t;
 	member arg0: uintptr_t;
 	member arg1: uintptr_t;

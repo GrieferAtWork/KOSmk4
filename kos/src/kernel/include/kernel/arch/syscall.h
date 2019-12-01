@@ -20,29 +20,9 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_ARCH_SYSCALL_H 1
 
 #include <kernel/compiler.h>
-#include <asm/unistd.h>
 
-#define ATTR_SECTION_SYSCALL(name) ATTR_SECTION(".text")
-
-#ifdef __CC__
-DECL_BEGIN
-
-#define SYSCALL_RESTART_MODE_AUTO 0 /* Automatic restarting */
-#define SYSCALL_RESTART_MODE_DONT 1 /* Don't restart */
-#define SYSCALL_RESTART_MODE_MUST 2 /* Always restart */
-
-/* System call restart mode / cancellation point configuration */
-#define SYSCALL_RESTART_MODE(sysno)           SYSCALL_RESTART_MODE_AUTO
-#define SYSCALL_RESTART_MODE_EX(sysno,error) (error)
-#define SYSCALL_IS_CANCELLATION_POINT(sysno)           1
-#define SYSCALL_IS_CANCELLATION_POINT_EX(sysno,error) (error)
-
-
-/* Evaluate the number of registers used by a given system call. */
-#define SYSCALL_REGISTER_COUNT(sysno)           6
-#define SYSCALL_REGISTER_COUNT_EX(sysno,error) (error)
-
-DECL_END
-#endif /* __CC__ */
+#ifndef ATTR_SECTION_SYSCALL
+#define ATTR_SECTION_SYSCALL(name) /* nothing */
+#endif /* !ATTR_SECTION_SYSCALL */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_ARCH_SYSCALL_H */

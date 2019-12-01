@@ -32,6 +32,9 @@
 #define RPC_SYSCALL_INFO_METHOD_SYSVABI_64   0x83 /* 64-bit call into the ukern segment */
 #define RPC_SYSCALL_INFO_METHOD_SIGRETURN_64 0xfe /* 64-bit call was restarted as part of `sigreturn()' */
 #define RPC_SYSCALL_INFO_METHOD_OTHER_64     0xff /* Some other kind of 64-bit system call invocation method */
+#define RPC_SYSCALL_INFO_METHOD_F32          0x00 /* FLAG: 32-bit system call */
+#define RPC_SYSCALL_INFO_METHOD_F64          0x80 /* FLAG: 64-bit system call */
+#define RPC_SYSCALL_INFO_METHOD_F3264        0x80 /* MASK: 32/64-bit system call */
 
 #ifdef __x86_64__
 #define RPC_SYSCALL_INFO_METHOD_INT80H    RPC_SYSCALL_INFO_METHOD_INT80H_64
