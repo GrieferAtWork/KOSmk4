@@ -17,9 +17,10 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #include <hybrid/host.h>
+
 #ifdef __x86_64__
-#include <crt-features/crt-kos-kernel64.h>
+#include "crt-kos-kernel64.h"
 #else /* __x86_64__ */
-#include <crt-features/crt-kos-kernel32.h>
+#include "crt-kos-kernel32.h"
 #endif /* !__x86_64__ */
 

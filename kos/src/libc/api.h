@@ -131,10 +131,10 @@
 
 #ifndef NOBLOCK
 #define NOBLOCK __NOBLOCK
-#endif
+#endif /* !NOBLOCK */
 #ifndef THROWS
 #define THROWS __THROWS
-#endif
+#endif /* !THROWS */
 
 #define ATTR_LIBC_PRINTF(a, b)    __ATTR_LIBC_PRINTF(a, b)
 #define ATTR_LIBC_PRINTF_P(a, b)  __ATTR_LIBC_PRINTF_P(a, b)
@@ -204,7 +204,7 @@ INTDEF NOBLOCK syscall_slong_t NOTHROW(__FCALL libc_seterrno)(errno_t value);
 #if 1
 #define CONFIG_LOG_LIBC_UNIMPLEMENTED 1
 INTDEF void LIBCCALL libc_unimplemented(char const *__restrict name);
-#define CRT_UNIMPLEMENTED(name)  libc_unimplemented(name)
+#define CRT_UNIMPLEMENTED(name) libc_unimplemented(name)
 #else
 #define CRT_UNIMPLEMENTED(name) (void)0
 #endif
