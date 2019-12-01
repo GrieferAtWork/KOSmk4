@@ -247,6 +247,10 @@ PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
 NOTHROW(FCALL task_push_asynchronous_srpc)(struct scpustate *__restrict state,
                                            task_srpc_t func, void *arg,
                                            struct sig *completed) {
+	(void)state;
+	(void)func;
+	(void)arg;
+	(void)completed;
 	kernel_panic("TODO");
 }
 

@@ -863,6 +863,9 @@ PRIVATE char const GDBFeatures_target_xml[] =
 INTERN NONNULL((1, 3)) ssize_t
 NOTHROW(FCALL GDBInfo_PrintFeaturesFile)(pformatprinter printer, void *arg,
                                          char const *__restrict filename) {
+	(void)printer;
+	(void)arg;
+	(void)filename;
 #ifdef HAVE_GDBFeatures_target_xml
 	if (strcmp(filename, "target.xml") == 0)
 		return (*printer)(arg, GDBFeatures_target_xml, COMPILER_STRLEN(GDBFeatures_target_xml));

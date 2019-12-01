@@ -100,7 +100,7 @@ NOTHROW(FCALL cpl_getiopl_impl)(void *buf, struct task *__restrict thread) {
 	if (thread == THIS_TASK) {
 		*(uintptr_t *)buf = irregs_getpflags(irregs);
 	} else {
-		*(uintptr_t *)buf = irregs->ir_eflags;
+		*(uintptr_t *)buf = irregs->ir_pflags;
 	}
 }
 

@@ -563,12 +563,12 @@ sigreturn32_rpc(void *UNUSED(arg),
 }
 
 DEFINE_SYSCALL32_6(void, sigreturn,
-                    USER UNCHECKED struct /*fpustate32*/ fpustate const *, restore_fpu,
+                    USER UNCHECKED struct fpustate32 const *, restore_fpu,
                     syscall_ulong_t, unused1,
                     syscall_ulong_t, unused2,
                     USER UNCHECKED sigset_t const *, restore_sigmask,
-                    USER UNCHECKED struct /*rpc_syscall_info32*/ rpc_syscall_info *, sc_info,
-                    USER UNCHECKED struct /*ucpustate32*/ ucpustate const *, restore_cpu) {
+                    USER UNCHECKED struct rpc_syscall_info32 *, sc_info,
+                    USER UNCHECKED struct ucpustate32 const *, restore_cpu) {
 	(void)restore_fpu;
 	(void)unused1;
 	(void)unused2;
@@ -623,8 +623,8 @@ raiseat32_rpc(void *UNUSED(arg),
 }
 
 DEFINE_SYSCALL32_2(errno_t, raiseat,
-                   USER UNCHECKED /*ucpustate32*/ struct ucpustate const *, state,
-                   USER UNCHECKED /*siginfo32_t*/ struct __siginfo_struct const *, si) {
+                   USER UNCHECKED struct ucpustate32 const *, state,
+                   USER UNCHECKED siginfo32_t const *, si) {
 	(void)state;
 	(void)si;
 	task_schedule_user_rpc(THIS_TASK,

@@ -26,6 +26,7 @@
 #include <kos/malloc.h>
 #include <kos/syscalls.h>
 #include <sys/resource.h>
+#include <sys/syscall.h>
 #include <sys/utsname.h>
 
 #include <fcntl.h>
@@ -563,9 +564,15 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.sched.user.SetEUid") void
 		__THROWS(...)
 /*[[[body:SetEUid]]]*/
 {
+#ifdef SYS_getresuid32
 	uint32_t ruid;
 	sys_Xgetresuid32(&ruid, NULL, NULL);
-	sys_Xsetreuid32(ruid, (uint32_t)euid);
+	sys_Xsetreuid32(ruid, euid);
+#else /* SYS_getresuid32 */
+	uid_t ruid;
+	sys_Xgetresuid(&ruid, NULL, NULL);
+	sys_Xsetreuid(ruid, euid);
+#endif /* !SYS_getresuid32 */
 }
 /*[[[end:SetEUid]]]*/
 
@@ -580,9 +587,15 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.sched.user.SetEGid") void
 		__THROWS(...)
 /*[[[body:SetEGid]]]*/
 {
+#ifdef SYS_getresgid32
 	uint32_t rgid;
 	sys_Xgetresgid32(&rgid, NULL, NULL);
-	sys_Xsetregid32(rgid, (uint32_t)egid);
+	sys_Xsetregid32(rgid, egid);
+#else /* SYS_getresgid32 */
+	gid_t rgid;
+	sys_Xgetresgid(&rgid, NULL, NULL);
+	sys_Xsetregid(rgid, egid);
+#endif /* !SYS_getresgid32 */
 }
 /*[[[end:SetEGid]]]*/
 

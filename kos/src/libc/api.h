@@ -20,6 +20,12 @@
 #define GUARD_LIBC_API_H 1
 #define __BUILDING_LIBC 1
 
+#ifdef __KERNEL__
+#define __CRT_KOS_KERNEL 1
+#else /* __KERNEL__ */
+#define __CRT_KOS 1
+#endif /* !__KERNEL__ */
+
 #ifndef __OPTIMIZE_SIZE__
 /* Enable system call inlining, causing calls to `sys_*' functions from <kos/syscalls.h>
  * to be inlined (as far as possible), rather than being declared as entry points to the

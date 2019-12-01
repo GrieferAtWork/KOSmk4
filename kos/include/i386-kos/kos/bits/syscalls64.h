@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f42ea03 */
+/* HASH CRC-32:0xfec91629 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,6 @@
 #include <bits/iovec-struct64.h>
 #include <bits/itimerspec64.h>
 #include <bits/siginfo-struct64.h>
-#include <bits/timespec32.h>
 #include <bits/timespec64.h>
 #include <bits/timeval64.h>
 #include <bits/types.h>
@@ -77,7 +76,6 @@ struct __fd_set_struct;
 struct __itimerspecx64;
 struct __siginfo64_struct;
 struct __sigset_struct;
-struct __timespecx32_64;
 struct __timespecx64;
 struct __timevalx64;
 struct debugtrap_reason64;
@@ -493,7 +491,7 @@ __CDECLARE_SC(,__errno_t,lfutexexpr,(void *__base, __size_t __exprc, struct lfut
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CDECLARE_SC(,__errno_t,lfutexlockexpr,(__uint64_t *__ulockaddr, void *__base, __size_t __exprc, struct lfutexexpr64 const *__exprv, struct __timespecx32_64 const *__timeout, __syscall_ulong_t __timeout_flags),(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+__CDECLARE_SC(,__errno_t,lfutexlockexpr,(__uint64_t *__ulockaddr, void *__base, __size_t __exprc, struct lfutexexpr64 const *__exprv, struct __timespecx64 const *__timeout, __syscall_ulong_t __timeout_flags),(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
 #endif /* __CRT_HAVE_SC(lfutexlockexpr) */
 #if __CRT_HAVE_SC(linux_fstat64)
 __CDECLARE_SC(,__errno_t,linux_fstat64,(__fd_t __fd, struct linux_stat64 *__statbuf),(__fd,__statbuf))
@@ -1174,7 +1172,7 @@ __CDECLARE_XSC(,__errno_t,lfutexexpr,(void *__base, __size_t __exprc, struct lfu
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CDECLARE_XSC(,__errno_t,lfutexlockexpr,(__uint64_t *__ulockaddr, void *__base, __size_t __exprc, struct lfutexexpr64 const *__exprv, struct __timespecx32_64 const *__timeout, __syscall_ulong_t __timeout_flags),(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+__CDECLARE_XSC(,__errno_t,lfutexlockexpr,(__uint64_t *__ulockaddr, void *__base, __size_t __exprc, struct lfutexexpr64 const *__exprv, struct __timespecx64 const *__timeout, __syscall_ulong_t __timeout_flags),(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
 #endif /* __CRT_HAVE_XSC(lfutexlockexpr) */
 #if __CRT_HAVE_XSC(linux_fstat64)
 __CDECLARE_XSC(,__errno_t,linux_fstat64,(__fd_t __fd, struct linux_stat64 *__statbuf),(__fd,__statbuf))

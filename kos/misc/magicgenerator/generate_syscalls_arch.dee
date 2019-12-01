@@ -491,6 +491,7 @@ function x86_64_printKernelSyscallWrapper_asm64_syscall(fp: File, f: Function, s
 	}
 	fp << "	popq_cfi_r %rcx\n";
 	fp << "	intr_exit_sysret\n";
+	fp << "	.cfi_endproc\n";
 	fp << "END(__x86_asm64_syscall_" << f.name << ")\n";
 }
 
@@ -549,7 +550,7 @@ function x86_64_assignRegister64(
 		b, none, c = b.partition(":")...;
 		assert clobber !is none;
 		x86_64_formDoubleWideArgument64Ex(fp, a, b, c, clobber);
-	} else if (b.startswith("r")) {
+	} else if (b.startswith("%r")) {
 		fp << "	movq   " << b << ", " << a << " /* "
 			<< x86_64_getRegisterName64(a)
 			<< " = "
@@ -970,6 +971,7 @@ function x86_64_printKernelSyscallWrapper_asm32_int80(fp: File, f: Function, sys
 	}
 	fp << "	popq_cfi_r %rcx\n";
 	fp << "	intr_exit_sysret\n";
+	fp << "	.cfi_endproc\n";
 	fp << "END(__x86_asm32_int80_" << f.name << ")\n";
 }
 
@@ -1016,6 +1018,7 @@ function x86_64_printKernelSyscallWrapper_asm32_sysenter(fp: File, f: Function, 
 	}
 	fp << "	popq_cfi_r %rcx\n";
 	fp << "	intr_exit_sysret\n";
+	fp << "	.cfi_endproc\n";
 	fp << "END(__x86_asm32_sysenter_" << f.name << ")\n";
 }
 

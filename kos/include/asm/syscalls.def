@@ -573,17 +573,17 @@ _newselect:(int TODO_PROTOTYPE) -> errno_t;
 [cp] flock:(fd_t fd, syscall_ulong_t operation) -> errno_t;
 [cp] msync:(void *addr, size_t len, syscall_ulong_t flags) -> errno_t;
 [cp] readv:(fd_t fd, struct iovec const *iovec, size_t count) -> ssize_t;
-[cp] readv32:(fd_t fd, struct iovec32 const *iovec, size_t count) -> ssize_t;
-[cp] readv64:(fd_t fd, struct iovec64 const *iovec, size_t count) -> ssize_t;
+[cp] readvx32:(fd_t fd, struct iovec32 const *iovec, size_t count) -> ssize_t;
+[cp] readvx64:(fd_t fd, struct iovec64 const *iovec, size_t count) -> ssize_t;
 [cp] readvf:(fd_t fd, struct iovec const *iovec, size_t count, iomode_t mode) -> ssize_t;
-[cp] readvf32:(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) -> ssize_t;
-[cp] readvf64:(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) -> ssize_t;
+[cp] readvfx32:(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) -> ssize_t;
+[cp] readvfx64:(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) -> ssize_t;
 [cp] writev:(fd_t fd, struct iovec const *iovec, size_t count) -> ssize_t;
-[cp] writev32:(fd_t fd, struct iovec32 const *iovec, size_t count) -> ssize_t;
-[cp] writev64:(fd_t fd, struct iovec64 const *iovec, size_t count) -> ssize_t;
+[cp] writevx32:(fd_t fd, struct iovec32 const *iovec, size_t count) -> ssize_t;
+[cp] writevx64:(fd_t fd, struct iovec64 const *iovec, size_t count) -> ssize_t;
 [cp] writevf:(fd_t fd, struct iovec const *iovec, size_t count, iomode_t mode) -> ssize_t;
-[cp] writevf32:(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) -> ssize_t;
-[cp] writevf64:(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) -> ssize_t;
+[cp] writevfx32:(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) -> ssize_t;
+[cp] writevfx64:(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) -> ssize_t;
 
 [restart(must)] getsid:(pid_t pid) -> pid_t;
 [cp] fdatasync:(fd_t fd) -> errno_t;
@@ -641,8 +641,8 @@ rt_sigpending:(struct __sigset_struct *set, size_t sigsetsize) -> errno_t;
 
 @@@param: signo: One of `SIG*'
 rt_sigqueueinfo:(pid_t tgid, syscall_ulong_t signo, struct __siginfo_struct const *uinfo) -> errno_t;
-[doc_alias(rt_sigqueueinfo)] rt_sigqueueinfo32:(pid_t tgid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) -> errno_t;
-[doc_alias(rt_sigqueueinfo)] rt_sigqueueinfo64:(pid_t tgid, syscall_ulong_t signo, struct __siginfo64_struct const *uinfo) -> errno_t;
+[doc_alias(rt_sigqueueinfo)] rt_sigqueueinfox32:(pid_t tgid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) -> errno_t;
+[doc_alias(rt_sigqueueinfo)] rt_sigqueueinfox64:(pid_t tgid, syscall_ulong_t signo, struct __siginfo64_struct const *uinfo) -> errno_t;
 
 rt_sigsuspend:(struct __sigset_struct const *set, size_t sigsetsize) -> errno_t;
 
@@ -794,8 +794,8 @@ kexec_load:(int TODO_PROTOTYPE) -> errno_t;
 waitid:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop,
         [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options,
         struct rusage *ru) -> errno_t;
-[restart(dont)][cp][doc_alias(waitid)] waitid32:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusage *ru) -> errno_t;
-[restart(dont)][cp][doc_alias(waitid)] waitid64:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo64_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusage *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitidx32:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusage *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitidx64:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo64_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusage *ru) -> errno_t;
 
 add_key:(int TODO_PROTOTYPE) -> errno_t;
 request_key:(int TODO_PROTOTYPE) -> errno_t;
@@ -898,8 +898,8 @@ get_robust_list:(int TODO_PROTOTYPE) -> errno_t;
 [cp] tee:(fd_t fdin, fd_t fdout, size_t length, syscall_ulong_t flags) -> ssize_t;
 
 [cp] vmsplice:(fd_t fdout, struct iovec const *iov, size_t count, syscall_ulong_t flags) -> ssize_t;
-[cp] vmsplice32:(fd_t fdout, struct iovec32 const *iov, size_t count, syscall_ulong_t flags) -> ssize_t;
-[cp] vmsplice64:(fd_t fdout, struct iovec64 const *iov, size_t count, syscall_ulong_t flags) -> ssize_t;
+[cp] vmsplicex32:(fd_t fdout, struct iovec32 const *iov, size_t count, syscall_ulong_t flags) -> ssize_t;
+[cp] vmsplicex64:(fd_t fdout, struct iovec64 const *iov, size_t count, syscall_ulong_t flags) -> ssize_t;
 
 move_pages:(int TODO_PROTOTYPE) -> errno_t;
 getcpu:(uint32_t *cpu, uint32_t *node, struct getcpu_cache *tcache) -> errno_t;
@@ -955,22 +955,22 @@ pipe2:(fd_t pipedes[2], [tostr(flagset(O_CLOEXEC,O_CLOFORK,O_NONBLOCK,O_DIRECT))
 inotify_init1:(int TODO_PROTOTYPE) -> errno_t;
 
 [cp] preadv:(fd_t fd, struct iovec const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
-[cp] preadv32:(fd_t fd, struct iovec32 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
-[cp] preadv64:(fd_t fd, struct iovec64 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
+[cp] preadvx32:(fd_t fd, struct iovec32 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
+[cp] preadvx64:(fd_t fd, struct iovec64 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
 [cp] preadvf:(fd_t fd, struct iovec const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
-[cp] preadvf32:(fd_t fd, struct iovec32 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
-[cp] preadvf64:(fd_t fd, struct iovec64 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
+[cp] preadvfx32:(fd_t fd, struct iovec32 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
+[cp] preadvfx64:(fd_t fd, struct iovec64 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
 [cp] pwritev:(fd_t fd, struct iovec const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
-[cp] pwritev32:(fd_t fd, struct iovec32 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
-[cp] pwritev64:(fd_t fd, struct iovec64 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
+[cp] pwritevx32:(fd_t fd, struct iovec32 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
+[cp] pwritevx64:(fd_t fd, struct iovec64 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
 [cp] pwritevf:(fd_t fd, struct iovec const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
-[cp] pwritevf32:(fd_t fd, struct iovec32 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
-[cp] pwritevf64:(fd_t fd, struct iovec64 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
+[cp] pwritevfx32:(fd_t fd, struct iovec32 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
+[cp] pwritevfx64:(fd_t fd, struct iovec64 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
 
 @@@param: signo: One of `SIG*'
 rt_tgsigqueueinfo:(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo_struct const *uinfo) -> errno_t;
-[doc_alias(rt_tgsigqueueinfo)] rt_tgsigqueueinfo32:(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) -> errno_t;
-[doc_alias(rt_tgsigqueueinfo)] rt_tgsigqueueinfo64:(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo64_struct const *uinfo) -> errno_t;
+[doc_alias(rt_tgsigqueueinfo)] rt_tgsigqueueinfox32:(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) -> errno_t;
+[doc_alias(rt_tgsigqueueinfo)] rt_tgsigqueueinfox64:(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo64_struct const *uinfo) -> errno_t;
 
 perf_event_open:(int TODO_PROTOTYPE) -> errno_t;
 /* TODO: `struct mmsghdr' needs a 32/64-variant */
@@ -994,11 +994,11 @@ clock_adjtime:(int TODO_PROTOTYPE) -> errno_t;
 [restart(dont)][cp] sendmmsg:(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags) -> ssize_t;
 setns:(fd_t fd, syscall_ulong_t nstype) -> errno_t;
 process_vm_readv:(pid_t pid, struct iovec const *lvec, size_t liovcnt, struct iovec const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
-process_vm_readv32:(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
-process_vm_readv64:(pid_t pid, struct iovec64 const *lvec, size_t liovcnt, struct iovec64 const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
+process_vm_readvx32:(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
+process_vm_readvx64:(pid_t pid, struct iovec64 const *lvec, size_t liovcnt, struct iovec64 const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
 process_vm_writev:(pid_t pid, struct iovec const *lvec, size_t liovcnt, struct iovec const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
-process_vm_writev32:(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
-process_vm_writev64:(pid_t pid, struct iovec64 const *lvec, size_t liovcnt, struct iovec64 const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
+process_vm_writevx32:(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
+process_vm_writevx64:(pid_t pid, struct iovec64 const *lvec, size_t liovcnt, struct iovec64 const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
 
 kcmp:(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2) -> syscall_slong_t;
 finit_module:(int TODO_PROTOTYPE) -> errno_t;
@@ -1234,14 +1234,14 @@ rpc_schedule:(pid_t target,
 		RPC_SCHEDULE_FLAG_LOWPRIO))]
 		syscall_ulong_t flags,
 	uint8_t const *program, void **arguments) -> syscall_slong_t;
-[doc_alias(rpc_schedule)] rpc_schedule32:(pid_t target,
+[doc_alias(rpc_schedule)] rpc_schedulex32:(pid_t target,
 	[tostr(flagset(RPC_SCHEDULE_SYNC:RPC_SCHEDULE_ASYNC,
 		RPC_SCHEDULE_FLAG_NONSYSCALL,RPC_SCHEDULE_FLAG_WAITFORSTART,RPC_SCHEDULE_FLAG_STATUSFUTEX,
 		RPC_SCHEDULE_FLAG_SYSRESTART,RPC_SCHEDULE_FLAG_NOSYSRESTART,RPC_SCHEDULE_FLAG_WAITSMPACK,
 		RPC_SCHEDULE_FLAG_DONTWAKE,RPC_SCHEDULE_FLAG_HIGHPRIO,RPC_SCHEDULE_FLAG_LOWPRIO))]
 		syscall_ulong_t flags,
 	uint8_t const *program, __HYBRID_PTR32(void) *arguments) -> syscall_slong_t;
-[doc_alias(rpc_schedule)] rpc_schedule64:(pid_t target,
+[doc_alias(rpc_schedule)] rpc_schedulex64:(pid_t target,
 	[tostr(flagset(RPC_SCHEDULE_SYNC:RPC_SCHEDULE_ASYNC,
 		RPC_SCHEDULE_FLAG_NONSYSCALL,RPC_SCHEDULE_FLAG_WAITFORSTART,RPC_SCHEDULE_FLAG_STATUSFUTEX,
 		RPC_SCHEDULE_FLAG_SYSRESTART,RPC_SCHEDULE_FLAG_NOSYSRESTART,RPC_SCHEDULE_FLAG_WAITSMPACK,
@@ -1264,8 +1264,8 @@ openpty:(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, s
 @@@return: 0 :        Success.
 @@@return: -1:EINVAL: The given MODE is invalid
 [restart(must)] set_exception_handler:(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) -> errno_t;
-[doc_alias(set_exception_handler)][restart(must)] set_exception_handler32:(syscall_ulong_t mode, __except_handler32_t handler, void *handler_sp) -> errno_t;
-[doc_alias(set_exception_handler)][restart(must)] set_exception_handler64:(syscall_ulong_t mode, __except_handler64_t handler, void *handler_sp) -> errno_t;
+[doc_alias(set_exception_handler)][restart(must)] set_exception_handlerx32:(syscall_ulong_t mode, __except_handler32_t handler, void *handler_sp) -> errno_t;
+[doc_alias(set_exception_handler)][restart(must)] set_exception_handlerx64:(syscall_ulong_t mode, __except_handler64_t handler, void *handler_sp) -> errno_t;
 
 @@Get the current exception handler mode for the calling thread.
 @@@param: PMODE:       When non-NULL, store the current mode, which is encoded as:
@@ -1281,13 +1281,13 @@ openpty:(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, s
 @@@return: 0 :         Success.
 @@@return: -1:EFAULT:  One of the given pointers is non-NULL and faulty
 [restart(must)] get_exception_handler:(syscall_ulong_t *pmode, except_handler_t *phandler, void **phandler_sp) -> errno_t;
-[doc_alias(get_exception_handler)][restart(must)] get_exception_handler32:(__ULONG32_TYPE__ *pmode, __except_handler32_t *phandler, __HYBRID_PTR32(void) *phandler_sp) -> errno_t;
-[doc_alias(get_exception_handler)][restart(must)] get_exception_handler64:(__ULONG64_TYPE__ *pmode, __except_handler64_t *phandler, __HYBRID_PTR64(void) *phandler_sp) -> errno_t;
+[doc_alias(get_exception_handler)][restart(must)] get_exception_handlerx32:(__ULONG32_TYPE__ *pmode, __except_handler32_t *phandler, __HYBRID_PTR32(void) *phandler_sp) -> errno_t;
+[doc_alias(get_exception_handler)][restart(must)] get_exception_handlerx64:(__ULONG64_TYPE__ *pmode, __except_handler64_t *phandler, __HYBRID_PTR64(void) *phandler_sp) -> errno_t;
 
 @@Set per-vm meta-data for allowing the kernel to enumerate loaded code modules
 [restart(must)] set_library_listdef:(struct library_listdef const *listdef) -> errno_t;
-[restart(must)][doc_alias(set_library_listdef)] set_library_listdef32:(struct library_listdef32 const *listdef) -> errno_t;
-[restart(must)][doc_alias(set_library_listdef)] set_library_listdef64:(struct library_listdef64 const *listdef) -> errno_t;
+[restart(must)][doc_alias(set_library_listdef)] set_library_listdefx32:(struct library_listdef32 const *listdef) -> errno_t;
+[restart(must)][doc_alias(set_library_listdef)] set_library_listdefx64:(struct library_listdef64 const *listdef) -> errno_t;
 
 @@Trigger a debugger trap `trapno', optionally extended with `regs'
 @@at either the system call return location, or at the given `state'
@@ -1300,8 +1300,8 @@ openpty:(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, s
 @@@return: -EOK:    `state' was NULL and the trap returned successfully
 @@@return: -ENOENT: No debugger is connected to the calling process/process-group/system
 debugtrap:(struct ucpustate const *state, struct debugtrap_reason const *reason) -> errno_t;
-[doc_alias(debugtrap)] debugtrap32:(struct ucpustate32 const *state, struct debugtrap_reason32 const *reason) -> errno_t;
-[doc_alias(debugtrap)] debugtrap64:(struct ucpustate64 const *state, struct debugtrap_reason64 const *reason) -> errno_t;
+[doc_alias(debugtrap)] debugtrapx32:(struct ucpustate32 const *state, struct debugtrap_reason32 const *reason) -> errno_t;
+[doc_alias(debugtrap)] debugtrapx64:(struct ucpustate64 const *state, struct debugtrap_reason64 const *reason) -> errno_t;
 
 @@>> lfutex(2)
 @@Provide the bottom-most API for implementing user-space synchronization on KOS
@@ -1325,15 +1325,12 @@ debugtrap:(struct ucpustate const *state, struct debugtrap_reason const *reason)
 @@@throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
 @@@throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
 @@@return: -ETIMEDOUT:         A blocking futex-wait operation has timed out
-[restart(dont)][cp]
-lfutex:(uintptr_t *uaddr, syscall_ulong_t futex_op, uintptr_t val,
-        struct __timespec64 const *timeout, uintptr_t val2) -> syscall_slong_t;
-[restart(dont)][cp][doc_alias(lfutex)]
-lfutex32:(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val,
-          struct __timespecx32_64 const *timeout, uint32_t val2) -> syscall_slong_t;
-[restart(dont)][cp][doc_alias(lfutex)]
-lfutex64:(uint64_t *uaddr, syscall_ulong_t futex_op, uint64_t val,
-          struct __timespecx64 const *timeout, uint64_t val2) -> syscall_slong_t;
+[restart(dont)][cp] lfutex:(uintptr_t *uaddr, syscall_ulong_t futex_op, uintptr_t val, struct timespec const *timeout, uintptr_t val2) -> syscall_slong_t;
+[restart(dont)][cp][doc_alias(lfutex)] lfutex32:(uintptr_t *uaddr, syscall_ulong_t futex_op, uintptr_t val, struct __timespec32 const *timeout, uintptr_t val2) -> syscall_slong_t;
+[restart(dont)][cp][doc_alias(lfutex)] lfutex64:(uintptr_t *uaddr, syscall_ulong_t futex_op, uintptr_t val, struct __timespec64 const *timeout, uintptr_t val2) -> syscall_slong_t;
+[restart(dont)][cp][doc_alias(lfutex)] lfutexx32:(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32 const *timeout, uint32_t val2) -> syscall_slong_t;
+[restart(dont)][cp][doc_alias(lfutex)] lfutexx32_64:(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32_64 const *timeout, uint32_t val2) -> syscall_slong_t;
+[restart(dont)][cp][doc_alias(lfutex)] lfutexx64:(uint64_t *uaddr, syscall_ulong_t futex_op, uint64_t val, struct __timespecx64 const *timeout, uint64_t val2) -> syscall_slong_t;
 
 @@>> lfutexexpr(2)
 @@The lfutexexpr() system call can be used to specify arbitrarily complex
@@ -1362,15 +1359,12 @@ lfutex64:(uint64_t *uaddr, syscall_ulong_t futex_op, uint64_t val,
 @@@return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
 @@@return: -1:EINTR:     A blocking futex-wait operation was interrupted
 @@@return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out
-[restart(dont)][cp]
-lfutexexpr:(void *base, size_t exprc, struct lfutexexpr const *exprv,
-            struct __timespec64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
-[restart(dont)][cp][doc_alias(lfutexexpr)]
-lfutexexpr32:(void *base, size_t exprc, struct lfutexexpr32 const *exprv,
-              struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
-[restart(dont)][cp][doc_alias(lfutexexpr)]
-lfutexexpr64:(void *base, size_t exprc, struct lfutexexpr64 const *exprv,
-              struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp] lfutexexpr:(void *base, size_t exprc, struct lfutexexpr const *exprv, struct timespec const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexpr32:(void *base, size_t exprc, struct lfutexexpr const *exprv, struct __timespec32 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexpr64:(void *base, size_t exprc, struct lfutexexpr const *exprv, struct __timespec64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexprx32:(void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexprx32_64:(void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexprx64:(void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
 
 
 @@>> lfutexlockexpr(2)
@@ -1402,13 +1396,12 @@ lfutexexpr64:(void *base, size_t exprc, struct lfutexexpr64 const *exprv,
 @@@return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out
 [restart(dont)][cp]
 lfutexlockexpr:(uintptr_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr const *exprv,
-                struct __timespec64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
-[restart(dont)][cp][doc_alias(lfutexlockexpr)]
-lfutexlockexpr32:(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr32 const *exprv,
-                  struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
-[restart(dont)][cp][doc_alias(lfutexlockexpr)]
-lfutexlockexpr64:(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr64 const *exprv,
-                  struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+                struct timespec const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexpr32:(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr const *exprv, struct __timespec32 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexpr64:(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr const *exprv, struct __timespec64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexprx32:(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexprx32_64:(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexprx64:(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
 
 @@Create and return a new tty terminal controller connected to the given keyboard and display
 @@The newly created device automatically gets assigned an arbitrary device number, before
@@ -1425,8 +1418,8 @@ mktty:(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) -> f
 @@TODO: Add a flags argument to control if the current signal mask
 @@      should be ignored (currently, it's always being ignored)
 [restart(must)] raiseat:(struct ucpustate const *state, struct __siginfo_struct const *si) -> errno_t;
-[doc_alias(raiseat)][restart(must)] raiseat32:(struct ucpustate32 const *state, struct __siginfo32_struct const *si) -> errno_t;
-[doc_alias(raiseat)][restart(must)] raiseat64:(struct ucpustate64 const *state, struct __siginfo64_struct const *si) -> errno_t;
+[doc_alias(raiseat)][restart(must)] raiseatx32:(struct ucpustate32 const *state, struct __siginfo32_struct const *si) -> errno_t;
+[doc_alias(raiseat)][restart(must)] raiseatx64:(struct ucpustate64 const *state, struct __siginfo64_struct const *si) -> errno_t;
 
 @@Trigger a coredump of the calling process.
 @@@param: curr_state:       The state as is still valid after any possible unwinding has already been done
@@ -1457,13 +1450,13 @@ coredump:(struct ucpustate const *curr_state, struct ucpustate const *orig_state
           void *const *traceback_vector, size_t traceback_length,
           struct exception_data const *exception, syscall_ulong_t unwind_error) -> errno_t;
 [doc_alias(coredump)][restart(must)]
-coredump32:(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state,
-            __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length,
-            struct exception_data32 const *exception, syscall_ulong_t unwind_error) -> errno_t;
+coredumpx32:(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state,
+             __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length,
+             struct exception_data32 const *exception, syscall_ulong_t unwind_error) -> errno_t;
 [doc_alias(coredump)][restart(must)]
-coredump64:(struct ucpustate64 const *curr_state, struct ucpustate64 const *orig_state,
-            __HYBRID_PTR64(void) const *traceback_vector, size_t traceback_length,
-            struct exception_data64 const *exception, syscall_ulong_t unwind_error) -> errno_t;
+coredumpx64:(struct ucpustate64 const *curr_state, struct ucpustate64 const *orig_state,
+             __HYBRID_PTR64(void) const *traceback_vector, size_t traceback_length,
+             struct exception_data64 const *exception, syscall_ulong_t unwind_error) -> errno_t;
 
 
 /* Generic system call numbers */

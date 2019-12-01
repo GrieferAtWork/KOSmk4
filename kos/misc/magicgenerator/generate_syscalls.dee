@@ -341,7 +341,7 @@ class Function {
 		print getFilenameForLog(declFilename),;
 		print "(",;
 		print declLine,;
-		print ") : ",;
+		print ") : Error : ",;
 		print message;
 		throw Error(message);
 	}
@@ -422,7 +422,7 @@ class ParserContext {
 		print getFilenameForLog(file),;
 		print "(",;
 		print line,;
-		print ") : ",;
+		print ") : Error : ",;
 		print message;
 		throw Error(message);
 	}
@@ -505,7 +505,7 @@ function parseTypeExpression(
 		print getFilenameForLog(filename),;
 		print "(",;
 		print text.count("\n", 0, i) + 1,;
-		print ") : ",;
+		print ") : Error : ",;
 		print message;
 		throw Error(message);
 	}
@@ -615,7 +615,7 @@ function parseSyscallDefs(context: ParserContext, text: string, filename: string
 		print getFilenameForLog(filename),;
 		print "(",;
 		print text.count("\n", 0, i) + 1,;
-		print ") : ",;
+		print ") : Error : ",;
 		print message;
 		throw Error(message);
 	}
@@ -2161,13 +2161,15 @@ again_scan_common:
 		writeHashedFile(a.formatPath(
 			"include/{name}/crt-features/crt-kos-syscalls{suffix}.h"
 		), [](fp){
-			generateCrtFeaturesCrtKosSyscallsHeader(
-				fp, for (local x: c.functions) x[1]);
+			generateCrtFeaturesCrtKosSyscallsHeader(fp,
+				for (local none, decl: c.sysidMappings)
+					c.functions[decl[2]]);
 		});
 	}
 	writeHashedFile("include/crt-features/crt-kos-syscalls.h", [](fp){
-		generateCrtFeaturesCrtKosSyscallsHeader(
-			fp, for (local x: baseContext.functions) x[1]);
+		generateCrtFeaturesCrtKosSyscallsHeader(fp,
+			for (local none, decl: baseContext.sysidMappings)
+				baseContext.functions[decl[2]]);
 	});
 
 	/* include/{}/asm/syscalls{}.h

@@ -33,14 +33,25 @@
 #include <kos/kernel/gdt.h>
 #endif /* __ASSEMBLER__ */
 
+#ifdef CONFIG_BUILDING_KERNEL_CORE
 #ifdef __x86_64__
-#include <asm/syscalls32_d.h>
+#if !defined(__NR32FEAT_DEFINED_SYSCALL_ARGUMENT_COUNT) || \
+    !defined(__NR32FEAT_DEFINED_SYSCALL_RETURN_TYPES) || \
+    !defined(__NR32FEAT_DEFINED_SYSCALL_ARGUMENT_TYPES)
+#undef __WANT_SYSCALL_ARGUMENT_COUNT
+#undef __WANT_SYSCALL_RETURN_TYPES
+#undef __WANT_SYSCALL_ARGUMENT_TYPES
+#define __WANT_SYSCALL_ARGUMENT_COUNT 1
+#define __WANT_SYSCALL_RETURN_TYPES   1
+#define __WANT_SYSCALL_ARGUMENT_TYPES 1
+#include <asm/syscalls-proto32_d.h>
+#endif /* !... */
+
+#define ATTR_SECTION_SYSCALL32(name) ATTR_SECTION(".text.x86.syscall32." #name)
 #endif /* __x86_64__ */
 
 #define ATTR_SECTION_SYSCALL(name)   ATTR_SECTION(".text.x86.syscall." #name)
-#ifdef __x86_64__
-#define ATTR_SECTION_SYSCALL32(name) ATTR_SECTION(".text.x86.syscall32." #name)
-#endif /* __x86_64__ */
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 
 /* System call calling conventions:

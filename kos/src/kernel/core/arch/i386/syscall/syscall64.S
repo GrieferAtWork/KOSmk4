@@ -71,17 +71,19 @@ INTERN_FUNCTION(x86_idt_syscall)
 	movzlq %eax, %rax
 .Ldo_asm32_syscall_int80_rax:
 	EXTERN(__x86_asm32_int80_break)
-#if __NR64_syscall0_min != 0
-	cmpq   $(__NR64_syscall0_min), %rax
+#if __NR32_syscall0_min != 0
+	cmpq   $(__NR32_syscall0_min), %rax
 	jb     __x86_asm32_int80_break
-#endif /* __NR64_syscall0_min != 0 */
+#endif /* __NR32_syscall0_min != 0 */
 	cmpq   $(__NR32_syscall0_max), %rax
 	ja     1f
 	EXTERN(x86_sysroute0_asm32_int80)
 	jmpq   *x86_sysroute0_asm32_int80(,%rax,8)
-1:	cmpq   $(__NR32_syscall1_min), %rax
+1:	movabs $(__NR32_syscall1_min), %r8
+	cmpq   %r8, %rax
 	jb     __x86_asm32_int80_break
-	cmpq   $(__NR32_syscall1_max), %rax
+	movabs $(__NR32_syscall1_max), %r8
+	cmpq   %r8, %rax
 	ja     __x86_asm32_int80_break
 	EXTERN(x86_sysroute1_asm32_int80)
 	jmpq   *(x86_sysroute1_asm32_int80 - ((__NR32_syscall1_min * 8) & 0xffffffffffffffff))(,%rax,8)
@@ -180,7 +182,6 @@ INTERN_FUNCTION(sys_invalid0)
 	movq   %rax, %rcx      /* pointers[1] = sysno */
 	movq   $(SIF(0)), %rdx /* pointers[0] = flags */
 	movq   $(2), %rsi                                  /* argc */
-.Lsys_include_common:
 	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
 	call   error_thrown
 END(sys_invalid0)
@@ -280,7 +281,6 @@ INTERN_FUNCTION(sys32_invalid0)
 	movq   %rax, %rcx      /* pointers[1] = sysno */
 	movq   $(SIF(0)), %rdx /* pointers[0] = flags */
 	movq   $(2), %rsi                                  /* argc */
-.Lsys_include_common:
 	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* code */
 	call   error_thrown
 END(sys32_invalid0)

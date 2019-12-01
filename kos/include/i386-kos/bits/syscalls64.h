@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4e05057 */
+/* HASH CRC-32:0x328bab4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -638,7 +638,7 @@
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-#define SYS_lfutexlockexpr         __NR_lfutexlockexpr         /* errno_t lfutexlockexpr(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+#define SYS_lfutexlockexpr         __NR_lfutexlockexpr         /* errno_t lfutexlockexpr(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
 /* Create and return a new tty terminal controller connected to the given keyboard and display
  * The newly created device automatically gets assigned an arbitrary device number, before
  * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)

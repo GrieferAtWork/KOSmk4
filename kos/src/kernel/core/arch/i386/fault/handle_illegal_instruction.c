@@ -1356,9 +1356,11 @@ e_bad_operand_addrmode:
 		PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE);
 		i = 2;
 		goto set_generic_illegal_instruction;
+#ifndef __x86_64__
 set_generic_illegal_instruction_4:
 		i = 4;
 		goto set_generic_illegal_instruction;
+#endif /* !__x86_64__ */
 e_privileged_instruction:
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE));
 		i = 1;

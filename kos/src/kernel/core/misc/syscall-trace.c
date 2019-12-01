@@ -54,17 +54,20 @@
 #include <inttypes.h>       /* PRI* */
 #include <sched.h>          /* CLONE_* */
 #include <unistd.h>         /* SEEK_* */
+#include <kos/bits/except-handler.h>
 
 #include <librpc/rpc.h> /* RPC_SCHEDULE_FLAG_* */
 
 #ifdef __ARCH_HAVE_COMPAT
 #if __ARCH_COMPAT_SIZEOF_POINTER == 4
+#include <kos/bits/except-handler32.h>
 #include <asm/syscalls32_d.h>
 #include <sys/syscall-trace32.h>
 #define COMPAT_NR(x)       __NR32##x
 #define COMPAT_SYSCALL(x)  SYSCALL32_##x
 #define COMPAT_LS_SYSCALLS <asm/ls-syscalls32.h>
 #else /* __ARCH_COMPAT_SIZEOF_POINTER == 4 */
+#include <kos/bits/except-handler64.h>
 #include <asm/syscalls64_d.h>
 #include <sys/syscall-trace64.h>
 #define COMPAT_NR(x)       __NR64##x
@@ -75,10 +78,14 @@
 
 DECL_BEGIN
 
-#ifndef ____idtype_t_defined
-#define ____idtype_t_defined 1
-typedef int __idtype_t;
-#endif /* !____idtype_t_defined */
+#if defined(__ARCH_HAVE_COMPAT) && __ARCH_COMPAT_SIZEOF_POINTER == 4
+#ifndef MAP_OFFSET64_POINTER
+/* XXX: Somehow pull this one from headers? */
+#define MAP_OFFSET64_POINTER 0x80000000
+#else /* !MAP_OFFSET64_POINTER */
+STATIC_ASSERT(MAP_OFFSET64_POINTER == 0x80000000);
+#endif /* MAP_OFFSET64_POINTER */
+#endif /* __ARCH_HAVE_COMPAT && __ARCH_COMPAT_SIZEOF_POINTER == 4 */
 
 
 PUBLIC void FCALL
@@ -162,19 +169,19 @@ syscall_printtrace_compat(pformatprinter printer, void *arg,
 	/* Trace system calls. */
 	switch (args->ta_sysno) {
 
-#define __SYSCALL(name)                                                           \
-	case COMPAT_NR(_##name):                                                      \
-		temp = format_printf(printer,                                             \
-		                     arg,                                                 \
-		                     #name "(" COMPAT_SYSCALL(_TRACE_ARGS_FORMAT_L)(name) \
-		                     COMPAT_SYSCALL(_TRACE_ARGS_ARGS)(name,               \
-		                         (COMPAT_NR(AM_##name)(args->ta_args[0],          \
-		                                               args->ta_args[1],          \
-		                                               args->ta_args[2],          \
-		                                               args->ta_args[3],          \
-		                                               args->ta_args[4],          \
-		                                               args->ta_args[5]))         \
-		                     ));                                                  \
+#define __SYSCALL(name)                                                          \
+	case COMPAT_NR(_##name):                                                     \
+		temp = format_printf(printer,                                            \
+		                     arg,                                                \
+		                     #name "(" COMPAT_SYSCALL(TRACE_ARGS_FORMAT_L)(name) \
+		                     COMPAT_SYSCALL(TRACE_ARGS_ARGS)(name,               \
+		                         (COMPAT_NR(AM_##name)(args->ta_args[0],         \
+		                                               args->ta_args[1],         \
+		                                               args->ta_args[2],         \
+		                                               args->ta_args[3],         \
+		                                               args->ta_args[4],         \
+		                                               args->ta_args[5]))        \
+		                     ));                                                 \
 		break;
 #include COMPAT_LS_SYSCALLS
 #undef __SYSCALL

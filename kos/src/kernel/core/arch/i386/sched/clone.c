@@ -48,6 +48,9 @@
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <kos/debugtrap.h>
+#include <kos/kernel/cpu-state-compat.h>
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
 
 #include <assert.h>
 #include <errno.h>
@@ -229,7 +232,7 @@ again_lock_vm:
 		/* Reset iopl() for the child thread/process */
 		if ((clone_flags & CLONE_THREAD) ? !x86_iopl_keep_after_clone
 		                                 : !x86_iopl_keep_after_fork)
-			state->scs_irregs.ir_eflags &= ~EFLAGS_IOPLMASK;
+			state->scs_irregs.ir_pflags &= ~EFLAGS_IOPLMASK;
 
 		/* Have `clone()' or `fork()' return `0' in the child thread/process */
 		gpregs_setpax(&state->scs_gpregs, 0);

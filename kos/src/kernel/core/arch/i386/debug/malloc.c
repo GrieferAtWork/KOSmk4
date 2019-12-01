@@ -37,6 +37,7 @@ PRIVATE ATTR_FREETEXT void KCALL inject_jmp(void *from, void *to) {
 }
 
 PRIVATE ATTR_FREETEXT void KCALL inject_ret(void *at, u16 n_bytes) {
+	(void)n_bytes;
 #ifndef __x86_64__
 	if (n_bytes != 0) {
 		*((byte_t *)at + 0)        = 0xc2;

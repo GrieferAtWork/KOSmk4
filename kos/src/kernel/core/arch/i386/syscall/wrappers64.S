@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12b96ea2 */
+/* HASH CRC-32:0xc67dab3d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,6 +61,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_read)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_read)
 
 /* ssize_t write(fd_t fd, void const *buf, size_t bufsize) */
@@ -90,6 +91,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_write)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_write)
 
 /* fd_t open(char const *filename, oflag_t oflags, mode_t mode) */
@@ -119,6 +121,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_open)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_open)
 
 /* Close a given file descriptor/handle `FD' */
@@ -149,6 +152,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_close)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_close)
 
 /* errno_t linux_stat64(char const *filename, struct linux_stat64 *statbuf) */
@@ -178,6 +182,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_stat64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_linux_stat64)
 
 /* errno_t linux_fstat64(fd_t fd, struct linux_stat64 *statbuf) */
@@ -207,6 +212,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_fstat64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_linux_fstat64)
 
 /* errno_t linux_lstat64(char const *filename, struct linux_stat64 *statbuf) */
@@ -236,6 +242,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_lstat64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_linux_lstat64)
 
 /* ssize_t poll(struct pollfd *fds, size_t nfds, syscall_slong_t timeout) */
@@ -265,6 +272,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_poll)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_poll)
 
 /* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
@@ -294,6 +302,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lseek64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_lseek64)
 
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
@@ -329,6 +338,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mmap)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_mmap)
 
 /* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED' */
@@ -359,6 +369,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mprotect)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_mprotect)
 
 /* errno_t munmap(void *addr, size_t len) */
@@ -388,6 +399,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_munmap)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_munmap)
 
 /* errno_t brk(void *addr) */
@@ -417,6 +429,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_brk)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_brk)
 
 /* @param: signo: One of `SIG*' */
@@ -448,6 +461,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigaction)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigaction)
 
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
@@ -479,6 +493,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigprocmask)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigprocmask)
 
 /* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info *sc_info, struct ucpustate const *restore_cpu) */
@@ -509,6 +524,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigreturn)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigreturn)
 
 /* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t request, void *arg) */
@@ -538,6 +554,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioctl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_ioctl)
 
 /* ssize_t pread64(fd_t fd, void *buf, size_t bufsize, uint64_t offset) */
@@ -568,6 +585,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pread64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_pread64)
 
 /* ssize_t pwrite64(fd_t fd, void const *buf, size_t bufsize, uint64_t offset) */
@@ -598,6 +616,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwrite64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_pwrite64)
 
 /* ssize_t readv(fd_t fd, struct iovec64 const *iovec, size_t count) */
@@ -627,6 +646,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readv)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_readv)
 
 /* ssize_t writev(fd_t fd, struct iovec64 const *iovec, size_t count) */
@@ -656,6 +676,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_writev)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_writev)
 
 /* @param: type: Set of `R_OK|W_OK|X_OK' or `F_OK' */
@@ -686,6 +707,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_access)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_access)
 
 /* errno_t pipe(fd_t[2] pipedes) */
@@ -715,6 +737,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pipe)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_pipe)
 
 /* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx64 *timeout) */
@@ -745,6 +768,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_select)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_select)
 
 /* errno_t sched_yield(void) */
@@ -774,6 +798,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_yield)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sched_yield)
 
 /* @param: flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED' */
@@ -805,6 +830,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mremap)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_mremap)
 
 /* errno_t msync(void *addr, size_t len, syscall_ulong_t flags) */
@@ -834,6 +860,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_msync)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_msync)
 
 /* errno_t mincore(void *start, size_t len, uint8_t *vec) */
@@ -863,6 +890,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mincore)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_mincore)
 
 /* errno_t madvise(void *addr, size_t len, syscall_ulong_t advice) */
@@ -892,6 +920,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_madvise)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_madvise)
 
 /* errno_t shmget(int TODO_PROTOTYPE) */
@@ -921,6 +950,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_shmget)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_shmget)
 
 /* errno_t shmat(int TODO_PROTOTYPE) */
@@ -950,6 +980,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_shmat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_shmat)
 
 /* errno_t shmctl(int TODO_PROTOTYPE) */
@@ -979,6 +1010,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_shmctl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_shmctl)
 
 /* fd_t dup(fd_t fd) */
@@ -1008,6 +1040,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_dup)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_dup)
 
 /* fd_t dup2(fd_t oldfd, fd_t newfd) */
@@ -1037,6 +1070,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_dup2)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_dup2)
 
 /* errno_t pause(void) */
@@ -1066,6 +1100,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pause)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_pause)
 
 /* errno_t nanosleep(struct __timespecx64 const *req, struct __timespecx64 *rem) */
@@ -1095,6 +1130,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_nanosleep)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_nanosleep)
 
 /* errno_t getitimer(syscall_ulong_t which, struct __itimerval32 *curr_value) */
@@ -1124,6 +1160,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getitimer)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getitimer)
 
 /* syscall_ulong_t alarm(syscall_ulong_t seconds) */
@@ -1153,6 +1190,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_alarm)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_alarm)
 
 /* errno_t setitimer(syscall_ulong_t which, struct __itimerval32 const *newval, struct __itimerval32 *oldval) */
@@ -1182,6 +1220,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setitimer)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_setitimer)
 
 /* pid_t getpid(void) */
@@ -1211,6 +1250,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getpid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getpid)
 
 /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
@@ -1241,6 +1281,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sendfile)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sendfile)
 
 /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
@@ -1270,6 +1311,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_socket)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_socket)
 
 /* errno_t connect(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
@@ -1299,6 +1341,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_connect)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_connect)
 
 /* errno_t accept(int TODO_PROTOTYPE) */
@@ -1328,6 +1371,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_accept)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_accept)
 
 /* param flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
@@ -1359,6 +1403,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sendto)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sendto)
 
 /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr *addr, socklen_t *addr_len) */
@@ -1389,6 +1434,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_recvfrom)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_recvfrom)
 
 /* ssize_t sendmsg(fd_t sockfd, struct msghdr const *message, syscall_ulong_t flags) */
@@ -1418,6 +1464,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sendmsg)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sendmsg)
 
 /* ssize_t recvmsg(fd_t sockfd, struct msghdr *message, syscall_ulong_t flags) */
@@ -1447,6 +1494,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_recvmsg)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_recvmsg)
 
 /* @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
@@ -1477,6 +1525,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_shutdown)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_shutdown)
 
 /* errno_t bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
@@ -1506,6 +1555,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_bind)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_bind)
 
 /* errno_t listen(fd_t sockfd, syscall_ulong_t max_backlog) */
@@ -1535,6 +1585,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_listen)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_listen)
 
 /* errno_t getsockname(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
@@ -1564,6 +1615,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getsockname)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getsockname)
 
 /* errno_t getpeername(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
@@ -1593,6 +1645,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getpeername)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getpeername)
 
 /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
@@ -1623,6 +1676,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_socketpair)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_socketpair)
 
 /* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
@@ -1655,6 +1709,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setsockopt)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_setsockopt)
 
 /* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
@@ -1687,6 +1742,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getsockopt)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getsockopt)
 
 /* pid_t clone(syscall_ulong_t flags, void *child_stack, pid_t *ptid, pid_t *ctid, uintptr_t newtls) */
@@ -1717,6 +1773,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_clone)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_clone)
 
 /* pid_t fork(void) */
@@ -1746,6 +1803,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fork)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fork)
 
 /* pid_t vfork(void) */
@@ -1775,6 +1833,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_vfork)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_vfork)
 
 /* errno_t execve(char const *path, char const *const *argv, char const *const *envp) */
@@ -1804,6 +1863,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_execve)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_execve)
 
 /* void exit(syscall_ulong_t status) */
@@ -1833,6 +1893,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_exit)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_exit)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
@@ -1865,6 +1926,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_wait4)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_wait4)
 
 /* @param: signo: One of `SIG*' */
@@ -1895,6 +1957,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kill)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_kill)
 
 /* errno_t uname(struct utsname *name) */
@@ -1924,6 +1987,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_uname)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_uname)
 
 /* errno_t semget(int TODO_PROTOTYPE) */
@@ -1953,6 +2017,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_semget)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_semget)
 
 /* errno_t semop(int TODO_PROTOTYPE) */
@@ -1982,6 +2047,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_semop)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_semop)
 
 /* errno_t semctl(int TODO_PROTOTYPE) */
@@ -2011,6 +2077,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_semctl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_semctl)
 
 /* errno_t shmdt(int TODO_PROTOTYPE) */
@@ -2040,6 +2107,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_shmdt)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_shmdt)
 
 /* errno_t msgget(int TODO_PROTOTYPE) */
@@ -2069,6 +2137,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_msgget)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_msgget)
 
 /* errno_t msgsnd(int TODO_PROTOTYPE) */
@@ -2098,6 +2167,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_msgsnd)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_msgsnd)
 
 /* errno_t msgrcv(int TODO_PROTOTYPE) */
@@ -2127,6 +2197,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_msgrcv)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_msgrcv)
 
 /* errno_t msgctl(int TODO_PROTOTYPE) */
@@ -2156,6 +2227,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_msgctl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_msgctl)
 
 /* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t cmd, void *arg) */
@@ -2185,6 +2257,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fcntl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fcntl)
 
 /* errno_t flock(fd_t fd, syscall_ulong_t operation) */
@@ -2214,6 +2287,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_flock)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_flock)
 
 /* errno_t fsync(fd_t fd) */
@@ -2243,6 +2317,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fsync)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fsync)
 
 /* errno_t fdatasync(fd_t fd) */
@@ -2272,6 +2347,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fdatasync)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fdatasync)
 
 /* errno_t truncate(char const *filename, syscall_ulong_t length) */
@@ -2301,6 +2377,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_truncate)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_truncate)
 
 /* errno_t ftruncate(fd_t fd, syscall_ulong_t length) */
@@ -2330,6 +2407,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ftruncate)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_ftruncate)
 
 /* ssize_t getdents(fd_t fd, struct linux_dirent *dirp, size_t count) */
@@ -2359,6 +2437,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getdents)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getdents)
 
 /* ssize_t getcwd(char *buf, size_t size) */
@@ -2388,6 +2467,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getcwd)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getcwd)
 
 /* errno_t chdir(char const *path) */
@@ -2417,6 +2497,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_chdir)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_chdir)
 
 /* errno_t fchdir(fd_t fd) */
@@ -2446,6 +2527,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fchdir)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fchdir)
 
 /* errno_t rename(char const *oldname, char const *newname_or_path) */
@@ -2475,6 +2557,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rename)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_rename)
 
 /* errno_t mkdir(char const *pathname, mode_t mode) */
@@ -2504,6 +2587,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mkdir)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_mkdir)
 
 /* errno_t rmdir(char const *path) */
@@ -2533,6 +2617,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rmdir)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_rmdir)
 
 /* fd_t creat(char const *filename, mode_t mode) */
@@ -2562,6 +2647,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_creat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_creat)
 
 /* errno_t link(char const *existing_file, char const *link_file) */
@@ -2591,6 +2677,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_link)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_link)
 
 /* errno_t unlink(char const *filename) */
@@ -2620,6 +2707,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_unlink)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_unlink)
 
 /* errno_t symlink(char const *link_text, char const *target_path) */
@@ -2649,6 +2737,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_symlink)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_symlink)
 
 /* ssize_t readlink(char const *path, char *buf, size_t buflen) */
@@ -2678,6 +2767,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readlink)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_readlink)
 
 /* errno_t chmod(char const *filename, mode_t mode) */
@@ -2707,6 +2797,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_chmod)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_chmod)
 
 /* errno_t fchmod(fd_t fd, mode_t mode) */
@@ -2736,6 +2827,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fchmod)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fchmod)
 
 /* errno_t chown(char const *filename, uid_t owner, gid_t group) */
@@ -2765,6 +2857,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_chown)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_chown)
 
 /* errno_t fchown(fd_t fd, uid_t owner, gid_t group) */
@@ -2794,6 +2887,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fchown)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fchown)
 
 /* errno_t lchown(char const *filename, uid_t owner, gid_t group) */
@@ -2823,6 +2917,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lchown)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_lchown)
 
 /* mode_t umask(mode_t mode) */
@@ -2852,6 +2947,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_umask)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_umask)
 
 /* errno_t gettimeofday(struct __timevalx64 *tv, struct timezone *tz) */
@@ -2881,6 +2977,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_gettimeofday)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_gettimeofday)
 
 /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
@@ -2910,6 +3007,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getrlimit)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getrlimit)
 
 /* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
@@ -2939,6 +3037,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getrusage)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getrusage)
 
 /* errno_t sysinfo(struct sysinfo *info) */
@@ -2968,6 +3067,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sysinfo)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sysinfo)
 
 /* clock_t times(struct tms *buf) */
@@ -2997,6 +3097,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_times)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_times)
 
 /* syscall_slong_t ptrace(syscall_ulong_t request, pid_t pid, void *addr, void *data) */
@@ -3027,6 +3128,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ptrace)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_ptrace)
 
 /* uid_t getuid(void) */
@@ -3056,6 +3158,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getuid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getuid)
 
 /* ssize_t syslog(syscall_ulong_t level, char const *str, size_t len) */
@@ -3085,6 +3188,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_syslog)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_syslog)
 
 /* gid_t getgid(void) */
@@ -3114,6 +3218,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getgid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getgid)
 
 /* errno_t setuid(uid_t uid) */
@@ -3143,6 +3248,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setuid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_setuid)
 
 /* errno_t setgid(gid_t gid) */
@@ -3172,6 +3278,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setgid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_setgid)
 
 /* uid_t geteuid(void) */
@@ -3201,6 +3308,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_geteuid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_geteuid)
 
 /* gid_t getegid(void) */
@@ -3230,6 +3338,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getegid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getegid)
 
 /* errno_t setpgid(pid_t pid, pid_t pgid) */
@@ -3259,6 +3368,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setpgid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_setpgid)
 
 /* pid_t getppid(void) */
@@ -3288,6 +3398,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getppid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getppid)
 
 /* pid_t getpgrp(void) */
@@ -3317,6 +3428,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getpgrp)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getpgrp)
 
 /* pid_t setsid(void) */
@@ -3346,6 +3458,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setsid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_setsid)
 
 /* errno_t setreuid(uid_t ruid, uid_t euid) */
@@ -3375,6 +3488,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setreuid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_setreuid)
 
 /* errno_t setregid(gid_t rgid, gid_t egid) */
@@ -3404,6 +3518,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setregid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_setregid)
 
 /* errno_t getgroups(size_t size, gid_t[] list) */
@@ -3433,6 +3548,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getgroups)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getgroups)
 
 /* errno_t setgroups(size_t count, gid_t const *groups) */
@@ -3462,6 +3578,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setgroups)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_setgroups)
 
 /* errno_t setresuid(uid_t ruid, uid_t euid, uid_t suid) */
@@ -3491,6 +3608,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setresuid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_setresuid)
 
 /* errno_t getresuid(uid_t *ruid, uid_t *euid, uid_t *suid) */
@@ -3520,6 +3638,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getresuid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getresuid)
 
 /* errno_t setresgid(gid_t rgid, gid_t egid, gid_t sgid) */
@@ -3549,6 +3668,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setresgid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_setresgid)
 
 /* errno_t getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid) */
@@ -3578,6 +3698,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getresgid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getresgid)
 
 /* pid_t getpgid(pid_t pid) */
@@ -3607,6 +3728,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getpgid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getpgid)
 
 /* errno_t setfsuid(uid_t uid) */
@@ -3636,6 +3758,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setfsuid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_setfsuid)
 
 /* errno_t setfsgid(gid_t gid) */
@@ -3665,6 +3788,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setfsgid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_setfsgid)
 
 /* pid_t getsid(pid_t pid) */
@@ -3694,6 +3818,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getsid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getsid)
 
 /* errno_t capget(int TODO_PROTOTYPE) */
@@ -3723,6 +3848,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_capget)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_capget)
 
 /* errno_t capset(int TODO_PROTOTYPE) */
@@ -3752,6 +3878,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_capset)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_capset)
 
 /* errno_t rt_sigpending(struct __sigset_struct *set, size_t sigsetsize) */
@@ -3781,6 +3908,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigpending)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigpending)
 
 /* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfo64_struct *info, struct __timespecx64 const *timeout, size_t sigsetsize) */
@@ -3811,6 +3939,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigtimedwait)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigtimedwait)
 
 /* @param: signo: One of `SIG*' */
@@ -3841,6 +3970,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigqueueinfo)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigqueueinfo)
 
 /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
@@ -3870,6 +4000,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigsuspend)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigsuspend)
 
 /* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
@@ -3899,6 +4030,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sigaltstack)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sigaltstack)
 
 /* errno_t utime(char const *filename, struct __utimbuf32 const *times) */
@@ -3928,6 +4060,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_utime)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_utime)
 
 /* errno_t mknod(char const *nodename, mode_t mode, dev_t dev) */
@@ -3957,6 +4090,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mknod)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_mknod)
 
 /* errno_t uselib(char const *library) */
@@ -3986,6 +4120,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_uselib)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_uselib)
 
 /* errno_t personality(int TODO_PROTOTYPE) */
@@ -4015,6 +4150,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_personality)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_personality)
 
 /* errno_t ustat(dev_t dev, struct ustat *ubuf) */
@@ -4044,6 +4180,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ustat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_ustat)
 
 /* errno_t statfs(char const *file, struct __statfs32 *buf) */
@@ -4073,6 +4210,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_statfs)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_statfs)
 
 /* errno_t fstatfs(fd_t file, struct __statfs32 *buf) */
@@ -4102,6 +4240,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fstatfs)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fstatfs)
 
 /* errno_t sysfs(int TODO_PROTOTYPE) */
@@ -4131,6 +4270,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sysfs)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sysfs)
 
 /* syscall_slong_t getpriority(syscall_ulong_t which, id_t who) */
@@ -4160,6 +4300,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getpriority)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getpriority)
 
 /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
@@ -4189,6 +4330,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setpriority)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_setpriority)
 
 /* errno_t sched_setparam(pid_t pid, struct sched_param const *param) */
@@ -4218,6 +4360,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_setparam)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sched_setparam)
 
 /* errno_t sched_getparam(pid_t pid, struct sched_param *param) */
@@ -4247,6 +4390,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_getparam)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sched_getparam)
 
 /* errno_t sched_setscheduler(pid_t pid, syscall_ulong_t policy, struct sched_param const *param) */
@@ -4276,6 +4420,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_setscheduler)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sched_setscheduler)
 
 /* syscall_slong_t sched_getscheduler(pid_t pid) */
@@ -4305,6 +4450,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_getscheduler)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sched_getscheduler)
 
 /* syscall_slong_t sched_get_priority_max(syscall_ulong_t algorithm) */
@@ -4334,6 +4480,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_get_priority_max)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sched_get_priority_max)
 
 /* syscall_slong_t sched_get_priority_min(syscall_ulong_t algorithm) */
@@ -4363,6 +4510,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_get_priority_min)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sched_get_priority_min)
 
 /* errno_t sched_rr_get_interval(pid_t pid, struct __timespecx64 *tms) */
@@ -4392,6 +4540,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_rr_get_interval)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sched_rr_get_interval)
 
 /* errno_t mlock(void const *addr, size_t len) */
@@ -4421,6 +4570,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mlock)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_mlock)
 
 /* errno_t munlock(void const *addr, size_t len) */
@@ -4450,6 +4600,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_munlock)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_munlock)
 
 /* errno_t mlockall(syscall_ulong_t flags) */
@@ -4479,6 +4630,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mlockall)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_mlockall)
 
 /* errno_t munlockall(void) */
@@ -4508,6 +4660,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_munlockall)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_munlockall)
 
 /* errno_t vhangup(void) */
@@ -4537,6 +4690,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_vhangup)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_vhangup)
 
 /* syscall_slong_t modify_ldt(syscall_ulong_t func, void *ptr, syscall_ulong_t bytecount) */
@@ -4566,6 +4720,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_modify_ldt)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_modify_ldt)
 
 /* errno_t pivot_root(int TODO_PROTOTYPE) */
@@ -4595,6 +4750,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pivot_root)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_pivot_root)
 
 /* errno_t _sysctl(int TODO_PROTOTYPE) */
@@ -4624,6 +4780,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall__sysctl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall__sysctl)
 
 /* errno_t prctl(int TODO_PROTOTYPE) */
@@ -4653,6 +4810,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_prctl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_prctl)
 
 /* errno_t arch_prctl(int TODO_PROTOTYPE) */
@@ -4682,6 +4840,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_arch_prctl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_arch_prctl)
 
 /* errno_t adjtimex(int TODO_PROTOTYPE) */
@@ -4711,6 +4870,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_adjtimex)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_adjtimex)
 
 /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
@@ -4740,6 +4900,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setrlimit)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_setrlimit)
 
 /* errno_t chroot(char const *path) */
@@ -4769,6 +4930,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_chroot)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_chroot)
 
 /* errno_t sync(void) */
@@ -4798,6 +4960,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sync)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sync)
 
 /* errno_t acct(char const *filename) */
@@ -4827,6 +4990,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_acct)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_acct)
 
 /* errno_t settimeofday(struct __timevalx64 const *tv, struct timezone const *tz) */
@@ -4856,6 +5020,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_settimeofday)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_settimeofday)
 
 /* errno_t mount(char const *special_file, char const *dir, char const *fstype, syscall_ulong_t rwflag, void const *data) */
@@ -4886,6 +5051,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mount)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_mount)
 
 /* errno_t umount2(char const *special_file, syscall_ulong_t flags) */
@@ -4915,6 +5081,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_umount2)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_umount2)
 
 /* @param: swapflags: Set of `SWAP_FLAG_*' */
@@ -4945,6 +5112,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_swapon)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_swapon)
 
 /* errno_t swapoff(char const *pathname) */
@@ -4974,6 +5142,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_swapoff)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_swapoff)
 
 /* @param: how: One of the `RB_*' constants from <sys/reboot.h> */
@@ -5004,6 +5173,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_reboot)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_reboot)
 
 /* errno_t sethostname(char const *name, size_t len) */
@@ -5033,6 +5203,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sethostname)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sethostname)
 
 /* errno_t setdomainname(char const *name, size_t len) */
@@ -5062,6 +5233,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setdomainname)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_setdomainname)
 
 /* errno_t iopl(syscall_ulong_t level) */
@@ -5091,6 +5263,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_iopl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_iopl)
 
 /* errno_t ioperm(syscall_ulong_t from, syscall_ulong_t num, syscall_ulong_t turn_on) */
@@ -5120,6 +5293,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioperm)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_ioperm)
 
 /* errno_t create_module(int TODO_PROTOTYPE) */
@@ -5149,6 +5323,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_create_module)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_create_module)
 
 /* errno_t init_module(int TODO_PROTOTYPE) */
@@ -5178,6 +5353,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_init_module)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_init_module)
 
 /* errno_t delete_module(int TODO_PROTOTYPE) */
@@ -5207,6 +5383,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_delete_module)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_delete_module)
 
 /* errno_t get_kernel_syms(int TODO_PROTOTYPE) */
@@ -5236,6 +5413,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_get_kernel_syms)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_get_kernel_syms)
 
 /* errno_t query_module(int TODO_PROTOTYPE) */
@@ -5265,6 +5443,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_query_module)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_query_module)
 
 /* errno_t quotactl(int TODO_PROTOTYPE) */
@@ -5294,6 +5473,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_quotactl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_quotactl)
 
 /* errno_t nfsservctl(int TODO_PROTOTYPE) */
@@ -5323,6 +5503,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_nfsservctl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_nfsservctl)
 
 /* errno_t getpmsg(int TODO_PROTOTYPE) */
@@ -5352,6 +5533,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getpmsg)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getpmsg)
 
 /* errno_t putpmsg(int TODO_PROTOTYPE) */
@@ -5381,6 +5563,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_putpmsg)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_putpmsg)
 
 /* errno_t afs_syscall(int TODO_PROTOTYPE) */
@@ -5410,6 +5593,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_afs_syscall)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_afs_syscall)
 
 /* errno_t tuxcall(int TODO_PROTOTYPE) */
@@ -5439,6 +5623,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_tuxcall)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_tuxcall)
 
 /* errno_t security(int TODO_PROTOTYPE) */
@@ -5468,6 +5653,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_security)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_security)
 
 /* pid_t gettid(void) */
@@ -5497,6 +5683,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_gettid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_gettid)
 
 /* ssize_t readahead(fd_t fd, uint64_t offset, size_t count) */
@@ -5526,6 +5713,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readahead)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_readahead)
 
 /* errno_t setxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
@@ -5556,6 +5744,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_setxattr)
 
 /* errno_t lsetxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
@@ -5586,6 +5775,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lsetxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_lsetxattr)
 
 /* errno_t fsetxattr(fd_t fd, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
@@ -5616,6 +5806,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fsetxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fsetxattr)
 
 /* ssize_t getxattr(char const *path, char const *name, void *buf, size_t bufsize) */
@@ -5646,6 +5837,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getxattr)
 
 /* ssize_t lgetxattr(char const *path, char const *name, void *buf, size_t bufsize) */
@@ -5676,6 +5868,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lgetxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_lgetxattr)
 
 /* ssize_t fgetxattr(fd_t fd, char const *name, void *buf, size_t bufsize) */
@@ -5706,6 +5899,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fgetxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fgetxattr)
 
 /* ssize_t listxattr(char const *path, char *listbuf, size_t listbufsize) */
@@ -5735,6 +5929,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_listxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_listxattr)
 
 /* ssize_t llistxattr(char const *path, char *listbuf, size_t listbufsize) */
@@ -5764,6 +5959,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_llistxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_llistxattr)
 
 /* ssize_t flistxattr(fd_t fd, char *listbuf, size_t listbufsize) */
@@ -5793,6 +5989,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_flistxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_flistxattr)
 
 /* errno_t removexattr(char const *path, char const *name) */
@@ -5822,6 +6019,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_removexattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_removexattr)
 
 /* errno_t lremovexattr(char const *path, char const *name) */
@@ -5851,6 +6049,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lremovexattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_lremovexattr)
 
 /* errno_t fremovexattr(int fd, char const *name) */
@@ -5880,6 +6079,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fremovexattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fremovexattr)
 
 /* errno_t tkill(pid_t tid, syscall_ulong_t signo) */
@@ -5909,6 +6109,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_tkill)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_tkill)
 
 /* time32_t time(time32_t *timer) */
@@ -5938,6 +6139,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_time)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_time)
 
 /* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
@@ -5968,6 +6170,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_futex)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_futex)
 
 /* errno_t sched_setaffinity(pid_t pid, size_t cpusetsize, struct __cpu_set_struct const *cpuset) */
@@ -5997,6 +6200,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_setaffinity)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sched_setaffinity)
 
 /* errno_t sched_getaffinity(pid_t pid, size_t cpusetsize, struct __cpu_set_struct *cpuset) */
@@ -6026,6 +6230,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_getaffinity)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sched_getaffinity)
 
 /* errno_t set_thread_area(int TODO_PROTOTYPE) */
@@ -6055,6 +6260,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_thread_area)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_set_thread_area)
 
 /* errno_t io_setup(int TODO_PROTOTYPE) */
@@ -6084,6 +6290,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_io_setup)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_io_setup)
 
 /* errno_t io_destroy(int TODO_PROTOTYPE) */
@@ -6113,6 +6320,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_io_destroy)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_io_destroy)
 
 /* errno_t io_getevents(int TODO_PROTOTYPE) */
@@ -6142,6 +6350,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_io_getevents)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_io_getevents)
 
 /* errno_t io_submit(int TODO_PROTOTYPE) */
@@ -6171,6 +6380,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_io_submit)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_io_submit)
 
 /* errno_t io_cancel(int TODO_PROTOTYPE) */
@@ -6200,6 +6410,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_io_cancel)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_io_cancel)
 
 /* errno_t get_thread_area(int TODO_PROTOTYPE) */
@@ -6229,6 +6440,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_get_thread_area)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_get_thread_area)
 
 /* errno_t lookup_dcookie(int TODO_PROTOTYPE) */
@@ -6258,6 +6470,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lookup_dcookie)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_lookup_dcookie)
 
 /* fd_t epoll_create(syscall_ulong_t size) */
@@ -6287,6 +6500,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_create)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_epoll_create)
 
 /* errno_t epoll_ctl_old(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
@@ -6317,6 +6531,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_ctl_old)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_epoll_ctl_old)
 
 /* errno_t epoll_wait_old(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout) */
@@ -6347,6 +6562,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_wait_old)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_epoll_wait_old)
 
 /* errno_t remap_file_pages(void *start, size_t size, syscall_ulong_t prot, size_t pgoff, syscall_ulong_t flags) */
@@ -6377,6 +6593,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_remap_file_pages)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_remap_file_pages)
 
 /* ssize_t getdents64(fd_t fd, struct linux_dirent64 *dirp, size_t count) */
@@ -6406,6 +6623,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getdents64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getdents64)
 
 /* pid_t set_tid_address(pid_t *tidptr) */
@@ -6435,6 +6653,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_tid_address)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_set_tid_address)
 
 /* errno_t restart_syscall(void) */
@@ -6464,6 +6683,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_restart_syscall)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_restart_syscall)
 
 /* errno_t semtimedop(int TODO_PROTOTYPE) */
@@ -6493,6 +6713,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_semtimedop)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_semtimedop)
 
 /* errno_t fadvise64(int TODO_PROTOTYPE) */
@@ -6522,6 +6743,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fadvise64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fadvise64)
 
 /* errno_t timer_create(clockid_t clock_id, struct sigevent *evp, timer_t *timerid) */
@@ -6551,6 +6773,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timer_create)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_timer_create)
 
 /* errno_t timer_settime(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx64 const *value, struct __itimerspecx64 *ovalue) */
@@ -6581,6 +6804,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timer_settime)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_timer_settime)
 
 /* errno_t timer_gettime(timer_t timerid, struct __itimerspecx64 *value) */
@@ -6610,6 +6834,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timer_gettime)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_timer_gettime)
 
 /* syscall_slong_t timer_getoverrun(timer_t timerid) */
@@ -6639,6 +6864,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timer_getoverrun)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_timer_getoverrun)
 
 /* errno_t timer_delete(timer_t timerid) */
@@ -6668,6 +6894,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timer_delete)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_timer_delete)
 
 /* errno_t clock_settime(clockid_t clock_id, struct __timespecx64 const *tp) */
@@ -6697,6 +6924,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_clock_settime)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_clock_settime)
 
 /* errno_t clock_gettime(clockid_t clock_id, struct __timespecx64 *tp) */
@@ -6726,6 +6954,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_clock_gettime)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_clock_gettime)
 
 /* errno_t clock_getres(clockid_t clock_id, struct __timespecx64 *res) */
@@ -6755,6 +6984,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_clock_getres)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_clock_getres)
 
 /* errno_t clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx64 const *requested_time, struct __timespecx64 *remaining) */
@@ -6785,6 +7015,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_clock_nanosleep)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_clock_nanosleep)
 
 /* void exit_group(syscall_ulong_t exit_code) */
@@ -6814,6 +7045,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_exit_group)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_exit_group)
 
 /* errno_t epoll_wait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout) */
@@ -6844,6 +7076,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_wait)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_epoll_wait)
 
 /* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
@@ -6874,6 +7107,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_ctl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_epoll_ctl)
 
 /* errno_t tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo) */
@@ -6903,6 +7137,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_tgkill)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_tgkill)
 
 /* errno_t utimes(char const *filename, struct __timevalx64 const[2] times) */
@@ -6932,6 +7167,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_utimes)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_utimes)
 
 /* errno_t vserver(int TODO_PROTOTYPE) */
@@ -6961,6 +7197,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_vserver)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_vserver)
 
 /* errno_t mbind(int TODO_PROTOTYPE) */
@@ -6990,6 +7227,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mbind)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_mbind)
 
 /* errno_t set_mempolicy(int TODO_PROTOTYPE) */
@@ -7019,6 +7257,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_mempolicy)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_set_mempolicy)
 
 /* errno_t get_mempolicy(int TODO_PROTOTYPE) */
@@ -7048,6 +7287,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_get_mempolicy)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_get_mempolicy)
 
 /* errno_t mq_open(int TODO_PROTOTYPE) */
@@ -7077,6 +7317,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_open)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_mq_open)
 
 /* errno_t mq_unlink(int TODO_PROTOTYPE) */
@@ -7106,6 +7347,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_unlink)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_mq_unlink)
 
 /* errno_t mq_timedsend(int TODO_PROTOTYPE) */
@@ -7135,6 +7377,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_timedsend)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_mq_timedsend)
 
 /* errno_t mq_timedreceive(int TODO_PROTOTYPE) */
@@ -7164,6 +7407,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_timedreceive)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_mq_timedreceive)
 
 /* errno_t mq_notify(int TODO_PROTOTYPE) */
@@ -7193,6 +7437,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_notify)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_mq_notify)
 
 /* errno_t mq_getsetattr(int TODO_PROTOTYPE) */
@@ -7222,6 +7467,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_getsetattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_mq_getsetattr)
 
 /* errno_t kexec_load(int TODO_PROTOTYPE) */
@@ -7251,6 +7497,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kexec_load)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_kexec_load)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
@@ -7282,6 +7529,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_waitid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_waitid)
 
 /* errno_t add_key(int TODO_PROTOTYPE) */
@@ -7311,6 +7559,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_add_key)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_add_key)
 
 /* errno_t request_key(int TODO_PROTOTYPE) */
@@ -7340,6 +7589,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_request_key)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_request_key)
 
 /* errno_t keyctl(int TODO_PROTOTYPE) */
@@ -7369,6 +7619,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_keyctl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_keyctl)
 
 /* errno_t ioprio_set(syscall_ulong_t which, syscall_ulong_t who, syscall_ulong_t ioprio) */
@@ -7398,6 +7649,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioprio_set)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_ioprio_set)
 
 /* errno_t ioprio_get(syscall_ulong_t which, syscall_ulong_t who) */
@@ -7427,6 +7679,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioprio_get)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_ioprio_get)
 
 /* errno_t inotify_init(int TODO_PROTOTYPE) */
@@ -7456,6 +7709,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_init)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_inotify_init)
 
 /* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
@@ -7485,6 +7739,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_add_watch)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_inotify_add_watch)
 
 /* errno_t inotify_rm_watch(int TODO_PROTOTYPE) */
@@ -7514,6 +7769,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_rm_watch)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_inotify_rm_watch)
 
 /* errno_t migrate_pages(int TODO_PROTOTYPE) */
@@ -7543,6 +7799,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_migrate_pages)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_migrate_pages)
 
 /* fd_t openat(fd_t dirfd, char const *filename, oflag_t oflags, mode_t mode) */
@@ -7573,6 +7830,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_openat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_openat)
 
 /* errno_t mkdirat(fd_t dirfd, char const *pathname, mode_t mode) */
@@ -7602,6 +7860,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mkdirat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_mkdirat)
 
 /* errno_t mknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev) */
@@ -7632,6 +7891,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mknodat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_mknodat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
@@ -7663,6 +7923,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fchownat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fchownat)
 
 /* errno_t futimesat(fd_t dirfd, const char *filename, struct __timevalx64 const[2] times) */
@@ -7692,6 +7953,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_futimesat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_futimesat)
 
 /* errno_t linux_fstatat(fd_t dirfd, char const *filename, struct linux64_stat32 *statbuf, atflag_t flags) */
@@ -7722,6 +7984,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_fstatat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_linux_fstatat)
 
 /* @param: flags: Set of `0 | AT_REMOVEDIR|AT_REMOVEREG | AT_DOSPATH' */
@@ -7752,6 +8015,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_unlinkat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_unlinkat)
 
 /* errno_t renameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path) */
@@ -7782,6 +8046,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_renameat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_renameat)
 
 /* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_FOLLOW | AT_DOSPATH' */
@@ -7813,6 +8078,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linkat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_linkat)
 
 /* errno_t symlinkat(char const *link_text, fd_t tofd, char const *target_path) */
@@ -7842,6 +8108,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_symlinkat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_symlinkat)
 
 /* ssize_t readlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen) */
@@ -7872,6 +8139,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readlinkat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_readlinkat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
@@ -7903,6 +8171,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fchmodat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fchmodat)
 
 /* @param: type: Set of `R_OK|W_OK|X_OK' or `F_OK'
@@ -7935,6 +8204,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_faccessat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_faccessat)
 
 /* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx64 const *timeout, void const *sigmask_sigset_and_len) */
@@ -7965,6 +8235,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pselect6)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_pselect6)
 
 /* ssize_t ppoll(struct pollfd *fds, size_t nfds, struct __timespecx64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
@@ -7995,6 +8266,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ppoll)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_ppoll)
 
 /* param flags: Set of `CLONE_*' */
@@ -8025,6 +8297,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_unshare)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_unshare)
 
 /* errno_t set_robust_list(int TODO_PROTOTYPE) */
@@ -8054,6 +8327,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_robust_list)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_set_robust_list)
 
 /* errno_t get_robust_list(int TODO_PROTOTYPE) */
@@ -8083,6 +8357,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_get_robust_list)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_get_robust_list)
 
 /* ssize_t splice(fd_t fdin, uint64_t *offin, fd_t fdout, uint64_t *offout, size_t length, syscall_ulong_t flags) */
@@ -8113,6 +8388,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_splice)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_splice)
 
 /* ssize_t tee(fd_t fdin, fd_t fdout, size_t length, syscall_ulong_t flags) */
@@ -8143,6 +8419,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_tee)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_tee)
 
 /* errno_t sync_file_range(fd_t fd, uint64_t offset, uint64_t count, syscall_ulong_t flags) */
@@ -8173,6 +8450,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sync_file_range)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sync_file_range)
 
 /* ssize_t vmsplice(fd_t fdout, struct iovec64 const *iov, size_t count, syscall_ulong_t flags) */
@@ -8203,6 +8481,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_vmsplice)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_vmsplice)
 
 /* errno_t move_pages(int TODO_PROTOTYPE) */
@@ -8232,6 +8511,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_move_pages)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_move_pages)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
@@ -8263,6 +8543,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_utimensat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_utimensat)
 
 /* errno_t epoll_pwait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss) */
@@ -8293,6 +8574,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_pwait)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_epoll_pwait)
 
 /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) */
@@ -8322,6 +8604,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_signalfd)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_signalfd)
 
 /* Return file descriptor for new interval timer source */
@@ -8352,6 +8635,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timerfd_create)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_timerfd_create)
 
 /* fd_t eventfd(syscall_ulong_t initval) */
@@ -8381,6 +8665,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_eventfd)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_eventfd)
 
 /* errno_t fallocate(fd_t fd, syscall_ulong_t mode, syscall_ulong_t offset, syscall_ulong_t length) */
@@ -8411,6 +8696,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fallocate)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fallocate)
 
 /* Set next expiration time of interval timer source UFD to UTMR.
@@ -8444,6 +8730,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timerfd_settime)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_timerfd_settime)
 
 /* Return the next expiration time of UFD */
@@ -8474,6 +8761,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_timerfd_gettime)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_timerfd_gettime)
 
 /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t flags) */
@@ -8504,6 +8792,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_accept4)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_accept4)
 
 /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize, syscall_ulong_t flags) */
@@ -8534,6 +8823,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_signalfd4)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_signalfd4)
 
 /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
@@ -8563,6 +8853,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_eventfd2)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_eventfd2)
 
 /* fd_t epoll_create1(syscall_ulong_t flags) */
@@ -8592,6 +8883,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_create1)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_epoll_create1)
 
 /* @param: flags:  Set of `O_CLOEXEC|O_CLOFORK' */
@@ -8622,6 +8914,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_dup3)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_dup3)
 
 /* errno_t pipe2(fd_t[2] pipedes, oflag_t flags) */
@@ -8651,6 +8944,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pipe2)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_pipe2)
 
 /* errno_t inotify_init1(int TODO_PROTOTYPE) */
@@ -8680,6 +8974,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_init1)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_inotify_init1)
 
 /* ssize_t preadv(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset) */
@@ -8710,6 +9005,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_preadv)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_preadv)
 
 /* ssize_t pwritev(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset) */
@@ -8740,6 +9036,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwritev)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_pwritev)
 
 /* @param: signo: One of `SIG*' */
@@ -8771,6 +9068,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_tgsigqueueinfo)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_rt_tgsigqueueinfo)
 
 /* errno_t perf_event_open(int TODO_PROTOTYPE) */
@@ -8800,6 +9098,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_perf_event_open)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_perf_event_open)
 
 /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx64 *tmo) */
@@ -8830,6 +9129,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_recvmmsg)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_recvmmsg)
 
 /* errno_t fanotify_init(int TODO_PROTOTYPE) */
@@ -8859,6 +9159,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fanotify_init)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fanotify_init)
 
 /* errno_t fanotify_mark(int TODO_PROTOTYPE) */
@@ -8888,6 +9189,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fanotify_mark)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fanotify_mark)
 
 /* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
@@ -8919,6 +9221,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_prlimit64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_prlimit64)
 
 /* errno_t name_to_handle_at(fd_t dirfd, char const *name, struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags) */
@@ -8949,6 +9252,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_name_to_handle_at)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_name_to_handle_at)
 
 /* fd_t open_by_handle_at(fd_t mountdirfd, struct file_handle *handle, syscall_ulong_t flags) */
@@ -8978,6 +9282,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_open_by_handle_at)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_open_by_handle_at)
 
 /* errno_t clock_adjtime(int TODO_PROTOTYPE) */
@@ -9007,6 +9312,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_clock_adjtime)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_clock_adjtime)
 
 /* errno_t syncfs(fd_t fd) */
@@ -9036,6 +9342,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_syncfs)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_syncfs)
 
 /* ssize_t sendmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags) */
@@ -9066,6 +9373,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sendmmsg)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sendmmsg)
 
 /* errno_t setns(fd_t fd, syscall_ulong_t nstype) */
@@ -9095,6 +9403,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_setns)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_setns)
 
 /* errno_t getcpu(uint32_t *cpu, uint32_t *node, struct getcpu_cache *tcache) */
@@ -9124,6 +9433,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getcpu)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getcpu)
 
 /* ssize_t process_vm_readv(pid_t pid, struct iovec64 const *lvec, size_t liovcnt, struct iovec64 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
@@ -9154,6 +9464,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_process_vm_readv)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_process_vm_readv)
 
 /* ssize_t process_vm_writev(pid_t pid, struct iovec64 const *lvec, size_t liovcnt, struct iovec64 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
@@ -9184,6 +9495,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_process_vm_writev)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_process_vm_writev)
 
 /* syscall_slong_t kcmp(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2) */
@@ -9214,6 +9526,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kcmp)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_kcmp)
 
 /* errno_t finit_module(int TODO_PROTOTYPE) */
@@ -9243,6 +9556,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_finit_module)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_finit_module)
 
 /* errno_t sched_setattr(int TODO_PROTOTYPE) */
@@ -9272,6 +9586,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_setattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sched_setattr)
 
 /* errno_t sched_getattr(int TODO_PROTOTYPE) */
@@ -9301,6 +9616,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_getattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sched_getattr)
 
 /* @param: flags: Set of `RENAME_EXCHANGE,RENAME_NOREPLACE,RENAME_WHITEOUT' */
@@ -9332,6 +9648,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_renameat2)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_renameat2)
 
 /* errno_t seccomp(int TODO_PROTOTYPE) */
@@ -9361,6 +9678,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_seccomp)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_seccomp)
 
 /* errno_t getrandom(int TODO_PROTOTYPE) */
@@ -9390,6 +9708,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getrandom)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getrandom)
 
 /* errno_t memfd_create(int TODO_PROTOTYPE) */
@@ -9419,6 +9738,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_memfd_create)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_memfd_create)
 
 /* errno_t kexec_file_load(int TODO_PROTOTYPE) */
@@ -9448,6 +9768,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kexec_file_load)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_kexec_file_load)
 
 /* errno_t bpf(int TODO_PROTOTYPE) */
@@ -9477,6 +9798,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_bpf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_bpf)
 
 /* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
@@ -9508,6 +9830,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_execveat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_execveat)
 
 /* errno_t userfaultfd(int TODO_PROTOTYPE) */
@@ -9537,6 +9860,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_userfaultfd)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_userfaultfd)
 
 /* errno_t membarrier(int TODO_PROTOTYPE) */
@@ -9566,6 +9890,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_membarrier)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_membarrier)
 
 /* errno_t mlock2(int TODO_PROTOTYPE) */
@@ -9595,6 +9920,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mlock2)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_mlock2)
 
 /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
@@ -9625,6 +9951,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_readf)
 
 /* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
@@ -9655,6 +9982,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_writef)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_writef)
 
 /* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
@@ -9684,6 +10012,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_hop)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_hop)
 
 /* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
@@ -9714,6 +10043,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_hopf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_hopf)
 
 /* errno_t kstat(char const *filename, struct stat *statbuf) */
@@ -9743,6 +10073,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kstat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_kstat)
 
 /* errno_t kfstat(fd_t fd, struct stat *statbuf) */
@@ -9772,6 +10103,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kfstat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_kfstat)
 
 /* errno_t klstat(char const *filename, struct stat *statbuf) */
@@ -9801,6 +10133,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_klstat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_klstat)
 
 /* >> detach(2)
@@ -9918,6 +10251,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_detach)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_detach)
 
 /* Returns a bitset of all of the currently mounted dos-drives */
@@ -9948,6 +10282,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getdrives)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_getdrives)
 
 /* You may pass `AT_READLINK_REQSIZE' to always have the function return
@@ -9981,6 +10316,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_frealpath4)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_frealpath4)
 
 /* Returns the absolute filesystem path for the specified file
@@ -10018,6 +10354,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_frealpathat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_frealpathat)
 
 /* Schedule an RPC for execution on the specified `target' thread.
@@ -10058,6 +10395,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rpc_schedule)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_rpc_schedule)
 
 /* syscall_slong_t sysctl(syscall_ulong_t command, void *arg) */
@@ -10087,6 +10425,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sysctl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_sysctl)
 
 /* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
@@ -10118,6 +10457,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_openpty)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_openpty)
 
 /* Set the exception handler mode for the calling thread.
@@ -10156,6 +10496,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_exception_handler)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_set_exception_handler)
 
 /* Get the current exception handler mode for the calling thread.
@@ -10198,6 +10539,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_get_exception_handler)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_get_exception_handler)
 
 /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
@@ -10228,6 +10570,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioctlf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_ioctlf)
 
 /* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
@@ -10258,6 +10601,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pread64f)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_pread64f)
 
 /* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
@@ -10288,6 +10632,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwrite64f)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_pwrite64f)
 
 /* ssize_t readvf(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) */
@@ -10318,6 +10663,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readvf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_readvf)
 
 /* ssize_t writevf(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) */
@@ -10348,6 +10694,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_writevf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_writevf)
 
 /* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
@@ -10378,6 +10725,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_library_listdef)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_set_library_listdef)
 
 /* Trigger a debugger trap `trapno', optionally extended with `regs'
@@ -10417,6 +10765,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_debugtrap)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_debugtrap)
 
 /* syscall_slong_t rpc_service(void) */
@@ -10446,6 +10795,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rpc_service)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_rpc_service)
 
 /* >> lfutex(2)
@@ -10498,6 +10848,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lfutex)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_lfutex)
 
 /* >> lfutexexpr(2)
@@ -10555,6 +10906,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lfutexexpr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_lfutexexpr)
 
 /* >> lfutexlockexpr(2)
@@ -10584,7 +10936,7 @@ END(__x86_asm64_syscall_lfutexexpr)
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexlockexpr(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+/* errno_t lfutexlockexpr(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
 .section .text.x86.asm64_syscall.lfutexlockexpr
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lfutexlockexpr)
 	.cfi_startproc simple
@@ -10612,6 +10964,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lfutexlockexpr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_lfutexlockexpr)
 
 /* Create and return a new tty terminal controller connected to the given keyboard and display
@@ -10646,6 +10999,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mktty)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_mktty)
 
 /* Raise a signal within the calling thread alongside the given CPU state
@@ -10683,6 +11037,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_raiseat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_raiseat)
 
 /* Trigger a coredump of the calling process.
@@ -10737,6 +11092,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_coredump)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_coredump)
 
 /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
@@ -10767,6 +11123,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kreaddir)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_kreaddir)
 
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -10797,6 +11154,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fchdirat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fchdirat)
 
 /* uint64_t fsmode(uint64_t mode) */
@@ -10826,6 +11184,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fsmode)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fsmode)
 
 /* Map the segments of a given library into memory
@@ -10866,6 +11225,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_maplibrary)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_maplibrary)
 
 /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
@@ -10896,6 +11256,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kreaddirf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_kreaddirf)
 
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -10927,6 +11288,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fmkdirat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fmkdirat)
 
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -10958,6 +11320,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fmknodat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fmknodat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
@@ -10989,6 +11352,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kfstatat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_kfstatat)
 
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -11020,6 +11384,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_frenameat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_frenameat)
 
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -11051,6 +11416,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fsymlinkat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_fsymlinkat)
 
 /* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
@@ -11082,6 +11448,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_freadlinkat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_freadlinkat)
 
 /* ssize_t preadvf(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
@@ -11112,6 +11479,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_preadvf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_preadvf)
 
 /* ssize_t pwritevf(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
@@ -11142,6 +11510,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwritevf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm64_syscall_pwritevf)
 
 
@@ -11180,6 +11549,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_restart_syscall)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_restart_syscall)
 
 /* void exit(syscall_ulong_t status) */
@@ -11210,6 +11580,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_exit)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_exit)
 
 /* pid_t fork(void) */
@@ -11239,6 +11610,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fork)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fork)
 
 /* ssize_t read(fd_t fd, void *buf, size_t bufsize) */
@@ -11271,6 +11643,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_read)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_read)
 
 /* ssize_t write(fd_t fd, void const *buf, size_t bufsize) */
@@ -11303,6 +11676,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_write)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_write)
 
 /* fd_t open(char const *filename, oflag_t oflags, mode_t mode) */
@@ -11335,6 +11709,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_open)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_open)
 
 /* Close a given file descriptor/handle `FD' */
@@ -11366,6 +11741,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_close)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_close)
 
 /* Wait for a child process:
@@ -11404,6 +11780,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitpid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_waitpid)
 
 /* fd_t creat(char const *filename, mode_t mode) */
@@ -11435,6 +11812,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_creat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_creat)
 
 /* errno_t link(char const *existing_file, char const *link_file) */
@@ -11466,6 +11844,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_link)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_link)
 
 /* errno_t unlink(char const *filename) */
@@ -11496,6 +11875,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_unlink)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_unlink)
 
 /* errno_t execve(char const *path, char const *const *argv, char const *const *envp) */
@@ -11528,6 +11908,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_execve)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_execve)
 
 /* errno_t chdir(char const *path) */
@@ -11558,6 +11939,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chdir)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_chdir)
 
 /* time32_t time(time32_t *timer) */
@@ -11588,6 +11970,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_time)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_time)
 
 /* errno_t mknod(char const *nodename, mode_t mode, dev_t dev) */
@@ -11620,6 +12003,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mknod)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mknod)
 
 /* errno_t chmod(char const *filename, mode_t mode) */
@@ -11651,6 +12035,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chmod)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_chmod)
 
 /* errno_t lchown(char const *filename, uint16_t owner, uint16_t group) */
@@ -11683,6 +12068,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lchown)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_lchown)
 
 /* errno_t break(void) */
@@ -11712,6 +12098,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_break)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_break)
 
 /* errno_t linux_oldstat(char const *filename, struct linux_oldstat *statbuf) */
@@ -11743,6 +12130,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_oldstat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_linux_oldstat)
 
 /* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
@@ -11775,6 +12163,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lseek)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_lseek)
 
 /* pid_t getpid(void) */
@@ -11804,6 +12193,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getpid)
 
 /* errno_t mount(char const *special_file, char const *dir, char const *fstype, syscall_ulong_t rwflag, void const *data) */
@@ -11839,6 +12229,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mount)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mount)
 
 /* errno_t umount(char const *special_file) */
@@ -11869,6 +12260,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_umount)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_umount)
 
 /* errno_t setuid(uint16_t uid) */
@@ -11899,6 +12291,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setuid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setuid)
 
 /* uint16_t getuid(void) */
@@ -11928,6 +12321,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getuid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getuid)
 
 /* errno_t stime(time32_t const *t) */
@@ -11958,6 +12352,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_stime)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_stime)
 
 /* syscall_slong_t ptrace(syscall_ulong_t request, pid_t pid, void *addr, void *data) */
@@ -11992,6 +12387,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ptrace)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_ptrace)
 
 /* syscall_ulong_t alarm(syscall_ulong_t seconds) */
@@ -12022,6 +12418,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_alarm)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_alarm)
 
 /* errno_t linux_oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
@@ -12053,6 +12450,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_oldfstat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_linux_oldfstat)
 
 /* errno_t pause(void) */
@@ -12082,6 +12480,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pause)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_pause)
 
 /* errno_t utime(char const *filename, struct __utimbuf32 const *times) */
@@ -12113,6 +12512,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_utime)
 
 /* errno_t stty(void) */
@@ -12142,6 +12542,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_stty)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_stty)
 
 /* errno_t gtty(void) */
@@ -12171,6 +12572,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_gtty)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_gtty)
 
 /* @param: type: Set of `R_OK|W_OK|X_OK' or `F_OK' */
@@ -12203,6 +12605,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_access)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_access)
 
 /* errno_t nice(syscall_slong_t inc) */
@@ -12233,6 +12636,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nice)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_nice)
 
 /* errno_t ftime(struct timeb *tp) */
@@ -12263,6 +12667,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_ftime)
 
 /* errno_t sync(void) */
@@ -12292,6 +12697,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sync)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sync)
 
 /* @param: signo: One of `SIG*' */
@@ -12324,6 +12730,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kill)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_kill)
 
 /* errno_t rename(char const *oldname, char const *newname_or_path) */
@@ -12355,6 +12762,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rename)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_rename)
 
 /* errno_t mkdir(char const *pathname, mode_t mode) */
@@ -12386,6 +12794,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mkdir)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mkdir)
 
 /* errno_t rmdir(char const *path) */
@@ -12416,6 +12825,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rmdir)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_rmdir)
 
 /* fd_t dup(fd_t fd) */
@@ -12446,6 +12856,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_dup)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_dup)
 
 /* errno_t pipe(fd_t[2] pipedes) */
@@ -12476,6 +12887,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pipe)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_pipe)
 
 /* clock_t times(struct tms *buf) */
@@ -12506,6 +12918,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_times)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_times)
 
 /* errno_t prof(void) */
@@ -12535,6 +12948,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_prof)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_prof)
 
 /* errno_t brk(void *addr) */
@@ -12565,6 +12979,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_brk)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_brk)
 
 /* errno_t setgid(uint16_t gid) */
@@ -12595,6 +13010,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setgid)
 
 /* uint16_t getgid(void) */
@@ -12624,6 +13040,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getgid)
 
 /* @param: signo: One of `SIG*' */
@@ -12656,6 +13073,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_signal)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_signal)
 
 /* uint16_t geteuid(void) */
@@ -12685,6 +13103,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_geteuid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_geteuid)
 
 /* uint16_t getegid(void) */
@@ -12714,6 +13133,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getegid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getegid)
 
 /* errno_t acct(char const *filename) */
@@ -12744,6 +13164,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_acct)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_acct)
 
 /* errno_t umount2(char const *special_file, syscall_ulong_t flags) */
@@ -12775,6 +13196,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_umount2)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_umount2)
 
 /* errno_t lock(void) */
@@ -12804,6 +13226,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lock)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_lock)
 
 /* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t request, void *arg) */
@@ -12836,6 +13259,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioctl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_ioctl)
 
 /* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t cmd, void *arg) */
@@ -12868,6 +13292,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fcntl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fcntl)
 
 /* errno_t mpx(void) */
@@ -12897,6 +13322,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mpx)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mpx)
 
 /* errno_t setpgid(pid_t pid, pid_t pgid) */
@@ -12928,6 +13354,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setpgid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setpgid)
 
 /* errno_t ulimit(void) */
@@ -12957,6 +13384,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ulimit)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_ulimit)
 
 /* errno_t oldolduname(struct linux_oldolduname *name) */
@@ -12987,6 +13415,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_oldolduname)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_oldolduname)
 
 /* mode_t umask(mode_t mode) */
@@ -13017,6 +13446,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_umask)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_umask)
 
 /* errno_t chroot(char const *path) */
@@ -13047,6 +13477,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chroot)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_chroot)
 
 /* errno_t ustat(dev_t dev, struct ustat *ubuf) */
@@ -13078,6 +13509,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ustat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_ustat)
 
 /* fd_t dup2(fd_t oldfd, fd_t newfd) */
@@ -13109,6 +13541,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_dup2)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_dup2)
 
 /* pid_t getppid(void) */
@@ -13138,6 +13571,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getppid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getppid)
 
 /* pid_t getpgrp(void) */
@@ -13167,6 +13601,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpgrp)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getpgrp)
 
 /* pid_t setsid(void) */
@@ -13196,6 +13631,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setsid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setsid)
 
 /* @param: signo: One of `SIG*' */
@@ -13229,6 +13665,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaction)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sigaction)
 
 /* syscall_ulong_t sgetmask(void) */
@@ -13258,6 +13695,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sgetmask)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sgetmask)
 
 /* syscall_ulong_t ssetmask(syscall_ulong_t sigmask) */
@@ -13288,6 +13726,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ssetmask)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_ssetmask)
 
 /* errno_t setreuid(uint16_t ruid, uint16_t euid) */
@@ -13319,6 +13758,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setreuid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setreuid)
 
 /* errno_t setregid(uint16_t rgid, uint16_t egid) */
@@ -13350,6 +13790,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setregid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setregid)
 
 /* errno_t sigsuspend(struct __sigset_struct const *set) */
@@ -13380,6 +13821,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigsuspend)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sigsuspend)
 
 /* errno_t sigpending(struct __sigset_struct *set) */
@@ -13410,6 +13852,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigpending)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sigpending)
 
 /* errno_t sethostname(char const *name, size_t len) */
@@ -13441,6 +13884,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sethostname)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sethostname)
 
 /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
@@ -13472,6 +13916,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setrlimit)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setrlimit)
 
 /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
@@ -13503,6 +13948,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrlimit)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getrlimit)
 
 /* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
@@ -13534,6 +13980,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrusage)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getrusage)
 
 /* errno_t gettimeofday(struct __timevalx32 *tv, struct timezone *tz) */
@@ -13565,6 +14012,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_gettimeofday)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_gettimeofday)
 
 /* errno_t settimeofday(struct __timevalx32 const *tv, struct timezone const *tz) */
@@ -13596,6 +14044,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_settimeofday)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_settimeofday)
 
 /* errno_t getgroups(size_t size, uint16_t[] list) */
@@ -13627,6 +14076,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgroups)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getgroups)
 
 /* errno_t setgroups(size_t count, uint16_t const *groups) */
@@ -13658,6 +14108,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgroups)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setgroups)
 
 /* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32 *timeout) */
@@ -13693,6 +14144,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_select)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_select)
 
 /* errno_t symlink(char const *link_text, char const *target_path) */
@@ -13724,6 +14176,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_symlink)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_symlink)
 
 /* errno_t linux_oldlstat(char const *filename, struct linux_oldstat *statbuf) */
@@ -13755,6 +14208,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_oldlstat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_linux_oldlstat)
 
 /* ssize_t readlink(char const *path, char *buf, size_t buflen) */
@@ -13787,6 +14241,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readlink)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_readlink)
 
 /* errno_t uselib(char const *library) */
@@ -13817,6 +14272,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_uselib)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_uselib)
 
 /* @param: swapflags: Set of `SWAP_FLAG_*' */
@@ -13849,6 +14305,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_swapon)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_swapon)
 
 /* @param: how: One of the `RB_*' constants from <sys/reboot.h> */
@@ -13880,6 +14337,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_reboot)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_reboot)
 
 /* Returns `0' to indicate end-of-directory; 1 to to indicate success */
@@ -13913,6 +14371,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readdir)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_readdir)
 
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
@@ -13954,6 +14413,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mmap)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mmap)
 
 /* errno_t munmap(void *addr, size_t len) */
@@ -13985,6 +14445,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_munmap)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_munmap)
 
 /* errno_t truncate(char const *filename, syscall_ulong_t length) */
@@ -14016,6 +14477,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_truncate)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_truncate)
 
 /* errno_t ftruncate(fd_t fd, syscall_ulong_t length) */
@@ -14047,6 +14509,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftruncate)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_ftruncate)
 
 /* errno_t fchmod(fd_t fd, mode_t mode) */
@@ -14078,6 +14541,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchmod)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fchmod)
 
 /* errno_t fchown(fd_t fd, uint16_t owner, uint16_t group) */
@@ -14110,6 +14574,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchown)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fchown)
 
 /* syscall_slong_t getpriority(syscall_ulong_t which, id_t who) */
@@ -14141,6 +14606,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpriority)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getpriority)
 
 /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
@@ -14173,6 +14639,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setpriority)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setpriority)
 
 /* errno_t profil(uint16_t *sample_buffer, size_t size, size_t offset, syscall_ulong_t scale) */
@@ -14207,6 +14674,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_profil)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_profil)
 
 /* errno_t statfs(char const *file, struct __statfs32 *buf) */
@@ -14238,6 +14706,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_statfs)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_statfs)
 
 /* errno_t fstatfs(fd_t file, struct __statfs32 *buf) */
@@ -14269,6 +14738,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstatfs)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fstatfs)
 
 /* errno_t ioperm(syscall_ulong_t from, syscall_ulong_t num, syscall_ulong_t turn_on) */
@@ -14301,6 +14771,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioperm)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_ioperm)
 
 /* errno_t socketcall(int call, unsigned long *args) */
@@ -14332,6 +14803,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_socketcall)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_socketcall)
 
 /* ssize_t syslog(syscall_ulong_t level, char const *str, size_t len) */
@@ -14364,6 +14836,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_syslog)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_syslog)
 
 /* errno_t setitimer(syscall_ulong_t which, struct __itimerval32 const *newval, struct __itimerval32 *oldval) */
@@ -14396,6 +14869,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setitimer)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setitimer)
 
 /* errno_t getitimer(syscall_ulong_t which, struct __itimerval32 *curr_value) */
@@ -14427,6 +14901,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getitimer)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getitimer)
 
 /* errno_t linux_stat32(char const *filename, struct linux_stat32 *statbuf) */
@@ -14458,6 +14933,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_stat32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_linux_stat32)
 
 /* errno_t linux_lstat32(char const *filename, struct linux_stat32 *statbuf) */
@@ -14489,6 +14965,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_lstat32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_linux_lstat32)
 
 /* errno_t linux_fstat32(fd_t fd, struct linux_stat32 *statbuf) */
@@ -14520,6 +14997,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstat32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_linux_fstat32)
 
 /* errno_t olduname(struct linux_olduname *name) */
@@ -14550,6 +15028,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_olduname)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_olduname)
 
 /* errno_t iopl(syscall_ulong_t level) */
@@ -14580,6 +15059,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_iopl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_iopl)
 
 /* errno_t vhangup(void) */
@@ -14609,6 +15089,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vhangup)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_vhangup)
 
 /* errno_t idle(void) */
@@ -14638,6 +15119,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_idle)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_idle)
 
 /* errno_t vm86old(int TODO_PROTOTYPE) */
@@ -14668,6 +15150,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vm86old)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_vm86old)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
@@ -14704,6 +15187,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_wait4)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_wait4)
 
 /* errno_t swapoff(char const *pathname) */
@@ -14734,6 +15218,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_swapoff)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_swapoff)
 
 /* errno_t sysinfo(struct sysinfo *info) */
@@ -14764,6 +15249,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sysinfo)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sysinfo)
 
 /* errno_t ipc(int TODO_PROTOTYPE) */
@@ -14794,6 +15280,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ipc)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_ipc)
 
 /* errno_t fsync(fd_t fd) */
@@ -14824,6 +15311,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsync)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fsync)
 
 /* Restore the specified register state when returning from a signal handler
@@ -14866,6 +15354,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigreturn)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sigreturn)
 
 /* pid_t clone(syscall_ulong_t flags, void *child_stack, pid_t *ptid, uintptr_t newtls, pid_t *ctid) */
@@ -14901,6 +15390,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clone)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_clone)
 
 /* errno_t setdomainname(char const *name, size_t len) */
@@ -14932,6 +15422,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setdomainname)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setdomainname)
 
 /* errno_t uname(struct utsname *name) */
@@ -14962,6 +15453,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_uname)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_uname)
 
 /* syscall_slong_t modify_ldt(syscall_ulong_t func, void *ptr, syscall_ulong_t bytecount) */
@@ -14994,6 +15486,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_modify_ldt)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_modify_ldt)
 
 /* errno_t adjtimex(int TODO_PROTOTYPE) */
@@ -15024,6 +15517,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_adjtimex)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_adjtimex)
 
 /* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED' */
@@ -15057,6 +15551,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mprotect)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mprotect)
 
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
@@ -15090,6 +15585,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigprocmask)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sigprocmask)
 
 /* errno_t create_module(int TODO_PROTOTYPE) */
@@ -15120,6 +15616,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_create_module)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_create_module)
 
 /* errno_t init_module(int TODO_PROTOTYPE) */
@@ -15150,6 +15647,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_init_module)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_init_module)
 
 /* errno_t delete_module(int TODO_PROTOTYPE) */
@@ -15180,6 +15678,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_delete_module)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_delete_module)
 
 /* errno_t get_kernel_syms(int TODO_PROTOTYPE) */
@@ -15210,6 +15709,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_kernel_syms)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_get_kernel_syms)
 
 /* errno_t quotactl(int TODO_PROTOTYPE) */
@@ -15240,6 +15740,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_quotactl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_quotactl)
 
 /* pid_t getpgid(pid_t pid) */
@@ -15270,6 +15771,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpgid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getpgid)
 
 /* errno_t fchdir(fd_t fd) */
@@ -15300,6 +15802,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchdir)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fchdir)
 
 /* errno_t bdflush(int TODO_PROTOTYPE) */
@@ -15330,6 +15833,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_bdflush)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_bdflush)
 
 /* errno_t sysfs(int TODO_PROTOTYPE) */
@@ -15360,6 +15864,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sysfs)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sysfs)
 
 /* errno_t personality(int TODO_PROTOTYPE) */
@@ -15390,6 +15895,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_personality)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_personality)
 
 /* errno_t afs_syscall(int TODO_PROTOTYPE) */
@@ -15420,6 +15926,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_afs_syscall)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_afs_syscall)
 
 /* errno_t setfsuid(uint16_t uid) */
@@ -15450,6 +15957,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsuid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setfsuid)
 
 /* errno_t setfsgid(uint16_t gid) */
@@ -15480,6 +15988,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsgid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setfsgid)
 
 /* errno_t _llseek(fd_t fd, int64_t offset, uint64_t *result, syscall_ulong_t whence) */
@@ -15503,7 +16012,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80__llseek)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %esi, %rdx /* ARG2 = REG3 */
-	movzlq %rax, %rsi /* ARG1 = %rax */
+	movq   %rax, %rsi /* ARG1 = %rax */
 	movzlq %edi, %rcx /* ARG3 = REG4 */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32__llseek)
@@ -15517,6 +16026,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80__llseek)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80__llseek)
 
 /* ssize_t getdents(fd_t fd, struct linux_dirent *dirp, size_t count) */
@@ -15549,6 +16059,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getdents)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getdents)
 
 /* errno_t _newselect(int TODO_PROTOTYPE) */
@@ -15579,6 +16090,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80__newselect)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80__newselect)
 
 /* errno_t flock(fd_t fd, syscall_ulong_t operation) */
@@ -15610,6 +16122,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_flock)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_flock)
 
 /* errno_t msync(void *addr, size_t len, syscall_ulong_t flags) */
@@ -15642,6 +16155,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_msync)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_msync)
 
 /* ssize_t readv(fd_t fd, struct iovec32 const *iovec, size_t count) */
@@ -15674,6 +16188,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readv)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_readv)
 
 /* ssize_t writev(fd_t fd, struct iovec32 const *iovec, size_t count) */
@@ -15706,6 +16221,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_writev)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_writev)
 
 /* pid_t getsid(pid_t pid) */
@@ -15736,6 +16252,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getsid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getsid)
 
 /* errno_t fdatasync(fd_t fd) */
@@ -15766,6 +16283,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fdatasync)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fdatasync)
 
 /* errno_t _sysctl(int TODO_PROTOTYPE) */
@@ -15796,6 +16314,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80__sysctl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80__sysctl)
 
 /* errno_t mlock(void const *addr, size_t len) */
@@ -15827,6 +16346,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlock)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mlock)
 
 /* errno_t munlock(void const *addr, size_t len) */
@@ -15858,6 +16378,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_munlock)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_munlock)
 
 /* errno_t mlockall(syscall_ulong_t flags) */
@@ -15888,6 +16409,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlockall)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mlockall)
 
 /* errno_t munlockall(void) */
@@ -15917,6 +16439,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_munlockall)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_munlockall)
 
 /* errno_t sched_setparam(pid_t pid, struct sched_param const *param) */
@@ -15948,6 +16471,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_setparam)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sched_setparam)
 
 /* errno_t sched_getparam(pid_t pid, struct sched_param *param) */
@@ -15979,6 +16503,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_getparam)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sched_getparam)
 
 /* errno_t sched_setscheduler(pid_t pid, syscall_ulong_t policy, struct sched_param const *param) */
@@ -16011,6 +16536,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_setscheduler)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sched_setscheduler)
 
 /* syscall_slong_t sched_getscheduler(pid_t pid) */
@@ -16041,6 +16567,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_getscheduler)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sched_getscheduler)
 
 /* errno_t sched_yield(void) */
@@ -16070,6 +16597,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_yield)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sched_yield)
 
 /* syscall_slong_t sched_get_priority_max(syscall_ulong_t algorithm) */
@@ -16100,6 +16628,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_get_priority_max)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sched_get_priority_max)
 
 /* syscall_slong_t sched_get_priority_min(syscall_ulong_t algorithm) */
@@ -16130,6 +16659,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_get_priority_min)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sched_get_priority_min)
 
 /* errno_t sched_rr_get_interval(pid_t pid, struct __timespecx32 *tms) */
@@ -16161,6 +16691,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_rr_get_interval)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sched_rr_get_interval)
 
 /* errno_t nanosleep(struct __timespecx32 const *req, struct __timespecx32 *rem) */
@@ -16192,6 +16723,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nanosleep)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_nanosleep)
 
 /* @param: flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED' */
@@ -16228,6 +16760,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mremap)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mremap)
 
 /* errno_t setresuid(uint16_t ruid, uint16_t euid, uint16_t suid) */
@@ -16260,6 +16793,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresuid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setresuid)
 
 /* errno_t getresuid(uint16_t *ruid, uint16_t *euid, uint16_t *suid) */
@@ -16292,6 +16826,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresuid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getresuid)
 
 /* errno_t vm86(int TODO_PROTOTYPE) */
@@ -16322,6 +16857,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vm86)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_vm86)
 
 /* errno_t query_module(int TODO_PROTOTYPE) */
@@ -16352,6 +16888,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_query_module)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_query_module)
 
 /* ssize_t poll(struct pollfd *fds, size_t nfds, syscall_slong_t timeout) */
@@ -16384,6 +16921,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_poll)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_poll)
 
 /* errno_t nfsservctl(int TODO_PROTOTYPE) */
@@ -16414,6 +16952,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nfsservctl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_nfsservctl)
 
 /* errno_t setresgid(uint16_t rgid, uint16_t egid, uint16_t sgid) */
@@ -16446,6 +16985,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresgid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setresgid)
 
 /* errno_t getresgid(uint16_t *rgid, uint16_t *egid, uint16_t *sgid) */
@@ -16478,6 +17018,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresgid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getresgid)
 
 /* errno_t prctl(int TODO_PROTOTYPE) */
@@ -16508,6 +17049,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_prctl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_prctl)
 
 /* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info *sc_info, struct ucpustate const *restore_cpu) */
@@ -16542,6 +17084,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigreturn)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_rt_sigreturn)
 
 /* @param: signo: One of `SIG*' */
@@ -16577,6 +17120,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigaction)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_rt_sigaction)
 
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
@@ -16612,6 +17156,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigprocmask)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_rt_sigprocmask)
 
 /* errno_t rt_sigpending(struct __sigset_struct *set, size_t sigsetsize) */
@@ -16643,6 +17188,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigpending)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_rt_sigpending)
 
 /* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct __timespecx32 const *timeout, size_t sigsetsize) */
@@ -16677,6 +17223,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_rt_sigtimedwait)
 
 /* @param: signo: One of `SIG*' */
@@ -16710,6 +17257,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigqueueinfo)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_rt_sigqueueinfo)
 
 /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
@@ -16741,6 +17289,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigsuspend)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_rt_sigsuspend)
 
 /* ssize_t pread64(fd_t fd, void *buf, size_t bufsize, uint64_t offset) */
@@ -16764,7 +17313,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pread64)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %rax, %rcx /* ARG3 = %rax */
+	movq   %rax, %rcx /* ARG3 = %rax */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_pread64)
@@ -16778,6 +17327,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pread64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_pread64)
 
 /* ssize_t pwrite64(fd_t fd, void const *buf, size_t bufsize, uint64_t offset) */
@@ -16801,7 +17351,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwrite64)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %rax, %rcx /* ARG3 = %rax */
+	movq   %rax, %rcx /* ARG3 = %rax */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_pwrite64)
@@ -16815,6 +17365,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwrite64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_pwrite64)
 
 /* errno_t chown(char const *filename, uint16_t owner, uint16_t group) */
@@ -16847,6 +17398,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chown)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_chown)
 
 /* ssize_t getcwd(char *buf, size_t size) */
@@ -16878,6 +17430,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getcwd)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getcwd)
 
 /* errno_t capget(int TODO_PROTOTYPE) */
@@ -16908,6 +17461,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_capget)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_capget)
 
 /* errno_t capset(int TODO_PROTOTYPE) */
@@ -16938,6 +17492,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_capset)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_capset)
 
 /* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
@@ -16969,6 +17524,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaltstack)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sigaltstack)
 
 /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
@@ -17003,6 +17559,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendfile)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sendfile)
 
 /* errno_t getpmsg(int TODO_PROTOTYPE) */
@@ -17033,6 +17590,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpmsg)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getpmsg)
 
 /* errno_t putpmsg(int TODO_PROTOTYPE) */
@@ -17063,6 +17621,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_putpmsg)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_putpmsg)
 
 /* pid_t vfork(void) */
@@ -17092,6 +17651,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vfork)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_vfork)
 
 /* errno_t ugetrlimit(int TODO_PROTOTYPE) */
@@ -17122,6 +17682,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ugetrlimit)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_ugetrlimit)
 
 /* void *mmap2(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t pgoffset) */
@@ -17158,6 +17719,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mmap2)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mmap2)
 
 /* errno_t truncate64(char const *filename, uint64_t length) */
@@ -17192,6 +17754,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_truncate64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_truncate64)
 
 /* errno_t ftruncate64(fd_t fd, uint64_t length) */
@@ -17226,6 +17789,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftruncate64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_ftruncate64)
 
 /* errno_t linux_stat64(char const *filename, struct linux_stat64 *statbuf) */
@@ -17257,6 +17821,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_stat64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_linux_stat64)
 
 /* errno_t linux_lstat64(char const *filename, struct linux_stat64 *statbuf) */
@@ -17288,6 +17853,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_lstat64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_linux_lstat64)
 
 /* errno_t linux_fstat64(fd_t fd, struct linux_stat64 *statbuf) */
@@ -17319,6 +17885,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstat64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_linux_fstat64)
 
 /* errno_t lchown32(char const *filename, uint32_t owner, uint32_t group) */
@@ -17351,6 +17918,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lchown32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_lchown32)
 
 /* uint32_t getuid32(void) */
@@ -17380,6 +17948,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getuid32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getuid32)
 
 /* uint32_t getgid32(void) */
@@ -17409,6 +17978,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgid32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getgid32)
 
 /* uint32_t geteuid32(void) */
@@ -17438,6 +18008,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_geteuid32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_geteuid32)
 
 /* uint32_t getegid32(void) */
@@ -17467,6 +18038,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getegid32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getegid32)
 
 /* errno_t setreuid32(uint32_t ruid, uint32_t euid) */
@@ -17498,6 +18070,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setreuid32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setreuid32)
 
 /* errno_t setregid32(uint32_t rgid, uint32_t egid) */
@@ -17529,6 +18102,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setregid32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setregid32)
 
 /* errno_t getgroups32(size_t size, uint32_t[] list) */
@@ -17560,6 +18134,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getgroups32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getgroups32)
 
 /* errno_t setgroups32(size_t count, uint32_t const *groups) */
@@ -17591,6 +18166,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgroups32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setgroups32)
 
 /* errno_t fchown32(fd_t fd, uint32_t owner, uint32_t group) */
@@ -17623,6 +18199,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchown32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fchown32)
 
 /* errno_t setresuid32(uint32_t ruid, uint32_t euid, uint32_t suid) */
@@ -17655,6 +18232,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresuid32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setresuid32)
 
 /* errno_t getresuid32(uint32_t *ruid, uint32_t *euid, uint32_t *suid) */
@@ -17687,6 +18265,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresuid32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getresuid32)
 
 /* errno_t setresgid32(uint32_t rgid, uint32_t egid, uint32_t sgid) */
@@ -17719,6 +18298,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresgid32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setresgid32)
 
 /* errno_t getresgid32(uint32_t *rgid, uint32_t *egid, uint32_t *sgid) */
@@ -17751,6 +18331,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getresgid32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getresgid32)
 
 /* errno_t chown32(char const *filename, uint32_t owner, uint32_t group) */
@@ -17783,6 +18364,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chown32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_chown32)
 
 /* errno_t setuid32(uint32_t uid) */
@@ -17813,6 +18395,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setuid32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setuid32)
 
 /* errno_t setgid32(uint32_t gid) */
@@ -17843,6 +18426,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgid32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setgid32)
 
 /* errno_t setfsuid32(uint32_t uid) */
@@ -17873,6 +18457,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsuid32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setfsuid32)
 
 /* errno_t setfsgid32(uint32_t gid) */
@@ -17903,6 +18488,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsgid32)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setfsgid32)
 
 /* errno_t pivot_root(int TODO_PROTOTYPE) */
@@ -17933,6 +18519,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pivot_root)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_pivot_root)
 
 /* errno_t mincore(void *start, size_t len, uint8_t *vec) */
@@ -17965,6 +18552,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mincore)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mincore)
 
 /* errno_t madvise(void *addr, size_t len, syscall_ulong_t advice) */
@@ -17997,6 +18585,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_madvise)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_madvise)
 
 /* ssize_t getdents64(fd_t fd, struct linux_dirent64 *dirp, size_t count) */
@@ -18029,6 +18618,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getdents64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getdents64)
 
 /* syscall_slong_t fcntl64(fd_t fd, syscall_ulong_t command, void *arg) */
@@ -18061,6 +18651,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fcntl64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fcntl64)
 
 /* pid_t gettid(void) */
@@ -18090,6 +18681,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_gettid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_gettid)
 
 /* ssize_t readahead(fd_t fd, uint64_t offset, size_t count) */
@@ -18114,7 +18706,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readahead)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %esi, %rdx /* ARG2 = REG3 */
-	movzlq %rax, %rsi /* ARG1 = %rax */
+	movq   %rax, %rsi /* ARG1 = %rax */
 	EXTERN(sys32_readahead)
 	call   sys32_readahead
 	popq_cfi_r %r11
@@ -18126,6 +18718,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readahead)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_readahead)
 
 /* errno_t setxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
@@ -18161,6 +18754,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setxattr)
 
 /* errno_t lsetxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
@@ -18196,6 +18790,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lsetxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_lsetxattr)
 
 /* errno_t fsetxattr(fd_t fd, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
@@ -18231,6 +18826,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsetxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fsetxattr)
 
 /* ssize_t getxattr(char const *path, char const *name, void *buf, size_t bufsize) */
@@ -18265,6 +18861,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getxattr)
 
 /* ssize_t lgetxattr(char const *path, char const *name, void *buf, size_t bufsize) */
@@ -18299,6 +18896,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lgetxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_lgetxattr)
 
 /* ssize_t fgetxattr(fd_t fd, char const *name, void *buf, size_t bufsize) */
@@ -18333,6 +18931,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fgetxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fgetxattr)
 
 /* ssize_t listxattr(char const *path, char *listbuf, size_t listbufsize) */
@@ -18365,6 +18964,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_listxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_listxattr)
 
 /* ssize_t llistxattr(char const *path, char *listbuf, size_t listbufsize) */
@@ -18397,6 +18997,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_llistxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_llistxattr)
 
 /* ssize_t flistxattr(fd_t fd, char *listbuf, size_t listbufsize) */
@@ -18429,6 +19030,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_flistxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_flistxattr)
 
 /* errno_t removexattr(char const *path, char const *name) */
@@ -18460,6 +19062,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_removexattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_removexattr)
 
 /* errno_t lremovexattr(char const *path, char const *name) */
@@ -18491,6 +19094,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lremovexattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_lremovexattr)
 
 /* errno_t fremovexattr(int fd, char const *name) */
@@ -18522,6 +19126,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fremovexattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fremovexattr)
 
 /* errno_t tkill(pid_t tid, syscall_ulong_t signo) */
@@ -18553,6 +19158,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tkill)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_tkill)
 
 /* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, uint64_t *offset, size_t count) */
@@ -18587,6 +19193,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendfile64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sendfile64)
 
 /* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
@@ -18623,6 +19230,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futex)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_futex)
 
 /* errno_t sched_setaffinity(pid_t pid, size_t cpusetsize, struct __cpu_set_struct const *cpuset) */
@@ -18655,6 +19263,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_setaffinity)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sched_setaffinity)
 
 /* errno_t sched_getaffinity(pid_t pid, size_t cpusetsize, struct __cpu_set_struct *cpuset) */
@@ -18687,6 +19296,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_getaffinity)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sched_getaffinity)
 
 /* errno_t set_thread_area(int TODO_PROTOTYPE) */
@@ -18717,6 +19327,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_thread_area)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_set_thread_area)
 
 /* errno_t get_thread_area(int TODO_PROTOTYPE) */
@@ -18747,6 +19358,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_thread_area)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_get_thread_area)
 
 /* errno_t io_setup(int TODO_PROTOTYPE) */
@@ -18777,6 +19389,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_setup)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_io_setup)
 
 /* errno_t io_destroy(int TODO_PROTOTYPE) */
@@ -18807,6 +19420,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_destroy)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_io_destroy)
 
 /* errno_t io_getevents(int TODO_PROTOTYPE) */
@@ -18837,6 +19451,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_getevents)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_io_getevents)
 
 /* errno_t io_submit(int TODO_PROTOTYPE) */
@@ -18867,6 +19482,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_submit)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_io_submit)
 
 /* errno_t io_cancel(int TODO_PROTOTYPE) */
@@ -18897,6 +19513,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_cancel)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_io_cancel)
 
 /* errno_t fadvise64(int TODO_PROTOTYPE) */
@@ -18927,6 +19544,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fadvise64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fadvise64)
 
 /* void exit_group(syscall_ulong_t exit_code) */
@@ -18957,6 +19575,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_exit_group)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_exit_group)
 
 /* errno_t lookup_dcookie(int TODO_PROTOTYPE) */
@@ -18987,6 +19606,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lookup_dcookie)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_lookup_dcookie)
 
 /* fd_t epoll_create(syscall_ulong_t size) */
@@ -19017,6 +19637,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_create)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_epoll_create)
 
 /* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
@@ -19051,6 +19672,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_ctl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_epoll_ctl)
 
 /* errno_t epoll_wait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout) */
@@ -19085,6 +19707,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_wait)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_epoll_wait)
 
 /* errno_t remap_file_pages(void *start, size_t size, syscall_ulong_t prot, size_t pgoff, syscall_ulong_t flags) */
@@ -19120,6 +19743,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_remap_file_pages)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_remap_file_pages)
 
 /* pid_t set_tid_address(pid_t *tidptr) */
@@ -19150,6 +19774,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_tid_address)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_set_tid_address)
 
 /* errno_t timer_create(clockid_t clock_id, struct sigevent *evp, timer_t *timerid) */
@@ -19182,6 +19807,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_create)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_timer_create)
 
 /* errno_t timer_settime(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32 const *value, struct __itimerspecx32 *ovalue) */
@@ -19216,6 +19842,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_settime)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_timer_settime)
 
 /* errno_t timer_gettime(timer_t timerid, struct __itimerspecx32 *value) */
@@ -19247,6 +19874,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_gettime)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_timer_gettime)
 
 /* syscall_slong_t timer_getoverrun(timer_t timerid) */
@@ -19277,6 +19905,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_getoverrun)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_timer_getoverrun)
 
 /* errno_t timer_delete(timer_t timerid) */
@@ -19307,6 +19936,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_delete)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_timer_delete)
 
 /* errno_t clock_settime(clockid_t clock_id, struct __timespecx32 const *tp) */
@@ -19338,6 +19968,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_settime)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_clock_settime)
 
 /* errno_t clock_gettime(clockid_t clock_id, struct __timespecx32 *tp) */
@@ -19369,6 +20000,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_gettime)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_clock_gettime)
 
 /* errno_t clock_getres(clockid_t clock_id, struct __timespecx32 *res) */
@@ -19400,6 +20032,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_getres)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_clock_getres)
 
 /* errno_t clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32 const *requested_time, struct __timespecx32 *remaining) */
@@ -19434,6 +20067,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_nanosleep)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_clock_nanosleep)
 
 /* errno_t statfs64(char const *file, struct statfs64 *buf) */
@@ -19465,6 +20099,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_statfs64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_statfs64)
 
 /* errno_t fstatfs64(fd_t file, struct statfs64 *buf) */
@@ -19496,6 +20131,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstatfs64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fstatfs64)
 
 /* errno_t tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo) */
@@ -19528,6 +20164,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tgkill)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_tgkill)
 
 /* errno_t utimes(char const *filename, struct __timevalx32 const[2] times) */
@@ -19559,6 +20196,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_utimes)
 
 /* errno_t fadvise64_64(int TODO_PROTOTYPE) */
@@ -19589,6 +20227,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fadvise64_64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fadvise64_64)
 
 /* errno_t vserver(int TODO_PROTOTYPE) */
@@ -19619,6 +20258,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vserver)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_vserver)
 
 /* errno_t mbind(int TODO_PROTOTYPE) */
@@ -19649,6 +20289,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mbind)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mbind)
 
 /* errno_t get_mempolicy(int TODO_PROTOTYPE) */
@@ -19679,6 +20320,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_mempolicy)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_get_mempolicy)
 
 /* errno_t set_mempolicy(int TODO_PROTOTYPE) */
@@ -19709,6 +20351,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_mempolicy)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_set_mempolicy)
 
 /* errno_t mq_open(int TODO_PROTOTYPE) */
@@ -19739,6 +20382,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_open)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mq_open)
 
 /* errno_t mq_unlink(int TODO_PROTOTYPE) */
@@ -19769,6 +20413,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_unlink)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mq_unlink)
 
 /* errno_t mq_timedsend(int TODO_PROTOTYPE) */
@@ -19799,6 +20444,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mq_timedsend)
 
 /* errno_t mq_timedreceive(int TODO_PROTOTYPE) */
@@ -19829,6 +20475,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mq_timedreceive)
 
 /* errno_t mq_notify(int TODO_PROTOTYPE) */
@@ -19859,6 +20506,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_notify)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mq_notify)
 
 /* errno_t mq_getsetattr(int TODO_PROTOTYPE) */
@@ -19889,6 +20537,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_getsetattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mq_getsetattr)
 
 /* errno_t kexec_load(int TODO_PROTOTYPE) */
@@ -19919,6 +20568,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kexec_load)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_kexec_load)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
@@ -19955,6 +20605,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_waitid)
 
 /* errno_t add_key(int TODO_PROTOTYPE) */
@@ -19985,6 +20636,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_add_key)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_add_key)
 
 /* errno_t request_key(int TODO_PROTOTYPE) */
@@ -20015,6 +20667,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_request_key)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_request_key)
 
 /* errno_t keyctl(int TODO_PROTOTYPE) */
@@ -20045,6 +20698,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_keyctl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_keyctl)
 
 /* errno_t ioprio_set(syscall_ulong_t which, syscall_ulong_t who, syscall_ulong_t ioprio) */
@@ -20077,6 +20731,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioprio_set)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_ioprio_set)
 
 /* errno_t ioprio_get(syscall_ulong_t which, syscall_ulong_t who) */
@@ -20108,6 +20763,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioprio_get)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_ioprio_get)
 
 /* errno_t inotify_init(int TODO_PROTOTYPE) */
@@ -20138,6 +20794,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_inotify_init)
 
 /* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
@@ -20168,6 +20825,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_add_watch)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_inotify_add_watch)
 
 /* errno_t inotify_rm_watch(int TODO_PROTOTYPE) */
@@ -20198,6 +20856,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_rm_watch)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_inotify_rm_watch)
 
 /* errno_t migrate_pages(int TODO_PROTOTYPE) */
@@ -20228,6 +20887,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_migrate_pages)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_migrate_pages)
 
 /* fd_t openat(fd_t dirfd, char const *filename, oflag_t oflags, mode_t mode) */
@@ -20262,6 +20922,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_openat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_openat)
 
 /* errno_t mkdirat(fd_t dirfd, char const *pathname, mode_t mode) */
@@ -20294,6 +20955,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mkdirat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mkdirat)
 
 /* errno_t mknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev) */
@@ -20328,6 +20990,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mknodat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mknodat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
@@ -20364,6 +21027,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchownat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fchownat)
 
 /* errno_t futimesat(fd_t dirfd, const char *filename, struct __timevalx32 const[2] times) */
@@ -20396,6 +21060,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futimesat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_futimesat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
@@ -20431,6 +21096,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstatat64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_linux_fstatat64)
 
 /* @param: flags: Set of `0 | AT_REMOVEDIR|AT_REMOVEREG | AT_DOSPATH' */
@@ -20464,6 +21130,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_unlinkat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_unlinkat)
 
 /* errno_t renameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path) */
@@ -20498,6 +21165,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_renameat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_renameat)
 
 /* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_FOLLOW | AT_DOSPATH' */
@@ -20534,6 +21202,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linkat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_linkat)
 
 /* errno_t symlinkat(char const *link_text, fd_t tofd, char const *target_path) */
@@ -20566,6 +21235,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_symlinkat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_symlinkat)
 
 /* ssize_t readlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen) */
@@ -20600,6 +21270,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readlinkat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_readlinkat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
@@ -20635,6 +21306,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchmodat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fchmodat)
 
 /* @param: type: Set of `R_OK|W_OK|X_OK' or `F_OK'
@@ -20671,6 +21343,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_faccessat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_faccessat)
 
 /* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx32 const *timeout, void const *sigmask_sigset_and_len) */
@@ -20707,6 +21380,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pselect6)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_pselect6)
 
 /* ssize_t ppoll(struct pollfd *fds, size_t nfds, struct __timespecx32 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
@@ -20742,6 +21416,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ppoll)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_ppoll)
 
 /* param flags: Set of `CLONE_*' */
@@ -20773,6 +21448,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_unshare)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_unshare)
 
 /* errno_t set_robust_list(int TODO_PROTOTYPE) */
@@ -20803,6 +21479,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_robust_list)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_set_robust_list)
 
 /* errno_t get_robust_list(int TODO_PROTOTYPE) */
@@ -20833,6 +21510,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_robust_list)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_get_robust_list)
 
 /* ssize_t splice(fd_t fdin, uint64_t *offin, fd_t fdout, uint64_t *offout, size_t length, syscall_ulong_t flags) */
@@ -20869,6 +21547,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_splice)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_splice)
 
 /* errno_t sync_file_range(fd_t fd, uint64_t offset, uint64_t count, syscall_ulong_t flags) */
@@ -20895,7 +21574,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sync_file_range)
 	movzlq %esi, %r8           /* ... */
 	shlq   $32, %rdx            /* ... */
 	orq    %r8, %rdx           /* ... */
-	movzlq %rax, %rsi /* ARG1 = %rax */
+	movq   %rax, %rsi /* ARG1 = %rax */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ebp, %rcx /* ARG3 = REG5 */
 	EXTERN(sys32_sync_file_range)
@@ -20909,6 +21588,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sync_file_range)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sync_file_range)
 
 /* ssize_t tee(fd_t fdin, fd_t fdout, size_t length, syscall_ulong_t flags) */
@@ -20943,6 +21623,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tee)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_tee)
 
 /* ssize_t vmsplice(fd_t fdout, struct iovec32 const *iov, size_t count, syscall_ulong_t flags) */
@@ -20977,6 +21658,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vmsplice)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_vmsplice)
 
 /* errno_t move_pages(int TODO_PROTOTYPE) */
@@ -21007,6 +21689,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_move_pages)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_move_pages)
 
 /* errno_t getcpu(uint32_t *cpu, uint32_t *node, struct getcpu_cache *tcache) */
@@ -21039,6 +21722,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getcpu)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getcpu)
 
 /* errno_t epoll_pwait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss) */
@@ -21074,6 +21758,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_pwait)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_epoll_pwait)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
@@ -21109,6 +21794,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimensat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_utimensat)
 
 /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) */
@@ -21141,6 +21827,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_signalfd)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_signalfd)
 
 /* Return file descriptor for new interval timer source */
@@ -21173,6 +21860,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_create)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_timerfd_create)
 
 /* fd_t eventfd(syscall_ulong_t initval) */
@@ -21203,6 +21891,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_eventfd)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_eventfd)
 
 /* errno_t fallocate(fd_t fd, syscall_ulong_t mode, syscall_ulong_t offset, syscall_ulong_t length) */
@@ -21237,6 +21926,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fallocate)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fallocate)
 
 /* Set next expiration time of interval timer source UFD to UTMR.
@@ -21274,6 +21964,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_settime)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_timerfd_settime)
 
 /* Return the next expiration time of UFD */
@@ -21306,6 +21997,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_gettime)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_timerfd_gettime)
 
 /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize, syscall_ulong_t flags) */
@@ -21340,6 +22032,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_signalfd4)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_signalfd4)
 
 /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
@@ -21371,6 +22064,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_eventfd2)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_eventfd2)
 
 /* fd_t epoll_create1(syscall_ulong_t flags) */
@@ -21401,6 +22095,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_create1)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_epoll_create1)
 
 /* @param: flags:  Set of `O_CLOEXEC|O_CLOFORK' */
@@ -21434,6 +22129,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_dup3)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_dup3)
 
 /* errno_t pipe2(fd_t[2] pipedes, oflag_t flags) */
@@ -21465,6 +22161,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pipe2)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_pipe2)
 
 /* errno_t inotify_init1(int TODO_PROTOTYPE) */
@@ -21495,6 +22192,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init1)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_inotify_init1)
 
 /* ssize_t preadv(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset) */
@@ -21518,7 +22216,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadv)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %rax, %rcx /* ARG3 = %rax */
+	movq   %rax, %rcx /* ARG3 = %rax */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_preadv)
@@ -21532,6 +22230,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadv)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_preadv)
 
 /* ssize_t pwritev(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset) */
@@ -21555,7 +22254,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritev)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %rax, %rcx /* ARG3 = %rax */
+	movq   %rax, %rcx /* ARG3 = %rax */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_pwritev)
@@ -21569,6 +22268,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritev)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_pwritev)
 
 /* @param: signo: One of `SIG*' */
@@ -21604,6 +22304,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_tgsigqueueinfo)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_rt_tgsigqueueinfo)
 
 /* errno_t perf_event_open(int TODO_PROTOTYPE) */
@@ -21634,6 +22335,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_perf_event_open)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_perf_event_open)
 
 /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx32 *tmo) */
@@ -21669,6 +22371,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_recvmmsg)
 
 /* errno_t fanotify_init(int TODO_PROTOTYPE) */
@@ -21699,6 +22402,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fanotify_init)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fanotify_init)
 
 /* errno_t fanotify_mark(int TODO_PROTOTYPE) */
@@ -21729,6 +22433,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fanotify_mark)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fanotify_mark)
 
 /* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
@@ -21764,6 +22469,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_prlimit64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_prlimit64)
 
 /* errno_t name_to_handle_at(fd_t dirfd, char const *name, struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags) */
@@ -21799,6 +22505,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_name_to_handle_at)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_name_to_handle_at)
 
 /* fd_t open_by_handle_at(fd_t mountdirfd, struct file_handle *handle, syscall_ulong_t flags) */
@@ -21831,6 +22538,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_open_by_handle_at)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_open_by_handle_at)
 
 /* errno_t clock_adjtime(int TODO_PROTOTYPE) */
@@ -21861,6 +22569,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_adjtime)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_clock_adjtime)
 
 /* errno_t syncfs(fd_t fd) */
@@ -21891,6 +22600,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_syncfs)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_syncfs)
 
 /* ssize_t sendmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags) */
@@ -21925,6 +22635,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendmmsg)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sendmmsg)
 
 /* errno_t setns(fd_t fd, syscall_ulong_t nstype) */
@@ -21956,6 +22667,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setns)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setns)
 
 /* ssize_t process_vm_readv(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
@@ -21992,6 +22704,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_readv)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_process_vm_readv)
 
 /* ssize_t process_vm_writev(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
@@ -22028,6 +22741,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_writev)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_process_vm_writev)
 
 /* syscall_slong_t kcmp(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2) */
@@ -22063,6 +22777,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kcmp)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_kcmp)
 
 /* errno_t finit_module(int TODO_PROTOTYPE) */
@@ -22093,6 +22808,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_finit_module)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_finit_module)
 
 /* errno_t sched_setattr(int TODO_PROTOTYPE) */
@@ -22123,6 +22839,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_setattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sched_setattr)
 
 /* errno_t sched_getattr(int TODO_PROTOTYPE) */
@@ -22153,6 +22870,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_getattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sched_getattr)
 
 /* @param: flags: Set of `RENAME_EXCHANGE,RENAME_NOREPLACE,RENAME_WHITEOUT' */
@@ -22189,6 +22907,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_renameat2)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_renameat2)
 
 /* errno_t seccomp(int TODO_PROTOTYPE) */
@@ -22219,6 +22938,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_seccomp)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_seccomp)
 
 /* errno_t getrandom(int TODO_PROTOTYPE) */
@@ -22249,6 +22969,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrandom)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getrandom)
 
 /* errno_t memfd_create(int TODO_PROTOTYPE) */
@@ -22279,6 +23000,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_memfd_create)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_memfd_create)
 
 /* errno_t bpf(int TODO_PROTOTYPE) */
@@ -22309,6 +23031,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_bpf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_bpf)
 
 /* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
@@ -22345,6 +23068,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_execveat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_execveat)
 
 /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
@@ -22377,6 +23101,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_socket)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_socket)
 
 /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
@@ -22411,6 +23136,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_socketpair)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_socketpair)
 
 /* errno_t bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
@@ -22443,6 +23169,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_bind)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_bind)
 
 /* errno_t connect(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
@@ -22475,6 +23202,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_connect)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_connect)
 
 /* errno_t listen(fd_t sockfd, syscall_ulong_t max_backlog) */
@@ -22506,6 +23234,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_listen)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_listen)
 
 /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t flags) */
@@ -22540,6 +23269,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_accept4)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_accept4)
 
 /* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
@@ -22577,6 +23307,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getsockopt)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getsockopt)
 
 /* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
@@ -22614,6 +23345,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setsockopt)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setsockopt)
 
 /* errno_t getsockname(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
@@ -22646,6 +23378,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getsockname)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getsockname)
 
 /* errno_t getpeername(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
@@ -22678,6 +23411,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpeername)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getpeername)
 
 /* param flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
@@ -22715,6 +23449,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendto)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sendto)
 
 /* ssize_t sendmsg(fd_t sockfd, struct msghdr const *message, syscall_ulong_t flags) */
@@ -22747,6 +23482,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendmsg)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sendmsg)
 
 /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr *addr, socklen_t *addr_len) */
@@ -22783,6 +23519,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvfrom)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_recvfrom)
 
 /* ssize_t recvmsg(fd_t sockfd, struct msghdr *message, syscall_ulong_t flags) */
@@ -22815,6 +23552,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmsg)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_recvmsg)
 
 /* @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
@@ -22847,6 +23585,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_shutdown)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_shutdown)
 
 /* errno_t userfaultfd(int TODO_PROTOTYPE) */
@@ -22877,6 +23616,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_userfaultfd)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_userfaultfd)
 
 /* errno_t membarrier(int TODO_PROTOTYPE) */
@@ -22907,6 +23647,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_membarrier)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_membarrier)
 
 /* errno_t mlock2(int TODO_PROTOTYPE) */
@@ -22937,6 +23678,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlock2)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mlock2)
 
 /* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
@@ -22969,6 +23711,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_hop)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_hop)
 
 /* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
@@ -23003,6 +23746,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_hopf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_hopf)
 
 /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
@@ -23037,6 +23781,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_readf)
 
 /* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
@@ -23071,6 +23816,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_writef)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_writef)
 
 /* >> detach(2)
@@ -23189,6 +23935,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_detach)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_detach)
 
 /* Returns a bitset of all of the currently mounted dos-drives */
@@ -23219,6 +23966,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getdrives)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getdrives)
 
 /* You may pass `AT_READLINK_REQSIZE' to always have the function return
@@ -23256,6 +24004,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpath4)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_frealpath4)
 
 /* Returns the absolute filesystem path for the specified file
@@ -23298,6 +24047,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpathat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_frealpathat)
 
 /* Schedule an RPC for execution on the specified `target' thread.
@@ -23342,6 +24092,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_schedule)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_rpc_schedule)
 
 /* syscall_slong_t sysctl(syscall_ulong_t command, void *arg) */
@@ -23373,6 +24124,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sysctl)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sysctl)
 
 /* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
@@ -23409,6 +24161,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_openpty)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_openpty)
 
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -23442,6 +24195,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchdirat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fchdirat)
 
 /* time64_t time64(time64_t *timer) */
@@ -23474,6 +24228,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_time64)
 	shrq   $32, %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_time64)
 
 /* Set the exception handler mode for the calling thread.
@@ -23515,6 +24270,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_exception_handler)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_set_exception_handler)
 
 /* Get the current exception handler mode for the calling thread.
@@ -23560,6 +24316,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_exception_handler)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_get_exception_handler)
 
 /* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
@@ -23591,6 +24348,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_library_listdef)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_set_library_listdef)
 
 /* Trigger a debugger trap `trapno', optionally extended with `regs'
@@ -23632,6 +24390,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_debugtrap)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_debugtrap)
 
 /* >> lfutex(2)
@@ -23689,6 +24448,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutex)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_lfutex)
 
 /* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
@@ -23713,7 +24473,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lseek64)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %esi, %rdx /* ARG2 = REG3 */
-	movzlq %rax, %rsi /* ARG1 = %rax */
+	movq   %rax, %rsi /* ARG1 = %rax */
 	EXTERN(sys32_lseek64)
 	call   sys32_lseek64
 	popq_cfi_r %r11
@@ -23727,6 +24487,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lseek64)
 	shrq   $32, %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_lseek64)
 
 /* >> lfutexexpr(2)
@@ -23789,6 +24550,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutexexpr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_lfutexexpr)
 
 /* >> lfutexlockexpr(2)
@@ -23852,6 +24614,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutexlockexpr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_lfutexlockexpr)
 
 /* Create and return a new tty terminal controller connected to the given keyboard and display
@@ -23890,6 +24653,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mktty)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_mktty)
 
 /* Raise a signal within the calling thread alongside the given CPU state
@@ -23929,6 +24693,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_raiseat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_raiseat)
 
 /* Trigger a coredump of the calling process.
@@ -23989,6 +24754,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_coredump)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_coredump)
 
 /* errno_t stime64(time64_t const *t) */
@@ -24019,6 +24785,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_stime64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_stime64)
 
 /* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
@@ -24050,6 +24817,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_utime64)
 
 /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
@@ -24084,6 +24852,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioctlf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_ioctlf)
 
 /* uint64_t fsmode(uint64_t mode) */
@@ -24119,6 +24888,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsmode)
 	shrq   $32, %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fsmode)
 
 /* errno_t gettimeofday64(struct __timevalx32_64 *tv, struct timezone *tz) */
@@ -24150,6 +24920,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_gettimeofday64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_gettimeofday64)
 
 /* errno_t settimeofday64(struct __timevalx32_64 const *tv, struct timezone const *tz) */
@@ -24181,6 +24952,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_settimeofday64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_settimeofday64)
 
 /* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32_64 *timeout) */
@@ -24216,6 +24988,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_select64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_select64)
 
 /* Map the segments of a given library into memory
@@ -24261,6 +25034,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_maplibrary)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_maplibrary)
 
 /* errno_t setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) */
@@ -24293,6 +25067,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setitimer64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_setitimer64)
 
 /* errno_t getitimer64(syscall_ulong_t which, struct __itimerval64 *curr_value) */
@@ -24324,6 +25099,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getitimer64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_getitimer64)
 
 /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
@@ -24358,6 +25134,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddir)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_kreaddir)
 
 /* ssize_t readvf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
@@ -24392,6 +25169,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readvf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_readvf)
 
 /* ssize_t writevf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
@@ -24426,6 +25204,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_writevf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_writevf)
 
 /* syscall_slong_t rpc_service(void) */
@@ -24455,6 +25234,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_service)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_rpc_service)
 
 /* errno_t sched_rr_get_interval64(pid_t pid, struct __timespecx32_64 *tms) */
@@ -24486,6 +25266,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_rr_get_interval64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_sched_rr_get_interval64)
 
 /* errno_t nanosleep64(struct __timespecx32_64 const *req, struct __timespecx32_64 *rem) */
@@ -24517,6 +25298,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nanosleep64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_nanosleep64)
 
 /* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct __timespecx32_64 const *timeout, size_t sigsetsize) */
@@ -24551,6 +25333,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_rt_sigtimedwait64)
 
 /* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
@@ -24574,7 +25357,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pread64f)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %rax, %rcx /* ARG3 = %rax */
+	movq   %rax, %rcx /* ARG3 = %rax */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ebp, %r8 /* ARG4 = REG5 */
@@ -24589,6 +25372,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pread64f)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_pread64f)
 
 /* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
@@ -24612,7 +25396,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwrite64f)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %rax, %rcx /* ARG3 = %rax */
+	movq   %rax, %rcx /* ARG3 = %rax */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ebp, %r8 /* ARG4 = REG5 */
@@ -24627,6 +25411,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwrite64f)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_pwrite64f)
 
 /* errno_t kstat(char const *filename, struct stat *statbuf) */
@@ -24658,6 +25443,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kstat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_kstat)
 
 /* errno_t klstat(char const *filename, struct stat *statbuf) */
@@ -24689,6 +25475,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_klstat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_klstat)
 
 /* errno_t kfstat(fd_t fd, struct stat *statbuf) */
@@ -24720,6 +25507,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kfstat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_kfstat)
 
 /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
@@ -24755,6 +25543,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddirf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_kreaddirf)
 
 /* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32_64 const *value, struct __itimerspecx32_64 *ovalue) */
@@ -24789,6 +25578,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_settime64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_timer_settime64)
 
 /* errno_t timer_gettime64(timer_t timerid, struct __itimerspecx32_64 *value) */
@@ -24820,6 +25610,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_gettime64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_timer_gettime64)
 
 /* errno_t clock_settime64(clockid_t clock_id, struct __timespecx32_64 const *tp) */
@@ -24851,6 +25642,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_settime64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_clock_settime64)
 
 /* errno_t clock_gettime64(clockid_t clock_id, struct __timespecx32_64 *tp) */
@@ -24882,6 +25674,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_gettime64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_clock_gettime64)
 
 /* errno_t clock_getres64(clockid_t clock_id, struct __timespecx32_64 *res) */
@@ -24913,6 +25706,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_getres64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_clock_getres64)
 
 /* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32_64 const *requested_time, struct __timespecx32_64 *remaining) */
@@ -24947,6 +25741,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_nanosleep64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_clock_nanosleep64)
 
 /* errno_t utimes64(char const *filename, struct __timevalx32_64 const[2] times) */
@@ -24978,6 +25773,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_utimes64)
 
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -25013,6 +25809,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmkdirat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fmkdirat)
 
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -25049,6 +25846,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmknodat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fmknodat)
 
 /* errno_t futimesat64(fd_t dirfd, const char *filename, struct __timevalx32_64 const[2] times) */
@@ -25081,6 +25879,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futimesat64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_futimesat64)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
@@ -25116,6 +25915,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kfstatat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_kfstatat)
 
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -25152,6 +25952,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_frenameat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_frenameat)
 
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -25187,6 +25988,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsymlinkat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fsymlinkat)
 
 /* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
@@ -25223,6 +26025,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_freadlinkat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_freadlinkat)
 
 /* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
@@ -25259,6 +26062,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pselect6_64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_pselect6_64)
 
 /* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct __timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
@@ -25294,6 +26098,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ppoll64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_ppoll64)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
@@ -25329,6 +26134,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimensat64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_utimensat64)
 
 /* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
@@ -25356,7 +26162,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fallocate64)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %rax, %rcx /* ARG3 = %rax */
+	movq   %rax, %rcx /* ARG3 = %rax */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_fallocate64)
 	call   sys32_fallocate64
@@ -25369,6 +26175,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fallocate64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_fallocate64)
 
 /* Set next expiration time of interval timer source UFD to UTMR.
@@ -25406,6 +26213,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_settime64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_timerfd_settime64)
 
 /* Return the next expiration time of UFD */
@@ -25438,6 +26246,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_gettime64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_timerfd_gettime64)
 
 /* ssize_t preadvf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
@@ -25461,7 +26270,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadvf)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %rax, %rcx /* ARG3 = %rax */
+	movq   %rax, %rcx /* ARG3 = %rax */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ebp, %r8 /* ARG4 = REG5 */
@@ -25476,6 +26285,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadvf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_preadvf)
 
 /* ssize_t pwritevf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
@@ -25499,7 +26309,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritevf)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %rax, %rcx /* ARG3 = %rax */
+	movq   %rax, %rcx /* ARG3 = %rax */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ebp, %r8 /* ARG4 = REG5 */
@@ -25514,6 +26324,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritevf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_pwritevf)
 
 /* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx32_64 *tmo) */
@@ -25549,6 +26360,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_int80_recvmmsg64)
 
 
@@ -25664,6 +26476,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mount)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_mount)
 
 /* errno_t umount(char const *special_file) */
@@ -25884,6 +26697,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_select)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_select)
 
 /* errno_t symlink(char const *link_text, char const *target_path) */
@@ -25950,6 +26764,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mmap)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_mmap)
 
 /* errno_t munmap(void *addr, size_t len) */
@@ -26079,6 +26894,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigreturn)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_sigreturn)
 
 /* pid_t clone(syscall_ulong_t flags, void *child_stack, pid_t *ptid, uintptr_t newtls, pid_t *ctid) */
@@ -26115,6 +26931,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clone)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_clone)
 
 /* errno_t setdomainname(char const *name, size_t len) */
@@ -26198,7 +27015,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter__llseek)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %esi, %rdx /* ARG2 = REG3 */
-	movzlq %rax, %rsi /* ARG1 = %rax */
+	movq   %rax, %rsi /* ARG1 = %rax */
 	movzlq 0(%ebp), %rcx /* ARG3 = 0(%ebp) */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32__llseek)
@@ -26212,6 +27029,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter__llseek)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter__llseek)
 
 /* ssize_t getdents(fd_t fd, struct linux_dirent *dirp, size_t count) */
@@ -26315,6 +27133,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mremap)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_mremap)
 
 /* errno_t setresuid(uint16_t ruid, uint16_t euid, uint16_t suid) */
@@ -26390,7 +27209,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pread64)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %rax, %rcx /* ARG3 = %rax */
+	movq   %rax, %rcx /* ARG3 = %rax */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_pread64)
@@ -26404,6 +27223,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pread64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_pread64)
 
 /* ssize_t pwrite64(fd_t fd, void const *buf, size_t bufsize, uint64_t offset) */
@@ -26428,7 +27248,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwrite64)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %rax, %rcx /* ARG3 = %rax */
+	movq   %rax, %rcx /* ARG3 = %rax */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_pwrite64)
@@ -26442,6 +27262,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwrite64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_pwrite64)
 
 /* errno_t chown(char const *filename, uint16_t owner, uint16_t group) */
@@ -26509,6 +27330,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mmap2)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_mmap2)
 
 /* errno_t truncate64(char const *filename, uint64_t length) */
@@ -26638,6 +27460,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_setxattr)
 
 /* errno_t lsetxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
@@ -26674,6 +27497,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lsetxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_lsetxattr)
 
 /* errno_t fsetxattr(fd_t fd, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
@@ -26710,6 +27534,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fsetxattr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_fsetxattr)
 
 /* ssize_t getxattr(char const *path, char const *name, void *buf, size_t bufsize) */
@@ -26780,6 +27605,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_futex)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_futex)
 
 /* errno_t sched_setaffinity(pid_t pid, size_t cpusetsize, struct __cpu_set_struct const *cpuset) */
@@ -26861,6 +27687,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_remap_file_pages)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_remap_file_pages)
 
 /* pid_t set_tid_address(pid_t *tidptr) */
@@ -26976,6 +27803,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_waitid)
 
 /* errno_t add_key(int TODO_PROTOTYPE) */
@@ -27049,6 +27877,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fchownat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_fchownat)
 
 /* errno_t futimesat(fd_t dirfd, const char *filename, struct __timevalx32 const[2] times) */
@@ -27100,6 +27929,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linkat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_linkat)
 
 /* errno_t symlinkat(char const *link_text, fd_t tofd, char const *target_path) */
@@ -27152,6 +27982,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pselect6)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_pselect6)
 
 /* ssize_t ppoll(struct pollfd *fds, size_t nfds, struct __timespecx32 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
@@ -27188,6 +28019,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ppoll)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_ppoll)
 
 /* param flags: Set of `CLONE_*' */
@@ -27235,6 +28067,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_splice)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_splice)
 
 /* errno_t sync_file_range(fd_t fd, uint64_t offset, uint64_t count, syscall_ulong_t flags) */
@@ -27262,7 +28095,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sync_file_range)
 	movzlq %esi, %r8           /* ... */
 	shlq   $32, %rdx            /* ... */
 	orq    %r8, %rdx           /* ... */
-	movzlq %rax, %rsi /* ARG1 = %rax */
+	movq   %rax, %rsi /* ARG1 = %rax */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq 4(%ebp), %rcx /* ARG3 = 4(%ebp) */
 	EXTERN(sys32_sync_file_range)
@@ -27276,6 +28109,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sync_file_range)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_sync_file_range)
 
 /* ssize_t tee(fd_t fdin, fd_t fdout, size_t length, syscall_ulong_t flags) */
@@ -27324,6 +28158,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_epoll_pwait)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_epoll_pwait)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
@@ -27394,7 +28229,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadv)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %rax, %rcx /* ARG3 = %rax */
+	movq   %rax, %rcx /* ARG3 = %rax */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_preadv)
@@ -27408,6 +28243,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadv)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_preadv)
 
 /* ssize_t pwritev(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset) */
@@ -27432,7 +28268,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritev)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %rax, %rcx /* ARG3 = %rax */
+	movq   %rax, %rcx /* ARG3 = %rax */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_pwritev)
@@ -27446,6 +28282,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritev)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_pwritev)
 
 /* @param: signo: One of `SIG*' */
@@ -27489,6 +28326,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_recvmmsg)
 
 /* errno_t fanotify_init(int TODO_PROTOTYPE) */
@@ -27535,6 +28373,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_name_to_handle_at)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_name_to_handle_at)
 
 /* fd_t open_by_handle_at(fd_t mountdirfd, struct file_handle *handle, syscall_ulong_t flags) */
@@ -27587,6 +28426,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_readv)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_process_vm_readv)
 
 /* ssize_t process_vm_writev(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
@@ -27624,6 +28464,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_writev)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_process_vm_writev)
 
 /* syscall_slong_t kcmp(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2) */
@@ -27660,6 +28501,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kcmp)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_kcmp)
 
 /* errno_t finit_module(int TODO_PROTOTYPE) */
@@ -27706,6 +28548,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_renameat2)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_renameat2)
 
 /* errno_t seccomp(int TODO_PROTOTYPE) */
@@ -27755,6 +28598,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_execveat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_execveat)
 
 /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
@@ -27811,6 +28655,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getsockopt)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_getsockopt)
 
 /* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
@@ -27849,6 +28694,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setsockopt)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_setsockopt)
 
 /* errno_t getsockname(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
@@ -27893,6 +28739,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sendto)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_sendto)
 
 /* ssize_t sendmsg(fd_t sockfd, struct msghdr const *message, syscall_ulong_t flags) */
@@ -27933,6 +28780,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvfrom)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_recvfrom)
 
 /* ssize_t recvmsg(fd_t sockfd, struct msghdr *message, syscall_ulong_t flags) */
@@ -28105,6 +28953,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_frealpathat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_frealpathat)
 
 /* Schedule an RPC for execution on the specified `target' thread.
@@ -28158,6 +29007,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_openpty)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_openpty)
 
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -28268,6 +29118,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutex)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_lfutex)
 
 /* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
@@ -28334,6 +29185,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutexexpr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_lfutexexpr)
 
 /* >> lfutexlockexpr(2)
@@ -28398,6 +29250,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutexlockexpr)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_lfutexlockexpr)
 
 /* Create and return a new tty terminal controller connected to the given keyboard and display
@@ -28477,6 +29330,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_coredump)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_coredump)
 
 /* errno_t stime64(time64_t const *t) */
@@ -28531,6 +29385,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_select64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_select64)
 
 /* Map the segments of a given library into memory
@@ -28577,6 +29432,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_maplibrary)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_maplibrary)
 
 /* errno_t setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) */
@@ -28628,7 +29484,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pread64f)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %rax, %rcx /* ARG3 = %rax */
+	movq   %rax, %rcx /* ARG3 = %rax */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq 4(%ebp), %r8 /* ARG4 = 4(%ebp) */
@@ -28643,6 +29499,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pread64f)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_pread64f)
 
 /* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
@@ -28667,7 +29524,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwrite64f)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %rax, %rcx /* ARG3 = %rax */
+	movq   %rax, %rcx /* ARG3 = %rax */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq 4(%ebp), %r8 /* ARG4 = 4(%ebp) */
@@ -28682,6 +29539,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwrite64f)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_pwrite64f)
 
 /* errno_t kstat(char const *filename, struct stat *statbuf) */
@@ -28727,6 +29585,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kreaddirf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_kreaddirf)
 
 /* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32_64 const *value, struct __itimerspecx32_64 *ovalue) */
@@ -28789,6 +29648,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fmknodat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_fmknodat)
 
 /* errno_t futimesat64(fd_t dirfd, const char *filename, struct __timevalx32_64 const[2] times) */
@@ -28833,6 +29693,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_frenameat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_frenameat)
 
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -28874,6 +29735,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_freadlinkat)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_freadlinkat)
 
 /* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
@@ -28911,6 +29773,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pselect6_64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_pselect6_64)
 
 /* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct __timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
@@ -28947,6 +29810,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ppoll64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_ppoll64)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
@@ -28979,7 +29843,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fallocate64)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %rax, %rcx /* ARG3 = %rax */
+	movq   %rax, %rcx /* ARG3 = %rax */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_fallocate64)
 	call   sys32_fallocate64
@@ -28992,6 +29856,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fallocate64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_fallocate64)
 
 /* Set next expiration time of interval timer source UFD to UTMR.
@@ -29026,7 +29891,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadvf)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %rax, %rcx /* ARG3 = %rax */
+	movq   %rax, %rcx /* ARG3 = %rax */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq 4(%ebp), %r8 /* ARG4 = 4(%ebp) */
@@ -29041,6 +29906,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadvf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_preadvf)
 
 /* ssize_t pwritevf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
@@ -29065,7 +29931,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritevf)
 	shlq   $32, %rax            /* ... */
 	orq    %r8, %rax           /* ... */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %rax, %rcx /* ARG3 = %rax */
+	movq   %rax, %rcx /* ARG3 = %rax */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq 4(%ebp), %r8 /* ARG4 = 4(%ebp) */
@@ -29080,6 +29946,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritevf)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_pwritevf)
 
 /* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx32_64 *tmo) */
@@ -29116,5 +29983,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg64)
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
 	intr_exit_sysret
+	.cfi_endproc
 END(__x86_asm32_sysenter_recvmmsg64)
 

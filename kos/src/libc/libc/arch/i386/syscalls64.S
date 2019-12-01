@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71b8da5d */
+/* HASH CRC-32:0x961c029a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -9112,7 +9112,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlfutexexpr, libc_sys_Xlfutexexpr)
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexlockexpr(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+/* errno_t lfutexlockexpr(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
 .section .text.crt.syscall.lfutexlockexpr
 INTERN_FUNCTION(libc_sys_lfutexlockexpr)
 	.cfi_startproc
@@ -9152,7 +9152,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutexlockexpr, libc_sys_lfutexlockexpr)
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexlockexpr(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+/* errno_t lfutexlockexpr(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
 .section .text.crt.syscall.Xlfutexlockexpr
 INTERN_FUNCTION(libc_sys_Xlfutexlockexpr)
 	.cfi_startproc
