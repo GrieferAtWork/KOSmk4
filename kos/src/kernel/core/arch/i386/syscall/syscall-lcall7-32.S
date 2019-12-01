@@ -1,4 +1,3 @@
-/* HASH 0x8cf0debf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,14 +20,20 @@
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
+#include <asm/unistd.h>
 #include <kos/kernel/gdt.h>
+#include <kos/kernel/cpu-state.h>
+
+
 
 
 .section .text
-INTERN_FUNCTION(x86_lcall7_main)
+PUBLIC_FUNCTION(x86_syscall32_lcall7)
 	/* Main entry point for `lcall $7'-style system calls */
 	.cfi_startproc simple
 	.cfi_signal_frame
+	EXTERN(x86_syscall_personality_asm32_lcall7)
+	.cfi_personality 0, x86_syscall_personality_asm32_lcall7
 	/* NOTE: Right now our stack looks like this:
 	 *  - 0(%esp)  == RETURN_IP
 	 *  - 4(%esp)  == RETURN_CS
@@ -68,14 +73,13 @@ INTERN_FUNCTION(x86_lcall7_main)
 
 	/* And with that, our IRET tail has been fixed! (and we can re-enable interrupts) */
 	sti
-	.cfi_endproc
-
-INTERN_FUNCTION(x86_lcall7_main_iret)
-	.cfi_startproc simple
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	EXTERN(x86_syscall_lcall7_personality)
-	.cfi_personality 0, x86_syscall_lcall7_personality
+PUBLIC_FUNCTION(x86_syscall32_lcall7_iret)
+	.cfi_restore_iret_eip
+	.cfi_restore_iret_cs
+	.cfi_restore_iret_eflags
+	.cfi_restore_iret_esp
+	.cfi_restore_iret_ss
+	.cfi_def_cfa_offset 0
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
 	pushl_cfi %es
@@ -84,8 +88,9 @@ INTERN_FUNCTION(x86_lcall7_main_iret)
 	.cfi_restore_iret_fs_or_offset -12
 
 	/* Save callee-clobber register */
-	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
+	pushl_cfi_r %ecx
+	pushl_cfi_r %eax
 
 	/* Load kernel segments. */
 	movl   $(SEGMENT_USER_DATA_RPL), %ecx
@@ -104,29 +109,38 @@ INTERN_FUNCTION(x86_lcall7_main_iret)
 	 * Otherwise, use the segment offset as sysno */
 
 	movl   %eax, %edx
-	movl   20(%esp), %ecx /* USER_EIP */
+	/* + 12: %eax, %ecx, %edx */
+	/* + 12: %fs, %es, %ds */
+	movl   (12 + 12 + OFFSET_IRREGS_EIP)(%esp), %ecx /* USER_EIP */
 	/* lcall $7, $? -- { 0x9a, ?, ?, ?, ?, 0x07, 0x00 } */
 	movb   -7(%ecx), %al
-	cmpb   $0x9a, %al
+	cmpb   $(0x9a), %al
 	jne    2f             /* Not invoked as `lcall $7, $?' */
 	movw   -2(%ecx), %ax
-	cmpw   $0x0007, %ax
+	cmpw   $(0x0007), %ax
 	jne    2f             /* Not invoked as `lcall $7, $?' */
 	movl   -6(%ecx), %eax /* EDX = ? (from `lcall $7, $?') */
 	testl  %eax, %eax
 	jz     2f             /* Invoked as `lcall $7, $0' (use the original %eax as sysno) */
 	movl   %eax, %edx
 2:	/* At this point we've got the intended sysno (in `%edx')! */
-	pushl_cfi %edx
+
+	/* %edx:     l7_sysno: u32;
+	 * 0(%esp):  l7_eax:   u32;
+	 * 4(%esp):  l7_ecx:   u32;
+	 * 8(%esp):  l7_edx:   u32;
+	 * 12(%esp): l7_fs:    u32;
+	 * 16(%esp): l7_es:    u32;
+	 * 20(%esp): l7_ds:    u32;
+	 * 24(%esp): l7_iret:  struct irregs_user; */
 	movl   %esp, %ecx
+	EXTERN(x86_syscall32_lcall7_main)
+	call   x86_syscall32_lcall7_main
 
-	EXTERN(x86_lcall7_syscall_main)
-	call   x86_lcall7_syscall_main
-INTERN_CONST(x86_lcall7_syscall_guard, .)
-
-	popl_cfi   %ecx  /* popl <void> */
-	popl_cfi_r %edx
+	popl_cfi %ecx /* popl <void> */
+	.cfi_restore %eax
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -137,8 +151,8 @@ INTERN_CONST(x86_lcall7_syscall_guard, .)
 
 	iret
 	.cfi_endproc
-END(x86_lcall7_main_iret)
-END(x86_lcall7_main)
+END(x86_syscall32_lcall7_iret)
+END(x86_syscall32_lcall7)
 
 
 

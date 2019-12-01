@@ -597,7 +597,7 @@ err:
 		}
 		{
 			PRIVATE SECTION_EXCEPT_STRING char const message_unwind_failed[] =
-				"Failed to unwind stack at %p [error=%u]\n";
+				"[libc] Failed to unwind stack at %p [error=%u]\n";
 			syslog(LOG_ERR, message_unwind_failed,
 			       (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDPC(oldstate),
 			       unwind_error);

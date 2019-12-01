@@ -103,6 +103,8 @@ __NRFEAT_SYSCALL_TABLE_FOREACH(DEFINE_KERNEL_SYSCALL_ROUTES)
 
 
 /* Entry point for `sysenter' (32-bit system call invocation)
+ * NOTE: When this function is called, no IRET tail exists, yet.
+ *       This also means that interrupts must be disabled when this function is hit!
  * Method:
  *    RPC_SYSCALL_INFO_METHOD_SYSENTER_32
  * In:
@@ -147,6 +149,29 @@ FUNDEF void ASMCALL x86_syscall32_sysenter_traced(void);
  *                system calls may cause specific registers to become clobbered. */
 FUNDEF void ASMCALL x86_syscall32_int80(void) ASMNAME("x86_idt_syscall");
 FUNDEF void ASMCALL x86_syscall32_int80_traced(void) ASMNAME("x86_idt_syscall_traced");
+
+/* Entry point for `lcall $7, $SYS_xxx' (32-bit system call invocation)
+ * Method:
+ *    RPC_SYSCALL_INFO_METHOD_LCALL7_32
+ * In:
+ *    %eax:       System call number (`__NR32_*')  (If `lcall $7, $0' was
+ *                used. Otherwise `SYS_xxx' is used as system call number)
+ *    0(%esp):    Arg #0  (If `kernel_syscall32_regcnt(%eax) >= 1')
+ *    4(%esp):    Arg #1  (If `kernel_syscall32_regcnt(%eax) >= 2')
+ *    8(%esp):    Arg #2  (If `kernel_syscall32_regcnt(%eax) >= 3')
+ *    12(%esp):   Arg #3  (If `kernel_syscall32_regcnt(%eax) >= 4')
+ *    16(%esp):   Arg #4  (If `kernel_syscall32_regcnt(%eax) >= 5')
+ *    20(%esp):   Arg #5  (If `kernel_syscall32_regcnt(%eax) >= 6')
+ *    %eflags.CF: Set to enable exception propagation. (s.a. `sys_set_exception_handler()')
+ * Out:
+ *    %eax:       low  32-bit of return value
+ *    %edx:       high 32-bit of return value (If `kernel_syscall32_doublewide(IN(%eax))')
+ *    %eflags.CF: When cleared on entry, set on return if an exception was propagated
+ *    *:          All other registers are preserved by default, though individual
+ *                system calls may cause specific registers to become clobbered. */
+FUNDEF void ASMCALL x86_syscall32_lcall7(void);
+/* Same as `x86_syscall32_lcall7()', but an IRET tail has already been created. */
+FUNDEF void ASMCALL x86_syscall32_lcall7_iret(void);
 
 
 

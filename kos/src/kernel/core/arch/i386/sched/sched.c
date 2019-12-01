@@ -32,6 +32,7 @@
 #include <kernel/pic.h>
 #include <kernel/pit.h>
 #include <kernel/printk.h>
+#include <kernel/syscall-tables.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/cpu.h>
@@ -518,9 +519,6 @@ NOTHROW(FCALL task_push_asynchronous_srpc)(struct scpustate *__restrict state,
 }
 
 
-INTDEF byte_t x86_lcall7_main[];
-INTDEF byte_t x86_lcall7_main_iret[];
-
 PRIVATE ATTR_COLD NOBLOCK u32
 NOTHROW(KCALL get_userspace_eflags)(struct task const *__restrict self) {
 	struct ucpustate st, ost;
@@ -643,13 +641,13 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 	assert(self->t_cpu == THIS_CPU);
 	assert(!(self->t_flags & TASK_FKERNTHREAD));
 	/* Check for special case: `self' was interrupted in
-	 * `x86_lcall7_main' before it was able to complete its IRET tail.
-	 * NOTE: It is sufficient to only check for EIP == ENTRY_OF(x86_lcall7_main),
-	 *       since the first thing `x86_lcall7_main' does is to disable preemption,
+	 * `x86_syscall32_lcall7' before it was able to complete its IRET tail.
+	 * NOTE: It is sufficient to only check for EIP == ENTRY_OF(x86_syscall32_lcall7),
+	 *       since the first thing `x86_syscall32_lcall7' does is to disable preemption,
 	 *       meaning that interrupts could only ever happen for the very first
 	 *       instruction. */
 	if unlikely(self != THIS_TASK &&
-	            self->t_sched.s_state->scs_irregs_k.ir_eip == (uintptr_t)x86_lcall7_main) {
+	            self->t_sched.s_state->scs_irregs.ir_eip == (uintptr_t)(void *)&x86_syscall32_lcall7) {
 		byte_t *fixup;
 		u32 eflags;
 		fixup = (byte_t *)self->t_sched.s_state;
@@ -664,11 +662,11 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 		                              SIZEOF_IRREGS_KERNEL);
 		self->t_sched.s_state = (struct scpustate *)fixup;
 		/* Read the original user-space EFLAGS value. */
-		eflags = ((struct scpustate *)fixup)->scs_irregs_k.ir_eflags;
+		eflags = ((struct scpustate *)fixup)->scs_irregs.ir_eflags;
 		/* Skip the lcall IRET adjustment we're doing outself below by
-		 * advancing the instruction pointer from `x86_lcall7_main'
-		 * to `x86_lcall7_main_iret' */
-		((struct scpustate *)fixup)->scs_irregs_k.ir_eip = (uintptr_t)x86_lcall7_main_iret;
+		 * advancing the instruction pointer from `x86_syscall32_lcall7'
+		 * to `x86_syscall32_lcall7_iret' */
+		((struct scpustate *)fixup)->scs_irregs.ir_eip = (uintptr_t)(void *)&x86_syscall32_lcall7_iret;
 		fixup += OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL;
 		/* `fixup' now points at at the u32[5] = { ???, IP, CS, SP, SS }
 		 * We want to change this to:   u32[5] = { IP, CS, EFLAGS, SP, SS } */
