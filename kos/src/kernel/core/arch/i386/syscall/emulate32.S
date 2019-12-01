@@ -30,24 +30,24 @@
 #include <librpc/rpc.h>
 
 
-#define TEST_DOUBLE_WIDE(sysno_reg, tempreg_l, tempreg_b, segment_prefix)        \
-	cmpl   $(__NR_syscall0_max), sysno_reg;                                       \
-	ja     1234f;                                                                \
-	movl   sysno_reg, tempreg_l;                                                 \
-	shrl   $1, tempreg_l;                                                        \
-	EXTERN(kernel_syscall0_regcnt);                                          \
-	movb   segment_prefix kernel_syscall0_regcnt(,tempreg_l,1), tempreg_b;   \
-	jmp    1235f;                                                                \
-1234:                                                                            \
-	leal   -__NR_syscall1_min(sysno_reg), tempreg_l;                            \
-	shrl   $1, tempreg_l;                                                        \
+#define TEST_DOUBLE_WIDE(sysno_reg, tempreg_l, tempreg_b, segment_prefix)  \
+	cmpl   $(__NR_syscall0_max), sysno_reg;                                \
+	ja     1234f;                                                          \
+	movl   sysno_reg, tempreg_l;                                           \
+	shrl   $1, tempreg_l;                                                  \
+	EXTERN(kernel_syscall0_regcnt);                                        \
+	movb   segment_prefix kernel_syscall0_regcnt(,tempreg_l,1), tempreg_b; \
+	jmp    1235f;                                                          \
+1234:                                                                      \
+	leal   -__NR_syscall1_min(sysno_reg), tempreg_l;                       \
+	shrl   $1, tempreg_l;                                                  \
 	EXTERN(kernel_syscall1_regcnt);                                        \
 	movb   segment_prefix kernel_syscall1_regcnt(,tempreg_l,1), tempreg_b; \
-1235:                                                                            \
-	testl  $1, sysno_reg;                                                        \
-	jz     1234f;                                                                \
-	shrb   $4, tempreg_b;                                                        \
-1234:                                                                            \
+1235:                                                                      \
+	testl  $1, sysno_reg;                                                  \
+	jz     1234f;                                                          \
+	shrb   $4, tempreg_b;                                                  \
+1234:                                                                      \
 	testb  $0x8, tempreg_b;
 
 

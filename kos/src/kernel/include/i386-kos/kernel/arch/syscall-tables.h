@@ -102,6 +102,39 @@ __NRFEAT_SYSCALL_TABLE_FOREACH(DEFINE_KERNEL_SYSCALL_ROUTES)
 #endif /* !__x86_64__ */
 
 
+/* Entry point for `sysenter' (32-bit system call invocation)
+ * Method:
+ *    RPC_SYSCALL_INFO_METHOD_SYSENTER_32
+ * In:
+ *    %eax:       System call number (`__NR_*')
+ *    %ebx:       Arg #0  (If `kernel_syscall32_regcnt(%eax) >= 1')
+ *    %ecx:       Arg #1  (If `kernel_syscall32_regcnt(%eax) >= 2')
+ *    %edx:       Arg #2  (If `kernel_syscall32_regcnt(%eax) >= 3')
+ *    %esi:       Arg #3  (If `kernel_syscall32_regcnt(%eax) >= 4')
+ *    0(%ebp):    Arg #4  (If `kernel_syscall32_regcnt(%eax) >= 5')
+ *    4(%ebp):    Arg #5  (If `kernel_syscall32_regcnt(%eax) >= 6')
+ *    %edi:       Return-%eip
+ *    %ebp:       Return-%esp
+ *    %eflags.CF: Set to enable exception propagation. (s.a. `sys_set_exception_handler()')
+ * Out:
+ *    %eax:       low  32-bit of return value
+ *    %edx:       high 32-bit of return value (If `kernel_syscall32_doublewide(IN(%eax))')
+ *    %eip:       Always set to `IN(%edi)'
+ *    %esp:       Always set to `IN(%ebp)'
+ *    %eflags.CF: When cleared on entry, set on return if an `%eax' contains
+ *                a negative errno code (possibly sign-extended into `%edx')
+ *                Note that this is only the case for error returned via
+ *                exceptions. System calls exists and manually return non-zero
+ *                errno codes without the use of exceptions (this is usually
+ *                done for ~errors~ that happen often or are even expected,
+ *                such as EAGAIN/EWOULDBLOCK/ETIMEDOUT when a timeout was given)
+ *    *:          All other registers are preserved by default, though individual
+ *                system calls may cause specific registers to become clobbered. */
+FUNDEF void ASMCALL x86_syscall_sysenter(void);
+FUNDEF void ASMCALL x86_syscall_sysenter_traced(void);
+
+
+
 DECL_END
 #endif /* __CC__ */
 

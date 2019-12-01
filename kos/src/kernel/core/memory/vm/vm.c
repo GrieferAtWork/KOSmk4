@@ -3562,7 +3562,8 @@ NOTHROW(FCALL vm_sync_locked)(struct vm *__restrict effective_vm,
 		cpu_sendipi_cpuset(targets,
 		                   &ipi_invtlb_for,
 		                   args,
-		                   CPU_IPI_FWAITFOR);
+		                   CPU_IPI_FWAITFOR |
+		                   CPU_IPI_FNOINTR);
 	}
 }
 
@@ -3586,7 +3587,8 @@ NOTHROW(FCALL vm_syncone_locked)(struct vm *__restrict effective_vm,
 		cpu_sendipi_cpuset(targets,
 		                   &ipi_invtlb_one_for,
 		                   args,
-		                   CPU_IPI_FWAITFOR);
+		                   CPU_IPI_FWAITFOR |
+		                   CPU_IPI_FNOINTR);
 	}
 }
 
@@ -3608,7 +3610,8 @@ NOTHROW(FCALL vm_syncall_locked)(struct vm *__restrict effective_vm) {
 		cpu_sendipi_cpuset(targets,
 		                   &ipi_invtlb_all_for,
 		                   args,
-		                   CPU_IPI_FWAITFOR);
+		                   CPU_IPI_FWAITFOR |
+		                   CPU_IPI_FNOINTR);
 	}
 }
 

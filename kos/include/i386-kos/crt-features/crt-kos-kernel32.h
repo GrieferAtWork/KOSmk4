@@ -2337,6 +2337,8 @@
 #define __CRT_HAVE_x86_syscall_emulate_int80h_r 1
 #define __CRT_HAVE_x86_syscall_emulate_sysenter 1
 #define __CRT_HAVE_x86_syscall_emulate_sysenter_r 1
+#define __CRT_HAVE_x86_syscall_sysenter 1
+#define __CRT_HAVE_x86_syscall_sysenter_traced 1
 #define __CRT_HAVE_x86_sysroute0_asm32_int80 1
 #define __CRT_HAVE_x86_sysroute0_asm32_sysenter 1
 #define __CRT_HAVE_x86_sysroute0_c 1

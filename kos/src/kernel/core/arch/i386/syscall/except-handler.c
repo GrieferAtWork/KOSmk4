@@ -363,50 +363,122 @@ x86_userexcept_raisesignal_from_exception(struct icpustate *__restrict state,
 	                                  &siginfo, true);
 }
 
+
+LOCAL NOBLOCK void
+NOTHROW(FCALL log_userexcept_errno_propagate)(struct icpustate const *__restrict state,
+                                              struct rpc_syscall_info const *__restrict sc_info,
+                                              struct exception_data const *__restrict data,
+                                              errno_t negative_errno_value) {
+	unsigned int pointer_count = EXCEPTION_DATA_POINTERS;
+	(void)state;
+	(void)sc_info;
+	while (pointer_count != 0 &&
+	       data->e_pointers[pointer_count - 1] == 0)
+		--pointer_count;
+	printk(KERN_TRACE "[except] Translate exception %#x:%#x",
+	       data->e_class, data->e_subclass);
+	if (pointer_count != 0) {
+		unsigned int i;
+		for (i = 0; i < pointer_count; ++i) {
+			printk(KERN_TRACE "%c%#Ix",
+			       i == 0 ? '[' : ',',
+			       data->e_pointers[i]);
+		}
+		printk(KERN_TRACE "]");
+	}
+	printk(KERN_TRACE " into errno=%d [tid=%u]\n",
+	       negative_errno_value, task_getroottid_s());
+}
+
+/* Set the appropriate error flag for the system call method described by `sc_info' (if any)
+ * In all current cases where such a flag is defined, this is EFLAGS.CF, allowing user-space
+ * to easily determine if an exception occurred by using `jc' instead of having to do a
+ * `cmpl $-4096, %eax'. Note however that this feature isn't actually being used in libc, since
+ * doing so would break POSIX compliance, as CF would not be set when a system call directly
+ * returns a value that would fall into the errno range, such as is the case for some system
+ * calls that do timeout-based wait operations and don't want to use a slow exception to indicate
+ * the (quite common) case of the timeout having expired. */
+LOCAL NOBLOCK struct icpustate *
+NOTHROW(FCALL x86_userexcept_set_error_flag)(struct icpustate *__restrict state,
+                                             struct rpc_syscall_info const *__restrict sc_info) {
+	switch (sc_info->rsi_flags & RPC_SYSCALL_INFO_FMETHOD) {
+
+	case RPC_SYSCALL_INFO_METHOD_INT80H_32:
+	case RPC_SYSCALL_INFO_METHOD_SYSENTER_32:
+	case RPC_SYSCALL_INFO_METHOD_LCALL7_32:
+#ifdef __x86_64__
+	case RPC_SYSCALL_INFO_METHOD_INT80H_64:
+	case RPC_SYSCALL_INFO_METHOD_LCALL7_64:
+#endif /* __x86_64__ */
+		/* Turn on EFLAGS.CF (it was off since otherwise the exception would not have
+		 * been translated to errno, as CF being set on entry would have indicated that
+		 * exceptions should have been used) */
+		icpustate_mskpflags(state, (uintptr_t)-1, EFLAGS_CF);
+		break;
+
+	default:
+		break;
+	}
+	return state;
+}
+
+
 /* Translate the current exception into an errno and set that errno
  * as the return value of the system call described by `sc_info'. */
+#ifdef __x86_64__
 PUBLIC WUNUSED struct icpustate *FCALL
 x86_userexcept_seterrno(struct icpustate *__restrict state,
                         struct rpc_syscall_info *__restrict sc_info) {
+	struct icpustate *result;
+	if (icpustate_is64bit(state)) {
+		result = x86_userexcept_seterrno64(state, sc_info);
+	} else {
+		result = x86_userexcept_seterrno32(state, sc_info);
+	}
+	return result;
+}
+
+PUBLIC WUNUSED struct icpustate *FCALL
+x86_userexcept_seterrno64(struct icpustate *__restrict state,
+                          struct rpc_syscall_info *__restrict sc_info) {
 	errno_t errval;
 	struct exception_data *data;
 	(void)sc_info;
 	data   = error_data();
 	errval = -error_as_errno(data);
-#if 1
-	{
-		unsigned int pointer_count = EXCEPTION_DATA_POINTERS;
-		while (pointer_count != 0 &&
-		       data->e_pointers[pointer_count - 1] == 0)
-			--pointer_count;
-		printk(KERN_TRACE "[except] Translate exception %#x:%#x",
-		       data->e_class, data->e_subclass);
-		if (pointer_count != 0) {
-			unsigned int i;
-			for (i = 0; i < pointer_count; ++i) {
-				printk(KERN_TRACE "%c%#Ix",
-				       i == 0 ? '[' : ',',
-				       data->e_pointers[i]);
-			}
-			printk(KERN_TRACE "]");
-		}
-		printk(KERN_TRACE " into errno=%d [tid=%u]\n",
-		       errval, task_getroottid_s());
-	}
-#endif
+	log_userexcept_errno_propagate(state, sc_info, data, errval);
 	gpregs_setpax(&state->ics_gpregs, errval);
 	/* Check if the system call is double-wide so we
 	 * can sign-extend the error code if necessary. */
-#ifdef __x86_64__
-	if (icpustate_is64bit(state)) {
-		if (kernel_syscall64_doublewide(gpregs_getpax(&state->ics_gpregs)))
-			gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
-	} else
-#endif /* __x86_64__ */
-	{
-		if (kernel_syscall32_doublewide(gpregs_getpax(&state->ics_gpregs)))
-			gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
-	}
+	if (kernel_syscall64_doublewide(gpregs_getpax(&state->ics_gpregs)))
+		gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
+	/* Set an error flag (if any) */
+	state = x86_userexcept_set_error_flag(state, sc_info);
+	return state;
+}
+
+PUBLIC WUNUSED struct icpustate *FCALL
+x86_userexcept_seterrno32(struct icpustate *__restrict state,
+                          struct rpc_syscall_info *__restrict sc_info)
+#else /* __x86_64__ */
+PUBLIC WUNUSED struct icpustate *FCALL
+x86_userexcept_seterrno(struct icpustate *__restrict state,
+                        struct rpc_syscall_info *__restrict sc_info)
+#endif /* !__x86_64__ */
+{
+	errno_t errval;
+	struct exception_data *data;
+	(void)sc_info;
+	data   = error_data();
+	errval = -error_as_errno(data);
+	log_userexcept_errno_propagate(state, sc_info, data, errval);
+	gpregs_setpax(&state->ics_gpregs, errval);
+	/* Check if the system call is double-wide so we
+	 * can sign-extend the error code if necessary. */
+	if (kernel_syscall32_doublewide(gpregs_getpax(&state->ics_gpregs)))
+		gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
+	/* Set an error flag (if any) */
+	state = x86_userexcept_set_error_flag(state, sc_info);
 	return state;
 }
 

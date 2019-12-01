@@ -362,10 +362,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak pagedir_ismapped; .long pagedir_ismapped
 	.reloc ., R_386_SIZE32, pagedir_ismapped; .long 0
 	.long 0x38f5564
-	.long 0 /* index: 90 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname90 /* index: 90 */
+	.weak x86_syscall_sysenter_traced; .long x86_syscall_sysenter_traced
+	.reloc ., R_386_SIZE32, x86_syscall_sysenter_traced; .long 0
+	.long 0x346ccd4
 	.long 0 /* index: 91 */
 	.long 0
 	.long 0
@@ -12106,10 +12106,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 3026 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3026 /* index: 3026 */
+	.weak x86_syscall_sysenter; .long x86_syscall_sysenter
+	.reloc ., R_386_SIZE32, x86_syscall_sysenter; .long 0
+	.long 0x25feb52
 	.long .Lname3027 /* index: 3027 */
 	.weak regdump_flags; .long regdump_flags
 	.reloc ., R_386_SIZE32, regdump_flags; .long 0
@@ -16488,6 +16488,8 @@ END(kernel_symbol_table)
 	.string "sys_open_by_handle_at"
 .Lname89:
 	.string "pagedir_ismapped"
+.Lname90:
+	.string "x86_syscall_sysenter_traced"
 .Lname92:
 	.string "error_as_signal"
 .Lname94:
@@ -19804,6 +19806,8 @@ END(kernel_symbol_table)
 	.string "sys_fchown32"
 .Lname3024:
 	.string "sys_getsockname"
+.Lname3026:
+	.string "x86_syscall_sysenter"
 .Lname3027:
 	.string "regdump_flags"
 .Lname3028:

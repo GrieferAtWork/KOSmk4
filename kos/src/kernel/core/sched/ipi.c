@@ -99,6 +99,11 @@ again_check_cpu_state:
 				 * If doing so fails, re-check the CPU's state, since it
 				 * may have entered deep-sleep mode in the mean time. */
 				if (!cpu_sendipi(c, func, args, flags)) {
+					assertf(c != THIS_CPU || (flags & CPU_IPI_FNOINTR) || PREEMPTION_ENABLED(),
+					        "Without `CPU_IPI_FWAKEUP' and preemption disabled, including your own "
+					        "CPU as target for a cpuset IPI also requires you to set the `CPU_IPI_FNOINTR' "
+					        "flag since the IPI can only be executed on your own CPU while keeping interrupts "
+					        "disabled. By setting `CPU_IPI_FWAKEUP', this szenario is instead ignored.");
 					task_pause();
 					goto again_check_cpu_state;
 				}

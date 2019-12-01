@@ -94,6 +94,16 @@ FUNDEF WUNUSED struct icpustate *FCALL
 x86_userexcept_seterrno(struct icpustate *__restrict state,
                         struct rpc_syscall_info *__restrict sc_info);
 
+#ifdef __x86_64__
+/* Dedicated functions which may be used if the caller already
+ * knows the result of `icpustate_is32bit(state)' and related helpers. */
+FUNDEF WUNUSED struct icpustate *FCALL x86_userexcept_seterrno32(struct icpustate *__restrict state, struct rpc_syscall_info *__restrict sc_info);
+FUNDEF WUNUSED struct icpustate *FCALL x86_userexcept_seterrno64(struct icpustate *__restrict state, struct rpc_syscall_info *__restrict sc_info);
+#else /* __x86_64__ */
+#define x86_userexcept_seterrno32 x86_userexcept_seterrno
+#endif /* !__x86_64__ */
+
+
 /* Propagate the currently thrown exception into user-space, using either the user-space
  * exception handler, by raising a POSIX signal, or by translating the exception into an
  * E* error code in the event of a system call with exceptions disabled (on x86, except-
