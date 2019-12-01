@@ -2014,7 +2014,7 @@ done_insert_ansitty_flag_hedit:
 			case 21:
 			case 22:
 				setcolor(self, (self->at_color & ~ANSITTY_IFSTRONG) |
-							   (self->at_defcolor & ANSITTY_IFSTRONG));
+				               (self->at_defcolor & ANSITTY_IFSTRONG));
 				break;
 
 			case 23:
@@ -2114,7 +2114,7 @@ done_insert_ansitty_flag_hedit:
 
 			case 52:
 				setattrib(self, self->at_attrib | (ANSITTY_ATTRIB_FRAMED |
-			                                       ANSITTY_ATTRIB_CIRCLED));
+				                                   ANSITTY_ATTRIB_CIRCLED));
 				break;
 
 			case 53:
@@ -2123,7 +2123,7 @@ done_insert_ansitty_flag_hedit:
 
 			case 54:
 				setattrib(self, self->at_attrib & ~(ANSITTY_ATTRIB_FRAMED |
-			                                        ANSITTY_ATTRIB_CIRCLED));
+				                                    ANSITTY_ATTRIB_CIRCLED));
 				break;
 
 			case 55:

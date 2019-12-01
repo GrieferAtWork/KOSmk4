@@ -2384,7 +2384,7 @@ rawmemrxlenq:([nonnull] /*aligned(8)*/ void const *__restrict haystack, $uint64_
 @@@return: * : Always re-returns `dst'
 [fast][libc][kernel][ATTR_LEAF]
 [dependency_include(<hybrid/__assert.h>)]
-memmoveup:([nonnull] void *dst, [nonnull] void const *src, size_t n_bytes) -> [== dst] void * {
+memmoveup:([nonnull] void *dst, [nonnull] void const *src, $size_t n_bytes) -> [== dst] void * {
 	byte_t *pdst, *psrc;
 	pdst = (byte_t *)dst + n_bytes;
 	psrc = (byte_t *)src + n_bytes;
@@ -2398,7 +2398,7 @@ memmoveup:([nonnull] void *dst, [nonnull] void const *src, size_t n_bytes) -> [=
 @@@return: * : Always re-returns `dst'
 [fast][libc][kernel][ATTR_LEAF]
 [dependency_include(<hybrid/__assert.h>)]
-memmovedown:([nonnull] void *dst, [nonnull] void const *src, size_t n_bytes) -> [== dst] void * {
+memmovedown:([nonnull] void *dst, [nonnull] void const *src, $size_t n_bytes) -> [== dst] void * {
 	byte_t *pdst, *psrc;
 	pdst = (byte_t *)dst;
 	psrc = (byte_t *)src;
@@ -2416,7 +2416,7 @@ memmovedown:([nonnull] void *dst, [nonnull] void const *src, size_t n_bytes) -> 
 [fast][libc][ATTR_LEAF]
 memcpyc:([nonnull] void *__restrict dst,
          [nonnull] void const *__restrict src,
-         size_t elem_count, size_t elem_size)
+         $size_t elem_count, $size_t elem_size)
 	-> [== dst] void *
 	%{auto_block(memcpyc(%auto))}
 
@@ -2424,7 +2424,7 @@ memcpyc:([nonnull] void *__restrict dst,
 [fast][libc][ATTR_LEAF]
 mempcpyc:([nonnull] void *__restrict dst,
           [nonnull] void const *__restrict src,
-          size_t elem_count, size_t elem_size)
+          $size_t elem_count, $size_t elem_size)
 	-> [== dst + (elem_count * elem_size)] void *
 	%{auto_block(memcpyc(%auto))}
 
@@ -2433,7 +2433,7 @@ mempcpyc:([nonnull] void *__restrict dst,
 [fast][libc][ATTR_LEAF]
 memmovec:([nonnull] void *dst,
           [nonnull] void const *src,
-          size_t elem_count, size_t elem_size)
+          $size_t elem_count, $size_t elem_size)
 	-> [== dst] void *
 	%{auto_block(memcpyc(%auto))}
 
@@ -2441,7 +2441,7 @@ memmovec:([nonnull] void *dst,
 [fast][libc][ATTR_LEAF]
 mempmovec:([nonnull] void *dst,
            [nonnull] void const *src,
-           size_t elem_count, size_t elem_size)
+           $size_t elem_count, $size_t elem_size)
 	-> [== dst + (elem_count * elem_size)] void *
 	%{auto_block(memcpyc(%auto))}
 
@@ -2450,7 +2450,7 @@ mempmovec:([nonnull] void *dst,
 [fast][libc][ATTR_LEAF]
 memmoveupc:([nonnull] void *dst,
             [nonnull] void const *src,
-            size_t elem_count, size_t elem_size)
+            $size_t elem_count, $size_t elem_size)
 	-> [== dst] void *
 	%{auto_block(memcpyc(%auto))}
 
@@ -2458,7 +2458,7 @@ memmoveupc:([nonnull] void *dst,
 [fast][libc][ATTR_LEAF][dependency_include(<hybrid/host.h>)]
 mempmoveupc:([nonnull] void *dst,
              [nonnull] void const *src,
-             size_t elem_count, size_t elem_size)
+             $size_t elem_count, $size_t elem_size)
 	-> [== dst + (elem_count * elem_size)] void *
 	%{auto_block(memcpyc(%auto))}
 
@@ -2467,7 +2467,7 @@ mempmoveupc:([nonnull] void *dst,
 [fast][libc][ATTR_LEAF]
 memmovedownc:([nonnull] void *dst,
               [nonnull] void const *src,
-              size_t elem_count, size_t elem_size)
+              $size_t elem_count, $size_t elem_size)
 	-> [== dst] void *
 	%{auto_block(memcpyc(%auto))}
 
@@ -2475,7 +2475,7 @@ memmovedownc:([nonnull] void *dst,
 [fast][libc][ATTR_LEAF]
 mempmovedownc:([nonnull] void *dst,
                [nonnull] void const *src,
-               size_t elem_count, size_t elem_size)
+               $size_t elem_count, $size_t elem_size)
 	-> [== dst + (elem_count * elem_size)] void *
 	%{auto_block(memcpyc(%auto))}
 

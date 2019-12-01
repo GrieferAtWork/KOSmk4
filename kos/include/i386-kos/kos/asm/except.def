@@ -33,19 +33,19 @@
 #define __SIZEOF_ERROR_REGISTER_STATE  SIZEOF_KCPUSTATE
 #endif /* __USE_KOS_KERNEL */
 #ifdef __x86_64__
-#define __ERROR_REGISTER_STATE_TYPE_RDPC(x)                      ((x).kcs_rip)
-#define __ERROR_REGISTER_STATE_TYPE_WRPC(x,value)                ((x).kcs_rip=(value))
-#define __ERROR_REGISTER_STATE_TYPE_RDSP(x)                      ((x).kcs_gpregs.gp_rsp)
-#define __ERROR_REGISTER_STATE_TYPE_WRSP(x,value)                ((x).kcs_gpregs.gp_rsp=(value))
-#define __ERROR_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)       ((x).kcs_gpregs.gp_rax)
-#define __ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x,value) ((x).kcs_gpregs.gp_rax=(value))
+#define __ERROR_REGISTER_STATE_TYPE_RDPC(x)                       ((x).kcs_rip)
+#define __ERROR_REGISTER_STATE_TYPE_WRPC(x, value)                ((x).kcs_rip=(value))
+#define __ERROR_REGISTER_STATE_TYPE_RDSP(x)                       ((x).kcs_gpregs.gp_rsp)
+#define __ERROR_REGISTER_STATE_TYPE_WRSP(x, value)                ((x).kcs_gpregs.gp_rsp=(value))
+#define __ERROR_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        ((x).kcs_gpregs.gp_rax)
+#define __ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x, value) ((x).kcs_gpregs.gp_rax=(value))
 #else /* __x86_64__ */
-#define __ERROR_REGISTER_STATE_TYPE_RDPC(x)                      ((x).kcs_eip)
-#define __ERROR_REGISTER_STATE_TYPE_WRPC(x,value)                ((x).kcs_eip=(value))
-#define __ERROR_REGISTER_STATE_TYPE_RDSP(x)                      ((x).kcs_gpregs.gp_esp)
-#define __ERROR_REGISTER_STATE_TYPE_WRSP(x,value)                ((x).kcs_gpregs.gp_esp=(value))
-#define __ERROR_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)       ((x).kcs_gpregs.gp_eax)
-#define __ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x,value) ((x).kcs_gpregs.gp_eax=(value))
+#define __ERROR_REGISTER_STATE_TYPE_RDPC(x)                       ((x).kcs_eip)
+#define __ERROR_REGISTER_STATE_TYPE_WRPC(x, value)                ((x).kcs_eip=(value))
+#define __ERROR_REGISTER_STATE_TYPE_RDSP(x)                       ((x).kcs_gpregs.gp_esp)
+#define __ERROR_REGISTER_STATE_TYPE_WRSP(x, value)                ((x).kcs_gpregs.gp_esp=(value))
+#define __ERROR_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        ((x).kcs_gpregs.gp_eax)
+#define __ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x, value) ((x).kcs_gpregs.gp_eax=(value))
 #endif /* !__x86_64__ */
 
 
@@ -295,16 +295,16 @@ class E_ILLEGAL_INSTRUCTION_VIO_INVALID_KERNEL_SP: E_ILLEGAL_INSTRUCTION = 0x101
 /* Helper macros to encode/decode the `opcode' field of `E_ILLEGAL_INSTRUCTION'
  * NOTE: If the instruction doesn't depend on `modrm_reg', set it directly. */
 #ifdef __x86_64__
-#define E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode,modrm_reg) ((__UINT64_TYPE__)(opcode)|(__UINT64_TYPE__)(modrm_reg)<<60|__UINT64_C(0x0800000000000000))
-#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETOPC(v)         ((__UINT64_TYPE__)(v)&__UINT64_C(0x07ffffffffffffff))
-#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETREG(v)         ((__UINT8_TYPE__)((__UINT64_TYPE__)(v)>>60))
-#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_HASREG(v)         ((__UINT64_TYPE__)(v)&__UINT64_C(0x0800000000000000))
-#else
-#define E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode,modrm_reg) ((__UINT32_TYPE__)(opcode)|(__UINT32_TYPE__)(modrm_reg)<<29|__UINT32_C(0x10000000))
-#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETOPC(v)         ((__UINT32_TYPE__)(v)&__UINT32_C(0x0fffffff))
-#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETREG(v)         ((__UINT8_TYPE__)((__UINT32_TYPE__)(v)>>29))
-#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_HASREG(v)         ((__UINT32_TYPE__)(v)&__UINT32_C(0x10000000))
-#endif
+#define E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, modrm_reg) ((__UINT64_TYPE__)(opcode) | (__UINT64_TYPE__)(modrm_reg) << 60 | __UINT64_C(0x0800000000000000))
+#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETOPC(v)          ((__UINT64_TYPE__)(v) & __UINT64_C(0x07ffffffffffffff))
+#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETREG(v)          ((__UINT8_TYPE__)((__UINT64_TYPE__)(v) >> 60))
+#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_HASREG(v)          ((__UINT64_TYPE__)(v) & __UINT64_C(0x0800000000000000))
+#else /* __x86_64__ */
+#define E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, modrm_reg) ((__UINT32_TYPE__)(opcode) | (__UINT32_TYPE__)(modrm_reg) << 29 | __UINT32_C(0x10000000))
+#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETOPC(v)          ((__UINT32_TYPE__)(v) & __UINT32_C(0x0fffffff))
+#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETREG(v)          ((__UINT8_TYPE__)((__UINT32_TYPE__)(v) >> 29))
+#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_HASREG(v)          ((__UINT32_TYPE__)(v) & __UINT32_C(0x10000000))
+#endif /* !__x86_64__ */
 
 }
 

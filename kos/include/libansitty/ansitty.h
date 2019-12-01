@@ -163,7 +163,7 @@
 #define ANSITTY_ATTRIB_LET_DHBP  0x0300 /* Letter mode: Single-Width, Double-Height (bottom-half) */
 #define ANSITTY_ATTRIB_LET_MASK  0x0300 /* Mask for letter mode. */
 #define ANSITTY_ATTRIB_FONTMASK  0xf000 /* MASK: Alternate font selection */
-#define ANSITTY_ATTRIB_FONTSHFT      24 /* SHFT: Alternate font selection */
+#define ANSITTY_ATTRIB_FONTSHFT      12 /* SHFT: Alternate font selection */
 
 
 #ifdef __CC__

@@ -219,18 +219,19 @@ done_procfs:
 		 *       on a working procfs (see the procfs init above, which allows
 		 *       for the insmod() and mount() to fail), meaning we need to use
 		 *       a custom (probably sysctl()-based) function for checking how
-		 *       many user-space threads are running on system */
+		 *       many user-space threads are running on the system */
 		kill(-1, SIGKILL);
 
 		/* Become the foreground process of /dev/console
 		 * In theory this shouldn't be necessary, since the kill() before
 		 * should have gotten rid of any process that could have been holding
-		 * this foreground-process lock before, however just in case the kernel
-		 * decides to make a SIGKILL-broadcast be performed asynchronously, in
+		 * the foreground-process lock before, however just in case the kernel
+		 * decides to have a SIGKILL-broadcast be performed asynchronously, in
 		 * which case the old foreground process may still be alive when we
-		 * clear the console above. - Note however that since we've installed
+		 * clear the console above, we go the safe route and always become the
+		 * foreground process once again. - Note however that since we've installed
 		 * a SIG_IGN handler for `SIGTTOU', we still wouldn't get suspended in
-		 * such a scenario, but we'd still be unable to reset the tty... */
+		 * such a scenario, but we'd also be unable to reset the tty... */
 		console_set_fgproc();
 
 		/* Reset the termios of /dev/console to sane values */
