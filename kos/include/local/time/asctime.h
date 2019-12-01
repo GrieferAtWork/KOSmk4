@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf98a577e */
+/* HASH CRC-32:0xb5739f75 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ __NAMESPACE_LOCAL_BEGIN
  * that is the representation of TP in this format */
 __LOCAL_LIBC(asctime) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime))(struct __NAMESPACE_STD_SYM tm const *__tp) {
-#line 612 "kos/src/libc/magic/time.c"
+#line 587 "kos/src/libc/magic/time.c"
 	return __localdep_asctime_r(__tp, __NAMESPACE_LOCAL_SYM __ctime_buf);
 }
 __NAMESPACE_LOCAL_END

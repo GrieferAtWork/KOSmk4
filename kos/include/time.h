@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9089a035 */
+/* HASH CRC-32:0x8826235c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,6 +85,7 @@ __NAMESPACE_STD_USING(timespec_get)
 
 #ifdef __USE_POSIX199309
 #include <bits/timespec.h>
+#include <bits/itimerval.h>
 #endif /* __USE_POSIX199309 */
 
 #ifdef __USE_XOPEN2K8
@@ -259,32 +260,6 @@ __NAMESPACE_STD_USING(tm)
 
 
 #ifdef __USE_POSIX199309
-#ifdef __USE_TIME64
-#ifdef __USE_TIME_BITS64
-#define itimerspec64     itimerspec
-#else /* __USE_TIME_BITS64 */
-#define __itimerspec_alt itimerspec64
-#endif /* !__USE_TIME_BITS64 */
-#endif /* __USE_TIME64 */
-
-#ifdef __USE_TIME_BITS64
-#define __itimerspec64 itimerspec
-#define __itimerspec32 __itimerspec_alt
-#else /* __USE_TIME_BITS64 */
-#define __itimerspec64 __itimerspec_alt
-#define __itimerspec32 itimerspec
-#endif /* !__USE_TIME_BITS64 */
-
-struct itimerspec {
-	struct timespec it_interval;
-	struct timespec it_value;
-};
-
-struct __itimerspec_alt {
-	struct __timespec_alt it_interval;
-	struct __timespec_alt it_value;
-};
-
 struct sigevent;
 #endif /* __USE_POSIX199309 */
 

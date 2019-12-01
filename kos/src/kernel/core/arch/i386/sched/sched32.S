@@ -27,6 +27,7 @@
 #include <kernel/pic.h>
 #include <kernel/pit.h>
 #include <kernel/syscall.h>
+#include <kernel/syscall-tables.h>
 #include <sched/task.h>
 #include <sched/tss.h>
 

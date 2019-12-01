@@ -24,10 +24,8 @@
  * properly enumerate these modules, as well as tell the GDB remote about them. */
 
 #include <__stdinc.h>
-#include <__crt.h>
-#include <bits/types.h>
 
-__SYSDECL_BEGIN
+#include <kos/bits/library-listdef.h>
 
 /* Module enumeration variants:
  *
@@ -107,43 +105,31 @@ __SYSDECL_BEGIN
  */
 
 
+#ifndef LIBRARY_LISTDEF_FNORMAL
 #define LIBRARY_LISTDEF_FNORMAL      0x0000 /* Normal library list flags. */
+#endif /* !LIBRARY_LISTDEF_FNORMAL */
+#ifndef LIBRARY_LISTDEF_FPFIRST
 #define LIBRARY_LISTDEF_FPFIRST      0x0001 /* `gll_first' should be loaded with an additional level of indirection. */
+#endif /* !LIBRARY_LISTDEF_FPFIRST */
+#ifndef LIBRARY_LISTDEF_FLINKLST
 #define LIBRARY_LISTDEF_FLINKLST     0x0002 /* `lld_entry_offsetof_next' is the offset to a pointer-to-next-loaded-modules. */
+#endif /* !LIBRARY_LISTDEF_FLINKLST */
+#ifndef LIBRARY_LISTDEF_FINLNAME
 #define LIBRARY_LISTDEF_FINLNAME     0x0004 /* `lld_module_offsetof_filename' is the offset of an inlined c-string. */
+#endif /* !LIBRARY_LISTDEF_FINLNAME */
+#ifndef LIBRARY_LISTDEF_FPELEMENT
 #define LIBRARY_LISTDEF_FPELEMENT    0x0008 /* Given some module element (either an entry in a vector, or linked list)
                                              * `lld_entry_offsetof_module' is the offset to a pointer to the actual module structure. */
+#endif /* !LIBRARY_LISTDEF_FPELEMENT */
+#ifndef LIBRARY_LISTDEF_FRELFILENAME
 #define LIBRARY_LISTDEF_FRELFILENAME 0x4000 /* The filename of the library may be a relative pathname to the current PWD. */
+#endif /* !LIBRARY_LISTDEF_FRELFILENAME */
+#ifndef LIBRARY_LISTDEF_FSINGLE
 #define LIBRARY_LISTDEF_FSINGLE      0x8000 /* Ignore `lld_offsetof_next' entirely. - Only a single library exists
                                              * When set, `lld_offsetof_loadaddr' and `lld_offsetof_loadstart' aren't
                                              * offsets, but the actual load addresses themself! */
-
-#ifdef __CC__
-struct library_listdef {
-	__size_t       lld_size;                      /* [== sizeof(struct gdb_library_listdef)] Used for versioning */
-	__size_t       lld_sizeof_pointer;            /* [== sizeof(void *)] Used for versioning and COMPAT32-mode */
-	__uintptr_t    lld_flags;                     /* Definition flags (Set of `LIBRARY_LISTDEF_F*') */
-	void          *lld_first;                     /* [1..1] User-space pointer to the first module
-	                                               * When `LIBRARY_LISTDEF_FPFIRST' isn't set: `first = (MODULE *)gll_first'
-	                                               * When `LIBRARY_LISTDEF_FPFIRST' is set:    `first = *(MODULE **)gll_first' */
-	__size_t      *lld_count;                     /* [0..1] Optional: Number of loaded modules.
-	                                               * When given, this is the max number of modules to enumerate before stopping.
-	                                               * When used without `LIBRARY_LISTDEF_FLINKLST', this is exact number of modules
-	                                               * When `LIBRARY_LISTDEF_FLINKLST' isn't set and this is field `NULL',
-	                                               * then a NULL/empty filename is used as sentinal. */
-	__ptrdiff_t    lld_module_offsetof_filename;  /* Offset to the module's filename field.
-	                                               * When `LIBRARY_LISTDEF_FINLNAME' is set:    `name = (char *)((byte_t *)curr + lld_module_offsetof_filename)'
-	                                               * When `LIBRARY_LISTDEF_FINLNAME' isn't set: `name = *(char **)((byte_t *)curr + lld_module_offsetof_filename)' */
-	__ptrdiff_t    lld_module_offsetof_loadaddr;  /* Offset to the module's in-memory load address.          (`loadaddr = *(uintptr_t *)((byte_t *)curr + lld_module_offsetof_loadaddr)') */
-	__ptrdiff_t    lld_module_offsetof_loadstart; /* Offset to the module's in-memory start mapping address. (`loadstart = *(uintptr_t *)((byte_t *)curr + lld_module_offsetof_loadstart)') */
-	__ptrdiff_t    lld_entry_offsetof_next;       /* Offset-of-pointer-to / stride to the next
-	                                               * When `LIBRARY_LISTDEF_FLINKLST' is set:    `next = *(MODULE **)((byte_t *)prev + lld_entry_offsetof_next)'
-	                                               * When `LIBRARY_LISTDEF_FLINKLST' isn't set: `next = (MODULE *)((byte_t *)prev + lld_entry_offsetof_next)' */
-	__ptrdiff_t    lld_entry_offsetof_module;     /* [valid_if(LIBRARY_LISTDEF_FPELEMENT)] Offset to the actual module structure (from individual elements) */
-};
-#endif /* __CC__ */
+#endif /* !LIBRARY_LISTDEF_FSINGLE */
 
 
-__SYSDECL_END
 
 #endif /* !_KOS_LIBRARY_LISTDEF_H */

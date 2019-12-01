@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59c34190 */
+/* HASH CRC-32:0x86c2f8a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the number of days in YEAR */
 __LOCAL_LIBC(dysize) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dysize))(int __year) {
-#line 899 "kos/src/libc/magic/time.c"
+#line 874 "kos/src/libc/magic/time.c"
 	return __isleap(__year) ? 366 : 365;
 }
 __NAMESPACE_LOCAL_END

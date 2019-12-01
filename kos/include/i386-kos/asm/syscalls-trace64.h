@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bfb4cbc */
+/* HASH CRC-32:0x24bd0c05 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2769,11 +2769,11 @@
 #define __NRATRA0_lfutex(uaddr, futex_op, val, timeout, val2) ,uaddr
 #define __NRATRF1_lfutex                 "%#" PRIxSIZ
 #define __NRATRA1_lfutex(uaddr, futex_op, val, timeout, val2) ,(uintptr_t)(futex_op)
-#define __NRATRF2_lfutex                 "%p"
+#define __NRATRF2_lfutex                 "%" PRIu64
 #define __NRATRA2_lfutex(uaddr, futex_op, val, timeout, val2) ,val
 #define __NRATRF3_lfutex                 "%p"
 #define __NRATRA3_lfutex(uaddr, futex_op, val, timeout, val2) ,timeout
-#define __NRATRF4_lfutex                 "%p"
+#define __NRATRF4_lfutex                 "%" PRIu64
 #define __NRATRA4_lfutex(uaddr, futex_op, val, timeout, val2) ,val2
 #define __NRATRF0_lfutexexpr             "%p"
 #define __NRATRA0_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,base

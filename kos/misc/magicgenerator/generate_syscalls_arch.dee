@@ -62,9 +62,7 @@ class SyscallArch {
 	@@Mapping of known system call wrappers.
 	@@@key:   The prefix to be pre-pended before the wrappers's name
 	@@        e.g. when `__fooasm_', one symbol might be `__fooasm_exit'
-	@@@value: A tuple @(visibility,
-	@@                  section,
-	@@                  function(fp: File, f: Function, sysno: int),
+	@@@value: A tuple @(function(fp: File, f: Function, sysno: int),
 	@@                  arch_origin_name)
 	@@        This function should print the assembly body for servicing
 	@@        the system call in the context in which this wrapper might
@@ -75,11 +73,7 @@ class SyscallArch {
 	@@        compatibility mode (such as x86_64's IA32-mode), one is
 	@@        allowed to specify a different arch who's system calls
 	@@        are then going to be wrapped.
-	@@        @visibility is the visibility of wrapper functions and should
-	@@        be one of `PRIVATE', `INTERN' or `PUBLIC', following the usual
-	@@        meanings of these. (though admittedly, `PRIVATE' doesn't make
-	@@        very much sense...)
-	member platformKernelSyscallWrappers: {string: (string, string, Callable, string)};
+	member platformKernelSyscallWrappers: {string: (Callable, string)};
 
 	formatPath(f: string): string {
 		return f.format({
@@ -179,7 +173,6 @@ function i386_printLibcSyscallWrapperCommon(fp: File) {
 			fp << "	ret\n";
 			fp << "	.cfi_endproc\n";
 			fp << "END(libc_" << name << ")\n";
-			
 		}
 	}
 }
@@ -187,7 +180,11 @@ function i386_printLibcSyscallWrapperCommon(fp: File) {
 function i386_printLibcSyscallWrapper(fp: File, f: Function, sysno: int, enableExcept: bool) {
 	local registerCount = f.getArgumentRegisterCount(32);
 	local conditionalX = enableExcept ? "X" : "";
-	fp << "	movl   $" << sysno.hex() << ", %eax\n";
+	if (sysno == 0) {
+		fp << "	xorl   %eax, %eax\n";
+	} else {
+		fp << "	movl   $(" << sysno.hex() << "), %eax\n";
+	}
 	fp << "	jmp    ";
 	if (registerCount == 0) {
 		fp << "libc___i386_" << conditionalX << "syscall\n";
@@ -201,6 +198,8 @@ function i386_printKernelSyscallWrapperCommon(fp: File) {
 	fp << "#include <kos/kernel/gdt.h>\n";
 	fp << "#include <kos/kernel/paging.h>\n";
 	fp << "#include <kernel/arch/syscall.h>\n";
+	fp << "\n";
+	fp << "EXTERN(__asm32_bad_sysenter_extension)\n";
 }
 
 function i386_restoreSyscallRegisters(fp: File, restoreRegisters: {string...}) {
@@ -236,6 +235,8 @@ function i386_restoreSyscallRegisters(fp: File, restoreRegisters: {string...}) {
 }
 
 function i386_printKernelSyscallWrapper_int80(fp: File, f: Function, sysno: int) {
+	fp << ".section .text.x86.asm32_syscall_int80." << f.name << "\n";
+	fp << "INTERN_WEAK_FUNCTION(__x86_asm32_int80_" << f.name << ")\n";
 	fp << "	.cfi_startproc simple\n";
 	fp << "	.cfi_personality 0, x86_syscall_personality_asm32_int80\n";
 	fp << "	.cfi_lsda 0, " << sysno.hex() << "\n";
@@ -320,9 +321,12 @@ function i386_printKernelSyscallWrapper_int80(fp: File, f: Function, sysno: int)
 		fp << "	iret\n";
 	}
 	fp << "	.cfi_endproc\n";
+	fp << "END(__x86_asm32_int80_" << f.name << ")\n";
 }
 
 function i386_printKernelSyscallWrapper_sysenter(fp: File, f: Function, sysno: int) {
+	fp << ".section .text.x86.asm32_syscall_sysenter." << f.name << "\n";
+	fp << "INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_" << f.name << ")\n";
 	fp << "	.cfi_startproc simple\n";
 	fp << "	.cfi_personality 0, x86_syscall_personality_asm32_sysenter\n";
 	fp << "	.cfi_lsda 0, " << sysno.hex() << "\n";
@@ -418,6 +422,7 @@ function i386_printKernelSyscallWrapper_sysenter(fp: File, f: Function, sysno: i
 		}
 	}
 	fp << "	.cfi_endproc\n";
+	fp << "END(__x86_asm32_sysenter_" << f.name << ")\n";
 }
 
 
@@ -425,28 +430,593 @@ function i386_printKernelSyscallWrapper_sysenter(fp: File, f: Function, sysno: i
 /************************************************************************/
 /* X86_64                                                               */
 /************************************************************************/
+final global x86_64SyscallArgumentRegisters = { "%rdi", "%rsi", "%rdx", "%r10", "%r8", "%r9" };
+final global x86_64SysvABIRegisters = { "%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9" };
 function x86_64_printLibcSyscallWrapperCommon(fp: File) {
-	fp << "/* TODO: x86_64_printLibcSyscallWrapperCommon() */\n";
 }
 
 function x86_64_printLibcSyscallWrapper(fp: File, f: Function, sysno: int, enableExcept: bool) {
-	fp << "/* TODO: x86_64_printLibcSyscallWrapper() */\n";
+	fp << "	.cfi_startproc\n";
+	if (sysno == 0) {
+		fp << "	xorq   %rax, %rax\n";
+	} else {
+		fp << "	movq   $(" << sysno.hex() << "), %rax\n";
+	}
+	if (f.getArgumentRegisterCount(64) >= 4)
+		fp << "	movq   %rcx, %r10\n";
+	fp << (enableExcept ? "	stc\n" : "	clc\n");
+	fp << "	syscall\n";
+	fp << "	ret\n";
+	fp << "	.cfi_endproc\n";
 }
 
 function x86_64_printKernelSyscallWrapperCommon(fp: File) {
-	fp << "/* TODO: x86_64_printKernelSyscallWrapperCommon() */\n";
+	fp << "#include <asm/cfi.h>\n";
+	fp << "#include <asm/instr/movzxq.h>\n";
+	fp << "#include <asm/instr/interrupt.h>\n";
+	fp << "#include <kos/kernel/paging.h>\n";
+	fp << "#include <kernel/arch/syscall.h>\n";
 }
 
 function x86_64_printKernelSyscallWrapper_asm64_syscall(fp: File, f: Function, sysno: int) {
-	fp << "/* TODO: x86_64_printKernelSyscallWrapper_asm64_syscall() */\n";
+	fp << ".section .text.x86.asm64_syscall." << f.name << "\n";
+	fp << "INTERN_WEAK_FUNCTION(__x86_asm64_syscall_" << f.name << ")\n";
+	fp << "	.cfi_startproc simple\n";
+	fp << "	.cfi_personality 0, x86_syscall_personality_asm64_syscall\n";
+	fp << "	.cfi_lsda 0, " << sysno.hex() << "\n";
+	fp << "	.cfi_iret_signal_frame\n";
+	fp << "	.cfi_def_cfa %rsp, 0\n";
+	fp << "	pushq_cfi_r %rcx\n";
+	fp << "	pushq_cfi_r %rdx\n";
+	fp << "	pushq_cfi_r %rsi\n";
+	fp << "	pushq_cfi_r %rdi\n";
+	fp << "	pushq_cfi_r %r8\n";
+	fp << "	pushq_cfi_r %r9\n";
+	fp << "	pushq_cfi_r %r10\n";
+	fp << "	pushq_cfi_r %r11\n";
+	if (f.getArgumentRegisterCount(64) >= 4)
+		fp << "	movq   %r10, %rcx\n";
+	fp << "	EXTERN(sys_" << f.name << ")\n";
+	fp << "	call   sys_" << f.name << "\n";
+	fp << "	popq_cfi_r %r11\n";
+	fp << "	popq_cfi_r %r10\n";
+	fp << "	popq_cfi_r %r9\n";
+	fp << "	popq_cfi_r %r8\n";
+	fp << "	popq_cfi_r %rdi\n";
+	fp << "	popq_cfi_r %rsi\n";
+	if (f.returnType.isReg128) {
+		fp << "	popq_cfi %rcx\n /* %rdx */";
+	} else {
+		fp << "	popq_cfi_r %rdx\n";
+	}
+	fp << "	popq_cfi_r %rcx\n";
+	fp << "	intr_exit_sysret\n";
+	fp << "END(__x86_asm64_syscall_" << f.name << ")\n";
+}
+
+
+function x86_64_getRegisterName32(reg: string): string {
+	local i = i386SyscallArgumentRegisters.find(reg);
+	if (i >= 0)
+		return "REG" + i;
+	if (reg == "0(%rbp)")
+		return "REG4";
+	if (reg == "4(%rbp)")
+		return "REG5";
+	return reg;
+}
+
+function x86_64_getRegisterName64(reg: string): string {
+	local i = x86_64SysvABIRegisters.find(reg);
+	if (i >= 0)
+		return "ARG" + i;
+	return reg;
+}
+
+function x86_64_formDoubleWideArgument64Ex(
+		fp: File, dst64: string, losrc32: string,
+		hisrc32: string, clobber: string) {
+	final local TEXTALIGN = 17;
+	fp << "	movzlq " << hisrc32 << ", " << dst64
+		<< (" " * (TEXTALIGN - (#hisrc32 + #dst64)))
+		<< " /* "
+		<< x86_64_getRegisterName64(dst64)
+		<< " = " << x86_64_getRegisterName32(losrc32)
+		<< ":" << x86_64_getRegisterName32(hisrc32)
+		<< " */\n";
+	fp << "	movzlq " << losrc32 << ", " << clobber
+		<< (" " * (TEXTALIGN - (#losrc32 + #clobber)))
+		<< " /* ... */\n";
+	fp << "	shlq   $32, " << dst64
+		<< (" " * (TEXTALIGN - (3 + #dst64)))
+		<< "  /* ... */\n";
+	fp << "	orq    " << clobber << ", " << dst64
+		<< (" " * (TEXTALIGN - (#clobber + #dst64)))
+		<< " /* ... */\n";
+}
+
+function x86_64_assignRegister64(
+		fp: File, sysenter: bool, format: string,
+		clobber: string = none) {
+	if (sysenter) {
+		format = format
+			.replace("%ebp", "4(%ebp)")
+			.replace("%edi", "0(%ebp)");
+	}
+	local a, none, b = format.partition("=")...;
+	if (":" in b) {
+		local c;
+		b, none, c = b.partition(":")...;
+		assert clobber !is none;
+		x86_64_formDoubleWideArgument64Ex(fp, a, b, c, clobber);
+	} else if (b.startswith("r")) {
+		fp << "	movq   " << b << ", " << a << " /* "
+			<< x86_64_getRegisterName64(a)
+			<< " = "
+			<< x86_64_getRegisterName64(b)
+			<< " */\n";
+	} else {
+		fp << "	movzlq " << b << ", " << a << " /* "
+			<< x86_64_getRegisterName64(a)
+			<< " = "
+			<< x86_64_getRegisterName32(b)
+			<< " */\n";
+	}
+}
+
+function x86_64_printKernelSyscallWrapper_transformArguments(
+		fp: File, f: Function, sysenter: bool) {
+	/* Re-arrange and zero-extend registers:
+	 *   - ARG0: %ebx -> %rdi
+	 *   - ARG1: %ecx -> %rsi
+	 *   - ARG2: %edx -> %rdx
+	 *   - ARG3: %esi -> %rcx
+	 *   - ARG4: %edi -> %r8     ARG4: 0(%ebp) -> %r8
+	 *   - ARG5: %ebp -> %r9     ARG5: 4(%ebp) -> %r9 */
+	local argumentCount = #f.args;
+	local registerCount = f.getArgumentRegisterCount(32);
+	local doubleWideArguments = Tuple(
+		for (local i: [:argumentCount])
+			if (f.args[i][0].isReg64)
+				i);
+	if (sysenter && registerCount > 4) {
+		fp << "	movzlq %ebp, %rbp\n"; /*  */
+		/* NOTE: By zero-extending the user-space EBP, we already
+		 *       ensured that %rbp doesn't point into kernel-space,
+		 *       as kernelspace on x86_64 only begins after the end
+		 *       of the 32-bit user-code address-space. */
+		/*fp << "	cmpq   $0, %rbp\n";
+		fp << "	jl     __asm32_bad_sysenter_extension\n";*/
+	}
+#define R(...) x86_64_assignRegister64(fp, sysenter, __VA_ARGS__)
+	switch (registerCount) {
+	case 0:
+		assert argumentCount == 0;
+		break;
+	case 1:
+		assert argumentCount == 1;
+		/* ARG0: %rdi=%ebx */
+		R("%rdi=%ebx");
+		break;
+	case 2:
+		if (0 in doubleWideArguments) {
+			assert argumentCount == 1;
+			/* ARG0: %rdi=%ebx:%ecx */
+			R("%rdi=%ebx:%ecx", clobber: "%rax");
+		} else {
+			assert argumentCount == 2;
+			/* ARG0: %rdi=%ebx
+			 * ARG1: %rsi=%ecx */
+			R("%rdi=%ebx");
+			R("%rsi=%ecx");
+		}
+		break;
+	case 3:
+		if (0 in doubleWideArguments) {
+			assert argumentCount == 2;
+			/* ARG0: %rdi=%ebx:%ecx
+			 * ARG1: %rsi=%edx */
+			R("%rdi=%ebx:%ecx", clobber: "%rax");
+			R("%rsi=%edx");
+		} else if (1 in doubleWideArguments) {
+			assert argumentCount == 2;
+			/* ARG0: %rdi=%ebx
+			 * ARG1: %rsi=%ecx:%edx */
+			R("%rdi=%ebx");
+			R("%rsi=%ecx:%edx", clobber: "%rax");
+		} else {
+			assert argumentCount == 3;
+			/* ARG0: %rdi=%ebx
+			 * ARG1: %rsi=%ecx
+			 * ARG2: %rdx=%edx */
+			R("%rdi=%ebx");
+			R("%rsi=%ecx");
+			R("%rdx=%edx");
+		}
+		break;
+	case 4:
+		if (0 in doubleWideArguments && 1 in doubleWideArguments) {
+			assert argumentCount == 2;
+			/* ARG0: %rdi=%ebx:%ecx
+			 * ARG1: %rsi=%edx:%esi */
+			R("%rdi=%ebx:%ecx", clobber: "%rax");
+			R("%rsi=%edx:%esi", clobber: "%rax");
+		} else if (0 in doubleWideArguments) {
+			assert argumentCount == 3;
+			/* ARG0: %rdi = %ebx:%ecx
+			 * ARG1: %rsi = %edx
+			 * ARG2: %rdx = %esi */
+			R("%rdi=%ebx:%ecx", clobber: "%rax");
+			R("%rsi=%esi");
+			R("%rdx=%edx");
+			fp << "	xchgq  %rdx, %rsi /* ARG1 = ARG2, ARG2 = ARG1 */\n";
+		} else if (1 in doubleWideArguments) {
+			assert argumentCount == 3;
+			/* ARG0: %rdi = %ebx
+			 * ARG1: %rsi = %ecx:%edx
+			 * ARG2: %rdx = %esi */
+			R("%rdi=%ebx");
+			R("%rax=%ecx:%edx", clobber: "%r8");
+			R("%rdx=%esi");
+			R("%rsi=%rax");
+		} else if (2 in doubleWideArguments) {
+			assert argumentCount == 3;
+			/* ARG0: %rdi = %ebx
+			 * ARG1: %rsi = %ecx
+			 * ARG2: %rdx = %edx:%esi */
+			R("%rdi=%ebx");
+			R("%rax=%ecx");
+			R("%rdx=%edx:%esi", clobber: "%r8");
+			R("%rsi=%rax");
+		} else {
+			assert argumentCount == 4;
+			/* ARG0: %rdi = %ebx
+			 * ARG1: %rsi = %ecx
+			 * ARG2: %rdx = %edx
+			 * ARG3: %rcx = %esi */
+			R("%rdi=%ebx");
+			R("%rdx=%edx");
+			R("%rsi=%esi");
+			R("%rcx=%ecx");
+			fp << "	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */\n";
+		}
+		break;
+	case 5:
+		if (0 in doubleWideArguments && 1 in doubleWideArguments) {
+			/* ARG0: %rdi = %ebx:%ecx
+			 * ARG1: %rsi = %edx:%esi
+			 * ARG2: %rdx = %edi */
+			assert argumentCount == 3;
+			R("%rax=%edi");
+			R("%rdi=%ebx:%ecx", clobber: "%r8");
+			R("%rsi=%edx:%esi", clobber: "%r8");
+			R("%rdx=%rax");
+		} else if (1 in doubleWideArguments && 2 in doubleWideArguments) {
+			assert argumentCount == 3;
+			/* ARG0: %rdi = %ebx
+			 * ARG1: %rsi = %ecx:%edx
+			 * ARG2: %rdx = %esi:%edi */
+			R("%rsi=%ecx:%edx", clobber: "%rax");
+			R("%rax=%esi:%edi", clobber: "%r8");
+			R("%rdi=%ebx");
+			R("%rdx=%rax");
+		} else if (0 in doubleWideArguments && 2 in doubleWideArguments) {
+			assert argumentCount == 3;
+			/* ARG0: %rdi = %ebx:%ecx
+			 * ARG1: %rsi = %edx
+			 * ARG2: %rdx = %esi:%edi */
+			R("%rax=%esi:%edi", clobber: "%r8");
+			R("%rsi=%edx");
+			R("%rdi=%ebx:%ecx", clobber: "%r8");
+			R("%rdx=%rax");
+		} else if (0 in doubleWideArguments) {
+			assert argumentCount == 4;
+			/* ARG0: %rdi = %ebx:%ecx
+			 * ARG1: %rsi = %edx
+			 * ARG2: %rdx = %esi
+			 * ARG3: %rcx = %edi */
+			R("%rsi=%esi");
+			R("%rdx=%edx");
+			fp << "	xchgq  %rdx, %rsi /* ARG1 = ARG2, ARG2 = ARG1 */\n";
+			R("%rax=%ebx:%ecx", clobber: "%r8");
+			R("%rcx=%edi");
+			R("%rdi=%rax");
+		} else if (1 in doubleWideArguments) {
+			assert argumentCount == 4;
+			/* ARG0: %rdi = %ebx
+			 * ARG1: %rsi = %ecx:%edx
+			 * ARG2: %rdx = %esi
+			 * ARG3: %rcx = %edi */
+			R("%rax=%ecx:%edx", clobber: "%r8");
+			R("%rdx=%esi");
+			R("%rsi=%rax");
+			R("%rcx=%edi");
+			R("%rdi=%ebx");
+		} else if (2 in doubleWideArguments) {
+			assert argumentCount == 4;
+			/* ARG0: %rdi = %ebx
+			 * ARG1: %rsi = %ecx
+			 * ARG2: %rdx = %edx:%esi
+			 * ARG3: %rcx = %edi */
+			R("%rdx=%edx:%esi", clobber: "%rax");
+			R("%rsi=%ecx");
+			R("%rcx=%edi");
+			R("%rdi=%ebx");
+		} else if (3 in doubleWideArguments) {
+			assert argumentCount == 4;
+			/* ARG0: %rdi = %ebx
+			 * ARG1: %rsi = %ecx
+			 * ARG2: %rdx = %edx
+			 * ARG3: %rcx = %esi:%edi */
+			R("%rax=%esi:%edi", clobber: "%r8");
+			R("%rsi=%ecx");
+			R("%rcx=%rax");
+			R("%rdx=%edx");
+			R("%rdi=%ebx");
+		} else {
+			assert argumentCount == 5;
+			/* ARG0: %rdi = %ebx
+			 * ARG1: %rsi = %ecx
+			 * ARG2: %rdx = %edx
+			 * ARG3: %rcx = %esi
+			 * ARG4: %r8  = %edi */
+			R("%r8=%edi");
+			R("%rdx=%edx");
+			R("%rsi=%esi");
+			R("%rcx=%ecx");
+			fp << "	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */\n";
+			R("%rdi=%ebx");
+		}
+		break;
+	case 6:
+		if (0 in doubleWideArguments && 1 in doubleWideArguments && 2 in doubleWideArguments) {
+			assert argumentCount == 3;
+			/* ARG0: %rdi = %ebx:%ecx
+			 * ARG1: %rsi = %edx:%esi
+			 * ARG2: %rdx = %edi:%ebp */
+			R("%rax=%edi:%ebp", clobber: "%r8");
+			R("%rsi=%edx:%esi", clobber: "%r8");
+			R("%rdx=%rax");
+			R("%rdi=%ebx:%ecx", clobber: "%rax");
+		} else if (0 in doubleWideArguments && 1 in doubleWideArguments) {
+			assert argumentCount == 4;
+			/* ARG0: %rdi = %ebx:%ecx
+			 * ARG1: %rsi = %edx:%esi
+			 * ARG2: %rdx = %edi
+			 * ARG3: %rcx = %ebp */
+			R("%rsi=%edx:%esi", clobber: "%rax");
+			R("%rax=%ebx:%ecx", clobber: "%r8");
+			R("%rdx=%edi");
+			R("%rdi=%rax");
+			R("%rcx=%ebp");
+		} else if (0 in doubleWideArguments && 2 in doubleWideArguments) {
+			assert argumentCount == 4;
+			/* ARG0: %rdi = %ebx:%ecx
+			 * ARG1: %rsi = %edx
+			 * ARG2: %rdx = %esi:%edi
+			 * ARG3: %rcx = %ebp */
+			R("%rax=%esi:%edi", clobber: "%r8");
+			R("%rsi=%edx");
+			R("%rdx=%rax");
+			R("%rdi=%ebx:%ecx", clobber: "%rax");
+			R("%rcx=%ebp");
+		} else if (0 in doubleWideArguments && 3 in doubleWideArguments) {
+			assert argumentCount == 4;
+			/* ARG0: %rdi = %ebx:%ecx
+			 * ARG1: %rsi = %edx
+			 * ARG2: %rdx = %esi
+			 * ARG3: %rcx = %edi:%ebp */
+			R("%rax=%ebx:%ecx", clobber: "%r8");
+			R("%rcx=%edi:%ebp", clobber: "%r8");
+			R("%rdi=%rax");
+			R("%rsi=%esi");
+			R("%rdx=%edx");
+			fp << "	xchgq  %rdx, %rsi /* ARG1 = ARG2, ARG2 = ARG1 */\n";
+		} else if (1 in doubleWideArguments && 2 in doubleWideArguments) {
+			assert argumentCount == 4;
+			/* ARG0: %rdi = %ebx
+			 * ARG1: %rsi = %ecx:%edx
+			 * ARG2: %rdx = %esi:%edi
+			 * ARG3: %rcx = %ebp */
+			R("%rax=%ecx:%edx", clobber: "%r8");
+			R("%rdx=%esi:%edi", clobber: "%r8");
+			R("%rsi=%rax");
+			R("%rdi=%ebx");
+			R("%rcx=%ebp");
+		} else if (1 in doubleWideArguments && 3 in doubleWideArguments) {
+			assert argumentCount == 4;
+			/* ARG0: %rdi = %ebx
+			 * ARG1: %rsi = %ecx:%edx
+			 * ARG2: %rdx = %esi
+			 * ARG3: %rcx = %edi:%ebp */
+			R("%rax=%ecx:%edx", clobber: "%r8");
+			R("%rdx=%esi");
+			R("%rsi=%rax");
+			R("%rcx=%edi:%ebp", clobber: "%rax");
+			R("%rdi=%ebx");
+		} else if (2 in doubleWideArguments && 3 in doubleWideArguments) {
+			assert argumentCount == 4;
+			/* ARG0: %rdi = %ebx
+			 * ARG1: %rsi = %ecx
+			 * ARG2: %rdx = %edx:%esi
+			 * ARG3: %rcx = %edi:%ebp */
+			R("%rdx=%edx:%esi", clobber: "%rax");
+			R("%rax=%edi:%ebp", clobber: "%r8");
+			R("%rsi=%ecx");
+			R("%rcx=%rax");
+			R("%rdi=%ebx");
+		} else if (0 in doubleWideArguments) {
+			assert argumentCount == 5;
+			/* ARG0: %rdi = %ebx:%ecx
+			 * ARG1: %rsi = %edx
+			 * ARG2: %rdx = %esi
+			 * ARG3: %rcx = %edi
+			 * ARG4: %r8  = %ebp */
+			R("%rax=%ebx:ecx", clobber: "%r8");
+			R("%rcx=%edi");
+			R("%rdi=%rax");
+			R("%rsi=%esi");
+			R("%rdx=%edx");
+			fp << "	xchgq  %rdx, %rsi /* ARG1 = ARG2, ARG2 = ARG1 */\n";
+			R("%r8=%ebp");
+		} else if (1 in doubleWideArguments) {
+			assert argumentCount == 5;
+			/* ARG0: %rdi = %ebx
+			 * ARG1: %rsi = %ecx:%edx
+			 * ARG2: %rdx = %esi
+			 * ARG3: %rcx = %edi
+			 * ARG4: %r8  = %ebp */
+			R("%rax=%ecx:%edx", clobber: "%r8");
+			R("%rdx=%esi");
+			R("%rsi=%rax");
+			R("%rcx=%edi");
+			R("%rdi=%ebx");
+			R("%r8=%ebp");
+		} else if (2 in doubleWideArguments) {
+			assert argumentCount == 5;
+			/* ARG0: %rdi = %ebx
+			 * ARG1: %rsi = %ecx
+			 * ARG2: %rdx = %edx:%esi
+			 * ARG3: %rcx = %edi
+			 * ARG4: %r8  = %ebp */
+			R("%rdx=%edx:%esi", clobber: "%rax");
+			R("%rsi=%ecx");
+			R("%rcx=%edi");
+			R("%rdi=%ebx");
+			R("%r8=%ebp");
+		} else if (3 in doubleWideArguments) {
+			assert argumentCount == 5;
+			/* ARG0: %rdi = %ebx
+			 * ARG1: %rsi = %ecx
+			 * ARG2: %rdx = %edx
+			 * ARG3: %rcx = %esi:%edi
+			 * ARG4: %r8  = %ebp */
+			R("%rax=%esi:%edi", clobber: "%r8");
+			R("%rsi=%ecx");
+			R("%rcx=%rax");
+			R("%rdx=%edx");
+			R("%rdi=%ebx");
+			R("%r8=%ebp");
+		} else if (4 in doubleWideArguments) {
+			assert argumentCount == 5;
+			/* ARG0: %rdi = %ebx
+			 * ARG1: %rsi = %ecx
+			 * ARG2: %rdx = %edx
+			 * ARG3: %rcx = %esi
+			 * ARG4: %r8  = %edi:%ebp */
+			R("%r8=%edi:%ebp", clobber: "%rax");
+			R("%rdx=%edx");
+			R("%rsi=%esi");
+			R("%rcx=%ecx");
+			fp << "	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */\n";
+			R("%rdi=%ebx");
+		} else {
+			assert argumentCount == 6;
+			/* ARG0: %rdi = %ebx
+			 * ARG1: %rsi = %ecx
+			 * ARG2: %rdx = %edx
+			 * ARG3: %rcx = %esi
+			 * ARG4: %r8  = %edi
+			 * ARG5: %r9  = %ebp */
+			R("%r8=%edi");
+			R("%r9=%ebp");
+			R("%rdx=%edx");
+			R("%rsi=%esi");
+			R("%rcx=%ecx");
+			fp << "	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */\n";
+			R("%rdi=%ebx");
+		}
+		break;
+#undef R
+	default:
+		assert 0, "registerCount = " + registerCount;
+	}
 }
 
 function x86_64_printKernelSyscallWrapper_asm32_int80(fp: File, f: Function, sysno: int) {
-	fp << "/* TODO: x86_64_printKernelSyscallWrapper_asm32_int80() */\n";
+	fp << ".section .text.x86.asm32_syscall_int80." << f.name << "\n";
+	fp << "INTERN_WEAK_FUNCTION(__x86_asm32_int80_" << f.name << ")\n";
+	fp << "	.cfi_startproc simple\n";
+	fp << "	.cfi_personality 0, x86_syscall_personality_asm32_int80\n";
+	fp << "	.cfi_lsda 0, " << sysno.hex() << "\n";
+	fp << "	.cfi_iret_signal_frame\n";
+	fp << "	.cfi_def_cfa %rsp, 0\n";
+	/* Preserve callee-clobber registers to prevent
+	 * kernel data from leaking into user-space. */
+	fp << "	pushq_cfi_r %rcx\n";
+	fp << "	pushq_cfi_r %rdx\n";
+	fp << "	pushq_cfi_r %rsi\n";
+	fp << "	pushq_cfi_r %rdi\n";
+	fp << "	pushq_cfi_r %r8\n";
+	fp << "	pushq_cfi_r %r9\n";
+	fp << "	pushq_cfi_r %r10\n";
+	fp << "	pushq_cfi_r %r11\n";
+	x86_64_printKernelSyscallWrapper_transformArguments(fp, f, sysenter: false);
+	fp << "	EXTERN(sys32_" << f.name << ")\n";
+	fp << "	call   sys32_" << f.name << "\n";
+	fp << "	popq_cfi_r %r11\n";
+	fp << "	popq_cfi_r %r10\n";
+	fp << "	popq_cfi_r %r9\n";
+	fp << "	popq_cfi_r %r8\n";
+	fp << "	popq_cfi_r %rdi\n";
+	fp << "	popq_cfi_r %rsi\n";
+	if (f.returnType.isReg64) {
+		fp << "	popq_cfi %rcx\n /* %rdx */";
+		/* Split the 64-bit return value into %eax:%edx */
+		fp << "	movq   %rax, %rdx\n";
+		fp << "	shrq   $32, %rdx\n";
+	} else {
+		fp << "	popq_cfi_r %rdx\n";
+	}
+	fp << "	popq_cfi_r %rcx\n";
+	fp << "	intr_exit_sysret\n";
+	fp << "END(__x86_asm32_int80_" << f.name << ")\n";
 }
 
 function x86_64_printKernelSyscallWrapper_asm32_sysenter(fp: File, f: Function, sysno: int) {
-	fp << "/* TODO: x86_64_printKernelSyscallWrapper_asm32_sysenter() */\n";
+	if (f.getArgumentRegisterCount(32) <= 4) {
+		fp << "DEFINE_INTERN_WEAK_ALIAS("
+			"__x86_asm32_sysenter_" << f.name << ", "
+			"__x86_asm32_int80_" << f.name << ")\n";
+		return;
+	}
+	fp << ".section .text.x86.asm32_syscall_sysenter." << f.name << "\n";
+	fp << "INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_" << f.name << ")\n";
+	fp << "	.cfi_startproc simple\n";
+	fp << "	.cfi_personality 0, x86_syscall_personality_asm32_sysenter\n";
+	fp << "	.cfi_lsda 0, " << sysno.hex() << "\n";
+	fp << "	.cfi_iret_signal_frame\n";
+	fp << "	.cfi_def_cfa %rsp, 0\n";
+	/* Preserve callee-clobber registers to prevent
+	 * kernel data from leaking into user-space. */
+	fp << "	pushq_cfi_r %rcx\n";
+	fp << "	pushq_cfi_r %rdx\n";
+	fp << "	pushq_cfi_r %rsi\n";
+	fp << "	pushq_cfi_r %rdi\n";
+	fp << "	pushq_cfi_r %r8\n";
+	fp << "	pushq_cfi_r %r9\n";
+	fp << "	pushq_cfi_r %r10\n";
+	fp << "	pushq_cfi_r %r11\n";
+	x86_64_printKernelSyscallWrapper_transformArguments(fp, f, sysenter: true);
+	fp << "	EXTERN(sys32_" << f.name << ")\n";
+	fp << "	call   sys32_" << f.name << "\n";
+	fp << "	popq_cfi_r %r11\n";
+	fp << "	popq_cfi_r %r10\n";
+	fp << "	popq_cfi_r %r9\n";
+	fp << "	popq_cfi_r %r8\n";
+	fp << "	popq_cfi_r %rdi\n";
+	fp << "	popq_cfi_r %rsi\n";
+	if (f.returnType.isReg64) {
+		fp << "	popq_cfi %rcx\n /* %rdx */";
+		/* Split the 64-bit return value into %eax:%edx */
+		fp << "	movq   %rax, %rdx\n";
+		fp << "	shrq   $32, %rdx\n";
+	} else {
+		fp << "	popq_cfi_r %rdx\n";
+	}
+	fp << "	popq_cfi_r %rcx\n";
+	fp << "	intr_exit_sysret\n";
+	fp << "END(__x86_asm32_sysenter_" << f.name << ")\n";
 }
 
 @@Listing of supported system call architectures, as well
@@ -466,14 +1036,8 @@ global ARCH: {string: SyscallArch} = {
 		platformLibcSyscallWrapper: i386_printLibcSyscallWrapper,
 		platformKernelSyscallWrappersCommon: i386_printKernelSyscallWrapperCommon,
 		platformKernelSyscallWrappers: {
-			"__x86_asm32_int80_" : (
-				"INTERN_WEAK", ".text.x86.asm32_syscall_int80.{name}",
-				i386_printKernelSyscallWrapper_int80,
-				"i386"),
-			"__x86_asm32_sysenter_" : (
-				"INTERN_WEAK", ".text.x86.asm32_syscall_sysenter.{name}",
-				i386_printKernelSyscallWrapper_sysenter,
-				"i386"),
+			(i386_printKernelSyscallWrapper_int80, "i386"),
+			(i386_printKernelSyscallWrapper_sysenter, "i386"),
 		},
 	),
 
@@ -490,18 +1054,9 @@ global ARCH: {string: SyscallArch} = {
 		platformLibcSyscallWrapper: x86_64_printLibcSyscallWrapper,
 		platformKernelSyscallWrappersCommon: x86_64_printKernelSyscallWrapperCommon,
 		platformKernelSyscallWrappers: {
-			"__x86_asm64_syscall_" : (
-				"INTERN_WEAK", ".text.x86.asm64_syscall.{name}",
-				x86_64_printKernelSyscallWrapper_asm64_syscall,
-				"x86_64"),
-			"__x86_asm32_int80_" : (
-				"INTERN_WEAK", ".text.x86.asm32_syscall_int80.{name}",
-				x86_64_printKernelSyscallWrapper_asm32_int80,
-				"i386"),
-			"__x86_asm32_sysenter_" : (
-				"INTERN_WEAK", ".text.x86.asm32_syscall_sysenter.{name}",
-				x86_64_printKernelSyscallWrapper_asm32_sysenter,
-				"i386"),
+			(x86_64_printKernelSyscallWrapper_asm64_syscall, "x86_64"),
+			(x86_64_printKernelSyscallWrapper_asm32_int80, "i386"),
+			(x86_64_printKernelSyscallWrapper_asm32_sysenter, "i386"),
 		},
 	),
 

@@ -27,8 +27,8 @@
 #include <asm/cfi.h>
 #include <asm/instr/interrupt.h>
 #include <asm/instr/movzxq.h>
-#include <asm/syscalls32.inl>
-#include <asm/syscalls64.inl>
+#include <asm/syscalls32_d.h>
+#include <asm/syscalls64_d.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
 
@@ -192,7 +192,7 @@ END(sys_invalid6)
 
 #define __SYSCALL(name) \
 	DEFINE_PUBLIC_WEAK_ALIAS(sys_##name, PP_CAT2(sys_invalid, __NR64AC_##name));
-#include <asm/ls_syscalls64.inl>
+#include <asm/ls-syscalls64.h>
 #undef __SYSCALL
 
 

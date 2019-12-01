@@ -30,6 +30,16 @@
  * >> int <name>(...);                    // In <kos/syscalls.h>
  */
 
+%[typeorg(<hybrid/typecore.h>: __UINT8_TYPE__, __INT8_TYPE__)]
+%[typeorg(<hybrid/typecore.h>: __UINT16_TYPE__, __INT16_TYPE__)]
+%[typeorg(<hybrid/typecore.h>: __UINT32_TYPE__, __INT32_TYPE__)]
+%[typeorg(<hybrid/typecore.h>: __UINT64_TYPE__, __INT64_TYPE__)]
+%[typeorg(<hybrid/typecore.h>: __SIZE_TYPE__, __PTRDIFF_TYPE__)]
+%[typeorg(<hybrid/typecore.h>: __UINTPTR_TYPE__, __INTPTR_TYPE__)]
+%[typeorg(<hybrid/typecore.h>: __ULONGPTR_TYPE__, __LONGPTR_TYPE__)]
+%[typeorg(<hybrid/typecore.h>: __ULONG32_TYPE__, __ULONG64_TYPE__)]
+%[typeorg(<hybrid/typecore.h>: __LONG32_TYPE__, __LONG64_TYPE__)]
+
 %[typeorg(<bits/types.h>: __u_char, __u_short, __u_int, __u_long)]
 %[typeorg(<bits/types.h>: __u8, __u16, __u32, __u64)]
 %[typeorg(<bits/types.h>: __s8, __s16, __s32, __s64)]
@@ -53,13 +63,73 @@
 %[typeorg(<bits/types.h>: __time32_t, __time64_t)]
 %[typeorg(<bits/types.h>: __quantum_diff_t, __clock_t, __suseconds_t, __clockid_t)]
 %[typeorg(<bits/types.h>: __gid_t, __uid_t, __useconds_t, __jtime_t, __timer_t)]
-%[typeorg(<bits/timespec.h>: __timespec32, __timespec64)]
-%[typeorg(<bits/timeval.h>: __timeval32, __timeval64)]
+%[typeorg(<bits/itimerspec.h>: itimerspec, __itimerspec32, __itimerspec64)]
+%[typeorg(<bits/itimerspec32.h>: __itimerspecx32, __itimerspecx32_64)]
+%[typeorg(<bits/itimerspec64.h>: __itimerspecx64)]
+%[typeorg(<bits/timespec.h>: timespec, __timespec32, __timespec64)]
+%[typeorg(<bits/timespec32.h>: __timespecx32, __timespecx32_64)]
+%[typeorg(<bits/timespec64.h>: __timespecx64)]
+%[typeorg(<bits/timeval.h>: timeval, __timeval32, __timeval64)]
+%[typeorg(<bits/timeval32.h>: __timevalx32, __timevalx32_64)]
+%[typeorg(<bits/timeval64.h>: __timevalx64)]
 %[typeorg(<bits/itimerval.h>: __itimerval32, __itimerval64)]
 %[typeorg(<bits/statfs.h>: __statfs32, statfs64)]
-%[typeorg(<kos/bits/except-handler.h>: __except_handler_t)]
 %[typeorg(<bits/sigaction.h>: sigaction)]
 %[typeorg(<bits/utimebuf.h>: __utimbuf32, __utimbuf64)]
+%[typeorg(<bits/siginfo-struct.h>: __siginfo_struct, siginfo_t)]
+%[typeorg(<bits/siginfo-struct32.h>: __siginfo32_struct, siginfo32_t)]
+%[typeorg(<bits/siginfo-struct64.h>: __siginfo64_struct, siginfo64_t)]
+%[typeorg(<hybrid/__pointer.h>: __HYBRID_PTR32, __HYBRID_PTR64)]
+%[typeorg(<bits/iovec-struct.h>: iovec)]
+%[typeorg(<bits/iovec-struct32.h>: iovec32)]
+%[typeorg(<bits/iovec-struct64.h>: iovec64)]
+
+%[typeorg(<librpc/bits/syscall-info.h>: rpc_syscall_info)]
+%[typeorg(<librpc/bits/syscall-info32.h>: rpc_syscall_info32)]
+%[typeorg(<librpc/bits/syscall-info64.h>: rpc_syscall_info64)]
+
+%[typeorg(<kos/bits/except-handler.h>: __except_handler_t)]
+%[typeorg(<kos/bits/except-handler32.h>: __except_handler32_t)]
+%[typeorg(<kos/bits/except-handler64.h>: __except_handler64_t)]
+%[typeorg(<kos/bits/debugtrap.h>: debugtrap_reason)]
+%[typeorg(<kos/bits/debugtrap32.h>: debugtrap_reason32)]
+%[typeorg(<kos/bits/debugtrap64.h>: debugtrap_reason64)]
+%[typeorg(<kos/bits/exception_data.h>: exception_data)]
+%[typeorg(<kos/bits/exception_data32.h>: exception_data32)]
+%[typeorg(<kos/bits/exception_data64.h>: exception_data64)]
+%[typeorg(<kos/bits/peb.h>: process_peb)]
+%[typeorg(<kos/bits/peb32.h>: process_peb32)]
+%[typeorg(<kos/bits/peb64.h>: process_peb64)]
+%[typeorg(<kos/bits/process.h>: process_rtld_elf)]
+%[typeorg(<kos/bits/process32.h>: process_rtld_elf32)]
+%[typeorg(<kos/bits/process64.h>: process_rtld_elf64)]
+%[typeorg(<kos/bits/ukern-struct.h>: userkern)]
+%[typeorg(<kos/bits/ukern-struct32.h>: userkern32)]
+%[typeorg(<kos/bits/ukern-struct64.h>: userkern64)]
+%[typeorg(<kos/kernel/cpu-state.h>: ucpustate, lcpustate, kcpustate, icpustate, scpustate, fcpustate)]
+%[typeorg(<kos/kernel/cpu-state32.h>: ucpustate32, lcpustate32, kcpustate32, icpustate32, scpustate32, fcpustate32)]
+%[typeorg(<kos/kernel/cpu-state64.h>: ucpustate64, lcpustate64, kcpustate64, icpustate64, scpustate64, fcpustate64)]
+%[typeorg(<kos/kernel/fpu-sstate.h>: sfpuenv, sfpustate)]
+%[typeorg(<kos/kernel/fpu-state.h>: xfpustate, fpustate)]
+%[typeorg(<kos/kernel/fpu-state32.h>: xfpustate32, fpustate32)]
+%[typeorg(<kos/kernel/fpu-state64.h>: xfpustate64, fpustate64)]
+%[typeorg(<kos/kernel/gdb-cpu-state.h>: gdb_cpustate)]
+%[typeorg(<kos/kernel/gdb-cpu-state32.h>: gdb_cpustate32)]
+%[typeorg(<kos/kernel/gdb-cpu-state64.h>: gdb_cpustate64)]
+%[typeorg(<kos/kernel/mcontext.h>: gregset_t, fpregset_t, mcontext)]
+%[typeorg(<kos/kernel/mcontext32.h>: gregset32_t, fpregset32_t, mcontext32)]
+%[typeorg(<kos/kernel/mcontext64.h>: gregset64_t, fpregset64_t, mcontext64)]
+%[typeorg(<kos/kernel/segment.h>: segment, idt_segment)]
+%[typeorg(<kos/kernel/ucontext.h>: ucontext)]
+%[typeorg(<kos/kernel/ucontext32.h>: ucontext32)]
+%[typeorg(<kos/kernel/ucontext64.h>: ucontext64)]
+%[typeorg(<kos/bits/library-listdef.h>: library_listdef)]
+%[typeorg(<kos/bits/library-listdef32.h>: library_listdef32)]
+%[typeorg(<kos/bits/library-listdef64.h>: library_listdef64)]
+%[typeorg(<kos/bits/futex-expr.h>: lfutexexpr)]
+%[typeorg(<kos/bits/futex-expr32.h>: lfutexexpr32)]
+%[typeorg(<kos/bits/futex-expr64.h>: lfutexexpr64)]
+
 %[mustundef(timezone, timeb, stat, dirent)]
 
 %[define_tostr(char = "%Q",{me})]
@@ -84,6 +154,8 @@
 %[define_tostr(timer_t          = "%p",{me})]
 %[define_tostr(sighandler_t     = "%p",{me})]
 %[define_tostr(except_handler_t = "%p",{me})]
+%[define_tostr(__except_handler32_t = "%p",{me})]
+%[define_tostr(__except_handler64_t = "%p",{me})]
 %[define_tostr(intptr_t         = "%Id",{me})]
 %[define_tostr(uintptr_t        = "%p",{me})]
 %[define_tostr(ssize_t          = "%Id",{me})]
@@ -170,11 +242,18 @@ time64:(time64_t *timer) -> [reg64] time64_t;
 [cp] chmod:(char const *filename, mode_t mode) -> errno_t;
 
 [cp] lchown:(char const *filename, uid_t owner, gid_t group) -> errno_t;
+[cp] lchown16:(char const *filename, uint16_t owner, uint16_t group) -> errno_t;
+[cp] lchown32:(char const *filename, uint32_t owner, uint32_t group) -> errno_t;
 [cp] fchown:(fd_t fd, uid_t owner, gid_t group) -> errno_t;
+[cp] fchown16:(fd_t fd, uint16_t owner, uint16_t group) -> errno_t;
+[cp] fchown32:(fd_t fd, uint32_t owner, uint32_t group) -> errno_t;
 [cp] chown:(char const *filename, uid_t owner, gid_t group) -> errno_t;
-@@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW|AT_DOSPATH'
+[cp] chown16:(char const *filename, uint16_t owner, uint16_t group) -> errno_t;
+[cp] chown32:(char const *filename, uint32_t owner, uint32_t group) -> errno_t;
+
+@@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
 [cp] fchownat:(fd_t dirfd, char const *filename, uid_t owner, gid_t group,
-               [tostr(flagset(AT_SYMLINK_NOFOLLOW,AT_DOSPATH))] atflag_t flags) -> errno_t;
+               [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
 
 
 
@@ -201,6 +280,40 @@ time64:(time64_t *timer) -> [reg64] time64_t;
 [restart(must)] setgroups:(size_t count, gid_t const *groups) -> errno_t;
 [restart(must)] setfsuid:(uid_t uid) -> errno_t;
 [restart(must)] setfsgid:(gid_t gid) -> errno_t;
+
+[restart(must)] getuid16:() -> uint16_t;
+[restart(must)] getuid32:() -> uint32_t;
+[restart(must)] setuid16:(uint16_t uid) -> errno_t;
+[restart(must)] setuid32:(uint32_t uid) -> errno_t;
+[restart(must)] getgid16:() -> uint16_t;
+[restart(must)] getgid32:() -> uint32_t;
+[restart(must)] setgid16:(uint16_t gid) -> errno_t;
+[restart(must)] setgid32:(uint32_t gid) -> errno_t;
+[restart(must)] geteuid16:() -> uint16_t;
+[restart(must)] geteuid32:() -> uint32_t;
+[restart(must)] setreuid16:(uint16_t ruid, uint16_t euid) -> errno_t;
+[restart(must)] setreuid32:(uint32_t ruid, uint32_t euid) -> errno_t;
+[restart(must)] getegid16:() -> uint16_t;
+[restart(must)] getegid32:() -> uint32_t;
+[restart(must)] setregid16:(uint16_t rgid, uint16_t egid) -> errno_t;
+[restart(must)] setregid32:(uint32_t rgid, uint32_t egid) -> errno_t;
+[restart(must)] getresuid16:(uint16_t *ruid, uint16_t *euid, uint16_t *suid) -> errno_t;
+[restart(must)] getresuid32:(uint32_t *ruid, uint32_t *euid, uint32_t *suid) -> errno_t;
+[restart(must)] setresuid16:(uint16_t ruid, uint16_t euid, uint16_t suid) -> errno_t;
+[restart(must)] setresuid32:(uint32_t ruid, uint32_t euid, uint32_t suid) -> errno_t;
+[restart(must)] getresgid16:(uint16_t *rgid, uint16_t *egid, uint16_t *sgid) -> errno_t;
+[restart(must)] getresgid32:(uint32_t *rgid, uint32_t *egid, uint32_t *sgid) -> errno_t;
+[restart(must)] setresgid16:(uint16_t rgid, uint16_t egid, uint16_t sgid) -> errno_t;
+[restart(must)] setresgid32:(uint32_t rgid, uint32_t egid, uint32_t sgid) -> errno_t;
+[restart(must)] getgroups16:(size_t size, uint16_t list[]) -> errno_t;
+[restart(must)] getgroups32:(size_t size, uint32_t list[]) -> errno_t;
+[restart(must)] setgroups16:(size_t count, uint16_t const *groups) -> errno_t;
+[restart(must)] setgroups32:(size_t count, uint32_t const *groups) -> errno_t;
+[restart(must)] setfsuid16:(uint16_t uid) -> errno_t;
+[restart(must)] setfsuid32:(uint32_t uid) -> errno_t;
+[restart(must)] setfsgid16:(uint16_t gid) -> errno_t;
+[restart(must)] setfsgid32:(uint32_t gid) -> errno_t;
+
 
 stime:(time32_t const *t) -> errno_t;
 stime64:(time64_t const *t) -> errno_t;
@@ -265,12 +378,26 @@ sethostname:(char const *name, size_t len) -> errno_t;
 setrlimit:(syscall_ulong_t resource, struct rlimit const *rlimits) -> errno_t;
 getrlimit:(syscall_ulong_t resource, struct rlimit *rlimits) -> errno_t;
 getrusage:(syscall_slong_t who, struct rusage *usage) -> errno_t;
-gettimeofday:(struct __timeval32 *tv, struct timezone *tz) -> errno_t;
+gettimeofday:(struct timeval *tv, struct timezone *tz) -> errno_t;
+gettimeofday32:(struct __timeval32 *tv, struct timezone *tz) -> errno_t;
 gettimeofday64:(struct __timeval64 *tv, struct timezone *tz) -> errno_t;
-settimeofday:(struct __timeval32 const *tv, struct timezone const *tz) -> errno_t;
+gettimeofdayx32:(struct __timevalx32 *tv, struct timezone *tz) -> errno_t;
+gettimeofdayx32_64:(struct __timevalx32_64 *tv, struct timezone *tz) -> errno_t;
+gettimeofdayx64:(struct __timevalx64 *tv, struct timezone *tz) -> errno_t;
+settimeofday:(struct timeval const *tv, struct timezone const *tz) -> errno_t;
+settimeofday32:(struct __timeval32 const *tv, struct timezone const *tz) -> errno_t;
 settimeofday64:(struct __timeval64 const *tv, struct timezone const *tz) -> errno_t;
-[restart(dont)][cp] select:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timeval32 *timeout) -> ssize_t;
+settimeofdayx32:(struct __timevalx32 const *tv, struct timezone const *tz) -> errno_t;
+settimeofdayx32_64:(struct __timevalx32_64 const *tv, struct timezone const *tz) -> errno_t;
+settimeofdayx64:(struct __timevalx64 const *tv, struct timezone const *tz) -> errno_t;
+
+[restart(dont)][cp] select:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timeval *timeout) -> ssize_t;
+[restart(dont)][cp] select32:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timeval32 *timeout) -> ssize_t;
 [restart(dont)][cp] select64:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timeval64 *timeout) -> ssize_t;
+[restart(dont)][cp] selectx32:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32 *timeout) -> ssize_t;
+[restart(dont)][cp] selectx32_64:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32_64 *timeout) -> ssize_t;
+[restart(dont)][cp] selectx64:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx64 *timeout) -> ssize_t;
+
 [cp] symlink:(char const *link_text, char const *target_path) -> errno_t;
 [cp] linux_oldlstat:(char const *filename, struct linux_oldstat *statbuf) -> errno_t;
 [cp] readlink:(char const *path, char *buf, size_t buflen) -> ssize_t;
@@ -326,6 +453,27 @@ mmap:(void *addr, size_t len,
 		syscall_ulong_t offset) -> void *;
 
 
+@@@param: prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
+@@@param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
+@@              with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
+@@              MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
+@@              MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE|MAP_OFFSET64_POINTER'
+mmap32:(void *addr, size_t len,
+	[tostr(flagset(
+		PROT_NONE:
+			PROT_EXEC, PROT_WRITE, PROT_READ,
+			PROT_SEM, PROT_LOOSE, PROT_SHARED))]
+		syscall_ulong_t prot,
+	[tostr(flagset(MAP_AUTOMATIC:
+		MAP_SHARED, MAP_PRIVATE, MAP_FIXED,
+		MAP_ANON, MAP_32BIT, MAP_GROWSDOWN, MAP_GROWSUP,
+		MAP_LOCKED, MAP_NORESERVE, MAP_POPULATE, MAP_NONBLOCK,
+		MAP_STACK, MAP_UNINITIALIZED, MAP_DONT_MAP, MAP_DONT_OVERRIDE,
+		MAP_OFFSET64_POINTER))]
+		syscall_ulong_t flags, fd_t fd,
+		syscall_ulong_t offset) -> void *;
+
+
 [restart(must)] munmap:(void *addr, size_t len) -> errno_t;
 
 truncate:(char const *filename, syscall_ulong_t length) -> errno_t;
@@ -374,17 +522,12 @@ oldwait4:(pid_t pid, int32_t *stat_loc,
 ipc:(int TODO_PROTOTYPE) -> errno_t;
 [cp] fsync:(fd_t fd) -> errno_t;
 
-[restart(must)][noexcept]
-sigreturn:(struct fpustate const *restore_fpu,
-           struct __sigset_struct const *restore_sigmask,
-           struct rpc_syscall_info *sc_info,
-           struct ucpustate const *restore_cpu);
-
-[restart(must)][noexcept]
-rt_sigreturn:(struct fpustate const *restore_fpu,
-              struct __sigset_struct const *restore_sigmask,
-              struct rpc_syscall_info *sc_info,
-              struct ucpustate const *restore_cpu);
+[restart(must)][noexcept] sigreturn:(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info *sc_info, struct ucpustate const *restore_cpu);
+[restart(must)][noexcept] sigreturn32:(struct fpustate32 const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 *sc_info, struct ucpustate32 const *restore_cpu);
+[restart(must)][noexcept] sigreturn64:(struct fpustate64 const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info64 *sc_info, struct ucpustate64 const *restore_cpu);
+[restart(must)][noexcept] rt_sigreturn:(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info *sc_info, struct ucpustate const *restore_cpu);
+[restart(must)][noexcept] rt_sigreturn32:(struct fpustate32 const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 *sc_info, struct ucpustate32 const *restore_cpu);
+[restart(must)][noexcept] rt_sigreturn64:(struct fpustate64 const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info64 *sc_info, struct ucpustate64 const *restore_cpu);
 
 clone:([tostr(flagset(CLONE_VM, CLONE_FS, CLONE_FILES, CLONE_SIGHAND, CLONE_PTRACE, CLONE_VFORK, CLONE_PARENT, CLONE_THREAD, CLONE_NEWNS, CLONE_SYSVSEM, CLONE_SETTLS, CLONE_PARENT_SETTID, CLONE_CHILD_CLEARTID, CLONE_DETACHED, CLONE_UNTRACED, CLONE_CHILD_SETTID, CLONE_NEWUTS, CLONE_NEWIPC, CLONE_NEWUSER, CLONE_NEWPID, CLONE_NEWNET, CLONE_IO))] syscall_ulong_t flags, void *child_stack, pid_t *ptid, uintptr_t newtls, pid_t *ctid) -> pid_t;
 
@@ -421,8 +564,8 @@ afs_syscall:(int TODO_PROTOTYPE) -> errno_t;
 [cp] getdents:(fd_t fd, struct linux_dirent *dirp, size_t count) -> ssize_t;
 [cp] kreaddir:(fd_t fd, struct dirent *buf, size_t bufsize,
 	[tostr(flagset(READDIR_DEFAULT:
-		READDIR_CONTINUE,READDIR_PEEK,
-		READDIR_SKIPREL,READDIR_WANTEOF))]
+		READDIR_CONTINUE, READDIR_PEEK,
+		READDIR_SKIPREL, READDIR_WANTEOF))]
 	syscall_ulong_t mode) -> ssize_t;
 
 _newselect:(int TODO_PROTOTYPE) -> errno_t;
@@ -430,9 +573,18 @@ _newselect:(int TODO_PROTOTYPE) -> errno_t;
 [cp] flock:(fd_t fd, syscall_ulong_t operation) -> errno_t;
 [cp] msync:(void *addr, size_t len, syscall_ulong_t flags) -> errno_t;
 [cp] readv:(fd_t fd, struct iovec const *iovec, size_t count) -> ssize_t;
+[cp] readv32:(fd_t fd, struct iovec32 const *iovec, size_t count) -> ssize_t;
+[cp] readv64:(fd_t fd, struct iovec64 const *iovec, size_t count) -> ssize_t;
 [cp] readvf:(fd_t fd, struct iovec const *iovec, size_t count, iomode_t mode) -> ssize_t;
+[cp] readvf32:(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) -> ssize_t;
+[cp] readvf64:(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) -> ssize_t;
 [cp] writev:(fd_t fd, struct iovec const *iovec, size_t count) -> ssize_t;
+[cp] writev32:(fd_t fd, struct iovec32 const *iovec, size_t count) -> ssize_t;
+[cp] writev64:(fd_t fd, struct iovec64 const *iovec, size_t count) -> ssize_t;
 [cp] writevf:(fd_t fd, struct iovec const *iovec, size_t count, iomode_t mode) -> ssize_t;
+[cp] writevf32:(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) -> ssize_t;
+[cp] writevf64:(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) -> ssize_t;
+
 [restart(must)] getsid:(pid_t pid) -> pid_t;
 [cp] fdatasync:(fd_t fd) -> errno_t;
 _sysctl:(int TODO_PROTOTYPE) -> errno_t;
@@ -448,10 +600,18 @@ sched_getscheduler:(pid_t pid) -> syscall_slong_t;
 [restart(dont)][cp] rpc_service:() -> syscall_slong_t;
 sched_get_priority_max:(syscall_ulong_t algorithm) -> syscall_slong_t;
 sched_get_priority_min:(syscall_ulong_t algorithm) -> syscall_slong_t;
-sched_rr_get_interval:(pid_t pid, struct __timespec32 *tms) -> errno_t;
+sched_rr_get_interval:(pid_t pid, struct __timespec *tms) -> errno_t;
+sched_rr_get_interval32:(pid_t pid, struct __timespec32 *tms) -> errno_t;
 sched_rr_get_interval64:(pid_t pid, struct __timespec64 *tms) -> errno_t;
-[restart(dont)][cp] nanosleep:(struct __timespec32 const *req, struct __timespec32 *rem) -> errno_t;
+sched_rr_get_intervalx32:(pid_t pid, struct __timespecx32 *tms) -> errno_t;
+sched_rr_get_intervalx32_64:(pid_t pid, struct __timespecx32_64 *tms) -> errno_t;
+sched_rr_get_intervalx64:(pid_t pid, struct __timespecx64 *tms) -> errno_t;
+[restart(dont)][cp] nanosleep:(struct timespec const *req, struct timespec *rem) -> errno_t;
+[restart(dont)][cp] nanosleep32:(struct __timespec32 const *req, struct __timespec32 *rem) -> errno_t;
 [restart(dont)][cp] nanosleep64:(struct __timespec64 const *req, struct __timespec64 *rem) -> errno_t;
+[restart(dont)][cp] nanosleepx32:(struct __timespecx32 const *req, struct __timespecx32 *rem) -> errno_t;
+[restart(dont)][cp] nanosleepx32_64:(struct __timespecx32_64 const *req, struct __timespecx32_64 *rem) -> errno_t;
+[restart(dont)][cp] nanosleepx64:(struct __timespecx64 const *req, struct __timespecx64 *rem) -> errno_t;
 
 @@@param: flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED'
 mremap:(void *addr, size_t old_len, size_t new_len,
@@ -471,11 +631,19 @@ rt_sigaction:(syscall_ulong_t signo, struct sigaction const *act, struct sigacti
 rt_sigprocmask:(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize) -> errno_t;
 
 rt_sigpending:(struct __sigset_struct *set, size_t sigsetsize) -> errno_t;
-[restart(dont)][cp] rt_sigtimedwait:(struct __sigset_struct const *set, struct __siginfo_struct *info, struct __timespec32 const *timeout, size_t sigsetsize) -> syscall_slong_t;
+
+[restart(dont)][cp] rt_sigtimedwait:(struct __sigset_struct const *set, struct __siginfo_struct *info, struct timespec const *timeout, size_t sigsetsize) -> syscall_slong_t;
+[restart(dont)][cp] rt_sigtimedwait32:(struct __sigset_struct const *set, struct __siginfo_struct *info, struct __timespec32 const *timeout, size_t sigsetsize) -> syscall_slong_t;
 [restart(dont)][cp] rt_sigtimedwait64:(struct __sigset_struct const *set, struct __siginfo_struct *info, struct __timespec64 const *timeout, size_t sigsetsize) -> syscall_slong_t;
+[restart(dont)][cp] rt_sigtimedwaitx32:(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct __timespecx32 const *timeout, size_t sigsetsize) -> syscall_slong_t;
+[restart(dont)][cp] rt_sigtimedwaitx32_64:(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct __timespecx32_64 const *timeout, size_t sigsetsize) -> syscall_slong_t;
+[restart(dont)][cp] rt_sigtimedwaitx64:(struct __sigset_struct const *set, struct __siginfo64_struct *info, struct __timespecx64 const *timeout, size_t sigsetsize) -> syscall_slong_t;
 
 @@@param: signo: One of `SIG*'
 rt_sigqueueinfo:(pid_t tgid, syscall_ulong_t signo, struct __siginfo_struct const *uinfo) -> errno_t;
+[doc_alias(rt_sigqueueinfo)] rt_sigqueueinfo32:(pid_t tgid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) -> errno_t;
+[doc_alias(rt_sigqueueinfo)] rt_sigqueueinfo64:(pid_t tgid, syscall_ulong_t signo, struct __siginfo64_struct const *uinfo) -> errno_t;
+
 rt_sigsuspend:(struct __sigset_struct const *set, size_t sigsetsize) -> errno_t;
 
 [cp] pread64:(fd_t fd, void *buf, size_t bufsize, [reg64] uint64_t offset) -> ssize_t;
@@ -508,8 +676,8 @@ madvise:(void *addr, size_t len, syscall_ulong_t advice) -> errno_t;
 [cp] getdents64:(fd_t fd, struct linux_dirent64 *dirp, size_t count) -> ssize_t;
 [cp] kreaddirf:(fd_t fd, struct dirent *buf, size_t bufsize,
 	[tostr(flagset(READDIR_DEFAULT:
-		READDIR_CONTINUE,READDIR_PEEK,
-		READDIR_SKIPREL,READDIR_WANTEOF))]
+		READDIR_CONTINUE, READDIR_PEEK,
+		READDIR_SKIPREL, READDIR_WANTEOF))]
 	syscall_ulong_t mode, iomode_t iomode) -> ssize_t;
 
 [cp] fcntl64:(fd_t fd, syscall_ulong_t command, void *arg) -> syscall_slong_t;
@@ -531,7 +699,14 @@ readahead:(fd_t fd, [reg64] uint64_t offset, size_t count) -> ssize_t;
 
 tkill:(pid_t tid, syscall_ulong_t signo) -> errno_t;
 sendfile64:(fd_t out_fd, fd_t in_fd, uint64_t *offset, size_t count) -> ssize_t;
-[cp] futex:(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespec32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
+
+[cp] futex:(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespec const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
+[cp] futex32:(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespec32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
+[cp] futex64:(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespec64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
+[cp] futexx32:(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
+[cp] futexx32_64:(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32_64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
+[cp] futexx64:(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;
+
 sched_setaffinity:(pid_t pid, size_t cpusetsize, struct __cpu_set_struct const *cpuset) -> errno_t;
 sched_getaffinity:(pid_t pid, size_t cpusetsize, struct __cpu_set_struct *cpuset) -> errno_t;
 set_thread_area:(int TODO_PROTOTYPE) -> errno_t;
@@ -553,23 +728,55 @@ epoll_ctl:(fd_t epfd, [tostr(select(EPOLL_CTL_ADD, EPOLL_CTL_DEL, EPOLL_CTL_MOD)
 remap_file_pages:(void *start, size_t size, syscall_ulong_t prot, size_t pgoff, syscall_ulong_t flags) -> errno_t;
 set_tid_address:(pid_t *tidptr) -> pid_t;
 timer_create:(clockid_t clock_id, struct sigevent *evp, timer_t *timerid) -> errno_t;
-timer_settime:(timer_t timerid, syscall_ulong_t flags, struct __itimerspec32 const *value, struct __itimerspec32 *ovalue) -> errno_t;
+
+timer_settime:(timer_t timerid, syscall_ulong_t flags, struct itimerspec const *value, struct itimerspec *ovalue) -> errno_t;
+timer_settime32:(timer_t timerid, syscall_ulong_t flags, struct __itimerspec32 const *value, struct __itimerspec32 *ovalue) -> errno_t;
 timer_settime64:(timer_t timerid, syscall_ulong_t flags, struct __itimerspec64 const *value, struct __itimerspec64 *ovalue) -> errno_t;
-timer_gettime:(timer_t timerid, struct __itimerspec32 *value) -> errno_t;
+timer_settimex32:(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32 const *value, struct __itimerspecx32 *ovalue) -> errno_t;
+timer_settimex32_64:(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32_64 const *value, struct __itimerspecx32_64 *ovalue) -> errno_t;
+timer_settimex64:(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx64 const *value, struct __itimerspecx64 *ovalue) -> errno_t;
+timer_gettime:(timer_t timerid, struct itimerspec *value) -> errno_t;
+timer_gettime32:(timer_t timerid, struct __itimerspec32 *value) -> errno_t;
 timer_gettime64:(timer_t timerid, struct __itimerspec64 *value) -> errno_t;
+timer_gettimex32:(timer_t timerid, struct __itimerspecx32 *value) -> errno_t;
+timer_gettimex32_64:(timer_t timerid, struct __itimerspecx32_64 *value) -> errno_t;
+timer_gettimex64:(timer_t timerid, struct __itimerspecx64 *value) -> errno_t;
+
 timer_getoverrun:(timer_t timerid) -> syscall_slong_t;
 timer_delete:(timer_t timerid) -> errno_t;
-clock_settime:(clockid_t clock_id, struct __timespec32 const *tp) -> errno_t;
+clock_settime:(clockid_t clock_id, struct timespec const *tp) -> errno_t;
+clock_settime32:(clockid_t clock_id, struct __timespec32 const *tp) -> errno_t;
 clock_settime64:(clockid_t clock_id, struct __timespec64 const *tp) -> errno_t;
-clock_gettime:(clockid_t clock_id, struct __timespec32 *tp) -> errno_t;
+clock_settimex32:(clockid_t clock_id, struct __timespecx32 const *tp) -> errno_t;
+clock_settimex32_64:(clockid_t clock_id, struct __timespecx32_64 const *tp) -> errno_t;
+clock_settimex64:(clockid_t clock_id, struct __timespecx64 const *tp) -> errno_t;
+clock_gettime:(clockid_t clock_id, struct timespec *tp) -> errno_t;
+clock_gettime32:(clockid_t clock_id, struct __timespec32 *tp) -> errno_t;
 clock_gettime64:(clockid_t clock_id, struct __timespec64 *tp) -> errno_t;
-clock_getres:(clockid_t clock_id, struct __timespec32 *res) -> errno_t;
+clock_gettimex32:(clockid_t clock_id, struct __timespecx32 *tp) -> errno_t;
+clock_gettimex32_64:(clockid_t clock_id, struct __timespecx32_64 *tp) -> errno_t;
+clock_gettimex64:(clockid_t clock_id, struct __timespecx64 *tp) -> errno_t;
+clock_getres:(clockid_t clock_id, struct timespec *res) -> errno_t;
+clock_getres32:(clockid_t clock_id, struct __timespec32 *res) -> errno_t;
 clock_getres64:(clockid_t clock_id, struct __timespec64 *res) -> errno_t;
-[restart(dont)][cp] clock_nanosleep:(clockid_t clock_id, syscall_ulong_t flags, struct __timespec32 const *requested_time, struct __timespec32 *remaining) -> errno_t;
+clock_getresx32:(clockid_t clock_id, struct __timespecx32 *res) -> errno_t;
+clock_getresx32_64:(clockid_t clock_id, struct __timespecx32_64 *res) -> errno_t;
+clock_getresx64:(clockid_t clock_id, struct __timespecx64 *res) -> errno_t;
+[restart(dont)][cp] clock_nanosleep:(clockid_t clock_id, syscall_ulong_t flags, struct timespec const *requested_time, struct timespec *remaining) -> errno_t;
+[restart(dont)][cp] clock_nanosleep32:(clockid_t clock_id, syscall_ulong_t flags, struct __timespec32 const *requested_time, struct __timespec32 *remaining) -> errno_t;
 [restart(dont)][cp] clock_nanosleep64:(clockid_t clock_id, syscall_ulong_t flags, struct __timespec64 const *requested_time, struct __timespec64 *remaining) -> errno_t;
+[restart(dont)][cp] clock_nanosleepx32:(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32 const *requested_time, struct __timespecx32 *remaining) -> errno_t;
+[restart(dont)][cp] clock_nanosleepx32_64:(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32_64 const *requested_time, struct __timespecx32_64 *remaining) -> errno_t;
+[restart(dont)][cp] clock_nanosleepx64:(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx64 const *requested_time, struct __timespecx64 *remaining) -> errno_t;
 tgkill:(pid_t tgid, pid_t tid, syscall_ulong_t signo) -> errno_t;
-[cp] utimes:(char const *filename, struct __timeval32 const times[2]) -> errno_t;
+
+[cp] utimes:(char const *filename, struct timeval const times[2]) -> errno_t;
+[cp] utimes32:(char const *filename, struct __timeval32 const times[2]) -> errno_t;
 [cp] utimes64:(char const *filename, struct __timeval64 const times[2]) -> errno_t;
+[cp] utimesx32:(char const *filename, struct __timevalx32 const times[2]) -> errno_t;
+[cp] utimesx32_64:(char const *filename, struct __timevalx32_64 const times[2]) -> errno_t;
+[cp] utimesx64:(char const *filename, struct __timevalx64 const times[2]) -> errno_t;
+
 vserver:(int TODO_PROTOTYPE) -> errno_t;
 mbind:(int TODO_PROTOTYPE) -> errno_t;
 get_mempolicy:(int TODO_PROTOTYPE) -> errno_t;
@@ -587,6 +794,8 @@ kexec_load:(int TODO_PROTOTYPE) -> errno_t;
 waitid:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop,
         [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options,
         struct rusage *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitid32:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusage *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitid64:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo64_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusage *ru) -> errno_t;
 
 add_key:(int TODO_PROTOTYPE) -> errno_t;
 request_key:(int TODO_PROTOTYPE) -> errno_t;
@@ -611,30 +820,32 @@ migrate_pages:(int TODO_PROTOTYPE) -> errno_t;
 @@@param: flags: Set of `0 | AT_DOSPATH'
 [cp] fmknodat:(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, [tostr(flagset(AT_DOSPATH))] atflag_t flags) -> errno_t;
 
-[cp] futimesat:(fd_t dirfd, const char *filename, struct __timeval32 const times[2]) -> errno_t;
-
-@@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH'
+[cp] futimesat:(fd_t dirfd, const char *filename, struct timeval const times[2]) -> errno_t;
+[cp] futimesat32:(fd_t dirfd, const char *filename, struct __timeval32 const times[2]) -> errno_t;
 [cp] futimesat64:(fd_t dirfd, const char *filename, struct __timeval64 const times[2]) -> errno_t;
+[cp] futimesatx32:(fd_t dirfd, const char *filename, struct __timevalx32 const times[2]) -> errno_t;
+[cp] futimesatx32_64:(fd_t dirfd, const char *filename, struct __timevalx32_64 const times[2]) -> errno_t;
+[cp] futimesatx64:(fd_t dirfd, const char *filename, struct __timevalx64 const times[2]) -> errno_t;
 
-@@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW|AT_DOSPATH'
-[cp] linux_fstatat64:(fd_t dirfd, char const *filename, struct linux_stat64 *statbuf, [tostr(flagset(AT_SYMLINK_NOFOLLOW,AT_DOSPATH))] atflag_t flags) -> errno_t;
+@@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
+[cp] linux_fstatat64:(fd_t dirfd, char const *filename, struct linux_stat64 *statbuf, [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
 
-@@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW|AT_DOSPATH'
+@@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
 [cp] kfstatat:(fd_t dirfd, char const *filename, struct stat *statbuf,
-               [tostr(flagset(AT_SYMLINK_NOFOLLOW,AT_DOSPATH))] atflag_t flags) -> errno_t;
+               [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
 
-@@@param: flags: Set of `0 | AT_REMOVEDIR|AT_REMOVEREG|AT_DOSPATH'
+@@@param: flags: Set of `0 | AT_REMOVEDIR|AT_REMOVEREG | AT_DOSPATH'
 [cp] unlinkat:(fd_t dirfd, char const *name,
-               [tostr(flagset(AT_REMOVEDIR,AT_REMOVEREG,AT_DOSPATH))] atflag_t flags) -> errno_t;
+               [tostr(flagset(AT_REMOVEDIR,AT_REMOVEREG, AT_DOSPATH))] atflag_t flags) -> errno_t;
 
 [cp] renameat:(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path) -> errno_t;
 
 @@@param: flags: Set of `0 | AT_DOSPATH'
 [cp] frenameat:(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, [tostr(flagset(AT_DOSPATH))] atflag_t flags) -> errno_t;
 
-@@@param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_FOLLOW|AT_DOSPATH'
+@@@param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_FOLLOW | AT_DOSPATH'
 [cp] linkat:(fd_t fromfd, char const *existing_file, fd_t tofd, char const *target_path,
-             [tostr(flagset(AT_EMPTY_PATH,AT_SYMLINK_FOLLOW,AT_DOSPATH))] atflag_t flags) -> errno_t;
+             [tostr(flagset(AT_EMPTY_PATH,AT_SYMLINK_FOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
 
 [cp] symlinkat:(char const *link_text, fd_t tofd, char const *target_path) -> errno_t;
 
@@ -644,31 +855,40 @@ migrate_pages:(int TODO_PROTOTYPE) -> errno_t;
 
 [cp] readlinkat:(fd_t dirfd, char const *path, char *buf, size_t buflen) -> ssize_t;
 
-@@@param: flags: Set of `0 | AT_READLINK_REQSIZE|AT_DOSPATH'
+@@@param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH'
 [cp] freadlinkat:(fd_t dirfd, char const *path, char *buf, size_t buflen,
-                  [tostr(flagset(AT_READLINK_REQSIZE,AT_DOSPATH))] atflag_t flags) -> ssize_t;
+                  [tostr(flagset(AT_READLINK_REQSIZE, AT_DOSPATH))] atflag_t flags) -> ssize_t;
 
-@@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW|AT_DOSPATH'
+@@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
 [cp] fchmodat:(fd_t dirfd, char const *filename, mode_t mode,
-               [tostr(flagset(AT_SYMLINK_NOFOLLOW,AT_DOSPATH))] atflag_t flags) -> errno_t;
+               [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
 
 @@@param: type: Set of `R_OK|W_OK|X_OK' or `F_OK'
-@@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW|AT_EACCESS|AT_DOSPATH'
+@@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW|AT_EACCESS | AT_DOSPATH'
 [cp] faccessat:(fd_t dirfd, char const *filename,
                 [tostr(flagset(F_OK: R_OK, W_OK, X_OK))] syscall_ulong_t type,
                 [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_EACCESS, AT_DOSPATH))] atflag_t flags) -> errno_t;
 
-[restart(dont)][cp] pselect6:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespec32 const *timeout, void const *sigmask_sigset_and_len) -> ssize_t;
+[restart(dont)][cp] pselect6:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespec const *timeout, void const *sigmask_sigset_and_len) -> ssize_t;
+[restart(dont)][cp] pselect6_32:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespec32 const *timeout, void const *sigmask_sigset_and_len) -> ssize_t;
 [restart(dont)][cp] pselect6_64:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespec64 const *timeout, void const *sigmask_sigset_and_len) -> ssize_t;
-[restart(dont)][cp] ppoll:(struct pollfd *fds, size_t nfds, struct __timespec32 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
+[restart(dont)][cp] pselect6_x32:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx32 const *timeout, void const *sigmask_sigset_and_len) -> ssize_t;
+[restart(dont)][cp] pselect6_x32_64:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) -> ssize_t;
+[restart(dont)][cp] pselect6_x64:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx64 const *timeout, void const *sigmask_sigset_and_len) -> ssize_t;
+
+[restart(dont)][cp] ppoll:(struct pollfd *fds, size_t nfds, struct timespec const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
+[restart(dont)][cp] ppoll32:(struct pollfd *fds, size_t nfds, struct __timespec32 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
 [restart(dont)][cp] ppoll64:(struct pollfd *fds, size_t nfds, struct __timespec64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
+[restart(dont)][cp] ppollx32:(struct pollfd *fds, size_t nfds, struct __timespecx32 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
+[restart(dont)][cp] ppollx32_64:(struct pollfd *fds, size_t nfds, struct __timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
+[restart(dont)][cp] ppollx64:(struct pollfd *fds, size_t nfds, struct __timespecx64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) -> ssize_t;
 
 @@param flags: Set of `CLONE_*'
 unshare:([tostr(flagset(CLONE_VM, CLONE_FS, CLONE_FILES, CLONE_SIGHAND, CLONE_PTRACE, CLONE_VFORK,
-                         CLONE_PARENT, CLONE_THREAD, CLONE_NEWNS, CLONE_SYSVSEM, CLONE_SETTLS,
-                         CLONE_PARENT_SETTID, CLONE_CHILD_CLEARTID, CLONE_DETACHED, CLONE_UNTRACED,
-                         CLONE_CHILD_SETTID, CLONE_NEWUTS, CLONE_NEWIPC, CLONE_NEWUSER, CLONE_NEWPID,
-                         CLONE_NEWNET, CLONE_IO))] syscall_ulong_t flags) -> errno_t;
+                        CLONE_PARENT, CLONE_THREAD, CLONE_NEWNS, CLONE_SYSVSEM, CLONE_SETTLS,
+                        CLONE_PARENT_SETTID, CLONE_CHILD_CLEARTID, CLONE_DETACHED, CLONE_UNTRACED,
+                        CLONE_CHILD_SETTID, CLONE_NEWUTS, CLONE_NEWIPC, CLONE_NEWUSER, CLONE_NEWPID,
+                        CLONE_NEWNET, CLONE_IO))] syscall_ulong_t flags) -> errno_t;
 
 set_robust_list:(int TODO_PROTOTYPE) -> errno_t;
 get_robust_list:(int TODO_PROTOTYPE) -> errno_t;
@@ -676,7 +896,11 @@ get_robust_list:(int TODO_PROTOTYPE) -> errno_t;
 [cp] splice:(fd_t fdin, uint64_t *offin, fd_t fdout, uint64_t *offout, size_t length, syscall_ulong_t flags) -> ssize_t;
 [cp] sync_file_range:(fd_t fd, [reg64] uint64_t offset, [reg64] uint64_t count, syscall_ulong_t flags) -> errno_t;
 [cp] tee:(fd_t fdin, fd_t fdout, size_t length, syscall_ulong_t flags) -> ssize_t;
+
 [cp] vmsplice:(fd_t fdout, struct iovec const *iov, size_t count, syscall_ulong_t flags) -> ssize_t;
+[cp] vmsplice32:(fd_t fdout, struct iovec32 const *iov, size_t count, syscall_ulong_t flags) -> ssize_t;
+[cp] vmsplice64:(fd_t fdout, struct iovec64 const *iov, size_t count, syscall_ulong_t flags) -> ssize_t;
+
 move_pages:(int TODO_PROTOTYPE) -> errno_t;
 getcpu:(uint32_t *cpu, uint32_t *node, struct getcpu_cache *tcache) -> errno_t;
 
@@ -685,12 +909,12 @@ epoll_pwait:(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents,
              syscall_slong_t timeout, struct __sigset_struct const *ss) -> errno_t;
 
 @@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH'
-[cp] utimensat:(fd_t dirfd, char const *filename, struct __timespec32 const times[2],
-                [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_CHANGE_CTIME, AT_DOSPATH))] atflag_t flags) -> errno_t;
-
-@@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH'
-[cp] utimensat64:(fd_t dirfd, char const *filename, struct __timespec64 const times[2],
-                  [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_CHANGE_CTIME, AT_DOSPATH))] atflag_t flags) -> errno_t;
+[cp] utimensat:(fd_t dirfd, char const *filename, struct timespec const times[2], [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_CHANGE_CTIME, AT_DOSPATH))] atflag_t flags) -> errno_t;
+[doc_alias(utimensat)][cp] utimensat32:(fd_t dirfd, char const *filename, struct __timespec32 const times[2], [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_CHANGE_CTIME, AT_DOSPATH))] atflag_t flags) -> errno_t;
+[doc_alias(utimensat)][cp] utimensat64:(fd_t dirfd, char const *filename, struct __timespec64 const times[2], [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_CHANGE_CTIME, AT_DOSPATH))] atflag_t flags) -> errno_t;
+[doc_alias(utimensat)][cp] utimensatx32:(fd_t dirfd, char const *filename, struct __timespecx32 const times[2], [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_CHANGE_CTIME, AT_DOSPATH))] atflag_t flags) -> errno_t;
+[doc_alias(utimensat)][cp] utimensatx32_64:(fd_t dirfd, char const *filename, struct __timespecx32_64 const times[2], [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_CHANGE_CTIME, AT_DOSPATH))] atflag_t flags) -> errno_t;
+[doc_alias(utimensat)][cp] utimensatx64:(fd_t dirfd, char const *filename, struct __timespecx64 const times[2], [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_CHANGE_CTIME, AT_DOSPATH))] atflag_t flags) -> errno_t;
 
 signalfd:(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) -> errno_t;
 
@@ -704,18 +928,20 @@ fallocate64:(fd_t fd, syscall_ulong_t mode, [reg64] uint64_t offset, [reg64] uin
 @@Set next expiration time of interval timer source UFD to UTMR.
 @@If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
 @@is absolute. Optionally return the old expiration time in OTMR
-timerfd_settime:(fd_t ufd, syscall_ulong_t flags, struct __itimerspec32 const *utmr, struct __itimerspec32 *otmr) -> errno_t;
-
-@@Set next expiration time of interval timer source UFD to UTMR.
-@@If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
-@@is absolute. Optionally return the old expiration time in OTMR
-timerfd_settime64:(fd_t ufd, syscall_ulong_t flags, struct __itimerspec64 const *utmr, struct __itimerspec64 *otmr) -> errno_t;
-
-@@Return the next expiration time of UFD
-timerfd_gettime:(fd_t ufd, struct __itimerspec32 *otmr) -> errno_t;
+timerfd_settime:(fd_t ufd, syscall_ulong_t flags, struct itimerspec const *utmr, struct itimerspec *otmr) -> errno_t;
+[doc_alias(timerfd_settime)] timerfd_settime32:(fd_t ufd, syscall_ulong_t flags, struct __itimerspec32 const *utmr, struct __itimerspec32 *otmr) -> errno_t;
+[doc_alias(timerfd_settime)] timerfd_settime64:(fd_t ufd, syscall_ulong_t flags, struct __itimerspec64 const *utmr, struct __itimerspec64 *otmr) -> errno_t;
+[doc_alias(timerfd_settime)] timerfd_settimex32:(fd_t ufd, syscall_ulong_t flags, struct __itimerspecx32 const *utmr, struct __itimerspecx32 *otmr) -> errno_t;
+[doc_alias(timerfd_settime)] timerfd_settimex32_64:(fd_t ufd, syscall_ulong_t flags, struct __itimerspecx32_64 const *utmr, struct __itimerspecx32_64 *otmr) -> errno_t;
+[doc_alias(timerfd_settime)] timerfd_settimex64:(fd_t ufd, syscall_ulong_t flags, struct __itimerspecx64 const *utmr, struct __itimerspecx64 *otmr) -> errno_t;
 
 @@Return the next expiration time of UFD
-timerfd_gettime64:(fd_t ufd, struct __itimerspec64 *otmr) -> errno_t;
+timerfd_gettime:(fd_t ufd, struct itimerspec *otmr) -> errno_t;
+[doc_alias(timerfd_gettime)] timerfd_gettime32:(fd_t ufd, struct __itimerspec32 *otmr) -> errno_t;
+[doc_alias(timerfd_gettime)] timerfd_gettime64:(fd_t ufd, struct __itimerspec64 *otmr) -> errno_t;
+[doc_alias(timerfd_gettime)] timerfd_gettimex32:(fd_t ufd, struct __itimerspecx32 *otmr) -> errno_t;
+[doc_alias(timerfd_gettime)] timerfd_gettimex32_64:(fd_t ufd, struct __itimerspecx32_64 *otmr) -> errno_t;
+[doc_alias(timerfd_gettime)] timerfd_gettimex64:(fd_t ufd, struct __itimerspecx64 *otmr) -> errno_t;
 
 signalfd4:(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize,
            [tostr(flagset(SFD_NONBLOCK, SFD_CLOEXEC))] syscall_ulong_t flags) -> errno_t;
@@ -727,17 +953,33 @@ epoll_create1:(syscall_ulong_t flags) -> fd_t;
 dup3:(fd_t oldfd, fd_t newfd, oflag_t flags) -> fd_t;
 pipe2:(fd_t pipedes[2], [tostr(flagset(O_CLOEXEC,O_CLOFORK,O_NONBLOCK,O_DIRECT))] oflag_t flags) -> errno_t;
 inotify_init1:(int TODO_PROTOTYPE) -> errno_t;
+
 [cp] preadv:(fd_t fd, struct iovec const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
+[cp] preadv32:(fd_t fd, struct iovec32 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
+[cp] preadv64:(fd_t fd, struct iovec64 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
 [cp] preadvf:(fd_t fd, struct iovec const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
+[cp] preadvf32:(fd_t fd, struct iovec32 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
+[cp] preadvf64:(fd_t fd, struct iovec64 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
 [cp] pwritev:(fd_t fd, struct iovec const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
+[cp] pwritev32:(fd_t fd, struct iovec32 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
+[cp] pwritev64:(fd_t fd, struct iovec64 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
 [cp] pwritevf:(fd_t fd, struct iovec const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
+[cp] pwritevf32:(fd_t fd, struct iovec32 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
+[cp] pwritevf64:(fd_t fd, struct iovec64 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
 
 @@@param: signo: One of `SIG*'
 rt_tgsigqueueinfo:(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo_struct const *uinfo) -> errno_t;
+[doc_alias(rt_tgsigqueueinfo)] rt_tgsigqueueinfo32:(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) -> errno_t;
+[doc_alias(rt_tgsigqueueinfo)] rt_tgsigqueueinfo64:(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo64_struct const *uinfo) -> errno_t;
 
 perf_event_open:(int TODO_PROTOTYPE) -> errno_t;
-[restart(dont)][cp] recvmmsg:(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespec32 *tmo) -> ssize_t;
+/* TODO: `struct mmsghdr' needs a 32/64-variant */
+[restart(dont)][cp] recvmmsg:(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct timespec *tmo) -> ssize_t;
+[restart(dont)][cp] recvmmsg32:(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespec32 *tmo) -> ssize_t;
 [restart(dont)][cp] recvmmsg64:(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespec64 *tmo) -> ssize_t;
+[restart(dont)][cp] recvmmsgx32:(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx32 *tmo) -> ssize_t;
+[restart(dont)][cp] recvmmsgx32_64:(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx32_64 *tmo) -> ssize_t;
+[restart(dont)][cp] recvmmsgx64:(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx64 *tmo) -> ssize_t;
 fanotify_init:(int TODO_PROTOTYPE) -> errno_t;
 fanotify_mark:(int TODO_PROTOTYPE) -> errno_t;
 
@@ -748,10 +990,16 @@ prlimit64:(pid_t pid, syscall_ulong_t resource, struct rlimit64 const *new_limit
 [cp] open_by_handle_at:(fd_t mountdirfd, struct file_handle *handle, syscall_ulong_t flags) -> fd_t;
 clock_adjtime:(int TODO_PROTOTYPE) -> errno_t;
 [cp] syncfs:(fd_t fd) -> errno_t;
+/* TODO: `struct mmsghdr' needs a 32/64-variant */
 [restart(dont)][cp] sendmmsg:(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags) -> ssize_t;
 setns:(fd_t fd, syscall_ulong_t nstype) -> errno_t;
 process_vm_readv:(pid_t pid, struct iovec const *lvec, size_t liovcnt, struct iovec const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
+process_vm_readv32:(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
+process_vm_readv64:(pid_t pid, struct iovec64 const *lvec, size_t liovcnt, struct iovec64 const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
 process_vm_writev:(pid_t pid, struct iovec const *lvec, size_t liovcnt, struct iovec const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
+process_vm_writev32:(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
+process_vm_writev64:(pid_t pid, struct iovec64 const *lvec, size_t liovcnt, struct iovec64 const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
+
 kcmp:(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2) -> syscall_slong_t;
 finit_module:(int TODO_PROTOTYPE) -> errno_t;
 sched_setattr:(int TODO_PROTOTYPE) -> errno_t;
@@ -765,9 +1013,9 @@ getrandom:(int TODO_PROTOTYPE) -> errno_t;
 memfd_create:(int TODO_PROTOTYPE) -> errno_t;
 bpf:(int TODO_PROTOTYPE) -> errno_t;
 
-@@@param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW|AT_DOSPATH'
+@@@param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
 [cp] execveat:(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp,
-               [tostr(flagset(AT_EMPTY_PATH,AT_SYMLINK_NOFOLLOW,AT_DOSPATH))] atflag_t flags) -> errno_t;
+               [tostr(flagset(AT_EMPTY_PATH,AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
 
 socket:(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) -> fd_t;
 socketpair:(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t fds[2]) -> errno_t;
@@ -803,7 +1051,7 @@ sendto:(fd_t sockfd, void const *buf, size_t bufsize,
         [tostr(flagset(MSG_CONFIRM, MSG_DONTROUTE, MSG_DONTWAIT, MSG_EOR, MSG_MORE, MSG_NOSIGNAL, MSG_OOB))] syscall_ulong_t flags,
         struct sockaddr const *addr, socklen_t addr_len) -> ssize_t;
 
-[restart(dont)][cp]
+[restart(dont)][cp] /* TODO: `struct msghdr' needs a 32/64-variant */
 sendmsg:(fd_t sockfd, struct msghdr const *message,
          [tostr(flagset(MSG_CONFIRM, MSG_DONTROUTE, MSG_DONTWAIT, MSG_EOR, MSG_MORE, MSG_NOSIGNAL, MSG_OOB))] syscall_ulong_t flags) -> ssize_t;
 
@@ -816,7 +1064,7 @@ recvfrom:(fd_t sockfd, void *buf, size_t bufsize,
           [tostr(flagset(MSG_DONTWAIT, MSG_ERRQUEUE, MSG_OOB, MSG_PEEK, MSG_TRUNC, MSG_WAITALL))] syscall_ulong_t flags,
           struct sockaddr *addr, socklen_t *addr_len) -> ssize_t;
 
-[restart(dont)][cp]
+[restart(dont)][cp] /* TODO: `struct msghdr' needs a 32/64-variant */
 recvmsg:(fd_t sockfd, struct msghdr *message,
          [tostr(flagset(MSG_CMSG_CLOEXEC, MSG_CMSG_CLOFORK, MSG_DONTWAIT, MSG_ERRQUEUE, MSG_OOB, MSG_PEEK, MSG_TRUNC, MSG_WAITALL))] syscall_ulong_t flags) -> ssize_t;
 
@@ -849,7 +1097,6 @@ epoll_ctl_old:(fd_t epfd, [tostr(select(EPOLL_CTL_ADD, EPOLL_CTL_DEL, EPOLL_CTL_
 
 [cp] linux_fstatat:(fd_t dirfd, char const *filename, struct linux64_stat32 *statbuf, [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
 [cp] linux_newfstatat:(fd_t dirfd, char const *filename, struct linux64_stat32 *statbuf, [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
-
 
 [cp] hop:(fd_t fd, syscall_ulong_t command, void *arg) -> syscall_slong_t;
 [cp] hopf:(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) -> syscall_slong_t;
@@ -987,6 +1234,20 @@ rpc_schedule:(pid_t target,
 		RPC_SCHEDULE_FLAG_LOWPRIO))]
 		syscall_ulong_t flags,
 	uint8_t const *program, void **arguments) -> syscall_slong_t;
+[doc_alias(rpc_schedule)] rpc_schedule32:(pid_t target,
+	[tostr(flagset(RPC_SCHEDULE_SYNC:RPC_SCHEDULE_ASYNC,
+		RPC_SCHEDULE_FLAG_NONSYSCALL,RPC_SCHEDULE_FLAG_WAITFORSTART,RPC_SCHEDULE_FLAG_STATUSFUTEX,
+		RPC_SCHEDULE_FLAG_SYSRESTART,RPC_SCHEDULE_FLAG_NOSYSRESTART,RPC_SCHEDULE_FLAG_WAITSMPACK,
+		RPC_SCHEDULE_FLAG_DONTWAKE,RPC_SCHEDULE_FLAG_HIGHPRIO,RPC_SCHEDULE_FLAG_LOWPRIO))]
+		syscall_ulong_t flags,
+	uint8_t const *program, __HYBRID_PTR32(void) *arguments) -> syscall_slong_t;
+[doc_alias(rpc_schedule)] rpc_schedule64:(pid_t target,
+	[tostr(flagset(RPC_SCHEDULE_SYNC:RPC_SCHEDULE_ASYNC,
+		RPC_SCHEDULE_FLAG_NONSYSCALL,RPC_SCHEDULE_FLAG_WAITFORSTART,RPC_SCHEDULE_FLAG_STATUSFUTEX,
+		RPC_SCHEDULE_FLAG_SYSRESTART,RPC_SCHEDULE_FLAG_NOSYSRESTART,RPC_SCHEDULE_FLAG_WAITSMPACK,
+		RPC_SCHEDULE_FLAG_DONTWAKE,RPC_SCHEDULE_FLAG_HIGHPRIO,RPC_SCHEDULE_FLAG_LOWPRIO))]
+		syscall_ulong_t flags,
+	uint8_t const *program, __HYBRID_PTR64(void) *arguments) -> syscall_slong_t;
 
 [cp] sysctl:(syscall_ulong_t command, void *arg) -> syscall_slong_t;
 
@@ -1002,8 +1263,9 @@ openpty:(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, s
 @@@param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
 @@@return: 0 :        Success.
 @@@return: -1:EINVAL: The given MODE is invalid
-[restart(must)]
-set_exception_handler:(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) -> errno_t;
+[restart(must)] set_exception_handler:(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) -> errno_t;
+[doc_alias(set_exception_handler)][restart(must)] set_exception_handler32:(syscall_ulong_t mode, __except_handler32_t handler, void *handler_sp) -> errno_t;
+[doc_alias(set_exception_handler)][restart(must)] set_exception_handler64:(syscall_ulong_t mode, __except_handler64_t handler, void *handler_sp) -> errno_t;
 
 @@Get the current exception handler mode for the calling thread.
 @@@param: PMODE:       When non-NULL, store the current mode, which is encoded as:
@@ -1018,12 +1280,14 @@ set_exception_handler:(syscall_ulong_t mode, except_handler_t handler, void *han
 @@                     then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
 @@@return: 0 :         Success.
 @@@return: -1:EFAULT:  One of the given pointers is non-NULL and faulty
-[restart(must)]
-get_exception_handler:(syscall_ulong_t *pmode, except_handler_t *phandler, void **phandler_sp) -> errno_t;
+[restart(must)] get_exception_handler:(syscall_ulong_t *pmode, except_handler_t *phandler, void **phandler_sp) -> errno_t;
+[doc_alias(get_exception_handler)][restart(must)] get_exception_handler32:(__ULONG32_TYPE__ *pmode, __except_handler32_t *phandler, __HYBRID_PTR32(void) *phandler_sp) -> errno_t;
+[doc_alias(get_exception_handler)][restart(must)] get_exception_handler64:(__ULONG64_TYPE__ *pmode, __except_handler64_t *phandler, __HYBRID_PTR64(void) *phandler_sp) -> errno_t;
 
 @@Set per-vm meta-data for allowing the kernel to enumerate loaded code modules
-[restart(must)]
-set_library_listdef:(struct library_listdef const *listdef) -> errno_t;
+[restart(must)] set_library_listdef:(struct library_listdef const *listdef) -> errno_t;
+[restart(must)][doc_alias(set_library_listdef)] set_library_listdef32:(struct library_listdef32 const *listdef) -> errno_t;
+[restart(must)][doc_alias(set_library_listdef)] set_library_listdef64:(struct library_listdef64 const *listdef) -> errno_t;
 
 @@Trigger a debugger trap `trapno', optionally extended with `regs'
 @@at either the system call return location, or at the given `state'
@@ -1036,6 +1300,8 @@ set_library_listdef:(struct library_listdef const *listdef) -> errno_t;
 @@@return: -EOK:    `state' was NULL and the trap returned successfully
 @@@return: -ENOENT: No debugger is connected to the calling process/process-group/system
 debugtrap:(struct ucpustate const *state, struct debugtrap_reason const *reason) -> errno_t;
+[doc_alias(debugtrap)] debugtrap32:(struct ucpustate32 const *state, struct debugtrap_reason32 const *reason) -> errno_t;
+[doc_alias(debugtrap)] debugtrap64:(struct ucpustate64 const *state, struct debugtrap_reason64 const *reason) -> errno_t;
 
 @@>> lfutex(2)
 @@Provide the bottom-most API for implementing user-space synchronization on KOS
@@ -1062,6 +1328,12 @@ debugtrap:(struct ucpustate const *state, struct debugtrap_reason const *reason)
 [restart(dont)][cp]
 lfutex:(uintptr_t *uaddr, syscall_ulong_t futex_op, uintptr_t val,
         struct __timespec64 const *timeout, uintptr_t val2) -> syscall_slong_t;
+[restart(dont)][cp][doc_alias(lfutex)]
+lfutex32:(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val,
+          struct __timespecx32_64 const *timeout, uint32_t val2) -> syscall_slong_t;
+[restart(dont)][cp][doc_alias(lfutex)]
+lfutex64:(uint64_t *uaddr, syscall_ulong_t futex_op, uint64_t val,
+          struct __timespecx64 const *timeout, uint64_t val2) -> syscall_slong_t;
 
 @@>> lfutexexpr(2)
 @@The lfutexexpr() system call can be used to specify arbitrarily complex
@@ -1093,6 +1365,12 @@ lfutex:(uintptr_t *uaddr, syscall_ulong_t futex_op, uintptr_t val,
 [restart(dont)][cp]
 lfutexexpr:(void *base, size_t exprc, struct lfutexexpr const *exprv,
             struct __timespec64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexexpr)]
+lfutexexpr32:(void *base, size_t exprc, struct lfutexexpr32 const *exprv,
+              struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexexpr)]
+lfutexexpr64:(void *base, size_t exprc, struct lfutexexpr64 const *exprv,
+              struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
 
 
 @@>> lfutexlockexpr(2)
@@ -1125,6 +1403,12 @@ lfutexexpr:(void *base, size_t exprc, struct lfutexexpr const *exprv,
 [restart(dont)][cp]
 lfutexlockexpr:(uintptr_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr const *exprv,
                 struct __timespec64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexlockexpr)]
+lfutexlockexpr32:(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr32 const *exprv,
+                  struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexlockexpr)]
+lfutexlockexpr64:(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr64 const *exprv,
+                  struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
 
 @@Create and return a new tty terminal controller connected to the given keyboard and display
 @@The newly created device automatically gets assigned an arbitrary device number, before
@@ -1140,9 +1424,9 @@ mktty:(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) -> f
 @@               return to the text location described by it.
 @@TODO: Add a flags argument to control if the current signal mask
 @@      should be ignored (currently, it's always being ignored)
-[restart(must)]
-raiseat:(struct ucpustate const *state,
-         struct __siginfo_struct const *si) -> errno_t;
+[restart(must)] raiseat:(struct ucpustate const *state, struct __siginfo_struct const *si) -> errno_t;
+[doc_alias(raiseat)][restart(must)] raiseat32:(struct ucpustate32 const *state, struct __siginfo32_struct const *si) -> errno_t;
+[doc_alias(raiseat)][restart(must)] raiseat64:(struct ucpustate64 const *state, struct __siginfo64_struct const *si) -> errno_t;
 
 @@Trigger a coredump of the calling process.
 @@@param: curr_state:       The state as is still valid after any possible unwinding has already been done
@@ -1170,8 +1454,16 @@ raiseat:(struct ucpustate const *state,
 @@                          was never actually performed, and `exception' is actually a `siginfo_t *'
 [restart(must)]
 coredump:(struct ucpustate const *curr_state, struct ucpustate const *orig_state,
-          void const *const *traceback_vector, size_t traceback_length,
+          void *const *traceback_vector, size_t traceback_length,
           struct exception_data const *exception, syscall_ulong_t unwind_error) -> errno_t;
+[doc_alias(coredump)][restart(must)]
+coredump32:(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state,
+            __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length,
+            struct exception_data32 const *exception, syscall_ulong_t unwind_error) -> errno_t;
+[doc_alias(coredump)][restart(must)]
+coredump64:(struct ucpustate64 const *curr_state, struct ucpustate64 const *orig_state,
+            __HYBRID_PTR64(void) const *traceback_vector, size_t traceback_length,
+            struct exception_data64 const *exception, syscall_ulong_t unwind_error) -> errno_t;
 
 
 /* Generic system call numbers */

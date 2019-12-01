@@ -34,7 +34,7 @@
 #endif /* __ASSEMBLER__ */
 
 #ifdef __x86_64__
-#include <asm/syscalls32.inl>
+#include <asm/syscalls32_d.h>
 #endif /* __x86_64__ */
 
 #define ATTR_SECTION_SYSCALL(name)   ATTR_SECTION(".text.x86.syscall." #name)
@@ -93,47 +93,6 @@
  *
  */
 
-
-#ifdef CONFIG_BUILDING_KERNEL_CORE
-/* Mangled names for assembly wrappers for a given
- * system call, when invoked via the specified mechanism.
- * Any possible combination of these is pre-defined as a
- * weak-internal wrapper that calls the associated `sys_##name'
- * function whilst passing the correct number and combination
- * of arguments, before correctly propagating the system call's
- * return value back into user-space.
- * NOTE: These macros are mainly provided since some system calls
- *       are better implemented in assembly, such as sched_yield
- *       being implemented such that the task's scpustate will
- *       already point back into user-space, as well as other
- *       system calls such as `sigreturn', which don't even have
- *       any real prototype.
- * NOTE: In x86_64, the 386 symbols refer to the symbols that are
- *       called by a process in 32-bit compatibility-mode.
- * For the default implementations, see:
- *  - /src/kernel/core/arch/i386/syscall/wrappers32.S
- *  - /src/kernel/core/arch/i386/syscall/wrappers64.S
- * Register state upon entry:
- *     X86_ASMSYSCALL32_INT80:
- *         i386:    Unchanged (all registers are the same)
- *         x86_64:  Unchanged (all registers are the same) (NOTE: Compatibility-mode)
- *     X86_ASMSYSCALL32_SYSENTER:
- *         i386:    - %esp has been loaded
- *                  - A user-space IRET tail was pushed and created
- *         x86_64:  TODO: Not yet decided
- *     X86_ASMSYSCALL64:
- *         x86_64:  TODO: Not yet decided
- * HINT: The low-level interrupt/entry handlers
- *       for system calls are implemented in:
- *        - /src/kernel/core/arch/i386/syscall/syscall32.S
- *        - /src/kernel/core/arch/i386/syscall/syscall64.S
- */
-#define X86_ASMSYSCALL32_INT80(name)         __asm32_int80_##name     /* Section: .text.x86.asm32_syscall_int80.<name> */
-#define X86_ASMSYSCALL32_SYSENTER(name)      __asm32_sysenter_##name  /* Section: .text.x86.asm32_syscall_sysenter.<name> */
-#ifdef __x86_64__
-#define X86_ASMSYSCALL64(name)               __asm64_syscall_##name   /* Section: .text.x86.asm64_syscall.<name> */
-#endif /* __x86_64__ */
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 
 #ifdef __CC__

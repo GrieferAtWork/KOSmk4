@@ -23,6 +23,8 @@
 
 #include <hybrid/typecore.h>
 
+#include <bits/iovec-struct.h>
+
 __SYSDECL_BEGIN
 
 #ifndef UIO_MAXIOV
@@ -34,14 +36,6 @@ __SYSDECL_BEGIN
 #define __size_t_defined 1
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
-
-#ifndef __iovec_defined
-#define __iovec_defined 1
-struct iovec {
-	void  *iov_base; /* Pointer to data. */
-	size_t iov_len;  /* Length of data. */
-};
-#endif /* !__iovec_defined */
 #endif /* __CC__ */
 
 __SYSDECL_END

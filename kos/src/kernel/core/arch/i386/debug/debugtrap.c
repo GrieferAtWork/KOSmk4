@@ -429,8 +429,8 @@ DEFINE_SYSCALL2(errno_t, debugtrap,
 
 #ifdef __x86_64__
 DEFINE_SYSCALL32_2(errno_t, debugtrap,
-                   USER UNCHECKED struct ucpustate const *, state,
-                   USER UNCHECKED struct debugtrap_reason const *, reason) {
+                   USER UNCHECKED struct ucpustate32 const *, state,
+                   USER UNCHECKED struct debugtrap_reason32 const *, reason) {
 	(void)state;
 	(void)reason;
 	if (kernel_debugtrap_enabled()) {

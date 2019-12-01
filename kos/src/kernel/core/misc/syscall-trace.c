@@ -59,17 +59,17 @@
 
 #ifdef __ARCH_HAVE_COMPAT
 #if __ARCH_COMPAT_SIZEOF_POINTER == 4
-#include <asm/syscalls32.inl>
+#include <asm/syscalls32_d.h>
 #include <sys/syscall-trace32.h>
 #define COMPAT_NR(x)       __NR32##x
 #define COMPAT_SYSCALL(x)  SYSCALL32_##x
-#define COMPAT_LS_SYSCALLS <asm/ls_syscalls32.inl>
+#define COMPAT_LS_SYSCALLS <asm/ls-syscalls32.h>
 #else /* __ARCH_COMPAT_SIZEOF_POINTER == 4 */
-#include <asm/syscalls64.inl>
+#include <asm/syscalls64_d.h>
 #include <sys/syscall-trace64.h>
 #define COMPAT_NR(x)       __NR64##x
 #define COMPAT_SYSCALL(x)  SYSCALL64_##x
-#define COMPAT_LS_SYSCALLS <asm/ls_syscalls64.inl>
+#define COMPAT_LS_SYSCALLS <asm/ls-syscalls64.h>
 #endif /* __ARCH_COMPAT_SIZEOF_POINTER != 4 */
 #endif /* __ARCH_HAVE_COMPAT */
 

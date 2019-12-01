@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d25571 */
+/* HASH CRC-32:0x8f42ea03 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,21 @@
 #include <__stdinc.h>
 #include <kos/asm/syscall.h>
 
-#include <bits/timespec.h>
+#include <bits/iovec-struct64.h>
+#include <bits/itimerspec64.h>
+#include <bits/siginfo-struct64.h>
+#include <bits/timespec32.h>
+#include <bits/timespec64.h>
+#include <bits/timeval64.h>
 #include <bits/types.h>
-#include <kos/bits/except-handler.h>
+#include <hybrid/__pointer.h>
+#include <hybrid/typecore.h>
+#include <kos/bits/debugtrap64.h>
+#include <kos/bits/except-handler64.h>
+#include <kos/bits/exception_data64.h>
+#include <kos/bits/futex-expr64.h>
+#include <kos/bits/library-listdef64.h>
+#include <kos/kernel/cpu-state64.h>
 
 
 #ifndef __CDECLARE_SC
@@ -53,26 +65,37 @@
 __SYSDECL_BEGIN
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("stat")
 #pragma push_macro("dirent")
+#pragma push_macro("stat")
+#pragma push_macro("timezone")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef stat
 #undef dirent
+#undef stat
+#undef timezone
 
-struct __siginfo_struct;
-struct __timespec64;
-struct debugtrap_reason;
+struct __fd_set_struct;
+struct __itimerspecx64;
+struct __siginfo64_struct;
+struct __sigset_struct;
+struct __timespecx32_64;
+struct __timespecx64;
+struct __timevalx64;
+struct debugtrap_reason64;
 struct dirent;
 struct epoll_event;
-struct exception_data;
-struct iovec;
-struct lfutexexpr;
-struct library_listdef;
+struct exception_data64;
+struct iovec64;
+struct lfutexexpr64;
+struct library_listdef64;
 struct linux64_stat32;
 struct linux_stat64;
+struct mmsghdr;
+struct pollfd;
+struct rusage;
 struct stat;
 struct termios;
-struct ucpustate;
+struct timezone;
+struct ucpustate64;
 struct winsize;
 
 #if __CRT_HAVE_SC(accept)
@@ -87,6 +110,18 @@ __CDECLARE_SC(,__errno_t,arch_prctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #if __CRT_HAVE_SC(chown)
 __CDECLARE_SC(,__errno_t,chown,(char const *__filename, __uid_t __owner, __gid_t __group),(__filename,__owner,__group))
 #endif /* __CRT_HAVE_SC(chown) */
+#if __CRT_HAVE_SC(clock_getres)
+__CDECLARE_SC(,__errno_t,clock_getres,(__clockid_t __clock_id, struct __timespecx64 *__res),(__clock_id,__res))
+#endif /* __CRT_HAVE_SC(clock_getres) */
+#if __CRT_HAVE_SC(clock_gettime)
+__CDECLARE_SC(,__errno_t,clock_gettime,(__clockid_t __clock_id, struct __timespecx64 *__tp),(__clock_id,__tp))
+#endif /* __CRT_HAVE_SC(clock_gettime) */
+#if __CRT_HAVE_SC(clock_nanosleep)
+__CDECLARE_SC(,__errno_t,clock_nanosleep,(__clockid_t __clock_id, __syscall_ulong_t __flags, struct __timespecx64 const *__requested_time, struct __timespecx64 *__remaining),(__clock_id,__flags,__requested_time,__remaining))
+#endif /* __CRT_HAVE_SC(clock_nanosleep) */
+#if __CRT_HAVE_SC(clock_settime)
+__CDECLARE_SC(,__errno_t,clock_settime,(__clockid_t __clock_id, struct __timespecx64 const *__tp),(__clock_id,__tp))
+#endif /* __CRT_HAVE_SC(clock_settime) */
 #if __CRT_HAVE_SC(clone)
 __CDECLARE_SC(,__pid_t,clone,(__syscall_ulong_t __flags, void *__child_stack, __pid_t *__ptid, __pid_t *__ctid, __uintptr_t __newtls),(__flags,__child_stack,__ptid,__ctid,__newtls))
 #endif /* __CRT_HAVE_SC(clone) */
@@ -115,7 +150,7 @@ __CDECLARE_SC(,__pid_t,clone,(__syscall_ulong_t __flags, void *__child_stack, __
  *                           allowing coredumps to also be triggerred for unhandled signals.
  * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_NOTHROW' if unwinding
  *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
-__CDECLARE_SC(,__errno_t,coredump,(struct ucpustate const *__curr_state, struct ucpustate const *__orig_state, void const *const *__traceback_vector, __size_t __traceback_length, struct exception_data const *__exception, __syscall_ulong_t __unwind_error),(__curr_state,__orig_state,__traceback_vector,__traceback_length,__exception,__unwind_error))
+__CDECLARE_SC(,__errno_t,coredump,(struct ucpustate64 const *__curr_state, struct ucpustate64 const *__orig_state, __HYBRID_PTR64(void) const *__traceback_vector, __size_t __traceback_length, struct exception_data64 const *__exception, __syscall_ulong_t __unwind_error),(__curr_state,__orig_state,__traceback_vector,__traceback_length,__exception,__unwind_error))
 #endif /* __CRT_HAVE_SC(coredump) */
 #if __CRT_HAVE_SC(create_module)
 __CDECLARE_SC(,__errno_t,create_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -131,7 +166,7 @@ __CDECLARE_SC(,__errno_t,create_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE)
  * @param: state:    When non-NULL, the CPU state where the trap should return to by default
  * @return: -EOK:    `state' was NULL and the trap returned successfully
  * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
-__CDECLARE_SC(,__errno_t,debugtrap,(struct ucpustate const *__state, struct debugtrap_reason const *__reason),(__state,__reason))
+__CDECLARE_SC(,__errno_t,debugtrap,(struct ucpustate64 const *__state, struct debugtrap_reason64 const *__reason),(__state,__reason))
 #endif /* __CRT_HAVE_SC(debugtrap) */
 #if __CRT_HAVE_SC(detach)
 /* >> detach(2)
@@ -246,7 +281,7 @@ __CDECLARE_SC(,__errno_t,fmkdirat,(__fd_t __dirfd, char const *__pathname, __mod
 __CDECLARE_SC(,__errno_t,fmknodat,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev, __atflag_t __flags),(__dirfd,__nodename,__mode,__dev,__flags))
 #endif /* __CRT_HAVE_SC(fmknodat) */
 #if __CRT_HAVE_SC(freadlinkat)
-/* @param: flags: Set of `0 | AT_READLINK_REQSIZE|AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
 __CDECLARE_SC(,__ssize_t,freadlinkat,(__fd_t __dirfd, char const *__path, char *__buf, __size_t __buflen, __atflag_t __flags),(__dirfd,__path,__buf,__buflen,__flags))
 #endif /* __CRT_HAVE_SC(freadlinkat) */
 #if __CRT_HAVE_SC(frealpath4)
@@ -276,6 +311,12 @@ __CDECLARE_SC(,__uint64_t,fsmode,(__uint64_t __mode),(__mode))
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,fsymlinkat,(char const *__link_text, __fd_t __tofd, char const *__target_path, __atflag_t __flags),(__link_text,__tofd,__target_path,__flags))
 #endif /* __CRT_HAVE_SC(fsymlinkat) */
+#if __CRT_HAVE_SC(futex)
+__CDECLARE_SC(,__syscall_slong_t,futex,(__uint32_t *__uaddr, __syscall_ulong_t __futex_op, __uint32_t __val, struct __timespecx64 const *__timeout_or_val2, __uint32_t *__uaddr2, __uint32_t __val3),(__uaddr,__futex_op,__val,__timeout_or_val2,__uaddr2,__val3))
+#endif /* __CRT_HAVE_SC(futex) */
+#if __CRT_HAVE_SC(futimesat)
+__CDECLARE_SC(,__errno_t,futimesat,(__fd_t __dirfd, __const char *__filename, struct __timevalx64 const *__times),(__dirfd,__filename,__times))
+#endif /* __CRT_HAVE_SC(futimesat) */
 #if __CRT_HAVE_SC(get_exception_handler)
 /* Get the current exception handler mode for the calling thread.
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
@@ -290,7 +331,7 @@ __CDECLARE_SC(,__errno_t,fsymlinkat,(char const *__link_text, __fd_t __tofd, cha
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
  * @return: 0 :         Success.
  * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
-__CDECLARE_SC(,__errno_t,get_exception_handler,(__syscall_ulong_t *__pmode, __except_handler_t *__phandler, void **__phandler_sp),(__pmode,__phandler,__phandler_sp))
+__CDECLARE_SC(,__errno_t,get_exception_handler,(__ULONG64_TYPE__ *__pmode, __except_handler64_t *__phandler, __HYBRID_PTR64(void) *__phandler_sp),(__pmode,__phandler,__phandler_sp))
 #endif /* __CRT_HAVE_SC(get_exception_handler) */
 #if __CRT_HAVE_SC(get_kernel_syms)
 __CDECLARE_SC(,__errno_t,get_kernel_syms,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -300,16 +341,16 @@ __CDECLARE_SC(,__errno_t,get_thread_area,(int __TODO_PROTOTYPE),(__TODO_PROTOTYP
 #endif /* __CRT_HAVE_SC(get_thread_area) */
 #if __CRT_HAVE_SC(getdrives)
 /* Returns a bitset of all of the currently mounted dos-drives */
-__CDECLARE_SC(,__syscall_slong_t,getdrives,(),())
+__CDECLARE_SC(,__syscall_slong_t,getdrives,(void),())
 #endif /* __CRT_HAVE_SC(getdrives) */
 #if __CRT_HAVE_SC(getegid)
-__CDECLARE_SC(,__gid_t,getegid,(),())
+__CDECLARE_SC(,__gid_t,getegid,(void),())
 #endif /* __CRT_HAVE_SC(getegid) */
 #if __CRT_HAVE_SC(geteuid)
-__CDECLARE_SC(,__uid_t,geteuid,(),())
+__CDECLARE_SC(,__uid_t,geteuid,(void),())
 #endif /* __CRT_HAVE_SC(geteuid) */
 #if __CRT_HAVE_SC(getgid)
-__CDECLARE_SC(,__gid_t,getgid,(),())
+__CDECLARE_SC(,__gid_t,getgid,(void),())
 #endif /* __CRT_HAVE_SC(getgid) */
 #if __CRT_HAVE_SC(getgroups)
 __CDECLARE_SC(,__errno_t,getgroups,(__size_t __size, __gid_t *__list),(__size,__list))
@@ -323,8 +364,11 @@ __CDECLARE_SC(,__errno_t,getresgid,(__gid_t *__rgid, __gid_t *__egid, __gid_t *_
 #if __CRT_HAVE_SC(getresuid)
 __CDECLARE_SC(,__errno_t,getresuid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *__suid),(__ruid,__euid,__suid))
 #endif /* __CRT_HAVE_SC(getresuid) */
+#if __CRT_HAVE_SC(gettimeofday)
+__CDECLARE_SC(,__errno_t,gettimeofday,(struct __timevalx64 *__tv, struct timezone *__tz),(__tv,__tz))
+#endif /* __CRT_HAVE_SC(gettimeofday) */
 #if __CRT_HAVE_SC(getuid)
-__CDECLARE_SC(,__uid_t,getuid,(),())
+__CDECLARE_SC(,__uid_t,getuid,(void),())
 #endif /* __CRT_HAVE_SC(getuid) */
 #if __CRT_HAVE_SC(hop)
 __CDECLARE_SC(,__syscall_slong_t,hop,(__fd_t __fd, __syscall_ulong_t __command, void *__arg),(__fd,__command,__arg))
@@ -348,7 +392,7 @@ __CDECLARE_SC(,__errno_t,kexec_file_load,(int __TODO_PROTOTYPE),(__TODO_PROTOTYP
 __CDECLARE_SC(,__errno_t,kfstat,(__fd_t __fd, struct stat *__statbuf),(__fd,__statbuf))
 #endif /* __CRT_HAVE_SC(kfstat) */
 #if __CRT_HAVE_SC(kfstatat)
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,kfstatat,(__fd_t __dirfd, char const *__filename, struct stat *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
 #endif /* __CRT_HAVE_SC(kfstatat) */
 #if __CRT_HAVE_SC(klstat)
@@ -389,7 +433,7 @@ __CDECLARE_SC(,__errno_t,lchown,(char const *__filename, __uid_t __owner, __gid_
  * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
  * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
  * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
-__CDECLARE_SC(,__syscall_slong_t,lfutex,(__uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val, struct __timespec64 const *__timeout, __uintptr_t __val2),(__uaddr,__futex_op,__val,__timeout,__val2))
+__CDECLARE_SC(,__syscall_slong_t,lfutex,(__uint64_t *__uaddr, __syscall_ulong_t __futex_op, __uint64_t __val, struct __timespecx64 const *__timeout, __uint64_t __val2),(__uaddr,__futex_op,__val,__timeout,__val2))
 #endif /* __CRT_HAVE_SC(lfutex) */
 #if __CRT_HAVE_SC(lfutexexpr)
 /* >> lfutexexpr(2)
@@ -419,7 +463,7 @@ __CDECLARE_SC(,__syscall_slong_t,lfutex,(__uintptr_t *__uaddr, __syscall_ulong_t
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CDECLARE_SC(,__errno_t,lfutexexpr,(void *__base, __size_t __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, __syscall_ulong_t __timeout_flags),(__base,__exprc,__exprv,__timeout,__timeout_flags))
+__CDECLARE_SC(,__errno_t,lfutexexpr,(void *__base, __size_t __exprc, struct lfutexexpr64 const *__exprv, struct __timespecx64 const *__timeout, __syscall_ulong_t __timeout_flags),(__base,__exprc,__exprv,__timeout,__timeout_flags))
 #endif /* __CRT_HAVE_SC(lfutexexpr) */
 #if __CRT_HAVE_SC(lfutexlockexpr)
 /* >> lfutexlockexpr(2)
@@ -449,7 +493,7 @@ __CDECLARE_SC(,__errno_t,lfutexexpr,(void *__base, __size_t __exprc, struct lfut
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CDECLARE_SC(,__errno_t,lfutexlockexpr,(__uintptr_t *__ulockaddr, void *__base, __size_t __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, __syscall_ulong_t __timeout_flags),(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+__CDECLARE_SC(,__errno_t,lfutexlockexpr,(__uint64_t *__ulockaddr, void *__base, __size_t __exprc, struct lfutexexpr64 const *__exprv, struct __timespecx32_64 const *__timeout, __syscall_ulong_t __timeout_flags),(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
 #endif /* __CRT_HAVE_SC(lfutexlockexpr) */
 #if __CRT_HAVE_SC(linux_fstat64)
 __CDECLARE_SC(,__errno_t,linux_fstat64,(__fd_t __fd, struct linux_stat64 *__statbuf),(__fd,__statbuf))
@@ -509,24 +553,45 @@ __CDECLARE_SC(,__errno_t,msgrcv,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #if __CRT_HAVE_SC(msgsnd)
 __CDECLARE_SC(,__errno_t,msgsnd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(msgsnd) */
+#if __CRT_HAVE_SC(nanosleep)
+__CDECLARE_SC(,__errno_t,nanosleep,(struct __timespecx64 const *__req, struct __timespecx64 *__rem),(__req,__rem))
+#endif /* __CRT_HAVE_SC(nanosleep) */
 #if __CRT_HAVE_SC(openpty)
 /* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
 __CDECLARE_SC(,__errno_t,openpty,(__fd_t *__amaster, __fd_t *__aslave, char *__name, struct termios const *__termp, struct winsize const *__winp),(__amaster,__aslave,__name,__termp,__winp))
 #endif /* __CRT_HAVE_SC(openpty) */
+#if __CRT_HAVE_SC(ppoll)
+__CDECLARE_SC(,__ssize_t,ppoll,(struct pollfd *__fds, __size_t __nfds, struct __timespecx64 const *__timeout_ts, struct __sigset_struct const *__sigmask, __size_t __sigsetsize),(__fds,__nfds,__timeout_ts,__sigmask,__sigsetsize))
+#endif /* __CRT_HAVE_SC(ppoll) */
 #if __CRT_HAVE_SC(pread64f)
 __CDECLARE_SC(,__ssize_t,pread64f,(__fd_t __fd, void *__buf, __size_t __bufsize, __uint64_t __offset, __iomode_t __mode),(__fd,__buf,__bufsize,__offset,__mode))
 #endif /* __CRT_HAVE_SC(pread64f) */
+#if __CRT_HAVE_SC(preadv)
+__CDECLARE_SC(,__ssize_t,preadv,(__fd_t __fd, struct iovec64 const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
+#endif /* __CRT_HAVE_SC(preadv) */
 #if __CRT_HAVE_SC(preadvf)
-__CDECLARE_SC(,__ssize_t,preadvf,(__fd_t __fd, struct iovec const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
+__CDECLARE_SC(,__ssize_t,preadvf,(__fd_t __fd, struct iovec64 const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
 #endif /* __CRT_HAVE_SC(preadvf) */
+#if __CRT_HAVE_SC(process_vm_readv)
+__CDECLARE_SC(,__ssize_t,process_vm_readv,(__pid_t __pid, struct iovec64 const *__lvec, __size_t __liovcnt, struct iovec64 const *__rvec, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__lvec,__liovcnt,__rvec,__riovcnt,__flags))
+#endif /* __CRT_HAVE_SC(process_vm_readv) */
+#if __CRT_HAVE_SC(process_vm_writev)
+__CDECLARE_SC(,__ssize_t,process_vm_writev,(__pid_t __pid, struct iovec64 const *__lvec, __size_t __liovcnt, struct iovec64 const *__rvec, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__lvec,__liovcnt,__rvec,__riovcnt,__flags))
+#endif /* __CRT_HAVE_SC(process_vm_writev) */
+#if __CRT_HAVE_SC(pselect6)
+__CDECLARE_SC(,__ssize_t,pselect6,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx64 const *__timeout, void const *__sigmask_sigset_and_len),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_and_len))
+#endif /* __CRT_HAVE_SC(pselect6) */
 #if __CRT_HAVE_SC(putpmsg)
 __CDECLARE_SC(,__errno_t,putpmsg,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(putpmsg) */
 #if __CRT_HAVE_SC(pwrite64f)
 __CDECLARE_SC(,__ssize_t,pwrite64f,(__fd_t __fd, void const *__buf, __size_t __bufsize, __uint64_t __offset, __iomode_t __mode),(__fd,__buf,__bufsize,__offset,__mode))
 #endif /* __CRT_HAVE_SC(pwrite64f) */
+#if __CRT_HAVE_SC(pwritev)
+__CDECLARE_SC(,__ssize_t,pwritev,(__fd_t __fd, struct iovec64 const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
+#endif /* __CRT_HAVE_SC(pwritev) */
 #if __CRT_HAVE_SC(pwritevf)
-__CDECLARE_SC(,__ssize_t,pwritevf,(__fd_t __fd, struct iovec const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
+__CDECLARE_SC(,__ssize_t,pwritevf,(__fd_t __fd, struct iovec64 const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
 #endif /* __CRT_HAVE_SC(pwritevf) */
 #if __CRT_HAVE_SC(query_module)
 __CDECLARE_SC(,__errno_t,query_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -540,14 +605,20 @@ __CDECLARE_SC(,__errno_t,query_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  *                return to the text location described by it.
  * TODO: Add a flags argument to control if the current signal mask
  *       should be ignored (currently, it's always being ignored) */
-__CDECLARE_SC(,__errno_t,raiseat,(struct ucpustate const *__state, struct __siginfo_struct const *__si),(__state,__si))
+__CDECLARE_SC(,__errno_t,raiseat,(struct ucpustate64 const *__state, struct __siginfo64_struct const *__si),(__state,__si))
 #endif /* __CRT_HAVE_SC(raiseat) */
 #if __CRT_HAVE_SC(readf)
 __CDECLARE_SC(,__ssize_t,readf,(__fd_t __fd, void *__buf, __size_t __bufsize, __iomode_t __mode),(__fd,__buf,__bufsize,__mode))
 #endif /* __CRT_HAVE_SC(readf) */
+#if __CRT_HAVE_SC(readv)
+__CDECLARE_SC(,__ssize_t,readv,(__fd_t __fd, struct iovec64 const *__iovec, __size_t __count),(__fd,__iovec,__count))
+#endif /* __CRT_HAVE_SC(readv) */
 #if __CRT_HAVE_SC(readvf)
-__CDECLARE_SC(,__ssize_t,readvf,(__fd_t __fd, struct iovec const *__iovec, __size_t __count, __iomode_t __mode),(__fd,__iovec,__count,__mode))
+__CDECLARE_SC(,__ssize_t,readvf,(__fd_t __fd, struct iovec64 const *__iovec, __size_t __count, __iomode_t __mode),(__fd,__iovec,__count,__mode))
 #endif /* __CRT_HAVE_SC(readvf) */
+#if __CRT_HAVE_SC(recvmmsg)
+__CDECLARE_SC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __flags, struct __timespecx64 *__tmo),(__sockfd,__vmessages,__vlen,__flags,__tmo))
+#endif /* __CRT_HAVE_SC(recvmmsg) */
 #if __CRT_HAVE_SC(rpc_schedule)
 /* Schedule an RPC for execution on the specified `target' thread.
  * @param: target:    The targeted thread.
@@ -559,14 +630,31 @@ __CDECLARE_SC(,__ssize_t,readvf,(__fd_t __fd, struct iovec const *__iovec, __siz
  * @return: -1: Error (s.a. `errno')
  * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
  * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
-__CDECLARE_SC(,__syscall_slong_t,rpc_schedule,(__pid_t __target, __syscall_ulong_t __flags, __uint8_t const *__program, void **__arguments),(__target,__flags,__program,__arguments))
+__CDECLARE_SC(,__syscall_slong_t,rpc_schedule,(__pid_t __target, __syscall_ulong_t __flags, __uint8_t const *__program, __HYBRID_PTR64(void) *__arguments),(__target,__flags,__program,__arguments))
 #endif /* __CRT_HAVE_SC(rpc_schedule) */
 #if __CRT_HAVE_SC(rpc_service)
-__CDECLARE_SC(,__syscall_slong_t,rpc_service,(),())
+__CDECLARE_SC(,__syscall_slong_t,rpc_service,(void),())
 #endif /* __CRT_HAVE_SC(rpc_service) */
+#if __CRT_HAVE_SC(rt_sigqueueinfo)
+/* @param: signo: One of `SIG*' */
+__CDECLARE_SC(,__errno_t,rt_sigqueueinfo,(__pid_t __tgid, __syscall_ulong_t __signo, struct __siginfo64_struct const *__uinfo),(__tgid,__signo,__uinfo))
+#endif /* __CRT_HAVE_SC(rt_sigqueueinfo) */
+#if __CRT_HAVE_SC(rt_sigtimedwait)
+__CDECLARE_SC(,__syscall_slong_t,rt_sigtimedwait,(struct __sigset_struct const *__set, struct __siginfo64_struct *__info, struct __timespecx64 const *__timeout, __size_t __sigsetsize),(__set,__info,__timeout,__sigsetsize))
+#endif /* __CRT_HAVE_SC(rt_sigtimedwait) */
+#if __CRT_HAVE_SC(rt_tgsigqueueinfo)
+/* @param: signo: One of `SIG*' */
+__CDECLARE_SC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __syscall_ulong_t __signo, struct __siginfo64_struct const *__uinfo),(__tgid,__tid,__signo,__uinfo))
+#endif /* __CRT_HAVE_SC(rt_tgsigqueueinfo) */
+#if __CRT_HAVE_SC(sched_rr_get_interval)
+__CDECLARE_SC(,__errno_t,sched_rr_get_interval,(__pid_t __pid, struct __timespecx64 *__tms),(__pid,__tms))
+#endif /* __CRT_HAVE_SC(sched_rr_get_interval) */
 #if __CRT_HAVE_SC(security)
 __CDECLARE_SC(,__errno_t,security,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(security) */
+#if __CRT_HAVE_SC(select)
+__CDECLARE_SC(,__ssize_t,select,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timevalx64 *__timeout),(__nfds,__readfds,__writefds,__exceptfds,__timeout))
+#endif /* __CRT_HAVE_SC(select) */
 #if __CRT_HAVE_SC(semctl)
 __CDECLARE_SC(,__errno_t,semctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(semctl) */
@@ -589,11 +677,11 @@ __CDECLARE_SC(,__errno_t,semtimedop,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-__CDECLARE_SC(,__errno_t,set_exception_handler,(__syscall_ulong_t __mode, __except_handler_t __handler, void *__handler_sp),(__mode,__handler,__handler_sp))
+__CDECLARE_SC(,__errno_t,set_exception_handler,(__syscall_ulong_t __mode, __except_handler64_t __handler, void *__handler_sp),(__mode,__handler,__handler_sp))
 #endif /* __CRT_HAVE_SC(set_exception_handler) */
 #if __CRT_HAVE_SC(set_library_listdef)
 /* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-__CDECLARE_SC(,__errno_t,set_library_listdef,(struct library_listdef const *__listdef),(__listdef))
+__CDECLARE_SC(,__errno_t,set_library_listdef,(struct library_listdef64 const *__listdef),(__listdef))
 #endif /* __CRT_HAVE_SC(set_library_listdef) */
 #if __CRT_HAVE_SC(set_thread_area)
 __CDECLARE_SC(,__errno_t,set_thread_area,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -622,6 +710,9 @@ __CDECLARE_SC(,__errno_t,setresuid,(__uid_t __ruid, __uid_t __euid, __uid_t __su
 #if __CRT_HAVE_SC(setreuid)
 __CDECLARE_SC(,__errno_t,setreuid,(__uid_t __ruid, __uid_t __euid),(__ruid,__euid))
 #endif /* __CRT_HAVE_SC(setreuid) */
+#if __CRT_HAVE_SC(settimeofday)
+__CDECLARE_SC(,__errno_t,settimeofday,(struct __timevalx64 const *__tv, struct timezone const *__tz),(__tv,__tz))
+#endif /* __CRT_HAVE_SC(settimeofday) */
 #if __CRT_HAVE_SC(setuid)
 __CDECLARE_SC(,__errno_t,setuid,(__uid_t __uid),(__uid))
 #endif /* __CRT_HAVE_SC(setuid) */
@@ -643,17 +734,50 @@ __CDECLARE_SC(,__syscall_slong_t,sysctl,(__syscall_ulong_t __command, void *__ar
 #if __CRT_HAVE_SC(sysfs)
 __CDECLARE_SC(,__errno_t,sysfs,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(sysfs) */
+#if __CRT_HAVE_SC(timer_gettime)
+__CDECLARE_SC(,__errno_t,timer_gettime,(__timer_t __timerid, struct __itimerspecx64 *__value),(__timerid,__value))
+#endif /* __CRT_HAVE_SC(timer_gettime) */
+#if __CRT_HAVE_SC(timer_settime)
+__CDECLARE_SC(,__errno_t,timer_settime,(__timer_t __timerid, __syscall_ulong_t __flags, struct __itimerspecx64 const *__value, struct __itimerspecx64 *__ovalue),(__timerid,__flags,__value,__ovalue))
+#endif /* __CRT_HAVE_SC(timer_settime) */
+#if __CRT_HAVE_SC(timerfd_gettime)
+/* Return the next expiration time of UFD */
+__CDECLARE_SC(,__errno_t,timerfd_gettime,(__fd_t __ufd, struct __itimerspecx64 *__otmr),(__ufd,__otmr))
+#endif /* __CRT_HAVE_SC(timerfd_gettime) */
+#if __CRT_HAVE_SC(timerfd_settime)
+/* Set next expiration time of interval timer source UFD to UTMR.
+ * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
+ * is absolute. Optionally return the old expiration time in OTMR */
+__CDECLARE_SC(,__errno_t,timerfd_settime,(__fd_t __ufd, __syscall_ulong_t __flags, struct __itimerspecx64 const *__utmr, struct __itimerspecx64 *__otmr),(__ufd,__flags,__utmr,__otmr))
+#endif /* __CRT_HAVE_SC(timerfd_settime) */
 #if __CRT_HAVE_SC(tuxcall)
 __CDECLARE_SC(,__errno_t,tuxcall,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(tuxcall) */
+#if __CRT_HAVE_SC(utimensat)
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+__CDECLARE_SC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, struct __timespecx64 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
+#endif /* __CRT_HAVE_SC(utimensat) */
+#if __CRT_HAVE_SC(utimes)
+__CDECLARE_SC(,__errno_t,utimes,(char const *__filename, struct __timevalx64 const *__times),(__filename,__times))
+#endif /* __CRT_HAVE_SC(utimes) */
+#if __CRT_HAVE_SC(vmsplice)
+__CDECLARE_SC(,__ssize_t,vmsplice,(__fd_t __fdout, struct iovec64 const *__iov, __size_t __count, __syscall_ulong_t __flags),(__fdout,__iov,__count,__flags))
+#endif /* __CRT_HAVE_SC(vmsplice) */
 #if __CRT_HAVE_SC(vserver)
 __CDECLARE_SC(,__errno_t,vserver,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(vserver) */
+#if __CRT_HAVE_SC(waitid)
+/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+__CDECLARE_SC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfo64_struct *__infop, __syscall_ulong_t __options, struct rusage *__ru),(__idtype,__id,__infop,__options,__ru))
+#endif /* __CRT_HAVE_SC(waitid) */
 #if __CRT_HAVE_SC(writef)
 __CDECLARE_SC(,__ssize_t,writef,(__fd_t __fd, void const *__buf, __size_t __bufsize, __iomode_t __mode),(__fd,__buf,__bufsize,__mode))
 #endif /* __CRT_HAVE_SC(writef) */
+#if __CRT_HAVE_SC(writev)
+__CDECLARE_SC(,__ssize_t,writev,(__fd_t __fd, struct iovec64 const *__iovec, __size_t __count),(__fd,__iovec,__count))
+#endif /* __CRT_HAVE_SC(writev) */
 #if __CRT_HAVE_SC(writevf)
-__CDECLARE_SC(,__ssize_t,writevf,(__fd_t __fd, struct iovec const *__iovec, __size_t __count, __iomode_t __mode),(__fd,__iovec,__count,__mode))
+__CDECLARE_SC(,__ssize_t,writevf,(__fd_t __fd, struct iovec64 const *__iovec, __size_t __count, __iomode_t __mode),(__fd,__iovec,__count,__mode))
 #endif /* __CRT_HAVE_SC(writevf) */
 #if __CRT_HAVE_XSC(accept)
 __CDECLARE_XSC(,__errno_t,accept,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -667,6 +791,18 @@ __CDECLARE_XSC(,__errno_t,arch_prctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #if __CRT_HAVE_XSC(chown)
 __CDECLARE_XSC(,__errno_t,chown,(char const *__filename, __uid_t __owner, __gid_t __group),(__filename,__owner,__group))
 #endif /* __CRT_HAVE_XSC(chown) */
+#if __CRT_HAVE_XSC(clock_getres)
+__CDECLARE_XSC(,__errno_t,clock_getres,(__clockid_t __clock_id, struct __timespecx64 *__res),(__clock_id,__res))
+#endif /* __CRT_HAVE_XSC(clock_getres) */
+#if __CRT_HAVE_XSC(clock_gettime)
+__CDECLARE_XSC(,__errno_t,clock_gettime,(__clockid_t __clock_id, struct __timespecx64 *__tp),(__clock_id,__tp))
+#endif /* __CRT_HAVE_XSC(clock_gettime) */
+#if __CRT_HAVE_XSC(clock_nanosleep)
+__CDECLARE_XSC(,__errno_t,clock_nanosleep,(__clockid_t __clock_id, __syscall_ulong_t __flags, struct __timespecx64 const *__requested_time, struct __timespecx64 *__remaining),(__clock_id,__flags,__requested_time,__remaining))
+#endif /* __CRT_HAVE_XSC(clock_nanosleep) */
+#if __CRT_HAVE_XSC(clock_settime)
+__CDECLARE_XSC(,__errno_t,clock_settime,(__clockid_t __clock_id, struct __timespecx64 const *__tp),(__clock_id,__tp))
+#endif /* __CRT_HAVE_XSC(clock_settime) */
 #if __CRT_HAVE_XSC(clone)
 __CDECLARE_XSC(,__pid_t,clone,(__syscall_ulong_t __flags, void *__child_stack, __pid_t *__ptid, __pid_t *__ctid, __uintptr_t __newtls),(__flags,__child_stack,__ptid,__ctid,__newtls))
 #endif /* __CRT_HAVE_XSC(clone) */
@@ -695,7 +831,7 @@ __CDECLARE_XSC(,__pid_t,clone,(__syscall_ulong_t __flags, void *__child_stack, _
  *                           allowing coredumps to also be triggerred for unhandled signals.
  * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_NOTHROW' if unwinding
  *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
-__CDECLARE_XSC(,__errno_t,coredump,(struct ucpustate const *__curr_state, struct ucpustate const *__orig_state, void const *const *__traceback_vector, __size_t __traceback_length, struct exception_data const *__exception, __syscall_ulong_t __unwind_error),(__curr_state,__orig_state,__traceback_vector,__traceback_length,__exception,__unwind_error))
+__CDECLARE_XSC(,__errno_t,coredump,(struct ucpustate64 const *__curr_state, struct ucpustate64 const *__orig_state, __HYBRID_PTR64(void) const *__traceback_vector, __size_t __traceback_length, struct exception_data64 const *__exception, __syscall_ulong_t __unwind_error),(__curr_state,__orig_state,__traceback_vector,__traceback_length,__exception,__unwind_error))
 #endif /* __CRT_HAVE_XSC(coredump) */
 #if __CRT_HAVE_XSC(create_module)
 __CDECLARE_XSC(,__errno_t,create_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -711,7 +847,7 @@ __CDECLARE_XSC(,__errno_t,create_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE
  * @param: state:    When non-NULL, the CPU state where the trap should return to by default
  * @return: -EOK:    `state' was NULL and the trap returned successfully
  * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
-__CDECLARE_XSC(,__errno_t,debugtrap,(struct ucpustate const *__state, struct debugtrap_reason const *__reason),(__state,__reason))
+__CDECLARE_XSC(,__errno_t,debugtrap,(struct ucpustate64 const *__state, struct debugtrap_reason64 const *__reason),(__state,__reason))
 #endif /* __CRT_HAVE_XSC(debugtrap) */
 #if __CRT_HAVE_XSC(detach)
 /* >> detach(2)
@@ -826,7 +962,7 @@ __CDECLARE_XSC(,__errno_t,fmkdirat,(__fd_t __dirfd, char const *__pathname, __mo
 __CDECLARE_XSC(,__errno_t,fmknodat,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev, __atflag_t __flags),(__dirfd,__nodename,__mode,__dev,__flags))
 #endif /* __CRT_HAVE_XSC(fmknodat) */
 #if __CRT_HAVE_XSC(freadlinkat)
-/* @param: flags: Set of `0 | AT_READLINK_REQSIZE|AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
 __CDECLARE_XSC(,__ssize_t,freadlinkat,(__fd_t __dirfd, char const *__path, char *__buf, __size_t __buflen, __atflag_t __flags),(__dirfd,__path,__buf,__buflen,__flags))
 #endif /* __CRT_HAVE_XSC(freadlinkat) */
 #if __CRT_HAVE_XSC(frealpath4)
@@ -856,6 +992,12 @@ __CDECLARE_XSC(,__uint64_t,fsmode,(__uint64_t __mode),(__mode))
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,fsymlinkat,(char const *__link_text, __fd_t __tofd, char const *__target_path, __atflag_t __flags),(__link_text,__tofd,__target_path,__flags))
 #endif /* __CRT_HAVE_XSC(fsymlinkat) */
+#if __CRT_HAVE_XSC(futex)
+__CDECLARE_XSC(,__syscall_slong_t,futex,(__uint32_t *__uaddr, __syscall_ulong_t __futex_op, __uint32_t __val, struct __timespecx64 const *__timeout_or_val2, __uint32_t *__uaddr2, __uint32_t __val3),(__uaddr,__futex_op,__val,__timeout_or_val2,__uaddr2,__val3))
+#endif /* __CRT_HAVE_XSC(futex) */
+#if __CRT_HAVE_XSC(futimesat)
+__CDECLARE_XSC(,__errno_t,futimesat,(__fd_t __dirfd, __const char *__filename, struct __timevalx64 const *__times),(__dirfd,__filename,__times))
+#endif /* __CRT_HAVE_XSC(futimesat) */
 #if __CRT_HAVE_XSC(get_exception_handler)
 /* Get the current exception handler mode for the calling thread.
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
@@ -870,7 +1012,7 @@ __CDECLARE_XSC(,__errno_t,fsymlinkat,(char const *__link_text, __fd_t __tofd, ch
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
  * @return: 0 :         Success.
  * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
-__CDECLARE_XSC(,__errno_t,get_exception_handler,(__syscall_ulong_t *__pmode, __except_handler_t *__phandler, void **__phandler_sp),(__pmode,__phandler,__phandler_sp))
+__CDECLARE_XSC(,__errno_t,get_exception_handler,(__ULONG64_TYPE__ *__pmode, __except_handler64_t *__phandler, __HYBRID_PTR64(void) *__phandler_sp),(__pmode,__phandler,__phandler_sp))
 #endif /* __CRT_HAVE_XSC(get_exception_handler) */
 #if __CRT_HAVE_XSC(get_kernel_syms)
 __CDECLARE_XSC(,__errno_t,get_kernel_syms,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -880,16 +1022,16 @@ __CDECLARE_XSC(,__errno_t,get_thread_area,(int __TODO_PROTOTYPE),(__TODO_PROTOTY
 #endif /* __CRT_HAVE_XSC(get_thread_area) */
 #if __CRT_HAVE_XSC(getdrives)
 /* Returns a bitset of all of the currently mounted dos-drives */
-__CDECLARE_XSC(,__syscall_slong_t,getdrives,(),())
+__CDECLARE_XSC(,__syscall_slong_t,getdrives,(void),())
 #endif /* __CRT_HAVE_XSC(getdrives) */
 #if __CRT_HAVE_XSC(getegid)
-__CDECLARE_XSC(,__gid_t,getegid,(),())
+__CDECLARE_XSC(,__gid_t,getegid,(void),())
 #endif /* __CRT_HAVE_XSC(getegid) */
 #if __CRT_HAVE_XSC(geteuid)
-__CDECLARE_XSC(,__uid_t,geteuid,(),())
+__CDECLARE_XSC(,__uid_t,geteuid,(void),())
 #endif /* __CRT_HAVE_XSC(geteuid) */
 #if __CRT_HAVE_XSC(getgid)
-__CDECLARE_XSC(,__gid_t,getgid,(),())
+__CDECLARE_XSC(,__gid_t,getgid,(void),())
 #endif /* __CRT_HAVE_XSC(getgid) */
 #if __CRT_HAVE_XSC(getgroups)
 __CDECLARE_XSC(,__errno_t,getgroups,(__size_t __size, __gid_t *__list),(__size,__list))
@@ -903,8 +1045,11 @@ __CDECLARE_XSC(,__errno_t,getresgid,(__gid_t *__rgid, __gid_t *__egid, __gid_t *
 #if __CRT_HAVE_XSC(getresuid)
 __CDECLARE_XSC(,__errno_t,getresuid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *__suid),(__ruid,__euid,__suid))
 #endif /* __CRT_HAVE_XSC(getresuid) */
+#if __CRT_HAVE_XSC(gettimeofday)
+__CDECLARE_XSC(,__errno_t,gettimeofday,(struct __timevalx64 *__tv, struct timezone *__tz),(__tv,__tz))
+#endif /* __CRT_HAVE_XSC(gettimeofday) */
 #if __CRT_HAVE_XSC(getuid)
-__CDECLARE_XSC(,__uid_t,getuid,(),())
+__CDECLARE_XSC(,__uid_t,getuid,(void),())
 #endif /* __CRT_HAVE_XSC(getuid) */
 #if __CRT_HAVE_XSC(hop)
 __CDECLARE_XSC(,__syscall_slong_t,hop,(__fd_t __fd, __syscall_ulong_t __command, void *__arg),(__fd,__command,__arg))
@@ -928,7 +1073,7 @@ __CDECLARE_XSC(,__errno_t,kexec_file_load,(int __TODO_PROTOTYPE),(__TODO_PROTOTY
 __CDECLARE_XSC(,__errno_t,kfstat,(__fd_t __fd, struct stat *__statbuf),(__fd,__statbuf))
 #endif /* __CRT_HAVE_XSC(kfstat) */
 #if __CRT_HAVE_XSC(kfstatat)
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,kfstatat,(__fd_t __dirfd, char const *__filename, struct stat *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
 #endif /* __CRT_HAVE_XSC(kfstatat) */
 #if __CRT_HAVE_XSC(klstat)
@@ -969,7 +1114,7 @@ __CDECLARE_XSC(,__errno_t,lchown,(char const *__filename, __uid_t __owner, __gid
  * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
  * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
  * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
-__CDECLARE_XSC(,__syscall_slong_t,lfutex,(__uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val, struct __timespec64 const *__timeout, __uintptr_t __val2),(__uaddr,__futex_op,__val,__timeout,__val2))
+__CDECLARE_XSC(,__syscall_slong_t,lfutex,(__uint64_t *__uaddr, __syscall_ulong_t __futex_op, __uint64_t __val, struct __timespecx64 const *__timeout, __uint64_t __val2),(__uaddr,__futex_op,__val,__timeout,__val2))
 #endif /* __CRT_HAVE_XSC(lfutex) */
 #if __CRT_HAVE_XSC(lfutexexpr)
 /* >> lfutexexpr(2)
@@ -999,7 +1144,7 @@ __CDECLARE_XSC(,__syscall_slong_t,lfutex,(__uintptr_t *__uaddr, __syscall_ulong_
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CDECLARE_XSC(,__errno_t,lfutexexpr,(void *__base, __size_t __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, __syscall_ulong_t __timeout_flags),(__base,__exprc,__exprv,__timeout,__timeout_flags))
+__CDECLARE_XSC(,__errno_t,lfutexexpr,(void *__base, __size_t __exprc, struct lfutexexpr64 const *__exprv, struct __timespecx64 const *__timeout, __syscall_ulong_t __timeout_flags),(__base,__exprc,__exprv,__timeout,__timeout_flags))
 #endif /* __CRT_HAVE_XSC(lfutexexpr) */
 #if __CRT_HAVE_XSC(lfutexlockexpr)
 /* >> lfutexlockexpr(2)
@@ -1029,7 +1174,7 @@ __CDECLARE_XSC(,__errno_t,lfutexexpr,(void *__base, __size_t __exprc, struct lfu
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CDECLARE_XSC(,__errno_t,lfutexlockexpr,(__uintptr_t *__ulockaddr, void *__base, __size_t __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, __syscall_ulong_t __timeout_flags),(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+__CDECLARE_XSC(,__errno_t,lfutexlockexpr,(__uint64_t *__ulockaddr, void *__base, __size_t __exprc, struct lfutexexpr64 const *__exprv, struct __timespecx32_64 const *__timeout, __syscall_ulong_t __timeout_flags),(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
 #endif /* __CRT_HAVE_XSC(lfutexlockexpr) */
 #if __CRT_HAVE_XSC(linux_fstat64)
 __CDECLARE_XSC(,__errno_t,linux_fstat64,(__fd_t __fd, struct linux_stat64 *__statbuf),(__fd,__statbuf))
@@ -1089,24 +1234,45 @@ __CDECLARE_XSC(,__errno_t,msgrcv,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #if __CRT_HAVE_XSC(msgsnd)
 __CDECLARE_XSC(,__errno_t,msgsnd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(msgsnd) */
+#if __CRT_HAVE_XSC(nanosleep)
+__CDECLARE_XSC(,__errno_t,nanosleep,(struct __timespecx64 const *__req, struct __timespecx64 *__rem),(__req,__rem))
+#endif /* __CRT_HAVE_XSC(nanosleep) */
 #if __CRT_HAVE_XSC(openpty)
 /* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
 __CDECLARE_XSC(,__errno_t,openpty,(__fd_t *__amaster, __fd_t *__aslave, char *__name, struct termios const *__termp, struct winsize const *__winp),(__amaster,__aslave,__name,__termp,__winp))
 #endif /* __CRT_HAVE_XSC(openpty) */
+#if __CRT_HAVE_XSC(ppoll)
+__CDECLARE_XSC(,__ssize_t,ppoll,(struct pollfd *__fds, __size_t __nfds, struct __timespecx64 const *__timeout_ts, struct __sigset_struct const *__sigmask, __size_t __sigsetsize),(__fds,__nfds,__timeout_ts,__sigmask,__sigsetsize))
+#endif /* __CRT_HAVE_XSC(ppoll) */
 #if __CRT_HAVE_XSC(pread64f)
 __CDECLARE_XSC(,__ssize_t,pread64f,(__fd_t __fd, void *__buf, __size_t __bufsize, __uint64_t __offset, __iomode_t __mode),(__fd,__buf,__bufsize,__offset,__mode))
 #endif /* __CRT_HAVE_XSC(pread64f) */
+#if __CRT_HAVE_XSC(preadv)
+__CDECLARE_XSC(,__ssize_t,preadv,(__fd_t __fd, struct iovec64 const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
+#endif /* __CRT_HAVE_XSC(preadv) */
 #if __CRT_HAVE_XSC(preadvf)
-__CDECLARE_XSC(,__ssize_t,preadvf,(__fd_t __fd, struct iovec const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
+__CDECLARE_XSC(,__ssize_t,preadvf,(__fd_t __fd, struct iovec64 const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
 #endif /* __CRT_HAVE_XSC(preadvf) */
+#if __CRT_HAVE_XSC(process_vm_readv)
+__CDECLARE_XSC(,__ssize_t,process_vm_readv,(__pid_t __pid, struct iovec64 const *__lvec, __size_t __liovcnt, struct iovec64 const *__rvec, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__lvec,__liovcnt,__rvec,__riovcnt,__flags))
+#endif /* __CRT_HAVE_XSC(process_vm_readv) */
+#if __CRT_HAVE_XSC(process_vm_writev)
+__CDECLARE_XSC(,__ssize_t,process_vm_writev,(__pid_t __pid, struct iovec64 const *__lvec, __size_t __liovcnt, struct iovec64 const *__rvec, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__lvec,__liovcnt,__rvec,__riovcnt,__flags))
+#endif /* __CRT_HAVE_XSC(process_vm_writev) */
+#if __CRT_HAVE_XSC(pselect6)
+__CDECLARE_XSC(,__ssize_t,pselect6,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx64 const *__timeout, void const *__sigmask_sigset_and_len),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_and_len))
+#endif /* __CRT_HAVE_XSC(pselect6) */
 #if __CRT_HAVE_XSC(putpmsg)
 __CDECLARE_XSC(,__errno_t,putpmsg,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(putpmsg) */
 #if __CRT_HAVE_XSC(pwrite64f)
 __CDECLARE_XSC(,__ssize_t,pwrite64f,(__fd_t __fd, void const *__buf, __size_t __bufsize, __uint64_t __offset, __iomode_t __mode),(__fd,__buf,__bufsize,__offset,__mode))
 #endif /* __CRT_HAVE_XSC(pwrite64f) */
+#if __CRT_HAVE_XSC(pwritev)
+__CDECLARE_XSC(,__ssize_t,pwritev,(__fd_t __fd, struct iovec64 const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
+#endif /* __CRT_HAVE_XSC(pwritev) */
 #if __CRT_HAVE_XSC(pwritevf)
-__CDECLARE_XSC(,__ssize_t,pwritevf,(__fd_t __fd, struct iovec const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
+__CDECLARE_XSC(,__ssize_t,pwritevf,(__fd_t __fd, struct iovec64 const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
 #endif /* __CRT_HAVE_XSC(pwritevf) */
 #if __CRT_HAVE_XSC(query_module)
 __CDECLARE_XSC(,__errno_t,query_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -1120,14 +1286,20 @@ __CDECLARE_XSC(,__errno_t,query_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE)
  *                return to the text location described by it.
  * TODO: Add a flags argument to control if the current signal mask
  *       should be ignored (currently, it's always being ignored) */
-__CDECLARE_XSC(,__errno_t,raiseat,(struct ucpustate const *__state, struct __siginfo_struct const *__si),(__state,__si))
+__CDECLARE_XSC(,__errno_t,raiseat,(struct ucpustate64 const *__state, struct __siginfo64_struct const *__si),(__state,__si))
 #endif /* __CRT_HAVE_XSC(raiseat) */
 #if __CRT_HAVE_XSC(readf)
 __CDECLARE_XSC(,__ssize_t,readf,(__fd_t __fd, void *__buf, __size_t __bufsize, __iomode_t __mode),(__fd,__buf,__bufsize,__mode))
 #endif /* __CRT_HAVE_XSC(readf) */
+#if __CRT_HAVE_XSC(readv)
+__CDECLARE_XSC(,__ssize_t,readv,(__fd_t __fd, struct iovec64 const *__iovec, __size_t __count),(__fd,__iovec,__count))
+#endif /* __CRT_HAVE_XSC(readv) */
 #if __CRT_HAVE_XSC(readvf)
-__CDECLARE_XSC(,__ssize_t,readvf,(__fd_t __fd, struct iovec const *__iovec, __size_t __count, __iomode_t __mode),(__fd,__iovec,__count,__mode))
+__CDECLARE_XSC(,__ssize_t,readvf,(__fd_t __fd, struct iovec64 const *__iovec, __size_t __count, __iomode_t __mode),(__fd,__iovec,__count,__mode))
 #endif /* __CRT_HAVE_XSC(readvf) */
+#if __CRT_HAVE_XSC(recvmmsg)
+__CDECLARE_XSC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __flags, struct __timespecx64 *__tmo),(__sockfd,__vmessages,__vlen,__flags,__tmo))
+#endif /* __CRT_HAVE_XSC(recvmmsg) */
 #if __CRT_HAVE_XSC(rpc_schedule)
 /* Schedule an RPC for execution on the specified `target' thread.
  * @param: target:    The targeted thread.
@@ -1139,14 +1311,31 @@ __CDECLARE_XSC(,__ssize_t,readvf,(__fd_t __fd, struct iovec const *__iovec, __si
  * @return: -1: Error (s.a. `errno')
  * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
  * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
-__CDECLARE_XSC(,__syscall_slong_t,rpc_schedule,(__pid_t __target, __syscall_ulong_t __flags, __uint8_t const *__program, void **__arguments),(__target,__flags,__program,__arguments))
+__CDECLARE_XSC(,__syscall_slong_t,rpc_schedule,(__pid_t __target, __syscall_ulong_t __flags, __uint8_t const *__program, __HYBRID_PTR64(void) *__arguments),(__target,__flags,__program,__arguments))
 #endif /* __CRT_HAVE_XSC(rpc_schedule) */
 #if __CRT_HAVE_XSC(rpc_service)
-__CDECLARE_XSC(,__syscall_slong_t,rpc_service,(),())
+__CDECLARE_XSC(,__syscall_slong_t,rpc_service,(void),())
 #endif /* __CRT_HAVE_XSC(rpc_service) */
+#if __CRT_HAVE_XSC(rt_sigqueueinfo)
+/* @param: signo: One of `SIG*' */
+__CDECLARE_XSC(,__errno_t,rt_sigqueueinfo,(__pid_t __tgid, __syscall_ulong_t __signo, struct __siginfo64_struct const *__uinfo),(__tgid,__signo,__uinfo))
+#endif /* __CRT_HAVE_XSC(rt_sigqueueinfo) */
+#if __CRT_HAVE_XSC(rt_sigtimedwait)
+__CDECLARE_XSC(,__syscall_slong_t,rt_sigtimedwait,(struct __sigset_struct const *__set, struct __siginfo64_struct *__info, struct __timespecx64 const *__timeout, __size_t __sigsetsize),(__set,__info,__timeout,__sigsetsize))
+#endif /* __CRT_HAVE_XSC(rt_sigtimedwait) */
+#if __CRT_HAVE_XSC(rt_tgsigqueueinfo)
+/* @param: signo: One of `SIG*' */
+__CDECLARE_XSC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __syscall_ulong_t __signo, struct __siginfo64_struct const *__uinfo),(__tgid,__tid,__signo,__uinfo))
+#endif /* __CRT_HAVE_XSC(rt_tgsigqueueinfo) */
+#if __CRT_HAVE_XSC(sched_rr_get_interval)
+__CDECLARE_XSC(,__errno_t,sched_rr_get_interval,(__pid_t __pid, struct __timespecx64 *__tms),(__pid,__tms))
+#endif /* __CRT_HAVE_XSC(sched_rr_get_interval) */
 #if __CRT_HAVE_XSC(security)
 __CDECLARE_XSC(,__errno_t,security,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(security) */
+#if __CRT_HAVE_XSC(select)
+__CDECLARE_XSC(,__ssize_t,select,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timevalx64 *__timeout),(__nfds,__readfds,__writefds,__exceptfds,__timeout))
+#endif /* __CRT_HAVE_XSC(select) */
 #if __CRT_HAVE_XSC(semctl)
 __CDECLARE_XSC(,__errno_t,semctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(semctl) */
@@ -1169,11 +1358,11 @@ __CDECLARE_XSC(,__errno_t,semtimedop,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-__CDECLARE_XSC(,__errno_t,set_exception_handler,(__syscall_ulong_t __mode, __except_handler_t __handler, void *__handler_sp),(__mode,__handler,__handler_sp))
+__CDECLARE_XSC(,__errno_t,set_exception_handler,(__syscall_ulong_t __mode, __except_handler64_t __handler, void *__handler_sp),(__mode,__handler,__handler_sp))
 #endif /* __CRT_HAVE_XSC(set_exception_handler) */
 #if __CRT_HAVE_XSC(set_library_listdef)
 /* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-__CDECLARE_XSC(,__errno_t,set_library_listdef,(struct library_listdef const *__listdef),(__listdef))
+__CDECLARE_XSC(,__errno_t,set_library_listdef,(struct library_listdef64 const *__listdef),(__listdef))
 #endif /* __CRT_HAVE_XSC(set_library_listdef) */
 #if __CRT_HAVE_XSC(set_thread_area)
 __CDECLARE_XSC(,__errno_t,set_thread_area,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -1202,6 +1391,9 @@ __CDECLARE_XSC(,__errno_t,setresuid,(__uid_t __ruid, __uid_t __euid, __uid_t __s
 #if __CRT_HAVE_XSC(setreuid)
 __CDECLARE_XSC(,__errno_t,setreuid,(__uid_t __ruid, __uid_t __euid),(__ruid,__euid))
 #endif /* __CRT_HAVE_XSC(setreuid) */
+#if __CRT_HAVE_XSC(settimeofday)
+__CDECLARE_XSC(,__errno_t,settimeofday,(struct __timevalx64 const *__tv, struct timezone const *__tz),(__tv,__tz))
+#endif /* __CRT_HAVE_XSC(settimeofday) */
 #if __CRT_HAVE_XSC(setuid)
 __CDECLARE_XSC(,__errno_t,setuid,(__uid_t __uid),(__uid))
 #endif /* __CRT_HAVE_XSC(setuid) */
@@ -1223,22 +1415,56 @@ __CDECLARE_XSC(,__syscall_slong_t,sysctl,(__syscall_ulong_t __command, void *__a
 #if __CRT_HAVE_XSC(sysfs)
 __CDECLARE_XSC(,__errno_t,sysfs,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(sysfs) */
+#if __CRT_HAVE_XSC(timer_gettime)
+__CDECLARE_XSC(,__errno_t,timer_gettime,(__timer_t __timerid, struct __itimerspecx64 *__value),(__timerid,__value))
+#endif /* __CRT_HAVE_XSC(timer_gettime) */
+#if __CRT_HAVE_XSC(timer_settime)
+__CDECLARE_XSC(,__errno_t,timer_settime,(__timer_t __timerid, __syscall_ulong_t __flags, struct __itimerspecx64 const *__value, struct __itimerspecx64 *__ovalue),(__timerid,__flags,__value,__ovalue))
+#endif /* __CRT_HAVE_XSC(timer_settime) */
+#if __CRT_HAVE_XSC(timerfd_gettime)
+/* Return the next expiration time of UFD */
+__CDECLARE_XSC(,__errno_t,timerfd_gettime,(__fd_t __ufd, struct __itimerspecx64 *__otmr),(__ufd,__otmr))
+#endif /* __CRT_HAVE_XSC(timerfd_gettime) */
+#if __CRT_HAVE_XSC(timerfd_settime)
+/* Set next expiration time of interval timer source UFD to UTMR.
+ * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
+ * is absolute. Optionally return the old expiration time in OTMR */
+__CDECLARE_XSC(,__errno_t,timerfd_settime,(__fd_t __ufd, __syscall_ulong_t __flags, struct __itimerspecx64 const *__utmr, struct __itimerspecx64 *__otmr),(__ufd,__flags,__utmr,__otmr))
+#endif /* __CRT_HAVE_XSC(timerfd_settime) */
 #if __CRT_HAVE_XSC(tuxcall)
 __CDECLARE_XSC(,__errno_t,tuxcall,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(tuxcall) */
+#if __CRT_HAVE_XSC(utimensat)
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+__CDECLARE_XSC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, struct __timespecx64 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
+#endif /* __CRT_HAVE_XSC(utimensat) */
+#if __CRT_HAVE_XSC(utimes)
+__CDECLARE_XSC(,__errno_t,utimes,(char const *__filename, struct __timevalx64 const *__times),(__filename,__times))
+#endif /* __CRT_HAVE_XSC(utimes) */
+#if __CRT_HAVE_XSC(vmsplice)
+__CDECLARE_XSC(,__ssize_t,vmsplice,(__fd_t __fdout, struct iovec64 const *__iov, __size_t __count, __syscall_ulong_t __flags),(__fdout,__iov,__count,__flags))
+#endif /* __CRT_HAVE_XSC(vmsplice) */
 #if __CRT_HAVE_XSC(vserver)
 __CDECLARE_XSC(,__errno_t,vserver,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(vserver) */
+#if __CRT_HAVE_XSC(waitid)
+/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+__CDECLARE_XSC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfo64_struct *__infop, __syscall_ulong_t __options, struct rusage *__ru),(__idtype,__id,__infop,__options,__ru))
+#endif /* __CRT_HAVE_XSC(waitid) */
 #if __CRT_HAVE_XSC(writef)
 __CDECLARE_XSC(,__ssize_t,writef,(__fd_t __fd, void const *__buf, __size_t __bufsize, __iomode_t __mode),(__fd,__buf,__bufsize,__mode))
 #endif /* __CRT_HAVE_XSC(writef) */
+#if __CRT_HAVE_XSC(writev)
+__CDECLARE_XSC(,__ssize_t,writev,(__fd_t __fd, struct iovec64 const *__iovec, __size_t __count),(__fd,__iovec,__count))
+#endif /* __CRT_HAVE_XSC(writev) */
 #if __CRT_HAVE_XSC(writevf)
-__CDECLARE_XSC(,__ssize_t,writevf,(__fd_t __fd, struct iovec const *__iovec, __size_t __count, __iomode_t __mode),(__fd,__iovec,__count,__mode))
+__CDECLARE_XSC(,__ssize_t,writevf,(__fd_t __fd, struct iovec64 const *__iovec, __size_t __count, __iomode_t __mode),(__fd,__iovec,__count,__mode))
 #endif /* __CRT_HAVE_XSC(writevf) */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("dirent")
+#pragma pop_macro("timezone")
 #pragma pop_macro("stat")
+#pragma pop_macro("dirent")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 

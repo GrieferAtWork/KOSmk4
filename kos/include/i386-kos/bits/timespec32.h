@@ -23,90 +23,106 @@
 #include <hybrid/typecore.h>
 #include <bits/timespec-cxx-support.h>
 
-#ifndef __x86_64__
+#ifdef __x86_64__
+#define timespecx32    __timespecx32
+#define timespecx32_64 __timespecx32_64
+#else /* __x86_64__ */
 #include <features.h>
 #ifdef __USE_TIME_BITS64
-/* Configure to use `timespec32_64' as `timespec' */
+/* Configure:
+ *   - `timespecx32_64' as `timespec'
+ *   - `timespecx32' as `__timespec32' */
 
-#define timespec32     __timespec32
-#define timespec32_64  timespec
-#define __timespec64   timespec
-#define __timespec_alt __timespec32
+#define timespecx32      __timespec32
+#define timespecx32_64   timespec
+#define __timespecx32    __timespec32
+#define __timespecx32_64 timespec
+#define __timespec32     __timespec32
+#define __timespec64     timespec
+#define __timespec_alt   __timespec32
+#ifdef __USE_KOS
+#define timespec32       __timespec32
+#endif /* __USE_KOS */
 #ifdef __USE_TIME64
-#define timespec64    timespec
+#define timespec64       timespec
 #endif /* __USE_TIME64 */
 
-#define __OFFSET_TIMESPEC_SEC    __OFFSET_TIMESPEC32_64_SEC
-#define __OFFSET_TIMESPEC_NSEC   __OFFSET_TIMESPEC32_64_NSEC
-#define __SIZEOF_TIMESPEC        __SIZEOF_TIMESPEC32_64
-#define __OFFSET_TIMESPEC64_SEC  __OFFSET_TIMESPEC32_64_SEC
-#define __OFFSET_TIMESPEC64_NSEC __OFFSET_TIMESPEC32_64_NSEC
-#define __SIZEOF_TIMESPEC64      __SIZEOF_TIMESPEC32_64
+#define __OFFSET_TIMESPEC_SEC    __OFFSET_TIMESPECX32_64_SEC
+#define __OFFSET_TIMESPEC_NSEC   __OFFSET_TIMESPECX32_64_NSEC
+#define __SIZEOF_TIMESPEC        __SIZEOF_TIMESPECX32_64
+#define __OFFSET_TIMESPEC64_SEC  __OFFSET_TIMESPECX32_64_SEC
+#define __OFFSET_TIMESPEC64_NSEC __OFFSET_TIMESPECX32_64_NSEC
+#define __SIZEOF_TIMESPEC64      __SIZEOF_TIMESPECX32_64
 
 #else /* __USE_TIME_BITS64 */
-/* Configure to use `timespec32' as `timespec' */
-
-#define __timespec32  timespec
-#define timespec32    timespec
+/* Configure:
+ *   - `timespecx32_64' as `timespec64' or `__timespec64'
+ *   - `timespecx32' as `timespec' */
+#define timespecx32      timespec
+#define __timespec32     timespec
+#define __timespecx32    timespec
 #ifdef __USE_TIME64
-#define timespec32_64  timespec64
-#define __timespec64   timespec64
-#define __timespec_alt timespec64
+#define __timespecx32_64 timespec64
+#define timespecx32_64   timespec64
+#define __timespec64     timespec64
+#define __timespec_alt   timespec64
 #else /* __USE_TIME64 */
-#define timespec32_64  __timespec64
-#define __timespec_alt __timespec64
+#define __timespecx32_64 __timespec64
+#define timespecx32_64   __timespec64
+#define __timespec64     __timespec64
+#define __timespec_alt   __timespec64
 #endif /* __USE_TIME64 */
+#ifdef __USE_KOS
+#define timespec32       timespec
+#endif /* __USE_KOS */
 
-#define __OFFSET_TIMESPEC_SEC    __OFFSET_TIMESPEC32_SEC
-#define __OFFSET_TIMESPEC_NSEC   __OFFSET_TIMESPEC32_NSEC
-#define __SIZEOF_TIMESPEC        __SIZEOF_TIMESPEC32
-#define __OFFSET_TIMESPEC64_SEC  __OFFSET_TIMESPEC32_64_SEC
-#define __OFFSET_TIMESPEC64_NSEC __OFFSET_TIMESPEC32_64_NSEC
-#define __SIZEOF_TIMESPEC64      __SIZEOF_TIMESPEC32_64
+#define __OFFSET_TIMESPEC_SEC    __OFFSET_TIMESPECX32_SEC
+#define __OFFSET_TIMESPEC_NSEC   __OFFSET_TIMESPECX32_NSEC
+#define __SIZEOF_TIMESPEC        __SIZEOF_TIMESPECX32
+#define __OFFSET_TIMESPEC64_SEC  __OFFSET_TIMESPECX32_64_SEC
+#define __OFFSET_TIMESPEC64_NSEC __OFFSET_TIMESPECX32_64_NSEC
+#define __SIZEOF_TIMESPEC64      __SIZEOF_TIMESPECX32_64
 
 #endif /* !__USE_TIME_BITS64 */
 #define __timespec_defined 1
 #endif /* !__x86_64__ */
 
 
-#define __OFFSET_TIMESPEC32_SEC      0
-#define __OFFSET_TIMESPEC32_NSEC     4
-#define __SIZEOF_TIMESPEC32          8
-#define __OFFSET_TIMESPEC32_64_SEC   0
-#define __OFFSET_TIMESPEC32_64_NSEC  8
-#define __SIZEOF_TIMESPEC32_64       16
+#define __OFFSET_TIMESPECX32_SEC      0
+#define __OFFSET_TIMESPECX32_NSEC     4
+#define __SIZEOF_TIMESPECX32          8
+#define __OFFSET_TIMESPECX32_64_SEC   0
+#define __OFFSET_TIMESPECX32_64_NSEC  8
+#define __SIZEOF_TIMESPECX32_64       16
 
 #ifdef __CC__
 __DECL_BEGIN
 __TIMESPEC_CXX_DECL_BEGIN
 
 /* 32-bit timespec for i386 */
-struct timespec32 /*[PREFIX(tv_)]*/ {
+struct timespecx32 /*[PREFIX(tv_)]*/ {
 	__INT32_TYPE__  tv_sec;   /* Seconds */
 	__UINT32_TYPE__ tv_nsec;  /* Nano seconds (<= 1000000000 == 1_000_000_000) */
-	__TIMESPEC_CXX_SUPPORT(struct timespec32, __INT32_TYPE__, __UINT32_TYPE__)
+	__TIMESPEC_CXX_SUPPORT(struct timespecx32, __INT32_TYPE__, __UINT32_TYPE__)
 };
-__TIMESPEC_CXX_SUPPORT2(struct timespec32, __INT32_TYPE__, __UINT32_TYPE__)
+__TIMESPEC_CXX_SUPPORT2(struct timespecx32, __INT32_TYPE__, __UINT32_TYPE__)
 
 /* 64-bit timespec for i386 */
-struct timespec32_64 /*[PREFIX(tv_)]*/ {
+struct timespecx32_64 /*[PREFIX(tv_)]*/ {
 	__INT64_TYPE__    tv_sec;   /* Seconds */
 	__UINT32_TYPE__   tv_nsec;  /* Nano seconds (<= 1000000000 == 1_000_000_000) */
 	__UINT32_TYPE__ __tv_pad;   /* ... */
-	__TIMESPEC_CXX_SUPPORT(struct timespec32_64, __INT64_TYPE__, __UINT32_TYPE__)
+	__TIMESPEC_CXX_SUPPORT(struct timespecx32_64, __INT64_TYPE__, __UINT32_TYPE__)
 };
-__TIMESPEC_CXX_SUPPORT2(struct timespec32_64, __INT64_TYPE__, __UINT32_TYPE__)
+__TIMESPEC_CXX_SUPPORT2(struct timespecx32_64, __INT64_TYPE__, __UINT32_TYPE__)
 
 __TIMESPEC_CXX_DECL_END
 __DECL_END
 #endif /* __CC__ */
 
-#ifndef __x86_64__
 #ifndef __USE_KOS
-#undef timespec32
-#undef timespec32_64
+#undef timespecx32
+#undef timespecx32_64
 #endif /* !__USE_KOS */
-#endif /* !__x86_64__ */
-
 
 #endif /* !_I386_KOS_BITS_TIMESPEC32_H */

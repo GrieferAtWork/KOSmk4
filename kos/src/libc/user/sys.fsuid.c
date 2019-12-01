@@ -39,7 +39,11 @@ NOTHROW_NCX(LIBCCALL libc_setfsuid)(uid_t uid)
 /*[[[body:setfsuid]]]*/
 {
 	errno_t result;
+#ifdef SYS_setfsuid32
 	result = sys_setfsuid32((u32)uid);
+#else /* SYS_setfsuid32 */
+	result = sys_setfsuid(uid);
+#endif /* !SYS_setfsuid32 */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:setfsuid]]]*/
@@ -51,7 +55,11 @@ NOTHROW_NCX(LIBCCALL libc_setfsgid)(gid_t gid)
 /*[[[body:setfsgid]]]*/
 {
 	errno_t result;
+#ifdef SYS_setfsgid32
 	result = sys_setfsgid32((u32)gid);
+#else /* SYS_setfsgid32 */
+	result = sys_setfsgid(gid);
+#endif /* !SYS_setfsgid32 */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:setfsgid]]]*/

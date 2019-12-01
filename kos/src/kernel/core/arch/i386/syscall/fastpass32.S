@@ -20,6 +20,7 @@
 
 #include <hybrid/compiler.h>
 #include <kernel/syscall.h>
+#include <kernel/syscall-tables.h>
 #include <syscall.h>
 
 #include <kos/kernel/gdt.h>

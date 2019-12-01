@@ -27,9 +27,9 @@
 @@The order chosen is also important, as it is selected such that arguments
 @@are only passed through registers that are preserved by CDECL
 [restart(must)][noexcept]
-sigreturn:(struct fpustate const *restore_fpu, syscall_ulong_t unused1,
+sigreturn:(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1,
            syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask,
-           struct rpc_syscall_info *sc_info, struct ucpustate const *restore_cpu);
+           struct rpc_syscall_info32 *sc_info, struct ucpustate32 const *restore_cpu);
 
 clone:([tostr(flagset(CLONE_VM, CLONE_FS, CLONE_FILES, CLONE_SIGHAND, CLONE_PTRACE,
                       CLONE_VFORK, CLONE_PARENT, CLONE_THREAD, CLONE_NEWNS, CLONE_SYSVSEM,
@@ -39,66 +39,97 @@ clone:([tostr(flagset(CLONE_VM, CLONE_FS, CLONE_FILES, CLONE_SIGHAND, CLONE_PTRA
        syscall_ulong_t flags, void *child_stack,
        pid_t *ptid, uintptr_t newtls, pid_t *ctid) -> pid_t;
 
-[cp] lchown:(char const *filename, uint16_t owner, uint16_t group) -> errno_t;
-[cp] lchown32:(char const *filename, uint32_t owner, uint32_t group) -> errno_t;
-[cp] fchown:(fd_t fd, uint16_t owner, uint16_t group) -> errno_t;
-[cp] fchown32:(fd_t fd, uint32_t owner, uint32_t group) -> errno_t;
-[cp] chown:(char const *filename, uint16_t owner, uint16_t group) -> errno_t;
-[cp] chown32:(char const *filename, uint32_t owner, uint32_t group) -> errno_t;
+/* For historical reasons, the uid_t and gid_t size used by normal system calls in 16-bit */
 
-[restart(must)] getuid:() -> uint16_t;
-[restart(must)] getuid32:() -> uint32_t;
-[restart(must)] setuid:(uint16_t uid) -> errno_t;
-[restart(must)] setuid32:(uint32_t uid) -> errno_t;
-[restart(must)] getgid:() -> uint16_t;
-[restart(must)] getgid32:() -> uint32_t;
-[restart(must)] setgid:(uint16_t gid) -> errno_t;
-[restart(must)] setgid32:(uint32_t gid) -> errno_t;
-[restart(must)] geteuid:() -> uint16_t;
-[restart(must)] geteuid32:() -> uint32_t;
-[restart(must)] setreuid:(uint16_t ruid, uint16_t euid) -> errno_t;
-[restart(must)] setreuid32:(uint32_t ruid, uint32_t euid) -> errno_t;
-[restart(must)] getegid:() -> uint16_t;
-[restart(must)] getegid32:() -> uint32_t;
-[restart(must)] setregid:(uint16_t rgid, uint16_t egid) -> errno_t;
-[restart(must)] setregid32:(uint32_t rgid, uint32_t egid) -> errno_t;
-[restart(must)] getresuid:(uint16_t *ruid, uint16_t *euid, uint16_t *suid) -> errno_t;
-[restart(must)] getresuid32:(uint32_t *ruid, uint32_t *euid, uint32_t *suid) -> errno_t;
-[restart(must)] setresuid:(uint16_t ruid, uint16_t euid, uint16_t suid) -> errno_t;
-[restart(must)] setresuid32:(uint32_t ruid, uint32_t euid, uint32_t suid) -> errno_t;
-[restart(must)] getresgid:(uint16_t *rgid, uint16_t *egid, uint16_t *sgid) -> errno_t;
-[restart(must)] getresgid32:(uint32_t *rgid, uint32_t *egid, uint32_t *sgid) -> errno_t;
-[restart(must)] setresgid:(uint16_t rgid, uint16_t egid, uint16_t sgid) -> errno_t;
-[restart(must)] setresgid32:(uint32_t rgid, uint32_t egid, uint32_t sgid) -> errno_t;
-[restart(must)] getgroups:(size_t size, uint16_t list[]) -> errno_t;
-[restart(must)] getgroups32:(size_t size, uint32_t list[]) -> errno_t;
-[restart(must)] setgroups:(size_t count, uint16_t const *groups) -> errno_t;
-[restart(must)] setgroups32:(size_t count, uint32_t const *groups) -> errno_t;
-[restart(must)] setfsuid:(uint16_t uid) -> errno_t;
-[restart(must)] setfsuid32:(uint32_t uid) -> errno_t;
-[restart(must)] setfsgid:(uint16_t gid) -> errno_t;
-[restart(must)] setfsgid32:(uint32_t gid) -> errno_t;
+lchown = lchown16;
+fchown = fchown16;
+chown = chown16;
+getuid = getuid16;
+setuid = setuid16;
+getgid = getgid16;
+setgid = setgid16;
+geteuid = geteuid16;
+setreuid = setreuid16;
+getegid = getegid16;
+setregid = setregid16;
+getresuid = getresuid16;
+setresuid = setresuid16;
+getresgid = getresgid16;
+setresgid = setresgid16;
+getgroups = getgroups16;
+setgroups = setgroups16;
+setfsuid = setfsuid16;
+setfsgid = setfsgid16;
 
-@@@param: prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
-@@@param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
-@@              with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
-@@              MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
-@@              MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE|MAP_OFFSET64_POINTER'
-mmap:(void *addr, size_t len,
-	[tostr(flagset(
-		PROT_NONE:
-			PROT_EXEC, PROT_WRITE, PROT_READ,
-			PROT_SEM, PROT_LOOSE, PROT_SHARED))]
-		syscall_ulong_t prot,
-	[tostr(flagset(MAP_AUTOMATIC:
-		MAP_SHARED, MAP_PRIVATE, MAP_FIXED,
-		MAP_ANON, MAP_32BIT, MAP_GROWSDOWN, MAP_GROWSUP,
-		MAP_LOCKED, MAP_NORESERVE, MAP_POPULATE, MAP_NONBLOCK,
-		MAP_STACK, MAP_UNINITIALIZED, MAP_DONT_MAP, MAP_DONT_OVERRIDE,
-		MAP_OFFSET64_POINTER))]
-		syscall_ulong_t flags, fd_t fd,
-		syscall_ulong_t offset) -> void *;
+/* Enable support for `MAP_OFFSET64_POINTER' */
+mmap = mmap32;
 
+/* Configure binding of multi-arch types in system calls. */
+gettimeofday = gettimeofdayx32;
+gettimeofday64 = gettimeofdayx32_64;
+settimeofday = settimeofdayx32;
+settimeofday64 = settimeofdayx32_64;
+select = selectx32;
+select64 = selectx32_64;
+utimes = utimesx32;
+utimes64 = utimesx32_64;
+futimesat = futimesatx32;
+futimesat64 = futimesatx32_64;
+sched_rr_get_interval = sched_rr_get_intervalx32;
+sched_rr_get_interval64 = sched_rr_get_intervalx32_64;
+nanosleep = nanosleepx32;
+nanosleep64 = nanosleepx32_64;
+rt_sigtimedwait = rt_sigtimedwaitx32;
+rt_sigtimedwait64 = rt_sigtimedwaitx32_64;
+futex = futexx32;
+clock_settime = clock_settimex32;
+clock_settime64 = clock_settimex32_64;
+clock_gettime = clock_gettimex32;
+clock_gettime64 = clock_gettimex32_64;
+clock_getres = clock_getresx32;
+clock_getres64 = clock_getresx32_64;
+clock_nanosleep = clock_nanosleepx32;
+clock_nanosleep64 = clock_nanosleepx32_64;
+pselect6 = pselect6_x32;
+pselect6_64 = pselect6_x32_64;
+ppoll = ppollx32;
+ppoll64 = ppollx32_64;
+utimensat = utimensatx32;
+utimensat64 = utimensatx32_64;
+recvmmsg = recvmmsgx32;
+recvmmsg64 = recvmmsgx32_64;
+rt_sigqueueinfo = rt_sigqueueinfo32;
+waitid = waitid32;
+rt_tgsigqueueinfo = rt_tgsigqueueinfo32;
+raiseat = raiseat32;
+coredump = coredump32;
+lfutexexpr = lfutexexpr32;
+lfutexlockexpr = lfutexlockexpr32;
+lfutex = lfutex32;
+debugtrap = debugtrap32;
+set_library_listdef = set_library_listdef32;
+get_exception_handler = get_exception_handler32;
+set_exception_handler = set_exception_handler32;
+rpc_schedule = rpc_schedule32;
+readv = readv32;
+readvf = readvf32;
+writev = writev32;
+writevf = writevf32;
+vmsplice = vmsplice32;
+preadv = preadv32;
+preadvf = preadvf32;
+pwritev = pwritev32;
+pwritevf = pwritevf32;
+process_vm_readv = process_vm_readv32;
+process_vm_writev = process_vm_writev32;
+timerfd_gettime = timerfd_gettimex32;
+timerfd_gettime64 = timerfd_gettimex32_64;
+timerfd_settime = timerfd_settimex32;
+timerfd_settime64 = timerfd_settimex32_64;
+timer_settime = timer_settimex32;
+timer_settime64 = timer_settimex32_64;
+timer_gettime = timer_gettimex32;
+timer_gettime64 = timer_gettimex32_64;
 
 
 /* Syscall definition syntax

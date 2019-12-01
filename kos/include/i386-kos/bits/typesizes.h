@@ -42,5 +42,4 @@
 #define __SIZEOF_IOMODE_T__         2
 #endif /* !__x86_64__ */
 
-
 #endif /* !_I386_KOS_BITS_TYPESIZES_H */

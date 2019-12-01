@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x395451f4 */
+/* HASH CRC-32:0xc1a8181a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -119,7 +119,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the `struct tm' representation of *TIMER in the local timezone */
 __LOCAL_LIBC(localtime) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct __NAMESPACE_STD_SYM tm *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(localtime))(__TM_TYPE(time) const *__timer) {
-#line 546 "kos/src/libc/magic/time.c"
+#line 521 "kos/src/libc/magic/time.c"
 #if defined(__CRT_HAVE_localtime64) || defined(__CRT_HAVE__localtime64)
 	__time64_t __tm64 = (__time64_t)*__timer;
 	return __localdep_localtime64(&__tm64);

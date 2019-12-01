@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4342b04 */
+/* HASH CRC-32:0xe9235550 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3026,11 +3026,11 @@
 #define __NR32ATRA0_lfutex(uaddr, futex_op, val, timeout, val2) ,uaddr
 #define __NR32ATRF1_lfutex                  "%#" PRIxSIZ
 #define __NR32ATRA1_lfutex(uaddr, futex_op, val, timeout, val2) ,(uintptr_t)(futex_op)
-#define __NR32ATRF2_lfutex                  "%p"
+#define __NR32ATRF2_lfutex                  "%" PRIu32
 #define __NR32ATRA2_lfutex(uaddr, futex_op, val, timeout, val2) ,val
 #define __NR32ATRF3_lfutex                  "%p"
 #define __NR32ATRA3_lfutex(uaddr, futex_op, val, timeout, val2) ,timeout
-#define __NR32ATRF4_lfutex                  "%p"
+#define __NR32ATRF4_lfutex                  "%" PRIu32
 #define __NR32ATRA4_lfutex(uaddr, futex_op, val, timeout, val2) ,val2
 #define __NR32ATRF0_lseek64                 "%d"
 #define __NR32ATRA0_lseek64(fd, offset, whence) ,(int)(fd)

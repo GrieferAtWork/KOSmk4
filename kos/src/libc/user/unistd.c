@@ -36,6 +36,7 @@
 #include <sys/sysinfo.h>
 #include <sys/time.h>
 #include <sys/utsname.h>
+#include <sys/syscall.h>
 
 #include <assert.h>
 #include <dirent.h>
@@ -428,7 +429,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.user.getuid") uid_t
 NOTHROW_NCX(LIBCCALL libc_getuid)(void)
 /*[[[body:getuid]]]*/
 {
+#ifdef SYS_getuid32
 	uint32_t result = sys_getuid32();
+#else /* SYS_getuid32 */
+	uid_t result = sys_getuid();
+#endif /* !SYS_getuid32 */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:getuid]]]*/
@@ -441,7 +446,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.user.geteuid") uid_t
 NOTHROW_NCX(LIBCCALL libc_geteuid)(void)
 /*[[[body:geteuid]]]*/
 {
+#ifdef SYS_geteuid32
 	uint32_t result = sys_geteuid32();
+#else /* SYS_geteuid32 */
+	uid_t result = sys_geteuid();
+#endif /* !SYS_geteuid32 */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:geteuid]]]*/
@@ -454,7 +463,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.user.getgid") gid_t
 NOTHROW_NCX(LIBCCALL libc_getgid)(void)
 /*[[[body:getgid]]]*/
 {
+#ifdef SYS_getgid32
 	uint32_t result = sys_getgid32();
+#else /* SYS_getgid32 */
+	gid_t result = sys_getgid();
+#endif /* !SYS_getgid32 */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:getgid]]]*/
@@ -467,7 +480,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.user.getegid") gid_t
 NOTHROW_NCX(LIBCCALL libc_getegid)(void)
 /*[[[body:getegid]]]*/
 {
+#ifdef SYS_getegid32
 	uint32_t result = sys_getegid32();
+#else /* SYS_getegid32 */
+	gid_t result = sys_getegid();
+#endif /* !SYS_getegid32 */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:getegid]]]*/
@@ -479,7 +496,11 @@ NOTHROW_NCX(LIBCCALL libc_getgroups)(int size,
 /*[[[body:getgroups]]]*/
 {
 	errno_t result;
+#ifdef SYS_getgroups32
 	result = sys_getgroups32((size_t)size, (uint32_t *)list);
+#else /* SYS_getgroups32 */
+	result = sys_getgroups((size_t)size, (uint32_t *)list);
+#endif /* !SYS_getgroups32 */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:getgroups]]]*/
@@ -495,7 +516,11 @@ NOTHROW_NCX(LIBCCALL libc_setuid)(uid_t uid)
 /*[[[body:setuid]]]*/
 {
 	errno_t result;
+#ifdef SYS_setuid32
 	result = sys_setuid32((uint32_t)uid);
+#else /* SYS_setuid32 */
+	result = sys_setuid(uid);
+#endif /* !SYS_setuid32 */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:setuid]]]*/
@@ -511,7 +536,11 @@ NOTHROW_NCX(LIBCCALL libc_setgid)(gid_t gid)
 /*[[[body:setgid]]]*/
 {
 	errno_t result;
+#ifdef SYS_setgid32
 	result = sys_setgid32((uint32_t)gid);
+#else /* SYS_setgid32 */
+	result = sys_setgid(gid);
+#endif /* !SYS_setgid32 */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:setgid]]]*/
@@ -1346,9 +1375,13 @@ NOTHROW_NCX(LIBCCALL libc_getresuid)(uid_t *ruid,
 /*[[[body:getresuid]]]*/
 {
 	errno_t result;
+#ifdef SYS_getresuid32
 	result = sys_getresuid32((uint32_t *)ruid,
 	                         (uint32_t *)euid,
 	                         (uint32_t *)suid);
+#else /* SYS_getresuid32 */
+	result = sys_getresuid(ruid, euid, suid);
+#endif /* !SYS_getresuid32 */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:getresuid]]]*/
@@ -1361,9 +1394,13 @@ NOTHROW_NCX(LIBCCALL libc_getresgid)(gid_t *rgid,
 /*[[[body:getresgid]]]*/
 {
 	errno_t result;
+#ifdef SYS_getresgid32
 	result = sys_getresgid32((uint32_t *)rgid,
 	                         (uint32_t *)egid,
 	                         (uint32_t *)sgid);
+#else /* SYS_getresgid32 */
+	result = sys_getresgid(rgid, egid, sgid);
+#endif /* !SYS_getresgid32 */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:getresgid]]]*/
@@ -1376,9 +1413,13 @@ NOTHROW_NCX(LIBCCALL libc_setresuid)(uid_t ruid,
 /*[[[body:setresuid]]]*/
 {
 	errno_t result;
+#ifdef SYS_setresuid32
 	result = sys_setresuid32((uint32_t)ruid,
 	                         (uint32_t)euid,
 	                         (uint32_t)suid);
+#else /* SYS_setresuid32 */
+	result = sys_setresuid(ruid, euid, suid);
+#endif /* !SYS_setresuid32 */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:setresuid]]]*/
@@ -1391,9 +1432,13 @@ NOTHROW_NCX(LIBCCALL libc_setresgid)(gid_t rgid,
 /*[[[body:setresgid]]]*/
 {
 	errno_t result;
+#ifdef SYS_setresgid32
 	result = sys_setresgid32((uint32_t)rgid,
 	                         (uint32_t)egid,
 	                         (uint32_t)sgid);
+#else /* SYS_setresgid32 */
+	result = sys_setresgid(rgid, egid, sgid);
+#endif /* !SYS_setresgid32 */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:setresgid]]]*/
@@ -1627,8 +1672,12 @@ NOTHROW_NCX(LIBCCALL libc_setreuid)(uid_t ruid,
 /*[[[body:setreuid]]]*/
 {
 	errno_t error;
+#ifdef SYS_setreuid32
 	error = sys_setreuid32((uint32_t)ruid,
 	                       (uint32_t)euid);
+#else /* SYS_setreuid32 */
+	error = sys_setreuid(ruid, euid);
+#endif /* !SYS_setreuid32 */
 	return libc_seterrno_syserr(error);
 }
 /*[[[end:setreuid]]]*/
@@ -1640,8 +1689,12 @@ NOTHROW_NCX(LIBCCALL libc_setregid)(gid_t rgid,
 /*[[[body:setregid]]]*/
 {
 	errno_t error;
+#ifdef SYS_setregid32
 	error = sys_setregid32((uint32_t)rgid,
 	                       (uint32_t)egid);
+#else /* SYS_setregid32 */
+	error = sys_setregid(rgid, egid);
+#endif /* !SYS_setregid32 */
 	return libc_seterrno_syserr(error);
 }
 /*[[[end:setregid]]]*/
@@ -1721,10 +1774,20 @@ NOTHROW_NCX(LIBCCALL libc_seteuid)(uid_t euid)
 /*[[[body:seteuid]]]*/
 {
 	errno_t error;
+#ifdef SYS_getresuid32
 	uint32_t ruid;
 	error = sys_getresuid32(&ruid, NULL, NULL);
-	if (E_ISOK(error))
+#else /* SYS_getresuid32 */
+	uid_t ruid;
+	error = sys_getresuid(&ruid, NULL, NULL);
+#endif /* !SYS_getresuid32 */
+	if (E_ISOK(error)) {
+#ifdef SYS_setreuid32
 		error = sys_setreuid32(ruid, (uint32_t)euid);
+#else /* SYS_setreuid32 */
+		error = sys_setreuid(ruid, euid);
+#endif /* !SYS_setreuid32 */
+	}
 	return libc_seterrno_syserr(error);
 }
 /*[[[end:seteuid]]]*/
@@ -1740,10 +1803,20 @@ NOTHROW_NCX(LIBCCALL libc_setegid)(gid_t egid)
 /*[[[body:setegid]]]*/
 {
 	errno_t error;
+#ifdef SYS_getresgid32
 	uint32_t rgid;
 	error = sys_getresgid32(&rgid, NULL, NULL);
-	if (E_ISOK(error))
+#else /* SYS_getresgid32 */
+	gid_t rgid;
+	error = sys_getresgid(&rgid, NULL, NULL);
+#endif /* !SYS_getresgid32 */
+	if (E_ISOK(error)) {
+#ifdef SYS_setregid32
 		error = sys_setregid32(rgid, (uint32_t)egid);
+#else /* SYS_setregid32 */
+		error = sys_setregid(rgid, egid);
+#endif /* !SYS_setregid32 */
+	}
 	return libc_seterrno_syserr(error);
 }
 /*[[[end:setegid]]]*/

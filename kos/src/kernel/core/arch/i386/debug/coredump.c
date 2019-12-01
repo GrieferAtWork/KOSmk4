@@ -30,6 +30,7 @@
 #include <sched/rpc.h>
 
 #include <hybrid/host.h>
+#include <hybrid/pointer.h>
 
 #include <asm/cpu-flags.h>
 #include <asm/registers.h>
@@ -211,10 +212,10 @@ coredump32_rpc(void *UNUSED(arg),
 
 
 DEFINE_SYSCALL32_6(errno_t, coredump,
-                   USER UNCHECKED struct /*ucpustate32*/ ucpustate const *, curr_state,
-                   USER UNCHECKED struct /*ucpustate32*/ ucpustate const *, orig_state,
-                   USER UNCHECKED /*u32*/ void const *const *, traceback_vector, size_t, traceback_length,
-                   USER UNCHECKED struct /*exception_data32*/ exception_data const *, exception,
+                   USER UNCHECKED struct ucpustate32 const *, curr_state,
+                   USER UNCHECKED struct ucpustate32 const *, orig_state,
+                   USER UNCHECKED PTR32(void) const *, traceback_vector, size_t, traceback_length,
+                   USER UNCHECKED struct exception_data32 const *, exception,
                    syscall_ulong_t, unwind_error) {
 	(void)curr_state;
 	(void)orig_state;

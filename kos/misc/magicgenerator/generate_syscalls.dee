@@ -228,14 +228,16 @@ class CType {
 			}
 			return;
 		}
-		if (typename && typename.issymstrt(0) && !typename.startswith("__")) {
+		if (typename && typename.issymstrt(0)) {
 			local e = 0;
 			while (e < #typename && typename.issymcont(e))
 				++e;
 			local n = typename[:e];
 			if (n !in ["int", "short", "long", "char",
 			           "signed", "unsigned", "void"]) {
-				local org = syscallTypeDeclarationOrigins.get("__" + n);
+				local org = syscallTypeDeclarationOrigins.get(n);
+				if (org is none)
+					org = syscallTypeDeclarationOrigins.get("__" + n);
 				if (org !is none)
 					headers.insert(org);
 			}
@@ -859,6 +861,12 @@ function parseSyscallDefs(context: ParserContext, text: string, filename: string
 				case "cp": currentFunction.isCp = argsToBool(); break;
 				case "noreturn": currentFunction.isNoReturn = argsToBool(); break;
 				case "noexcept": currentFunction.isNoExcept = argsToBool(); break;
+				case "doc_alias": {
+					local alias = context.functions.get(directive_args);
+					if (alias is none)
+						err(name_start, "Unknown function {!r}".format({ directive_args }));
+					currentFunction.doc = alias.doc;
+				}	break;
 
 				case "restart": {
 					final local MODE_NAMES = {
@@ -898,14 +906,59 @@ function parseSyscallDefs(context: ParserContext, text: string, filename: string
 			currentFunction.declFilename = filename;
 			currentFunction.declLine = text.count("\n", 0, nameStart) + 1;
 			currentFunction.name = text[nameStart:i];
-			if (currentFunction.name in disallowFunctionOverride &&
-			    currentFunction.name in context.functions)
-				err(i, "Function {!r} was already defined".format({ currentFunction.name }));
 			while (i < len && text.isspace(i))
 				++i;
 			if (i >= len)
 				err(i, "Unexpected EOF in definition of function {!r}".format({ currentFunction.name }));
-			if (text[i] != ":")
+			ch = text[i];
+			if (ch == "=") {
+				/* Function alias definition:
+				 * >> my_chown = chown;
+				 * Same as:
+				 * >> [ATTRIBUTES_OF(chown)]
+				 * >> my_chown:(ARGUMENTS_OF(chown)) -> RETURN_TYPE_OF(chown); */
+				currentFunction = currentFunction.name;
+				++i;
+				while (i < len && text.isspace(i))
+					++i;
+				if (i >= len)
+					err(i, "Unexpected EOF in definition of function {!r}".format({ currentFunction }));
+				if (!text.issymstrt(i))
+					err(i, "Expected alias name after `{}='".format({ currentFunction }));
+				local aliasStart = i;
+				do {
+					++i;
+				} while (i < len && text.issymcont(i));
+				local aliasName = text[aliasStart:i];
+				while (i < len && text.isspace(i))
+					++i;
+				if (i >= len)
+					err(i, "Unexpected EOF in definition of function {!r}".format({ currentFunction }));
+				if (text[i] != ";")
+					err(i, "Expected `;' after definition of function alias `{} = {}', but got {!r}"
+						.format({ currentFunction, aliasName, text[i] }));
+				local aliasFunc = context.functions.get(aliasName);
+				if (aliasFunc is none)
+					err(i, "Cannot alias `{} = {}'. Function {!r} isn't defined"
+						.format({ currentFunction, aliasName, aliasName }));
+				if (currentFunction != aliasName) {
+					if (currentFunction in disallowFunctionOverride &&
+					    currentFunction in context.functions)
+						err(i, "Function {!r} was already defined".format({ currentFunction }));
+					aliasFunc = copy aliasFunc;
+					aliasFunc.name = currentFunction;
+					context.functions[currentFunction] = aliasFunc;
+					disallowFunctionOverride.insert(currentFunction);
+				}
+				currentFunction = none;
+				currentFunctionPos = -1;
+				++i;
+				continue;
+			}
+			if (currentFunction.name in disallowFunctionOverride &&
+			    currentFunction.name in context.functions)
+				err(i, "Function {!r} was already defined".format({ currentFunction.name }));
+			if (ch != ":")
 				err(i, "Expected `:' after function name {!r}".format({ currentFunction.name }));
 			++i;
 			while (i < len && text.isspace(i))
@@ -1042,9 +1095,14 @@ function printSyscallDeclarations(
 			x.printFunctionAttributes(fp);
 			if (usedReturnType)
 				fp << "," << usedReturnType;
-			fp << "," << x.name << ",(" << ", ".join(
-				for (local t, n: x.args)
-					joinVariableName(t.escapedTypenameBase, "__" + n));
+			fp << "," << x.name << ",(";
+			if (x.args) {
+				fp << ", ".join(
+					for (local t, n: x.args)
+						joinVariableName(t.escapedTypenameBase, "__" + n));
+			} else {
+				fp << "void";
+			}
 			fp << "),(" << ",".join(for (local none, n: x.args) "__" + n) << "))\n";
 			fp << "#endif /* __CRT_HAVE_" << conditionalX << "SC(" << x.name << ") */\n";
 		}
@@ -1495,7 +1553,8 @@ function generateAsmSyscallsProtoHeader(
 					}
 					fp << "((__uint128_t)" << a << " | (__uint128_t)" << b << " << 64)";
 				}
-			} else if (t.isReg64 && arch.platformGpRegisterSizeInBits && arch.platformGpRegisterSizeInBits < 64) {
+			} else if (t.isReg64 && arch.platformGpRegisterSizeInBits &&
+			           arch.platformGpRegisterSizeInBits < 64) {
 				local a = args.pop(0);
 				local b = args.pop(0);
 				if (arch.platformEndian == "be") {
@@ -1964,12 +2023,9 @@ function generateKernelCoreArchSyscallWrappersAssembly(
 	fp << "\n";
 	arch.platformKernelSyscallWrappersCommon(fp);
 	fp << "\n";
-	for (local prefix: arch.platformKernelSyscallWrappers.keys.sorted()) {
-		local data = arch.platformKernelSyscallWrappers[prefix];
-		local visibility, sectionName, generator, srcArchName = data...;
+	for (local generator, srcArchName: arch.platformKernelSyscallWrappers) {
 		local srcArch/*: SyscallArch*/ = ARCH[srcArchName];
 		fp << "\n\n\n\n\n\n\n\n\n";
-		printMessageBox(fp, "WRAPPERS: {}...".format({ prefix }));
 		local srcContext = archContexts[srcArchName];
 		local srcIds = srcContext.sysidMappings.keys.sorted();
 		for (local id: srcIds) {
@@ -1979,10 +2035,7 @@ function generateKernelCoreArchSyscallWrappersAssembly(
 			fp << "/* ";
 			f.printPrototype(fp);
 			fp << " */\n";
-			fp << ".section " << sectionName.format({ .name = name }) << "\n";
-			fp << visibility << "_FUNCTION(" << prefix << name << ")\n";
 			generator(fp, f, id);
-			fp << "END(" << prefix << name << ")\n";
 			fp << "\n";
 		}
 	}

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f43f67c */
+/* HASH CRC-32:0x2d21cdd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -859,11 +859,11 @@
 #define __NRAT1_pselect6               (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NRAT2_pselect6               (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NRAT3_pselect6               (struct __fd_set_struct *, struct __fd_set_struct *)
-#define __NRAT4_pselect6               (struct __timespec32 const *, struct __timespec32 const *)
+#define __NRAT4_pselect6               (struct timespec const *, struct timespec const *)
 #define __NRAT5_pselect6               (void const *, void const *)
 #define __NRAT0_ppoll                  (struct pollfd *, struct pollfd *)
 #define __NRAT1_ppoll                  (size_t, __size_t)
-#define __NRAT2_ppoll                  (struct __timespec32 const *, struct __timespec32 const *)
+#define __NRAT2_ppoll                  (struct timespec const *, struct timespec const *)
 #define __NRAT3_ppoll                  (struct __sigset_struct const *, struct __sigset_struct const *)
 #define __NRAT4_ppoll                  (size_t, __size_t)
 #define __NRAT0_signalfd4              (fd_t, __fd_t)
@@ -898,13 +898,13 @@
 #define __NRAT1_timerfd_create         (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_timerfd_settime        (fd_t, __fd_t)
 #define __NRAT1_timerfd_settime        (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT2_timerfd_settime        (struct __itimerspec32 const *, struct __itimerspec32 const *)
-#define __NRAT3_timerfd_settime        (struct __itimerspec32 *, struct __itimerspec32 *)
+#define __NRAT2_timerfd_settime        (struct itimerspec const *, struct itimerspec const *)
+#define __NRAT3_timerfd_settime        (struct itimerspec *, struct itimerspec *)
 #define __NRAT0_timerfd_gettime        (fd_t, __fd_t)
-#define __NRAT1_timerfd_gettime        (struct __itimerspec32 *, struct __itimerspec32 *)
+#define __NRAT1_timerfd_gettime        (struct itimerspec *, struct itimerspec *)
 #define __NRAT0_utimensat              (fd_t, __fd_t)
 #define __NRAT1_utimensat              (char const *, char const *)
-#define __NRAT2_utimensat              (struct __timespec32 const *, struct __timespec32 const *)
+#define __NRAT2_utimensat              (struct timespec const *, struct timespec const *)
 #define __NRAT3_utimensat              (atflag_t, __atflag_t)
 #define __NRAT0_acct                   (char const *, char const *)
 #define __NRAT0_capget                 (int, int)
@@ -922,13 +922,13 @@
 #define __NRAT0_futex                  (uint32_t *, __uint32_t *)
 #define __NRAT1_futex                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT2_futex                  (uint32_t, __uint32_t)
-#define __NRAT3_futex                  (struct __timespec32 const *, struct __timespec32 const *)
+#define __NRAT3_futex                  (struct timespec const *, struct timespec const *)
 #define __NRAT4_futex                  (uint32_t *, __uint32_t *)
 #define __NRAT5_futex                  (uint32_t, __uint32_t)
 #define __NRAT0_set_robust_list        (int, int)
 #define __NRAT0_get_robust_list        (int, int)
-#define __NRAT0_nanosleep              (struct __timespec32 const *, struct __timespec32 const *)
-#define __NRAT1_nanosleep              (struct __timespec32 *, struct __timespec32 *)
+#define __NRAT0_nanosleep              (struct timespec const *, struct timespec const *)
+#define __NRAT1_nanosleep              (struct timespec *, struct timespec *)
 #define __NRAT0_getitimer              (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_getitimer              (struct __itimerval32 *, struct __itimerval32 *)
 #define __NRAT0_setitimer              (syscall_ulong_t, __syscall_ulong_t)
@@ -941,23 +941,23 @@
 #define __NRAT1_timer_create           (struct sigevent *, struct sigevent *)
 #define __NRAT2_timer_create           (timer_t *, __timer_t *)
 #define __NRAT0_timer_gettime          (timer_t, __timer_t)
-#define __NRAT1_timer_gettime          (struct __itimerspec32 *, struct __itimerspec32 *)
+#define __NRAT1_timer_gettime          (struct itimerspec *, struct itimerspec *)
 #define __NRAT0_timer_getoverrun       (timer_t, __timer_t)
 #define __NRAT0_timer_settime          (timer_t, __timer_t)
 #define __NRAT1_timer_settime          (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT2_timer_settime          (struct __itimerspec32 const *, struct __itimerspec32 const *)
-#define __NRAT3_timer_settime          (struct __itimerspec32 *, struct __itimerspec32 *)
+#define __NRAT2_timer_settime          (struct itimerspec const *, struct itimerspec const *)
+#define __NRAT3_timer_settime          (struct itimerspec *, struct itimerspec *)
 #define __NRAT0_timer_delete           (timer_t, __timer_t)
 #define __NRAT0_clock_settime          (clockid_t, __clockid_t)
-#define __NRAT1_clock_settime          (struct __timespec32 const *, struct __timespec32 const *)
+#define __NRAT1_clock_settime          (struct timespec const *, struct timespec const *)
 #define __NRAT0_clock_gettime          (clockid_t, __clockid_t)
-#define __NRAT1_clock_gettime          (struct __timespec32 *, struct __timespec32 *)
+#define __NRAT1_clock_gettime          (struct timespec *, struct timespec *)
 #define __NRAT0_clock_getres           (clockid_t, __clockid_t)
-#define __NRAT1_clock_getres           (struct __timespec32 *, struct __timespec32 *)
+#define __NRAT1_clock_getres           (struct timespec *, struct timespec *)
 #define __NRAT0_clock_nanosleep        (clockid_t, __clockid_t)
 #define __NRAT1_clock_nanosleep        (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT2_clock_nanosleep        (struct __timespec32 const *, struct __timespec32 const *)
-#define __NRAT3_clock_nanosleep        (struct __timespec32 *, struct __timespec32 *)
+#define __NRAT2_clock_nanosleep        (struct timespec const *, struct timespec const *)
+#define __NRAT3_clock_nanosleep        (struct timespec *, struct timespec *)
 #define __NRAT0_syslog                 (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_syslog                 (char const *, char const *)
 #define __NRAT2_syslog                 (size_t, __size_t)
@@ -982,7 +982,7 @@
 #define __NRAT0_sched_get_priority_max (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_sched_get_priority_min (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_sched_rr_get_interval  (pid_t, __pid_t)
-#define __NRAT1_sched_rr_get_interval  (struct __timespec32 *, struct __timespec32 *)
+#define __NRAT1_sched_rr_get_interval  (struct __timespec *, struct __timespec *)
 #define __NRAT0_kill                   (pid_t, __pid_t)
 #define __NRAT1_kill                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_tkill                  (pid_t, __pid_t)
@@ -1006,7 +1006,7 @@
 #define __NRAT1_rt_sigpending          (size_t, __size_t)
 #define __NRAT0_rt_sigtimedwait        (struct __sigset_struct const *, struct __sigset_struct const *)
 #define __NRAT1_rt_sigtimedwait        (struct __siginfo_struct *, struct __siginfo_struct *)
-#define __NRAT2_rt_sigtimedwait        (struct __timespec32 const *, struct __timespec32 const *)
+#define __NRAT2_rt_sigtimedwait        (struct timespec const *, struct timespec const *)
 #define __NRAT3_rt_sigtimedwait        (size_t, __size_t)
 #define __NRAT0_rt_sigqueueinfo        (pid_t, __pid_t)
 #define __NRAT1_rt_sigqueueinfo        (syscall_ulong_t, __syscall_ulong_t)
@@ -1066,9 +1066,9 @@
 #define __NRAT0_getcpu                 (uint32_t *, __uint32_t *)
 #define __NRAT1_getcpu                 (uint32_t *, __uint32_t *)
 #define __NRAT2_getcpu                 (struct getcpu_cache *, struct getcpu_cache *)
-#define __NRAT0_gettimeofday           (struct __timeval32 *, struct __timeval32 *)
+#define __NRAT0_gettimeofday           (struct timeval *, struct timeval *)
 #define __NRAT1_gettimeofday           (struct timezone *, struct timezone *)
-#define __NRAT0_settimeofday           (struct __timeval32 const *, struct __timeval32 const *)
+#define __NRAT0_settimeofday           (struct timeval const *, struct timeval const *)
 #define __NRAT1_settimeofday           (struct timezone const *, struct timezone const *)
 #define __NRAT0_adjtimex               (int, int)
 #define __NRAT0_sysinfo                (struct sysinfo *, struct sysinfo *)
@@ -1207,7 +1207,7 @@
 #define __NRAT1_recvmmsg               (struct mmsghdr *, struct mmsghdr *)
 #define __NRAT2_recvmmsg               (size_t, __size_t)
 #define __NRAT3_recvmmsg               (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT4_recvmmsg               (struct __timespec32 *, struct __timespec32 *)
+#define __NRAT4_recvmmsg               (struct timespec *, struct timespec *)
 #define __NRAT0_wait4                  (pid_t, __pid_t)
 #define __NRAT1_wait4                  (int32_t *, __int32_t *)
 #define __NRAT2_wait4                  (syscall_ulong_t, __syscall_ulong_t)
@@ -1301,7 +1301,7 @@
 #define __NRAT0_symlink                (char const *, char const *)
 #define __NRAT1_symlink                (char const *, char const *)
 #define __NRAT0_utimes                 (char const *, char const *)
-#define __NRAT1_utimes                 (struct __timeval32 const *, struct __timeval32 const *)
+#define __NRAT1_utimes                 (struct timeval const *, struct timeval const *)
 #define __NRAT0_pipe                   (fd_t *, __fd_t *)
 #define __NRAT0_dup2                   (fd_t, __fd_t)
 #define __NRAT1_dup2                   (fd_t, __fd_t)
@@ -1357,12 +1357,12 @@
 #define __NRAT2_getdents               (size_t, __size_t)
 #define __NRAT0_futimesat              (fd_t, __fd_t)
 #define __NRAT1_futimesat              (const char *, __const char *)
-#define __NRAT2_futimesat              (struct __timeval32 const *, struct __timeval32 const *)
+#define __NRAT2_futimesat              (struct timeval const *, struct timeval const *)
 #define __NRAT0_select                 (size_t, __size_t)
 #define __NRAT1_select                 (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NRAT2_select                 (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NRAT3_select                 (struct __fd_set_struct *, struct __fd_set_struct *)
-#define __NRAT4_select                 (struct __timeval32 *, struct __timeval32 *)
+#define __NRAT4_select                 (struct timeval *, struct timeval *)
 #define __NRAT0_poll                   (struct pollfd *, struct pollfd *)
 #define __NRAT1_poll                   (size_t, __size_t)
 #define __NRAT2_poll                   (syscall_slong_t, __syscall_slong_t)
@@ -1463,8 +1463,8 @@
 #define __NRAM_pwrite64(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)d
 #define __NRAM_preadv(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__fd_t)a, (struct iovec const *)b, (__size_t)c, (__uint64_t)d
 #define __NRAM_pwritev(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                (__fd_t)a, (struct iovec const *)b, (__size_t)c, (__uint64_t)d
-#define __NRAM_pselect6(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct __timespec32 const *)e, (void const *)f
-#define __NRAM_ppoll(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (struct pollfd *)a, (__size_t)b, (struct __timespec32 const *)c, (struct __sigset_struct const *)d, (__size_t)e
+#define __NRAM_pselect6(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct timespec const *)e, (void const *)f
+#define __NRAM_ppoll(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (struct pollfd *)a, (__size_t)b, (struct timespec const *)c, (struct __sigset_struct const *)d, (__size_t)e
 #define __NRAM_signalfd4(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a, (struct __sigset_struct const *)b, (__size_t)c, (__syscall_ulong_t)d
 #define __NRAM_vmsplice(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__fd_t)a, (struct iovec const *)b, (__size_t)c, (__syscall_ulong_t)d
 #define __NRAM_splice(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__fd_t)a, (__uint64_t *)b, (__fd_t)c, (__uint64_t *)d, (__size_t)e, (__syscall_ulong_t)f
@@ -1475,9 +1475,9 @@
 #define __NRAM_fdatasync(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a
 #define __NRAM_sync_file_range(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (__fd_t)a, (__uint64_t)b, (__uint64_t)c, (__syscall_ulong_t)d
 #define __NRAM_timerfd_create(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)         (__clockid_t)a, (__syscall_ulong_t)b
-#define __NRAM_timerfd_settime(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (__fd_t)a, (__syscall_ulong_t)b, (struct __itimerspec32 const *)c, (struct __itimerspec32 *)d
-#define __NRAM_timerfd_gettime(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (__fd_t)a, (struct __itimerspec32 *)b
-#define __NRAM_utimensat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a, (char const *)b, (struct __timespec32 const *)c, (__atflag_t)d
+#define __NRAM_timerfd_settime(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (__fd_t)a, (__syscall_ulong_t)b, (struct itimerspec const *)c, (struct itimerspec *)d
+#define __NRAM_timerfd_gettime(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (__fd_t)a, (struct itimerspec *)b
+#define __NRAM_utimensat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a, (char const *)b, (struct timespec const *)c, (__atflag_t)d
 #define __NRAM_acct(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (char const *)a
 #define __NRAM_capget(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (int)a
 #define __NRAM_capset(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (int)a
@@ -1487,24 +1487,24 @@
 #define __NRAM_waitid(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__syscall_ulong_t)a, (__id_t)b, (struct __siginfo_struct *)c, (__syscall_ulong_t)d, (struct rusage *)e
 #define __NRAM_set_tid_address(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (__pid_t *)a
 #define __NRAM_unshare(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                (__syscall_ulong_t)a
-#define __NRAM_futex(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__uint32_t *)a, (__syscall_ulong_t)b, (__uint32_t)c, (struct __timespec32 const *)d, (__uint32_t *)e, (__uint32_t)f
+#define __NRAM_futex(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__uint32_t *)a, (__syscall_ulong_t)b, (__uint32_t)c, (struct timespec const *)d, (__uint32_t *)e, (__uint32_t)f
 #define __NRAM_set_robust_list(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (int)a
 #define __NRAM_get_robust_list(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (int)a
-#define __NRAM_nanosleep(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (struct __timespec32 const *)a, (struct __timespec32 *)b
+#define __NRAM_nanosleep(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (struct timespec const *)a, (struct timespec *)b
 #define __NRAM_getitimer(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__syscall_ulong_t)a, (struct __itimerval32 *)b
 #define __NRAM_setitimer(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__syscall_ulong_t)a, (struct __itimerval32 const *)b, (struct __itimerval32 *)c
 #define __NRAM_kexec_load(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (int)a
 #define __NRAM_init_module(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (int)a
 #define __NRAM_delete_module(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (int)a
 #define __NRAM_timer_create(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (__clockid_t)a, (struct sigevent *)b, (__timer_t *)c
-#define __NRAM_timer_gettime(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (__timer_t)a, (struct __itimerspec32 *)b
+#define __NRAM_timer_gettime(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (__timer_t)a, (struct itimerspec *)b
 #define __NRAM_timer_getoverrun(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)       (__timer_t)a
-#define __NRAM_timer_settime(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (__timer_t)a, (__syscall_ulong_t)b, (struct __itimerspec32 const *)c, (struct __itimerspec32 *)d
+#define __NRAM_timer_settime(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (__timer_t)a, (__syscall_ulong_t)b, (struct itimerspec const *)c, (struct itimerspec *)d
 #define __NRAM_timer_delete(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (__timer_t)a
-#define __NRAM_clock_settime(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (__clockid_t)a, (struct __timespec32 const *)b
-#define __NRAM_clock_gettime(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (__clockid_t)a, (struct __timespec32 *)b
-#define __NRAM_clock_getres(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (__clockid_t)a, (struct __timespec32 *)b
-#define __NRAM_clock_nanosleep(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (__clockid_t)a, (__syscall_ulong_t)b, (struct __timespec32 const *)c, (struct __timespec32 *)d
+#define __NRAM_clock_settime(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (__clockid_t)a, (struct timespec const *)b
+#define __NRAM_clock_gettime(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (__clockid_t)a, (struct timespec *)b
+#define __NRAM_clock_getres(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (__clockid_t)a, (struct timespec *)b
+#define __NRAM_clock_nanosleep(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (__clockid_t)a, (__syscall_ulong_t)b, (struct timespec const *)c, (struct timespec *)d
 #define __NRAM_syslog(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__syscall_ulong_t)a, (char const *)b, (__size_t)c
 #define __NRAM_ptrace(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__syscall_ulong_t)a, (__pid_t)b, (void *)c, (void *)d
 #define __NRAM_sched_setparam(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)         (__pid_t)a, (struct sched_param const *)b
@@ -1516,7 +1516,7 @@
 #define __NRAM_sched_yield(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            /* nothing */
 #define __NRAM_sched_get_priority_max(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z) (__syscall_ulong_t)a
 #define __NRAM_sched_get_priority_min(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z) (__syscall_ulong_t)a
-#define __NRAM_sched_rr_get_interval(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)  (__pid_t)a, (struct __timespec32 *)b
+#define __NRAM_sched_rr_get_interval(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)  (__pid_t)a, (struct __timespec *)b
 #define __NRAM_restart_syscall(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        /* nothing */
 #define __NRAM_kill(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (__pid_t)a, (__syscall_ulong_t)b
 #define __NRAM_tkill(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__pid_t)a, (__syscall_ulong_t)b
@@ -1526,7 +1526,7 @@
 #define __NRAM_rt_sigaction(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (__syscall_ulong_t)a, (struct sigaction const *)b, (struct sigaction *)c, (__size_t)d
 #define __NRAM_rt_sigprocmask(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)         (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c, (__size_t)d
 #define __NRAM_rt_sigpending(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (struct __sigset_struct *)a, (__size_t)b
-#define __NRAM_rt_sigtimedwait(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (struct __sigset_struct const *)a, (struct __siginfo_struct *)b, (struct __timespec32 const *)c, (__size_t)d
+#define __NRAM_rt_sigtimedwait(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (struct __sigset_struct const *)a, (struct __siginfo_struct *)b, (struct timespec const *)c, (__size_t)d
 #define __NRAM_rt_sigqueueinfo(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (__pid_t)a, (__syscall_ulong_t)b, (struct __siginfo_struct const *)c
 #define __NRAM_rt_sigreturn(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (struct fpustate const *)a, (struct __sigset_struct const *)b, (struct rpc_syscall_info *)c, (struct ucpustate const *)d
 #define __NRAM_setpriority(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (__syscall_ulong_t)a, (__id_t)b, (__syscall_ulong_t)c
@@ -1558,8 +1558,8 @@
 #define __NRAM_umask(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__mode_t)a
 #define __NRAM_prctl(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (int)a
 #define __NRAM_getcpu(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__uint32_t *)a, (__uint32_t *)b, (struct getcpu_cache *)c
-#define __NRAM_gettimeofday(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (struct __timeval32 *)a, (struct timezone *)b
-#define __NRAM_settimeofday(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (struct __timeval32 const *)a, (struct timezone const *)b
+#define __NRAM_gettimeofday(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (struct timeval *)a, (struct timezone *)b
+#define __NRAM_settimeofday(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (struct timeval const *)a, (struct timezone const *)b
 #define __NRAM_adjtimex(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (int)a
 #define __NRAM_getpid(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 /* nothing */
 #define __NRAM_getppid(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                /* nothing */
@@ -1630,7 +1630,7 @@
 #define __NRAM_rt_tgsigqueueinfo(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)      (__pid_t)a, (__pid_t)b, (__syscall_ulong_t)c, (struct __siginfo_struct const *)d
 #define __NRAM_perf_event_open(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (int)a
 #define __NRAM_accept4(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                (__fd_t)a, (struct sockaddr *)b, (__socklen_t *)c, (__syscall_ulong_t)d
-#define __NRAM_recvmmsg(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__fd_t)a, (struct mmsghdr *)b, (__size_t)c, (__syscall_ulong_t)d, (struct __timespec32 *)e
+#define __NRAM_recvmmsg(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__fd_t)a, (struct mmsghdr *)b, (__size_t)c, (__syscall_ulong_t)d, (struct timespec *)e
 #define __NRAM_wait4(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__pid_t)a, (__int32_t *)b, (__syscall_ulong_t)c, (struct rusage *)d
 #define __NRAM_prlimit64(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__pid_t)a, (__syscall_ulong_t)b, (struct rlimit64 const *)c, (struct rlimit64 *)d
 #define __NRAM_fanotify_init(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (int)a
@@ -1669,7 +1669,7 @@
 #define __NRAM_rename(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (char const *)a, (char const *)b
 #define __NRAM_readlink(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (char const *)a, (char *)b, (__size_t)c
 #define __NRAM_symlink(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                (char const *)a, (char const *)b
-#define __NRAM_utimes(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (char const *)a, (struct __timeval32 const *)b
+#define __NRAM_utimes(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (char const *)a, (struct timeval const *)b
 #define __NRAM_pipe(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (__fd_t *)a
 #define __NRAM_dup2(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (__fd_t)a, (__fd_t)b
 #define __NRAM_epoll_create(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (__syscall_ulong_t)a
@@ -1696,8 +1696,8 @@
 #define __NRAM_utime(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (char const *)a, (struct __utimbuf32 const *)b
 #define __NRAM_creat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (char const *)a, (__mode_t)b
 #define __NRAM_getdents(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__fd_t)a, (struct linux_dirent *)b, (__size_t)c
-#define __NRAM_futimesat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a, (__const char *)b, (struct __timeval32 const *)c
-#define __NRAM_select(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct __timeval32 *)e
+#define __NRAM_futimesat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a, (__const char *)b, (struct timeval const *)c
+#define __NRAM_select(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct timeval *)e
 #define __NRAM_poll(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (struct pollfd *)a, (__size_t)b, (__syscall_slong_t)c
 #define __NRAM_epoll_wait(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (__fd_t)a, (struct epoll_event *)b, (__syscall_ulong_t)c, (__syscall_slong_t)d
 #define __NRAM_ustat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__dev_t)a, (struct ustat *)b

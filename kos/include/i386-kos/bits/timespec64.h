@@ -28,10 +28,17 @@
 #define __OFFSET_TIMESPEC_SEC    __OFFSET_TIMESPECX64_SEC
 #define __OFFSET_TIMESPEC_NSEC   __OFFSET_TIMESPECX64_NSEC
 #define __SIZEOF_TIMESPEC        __SIZEOF_TIMESPECX64
+#define __OFFSET_TIMESPEC64_SEC  __OFFSET_TIMESPECX64_SEC
+#define __OFFSET_TIMESPEC64_NSEC __OFFSET_TIMESPECX64_NSEC
+#define __SIZEOF_TIMESPEC64      __SIZEOF_TIMESPECX64
 #define timespecx64              timespec
+#define __timespecx64            timespec
 #define __timespec32             timespec
 #define __timespec64             timespec
 #define __timespec_alt           timespec
+#ifdef __USE_KOS
+#define timespec32               timespec
+#endif /* __USE_KOS */
 #ifdef __USE_TIME64
 #define timespec64               timespec
 #define __OFFSET_TIMESPEC64_SEC  __OFFSET_TIMESPECX64_SEC
@@ -39,7 +46,9 @@
 #define __SIZEOF_TIMESPEC64      __SIZEOF_TIMESPECX64
 #endif /* __USE_TIME64 */
 #define __timespec_defined 1
-#endif /* __x86_64__ */
+#else /* __x86_64__ */
+#define timespecx64              __timespecx64
+#endif /* !__x86_64__ */
 
 
 #define __OFFSET_TIMESPECX64_SEC   0
@@ -52,8 +61,8 @@ __TIMESPEC_CXX_DECL_BEGIN
 
 /* timespec for x86_64 */
 struct timespecx64 /*[PREFIX(tv_)]*/ {
-	__INT64_TYPE__    tv_sec;   /* Seconds */
-	__UINT64_TYPE__   tv_nsec;  /* Nano seconds (<= 1000000000 == 1_000_000_000) */
+	__INT64_TYPE__  tv_sec;   /* Seconds */
+	__UINT64_TYPE__ tv_nsec;  /* Nano seconds (<= 1000000000 == 1_000_000_000) */
 	__TIMESPEC_CXX_SUPPORT(struct timespecx64, __INT64_TYPE__, __UINT64_TYPE__)
 };
 __TIMESPEC_CXX_SUPPORT2(struct timespecx64, __INT64_TYPE__, __UINT64_TYPE__)
@@ -62,5 +71,8 @@ __TIMESPEC_CXX_DECL_END
 __DECL_END
 #endif /* __CC__ */
 
+#ifndef __USE_KOS
+#undef timespecx64
+#endif /* !__USE_KOS */
 
 #endif /* !_I386_KOS_BITS_TIMESPEC64_H */

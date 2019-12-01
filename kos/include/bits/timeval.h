@@ -21,9 +21,11 @@
 
 #include <__stdinc.h>
 #include <features.h>
-#include <bits/types.h>
-#include <bits/timeval-cxx-support.h>
+
 #include <hybrid/typecore.h>
+
+#include <bits/timeval-cxx-support.h>
+#include <bits/types.h>
 
 #define __OFFSET_TIMEVAL_SEC     0
 #if __TM_SIZEOF(TIME) >= 8 || __SIZEOF_SYSCALL_LONG_T__ >= 8

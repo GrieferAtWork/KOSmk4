@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeeb35cbd */
+/* HASH CRC-32:0x687b99b2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.time.difftime") double
 NOTHROW_NCX(LIBCCALL libc_difftime)(time_t time1,
                                     time_t time0) {
-#line 417 "kos/src/libc/magic/time.c"
+#line 392 "kos/src/libc/magic/time.c"
 	return (double)time1 - (double)time0;
 }
 
@@ -77,7 +77,7 @@ __NAMESPACE_STD_END
 INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.mktime") time_t
 NOTHROW_NCX(LIBCCALL libc_mktime)(__STRUCT_TM __KOS_FIXED_CONST *tp) {
-#line 439 "kos/src/libc/magic/time.c"
+#line 414 "kos/src/libc/magic/time.c"
 #if defined(__CRT_HAVE_mktime64) || defined(__CRT_HAVE__mktime64)
 	return (time_t)libc_mktime64(tp);
 #elif defined(__CRT_HAVE_mktime) || defined(__CRT_HAVE__mktime32)
@@ -115,7 +115,7 @@ __NAMESPACE_LOCAL_END
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.ctime") char *
 NOTHROW_NCX(LIBCCALL libc_ctime)(time_t const *timer) {
-#line 488 "kos/src/libc/magic/time.c"
+#line 463 "kos/src/libc/magic/time.c"
 #if defined(__CRT_HAVE_ctime64) || defined(__CRT_HAVE__ctime64)
 	time64_t tm64 = (time64_t)*timer;
 	return libc_ctime64(&tm64);
@@ -182,7 +182,7 @@ __NAMESPACE_LOCAL_END
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.gmtime") struct tm *
 NOTHROW_NCX(LIBCCALL libc_gmtime)(time_t const *timer) {
-#line 529 "kos/src/libc/magic/time.c"
+#line 504 "kos/src/libc/magic/time.c"
 #if defined(__CRT_HAVE_gmtime64) || defined(__CRT_HAVE__gmtime64)
 	time64_t tm64 = (time64_t)*timer;
 	return libc_gmtime64(&tm64);
@@ -248,7 +248,7 @@ __NAMESPACE_LOCAL_END
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.localtime") struct tm *
 NOTHROW_NCX(LIBCCALL libc_localtime)(time_t const *timer) {
-#line 546 "kos/src/libc/magic/time.c"
+#line 521 "kos/src/libc/magic/time.c"
 #if defined(__CRT_HAVE_localtime64) || defined(__CRT_HAVE__localtime64)
 	time64_t tm64 = (time64_t)*timer;
 	return libc_localtime64(&tm64);
@@ -301,7 +301,7 @@ NOTHROW_NCX(LIBCCALL libc_strftime)(char *__restrict buf,
                                     size_t bufsize,
                                     char const *__restrict format,
                                     __STRUCT_TM const *__restrict tp) {
-#line 574 "kos/src/libc/magic/time.c"
+#line 549 "kos/src/libc/magic/time.c"
 #if (defined(__CRT_HAVE_strftime_l) || defined(__CRT_HAVE__strftime_l)) && !defined(__BUILDING_LIBC)
 	return libc_crt_strftime_l(buf, bufsize, format, tp, NULL);
 #else
@@ -337,7 +337,7 @@ __NAMESPACE_LOCAL_END
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.asctime") char *
 NOTHROW_NCX(LIBCCALL libc_asctime)(struct tm const *tp) {
-#line 612 "kos/src/libc/magic/time.c"
+#line 587 "kos/src/libc/magic/time.c"
 	return libc_asctime_r(tp, __NAMESPACE_LOCAL_SYM __ctime_buf);
 }
 
@@ -347,7 +347,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.time.asctime_s") errno_t
 NOTHROW_NCX(LIBCCALL libc_asctime_s)(char *__restrict buf,
                                      size_t buflen,
                                      struct tm const *__restrict tp) {
-#line 621 "kos/src/libc/magic/time.c"
+#line 596 "kos/src/libc/magic/time.c"
 	if (buflen < 26)
 		return __ERANGE;
 	libc_asctime_r(tp, buf);
@@ -362,7 +362,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.time.difftime64") double
 NOTHROW_NCX(LIBCCALL libc_difftime64)(time64_t time1,
                                       time64_t time0) {
-#line 645 "kos/src/libc/magic/time.c"
+#line 620 "kos/src/libc/magic/time.c"
 #if (defined(__CRT_HAVE_difftime) || defined(__CRT_HAVE__difftime32)) && !defined(__BUILDING_LIBC)
 	return libc_difftime32((time32_t)time1, (time32_t)time0);
 #else /* ... */
@@ -413,7 +413,7 @@ DEFINE_INTERN_ALIAS(libc_mktime64, libc_mktime);
 INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.mktime64") time64_t
 NOTHROW_NCX(LIBCCALL libc_mktime64)(__STRUCT_TM __KOS_FIXED_CONST *tp) {
-#line 663 "kos/src/libc/magic/time.c"
+#line 638 "kos/src/libc/magic/time.c"
 #if (defined(__CRT_HAVE_mktime) || defined(__CRT_HAVE__mktime32)) && !defined(__BUILDING_LIBC)
 	return (time64_t)libc_mktime32(tp);
 #else
@@ -453,7 +453,7 @@ DEFINE_INTERN_ALIAS(libc_ctime64, libc_ctime);
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.ctime64") char *
 NOTHROW_NCX(LIBCCALL libc_ctime64)(time64_t const *timer) {
-#line 697 "kos/src/libc/magic/time.c"
+#line 672 "kos/src/libc/magic/time.c"
 #if (defined(__CRT_HAVE_ctime) || defined(__CRT_HAVE__ctime32)) && !defined(__BUILDING_LIBC)
 	time32_t tm32 = (time32_t)*timer;
 	return libc_ctime32(&tm32);
@@ -521,7 +521,7 @@ DEFINE_INTERN_ALIAS(libc_gmtime64, libc_gmtime);
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.gmtime64") __STRUCT_TM *
 NOTHROW_NCX(LIBCCALL libc_gmtime64)(time64_t const *timer) {
-#line 708 "kos/src/libc/magic/time.c"
+#line 683 "kos/src/libc/magic/time.c"
 #if (defined(__CRT_HAVE_gmtime) || defined(__CRT_HAVE__gmtime32)) && !defined(__BUILDING_LIBC)
 	time32_t tm32 = (time32_t)*timer;
 	return libc_gmtime32(&tm32);
@@ -588,7 +588,7 @@ DEFINE_INTERN_ALIAS(libc_localtime64, libc_localtime);
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.localtime64") __STRUCT_TM *
 NOTHROW_NCX(LIBCCALL libc_localtime64)(time64_t const *timer) {
-#line 720 "kos/src/libc/magic/time.c"
+#line 695 "kos/src/libc/magic/time.c"
 #if (defined(__CRT_HAVE_localtime) || defined(__CRT_HAVE__localtime32)) && !defined(__BUILDING_LIBC)
 	time32_t tm32 = (time32_t)*timer;
 	return libc_localtime32(&tm32);
@@ -634,7 +634,7 @@ __NAMESPACE_STD_END
 INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.timegm") time_t
 NOTHROW_NCX(LIBCCALL libc_timegm)(__STRUCT_TM *tp) {
-#line 882 "kos/src/libc/magic/time.c"
+#line 857 "kos/src/libc/magic/time.c"
 #if defined(__CRT_HAVE_timegm64) && !defined(__BUILDING_LIBC)
 	return (time_t)libc_timegm64(tp);
 #else
@@ -647,7 +647,7 @@ NOTHROW_NCX(LIBCCALL libc_timegm)(__STRUCT_TM *tp) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.time.dysize") int
 NOTHROW_NCX(LIBCCALL libc_dysize)(int year) {
-#line 899 "kos/src/libc/magic/time.c"
+#line 874 "kos/src/libc/magic/time.c"
 	return __isleap(year) ? 366 : 365;
 }
 
@@ -690,7 +690,7 @@ DEFINE_INTERN_ALIAS(libc_timegm64, libc_timegm);
 INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.timegm64") time64_t
 NOTHROW_NCX(LIBCCALL libc_timegm64)(__STRUCT_TM *tp) {
-#line 917 "kos/src/libc/magic/time.c"
+#line 892 "kos/src/libc/magic/time.c"
 #if defined(__CRT_HAVE_timegm) && !defined(__BUILDING_LIBC)
 	return (time64_t)libc_timegm32(tp);
 #else /* __CRT_HAVE_timegm && !__BUILDING_LIBC */
@@ -741,7 +741,7 @@ NOTHROW_NCX(LIBCCALL libc_strftime_l)(char *__restrict buf,
                                       char const *__restrict format,
                                       __STRUCT_TM const *__restrict tp,
                                       locale_t locale) {
-#line 1378 "kos/src/libc/magic/time.c"
+#line 1354 "kos/src/libc/magic/time.c"
 	(void)locale;
 	return libc_strftime(buf, bufsize, format, tp);
 }
@@ -785,7 +785,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.time.strptime") char *
 NOTHROW_NCX(LIBCCALL libc_strptime)(char const *__restrict s,
                                     char const *__restrict format,
                                     __STRUCT_TM *__restrict tp) {
-#line 1398 "kos/src/libc/magic/time.c"
+#line 1374 "kos/src/libc/magic/time.c"
 #if defined(__CRT_HAVE_strptime_l) && !defined(__BUILDING_LIBC)
 	return libc_crt_strptime_l(s, format, tp, NULL);
 #else
@@ -838,7 +838,7 @@ NOTHROW_NCX(LIBCCALL libc_strptime_l)(char const *__restrict s,
                                       char const *__restrict format,
                                       __STRUCT_TM *__restrict tp,
                                       locale_t locale) {
-#line 1420 "kos/src/libc/magic/time.c"
+#line 1396 "kos/src/libc/magic/time.c"
 	(void)locale;
 	return libc_strptime(s, format, tp);
 }
@@ -879,7 +879,7 @@ INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.getdate_r") int
 NOTHROW_NCX(LIBCCALL libc_getdate_r)(char const *__restrict string,
                                      __STRUCT_TM *__restrict resbufp) {
-#line 1427 "kos/src/libc/magic/time.c"
+#line 1403 "kos/src/libc/magic/time.c"
 	/* TODO */
 	(void)string;
 	(void)resbufp;
@@ -924,7 +924,7 @@ INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.gmtime_r") __STRUCT_TM *
 NOTHROW_NCX(LIBCCALL libc_gmtime_r)(time_t const *__restrict timer,
                                     __STRUCT_TM *__restrict tp) {
-#line 1446 "kos/src/libc/magic/time.c"
+#line 1422 "kos/src/libc/magic/time.c"
 	time64_t tm64 = (time64_t)*timer;
 	return libc_gmtime64_r(&tm64, tp);
 }
@@ -966,7 +966,7 @@ INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.localtime_r") __STRUCT_TM *
 NOTHROW_NCX(LIBCCALL libc_localtime_r)(time_t const *__restrict timer,
                                        __STRUCT_TM *__restrict tp) {
-#line 1462 "kos/src/libc/magic/time.c"
+#line 1438 "kos/src/libc/magic/time.c"
 	time64_t tm64 = (time64_t)*timer;
 	return libc_localtime64_r(&tm64, tp);
 }
@@ -1008,7 +1008,7 @@ INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.ctime_r") char *
 NOTHROW_NCX(LIBCCALL libc_ctime_r)(time_t const *__restrict timer,
                                    char buf[26]) {
-#line 1477 "kos/src/libc/magic/time.c"
+#line 1453 "kos/src/libc/magic/time.c"
 	struct tm ltm;
 	return libc_asctime_r(libc_localtime_r(timer, &ltm), buf);
 }
@@ -1082,7 +1082,7 @@ INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.gmtime64_r") __STRUCT_TM *
 NOTHROW_NCX(LIBCCALL libc_gmtime64_r)(time64_t const *__restrict timer,
                                       __STRUCT_TM *__restrict tp) {
-#line 1527 "kos/src/libc/magic/time.c"
+#line 1503 "kos/src/libc/magic/time.c"
 #if (defined(__CRT_HAVE__gmtime32_s) || defined(__CRT_HAVE__gmtime64_s)) && !defined(__BUILDING_LIBC)
 	return libc_dos_gmtime64_s(tp, timer) ? NULL : tp;
 #else
@@ -1170,7 +1170,7 @@ INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.localtime64_r") __STRUCT_TM *
 NOTHROW_NCX(LIBCCALL libc_localtime64_r)(time64_t const *__restrict timer,
                                          __STRUCT_TM *__restrict tp) {
-#line 1578 "kos/src/libc/magic/time.c"
+#line 1554 "kos/src/libc/magic/time.c"
 	/* XXX: Timezone support? */
 	return libc_gmtime64_r(timer, tp);
 }
@@ -1216,7 +1216,7 @@ INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.ctime64_r") char *
 NOTHROW_NCX(LIBCCALL libc_ctime64_r)(time64_t const *__restrict timer,
                                      char buf[26]) {
-#line 1591 "kos/src/libc/magic/time.c"
+#line 1567 "kos/src/libc/magic/time.c"
 	struct tm ltm;
 	return libc_asctime_r(libc_localtime64_r(timer, &ltm), buf);
 }
@@ -1293,7 +1293,7 @@ INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.asctime_r") char *
 NOTHROW_NCX(LIBCCALL libc_asctime_r)(__STRUCT_TM const *__restrict tp,
                                      char buf[26]) {
-#line 1645 "kos/src/libc/magic/time.c"
+#line 1621 "kos/src/libc/magic/time.c"
 #if defined(__CRT_HAVE_asctime_s) && !defined(__BUILDING_LIBC)
 	return libc_crt_asctime_s(buf, 26, tp) ? NULL : buf;
 #else

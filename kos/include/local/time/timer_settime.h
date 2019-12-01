@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa607c7b */
+/* HASH CRC-32:0x9e10f19 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,8 @@
 #ifndef __local_timer_settime_defined
 #if defined(__CRT_HAVE_timer_settime) || defined(__CRT_HAVE_timer_settime64)
 #define __local_timer_settime_defined 1
+#include <bits/itimerspec.h>
+#include <bits/itimerspec.h>
 /* Dependency: "timer_settime32" from "time" */
 #ifndef ____localdep_timer_settime32_defined
 #define ____localdep_timer_settime32_defined 1
@@ -56,7 +58,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_settime))(timer_t __timerid,
                                                            int __flags,
                                                            struct itimerspec const *__restrict __value,
                                                            struct itimerspec *__restrict __ovalue) {
-#line 1083 "kos/src/libc/magic/time.c"
+#line 1058 "kos/src/libc/magic/time.c"
 #ifdef __CRT_HAVE_timer_settime
 	int __result;
 	struct __itimerspec32 __value32, __ovalue32;

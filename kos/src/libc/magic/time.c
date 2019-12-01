@@ -40,6 +40,7 @@
 
 #ifdef __USE_POSIX199309
 #include <bits/timespec.h>
+#include <bits/itimerval.h>
 #endif /* __USE_POSIX199309 */
 
 #ifdef __USE_XOPEN2K8
@@ -218,32 +219,6 @@ __NAMESPACE_STD_USING(tm)
 
 
 #ifdef __USE_POSIX199309
-#ifdef __USE_TIME64
-#ifdef __USE_TIME_BITS64
-#define itimerspec64     itimerspec
-#else /* __USE_TIME_BITS64 */
-#define __itimerspec_alt itimerspec64
-#endif /* !__USE_TIME_BITS64 */
-#endif /* __USE_TIME64 */
-
-#ifdef __USE_TIME_BITS64
-#define __itimerspec64 itimerspec
-#define __itimerspec32 __itimerspec_alt
-#else /* __USE_TIME_BITS64 */
-#define __itimerspec64 __itimerspec_alt
-#define __itimerspec32 itimerspec
-#endif /* !__USE_TIME_BITS64 */
-
-struct itimerspec {
-	struct timespec it_interval;
-	struct timespec it_value;
-};
-
-struct __itimerspec_alt {
-	struct __timespec_alt it_interval;
-	struct __timespec_alt it_value;
-};
-
 struct sigevent;
 #endif /* __USE_POSIX199309 */
 
@@ -1067,7 +1042,7 @@ timer_create:(clockid_t clock_id,
 timer_delete:(timer_t timerid) -> int;
 
 @@Set timer TIMERID to VALUE, returning old value in OVALUE
-[ignore][section(.text.crt.timer)]
+[ignore][section(.text.crt.timer)][decl_include(<bits/itimerspec.h>)]
 timer_settime32:(timer_t timerid, int flags,
                  [nonnull] struct __itimerspec32 const *__restrict value,
                  [nullable] struct __itimerspec32 *ovalue) -> int = timer_settime?;
@@ -1076,7 +1051,7 @@ timer_settime32:(timer_t timerid, int flags,
 [if(defined(__USE_TIME_BITS64)), preferred_alias(timer_settime64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(timer_settime)]
 [requires(defined(__CRT_HAVE_timer_settime) || defined(__CRT_HAVE_timer_settime64))]
-[section(.text.crt.timer)]
+[section(.text.crt.timer)][decl_include(<bits/itimerspec.h>)]
 timer_settime:(timer_t timerid, int flags,
                [nonnull] struct itimerspec const *__restrict value,
                [nullable] struct itimerspec *__restrict ovalue) -> int {
@@ -1114,13 +1089,14 @@ timer_settime:(timer_t timerid, int flags,
 }
 
 [ignore][section(.text.crt.timer)][doc_alias(timer_gettime)]
+[decl_include(<bits/itimerspec.h>)]
 timer_gettime32:(timer_t timerid, [nonnull] struct itimerspec *value) -> int = timer_gettime?;
 
 @@Get current value of timer TIMERID and store it in VALUE
 [if(defined(__USE_TIME_BITS64)), preferred_alias(timer_gettime64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(timer_gettime)]
 [requires(defined(__CRT_HAVE_timer_gettime) || defined(__CRT_HAVE_timer_gettime64))]
-[section(.text.crt.timer)]
+[section(.text.crt.timer)][decl_include(<bits/itimerspec.h>)]
 timer_gettime:(timer_t timerid, [nonnull] struct itimerspec *value) -> int {
 #ifdef __CRT_HAVE_timer_settime
 	int result;
@@ -1245,7 +1221,7 @@ clock_settime64:(clockid_t clock_id, [nonnull] struct $timespec64 const *tp) -> 
 	return clock_settime32(clock_id, &tp32);
 }
 
-[requires($has_function(timer_settime32))]
+[requires($has_function(timer_settime32))][decl_include(<bits/itimerspec.h>)]
 [section(.text.crt.timer)][time64_variant_of(timer_settime)]
 timer_settime64:(timer_t timerid, int flags,
                  [nonnull] struct $itimerspec64 const *__restrict value,
@@ -1266,7 +1242,7 @@ timer_settime64:(timer_t timerid, int flags,
 	return result;
 }
 
-[requires($has_function(timer_gettime32))]
+[requires($has_function(timer_gettime32))][decl_include(<bits/itimerspec.h>)]
 [section(.text.crt.timer)][time64_variant_of(timer_gettime)]
 timer_gettime64:(timer_t timerid, [nonnull] struct $itimerspec64 *value) -> int {
 	int result;

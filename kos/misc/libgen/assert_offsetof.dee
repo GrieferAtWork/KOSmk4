@@ -194,6 +194,8 @@ got_field:
 					local field_name = mac[#fieldPrefix:];
 					if (field_name in knownFields)
 						continue;
+					if (!field_name || !field_name.issymstrt(0))
+						continue;
 					knownFields[field_name] = mac;
 				}
 			}

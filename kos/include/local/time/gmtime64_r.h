@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x922b21af */
+/* HASH CRC-32:0x5c788494 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,7 +98,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(gmtime64_r) __ATTR_NONNULL((1, 2)) __STRUCT_TM *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime64_r))(__time64_t const *__restrict __timer,
                                                         __STRUCT_TM *__restrict __tp) {
-#line 1527 "kos/src/libc/magic/time.c"
+#line 1503 "kos/src/libc/magic/time.c"
 #if (defined(__CRT_HAVE__gmtime32_s) || defined(__CRT_HAVE__gmtime64_s)) && !defined(__BUILDING_LIBC)
 	return __localdep_dos_gmtime64_s(__tp, __timer) ? __NULLPTR : __tp;
 #else
