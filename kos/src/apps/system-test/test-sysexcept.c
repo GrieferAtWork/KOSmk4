@@ -25,6 +25,7 @@
 #include <kos/types.h>
 #include <kos/except.h>
 #include <kos/unistd.h>
+#include <kos/syscalls.h>
 #include <sys/syscall.h>
 #include <sys/syscall-proto.h>
 #include <stdio.h>
@@ -96,16 +97,46 @@ PRIVATE ATTR_NOINLINE void int80_Pipe(fd_t fd[2]) {
 
 DEFINE_TEST(system_exceptions_work_correctly) {
 	/* Test all 3 ways in which an exception can be thrown:
-	 *  - syscall
+	 *  - syscall  (including all arch-specific, as well as generic variants)
 	 *  - THROW()
 	 *  - user-space fault
 	 */
+
+	/* The regular exception-enabled,
+	 * portable user-space wrapper function */
+	{
+		fd_t fds[2];
+		fds[0] = fds[1] = -1;
+		Pipe(fds);
+		assert(fds[0] != -1);
+		assert(fds[1] != -1);
+		sys_Xclose(fds[1]);
+		sys_Xclose(fds[0]);
+	}
 	TRY {
 		Pipe(NULL);
-		assert_failed("syscall: Shouldn't get here!\n");
+		assert_failed("syscall:libc: Shouldn't get here!\n");
 	} EXCEPT {
 		assert_error_code(E_SEGFAULT);
 	}
+
+	/* The libc direct syscall function */
+	{
+		fd_t fds[2];
+		fds[0] = fds[1] = -1;
+		sys_Xpipe(fds);
+		assert(fds[0] != -1);
+		assert(fds[1] != -1);
+		sys_Xclose(fds[1]);
+		sys_Xclose(fds[0]);
+	}
+	TRY {
+		Pipe(NULL);
+		assert_failed("syscall:libc:sysX: Shouldn't get here!\n");
+	} EXCEPT {
+		assert_error_code(E_SEGFAULT);
+	}
+
 	/* Also make sure that ukern system calls _can_ work
 	 * Note that these are exception-enabled system calls,
 	 * so if anything went wrong in here, the kernel would
@@ -122,7 +153,7 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 	}
 	TRY {
 		userkern_Syscall(userkern_self(), pipe)(NULL);
-		assert_failed("syscall: Shouldn't get here! (useg)\n");
+		assert_failed("syscall:useg: Shouldn't get here!\n");
 	} EXCEPT {
 		assert_error_code(E_SEGFAULT);
 	}
@@ -135,12 +166,12 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 		lcall7_Pipe(fds);
 		assert(fds[0] != -1);
 		assert(fds[1] != -1);
-		userkern_Syscall(userkern_self(), close)(fds[1]);
-		userkern_Syscall(userkern_self(), close)(fds[0]);
+		sys_Xclose(fds[1]);
+		sys_Xclose(fds[0]);
 	}
 	TRY {
 		lcall7_Pipe(NULL);
-		assert_failed("syscall:lcall7: Shouldn't get here! (useg)\n");
+		assert_failed("syscall:lcall7: Shouldn't get here!\n");
 	} EXCEPT {
 		assert_error_code(E_SEGFAULT);
 	}
@@ -151,12 +182,12 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 		sysenter_Pipe(fds);
 		assert(fds[0] != -1);
 		assert(fds[1] != -1);
-		userkern_Syscall(userkern_self(), close)(fds[1]);
-		userkern_Syscall(userkern_self(), close)(fds[0]);
+		sys_Xclose(fds[1]);
+		sys_Xclose(fds[0]);
 	}
 	TRY {
 		sysenter_Pipe(NULL);
-		assert_failed("syscall:sysenter: Shouldn't get here! (useg)\n");
+		assert_failed("syscall:sysenter: Shouldn't get here!\n");
 	} EXCEPT {
 		assert_error_code(E_SEGFAULT);
 	}
@@ -170,23 +201,28 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 		int80_Pipe(fds);
 		assert(fds[0] != -1);
 		assert(fds[1] != -1);
-		userkern_Syscall(userkern_self(), close)(fds[1]);
-		userkern_Syscall(userkern_self(), close)(fds[0]);
+		sys_Xclose(fds[1]);
+		sys_Xclose(fds[0]);
 	}
 	TRY {
 		int80_Pipe(NULL);
-		assert_failed("syscall:int80: Shouldn't get here! (useg)\n");
+		assert_failed("syscall:int80: Shouldn't get here!\n");
 	} EXCEPT {
 		assert_error_code(E_SEGFAULT);
 	}
 #endif /* __i386__ || __x86_64__ */
 
+	/* Throw an exception manually by using the THROW() macro. */
+	assert_error_code(E_OK);
 	TRY {
 		THROW(E_DIVIDE_BY_ZERO);
 		assert_failed("THROW(): Shouldn't get here!\n");
 	} EXCEPT {
 		assert_error_code(E_DIVIDE_BY_ZERO);
 	}
+
+	/* Do something that causes the kernel to throw an
+	 * exception due to performing an illegal operation. */
 	assert_error_code(E_OK);
 	TRY {
 		static volatile int x = 10;
@@ -198,6 +234,7 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 	} EXCEPT {
 		assert_error_code(E_DIVIDE_BY_ZERO);
 	}
+	assert_error_code(E_OK);
 }
 
 
