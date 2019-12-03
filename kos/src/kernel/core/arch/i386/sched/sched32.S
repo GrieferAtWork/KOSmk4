@@ -26,8 +26,8 @@
 #include <kernel/gdt.h>
 #include <kernel/pic.h>
 #include <kernel/pit.h>
-#include <kernel/syscall.h>
 #include <kernel/syscall-tables.h>
+#include <kernel/syscall.h>
 #include <sched/task.h>
 #include <sched/tss.h>
 
@@ -60,7 +60,9 @@ INTERN_FUNCTION(x86_idt_apic_spurious)
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
 
+	EXTERN(x86_apic_spur)
 	call   x86_apic_spur
+	EXTERN(x86_lapicbase)
 	movl   x86_lapicbase, %eax
 	movl   $(APIC_EOI_FSIGNAL), APIC_EOI(%eax)
 
@@ -80,7 +82,6 @@ INTERN_FUNCTION(x86_idt_apic_spurious)
 END(x86_idt_apic_spurious)
 
 
-EXTERN(cpu_scheduler_interrupt)
 
 /* The PIT interrupt handler -- Used for scheduling.
  * NOTE: If available, this interrupt will actually be fired by the LAPIC */
@@ -124,10 +125,12 @@ END(x86_pic_acknowledge)
 	movl   %ebx, %ecx            /* cpu_scheduler_interrupt::struct cpu *__restrict caller */
 
 	/* Invoke the C-level interrupt implementation. */
+	EXTERN(cpu_scheduler_interrupt)
 	call   cpu_scheduler_interrupt
 
 	/* Set the task returned by `cpu_scheduler_interrupt()'
 	 * as the new current one. */
+	EXTERN(thiscpu_current)
 	movl   %eax, thiscpu_current(%ebx)
 INTERN_FUNCTION(x86_load_thread_eax_cpu_ebx)
 	EXTERN(this_sched_state)
@@ -144,40 +147,41 @@ INTERN_FUNCTION(x86_load_thread_eax_cpu_ebx)
 	/* SEGMENT_KERNEL_FSBASE */
 	movl   %eax, %ecx
 	movl   %eax, %edx
-	shrl   $24,  %ecx
-	andl   $0x00ffffff, %edx
-	andl   $0xff000000, OFFSET_SEGMENT_DESCRIPTOR_BASE0 + GDT(SEGMENT_KERNEL_FSBASE) /* Clear out base_low */
-	orl    %edx,        OFFSET_SEGMENT_DESCRIPTOR_BASE0 + GDT(SEGMENT_KERNEL_FSBASE) /* Set base_low */
-	movb   %cl,         OFFSET_SEGMENT_DESCRIPTOR_BASE2 + GDT(SEGMENT_KERNEL_FSBASE) /* Set base_hi */
+	shrl   $(24), %ecx
+	andl   $(0x00ffffff), %edx
+	andl   $(0xff000000), OFFSET_SEGMENT_DESCRIPTOR_BASE0 + GDT(SEGMENT_KERNEL_FSBASE) /* Clear out base_low */
+	orl    %edx,          OFFSET_SEGMENT_DESCRIPTOR_BASE0 + GDT(SEGMENT_KERNEL_FSBASE) /* Set base_low */
+	movb   %cl,           OFFSET_SEGMENT_DESCRIPTOR_BASE2 + GDT(SEGMENT_KERNEL_FSBASE) /* Set base_hi */
 
 	/* SEGMENT_USER_FSBASE */
 	movl   this_x86_user_fsbase(%eax), %ecx
 	movl   %ecx, %edx
-	shrl   $24,  %ecx
-	andl   $0x00ffffff, %edx
-	andl   $0xff000000, OFFSET_SEGMENT_DESCRIPTOR_BASE0 + GDT(SEGMENT_USER_FSBASE) /* Clear out base_low */
-	orl    %edx,        OFFSET_SEGMENT_DESCRIPTOR_BASE0 + GDT(SEGMENT_USER_FSBASE) /* Set base_low */
-	movb   %cl,         OFFSET_SEGMENT_DESCRIPTOR_BASE2 + GDT(SEGMENT_USER_FSBASE) /* Set base_hi */
+	shrl   $(24), %ecx
+	andl   $(0x00ffffff), %edx
+	andl   $(0xff000000), OFFSET_SEGMENT_DESCRIPTOR_BASE0 + GDT(SEGMENT_USER_FSBASE) /* Clear out base_low */
+	orl    %edx,          OFFSET_SEGMENT_DESCRIPTOR_BASE0 + GDT(SEGMENT_USER_FSBASE) /* Set base_low */
+	movb   %cl,           OFFSET_SEGMENT_DESCRIPTOR_BASE2 + GDT(SEGMENT_USER_FSBASE) /* Set base_hi */
 
 	/* SEGMENT_USER_GSBASE */
 	movl   this_x86_user_gsbase(%eax), %ecx
 	movl   %ecx, %edx
-	shrl   $24,  %ecx
-	andl   $0x00ffffff, %edx
-	andl   $0xff000000, OFFSET_SEGMENT_DESCRIPTOR_BASE0 + GDT(SEGMENT_USER_GSBASE) /* Clear out base_low */
-	orl    %edx,        OFFSET_SEGMENT_DESCRIPTOR_BASE0 + GDT(SEGMENT_USER_GSBASE) /* Set base_low */
-	movb   %cl,         OFFSET_SEGMENT_DESCRIPTOR_BASE2 + GDT(SEGMENT_USER_GSBASE) /* Set base_hi */
+	shrl   $(24), %ecx
+	andl   $(0x00ffffff), %edx
+	andl   $(0xff000000), OFFSET_SEGMENT_DESCRIPTOR_BASE0 + GDT(SEGMENT_USER_GSBASE) /* Clear out base_low */
+	orl    %edx,          OFFSET_SEGMENT_DESCRIPTOR_BASE0 + GDT(SEGMENT_USER_GSBASE) /* Set base_low */
+	movb   %cl,           OFFSET_SEGMENT_DESCRIPTOR_BASE2 + GDT(SEGMENT_USER_GSBASE) /* Set base_hi */
 #undef GDT
 
 #ifndef CONFIG_NO_FPU
 	/* Disable the FPU, preparing it to be loaded lazily. */
 	movl   %cr0, %ecx
-	andl   $~CR0_TS, %ecx
+	andl   $(~CR0_TS), %ecx
+	EXTERN(thiscpu_x86_fputhread)
 	movl   thiscpu_x86_fputhread(%ebx), %edx
 	cmpl   %edx, %eax
 	je     1f
 	/* Only disable if the target thread isn't holding the active FPU-context */
-	orl    $CR0_TS, %ecx
+	orl    $(CR0_TS), %ecx
 1:	movl   %ecx, %cr0
 #endif /* !CONFIG_NO_FPU */
 
@@ -190,7 +194,9 @@ INTERN_LABEL(__x86_lazy_disable_ioperm_bitmap_return):
 	.cfi_remember_state
 
 	/* Update the used page directory pointer. */
+	EXTERN(this_vm)
 	movl   this_vm(%eax), %ecx
+	EXTERN(thisvm_pdir_phys_ptr)
 	movl   thisvm_pdir_phys_ptr(%ecx), %eax
 	movl   %cr3, %edx
 	cmpl   %edx, %eax
@@ -219,7 +225,9 @@ INTERN_LABEL(__x86_lazy_disable_ioperm_bitmap_return):
 	/* Disable the I/O permissions bitmap. */
 .Llazy_disable_ioperm_bitmap:
 	/* Check if the loaded I/O permissions bitmap is the calling thread's */
+	EXTERN(this_x86_ioperm_bitmap)
 	movl   this_x86_ioperm_bitmap(%eax), %edx
+	EXTERN(thiscpu_x86_ioperm_bitmap)
 	cmpl   %edx, thiscpu_x86_ioperm_bitmap(%ebx)
 	je     __x86_lazy_disable_ioperm_bitmap_return
 	/* Must actually unmap the I/O permissions bitmap! */
@@ -280,6 +288,7 @@ PUBLIC_FUNCTION(task_yield)
 	movl   this_cpu(%esi), %ebx
 
 	/* Check for a scheduling override. */
+	EXTERN(thiscpu_override)
 	cmpl   $0, thiscpu_override(%ebx)
 	jne    .Lyield_same_target_with_override
 
@@ -291,11 +300,14 @@ PUBLIC_FUNCTION(task_yield)
 	call   cpu_quantum_end
 
 	/* Load the new CPU state */
+	EXTERN(thiscpu_current)
 	movl   %edi, thiscpu_current(%ebx)
 	movl   %edi, %eax
+	EXTERN(x86_load_thread_eax_cpu_ebx)
 	jmp    x86_load_thread_eax_cpu_ebx
 .Lyield_same_target_with_override:
 #ifndef NDEBUG
+	EXTERN(thiscpu_override)
 	cmpl   %esi, thiscpu_override(%ebx)
 	je     .Lyield_same_target
 	int3   /* Assertion failed: CPU override does not match calling thread.
@@ -373,13 +385,14 @@ PUBLIC_FUNCTION(task_yield_nx)
 	/* Remember the current scheduler state. */
 	movl   %fs:0, %esi
 	cli
+	EXTERN(this_sched_runnxt)
 	movl   this_sched_runnxt(%esi), %edi
 	cmpl   %esi, %edi
 	je     .Lyield_same_target
 	jmp    .Ldo_task_yield_esi_to_edi
 	.cfi_restore_state
 .Lillegal_task_yield_nx:
-	addl   $4, %esp
+	addl   $(4), %esp
 	.cfi_adjust_cfa_offset -4
 	movl   %eax, %ecx
 	.cfi_register %eip, %ecx
@@ -397,7 +410,7 @@ PUBLIC_FUNCTION(task_tryyield_or_pause)
 	pushfl_cfi_r
 	testl  $(EFLAGS_IF), (%esp)
 	jnz    1f
-	addl   $4, %esp
+	addl   $(4), %esp
 	.cfi_adjust_cfa_offset -4
 	.cfi_same_value %eflags
 	movl   $(TASK_TRYYIELD_PREEMPTION_DISABLED), %eax
@@ -414,7 +427,7 @@ PUBLIC_FUNCTION(task_tryyield)
 	pushfl_cfi_r
 	testl  $(EFLAGS_IF), (%esp)
 	jnz    1f
-	addl   $4, %esp
+	addl   $(4), %esp
 	.cfi_adjust_cfa_offset -4
 	.cfi_same_value %eflags
 	movl   $(TASK_TRYYIELD_PREEMPTION_DISABLED), %eax
@@ -434,6 +447,7 @@ PUBLIC_FUNCTION(task_tryyield)
 	/* Remember the current scheduler state. */
 	movl   %fs:0, %esi
 	cli
+	EXTERN(this_sched_runnxt)
 	movl   this_sched_runnxt(%esi), %edi
 	cmpl   %esi, %edi
 	jne    .Ldo_task_yield_esi_to_edi
@@ -467,10 +481,13 @@ PUBLIC_FUNCTION(cpu_run_current_and_remember)
 	pushal_cfi_r
 
 	/* Remember the current scheduler state. */
+	EXTERN(this_sched_state)
 	movl   %esp, this_sched_state(%ecx)
+	EXTERN(this_cpu)
 	movl   this_cpu(%ecx), %ebx
 
 	/* Load the new CPU state */
+	EXTERN(thiscpu_current)
 	movl   thiscpu_current(%ebx), %eax
 	jmp    x86_load_thread_eax_cpu_ebx
 	.cfi_endproc
@@ -481,7 +498,9 @@ PUBLIC_FUNCTION(cpu_run_current)
 	.cfi_startproc
 	/* Load the CPU state of the task set as current. */
 	movl   %fs:0, %eax
+	EXTERN(this_cpu)
 	movl   this_cpu(%eax), %ebx
+	EXTERN(thiscpu_current)
 	movl   thiscpu_current(%ebx), %eax
 	jmp    x86_load_thread_eax_cpu_ebx
 	.cfi_endproc
@@ -492,10 +511,12 @@ END(cpu_run_current)
 .section .text.free
 INTERN_FUNCTION(x86_apic_cpu_quantum_elapsed)
 	pushfl
+	EXTERN(x86_lapicbase)
 	movl   x86_lapicbase, %ecx
 	movl   %fs:this_cpu, %eax
 	cli
 	movl   APIC_TIMER_CURRENT(%ecx), %ecx
+	EXTERN(thiscpu_quantum_length)
 	movl   thiscpu_quantum_length(%eax), %eax
 	popfl
 	subl   %ecx, %eax
@@ -504,9 +525,12 @@ INTERN_CONST(x86_apic_cpu_quantum_elapsed_size, . - x86_apic_cpu_quantum_elapsed
 END(x86_apic_cpu_quantum_elapsed)
 
 INTERN_FUNCTION(x86_apic_cpu_quantum_elapsed_nopr)
+	EXTERN(x86_lapicbase)
 	movl   x86_lapicbase, %ecx
+	EXTERN(this_cpu)
 	movl   %fs:this_cpu, %eax
 	movl   APIC_TIMER_CURRENT(%ecx), %ecx
+	EXTERN(thiscpu_quantum_length)
 	movl   thiscpu_quantum_length(%eax), %eax
 	subl   %ecx, %eax
 	ret
@@ -515,6 +539,7 @@ END(x86_apic_cpu_quantum_elapsed_nopr)
 
 INTERN_FUNCTION(x86_apic_cpu_quantum_remaining)
 	pushfl
+	EXTERN(x86_lapicbase)
 	movl   x86_lapicbase, %eax
 	cli
 	movl   APIC_TIMER_CURRENT(%eax), %eax
@@ -524,6 +549,7 @@ INTERN_CONST(x86_apic_cpu_quantum_remaining_size, . - x86_apic_cpu_quantum_remai
 END(x86_apic_cpu_quantum_remaining)
 
 INTERN_FUNCTION(x86_apic_cpu_quantum_remaining_nopr)
+	EXTERN(x86_lapicbase)
 	movl   x86_lapicbase, %eax
 	movl   APIC_TIMER_CURRENT(%eax), %eax
 	ret
@@ -532,6 +558,7 @@ END(x86_apic_cpu_quantum_remaining_nopr)
 
 INTERN_FUNCTION(x86_apic_cpu_disable_preemptive_interrupts)
 	pushfl
+	EXTERN(x86_lapicbase)
 	movl   x86_lapicbase, %ecx
 	cli
 	/* lapic_write(APIC_TIMER, APIC_TIMER_FDISABLED); */
@@ -542,6 +569,7 @@ INTERN_CONST(x86_apic_cpu_disable_preemptive_interrupts_size, . - x86_apic_cpu_d
 END(x86_apic_cpu_disable_preemptive_interrupts)
 
 INTERN_FUNCTION(x86_apic_cpu_disable_preemptive_interrupts_nopr)
+	EXTERN(x86_lapicbase)
 	movl   x86_lapicbase, %ecx
 	/* lapic_write(APIC_TIMER, APIC_TIMER_FDISABLED); */
 	movl   $(APIC_TIMER_FDISABLED), APIC_TIMER(%ecx)
@@ -551,9 +579,12 @@ END(x86_apic_cpu_disable_preemptive_interrupts_nopr)
 
 INTERN_FUNCTION(x86_apic_cpu_enable_preemptive_interrupts)
 	pushfl
+	EXTERN(this_cpu)
 	movl   %fs:this_cpu, %eax
+	EXTERN(x86_lapicbase)
 	movl   x86_lapicbase, %ecx
 	cli
+	EXTERN(thiscpu_quantum_length)
 	movl   thiscpu_quantum_length(%eax), %eax
 	/* lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F16); */
 	movl   $(APIC_TIMER_DIVIDE_F16), APIC_TIMER_DIVIDE(%ecx)
@@ -572,8 +603,11 @@ INTERN_CONST(x86_apic_cpu_enable_preemptive_interrupts_size, . - x86_apic_cpu_en
 END(x86_apic_cpu_enable_preemptive_interrupts)
 
 INTERN_FUNCTION(x86_apic_cpu_enable_preemptive_interrupts_nopr)
+	EXTERN(this_cpu)
 	movl   %fs:this_cpu, %eax
+	EXTERN(x86_lapicbase)
 	movl   x86_lapicbase, %ecx
+	EXTERN(thiscpu_quantum_length)
 	movl   thiscpu_quantum_length(%eax), %eax
 	/* lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F16); */
 	movl   $(APIC_TIMER_DIVIDE_F16), APIC_TIMER_DIVIDE(%ecx)
@@ -592,9 +626,12 @@ END(x86_apic_cpu_enable_preemptive_interrupts_nopr)
 
 INTERN_FUNCTION(x86_apic_cpu_quantum_reset)
 	pushfl
+	EXTERN(this_cpu)
 	movl   %fs:this_cpu, %eax
+	EXTERN(x86_lapicbase)
 	movl   x86_lapicbase, %ecx
 	cli
+	EXTERN(thiscpu_quantum_length)
 	movl   thiscpu_quantum_length(%eax), %eax
 	/* lapic_write(APIC_TIMER_CURRENT, PERCPU(thiscpu_quantum_length)); */
 	movl   %eax, APIC_TIMER_CURRENT(%ecx)
@@ -604,8 +641,11 @@ INTERN_CONST(x86_apic_cpu_quantum_reset_size, . - x86_apic_cpu_quantum_reset)
 END(x86_apic_cpu_quantum_reset)
 
 INTERN_FUNCTION(x86_apic_cpu_quantum_reset_nopr)
+	EXTERN(this_cpu)
 	movl   %fs:this_cpu, %eax
+	EXTERN(x86_lapicbase)
 	movl   x86_lapicbase, %ecx
+	EXTERN(thiscpu_quantum_length)
 	movl   thiscpu_quantum_length(%eax), %eax
 	/* lapic_write(APIC_TIMER_CURRENT, PERCPU(thiscpu_quantum_length)); */
 	movl   %eax, APIC_TIMER_CURRENT(%ecx)
@@ -617,6 +657,7 @@ INTERN_FUNCTION(x86_apic_cpu_ipi_pending)
 	/* u32 mask = lapic_read(APIC_ISR(APIC_ISR_INDEX(X86_INTERRUPT_APIC_IPI))); */
 	/* return (mask & APIC_ISR_MASK(X86_INTERRUPT_APIC_IPI)) != 0; */
 	xorl   %eax, %eax
+	EXTERN(x86_lapicbase)
 	movl   x86_lapicbase, %ecx
 	movl   APIC_ISR(APIC_ISR_INDEX(X86_INTERRUPT_APIC_IPI))(%ecx), %ecx
 	testl  $(APIC_ISR_MASK(X86_INTERRUPT_APIC_IPI)), %ecx
@@ -676,7 +717,7 @@ PUBLIC_FUNCTION(cpu_quantum_elapsed_nopr)
 	movb   %al, %cl
 	inb    $(PIT_DATA0),     %al
 	movb   %al, %ch
-	movl   $PIT_HZ_DIV(HZ), %eax
+	movl   $(PIT_HZ_DIV(HZ)), %eax
 	subw   %cx, %ax
 	ret
 .if x86_apic_cpu_quantum_elapsed_size_nopr > (. - cpu_quantum_elapsed_nopr)
@@ -697,7 +738,7 @@ PUBLIC_FUNCTION(cpu_quantum_elapsed)
 	inb    $(PIT_DATA0),     %al
 	popfl
 	movb   %al, %ch
-	movl   $PIT_HZ_DIV(HZ), %eax
+	movl   $(PIT_HZ_DIV(HZ)), %eax
 	subw   %cx, %ax
 	ret
 .if x86_apic_cpu_quantum_elapsed_size > (. - cpu_quantum_elapsed)

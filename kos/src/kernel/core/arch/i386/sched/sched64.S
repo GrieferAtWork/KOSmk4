@@ -27,8 +27,8 @@
 #include <kernel/gdt.h>
 #include <kernel/pic.h>
 #include <kernel/pit.h>
-#include <kernel/syscall.h>
 #include <kernel/syscall-tables.h>
+#include <kernel/syscall.h>
 #include <sched/task.h>
 #include <sched/tss.h>
 
@@ -54,7 +54,7 @@
 .endm
 
 
-/* Pop `IA32_KERNEL_GS_BASE' onto the stack
+/* Pop `IA32_KERNEL_GS_BASE' from the stack
  * This macro clobbers %rax, %rcx and %rdx */
 .macro popq_cfi_kernel_gs_base
 	movl   $(IA32_KERNEL_GS_BASE), %ecx
@@ -83,7 +83,9 @@ INTERN_FUNCTION(x86_idt_apic_spurious)
 	pushq_cfi_r %r10    /* [C] General purpose register #10 */
 	pushq_cfi_r %r11    /* [C] General purpose register #11 */
 
+	EXTERN(x86_apic_spur)
 	call   x86_apic_spur
+	EXTERN(x86_lapicbase)
 	movq   x86_lapicbase, %rax
 	movl   $(APIC_EOI_FSIGNAL), APIC_EOI(%rax)
 
@@ -102,7 +104,6 @@ INTERN_FUNCTION(x86_idt_apic_spurious)
 END(x86_idt_apic_spurious)
 
 
-EXTERN(cpu_scheduler_interrupt)
 
 /* The PIT interrupt handler -- Used for scheduling.
  * NOTE: If available, this interrupt will actually be fired by the LAPIC */
@@ -152,6 +153,7 @@ END(x86_pic_acknowledge)
 	movq   %rbx, %rcx            /* cpu_scheduler_interrupt::struct cpu *__restrict caller */
 
 	/* Invoke the C-level interrupt implementation. */
+	EXTERN(cpu_scheduler_interrupt)
 	call   cpu_scheduler_interrupt
 
 	/* Set the task returned by `cpu_scheduler_interrupt()'
@@ -176,6 +178,7 @@ INTERN_FUNCTION(x86_load_thread_rax_cpu_rbx)
 	/* Disable the FPU, preparing it to be loaded lazily. */
 	movq   %cr0, %rcx
 	andq   $~CR0_TS, %rcx
+	EXTERN(thiscpu_x86_fputhread)
 	movq   thiscpu_x86_fputhread(%rbx), %rdx
 	cmpq   %rdx, %rax
 	je     1f
@@ -186,7 +189,7 @@ INTERN_FUNCTION(x86_load_thread_rax_cpu_rbx)
 
 	/* Check if the old thread had its I/O permissions bitmap loaded. */
 	EXTERN(thiscpu_x86_ioperm_bitmap)
-	cmpq   $0, thiscpu_x86_ioperm_bitmap(%ebx)
+	cmpq   $(0), thiscpu_x86_ioperm_bitmap(%ebx)
 	jnz    .Llazy_disable_ioperm_bitmap
 .Llazy_disable_ioperm_bitmap_return:
 
@@ -194,7 +197,9 @@ INTERN_FUNCTION(x86_load_thread_rax_cpu_rbx)
 
 
 	/* Update the used page directory pointer. */
+	EXTERN(this_vm)
 	movq   this_vm(%rax), %rcx
+	EXTERN(thisvm_pdir_phys_ptr)
 	movq   thisvm_pdir_phys_ptr(%rcx), %rax
 	movq   %cr3, %rdx
 	cmpq   %rdx, %rax
@@ -234,7 +239,9 @@ INTERN_FUNCTION(x86_load_thread_rax_cpu_rbx)
 	/* Disable the I/O permissions bitmap. */
 .Llazy_disable_ioperm_bitmap:
 	/* Check if the loaded I/O permissions bitmap is the calling thread's */
+	EXTERN(this_x86_ioperm_bitmap)
 	movq   this_x86_ioperm_bitmap(%rax), %rdx
+	EXTERN(thiscpu_x86_ioperm_bitmap)
 	cmpq   %rdx, thiscpu_x86_ioperm_bitmap(%rbx)
 	je     .Llazy_disable_ioperm_bitmap_return
 	/* Must actually unmap the I/O permissions bitmap! */
@@ -307,30 +314,38 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 	/* Remember the current scheduler state. */
 	movq   %gs:0, %rbx
 	cli
+	EXTERN(this_sched_runnxt)
 	movq   this_sched_runnxt(%rbx), %rbp
 	cmpq   %rbx, %rbp
 	je     .Lyield_same_target
 .Ldo_task_yield_rbx_to_rbp:
 
 	/* Check for a scheduling override. */
+	EXTERN(this_cpu)
 	movq   this_cpu(%rbx), %rax
-	cmpq   $0, thiscpu_override(%rax)
+	EXTERN(thiscpu_override)
+	cmpq   $(0), thiscpu_override(%rax)
 	jne    .Lyield_same_target_with_override
 
 	/* CURR: %rbx */
 	/* NEXT: %rbp*/
+	EXTERN(this_sched_state)
 	movq   %rsp, this_sched_state(%rbx)
 
 	/* Prematurely end the current quantum */
+	EXTERN(cpu_quantum_end)
 	call   cpu_quantum_end
 
 	/* Load the new CPU state */
+	EXTERN(this_cpu)
 	movq   this_cpu(%rbx), %rbx
+	EXTERN(thiscpu_current)
 	movq   %rbp, thiscpu_current(%rbx)
 	movq   %rbp, %rax
 	jmp    x86_load_thread_rax_cpu_rbx
 .Lyield_same_target_with_override:
 #ifndef NDEBUG
+	EXTERN(thiscpu_override)
 	cmpq   %rbx, thiscpu_override(%rax)
 	je     .Lyield_same_target
 	int3   /* Assertion failed: CPU override does not match calling thread.
@@ -409,17 +424,18 @@ PUBLIC_FUNCTION(task_yield_nx)
 	/* Remember the current scheduler state. */
 	movq   %gs:0, %rbx
 	cli
+	EXTERN(this_sched_runnxt)
 	movq   this_sched_runnxt(%rbx), %rbp
 	cmpq   %rbx, %rbp
 	je     .Lyield_same_target
 	jmp    .Ldo_task_yield_rbx_to_rbp
 	.cfi_restore_state
 .Lillegal_task_yield_nx:
-	addq   $24, %rsp
+	addq   $(24), %rsp
 	.cfi_adjust_cfa_offset -24
 	movq   %rax, %rcx
 	.cfi_register %rip, %rcx
-	movq   $0, %rax
+	movq   $(0), %rax
 	jmpq   *%rcx
 	.cfi_endproc
 END(task_yield_nx)
@@ -440,13 +456,13 @@ PUBLIC_FUNCTION(task_tryyield_or_pause)
 	pushfq_cfi_r                     /* ir_rflags */
 	testq  $(EFLAGS_IF), 0(%rsp)
 	jnz    1f
-	addq   $24, %rsp
+	addq   $(24), %rsp
 	.cfi_adjust_cfa_offset -24
 	.cfi_same_value %rflags
 	movq   $(TASK_TRYYIELD_PREEMPTION_DISABLED), %rax
 #ifndef CONFIG_NO_SMP
 	pause
-#endif
+#endif /* !CONFIG_NO_SMP */
 	jmpq   *%rcx
 END(task_tryyield_or_pause)
 	.cfi_adjust_cfa_offset 8
@@ -462,7 +478,7 @@ PUBLIC_FUNCTION(task_tryyield)
 	pushfq_cfi_r                     /* ir_rflags */
 	testq  $(EFLAGS_IF), 0(%rsp)
 	jnz    1f
-	addq   $24, %rsp
+	addq   $(24), %rsp
 	.cfi_adjust_cfa_offset -24
 	.cfi_same_value %rflags
 	movq   $(TASK_TRYYIELD_PREEMPTION_DISABLED), %rax
@@ -478,7 +494,7 @@ PUBLIC_FUNCTION(task_tryyield)
 	.cfi_rel_offset %rip, 0
 
 	/* Construct a full `struct scpustate' structure */
-	pushq_cfi   $(TASK_TRYYIELD_SUCCESS) /* [C] Accumulator register */
+	pushq_cfi $(TASK_TRYYIELD_SUCCESS) /* [C] Accumulator register */
 	.cfi_rel_offset %rax, 0
 	pushq_cfi_r %rcx                 /* [C] Count register */
 	pushq_cfi_r %rdx                 /* [C] Data register */
@@ -504,6 +520,7 @@ PUBLIC_FUNCTION(task_tryyield)
 	/* Remember the current scheduler state. */
 	movq   %gs:0, %rbx
 	cli
+	EXTERN(this_sched_runnxt)
 	movq   this_sched_runnxt(%rbx), %rbp
 	cmpq   %rbx, %rbp
 	jne    .Ldo_task_yield_rbx_to_rbp
@@ -563,11 +580,15 @@ PUBLIC_FUNCTION(cpu_run_current_and_remember)
 	pushq_cfi_kernel_gs_base
 
 	/* Remember the current scheduler state. */
+	EXTERN(this_sched_state)
 	movq   %rsp, this_sched_state(%rdi)
+	EXTERN(this_cpu)
 	movq   this_cpu(%rdi), %rbx
 
 	/* Load the new CPU state */
+	EXTERN(thiscpu_current)
 	movq   thiscpu_current(%rbx), %rax
+	EXTERN(x86_load_thread_rax_cpu_rbx)
 	jmp    x86_load_thread_rax_cpu_rbx
 	.cfi_endproc
 END(cpu_run_current_and_remember)
@@ -577,8 +598,11 @@ PUBLIC_FUNCTION(cpu_run_current)
 	.cfi_startproc
 	/* Load the CPU state of the task set as current. */
 	movq   %gs:0, %rax
+	EXTERN(this_cpu)
 	movq   this_cpu(%rax), %rbx
+	EXTERN(thiscpu_current)
 	movq   thiscpu_current(%rbx), %rax
+	EXTERN(x86_load_thread_rax_cpu_rbx)
 	jmp    x86_load_thread_rax_cpu_rbx
 	.cfi_endproc
 END(cpu_run_current)
@@ -588,10 +612,13 @@ END(cpu_run_current)
 .section .text.free
 INTERN_FUNCTION(x86_apic_cpu_quantum_elapsed)
 	pushfq
+	EXTERN(x86_lapicbase)
 	movq   x86_lapicbase, %rcx
+	EXTERN(this_cpu)
 	movq   %fs:this_cpu, %rax
 	cli
 	movzlq APIC_TIMER_CURRENT(%rcx), %rcx
+	EXTERN(thiscpu_quantum_length)
 	movzlq thiscpu_quantum_length(%rax), %rax
 	popfq
 	subq   %rcx, %rax
@@ -600,9 +627,12 @@ INTERN_CONST(x86_apic_cpu_quantum_elapsed_size, . - x86_apic_cpu_quantum_elapsed
 END(x86_apic_cpu_quantum_elapsed)
 
 INTERN_FUNCTION(x86_apic_cpu_quantum_elapsed_nopr)
+	EXTERN(x86_lapicbase)
 	movq   x86_lapicbase, %rcx
+	EXTERN(this_cpu)
 	movq   %fs:this_cpu, %rax
 	movzlq APIC_TIMER_CURRENT(%rcx), %rcx
+	EXTERN(thiscpu_quantum_length)
 	movzlq thiscpu_quantum_length(%rax), %rax
 	subq   %rcx, %rax
 	ret
@@ -611,6 +641,7 @@ END(x86_apic_cpu_quantum_elapsed_nopr)
 
 INTERN_FUNCTION(x86_apic_cpu_quantum_remaining)
 	pushfq
+	EXTERN(x86_lapicbase)
 	movq   x86_lapicbase, %rax
 	cli
 	movzlq APIC_TIMER_CURRENT(%rax), %rax
@@ -620,6 +651,7 @@ INTERN_CONST(x86_apic_cpu_quantum_remaining_size, . - x86_apic_cpu_quantum_remai
 END(x86_apic_cpu_quantum_remaining)
 
 INTERN_FUNCTION(x86_apic_cpu_quantum_remaining_nopr)
+	EXTERN(x86_lapicbase)
 	movq   x86_lapicbase, %rax
 	movzlq APIC_TIMER_CURRENT(%rax), %rax
 	ret
@@ -628,6 +660,7 @@ END(x86_apic_cpu_quantum_remaining_nopr)
 
 INTERN_FUNCTION(x86_apic_cpu_disable_preemptive_interrupts)
 	pushfq
+	EXTERN(x86_lapicbase)
 	movq   x86_lapicbase, %rcx
 	cli
 	/* lapic_write(APIC_TIMER, APIC_TIMER_FDISABLED); */
@@ -638,6 +671,7 @@ INTERN_CONST(x86_apic_cpu_disable_preemptive_interrupts_size, . - x86_apic_cpu_d
 END(x86_apic_cpu_disable_preemptive_interrupts)
 
 INTERN_FUNCTION(x86_apic_cpu_disable_preemptive_interrupts_nopr)
+	EXTERN(x86_lapicbase)
 	movq   x86_lapicbase, %rcx
 	/* lapic_write(APIC_TIMER, APIC_TIMER_FDISABLED); */
 	movl   $(APIC_TIMER_FDISABLED), APIC_TIMER(%rcx)
@@ -647,9 +681,12 @@ END(x86_apic_cpu_disable_preemptive_interrupts_nopr)
 
 INTERN_FUNCTION(x86_apic_cpu_enable_preemptive_interrupts)
 	pushfq
+	EXTERN(this_cpu)
 	movq   %fs:this_cpu, %rax
+	EXTERN(x86_lapicbase)
 	movq   x86_lapicbase, %rcx
 	cli
+	EXTERN(thiscpu_quantum_length)
 	movl   thiscpu_quantum_length(%rax), %eax
 	/* lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F16); */
 	movl   $(APIC_TIMER_DIVIDE_F16), APIC_TIMER_DIVIDE(%rcx)
@@ -668,8 +705,11 @@ INTERN_CONST(x86_apic_cpu_enable_preemptive_interrupts_size, . - x86_apic_cpu_en
 END(x86_apic_cpu_enable_preemptive_interrupts)
 
 INTERN_FUNCTION(x86_apic_cpu_enable_preemptive_interrupts_nopr)
+	EXTERN(this_cpu)
 	movq   %fs:this_cpu, %rax
+	EXTERN(x86_lapicbase)
 	movq   x86_lapicbase, %rcx
+	EXTERN(thiscpu_quantum_length)
 	movl   thiscpu_quantum_length(%rax), %eax
 	/* lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F16); */
 	movl   $(APIC_TIMER_DIVIDE_F16), APIC_TIMER_DIVIDE(%rcx)
@@ -688,9 +728,12 @@ END(x86_apic_cpu_enable_preemptive_interrupts_nopr)
 
 INTERN_FUNCTION(x86_apic_cpu_quantum_reset)
 	pushfq
+	EXTERN(this_cpu)
 	movq   %fs:this_cpu, %rax
+	EXTERN(x86_lapicbase)
 	movq   x86_lapicbase, %rcx
 	cli
+	EXTERN(thiscpu_quantum_length)
 	movl   thiscpu_quantum_length(%rax), %eax
 	/* lapic_write(APIC_TIMER_CURRENT, PERCPU(thiscpu_quantum_length)); */
 	movl   %eax, APIC_TIMER_CURRENT(%rcx)
@@ -700,8 +743,11 @@ INTERN_CONST(x86_apic_cpu_quantum_reset_size, . - x86_apic_cpu_quantum_reset)
 END(x86_apic_cpu_quantum_reset)
 
 INTERN_FUNCTION(x86_apic_cpu_quantum_reset_nopr)
+	EXTERN(this_cpu)
 	movq   %fs:this_cpu, %rax
+	EXTERN(x86_lapicbase)
 	movq   x86_lapicbase, %rcx
+	EXTERN(thiscpu_quantum_length)
 	movl   thiscpu_quantum_length(%rax), %eax
 	/* lapic_write(APIC_TIMER_CURRENT, PERCPU(thiscpu_quantum_length)); */
 	movl   %eax, APIC_TIMER_CURRENT(%rcx)
@@ -713,6 +759,7 @@ INTERN_FUNCTION(x86_apic_cpu_ipi_pending)
 	/* u32 mask = lapic_read(APIC_ISR(APIC_ISR_INDEX(X86_INTERRUPT_APIC_IPI))); */
 	/* return (mask & APIC_ISR_MASK(X86_INTERRUPT_APIC_IPI)) != 0; */
 	xorq   %rax, %rax
+	EXTERN(x86_lapicbase)
 	movq   x86_lapicbase, %rcx
 	movl   APIC_ISR(APIC_ISR_INDEX(X86_INTERRUPT_APIC_IPI))(%rcx), %ecx
 	testl  $(APIC_ISR_MASK(X86_INTERRUPT_APIC_IPI)), %ecx

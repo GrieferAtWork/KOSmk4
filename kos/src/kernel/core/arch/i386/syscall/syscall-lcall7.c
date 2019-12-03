@@ -94,13 +94,20 @@ restore_exception:
 
 
 
-#ifdef __x86_64__
-
-/* TODO */
-
-#else /* __x86_64__ */
 
 struct x86_syscall32_lcall7_args {
+#ifdef __x86_64__
+	u64           l7_rax;
+	u64           l7_rdi;
+	u64           l7_rsi;
+	u64           l7_rdx;
+	u64           l7_rcx;
+	u64           l7_r8;
+	u64           l7_r9;
+	u64           l7_r10;
+	u64           l7_r11;
+	struct irregs l7_iret;
+#else /* __x86_64__ */
 	u32                l7_eax;
 	u32                l7_ecx;
 	u32                l7_edx;
@@ -108,6 +115,7 @@ struct x86_syscall32_lcall7_args {
 	u32                l7_es;
 	u32                l7_ds;
 	struct irregs_user l7_iret;
+#endif /* !__x86_64__ */
 };
 
 INTDEF void FCALL /* TODO: Get rid of this */
@@ -169,18 +177,18 @@ x86_syscall32_lcall7_main(struct x86_syscall32_lcall7_args *__restrict args,
 	unsigned int argc;
 	syscall_ulong_t result;
 	syscall_ulong_t argv[6];
-	USER UNCHECKED syscall_ulong_t *usp;
+	USER UNCHECKED u32 *usp;
 	bool double_wide;
 	void *proto;
-	usp = (USER UNCHECKED syscall_ulong_t *)args->l7_iret.ir_esp;
-	if (sysno <= __NR_syscall0_max) {
+	usp = (USER UNCHECKED u32 *)irregs_getuserpsp(&args->l7_iret);
+	if (sysno <= __NR32_syscall0_max) {
 		proto       = x86_sysroute0_c32[sysno];
-		argc        = __kernel_syscall_regcnt(kernel_syscall0_regcnt, sysno);
-		double_wide = __kernel_syscall_doublewide(kernel_syscall0_regcnt, sysno);
-	} else if (sysno >= __NR_syscall1_min && sysno <= __NR_syscall1_max) {
-		proto       = x86_sysroute1_c32[sysno - __NR_syscall1_min];
-		argc        = __kernel_syscall_regcnt(kernel_syscall1_regcnt, sysno - __NR_syscall1_min);
-		double_wide = __kernel_syscall_doublewide(kernel_syscall1_regcnt, sysno - __NR_syscall1_min);
+		argc        = __kernel_syscall_regcnt(kernel_syscall0_regcnt32, sysno);
+		double_wide = __kernel_syscall_doublewide(kernel_syscall0_regcnt32, sysno);
+	} else if (sysno >= __NR32_syscall1_min && sysno <= __NR32_syscall1_max) {
+		proto       = x86_sysroute1_c32[sysno - __NR32_syscall1_min];
+		argc        = __kernel_syscall_regcnt(kernel_syscall1_regcnt32, sysno - __NR32_syscall1_min);
+		double_wide = __kernel_syscall_doublewide(kernel_syscall1_regcnt32, sysno - __NR32_syscall1_min);
 	} else {
 		syscall_ulong_t rpc_flags;
 		if (!(irregs_getpflags(&args->l7_iret) & EFLAGS_CF))
@@ -243,8 +251,12 @@ x86_syscall32_lcall7_main(struct x86_syscall32_lcall7_args *__restrict args,
 		result64 = (*(syscall_proto64_t)proto)(argv[0], argv[1],
 		                                       argv[2], argv[3],
 		                                       argv[4], argv[5]);
+#ifdef __x86_64__
+		args->l7_rdx = (u64)(u32)(result64 >> 32);
+#else /* __x86_64__ */
 		args->l7_edx = (u32)(result64 >> 32);
-		result = (u32)result64;
+#endif /* !__x86_64__ */
+		result = (syscall_ulong_t)(u32)result64;
 	} else {
 		result = (*(syscall_proto_t)proto)(argv[0], argv[1],
 		                                   argv[2], argv[3],
@@ -257,7 +269,6 @@ x86_syscall32_lcall7_main(struct x86_syscall32_lcall7_args *__restrict args,
 #pragma GCC diagnostic pop
 #endif /* __GNUC__ */
 
-#endif /* !__x86_64__ */
 
 DECL_END
 

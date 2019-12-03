@@ -114,11 +114,23 @@ DECL_END
 /* Enable compatibility-mode alias properties */
 #define KERNEL_SYSCALL_PROPERTIES_COMPAT_ALIAS 32
 
+#define kernel_syscall0_iscp64        kernel_syscall0_iscp
+#define kernel_syscall0_restartmode64 kernel_syscall0_restartmode
+#define kernel_syscall0_regcnt64      kernel_syscall0_regcnt
+#define kernel_syscall1_iscp64        kernel_syscall1_iscp
+#define kernel_syscall1_restartmode64 kernel_syscall1_restartmode
+#define kernel_syscall1_regcnt64      kernel_syscall1_regcnt
 #else /* __x86_64__ */
-#define kernel_syscall32_iscp        kernel_syscall_iscp
-#define kernel_syscall32_restartmode kernel_syscall_restartmode
-#define kernel_syscall32_regcnt      kernel_syscall_regcnt
-#define kernel_syscall32_doublewide  kernel_syscall_doublewide
+#define kernel_syscall32_iscp         kernel_syscall_iscp
+#define kernel_syscall32_restartmode  kernel_syscall_restartmode
+#define kernel_syscall32_regcnt       kernel_syscall_regcnt
+#define kernel_syscall32_doublewide   kernel_syscall_doublewide
+#define kernel_syscall0_iscp32        kernel_syscall0_iscp
+#define kernel_syscall0_restartmode32 kernel_syscall0_restartmode
+#define kernel_syscall0_regcnt32      kernel_syscall0_regcnt
+#define kernel_syscall1_iscp32        kernel_syscall1_iscp
+#define kernel_syscall1_restartmode32 kernel_syscall1_restartmode
+#define kernel_syscall1_regcnt32      kernel_syscall1_regcnt
 #endif /* !__x86_64__ */
 #endif /* __CC__ */
 

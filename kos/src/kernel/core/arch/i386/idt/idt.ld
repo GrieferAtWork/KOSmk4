@@ -100,7 +100,7 @@ INTR(02) /* NMI -- Non-maskable Interrupt */
 TRAP(03) /* #BP -- Breakpoint */
 TRAP(04) /* #OF -- Overflow */
 TRAP(05) /* #BR -- Bound Range */
-TRAP(06) /* #UD -- Illegal Instruction */
+INTR(06) /* #UD -- Illegal Instruction */
 INTR(07) /* #NM -- Device not available. */
 
 #ifdef __x86_64__
@@ -115,7 +115,7 @@ INTR(09)
 INTR(0a) /* #TS -- Invalid TSS. */
 INTR(0b) /* #NP -- Segment not present. */
 INTR(0c) /* #SS -- Stack segment fault. */
-TRAP(0d) /* #GP -- General Protection Fault. */
+INTR(0d) /* #GP -- General Protection Fault. */
 INTR(0e) /* #PF -- Page Fault. */
 INTR(0f)
 INTR(10)

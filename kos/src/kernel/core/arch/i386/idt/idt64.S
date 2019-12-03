@@ -25,7 +25,9 @@
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
-#include <kos/kernel/cpu-state32.h>
+#include <asm/instr/interrupt.h>
+#include <kos/kernel/cpu-state-asm.h>
+#include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
 #include <kos/kernel/tss.h>
 
@@ -55,10 +57,10 @@
 
 
 #ifndef __INTELLISENSE__
-#define IDT_EXCEPT_IMPL   "idt32-exception.S"
-#define IDT_WINSPEC_IMPL  "idt32-exception.S"
-#define IDT_GENERIC_IMPL  "idt32-dynamic.S"
-#define IDT_SPECIFIC_IMPL "idt32-dynamic.S"
+#define IDT_EXCEPT_IMPL   "idt64-exception.S"
+#define IDT_WINSPEC_IMPL  "idt64-exception.S"
+#define IDT_GENERIC_IMPL  "idt64-dynamic.S"
+#define IDT_SPECIFIC_IMPL "idt64-dynamic.S"
 #include "foreach.h"
 #endif /* !__INTELLISENSE__ */
 
@@ -66,36 +68,24 @@
 .cfi_startproc
 .cfi_iret_signal_frame
 PRIVATE_FUNCTION(x86_idt_unused_common)
-	.cfi_def_cfa %esp, 4
-	popl_cfi %ss:-(12 + SIZEOF_GPREGS + 4)(%esp) /* VECNO */
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	pushal_cfi_r
-	movl   %esp, %ecx /* struct icpustate *state */
-	xorl   %edx, %edx /* uintptr_t ecode */
-	subl   $4, %esp   /* VECNO */
-	.cfi_adjust_cfa_offset 4
+	.cfi_def_cfa %rsp, 8
+	popq_cfi -(SIZEOF_GPREGS64 + 8)(%rsp) /* VECNO */
+	intr_enter INTR
+	ASM_PUSH_GPREGSNSP_CFI_R
+	movq   %rsp, %rdi     /* struct icpustate *state */
+	xorq   %rsi, %rsi     /* uintptr_t ecode */
+	movq   -8(%rsp), %rdx /* VECNO */
 
 	EXTERN(x86_handle_unhandled_idt)
 	call   x86_handle_unhandled_idt
-	movl   %eax, %esp
+	movq   %rax, %rsp
 
-	popal_cfi_r
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
+	ASM_POP_GPREGSNSP_CFI_R
+	intr_exit
 END(x86_idt_unused_common)
 
 #ifndef __INTELLISENSE__
-#define IDT_UNUSED_IMPL   "idt32-unused.S"
+#define IDT_UNUSED_IMPL   "idt64-unused.S"
 #include "foreach.h"
 #endif /* !__INTELLISENSE__ */
 .cfi_endproc

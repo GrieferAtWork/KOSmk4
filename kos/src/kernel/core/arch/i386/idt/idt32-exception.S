@@ -285,7 +285,7 @@ INTERN_FUNCTION(PP_CAT2(x86_handle_, IDT_VECTOR_NAME))
 #if !IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)
 	xorl   %edx, %edx /* uintptr_t ecode */
 #endif /* IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */
-	pushl_cfi $(IDT_VECTOR_ID)
+	pushl_cfi $(IDT_VECTOR_ID) /* uintptr_t vecno */
 	EXTERN(x86_handle_unhandled_idt)
 	call   x86_handle_unhandled_idt
 	.cfi_adjust_cfa_offset -4
