@@ -275,6 +275,7 @@ NOTHROW(FCALL task_push_asynchronous_srpc)(struct scpustate *__restrict state,
  * @return: false: The given thread has already been redirected. */
 PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
+	(void)self;
 	kernel_panic("TODO");
 	return true;
 }

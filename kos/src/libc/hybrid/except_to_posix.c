@@ -84,7 +84,6 @@ NOTHROW_NCX_KERNEL(LIBCCALL libc_error_as_signal)(struct exception_data const *_
                                                   struct __siginfo_struct *__restrict result) {
 	error_code_t code = data->e_code;
 	memset(result, 0, sizeof(*result));
-
 	/* TODO: Make sure that this matches the sysv abi386 requirements:
 	 *       Figure 3-27:  Hardware Exceptions and Signals
 	 *       0   divide error fault             SIGFPE
@@ -123,6 +122,8 @@ NOTHROW_NCX_KERNEL(LIBCCALL libc_error_as_signal)(struct exception_data const *_
 		result->si_signo   = SIGSYS;
 		result->si_errno   = ENOSYS;
 		result->si_syscall = data->e_pointers[1];
+		/* TODO: `si_arch' could be determined by
+		 *       `data->e_pointers[0] & RPC_SYSCALL_INFO_FMETHOD'! */
 		break;
 
 	case E_DIVIDE_BY_ZERO:

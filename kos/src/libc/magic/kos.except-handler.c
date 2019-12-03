@@ -27,23 +27,24 @@
 #define __EXCEPT_HANDLER_CC  /* nothing */
 #endif /* !__EXCEPT_HANDLER_CC */
 
-/* Interface for defining how the kernel propagates exceptions to user-space.
+/* >> set_exception_handler(2)
+ * Interface for defining how the kernel propagates exceptions to user-space.
  * By default, kernel exceptions aren't propagated and are instead handled as
  * the process simply being terminated when the kernel tries to propagate an
  * exception (meaning that sys_X* system calls either terminate the process on
  * error, or propagate an exception by sending a POSIX signal, when such a signal
- * exists)
+ * exists (s.a. `error_as_signal(3)'))
  * Using this interface, user-space can define a per-thread exception handler.
- *   - This handler is inherited by child processes/threads during clone()/fork()
+ *   - This handler is inherited by child processes/threads during `clone(2)' / `fork(2)'
  *   - When exec() is called, the handler is reset, meaning that applications
- *     always start with kernel exception handling disabled.
+ *     always start with kernel exception handling disabled. (s.a. mode #1)
  * Note that some situations exist where the kernel may try to propagate an
  * exception into user-space, even when user-space didn't actually perform
- * a system call:
- *   - Divide by Zero                          (E_DIVIDE_BY_ZERO)
+ * a system call (though such exceptions are arch-specific):
+ *   - Division by Zero                        (E_DIVIDE_BY_ZERO)
  *   - FPU Access failed to allocate registers (E_BADALLOC)
  *   - Integer overflow with check             (E_OVERFLOW)
- *   - Illegal instruction executed            (E_ILLEGAL_INSTRUCTION)
+ *   - Illegal/Privileged instruction executed (E_ILLEGAL_INSTRUCTION)
  *   - etc.
  * For compatibility with POSIX, (most of) these types of exceptions can be
  * handled in 1 of 2 ways:
@@ -53,18 +54,26 @@
  *     handler to be used for system call exceptions)
  *     In this mode, so-long as no sys_X* system calls are used, KOS behaves
  *     identically to POSIX guidelines, and no exceptions will ever be thrown
- *     without the user explicitly making use of exception-enabled functions
+ *     without the user explicitly making use of exception-enabled functions,
+ *     or marking their binary as `dlexceptaware(3)'
  *     -> This is the default when a standard-linked application's main()
- *        function is reached
+ *        function is reached, and is further described by mode #4
  *   - By propagating the underlying kernel exception into user-space.
  *     In this mode, user-space gains the greatest amount of knowledge
  *     about the exception in question, but will be required to implement
  *     handling for exceptions, as well as include eh_frame unwind information
  *     within their application, and be using C++ if the intend is to actually
  *     catch such an exception (KOS kernel exceptions use the same mechanism
- *     as C++, meaning that RAII and the like get handled correctly)
+ *     as C++, meaning that RAII and the like get handled correctly, though to
+ *     make the intend of handling KOS exceptions more clear, as well as allow
+ *     for possible compiler-specific extensions in the future, it is still
+ *     recommended to use the `TRY' and `EXCEPT' macros from `<kos/except.h>'
+ *     instead of using `try' and `catch (...)')
  *
- * In practice, you will usually encounter 1 of 4 modes:
+ * In practice, you will usually encounter 1 of 4 modes, though KOS system
+ * libraries often assume that either mode #3 or #4 is enabled, and in practice
+ * there is little to no reason to ever concern yourself with any of this, as
+ * libc will by default allow for the use of exceptions:
  *
  *  #1 KOS exceptions are fully disabled
  *     Behavior:
@@ -157,7 +166,7 @@
  *                If the exception cannot be translated into a signal,
  *                move on to step #CORE.
  *                NOTE: For this purpose, the `sys_raiseat()' system call exists.
- *         #CORE: Trigger a coredump terminated the current application.
+ *         #CORE: Trigger a coredump to terminate the current application.
  *                NOTE: For this purpose, the `sys_codedump()' system call exists.
  *     Environment:
  *      - This is the actual mode that you will encounter for most of your travels.

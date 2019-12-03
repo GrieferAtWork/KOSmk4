@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0285fdc */
+/* HASH CRC-32:0xa959e959 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1022,6 +1022,12 @@ __LIBC __ATTR_NORETURN __ATTR_COLD void (__ERROR_THROWN_CC error_thrown)(error_c
 #endif /* !__INTELLISENSE__ */
 
 #ifdef __cplusplus
+/* TODO: In user-space, using TRY and EXCEPT should leave some sort of marker in the
+ *       binary that allows for libc to consider these handlers as `dlexceptaware(3)'
+ *       when operating in except-mode #4. However, I am unsure as to how this could
+ *       be implemented without making some additional tweaks to gcc under KOS, though
+ *       that wouldn't even be the first time I had to tweak binutils/gcc for this
+ *       project... */
 #define TRY         try
 #define EXCEPT      catch(...)
 #endif /* __cplusplus */

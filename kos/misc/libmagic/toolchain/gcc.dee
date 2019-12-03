@@ -232,7 +232,7 @@ global class GCCToolchain: Toolchain {
 										local script_path = normalizeFilenameForLog(
 											l[col + 1:col2].decode("utf-8"));
 										local lineno = l[col2+1:lineno_end];
-										local message = l[lineno_end:].strip();
+										local message = l[lineno_end:].strip().lstrip(":").lstrip();
 										print script_path,;
 										print "(",;
 										print lineno,;
