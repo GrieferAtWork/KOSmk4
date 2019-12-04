@@ -139,8 +139,8 @@ __SYSDECL_BEGIN
 
 #define scpustate64                scpustate
 #define OFFSET_SCPUSTATE_SGBASE    OFFSET_SCPUSTATE64_SGBASE
-#define OFFSET_SCPUSTATE_GPREGSNSP OFFSET_SCPUSTATE64_GPREGSNSP
 #define OFFSET_SCPUSTATE_SGREGS    OFFSET_SCPUSTATE64_SGREGS
+#define OFFSET_SCPUSTATE_GPREGSNSP OFFSET_SCPUSTATE64_GPREGSNSP
 #define OFFSET_SCPUSTATE_IRREGS    OFFSET_SCPUSTATE64_IRREGS
 #define SIZEOF_SCPUSTATE           SIZEOF_SCPUSTATE64
 
@@ -356,11 +356,11 @@ struct __ATTR_PACKED irregs64 {
 
 
 
-#define OFFSET_UCPUSTATE64_SGBASE 0
-#define OFFSET_UCPUSTATE64_SGREGS 16
-#define OFFSET_UCPUSTATE64_GPREGS 48
-#define OFFSET_UCPUSTATE64_CS     176
-#define OFFSET_UCPUSTATE64_SS     184
+#define OFFSET_UCPUSTATE64_SGREGS 0
+#define OFFSET_UCPUSTATE64_SGBASE 32
+#define OFFSET_UCPUSTATE64_CS     48
+#define OFFSET_UCPUSTATE64_SS     56
+#define OFFSET_UCPUSTATE64_GPREGS 64
 #define OFFSET_UCPUSTATE64_RFLAGS 192
 #define OFFSET_UCPUSTATE64_RIP    200
 #define SIZEOF_UCPUSTATE64        208
@@ -369,9 +369,8 @@ struct __ATTR_PACKED ucpustate64 { /* u -- User */
 	/* Full CPU state, as used by system calls.
 	 * NOTE: Also represents the state saved when an exception occurs,
 	 *       both inside kernel-, as well as user-space. */
-	struct sgbase64 ucs_sgbase; /* Segment base registers. */
 	struct sgregs64 ucs_sgregs; /* Segment registers. */
-	struct gpregs64 ucs_gpregs; /* General purpose registers. */
+	struct sgbase64 ucs_sgbase; /* Segment base registers. */
 	union {
 		__u64       ucs_cs;     /* Code segment (Ring #3, usually `SEGMENT_USER_CODE_RPL')
 		                         * (upper 48 bits are undefined, but should be written as zeros) */
@@ -382,6 +381,7 @@ struct __ATTR_PACKED ucpustate64 { /* u -- User */
 		                         * (upper 48 bits are undefined, but should be written as zeros) */
 		__u16       ucs_ss16;   /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL') */
 	};
+	struct gpregs64 ucs_gpregs; /* General purpose registers. */
 	__u64           ucs_rflags; /* Flags register */
 	__u64           ucs_rip;    /* Instruction pointer */
 };
@@ -491,8 +491,8 @@ struct __ATTR_PACKED icpustate64 { /* i -- Interrupts */
 
 
 
-#define OFFSET_SCPUSTATE64_SGBASE        0
-#define OFFSET_SCPUSTATE64_SGREGS        16
+#define OFFSET_SCPUSTATE64_SGREGS        0
+#define OFFSET_SCPUSTATE64_SGBASE        32
 #define OFFSET_SCPUSTATE64_GPREGSNSP     48 /* [FIELD(scs_gpregs)] */
 #define OFFSET_SCPUSTATE64_IRREGS        168
 #define SIZEOF_SCPUSTATE64               208
@@ -501,8 +501,8 @@ struct __ATTR_PACKED scpustate64 { /* i -- Interrupts */
 	/* A CPU state that is used by hardware interrupts (other than
 	 * those used by scheduling, which generate `scpustate' instead),
 	 * in order to describe the interrupted text location. */
-	struct sgbase64    scs_sgbase;        /* Segment base registers. (NOTE: These are _always_ the user-space values!) */
 	struct sgregs64    scs_sgregs;        /* Segment registers. */
+	struct sgbase64    scs_sgbase;        /* Segment base registers. (NOTE: These are _always_ the user-space values!) */
 	struct gpregsnsp64 scs_gpregs;        /* General purpose registers. */
 	struct irregs64    scs_irregs;        /* Interrupt return registers. */
 };

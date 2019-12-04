@@ -27,12 +27,15 @@
 /* ATTR_NORETURN void kernel_panic_here(void) */
 PUBLIC_FUNCTION(kernel_panic_here)
 	.cfi_startproc
+	.cfi_signal_frame
 	pushfq_cfi_r
 	pushq_cfi_r %rax
 	pushq_cfi_r %rcx
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rbx
-	pushq_cfi_r %rsp
+	pushq_cfi %rsp
+	addq   $(56), 0(%rsp)
+	.cfi_rel_offset %rsp, 0
 	pushq_cfi_r %rbp
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
@@ -46,12 +49,12 @@ PUBLIC_FUNCTION(kernel_panic_here)
 	pushq_cfi_r %r15
 	pushq_seg_cfi_r %ss, %rax
 	pushq_seg_cfi_r %cs, %rax
+	pushq_seg_cfi_r %fs.base, %rax
+	pushq_seg_cfi_r %gs.base, %rax
 	pushq_seg_cfi_r %ds, %rax
 	pushq_seg_cfi_r %es, %rax
 	pushq_cfi_r %fs
 	pushq_cfi_r %gs
-	pushq_seg_cfi_r %fs.base, %rax
-	pushq_seg_cfi_r %gs.base, %rax
 
 	xorq   %rdx, %rdx /* __builtin_va_list args */
 	xorq   %rsi, %rsi /* char const *format */
@@ -65,12 +68,15 @@ END(kernel_panic_here)
 /* ATTR_NORETURN void kernel_vpanic(char const *format, va_list args) */
 PUBLIC_FUNCTION(kernel_vpanic)
 	.cfi_startproc
+	.cfi_signal_frame
 	pushfq_cfi_r
 	pushq_cfi_r %rax
 	pushq_cfi_r %rcx
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rbx
-	pushq_cfi_r %rsp
+	pushq_cfi %rsp
+	addq   $(56), 0(%rsp)
+	.cfi_rel_offset %rsp, 0
 	pushq_cfi_r %rbp
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
@@ -84,12 +90,12 @@ PUBLIC_FUNCTION(kernel_vpanic)
 	pushq_cfi_r %r15
 	pushq_seg_cfi_r %ss, %rax
 	pushq_seg_cfi_r %cs, %rax
+	pushq_seg_cfi_r %fs.base, %rax
+	pushq_seg_cfi_r %gs.base, %rax
 	pushq_seg_cfi_r %ds, %rax
 	pushq_seg_cfi_r %es, %rax
 	pushq_cfi_r %fs
 	pushq_cfi_r %gs
-	pushq_seg_cfi_r %fs.base, %rax
-	pushq_seg_cfi_r %gs.base, %rax
 
 	movq   %rsi, %rdx /* __builtin_va_list args */
 	movq   %rdi, %rsi /* char const *format */
@@ -103,12 +109,15 @@ END(kernel_vpanic)
 /* ATTR_NORETURN void kernel_panic(char const *format, ...) */
 PUBLIC_FUNCTION(kernel_panic)
 	.cfi_startproc
+	.cfi_signal_frame
 	pushfq_cfi_r
 	pushq_cfi_r %rax
 	pushq_cfi_r %rcx
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rbx
-	pushq_cfi_r %rsp
+	pushq_cfi %rsp
+	addq   $(56), 0(%rsp)
+	.cfi_rel_offset %rsp, 0
 	pushq_cfi_r %rbp
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
@@ -122,12 +131,12 @@ PUBLIC_FUNCTION(kernel_panic)
 	pushq_cfi_r %r15
 	pushq_seg_cfi_r %ss, %rax
 	pushq_seg_cfi_r %cs, %rax
+	pushq_seg_cfi_r %fs.base, %rax
+	pushq_seg_cfi_r %gs.base, %rax
 	pushq_seg_cfi_r %ds, %rax
 	pushq_seg_cfi_r %es, %rax
 	pushq_cfi_r %fs
 	pushq_cfi_r %gs
-	pushq_seg_cfi_r %fs.base, %rax
-	pushq_seg_cfi_r %gs.base, %rax
 
 	/* struct x86_64_va_list_reg_save_area */
 	pushq_cfi %r9

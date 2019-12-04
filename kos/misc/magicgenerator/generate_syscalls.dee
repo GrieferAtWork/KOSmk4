@@ -2077,6 +2077,42 @@ function generateLibcArchSyscallAssembly(
 	fp << "\n";
 }
 
+function generateSyscallCompatibilityHeader(
+		fp: File, prefix: string,
+		baseContext: ParserContext, baseArch/*: SyscallArch*/,
+		compatContext: ParserContext, compatArch/*: SyscallArch*/) {
+	local baseFunctions = Dict(
+		for (local none, decl: baseContext.sysidMappings)
+			(decl[2], baseContext.functions[decl[2]]));
+	local compatFunctions = Dict(
+		for (local none, decl: compatContext.sysidMappings)
+			(decl[2], compatContext.functions[decl[2]]));
+	local compatFunctionNames: HashSet with string = HashSet();
+	for (local name, baseFunc: baseFunctions) {
+		local compatFunc = compatFunctions.get(name);
+		if (compatFunc is none)
+			continue;
+		if (baseFunc.returnType == compatFunc.returnType &&
+		    baseFunc.args == compatFunc.args &&
+		    baseFunc.restartMode == compatFunc.restartMode &&
+		    baseFunc.isCp == compatFunc.isCp &&
+		    baseFunc.isNoReturn == compatFunc.isNoReturn &&
+		    baseFunc.isNoExcept == compatFunc.isNoExcept)
+			compatFunctionNames.insert(name);
+	}
+	compatFunctionNames = compatFunctionNames.sorted();
+	local longestNameLen = compatFunctionNames.each.length > ...;
+	fp << copyright << "\n";
+	local firstName = compatFunctionNames.first;
+	fp << "#ifndef " << prefix << firstName << "\n";
+	for (local n: compatFunctionNames) {
+		fp << "#define " << prefix << n
+			<< " " * (longestNameLen - #n)
+			<< " 1\n";
+	}
+	fp << "#endif /* !" << prefix << firstName << " */\n";
+}
+
 
 
 function main() {
@@ -2232,6 +2268,23 @@ again_scan_common:
 	writeHashedFile("include/asm/ls-syscalls.h", [](fp){
 		generateAsmLsSyscallsHeader(fp, baseContext, none);
 	});
+
+	for (local name, a: ARCH) {
+		if (!a.platformSyscallCompatArch)
+			continue;
+		local baseContext = archContexts[name];
+		for (local headerName, prefix, compatArchName:
+				a.platformSyscallCompatArch) {
+			local compatArch = ARCH[compatArchName];
+			local compatContext = archContexts[compatArchName];
+			writeHashedFile(headerName, [](fp){
+				generateSyscallCompatibilityHeader(
+					fp, prefix,
+					baseContext, a,
+					compatContext, compatArch);
+			});
+		}
+	}
 
 	for (local name, a: ARCH) {
 		local c = archContexts[name];

@@ -22,6 +22,8 @@
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/host.h>
+
 #include <kernel/gdt.h>
 #include <kernel/memory.h>
 #include <kernel/realmode.h>
@@ -65,9 +67,10 @@ INTERN uintptr_t x86_realmode_base = 0;
 
 PRIVATE int LIBVM86_CC
 vm86_handle_io(vm86_state_t *__restrict self,
-               __uint16_t port,
-               unsigned int action, void *data) {
+               u16 port, unsigned int action,
+               void *data) {
 	int result = VM86_SUCCESS;
+	(void)self;
 	switch (action) {
 	case VM86_HANDLE_IO_INB:
 		*(uint8_t *)data = inb((port_t)port);
@@ -136,6 +139,7 @@ NOTHROW(FCALL x86_realmode_interrupt)(struct rmcpustate *__restrict state) {
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_realmode_initialize)(void) {
+#ifndef __x86_64__
 #if 1
 	if (X86_PAGEDIR_USES_P32()) {
 		memcpyl(pagedir_kernel.pd_p32.p_e2,
@@ -149,6 +153,7 @@ NOTHROW(KCALL x86_realmode_initialize)(void) {
 	        pagedir_kernel.p_e2 + (1024 - 256),
 	        256);
 #endif
+#endif /* !__x86_64__ */
 	pagedir_syncall();
 #if 0
 	{
@@ -165,6 +170,7 @@ NOTHROW(KCALL x86_realmode_initialize)(void) {
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_realmode_finalize)(void) {
+#ifndef __x86_64__
 #if 1
 	if (X86_PAGEDIR_USES_P32()) {
 		memsetl(pagedir_kernel.pd_p32.p_e2, 0, 256);
@@ -174,6 +180,7 @@ NOTHROW(KCALL x86_realmode_finalize)(void) {
 #else
 	memsetl(pagedir_kernel.p_e2, 0, 256);
 #endif
+#endif /* !__x86_64__ */
 	pagedir_syncall();
 }
 

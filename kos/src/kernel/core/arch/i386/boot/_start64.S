@@ -55,11 +55,18 @@ EXTERN(x86_bootcpu_cpuid)
 #endif /* !CONFIG_NO_BOOT0 */
 
 
+
 #define VGA_BASE   0xb8000
 #define VGA_WIDTH  80
 #define VGA_HEIGHT 25
 
 .code32
+
+.section .bss.free
+INTERN_OBJECT(boot_failure_vga_ptr)
+	.long 0
+END(boot_failure_vga_ptr)
+
 .section .text.free
 
 /* CLOBBER: []
@@ -317,7 +324,7 @@ INTERN_FUNCTION(_start)
 	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RAX)
 	sgdtl  V2P(boot_cpustate + OFFSET_FCPUSTATE_GDT + 2)
 	sidtl  V2P(boot_cpustate + OFFSET_FCPUSTATE_IDT + 2)
-	movl   $_start, V2P(boot_cpustate + OFFSET_FCPUSTATE_RIP)
+	movl   $(V2P(_start)), V2P(boot_cpustate + OFFSET_FCPUSTATE_RIP)
 	movw   %gs, V2P(boot_cpustate + OFFSET_FCPUSTATE_GS)
 	movw   %fs, V2P(boot_cpustate + OFFSET_FCPUSTATE_FS)
 	movw   %es, V2P(boot_cpustate + OFFSET_FCPUSTATE_ES)

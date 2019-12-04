@@ -77,7 +77,7 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 	 * - Enabled A20 (Using the keyboard controller method)
 	 * - Load the kernel using `read_lba' and copy its data to 0x00100000
 	 * - Enable protected mode and fill in %cs and %ds
-	 * - Jump to `_start' (which is at `_start - KERNEL_BASE')
+	 * - Jump to `_start' (which is at `_start - KERNEL_CORE_BASE')
 	 * - If possible, also fill in custom boot magic in `%eax'
 	 *   to pass information about `BOOTDISK' to the kernel. */
 
@@ -165,7 +165,7 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 	call16 pmode_enter
 .code32
 	/* Jump to the kernel entry point */
-	movl   $(_start - KERNEL_BASE), %eax
+	movl   $(_start - KERNEL_CORE_BASE), %eax
 	jmp    *%eax
 .code16
 

@@ -20,7 +20,11 @@
 #define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_REALMODE_H 1
 
 #include <kernel/compiler.h>
+
+#include <hybrid/host.h>
+
 #include <kernel/types.h>
+
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/paging.h>
 
@@ -28,16 +32,17 @@ DECL_BEGIN
 
 #undef CONFIG_USE_LIBVM86_FOR_REALMODE
 
-#if 0 /* TODO: It does work to correctly emulate QEMU's e820 function, but
-       *       there are many other functions which exist, and even then:
-       *       the current implementation is still really badly hacked
-       *       together and still makes use of actual low memory for storing
-       *       buffers, instead of making use of the page-translation function
-       *       to simply emulate a low-memory environment by adding KERNEL_BASE
-       * -> In other words: It works, but until libvm86 gets hardened more, I'm
-       *    not comfortable in using it by default (also: Once libvm86 does become
-       *    the default, add a kernel commandline option to force use of an actual
-       *    realmode environment when calling bios functions) */
+#if defined(__x86_64__) || 0
+/* TODO: It does work to correctly emulate QEMU's e820 function, but
+ *       there are many other functions which exist, and even then:
+ *       the current implementation is still really badly hacked
+ *       together and still makes use of actual low memory for storing
+ *       buffers, instead of making use of the page-translation function
+ *       to simply emulate a low-memory environment by adding KERNEL_BASE
+ * -> In other words: It works, but until libvm86 gets hardened more, I'm
+ *    not comfortable in using it by default (also: Once libvm86 does become
+ *    the default, add a kernel commandline option to force use of an actual
+ *    realmode environment when calling bios functions) */
 #define CONFIG_USE_LIBVM86_FOR_REALMODE 1
 #endif
 

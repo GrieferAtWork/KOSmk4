@@ -32,6 +32,17 @@ class SyscallArch {
 	@@Optional suffix for platform files (for use with multi-arch platforms)
 	member platformSuffix: string = "";
 
+	@@Set of (name, prefix, arch) for other architectures for which
+	@@syscall compatibility meta-data should be generated in the
+	@@form of a system header @"/kos/{name}" that contains a set of
+	@@definitions @"{prefix}{syscall-name} 1" for all system calls
+	@@defined by both architectures that share both the same name,
+	@@as well as binary compatibility.
+	@@On multi-arch targets such as x86_64, this is used to determine if an
+	@@invocation of `DEFINE_SYSCALLn()` should also define the compatibility-
+	@@mode variant of another system call with the same name.
+	member platformSyscallCompatArch: {(string, string, string)...} = none;
+
 	@@Size of general-purpose registers used for passing system call arguments (in bits)
 	member platformGpRegisterSizeInBits: int;
 
@@ -1048,6 +1059,9 @@ global ARCH: {string: SyscallArch} = {
 		platformName: "i386-kos",
 		platformArch: "i386",
 		platformSuffix: "64",
+		platformSyscallCompatArch: {
+			("include/i386-kos/asm/syscall3264-compat.h", "__NR3264COMPAT_", "i386"),
+		},
 		platformGpRegisterSizeInBits: 64,
 		platformSyscallRegisterCount: 6,
 		platformEndian: "le",

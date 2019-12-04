@@ -130,12 +130,12 @@ INTERN_FUNCTION(x86_idt_preemption)
 	pushq_cfi_r %r13                 /* [P] General purpose register #13 */
 	pushq_cfi_r %r14                 /* [P] General purpose register #14 */
 	pushq_cfi_r %r15                 /* [P] General purpose register #15 */
+	pushq_seg_cfi_r %fs.base, %rax
+	pushq_cfi_kernel_gs_base
 	pushq_seg_cfi_r %ds, %rax
 	pushq_seg_cfi_r %es, %rax
 	pushq_cfi_r %fs
 	pushq_cfi_r %gs
-	pushq_seg_cfi_r %fs.base, %rax
-	pushq_cfi_kernel_gs_base
 
 	/* Acknowledge the interrupt. */
 INTERN_FUNCTION(x86_pic_acknowledge)
@@ -211,12 +211,12 @@ INTERN_FUNCTION(x86_load_thread_rax_cpu_rbx)
 
 .Lload_scpustate_rsp:
 	/* Load the underlying CPU state */
-	popq_cfi_kernel_gs_base
-	popq_seg_cfi_r %fs.base, %rax
 	popq_cfi_r %gs
 	popq_cfi_r %fs
 	popq_seg_cfi_r %es, %rax
 	popq_seg_cfi_r %ds, %rax
+	popq_cfi_kernel_gs_base
+	popq_seg_cfi_r %fs.base, %rax
 	popq_cfi_r %r15                 /* [P] General purpose register #15 */
 	popq_cfi_r %r14                 /* [P] General purpose register #14 */
 	popq_cfi_r %r13                 /* [P] General purpose register #13 */
@@ -303,12 +303,12 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 	pushq_cfi_r %r13                 /* [P] General purpose register #13 */
 	pushq_cfi_r %r14                 /* [P] General purpose register #14 */
 	pushq_cfi_r %r15                 /* [P] General purpose register #15 */
+	pushq_seg_cfi_r %fs.base, %rax
+	pushq_cfi_kernel_gs_base
 	pushq_seg_cfi_r %ds, %rax
 	pushq_seg_cfi_r %es, %rax
 	pushq_cfi_r %fs
 	pushq_cfi_r %gs
-	pushq_seg_cfi_r %fs.base, %rax
-	pushq_cfi_kernel_gs_base
 
 
 	/* Remember the current scheduler state. */
@@ -414,12 +414,12 @@ PUBLIC_FUNCTION(task_yield_nx)
 	pushq_cfi_r %r13                 /* [P] General purpose register #13 */
 	pushq_cfi_r %r14                 /* [P] General purpose register #14 */
 	pushq_cfi_r %r15                 /* [P] General purpose register #15 */
+	pushq_seg_cfi_r %fs.base, %rax
+	pushq_cfi_kernel_gs_base
 	pushq_seg_cfi_r %ds, %rax
 	pushq_seg_cfi_r %es, %rax
 	pushq_cfi_r %fs
 	pushq_cfi_r %gs
-	pushq_seg_cfi_r %fs.base, %rax
-	pushq_cfi_kernel_gs_base
 
 	/* Remember the current scheduler state. */
 	movq   %gs:0, %rbx
@@ -510,12 +510,12 @@ PUBLIC_FUNCTION(task_tryyield)
 	pushq_cfi_r %r13                 /* [P] General purpose register #13 */
 	pushq_cfi_r %r14                 /* [P] General purpose register #14 */
 	pushq_cfi_r %r15                 /* [P] General purpose register #15 */
+	pushq_seg_cfi_r %fs.base, %rax
+	pushq_cfi_kernel_gs_base
 	pushq_seg_cfi_r %ds, %rax
 	pushq_seg_cfi_r %es, %rax
 	pushq_cfi_r %fs
 	pushq_cfi_r %gs
-	pushq_seg_cfi_r %fs.base, %rax
-	pushq_cfi_kernel_gs_base
 
 	/* Remember the current scheduler state. */
 	movq   %gs:0, %rbx
@@ -572,12 +572,12 @@ PUBLIC_FUNCTION(cpu_run_current_and_remember)
 	pushq_cfi_r %r13                 /* [P] General purpose register #13 */
 	pushq_cfi_r %r14                 /* [P] General purpose register #14 */
 	pushq_cfi_r %r15                 /* [P] General purpose register #15 */
+	pushq_seg_cfi_r %fs.base, %rax
+	pushq_cfi_kernel_gs_base
 	pushq_seg_cfi_r %ds, %rax
 	pushq_seg_cfi_r %es, %rax
 	pushq_cfi_r %fs
 	pushq_cfi_r %gs
-	pushq_seg_cfi_r %fs.base, %rax
-	pushq_cfi_kernel_gs_base
 
 	/* Remember the current scheduler state. */
 	EXTERN(this_sched_state)

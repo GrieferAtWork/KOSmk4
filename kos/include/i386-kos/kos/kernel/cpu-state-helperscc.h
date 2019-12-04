@@ -246,8 +246,81 @@ __NOTHROW_NCX(kcpustate32_to_ucpustate64)(struct kcpustate32 const *__restrict _
 	                              SEGMENT_CURRENT_CODE_RPL,
 	                              SEGMENT_CURRENT_DATA_RPL);
 }
-/* TODO: kcpustate32_to_icpustate64_p */
-/* TODO: kcpustate32_to_scpustate64_p */
+__LOCAL __NOBLOCK __ATTR_RETNONNULL struct icpustate64 *
+__NOTHROW_NCX(kcpustate32_to_icpustate64_p_ex)(struct kcpustate32 const *__restrict __self,
+                                               void *__restrict __kernel_rsp,
+                                               __u64 __v_gp_r15, __u64 __v_gp_r14,
+                                               __u64 __v_gp_r13, __u64 __v_gp_r12,
+                                               __u64 __v_gp_r11, __u64 __v_gp_r10,
+                                               __u64 __v_gp_r9, __u64 __v_gp_r8,
+                                               __u16 __v_cs, __u16 __v_ss) {
+	struct icpustate64 *__result;
+	__result = (struct icpustate64 *)((__byte_t *)__kernel_rsp - SIZEOF_ICPUSTATE64);
+	gpregs32_to_gpregsnsp64_ex(&__self->kcs_gpregs, &__result->ics_gpregs,
+	                           __v_gp_r15, __v_gp_r14, __v_gp_r13, __v_gp_r12,
+	                           __v_gp_r11, __v_gp_r10, __v_gp_r9, __v_gp_r8);
+	__result->ics_irregs.ir_rip    = __self->kcs_eip;
+	__result->ics_irregs.ir_cs     = __v_cs;
+	__result->ics_irregs.ir_rflags = __self->kcs_eflags;
+	__result->ics_irregs.ir_rsp    = __self->kcs_gpregs.gp_esp;
+	__result->ics_irregs.ir_ss     = __v_ss;
+	return __result;
+}
+__LOCAL __NOBLOCK __ATTR_RETNONNULL struct icpustate64 *
+__NOTHROW_NCX(kcpustate32_to_icpustate64_p)(struct kcpustate32 const *__restrict __self,
+                                            void *__restrict __kernel_rsp) {
+	return kcpustate32_to_icpustate64_p_ex(__self, __kernel_rsp,
+	                                       0, 0, 0, 0, 0, 0, 0, 0,
+	                                       SEGMENT_CURRENT_CODE_RPL,
+	                                       SEGMENT_CURRENT_DATA_RPL);
+}
+__LOCAL __NOBLOCK __ATTR_RETNONNULL struct scpustate64 *
+__NOTHROW_NCX(kcpustate32_to_scpustate64_p_ex)(struct kcpustate32 const *__restrict __self,
+                                               void *__restrict __kernel_rsp,
+                                               __u64 __v_sg_gsbase, __u64 __v_sg_fsbase,
+                                               __u64 __v_gp_r15, __u64 __v_gp_r14,
+                                               __u64 __v_gp_r13, __u64 __v_gp_r12,
+                                               __u64 __v_gp_r11, __u64 __v_gp_r10,
+                                               __u64 __v_gp_r9, __u64 __v_gp_r8,
+                                               __u16 __v_gs, __u16 __v_fs,
+                                               __u16 __v_es, __u16 __v_ds,
+                                               __u16 __v_cs, __u16 __v_ss) {
+	struct scpustate64 *__result;
+	__result->scs_sgbase.sg_gsbase = __v_sg_gsbase;
+	__result->scs_sgbase.sg_fsbase = __v_sg_fsbase;
+	__result->scs_sgregs.sg_gs     = __v_gs;
+	__result->scs_sgregs.sg_fs     = __v_fs;
+	__result->scs_sgregs.sg_es     = __v_es;
+	__result->scs_sgregs.sg_ds     = __v_ds;
+	__result = (struct scpustate64 *)((__byte_t *)__kernel_rsp - SIZEOF_SCPUSTATE64);
+	gpregs32_to_gpregsnsp64_ex(&__self->kcs_gpregs, &__result->scs_gpregs,
+	                           __v_gp_r15, __v_gp_r14, __v_gp_r13, __v_gp_r12,
+	                           __v_gp_r11, __v_gp_r10, __v_gp_r9, __v_gp_r8);
+	__result->scs_irregs.ir_rip    = __self->kcs_eip;
+	__result->scs_irregs.ir_cs     = __v_cs;
+	__result->scs_irregs.ir_rflags = __self->kcs_eflags;
+	__result->scs_irregs.ir_rsp    = __self->kcs_gpregs.gp_esp;
+	__result->scs_irregs.ir_ss     = __v_ss;
+	return __result;
+}
+__LOCAL __NOBLOCK __ATTR_RETNONNULL struct scpustate64 *
+__NOTHROW_NCX(kcpustate32_to_scpustate64_p)(struct kcpustate32 const *__restrict __self,
+                                            void *__restrict __kernel_rsp) {
+	return kcpustate32_to_scpustate64_p_ex(__self, __kernel_rsp,
+	                                       __CPUSTATE_GET_USER_GSBASE(),
+	                                       __CPUSTATE_GET_USER_FSBASE(),
+	                                       0, 0, 0, 0, 0, 0, 0, 0,
+	                                       __rdgs(),
+#if defined(__KERNEL__) && !defined(__x86_64__)
+	                                       SEGMENT_KERNEL_FSBASE,
+	                                       SEGMENT_USER_DATA_RPL,
+	                                       SEGMENT_USER_DATA_RPL,
+#else /* __KERNEL__ && !__x86_64__ */
+	                                       __rdfs(), __rdes(), __rdds(),
+#endif /* !__KERNEL__ || __x86_64__ */
+	                                       SEGMENT_CURRENT_CODE_RPL,
+	                                       SEGMENT_CURRENT_DATA_RPL);
+}
 /************************************************************************/
 
 
@@ -409,7 +482,8 @@ __NOTHROW_NCX(icpustate32_user_to_kcpustate64)(struct icpustate32 const *__restr
 __LOCAL __NOBLOCK void
 __NOTHROW_NCX(icpustate64_to_ucpustate32_ex)(struct icpustate64 const *__restrict __self,
                                              struct ucpustate32 *__restrict __result,
-                                             __u16 __v_gs, __u16 __v_fs, __u16 __v_es, __u16 __v_ds) {
+                                             __u16 __v_gs, __u16 __v_fs,
+                                             __u16 __v_es, __u16 __v_ds) {
 	gpregsnsp64_to_gpregs32(&__self->ics_gpregs,
 	                        &__result->ucs_gpregs,
 	                        (__u32)icpustate64_getrsp(__self));
@@ -452,8 +526,11 @@ __NOTHROW_NCX(icpustate64_to_kcpustate32)(struct icpustate64 const *__restrict _
 /************************************************************************/
 /* `struct scpustate32'                                                 */
 /************************************************************************/
-/* TODO: scpustate32_to_ucpustate32 */
-/* TODO: scpustate32_to_kcpustate32 */
+/* TODO: scpustate32_to_ucpustate64 */
+/* TODO: scpustate32_to_kcpustate64 */
+/* TODO: scpustate32_to_lcpustate64 */
+/* TODO: scpustate32_to_icpustate64_p */
+/* TODO: scpustate32_to_scpustate64_p */
 /************************************************************************/
 
 
@@ -464,6 +541,7 @@ __NOTHROW_NCX(icpustate64_to_kcpustate32)(struct icpustate64 const *__restrict _
 /************************************************************************/
 /* TODO: scpustate64_to_ucpustate32 */
 /* TODO: scpustate64_to_kcpustate32 */
+/* TODO: scpustate64_to_lcpustate32 */
 /************************************************************************/
 
 
@@ -504,8 +582,43 @@ __NOTHROW_NCX(ucpustate32_to_ucpustate64)(struct ucpustate32 const *__restrict _
 	                              __CPUSTATE_GET_USER_FSBASE(),
 	                              0, 0, 0, 0, 0, 0, 0, 0);
 }
-/* TODO: ucpustate32_to_kcpustate64 */
-/* TODO: ucpustate32_to_lcpustate64 */
+__LOCAL __NOBLOCK void
+__NOTHROW_NCX(ucpustate32_to_kcpustate64_ex)(struct ucpustate32 const *__restrict __self,
+                                             struct kcpustate64 *__restrict __result,
+                                             __u64 __v_gp_r15, __u64 __v_gp_r14,
+                                             __u64 __v_gp_r13, __u64 __v_gp_r12,
+                                             __u64 __v_gp_r11, __u64 __v_gp_r10,
+                                             __u64 __v_gp_r9, __u64 __v_gp_r8) {
+	gpregs32_to_gpregs64_ex(&__self->ucs_gpregs, &__result->kcs_gpregs,
+	                        __v_gp_r15, __v_gp_r14, __v_gp_r13, __v_gp_r12,
+	                        __v_gp_r11, __v_gp_r10, __v_gp_r9, __v_gp_r8);
+	__result->kcs_rflags       = __self->ucs_eflags;
+	__result->kcs_rip          = __self->ucs_eip;
+}
+__LOCAL __NOBLOCK void
+__NOTHROW_NCX(ucpustate32_to_kcpustate64)(struct ucpustate32 const *__restrict __self,
+                                          struct kcpustate64 *__restrict __result) {
+	ucpustate32_to_kcpustate64_ex(__self, __result, 0, 0, 0, 0, 0, 0, 0, 0);
+}
+__LOCAL __NOBLOCK void
+__NOTHROW_NCX(ucpustate32_to_lcpustate64_ex)(struct ucpustate32 const *__restrict __self,
+                                             struct lcpustate64 *__restrict __result,
+                                             __u64 __v_gp_r15, __u64 __v_gp_r14,
+                                             __u64 __v_gp_r13, __u64 __v_gp_r12) {
+	__result->lcs_r15 = __v_gp_r15;
+	__result->lcs_r14 = __v_gp_r14;
+	__result->lcs_r13 = __v_gp_r13;
+	__result->lcs_r12 = __v_gp_r12;
+	__result->lcs_rbp = __self->ucs_gpregs.gp_ebp;
+	__result->lcs_rsp = __self->ucs_gpregs.gp_esp;
+	__result->lcs_rbx = __self->ucs_gpregs.gp_ebx;
+	__result->lcs_rip = __self->ucs_eip;
+}
+__LOCAL __NOBLOCK void
+__NOTHROW_NCX(ucpustate32_to_lcpustate64)(struct ucpustate32 const *__restrict __self,
+                                          struct lcpustate64 *__restrict __result) {
+	ucpustate32_to_lcpustate64_ex(__self, __result, 0, 0, 0, 0);
+}
 /************************************************************************/
 
 
@@ -525,9 +638,12 @@ __NOTHROW_NCX(ucpustate32_to_ucpustate64)(struct ucpustate32 const *__restrict _
 /************************************************************************/
 /* `struct fcpustate32'                                                 */
 /************************************************************************/
-/* TODO: fcpustate64_to_fcpustate32 */
-/* TODO: fcpustate64_to_ucpustate32 */
-/* TODO: fcpustate64_to_kcpustate32 */
+/* TODO: fcpustate32_to_fcpustate64 */
+/* TODO: fcpustate32_to_ucpustate64 */
+/* TODO: fcpustate32_to_kcpustate64 */
+/* TODO: fcpustate32_to_lcpustate64 */
+/* TODO: fcpustate32_to_icpustate64_p */
+/* TODO: fcpustate32_to_scpustate64_p */
 /************************************************************************/
 
 
@@ -536,9 +652,10 @@ __NOTHROW_NCX(ucpustate32_to_ucpustate64)(struct ucpustate32 const *__restrict _
 /************************************************************************/
 /* `struct fcpustate64'                                                 */
 /************************************************************************/
-/* TODO: fcpustate32_to_fcpustate64 */
-/* TODO: fcpustate32_to_ucpustate64 */
-/* TODO: fcpustate32_to_kcpustate64 */
+/* TODO: fcpustate64_to_fcpustate32 */
+/* TODO: fcpustate64_to_ucpustate32 */
+/* TODO: fcpustate64_to_kcpustate32 */
+/* TODO: fcpustate64_to_lcpustate32 */
 /************************************************************************/
 
 
@@ -551,7 +668,6 @@ __NOTHROW_NCX(ucpustate32_to_ucpustate64)(struct ucpustate32 const *__restrict _
 
 
 /*[[[deemon
-
 local functions = {
 	"gpregs32_to_gpregsnsp64_ex",
 	"gpregs32_to_gpregs64_ex",
@@ -568,6 +684,11 @@ local functions = {
 	"kcpustate32_to_kcpustate64",
 	"kcpustate32_to_ucpustate64_ex",
 	"kcpustate32_to_ucpustate64",
+	"kcpustate32_to_icpustate64_p_ex",
+	"kcpustate32_to_icpustate64_p",
+	"kcpustate32_to_scpustate64_p_ex",
+	"kcpustate32_to_scpustate64_p",
+
 	"kcpustate64_to_kcpustate32",
 	"kcpustate64_to_ucpustate32_ex",
 	"kcpustate64_to_ucpustate32",
@@ -589,6 +710,10 @@ local functions = {
 
 	"ucpustate32_to_ucpustate64_ex",
 	"ucpustate32_to_ucpustate64",
+	"ucpustate32_to_kcpustate64_ex",
+	"ucpustate32_to_kcpustate64",
+	"ucpustate32_to_lcpustate64_ex",
+	"ucpustate32_to_lcpustate64",
 };
 
 local longest_name_length = functions.each.length > ...;
@@ -614,6 +739,10 @@ print "#endif /" "* !__x86_64__ *" "/";
 #define kcpustate32_to_kcpustate          kcpustate32_to_kcpustate64
 #define kcpustate32_to_ucpustate_ex       kcpustate32_to_ucpustate64_ex
 #define kcpustate32_to_ucpustate          kcpustate32_to_ucpustate64
+#define kcpustate32_to_icpustate_p_ex     kcpustate32_to_icpustate64_p_ex
+#define kcpustate32_to_icpustate_p        kcpustate32_to_icpustate64_p
+#define kcpustate32_to_scpustate_p_ex     kcpustate32_to_scpustate64_p_ex
+#define kcpustate32_to_scpustate_p        kcpustate32_to_scpustate64_p
 #define kcpustate_to_kcpustate32          kcpustate64_to_kcpustate32
 #define kcpustate_to_ucpustate32_ex       kcpustate64_to_ucpustate32_ex
 #define kcpustate_to_ucpustate32          kcpustate64_to_ucpustate32
@@ -632,6 +761,10 @@ print "#endif /" "* !__x86_64__ *" "/";
 #define icpustate_user_to_ucpustate32     icpustate64_user_to_ucpustate32
 #define ucpustate32_to_ucpustate_ex       ucpustate32_to_ucpustate64_ex
 #define ucpustate32_to_ucpustate          ucpustate32_to_ucpustate64
+#define ucpustate32_to_kcpustate_ex       ucpustate32_to_kcpustate64_ex
+#define ucpustate32_to_kcpustate          ucpustate32_to_kcpustate64
+#define ucpustate32_to_lcpustate_ex       ucpustate32_to_lcpustate64_ex
+#define ucpustate32_to_lcpustate          ucpustate32_to_lcpustate64
 #else /* __x86_64__ */
 #define gpregs_to_gpregsnsp64_ex          gpregs32_to_gpregsnsp64_ex
 #define gpregs_to_gpregs64_ex             gpregs32_to_gpregs64_ex
@@ -645,6 +778,10 @@ print "#endif /" "* !__x86_64__ *" "/";
 #define kcpustate_to_kcpustate64          kcpustate32_to_kcpustate64
 #define kcpustate_to_ucpustate64_ex       kcpustate32_to_ucpustate64_ex
 #define kcpustate_to_ucpustate64          kcpustate32_to_ucpustate64
+#define kcpustate_to_icpustate64_p_ex     kcpustate32_to_icpustate64_p_ex
+#define kcpustate_to_icpustate64_p        kcpustate32_to_icpustate64_p
+#define kcpustate_to_scpustate64_p_ex     kcpustate32_to_scpustate64_p_ex
+#define kcpustate_to_scpustate64_p        kcpustate32_to_scpustate64_p
 #define kcpustate64_to_kcpustate          kcpustate64_to_kcpustate32
 #define kcpustate64_to_ucpustate_ex       kcpustate64_to_ucpustate32_ex
 #define kcpustate64_to_ucpustate          kcpustate64_to_ucpustate32
@@ -663,6 +800,10 @@ print "#endif /" "* !__x86_64__ *" "/";
 #define icpustate64_user_to_ucpustate     icpustate64_user_to_ucpustate32
 #define ucpustate_to_ucpustate64_ex       ucpustate32_to_ucpustate64_ex
 #define ucpustate_to_ucpustate64          ucpustate32_to_ucpustate64
+#define ucpustate_to_kcpustate64_ex       ucpustate32_to_kcpustate64_ex
+#define ucpustate_to_kcpustate64          ucpustate32_to_kcpustate64
+#define ucpustate_to_lcpustate64_ex       ucpustate32_to_lcpustate64_ex
+#define ucpustate_to_lcpustate64          ucpustate32_to_lcpustate64
 #endif /* !__x86_64__ */
 //[[[end]]]
 
