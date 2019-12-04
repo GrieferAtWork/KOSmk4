@@ -42,17 +42,17 @@ IDT_HANDLER_BEGIN
 	/* SPUR#1 */
 #define HAVE_SPURIOUS_FAULT 1
 	movb   $(X86_PIC_READ_ISR), %al
-	outb   %al,      $(X86_PIC1_CMD) /* outb(X86_PIC1_CMD, X86_PIC_READ_ISR); */
-	inb    $(X86_PIC2_CMD),     %al
-	testb  $0x80,               %al
+	outb   %al, $(X86_PIC1_CMD) /* outb(X86_PIC1_CMD, X86_PIC_READ_ISR); */
+	inb    $(X86_PIC2_CMD), %al
+	testb  $(0x80), %al
 	jnz    99f /* if (!(inb(X86_PIC2_CMD) & 0x80)) goto 99f; */
 #elif IDT_VECTOR_ID == 0xff
 	/* SPUR#2 */
 #define HAVE_SPURIOUS_FAULT 1
 	movb   $(X86_PIC_READ_ISR), %al
-	outb   %al,      $(X86_PIC2_CMD) /* outb(X86_PIC2_CMD, X86_PIC_READ_ISR); */
-	inb    $(X86_PIC2_CMD),     %al
-	testb  $0x80,               %al
+	outb   %al, $(X86_PIC2_CMD) /* outb(X86_PIC2_CMD, X86_PIC_READ_ISR); */
+	inb    $(X86_PIC2_CMD), %al
+	testb  $(0x80), %al
 	jz     99f /* if (!(inb(X86_PIC2_CMD) & 0x80)) goto 99f; */
 #endif
 
@@ -64,9 +64,9 @@ IDT_HANDLER_BEGIN
 #if IDT_VECTOR_ID >= X86_INTERRUPT_PIC1_BASE
 	movb   $(X86_PIC_CMD_EOI), %al
 #if IDT_VECTOR_ID >= X86_INTERRUPT_PIC2_BASE
-	outb   %al,      $(X86_PIC2_CMD) /* outb(X86_PIC2_CMD, X86_PIC_CMD_EOI); */
+	outb   %al, $(X86_PIC2_CMD) /* outb(X86_PIC2_CMD, X86_PIC_CMD_EOI); */
 #endif /* IDT_VECTOR_ID >= X86_INTERRUPT_PIC2_BASE */
-	outb   %al,      $(X86_PIC1_CMD) /* outb(X86_PIC1_CMD, X86_PIC_CMD_EOI); */
+	outb   %al, $(X86_PIC1_CMD) /* outb(X86_PIC1_CMD, X86_PIC_CMD_EOI); */
 #endif /* IDT_VECTOR_ID >= X86_INTERRUPT_PIC1_BASE */
 
 #ifdef HAVE_SPURIOUS_FAULT
@@ -89,7 +89,7 @@ IDT_HANDLER_BEGIN
 #ifdef HAVE_SPURIOUS_FAULT
 #undef HAVE_SPURIOUS_FAULT
 	.cfi_restore_state
-99:	pushq_cfi $98b
+99:	pushq_cfi $(98b)
 #if IDT_VECTOR_ID == 0xf7
 	EXTERN(x86_pic1_spur)
 	jmp    x86_pic1_spur

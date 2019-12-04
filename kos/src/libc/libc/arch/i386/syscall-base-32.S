@@ -31,7 +31,7 @@ INTERN_FUNCTION(libc_x86_syscall_check_sysenter)
 	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
 	pushl_cfi_r %ebx
-	movl   $1, %eax
+	movl   $(1), %eax
 	cpuid
 	movl   16(%esp), %ebx /* Return address */
 	testl  $(CPUID_1D_SEP), %edx
@@ -47,7 +47,7 @@ INTERN_FUNCTION(libc_x86_syscall_check_sysenter)
 #if CPUID_1A_MODEL_S != 0
 	shrl   $(CPUID_1A_MODEL_S), %ecx
 #endif /* CPUID_1A_MODEL_S != 0 */
-	cmpl   $3, %ecx
+	cmpl   $(3), %ecx
 	jae    .Lis_supported  /* if (Model >= 3) goto .Lis_supported; */
 	movl   %eax, %ecx
 	andl   $(CPUID_1A_STEPPING_M), %ecx
@@ -104,7 +104,7 @@ INTERN_FUNCTION(libc_x86_syscall_check_sysenter)
 	movb   1(%ebx), %ah   /* Operand of `jz' */
 	addb   $(5), %ah        /* Adjust for additional offset */
 	movb   $(0xeb), %al
-	pushl_cfi $0
+	pushl_cfi $(0)
 	pushl_cfi %eax
 	/* Atomically re-write the call to our function. */
 	fildll (%esp)
@@ -171,7 +171,7 @@ INTERN_FUNCTION(libc___i386_syscall)
 	ret
 
 1:	clc
-	int    $0x80
+	int    $(0x80)
 	ret
 	.cfi_endproc
 END(libc___i386_syscall)
@@ -197,7 +197,7 @@ INTERN_FUNCTION(libc___i386_Xsyscall)
 	ret
 
 1:	stc
-	int    $0x80
+	int    $(0x80)
 	ret
 	.cfi_endproc
 END(libc___i386_Xsyscall)
@@ -217,7 +217,7 @@ INTERN_FUNCTION(libc_syscall)
 	movl   40(%esp), %edi /* arg #4 */
 	movl   44(%esp), %ebp /* arg #5 */
 	clc
-	int    $0x80
+	int    $(0x80)
 	cmpl   $-4096, %eax /* Check for error. */
 	ja     1f
 	.cfi_remember_state
@@ -259,7 +259,7 @@ INTERN_FUNCTION(libc_Syscall)
 	movl   40(%esp), %edi /* arg #4 */
 	movl   44(%esp), %ebp /* arg #5 */
 	stc
-	int    $0x80
+	int    $(0x80)
 	popl_cfi_r %ebp
 	popl_cfi_r %edi
 	popl_cfi_r %esi

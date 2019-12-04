@@ -132,7 +132,7 @@ INTERN_FUNCTION(FUNC(execve))
 	movl   %eax, %fs
 
 	movl   %esp, %eax
-	pushl_cfi $0        /* Arg #4 */
+	pushl_cfi $(0)      /* Arg #4 */
 	pushl_cfi %edx      /* Arg #3 */
 	pushl_cfi %ecx      /* Arg #2 */
 	pushl_cfi %ebx      /* Arg #1 */

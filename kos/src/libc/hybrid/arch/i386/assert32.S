@@ -89,8 +89,8 @@ INTERN_FUNCTION(libc___afail)
 	movl   %eax, SIZEOF_KCPUSTATE+8(%esp)  /* aa_line */
 	movl   SIZEOF_KCPUSTATE+16(%esp), %eax /* char const *func */
 	movl   %eax, SIZEOF_KCPUSTATE+12(%esp) /* aa_func */
-	movl   $0, SIZEOF_KCPUSTATE+16(%esp)   /* aa_format */
-	pushl_cfi $0                           /* aa_args */
+	movl   $(0), SIZEOF_KCPUSTATE+16(%esp) /* aa_format */
+	pushl_cfi $(0)                         /* aa_args */
 	movl   %esp, %ecx
 	INTERN(libc_assertion_failure_core)
 	call   libc_assertion_failure_core
@@ -138,8 +138,8 @@ INTERN_FUNCTION(libc___acheck)
 	movl   %eax, SIZEOF_KCPUSTATE+8(%esp)  /* aa_line */
 	movl   SIZEOF_KCPUSTATE+16(%esp), %eax /* char const *func */
 	movl   %eax, SIZEOF_KCPUSTATE+12(%esp) /* aa_func */
-	movl   $0, SIZEOF_KCPUSTATE+16(%esp)   /* aa_format */
-	pushl_cfi $0                           /* aa_args */
+	movl   $(0), SIZEOF_KCPUSTATE+16(%esp) /* aa_format */
+	pushl_cfi $(0)                         /* aa_args */
 	movl   %esp, %ecx
 	INTERN(libc_assertion_check_core)
 	call   libc_assertion_check_core
@@ -225,8 +225,8 @@ INTERN_FUNCTION(libc___assert_func)
 	ADJUST_ESP(4)
 	movl   SIZEOF_KCPUSTATE+16(%esp), %eax /* char const *expr */
 	movl   %eax, SIZEOF_KCPUSTATE+0(%esp)  /* aa_expr */
-	movl   $0, SIZEOF_KCPUSTATE+16(%esp)   /* aa_format */
-	pushl_cfi $0                           /* aa_args */
+	movl   $(0), SIZEOF_KCPUSTATE+16(%esp) /* aa_format */
+	pushl_cfi $(0)                         /* aa_args */
 	movl   %esp, %ecx
 	INTERN(libc_assertion_failure_core)
 	call   libc_assertion_failure_core
@@ -242,8 +242,8 @@ INTERN_FUNCTION(libc___assertfail)
 	pushfl_cfi_r
 	pushal_cfi_r
 	ADJUST_ESP(0)
-	movl   $0, SIZEOF_KCPUSTATE+16(%esp)   /* aa_format */
-	pushl_cfi $0                           /* aa_args */
+	movl   $(0), SIZEOF_KCPUSTATE+16(%esp) /* aa_format */
+	pushl_cfi $(0)                         /* aa_args */
 	movl   %esp, %ecx
 	INTERN(libc_assertion_failure_core)
 	call   libc_assertion_failure_core
@@ -274,9 +274,9 @@ INTERN_FUNCTION(libc___assert)
 	movl   %eax, SIZEOF_KCPUSTATE+8(%esp)  /* aa_line */
 	movl   SIZEOF_KCPUSTATE+16(%esp), %eax /* char const *expr */
 	movl   %eax, SIZEOF_KCPUSTATE+0(%esp)  /* aa_expr */
-	movl   $0, SIZEOF_KCPUSTATE+12(%esp)   /* aa_func */
-	movl   $0, SIZEOF_KCPUSTATE+16(%esp)   /* aa_format */
-	pushl_cfi $0                           /* aa_args */
+	movl   $(0), SIZEOF_KCPUSTATE+12(%esp) /* aa_func */
+	movl   $(0), SIZEOF_KCPUSTATE+16(%esp) /* aa_format */
+	pushl_cfi $(0)                         /* aa_args */
 	movl   %esp, %ecx
 	INTERN(libc_assertion_failure_core)
 	call   libc_assertion_failure_core
@@ -307,9 +307,9 @@ INTERN_FUNCTION(libc__assert)
 	movl   %eax, SIZEOF_KCPUSTATE+4(%esp)  /* aa_file */
 	movl   SIZEOF_KCPUSTATE+16(%esp), %eax /* unsigned int line */
 	movl   %eax, SIZEOF_KCPUSTATE+8(%esp)  /* aa_line */
-	movl   $0, SIZEOF_KCPUSTATE+12(%esp)   /* aa_func */
-	movl   $0, SIZEOF_KCPUSTATE+16(%esp)   /* aa_format */
-	pushl_cfi $0                           /* aa_args */
+	movl   $(0), SIZEOF_KCPUSTATE+12(%esp) /* aa_func */
+	movl   $(0), SIZEOF_KCPUSTATE+16(%esp) /* aa_format */
+	pushl_cfi $(0)                         /* aa_args */
 	movl   %esp, %ecx
 	INTERN(libc_assertion_failure_core)
 	call   libc_assertion_failure_core

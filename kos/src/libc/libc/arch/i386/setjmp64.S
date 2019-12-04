@@ -91,7 +91,7 @@ DEFINE_PUBLIC_ALIAS(__fast_longjmp, libc___fast_longjmp)
 .section .text.crt.utility.setjmp.sigsetjmp
 INTERN_FUNCTION(libc__setjmpex)
 	.cfi_startproc
-	movq   $1, %rsi
+	movq   $(1), %rsi
 INTERN_FUNCTION(libc_sigsetjmp)
 	movq   %rbx, OFFSET_JMPBUF_RBX(%rdi)
 	movq   %rbp, OFFSET_JMPBUF_RBP(%rdi)
@@ -134,7 +134,7 @@ DEFINE_PUBLIC_ALIAS(__sigsetjmp, libc_sigsetjmp)
 INTERN_FUNCTION(libc_siglongjmp)
 	.cfi_startproc
 	.cfi_signal_frame
-	cmpq   $0, OFFSET_JMPBUF_HASSIG(%rdi)
+	cmpq   $(0), OFFSET_JMPBUF_HASSIG(%rdi)
 	je     libc_longjmp
 	/* Restore signal mask. */
 	pushq_cfi %rdi

@@ -151,7 +151,7 @@ PUBLIC_FUNCTION(kernel_panic)
 	pushq_cfi %rax   /* vl_reg_save_area */
 	leaq   (8+(8*5)+SIZEOF_UCPUSTATE+8)(%rsp), %rax
 	pushq_cfi %rax   /* vl_overflow_arg_area */
-	pushq_cfi $304   /* No FP-registers */
+	pushq_cfi $(304) /* No FP-registers */
 	pushq_cfi $(1*8) /* 1 GP registers already in use */
 	movq   %rsp, %rdx                  /* __builtin_va_list args */
 	movq   %rdi, %rsi                  /* char const *format */

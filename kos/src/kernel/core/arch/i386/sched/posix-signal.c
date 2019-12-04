@@ -291,7 +291,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	} else {
 		/* Must push assembly onto the user-stack:
 		 * >>     movl  $SYS_sigreturn, %eax
-		 * >>     int   $0x80
+		 * >>     int   $(0x80)
 		 */
 		/* NOTE: This assembly block's size must be pointer-aligned! */
 		PRIVATE byte_t const sigreturn_invoke_assembly[] = {
@@ -301,7 +301,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 			(SYSCALL_VECTOR_SIGRETURN32 >> 8) & 0xff,
 			(SYSCALL_VECTOR_SIGRETURN32 >> 16) & 0xff,
 			(SYSCALL_VECTOR_SIGRETURN32 >> 24) & 0xff,
-			/* int   $0x80 */
+			/* int   $(0x80) */
 			0xcd,
 			0x80,
 			/* Pad to 8 bytes */

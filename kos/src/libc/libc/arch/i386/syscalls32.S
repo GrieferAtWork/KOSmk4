@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e80a8cd */
+/* HASH CRC-32:0x9ef5715 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ INTERN_FUNCTION(libc_x86_exec_syscall1)
 	pushl_cfi_r %ebx
 	movl   8(%esp), %ebx
 	clc
-	int    $0x80
+	int    $(0x80)
 	popl_cfi_r %ebx
 	ret
 	.cfi_endproc
@@ -84,7 +84,7 @@ INTERN_FUNCTION(libc_x86_exec_syscall2)
 	movl   8(%esp), %ebx
 	movl   12(%esp), %ecx
 	clc
-	int    $0x80
+	int    $(0x80)
 	popl_cfi_r %ebx
 	ret
 	.cfi_endproc
@@ -119,7 +119,7 @@ INTERN_FUNCTION(libc_x86_exec_syscall3)
 	movl   12(%esp), %ecx
 	movl   16(%esp), %edx
 	clc
-	int    $0x80
+	int    $(0x80)
 	popl_cfi_r %ebx
 	ret
 	.cfi_endproc
@@ -159,7 +159,7 @@ INTERN_FUNCTION(libc_x86_exec_syscall4)
 	movl   20(%esp), %edx
 	movl   24(%esp), %esi
 	clc
-	int    $0x80
+	int    $(0x80)
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
 	ret
@@ -187,7 +187,7 @@ INTERN_FUNCTION(libc_x86_exec_syscall5)
 	movl   32(%esp), %esi
 	pushl_cfi 36(%esp)
 	call   libc_x86_sysenter_common
-	addl   $4, %esp
+	addl   $(4), %esp
 	.cfi_adjust_cfa_offset -4
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
@@ -205,7 +205,7 @@ INTERN_FUNCTION(libc_x86_exec_syscall5)
 	movl   28(%esp), %esi
 	movl   32(%esp), %edi
 	clc
-	int    $0x80
+	int    $(0x80)
 	popl_cfi_r %edi
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
@@ -235,7 +235,7 @@ INTERN_FUNCTION(libc_x86_exec_syscall6)
 	pushl_cfi 40(%esp)
 	pushl_cfi 40(%esp)
 	call   libc_x86_sysenter_common
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
@@ -255,7 +255,7 @@ INTERN_FUNCTION(libc_x86_exec_syscall6)
 	movl   36(%esp), %edi
 	movl   40(%esp), %ebp
 	clc
-	int    $0x80
+	int    $(0x80)
 	popl_cfi_r %ebp
 	popl_cfi_r %edi
 	popl_cfi_r %esi
@@ -289,7 +289,7 @@ INTERN_FUNCTION(libc_x86_exec_Xsyscall1)
 	pushl_cfi_r %ebx
 	movl   8(%esp), %ebx
 	stc
-	int    $0x80
+	int    $(0x80)
 	popl_cfi_r %ebx
 	ret
 	.cfi_endproc
@@ -322,7 +322,7 @@ INTERN_FUNCTION(libc_x86_exec_Xsyscall2)
 	movl   8(%esp), %ebx
 	movl   12(%esp), %ecx
 	stc
-	int    $0x80
+	int    $(0x80)
 	popl_cfi_r %ebx
 	ret
 	.cfi_endproc
@@ -357,7 +357,7 @@ INTERN_FUNCTION(libc_x86_exec_Xsyscall3)
 	movl   12(%esp), %ecx
 	movl   16(%esp), %edx
 	stc
-	int    $0x80
+	int    $(0x80)
 	popl_cfi_r %ebx
 	ret
 	.cfi_endproc
@@ -397,7 +397,7 @@ INTERN_FUNCTION(libc_x86_exec_Xsyscall4)
 	movl   20(%esp), %edx
 	movl   24(%esp), %esi
 	stc
-	int    $0x80
+	int    $(0x80)
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
 	ret
@@ -425,7 +425,7 @@ INTERN_FUNCTION(libc_x86_exec_Xsyscall5)
 	movl   32(%esp), %esi
 	pushl_cfi 36(%esp)
 	call   libc_x86_sysenter_Xcommon
-	addl   $4, %esp
+	addl   $(4), %esp
 	.cfi_adjust_cfa_offset -4
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
@@ -443,7 +443,7 @@ INTERN_FUNCTION(libc_x86_exec_Xsyscall5)
 	movl   28(%esp), %esi
 	movl   32(%esp), %edi
 	stc
-	int    $0x80
+	int    $(0x80)
 	popl_cfi_r %edi
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
@@ -473,7 +473,7 @@ INTERN_FUNCTION(libc_x86_exec_Xsyscall6)
 	pushl_cfi 40(%esp)
 	pushl_cfi 40(%esp)
 	call   libc_x86_sysenter_Xcommon
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
@@ -493,7 +493,7 @@ INTERN_FUNCTION(libc_x86_exec_Xsyscall6)
 	movl   36(%esp), %edi
 	movl   40(%esp), %ebp
 	stc
-	int    $0x80
+	int    $(0x80)
 	popl_cfi_r %ebp
 	popl_cfi_r %edi
 	popl_cfi_r %esi

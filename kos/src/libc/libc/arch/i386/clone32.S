@@ -45,17 +45,17 @@ INTERN_FUNCTION(libc_clone)
 	pushl_cfi  32(%esp) /* pid_t *ptid */
 	pushl_cfi  24(%esp) /* void *child_stack */
 	pushl_cfi  32(%esp) /* int flags */
-	lcall  $7, $SYS_clone
+	lcall  $(7), $SYS_clone
 
 	/* Check if we're inside of the child thread */
 	testl  %eax, %eax
 	jz     .Lthread_entry
 
-	addl   $20, %esp  /* lcall-arguments */
+	addl   $(20), %esp  /* lcall-arguments */
 	.cfi_adjust_cfa_offset -20
 
 	/* Check for errors. */
-	cmpl   $-4096, %eax
+	cmpl   $(-4096), %eax
 	ja     .Lthread_clone_error
 	
 	ret

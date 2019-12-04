@@ -70,7 +70,7 @@ INTERN_FUNCTION(F(libc_memcpy))
 #endif /* !RETURN_PCPY */
 #if N == 1
 	movq   %rdx, %rcx
-	shrq   $3, %rcx
+	shrq   $(3), %rcx
 	rep    movsq
 	jnc    1f /* if (!(n_bytes & 4)) goto 1f; */
 	movsl
@@ -83,7 +83,7 @@ INTERN_FUNCTION(F(libc_memcpy))
 1:
 #elif N == 2
 	movq   %rdx, %rcx
-	shrq   $2, %rcx
+	shrq   $(2), %rcx
 	rep    movsq
 	jnc    1f /* if (!(n_words & 2)) goto 1f; */
 	movsl
@@ -93,7 +93,7 @@ INTERN_FUNCTION(F(libc_memcpy))
 1:
 #elif N == 4
 	movq   %rdx, %rcx
-	shrq   $1, %rcx
+	shrq   $(1), %rcx
 	rep    movsq
 	jnc    1f /* if (!(n_dwords & 1)) goto 1f; */
 	movsl
@@ -142,13 +142,13 @@ INTERN_FUNCTION(F(libc_memset))
 #elif N == 4
 	movl   %esi, %esi /* RSI = ESI & 0xffffffff */
 	movl   %esi, %eax
-	shrq   $32,  %rax
+	shrq   $(32),  %rax
 	orq    %rsi, %rax /* RAX = ESI << 32 | ESI */
 	movq   %rdx, %rcx
 #if !RETURN_PCPY
 	movq   %rdi, %rdx
 #endif /* !RETURN_PCPY */
-	shrq   $1, %rcx
+	shrq   $(1), %rcx
 	rep    stosq
 	jnc    1f /* if (!(n_dwords & 1)) goto 1f; */
 	stosl
@@ -160,15 +160,15 @@ INTERN_FUNCTION(F(libc_memset))
 #endif /* !RETURN_PCPY */
 #elif N == 2
 	movw   %si, %ax
-	shll   $16, %eax
+	shll   $(16), %eax
 	movw   %si, %ax   /* EAX = WORD << 16 | WORD */
 	movzlq %eax, %rsi
-	shlq   $32, %rax
+	shlq   $(32), %rax
 	orq    %rsi, %rax /* EAX = WORD << 48 | WORD << 32 | WORD << 16 | WORD */
 #if !RETURN_PCPY
 	movq   %rdi, %r8
 #endif /* !RETURN_PCPY */
-	shrq   $2, %rcx
+	shrq   $(2), %rcx
 	rep    stosq
 	jnc    1f /* if (!(n_words & 2)) goto 1f; */
 	stosl
@@ -185,15 +185,15 @@ INTERN_FUNCTION(F(libc_memset))
 	movb   %sil, %al
 	movb   %al, %ah
 	movw   %ax, %si
-	shll   $16, %eax
+	shll   $(16), %eax
 	movw   %si, %ax
 	movzlq %eax, %rsi
-	shlq   $32, %rax
+	shlq   $(32), %rax
 	orq    %rsi, %rax
 #if !RETURN_PCPY
 	movq   %rdi, %r8
 #endif /* !RETURN_PCPY */
-	shrq   $3, %rcx
+	shrq   $(3), %rcx
 	rep    stosq
 	jnc    1f /* if (!(n_bytes & 4)) goto 1f; */
 	stosl
@@ -292,7 +292,7 @@ INTERN_FUNCTION(F_STRING(len))
 	xorl   %eax, %eax
 	repne; I(scas)
 	subq   %rcx, %rax /* result = 0 - RCX; */
-	subq   $2, %rax   /* result = (0 - RCX) - 2; */
+	subq   $(2), %rax   /* result = (0 - RCX) - 2; */
 	ret
 	.cfi_endproc
 END(F_STRING(len))

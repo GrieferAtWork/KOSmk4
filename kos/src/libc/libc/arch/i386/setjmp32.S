@@ -94,7 +94,7 @@ DEFINE_PUBLIC_ALIAS(__fast_longjmp, libc___fast_longjmp)
 .section .text.crt.utility.setjmp.sigsetjmp
 INTERN_FUNCTION(libc__setjmpex)
 	.cfi_startproc
-	movl   $1, %edx
+	movl   $(1), %edx
 	jmp    1f
 INTERN_FUNCTION(libc_sigsetjmp)
 	movl   8(%esp), %edx /* savemask */
@@ -108,16 +108,16 @@ INTERN_FUNCTION(libc_sigsetjmp)
 	movl   0(%esp), %ecx
 	movl   %ecx, OFFSET_JMPBUF_EIP(%eax)
 	movl   %edx, OFFSET_JMPBUF_PA0(%eax)
-	movl   $0, OFFSET_JMPBUF_PA1(%eax)
+	movl   $(0), OFFSET_JMPBUF_PA1(%eax)
 	testl  %edx, %edx
 	jz     1f
 	/* Save the signal mask. */
 	leal   OFFSET_JMPBUF_SIG(%eax), %eax
 	pushl_cfi %eax             /* sigset_t *oset */
-	pushl_cfi $0               /* sigset_t const *set */
+	pushl_cfi $(0)             /* sigset_t const *set */
 	pushl_cfi $(SIG_SETMASK)   /* syscall_ulong_t how */
 	call   libc_sys_sigprocmask
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 1:	xorl   %eax, %eax
 	ret
@@ -134,15 +134,15 @@ INTERN_FUNCTION(libc_siglongjmp)
 	.cfi_startproc
 	.cfi_signal_frame
 	movl   4(%esp), %ecx
-	cmpl   $0, OFFSET_JMPBUF_PA0(%ecx)
+	cmpl   $(0), OFFSET_JMPBUF_PA0(%ecx)
 	je     libc_longjmp /* No signal mask */
 	/* Restore signal mask */
 	leal   OFFSET_JMPBUF_SIG(%ecx), %eax
-	pushl_cfi $0               /* sigset_t *oset */
+	pushl_cfi $(0)             /* sigset_t *oset */
 	pushl_cfi %eax             /* sigset_t *set */
 	pushl_cfi $(SIG_SETMASK)   /* syscall_ulong_t how */
 	call   libc_sys_sigprocmask
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	jmp    libc_longjmp
 	.cfi_endproc

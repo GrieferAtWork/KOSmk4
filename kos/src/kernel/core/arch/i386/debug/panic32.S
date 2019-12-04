@@ -34,7 +34,7 @@ PUBLIC_FUNCTION(kernel_panic_here)
 	pushl_cfi_r %fs
 	pushl_cfi_r %gs
 	pushal_cfi_r
-	pushl_cfi  $0        /* va_list args */
+	pushl_cfi  $(0)      /* va_list args */
 	xorl   %edx, %edx    /* char const *format */
 	leal   4(%esp), %ecx /* struct ucpustate *state */
 	PUBLIC(kernel_vpanic_ucpustate)

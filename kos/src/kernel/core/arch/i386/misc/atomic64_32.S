@@ -73,7 +73,7 @@ ST(atomic64_cmpxch_val)
 	lock;  cmpxchg8b 0(%esi)
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
-	ret    $16
+	ret    $(16)
 	.cfi_endproc
 EN(atomic64_cmpxch_val)
 
@@ -95,7 +95,7 @@ ST(atomic64_cmpxch)
 	popl_cfi_r %ebx
 	sete   %al
 	movzbl %al, %eax
-	ret    $16
+	ret    $(16)
 	.cfi_endproc
 EN(atomic64_cmpxch)
 
@@ -114,7 +114,7 @@ ST(atomic64_xch)
 	jne    1b
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
-	ret    $8
+	ret    $(8)
 	.cfi_endproc
 EN(atomic64_xch)
 
@@ -133,7 +133,7 @@ ST(atomic64_write)
 	jne    1b
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
-	ret    $8
+	ret    $(8)
 	.cfi_endproc
 EN(atomic64_write)
 
@@ -154,7 +154,7 @@ ST(atomic64_fetchadd)
 	jne    1b
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
-	ret    $8
+	ret    $(8)
 	.cfi_endproc
 EN(atomic64_fetchadd)
 
@@ -175,7 +175,7 @@ ST(atomic64_fetchand)
 	jne    1b
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
-	ret    $8
+	ret    $(8)
 	.cfi_endproc
 EN(atomic64_fetchand)
 
@@ -196,7 +196,7 @@ ST(atomic64_fetchor)
 	jne    1b
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
-	ret    $8
+	ret    $(8)
 	.cfi_endproc
 EN(atomic64_fetchor)
 
@@ -217,7 +217,7 @@ ST(atomic64_fetchxor)
 	jne    1b
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
-	ret    $8
+	ret    $(8)
 	.cfi_endproc
 EN(atomic64_fetchxor)
 

@@ -34,21 +34,21 @@
 	cmpl   $(__NR_syscall0_max), sysno_reg;                                \
 	ja     1234f;                                                          \
 	movl   sysno_reg, tempreg_l;                                           \
-	shrl   $1, tempreg_l;                                                  \
+	shrl   $(1), tempreg_l;                                                \
 	EXTERN(kernel_syscall0_regcnt);                                        \
 	movb   segment_prefix kernel_syscall0_regcnt(,tempreg_l,1), tempreg_b; \
 	jmp    1235f;                                                          \
 1234:                                                                      \
 	leal   -__NR_syscall1_min(sysno_reg), tempreg_l;                       \
-	shrl   $1, tempreg_l;                                                  \
+	shrl   $(1), tempreg_l;                                                \
 	EXTERN(kernel_syscall1_regcnt);                                        \
 	movb   segment_prefix kernel_syscall1_regcnt(,tempreg_l,1), tempreg_b; \
 1235:                                                                      \
-	testl  $1, sysno_reg;                                                  \
+	testl  $(1), sysno_reg;                                                \
 	jz     1234f;                                                          \
-	shrb   $4, tempreg_b;                                                  \
+	shrb   $(4), tempreg_b;                                                \
 1234:                                                                      \
-	testb  $0x8, tempreg_b;
+	testb  $(0x8), tempreg_b;
 
 
 /* Emulate the execution of a system call.
@@ -154,14 +154,14 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_end):
 	movl   %edx, OFFSET_GPREGS_EDX(%esp)
 1:
 	/* Restore GP registers (except for %eax, which holds the syscall return value) */
-	popl_cfi_r %edi /* [P] Destination pointer */
-	popl_cfi_r %esi /* [P] Source pointer */
-	popl_cfi_r %ebp /* [P] Frame base pointer */
-	popl_cfi_r %esp /* [P] Stack pointer */
-	popl_cfi_r %ebx /* [P] Base register */
-	popl_cfi_r %edx /* [C] Data register */
-	popl_cfi_r %ecx /* [C] Count register */
-	addl   $4, %esp /* [C] Accumulator register */
+	popl_cfi_r %edi   /* [P] Destination pointer */
+	popl_cfi_r %esi   /* [P] Source pointer */
+	popl_cfi_r %ebp   /* [P] Frame base pointer */
+	popl_cfi_r %esp   /* [P] Stack pointer */
+	popl_cfi_r %ebx   /* [P] Base register */
+	popl_cfi_r %edx   /* [C] Data register */
+	popl_cfi_r %ecx   /* [C] Count register */
+	addl   $(4), %esp /* [C] Accumulator register */
 	.cfi_adjust_cfa_offset -4
 
 	popl_cfi %fs

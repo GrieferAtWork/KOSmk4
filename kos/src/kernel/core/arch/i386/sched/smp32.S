@@ -289,7 +289,7 @@ INTERN_LABEL(x86_smp_entry_gdt_offset):
 	orw    $(CR0_PE), %sp
 	movl   %esp, %cr0
 	/* Jump to protected mode. */
-	ljmpl  $8, $(x86_smp_entry32 - KERNEL_BASE)
+	ljmpl  $(8), $(x86_smp_entry32 - KERNEL_BASE)
 INTERN_OBJECT(x86_smp_gdt)
 	.word  (3 * SIZEOF_SEGMENT_DESCRIPTOR) - 1
 INTERN_LABEL(x86_smp_gdt_pointer_base):

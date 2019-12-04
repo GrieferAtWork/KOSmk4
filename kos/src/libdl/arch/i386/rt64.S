@@ -30,7 +30,7 @@ INTERN(require_global)
 	.section .text;                                       \
 	INTERN_FUNCTION(name);                                \
 		.cfi_startproc;                                   \
-		pushq       $0;   /* RETURN_PC_OVERRIDE */        \
+		pushq       $(0);   /* RETURN_PC_OVERRIDE */      \
 		pushfq_cfi_r;                                     \
 		pushq_cfi_r %rax;                                 \
 		pushq_cfi_r %rcx;                                 \
@@ -141,7 +141,7 @@ INTERN_FUNCTION(libdl_load_lazy_relocation)
 	xchgq  %rax, (%rsp) /* RESTORE(EAX); 0(%esp) = RESOLVED_ADDRESS */
 	.cfi_same_value %rax
 	.cfi_rel_offset %rip, 0
-	ret    $8           /* EIP = [ESP]; ESP += (4 + 8);
+	ret    $(8)         /* EIP = [ESP]; ESP += (4 + 8);
 	                     * Cleanup: RESOLVED_ADDRESS + MODULE + JMPREL_offset */
 	.cfi_endproc
 END(libdl_load_lazy_relocation)

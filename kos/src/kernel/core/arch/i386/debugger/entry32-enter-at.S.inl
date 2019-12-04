@@ -305,7 +305,7 @@ L(acquire_lapic_lock):
 	 * command-line driver is active, allowing them to soft-reset the debugger commandline
 	 * in case the current command gets into a loop) */
 	EXTERN(dbg_active)
-	cmpl   $0, %ss:dbg_active
+	cmpl   $(0), %ss:dbg_active
 	jne    .Lcommon_recursive_debugger
 
 #define COPYWORD(src_offset,dst_offset) \
@@ -315,7 +315,7 @@ L(acquire_lapic_lock):
 	movl   src_reg, %eax; \
 	movl   %eax, %ss:dbg_exitstate+(dst_offset)
 #define NULLREG(dst_offset) \
-	movl   $0, %ss:dbg_exitstate+(dst_offset)
+	movl   $(0), %ss:dbg_exitstate+(dst_offset)
 #define FIXEDREG(value,dst_offset) \
 	movl   $value, %ss:dbg_exitstate+(dst_offset)
 
@@ -427,7 +427,7 @@ L(acquire_lapic_lock):
 	jmp    L(copy_user_iret_regs)
 L(no_vm86_iret):
 	/* Check for a user-space IRET tail. */
-	testl  $3, IRET(OFFSET_IRREGS_CS)
+	testl  $(3), IRET(OFFSET_IRREGS_CS)
 	jz     L(no_user_iret)
 L(copy_user_iret_regs):
 	COPYWORD(IRREGS_OFFSET+OFFSET_IRREGS_SS,OFFSET_FCPUSTATE_SS)
@@ -447,9 +447,9 @@ L(copy_common_iret_regs):
 #undef IRREGS_OFFSET
 #endif
 
-	movl   $0, %ss:dbg_exitstate+OFFSET_FCPUSTATE_TR
+	movl   $(0), %ss:dbg_exitstate+OFFSET_FCPUSTATE_TR
 	str    %ss:dbg_exitstate+OFFSET_FCPUSTATE_TR
-	movl   $0, %ss:dbg_exitstate+OFFSET_FCPUSTATE_LDT
+	movl   $(0), %ss:dbg_exitstate+OFFSET_FCPUSTATE_LDT
 	sldt   %ss:dbg_exitstate+OFFSET_FCPUSTATE_LDT
 	movl   %cr0, %eax
 	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR0
@@ -534,11 +534,11 @@ L(copy_common_iret_regs):
 	movl   %eax, %gs
 	movl   $(SEGMENT_KERNEL_DATA), %eax
 	movl   %eax, %ss
-	ljmpl  $(SEGMENT_KERNEL_CODE), $1f /* movl $(SEGMENT_KERNEL_CODE), %cs */
+	ljmpl  $(SEGMENT_KERNEL_CODE), $(1f) /* movl $(SEGMENT_KERNEL_CODE), %cs */
 1:
 
 	/* x86_debug_gdt[SEGMENT_CPU_TSS].busy = 0; */
-	andb   $0b11111101, x86_debug_gdt+SEGMENT_CPU_TSS+5
+	andb   $(0b11111101), x86_debug_gdt+SEGMENT_CPU_TSS+5
 	movw   $(SEGMENT_CPU_TSS), %ax
 	ltrw   %ax
 
@@ -555,9 +555,9 @@ L(copy_common_iret_regs):
 	pushl  %edx           /* void (KCALL *main)(void *arg) */
 
 	/* Check if we need to initialize the debugger? */
-	cmpl   $0, dbg_active
+	cmpl   $(0), dbg_active
 	jne    1f
-	movl   $1, dbg_active /* Indicate that the debugger is now active */
+	movl   $(1), dbg_active /* Indicate that the debugger is now active */
 	EXTERN(dbg_init)
 	call   dbg_init       /* Initialize first time around */
 1:

@@ -147,8 +147,8 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	pushl_cfi %fs
 	.cfi_restore_iret_fs_or_offset -16
 
-	pushl_cfi   $0   /* ARG[5] */
-	pushl_cfi   $0   /* ARG[4] */
+	pushl_cfi   $(0)   /* ARG[5] */
+	pushl_cfi   $(0)   /* ARG[4] */
 	pushl_cfi_r %esi /* ARG[3] */
 	pushl_cfi_r %edx /* ARG[2] */
 	pushl_cfi_r %ecx /* ARG[1] */
@@ -166,7 +166,7 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	cmpl   $(__NR_syscall0_max), %eax
 	ja     1f
 	movl   %eax, %ecx
-	shrl   $1, %ecx
+	shrl   $(1), %ecx
 	EXTERN(kernel_syscall0_regcnt)
 	movb   kernel_syscall0_regcnt(,%ecx,1), %cl
 	jmp   .Lgot_mask
@@ -175,22 +175,22 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	cmpl   $(__NR_syscall1_max - __NR_syscall1_min), %eax
 	ja    .Lgot_sysenter_args
 	movl   %eax, %ecx
-	shrl   $1, %ecx
+	shrl   $(1), %ecx
 	EXTERN(kernel_syscall1_regcnt)
 	movb   kernel_syscall1_regcnt(,%ecx,1), %cl
 .Lgot_mask:
-	testl  $1, %eax
+	testl  $(1), %eax
 	jz     1f
-	shrb   $4, %cl
-1:	andb   $0x7, %cl
-	cmpb   $4, %cl
+	shrb   $(4), %cl
+1:	andb   $(0x7), %cl
+	cmpb   $(4), %cl
 	jbe    .Lgot_sysenter_args
 	/* Must load one (%cl == 5) or two (%cl == 6) arguments */
 	cmpl   $(KERNEL_BASE), %ebp
 	jae    .Lbad_args_pointer
 	movl   0(%ebp), %eax
 	movl   %eax, 20(%esp) /* ARG[4] */
-	cmpb   $5, %cl
+	cmpb   $(5), %cl
 	jbe    .Lgot_sysenter_args
 	/* Must also load the six'th argument! */
 	movl   4(%ebp), %eax
@@ -208,7 +208,7 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	popl_cfi_r %ecx /* ARG[1] */
 	popl_cfi_r %edx /* ARG[2] */
 	popl_cfi_r %esi /* ARG[3] */
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 
 	popl_cfi %fs
@@ -235,7 +235,7 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	popl_cfi_r %ecx /* ARG[1] */
 	popl_cfi_r %edx /* ARG[2] */
 	popl_cfi_r %esi /* ARG[3] */
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	jmp    __asm32_bad_sysenter_extension
 	.cfi_endproc
@@ -334,21 +334,21 @@ END(x86_syscall_emulate_sysenter_r)
 	cmpl   $(__NR_syscall0_max), sysno_reg;                                \
 	ja     1234f;                                                          \
 	movl   sysno_reg, tempreg_l;                                           \
-	shrl   $1, tempreg_l;                                                  \
+	shrl   $(1), tempreg_l;                                                \
 	EXTERN(kernel_syscall0_regcnt);                                        \
 	movb   segment_prefix kernel_syscall0_regcnt(,tempreg_l,1), tempreg_b; \
 	jmp    1235f;                                                          \
 1234:                                                                      \
 	leal   -__NR_syscall1_min(sysno_reg), tempreg_l;                       \
-	shrl   $1, tempreg_l;                                                  \
+	shrl   $(1), tempreg_l;                                                \
 	EXTERN(kernel_syscall1_regcnt);                                        \
 	movb   segment_prefix kernel_syscall1_regcnt(,tempreg_l,1), tempreg_b; \
 1235:                                                                      \
-	testl  $1, sysno_reg;                                                  \
+	testl  $(1), sysno_reg;                                                \
 	jz     1234f;                                                          \
-	shrb   $4, tempreg_b;                                                  \
+	shrb   $(4), tempreg_b;                                                \
 1234:                                                                      \
-	testb  $0x8, tempreg_b;
+	testb  $(0x8), tempreg_b;
 
 
 .section .text.cold
@@ -407,7 +407,7 @@ INTERN_FUNCTION(__asm32_bad_sysenter_extension)
 	/* Throw an E_SEGFAULT exception! */
 	pushl_cfi $(E_SEGFAULT_CONTEXT_FAULT)
 	pushl_cfi %ebp
-	pushl_cfi $2
+	pushl_cfi $(2)
 	pushl_cfi $ERROR_CODEOF(E_SEGFAULT_UNMAPPED)
 	EXTERN(error_thrown)
 	call   error_thrown
@@ -472,8 +472,8 @@ INTERN_FUNCTION(__x86_asm32_sysenter_break)
 	pushl_cfi %fs
 	.cfi_restore_iret_fs_or_offset -12
 
-	pushl_cfi $0 /* Make space for ARG5 */
-	pushl_cfi $0 /* Make space for ARG4 */
+	pushl_cfi $(0) /* Make space for ARG5 */
+	pushl_cfi $(0) /* Make space for ARG4 */
 	pushl_cfi_r %esi /* ARG[3] */
 	pushl_cfi_r %edx /* ARG[2] */
 	pushl_cfi_r %ecx /* ARG[1] */

@@ -46,7 +46,7 @@
 /* Push `IA32_KERNEL_GS_BASE' onto the stack
  * This macro clobbers %rax, %rcx and %rdx */
 .macro pushq_cfi_kernel_gs_base
-	subq   $8, %rsp
+	subq   $(8), %rsp
 	.cfi_adjust_cfa_offset 8
 	movl   $(IA32_KERNEL_GS_BASE), %ecx
 	rdmsr
@@ -62,7 +62,7 @@
 	movl   0(%rsp), %eax
 	movl   4(%rsp), %edx
 	wrmsr
-	addq   $8, %rsp
+	addq   $(8), %rsp
 	.cfi_adjust_cfa_offset -8
 .endm
 
@@ -295,7 +295,7 @@ INTERN_LABEL(x86_smp_entry_gdt_offset):
 	orw    $(CR0_PE), %sp
 	movl   %esp, %cr0
 	/* Jump to protected mode. */
-	ljmpl  $8, $(x86_smp_entry32 - KERNEL_CORE_BASE)
+	ljmpl  $(8), $(x86_smp_entry32 - KERNEL_CORE_BASE)
 INTERN_OBJECT(x86_smp_gdt)
 	.word  (3 * SIZEOF_SEGMENT_DESCRIPTOR) - 1
 INTERN_LABEL(x86_smp_gdt_pointer_base):

@@ -161,7 +161,7 @@ INTERN_FUNCTION(libcpu_apply_ucpustate)
 	movl   %eax, %es
 	movl   (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_DS)(%ecx), %eax
 	movl   %eax, %ds
-	testl  $3, %ss:OFFSET_UCPUSTATE_CS(%ecx)
+	testl  $(3), %ss:OFFSET_UCPUSTATE_CS(%ecx)
 #ifdef __KERNEL__
 	jz     1f
 #else
@@ -358,7 +358,7 @@ INTERN_FUNCTION(libcpu_apply_fcpustate)
 	movw   OFFSET_FCPUSTATE_DS(%ecx), %ax
 	movw   %ax, %ds
 	.cfi_same_value %ds
-	testl  $3, %ss:OFFSET_FCPUSTATE_CS(%ecx)
+	testl  $(3), %ss:OFFSET_FCPUSTATE_CS(%ecx)
 #ifdef __KERNEL__
 	jz     1f
 #else

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9398b186 */
+/* HASH CRC-32:0xd936a817 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -828,7 +828,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mount)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -3063,7 +3063,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_select)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -3372,7 +3372,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mmap)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -4458,7 +4458,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigreturn)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -4499,7 +4499,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clone)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -5245,7 +5245,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80__llseek)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -6097,7 +6097,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mremap)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -6741,7 +6741,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pread64)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -6782,7 +6782,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwrite64)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -7194,7 +7194,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mmap2)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -8374,7 +8374,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setxattr)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -8415,7 +8415,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lsetxattr)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -8456,7 +8456,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsetxattr)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -8913,7 +8913,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futex)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -9501,7 +9501,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_remap_file_pages)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -10509,7 +10509,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -10999,7 +10999,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchownat)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -11195,7 +11195,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linkat)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -11394,7 +11394,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pselect6)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -11435,7 +11435,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ppoll)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -11589,7 +11589,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_splice)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -11631,7 +11631,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sync_file_range)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -11824,7 +11824,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_pwait)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -12361,7 +12361,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadv)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -12402,7 +12402,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritev)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -12520,7 +12520,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -12675,7 +12675,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_name_to_handle_at)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -12904,7 +12904,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_readv)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -12946,7 +12946,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_writev)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -12987,7 +12987,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kcmp)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -13140,7 +13140,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_renameat2)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -13330,7 +13330,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_execveat)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -13599,7 +13599,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getsockopt)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -13642,7 +13642,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setsockopt)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -13759,7 +13759,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendto)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -13838,7 +13838,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvfrom)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -14429,7 +14429,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpathat)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -14557,7 +14557,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_openpty)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -14874,7 +14874,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutex)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -14913,7 +14913,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lseek64)
 	call   sys_lseek64
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -14981,7 +14981,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutexexpr)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -15050,7 +15050,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutexlockexpr)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -15204,7 +15204,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_coredump)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -15467,7 +15467,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_select64)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -15518,7 +15518,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_maplibrary)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -15899,7 +15899,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pread64f)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -15941,7 +15941,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwrite64f)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -16093,7 +16093,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddirf)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -16438,7 +16438,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmknodat)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -16557,7 +16557,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_frenameat)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -16639,7 +16639,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_freadlinkat)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -16681,7 +16681,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pselect6_64)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -16722,7 +16722,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ppoll64)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -16804,7 +16804,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fallocate64)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -16926,7 +16926,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadvf)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -16968,7 +16968,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritevf)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -17009,7 +17009,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg64)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -17825,7 +17825,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mount)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -20062,7 +20062,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_select)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -20373,7 +20373,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mmap)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -21461,7 +21461,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigreturn)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -21504,7 +21504,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clone)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -22252,7 +22252,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter__llseek)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -23106,7 +23106,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mremap)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -23752,7 +23752,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pread64)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -23795,7 +23795,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwrite64)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -24209,7 +24209,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mmap2)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -25391,7 +25391,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setxattr)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -25434,7 +25434,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lsetxattr)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -25477,7 +25477,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fsetxattr)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -25936,7 +25936,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_futex)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -26526,7 +26526,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_remap_file_pages)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -27536,7 +27536,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -28028,7 +28028,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fchownat)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -28226,7 +28226,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linkat)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -28427,7 +28427,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pselect6)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -28470,7 +28470,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ppoll)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -28626,7 +28626,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_splice)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -28670,7 +28670,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sync_file_range)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -28865,7 +28865,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_epoll_pwait)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -29404,7 +29404,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadv)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -29447,7 +29447,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritev)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -29567,7 +29567,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -29724,7 +29724,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_name_to_handle_at)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -29955,7 +29955,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_readv)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -29999,7 +29999,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_writev)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -30042,7 +30042,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kcmp)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -30197,7 +30197,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_renameat2)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -30389,7 +30389,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_execveat)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -30660,7 +30660,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getsockopt)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -30705,7 +30705,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setsockopt)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -30824,7 +30824,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sendto)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -30905,7 +30905,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvfrom)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -31498,7 +31498,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_frealpathat)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -31628,7 +31628,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_openpty)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -31947,7 +31947,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutex)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -31986,7 +31986,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lseek64)
 	call   sys_lseek64
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -32056,7 +32056,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutexexpr)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -32127,7 +32127,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutexlockexpr)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -32283,7 +32283,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_coredump)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -32548,7 +32548,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_select64)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -32601,7 +32601,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_maplibrary)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -32984,7 +32984,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pread64f)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -33028,7 +33028,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwrite64f)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -33182,7 +33182,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kreaddirf)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -33529,7 +33529,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fmknodat)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -33650,7 +33650,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_frenameat)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -33734,7 +33734,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_freadlinkat)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -33778,7 +33778,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pselect6_64)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -33821,7 +33821,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ppoll64)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -33905,7 +33905,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fallocate64)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -34029,7 +34029,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadvf)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -34073,7 +34073,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritevf)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
@@ -34116,7 +34116,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg64)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $8, %esp
+	addl   $(8), %esp
 	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs

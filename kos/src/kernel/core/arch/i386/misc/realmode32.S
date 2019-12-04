@@ -54,12 +54,12 @@ INTERN_FUNCTION(x86_realmode_interrupt)
 	pushl_cfi_r %gs
 	/* Save the current GDT & IDT, so we can load
 	 * the BIOS one and restore our's later */
-	subl   $18, %esp
+	subl   $(18), %esp
 	.cfi_adjust_cfa_offset 18
 	sgdtl  12(%esp)
 	sidtl  6(%esp)
-	movw   $0x03ff, 0(%esp) /* LIMIT */
-	movl   $0,      2(%esp) /* BASE */
+	movw   $(0x03ff), 0(%esp) /* LIMIT */
+	movl   $(0),      2(%esp) /* BASE */
 	lidtl  (%esp)
 	/* Jump to physical memory */
 	jmp    1f - KERNEL_BASE
@@ -69,7 +69,7 @@ INTERN_FUNCTION(x86_realmode_interrupt)
 	movw   $(RM_SEGMENT_COUNT - 1),           0(%esp) /* LIMIT */
 	movl   $(x86_realmode_gdt - KERNEL_BASE), 2(%esp) /* BASE */
 	lgdtl  (%esp)
-	addl   $6, %esp
+	addl   $(6), %esp
 	.cfi_adjust_cfa_offset -6
 
 	movl   %cr0, %eax
@@ -131,7 +131,7 @@ END(x86_realmode_base)
 1:	/* Restore the original GDT & IDT */
 	lidtl  0(%esp)
 	lgdtl  6(%esp)
-	addl   $12, %esp
+	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	/* Restore registers */
 	popl_cfi_r  %gs
@@ -169,7 +169,7 @@ INTERN_FUNCTION(x86_realmode_interrupt_16_entry)
 	movb   0(%esp), %al /* %al = intno */
 	movb   %al, (77f - x86_realmode_interrupt_16_entry)(%bp)
 	/* Load registers. */
-	addw   $4,  %sp
+	addw   $(4),  %sp
 
 	/* Disable protected mode */
 	movl   %cr0, %eax
@@ -215,7 +215,7 @@ INTERN_FUNCTION(x86_realmode_interrupt_16_entry)
 	pushw  %fs
 	pushw  %es
 	pushw  %ds
-	subw   $4,  %sp
+	subw   $(4),  %sp
 	cli
 
 	/* Re-enable protected mode */

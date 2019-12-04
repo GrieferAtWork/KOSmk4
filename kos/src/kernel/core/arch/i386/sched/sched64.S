@@ -45,7 +45,7 @@
 /* Push `IA32_KERNEL_GS_BASE' onto the stack
  * This macro clobbers %rax, %rcx and %rdx */
 .macro pushq_cfi_kernel_gs_base
-	subq   $8, %rsp
+	subq   $(8), %rsp
 	.cfi_adjust_cfa_offset 8
 	movl   $(IA32_KERNEL_GS_BASE), %ecx
 	rdmsr
@@ -61,7 +61,7 @@
 	movl   0(%rsp), %eax
 	movl   4(%rsp), %edx
 	wrmsr
-	addq   $8, %rsp
+	addq   $(8), %rsp
 	.cfi_adjust_cfa_offset -8
 .endm
 
@@ -398,7 +398,7 @@ PUBLIC_FUNCTION(task_yield_nx)
 	.cfi_rel_offset %rip, 0
 
 	/* Construct a full `struct scpustate' structure */
-	pushq_cfi   $1                   /* [C] Accumulator register */
+	pushq_cfi $(1)                   /* [C] Accumulator register */
 	.cfi_rel_offset %rax, 0 /* Eventually, we want to return true. */
 	pushq_cfi_r %rcx                 /* [C] Count register */
 	pushq_cfi_r %rdx                 /* [C] Data register */

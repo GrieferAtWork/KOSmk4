@@ -117,16 +117,16 @@ INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 
 	/* Check for additional RPC callbacks. */
 	EXTERN(this_rpcs_pending)
-	cmpq   $0, %gs:this_rpcs_pending
+	cmpq   $(0), %gs:this_rpcs_pending
 	jne    x86_serve_user_rpc_and_propagate_exceptions
 
 	/* Check if an exception has been set for user-space. */
 	EXTERN(this_rpcs_pending)
-	cmpq   $0, %gs:this_exception_code
+	cmpq   $(0), %gs:this_exception_code
 	je     1f
 
 	/* Check if exceptions are propagated to user-space, or kernel-space */
-	testq  $3, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS(%rsp)
+	testq  $(3), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS(%rsp)
 	jnz    2f
 	/* Kernel-space target! */
 
@@ -343,7 +343,7 @@ END(task_rpc_exec_here_onexit)
 .section .text
 PUBLIC_FUNCTION(task_serve)
 	.cfi_startproc
-	cmpq   $0, %gs:this_rpc_pending_sync_count
+	cmpq   $(0), %gs:this_rpc_pending_sync_count
 	jne    1f
 #if 1 /* Service blocking cleanup operations. */
 	call   blocking_cleanup_service
@@ -376,7 +376,7 @@ PUBLIC_FUNCTION(task_serve)
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 
-	movq   $1, %rax /* Return $1 later on (unless overwritten by RPC functions themself) */
+	movq   $(1), %rax /* Return $1 later on (unless overwritten by RPC functions themself) */
 
 	ASM_PUSH_GPREGSNSP_CFI_R
 
@@ -388,7 +388,7 @@ PUBLIC_FUNCTION(task_serve)
 	movq   %rax, %rsp
 	.cfi_def_cfa_register %rsp
 	/* Check if there are more pending RPC callbacks. */
-	cmpq   $0, %gs:this_rpc_pending_sync_count
+	cmpq   $(0), %gs:this_rpc_pending_sync_count
 	jne    1b
 
 #if 1 /* Service blocking cleanup operations. */
@@ -408,17 +408,17 @@ END(task_serve)
 .section .text
 PUBLIC_FUNCTION(task_serve_nx)
 	.cfi_startproc
-	cmpq   $0, %gs:this_rpc_pending_sync_count_nx
+	cmpq   $(0), %gs:this_rpc_pending_sync_count_nx
 #if 1
 	je     blocking_cleanup_service
 #else
 	jne    1f
 #if TASK_SERVE_NX_XPENDING == 1
 	xorq   %rax, %rax
-	cmpq   $0, %gs:this_rpc_pending_sync_count
+	cmpq   $(0), %gs:this_rpc_pending_sync_count
 	setne  %al
 #else
-	cmpq   $0, %gs:this_rpc_pending_sync_count
+	cmpq   $(0), %gs:this_rpc_pending_sync_count
 	movq   $(TASK_SERVE_NX_DIDRUN), %rcx
 	cmovne %rcx, %rax
 #endif
@@ -454,7 +454,7 @@ PUBLIC_FUNCTION(task_serve_nx)
 	movq   %rax, %rsp
 	.cfi_def_cfa_register %rsp
 	/* Check if there are more pending RPC callbacks. */
-	cmpq   $0, %gs:this_rpc_pending_sync_count_nx
+	cmpq   $(0), %gs:this_rpc_pending_sync_count_nx
 	jne    1b
 
 #if 1 /* Service blocking cleanup operations. */
@@ -463,7 +463,7 @@ PUBLIC_FUNCTION(task_serve_nx)
 #endif
 
 	ASM_POP_GPREGSNSP_CFI_R
-	cmpq   $0, %gs:this_rpc_pending_sync_count
+	cmpq   $(0), %gs:this_rpc_pending_sync_count
 	je     1f
 	orq    $(TASK_SERVE_NX_XPENDING), %rax
 1:	intr_exit

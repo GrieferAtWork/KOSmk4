@@ -119,9 +119,9 @@ if (n != 0)
 	print r"__CRT_FUNCTION_IF_NOT_NORETURN(name,                                            \";
 if (stack_cleanup != 0) {
 	if (stack_cleanup == 8) {
-	print r"		popq_cfi   %rsi; /" r"* addq $8, %rsp; *" r"/                                   \";
+	print r"		popq_cfi   %rsi; /" r"* addq $(8), %rsp; *" r"/                                 \";
 	} else {
-	print r"		addq   ${}, %rsp;".format({ stack_cleanup }).ljust(LENGTH-3) + "\\";
+	print r"		addq   $({}), %rsp;".format({ stack_cleanup }).ljust(LENGTH-3) + "\\";
 	print r"		.cfi_adjust_cfa_offset -{};".format({ stack_cleanup }).ljust(LENGTH-3) + "\\";
 	}
 }
@@ -299,7 +299,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 		INTERN(libc_##name);                                                    \
 		call   libc_##name;                                                     \
 __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            \
-		popq_cfi   %rsi; /* addq $8, %rsp; */                                   \
+		popq_cfi   %rsi; /* addq $(8), %rsp; */                                 \
 		popq_cfi_r %rsi;                                                        \
 		popq_cfi_r %rdi;                                                        \
 		ret;)                                                                   \
@@ -326,7 +326,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 		INTERN(libc_##name);                                                    \
 		call   libc_##name;                                                     \
 __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            \
-		addq   $16, %rsp;                                                       \
+		addq   $(16), %rsp;                                                     \
 		.cfi_adjust_cfa_offset -16;                                             \
 		popq_cfi_r %rsi;                                                        \
 		popq_cfi_r %rdi;                                                        \
@@ -355,7 +355,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 		INTERN(libc_##name);                                                    \
 		call   libc_##name;                                                     \
 __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            \
-		addq   $24, %rsp;                                                       \
+		addq   $(24), %rsp;                                                     \
 		.cfi_adjust_cfa_offset -24;                                             \
 		popq_cfi_r %rsi;                                                        \
 		popq_cfi_r %rdi;                                                        \
@@ -385,7 +385,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 		INTERN(libc_##name);                                                    \
 		call   libc_##name;                                                     \
 __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            \
-		addq   $32, %rsp;                                                       \
+		addq   $(32), %rsp;                                                     \
 		.cfi_adjust_cfa_offset -32;                                             \
 		popq_cfi_r %rsi;                                                        \
 		popq_cfi_r %rdi;                                                        \
@@ -416,7 +416,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 		INTERN(libc_##name);                                                    \
 		call   libc_##name;                                                     \
 __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            \
-		addq   $40, %rsp;                                                       \
+		addq   $(40), %rsp;                                                     \
 		.cfi_adjust_cfa_offset -40;                                             \
 		popq_cfi_r %rsi;                                                        \
 		popq_cfi_r %rdi;                                                        \
@@ -448,7 +448,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 		INTERN(libc_##name);                                                    \
 		call   libc_##name;                                                     \
 __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            \
-		addq   $48, %rsp;                                                       \
+		addq   $(48), %rsp;                                                     \
 		.cfi_adjust_cfa_offset -48;                                             \
 		popq_cfi_r %rsi;                                                        \
 		popq_cfi_r %rdi;                                                        \
@@ -481,7 +481,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 		INTERN(libc_##name);                                                    \
 		call   libc_##name;                                                     \
 __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            \
-		addq   $56, %rsp;                                                       \
+		addq   $(56), %rsp;                                                     \
 		.cfi_adjust_cfa_offset -56;                                             \
 		popq_cfi_r %rsi;                                                        \
 		popq_cfi_r %rdi;                                                        \
@@ -515,7 +515,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 		INTERN(libc_##name);                                                    \
 		call   libc_##name;                                                     \
 __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            \
-		addq   $64, %rsp;                                                       \
+		addq   $(64), %rsp;                                                     \
 		.cfi_adjust_cfa_offset -64;                                             \
 		popq_cfi_r %rsi;                                                        \
 		popq_cfi_r %rdi;                                                        \
@@ -550,7 +550,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 		INTERN(libc_##name);                                                    \
 		call   libc_##name;                                                     \
 __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            \
-		addq   $72, %rsp;                                                       \
+		addq   $(72), %rsp;                                                     \
 		.cfi_adjust_cfa_offset -72;                                             \
 		popq_cfi_r %rsi;                                                        \
 		popq_cfi_r %rdi;                                                        \

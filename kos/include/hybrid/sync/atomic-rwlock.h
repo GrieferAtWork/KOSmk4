@@ -311,7 +311,7 @@ __LOCAL void __NOTHROW(atomic_rwlock_downgrade)(struct atomic_rwlock *__restrict
 	LOCK_PREFIX decq \__self
 .endm
 .macro atomic_rwlock_endwrite __self
-	movq   $0, \__self
+	movq   $(0), \__self
 .endm
 
 #elif defined(__i386__)
@@ -379,7 +379,7 @@ __LOCAL void __NOTHROW(atomic_rwlock_downgrade)(struct atomic_rwlock *__restrict
 	LOCK_PREFIX decl \__self
 .endm
 .macro atomic_rwlock_endwrite __self
-	movl   $0, \__self
+	movl   $(0), \__self
 .endm
 #endif
 #endif /* __ASSEMBLER__ */

@@ -200,7 +200,7 @@ INTERN_FUNCTION(_start)
 
 	orl    $(CPU_FEATURE_FCPUID), V2P(x86_bootcpu_cpufeatures)
 
-	movl   $1, %eax
+	movl   $(1), %eax
 	cpuid
 	movl   %eax, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1A
 	movl   %ebx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1B
@@ -209,70 +209,70 @@ INTERN_FUNCTION(_start)
 
 	/* if (Family == 6 && Model < 3 && Stepping < 3)
 	 *     OFFSET_CPUID_1D &= ~CPUID_1D_SEP; */
-	testl  $CPUID_1D_SEP, %edx
+	testl  $(CPUID_1D_SEP), %edx
 	jz     1f
 	movl   %eax, %ecx
-	andl   $CPUID_1A_FAMILY_M, %ecx
+	andl   $(CPUID_1A_FAMILY_M), %ecx
 	cmpl   $(6 << CPUID_1A_FAMILY_S), %ecx
 	jne    1f  /* if (Family != 6) goto 1f; */
 	movl   %eax, %ecx
-	andl   $CPUID_1A_MODEL_M, %ecx
-#if CPUID_1A_MODEL_S
-	shrl   $CPUID_1A_MODEL_S, %ecx
-#endif
-	cmpl   $3, %ecx
+	andl   $(CPUID_1A_MODEL_M), %ecx
+#if CPUID_1A_MODEL_S != 0
+	shrl   $(CPUID_1A_MODEL_S), %ecx
+#endif /* CPUID_1A_MODEL_S != 0 */
+	cmpl   $(3), %ecx
 	jae    1f  /* if (Model >= 3) goto 1f; */
 	movl   %eax, %ecx
-	andl   $CPUID_1A_STEPPING_M, %ecx
-#if CPUID_1A_STEPPING_S
-	shrl   $CPUID_1A_STEPPING_S, %ecx
-#endif
-	cmpl   $3, %ecx
+	andl   $(CPUID_1A_STEPPING_M), %ecx
+#if CPUID_1A_STEPPING_S != 0
+	shrl   $(CPUID_1A_STEPPING_S), %ecx
+#endif /* CPUID_1A_STEPPING_S != 0 */
+	cmpl   $(3), %ecx
 	/* if (Stepping >= 3) goto 1f; */
 	jae    1f
-	andl   $~CPUID_1D_SEP, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1D
+	andl   $(~CPUID_1D_SEP), V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1D
 1:
 
 	/* Query additional CPUID features. */
-	movl   $0, %eax
+	xorl   %eax, %eax
 	cpuid
 	movl   %eax, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_0A
 	movl   %ebx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_0B
 	movl   %edx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_0D
 	movl   %ecx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_0C
-	cmpl   $7, %eax
+	cmpl   $(7), %eax
 	jnae   1f
-	movl   $7, %eax
-	movl   $0, %ecx /* Sub-leaf:0 */
+	movl   $(7), %eax
+	xorl   %ecx, %ecx /* Sub-leaf:0 */
 	cpuid
 	movl   %edx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_7D
 	movl   %ecx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_7C
 	movl   %ebx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_7B
-1:	movl   $0x80000000, %eax
+1:	movl   $(0x80000000), %eax
 	cpuid
 	movl   %eax, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000000A
-	cmpl   $0x80000001, %eax
+	cmpl   $(0x80000001), %eax
 	jnae   2f
-	movl   $0x80000001, %eax
+	movl   $(0x80000001), %eax
 	cpuid
 	movl   %ecx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000001C
 	movl   %edx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000001D
 	movl   V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000000A, %eax
-	cmpl   $0x80000004, %eax
+	cmpl   $(0x80000004), %eax
 	jnae   3f
-	movl   $0x80000004, %eax
+	movl   $(0x80000004), %eax
 	cpuid
 	movl   %eax, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000004A
 	movl   %ebx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000004B
 	movl   %ecx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000004C
 	movl   %edx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000004D
-	movl   $0x80000003, %eax
+	movl   $(0x80000003), %eax
 	cpuid
 	movl   %eax, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000003A
 	movl   %ebx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000003B
 	movl   %ecx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000003C
 	movl   %edx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000003D
-	movl   $0x80000002, %eax
+	movl   $(0x80000002), %eax
 	cpuid
 	movl   %eax, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000002A
 	movl   %ebx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_80000002B
@@ -287,9 +287,9 @@ INTERN_FUNCTION(_start)
 	EXTERN(used_pxx_page_fglobal)
 	testl  $(CPUID_1D_PGE), V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1D
 	jnz    1f
-	movl   $0,   V2P(used_pxx_page_fglobal)
+	movl   $(0), V2P(used_pxx_page_fglobal)
 #if !defined(CONFIG_NO_PAGING_PAE) && (PAE_PAGE_FGLOBAL > 0xffffffff)
-	movl   $0,   V2P(used_pxx_page_fglobal) + 4
+	movl   $(0), V2P(used_pxx_page_fglobal) + 4
 #endif
 	jmp    2f
 1:	/* Enable page-global support */
@@ -371,7 +371,7 @@ INTERN_FUNCTION(_start)
 #define PAGE_FLAGS      (PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT | \
 	                     PAE_PAGE_FDIRTY | /*PAE_PAGE_FGLOBAL |*/ PAE_PAGE_FPREPARED)
 #define PAE_KS_SHARE_E2_BASE           V2P(__x86_pagedir_kernel_share)
-#define PAE_KS_SHARE_E1_BASE          (V2P(__x86_pagedir_kernel_share) + 0x4000)            /* 0x4000 == 4 * 512 * 8 */
+#define PAE_KS_SHARE_E1_BASE          (V2P(__x86_pagedir_kernel_share) + 0x4000)                /* 0x4000 == 4 * 512 * 8 */
 #define PAE_KS_SHARE_E2(vec3, vec2)   (PAE_KS_SHARE_E2_BASE + ((vec3) * 0x1000) + ((vec2) * 8)) /* 0x1000 == 8 * 512 */
 #define PAE_KS_SHARE_E1(vec2, vec1)   (PAE_KS_SHARE_E1_BASE + ((vec2) * 0x1000) + ((vec1) * 8)) /* 0x1000 == 8 * 512 */
 #define PAE_PAGEDIR_KERNEL_P_E3(vec3) (pagedir_kernel_phys + (vec3) * 8)
@@ -382,12 +382,12 @@ INTERN_FUNCTION(_start)
 	/* >> for (i = 0; i < 508; ++i) {
 	 * >>     ks_share_e2[3][i] = PHYS_ADDR(&ks_share_e1[i][0]) | VECTOR_FLAGS;
 	 * >> } */
-	movl   $508, %ecx
+	movl   $(508), %ecx
 	movl   $(PAE_KS_SHARE_E1(0, 0) + VECTOR_FLAGS), %eax
 	movl   $(PAE_KS_SHARE_E2(3, 0)), %edi
 1:	stosl
-	addl   $4,      %edi /* Keep the upper 32 bits as 0 (the 0 stemming from .bss init) */
-	addl   $0x1000, %eax /* 0x1000 == PAE_KS_SHARE_E1(1, 0) - PAE_KS_SHARE_E1(0, 0) */
+	addl   $(4),      %edi /* Keep the upper 32 bits as 0 (the 0 stemming from .bss init) */
+	addl   $(0x1000), %eax /* 0x1000 == PAE_KS_SHARE_E1(1, 0) - PAE_KS_SHARE_E1(0, 0) */
 	loop   1b
 	/* >> ks_share_e2[3][508] = PHYS_ADDR(&ks_share_e2[0][0]) | VECTOR_FLAGS; // Self-map
 	 * >> ks_share_e2[3][509] = PHYS_ADDR(&ks_share_e2[1][0]) | VECTOR_FLAGS; // Self-map
@@ -405,8 +405,8 @@ INTERN_FUNCTION(_start)
 	movl   $(0 + PAGE_FLAGS), %eax
 	orl    V2P(used_pxx_page_fglobal), %eax /* Include the `PAE_PAGE_FGLOBAL' flag (if supported) */
 1:	stosl
-	addl   $4,      %edi /* Keep the upper 32 bits as 0 (the 0 stemming from .bss init) */
-	addl   $4096,   %eax
+	addl   $(4),      %edi /* Keep the upper 32 bits as 0 (the 0 stemming from .bss init) */
+	addl   $(4096),   %eax
 	loop   1b
 
 	/* Enable PAE support in CR4 */
@@ -464,7 +464,7 @@ INTERN_FUNCTION(_start)
 	movl   $(P32_KS_SHARE(0, 0) + VECTOR_FLAGS), %eax
 	movl   $(P32_PAGEDIR_KERNEL_P_E2(768)), %edi
 1:	stosl
-	addl   $0x1000, %eax /* 0x1000 == P32_KS_SHARE(1, 0) - P32_KS_SHARE(0, 0) */
+	addl   $(0x1000), %eax /* 0x1000 == P32_KS_SHARE(1, 0) - P32_KS_SHARE(0, 0) */
 	loop   1b
 	/* >> pagedir_kernel.pd_p32.p_e2[1023].p_word = PHYS_ADDR(&pagedir_kernel) | VECTOR_FLAGS; // Self-map */
 	movl   $(pagedir_kernel_phys + VECTOR_FLAGS), P32_PAGEDIR_KERNEL_P_E2(1023)
@@ -476,7 +476,7 @@ INTERN_FUNCTION(_start)
 	movl   $(0 + PAGE_FLAGS), %eax
 	orl    V2P(used_pxx_page_fglobal), %eax /* Include the `PAE_PAGE_FGLOBAL' flag (if supported) */
 1:	stosl
-	addl   $4096, %eax
+	addl   $(4096), %eax
 	loop   1b
 	/* >> i = __x86_p32_identity_mapped_text_4mib_index;
 	 * >> pagedir_kernel.pd_p32.p_e2[i].p_word = PHYS_ADDR(&ks_share[i][0]) | VECTOR_FLAGS; */
@@ -548,7 +548,7 @@ END(__x86_paging_init_identity_mapped_text)
 
 #ifndef CONFIG_NO_PAGING_P32
 .Lcleanup_paging_p32:
-	movl   $0, __x86_p32_identity_mapped_text_4mib_e2_word
+	movl   $(0), __x86_p32_identity_mapped_text_4mib_e2_word
 #endif /* !CONFIG_NO_PAGING_P32 */
 .Ldone_cleanup_paging:
 
@@ -577,7 +577,7 @@ END(__x86_paging_init_identity_mapped_text)
 	movw   %ax, %gs
 	movw   $(SEGMENT_KERNEL_DATA), %ax
 	movw   %ax, %ss
-	ljmp   $(SEGMENT_KERNEL_CODE), $1f
+	ljmp   $(SEGMENT_KERNEL_CODE), $(1f)
 1:	movw   $(SEGMENT_CPU_TSS), %ax
 	ltrw   %ax
 

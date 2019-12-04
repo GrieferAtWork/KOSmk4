@@ -69,7 +69,7 @@ END(boot_failure_vga_ptr)
 
 .section .text.free
 
-/* CLOBBER: []
+/* CLOBBER: [%eflags]
  * OUT: [pointer_to_vga_base: %edi]
  * Clear the VGA screen and re-initialize the VGA pointer. */
 PRIVATE_FUNCTION(vga_cls)
@@ -78,7 +78,7 @@ PRIVATE_FUNCTION(vga_cls)
 	leal   VGA_BASE, %edi
 	movl   %edi, SYM(boot_failure_vga_ptr)
 	movl   $(VGA_WIDTH * VGA_HEIGHT), %ecx
-	movl   $0, %eax
+	xorl   %eax, %eax
 	rep    stosw
 	leal   VGA_BASE, %edi
 	popl   %ecx
@@ -86,10 +86,10 @@ PRIVATE_FUNCTION(vga_cls)
 	ret
 END(vga_cls)
 
-/* CLOBBER: []
- * OUT: [pointer_to_last_line: %edi]
+/* CLOBBER: [%eflags]
+ * OUT: [pointer_to_start_of_last_line: %edi]
  * Scroll the VGA display by 1 line and set
- * the VGA point to the start of the last line. */
+ * the VGA pointer to the start of the last line. */
 PRIVATE_FUNCTION(vga_scroll)
 	pushl  %esi
 	pushl  %ecx
@@ -174,7 +174,7 @@ END(vga_puts)
 
 
 
-/* IN: [reason_string: %edi]
+/* IN: [reason_string: %esi]
  * Print an error message and abort booting. */
 PRIVATE_FUNCTION(boot_failure)
 	pushl  %esi
@@ -182,7 +182,7 @@ PRIVATE_FUNCTION(boot_failure)
 	leal   SYM(str_bootfailure_1), %esi
 	call   vga_puts
 	popl   %esi
-	call   vga_puts
+	call   vga_puts /* Print the message given by the caller */
 	DEFINE_PRIVATE_STRING(str_bootfailure_2, "\n\nPress CTRL+ALT+DEL to reboot")
 	leal   SYM(str_bootfailure_2), %esi
 	call   vga_puts
@@ -190,7 +190,7 @@ PRIVATE_FUNCTION(boot_failure)
 	jmp 1b
 END(boot_failure)
 
-/* IN: [reason_string: %edi]
+/* IN: [reason_string: %esi]
  * CLOBBER: [%eflags]
  * Print a warning message and return. */
 PRIVATE_FUNCTION(boot_warning)
@@ -205,7 +205,7 @@ KOS may behave unexpectedly, crash, or not be able to boot at all.\n\n")
 	leal   SYM(str_bootwarning_2), %esi
 	call   vga_puts
 	/* Only print the warning implication message once */
-	movb   $0, SYM(str_bootwarning_2) + 2
+	movb   $(0), SYM(str_bootwarning_2) + 2
 	ret
 END(boot_warning)
 
@@ -438,9 +438,9 @@ INTERN_FUNCTION(_start)
 	andl   $(EFLAGS_ID), %eax
 	jz     boot_failure_no_cpuid
 
-	movl   $0, %eax
+	xorl   %eax, %eax
 	cpuid
-	cmpl   $1, %eax
+	cmpl   $(1), %eax
 	jb     boot_failure_no_cpuid_0x1
 	movl   %eax, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_0A
 	movl   %ebx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_0B
@@ -522,7 +522,7 @@ INTERN_FUNCTION(_start)
 3:  /* ci_80000000a < 0x80000004 */
 
 
-	movl   $1, %eax
+	movl   $(1), %eax
 	cpuid
 	movl   %eax, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1A
 	movl   %ebx, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1B
@@ -561,9 +561,9 @@ INTERN_FUNCTION(_start)
 	testl  $(CPUID_1D_PGE), %edx
 	jnz    1f
 	EXTERN(used_pxx_page_fglobal)
-	movl   $0,   V2P(used_pxx_page_fglobal)
+	movl   $(0), V2P(used_pxx_page_fglobal)
 #if (P64_PAGE_FGLOBAL > 0xffffffff)
-	movl   $0,   V2P(used_pxx_page_fglobal) + 4
+	movl   $(0), V2P(used_pxx_page_fglobal) + 4
 #endif
 1:
 
@@ -577,17 +577,17 @@ INTERN_FUNCTION(_start)
 	jne    1f  /* if (Family != 6) goto 1f; */
 	movl   %eax, %ecx
 	andl   $(CPUID_1A_MODEL_M), %ecx
-#if CPUID_1A_MODEL_S
+#if CPUID_1A_MODEL_S != 0
 	shrl   $(CPUID_1A_MODEL_S), %ecx
-#endif /* CPUID_1A_MODEL_S */
-	cmpl   $3, %ecx
+#endif /* CPUID_1A_MODEL_S != 0 */
+	cmpl   $(3), %ecx
 	jae    1f  /* if (Model >= 3) goto 1f; */
 	movl   %eax, %ecx
 	andl   $(CPUID_1A_STEPPING_M), %ecx
-#if CPUID_1A_STEPPING_S
+#if CPUID_1A_STEPPING_S != 0
 	shrl   $(CPUID_1A_STEPPING_S), %ecx
-#endif /* CPUID_1A_STEPPING_S */
-	cmpl   $3, %ecx
+#endif /* CPUID_1A_STEPPING_S != 0 */
+	cmpl   $(3), %ecx
 	/* if (Stepping >= 3) goto 1f; */
 	jae    1f
 	andl   $~CPUID_1D_SEP, V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1D
@@ -739,7 +739,7 @@ END(_start)
 INTERN_FUNCTION(_start64)
 	/* Do an absolute jump to get out of physical
 	 * memory and into the virtual world! */
-	movabs $1f, %rax
+	movabs $(1f), %rax
 	jmpq   *%rax
 1:	/* Now we're truly in virtual, 64-bit mode! */
 

@@ -135,7 +135,7 @@ __ASM_L(	.cfi_escape 0x23,(OFFSET_FCPUSTATE_GS))
 	nop    /* For tracebacks */
 PUBLIC_FUNCTION(dbg_exit)
 	cli
-	cmpl   $0, dbg_active
+	cmpl   $(0), dbg_active
 	jne    1f
 	int3   /* Assertion failed: Not in debugger mode! */
 1:	movl   $(dbg_exitstate), %esi
@@ -230,7 +230,7 @@ PUBLIC_FUNCTION(dbg_exit)
 	movl   %eax, %edx
 	andl   $~0x7, %edx
 	movl   EXIT_STATE(OFFSET_FCPUSTATE_GDT+OFFSET_DESCTAB_BASE), %ecx
-	andb   $0b11111101, 5(%ecx,%edx,1)
+	andb   $(0b11111101), 5(%ecx,%edx,1)
 	ltr    %ax
 
 	/* Restore gp. registers */
@@ -272,7 +272,7 @@ PUBLIC_FUNCTION(dbg_exit)
 
 	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EAX), %eax
 	/* Check if we're about to return to user-space */
-	testl  $3, EXIT_STATE(OFFSET_FCPUSTATE_CS)
+	testl  $(3), EXIT_STATE(OFFSET_FCPUSTATE_CS)
 	jz     1f
 	pushl  EXIT_STATE(OFFSET_FCPUSTATE_SS)
 	pushl  EXIT_STATE(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESP)

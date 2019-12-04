@@ -46,7 +46,7 @@ INTERN_FUNCTION(PP_CAT2(__x64_rdfsbase_, TARGET_REGISTER))
 	xorq   %rax, %rax
 	movq   $IA32_FS_BASE, %rcx
 	rdmsr
-	shlq   $32, %rdx
+	shlq   $(32), %rdx
 #ifdef TARGET_REGISTER_IS_RDX
 	orq    %rax, %rdx
 #else /* TARGET_REGISTER_IS_RDX */
@@ -87,7 +87,7 @@ INTERN_FUNCTION(PP_CAT2(__x64_rdgsbase_, TARGET_REGISTER))
 	xorq   %rax, %rax
 	movq   $IA32_GS_BASE, %rcx
 	rdmsr
-	shlq   $32, %rdx
+	shlq   $(32), %rdx
 #ifdef TARGET_REGISTER_IS_RDX
 	orq    %rax, %rdx
 #else /* TARGET_REGISTER_IS_RDX */
@@ -128,7 +128,7 @@ INTERN_FUNCTION(PP_CAT2(__x64_wrfsbase_, TARGET_REGISTER))
 	movq   %TARGET_REGISTER, %rax
 	movq   %TARGET_REGISTER, %rdx
 #endif
-	shrq   $32, %rdx
+	shrq   $(32), %rdx
 	movq   $IA32_FS_BASE, %rcx
 	wrmsr
 	popq_cfi_r %rdx
@@ -155,7 +155,7 @@ INTERN_FUNCTION(PP_CAT2(__x64_wrgsbase_, TARGET_REGISTER))
 	movq   %TARGET_REGISTER, %rax
 	movq   %TARGET_REGISTER, %rdx
 #endif
-	shrq   $32, %rdx
+	shrq   $(32), %rdx
 	movq   $IA32_GS_BASE, %rcx
 	wrmsr
 	popq_cfi_r %rdx

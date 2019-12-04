@@ -55,7 +55,7 @@ PUBLIC_FUNCTION(__predict_update_rax)
 	pushfq_cfi_r
 	pushq_cfi_r %rax
 	cmpq   %rax, 8(%rdi)
-1:	movq   $0, %rax
+1:	movq   $(0), %rax
 	sete   %al
 	/* Increment the miss/hit counter */
 	lock;  incq 16(%rdi,%rax,8)

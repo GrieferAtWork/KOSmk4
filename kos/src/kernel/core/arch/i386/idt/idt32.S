@@ -77,7 +77,7 @@ PRIVATE_FUNCTION(x86_idt_unused_common)
 	pushal_cfi_r
 	movl   %esp, %ecx /* struct icpustate *state */
 	xorl   %edx, %edx /* uintptr_t ecode */
-	subl   $4, %esp   /* VECNO */
+	subl   $(4), %esp /* VECNO */
 	.cfi_adjust_cfa_offset 4
 
 	EXTERN(x86_handle_unhandled_idt)

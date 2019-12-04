@@ -57,10 +57,10 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 	xorw   %ax, %ax
 	movw   %ax, %es
 	movw   %ax, %di
-	movb   $0x08, %ah
-	int    $0x13
+	movb   $(0x08), %ah
+	int    $(0x13)
 //	jc8    boot_error
-	andb   $0x3f, %cl
+	andb   $(0x3f), %cl
 	/* DH: Number of Heads -1 */
 	/* CL: Sectors per Track */
 	xorb   %ch, %ch
@@ -83,24 +83,24 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 
 	/* Enable A20 (from https://wiki.osdev.org/A20_Line) */
 	call16 a20wait
-	movb   $0xAD, %al
-	outb   %al, $0x64
+	movb   $(0xad), %al
+	outb   %al, $(0x64)
 	call16 a20wait
-	movb   $0xd0, %al
-	outb   %al, $0x64
+	movb   $(0xd0), %al
+	outb   %al, $(0x64)
 	call16 a20wait2
-	inb    $0x60, %al
+	inb    $(0x60), %al
 	pushw  %ax
 	call16 a20wait
-	movb   $0xd1, %al
-	outb   %al, $0x64
+	movb   $(0xd1), %al
+	outb   %al, $(0x64)
 	call16 a20wait
 	popw   %ax
-	orb    $2, %al
-	outb   %al, $0x60
+	orb    $(2), %al
+	outb   %al, $(0x60)
 	call16 a20wait
-	movb   $0xae, %al
-	outb   %al, $0x64
+	movb   $(0xae), %al
+	outb   %al, $(0x64)
 	call16 a20wait
 
 	xorw   %ax, %ax
@@ -110,33 +110,33 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 
 	EXTERN(__kernel_sector_count)
 	movw   $(__kernel_sector_count), %cx
-	movl   $0x00100000, %edi /* DESTPTR */
-	movw   $0, %ax           /* SECNO */
+	movl   $(0x00100000), %edi /* DESTPTR */
+	movw   $(0), %ax           /* SECNO */
 1:
 
 #if 1
 	pushaw
-	movw   $0xb800, %dx
+	movw   $(0xb800), %dx
 	movw   %dx, %es
 	xorw   %di, %di
 	movw   %ax, %dx
-	shrw   $12, %ax
+	shrw   $(12), %ax
 	call16 tohex
-	movb   $0x07, %ah
+	movb   $(0x07), %ah
 	stosw
 	movw   %dx, %ax
-	shrw   $8, %ax
+	shrw   $(8), %ax
 	call16 tohex
-	movb   $0x07, %ah
+	movb   $(0x07), %ah
 	stosw
 	movw   %dx, %ax
-	shrw   $4, %ax
+	shrw   $(4), %ax
 	call16 tohex
-	movb   $0x07, %ah
+	movb   $(0x07), %ah
 	stosw
 	movw   %dx, %ax
 	call16 tohex
-	movb   $0x07, %ah
+	movb   $(0x07), %ah
 	stosw
 	popaw
 #endif
@@ -144,7 +144,7 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 	movw   %cx, %dx
 	xorw   %cx, %cx
 	movw   %cx, %es     /* %es=0 */
-	movw   $0x0500, %bx /* Buffer location: %es:0x0500 */
+	movw   $(0x0500), %bx /* Buffer location: %es:0x0500 */
 	pushw  %ax
 
 	call   read_lba
@@ -152,7 +152,7 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 .code32
 	/* Copy into high memory. */
 	movzwl %bx, %esi
-	movl   $128, %ecx
+	movl   $(128), %ecx
 	rep;   movsl
 	call16_p pmode_leave
 .code16
@@ -166,29 +166,29 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 .code32
 	/* Jump to the kernel entry point */
 	movl   $(_start - KERNEL_CORE_BASE), %eax
-	jmp    *%eax
+	jmpl   *%eax
 .code16
 
-//	subw   $512, %sp
+//	subw   $(512), %sp
 //	movw   %ss, %ax
 //	movw   %ax, %es
 //	movw   %sp, %bx
-//	movw   $15, %ax /* LBA */
+//	movw   $(15), %ax /* LBA */
 //	call16 read_lba
 //
 //	/* For debugging: Hexdump to VGA display */
 //	movw   %ss, %ax
 //	movw   %ax, %ds
 //	movw   %sp, %si
-//	movw   $0xb800, %ax
+//	movw   $(0xb800), %ax
 //	movw   %ax, %es
-//	movw   $0, %di
-//	movw   $512, %cx
+//	movw   $(0), %di
+//	movw   $(512), %cx
 //
-//	movb   $0x07, %ah
+//	movb   $(0x07), %ah
 //1:	lodsb
 //	movb   %al, %dl
-//	shrb   $4, %al
+//	shrb   $(4), %al
 //	call16 tohex
 //	stosw
 //	movb   %dl, %al
@@ -201,14 +201,14 @@ PRIVATE_FUNCTION(x86_boot0_sector)
 //	jmp8   1b
 
 a20wait:
-	inb    $0x64, %al
-	testb  $2, %al
+	inb    $(0x64), %al
+	testb  $(2), %al
 	jnz8   a20wait
 	ret
 
 a20wait2:
-	inb    $0x64, %al
-	testb  $1, %al
+	inb    $(0x64), %al
+	testb  $(1), %al
 	jz8    a20wait2
 	ret
 
@@ -218,14 +218,14 @@ PRIVATE_FUNCTION(pmode_enter)
 	movl   %eax, %cr0
 	movw   %ss, %ax
 	/* ljmpl $8, $<return-addr> */
-	ljmpl $8, $S(1f)
+	ljmpl  $(8), $(S(1f))
 	.code32
 1:	/* Fixup the stack pointer. */
 	movzwl %ax, %eax
-	shll   $4, %eax
+	shll   $(4), %eax
 	addl   %eax, %esp
 	/* Set p-mode %ss */
-	movw   $16, %ax
+	movw   $(16), %ax
 	movw   %ax, %ss
 	movw   %ax, %ds
 	movw   %ax, %es
@@ -240,17 +240,17 @@ PRIVATE_FUNCTION(pmode_leave)
 	pushw  %dx
 	/* Split ESP */
 	movl   %esp, %edx
-	shrl   $4, %edx
-	movw   $32, %cx
+	shrl   $(4), %edx
+	movw   $(32), %cx
 	movw   %cx, %ss
 	movl   %cr0, %ecx
-	ljmpl  $24, $S(1f) /* Jump to segmented real-mode */
+	ljmpl  $(24), $(S(1f)) /* Jump to segmented real-mode */
 1:	.code16
 	andw   $(~CR0_PE), %cx
 	movl   %ecx, %cr0
-	ljmpw  $0, $S(1f) /* Jump to raw real-mode */
+	ljmpw  $(0), $(S(1f)) /* Jump to raw real-mode */
 1:	/* Set stack segment */
-	andw   $0xf000, %dx
+	andw   $(0xf000), %dx
 	movw   %dx, %ss /* See above */
 	/* Return to the caller */
 	popw   %dx
@@ -278,12 +278,12 @@ END(boot0_gdt)
 	 * IN:  u8 value = %al;   (Upper 4 bits are ignored)
 	 * OUT: char hexch = %al; */
 PRIVATE_FUNCTION(tohex)
-	andb   $0xf, %al
-	cmpb   $10, %al
+	andb   $(0xf), %al
+	cmpb   $(10), %al
 	jae8   1f
-	addb   $'0', %al
+	addb   $('0'), %al
 	ret
-1:	addb   $(+ 'A' - 10), %al
+1:	addb   $('A' - 10), %al
 	ret
 END(tohex)
 
@@ -303,7 +303,7 @@ PRIVATE_FUNCTION(read_lba)
 	 * Head     = %ax % NUM_HEADS */
 	movb   %dl, %cl
 	incb   %cl
-	andb   $0x3f, %cl
+	andb   $(0x3f), %cl
 	/* Sector   = %cl
 	 * Cylinder = %ax / NUM_HEADS
 	 * Head     = %ax % NUM_HEADS */
@@ -318,8 +318,8 @@ PRIVATE_FUNCTION(read_lba)
 	 * Head     = %dh */
 	/* Only one missing now: Cylinder */
 	movb   %al, %ch
-	andb   $0x03, %ah
-	shlb   $6, %ah
+	andb   $(0x03), %ah
+	shlb   $(6), %ah
 	orb    %ah, %cl
 	/* Disk:     BOOTDISK (== %dl)
 	 * Sector:   1-63     (== %cl & 0x3f)
@@ -327,15 +327,15 @@ PRIVATE_FUNCTION(read_lba)
 	 * Head:     0-0xff   (== %dh) */
 	movb   BOOTDISK, %dl
 	/* Now we can finally invoke `int 13h' */
-	movw   $0x0201, %ax /* 0x01: # of sectors; 0x0200: Function ID */
-	int    $0x13
+	movw   $(0x0201), %ax /* 0x01: # of sectors; 0x0200: Function ID */
+	int    $(0x13)
 	popaw
 //	jc8    boot_error
 	ret
 END(read_lba)
 
 PRIVATE_FUNCTION(boot_error)
-	xchgw %bx, %bx
+	xchgw %bx, %bx /* Bochs magic breakpoint... */
 1:	hlt
 	jmp8 1b
 END(boot_error)

@@ -265,7 +265,7 @@ DECL_END
 	jnz    99f;                                                               \
 	movl   OFFSET_IRREGS_ESP(%esp), %ecx;                                     \
 	movl   OFFSET_IRREGS_EIP(%esp), %edx;                                     \
-	addl   $8, %esp;                                                          \
+	addl   $(8), %esp;                                                        \
 	.cfi_adjust_cfa_offset - 8;                                               \
 	/* Prevent popfl from enabling interrupts to bypass a race condition      \
 	 * that could result in an interrupt attempting to re-direct user-space   \
@@ -289,7 +289,7 @@ DECL_END
 	jne    99f;                                                               \
 	movl   OFFSET_IRREGS_ESP(%esp), %ecx;                                     \
 	movl   OFFSET_IRREGS_EIP(%esp), %edx;                                     \
-	addl   $8, %esp;                                                          \
+	addl   $(8), %esp;                                                        \
 	.cfi_adjust_cfa_offset - 8;                                               \
 	/* Prevent popfl from enabling interrupts to bypass a race condition      \
 	 * that could result in an interrupt attempting to re-direct user-space   \

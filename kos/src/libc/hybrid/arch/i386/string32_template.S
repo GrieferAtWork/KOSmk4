@@ -85,7 +85,7 @@ INTERN_FUNCTION(F(libc_memcpy))
 #endif /* !RETURN_PCPY */
 #if N == 1
 	movl   %ecx, %edx
-	shrl   $2, %ecx
+	shrl   $(2), %ecx
 	rep;   movsl
 	jnc    1f /* if (!(n_bytes & 2)) goto 1f; */
 	movsw
@@ -94,7 +94,7 @@ INTERN_FUNCTION(F(libc_memcpy))
 	movsb
 1:
 #elif N == 2
-	shrl   $1, %ecx
+	shrl   $(1), %ecx
 	rep;   movsl
 	jnc    1f /* if (!(n_words & 1)) goto 1f; */
 	movsw
@@ -427,14 +427,14 @@ INTERN_FUNCTION(F(libc_memset))
 	movzbl 16(%esp), %eax /* byte */
 	movb   %al, %ah
 	movw   %ax, %cx
-	shll   $16, %eax
+	shll   $(16), %eax
 	movw   %cx, %ax
 	movl   20(%esp), %ecx /* n_bytes */
 #if !RETURN_PCPY
 	pushl_cfi %edi
 #endif
 	movl   %ecx, %edx
-	shrl   $2, %ecx
+	shrl   $(2), %ecx
 	rep;   stosl
 	jnc    1f /* if (!(n_bytes & 2)) goto 1f; */
 	stosw
@@ -450,13 +450,13 @@ INTERN_FUNCTION(F(libc_memset))
 #elif N == 2
 	movzwl 16(%esp), %eax /* word */
 	movw   %ax, %cx
-	shll   $16, %eax
+	shll   $(16), %eax
 	movw   %cx, %ax
 	movl   20(%esp), %ecx /* n_words */
 #if !RETURN_PCPY
 	movl   %edi, %edx
 #endif
-	shrl   $1, %ecx
+	shrl   $(1), %ecx
 	rep;   stosl
 	jnc    1f /* if (!(n_words & 1)) goto 1f; */
 	stosw
@@ -570,7 +570,7 @@ INTERN_FUNCTION(F_STRING(len))
 	xorl   %eax, %eax
 	repne; I(scas)
 	subl   %ecx, %eax /* result = 0 - ECX; */
-	subl   $2, %eax   /* result = (0 - ECX) - 2; */
+	subl   $(2), %eax   /* result = (0 - ECX) - 2; */
 	popl_cfi_r %edi
 	RET(4)
 	.cfi_endproc

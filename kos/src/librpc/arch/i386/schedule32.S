@@ -171,7 +171,7 @@ __ASM_L(	.cfi_escape 0x16,0x04,0x04,0x54,0x06,0x23,0x1c)
 	movl   SYSINFO(OFFSET_RPC_SYSCALL_INFO_ARG(3)), %esi
 	movl   SYSINFO(OFFSET_RPC_SYSCALL_INFO_ARG(4)), %edi
 	movl   SYSINFO(OFFSET_RPC_SYSCALL_INFO_ARG(5)), %ebp
-	int    $0x80
+	int    $(0x80)
 #undef SYSINFO
 	popl   %ebp
 	.cfi_restore_state
@@ -194,10 +194,10 @@ __ASM_L(	.cfi_escape 0x16,0x04,0x04,0x54,0x06,0x23,0x1c)
 	popl_cfi_r %edi
 	movl   %ebp, %esp
 	.cfi_def_cfa_register %esp
-	addl   $4, %esp /* EAX */
+	addl   $(4), %esp /* EAX */
 	.cfi_adjust_cfa_offset -4
 	popl_cfi_r %ecx
-	addl   $4, %esp /* EDX */
+	addl   $(4), %esp /* EDX */
 	.cfi_adjust_cfa_offset -4
 	popl_cfi_r %ebp
 	popl_cfi_r %ebx
@@ -290,7 +290,7 @@ INTERN_FUNCTION(librpc_schedule)
 	movl   %ecx, (%eax) /* ARGS[0] = flags = &librpc_schedule_rpc_entry */
 	INTERN(librpc_schedule_ex)
 	call   librpc_schedule_ex
-	addl   $16, %esp
+	addl   $(16), %esp
 	.cfi_adjust_cfa_offset -16
 	popl_cfi_r %ebx
 	ret

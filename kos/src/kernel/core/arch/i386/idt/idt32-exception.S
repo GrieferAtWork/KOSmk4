@@ -191,7 +191,7 @@ __ASM_L(	.cfi_escape 0x23,(OFFSET_TSS_LDTR),0x56,0x22)
 	movw   %cx, %fs
 	movw   %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_SGREGS+OFFSET_SGREGS_GS(%eax), %cx
 	movw   %cx, %gs
-	testl  $3, %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_CS(%eax)
+	testl  $(3), %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_CS(%eax)
 	jz     1f
 2:	pushl  %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_SS(%eax) /* ir_ss */
 	pushl  %ss:OFFSET_DF_CPUSTATE_REGS+OFFSET_UCPUSTATE_GPREGS+OFFSET_GPREGS_ESP(%eax) /* ir_esp */

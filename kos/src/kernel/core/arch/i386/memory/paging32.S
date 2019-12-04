@@ -40,7 +40,7 @@
 /* FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncall)(void); */
 PUBLIC_FUNCTION(pagedir_syncall)
 	.cfi_startproc
-	movl   $2, %eax
+	movl   $(2), %eax
 	invpcid 1f, %eax
 	ret
 1:	.long 0x00000000, 0x00000000
@@ -55,7 +55,7 @@ END(pagedir_syncall)
 /* FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_syncall_maybe_global)(VIRT vm_virt_t virt_addr, size_t num_pages); */
 PUBLIC_FUNCTION(x86_pagedir_syncall_maybe_global)
 	.cfi_startproc
-	shll   $12, %edx
+	shll   $(12), %edx
 	addl   %edx, %ecx
 	jo8    pagedir_syncall /* sync up until, or past the end of the address space. */
 	cmpl   $(KERNEL_BASE), %ecx
@@ -92,7 +92,7 @@ PUBLIC_FUNCTION(x86_pagedir_sync)
 	testl  %ecx, %ecx
 	jz8    2f
 1:	invlpg (%eax)
-	addl   $4096, %eax
+	addl   $(4096), %eax
 	loop   1b
 2:	ret
 	PAD_FOR(x86_pagedir_sync, RELOAD_WITH_CR3_TEXTSIZE)

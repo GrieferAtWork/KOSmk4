@@ -43,7 +43,7 @@ INTERN_FUNCTION(libc_pthread_clone)
 	 * thread. */
 	pushl_cfi  OFFSET_PTHREAD_TID(%ecx) /* pid_t *ctid */
 	pushl_cfi  OFFSET_PTHREAD_TLS(%ecx) /* void *newtls */
-	pushl_cfi  $0                       /* pid_t *ptid */
+	pushl_cfi  $(0)                       /* pid_t *ptid */
 	movl       OFFSET_PTHREAD_STACKADDR(%ecx), %eax
 	addl       OFFSET_PTHREAD_STACKSIZE(%ecx), %eax
 	pushl_cfi  %eax                     /* void *child_stack */
@@ -52,7 +52,7 @@ INTERN_FUNCTION(libc_pthread_clone)
 	             CLONE_PARENT | CLONE_THREAD | CLONE_SYSVSEM | CLONE_SETTLS | \
 	             CLONE_CHILD_CLEARTID | CLONE_DETACHED  | CLONE_CHILD_SETTID | \
 	             CLONE_IO)
-	lcall  $7, $(SYS_clone)
+	lcall  $(7), $(SYS_clone)
 
 	/* Check if we're inside of the child thread
 	 * If so, just to pthread's thread entry point.
@@ -62,7 +62,7 @@ INTERN_FUNCTION(libc_pthread_clone)
 	INTERN(libc_pthread_main)
 	jz     libc_pthread_main
 
-	addl   $20, %esp  /* lcall-arguments */
+	addl   $(20), %esp  /* lcall-arguments */
 	.cfi_adjust_cfa_offset -20
 
 	ret
@@ -80,12 +80,12 @@ INTERN_FUNCTION(libc_pthread_unmap_stack_and_exit)
 	movl   %ecx,          %ebx /* munmap:addr = void *stackaddr */
 	movl   %edx,          %ecx /* munmap:len  = size_t stacksize */
 	movl   $(SYS_munmap), %eax
-	int    $0x80               /* unmap our own stack. */
+	int    $(0x80)             /* unmap our own stack. */
 	/* WARNING: No more accessing stack memory from here on! */
 
 	movl   %esp,        %ebx   /* int exitcode */
 	movl   $(SYS_exit), %eax
-	int    $0x80
+	int    $(0x80)
 	/* -unreachable- */
 END(libc_pthread_unmap_stack_and_exit)
 

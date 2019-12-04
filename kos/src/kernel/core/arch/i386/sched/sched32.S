@@ -289,7 +289,7 @@ PUBLIC_FUNCTION(task_yield)
 
 	/* Check for a scheduling override. */
 	EXTERN(thiscpu_override)
-	cmpl   $0, thiscpu_override(%ebx)
+	cmpl   $(0), thiscpu_override(%ebx)
 	jne    .Lyield_same_target_with_override
 
 	/* CURR: %esi */
@@ -379,7 +379,7 @@ PUBLIC_FUNCTION(task_yield_nx)
 	pushl_cfi_r %es
 	pushl_cfi_r %fs
 	pushl_cfi_r %gs
-	movl   $1, %eax /* Eventually, we want to return true. */
+	movl   $(1), %eax /* Eventually, we want to return true. */
 	pushal_cfi_r
 
 	/* Remember the current scheduler state. */
@@ -396,7 +396,7 @@ PUBLIC_FUNCTION(task_yield_nx)
 	.cfi_adjust_cfa_offset -4
 	movl   %eax, %ecx
 	.cfi_register %eip, %ecx
-	movl   $0, %eax
+	movl   $(0), %eax
 	jmpl   *%ecx
 	.cfi_endproc
 END(task_yield_nx)

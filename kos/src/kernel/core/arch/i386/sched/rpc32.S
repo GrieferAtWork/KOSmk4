@@ -149,7 +149,7 @@ PUBLIC_FUNCTION(x86_rpc_user_redirection)
 	.cfi_reg_offset %ss, 16, %esp
 	.cfi_reg_offset %eax, (20 + OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EAX - (SIZEOF_IRREGS_KERNEL + OFFSET_ICPUSTATE_IRREGS)), %esp
 	.cfi_reg_offset %fs, (20 + OFFSET_ICPUSTATE_FS - (SIZEOF_IRREGS_KERNEL + OFFSET_ICPUSTATE_IRREGS)), %esp
-	subl   $8, %esp /* ir_fs + gp_eax */
+	subl   $(8), %esp /* ir_fs + gp_eax */
 /*	.cfi_reg_offset %esp, 28, %esp */
 /*	.cfi_reg_offset %ss, 24, %esp */
 /*	.cfi_reg_offset %eax, (28 + OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EAX - (SIZEOF_IRREGS_KERNEL + OFFSET_ICPUSTATE_IRREGS)), %esp */
@@ -788,7 +788,7 @@ PUBLIC_FUNCTION(task_serve)
 	pushl_cfi %fs
 	.cfi_restore_iret_fs_or_offset -12
 
-	movl   $1, %eax /* Return $1 later on (unless overwritten by RPC functions themself) */
+	movl   $(1), %eax /* Return $(1) later on (unless overwritten by RPC functions themself) */
 	pushal_cfi_r
 
 1:	movl   %esp, %ecx

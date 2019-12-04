@@ -124,7 +124,7 @@ function i386_printLibcSyscallSysenterCdeclInvocation(
 	fp << "common\n";
 	if (registerCount > 4) {
 		local off = 4 * (registerCount - 4);
-		fp << "	" << "addl   $" << off << ", %esp\n";
+		fp << "	" << "addl   $(" << off << "), %esp\n";
 		fp << "	.cfi_adjust_cfa_offset -" << off << "\n";
 	}
 	for (local x: preservedRegisters.reversed())
@@ -148,7 +148,7 @@ function i386_printLibcSyscallInt80CdeclInvocation(
 	for (local i: [:registerCount])
 		fp << "	" << "movl   " << (sp_offset + i * 4) << "(%esp), " << i386SyscallArgumentRegisters[i] << "\n";
 	fp << (enableExcept ? "	stc\n" : "	clc\n");
-	fp << "	int    $0x80\n";
+	fp << "	int    $(0x80)\n";
 	for (local x: preservedRegisters.reversed())
 		fp << "	" << "popl_cfi_r " << x << "\n";
 }
@@ -234,9 +234,9 @@ function i386_restoreSyscallRegisters(fp: File, restoreRegisters: {string...}) {
 			}
 			if (count == 1 && restoreRegisters) {
 				local reg = restoreRegisters.first;
-				fp << "	popl_cfi " << reg << " /* addl $4, %esp */\n";
+				fp << "	popl_cfi " << reg << " /* addl $(4), %esp */\n";
 			} else {
-				fp << "	addl   $" << (count * 4) << ", %esp\n";
+				fp << "	addl   $(" << (count * 4) << "), %esp\n";
 				fp << "	.cfi_adjust_cfa_offset -" << (count * 4) << "\n";
 			}
 		} else {
@@ -539,7 +539,7 @@ function x86_64_formDoubleWideArgument64Ex(
 	fp << "	movzlq " << losrc32 << ", " << clobber
 		<< (" " * (TEXTALIGN - (#losrc32 + #clobber)))
 		<< " /* ... */\n";
-	fp << "	shlq   $32, " << dst64
+	fp << "	shlq   $(32), " << dst64
 		<< (" " * (TEXTALIGN - (3 + #dst64)))
 		<< "  /* ... */\n";
 	fp << "	orq    " << clobber << ", " << dst64
@@ -597,7 +597,7 @@ function x86_64_printKernelSyscallWrapper_transformArguments(
 		 *       ensured that %rbp doesn't point into kernel-space,
 		 *       as kernelspace on x86_64 only begins after the end
 		 *       of the 32-bit user-code address-space. */
-		/*fp << "	cmpq   $0, %rbp\n";
+		/*fp << "	cmpq   $(0), %rbp\n";
 		fp << "	jl     __asm32_bad_sysenter_extension\n";*/
 	}
 #define R(...) x86_64_assignRegister64(fp, sysenter, __VA_ARGS__)
@@ -976,7 +976,7 @@ function x86_64_printKernelSyscallWrapper_asm32_int80(fp: File, f: Function, sys
 		fp << "	popq_cfi %rcx\n /* %rdx */";
 		/* Split the 64-bit return value into %eax:%edx */
 		fp << "	movq   %rax, %rdx\n";
-		fp << "	shrq   $32, %rdx\n";
+		fp << "	shrq   $(32), %rdx\n";
 	} else {
 		fp << "	popq_cfi_r %rdx\n";
 	}
@@ -1023,7 +1023,7 @@ function x86_64_printKernelSyscallWrapper_asm32_sysenter(fp: File, f: Function, 
 		fp << "	popq_cfi %rcx\n /* %rdx */";
 		/* Split the 64-bit return value into %eax:%edx */
 		fp << "	movq   %rax, %rdx\n";
-		fp << "	shrq   $32, %rdx\n";
+		fp << "	shrq   $(32), %rdx\n";
 	} else {
 		fp << "	popq_cfi_r %rdx\n";
 	}

@@ -56,7 +56,7 @@
 	__ASM_L(	.cfi_register %eip, %eax)                                                                   \
 	__ASM_L(	popl   %ecx)                                                                                \
 	__ASM_L(	.cfi_adjust_cfa_offset -4)                                                                  \
-	__ASM_L(	subl   $5, %ecx)           /* %ecx == OPERAND_OF(jmp 1f) + 4 */                             \
+	__ASM_L(	subl   $(5), %ecx)         /* %ecx == OPERAND_OF(jmp 1f) + 4 */                             \
 	__ASM_L(	movl   %eax, %edx)         /* %edx == RETURN_OF_GETADDR */                                  \
 	__ASM_L(	subl   %ecx, %edx)         /* %edx == DISP(RETURN_OF_GETADDR)@(OPERAND_OF(jmp 1f) + 4) */   \
 	__ASM_L(	lock;  xchgl (%ecx), %edx) /* Override the jmp target of binding (using an atomic write) */ \

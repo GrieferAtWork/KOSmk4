@@ -196,7 +196,7 @@ PUBLIC_FUNCTION(x86_syscall_emulate_int80h_r)
 	 *    routing a real sysenter system call invocation. */
 #ifndef CONFIG_NO_SYSCALL_TRACING
 	EXTERN(syscall_tracing_enabled)
-	cmpb   $0, %ss:syscall_tracing_enabled
+	cmpb   $(0), %ss:syscall_tracing_enabled
 	EXTERN(x86_idt_syscall_traced)
 	jne    x86_idt_syscall_traced /* With tracing enabled... */
 #endif /* !CONFIG_NO_SYSCALL_TRACING */

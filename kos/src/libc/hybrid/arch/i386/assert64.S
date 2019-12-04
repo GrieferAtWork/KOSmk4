@@ -110,30 +110,30 @@ INTERN_FUNCTION(libc___afail)
 	 * %rsi: char const *file
 	 * %rdx: unsigned int line
 	 * %rcx: char const *func */
-	pushq_cfi $0   /* aa_format */
+	pushq_cfi $(0) /* aa_format */
 	pushq_cfi %rcx /* aa_func */
 	pushq_cfi %rdx /* aa_line */
 	pushq_cfi %rsi /* aa_file */
 	pushq_cfi %rdi /* aa_expr */
 	pushq_cfi (6*8)(%rsp) /* aa_state.kcs_rip */
 	pushfq_cfi_r          /* aa_state.kcs_rflags */
-	pushq_cfi_r %rax    /* [C] Accumulator register */
-	pushq_cfi_r %rcx    /* [C] Count register */
-	pushq_cfi_r %rdx    /* [C] Data register */
-	pushq_cfi_r %rbx    /* [P] Base register */
+	pushq_cfi_r %rax      /* [C] Accumulator register */
+	pushq_cfi_r %rcx      /* [C] Count register */
+	pushq_cfi_r %rdx      /* [C] Data register */
+	pushq_cfi_r %rbx      /* [P] Base register */
 	leaq   (12*8)(%rsp), %rax
-	pushq_cfi   %rax    /* [P] Stack pointer */
-	pushq_cfi_r %rbp    /* [P] Frame base pointer */
-	pushq_cfi_r %rsi    /* [C] Source pointer */
-	pushq_cfi_r %rdi    /* [C] Destination pointer */
-	pushq_cfi_r %r8     /* [C] General purpose register #8 */
-	pushq_cfi_r %r9     /* [C] General purpose register #9 */
-	pushq_cfi_r %r10    /* [C] General purpose register #10 */
-	pushq_cfi_r %r11    /* [C] General purpose register #11 */
-	pushq_cfi_r %r12    /* [P] General purpose register #12 */
-	pushq_cfi_r %r13    /* [P] General purpose register #13 */
-	pushq_cfi_r %r14    /* [P] General purpose register #14 */
-	pushq_cfi_r %r15    /* [P] General purpose register #15 */
+	pushq_cfi   %rax      /* [P] Stack pointer */
+	pushq_cfi_r %rbp      /* [P] Frame base pointer */
+	pushq_cfi_r %rsi      /* [C] Source pointer */
+	pushq_cfi_r %rdi      /* [C] Destination pointer */
+	pushq_cfi_r %r8       /* [C] General purpose register #8 */
+	pushq_cfi_r %r9       /* [C] General purpose register #9 */
+	pushq_cfi_r %r10      /* [C] General purpose register #10 */
+	pushq_cfi_r %r11      /* [C] General purpose register #11 */
+	pushq_cfi_r %r12      /* [P] General purpose register #12 */
+	pushq_cfi_r %r13      /* [P] General purpose register #13 */
+	pushq_cfi_r %r14      /* [P] General purpose register #14 */
+	pushq_cfi_r %r15      /* [P] General purpose register #15 */
 	subq   $(SIZEOF_X86_64_VA_LIST_STRUCT), %rsp /* aa_args */
 	movq   %rsp, %rdi
 	INTERN(libc_assertion_failure_core)
@@ -167,28 +167,28 @@ INTERN_FUNCTION(libc___afailf)
 	pushq_cfi %rdi /* aa_expr */
 	pushq_cfi (6*8)(%rsp) /* aa_state.kcs_rip */
 	pushfq_cfi_r          /* aa_state.kcs_rflags */
-	pushq_cfi_r %rax    /* [C] Accumulator register */
-	pushq_cfi_r %rcx    /* [C] Count register */
-	pushq_cfi_r %rdx    /* [C] Data register */
-	pushq_cfi_r %rbx    /* [P] Base register */
+	pushq_cfi_r %rax      /* [C] Accumulator register */
+	pushq_cfi_r %rcx      /* [C] Count register */
+	pushq_cfi_r %rdx      /* [C] Data register */
+	pushq_cfi_r %rbx      /* [P] Base register */
 	leaq   (12*8)(%rsp), %rdx
-	pushq_cfi   %rdx    /* [P] Stack pointer */
-	pushq_cfi_r %rbp    /* [P] Frame base pointer */
-	pushq_cfi_r %rsi    /* [C] Source pointer */
-	pushq_cfi_r %rdi    /* [C] Destination pointer */
-	pushq_cfi_r %r8     /* [C] General purpose register #8 */
-	pushq_cfi_r %r9     /* [C] General purpose register #9 */
-	pushq_cfi_r %r10    /* [C] General purpose register #10 */
-	pushq_cfi_r %r11    /* [C] General purpose register #11 */
-	pushq_cfi_r %r12    /* [P] General purpose register #12 */
-	pushq_cfi_r %r13    /* [P] General purpose register #13 */
-	pushq_cfi_r %r14    /* [P] General purpose register #14 */
-	pushq_cfi_r %r15    /* [P] General purpose register #15 */
+	pushq_cfi   %rdx      /* [P] Stack pointer */
+	pushq_cfi_r %rbp      /* [P] Frame base pointer */
+	pushq_cfi_r %rsi      /* [C] Source pointer */
+	pushq_cfi_r %rdi      /* [C] Destination pointer */
+	pushq_cfi_r %r8       /* [C] General purpose register #8 */
+	pushq_cfi_r %r9       /* [C] General purpose register #9 */
+	pushq_cfi_r %r10      /* [C] General purpose register #10 */
+	pushq_cfi_r %r11      /* [C] General purpose register #11 */
+	pushq_cfi_r %r12      /* [P] General purpose register #12 */
+	pushq_cfi_r %r13      /* [P] General purpose register #13 */
+	pushq_cfi_r %r14      /* [P] General purpose register #14 */
+	pushq_cfi_r %r15      /* [P] General purpose register #15 */
 	leaq   ((6*8) - OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9)(%rsp), %rcx
-	pushq_cfi %rcx      /* vl_reg_save_area (== &aa_state.kcs_gpregs.gp_r9 - OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9) */
-	pushq_cfi %rdx      /* vl_overflow_arg_area (== aa_state.kcs_gpregs.gp_rsp) */
-	pushq  $(5 * 8)     /* vl_gp_offset */
-	movq   %rsp, %rdi   /* libc_assertion_failure_core:args */
+	pushq_cfi %rcx        /* vl_reg_save_area (== &aa_state.kcs_gpregs.gp_r9 - OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9) */
+	pushq_cfi %rdx        /* vl_overflow_arg_area (== aa_state.kcs_gpregs.gp_rsp) */
+	pushq  $(5 * 8)       /* vl_gp_offset */
+	movq   %rsp, %rdi     /* libc_assertion_failure_core:args */
 #ifndef __NO_FPU
 	/* Check if FPU registers need saving */
 	testq  %rax, %rax
@@ -197,7 +197,7 @@ INTERN_FUNCTION(libc___afailf)
 	subq_imm_cfi (1 * 8 + X86_64_VA_LIST_XMM_COUNT * 16), %rsp
 	leaq   -OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9(%rsp), %rcx
 	movq   %rcx, OFFSET_X86_64_VA_LIST_STRUCT_REG_SAVE_AREA(%rdi)
-	movl   $0,   OFFSET_X86_64_VA_LIST_STRUCT_FP_OFFSET(%rdi)
+	movl   $(0),   OFFSET_X86_64_VA_LIST_STRUCT_FP_OFFSET(%rdi)
 	movq   %r9,  0(%rsp)
 	X86_64_VA_LIST_SAVE_XMM(8(%rsp))
 	INTERN(libc_assertion_failure_core)
@@ -222,30 +222,30 @@ INTERN_FUNCTION(libc___acheck)
 	 * %rsi: char const *file
 	 * %rdx: unsigned int line
 	 * %rcx: char const *func */
-	pushq_cfi $0   /* aa_format */
+	pushq_cfi $(0) /* aa_format */
 	pushq_cfi %rcx /* aa_func */
 	pushq_cfi %rdx /* aa_line */
 	pushq_cfi %rsi /* aa_file */
 	pushq_cfi %rdi /* aa_expr */
 	pushq_cfi (6*8)(%rsp) /* aa_state.kcs_rip */
 	pushfq_cfi_r          /* aa_state.kcs_rflags */
-	pushq_cfi_r %rax    /* [C] Accumulator register */
-	pushq_cfi_r %rcx    /* [C] Count register */
-	pushq_cfi_r %rdx    /* [C] Data register */
-	pushq_cfi_r %rbx    /* [P] Base register */
+	pushq_cfi_r %rax      /* [C] Accumulator register */
+	pushq_cfi_r %rcx      /* [C] Count register */
+	pushq_cfi_r %rdx      /* [C] Data register */
+	pushq_cfi_r %rbx      /* [P] Base register */
 	leaq   (12*8)(%rsp), %rax
-	pushq_cfi   %rax    /* [P] Stack pointer */
-	pushq_cfi_r %rbp    /* [P] Frame base pointer */
-	pushq_cfi_r %rsi    /* [C] Source pointer */
-	pushq_cfi_r %rdi    /* [C] Destination pointer */
-	pushq_cfi_r %r8     /* [C] General purpose register #8 */
-	pushq_cfi_r %r9     /* [C] General purpose register #9 */
-	pushq_cfi_r %r10    /* [C] General purpose register #10 */
-	pushq_cfi_r %r11    /* [C] General purpose register #11 */
-	pushq_cfi_r %r12    /* [P] General purpose register #12 */
-	pushq_cfi_r %r13    /* [P] General purpose register #13 */
-	pushq_cfi_r %r14    /* [P] General purpose register #14 */
-	pushq_cfi_r %r15    /* [P] General purpose register #15 */
+	pushq_cfi   %rax      /* [P] Stack pointer */
+	pushq_cfi_r %rbp      /* [P] Frame base pointer */
+	pushq_cfi_r %rsi      /* [C] Source pointer */
+	pushq_cfi_r %rdi      /* [C] Destination pointer */
+	pushq_cfi_r %r8       /* [C] General purpose register #8 */
+	pushq_cfi_r %r9       /* [C] General purpose register #9 */
+	pushq_cfi_r %r10      /* [C] General purpose register #10 */
+	pushq_cfi_r %r11      /* [C] General purpose register #11 */
+	pushq_cfi_r %r12      /* [P] General purpose register #12 */
+	pushq_cfi_r %r13      /* [P] General purpose register #13 */
+	pushq_cfi_r %r14      /* [P] General purpose register #14 */
+	pushq_cfi_r %r15      /* [P] General purpose register #15 */
 	subq   $(SIZEOF_X86_64_VA_LIST_STRUCT), %rsp /* aa_args */
 	movq   %rsp, %rdi
 	INTERN(libc_assertion_check_core)
@@ -340,28 +340,28 @@ INTERN_FUNCTION(libc___acheckf)
 	pushq_cfi %rdi /* aa_expr */
 	pushq_cfi (6*8)(%rsp) /* aa_state.kcs_rip */
 	pushfq_cfi_r          /* aa_state.kcs_rflags */
-	pushq_cfi_r %rax    /* [C] Accumulator register */
-	pushq_cfi_r %rcx    /* [C] Count register */
-	pushq_cfi_r %rdx    /* [C] Data register */
-	pushq_cfi_r %rbx    /* [P] Base register */
+	pushq_cfi_r %rax      /* [C] Accumulator register */
+	pushq_cfi_r %rcx      /* [C] Count register */
+	pushq_cfi_r %rdx      /* [C] Data register */
+	pushq_cfi_r %rbx      /* [P] Base register */
 	leaq   (12*8)(%rsp), %rdx
-	pushq_cfi   %rdx    /* [P] Stack pointer */
-	pushq_cfi_r %rbp    /* [P] Frame base pointer */
-	pushq_cfi_r %rsi    /* [C] Source pointer */
-	pushq_cfi_r %rdi    /* [C] Destination pointer */
-	pushq_cfi_r %r8     /* [C] General purpose register #8 */
-	pushq_cfi_r %r9     /* [C] General purpose register #9 */
-	pushq_cfi_r %r10    /* [C] General purpose register #10 */
-	pushq_cfi_r %r11    /* [C] General purpose register #11 */
-	pushq_cfi_r %r12    /* [P] General purpose register #12 */
-	pushq_cfi_r %r13    /* [P] General purpose register #13 */
-	pushq_cfi_r %r14    /* [P] General purpose register #14 */
-	pushq_cfi_r %r15    /* [P] General purpose register #15 */
+	pushq_cfi   %rdx      /* [P] Stack pointer */
+	pushq_cfi_r %rbp      /* [P] Frame base pointer */
+	pushq_cfi_r %rsi      /* [C] Source pointer */
+	pushq_cfi_r %rdi      /* [C] Destination pointer */
+	pushq_cfi_r %r8       /* [C] General purpose register #8 */
+	pushq_cfi_r %r9       /* [C] General purpose register #9 */
+	pushq_cfi_r %r10      /* [C] General purpose register #10 */
+	pushq_cfi_r %r11      /* [C] General purpose register #11 */
+	pushq_cfi_r %r12      /* [P] General purpose register #12 */
+	pushq_cfi_r %r13      /* [P] General purpose register #13 */
+	pushq_cfi_r %r14      /* [P] General purpose register #14 */
+	pushq_cfi_r %r15      /* [P] General purpose register #15 */
 	leaq   ((6*8) - OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9)(%rsp), %rcx
-	pushq_cfi %rcx      /* vl_reg_save_area (== &aa_state.kcs_gpregs.gp_r9 - OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9) */
-	pushq_cfi %rdx      /* vl_overflow_arg_area (== aa_state.kcs_gpregs.gp_rsp) */
-	pushq  $(5 * 8)     /* vl_gp_offset */
-	movq   %rsp, %rdi   /* libc_assertion_failure_core:args */
+	pushq_cfi %rcx        /* vl_reg_save_area (== &aa_state.kcs_gpregs.gp_r9 - OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9) */
+	pushq_cfi %rdx        /* vl_overflow_arg_area (== aa_state.kcs_gpregs.gp_rsp) */
+	pushq  $(5 * 8)       /* vl_gp_offset */
+	movq   %rsp, %rdi     /* libc_assertion_failure_core:args */
 #ifndef __NO_FPU
 	/* Check if FPU registers need saving */
 	testq  %rax, %rax
@@ -370,7 +370,7 @@ INTERN_FUNCTION(libc___acheckf)
 	subq_imm_cfi (1 * 8 + X86_64_VA_LIST_XMM_COUNT * 16), %rsp
 	leaq   -OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9(%rsp), %rcx
 	movq   %rcx, OFFSET_X86_64_VA_LIST_STRUCT_REG_SAVE_AREA(%rdi)
-	movl   $0,   OFFSET_X86_64_VA_LIST_STRUCT_FP_OFFSET(%rdi)
+	movl   $(0),   OFFSET_X86_64_VA_LIST_STRUCT_FP_OFFSET(%rdi)
 	movq   %r9,  0(%rsp)
 	X86_64_VA_LIST_SAVE_XMM(8(%rsp))
 	INTERN(libc_assertion_failure_core)
@@ -401,30 +401,30 @@ INTERN_FUNCTION(libc___assert_func)
 	 * %rsi: unsigned int line
 	 * %rdx: char const *func
 	 * %rcx: char const *expr */
-	pushq_cfi $0   /* aa_format */
+	pushq_cfi $(0)   /* aa_format */
 	pushq_cfi %rdx /* aa_func */
 	pushq_cfi %rsi /* aa_line */
 	pushq_cfi %rdi /* aa_file */
 	pushq_cfi %rcx /* aa_expr */
 	pushq_cfi (6*8)(%rsp) /* aa_state.kcs_rip */
 	pushfq_cfi_r          /* aa_state.kcs_rflags */
-	pushq_cfi_r %rax    /* [C] Accumulator register */
-	pushq_cfi_r %rcx    /* [C] Count register */
-	pushq_cfi_r %rdx    /* [C] Data register */
-	pushq_cfi_r %rbx    /* [P] Base register */
+	pushq_cfi_r %rax      /* [C] Accumulator register */
+	pushq_cfi_r %rcx      /* [C] Count register */
+	pushq_cfi_r %rdx      /* [C] Data register */
+	pushq_cfi_r %rbx      /* [P] Base register */
 	leaq   (12*8)(%rsp), %rax
-	pushq_cfi   %rax    /* [P] Stack pointer */
-	pushq_cfi_r %rbp    /* [P] Frame base pointer */
-	pushq_cfi_r %rsi    /* [C] Source pointer */
-	pushq_cfi_r %rdi    /* [C] Destination pointer */
-	pushq_cfi_r %r8     /* [C] General purpose register #8 */
-	pushq_cfi_r %r9     /* [C] General purpose register #9 */
-	pushq_cfi_r %r10    /* [C] General purpose register #10 */
-	pushq_cfi_r %r11    /* [C] General purpose register #11 */
-	pushq_cfi_r %r12    /* [P] General purpose register #12 */
-	pushq_cfi_r %r13    /* [P] General purpose register #13 */
-	pushq_cfi_r %r14    /* [P] General purpose register #14 */
-	pushq_cfi_r %r15    /* [P] General purpose register #15 */
+	pushq_cfi   %rax      /* [P] Stack pointer */
+	pushq_cfi_r %rbp      /* [P] Frame base pointer */
+	pushq_cfi_r %rsi      /* [C] Source pointer */
+	pushq_cfi_r %rdi      /* [C] Destination pointer */
+	pushq_cfi_r %r8       /* [C] General purpose register #8 */
+	pushq_cfi_r %r9       /* [C] General purpose register #9 */
+	pushq_cfi_r %r10      /* [C] General purpose register #10 */
+	pushq_cfi_r %r11      /* [C] General purpose register #11 */
+	pushq_cfi_r %r12      /* [P] General purpose register #12 */
+	pushq_cfi_r %r13      /* [P] General purpose register #13 */
+	pushq_cfi_r %r14      /* [P] General purpose register #14 */
+	pushq_cfi_r %r15      /* [P] General purpose register #15 */
 	subq   $(SIZEOF_X86_64_VA_LIST_STRUCT), %rsp /* aa_args */
 	movq   %rsp, %rdi
 	INTERN(libc_assertion_failure_core)
@@ -440,30 +440,30 @@ INTERN_FUNCTION(libc___assert)
 	/* %rdi: char const *file
 	 * %rsi: unsigned int line
 	 * %rdx: char const *expr */
-	pushq_cfi $0   /* aa_format */
-	pushq_cfi $0   /* aa_func */
+	pushq_cfi $(0) /* aa_format */
+	pushq_cfi $(0) /* aa_func */
 	pushq_cfi %rsi /* aa_line */
 	pushq_cfi %rdi /* aa_file */
 	pushq_cfi %rdx /* aa_expr */
 	pushq_cfi (6*8)(%rsp) /* aa_state.kcs_rip */
 	pushfq_cfi_r          /* aa_state.kcs_rflags */
-	pushq_cfi_r %rax    /* [C] Accumulator register */
-	pushq_cfi_r %rcx    /* [C] Count register */
-	pushq_cfi_r %rdx    /* [C] Data register */
-	pushq_cfi_r %rbx    /* [P] Base register */
+	pushq_cfi_r %rax      /* [C] Accumulator register */
+	pushq_cfi_r %rcx      /* [C] Count register */
+	pushq_cfi_r %rdx      /* [C] Data register */
+	pushq_cfi_r %rbx      /* [P] Base register */
 	leaq   (12*8)(%rsp), %rax
-	pushq_cfi   %rax    /* [P] Stack pointer */
-	pushq_cfi_r %rbp    /* [P] Frame base pointer */
-	pushq_cfi_r %rsi    /* [C] Source pointer */
-	pushq_cfi_r %rdi    /* [C] Destination pointer */
-	pushq_cfi_r %r8     /* [C] General purpose register #8 */
-	pushq_cfi_r %r9     /* [C] General purpose register #9 */
-	pushq_cfi_r %r10    /* [C] General purpose register #10 */
-	pushq_cfi_r %r11    /* [C] General purpose register #11 */
-	pushq_cfi_r %r12    /* [P] General purpose register #12 */
-	pushq_cfi_r %r13    /* [P] General purpose register #13 */
-	pushq_cfi_r %r14    /* [P] General purpose register #14 */
-	pushq_cfi_r %r15    /* [P] General purpose register #15 */
+	pushq_cfi   %rax      /* [P] Stack pointer */
+	pushq_cfi_r %rbp      /* [P] Frame base pointer */
+	pushq_cfi_r %rsi      /* [C] Source pointer */
+	pushq_cfi_r %rdi      /* [C] Destination pointer */
+	pushq_cfi_r %r8       /* [C] General purpose register #8 */
+	pushq_cfi_r %r9       /* [C] General purpose register #9 */
+	pushq_cfi_r %r10      /* [C] General purpose register #10 */
+	pushq_cfi_r %r11      /* [C] General purpose register #11 */
+	pushq_cfi_r %r12      /* [P] General purpose register #12 */
+	pushq_cfi_r %r13      /* [P] General purpose register #13 */
+	pushq_cfi_r %r14      /* [P] General purpose register #14 */
+	pushq_cfi_r %r15      /* [P] General purpose register #15 */
 	subq   $(SIZEOF_X86_64_VA_LIST_STRUCT), %rsp /* aa_args */
 	movq   %rsp, %rdi
 	INTERN(libc_assertion_failure_core)
@@ -479,30 +479,30 @@ INTERN_FUNCTION(libc__assert)
 	/* %rdi: char const *expr
 	 * %rsi: char const *file
 	 * %rdx: unsigned int line */
-	pushq_cfi $0   /* aa_format */
-	pushq_cfi $0   /* aa_func */
+	pushq_cfi $(0) /* aa_format */
+	pushq_cfi $(0) /* aa_func */
 	pushq_cfi %rdx /* aa_line */
 	pushq_cfi %rsi /* aa_file */
 	pushq_cfi %rdi /* aa_expr */
 	pushq_cfi (6*8)(%rsp) /* aa_state.kcs_rip */
 	pushfq_cfi_r          /* aa_state.kcs_rflags */
-	pushq_cfi_r %rax    /* [C] Accumulator register */
-	pushq_cfi_r %rcx    /* [C] Count register */
-	pushq_cfi_r %rdx    /* [C] Data register */
-	pushq_cfi_r %rbx    /* [P] Base register */
+	pushq_cfi_r %rax      /* [C] Accumulator register */
+	pushq_cfi_r %rcx      /* [C] Count register */
+	pushq_cfi_r %rdx      /* [C] Data register */
+	pushq_cfi_r %rbx      /* [P] Base register */
 	leaq   (12*8)(%rsp), %rax
-	pushq_cfi   %rax    /* [P] Stack pointer */
-	pushq_cfi_r %rbp    /* [P] Frame base pointer */
-	pushq_cfi_r %rsi    /* [C] Source pointer */
-	pushq_cfi_r %rdi    /* [C] Destination pointer */
-	pushq_cfi_r %r8     /* [C] General purpose register #8 */
-	pushq_cfi_r %r9     /* [C] General purpose register #9 */
-	pushq_cfi_r %r10    /* [C] General purpose register #10 */
-	pushq_cfi_r %r11    /* [C] General purpose register #11 */
-	pushq_cfi_r %r12    /* [P] General purpose register #12 */
-	pushq_cfi_r %r13    /* [P] General purpose register #13 */
-	pushq_cfi_r %r14    /* [P] General purpose register #14 */
-	pushq_cfi_r %r15    /* [P] General purpose register #15 */
+	pushq_cfi   %rax      /* [P] Stack pointer */
+	pushq_cfi_r %rbp      /* [P] Frame base pointer */
+	pushq_cfi_r %rsi      /* [C] Source pointer */
+	pushq_cfi_r %rdi      /* [C] Destination pointer */
+	pushq_cfi_r %r8       /* [C] General purpose register #8 */
+	pushq_cfi_r %r9       /* [C] General purpose register #9 */
+	pushq_cfi_r %r10      /* [C] General purpose register #10 */
+	pushq_cfi_r %r11      /* [C] General purpose register #11 */
+	pushq_cfi_r %r12      /* [P] General purpose register #12 */
+	pushq_cfi_r %r13      /* [P] General purpose register #13 */
+	pushq_cfi_r %r14      /* [P] General purpose register #14 */
+	pushq_cfi_r %r15      /* [P] General purpose register #15 */
 	subq   $(SIZEOF_X86_64_VA_LIST_STRUCT), %rsp /* aa_args */
 	movq   %rsp, %rdi
 	INTERN(libc_assertion_failure_core)

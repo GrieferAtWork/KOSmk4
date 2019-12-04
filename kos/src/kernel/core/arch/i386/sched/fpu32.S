@@ -226,10 +226,10 @@ PUBLIC_FUNCTION(x86_fxrstor)
 	leal   OFFSET_XFPUSTATE_ST(0)(%ecx), %esi
 	leal   OFFSET_SFPUSTATE_ST(0)(%esp), %edi
 .rept 8
-	movsl           /* CCCC------...... */
-	movsl           /* CCCCCCCC--...... */
-	movsw           /* CCCCCCCCCC...... */
-	addl   $6, %esi /* CCCCCCCCCC------ */
+	movsl             /* CCCC------...... */
+	movsl             /* CCCCCCCC--...... */
+	movsw             /* CCCCCCCCCC...... */
+	addl   $(6), %esi /* CCCCCCCCCC------ */
 .endr
 
 	frstor (%esp)

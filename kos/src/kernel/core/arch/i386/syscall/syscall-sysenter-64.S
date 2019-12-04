@@ -153,8 +153,8 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
 	pushq_cfi_r %rdi
-	pushq_cfi   $0   /* ARG[5] */
-	pushq_cfi   $0   /* ARG[4] */
+	pushq_cfi $(0)   /* ARG[5] */
+	pushq_cfi $(0)   /* ARG[4] */
 	pushq_cfi_r %rsi /* ARG[3] */
 	pushq_cfi_r %rdx /* ARG[2] */
 	pushq_cfi_r %rcx /* ARG[1] */
@@ -332,8 +332,8 @@ INTERN_FUNCTION(__x86_asm32_sysenter_break)
 	intr_exit_sysret
 1:
 
-	pushq_cfi $0 /* Make space for ARG5 */
-	pushq_cfi $0 /* Make space for ARG4 */
+	pushq_cfi $(0)    /* Make space for ARG5 */
+	pushq_cfi $(0)    /* Make space for ARG4 */
 	pushq_cfi_r %rsi  /* ARG[3] */
 	pushq_cfi_r %rdx  /* ARG[2] */
 	movq   %rcx, %r9  /* ARG[1] */

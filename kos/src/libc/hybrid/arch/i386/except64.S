@@ -151,7 +151,7 @@ IU(	call   libc_error_info)
 	pushq  OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RDX(%rax)
 	/* Push %rcx and the return address onto the target stack */
 	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RSP(%rax), %rcx
-	subq   $16, %rcx
+	subq   $(16), %rcx
 	/* NOTE: Push EIP first, since that one is stored closer to the bottom
 	 *       of the kcpustate structure, meaning it would get overwritten
 	 *       first! */
@@ -398,14 +398,14 @@ IU(	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RDI(%rsp), %rdi)
 IU(	movzlq OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RSI(%rsp), %rsi)
 IK(	movzlq %esi, %rsi)
 	movq   %rdi, FIELD_ERROR_CODE
-	cmpq   $1, %rsi
+	cmpq   $(1), %rsi
 	jb     .Lclear_unused_exception_pointers /* 0 */
 IU(	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RDX(%rsp), %rdx)
 	movq   %rdx, FIELD_ERROR_POINTERS(0)
 	je     .Lclear_unused_exception_pointers /* 1 */
 IU(	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RCX(%rsp), %rcx)
 	movq   %rcx, FIELD_ERROR_POINTERS(8)
-	cmpq   $3, %rsi
+	cmpq   $(3), %rsi
 	jb     .Lclear_unused_exception_pointers /* 2 */
 IU(	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R8(%rsp), %r8)
 	movq   %r8, FIELD_ERROR_POINTERS(16)
@@ -413,7 +413,7 @@ IU(	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R8(%rsp), %r8)
 IU(	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R9(%rsp), %r9)
 	movq   %r9, FIELD_ERROR_POINTERS(20)
 #if EXCEPTION_DATA_POINTERS >= 5
-	cmpq   $4, %rsi
+	cmpq   $(4), %rsi
 	jbe    .Lclear_unused_exception_pointers /* 4 */
 	/* assume(%rsi >= 5); */
 	/* Copy any remaining arguments. */
@@ -459,7 +459,7 @@ IU(	call   libc_error_info)
 #if EXCEPTION_DATA_POINTERS != 0
 	.Lindex = 0
 	.rept EXCEPTION_DATA_POINTERS
-	movq   $0, FIELD_ERROR_POINTERS(.Lindex)
+	movq   $(0), FIELD_ERROR_POINTERS(.Lindex)
 	.Lindex = .Lindex + 8
 	.endr
 #endif /* EXCEPTION_DATA_POINTERS != 0 */
@@ -501,7 +501,7 @@ IU(	movq   %rcx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R
 .Ldo_fill_trace:
 	.Lindex = 0
 	.rept EXCEPT_BACKTRACE_SIZE-1
-	movq   $0, FIELD_ERROR_TRACE(.Lindex)
+	movq   $(0), FIELD_ERROR_TRACE(.Lindex)
 	.Lindex = .Lindex + 8
 	.endr
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -558,7 +558,7 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_kernel_esp)
 #if EXCEPT_BACKTRACE_SIZE != 0
 	.Lindex = 0
 	.rept EXCEPT_BACKTRACE_SIZE-1
-	movq   $0, %gs:this_exception_trace + .Lindex
+	movq   $(0), %gs:this_exception_trace + .Lindex
 	.Lindex = .Lindex + 8
 	.endr
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */

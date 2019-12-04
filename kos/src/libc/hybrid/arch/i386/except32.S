@@ -112,7 +112,7 @@ IU(	call   libc_error_info)
 	pushl  OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX(%eax)
 	/* Push %ecx and the return address onto the target stack */
 	movl   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%eax), %ecx
-	subl   $8, %ecx
+	subl   $(8), %ecx
 	/* NOTE: Push EIP first, since that one is stored closer to the bottom
 	 *       of the kcpustate structure, meaning it would get overwritten
 	 *       first! */
@@ -380,7 +380,7 @@ IU(	pushl_cfi %eax)
 2:	/* Fill in undefined pointers with NULL */
 	movl   %edi, %eax
 	subl   %edx, %eax
-	shrl   $2,   %eax  /* EAX = (P - this_exception_pointers) / 4 */
+	shrl   $(2), %eax  /* EAX = (P - this_exception_pointers) / 4 */
 	movl   $EXCEPTION_DATA_POINTERS, %ecx
 	subl   %eax, %ecx  /* ECX = EXCEPTION_DATA_POINTERS - EAX; (Number of unset pointers) */
 	xorl   %eax, %eax
@@ -409,7 +409,7 @@ IU(	movl   OFFSET_GPREGS_ECX(%esp), %ecx) /* Reload %ecx, which may have been cl
 #if EXCEPTION_DATA_POINTERS != 0
 	.Lindex = 0
 	.rept EXCEPTION_DATA_POINTERS
-	movl   $0, FIELD_ERROR_POINTERS(.Lindex)
+	movl   $(0), FIELD_ERROR_POINTERS(.Lindex)
 	.Lindex = .Lindex + 4
 	.endr
 #endif /* EXCEPTION_DATA_POINTERS != 0 */
@@ -452,7 +452,7 @@ IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_E
 .Ldo_fill_trace:
 	.Lindex = 0
 	.rept EXCEPT_BACKTRACE_SIZE-1
-	movl   $0, FIELD_ERROR_TRACE(.Lindex)
+	movl   $(0), FIELD_ERROR_TRACE(.Lindex)
 	.Lindex = .Lindex + 4
 	.endr
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -497,7 +497,7 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt)
 	.cfi_def_cfa_register %esp
 PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_esp)
 	/* Check if the interrupt state points into user-space. */
-	testl  $3, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS(%esp)
+	testl  $(3), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS(%esp)
 	jnz    x86_serve_user_rpc_and_propagate_exceptions
 	testl  $EFLAGS_VM, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_EFLAGS(%esp)
 	jnz    x86_serve_user_rpc_and_propagate_exceptions
@@ -528,7 +528,7 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_kernel_esp)
 #if EXCEPT_BACKTRACE_SIZE != 0
 	.Lindex = 0
 	.rept EXCEPT_BACKTRACE_SIZE-1
-	movl   $0, %fs:this_exception_trace + .Lindex
+	movl   $(0), %fs:this_exception_trace + .Lindex
 	.Lindex = .Lindex + 4
 	.endr
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
