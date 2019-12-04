@@ -967,7 +967,8 @@ NOTHROW(FCALL dbg_hexedit)(void *addr, bool is_readonly) {
 	hd_nibbles_per_word = old_nibbles_per_word;
 	hd_hex_le           = old_show_le;
 	hd_change_buffer_init(); /* XXX: During a recursive call, changes made are lost! */
-	dbg_calculate_linesize();
+	if (old_nibbles_per_word != 0)
+		dbg_calculate_linesize();
 
 	/* Restore display contents and terminal settings. */
 	dbg_setscreendata(0, 0, dbg_screen_width, dbg_screen_height, buf);
