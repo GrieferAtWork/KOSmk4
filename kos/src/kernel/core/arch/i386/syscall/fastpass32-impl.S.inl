@@ -109,8 +109,9 @@ INTERN_FUNCTION(FUNC(execveat))
 	.cfi_endproc
 END(FUNC(execveat))
 
+#ifdef SYSCALL_DEFMODE_INT80
 .section SECT(execve)
-INTERN_FUNCTION(FUNC(execve))
+INTERN_FUNCTION(X86_ASMSYSCALL32_INT80(execve))
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality
 	.cfi_lsda 0, LSDA(SYS_execve)
@@ -152,11 +153,14 @@ INTERN_FUNCTION(FUNC(execve))
 	.cfi_restore_iret_ds
 	IRET
 	.cfi_endproc
-END(FUNC(execve))
+END(X86_ASMSYSCALL32_INT80(execve))
+#else /* SYSCALL_DEFMODE_INT80 */
+DEFINE_INTERN_ALIAS(FUNC(execve), X86_ASMSYSCALL32_INT80(execve))
+#endif /* !SYSCALL_DEFMODE_INT80 */
 
-
+#ifdef SYSCALL_DEFMODE_INT80
 .section SECT(debugtrap)
-INTERN_FUNCTION(FUNC(debugtrap))
+INTERN_FUNCTION(X86_ASMSYSCALL32_INT80(debugtrap))
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality
 	.cfi_lsda 0, LSDA(SYS_debugtrap)
@@ -191,11 +195,16 @@ INTERN_FUNCTION(FUNC(debugtrap))
 	.cfi_restore_iret_ds
 	IRET
 	.cfi_endproc
-END(FUNC(debugtrap))
+END(X86_ASMSYSCALL32_INT80(debugtrap))
+#else /* SYSCALL_DEFMODE_INT80 */
+DEFINE_INTERN_ALIAS(FUNC(debugtrap), X86_ASMSYSCALL32_INT80(debugtrap))
+#endif /* !SYSCALL_DEFMODE_INT80 */
 
 
+
+#ifdef SYSCALL_DEFMODE_INT80
 .section SECT(iopl)
-INTERN_FUNCTION(FUNC(iopl))
+INTERN_FUNCTION(X86_ASMSYSCALL32_INT80(iopl))
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality
 	.cfi_lsda 0, LSDA(SYS_iopl)
@@ -230,7 +239,10 @@ INTERN_FUNCTION(FUNC(iopl))
 	.cfi_restore_iret_ds
 	IRET
 	.cfi_endproc
-END(FUNC(iopl))
+END(X86_ASMSYSCALL32_INT80(iopl))
+#else /* SYSCALL_DEFMODE_INT80 */
+DEFINE_INTERN_ALIAS(FUNC(iopl), X86_ASMSYSCALL32_INT80(iopl))
+#endif /* !SYSCALL_DEFMODE_INT80 */
 
 
 /* TODO: sigreturn() */
