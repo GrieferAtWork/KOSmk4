@@ -37,33 +37,11 @@
 #include <asm/cpu-msr.h>
 #include <asm/instr/fsgsbase.h>
 #include <asm/instr/interrupt.h>
+#include <asm/instr/kgsbase.h>
 #include <asm/instr/movzxq.h>
 #include <asm/param.h>
+#include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>
-
-
-/* Push `IA32_KERNEL_GS_BASE' onto the stack
- * This macro clobbers %rax, %rcx and %rdx */
-.macro pushq_cfi_kernel_gs_base
-	subq   $(8), %rsp
-	.cfi_adjust_cfa_offset 8
-	movl   $(IA32_KERNEL_GS_BASE), %ecx
-	rdmsr
-	movl   %eax, 0(%rsp)
-	movl   %edx, 4(%rsp)
-.endm
-
-
-/* Pop `IA32_KERNEL_GS_BASE' from the stack
- * This macro clobbers %rax, %rcx and %rdx */
-.macro popq_cfi_kernel_gs_base
-	movl   $(IA32_KERNEL_GS_BASE), %ecx
-	movl   0(%rsp), %eax
-	movl   4(%rsp), %edx
-	wrmsr
-	addq   $(8), %rsp
-	.cfi_adjust_cfa_offset -8
-.endm
 
 
 .section .text
@@ -115,27 +93,7 @@ INTERN_FUNCTION(x86_idt_preemption)
 	intr_enter INTR
 
 	/* Construct a full `struct scpustate' structure */
-	pushq_cfi_r %rax                 /* [C] Accumulator register */
-	pushq_cfi_r %rcx                 /* [C] Count register */
-	pushq_cfi_r %rdx                 /* [C] Data register */
-	pushq_cfi_r %rbx                 /* [P] Base register */
-	pushq_cfi_r %rbp                 /* [P] Frame base pointer */
-	pushq_cfi_r %rsi                 /* [C] Source pointer */
-	pushq_cfi_r %rdi                 /* [C] Destination pointer */
-	pushq_cfi_r %r8                  /* [C] General purpose register #8 */
-	pushq_cfi_r %r9                  /* [C] General purpose register #9 */
-	pushq_cfi_r %r10                 /* [C] General purpose register #10 */
-	pushq_cfi_r %r11                 /* [C] General purpose register #11 */
-	pushq_cfi_r %r12                 /* [P] General purpose register #12 */
-	pushq_cfi_r %r13                 /* [P] General purpose register #13 */
-	pushq_cfi_r %r14                 /* [P] General purpose register #14 */
-	pushq_cfi_r %r15                 /* [P] General purpose register #15 */
-	pushq_seg_cfi_r %fs.base, %rax
-	pushq_cfi_kernel_gs_base
-	pushq_seg_cfi_r %ds, %rax
-	pushq_seg_cfi_r %es, %rax
-	pushq_cfi_r %fs
-	pushq_cfi_r %gs
+	ASM_PUSH_SCPUSTATE_AFTER_IRET_CFI_R
 
 	/* Acknowledge the interrupt. */
 INTERN_FUNCTION(x86_pic_acknowledge)
@@ -211,28 +169,7 @@ INTERN_FUNCTION(x86_load_thread_rax_cpu_rbx)
 
 .Lload_scpustate_rsp:
 	/* Load the underlying CPU state */
-	popq_cfi_r %gs
-	popq_cfi_r %fs
-	popq_seg_cfi_r %es, %rax
-	popq_seg_cfi_r %ds, %rax
-	popq_cfi_kernel_gs_base
-	popq_seg_cfi_r %fs.base, %rax
-	popq_cfi_r %r15                 /* [P] General purpose register #15 */
-	popq_cfi_r %r14                 /* [P] General purpose register #14 */
-	popq_cfi_r %r13                 /* [P] General purpose register #13 */
-	popq_cfi_r %r12                 /* [P] General purpose register #12 */
-	popq_cfi_r %r11                 /* [C] General purpose register #11 */
-	popq_cfi_r %r10                 /* [C] General purpose register #10 */
-	popq_cfi_r %r9                  /* [C] General purpose register #9 */
-	popq_cfi_r %r8                  /* [C] General purpose register #8 */
-	popq_cfi_r %rdi                 /* [C] Destination pointer */
-	popq_cfi_r %rsi                 /* [C] Source pointer */
-	popq_cfi_r %rbp                 /* [P] Frame base pointer */
-	popq_cfi_r %rbx                 /* [P] Base register */
-	popq_cfi_r %rdx                 /* [C] Data register */
-	popq_cfi_r %rcx                 /* [C] Count register */
-	popq_cfi_r %rax                 /* [C] Accumulator register */
-
+	ASM_POP_SCPUSTATE_BEFORE_IRET_CFI_R
 	intr_exit
 	.cfi_restore_state
 
@@ -288,28 +225,7 @@ PUBLIC_FUNCTION(task_yield)
 
 INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 	/* Construct a full `struct scpustate' structure */
-	pushq_cfi_r %rax                 /* [C] Accumulator register */
-	pushq_cfi_r %rcx                 /* [C] Count register */
-	pushq_cfi_r %rdx                 /* [C] Data register */
-	pushq_cfi_r %rbx                 /* [P] Base register */
-	pushq_cfi_r %rbp                 /* [P] Frame base pointer */
-	pushq_cfi_r %rsi                 /* [C] Source pointer */
-	pushq_cfi_r %rdi                 /* [C] Destination pointer */
-	pushq_cfi_r %r8                  /* [C] General purpose register #8 */
-	pushq_cfi_r %r9                  /* [C] General purpose register #9 */
-	pushq_cfi_r %r10                 /* [C] General purpose register #10 */
-	pushq_cfi_r %r11                 /* [C] General purpose register #11 */
-	pushq_cfi_r %r12                 /* [P] General purpose register #12 */
-	pushq_cfi_r %r13                 /* [P] General purpose register #13 */
-	pushq_cfi_r %r14                 /* [P] General purpose register #14 */
-	pushq_cfi_r %r15                 /* [P] General purpose register #15 */
-	pushq_seg_cfi_r %fs.base, %rax
-	pushq_cfi_kernel_gs_base
-	pushq_seg_cfi_r %ds, %rax
-	pushq_seg_cfi_r %es, %rax
-	pushq_cfi_r %fs
-	pushq_cfi_r %gs
-
+	ASM_PUSH_SCPUSTATE_AFTER_IRET_CFI_R
 
 	/* Remember the current scheduler state. */
 	movq   %gs:0, %rbx
@@ -400,26 +316,9 @@ PUBLIC_FUNCTION(task_yield_nx)
 	/* Construct a full `struct scpustate' structure */
 	pushq_cfi $(1)                   /* [C] Accumulator register */
 	.cfi_rel_offset %rax, 0 /* Eventually, we want to return true. */
-	pushq_cfi_r %rcx                 /* [C] Count register */
-	pushq_cfi_r %rdx                 /* [C] Data register */
-	pushq_cfi_r %rbx                 /* [P] Base register */
-	pushq_cfi_r %rbp                 /* [P] Frame base pointer */
-	pushq_cfi_r %rsi                 /* [C] Source pointer */
-	pushq_cfi_r %rdi                 /* [C] Destination pointer */
-	pushq_cfi_r %r8                  /* [C] General purpose register #8 */
-	pushq_cfi_r %r9                  /* [C] General purpose register #9 */
-	pushq_cfi_r %r10                 /* [C] General purpose register #10 */
-	pushq_cfi_r %r11                 /* [C] General purpose register #11 */
-	pushq_cfi_r %r12                 /* [P] General purpose register #12 */
-	pushq_cfi_r %r13                 /* [P] General purpose register #13 */
-	pushq_cfi_r %r14                 /* [P] General purpose register #14 */
-	pushq_cfi_r %r15                 /* [P] General purpose register #15 */
-	pushq_seg_cfi_r %fs.base, %rax
-	pushq_cfi_kernel_gs_base
-	pushq_seg_cfi_r %ds, %rax
-	pushq_seg_cfi_r %es, %rax
-	pushq_cfi_r %fs
-	pushq_cfi_r %gs
+	ASM_PUSH_GPREGSNSP_NORAX_CFI_R
+	ASM_PUSH_SGBASE_CFI_R
+	ASM_PUSH_SGREGS_CFI_R(%rax)
 
 	/* Remember the current scheduler state. */
 	movq   %gs:0, %rbx
@@ -496,26 +395,9 @@ PUBLIC_FUNCTION(task_tryyield)
 	/* Construct a full `struct scpustate' structure */
 	pushq_cfi $(TASK_TRYYIELD_SUCCESS) /* [C] Accumulator register */
 	.cfi_rel_offset %rax, 0
-	pushq_cfi_r %rcx                 /* [C] Count register */
-	pushq_cfi_r %rdx                 /* [C] Data register */
-	pushq_cfi_r %rbx                 /* [P] Base register */
-	pushq_cfi_r %rbp                 /* [P] Frame base pointer */
-	pushq_cfi_r %rsi                 /* [C] Source pointer */
-	pushq_cfi_r %rdi                 /* [C] Destination pointer */
-	pushq_cfi_r %r8                  /* [C] General purpose register #8 */
-	pushq_cfi_r %r9                  /* [C] General purpose register #9 */
-	pushq_cfi_r %r10                 /* [C] General purpose register #10 */
-	pushq_cfi_r %r11                 /* [C] General purpose register #11 */
-	pushq_cfi_r %r12                 /* [P] General purpose register #12 */
-	pushq_cfi_r %r13                 /* [P] General purpose register #13 */
-	pushq_cfi_r %r14                 /* [P] General purpose register #14 */
-	pushq_cfi_r %r15                 /* [P] General purpose register #15 */
-	pushq_seg_cfi_r %fs.base, %rax
-	pushq_cfi_kernel_gs_base
-	pushq_seg_cfi_r %ds, %rax
-	pushq_seg_cfi_r %es, %rax
-	pushq_cfi_r %fs
-	pushq_cfi_r %gs
+	ASM_PUSH_GPREGSNSP_NORAX_CFI_R
+	ASM_PUSH_SGBASE_CFI_R
+	ASM_PUSH_SGREGS_CFI_R(%rax)
 
 	/* Remember the current scheduler state. */
 	movq   %gs:0, %rbx
@@ -557,27 +439,7 @@ PUBLIC_FUNCTION(cpu_run_current_and_remember)
 	.cfi_rel_offset %rip, 0
 
 	/* Construct a full `struct scpustate' structure */
-	pushq_cfi_r %rax                 /* [C] Accumulator register */
-	pushq_cfi_r %rcx                 /* [C] Count register */
-	pushq_cfi_r %rdx                 /* [C] Data register */
-	pushq_cfi_r %rbx                 /* [P] Base register */
-	pushq_cfi_r %rbp                 /* [P] Frame base pointer */
-	pushq_cfi_r %rsi                 /* [C] Source pointer */
-	pushq_cfi_r %rdi                 /* [C] Destination pointer */
-	pushq_cfi_r %r8                  /* [C] General purpose register #8 */
-	pushq_cfi_r %r9                  /* [C] General purpose register #9 */
-	pushq_cfi_r %r10                 /* [C] General purpose register #10 */
-	pushq_cfi_r %r11                 /* [C] General purpose register #11 */
-	pushq_cfi_r %r12                 /* [P] General purpose register #12 */
-	pushq_cfi_r %r13                 /* [P] General purpose register #13 */
-	pushq_cfi_r %r14                 /* [P] General purpose register #14 */
-	pushq_cfi_r %r15                 /* [P] General purpose register #15 */
-	pushq_seg_cfi_r %fs.base, %rax
-	pushq_cfi_kernel_gs_base
-	pushq_seg_cfi_r %ds, %rax
-	pushq_seg_cfi_r %es, %rax
-	pushq_cfi_r %fs
-	pushq_cfi_r %gs
+	ASM_PUSH_SCPUSTATE_AFTER_IRET_CFI_R
 
 	/* Remember the current scheduler state. */
 	EXTERN(this_sched_state)

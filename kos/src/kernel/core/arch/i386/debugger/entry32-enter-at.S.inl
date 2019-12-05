@@ -417,7 +417,7 @@ L(acquire_lapic_lock):
 
 	/* Check for a VM86 IRET tail. */
 #define IRET(offset)  (IRREGS_OFFSET+(offset))(%ecx)
-	testl  $EFLAGS_VM, IRET(OFFSET_IRREGS_EFLAGS)
+	testl  $(EFLAGS_VM), IRET(OFFSET_IRREGS_EFLAGS)
 	jz     L(no_vm86_iret)
 	/* VM86 IRET */
 	COPYWORD(IRREGS_OFFSET+OFFSET_IRREGS_ES,OFFSET_FCPUSTATE_ES)

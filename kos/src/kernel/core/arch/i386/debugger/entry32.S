@@ -82,14 +82,14 @@ function encodeRegister(reg: string, offset: string) {
 		plus $@(' + offset + r')
 	', deref_after: true);
 }
-encodeRegister("%edi", "OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EDI");
-encodeRegister("%esi", "OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESI");
-encodeRegister("%ebp", "OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EBP");
-encodeRegister("%esp", "OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESP");
-encodeRegister("%ebx", "OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EBX");
-encodeRegister("%edx", "OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EDX");
-encodeRegister("%ecx", "OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ECX");
-encodeRegister("%eax", "OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EAX");
+encodeRegister("%edi", "OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDI");
+encodeRegister("%esi", "OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESI");
+encodeRegister("%ebp", "OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EBP");
+encodeRegister("%esp", "OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESP");
+encodeRegister("%ebx", "OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EBX");
+encodeRegister("%edx", "OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDX");
+encodeRegister("%ecx", "OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ECX");
+encodeRegister("%eax", "OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EAX");
 encodeRegister("%eflags", "OFFSET_FCPUSTATE_EFLAGS");
 encodeRegister("%eip", "OFFSET_FCPUSTATE_EIP");
 encodeRegister("%es", "OFFSET_FCPUSTATE_ES");
@@ -100,21 +100,21 @@ encodeRegister("%fs", "OFFSET_FCPUSTATE_FS");
 encodeRegister("%gs", "OFFSET_FCPUSTATE_GS");
 ]]]*/
 __ASM_L(	.cfi_escape 0x10,0x07,0x07,DW_OP_addr,__x86_dbg_exitstate_temporary_b0,__x86_dbg_exitstate_temporary_b1,__x86_dbg_exitstate_temporary_b2,__x86_dbg_exitstate_temporary_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EDI))
+__ASM_L(	.cfi_escape 0x23,(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDI))
 __ASM_L(	.cfi_escape 0x10,0x06,0x07,DW_OP_addr,__x86_dbg_exitstate_temporary_b0,__x86_dbg_exitstate_temporary_b1,__x86_dbg_exitstate_temporary_b2,__x86_dbg_exitstate_temporary_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESI))
+__ASM_L(	.cfi_escape 0x23,(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESI))
 __ASM_L(	.cfi_escape 0x10,0x05,0x07,DW_OP_addr,__x86_dbg_exitstate_temporary_b0,__x86_dbg_exitstate_temporary_b1,__x86_dbg_exitstate_temporary_b2,__x86_dbg_exitstate_temporary_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EBP))
+__ASM_L(	.cfi_escape 0x23,(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EBP))
 __ASM_L(	.cfi_escape 0x10,0x04,0x07,DW_OP_addr,__x86_dbg_exitstate_temporary_b0,__x86_dbg_exitstate_temporary_b1,__x86_dbg_exitstate_temporary_b2,__x86_dbg_exitstate_temporary_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESP))
+__ASM_L(	.cfi_escape 0x23,(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESP))
 __ASM_L(	.cfi_escape 0x10,0x03,0x07,DW_OP_addr,__x86_dbg_exitstate_temporary_b0,__x86_dbg_exitstate_temporary_b1,__x86_dbg_exitstate_temporary_b2,__x86_dbg_exitstate_temporary_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EBX))
+__ASM_L(	.cfi_escape 0x23,(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EBX))
 __ASM_L(	.cfi_escape 0x10,0x02,0x07,DW_OP_addr,__x86_dbg_exitstate_temporary_b0,__x86_dbg_exitstate_temporary_b1,__x86_dbg_exitstate_temporary_b2,__x86_dbg_exitstate_temporary_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EDX))
+__ASM_L(	.cfi_escape 0x23,(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDX))
 __ASM_L(	.cfi_escape 0x10,0x01,0x07,DW_OP_addr,__x86_dbg_exitstate_temporary_b0,__x86_dbg_exitstate_temporary_b1,__x86_dbg_exitstate_temporary_b2,__x86_dbg_exitstate_temporary_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ECX))
+__ASM_L(	.cfi_escape 0x23,(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ECX))
 __ASM_L(	.cfi_escape 0x10,0x00,0x07,DW_OP_addr,__x86_dbg_exitstate_temporary_b0,__x86_dbg_exitstate_temporary_b1,__x86_dbg_exitstate_temporary_b2,__x86_dbg_exitstate_temporary_b3)
-__ASM_L(	.cfi_escape 0x23,(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EAX))
+__ASM_L(	.cfi_escape 0x23,(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EAX))
 __ASM_L(	.cfi_escape 0x10,0x09,0x07,DW_OP_addr,__x86_dbg_exitstate_temporary_b0,__x86_dbg_exitstate_temporary_b1,__x86_dbg_exitstate_temporary_b2,__x86_dbg_exitstate_temporary_b3)
 __ASM_L(	.cfi_escape 0x23,(OFFSET_FCPUSTATE_EFLAGS))
 __ASM_L(	.cfi_escape 0x10,0x08,0x07,DW_OP_addr,__x86_dbg_exitstate_temporary_b0,__x86_dbg_exitstate_temporary_b1,__x86_dbg_exitstate_temporary_b2,__x86_dbg_exitstate_temporary_b3)
@@ -144,14 +144,14 @@ PUBLIC_FUNCTION(dbg_exit)
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %esi, 0
-	.cfi_rel_offset %edi, OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EDI
-	.cfi_rel_offset %esi, OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESI
-	.cfi_rel_offset %ebp, OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EBP
-	.cfi_rel_offset %esp, OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESP
-	.cfi_rel_offset %ebx, OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EBX
-	.cfi_rel_offset %edx, OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EDX
-	.cfi_rel_offset %ecx, OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ECX
-	.cfi_rel_offset %eax, OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EAX
+	.cfi_rel_offset %edi, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDI
+	.cfi_rel_offset %esi, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESI
+	.cfi_rel_offset %ebp, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EBP
+	.cfi_rel_offset %esp, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESP
+	.cfi_rel_offset %ebx, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EBX
+	.cfi_rel_offset %edx, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDX
+	.cfi_rel_offset %ecx, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ECX
+	.cfi_rel_offset %eax, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EAX
 	.cfi_rel_offset %eflags, OFFSET_FCPUSTATE_EFLAGS
 	.cfi_rel_offset %eip, OFFSET_FCPUSTATE_EIP
 	.cfi_rel_offset %es, OFFSET_FCPUSTATE_ES
@@ -191,9 +191,9 @@ PUBLIC_FUNCTION(dbg_exit)
 #endif /* !CONFIG_NO_SMP */
 
 #ifdef CONFIG_NO_SMP
-#define EXIT_STATE(offset) dbg_exitstate+offset
+#define EXIT_STATE(offset) dbg_exitstate + offset
 #else /* CONFIG_NO_SMP */
-#define EXIT_STATE(offset) ((-SIZEOF_FCPUSTATE)+offset)(%edi)
+#define EXIT_STATE(offset) ((-SIZEOF_FCPUSTATE) + offset)(%edi)
 #endif /* !CONFIG_NO_SMP */
 
 	/* Restore descriptor table registers */
@@ -201,27 +201,27 @@ PUBLIC_FUNCTION(dbg_exit)
 	lgdtl  EXIT_STATE(OFFSET_FCPUSTATE_GDT)
 
 	/* Restore debug registers */
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR7), %eax
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_DRREGS + OFFSET_DRREGS_DR7), %eax
 	movl   %eax, %dr7
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR6), %eax
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_DRREGS + OFFSET_DRREGS_DR6), %eax
 	movl   %eax, %dr6
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR3), %eax
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_DRREGS + OFFSET_DRREGS_DR3), %eax
 	movl   %eax, %dr3
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR2), %eax
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_DRREGS + OFFSET_DRREGS_DR2), %eax
 	movl   %eax, %dr2
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR1), %eax
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_DRREGS + OFFSET_DRREGS_DR1), %eax
 	movl   %eax, %dr1
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR0), %eax
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_DRREGS + OFFSET_DRREGS_DR0), %eax
 	movl   %eax, %dr0
 
 	/* Restore control registers */
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR4), %eax
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_COREGS + OFFSET_COREGS_CR4), %eax
 	movl   %eax, %cr4
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR3), %eax
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_COREGS + OFFSET_COREGS_CR3), %eax
 	movl   %eax, %cr3
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR2), %eax
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_COREGS + OFFSET_COREGS_CR2), %eax
 	movl   %eax, %cr2
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR0), %eax
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_COREGS + OFFSET_COREGS_CR0), %eax
 	movl   %eax, %cr0
 
 	/* Restore the LDT and TR registers */
@@ -229,35 +229,35 @@ PUBLIC_FUNCTION(dbg_exit)
 	movzwl EXIT_STATE(OFFSET_FCPUSTATE_TR), %eax
 	movl   %eax, %edx
 	andl   $~0x7, %edx
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_GDT+OFFSET_DESCTAB_BASE), %ecx
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_GDT + OFFSET_DESCTAB_BASE), %ecx
 	andb   $(0b11111101), 5(%ecx,%edx,1)
 	ltr    %ax
 
 	/* Restore gp. registers */
 #ifdef CONFIG_NO_SMP
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EDI), %edi
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDI), %edi
 #endif /* CONFIG_NO_SMP */
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESI), %esi
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EBP), %ebp
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EBX), %ebx
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EDX), %edx
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ECX), %ecx
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESI), %esi
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EBP), %ebp
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EBX), %ebx
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDX), %edx
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ECX), %ecx
 
 	/* Check if we're about to return to VM86 */
-	testl  $EFLAGS_VM, EXIT_STATE(OFFSET_FCPUSTATE_EFLAGS)
+	testl  $(EFLAGS_VM), EXIT_STATE(OFFSET_FCPUSTATE_EFLAGS)
 	jz     1f
 	pushl  EXIT_STATE(OFFSET_FCPUSTATE_GS)
 	pushl  EXIT_STATE(OFFSET_FCPUSTATE_FS)
 	pushl  EXIT_STATE(OFFSET_FCPUSTATE_DS)
 	pushl  EXIT_STATE(OFFSET_FCPUSTATE_ES)
 	pushl  EXIT_STATE(OFFSET_FCPUSTATE_SS)
-	pushl  EXIT_STATE(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESP)
+	pushl  EXIT_STATE(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESP)
 	pushl  EXIT_STATE(OFFSET_FCPUSTATE_EFLAGS)
 	pushl  EXIT_STATE(OFFSET_FCPUSTATE_CS)
 	pushl  EXIT_STATE(OFFSET_FCPUSTATE_EIP)
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EAX), %eax
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EAX), %eax
 #ifndef CONFIG_NO_SMP
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EDI), %edi
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDI), %edi
 #endif /* !CONFIG_NO_SMP */
 	iret
 1:	/* Restore segment registers. */
@@ -270,27 +270,27 @@ PUBLIC_FUNCTION(dbg_exit)
 	movw   EXIT_STATE(OFFSET_FCPUSTATE_ES), %ax
 	movw   %ax, %es
 
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EAX), %eax
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EAX), %eax
 	/* Check if we're about to return to user-space */
 	testl  $(3), EXIT_STATE(OFFSET_FCPUSTATE_CS)
 	jz     1f
 	pushl  EXIT_STATE(OFFSET_FCPUSTATE_SS)
-	pushl  EXIT_STATE(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESP)
+	pushl  EXIT_STATE(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESP)
 	pushl  EXIT_STATE(OFFSET_FCPUSTATE_EFLAGS)
 	pushl  EXIT_STATE(OFFSET_FCPUSTATE_CS)
 	pushl  EXIT_STATE(OFFSET_FCPUSTATE_EIP)
 #ifndef CONFIG_NO_SMP
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EDI), %edi
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDI), %edi
 #endif /* !CONFIG_NO_SMP */
 	iret
 1:	/* Return to kernel-space (in this scenario, we need to assume a valid destination SP) */
 	movw   EXIT_STATE(OFFSET_FCPUSTATE_SS), %ss
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESP), %esp
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESP), %esp
 	pushl  EXIT_STATE(OFFSET_FCPUSTATE_EFLAGS)
 	pushl  EXIT_STATE(OFFSET_FCPUSTATE_CS)
 	pushl  EXIT_STATE(OFFSET_FCPUSTATE_EIP)
 #ifndef CONFIG_NO_SMP
-	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EDI), %edi
+	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDI), %edi
 #endif /* !CONFIG_NO_SMP */
 	iret
 	.cfi_endproc

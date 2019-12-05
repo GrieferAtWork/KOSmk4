@@ -107,7 +107,7 @@ PRIVATE ATTR_COLDRODATA fsgsbase_patches_t const fsgsbase_patches = {
  * @return: false: The given code location was already patched,
  *                 or isn't one of the above instructions. */
 PUBLIC ATTR_COLDTEXT NOBLOCK bool
-NOTHROW(KCALL fsgsbase_patch)(void *__restrict pc) {
+NOTHROW(KCALL x86_fsgsbase_patch)(void *__restrict pc) {
 	/* F3 REX.W 0F AE /0 RDFSBASE r64 */
 	/* F3 REX.W 0F AE /1 RDGSBASE r64 */
 	/* F3 REX.W 0F AE /2 WRFSBASE r64 */
@@ -179,7 +179,7 @@ NOTHROW(KCALL fsgsbase_patch_kernel)(void) {
 	for (iter = __x64_fixup_fsgsbase_start;
 	     iter < __x64_fixup_fsgsbase_end; ++iter) {
 		uintptr_t pc = KERNEL_CORE_BASE + *iter;
-		bool was_ok = fsgsbase_patch((void *)pc);
+		bool was_ok = x86_fsgsbase_patch((void *)pc);
 		if unlikely(!was_ok)
 			kernel_panic(FREESTR("Failed to patch fsgsbase instruction at %p\n"), pc);
 	}

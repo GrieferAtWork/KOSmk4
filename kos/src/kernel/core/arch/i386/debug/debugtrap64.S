@@ -68,3 +68,23 @@ END(kernel_debugtrap)
 
 
 
+#define CPUSTATE_IS_ICPUSTATE
+#define CPUSTATE icpustate
+#include "debugtrap64-impl.S"
+
+#define CPUSTATE_IS_SCPUSTATE
+#define CPUSTATE scpustate
+#include "debugtrap64-impl.S"
+
+#define CPUSTATE ucpustate
+#include "debugtrap64-impl.S"
+
+#define CPUSTATE kcpustate
+#include "debugtrap64-impl.S"
+
+#define CPUSTATE lcpustate
+#include "debugtrap64-impl.S"
+
+#define CPUSTATE fcpustate
+#include "debugtrap64-impl.S"
+

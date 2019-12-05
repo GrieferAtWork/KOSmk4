@@ -38,7 +38,7 @@ DECL_BEGIN
  * @return: true:  Successfully patched the given code location.
  * @return: false: The given code location was already patched,
  *                 or isn't one of the above instructions. */
-FUNDEF NOBLOCK bool NOTHROW(KCALL fsgsbase_patch)(void *__restrict pc);
+FUNDEF NOBLOCK bool NOTHROW(KCALL x86_fsgsbase_patch)(void *__restrict pc);
 #endif /* __CC__ */
 
 DECL_END

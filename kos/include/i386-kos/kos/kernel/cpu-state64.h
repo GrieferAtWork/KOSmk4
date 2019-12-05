@@ -108,9 +108,11 @@ __SYSDECL_BEGIN
 #define SIZEOF_IRREGS              SIZEOF_IRREGS64
 
 #define ucpustate64                ucpustate
-#define OFFSET_UCPUSTATE_SGBASE    OFFSET_UCPUSTATE64_SGBASE
-#define OFFSET_UCPUSTATE_GPREGS    OFFSET_UCPUSTATE64_GPREGS
 #define OFFSET_UCPUSTATE_SGREGS    OFFSET_UCPUSTATE64_SGREGS
+#define OFFSET_UCPUSTATE_SGBASE    OFFSET_UCPUSTATE64_SGBASE
+#define OFFSET_UCPUSTATE_CS        OFFSET_UCPUSTATE64_CS
+#define OFFSET_UCPUSTATE_SS        OFFSET_UCPUSTATE64_SS
+#define OFFSET_UCPUSTATE_GPREGS    OFFSET_UCPUSTATE64_GPREGS
 #define OFFSET_UCPUSTATE_RFLAGS    OFFSET_UCPUSTATE64_RFLAGS
 #define OFFSET_UCPUSTATE_RIP       OFFSET_UCPUSTATE64_RIP
 #define SIZEOF_UCPUSTATE           SIZEOF_UCPUSTATE64
@@ -138,16 +140,16 @@ __SYSDECL_BEGIN
 #define SIZEOF_ICPUSTATE           SIZEOF_ICPUSTATE64
 
 #define scpustate64                scpustate
-#define OFFSET_SCPUSTATE_SGBASE    OFFSET_SCPUSTATE64_SGBASE
 #define OFFSET_SCPUSTATE_SGREGS    OFFSET_SCPUSTATE64_SGREGS
+#define OFFSET_SCPUSTATE_SGBASE    OFFSET_SCPUSTATE64_SGBASE
 #define OFFSET_SCPUSTATE_GPREGSNSP OFFSET_SCPUSTATE64_GPREGSNSP
 #define OFFSET_SCPUSTATE_IRREGS    OFFSET_SCPUSTATE64_IRREGS
 #define SIZEOF_SCPUSTATE           SIZEOF_SCPUSTATE64
 
 #define desctab64                  desctab
-#define OFFSET_DESCTAB_LIMIT       OFFSET_DESCTAB_LIMIT
-#define OFFSET_DESCTAB_BASE        OFFSET_DESCTAB_BASE
-#define SIZEOF_DESCTAB             SIZEOF_DESCTAB
+#define OFFSET_DESCTAB_LIMIT       OFFSET_DESCTAB64_LIMIT
+#define OFFSET_DESCTAB_BASE        OFFSET_DESCTAB64_BASE
+#define SIZEOF_DESCTAB             SIZEOF_DESCTAB64
 
 #define fcpustate64                fcpustate
 #define OFFSET_FCPUSTATE_GPREGS    OFFSET_FCPUSTATE64_GPREGS
@@ -161,6 +163,7 @@ __SYSDECL_BEGIN
 #define OFFSET_FCPUSTATE_GS        OFFSET_FCPUSTATE64_GS
 #define OFFSET_FCPUSTATE_TR        OFFSET_FCPUSTATE64_TR
 #define OFFSET_FCPUSTATE_LDT       OFFSET_FCPUSTATE64_LDT
+#define OFFSET_FCPUSTATE_SGBASE    OFFSET_FCPUSTATE64_SGBASE
 #define OFFSET_FCPUSTATE_SGREGS    OFFSET_FCPUSTATE64_SGREGS
 #define OFFSET_FCPUSTATE_COREGS    OFFSET_FCPUSTATE64_COREGS
 #define OFFSET_FCPUSTATE_DRREGS    OFFSET_FCPUSTATE64_DRREGS
@@ -286,7 +289,7 @@ struct __ATTR_PACKED sgregs64 {
 #define SIZEOF_SGBASE64         16
 #ifdef __CC__
 struct __ATTR_PACKED sgbase64 /*[PREFIX(sg_)]*/ {
-	__u64   sg_gsbase;  /* G segment register base */
+	__u64   sg_gsbase;  /* G segment register base (for user-space) */
 	__u64   sg_fsbase;  /* F segment register base */
 };
 #endif /* __CC__ */
@@ -502,7 +505,10 @@ struct __ATTR_PACKED scpustate64 { /* i -- Interrupts */
 	 * those used by scheduling, which generate `scpustate' instead),
 	 * in order to describe the interrupted text location. */
 	struct sgregs64    scs_sgregs;        /* Segment registers. */
-	struct sgbase64    scs_sgbase;        /* Segment base registers. (NOTE: These are _always_ the user-space values!) */
+	struct sgbase64    scs_sgbase;        /* Segment base registers.
+	                                       * NOTE: These are _always_ the user-space values!
+	                                       * In other words: `sg_gsbase' mirrors `IA32_KERNEL_GS_BASE';
+	                                       * s.a. <asm/instr/kernel-gs-base.h> */
 	struct gpregsnsp64 scs_gpregs;        /* General purpose registers. */
 	struct irregs64    scs_irregs;        /* Interrupt return registers. */
 };

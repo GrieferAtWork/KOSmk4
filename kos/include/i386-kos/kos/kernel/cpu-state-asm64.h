@@ -24,74 +24,120 @@
 #include "cpu-state64.h"
 
 #ifdef __x86_64__
-#include <asm/cfi.h>
 #include <hybrid/__asm.h>
+
+#include <asm/cfi.h>
+#include <asm/instr/kgsbase.h>
 
 /* Helper macros for restoring registers from cpu-state structures */
 #define ASM_CFI_REL_OFFSET_RESTORE_GPREGSNSP(offset)                 \
-	__ASM_L(.cfi_rel_offset %r15, ((offset) + OFFSET_GPREGSNSP_R15)) \
-	__ASM_L(.cfi_rel_offset %r14, ((offset) + OFFSET_GPREGSNSP_R14)) \
-	__ASM_L(.cfi_rel_offset %r13, ((offset) + OFFSET_GPREGSNSP_R13)) \
-	__ASM_L(.cfi_rel_offset %r12, ((offset) + OFFSET_GPREGSNSP_R12)) \
-	__ASM_L(.cfi_rel_offset %r11, ((offset) + OFFSET_GPREGSNSP_R11)) \
-	__ASM_L(.cfi_rel_offset %r10, ((offset) + OFFSET_GPREGSNSP_R10)) \
-	__ASM_L(.cfi_rel_offset %r9, ((offset) + OFFSET_GPREGSNSP_R9))   \
-	__ASM_L(.cfi_rel_offset %r8, ((offset) + OFFSET_GPREGSNSP_R8))   \
-	__ASM_L(.cfi_rel_offset %rdi, ((offset) + OFFSET_GPREGSNSP_RDI)) \
-	__ASM_L(.cfi_rel_offset %rsi, ((offset) + OFFSET_GPREGSNSP_RSI)) \
-	__ASM_L(.cfi_rel_offset %rbp, ((offset) + OFFSET_GPREGSNSP_RBP)) \
-	__ASM_L(.cfi_rel_offset %rbx, ((offset) + OFFSET_GPREGSNSP_RBX)) \
-	__ASM_L(.cfi_rel_offset %rdx, ((offset) + OFFSET_GPREGSNSP_RDX)) \
+	__ASM_L(.cfi_rel_offset %rax, ((offset) + OFFSET_GPREGSNSP_RAX)) \
 	__ASM_L(.cfi_rel_offset %rcx, ((offset) + OFFSET_GPREGSNSP_RCX)) \
-	__ASM_L(.cfi_rel_offset %rax, ((offset) + OFFSET_GPREGSNSP_RAX))
-
-#define ASM_CFI_REL_OFFSET_RESTORE_SGBASE(offset)                        \
-	__ASM_L(.cfi_rel_offset %gs.base, ((offset) + OFFSET_SGBASE_GSBASE)) \
-	__ASM_L(.cfi_rel_offset %fs.base, ((offset) + OFFSET_SGBASE_FSBASE))
+	__ASM_L(.cfi_rel_offset %rdx, ((offset) + OFFSET_GPREGSNSP_RDX)) \
+	__ASM_L(.cfi_rel_offset %rbx, ((offset) + OFFSET_GPREGSNSP_RBX)) \
+	__ASM_L(.cfi_rel_offset %rbp, ((offset) + OFFSET_GPREGSNSP_RBP)) \
+	__ASM_L(.cfi_rel_offset %rsi, ((offset) + OFFSET_GPREGSNSP_RSI)) \
+	__ASM_L(.cfi_rel_offset %rdi, ((offset) + OFFSET_GPREGSNSP_RDI)) \
+	__ASM_L(.cfi_rel_offset %r8, ((offset) + OFFSET_GPREGSNSP_R8))   \
+	__ASM_L(.cfi_rel_offset %r9, ((offset) + OFFSET_GPREGSNSP_R9))   \
+	__ASM_L(.cfi_rel_offset %r10, ((offset) + OFFSET_GPREGSNSP_R10)) \
+	__ASM_L(.cfi_rel_offset %r11, ((offset) + OFFSET_GPREGSNSP_R11)) \
+	__ASM_L(.cfi_rel_offset %r12, ((offset) + OFFSET_GPREGSNSP_R12)) \
+	__ASM_L(.cfi_rel_offset %r13, ((offset) + OFFSET_GPREGSNSP_R13)) \
+	__ASM_L(.cfi_rel_offset %r14, ((offset) + OFFSET_GPREGSNSP_R14)) \
+	__ASM_L(.cfi_rel_offset %r15, ((offset) + OFFSET_GPREGSNSP_R15))
 
 #define ASM_CFI_REL_OFFSET_RESTORE_SGREGS(offset)               \
-	__ASM_L(.cfi_rel_offset %gs, ((offset) + OFFSET_SGREGS_GS)) \
-	__ASM_L(.cfi_rel_offset %fs, ((offset) + OFFSET_SGREGS_FS)) \
+	__ASM_L(.cfi_rel_offset %ds, ((offset) + OFFSET_SGREGS_DS)) \
 	__ASM_L(.cfi_rel_offset %es, ((offset) + OFFSET_SGREGS_ES)) \
-	__ASM_L(.cfi_rel_offset %ds, ((offset) + OFFSET_SGREGS_DS))
+	__ASM_L(.cfi_rel_offset %fs, ((offset) + OFFSET_SGREGS_FS)) \
+	__ASM_L(.cfi_rel_offset %gs, ((offset) + OFFSET_SGREGS_GS))
+
+#ifdef __KERNEL__
+#define ASM_CFI_REL_OFFSET_RESTORE_SGBASE(offset) \
+	__ASM_L(.cfi_rel_offset %fs.base, ((offset) + OFFSET_SGBASE_FSBASE))
+#else /* __KERNEL__ */
+#define ASM_CFI_REL_OFFSET_RESTORE_SGBASE(offset)                        \
+	__ASM_L(.cfi_rel_offset %fs.base, ((offset) + OFFSET_SGBASE_FSBASE)) \
+	__ASM_L(.cfi_rel_offset %gs.base, ((offset) + OFFSET_SGBASE_GSBASE))
+#endif /* !__KERNEL__ */
 
 #define ASM_CFI_REL_OFFSET_RESTORE_GPREGS(offset)                 \
-	__ASM_L(.cfi_rel_offset %r15, ((offset) + OFFSET_GPREGS_R15)) \
-	__ASM_L(.cfi_rel_offset %r14, ((offset) + OFFSET_GPREGS_R14)) \
-	__ASM_L(.cfi_rel_offset %r13, ((offset) + OFFSET_GPREGS_R13)) \
-	__ASM_L(.cfi_rel_offset %r12, ((offset) + OFFSET_GPREGS_R12)) \
-	__ASM_L(.cfi_rel_offset %r11, ((offset) + OFFSET_GPREGS_R11)) \
-	__ASM_L(.cfi_rel_offset %r10, ((offset) + OFFSET_GPREGS_R10)) \
-	__ASM_L(.cfi_rel_offset %r9, ((offset) + OFFSET_GPREGS_R9))   \
-	__ASM_L(.cfi_rel_offset %r8, ((offset) + OFFSET_GPREGS_R8))   \
-	__ASM_L(.cfi_rel_offset %rdi, ((offset) + OFFSET_GPREGS_RDI)) \
-	__ASM_L(.cfi_rel_offset %rsi, ((offset) + OFFSET_GPREGS_RSI)) \
-	__ASM_L(.cfi_rel_offset %rbp, ((offset) + OFFSET_GPREGS_RBP)) \
-	__ASM_L(.cfi_rel_offset %rsp, ((offset) + OFFSET_GPREGS_RSP)) \
-	__ASM_L(.cfi_rel_offset %rbx, ((offset) + OFFSET_GPREGS_RBX)) \
-	__ASM_L(.cfi_rel_offset %rdx, ((offset) + OFFSET_GPREGS_RDX)) \
+	__ASM_L(.cfi_rel_offset %rax, ((offset) + OFFSET_GPREGS_RAX)) \
 	__ASM_L(.cfi_rel_offset %rcx, ((offset) + OFFSET_GPREGS_RCX)) \
-	__ASM_L(.cfi_rel_offset %rax, ((offset) + OFFSET_GPREGS_RAX))
+	__ASM_L(.cfi_rel_offset %rdx, ((offset) + OFFSET_GPREGS_RDX)) \
+	__ASM_L(.cfi_rel_offset %rbx, ((offset) + OFFSET_GPREGS_RBX)) \
+	__ASM_L(.cfi_rel_offset %rsp, ((offset) + OFFSET_GPREGS_RSP)) \
+	__ASM_L(.cfi_rel_offset %rbp, ((offset) + OFFSET_GPREGS_RBP)) \
+	__ASM_L(.cfi_rel_offset %rsi, ((offset) + OFFSET_GPREGS_RSI)) \
+	__ASM_L(.cfi_rel_offset %rdi, ((offset) + OFFSET_GPREGS_RDI)) \
+	__ASM_L(.cfi_rel_offset %r8, ((offset) + OFFSET_GPREGS_R8))   \
+	__ASM_L(.cfi_rel_offset %r9, ((offset) + OFFSET_GPREGS_R9))   \
+	__ASM_L(.cfi_rel_offset %r10, ((offset) + OFFSET_GPREGS_R10)) \
+	__ASM_L(.cfi_rel_offset %r11, ((offset) + OFFSET_GPREGS_R11)) \
+	__ASM_L(.cfi_rel_offset %r12, ((offset) + OFFSET_GPREGS_R12)) \
+	__ASM_L(.cfi_rel_offset %r13, ((offset) + OFFSET_GPREGS_R13)) \
+	__ASM_L(.cfi_rel_offset %r14, ((offset) + OFFSET_GPREGS_R14)) \
+	__ASM_L(.cfi_rel_offset %r15, ((offset) + OFFSET_GPREGS_R15))
 
 #define ASM_CFI_REL_OFFSET_RESTORE_IRREGS(offset)                       \
-	__ASM_L(.cfi_rel_offset %rip, ((offset) + OFFSET_IRREGS_RIP))       \
-	__ASM_L(.cfi_rel_offset %cs, ((offset) + OFFSET_IRREGS_CS))         \
-	__ASM_L(.cfi_rel_offset %rflags, ((offset) + OFFSET_IRREGS_RFLAGS)) \
+	__ASM_L(.cfi_rel_offset %ss, ((offset) + OFFSET_IRREGS_SS))         \
 	__ASM_L(.cfi_rel_offset %rsp, ((offset) + OFFSET_IRREGS_RSP))       \
-	__ASM_L(.cfi_rel_offset %ss, ((offset) + OFFSET_IRREGS_SS))
-
+	__ASM_L(.cfi_rel_offset %rflags, ((offset) + OFFSET_IRREGS_RFLAGS)) \
+	__ASM_L(.cfi_rel_offset %cs, ((offset) + OFFSET_IRREGS_CS))         \
+	__ASM_L(.cfi_rel_offset %rip, ((offset) + OFFSET_IRREGS_RIP))
 
 #define ASM_CFI_REL_OFFSET_RESTORE_KCPUSTATE(offset)                       \
-	ASM_CFI_REL_OFFSET_RESTORE_GPREGS((offset) + OFFSET_KCPUSTATE_GPREGS); \
+	__ASM_L(.cfi_rel_offset %rip, ((offset) + OFFSET_KCPUSTATE_RIP))       \
 	__ASM_L(.cfi_rel_offset %rflags, ((offset) + OFFSET_KCPUSTATE_RFLAGS)) \
-	__ASM_L(.cfi_rel_offset %rip, ((offset) + OFFSET_KCPUSTATE_RIP))
+	ASM_CFI_REL_OFFSET_RESTORE_GPREGS((offset) + OFFSET_KCPUSTATE_GPREGS)
+
+#define ASM_CFI_REL_OFFSET_RESTORE_SCPUSTATE(offset)                            \
+	ASM_CFI_REL_OFFSET_RESTORE_IRREGS((offset) + OFFSET_SCPUSTATE_IRREGS)       \
+	ASM_CFI_REL_OFFSET_RESTORE_GPREGSNSP((offset) + OFFSET_SCPUSTATE_GPREGSNSP) \
+	ASM_CFI_REL_OFFSET_RESTORE_SGBASE((offset) + OFFSET_SCPUSTATE_SGBASE)       \
+	ASM_CFI_REL_OFFSET_RESTORE_SGREGS((offset) + OFFSET_SCPUSTATE_SGREGS)
+
+#define ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(offset)                      \
+	ASM_CFI_REL_OFFSET_RESTORE_IRREGS((offset) + OFFSET_ICPUSTATE_IRREGS) \
+	ASM_CFI_REL_OFFSET_RESTORE_GPREGSNSP((offset) + OFFSET_ICPUSTATE_GPREGSNSP)
+
+#define ASM_CFI_REL_OFFSET_RESTORE_UCPUSTATE(offset)                      \
+	__ASM_L(.cfi_rel_offset %rip, (offset) + OFFSET_UCPUSTATE_RIP)        \
+	ASM_CFI_REL_OFFSET_RESTORE_GPREGS((offset) + OFFSET_UCPUSTATE_GPREGS) \
+	__ASM_L(.cfi_rel_offset %rflags, (offset) + OFFSET_UCPUSTATE_RFLAGS)  \
+	__ASM_L(.cfi_rel_offset %ss, (offset) + OFFSET_UCPUSTATE_SS)          \
+	__ASM_L(.cfi_rel_offset %cs, (offset) + OFFSET_UCPUSTATE_CS)          \
+	ASM_CFI_REL_OFFSET_RESTORE_SGREGS((offset) + OFFSET_UCPUSTATE_SGREGS) \
+	ASM_CFI_REL_OFFSET_RESTORE_SGBASE((offset) + OFFSET_UCPUSTATE_SGBASE)
+
+#define ASM_CFI_REL_OFFSET_RESTORE_LCPUSTATE(offset)               \
+	__ASM_L(.cfi_rel_offset %r15, (offset) + OFFSET_LCPUSTATE_R15) \
+	__ASM_L(.cfi_rel_offset %r14, (offset) + OFFSET_LCPUSTATE_R14) \
+	__ASM_L(.cfi_rel_offset %r13, (offset) + OFFSET_LCPUSTATE_R13) \
+	__ASM_L(.cfi_rel_offset %r12, (offset) + OFFSET_LCPUSTATE_R12) \
+	__ASM_L(.cfi_rel_offset %rbp, (offset) + OFFSET_LCPUSTATE_RBP) \
+	__ASM_L(.cfi_rel_offset %rsp, (offset) + OFFSET_LCPUSTATE_RSP) \
+	__ASM_L(.cfi_rel_offset %rbx, (offset) + OFFSET_LCPUSTATE_RBX) \
+	__ASM_L(.cfi_rel_offset %rip, (offset) + OFFSET_LCPUSTATE_RIP)
+
+#define ASM_CFI_REL_OFFSET_RESTORE_FCPUSTATE(offset)                      \
+	ASM_CFI_REL_OFFSET_RESTORE_GPREGS((offset) + OFFSET_FCPUSTATE_GPREGS) \
+	__ASM_L(.cfi_rel_offset %rflags, (offset) + OFFSET_FCPUSTATE_RFLAGS)  \
+	__ASM_L(.cfi_rel_offset %rip, (offset) + OFFSET_FCPUSTATE_RIP)        \
+	__ASM_L(.cfi_rel_offset %es, (offset) + OFFSET_FCPUSTATE_ES)          \
+	__ASM_L(.cfi_rel_offset %cs, (offset) + OFFSET_FCPUSTATE_CS)          \
+	__ASM_L(.cfi_rel_offset %ss, (offset) + OFFSET_FCPUSTATE_SS)          \
+	__ASM_L(.cfi_rel_offset %ds, (offset) + OFFSET_FCPUSTATE_DS)          \
+	__ASM_L(.cfi_rel_offset %fs, (offset) + OFFSET_FCPUSTATE_FS)          \
+	__ASM_L(.cfi_rel_offset %gs, (offset) + OFFSET_FCPUSTATE_GS)          \
+	__ASM_L(.cfi_rel_offset %tr, (offset) + OFFSET_FCPUSTATE_TR)          \
+	__ASM_L(.cfi_rel_offset %ldtr, (offset) + OFFSET_FCPUSTATE_LDT)       \
+	ASM_CFI_REL_OFFSET_RESTORE_SGBASE((offset) + OFFSET_FCPUSTATE_SGBASE)
 
 
-/* Push all current general-purpose registers to form a a `struct gpregsnsp64'
- * that will be stored at `0(%rsp)' upon return. Additionally, generate cfi
- * instrumentation to allow all pushed registered to be restored during unwinding. */
-#define ASM_PUSH_GPREGSNSP_CFI_R                                     \
-	__ASM_L(pushq_cfi_r %rax) /* [C] Accumulator register */         \
+/* Same as `ASM_PUSH_GPREGSNSP_CFI_R', but don't push %rax */
+#define ASM_PUSH_GPREGSNSP_NORAX_CFI_R                               \
 	__ASM_L(pushq_cfi_r %rcx) /* [C] Count register */               \
 	__ASM_L(pushq_cfi_r %rdx) /* [C] Data register */                \
 	__ASM_L(pushq_cfi_r %rbx) /* [P] Base register */                \
@@ -107,12 +153,8 @@
 	__ASM_L(pushq_cfi_r %r14) /* [P] General purpose register #14 */ \
 	__ASM_L(pushq_cfi_r %r15) /* [P] General purpose register #15 */
 
-/* Restore general purpose registers from a `struct gpregsnsp64' stored
- * at `0(%rsp)', as well as increment `%rsp += SIZEOF_GPREGSNSP64'
- * Additionally, generate CFI instrumentation to indicate that registers
- * loaded with stack-values have re-gained their original values and should
- * not be modified during unwinding (s.a. `.cfi_restore') */
-#define ASM_POP_GPREGSNSP_CFI_R                                     \
+/* Same as `ASM_POP_GPREGSNSP_CFI_R', but don't pop %rax */
+#define ASM_POP_GPREGSNSP_NORAX_CFI_R                               \
 	__ASM_L(popq_cfi_r %r15) /* [P] General purpose register #15 */ \
 	__ASM_L(popq_cfi_r %r14) /* [P] General purpose register #14 */ \
 	__ASM_L(popq_cfi_r %r13) /* [P] General purpose register #13 */ \
@@ -126,9 +168,93 @@
 	__ASM_L(popq_cfi_r %rbp) /* [P] Frame base pointer */           \
 	__ASM_L(popq_cfi_r %rbx) /* [P] Base register */                \
 	__ASM_L(popq_cfi_r %rdx) /* [C] Data register */                \
-	__ASM_L(popq_cfi_r %rcx) /* [C] Count register */               \
-	__ASM_L(popq_cfi_r %rax) /* [C] Accumulator register */         \
+	__ASM_L(popq_cfi_r %rcx) /* [C] Count register */
 
+/* Push all current general-purpose registers to form a a `struct gpregsnsp64'
+ * that will be stored at `0(%rsp)' upon return. Additionally, generate cfi
+ * instrumentation to allow all pushed registered to be restored during unwinding. */
+#define ASM_PUSH_GPREGSNSP_CFI_R                             \
+	__ASM_L(pushq_cfi_r %rax) /* [C] Accumulator register */ \
+	ASM_PUSH_GPREGSNSP_NORAX_CFI_R
+
+/* Restore general purpose registers from a `struct gpregsnsp64' stored
+ * at `0(%rsp)', as well as increment `%rsp += SIZEOF_GPREGSNSP64'
+ * Additionally, generate CFI instrumentation to indicate that registers
+ * loaded with stack-values have re-gained their original values and should
+ * not be modified during unwinding (s.a. `.cfi_restore') */
+#define ASM_POP_GPREGSNSP_CFI_R   \
+	ASM_POP_GPREGSNSP_NORAX_CFI_R \
+	__ASM_L(popq_cfi_r %rax) /* [C] Accumulator register */
+
+/* @param: clobber_gpreg: 64-bit gp-register which may be clobbered. */
+#define ASM_PUSH_SGREGS_CFI_R(clobber_gpreg)    \
+	__ASM_L(pushq_cfi_seg_r %ds, clobber_gpreg) \
+	__ASM_L(pushq_cfi_seg_r %es, clobber_gpreg) \
+	__ASM_L(pushq_cfi_r %fs)                    \
+	__ASM_L(pushq_cfi_r %gs)
+
+/* @param: clobber_gpreg: 64-bit gp-register which may be clobbered. */
+#define ASM_POP_SGREGS_CFI_R(clobber_gpreg)    \
+	__ASM_L(popq_cfi_r %gs)                    \
+	__ASM_L(popq_cfi_r %fs)                    \
+	__ASM_L(popq_cfi_seg_r %es, clobber_gpreg) \
+	__ASM_L(popq_cfi_seg_r %ds, clobber_gpreg)
+
+#ifdef __KERNEL__
+/* CLOBBER: %rax, %rcx, %rdx and %rflags */
+#define ASM_PUSH_SGBASE_CFI_R               \
+	__ASM_L(pushq_cfi_seg_r %fs.base, %rax) \
+	__ASM_L(pushq_cfi_kgsbase)
+/* CLOBBER: %rax, %rcx, %rdx and %rflags */
+#define ASM_POP_SGBASE_CFI_R  \
+	__ASM_L(popq_cfi_kgsbase) \
+	__ASM_L(popq_cfi_seg_r %fs.base, %rax)
+#else /* __KERNEL__ */
+/* CLOBBER: %rax */
+#define ASM_PUSH_SGBASE_CFI_R               \
+	__ASM_L(pushq_cfi_seg_r %fs.base, %rax) \
+	__ASM_L(pushq_cfi_seg_r %gs.base, %rax)
+/* CLOBBER: %rax */
+#define ASM_POP_SGBASE_CFI_R               \
+	__ASM_L(popq_cfi_seg_r %gs.base, %rax) \
+	__ASM_L(popq_cfi_seg_r %fs.base, %rax)
+#endif /* !__KERNEL__ */
+
+/* Push everything necessary to create an `icpustate'
+ * from an `irregs' structure onto the stack. */
+#define ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R  \
+	ASM_PUSH_GPREGSNSP_CFI_R
+
+/* Do the reverse of `ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R' */
+#define ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R  \
+	ASM_POP_GPREGSNSP_CFI_R
+
+/* Push everything necessary to create an `scpustate'
+ * from an `irregs' structure onto the stack.
+ * CLOBBER: %rax, %rcx, %rdx and %rflags */
+#define ASM_PUSH_SCPUSTATE_AFTER_IRET_CFI_R \
+	ASM_PUSH_GPREGSNSP_CFI_R                \
+	ASM_PUSH_SGBASE_CFI_R                   \
+	ASM_PUSH_SGREGS_CFI_R(%rax)
+
+/* Do the reverse of `ASM_PUSH_SCPUSTATE_AFTER_IRET_CFI_R' */
+#define ASM_POP_SCPUSTATE_BEFORE_IRET_CFI_R \
+	ASM_POP_SGREGS_CFI_R(%rax)             \
+	ASM_POP_SGBASE_CFI_R                   \
+	ASM_POP_GPREGSNSP_CFI_R
+
+/* Push everything necessary to create an `scpustate'
+ * from an `icpustate' structure onto the stack.
+ * CLOBBER: %rax, %rcx, %rdx and %rflags */
+#define ASM_PUSH_SCPUSTATE_AFTER_ICPUSTATE_CFI_R \
+	ASM_PUSH_SGBASE_CFI_R                        \
+	ASM_PUSH_SGREGS_CFI_R(%rax)
+
+/* Do the reverse of `ASM_PUSH_SCPUSTATE_AFTER_ICPUSTATE_CFI_R'
+ * @param: clobber_gpreg: 64-bit gp-register which may be clobbered. */
+#define ASM_POP_SCPUSTATE_BEFORE_ICPUSTATE_CFI_R(clobber_gpreg) \
+	ASM_POP_SGREGS_CFI_R(clobber_gpreg)                        \
+	ASM_POP_SGBASE_CFI_R
 
 
 

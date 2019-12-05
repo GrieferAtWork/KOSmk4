@@ -23,6 +23,13 @@
 
 #ifdef __KERNEL__
 #include <kernel/fsgsbase.h>
-#endif /* __KERNEL__ */
+#else /* __KERNEL__ */
+#ifdef __ASSEMBLER__
+#define rdfsbaseq  rdfsbase
+#define rdgsbaseq  rdgsbase
+#define wrfsbaseq  wrfsbase
+#define wrgsbaseq  wrgsbase
+#endif /* __ASSEMBLER__ */
+#endif /* !__KERNEL__ */
 
 #endif /* !_I386_KOS_ASM_INSTR_FSGSBASE_H */

@@ -159,10 +159,10 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	.cfi_restore_state
 .Lipi_switch_tasks:
 	/* Complete the full scpustate structure. */
-	pushq_seg_cfi_r %fs.base, %rax
+	pushq_cfi_seg_r %fs.base, %rax
 	pushq_cfi_kernel_gs_base
-	pushq_seg_cfi_r %ds, %rax
-	pushq_seg_cfi_r %es, %rax
+	pushq_cfi_seg_r %ds, %rax
+	pushq_cfi_seg_r %es, %rax
 	pushq_cfi_r %fs
 	pushq_cfi_r %gs
 
@@ -655,11 +655,11 @@ INTERN_FUNCTION(x86_smp_entry32)
 	/* (Partially) load the underlying CPU state */
 	popq_cfi_r %gs
 	popq_cfi_r %fs
-	popq_seg_cfi_r %es, %rax
-	popq_seg_cfi_r %ds, %rax
+	popq_cfi_seg_r %es, %rax
+	popq_cfi_seg_r %ds, %rax
 	wrgsbaseq R_TASK
 	popq_cfi_kernel_gs_base
-	popq_seg_cfi_r %fs.base, %rax
+	popq_cfi_seg_r %fs.base, %rax
 
 	/* Service pending IPIs for the first time.
 	 * -> Since we got here thanks to an INIT IPI, regular IPI callbacks
@@ -706,10 +706,10 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	.cfi_def_cfa %rsp, 0
 
 	ASM_PUSH_GPREGSNSP_CFI_R         /* gpregs */
-	pushq_seg_cfi_r %fs.base, %rax
+	pushq_cfi_seg_r %fs.base, %rax
 	pushq_cfi_kernel_gs_base
-	pushq_seg_cfi_r %ds, %rax
-	pushq_seg_cfi_r %es, %rax
+	pushq_cfi_seg_r %ds, %rax
+	pushq_cfi_seg_r %es, %rax
 	pushq_cfi_r %fs
 	pushq_cfi_r %gs
 

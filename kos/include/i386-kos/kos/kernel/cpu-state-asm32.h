@@ -35,6 +35,9 @@
 	__ASM_L(.cfi_rel_offset %ecx, ((offset) + OFFSET_GPREGS_ECX)) \
 	__ASM_L(.cfi_rel_offset %eax, ((offset) + OFFSET_GPREGS_EAX))
 
+#define ASM_CFI_REL_OFFSET_RESTORE_GPREGS(offset) \
+	ASM_CFI_REL_OFFSET_RESTORE_GPREGSNSP(offset)  \
+	__ASM_L(.cfi_rel_offset %esp, ((offset) + OFFSET_GPREGS_ESP))
 
 #endif /* __i386__ && !__x86_64__ */
 

@@ -17,22 +17,26 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #include "../../api.h"
+/**/
+
 #include <hybrid/compiler.h>
-#include <libcpustate/apply.h>
-#include <kos/kernel/cpu-state.h>
+
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
+#include <kos/kernel/cpu-state.h>
+
+#include <libcpustate/apply.h>
 
 
 #ifdef __KERNEL__
 #define TEXT_SECTION     .section .xdata
 #define BEGIN_TRAP(name) PUBLIC_FUNCTION(name); .byte 0xe9; .long 0x00000000
 #define END_TRAP(name)   END(name)
-#else
+#else /* __KERNEL__ */
 #define TEXT_SECTION     .section .text
 #define BEGIN_TRAP(name) /* nothing */
 #define END_TRAP(name)   /* nothing */
-#endif
+#endif /* !__KERNEL__ */
 
 
 #ifdef __KERNEL__
@@ -146,7 +150,7 @@ TEXT_SECTION
 	.cfi_rel_offset %eip, OFFSET_UCPUSTATE_EIP
 BEGIN_TRAP(kernel_debugtrap_ucpustate)
 INTERN_FUNCTION(libcpu_apply_ucpustate)
-	testl  $EFLAGS_VM, OFFSET_UCPUSTATE_EFLAGS(%ecx)
+	testl  $(EFLAGS_VM), OFFSET_UCPUSTATE_EFLAGS(%ecx)
 	jz     1f
 	pushl  (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_GS)(%ecx)
 	pushl  (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_FS)(%ecx)
@@ -164,9 +168,9 @@ INTERN_FUNCTION(libcpu_apply_ucpustate)
 	testl  $(3), %ss:OFFSET_UCPUSTATE_CS(%ecx)
 #ifdef __KERNEL__
 	jz     1f
-#else
+#else /* __KERNEL__ */
 	jnz    1f
-#endif
+#endif /* !__KERNEL__ */
 	pushl  %ss:OFFSET_UCPUSTATE_SS(%ecx)
 	pushl  %ss:(OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESP)(%ecx)
 	jmp    2f
@@ -263,14 +267,14 @@ TEXT_SECTION
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %ecx, 0
-	.cfi_rel_offset %edi, OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EDI
-	.cfi_rel_offset %esi, OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESI
-	.cfi_rel_offset %ebp, OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EBP
-	.cfi_rel_offset %esp, OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESP
-	.cfi_rel_offset %ebx, OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EBX
-	.cfi_rel_offset %edx, OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EDX
-	.cfi_rel_offset %ecx, OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ECX
-	.cfi_rel_offset %eax, OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EAX
+	.cfi_rel_offset %edi, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDI
+	.cfi_rel_offset %esi, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESI
+	.cfi_rel_offset %ebp, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EBP
+	.cfi_rel_offset %esp, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESP
+	.cfi_rel_offset %ebx, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EBX
+	.cfi_rel_offset %edx, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDX
+	.cfi_rel_offset %ecx, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ECX
+	.cfi_rel_offset %eax, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EAX
 	.cfi_rel_offset %gs, OFFSET_FCPUSTATE_GS
 	.cfi_rel_offset %fs, OFFSET_FCPUSTATE_FS
 	.cfi_rel_offset %es, OFFSET_FCPUSTATE_ES
@@ -285,28 +289,28 @@ INTERN_FUNCTION(libcpu_apply_fcpustate)
 	ltrw   %ax
 	movw   OFFSET_FCPUSTATE_LDT(%ecx), %ax
 	lldtw  %ax
-	movl   (OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR0)(%ecx), %eax
+	movl   (OFFSET_FCPUSTATE_COREGS + OFFSET_COREGS_CR0)(%ecx), %eax
 	movl   %eax, %cr0
-	movl   (OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR2)(%ecx), %eax
+	movl   (OFFSET_FCPUSTATE_COREGS + OFFSET_COREGS_CR2)(%ecx), %eax
 	movl   %eax, %cr2
-	movl   (OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR3)(%ecx), %eax
+	movl   (OFFSET_FCPUSTATE_COREGS + OFFSET_COREGS_CR3)(%ecx), %eax
 	movl   %eax, %cr3
-	movl   (OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR4)(%ecx), %eax
+	movl   (OFFSET_FCPUSTATE_COREGS + OFFSET_COREGS_CR4)(%ecx), %eax
 	movl   %eax, %cr4
-	movl   (OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR0)(%ecx), %eax
+	movl   (OFFSET_FCPUSTATE_DRREGS + OFFSET_DRREGS_DR0)(%ecx), %eax
 	movl   %eax, %dr0
-	movl   (OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR1)(%ecx), %eax
+	movl   (OFFSET_FCPUSTATE_DRREGS + OFFSET_DRREGS_DR1)(%ecx), %eax
 	movl   %eax, %dr1
-	movl   (OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR2)(%ecx), %eax
+	movl   (OFFSET_FCPUSTATE_DRREGS + OFFSET_DRREGS_DR2)(%ecx), %eax
 	movl   %eax, %dr2
-	movl   (OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR3)(%ecx), %eax
+	movl   (OFFSET_FCPUSTATE_DRREGS + OFFSET_DRREGS_DR3)(%ecx), %eax
 	movl   %eax, %dr3
-	movl   (OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR6)(%ecx), %eax
+	movl   (OFFSET_FCPUSTATE_DRREGS + OFFSET_DRREGS_DR6)(%ecx), %eax
 	movl   %eax, %dr6
-	movl   (OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR7)(%ecx), %eax
+	movl   (OFFSET_FCPUSTATE_DRREGS + OFFSET_DRREGS_DR7)(%ecx), %eax
 	movl   %eax, %dr7
-	lgdtl  (OFFSET_FCPUSTATE_GDT+2)(%ecx)
-	lidtl  (OFFSET_FCPUSTATE_IDT+2)(%ecx)
+	lgdtl  OFFSET_FCPUSTATE_GDT(%ecx)
+	lidtl  OFFSET_FCPUSTATE_IDT(%ecx)
 	movl   (OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDI)(%ecx), %edi
 	.cfi_same_value %edi
 	movl   (OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESI)(%ecx), %esi
@@ -318,7 +322,7 @@ INTERN_FUNCTION(libcpu_apply_fcpustate)
 	movl   (OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDX)(%ecx), %edx
 	.cfi_same_value %edx
 
-	testl  $EFLAGS_VM, OFFSET_FCPUSTATE_EFLAGS(%ecx)
+	testl  $(EFLAGS_VM), OFFSET_FCPUSTATE_EFLAGS(%ecx)
 	jz     1f
 	/* Return to vm86 */
 	.cfi_remember_state
@@ -361,9 +365,9 @@ INTERN_FUNCTION(libcpu_apply_fcpustate)
 	testl  $(3), %ss:OFFSET_FCPUSTATE_CS(%ecx)
 #ifdef __KERNEL__
 	jz     1f
-#else
+#else /* __KERNEL__ */
 	jnz    1f
-#endif
+#endif /* !__KERNEL__ */
 	/* Return to user-space */
 	.cfi_remember_state
 	pushl  %ss:OFFSET_FCPUSTATE_SS(%ecx)

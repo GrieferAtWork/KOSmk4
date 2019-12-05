@@ -499,7 +499,7 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_esp)
 	/* Check if the interrupt state points into user-space. */
 	testl  $(3), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS(%esp)
 	jnz    x86_serve_user_rpc_and_propagate_exceptions
-	testl  $EFLAGS_VM, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_EFLAGS(%esp)
+	testl  $(EFLAGS_VM), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_EFLAGS(%esp)
 	jnz    x86_serve_user_rpc_and_propagate_exceptions
 	.cfi_endproc
 

@@ -47,12 +47,12 @@ PUBLIC_FUNCTION(kernel_panic_here)
 	pushq_cfi_r %r13
 	pushq_cfi_r %r14
 	pushq_cfi_r %r15
-	pushq_seg_cfi_r %ss, %rax
-	pushq_seg_cfi_r %cs, %rax
-	pushq_seg_cfi_r %fs.base, %rax
-	pushq_seg_cfi_r %gs.base, %rax
-	pushq_seg_cfi_r %ds, %rax
-	pushq_seg_cfi_r %es, %rax
+	pushq_cfi_seg_r %ss, %rax
+	pushq_cfi_seg_r %cs, %rax
+	pushq_cfi_seg_r %fs.base, %rax
+	pushq_cfi_seg_r %gs.base, %rax
+	pushq_cfi_seg_r %ds, %rax
+	pushq_cfi_seg_r %es, %rax
 	pushq_cfi_r %fs
 	pushq_cfi_r %gs
 
@@ -88,12 +88,12 @@ PUBLIC_FUNCTION(kernel_vpanic)
 	pushq_cfi_r %r13
 	pushq_cfi_r %r14
 	pushq_cfi_r %r15
-	pushq_seg_cfi_r %ss, %rax
-	pushq_seg_cfi_r %cs, %rax
-	pushq_seg_cfi_r %fs.base, %rax
-	pushq_seg_cfi_r %gs.base, %rax
-	pushq_seg_cfi_r %ds, %rax
-	pushq_seg_cfi_r %es, %rax
+	pushq_cfi_seg_r %ss, %rax
+	pushq_cfi_seg_r %cs, %rax
+	pushq_cfi_seg_r %fs.base, %rax
+	pushq_cfi_seg_r %gs.base, %rax
+	pushq_cfi_seg_r %ds, %rax
+	pushq_cfi_seg_r %es, %rax
 	pushq_cfi_r %fs
 	pushq_cfi_r %gs
 
@@ -129,12 +129,12 @@ PUBLIC_FUNCTION(kernel_panic)
 	pushq_cfi_r %r13
 	pushq_cfi_r %r14
 	pushq_cfi_r %r15
-	pushq_seg_cfi_r %ss, %rax
-	pushq_seg_cfi_r %cs, %rax
-	pushq_seg_cfi_r %fs.base, %rax
-	pushq_seg_cfi_r %gs.base, %rax
-	pushq_seg_cfi_r %ds, %rax
-	pushq_seg_cfi_r %es, %rax
+	pushq_cfi_seg_r %ss, %rax
+	pushq_cfi_seg_r %cs, %rax
+	pushq_cfi_seg_r %fs.base, %rax
+	pushq_cfi_seg_r %gs.base, %rax
+	pushq_cfi_seg_r %ds, %rax
+	pushq_cfi_seg_r %es, %rax
 	pushq_cfi_r %fs
 	pushq_cfi_r %gs
 
