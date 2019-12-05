@@ -54,13 +54,15 @@
  *     X86_ASMSYSCALL32_SYSENTER:
  *         i386:    - %esp has been loaded
  *                  - A user-space IRET tail was pushed and created
- *         x86_64:  TODO: Not yet decided
+ *         x86_64:  - %esp has been loaded
+ *                  - A user-space IRET tail was pushed and created
+ *                  - Compatibility-mode
  *     X86_ASMSYSCALL64:
- *         x86_64:  TODO: Not yet decided
+ *         x86_64:  Unchanged (all registers are the same)
  * HINT: The low-level interrupt/entry handlers
  *       for system calls are implemented in:
- *        - /src/kernel/core/arch/i386/syscall/syscall32.S
- *        - /src/kernel/core/arch/i386/syscall/syscall64.S
+ *        - /src/kernel/core/arch/i386/syscall/wrappers32.S
+ *        - /src/kernel/core/arch/i386/syscall/wrappers64.S
  */
 #define X86_ASMSYSCALL32_INT80(name)    __x86_asm32_int80_##name    /* Section: .text.x86.asm32_syscall_int80.<name> */
 #define X86_ASMSYSCALL32_SYSENTER(name) __x86_asm32_sysenter_##name /* Section: .text.x86.asm32_syscall_sysenter.<name> */
