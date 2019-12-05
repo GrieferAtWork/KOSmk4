@@ -20,8 +20,8 @@
 #define _BITS_SIGSTACK_H 1
 
 #include <__stdinc.h>
-#include <hybrid/typecore.h>
 
+#include <hybrid/typecore.h>
 
 __SYSDECL_BEGIN
 
@@ -96,7 +96,7 @@ enum {
 #endif /* !MINSIGSTKSZ */
 
 #ifndef SIGSTKSZ
-#define SIGSTKSZ    8192 /* System default stack size. */
+#define SIGSTKSZ 8192 /* System default stack size. */
 #endif /* !SIGSTKSZ */
 
 

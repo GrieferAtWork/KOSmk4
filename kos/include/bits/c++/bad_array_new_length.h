@@ -19,6 +19,7 @@
 #ifndef _BITS_CXX_BAD_ARRAY_NEW_LENGTH_H
 #define _BITS_CXX_BAD_ARRAY_NEW_LENGTH_H 1
 
+#include <__crt.h>
 #include <__stdcxx.h>
 
 #include "bad_alloc.h"

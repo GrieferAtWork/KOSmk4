@@ -31,7 +31,7 @@
 	        ".reloc ., R_X86_64_RELATIVE, " #function_name "\n\t" \
 	        ".quad 0\n\t"                                         \
 	        ".popsection");                                       \
-	__PRIVATE __ATTR_USED int __ATTR_SYSVABI function_name(void)
+	__PRIVATE __ATTR_USED int (__ATTR_SYSVABI function_name)(void)
 #else /* __x86_64__ */
 #define __DL_REGISTER_CACHE(function_name)                     \
 	__asm__(".pushsection .dl_caches, \"\"\n\t"                \
@@ -39,7 +39,7 @@
 	        ".reloc ., R_386_RELATIVE, " #function_name "\n\t" \
 	        ".long 0\n\t"                                      \
 	        ".popsection");                                    \
-	__PRIVATE __ATTR_USED int __ATTR_CDECL function_name(void)
+	__PRIVATE __ATTR_USED int (__ATTR_CDECL function_name)(void)
 #endif /* !__x86_64__ */
 #else /* __CC__ */
 #ifdef __x86_64__

@@ -21,7 +21,7 @@
 
 #ifndef ARG_MAX
 #define __undef_ARG_MAX
-#endif
+#endif /* !ARG_MAX */
 
 #include <linux/limits.h>
 #include <linux/param.h>
@@ -29,7 +29,7 @@
 #ifdef __undef_ARG_MAX
 #undef ARG_MAX
 #undef __undef_ARG_MAX
-#endif
+#endif /* __undef_ARG_MAX */
 
 #ifndef MAXSYMLINKS
 #define MAXSYMLINKS 20

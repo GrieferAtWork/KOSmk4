@@ -124,6 +124,7 @@ function autoFormatEnumsInFile(filename: string) {
 					while (iter < input_len && input.isspace(iter))
 						++iter;
 					local enumValueStart = iter;
+continue_parsing_enum_value:
 					local parenRecursion = 0;
 					while (iter < input_len) {
 						local ch = input[iter];
@@ -138,6 +139,26 @@ function autoFormatEnumsInFile(filename: string) {
 					enumValue = input[enumValueStart:iter];
 					while (iter < input_len && input.isspace(iter))
 						++iter;
+					if (iter < input_len && input[iter] in "+-*/&|^%?:~!") {
+						++iter;
+						while (iter < input_len && input.isspace(iter))
+							++iter;
+						goto continue_parsing_enum_value;
+					}
+					if (enumValue.isanyspace() &&
+					    (!enumValue.startswith("(") ||
+					     !enumValue.endswith(")") ||
+					     enumValue.findmatch("(", ")", 1) < 0))
+						enumValue = "({})".format({ enumValue });
+					/* Check if `knownEnums' is the name of another enum that is already known. */
+					if (enumValue.issymbol()) {
+						for (local otherName, otherValue, none, none: knownEnums) {
+							if (enumValue == otherName) {
+								enumValue = otherValue;
+								break;
+							}
+						}
+					}
 				}
 				if (enumValue is none) {
 					if (previousEnumValue is none)
@@ -148,21 +169,20 @@ function autoFormatEnumsInFile(filename: string) {
 						if (newEnumValue is none) {
 							while (
 								previousEnumValue.startswith("(") &&
-								previousEnumValue.endswith("(") &&
+								previousEnumValue.endswith(")") &&
 								previousEnumValue.findmatch("(", ")", 1) == #previousEnumValue - 1)
 								previousEnumValue = previousEnumValue[1:-1].strip();
 							local temp = previousEnumValue.rfind("+");
 							if (temp >= 0) {
-								local addendStr = previousEnumValue[temp:].lstrip();
-								local addend = try
-									int(previousEnumValue[temp:].lstrip())
-								catch (...) none;
+								local addendStr = previousEnumValue[temp+1:].lstrip();
+								local addend = try int(addendStr) catch (...) none;
 								if (addend !is none) {
 									addend = addend + 1;
 									addend = ("0x" in addendStr || "0X" in addendStr)
-										? addend.hex() : str(addend);
+										? addend.hex()
+										: str(addend);
 									enumValue = "({} + {})".format({
-										previousEnumValue[:temp], addend });
+										previousEnumValue[:temp].rstrip(), addend });
 								}
 							}
 							if (enumValue is none)

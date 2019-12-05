@@ -44,9 +44,9 @@
 __SYSDECL_BEGIN
 
 /* Routing table calls. */
-#define SIOCADDRT      0x890B /* add routing table entry. */
-#define SIOCDELRT      0x890C /* delete routing table entry. */
-#define SIOCRTMSG      0x890D /* call to routing system. */
+#define SIOCADDRT      0x890b /* add routing table entry. */
+#define SIOCDELRT      0x890c /* delete routing table entry. */
+#define SIOCRTMSG      0x890d /* call to routing system. */
 
 /* Socket configuration controls. */
 #define SIOCGIFNAME    0x8910 /* get iface name. */
@@ -113,9 +113,9 @@ __SYSDECL_BEGIN
 
 /* Device private ioctl calls. */
 
-#define SIOCDEVPRIVATE 0x89F0 /* to 89FF */
+#define SIOCDEVPRIVATE 0x89f0 /* to 89FF */
 /* These 16 ioctl calls are protocol private */
-#define SIOCPROTOPRIVATE 0x89E0 /* to 89EF */
+#define SIOCPROTOPRIVATE 0x89e0 /* to 89EF */
 
  __SYSDECL_END
 

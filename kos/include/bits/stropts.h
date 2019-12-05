@@ -88,7 +88,7 @@
 #define FLUSHRW   0x03 /* Flush read and write queues. */
 #ifdef __USE_GNU
 #define FLUSHBAND 0x04 /* Flush only specified band. */
-#endif
+#endif /* __USE_GNU */
 
 /* Possible arguments for `I_SETSIG'. */
 #define S_INPUT   0x0001 /* A message, other than a high-priority message, has arrived. */
@@ -115,13 +115,13 @@
 #define RPROTNORM 0x0010 /* Fail `read' with EBADMSG if a message containing a control part is at the front of the STREAM head read queue. */
 #ifdef __USE_GNU
 #define RPROTMASK 0x001C /* The RPROT bits */
-#endif
+#endif /* __USE_GNU */
 
 /* Possible mode for `I_SWROPT'. */
 #define SNDZERO 0x001 /* Send a zero-length message downstream when a `write' of 0 bytes occurs. */
 #ifdef __USE_GNU
 #define SNDPIPE 0x002 /* Send SIGPIPE on write and putmsg if sd_werror is set. */
-#endif
+#endif /* __USE_GNU */
 
 /* Arguments for `I_ATMARK'. */
 #define ANYMARK  0x01 /* Check if the message is marked. */
@@ -130,7 +130,7 @@
 /* Argument for `I_UNLINK'. */
 #ifdef __USE_GNU
 #define MUXID_ALL (-1) /* Unlink all STREAMs linked to the STREAM associated with `fildes'. */
-#endif
+#endif /* __USE_GNU */
 
 
 /* Macros for `getmsg', `getpmsg', `putmsg' and `putpmsg'. */

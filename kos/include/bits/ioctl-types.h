@@ -82,6 +82,46 @@ struct termio {
 /* ioctl (fd, TIOCSERGETLSR, &result) where result may be as below */
 
 /* line disciplines */
+/*[[[enum]]]*/
+#ifdef __CC__
+enum {
+	N_TTY,
+	N_SLIP,
+	N_MOUSE,
+	N_PPP,
+	N_STRIP,
+	N_AX25,
+	N_X25, /* X.25 async  */
+	N_6PACK,
+	N_MASC,         /* Mobitex module  */
+	N_R3964,        /* Simatic R3964 module  */
+	N_PROFIBUS_FDL, /* Profibus  */
+	N_IRDA,         /* Linux IR  */
+	N_SMSBLOCK,     /* SMS block mode  */
+	N_HDLC,         /* synchronous HDLC  */
+	N_SYNC_PPP,     /* synchronous PPP  */
+	N_HCI,          /* Bluetooth HCI UART  */
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define N_TTY          N_TTY
+#define N_SLIP         N_SLIP
+#define N_MOUSE        N_MOUSE
+#define N_PPP          N_PPP
+#define N_STRIP        N_STRIP
+#define N_AX25         N_AX25
+#define N_X25          N_X25          /* X.25 async  */
+#define N_6PACK        N_6PACK
+#define N_MASC         N_MASC         /* Mobitex module  */
+#define N_R3964        N_R3964        /* Simatic R3964 module  */
+#define N_PROFIBUS_FDL N_PROFIBUS_FDL /* Profibus  */
+#define N_IRDA         N_IRDA         /* Linux IR  */
+#define N_SMSBLOCK     N_SMSBLOCK     /* SMS block mode  */
+#define N_HDLC         N_HDLC         /* synchronous HDLC  */
+#define N_SYNC_PPP     N_SYNC_PPP     /* synchronous PPP  */
+#define N_HCI          N_HCI          /* Bluetooth HCI UART  */
+#else /* __COMPILER_PREFERR_ENUMS */
 #define N_TTY          0
 #define N_SLIP         1
 #define N_MOUSE        2
@@ -98,6 +138,8 @@ struct termio {
 #define N_HDLC         13 /* synchronous HDLC  */
 #define N_SYNC_PPP     14 /* synchronous PPP  */
 #define N_HCI          15 /* Bluetooth HCI UART  */
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 __SYSDECL_END
 

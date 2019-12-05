@@ -19,35 +19,35 @@
 
 #ifndef __CHAR_TYPE
 #define __CHAR_TYPE       char
-#endif
+#endif /* !__CHAR_TYPE */
 #ifndef __CHAR_SIZE
 #define __CHAR_SIZE       __SIZEOF_CHAR__
-#endif
+#endif /* !__CHAR_SIZE */
 #ifndef __FORMAT_PGETC
 #define __FORMAT_PGETC    pgetc
-#endif
+#endif /* !__FORMAT_PGETC */
 #ifndef __FORMAT_PUNGETC
 #define __FORMAT_PUNGETC  pungetc
-#endif
+#endif /* !__FORMAT_PUNGETC */
 #ifndef __FORMAT_ARG
 #define __FORMAT_ARG      arg
-#endif
+#endif /* !__FORMAT_ARG */
 #ifndef __FORMAT_FORMAT
 #define __FORMAT_FORMAT   format
-#endif
+#endif /* !__FORMAT_FORMAT */
 #ifndef __FORMAT_ARGS
 #define __FORMAT_ARGS     args
-#endif
+#endif /* !__FORMAT_ARGS */
 
 #include <hybrid/typecore.h>
 
 #ifndef __EOF
 #ifdef EOF
 #define __EOF  EOF
-#else
+#else /* EOF */
 #define __EOF (-1)
-#endif
-#endif
+#endif /* !EOF */
+#endif /* !__EOF */
 
 #include <hybrid/typecore.h>
 
@@ -208,22 +208,22 @@ __next_mod_curr:
 			case 1:
 				*(__UINT8_TYPE__ *)__dest = (__UINT8_TYPE__)__read_count;
 				break;
-#endif
+#endif /* __SIZEOF_INT__ != 1 */
 #if __SIZEOF_INT__ != 2
 			case 2:
 				*(__UINT16_TYPE__ *)__dest = (__UINT16_TYPE__)__read_count;
 				break;
-#endif
+#endif /* __SIZEOF_INT__ != 2 */
 #if __SIZEOF_INT__ != 4
 			case 4:
 				*(__UINT32_TYPE__ *)__dest = (__UINT32_TYPE__)__read_count;
 				break;
-#endif
+#endif /* __SIZEOF_INT__ != 4 */
 #if defined(__UINT64_TYPE__) && __SIZEOF_INT__ != 8
 			case 8:
 				*(__UINT64_TYPE__ *)__dest = (__UINT64_TYPE__)__read_count;
 				break;
-#endif
+#endif /* __UINT64_TYPE__ && __SIZEOF_INT__ != 8 */
 			default:
 				*(unsigned int *)__dest = (unsigned int)__read_count;
 				break;
@@ -235,9 +235,9 @@ __next_mod_curr:
 			unsigned int __radix;
 #ifdef __UINT64_TYPE__
 			__UINT64_TYPE__ __val;
-#else
+#else /* __UINT64_TYPE__ */
 			__UINT32_TYPE__ __val;
-#endif
+#endif /* !__UINT64_TYPE__ */
 		case 'p':
 			__radix = 16;
 			goto __do_scanf_integer_unsigned;
@@ -377,7 +377,7 @@ __store_integer_val:
 						*(__UINT8_TYPE__ *)__dest = (__UINT8_TYPE__)__val;
 					}
 					break;
-#endif
+#endif /* __SIZEOF_INT__ != 1 */
 #if __SIZEOF_INT__ != 2
 				case 2:
 					if (__flags & __SCANF_FLAG_SIGNED)
@@ -386,7 +386,7 @@ __store_integer_val:
 						*(__UINT16_TYPE__ *)__dest = (__UINT16_TYPE__)__val;
 					}
 					break;
-#endif
+#endif /* __SIZEOF_INT__ != 2 */
 #if __SIZEOF_INT__ != 4
 				case 4:
 					if (__flags & __SCANF_FLAG_SIGNED)
@@ -395,7 +395,7 @@ __store_integer_val:
 						*(__UINT32_TYPE__ *)__dest = (__UINT32_TYPE__)__val;
 					}
 					break;
-#endif
+#endif /* __SIZEOF_INT__ != 4 */
 #if defined(__UINT64_TYPE__) && __SIZEOF_INT__ != 8
 				case 8:
 					if (__flags & __SCANF_FLAG_SIGNED)
@@ -404,7 +404,7 @@ __store_integer_val:
 						*(__UINT64_TYPE__ *)__dest = (__UINT64_TYPE__)__val;
 					}
 					break;
-#endif
+#endif /* __UINT64_TYPE__ && __SIZEOF_INT__ != 8 */
 				default:
 					if (__flags & __SCANF_FLAG_SIGNED)
 						*(int *)__dest = -(int)(unsigned int)__val;

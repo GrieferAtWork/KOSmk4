@@ -44,34 +44,34 @@ struct utimbuf {
 #if __TM_SIZEOF(TIME) <= 4
 #define __utimbuf64  __utimbuf_alt
 #define __utimbuf32  utimbuf
-#else
+#else /* __TM_SIZEOF(TIME) <= 4 */
 #define __utimbuf64  utimbuf
 #define __utimbuf32  __utimbuf_alt
-#endif
+#endif /* __TM_SIZEOF(TIME) > 4 */
 
 #ifdef __USE_TIME64
 #if __TM_SIZEOF(TIME) <= 4
 #define __utimbuf_alt utimbuf64
-#else
+#else /* __TM_SIZEOF(TIME) <= 4 */
 #define utimbuf64     utimbuf
-#endif
+#endif /* __TM_SIZEOF(TIME) > 4 */
 #endif /* __USE_TIME64 */
 
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 #if defined(__USE_TIME64) && __TM_SIZEOF(TIME) <= 4
 #define utimbuf64     utimbuf
-#else
+#else /* __USE_TIME64 && __TM_SIZEOF(TIME) <= 4 */
 #define __utimbuf_alt utimbuf
-#endif
+#endif /* !__USE_TIME64 || __TM_SIZEOF(TIME) > 4 */
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 struct __utimbuf_alt {
 #if __TM_SIZEOF(TIME) <= 4
 	__time64_t      actime;  /* Access time. */
 	__time64_t      modtime; /* Modification time. */
-#else
+#else /* __TM_SIZEOF(TIME) <= 4 */
 	__time32_t      actime;  /* Access time. */
 	__time32_t      modtime; /* Modification time. */
-#endif
+#endif /* __TM_SIZEOF(TIME) > 4 */
 };
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 

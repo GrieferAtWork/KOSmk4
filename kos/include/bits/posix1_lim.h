@@ -82,45 +82,45 @@
 #endif /* !_POSIX_NAME_MAX */
 #ifdef __USE_XOPEN2K
 #ifndef _POSIX_CHILD_MAX
-#   define _POSIX_CHILD_MAX    25   /* Maximum simultaneous processes per real user ID. */
+#define _POSIX_CHILD_MAX    25   /* Maximum simultaneous processes per real user ID. */
 #endif /* !_POSIX_CHILD_MAX */
 #ifndef _POSIX_NGROUPS_MAX
-#   define _POSIX_NGROUPS_MAX  8    /* Number of simultaneous supplementary group IDs per process. */
+#define _POSIX_NGROUPS_MAX  8    /* Number of simultaneous supplementary group IDs per process. */
 #endif /* !_POSIX_NGROUPS_MAX */
 #ifndef _POSIX_OPEN_MAX
-#   define _POSIX_OPEN_MAX     20   /* Number of files one process can have open at once. */
+#define _POSIX_OPEN_MAX     20   /* Number of files one process can have open at once. */
 #endif /* !_POSIX_OPEN_MAX */
 #ifndef _POSIX_TZNAME_MAX
-#   define _POSIX_TZNAME_MAX   6   /* Maximum length of a timezone name (element of `tzname'). */
+#define _POSIX_TZNAME_MAX   6   /* Maximum length of a timezone name (element of `tzname'). */
 #endif /* !_POSIX_TZNAME_MAX */
-#else
+#else /* !__USE_XOPEN2K */
 #ifndef _POSIX_CHILD_MAX
-#   define _POSIX_CHILD_MAX    6    /* Maximum simultaneous processes per real user ID. */
+#define _POSIX_CHILD_MAX    6    /* Maximum simultaneous processes per real user ID. */
 #endif /* !_POSIX_CHILD_MAX */
 #ifndef _POSIX_NGROUPS_MAX
-#   define _POSIX_NGROUPS_MAX  0    /* Number of simultaneous supplementary group IDs per process. */
+#define _POSIX_NGROUPS_MAX  0    /* Number of simultaneous supplementary group IDs per process. */
 #endif /* !_POSIX_NGROUPS_MAX */
 #ifndef _POSIX_OPEN_MAX
-#   define _POSIX_OPEN_MAX     16   /* Number of files one process can have open at once. */
+#define _POSIX_OPEN_MAX     16   /* Number of files one process can have open at once. */
 #endif /* !_POSIX_OPEN_MAX */
 #ifndef _POSIX_TZNAME_MAX
-#   define _POSIX_TZNAME_MAX   3   /* Maximum length of a timezone name (element of `tzname'). */
+#define _POSIX_TZNAME_MAX   3   /* Maximum length of a timezone name (element of `tzname'). */
 #endif /* !_POSIX_TZNAME_MAX */
-#endif
+#endif /* !__USE_XOPEN2K */
 #if !defined(__USE_XOPEN2K) || defined(__USE_GNU)
 #ifndef _POSIX_FD_SETSIZE
-#   define _POSIX_FD_SETSIZE   _POSIX_OPEN_MAX /* Number of descriptors that a process may examine with `pselect' or `select'. */
+#define _POSIX_FD_SETSIZE   _POSIX_OPEN_MAX /* Number of descriptors that a process may examine with `pselect' or `select'. */
 #endif /* !_POSIX_FD_SETSIZE */
 #ifndef _POSIX_QLIMIT
-#   define _POSIX_QLIMIT       1   /* Maximum number of connections that can be queued on a socket. */
+#define _POSIX_QLIMIT       1   /* Maximum number of connections that can be queued on a socket. */
 #endif /* !_POSIX_QLIMIT */
 #ifndef _POSIX_HIWAT
-#   define _POSIX_HIWAT        _POSIX_PIPE_BUF /* Maximum number of bytes that can be buffered on a socket for send or receive. */
+#define _POSIX_HIWAT        _POSIX_PIPE_BUF /* Maximum number of bytes that can be buffered on a socket for send or receive. */
 #endif /* !_POSIX_HIWAT */
 #ifndef _POSIX_UIO_MAXIOV
-#   define _POSIX_UIO_MAXIOV    16 /* Maximum number of elements in an `iovec' array. */
+#define _POSIX_UIO_MAXIOV    16 /* Maximum number of elements in an `iovec' array. */
 #endif /* !_POSIX_UIO_MAXIOV */
-#endif
+#endif /* !__USE_XOPEN2K || __USE_GNU */
 #ifndef _POSIX_PATH_MAX
 #define _POSIX_PATH_MAX        256 /* Number of bytes in a pathname. */
 #endif /* !_POSIX_PATH_MAX */

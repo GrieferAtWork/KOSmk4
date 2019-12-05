@@ -35,7 +35,7 @@ INTERN_FUNCTION(libc_syscall)
 	movq   8(%rsp), %r9  /* arg #5 */
 	clc
 	syscall
-	cmpq   $-4096, %rax /* Check for error. */
+	cmpq   $(-4096), %rax /* Check for error. */
 	ja     1f
 	ret
 1:	movq   %rax, %rdi

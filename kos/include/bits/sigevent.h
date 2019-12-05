@@ -21,9 +21,11 @@
 
 #include <__stdinc.h>
 #include <features.h>
+
 #include <hybrid/typecore.h>
-#include <bits/types.h>
+
 #include <bits/sigval.h>
+#include <bits/types.h>
 
 __SYSDECL_BEGIN
 

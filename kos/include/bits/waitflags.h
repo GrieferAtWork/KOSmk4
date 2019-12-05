@@ -54,7 +54,7 @@ __SYSDECL_BEGIN
 #if defined(__USE_KOS) && __KOS_VERSION__ >= 300 && __KOS_VERSION__ < 400
 #define WONLYTHREADS 0x8000     /* Only wait for children created within the current
                                  * process, and with the `CLONE_THREAD' flag set. */
-#endif
+#endif /* __USE_KOS && __KOS_VERSION__ >= 300 && __KOS_VERSION__ < 400 */
 #define WNOWAIT     0x01000000 /* Don't reap, just poll status. */
 #ifdef __USE_KOS
 #define WNOREAP     WNOWAIT    /* Don't reap, just poll status (doesn't this name make more sense than `WNOWAIT'?). */
@@ -67,9 +67,9 @@ __SYSDECL_BEGIN
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 #ifndef __ENUM_IDTYPE_T
 #define __ENUM_IDTYPE_T 1
-#   undef P_ALL
-#   undef P_PID
-#   undef P_PGID
+#undef P_ALL
+#undef P_PID
+#undef P_PGID
 #ifdef __idtype_t_defined
 #define idtype_t   __new_idtype_t
 #else /* __idtype_t_defined */

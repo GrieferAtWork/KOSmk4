@@ -273,8 +273,8 @@ re_set_syntax:(reg_syntax_t syntax) -> reg_syntax_t;
 @@and syntax given by the global `re_syntax_options', into the buffer
 @@BUFFER. Return NULL if successful, and an error string if not.
 @@To free the allocated storage, you must call `regfree' on BUFFER.
-@@Note that the translate table must either have been initialised by
-@@`regcomp', with a malloc'ed value, or set to NULL before calling `regfree'
+@@Note that the translate table must either have been initialized by
+@@`regcomp', with a malloc'd value, or set to NULL before calling `regfree'
 re_compile_pattern:(char const *pattern, size_t length, struct re_pattern_buffer *buffer) -> char const *;
 
 @@Compile a fastmap for the compiled pattern in BUFFER; used to

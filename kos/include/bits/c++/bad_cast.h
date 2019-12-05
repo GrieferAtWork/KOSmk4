@@ -19,6 +19,7 @@
 #ifndef _BITS_CXX_BAD_CAST_H
 #define _BITS_CXX_BAD_CAST_H 1
 
+#include <__crt.h>
 #include <__stdcxx.h>
 
 #include "exception.h"

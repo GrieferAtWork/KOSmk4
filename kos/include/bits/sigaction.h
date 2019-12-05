@@ -20,9 +20,10 @@
 #define _BITS_SIGACTION_H 1
 
 #include <__stdinc.h>
+
+#include <bits/sigaction-struct.h>
 #include <bits/siginfo.h>
 #include <bits/sigset.h>
-#include <bits/sigaction-struct.h>
 
 /* Bits in `sa_flags'. */
 #ifndef SA_NOCLDSTOP
@@ -49,9 +50,9 @@
 #ifndef SA_ONSTACK
 #ifdef __CRT_CYG_PRIMARY
 #define SA_ONSTACK    0x20000000 /* Execute the handler on sigaltstack. */
-#else
+#else /* __CRT_CYG_PRIMARY */
 #define SA_ONSTACK    0x08000000 /* Execute the handler on sigaltstack. */
-#endif
+#endif /* !__CRT_CYG_PRIMARY */
 #endif /* !SA_ONSTACK */
 #endif /* __USE_UNIX98 || __USE_MISC */
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)

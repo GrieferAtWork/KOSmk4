@@ -57,29 +57,29 @@ __SYSDECL_BEGIN
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 /* These values are defined in XPG4.2. */
 #ifndef POLLRDNORM
-#   define POLLRDNORM  0x040 /* Normal data may be read. */
+#define POLLRDNORM  0x040 /* Normal data may be read. */
 #endif /* !POLLRDNORM */
 #ifndef POLLRDBAND
-#   define POLLRDBAND  0x080 /* Priority data may be read. */
+#define POLLRDBAND  0x080 /* Priority data may be read. */
 #endif /* !POLLRDBAND */
 #ifndef POLLWRNORM
-#   define POLLWRNORM  0x100 /* Writing now will not block. */
+#define POLLWRNORM  0x100 /* Writing now will not block. */
 #endif /* !POLLWRNORM */
 #ifndef POLLWRBAND
-#   define POLLWRBAND  0x200 /* Priority data may be written. */
+#define POLLWRBAND  0x200 /* Priority data may be written. */
 #endif /* !POLLWRBAND */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
 #ifdef __USE_GNU
 /* These are extensions for Linux. */
 #ifndef POLLMSG
-#   define POLLMSG     0x0400
+#define POLLMSG     0x0400
 #endif /* !POLLMSG */
 #ifndef POLLREMOVE
-#   define POLLREMOVE  0x1000
+#define POLLREMOVE  0x1000
 #endif /* !POLLREMOVE */
 #ifndef POLLRDHUP
-#   define POLLRDHUP   0x2000
+#define POLLRDHUP   0x2000
 #endif /* !POLLRDHUP */
 #endif /* __USE_GNU */
 

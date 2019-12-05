@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x967b5f04 */
+/* HASH CRC-32:0x71561ec8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,8 +34,8 @@ INTDEF reg_syntax_t NOTHROW_NCX(LIBCCALL libc_re_set_syntax)(reg_syntax_t syntax
  * and syntax given by the global `re_syntax_options', into the buffer
  * BUFFER. Return NULL if successful, and an error string if not.
  * To free the allocated storage, you must call `regfree' on BUFFER.
- * Note that the translate table must either have been initialised by
- * `regcomp', with a malloc'ed value, or set to NULL before calling `regfree' */
+ * Note that the translate table must either have been initialized by
+ * `regcomp', with a malloc'd value, or set to NULL before calling `regfree' */
 INTDEF char const *NOTHROW_NCX(LIBCCALL libc_re_compile_pattern)(char const *pattern, size_t length, struct re_pattern_buffer *buffer);
 /* Compile a fastmap for the compiled pattern in BUFFER; used to
  * accelerate searches. Return 0 if successful and -2 if was an internal error */

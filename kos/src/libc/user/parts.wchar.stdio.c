@@ -20,7 +20,14 @@
 #define GUARD_LIBC_USER_PARTS_WCHAR_STDIO_C 1
 
 #include "../api.h"
+/**/
+
+#include "../libc/uchar.h"
+#include "malloc.h"
 #include "parts.wchar.stdio.h"
+#include "stdio-api.h"
+#include "stdio.h"
+#include "stdlib.h"
 
 DECL_BEGIN
 
@@ -36,10 +43,14 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.modify.wremove") int
 NOTHROW_NCX(LIBCCALL libc_wremove)(char32_t const *filename)
 /*[[[body:wremove]]]*/
 {
-	(void)filename;
-	CRT_UNIMPLEMENTED("wremove"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	/*utf-8*/ char *utf8_filename;
+	utf8_filename = libc_uchar_c32tombs(filename);
+	if likely(utf8_filename) {
+		result = remove(utf8_filename);
+		free(utf8_filename);
+	}
+	return result;
 }
 /*[[[end:wremove]]]*/
 
@@ -49,10 +60,14 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.modify.wremove") int
 NOTHROW_NCX(LIBDCALL libd_wremove)(char16_t const *filename)
 /*[[[body:DOS$wremove]]]*/
 {
-	(void)filename;
-	CRT_UNIMPLEMENTED("wremove"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	/*utf-8*/ char *utf8_filename;
+	utf8_filename = libc_uchar_c16tombs(filename);
+	if likely(utf8_filename) {
+		result = remove(utf8_filename);
+		free(utf8_filename);
+	}
+	return result;
 }
 /*[[[end:DOS$wremove]]]*/
 
@@ -63,11 +78,22 @@ NOTHROW_NCX(LIBCCALL libc_wfopen)(char32_t const *filename,
                                   char32_t const *mode)
 /*[[[body:wfopen]]]*/
 {
-	(void)filename;
-	(void)mode;
-	CRT_UNIMPLEMENTED("wfopen"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	FILE *result = NULL;
+	/*utf-8*/ char *utf8_filename;
+	/*utf-8*/ char *utf8_mode;
+	utf8_filename = libc_uchar_c32tombs(filename);
+	if unlikely(!utf8_filename)
+		goto done;
+	utf8_mode = libc_uchar_c32tombs(mode);
+	if unlikely(!utf8_mode) {
+		free(utf8_filename);
+		goto done;
+	}
+	result = fopen(utf8_filename, utf8_mode);
+	free(utf8_mode);
+	free(utf8_filename);
+done:
+	return result;
 }
 /*[[[end:wfopen]]]*/
 
@@ -78,11 +104,22 @@ NOTHROW_NCX(LIBDCALL libd_wfopen)(char16_t const *filename,
                                   char16_t const *mode)
 /*[[[body:DOS$wfopen]]]*/
 {
-	(void)filename;
-	(void)mode;
-	CRT_UNIMPLEMENTED("wfopen"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	FILE *result = NULL;
+	/*utf-8*/ char *utf8_filename;
+	/*utf-8*/ char *utf8_mode;
+	utf8_filename = libc_uchar_c16tombs(filename);
+	if unlikely(!utf8_filename)
+		goto done;
+	utf8_mode = libc_uchar_c16tombs(mode);
+	if unlikely(!utf8_mode) {
+		free(utf8_filename);
+		goto done;
+	}
+	result = fopen(utf8_filename, utf8_mode);
+	free(utf8_mode);
+	free(utf8_filename);
+done:
+	return result;
 }
 /*[[[end:DOS$wfopen]]]*/
 
@@ -94,12 +131,22 @@ NOTHROW_NCX(LIBCCALL libc_wfreopen)(char32_t const *filename,
                                     FILE *stream)
 /*[[[body:wfreopen]]]*/
 {
-	(void)filename;
-	(void)mode;
-	(void)stream;
-	CRT_UNIMPLEMENTED("wfreopen"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	FILE *result = NULL;
+	/*utf-8*/ char *utf8_filename;
+	/*utf-8*/ char *utf8_mode;
+	utf8_filename = libc_uchar_c32tombs(filename);
+	if unlikely(!utf8_filename)
+		goto done;
+	utf8_mode = libc_uchar_c32tombs(mode);
+	if unlikely(!utf8_mode) {
+		free(utf8_filename);
+		goto done;
+	}
+	result = freopen(utf8_filename, utf8_mode, stream);
+	free(utf8_mode);
+	free(utf8_filename);
+done:
+	return result;
 }
 /*[[[end:wfreopen]]]*/
 
@@ -111,12 +158,22 @@ NOTHROW_NCX(LIBDCALL libd_wfreopen)(char16_t const *filename,
                                     FILE *stream)
 /*[[[body:DOS$wfreopen]]]*/
 {
-	(void)filename;
-	(void)mode;
-	(void)stream;
-	CRT_UNIMPLEMENTED("wfreopen"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	FILE *result = NULL;
+	/*utf-8*/ char *utf8_filename;
+	/*utf-8*/ char *utf8_mode;
+	utf8_filename = libc_uchar_c16tombs(filename);
+	if unlikely(!utf8_filename)
+		goto done;
+	utf8_mode = libc_uchar_c16tombs(mode);
+	if unlikely(!utf8_mode) {
+		free(utf8_filename);
+		goto done;
+	}
+	result = freopen(utf8_filename, utf8_mode, stream);
+	free(utf8_mode);
+	free(utf8_filename);
+done:
+	return result;
 }
 /*[[[end:DOS$wfreopen]]]*/
 
@@ -127,11 +184,22 @@ NOTHROW_NCX(LIBCCALL libc_wpopen)(char32_t const *command,
                                   char32_t const *mode)
 /*[[[body:wpopen]]]*/
 {
-	(void)command;
-	(void)mode;
-	CRT_UNIMPLEMENTED("wpopen"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	FILE *result = NULL;
+	/*utf-8*/ char *utf8_command;
+	/*utf-8*/ char *utf8_mode;
+	utf8_command = libc_uchar_c32tombs(command);
+	if unlikely(!utf8_command)
+		goto done;
+	utf8_mode = libc_uchar_c32tombs(mode);
+	if unlikely(!utf8_mode) {
+		free(utf8_command);
+		goto done;
+	}
+	result = popen(utf8_command, utf8_mode);
+	free(utf8_mode);
+	free(utf8_command);
+done:
+	return result;
 }
 /*[[[end:wpopen]]]*/
 
@@ -142,11 +210,22 @@ NOTHROW_NCX(LIBDCALL libd_wpopen)(char16_t const *command,
                                   char16_t const *mode)
 /*[[[body:DOS$wpopen]]]*/
 {
-	(void)command;
-	(void)mode;
-	CRT_UNIMPLEMENTED("wpopen"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	FILE *result = NULL;
+	/*utf-8*/ char *utf8_command;
+	/*utf-8*/ char *utf8_mode;
+	utf8_command = libc_uchar_c16tombs(command);
+	if unlikely(!utf8_command)
+		goto done;
+	utf8_mode = libc_uchar_c16tombs(mode);
+	if unlikely(!utf8_mode) {
+		free(utf8_command);
+		goto done;
+	}
+	result = popen(utf8_command, utf8_mode);
+	free(utf8_mode);
+	free(utf8_command);
+done:
+	return result;
 }
 /*[[[end:DOS$wpopen]]]*/
 

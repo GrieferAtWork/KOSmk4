@@ -56,9 +56,9 @@ __SYSDECL_BEGIN
 #define SEGMENT_USER_CODE32_RPL 0x003b /* SEGMENT_USER_CODE32 | 3 */
 #define SEGMENT_USER_DATA32     0x0040 /* Ring #3 32-bit data segment (%ss, %ds, %es) */
 #define SEGMENT_USER_DATA32_RPL 0x0043 /* SEGMENT_USER_DATA32 | 3 */
-#define SEGMENT_USER_FSBASE     0x0048 /* Ring #3 fs-segment (%fs by convention (user may re-assign the base to another segment)) */
+#define SEGMENT_USER_FSBASE     0x0048 /* Ring #3 fs-segment (%fs by convention (user may re-assign the base address)) */
 #define SEGMENT_USER_FSBASE_RPL 0x004b /* SEGMENT_USER_FSBASE | 3 */
-#define SEGMENT_USER_GSBASE     0x0050 /* Ring #3 gs-segment (%gs by convention (user may re-assign the base to another segment)) */
+#define SEGMENT_USER_GSBASE     0x0050 /* Ring #3 gs-segment (%gs by convention (user may re-assign the base address)) */
 #define SEGMENT_USER_GSBASE_RPL 0x0053 /* SEGMENT_USER_GSBASE | 3 */
 #ifdef __x86_64__
 #define SEGMENT_USER_CODE64     0x0058 /* Ring #3 64-bit code segment (%cs) */
@@ -108,7 +108,8 @@ __SYSDECL_BEGIN
 #define LDT_SEGMENT_SYSCALL     0x0000 /* System call callgate (for use with `lcall $7, $...') */
 #define LDT_SEGMENT_SYSCALL_RPL 0x0007 /* LDT_SEGMENT_SYSCALL | 7 */
 #ifdef __x86_64__
-#define LDT_SEGMENT_COUNT       2 /* `LDT_SEGMENT_SYSCALL' takes up 2 entries. */
+#define LDT_SEGMENT_SYSCALL2    0x0008 /* On x86_64, a callgate requires two consecutive entries. */
+#define LDT_SEGMENT_COUNT       2
 #else /* __x86_64__ */
 #define LDT_SEGMENT_COUNT       1
 #endif /* !__x86_64__ */
@@ -144,28 +145,31 @@ __SYSDECL_BEGIN
  *   - `%fs' is undefined (left unchanged), which means it's usually `SEGMENT_USER_DATA64_RPL' or `SEGMENT_USER_FSBASE_RPL'
  *   - `%gs' is undefined (left unchanged), which means it's usually `SEGMENT_USER_DATA64_RPL' or `SEGMENT_USER_GSBASE_RPL'
  *
- * In user-space (i386):
- *   - `%ds' is usually `SEGMENT_USER_DATA_RPL'
- *   - `%es' is usually `SEGMENT_USER_DATA_RPL'
- *   - `%ss' is usually `SEGMENT_USER_DATA_RPL'
- *   - `%cs' is always `SEGMENT_USER_CODE_RPL'
+ * In user-space (i386 or IA32e-Compat):
+ *   - `%ds' is usually `SEGMENT_USER_DATA32_RPL'
+ *   - `%es' is usually `SEGMENT_USER_DATA32_RPL'
+ *   - `%ss' is usually `SEGMENT_USER_DATA32_RPL'
+ *   - `%cs' is always `SEGMENT_USER_CODE32_RPL'
  *   - `%fs' is usually `SEGMENT_USER_FSBASE_RPL'
  *   - `%gs' is usually `SEGMENT_USER_GSBASE_RPL'
  *
  * In user-space (x86_64):
- *   - `%ds' is usually `SEGMENT_USER_DATA_RPL'
- *   - `%es' is usually `SEGMENT_USER_DATA_RPL'
- *   - `%ss' is usually `SEGMENT_USER_DATA_RPL'
- *   - `%cs' is always `SEGMENT_USER_CODE_RPL'
- *   - `%fs' is usually `SEGMENT_USER_DATA_RPL'
- *   - `%gs' is usually `SEGMENT_USER_DATA_RPL'
+ *   - `%ds' is usually `SEGMENT_USER_DATA64_RPL'
+ *   - `%es' is usually `SEGMENT_USER_DATA64_RPL'
+ *   - `%ss' is usually `SEGMENT_USER_DATA64_RPL'
+ *   - `%cs' is always `SEGMENT_USER_CODE64_RPL'
+ *   - `%fs' is usually `SEGMENT_USER_DATA64_RPL'
+ *   - `%gs' is usually `SEGMENT_USER_DATA64_RPL'
  *
- * The fact that %gs goes unused in kernel-space is also the reason why
- * some CPU state structures exist that simply omit it, as it doesn't
- * need to be saved/written/restored for the purposes of syscalls or hardware
- * interrupts. The only place where it does actually need to be saved is when
- * it comes to scheduling, as different user-space tasks are allowed to have
- * different values for their %gs segment selector.
+ * always:  Guarantied to be the case (may assume this case)
+ * usually: Is the case by default; can be changed by factors (don't assume, but may optimize for this case)
+ *
+ * NOTE: The fact that %gs goes unused in kernel-space is also the reason why
+ *       some CPU state structures exist that simply omit it, as it doesn't
+ *       need to be saved/written/restored for the purposes of syscalls or hardware
+ *       interrupts. The only place where it does actually need to be saved is when
+ *       it comes to scheduling, as different user-space tasks are allowed to have
+ *       different values for their %gs segment selector.
  */
 
 

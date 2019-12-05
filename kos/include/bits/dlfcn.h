@@ -16,8 +16,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_GENERIC_DLFCN_H
-#define _BITS_GENERIC_DLFCN_H 1
+#ifndef _BITS_DLFCN_H
 #define _BITS_DLFCN_H 1
 
 #include <__stdinc.h>
@@ -56,11 +55,11 @@ __SYSDECL_BEGIN
 #endif /* !RTLD_BINDING_MASK */
 
 #ifndef RTLD_NOLOAD
-#ifdef __CYG_COMPAT__
+#ifdef __CRT_CYG_PRIMARY
 #define RTLD_NOLOAD       0x00010 /* Do not load the object. */
-#else
+#else /* __CRT_CYG_PRIMARY */
 #define RTLD_NOLOAD       0x00004 /* Do not load the object. */
-#endif
+#endif /* !__CRT_CYG_PRIMARY */
 #endif /* !RTLD_NOLOAD */
 
 /* If the associated library uses a symbol that it itself also defines,
@@ -81,11 +80,11 @@ __SYSDECL_BEGIN
  * NOTE: This is the same as `DF_SYMBOLIC'
  */
 #ifndef RTLD_DEEPBIND
-#ifdef __CYG_COMPAT__
+#ifdef __CRT_CYG_PRIMARY
 #define RTLD_DEEPBIND     0x00020 /* Use deep binding. */
-#else
+#else /* __CRT_CYG_PRIMARY */
 #define RTLD_DEEPBIND     0x00008 /* Use deep binding. */
-#endif
+#endif /* !__CRT_CYG_PRIMARY */
 #endif /* !RTLD_DEEPBIND */
 
 /* If the following bit is set in the MODE argument to `dlopen',
@@ -104,11 +103,11 @@ __SYSDECL_BEGIN
 
 /* Do not delete object when closed.  */
 #ifndef RTLD_NODELETE
-#ifdef __CYG_COMPAT__
+#ifdef __CRT_CYG_PRIMARY
 #define RTLD_NODELETE     0x00008
-#else
+#else /* __CRT_CYG_PRIMARY */
 #define RTLD_NODELETE     0x01000
-#endif
+#endif /* !__CRT_CYG_PRIMARY */
 #endif /* !RTLD_NODELETE */
 
 #if defined(__USE_KOS) && defined(__KOS__)
@@ -147,4 +146,4 @@ extern void (_dl_mcount_wrapper_check)(void *__selfpc);
 
 __SYSDECL_END
 
-#endif /* !_BITS_GENERIC_DLFCN_H */
+#endif /* !_BITS_DLFCN_H */

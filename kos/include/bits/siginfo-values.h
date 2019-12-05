@@ -23,15 +23,15 @@
 
 /* Values for `si_code'. Positive values are reserved for kernel-generated signals. */
 #ifndef __SI_USER
-#define __SI_ASYNCNL (-60)  /* Sent by asynch name lookup completion. */
-#define __SI_TKILL   (-6)   /* Sent by tkill. */
-#define __SI_SIGIO   (-5)   /* Sent by queued SIGIO. */
-#define __SI_ASYNCIO (-4)   /* Sent by AIO completion. */
-#define __SI_MESGQ   (-3)   /* Sent by real time mesq state change. */
-#define __SI_TIMER   (-2)   /* Sent by timer expiration. */
-#define __SI_QUEUE   (-1)   /* Sent by sigqueue_entry. */
-#define __SI_USER      0    /* Sent by kill, sigsend. */
-#define __SI_KERNEL    0x80 /* Send by kernel. */
+#define __SI_ASYNCNL (-60) /* Sent by asynch name lookup completion. */
+#define __SI_TKILL   (-6)  /* Sent by tkill. */
+#define __SI_SIGIO   (-5)  /* Sent by queued SIGIO. */
+#define __SI_ASYNCIO (-4)  /* Sent by AIO completion. */
+#define __SI_MESGQ   (-3)  /* Sent by real time mesq state change. */
+#define __SI_TIMER   (-2)  /* Sent by timer expiration. */
+#define __SI_QUEUE   (-1)  /* Sent by sigqueue_entry. */
+#define __SI_USER    0     /* Sent by kill, sigsend. */
+#define __SI_KERNEL  0x80  /* Send by kernel. */
 #endif /* !__SI_ASYNCNL */
 
 /* `si_code' values for SIGILL signal. */

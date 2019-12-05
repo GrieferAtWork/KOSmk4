@@ -22,16 +22,22 @@
 #define _KOS_SOURCE 1
 
 #include "../api.h"
-#include "regex.h"
-#include <libregex/regex.h>
-#include <stdbool.h>
+/**/
+
 #include <assert.h>
-#include <stddef.h>
 #include <errno.h>
-#include <string.h>
 #include <malloc.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <string.h>
+
+#include <libregex/regex.h>
+
+#include "regex.h"
+
 #ifndef LIBREGEX_WANT_PROTOTYPES
 #include <hybrid/atomic.h>
+
 #include <dlfcn.h>
 #endif /* !LIBREGEX_WANT_PROTOTYPES */
 
@@ -131,13 +137,13 @@ NOTHROW_NCX(LIBCCALL libc_re_set_syntax)(reg_syntax_t syntax)
 }
 /*[[[end:re_set_syntax]]]*/
 
-/*[[[head:re_compile_pattern,hash:CRC-32=0x36201f21]]]*/
+/*[[[head:re_compile_pattern,hash:CRC-32=0x2df41685]]]*/
 /* Compile the regular expression PATTERN, with length LENGTH
  * and syntax given by the global `re_syntax_options', into the buffer
  * BUFFER. Return NULL if successful, and an error string if not.
  * To free the allocated storage, you must call `regfree' on BUFFER.
- * Note that the translate table must either have been initialised by
- * `regcomp', with a malloc'ed value, or set to NULL before calling `regfree' */
+ * Note that the translate table must either have been initialized by
+ * `regcomp', with a malloc'd value, or set to NULL before calling `regfree' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.re_compile_pattern") char const *
 NOTHROW_NCX(LIBCCALL libc_re_compile_pattern)(char const *pattern,
                                               size_t length,

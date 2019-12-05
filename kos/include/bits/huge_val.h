@@ -43,73 +43,73 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#if __GCC_VERSION(3,3,0) || __has_builtin(__builtin_huge_val)
-#define HUGE_VAL    (__builtin_huge_val())
+#if __GCC_VERSION(3, 3, 0) || __has_builtin(__builtin_huge_val)
+#define HUGE_VAL (__builtin_huge_val())
 #else /* ... */
 #include <hybrid/typecore.h>
 #if __SIZEOF_DOUBLE__ == 8
-#if __GCC_VERSION(2,96,0)
-#define HUGE_VAL    (__extension__ 0x1.0p2047)
+#if __GCC_VERSION(2, 96, 0)
+#define HUGE_VAL (__extension__ 0x1.0p2047)
 #elif defined(__GNUC__)
-#define HUGE_VAL    (__extension__((union { __UINT64_TYPE__ __l; double __d; }){ 0x7ff0000000000000ULL }).__d)
+#define HUGE_VAL (__extension__((union { __UINT64_TYPE__ __l; double __d; }) { 0x7ff0000000000000ULL }).__d)
 #else /* ... */
 #include <hybrid/__byteorder.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_CONST_DATA union {
-    __BYTE_TYPE__ __c[8];
-    double        __d;
+	__BYTE_TYPE__ __c[8];
+	double        __d;
 } const __huge_val = {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    { 0x7f, 0xf0, 0, 0, 0, 0, 0, 0 }
+	{ 0x7f, 0xf0, 0, 0, 0, 0, 0, 0 }
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    { 0, 0, 0, 0, 0, 0, 0xf0, 0x7f }
+	{ 0, 0, 0, 0, 0, 0, 0xf0, 0x7f }
 #else
 #error "Unsupported __BYTE_ORDER__"
 #endif
 };
 __NAMESPACE_LOCAL_END
-#define HUGE_VAL    (__NAMESPACE_LOCAL_SYM __huge_val.__d)
+#define HUGE_VAL (__NAMESPACE_LOCAL_SYM __huge_val.__d)
 #endif /* !... */
 #elif __SIZEOF_DOUBLE__ == 4
-#if __GCC_VERSION(2,96,0)
-#define HUGE_VAL    (__extension__ 0x1.0p255f)
+#if __GCC_VERSION(2, 96, 0)
+#define HUGE_VAL (__extension__ 0x1.0p255f)
 #elif defined(__GNUC__)
-#define HUGE_VAL    (__extension__((union { __UINT32_TYPE__ __l; double __d; }){ 0x7f800000UL }).__d)
+#define HUGE_VAL (__extension__((union { __UINT32_TYPE__ __l; double __d; }) { 0x7f800000UL }).__d)
 #else /* ... */
 #include <hybrid/__byteorder.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_CONST_DATA union {
-    __BYTE_TYPE__ __c[4];
-    double        __d;
+	__BYTE_TYPE__ __c[4];
+	double        __d;
 } const __huge_val = {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    { 0x7f, 0x80, 0, 0 }
+	{ 0x7f, 0x80, 0, 0 }
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    { 0, 0, 0x80, 0x7f }
+	{ 0, 0, 0x80, 0x7f }
 #else
 #error "Unsupported __BYTE_ORDER__"
 #endif
 };
 __NAMESPACE_LOCAL_END
-#define HUGE_VAL    (__NAMESPACE_LOCAL_SYM __huge_val.__d)
+#define HUGE_VAL (__NAMESPACE_LOCAL_SYM __huge_val.__d)
 #endif /* !... */
 #elif __SIZEOF_DOUBLE__ == 12
-#if __GCC_VERSION(2,96,0)
-#define HUGE_VAL    (__extension__ 0x1.0p32767L)
+#if __GCC_VERSION(2, 96, 0)
+#define HUGE_VAL (__extension__ 0x1.0p32767L)
 #elif defined(__GNUC__)
-#define HUGE_VAL    (__extension__((union { __BYTE_TYPE__ __c[12]; double __d; }) { { 0, 0, 0, 0, 0, 0, 0, 0x80, 0xff, 0x7f, 0, 0 } }).__d)
+#define HUGE_VAL (__extension__((union { __BYTE_TYPE__ __c[12]; double __d; }) { { 0, 0, 0, 0, 0, 0, 0, 0x80, 0xff, 0x7f, 0, 0 } }).__d)
 #else /* ... */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_CONST_DATA union {
-    __BYTE_TYPE__ __c[12];
-    double        __d;
+	__BYTE_TYPE__ __c[12];
+	double        __d;
 } const __huge_val = {
-    { 0, 0, 0, 0, 0, 0, 0, 0x80, 0xff, 0x7f, 0, 0 }
+	{ 0, 0, 0, 0, 0, 0, 0, 0x80, 0xff, 0x7f, 0, 0 }
 };
 __NAMESPACE_LOCAL_END
-#define HUGE_VAL    (__NAMESPACE_LOCAL_SYM __huge_val.__d)
+#define HUGE_VAL (__NAMESPACE_LOCAL_SYM __huge_val.__d)
 #endif /* !... */
-#else /* __SIZEOF_DOUBLE__... */
+#else  /* __SIZEOF_DOUBLE__... */
 #error "Unsupported __SIZEOF_DOUBLE__"
 #endif /* !__SIZEOF_DOUBLE__... */
 #endif /* !... */

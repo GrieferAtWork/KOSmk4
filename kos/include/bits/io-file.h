@@ -66,31 +66,33 @@ __NAMESPACE_STD_BEGIN
 struct __IO_FILE {
 #ifdef __BUILDING_LIBC
 #if __SIZEOF_POINTER__ >= 8
-#define __IO_FILE_INIT(if_ptr_, if_cnt_, if_base_, if_flag_, if_fd_, if_charbuf_, if_bufsize_, if_exdata_) \
-	{                                                                                                      \
-		/* .if_ptr     = */ if_ptr_,                                                                       \
-		/* .if_cnt     = */ if_cnt_,                                                                       \
-		/* .__if_pad0  = */ 0,                                                                             \
-		/* .if_base    = */ if_base_,                                                                      \
-		/* .if_flag    = */ if_flag_,                                                                      \
-		/* .if_fd      = */ if_fd_,                                                                        \
-		/* .if_charbuf = */ if_charbuf_,                                                                   \
-		/* .if_bufsiz  = */ if_bufsize_,                                                                   \
-		/* .if_exdata  = */ if_exdata_                                                                     \
+#define __IO_FILE_INIT(if_ptr_, if_cnt_, if_base_, if_flag_, if_fd_, \
+                       if_charbuf_, if_bufsize_, if_exdata_)         \
+	{                                                                \
+		/* .if_ptr     = */ if_ptr_,                                 \
+		/* .if_cnt     = */ if_cnt_,                                 \
+		/* .__if_pad0  = */ 0,                                       \
+		/* .if_base    = */ if_base_,                                \
+		/* .if_flag    = */ if_flag_,                                \
+		/* .if_fd      = */ if_fd_,                                  \
+		/* .if_charbuf = */ if_charbuf_,                             \
+		/* .if_bufsiz  = */ if_bufsize_,                             \
+		/* .if_exdata  = */ if_exdata_                               \
 	}
 #else /* __SIZEOF_POINTER__ >= 8 */
-#define __IO_FILE_INIT(if_ptr_, if_cnt_, if_base_, if_flag_, if_fd_, if_charbuf_, if_bufsize_, if_exdata_) \
-	{                                                                                                      \
-		/* .if_ptr     = */ if_ptr_,                                                                       \
-		/* .if_cnt     = */ if_cnt_,                                                                       \
-		/* .if_base    = */ if_base_,                                                                      \
-		/* .if_flag    = */ if_flag_,                                                                      \
-		/* .if_fd      = */ if_fd_,                                                                        \
-		/* .if_charbuf = */ if_charbuf_,                                                                   \
-		/* .if_bufsiz  = */ if_bufsize_,                                                                   \
-		/* .if_exdata  = */ if_exdata_                                                                     \
+#define __IO_FILE_INIT(if_ptr_, if_cnt_, if_base_, if_flag_, if_fd_, \
+                       if_charbuf_, if_bufsize_, if_exdata_)         \
+	{                                                                \
+		/* .if_ptr     = */ if_ptr_,                                 \
+		/* .if_cnt     = */ if_cnt_,                                 \
+		/* .if_base    = */ if_base_,                                \
+		/* .if_flag    = */ if_flag_,                                \
+		/* .if_fd      = */ if_fd_,                                  \
+		/* .if_charbuf = */ if_charbuf_,                             \
+		/* .if_bufsiz  = */ if_bufsize_,                             \
+		/* .if_exdata  = */ if_exdata_                               \
 	}
-#endif /* __SIZEOF_POINTER__ < 8 */
+#endif                                 /* __SIZEOF_POINTER__ < 8 */
 	__BYTE_TYPE__      *if_ptr;        /* [>= if_base][+if_cnt <= if_base + if_bufsiz][lock(if_exdata->io_lock)]
 	                                    * Pointer to the next character to-be read/written.
 	                                    * The absolute in-file position is then `if_exdata->io_fblk + (if_ptr - if_base)' */
@@ -126,7 +128,7 @@ struct __IO_FILE {
 	__INT32_TYPE__ __f_cnt;
 #if __SIZEOF_POINTER__ >= 8
 	__INT32_TYPE__ __f_pad0;
-#endif
+#endif /* __SIZEOF_POINTER__ >= 8 */
 	char          *__f_base;
 	__INT32_TYPE__ __f_flag;
 	__INT32_TYPE__ __f_file;
@@ -160,7 +162,7 @@ struct __IO_FILE {
 	union { __INT32_TYPE__ __f_cnt;      __INT32_TYPE__ _cnt;      };
 #if __SIZEOF_POINTER__ >= 8
 	__INT32_TYPE__         __f_pad0;
-#endif
+#endif /* __SIZEOF_POINTER__ >= 8 */
 	union { char          *__f_base;     char          *_base;     };
 	union { __INT32_TYPE__ __f_flag;     __INT32_TYPE__ _flag;     };
 	union { __INT32_TYPE__ __f_file;     __INT32_TYPE__ _file;     };
@@ -172,7 +174,7 @@ struct __IO_FILE {
 	__INT32_TYPE__ _cnt;
 #if __SIZEOF_POINTER__ >= 8
 	__INT32_TYPE__ __f_pad0;
-#endif
+#endif /* __SIZEOF_POINTER__ >= 8 */
 	char          *_base;
 	__INT32_TYPE__ _flag;
 	__INT32_TYPE__ _file;
@@ -210,7 +212,7 @@ struct __IO_FILE {
 	__INT32_TYPE__ __f_cnt;
 #if __SIZEOF_POINTER__ >= 8
 	__INT32_TYPE__ __f_pad0;
-#endif
+#endif /* __SIZEOF_POINTER__ >= 8 */
 	char          *__f_base;
 	__INT32_TYPE__ __f_flag;
 	__INT32_TYPE__ __f_file;
@@ -245,7 +247,7 @@ struct __IO_FILE {
 	union { __INT32_TYPE__ __f_cnt;      __INT32_TYPE__ _cnt;      };
 #if __SIZEOF_POINTER__ >= 8
 	__INT32_TYPE__         __f_pad0;
-#endif
+#endif /* __SIZEOF_POINTER__ >= 8 */
 	union { char          *__f_base;     char          *_base;     };
 	union { __INT32_TYPE__ __f_flag;     __INT32_TYPE__ _flag;     };
 	union { __INT32_TYPE__ __f_file;     __INT32_TYPE__ _file;     };
@@ -257,7 +259,7 @@ struct __IO_FILE {
 	__INT32_TYPE__ _cnt;
 #if __SIZEOF_POINTER__ >= 8
 	__INT32_TYPE__ __f_pad0;
-#endif
+#endif /* __SIZEOF_POINTER__ >= 8 */
 	char          *_base;
 	__INT32_TYPE__ _flag;
 	__INT32_TYPE__ _file;

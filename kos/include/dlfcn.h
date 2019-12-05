@@ -373,7 +373,7 @@ __IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CALL dlauxinfo)(void *__hand
  * The prototype of such a function looks like:
  * >> DECL_BEGIN // Needs to be declared with `extern "C"' in c++-mode
  * >> DL_REGISTER_CACHE(my_cache_clear_function);
- * >> int my_cache_clear_function(void) {
+ * >> PRIVATE int my_cache_clear_function(void) {
  * >>     if (clear_my_caches() != NO_CACHES_CLEARED)
  * >>         return 1; // Hint that memory may have become available.
  * >>     return 0;     // Hint that no additional memory became available.
@@ -389,9 +389,9 @@ __IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CALL dlauxinfo)(void *__hand
 #ifndef DL_REGISTER_CACHE
 #ifndef __NO_DL_REGISTER_CACHE
 #   define DL_REGISTER_CACHE(func)  __DL_REGISTER_CACHE(func)
-#else
-#   define DL_REGISTER_CACHE(func)  /* nothing */
-#endif
+#else /* !__NO_DL_REGISTER_CACHE */
+#   define DL_REGISTER_CACHE(func)  __PRIVATE __ATTR_USED int (func)(void)
+#endif /* __NO_DL_REGISTER_CACHE */
 #endif /* !DL_REGISTER_CACHE */
 
 #else /* __KOS_VERSION__ >= 400 */
@@ -404,11 +404,11 @@ __IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CALL fdlopen)(__fd_t __fd, i
 #ifdef __USE_GNU
 
 typedef struct {
-#ifdef __CYG_COMPAT__
+#ifdef __CRT_CYG_PRIMARY
 	char        dli_fname[4096]; /* File name of defining object. */
-#else
+#else /* __CRT_CYG_PRIMARY */
 	char const *dli_fname; /* File name of defining object. */
-#endif
+#endif /* !__CRT_CYG_PRIMARY */
 	void       *dli_fbase; /* Load address of that object. */
 	char const *dli_sname; /* Name of nearest symbol. */
 	void       *dli_saddr; /* Exact value of nearest symbol. */

@@ -21,7 +21,9 @@
 
 #include <__stdinc.h>
 #include <features.h>
+
 #include <hybrid/typecore.h>
+
 #include <bits/sigval.h>
 #include <bits/types.h>
 
@@ -30,37 +32,37 @@ __SYSDECL_BEGIN
 #define __SI_MAX_SIZE    128
 #if __SIZEOF_POINTER__ > 4
 #define __SI_PAD_SIZE  ((__SI_MAX_SIZE/4)-4)
-#else
+#else /* __SIZEOF_POINTER__ > 4 */
 #define __SI_PAD_SIZE  ((__SI_MAX_SIZE/4)-3)
-#endif
+#endif /* __SIZEOF_POINTER__ <= 4 */
 
-#define __OFFSET_SIGINFO_SIGNO        0
-#define __OFFSET_SIGINFO_ERRNO        4
-#define __OFFSET_SIGINFO_CODE      (2*4)
-#define __OFFSET_SIGINFO_PID       (4*4)
-#define __OFFSET_SIGINFO_UID       (4*4+__SIZEOF_PID_T__)
-#define __OFFSET_SIGINFO_TIMERID   (4*4)
-#define __OFFSET_SIGINFO_OVERRUN   (5*4)
-#define __OFFSET_SIGINFO_VALUE     (6*4)
-#define __OFFSET_SIGINFO_INT       (6*4)
-#define __OFFSET_SIGINFO_PTR       (6*4)
-#define __OFFSET_SIGINFO_STATUS    (4*4+2*__SIZEOF_PID_T__)
+#define __OFFSET_SIGINFO_SIGNO     0
+#define __OFFSET_SIGINFO_ERRNO     4
+#define __OFFSET_SIGINFO_CODE      (2 * 4)
+#define __OFFSET_SIGINFO_PID       (4 * 4)
+#define __OFFSET_SIGINFO_UID       (4 * 4 + __SIZEOF_PID_T__)
+#define __OFFSET_SIGINFO_TIMERID   (4 * 4)
+#define __OFFSET_SIGINFO_OVERRUN   (5 * 4)
+#define __OFFSET_SIGINFO_VALUE     (6 * 4)
+#define __OFFSET_SIGINFO_INT       (6 * 4)
+#define __OFFSET_SIGINFO_PTR       (6 * 4)
+#define __OFFSET_SIGINFO_STATUS    (4 * 4 + 2 * __SIZEOF_PID_T__)
 #if __SIZEOF_CLOCK_T__ >= 8
-#define __OFFSET_SIGINFO_UTIME     (4*__SIZEOF_POINTER__)
-#define __OFFSET_SIGINFO_STIME     (4*__SIZEOF_POINTER__+__SIZEOF_CLOCK_T__)
+#define __OFFSET_SIGINFO_UTIME     (4 * __SIZEOF_POINTER__)
+#define __OFFSET_SIGINFO_STIME     (4 * __SIZEOF_POINTER__ + __SIZEOF_CLOCK_T__)
 #else /* __SIZEOF_CLOCK_T__ >= 8 */
-#define __OFFSET_SIGINFO_UTIME     (5*4+2*__SIZEOF_PID_T__)
-#define __OFFSET_SIGINFO_STIME     (5*4+2*__SIZEOF_PID_T__+__SIZEOF_CLOCK_T__)
+#define __OFFSET_SIGINFO_UTIME     (5 * 4 + 2 * __SIZEOF_PID_T__)
+#define __OFFSET_SIGINFO_STIME     (5 * 4 + 2 * __SIZEOF_PID_T__ + __SIZEOF_CLOCK_T__)
 #endif /* __SIZEOF_CLOCK_T__ < 8 */
-#define __OFFSET_SIGINFO_ADDR      (4*4)
-#define __OFFSET_SIGINFO_ADDR_LSB  (4*4+__SIZEOF_POINTER__)
-#define __OFFSET_SIGINFO_LOWER     (4*4+2*__SIZEOF_POINTER__)
-#define __OFFSET_SIGINFO_UPPER     (4*4+3*__SIZEOF_POINTER__)
-#define __OFFSET_SIGINFO_BAND      (4*4)
-#define __OFFSET_SIGINFO_FD        (4*4+__SIZEOF_POINTER__)
-#define __OFFSET_SIGINFO_CALL_ADDR (4*4)
-#define __OFFSET_SIGINFO_SYSCALL   (4*4+__SIZEOF_POINTER__)
-#define __OFFSET_SIGINFO_ARCH      (5*4+__SIZEOF_POINTER__)
+#define __OFFSET_SIGINFO_ADDR      (4 * 4)
+#define __OFFSET_SIGINFO_ADDR_LSB  (4 * 4 + __SIZEOF_POINTER__)
+#define __OFFSET_SIGINFO_LOWER     (4 * 4 + 2 * __SIZEOF_POINTER__)
+#define __OFFSET_SIGINFO_UPPER     (4 * 4 + 3 * __SIZEOF_POINTER__)
+#define __OFFSET_SIGINFO_BAND      (4 * 4)
+#define __OFFSET_SIGINFO_FD        (4 * 4 + __SIZEOF_POINTER__)
+#define __OFFSET_SIGINFO_CALL_ADDR (4 * 4)
+#define __OFFSET_SIGINFO_SYSCALL   (4 * 4 + __SIZEOF_POINTER__)
+#define __OFFSET_SIGINFO_ARCH      (5 * 4 + __SIZEOF_POINTER__)
 #define __SIZEOF_SIGINFO            __SI_MAX_SIZE
 
 

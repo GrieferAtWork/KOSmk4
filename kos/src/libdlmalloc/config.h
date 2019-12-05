@@ -31,6 +31,25 @@
 #undef ONLY_MSPACES
 #define USE_LOCKS 1
 #define USE_SPIN_LOCKS 1
+/* FIXME: Recursion is possible in:
+ *        locked:malloc()
+ *        mmap()
+ *        dlclearcaches()
+ *        DL_REGISTER_CACHE(my_cache_free_function)
+ *        my_cache_free_function()
+ *        locked:free()    <--- Deadlock here
+ * NOTE: A proper fix for this would implement a free() that is non-blocking
+ *       and reentrant, however dlmalloc cannot be bend to do this for us, so
+ *       Another would be enabling `USE_RECURSIVE_LOCKS' and somehow providing
+ *       a custom lock implementation that doesn't make use of `pthread_self()'
+ *       (which can't be used since `pthread_self()' itself might call `malloc()'
+ *       to allocate the thread-self descriptor of a thread created via direct
+ *       invocation of the clone() system call, or via use of a threading API
+ *       not built ontop of pthreads). However, given how useful a non-blocking
+ *       free function is in kernel-space, it only seems fair that user-space
+ *       should eventually get its own hand-written heap implementation that
+ *       also contains such a free function, alongside some more neat extension.
+ */
 #undef USE_RECURSIVE_LOCKS
 #undef LOCK_AT_FORK
 #undef FOOTERS

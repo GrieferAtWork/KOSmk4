@@ -19,6 +19,7 @@
 #ifndef _BITS_CXX___ADDRESSOF_H
 #define _BITS_CXX___ADDRESSOF_H 1
 
+#include <__crt.h>
 #include <__stdcxx.h>
 
 __CXXDECL_BEGIN

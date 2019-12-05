@@ -20,9 +20,10 @@
 #define _BITS_SIGINFO_H 1
 
 #include <__stdinc.h>
+#include <features.h>
+
 #include <bits/siginfo-struct.h>
 #include <bits/siginfo-values.h>
-#include <features.h>
 
 __SYSDECL_BEGIN
 

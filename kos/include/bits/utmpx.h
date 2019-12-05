@@ -20,10 +20,12 @@
 #define _BITS_UTMPX_H 1
 
 #include <__stdinc.h>
-#include <bits/types.h>
-#include <bits/timeval.h>
-#include <sys/time.h>
+
 #include <hybrid/typecore.h>
+
+#include <bits/timeval.h>
+#include <bits/types.h>
+#include <sys/time.h>
 
 /* Documentation taken from Glibc /usr/include/i386-linux-gnu/bits/utmpx.h */
 /* Structures and definitions for the user accounting database.  GNU version.
@@ -70,8 +72,8 @@ __SYSDECL_BEGIN
 #define DEAD_PROCESS  8 /* Terminated process. */
 
 #ifdef __USE_GNU
-# define ACCOUNTING	9	/* System accounting. */
-#endif
+#define ACCOUNTING 9 /* System accounting. */
+#endif /* __USE_GNU */
 
 #ifdef __CC__
 /* The structure describing the status of a terminated process.

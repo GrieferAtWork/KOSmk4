@@ -65,13 +65,13 @@ struct semid_ds {
 #if __TM_SIZEOF(TIME) != __SIZEOF_SYSCALL_LONG_T__*2
 #error "Unsupported configuration"
 #endif
-#else
+#else /* __TM_SIZEOF(TIME) > __SIZEOF_SYSCALL_LONG_T__ */
 	__syscall_ulong_t __glibc_reserved1;
-#endif
+#endif /* __TM_SIZEOF(TIME) <= __SIZEOF_SYSCALL_LONG_T__ */
 	__TM_TYPE(time)     sem_ctime; /* last time changed by semctl() */
 #if __TM_SIZEOF(TIME) <= __SIZEOF_SYSCALL_LONG_T__
 	__syscall_ulong_t __glibc_reserved2;
-#endif
+#endif /* __TM_SIZEOF(TIME) <= __SIZEOF_SYSCALL_LONG_T__ */
 	__syscall_ulong_t   sem_nsems; /* number of semaphores in set */
 	__syscall_ulong_t __glibc_reserved3;
 	__syscall_ulong_t __glibc_reserved4;

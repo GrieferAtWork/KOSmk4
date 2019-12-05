@@ -19,9 +19,11 @@
 #ifndef _BITS_SELECT_H
 #define _BITS_SELECT_H 1
 
+#include <__stdinc.h>
+
 #ifndef __FD_SETSIZE
 #define __FD_SETSIZE 1024
-#endif
+#endif /* !__FD_SETSIZE */
 
 #ifndef __FD_ZERO
 #define __FD_ZERO(set)                                                 \
@@ -35,13 +37,13 @@
 #endif /* !__FD_ZERO */
 
 #ifndef __FD_SET
-#define __FD_SET(d,set)   ((void)(__FDS_BITS(set)[__FD_ELT(d)] |= __FD_MASK(d)))
-#endif
+#define __FD_SET(d, set) ((void)(__FDS_BITS(set)[__FD_ELT(d)] |= __FD_MASK(d)))
+#endif /* !__FD_SET */
 #ifndef __FD_CLR
-#define __FD_CLR(d,set)   ((void)(__FDS_BITS(set)[__FD_ELT(d)] &= ~__FD_MASK(d)))
-#endif
+#define __FD_CLR(d, set) ((void)(__FDS_BITS(set)[__FD_ELT(d)] &= ~__FD_MASK(d)))
+#endif /* !__FD_CLR */
 #ifndef __FD_ISSET
-#define __FD_ISSET(d,set) ((__FDS_BITS(set)[__FD_ELT(d)]&__FD_MASK(d))!=0)
-#endif
+#define __FD_ISSET(d, set) ((__FDS_BITS(set)[__FD_ELT(d)] & __FD_MASK(d)) != 0)
+#endif /* !__FD_ISSET */
 
 #endif /* !_BITS_SELECT_H */

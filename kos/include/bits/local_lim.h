@@ -43,35 +43,35 @@
 
 #ifndef NR_OPEN
 #define __undef_NR_OPEN
-#endif
+#endif /* !NR_OPEN */
 #ifndef LINK_MAX
 #define __undef_LINK_MAX
-#endif
+#endif /* !LINK_MAX */
 #ifndef OPEN_MAX
 #define __undef_OPEN_MAX
-#endif
+#endif /* !OPEN_MAX */
 #ifndef ARG_MAX
 #define __undef_ARG_MAX
-#endif
+#endif /* !ARG_MAX */
 
 #include <linux/limits.h>
 
 #ifdef __undef_NR_OPEN
 #undef __undef_NR_OPEN
 #undef NR_OPEN
-#endif
+#endif /* __undef_NR_OPEN */
 #ifdef __undef_LINK_MAX
 #undef __undef_LINK_MAX
 #undef LINK_MAX
-#endif
+#endif /* __undef_LINK_MAX */
 #ifdef __undef_OPEN_MAX
 #undef __undef_OPEN_MAX
 #undef OPEN_MAX
-#endif
+#endif /* __undef_OPEN_MAX */
 #ifdef __undef_ARG_MAX
 #undef __undef_ARG_MAX
 #undef ARG_MAX
-#endif
+#endif /* __undef_ARG_MAX */
 
 #define _POSIX_THREAD_KEYS_MAX              128         /* The number of data keys per process. */
 #define PTHREAD_KEYS_MAX                    1024        /* This is the value this implementation supports. */
@@ -79,13 +79,13 @@
 #define PTHREAD_DESTRUCTOR_ITERATIONS       _POSIX_THREAD_DESTRUCTOR_ITERATIONS /* Number of iterations this implementation does. */
 #define _POSIX_THREAD_THREADS_MAX           64          /* The number of threads per process. */
 #undef  PTHREAD_THREADS_MAX                             /* We have no predefined limit on the number of threads. */
-#define AIO_PRIO_DELTA_MAX                  20          /* Maximum amount by which a process can descrease its asynchronous I/O priority level. */
+#define AIO_PRIO_DELTA_MAX                  20          /* Maximum amount by which a process can decrease its asynchronous I/O priority level. */
 #define PTHREAD_STACK_MIN                   16384       /* Minimum size for a thread.  We are free to choose a reasonable value. */
 #define DELAYTIMER_MAX                      2147483647  /* Maximum number of timer expiration overruns. */
 #define TTY_NAME_MAX                        32          /* Maximum tty name length. */
 #define LOGIN_NAME_MAX                      256         /* Maximum login name length.  This is arbitrary. */
 #define HOST_NAME_MAX                       64          /* Maximum host name length. */
 #define MQ_PRIO_MAX                         32768       /* Maximum message queue priority level. */
-#define SEM_VALUE_MAX                      (2147483647) /* Maximum value the semaphore can have. */
+#define SEM_VALUE_MAX                       2147483647  /* Maximum value the semaphore can have. */
 
 #endif /* !_BITS_LOCAL_LIM_H */

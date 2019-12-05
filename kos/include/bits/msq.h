@@ -20,9 +20,10 @@
 #define _BITS_MSQ_H 1
 
 #include <__stdinc.h>
+#include <features.h>
 
 #include <hybrid/typecore.h>
-#include <features.h>
+
 #include <bits/types.h>
 
 /* Documentation taken from /usr/include/i386-linux/gnu/bits/msq.h */

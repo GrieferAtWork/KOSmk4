@@ -27,9 +27,9 @@ __DECL_BEGIN
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-	EFD_SEMAPHORE = 00000001,
-	EFD_NONBLOCK  = 00004000,
-	EFD_CLOEXEC   = 02000000
+	EFD_SEMAPHORE = 0x00001,
+	EFD_NONBLOCK  = 0x00800,
+	EFD_CLOEXEC   = 0x80000
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -38,9 +38,9 @@ enum {
 #define EFD_NONBLOCK  EFD_NONBLOCK
 #define EFD_CLOEXEC   EFD_CLOEXEC
 #else /* __COMPILER_PREFERR_ENUMS */
-#define EFD_SEMAPHORE 00000001
-#define EFD_NONBLOCK  00004000
-#define EFD_CLOEXEC   02000000
+#define EFD_SEMAPHORE 0x00001
+#define EFD_NONBLOCK  0x00800
+#define EFD_CLOEXEC   0x80000
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

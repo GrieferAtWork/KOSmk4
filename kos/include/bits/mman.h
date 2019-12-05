@@ -21,10 +21,8 @@
 
 #include <__stdinc.h>
 
-/* XXX: Support for KOSm2's xmmap() system call? */
-/* XXX: Add a few new system calls, or ioctl()s to allow mmap-ing of
+/* XXX: Add a few new system calls, or hop()s to allow mmap-ing of
  *      memory that will be pre-initialized to a custom value upon
  *      first access. */
-
 
 #endif /* !_BITS_MMAN_H */

@@ -29,28 +29,28 @@ __SYSDECL_BEGIN
 #if __TM_SIZEOF(TIME) <= __SIZEOF_TIME32_T__
 #define __itimerval64   __itimerval_alt
 #define __itimerval32   itimerval
-#else
+#else /* __TM_SIZEOF(TIME) <= __SIZEOF_TIME32_T__ */
 #define __itimerval64   itimerval
 #define __itimerval32   __itimerval_alt
-#endif
+#endif /* __TM_SIZEOF(TIME) > __SIZEOF_TIME32_T__ */
 
 #ifdef __USE_TIME64
 #if __TM_SIZEOF(TIME) <= __SIZEOF_TIME32_T__
 #define __itimerval_alt itimerval64
-#else
+#else /* __TM_SIZEOF(TIME) <= __SIZEOF_TIME32_T__ */
 #define itimerval64     itimerval
-#endif
+#endif /* __TM_SIZEOF(TIME) > __SIZEOF_TIME32_T__ */
 #endif /* __USE_TIME64 */
 
 struct itimerval {
 	struct timeval       it_interval; /* Value to put into `it_value' when the timer expires. */
 	struct timeval       it_value;    /* Time to the next timer expiration. */
 };
+
 struct __itimerval_alt {
 	struct __timeval_alt it_interval; /* Value to put into `it_value' when the timer expires. */
 	struct __timeval_alt it_value;    /* Time to the next timer expiration. */
 };
-
 
 __SYSDECL_END
 #endif /* __CC__ */

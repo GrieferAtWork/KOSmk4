@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x697ac7e7 */
+/* HASH CRC-32:0xb0ab1ee3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -300,8 +300,8 @@ __CDECLARE(,reg_syntax_t,__NOTHROW_NCX,re_set_syntax,(reg_syntax_t __syntax),(__
  * and syntax given by the global `re_syntax_options', into the buffer
  * BUFFER. Return NULL if successful, and an error string if not.
  * To free the allocated storage, you must call `regfree' on BUFFER.
- * Note that the translate table must either have been initialised by
- * `regcomp', with a malloc'ed value, or set to NULL before calling `regfree' */
+ * Note that the translate table must either have been initialized by
+ * `regcomp', with a malloc'd value, or set to NULL before calling `regfree' */
 __CDECLARE(,char const *,__NOTHROW_NCX,re_compile_pattern,(char const *__pattern, size_t __length, struct re_pattern_buffer *__buffer),(__pattern,__length,__buffer))
 #endif /* re_compile_pattern... */
 #ifdef __CRT_HAVE_re_compile_fastmap

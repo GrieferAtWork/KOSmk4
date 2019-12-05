@@ -27,8 +27,8 @@ __DECL_BEGIN
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-	SFD_NONBLOCK = 00004000,
-	SFD_CLOEXEC  = 02000000
+	SFD_NONBLOCK = 0x00800,
+	SFD_CLOEXEC  = 0x80000
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -36,8 +36,8 @@ enum {
 #define SFD_NONBLOCK SFD_NONBLOCK
 #define SFD_CLOEXEC  SFD_CLOEXEC
 #else /* __COMPILER_PREFERR_ENUMS */
-#define SFD_NONBLOCK 00004000
-#define SFD_CLOEXEC  02000000
+#define SFD_NONBLOCK 0x00800
+#define SFD_CLOEXEC  0x80000
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

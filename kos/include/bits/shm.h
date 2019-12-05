@@ -21,9 +21,11 @@
 
 #include <__stdinc.h>
 #include <features.h>
-#include <bits/types.h>
+
 #include <hybrid/host.h>
 #include <hybrid/limits.h>
+
+#include <bits/types.h>
 
 __SYSDECL_BEGIN
 
@@ -45,14 +47,14 @@ __SYSDECL_BEGIN
    <http://www.gnu.org/licenses/>.  */
 
 /* Permission flag for shmget. */
-#define SHM_R  0400 /* or S_IRUGO from <linux/stat.h> */
-#define SHM_W  0200 /* or S_IWUGO from <linux/stat.h> */
+#define SHM_W  0x080 /* or S_IWUGO from <linux/stat.h> */
+#define SHM_R  0x100 /* or S_IRUGO from <linux/stat.h> */
 
 /* Flags for `shmat'. */
-#define SHM_RDONLY 0010000 /* attach read-only else read-write. */
-#define SHM_RND    0020000 /* round attach address to SHMLBA. */
-#define SHM_REMAP  0040000 /* take-over region on attach. */
-#define SHM_EXEC   0100000 /* execution access. */
+#define SHM_RDONLY 0x1000 /* attach read-only else read-write. */
+#define SHM_RND    0x2000 /* round attach address to SHMLBA. */
+#define SHM_REMAP  0x4000 /* take-over region on attach. */
+#define SHM_EXEC   0x8000 /* execution access. */
 
 /* Commands for `shmctl'. */
 #define SHM_LOCK   11 /* lock segment (root only). */
@@ -63,11 +65,11 @@ __SYSDECL_BEGIN
 #if defined(__CC__) && defined(__CRT_HAVE_getpagesize)
 #ifndef ____libc_getpagesize_defined
 #define ____libc_getpagesize_defined 1
-__CREDIRECT(__ATTR_CONST,int,__NOTHROW,__libc_getpagesize,(void),getpagesize,());
+__CREDIRECT(__ATTR_CONST,int,__NOTHROW,__libc_getpagesize,(void),getpagesize,())
 #endif /* !____libc_getpagesize_defined */
-#define SHMLBA        (__libc_getpagesize())
+#define SHMLBA __libc_getpagesize()
 #else
-#define SHMLBA         PAGESIZE
+#define SHMLBA PAGESIZE
 #endif
 #endif /* !SHMLBA */
 
@@ -105,10 +107,10 @@ struct shmid_ds {
 #define SHM_INFO        14
 
 /* shm_mode upper byte flags. */
-#define SHM_DEST       01000 /* segment will be destroyed on last detach. */
-#define SHM_LOCKED     02000 /* segment will not be swapped. */
-#define SHM_HUGETLB    04000 /* segment is mapped via hugetlb. */
-#define SHM_NORESERVE 010000 /* don't check for reservations. */
+#define SHM_DEST      0x0200 /* segment will be destroyed on last detach. */
+#define SHM_LOCKED    0x0400 /* segment will not be swapped. */
+#define SHM_HUGETLB   0x0800 /* segment is mapped via hugetlb. */
+#define SHM_NORESERVE 0x1000 /* don't check for reservations. */
 
 
 #ifdef __CC__

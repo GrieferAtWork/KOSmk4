@@ -27,7 +27,9 @@ __SYSDECL_BEGIN
 /* Internet address. */
 #ifdef __CC__
 typedef uint32_t in_addr_t;
-struct in_addr { in_addr_t s_addr; };
+struct in_addr {
+	in_addr_t s_addr;
+};
 #endif /* __CC__ */
 
 
@@ -103,39 +105,40 @@ struct in_addr { in_addr_t s_addr; };
 #ifndef IP_MSFILTER
 #define IP_MSFILTER               41
 #endif /* !IP_MSFILTER */
+
 #ifdef __USE_MISC
 #ifndef MCAST_JOIN_GROUP
-#    define MCAST_JOIN_GROUP      42 /* group_req: join any-source group */
+#define MCAST_JOIN_GROUP      42 /* group_req: join any-source group */
 #endif /* !MCAST_JOIN_GROUP */
 #ifndef MCAST_BLOCK_SOURCE
-#    define MCAST_BLOCK_SOURCE    43 /* group_source_req: block from given group */
+#define MCAST_BLOCK_SOURCE    43 /* group_source_req: block from given group */
 #endif /* !MCAST_BLOCK_SOURCE */
 #ifndef MCAST_UNBLOCK_SOURCE
-#    define MCAST_UNBLOCK_SOURCE  44 /* group_source_req: unblock from given group*/
+#define MCAST_UNBLOCK_SOURCE  44 /* group_source_req: unblock from given group*/
 #endif /* !MCAST_UNBLOCK_SOURCE */
 #ifndef MCAST_LEAVE_GROUP
-#    define MCAST_LEAVE_GROUP     45 /* group_req: leave any-source group */
+#define MCAST_LEAVE_GROUP     45 /* group_req: leave any-source group */
 #endif /* !MCAST_LEAVE_GROUP */
 #ifndef MCAST_JOIN_SOURCE_GROUP
-#    define MCAST_JOIN_SOURCE_GROUP 46 /* group_source_req: join source-spec gr */
+#define MCAST_JOIN_SOURCE_GROUP 46 /* group_source_req: join source-spec gr */
 #endif /* !MCAST_JOIN_SOURCE_GROUP */
 #ifndef MCAST_LEAVE_SOURCE_GROUP
-#    define MCAST_LEAVE_SOURCE_GROUP 47 /* group_source_req: leave source-spec gr*/
+#define MCAST_LEAVE_SOURCE_GROUP 47 /* group_source_req: leave source-spec gr*/
 #endif /* !MCAST_LEAVE_SOURCE_GROUP */
 #ifndef MCAST_MSFILTER
-#    define MCAST_MSFILTER        48
+#define MCAST_MSFILTER        48
 #endif /* !MCAST_MSFILTER */
 #ifndef IP_MULTICAST_ALL
-#    define IP_MULTICAST_ALL      49
+#define IP_MULTICAST_ALL      49
 #endif /* !IP_MULTICAST_ALL */
 #ifndef IP_UNICAST_IF
-#    define IP_UNICAST_IF         50
+#define IP_UNICAST_IF         50
 #endif /* !IP_UNICAST_IF */
 #ifndef MCAST_EXCLUDE
-#    define MCAST_EXCLUDE         0
+#define MCAST_EXCLUDE         0
 #endif /* !MCAST_EXCLUDE */
 #ifndef MCAST_INCLUDE
-#    define MCAST_INCLUDE         1
+#define MCAST_INCLUDE         1
 #endif /* !MCAST_INCLUDE */
 #endif /* __USE_MISC */
 
@@ -287,8 +290,8 @@ struct in_addr { in_addr_t s_addr; };
  * The `ip_dst' field is used for the first-hop gateway when using a
  * source route (this gets put into the header proper). */
 struct ip_opts {
-	struct in_addr ip_dst; /* First hop; zero without source route. */
-	char ip_opts[40];      /* Actually variable in size. */
+	struct in_addr ip_dst;      /* First hop; zero without source route. */
+	char           ip_opts[40]; /* Actually variable in size. */
 };
 
 /* Like `struct ip_mreq' but including interface specification by index. */

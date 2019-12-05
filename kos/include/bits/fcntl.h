@@ -153,7 +153,7 @@ struct flock64 {
 #if defined(__USE_POSIX199309) || defined(__USE_UNIX98)
 #define O_DSYNC __O_DSYNC /* ??? */
 #define O_RSYNC __O_SYNC  /* ??? */
-#endif
+#endif /* __USE_POSIX199309 || __USE_UNIX98 */
 
 
 
@@ -179,86 +179,86 @@ struct flock64 {
 #define F_OFD_GETLK  36
 #define F_OFD_SETLK  37
 #define F_OFD_SETLKW 38
-#endif
+#endif /* __USE_GNU */
 
 #ifndef F_DUPFD
 #define F_DUPFD       0 /* Duplicate file descriptor. */
-#endif
+#endif /* !F_DUPFD */
 #ifndef F_GETFD
 #define F_GETFD       1 /* Get file descriptor flags. */
 #define F_SETFD       2 /* Set file descriptor flags. */
-#endif
+#endif /* !F_GETFD */
 #ifndef F_GETFL
 #define F_GETFL       3 /* Get file status flags. */
 #define F_SETFL       4 /* Set file status flags. */
-#endif
+#endif /* !F_GETFL */
 
 #ifndef __F_SETOWN
 #define __F_SETOWN    8 /* Get owner (process receiving SIGIO). */
 #define __F_GETOWN    9 /* Set owner (process receiving SIGIO). */
-#endif
+#endif /* !__F_SETOWN */
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 #ifndef F_SETOWN
 #define F_SETOWN      __F_SETOWN /* Get owner (process receiving SIGIO). */
 #define F_GETOWN      __F_GETOWN /* Set owner (process receiving SIGIO). */
-#endif
-#endif
+#endif /* !F_SETOWN */
+#endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 
 #ifndef __F_SETSIG
 #define __F_SETSIG    10 /* Set number of signal to be sent. */
 #define __F_GETSIG    11 /* Get number of signal to be sent. */
-#endif
+#endif /* !__F_SETSIG */
 
 #ifndef __F_SETOWN_EX
 #define __F_SETOWN_EX 15 /* Get owner (thread receiving SIGIO). */
 #define __F_GETOWN_EX 16 /* Set owner (thread receiving SIGIO). */
-#endif
+#endif /* !__F_SETOWN_EX */
 
 #ifdef __USE_GNU
 #ifndef F_SETSIG
 #define F_SETSIG      __F_SETSIG    /* Set number of signal to be sent. */
 #define F_GETSIG      __F_GETSIG    /* Get number of signal to be sent. */
-#endif
+#endif /* !F_SETSIG */
 #ifndef F_SETOWN_EX
 #define F_SETOWN_EX   __F_SETOWN_EX /* Get owner (thread receiving SIGIO). */
 #define F_GETOWN_EX   __F_GETOWN_EX /* Set owner (thread receiving SIGIO). */
-#endif
+#endif /* !F_SETOWN_EX */
 #endif /* __USE_GNU */
 
 #ifdef __USE_GNU
 #ifndef F_SETLEASE
 #define F_SETLEASE   1024 /* Set a lease. */
 #define F_GETLEASE   1025 /* Enquire what lease is active. */
-#endif
+#endif /* !F_SETLEASE */
 #ifndef F_NOTIFY
 #define F_NOTIFY     1026 /* Request notifications on a directory. */
-#endif
+#endif /* !F_NOTIFY */
 #ifndef F_SETPIPE_SZ
 #define F_SETPIPE_SZ 1031 /* Set pipe page size array. */
 #define F_GETPIPE_SZ 1032 /* Get pipe page size array. */
-#endif
+#endif /* !F_SETPIPE_SZ */
 #endif /* __USE_GNU */
 
 #ifdef __USE_XOPEN2K8
 #ifndef F_DUPFD_CLOEXEC
 #define F_DUPFD_CLOEXEC 1030 /* Duplicate file descriptor with close-on-exit set. */
-#endif
+#endif /* !F_DUPFD_CLOEXEC */
 #endif /* __USE_XOPEN2K8 */
 
 #if defined(__USE_KOS) && defined(__KOS__)
 #ifndef F_SETFL_XCH
 #define F_SETFL_XCH  5163 /* Same as 'F_SETFL', but return the old set of flags instead of `-EOK' upon success. */
-#endif
+#endif /* !F_SETFL_XCH */
 #endif /* __USE_KOS && __KOS__ */
 
 #ifndef FD_CLOEXEC
 #define FD_CLOEXEC   0x01 /* FLAG: Close the descriptor on `exec()'. */
-#endif
+#endif /* !FD_CLOEXEC */
 #if defined(__USE_KOS) && defined(__KOS__)
 #ifndef FD_CLOFORK
 #define FD_CLOFORK   0x02 /* FLAG: Close the descriptor during unsharing after `fork()' (Similar to `PROT_LOOSE' for memory). */
-#endif
+#endif /* !FD_CLOFORK */
 #endif /* __USE_KOS && __KOS__ */
 
 #ifndef F_RDLCK
@@ -352,19 +352,19 @@ struct f_owner_ex {
 #ifdef __USE_MISC
 #ifndef FAPPEND
 #define FAPPEND   O_APPEND
-#endif
+#endif /* !FAPPEND */
 #ifndef FFSYNC
 #define FFSYNC    O_FSYNC
-#endif
+#endif /* !FFSYNC */
 #ifndef FASYNC
 #define FASYNC    O_ASYNC
-#endif
+#endif /* !FASYNC */
 #ifndef FNONBLOCK
 #define FNONBLOCK O_NONBLOCK
-#endif
+#endif /* !FNONBLOCK */
 #ifndef FNDELAY
 #define FNDELAY   O_NDELAY
-#endif
+#endif /* !FNDELAY */
 #endif /* __USE_MISC */
 
 #ifndef __POSIX_FADV_DONTNEED
@@ -408,7 +408,7 @@ struct f_owner_ex {
 struct file_handle {
 	unsigned int  handle_bytes;
 	int           handle_type;
-	__COMPILER_FLEXIBLE_ARRAY(unsigned char,f_handle); /* File identifier (max is `MAX_HANDLE_SZ'). */
+	__COMPILER_FLEXIBLE_ARRAY(unsigned char, f_handle); /* File identifier (max is `MAX_HANDLE_SZ'). */
 };
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("f_handle")
@@ -573,7 +573,7 @@ struct file_handle {
 #define AT_FDDRIVE_ROOT(drivechar) ((-300)+((drivechar)-'A'))
 #define AT_DOS_DRIVEMIN            'A'
 #define AT_DOS_DRIVEMAX            'Z'
-#endif
+#endif /* __KOS_VERSION__ >= 300 */
 #endif /* __USE_KOS */
 #endif /* __USE_ATFILE */
 

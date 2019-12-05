@@ -19,6 +19,7 @@
 #ifndef _BITS_CXX_EXCEPTION_H
 #define _BITS_CXX_EXCEPTION_H 1
 
+#include <__crt.h>
 #include <__stdcxx.h>
 
 __CXXDECL_BEGIN

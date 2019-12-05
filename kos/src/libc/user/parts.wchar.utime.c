@@ -22,10 +22,11 @@
 #include "../api.h"
 /**/
 
-#include "../libc/uchar.h"
-#include "parts.wchar.utime.h"
 #include <malloc.h>
 #include <uchar.h>
+
+#include "../libc/uchar.h"
+#include "parts.wchar.utime.h"
 
 DECL_BEGIN
 

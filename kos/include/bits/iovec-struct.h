@@ -31,10 +31,12 @@
 
 #ifdef __CC__
 __SYSDECL_BEGIN
+
 struct iovec {
 	void         *iov_base; /* Pointer to data. */
 	__SIZE_TYPE__ iov_len;  /* Length of data. */
 };
+
 __SYSDECL_END
 #endif /* __CC__ */
 

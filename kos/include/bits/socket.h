@@ -18,8 +18,6 @@
  */
 #ifndef _BITS_SOCKET_H
 #define _BITS_SOCKET_H 1
-#ifndef __BITS_SOCKET_H
-#define __BITS_SOCKET_H 1
 
 /* System-specific socket constants and types.  Linux version.
    Copyright (C) 1991-2016 Free Software Foundation, Inc.
@@ -513,22 +511,29 @@ struct cmsghdr {
 /* Ancillary data object manipulation macros. */
 #ifdef __CC__
 #ifndef CMSG_DATA
-#define CMSG_DATA(cmsg)        ((cmsg)->__cmsg_data)
+#define CMSG_DATA(cmsg) ((cmsg)->__cmsg_data)
 #endif /* !CMSG_DATA */
 #ifndef CMSG_FIRSTHDR
-#define CMSG_FIRSTHDR(mhdr)    ((size_t)(mhdr)->msg_controllen >= __builtin_offsetof(struct cmsghdr,__cmsg_data) ? (struct cmsghdr *)(mhdr)->msg_control : (struct cmsghdr *)0)
+#define CMSG_FIRSTHDR(mhdr)                                                            \
+	((size_t)(mhdr)->msg_controllen >= __builtin_offsetof(struct cmsghdr, __cmsg_data) \
+	 ? (struct cmsghdr *)(mhdr)->msg_control                                           \
+	 : (struct cmsghdr *)0)
 #endif /* !CMSG_FIRSTHDR */
 #ifndef CMSG_ALIGN
-#define CMSG_ALIGN(len)       (((len)+sizeof(size_t)-1) & (size_t)~(sizeof(size_t)-1))
+#define CMSG_ALIGN(len) \
+	(((len) + sizeof(size_t) - 1) & (size_t) ~(sizeof(size_t) - 1))
 #endif /* !CMSG_ALIGN */
 #ifndef CMSG_SPACE
-#define CMSG_SPACE(len)        (CMSG_ALIGN(len)+CMSG_ALIGN(__builtin_offsetof(struct cmsghdr,__cmsg_data)))
+#define CMSG_SPACE(len) \
+	(CMSG_ALIGN(len) + CMSG_ALIGN(__builtin_offsetof(struct cmsghdr, __cmsg_data)))
 #endif /* !CMSG_SPACE */
 #ifndef CMSG_LEN
-#define CMSG_LEN(len)          (CMSG_ALIGN(__builtin_offsetof(struct cmsghdr,__cmsg_data))+(len))
+#define CMSG_LEN(len) \
+	(CMSG_ALIGN(__builtin_offsetof(struct cmsghdr, __cmsg_data)) + (len))
 #endif /* !CMSG_LEN */
 #ifndef CMSG_NXTHDR
-#define CMSG_NXTHDR(mhdr,cmsg)   __cmsg_nxthdr(mhdr, cmsg)
+#define CMSG_NXTHDR(mhdr, cmsg) \
+	__cmsg_nxthdr(mhdr, cmsg)
 #ifdef __CRT_HAVE___cmsg_nxthdr
 __CDECLARE(__ATTR_WUNUSED,struct cmsghdr *,__NOTHROW_NCX,__cmsg_nxthdr,(struct msghdr *__mhdr, struct cmsghdr *__cmsg),(__mhdr,__cmsg))
 #else /* __CRT_HAVE___cmsg_nxthdr */
@@ -610,5 +615,4 @@ struct linger {
 
 __SYSDECL_END
 
-#endif /* !__BITS_SOCKET_H */
 #endif /* !_BITS_SOCKET_H */

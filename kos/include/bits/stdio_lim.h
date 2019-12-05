@@ -23,49 +23,49 @@
 
 #ifndef L_tmpnam
 #ifdef __CRT_DOS_PRIMARY
-#   define L_tmpnam     14
-#else
-#   define L_tmpnam     20
-#endif
+#define L_tmpnam 14
+#else /* __CRT_DOS_PRIMARY */
+#define L_tmpnam 20
+#endif /* !__CRT_DOS_PRIMARY */
 #endif /* !L_tmpnam */
 
 #ifndef FILENAME_MAX
 #ifdef __CRT_DOS_PRIMARY
-#   define FILENAME_MAX 260
-#else
-#   define FILENAME_MAX 4096
-#endif
+#define FILENAME_MAX 260
+#else /* __CRT_DOS_PRIMARY */
+#define FILENAME_MAX 4096
+#endif /* !__CRT_DOS_PRIMARY */
 #endif /* !FILENAME_MAX */
 
 #ifndef TMP_MAX
 #ifdef __CRT_DOS_PRIMARY
-#   define TMP_MAX      32767
-#else
-#   define TMP_MAX      238328
-#endif
+#define TMP_MAX 32767
+#else /* __CRT_DOS_PRIMARY */
+#define TMP_MAX 238328
+#endif /* !__CRT_DOS_PRIMARY */
 #endif /* !TMP_MAX */
 
 #ifdef __USE_POSIX
 #ifndef L_ctermid
-#   define L_ctermid    9
+#define L_ctermid 9
 #endif /* !L_ctermid */
 #if !defined(__USE_XOPEN2K) || defined(__USE_GNU)
 #ifndef L_cuserid
-#   define L_cuserid    9
+#define L_cuserid 9
 #endif /* !L_cuserid */
 #endif /* !__USE_XOPEN2K || __USE_GNU */
 #endif /* __USE_POSIX */
 
 #ifndef FOPEN_MAX
 #ifdef __CRT_DOS_PRIMARY
-#   define FOPEN_MAX    20
-#else
-#   define FOPEN_MAX    16
-#endif
+#define FOPEN_MAX 20
+#else /* __CRT_DOS_PRIMARY */
+#define FOPEN_MAX 16
+#endif /* !__CRT_DOS_PRIMARY */
 #endif /* !FOPEN_MAX */
 
 #ifndef IOV_MAX
-#define IOV_MAX         1024
+#define IOV_MAX 1024
 #endif /* !IOV_MAX */
 
 #endif /* !_BITS_STDIO_LIM_H */

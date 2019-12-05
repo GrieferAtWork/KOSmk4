@@ -42,28 +42,28 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#if __GCC_VERSION(3,3,0) || __has_builtin(__builtin_nanf)
-#define NAN    __builtin_nanf("")
+#if __GCC_VERSION(3, 3, 0) || __has_builtin(__builtin_nanf)
+#define NAN __builtin_nanf("")
 #elif defined(__GNUC__)
-#define NAN (__extension__((union{ unsigned __l __attribute__((__mode__(__SI__))); float __d; }){ 0x7fc00000UL }).__d)
+#define NAN (__extension__((union { unsigned __l __attribute__((__mode__(__SI__))); float __d; }) { 0x7fc00000UL }).__d)
 #else /* ... */
 #include <hybrid/__byteorder.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_CONST_DATA union {
-    __BYTE_TYPE__ __c[4];
-    float         __d;
+	__BYTE_TYPE__ __c[4];
+	float         __d;
 } const __qnan_union = {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    { 0x7f, 0xc0, 0, 0 }
+	{ 0x7f, 0xc0, 0, 0 }
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    { 0, 0, 0xc0, 0x7f }
+	{ 0, 0, 0xc0, 0x7f }
 #else
 #error "Unsupported __BYTE_ORDER__"
 #endif
 };
 __NAMESPACE_LOCAL_END
-#define NAN      (__NAMESPACE_LOCAL_SYM __qnan_union.__d)
+#define NAN (__NAMESPACE_LOCAL_SYM __qnan_union.__d)
 #endif /* !... */
 
 __SYSDECL_END
