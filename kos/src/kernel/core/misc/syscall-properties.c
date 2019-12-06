@@ -220,7 +220,7 @@ DECL_BEGIN
 	PUBLIC struct CN(struct_kernel_syscall##table_id##_regcnt) \
 	CN(kernel_syscall##table_id##_regcnt_s) ASMNAME("kernel_syscall" #table_id "_regcnt" CNS) = {
 #define __TSYSCALL(table_id, name, table_index, table_index_without_unused_leading) /* .rc_##name       = */ NRCN(RC_##name) | (IS_DEFINED(NRCN(DW_##name)) ? 8 : 0),
-#define __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)                     /* .rc_break##sysno = */ __NRFEAT_SYSCALL_REGISTER_MAX_COUNT,
+#define __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)                     /* .rc_break##sysno = */ NRCN(FEAT_SYSCALL_REGISTER_MAX_COUNT),
 #define __TSYSCALL_UNUSED(table_id, sysno, table_index, table_index_without_unused_leading) __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)
 #define __TSYSCALL_UNUSED_TRAILING(table_id, sysno, table_index, table_index_without_unused_leading, index_in_unused_trailing) __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)
 #define __TSYSCALL_TABLE_END(table_id, ...) \
