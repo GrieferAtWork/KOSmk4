@@ -136,10 +136,105 @@ DECL_BEGIN
 
 
 
+/* Define system call properties for compatibility mode (should such a mode exists on the target arch)
+ * -> Use `KERNEL_SYSCALL_PROPERTIES_COMPAT_ALIAS' the same way
+ *    `platformSuffix' is used in `generate_syscall.dee' in order to define
+ *    `kernel_syscall##id##_restartmode##KERNEL_SYSCALL_PROPERTIES_COMPAT_ALIAS' */
 #ifdef KERNEL_SYSCALL_PROPERTIES_COMPAT_ALIAS
-/* TODO: Use `KERNEL_SYSCALL_PROPERTIES_COMPAT_ALIAS' the same
- *       way `platformSuffix' is used in `generate_syscall.dee' in order to define
- *      `kernel_syscall##id##_restartmode##KERNEL_SYSCALL_PROPERTIES_COMPAT_ALIAS' */
+#define CN3(x, y)   x##y
+#define CN2(x, y)   CN3(x, y)
+#define CN(x)       CN2(x, KERNEL_SYSCALL_PROPERTIES_COMPAT_ALIAS)
+#define NRCN3(x, y) __NR##x##y
+#define NRCN2(x, y) NRCN3(x, y)
+#define NRCN(x)     NRCN2(KERNEL_SYSCALL_PROPERTIES_COMPAT_ALIAS, x)
+#define CNS         PP_STR(KERNEL_SYSCALL_PROPERTIES_COMPAT_ALIAS)
+#define INCLUDE_ASM_LS_SYSCALLS_COMPAT_H() <asm/ls-CN(syscalls).h>
+
+/************************************************************************/
+/* Define kernel_syscallN_iscpCN                                        */
+/************************************************************************/
+#define __TSYSCALL_TABLE_BEGIN(table_id, ...) \
+	struct CN(struct_kernel_syscall##table_id##_iscp) {
+#define __TSYSCALL(table_id, name, table_index, table_index_without_unused_leading) unsigned int iscp_##name : 1;
+#define __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)                     unsigned int iscp_break##sysno : 1;
+#define __TSYSCALL_UNUSED(table_id, sysno, table_index, table_index_without_unused_leading) __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)
+#define __TSYSCALL_UNUSED_TRAILING(table_id, sysno, table_index, table_index_without_unused_leading, index_in_unused_trailing) __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)
+#define __TSYSCALL_TABLE_END(table_id, ...) \
+	};
+#include INCLUDE_ASM_LS_SYSCALLS_COMPAT_H()
+#define __TSYSCALL_TABLE_BEGIN(table_id, ...) \
+	PUBLIC struct CN(struct_kernel_syscall##table_id##_iscp) \
+	CN(kernel_syscall##table_id##_iscp_s) ASMNAME("kernel_syscall" #table_id "_iscp" CNS) = {
+#define __TSYSCALL(table_id, name, table_index, table_index_without_unused_leading) /* .iscp_##name       = */ IS_DEFINED(NRCN(CP_##name)),
+#define __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)                     /* .iscp_break##sysno = */ 0,
+#define __TSYSCALL_UNUSED(table_id, sysno, table_index, table_index_without_unused_leading) __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)
+#define __TSYSCALL_UNUSED_TRAILING(table_id, sysno, table_index, table_index_without_unused_leading, index_in_unused_trailing) __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)
+#define __TSYSCALL_TABLE_END(table_id, ...) \
+	};
+#include INCLUDE_ASM_LS_SYSCALLS_COMPAT_H()
+
+
+
+
+
+/************************************************************************/
+/* Define kernel_syscallN_restartmodeCN                                 */
+/************************************************************************/
+#define __TSYSCALL_TABLE_BEGIN(table_id, ...) \
+	struct CN(struct_kernel_syscall##table_id##_restartmode) {
+#define __TSYSCALL(table_id, name, table_index, table_index_without_unused_leading) unsigned int rm_##name : 2;
+#define __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)                     unsigned int rm_break##sysno : 2;
+#define __TSYSCALL_UNUSED(table_id, sysno, table_index, table_index_without_unused_leading) __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)
+#define __TSYSCALL_UNUSED_TRAILING(table_id, sysno, table_index, table_index_without_unused_leading, index_in_unused_trailing) __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)
+#define __TSYSCALL_TABLE_END(table_id, ...) \
+	};
+#include INCLUDE_ASM_LS_SYSCALLS_COMPAT_H()
+#define __TSYSCALL_TABLE_BEGIN(table_id, ...) \
+	PUBLIC struct CN(struct_kernel_syscall##table_id##_restartmode) \
+	CN(kernel_syscall##table_id##_restartmode_s) ASMNAME("kernel_syscall" #table_id "_restartmode" CNS) = {
+#define __TSYSCALL(table_id, name, table_index, table_index_without_unused_leading) /* .rm_##name       = */ NRCN(RM_##name),
+#define __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)                     /* .rm_break##sysno = */ SYSCALL_RESTART_MODE_AUTO,
+#define __TSYSCALL_UNUSED(table_id, sysno, table_index, table_index_without_unused_leading) __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)
+#define __TSYSCALL_UNUSED_TRAILING(table_id, sysno, table_index, table_index_without_unused_leading, index_in_unused_trailing) __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)
+#define __TSYSCALL_TABLE_END(table_id, ...) \
+	};
+#include INCLUDE_ASM_LS_SYSCALLS_COMPAT_H()
+
+
+
+
+
+/************************************************************************/
+/* Define kernel_syscallN_regcnt                                        */
+/************************************************************************/
+#define __TSYSCALL_TABLE_BEGIN(table_id, ...) \
+	struct CN(struct_kernel_syscall##table_id##_regcnt) {
+#define __TSYSCALL(table_id, name, table_index, table_index_without_unused_leading) unsigned int rc_##name : 4;
+#define __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)                     unsigned int rc_break##sysno : 4;
+#define __TSYSCALL_UNUSED(table_id, sysno, table_index, table_index_without_unused_leading) __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)
+#define __TSYSCALL_UNUSED_TRAILING(table_id, sysno, table_index, table_index_without_unused_leading, index_in_unused_trailing) __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)
+#define __TSYSCALL_TABLE_END(table_id, ...) \
+	};
+#include INCLUDE_ASM_LS_SYSCALLS_COMPAT_H()
+#define __TSYSCALL_TABLE_BEGIN(table_id, ...) \
+	PUBLIC struct CN(struct_kernel_syscall##table_id##_regcnt) \
+	CN(kernel_syscall##table_id##_regcnt_s) ASMNAME("kernel_syscall" #table_id "_regcnt" CNS) = {
+#define __TSYSCALL(table_id, name, table_index, table_index_without_unused_leading) /* .rc_##name       = */ NRCN(RC_##name) | (IS_DEFINED(NRCN(DW_##name)) ? 8 : 0),
+#define __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)                     /* .rc_break##sysno = */ __NRFEAT_SYSCALL_REGISTER_MAX_COUNT,
+#define __TSYSCALL_UNUSED(table_id, sysno, table_index, table_index_without_unused_leading) __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)
+#define __TSYSCALL_UNUSED_TRAILING(table_id, sysno, table_index, table_index_without_unused_leading, index_in_unused_trailing) __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)
+#define __TSYSCALL_TABLE_END(table_id, ...) \
+	};
+#include INCLUDE_ASM_LS_SYSCALLS_COMPAT_H()
+
+#undef INCLUDE_ASM_LS_SYSCALLS_COMPAT_H
+#undef CNS
+#undef NRCN
+#undef NRCN2
+#undef NRCN3
+#undef CN
+#undef CN2
+#undef CN3
 #endif /* KERNEL_SYSCALL_PROPERTIES_COMPAT_ALIAS */
 
 DECL_END
