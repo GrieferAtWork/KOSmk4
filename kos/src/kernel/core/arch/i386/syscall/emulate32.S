@@ -151,7 +151,7 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_end):
 	/* Check if we must sign-extend the error return value. */
 	TEST_DOUBLE_WIDE(%eax, %ecx, %cl, )
 	jz     1f
-	movl   %edx, (OFFSET_ICPUSTATE_GPREG + OFFSET_GPREGS_EDX)(%esp)
+	movl   %edx, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDX)(%esp)
 1:
 	/* Restore GP registers (except for %eax, which holds the syscall return value) */
 	popl_cfi_r %edi   /* [P] Destination pointer */
