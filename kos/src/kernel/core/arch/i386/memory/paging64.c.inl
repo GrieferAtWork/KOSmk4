@@ -781,6 +781,11 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten)(unsigned int vec4,
                                                   unsigned int vec2,
                                                   unsigned int vec1_unprepare_start,
                                                   unsigned int vec1_unprepare_size) {
+	(void)vec4;
+	(void)vec3;
+	(void)vec2;
+	(void)vec1_unprepare_start;
+	(void)vec1_unprepare_size;
 	/* TODO */
 }
 
