@@ -474,12 +474,26 @@ libterminal_flush_icanon(struct terminal *__restrict self, iomode_t mode)
 }
 
 
+/* Return the number of unicode characters within a given utf-8 string */
+PRIVATE NONNULL((1)) size_t CC
+utf8_character_count(__USER __CHECKED /*utf-8*/ char const *erased_data,
+                     size_t num_bytes) {
+	size_t result = 0;
+	__USER __CHECKED char const *ptr, *end;
+	ptr = erased_data;
+	end = erased_data + num_bytes;
+	while (ptr < end) {
+		unicode_readutf8_n(&ptr, end);
+		++result;
+	}
+	return result;
+}
 
 PRIVATE NONNULL((1)) ssize_t CC
 libterminal_do_iwrite_erase(struct terminal *__restrict self,
                             __USER __CHECKED void const *erased_data,
                             size_t num_bytes, iomode_t mode,
-                            tcflag_t lflag) {
+                            tcflag_t lflag, tcflag_t iflag) {
 	ssize_t temp, result = 0;
 	if (lflag & ECHOPRT) {
 		/* Hardcopy terminal support. */
@@ -487,24 +501,51 @@ libterminal_do_iwrite_erase(struct terminal *__restrict self,
 		if unlikely(temp < (ssize_t)COMPILER_LENOF(backslash))
 			goto err_or_done;
 		result += temp;
-		while (num_bytes) {
-			--num_bytes;
-			temp = libterminal_do_owrite_echo(self,
-			                                  (byte_t *)erased_data + num_bytes,
-			                                  1,
-			                                  mode,
-			                                  lflag);
-			if unlikely(temp <= 0)
-				goto err_or_done;
-			result += temp;
+		if (iflag & IUTF8) {
+			__USER __CHECKED char const *ptr, *nextptr, *start;
+			start = (__USER __CHECKED char const *)erased_data;
+			ptr   = (__USER __CHECKED char const *)((byte_t *)erased_data + num_bytes);
+			/* Unwrite data-blocks one unicode character at a time. */
+			while (ptr > start) {
+				nextptr = ptr;
+				unicode_readutf8_rev_n(&nextptr, start);
+				temp = libterminal_do_owrite_echo(self,
+				                                  nextptr,
+				                                  (size_t)((byte_t *)ptr - (byte_t *)nextptr),
+				                                  mode,
+				                                  lflag);
+				if unlikely(temp <= 0)
+					goto err_or_done;
+				result += temp;
+				ptr = nextptr;
+			}
+		} else {
+			/* Unwrite data-blocks one byte at a time. */
+			while (num_bytes) {
+				--num_bytes;
+				temp = libterminal_do_owrite_echo(self,
+				                                  (byte_t *)erased_data + num_bytes,
+				                                  1,
+				                                  mode,
+				                                  lflag);
+				if unlikely(temp <= 0)
+					goto err_or_done;
+				result += temp;
+			}
 		}
 		temp = libterminal_do_owrite_echo(self, slash, COMPILER_LENOF(slash), mode, lflag);
 		if unlikely(temp < (ssize_t)COMPILER_LENOF(slash))
 			goto err_or_done;
 		result += temp;
 	} else {
-		while (num_bytes) {
-			--num_bytes;
+		size_t character_count;
+		character_count = num_bytes;
+		/* If UTF-8 is supported, count the number of characters
+		 * to delete, rather than the number of bytes. */
+		if (iflag & IUTF8)
+			character_count = utf8_character_count((__USER __CHECKED /*utf-8*/ char const *)erased_data, num_bytes);
+		while (character_count) {
+			--character_count;
 			temp = libterminal_do_owrite_echo(self, erase1, COMPILER_LENOF(erase1), mode,
 			                                  /* Disable `ECHOCTL', since `erase1' would
 			                                   * otherwise get escaped as `^H ^H' */
@@ -626,7 +667,7 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 						linecapture_fini(&capture);
 						RETHROW();
 					}
-					temp = libterminal_do_iwrite_erase(self, &delch, 1, mode, lflag);
+					temp = libterminal_do_iwrite_erase(self, &delch, 1, mode, lflag, iflag);
 					if unlikely(temp < 0)
 						goto err;
 				}
@@ -650,7 +691,8 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 						                                   capture.lc_base,
 						                                   capture.lc_size,
 						                                   mode,
-						                                   lflag);
+						                                   lflag,
+						                                   iflag);
 					} EXCEPT {
 						linecapture_fini(&capture);
 						RETHROW();
@@ -714,7 +756,9 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 						temp = libterminal_do_iwrite_erase(self,
 						                                   capture.lc_base + new_size,
 						                                   capture.lc_size - new_size,
-						                                   mode, lflag);
+						                                   mode,
+						                                   lflag,
+						                                   iflag);
 						if unlikely(temp < 0)
 							goto err_capture;
 						/* Re-writed the truncated canon */
