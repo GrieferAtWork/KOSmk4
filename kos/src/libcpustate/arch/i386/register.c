@@ -179,6 +179,8 @@ NOTHROW_NCX(CC libcpu_getreg_sgregs)(struct sgregs const *__restrict self, unsig
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
+	/* TODO */
 	return 0;
 }
 
@@ -189,6 +191,8 @@ NOTHROW_NCX(CC libcpu_setreg_sgregs)(struct sgregs *__restrict self, unsigned in
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
+	/* TODO */
 	return 0;
 }
 
@@ -199,6 +203,7 @@ NOTHROW_NCX(CC libcpu_getreg_coregs)(struct coregs const *__restrict self, unsig
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -210,6 +215,7 @@ NOTHROW_NCX(CC libcpu_setreg_coregs)(struct coregs *__restrict self, unsigned in
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -221,6 +227,7 @@ NOTHROW_NCX(CC libcpu_getreg_drregs)(struct drregs const *__restrict self, unsig
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -232,6 +239,7 @@ NOTHROW_NCX(CC libcpu_setreg_drregs)(struct drregs *__restrict self, unsigned in
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -243,6 +251,7 @@ NOTHROW_NCX(CC libcpu_getreg_ucpustate)(struct ucpustate const *__restrict self,
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -254,6 +263,7 @@ NOTHROW_NCX(CC libcpu_setreg_ucpustate)(struct ucpustate *__restrict self, unsig
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -265,6 +275,7 @@ NOTHROW_NCX(CC libcpu_getreg_lcpustate)(struct lcpustate const *__restrict self,
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -276,6 +287,7 @@ NOTHROW_NCX(CC libcpu_setreg_lcpustate)(struct lcpustate *__restrict self, unsig
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -287,6 +299,7 @@ NOTHROW_NCX(CC libcpu_getreg_kcpustate)(struct kcpustate const *__restrict self,
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -298,6 +311,7 @@ NOTHROW_NCX(CC libcpu_setreg_kcpustate)(struct kcpustate *__restrict self, unsig
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -309,6 +323,7 @@ NOTHROW_NCX(CC libcpu_getreg_fcpustate)(struct fcpustate const *__restrict self,
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -320,6 +335,7 @@ NOTHROW_NCX(CC libcpu_setreg_fcpustate)(struct fcpustate *__restrict self, unsig
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -331,6 +347,7 @@ NOTHROW_NCX(CC libcpu_getreg_sfpuenv)(struct sfpuenv const *__restrict self, uns
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -342,6 +359,7 @@ NOTHROW_NCX(CC libcpu_setreg_sfpuenv)(struct sfpuenv *__restrict self, unsigned 
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -353,6 +371,7 @@ NOTHROW_NCX(CC libcpu_getreg_sfpustate)(struct sfpustate const *__restrict self,
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -364,6 +383,7 @@ NOTHROW_NCX(CC libcpu_setreg_sfpustate)(struct sfpustate *__restrict self, unsig
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -375,6 +395,7 @@ NOTHROW_NCX(CC libcpu_getreg_xfpustate)(struct xfpustate const *__restrict self,
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -386,6 +407,7 @@ NOTHROW_NCX(CC libcpu_setreg_xfpustate)(struct xfpustate *__restrict self, unsig
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -398,6 +420,7 @@ NOTHROW_NCX(CC libcpu_getreg_gpregsnsp)(struct gpregsnsp const *__restrict self,
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -409,6 +432,7 @@ NOTHROW_NCX(CC libcpu_setreg_gpregsnsp)(struct gpregsnsp *__restrict self, unsig
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -420,6 +444,7 @@ NOTHROW_NCX(CC libcpu_getreg_sgbase)(struct sgbase const *__restrict self, unsig
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -431,6 +456,7 @@ NOTHROW_NCX(CC libcpu_setreg_sgbase)(struct sgbase *__restrict self, unsigned in
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -444,6 +470,7 @@ NOTHROW_NCX(CC libcpu_getreg_mcontext)(struct mcontext const *__restrict self, u
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -455,6 +482,7 @@ NOTHROW_NCX(CC libcpu_setreg_mcontext)(struct mcontext *__restrict self, unsigne
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -466,6 +494,7 @@ NOTHROW_NCX(CC libcpu_getreg_ucontext)(struct ucontext const *__restrict self, u
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -477,6 +506,7 @@ NOTHROW_NCX(CC libcpu_setreg_ucontext)(struct ucontext *__restrict self, unsigne
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -490,6 +520,7 @@ NOTHROW_NCX(CC libcpu_getreg_irregs)(LIBCPUSTATE_IRREGS_STRUCT_TYPE const *__res
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -501,6 +532,7 @@ NOTHROW_NCX(CC libcpu_setreg_irregs_p)(LIBCPUSTATE_IRREGS_STRUCT_TYPE **__restri
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -512,6 +544,7 @@ NOTHROW_NCX(CC libcpu_getreg_icpustate)(struct icpustate const *__restrict self,
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -523,6 +556,7 @@ NOTHROW_NCX(CC libcpu_setreg_icpustate_p)(struct icpustate **__restrict pself, u
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -534,6 +568,7 @@ NOTHROW_NCX(CC libcpu_getreg_scpustate)(struct scpustate const *__restrict self,
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
@@ -545,6 +580,7 @@ NOTHROW_NCX(CC libcpu_setreg_scpustate_p)(struct scpustate **__restrict pself, u
 	(void)regno;
 	(void)buf;
 	(void)buflen;
+	COMPILER_IMPURE();
 	/* TODO */
 	return 0;
 }
