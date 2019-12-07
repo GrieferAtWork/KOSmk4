@@ -23,6 +23,7 @@ if (gcc_opt.remove("-O3"))
  */
 #ifndef GUARD_KERNEL_SRC_DEBUGGER_RT_C
 #define GUARD_KERNEL_SRC_DEBUGGER_RT_C 1
+#define DISABLE_BRANCH_PROFILING 1
 
 #include <kernel/compiler.h>
 
@@ -41,7 +42,14 @@ PUBLIC ATTR_DBGBSS byte_t dbg_stack[KERNEL_DEBUG_STACKSIZE] = {};
 PUBLIC ATTR_DBGBSS bool dbg_active = false;
 
 /* [1..1] The thread that is currently being viewed. */
-PUBLIC struct task *dbg_current = NULL;
+PUBLIC ATTR_DBGBSS struct task *dbg_current = NULL;
+
+/* Apply changes made to `DBG_REGLEVEL_VIEW' onto `DBG_REGLEVEL_ORIG'. */
+PUBLIC ATTR_DBGTEXT ATTR_WEAK void NOTHROW(FCALL dbg_applyview)(void) {
+	struct fcpustate fst;
+	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
+	dbg_setallregs(DBG_REGLEVEL_ORIG, &fst);
+}
 
 
 DECL_END

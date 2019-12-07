@@ -19,8 +19,9 @@
 #ifndef _I386_KOS_LIBCPUSTATE_APPLY_H
 #define _I386_KOS_LIBCPUSTATE_APPLY_H 1
 
-#include <libcpustate/api.h>
 #include <bits/types.h>
+
+#include <libcpustate/api.h>
 
 #ifdef __CC__
 __DECL_BEGIN

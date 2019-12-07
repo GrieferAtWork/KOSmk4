@@ -142,10 +142,41 @@ DATDEF struct desctab const x86_dbgidt_ptr;
 #endif /* !__x86_dbgidt_defined */
 
 
+/* Get/set a register, given its ID
+ * NOTE: When `return > buflen', then
+ *       dbg_getregbyname: The contents of `buf' are undefined.
+ *       dbg_setregbyname: The register was not written.
+ * NOTE: Accepted register names are those found in comments in `<asm/registers.h>'
+ * @param: id:  One of `X86_REGISTER_*' (from <asm/registers.h>) or one of `X86_DBGREGISTER_*'
+ * @return: * : The required buffer size, or 0 when `name' isn't recognized. */
+FUNDEF size_t NOTHROW(KCALL x86_dbg_getregbyid)(unsigned int level, unsigned int id, void *__restrict buf, size_t buflen);
+FUNDEF size_t NOTHROW(KCALL x86_dbg_setregbyid)(unsigned int level, unsigned int id, void const *__restrict buf, size_t buflen);
+
+/* Return the ID (one of `X86_REGISTER_*' from <asm/registers.h>,
+ * or one of `X86_DBGREGISTER_*') from a given register name. */
+FUNDEF WUNUSED ATTR_PURE NONNULL((1)) unsigned int
+NOTHROW(KCALL x86_dbg_regfromname)(char const *__restrict name, size_t namelen);
 
 #endif /* __CC__ */
 
+/*[[[enum]]]*/
+#ifdef __CC__
+enum {
+	X86_DBGREGISTER_FEXCEPTREGISTER = 0x80000000, /* FLAG: Lookup the register in the thread's exception-context.
+	                                               *       Written as `%x.eax' or `%except.eax' */
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define X86_DBGREGISTER_FEXCEPTREGISTER X86_DBGREGISTER_FEXCEPTREGISTER /* FLAG: Lookup the register in the thread's exception-context. */
+#else /* __COMPILER_PREFERR_ENUMS */
+#define X86_DBGREGISTER_FEXCEPTREGISTER 0x80000000 /* FLAG: Lookup the register in the thread's exception-context. */
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
+
+
+/* CPU state kind codes. */
 #define X86_DBG_STATEKIND_NONE 0 /* No DBG_REGLEVEL_TRAP-level CPU state */
 #define X86_DBG_STATEKIND_FCPU 1 /* `struct fcpustate' */
 #define X86_DBG_STATEKIND_UCPU 2 /* `struct ucpustate' */
@@ -153,7 +184,6 @@ DATDEF struct desctab const x86_dbgidt_ptr;
 #define X86_DBG_STATEKIND_KCPU 4 /* `struct kcpustate' */
 #define X86_DBG_STATEKIND_ICPU 5 /* `struct icpustate' */
 #define X86_DBG_STATEKIND_SCPU 6 /* `struct scpustate' */
-
 
 DECL_END
 #endif /* CONFIG_HAVE_DEBUGGER */

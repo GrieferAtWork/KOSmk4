@@ -173,15 +173,19 @@ register_name(uintptr_t id) {
 
 	case X86_REGISTER_GENERAL_PURPOSE:
 		switch (id & X86_REGISTER_SIZEMASK) {
-		case X86_REGISTER_GENERAL_PURPOSE_EAX &X86_REGISTER_SIZEMASK:
+
+		case X86_REGISTER_GENERAL_PURPOSE_EAX & X86_REGISTER_SIZEMASK:
 			result = gp32_names[id & 7];
 			break;
-		case X86_REGISTER_GENERAL_PURPOSE_AX &X86_REGISTER_SIZEMASK:
+
+		case X86_REGISTER_GENERAL_PURPOSE_AX & X86_REGISTER_SIZEMASK:
 			result = gp16_names[id & 7];
 			break;
-		case X86_REGISTER_GENERAL_PURPOSE_AL &X86_REGISTER_SIZEMASK:
+
+		case X86_REGISTER_GENERAL_PURPOSE_AL & X86_REGISTER_SIZEMASK:
 			result = gp8_names[id & 7];
 			break;
+
 		default: break;
 		}
 		break;
@@ -217,29 +221,52 @@ register_name(uintptr_t id) {
 
 	case X86_REGISTER_MISC:
 		switch (id) {
+
 #ifdef X86_REGISTER_MISC_RFLAGS
 		case X86_REGISTER_MISC_RFLAGS:
 			result = "rflags";
 			break;
 #endif /* X86_REGISTER_MISC_RFLAGS */
+
 		case X86_REGISTER_MISC_EFLAGS:
 			result = "eflags";
 			break;
+
 		case X86_REGISTER_MISC_FLAGS:
 			result = "flags";
 			break;
+
 		case X86_REGISTER_MISC_TR:
 			result = "tr";
 			break;
+
 		case X86_REGISTER_MISC_LDT:
 			result = "ldt";
 			break;
-		case X86_REGISTER_MISC_GDT:
-			result = "gdt";
+
+		case X86_REGISTER_MISC_GDT_BASEL:
+#ifdef X86_REGISTER_MISC_GDT_BASEQ
+		case X86_REGISTER_MISC_GDT_BASEQ:
+#endif /* X86_REGISTER_MISC_GDT_BASEQ */
+			result = "gdt.base";
 			break;
-		case X86_REGISTER_MISC_IDT:
-			result = "idt";
+
+		case X86_REGISTER_MISC_GDT_LIMIT:
+			result = "gdt.limit";
 			break;
+
+		case X86_REGISTER_MISC_IDT_BASEL:
+#ifdef X86_REGISTER_MISC_IDT_BASEQ
+
+		case X86_REGISTER_MISC_IDT_BASEQ:
+#endif /* X86_REGISTER_MISC_IDT_BASEQ */
+			result = "idt.base";
+			break;
+
+		case X86_REGISTER_MISC_IDT_LIMIT:
+			result = "idt.limit";
+			break;
+
 		default: break;
 		}
 		break;
