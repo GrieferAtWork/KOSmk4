@@ -475,7 +475,7 @@ libterminal_flush_icanon(struct terminal *__restrict self, iomode_t mode)
 
 
 /* Return the number of unicode characters within a given utf-8 string */
-PRIVATE NONNULL((1)) size_t CC
+PRIVATE ATTR_PURE WUNUSED size_t CC
 utf8_character_count(__USER __CHECKED /*utf-8*/ char const *erased_data,
                      size_t num_bytes) {
 	size_t result = 0;
