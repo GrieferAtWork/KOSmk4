@@ -56,18 +56,26 @@ dbg_readline(/*utf-8*/ char *__restrict buf,
 		ch = dbg_getc();
 		if (ch == '\b') {
 			if (count) {
+				char *endp;
 				dbg_print(DBGSTR("\b \b"));
-				--count;
+				endp = buf + count;
+				unicode_readutf8_rev_n(&endp, buf);
+				count = (size_t)(endp - buf);
 			}
 			continue;
 		}
 		if (ch == '\t' && autocomplete) {
 			size_t i, more_chars;
+			char *ptr, *endp;
 			more_chars = (*autocomplete)(buf, bufsize, count);
 			assert(count + more_chars <= bufsize);
 			/* Re-print the current line */
-			for (i = 0; i < count; ++i)
+			ptr  = buf;
+			endp = buf + count;
+			while (ptr < endp) {
+				unicode_readutf8_n(&ptr, endp);
 				dbg_print(DBGSTR("\b \b"));
+			}
 			count += more_chars;
 			for (i = 0; i < count; ++i)
 				dbg_putc(buf[i]);
