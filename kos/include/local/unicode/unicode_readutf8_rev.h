@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae300b71 */
+/* HASH CRC-32:0xe583b156 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,14 +47,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_rev))(/*utf-8*/ char
 		case 2:
 			__result  = (__result & 0x1f) << 6;
 			__result |= (__iter[0] & 0x3f);
-			__iter += 1;
 			break;
 
 		case 3:
 			__result  = (__result & 0x0f) << 12;
 			__result |= (__iter[0] & 0x3f) << 6;
 			__result |= (__iter[1] & 0x3f);
-			__iter += 2;
 			break;
 
 		case 4:
@@ -62,7 +60,6 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_rev))(/*utf-8*/ char
 			__result |= (__iter[0] & 0x3f) << 12;
 			__result |= (__iter[1] & 0x3f) << 6;
 			__result |= (__iter[2] & 0x3f);
-			__iter += 3;
 			break;
 
 		case 5:
@@ -71,7 +68,6 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_rev))(/*utf-8*/ char
 			__result |= (__iter[1] & 0x3f) << 12;
 			__result |= (__iter[2] & 0x3f) << 6;
 			__result |= (__iter[3] & 0x3f);
-			__iter += 4;
 			break;
 
 		case 6:
@@ -81,7 +77,6 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_rev))(/*utf-8*/ char
 			__result |= (__iter[2] & 0x3f) << 12;
 			__result |= (__iter[3] & 0x3f) << 6;
 			__result |= (__iter[4] & 0x3f);
-			__iter += 5;
 			break;
 
 		case 7:
@@ -91,7 +86,6 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_rev))(/*utf-8*/ char
 			__result |= (__iter[3] & 0x3f) << 12;
 			__result |= (__iter[4] & 0x3f) << 6;
 			__result |= (__iter[5] & 0x3f);
-			__iter += 6;
 			break;
 
 		case 8:
@@ -102,7 +96,6 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_rev))(/*utf-8*/ char
 			__result |= (__iter[4] & 0x3f) << 12;
 			__result |= (__iter[5] & 0x3f) << 6;
 			__result |= (__iter[6] & 0x3f);
-			__iter += 7;
 			break;
 
 		default:

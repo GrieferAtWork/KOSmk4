@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc913d26 */
+/* HASH CRC-32:0x87aeb1e9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
  * being updated to point to the start of the character that was read */
 __LOCAL_LIBC(unicode_readutf16_rev) __ATTR_NONNULL((1)) __CHAR32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf16_rev))(/*utf-16*/ __CHAR16_TYPE__ const **__restrict __ptext) {
-#line 582 "kos/src/libc/magic/unicode.c"
+#line 568 "kos/src/libc/magic/unicode.c"
 	__CHAR32_TYPE__ __result;
 	__CHAR16_TYPE__ const *__text = *__ptext;
 	__result = (__CHAR32_TYPE__)(__UINT16_TYPE__)*--__text;

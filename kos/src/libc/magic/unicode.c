@@ -218,14 +218,12 @@ unicode_readutf8_rev:([nonnull] /*utf-8*/ char const **__restrict ptext) -> $cha
 		case 2:
 			result  = (result & 0x1f) << 6;
 			result |= (iter[0] & 0x3f);
-			iter += 1;
 			break;
 
 		case 3:
 			result  = (result & 0x0f) << 12;
 			result |= (iter[0] & 0x3f) << 6;
 			result |= (iter[1] & 0x3f);
-			iter += 2;
 			break;
 
 		case 4:
@@ -233,7 +231,6 @@ unicode_readutf8_rev:([nonnull] /*utf-8*/ char const **__restrict ptext) -> $cha
 			result |= (iter[0] & 0x3f) << 12;
 			result |= (iter[1] & 0x3f) << 6;
 			result |= (iter[2] & 0x3f);
-			iter += 3;
 			break;
 
 		case 5:
@@ -242,7 +239,6 @@ unicode_readutf8_rev:([nonnull] /*utf-8*/ char const **__restrict ptext) -> $cha
 			result |= (iter[1] & 0x3f) << 12;
 			result |= (iter[2] & 0x3f) << 6;
 			result |= (iter[3] & 0x3f);
-			iter += 4;
 			break;
 
 		case 6:
@@ -252,7 +248,6 @@ unicode_readutf8_rev:([nonnull] /*utf-8*/ char const **__restrict ptext) -> $cha
 			result |= (iter[2] & 0x3f) << 12;
 			result |= (iter[3] & 0x3f) << 6;
 			result |= (iter[4] & 0x3f);
-			iter += 5;
 			break;
 
 		case 7:
@@ -262,7 +257,6 @@ unicode_readutf8_rev:([nonnull] /*utf-8*/ char const **__restrict ptext) -> $cha
 			result |= (iter[3] & 0x3f) << 12;
 			result |= (iter[4] & 0x3f) << 6;
 			result |= (iter[5] & 0x3f);
-			iter += 6;
 			break;
 
 		case 8:
@@ -273,7 +267,6 @@ unicode_readutf8_rev:([nonnull] /*utf-8*/ char const **__restrict ptext) -> $cha
 			result |= (iter[4] & 0x3f) << 12;
 			result |= (iter[5] & 0x3f) << 6;
 			result |= (iter[6] & 0x3f);
-			iter += 7;
 			break;
 
 		default:
@@ -409,14 +402,12 @@ unicode_readutf8_rev_n:([nonnull] /*utf-8*/ char const **__restrict ptext, [nonn
 		case 2:
 			result  = (result & 0x1f) << 6;
 			result |= (iter[0] & 0x3f);
-			iter += 1;
 			break;
 
 		case 3:
 			result  = (result & 0x0f) << 12;
 			result |= (iter[0] & 0x3f) << 6;
 			result |= (iter[1] & 0x3f);
-			iter += 2;
 			break;
 
 		case 4:
@@ -424,7 +415,6 @@ unicode_readutf8_rev_n:([nonnull] /*utf-8*/ char const **__restrict ptext, [nonn
 			result |= (iter[0] & 0x3f) << 12;
 			result |= (iter[1] & 0x3f) << 6;
 			result |= (iter[2] & 0x3f);
-			iter += 3;
 			break;
 
 		case 5:
@@ -433,7 +423,6 @@ unicode_readutf8_rev_n:([nonnull] /*utf-8*/ char const **__restrict ptext, [nonn
 			result |= (iter[1] & 0x3f) << 12;
 			result |= (iter[2] & 0x3f) << 6;
 			result |= (iter[3] & 0x3f);
-			iter += 4;
 			break;
 
 		case 6:
@@ -443,7 +432,6 @@ unicode_readutf8_rev_n:([nonnull] /*utf-8*/ char const **__restrict ptext, [nonn
 			result |= (iter[2] & 0x3f) << 12;
 			result |= (iter[3] & 0x3f) << 6;
 			result |= (iter[4] & 0x3f);
-			iter += 5;
 			break;
 
 		case 7:
@@ -453,7 +441,6 @@ unicode_readutf8_rev_n:([nonnull] /*utf-8*/ char const **__restrict ptext, [nonn
 			result |= (iter[3] & 0x3f) << 12;
 			result |= (iter[4] & 0x3f) << 6;
 			result |= (iter[5] & 0x3f);
-			iter += 6;
 			break;
 
 		case 8:
@@ -464,7 +451,6 @@ unicode_readutf8_rev_n:([nonnull] /*utf-8*/ char const **__restrict ptext, [nonn
 			result |= (iter[4] & 0x3f) << 12;
 			result |= (iter[5] & 0x3f) << 6;
 			result |= (iter[6] & 0x3f);
-			iter += 7;
 			break;
 
 		default:

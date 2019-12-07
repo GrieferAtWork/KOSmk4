@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e7791b8 */
+/* HASH CRC-32:0x1e8244cf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Same as `unicode_readutf16_rev()', but read in reverse endian as that of the host CPU */
 __LOCAL_LIBC(unicode_readutf16_swap_rev) __ATTR_NONNULL((1)) __CHAR32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf16_swap_rev))(/*utf-16*/ __CHAR16_TYPE__ const **__restrict __ptext) {
-#line 604 "kos/src/libc/magic/unicode.c"
+#line 590 "kos/src/libc/magic/unicode.c"
 	__CHAR32_TYPE__ __result;
 	__CHAR16_TYPE__ const *__text = *__ptext;
 	--__text;

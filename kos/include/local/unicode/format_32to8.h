@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe79f3869 */
+/* HASH CRC-32:0xa6a0d336 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __LOCAL_LIBC(format_32to8) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_32to8))(/*struct format_32to8_data **/ void *__arg,
                                                           __CHAR32_TYPE__ const *__data,
                                                           __SIZE_TYPE__ __datalen) {
-#line 1604 "kos/src/libc/magic/unicode.c"
+#line 1590 "kos/src/libc/magic/unicode.c"
 	struct __local_format_32to8_data {
 		__pformatprinter __fd_printer; /* [1..1] Inner printer */
 		void            *__fd_arg;     /* Argument for `fd_printer' */
