@@ -60,16 +60,20 @@ struct desctab;     /* From <kos/kernel/cpu-state.h> */
 
 DATDEF struct idt_segment x86_idt[256];
 DATDEF struct desctab const x86_idt_ptr;
+
 #ifndef CONFIG_NO_DEBUGGER
+#ifndef __x86_dbgidt_defined
+#define __x86_dbgidt_defined 1
 DATDEF struct idt_segment x86_dbgidt[256];
 DATDEF struct desctab const x86_dbgidt_ptr;
+#endif /* !__x86_dbgidt_defined */
 #endif /* !CONFIG_NO_DEBUGGER */
 
 /* Start modifying `x86_idt'
  * This function must be called prior to making modifications to `x86_idt'.
  * Doing this is required to prevent other CPUs/threads from servicing
  * interrupts with IDT segments that aren't fully initialized.
- * As such, any modifications made to `x86_dbgidt' after this function
+ * As such, any modifications made to `x86_idt' after this function
  * is called will only code into effect once `x86_idt_modify_end()' is
  * called. These functions are implemented as:
  *   x86_idt_modify_start():

@@ -94,7 +94,7 @@ BEGIN
 		"arch/" + TARGET_XARCH + "/*.c",
 	];
 	for (local x: fs.dir("kos/src/kernel/core/arch/" + TARGET_XARCH)) {
-		if ("." in x || x in ["__ice__"])
+		if ("." in x || x.startswith("__"))
 			continue; /* Not a directory */
 		local path = "arch/{}/{}/".format({ TARGET_XARCH, x });
 		KERNEL_ASM_SOURCES.append(path + "*" + TARGET_BITS_PER_POINTER + ".S");

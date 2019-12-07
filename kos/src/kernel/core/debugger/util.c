@@ -36,6 +36,7 @@ if (gcc_opt.remove("-O3"))
 
 #include <alloca.h>
 #include <string.h>
+#include <stdarg.h>
 
 DECL_BEGIN
 

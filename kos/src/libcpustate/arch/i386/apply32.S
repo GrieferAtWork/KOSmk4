@@ -281,14 +281,20 @@ TEXT_SECTION
 	.cfi_rel_offset %ds, OFFSET_FCPUSTATE_DS
 	.cfi_rel_offset %cs, OFFSET_FCPUSTATE_CS
 	.cfi_rel_offset %ss, OFFSET_FCPUSTATE_SS
+	.cfi_rel_offset %tr, OFFSET_FCPUSTATE_TR
+	.cfi_rel_offset %ldtr, OFFSET_FCPUSTATE_LDT
 	.cfi_rel_offset %eflags, OFFSET_FCPUSTATE_EFLAGS
 	.cfi_rel_offset %eip, OFFSET_FCPUSTATE_EIP
 BEGIN_TRAP(kernel_debugtrap_fcpustate)
 INTERN_FUNCTION(libcpu_apply_fcpustate)
+	lgdtl  OFFSET_FCPUSTATE_GDT(%ecx)
+	lidtl  OFFSET_FCPUSTATE_IDT(%ecx)
 	movw   OFFSET_FCPUSTATE_TR(%ecx), %ax
 	ltrw   %ax
+	.cfi_same_value %tr
 	movw   OFFSET_FCPUSTATE_LDT(%ecx), %ax
 	lldtw  %ax
+	.cfi_same_value %ldtr
 	movl   (OFFSET_FCPUSTATE_COREGS + OFFSET_COREGS_CR0)(%ecx), %eax
 	movl   %eax, %cr0
 	movl   (OFFSET_FCPUSTATE_COREGS + OFFSET_COREGS_CR2)(%ecx), %eax
@@ -309,8 +315,6 @@ INTERN_FUNCTION(libcpu_apply_fcpustate)
 	movl   %eax, %dr6
 	movl   (OFFSET_FCPUSTATE_DRREGS + OFFSET_DRREGS_DR7)(%ecx), %eax
 	movl   %eax, %dr7
-	lgdtl  OFFSET_FCPUSTATE_GDT(%ecx)
-	lidtl  OFFSET_FCPUSTATE_IDT(%ecx)
 	movl   (OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDI)(%ecx), %edi
 	.cfi_same_value %edi
 	movl   (OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESI)(%ecx), %esi

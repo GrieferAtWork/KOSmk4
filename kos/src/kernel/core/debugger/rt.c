@@ -1,3 +1,8 @@
+/*[[[magic
+local gcc_opt = options.setdefault("GCC.options", []);
+if (gcc_opt.remove("-O3"))
+	gcc_opt.append("-Os");
+]]]*/
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -16,28 +21,30 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_DEBUGGER_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_DEBUGGER_H 1
+#ifndef GUARD_KERNEL_SRC_DEBUGGER_RT_C
+#define GUARD_KERNEL_SRC_DEBUGGER_RT_C 1
 
 #include <kernel/compiler.h>
-#include <kernel/types.h>
-#include <stdarg.h>
 
-#ifndef CONFIG_NO_DEBUGGER
-#include <kos/kernel/segment.h>
-#include <kos/kernel/gdt.h>
+#include <debugger/config.h>
+#ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/function.h>
+#include <debugger/rt.h>
 
 DECL_BEGIN
 
-#ifdef __CC__
+/* The stack from which debug code is executed. */
+PUBLIC ATTR_DBGBSS byte_t dbg_stack[KERNEL_DEBUG_STACKSIZE] = {};
 
-/* The GDT and IDT used by the debugger. */
-DATDEF struct segment x86_debug_gdt[SEGMENT_COUNT];
-DATDEF struct idt_segment x86_debug_idt[256] ASMNAME("x86_dbgidt");
+/* Set to true while the debugger is currently active.
+ * NOTE: This variable may be used to test if the system is being debugged. */
+PUBLIC ATTR_DBGBSS bool dbg_active = false;
 
-#endif /* __CC__ */
+/* [1..1] The thread that is currently being viewed. */
+PUBLIC struct task *dbg_current = NULL;
+
 
 DECL_END
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_DEBUGGER_H */
+#endif /* !GUARD_KERNEL_SRC_DEBUGGER_RT_C */

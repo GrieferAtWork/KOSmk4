@@ -145,7 +145,7 @@ NOTHROW(KCALL dbg_autocomplete_command)(char *__restrict line,
 }
 
 
-PRIVATE ATTR_DBGTEXT uintptr_t DEBUG_CALL
+PRIVATE ATTR_DBGTEXT uintptr_t DBG_CALL
 debug_exit(size_t argc, char *argv[]) {
 	(void)argc;
 	(void)argv;
@@ -346,7 +346,7 @@ dbg_main(uintptr_t show_welcome) {
 		/* Add a visual indicator for when the exit state doesn't match the currently
 		 * viewed state (thus informing the user that they need to type `apply' before
 		 * exit if they wish to return to the modified state) */
-		if (memcmp(&dbg_origstate, &dbg_viewstate, sizeof(dbg_origstate)) != 0)
+		if (memcmp(&x86_dbg_origstate, &x86_dbg_viewstate, sizeof(x86_dbg_origstate)) != 0)
 			dbg_print(DBGSTR(DF_COLOR(DBG_COLOR_LIME, DBG_COLOR_DARK_GRAY, "!")));
 		dbg_print(DBGSTR("> "));
 		attr = dbg_attr;

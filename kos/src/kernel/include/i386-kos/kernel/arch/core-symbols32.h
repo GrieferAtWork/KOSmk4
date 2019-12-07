@@ -123,13 +123,13 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname30 /* index: 30 */
-	.weak sys_getpeername; .long sys_getpeername
-	.reloc ., R_386_SIZE32, sys_getpeername; .long 0
-	.long 0x296f855
-	.long 0 /* index: 31 */
-	.long 0
-	.long 0
-	.long 0
+	.weak ramfs_type; .long ramfs_type
+	.reloc ., R_386_SIZE32, ramfs_type; .long 0
+	.long 0xd914855
+	.long .Lname31 /* index: 31 */
+	.weak x86_dbg_viewstate; .long x86_dbg_viewstate
+	.reloc ., R_386_SIZE32, x86_dbg_viewstate; .long 0
+	.long 0x6127805
 	.long .Lname32 /* index: 32 */
 	.weak sys_setresgid; .long sys_setresgid
 	.reloc ., R_386_SIZE32, sys_setresgid; .long 0
@@ -411,9 +411,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, aio_multihandle_done; .long 0
 	.long 0x81e0065
 	.long .Lname102 /* index: 102 */
-	.weak linebuffer_rewrite; .long linebuffer_rewrite
-	.reloc ., R_386_SIZE32, linebuffer_rewrite; .long 0
-	.long 0x4321d55
+	.weak dbg_screen_cellsize; .long dbg_screen_cellsize
+	.reloc ., R_386_SIZE32, dbg_screen_cellsize; .long 0
+	.long 0xa250d55
 	.long .Lname103 /* index: 103 */
 	.weak __cxa_rethrow; .long __cxa_rethrow
 	.reloc ., R_386_SIZE32, __cxa_rethrow; .long 0
@@ -607,9 +607,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname151 /* index: 151 */
-	.weak x86_userexcept_unwind_i; .long x86_userexcept_unwind_i
-	.reloc ., R_386_SIZE32, x86_userexcept_unwind_i; .long 0
-	.long 0x1010019
+	.weak sys_getpeername; .long sys_getpeername
+	.reloc ., R_386_SIZE32, sys_getpeername; .long 0
+	.long 0x296f855
 	.long .Lname152 /* index: 152 */
 	.weak path_traversefull_ex; .long path_traversefull_ex
 	.reloc ., R_386_SIZE32, path_traversefull_ex; .long 0
@@ -1395,9 +1395,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname348 /* index: 348 */
-	.weak sys_linux_stat64; .long sys_linux_stat64
-	.reloc ., R_386_SIZE32, sys_linux_stat64; .long 0
-	.long 0x836bc4
+	.weak sys_timer_settime64; .long sys_timer_settime64
+	.reloc ., R_386_SIZE32, sys_timer_settime64; .long 0
+	.long 0x3613bc4
 	.long .Lname349 /* index: 349 */
 	.weak task_alloc_user_rpc; .long task_alloc_user_rpc
 	.reloc ., R_386_SIZE32, task_alloc_user_rpc; .long 0
@@ -1463,9 +1463,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, vfs_kernel; .long 0
 	.long 0x61b592c
 	.long .Lname365 /* index: 365 */
-	.weak vm_pagetophys; .long vm_pagetophys
-	.reloc ., R_386_SIZE32, vm_pagetophys; .long 0
-	.long 0x1a009a3
+	.weak vm_pageinphys; .long vm_pageinphys
+	.reloc ., R_386_SIZE32, vm_pageinphys; .long 0
+	.long 0x6d309a3
 	.long 0 /* index: 366 */
 	.long 0
 	.long 0
@@ -1815,9 +1815,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, json_parser_getfloat; .long 0
 	.long 0xf5511c4
 	.long .Lname453 /* index: 453 */
-	.weak pagedir_isuseraccessible; .long pagedir_isuseraccessible
-	.reloc ., R_386_SIZE32, pagedir_isuseraccessible; .long 0
-	.long 0x24251c5
+	.weak memset_nopf; .long memset_nopf
+	.reloc ., R_386_SIZE32, memset_nopf; .long 0
+	.long 0xcf792f6
 	.long 0 /* index: 454 */
 	.long 0
 	.long 0
@@ -1862,10 +1862,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 465 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname465 /* index: 465 */
+	.weak x86_dbggdt; .long x86_dbggdt
+	.reloc ., R_386_SIZE32, x86_dbggdt; .long 0
+	.long 0x5af6674
 	.long .Lname466 /* index: 466 */
 	.weak slab_kmalloc12; .long slab_kmalloc12
 	.reloc ., R_386_SIZE32, slab_kmalloc12; .long 0
@@ -1998,10 +1998,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak slab_kmalloc32; .long slab_kmalloc32
 	.reloc ., R_386_SIZE32, slab_kmalloc32; .long 0
 	.long 0x66b31f2
-	.long 0 /* index: 499 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname499 /* index: 499 */
+	.weak dbg_getallregs; .long dbg_getallregs
+	.reloc ., R_386_SIZE32, dbg_getallregs; .long 0
+	.long 0x10651f3
 	.long .Lname500 /* index: 500 */
 	.weak dbg_editfield; .long dbg_editfield
 	.reloc ., R_386_SIZE32, dbg_editfield; .long 0
@@ -2047,9 +2047,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, unicode_readutf16_swap_n; .long 0
 	.long 0x1561fe
 	.long .Lname511 /* index: 511 */
-	.weak ramfs_type; .long ramfs_type
-	.reloc ., R_386_SIZE32, ramfs_type; .long 0
-	.long 0xd914855
+	.weak dbg_setregbyname; .long dbg_setregbyname
+	.reloc ., R_386_SIZE32, dbg_setregbyname; .long 0
+	.long 0xb065855
 	.long 0 /* index: 512 */
 	.long 0
 	.long 0
@@ -2059,9 +2059,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname514 /* index: 514 */
-	.weak pagedir_prepare_mapone; .long pagedir_prepare_mapone
-	.reloc ., R_386_SIZE32, pagedir_prepare_mapone; .long 0
-	.long 0x749dd55
+	.weak linebuffer_rewrite; .long linebuffer_rewrite
+	.reloc ., R_386_SIZE32, linebuffer_rewrite; .long 0
+	.long 0x4321d55
 	.long 0 /* index: 515 */
 	.long 0
 	.long 0
@@ -2275,9 +2275,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname568 /* index: 568 */
-	.weak validate_readable; .long validate_readable
-	.reloc ., R_386_SIZE32, validate_readable; .long 0
-	.long 0x18c4d55
+	.weak pagedir_prepare_mapone; .long pagedir_prepare_mapone
+	.reloc ., R_386_SIZE32, pagedir_prepare_mapone; .long 0
+	.long 0x749dd55
 	.long .Lname569 /* index: 569 */
 	.weak atomic64_fetchand; .long atomic64_fetchand
 	.reloc ., R_386_SIZE32, atomic64_fetchand; .long 0
@@ -2602,10 +2602,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 650 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname650 /* index: 650 */
+	.weak vm_pagetophys; .long vm_pagetophys
+	.reloc ., R_386_SIZE32, vm_pagetophys; .long 0
+	.long 0x1a009a3
 	.long .Lname651 /* index: 651 */
 	.weak vm_datablock_write_unsafe; .long vm_datablock_write_unsafe
 	.reloc ., R_386_SIZE32, vm_datablock_write_unsafe; .long 0
@@ -3035,9 +3035,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, rwlock_downgrade; .long 0
 	.long 0x9e642f5
 	.long .Lname758 /* index: 758 */
-	.weak memset_nopf; .long memset_nopf
-	.reloc ., R_386_SIZE32, memset_nopf; .long 0
-	.long 0xcf792f6
+	.weak json_parser_next; .long json_parser_next
+	.reloc ., R_386_SIZE32, json_parser_next; .long 0
+	.long 0x825df04
 	.long .Lname759 /* index: 759 */
 	.weak keyboard_buffer_putkey; .long keyboard_buffer_putkey
 	.reloc ., R_386_SIZE32, keyboard_buffer_putkey; .long 0
@@ -3374,10 +3374,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 843 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname843 /* index: 843 */
+	.weak sys_sched_get_priority_max; .long sys_sched_get_priority_max
+	.reloc ., R_386_SIZE32, sys_sched_get_priority_max; .long 0
+	.long 0xdd6a7e8
 	.long 0 /* index: 844 */
 	.long 0
 	.long 0
@@ -4311,9 +4311,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sys_futimesat; .long 0
 	.long 0x20a9434
 	.long .Lname1077 /* index: 1077 */
-	.weak dbg_exitstate; .long dbg_exitstate
-	.reloc ., R_386_SIZE32, dbg_exitstate; .long 0
-	.long 0xa37f435
+	.weak pagedir_unprepare_mapone; .long pagedir_unprepare_mapone
+	.reloc ., R_386_SIZE32, pagedir_unprepare_mapone; .long 0
+	.long 0xbdfa435
 	.long .Lname1078 /* index: 1078 */
 	.weak sys_setuid32; .long sys_setuid32
 	.reloc ., R_386_SIZE32, sys_setuid32; .long 0
@@ -5046,10 +5046,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_signal; .long sys_signal
 	.reloc ., R_386_SIZE32, sys_signal; .long 0
 	.long 0x69874ec
-	.long 0 /* index: 1261 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1261 /* index: 1261 */
+	.weak x86_dbgidt_ptr; .long x86_dbgidt_ptr
+	.reloc ., R_386_SIZE32, x86_dbgidt_ptr; .long 0
+	.long 0x47dc8d2
 	.long .Lname1262 /* index: 1262 */
 	.weak sys_getgroups; .long sys_getgroups
 	.reloc ., R_386_SIZE32, sys_getgroups; .long 0
@@ -5546,10 +5546,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak pagedir_syncall; .long pagedir_syncall
 	.reloc ., R_386_SIZE32, pagedir_syncall; .long 0
 	.long 0x75fe63c
-	.long 0 /* index: 1386 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1386 /* index: 1386 */
+	.weak vm_tasklock_trywrite; .long vm_tasklock_trywrite
+	.reloc ., R_386_SIZE32, vm_tasklock_trywrite; .long 0
+	.long 0xc3a29c5
 	.long 0 /* index: 1387 */
 	.long 0
 	.long 0
@@ -5598,10 +5598,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 1399 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1399 /* index: 1399 */
+	.weak validate_readable; .long validate_readable
+	.reloc ., R_386_SIZE32, validate_readable; .long 0
+	.long 0x18c4d55
 	.long .Lname1400 /* index: 1400 */
 	.weak vm_kernel_treelock_read; .long vm_kernel_treelock_read
 	.reloc ., R_386_SIZE32, vm_kernel_treelock_read; .long 0
@@ -5726,10 +5726,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_openpty; .long sys_openpty
 	.reloc ., R_386_SIZE32, sys_openpty; .long 0
 	.long 0x6115ed9
-	.long .Lname1431 /* index: 1431 */
-	.weak pipe_writer_destroy; .long pipe_writer_destroy
-	.reloc ., R_386_SIZE32, pipe_writer_destroy; .long 0
-	.long 0xac6cb99
+	.long 0 /* index: 1431 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname1432 /* index: 1432 */
 	.weak vpage_realloc_untraced_nx; .long vpage_realloc_untraced_nx
 	.reloc ., R_386_SIZE32, vpage_realloc_untraced_nx; .long 0
@@ -5894,10 +5894,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname1473 /* index: 1473 */
-	.weak x86_dbgidt; .long x86_dbgidt
-	.reloc ., R_386_SIZE32, x86_dbgidt; .long 0
-	.long 0x5af6474
+	.long 0 /* index: 1473 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname1474 /* index: 1474 */
 	.weak atomic64_fetchxor_r; .long atomic64_fetchxor_r
 	.reloc ., R_386_SIZE32, atomic64_fetchxor_r; .long 0
@@ -6315,9 +6315,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname1578 /* index: 1578 */
-	.weak task_raisesignalprocess; .long task_raisesignalprocess
-	.reloc ., R_386_SIZE32, task_raisesignalprocess; .long 0
-	.long 0x8915943
+	.weak sys_syncfs; .long sys_syncfs
+	.reloc ., R_386_SIZE32, sys_syncfs; .long 0
+	.long 0x6a9f943
 	.long 0 /* index: 1579 */
 	.long 0
 	.long 0
@@ -6554,10 +6554,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 1638 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1638 /* index: 1638 */
+	.weak dbg_enter_lcpustate_r; .long dbg_enter_lcpustate_r
+	.reloc ., R_386_SIZE32, dbg_enter_lcpustate_r; .long 0
+	.long 0x1b63ee2
 	.long .Lname1639 /* index: 1639 */
 	.weak rawmemrlenw; .long rawmemrlenw
 	.reloc ., R_386_SIZE32, rawmemrlenw; .long 0
@@ -6974,10 +6974,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak syscall_tracing_getenabled; .long syscall_tracing_getenabled
 	.reloc ., R_386_SIZE32, syscall_tracing_getenabled; .long 0
 	.long 0xab3b144
-	.long .Lname1743 /* index: 1743 */
-	.weak sys_timer_settime64; .long sys_timer_settime64
-	.reloc ., R_386_SIZE32, sys_timer_settime64; .long 0
-	.long 0x3613bc4
+	.long 0 /* index: 1743 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 1744 */
 	.long 0
 	.long 0
@@ -7443,9 +7443,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname1860 /* index: 1860 */
-	.weak debug_original_thread; .long debug_original_thread
-	.reloc ., R_386_SIZE32, debug_original_thread; .long 0
-	.long 0xcc8744
+	.weak path_sprintent; .long path_sprintent
+	.reloc ., R_386_SIZE32, path_sprintent; .long 0
+	.long 0x6bc744
 	.long .Lname1861 /* index: 1861 */
 	.weak fs_filesystems_lock_tryupgrade; .long fs_filesystems_lock_tryupgrade
 	.reloc ., R_386_SIZE32, fs_filesystems_lock_tryupgrade; .long 0
@@ -7546,10 +7546,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 1886 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1886 /* index: 1886 */
+	.weak x86_dbg_owner_lapicid; .long x86_dbg_owner_lapicid
+	.reloc ., R_386_SIZE32, x86_dbg_owner_lapicid; .long 0
+	.long 0x818b944
 	.long .Lname1887 /* index: 1887 */
 	.weak json_encode; .long json_encode
 	.reloc ., R_386_SIZE32, json_encode; .long 0
@@ -7759,9 +7759,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname1939 /* index: 1939 */
-	.weak sys_syncfs; .long sys_syncfs
-	.reloc ., R_386_SIZE32, sys_syncfs; .long 0
-	.long 0x6a9f943
+	.weak sys_mq_notify; .long sys_mq_notify
+	.reloc ., R_386_SIZE32, sys_mq_notify; .long 0
+	.long 0xf5fcbf9
 	.long .Lname1940 /* index: 1940 */
 	.weak sys_getitimer64; .long sys_getitimer64
 	.reloc ., R_386_SIZE32, sys_getitimer64; .long 0
@@ -8014,10 +8014,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname2003 /* index: 2003 */
-	.weak task_pause; .long task_pause
-	.reloc ., R_386_SIZE32, task_pause; .long 0
-	.long 0x1612435
+	.long 0 /* index: 2003 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname2004 /* index: 2004 */
 	.weak instruction_pred; .long instruction_pred
 	.reloc ., R_386_SIZE32, instruction_pred; .long 0
@@ -8031,9 +8031,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, system_trimheaps; .long 0
 	.long 0x6f86353
 	.long .Lname2007 /* index: 2007 */
-	.weak sys_mq_notify; .long sys_mq_notify
-	.reloc ., R_386_SIZE32, sys_mq_notify; .long 0
-	.long 0xf5fcbf9
+	.weak dbg_applyview; .long dbg_applyview
+	.reloc ., R_386_SIZE32, dbg_applyview; .long 0
+	.long 0xdcd97d7
 	.long .Lname2008 /* index: 2008 */
 	.weak kmalloc_nx; .long kmalloc_nx
 	.reloc ., R_386_SIZE32, kmalloc_nx; .long 0
@@ -8535,9 +8535,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, dbg_hexedit; .long 0
 	.long 0xea43854
 	.long .Lname2133 /* index: 2133 */
-	.weak devfs_lock_downgrade; .long devfs_lock_downgrade
-	.reloc ., R_386_SIZE32, devfs_lock_downgrade; .long 0
-	.long 0x5204855
+	.weak dbg_getregbyname; .long dbg_getregbyname
+	.reloc ., R_386_SIZE32, dbg_getregbyname; .long 0
+	.long 0x8465855
 	.long 0 /* index: 2134 */
 	.long 0
 	.long 0
@@ -8598,10 +8598,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak json_parser_rewind; .long json_parser_rewind
 	.reloc ., R_386_SIZE32, json_parser_rewind; .long 0
 	.long 0x71f2864
-	.long 0 /* index: 2149 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2149 /* index: 2149 */
+	.weak x86_dbg_exitstate; .long x86_dbg_exitstate
+	.reloc ., R_386_SIZE32, x86_dbg_exitstate; .long 0
+	.long 0xa424865
 	.long 0 /* index: 2150 */
 	.long 0
 	.long 0
@@ -9035,9 +9035,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, heap_allat_nx; .long 0
 	.long 0xd910178
 	.long .Lname2258 /* index: 2258 */
-	.weak x86_dbgidt_ptr; .long x86_dbgidt_ptr
-	.reloc ., R_386_SIZE32, x86_dbgidt_ptr; .long 0
-	.long 0x47dc8d2
+	.weak x86_dbggdt_ptr; .long x86_dbggdt_ptr
+	.reloc ., R_386_SIZE32, x86_dbggdt_ptr; .long 0
+	.long 0x67dc8d2
 	.long .Lname2259 /* index: 2259 */
 	.weak block_device_alloc; .long block_device_alloc
 	.reloc ., R_386_SIZE32, block_device_alloc; .long 0
@@ -9274,10 +9274,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_datapart_do_read; .long vm_datapart_do_read
 	.reloc ., R_386_SIZE32, vm_datapart_do_read; .long 0
 	.long 0x2bb9e4
-	.long .Lname2318 /* index: 2318 */
-	.weak sys_timer_getoverrun; .long sys_timer_getoverrun
-	.reloc ., R_386_SIZE32, sys_timer_getoverrun; .long 0
-	.long 0xa3fec8e
+	.long 0 /* index: 2318 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname2319 /* index: 2319 */
 	.weak unwind_getreg_icpustate; .long unwind_getreg_icpustate
 	.reloc ., R_386_SIZE32, unwind_getreg_icpustate; .long 0
@@ -9471,9 +9471,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname2367 /* index: 2367 */
-	.weak dbg_viewstate; .long dbg_viewstate
-	.reloc ., R_386_SIZE32, dbg_viewstate; .long 0
-	.long 0x667c435
+	.weak error_code; .long error_code
+	.reloc ., R_386_SIZE32, error_code; .long 0
+	.long 0x6836c35
 	.long .Lname2368 /* index: 2368 */
 	.weak strtou32; .long strtou32
 	.reloc ., R_386_SIZE32, strtou32; .long 0
@@ -10046,10 +10046,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak mouse_device_button; .long mouse_device_button
 	.reloc ., R_386_SIZE32, mouse_device_button; .long 0
 	.long 0xb3cd9ce
-	.long 0 /* index: 2511 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2511 /* index: 2511 */
+	.weak x86_dbg_origstate; .long x86_dbg_origstate
+	.reloc ., R_386_SIZE32, x86_dbg_origstate; .long 0
+	.long 0x5125275
 	.long 0 /* index: 2512 */
 	.long 0
 	.long 0
@@ -10063,9 +10063,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, cpu_quantum_remaining_nopr; .long 0
 	.long 0xf0d29d2
 	.long .Lname2515 /* index: 2515 */
-	.weak vm_pageinphys; .long vm_pageinphys
-	.reloc ., R_386_SIZE32, vm_pageinphys; .long 0
-	.long 0x6d309a3
+	.weak this_read_locks; .long this_read_locks
+	.reloc ., R_386_SIZE32, this_read_locks; .long 0
+	.long 0xad5a9a3
 	.long 0 /* index: 2516 */
 	.long 0
 	.long 0
@@ -10090,10 +10090,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak swap_read; .long swap_read
 	.reloc ., R_386_SIZE32, swap_read; .long 0
 	.long 0x866f1a4
-	.long 0 /* index: 2522 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2522 /* index: 2522 */
+	.weak x86_userexcept_unwind_i; .long x86_userexcept_unwind_i
+	.reloc ., R_386_SIZE32, x86_userexcept_unwind_i; .long 0
+	.long 0x1010019
 	.long 0 /* index: 2523 */
 	.long 0
 	.long 0
@@ -10343,9 +10343,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, dbg_putuni; .long 0
 	.long 0x67a1499
 	.long .Lname2585 /* index: 2585 */
-	.weak json_parser_next; .long json_parser_next
-	.reloc ., R_386_SIZE32, json_parser_next; .long 0
-	.long 0x825df04
+	.weak dbg_current; .long dbg_current
+	.reloc ., R_386_SIZE32, dbg_current; .long 0
+	.long 0xaa30704
 	.long 0 /* index: 2586 */
 	.long 0
 	.long 0
@@ -10410,10 +10410,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vio_subl; .long vio_subl
 	.reloc ., R_386_SIZE32, vio_subl; .long 0
 	.long 0x56ac5c
-	.long 0 /* index: 2602 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2602 /* index: 2602 */
+	.weak task_raisesignalprocess; .long task_raisesignalprocess
+	.reloc ., R_386_SIZE32, task_raisesignalprocess; .long 0
+	.long 0x8915943
 	.long .Lname2603 /* index: 2603 */
 	.weak debuginfo_cu_parser_loadattr_lexical_block; .long debuginfo_cu_parser_loadattr_lexical_block
 	.reloc ., R_386_SIZE32, debuginfo_cu_parser_loadattr_lexical_block; .long 0
@@ -10491,9 +10491,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname2622 /* index: 2622 */
-	.weak rawmemlen; .long rawmemlen
-	.reloc ., R_386_SIZE32, rawmemlen; .long 0
-	.long 0xe3c5a3e
+	.weak devfs_lock_downgrade; .long devfs_lock_downgrade
+	.reloc ., R_386_SIZE32, devfs_lock_downgrade; .long 0
+	.long 0x5204855
 	.long .Lname2623 /* index: 2623 */
 	.weak regdump_fcpustate; .long regdump_fcpustate
 	.reloc ., R_386_SIZE32, regdump_fcpustate; .long 0
@@ -10758,10 +10758,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak pagedir_mapone_p; .long pagedir_mapone_p
 	.reloc ., R_386_SIZE32, pagedir_mapone_p; .long 0
 	.long 0x3e36a80
-	.long 0 /* index: 2689 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2689 /* index: 2689 */
+	.weak x86_dbg_hostbackup; .long x86_dbg_hostbackup
+	.reloc ., R_386_SIZE32, x86_dbg_hostbackup; .long 0
+	.long 0x509b1c0
 	.long .Lname2690 /* index: 2690 */
 	.weak sys_sched_getattr; .long sys_sched_getattr
 	.reloc ., R_386_SIZE32, sys_sched_getattr; .long 0
@@ -10814,10 +10814,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 2703 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2703 /* index: 2703 */
+	.weak x86_dbg_trapstatekind; .long x86_dbg_trapstatekind
+	.reloc ., R_386_SIZE32, x86_dbg_trapstatekind; .long 0
+	.long 0xf7a9e34
 	.long 0 /* index: 2704 */
 	.long 0
 	.long 0
@@ -10879,9 +10879,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, x86_userexcept_raisesignal_from_exception; .long 0
 	.long 0x1898a9e
 	.long .Lname2719 /* index: 2719 */
-	.weak vm_tasklock_trywrite; .long vm_tasklock_trywrite
-	.reloc ., R_386_SIZE32, vm_tasklock_trywrite; .long 0
-	.long 0xc3a29c5
+	.weak pagedir_isuseraccessible; .long pagedir_isuseraccessible
+	.reloc ., R_386_SIZE32, pagedir_isuseraccessible; .long 0
+	.long 0x24251c5
 	.long .Lname2720 /* index: 2720 */
 	.weak directory_getcaseentry_p; .long directory_getcaseentry_p
 	.reloc ., R_386_SIZE32, directory_getcaseentry_p; .long 0
@@ -10983,9 +10983,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, vm_datablock_vio_write_phys; .long 0
 	.long 0x2726b03
 	.long .Lname2745 /* index: 2745 */
-	.weak dbg_impersonate_thread; .long dbg_impersonate_thread
-	.reloc ., R_386_SIZE32, dbg_impersonate_thread; .long 0
-	.long 0x6c9c474
+	.weak x86_dbgidt; .long x86_dbgidt
+	.reloc ., R_386_SIZE32, x86_dbgidt; .long 0
+	.long 0x5af6474
 	.long 0 /* index: 2746 */
 	.long 0
 	.long 0
@@ -11142,10 +11142,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 2785 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2785 /* index: 2785 */
+	.weak dbg_enter_kcpustate_r; .long dbg_enter_kcpustate_r
+	.reloc ., R_386_SIZE32, dbg_enter_kcpustate_r; .long 0
+	.long 0x1b53ee2
 	.long .Lname2786 /* index: 2786 */
 	.weak sys_get_exception_handler; .long sys_get_exception_handler
 	.reloc ., R_386_SIZE32, sys_get_exception_handler; .long 0
@@ -11879,9 +11879,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname2969 /* index: 2969 */
-	.weak path_sprintent; .long path_sprintent
-	.reloc ., R_386_SIZE32, path_sprintent; .long 0
-	.long 0x6bc744
+	.weak pipe_writer_destroy; .long pipe_writer_destroy
+	.reloc ., R_386_SIZE32, pipe_writer_destroy; .long 0
+	.long 0xac6cb99
 	.long .Lname2970 /* index: 2970 */
 	.weak x86_fxsave; .long x86_fxsave
 	.reloc ., R_386_SIZE32, x86_fxsave; .long 0
@@ -11983,9 +11983,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, block_device_awrite_sector; .long 0
 	.long 0x1e52bb2
 	.long .Lname2995 /* index: 2995 */
-	.weak pmembank_type_names; .long pmembank_type_names
-	.reloc ., R_386_SIZE32, pmembank_type_names; .long 0
-	.long 0xf2efbb3
+	.weak dbg_setallregs; .long dbg_setallregs
+	.reloc ., R_386_SIZE32, dbg_setallregs; .long 0
+	.long 0x10511f3
 	.long .Lname2996 /* index: 2996 */
 	.weak sys_setrlimit; .long sys_setrlimit
 	.reloc ., R_386_SIZE32, sys_setrlimit; .long 0
@@ -12051,9 +12051,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sigmask_check_s; .long 0
 	.long 0x7d37bc3
 	.long .Lname3012 /* index: 3012 */
-	.weak dbg_activator_lapic_id; .long dbg_activator_lapic_id
-	.reloc ., R_386_SIZE32, dbg_activator_lapic_id; .long 0
-	.long 0x5860bc4
+	.weak sys_linux_stat64; .long sys_linux_stat64
+	.reloc ., R_386_SIZE32, sys_linux_stat64; .long 0
+	.long 0x836bc4
 	.long 0 /* index: 3013 */
 	.long 0
 	.long 0
@@ -12419,9 +12419,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname3104 /* index: 3104 */
-	.weak vm_datablock_anonymous; .long vm_datablock_anonymous
-	.reloc ., R_386_SIZE32, vm_datablock_anonymous; .long 0
-	.long 0xb72da13
+	.weak vm_copytophys; .long vm_copytophys
+	.reloc ., R_386_SIZE32, vm_copytophys; .long 0
+	.long 0xda3ca13
 	.long .Lname3105 /* index: 3105 */
 	.weak heap_alloc_nx; .long heap_alloc_nx
 	.reloc ., R_386_SIZE32, heap_alloc_nx; .long 0
@@ -12859,9 +12859,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname3214 /* index: 3214 */
-	.weak kernel_vpanic_scpustate; .long kernel_vpanic_scpustate
-	.reloc ., R_386_SIZE32, kernel_vpanic_scpustate; .long 0
-	.long 0xf5ade45
+	.weak sys_timer_getoverrun; .long sys_timer_getoverrun
+	.reloc ., R_386_SIZE32, sys_timer_getoverrun; .long 0
+	.long 0xa3fec8e
 	.long 0 /* index: 3215 */
 	.long 0
 	.long 0
@@ -13030,10 +13030,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_datapart_lock_upgrade_nx; .long vm_datapart_lock_upgrade_nx
 	.reloc ., R_386_SIZE32, vm_datapart_lock_upgrade_nx; .long 0
 	.long 0xd3f0cb8
-	.long .Lname3257 /* index: 3257 */
-	.weak x86_debug_gdt; .long x86_debug_gdt
-	.reloc ., R_386_SIZE32, x86_debug_gdt; .long 0
-	.long 0x2010774
+	.long 0 /* index: 3257 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 3258 */
 	.long 0
 	.long 0
@@ -13190,10 +13190,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname3297 /* index: 3297 */
-	.weak vmb_mapat; .long vmb_mapat
-	.reloc ., R_386_SIZE32, vmb_mapat; .long 0
-	.long 0x863fbb4
+	.long 0 /* index: 3297 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 3298 */
 	.long 0
 	.long 0
@@ -13423,9 +13423,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname3355 /* index: 3355 */
-	.weak inode_areadk; .long inode_areadk
-	.reloc ., R_386_SIZE32, inode_areadk; .long 0
-	.long 0x28ded1b
+	.weak dbg_stack; .long dbg_stack
+	.reloc ., R_386_SIZE32, dbg_stack; .long 0
+	.long 0xd6acd1b
 	.long 0 /* index: 3356 */
 	.long 0
 	.long 0
@@ -13534,10 +13534,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak task_tryyield_or_pause; .long task_tryyield_or_pause
 	.reloc ., R_386_SIZE32, task_tryyield_or_pause; .long 0
 	.long 0xa8862a5
-	.long .Lname3383 /* index: 3383 */
-	.weak dbg_applyreg; .long dbg_applyreg
-	.reloc ., R_386_SIZE32, dbg_applyreg; .long 0
-	.long 0x1dcdd37
+	.long 0 /* index: 3383 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname3384 /* index: 3384 */
 	.weak slab_kmalloc_nx; .long slab_kmalloc_nx
 	.reloc ., R_386_SIZE32, slab_kmalloc_nx; .long 0
@@ -13739,9 +13739,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sys_sysctl; .long 0
 	.long 0x6b72a3c
 	.long .Lname3434 /* index: 3434 */
-	.weak sys_finit_module; .long sys_finit_module
-	.reloc ., R_386_SIZE32, sys_finit_module; .long 0
-	.long 0x20fbc35
+	.weak vmb_mapat; .long vmb_mapat
+	.reloc ., R_386_SIZE32, vmb_mapat; .long 0
+	.long 0x863fbb4
 	.long .Lname3435 /* index: 3435 */
 	.weak pidns_trylookup_task; .long pidns_trylookup_task
 	.reloc ., R_386_SIZE32, pidns_trylookup_task; .long 0
@@ -13783,9 +13783,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, debuginfo_location_select; .long 0
 	.long 0x19e2d74
 	.long .Lname3445 /* index: 3445 */
-	.weak sys_sched_get_priority_max; .long sys_sched_get_priority_max
-	.reloc ., R_386_SIZE32, sys_sched_get_priority_max; .long 0
-	.long 0xdd6a7e8
+	.weak rawmemlen; .long rawmemlen
+	.reloc ., R_386_SIZE32, rawmemlen; .long 0
+	.long 0xe3c5a3e
 	.long .Lname3446 /* index: 3446 */
 	.weak dbg_printf; .long dbg_printf
 	.reloc ., R_386_SIZE32, dbg_printf; .long 0
@@ -14615,9 +14615,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sys_execveat; .long 0
 	.long 0x90a5e44
 	.long .Lname3653 /* index: 3653 */
-	.weak dbg_origstate; .long dbg_origstate
-	.reloc ., R_386_SIZE32, dbg_origstate; .long 0
-	.long 0x567ce45
+	.weak kernel_vpanic_scpustate; .long kernel_vpanic_scpustate
+	.reloc ., R_386_SIZE32, kernel_vpanic_scpustate; .long 0
+	.long 0xf5ade45
 	.long .Lname3654 /* index: 3654 */
 	.weak kernel_vpanic_lcpustate; .long kernel_vpanic_lcpustate
 	.reloc ., R_386_SIZE32, kernel_vpanic_lcpustate; .long 0
@@ -14711,9 +14711,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname3677 /* index: 3677 */
-	.weak pagedir_unprepare_mapone; .long pagedir_unprepare_mapone
-	.reloc ., R_386_SIZE32, pagedir_unprepare_mapone; .long 0
-	.long 0xbdfa435
+	.weak task_pause; .long task_pause
+	.reloc ., R_386_SIZE32, task_pause; .long 0
+	.long 0x1612435
 	.long .Lname3678 /* index: 3678 */
 	.weak page_stat_between; .long page_stat_between
 	.reloc ., R_386_SIZE32, page_stat_between; .long 0
@@ -14915,9 +14915,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, vm_do_ffreeram; .long 0
 	.long 0xed09a6d
 	.long .Lname3728 /* index: 3728 */
-	.weak vm_copytophys; .long vm_copytophys
-	.reloc ., R_386_SIZE32, vm_copytophys; .long 0
-	.long 0xda3ca13
+	.weak this_connections; .long this_connections
+	.reloc ., R_386_SIZE32, this_connections; .long 0
+	.long 0x2cb0a13
 	.long .Lname3729 /* index: 3729 */
 	.weak vm_kernel_treelock_read_nx; .long vm_kernel_treelock_read_nx
 	.reloc ., R_386_SIZE32, vm_kernel_treelock_read_nx; .long 0
@@ -14967,9 +14967,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, task_start; .long 0
 	.long 0x16d0034
 	.long .Lname3741 /* index: 3741 */
-	.weak error_code; .long error_code
-	.reloc ., R_386_SIZE32, error_code; .long 0
-	.long 0x6836c35
+	.weak sys_finit_module; .long sys_finit_module
+	.reloc ., R_386_SIZE32, sys_finit_module; .long 0
+	.long 0x20fbc35
 	.long .Lname3742 /* index: 3742 */
 	.weak vm_sync_end; .long vm_sync_end
 	.reloc ., R_386_SIZE32, vm_sync_end; .long 0
@@ -14990,10 +14990,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 3747 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3747 /* index: 3747 */
+	.weak inode_areadk; .long inode_areadk
+	.reloc ., R_386_SIZE32, inode_areadk; .long 0
+	.long 0x28ded1b
 	.long .Lname3748 /* index: 3748 */
 	.weak vm_datapart_read; .long vm_datapart_read
 	.reloc ., R_386_SIZE32, vm_datapart_read; .long 0
@@ -15243,9 +15243,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname3810 /* index: 3810 */
-	.weak mouse_device_hwheel_nopr; .long mouse_device_hwheel_nopr
-	.reloc ., R_386_SIZE32, mouse_device_hwheel_nopr; .long 0
-	.long 0x3b1aee2
+	.weak dbg_enter_fcpustate_r; .long dbg_enter_fcpustate_r
+	.reloc ., R_386_SIZE32, dbg_enter_fcpustate_r; .long 0
+	.long 0x1a83ee2
 	.long .Lname3811 /* index: 3811 */
 	.weak vm_copyfromphys; .long vm_copyfromphys
 	.reloc ., R_386_SIZE32, vm_copyfromphys; .long 0
@@ -15335,9 +15335,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname3833 /* index: 3833 */
-	.weak mouse_device_vwheel_nopr; .long mouse_device_vwheel_nopr
-	.reloc ., R_386_SIZE32, mouse_device_vwheel_nopr; .long 0
-	.long 0x3a3aee2
+	.weak dbg_enter_icpustate_r; .long dbg_enter_icpustate_r
+	.reloc ., R_386_SIZE32, dbg_enter_icpustate_r; .long 0
+	.long 0x1ab3ee2
 	.long 0 /* index: 3834 */
 	.long 0
 	.long 0
@@ -15514,10 +15514,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak dbg_beginupdate; .long dbg_beginupdate
 	.reloc ., R_386_SIZE32, dbg_beginupdate; .long 0
 	.long 0x89e7f25
-	.long 0 /* index: 3878 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3878 /* index: 3878 */
+	.weak vm_datablock_anonymous; .long vm_datablock_anonymous
+	.reloc ., R_386_SIZE32, vm_datablock_anonymous; .long 0
+	.long 0xb72da13
 	.long .Lname3879 /* index: 3879 */
 	.weak inode_read_phys_blocking; .long inode_read_phys_blocking
 	.reloc ., R_386_SIZE32, inode_read_phys_blocking; .long 0
@@ -15734,10 +15734,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vio_cmpxch_or_writel; .long vio_cmpxch_or_writel
 	.reloc ., R_386_SIZE32, vio_cmpxch_or_writel; .long 0
 	.long 0x8230f5c
-	.long 0 /* index: 3933 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3933 /* index: 3933 */
+	.weak pmembank_type_names; .long pmembank_type_names
+	.reloc ., R_386_SIZE32, pmembank_type_names; .long 0
+	.long 0xf2efbb3
 	.long 0 /* index: 3934 */
 	.long 0
 	.long 0
@@ -15830,10 +15830,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 3957 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3957 /* index: 3957 */
+	.weak x86_dbg_trapstate; .long x86_dbg_trapstate
+	.reloc ., R_386_SIZE32, x86_dbg_trapstate; .long 0
+	.long 0x2827f75
 	.long 0 /* index: 3958 */
 	.long 0
 	.long 0
@@ -16010,10 +16010,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 4002 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname4002 /* index: 4002 */
+	.weak mouse_device_vwheel_nopr; .long mouse_device_vwheel_nopr
+	.reloc ., R_386_SIZE32, mouse_device_vwheel_nopr; .long 0
+	.long 0x3a3aee2
 	.long .Lname4003 /* index: 4003 */
 	.weak block_device_readv_phys_sync; .long block_device_readv_phys_sync
 	.reloc ., R_386_SIZE32, block_device_readv_phys_sync; .long 0
@@ -16178,10 +16178,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 4044 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname4044 /* index: 4044 */
+	.weak this_sighand_ptr; .long this_sighand_ptr
+	.reloc ., R_386_SIZE32, this_sighand_ptr; .long 0
+	.long 0xf283552
 	.long .Lname4045 /* index: 4045 */
 	.weak sys_mq_getsetattr; .long sys_mq_getsetattr
 	.reloc ., R_386_SIZE32, sys_mq_getsetattr; .long 0
@@ -16294,10 +16294,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 4073 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname4073 /* index: 4073 */
+	.weak memchrl; .long memchrl
+	.reloc ., R_386_SIZE32, memchrl; .long 0
+	.long 0x3c39ffc
 	.long 0 /* index: 4074 */
 	.long 0
 	.long 0
@@ -16311,9 +16311,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname4077 /* index: 4077 */
-	.weak this_sighand_ptr; .long this_sighand_ptr
-	.reloc ., R_386_SIZE32, this_sighand_ptr; .long 0
-	.long 0xf283552
+	.weak mouse_device_hwheel_nopr; .long mouse_device_hwheel_nopr
+	.reloc ., R_386_SIZE32, mouse_device_hwheel_nopr; .long 0
+	.long 0x3b1aee2
 	.long 0 /* index: 4078 */
 	.long 0
 	.long 0
@@ -16371,9 +16371,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname4092 /* index: 4092 */
-	.weak memchrl; .long memchrl
-	.reloc ., R_386_SIZE32, memchrl; .long 0
-	.long 0x3c39ffc
+	.weak dbg_enter_ucpustate_r; .long dbg_enter_ucpustate_r
+	.reloc ., R_386_SIZE32, dbg_enter_ucpustate_r; .long 0
+	.long 0x19f3ee2
 	.long 0 /* index: 4093 */
 	.long 0
 	.long 0
@@ -16383,9 +16383,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname4095 /* index: 4095 */
-	.weak dbg_screen_cellsize; .long dbg_screen_cellsize
-	.reloc ., R_386_SIZE32, dbg_screen_cellsize; .long 0
-	.long 0xa250d55
+	.weak dbg_enter_scpustate_r; .long dbg_enter_scpustate_r
+	.reloc ., R_386_SIZE32, dbg_enter_scpustate_r; .long 0
+	.long 0x19d3ee2
 END(kernel_symbol_table)
 .section .rodata.kernel_strtab
 .Lname0:
@@ -16425,7 +16425,9 @@ END(kernel_symbol_table)
 .Lname28:
 	.string "vm_getfutex_existing"
 .Lname30:
-	.string "sys_getpeername"
+	.string "ramfs_type"
+.Lname31:
+	.string "x86_dbg_viewstate"
 .Lname32:
 	.string "sys_setresgid"
 .Lname34:
@@ -16503,7 +16505,7 @@ END(kernel_symbol_table)
 .Lname101:
 	.string "aio_multihandle_done"
 .Lname102:
-	.string "linebuffer_rewrite"
+	.string "dbg_screen_cellsize"
 .Lname103:
 	.string "__cxa_rethrow"
 .Lname107:
@@ -16561,7 +16563,7 @@ END(kernel_symbol_table)
 .Lname149:
 	.string "block_device_acquire_partlock_write"
 .Lname151:
-	.string "x86_userexcept_unwind_i"
+	.string "sys_getpeername"
 .Lname152:
 	.string "path_traversefull_ex"
 .Lname153:
@@ -16781,7 +16783,7 @@ END(kernel_symbol_table)
 .Lname345:
 	.string "devfs_lock_read"
 .Lname348:
-	.string "sys_linux_stat64"
+	.string "sys_timer_settime64"
 .Lname349:
 	.string "task_alloc_user_rpc"
 .Lname350:
@@ -16801,7 +16803,7 @@ END(kernel_symbol_table)
 .Lname364:
 	.string "vfs_kernel"
 .Lname365:
-	.string "vm_pagetophys"
+	.string "vm_pageinphys"
 .Lname368:
 	.string "vm_datapart_map_ram_autoprop"
 .Lname369:
@@ -16913,7 +16915,7 @@ END(kernel_symbol_table)
 .Lname452:
 	.string "json_parser_getfloat"
 .Lname453:
-	.string "pagedir_isuseraccessible"
+	.string "memset_nopf"
 .Lname455:
 	.string "x86_vm86_outw"
 .Lname456:
@@ -16924,6 +16926,8 @@ END(kernel_symbol_table)
 	.string "vm_datapart_lock_trywrite"
 .Lname461:
 	.string "sys_vserver"
+.Lname465:
+	.string "x86_dbggdt"
 .Lname466:
 	.string "slab_kmalloc12"
 .Lname467:
@@ -16962,6 +16966,8 @@ END(kernel_symbol_table)
 	.string "regdump_gpregs_with_sp"
 .Lname498:
 	.string "slab_kmalloc32"
+.Lname499:
+	.string "dbg_getallregs"
 .Lname500:
 	.string "dbg_editfield"
 .Lname501:
@@ -16975,9 +16981,9 @@ END(kernel_symbol_table)
 .Lname510:
 	.string "unicode_readutf16_swap_n"
 .Lname511:
-	.string "ramfs_type"
+	.string "dbg_setregbyname"
 .Lname514:
-	.string "pagedir_prepare_mapone"
+	.string "linebuffer_rewrite"
 .Lname516:
 	.string "regdump_idt"
 .Lname517:
@@ -17051,7 +17057,7 @@ END(kernel_symbol_table)
 .Lname566:
 	.string "block_device_readv"
 .Lname568:
-	.string "validate_readable"
+	.string "pagedir_prepare_mapone"
 .Lname569:
 	.string "atomic64_fetchand"
 .Lname571:
@@ -17164,6 +17170,8 @@ END(kernel_symbol_table)
 	.string "thiscpu_x86_tssdf"
 .Lname648:
 	.string "vm_datapart_lock_endread"
+.Lname650:
+	.string "vm_pagetophys"
 .Lname651:
 	.string "vm_datablock_write_unsafe"
 .Lname653:
@@ -17277,7 +17285,7 @@ END(kernel_symbol_table)
 .Lname757:
 	.string "rwlock_downgrade"
 .Lname758:
-	.string "memset_nopf"
+	.string "json_parser_next"
 .Lname759:
 	.string "keyboard_buffer_putkey"
 .Lname761:
@@ -17366,6 +17374,8 @@ END(kernel_symbol_table)
 	.string "sys_waitpid"
 .Lname841:
 	.string "unwind_getreg_ucpustate"
+.Lname843:
+	.string "sys_sched_get_priority_max"
 .Lname845:
 	.string "task_schedule_user_rpc"
 .Lname846:
@@ -17653,7 +17663,7 @@ END(kernel_symbol_table)
 .Lname1076:
 	.string "sys_futimesat"
 .Lname1077:
-	.string "dbg_exitstate"
+	.string "pagedir_unprepare_mapone"
 .Lname1078:
 	.string "sys_setuid32"
 .Lname1081:
@@ -17858,6 +17868,8 @@ END(kernel_symbol_table)
 	.string "ramfs_dev_type"
 .Lname1260:
 	.string "sys_signal"
+.Lname1261:
+	.string "x86_dbgidt_ptr"
 .Lname1262:
 	.string "sys_getgroups"
 .Lname1263:
@@ -17990,6 +18002,8 @@ END(kernel_symbol_table)
 	.string "sys_ftruncate"
 .Lname1385:
 	.string "pagedir_syncall"
+.Lname1386:
+	.string "vm_tasklock_trywrite"
 .Lname1389:
 	.string "keyboard_device_putkey_nopr"
 .Lname1393:
@@ -17998,6 +18012,8 @@ END(kernel_symbol_table)
 	.string "vm_datapart_writev_phys"
 .Lname1396:
 	.string "handle_print"
+.Lname1399:
+	.string "validate_readable"
 .Lname1400:
 	.string "vm_kernel_treelock_read"
 .Lname1401:
@@ -18032,8 +18048,6 @@ END(kernel_symbol_table)
 	.string "superblock_nodeslock_tryservice"
 .Lname1430:
 	.string "sys_openpty"
-.Lname1431:
-	.string "pipe_writer_destroy"
 .Lname1432:
 	.string "vpage_realloc_untraced_nx"
 .Lname1433:
@@ -18090,8 +18104,6 @@ END(kernel_symbol_table)
 	.string "vm_datapart_write"
 .Lname1471:
 	.string "kernel_panic_lcpustate"
-.Lname1473:
-	.string "x86_dbgidt"
 .Lname1474:
 	.string "atomic64_fetchxor_r"
 .Lname1475:
@@ -18213,7 +18225,7 @@ END(kernel_symbol_table)
 .Lname1572:
 	.string "_strtoui64"
 .Lname1578:
-	.string "task_raisesignalprocess"
+	.string "sys_syncfs"
 .Lname1580:
 	.string "vm_isused"
 .Lname1581:
@@ -18278,6 +18290,8 @@ END(kernel_symbol_table)
 	.string "sys_lfutexlockexpr"
 .Lname1636:
 	.string "cpu_quantum_end"
+.Lname1638:
+	.string "dbg_enter_lcpustate_r"
 .Lname1639:
 	.string "rawmemrlenw"
 .Lname1641:
@@ -18378,8 +18392,6 @@ END(kernel_symbol_table)
 	.string "sys_sysinfo"
 .Lname1742:
 	.string "syscall_tracing_getenabled"
-.Lname1743:
-	.string "sys_timer_settime64"
 .Lname1746:
 	.string "dbg_fillrect2"
 .Lname1747:
@@ -18515,7 +18527,7 @@ END(kernel_symbol_table)
 .Lname1858:
 	.string "sys_lchown32"
 .Lname1860:
-	.string "debug_original_thread"
+	.string "path_sprintent"
 .Lname1861:
 	.string "fs_filesystems_lock_tryupgrade"
 .Lname1865:
@@ -18534,6 +18546,8 @@ END(kernel_symbol_table)
 	.string "isr_unregister_at"
 .Lname1884:
 	.string "coredump_create_for_signal"
+.Lname1886:
+	.string "x86_dbg_owner_lapicid"
 .Lname1887:
 	.string "json_encode"
 .Lname1889:
@@ -18579,7 +18593,7 @@ END(kernel_symbol_table)
 .Lname1934:
 	.string "unwind_fde_find"
 .Lname1939:
-	.string "sys_syncfs"
+	.string "sys_mq_notify"
 .Lname1940:
 	.string "sys_getitimer64"
 .Lname1941:
@@ -18644,8 +18658,6 @@ END(kernel_symbol_table)
 	.string "sys_swapon"
 .Lname2001:
 	.string "vm_library_enumerate"
-.Lname2003:
-	.string "task_pause"
 .Lname2004:
 	.string "instruction_pred"
 .Lname2005:
@@ -18653,7 +18665,7 @@ END(kernel_symbol_table)
 .Lname2006:
 	.string "system_trimheaps"
 .Lname2007:
-	.string "sys_mq_notify"
+	.string "dbg_applyview"
 .Lname2008:
 	.string "kmalloc_nx"
 .Lname2011:
@@ -18801,7 +18813,7 @@ END(kernel_symbol_table)
 .Lname2132:
 	.string "dbg_hexedit"
 .Lname2133:
-	.string "devfs_lock_downgrade"
+	.string "dbg_getregbyname"
 .Lname2135:
 	.string "ttybase_device_hupctty"
 .Lname2137:
@@ -18816,6 +18828,8 @@ END(kernel_symbol_table)
 	.string "x86_userexcept_unwind_interrupt_kernel_esp"
 .Lname2148:
 	.string "json_parser_rewind"
+.Lname2149:
+	.string "x86_dbg_exitstate"
 .Lname2151:
 	.string "handle_installxchg"
 .Lname2152:
@@ -18939,7 +18953,7 @@ END(kernel_symbol_table)
 .Lname2257:
 	.string "heap_allat_nx"
 .Lname2258:
-	.string "x86_dbgidt_ptr"
+	.string "x86_dbggdt_ptr"
 .Lname2259:
 	.string "block_device_alloc"
 .Lname2260:
@@ -18994,8 +19008,6 @@ END(kernel_symbol_table)
 	.string "sighand_ptr_destroy"
 .Lname2317:
 	.string "vm_datapart_do_read"
-.Lname2318:
-	.string "sys_timer_getoverrun"
 .Lname2319:
 	.string "unwind_getreg_icpustate"
 .Lname2322:
@@ -19063,7 +19075,7 @@ END(kernel_symbol_table)
 .Lname2365:
 	.string "tty_device_startfwd"
 .Lname2367:
-	.string "dbg_viewstate"
+	.string "error_code"
 .Lname2368:
 	.string "strtou32"
 .Lname2370:
@@ -19210,12 +19222,14 @@ END(kernel_symbol_table)
 	.string "task_sethandlemanager"
 .Lname2510:
 	.string "mouse_device_button"
+.Lname2511:
+	.string "x86_dbg_origstate"
 .Lname2513:
 	.string "vm_writephysq"
 .Lname2514:
 	.string "cpu_quantum_remaining_nopr"
 .Lname2515:
-	.string "vm_pageinphys"
+	.string "this_read_locks"
 .Lname2517:
 	.string "debugaranges_locate"
 .Lname2519:
@@ -19224,6 +19238,8 @@ END(kernel_symbol_table)
 	.string "inode_recent_clear_nx"
 .Lname2521:
 	.string "swap_read"
+.Lname2522:
+	.string "x86_userexcept_unwind_i"
 .Lname2526:
 	.string "page_free"
 .Lname2527:
@@ -19303,7 +19319,7 @@ END(kernel_symbol_table)
 .Lname2584:
 	.string "dbg_putuni"
 .Lname2585:
-	.string "json_parser_next"
+	.string "dbg_current"
 .Lname2587:
 	.string "sys_fadvise64_64"
 .Lname2591:
@@ -19318,6 +19334,8 @@ END(kernel_symbol_table)
 	.string "vm_datapart_do_enumdma"
 .Lname2601:
 	.string "vio_subl"
+.Lname2602:
+	.string "task_raisesignalprocess"
 .Lname2603:
 	.string "debuginfo_cu_parser_loadattr_lexical_block"
 .Lname2604:
@@ -19345,7 +19363,7 @@ END(kernel_symbol_table)
 .Lname2620:
 	.string "sys_keyctl"
 .Lname2622:
-	.string "rawmemlen"
+	.string "devfs_lock_downgrade"
 .Lname2623:
 	.string "regdump_fcpustate"
 .Lname2624:
@@ -19436,6 +19454,8 @@ END(kernel_symbol_table)
 	.string "page_freeone"
 .Lname2688:
 	.string "pagedir_mapone_p"
+.Lname2689:
+	.string "x86_dbg_hostbackup"
 .Lname2690:
 	.string "sys_sched_getattr"
 .Lname2693:
@@ -19448,6 +19468,8 @@ END(kernel_symbol_table)
 	.string "task_waitfor_norpc_nx"
 .Lname2701:
 	.string "x86_syscall_emulate_sysenter_r"
+.Lname2703:
+	.string "x86_dbg_trapstatekind"
 .Lname2705:
 	.string "vm_getfutex"
 .Lname2706:
@@ -19475,7 +19497,7 @@ END(kernel_symbol_table)
 .Lname2718:
 	.string "x86_userexcept_raisesignal_from_exception"
 .Lname2719:
-	.string "vm_tasklock_trywrite"
+	.string "pagedir_isuseraccessible"
 .Lname2720:
 	.string "directory_getcaseentry_p"
 .Lname2722:
@@ -19509,7 +19531,7 @@ END(kernel_symbol_table)
 .Lname2744:
 	.string "vm_datablock_vio_write_phys"
 .Lname2745:
-	.string "dbg_impersonate_thread"
+	.string "x86_dbgidt"
 .Lname2750:
 	.string "x86_idt_modify_end"
 .Lname2756:
@@ -19546,6 +19568,8 @@ END(kernel_symbol_table)
 	.string "json_writer_putnull"
 .Lname2783:
 	.string "vm_sync_endone"
+.Lname2785:
+	.string "dbg_enter_kcpustate_r"
 .Lname2786:
 	.string "sys_get_exception_handler"
 .Lname2787:
@@ -19753,7 +19777,7 @@ END(kernel_symbol_table)
 .Lname2967:
 	.string "dbg_hasuni"
 .Lname2969:
-	.string "path_sprintent"
+	.string "pipe_writer_destroy"
 .Lname2970:
 	.string "x86_fxsave"
 .Lname2972:
@@ -19781,7 +19805,7 @@ END(kernel_symbol_table)
 .Lname2994:
 	.string "block_device_awrite_sector"
 .Lname2995:
-	.string "pmembank_type_names"
+	.string "dbg_setallregs"
 .Lname2996:
 	.string "sys_setrlimit"
 .Lname2997:
@@ -19805,7 +19829,7 @@ END(kernel_symbol_table)
 .Lname3011:
 	.string "sigmask_check_s"
 .Lname3012:
-	.string "dbg_activator_lapic_id"
+	.string "sys_linux_stat64"
 .Lname3014:
 	.string "terminal_owrite"
 .Lname3015:
@@ -19913,7 +19937,7 @@ END(kernel_symbol_table)
 .Lname3101:
 	.string "sys_ioperm"
 .Lname3104:
-	.string "vm_datablock_anonymous"
+	.string "vm_copytophys"
 .Lname3105:
 	.string "heap_alloc_nx"
 .Lname3107:
@@ -20051,7 +20075,7 @@ END(kernel_symbol_table)
 .Lname3212:
 	.string "mouse_device_ioctl"
 .Lname3214:
-	.string "kernel_vpanic_scpustate"
+	.string "sys_timer_getoverrun"
 .Lname3217:
 	.string "vm_datapart_lock_read_nx"
 .Lname3218:
@@ -20096,8 +20120,6 @@ END(kernel_symbol_table)
 	.string "json_parser_getstring"
 .Lname3256:
 	.string "vm_datapart_lock_upgrade_nx"
-.Lname3257:
-	.string "x86_debug_gdt"
 .Lname3260:
 	.string "vio_cmpxchl"
 .Lname3261:
@@ -20144,8 +20166,6 @@ END(kernel_symbol_table)
 	.string "sys_setfsuid32"
 .Lname3295:
 	.string "error_register_state"
-.Lname3297:
-	.string "vmb_mapat"
 .Lname3300:
 	.string "json_parser_leaveobject"
 .Lname3301:
@@ -20213,7 +20233,7 @@ END(kernel_symbol_table)
 .Lname3352:
 	.string "thiscpu_quantum_length"
 .Lname3355:
-	.string "inode_areadk"
+	.string "dbg_stack"
 .Lname3357:
 	.string "unicode_32to8"
 .Lname3358:
@@ -20242,8 +20262,6 @@ END(kernel_symbol_table)
 	.string "dbg_enter_scpustate"
 .Lname3382:
 	.string "task_tryyield_or_pause"
-.Lname3383:
-	.string "dbg_applyreg"
 .Lname3384:
 	.string "slab_kmalloc_nx"
 .Lname3385:
@@ -20305,7 +20323,7 @@ END(kernel_symbol_table)
 .Lname3433:
 	.string "sys_sysctl"
 .Lname3434:
-	.string "sys_finit_module"
+	.string "vmb_mapat"
 .Lname3435:
 	.string "pidns_trylookup_task"
 .Lname3437:
@@ -20317,7 +20335,7 @@ END(kernel_symbol_table)
 .Lname3444:
 	.string "debuginfo_location_select"
 .Lname3445:
-	.string "sys_sched_get_priority_max"
+	.string "rawmemlen"
 .Lname3446:
 	.string "dbg_printf"
 .Lname3449:
@@ -20581,7 +20599,7 @@ END(kernel_symbol_table)
 .Lname3652:
 	.string "sys_execveat"
 .Lname3653:
-	.string "dbg_origstate"
+	.string "kernel_vpanic_scpustate"
 .Lname3654:
 	.string "kernel_vpanic_lcpustate"
 .Lname3655:
@@ -20613,7 +20631,7 @@ END(kernel_symbol_table)
 .Lname3674:
 	.string "terminal_setios"
 .Lname3677:
-	.string "pagedir_unprepare_mapone"
+	.string "task_pause"
 .Lname3678:
 	.string "page_stat_between"
 .Lname3679:
@@ -20681,7 +20699,7 @@ END(kernel_symbol_table)
 .Lname3727:
 	.string "vm_do_ffreeram"
 .Lname3728:
-	.string "vm_copytophys"
+	.string "this_connections"
 .Lname3729:
 	.string "vm_kernel_treelock_read_nx"
 .Lname3730:
@@ -20701,7 +20719,7 @@ END(kernel_symbol_table)
 .Lname3740:
 	.string "task_start"
 .Lname3741:
-	.string "error_code"
+	.string "sys_finit_module"
 .Lname3742:
 	.string "vm_sync_end"
 .Lname3743:
@@ -20710,6 +20728,8 @@ END(kernel_symbol_table)
 	.string "kernel_debugtrap"
 .Lname3745:
 	.string "sys_sched_setscheduler"
+.Lname3747:
+	.string "inode_areadk"
 .Lname3748:
 	.string "vm_datapart_read"
 .Lname3749:
@@ -20773,7 +20793,7 @@ END(kernel_symbol_table)
 .Lname3807:
 	.string "block_device_write"
 .Lname3810:
-	.string "mouse_device_hwheel_nopr"
+	.string "dbg_enter_fcpustate_r"
 .Lname3811:
 	.string "vm_copyfromphys"
 .Lname3812:
@@ -20797,7 +20817,7 @@ END(kernel_symbol_table)
 .Lname3829:
 	.string "kernel_debugtrap_icpustate"
 .Lname3833:
-	.string "mouse_device_vwheel_nopr"
+	.string "dbg_enter_icpustate_r"
 .Lname3836:
 	.string "dbg_scroll"
 .Lname3839:
@@ -20850,6 +20870,8 @@ END(kernel_symbol_table)
 	.string "sys_linux_fstat64"
 .Lname3877:
 	.string "dbg_beginupdate"
+.Lname3878:
+	.string "vm_datablock_anonymous"
 .Lname3879:
 	.string "inode_read_phys_blocking"
 .Lname3881:
@@ -20922,6 +20944,8 @@ END(kernel_symbol_table)
 	.string "character_device_pread"
 .Lname3932:
 	.string "vio_cmpxch_or_writel"
+.Lname3933:
+	.string "pmembank_type_names"
 .Lname3935:
 	.string "vm_tasklock_downgrade"
 .Lname3936:
@@ -20952,6 +20976,8 @@ END(kernel_symbol_table)
 	.string "dbg_evaladdr"
 .Lname3955:
 	.string "pidns_alloc"
+.Lname3957:
+	.string "x86_dbg_trapstate"
 .Lname3961:
 	.string "handle_installat"
 .Lname3963:
@@ -20992,6 +21018,8 @@ END(kernel_symbol_table)
 	.string "fpustate_saveinto"
 .Lname4000:
 	.string "pidns_trylookup"
+.Lname4002:
+	.string "mouse_device_vwheel_nopr"
 .Lname4003:
 	.string "block_device_readv_phys_sync"
 .Lname4004:
@@ -21040,6 +21068,8 @@ END(kernel_symbol_table)
 	.string "sys_setresgid32"
 .Lname4041:
 	.string "vm_syncall"
+.Lname4044:
+	.string "this_sighand_ptr"
 .Lname4045:
 	.string "sys_mq_getsetattr"
 .Lname4048:
@@ -21080,8 +21110,10 @@ END(kernel_symbol_table)
 	.string "sys_mincore"
 .Lname4071:
 	.string "memchrw"
+.Lname4073:
+	.string "memchrl"
 .Lname4077:
-	.string "this_sighand_ptr"
+	.string "mouse_device_hwheel_nopr"
 .Lname4080:
 	.string "sys_kcmp"
 .Lname4081:
@@ -21091,6 +21123,6 @@ END(kernel_symbol_table)
 .Lname4089:
 	.string "sys_fmkdirat"
 .Lname4092:
-	.string "memchrl"
+	.string "dbg_enter_ucpustate_r"
 .Lname4095:
-	.string "dbg_screen_cellsize"
+	.string "dbg_enter_scpustate_r"

@@ -61,7 +61,7 @@ INTDEF byte_t __x86_gdt_kernel_tls_hi[];
 	[SEGMENT_INDEX(id)] = { { { (uintptr_t)lo, (uintptr_t)hi } } }
 #endif /* !__x86_64__ */
 
-PUBLIC struct segment x86_debug_gdt[SEGMENT_COUNT] = {
+PUBLIC ATTR_DBGDATA struct segment x86_dbggdt[SEGMENT_COUNT] = {
 	[SEGMENT_INDEX(SEGMENT_NULL)]          = SEGMENT_DESCRIPTOR_INIT(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),                                           /* NULL segment */
 	[SEGMENT_INDEX(SEGMENT_KERNEL_CODE)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 0, 1, 0, GDT_L, 1, 1), /* Kernel code segment */
 	[SEGMENT_INDEX(SEGMENT_KERNEL_DATA)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 0, 1, 0, GDT_L, 1, 1), /* Kernel data segment */
@@ -77,6 +77,11 @@ PUBLIC struct segment x86_debug_gdt[SEGMENT_COUNT] = {
 	[SEGMENT_INDEX(SEGMENT_USER_CODE64)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 3, 1, 0, 1, 1, 1), /* User code (64-bit) */
 	[SEGMENT_INDEX(SEGMENT_USER_DATA64)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 3, 1, 0, 1, 1, 1), /* User data (64-bit) */
 #endif /* __x86_64__ */
+};
+
+PUBLIC_CONST ATTR_DBGRODATA struct desctab const x86_dbggdt_ptr = {
+	/* .dt_limit = */ sizeof(x86_dbggdt) - 1,
+	/* .dt_base  = */ (uintptr_t)&x86_dbggdt[0]
 };
 
 DECL_END

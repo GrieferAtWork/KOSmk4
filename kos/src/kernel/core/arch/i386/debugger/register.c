@@ -73,18 +73,19 @@ NOTHROW(FCALL name2regid)(char const *__restrict name,
 }
 
 
-/* Try to get/set the value of a given register from `dbg_viewstate', given its name.
- * Note that registers with values larger than pointer-size are usually split up into
- * two or more different registers.
- * @return: true:  Success.
- * @return: false: Invalid register name. */
-PUBLIC ATTR_DBGTEXT bool
-NOTHROW(FCALL dbg_getreg)(char const *__restrict name,
-                          size_t namelen, uintptr_t *__restrict presult) {
+/* Get/set a register, given its (arch-specific) name
+ * NOTE: When `return > buflen', then
+ *       dbg_getregbyname: The contents of `buf' are undefined.
+ *       dbg_setregbyname: The register was not written.
+ * @return: * : The required buffer size, or 0 when `name' isn't recognized. */
+PUBLIC ATTR_DBGTEXT size_t
+NOTHROW(KCALL dbg_getregbyname)(unsigned int level, char const *__restrict name,
+                                size_t namelen, void *__restrict buf, size_t buflen) {
 	uintptr_t value;
 	unsigned int id = name2regid(name, namelen);
 	if (id == REG_INVALID)
-		return false;
+		return 0;
+	(void)level; /* TODO */
 	switch (id) {
 
 #define REGISTER(name, get, set) \
@@ -95,17 +96,23 @@ NOTHROW(FCALL dbg_getreg)(char const *__restrict name,
 
 	default: __builtin_unreachable();
 	}
-	*presult = value;
-	return true;
+	if (buflen >= sizeof(uintptr_t))
+		memcpy(buf, &value, sizeof(uintptr_t));
+	return sizeof(uintptr_t);
 }
 
 
-PUBLIC ATTR_DBGTEXT bool
-NOTHROW(FCALL dbg_setreg)(char const *__restrict name,
-                          size_t namelen, uintptr_t value) {
+PUBLIC ATTR_DBGTEXT size_t
+NOTHROW(KCALL dbg_setregbyname)(unsigned int level, char const *__restrict name,
+                                size_t namelen, void const *__restrict buf, size_t buflen) {
 	unsigned int id = name2regid(name, namelen);
+	uintptr_t value;
 	if (id == REG_INVALID)
-		return false;
+		return 0;
+	(void)level; /* TODO */
+	if (buflen < sizeof(uintptr_t))
+		return sizeof(uintptr_t);
+	memcpy(&value, buf, sizeof(uintptr_t));
 	switch (id) {
 
 #define REGISTER(name, get, set) \
@@ -116,37 +123,75 @@ NOTHROW(FCALL dbg_setreg)(char const *__restrict name,
 
 	default: __builtin_unreachable();
 	}
-	return true;
+	return sizeof(uintptr_t);
 }
 
 
 
 /* Apply changes made to the viewed register state
  * to the current thread's return location. */
-PUBLIC void NOTHROW(FCALL dbg_applyreg)(void) {
-	struct task *me = THIS_TASK;
-	if (me == debug_original_thread) {
+PUBLIC void NOTHROW(FCALL dbg_applyview)(void) {
+	if (dbg_current == THIS_TASK) {
 		/* The original thread is being used.
 		 * In this case, copying the view-state into
 		 * the exit-state is already sufficient. */
-		memcpy(&dbg_exitstate,
-		       &dbg_viewstate,
-		       sizeof(dbg_exitstate));
+		memcpy(&x86_dbg_exitstate,
+		       &x86_dbg_viewstate,
+		       sizeof(x86_dbg_exitstate));
 	} else {
 		struct scpustate *state;
 		/* Some foreign thread.
 		 * In this case, we must update the thread's
 		 * return-state to the viewed register state. */
-		state = me->t_sched.s_state;
+		state = dbg_current->t_sched.s_state;
 		state = (struct scpustate *)((byte_t *)state + scpustate_sizeof(state));
-		state = fcpustate_to_scpustate_p(&dbg_viewstate, state);
-		me->t_sched.s_state = state;
+		state = fcpustate_to_scpustate_p(&x86_dbg_viewstate, state);
+		dbg_current->t_sched.s_state = state;
 	}
-	memcpy(&dbg_origstate,
-	       &dbg_viewstate,
-	       sizeof(dbg_origstate));
+	memcpy(&x86_dbg_origstate,
+	       &x86_dbg_viewstate,
+	       sizeof(x86_dbg_origstate));
 }
 
+
+/* Get/set all registers. */
+PUBLIC void
+NOTHROW(KCALL dbg_getallregs)(unsigned int level,
+                              struct fcpustate *__restrict state) {
+	(void)level; /* TODO */
+	*state = x86_dbg_viewstate;
+}
+
+PUBLIC void
+NOTHROW(KCALL dbg_setallregs)(unsigned int level,
+                              struct fcpustate const *__restrict state) {
+	(void)level; /* TODO */
+	x86_dbg_viewstate = *state;
+}
+
+
+/* Get/Set debugger register for some given level.
+ * NOTE: These functions are written to be compatible with `unwind_getreg_t' / `unwind_setreg_t'
+ * @param: arg: One of `DBG_REGLEVEL_*', cast as `(void *)(uintptr_t)DBG_REGLEVEL_*' */
+PUBLIC bool
+NOTHROW(LIBUNWIND_CC dbg_getreg)(/*uintptr_t level*/ void const *arg,
+                                 uintptr_half_t regno, void *__restrict buf) {
+	(void)arg;
+	(void)regno;
+	(void)buf;
+	/* TODO */
+	return false;
+}
+
+PUBLIC bool
+NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *arg,
+                                 uintptr_half_t regno, void const *__restrict buf) {
+	(void)arg;
+	(void)regno;
+	(void)buf;
+	/* TODO */
+	return false;
+}
 
 
 DECL_END

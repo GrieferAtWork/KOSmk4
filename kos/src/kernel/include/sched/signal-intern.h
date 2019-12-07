@@ -16,39 +16,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_INCLUDE_SCHED_SIGNAL_INTERN_H
+#define GUARD_KERNEL_INCLUDE_SCHED_SIGNAL_INTERN_H 1
 
 #include <kernel/compiler.h>
 
-#include <kernel/cpuid.h>
-#include <kernel/paging.h>
+#include <kernel/types.h>
+#include <sched/pertask.h>
+#include <sched/signal.h>
 
-#include <kos/kernel/gdt.h>
-#include <kos/kernel/tss.h>
+DECL_BEGIN
 
-#define EXPORT_AS_OBJECT(name) \
-	.type name, @object;       \
-	.global name;
-#define EXPORT_AS_OBJECT_EX(name, size_) \
-	EXPORT_AS_OBJECT(name)               \
-	.size name, size_;
-EXPORT_AS_OBJECT(vm_kernel)
-EXPORT_AS_OBJECT(thiscpu_idle)
-EXPORT_AS_OBJECT(_bootcpu)
-EXPORT_AS_OBJECT(_bootidle)
-EXPORT_AS_OBJECT(_boottask)
-EXPORT_AS_OBJECT_EX(pagedir_kernel, PAGEDIR_SIZE)
-EXPORT_AS_OBJECT_EX(pagedir_kernel_phys, PAGEDIR_SIZE)
-EXPORT_AS_OBJECT_EX(dbg_stack, KERNEL_DEBUG_STACKSIZE)
-EXPORT_AS_OBJECT_EX(jiffies, 8)
-EXPORT_AS_OBJECT_EX(thiscpu_x86_tss, SIZEOF_TSS)
-EXPORT_AS_OBJECT_EX(thiscpu_x86_iob, 8192)
-EXPORT_AS_OBJECT_EX(this_x86_kernel_psp0, __SIZEOF_POINTER__)
-EXPORT_AS_OBJECT_EX(x86_bootcpu_cpufeatures, 2)
-EXPORT_AS_OBJECT_EX(x86_bootcpu_cpuid, SIZEOF_CPUID_CPUINFO)
-EXPORT_AS_OBJECT_EX(x86_bootcpu_gdt, SEGMENT_COUNT * 8)
-EXPORT_AS_OBJECT_EX(this_idle_sched_state, __SIZEOF_POINTER__)
-EXPORT_AS_OBJECT_EX(this_idle_x86_kernel_psp0, __SIZEOF_POINTER__)
-#undef EXPORT_AS_OBJECT_EX
-#undef EXPORT_AS_OBJECT
+#ifdef __CC__
 
+struct task_connections;
 
+/* Active connections of the current thread */
+DATDEF ATTR_PERTASK struct task_connections this_connections;
+
+INTDEF NOBLOCK void NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self);
+
+#endif /* __CC__ */
+
+DECL_END
+
+#endif /* !GUARD_KERNEL_INCLUDE_SCHED_SIGNAL_INTERN_H */

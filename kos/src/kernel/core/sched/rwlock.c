@@ -20,8 +20,6 @@
 #define GUARD_KERNEL_SRC_SCHED_RWLOCK_C 1
 #define _KOS_SOURCE 1
 
-#include "rwlock.h"
-
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
@@ -33,6 +31,7 @@
 #include <sched/pertask.h>
 #include <sched/rpc.h>
 #include <sched/rwlock.h>
+#include <sched/rwlock-intern.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -80,7 +79,7 @@ DECL_BEGIN
 	             THIS_TASK, __builtin_return_address(0))
 
 
-INTERN ATTR_PERTASK struct read_locks this_read_locks = {
+PUBLIC ATTR_PERTASK struct read_locks this_read_locks = {
 	/* .rls_sbuf = */ { },
 	/* .rls_use  = */ 0,
 	/* .rls_cnt  = */ 0,

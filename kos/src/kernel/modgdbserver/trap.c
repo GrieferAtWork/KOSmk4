@@ -96,7 +96,7 @@ NOTHROW(FCALL GDBServer_HasStopEvent)(GDBThreadStopEvent *chain,
 
 
 #ifndef CONFIG_NO_DEBUGGER
-PRIVATE void KCALL GDBServer_RecursiveEntryDebuggerMain(void *UNUSED(arg)) {
+PRIVATE void KCALL GDBServer_RecursiveEntryDebuggerMain(void) {
 	dbg_printf(DF_SETCOLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON)
 	           "Recursive GDB trap" DF_RESETATTR "\n");
 }
@@ -173,17 +173,17 @@ do_print_message_in_nonstop_mode:
 #ifndef CONFIG_NO_DEBUGGER
 			switch (state_kind) {
 			case CPUSTATE_KIND_ICPUSTATE:
-				dbg_enter((struct icpustate *)state, &GDBServer_RecursiveEntryDebuggerMain, NULL);
+				dbg_enter(&GDBServer_RecursiveEntryDebuggerMain, (struct icpustate *)state);
 			case CPUSTATE_KIND_SCPUSTATE:
-				dbg_enter((struct scpustate *)state, &GDBServer_RecursiveEntryDebuggerMain, NULL);
+				dbg_enter(&GDBServer_RecursiveEntryDebuggerMain, (struct scpustate *)state);
 			case CPUSTATE_KIND_UCPUSTATE:
-				dbg_enter((struct ucpustate *)state, &GDBServer_RecursiveEntryDebuggerMain, NULL);
+				dbg_enter(&GDBServer_RecursiveEntryDebuggerMain, (struct ucpustate *)state);
 			case CPUSTATE_KIND_KCPUSTATE:
-				dbg_enter((struct kcpustate *)state, &GDBServer_RecursiveEntryDebuggerMain, NULL);
+				dbg_enter(&GDBServer_RecursiveEntryDebuggerMain, (struct kcpustate *)state);
 			case CPUSTATE_KIND_LCPUSTATE:
-				dbg_enter((struct lcpustate *)state, &GDBServer_RecursiveEntryDebuggerMain, NULL);
+				dbg_enter(&GDBServer_RecursiveEntryDebuggerMain, (struct lcpustate *)state);
 			case CPUSTATE_KIND_FCPUSTATE:
-				dbg_enter((struct fcpustate *)state, &GDBServer_RecursiveEntryDebuggerMain, NULL);
+				dbg_enter(&GDBServer_RecursiveEntryDebuggerMain, (struct fcpustate *)state);
 			default: break;
 			}
 #endif /* !CONFIG_NO_DEBUGGER */

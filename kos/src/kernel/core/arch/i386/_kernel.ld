@@ -396,8 +396,8 @@ SECTIONS {
 
 #ifndef CONFIG_NO_DEBUGGER
 		IP_ALIGN(PAGESIZE);
-		PROVIDE_HIDDEN(__kernel_debug_stack = ABSOLUTE(.));
-		PROVIDE_HIDDEN(__kernel_debug_stack_page = ABSOLUTE(ABSOLUTE(.) / PAGESIZE));
+		. += PAGESIZE;
+		PROVIDE(dbg_stack = ABSOLUTE(.));
 		. += KERNEL_DEBUG_STACKSIZE;
 #endif /* !CONFIG_NO_DEBUGGER */
 
@@ -535,26 +535,26 @@ SECTIONS {
 	PROVIDE(this_idle_sched_state = ABSOLUTE(ABSOLUTE(thiscpu_idle) + ABSOLUTE(this_sched_state)));
 	PROVIDE(this_idle_x86_kernel_psp0 = ABSOLUTE(ABSOLUTE(thiscpu_idle) + ABSOLUTE(this_x86_kernel_psp0)));
 
-	PROVIDE_HIDDEN(__x86_dbg_cpu_temporary_b0 = (ABSOLUTE(dbg_cpu_temporary) & 0x000000ff) >> 0);
-	PROVIDE_HIDDEN(__x86_dbg_cpu_temporary_b1 = (ABSOLUTE(dbg_cpu_temporary) & 0x0000ff00) >> 8);
-	PROVIDE_HIDDEN(__x86_dbg_cpu_temporary_b2 = (ABSOLUTE(dbg_cpu_temporary) & 0x00ff0000) >> 16);
-	PROVIDE_HIDDEN(__x86_dbg_cpu_temporary_b3 = (ABSOLUTE(dbg_cpu_temporary) & 0xff000000) >> 24);
+	PROVIDE_HIDDEN(x86_dbg_cpu_temporary_b0 = (ABSOLUTE(dbg_cpu_temporary) & 0x000000ff) >> 0);
+	PROVIDE_HIDDEN(x86_dbg_cpu_temporary_b1 = (ABSOLUTE(dbg_cpu_temporary) & 0x0000ff00) >> 8);
+	PROVIDE_HIDDEN(x86_dbg_cpu_temporary_b2 = (ABSOLUTE(dbg_cpu_temporary) & 0x00ff0000) >> 16);
+	PROVIDE_HIDDEN(x86_dbg_cpu_temporary_b3 = (ABSOLUTE(dbg_cpu_temporary) & 0xff000000) >> 24);
 #ifdef __x86_64__
-	PROVIDE_HIDDEN(__x86_dbg_cpu_temporary_b4 = (ABSOLUTE(dbg_cpu_temporary) & 0x000000ff00000000) >> 32);
-	PROVIDE_HIDDEN(__x86_dbg_cpu_temporary_b5 = (ABSOLUTE(dbg_cpu_temporary) & 0x0000ff0000000000) >> 40);
-	PROVIDE_HIDDEN(__x86_dbg_cpu_temporary_b6 = (ABSOLUTE(dbg_cpu_temporary) & 0x00ff000000000000) >> 48);
-	PROVIDE_HIDDEN(__x86_dbg_cpu_temporary_b7 = (ABSOLUTE(dbg_cpu_temporary) & 0xff00000000000000) >> 56);
+	PROVIDE_HIDDEN(x86_dbg_cpu_temporary_b4 = (ABSOLUTE(dbg_cpu_temporary) & 0x000000ff00000000) >> 32);
+	PROVIDE_HIDDEN(x86_dbg_cpu_temporary_b5 = (ABSOLUTE(dbg_cpu_temporary) & 0x0000ff0000000000) >> 40);
+	PROVIDE_HIDDEN(x86_dbg_cpu_temporary_b6 = (ABSOLUTE(dbg_cpu_temporary) & 0x00ff000000000000) >> 48);
+	PROVIDE_HIDDEN(x86_dbg_cpu_temporary_b7 = (ABSOLUTE(dbg_cpu_temporary) & 0xff00000000000000) >> 56);
 #endif /* __x86_64__ */
 
-	PROVIDE_HIDDEN(__x86_dbg_exitstate_temporary_b0 = (ABSOLUTE(dbg_exitstate) & 0x000000ff) >> 0);
-	PROVIDE_HIDDEN(__x86_dbg_exitstate_temporary_b1 = (ABSOLUTE(dbg_exitstate) & 0x0000ff00) >> 8);
-	PROVIDE_HIDDEN(__x86_dbg_exitstate_temporary_b2 = (ABSOLUTE(dbg_exitstate) & 0x00ff0000) >> 16);
-	PROVIDE_HIDDEN(__x86_dbg_exitstate_temporary_b3 = (ABSOLUTE(dbg_exitstate) & 0xff000000) >> 24);
+	PROVIDE_HIDDEN(x86_dbg_exitstate_b0 = (ABSOLUTE(x86_dbg_exitstate) & 0x000000ff) >> 0);
+	PROVIDE_HIDDEN(x86_dbg_exitstate_b1 = (ABSOLUTE(x86_dbg_exitstate) & 0x0000ff00) >> 8);
+	PROVIDE_HIDDEN(x86_dbg_exitstate_b2 = (ABSOLUTE(x86_dbg_exitstate) & 0x00ff0000) >> 16);
+	PROVIDE_HIDDEN(x86_dbg_exitstate_b3 = (ABSOLUTE(x86_dbg_exitstate) & 0xff000000) >> 24);
 #ifdef __x86_64__
-	PROVIDE_HIDDEN(__x86_dbg_exitstate_temporary_b4 = (ABSOLUTE(dbg_exitstate) & 0x000000ff00000000) >> 32);
-	PROVIDE_HIDDEN(__x86_dbg_exitstate_temporary_b5 = (ABSOLUTE(dbg_exitstate) & 0x0000ff0000000000) >> 40);
-	PROVIDE_HIDDEN(__x86_dbg_exitstate_temporary_b6 = (ABSOLUTE(dbg_exitstate) & 0x00ff000000000000) >> 48);
-	PROVIDE_HIDDEN(__x86_dbg_exitstate_temporary_b7 = (ABSOLUTE(dbg_exitstate) & 0xff00000000000000) >> 56);
+	PROVIDE_HIDDEN(x86_dbg_exitstate_b4 = (ABSOLUTE(x86_dbg_exitstate) & 0x000000ff00000000) >> 32);
+	PROVIDE_HIDDEN(x86_dbg_exitstate_b5 = (ABSOLUTE(x86_dbg_exitstate) & 0x0000ff0000000000) >> 40);
+	PROVIDE_HIDDEN(x86_dbg_exitstate_b6 = (ABSOLUTE(x86_dbg_exitstate) & 0x00ff000000000000) >> 48);
+	PROVIDE_HIDDEN(x86_dbg_exitstate_b7 = (ABSOLUTE(x86_dbg_exitstate) & 0xff00000000000000) >> 56);
 #endif /* __x86_64__ */
 
 

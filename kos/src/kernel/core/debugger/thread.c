@@ -57,7 +57,7 @@ DECL_BEGIN
 PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 enum_thread(struct task *__restrict thread, unsigned int state) {
 	dbg_attr_t old_attr = dbg_attr;
-	if (thread == THIS_TASK)
+	if (thread == dbg_current)
 		dbg_setfgcolor(DBG_COLOR_GREEN);
 	dbg_printf(DBGSTR("%p "), thread);
 	dbg_attr = old_attr;
@@ -79,10 +79,10 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 	           ,
 	           (unsigned int)thread->t_cpu->c_id);
 	dbg_printf(DBGSTR("%[vinfo:%n(%p)]\t%p"),
-	           thread == debug_original_thread ? fcpustate_getpc(&dbg_exitstate)
-	                                           : scpustate_getpc(thread->t_sched.s_state),
-	           thread == debug_original_thread ? fcpustate_getsp(&dbg_exitstate)
-	                                           : scpustate_getsp(thread->t_sched.s_state));
+	           thread == THIS_TASK ? fcpustate_getpc(&x86_dbg_exitstate)
+	                               : scpustate_getpc(thread->t_sched.s_state),
+	           thread == THIS_TASK ? fcpustate_getsp(&x86_dbg_exitstate)
+	                               : scpustate_getsp(thread->t_sched.s_state));
 	if (thread == &_boottask)
 		dbg_print(DBGSTR("\t_boottask"));
 	else if (thread == &_bootidle)
@@ -295,7 +295,7 @@ DEFINE_DEBUG_FUNCTION(
 		dbg_printf(DBGSTR("Invalid thread %p (use `thread %p force' to override)\n"), thread, thread);
 		return 1;
 	}
-	dbg_impersonate_thread(thread);
+	dbg_current = thread;
 	return 0;
 }
 

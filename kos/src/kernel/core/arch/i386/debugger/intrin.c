@@ -37,6 +37,7 @@ if (gcc_opt.remove("-O3"))
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/cpu-state-compat.h>
 #include <sys/io.h>
 
 #include <libdisasm/disassembler.h>
@@ -86,10 +87,10 @@ DEFINE_DEBUG_FUNCTION(
 
 
 #ifdef __x86_64__
-#define fcs_Xflags fcs_rflags
-#else
-#define fcs_Xflags fcs_eflags
-#endif
+#define CFI_UNWIND_REGISTER_PFLAGS CFI_X86_64_UNWIND_REGISTER_RFLAGS
+#else /* __x86_64__ */
+#define CFI_UNWIND_REGISTER_PFLAGS CFI_386_UNWIND_REGISTER_EFLAGS
+#endif /* !__x86_64__ */
 
 
 DEFINE_DEBUG_FUNCTION(
@@ -97,12 +98,15 @@ DEFINE_DEBUG_FUNCTION(
 		"cli\n"
 		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.IF = 0") "\n"
 		, argc, argv) {
+	uintptr_t pflags;
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	(void)argv;
+	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("cli EFLAGS.IF = 0 (was %u)\n"),
-	           dbg_viewstate.fcs_Xflags & EFLAGS_IF ? 1 : 0);
-	dbg_viewstate.fcs_Xflags &= ~EFLAGS_IF;
+	           pflags & EFLAGS_IF ? 1 : 0);
+	pflags &= ~EFLAGS_IF;
+	dbg_setregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
 	return 0;
 }
 DEFINE_DEBUG_FUNCTION(
@@ -110,12 +114,15 @@ DEFINE_DEBUG_FUNCTION(
 		"sti\n"
 		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.IF = 1") "\n"
 		, argc, argv) {
+	uintptr_t pflags;
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	(void)argv;
+	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("sti EFLAGS.IF = 1 (was %u)\n"),
-	           dbg_viewstate.fcs_Xflags & EFLAGS_IF ? 1 : 0);
-	dbg_viewstate.fcs_Xflags |= EFLAGS_IF;
+	           pflags & EFLAGS_IF ? 1 : 0);
+	pflags |= EFLAGS_IF;
+	dbg_setregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
 	return 0;
 }
 DEFINE_DEBUG_FUNCTION(
@@ -123,12 +130,15 @@ DEFINE_DEBUG_FUNCTION(
 		"cld\n"
 		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.DF = 0") "\n"
 		, argc, argv) {
+	uintptr_t pflags;
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	(void)argv;
+	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("cld EFLAGS.DF = 0 (was %u)\n"),
-	           dbg_viewstate.fcs_Xflags & EFLAGS_DF ? 1 : 0);
-	dbg_viewstate.fcs_Xflags &= ~EFLAGS_DF;
+	           pflags & EFLAGS_DF ? 1 : 0);
+	pflags &= ~EFLAGS_DF;
+	dbg_setregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
 	return 0;
 }
 DEFINE_DEBUG_FUNCTION(
@@ -136,12 +146,15 @@ DEFINE_DEBUG_FUNCTION(
 		"std\n"
 		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.DF = 1") "\n"
 		, argc, argv) {
+	uintptr_t pflags;
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	(void)argv;
+	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("std EFLAGS.DF = 1 (was %u)\n"),
-	           dbg_viewstate.fcs_Xflags & EFLAGS_DF ? 1 : 0);
-	dbg_viewstate.fcs_Xflags |= EFLAGS_DF;
+	           pflags & EFLAGS_DF ? 1 : 0);
+	pflags |= EFLAGS_DF;
+	dbg_setregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
 	return 0;
 }
 DEFINE_DEBUG_FUNCTION(
@@ -149,12 +162,15 @@ DEFINE_DEBUG_FUNCTION(
 		"clc\n"
 		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.CF = 0") "\n"
 		, argc, argv) {
+	uintptr_t pflags;
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	(void)argv;
+	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("clc EFLAGS.CF = 0 (was %u)\n"),
-	           dbg_viewstate.fcs_Xflags & EFLAGS_CF ? 1 : 0);
-	dbg_viewstate.fcs_Xflags &= ~EFLAGS_CF;
+	           pflags & EFLAGS_CF ? 1 : 0);
+	pflags &= ~EFLAGS_CF;
+	dbg_setregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
 	return 0;
 }
 DEFINE_DEBUG_FUNCTION(
@@ -162,12 +178,15 @@ DEFINE_DEBUG_FUNCTION(
 		"stc\n"
 		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.CF = 1") "\n"
 		, argc, argv) {
+	uintptr_t pflags;
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	(void)argv;
+	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("stc EFLAGS.CF = 1 (was %u)\n"),
-	           dbg_viewstate.fcs_Xflags & EFLAGS_CF ? 1 : 0);
-	dbg_viewstate.fcs_Xflags |= EFLAGS_CF;
+	           pflags & EFLAGS_CF ? 1 : 0);
+	pflags |= EFLAGS_CF;
+	dbg_setregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
 	return 0;
 }
 DEFINE_DEBUG_FUNCTION(
@@ -175,13 +194,16 @@ DEFINE_DEBUG_FUNCTION(
 		"cmc\n"
 		"\tSet " DF_COLOR(DBG_COLOR_DARK_GRAY, DBG_COLOR_LIGHT_GRAY, "EFLAGS.CF = -EFLAGS.CF") "\n"
 		, argc, argv) {
+	uintptr_t pflags;
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	(void)argv;
+	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("stc EFLAGS.CF = %u (was %u)\n"),
-	           dbg_viewstate.fcs_Xflags & EFLAGS_CF ? 0 : 1,
-	           dbg_viewstate.fcs_Xflags & EFLAGS_CF ? 1 : 0);
-	dbg_viewstate.fcs_Xflags ^= EFLAGS_CF;
+	           pflags & EFLAGS_CF ? 0 : 1,
+	           pflags & EFLAGS_CF ? 1 : 0);
+	pflags ^= EFLAGS_CF;
+	dbg_setregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
 	return 0;
 }
 
@@ -192,27 +214,33 @@ DEFINE_DEBUG_FUNCTION(
 		, argc, argv) {
 	u16 limit;
 	uintptr_t base;
+	struct fcpustate fst;
 	if (argc != 3 ||
 	    sscanf(argv[1], DBGSTR("%I16U"), &limit) != 1 ||
 	    sscanf(argv[2], DBGSTR("%Ix"), &base) != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	dbg_printf("lgdt #%.4I16x (%I16u), %p\n", limit, limit, base);
-	dbg_viewstate.fcs_gdt.dt_limit = limit;
-	dbg_viewstate.fcs_gdt.dt_base  = base;
+	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
+	fst.fcs_gdt.dt_limit = limit;
+	fst.fcs_gdt.dt_base  = base;
+	dbg_setallregs(DBG_REGLEVEL_VIEW, &fst);
 	return 0;
 }
+
 DEFINE_DEBUG_FUNCTION(
 		"sgdt",
 		"sgdt\n"
 		"\tPrint the base and limit of the current Global Descriptor Table\n"
 		, argc, argv) {
+	struct fcpustate fst;
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	(void)argv;
+	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
 	dbg_printf(DBGSTR("sgdt %#.4I16x (%I16u), %p\n"),
-	           dbg_viewstate.fcs_gdt.dt_limit,
-	           dbg_viewstate.fcs_gdt.dt_limit,
-	           dbg_viewstate.fcs_gdt.dt_base);
+	           fst.fcs_gdt.dt_limit,
+	           fst.fcs_gdt.dt_limit,
+	           fst.fcs_gdt.dt_base);
 	return 0;
 }
 
@@ -223,28 +251,34 @@ DEFINE_DEBUG_FUNCTION(
 		, argc, argv) {
 	u16 limit;
 	uintptr_t base;
+	struct fcpustate fst;
 	if (argc != 3 ||
 	    sscanf(argv[1], "%I16U", &limit) != 1 ||
 	    sscanf(argv[2], "%Ix", &base) != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	dbg_printf(DBGSTR("lidt %#.4I16x (%I16u), %p\n"),
 	           limit, limit, base);
-	dbg_viewstate.fcs_idt.dt_limit = limit;
-	dbg_viewstate.fcs_idt.dt_base  = base;
+	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
+	fst.fcs_idt.dt_limit = limit;
+	fst.fcs_idt.dt_base  = base;
+	dbg_setallregs(DBG_REGLEVEL_VIEW, &fst);
 	return 0;
 }
+
 DEFINE_DEBUG_FUNCTION(
 		"sidt",
 		"sidt\n"
 		"\tPrint the base and limit of the current Interrupt Descriptor Table\n"
 		, argc, argv) {
+	struct fcpustate fst;
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	(void)argv;
+	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
 	dbg_printf(DBGSTR("sidt %#.4I16x (%I16u), %p\n"),
-	           dbg_viewstate.fcs_idt.dt_limit,
-	           dbg_viewstate.fcs_idt.dt_limit,
-	           dbg_viewstate.fcs_idt.dt_base);
+	           fst.fcs_idt.dt_limit,
+	           fst.fcs_idt.dt_limit,
+	           fst.fcs_idt.dt_base);
 	return 0;
 }
 
@@ -289,13 +323,15 @@ DEFINE_DEBUG_FUNCTION(
 		"\tDisplay a dump of the current register state\n"
 		, argc, argv) {
 	struct regdump_printer re_printer;
+	struct fcpustate fst;
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	(void)argv;
 	re_printer.rdp_printer     = &dbg_printer;
 	re_printer.rdp_printer_arg = NULL;
 	re_printer.rdp_format      = &debug_regdump_print_format;
-	regdump_fcpustate(&re_printer, &dbg_viewstate);
+	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
+	regdump_fcpustate(&re_printer, &fst);
 	return 0;
 }
 

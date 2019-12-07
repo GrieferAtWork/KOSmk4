@@ -194,7 +194,7 @@ libc_assertion_failure_core(struct assert_args *__restrict args) {
 		kernel_debugtrap(&args->aa_state, SIGTRAP);
 #ifndef CONFIG_NO_DEBUGGER
 	/* Enter the debugger */
-	dbg_enter(&args->aa_state, &panic_assert_dbg_main, args);
+	dbg_enter(&panic_assert_dbg_main, args, &args->aa_state);
 #else
 	PREEMPTION_HALT();
 #endif
@@ -251,7 +251,7 @@ panic_assert_chk_dbg_main(void *arg) {
 	{
 		unsigned int i;
 		for (i = 0; i < COMPILER_LENOF(always_ignored_assertions); ++i) {
-			if (fcpustate_getpc(&dbg_exitstate) == always_ignored_assertions[i]) {
+			if (fcpustate_getpc(&x86_dbg_exitstate) == always_ignored_assertions[i]) {
 				option = ASSERTION_OPTION_IGNORE;
 				goto handle_retry_or_ignore;
 			}
@@ -270,7 +270,7 @@ panic_assert_chk_dbg_main(void *arg) {
 		for (i = 0; i < COMPILER_LENOF(always_ignored_assertions); ++i) {
 			if (always_ignored_assertions[i])
 				continue;
-			always_ignored_assertions[i] = fcpustate_getpc(&dbg_exitstate);
+			always_ignored_assertions[i] = fcpustate_getpc(&x86_dbg_exitstate);
 			break;
 		}
 		option = ASSERTION_OPTION_IGNORE;
@@ -282,9 +282,9 @@ handle_retry_or_ignore:
 		acheck_result = option == ASSERTION_OPTION_RETRY ? 1 : 0;
 		/* TODO: Make this part arch-independent */
 #ifdef __x86_64__
-		dbg_exitstate.fcs_gpregs.gp_rax = acheck_result;
+		x86_dbg_exitstate.fcs_gpregs.gp_rax = acheck_result;
 #elif defined(__i386__)
-		dbg_exitstate.fcs_gpregs.gp_eax = acheck_result;
+		x86_dbg_exitstate.fcs_gpregs.gp_eax = acheck_result;
 #else
 #error Unsupported arch
 #endif
@@ -326,7 +326,7 @@ libc_assertion_check_core(struct assert_args *__restrict args) {
 		kernel_debugtrap(&args->aa_state, SIGTRAP);
 #ifndef CONFIG_NO_DEBUGGER
 	/* Enter the debugger */
-	dbg_enter(&args->aa_state, &panic_assert_chk_dbg_main, args);
+	dbg_enter(&panic_assert_chk_dbg_main, args, &args->aa_state);
 #else
 	PREEMPTION_HALT();
 #endif
@@ -338,13 +338,13 @@ libc_assertion_check_core(struct assert_args *__restrict args) {
 PRIVATE ATTR_COLDTEXT void KCALL
 panic_genfail_dbg_main(void *arg) {
 	uintptr_t prev_pc;
-	prev_pc = (uintptr_t)instruction_trypred((void const *)fcpustate_getpc(&dbg_exitstate));
+	prev_pc = (uintptr_t)instruction_trypred((void const *)fcpustate_getpc(&x86_dbg_exitstate));
 	dbg_printf(DF_SETCOLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON) "%s" DF_DEFCOLOR "%[vinfo:"
 	           "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
 	           "func: " DF_WHITE("%n") "\n]"
 	           "addr: " DF_WHITE("%p") "+" DF_WHITE("%Iu") "\n",
 	           arg, prev_pc, prev_pc,
-	           (size_t)(fcpustate_getpc(&dbg_exitstate) - prev_pc));
+	           (size_t)(fcpustate_getpc(&x86_dbg_exitstate) - prev_pc));
 	dbg_main(0);
 }
 #endif
@@ -371,8 +371,9 @@ libc_stack_failure_core(struct kcpustate *__restrict state) {
 		kernel_debugtrap(state, SIGSEGV);
 #ifndef CONFIG_NO_DEBUGGER
 	/* Enter the debugger */
-	dbg_enter(state, &panic_genfail_dbg_main,
-	          (void *)"Stack check failure (corrupted cookie)\n");
+	dbg_enter(&panic_genfail_dbg_main,
+	          (void *)"Stack check failure (corrupted cookie)\n",
+	          state);
 #else /* !CONFIG_NO_DEBUGGER */
 	PREEMPTION_HALT();
 #endif /* CONFIG_NO_DEBUGGER */
@@ -391,8 +392,9 @@ libc_abort_failure_core(struct kcpustate *__restrict state) {
 		kernel_debugtrap(state, SIGABRT);
 #ifndef CONFIG_NO_DEBUGGER
 	/* Enter the debugger */
-	dbg_enter(state, &panic_genfail_dbg_main,
-	          (void *)"Kernel called abort()\n");
+	dbg_enter(&panic_genfail_dbg_main,
+	          (void *)"Kernel called abort()\n",
+	          state);
 #else /* !CONFIG_NO_DEBUGGER */
 	PREEMPTION_HALT();
 #endif /* CONFIG_NO_DEBUGGER */
@@ -408,7 +410,7 @@ PRIVATE ATTR_COLDTEXT void KCALL
 panic_kernel_dbg_main(void *arg) {
 	struct panic_args *args;
 	uintptr_t prev_pc;
-	prev_pc = (uintptr_t)instruction_trypred((void const *)fcpustate_getpc(&dbg_exitstate));
+	prev_pc = (uintptr_t)instruction_trypred((void const *)fcpustate_getpc(&x86_dbg_exitstate));
 	args    = (struct panic_args *)arg;
 	dbg_printf("Kernel Panic\n"
 	           "%[vinfo:" "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
@@ -423,7 +425,7 @@ panic_kernel_dbg_main(void *arg) {
 		dbg_print(DF_DEFCOLOR "\n");
 	}
 	dbg_printf("addr: " DF_WHITE("%p") "+" DF_WHITE("%Iu") "\n",
-	           prev_pc, (size_t)(fcpustate_getpc(&dbg_exitstate) - prev_pc));
+	           prev_pc, (size_t)(fcpustate_getpc(&x86_dbg_exitstate) - prev_pc));
 	dbg_main(0);
 }
 #endif /* !CONFIG_NO_DEBUGGER */
@@ -453,7 +455,7 @@ kernel_vpanic_ucpustate(struct ucpustate *__restrict state,
 		if (format)
 			va_copy(pargs.args, args);
 		pargs.format = format;
-		dbg_enter(state, &panic_kernel_dbg_main, &pargs);
+		dbg_enter(&panic_kernel_dbg_main, &pargs, state);
 	}
 #else /* !CONFIG_NO_DEBUGGER */
 	PREEMPTION_HALT();

@@ -617,7 +617,7 @@ halt_unhandled_exception(unsigned int unwind_error,
 		args.error   = unwind_error;
 		args.last_pc = last_pc;
 		args.info    = info;
-		dbg_enter(unwind_state, &panic_uhe_dbg_main, &args);
+		dbg_enter(&panic_uhe_dbg_main, &args, unwind_state);
 	}
 #else /* !CONFIG_NO_DEBUGGER */
 	kernel_panic(unwind_state, "Unhandled exception\n");

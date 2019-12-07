@@ -507,6 +507,6 @@
 #define ATTR_DBGDATA
 #define ATTR_DBGBSS
 #define DBGSTR
-#define DEBUG_CALL
+#define DBG_CALL
 #define DEFINE_DEBUG_FUNCTION(name, help, argc, argv) uintptr_t _debug_main_xxx(size_t argc, char *argv[])
 

@@ -177,7 +177,7 @@ do_parse_as_hex:
 
 	case '.':
 		/* Current address. */
-		value = fcpustate_getpc(&dbg_viewstate);
+		value = fcpustate_getpc(&x86_dbg_viewstate);
 		break;
 
 	case '+':

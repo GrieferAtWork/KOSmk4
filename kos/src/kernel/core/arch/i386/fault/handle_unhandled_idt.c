@@ -200,7 +200,7 @@ panic_uhi_dbg_main(void *arg) {
 	           "func: " DF_WHITE("%n") "\n"
 	           "addr: " DF_WHITE("%p") "\n"
 	           "]",
-	           fcpustate_getpc(&dbg_exitstate));
+	           fcpustate_getpc(&x86_dbg_exitstate));
 	dbg_main(0);
 }
 #endif /* !CONFIG_NO_DEBUGGER */
@@ -247,7 +247,7 @@ x86_handle_unhandled_idt(struct icpustate *__restrict state,
 			X86_PIC_EOI(intno);
 		args.ecode = ecode;
 		args.intno = intno;
-		dbg_enter(state, &panic_uhi_dbg_main, &args);
+		state = dbg_enter_r(&panic_uhi_dbg_main, &args, state);
 	}
 #else /* !CONFIG_NO_DEBUGGER */
 	PREEMPTION_HALT();

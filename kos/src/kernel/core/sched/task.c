@@ -171,12 +171,12 @@ debug_this_kernel_stack_init(void) {
 	}
 }
 
-INTDEF byte_t __kernel_debug_stack[];
+INTDEF byte_t dbg_stack[];
 PRIVATE ATTR_USED void KCALL
 debug_this_kernel_stack_reset(void) {
 	struct vm_node *my_stack;
 	my_stack                     = (struct vm_node *)THIS_KERNEL_STACK;
-	my_stack->vn_node.a_vmin     = (vm_vpage_t)VM_ADDR2PAGE((uintptr_t)__kernel_debug_stack);
+	my_stack->vn_node.a_vmin     = (vm_vpage_t)VM_ADDR2PAGE((uintptr_t)dbg_stack);
 	my_stack->vn_node.a_vmax     = my_stack->vn_node.a_vmin + KERNEL_DEBUG_STACKSIZE / PAGESIZE;
 	my_stack->vn_node.a_min      = NULL;
 	my_stack->vn_node.a_max      = NULL;

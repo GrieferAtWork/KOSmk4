@@ -16,9 +16,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_ARCH_DEBUGGER_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_ARCH_DEBUGGER_H 1
+#ifndef GUARD_KERNEL_INCLUDE_DEBUGGER_CONFIG_H
+#define GUARD_KERNEL_INCLUDE_DEBUGGER_CONFIG_H 1
 
 #include <kernel/compiler.h>
 
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_ARCH_DEBUGGER_H */
+#ifdef CONFIG_NO_DEBUGGER
+#undef CONFIG_HAVE_DEBUGGER
+#elif !defined(NDEBUG) || 1
+#undef CONFIG_HAVE_DEBUGGER
+#define CONFIG_HAVE_DEBUGGER 1
+#else
+#undef CONFIG_NO_DEBUGGER
+#define CONFIG_NO_DEBUGGER 1
+#endif
+
+#endif /* !GUARD_KERNEL_INCLUDE_DEBUGGER_CONFIG_H */

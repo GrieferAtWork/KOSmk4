@@ -16,20 +16,24 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_SCHED_RWLOCK_H
-#define GUARD_KERNEL_SRC_SCHED_RWLOCK_H 1
+#ifndef GUARD_KERNEL_INCLUDE_SCHED_RWLOCK_INTERN_H
+#define GUARD_KERNEL_INCLUDE_SCHED_RWLOCK_INTERN_H 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
+#include <kernel/malloc-defs.h>
 #include <kernel/types.h>
 #include <sched/rwlock.h>
 
 DECL_BEGIN
 
-
+#ifdef __CC__
 /* A dummy R/W lock pointer. */
 #define READLOCK_DUMMYLOCK  ((struct rwlock *)-1)
+
+struct rwlock;
+struct task;
 
 struct read_lock {
 	uintptr_t      rl_recursion; /* [valid_if(rl_rwlock != NULL && rl_rwlock != READLOCK_DUMMYLOCK)]
@@ -49,7 +53,11 @@ struct read_locks {
 	                            * As hash-index, use `RWLOCK_HASH()' */
 };
 
-INTDEF ATTR_PERTASK struct read_locks this_read_locks;
+DATDEF ATTR_PERTASK struct read_locks this_read_locks;
+
+#ifdef CONFIG_BUILDING_KERNEL_CORE
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL pertask_readlocks_init)(struct task *__restrict thread);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL pertask_readlocks_fini)(struct task *__restrict thread);
 
 /* Find an existing read-lock descriptor for `lock', or return NULL. */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) struct read_lock *
@@ -64,7 +72,10 @@ NOTHROW(KCALL rwlock_get_readlock_nx)(struct rwlock *__restrict lock);
 /* Delete the given rlock. */
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL rwlock_delete_readlock)(struct read_lock *__restrict rlock);
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
+
+#endif /* __CC__ */
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_SCHED_RWLOCK_H */
+#endif /* !GUARD_KERNEL_INCLUDE_SCHED_RWLOCK_INTERN_H */

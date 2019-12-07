@@ -63,8 +63,8 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 #ifndef CONFIG_NO_DEBUGGER
 PRIVATE void KCALL
 panic_df_dbg_main(void *cr3) {
-	dbg_exitstate.fcs_coregs.co_cr3 = (uintptr_t)cr3;
-	dbg_viewstate.fcs_coregs.co_cr3 = (uintptr_t)cr3;
+	x86_dbg_exitstate.fcs_coregs.co_cr3 = (uintptr_t)cr3;
+	x86_dbg_viewstate.fcs_coregs.co_cr3 = (uintptr_t)cr3;
 	dbg_printf(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON, "Double fault"));
 	dbg_printf("\n"
 	           "%[vinfo:"
@@ -72,7 +72,7 @@ panic_df_dbg_main(void *cr3) {
 	           "func: " DF_WHITE("%n") "\n"
 	           "addr: " DF_WHITE("%p") "\n"
 	           "]",
-	           fcpustate_getpc(&dbg_exitstate));
+	           fcpustate_getpc(&x86_dbg_exitstate));
 	dbg_main(0);
 }
 #endif
@@ -99,7 +99,7 @@ x86_handle_double_fault(struct df_cpustate *__restrict state) {
 	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_UNHANDLED_INTERRUPT))
 		kernel_debugtrap(&state->dcs_regs, SIGBUS);
 #ifndef CONFIG_NO_DEBUGGER
-	dbg_enter(&state->dcs_regs, &panic_df_dbg_main, state->dcs_cr3);
+	dbg_enter(&panic_df_dbg_main, state->dcs_cr3, &state->dcs_regs);
 #else /* !CONFIG_NO_DEBUGGER */
 	PREEMPTION_HALT();
 #endif /* CONFIG_NO_DEBUGGER */

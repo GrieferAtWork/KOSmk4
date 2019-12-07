@@ -701,7 +701,7 @@ DEFINE_DEBUG_FUNCTION(
 		"a [ADDR=pc]\n"
 		"\tOpen an interactive assembly view at ADDR\n",
 		argc, argv) {
-	void *addr = (void *)fcpustate_getpc(&dbg_viewstate);
+	void *addr = (void *)fcpustate_getpc(&x86_dbg_viewstate);
 	if (argc >= 2) {
 		if (!dbg_evaladdr(argv[1], (uintptr_t *)&addr))
 			return DBG_FUNCTION_INVALID_ARGUMENTS;
