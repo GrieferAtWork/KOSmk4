@@ -19,17 +19,17 @@
 
 #ifdef ENTER_HERE
 #define L(x) .L##x##2
-#else
+#else /* ENTER_HERE */
 #define L(x) .L##x
-#endif
+#endif /* !ENTER_HERE */
 
 
 .section .text.cold
 #ifdef ENTER_HERE
 PUBLIC_FUNCTION(dbg_enter_here)
-#else
+#else /* ENTER_HERE */
 PUBLIC_FUNCTION(dbg)
-#endif
+#endif /* !ENTER_HERE */
 	.cfi_startproc
 	/* Assume as little as possible about our current CPU state:
 	 *   - Assume that %ss and %cs is a valid segment (else: how would we have even gotten here?)
@@ -38,7 +38,7 @@ PUBLIC_FUNCTION(dbg)
 	 *     mapped where we expect it to (else: how would we have even gotten here?)
 	 *   - Assume that at least 8 more bytes can be pushed onto the stack at %ss:(%esp)
 	 */
-	leal   -8(%esp), %esp    /* Allocate 4 bytes. */
+	leal   -8(%esp), %esp    /* Allocate 8 bytes. */
 	.cfi_adjust_cfa_offset 8
 	movl   %eax, %ss:4(%esp) /* Save EAX (using %ss) as base register */
 	.cfi_rel_offset %eax, 4
@@ -69,8 +69,8 @@ L(acquire_lapic_lock):
 	testl  %eax, %eax
 	jz     1f  /* No LAPIC --> We're the only CPU! */
 	movl   %ss:APIC_ID(%eax), %eax
-	andl   $APIC_ID_FMASK, %eax
-	shrl   $APIC_ID_FSHIFT, %eax
+	andl   $(APIC_ID_FMASK), %eax
+	shrl   $(APIC_ID_FSHIFT), %eax
 	movl   %ecx, %ss:dbg_cpu_temporary(,%eax,4)
 	leal   1(%eax), %ecx
 	xorl   %eax, %eax
@@ -136,9 +136,9 @@ L(acquire_lapic_lock):
 	movl   %gs, %eax
 	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_GS
 	movl   $(0), %ss:dbg_exitstate+OFFSET_FCPUSTATE_TR
-	str    %ss:dbg_exitstate+OFFSET_FCPUSTATE_TR
+	strw   %ss:dbg_exitstate+OFFSET_FCPUSTATE_TR
 	movl   $(0), %ss:dbg_exitstate+OFFSET_FCPUSTATE_LDT
-	sldt   %ss:dbg_exitstate+OFFSET_FCPUSTATE_LDT
+	sldtw  %ss:dbg_exitstate+OFFSET_FCPUSTATE_LDT
 	movl   %cr0, %eax
 	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR0
 	movl   %cr2, %eax
@@ -201,15 +201,15 @@ L(recursive_debugger):
 	lidtl  %ss:dbg_idt_pointer
 
 	/* Load segment registers. */
-	movl   $(SEGMENT_USER_DATA_RPL), %eax
-	movl   %eax, %ds
-	movl   %eax, %es
-	movl   $(SEGMENT_KERNEL_FSBASE), %eax
-	movl   %eax, %fs
-	movl   $(SEGMENT_USER_GSBASE_RPL), %eax
-	movl   %eax, %gs
-	movl   $(SEGMENT_KERNEL_DATA), %eax
-	movl   %eax, %ss
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	movw   $(SEGMENT_USER_GSBASE_RPL), %ax
+	movw   %ax, %gs
+	movw   $(SEGMENT_KERNEL_DATA), %ax
+	movw   %ax, %ss
 	ljmpl  $(SEGMENT_KERNEL_CODE), $(1f) /* movl $(SEGMENT_KERNEL_CODE), %cs */
 1:
 
@@ -227,7 +227,7 @@ L(recursive_debugger):
 	pushl  %edx       /* void *arg */
 	pushl  $dbg_exit  /* Return address... */
 	pushl  %ecx       /* void (KCALL *main)(void *arg) */
-#endif
+#endif /* ENTER_HERE */
 
 	/* Check if we need to initialize the debugger? */
 	cmpl   $(0), dbg_active
@@ -255,9 +255,9 @@ L(recursive_debugger):
 	.cfi_endproc
 #ifdef ENTER_HERE
 END(dbg_enter_here)
-#else
+#else /* ENTER_HERE */
 END(dbg)
-#endif
+#endif /* !ENTER_HERE */
 
 #undef ENTER_HERE
 #undef L

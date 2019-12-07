@@ -67,12 +67,6 @@ FUNDEF ATTR_NORETURN NONNULL((1, 2)) void FCALL dbg_enter_kcpustate(struct kcpus
 FUNDEF ATTR_NORETURN NONNULL((1, 2)) void FCALL dbg_enter_icpustate(struct icpustate *__restrict state, void (KCALL *main)(void *arg), void *arg);
 FUNDEF ATTR_NORETURN NONNULL((1, 2)) void FCALL dbg_enter_scpustate(struct scpustate *__restrict state, void (KCALL *main)(void *arg), void *arg);
 #endif /* __CC__ */
-#define DBG_ENTER_STATE_CURRENT   0 /* Use the CPU state of the caller to `dbg_enter', allowing any changes
-                                     * made to that state by `main' to be propagated upon return. */
-#define DBG_ENTER_STATE_FSTATE    1 /* Use `state', interpreted as `struct fcpustate *state'. */
-#define DBG_ENTER_STATE_USTATE    2 /* Use `state', interpreted as `struct ucpustate *state'. */
-#define DBG_ENTER_STATE_LSTATE    3 /* Use `state', interpreted as `struct lcpustate *state'. */
-#define DBG_ENTER_STATE_KSTATE    4 /* Use `state', interpreted as `struct kcpustate *state'. */
 
 #ifdef __CC__
 #ifdef __cplusplus

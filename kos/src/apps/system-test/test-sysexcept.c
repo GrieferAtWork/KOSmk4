@@ -65,6 +65,19 @@ __asm__(
 "	sysenter\n"
 "	.cfi_endproc\n"
 ".size sysenter_common, . - sysenter_common\n"
+"\n"
+"sysenter_common2:\n"
+"	.cfi_startproc\n"
+"	pushl  %ebp\n"
+"	.cfi_adjust_cfa_offset 4\n"
+"	.cfi_rel_offset %ebp, 0\n"
+"	call   sysenter_common\n"
+"	popl   %ebp\n"
+"	.cfi_adjust_cfa_offset -4\n"
+"	.cfi_restore %ebp\n"
+"	ret\n"
+"	.cfi_endproc\n"
+".size sysenter_common2, . - sysenter_common2\n"
 ".popsection\n"
 );
 
@@ -74,12 +87,12 @@ PRIVATE ATTR_NOINLINE void sysenter_Pipe(fd_t fd[2]) {
 	 *       emulation is quite slow and expensive, so it's if unavailable,
 	 *       libc would fall back to using int 80h at runtime. */
 	__asm__ __volatile__("stc\n\t"
-	                     "call sysenter_common\n\t"
+	                     "call sysenter_common2\n\t"
 	                     :
 	                     : "a" (SYS_pipe)
 	                     , "b" (&fd[0])
 	                     : "cc", "memory"
-	                     , "edi", "ebp");
+	                     , "edi");
 }
 #endif /* __i386__ && !__x86_64 */
 

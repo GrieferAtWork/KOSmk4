@@ -754,7 +754,7 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 #ifndef CONFIG_NO_FPU
 	/* With the CPU about to go OFFLINE, make sure to also save the current
 	 * FPU state (if the FPU was used), so-as to not lose that information
-	 * and have it still be available when we go back online. */
+	 * and have it still be available when we come back online. */
 	EXTERN(thiscpu_x86_fputhread)
 	movl   thiscpu_x86_fputhread(%ecx), %eax
 	testl  %eax, %eax

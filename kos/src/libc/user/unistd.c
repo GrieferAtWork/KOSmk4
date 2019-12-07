@@ -2306,30 +2306,29 @@ NOTHROW_NCX(LIBCCALL libc_confstr)(int name,
 		result_string = cs_path;
 	}	break;
 
-#define _CS_GNU_LIBC_VERSION                     2
-#define _CS_GNU_LIBPTHREAD_VERSION               3
-
-#define _CS_V6_WIDTH_RESTRICTED_ENVS             1
-#define _CS_V5_WIDTH_RESTRICTED_ENVS             4
-#define _CS_V7_WIDTH_RESTRICTED_ENVS             5
-#define _CS_XBS5_ILP32_OFF32_CFLAGS              1100
-#define _CS_XBS5_ILP32_OFF32_LDFLAGS             1101
-#define _CS_XBS5_ILP32_OFFBIG_CFLAGS             1104
-#define _CS_XBS5_ILP32_OFFBIG_LDFLAGS            1105
-#define _CS_XBS5_LP64_OFF64_CFLAGS               1108
-#define _CS_XBS5_LP64_OFF64_LDFLAGS              1109
-#define _CS_POSIX_V6_ILP32_OFF32_CFLAGS          1116
-#define _CS_POSIX_V6_ILP32_OFF32_LDFLAGS         1117
-#define _CS_POSIX_V6_ILP32_OFFBIG_CFLAGS         1120
-#define _CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS        1121
-#define _CS_POSIX_V6_LP64_OFF64_CFLAGS           1124
-#define _CS_POSIX_V6_LP64_OFF64_LDFLAGS          1125
-#define _CS_POSIX_V7_ILP32_OFF32_CFLAGS          1132
-#define _CS_POSIX_V7_ILP32_OFF32_LDFLAGS         1133
-#define _CS_POSIX_V7_ILP32_OFFBIG_CFLAGS         1136
-#define _CS_POSIX_V7_ILP32_OFFBIG_LDFLAGS        1137
-#define _CS_POSIX_V7_LP64_OFF64_CFLAGS           1140
-#define _CS_POSIX_V7_LP64_OFF64_LDFLAGS          1141
+//#define _CS_GNU_LIBC_VERSION                     2
+//#define _CS_GNU_LIBPTHREAD_VERSION               3
+//#define _CS_V6_WIDTH_RESTRICTED_ENVS             1
+//#define _CS_V5_WIDTH_RESTRICTED_ENVS             4
+//#define _CS_V7_WIDTH_RESTRICTED_ENVS             5
+//#define _CS_XBS5_ILP32_OFF32_CFLAGS              1100
+//#define _CS_XBS5_ILP32_OFF32_LDFLAGS             1101
+//#define _CS_XBS5_ILP32_OFFBIG_CFLAGS             1104
+//#define _CS_XBS5_ILP32_OFFBIG_LDFLAGS            1105
+//#define _CS_XBS5_LP64_OFF64_CFLAGS               1108
+//#define _CS_XBS5_LP64_OFF64_LDFLAGS              1109
+//#define _CS_POSIX_V6_ILP32_OFF32_CFLAGS          1116
+//#define _CS_POSIX_V6_ILP32_OFF32_LDFLAGS         1117
+//#define _CS_POSIX_V6_ILP32_OFFBIG_CFLAGS         1120
+//#define _CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS        1121
+//#define _CS_POSIX_V6_LP64_OFF64_CFLAGS           1124
+//#define _CS_POSIX_V6_LP64_OFF64_LDFLAGS          1125
+//#define _CS_POSIX_V7_ILP32_OFF32_CFLAGS          1132
+//#define _CS_POSIX_V7_ILP32_OFF32_LDFLAGS         1133
+//#define _CS_POSIX_V7_ILP32_OFFBIG_CFLAGS         1136
+//#define _CS_POSIX_V7_ILP32_OFFBIG_LDFLAGS        1137
+//#define _CS_POSIX_V7_LP64_OFF64_CFLAGS           1140
+//#define _CS_POSIX_V7_LP64_OFF64_LDFLAGS          1141
 
 	case _CS_LFS_CFLAGS:
 	case _CS_LFS_LINTFLAGS: {
@@ -2426,9 +2425,9 @@ NOTHROW_NCX(LIBCCALL libc_sysconf)(int name)
 		/* Unlimited, but needs a fixed value for historical reasons... */
 #ifdef STREAM_MAX
 		result = STREAM_MAX;
-#else
+#else /* STREAM_MAX */
 		result = FOPEN_MAX;
-#endif
+#endif /* !STREAM_MAX */
 		break;
 
 	case _SC_JOB_CONTROL:
@@ -2591,145 +2590,145 @@ NOTHROW_NCX(LIBCCALL libc_sysconf)(int name)
 #ifdef _POSIX2_C_BIND
 		result = _POSIX2_C_BIND;
 		break;
-#else
+#else /* _POSIX2_C_BIND */
 		goto unlimited;
-#endif
+#endif /* !_POSIX2_C_BIND */
 
 	case _SC_2_C_DEV:
 #ifdef _POSIX2_C_DEV
 		result = _POSIX2_C_DEV;
 		break;
-#else
+#else /* _POSIX2_C_DEV */
 		goto unlimited;
-#endif
+#endif /* !_POSIX2_C_DEV */
 
 	case _SC_2_FORT_DEV:
 #ifdef _POSIX2_FORT_DEV
 		result = _POSIX2_FORT_DEV;
 		break;
-#else
+#else /* _POSIX2_FORT_DEV */
 		goto unlimited;
-#endif
+#endif /* !_POSIX2_FORT_DEV */
 
 	case _SC_2_FORT_RUN:
 #ifdef _POSIX2_FORT_RUN
 		result = _POSIX2_FORT_RUN;
 		break;
-#else
+#else /* _POSIX2_FORT_RUN */
 		goto unlimited;
-#endif
+#endif /* !_POSIX2_FORT_RUN */
 
 	case _SC_2_SW_DEV:
 #ifdef _POSIX2_SW_DEV
 		result = _POSIX2_SW_DEV;
 		break;
-#else
+#else /* _POSIX2_SW_DEV */
 		goto unlimited;
-#endif
+#endif /* !_POSIX2_SW_DEV */
 
 	case _SC_2_LOCALEDEF:
 #ifdef _POSIX2_LOCALEDEF
 		result = _POSIX2_LOCALEDEF;
 		break;
-#else
+#else /* _POSIX2_LOCALEDEF */
 		goto unlimited;
-#endif
+#endif /* !_POSIX2_LOCALEDEF */
 
 	case _SC_PII:
 #ifdef _POSIX_PII
 		result = 1;
 		break;
-#else
+#else /* _POSIX_PII */
 		goto unlimited;
-#endif
+#endif /* !_POSIX_PII */
 
 	case _SC_PII_XTI:
 #ifdef _POSIX_PII_XTI
 		result = 1;
 		break;
-#else
+#else /* _POSIX_PII_XTI */
 		goto unlimited;
-#endif
+#endif /* !_POSIX_PII_XTI */
 
 	case _SC_PII_SOCKET:
 #ifdef _POSIX_PII_SOCKET
 		result = 1;
 		break;
-#else
+#else /* _POSIX_PII_SOCKET */
 		goto unlimited;
-#endif
+#endif /* !_POSIX_PII_SOCKET */
 
 	case _SC_PII_INTERNET:
 #ifdef _POSIX_PII_INTERNET
 		result = 1;
 		break;
-#else
+#else /* _POSIX_PII_INTERNET */
 		goto unlimited;
-#endif
+#endif /* !_POSIX_PII_INTERNET */
 
 	case _SC_PII_OSI:
 #ifdef _POSIX_PII_OSI
 		result = 1;
 		break;
-#else
+#else /* _POSIX_PII_OSI */
 		goto unlimited;
-#endif
+#endif /* !_POSIX_PII_OSI */
 
 	case _SC_POLL:
 #ifdef _POSIX_POLL
 		result = 1;
 		break;
-#else
+#else /* _POSIX_POLL */
 		goto unlimited;
-#endif
+#endif /* !_POSIX_POLL */
 
 	case _SC_SELECT:
 #ifdef _POSIX_SELECT
 		result = 1;
 		break;
-#else
+#else /* _POSIX_SELECT */
 		goto unlimited;
-#endif
+#endif /* !_POSIX_SELECT */
 
 	case _SC_PII_INTERNET_STREAM:
 #ifdef _POSIX_PII_INTERNET_STREAM
 		result = 1;
 		break;
-#else
+#else /* _POSIX_PII_INTERNET_STREAM */
 		goto unlimited;
-#endif
+#endif /* !_POSIX_PII_INTERNET_STREAM */
 
 	case _SC_PII_INTERNET_DGRAM:
 #ifdef _POSIX_PII_INTERNET_DGRAM
 		result = 1;
 		break;
-#else
+#else /* _POSIX_PII_INTERNET_DGRAM */
 		goto unlimited;
-#endif
+#endif /* !_POSIX_PII_INTERNET_DGRAM */
 
 	case _SC_PII_OSI_COTS:
 #ifdef _POSIX_PII_OSI_COTS
 		result = 1;
 		break;
-#else
+#else /* _POSIX_PII_OSI_COTS */
 		goto unlimited;
-#endif
+#endif /* !_POSIX_PII_OSI_COTS */
 
 	case _SC_PII_OSI_CLTS:
 #ifdef _POSIX_PII_OSI_CLTS
 		result = 1;
 		break;
-#else
+#else /* _POSIX_PII_OSI_CLTS */
 		goto unlimited;
-#endif
+#endif /* !_POSIX_PII_OSI_CLTS */
 
 	case _SC_PII_OSI_M:
 #ifdef _POSIX_PII_OSI_M
 		result = 1;
 		break;
-#else
+#else /* _POSIX_PII_OSI_M */
 		goto unlimited;
-#endif
+#endif /* !_POSIX_PII_OSI_M */
 
 	case _SC_THREADS:
 		result = _POSIX_THREADS;

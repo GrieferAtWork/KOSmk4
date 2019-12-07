@@ -716,19 +716,19 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 #ifndef CONFIG_NO_FPU
 	/* With the CPU about to go OFFLINE, make sure to also save the current
 	 * FPU state (if the FPU was used), so-as to not lose that information
-	 * and have it still be available when we go back online. */
+	 * and have it still be available when we come back online. */
 	EXTERN(thiscpu_x86_fputhread)
-	movq   thiscpu_x86_fputhread(%rcx), %rax
+	movq   thiscpu_x86_fputhread(%rdi), %rax
 	testq  %rax, %rax
 	jz     1f
 	clts   /* Make sure FPU access is allowed. */
 	/* Save the current FPU context into `this_x86_fpustate(%rax)' */
-	movq   %rcx, %rbx /* Preserve THIS_CPU */
+	movq   %rdi, %rbx /* Preserve THIS_CPU */
 	EXTERN(this_x86_fpustate)
-	movq   this_x86_fpustate(%rax), %rcx
+	movq   this_x86_fpustate(%rax), %rdi
 	EXTERN(x86_fpustate_save)
 	call   x86_fpustate_save
-	movq   %rbx, %rcx /* Restore THIS_CPU */
+	movq   %rbx, %rdi /* Restore THIS_CPU */
 1:
 #endif /* !CONFIG_NO_FPU */
 
@@ -737,12 +737,12 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	lock;  decq cpu_online_count
 
 	EXTERN(this_idle_sched_state)
-	movq   %rsp, this_idle_sched_state(%rcx)
+	movq   %rsp, this_idle_sched_state(%rdi)
 
 	/* Flush all caches before actually commiting to beginning to dream */
 	wbinvd
 	EXTERN(thiscpu_state)
-	movq   $(CPU_STATE_DREAMING), thiscpu_state(%rcx)
+	movq   $(CPU_STATE_DREAMING), thiscpu_state(%rdi)
 
 	/* We're now dreaming, meaning that our core may get reset at any moment,
 	 * and there is nothing we can do to undo this ourself, or prevent such a

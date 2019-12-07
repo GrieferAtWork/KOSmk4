@@ -539,15 +539,31 @@ SECTIONS {
 	PROVIDE_HIDDEN(__x86_dbg_cpu_temporary_b1 = (ABSOLUTE(dbg_cpu_temporary) & 0x0000ff00) >> 8);
 	PROVIDE_HIDDEN(__x86_dbg_cpu_temporary_b2 = (ABSOLUTE(dbg_cpu_temporary) & 0x00ff0000) >> 16);
 	PROVIDE_HIDDEN(__x86_dbg_cpu_temporary_b3 = (ABSOLUTE(dbg_cpu_temporary) & 0xff000000) >> 24);
+#ifdef __x86_64__
+	PROVIDE_HIDDEN(__x86_dbg_cpu_temporary_b4 = (ABSOLUTE(dbg_cpu_temporary) & 0x000000ff00000000) >> 32);
+	PROVIDE_HIDDEN(__x86_dbg_cpu_temporary_b5 = (ABSOLUTE(dbg_cpu_temporary) & 0x0000ff0000000000) >> 40);
+	PROVIDE_HIDDEN(__x86_dbg_cpu_temporary_b6 = (ABSOLUTE(dbg_cpu_temporary) & 0x00ff000000000000) >> 48);
+	PROVIDE_HIDDEN(__x86_dbg_cpu_temporary_b7 = (ABSOLUTE(dbg_cpu_temporary) & 0xff00000000000000) >> 56);
+#endif /* __x86_64__ */
+
 	PROVIDE_HIDDEN(__x86_dbg_exitstate_temporary_b0 = (ABSOLUTE(dbg_exitstate) & 0x000000ff) >> 0);
 	PROVIDE_HIDDEN(__x86_dbg_exitstate_temporary_b1 = (ABSOLUTE(dbg_exitstate) & 0x0000ff00) >> 8);
 	PROVIDE_HIDDEN(__x86_dbg_exitstate_temporary_b2 = (ABSOLUTE(dbg_exitstate) & 0x00ff0000) >> 16);
 	PROVIDE_HIDDEN(__x86_dbg_exitstate_temporary_b3 = (ABSOLUTE(dbg_exitstate) & 0xff000000) >> 24);
+#ifdef __x86_64__
+	PROVIDE_HIDDEN(__x86_dbg_exitstate_temporary_b4 = (ABSOLUTE(dbg_exitstate) & 0x000000ff00000000) >> 32);
+	PROVIDE_HIDDEN(__x86_dbg_exitstate_temporary_b5 = (ABSOLUTE(dbg_exitstate) & 0x0000ff0000000000) >> 40);
+	PROVIDE_HIDDEN(__x86_dbg_exitstate_temporary_b6 = (ABSOLUTE(dbg_exitstate) & 0x00ff000000000000) >> 48);
+	PROVIDE_HIDDEN(__x86_dbg_exitstate_temporary_b7 = (ABSOLUTE(dbg_exitstate) & 0xff00000000000000) >> 56);
+#endif /* __x86_64__ */
 
+
+#ifndef __x86_64__
 	PROVIDE_HIDDEN(__x86_cputss_b0 = (ABSOLUTE(thiscpu_x86_tss) & 0x000000ff) >> 0);
 	PROVIDE_HIDDEN(__x86_cputss_b1 = (ABSOLUTE(thiscpu_x86_tss) & 0x0000ff00) >> 8);
 	PROVIDE_HIDDEN(__x86_cputss_b2 = (ABSOLUTE(thiscpu_x86_tss) & 0x00ff0000) >> 16);
 	PROVIDE_HIDDEN(__x86_cputss_b3 = (ABSOLUTE(thiscpu_x86_tss) & 0xff000000) >> 24);
+#endif /* !__x86_64__ */
 
 #ifndef __x86_64__
 #ifndef CONFIG_NO_PAGING_P32

@@ -174,8 +174,9 @@ PUBLIC_FUNCTION(dbg_exit)
 	movl   debug_mycpu, %edi
 	EXTERN(this_idle_x86_kernel_psp0)
 	movl   this_idle_x86_kernel_psp0(%edi), %edi
-	addl   $(SIZEOF_IRREGS_VM86), %edi /* Worst-cast stack requirement for IRET */
+	subl   $(SIZEOF_IRREGS_VM86), %edi /* Worst-cast stack requirement for IRET */
 	movl   $(SIZEOF_FCPUSTATE/4), %ecx
+	cld
 	rep;   movsl   /* Copy the exit-state to the end of the calling CPU's IDLE-thread's stack */
 	.cfi_def_cfa %edi, -SIZEOF_FCPUSTATE
 #endif /* !CONFIG_NO_SMP */
@@ -225,13 +226,13 @@ PUBLIC_FUNCTION(dbg_exit)
 	movl   %eax, %cr0
 
 	/* Restore the LDT and TR registers */
-	lldt   EXIT_STATE(OFFSET_FCPUSTATE_LDT)
+	lldtw  EXIT_STATE(OFFSET_FCPUSTATE_LDT)
 	movzwl EXIT_STATE(OFFSET_FCPUSTATE_TR), %eax
 	movl   %eax, %edx
 	andl   $~0x7, %edx
 	movl   EXIT_STATE(OFFSET_FCPUSTATE_GDT + OFFSET_DESCTAB_BASE), %ecx
 	andb   $(0b11111101), 5(%ecx,%edx,1)
-	ltr    %ax
+	ltrw   %ax
 
 	/* Restore gp. registers */
 #ifdef CONFIG_NO_SMP

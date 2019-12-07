@@ -24,8 +24,9 @@
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
 #include <asm/instr/jccN.h>
+#include <asm/instr/movzxq.h>
 #include <kos/kernel/fpu-sstate.h>
-#include <kos/kernel/fpu-state32.h>
+#include <kos/kernel/fpu-state64.h>
 
 
 #define MIN_DISTANCE(to, dist) \
@@ -38,21 +39,21 @@
 	.cfi_startproc
 PUBLIC_FUNCTION(x86_fpustate_load)
 	/* void FCALL x86_fpustate_load(struct fpustate const *__restrict state); */
-	fxrstor (%ecx)
+	fxrstor64 (%rdi)
 	ret
 	MIN_DISTANCE(x86_fpustate_load, 5)
 END(x86_fpustate_load)
 
 PUBLIC_FUNCTION(x86_fpustate_save)
 	/* void FCALL x86_fpustate_save(struct fpustate *__restrict state); */
-	fxsave (%ecx)
+	fxsave64 (%rdi)
 	ret
 	MIN_DISTANCE(x86_fpustate_save, 5)
 END(x86_fpustate_save)
 
 PUBLIC_FUNCTION(x86_fpustate_save_noreset)
 	/* void FCALL x86_fpustate_save_noreset(struct fpustate *__restrict state); */
-	fxsave (%ecx)
+	fxsave64 (%rdi)
 	ret
 	MIN_DISTANCE(x86_fpustate_save_noreset, 5)
 END(x86_fpustate_save_noreset)
@@ -63,7 +64,11 @@ PUBLIC_FUNCTION(x86_fpustate_init)
 	/* >> movw   $(FCW_IM | FCW_DM | FCW_ZM | FCW_OM | \
 	 * >>          FCW_UM | FCW_PM | 0x40 (???) | \
 	 * >>          FCW_PC_EXTEND | FCW_RC_NEAREST),  \
-	 * >>        OFFSET_XFPUSTATE_FCW(%ecx) */
+	 * >>        OFFSET_XFPUSTATE_FCW(%rdi) */
+	movw   $(FCW_IM | FCW_DM | FCW_ZM | FCW_OM | \
+	         FCW_UM | FCW_PM | 0x40 | \
+	         FCW_PC_EXTEND | FCW_RC_NEAREST),  \
+	       OFFSET_XFPUSTATE_FCW(%rdi)
 #if OFFSET_XFPUSTATE_FCW == 0
 	.byte  0x66, 0xc7, 0x01
 #else /* OFFSET_XFPUSTATE_FCW == 0 */
@@ -74,7 +79,8 @@ PUBLIC_FUNCTION(x86_fpustate_init)
 	        FCW_UM | FCW_PM | 0x40 | /* ??? */ \
 	        FCW_PC_EXTEND | FCW_RC_NEAREST)
 
-	/* movw   $(FTW_ALLEMPTY),  OFFSET_XFPUSTATE_FTW(%ecx) */
+	/* movw   $(FTW_ALLEMPTY),  OFFSET_XFPUSTATE_FTW(%rdi) */
+	movw   $(FTW_ALLEMPTY),  OFFSET_XFPUSTATE_FTW(%rdi)
 	.byte  0x66, 0xc7, 0x41
 INTERN_FUNCTION(x86_fpustate_init_ftw_offset_byte)
 	.byte  OFFSET_XFPUSTATE_FTW
@@ -83,7 +89,8 @@ INTERN_FUNCTION(x86_fpustate_init_ftw_value)
 	.word  FTW_ALLEMPTY
 END(x86_fpustate_init_ftw_value)
 
-	/* movw   $(MXCSR_...),  OFFSET_XFPUSTATE_MXCSR(%ecx) */
+	/* movw   $(MXCSR_...),  OFFSET_XFPUSTATE_MXCSR(%rdi) */
+	movw   $(MXCSR_...),  OFFSET_XFPUSTATE_MXCSR(%rdi)
 INTERN_FUNCTION(x86_fpustate_init_mxcsr)
 	.byte  0xc7, 0x41
 	.byte  OFFSET_XFPUSTATE_MXCSR
@@ -104,11 +111,11 @@ END(x86_fpustate_init)
 PUBLIC_FUNCTION(x86_fxsave)
 	/* void FCALL x86_fxsave(struct xfpustate *state); */
 	.cfi_startproc
-	fnsave (%ecx)
-	frstor (%ecx) /* Restore fenv since `fnsave' also did `finit' */
+	fnsave (%rdi)
+	frstor (%rdi) /* Restore fenv since `fnsave' also did `finit' */
 
-	movw   OFFSET_SFPUSTATE_FSW(%ecx), %ax
-	movw   %ax, OFFSET_XFPUSTATE_FSW(%ecx)
+	movw   OFFSET_SFPUSTATE_FSW(%rdi), %ax
+	movw   %ax, OFFSET_XFPUSTATE_FSW(%rdi)
 
 	/* Compress the FTW word:
 	 * >> u8 res = 0;
@@ -116,45 +123,41 @@ PUBLIC_FUNCTION(x86_fxsave)
 	 * >>     if ((ftw & FTW_MASK(i)) != FTW_EMPTY(i))
 	 * >>         res |= 1 << i;
 	 * >> } */
-	pushl_cfi_r %ecx
+	pushq_cfi_r %rdi
 	EXTERN(x86_fxsave_compress_ftw)
 	call   x86_fxsave_compress_ftw
-	popl_cfi_r %ecx
-	movb   %al, OFFSET_XFPUSTATE_FTW(%ecx)
+	popq_cfi_r %rdi
+	movb   %al, OFFSET_XFPUSTATE_FTW(%rdi)
 
-	movw   OFFSET_SFPUSTATE_FOP(%ecx), %ax
-	movw   %ax, OFFSET_XFPUSTATE_FOP(%ecx)
-	movl   OFFSET_SFPUSTATE_FPUIP(%ecx), %eax
-	movl   %eax, OFFSET_XFPUSTATE_FPUIP(%ecx)
-	movw   OFFSET_SFPUSTATE_FPUCS(%ecx), %ax
-	movw   %ax, OFFSET_XFPUSTATE_FPUCS(%ecx)
-	movl   OFFSET_SFPUSTATE_FPUDP(%ecx), %eax
-	movl   %eax, OFFSET_XFPUSTATE_FPUDP(%ecx)
-	movw   OFFSET_SFPUSTATE_FPUDS(%ecx), %ax
-	movw   %ax, OFFSET_XFPUSTATE_FPUDS(%ecx)
+	movw   OFFSET_SFPUSTATE_FOP(%rdi), %ax
+	movw   %ax, OFFSET_XFPUSTATE_FOP(%rdi)
+	movzlq OFFSET_SFPUSTATE_FPUIP(%rdi), %rax
+	movq   %rax, OFFSET_XFPUSTATE_FPUIP(%rdi)
+	movzlq OFFSET_SFPUSTATE_FPUDP(%rdi), %rax
+	movq   %rax, OFFSET_XFPUSTATE_FPUDP(%rdi)
 
 	/* Expand %st(i) registers */
-	pushl_cfi_r %edi
-	pushl_cfi_r %esi
+	pushq_cfi_r %rdi
 	cld
-	leal   (OFFSET_SFPUSTATE_ST(8) - 4)(%ecx), %esi
-	leal   (OFFSET_XFPUSTATE_ST(8) - 4)(%ecx), %edi
+	leaq   (OFFSET_SFPUSTATE_ST(8) - 4)(%rdi), %rsi
+	leaq   (OFFSET_XFPUSTATE_ST(8) - 4)(%rdi), %rdi
 	xorl   %eax, %eax
 .rept 8
 	stosl /* ------------0000 */
 	stosw /* ----------000000 */
 	movsw /* --------CC000000 */
-	movsl /* ----CCCCCC000000 */
-	movsl /* CCCCCCCCCC000000 */
+	movsq /* CCCCCCCCCC000000 */
 .endr
 	std
+	popq_cfi_r %rdi
 
 	/* NOTE: FPU initialization code assumes that %eax==0 at this point! */
 INTERN_FUNCTION(x86_fxsave_section_stmxcsr)
-	stmxcsr OFFSET_XFPUSTATE_MXCSR(%ecx)
+	stmxcsr OFFSET_XFPUSTATE_MXCSR(%rdi)
 END(x86_fxsave_section_stmxcsr)
 
-	/* movl $*x86_fxsave_mxcsr_mask, OFFSET_XFPUSTATE_MXCSR_MASK(%ecx) */
+	/* movl $*x86_fxsave_mxcsr_mask, OFFSET_XFPUSTATE_MXCSR_MASK(%rdi) */
+	movl   $0x12345678, OFFSET_XFPUSTATE_MXCSR_MASK(%rdi)
 #if OFFSET_XFPUSTATE_MXCSR_MASK <= 0x7f
 	.byte  0xc7, 0x41, OFFSET_XFPUSTATE_MXCSR_MASK
 #else /* OFFSET_XFPUSTATE_MXCSR_MASK <= 0x7f */
@@ -171,18 +174,23 @@ END(x86_fxsave_mxcsr_mask)
 	/* NOTE: FPU initialization code assumes that %eax==0 at this point! */
 INTERN_FUNCTION(x86_fxsave_section_savexmm)
 	/* Save XMM registers. */
-	movaps %xmm0, OFFSET_XFPUSTATE_XMM(0)(%ecx)
-	movaps %xmm1, OFFSET_XFPUSTATE_XMM(1)(%ecx)
-	movaps %xmm2, OFFSET_XFPUSTATE_XMM(2)(%ecx)
-	movaps %xmm3, OFFSET_XFPUSTATE_XMM(3)(%ecx)
-	movaps %xmm4, OFFSET_XFPUSTATE_XMM(4)(%ecx)
-	movaps %xmm5, OFFSET_XFPUSTATE_XMM(5)(%ecx)
-	movaps %xmm6, OFFSET_XFPUSTATE_XMM(6)(%ecx)
-	movaps %xmm7, OFFSET_XFPUSTATE_XMM(7)(%ecx)
+	movaps %xmm0, OFFSET_XFPUSTATE_XMM(0)(%rdi)
+	movaps %xmm1, OFFSET_XFPUSTATE_XMM(1)(%rdi)
+	movaps %xmm2, OFFSET_XFPUSTATE_XMM(2)(%rdi)
+	movaps %xmm3, OFFSET_XFPUSTATE_XMM(3)(%rdi)
+	movaps %xmm4, OFFSET_XFPUSTATE_XMM(4)(%rdi)
+	movaps %xmm5, OFFSET_XFPUSTATE_XMM(5)(%rdi)
+	movaps %xmm6, OFFSET_XFPUSTATE_XMM(6)(%rdi)
+	movaps %xmm7, OFFSET_XFPUSTATE_XMM(7)(%rdi)
+	movaps %xmm8, OFFSET_XFPUSTATE_XMM(8)(%rdi)
+	movaps %xmm9, OFFSET_XFPUSTATE_XMM(9)(%rdi)
+	movaps %xmm10, OFFSET_XFPUSTATE_XMM(10)(%rdi)
+	movaps %xmm11, OFFSET_XFPUSTATE_XMM(11)(%rdi)
+	movaps %xmm12, OFFSET_XFPUSTATE_XMM(12)(%rdi)
+	movaps %xmm13, OFFSET_XFPUSTATE_XMM(13)(%rdi)
+	movaps %xmm14, OFFSET_XFPUSTATE_XMM(14)(%rdi)
+	movaps %xmm15, OFFSET_XFPUSTATE_XMM(15)(%rdi)
 END(x86_fxsave_section_savexmm)
-
-	popl_cfi_r %esi
-	popl_cfi_r %edi
 	ret
 	.cfi_endproc
 END(x86_fxsave)
@@ -195,36 +203,32 @@ PUBLIC_FUNCTION(x86_fxrstor)
 	/* void FCALL x86_fxrstor(struct xfpustate const *state); */
 	.cfi_startproc
 
-	pushl_cfi_r %edi
-	pushl_cfi_r %esi
-	subl  $(SIZEOF_SFPUSTATE), %esp
+	pushq_cfi_r %rdi
+	subq  $(SIZEOF_SFPUSTATE), %rsp
 	.cfi_adjust_cfa_offset SIZEOF_SFPUSTATE
 
 	/* Load the primary part of the FPU by converting the xfpustate
 	 * into an `sfpustate' which we'll keep ontop of the stack. */
-	movzwl OFFSET_XFPUSTATE_FCW(%ecx), %eax
-	movl   %eax, OFFSET_SFPUSTATE_FCW(%esp)
-	movzwl OFFSET_XFPUSTATE_FSW(%ecx), %eax
-	movl   %eax, OFFSET_SFPUSTATE_FSW(%esp)
-	pushl_cfi_r %ecx
+	movzwl OFFSET_XFPUSTATE_FCW(%rdi), %eax
+	movl   %eax, OFFSET_SFPUSTATE_FCW(%rsp)
+	movzwl OFFSET_XFPUSTATE_FSW(%rdi), %eax
+	movl   %eax, OFFSET_SFPUSTATE_FSW(%rsp)
 	EXTERN(x86_fxsave_decompress_ftw)
 	call   x86_fxsave_decompress_ftw
-	popl_cfi_r %ecx
-	movl   %eax, OFFSET_SFPUSTATE_FTW(%esp)
-	movl   OFFSET_XFPUSTATE_FPUIP(%ecx), %eax
-	movl   %eax, OFFSET_SFPUSTATE_FPUIP(%esp)
-	movw   OFFSET_XFPUSTATE_FPUCS(%ecx), %ax
-	movw   %ax, OFFSET_SFPUSTATE_FPUCS(%esp)
-	movw   OFFSET_XFPUSTATE_FOP(%ecx), %ax
-	movw   %ax, OFFSET_SFPUSTATE_FOP(%esp)
-	movl   OFFSET_XFPUSTATE_FPUDP(%ecx), %eax
-	movl   %eax, OFFSET_SFPUSTATE_FPUDP(%esp)
-	movzwl OFFSET_XFPUSTATE_FPUDS(%ecx), %eax
-	movl   %eax, OFFSET_SFPUSTATE_FPUDS(%esp)
+	movq   SIZEOF_SFPUSTATE(%rsp), %rdi /* Re-load RDI */
+	movl   %eax, OFFSET_SFPUSTATE_FTW(%rsp)
+	movl   OFFSET_XFPUSTATE_FPUIP(%rdi), %eax
+	movl   %eax, OFFSET_SFPUSTATE_FPUIP(%rsp)
+	movw   $(0), OFFSET_SFPUSTATE_FPUCS(%rsp)
+	movw   OFFSET_XFPUSTATE_FOP(%rdi), %ax
+	movw   %ax, OFFSET_SFPUSTATE_FOP(%rsp)
+	movl   OFFSET_XFPUSTATE_FPUDP(%rdi), %eax
+	movl   %eax, OFFSET_SFPUSTATE_FPUDP(%rsp)
+	movl   $(0), OFFSET_SFPUSTATE_FPUDS(%rsp)
 
 	/* Reduce %st(i) registers */
-	leal   OFFSET_XFPUSTATE_ST(0)(%ecx), %esi
-	leal   OFFSET_SFPUSTATE_ST(0)(%esp), %edi
+	leaq   OFFSET_XFPUSTATE_ST(0)(%rdi), %rsi
+	leaq   OFFSET_SFPUSTATE_ST(0)(%rsp), %rdi
 .rept 8
 	movsl             /* CCCC------...... */
 	movsl             /* CCCCCCCC--...... */
@@ -232,26 +236,33 @@ PUBLIC_FUNCTION(x86_fxrstor)
 	addl   $(6), %esi /* CCCCCCCCCC------ */
 .endr
 
-	frstor (%esp)
-	addl  $(SIZEOF_SFPUSTATE), %esp
+	frstor (%rsp)
+	addq  $(SIZEOF_SFPUSTATE), %rsp
 	.cfi_adjust_cfa_offset -SIZEOF_SFPUSTATE
-	popl_cfi_r %esi
-	popl_cfi_r %edi
+	popq_cfi_r %rdi
 
 INTERN_FUNCTION(x86_fxrstor_section_ldmxcsr)
-	ldmxcsr OFFSET_XFPUSTATE_MXCSR(%ecx)
+	ldmxcsr OFFSET_XFPUSTATE_MXCSR(%rdi)
 END(x86_fxrstor_section_ldmxcsr)
 
 INTERN_FUNCTION(x86_fxrstor_section_loadxmm)
 	/* Load XMM registers. */
-	movaps OFFSET_XFPUSTATE_XMM(0)(%ecx), %xmm0
-	movaps OFFSET_XFPUSTATE_XMM(1)(%ecx), %xmm1
-	movaps OFFSET_XFPUSTATE_XMM(2)(%ecx), %xmm2
-	movaps OFFSET_XFPUSTATE_XMM(3)(%ecx), %xmm3
-	movaps OFFSET_XFPUSTATE_XMM(4)(%ecx), %xmm4
-	movaps OFFSET_XFPUSTATE_XMM(5)(%ecx), %xmm5
-	movaps OFFSET_XFPUSTATE_XMM(6)(%ecx), %xmm6
-	movaps OFFSET_XFPUSTATE_XMM(7)(%ecx), %xmm7
+	movaps OFFSET_XFPUSTATE_XMM(0)(%rdi), %xmm0
+	movaps OFFSET_XFPUSTATE_XMM(1)(%rdi), %xmm1
+	movaps OFFSET_XFPUSTATE_XMM(2)(%rdi), %xmm2
+	movaps OFFSET_XFPUSTATE_XMM(3)(%rdi), %xmm3
+	movaps OFFSET_XFPUSTATE_XMM(4)(%rdi), %xmm4
+	movaps OFFSET_XFPUSTATE_XMM(5)(%rdi), %xmm5
+	movaps OFFSET_XFPUSTATE_XMM(6)(%rdi), %xmm6
+	movaps OFFSET_XFPUSTATE_XMM(7)(%rdi), %xmm7
+	movaps OFFSET_XFPUSTATE_XMM(8)(%rdi), %xmm8
+	movaps OFFSET_XFPUSTATE_XMM(9)(%rdi), %xmm9
+	movaps OFFSET_XFPUSTATE_XMM(10)(%rdi), %xmm10
+	movaps OFFSET_XFPUSTATE_XMM(11)(%rdi), %xmm11
+	movaps OFFSET_XFPUSTATE_XMM(12)(%rdi), %xmm12
+	movaps OFFSET_XFPUSTATE_XMM(13)(%rdi), %xmm13
+	movaps OFFSET_XFPUSTATE_XMM(14)(%rdi), %xmm14
+	movaps OFFSET_XFPUSTATE_XMM(15)(%rdi), %xmm15
 END(x86_fxrstor_section_loadxmm)
 
 	ret
