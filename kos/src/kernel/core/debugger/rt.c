@@ -45,7 +45,8 @@ PUBLIC ATTR_DBGBSS bool dbg_active = false;
 PUBLIC ATTR_DBGBSS struct task *dbg_current = NULL;
 
 /* Apply changes made to `DBG_REGLEVEL_VIEW' onto `DBG_REGLEVEL_ORIG'. */
-PUBLIC ATTR_DBGTEXT ATTR_WEAK void NOTHROW(FCALL dbg_applyview)(void) {
+PUBLIC ATTR_DBGTEXT_S("dbg_applyview") ATTR_WEAK
+void NOTHROW(FCALL dbg_applyview)(void) {
 	struct fcpustate fst;
 	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
 	dbg_setallregs(DBG_REGLEVEL_ORIG, &fst);

@@ -38,6 +38,7 @@
 #include <asm/cpu-flags.h>
 #include <asm/cpu-msr.h>
 #include <asm/intrin.h>
+#include <asm/registers-compat.h>
 #include <asm/registers.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
@@ -679,24 +680,24 @@ done_noncanon_check:
 			if (mod.mi_reg == 2) {
 				/* LGDT m16&32 */
 				PERTASK_SET(this_exception_pointers[2],
-				            (uintptr_t)X86_REGISTER_MISC_GDT);
+				            (uintptr_t)X86_REGISTER_MISC_GDT_BASE);
 			} else if (mod.mi_reg == 3) {
 				/* LIDT m16&32 */
 				PERTASK_SET(this_exception_pointers[2],
-				            (uintptr_t)X86_REGISTER_MISC_IDT);
+				            (uintptr_t)X86_REGISTER_MISC_IDT_BASE);
 			} else if (mod.mi_reg == 0) {
 				/* SGDT r/m16 */
 				PERTASK_SET(this_exception_pointers[1],
 				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV);
 				PERTASK_SET(this_exception_pointers[2],
-				            (uintptr_t)X86_REGISTER_MISC_GDT);
+				            (uintptr_t)X86_REGISTER_MISC_GDT_BASE);
 				goto unwind_state;
 			} else if (mod.mi_reg == 1) {
 				/* SIDT r/m16 */
 				PERTASK_SET(this_exception_pointers[1],
 				            (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV);
 				PERTASK_SET(this_exception_pointers[2],
-				            (uintptr_t)X86_REGISTER_MISC_IDT);
+				            (uintptr_t)X86_REGISTER_MISC_IDT_BASE);
 				goto unwind_state;
 			} else if (mod.mi_reg == 4) {
 				/* SMSW r/m16 */

@@ -75,33 +75,50 @@
 
 
 
-#define ATTR_FREETEXT    FREE ATTR_SECTION(".text.free")
-#define ATTR_FREERODATA  FREE ATTR_SECTION(".rodata.free")
-#define ATTR_FREEDATA    FREE ATTR_SECTION(".data.free")
-#define ATTR_FREEBSS     FREE ATTR_SECTION(".bss.free")
+#define ATTR_FREETEXT        FREE ATTR_SECTION(".text.free")
+#define ATTR_FREERODATA      FREE ATTR_SECTION(".rodata.free")
+#define ATTR_FREEDATA        FREE ATTR_SECTION(".data.free")
+#define ATTR_FREEBSS         FREE ATTR_SECTION(".bss.free")
+#define ATTR_FREETEXT_S(x)   FREE ATTR_SECTION(".text.free." x)
+#define ATTR_FREERODATA_S(x) FREE ATTR_SECTION(".rodata.free." x)
+#define ATTR_FREEDATA_S(x)   FREE ATTR_SECTION(".data.free." x)
+#define ATTR_FREEBSS_S(x)    FREE ATTR_SECTION(".bss.free." x)
 
-#define ATTR_HOTTEXT     ATTR_SECTION(".text.hot")
-#define ATTR_HOTRODATA   ATTR_SECTION(".rodata.hot")
-#define ATTR_HOTDATA     ATTR_SECTION(".data.hot")
-#define ATTR_HOTBSS      ATTR_SECTION(".bss.hot")
+#define ATTR_HOTTEXT        ATTR_SECTION(".text.hot")
+#define ATTR_HOTRODATA      ATTR_SECTION(".rodata.hot")
+#define ATTR_HOTDATA        ATTR_SECTION(".data.hot")
+#define ATTR_HOTBSS         ATTR_SECTION(".bss.hot")
+#define ATTR_HOTTEXT_S(x)   ATTR_SECTION(".text.hot." x)
+#define ATTR_HOTRODATA_S(x) ATTR_SECTION(".rodata.hot." x)
+#define ATTR_HOTDATA_S(x)   ATTR_SECTION(".data.hot." x)
+#define ATTR_HOTBSS_S(x)    ATTR_SECTION(".bss.hot." x)
 
 /* Attributes for tiny pieces of data that are accessed extremely often,
  * usually done through reads, rather than writes. - This then allows us
  * to put all of them together, meaning that they can share cache-lines,
  * thus reducing the amount of necessary lookups in main memory. */
-#define ATTR_READMOSTLY      ATTR_SECTION(".data.hot.read_mostly")
-#define ATTR_WRITEMOSTLY     ATTR_SECTION(".data.hot.write_mostly")
+#define ATTR_READMOSTLY       ATTR_SECTION(".data.hot.read_mostly")
+#define ATTR_WRITEMOSTLY      ATTR_SECTION(".data.hot.write_mostly")
+#define ATTR_READMOSTLY_S(x)  ATTR_SECTION(".data.hot.read_mostly." x)
+#define ATTR_WRITEMOSTLY_S(x) ATTR_SECTION(".data.hot.write_mostly." x)
 
-
-#define ATTR_COLDTEXT    ATTR_SECTION(".text.cold")
-#define ATTR_COLDRODATA  ATTR_SECTION(".rodata.cold")
-#define ATTR_COLDDATA    ATTR_SECTION(".data.cold")
-#define ATTR_COLDBSS     ATTR_SECTION(".bss.cold")
+#define ATTR_COLDTEXT        ATTR_SECTION(".text.cold")
+#define ATTR_COLDRODATA      ATTR_SECTION(".rodata.cold")
+#define ATTR_COLDDATA        ATTR_SECTION(".data.cold")
+#define ATTR_COLDBSS         ATTR_SECTION(".bss.cold")
+#define ATTR_COLDTEXT_S(x)   ATTR_SECTION(".text.cold." x)
+#define ATTR_COLDRODATA_S(x) ATTR_SECTION(".rodata.cold." x)
+#define ATTR_COLDDATA_S(x)   ATTR_SECTION(".data.cold." x)
+#define ATTR_COLDBSS_S(x)    ATTR_SECTION(".bss.cold." x)
 
 #define ATTR_TEXT        ATTR_SECTION(".text")
 #define ATTR_RODATA      ATTR_SECTION(".rodata")
 #define ATTR_DATA        ATTR_SECTION(".data")
 #define ATTR_BSS         ATTR_SECTION(".bss")
+#define ATTR_TEXT_S(x)   ATTR_SECTION(".text." s)
+#define ATTR_RODATA_S(x) ATTR_SECTION(".rodata." s)
+#define ATTR_DATA_S(x)   ATTR_SECTION(".data." s)
+#define ATTR_BSS_S(x)    ATTR_SECTION(".bss." s)
 
 #define FREESTR(s) XBLOCK({ PRIVATE ATTR_FREERODATA char const _free_str[] = s; XRETURN _free_str; })
 
