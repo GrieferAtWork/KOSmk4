@@ -179,7 +179,7 @@ NOTHROW(FCALL x86_idt_setcurrent)(struct desctab const *__restrict ptr) {
  * As such, any modifications made to `x86_dbgidt' after this function
  * is called will only code into effect once `x86_idt_modify_end()' is
  * called. These functions are implemented as:
- *   x86_idt_modify_start():
+ *   x86_idt_modify_begin():
  *     - Acquire an internal mutex
  *     - Allocate an internal copy of the IDT
  *     - Copy `x86_idt' into the internal copy
@@ -187,19 +187,19 @@ NOTHROW(FCALL x86_idt_setcurrent)(struct desctab const *__restrict ptr) {
  *   x86_idt_modify_end():
  *     - if (discard_changes) x86_idt = <INTERNAL_COPY>;
  *     - Broadcast an IPI, telling all CPUs to `lidt(&x86_idt_ptr)'
- *     - Free the internal copy previously allocated by `x86_idt_modify_start()'
+ *     - Free the internal copy previously allocated by `x86_idt_modify_begin()'
  *     - Release the internal mutex
  * Using this method, changes can be staged for eventual use in `x86_idt',
  * without running the risk of any CPU/thread ever accessing an incomplete/
  * corrupt IDT entry.
  * When calling `x86_idt_modify_end()', the caller is responsible to ensure
- * that the call was preceded by `x86_idt_modify_start()', as well as to ensure
- * that any call to `x86_idt_modify_start()' is eventually followed by another
+ * that the call was preceded by `x86_idt_modify_begin()', as well as to ensure
+ * that any call to `x86_idt_modify_begin()' is eventually followed by another
  * call to `x86_idt_modify_end()'
  * Also note that these functions must not be called recursively from the same
- * thread. - A call to `x86_idt_modify_start()' must _NOT_ be followed by another
- * call to `x86_idt_modify_start()' from the same thread! */
-PUBLIC ATTR_COLDTEXT void FCALL x86_idt_modify_start(void)
+ * thread. - A call to `x86_idt_modify_begin()' must _NOT_ be followed by another
+ * call to `x86_idt_modify_begin()' from the same thread! */
+PUBLIC ATTR_COLDTEXT void FCALL x86_idt_modify_begin(void)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INTERRUPT) {
 	struct idt_segment *copy;
 	struct desctab dt;

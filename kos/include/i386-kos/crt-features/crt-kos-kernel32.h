@@ -267,6 +267,7 @@
 #define __CRT_HAVE_dbg_asmview 1
 #define __CRT_HAVE_dbg_attr 1
 #define __CRT_HAVE_dbg_autocomplete_command 1
+#define __CRT_HAVE_dbg_beginshowscreen 1
 #define __CRT_HAVE_dbg_beginupdate 1
 #define __CRT_HAVE_dbg_bell 1
 #define __CRT_HAVE_dbg_changedview 1
@@ -274,6 +275,7 @@
 #define __CRT_HAVE_dbg_default_attr 1
 #define __CRT_HAVE_dbg_draweditfield 1
 #define __CRT_HAVE_dbg_editfield 1
+#define __CRT_HAVE_dbg_endshowscreen 1
 #define __CRT_HAVE_dbg_endupdate 1
 #define __CRT_HAVE_dbg_enter_fcpustate 1
 #define __CRT_HAVE_dbg_enter_fcpustate_r 1
@@ -344,8 +346,6 @@
 #define __CRT_HAVE_dbg_setregbyname 1
 #define __CRT_HAVE_dbg_setregbynamep 1
 #define __CRT_HAVE_dbg_setscreendata 1
-#define __CRT_HAVE_dbg_showscreen_end 1
-#define __CRT_HAVE_dbg_showscreen_start 1
 #define __CRT_HAVE_dbg_stack 1
 #define __CRT_HAVE_dbg_tabsize 1
 #define __CRT_HAVE_dbg_trygetc 1
@@ -2385,8 +2385,8 @@
 #define __CRT_HAVE_x86_get_irregs 1
 #define __CRT_HAVE_x86_getiopl 1
 #define __CRT_HAVE_x86_idt 1
+#define __CRT_HAVE_x86_idt_modify_begin 1
 #define __CRT_HAVE_x86_idt_modify_end 1
-#define __CRT_HAVE_x86_idt_modify_start 1
 #define __CRT_HAVE_x86_idt_ptr 1
 #define __CRT_HAVE_x86_idt_syscall 1
 #define __CRT_HAVE_x86_idt_syscall_traced 1

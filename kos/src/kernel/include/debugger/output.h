@@ -146,8 +146,8 @@ FUNDEF void NOTHROW(KCALL dbg_beginupdate)(void);
 FUNDEF void NOTHROW(KCALL dbg_endupdate)(bool force DFL(false));
 
 /* TTY show-screen support (display the contents of the monitor before the debugger was enabled) */
-FUNDEF void NOTHROW(KCALL dbg_showscreen_start)(void);
-FUNDEF void NOTHROW(KCALL dbg_showscreen_end)(void);
+FUNDEF void NOTHROW(KCALL dbg_beginshowscreen)(void);
+FUNDEF void NOTHROW(KCALL dbg_endshowscreen)(void);
 
 
 

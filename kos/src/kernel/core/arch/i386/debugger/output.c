@@ -1568,7 +1568,7 @@ NOTHROW(KCALL x86_initialize_debugger_textfont)(void) {
 
 
 /* TTY show-screen support (display the contents of the monitor before the debugger was enabled) */
-PUBLIC void NOTHROW(KCALL dbg_showscreen_start)(void) {
+PUBLIC void NOTHROW(KCALL dbg_beginshowscreen)(void) {
 	if (!vga_showscreen_enabled) {
 		if (vga_backlog_scrollpos)
 			vga_backlog_setscrollpos(0);
@@ -1583,7 +1583,7 @@ PUBLIC void NOTHROW(KCALL dbg_showscreen_start)(void) {
 	}
 }
 
-PUBLIC void NOTHROW(KCALL dbg_showscreen_end)(void) {
+PUBLIC void NOTHROW(KCALL dbg_endshowscreen)(void) {
 	if (vga_showscreen_enabled) {
 		VGA_SetMode(&vga_textmode);
 		VGA_SetPalette(&vga_biospal, sizeof(vga_biospal));
@@ -1620,7 +1620,7 @@ INTERN ATTR_DBGTEXT void NOTHROW(KCALL dbg_initialize_tty)(void) {
 
 INTERN ATTR_DBGTEXT void NOTHROW(KCALL dbg_finalize_tty)(void) {
 	/* Make sure we're not in show-screen mode. */
-	dbg_showscreen_end();
+	dbg_endshowscreen();
 	/* Restore font memory. */
 	if (vga_did_initialized_textfont)
 		VGA_SetFont(&vga_oldfont);
@@ -1637,7 +1637,7 @@ INTERN ATTR_DBGTEXT void NOTHROW(KCALL dbg_finalize_tty)(void) {
 
 INTERN ATTR_DBGTEXT void NOTHROW(KCALL dbg_reset_tty)(void) {
 	/* Make sure we're not in show-screen mode from before. */
-	dbg_showscreen_end();
+	dbg_endshowscreen();
 	vga_vram_offset = 0;
 	vga_vram(VGA_VRAM_TEXT - VGA_VRAM_BASE);
 	ansitty_init(&vga_tty, &vga_tty_operators);
