@@ -42,7 +42,7 @@
 	.cfi_escape DW_CFA_def_cfa_expression, 5
 	.cfi_escape DW_OP_addr, x86_dbg_exitstate_b0, x86_dbg_exitstate_b1, \
 	                        x86_dbg_exitstate_b2, x86_dbg_exitstate_b3
-#define RESTORE(reg, offset) .cfi_offset reg, (-SIZEOF_FCPUSTATE) + (offset)
+#define RESTORE(reg, offset) .cfi_offset reg, (offset)
 	RESTORE(%edi, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDI)
 	RESTORE(%esi, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESI)
 	RESTORE(%ebp, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EBP)
