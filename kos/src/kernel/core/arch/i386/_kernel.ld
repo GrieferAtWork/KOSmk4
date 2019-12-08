@@ -504,7 +504,7 @@ SECTIONS {
 
 	/* The size of the `struct tss' plus the associated IOB vector addend. */
 #define SIZEOF_TSS_PLUS_IOB_VECTOR \
-	(CEILDIV(SIZEOF_TSS, PAGESIZE) + 2 * PAGESIZE + 1)
+	(CEIL_ALIGN(SIZEOF_TSS, PAGESIZE) + 2 * PAGESIZE + 1)
 
 	/* Pre-calculate TSS and TLS segment initializers. */
 #ifdef __x86_64__
