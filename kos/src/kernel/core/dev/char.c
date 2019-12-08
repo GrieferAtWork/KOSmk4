@@ -19,6 +19,7 @@
 #ifndef GUARD_KERNEL_SRC_DEV_CHAR_C
 #define GUARD_KERNEL_SRC_DEV_CHAR_C 1
 #define _KOS_SOURCE 1
+#define WANT_CHARACTER_DEVICE_NEXTLINK 1
 
 #include <kernel/compiler.h>
 
@@ -84,7 +85,7 @@ DEFINE_DBG_BZERO_OBJECT(character_device_lock);
 /* [0..1] Chain of weakly referenced, dead character devices.
  * These are serviced whenever a lock to `character_device_lock' is acquired. */
 PRIVATE WEAK struct character_device *dead_character_devices = NULL;
-#define dead_character_devices_NEXTP(x) (*(struct character_device **)&(x)->cd_type.ct_fini)
+#define dead_character_devices_NEXTP(x) (x)->cd_nextdead
 
 LOCAL NOBLOCK void
 NOTHROW(KCALL character_device_free)(struct character_device *__restrict self) {
