@@ -118,15 +118,11 @@ DATDEF u32 const x86_fxsave_mxcsr_mask;
 
 #ifdef __x86_64__
 struct fpustate32;
-FUNDEF NOBLOCK void KCALL fpustate_loadfrom32(USER CHECKED struct fpustate32 const *state) THROWS(E_SEGFAULT, E_BADALLOC);
-FUNDEF NOBLOCK void KCALL fpustate_saveinto32(USER CHECKED struct fpustate32 *state) THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void KCALL sfpustate_loadfrom32(USER CHECKED struct spustate32 const *state) THROWS(E_SEGFAULT, E_BADALLOC);
-FUNDEF NOBLOCK void KCALL sfpustate_saveinto32(USER CHECKED struct spustate32 *state) THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void KCALL xfpustate_loadfrom32(USER CHECKED struct xpustate32 const *state) THROWS(E_SEGFAULT, E_BADALLOC);
-FUNDEF NOBLOCK void KCALL xfpustate_saveinto32(USER CHECKED struct xpustate32 *state) THROWS(E_SEGFAULT);
+FUNDEF NOBLOCK void KCALL fpustate32_loadfrom(USER CHECKED struct fpustate32 const *state) THROWS(E_SEGFAULT, E_BADALLOC);
+FUNDEF NOBLOCK void KCALL fpustate32_saveinto(USER CHECKED struct fpustate32 *state) THROWS(E_SEGFAULT);
 #else /* __x86_64__ */
-FUNDEF NOBLOCK void KCALL fpustate_loadfrom32(USER CHECKED struct fpustate const *state) ASMNAME("fpustate_loadfrom") THROWS(E_SEGFAULT, E_BADALLOC);
-FUNDEF NOBLOCK void KCALL fpustate_saveinto32(USER CHECKED struct fpustate *state) ASMNAME("fpustate_saveinto") THROWS(E_SEGFAULT);
+#define fpustate32_loadfrom fpustate_loadfrom
+#define fpustate32_saveinto fpustate_saveinto
 #endif /* !__x86_64__ */
 
 

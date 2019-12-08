@@ -202,7 +202,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		}
 		if (PERTASK_GET(this_x86_fpustate)) {
 			user_fpustate = &user_ucontext->uc_mcontext.mc_fpu;
-			fpustate_saveinto32(user_fpustate);
+			fpustate32_saveinto(user_fpustate);
 			user_ucontext->uc_mcontext.mc_flags |= x86_fpustate_variant == FPU_STATE_SSTATE
 			                                       ? __MCONTEXT_FLAG_HAVESFPU
 			                                       : __MCONTEXT_FLAG_HAVEXFPU;
@@ -231,7 +231,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 			                  MIN(sizeof(struct sfpustate),
 			                      sizeof(struct xfpustate32)));
 			COMPILER_WRITE_BARRIER();
-			fpustate_saveinto32(user_fpustate);
+			fpustate32_saveinto(user_fpustate);
 		}
 		/* Only save the sigmask if it was changed. */
 		if (must_restore_sigmask) {
@@ -365,7 +365,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
                      struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
 	struct icpustate *result;
-	if (irregs_iscompat(&state->ics_irregs)) {
+	if (irregs_is32bit(&state->ics_irregs)) {
 		/* Compatibility mode. */
 		result = sighand_raise_signal32(state, action,
 		                                siginfo, sc_info);
@@ -463,7 +463,7 @@ again:
 		}
 		/* Restore the FPU context */
 		if (restore_fpu)
-			fpustate_loadfrom32(restore_fpu);
+			fpustate32_loadfrom(restore_fpu);
 		/* Restore the CPU context */
 		state = syscall_fill_icpustate_from_ucpustate32(state, restore_cpu);
 

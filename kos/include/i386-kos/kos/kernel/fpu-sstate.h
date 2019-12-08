@@ -27,16 +27,16 @@
 
 __SYSDECL_BEGIN
 
-#define OFFSET_SFPUENV_FCW      0
-#define OFFSET_SFPUENV_FSW      4
-#define OFFSET_SFPUENV_FTW      8
-#define OFFSET_SFPUENV_FPUIP    12
-#define OFFSET_SFPUENV_FPUCS    16
-#define OFFSET_SFPUENV_FOP      18
-#define OFFSET_SFPUENV_FPUDP    20
-#define OFFSET_SFPUENV_FPUDS    24
-#define SIZEOF_SFPUENV          28
-#define ALIGNOF_SFPUENV         4
+#define OFFSET_SFPUENV_FCW   0
+#define OFFSET_SFPUENV_FSW   4
+#define OFFSET_SFPUENV_FTW   8
+#define OFFSET_SFPUENV_FPUIP 12
+#define OFFSET_SFPUENV_FPUCS 16
+#define OFFSET_SFPUENV_FOP   18
+#define OFFSET_SFPUENV_FPUDP 20
+#define OFFSET_SFPUENV_FPUDS 24
+#define SIZEOF_SFPUENV       28
+#define ALIGNOF_SFPUENV      4
 #ifdef __CC__
 struct __ATTR_ALIGNED(ALIGNOF_SFPUENV) __ATTR_PACKED sfpuenv /*[PREFIX(fe_)]*/ {
 	/* FPU environment structure, as described here:
@@ -59,18 +59,18 @@ struct __ATTR_ALIGNED(ALIGNOF_SFPUENV) __ATTR_PACKED sfpuenv /*[PREFIX(fe_)]*/ {
 };
 #endif /* __CC__ */
 
-#define OFFSET_SFPUSTATE_FCW      0
-#define OFFSET_SFPUSTATE_FSW      4
-#define OFFSET_SFPUSTATE_FTW      8
-#define OFFSET_SFPUSTATE_FPUIP    12
-#define OFFSET_SFPUSTATE_FPUCS    16
-#define OFFSET_SFPUSTATE_FOP      18
-#define OFFSET_SFPUSTATE_FPUDP    20
-#define OFFSET_SFPUSTATE_FPUDS    24
-#define OFFSET_SFPUSTATE_ST(i)   (28 + (i) * 10)
-#define OFFSET_SFPUSTATE_MM(i)   (28 + (i) * 10)
-#define SIZEOF_SFPUSTATE          108
-#define ALIGNOF_SFPUSTATE         4
+#define OFFSET_SFPUSTATE_FCW   0
+#define OFFSET_SFPUSTATE_FSW   4
+#define OFFSET_SFPUSTATE_FTW   8
+#define OFFSET_SFPUSTATE_FPUIP 12
+#define OFFSET_SFPUSTATE_FPUCS 16
+#define OFFSET_SFPUSTATE_FOP   18
+#define OFFSET_SFPUSTATE_FPUDP 20
+#define OFFSET_SFPUSTATE_FPUDS 24
+#define OFFSET_SFPUSTATE_ST(i) (28 + (i) * 10)
+#define OFFSET_SFPUSTATE_MM(i) (28 + (i) * 10)
+#define SIZEOF_SFPUSTATE       108
+#define ALIGNOF_SFPUSTATE      4
 #ifdef __CC__
 struct __ATTR_ALIGNED(ALIGNOF_SFPUSTATE) __ATTR_PACKED sfpustate /*[PREFIX(fs_)]*/ {
 	/* FPU context structure, as described here:

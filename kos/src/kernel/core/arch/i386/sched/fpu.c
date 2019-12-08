@@ -43,6 +43,7 @@
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/fpu-state.h>
 #include <kos/kernel/fpu-state32.h>
+#include <kos/kernel/fpu-state-helpers.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -386,23 +387,23 @@ NOTHROW(FCALL x86_fxsave_compress_ftw)(struct sfpustate const *__restrict self) 
 INTERN NOBLOCK u32
 NOTHROW(FCALL x86_fxsave_decompress_ftw)(struct xfpustate const *__restrict self) {
 	unsigned int i;
-	u8 ftw = self->fs_ftw;
+	u8 ftw = self->fx_ftw;
 	u32 res = 0;
 	for (i = 0; i < 8; ++i) {
 		if (ftw & (1 << i)) {
 			/* s.a. `Table 3-45' in the Intel developer manual */
-			if (self->fs_regs[i].ieee_nan.exponent == 0x7fff) {
+			if (self->fx_regs[i].ieee_nan.exponent == 0x7fff) {
 				/* Special */
 				res |= FTW_SPEC(i);
-			} else if (self->fs_regs[i].ieee_nan.exponent == 0) {
-				if (self->fs_regs[i].ieee_nan.mantissa1 == 0 &&
-				    self->fs_regs[i].ieee_nan.mantissa0 == 0 &&
-					self->fs_regs[i].ieee_nan.one == 0)
+			} else if (self->fx_regs[i].ieee_nan.exponent == 0) {
+				if (self->fx_regs[i].ieee_nan.mantissa1 == 0 &&
+				    self->fx_regs[i].ieee_nan.mantissa0 == 0 &&
+					self->fx_regs[i].ieee_nan.one == 0)
 					res |= FTW_ZERO(i); /* Fraction all 0's (and j == 0) */
 				else {
 					res |= FTW_SPEC(i);
 				}
-			} else if (self->fs_regs[i].ieee_nan.one == 0) {
+			} else if (self->fx_regs[i].ieee_nan.one == 0) {
 				res |= FTW_SPEC(i);
 			} else {
 				res |= FTW_VALID(i);
@@ -473,12 +474,12 @@ setup_fpu_emulation:
 			x86_fxsave_mxcsr_mask_ = 0;
 		} else {
 			struct xfpustate32 fst;
-			fst.fs_mxcsr_mask = 0;
+			fst.fx_mxcsr_mask = 0;
 			__fninit();
 			__fxsave(&fst);
-			if (!fst.fs_mxcsr_mask) /* Intel says that zero should equate `0xffbf' */
-				fst.fs_mxcsr_mask = 0x0000ffbf;
-			x86_fxsave_mxcsr_mask_ = fst.fs_mxcsr_mask;
+			if (!fst.fx_mxcsr_mask) /* Intel says that zero should equate `0xffbf' */
+				fst.fx_mxcsr_mask = 0x0000ffbf;
+			x86_fxsave_mxcsr_mask_ = fst.fx_mxcsr_mask;
 		}
 		/* Mask the default MXCSR value with what is actually available */
 		x86_fpustate_init_mxcsr_value &= x86_fxsave_mxcsr_mask_;
@@ -549,6 +550,35 @@ setup_fpu_emulation:
 	__wrcr0(cr0 | CR0_TS);
 	test_fpu64();
 }
+
+#ifdef __x86_64__
+PUBLIC NOBLOCK void KCALL
+fpustate32_loadfrom(USER CHECKED struct fpustate32 const *state)
+		THROWS(E_SEGFAULT, E_BADALLOC) {
+	struct fpustate fst;
+	if (x86_fpustate_variant == FPU_STATE_SSTATE) {
+		memcpy(&fst.f_ssave, &state->f_ssave, sizeof(struct sfpustate));
+	} else {
+		fpustate_saveinto(&fst);
+		xfpustate_assign_xfpustate32(&fst.f_xsave,
+		                             &state->f_xsave);
+	}
+	fpustate_loadfrom(&fst);
+}
+
+PUBLIC NOBLOCK void KCALL
+fpustate32_saveinto(USER CHECKED struct fpustate32 *state)
+		THROWS(E_SEGFAULT) {
+	struct fpustate fst;
+	fpustate_saveinto(&fst);
+	if (x86_fpustate_variant == FPU_STATE_SSTATE) {
+		memcpy(&state->f_ssave, &fst.f_ssave, sizeof(struct sfpustate));
+	} else {
+		xfpustate_to_xfpustate32(&fst.f_xsave,
+		                         &state->f_xsave);
+	}
+}
+#endif /* __x86_64__ */
 
 #endif /* !CONFIG_NO_FPU */
 

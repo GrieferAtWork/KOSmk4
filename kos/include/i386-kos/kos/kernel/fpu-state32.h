@@ -63,84 +63,34 @@ __SYSDECL_BEGIN
 #define OFFSET_XFPUSTATE32_FPUDS      20
 #define OFFSET_XFPUSTATE32_MXCSR      24
 #define OFFSET_XFPUSTATE32_MXCSR_MASK 28
-#define OFFSET_XFPUSTATE32_ST(i)     (32 + (i) * 16)
-#define OFFSET_XFPUSTATE32_MM(i)     (32 + (i) * 16)
-#define OFFSET_XFPUSTATE32_XMM(i)    (160 + (i) * 16)
+#define OFFSET_XFPUSTATE32_ST(i)      (32 + (i) * 16)
+#define OFFSET_XFPUSTATE32_MM(i)      (32 + (i) * 16)
+#define OFFSET_XFPUSTATE32_XMM(i)     (160 + (i) * 16)
 #define SIZEOF_XFPUSTATE32            512
 #define ALIGNOF_XFPUSTATE32           16
 
 #ifdef __CC__
-#undef fs_fcw
-#undef fs_fsw
-#undef fs_ftw
-#undef fs_fop
-#undef fs_fpuip
-#undef fs_fpucs
-#undef fs_fpudp
-#undef fs_fpuds
-struct __ATTR_ALIGNED(ALIGNOF_XFPUSTATE32) __ATTR_PACKED xfpustate32 /*[PREFIX(fs_)]*/ {
+struct __ATTR_ALIGNED(ALIGNOF_XFPUSTATE32) xfpustate32 /*[PREFIX(fx_)]*/ {
 	/* FPU context structure, as described here:
 	 *   - http://asm.inightmare.org/opcodelst/index.php?op=FXSAVE
 	 *   - http://x86.renejeschke.de/html/file_module_x86_id_128.html */
-#ifndef __COMPILER_HAVE_TRANSPARENT_UNION
-	union __ATTR_PACKED {
-#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
-#ifndef __COMPILER_HAVE_TRANSPARENT_STRUCT
-	struct __ATTR_PACKED {
-#endif /* !__COMPILER_HAVE_TRANSPARENT_STRUCT */
-	__u16                     fs_fcw;        /* Floating point control word. (Set of `FCW_*') */
-	__u16                     fs_fsw;        /* Floating point status word. (Set of `FSW_*') */
-	__u8                      fs_ftw;        /* Compressed floating point tag word. (0 << i: FTW_EMPTY(i), 1 << i: FTW_(VALID|ZERO|SPEC)(i) (based on actually loaded value)) */
-	__u8                    __fs_pad1;       /* ... */
-	__u16                     fs_fop;        /* Lower 11-bit f.p. opcode. */
-	__u32                     fs_fpuip;      /* FPU instruction pointer. */
-	__u16                     fs_fpucs;      /* FPU code segment selector. */
-	__u16                   __fs_pad2;       /* ... */
-	__u32                     fs_fpudp;      /* FPU data pointer. */
-	__u16                     fs_fpuds;      /* FPU data segment selector. */
-	__u16                   __fs_pad3;       /* ... */
-#ifndef __COMPILER_HAVE_TRANSPARENT_STRUCT
-	} _fs_env_struct;
-#endif /* !__COMPILER_HAVE_TRANSPARENT_STRUCT */
-#ifndef __COMPILER_HAVE_TRANSPARENT_UNION
-	} _fs_env_union;
-#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
-	__u32                     fs_mxcsr;      /* MXCSR (SSE only) (Set of `MXCSR_') */
-	__u32                     fs_mxcsr_mask; /* MXCSR mask (SSE only) (Set of `MXCSR_', used to identify available features -- 11.6.6) */
-	union ieee854_long_double fs_regs[8];    /* ST(i) / MMi */
-	union ieee854_long_double fs_xmm[8];     /* XMMi */
-	__u8                    __fs_pad4[224];
+	__u16                     fx_fcw;        /* Floating point control word. (Set of `FCW_*') */
+	__u16                     fx_fsw;        /* Floating point status word. (Set of `FSW_*') */
+	__u8                      fx_ftw;        /* Compressed floating point tag word. (0 << i: FTW_EMPTY(i), 1 << i: FTW_(VALID|ZERO|SPEC)(i) (based on actually loaded value)) */
+	__u8                    __fx_pad1;       /* ... */
+	__u16                     fx_fop;        /* Lower 11-bit f.p. opcode. */
+	__u32                     fx_fpuip;      /* FPU instruction pointer. */
+	__u16                     fx_fpucs;      /* FPU code segment selector. */
+	__u16                   __fx_pad2;       /* ... */
+	__u32                     fx_fpudp;      /* FPU data pointer. */
+	__u16                     fx_fpuds;      /* FPU data segment selector. */
+	__u16                   __fx_pad3;       /* ... */
+	__u32                     fx_mxcsr;      /* MXCSR (SSE only) (Set of `MXCSR_') */
+	__u32                     fx_mxcsr_mask; /* MXCSR mask (SSE only) (Set of `MXCSR_', used to identify available features -- 11.6.6) */
+	union ieee854_long_double fx_regs[8];    /* ST(i) / MMi */
+	union ieee854_long_double fx_xmm[8];     /* XMMi */
+	__u8                    __fx_pad4[224];
 };
-
-#if !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && !defined(__COMPILER_HAVE_TRANSPARENT_UNION)
-#define fs_fcw        _fs_env_union._fs_env_struct.fs_fcw
-#define fs_fsw        _fs_env_union._fs_env_struct.fs_fsw
-#define fs_ftw        _fs_env_union._fs_env_struct.fs_ftw
-#define fs_fop        _fs_env_union._fs_env_struct.fs_fop
-#define fs_fpuip      _fs_env_union._fs_env_struct.fs_fpuip
-#define fs_fpucs      _fs_env_union._fs_env_struct.fs_fpucs
-#define fs_fpudp      _fs_env_union._fs_env_struct.fs_fpudp
-#define fs_fpuds      _fs_env_union._fs_env_struct.fs_fpuds
-#elif !defined(__COMPILER_HAVE_TRANSPARENT_UNION)
-#define fs_fcw        _fs_env_union.fs_fcw
-#define fs_fsw        _fs_env_union.fs_fsw
-#define fs_ftw        _fs_env_union.fs_ftw
-#define fs_fop        _fs_env_union.fs_fop
-#define fs_fpuip      _fs_env_union.fs_fpuip
-#define fs_fpucs      _fs_env_union.fs_fpucs
-#define fs_fpudp      _fs_env_union.fs_fpudp
-#define fs_fpuds      _fs_env_union.fs_fpuds
-#elif !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT)
-#define fs_fcw        _fs_env_struct.fs_fcw
-#define fs_fsw        _fs_env_struct.fs_fsw
-#define fs_ftw        _fs_env_struct.fs_ftw
-#define fs_fop        _fs_env_struct.fs_fop
-#define fs_fpuip      _fs_env_struct.fs_fpuip
-#define fs_fpucs      _fs_env_struct.fs_fpucs
-#define fs_fpudp      _fs_env_struct.fs_fpudp
-#define fs_fpuds      _fs_env_struct.fs_fpuds
-#endif
-
 #endif /* __CC__ */
 
 
@@ -149,8 +99,8 @@ struct __ATTR_ALIGNED(ALIGNOF_XFPUSTATE32) __ATTR_PACKED xfpustate32 /*[PREFIX(f
 #ifdef __CC__
 #undef f_ssave
 #undef f_xsave
-struct __ATTR_ALIGNED(ALIGNOF_FPUSTATE32) __ATTR_PACKED fpustate32 {
-	union __ATTR_PACKED {
+struct __ATTR_ALIGNED(ALIGNOF_FPUSTATE32) fpustate32 {
+	union {
 		struct sfpustate   f_ssave; /* State saved by `fsave' / `fnsave' */
 		struct xfpustate32 f_xsave; /* State saved by `fxsave' */
 	}

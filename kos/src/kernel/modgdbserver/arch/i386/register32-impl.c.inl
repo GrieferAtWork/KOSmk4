@@ -127,7 +127,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 				fpureg = &fpu->f_ssave.fs_regs[regno - GDB_REGISTER_I386_ST0];
 			} else if (x86_fpustate_variant == FPU_STATE_XSTATE) {
-				fpureg = &fpu->f_xsave.fs_regs[regno - GDB_REGISTER_I386_ST0];
+				fpureg = &fpu->f_xsave.fx_regs[regno - GDB_REGISTER_I386_ST0];
 #ifdef SET_REGISTER
 				if (bufsize == 10)
 					memset((byte_t *)fpureg + 10, 0, 6);
@@ -152,7 +152,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 		case GDB_REGISTER_I386_XMM0 ... GDB_REGISTER_I386_XMM7: {
 			if (x86_fpustate_variant == FPU_STATE_XSTATE) {
 				void *fpureg;
-				fpureg = &fpu->f_xsave.fs_xmm[regno - GDB_REGISTER_I386_XMM0];
+				fpureg = &fpu->f_xsave.fx_xmm[regno - GDB_REGISTER_I386_XMM0];
 #ifdef GET_REGISTER
 				if (bufsize >= 16)
 					memcpy(buf, fpureg, 16);
@@ -173,7 +173,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 				FIELD4(fpu->f_ssave.fs_fcw);
 			} else if (x86_fpustate_variant == FPU_STATE_XSTATE) {
-				FIELD4(fpu->f_xsave.fs_fcw);
+				FIELD4(fpu->f_xsave.fx_fcw);
 			} else {
 				GETSET4_NOOP();
 			}
@@ -183,7 +183,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 				FIELD4(fpu->f_ssave.fs_fsw);
 			} else if (x86_fpustate_variant == FPU_STATE_XSTATE) {
-				FIELD4(fpu->f_xsave.fs_fsw);
+				FIELD4(fpu->f_xsave.fx_fsw);
 			} else {
 				GETSET4_NOOP();
 			}
@@ -193,7 +193,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 				FIELD4(fpu->f_ssave.fs_ftw);
 			} else if (x86_fpustate_variant == FPU_STATE_XSTATE) {
-				FIELD4(fpu->f_xsave.fs_ftw);
+				FIELD4(fpu->f_xsave.fx_ftw);
 			} else {
 				GETSET4_NOOP();
 			}
@@ -203,7 +203,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 				FIELD4(fpu->f_ssave.fs_fpucs);
 			} else if (x86_fpustate_variant == FPU_STATE_XSTATE) {
-				FIELD4(fpu->f_xsave.fs_fpucs);
+				FIELD4(fpu->f_xsave.fx_fpucs);
 			} else {
 				GETSET4_NOOP();
 			}
@@ -213,7 +213,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 				FIELD4(fpu->f_ssave.fs_fpuip);
 			} else if (x86_fpustate_variant == FPU_STATE_XSTATE) {
-				FIELD4(fpu->f_xsave.fs_fpuip);
+				FIELD4(fpu->f_xsave.fx_fpuip);
 			} else {
 				GETSET4_NOOP();
 			}
@@ -223,7 +223,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 				FIELD4(fpu->f_ssave.fs_fpuds);
 			} else if (x86_fpustate_variant == FPU_STATE_XSTATE) {
-				FIELD4(fpu->f_xsave.fs_fpuds);
+				FIELD4(fpu->f_xsave.fx_fpuds);
 			} else {
 				GETSET4_NOOP();
 			}
@@ -233,7 +233,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 				FIELD4(fpu->f_ssave.fs_fpudp);
 			} else if (x86_fpustate_variant == FPU_STATE_XSTATE) {
-				FIELD4(fpu->f_xsave.fs_fpudp);
+				FIELD4(fpu->f_xsave.fx_fpudp);
 			} else {
 				GETSET4_NOOP();
 			}
@@ -243,7 +243,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 				FIELD4(fpu->f_ssave.fs_fop);
 			} else if (x86_fpustate_variant == FPU_STATE_XSTATE) {
-				FIELD4(fpu->f_xsave.fs_fop);
+				FIELD4(fpu->f_xsave.fx_fop);
 			} else {
 				GETSET4_NOOP();
 			}
@@ -251,7 +251,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 
 		case GDB_REGISTER_I386_MXCSR:
 			if (x86_fpustate_variant == FPU_STATE_XSTATE) {
-				FIELD4(fpu->f_xsave.fs_mxcsr);
+				FIELD4(fpu->f_xsave.fx_mxcsr);
 			} else {
 				GETSET4_NOOP();
 			}

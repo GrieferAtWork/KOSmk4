@@ -127,7 +127,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 				fpureg = &fpu->f_ssave.fs_regs[regno - GDB_REGISTER_X86_64_ST0];
 			} else if (x86_fpustate_variant == FPU_STATE_XSTATE) {
-				fpureg = &fpu->f_xsave.fs_regs[regno - GDB_REGISTER_X86_64_ST0];
+				fpureg = &fpu->f_xsave.fx_regs[regno - GDB_REGISTER_X86_64_ST0];
 #ifdef SET_REGISTER
 				if (bufsize == 10)
 					memset((byte_t *)fpureg + 10, 0, 6);
@@ -152,7 +152,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 		case GDB_REGISTER_X86_64_XMM0 ... GDB_REGISTER_X86_64_XMM15: {
 			if (x86_fpustate_variant == FPU_STATE_XSTATE) {
 				void *fpureg;
-				fpureg = &fpu->f_xsave.fs_xmm[regno - GDB_REGISTER_X86_64_XMM0];
+				fpureg = &fpu->f_xsave.fx_xmm[regno - GDB_REGISTER_X86_64_XMM0];
 #ifdef GET_REGISTER
 				if (bufsize >= 16)
 					memcpy(buf, fpureg, 16);
@@ -173,7 +173,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 				FIELD8(fpu->f_ssave.fs_fcw);
 			} else if (x86_fpustate_variant == FPU_STATE_XSTATE) {
-				FIELD8(fpu->f_xsave.fs_fcw);
+				FIELD8(fpu->f_xsave.fx_fcw);
 			} else {
 				GETSET8_NOOP();
 			}
@@ -183,7 +183,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 				FIELD8(fpu->f_ssave.fs_fsw);
 			} else if (x86_fpustate_variant == FPU_STATE_XSTATE) {
-				FIELD8(fpu->f_xsave.fs_fsw);
+				FIELD8(fpu->f_xsave.fx_fsw);
 			} else {
 				GETSET8_NOOP();
 			}
@@ -193,7 +193,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 				FIELD8(fpu->f_ssave.fs_ftw);
 			} else if (x86_fpustate_variant == FPU_STATE_XSTATE) {
-				FIELD8(fpu->f_xsave.fs_ftw);
+				FIELD8(fpu->f_xsave.fx_ftw);
 			} else {
 				GETSET8_NOOP();
 			}
@@ -211,7 +211,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 				FIELD8(fpu->f_ssave.fs_fpuip);
 			} else if (x86_fpustate_variant == FPU_STATE_XSTATE) {
-				FIELD8(fpu->f_xsave.fs_fpuip);
+				FIELD8(fpu->f_xsave.fx_fpuip);
 			} else {
 				GETSET8_NOOP();
 			}
@@ -229,7 +229,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 				FIELD8(fpu->f_ssave.fs_fpudp);
 			} else if (x86_fpustate_variant == FPU_STATE_XSTATE) {
-				FIELD8(fpu->f_xsave.fs_fpudp);
+				FIELD8(fpu->f_xsave.fx_fpudp);
 			} else {
 				GETSET8_NOOP();
 			}
@@ -239,7 +239,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 				FIELD8(fpu->f_ssave.fs_fop);
 			} else if (x86_fpustate_variant == FPU_STATE_XSTATE) {
-				FIELD8(fpu->f_xsave.fs_fop);
+				FIELD8(fpu->f_xsave.fx_fop);
 			} else {
 				GETSET8_NOOP();
 			}
@@ -247,7 +247,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 
 		case GDB_REGISTER_X86_64_MXCSR:
 			if (x86_fpustate_variant == FPU_STATE_XSTATE) {
-				FIELD8(fpu->f_xsave.fs_mxcsr);
+				FIELD8(fpu->f_xsave.fx_mxcsr);
 			} else {
 				GETSET8_NOOP();
 			}
