@@ -30,6 +30,7 @@ if (gcc_opt.remove("-O3"))
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_DEBUGGER
 
+#include <debugger/entry.h>
 #include <debugger/function.h>
 #include <debugger/rt.h>
 #include <kernel/apic.h>
@@ -39,13 +40,18 @@ if (gcc_opt.remove("-O3"))
 #include <sched/task.h>
 #include <sched/tss.h>
 
+#include <hybrid/align.h>
 #include <hybrid/atomic.h>
 
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <alloca.h>
+#include <stddef.h>
 #include <string.h>
+
+#include <libcpustate/apply.h>
 
 DECL_BEGIN
 
@@ -345,8 +351,6 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 	memcpy(&x86_dbg_hostbackup.dhs_except,
 	       &FORTASK(mythread, this_exception_info),
 	       sizeof(struct exception_info));
-	memset(&FORTASK(mythread, this_exception_info),
-	       0, sizeof(struct exception_info));
 	x86_dbg_hostbackup.dhs_taskself  = mythread->t_self;
 	mythread->t_self                 = mythread;
 	x86_dbg_hostbackup.dhs_taskflags = ATOMIC_FETCHOR(mythread->t_flags, TASK_FKEEPCORE);
@@ -516,6 +520,141 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 	if (x86_dbg_trapstatekind != X86_DBG_STATEKIND_NONE)
 		x86_dbg_exitstate.fcs_gpregs.gp_pax = (uintptr_t)x86_dbg_trapstate;
 }
+
+
+/* Construct a debugger entry info descriptor which will invoke the given entry
+ * by passing a pointer to a stack-allocated copy of the given structure.
+ * Note that this copy is allocated on the debugger stack! */
+#ifdef __x86_64__
+#define MAKEINFO(entry, data, num_bytes)                                              \
+	struct dbg_entry_info *info;                                                      \
+	info = (struct dbg_entry_info *)alloca(offsetof(struct dbg_entry_info, ei_argv) + \
+	                                       48 + CEIL_ALIGN(num_bytes, 8));            \
+	memcpy(&info->ei_argv[6], data, CEIL_ALIGN(num_bytes, 8));                        \
+	info->ei_entry   = (dbg_entry_t)entry;                                            \
+	info->ei_argc    = 6 + CEILDIV(num_bytes, 8);                                     \
+	info->ei_argv[0] = (dbg_stack + KERNEL_DEBUG_STACKSIZE) - CEIL_ALIGN(num_bytes, 8)
+#else /* __x86_64__ */
+#define MAKEINFO(entry, data, num_bytes)                                              \
+	struct dbg_entry_info *info;                                                      \
+	info = (struct dbg_entry_info *)alloca(offsetof(struct dbg_entry_info, ei_argv) + \
+	                                       4 + CEIL_ALIGN(num_bytes, 4));             \
+	memcpy(&info->ei_argv[1], data, CEIL_ALIGN(num_bytes, 4));                        \
+	info->ei_entry   = (dbg_entry_t)entry;                                            \
+	info->ei_argc    = 1 + CEILDIV(num_bytes, 4);                                     \
+	info->ei_argv[0] = (dbg_stack + KERNEL_DEBUG_STACKSIZE) - CEIL_ALIGN(num_bytes, 4)
+#endif /* !__x86_64__ */
+
+
+
+PUBLIC NONNULL((1, 2)) void FCALL
+dbg_enter_here_c(dbg_entry_c_t entry, void const *data, size_t num_bytes) {
+	MAKEINFO(entry, data, num_bytes);
+	dbg_enter_here(info);
+}
+
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct fcpustate *FCALL
+dbg_enter_fcpustate_cr(dbg_entry_c_t entry, void const *data,
+                       size_t num_bytes, struct fcpustate *__restrict state) {
+	struct fcpustate *result;
+	MAKEINFO(entry, data, num_bytes);
+	result = dbg_enter_fcpustate_r(info, state);
+	return result;
+}
+
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct ucpustate *FCALL
+dbg_enter_ucpustate_cr(dbg_entry_c_t entry, void const *data,
+                       size_t num_bytes, struct ucpustate *__restrict state) {
+	struct ucpustate *result;
+	MAKEINFO(entry, data, num_bytes);
+	result = dbg_enter_ucpustate_r(info, state);
+	return result;
+}
+
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct lcpustate *FCALL
+dbg_enter_lcpustate_cr(dbg_entry_c_t entry, void const *data,
+                       size_t num_bytes, struct lcpustate *__restrict state) {
+	struct lcpustate *result;
+	MAKEINFO(entry, data, num_bytes);
+	result = dbg_enter_lcpustate_r(info, state);
+	return result;
+}
+
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct kcpustate *FCALL
+dbg_enter_kcpustate_cr(dbg_entry_c_t entry, void const *data,
+                       size_t num_bytes, struct kcpustate *__restrict state) {
+	struct kcpustate *result;
+	MAKEINFO(entry, data, num_bytes);
+	result = dbg_enter_kcpustate_r(info, state);
+	return result;
+}
+
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct icpustate *FCALL
+dbg_enter_icpustate_cr(dbg_entry_c_t entry, void const *data,
+                       size_t num_bytes, struct icpustate *__restrict state) {
+	struct icpustate *result;
+	MAKEINFO(entry, data, num_bytes);
+	result = dbg_enter_icpustate_r(info, state);
+	return result;
+}
+
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct scpustate *FCALL
+dbg_enter_scpustate_cr(dbg_entry_c_t entry, void const *data,
+                       size_t num_bytes, struct scpustate *__restrict state) {
+	struct scpustate *result;
+	MAKEINFO(entry, data, num_bytes);
+	result = dbg_enter_scpustate_r(info, state);
+	return result;
+}
+
+PUBLIC ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
+dbg_enter_fcpustate_c(dbg_entry_c_t entry, void const *data,
+                      size_t num_bytes, struct fcpustate *__restrict state) {
+	struct fcpustate *new_state;
+	new_state = dbg_enter_fcpustate_cr(entry, data, num_bytes, state);
+	cpu_apply_fcpustate(new_state);
+}
+
+PUBLIC ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
+dbg_enter_ucpustate_c(dbg_entry_c_t entry, void const *data,
+                      size_t num_bytes, struct ucpustate *__restrict state) {
+	struct ucpustate *new_state;
+	new_state = dbg_enter_ucpustate_cr(entry, data, num_bytes, state);
+	cpu_apply_ucpustate(new_state);
+}
+
+PUBLIC ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
+dbg_enter_lcpustate_c(dbg_entry_c_t entry, void const *data,
+                      size_t num_bytes, struct lcpustate *__restrict state) {
+	struct lcpustate *new_state;
+	new_state = dbg_enter_lcpustate_cr(entry, data, num_bytes, state);
+	cpu_apply_lcpustate(new_state);
+}
+
+PUBLIC ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
+dbg_enter_kcpustate_c(dbg_entry_c_t entry, void const *data,
+                      size_t num_bytes, struct kcpustate *__restrict state) {
+	struct kcpustate *new_state;
+	new_state = dbg_enter_kcpustate_cr(entry, data, num_bytes, state);
+	cpu_apply_kcpustate(new_state);
+}
+
+PUBLIC ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
+dbg_enter_icpustate_c(dbg_entry_c_t entry, void const *data,
+                      size_t num_bytes, struct icpustate *__restrict state) {
+	struct icpustate *new_state;
+	new_state = dbg_enter_icpustate_cr(entry, data, num_bytes, state);
+	cpu_apply_icpustate(new_state);
+}
+
+PUBLIC ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
+dbg_enter_scpustate_c(dbg_entry_c_t entry, void const *data,
+                      size_t num_bytes, struct scpustate *__restrict state) {
+	struct scpustate *new_state;
+	new_state = dbg_enter_scpustate_cr(entry, data, num_bytes, state);
+	cpu_apply_scpustate(new_state);
+}
+
 
 
 DECL_END

@@ -1202,10 +1202,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 300 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname300 /* index: 300 */
+	.weak x86_bootcpu_cpufeatures; .long x86_bootcpu_cpufeatures
+	.reloc ., R_386_SIZE32, x86_bootcpu_cpufeatures; .long 0
+	.long 0xfeca523
 	.long 0 /* index: 301 */
 	.long 0
 	.long 0
@@ -1663,9 +1663,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, mempmovedown; .long 0
 	.long 0x1f7f19e
 	.long .Lname415 /* index: 415 */
-	.weak path_lock_trywrite; .long path_lock_trywrite
-	.reloc ., R_386_SIZE32, path_lock_trywrite; .long 0
-	.long 0x3c4845
+	.weak mall_dump_leaks; .long mall_dump_leaks
+	.reloc ., R_386_SIZE32, mall_dump_leaks; .long 0
+	.long 0x7877fe3
 	.long 0 /* index: 416 */
 	.long 0
 	.long 0
@@ -2111,9 +2111,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, cpu_idlemain; .long 0
 	.long 0xd8d820e
 	.long .Lname527 /* index: 527 */
-	.weak thiscpu_state; .long thiscpu_state
-	.reloc ., R_386_SIZE32, thiscpu_state; .long 0
-	.long 0x19a32a5
+	.weak task_tryyield_or_pause; .long task_tryyield_or_pause
+	.reloc ., R_386_SIZE32, task_tryyield_or_pause; .long 0
+	.long 0xa8862a5
 	.long .Lname528 /* index: 528 */
 	.weak vm_datablock_writevp; .long vm_datablock_writevp
 	.reloc ., R_386_SIZE32, vm_datablock_writevp; .long 0
@@ -2123,9 +2123,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname530 /* index: 530 */
-	.weak dbg_getcur; .long dbg_getcur
-	.reloc ., R_386_SIZE32, dbg_getcur; .long 0
-	.long 0x5da0212
+	.weak dbg_enter_lcpustate_c; .long dbg_enter_lcpustate_c
+	.reloc ., R_386_SIZE32, dbg_enter_lcpustate_c; .long 0
+	.long 0x1b63ed3
 	.long .Lname531 /* index: 531 */
 	.weak sprintf_s; .long sprintf_s
 	.reloc ., R_386_SIZE32, sprintf_s; .long 0
@@ -2230,10 +2230,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 557 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname557 /* index: 557 */
+	.weak dbg_enter_icpustate_cr; .long dbg_enter_icpustate_cr
+	.reloc ., R_386_SIZE32, dbg_enter_icpustate_cr; .long 0
+	.long 0xab3edb2
 	.long 0 /* index: 558 */
 	.long 0
 	.long 0
@@ -3875,9 +3875,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sys_syslog; .long 0
 	.long 0x6b733c7
 	.long .Lname968 /* index: 968 */
-	.weak task_alloc_user_rpc_nx; .long task_alloc_user_rpc_nx
-	.reloc ., R_386_SIZE32, task_alloc_user_rpc_nx; .long 0
-	.long 0xcab93c8
+	.weak dbg_enter_ucpustate_c; .long dbg_enter_ucpustate_c
+	.reloc ., R_386_SIZE32, dbg_enter_ucpustate_c; .long 0
+	.long 0x19f3ed3
 	.long .Lname969 /* index: 969 */
 	.weak sys_hopf; .long sys_hopf
 	.reloc ., R_386_SIZE32, sys_hopf; .long 0
@@ -4258,10 +4258,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_kernel_treelock_downgrade; .long vm_kernel_treelock_downgrade
 	.reloc ., R_386_SIZE32, vm_kernel_treelock_downgrade; .long 0
 	.long 0xf47fd75
-	.long 0 /* index: 1064 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1064 /* index: 1064 */
+	.weak x86_userexcept_unwind; .long x86_userexcept_unwind
+	.reloc ., R_386_SIZE32, x86_userexcept_unwind; .long 0
+	.long 0x64100f4
 	.long 0 /* index: 1065 */
 	.long 0
 	.long 0
@@ -6134,10 +6134,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak x86_idt_syscall; .long x86_idt_syscall
 	.reloc ., R_386_SIZE32, x86_idt_syscall; .long 0
 	.long 0x75655fc
-	.long 0 /* index: 1533 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1533 /* index: 1533 */
+	.weak dbg_enter_ucpustate_cr; .long dbg_enter_ucpustate_cr
+	.reloc ., R_386_SIZE32, dbg_enter_ucpustate_cr; .long 0
+	.long 0x9f3edb2
 	.long .Lname1534 /* index: 1534 */
 	.weak x86_memcpy_nopf_ret_pointer; .long x86_memcpy_nopf_ret_pointer
 	.reloc ., R_386_SIZE32, x86_memcpy_nopf_ret_pointer; .long 0
@@ -6854,10 +6854,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_datablock_anonymous_zero_type_vec; .long vm_datablock_anonymous_zero_type_vec
 	.reloc ., R_386_SIZE32, vm_datablock_anonymous_zero_type_vec; .long 0
 	.long 0x27a0e13
-	.long 0 /* index: 1713 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1713 /* index: 1713 */
+	.weak task_alloc_user_rpc_nx; .long task_alloc_user_rpc_nx
+	.reloc ., R_386_SIZE32, task_alloc_user_rpc_nx; .long 0
+	.long 0xcab93c8
 	.long 0 /* index: 1714 */
 	.long 0
 	.long 0
@@ -7151,9 +7151,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname1787 /* index: 1787 */
-	.weak unwind_emulator_exec_autostack; .long unwind_emulator_exec_autostack
-	.reloc ., R_386_SIZE32, unwind_emulator_exec_autostack; .long 0
-	.long 0x49816fb
+	.weak strto32; .long strto32
+	.reloc ., R_386_SIZE32, strto32; .long 0
+	.long 0xab9b212
 	.long .Lname1788 /* index: 1788 */
 	.weak sys_restart_syscall; .long sys_restart_syscall
 	.reloc ., R_386_SIZE32, sys_restart_syscall; .long 0
@@ -7178,10 +7178,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 1794 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1794 /* index: 1794 */
+	.weak ringbuffer_read_nonblock; .long ringbuffer_read_nonblock
+	.reloc ., R_386_SIZE32, ringbuffer_read_nonblock; .long 0
+	.long 0x2a41a5b
 	.long .Lname1795 /* index: 1795 */
 	.weak handle_get_fs; .long handle_get_fs
 	.reloc ., R_386_SIZE32, handle_get_fs; .long 0
@@ -8570,10 +8570,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 2142 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2142 /* index: 2142 */
+	.weak path_lock_trywrite; .long path_lock_trywrite
+	.reloc ., R_386_SIZE32, path_lock_trywrite; .long 0
+	.long 0x3c4845
 	.long .Lname2143 /* index: 2143 */
 	.weak debuginfo_print_value; .long debuginfo_print_value
 	.reloc ., R_386_SIZE32, debuginfo_print_value; .long 0
@@ -8766,10 +8766,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 2191 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2191 /* index: 2191 */
+	.weak dbg_enter_lcpustate_cr; .long dbg_enter_lcpustate_cr
+	.reloc ., R_386_SIZE32, dbg_enter_lcpustate_cr; .long 0
+	.long 0xb63edb2
 	.long .Lname2192 /* index: 2192 */
 	.weak vm_datablock_readp; .long vm_datablock_readp
 	.reloc ., R_386_SIZE32, vm_datablock_readp; .long 0
@@ -9166,10 +9166,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 2291 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2291 /* index: 2291 */
+	.weak dbg_enter_icpustate_c; .long dbg_enter_icpustate_c
+	.reloc ., R_386_SIZE32, dbg_enter_icpustate_c; .long 0
+	.long 0x1ab3ed3
 	.long .Lname2292 /* index: 2292 */
 	.weak json_parser_init; .long json_parser_init
 	.reloc ., R_386_SIZE32, json_parser_init; .long 0
@@ -10126,10 +10126,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm86_hw_intr; .long vm86_hw_intr
 	.reloc ., R_386_SIZE32, vm86_hw_intr; .long 0
 	.long 0x82559e2
-	.long 0 /* index: 2531 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2531 /* index: 2531 */
+	.weak unwind_emulator_exec_autostack; .long unwind_emulator_exec_autostack
+	.reloc ., R_386_SIZE32, unwind_emulator_exec_autostack; .long 0
+	.long 0x49816fb
 	.long .Lname2532 /* index: 2532 */
 	.weak dbg_isholding_alt; .long dbg_isholding_alt
 	.reloc ., R_386_SIZE32, dbg_isholding_alt; .long 0
@@ -10547,9 +10547,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname2636 /* index: 2636 */
-	.weak x86_userexcept_unwind; .long x86_userexcept_unwind
-	.reloc ., R_386_SIZE32, x86_userexcept_unwind; .long 0
-	.long 0x64100f4
+	.weak thiscpu_state; .long thiscpu_state
+	.reloc ., R_386_SIZE32, thiscpu_state; .long 0
+	.long 0x19a32a5
 	.long .Lname2637 /* index: 2637 */
 	.weak sys_setregid32; .long sys_setregid32
 	.reloc ., R_386_SIZE32, sys_setregid32; .long 0
@@ -10607,9 +10607,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname2651 /* index: 2651 */
-	.weak ringbuffer_read_nonblock; .long ringbuffer_read_nonblock
-	.reloc ., R_386_SIZE32, ringbuffer_read_nonblock; .long 0
-	.long 0x2a41a5b
+	.weak dbg_enter_scpustate_c; .long dbg_enter_scpustate_c
+	.reloc ., R_386_SIZE32, dbg_enter_scpustate_c; .long 0
+	.long 0x19d3ed3
 	.long .Lname2652 /* index: 2652 */
 	.weak mempmovedownl; .long mempmovedownl
 	.reloc ., R_386_SIZE32, mempmovedownl; .long 0
@@ -11058,10 +11058,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_readlink; .long sys_readlink
 	.reloc ., R_386_SIZE32, sys_readlink; .long 0
 	.long 0xccbbacb
-	.long 0 /* index: 2764 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2764 /* index: 2764 */
+	.weak dbg_enter_scpustate_cr; .long dbg_enter_scpustate_cr
+	.reloc ., R_386_SIZE32, dbg_enter_scpustate_cr; .long 0
+	.long 0x9d3edb2
 	.long .Lname2765 /* index: 2765 */
 	.weak vm_do_allocram; .long vm_do_allocram
 	.reloc ., R_386_SIZE32, vm_do_allocram; .long 0
@@ -11582,10 +11582,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 2895 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2895 /* index: 2895 */
+	.weak dbg_enter_kcpustate_cr; .long dbg_enter_kcpustate_cr
+	.reloc ., R_386_SIZE32, dbg_enter_kcpustate_cr; .long 0
+	.long 0xb53edb2
 	.long 0 /* index: 2896 */
 	.long 0
 	.long 0
@@ -12727,9 +12727,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sys_profil; .long 0
 	.long 0x680ec6c
 	.long .Lname3181 /* index: 3181 */
-	.weak dbg_setcur; .long dbg_setcur
-	.reloc ., R_386_SIZE32, dbg_setcur; .long 0
-	.long 0x69a0212
+	.weak dbg_getcur; .long dbg_getcur
+	.reloc ., R_386_SIZE32, dbg_getcur; .long 0
+	.long 0x5da0212
 	.long 0 /* index: 3182 */
 	.long 0
 	.long 0
@@ -13439,9 +13439,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, pagedir_haschanged; .long 0
 	.long 0xec67e94
 	.long .Lname3359 /* index: 3359 */
-	.weak mall_dump_leaks; .long mall_dump_leaks
-	.reloc ., R_386_SIZE32, mall_dump_leaks; .long 0
-	.long 0x7877fe3
+	.weak dbg_enter_here_c; .long dbg_enter_here_c
+	.reloc ., R_386_SIZE32, dbg_enter_here_c; .long 0
+	.long 0x2f8fe3
 	.long .Lname3360 /* index: 3360 */
 	.weak sys_seccomp; .long sys_seccomp
 	.reloc ., R_386_SIZE32, sys_seccomp; .long 0
@@ -13531,9 +13531,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, dbg_enter_scpustate; .long 0
 	.long 0x7819d35
 	.long .Lname3382 /* index: 3382 */
-	.weak task_tryyield_or_pause; .long task_tryyield_or_pause
-	.reloc ., R_386_SIZE32, task_tryyield_or_pause; .long 0
-	.long 0xa8862a5
+	.weak dbg_enter_kcpustate_c; .long dbg_enter_kcpustate_c
+	.reloc ., R_386_SIZE32, dbg_enter_kcpustate_c; .long 0
+	.long 0x1b53ed3
 	.long 0 /* index: 3383 */
 	.long 0
 	.long 0
@@ -14026,10 +14026,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_get_thread_area; .long sys_get_thread_area
 	.reloc ., R_386_SIZE32, sys_get_thread_area; .long 0
 	.long 0x5062db1
-	.long 0 /* index: 3506 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3506 /* index: 3506 */
+	.weak dbg_enter_fcpustate_cr; .long dbg_enter_fcpustate_cr
+	.reloc ., R_386_SIZE32, dbg_enter_fcpustate_cr; .long 0
+	.long 0xa83edb2
 	.long .Lname3507 /* index: 3507 */
 	.weak block_device_writev_phys_sync; .long block_device_writev_phys_sync
 	.reloc ., R_386_SIZE32, block_device_writev_phys_sync; .long 0
@@ -14539,9 +14539,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, slab_malloc8; .long 0
 	.long 0x4e16d08
 	.long .Lname3634 /* index: 3634 */
-	.weak strto32; .long strto32
-	.reloc ., R_386_SIZE32, strto32; .long 0
-	.long 0xab9b212
+	.weak dbg_setcur; .long dbg_setcur
+	.reloc ., R_386_SIZE32, dbg_setcur; .long 0
+	.long 0x69a0212
 	.long 0 /* index: 3635 */
 	.long 0
 	.long 0
@@ -15183,9 +15183,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, cpu_vector; .long 0
 	.long 0x6cd0ed2
 	.long .Lname3795 /* index: 3795 */
-	.weak x86_bootcpu_cpufeatures; .long x86_bootcpu_cpufeatures
-	.reloc ., R_386_SIZE32, x86_bootcpu_cpufeatures; .long 0
-	.long 0xfeca523
+	.weak dbg_enter_fcpustate_c; .long dbg_enter_fcpustate_c
+	.reloc ., R_386_SIZE32, dbg_enter_fcpustate_c; .long 0
+	.long 0x1a83ed3
 	.long .Lname3796 /* index: 3796 */
 	.weak inode_aread; .long inode_aread
 	.reloc ., R_386_SIZE32, inode_aread; .long 0
@@ -16738,6 +16738,8 @@ END(kernel_symbol_table)
 	.string "vm_map_subrange"
 .Lname297:
 	.string "path_traversenfull"
+.Lname300:
+	.string "x86_bootcpu_cpufeatures"
 .Lname302:
 	.string "dbg_fillscreen"
 .Lname303:
@@ -16875,7 +16877,7 @@ END(kernel_symbol_table)
 .Lname414:
 	.string "mempmovedown"
 .Lname415:
-	.string "path_lock_trywrite"
+	.string "mall_dump_leaks"
 .Lname417:
 	.string "rawmemrchrq"
 .Lname418:
@@ -17011,11 +17013,11 @@ END(kernel_symbol_table)
 .Lname526:
 	.string "cpu_idlemain"
 .Lname527:
-	.string "thiscpu_state"
+	.string "task_tryyield_or_pause"
 .Lname528:
 	.string "vm_datablock_writevp"
 .Lname530:
-	.string "dbg_getcur"
+	.string "dbg_enter_lcpustate_c"
 .Lname531:
 	.string "sprintf_s"
 .Lname532:
@@ -17056,6 +17058,8 @@ END(kernel_symbol_table)
 	.string "strto64"
 .Lname555:
 	.string "sys_lock"
+.Lname557:
+	.string "dbg_enter_icpustate_cr"
 .Lname559:
 	.string "vm_kernel_treelock_tryread"
 .Lname560:
@@ -17551,7 +17555,7 @@ END(kernel_symbol_table)
 .Lname967:
 	.string "sys_syslog"
 .Lname968:
-	.string "task_alloc_user_rpc_nx"
+	.string "dbg_enter_ucpustate_c"
 .Lname969:
 	.string "sys_hopf"
 .Lname971:
@@ -17664,6 +17668,8 @@ END(kernel_symbol_table)
 	.string "vm_ramfile_type"
 .Lname1063:
 	.string "vm_kernel_treelock_downgrade"
+.Lname1064:
+	.string "x86_userexcept_unwind"
 .Lname1067:
 	.string "sys_epoll_wait"
 .Lname1068:
@@ -18214,6 +18220,8 @@ END(kernel_symbol_table)
 	.string "pagedir_fini"
 .Lname1532:
 	.string "x86_idt_syscall"
+.Lname1533:
+	.string "dbg_enter_ucpustate_cr"
 .Lname1534:
 	.string "x86_memcpy_nopf_ret_pointer"
 .Lname1535:
@@ -18414,6 +18422,8 @@ END(kernel_symbol_table)
 	.string "mouse_device_vwheel"
 .Lname1712:
 	.string "vm_datablock_anonymous_zero_type_vec"
+.Lname1713:
+	.string "task_alloc_user_rpc_nx"
 .Lname1715:
 	.string "superblock_clear_caches"
 .Lname1716:
@@ -18493,11 +18503,13 @@ END(kernel_symbol_table)
 .Lname1785:
 	.string "pidns_root"
 .Lname1787:
-	.string "unwind_emulator_exec_autostack"
+	.string "strto32"
 .Lname1788:
 	.string "sys_restart_syscall"
 .Lname1791:
 	.string "inode_file_writev_with_write"
+.Lname1794:
+	.string "ringbuffer_read_nonblock"
 .Lname1795:
 	.string "handle_get_fs"
 .Lname1796:
@@ -18874,6 +18886,8 @@ END(kernel_symbol_table)
 	.string "x86_emulock_cmpxchg64"
 .Lname2140:
 	.string "vmb_find_first_node_greater_equal"
+.Lname2142:
+	.string "path_lock_trywrite"
 .Lname2143:
 	.string "debuginfo_print_value"
 .Lname2144:
@@ -18922,6 +18936,8 @@ END(kernel_symbol_table)
 	.string "disasm_print_symbol"
 .Lname2189:
 	.string "keyboard_buffer_putkey_nopr"
+.Lname2191:
+	.string "dbg_enter_lcpustate_cr"
 .Lname2192:
 	.string "vm_datablock_readp"
 .Lname2194:
@@ -19046,6 +19062,8 @@ END(kernel_symbol_table)
 	.string "kernel_syscall0_iscp"
 .Lname2289:
 	.string "sys_getpgid"
+.Lname2291:
+	.string "dbg_enter_icpustate_c"
 .Lname2292:
 	.string "json_parser_init"
 .Lname2293:
@@ -19304,6 +19322,8 @@ END(kernel_symbol_table)
 	.string "sys_utimes64"
 .Lname2530:
 	.string "vm86_hw_intr"
+.Lname2531:
+	.string "unwind_emulator_exec_autostack"
 .Lname2532:
 	.string "dbg_isholding_alt"
 .Lname2533:
@@ -19439,7 +19459,7 @@ END(kernel_symbol_table)
 .Lname2633:
 	.string "empty_directory_entry"
 .Lname2636:
-	.string "x86_userexcept_unwind"
+	.string "thiscpu_state"
 .Lname2637:
 	.string "sys_setregid32"
 .Lname2638:
@@ -19461,7 +19481,7 @@ END(kernel_symbol_table)
 .Lname2649:
 	.string "zlib_reader_rewind"
 .Lname2651:
-	.string "ringbuffer_read_nonblock"
+	.string "dbg_enter_scpustate_c"
 .Lname2652:
 	.string "mempmovedownl"
 .Lname2654:
@@ -19606,6 +19626,8 @@ END(kernel_symbol_table)
 	.string "ioperm_bitmap_destroy"
 .Lname2763:
 	.string "sys_readlink"
+.Lname2764:
+	.string "dbg_enter_scpustate_cr"
 .Lname2765:
 	.string "vm_do_allocram"
 .Lname2767:
@@ -19754,6 +19776,8 @@ END(kernel_symbol_table)
 	.string "handle_get_taskpid"
 .Lname2893:
 	.string "strlen"
+.Lname2895:
+	.string "dbg_enter_kcpustate_cr"
 .Lname2898:
 	.string "block_device_awritev_phys_sector"
 .Lname2901:
@@ -20111,7 +20135,7 @@ END(kernel_symbol_table)
 .Lname3180:
 	.string "sys_profil"
 .Lname3181:
-	.string "dbg_setcur"
+	.string "dbg_getcur"
 .Lname3184:
 	.string "sys_exit_group"
 .Lname3186:
@@ -20327,7 +20351,7 @@ END(kernel_symbol_table)
 .Lname3358:
 	.string "pagedir_haschanged"
 .Lname3359:
-	.string "mall_dump_leaks"
+	.string "dbg_enter_here_c"
 .Lname3360:
 	.string "sys_seccomp"
 .Lname3362:
@@ -20351,7 +20375,7 @@ END(kernel_symbol_table)
 .Lname3381:
 	.string "dbg_enter_scpustate"
 .Lname3382:
-	.string "task_tryyield_or_pause"
+	.string "dbg_enter_kcpustate_c"
 .Lname3384:
 	.string "slab_kmalloc_nx"
 .Lname3385:
@@ -20510,6 +20534,8 @@ END(kernel_symbol_table)
 	.string "vm_datablock_debugheap"
 .Lname3505:
 	.string "sys_get_thread_area"
+.Lname3506:
+	.string "dbg_enter_fcpustate_cr"
 .Lname3507:
 	.string "block_device_writev_phys_sync"
 .Lname3509:
@@ -20671,7 +20697,7 @@ END(kernel_symbol_table)
 .Lname3633:
 	.string "slab_malloc8"
 .Lname3634:
-	.string "strto32"
+	.string "dbg_setcur"
 .Lname3636:
 	.string "heap_truncate_untraced"
 .Lname3637:
@@ -20877,7 +20903,7 @@ END(kernel_symbol_table)
 .Lname3794:
 	.string "cpu_vector"
 .Lname3795:
-	.string "x86_bootcpu_cpufeatures"
+	.string "dbg_enter_fcpustate_c"
 .Lname3796:
 	.string "inode_aread"
 .Lname3797:

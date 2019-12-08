@@ -30,7 +30,8 @@
  * or _KOS_KERNEL_SOURCE, or simply being apart of the kernel core, or a driver
  * module to-be loaded into the KOS kernel. */
 #undef __do_cassert_wrapper
-#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+#if (defined(__USE_KOS) || defined(__USE_KOS_KERNEL)) && \
+     0 /* I keep having problems with this. - GCC seems to be unable to fully deal with this... */
 #if !defined(__NO_builtin_choose_expr) && \
     !defined(__NO_builtin_constant_p) && 0
 /* This one doesn't seem to work... Apparently, GCC won't evaluate the

@@ -43,6 +43,7 @@ struct icpustate;
 struct scpustate;
 
 typedef void (KCALL *dbg_entry_t)();
+typedef void (KCALL *dbg_entry_c_t)(void *arg);
 struct dbg_entry_info {
 	dbg_entry_t                     ei_entry; /* [1..1] Debugger entry point */
 	size_t                          ei_argc;  /* Number of pointer-arguments taken by `ei_entry' */
@@ -96,6 +97,19 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) struct lcpustate *FCALL dbg_enter_lc
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) struct kcpustate *FCALL dbg_enter_kcpustate_r(struct dbg_entry_info const *info, struct kcpustate *__restrict state);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) struct icpustate *FCALL dbg_enter_icpustate_r(struct dbg_entry_info const *info, struct icpustate *__restrict state);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) struct scpustate *FCALL dbg_enter_scpustate_r(struct dbg_entry_info const *info, struct scpustate *__restrict state);
+FUNDEF NONNULL((1, 2)) void FCALL dbg_enter_here_c(dbg_entry_c_t entry, void const *data, size_t num_bytes);
+FUNDEF ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL dbg_enter_fcpustate_c(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct fcpustate *__restrict state);
+FUNDEF ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL dbg_enter_ucpustate_c(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct ucpustate *__restrict state);
+FUNDEF ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL dbg_enter_lcpustate_c(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct lcpustate *__restrict state);
+FUNDEF ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL dbg_enter_kcpustate_c(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct kcpustate *__restrict state);
+FUNDEF ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL dbg_enter_icpustate_c(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct icpustate *__restrict state);
+FUNDEF ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL dbg_enter_scpustate_c(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct scpustate *__restrict state);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct fcpustate *FCALL dbg_enter_fcpustate_cr(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct fcpustate *__restrict state);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct ucpustate *FCALL dbg_enter_ucpustate_cr(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct ucpustate *__restrict state);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct lcpustate *FCALL dbg_enter_lcpustate_cr(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct lcpustate *__restrict state);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct kcpustate *FCALL dbg_enter_kcpustate_cr(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct kcpustate *__restrict state);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct icpustate *FCALL dbg_enter_icpustate_cr(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct icpustate *__restrict state);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct scpustate *FCALL dbg_enter_scpustate_cr(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct scpustate *__restrict state);
 
 #ifdef __cplusplus
 extern "C++" {
@@ -138,6 +152,19 @@ LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct lcpustate *FCALL dbg_enter_
 LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct kcpustate *FCALL dbg_enter_r(void (KCALL *main)(void), struct kcpustate *__restrict state) { STRUCT_DBG_ENTRY_INFO0 info; info.ei_entry = (void (KCALL *)())main; info.ei_argc = 0; return dbg_enter_kcpustate_r((struct dbg_entry_info *)&info, state); }
 LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL dbg_enter_r(void (KCALL *main)(void), struct icpustate *__restrict state) { STRUCT_DBG_ENTRY_INFO0 info; info.ei_entry = (void (KCALL *)())main; info.ei_argc = 0; return dbg_enter_icpustate_r((struct dbg_entry_info *)&info, state); }
 LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct scpustate *FCALL dbg_enter_r(void (KCALL *main)(void), struct scpustate *__restrict state) { STRUCT_DBG_ENTRY_INFO0 info; info.ei_entry = (void (KCALL *)())main; info.ei_argc = 0; return dbg_enter_scpustate_r((struct dbg_entry_info *)&info, state); }
+FUNDEF NONNULL((1, 2)) void FCALL dbg_enter(dbg_entry_c_t entry, void const *data, size_t num_bytes) ASMNAME("dbg_enter_here_c");
+FUNDEF ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL dbg_enter(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct fcpustate *__restrict state) ASMNAME("dbg_enter_fcpustate_c");
+FUNDEF ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL dbg_enter(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct ucpustate *__restrict state) ASMNAME("dbg_enter_ucpustate_c");
+FUNDEF ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL dbg_enter(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct lcpustate *__restrict state) ASMNAME("dbg_enter_lcpustate_c");
+FUNDEF ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL dbg_enter(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct kcpustate *__restrict state) ASMNAME("dbg_enter_kcpustate_c");
+FUNDEF ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL dbg_enter(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct icpustate *__restrict state) ASMNAME("dbg_enter_icpustate_c");
+FUNDEF ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL dbg_enter(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct scpustate *__restrict state) ASMNAME("dbg_enter_scpustate_c");
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct fcpustate *FCALL dbg_enter_r(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct fcpustate *__restrict state) ASMNAME("dbg_enter_fcpustate_cr");
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct ucpustate *FCALL dbg_enter_r(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct ucpustate *__restrict state) ASMNAME("dbg_enter_ucpustate_cr");
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct lcpustate *FCALL dbg_enter_r(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct lcpustate *__restrict state) ASMNAME("dbg_enter_lcpustate_cr");
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct kcpustate *FCALL dbg_enter_r(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct kcpustate *__restrict state) ASMNAME("dbg_enter_kcpustate_cr");
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct icpustate *FCALL dbg_enter_r(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct icpustate *__restrict state) ASMNAME("dbg_enter_icpustate_cr");
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct scpustate *FCALL dbg_enter_r(dbg_entry_c_t entry, void const *data, size_t num_bytes, struct scpustate *__restrict state) ASMNAME("dbg_enter_scpustate_cr");
 }
 #endif /* __cplusplus */
 

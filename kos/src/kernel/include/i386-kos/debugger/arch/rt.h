@@ -30,6 +30,8 @@
 #include <sched/rwlock-intern.h>
 #include <sched/signal-intern.h>
 
+#include <asm/registers-compat.h>
+#include <asm/registers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
 #include <kos/kernel/segment.h>

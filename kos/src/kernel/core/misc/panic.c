@@ -1,3 +1,8 @@
+/*[[[magic
+local gcc_opt = options.setdefault("GCC.options", []);
+if (gcc_opt.remove("-O3"))
+	gcc_opt.append("-Os");
+]]]*/
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +23,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MISC_PANIC_C
 #define GUARD_KERNEL_SRC_MISC_PANIC_C 1
+#define DISABLE_BRANCH_PROFILING 1
 
 #include <kernel/compiler.h>
 
@@ -32,6 +38,8 @@
 #include <kernel/memory.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
+#include <sched/rwlock-intern.h>
+#include <sched/signal-intern.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -49,11 +57,37 @@
 #include <libinstrlen/instrlen.h>
 #include <libunwind/unwind.h>
 
-#include "../../../libc/libc/assert.h"
+#include "../../../libc/libc/assert.h" /* struct assert_args */
 
 DECL_BEGIN
 
 #define LOG_STACK_REMAINDER 1
+
+
+LOCAL ATTR_COLDTEXT NOBLOCK void
+NOTHROW(KCALL fixup_uninitialized_thread)(struct task *__restrict thread) {
+	if (thread->t_self != thread)
+		thread->t_self = thread; /* Shouldn't happen... */
+	if (!FORTASK(thread, this_read_locks).rls_vec)
+		pertask_readlocks_init(thread);
+	if (!FORTASK(thread, this_connections).tc_static_v ||
+	    FORTASK(thread, this_connections).tc_signals.ts_thread != thread)
+		pertask_init_task_connections(thread);
+}
+
+/* Some some potential system inconsistencies that may
+ * otherwise cause infinite loops when an assertion gets
+ * triggered (after all: there is code that can get called
+ * from within an assertion handler, which in turn is able
+ * to cause other assertions) */
+PRIVATE ATTR_COLDTEXT NOBLOCK void
+NOTHROW(KCALL fixup_potential_system_inconsistencies)(void) {
+	struct task *mythread = THIS_TASK;
+	fixup_uninitialized_thread(&_boottask);
+	fixup_uninitialized_thread(&_bootidle);
+	if (mythread != &_boottask && mythread != &_bootidle)
+		fixup_uninitialized_thread(mythread);
+}
 
 
 PRIVATE ATTR_COLDTEXT NOBLOCK bool
@@ -75,6 +109,7 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 #ifdef LOG_STACK_REMAINDER
 	uintptr_t last_good_sp;
 #endif /* LOG_STACK_REMAINDER */
+	fixup_potential_system_inconsistencies();
 	memcpy(&state, dumpstate, sizeof(struct ucpustate));
 #ifdef LOG_STACK_REMAINDER
 	last_good_sp = ucpustate_getsp(&state);
@@ -174,6 +209,7 @@ panic_assert_dbg_main(void *arg) {
 INTERN ATTR_COLD ATTR_COLDTEXT ATTR_NOINLINE ATTR_NORETURN void FCALL
 libc_assertion_failure_core(struct assert_args *__restrict args) {
 	PREEMPTION_DISABLE();
+	fixup_potential_system_inconsistencies();
 	printk(KERN_RAW "\n\n\n");
 	printk(KERN_EMERG "Assertion Failure [pc=%p]\n",
 	       kcpustate_getpc(&args->aa_state));
@@ -199,7 +235,8 @@ libc_assertion_failure_core(struct assert_args *__restrict args) {
 		kernel_debugtrap(&args->aa_state, SIGTRAP);
 #ifdef CONFIG_HAVE_DEBUGGER
 	/* Enter the debugger */
-	dbg_enter(&panic_assert_dbg_main, args, &args->aa_state);
+	dbg_enter(&panic_assert_dbg_main, args,
+	          sizeof(*args), &args->aa_state);
 #else /* CONFIG_HAVE_DEBUGGER */
 	PREEMPTION_HALT();
 #endif /* !CONFIG_HAVE_DEBUGGER */
@@ -246,20 +283,24 @@ PRIVATE ATTR_DBGRODATA char const *const assert_chk_options[] = {
 	NULL
 };
 PRIVATE ATTR_DBGBSS uintptr_t always_ignored_assertions[64] = { 0 };
+PRIVATE ATTR_PURE ATTR_COLDTEXT NOBLOCK bool
+NOTHROW(KCALL is_pc_always_ignored)(uintptr_t pc) {
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(always_ignored_assertions); ++i) {
+		if (pc == always_ignored_assertions[i])
+			return true;
+	}
+	return false;
+}
 
 PRIVATE ATTR_COLD ATTR_COLDTEXT void KCALL
 panic_assert_chk_dbg_main(void *arg) {
 	struct assert_args *args;
 	unsigned int option;
 	args = (struct assert_args *)arg;
-	{
-		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(always_ignored_assertions); ++i) {
-			if (dbg_getpcreg(DBG_REGLEVEL_EXIT) == always_ignored_assertions[i]) {
-				option = ASSERTION_OPTION_IGNORE;
-				goto handle_retry_or_ignore;
-			}
-		}
+	if (is_pc_always_ignored(dbg_getpcreg(DBG_REGLEVEL_TRAP))) {
+		option = ASSERTION_OPTION_IGNORE;
+		goto handle_retry_or_ignore;
 	}
 
 	/* Display a menu to let the user select what to do about the assertion... */
@@ -274,7 +315,7 @@ panic_assert_chk_dbg_main(void *arg) {
 		for (i = 0; i < COMPILER_LENOF(always_ignored_assertions); ++i) {
 			if (always_ignored_assertions[i])
 				continue;
-			always_ignored_assertions[i] = dbg_getpcreg(DBG_REGLEVEL_EXIT);
+			always_ignored_assertions[i] = dbg_getpcreg(DBG_REGLEVEL_TRAP);
 			break;
 		}
 		option = ASSERTION_OPTION_IGNORE;
@@ -285,10 +326,15 @@ panic_assert_chk_dbg_main(void *arg) {
 handle_retry_or_ignore:
 		acheck_result = option == ASSERTION_OPTION_RETRY ? 1 : 0;
 		/* TODO: Make this part arch-independent */
+		dbg_current = THIS_TASK;
 #ifdef __x86_64__
-		x86_dbg_exitstate.fcs_gpregs.gp_rax = acheck_result;
+		x86_dbg_setregbyidp(DBG_REGLEVEL_TRAP,
+		                    X86_REGISTER_GENERAL_PURPOSE_RAX,
+		                    acheck_result);
 #elif defined(__i386__)
-		x86_dbg_exitstate.fcs_gpregs.gp_eax = acheck_result;
+		x86_dbg_setregbyidp(DBG_REGLEVEL_TRAP,
+		                    X86_REGISTER_GENERAL_PURPOSE_EAX,
+		                    acheck_result);
 #else
 #error Unsupported arch
 #endif
@@ -303,8 +349,22 @@ handle_retry_or_ignore:
 
 INTERN ATTR_COLD ATTR_COLDTEXT ATTR_NOINLINE struct kcpustate *FCALL
 libc_assertion_check_core(struct assert_args *__restrict args) {
-	/* TODO: Check if assertion failures at `kcpustate_getpc(&args->aa_state)' should be ignored. */
+	/* Check if assertion failures at the caller's PC should always be ignored. */
+#ifdef CONFIG_HAVE_DEBUGGER
+	if (is_pc_always_ignored(kcpustate_getpc(&args->aa_state))) {
+		/* TODO: Make this part arch-independent */
+#ifdef __x86_64__
+		args->aa_state.kcs_gpregs.gp_rax = 0;
+#elif defined(__i386__)
+		args->aa_state.kcs_gpregs.gp_eax = 0;
+#else
+#error Unsupported arch
+#endif
+		return &args->aa_state;
+	}
+#endif /* CONFIG_HAVE_DEBUGGER */
 	PREEMPTION_DISABLE();
+	fixup_potential_system_inconsistencies();
 	printk(KERN_RAW "\n\n\n");
 	printk(KERN_EMERG "Assertion Failure [pc=%p]\n",
 	       kcpustate_getpc(&args->aa_state));
@@ -330,7 +390,13 @@ libc_assertion_check_core(struct assert_args *__restrict args) {
 		kernel_debugtrap(&args->aa_state, SIGTRAP);
 #ifdef CONFIG_HAVE_DEBUGGER
 	/* Enter the debugger */
-	dbg_enter(&panic_assert_chk_dbg_main, args, &args->aa_state);
+	{
+		struct kcpustate *result;
+		result = dbg_enter_r(&panic_assert_chk_dbg_main,
+		                     args, sizeof(*args),
+		                     &args->aa_state);
+		return result;
+	}
 #else /* CONFIG_HAVE_DEBUGGER */
 	PREEMPTION_HALT();
 #endif /* !CONFIG_HAVE_DEBUGGER */
@@ -340,15 +406,15 @@ libc_assertion_check_core(struct assert_args *__restrict args) {
 
 #ifdef CONFIG_HAVE_DEBUGGER
 PRIVATE ATTR_DBGTEXT void KCALL
-panic_genfail_dbg_main(void *arg) {
+panic_genfail_dbg_main(/*char const **/ void *message) {
 	uintptr_t pc, prev_pc;
-	pc      = dbg_getpcreg(DBG_REGLEVEL_EXIT);
+	pc      = dbg_getpcreg(DBG_REGLEVEL_TRAP);
 	prev_pc = (uintptr_t)instruction_trypred((void const *)pc);
 	dbg_printf(DBGSTR(DF_SETCOLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON) "%s" DF_DEFCOLOR "%[vinfo:"
 	                  "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
 	                  "func: " DF_WHITE("%n") "\n]"
 	                  "addr: " DF_WHITE("%p") "+" DF_WHITE("%Iu") "\n"),
-	           arg, prev_pc, prev_pc,
+	           message, prev_pc, prev_pc,
 	           (size_t)(pc - prev_pc));
 	dbg_main(0);
 }
@@ -367,6 +433,7 @@ INTERN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN void FCALL
 libc_stack_failure_core(struct kcpustate *__restrict state) {
 	struct ucpustate ustate;
 	PREEMPTION_DISABLE();
+	fixup_potential_system_inconsistencies();
 	printk(KERN_RAW "\n\n\n");
 	printk(KERN_EMERG "Stack check failure [pc=%p]\n", kcpustate_getpc(state));
 	kcpustate_to_ucpustate(state, &ustate);
@@ -388,6 +455,7 @@ INTERN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN void FCALL
 libc_abort_failure_core(struct kcpustate *__restrict state) {
 	struct ucpustate ustate;
 	PREEMPTION_DISABLE();
+	fixup_potential_system_inconsistencies();
 	printk(KERN_RAW "\n\n\n");
 	printk(KERN_EMERG "Kernel aborted [pc=%p]\n", kcpustate_getpc(state));
 	kcpustate_to_ucpustate(state, &ustate);
@@ -415,9 +483,9 @@ PRIVATE ATTR_DBGTEXT void KCALL
 panic_kernel_dbg_main(void *arg) {
 	struct panic_args *args;
 	uintptr_t pc, prev_pc;
-	pc      = dbg_getpcreg(DBG_REGLEVEL_EXIT);
+	args = (struct panic_args *)arg;
+	pc      = dbg_getpcreg(DBG_REGLEVEL_TRAP);
 	prev_pc = (uintptr_t)instruction_trypred((void const *)pc);
-	args    = (struct panic_args *)arg;
 	dbg_printf(DBGSTR("Kernel Panic\n"
 	                  "%[vinfo:" "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
 	                             "func: " DF_WHITE("%n") "\n"
@@ -440,6 +508,7 @@ PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
 kernel_vpanic_ucpustate(struct ucpustate *__restrict state,
                         char const *format, va_list args) {
 	PREEMPTION_DISABLE();
+	fixup_potential_system_inconsistencies();
 	printk(KERN_RAW "\n\n\n");
 	printk(KERN_EMERG "Kernel Panic [pc=%p]\n",
 	       ucpustate_getpc(state));
