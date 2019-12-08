@@ -23,11 +23,12 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
+#include <debugger/function.h>
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/aio.h>
 #include <kernel/cache.h>
-#include <kernel/debugger.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>

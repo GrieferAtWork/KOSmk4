@@ -20,6 +20,7 @@
 #define GUARD_KERNEL_INCLUDE_DEBUGGER_FUNCTION_H 1
 
 #include <kernel/compiler.h>
+
 #include <debugger/config.h>
 
 #ifdef CONFIG_HAVE_DEBUGGER

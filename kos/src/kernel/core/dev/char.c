@@ -22,6 +22,9 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
+#include <debugger/function.h>
+#include <debugger/io.h>
 #include <dev/char.h>
 #include <dev/keyboard.h>
 #include <dev/mouse.h>
@@ -30,7 +33,6 @@
 #include <fs/node.h>
 #include <fs/ramfs.h>
 #include <kernel/aio.h>
-#include <kernel/debugger.h>
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
@@ -790,24 +792,27 @@ DEFINE_PUBLIC_ALIAS(character_device_stat, handle_characterdevice_stat);
 DEFINE_PUBLIC_ALIAS(character_device_poll, handle_characterdevice_poll);
 
 
-#ifndef CONFIG_NO_DEBUGGER
-PRIVATE void KCALL
+#ifdef CONFIG_HAVE_DEBUGGER
+PRIVATE ATTR_DBGTEXT void KCALL
 do_dump_character_device(struct character_device *__restrict self) {
 	char const *kind;
 	if (character_device_isattybase(self))
-		kind = ttybase_isapty((struct ttybase_device *)self) ? "pty" : "tty";
+		kind = ttybase_isapty((struct ttybase_device *)self)
+		       ? DBGSTR("pty")
+		       : DBGSTR("tty");
 	else if (character_device_isakeyboard(self))
-		kind = "keyboard";
+		kind = DBGSTR("keyboard");
 	else if (character_device_isamouse(self))
-		kind = "mouse";
+		kind = DBGSTR("mouse");
 	else {
-		kind = "other";
+		kind = DBGSTR("other");
 	}
-	dbg_printf("/dev/" DF_WHITE("%s") "\t%u:%-2u\t%s\t%s\t",
+	dbg_printf(DBGSTR("/dev/" DF_WHITE("%s") "\t%u:%-2u\t%s\t%s\t"),
 	           self->cd_name,
 	           (unsigned int)MAJOR(character_device_devno(self)),
 	           (unsigned int)MINOR(character_device_devno(self)),
-	           self->cd_type.ct_driver ? self->cd_type.ct_driver->d_name : "?",
+	           self->cd_type.ct_driver ? self->cd_type.ct_driver->d_name
+	                                   : DBGSTR("?"),
 	           kind);
 	dbg_putc(self->cd_type.ct_read ? 'r' : '-');
 	dbg_putc(self->cd_type.ct_write ? 'w' : '-');
@@ -821,7 +826,7 @@ do_dump_character_device(struct character_device *__restrict self) {
 	dbg_putc('\n');
 }
 
-PRIVATE void KCALL
+PRIVATE ATTR_DBGTEXT void KCALL
 dump_character_device(struct character_device *__restrict self) {
 again:
 	do_dump_character_device(self);
@@ -845,13 +850,13 @@ DEFINE_DEBUG_FUNCTION(
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	(void)argv;
-	dbg_print("     name\tdevno\tdriver\tkind\tfeatures\n");
+	dbg_print(DBGSTR("     name\tdevno\tdriver\tkind\tfeatures\n"));
 	if (character_device_tree)
 		dump_character_device(character_device_tree);
 	return 0;
 }
 
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 DECL_END

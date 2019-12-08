@@ -23,31 +23,34 @@ if (gcc_opt.remove("-O3"))
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_INTRIN_C
 #define GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_INTRIN_C 1
-#define _KOS_SOURCE 1
 #define DISABLE_BRANCH_PROFILING 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
-#include <kernel/debugger.h>
+#include <debugger/config.h>
 
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/function.h>
+#include <debugger/io.h>
+#include <debugger/rt.h>
 #include <kernel/addr2line.h>
 #include <kernel/except.h>
 
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
-#include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state-compat.h>
+#include <kos/kernel/cpu-state.h>
 #include <sys/io.h>
+
+#include <format-printer.h>
+#include <stdio.h>
+#include <string.h>
 
 #include <libdisasm/disassembler.h>
 #include <libinstrlen/instrlen.h>
 #include <libregdump/cpu-state.h>
 #include <libregdump/x86.h>
-
-#include <format-printer.h>
-#include <stdio.h>
-#include <string.h>
 
 DECL_BEGIN
 
@@ -370,6 +373,6 @@ DEFINE_DEBUG_FUNCTION(
 
 
 DECL_END
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_INTRIN_C */

@@ -36,8 +36,9 @@
 #endif
 
 #ifdef CONFIG_DEBUG_MALLOC
+#include <debugger/config.h>
+#include <debugger/function.h>
 #include <kernel/addr2line.h>
-#include <kernel/debugger.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/paging.h>
@@ -46,8 +47,8 @@
 #include <kernel/types.h>
 #include <kernel/vm.h>
 #include <sched/cpu.h>
-#include <sched/task.h>
 #include <sched/pid.h>
+#include <sched/task.h>
 #ifndef CONFIG_NO_SMP
 #include <sched/signal.h>
 #endif /* !CONFIG_NO_SMP */
@@ -57,6 +58,9 @@
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
+
 #include <assert.h>
 #include <format-printer.h>
 #include <stdint.h>
@@ -64,8 +68,6 @@
 
 #include <libinstrlen/instrlen.h>
 #include <libunwind/unwind.h>
-#include <kos/kernel/cpu-state.h>
-#include <kos/kernel/cpu-state-helpers.h>
 
 #include "corebase.h"
 

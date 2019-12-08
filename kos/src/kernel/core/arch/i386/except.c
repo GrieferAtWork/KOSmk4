@@ -22,8 +22,12 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
+#include <debugger/entry.h>
+#include <debugger/function.h>
+#include <debugger/io.h>
+#include <debugger/util.h>
 #include <kernel/addr2line.h>
-#include <kernel/debugger.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
 #include <kernel/panic.h>
@@ -489,14 +493,14 @@ NOTHROW(VCALL error_printf)(char const *__restrict reason, ...) {
 	va_end(args);
 }
 
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 struct panic_args {
 	unsigned int           error;
 	uintptr_t              last_pc;
 	struct exception_info *info;
 };
 
-PRIVATE void KCALL
+PRIVATE ATTR_DBGTEXT void KCALL
 panic_uhe_dbg_main(void *arg) {
 	struct panic_args *args;
 	unsigned int i;
@@ -505,14 +509,14 @@ panic_uhe_dbg_main(void *arg) {
 	struct exception_info *info;
 	args = (struct panic_args *)arg;
 	info = args->info;
-	dbg_printf(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON, "Unhandled exception") " "
-	           DF_WHITE("%.4I16X") " " DF_WHITE("%.4I16X"),
+	dbg_printf(DBGSTR(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON, "Unhandled exception") " "
+	                  DF_WHITE("%.4I16X") " " DF_WHITE("%.4I16X")),
 	           info->ei_class, info->ei_subclass);
 
 	/* Dump the exception that occurred. */
 	name = get_exception_name(info->ei_code);
 	if (name)
-		dbg_printf(" [" DF_WHITE("%s") "]", name);
+		dbg_printf(DBGSTR(" [" DF_WHITE("%s") "]"), name);
 	print_exception_desc(&dbg_printer, NULL);
 	dbg_putc('\n');
 	is_first_pointer = true;
@@ -521,22 +525,24 @@ panic_uhe_dbg_main(void *arg) {
 		if (info->ei_data.e_pointers[i] == 0)
 			continue;
 		if (is_first_pointer) {
-			dbg_print("Exception pointers:\n");
+			dbg_print(DBGSTR("Exception pointers:\n"));
 			is_first_pointer = false;
 		}
-		dbg_printf("    [" DF_WHITE("%u") "] = " DF_WHITE("%p") " (" DF_WHITE("%Iu") ")\n",
+		dbg_printf(DBGSTR("    [" DF_WHITE("%u") "] = " DF_WHITE("%p") " (" DF_WHITE("%Iu") ")\n"),
 		           i,
 		           info->ei_data.e_pointers[i],
 		           info->ei_data.e_pointers[i]);
 	}
 	dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)kcpustate_getpc(&info->ei_state)),
-	                     kcpustate_getpc(&info->ei_state), "Thrown here");
+	                     kcpustate_getpc(&info->ei_state),
+	                     DBGSTR("Thrown here"));
 #if EXCEPT_BACKTRACE_SIZE != 0
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i) {
 		if (!info->ei_trace[i])
 			break;
 		dbg_addr2line_printf((uintptr_t)instruction_trypred(info->ei_trace[i]),
-		                     (uintptr_t)info->ei_trace[i], "Called here");
+		                     (uintptr_t)info->ei_trace[i],
+		                     DBGSTR("Called here"));
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 #if EXCEPT_BACKTRACE_SIZE != 0
@@ -551,25 +557,27 @@ panic_uhe_dbg_main(void *arg) {
 		if (!my_last_pc) {
 			my_last_pc = prev_last_pc;
 		} else if (my_last_pc != prev_last_pc) {
-			dbg_print("...\n");
+			dbg_print(DBGSTR("...\n"));
 			addr2line_printf(&kprinter, (void *)KERN_RAW,
 			                 (uintptr_t)instruction_trypred((void const *)my_last_pc),
-			                 my_last_pc, "Traceback ends here");
+			                 my_last_pc,
+			                 DBGSTR("Traceback ends here"));
 		}
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	if (args->error == UNWIND_SUCCESS) {
-		dbg_printf("Unwinding stopped when " DF_FGCOLOR(DBG_COLOR_PURPLE, "NOTHROW")
-		           "() function " "%[vinfo:" DF_WHITE("%n") "] was reached\n",
+		dbg_printf(DBGSTR("Unwinding stopped when " DF_FGCOLOR(DBG_COLOR_PURPLE, "NOTHROW")
+		                  "() function " "%[vinfo:" DF_WHITE("%n") "] was reached\n"),
 		           instruction_trypred((void const *)args->last_pc));
 	} else if (args->error != UNWIND_NO_FRAME) {
-		dbg_printf(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON, "Unwinding failed")
-		           ": " DF_WHITE("%u") "\n", args->error);
+		dbg_printf(DBGSTR(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON, "Unwinding failed")
+		                  ": " DF_WHITE("%u") "\n"),
+		           args->error);
 	}
 	dbg_main(0);
 }
 
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 INTDEF void KCALL
@@ -622,7 +630,7 @@ halt_unhandled_exception(unsigned int unwind_error,
 		kcpustate_to_ucpustate(unwind_state, &ustate);
 		kernel_halt_dump_traceback(&kprinter, (void *)KERN_RAW, &ustate);
 	}
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled() &&
 		(kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_UNHANDLED_EXCEPT)) {
@@ -646,9 +654,9 @@ halt_unhandled_exception(unsigned int unwind_error,
 		args.info    = info;
 		dbg_enter(&panic_uhe_dbg_main, &args, unwind_state);
 	}
-#else /* !CONFIG_NO_DEBUGGER */
+#else /* CONFIG_HAVE_DEBUGGER */
 	kernel_panic(unwind_state, "Unhandled exception\n");
-#endif /* CONFIG_NO_DEBUGGER */
+#endif /* !CONFIG_HAVE_DEBUGGER */
 }
 
 

@@ -21,17 +21,22 @@ if (gcc_opt.remove("-O3"))
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_DEBUGGER_HEXEDIT_C
-#define GUARD_KERNEL_SRC_DEBUGGER_HEXEDIT_C 1
+#ifndef GUARD_KERNEL_SRC_DEBUGGER_APPS_HEXEDIT_C
+#define GUARD_KERNEL_SRC_DEBUGGER_APPS_HEXEDIT_C 1
 #define DISABLE_BRANCH_PROFILING 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
-#include <kernel/debugger.h>
-#ifndef CONFIG_NO_DEBUGGER
+#include <debugger/config.h>
+#ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/function.h>
+#include <debugger/io.h>
+#include <debugger/rt.h>
+#include <debugger/util.h>
 #include <kernel/except.h>
 #include <kernel/paging.h>
+#include <kernel/types.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
 
@@ -941,6 +946,6 @@ DEFINE_DEBUG_FUNCTION(
 
 
 DECL_END
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
-#endif /* !GUARD_KERNEL_SRC_DEBUGGER_HEXEDIT_C */
+#endif /* !GUARD_KERNEL_SRC_DEBUGGER_APPS_HEXEDIT_C */

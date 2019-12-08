@@ -23,7 +23,8 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/debugger.h>
+#include <debugger/config.h>
+#include <debugger/function.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>

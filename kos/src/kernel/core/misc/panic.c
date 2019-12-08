@@ -21,8 +21,13 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
+#include <debugger/entry.h>
+#include <debugger/function.h>
+#include <debugger/io.h>
+#include <debugger/rt.h>
+#include <debugger/util.h>
 #include <kernel/addr2line.h>
-#include <kernel/debugger.h>
 #include <kernel/debugtrap.h>
 #include <kernel/memory.h>
 #include <kernel/printk.h>
@@ -62,7 +67,7 @@ NOTHROW(KCALL is_pc)(uintptr_t pc) {
 	return (node->vn_prot & VM_PROT_EXEC) != 0;
 }
 
-INTERN ATTR_COLDTEXT void KCALL
+INTERN ATTR_COLD ATTR_COLDTEXT void KCALL
 kernel_halt_dump_traceback(pformatprinter printer, void *arg,
                            struct ucpustate const *__restrict dumpstate) {
 	unsigned int error;
@@ -138,35 +143,35 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 }
 
 
-#ifndef CONFIG_NO_DEBUGGER
-PRIVATE ATTR_COLDTEXT void KCALL
+#ifdef CONFIG_HAVE_DEBUGGER
+PRIVATE ATTR_DBGTEXT void KCALL
 panic_assert_dbg_main(void *arg) {
 	struct assert_args *args;
 	args = (struct assert_args *)arg;
-	dbg_printf(DF_SETCOLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON) "Assertion failure" DF_DEFCOLOR "\n"
-	           "expr: " DF_SETFGCOLOR(DBG_COLOR_WHITE) "%s" DF_DEFFGCOLOR "\n"
-	           "file: " DF_SETFGCOLOR(DBG_COLOR_WHITE) "%s" DF_DEFFGCOLOR
-	           " (line " DF_SETFGCOLOR(DBG_COLOR_WHITE) "%u" DF_DEFFGCOLOR ")\n",
+	dbg_printf(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON, "Assertion failure") "\n"
+	           "expr: "  DF_FGCOLOR(DBG_COLOR_WHITE, "%s") "\n"
+	           "file: "  DF_FGCOLOR(DBG_COLOR_WHITE, "%s")
+	           " (line " DF_FGCOLOR(DBG_COLOR_WHITE, "%u") ")\n",
 	           args->aa_expr,
 	           args->aa_file,
 	           args->aa_line);
 	if (args->aa_func)
-		dbg_printf("func: " DF_SETFGCOLOR(DBG_COLOR_WHITE) "%s" DF_DEFFGCOLOR "\n", args->aa_func);
+		dbg_printf(DBGSTR("func: " DF_FGCOLOR(DBG_COLOR_WHITE, "%s") "\n"), args->aa_func);
 	if (args->aa_format) {
-		dbg_print("mesg: " DF_SETCOLOR(DBG_COLOR_TEAL, DBG_COLOR_BLACK));
+		dbg_print(DBGSTR("mesg: " DF_SETCOLOR(DBG_COLOR_TEAL, DBG_COLOR_BLACK)));
 		dbg_indent += 6;
 		format_vprintf(&dbg_printer, NULL, args->aa_format, args->aa_args);
 		dbg_indent -= 6;
-		dbg_print(DF_DEFCOLOR "\n");
+		dbg_print(DBGSTR(DF_DEFCOLOR "\n"));
 	}
-	dbg_printf("addr: " DF_SETFGCOLOR(DBG_COLOR_WHITE) "%p" DF_DEFFGCOLOR "\n",
+	dbg_printf(DBGSTR("addr: " DF_FGCOLOR(DBG_COLOR_WHITE, "%p") "\n"),
 	           kcpustate_getpc(&args->aa_state));
 	dbg_main(0);
 }
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
-INTERN ATTR_COLDTEXT ATTR_NOINLINE ATTR_NORETURN void FCALL
+INTERN ATTR_COLD ATTR_COLDTEXT ATTR_NOINLINE ATTR_NORETURN void FCALL
 libc_assertion_failure_core(struct assert_args *__restrict args) {
 	PREEMPTION_DISABLE();
 	printk(KERN_RAW "\n\n\n");
@@ -192,38 +197,38 @@ libc_assertion_failure_core(struct assert_args *__restrict args) {
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())
 		kernel_debugtrap(&args->aa_state, SIGTRAP);
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 	/* Enter the debugger */
 	dbg_enter(&panic_assert_dbg_main, args, &args->aa_state);
-#else
+#else /* CONFIG_HAVE_DEBUGGER */
 	PREEMPTION_HALT();
-#endif
+#endif /* !CONFIG_HAVE_DEBUGGER */
 }
 
 
 
 
-#ifndef CONFIG_NO_DEBUGGER
-PRIVATE ATTR_COLDTEXT void KCALL
+#ifdef CONFIG_HAVE_DEBUGGER
+PRIVATE ATTR_DBGTEXT void KCALL
 panic_assert_chk_print_message(void *arg) {
 	struct assert_args *args;
 	args = (struct assert_args *)arg;
-	dbg_printf("expr: " DF_SETFGCOLOR(DBG_COLOR_WHITE) "%s" DF_DEFFGCOLOR "\n"
-	           "file: " DF_SETFGCOLOR(DBG_COLOR_WHITE) "%s" DF_DEFFGCOLOR
-	           " (line " DF_SETFGCOLOR(DBG_COLOR_WHITE) "%u" DF_DEFFGCOLOR ")\n",
+	dbg_printf(DBGSTR("expr: " DF_FGCOLOR(DBG_COLOR_WHITE, "%s") "\n"
+	                  "file: " DF_FGCOLOR(DBG_COLOR_WHITE, "%s")
+	                  " (line " DF_FGCOLOR(DBG_COLOR_WHITE, "%u") ")\n"),
 	           args->aa_expr,
 	           args->aa_file,
 	           args->aa_line);
 	if (args->aa_func)
-		dbg_printf("func: " DF_SETFGCOLOR(DBG_COLOR_WHITE) "%s" DF_DEFFGCOLOR "\n", args->aa_func);
+		dbg_printf(DBGSTR("func: " DF_FGCOLOR(DBG_COLOR_WHITE, "%s") "\n"), args->aa_func);
 	if (args->aa_format) {
-		dbg_print("mesg: " DF_SETCOLOR(DBG_COLOR_TEAL, DBG_COLOR_BLACK));
+		dbg_print(DBGSTR("mesg: " DF_SETCOLOR(DBG_COLOR_TEAL, DBG_COLOR_BLACK)));
 		dbg_indent += 6;
 		format_vprintf(&dbg_printer, NULL, args->aa_format, args->aa_args);
 		dbg_indent -= 6;
-		dbg_print(DF_DEFCOLOR "\n");
+		dbg_print(DBGSTR(DF_DEFCOLOR "\n"));
 	}
-	dbg_printf("addr: " DF_SETFGCOLOR(DBG_COLOR_WHITE) "%p" DF_DEFFGCOLOR "\n",
+	dbg_printf(DBGSTR("addr: " DF_FGCOLOR(DBG_COLOR_WHITE, "%p") "\n"),
 	           kcpustate_getpc(&args->aa_state));
 }
 
@@ -233,17 +238,16 @@ panic_assert_chk_print_message(void *arg) {
 #define ASSERTION_OPTION_IGNORE         2
 #define ASSERTION_OPTION_IGNORE_ALWAYS  3
 
-PRIVATE ATTR_COLDRODATA char const *const assert_chk_options[] = {
+PRIVATE ATTR_DBGRODATA char const *const assert_chk_options[] = {
 	[ASSERTION_OPTION_RETRY]         = "retry",
 	[ASSERTION_OPTION_DEBUG]         = "debug",
 	[ASSERTION_OPTION_IGNORE]        = "ignore",
 	[ASSERTION_OPTION_IGNORE_ALWAYS] = "ignore (always)",
 	NULL
 };
-PRIVATE ATTR_COLDBSS uintptr_t always_ignored_assertions[64] = { 0 };
+PRIVATE ATTR_DBGBSS uintptr_t always_ignored_assertions[64] = { 0 };
 
-
-PRIVATE ATTR_COLDTEXT void KCALL
+PRIVATE ATTR_COLD ATTR_COLDTEXT void KCALL
 panic_assert_chk_dbg_main(void *arg) {
 	struct assert_args *args;
 	unsigned int option;
@@ -251,7 +255,7 @@ panic_assert_chk_dbg_main(void *arg) {
 	{
 		unsigned int i;
 		for (i = 0; i < COMPILER_LENOF(always_ignored_assertions); ++i) {
-			if (fcpustate_getpc(&x86_dbg_exitstate) == always_ignored_assertions[i]) {
+			if (dbg_getpcreg(DBG_REGLEVEL_EXIT) == always_ignored_assertions[i]) {
 				option = ASSERTION_OPTION_IGNORE;
 				goto handle_retry_or_ignore;
 			}
@@ -270,7 +274,7 @@ panic_assert_chk_dbg_main(void *arg) {
 		for (i = 0; i < COMPILER_LENOF(always_ignored_assertions); ++i) {
 			if (always_ignored_assertions[i])
 				continue;
-			always_ignored_assertions[i] = fcpustate_getpc(&x86_dbg_exitstate);
+			always_ignored_assertions[i] = dbg_getpcreg(DBG_REGLEVEL_EXIT);
 			break;
 		}
 		option = ASSERTION_OPTION_IGNORE;
@@ -295,9 +299,9 @@ handle_retry_or_ignore:
 	dbg_setcur(0, 0);
 	panic_assert_dbg_main(arg);
 }
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
-INTERN ATTR_COLDTEXT ATTR_NOINLINE struct kcpustate *FCALL
+INTERN ATTR_COLD ATTR_COLDTEXT ATTR_NOINLINE struct kcpustate *FCALL
 libc_assertion_check_core(struct assert_args *__restrict args) {
 	/* TODO: Check if assertion failures at `kcpustate_getpc(&args->aa_state)' should be ignored. */
 	PREEMPTION_DISABLE();
@@ -324,30 +328,31 @@ libc_assertion_check_core(struct assert_args *__restrict args) {
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())
 		kernel_debugtrap(&args->aa_state, SIGTRAP);
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 	/* Enter the debugger */
 	dbg_enter(&panic_assert_chk_dbg_main, args, &args->aa_state);
-#else
+#else /* CONFIG_HAVE_DEBUGGER */
 	PREEMPTION_HALT();
-#endif
+#endif /* !CONFIG_HAVE_DEBUGGER */
 }
 
 
 
-#ifndef CONFIG_NO_DEBUGGER
-PRIVATE ATTR_COLDTEXT void KCALL
+#ifdef CONFIG_HAVE_DEBUGGER
+PRIVATE ATTR_DBGTEXT void KCALL
 panic_genfail_dbg_main(void *arg) {
-	uintptr_t prev_pc;
-	prev_pc = (uintptr_t)instruction_trypred((void const *)fcpustate_getpc(&x86_dbg_exitstate));
-	dbg_printf(DF_SETCOLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON) "%s" DF_DEFCOLOR "%[vinfo:"
-	           "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
-	           "func: " DF_WHITE("%n") "\n]"
-	           "addr: " DF_WHITE("%p") "+" DF_WHITE("%Iu") "\n",
+	uintptr_t pc, prev_pc;
+	pc      = dbg_getpcreg(DBG_REGLEVEL_EXIT);
+	prev_pc = (uintptr_t)instruction_trypred((void const *)pc);
+	dbg_printf(DBGSTR(DF_SETCOLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON) "%s" DF_DEFCOLOR "%[vinfo:"
+	                  "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
+	                  "func: " DF_WHITE("%n") "\n]"
+	                  "addr: " DF_WHITE("%p") "+" DF_WHITE("%Iu") "\n"),
 	           arg, prev_pc, prev_pc,
-	           (size_t)(fcpustate_getpc(&x86_dbg_exitstate) - prev_pc));
+	           (size_t)(pc - prev_pc));
 	dbg_main(0);
 }
-#endif
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 /* The `__stack_chk_guard' global is read _very_ often,
@@ -358,7 +363,7 @@ PUBLIC ATTR_READMOSTLY uintptr_t __stack_chk_guard = 0x123baf37;
 PUBLIC ATTR_COLDDATA uintptr_t __stack_chk_guard = 0x123baf37;
 #endif /* NDEBUG */
 
-INTERN ATTR_COLDTEXT ATTR_COLD ATTR_NORETURN void FCALL
+INTERN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN void FCALL
 libc_stack_failure_core(struct kcpustate *__restrict state) {
 	struct ucpustate ustate;
 	PREEMPTION_DISABLE();
@@ -369,17 +374,17 @@ libc_stack_failure_core(struct kcpustate *__restrict state) {
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())
 		kernel_debugtrap(state, SIGSEGV);
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 	/* Enter the debugger */
 	dbg_enter(&panic_genfail_dbg_main,
-	          (void *)"Stack check failure (corrupted cookie)\n",
+	          (void *)DBGSTR("Stack check failure (corrupted cookie)\n"),
 	          state);
-#else /* !CONFIG_NO_DEBUGGER */
+#else /* CONFIG_HAVE_DEBUGGER */
 	PREEMPTION_HALT();
-#endif /* CONFIG_NO_DEBUGGER */
+#endif /* !CONFIG_HAVE_DEBUGGER */
 }
 
-INTERN ATTR_COLDTEXT ATTR_COLD ATTR_NORETURN void FCALL
+INTERN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN void FCALL
 libc_abort_failure_core(struct kcpustate *__restrict state) {
 	struct ucpustate ustate;
 	PREEMPTION_DISABLE();
@@ -390,47 +395,48 @@ libc_abort_failure_core(struct kcpustate *__restrict state) {
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())
 		kernel_debugtrap(state, SIGABRT);
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 	/* Enter the debugger */
 	dbg_enter(&panic_genfail_dbg_main,
-	          (void *)"Kernel called abort()\n",
+	          (void *)DBGSTR("Kernel called abort()\n"),
 	          state);
-#else /* !CONFIG_NO_DEBUGGER */
+#else /* CONFIG_HAVE_DEBUGGER */
 	PREEMPTION_HALT();
-#endif /* CONFIG_NO_DEBUGGER */
+#endif /* !CONFIG_HAVE_DEBUGGER */
 }
 
 
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 struct panic_args {
 	char const *format;
 	va_list     args;
 };
-PRIVATE ATTR_COLDTEXT void KCALL
+PRIVATE ATTR_DBGTEXT void KCALL
 panic_kernel_dbg_main(void *arg) {
 	struct panic_args *args;
-	uintptr_t prev_pc;
-	prev_pc = (uintptr_t)instruction_trypred((void const *)fcpustate_getpc(&x86_dbg_exitstate));
+	uintptr_t pc, prev_pc;
+	pc      = dbg_getpcreg(DBG_REGLEVEL_EXIT);
+	prev_pc = (uintptr_t)instruction_trypred((void const *)pc);
 	args    = (struct panic_args *)arg;
-	dbg_printf("Kernel Panic\n"
-	           "%[vinfo:" "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
-	                      "func: " DF_WHITE("%n") "\n"
-	           "]",
+	dbg_printf(DBGSTR("Kernel Panic\n"
+	                  "%[vinfo:" "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
+	                             "func: " DF_WHITE("%n") "\n"
+	                  "]"),
 	           prev_pc);
 	if (args->format) {
-		dbg_print("mesg: " DF_SETCOLOR(DBG_COLOR_TEAL, DBG_COLOR_BLACK));
+		dbg_print(DBGSTR("mesg: " DF_SETCOLOR(DBG_COLOR_TEAL, DBG_COLOR_BLACK)));
 		dbg_indent += 6;
 		format_vprintf(&dbg_printer, NULL, args->format, args->args);
 		dbg_indent -= 6;
 		dbg_print(DF_DEFCOLOR "\n");
 	}
-	dbg_printf("addr: " DF_WHITE("%p") "+" DF_WHITE("%Iu") "\n",
-	           prev_pc, (size_t)(fcpustate_getpc(&x86_dbg_exitstate) - prev_pc));
+	dbg_printf(DBGSTR("addr: " DF_WHITE("%p") "+" DF_WHITE("%Iu") "\n"),
+	           prev_pc, (size_t)(pc - prev_pc));
 	dbg_main(0);
 }
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
-FUNDEF ATTR_NORETURN ATTR_COLD void FCALL
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
 kernel_vpanic_ucpustate(struct ucpustate *__restrict state,
                         char const *format, va_list args) {
 	PREEMPTION_DISABLE();
@@ -448,7 +454,7 @@ kernel_vpanic_ucpustate(struct ucpustate *__restrict state,
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())
 		kernel_debugtrap(state, SIGABRT);
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 	/* Enter the debugger */
 	{
 		struct panic_args pargs;
@@ -457,12 +463,12 @@ kernel_vpanic_ucpustate(struct ucpustate *__restrict state,
 		pargs.format = format;
 		dbg_enter(&panic_kernel_dbg_main, &pargs, state);
 	}
-#else /* !CONFIG_NO_DEBUGGER */
+#else /* CONFIG_HAVE_DEBUGGER */
 	PREEMPTION_HALT();
-#endif /* CONFIG_NO_DEBUGGER */
+#endif /* !CONFIG_HAVE_DEBUGGER */
 }
 
-FUNDEF ATTR_NORETURN ATTR_COLD void FCALL
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
 kernel_vpanic_lcpustate(struct lcpustate *__restrict state,
                         char const *format, va_list args) {
 	struct ucpustate ustate;
@@ -470,7 +476,7 @@ kernel_vpanic_lcpustate(struct lcpustate *__restrict state,
 	kernel_vpanic_ucpustate(&ustate, format, args);
 }
 
-FUNDEF ATTR_NORETURN ATTR_COLD void FCALL
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
 kernel_vpanic_kcpustate(struct kcpustate *__restrict state,
                         char const *format, va_list args) {
 	struct ucpustate ustate;
@@ -478,7 +484,7 @@ kernel_vpanic_kcpustate(struct kcpustate *__restrict state,
 	kernel_vpanic_ucpustate(&ustate, format, args);
 }
 
-FUNDEF ATTR_NORETURN ATTR_COLD void FCALL
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
 kernel_vpanic_icpustate(struct icpustate *__restrict state,
                         char const *format, va_list args) {
 	struct ucpustate ustate;
@@ -486,7 +492,7 @@ kernel_vpanic_icpustate(struct icpustate *__restrict state,
 	kernel_vpanic_ucpustate(&ustate, format, args);
 }
 
-FUNDEF ATTR_NORETURN ATTR_COLD void FCALL
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
 kernel_vpanic_scpustate(struct scpustate *__restrict state,
                         char const *format, va_list args) {
 	struct ucpustate ustate;
@@ -496,7 +502,7 @@ kernel_vpanic_scpustate(struct scpustate *__restrict state,
 
 
 
-FUNDEF ATTR_NORETURN ATTR_COLD void VCALL
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
 kernel_panic_ucpustate(struct ucpustate *__restrict state,
                        char const *format, ...) {
 	va_list args;
@@ -504,7 +510,7 @@ kernel_panic_ucpustate(struct ucpustate *__restrict state,
 	kernel_vpanic_ucpustate(state, format, args);
 }
 
-FUNDEF ATTR_NORETURN ATTR_COLD void VCALL
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
 kernel_panic_lcpustate(struct lcpustate *__restrict state,
                        char const *format, ...) {
 	va_list args;
@@ -512,7 +518,7 @@ kernel_panic_lcpustate(struct lcpustate *__restrict state,
 	kernel_vpanic_lcpustate(state, format, args);
 }
 
-FUNDEF ATTR_NORETURN ATTR_COLD void VCALL
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
 kernel_panic_kcpustate(struct kcpustate *__restrict state,
                        char const *format, ...) {
 	va_list args;
@@ -520,7 +526,7 @@ kernel_panic_kcpustate(struct kcpustate *__restrict state,
 	kernel_vpanic_kcpustate(state, format, args);
 }
 
-FUNDEF ATTR_NORETURN ATTR_COLD void VCALL
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
 kernel_panic_icpustate(struct icpustate *__restrict state,
                        char const *format, ...) {
 	va_list args;
@@ -528,7 +534,7 @@ kernel_panic_icpustate(struct icpustate *__restrict state,
 	kernel_vpanic_icpustate(state, format, args);
 }
 
-FUNDEF ATTR_NORETURN ATTR_COLD void VCALL
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
 kernel_panic_scpustate(struct scpustate *__restrict state,
                        char const *format, ...) {
 	va_list args;

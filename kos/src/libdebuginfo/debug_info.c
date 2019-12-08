@@ -48,9 +48,11 @@ if (gcc_opt.remove("-O3"))
 #include "debug_aranges.h"
 
 #ifdef __KERNEL__
-#include <hybrid/atomic.h>
+#include <debugger/config.h>
+#include <debugger/rt.h>
 #include <kernel/heap.h>
-#include <kernel/debugger.h>
+
+#include <hybrid/atomic.h>
 #else /* __KERNEL__ */
 #include <malloc.h>
 #endif /* !__KERNEL__ */
@@ -60,7 +62,7 @@ DECL_BEGIN
 
 #ifdef __KERNEL__
 
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 /* Lock to keep track of attempts to allocate memory for the
  * purposes of abbreviation code caches. Because libdebuginfo
  * is heavily used by the kernel's builtin debugger, we have
@@ -88,10 +90,10 @@ PRIVATE struct atomic_rwlock kernel_debug_info_inside_malloc = ATOMIC_RWLOCK_INI
 #define MY_KMALLOC_RELEASE_LOCK() \
 	atomic_rwlock_end(&kernel_debug_info_inside_malloc)
 
-#else /* !CONFIG_NO_DEBUGGER */
+#else /* CONFIG_HAVE_DEBUGGER */
 #define MY_KMALLOC_ACQUIRE_LOCK() (void)0
 #define MY_KMALLOC_RELEASE_LOCK() (void)0
-#endif /* CONFIG_NO_DEBUGGER */
+#endif /* !CONFIG_HAVE_DEBUGGER */
 
 /* The debugger overrides the #PF handler to disable any form of lazy initialization
  * of memory, meaning that if we're being called from there, the only way we can

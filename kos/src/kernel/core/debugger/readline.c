@@ -27,13 +27,17 @@ if (gcc_opt.remove("-O3"))
 
 #include <kernel/compiler.h>
 
-#include <kernel/debugger.h>
-#ifndef CONFIG_NO_DEBUGGER
+#include <debugger/config.h>
+#ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/function.h>
+#include <debugger/io.h>
+#include <debugger/util.h>
+
 #include <kos/keyboard.h>
 
+#include <assert.h>
 #include <string.h>
 #include <unicode.h>
-#include <assert.h>
 
 DECL_BEGIN
 
@@ -95,6 +99,6 @@ dbg_readline(/*utf-8*/ char *__restrict buf,
 
 
 DECL_END
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_SRC_DEBUGGER_READLINE_C */

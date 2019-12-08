@@ -74,7 +74,7 @@ IncludeCategories:
     Priority:        1
   - Regex:           '<(.*/compiler|__stdinc|__stdcxx|__crt|features)[.]h>'
     Priority:        2
-  - Regex:           '<(kernel|dev|drivers|fs|misc|sched)/.*>'
+  - Regex:           '<(kernel|debugger|dev|drivers|fs|misc|sched)/.*>'
     Priority:        3
   - Regex:           '<hybrid/.*[.]h>'
     Priority:        4

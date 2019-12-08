@@ -23,10 +23,10 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
 #include <fs/vfs.h>
 #include <kernel/apic.h>
 #include <kernel/cpuid.h>
-#include <kernel/debugger.h>
 #include <kernel/driver-param.h>
 #include <kernel/gdt.h>
 #include <kernel/handle.h>
@@ -64,9 +64,9 @@ PUBLIC DEFINE_ATOMIC_RWLOCK(x86_pit_lock);
 #endif /* !CONFIG_NO_SMP */
 
 INTDEF byte_t x86_pic_acknowledge[];
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 INTDEF byte_t x86_debug_pic_acknowledge[];
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 #ifdef __x86_64__
 PRIVATE ATTR_FREERODATA u8 const x86_ack_apic[18] = {
@@ -788,13 +788,13 @@ INTDEF NOBLOCK void NOTHROW(KCALL x86_cpu_disable_preemptive_interrupts_nopr)(vo
 INTDEF NOBLOCK void NOTHROW(KCALL x86_cpu_enable_preemptive_interrupts_nopr)(void);
 
 
-#ifdef CONFIG_NO_DEBUGGER
+#ifndef CONFIG_HAVE_DEBUGGER
 INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_pic)(void)
-#else /* CONFIG_NO_DEBUGGER */
+#else /* !CONFIG_HAVE_DEBUGGER */
 /* The debugger calls this function during init,
  * so we can't mark it as ATTR_FREETEXT */
 INTERN void NOTHROW(KCALL x86_initialize_pic)(void)
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 {
 	/* >> (re-)initialize the master & slave PICs.
 	 * Following this, each PIC will expect 3 additional "initialization words". */
@@ -813,12 +813,12 @@ INTERN void NOTHROW(KCALL x86_initialize_pic)(void)
 	outb_p(X86_PIC1_DATA, X86_ICW4_8086);
 	outb_p(X86_PIC2_DATA, X86_ICW4_8086);
 
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 	/* This function should only ever be called once (I've seen the
 	 * PIC stop working properly if it's initialized more than once...)
 	 * To ensure this, we re-write our own entry-point with a ret-instruction. */
 	*(u8 *)(void *)&x86_initialize_pic = 0xc3; /* ret */
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 }
 
 INTERN ATTR_FREEBSS bool x86_config_noapic = false;

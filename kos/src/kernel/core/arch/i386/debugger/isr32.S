@@ -16,10 +16,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_ISR32_S
+#define GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_ISR32_S 1
 
-#include <kernel/debugger.h>
+#include <debugger/config.h>
 
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 #include <kernel/compiler.h>
 #include <kernel/pic.h>
 #include <kernel/apic.h>
@@ -151,5 +153,6 @@ END(x86_dbgidt_specific_00h)
 
 
 
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_ISR32_S */

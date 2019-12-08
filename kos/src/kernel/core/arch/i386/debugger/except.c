@@ -23,14 +23,14 @@ if (gcc_opt.remove("-O3"))
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_EXCEPT_C
 #define GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_EXCEPT_C 1
-#define _KOS_SOURCE 1
 #define DISABLE_BRANCH_PROFILING 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
-#include <kernel/debugger.h>
-
-#ifndef CONFIG_NO_DEBUGGER
+#include <debugger/config.h>
+#ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/function.h>
 #include <kernel/except.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
@@ -187,6 +187,6 @@ do_unwind_state:
 
 
 DECL_END
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_EXCEPT_C */

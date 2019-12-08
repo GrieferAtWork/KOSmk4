@@ -20,10 +20,12 @@
 #define GUARD_KERNEL_INCLUDE_DEBUGGER_UTIL_H 1
 
 #include <kernel/compiler.h>
+
 #include <debugger/config.h>
 
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <kernel/types.h>
+
 #include <stdbool.h>
 
 DECL_BEGIN

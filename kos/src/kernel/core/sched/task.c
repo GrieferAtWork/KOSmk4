@@ -22,8 +22,9 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
+#include <debugger/function.h>
 #include <fs/vfs.h>
-#include <kernel/debugger.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/heap.h>
@@ -45,9 +46,9 @@
 #include <stddef.h>
 #include <string.h>
 
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 #include "../memory/vm/vm-nodeapi.h"
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 DECL_BEGIN
 
@@ -146,7 +147,7 @@ _this_kernel_stacknode ASMNAME("this_kernel_stacknode") = {
 };
 
 
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 
 #if 0 /* TODO */
 /* Re-configure the stack of the current task to point to be descriptive
@@ -210,7 +211,7 @@ DEFINE_DBG_RESET(debug_this_kernel_stack_reset);
 DEFINE_DBG_FINI(debug_this_kernel_stack_fini);
 #endif
 
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 

@@ -23,14 +23,19 @@ if (gcc_opt.remove("-O3"))
  */
 #ifndef GUARD_KERNEL_SRC_DEBUGGER_EDIT_C
 #define GUARD_KERNEL_SRC_DEBUGGER_EDIT_C 1
-#define _KOS_SOURCE 1
 #define DISABLE_BRANCH_PROFILING 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
-#include <kernel/debugger.h>
-#ifndef CONFIG_NO_DEBUGGER
+#include <debugger/config.h>
+#ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/function.h>
+#include <debugger/io.h>
+#include <debugger/util.h>
+
 #include <kos/keyboard.h>
+
 #include <ctype.h>
 #include <string.h>
 
@@ -267,6 +272,6 @@ NOTHROW(FCALL dbg_draweditfield)(int x, int y, unsigned int field_width,
 
 
 DECL_END
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_SRC_DEBUGGER_EDIT_C */

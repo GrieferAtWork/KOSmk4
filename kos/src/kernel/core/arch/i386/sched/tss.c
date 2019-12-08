@@ -23,7 +23,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/debugger.h>
+#include <debugger/function.h>
 #include <kernel/gdt.h>
 #include <kernel/memory.h>
 #include <kernel/paging.h>

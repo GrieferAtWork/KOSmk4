@@ -30,12 +30,11 @@ if (gcc_opt.remove("-O3"))
 
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/function.h>
+#include <debugger/rt.h>
 #include <kernel/vm.h>
 
 #include <hybrid/byteorder.h>
-
-#include <debugger/function.h>
-#include <debugger/rt.h>
 
 #include <string.h>
 

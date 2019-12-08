@@ -23,14 +23,18 @@ if (gcc_opt.remove("-O3"))
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_INPUT_C
 #define GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_INPUT_C 1
-#define _KOS_SOURCE 1
 #define DISABLE_BRANCH_PROFILING 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
-#include <kernel/debugger.h>
+#include <debugger/config.h>
 
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/entry.h>
+#include <debugger/function.h>
+#include <debugger/io.h>
+#include <debugger/rt.h>
 #include <kernel/panic.h>
 #include <kernel/pic.h>
 #include <kernel/printk.h>
@@ -89,7 +93,7 @@ LOCAL ATTR_DBGTEXT bool KCALL ps2_write_data(u8 data) {
 
 #ifndef CONFIG_PS2_KEYBOARD_BUFFER_SIZE
 #define CONFIG_PS2_KEYBOARD_BUFFER_SIZE 256
-#endif
+#endif /* !CONFIG_PS2_KEYBOARD_BUFFER_SIZE */
 
 /* Buffer to pressed, but not read key codes. */
 PRIVATE ATTR_DBGBSS u8 ps2_keyboard_buffer[CONFIG_PS2_KEYBOARD_BUFFER_SIZE] = { 0, };
@@ -1414,6 +1418,6 @@ x86_debug_finalize_ps2_keyboard(void) {
 
 
 DECL_END
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_INPUT_C */

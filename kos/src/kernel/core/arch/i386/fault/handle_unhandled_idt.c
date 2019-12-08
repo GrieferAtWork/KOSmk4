@@ -21,8 +21,12 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
+#include <debugger/entry.h>
+#include <debugger/function.h>
+#include <debugger/io.h>
+#include <debugger/rt.h>
 #include <kernel/addr2line.h>
-#include <kernel/debugger.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
 #include <kernel/paging.h>
@@ -166,44 +170,42 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 }
 
 
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 struct panic_args {
 	uintptr_t ecode;
 	uintptr_t intno;
 };
 
-PRIVATE void KCALL
+PRIVATE ATTR_DBGTEXT void KCALL
 panic_uhi_dbg_main(void *arg) {
 	struct panic_args *args;
+	char const *name;
 	args = (struct panic_args *)arg;
-	dbg_printf(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON,
-	                    "Unhandled interrupt")
-	           " [int: " DF_WHITE("%#.2I8x") " (" DF_WHITE("%I8u") ")]",
-	           (u8)args->intno, (u8)args->intno);
+	dbg_printf(DBGSTR(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON, "Unhandled interrupt")
+	                  " [int: " DF_WHITE("%#.2I8x") " (" DF_WHITE("%I8u") ")]"),
+	           (u8)args->intno,
+	           (u8)args->intno);
 	if (args->ecode)
-		dbg_printf(" [ecode=" DF_WHITE("%#.8I32x") "]", (u32)args->ecode);
-	{
-		char const *name;
-		name = get_interrupt_name(args->intno);
-		if (name) {
-			char const *desc;
-			desc = get_interrupt_desc(args->intno, args->ecode);
-			dbg_printf(" [" DF_WHITE("%s"), name);
-			if (desc)
-				dbg_printf(":" DF_WHITE("%s"), desc);
-			dbg_putc(']');
-		}
+		dbg_printf(DBGSTR(" [ecode=" DF_WHITE("%#.8I32x") "]"), (u32)args->ecode);
+	name = get_interrupt_name(args->intno);
+	if (name != NULL) {
+		char const *desc;
+		desc = get_interrupt_desc(args->intno, args->ecode);
+		dbg_printf(DBGSTR(" [" DF_WHITE("%s")), name);
+		if (desc)
+			dbg_printf(DBGSTR(":" DF_WHITE("%s")), desc);
+		dbg_putc(']');
 	}
-	dbg_printf("\n"
-	           "%[vinfo:"
-	           "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
-	           "func: " DF_WHITE("%n") "\n"
-	           "addr: " DF_WHITE("%p") "\n"
-	           "]",
+	dbg_printf(DBGSTR("\n"
+	                  "%[vinfo:"
+	                  "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
+	                  "func: " DF_WHITE("%n") "\n"
+	                  "addr: " DF_WHITE("%p") "\n"
+	                  "]"),
 	           fcpustate_getpc(&x86_dbg_exitstate));
 	dbg_main(0);
 }
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 INTERN struct icpustate *FCALL
@@ -227,10 +229,6 @@ x86_handle_unhandled_idt(struct icpustate *__restrict state,
 	if (intno == 0xe)
 		printk(KERN_EMERG " [%%cr2=%p]", __rdcr2());
 	printk(KERN_EMERG "\n");
-#ifndef CONFIG_NO_DEBUGGER
-	if (dbg_active)
-		return state; /* Don't override the debugger return location if we're already inside. */
-#endif /* !CONFIG_NO_DEBUGGER */
 	x86_dump_ucpustate_register_state(&ustate, (PHYS pagedir_t *)__rdcr3());
 	if (THIS_TASK != &_boottask) {
 		printk(KERN_EMERG "Boot task state:\n");
@@ -240,18 +238,19 @@ x86_handle_unhandled_idt(struct icpustate *__restrict state,
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_UNHANDLED_INTERRUPT))
 		kernel_debugtrap(state, SIGBUS);
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 	{
 		struct panic_args args;
 		if (intno >= X86_INTERRUPT_PIC1_BASE)
 			X86_PIC_EOI(intno);
 		args.ecode = ecode;
 		args.intno = intno;
-		state = dbg_enter_r(&panic_uhi_dbg_main, &args, state);
+		state = dbg_enter_r(&panic_uhi_dbg_main,
+		                    &args, state);
 	}
-#else /* !CONFIG_NO_DEBUGGER */
+#else /* CONFIG_HAVE_DEBUGGER */
 	PREEMPTION_HALT();
-#endif /* CONFIG_NO_DEBUGGER */
+#endif /* !CONFIG_HAVE_DEBUGGER */
 	return state;
 }
 

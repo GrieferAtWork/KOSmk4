@@ -23,14 +23,20 @@ if (gcc_opt.remove("-O3"))
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_GDT_C
 #define GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_GDT_C 1
-#define _KOS_SOURCE 1
 #define DISABLE_BRANCH_PROFILING 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
-#include <kernel/debugger.h>
+
+#include <debugger/config.h>
 #include <kernel/gdt.h>
 
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/function.h>
+
+#include <kos/kernel/cpu-state.h>
+
+
 DECL_BEGIN
 
 INTDEF byte_t __x86_gdt_tss_lo[];
@@ -85,6 +91,6 @@ PUBLIC_CONST ATTR_DBGRODATA struct desctab const x86_dbggdt_ptr = {
 };
 
 DECL_END
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_GDT_C */

@@ -23,9 +23,11 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
+#include <debugger/function.h>
+#include <debugger/io.h>
 #include <fs/node.h>
 #include <fs/vfs.h>
-#include <kernel/debugger.h>
 #include <kernel/debugtrap.h>
 #include <kernel/driver-param.h>
 #include <kernel/driver.h>
@@ -1266,10 +1268,6 @@ driver_getshdrs(struct driver *__restrict self)
 	node = driver_getfile(self);
 	if unlikely(!node)
 		return NULL;
-#ifndef CONFIG_NO_DEBUGGER
-	if unlikely(ATOMIC_READ(dbg_active))
-		return NULL;
-#endif /* !CONFIG_NO_DEBUGGER */
 	/* Allocate the section header vector. */
 	result = (Elf_Shdr *)kmalloc(self->d_shnum * sizeof(Elf_Shdr), GFP_PREFLT);
 	TRY {
@@ -1310,10 +1308,6 @@ driver_getshstrtab(struct driver *__restrict self)
 	shdrs += self->d_shstrndx;
 	if unlikely(shdrs->sh_type == SHT_NOBITS)
 		return NULL;
-#ifndef CONFIG_NO_DEBUGGER
-	if unlikely(ATOMIC_READ(dbg_active))
-		return NULL;
-#endif /* !CONFIG_NO_DEBUGGER */
 	/* Allocate the section header string table. */
 	result = (char *)kmalloc(shdrs->sh_size + 1, GFP_PREFLT);
 	result[shdrs->sh_size] = '\0'; /* Ensure NUL-termination */
@@ -2379,12 +2373,6 @@ again_lock_sections_after_free_result:
 	    (result->ds_flags & DRIVER_DLSECTION_FOWNED)) {
 		void *base;
 		size_t num_pages;
-#ifndef CONFIG_NO_DEBUGGER
-		if unlikely(ATOMIC_READ(dbg_active)) {
-			decref(result);
-			return NULL;
-		}
-#endif /* !CONFIG_NO_DEBUGGER */
 		/* Load section into memory. */
 		num_pages = CEILDIV(sect->sh_size, pagedir_pagesize());
 		TRY {
@@ -4408,7 +4396,7 @@ DEFINE_HANDLE_REFCNT_FUNCTIONS(driver_state, struct driver_state);
 /* TODO: Other handle operators (specifically: hop()) */
 
 
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 DEFINE_DEBUG_FUNCTION(
 		"lsmod",
 		"lsmod\n"
@@ -4471,7 +4459,7 @@ DEFINE_DEBUG_FUNCTION(
 	decref_nokill(ds);
 	return 0;
 }
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 DECL_END

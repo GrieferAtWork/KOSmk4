@@ -21,30 +21,19 @@ if (gcc_opt.remove("-O3"))
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_DEBUGGER_ASMVIEW_C
-#define GUARD_KERNEL_SRC_DEBUGGER_ASMVIEW_C 1
+#ifndef GUARD_KERNEL_SRC_DEBUGGER_APPS_ASMVIEW_C
+#define GUARD_KERNEL_SRC_DEBUGGER_APPS_ASMVIEW_C 1
 #define DISABLE_BRANCH_PROFILING 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
-#include <kernel/debugger.h>
-#ifndef CONFIG_NO_DEBUGGER
-
-#undef CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER
-
-/* Use the disassembly printer to determine the length
- * of instructions, rather than making use of libdisasm.
- * In theory, this shouldn't really make a difference, but
- * in practice, there can easily occur cases where the length
- * of an instruction determined by libdisasm will differ from
- * the length determined for the same instruction by libinstrlen.
- * So to prevent inconsistencies during disassembly printing, we
- * instead always make use of the disassembly printer to provide
- * us with information about the length of an instruction. */
-#define CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER 1
-
-
+#include <debugger/config.h>
+#ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/function.h>
+#include <debugger/io.h>
+#include <debugger/rt.h>
+#include <debugger/util.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/paging.h>
@@ -62,6 +51,20 @@ if (gcc_opt.remove("-O3"))
 #include <libdebuginfo/debug_info.h>
 #include <libdisasm/disassembler.h>
 #include <libdisasm/format.h>
+
+
+#undef CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER
+
+/* Use the disassembly printer to determine the length
+ * of instructions, rather than making use of libdisasm.
+ * In theory, this shouldn't really make a difference, but
+ * in practice, there can easily occur cases where the length
+ * of an instruction determined by libdisasm will differ from
+ * the length determined for the same instruction by libinstrlen.
+ * So to prevent inconsistencies during disassembly printing, we
+ * instead always make use of the disassembly printer to provide
+ * us with information about the length of an instruction. */
+#define CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER 1
 
 #ifndef CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER
 #include <libinstrlen/instrlen.h>
@@ -721,6 +724,6 @@ DEFINE_DEBUG_FUNCTION(
 
 
 DECL_END
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
-#endif /* !GUARD_KERNEL_SRC_DEBUGGER_ASMVIEW_C */
+#endif /* !GUARD_KERNEL_SRC_DEBUGGER_APPS_ASMVIEW_C */

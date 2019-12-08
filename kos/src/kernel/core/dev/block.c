@@ -22,12 +22,14 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
+#include <debugger/function.h>
+#include <debugger/io.h>
 #include <dev/block.h>
 #include <fs/node.h>
 #include <fs/ramfs.h>
 #include <kernel/aio.h>
 #include <kernel/cache.h>
-#include <kernel/debugger.h>
 #include <kernel/driver-param.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
@@ -75,11 +77,11 @@ kernel_boot_option_handler(char *__restrict arg) {
 	REF struct basic_block_device *new_boot;
 	new_boot = block_device_lookup(arg);
 	if unlikely(!new_boot) {
-#ifdef CONFIG_NO_DEBUGGER
-		kernel_panic(FREESTR("No such boot block device %q"), arg);
-#else /* CONFIG_NO_DEBUGGER */
+#ifdef CONFIG_HAVE_DEBUGGER
 		kernel_panic(FREESTR("No such boot block device %q (use `lsblk' for detected devices)"), arg);
-#endif /* !CONFIG_NO_DEBUGGER */
+#else /* CONFIG_HAVE_DEBUGGER */
+		kernel_panic(FREESTR("No such boot block device %q"), arg);
+#endif /* !CONFIG_HAVE_DEBUGGER */
 	}
 	if (boot_partition != NULL &&
 	    boot_partition != (REF struct basic_block_device *)-1)
@@ -1527,26 +1529,26 @@ _block_device_write(struct block_device *__restrict self,
 	}
 }
 
-#ifndef CONFIG_NO_DEBUGGER
-PRIVATE void KCALL
+#ifdef CONFIG_HAVE_DEBUGGER
+PRIVATE ATTR_DBGTEXT void KCALL
 do_dump_block_device(struct basic_block_device *__restrict self) {
 	u64 total_bytes_adj = (u64)self->bd_total_bytes;
-	char const *total_bytes_name = "b";
+	char const *total_bytes_name = DBGSTR("b");
 	REF struct driver *drv;
 	if (total_bytes_adj >= 1024 * 1024 * 1024) {
 		total_bytes_adj /= 1024 * 1024 * 1024;
-		total_bytes_name = "GiB";
+		total_bytes_name = DBGSTR("GiB");
 	} else if (total_bytes_adj >= 1024 * 1024) {
 		total_bytes_adj /= 1024 * 1024;
-		total_bytes_name = "MiB";
+		total_bytes_name = DBGSTR("MiB");
 	} else if (total_bytes_adj >= 1024) {
 		total_bytes_adj /= 1024;
-		total_bytes_name = "KiB";
+		total_bytes_name = DBGSTR("KiB");
 	}
 	drv = driver_at_address(block_device_ispartition(self)
 	                        ? (void *)((struct block_device_partition *)self)->bp_master->bd_type.dt_read
 	                        : (void *)self->bd_type.dt_read);
-	dbg_printf("/dev/" DF_WHITE("%s") "\t%u:%-2u\t%s\t%I64u%s\t%I64u\t%Iu\n",
+	dbg_printf(DBGSTR("/dev/" DF_WHITE("%s") "\t%u:%-2u\t%s\t%I64u%s\t%I64u\t%Iu\n"),
 	           self->bd_name,
 	           (unsigned int)MAJOR(block_device_devno(self)),
 	           (unsigned int)MINOR(block_device_devno(self)),
@@ -1557,7 +1559,7 @@ do_dump_block_device(struct basic_block_device *__restrict self) {
 	xdecref_nokill(drv);
 }
 
-PRIVATE void KCALL
+PRIVATE ATTR_DBGTEXT void KCALL
 dump_block_device(struct basic_block_device *__restrict self) {
 again:
 	if (!block_device_ispartition(self)) {
@@ -1588,14 +1590,14 @@ DEFINE_DEBUG_FUNCTION(
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	(void)argv;
-	dbg_print("     name\tdevno\tdriver\tsize\tsectors\tsector-size\n");
+	dbg_print(DBGSTR("     name\tdevno\tdriver\tsize\tsectors\tsector-size\n"));
 	if (block_device_tree)
 		dump_block_device(block_device_tree);
 	return 0;
 }
 
 
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 DECL_END

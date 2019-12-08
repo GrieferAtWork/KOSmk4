@@ -23,8 +23,8 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/function.h>
 #include <fs/vfs.h>
-#include <kernel/debugger.h>
 
 #include <bits/param.h>
 

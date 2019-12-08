@@ -22,9 +22,10 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
+#include <debugger/entry.h>
 #include <dev/keyboard.h>
 #include <kernel/compat.h>
-#include <kernel/debugger.h>
 #include <kernel/except.h>
 #include <kernel/printk.h>
 #include <kernel/user.h>
@@ -45,7 +46,7 @@
 
 DECL_BEGIN
 
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 PUBLIC NOBLOCK bool
 NOTHROW(KCALL keyboard_device_putkey)(struct keyboard_device *__restrict self, u16 key) {
 	pflag_t was;
@@ -74,7 +75,7 @@ again_read_flags:
 	}
 	return keyboard_buffer_putkey_nopr(&self->kd_buf, key);
 }
-#endif /* CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 /* Add a given key to the keyboard user-input buffer.
  * NOTE: The caller must not pass `KEY_NONE' for `key'

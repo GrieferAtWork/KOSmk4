@@ -20,13 +20,19 @@
 #define GUARD_KERNEL_INCLUDE_DEV_KEYBOARD_H 1
 
 #include <kernel/compiler.h>
-#include <kernel/types.h>
+
+#include <debugger/config.h> /* CONFIG_HAVE_DEBUGGER */
 #include <dev/char.h>
-#include <kos/keyboard.h>
-#include <sched/signal.h>
+#include <kernel/types.h>
 #include <sched/mutex.h>
+#include <sched/signal.h>
+
+#include <kos/keyboard.h>
+
 #include <stdbool.h>
+
 #include <libkeymap/keymap.h>
+
 #ifndef CONFIG_NO_SMP
 #include <hybrid/sync/atomic-rwlock.h>
 #endif /* !CONFIG_NO_SMP */
@@ -138,13 +144,13 @@ FUNDEF NOBLOCK void NOTHROW(KCALL keyboard_device_fini)(struct keyboard_device *
  * @return: false: The buffer is already full and the key was not added. */
 FUNDEF NOBLOCK bool NOTHROW(KCALL keyboard_buffer_putkey)(struct keyboard_buffer *__restrict self, u16 key);
 FUNDEF NOBLOCK bool NOTHROW(KCALL keyboard_buffer_putkey_nopr)(struct keyboard_buffer *__restrict self, u16 key);
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 FUNDEF NOBLOCK bool NOTHROW(KCALL keyboard_device_putkey)(struct keyboard_device *__restrict self, u16 key);
 FUNDEF NOBLOCK bool NOTHROW(KCALL keyboard_device_putkey_nopr)(struct keyboard_device *__restrict self, u16 key);
-#else /* !CONFIG_NO_DEBUGGER */
+#else /* CONFIG_HAVE_DEBUGGER */
 #define keyboard_device_putkey(self, key) keyboard_buffer_putkey(&(self)->kd_buf, key)
 #define keyboard_device_putkey_nopr(self, key) keyboard_buffer_putkey_nopr(&(self)->kd_buf, key)
-#endif /* CONFIG_NO_DEBUGGER */
+#endif /* !CONFIG_HAVE_DEBUGGER */
 
 
 /* Try to read a key stroke from the given keyboard buffer.

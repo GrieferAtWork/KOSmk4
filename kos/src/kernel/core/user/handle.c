@@ -23,13 +23,14 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
+#include <debugger/function.h>
 #include <dev/block.h>
 #include <dev/char.h>
 #include <fs/file.h>
 #include <fs/node.h>
 #include <fs/pipe.h>
 #include <fs/vfs.h>
-#include <kernel/debugger.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>

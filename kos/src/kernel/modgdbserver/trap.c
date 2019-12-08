@@ -24,7 +24,9 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/debugger.h>
+#include <debugger/config.h>
+#include <debugger/io.h>
+#include <debugger/entry.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
 #include <kernel/fpu.h>
@@ -95,12 +97,12 @@ NOTHROW(FCALL GDBServer_HasStopEvent)(GDBThreadStopEvent *chain,
 #endif /* !NDEBUG */
 
 
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 PRIVATE void KCALL GDBServer_RecursiveEntryDebuggerMain(void) {
 	dbg_printf(DF_SETCOLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON)
 	           "Recursive GDB trap" DF_RESETATTR "\n");
 }
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 /* Debug trap entry points. */
@@ -170,7 +172,7 @@ do_print_message_in_nonstop_mode:
 		GDBThreadStopEvent *next_notif;
 		if (oldhost == stop_event.tse_thread) {
 			kernel_debugtraps_uninstall(&GDBServer_DebugTraps);
-#ifndef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_HAVE_DEBUGGER
 			switch (state_kind) {
 			case CPUSTATE_KIND_ICPUSTATE:
 				dbg_enter(&GDBServer_RecursiveEntryDebuggerMain, (struct icpustate *)state);
@@ -186,7 +188,7 @@ do_print_message_in_nonstop_mode:
 				dbg_enter(&GDBServer_RecursiveEntryDebuggerMain, (struct fcpustate *)state);
 			default: break;
 			}
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 			switch (state_kind) {
 			case CPUSTATE_KIND_ICPUSTATE:
 				kernel_panic((struct icpustate *)state, "Recursive GDB trap\n");

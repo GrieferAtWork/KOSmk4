@@ -20,15 +20,16 @@
 #define GUARD_KERNEL_INCLUDE_DEBUGGER_RT_H 1
 
 #include <kernel/compiler.h>
+
 #include <debugger/config.h>
 
 #ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/arch/rt.h>
 #include <kernel/paging.h>
 #include <kernel/types.h>
 
 #include <hybrid/__assert.h>
 
-#include <debugger/arch/rt.h>
 #include <kos/kernel/paging.h> /* KERNEL_DEBUG_STACKSIZE */
 
 #include <stdbool.h>

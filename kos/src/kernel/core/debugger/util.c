@@ -23,20 +23,23 @@ if (gcc_opt.remove("-O3"))
  */
 #ifndef GUARD_KERNEL_SRC_DEBUGGER_UTIL_C
 #define GUARD_KERNEL_SRC_DEBUGGER_UTIL_C 1
-#define _GNU_SOURCE 1 /* strchrnul() */
 #define DISABLE_BRANCH_PROFILING 1
+#define _GNU_SOURCE 1 /* strchrnul() */
 
 #include <kernel/compiler.h>
 
-#include <kernel/debugger.h>
-#ifndef CONFIG_NO_DEBUGGER
+#include <debugger/config.h>
+#ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/function.h>
+#include <debugger/io.h>
+#include <debugger/util.h>
 #include <kernel/addr2line.h>
 
 #include <kos/keyboard.h>
 
 #include <alloca.h>
-#include <string.h>
 #include <stdarg.h>
+#include <string.h>
 
 DECL_BEGIN
 
@@ -368,6 +371,6 @@ NOTHROW(KCALL dbg_messagebox)(char const *__restrict title,
 
 
 DECL_END
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_SRC_DEBUGGER_UTIL_C */

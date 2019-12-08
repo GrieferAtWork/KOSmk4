@@ -22,7 +22,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/debugger.h>
+#include <debugger/function.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>

@@ -1,3 +1,8 @@
+/*[[[magic
+local gcc_opt = options.setdefault("GCC.options", []);
+if (gcc_opt.remove("-O3"))
+	gcc_opt.append("-Os");
+]]]*/
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +30,8 @@
 #include <debugger/config.h>
 
 #ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/function.h>
+#include <debugger/rt.h>
 #include <kernel/breakpoint.h>
 #include <kernel/vm.h>
 
@@ -33,8 +40,6 @@
 #include <asm/cpu-flags.h>
 #include <asm/registers-compat.h>
 #include <asm/registers.h>
-#include <debugger/function.h>
-#include <debugger/rt.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
@@ -48,8 +53,8 @@
 
 DECL_BEGIN
 
-PRIVATE ATTR_DBGBSS struct fcpustate x86_dbg_origstate = {};
-PRIVATE ATTR_DBGBSS struct fcpustate x86_dbg_viewstate = {};
+INTERN ATTR_DBGBSS struct fcpustate x86_dbg_origstate = {};
+INTERN ATTR_DBGBSS struct fcpustate x86_dbg_viewstate = {};
 
 /* [0..1] The thread who's view state is currently cached
  *        in `x86_dbg_viewstate' and `x86_dbg_origstate' */

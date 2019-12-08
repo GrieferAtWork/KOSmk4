@@ -1,3 +1,8 @@
+/*[[[magic
+local gcc_opt = options.setdefault("GCC.options", []);
+if (gcc_opt.remove("-O3"))
+	gcc_opt.append("-Os");
+]]]*/
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +23,15 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_RT_C
 #define GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_RT_C 1
+#define DISABLE_BRANCH_PROFILING 1
 
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_DEBUGGER
 
+#include <debugger/function.h>
+#include <debugger/rt.h>
 #include <kernel/apic.h>
 #include <kernel/gdt.h>
 #include <kernel/types.h>
@@ -34,8 +42,6 @@
 #include <hybrid/atomic.h>
 
 #include <asm/intrin.h>
-#include <debugger/function.h>
-#include <debugger/rt.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state.h>
 

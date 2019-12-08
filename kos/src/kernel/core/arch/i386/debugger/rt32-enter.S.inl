@@ -21,12 +21,12 @@
 #define DEFINE_DBG_ENTER_ICPUSTATE 1
 #endif /* __INTELLISENSE__ */
 
+#include <debugger/entry.h>
+#include <debugger/rt.h>
 #include <kernel/apic.h>
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
-#include <debugger/entry.h>
-#include <debugger/rt.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>
 

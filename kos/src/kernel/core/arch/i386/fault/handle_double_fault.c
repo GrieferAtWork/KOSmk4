@@ -22,7 +22,10 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/debugger.h>
+#include <debugger/entry.h>
+#include <debugger/function.h>
+#include <debugger/io.h>
+#include <debugger/rt.h>
 #include <kernel/debugtrap.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
@@ -61,24 +64,30 @@ INTDEF void FCALL
 x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
                                   PHYS pagedir_t *cr3);
 
-#ifndef CONFIG_NO_DEBUGGER
-PRIVATE void KCALL
+#ifdef CONFIG_HAVE_DEBUGGER
+INTDEF struct task *x86_dbg_viewthread;
+INTDEF struct fcpustate x86_dbg_origstate;
+INTDEF struct fcpustate x86_dbg_viewstate;
+
+PRIVATE ATTR_DBGTEXT void KCALL
 panic_df_dbg_main(void *cr3) {
+	/* Inject the correct information about the CR3 register */
 	x86_dbg_exitstate.fcs_coregs.co_cr3 = (uintptr_t)cr3;
-	dbg_current = THIS_TASK;
-	/* Make sure that the current register view is updated properly! */
-	x86_dbg_setregbyid(DBG_REGLEVEL_VIEW, X86_REGISTER_CONTROL_CR3, &cr3, sizeof(cr3));
-	dbg_printf(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON, "Double fault"));
-	dbg_printf("\n"
-	           "%[vinfo:"
-	           "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
-	           "func: " DF_WHITE("%n") "\n"
-	           "addr: " DF_WHITE("%p") "\n"
-	           "]",
+	if (x86_dbg_viewthread == THIS_TASK) {
+		if (x86_dbg_viewstate.fcs_coregs.co_cr3 == x86_dbg_origstate.fcs_coregs.co_cr3)
+			x86_dbg_viewstate.fcs_coregs.co_cr3 = (uintptr_t)cr3;
+		x86_dbg_origstate.fcs_coregs.co_cr3 = (uintptr_t)cr3;
+	}
+	dbg_printf(DBGSTR(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON, "Double fault") "\n"
+	                  "%[vinfo:"
+	                  "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
+	                  "func: " DF_WHITE("%n") "\n"
+	                  "addr: " DF_WHITE("%p") "\n"
+	                  "]"),
 	           fcpustate_getpc(&x86_dbg_exitstate));
 	dbg_main(0);
 }
-#endif
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 /* Double fault handler. */
