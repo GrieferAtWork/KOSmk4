@@ -1142,15 +1142,16 @@ VGA_Putc(struct ansitty *__restrict self, char32_t ch)
 				unsigned int cur_x, num_space, max_space;
 				u16 *oldptr;
 				do {
+again_dotab:
 					oldptr = ATOMIC_READ(me->v_textptr);
 					if (oldptr >= me->v_textend) {
 						/* Scroll down */
 						if (!ATOMIC_CMPXCH(me->v_textptr, oldptr, me->v_textlline))
-							continue;
+							goto again_dotab;
 						memmovew(me->v_textbase, me->v_text2line,
 						         (me->v_textsizey - 1) * me->v_textsizex);
 						memsetw(me->v_textlline, VGA_CHR(me, ' '), me->v_textsizex);
-						continue;
+						goto again_dotab;
 					}
 					cur_x     = (oldptr - me->v_textbase) % me->v_textsizex;
 					num_space = TABSIZE - (cur_x % TABSIZE);
