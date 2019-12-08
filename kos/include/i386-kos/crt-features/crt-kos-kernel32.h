@@ -301,6 +301,7 @@
 #define __CRT_HAVE_dbg_getfunc_fuzzy 1
 #define __CRT_HAVE_dbg_getfunc_start 1
 #define __CRT_HAVE_dbg_getkey 1
+#define __CRT_HAVE_dbg_getpagedir 1
 #define __CRT_HAVE_dbg_getreg 1
 #define __CRT_HAVE_dbg_getregbyname 1
 #define __CRT_HAVE_dbg_getregbynamep 1
@@ -330,6 +331,7 @@
 #define __CRT_HAVE_dbg_putc 1
 #define __CRT_HAVE_dbg_putuni 1
 #define __CRT_HAVE_dbg_readline 1
+#define __CRT_HAVE_dbg_readmemory 1
 #define __CRT_HAVE_dbg_screen_cellsize 1
 #define __CRT_HAVE_dbg_screen_height 1
 #define __CRT_HAVE_dbg_screen_width 1
@@ -352,10 +354,12 @@
 #define __CRT_HAVE_dbg_ungetc 1
 #define __CRT_HAVE_dbg_ungetkey 1
 #define __CRT_HAVE_dbg_ungetuni 1
+#define __CRT_HAVE_dbg_verifypagedir 1
 #define __CRT_HAVE_dbg_vline 1
 #define __CRT_HAVE_dbg_vmenuf 1
 #define __CRT_HAVE_dbg_vpprintf 1
 #define __CRT_HAVE_dbg_vprintf 1
+#define __CRT_HAVE_dbg_writememory 1
 #define __CRT_HAVE_debug_dllocksections 1
 #define __CRT_HAVE_debug_dlunlocksections 1
 #define __CRT_HAVE_debug_print_filename 1
@@ -2354,10 +2358,12 @@
 #define __CRT_HAVE_x86_bootcpu_gdt 1
 #define __CRT_HAVE_x86_dbg_exitstate 1
 #define __CRT_HAVE_x86_dbg_getregbyid 1
+#define __CRT_HAVE_x86_dbg_getregbyidp 1
 #define __CRT_HAVE_x86_dbg_hostbackup 1
 #define __CRT_HAVE_x86_dbg_owner_lapicid 1
 #define __CRT_HAVE_x86_dbg_regfromname 1
 #define __CRT_HAVE_x86_dbg_setregbyid 1
+#define __CRT_HAVE_x86_dbg_setregbyidp 1
 #define __CRT_HAVE_x86_dbg_trapstate 1
 #define __CRT_HAVE_x86_dbg_trapstatekind 1
 #define __CRT_HAVE_x86_dbggdt 1

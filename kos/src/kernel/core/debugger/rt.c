@@ -24,13 +24,19 @@ if (gcc_opt.remove("-O3"))
 #ifndef GUARD_KERNEL_SRC_DEBUGGER_RT_C
 #define GUARD_KERNEL_SRC_DEBUGGER_RT_C 1
 #define DISABLE_BRANCH_PROFILING 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_DEBUGGER
+#include <kernel/vm.h>
+
+#include <hybrid/byteorder.h>
+
 #include <debugger/function.h>
 #include <debugger/rt.h>
+
 #include <string.h>
 
 DECL_BEGIN
@@ -71,8 +77,13 @@ NOTHROW(KCALL dbg_getregbynamep)(unsigned int level, char const *__restrict name
 	if (!reqlen || reqlen > sizeof(*result))
 		return false;
 	if (reqlen < sizeof(*result)) {
-		memset(result + reqlen, 0,
-		       sizeof(*result) - reqlen);
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+		memset((byte_t *)result + reqlen, 0, sizeof(*result) - reqlen);
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+		memmoveup((byte_t *)result + sizeof(*result) - reqlen,
+		          result, sizeof(*result) - reqlen);
+		memset(result, 0, sizeof(*result) - reqlen);
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 	}
 	return true;
 }
@@ -87,6 +98,7 @@ NOTHROW(KCALL dbg_setregbynamep)(unsigned int level, char const *__restrict name
 		return false;
 	return true;
 }
+
 
 
 DECL_END

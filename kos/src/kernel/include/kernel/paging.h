@@ -589,6 +589,30 @@ FUNDEF NOBLOCK ATTR_CONST WUNUSED size_t NOTHROW(KCALL pagedir_pagesize_p)(PAGED
 #endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_PAGESIZE_P */
 
 
+/* Temporarily switch to a different page directory `self'
+ * @param: self: The page directory to switch to (of type `PAGEDIR_P_SELFTYPE') */
+#ifdef __INTELLISENSE__
+#define PAGEDIR_P_BEGINUSE(self) do
+#define PAGEDIR_P_ENDUSE(self)   __WHILE0
+#else /* __INTELLISENSE__ */
+#define PAGEDIR_P_BEGINUSE(self)                              \
+	do {                                                      \
+		PAGEDIR_P_SELFTYPE _old_pdir;                         \
+		pflag_t _p_was = PREEMPTION_PUSHOFF();                \
+		assert(IS_ALIGNED((uintptr_t)(self), PAGEDIR_ALIGN)); \
+		_old_pdir = pagedir_get();                            \
+		if (_old_pdir != (self))                              \
+			pagedir_set(self);                                \
+		do
+#define PAGEDIR_P_ENDUSE(self)      \
+		__WHILE0;                   \
+		if (_old_pdir != (self))    \
+			pagedir_set(_old_pdir); \
+		PREEMPTION_POP(_p_was);     \
+	} __WHILE0
+#endif /* !__INTELLISENSE__ */
+
+
 #endif /* __CC__ */
 
 

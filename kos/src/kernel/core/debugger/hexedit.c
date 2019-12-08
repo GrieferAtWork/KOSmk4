@@ -64,51 +64,6 @@ DECL_BEGIN
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 
 
-PRIVATE ATTR_DBGTEXT bool
-NOTHROW(FCALL hd_setbyte)(void *addr, byte_t value) {
-	TRY {
-		*(byte_t *)addr = value;
-		return true;
-	} EXCEPT {
-	}
-	{
-		vm_vpage_t page;
-		page = VM_ADDR2PAGE((vm_virt_t)addr);
-		/* Try to force write-access to the associated page by directly
-		 * accessing the underlying physical memory (if there is any). */
-		if (pagedir_ismapped(page)) {
-			vm_phys_t phys;
-			phys = pagedir_translate((vm_virt_t)addr);
-			vm_writephysb(phys, value);
-			return true;
-		}
-	}
-	return false;
-}
-
-
-PRIVATE ATTR_DBGTEXT bool
-NOTHROW(FCALL hd_getbyte)(void *addr, byte_t *pvalue) {
-	TRY {
-		*pvalue = *(byte_t *)addr;
-		return true;
-	} EXCEPT {
-	}
-	{
-		vm_vpage_t page;
-		page = VM_ADDR2PAGE((vm_virt_t)addr);
-		/* Try to force write-access to the associated page by directly
-		 * accessing the underlying physical memory (if there is any). */
-		if (pagedir_ismapped(page)) {
-			vm_phys_t phys;
-			phys    = pagedir_translate((vm_virt_t)addr);
-			*pvalue = vm_readphysb(phys);
-			return true;
-		}
-	}
-	return false;
-}
-
 
 
 struct hd_change {
@@ -148,7 +103,7 @@ NOTHROW(FCALL hd_changes_commit)(void) {
 		size_t i;
 		for (i = 0; i < iter->hc_length; ++i) {
 			byte_t *addr = iter->hc_start + i;
-			if (!hd_setbyte(addr, iter->hc_data[i]))
+			if (dbg_writememory(addr, &iter->hc_data[i], 1, true) != 0)
 				result = false;
 		}
 		iter = HD_CHANGE_NEXT(iter);
@@ -244,7 +199,8 @@ NOTHROW(FCALL hd_setdata)(void *addr, unsigned int how, byte_t value) {
 	if (how == HD_SETDATA_BOTH) {
 		newval = value;
 	} else {
-		hd_getbyte(addr, &newval);
+		if (dbg_readmemory(addr, &newval, 1) != 0)
+			newval = 0;
 		hd_changes_applyto((byte_t *)addr, &newval, 1, NULL);
 		if (how == HD_SETDATA_LOW) {
 			newval &= 0x0f;
@@ -279,32 +235,21 @@ NOTHROW(FCALL dbg_calculate_linesize)(void);
  * @return: * : Bitset of valid bytes (usually 0xffff). */
 PRIVATE ATTR_DBGTEXT u64 FCALL
 hd_getline(void *start_addr, byte_t data[HD_MAXLINESIZE], u64 *pchanged) {
-	TRY {
-		COMPILER_READ_BARRIER();
-		memcpy(data, start_addr, hd_linesize);
-		COMPILER_READ_BARRIER();
-	} EXCEPT {
-		goto tryhard;
-	}
-	hd_changes_applyto((byte_t *)start_addr, data, hd_linesize, pchanged);
-	return (u64)-1;
-tryhard:
-	/* Something's wrong with the address. - Try to copy each byte individually. */
-	{
-		u64 result = (u64)-1;
+	size_t error;
+	u64 result = (u64)-1;
+	error = dbg_readmemory(start_addr, data, hd_linesize);
+	if unlikely(error != 0) {
+		/* Something's wrong with the address. - Try to copy each byte individually. */
 		unsigned int i;
 		for (i = 0; i < hd_linesize; ++i) {
-			TRY {
-				COMPILER_READ_BARRIER();
-				data[i] = ((byte_t *)start_addr)[i];
-				COMPILER_READ_BARRIER();
-			} EXCEPT {
+			error = dbg_readmemory(&((byte_t *)start_addr)[i],
+			                       &data[i], 1);
+			if (error != 0)
 				result &= ~((u64)1 << i);
-			}
 		}
-		hd_changes_applyto((byte_t *)start_addr, data, hd_linesize, pchanged);
-		return result;
 	}
+	hd_changes_applyto((byte_t *)start_addr, data, hd_linesize, pchanged);
+	return result;
 }
 
 

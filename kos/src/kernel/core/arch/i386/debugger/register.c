@@ -200,7 +200,6 @@ NOTHROW(KCALL saveorig)(void) {
 		cpuid_t cpuid;
 		struct icpustate *ist;
 		struct x86_dbg_cpuammend *ammend;
-		uintptr_t psp;
 		/* The current thread of a different CPU. */
 		cpuid  = dbg_current->t_cpu->c_id;
 		ist    = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_istate;
@@ -847,6 +846,22 @@ NOTHROW(KCALL dbg_setallregs)(unsigned int level,
 		saveorig();
 }
 
+/* Return the page directory of `dbg_current' */
+PUBLIC ATTR_PURE WUNUSED PAGEDIR_P_SELFTYPE
+NOTHROW(KCALL dbg_getpagedir)(void) {
+	uintptr_t result;
+	result = x86_dbg_getregbyidp(DBG_REGLEVEL_VIEW,
+	                             X86_REGISTER_CONTROL_CR3);
+#ifdef __INTELLISENSE__
+	PAGEDIR_P_SELFTYPE r;
+	r._m_self = (PHYS pagedir_t *)result;
+	return r;
+#else /* __INTELLISENSE__ */
+	return (PAGEDIR_P_SELFTYPE)result;
+#endif /* !__INTELLISENSE__ */
+}
+
+
 /* Get/set a register, given its (arch-specific) name
  * NOTE: When `return > buflen', then
  *       dbg_getregbyname: The contents of `buf' are undefined.
@@ -870,6 +885,32 @@ NOTHROW(KCALL dbg_setregbyname)(unsigned int level, char const *__restrict name,
 	nameid = x86_dbg_regfromname(name, namelen);
 	result = x86_dbg_setregbyid(level, nameid, buf, buflen);
 	return result;
+}
+
+
+/* Get/Set a pointer-sized register, given its ID */
+PUBLIC ATTR_PURE WUNUSED uintptr_t
+NOTHROW(KCALL x86_dbg_getregbyidp)(unsigned int level,
+                                   unsigned int regno) {
+	size_t reqlen;
+	uintptr_t result;
+	reqlen = x86_dbg_getregbyid(level, regno, &result, sizeof(result));
+	if (!reqlen || reqlen > sizeof(result))
+		return 0; /* Shouldn't happen... */
+	if (reqlen < sizeof(result))
+		memset((byte_t *)result + reqlen, 0, sizeof(result) - reqlen);
+	return result;
+}
+
+PUBLIC bool
+NOTHROW(KCALL x86_dbg_setregbyidp)(unsigned int level,
+                                   unsigned int regno,
+                                   uintptr_t value) {
+	size_t reqlen;
+	reqlen = x86_dbg_setregbyid(level, regno, &value, sizeof(value));
+	if (!reqlen || reqlen > sizeof(value))
+		return false;
+	return true;
 }
 
 

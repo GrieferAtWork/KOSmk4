@@ -23,6 +23,7 @@
 #include <debugger/config.h>
 
 #ifdef CONFIG_HAVE_DEBUGGER
+#include <kernel/paging.h>
 #include <kernel/types.h>
 
 #include <hybrid/__assert.h>
@@ -123,13 +124,19 @@ struct ucpustate;
 FUNDEF void NOTHROW(KCALL dbg_getallregs)(unsigned int level, struct fcpustate *__restrict state);
 FUNDEF void NOTHROW(KCALL dbg_setallregs)(unsigned int level, struct fcpustate const *__restrict state);
 
+/* Return the page directory of `dbg_current' */
+FUNDEF ATTR_PURE WUNUSED PAGEDIR_P_SELFTYPE NOTHROW(KCALL dbg_getpagedir)(void);
+
+/* Verify that the given page directory isn't corrupt. */
+FUNDEF ATTR_PURE WUNUSED bool NOTHROW(KCALL dbg_verifypagedir)(PAGEDIR_P_SELFTYPE pdir);
+
 /* Get/set memory in the context of `dbg_current'
  * NOTE: These functions will not make use of copy-on-write or lazy memory allocations,
  *       but will instead indicate an error, or (in when `force' is true), write directly
  *       to the physical memory backing of the underlying page directory.
  * @return: * : The number of trailing bytes that could not be copied. */
-FUNDEF size_t NOTHROW(KCALL dbg_getmemory)(void const *addr, void *__restrict buf, size_t buflen);
-FUNDEF size_t NOTHROW(KCALL dbg_setmemory)(void *addr, void const *__restrict buf, size_t buflen, bool force);
+FUNDEF size_t NOTHROW(KCALL dbg_readmemory)(void const *addr, void *__restrict buf, size_t num_bytes);
+FUNDEF size_t NOTHROW(KCALL dbg_writememory)(void *addr, void const *__restrict buf, size_t num_bytes, bool force);
 
 /* Apply changes made to `DBG_REGLEVEL_VIEW' onto `DBG_REGLEVEL_ORIG'. */
 FUNDEF void NOTHROW(FCALL dbg_applyview)(void);

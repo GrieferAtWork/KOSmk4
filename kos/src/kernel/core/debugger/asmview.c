@@ -70,6 +70,37 @@ if (gcc_opt.remove("-O3"))
 DECL_BEGIN
 
 
+
+PRIVATE ATTR_DBGTEXT bool
+NOTHROW(FCALL av_disasm_print_instruction)(struct disassembler *__restrict self) {
+	enum { MAXTEXTLEN = 128 };
+	/* This `12' must be >= the max number of remaining zero-bytes
+	 * following after any other sequence of instruction bytes.
+	 * This is used to ensure that libdisasm sees that our instruction
+	 * sequence terminates after a certain offset. */
+	enum { TEXTTAILSIZE = 12 };
+	byte_t textbuf[MAXTEXTLEN + TEXTTAILSIZE], *old_pc;
+	size_t textlen;
+	textlen = MAXTEXTLEN - dbg_readmemory(self->d_pc, textbuf, MAXTEXTLEN);
+	if (!textlen)
+		return false;
+	/* zero-fill a small tail area after the text to
+	 * ensure that instructions are terminated. */
+	memset(textbuf + textlen, 0, TEXTTAILSIZE);
+	/* Print instructions from our text buffer. */
+	old_pc          = self->d_pc;
+	self->d_pc      = textbuf;
+	self->d_baseoff = (uintptr_t)old_pc - (uintptr_t)textbuf;
+	/* Print the assembly. */
+	disasm_print_instruction(self);
+	/* Restore the proper PC value and account for distance moved. */
+	self->d_pc = old_pc + (size_t)(self->d_pc - textbuf);
+	/*self->d_baseoff = 0;*/
+	return true;
+}
+
+
+
 #ifdef CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER
 
 /* # of instructions to unwind for the purpose of
@@ -90,26 +121,23 @@ NOTHROW(LIBDISASM_CC stub_symbol_printer)(struct disassembler *__restrict UNUSED
 }
 
 PRIVATE ATTR_DBGDATA struct disassembler av_instrlen_da = {
-	.d_pc         = NULL,            /* Fill in as-needed */
-	.d_baseoff    = 0,
-	.d_printer    = &stub_printer,
-	.d_arg        = NULL,
-	.d_result     = 0,
-	.d_symbol     = &stub_symbol_printer,
-	.d_format     = NULL,
-	.d_target     = DISASSEMBLER_TARGET_CURRENT,
-	.d_flags      = DISASSEMBLER_FNOADDR | DISASSEMBLER_FNOBYTES,
-	.d_maxbytes   = 0,
+	.d_pc       = NULL,            /* Fill in as-needed */
+	.d_baseoff  = 0,
+	.d_printer  = &stub_printer,
+	.d_arg      = NULL,
+	.d_result   = 0,
+	.d_symbol   = &stub_symbol_printer,
+	.d_format   = NULL,
+	.d_target   = DISASSEMBLER_TARGET_CURRENT,
+	.d_flags    = DISASSEMBLER_FNOADDR | DISASSEMBLER_FNOBYTES,
+	.d_maxbytes = 0,
 };
 
 PRIVATE ATTR_DBGTEXT void *
 NOTHROW(FCALL av_core_instr_trysucc)(void *addr) {
 	av_instrlen_da.d_pc = (byte_t *)addr;
-	TRY {
-		disasm_print_instruction(&av_instrlen_da);
-	} EXCEPT {
+	if (!av_disasm_print_instruction(&av_instrlen_da))
 		return (byte_t *)addr + 1;
-	}
 	return av_instrlen_da.d_pc;
 }
 
@@ -160,7 +188,7 @@ NOTHROW(FCALL av_instr_pred_n)(void *addr, unsigned int n) {
 	return addr;
 }
 
-#else
+#else /* CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER */
 
 #define av_instr_succ(addr) ((void *)instruction_trysucc(addr))
 #define av_instr_pred(addr) ((void *)instruction_trypred(addr))
@@ -173,7 +201,7 @@ NOTHROW(FCALL av_instr_pred_n)(void *addr, unsigned int n) {
 	return addr;
 }
 
-#endif
+#endif /* !CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER */
 
 
 
@@ -210,26 +238,9 @@ av_format(struct disassembler *__restrict UNUSED(self), unsigned int format_opti
 	return 0;
 }
 
-PRIVATE ATTR_DBGTEXT bool
+LOCAL ATTR_DBGTEXT bool
 NOTHROW(FCALL av_getbyte)(void *addr, byte_t *pvalue) {
-	TRY {
-		*pvalue = *(byte_t *)addr;
-		return true;
-	} EXCEPT {
-	}
-	{
-		vm_vpage_t page;
-		page = VM_ADDR2PAGE((vm_virt_t)addr);
-		/* Try to force write-access to the associated page by directly
-		 * accessing the underlying physical memory (if there is any). */
-		if (pagedir_ismapped(page)) {
-			vm_phys_t phys;
-			phys    = pagedir_translate((vm_virt_t)addr);
-			*pvalue = vm_readphysb(phys);
-			return true;
-		}
-	}
-	return false;
+	return dbg_readmemory(addr, pvalue, 1) == 0;
 }
 
 
@@ -467,9 +478,7 @@ NOTHROW(FCALL av_printscreen)(void *start_addr, void **psel_addr,
 			for (; i < maxbytes; ++i)
 				dbg_print(DBGSTR("   "));
 		}
-		TRY {
-			disasm_print_instruction(&da);
-		} EXCEPT {
+		if (!av_disasm_print_instruction(&da)) {
 			dbg_print(DBGSTR("??"));
 			da.d_pc = (byte_t *)line_endaddr;
 		}

@@ -178,6 +178,12 @@ DATDEF struct desctab const x86_dbgidt_ptr;
 FUNDEF size_t NOTHROW(KCALL x86_dbg_getregbyid)(unsigned int level, unsigned int regno, void *__restrict buf, size_t buflen);
 FUNDEF size_t NOTHROW(KCALL x86_dbg_setregbyid)(unsigned int level, unsigned int regno, void const *__restrict buf, size_t buflen);
 
+/* Get/Set a pointer-sized register, given its ID */
+FUNDEF ATTR_PURE WUNUSED uintptr_t
+NOTHROW(KCALL x86_dbg_getregbyidp)(unsigned int level, unsigned int regno);
+FUNDEF bool
+NOTHROW(KCALL x86_dbg_setregbyidp)(unsigned int level, unsigned int regno, uintptr_t value);
+
 /* Return the ID (one of `X86_REGISTER_*' from <asm/registers.h>,
  * or one of `X86_DBGREGISTER_*') from a given register name. */
 FUNDEF WUNUSED ATTR_PURE NONNULL((1)) unsigned int
