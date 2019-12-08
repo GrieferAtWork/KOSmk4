@@ -132,20 +132,20 @@ INTDEF byte_t *(KCALL x86_decode_modrm)(byte_t *__restrict text, struct modrm *_
 
 
 /* @param: regno: One of `R_*' */
-INTDEF WUNUSED u8 NOTHROW(FCALL x86_icpustate_get8)(struct icpustate *__restrict state, u8 regno);
-INTDEF WUNUSED u16 NOTHROW(FCALL x86_icpustate_get16)(struct icpustate *__restrict state, u8 regno);
-INTDEF WUNUSED u32 NOTHROW(FCALL x86_icpustate_get32)(struct icpustate *__restrict state, u8 regno);
-INTDEF void NOTHROW(FCALL x86_icpustate_set8)(struct icpustate *__restrict state, u8 regno, u8 value);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) u8 NOTHROW(FCALL x86_icpustate_get8)(struct icpustate *__restrict state, u8 regno);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) u16 NOTHROW(FCALL x86_icpustate_get16)(struct icpustate *__restrict state, u8 regno);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) u32 NOTHROW(FCALL x86_icpustate_get32)(struct icpustate *__restrict state, u8 regno);
+INTDEF NONNULL((1)) void NOTHROW(FCALL x86_icpustate_set8)(struct icpustate *__restrict state, u8 regno, u8 value);
 #ifdef __x86_64__
-INTDEF void NOTHROW(FCALL x86_icpustate_set16)(struct icpustate *__restrict state, u8 regno, u16 value);
-INTDEF void NOTHROW(FCALL x86_icpustate_set32)(struct icpustate *__restrict state, u8 regno, u32 value);
-INTDEF WUNUSED u64 NOTHROW(FCALL x86_icpustate_get64)(struct icpustate *__restrict state, u8 regno);
-INTDEF void NOTHROW(FCALL x86_icpustate_set64)(struct icpustate *__restrict state, u8 regno, u64 value);
+INTDEF NONNULL((1)) void NOTHROW(FCALL x86_icpustate_set16)(struct icpustate *__restrict state, u8 regno, u16 value);
+INTDEF NONNULL((1)) void NOTHROW(FCALL x86_icpustate_set32)(struct icpustate *__restrict state, u8 regno, u32 value);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) u64 NOTHROW(FCALL x86_icpustate_get64)(struct icpustate *__restrict state, u8 regno);
+INTDEF NONNULL((1)) void NOTHROW(FCALL x86_icpustate_set64)(struct icpustate *__restrict state, u8 regno, u64 value);
 #define x86_icpustate_get(state,regno)       x86_icpustate_get64(state,regno)
 #define x86_icpustate_set(state,regno,value) x86_icpustate_set64(state,regno,value)
 #else /* __x86_64__ */
-INTDEF void FCALL x86_icpustate_set16(struct icpustate *__restrict state, u8 regno, u16 value);
-INTDEF void FCALL x86_icpustate_set32(struct icpustate *__restrict state, u8 regno, u32 value);
+INTDEF NONNULL((1)) void FCALL x86_icpustate_set16(struct icpustate *__restrict state, u8 regno, u16 value);
+INTDEF NONNULL((1)) void FCALL x86_icpustate_set32(struct icpustate *__restrict state, u8 regno, u32 value);
 #define x86_icpustate_get(state, regno)        x86_icpustate_get32(state, regno)
 #define x86_icpustate_set(state, regno, value) x86_icpustate_set32(state, regno, value)
 #endif /* !__x86_64__ */

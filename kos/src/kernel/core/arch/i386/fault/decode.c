@@ -206,13 +206,13 @@ PRIVATE u16 const x86_icpustate_64bit_offsets[] = {
 
 
 /* @param: regno: One of `R_*' */
-INTERN WUNUSED u8
+INTERN WUNUSED ATTR_PURE NONNULL((1)) u8
 NOTHROW(FCALL x86_icpustate_get8)(struct icpustate *__restrict state, u8 regno) {
 	assert(regno < COMPILER_LENOF(x86_icpustate_8bit_offsets));
 	return *(u8 *)((byte_t *)state + x86_icpustate_8bit_offsets[regno]);
 }
 
-INTERN WUNUSED u16
+INTERN WUNUSED ATTR_PURE NONNULL((1)) u16
 NOTHROW(FCALL x86_icpustate_get16)(struct icpustate *__restrict state, u8 regno) {
 #ifndef __x86_64__
 	if (EFFECTIVE_REGNO(regno) == R_ESP)
@@ -221,7 +221,7 @@ NOTHROW(FCALL x86_icpustate_get16)(struct icpustate *__restrict state, u8 regno)
 	return *(u16 *)&ACCESS_GPREG(state, regno);
 }
 
-INTERN WUNUSED u32
+INTERN WUNUSED ATTR_PURE NONNULL((1)) u32
 NOTHROW(FCALL x86_icpustate_get32)(struct icpustate *__restrict state, u8 regno) {
 #ifndef __x86_64__
 	if (EFFECTIVE_REGNO(regno) == R_ESP)
@@ -232,32 +232,32 @@ NOTHROW(FCALL x86_icpustate_get32)(struct icpustate *__restrict state, u8 regno)
 
 
 #ifdef __x86_64__
-INTERN WUNUSED u64
+INTERN WUNUSED ATTR_PURE NONNULL((1)) u64
 NOTHROW(FCALL x86_icpustate_get64)(struct icpustate *__restrict state, u8 regno) {
 	return ACCESS_GPREG(state, regno);
 }
 
-INTERN void
+INTERN NONNULL((1)) void
 NOTHROW(FCALL x86_icpustate_set64)(struct icpustate *__restrict state, u8 regno, u64 value) {
 	ACCESS_GPREG(state, regno) = (uintptr_t)value;
 }
 #endif /* __x86_64__ */
 
 
-INTERN void
+INTERN NONNULL((1)) void
 NOTHROW(FCALL x86_icpustate_set8)(struct icpustate *__restrict state, u8 regno, u8 value) {
 	assert(regno < COMPILER_LENOF(x86_icpustate_8bit_offsets));
 	*(u8 *)((byte_t *)state + x86_icpustate_8bit_offsets[regno]) = value;
 }
 
 #ifdef __x86_64__
-INTERN void
+INTERN NONNULL((1)) void
 NOTHROW(FCALL x86_icpustate_set16)(struct icpustate *__restrict state,
                                    u8 regno, u16 value) {
 	ACCESS_GPREG(state, regno) = (uintptr_t)value;
 }
 
-INTERN void
+INTERN NONNULL((1)) void
 NOTHROW(FCALL x86_icpustate_set32)(struct icpustate *__restrict state,
                                    u8 regno, u32 value) {
 	ACCESS_GPREG(state, regno) = (uintptr_t)value;

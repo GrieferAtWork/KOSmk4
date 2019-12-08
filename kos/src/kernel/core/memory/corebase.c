@@ -65,8 +65,8 @@ PRIVATE ATTR_READMOSTLY struct pending_free_part *pending_free = NULL;
 	 1)
 
 
-PRIVATE bool
-NOTHROW(KCALL corepage_hasfree)(struct vm_corepage *__restrict self) {
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(KCALL corepage_hasfree)(struct vm_corepage const *__restrict self) {
 	unsigned int i;
 	for (i = 0; i < COMPILER_LENOF(self->cp_ctrl.cpc_used) - 1; ++i) {
 		if (self->cp_ctrl.cpc_used[i] != (uintptr_t)-1)
@@ -75,8 +75,8 @@ NOTHROW(KCALL corepage_hasfree)(struct vm_corepage *__restrict self) {
 	return self->cp_ctrl.cpc_used[COMPILER_LENOF(self->cp_ctrl.cpc_used) - 1] != LAST_ALL_USED_MASK;
 }
 
-PRIVATE bool
-NOTHROW(KCALL corepage_hasused)(struct vm_corepage *__restrict self) {
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(KCALL corepage_hasused)(struct vm_corepage const *__restrict self) {
 	unsigned int i;
 	for (i = 0; i < COMPILER_LENOF(self->cp_ctrl.cpc_used); ++i) {
 		if (self->cp_ctrl.cpc_used[i] != 0)
@@ -86,7 +86,7 @@ NOTHROW(KCALL corepage_hasused)(struct vm_corepage *__restrict self) {
 }
 
 
-PRIVATE void
+PRIVATE NONNULL((1)) void
 NOTHROW(KCALL do_free_part)(void *__restrict part) {
 	struct vm_corepage *page;
 	unsigned int index, i;

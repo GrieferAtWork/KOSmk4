@@ -866,6 +866,7 @@ NOTHROW(FCALL GDBInfo_PrintFeaturesFile)(pformatprinter printer, void *arg,
 	(void)printer;
 	(void)arg;
 	(void)filename;
+	COMPILER_IMPURE();
 #ifdef HAVE_GDBFeatures_target_xml
 	if (strcmp(filename, "target.xml") == 0)
 		return (*printer)(arg, GDBFeatures_target_xml, COMPILER_STRLEN(GDBFeatures_target_xml));

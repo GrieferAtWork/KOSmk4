@@ -42,7 +42,7 @@ PUBLIC ATTR_PERVM uintptr_t thisvm_x86_dr3 = 0;
 PUBLIC ATTR_PERVM uintptr_t thisvm_x86_dr7 = 0;
 
 #define thisvm_x86_drN(n) (*thisvm_x86_drN_impl(n))
-LOCAL uintptr_t *KCALL thisvm_x86_drN_impl(unsigned int n) {
+LOCAL ATTR_CONST uintptr_t *KCALL thisvm_x86_drN_impl(unsigned int n) {
 	uintptr_t *result;
 	switch (n) {
 
@@ -64,7 +64,7 @@ LOCAL uintptr_t *KCALL thisvm_x86_drN_impl(unsigned int n) {
 	return result;
 }
 
-LOCAL uintptr_t KCALL __rddrN0123(unsigned int n) {
+LOCAL ATTR_PURE uintptr_t KCALL __rddrN0123(unsigned int n) {
 	uintptr_t result;
 	switch (n) {
 
