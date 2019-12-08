@@ -345,6 +345,8 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 	memcpy(&x86_dbg_hostbackup.dhs_except,
 	       &FORTASK(mythread, this_exception_info),
 	       sizeof(struct exception_info));
+	memset(&FORTASK(mythread, this_exception_info),
+	       0, sizeof(struct exception_info));
 	x86_dbg_hostbackup.dhs_taskself  = mythread->t_self;
 	mythread->t_self                 = mythread;
 	x86_dbg_hostbackup.dhs_taskflags = ATOMIC_FETCHOR(mythread->t_flags, TASK_FKEEPCORE);
@@ -420,8 +422,6 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 	x86_dbg_initialize_segments(mycpu, mythread);
 
 	/* Re-configure the hosting cpu/thread */
-	memset(&FORTASK(mythread, this_exception_info),
-	       0, sizeof(struct exception_info));
 	mythread->t_self = mythread;
 	ATOMIC_FETCHOR(mythread->t_flags, TASK_FKEEPCORE);
 	mycpu->c_override = mythread;

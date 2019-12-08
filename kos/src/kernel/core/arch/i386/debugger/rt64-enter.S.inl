@@ -288,7 +288,7 @@ L(.Lalready_active):
 	                        x86_dbg_exitstate_b2, x86_dbg_exitstate_b3, \
 	                        x86_dbg_exitstate_b4, x86_dbg_exitstate_b5, \
 	                        x86_dbg_exitstate_b6, x86_dbg_exitstate_b7
-	ASM_CFI_REL_OFFSET_RESTORE_FCPUSTATE(0)
+	ASM_CFI_OFFSET_RESTORE_FCPUSTATE(0)
 
 	/* Fixup control registers. */
 	movq   $(pagedir_kernel_phys), %rax

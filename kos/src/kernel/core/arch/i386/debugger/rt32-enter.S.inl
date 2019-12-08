@@ -141,8 +141,10 @@ END(DEFINE_DBG_ENTER_XCPUSTATE)
  *                       struct Xcpustate *state); */
 .section .text.cold
 PUBLIC_FUNCTION(DBG_ENTER_NAME)
-	.cfi_startproc
+	.cfi_startproc simple
 	.cfi_signal_frame
+	.cfi_def_cfa %esp, 4
+	.cfi_rel_offset %eip, 0
 	pushl_cfi_r %eax
 	pushfl_cfi_r
 	cli /* Disable interrupts */
@@ -278,7 +280,7 @@ L(.Lalready_active):
 	.cfi_escape DW_CFA_def_cfa_expression, 5
 	.cfi_escape DW_OP_addr, x86_dbg_exitstate_b0, x86_dbg_exitstate_b1, \
 	                        x86_dbg_exitstate_b2, x86_dbg_exitstate_b3
-	ASM_CFI_REL_OFFSET_RESTORE_FCPUSTATE(0)
+	ASM_CFI_OFFSET_RESTORE_FCPUSTATE(0)
 
 	/* Fixup control registers. */
 	movl   $(pagedir_kernel_phys), %eax
@@ -361,7 +363,7 @@ L(.Lalready_active):
 	/* XXX: Do some additional verification of `struct dbg_entry_info const *%ecx'
 	 *      After all: If there is anything wrong with it, we're in _deep_ troubles! */
 	movl   %ecx, %ebp
-	movl   OFFSET_DBG_ENTRY_INFO_ENTRY(%ebp), %eax
+	movl   OFFSET_DBG_ENTRY_INFO_ENTRY(%ebp), %ebx
 	movl   OFFSET_DBG_ENTRY_INFO_ARGC(%ebp), %ecx
 	testl  %ecx, %ecx
 	jz     L(.Lafter_copy_dbg_args)
@@ -370,17 +372,18 @@ L(.Lalready_active):
 	movl   %esp, %edi
 	subl   %eax, %edi
 	leal   OFFSET_DBG_ENTRY_INFO_ARGV(0)(%ebp), %esi
+	movl   %ecx, %edx /* Backup of ARGC */
 	/* Check the relation of `%edi' and `%esi' */
 	cmpl   %esi, %edi
 	ja     L(.Lcopy_args_up)   /* EDI > ESI */
 	jb     L(.Lcopy_args_down) /* EDI < ESI */
 	/* case: %esi == %edi */
 L(.Lafter_copy_dbg_args):
-	shll   $(2), %ecx  /* %ecx = ARGC * 4 */
-	subl   %ecx, %esp  /* Skip stack space for arguments */
+	shll   $(2), %edx  /* %edx = ARGC * 4 */
+	subl   %edx, %esp  /* Skip stack space for arguments */
 	EXTERN(dbg_exit)
 	pushl  $(dbg_exit) /* Return address. */
-	pushl  %eax        /* Debugger entry point. */
+	pushl  %ebx        /* Debugger entry point. */
 	jmp    L(.Ldebug_stack_setup)
 
 L(.Lcopy_args_up):    /* EDI > ESI */

@@ -77,11 +77,16 @@
 	__ASM_L(.cfi_reg_offset %gs, ((offset) + OFFSET_SGREGS_GS), reg)
 
 #ifdef __KERNEL__
+#define ASM_CFI_OFFSET_RESTORE_SGBASE(offset) \
+	__ASM_L(.cfi_offset %fs.base, ((offset) + OFFSET_SGBASE_FSBASE))
 #define ASM_CFI_REL_OFFSET_RESTORE_SGBASE(offset) \
 	__ASM_L(.cfi_rel_offset %fs.base, ((offset) + OFFSET_SGBASE_FSBASE))
 #define ASM_CFI_REG_OFFSET_RESTORE_SGBASE(offset) \
 	__ASM_L(.cfi_reg_offset %fs.base, ((offset) + OFFSET_SGBASE_FSBASE), reg)
 #else /* __KERNEL__ */
+#define ASM_CFI_OFFSET_RESTORE_SGBASE(offset)                        \
+	__ASM_L(.cfi_offset %fs.base, ((offset) + OFFSET_SGBASE_FSBASE)) \
+	__ASM_L(.cfi_offset %gs.base, ((offset) + OFFSET_SGBASE_GSBASE))
 #define ASM_CFI_REL_OFFSET_RESTORE_SGBASE(offset)                        \
 	__ASM_L(.cfi_rel_offset %fs.base, ((offset) + OFFSET_SGBASE_FSBASE)) \
 	__ASM_L(.cfi_rel_offset %gs.base, ((offset) + OFFSET_SGBASE_GSBASE))
@@ -89,6 +94,24 @@
 	__ASM_L(.cfi_reg_offset %fs.base, ((offset) + OFFSET_SGBASE_FSBASE), reg) \
 	__ASM_L(.cfi_reg_offset %gs.base, ((offset) + OFFSET_SGBASE_GSBASE), reg)
 #endif /* !__KERNEL__ */
+
+#define ASM_CFI_OFFSET_RESTORE_GPREGS(offset)                 \
+	__ASM_L(.cfi_offset %rax, ((offset) + OFFSET_GPREGS_RAX)) \
+	__ASM_L(.cfi_offset %rcx, ((offset) + OFFSET_GPREGS_RCX)) \
+	__ASM_L(.cfi_offset %rdx, ((offset) + OFFSET_GPREGS_RDX)) \
+	__ASM_L(.cfi_offset %rbx, ((offset) + OFFSET_GPREGS_RBX)) \
+	__ASM_L(.cfi_offset %rsp, ((offset) + OFFSET_GPREGS_RSP)) \
+	__ASM_L(.cfi_offset %rbp, ((offset) + OFFSET_GPREGS_RBP)) \
+	__ASM_L(.cfi_offset %rsi, ((offset) + OFFSET_GPREGS_RSI)) \
+	__ASM_L(.cfi_offset %rdi, ((offset) + OFFSET_GPREGS_RDI)) \
+	__ASM_L(.cfi_offset %r8, ((offset) + OFFSET_GPREGS_R8))   \
+	__ASM_L(.cfi_offset %r9, ((offset) + OFFSET_GPREGS_R9))   \
+	__ASM_L(.cfi_offset %r10, ((offset) + OFFSET_GPREGS_R10)) \
+	__ASM_L(.cfi_offset %r11, ((offset) + OFFSET_GPREGS_R11)) \
+	__ASM_L(.cfi_offset %r12, ((offset) + OFFSET_GPREGS_R12)) \
+	__ASM_L(.cfi_offset %r13, ((offset) + OFFSET_GPREGS_R13)) \
+	__ASM_L(.cfi_offset %r14, ((offset) + OFFSET_GPREGS_R14)) \
+	__ASM_L(.cfi_offset %r15, ((offset) + OFFSET_GPREGS_R15))
 
 #define ASM_CFI_REL_OFFSET_RESTORE_GPREGS(offset)                 \
 	__ASM_L(.cfi_rel_offset %rax, ((offset) + OFFSET_GPREGS_RAX)) \
@@ -207,6 +230,20 @@
 	__ASM_L(.cfi_reg_offset %rsp, (offset) + OFFSET_LCPUSTATE_RSP, reg) \
 	__ASM_L(.cfi_reg_offset %rbx, (offset) + OFFSET_LCPUSTATE_RBX, reg) \
 	__ASM_L(.cfi_reg_offset %rip, (offset) + OFFSET_LCPUSTATE_RIP, reg)
+
+#define ASM_CFI_OFFSET_RESTORE_FCPUSTATE(offset)                      \
+	ASM_CFI_OFFSET_RESTORE_GPREGS((offset) + OFFSET_FCPUSTATE_GPREGS) \
+	__ASM_L(.cfi_offset %rflags, (offset) + OFFSET_FCPUSTATE_RFLAGS)  \
+	__ASM_L(.cfi_offset %rip, (offset) + OFFSET_FCPUSTATE_RIP)        \
+	__ASM_L(.cfi_offset %es, (offset) + OFFSET_FCPUSTATE_ES)          \
+	__ASM_L(.cfi_offset %cs, (offset) + OFFSET_FCPUSTATE_CS)          \
+	__ASM_L(.cfi_offset %ss, (offset) + OFFSET_FCPUSTATE_SS)          \
+	__ASM_L(.cfi_offset %ds, (offset) + OFFSET_FCPUSTATE_DS)          \
+	__ASM_L(.cfi_offset %fs, (offset) + OFFSET_FCPUSTATE_FS)          \
+	__ASM_L(.cfi_offset %gs, (offset) + OFFSET_FCPUSTATE_GS)          \
+	__ASM_L(.cfi_offset %tr, (offset) + OFFSET_FCPUSTATE_TR)          \
+	__ASM_L(.cfi_offset %ldtr, (offset) + OFFSET_FCPUSTATE_LDT)       \
+	ASM_CFI_OFFSET_RESTORE_SGBASE((offset) + OFFSET_FCPUSTATE_SGBASE)
 
 #define ASM_CFI_REL_OFFSET_RESTORE_FCPUSTATE(offset)                      \
 	ASM_CFI_REL_OFFSET_RESTORE_GPREGS((offset) + OFFSET_FCPUSTATE_GPREGS) \

@@ -41,7 +41,7 @@
 	.cfi_escape DW_CFA_def_cfa_expression, 5
 	.cfi_escape DW_OP_addr, x86_dbg_exitstate_b0, x86_dbg_exitstate_b1, \
 	                        x86_dbg_exitstate_b2, x86_dbg_exitstate_b3
-	ASM_CFI_REL_OFFSET_RESTORE_FCPUSTATE(0)
+	ASM_CFI_OFFSET_RESTORE_FCPUSTATE(0)
 	nop /* For tracebacks. */
 PUBLIC_FUNCTION(dbg_exit)
 	cli

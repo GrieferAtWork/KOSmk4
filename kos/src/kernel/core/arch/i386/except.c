@@ -494,21 +494,13 @@ NOTHROW(VCALL error_printf)(char const *__restrict reason, ...) {
 }
 
 #ifdef CONFIG_HAVE_DEBUGGER
-struct panic_args {
-	unsigned int           error;
-	uintptr_t              last_pc;
-	struct exception_info *info;
-};
-
 PRIVATE ATTR_DBGTEXT void KCALL
-panic_uhe_dbg_main(void *arg) {
-	struct panic_args *args;
+panic_uhe_dbg_main(unsigned int unwind_error,
+                   uintptr_t last_pc,
+                   struct exception_info *info) {
 	unsigned int i;
 	bool is_first_pointer;
 	char const *name;
-	struct exception_info *info;
-	args = (struct panic_args *)arg;
-	info = args->info;
 	dbg_printf(DBGSTR(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON, "Unhandled exception") " "
 	                  DF_WHITE("%.4I16X") " " DF_WHITE("%.4I16X")),
 	           info->ei_class, info->ei_subclass);
@@ -548,7 +540,7 @@ panic_uhe_dbg_main(void *arg) {
 #if EXCEPT_BACKTRACE_SIZE != 0
 	{
 		uintptr_t prev_last_pc;
-		uintptr_t my_last_pc = args->last_pc;
+		uintptr_t my_last_pc = last_pc;
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i) {
 			if (!info->ei_trace[i])
 				break;
@@ -565,14 +557,14 @@ panic_uhe_dbg_main(void *arg) {
 		}
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	if (args->error == UNWIND_SUCCESS) {
+	if (unwind_error == UNWIND_SUCCESS) {
 		dbg_printf(DBGSTR("Unwinding stopped when " DF_FGCOLOR(DBG_COLOR_PURPLE, "NOTHROW")
 		                  "() function " "%[vinfo:" DF_WHITE("%n") "] was reached\n"),
-		           instruction_trypred((void const *)args->last_pc));
-	} else if (args->error != UNWIND_NO_FRAME) {
+		           instruction_trypred((void const *)last_pc));
+	} else if (unwind_error != UNWIND_NO_FRAME) {
 		dbg_printf(DBGSTR(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON, "Unwinding failed")
 		                  ": " DF_WHITE("%u") "\n"),
-		           args->error);
+		           unwind_error);
 	}
 	dbg_main(0);
 }
@@ -647,12 +639,14 @@ halt_unhandled_exception(unsigned int unwind_error,
 		kernel_debugtrap(&info->ei_state, trapno);
 	}
 	{
-		struct panic_args args;
+		STRUCT_DBG_ENTRY_INFO(3) einfo;
 		/* Enter the debugger */
-		args.error   = unwind_error;
-		args.last_pc = last_pc;
-		args.info    = info;
-		dbg_enter(&panic_uhe_dbg_main, &args, unwind_state);
+		einfo.ei_entry   = (dbg_entry_t)&panic_uhe_dbg_main;
+		einfo.ei_argc    = 3;
+		einfo.ei_argv[0] = (void *)(uintptr_t)unwind_error;
+		einfo.ei_argv[1] = (void *)last_pc;
+		einfo.ei_argv[2] = (void *)info;
+		dbg_enter((struct dbg_entry_info *)&einfo, unwind_state);
 	}
 #else /* CONFIG_HAVE_DEBUGGER */
 	kernel_panic(unwind_state, "Unhandled exception\n");
