@@ -134,6 +134,10 @@ END(sys_break6)
 .cfi_endproc
 #undef SIF
 
+/* Force `sys_break' to use the max number of registers */
+#undef __NR64RC_break
+#define __NR64RC_break __NR64FEAT_SYSCALL_REGISTER_MAX_COUNT
+
 /* Define all unimplemented system calls as weak aliases
  * of `sys_breakN', where N is the register count */
 #define __SYSINVALID_OF2(register_count) sys_break##register_count
@@ -142,6 +146,11 @@ END(sys_break6)
 	DEFINE_PUBLIC_WEAK_ALIAS(sys_##name, __SYSINVALID_OF(__NR64RC_##name))
 /* #include <asm/ls-syscalls64.h> */
 #include "../../../../../../include/i386-kos/asm/ls-syscalls64.h"
+
+/* Define the 64-bit break system call (if it wasn't already defined by <i386-kos/asm/syscalls64.def>) */
+.ifndef sys_break
+DEFINE_PUBLIC_ALIAS(sys_break, sys_break6)
+.endif /* !sys_break */
 
 
 
@@ -238,10 +247,19 @@ END(sys32_break6)
 .cfi_endproc
 #undef SIF
 
+/* Force `sys32_break' to use the max number of registers */
+#undef __NR32RC_break
+#define __NR32RC_break __NR32FEAT_SYSCALL_REGISTER_MAX_COUNT
+
 #define __SYSINVALID32_OF2(register_count) sys32_break##register_count
 #define __SYSINVALID32_OF(register_count) __SYSINVALID32_OF2(register_count)
 #define __SYSCALL(name) \
 	DEFINE_PUBLIC_WEAK_ALIAS(sys32_##name, __SYSINVALID32_OF(__NR32RC_##name))
 /* #include <asm/ls-syscalls32.h> */
 #include "../../../../../../include/i386-kos/asm/ls-syscalls32.h"
+
+/* Define the 32-bit break system call (if it wasn't already defined by <i386-kos/asm/syscalls32.def>) */
+.ifndef sys32_break
+DEFINE_PUBLIC_ALIAS(sys32_break, sys32_break6)
+.endif /* !sys32_break */
 

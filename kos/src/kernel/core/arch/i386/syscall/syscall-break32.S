@@ -87,6 +87,10 @@ INTERN_FUNCTION(sys_break6)
 END(sys_break6)
 .cfi_endproc
 
+/* Force `sys_break' to use the max number of registers */
+#undef __NR32RC_break
+#define __NR32RC_break __NR32FEAT_SYSCALL_REGISTER_MAX_COUNT
+
 /* Define all unimplemented system calls as weak aliases
  * of `sys_breakN', where N is the register count */
 #define __SYSINVALID_OF2(register_count) sys_break##register_count
@@ -94,4 +98,9 @@ END(sys_break6)
 #define __SYSCALL(name) \
 	DEFINE_PUBLIC_WEAK_ALIAS(sys_##name, __SYSINVALID_OF(__NR32RC_##name))
 #include <asm/ls-syscalls32.h>
+
+/* Define the 32-bit break system call (if it wasn't already defined by <i386-kos/asm/syscalls32.def>) */
+.ifndef sys_break
+DEFINE_PUBLIC_ALIAS(sys_break, sys_break6)
+.endif /* !sys_break */
 
