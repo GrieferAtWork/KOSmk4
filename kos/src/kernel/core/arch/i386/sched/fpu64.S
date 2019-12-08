@@ -68,7 +68,7 @@ PUBLIC_FUNCTION(x86_fpustate_init)
 	movw   $(FCW_IM | FCW_DM | FCW_ZM | FCW_OM | \
 	         FCW_UM | FCW_PM | 0x40 | \
 	         FCW_PC_EXTEND | FCW_RC_NEAREST),  \
-	       OFFSET_XFPUSTATE_FCW(%rdi)
+	       OFFSET_XFPUSTATE_FCW(%rdi) /* TODO: Remove me */
 #if OFFSET_XFPUSTATE_FCW == 0
 	.byte  0x66, 0xc7, 0x01
 #else /* OFFSET_XFPUSTATE_FCW == 0 */
@@ -80,7 +80,7 @@ PUBLIC_FUNCTION(x86_fpustate_init)
 	        FCW_PC_EXTEND | FCW_RC_NEAREST)
 
 	/* movw   $(FTW_ALLEMPTY),  OFFSET_XFPUSTATE_FTW(%rdi) */
-	movw   $(FTW_ALLEMPTY),  OFFSET_XFPUSTATE_FTW(%rdi)
+	movw   $(FTW_ALLEMPTY),  OFFSET_XFPUSTATE_FTW(%rdi) /* TODO: Remove me */
 	.byte  0x66, 0xc7, 0x41
 INTERN_FUNCTION(x86_fpustate_init_ftw_offset_byte)
 	.byte  OFFSET_XFPUSTATE_FTW
@@ -90,7 +90,7 @@ INTERN_FUNCTION(x86_fpustate_init_ftw_value)
 END(x86_fpustate_init_ftw_value)
 
 	/* movw   $(MXCSR_...),  OFFSET_XFPUSTATE_MXCSR(%rdi) */
-	movw   $(MXCSR_...),  OFFSET_XFPUSTATE_MXCSR(%rdi)
+	movw   $(0x1234),  OFFSET_XFPUSTATE_MXCSR(%rdi) /* TODO: Remove me */
 INTERN_FUNCTION(x86_fpustate_init_mxcsr)
 	.byte  0xc7, 0x41
 	.byte  OFFSET_XFPUSTATE_MXCSR
@@ -157,7 +157,7 @@ INTERN_FUNCTION(x86_fxsave_section_stmxcsr)
 END(x86_fxsave_section_stmxcsr)
 
 	/* movl $*x86_fxsave_mxcsr_mask, OFFSET_XFPUSTATE_MXCSR_MASK(%rdi) */
-	movl   $0x12345678, OFFSET_XFPUSTATE_MXCSR_MASK(%rdi)
+	movl   $0x12345678, OFFSET_XFPUSTATE_MXCSR_MASK(%rdi) /* TODO: Remove me */
 #if OFFSET_XFPUSTATE_MXCSR_MASK <= 0x7f
 	.byte  0xc7, 0x41, OFFSET_XFPUSTATE_MXCSR_MASK
 #else /* OFFSET_XFPUSTATE_MXCSR_MASK <= 0x7f */

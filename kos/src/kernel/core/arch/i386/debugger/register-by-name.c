@@ -197,13 +197,6 @@ do_pax:
 				}
 				break;
 
-			CASENOCASE('z'):
-				switch (name[0]) {
-				CASENOCASE('i'): result = X86_REGISTER_MISC_RIZ; goto done;
-				default: break;
-				}
-				break;
-
 			case '0' ... '5':
 				if (name[0] == '1') {
 					result = X86_REGISTER_GENERAL_PURPOSE_R10 + (name[1] - '0');
@@ -492,6 +485,7 @@ do_pax:
 			CASENOCASE('b'): result = X86_REGISTER_GENERAL_PURPOSE_BPL; goto done;
 			default: break;
 			}
+			break;
 
 		CASENOCASE('i'):
 			switch (name[0]) {
@@ -499,6 +493,7 @@ do_pax:
 			CASENOCASE('d'): result = X86_REGISTER_GENERAL_PURPOSE_DIL; goto done;
 			default: break;
 			}
+			break;
 
 		default: break;
 		}
