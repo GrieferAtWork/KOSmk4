@@ -34,10 +34,10 @@ __SYSDECL_BEGIN
 #define OFFSET_XFPUSTATE_FSW        OFFSET_XFPUSTATE32_FSW
 #define OFFSET_XFPUSTATE_FTW        OFFSET_XFPUSTATE32_FTW
 #define OFFSET_XFPUSTATE_FOP        OFFSET_XFPUSTATE32_FOP
-#define OFFSET_XFPUSTATE_FPUIP      OFFSET_XFPUSTATE32_FPUIP
-#define OFFSET_XFPUSTATE_FPUCS      OFFSET_XFPUSTATE32_FPUCS
-#define OFFSET_XFPUSTATE_FPUDP      OFFSET_XFPUSTATE32_FPUDP
-#define OFFSET_XFPUSTATE_FPUDS      OFFSET_XFPUSTATE32_FPUDS
+#define OFFSET_XFPUSTATE_FIP        OFFSET_XFPUSTATE32_FIP
+#define OFFSET_XFPUSTATE_FCS        OFFSET_XFPUSTATE32_FCS
+#define OFFSET_XFPUSTATE_FDP        OFFSET_XFPUSTATE32_FDP
+#define OFFSET_XFPUSTATE_FDS        OFFSET_XFPUSTATE32_FDS
 #define OFFSET_XFPUSTATE_MXCSR      OFFSET_XFPUSTATE32_MXCSR
 #define OFFSET_XFPUSTATE_MXCSR_MASK OFFSET_XFPUSTATE32_MXCSR_MASK
 #define OFFSET_XFPUSTATE_ST         OFFSET_XFPUSTATE32_ST
@@ -57,10 +57,10 @@ __SYSDECL_BEGIN
 #define OFFSET_XFPUSTATE32_FSW        2
 #define OFFSET_XFPUSTATE32_FTW        4
 #define OFFSET_XFPUSTATE32_FOP        6
-#define OFFSET_XFPUSTATE32_FPUIP      8
-#define OFFSET_XFPUSTATE32_FPUCS      12
-#define OFFSET_XFPUSTATE32_FPUDP      16
-#define OFFSET_XFPUSTATE32_FPUDS      20
+#define OFFSET_XFPUSTATE32_FIP        8
+#define OFFSET_XFPUSTATE32_FCS        12
+#define OFFSET_XFPUSTATE32_FDP        16
+#define OFFSET_XFPUSTATE32_FDS        20
 #define OFFSET_XFPUSTATE32_MXCSR      24
 #define OFFSET_XFPUSTATE32_MXCSR_MASK 28
 #define OFFSET_XFPUSTATE32_ST(i)      (32 + (i) * 16)
@@ -79,11 +79,11 @@ struct __ATTR_ALIGNED(ALIGNOF_XFPUSTATE32) xfpustate32 /*[PREFIX(fx_)]*/ {
 	__u8                      fx_ftw;        /* Compressed floating point tag word. (0 << i: FTW_EMPTY(i), 1 << i: FTW_(VALID|ZERO|SPEC)(i) (based on actually loaded value)) */
 	__u8                    __fx_pad1;       /* ... */
 	__u16                     fx_fop;        /* Lower 11-bit f.p. opcode. */
-	__u32                     fx_fpuip;      /* FPU instruction pointer. */
-	__u16                     fx_fpucs;      /* FPU code segment selector. */
+	__u32                     fx_fip;        /* FPU instruction pointer. */
+	__u16                     fx_fcs;        /* FPU code segment selector. */
 	__u16                   __fx_pad2;       /* ... */
-	__u32                     fx_fpudp;      /* FPU data pointer. */
-	__u16                     fx_fpuds;      /* FPU data segment selector. */
+	__u32                     fx_fdp;        /* FPU data pointer. */
+	__u16                     fx_fds;        /* FPU data segment selector. */
 	__u16                   __fx_pad3;       /* ... */
 	__u32                     fx_mxcsr;      /* MXCSR (SSE only) (Set of `MXCSR_') */
 	__u32                     fx_mxcsr_mask; /* MXCSR mask (SSE only) (Set of `MXCSR_', used to identify available features -- 11.6.6) */

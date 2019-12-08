@@ -369,50 +369,17 @@ NOTHROW(KCALL test_fpu64)(void) {
 }
 
 /* Convert sfpustate's FTW to xfpustate's */
-INTERN NOBLOCK u8
+INTERN ATTR_PURE NOBLOCK u8
 NOTHROW(FCALL x86_fxsave_compress_ftw)(struct sfpustate const *__restrict self) {
-	unsigned int i;
-	u16 ftw = self->fs_ftw;
-	u8 res = 0;
-	for (i = 0; i < 8; ++i) {
-		if ((ftw & FTW_MASK(i)) != FTW_EMPTY(i))
-			res |= 1 << i;
-	}
-	return res;
+	return fpustate_ftw2ftwx(self->fs_ftw);
 }
 
 /* Convert xfpustate's FTW to sfpustate's
  * NOTE: Return value is actually a `u16', but use `u32'
  *       so assembly doesn't have to movzwl the value! */
-INTERN NOBLOCK u32
+INTERN ATTR_PURE NOBLOCK u32
 NOTHROW(FCALL x86_fxsave_decompress_ftw)(struct xfpustate const *__restrict self) {
-	unsigned int i;
-	u8 ftw = self->fx_ftw;
-	u32 res = 0;
-	for (i = 0; i < 8; ++i) {
-		if (ftw & (1 << i)) {
-			/* s.a. `Table 3-45' in the Intel developer manual */
-			if (self->fx_regs[i].ieee_nan.exponent == 0x7fff) {
-				/* Special */
-				res |= FTW_SPEC(i);
-			} else if (self->fx_regs[i].ieee_nan.exponent == 0) {
-				if (self->fx_regs[i].ieee_nan.mantissa1 == 0 &&
-				    self->fx_regs[i].ieee_nan.mantissa0 == 0 &&
-					self->fx_regs[i].ieee_nan.one == 0)
-					res |= FTW_ZERO(i); /* Fraction all 0's (and j == 0) */
-				else {
-					res |= FTW_SPEC(i);
-				}
-			} else if (self->fx_regs[i].ieee_nan.one == 0) {
-				res |= FTW_SPEC(i);
-			} else {
-				res |= FTW_VALID(i);
-			}
-		} else {
-			res |= FTW_EMPTY(i);
-		}
-	}
-	return res;
+	return fpustate_ftwx2ftw(self->fx_ftw, self->fx_regs);
 }
 
 

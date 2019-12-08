@@ -29,11 +29,14 @@
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/fpu-state-helpers.h>
+#include <kos/kernel/fpu-state.h>
 #include <kos/kernel/types.h>
 #include <kos/types.h>
 
-#include <libcpustate/register.h>
 #include <string.h>
+
+#include <libcpustate/register.h>
 
 #include "register.h"
 
@@ -795,73 +798,296 @@ done:
 INTERN NONNULL((1)) size_t
 NOTHROW_NCX(CC libcpu_getreg_sfpuenv)(struct sfpuenv const *__restrict self, unsigned int regno,
                                       void *__restrict buf, size_t buflen) {
-	(void)self;
-	(void)regno;
-	(void)buf;
-	(void)buflen;
-	COMPILER_IMPURE();
-	/* TODO */
-	return 0;
+	uintptr_t value;
+	switch (regno & ~X86_REGISTER_SIZEMASK) {
+
+	case (X86_REGISTER_MISC_FCW & ~X86_REGISTER_SIZEMASK): value = self->fe_fcw; break;
+	case (X86_REGISTER_MISC_FSW & ~X86_REGISTER_SIZEMASK): value = self->fe_fsw; break;
+	case (X86_REGISTER_MISC_FTW & ~X86_REGISTER_SIZEMASK): value = self->fe_ftw; break;
+	case (X86_REGISTER_MISC_FTWX & ~X86_REGISTER_SIZEMASK): value = fpustate_ftw2ftwx(self->fe_ftw); break;
+	case (X86_REGISTER_MISC_FOP & ~X86_REGISTER_SIZEMASK): value = self->fe_fop & ((1 << 11) - 1); break;
+	case (X86_REGISTER_MISC_FIP & ~X86_REGISTER_SIZEMASK): value = self->fe_fip; break;
+	case (X86_REGISTER_MISC_FCS & ~X86_REGISTER_SIZEMASK): value = self->fe_fcs; break;
+	case (X86_REGISTER_MISC_FDP & ~X86_REGISTER_SIZEMASK): value = self->fe_fdp; break;
+	case (X86_REGISTER_MISC_FDS & ~X86_REGISTER_SIZEMASK): value = self->fe_fds; break;
+
+	default:
+		return 0;
+	}
+	return getregval(value, regno, buf, buflen);
 }
 
 INTERN NONNULL((1)) size_t
 NOTHROW_NCX(CC libcpu_setreg_sfpuenv)(struct sfpuenv *__restrict self, unsigned int regno,
                                       void const *__restrict buf, size_t buflen) {
-	(void)self;
-	(void)regno;
-	(void)buf;
-	(void)buflen;
-	COMPILER_IMPURE();
-	/* TODO */
-	return 0;
+	size_t result;
+	uintptr_t value;
+	switch (regno & X86_REGISTER_SIZEMASK) {
+
+	case X86_REGISTER_SIZEMASK_1BYTE:
+		result = 1;
+		if (buflen < 1)
+			goto done;
+		value = *(u8 *)buf;
+		break;
+
+	case X86_REGISTER_SIZEMASK_2BYTE:
+		result = 2;
+		if (buflen < 2)
+			goto done;
+		value = UNALIGNED_GET16((u16 *)buf);
+		break;
+
+	case X86_REGISTER_SIZEMASK_4BYTE:
+		result = 4;
+		if (buflen < 4)
+			goto done;
+		value = UNALIGNED_GET32((u32 *)buf);
+		break;
+
+#ifdef __x86_64__
+	case X86_REGISTER_SIZEMASK_8BYTE:
+		result = 8;
+		if (buflen < 8)
+			goto done;
+		value = UNALIGNED_GET64((u64 *)buf);
+		break;
+#endif /* __x86_64__ */
+
+	default: goto nope;
+	}
+
+	switch (regno & ~X86_REGISTER_SIZEMASK) {
+
+	case (X86_REGISTER_MISC_FCW & ~X86_REGISTER_SIZEMASK): self->fe_fcw = (u16)value; break;
+	case (X86_REGISTER_MISC_FSW & ~X86_REGISTER_SIZEMASK): self->fe_fsw = (u16)value; break;
+	case (X86_REGISTER_MISC_FTW & ~X86_REGISTER_SIZEMASK): self->fe_ftw = (u16)value; break;
+	case (X86_REGISTER_MISC_FTWX & ~X86_REGISTER_SIZEMASK):
+		if (value != fpustate_ftw2ftwx(self->fe_ftw))
+			goto nope;
+		break;
+	case (X86_REGISTER_MISC_FOP & ~X86_REGISTER_SIZEMASK): self->fe_fop = (u16)(value & ((1 << 11) - 1)); break;
+	case (X86_REGISTER_MISC_FIP & ~X86_REGISTER_SIZEMASK): self->fe_fip = (u32)value; break;
+	case (X86_REGISTER_MISC_FCS & ~X86_REGISTER_SIZEMASK): self->fe_fcs = (u16)value; break;
+	case (X86_REGISTER_MISC_FDP & ~X86_REGISTER_SIZEMASK): self->fe_fdp = (u32)value; break;
+	case (X86_REGISTER_MISC_FDS & ~X86_REGISTER_SIZEMASK): self->fe_fds = (u16)value; break;
+
+	default:
+nope:
+		return 0;
+	}
+done:
+	return result;
 }
 
 INTERN NONNULL((1)) size_t
 NOTHROW_NCX(CC libcpu_getreg_sfpustate)(struct sfpustate const *__restrict self, unsigned int regno,
                                         void *__restrict buf, size_t buflen) {
-	(void)self;
-	(void)regno;
-	(void)buf;
-	(void)buflen;
-	COMPILER_IMPURE();
-	/* TODO */
-	return 0;
+	if ((regno & X86_REGISTER_CLASSMASK) == X86_REGISTER_FLOAT &&
+	    (regno & X86_REGISTER_IDMASK) <= 7) {
+		if (buflen >= 10)
+			memcpy(buf, &self->fs_regs[regno & X86_REGISTER_IDMASK], 10);
+		return 10;
+	}
+	return libcpu_getreg_sfpuenv(&self->fs_env, regno, buf, buflen);
 }
 
 INTERN NONNULL((1)) size_t
 NOTHROW_NCX(CC libcpu_setreg_sfpustate)(struct sfpustate *__restrict self, unsigned int regno,
                                         void const *__restrict buf, size_t buflen) {
-	(void)self;
-	(void)regno;
-	(void)buf;
-	(void)buflen;
-	COMPILER_IMPURE();
-	/* TODO */
-	return 0;
+	size_t result;
+	if ((regno & X86_REGISTER_CLASSMASK) == X86_REGISTER_FLOAT &&
+	    (regno & X86_REGISTER_IDMASK) <= 7) {
+		if (buflen >= 10)
+			memcpy(&self->fs_regs[regno & X86_REGISTER_IDMASK], buf, 10);
+		return 10;
+	}
+	result = libcpu_setreg_sfpuenv(&self->fs_env, regno, buf, buflen);
+	if (result == 0 &&
+	    (regno & ~X86_REGISTER_SIZEMASK) == (X86_REGISTER_MISC_FTWX & ~X86_REGISTER_SIZEMASK)) {
+		uintptr_t value;
+		switch (regno & X86_REGISTER_SIZEMASK) {
+
+		case X86_REGISTER_SIZEMASK_1BYTE:
+			result = 1;
+			if (buflen < 1)
+				goto done;
+			value = *(u8 *)buf;
+			break;
+
+		case X86_REGISTER_SIZEMASK_2BYTE:
+			result = 2;
+			if (buflen < 2)
+				goto done;
+			value = UNALIGNED_GET16((u16 *)buf);
+			break;
+
+		case X86_REGISTER_SIZEMASK_4BYTE:
+			result = 4;
+			if (buflen < 4)
+				goto done;
+			value = UNALIGNED_GET32((u32 *)buf);
+			break;
+
+#ifdef __x86_64__
+		case X86_REGISTER_SIZEMASK_8BYTE:
+			result = 8;
+			if (buflen < 8)
+				goto done;
+			value = UNALIGNED_GET64((u64 *)buf);
+			break;
+#endif /* __x86_64__ */
+
+		default: goto done;
+		}
+		/* Decompress the register state. */
+		self->fs_ftw = fpustate_ftwx2ftw((u8)value, self->fs_regs);
+	}
+done:
+	return result;
 }
 
 INTERN NONNULL((1)) size_t
 NOTHROW_NCX(CC libcpu_getreg_xfpustate)(struct xfpustate const *__restrict self, unsigned int regno,
                                         void *__restrict buf, size_t buflen) {
-	(void)self;
-	(void)regno;
-	(void)buf;
-	(void)buflen;
-	COMPILER_IMPURE();
-	/* TODO */
-	return 0;
+	uintptr_t value;
+	switch (regno & ~X86_REGISTER_SIZEMASK) {
+
+	case (X86_REGISTER_FLOAT_ST0 & ~X86_REGISTER_SIZEMASK)...(X86_REGISTER_FLOAT_ST7 & ~X86_REGISTER_SIZEMASK):
+		if (buflen >= 10)
+			memcpy(buf, &self->fx_regs[regno & X86_REGISTER_IDMASK], 10);
+		return 10;
+
+	case (X86_REGISTER_MMX_MM0 & ~X86_REGISTER_SIZEMASK)...(X86_REGISTER_MMX_MM7 & ~X86_REGISTER_SIZEMASK):
+		if (buflen >= 16)
+			memcpy(buf, &self->fx_regs[regno & X86_REGISTER_IDMASK], 16);
+		return 16;
+
+#ifdef __x86_64__
+	case (X86_REGISTER_XMM_XMM0 & ~X86_REGISTER_SIZEMASK)...(X86_REGISTER_XMM_XMM15 & ~X86_REGISTER_SIZEMASK):
+	case (X86_REGISTER_YMM_YMM0 & ~X86_REGISTER_SIZEMASK)...(X86_REGISTER_YMM_YMM15 & ~X86_REGISTER_SIZEMASK):
+#else /* __x86_64__ */
+	case (X86_REGISTER_XMM_XMM0 & ~X86_REGISTER_SIZEMASK)...(X86_REGISTER_XMM_XMM7 & ~X86_REGISTER_SIZEMASK):
+	case (X86_REGISTER_YMM_YMM0 & ~X86_REGISTER_SIZEMASK)...(X86_REGISTER_YMM_YMM7 & ~X86_REGISTER_SIZEMASK):
+#endif /* !__x86_64__ */
+		if (buflen >= 16)
+			memcpy(buf, &self->fx_xmm[regno & X86_REGISTER_IDMASK], 16);
+		return 16;
+
+	case (X86_REGISTER_MISC_FCW & ~X86_REGISTER_SIZEMASK): value = self->fx_fcw; break;
+	case (X86_REGISTER_MISC_FSW & ~X86_REGISTER_SIZEMASK): value = self->fx_fsw; break;
+	case (X86_REGISTER_MISC_FTW & ~X86_REGISTER_SIZEMASK): value = fpustate_ftwx2ftw(self->fx_ftw, self->fx_regs); break;
+	case (X86_REGISTER_MISC_FTWX & ~X86_REGISTER_SIZEMASK): value = self->fx_ftw; break;
+	case (X86_REGISTER_MISC_FOP & ~X86_REGISTER_SIZEMASK): value = self->fx_fop & ((1 << 11) - 1); break;
+	case (X86_REGISTER_MISC_FIP & ~X86_REGISTER_SIZEMASK): value = self->fx_fip; break;
+	case (X86_REGISTER_MISC_FDP & ~X86_REGISTER_SIZEMASK): value = self->fx_fdp; break;
+#ifdef __x86_64__
+	case (X86_REGISTER_MISC_FCS & ~X86_REGISTER_SIZEMASK): value = 0; break;
+	case (X86_REGISTER_MISC_FDS & ~X86_REGISTER_SIZEMASK): value = 0; break;
+#else /* __x86_64__ */
+	case (X86_REGISTER_MISC_FCS & ~X86_REGISTER_SIZEMASK): value = self->fx_fcs; break;
+	case (X86_REGISTER_MISC_FDS & ~X86_REGISTER_SIZEMASK): value = self->fx_fds; break;
+#endif /* !__x86_64__ */
+	case (X86_REGISTER_MISC_MXCSR & ~X86_REGISTER_SIZEMASK): value = self->fx_mxcsr; break;
+	case (X86_REGISTER_MISC_MXCSR_MASK & ~X86_REGISTER_SIZEMASK): value = self->fx_mxcsr_mask; break;
+
+	default:
+		return 0;
+	}
+	return getregval(value, regno, buf, buflen);
 }
 
 INTERN NONNULL((1)) size_t
 NOTHROW_NCX(CC libcpu_setreg_xfpustate)(struct xfpustate *__restrict self, unsigned int regno,
                                         void const *__restrict buf, size_t buflen) {
-	(void)self;
-	(void)regno;
-	(void)buf;
-	(void)buflen;
-	COMPILER_IMPURE();
-	/* TODO */
-	return 0;
+	size_t result;
+	uintptr_t value;
+	switch (regno & ~X86_REGISTER_SIZEMASK) {
+
+	case (X86_REGISTER_FLOAT_ST0 & ~X86_REGISTER_SIZEMASK)...(X86_REGISTER_FLOAT_ST7 & ~X86_REGISTER_SIZEMASK):
+		if (buflen >= 10) {
+			memcpy(&self->fx_regs[regno & X86_REGISTER_IDMASK], buf, 10);
+			memset((byte_t *)&self->fx_regs[regno & X86_REGISTER_IDMASK] + 10, 0, 6);
+		}
+		return 10;
+
+	case (X86_REGISTER_MMX_MM0 & ~X86_REGISTER_SIZEMASK)...(X86_REGISTER_MMX_MM7 & ~X86_REGISTER_SIZEMASK):
+		if (buflen >= 16)
+			memcpy(&self->fx_regs[regno & X86_REGISTER_IDMASK], buf, 16);
+		return 16;
+
+#ifdef __x86_64__
+	case (X86_REGISTER_XMM_XMM0 & ~X86_REGISTER_SIZEMASK)...(X86_REGISTER_XMM_XMM15 & ~X86_REGISTER_SIZEMASK):
+	case (X86_REGISTER_YMM_YMM0 & ~X86_REGISTER_SIZEMASK)...(X86_REGISTER_YMM_YMM15 & ~X86_REGISTER_SIZEMASK):
+#else /* __x86_64__ */
+	case (X86_REGISTER_XMM_XMM0 & ~X86_REGISTER_SIZEMASK)...(X86_REGISTER_XMM_XMM7 & ~X86_REGISTER_SIZEMASK):
+	case (X86_REGISTER_YMM_YMM0 & ~X86_REGISTER_SIZEMASK)...(X86_REGISTER_YMM_YMM7 & ~X86_REGISTER_SIZEMASK):
+#endif /* !__x86_64__ */
+		if (buflen >= 16)
+			memcpy(&self->fx_xmm[regno & X86_REGISTER_IDMASK], buf, 16);
+		return 16;
+
+	default: break;
+	}
+	switch (regno & X86_REGISTER_SIZEMASK) {
+
+	case X86_REGISTER_SIZEMASK_1BYTE:
+		result = 1;
+		if (buflen < 1)
+			goto done;
+		value = *(u8 *)buf;
+		break;
+
+	case X86_REGISTER_SIZEMASK_2BYTE:
+		result = 2;
+		if (buflen < 2)
+			goto done;
+		value = UNALIGNED_GET16((u16 *)buf);
+		break;
+
+	case X86_REGISTER_SIZEMASK_4BYTE:
+		result = 4;
+		if (buflen < 4)
+			goto done;
+		value = UNALIGNED_GET32((u32 *)buf);
+		break;
+
+#ifdef __x86_64__
+	case X86_REGISTER_SIZEMASK_8BYTE:
+		result = 8;
+		if (buflen < 8)
+			goto done;
+		value = UNALIGNED_GET64((u64 *)buf);
+		break;
+#endif /* __x86_64__ */
+
+	default: goto nope;
+	}
+	switch (regno & ~X86_REGISTER_SIZEMASK) {
+
+	case (X86_REGISTER_MISC_FCW & ~X86_REGISTER_SIZEMASK): self->fx_fcw = (u16)value; break;
+	case (X86_REGISTER_MISC_FSW & ~X86_REGISTER_SIZEMASK): self->fx_fsw = (u16)value; break;
+	case (X86_REGISTER_MISC_FTW & ~X86_REGISTER_SIZEMASK): self->fx_ftw = fpustate_ftw2ftwx((u16)value); break;
+	case (X86_REGISTER_MISC_FTWX & ~X86_REGISTER_SIZEMASK): self->fx_ftw = (u8)value; break;
+	case (X86_REGISTER_MISC_FOP & ~X86_REGISTER_SIZEMASK): self->fx_fop = (u16)(value & ((1 << 11) - 1)); break;
+	case (X86_REGISTER_MISC_FIP & ~X86_REGISTER_SIZEMASK): self->fx_fip = (uintptr_t)value; break;
+	case (X86_REGISTER_MISC_FDP & ~X86_REGISTER_SIZEMASK): self->fx_fdp = (uintptr_t)value; break;
+#ifdef __x86_64__
+	case (X86_REGISTER_MISC_FCS & ~X86_REGISTER_SIZEMASK): if (value != 0) goto nope; break;
+	case (X86_REGISTER_MISC_FDS & ~X86_REGISTER_SIZEMASK): if (value != 0) goto nope; break;
+#else /* __x86_64__ */
+	case (X86_REGISTER_MISC_FCS & ~X86_REGISTER_SIZEMASK): self->fx_fcs = (u16)value; break;
+	case (X86_REGISTER_MISC_FDS & ~X86_REGISTER_SIZEMASK): self->fx_fds = (u16)value; break;
+#endif /* !__x86_64__ */
+	case (X86_REGISTER_MISC_MXCSR & ~X86_REGISTER_SIZEMASK): self->fx_mxcsr = (u32)value; break;
+	case (X86_REGISTER_MISC_MXCSR_MASK & ~X86_REGISTER_SIZEMASK): self->fx_mxcsr_mask = (u32)value; break;
+
+	default:
+nope:
+		return 0;
+	}
+done:
+	return result;
 }
 
 #ifdef __x86_64__

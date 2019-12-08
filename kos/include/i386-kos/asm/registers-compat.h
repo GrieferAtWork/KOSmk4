@@ -47,6 +47,8 @@
 #define X86_REGISTER_MISC_GSBASE          X86_REGISTER_MISC_GSBASEQ        /* %gs.base */
 #define X86_REGISTER_MISC_GDT_BASE        X86_REGISTER_MISC_GDT_BASEQ      /* %gdt.base */
 #define X86_REGISTER_MISC_IDT_BASE        X86_REGISTER_MISC_IDT_BASEQ      /* %idt.base */
+#define X86_REGISTER_MISC_FIP             X86_REGISTER_MISC_FIPQ           /* %fip */
+#define X86_REGISTER_MISC_FDP             X86_REGISTER_MISC_FDPQ           /* %fdp */
 #define X86_REGISTER_SIZEMASK_PBYTE       X86_REGISTER_SIZEMASK_8BYTE
 #else /* __x86_64__ */
 #define X86_REGISTER_GENERAL_PURPOSE_PAX  X86_REGISTER_GENERAL_PURPOSE_EAX /* %pax */
@@ -63,6 +65,8 @@
 #define X86_REGISTER_MISC_GSBASE          X86_REGISTER_MISC_GSBASEL        /* %gs.base */
 #define X86_REGISTER_MISC_GDT_BASE        X86_REGISTER_MISC_GDT_BASEL      /* %gdt.base */
 #define X86_REGISTER_MISC_IDT_BASE        X86_REGISTER_MISC_IDT_BASEL      /* %idt.base */
+#define X86_REGISTER_MISC_FIP             X86_REGISTER_MISC_FIPL           /* %fip */
+#define X86_REGISTER_MISC_FDP             X86_REGISTER_MISC_FDPL           /* %fdp */
 #define X86_REGISTER_SIZEMASK_PBYTE       X86_REGISTER_SIZEMASK_4BYTE
 #endif /* !__x86_64__ */
 

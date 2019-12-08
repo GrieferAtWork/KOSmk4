@@ -370,6 +370,17 @@ do_pax:
 		result = X86_REGISTER_FLOAT_ST0 + (name[2] - '0');
 		goto done;
 	}
+	if (namelen == 5 &&
+	    EQNOCASE(name[0], 's') &&
+	    EQNOCASE(name[1], 't') &&
+	    EQNOCASE(name[2], '(') &&
+	    /* TODO: Allow white-space as in `st ( 0 )'
+	     *                            here: ^ ^ ^ */
+	    (name[3] >= '0' && name[3] <= '7') &&
+	    EQNOCASE(name[4], ')')) {
+		result = X86_REGISTER_FLOAT_ST0 + (name[3] - '0');
+		goto done;
+	}
 	if (namelen == 3 &&
 	    EQNOCASE(name[0], 'm') &&
 	    EQNOCASE(name[1], 'm') &&
@@ -551,6 +562,112 @@ do_pax:
 				goto done;
 			}
 #endif /* __x86_64__ */
+		}
+	}
+
+	if (namelen >= 3 && EQNOCASE(name[0], 'f')) {
+		switch (name[1]) {
+
+		CASENOCASE('c'):
+			if (namelen == 3) {
+				switch (name[2]) {
+				CASENOCASE('w'): result = X86_REGISTER_MISC_FCW; goto done;
+				CASENOCASE('s'): result = X86_REGISTER_MISC_FCS; goto done;
+				default: break;
+				}
+			}
+			break;
+
+		CASENOCASE('s'):
+			if (namelen == 3) {
+				switch (name[2]) {
+				CASENOCASE('w'): result = X86_REGISTER_MISC_FSW; goto done;
+				default: break;
+				}
+			}
+			break;
+
+		CASENOCASE('t'):
+			if (EQNOCASE(name[2], 'w')) {
+				if (namelen == 3) {
+					result = X86_REGISTER_MISC_FTW;
+					goto done;
+				}
+				if (namelen == 4 && EQNOCASE(name[3], 'x')) {
+					result = X86_REGISTER_MISC_FTWX;
+					goto done;
+				}
+			}
+			break;
+
+		CASENOCASE('o'):
+			if (namelen == 3) {
+				switch (name[2]) {
+				CASENOCASE('p'): result = X86_REGISTER_MISC_FOP; goto done;
+				default: break;
+				}
+			}
+			break;
+
+		CASENOCASE('i'):
+			if (EQNOCASE(name[2], 'p')) {
+				if (namelen == 3) {
+					result = X86_REGISTER_MISC_FIP;
+					goto done;
+				}
+				if (namelen == 4) {
+					if (EQNOCASE(name[3], 'l')) {
+						result = X86_REGISTER_MISC_FIPL;
+						goto done;
+					}
+#ifdef __x86_64__
+					if (EQNOCASE(name[3], 'q')) {
+						result = X86_REGISTER_MISC_FIPQ;
+						goto done;
+					}
+#endif /* __x86_64__ */
+				}
+			}
+			break;
+
+		CASENOCASE('d'):
+			if (EQNOCASE(name[2], 'p')) {
+				if (namelen == 3) {
+					result = X86_REGISTER_MISC_FDP;
+					goto done;
+				}
+				if (namelen == 4) {
+					if (EQNOCASE(name[3], 'l')) {
+						result = X86_REGISTER_MISC_FDPL;
+						goto done;
+					}
+#ifdef __x86_64__
+					if (EQNOCASE(name[3], 'q')) {
+						result = X86_REGISTER_MISC_FDPQ;
+						goto done;
+					}
+#endif /* __x86_64__ */
+				}
+			}
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	if (namelen >= 5 && EQNOCASE(name[0], 'm') &&
+	    EQNOCASE(name[1], 'x') && EQNOCASE(name[2], 'c') &&
+	    EQNOCASE(name[3], 's') && EQNOCASE(name[4], 'r')) {
+		if (namelen == 5) {
+			result = X86_REGISTER_MISC_MXCSR;
+			goto done;
+		}
+		if (namelen == 10 && EQNOCASE(name[5], '_') &&
+		    EQNOCASE(name[6], 'm') && EQNOCASE(name[7], 'a') &&
+		    EQNOCASE(name[8], 's') && EQNOCASE(name[9], 'k')) {
+			result = X86_REGISTER_MISC_MXCSR_MASK;
+			goto done;
 		}
 	}
 #undef SKIP_LEADING_SPACE

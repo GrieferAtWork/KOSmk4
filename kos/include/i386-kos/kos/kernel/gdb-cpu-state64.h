@@ -80,10 +80,10 @@ __SYSDECL_BEGIN
 #define GDB_REGISTER_X86_64_FCW    0x20 /* fs_fcw (fctrl) */
 #define GDB_REGISTER_X86_64_FSW    0x21 /* fs_fsw (fstat) */
 #define GDB_REGISTER_X86_64_FTW    0x22 /* fs_ftw (ftag) */
-#define GDB_REGISTER_X86_64_FPUCS  0x23 /* fs_fpucs (fiseg) */
-#define GDB_REGISTER_X86_64_FPUIP  0x24 /* fs_fpuip (fioff) */
-#define GDB_REGISTER_X86_64_FPUDS  0x25 /* fs_fpuds (foseg) */
-#define GDB_REGISTER_X86_64_FPUDP  0x26 /* fs_fpudp (fooff) */
+#define GDB_REGISTER_X86_64_FPUCS  0x23 /* fs_fcs (fiseg) */
+#define GDB_REGISTER_X86_64_FPUIP  0x24 /* fs_fip (fioff) */
+#define GDB_REGISTER_X86_64_FPUDS  0x25 /* fs_fds (foseg) */
+#define GDB_REGISTER_X86_64_FPUDP  0x26 /* fs_fdp (fooff) */
 #define GDB_REGISTER_X86_64_FOP    0x27 /* fs_fop (fop) */
 #define GDB_REGISTER_X86_64_XMM0   0x28 /* %xmm0 */
 #define GDB_REGISTER_X86_64_XMM1   0x29 /* %xmm1 */

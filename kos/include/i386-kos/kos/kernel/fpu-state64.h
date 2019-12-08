@@ -34,8 +34,8 @@ __SYSDECL_BEGIN
 #define OFFSET_XFPUSTATE_FSW        OFFSET_XFPUSTATE64_FSW
 #define OFFSET_XFPUSTATE_FTW        OFFSET_XFPUSTATE64_FTW
 #define OFFSET_XFPUSTATE_FOP        OFFSET_XFPUSTATE64_FOP
-#define OFFSET_XFPUSTATE_FPUIP      OFFSET_XFPUSTATE64_FPUIP
-#define OFFSET_XFPUSTATE_FPUDP      OFFSET_XFPUSTATE64_FPUDP
+#define OFFSET_XFPUSTATE_FIP        OFFSET_XFPUSTATE64_FIP
+#define OFFSET_XFPUSTATE_FDP        OFFSET_XFPUSTATE64_FDP
 #define OFFSET_XFPUSTATE_MXCSR      OFFSET_XFPUSTATE64_MXCSR
 #define OFFSET_XFPUSTATE_MXCSR_MASK OFFSET_XFPUSTATE64_MXCSR_MASK
 #define OFFSET_XFPUSTATE_ST         OFFSET_XFPUSTATE64_ST
@@ -54,8 +54,8 @@ __SYSDECL_BEGIN
 #define OFFSET_XFPUSTATE64_FSW        2
 #define OFFSET_XFPUSTATE64_FTW        4
 #define OFFSET_XFPUSTATE64_FOP        6
-#define OFFSET_XFPUSTATE64_FPUIP      8
-#define OFFSET_XFPUSTATE64_FPUDP      16
+#define OFFSET_XFPUSTATE64_FIP        8
+#define OFFSET_XFPUSTATE64_FDP        16
 #define OFFSET_XFPUSTATE64_MXCSR      24
 #define OFFSET_XFPUSTATE64_MXCSR_MASK 28
 #define OFFSET_XFPUSTATE64_ST(i)      (32 + (i) * 16)
@@ -73,8 +73,8 @@ struct __ATTR_ALIGNED(ALIGNOF_XFPUSTATE64) xfpustate64 /*[PREFIX(fx_)]*/ {
 	__u8                      fx_ftw;        /* Compressed floating point tag word. (0 << i: FTW_EMPTY(i), 1 << i: FTW_(VALID|ZERO|SPEC)(i) (based on actually loaded value)) */
 	__u8                    __fx_pad1;       /* ... */
 	__u16                     fx_fop;        /* Lower 11-bit f.p. opcode. */
-	__u64                     fx_fpuip;      /* FPU instruction pointer. */
-	__u64                     fx_fpudp;      /* FPU data pointer. */
+	__u64                     fx_fip;        /* FPU instruction pointer. */
+	__u64                     fx_fdp;        /* FPU data pointer. */
 	__u32                     fx_mxcsr;      /* MXCSR (SSE only) (Set of `MXCSR_') */
 	__u32                     fx_mxcsr_mask; /* MXCSR mask (SSE only) (Set of `MXCSR_', used to identify available features -- 11.6.6) */
 	union ieee854_long_double fx_regs[8];    /* ST(i) / MMi */

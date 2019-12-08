@@ -72,10 +72,10 @@ __SYSDECL_BEGIN
 #define GDB_REGISTER_I386_FCW    0x18 /* fs_fcw (fctrl) */
 #define GDB_REGISTER_I386_FSW    0x19 /* fs_fsw (fstat) */
 #define GDB_REGISTER_I386_FTW    0x1a /* fs_ftw (ftag) */
-#define GDB_REGISTER_I386_FPUCS  0x1b /* fs_fpucs (fiseg) */
-#define GDB_REGISTER_I386_FPUIP  0x1c /* fs_fpuip (fioff) */
-#define GDB_REGISTER_I386_FPUDS  0x1d /* fs_fpuds (foseg) */
-#define GDB_REGISTER_I386_FPUDP  0x1e /* fs_fpudp (fooff) */
+#define GDB_REGISTER_I386_FPUCS  0x1b /* fs_fcs (fiseg) */
+#define GDB_REGISTER_I386_FPUIP  0x1c /* fs_fip (fioff) */
+#define GDB_REGISTER_I386_FPUDS  0x1d /* fs_fds (foseg) */
+#define GDB_REGISTER_I386_FPUDP  0x1e /* fs_fdp (fooff) */
 #define GDB_REGISTER_I386_FOP    0x1f /* fs_fop (fop) */
 #define GDB_REGISTER_I386_XMM0   0x20 /* %xmm0 */
 #define GDB_REGISTER_I386_XMM1   0x21 /* %xmm1 */

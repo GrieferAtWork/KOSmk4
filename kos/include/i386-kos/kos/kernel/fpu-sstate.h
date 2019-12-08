@@ -30,11 +30,11 @@ __SYSDECL_BEGIN
 #define OFFSET_SFPUENV_FCW   0
 #define OFFSET_SFPUENV_FSW   4
 #define OFFSET_SFPUENV_FTW   8
-#define OFFSET_SFPUENV_FPUIP 12
-#define OFFSET_SFPUENV_FPUCS 16
+#define OFFSET_SFPUENV_FIP   12
+#define OFFSET_SFPUENV_FCS   16
 #define OFFSET_SFPUENV_FOP   18
-#define OFFSET_SFPUENV_FPUDP 20
-#define OFFSET_SFPUENV_FPUDS 24
+#define OFFSET_SFPUENV_FDP   20
+#define OFFSET_SFPUENV_FDS   24
 #define SIZEOF_SFPUENV       28
 #define ALIGNOF_SFPUENV      4
 #ifdef __CC__
@@ -50,11 +50,11 @@ struct __ATTR_ALIGNED(ALIGNOF_SFPUENV) __ATTR_PACKED sfpuenv /*[PREFIX(fe_)]*/ {
 	__uint16_t          __fe_pad2;      /* ... */
 	__uint16_t            fe_ftw;       /* Floating point tag word. (Indicates the contents of `fs_regs' with 2 bits per register; set of `FTW_*') */
 	__uint16_t          __fe_pad3;      /* ... */
-	__uint32_t            fe_fpuip;     /* FPU instruction pointer. */
-	__uint16_t            fe_fpucs;     /* FPU code segment selector. */
+	__uint32_t            fe_fip;       /* FPU instruction pointer. */
+	__uint16_t            fe_fcs;       /* FPU code segment selector. */
 	__uint16_t            fe_fop;       /* Lower 11-bit f.p. opcode (bits 0:10). */
-	__uint32_t            fe_fpudp;     /* FPU data pointer. */
-	__uint16_t            fe_fpuds;     /* FPU data segment selector. */
+	__uint32_t            fe_fdp;       /* FPU data pointer. */
+	__uint16_t            fe_fds;       /* FPU data segment selector. */
 	__uint16_t          __fe_pad4;      /* ... */
 };
 #endif /* __CC__ */
@@ -62,16 +62,25 @@ struct __ATTR_ALIGNED(ALIGNOF_SFPUENV) __ATTR_PACKED sfpuenv /*[PREFIX(fe_)]*/ {
 #define OFFSET_SFPUSTATE_FCW   0
 #define OFFSET_SFPUSTATE_FSW   4
 #define OFFSET_SFPUSTATE_FTW   8
-#define OFFSET_SFPUSTATE_FPUIP 12
-#define OFFSET_SFPUSTATE_FPUCS 16
+#define OFFSET_SFPUSTATE_FIP   12
+#define OFFSET_SFPUSTATE_FCS   16
 #define OFFSET_SFPUSTATE_FOP   18
-#define OFFSET_SFPUSTATE_FPUDP 20
-#define OFFSET_SFPUSTATE_FPUDS 24
+#define OFFSET_SFPUSTATE_FDP   20
+#define OFFSET_SFPUSTATE_FDS   24
 #define OFFSET_SFPUSTATE_ST(i) (28 + (i) * 10)
 #define OFFSET_SFPUSTATE_MM(i) (28 + (i) * 10)
 #define SIZEOF_SFPUSTATE       108
 #define ALIGNOF_SFPUSTATE      4
 #ifdef __CC__
+#undef fs_env
+#undef fs_fcw
+#undef fs_fsw
+#undef fs_ftw
+#undef fs_fip
+#undef fs_fcs
+#undef fs_fop
+#undef fs_fdp
+#undef fs_fds
 struct __ATTR_ALIGNED(ALIGNOF_SFPUSTATE) __ATTR_PACKED sfpustate /*[PREFIX(fs_)]*/ {
 	/* FPU context structure, as described here:
 	 *   - https://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-1-manual.pdf
@@ -87,11 +96,11 @@ struct __ATTR_ALIGNED(ALIGNOF_SFPUSTATE) __ATTR_PACKED sfpustate /*[PREFIX(fs_)]
 			__uint16_t          __fs_pad2;    /* ... */
 			__uint16_t            fs_ftw;     /* Floating point tag word. (Indicates the contents of `fs_regs' with 2 bits per register; set of `FTW_*') */
 			__uint16_t          __fs_pad3;    /* ... */
-			__uint32_t            fs_fpuip;   /* FPU instruction pointer. */
-			__uint16_t            fs_fpucs;   /* FPU code segment selector. */
+			__uint32_t            fs_fip;     /* FPU instruction pointer. */
+			__uint16_t            fs_fcs;     /* FPU code segment selector. */
 			__uint16_t            fs_fop;     /* Lower 11-bit f.p. opcode (bits 0:10). */
-			__uint32_t            fs_fpudp;   /* FPU data pointer. */
-			__uint16_t            fs_fpuds;   /* FPU data segment selector. */
+			__uint32_t            fs_fdp;     /* FPU data pointer. */
+			__uint16_t            fs_fds;     /* FPU data segment selector. */
 			__uint16_t          __fs_pad4;    /* ... */
 		}
 #ifndef __COMPILER_HAVE_TRANSPARENT_STRUCT
@@ -107,34 +116,34 @@ struct __ATTR_ALIGNED(ALIGNOF_SFPUSTATE) __ATTR_PACKED sfpustate /*[PREFIX(fs_)]
 };
 
 #if !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && !defined(__COMPILER_HAVE_TRANSPARENT_UNION)
-#define fs_env   _fs_env_union.fs_env
-#define fs_fcw   _fs_env_union._fs_env_struct.fs_fcw
-#define fs_fsw   _fs_env_union._fs_env_struct.fs_fsw
-#define fs_ftw   _fs_env_union._fs_env_struct.fs_ftw
-#define fs_fpuip _fs_env_union._fs_env_struct.fs_fpuip
-#define fs_fpucs _fs_env_union._fs_env_struct.fs_fpucs
-#define fs_fop   _fs_env_union._fs_env_struct.fs_fop
-#define fs_fpudp _fs_env_union._fs_env_struct.fs_fpudp
-#define fs_fpuds _fs_env_union._fs_env_struct.fs_fpuds
+#define fs_env _fs_env_union.fs_env
+#define fs_fcw _fs_env_union._fs_env_struct.fs_fcw
+#define fs_fsw _fs_env_union._fs_env_struct.fs_fsw
+#define fs_ftw _fs_env_union._fs_env_struct.fs_ftw
+#define fs_fip _fs_env_union._fs_env_struct.fs_fip
+#define fs_fcs _fs_env_union._fs_env_struct.fs_fcs
+#define fs_fop _fs_env_union._fs_env_struct.fs_fop
+#define fs_fdp _fs_env_union._fs_env_struct.fs_fdp
+#define fs_fds _fs_env_union._fs_env_struct.fs_fds
 #elif !defined(__COMPILER_HAVE_TRANSPARENT_UNION)
-#define fs_env   _fs_env_union.fs_env
-#define fs_fcw   _fs_env_union.fs_fcw
-#define fs_fsw   _fs_env_union.fs_fsw
-#define fs_ftw   _fs_env_union.fs_ftw
-#define fs_fpuip _fs_env_union.fs_fpuip
-#define fs_fpucs _fs_env_union.fs_fpucs
-#define fs_fop   _fs_env_union.fs_fop
-#define fs_fpudp _fs_env_union.fs_fpudp
-#define fs_fpuds _fs_env_union.fs_fpuds
+#define fs_env _fs_env_union.fs_env
+#define fs_fcw _fs_env_union.fs_fcw
+#define fs_fsw _fs_env_union.fs_fsw
+#define fs_ftw _fs_env_union.fs_ftw
+#define fs_fip _fs_env_union.fs_fip
+#define fs_fcs _fs_env_union.fs_fcs
+#define fs_fop _fs_env_union.fs_fop
+#define fs_fdp _fs_env_union.fs_fdp
+#define fs_fds _fs_env_union.fs_fds
 #elif !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT)
-#define fs_fcw   _fs_env_struct.fs_fcw
-#define fs_fsw   _fs_env_struct.fs_fsw
-#define fs_ftw   _fs_env_struct.fs_ftw
-#define fs_fpuip _fs_env_struct.fs_fpuip
-#define fs_fpucs _fs_env_struct.fs_fpucs
-#define fs_fop   _fs_env_struct.fs_fop
-#define fs_fpudp _fs_env_struct.fs_fpudp
-#define fs_fpuds _fs_env_struct.fs_fpuds
+#define fs_fcw _fs_env_struct.fs_fcw
+#define fs_fsw _fs_env_struct.fs_fsw
+#define fs_ftw _fs_env_struct.fs_ftw
+#define fs_fip _fs_env_struct.fs_fip
+#define fs_fcs _fs_env_struct.fs_fcs
+#define fs_fop _fs_env_struct.fs_fop
+#define fs_fdp _fs_env_struct.fs_fdp
+#define fs_fds _fs_env_struct.fs_fds
 #endif
 
 #endif /* __CC__ */

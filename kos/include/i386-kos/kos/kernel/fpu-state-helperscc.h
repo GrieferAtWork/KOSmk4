@@ -44,10 +44,10 @@ __LOCAL void
 __NOTHROW_NCX(xfpustate64_assign_xfpustate32)(struct xfpustate64 *__restrict __self,
                                               struct xfpustate32 const *__restrict __data) {
 	/* Copy data leading up the IP/DP pointers */
-	__libc_memcpy(__self, __data, OFFSET_XFPUSTATE32_FPUIP);
+	__libc_memcpy(__self, __data, OFFSET_XFPUSTATE32_FIP);
 	/* The IP/DP pointers were changed between i386/x86_64 */
-	__self->fx_fpuip = __data->fx_fpuip;
-	__self->fx_fpudp = __data->fx_fpudp;
+	__self->fx_fip = __data->fx_fip;
+	__self->fx_fdp = __data->fx_fdp;
 	/* Copy remaining data one-on-one, but stop after XMM register #7
 	 * In 32-bit mode, only 8 XMM registers are available, so when
 	 * converting the FPU state structure, leave 64-bit mode's XMM
@@ -61,10 +61,10 @@ __LOCAL void
 __NOTHROW_NCX(xfpustate64_to_xfpustate32)(struct xfpustate64 const *__restrict __self,
                                           struct xfpustate32 *__restrict __result) {
 	__libc_memcpy(__result, __self, SIZEOF_XFPUSTATE32);
-	__result->fx_fpuip  = (__uint32_t)__self->fx_fpuip;
-	__result->fx_fpucs  = 0;
-	__result->fx_fpudp  = (__uint32_t)__self->fx_fpudp;
-	__result->fx_fpuds  = 0;
+	__result->fx_fip  = (__uint32_t)__self->fx_fip;
+	__result->fx_fcs  = 0;
+	__result->fx_fdp  = (__uint32_t)__self->fx_fdp;
+	__result->fx_fds  = 0;
 	__result->__fx_pad2 = 0;
 	__result->__fx_pad3 = 0;
 }

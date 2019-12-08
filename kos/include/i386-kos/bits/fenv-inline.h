@@ -242,11 +242,11 @@ __NOTHROW(__inline_fesetenv)(struct __fenv_struct const *__restrict __envp) {
 		__temp.fe_fsw &= ~(FSW_IE | FSW_DE | FSW_ZE | FSW_OE | FSW_UE | FSW_PE);
 		__temp.fe_fsw |= __envp->__status_word & (FSW_IE | FSW_DE | FSW_ZE | FSW_OE | FSW_UE | FSW_PE);
 	}
-	__temp.fe_fpuip = 0;
-	__temp.fe_fpucs = 0;
-	__temp.fe_fop   = 0;
-	__temp.fe_fpudp = 0;
-	__temp.fe_fpuds = 0;
+	__temp.fe_fip = 0;
+	__temp.fe_fcs = 0;
+	__temp.fe_fop = 0;
+	__temp.fe_fdp = 0;
+	__temp.fe_fds = 0;
 	__fldenv(&__temp);
 	if (__CPU_HAVE_SSE()) {
 		__UINT32_TYPE__ __mscsr;

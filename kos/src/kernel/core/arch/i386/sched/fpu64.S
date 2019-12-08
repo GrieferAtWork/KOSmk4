@@ -131,10 +131,10 @@ PUBLIC_FUNCTION(x86_fxsave)
 
 	movw   OFFSET_SFPUSTATE_FOP(%rdi), %ax
 	movw   %ax, OFFSET_XFPUSTATE_FOP(%rdi)
-	movzlq OFFSET_SFPUSTATE_FPUIP(%rdi), %rax
-	movq   %rax, OFFSET_XFPUSTATE_FPUIP(%rdi)
-	movzlq OFFSET_SFPUSTATE_FPUDP(%rdi), %rax
-	movq   %rax, OFFSET_XFPUSTATE_FPUDP(%rdi)
+	movzlq OFFSET_SFPUSTATE_FIP(%rdi), %rax
+	movq   %rax, OFFSET_XFPUSTATE_FIP(%rdi)
+	movzlq OFFSET_SFPUSTATE_FDP(%rdi), %rax
+	movq   %rax, OFFSET_XFPUSTATE_FDP(%rdi)
 
 	/* Expand %st(i) registers */
 	pushq_cfi_r %rdi
@@ -217,14 +217,14 @@ PUBLIC_FUNCTION(x86_fxrstor)
 	call   x86_fxsave_decompress_ftw
 	movq   SIZEOF_SFPUSTATE(%rsp), %rdi /* Re-load RDI */
 	movl   %eax, OFFSET_SFPUSTATE_FTW(%rsp)
-	movl   OFFSET_XFPUSTATE_FPUIP(%rdi), %eax
-	movl   %eax, OFFSET_SFPUSTATE_FPUIP(%rsp)
-	movw   $(0), OFFSET_SFPUSTATE_FPUCS(%rsp)
+	movl   OFFSET_XFPUSTATE_FIP(%rdi), %eax
+	movl   %eax, OFFSET_SFPUSTATE_FIP(%rsp)
+	movw   $(0), OFFSET_SFPUSTATE_FCS(%rsp)
 	movw   OFFSET_XFPUSTATE_FOP(%rdi), %ax
 	movw   %ax, OFFSET_SFPUSTATE_FOP(%rsp)
-	movl   OFFSET_XFPUSTATE_FPUDP(%rdi), %eax
-	movl   %eax, OFFSET_SFPUSTATE_FPUDP(%rsp)
-	movl   $(0), OFFSET_SFPUSTATE_FPUDS(%rsp)
+	movl   OFFSET_XFPUSTATE_FDP(%rdi), %eax
+	movl   %eax, OFFSET_SFPUSTATE_FDP(%rsp)
+	movl   $(0), OFFSET_SFPUSTATE_FDS(%rsp)
 
 	/* Reduce %st(i) registers */
 	leaq   OFFSET_XFPUSTATE_ST(0)(%rdi), %rsi

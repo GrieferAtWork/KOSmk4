@@ -201,7 +201,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 
 		case GDB_REGISTER_X86_64_FPUCS:
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
-				FIELD8(fpu->f_ssave.fs_fpucs);
+				FIELD8(fpu->f_ssave.fs_fcs);
 			} else {
 				GETSET8_NOOP();
 			}
@@ -209,9 +209,9 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 
 		case GDB_REGISTER_X86_64_FPUIP:
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
-				FIELD8(fpu->f_ssave.fs_fpuip);
+				FIELD8(fpu->f_ssave.fs_fip);
 			} else if (x86_fpustate_variant == FPU_STATE_XSTATE) {
-				FIELD8(fpu->f_xsave.fx_fpuip);
+				FIELD8(fpu->f_xsave.fx_fip);
 			} else {
 				GETSET8_NOOP();
 			}
@@ -219,7 +219,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 
 		case GDB_REGISTER_X86_64_FPUDS:
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
-				FIELD8(fpu->f_ssave.fs_fpuds);
+				FIELD8(fpu->f_ssave.fs_fds);
 			} else {
 				GETSET8_NOOP();
 			}
@@ -227,9 +227,9 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 
 		case GDB_REGISTER_X86_64_FPUDP:
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
-				FIELD8(fpu->f_ssave.fs_fpudp);
+				FIELD8(fpu->f_ssave.fs_fdp);
 			} else if (x86_fpustate_variant == FPU_STATE_XSTATE) {
-				FIELD8(fpu->f_xsave.fx_fpudp);
+				FIELD8(fpu->f_xsave.fx_fdp);
 			} else {
 				GETSET8_NOOP();
 			}

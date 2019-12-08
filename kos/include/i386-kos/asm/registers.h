@@ -21,23 +21,23 @@
 
 #include <hybrid/host.h>
 
-#define X86_REGISTER_NONE              0x0000 /* No/invalid register. */
+#define X86_REGISTER_NONE 0x0000 /* No/invalid register. */
 
 /* Universal masks for registers. */
-#define X86_REGISTER_IDMASK     0x03ff
-#define X86_REGISTER_SIZEMASK   0x0c00
-#define X86_REGISTER_CLASSMASK  0xf000
+#define X86_REGISTER_IDMASK    0x03ff
+#define X86_REGISTER_SIZEMASK  0x0c00
+#define X86_REGISTER_CLASSMASK 0xf000
 
 /* Return the size of a general-purpose, or misc. register. (in bytes) */
 #define X86_REGISTER_SIZEOF(x) (1 << (3 - (((x) & 0xc00) >> 14)))
-#define X86_REGISTER_SIZEMASK_1BYTE   0x0c00
-#define X86_REGISTER_SIZEMASK_2BYTE   0x0800
-#define X86_REGISTER_SIZEMASK_4BYTE   0x0400
-#define X86_REGISTER_SIZEMASK_8BYTE   0x0000
+#define X86_REGISTER_SIZEMASK_1BYTE 0x0c00
+#define X86_REGISTER_SIZEMASK_2BYTE 0x0800
+#define X86_REGISTER_SIZEMASK_4BYTE 0x0400
+#define X86_REGISTER_SIZEMASK_8BYTE 0x0000
 
 
 /* General-purpose registers. */
-#define X86_REGISTER_GENERAL_PURPOSE   0x1000
+#define X86_REGISTER_GENERAL_PURPOSE      0x1000
 #ifdef __x86_64__
 #define X86_REGISTER_GENERAL_PURPOSE_RAX  0x1000 /* %rax */
 #define X86_REGISTER_GENERAL_PURPOSE_RCX  0x1001 /* %rcx */
@@ -117,142 +117,158 @@
 
 
 /* Segment registers. */
-#define X86_REGISTER_SEGMENT           0x2000
-#   define X86_REGISTER_SEGMENT_ES     0x2800 /* %es */
-#   define X86_REGISTER_SEGMENT_CS     0x2801 /* %cs */
-#   define X86_REGISTER_SEGMENT_SS     0x2802 /* %ss */
-#   define X86_REGISTER_SEGMENT_DS     0x2803 /* %ds */
-#   define X86_REGISTER_SEGMENT_FS     0x2804 /* %fs */
-#   define X86_REGISTER_SEGMENT_GS     0x2805 /* %gs */
+#define X86_REGISTER_SEGMENT       0x2000
+#   define X86_REGISTER_SEGMENT_ES 0x2800 /* %es */
+#   define X86_REGISTER_SEGMENT_CS 0x2801 /* %cs */
+#   define X86_REGISTER_SEGMENT_SS 0x2802 /* %ss */
+#   define X86_REGISTER_SEGMENT_DS 0x2803 /* %ds */
+#   define X86_REGISTER_SEGMENT_FS 0x2804 /* %fs */
+#   define X86_REGISTER_SEGMENT_GS 0x2805 /* %gs */
 
 
 /* Control registers. */
-#define X86_REGISTER_CONTROL           0x3000
+#define X86_REGISTER_CONTROL        0x3000
 #ifdef __x86_64__
-#   define X86_REGISTER_CONTROL_CR0    0x3000 /* %cr0 */
-#   define X86_REGISTER_CONTROL_CR2    0x3002 /* %cr2 */
-#   define X86_REGISTER_CONTROL_CR3    0x3003 /* %cr3 */
-#   define X86_REGISTER_CONTROL_CR4    0x3004 /* %cr4 */
-#   define X86_REGISTER_CONTROL_CR8    0x3008 /* %cr4 */
+#   define X86_REGISTER_CONTROL_CR0 0x3000 /* %cr0 */
+#   define X86_REGISTER_CONTROL_CR2 0x3002 /* %cr2 */
+#   define X86_REGISTER_CONTROL_CR3 0x3003 /* %cr3 */
+#   define X86_REGISTER_CONTROL_CR4 0x3004 /* %cr4 */
+#   define X86_REGISTER_CONTROL_CR8 0x3008 /* %cr4 */
 #else /* __x86_64__ */
-#   define X86_REGISTER_CONTROL_CR0    0x3400 /* %cr0 */
-#   define X86_REGISTER_CONTROL_CR2    0x3402 /* %cr2 */
-#   define X86_REGISTER_CONTROL_CR3    0x3403 /* %cr3 */
-#   define X86_REGISTER_CONTROL_CR4    0x3404 /* %cr4 */
+#   define X86_REGISTER_CONTROL_CR0 0x3400 /* %cr0 */
+#   define X86_REGISTER_CONTROL_CR2 0x3402 /* %cr2 */
+#   define X86_REGISTER_CONTROL_CR3 0x3403 /* %cr3 */
+#   define X86_REGISTER_CONTROL_CR4 0x3404 /* %cr4 */
 #endif /* !__x86_64__ */
 
 /* Float registers. */
-#define X86_REGISTER_FLOAT             0x4000
-#   define X86_REGISTER_FLOAT_ST(x)   (0x4000 | ((x) & 7)) /* %st(x) */
-#   define X86_REGISTER_FLOAT_ST0      0x4000 /* %st(0) */
-#   define X86_REGISTER_FLOAT_ST1      0x4001 /* %st(1) */
-#   define X86_REGISTER_FLOAT_ST2      0x4002 /* %st(2) */
-#   define X86_REGISTER_FLOAT_ST3      0x4003 /* %st(3) */
-#   define X86_REGISTER_FLOAT_ST4      0x4004 /* %st(4) */
-#   define X86_REGISTER_FLOAT_ST5      0x4005 /* %st(5) */
-#   define X86_REGISTER_FLOAT_ST6      0x4006 /* %st(6) */
-#   define X86_REGISTER_FLOAT_ST7      0x4007 /* %st(7) */
+#define X86_REGISTER_FLOAT          0x4000
+#   define X86_REGISTER_FLOAT_ST(x) (0x4000 | ((x) & 7)) /* %st(x) */
+#   define X86_REGISTER_FLOAT_ST0   0x4000 /* %st(0) */
+#   define X86_REGISTER_FLOAT_ST1   0x4001 /* %st(1) */
+#   define X86_REGISTER_FLOAT_ST2   0x4002 /* %st(2) */
+#   define X86_REGISTER_FLOAT_ST3   0x4003 /* %st(3) */
+#   define X86_REGISTER_FLOAT_ST4   0x4004 /* %st(4) */
+#   define X86_REGISTER_FLOAT_ST5   0x4005 /* %st(5) */
+#   define X86_REGISTER_FLOAT_ST6   0x4006 /* %st(6) */
+#   define X86_REGISTER_FLOAT_ST7   0x4007 /* %st(7) */
 
 /* MMX registers. */
-#define X86_REGISTER_MMX               0x5000
-#   define X86_REGISTER_MMX_MM0        0x5000 /* %mm0 */
-#   define X86_REGISTER_MMX_MM1        0x5001 /* %mm1 */
-#   define X86_REGISTER_MMX_MM2        0x5002 /* %mm2 */
-#   define X86_REGISTER_MMX_MM3        0x5003 /* %mm3 */
-#   define X86_REGISTER_MMX_MM4        0x5004 /* %mm4 */
-#   define X86_REGISTER_MMX_MM5        0x5005 /* %mm5 */
-#   define X86_REGISTER_MMX_MM6        0x5006 /* %mm6 */
-#   define X86_REGISTER_MMX_MM7        0x5007 /* %mm7 */
+#define X86_REGISTER_MMX        0x5000
+#   define X86_REGISTER_MMX_MM0 0x5000 /* %mm0 */
+#   define X86_REGISTER_MMX_MM1 0x5001 /* %mm1 */
+#   define X86_REGISTER_MMX_MM2 0x5002 /* %mm2 */
+#   define X86_REGISTER_MMX_MM3 0x5003 /* %mm3 */
+#   define X86_REGISTER_MMX_MM4 0x5004 /* %mm4 */
+#   define X86_REGISTER_MMX_MM5 0x5005 /* %mm5 */
+#   define X86_REGISTER_MMX_MM6 0x5006 /* %mm6 */
+#   define X86_REGISTER_MMX_MM7 0x5007 /* %mm7 */
 
 /* XMM registers. */
-#define X86_REGISTER_XMM               0x6000
-#   define X86_REGISTER_XMM_XMM0       0x6000 /* %xmm0 */
-#   define X86_REGISTER_XMM_XMM1       0x6001 /* %xmm1 */
-#   define X86_REGISTER_XMM_XMM2       0x6002 /* %xmm2 */
-#   define X86_REGISTER_XMM_XMM3       0x6003 /* %xmm3 */
-#   define X86_REGISTER_XMM_XMM4       0x6004 /* %xmm4 */
-#   define X86_REGISTER_XMM_XMM5       0x6005 /* %xmm5 */
-#   define X86_REGISTER_XMM_XMM6       0x6006 /* %xmm6 */
-#   define X86_REGISTER_XMM_XMM7       0x6007 /* %xmm7 */
+#define X86_REGISTER_XMM          0x6000
+#   define X86_REGISTER_XMM_XMM0  0x6000 /* %xmm0 */
+#   define X86_REGISTER_XMM_XMM1  0x6001 /* %xmm1 */
+#   define X86_REGISTER_XMM_XMM2  0x6002 /* %xmm2 */
+#   define X86_REGISTER_XMM_XMM3  0x6003 /* %xmm3 */
+#   define X86_REGISTER_XMM_XMM4  0x6004 /* %xmm4 */
+#   define X86_REGISTER_XMM_XMM5  0x6005 /* %xmm5 */
+#   define X86_REGISTER_XMM_XMM6  0x6006 /* %xmm6 */
+#   define X86_REGISTER_XMM_XMM7  0x6007 /* %xmm7 */
 #ifdef __x86_64__
-#   define X86_REGISTER_XMM_XMM8       0x6008 /* %xmm8 */
-#   define X86_REGISTER_XMM_XMM9       0x6009 /* %xmm9 */
-#   define X86_REGISTER_XMM_XMM10      0x600a /* %xmm10 */
-#   define X86_REGISTER_XMM_XMM11      0x600b /* %xmm11 */
-#   define X86_REGISTER_XMM_XMM12      0x600c /* %xmm12 */
-#   define X86_REGISTER_XMM_XMM13      0x600d /* %xmm13 */
-#   define X86_REGISTER_XMM_XMM14      0x600e /* %xmm14 */
-#   define X86_REGISTER_XMM_XMM15      0x600f /* %xmm15 */
+#   define X86_REGISTER_XMM_XMM8  0x6008 /* %xmm8 */
+#   define X86_REGISTER_XMM_XMM9  0x6009 /* %xmm9 */
+#   define X86_REGISTER_XMM_XMM10 0x600a /* %xmm10 */
+#   define X86_REGISTER_XMM_XMM11 0x600b /* %xmm11 */
+#   define X86_REGISTER_XMM_XMM12 0x600c /* %xmm12 */
+#   define X86_REGISTER_XMM_XMM13 0x600d /* %xmm13 */
+#   define X86_REGISTER_XMM_XMM14 0x600e /* %xmm14 */
+#   define X86_REGISTER_XMM_XMM15 0x600f /* %xmm15 */
 #endif /* __x86_64__ */
 
 /* YMM registers. */
-#define X86_REGISTER_YMM               0x7000
-#   define X86_REGISTER_YMM_YMM0       0x7000 /* %ymm0 */
-#   define X86_REGISTER_YMM_YMM1       0x7001 /* %ymm1 */
-#   define X86_REGISTER_YMM_YMM2       0x7002 /* %ymm2 */
-#   define X86_REGISTER_YMM_YMM3       0x7003 /* %ymm3 */
-#   define X86_REGISTER_YMM_YMM4       0x7004 /* %ymm4 */
-#   define X86_REGISTER_YMM_YMM5       0x7005 /* %ymm5 */
-#   define X86_REGISTER_YMM_YMM6       0x7006 /* %ymm6 */
-#   define X86_REGISTER_YMM_YMM7       0x7007 /* %ymm7 */
+#define X86_REGISTER_YMM          0x7000
+#   define X86_REGISTER_YMM_YMM0  0x7000 /* %ymm0 */
+#   define X86_REGISTER_YMM_YMM1  0x7001 /* %ymm1 */
+#   define X86_REGISTER_YMM_YMM2  0x7002 /* %ymm2 */
+#   define X86_REGISTER_YMM_YMM3  0x7003 /* %ymm3 */
+#   define X86_REGISTER_YMM_YMM4  0x7004 /* %ymm4 */
+#   define X86_REGISTER_YMM_YMM5  0x7005 /* %ymm5 */
+#   define X86_REGISTER_YMM_YMM6  0x7006 /* %ymm6 */
+#   define X86_REGISTER_YMM_YMM7  0x7007 /* %ymm7 */
 #ifdef __x86_64__
-#   define X86_REGISTER_YMM_YMM8       0x7008 /* %ymm8 */
-#   define X86_REGISTER_YMM_YMM9       0x7009 /* %ymm9 */
-#   define X86_REGISTER_YMM_YMM10      0x700a /* %ymm10 */
-#   define X86_REGISTER_YMM_YMM11      0x700b /* %ymm11 */
-#   define X86_REGISTER_YMM_YMM12      0x700c /* %ymm12 */
-#   define X86_REGISTER_YMM_YMM13      0x700d /* %ymm13 */
-#   define X86_REGISTER_YMM_YMM14      0x700e /* %ymm14 */
-#   define X86_REGISTER_YMM_YMM15      0x700f /* %ymm15 */
+#   define X86_REGISTER_YMM_YMM8  0x7008 /* %ymm8 */
+#   define X86_REGISTER_YMM_YMM9  0x7009 /* %ymm9 */
+#   define X86_REGISTER_YMM_YMM10 0x700a /* %ymm10 */
+#   define X86_REGISTER_YMM_YMM11 0x700b /* %ymm11 */
+#   define X86_REGISTER_YMM_YMM12 0x700c /* %ymm12 */
+#   define X86_REGISTER_YMM_YMM13 0x700d /* %ymm13 */
+#   define X86_REGISTER_YMM_YMM14 0x700e /* %ymm14 */
+#   define X86_REGISTER_YMM_YMM15 0x700f /* %ymm15 */
 #endif /* __x86_64__ */
 
 /* Debug registers. */
-#define X86_REGISTER_DEBUG             0x8000
+#define X86_REGISTER_DEBUG        0x8000
 #ifdef __x86_64__
-#   define X86_REGISTER_DEBUG_DR0      0x8000 /* %dr0 */
-#   define X86_REGISTER_DEBUG_DR1      0x8001 /* %dr1 */
-#   define X86_REGISTER_DEBUG_DR2      0x8002 /* %dr2 */
-#   define X86_REGISTER_DEBUG_DR3      0x8003 /* %dr3 */
-#   define X86_REGISTER_DEBUG_DR6      0x8006 /* %dr6 */
-#   define X86_REGISTER_DEBUG_DR7      0x8007 /* %dr7 */
+#   define X86_REGISTER_DEBUG_DR0 0x8000 /* %dr0 */
+#   define X86_REGISTER_DEBUG_DR1 0x8001 /* %dr1 */
+#   define X86_REGISTER_DEBUG_DR2 0x8002 /* %dr2 */
+#   define X86_REGISTER_DEBUG_DR3 0x8003 /* %dr3 */
+#   define X86_REGISTER_DEBUG_DR6 0x8006 /* %dr6 */
+#   define X86_REGISTER_DEBUG_DR7 0x8007 /* %dr7 */
 #else /* __x86_64__ */
-#   define X86_REGISTER_DEBUG_DR0      0x8400 /* %dr0 */
-#   define X86_REGISTER_DEBUG_DR1      0x8401 /* %dr1 */
-#   define X86_REGISTER_DEBUG_DR2      0x8402 /* %dr2 */
-#   define X86_REGISTER_DEBUG_DR3      0x8403 /* %dr3 */
-#   define X86_REGISTER_DEBUG_DR6      0x8406 /* %dr6 */
-#   define X86_REGISTER_DEBUG_DR7      0x8407 /* %dr7 */
+#   define X86_REGISTER_DEBUG_DR0 0x8400 /* %dr0 */
+#   define X86_REGISTER_DEBUG_DR1 0x8401 /* %dr1 */
+#   define X86_REGISTER_DEBUG_DR2 0x8402 /* %dr2 */
+#   define X86_REGISTER_DEBUG_DR3 0x8403 /* %dr3 */
+#   define X86_REGISTER_DEBUG_DR6 0x8406 /* %dr6 */
+#   define X86_REGISTER_DEBUG_DR7 0x8407 /* %dr7 */
 #endif /* !__x86_64__ */
 
 /* Misc. registers. */
-#define X86_REGISTER_MISC              0xe000
-#   define X86_REGISTER_MISC_EFLAGS    0xe400 /* %eflags */
-#   define X86_REGISTER_MISC_FLAGS     0xe800 /* %flags */
-#   define X86_REGISTER_MISC_EIP       0xe401 /* %eip */
-#   define X86_REGISTER_MISC_IP        0xe801 /* %ip */
+#define X86_REGISTER_MISC               0xe000
+#   define X86_REGISTER_MISC_EFLAGS     0xe400 /* %eflags */
+#   define X86_REGISTER_MISC_FLAGS      0xe800 /* %flags */
+#   define X86_REGISTER_MISC_EIP        0xe401 /* %eip */
+#   define X86_REGISTER_MISC_IP         0xe801 /* %ip */
 #ifdef __x86_64__
-#   define X86_REGISTER_MISC_RFLAGS    0xe000 /* %rflags */
-#   define X86_REGISTER_MISC_RIP       0xe001 /* %rip */
+#   define X86_REGISTER_MISC_RFLAGS     0xe000 /* %rflags */
+#   define X86_REGISTER_MISC_RIP        0xe001 /* %rip */
 #endif /* __x86_64__ */
-#   define X86_REGISTER_MISC_TR        0xe810 /* %tr (ltr, str; TaskRegister) */
-#   define X86_REGISTER_MISC_LDT       0xe811 /* %ldt (lldt, sldt; LocalDescriptorTable) */
-#   define X86_REGISTER_MISC_GDT_LIMIT 0xe812 /* %gdt.limit (lgdt, sgdt; GlobalDescriptorTable) */
-#   define X86_REGISTER_MISC_GDT_BASEL 0xe413 /* %gdt.basel (lgdt, sgdt; GlobalDescriptorTable) */
-#   define X86_REGISTER_MISC_IDT_LIMIT 0xe814 /* %idt.limit (lidt, sidt; InterruptDescriptorTable) */
-#   define X86_REGISTER_MISC_IDT_BASEL 0xe415 /* %idt.basel (lidt, sidt; InterruptDescriptorTable) */
+#   define X86_REGISTER_MISC_TR         0xe810 /* %tr (ltr, str; TaskRegister) */
+#   define X86_REGISTER_MISC_LDT        0xe811 /* %ldt (lldt, sldt; LocalDescriptorTable) */
+#   define X86_REGISTER_MISC_GDT_LIMIT  0xe812 /* %gdt.limit (lgdt, sgdt; GlobalDescriptorTable) */
+#   define X86_REGISTER_MISC_GDT_BASEL  0xe413 /* %gdt.basel (lgdt, sgdt; GlobalDescriptorTable) */
+#   define X86_REGISTER_MISC_IDT_LIMIT  0xe814 /* %idt.limit (lidt, sidt; InterruptDescriptorTable) */
+#   define X86_REGISTER_MISC_IDT_BASEL  0xe415 /* %idt.basel (lidt, sidt; InterruptDescriptorTable) */
 #ifdef __x86_64__
-#   define X86_REGISTER_MISC_GDT_BASEQ 0xe013 /* %gdt.baseq (lgdt, sgdt; GlobalDescriptorTable) */
-#   define X86_REGISTER_MISC_IDT_BASEQ 0xe015 /* %idt.baseq (lidt, sidt; InterruptDescriptorTable) */
+#   define X86_REGISTER_MISC_GDT_BASEQ  0xe013 /* %gdt.baseq (lgdt, sgdt; GlobalDescriptorTable) */
+#   define X86_REGISTER_MISC_IDT_BASEQ  0xe015 /* %idt.baseq (lidt, sidt; InterruptDescriptorTable) */
 #endif /* __x86_64__ */
-#   define X86_REGISTER_MISC_FSBASEL   0xe420 /* %fs.basel */
-#   define X86_REGISTER_MISC_GSBASEL   0xe421 /* %gs.basel */
+#   define X86_REGISTER_MISC_FSBASEL    0xe420 /* %fs.basel */
+#   define X86_REGISTER_MISC_GSBASEL    0xe421 /* %gs.basel */
 #ifdef __x86_64__
-#   define X86_REGISTER_MISC_FSBASEQ   0xe020 /* %fs.baseq */
-#   define X86_REGISTER_MISC_GSBASEQ   0xe021 /* %gs.baseq */
+#   define X86_REGISTER_MISC_FSBASEQ    0xe020 /* %fs.baseq */
+#   define X86_REGISTER_MISC_GSBASEQ    0xe021 /* %gs.baseq */
 #endif /* __x86_64__ */
+#   define X86_REGISTER_MISC_FCW        0xe830 /* %fcw (FpuControlWord; `sfpuenv::fe_fcw,sfpustate::fs_fcw,xfpustate::fx_fcw') */
+#   define X86_REGISTER_MISC_FSW        0xe831 /* %fsw (FpuStatusWord; `sfpuenv::fe_fsw,sfpustate::fs_fsw,xfpustate::fx_fsw') */
+#   define X86_REGISTER_MISC_FTW        0xe832 /* %ftw (FpuTagWord; `sfpuenv::fe_ftw,sfpustate::fs_ftw') */
+#   define X86_REGISTER_MISC_FTWX       0xec33 /* %ftwx (FpuTagWordX; `xfpustate::fx_ftw') */
+#   define X86_REGISTER_MISC_FOP        0xe834 /* %fop (FpuOPcode; `sfpuenv::fe_fop,sfpustate::fs_fop,xfpustate::fx_fop')
+                                                * NOTE: actually an 11-bit register */
+#   define X86_REGISTER_MISC_FIPL       0xe435 /* %fipl (FpuInstructionPointer; `sfpuenv::fe_fip,sfpustate::fs_fip,xfpustate::fx_fip') */
+#   define X86_REGISTER_MISC_FCS        0xe836 /* %fcs (FpuCodeSegment; `sfpuenv::fe_fcs,sfpustate::fs_fcs') (NOTE: Always `0' for `xfpustate') */
+#   define X86_REGISTER_MISC_FDPL       0xe437 /* %fdpl (FpuDataPointer; `sfpuenv::fe_fdp,sfpustate::fs_fdp,xfpustate::fx_fdp') */
+#   define X86_REGISTER_MISC_FDS        0xe838 /* %fds (FpuDataSegment; `sfpuenv::fe_fds,sfpustate::fs_fds') (NOTE: Always `0' for `xfpustate') */
+#ifdef __x86_64__
+#   define X86_REGISTER_MISC_FIPQ       0xe035 /* %fipq (FpuInstructionPointer; `sfpuenv::fe_fip,sfpustate::fs_fip,xfpustate::fx_fip') */
+#   define X86_REGISTER_MISC_FDPQ       0xe037 /* %fdpq (FpuDataPointer; `sfpuenv::fe_fdp,sfpustate::fs_fdp,xfpustate::fx_fdp') */
+#endif /* __x86_64__ */
+#   define X86_REGISTER_MISC_MXCSR      0xe439 /* %mxcsr (MXCSR (SSE only); `xfpustate::fx_mxcsr') */
+#   define X86_REGISTER_MISC_MXCSR_MASK 0xe43a /* %mxcsr_mask (MXCSR mask (SSE only); `xfpustate::fx_mxcsr_mask') */
 
 /* Model-specific registers. */
-#define X86_REGISTER_MSR               0xf000
+#define X86_REGISTER_MSR 0xf000
 
 
 #endif /* !_I386_KOS_ASM_REGISTERS_H */

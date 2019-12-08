@@ -124,14 +124,14 @@ PUBLIC_FUNCTION(x86_fxsave)
 
 	movw   OFFSET_SFPUSTATE_FOP(%ecx), %ax
 	movw   %ax, OFFSET_XFPUSTATE_FOP(%ecx)
-	movl   OFFSET_SFPUSTATE_FPUIP(%ecx), %eax
-	movl   %eax, OFFSET_XFPUSTATE_FPUIP(%ecx)
-	movw   OFFSET_SFPUSTATE_FPUCS(%ecx), %ax
-	movw   %ax, OFFSET_XFPUSTATE_FPUCS(%ecx)
-	movl   OFFSET_SFPUSTATE_FPUDP(%ecx), %eax
-	movl   %eax, OFFSET_XFPUSTATE_FPUDP(%ecx)
-	movw   OFFSET_SFPUSTATE_FPUDS(%ecx), %ax
-	movw   %ax, OFFSET_XFPUSTATE_FPUDS(%ecx)
+	movl   OFFSET_SFPUSTATE_FIP(%ecx), %eax
+	movl   %eax, OFFSET_XFPUSTATE_FIP(%ecx)
+	movw   OFFSET_SFPUSTATE_FCS(%ecx), %ax
+	movw   %ax, OFFSET_XFPUSTATE_FCS(%ecx)
+	movl   OFFSET_SFPUSTATE_FDP(%ecx), %eax
+	movl   %eax, OFFSET_XFPUSTATE_FDP(%ecx)
+	movw   OFFSET_SFPUSTATE_FDS(%ecx), %ax
+	movw   %ax, OFFSET_XFPUSTATE_FDS(%ecx)
 
 	/* Expand %st(i) registers */
 	pushl_cfi_r %edi
@@ -211,16 +211,16 @@ PUBLIC_FUNCTION(x86_fxrstor)
 	call   x86_fxsave_decompress_ftw
 	popl_cfi_r %ecx
 	movl   %eax, OFFSET_SFPUSTATE_FTW(%esp)
-	movl   OFFSET_XFPUSTATE_FPUIP(%ecx), %eax
-	movl   %eax, OFFSET_SFPUSTATE_FPUIP(%esp)
-	movw   OFFSET_XFPUSTATE_FPUCS(%ecx), %ax
-	movw   %ax, OFFSET_SFPUSTATE_FPUCS(%esp)
+	movl   OFFSET_XFPUSTATE_FIP(%ecx), %eax
+	movl   %eax, OFFSET_SFPUSTATE_FIP(%esp)
+	movw   OFFSET_XFPUSTATE_FCS(%ecx), %ax
+	movw   %ax, OFFSET_SFPUSTATE_FCS(%esp)
 	movw   OFFSET_XFPUSTATE_FOP(%ecx), %ax
 	movw   %ax, OFFSET_SFPUSTATE_FOP(%esp)
-	movl   OFFSET_XFPUSTATE_FPUDP(%ecx), %eax
-	movl   %eax, OFFSET_SFPUSTATE_FPUDP(%esp)
-	movzwl OFFSET_XFPUSTATE_FPUDS(%ecx), %eax
-	movl   %eax, OFFSET_SFPUSTATE_FPUDS(%esp)
+	movl   OFFSET_XFPUSTATE_FDP(%ecx), %eax
+	movl   %eax, OFFSET_SFPUSTATE_FDP(%esp)
+	movzwl OFFSET_XFPUSTATE_FDS(%ecx), %eax
+	movl   %eax, OFFSET_SFPUSTATE_FDS(%esp)
 
 	/* Reduce %st(i) registers */
 	leal   OFFSET_XFPUSTATE_ST(0)(%ecx), %esi
