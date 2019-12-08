@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x882f3dd0 */
+/* HASH CRC-32:0xced4191b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,13 +35,13 @@
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch
  * (00:00:00 GMT, January 1, 1970). */
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_pthread_cond_timedwait,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __TM_TYPE(timespec) const *__restrict __abstime),pthread_cond_timedwait64,(__cond,__mutex,__abstime))
+__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_pthread_cond_timedwait,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_cond_timedwait64,(__cond,__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_cond_timedwait) && (!defined(__USE_TIME_BITS64))
 /* Wait for condition variable COND to be signaled or broadcast until
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch
  * (00:00:00 GMT, January 1, 1970). */
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_pthread_cond_timedwait,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __TM_TYPE(timespec) const *__restrict __abstime),pthread_cond_timedwait,(__cond,__mutex,__abstime))
+__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_pthread_cond_timedwait,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_cond_timedwait,(__cond,__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_cond_timedwait) || defined(__CRT_HAVE_pthread_cond_timedwait64)
 #include <local/pthread/pthread_cond_timedwait.h>
 /* Wait for condition variable COND to be signaled or broadcast until
@@ -61,7 +61,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(cnd_timedwait) __ATTR_NONNULL((1, 2, 3)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(cnd_timedwait))(__cnd_t *__restrict __cond,
                                                            __mtx_t *__restrict __mutex,
-                                                           struct __TM_TYPE(timespec) const *__restrict __time_point) {
+                                                           struct timespec const *__restrict __time_point) {
 #line 432 "kos/src/libc/magic/threads.c"
 	int __error;
 	__error = __localdep_pthread_cond_timedwait((__pthread_cond_t *)__cond,

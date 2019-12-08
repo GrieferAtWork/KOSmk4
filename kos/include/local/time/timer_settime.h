@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e10f19 */
+/* HASH CRC-32:0xacf7ea55 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_settime))(timer_t __timerid,
                                                            int __flags,
                                                            struct itimerspec const *__restrict __value,
                                                            struct itimerspec *__restrict __ovalue) {
-#line 1058 "kos/src/libc/magic/time.c"
+#line 1056 "kos/src/libc/magic/time.c"
 #ifdef __CRT_HAVE_timer_settime
 	int __result;
 	struct __itimerspec32 __value32, __ovalue32;

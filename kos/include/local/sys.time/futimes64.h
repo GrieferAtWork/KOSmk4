@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6147ba41 */
+/* HASH CRC-32:0x10e3c9f4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(futimes64) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimes64))(__fd_t __fd,
                                                        struct __timeval64 const __tvp[2]) {
-#line 541 "kos/src/libc/magic/sys.time.c"
+#line 539 "kos/src/libc/magic/sys.time.c"
 	struct __timeval32 __tv32[2];
 	if (!__tvp)
 		return __localdep_futimes32(__fd, __NULLPTR);

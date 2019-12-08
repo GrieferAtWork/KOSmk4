@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a183f32 */
+/* HASH CRC-32:0x1b5c7d7c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -129,7 +129,7 @@ __NAMESPACE_LOCAL_BEGIN
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 __LOCAL_LIBC(gmtime) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct __NAMESPACE_STD_SYM tm *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime))(__TM_TYPE(time) const *__timer) {
-#line 504 "kos/src/libc/magic/time.c"
+#line 502 "kos/src/libc/magic/time.c"
 #if defined(__CRT_HAVE_gmtime64) || defined(__CRT_HAVE__gmtime64)
 	__time64_t __tm64 = (__time64_t)*__timer;
 	return __localdep_gmtime64(&__tm64);

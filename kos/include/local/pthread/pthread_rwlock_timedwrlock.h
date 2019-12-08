@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x509277ec */
+/* HASH CRC-32:0xe9859832 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Try to acquire write lock for RWLOCK or return after specfied time */
 __LOCAL_LIBC(pthread_rwlock_timedwrlock) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock))(__pthread_rwlock_t *__restrict __rwlock,
-                                                                        struct __TM_TYPE(timespec) const *__restrict __abstime) {
+                                                                        struct timespec const *__restrict __abstime) {
 #line 1048 "kos/src/libc/magic/pthread.c"
 #ifdef __CRT_HAVE_pthread_rwlock_timedwrlock
 	int __result;

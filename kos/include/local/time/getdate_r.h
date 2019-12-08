@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd302807c */
+/* HASH CRC-32:0xe6bad58 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getdate_r) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getdate_r))(char const *__restrict __string,
                                                        __STRUCT_TM *__restrict __resbufp) {
-#line 1403 "kos/src/libc/magic/time.c"
+#line 1401 "kos/src/libc/magic/time.c"
 	/* TODO */
 	(void)__string;
 	(void)__resbufp;

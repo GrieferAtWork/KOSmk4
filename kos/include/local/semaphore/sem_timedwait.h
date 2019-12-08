@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbd4a7f7 */
+/* HASH CRC-32:0x602fe2cb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Similar to `sem_wait' but wait only until ABSTIME */
 __LOCAL_LIBC(sem_timedwait) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sem_timedwait))(sem_t *__restrict __sem,
-                                                           struct __TM_TYPE(timespec) const *__restrict __abstime) {
+                                                           struct timespec const *__restrict __abstime) {
 #line 88 "kos/src/libc/magic/semaphore.c"
 #ifdef __CRT_HAVE_sem_timedwait
 	struct __timespec32 __ts32;

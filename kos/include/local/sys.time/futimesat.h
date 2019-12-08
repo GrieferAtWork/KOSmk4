@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5084695 */
+/* HASH CRC-32:0x48b31937 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,8 +54,8 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(futimesat) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimesat))(__fd_t __fd,
                                                        char const *__file,
-                                                       struct __TM_TYPE(timeval) const __tvp[2]) {
-#line 283 "kos/src/libc/magic/sys.time.c"
+                                                       struct timeval const __tvp[2]) {
+#line 281 "kos/src/libc/magic/sys.time.c"
 #ifdef __CRT_HAVE_utimes
 	struct __timeval32 __tv32[2];
 	if (!__tvp)

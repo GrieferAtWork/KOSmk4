@@ -18,8 +18,6 @@
  */
 
 %[define_replacement(sigset_t   = struct __sigset_struct)]
-%[define_replacement(timespec   = __TM_TYPE(timespec))]
-%[define_replacement(timeval    = __TM_TYPE(timeval))]
 %[define_replacement(time_t     = __TM_TYPE(time))]
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]

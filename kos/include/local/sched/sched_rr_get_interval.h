@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46db6ee4 */
+/* HASH CRC-32:0x814d7534 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,8 +48,8 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_rr_get_interval64,(__pid_t __pid
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sched_rr_get_interval) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sched_rr_get_interval))(__pid_t __pid,
-                                                                   struct __TM_TYPE(timespec) *__tms) {
-#line 110 "kos/src/libc/magic/sched.c"
+                                                                   struct timespec *__tms) {
+#line 109 "kos/src/libc/magic/sched.c"
 #ifdef __CRT_HAVE_sched_rr_get_interval
 	struct __timespec32 __tms32;
 	if (!__tms)

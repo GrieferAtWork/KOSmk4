@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8973476f */
+/* HASH CRC-32:0x8539ede7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,8 +53,8 @@ __NAMESPACE_LOCAL_BEGIN
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 __LOCAL_LIBC(futimes) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimes))(__fd_t __fd,
-                                                     struct __TM_TYPE(timeval) const __tvp[2]) {
-#line 403 "kos/src/libc/magic/sys.time.c"
+                                                     struct timeval const __tvp[2]) {
+#line 401 "kos/src/libc/magic/sys.time.c"
 #ifdef __CRT_HAVE_utimes
 	struct __timeval32 __tv32[2];
 	if (!__tvp)

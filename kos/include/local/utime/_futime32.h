@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94ab3bc7 */
+/* HASH CRC-32:0x4ad044c1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_futime32) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_futime32))(__fd_t __fd,
                                                        struct __utimbuf32 __KOS_FIXED_CONST *__file_times) {
-#line 226 "kos/src/libc/magic/utime.c"
+#line 224 "kos/src/libc/magic/utime.c"
 	struct __utimbuf64 __buf64;
 	if (!__file_times)
 		return __localdep_crt_futime64(__fd,__NULLPTR);

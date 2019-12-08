@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41431721 */
+/* HASH CRC-32:0xf4a4c83e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,7 +69,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(pthread_timedjoin_np) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_timedjoin_np))(__pthread_t __pthread,
                                                                   void **__thread_return,
-                                                                  struct __TM_TYPE(timespec) const *__abstime) {
+                                                                  struct timespec const *__abstime) {
 #line 264 "kos/src/libc/magic/pthread.c"
 #ifdef __CRT_HAVE_pthread_timedjoin_np
 	int __result;

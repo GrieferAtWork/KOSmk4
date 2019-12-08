@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6945523c */
+/* HASH CRC-32:0x72218347 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,9 +67,9 @@ __NAMESPACE_LOCAL_BEGIN
  * adjustment remaining to be done from the last `adjtime' call.
  * This call is restricted to the super-user */
 __LOCAL_LIBC(adjtime) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtime))(struct __TM_TYPE(timeval) const *__delta,
-                                                     struct __TM_TYPE(timeval) *__olddelta) {
-#line 340 "kos/src/libc/magic/sys.time.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtime))(struct timeval const *__delta,
+                                                     struct timeval *__olddelta) {
+#line 338 "kos/src/libc/magic/sys.time.c"
 #ifdef __CRT_HAVE_adjtime
 	int __result;
 	struct __timeval32 __delta32, __olddelta32;

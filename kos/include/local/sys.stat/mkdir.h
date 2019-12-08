@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdafa509a */
+/* HASH CRC-32:0x8f50a229 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mkdir) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mkdir))(char const *__pathname,
                                                    __mode_t __mode) {
-#line 467 "kos/src/libc/magic/sys.stat.c"
+#line 466 "kos/src/libc/magic/sys.stat.c"
 	(void)__mode;
 	return __localdep_dos_mkdir(__pathname);
 }

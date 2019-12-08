@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74d9057d */
+/* HASH CRC-32:0xacdd86d4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(adjtimex) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtimex))(struct timex *__restrict __ntx) {
-#line 127 "kos/src/libc/magic/sys.timex.c"
+#line 125 "kos/src/libc/magic/sys.timex.c"
 	int __result;
 #if defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
 	struct __timex32 __nxtalt;

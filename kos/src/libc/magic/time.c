@@ -25,8 +25,6 @@
 %[define_replacement(time64_t = __time64_t)]
 %[define_replacement(clock_t  = __typedef_clock_t)]
 
-%[define_replacement(timespec   = __TM_TYPE(timespec))]
-%[define_replacement(timeval    = __TM_TYPE(timeval))]
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]
 %[define_replacement(timeval32  = __timeval32)]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe3b95b2 */
+/* HASH CRC-32:0x5bf381be */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __CREDIRECT_VOID(,,__localdep_FUtimens64,(__fd_t __fd, struct __timespec64 const
 #ifndef ____localdep_FUtimens32_defined
 #define ____localdep_FUtimens32_defined 1
 #ifdef __CRT_HAVE_FUtimens
-__CREDIRECT_VOID(,,__localdep_FUtimens32,(__fd_t __fd, struct __TM_TYPE(timespec) const __times[2 /*or:3*/]),FUtimens,(__fd,__times)) __THROWS(...)
+__CREDIRECT_VOID(,,__localdep_FUtimens32,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),FUtimens,(__fd,__times)) __THROWS(...)
 #else /* LIBC: FUtimens */
 #undef ____localdep_FUtimens32_defined
 #endif /* FUtimens32... */
@@ -49,8 +49,8 @@ __CREDIRECT_VOID(,,__localdep_FUtimens32,(__fd_t __fd, struct __TM_TYPE(timespec
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(FUtimens) void
 (__LIBCCALL __LIBC_LOCAL_NAME(FUtimens))(__fd_t __fd,
-                                         struct __TM_TYPE(timespec) const __times[2 /*or:3*/]) __THROWS(...) {
-#line 269 "kos/src/libc/magic/kos.sys.stat.c"
+                                         struct timespec const __times[2 /*or:3*/]) __THROWS(...) {
+#line 268 "kos/src/libc/magic/kos.sys.stat.c"
 #ifdef __CRT_HAVE_UTimensAt64
 	struct __timespec64 __tms[2];
 	if (!__times) {

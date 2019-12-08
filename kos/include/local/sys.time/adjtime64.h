@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ae6ed35 */
+/* HASH CRC-32:0x4761dcb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(adjtime64) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtime64))(struct __timeval64 const *__delta,
                                                        struct __timeval64 *__olddelta) {
-#line 510 "kos/src/libc/magic/sys.time.c"
+#line 508 "kos/src/libc/magic/sys.time.c"
 	int __result;
 	struct __timeval32 __delta32, __olddelta32;
 	if (__delta) {

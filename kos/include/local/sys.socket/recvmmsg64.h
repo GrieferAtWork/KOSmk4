@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7da658a */
+/* HASH CRC-32:0x68e7da09 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(recvmmsg64))(__fd_t __sockfd,
                                                         unsigned int __vlen,
                                                         int __flags,
                                                         struct __timespec64 *__tmo) {
-#line 267 "kos/src/libc/magic/sys.socket.c"
+#line 266 "kos/src/libc/magic/sys.socket.c"
 	struct __timespec32 __tmo32;
 	if (!__tmo)
 		return __localdep_recvmmsg32(__sockfd,__vmessages,__vlen,__flags,__NULLPTR);

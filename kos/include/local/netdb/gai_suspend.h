@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x253affc5 */
+/* HASH CRC-32:0xd1ea9278 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(gai_suspend) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(gai_suspend))(struct gaicb const *const __list[],
                                                          int __ent,
-                                                         struct __TM_TYPE(timespec) const *__timeout) {
+                                                         struct timespec const *__timeout) {
 #line 522 "kos/src/libc/magic/netdb.c"
 #ifdef __CRT_HAVE_gai_suspend
 	struct __timespec32 __tmo32;

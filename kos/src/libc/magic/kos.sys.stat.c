@@ -21,7 +21,6 @@
 %[define_replacement(atflag_t = __atflag_t)]
 %[define_replacement(mode_t = __mode_t)]
 %[define_replacement(dev_t = __dev_t)]
-%[define_replacement(timespec = __TM_TYPE(timespec))]
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]
 %[define_replacement(time_t = __TM_TYPE(time))]

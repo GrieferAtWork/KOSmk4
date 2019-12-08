@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f5936a2 */
+/* HASH CRC-32:0x3d337a14 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the current time and put it in *TIMER if TIMER is not NULL */
 __LOCAL_LIBC(time) __TM_TYPE(time)
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(time))(__TM_TYPE(time) *__timer) {
-#line 369 "kos/src/libc/magic/time.c"
+#line 367 "kos/src/libc/magic/time.c"
 #ifdef __USE_TIME_BITS64
 	__time32_t __tm32 = __localdep_time32(__NULLPTR);
 	if (__timer)

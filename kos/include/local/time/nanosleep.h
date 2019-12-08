@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1416764b */
+/* HASH CRC-32:0x37c1c8f4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,10 @@
 #define ____localdep_nanosleep32_defined 1
 #ifdef __CRT_HAVE_nanosleep
 /* Pause execution for a number of nanoseconds */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct __TM_TYPE(timespec) const *__requested_time, struct __timespec32 *__remaining),nanosleep,(__requested_time,__remaining))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct timespec const *__requested_time, struct __timespec32 *__remaining),nanosleep,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE___nanosleep)
 /* Pause execution for a number of nanoseconds */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct __TM_TYPE(timespec) const *__requested_time, struct __timespec32 *__remaining),__nanosleep,(__requested_time,__remaining))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct timespec const *__requested_time, struct __timespec32 *__remaining),__nanosleep,(__requested_time,__remaining))
 #else /* LIBC: nanosleep */
 #undef ____localdep_nanosleep32_defined
 #endif /* nanosleep32... */
@@ -55,9 +55,9 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep64,(struct
 __NAMESPACE_LOCAL_BEGIN
 /* Pause execution for a number of nanoseconds */
 __LOCAL_LIBC(nanosleep) __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(nanosleep))(struct __TM_TYPE(timespec) const *__requested_time,
-                                                       struct __TM_TYPE(timespec) *__remaining) {
-#line 924 "kos/src/libc/magic/time.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(nanosleep))(struct timespec const *__requested_time,
+                                                       struct timespec *__remaining) {
+#line 922 "kos/src/libc/magic/time.c"
 #ifdef __CRT_HAVE_nanosleep
 	int __result;
 	struct __timespec32 __req32, __rem32;

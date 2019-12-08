@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d441bc9 */
+/* HASH CRC-32:0xd7915e4e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((2)),,__localdep_UTimensAt64,(__fd_t __dirfd, ch
 #define ____localdep_UTimensAt32_defined 1
 #ifdef __CRT_HAVE_UTimensAt
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-__CREDIRECT_VOID(__ATTR_NONNULL((2)),,__localdep_UTimensAt32,(__fd_t __dirfd, char const *__filename, struct __TM_TYPE(timespec) const __times[2 /*or:3*/], __atflag_t __flags),UTimensAt,(__dirfd,__filename,__times,__flags)) __THROWS(...)
+__CREDIRECT_VOID(__ATTR_NONNULL((2)),,__localdep_UTimensAt32,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),UTimensAt,(__dirfd,__filename,__times,__flags)) __THROWS(...)
 #else /* LIBC: UTimensAt */
 #undef ____localdep_UTimensAt32_defined
 #endif /* UTimensAt32... */
@@ -55,9 +55,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(UTimensAt) __ATTR_NONNULL((2)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(UTimensAt))(__fd_t __dirfd,
                                           char const *__filename,
-                                          struct __TM_TYPE(timespec) const __times[2 /*or:3*/],
+                                          struct timespec const __times[2 /*or:3*/],
                                           __atflag_t __flags) __THROWS(...) {
-#line 164 "kos/src/libc/magic/kos.sys.stat.c"
+#line 163 "kos/src/libc/magic/kos.sys.stat.c"
 #ifdef __CRT_HAVE_UTimensAt64
 #if defined(__KOS__) && __KOS_VERSION__ >= 300
 	struct __timespec64 __tms[3];

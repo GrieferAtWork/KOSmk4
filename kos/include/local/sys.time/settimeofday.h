@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33d0967 */
+/* HASH CRC-32:0xd530fa5a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,9 +57,9 @@ __NAMESPACE_LOCAL_BEGIN
 /* Set the current time of day and timezone information.
  * This call is restricted to the super-user */
 __LOCAL_LIBC(settimeofday) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(settimeofday))(struct __TM_TYPE(timeval) const *__tv,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(settimeofday))(struct timeval const *__tv,
                                                           struct timezone const *__tz) {
-#line 314 "kos/src/libc/magic/sys.time.c"
+#line 312 "kos/src/libc/magic/sys.time.c"
 #ifdef __CRT_HAVE_settimeofday
 	struct __timeval32 __tv32;
 	if (!__tv)

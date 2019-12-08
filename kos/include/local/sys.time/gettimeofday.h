@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70d79fd2 */
+/* HASH CRC-32:0x7d20db12 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,9 +79,9 @@ __NAMESPACE_LOCAL_BEGIN
  * NOTE: This form of timezone information is obsolete.
  * Use the functions and variables declared in <time.h> instead */
 __LOCAL_LIBC(gettimeofday) __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gettimeofday))(struct __TM_TYPE(timeval) *__restrict __tv,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gettimeofday))(struct timeval *__restrict __tv,
                                                           __timezone_ptr_t __tz) {
-#line 145 "kos/src/libc/magic/sys.time.c"
+#line 143 "kos/src/libc/magic/sys.time.c"
 #ifdef __CRT_HAVE_gettimeofday
 	int __result;
 	struct __timeval32 __tv32;

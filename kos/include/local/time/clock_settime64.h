@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54ebd3c3 */
+/* HASH CRC-32:0x3c86c563 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(clock_settime64) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_settime64))(__clockid_t __clock_id,
                                                              struct __timespec64 const *__tp) {
-#line 1218 "kos/src/libc/magic/time.c"
+#line 1216 "kos/src/libc/magic/time.c"
 	struct __timespec32 __tp32;
 	__tp32.tv_sec  = (__time32_t)__tp->tv_sec;
 	__tp32.tv_nsec = __tp->tv_nsec;

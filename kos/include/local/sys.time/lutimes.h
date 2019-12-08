@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8198d30 */
+/* HASH CRC-32:0x6c6f6750 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,8 +53,8 @@ __NAMESPACE_LOCAL_BEGIN
 /* Same as `utimes', but does not follow symbolic links */
 __LOCAL_LIBC(lutimes) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lutimes))(char const *__file,
-                                                     struct __TM_TYPE(timeval) const __tvp[2]) {
-#line 375 "kos/src/libc/magic/sys.time.c"
+                                                     struct timeval const __tvp[2]) {
+#line 373 "kos/src/libc/magic/sys.time.c"
 #ifdef __CRT_HAVE_utimes
 	struct __timeval32 __tv32[2];
 	if (!__tvp)

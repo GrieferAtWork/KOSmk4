@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c5b0166 */
+/* HASH CRC-32:0x182c5cd6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,8 +63,8 @@ __NAMESPACE_LOCAL_BEGIN
  * Returns 0 on success, -1 on errors */
 __LOCAL_LIBC(utimes) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(utimes))(char const *__file,
-                                                    struct __TM_TYPE(timeval) const __tvp[2]) {
-#line 254 "kos/src/libc/magic/sys.time.c"
+                                                    struct timeval const __tvp[2]) {
+#line 252 "kos/src/libc/magic/sys.time.c"
 #ifdef __CRT_HAVE_utimes
 	struct __timeval32 __tv32[2];
 	if (!__tvp)

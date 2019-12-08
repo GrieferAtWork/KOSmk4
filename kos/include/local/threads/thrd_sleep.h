@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce725984 */
+/* HASH CRC-32:0x369660c3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,8 +79,8 @@ __NAMESPACE_LOCAL_BEGIN
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __LOCAL_LIBC(thrd_sleep) __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_sleep))(struct __TM_TYPE(timespec) const *__time_point,
-                                                        struct __TM_TYPE(timespec) *__remaining) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_sleep))(struct timespec const *__time_point,
+                                                        struct timespec *__remaining) {
 #line 135 "kos/src/libc/magic/threads.c"
 #ifdef __CRT_HAVE_thrd_sleep
 	int __result;

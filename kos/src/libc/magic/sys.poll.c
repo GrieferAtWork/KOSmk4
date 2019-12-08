@@ -23,7 +23,6 @@
 %[define_replacement(time_t   = __TM_TYPE(time))]
 %[define_replacement(time32_t = __time32_t)]
 %[define_replacement(time64_t = __time64_t)]
-%[define_replacement(timespec = __TM_TYPE(timespec))]
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]
 %[default_impl_section(.text.crt.io.poll)]

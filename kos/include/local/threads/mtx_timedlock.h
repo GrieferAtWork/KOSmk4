@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf174b8a */
+/* HASH CRC-32:0xdeea4d2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,10 +30,10 @@
 #define ____localdep_pthread_mutex_timedlock_defined 1
 #if defined(__CRT_HAVE_pthread_mutex_timedlock64) && defined(__USE_TIME_BITS64)
 /* Wait until lock becomes available, or specified time passes */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_mutex_timedlock,(__pthread_mutex_t *__restrict __mutex, struct __TM_TYPE(timespec) const *__restrict __abstime),pthread_mutex_timedlock64,(__mutex,__abstime))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_mutex_timedlock,(__pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_mutex_timedlock64,(__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock) && (!defined(__USE_TIME_BITS64))
 /* Wait until lock becomes available, or specified time passes */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_mutex_timedlock,(__pthread_mutex_t *__restrict __mutex, struct __TM_TYPE(timespec) const *__restrict __abstime),pthread_mutex_timedlock,(__mutex,__abstime))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_mutex_timedlock,(__pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_mutex_timedlock,(__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock) || defined(__CRT_HAVE_pthread_mutex_timedlock64)
 #include <local/pthread/pthread_mutex_timedlock.h>
 /* Wait until lock becomes available, or specified time passes */
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
  * s.a. `pthread_mutex_timedlock()' */
 __LOCAL_LIBC(mtx_timedlock) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mtx_timedlock))(__mtx_t *__restrict __mutex,
-                                                           struct __TM_TYPE(timespec) const *__restrict __time_point) {
+                                                           struct timespec const *__restrict __time_point) {
 #line 295 "kos/src/libc/magic/threads.c"
 	int __error;
 	__error = __localdep_pthread_mutex_timedlock((__pthread_mutex_t *)__mutex, __time_point);

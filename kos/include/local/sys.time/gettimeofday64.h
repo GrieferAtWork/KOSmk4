@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85fd4273 */
+/* HASH CRC-32:0xfa15be1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(gettimeofday64) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gettimeofday64))(struct __timeval64 *__restrict __tv,
                                                             __timezone_ptr_t __tz) {
-#line 431 "kos/src/libc/magic/sys.time.c"
+#line 429 "kos/src/libc/magic/sys.time.c"
 	int __result;
 	struct __timeval32 __tv32;
 	if (!__tv)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71be53f */
+/* HASH CRC-32:0x41cd04f3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_gettime32,(stru
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ntp_gettime64) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_gettime64))(struct ntptimeval64 *__restrict __ntv) {
-#line 481 "kos/src/libc/magic/sys.timex.c"
+#line 479 "kos/src/libc/magic/sys.timex.c"
 	struct __ntptimeval32 __ntv32;
 	int __result = __localdep_ntp_gettime32(&__ntv32);
 	if __likely(__result == 0) {
