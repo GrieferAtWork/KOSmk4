@@ -36,6 +36,7 @@
 #include <asm/intrin.h>
 #include <debugger/function.h>
 #include <debugger/rt.h>
+#include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state.h>
 
 #include <string.h>
@@ -45,8 +46,10 @@ DECL_BEGIN
 /* Host-thread special-state backup data. (saved/restored by `dbg_init()' and `dbg_fini()') */
 PUBLIC ATTR_DBGBSS struct x86_dbg_hoststate x86_dbg_hostbackup = {};
 PUBLIC ATTR_DBGBSS struct fcpustate x86_dbg_exitstate          = {};
-PUBLIC ATTR_DBGBSS struct fcpustate x86_dbg_origstate          = {};
-PUBLIC ATTR_DBGBSS struct fcpustate x86_dbg_viewstate          = {};
+
+/* [0..1] The thread who's view state is currently cached
+ *        in `x86_dbg_viewstate' and `x86_dbg_origstate' */
+INTDEF struct task *x86_dbg_viewthread;
 
 /* DBG trap state information. */
 PUBLIC ATTR_DBGBSS void *x86_dbg_trapstate            = NULL;
@@ -91,22 +94,138 @@ INTDEF dbg_callback_t const __kernel_dbg_fini_end[];
 DATDEF ATTR_PERTASK uintptr_t this_x86_kernel_psp0_ ASMNAME("this_x86_kernel_psp0");
 INTDEF NOBLOCK void NOTHROW(KCALL init_this_x86_kernel_psp0)(struct task *__restrict self);
 
+/* Check if preemptive interrupts are enabled on the calling CPU */
+PRIVATE ATTR_DBGTEXT NOBLOCK WUNUSED ATTR_PURE bool
+NOTHROW(KCALL are_preemptive_interrupts_enabled)(void) {
+	COMPILER_IMPURE();
+	/* TODO */
+	return true;
+}
+
 
 #ifndef CONFIG_NO_SMP
 PRIVATE ATTR_DBGTEXT NOBLOCK NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
                                       void *args[CPU_IPI_ARGCOUNT]) {
+	struct x86_dbg_cpuammend ammend;
+	cpuid_t mycpuid;
 	(void)args;
-	cpu_disable_preemptive_interrupts_nopr();
+	ammend.dca_thread = THIS_TASK;
+	ammend.dca_cpu    = ammend.dca_thread->t_cpu;
+	mycpuid           = ammend.dca_cpu->c_id;
+
+	/* Set the KEEPCORE flag for our current thread. */
+	ammend.dca_taskflags = ATOMIC_FETCHOR(ammend.dca_thread->t_flags, TASK_FKEEPCORE);
+
+	/* Set our own thread as the scheduling override. */
+	ammend.dca_override        = ammend.dca_cpu->c_override;
+	ammend.dca_cpu->c_override = ammend.dca_thread;
+
+	/* Save additional registers. */
+	ammend.dca_tr  = __str();
+	ammend.dca_ldt = __sldt();
+	__sidt(&ammend.dca_idt);
+	__sgdt(&ammend.dca_gdt);
+	ammend.dca_coregs.co_cr0 = __rdcr0();
+	ammend.dca_coregs.co_cr2 = __rdcr2();
+	ammend.dca_coregs.co_cr3 = __rdcr3();
+	ammend.dca_coregs.co_cr4 = __rdcr4();
+	ammend.dca_drregs.dr_dr0 = __rddr0();
+	ammend.dca_drregs.dr_dr1 = __rddr1();
+	ammend.dca_drregs.dr_dr2 = __rddr2();
+	ammend.dca_drregs.dr_dr3 = __rddr3();
+	ammend.dca_drregs.dr_dr6 = __rddr6();
+	ammend.dca_drregs.dr_dr7 = __rddr7();
+#ifdef __x86_64__
+	ammend.dca_sgbase.sg_fsbase = __rdfsbaseq();
+	ammend.dca_sgbase.sg_gsbase = __rdmsr(IA32_KERNEL_GS_BASE);
+	ammend.dca_sgregs.sg_gs     = __rdgs();
+	ammend.dca_sgregs.sg_fs     = __rdfs();
+	ammend.dca_sgregs.sg_es     = __rdes();
+	ammend.dca_sgregs.sg_ds     = __rdds();
+#else /* __x86_64__ */
+	ammend.dca_gs = __rdgs();
+	ammend.dca_ss = __rdss();
+#endif /* !__x86_64__ */
+
+	/* Disable preemptive interrupts. */
+	ammend.dca_pint = are_preemptive_interrupts_enabled();
+	if (ammend.dca_pint)
+		cpu_disable_preemptive_interrupts_nopr();
+
+	/* Fill in the host-backup area of our CPU, thus
+	 * ACK-ing the fact that we're now supposed to sleep. */
+	ATOMIC_WRITE(x86_dbg_hostbackup.dhs_cpus[mycpuid].dcs_iammend, &ammend);
+	ATOMIC_WRITE(x86_dbg_hostbackup.dhs_cpus[mycpuid].dcs_istate, state);
+
+	/* While for the debugger to become inactive. */
 	while (dbg_active)
 		PREEMPTION_ENABLE_WAIT_DISABLE();
-	cpu_enable_preemptive_interrupts_nopr(); /* XXX: Don't account for lost time! */
+
+	/* Re-load the saved return state. */
+	state = ATOMIC_XCH(x86_dbg_hostbackup.dhs_cpus[mycpuid].dcs_istate, NULL);
+
+	/* Re-load overwritten configuration variables and additional registers. */
+	__wrcr0(ammend.dca_coregs.co_cr0);
+	__wrcr2(ammend.dca_coregs.co_cr2);
+	__wrcr3(ammend.dca_coregs.co_cr3);
+	__wrcr4(ammend.dca_coregs.co_cr4);
+	__wrdr0(ammend.dca_drregs.dr_dr0);
+	__wrdr1(ammend.dca_drregs.dr_dr1);
+	__wrdr2(ammend.dca_drregs.dr_dr2);
+	__wrdr3(ammend.dca_drregs.dr_dr3);
+	__wrdr6(ammend.dca_drregs.dr_dr6);
+	__wrdr7(ammend.dca_drregs.dr_dr7);
+	__lgdt_p(&ammend.dca_gdt);
+	__lidt_p(&ammend.dca_idt);
+#ifdef __x86_64__
+	__wrgs(ammend.dca_sgregs.sg_gs);
+	__wrfs(ammend.dca_sgregs.sg_fs);
+	__wres(ammend.dca_sgregs.sg_es);
+	__wrds(ammend.dca_sgregs.sg_ds);
+	__wrfsbaseq(ammend.dca_sgbase.sg_fsbase);
+	__wrmsr(IA32_KERNEL_GS_BASE, ammend.dca_sgbase.sg_gsbase);
+#else /* __x86_64__ */
+	__wrgs(ammend.dca_gs);
+	__wrss(ammend.dca_ss);
+#endif /* !__x86_64__ */
+	__lldt(ammend.dca_ldt);
+	{
+		struct segment *gdt;
+		gdt = (struct segment *)ammend.dca_gdt.dt_base;
+		gdt[SEGMENT_INDEX(ammend.dca_tr)].s_tss.t_type_bits.ttb_busy = 0; /* BUSY=0 */
+		__ltr(ammend.dca_tr);
+	}
+
+	/* Restore the old state of the KEEPCORE flag. */
+	if (!(ammend.dca_taskflags & TASK_FKEEPCORE))
+		ATOMIC_FETCHAND(ammend.dca_thread->t_flags, ~TASK_FKEEPCORE);
+
+	/* Restore the previous override. */
+	ammend.dca_cpu->c_override = ammend.dca_override;
+
+	/* Re-enable preemptive interrupts. */
+	if (ammend.dca_pint)
+		cpu_enable_preemptive_interrupts_nopr(); /* XXX: Don't account for lost time! */
+
 	return state;
 }
 #endif /* !CONFIG_NO_SMP */
 
 
 #ifndef CONFIG_NO_SMP
+
+/* Return the number of CPUs that have ACKed having been suspended. */
+PRIVATE ATTR_DBGTEXT NOBLOCK cpuid_t
+NOTHROW(KCALL x86_dbg_hostbackup_cpu_suspended_count)(void) {
+	cpuid_t i, result = 0;
+	for (i = 0; i < cpu_count; ++i) {
+		if (ATOMIC_READ(x86_dbg_hostbackup.dhs_cpus[i].dcs_istate) != NULL)
+			++result;
+	}
+	return result;
+}
+
 PRIVATE ATTR_DBGTEXT NOBLOCK NONNULL((1, 2)) cpuid_t
 NOTHROW(KCALL cpu_broadcastipi_notthis_early_boot_aware)(cpu_ipi_t func,
                                                          void *args[CPU_IPI_ARGCOUNT],
@@ -242,7 +361,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 	/* Push active connections. */
 	task_pushconnections(&x86_dbg_hostbackup.dhs_signals);
 
-	x86_dbg_hostbackup.dhs_pint = true; /* TODO: `cpu_are_preemptive_interrupts_enabled()' */
+	x86_dbg_hostbackup.dhs_pint = are_preemptive_interrupts_enabled();
 	if (x86_dbg_hostbackup.dhs_pint)
 		cpu_disable_preemptive_interrupts_nopr();
 
@@ -250,14 +369,22 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 #ifndef CONFIG_NO_SMP
 	{
 		void *args[CPU_IPI_ARGCOUNT];
-		cpu_broadcastipi_notthis_early_boot_aware(&debugger_wait_for_done, args,
-		                                          CPU_IPI_FNORMAL, mycpu);
+		cpuid_t count;
+		memset(x86_dbg_hostbackup.dhs_cpus, 0, sizeof(x86_dbg_hostbackup.dhs_cpus));
+		COMPILER_BARRIER();
+		count = cpu_broadcastipi_notthis_early_boot_aware(&debugger_wait_for_done, args,
+		                                                  CPU_IPI_FWAITFOR, mycpu);
+		if (count) {
+			/* Wait for other CPUs to ACK becoming suspended. */
+			while (count < x86_dbg_hostbackup_cpu_suspended_count())
+				__pause();
+		}
 	}
 #endif /* !CONFIG_NO_SMP */
 
-	/* Set the currently viewed state to be the exit state. */
-	memcpy(&x86_dbg_viewstate, &x86_dbg_exitstate, sizeof(struct fcpustate));
-	memcpy(&x86_dbg_origstate, &x86_dbg_exitstate, sizeof(struct fcpustate));
+	/* Set our own thread as the current thread. */
+	dbg_current        = mythread;
+	x86_dbg_viewthread = NULL;
 
 	/* Make sure that the PIC is initialized properly, as the debugger's
 	 * PS/2 keyboard driver requires interrupts to be mapped properly. */
@@ -300,10 +427,9 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 	    FORTASK(mythread, this_connections).tc_signals.ts_thread != mythread)
 		pertask_init_task_connections(mythread);
 
-	/* Set the currently viewed state to be the exit state. */
-	dbg_current = mythread;
-	memcpy(&x86_dbg_viewstate, &x86_dbg_exitstate, sizeof(struct fcpustate));
-	memcpy(&x86_dbg_origstate, &x86_dbg_exitstate, sizeof(struct fcpustate));
+	/* Set our own thread as the current thread. */
+	dbg_current        = mythread;
+	x86_dbg_viewthread = NULL;
 
 	/* Reset the debugger TTY */
 	dbg_reset_tty();
@@ -347,9 +473,14 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 #ifndef CONFIG_NO_SMP
 	{
 		void *args[CPU_IPI_ARGCOUNT];
+		COMPILER_BARRIER();
 		/* Send a sporadic IPI to all CPUs other than the caller. */
 		cpu_broadcastipi_notthis_early_boot_aware(&debugger_wake_after_done, args,
-		                                          CPU_IPI_FNORMAL, mycpu);
+		                                          CPU_IPI_FWAITFOR, mycpu);
+		/* Wait for other CPUs to resume execution. */
+		while (x86_dbg_hostbackup_cpu_suspended_count() != 0)
+			__pause();
+		memset(x86_dbg_hostbackup.dhs_cpus, 0, sizeof(x86_dbg_hostbackup.dhs_cpus));
 	}
 #endif /* !CONFIG_NO_SMP */
 
@@ -369,6 +500,15 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 
 	if (x86_dbg_hostbackup.dhs_pint)
 		cpu_enable_preemptive_interrupts_nopr();
+
+	/* Update the debugger exit state to have `dbg_enter_r()' return
+	 * the updated trap state descriptor pointer. This pointer has to
+	 * be updated in case the trap state was moved, as is required when
+	 * setting the kernel_esp register of a 32-bit irregs structure,
+	 * as found in icpustate or scpustate, both of which may appear
+	 * within the `x86_dbg_trapstate' pointer. */
+	if (x86_dbg_trapstatekind != X86_DBG_STATEKIND_NONE)
+		x86_dbg_exitstate.fcs_gpregs.gp_pax = (uintptr_t)x86_dbg_trapstate;
 }
 
 

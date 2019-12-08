@@ -110,6 +110,40 @@ __DECL_BEGIN
 #define irregs32_getss(self)             (irregs32_isuser(self) ? irregs32_getuserss(self) : irregs32_getkernelss(self))
 #define irregs32_trysetesp(self, value)  (irregs32_isuser(self) ? (irregs32_setuseresp(self, value), 1) : (irregs32_getkernelesp(self) == (value)))
 #define irregs32_trysetss(self, value)   (irregs32_isuser(self) ? (irregs32_setuserss(self, value), 1) : (irregs32_getkernelss(self) == (value)))
+#define irregs32_trysetuserss(self, value) (irregs32_isuser(self) ? (irregs32_setuserss(self, value), 1) : 0)
+#define irregs32_getvm86ds(self)        ((struct irregs32_vm86 const *)(self))->ir_ds16
+#define irregs32_setvm86ds(self, value) (((struct irregs32_vm86 *)(self))->ir_ds16=(value))
+#define irregs32_getvm86es(self)        ((struct irregs32_vm86 const *)(self))->ir_es16
+#define irregs32_setvm86es(self, value) (((struct irregs32_vm86 *)(self))->ir_es16=(value))
+#define irregs32_getvm86fs(self)        ((struct irregs32_vm86 const *)(self))->ir_fs16
+#define irregs32_setvm86fs(self, value) (((struct irregs32_vm86 *)(self))->ir_fs16=(value))
+#define irregs32_getvm86gs(self)        ((struct irregs32_vm86 const *)(self))->ir_gs16
+#define irregs32_setvm86gs(self, value) (((struct irregs32_vm86 *)(self))->ir_gs16=(value))
+#define irregs32_getds_ex(self, v_nonvm86_ds) (irregs32_isvm86(self) ? irregs32_getvm86ds(self) : (v_nonvm86_ds))
+#define irregs32_trysetds_ex(self, value, v_nonvm86_ds) (irregs32_isvm86(self) ? (irregs32_setvm86ds(self, value), 1) : ((v_nonvm86_ds) == (value)))
+#define irregs32_getes_ex(self, v_nonvm86_es) (irregs32_isvm86(self) ? irregs32_getvm86es(self) : (v_nonvm86_es))
+#define irregs32_trysetes_ex(self, value, v_nonvm86_es) (irregs32_isvm86(self) ? (irregs32_setvm86es(self, value), 1) : ((v_nonvm86_es) == (value)))
+#define irregs32_getfs_ex(self, v_nonvm86_fs) (irregs32_isvm86(self) ? irregs32_getvm86fs(self) : (v_nonvm86_fs))
+#define irregs32_trysetfs_ex(self, value, v_nonvm86_fs) (irregs32_isvm86(self) ? (irregs32_setvm86fs(self, value), 1) : ((v_nonvm86_fs) == (value)))
+#define irregs32_getgs_ex(self, v_nonvm86_gs) (irregs32_isvm86(self) ? irregs32_getvm86gs(self) : (v_nonvm86_gs))
+#define irregs32_trysetgs_ex(self, value, v_nonvm86_gs) (irregs32_isvm86(self) ? (irregs32_setvm86gs(self, value), 1) : ((v_nonvm86_gs) == (value)))
+#if defined(__KERNEL__) && !defined(__x86_64__)
+#define irregs32_getds(self)           irregs32_getds_ex(self, SEGMENT_USER_DATA_RPL)
+#define irregs32_trysetds(self, value) irregs32_trysetds_ex(self, value, SEGMENT_USER_DATA_RPL)
+#define irregs32_getes(self)           irregs32_getes_ex(self, SEGMENT_USER_DATA_RPL)
+#define irregs32_trysetes(self, value) irregs32_trysetes_ex(self, value, SEGMENT_USER_DATA_RPL)
+#define irregs32_getfs(self)           irregs32_getfs_ex(self, SEGMENT_KERNEL_FSBASE)
+#define irregs32_trysetfs(self, value) irregs32_trysetfs_ex(self, value, SEGMENT_KERNEL_FSBASE)
+#else /* __KERNEL__ && !__x86_64__ */
+#define irregs32_getds(self)           irregs32_getds_ex(self, __rdds())
+#define irregs32_trysetds(self, value) irregs32_trysetds_ex(self, value, __rdds())
+#define irregs32_getes(self)           irregs32_getes_ex(self, __rdes())
+#define irregs32_trysetes(self, value) irregs32_trysetes_ex(self, value, __rdes())
+#define irregs32_getfs(self)           irregs32_getfs_ex(self, __rdfs())
+#define irregs32_trysetfs(self, value) irregs32_trysetfs_ex(self, value, __rdfs())
+#endif /* !__KERNEL__ || __x86_64__ */
+#define irregs32_getgs(self)           irregs32_getgs_ex(self, __rdgs())
+#define irregs32_trysetgs(self, value) irregs32_trysetgs_ex(self, value, __rdgs())
 
 /* Returns the total size of the given CPU state. */
 #define irregs32_sizeof(self) \
@@ -429,6 +463,7 @@ __NOTHROW_NCX(kcpustate32_to_icpustate32_p)(struct kcpustate32 const *__restrict
 #define icpustate32_getgs_ex(self, v_nonvm86_gs) (icpustate32_isvm86(self) ? (self)->ics_irregs_v.ir_gs16 : (v_nonvm86_gs))
 #define icpustate32_getgs(self)                  icpustate32_getgs_ex(self, __rdgs())
 #define icpustate32_setgs(self, value)           (icpustate32_isvm86(self) ? (void)((self)->ics_irregs_v.ir_gs = (value)) : __wrgs(value))
+#define icpustate32_trysetgs(self, value)        (icpustate32_isvm86(self) ? ((self)->ics_irregs_v.ir_gs = (value), 1) : (__rdgs() == (value)))
 #define icpustate32_getds_novm86(self)           ((__u16)(self)->ics_ds16)
 #define icpustate32_setds_novm86(self, value)    ((self)->ics_ds = (value))
 #define icpustate32_getes_novm86(self)           ((__u16)(self)->ics_es16)
@@ -444,6 +479,7 @@ __NOTHROW_NCX(kcpustate32_to_icpustate32_p)(struct kcpustate32 const *__restrict
 #define icpustate32_setcs(self, value)           irregs32_setcs(&(self)->ics_irregs, value)
 #define icpustate32_getss(self)                  irregs32_getss(&(self)->ics_irregs)
 #define icpustate32_trysetss(self, value)        irregs32_trysetss(&(self)->ics_irregs, value)
+#define icpustate32_trysetuserss(self, value)    irregs32_trysetuserss(&(self)->ics_irregs, value)
 #define icpustate32_trysetesp(self, value)       irregs32_trysetesp(&(self)->ics_irregs, value)
 #define icpustate32_sizeof(self)                 (irregs32_sizeof(&(self)->ics_irregs) + OFFSET_ICPUSTATE32_IRREGS)
 __LOCAL __NOBLOCK __ATTR_WUNUSED struct icpustate32 *
@@ -761,6 +797,7 @@ __NOTHROW_NCX(icpustate32_user_to_icpustate32_p)(struct icpustate32 const *__res
 #define scpustate32_getss(self)                  (scpustate32_isuser(self) ? scpustate32_getuserss(self) : scpustate32_getkernelss(self))
 #define scpustate32_trysetesp(self, value)       (scpustate32_isuser(self) ? (scpustate32_setuseresp(self, value), 1) : (scpustate32_getkernelesp(self) == (value)))
 #define scpustate32_trysetss(self, value)        (scpustate32_isuser(self) ? (scpustate32_setuserss(self, value), 1) : (scpustate32_getkernelss(self) == (value)))
+#define scpustate32_trysetuserss(self, value)    (scpustate32_isuser(self) ? (scpustate32_setuserss(self, value), 1) : 0)
 #define scpustate32_sizeof(self)                            \
 	(scpustate32_isvm86(self)                               \
 	 ? (OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_VM86)   \
@@ -1199,6 +1236,23 @@ __NOTHROW_NCX(fcpustate32_assign_ucpustate32)(struct fcpustate32 *__restrict __s
 	__self->fcs_sgregs.sg_ss = __data->ucs_ss;
 }
 __LOCAL __NOBLOCK void
+__NOTHROW_NCX(fcpustate32_assign_lcpustate32)(struct fcpustate32 *__restrict __self,
+                                              struct lcpustate32 const *__restrict __data) {
+	__self->fcs_gpregs.gp_edi = __data->lcs_edi;
+	__self->fcs_gpregs.gp_esi = __data->lcs_esi;
+	__self->fcs_gpregs.gp_ebp = __data->lcs_ebp;
+	__self->fcs_gpregs.gp_esp = __data->lcs_esp;
+	__self->fcs_gpregs.gp_ebx = __data->lcs_ebx;
+	__self->fcs_eip           = __data->lcs_eip;
+}
+__LOCAL __NOBLOCK void
+__NOTHROW_NCX(fcpustate32_assign_kcpustate32)(struct fcpustate32 *__restrict __self,
+                                              struct kcpustate32 const *__restrict __data) {
+	__self->fcs_gpregs = __data->kcs_gpregs;
+	__self->fcs_eflags = __data->kcs_eflags;
+	__self->fcs_eip    = __data->kcs_eip;
+}
+__LOCAL __NOBLOCK void
 __NOTHROW_NCX(fcpustate32_assign_scpustate32)(struct fcpustate32 *__restrict __self,
                                               struct scpustate32 const *__restrict __data) {
 	__self->fcs_gpregs       = __data->scs_gpregs;
@@ -1405,8 +1459,33 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define irregs_getkernelss                  irregs32_getkernelss
 #define irregs_getss                        irregs32_getss
 #define irregs_trysetss                     irregs32_trysetss
+#define irregs_trysetuserss                 irregs32_trysetuserss
 #define irregs_trysetesp                    irregs32_trysetesp
 #define irregs_sizeof                       irregs32_sizeof
+#define irregs_getvm86ds                    irregs32_getvm86ds
+#define irregs_setvm86ds                    irregs32_setvm86ds
+#define irregs_getvm86es                    irregs32_getvm86es
+#define irregs_setvm86es                    irregs32_setvm86es
+#define irregs_getvm86fs                    irregs32_getvm86fs
+#define irregs_setvm86fs                    irregs32_setvm86fs
+#define irregs_getvm86gs                    irregs32_getvm86gs
+#define irregs_setvm86gs                    irregs32_setvm86gs
+#define irregs_getds_ex                     irregs32_getds_ex
+#define irregs_trysetds_ex                  irregs32_trysetds_ex
+#define irregs_getes_ex                     irregs32_getes_ex
+#define irregs_trysetes_ex                  irregs32_trysetes_ex
+#define irregs_getfs_ex                     irregs32_getfs_ex
+#define irregs_trysetfs_ex                  irregs32_trysetfs_ex
+#define irregs_getgs_ex                     irregs32_getgs_ex
+#define irregs_trysetgs_ex                  irregs32_trysetgs_ex
+#define irregs_getds                        irregs32_getds
+#define irregs_trysetds                     irregs32_trysetds
+#define irregs_getes                        irregs32_getes
+#define irregs_trysetes                     irregs32_trysetes
+#define irregs_getfs                        irregs32_getfs
+#define irregs_trysetfs                     irregs32_trysetfs
+#define irregs_getgs                        irregs32_getgs
+#define irregs_trysetgs                     irregs32_trysetgs
 
 #define lcpustate_getpc                     lcpustate32_geteip
 #define lcpustate_setpc                     lcpustate32_seteip
@@ -1494,6 +1573,7 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define icpustate_getgs_ex                  icpustate32_getgs_ex
 #define icpustate_getgs                     icpustate32_getgs
 #define icpustate_setgs                     icpustate32_setgs
+#define icpustate_trysetgs                  icpustate32_trysetgs
 #define icpustate_getds_novm86              icpustate32_getds_novm86
 #define icpustate_setds_novm86              icpustate32_setds_novm86
 #define icpustate_getes_novm86              icpustate32_getes_novm86
@@ -1509,6 +1589,7 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define icpustate_setcs                     icpustate32_setcs
 #define icpustate_getss                     icpustate32_getss
 #define icpustate_trysetss                  icpustate32_trysetss
+#define icpustate_trysetuserss              icpustate32_trysetuserss
 #define icpustate_sizeof                    icpustate32_sizeof
 #define icpustate_to_ucpustate_ex           icpustate32_to_ucpustate32_ex
 #define icpustate_to_ucpustate32_ex         icpustate32_to_ucpustate32_ex
@@ -1589,6 +1670,7 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define scpustate_setcs                     scpustate32_setcs
 #define scpustate_getss                     scpustate32_getss
 #define scpustate_trysetss                  scpustate32_trysetss
+#define scpustate_trysetuserss              scpustate32_trysetuserss
 #define scpustate_sizeof                    scpustate32_sizeof
 #define scpustate_to_ucpustate              scpustate32_to_ucpustate32
 #define scpustate_to_ucpustate32            scpustate32_to_ucpustate32
@@ -1672,6 +1754,12 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define fcpustate_assign_ucpustate          fcpustate32_assign_ucpustate32
 #define fcpustate_assign_ucpustate32        fcpustate32_assign_ucpustate32
 #define fcpustate32_assign_ucpustate        fcpustate32_assign_ucpustate32
+#define fcpustate_assign_lcpustate          fcpustate32_assign_lcpustate32
+#define fcpustate_assign_lcpustate32        fcpustate32_assign_lcpustate32
+#define fcpustate32_assign_lcpustate        fcpustate32_assign_lcpustate32
+#define fcpustate_assign_kcpustate          fcpustate32_assign_kcpustate32
+#define fcpustate_assign_kcpustate32        fcpustate32_assign_kcpustate32
+#define fcpustate32_assign_kcpustate        fcpustate32_assign_kcpustate32
 #define fcpustate_assign_scpustate          fcpustate32_assign_scpustate32
 #define fcpustate_assign_scpustate32        fcpustate32_assign_scpustate32
 #define fcpustate32_assign_scpustate        fcpustate32_assign_scpustate32

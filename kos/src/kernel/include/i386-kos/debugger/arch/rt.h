@@ -26,6 +26,7 @@
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <kernel/except.h>
 #include <kernel/types.h>
+#include <sched/cpu.h>
 #include <sched/rwlock-intern.h>
 #include <sched/signal-intern.h>
 
@@ -94,6 +95,32 @@ struct task;
 
 /* Arch-specific backups for context data of
  * the current thread whilst in debugger mode. */
+#ifndef CONFIG_NO_SMP
+struct x86_dbg_cpuammend {
+	struct cpu    *dca_cpu;       /* [1..1][const] The associated CPU (same as `cpu_vector[INDEXOF(this in dhs_cpus)]') */
+	struct task   *dca_thread;    /* [1..1][const] The associated thread (same as `cpu_vector[INDEXOF(this in dhs_cpus)]->c_current') */
+	struct coregs  dca_coregs;    /* Control registers. */
+	struct drregs  dca_drregs;    /* Debug registers. */
+#ifdef __x86_64__
+	struct sgregs  dca_sgregs;    /* Saved segment registers */
+	struct sgbase  dca_sgbase;    /* Saved segment base register values. */
+#else /* __x86_64__ */
+	u16            dca_gs;        /* Saved %gs. */
+	u16            dca_ss;        /* Saved %ss. */
+#endif /* !__x86_64__ */
+	u16            dca_tr;        /* Saved %tr. */
+	u16            dca_ldt;       /* Saved %ldtr. */
+	struct desctab dca_idt;       /* Saved IDT descriptor table. */
+	struct desctab dca_gdt;       /* Saved GDT descriptor table. */
+	struct task   *dca_override;  /* [0..1] Saved `c_override' of this CPU */
+	uintptr_t      dca_taskflags; /* Saved `dca_thread->t_flags' */
+	bool           dca_pint;      /* Set to true if preemptive interrupts were enabled. */
+};
+struct x86_dbg_cpustate {
+	struct icpustate         *dcs_istate;   /* [0..1] Saved `icpustate' of this CPU */
+	struct x86_dbg_cpuammend *dcs_iammend;  /* [valid_if(dcs_istate)] CPU state ammendment of this CPU. */
+};
+#endif /* !CONFIG_NO_SMP */
 struct x86_dbg_hoststate {
 	struct exception_info   dhs_except;    /* Saved exception info. */
 	struct task            *dhs_taskself;  /* Saved `this_task.t_self' */
@@ -103,6 +130,9 @@ struct x86_dbg_hoststate {
 	struct read_locks       dhs_readlocks; /* Saved `this_read_locks' */
 	struct task_connections dhs_signals;   /* Saved signal connections. */
 	bool                    dhs_pint;      /* Set to true if preemptive interrupts were enabled. */
+#ifndef CONFIG_NO_SMP
+	struct x86_dbg_cpustate dhs_cpus[CONFIG_MAX_CPU_COUNT];
+#endif /* !CONFIG_NO_SMP */
 };
 
 /* Host-thread special-state backup data. (saved/restored by `dbg_init()' and `dbg_fini()') */
@@ -118,10 +148,6 @@ DATDEF unsigned int x86_dbg_trapstatekind;
 
 /* The CPU state that gets loaded when `dbg_exit()' is called. */
 DATDEF struct fcpustate x86_dbg_exitstate;
-
-/* TODO: Get rid of the following two functions! */
-DATDEF struct fcpustate x86_dbg_origstate; /* The CPU state originally loaded by the current thread. */
-DATDEF struct fcpustate x86_dbg_viewstate; /* The CPU state currently being viewed by the debugger (for walking the stack...). */
 
 
 
@@ -147,10 +173,10 @@ DATDEF struct desctab const x86_dbgidt_ptr;
  *       dbg_getregbyname: The contents of `buf' are undefined.
  *       dbg_setregbyname: The register was not written.
  * NOTE: Accepted register names are those found in comments in `<asm/registers.h>'
- * @param: id:  One of `X86_REGISTER_*' (from <asm/registers.h>) or one of `X86_DBGREGISTER_*'
- * @return: * : The required buffer size, or 0 when `name' isn't recognized. */
-FUNDEF size_t NOTHROW(KCALL x86_dbg_getregbyid)(unsigned int level, unsigned int id, void *__restrict buf, size_t buflen);
-FUNDEF size_t NOTHROW(KCALL x86_dbg_setregbyid)(unsigned int level, unsigned int id, void const *__restrict buf, size_t buflen);
+ * @param: regno: One of `X86_REGISTER_*' (from <asm/registers.h>) or one of `X86_DBGREGISTER_*'
+ * @return: * :   The required buffer size, or 0 when `name' isn't recognized. */
+FUNDEF size_t NOTHROW(KCALL x86_dbg_getregbyid)(unsigned int level, unsigned int regno, void *__restrict buf, size_t buflen);
+FUNDEF size_t NOTHROW(KCALL x86_dbg_setregbyid)(unsigned int level, unsigned int regno, void const *__restrict buf, size_t buflen);
 
 /* Return the ID (one of `X86_REGISTER_*' from <asm/registers.h>,
  * or one of `X86_DBGREGISTER_*') from a given register name. */

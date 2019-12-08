@@ -346,7 +346,7 @@ dbg_main(uintptr_t show_welcome) {
 		/* Add a visual indicator for when the exit state doesn't match the currently
 		 * viewed state (thus informing the user that they need to type `apply' before
 		 * exit if they wish to return to the modified state) */
-		if (memcmp(&x86_dbg_origstate, &x86_dbg_viewstate, sizeof(x86_dbg_origstate)) != 0)
+		if (dbg_changedview())
 			dbg_print(DBGSTR(DF_COLOR(DBG_COLOR_LIME, DBG_COLOR_DARK_GRAY, "!")));
 		dbg_print(DBGSTR("> "));
 		attr = dbg_attr;

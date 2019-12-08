@@ -43,7 +43,6 @@
 #define X86_REGISTER_GENERAL_PURPOSE_P15  X86_REGISTER_GENERAL_PURPOSE_R15 /* %p15 */
 #define X86_REGISTER_MISC_PFLAGS          X86_REGISTER_MISC_RFLAGS         /* %pflags */
 #define X86_REGISTER_MISC_PIP             X86_REGISTER_MISC_RIP            /* %pip */
-#define X86_REGISTER_MISC_PIZ             X86_REGISTER_MISC_RIZ            /* %piz */
 #define X86_REGISTER_MISC_FSBASE          X86_REGISTER_MISC_FSBASEQ        /* %fs.base */
 #define X86_REGISTER_MISC_GSBASE          X86_REGISTER_MISC_GSBASEQ        /* %gs.base */
 #define X86_REGISTER_MISC_GDT_BASE        X86_REGISTER_MISC_GDT_BASEQ      /* %gdt.base */
@@ -60,7 +59,6 @@
 #define X86_REGISTER_GENERAL_PURPOSE_PDI  X86_REGISTER_GENERAL_PURPOSE_EDI /* %pdi */
 #define X86_REGISTER_MISC_PFLAGS          X86_REGISTER_MISC_EFLAGS         /* %pflags */
 #define X86_REGISTER_MISC_PIP             X86_REGISTER_MISC_EIP            /* %pip */
-#define X86_REGISTER_MISC_PIZ             X86_REGISTER_MISC_EIZ            /* %piz */
 #define X86_REGISTER_MISC_FSBASE          X86_REGISTER_MISC_FSBASEL        /* %fs.base */
 #define X86_REGISTER_MISC_GSBASE          X86_REGISTER_MISC_GSBASEL        /* %gs.base */
 #define X86_REGISTER_MISC_GDT_BASE        X86_REGISTER_MISC_GDT_BASEL      /* %gdt.base */

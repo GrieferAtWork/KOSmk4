@@ -139,18 +139,30 @@ LIBCPUSTATE_DECL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC setre
 #endif /* LIBCPUSTATE_WANT_PROTOTYPES */
 #else /* !__KERNEL__ */
 typedef __ATTR_NONNULL((1)) __size_t /*__NOTHROW_NCX*/(LIBCPUSTATE_CC *PGETREG_IRREGS)(__LIBCPUSTATE_IRREGS_STRUCT_TYPE const *__restrict __self, unsigned int __regno, void *__restrict __buf, __size_t __buflen);
-typedef __ATTR_NONNULL((1)) __size_t /*__NOTHROW_NCX*/(LIBCPUSTATE_CC *PSETREG_IRREGS_P)(__LIBCPUSTATE_IRREGS_STRUCT_TYPE **__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen);
 typedef __ATTR_NONNULL((1)) __size_t /*__NOTHROW_NCX*/(LIBCPUSTATE_CC *PGETREG_ICPUSTATE)(struct icpustate const *__restrict __self, unsigned int __regno, void *__restrict __buf, __size_t __buflen);
-typedef __ATTR_NONNULL((1)) __size_t /*__NOTHROW_NCX*/(LIBCPUSTATE_CC *PSETREG_ICPUSTATE_P)(struct icpustate **__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen);
 typedef __ATTR_NONNULL((1)) __size_t /*__NOTHROW_NCX*/(LIBCPUSTATE_CC *PGETREG_SCPUSTATE)(struct scpustate const *__restrict __self, unsigned int __regno, void *__restrict __buf, __size_t __buflen);
+#ifdef __x86_64__
+typedef __ATTR_NONNULL((1)) __size_t /*__NOTHROW_NCX*/(LIBCPUSTATE_CC *PSETREG_IRREGS)(__LIBCPUSTATE_IRREGS_STRUCT_TYPE *__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen);
+typedef __ATTR_NONNULL((1)) __size_t /*__NOTHROW_NCX*/(LIBCPUSTATE_CC *PSETREG_ICPUSTATE)(struct icpustate *__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen);
+typedef __ATTR_NONNULL((1)) __size_t /*__NOTHROW_NCX*/(LIBCPUSTATE_CC *PSETREG_SCPUSTATE)(struct scpustate *__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen);
+#else /* __x86_64__ */
+typedef __ATTR_NONNULL((1)) __size_t /*__NOTHROW_NCX*/(LIBCPUSTATE_CC *PSETREG_IRREGS_P)(__LIBCPUSTATE_IRREGS_STRUCT_TYPE **__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen);
+typedef __ATTR_NONNULL((1)) __size_t /*__NOTHROW_NCX*/(LIBCPUSTATE_CC *PSETREG_ICPUSTATE_P)(struct icpustate **__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen);
 typedef __ATTR_NONNULL((1)) __size_t /*__NOTHROW_NCX*/(LIBCPUSTATE_CC *PSETREG_SCPUSTATE_P)(struct scpustate **__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen);
+#endif /* !__x86_64__ */
 #ifdef LIBCPUSTATE_WANT_PROTOTYPES
 LIBCPUSTATE_DECL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC getreg_irregs)(__LIBCPUSTATE_IRREGS_STRUCT_TYPE const *__restrict __self, unsigned int __regno, void *__restrict __buf, __size_t __buflen);
-LIBCPUSTATE_DECL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC setreg_irregs_p)(__LIBCPUSTATE_IRREGS_STRUCT_TYPE **__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen);
 LIBCPUSTATE_DECL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC getreg_icpustate)(struct icpustate const *__restrict __self, unsigned int __regno, void *__restrict __buf, __size_t __buflen);
-LIBCPUSTATE_DECL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC setreg_icpustate_p)(struct icpustate **__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen);
 LIBCPUSTATE_DECL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC getreg_scpustate)(struct scpustate const *__restrict __self, unsigned int __regno, void *__restrict __buf, __size_t __buflen);
+#ifdef __x86_64__
+LIBCPUSTATE_DECL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC setreg_irregs)(__LIBCPUSTATE_IRREGS_STRUCT_TYPE *__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen);
+LIBCPUSTATE_DECL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC setreg_icpustate)(struct icpustate *__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen);
+LIBCPUSTATE_DECL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC setreg_scpustate)(struct scpustate *__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen);
+#else /* __x86_64__ */
+LIBCPUSTATE_DECL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC setreg_irregs_p)(__LIBCPUSTATE_IRREGS_STRUCT_TYPE **__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen);
+LIBCPUSTATE_DECL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC setreg_icpustate_p)(struct icpustate **__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen);
 LIBCPUSTATE_DECL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC setreg_scpustate_p)(struct scpustate **__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen);
+#endif /* !__x86_64__ */
 #endif /* LIBCPUSTATE_WANT_PROTOTYPES */
 #endif /* __KERNEL__ */
 
@@ -194,11 +206,17 @@ __REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTA
 __REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,setreg,(struct ucontext *__restrict __self, unsigned int __regno, void const *__restrict __buf, __size_t __buflen),setreg_ucontext,(__self,__regno,__buf,__buflen))
 #else /* !__KERNEL__ */
 __REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,getreg,(__LIBCPUSTATE_IRREGS_STRUCT_TYPE const *__restrict __self, unsigned int __regno, void *__restrict __buf, __size_t __buflen),getreg_irregs,(__self,__regno,__buf,__buflen))
-__REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,setreg,(__LIBCPUSTATE_IRREGS_STRUCT_TYPE **__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen),setreg_irregs_p,(__self,__regno,__buf,__buflen))
 __REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,getreg,(struct icpustate const *__restrict __self, unsigned int __regno, void *__restrict __buf, __size_t __buflen),getreg_icpustate,(__self,__regno,__buf,__buflen))
-__REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,setreg,(struct icpustate **__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen),setreg_icpustate_p,(__self,__regno,__buf,__buflen))
 __REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,getreg,(struct scpustate const *__restrict __self, unsigned int __regno, void *__restrict __buf, __size_t __buflen),getreg_scpustate,(__self,__regno,__buf,__buflen))
+#ifdef __x86_64__
+__REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,setreg,(__LIBCPUSTATE_IRREGS_STRUCT_TYPE *__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen),setreg_irregs,(__self,__regno,__buf,__buflen))
+__REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,setreg,(struct icpustate *__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen),setreg_icpustate,(__self,__regno,__buf,__buflen))
+__REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,setreg,(struct scpustate *__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen),setreg_scpustate,(__self,__regno,__buf,__buflen))
+#else /* __x86_64__ */
+__REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,setreg,(__LIBCPUSTATE_IRREGS_STRUCT_TYPE **__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen),setreg_irregs_p,(__self,__regno,__buf,__buflen))
+__REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,setreg,(struct icpustate **__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen),setreg_icpustate_p,(__self,__regno,__buf,__buflen))
 __REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,setreg,(struct scpustate **__restrict __pself, unsigned int __regno, void const *__restrict __buf, __size_t __buflen),setreg_scpustate_p,(__self,__regno,__buf,__buflen))
+#endif /* !__x86_64__ */
 #endif /* __KERNEL__ */
 }
 #endif /* LIBCPUSTATE_WANT_PROTOTYPES */

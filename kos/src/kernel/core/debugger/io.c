@@ -78,11 +78,14 @@ DEFINE_DEBUG_FUNCTION(
 		"undo\n"
 		"\tUndo all unapplied changes to the return register state\n"
 		, argc, argv) {
+	struct fcpustate fst;
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	(void)argv;
 	dbg_current = THIS_TASK;
-	memcpy(&x86_dbg_viewstate, &x86_dbg_origstate, sizeof(x86_dbg_origstate));
+	/* Reset the view's register state. */
+	dbg_getallregs(DBG_REGLEVEL_ORIG, &fst);
+	dbg_setallregs(DBG_REGLEVEL_VIEW, &fst);
 	return 0;
 }
 
@@ -292,7 +295,7 @@ DEFINE_DEBUG_FUNCTION(
 		argc, argv) {
 	uintptr_t addr, current_pc, count;
 	struct disassembler da;
-	current_pc = fcpustate_getpc(&x86_dbg_viewstate);
+	current_pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
 	current_pc = (uintptr_t)instruction_trypred((void const *)current_pc);
 	addr = current_pc;
 	if (argc >= 2) {
@@ -320,7 +323,7 @@ DEFINE_DEBUG_FUNCTION(
 		"\tPrint the length of the specified instruction\n",
 		argc, argv) {
 	uintptr_t addr, current_pc, length;
-	current_pc = fcpustate_getpc(&x86_dbg_viewstate);
+	current_pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
 	current_pc = (uintptr_t)instruction_trypred((void const *)current_pc);
 	addr = current_pc;
 	if (argc >= 2) {
@@ -346,7 +349,7 @@ DEFINE_DEBUG_FUNCTION(
 		"\tLine: Line number within File of the associated source code\n"
 		"\tInfo: Additional information\n",
 		argc, argv) {
-	struct ucpustate state;
+	struct fcpustate state;
 	unsigned int error;
 #ifdef LOG_STACK_REMAINDER
 	uintptr_t last_good_sp;
@@ -354,26 +357,26 @@ DEFINE_DEBUG_FUNCTION(
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	(void)argv;
-	fcpustate_to_ucpustate(&x86_dbg_viewstate, &state);
+	dbg_getallregs(DBG_REGLEVEL_VIEW, &state);
 #ifdef LOG_STACK_REMAINDER
-	last_good_sp = ucpustate_getsp(&state);
+	last_good_sp = fcpustate_getsp(&state);
 #endif /* LOG_STACK_REMAINDER */
-	dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)ucpustate_getpc(&state)),
-	                     (uintptr_t)ucpustate_getpc(&state),
-	                     DBGSTR("sp=%p"), (void *)ucpustate_getsp(&state));
+	dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)fcpustate_getpc(&state)),
+	                     (uintptr_t)fcpustate_getpc(&state),
+	                     DBGSTR("sp=%p"), (void *)fcpustate_getsp(&state));
 	for (;;) {
-		struct ucpustate old_state;
-		memcpy(&old_state, &state, sizeof(struct ucpustate));
-		error = unwind((void *)(ucpustate_getpc(&old_state) - 1),
-		               &unwind_getreg_ucpustate, &old_state,
-		               &unwind_setreg_ucpustate, &state);
+		struct fcpustate old_state;
+		memcpy(&old_state, &state, sizeof(struct fcpustate));
+		error = unwind((void *)(fcpustate_getpc(&old_state) - 1),
+		               &unwind_getreg_fcpustate, &old_state,
+		               &unwind_setreg_fcpustate, &state);
 		if (error != UNWIND_SUCCESS)
 			break;
-		dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)ucpustate_getpc(&state)),
-		                     (uintptr_t)ucpustate_getpc(&state), DBGSTR("sp=%p"),
-		                     (void *)ucpustate_getsp(&state));
+		dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)fcpustate_getpc(&state)),
+		                     (uintptr_t)fcpustate_getpc(&state), DBGSTR("sp=%p"),
+		                     (void *)fcpustate_getsp(&state));
 #ifdef LOG_STACK_REMAINDER
-		last_good_sp = ucpustate_getsp(&state);
+		last_good_sp = fcpustate_getsp(&state);
 #endif /* LOG_STACK_REMAINDER */
 	}
 	if (error != UNWIND_NO_FRAME)
@@ -421,23 +424,28 @@ DEFINE_DEBUG_FUNCTION(
 		"u\n"
 		"\tUnwind the current source location to its call-site\n"
 		, argc, argv) {
-	struct fcpustate newstate;
+	struct fcpustate oldstate, newstate;
 	unsigned int error;
+	void *final_pc;
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	(void)argv;
-	memcpy(&newstate, &x86_dbg_viewstate, sizeof(struct fcpustate));
-	error = unwind((void *)(fcpustate_getpc(&x86_dbg_viewstate) - 1),
-	               &unwind_getreg_fcpustate, &x86_dbg_viewstate,
+	dbg_getallregs(DBG_REGLEVEL_VIEW, &oldstate);
+	memcpy(&newstate, &oldstate, sizeof(struct fcpustate));
+	error = unwind((void *)(fcpustate_getpc(&oldstate) - 1),
+	               &unwind_getreg_fcpustate, &oldstate,
 	               &unwind_setreg_fcpustate, &newstate);
 	if (error != UNWIND_SUCCESS) {
 		dbg_printf(DBGSTR("Unwind failure: %u\n"), error);
+		final_pc = (void *)fcpustate_getpc(&oldstate);
 	} else {
-		memcpy(&x86_dbg_viewstate, &newstate, sizeof(struct fcpustate));
+		dbg_setallregs(DBG_REGLEVEL_VIEW, &newstate);
+		final_pc = (void *)fcpustate_getpc(&newstate);
 	}
-	dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)fcpustate_getpc(&x86_dbg_viewstate)),
-	                     (uintptr_t)fcpustate_getpc(&x86_dbg_viewstate),
-	                     DBGSTR("sp=%p"), (void *)fcpustate_getsp(&x86_dbg_viewstate));
+	dbg_addr2line_printf((uintptr_t)instruction_trypred(final_pc),
+	                     (uintptr_t)final_pc,
+	                     DBGSTR("sp=%p"),
+	                     (void *)final_pc);
 	return 0;
 }
 
@@ -452,7 +460,7 @@ DEFINE_DEBUG_FUNCTION(
 again:
 	--argc;
 	++argv;
-	current_pc = fcpustate_getpc(&x86_dbg_viewstate);
+	current_pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
 	current_pc = (uintptr_t)instruction_trypred((void const *)current_pc);
 	addr = current_pc;
 	if (argc >= 1) {

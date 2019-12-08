@@ -192,7 +192,7 @@ __SYSDECL_BEGIN
 #define OFFSET_GPREGS64_RAX 120
 #define SIZEOF_GPREGS64     128
 #ifdef __CC__
-struct __ATTR_PACKED gpregs64 {
+struct gpregs64 {
 	__u64   gp_r15;    /* [P] General purpose register #15 */
 	__u64   gp_r14;    /* [P] General purpose register #14 */
 	__u64   gp_r13;    /* [P] General purpose register #13 */
@@ -232,7 +232,7 @@ struct __ATTR_PACKED gpregs64 {
 #define OFFSET_GPREGSNSP64_RAX 112
 #define SIZEOF_GPREGSNSP64     120
 #ifdef __CC__
-struct __ATTR_PACKED gpregsnsp64 /*[PREFIX(gp_)]*/ {
+struct gpregsnsp64 /*[PREFIX(gp_)]*/ {
 	__u64   gp_r15;    /* [P] General purpose register #15 */
 	__u64   gp_r14;    /* [P] General purpose register #14 */
 	__u64   gp_r13;    /* [P] General purpose register #13 */
@@ -259,7 +259,7 @@ struct __ATTR_PACKED gpregsnsp64 /*[PREFIX(gp_)]*/ {
 #define OFFSET_SGREGS64_DS  24
 #define SIZEOF_SGREGS64     32
 #ifdef __CC__
-struct __ATTR_PACKED sgregs64 {
+struct sgregs64 {
 	union {
 		__u64 sg_gs;     /* G segment register (Usually `SEGMENT_USER_GSBASE_RPL')
 		                  * (upper 48 bits are undefined, but should be written as zeros) */
@@ -288,7 +288,7 @@ struct __ATTR_PACKED sgregs64 {
 #define OFFSET_SGBASE64_FSBASE  8
 #define SIZEOF_SGBASE64         16
 #ifdef __CC__
-struct __ATTR_PACKED sgbase64 /*[PREFIX(sg_)]*/ {
+struct sgbase64 /*[PREFIX(sg_)]*/ {
 	__u64   sg_gsbase;  /* G segment register base (for user-space) */
 	__u64   sg_fsbase;  /* F segment register base */
 };
@@ -302,7 +302,7 @@ struct __ATTR_PACKED sgbase64 /*[PREFIX(sg_)]*/ {
 #define OFFSET_COREGS64_CR4 24
 #define SIZEOF_COREGS64     32
 #ifdef __CC__
-struct __ATTR_PACKED coregs64 {
+struct coregs64 {
 	__u64   co_cr0;    /* %cr0 (Set of `CR0_*' from `/include/i386-kos/asm/cpu-flags.h') */
 	__u64   co_cr2;    /* %cr2 (Page Fault Linear Address (PFLA) (when a #PF occurs, contains that fault's address)) */
 	__u64   co_cr3;    /* %cr3 (Page Directory Linear Address) */
@@ -320,7 +320,7 @@ struct __ATTR_PACKED coregs64 {
 #define OFFSET_DRREGS64_DR7  40
 #define SIZEOF_DRREGS64      48
 #ifdef __CC__
-struct __ATTR_PACKED drregs64 {
+struct drregs64 {
 	__u64   dr_dr0;    /* %dr0 (Linear address of first breakpoint) */
 	__u64   dr_dr1;    /* %dr1 (Linear address of second breakpoint) */
 	__u64   dr_dr2;    /* %dr2 (Linear address of third breakpoint) */
@@ -339,7 +339,7 @@ struct __ATTR_PACKED drregs64 {
 #define OFFSET_IRREGS64_SS     32
 #define SIZEOF_IRREGS64        40
 #ifdef __CC__
-struct __ATTR_PACKED irregs64 {
+struct irregs64 {
 	/* On x86_64, the interrupt return tail always looks the same. */
 	__u64     ir_rip;    /* Instruction pointer */
 	union {
@@ -368,7 +368,7 @@ struct __ATTR_PACKED irregs64 {
 #define OFFSET_UCPUSTATE64_RIP    200
 #define SIZEOF_UCPUSTATE64        208
 #ifdef __CC__
-struct __ATTR_PACKED ucpustate64 { /* u -- User */
+struct ucpustate64 { /* u -- User */
 	/* Full CPU state, as used by system calls.
 	 * NOTE: Also represents the state saved when an exception occurs,
 	 *       both inside kernel-, as well as user-space. */
@@ -402,7 +402,7 @@ struct __ATTR_PACKED ucpustate64 { /* u -- User */
 #define OFFSET_LCPUSTATE64_RIP  56
 #define SIZEOF_LCPUSTATE64      64
 #ifdef __CC__
-struct __ATTR_PACKED lcpustate64 { /* l -- Little */
+struct lcpustate64 { /* l -- Little */
 	/* A minimal CPU state containing only registers that are callee-preserved.
 	 * This kind of CPU state is most useful for generating tracebacks. */
 	__u64         lcs_r15;    /* [P] General purpose register #15 */
@@ -423,7 +423,7 @@ struct __ATTR_PACKED lcpustate64 { /* l -- Little */
 #define OFFSET_KCPUSTATE64_RIP     136
 #define SIZEOF_KCPUSTATE64         144
 #ifdef __CC__
-struct __ATTR_PACKED kcpustate64 {
+struct kcpustate64 {
 	/* A CPU state used to describe a known, valid register state in kernel-space.
 	 * This kind of state is also used by exception handling, and the associated
 	 * stack unwinding. */
@@ -439,7 +439,7 @@ struct __ATTR_PACKED kcpustate64 {
 #define OFFSET_ICPUSTATE64_IRREGS    120
 #define SIZEOF_ICPUSTATE64           160
 #ifdef __CC__
-struct __ATTR_PACKED icpustate64 { /* i -- Interrupts */
+struct icpustate64 { /* i -- Interrupts */
 	/* A CPU state that is used by hardware interrupts (other than those used
 	 * by scheduling, which generate `scpustate' instead), in order to describe
 	 * the interrupted text location.
@@ -500,7 +500,7 @@ struct __ATTR_PACKED icpustate64 { /* i -- Interrupts */
 #define OFFSET_SCPUSTATE64_IRREGS        168
 #define SIZEOF_SCPUSTATE64               208
 #ifdef __CC__
-struct __ATTR_PACKED scpustate64 { /* i -- Interrupts */
+struct scpustate64 { /* i -- Interrupts */
 	/* A CPU state that is used by hardware interrupts (other than
 	 * those used by scheduling, which generate `scpustate' instead),
 	 * in order to describe the interrupted text location. */
@@ -546,7 +546,7 @@ struct __ATTR_PACKED desctab64 /*[PREFIX(dt_)]*/ {
 #define OFFSET_FCPUSTATE64_IDT    326
 #define SIZEOF_FCPUSTATE64        336
 #ifdef __CC__
-struct __ATTR_PACKED fcpustate64 { /* f -- Full */
+struct fcpustate64 { /* f -- Full */
 	/* Full CPU state (including _all_ registers that exist). */
 	struct gpregs64  fcs_gpregs; /* General purpose registers. */
 	__u64            fcs_rflags; /* Flags register */

@@ -171,7 +171,7 @@ __SYSDECL_BEGIN
 #define OFFSET_GPREGS32_EAX 28
 #define SIZEOF_GPREGS32     32
 #ifdef __CC__
-struct __ATTR_PACKED gpregs32 {
+struct gpregs32 {
 	__u32   gp_edi;    /* [P] Destination pointer */
 	__u32   gp_esi;    /* [P] Source pointer */
 	__u32   gp_ebp;    /* [P] Frame base pointer */
@@ -191,7 +191,7 @@ struct __ATTR_PACKED gpregs32 {
 #define OFFSET_SGREGS32_DS  12
 #define SIZEOF_SGREGS32     16
 #ifdef __CC__
-struct __ATTR_PACKED sgregs32 {
+struct sgregs32 {
 	union {
 		__u32 sg_gs;     /* G segment register (Usually `SEGMENT_USER_GSBASE_RPL')
 		                  * (upper 16 bits are undefined, but should be written as zeros) */
@@ -223,7 +223,7 @@ struct __ATTR_PACKED sgregs32 {
 #define OFFSET_COREGS32_CR4 12
 #define SIZEOF_COREGS32     16
 #ifdef __CC__
-struct __ATTR_PACKED coregs32 {
+struct coregs32 {
 	__u32   co_cr0;    /* %cr0 (Set of `CR0_*' from `/include/i386-kos/asm/cpu-flags.h') */
 	__u32   co_cr2;    /* %cr2 (Page Fault Linear Address (PFLA) (when a #PF occurs, contains that fault's address)) */
 	__u32   co_cr3;    /* %cr3 (Page Directory Linear Address) */
@@ -241,7 +241,7 @@ struct __ATTR_PACKED coregs32 {
 #define OFFSET_DRREGS32_DR7  20
 #define SIZEOF_DRREGS32      24
 #ifdef __CC__
-struct __ATTR_PACKED drregs32 {
+struct drregs32 {
 	__u32   dr_dr0;    /* %dr0 (Linear address of first breakpoint) */
 	__u32   dr_dr1;    /* %dr1 (Linear address of second breakpoint) */
 	__u32   dr_dr2;    /* %dr2 (Linear address of third breakpoint) */
@@ -283,7 +283,7 @@ struct __ATTR_PACKED drregs32 {
 #define OFFSET_IRREGS32_VM86_FS       OFFSET_IRREGS32_FS
 #define OFFSET_IRREGS32_VM86_GS       OFFSET_IRREGS32_GS
 #ifdef __CC__
-struct __ATTR_PACKED irregs32_kernel {
+struct irregs32_kernel {
 	__u32     ir_eip;    /* Instruction pointer */
 	union {
 		__u32 ir_cs;     /* Code segment (Ring #0, usually `SEGMENT_KERNEL_CODE')
@@ -293,7 +293,7 @@ struct __ATTR_PACKED irregs32_kernel {
 	__u32     ir_eflags; /* Flags register */
 };
 #if defined(__cplusplus) && 0 /* offsetof() in non-POD is undefined... */
-struct __ATTR_PACKED irregs32_user: irregs_kernel {
+struct irregs32_user: irregs_kernel {
 	/* The following fields are popped when `(ir_cs & 3) != CURRENT_RING' */
 	__u32     ir_esp;    /* Stack pointer */
 	union {
@@ -302,7 +302,7 @@ struct __ATTR_PACKED irregs32_user: irregs_kernel {
 		__u16 ir_ss16;   /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL') */
 	};
 };
-struct __ATTR_PACKED irregs32_vm86: irregs_user {
+struct irregs32_vm86: irregs_user {
 	/* `ir_eflags' has the `EFLAGS_VM' flag set.
 	 * NOTE: For each of these, the upper 16 bits are undefined, but should be written as zeros */
 	union {
@@ -323,7 +323,7 @@ struct __ATTR_PACKED irregs32_vm86: irregs_user {
 	};
 };
 #else
-struct __ATTR_PACKED irregs32_user {
+struct irregs32_user {
 	__u32     ir_eip;    /* Instruction pointer */
 	union {
 		__u32 ir_cs;     /* Code segment (Ring #3, usually `SEGMENT_USER_CODE_RPL')
@@ -339,7 +339,7 @@ struct __ATTR_PACKED irregs32_user {
 		__u16 ir_ss16;   /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL') */
 	};
 };
-struct __ATTR_PACKED irregs32_vm86 {
+struct irregs32_vm86 {
 	__u32     ir_eip;
 	union {
 		__u32 ir_cs;
@@ -382,7 +382,7 @@ struct __ATTR_PACKED irregs32_vm86 {
 #define OFFSET_UCPUSTATE32_EIP     60
 #define SIZEOF_UCPUSTATE32         64
 #ifdef __CC__
-struct __ATTR_PACKED ucpustate32 { /* u -- User */
+struct ucpustate32 { /* u -- User */
 	/* Full CPU state, as used by system calls.
 	 * NOTE: Also represents the state saved when an exception occurs,
 	 *       both inside kernel-, as well as user-space. */
@@ -413,7 +413,7 @@ struct __ATTR_PACKED ucpustate32 { /* u -- User */
 #define OFFSET_LCPUSTATE32_EIP 20
 #define SIZEOF_LCPUSTATE32     24
 #ifdef __CC__
-struct __ATTR_PACKED lcpustate32 { /* l -- Little */
+struct lcpustate32 { /* l -- Little */
 	/* A minimal CPU state containing only registers that are callee-preserved.
 	 * This kind of CPU state is most useful for generating tracebacks. */
 	__u32         lcs_edi;    /* [P] Destination pointer */
@@ -432,7 +432,7 @@ struct __ATTR_PACKED lcpustate32 { /* l -- Little */
 #define OFFSET_KCPUSTATE32_EIP    36
 #define SIZEOF_KCPUSTATE32        40
 #ifdef __CC__
-struct __ATTR_PACKED kcpustate32 {
+struct kcpustate32 {
 	/* A CPU state used to describe a known, valid register state in kernel-space.
 	 * This kind of state is also used by exception handling, and the associated
 	 * stack unwinding. */
@@ -450,7 +450,7 @@ struct __ATTR_PACKED kcpustate32 {
 #define OFFSET_ICPUSTATE32_DS     40
 #define OFFSET_ICPUSTATE32_IRREGS 44
 #ifdef __CC__
-struct __ATTR_PACKED icpustate32 { /* i -- Interrupts */
+struct icpustate32 { /* i -- Interrupts */
 	/* A CPU state that is used by hardware interrupts (other than those used
 	 * by scheduling, which generate `scpustate' instead), in order to describe
 	 * the interrupted text location.
@@ -480,7 +480,7 @@ struct __ATTR_PACKED icpustate32 { /* i -- Interrupts */
 		                            * (upper 16 bits are undefined, but should be written as zeros) */
 		__u16          ics_ds16;   /* D (destination) segment register (Usually `SEGMENT_USER_DATA_RPL') */
 	};
-	union __ATTR_PACKED {
+	union {
 		/* Interrupt return registers.
 		 * NOTE: When returning to user-space, the ESP inside
 		 *       of this structure is the user-space EPS.
@@ -503,11 +503,11 @@ struct __ATTR_PACKED icpustate32 { /* i -- Interrupts */
 #define OFFSET_SCPUSTATE32_SGREGS  32
 #define OFFSET_SCPUSTATE32_IRREGS  48
 #ifdef __CC__
-struct __ATTR_PACKED scpustate32 { /* s -- Scheduling */
+struct scpustate32 { /* s -- Scheduling */
 	/* CPU state, as used to store the state of a thread that isn't currently running. */
 	struct gpregs32    scs_gpregs; /* General purpose registers. */
 	struct sgregs32    scs_sgregs; /* Segment registers. */
-	union __ATTR_PACKED {
+	union {
 		/* Interrupt return registers.
 		 * NOTE: When returning to user-space, the ESP inside
 		 *       of this structure is the user-space EPS.
@@ -555,7 +555,7 @@ struct __ATTR_PACKED desctab32 /*[PREFIX(dt_)]*/ {
 #define OFFSET_FCPUSTATE32_IDT    122
 #define SIZEOF_FCPUSTATE32        128
 #ifdef __CC__
-struct __ATTR_PACKED fcpustate32 { /* f -- Full */
+struct fcpustate32 { /* f -- Full */
 	/* Full CPU state (including _all_ registers that exist). */
 	struct gpregs32  fcs_gpregs; /* General purpose registers. */
 	__u32            fcs_eflags; /* Flags register */

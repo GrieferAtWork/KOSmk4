@@ -28,6 +28,7 @@
 #include <kernel/printk.h>
 #include <kernel/types.h>
 
+#include <asm/registers.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
@@ -64,7 +65,9 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 PRIVATE void KCALL
 panic_df_dbg_main(void *cr3) {
 	x86_dbg_exitstate.fcs_coregs.co_cr3 = (uintptr_t)cr3;
-	x86_dbg_viewstate.fcs_coregs.co_cr3 = (uintptr_t)cr3;
+	dbg_current = THIS_TASK;
+	/* Make sure that the current register view is updated properly! */
+	x86_dbg_setregbyid(DBG_REGLEVEL_VIEW, X86_REGISTER_CONTROL_CR3, &cr3, sizeof(cr3));
 	dbg_printf(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON, "Double fault"));
 	dbg_printf("\n"
 	           "%[vinfo:"

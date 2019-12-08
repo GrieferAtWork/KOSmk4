@@ -773,6 +773,25 @@ __NOTHROW_NCX(fcpustate64_assign_ucpustate64)(struct fcpustate64 *__restrict __s
 	__self->fcs_sgregs.sg_ss = __data->ucs_ss;
 }
 __LOCAL __NOBLOCK void
+__NOTHROW_NCX(fcpustate64_assign_lcpustate64)(struct fcpustate64 *__restrict __self,
+                                              struct lcpustate64 const *__restrict __data) {
+	__self->fcs_gpregs.gp_r15 = __data->lcs_r15;
+	__self->fcs_gpregs.gp_r14 = __data->lcs_r14;
+	__self->fcs_gpregs.gp_r13 = __data->lcs_r13;
+	__self->fcs_gpregs.gp_r12 = __data->lcs_r12;
+	__self->fcs_gpregs.gp_rbp = __data->lcs_rbp;
+	__self->fcs_gpregs.gp_rsp = __data->lcs_rsp;
+	__self->fcs_gpregs.gp_rbx = __data->lcs_rbx;
+	__self->fcs_rip           = __data->lcs_rip;
+}
+__LOCAL __NOBLOCK void
+__NOTHROW_NCX(fcpustate64_assign_kcpustate64)(struct fcpustate64 *__restrict __self,
+                                              struct kcpustate64 const *__restrict __data) {
+	__self->fcs_gpregs       = __data->kcs_gpregs;
+	__self->fcs_rflags       = __data->kcs_rflags;
+	__self->fcs_rip          = __data->kcs_rip;
+}
+__LOCAL __NOBLOCK void
 __NOTHROW_NCX(fcpustate64_assign_scpustate64)(struct fcpustate64 *__restrict __self,
                                               struct scpustate64 const *__restrict __data) {
 	gpregsnsp64_to_gpregs64(&__data->scs_gpregs, &__self->fcs_gpregs,
@@ -814,7 +833,7 @@ __NOTHROW_NCX(fcpustate64_assign_icpustate64)(struct fcpustate64 *__restrict __s
 	                                  __rdgs(), __rdfs(), __rdes(), __rdds());
 }
 __LOCAL __NOBLOCK __ATTR_RETNONNULL struct icpustate64 *
-__NOTHROW_NCX(fcpustate64_to_icpustate64_p)(struct fcpustate64 *__restrict __self,
+__NOTHROW_NCX(fcpustate64_to_icpustate64_p)(struct fcpustate64 const *__restrict __self,
                                             void *__kernel_rsp) {
 	struct icpustate64 *__result;
 	__result = (struct icpustate64 *)(__kernel_rsp - SIZEOF_ICPUSTATE64);
@@ -827,7 +846,7 @@ __NOTHROW_NCX(fcpustate64_to_icpustate64_p)(struct fcpustate64 *__restrict __sel
 	return __result;
 }
 __LOCAL __NOBLOCK __ATTR_RETNONNULL struct scpustate64 *
-__NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 *__restrict __self,
+__NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict __self,
                                             void *__kernel_rsp) {
 	struct scpustate64 *__result;
 	__result = (struct scpustate64 *)(__kernel_rsp - SIZEOF_SCPUSTATE64);
@@ -1189,6 +1208,12 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 *__restrict __sel
 #define fcpustate_assign_ucpustate          fcpustate64_assign_ucpustate64
 #define fcpustate_assign_ucpustate64        fcpustate64_assign_ucpustate64
 #define fcpustate64_assign_ucpustate        fcpustate64_assign_ucpustate64
+#define fcpustate_assign_lcpustate          fcpustate64_assign_lcpustate64
+#define fcpustate_assign_lcpustate64        fcpustate64_assign_lcpustate64
+#define fcpustate64_assign_lcpustate        fcpustate64_assign_lcpustate64
+#define fcpustate_assign_kcpustate          fcpustate64_assign_kcpustate64
+#define fcpustate_assign_kcpustate64        fcpustate64_assign_kcpustate64
+#define fcpustate64_assign_kcpustate        fcpustate64_assign_kcpustate64
 #define fcpustate_assign_scpustate          fcpustate64_assign_scpustate64
 #define fcpustate_assign_scpustate64        fcpustate64_assign_scpustate64
 #define fcpustate64_assign_scpustate        fcpustate64_assign_scpustate64

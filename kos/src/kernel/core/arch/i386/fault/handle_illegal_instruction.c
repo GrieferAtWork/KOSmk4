@@ -422,7 +422,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				x86_icpustate_set64(state, op_flags & F_REX_R ? (opcode - 0x0fc8) + 8 : (opcode - 0x0fc8),
 					                tempval);
 			} else
-#endif
+#endif /* __x86_64__ */
 			{
 				u32 value;
 				__register u16 temp;
@@ -431,9 +431,9 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				                            op_flags & F_REX_R
 				                            ? (opcode - 0x0fc8) + 8
 				                            : (opcode - 0x0fc8));
-#else
+#else /* __x86_64__ */
 				value = x86_icpustate_get32(state, opcode - 0x0fc8);
-#endif
+#endif /* !__x86_64__ */
 				/* Use inline assembly so GCC doesn't optimize by
 				 * using the instruction we're trying to emulate. */
 				__asm__ __volatile__("movw  0+%0, %1\n\t" /* x = lo; */
@@ -449,11 +449,11 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				                    ? (opcode - 0x0fc8) + 8
 				                    : (opcode - 0x0fc8),
 				                   (u32)value);
-#else
+#else /* __x86_64__ */
 				x86_icpustate_set32(state,
 				                    opcode - 0x0fc8,
 				                    (u32)value);
-#endif
+#endif /* !__x86_64__ */
 			}
 		}	break;
 

@@ -37,8 +37,12 @@
 DECL_BEGIN
 
 #ifdef __x86_64__
+#define IF32(...) /* nothing */
+#define IF64(...) __VA_ARGS__
 #define IFELSE3264(x32, x64) x64
 #else /* __x86_64__ */
+#define IF32(...) __VA_ARGS__
+#define IF64(...) /* nothing */
 #define IFELSE3264(x32, x64) x32
 #endif /* !__x86_64__ */
 
@@ -287,7 +291,6 @@ do_pax:
 			CASENOCASE('c'): result = X86_REGISTER_GENERAL_PURPOSE_CL; goto done;
 			CASENOCASE('d'): result = X86_REGISTER_GENERAL_PURPOSE_DL; goto done;
 			CASENOCASE('b'): result = X86_REGISTER_GENERAL_PURPOSE_BL; goto done;
-			CASENOCASE('z'): result = X86_REGISTER_MISC_ZL; goto done;
 			default: break;
 			}
 			break;
@@ -348,13 +351,6 @@ do_pax:
 			}
 			break;
 
-		CASENOCASE('z'):
-			switch (name[0]) {
-			CASENOCASE('i'): result = X86_REGISTER_MISC_IZ; goto done;
-			default: break;
-			}
-			break;
-
 		default:
 			break;
 		}
@@ -363,7 +359,8 @@ do_pax:
 	if (namelen == 3 &&
 	    EQNOCASE(name[0], 'c') &&
 	    EQNOCASE(name[1], 'r') &&
-	    (name[2] >= '0' && name[2] <= '4' && name[2] != '1')) {
+	    ((name[2] >= '0' && name[2] <= '4' && name[2] != '1')
+	     IF64(|| name[2] == '8'))) {
 		result = X86_REGISTER_CONTROL_CR0 + (name[2] - '0');
 		goto done;
 	}

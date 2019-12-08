@@ -155,8 +155,8 @@ do_print_local(void *UNUSED(arg),
 	/* Read the value of this local variable. */
 	error = debuginfo_location_getvalue(&var->v_location,
 	                                    di_enum_locals_sections_as_unwind_emulator_sections(sections),
-	                                    &unwind_getreg_fcpustate,
-	                                    &x86_dbg_viewstate,
+	                                    &dbg_getreg,
+	                                    (void *)(uintptr_t)DBG_REGLEVEL_VIEW,
 	                                    cu->cu_ranges.r_startpc,
 	                                    module_relative_pc,
 	                                    value_buffer,
@@ -264,7 +264,7 @@ DEFINE_DEBUG_FUNCTION(
 	(void)argv;
 	/* Enumerate location variables. */
 	debuginfo_enum_locals(&kernel_enum_locals_sections,
-	                      fcpustate_getpc(&x86_dbg_viewstate),
+	                      dbg_getpcreg(DBG_REGLEVEL_VIEW),
 	                      &print_local,
 	                      NULL);
 	return 0;
@@ -302,11 +302,11 @@ DEFINE_DEBUG_FUNCTION(
 	(void)argv;
 	/* Enumerate location variables. */
 	debuginfo_enum_locals(&kernel_enum_locals_sections,
-	                      fcpustate_getpc(&x86_dbg_viewstate),
+	                      dbg_getpcreg(DBG_REGLEVEL_VIEW),
 	                      &locals_maxlen,
 	                      &maxlen);
 	debuginfo_enum_locals(&kernel_enum_locals_sections,
-	                      fcpustate_getpc(&x86_dbg_viewstate),
+	                      dbg_getpcreg(DBG_REGLEVEL_VIEW),
 	                      &print_local,
 	                      &maxlen);
 	return 0;

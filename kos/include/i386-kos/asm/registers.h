@@ -118,20 +118,28 @@
 
 /* Segment registers. */
 #define X86_REGISTER_SEGMENT           0x2000
-#   define X86_REGISTER_SEGMENT_ES     0x2000 /* %es */
-#   define X86_REGISTER_SEGMENT_CS     0x2001 /* %cs */
-#   define X86_REGISTER_SEGMENT_SS     0x2002 /* %ss */
-#   define X86_REGISTER_SEGMENT_DS     0x2003 /* %ds */
-#   define X86_REGISTER_SEGMENT_FS     0x2004 /* %fs */
-#   define X86_REGISTER_SEGMENT_GS     0x2005 /* %gs */
+#   define X86_REGISTER_SEGMENT_ES     0x2800 /* %es */
+#   define X86_REGISTER_SEGMENT_CS     0x2801 /* %cs */
+#   define X86_REGISTER_SEGMENT_SS     0x2802 /* %ss */
+#   define X86_REGISTER_SEGMENT_DS     0x2803 /* %ds */
+#   define X86_REGISTER_SEGMENT_FS     0x2804 /* %fs */
+#   define X86_REGISTER_SEGMENT_GS     0x2805 /* %gs */
 
 
 /* Control registers. */
 #define X86_REGISTER_CONTROL           0x3000
+#ifdef __x86_64__
 #   define X86_REGISTER_CONTROL_CR0    0x3000 /* %cr0 */
 #   define X86_REGISTER_CONTROL_CR2    0x3002 /* %cr2 */
 #   define X86_REGISTER_CONTROL_CR3    0x3003 /* %cr3 */
 #   define X86_REGISTER_CONTROL_CR4    0x3004 /* %cr4 */
+#   define X86_REGISTER_CONTROL_CR8    0x3008 /* %cr4 */
+#else /* __x86_64__ */
+#   define X86_REGISTER_CONTROL_CR0    0x3400 /* %cr0 */
+#   define X86_REGISTER_CONTROL_CR2    0x3402 /* %cr2 */
+#   define X86_REGISTER_CONTROL_CR3    0x3403 /* %cr3 */
+#   define X86_REGISTER_CONTROL_CR4    0x3404 /* %cr4 */
+#endif /* !__x86_64__ */
 
 /* Float registers. */
 #define X86_REGISTER_FLOAT             0x4000
@@ -200,12 +208,21 @@
 
 /* Debug registers. */
 #define X86_REGISTER_DEBUG             0x8000
+#ifdef __x86_64__
 #   define X86_REGISTER_DEBUG_DR0      0x8000 /* %dr0 */
 #   define X86_REGISTER_DEBUG_DR1      0x8001 /* %dr1 */
 #   define X86_REGISTER_DEBUG_DR2      0x8002 /* %dr2 */
 #   define X86_REGISTER_DEBUG_DR3      0x8003 /* %dr3 */
 #   define X86_REGISTER_DEBUG_DR6      0x8006 /* %dr6 */
 #   define X86_REGISTER_DEBUG_DR7      0x8007 /* %dr7 */
+#else /* __x86_64__ */
+#   define X86_REGISTER_DEBUG_DR0      0x8400 /* %dr0 */
+#   define X86_REGISTER_DEBUG_DR1      0x8401 /* %dr1 */
+#   define X86_REGISTER_DEBUG_DR2      0x8402 /* %dr2 */
+#   define X86_REGISTER_DEBUG_DR3      0x8403 /* %dr3 */
+#   define X86_REGISTER_DEBUG_DR6      0x8406 /* %dr6 */
+#   define X86_REGISTER_DEBUG_DR7      0x8407 /* %dr7 */
+#endif /* !__x86_64__ */
 
 /* Misc. registers. */
 #define X86_REGISTER_MISC              0xe000
@@ -213,23 +230,19 @@
 #   define X86_REGISTER_MISC_FLAGS     0xe800 /* %flags */
 #   define X86_REGISTER_MISC_EIP       0xe401 /* %eip */
 #   define X86_REGISTER_MISC_IP        0xe801 /* %ip */
-#   define X86_REGISTER_MISC_EIZ       0xe402 /* %eiz (32-bit symbolic, always-zero register) */
-#   define X86_REGISTER_MISC_IZ        0xe802 /* %iz (16-bit symbolic, always-zero register) */
-#   define X86_REGISTER_MISC_ZL        0xec02 /* %zl (8-bit symbolic, always-zero register) */
 #ifdef __x86_64__
 #   define X86_REGISTER_MISC_RFLAGS    0xe000 /* %rflags */
 #   define X86_REGISTER_MISC_RIP       0xe001 /* %rip */
-#   define X86_REGISTER_MISC_RIZ       0xe002 /* %riz (64-bit symbolic, always-zero register) */
 #endif /* __x86_64__ */
 #   define X86_REGISTER_MISC_TR        0xe810 /* %tr (ltr, str; TaskRegister) */
 #   define X86_REGISTER_MISC_LDT       0xe811 /* %ldt (lldt, sldt; LocalDescriptorTable) */
 #   define X86_REGISTER_MISC_GDT_LIMIT 0xe812 /* %gdt.limit (lgdt, sgdt; GlobalDescriptorTable) */
-#   define X86_REGISTER_MISC_IDT_LIMIT 0xe813 /* %idt.limit (lidt, sidt; InterruptDescriptorTable) */
-#   define X86_REGISTER_MISC_GDT_BASEL 0xe412 /* %gdt.basel (lgdt, sgdt; GlobalDescriptorTable) */
-#   define X86_REGISTER_MISC_IDT_BASEL 0xe413 /* %idt.basel (lidt, sidt; InterruptDescriptorTable) */
+#   define X86_REGISTER_MISC_GDT_BASEL 0xe413 /* %gdt.basel (lgdt, sgdt; GlobalDescriptorTable) */
+#   define X86_REGISTER_MISC_IDT_LIMIT 0xe814 /* %idt.limit (lidt, sidt; InterruptDescriptorTable) */
+#   define X86_REGISTER_MISC_IDT_BASEL 0xe415 /* %idt.basel (lidt, sidt; InterruptDescriptorTable) */
 #ifdef __x86_64__
-#   define X86_REGISTER_MISC_GDT_BASEQ 0xe012 /* %gdt.baseq (lgdt, sgdt; GlobalDescriptorTable) */
-#   define X86_REGISTER_MISC_IDT_BASEQ 0xe013 /* %idt.baseq (lidt, sidt; InterruptDescriptorTable) */
+#   define X86_REGISTER_MISC_GDT_BASEQ 0xe013 /* %gdt.baseq (lgdt, sgdt; GlobalDescriptorTable) */
+#   define X86_REGISTER_MISC_IDT_BASEQ 0xe015 /* %idt.baseq (lidt, sidt; InterruptDescriptorTable) */
 #endif /* __x86_64__ */
 #   define X86_REGISTER_MISC_FSBASEL   0xe420 /* %fs.basel */
 #   define X86_REGISTER_MISC_GSBASEL   0xe421 /* %gs.basel */
