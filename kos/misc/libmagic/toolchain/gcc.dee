@@ -212,7 +212,7 @@ global class GCCToolchain: Toolchain {
 				r = File.Buffer(r, "ro,c,none");
 				if (kind in ["ld"]) {
 					@@Pair (object_filename, function_name)
-					local current_in_function: (string, string) = none;
+					local currentInFunction: (string, string) = none;
 					for (local l: r) {
 						local col = l.find(":");
 						/* Capture: <LD_PATH>:<SCRIPT_PATH>:<LINENO> <MESSAGE> */
@@ -231,11 +231,11 @@ global class GCCToolchain: Toolchain {
 											l[:col].decode("utf-8"));
 										local script_path = normalizeFilenameForLog(
 											l[col + 1:col2].decode("utf-8"));
-										local lineno = l[col2+1:lineno_end];
+										local lineNo = l[col2+1:lineno_end];
 										local message = l[lineno_end:].strip().lstrip(":").lstrip();
 										print script_path,;
 										print "(",;
-										print lineno,;
+										print lineNo,;
 										print "): error: ",;
 										print message,;
 										print " (from ",;
@@ -250,7 +250,7 @@ global class GCCToolchain: Toolchain {
 								if (tail.startswith(IN_FUNCTION_PREFIX)) {
 									local end = tail.find("\'", #IN_FUNCTION_PREFIX);
 									if (end >= 0) {
-										current_in_function = (
+										currentInFunction = (
 											normalizeFilenameForLog(l[col + 1:col2].strip().decode("utf-8")),
 											tail[#IN_FUNCTION_PREFIX:end].decode("utf-8")
 										);
@@ -258,18 +258,18 @@ global class GCCToolchain: Toolchain {
 									}
 								}
 								function printSourceMessage(
-										source_file: string, lineno: string, message: string,
-										current_in_function: (string, string) | none) {
-									print source_file,;
+										sourceFile: string, lineNo: string, message: string,
+										currentInFunction: (string, string) | none) {
+									print sourceFile,;
 									print "(",;
-									print lineno,;
+									print lineNo,;
 									print "): error: ",;
 									print message,;
-									if (current_in_function !is none) {
+									if (currentInFunction !is none) {
 										print " (in ",;
-										print repr(current_in_function[1]),;
+										print repr(currentInFunction[1]),;
 										print " defined by ",;
-										print repr(current_in_function[0]),;
+										print repr(currentInFunction[0]),;
 										print ")",;
 									}
 									print;
@@ -280,24 +280,64 @@ global class GCCToolchain: Toolchain {
 										normalizeFilenameForLog(l[:col].decode("utf-8")),
 										l[col + 1:col2].decode("utf-8"),
 										l[col2 + 1:].strip().decode("utf-8"),
-										current_in_function);
+										currentInFunction);
 									continue;
 								}
 								/* Capture: <LD_PATH>: <SOURCE_FILE>:<LINENO>: <MESSAGE> */
 								if (l[col + 1] == " ".ord()) {
-									local col3 = l.find(":", col2 + 1);
+									local col3;
+									/* Capture: <LD_PATH>: <OBJECT_FILE>:(<SECTION_LOCATION>): <MESSAGE> */
+									/*                   ^col           ^col2 */
+									if (l[col2 + 1] == "(".ord()) {
+										col3 = l.findmatch("(", ")", col2 + 2);
+										if (col3 >= 0) {
+											local objFile = normalizeFilenameForLog(l[col + 2:col2].strip().decode("utf-8"));
+											local sectionLocation = l[col2+2:col3].strip().decode("utf-8");
+											local message = l[col3+1:].lstrip().lstrip(":").strip().decode("utf-8");
+											local sectionName, sectionOffset;
+											if ("+" in sectionLocation) {
+												sectionName, none, sectionOffset = sectionLocation.rpartition("+")...;
+											} else {
+												sectionName = sectionLocation;
+												sectionOffset = "0";
+											}
+											print objFile,;
+											print ": error: in section ",;
+											print repr(sectionName),;
+											print " + ",;
+											print sectionOffset,;
+											print ": ",;
+											print message,;
+											print;
+											continue;
+										}
+									}
+									col3 = l.find(":", col2 + 1);
 									if (col3 >= 0) {
 										if (l.isdigit(col2 + 1, col3)) {
 											printSourceMessage(
 												normalizeFilenameForLog(l[col+2:col2].decode("utf-8")),
 												l[col2 + 1:col3].decode("utf-8"),
 												l[col3 + 1:].strip().decode("utf-8"),
-												current_in_function);
+												currentInFunction);
 											continue;
+										}
+										/* Capture: <LD_PATH>: <OBJECT_FILE>:<SOURCE_FILE>:<LINENO>: <MESSAGE> */
+										/*                   ^col           ^col2         ^col3 */
+										local col4 = l.find(":", col3 + 1);
+										if (col4 >= 0) {
+											if (l.isdigit(col3 + 1, col4)) {
+												local objFile = normalizeFilenameForLog(l[col + 2:col2].strip().decode("utf-8"));
+												printSourceMessage(
+													normalizeFilenameForLog(l[col2+1:col3].decode("utf-8")),
+													l[col3 + 1:col4].decode("utf-8"),
+													l[col4 + 1:].strip().decode("utf-8"),
+													(objFile, currentInFunction[1]));
+												continue;
+											}
 										}
 									}
 								}
-
 							}
 						}
 						print l.rstrip();
@@ -427,13 +467,13 @@ global class GCCToolchain: Toolchain {
 			depFile = this.config.getDependencyFilename(this, srcFile);
 		if (outFile is none)
 			outFile = this.config.getPreprocessedFilename(this, srcFile);
-		local cc, lang_flags = getCCForLanguageAndSrcFile(srcFile, language)...;
+		local cc, langFlags = getCCForLanguageAndSrcFile(srcFile, language)...;
 		local cc = EXE_FORMAT.format({ this.config.CROSS_PREFIX, cc });
 		local arguments = [
 			"-E", "-o", outFile, "-MMD", "-MF", depFile,
 			options.get(OPT_GCC_OPTIONS)...];
-		if (lang_flags)
-			arguments.extend(lang_flags);
+		if (langFlags)
+			arguments.extend(langFlags);
 		if (incPath) {
 			local len = #arguments;
 			for (local x: incPath)
@@ -476,7 +516,7 @@ global class GCCToolchain: Toolchain {
 			th.start();
 			return WaitableJoin(th);
 		}
-		local cc, lang_flags = getCCForLanguageAndSrcFile(srcFile, language)...;
+		local cc, langFlags = getCCForLanguageAndSrcFile(srcFile, language)...;
 		local cc = EXE_FORMAT.format({ this.config.CROSS_PREFIX, cc });
 		local arguments = [
 			language == "assembler-with-cpp"
@@ -486,8 +526,8 @@ global class GCCToolchain: Toolchain {
 				,
 			"-o", asmFile, "-MMD", "-MF", depFile,
 			options.get(OPT_GCC_OPTIONS)...];
-		if (lang_flags)
-			arguments.extend(lang_flags);
+		if (langFlags)
+			arguments.extend(langFlags);
 		if (incPath) {
 			local len = #arguments;
 			for (local x: incPath)
@@ -513,11 +553,11 @@ global class GCCToolchain: Toolchain {
 	                                          incPath: {string...} = none,
 	                                          macros: {string: string | none} = none,
 	                                          asFlags: {string...} = none): ipc.Process {
-		local cc, lang_flags = getCCForLanguage(language)...;
+		local cc, langFlags = getCCForLanguage(language)...;
 		local cc = EXE_FORMAT.format({ this.config.CROSS_PREFIX, cc });
 		local arguments = ["-c", "-o", "/dev/stdout", "-Wall", "-Werror", options.get(OPT_GCC_OPTIONS)...];
-		if (lang_flags)
-			arguments.extend(lang_flags);
+		if (langFlags)
+			arguments.extend(langFlags);
 		if (incPath) {
 			local len = #arguments;
 			for (local x: incPath)
@@ -552,13 +592,13 @@ global class GCCToolchain: Toolchain {
 			depFile = this.config.getDependencyFilename(srcFile);
 		if (objFile is none)
 			objFile = this.config.getObjectFilename(srcFile);
-		local cc, lang_flags = getCCForLanguageAndSrcFile(srcFile, language)...;
+		local cc, langFlags = getCCForLanguageAndSrcFile(srcFile, language)...;
 		local cc = EXE_FORMAT.format({ this.config.CROSS_PREFIX, cc });
 		local arguments = [
 			"-c", "-o", objFile, "-MMD", "-MF", depFile,
 			options.get(OPT_GCC_OPTIONS)...];
-		if (lang_flags)
-			arguments.extend(lang_flags);
+		if (langFlags)
+			arguments.extend(langFlags);
 		if (incPath) {
 			local len = #arguments;
 			for (local x: incPath)
@@ -589,14 +629,14 @@ global class GCCToolchain: Toolchain {
 	final member _stdlibCache: {(string, none | {string...}):
 		({string...}, {string...}, {string...})} = Dict();
 	function enumerateSystemLibraryPathsAndStandardLibraries(
-			gcc_opt: {string...} | none, language: string)
+			gccOptions: {string...} | none, language: string)
 			: ({string...}, {string...}, {string...}) {
-		local gcc_opt = Tuple(gcc_opt);
-		local result = _stdlibCache.get((language, gcc_opt));
+		local gccOptions = Tuple(gccOptions);
+		local result = _stdlibCache.get((language, gccOptions));
 		if (result !is none)
 			return result;
 		local simple_gcc_opt = List();
-		for (local x: gcc_opt) {
+		for (local x: gccOptions) {
 			if (!x.startswith("-O") && !x.startswith("-g") &&
 				x !in GCC_SYSTEM_LIBRARY_UNRELATED_FLAGS)
 				simple_gcc_opt.append(x);
@@ -604,7 +644,7 @@ global class GCCToolchain: Toolchain {
 		local cacheKey = (language, Tuple(simple_gcc_opt));
 		local result = _stdlibCache.get(cacheKey);
 		if (result !is none) {
-			_stdlibCache[(language, gcc_opt)] = result;
+			_stdlibCache[(language, gccOptions)] = result;
 			return result;
 		}
 		local cc = EXE_FORMAT.format({ this.config.CROSS_PREFIX, getCCForLanguage(language)[0] });
@@ -635,30 +675,30 @@ global class GCCToolchain: Toolchain {
 		w.close();
 		local output = r.readall();
 		joinProcess(proc);
-		local collect2_cmdline = none;
+		local collect2Cmdline = none;
 		output = output.decode("utf-8");
 		for (local l: output.splitlines()) {
 			if ("collect2" !in l)
 				continue;
 			if (("-o testOutputFilename") !in l)
 				continue;
-			if (collect2_cmdline !is none)
+			if (collect2Cmdline !is none)
 				throw Error("Multiple collect2 commandlines:\n1:{}\n2:{}"
-					.format({ collect2_cmdline, l }));
-			collect2_cmdline = l;
+					.format({ collect2Cmdline, l }));
+			collect2Cmdline = l;
 		}
-		if (collect2_cmdline is none)
+		if (collect2Cmdline is none)
 			throw Error("No collect2 commandlines in:\n{}".format({ output }));
-		collect2_cmdline = collect2_cmdline.partition("-o testOutputFilename")[2].strip();
-		collect2_cmdline = Tuple(splitCommandline(collect2_cmdline));
+		collect2Cmdline = collect2Cmdline.partition("-o testOutputFilename")[2].strip();
+		collect2Cmdline = Tuple(splitCommandline(collect2Cmdline));
 		local result = (
-			Tuple(for (local x: collect2_cmdline)
+			Tuple(for (local x: collect2Cmdline)
 				if (x.startswith("-L"))
 					normalizePath(x[2:])),
-			Tuple(for (local x: collect2_cmdline)
+			Tuple(for (local x: collect2Cmdline)
 				if (x.startswith("-l"))
 					x[2:]),
-			Tuple(for (local x: collect2_cmdline)
+			Tuple(for (local x: collect2Cmdline)
 				if (!x.startswith("-L") && !x.startswith("-l") && x != testObjectFile)
 					normalizePath(x)),
 		);
@@ -671,7 +711,7 @@ global class GCCToolchain: Toolchain {
 		print repr result;
 		print ");";
 		_stdlibCache[cacheKey] = result;
-		_stdlibCache[(language, gcc_opt)] = result;
+		_stdlibCache[(language, gccOptions)] = result;
 		return result;
 	}
 
@@ -684,9 +724,9 @@ global class GCCToolchain: Toolchain {
 		local systemLibraryPaths, systemLibraries, systemObjects;
 		if (language is none)
 			language = getDefaultLinkerLanguage(step);
-		local gcc_opt = step.group.options.get(OPT_GCC_OPTIONS);
+		local gccOptions = step.group.options.get(OPT_GCC_OPTIONS);
 		systemLibraryPaths, systemLibraries, systemObjects =
-			enumerateSystemLibraryPathsAndStandardLibraries(gcc_opt, language)...;
+			enumerateSystemLibraryPathsAndStandardLibraries(gccOptions, language)...;
 		if (!noStdLib)
 			yield systemObjects...;
 		local allLibPaths = (!libPath
@@ -710,7 +750,7 @@ global class GCCToolchain: Toolchain {
 					if (libext is none)
 						libext = step.toolchain.config.LIBRARY_SUFFIX;
 					if (do_static is none)
-						do_static = "-static" in gcc_opt;
+						do_static = "-static" in gccOptions;
 					if (do_static) {
 						locations.append(joinpath(path, "lib{}.a".format({ lib })));
 						locations.append(joinpath(path, "lib{}{}".format({ lib, libext })));
