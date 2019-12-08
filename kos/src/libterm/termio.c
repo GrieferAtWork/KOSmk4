@@ -476,12 +476,12 @@ libterminal_flush_icanon(struct terminal *__restrict self, iomode_t mode)
 
 /* Return the number of unicode characters within a given utf-8 string */
 PRIVATE ATTR_PURE WUNUSED size_t CC
-utf8_character_count(__USER __CHECKED /*utf-8*/ char const *erased_data,
+utf8_character_count(__USER __CHECKED /*utf-8*/ char const *string,
                      size_t num_bytes) {
 	size_t result = 0;
 	__USER __CHECKED char const *ptr, *end;
-	ptr = erased_data;
-	end = erased_data + num_bytes;
+	ptr = string;
+	end = string + num_bytes;
 	while (ptr < end) {
 		unicode_readutf8_n(&ptr, end);
 		++result;
