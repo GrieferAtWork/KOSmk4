@@ -24,10 +24,9 @@
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <asm/cpu-flags.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/cpu-state-asm.h>
 
 #include <libunwind/cfi.h>
-#include <libunwind/cfi/i386.h>
-
 
 .section .text.cold
 	.cfi_startproc simple
@@ -42,26 +41,7 @@
 	.cfi_escape DW_CFA_def_cfa_expression, 5
 	.cfi_escape DW_OP_addr, x86_dbg_exitstate_b0, x86_dbg_exitstate_b1, \
 	                        x86_dbg_exitstate_b2, x86_dbg_exitstate_b3
-#define RESTORE(reg, offset) .cfi_offset reg, (offset)
-	RESTORE(%edi, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDI)
-	RESTORE(%esi, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESI)
-	RESTORE(%ebp, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EBP)
-	RESTORE(%esp, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESP)
-	RESTORE(%ebx, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EBX)
-	RESTORE(%edx, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EDX)
-	RESTORE(%ecx, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ECX)
-	RESTORE(%eax, OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EAX)
-	RESTORE(%eflags, OFFSET_FCPUSTATE_EFLAGS)
-	RESTORE(%eip, OFFSET_FCPUSTATE_EIP)
-	RESTORE(%es, OFFSET_FCPUSTATE_ES)
-	RESTORE(%cs, OFFSET_FCPUSTATE_CS)
-	RESTORE(%ss, OFFSET_FCPUSTATE_SS)
-	RESTORE(%ds, OFFSET_FCPUSTATE_DS)
-	RESTORE(%fs, OFFSET_FCPUSTATE_FS)
-	RESTORE(%gs, OFFSET_FCPUSTATE_GS)
-	RESTORE(%tr, OFFSET_FCPUSTATE_TR)
-	RESTORE(%ldtr, OFFSET_FCPUSTATE_LDT)
-#undef RESTORE
+	ASM_CFI_REL_OFFSET_RESTORE_FCPUSTATE(0)
 	nop /* For tracebacks. */
 PUBLIC_FUNCTION(dbg_exit)
 	cli

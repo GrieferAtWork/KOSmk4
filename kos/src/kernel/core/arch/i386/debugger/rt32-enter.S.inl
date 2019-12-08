@@ -93,6 +93,7 @@ PUBLIC_FUNCTION(DEFINE_DBG_ENTER_XCPUSTATE)
 	ASM_CFI_REL_OFFSET_RESTORE_SCPUSTATE_NOIRET(0)
 #else
 	.cfi_def_cfa %edx, 0
+	.cfi_signal_frame
 #define ASM_CFI_REL_OFFSET_RESTORE_XCPUSTATE2(func, offset) func(offset)
 #define ASM_CFI_REL_OFFSET_RESTORE_XCPUSTATE(offset) ASM_CFI_REL_OFFSET_RESTORE_XCPUSTATE2(PP_CAT2(ASM_CFI_REL_OFFSET_RESTORE_,DBG_STATE_NAME_U), offset)
 	ASM_CFI_REL_OFFSET_RESTORE_XCPUSTATE(0)
@@ -141,7 +142,7 @@ END(DEFINE_DBG_ENTER_XCPUSTATE)
 .section .text.cold
 PUBLIC_FUNCTION(DBG_ENTER_NAME)
 	.cfi_startproc
-	pushl_cfi_r %eax 
+	pushl_cfi_r %eax
 	pushfl_cfi_r
 	cli /* Disable interrupts */
 
@@ -180,6 +181,8 @@ L(.Lacquire_lapicid_lock):
 	testl  $(EFLAGS_IF), %ss:0(%esp)
 	jz     1f /* Not allowed to block... */
 	sti
+	/* A secondary pause is used because `sti' only enables interrupts after the next instruction.
+	 * The intend here is that we execute `pause' at least once with interrupts enabled (if possible) */
 	pause
 1:	pause
 	cli
@@ -206,7 +209,7 @@ L(.Ldone_lapicid_lock):
 	 *             but should instead reset the stack and invoke the new
 	 *             debugger entry point. */
 	EXTERN(dbg_active)
-	cmpl   $(0), %ss:dbg_active
+	cmpb   $(0), %ss:dbg_active
 	jne    L(.Lalready_active)
 
 	/* Save the register for the caller of our function in `x86_dbg_exitstate' */
@@ -266,10 +269,14 @@ L(.Ldone_lapicid_lock):
 
 L(.Lalready_active):
 
-	/* Setup `%ebx' as a CFI unwind register for an FCPUSTATE. */
-	EXTERN(x86_dbg_exitstate)
-	movl   $(x86_dbg_exitstate), %ebx
-	.cfi_def_cfa %ebx, 0
+	/* Encode CFA as `x86_dbg_exitstate' */
+	EXTERN(x86_dbg_exitstate_b0)
+	EXTERN(x86_dbg_exitstate_b1)
+	EXTERN(x86_dbg_exitstate_b2)
+	EXTERN(x86_dbg_exitstate_b3)
+	.cfi_escape DW_CFA_def_cfa_expression, 5
+	.cfi_escape DW_OP_addr, x86_dbg_exitstate_b0, x86_dbg_exitstate_b1, \
+	                        x86_dbg_exitstate_b2, x86_dbg_exitstate_b3
 	ASM_CFI_REL_OFFSET_RESTORE_FCPUSTATE(0)
 
 	/* Fixup control registers. */
@@ -282,7 +289,9 @@ L(.Lalready_active):
 	movl   %eax, %cr0
 
 	/* Load the debugger-specific GDT / IDT */
+	EXTERN(x86_dbggdt_ptr)
 	lgdtl  %ss:x86_dbggdt_ptr
+	EXTERN(x86_dbgidt_ptr)
 	lidtl  %ss:x86_dbgidt_ptr
 
 	/* Load segment registers. */
@@ -311,7 +320,11 @@ L(.Lalready_active):
 	EXTERN(dbg_stack)
 	movl   $(dbg_stack + KERNEL_DEBUG_STACKSIZE), %esp
 
-	/* Fill in TRAP-level cpu state information. */
+	/* Fill in TRAP-level cpu state information.
+	 * NOTE: Don't do so if the debugger is being entered recursively!
+	 *       In the later case, we must keep the original trap state. */
+	cmpb   $(0), dbg_active
+	jne    1f
 	EXTERN(x86_dbg_trapstate)
 	EXTERN(x86_dbg_trapstatekind)
 #ifdef X86_DBG_STATEKIND_XCPU
@@ -319,8 +332,9 @@ L(.Lalready_active):
 	movl   %edx, x86_dbg_trapstate
 #else /* X86_DBG_STATEKIND_XCPU */
 	movl   $(X86_DBG_STATEKIND_NONE), x86_dbg_trapstatekind
-	movl   $0, x86_dbg_trapstate
+	movl   $(0), x86_dbg_trapstate
 #endif /* !X86_DBG_STATEKIND_XCPU */
+1:
 
 	/* Setup the debugger entry point callback.
 	 * This needs to be done immediately after loading the debugger stack,
@@ -363,6 +377,7 @@ L(.Lalready_active):
 L(.Lafter_copy_dbg_args):
 	shll   $(2), %ecx  /* %ecx = ARGC * 4 */
 	subl   %ecx, %esp  /* Skip stack space for arguments */
+	EXTERN(dbg_exit)
 	pushl  $(dbg_exit) /* Return address. */
 	pushl  %eax        /* Debugger entry point. */
 	jmp    L(.Ldebug_stack_setup)
@@ -370,8 +385,8 @@ L(.Lafter_copy_dbg_args):
 L(.Lcopy_args_up):    /* EDI > ESI */
 	/* Copy memory top->bottom */
 	std
-	leal   -4(%esi,%ecx,4), %esi
 	leal   -4(%edi,%ecx,4), %edi
+	leal   -4(%esi,%ecx,4), %esi
 1:	movsl
 	loop   1b
 	jmp    L(.Lafter_copy_dbg_args)
@@ -387,7 +402,9 @@ L(.Lcall_default):
 #endif /* !DEFINE_DBG */
 	/* Call the default debugger entry point. */
 	pushl  $(1)        /* dbg_main:show_welcome. */
+	EXTERN(dbg_exit)
 	pushl  $(dbg_exit) /* Return address. */
+	EXTERN(dbg_main)
 	pushl  $(dbg_main)
 L(.Ldebug_stack_setup):
 
@@ -397,10 +414,8 @@ L(.Ldebug_stack_setup):
 	/* Check if this is a recursive callback. */
 	cmpb   $(0), dbg_active
 	jne    1f
-	movl   %edx, %ebp /* Preserve `struct Xcpustate *state' */
 	EXTERN(x86_dbg_init)
-	call   x86_dbg_init         /* Initialize first time around */
-	movl   %ebp, %edx /* Restore `struct Xcpustate *state' */
+	call   x86_dbg_init /* Initialize first time around */
 	/* NOTE: `x86_dbg_init()' will have suspended other CPUs */
 	movb   $(1), dbg_active /* Indicate that the debugger is now active */
 1:
