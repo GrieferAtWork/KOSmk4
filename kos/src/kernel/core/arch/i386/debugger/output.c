@@ -295,8 +295,8 @@ NOTHROW(KCALL vga_backlog_setscrollpos)(unsigned int pos) {
 			memcpyw(vga_terminal_start, visible_start, VGA_WIDTH * VGA_HEIGHT);
 		} else {
 			size_t num_leading, num_trailing;
-			num_leading  = (size_t)(vga_terminal_backlog - visible_start);
-			num_trailing = (size_t)(backlog_offset - num_leading);
+			num_leading  = (size_t)(visible_end - vga_terminal_backlog);
+			num_trailing = (size_t)(vga_terminal_backlog - visible_start);
 			assertf(num_trailing < COMPILER_LENOF(vga_terminal_backlog), "num_trailing = %Iu\n", num_trailing);
 			assertf(num_leading < COMPILER_LENOF(vga_terminal_backlog), "num_leading = %Iu\n", num_leading);
 			memcpyw(vga_terminal_start, vga_terminal_backlog_end - num_trailing, num_trailing);

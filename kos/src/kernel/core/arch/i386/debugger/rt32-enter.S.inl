@@ -142,6 +142,7 @@ END(DEFINE_DBG_ENTER_XCPUSTATE)
 .section .text.cold
 PUBLIC_FUNCTION(DBG_ENTER_NAME)
 	.cfi_startproc
+	.cfi_signal_frame
 	pushl_cfi_r %eax
 	pushfl_cfi_r
 	cli /* Disable interrupts */
