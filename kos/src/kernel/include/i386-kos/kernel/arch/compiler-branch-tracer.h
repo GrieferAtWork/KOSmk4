@@ -31,7 +31,7 @@
 __ASM_BEGIN
 __ASM_L(.macro _x86_call_predict_update expr_reg:req)
 #ifdef __x86_64__
-#define __VARIANT_BWLQ(b,w,l,q)                                             \
+#define __VARIANT_BWLQ(b, w, l, q)                                          \
 	__ASM_L(.ifc __ASM_ARG(\expr_reg),%b; call __predict_update_##b; .else) \
 	__ASM_L(.ifc __ASM_ARG(\expr_reg),%w; call __predict_update_##w; .else) \
 	__ASM_L(.ifc __ASM_ARG(\expr_reg),%l; call __predict_update_##l; .else) \
@@ -84,7 +84,7 @@ DECL_BEGIN
                          "\t.int 0\n\t"                 \
                          ".popsection\n\t"              \
                          ".Ltracepoint_%=:\n\t"         \
-                         "leaq 991b, %%rdi\n\t"         \
+                         "movq $991b,%%rdi\n\t"         \
                          "_x86_call_predict_update %1"  \
                          :                              \
                          : "X" (expected)               \
@@ -103,7 +103,7 @@ DECL_BEGIN
                          "\t.long 0\n\t"                \
                          ".popsection\n\t"              \
                          ".Ltracepoint_%=:\n\t"         \
-                         "movl $991b, %%ecx\n\t"        \
+                         "movl $991b,%%ecx\n\t"         \
                          "_x86_call_predict_update %1"  \
                          :                              \
                          : "X" (expected)               \

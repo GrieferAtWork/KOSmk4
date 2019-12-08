@@ -22,8 +22,7 @@
 
 #ifndef CONFIG_NO_BRANCH_PROFILING
 
-/* struct branch_prediction *pred = %ecx */
-/* int                       expr = %dl */
+/* struct branch_prediction *pred = %rdi */
 .section .text.hot
 .cfi_startproc
 #define DEFINE_VARIANT(name,cmpX_reg) \
@@ -31,22 +30,26 @@ PUBLIC_FUNCTION(name);                \
 	.cfi_remember_state;              \
 	pushfq_cfi_r;                     \
 	pushq_cfi_r %rax;                 \
-	cmpX_reg, 8(%rcx);                \
+	cmpX_reg, 8(%rdi);                \
 	jmp    1f;                        \
 	.cfi_restore_state;               \
 END(name);                            \
 /**/
+DEFINE_VARIANT(__predict_update_sil, cmpb %sil)
 DEFINE_VARIANT(__predict_update_si, cmpw %si)
 DEFINE_VARIANT(__predict_update_esi, cmpl %esi)
 DEFINE_VARIANT(__predict_update_rsi, cmpq %rsi)
+
 DEFINE_VARIANT(__predict_update_dl, cmpb %dl)
 DEFINE_VARIANT(__predict_update_dx, cmpw %dx)
 DEFINE_VARIANT(__predict_update_edx, cmpl %edx)
 DEFINE_VARIANT(__predict_update_rdx, cmpq %rdx)
+
 DEFINE_VARIANT(__predict_update_cl, cmpb %cl)
 DEFINE_VARIANT(__predict_update_cx, cmpw %cx)
 DEFINE_VARIANT(__predict_update_ecx, cmpl %ecx)
 DEFINE_VARIANT(__predict_update_rcx, cmpq %rcx)
+
 DEFINE_VARIANT(__predict_update_al, cmpb %al)
 DEFINE_VARIANT(__predict_update_ax, cmpw %ax)
 DEFINE_VARIANT(__predict_update_eax, cmpl %eax)
