@@ -302,13 +302,13 @@ global class GCCToolchain: Toolchain {
 												sectionOffset = "0";
 											}
 											print objFile,;
-											print ": error: in section ",;
-											print repr(sectionName),;
-											print " + ",;
-											print sectionOffset,;
-											print ": ",;
+											print ": error: ",;
 											print message,;
-											print;
+											print " (in section ",;
+											print repr(sectionName),;
+											print " at offset ",;
+											print sectionOffset,;
+											print ")";
 											continue;
 										}
 									}
