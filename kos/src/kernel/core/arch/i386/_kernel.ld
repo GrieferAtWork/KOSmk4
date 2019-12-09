@@ -89,11 +89,10 @@ SECTIONS {
 	PROVIDE_HIDDEN(__kernel_sect_text_start = ABSOLUTE(.));
 	PROVIDE_HIDDEN(__kernel_text_startpage = ABSOLUTE(.) / PAGESIZE);
 	SECTION(.text) {
-		*(.text.hot .text.likely)
+		*(.text.hot .text.likely .text.hot.*)
 		*(.text .text._ZN*)
 		*(.text.crt.*)
 		*(.text.kernel.*)
-		*(.text.cold .text.unlikely)
 		*(.text.unlikely*)     /* Should be necessary, but prevents problems... */
 		*(.text.x86.syscall.*) /* C-level implementations of system calls. */
 #ifdef __x86_64__
@@ -107,6 +106,7 @@ SECTIONS {
 		*(.text.x86.asm32_syscall_int80.*)
 		*(.text.x86.asm32_syscall_sysenter.*)
 		*(.text.x86.*)
+		*(.text.cold .text.unlikely .text.cold.*)
 	}
 
 #define DEFINE_CALLBACK_VECTOR(name,section) \
@@ -124,12 +124,11 @@ SECTIONS {
 	PROVIDE_HIDDEN(__kernel_sect_rodata_start = ABSOLUTE(.));
 	PROVIDE_HIDDEN(__kernel_rodata_startpage = ABSOLUTE(.) / PAGESIZE);
 	SECTION(.rodata) {
-		*(.rodata.hot .rodata.likely)
+		*(.rodata.hot .rodata.likely .rodata.hot.*)
 		*(.rodata.x86.*)
 		KEEP(*(.rodata.kernel_ld_elf))
 		*(.rodata .rodata.kernel_symtab .rodata.cst*)
 		*(.rodata.str* .rodata.*.str* .rodata.kernel_strtab)
-		*(.rodata.cold .rodata.unlikely)
 #ifndef CONFIG_NO_DEBUGGER
 		*(.rodata.cold.debug_function_str)
 		IP_ALIGN(__SIZEOF_POINTER__);
@@ -153,6 +152,8 @@ SECTIONS {
 		DEFINE_CALLBACK_VECTOR(pervm_clone,.rodata.callback.pervm.clone)
 		DEFINE_CALLBACK_VECTOR(pervm_onexec,.rodata.callback.pervm.onexec)
 		DEFINE_CALLBACK_VECTOR(validatable_heaps,.rodata.heaps.validatable)
+
+		*(.rodata.cold .rodata.unlikely .rodata.cold.*)
 	}
 #undef DEFINE_CALLBACK_VECTOR
 	PROVIDE_HIDDEN(__kernel_sect_rodata_size = ABSOLUTE(ABSOLUTE(.) - ABSOLUTE(__kernel_sect_rodata_start)));
@@ -250,10 +251,8 @@ SECTIONS {
 		*(.data.hot.write_mostly)
 		*(.data.hot.write_mostly.tail)
 
-		*(.data.hot .data.likely)
+		*(.data.hot .data.likely .data.hot.*)
 		*(.data)
-		*(.data.cold)
-		*(.data.unlikely)
 		*(.data.local.*)
 
 #ifdef CONFIG_NO_SMP
@@ -295,6 +294,7 @@ SECTIONS {
 		PROVIDE_HIDDEN(kernel_profile_branch_annotated_start = ABSOLUTE(.));
 		PROVIDE_HIDDEN(kernel_profile_branch_annotated_end = ABSOLUTE(.));
 #endif /* CONFIG_NO_BRANCH_PROFILING */
+		*(.data.cold .data.unlikely .data.cold.*)
 
 		IP_ALIGN(PAGESIZE);
 		PROVIDE_HIDDEN(__kernel_data_endpage = ABSOLUTE(.) / PAGESIZE);
@@ -326,17 +326,17 @@ SECTIONS {
 
 	PROVIDE_HIDDEN(__kernel_sect_bss_start = ABSOLUTE(.));
 	SECTION(.bss) {
-		*(.xbss.hot .xbss.likely)
+		*(.xbss.hot .xbss.likely .xbss.hot.*)
 		*(.xbss)
-		*(.xbss.cold .xbss.unlikely)
+		*(.xbss.cold .xbss.unlikely .xbss.cold.*)
 		IP_ALIGN(PAGESIZE);
 		PROVIDE_HIDDEN(__kernel_xdata_endpage = ABSOLUTE(.) / PAGESIZE);
 		PROVIDE_HIDDEN(__kernel_xdata_numpages = ABSOLUTE(ABSOLUTE(__kernel_xdata_endpage) - ABSOLUTE(__kernel_xdata_startpage)));
 
 		PROVIDE_HIDDEN(__kernel_bss_startpage = ABSOLUTE(.) / PAGESIZE);
-		*(.bss.hot .bss.likely)
+		*(.bss.hot .bss.likely .bss.hot.*)
 		*(.bss)
-		*(.bss.cold .bss.unlikely)
+		*(.bss.cold .bss.unlikely .bss.cold.*)
 
 		/* Boot CPU/TASK/VM data. */
 #ifndef CONFIG_NO_SMP
