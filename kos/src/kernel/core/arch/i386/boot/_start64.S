@@ -168,7 +168,7 @@ END(vga_puts)
 #define DEFINE_PRIVATE_STRING(name, str) \
 	.section .data.free;                 \
 		PRIVATE_OBJECT(name);            \
-		.ascii str;                      \
+		.asciz str;                      \
 		END(name);                       \
 	.section .text.free;
 
@@ -231,7 +231,7 @@ END(boot_failure_no_cpuid_0x80000001)
 PRIVATE_FUNCTION(boot_failure_no_longmode)
 	DEFINE_PRIVATE_STRING(str_no_longmode, "\
 Long mode (64-bit mode) is not supported\n\
-   [cpuid leaf 80000001h:%edx is lacking #LM (bit #29)]")
+    [cpuid leaf 80000001h:%edx is lacking #LM (bit #29)]")
 	leal   SYM(str_no_longmode), %esi
 	jmp    boot_failure
 END(boot_failure_no_longmode)
@@ -239,7 +239,7 @@ END(boot_failure_no_longmode)
 PRIVATE_FUNCTION(boot_failure_no_pae)
 	DEFINE_PRIVATE_STRING(str_no_pae, "\
 PAE (Physical Address Extension) Paging is not supported\n\
-   [cpuid leaf 80000001h:%edx is lacking #PAE (bit #6)]")
+    [cpuid leaf 80000001h:%edx is lacking #PAE (bit #6)]")
 	leal   SYM(str_no_pae), %esi
 	jmp    boot_failure
 END(boot_failure_no_pae)
@@ -247,7 +247,7 @@ END(boot_failure_no_pae)
 PRIVATE_FUNCTION(boot_failure_no_pse)
 	DEFINE_PRIVATE_STRING(str_no_pse, "\
 PSE (Page Size Extension) Paging is not supported\n\
-   [cpuid leaf 80000001h:%edx is lacking #PSE (bit #3)]")
+    [cpuid leaf 80000001h:%edx is lacking #PSE (bit #3)]")
 	leal   SYM(str_no_pse), %esi
 	jmp    boot_failure
 END(boot_failure_no_pse)
@@ -255,7 +255,7 @@ END(boot_failure_no_pse)
 PRIVATE_FUNCTION(boot_failure_no_msr)
 	DEFINE_PRIVATE_STRING(str_no_msr, "\
 MSR (Model Specific Registers) are not implemented\n\
-   [cpuid leaf 80000001h:%edx is lacking #PSE (bit #3)]")
+    [cpuid leaf 80000001h:%edx is lacking #PSE (bit #3)]")
 	leal   SYM(str_no_msr), %esi
 	jmp    boot_failure
 END(boot_failure_no_msr)
@@ -471,12 +471,12 @@ INTERN_FUNCTION(_start)
 
 
 #define CALL_IF_Z(func) \
-	jnz  991f; call func; 991:
+	jz  991f; call func; 991:
 
 
 	/* Test the LM bit. */
 	testl  $(CPUID_80000001D_LM), %edx
-	jz     boot_failure_no_longmode
+	jnz     boot_failure_no_longmode
 
 	/* Test the PAE bit. */
 	testl  $(CPUID_80000001D_PAE), %edx
