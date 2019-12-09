@@ -56,7 +56,6 @@
 
 DECL_BEGIN
 
-
 INTDEF byte_t __kernel_bootidle_stack[KERNEL_IDLE_STACKSIZE];
 
 INTERN ATTR_FREETEXT void KCALL
@@ -211,19 +210,18 @@ NOTHROW(KCALL cpu_enable_preemptive_interrupts_nopr)(void) {
 
 #ifdef __x86_64__
 
+
 /* Modify `state' to insert an asynchronous call to the given RPC function.
- * When that function then returns, the old state will restored, and (if provided)
- * the `completed' signal will be broadcast.
+ * When that function then returns, the old state will restored.
  * The reason passed to `func' is either `TASK_RPC_REASON_ASYNCUSER' if the
  * old state points into user-space, or `TASK_RPC_REASON_ASYNC' if not. */
 PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
 NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
-                                          task_rpc_t func, void *arg,
-                                          struct sig *completed) {
+                                          task_rpc_t func,
+                                          void *arg) {
 	(void)state;
 	(void)func;
 	(void)arg;
-	(void)completed;
 	kernel_panic("TODO");
 }
 
@@ -232,26 +230,13 @@ NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
  * of the given buffer as value for `arg' to the given `func'. */
 PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
 NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
-                                            task_rpc_t func, void const *buf,
-                                            size_t bufsize, struct sig *completed) {
+                                            task_rpc_t func,
+                                            void const *buf,
+                                            size_t bufsize) {
 	(void)state;
 	(void)func;
 	(void)buf;
 	(void)bufsize;
-	(void)completed;
-	kernel_panic("TODO");
-}
-
-
-
-PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
-NOTHROW(FCALL task_push_asynchronous_srpc)(struct scpustate *__restrict state,
-                                           task_srpc_t func, void *arg,
-                                           struct sig *completed) {
-	(void)state;
-	(void)func;
-	(void)arg;
-	(void)completed;
 	kernel_panic("TODO");
 }
 
@@ -280,8 +265,10 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 	return true;
 }
 
+/* TODO */
 
 #else /* __x86_64__ */
+
 
 /* EAX:    <task_rpc_t func>
  * ECX:    <void *arg>
@@ -300,62 +287,14 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 INTDEF void ASMCALL x86_rpc_kernel_redirection(void);
 INTDEF void ASMCALL x86_rpc_kernel_redirection_handler(void);
 
-/* EAX:    <task_rpc_t func>
- * ECX:    <void *arg>
- * EDX:    <struct icpustate *>    (contains the return location; also used for CFI)
- * EBX:    <unsigned int reason>
- * EBP:    <struct icpustate *>    (Alias for `EDX')
- * ESP:    { <struct sig *completed>, EDI, ESI, EBP, IGNORED, EBX, EDX, ECX, EAX, FS, ES, DS, IRREGS }
- * EFLAGS: <0>                     (interrupts are disabled)
- * CS:     <SEGMENT_KERNEL_CODE>
- * SS:     <SEGMENT_KERNEL_DATA>
- * DS:     <SEGMENT_USER_DATA_RPL>
- * ES:     <SEGMENT_USER_DATA_RPL>
- * FS:     <SEGMENT_KERNEL_FSBASE>
- * GS:     Already restored
- * *:      Undefined */
-INTDEF void ASMCALL x86_rpc_kernel_redirection_c(void);
-INTDEF void ASMCALL x86_rpc_kernel_redirection_c_handler(void);
-
-
-/* EAX:    <task_srpc_t func>
- * ECX:    <void *arg>
- * ESP:    { EDX, ECX, EAX, FS, ES, DS, IRREGS }
- * EFLAGS: <0>                     (interrupts are disabled)
- * CS:     <SEGMENT_KERNEL_CODE>
- * SS:     <SEGMENT_KERNEL_DATA>
- * DS:     <SEGMENT_USER_DATA_RPL>
- * ES:     <SEGMENT_USER_DATA_RPL>
- * FS:     <SEGMENT_KERNEL_FSBASE>
- * GS:     Already restored
- * *:      Undefined */
-INTDEF void ASMCALL x86_srpc_kernel_redirection(void);
-INTDEF void ASMCALL x86_srpc_kernel_redirection_handler(void);
-
-/* EAX:    <task_srpc_t func>
- * ECX:    <void *arg>
- * ESP:    { <struct sig *completed>, EDX, ECX, EAX, FS, ES, DS, IRREGS }
- * EFLAGS: <0>                     (interrupts are disabled)
- * CS:     <SEGMENT_KERNEL_CODE>
- * SS:     <SEGMENT_KERNEL_DATA>
- * DS:     <SEGMENT_USER_DATA_RPL>
- * ES:     <SEGMENT_USER_DATA_RPL>
- * FS:     <SEGMENT_KERNEL_FSBASE>
- * GS:     Already restored
- * *:      Undefined */
-INTDEF void ASMCALL x86_srpc_kernel_redirection_c(void);
-INTDEF void ASMCALL x86_srpc_kernel_redirection_c_handler(void);
-
-
 /* Modify `state' to insert an asynchronous call to the given RPC function.
- * When that function then returns, the old state will restored, and (if provided)
- * the `completed' signal will be broadcast.
+ * When that function then returns, the old state will restored.
  * The reason passed to `func' is either `TASK_RPC_REASON_ASYNCUSER' if the
  * old state points into user-space, or `TASK_RPC_REASON_ASYNC' if not. */
 PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
 NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
-                                          task_rpc_t func, void *arg,
-                                          struct sig *completed) {
+                                          task_rpc_t func,
+                                          void *arg) {
 	struct ATTR_PACKED buffer {
 		struct gpregs b_gpregs; /* General purpose registers. */
 		u32           b_gs;     /* G segment register (Usually `SEGMENT_USER_GSBASE_RPL') */
@@ -372,10 +311,6 @@ NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
 	memcpy(dest, &buf.b_gpregs, sizeof(struct gpregs));
 	/* `dest' now points to a valid `struct icpustate' (which will be passed to `func') */
 	istate = (struct icpustate *)dest;
-	if (completed) {
-		SUBSP(sizeof(struct sig *));
-		*(uintptr_t *)dest = (uintptr_t)completed;
-	}
 	/* Allocate a kernel-space S-cpustate, which will be loaded to execute the user-function. */
 	SUBSP(OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL);
 	result = (struct scpustate *)dest;
@@ -391,9 +326,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
 	result->scs_sgregs.sg_es    = SEGMENT_USER_DATA_RPL;
 	result->scs_sgregs.sg_fs    = SEGMENT_KERNEL_FSBASE;
 	result->scs_sgregs.sg_gs    = buf.b_gs;
-	result->scs_irregs_k.ir_eip = completed
-	                              ? (uintptr_t)&x86_rpc_kernel_redirection_c
-	                              : (uintptr_t)&x86_rpc_kernel_redirection;
+	result->scs_irregs_k.ir_eip = (uintptr_t)&x86_rpc_kernel_redirection;
 	result->scs_irregs_k.ir_cs     = SEGMENT_KERNEL_CODE;
 	result->scs_irregs_k.ir_eflags = 0;
 #undef SUBSP
@@ -405,8 +338,9 @@ NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
  * of the given buffer as value for `arg' to the given `func'. */
 PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
 NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
-                                            task_rpc_t func, void const *buf,
-                                            size_t bufsize, struct sig *completed) {
+                                            task_rpc_t func,
+                                            void const *buf,
+                                            size_t bufsize) {
 	struct ATTR_PACKED buffer {
 		struct gpregs b_gpregs; /* General purpose registers. */
 		u32 b_gs;               /* G segment register (Usually `SEGMENT_USER_GSBASE_RPL') */
@@ -416,10 +350,6 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
 	struct buffer regbuf;
 	byte_t *dest;
 	void *argbuffer;
-	(void)completed;
-	assertf(completed == NULL,
-	        "Not implemented for `completed != NULL'. Also: The `completed' "
-	        "signal is deprecated and scheduled to be removed");
 	memcpy(&regbuf, state, sizeof(regbuf));
 	dest = (byte_t *)state + sizeof(regbuf);
 #define SUBSP(x) (dest -= (x))
@@ -450,71 +380,6 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
 	result->scs_irregs_k.ir_eip = (uintptr_t)&x86_rpc_kernel_redirection;
 	result->scs_irregs_k.ir_cs  = SEGMENT_KERNEL_CODE;
 	result->scs_irregs_k.ir_eflags = 0;
-#undef SUBSP
-	return result;
-}
-
-
-
-PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
-NOTHROW(FCALL task_push_asynchronous_srpc)(struct scpustate *__restrict state,
-                                           task_srpc_t func, void *arg,
-                                           struct sig *completed) {
-	/* EAX:    <task_srpc_t func>
-	 * ECX:    <void *arg>
-	 * ESP:    { EDX, ECX, EAX, FS, ES, DS, IRREGS }
-	 * EFLAGS: <0>                     (interrupts are disabled)
-	 * CS:     <SEGMENT_KERNEL_CODE>
-	 * SS:     <SEGMENT_KERNEL_DATA>
-	 * DS:     <SEGMENT_USER_DATA_RPL>
-	 * ES:     <SEGMENT_USER_DATA_RPL>
-	 * FS:     <SEGMENT_KERNEL_FSBASE>
-	 * GS:     Already restored
-	 * *:      Undefined */
-	struct ATTR_PACKED buffer {
-		struct gpregs b_gpregs; /* General purpose registers. */
-		struct sgregs b_sgregs; /* Segment registers. */
-	};
-	struct scpustate *result;
-	struct buffer regbuf;
-	byte_t *dest;
-	/* NOTE: sizeof(regbuf) == OFFSET_SCPUSTATE_IRREGS */
-	memcpy(&regbuf, state, sizeof(regbuf));
-	dest = (byte_t *)state + OFFSET_SCPUSTATE_IRREGS;
-#define SUBSP(x) (dest -= (x))
-#define PUSH(x)  (dest -= sizeof(uintptr_t), *(uintptr_t *)dest = (x))
-	/* Save clobbered registers. */
-	PUSH(regbuf.b_sgregs.sg_ds16);
-	PUSH(regbuf.b_sgregs.sg_es16);
-	PUSH(regbuf.b_sgregs.sg_fs16);
-	PUSH(regbuf.b_gpregs.gp_eax);
-	PUSH(regbuf.b_gpregs.gp_ecx);
-	PUSH(regbuf.b_gpregs.gp_edx);
-	if (completed)
-		PUSH((uintptr_t)completed);
-
-	/* Allocate a kernel-space S-cpustate, which will be loaded to execute the user-function. */
-	SUBSP(OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL);
-	result = (struct scpustate *)dest;
-
-	/* Fill in the new state to generate a redirection towards the RPC wrapper. */
-	result->scs_gpregs.gp_edi   = regbuf.b_gpregs.gp_edi;
-	result->scs_gpregs.gp_esi   = regbuf.b_gpregs.gp_esi;
-	result->scs_gpregs.gp_ebp   = regbuf.b_gpregs.gp_ebp;
-	result->scs_gpregs.gp_ebx   = regbuf.b_gpregs.gp_ebx;
-	result->scs_gpregs.gp_edx   = regbuf.b_gpregs.gp_edx;
-	result->scs_gpregs.gp_eax   = (uintptr_t)func;
-	result->scs_gpregs.gp_ecx   = (uintptr_t)arg;
-	result->scs_sgregs.sg_ds    = SEGMENT_USER_DATA_RPL;
-	result->scs_sgregs.sg_es    = SEGMENT_USER_DATA_RPL;
-	result->scs_sgregs.sg_fs    = SEGMENT_KERNEL_FSBASE;
-	result->scs_sgregs.sg_gs    = regbuf.b_sgregs.sg_gs;
-	result->scs_irregs_k.ir_eip = completed
-	                              ? (uintptr_t)&x86_srpc_kernel_redirection_c
-	                              : (uintptr_t)&x86_srpc_kernel_redirection;
-	result->scs_irregs_k.ir_cs     = SEGMENT_KERNEL_CODE;
-	result->scs_irregs_k.ir_eflags = 0;
-#undef PUSH
 #undef SUBSP
 	return result;
 }
@@ -664,7 +529,7 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 		self->t_sched.s_state = (struct scpustate *)fixup;
 		/* Read the original user-space EFLAGS value. */
 		eflags = ((struct scpustate *)fixup)->scs_irregs.ir_eflags;
-		/* Skip the lcall IRET adjustment we're doing outself below by
+		/* Skip the lcall IRET adjustment we're doing ourself below by
 		 * advancing the instruction pointer from `x86_syscall32_lcall7'
 		 * to `x86_syscall32_lcall7_iret' */
 		((struct scpustate *)fixup)->scs_irregs.ir_eip = (uintptr_t)(void *)&x86_syscall32_lcall7_iret;
@@ -700,7 +565,7 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 INTERN unsigned int
 NOTHROW(KCALL x86_rpc_user_redirection_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
                                                     struct kcpustate *__restrict state,
-                                                    byte_t *__restrict UNUSED(reader)) {
+                                                    byte_t *__restrict UNUSED(lsda)) {
 	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
 	 * frame just as it is, with no modifications made to the register state. */
 	if (kcpustate_getpc(state) == (uintptr_t)&x86_rpc_user_redirection)
@@ -711,7 +576,7 @@ NOTHROW(KCALL x86_rpc_user_redirection_personality)(struct unwind_fde_struct *__
 INTERN unsigned int
 NOTHROW(KCALL x86_rpc_kernel_redirection_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
                                                       struct kcpustate *__restrict state,
-                                                      byte_t *__restrict UNUSED(reader)) {
+                                                      byte_t *__restrict UNUSED(lsda)) {
 	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
 	 * frame just as it is, with no modifications made to the register state. */
 	if (kcpustate_getpc(state) == (uintptr_t)&x86_rpc_kernel_redirection) {
@@ -721,49 +586,7 @@ NOTHROW(KCALL x86_rpc_kernel_redirection_personality)(struct unwind_fde_struct *
 	return DWARF_PERSO_CONTINUE_UNWIND;
 }
 
-INTERN unsigned int
-NOTHROW(KCALL x86_rpc_kernel_redirection_c_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
-                                                        struct kcpustate *__restrict state,
-                                                        byte_t *__restrict UNUSED(reader)) {
-	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
-	 * frame just as it is, with no modifications made to the register state. */
-	if (kcpustate_getpc(state) == (uintptr_t)&x86_rpc_kernel_redirection_c) {
-		kcpustate_setpc(state, (uintptr_t)&x86_rpc_kernel_redirection_c_handler);
-		return DWARF_PERSO_EXECUTE_HANDLER_NOW;
-	}
-	return DWARF_PERSO_CONTINUE_UNWIND;
-}
-
-INTERN unsigned int
-NOTHROW(KCALL x86_srpc_kernel_redirection_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
-                                                       struct kcpustate *__restrict state,
-                                                       byte_t *__restrict UNUSED(reader)) {
-	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
-	 * frame just as it is, with no modifications made to the register state. */
-	if (kcpustate_getpc(state) == (uintptr_t)&x86_srpc_kernel_redirection) {
-		kcpustate_setpc(state, (uintptr_t)&x86_srpc_kernel_redirection_handler);
-		return DWARF_PERSO_EXECUTE_HANDLER_NOW;
-	}
-	return DWARF_PERSO_CONTINUE_UNWIND;
-}
-
-INTERN unsigned int
-NOTHROW(KCALL x86_srpc_kernel_redirection_c_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
-                                                         struct kcpustate *__restrict state,
-                                                         byte_t *__restrict UNUSED(reader)) {
-	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
-	 * frame just as it is, with no modifications made to the register state. */
-	if (kcpustate_getpc(state) == (uintptr_t)&x86_srpc_kernel_redirection_c) {
-		kcpustate_setpc(state, (uintptr_t)&x86_srpc_kernel_redirection_c_handler);
-		return DWARF_PERSO_EXECUTE_HANDLER_NOW;
-	}
-	return DWARF_PERSO_CONTINUE_UNWIND;
-}
-
 #endif /* !__x86_64__ */
-
-
-
 
 
 

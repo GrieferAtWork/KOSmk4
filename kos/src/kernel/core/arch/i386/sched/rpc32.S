@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_SCHED_RPC32_S
+#define GUARD_KERNEL_CORE_ARCH_I386_SCHED_RPC32_S 1
 
 #include <kernel/compiler.h>
 #include <kernel/gdt.h>
@@ -361,316 +363,22 @@ END(x86_rpc_kernel_redirection_handler)
 
 
 
-.section .text
-	.cfi_startproc simple
-	.cfi_signal_frame
-	.cfi_restore_iret_eip
-	.cfi_restore_iret_cs
-	.cfi_restore_iret_eflags
-	.cfi_restore_iret_esp
-	.cfi_restore_iret_ss
-	.cfi_def_cfa %ebp, OFFSET_ICPUSTATE_IRREGS
-	.cfi_rel_offset %edi, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDI
-	.cfi_rel_offset %esi, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ESI
-	.cfi_rel_offset %ebp, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBP
-	.cfi_rel_offset %ebx, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBX
-	.cfi_rel_offset %edx, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDX
-	.cfi_rel_offset %ecx, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ECX
-	.cfi_rel_offset %eax, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EAX
-	.cfi_restore_iret_gs
-	.cfi_restore_iret_fs_or_offset (OFFSET_ICPUSTATE_FS - OFFSET_ICPUSTATE_IRREGS)
-	.cfi_restore_iret_es_or_offset (OFFSET_ICPUSTATE_ES - OFFSET_ICPUSTATE_IRREGS)
-	.cfi_restore_iret_ds_or_offset (OFFSET_ICPUSTATE_DS - OFFSET_ICPUSTATE_IRREGS)
-	EXTERN(x86_rpc_kernel_redirection_c_personality)
-	.cfi_personality 0, x86_rpc_kernel_redirection_c_personality
-	nop /* Required to allow for detection during unwinding. */
-INTERN_FUNCTION(x86_rpc_kernel_redirection_c)
-	/* EAX:    <task_rpc_t func>
-	 * ECX:    <void *arg>
-	 * EDX:    <struct icpustate *>    (contains the return location; also used for CFI)
-	 * EBX:    <unsigned int reason>
-	 * EBP:    <struct icpustate *>    (Alias for `EDX')
-	 * ESP:    { <struct sig *completed>, EDI, ESI, EBP, IGNORED, EBX, EDX, ECX, EAX, FS, ES, DS, IRREGS }
-	 * EFLAGS: <0>                     (interrupts are disabled)
-	 * CS:     <SEGMENT_KERNEL_CODE>
-	 * SS:     <SEGMENT_KERNEL_DATA>
-	 * DS:     <SEGMENT_USER_DATA_RPL>
-	 * ES:     <SEGMENT_USER_DATA_RPL>
-	 * FS:     <SEGMENT_KERNEL_FSBASE>
-	 * GS:     Already restored
-	 * *:      Undefined */
-	pushl  $(0)   /* `struct rpc_syscall_info *sc_info' */
-	pushl  %ebx /* reason */
-	call   *%eax
-	movl   %eax, %ebx
-	.cfi_def_cfa_register %ebx
-	call   sig_broadcast
-	movl   %ebx, %esp
-	.cfi_def_cfa_register %esp
-	/* Load the updated CPU state (which conforms to a `struct icpustate') */
-	popal_cfi_r
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-END(x86_rpc_kernel_redirection_c)
-.cfi_endproc
-
-.section .text
-INTERN_FUNCTION(x86_rpc_kernel_redirection_c_handler)
-	.cfi_startproc simple
-	.cfi_signal_frame
-	.cfi_restore_iret_eip
-	.cfi_restore_iret_cs
-	.cfi_restore_iret_eflags
-	.cfi_restore_iret_esp
-	.cfi_restore_iret_ss
-	.cfi_def_cfa %ebp, OFFSET_ICPUSTATE_IRREGS
-	.cfi_rel_offset %edi, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDI
-	.cfi_rel_offset %esi, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ESI
-	.cfi_rel_offset %ebp, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBP
-	.cfi_rel_offset %ebx, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBX
-	.cfi_rel_offset %edx, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDX
-	.cfi_rel_offset %ecx, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ECX
-	.cfi_rel_offset %eax, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EAX
-	.cfi_restore_iret_gs
-	.cfi_restore_iret_fs_or_offset (OFFSET_ICPUSTATE_FS - OFFSET_ICPUSTATE_IRREGS)
-	.cfi_restore_iret_es_or_offset (OFFSET_ICPUSTATE_ES - OFFSET_ICPUSTATE_IRREGS)
-	.cfi_restore_iret_ds_or_offset (OFFSET_ICPUSTATE_DS - OFFSET_ICPUSTATE_IRREGS)
-	/* EAX:    <task_rpc_t func>
-	 * ECX:    <void *arg>
-	 * EDX:    <struct icpustate *>    (contains the return location; also used for CFI)
-	 * EBX:    <unsigned int reason>
-	 * EBP:    <struct icpustate *>    (Alias for `EDX')
-	 * ESP:    { <struct sig *completed>, EDI, ESI, EBP, IGNORED, EBX, EDX, ECX, EAX, FS, ES, DS, IRREGS }
-	 * EFLAGS: <0>                     (interrupts are disabled)
-	 * CS:     <SEGMENT_KERNEL_CODE>
-	 * SS:     <SEGMENT_KERNEL_DATA>
-	 * DS:     <SEGMENT_USER_DATA_RPL>
-	 * ES:     <SEGMENT_USER_DATA_RPL>
-	 * FS:     <SEGMENT_KERNEL_FSBASE>
-	 * GS:     Already restored
-	 * *:      Undefined */
-	pushl  $(0)   /* `struct rpc_syscall_info *sc_info' */
-	pushl  %ebx /* reason */
-	call   *%eax
-	movl   %eax, %ebx
-	.cfi_def_cfa_register %ebx
-	call   sig_broadcast
-	movl   %ebx, %esp
-	.cfi_def_cfa_register %esp
-	/* Continue unwinding the exception that brought us here. */
-	EXTERN(x86_userexcept_unwind_interrupt_esp)
-	jmp    x86_userexcept_unwind_interrupt_esp
-END(x86_rpc_kernel_redirection_handler)
-.cfi_endproc
-
-
-.section .text
-	.cfi_startproc simple
-	.cfi_signal_frame
-	.cfi_restore_iret_eip
-	.cfi_restore_iret_cs
-	.cfi_restore_iret_eflags
-	.cfi_restore_iret_esp
-	.cfi_restore_iret_ss
-	.cfi_def_cfa %esp, 24
-	.cfi_rel_offset %edx, 0
-	.cfi_rel_offset %ecx, 4
-	.cfi_rel_offset %eax, 8
-	.cfi_restore_iret_gs
-	.cfi_restore_iret_fs_or_offset (12 - 24)
-	.cfi_restore_iret_es_or_offset (16 - 24)
-	.cfi_restore_iret_ds_or_offset (20 - 24)
-	EXTERN(x86_srpc_kernel_redirection_personality)
-	.cfi_personality 0, x86_srpc_kernel_redirection_personality
-	nop /* Required to allow for detection during unwinding. */
-INTERN_FUNCTION(x86_srpc_kernel_redirection)
-	/* EAX:    <task_srpc_t func>
-	 * ECX:    <void *arg>
-	 * ESP:    { EDX, ECX, EAX, FS, ES, DS, IRREGS }
-	 * EFLAGS: <0>                     (interrupts are disabled)
-	 * CS:     <SEGMENT_KERNEL_CODE>
-	 * SS:     <SEGMENT_KERNEL_DATA>
-	 * DS:     <SEGMENT_USER_DATA_RPL>
-	 * ES:     <SEGMENT_USER_DATA_RPL>
-	 * FS:     <SEGMENT_KERNEL_FSBASE>
-	 * GS:     Already restored
-	 * *:      Undefined */
-	call   *%eax
-	/* Load the interrupted text location. */
-	popl_cfi_r %edx
-	popl_cfi_r %ecx
-	popl_cfi_r %eax
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-END(x86_srpc_kernel_redirection)
-.cfi_endproc
-
-.section .text
-INTERN_FUNCTION(x86_srpc_kernel_redirection_handler)
-	.cfi_startproc simple
-	.cfi_signal_frame
-	.cfi_restore_iret_eip
-	.cfi_restore_iret_cs
-	.cfi_restore_iret_eflags
-	.cfi_restore_iret_esp
-	.cfi_restore_iret_ss
-	.cfi_def_cfa %esp, 24
-	.cfi_rel_offset %edx, 0
-	.cfi_rel_offset %ecx, 4
-	.cfi_rel_offset %eax, 8
-	.cfi_restore_iret_gs
-	.cfi_restore_iret_fs_or_offset (12 - 24)
-	.cfi_restore_iret_es_or_offset (16 - 24)
-	.cfi_restore_iret_ds_or_offset (20 - 24)
-	/* EAX:    <task_srpc_t func>
-	 * ECX:    <void *arg>
-	 * ESP:    { EDX, ECX, EAX, FS, ES, DS, IRREGS }
-	 * EFLAGS: <0>                     (interrupts are disabled)
-	 * CS:     <SEGMENT_KERNEL_CODE>
-	 * SS:     <SEGMENT_KERNEL_DATA>
-	 * DS:     <SEGMENT_USER_DATA_RPL>
-	 * ES:     <SEGMENT_USER_DATA_RPL>
-	 * FS:     <SEGMENT_KERNEL_FSBASE>
-	 * GS:     Already restored
-	 * *:      Undefined */
-	call   *%eax
-	/* Load the interrupted text location. */
-	popl_cfi_r %edx
-	popl_cfi_r %ecx
-	popl_cfi_r %eax
-	pushal_cfi_r
-	/* Continue unwinding the exception that brought us here. */
-	EXTERN(x86_userexcept_unwind_interrupt_esp)
-	jmp    x86_userexcept_unwind_interrupt_esp
-END(x86_srpc_kernel_redirection_handler)
-.cfi_endproc
-
-.section .text
-	.cfi_startproc simple
-	.cfi_signal_frame
-	.cfi_restore_iret_eip
-	.cfi_restore_iret_cs
-	.cfi_restore_iret_eflags
-	.cfi_restore_iret_esp
-	.cfi_restore_iret_ss
-	.cfi_def_cfa %esp, 28
-	.cfi_rel_offset %edx, 4
-	.cfi_rel_offset %ecx, 8
-	.cfi_rel_offset %eax, 12
-	.cfi_restore_iret_gs
-	.cfi_restore_iret_fs_or_offset (16 - 28)
-	.cfi_restore_iret_es_or_offset (20 - 28)
-	.cfi_restore_iret_ds_or_offset (24 - 28)
-	EXTERN(x86_srpc_kernel_redirection_c_personality)
-	.cfi_personality 0, x86_srpc_kernel_redirection_c_personality
-	nop    /* Required to allow for detection during unwinding. */
-INTERN_FUNCTION(x86_srpc_kernel_redirection_c)
-	/* EAX:    <task_srpc_t func>
-	 * ECX:    <void *arg>
-	 * ESP:    { <struct sig *completed>, EDX, ECX, EAX, FS, ES, DS, IRREGS }
-	 * EFLAGS: <0>                     (interrupts are disabled)
-	 * CS:     <SEGMENT_KERNEL_CODE>
-	 * SS:     <SEGMENT_KERNEL_DATA>
-	 * DS:     <SEGMENT_USER_DATA_RPL>
-	 * ES:     <SEGMENT_USER_DATA_RPL>
-	 * FS:     <SEGMENT_KERNEL_FSBASE>
-	 * GS:     Already restored
-	 * *:      Undefined */
-	call   *%eax
-	/* Broadcast the completion signal. */
-	call   sig_broadcast
-	.cfi_adjust_cfa_offset -4
-	/* Load the interrupted text location. */
-	popl_cfi_r %edx
-	popl_cfi_r %ecx
-	popl_cfi_r %eax
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-END(x86_srpc_kernel_redirection_c)
-.cfi_endproc
-
-.section .text
-INTERN_FUNCTION(x86_srpc_kernel_redirection_c_handler)
-	.cfi_startproc simple
-	.cfi_signal_frame
-	.cfi_restore_iret_eip
-	.cfi_restore_iret_cs
-	.cfi_restore_iret_eflags
-	.cfi_restore_iret_esp
-	.cfi_restore_iret_ss
-	.cfi_def_cfa %esp, 28
-	.cfi_rel_offset %edx, 4
-	.cfi_rel_offset %ecx, 8
-	.cfi_rel_offset %eax, 12
-	.cfi_restore_iret_gs
-	.cfi_restore_iret_fs_or_offset (16 - 28)
-	.cfi_restore_iret_es_or_offset (20 - 28)
-	.cfi_restore_iret_ds_or_offset (24 - 28)
-	/* EAX:    <task_srpc_t func>
-	 * ECX:    <void *arg>
-	 * ESP:    { <struct sig *completed>, EDX, ECX, EAX, FS, ES, DS, IRREGS }
-	 * EFLAGS: <0>                     (interrupts are disabled)
-	 * CS:     <SEGMENT_KERNEL_CODE>
-	 * SS:     <SEGMENT_KERNEL_DATA>
-	 * DS:     <SEGMENT_USER_DATA_RPL>
-	 * ES:     <SEGMENT_USER_DATA_RPL>
-	 * FS:     <SEGMENT_KERNEL_FSBASE>
-	 * GS:     Already restored
-	 * *:      Undefined */
-	call   *%eax
-	/* Broadcast the completion signal. */
-	call   sig_broadcast
-	.cfi_adjust_cfa_offset -4
-	/* Load the interrupted text location. */
-	popl_cfi_r %edx
-	popl_cfi_r %ecx
-	popl_cfi_r %eax
-	pushal_cfi_r
-	/* Continue unwinding the exception that brought us here. */
-	EXTERN(x86_userexcept_unwind_interrupt_esp)
-	jmp    x86_userexcept_unwind_interrupt_esp
-END(x86_srpc_kernel_redirection_c_handler)
-.cfi_endproc
 
 
 
 .section .text
 PUBLIC_FUNCTION(task_rpc_exec_here)
-	.cfi_startproc simple
+	.cfi_startproc
 	.cfi_signal_frame
-	.cfi_def_cfa %esp, 8
-	.cfi_rel_offset %eip, 0
+	.cfi_def_cfa %esp, 0
 	/* ECX:    <task_rpc_t func>
 	 * EDX:    <void *arg>
-	 * 0(ESP): <return address>
-	 * 4(ESP): <struct sig *completed>
-	 */
-	movl   0(%esp), %eax
-	pushl_cfi %eax
-	.cfi_rel_offset %eip, 0
-	movl   $(SEGMENT_KERNEL_CODE), 4(%esp)
-	pushfl_cfi
+	 * 0(ESP): <return address> */
 	popl_cfi %eax
-	xchgl  %eax, 4(%esp)
-	/* EAX:    <struct sig *completed>
-	 * ECX:    <task_rpc_t func>
-	 * EDX:    <void *arg> */
-
+	.cfi_register %eip, %eax
+	pushfl_cfi_r                     /* %eflags */
+	pushl_cfi $(SEGMENT_KERNEL_CODE) /* %cs */
+	pushl     %eax                   /* %eip */
 	.cfi_restore_iret_eip
 	.cfi_restore_iret_cs
 	.cfi_restore_iret_eflags
@@ -678,6 +386,8 @@ PUBLIC_FUNCTION(task_rpc_exec_here)
 	.cfi_restore_iret_ss
 	.cfi_restore_iret_gs
 	.cfi_def_cfa %esp, 0
+	/* ECX:    <task_rpc_t func>
+	 * EDX:    <void *arg> */
 
 	/* Generate a full ICPUSTATE */
 	pushl_cfi %ds
@@ -689,20 +399,15 @@ PUBLIC_FUNCTION(task_rpc_exec_here)
 
 	pushal_cfi_r
 
-	pushl_cfi %eax                    /* <struct sig *completed> */
-	movl   %ecx, %eax                 /* <task_rpc_t func> */
-	movl   %edx, %ecx                 /* <void *arg> */
-	leal   4(%esp), %edx              /* <struct icpustate *state> */
-	pushl  $(0)                         /* <struct rpc_syscall_info *sc_info> */
-	pushl_cfi $TASK_RPC_REASON_ASYNC  /* <unsigned int reason> */
+	movl   %ecx, %eax                  /* <task_rpc_t func> */
+	movl   %edx, %ecx                  /* <void *arg> */
+	movl   %esp, %edx                  /* <struct icpustate *state> */
+	pushl_cfi $(0)                     /* <struct rpc_syscall_info *sc_info> */
+	pushl_cfi $(TASK_RPC_REASON_ASYNC) /* <unsigned int reason> */
 	call   *%eax
 	.cfi_adjust_cfa_offset -8
-	cmpl   $(0), 0(%esp)
-	je     1f
-	movl   %eax, %ebp
-	call   sig_broadcast              /* NOTE: `struct sig' is still in 0(%esp) from the push above  */
-	movl   %ebp, %eax
-1:	movl   %eax, %esp
+	movl   %eax, %esp
+
 	popal_cfi_r
 
 	popl_cfi %fs
@@ -727,13 +432,14 @@ PUBLIC_FUNCTION(task_rpc_exec_here_onexit)
 	pushl_cfi %es      /* icpustate::ics_es */
 	pushl_cfi %ds      /* icpustate::ics_ds */
 	pushal_cfi
-	movl   %ecx, %eax
-	movl   %edx, %ecx
-	movl   %esp, %edx
-	pushl_cfi $TASK_RPC_REASON_SHUTDOWN
+	movl   %ecx, %eax                     /* task_rpc_t func */
+	movl   %edx, %ecx                     /* void *arg */
+	movl   %esp, %edx                     /* struct icpustate *state */
+	pushl_cfi $(0)                        /* struct rpc_syscall_info const *sc_info */
+	pushl_cfi $(TASK_RPC_REASON_SHUTDOWN) /* unsigned int reason */
 	call   *%eax
-	.cfi_adjust_cfa_offset -4
-	addl   $OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL, %esp
+	.cfi_adjust_cfa_offset -8
+	addl   $(OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL), %esp
 	.cfi_adjust_cfa_offset -(OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL)
 	ret
 	.cfi_endproc
@@ -750,10 +456,10 @@ PUBLIC_FUNCTION(task_serve)
 #if 1 /* Service blocking cleanup operations. */
 	call   blocking_cleanup_service
 	/* If there are pending X-RPCs, service them below. */
-	cmpl   $BLOCKING_CLEANUP_SERVICE_XRPC, %eax
+	cmpl   $(BLOCKING_CLEANUP_SERVICE_XRPC), %eax
 	je     1f
 	/* return EAX == BLOCKING_CLEANUP_SERVICE_DONE */
-	cmpl   $BLOCKING_CLEANUP_SERVICE_DONE, %eax
+	cmpl   $(BLOCKING_CLEANUP_SERVICE_DONE), %eax
 	sete   %cl
 	movzbl %cl, %eax
 	ret
@@ -800,7 +506,7 @@ PUBLIC_FUNCTION(task_serve)
 
 #if 1 /* Service blocking cleanup operations. */
 	call   blocking_cleanup_service
-	cmpl   $BLOCKING_CLEANUP_SERVICE_XRPC, %eax
+	cmpl   $(BLOCKING_CLEANUP_SERVICE_XRPC), %eax
 	je     1b
 #endif
 
@@ -832,7 +538,7 @@ PUBLIC_FUNCTION(task_serve_nx)
 	setne  %al
 #else
 	cmpl   $(0), %fs:this_rpc_pending_sync_count
-	movl   $TASK_SERVE_NX_DIDRUN, %ecx
+	movl   $(TASK_SERVE_NX_DIDRUN), %ecx
 	cmovne %ecx, %eax
 #endif
 	ret
@@ -866,7 +572,7 @@ PUBLIC_FUNCTION(task_serve_nx)
 	.cfi_restore_iret_fs_or_offset -12
 
 	/* Return $1 later on (unless overwritten by RPC functions themself) */
-	movl   $TASK_SERVE_NX_DIDRUN, %eax
+	movl   $(TASK_SERVE_NX_DIDRUN), %eax
 	pushal_cfi_r
 
 1:	movl   %esp, %ecx
@@ -897,32 +603,4 @@ PUBLIC_FUNCTION(task_serve_nx)
 	.cfi_endproc
 END(task_serve_nx)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_RPC32_S */

@@ -35,7 +35,7 @@ EXTERN(__x86_asm32_int80_break)
 #define __SYSCALL_UNUSED(sysno) PTR __x86_asm32_int80_break;
 #define __TSYSCALL_TABLE_END(table_id, ...) \
 	END(x86_sysroute##table_id##_asm32_int80)
-#include <asm/ls-syscalls32.h>
+#include "../../../../../../include/i386-kos/asm/ls-syscalls32.h"
 
 
 /* Define `x86_sysrouteN_asm32_sysenter' */
@@ -47,7 +47,7 @@ EXTERN(__x86_asm32_sysenter_break)
 #define __SYSCALL_UNUSED(sysno) PTR __x86_asm32_sysenter_break;
 #define __TSYSCALL_TABLE_END(table_id, ...) \
 	END(x86_sysroute##table_id##_asm32_sysenter)
-#include <asm/ls-syscalls32.h>
+#include "../../../../../../include/i386-kos/asm/ls-syscalls32.h"
 
 
 /* Define `x86_sysrouteN_c' or `x86_sysrouteN_c32' */
@@ -69,5 +69,5 @@ EXTERN(sys_break)
 #define __TSYSCALL_TABLE_END(table_id, ...) \
 	END(x86_sysroute##table_id##_c)
 #endif /* !__x86_64__ */
-#include <asm/ls-syscalls32.h>
+#include "../../../../../../include/i386-kos/asm/ls-syscalls32.h"
 

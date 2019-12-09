@@ -87,9 +87,13 @@ DATDEF ATTR_PERTASK struct vm_datapart _this_kernel_stackpart ASMNAME("this_kern
 #define HINT_GETMODE(x) HINT_MODE x
 
 
-PRIVATE void FCALL
-task_srpc_set_child_tid(/*USER CHECKED pid_t*/ void *arg) {
-	ATOMIC_WRITE(*(pid_t *)arg, task_gettid());
+PRIVATE WUNUSED NONNULL((2)) struct icpustate *FCALL
+task_srpc_set_child_tid(void *arg,
+                        struct icpustate *__restrict state,
+                        unsigned int UNUSED(reason),
+                        struct rpc_syscall_info const *UNUSED(sc_info)) {
+	ATOMIC_WRITE(*(USER CHECKED pid_t *)arg, task_gettid());
+	return state;
 }
 
 #if 0
@@ -249,10 +253,9 @@ again_lock_vm:
 			 * This always needs to be done in the context of the child, so that exceptions
 			 * during the write are handled in the proper context, as well as in regards to
 			 * the child actually existing in a different VM when `CLONE_VM' isn't given. */
-			state = task_push_asynchronous_srpc(state,
-			                                    &task_srpc_set_child_tid,
-			                                    child_tidptr,
-			                                    NULL);
+			state = task_push_asynchronous_rpc(state,
+			                                   &task_srpc_set_child_tid,
+			                                   child_tidptr);
 		}
 		result->t_sched.s_state = state;
 	}
@@ -400,7 +403,6 @@ DEFINE_SYSCALL5(pid_t, clone,
 	                       NULL,
 	                       TASK_RPC_FHIGHPRIO |
 	                       TASK_USER_RPC_FINTR,
-	                       NULL,
 	                       GFP_NORMAL);
 	/* Shouldn't get here... */
 	return -EOK;
@@ -413,7 +415,6 @@ DEFINE_SYSCALL0(pid_t, fork) {
 	                       NULL,
 	                       TASK_RPC_FHIGHPRIO |
 	                       TASK_USER_RPC_FINTR,
-	                       NULL,
 	                       GFP_NORMAL);
 	/* Shouldn't get here... */
 	return -EOK;

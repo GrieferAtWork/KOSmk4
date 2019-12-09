@@ -118,31 +118,27 @@ restore_rpc:
 			}
 		}
 		TRY {
-			if (chain->re_kind & RPC_KIND_SRPC) {
-				(*chain->re_sfunc)(chain->re_arg);
-			} else {
 #ifndef RPC_SERVE_ALL
-				new_state = (*chain->re_func)(chain->re_arg,
-				                              state,
-				                              TASK_RPC_REASON_ASYNCUSER,
-				                              NULL);
-				if unlikely(new_state != state)
-					goto load_new_state;
-				assert(new_state != TASK_RPC_RESTART_SYSCALL);
+			new_state = (*chain->re_func)(chain->re_arg,
+			                              state,
+			                              TASK_RPC_REASON_ASYNCUSER,
+			                              NULL);
+			if unlikely(new_state != state)
+				goto load_new_state;
+			assert(new_state != TASK_RPC_RESTART_SYSCALL);
 #else /* !RPC_SERVE_ALL */
-				struct icpustate *new_state;
-				new_state = (*chain->re_func)(chain->re_arg,
-				                              state,
-				                              reason,
-				                              sc_info);
-				if (new_state == TASK_RPC_RESTART_SYSCALL) {
-					assert(reason == TASK_RPC_REASON_SYSCALL);
-					must_restart_syscall = true;
-					new_state            = state;
-				}
-				state = new_state;
-#endif /* RPC_SERVE_ALL */
+			struct icpustate *new_state;
+			new_state = (*chain->re_func)(chain->re_arg,
+			                              state,
+			                              reason,
+			                              sc_info);
+			if (new_state == TASK_RPC_RESTART_SYSCALL) {
+				assert(reason == TASK_RPC_REASON_SYSCALL);
+				must_restart_syscall = true;
+				new_state            = state;
 			}
+			state = new_state;
+#endif /* RPC_SERVE_ALL */
 		} EXCEPT {
 			assertf(!(chain->re_kind & RPC_KIND_NOTHROW),
 			        "Exception thrown by NOTHROW RPC at %p",

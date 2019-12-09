@@ -18,7 +18,6 @@
  */
 #ifdef __INTELLISENSE__
 #include "rpc.c"
-//#define RPC_SIMPLE    1
 //#define RPC_NOEXCEPT  1
 #define RPC_USER      1
 #endif /* __INTELLISENSE__ */
@@ -42,15 +41,6 @@ DECL_BEGIN
 #define TARGET_HAS_TERMINATED_RETURN_VALUE  TASK_SCHEDULE_SYNCHRONOUS_RPC_TERMINATED
 #endif
 
-#ifdef RPC_SIMPLE
-#define RPC_FUNCTION_ARGS   struct task *__restrict target, task_srpc_t func, void *arg, uintptr_t mode, struct sig *completed, gfp_t rpc_gfp
-#define RPC_ALLOC_ARGS      task_srpc_t func, void *arg, uintptr_t mode, struct sig *completed, gfp_t rpc_gfp
-#else /* RPC_SIMPLE */
-#define RPC_FUNCTION_ARGS   struct task *__restrict target, task_rpc_t func, void *arg, uintptr_t mode, struct sig *completed, gfp_t rpc_gfp
-#define RPC_ALLOC_ARGS      task_rpc_t func, void *arg, uintptr_t mode, struct sig *completed, gfp_t rpc_gfp
-#endif /* !RPC_SIMPLE */
-
-
 
 #ifdef RPC_USER
 /* Schedule a synchronous RPC to be serviced by `target'
@@ -63,17 +53,21 @@ DECL_BEGIN
  * @return: false: The target thread has the `TASK_FKERNTHREAD' flag
  *                 set, meaning it can never return to user-space,
  *                 since it only exists in kernel-space. */
-#if defined(RPC_SIMPLE) && defined(RPC_NOEXCEPT)
+#ifdef RPC_NOEXCEPT
 PUBLIC NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) NONNULL((1, 2)) int
-NOTHROW(KCALL task_schedule_user_srpc_nx)(RPC_FUNCTION_ARGS)
-#elif defined(RPC_SIMPLE)
-PUBLIC NONNULL((1, 2)) bool (KCALL task_schedule_user_srpc)(RPC_FUNCTION_ARGS)
-#elif defined(RPC_NOEXCEPT)
-PUBLIC NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) NONNULL((1, 2)) int
-NOTHROW(KCALL task_schedule_user_rpc_nx)(RPC_FUNCTION_ARGS)
-#else /* ... */
-PUBLIC NONNULL((1, 2)) bool (KCALL task_schedule_user_rpc)(RPC_FUNCTION_ARGS)
-#endif /* !... */
+NOTHROW(KCALL task_schedule_user_rpc_nx)(struct task *__restrict target,
+                                         task_rpc_t func,
+                                         void *arg,
+                                         uintptr_t mode,
+                                         gfp_t rpc_gfp)
+#else /* RPC_NOEXCEPT */
+PUBLIC NONNULL((1, 2)) bool
+(KCALL task_schedule_user_rpc)(struct task *__restrict target,
+                               task_rpc_t func,
+                               void *arg,
+                               uintptr_t mode,
+                               gfp_t rpc_gfp)
+#endif /* !RPC_NOEXCEPT */
 #else /* RPC_USER */
 /* Schedule a synchronous RPC to be serviced by `target'
  * NOTE: When `target' is the calling thread, the RPC will
@@ -84,17 +78,21 @@ PUBLIC NONNULL((1, 2)) bool (KCALL task_schedule_user_rpc)(RPC_FUNCTION_ARGS)
  * @return: true:  The RPC has been scheduled.
  * @return: false: The RPC could not be scheduled, because
  *                `target' has terminated, or is terminating. */
-#if defined(RPC_SIMPLE) && defined(RPC_NOEXCEPT)
+#ifdef RPC_NOEXCEPT
 PUBLIC NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) NONNULL((1, 2)) int
-NOTHROW(KCALL task_schedule_synchronous_srpc_nx)(RPC_FUNCTION_ARGS)
-#elif defined(RPC_SIMPLE)
-PUBLIC NONNULL((1, 2)) bool (KCALL task_schedule_synchronous_srpc)(RPC_FUNCTION_ARGS)
-#elif defined(RPC_NOEXCEPT)
-PUBLIC NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) NONNULL((1, 2)) int
-NOTHROW(KCALL task_schedule_synchronous_rpc_nx)(RPC_FUNCTION_ARGS)
-#else /* ... */
-PUBLIC NONNULL((1, 2)) bool (KCALL task_schedule_synchronous_rpc)(RPC_FUNCTION_ARGS)
-#endif /* !... */
+NOTHROW(KCALL task_schedule_synchronous_rpc_nx)(struct task *__restrict target,
+                                                task_rpc_t func,
+                                                void *arg,
+                                                uintptr_t mode,
+                                                gfp_t rpc_gfp)
+#else /* RPC_NOEXCEPT */
+PUBLIC NONNULL((1, 2)) bool
+(KCALL task_schedule_synchronous_rpc)(struct task *__restrict target,
+                                      task_rpc_t func,
+                                      void *arg,
+                                      uintptr_t mode,
+                                      gfp_t rpc_gfp)
+#endif /* !RPC_NOEXCEPT */
 #endif /* !RPC_USER */
 #ifndef RPC_NOEXCEPT
 #ifdef RPC_USER
@@ -142,33 +140,18 @@ PUBLIC NONNULL((1, 2)) bool (KCALL task_schedule_synchronous_rpc)(RPC_FUNCTION_A
 	entry = rpcentry_alloc(rpc_gfp);
 #endif /* !RPC_NOEXCEPT */
 
-#ifdef RPC_SIMPLE
-	entry->re_sfunc = func;
-#else /* RPC_SIMPLE */
 	entry->re_func = func;
-#endif /*!RPC_SIMPLE */
 	entry->re_arg  = arg;
-	entry->re_done = completed;
 #ifdef RPC_USER
 #if RPC_KIND_USER_INTR == (RPC_KIND_USER | TASK_USER_RPC_FINTR) &&                            \
     RPC_KIND_USER_INTR_SYNC == (RPC_KIND_USER | TASK_USER_RPC_FINTR | TASK_USER_RPC_FSYNC) && \
     RPC_KIND_NONSYSCALL == TASK_USER_RPC_FNONSYSCALL &&                                       \
     TASK_USER_RPC_FNOTHROW == RPC_KIND_NOTHROW
-	entry->re_kind = (RPC_KIND_USER |
-#ifdef RPC_SIMPLE
-	                  RPC_KIND_SRPC |
-#endif /* RPC_SIMPLE */
-	                  (mode & (TASK_USER_RPC_FINTR |
-	                           TASK_USER_RPC_FSYNC |
-	                           TASK_USER_RPC_FNONSYSCALL |
-	                           TASK_USER_RPC_FNOTHROW)));
+	entry->re_kind = RPC_KIND_USER |
+	                 (mode & (TASK_USER_RPC_FINTR | TASK_USER_RPC_FSYNC |
+	                          TASK_USER_RPC_FNONSYSCALL | TASK_USER_RPC_FNOTHROW));
 #else
-	entry->re_kind = RPC_KIND_USER
-#ifdef RPC_SIMPLE
-	                 |
-	                 RPC_KIND_SRPC
-#endif /* RPC_SIMPLE */
-	                 ;
+	entry->re_kind = RPC_KIND_USER;
 	if (mode & TASK_USER_RPC_FINTR)
 		entry->re_kind |= RPC_KIND_USER_INTR;
 	if (mode & TASK_USER_RPC_FSYNC)
@@ -181,11 +164,11 @@ PUBLIC NONNULL((1, 2)) bool (KCALL task_schedule_synchronous_rpc)(RPC_FUNCTION_A
 #else /* RPC_USER */
 #if TASK_SYNC_RPC_FNOTHROW == RPC_KIND_NOTHROW
 	entry->re_kind = RPC_KIND_SYNC | (mode & RPC_KIND_NOTHROW);
-#else
+#else /* TASK_SYNC_RPC_FNOTHROW == RPC_KIND_NOTHROW */
 	entry->re_kind = RPC_KIND_SYNC;
 	if (mode & TASK_SYNC_RPC_FNOTHROW)
 		entry->re_kind |= RPC_KIND_NOTHROW;
-#endif
+#endif /* TASK_SYNC_RPC_FNOTHROW != RPC_KIND_NOTHROW */
 #endif /* !RPC_USER */
 
 	/* Add the RPC entry to the target thread. */
@@ -258,44 +241,34 @@ PUBLIC NONNULL((1, 2)) bool (KCALL task_schedule_synchronous_rpc)(RPC_FUNCTION_A
  * NOTE: The *_nx variants return `NULL' if the allocation failed. */
 #ifdef RPC_USER
 #ifdef RPC_NOEXCEPT
-#ifdef RPC_SIMPLE
 PUBLIC NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED ATTR_MALLOC NONNULL((1)) struct rpc_entry *
-NOTHROW(KCALL task_alloc_user_srpc_nx)(RPC_ALLOC_ARGS)
-#else /* RPC_SIMPLE */
-PUBLIC NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED ATTR_MALLOC NONNULL((1)) struct rpc_entry *
-NOTHROW(KCALL task_alloc_user_rpc_nx)(RPC_ALLOC_ARGS)
-#endif /* !RPC_SIMPLE */
+NOTHROW(KCALL task_alloc_user_rpc_nx)(task_rpc_t func,
+                                      void *arg,
+                                      uintptr_t mode,
+                                      gfp_t rpc_gfp)
 #else /* RPC_NOEXCEPT */
-#ifdef RPC_SIMPLE
 PUBLIC NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED
 ATTR_MALLOC ATTR_RETNONNULL NONNULL((1)) struct rpc_entry *
-(KCALL task_alloc_user_srpc)(RPC_ALLOC_ARGS)
-#else /* RPC_SIMPLE */
-PUBLIC NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED
-ATTR_MALLOC ATTR_RETNONNULL NONNULL((1)) struct rpc_entry *
-(KCALL task_alloc_user_rpc)(RPC_ALLOC_ARGS)
-#endif /* !RPC_SIMPLE */
+(KCALL task_alloc_user_rpc)(task_rpc_t func,
+                            void *arg,
+                            uintptr_t mode,
+                            gfp_t rpc_gfp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC)
 #endif /* !RPC_NOEXCEPT */
 #else /* RPC_USER */
 #ifdef RPC_NOEXCEPT
-#ifdef RPC_SIMPLE
 PUBLIC NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED ATTR_MALLOC NONNULL((1)) struct rpc_entry *
-NOTHROW(KCALL task_alloc_synchronous_srpc_nx)(RPC_ALLOC_ARGS)
-#else /* RPC_SIMPLE */
-PUBLIC NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED ATTR_MALLOC NONNULL((1)) struct rpc_entry *
-NOTHROW(KCALL task_alloc_synchronous_rpc_nx)(RPC_ALLOC_ARGS)
-#endif /* !RPC_SIMPLE */
+NOTHROW(KCALL task_alloc_synchronous_rpc_nx)(task_rpc_t func,
+                                             void *arg,
+                                             uintptr_t mode,
+                                             gfp_t rpc_gfp)
 #else /* RPC_NOEXCEPT */
-#ifdef RPC_SIMPLE
 PUBLIC NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED
 ATTR_MALLOC ATTR_RETNONNULL NONNULL((1)) struct rpc_entry *
-(KCALL task_alloc_synchronous_srpc)(RPC_ALLOC_ARGS)
-#else /* RPC_SIMPLE */
-PUBLIC NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED
-ATTR_MALLOC ATTR_RETNONNULL NONNULL((1)) struct rpc_entry *
-(KCALL task_alloc_synchronous_rpc)(RPC_ALLOC_ARGS)
-#endif /* !RPC_SIMPLE */
+(KCALL task_alloc_synchronous_rpc)(task_rpc_t func,
+                                   void *arg,
+                                   uintptr_t mode,
+                                   gfp_t rpc_gfp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC)
 #endif /* !RPC_NOEXCEPT */
 #endif /* !RPC_USER */
@@ -316,33 +289,18 @@ ATTR_MALLOC ATTR_RETNONNULL NONNULL((1)) struct rpc_entry *
 	result          = rpcentry_alloc(rpc_gfp);
 #endif /* !RPC_NOEXCEPT */
 
-#ifdef RPC_SIMPLE
-	result->re_sfunc = func;
-#else /* RPC_SIMPLE */
 	result->re_func = func;
-#endif /* !RPC_SIMPLE */
 	result->re_arg  = arg;
-	result->re_done = completed;
 #ifdef RPC_USER
 #if RPC_KIND_USER_INTR == (RPC_KIND_USER | TASK_USER_RPC_FINTR) &&                            \
     RPC_KIND_USER_INTR_SYNC == (RPC_KIND_USER | TASK_USER_RPC_FINTR | TASK_USER_RPC_FSYNC) && \
     RPC_KIND_NONSYSCALL == TASK_USER_RPC_FNONSYSCALL &&                                       \
     TASK_USER_RPC_FNOTHROW == RPC_KIND_NOTHROW
-	result->re_kind = (RPC_KIND_USER |
-#ifdef RPC_SIMPLE
-	                   RPC_KIND_SRPC |
-#endif /* RPC_SIMPLE */
-	                   (mode & (TASK_USER_RPC_FINTR |
-	                            TASK_USER_RPC_FSYNC |
-	                            TASK_USER_RPC_FNONSYSCALL |
-	                            TASK_USER_RPC_FNOTHROW)));
+	result->re_kind = RPC_KIND_USER |
+	                  (mode & (TASK_USER_RPC_FINTR | TASK_USER_RPC_FSYNC |
+	                           TASK_USER_RPC_FNONSYSCALL | TASK_USER_RPC_FNOTHROW));
 #else
-	result->re_kind = RPC_KIND_USER
-#ifdef RPC_SIMPLE
-	                  |
-	                  RPC_KIND_SRPC
-#endif /* RPC_SIMPLE */
-	                  ;
+	result->re_kind = RPC_KIND_USER;
 	if (mode & TASK_USER_RPC_FINTR)
 		result->re_kind |= RPC_KIND_USER_INTR;
 	if (mode & TASK_USER_RPC_FSYNC)
@@ -355,11 +313,11 @@ ATTR_MALLOC ATTR_RETNONNULL NONNULL((1)) struct rpc_entry *
 #else /* RPC_USER */
 #if TASK_SYNC_RPC_FNOTHROW == RPC_KIND_NOTHROW
 	result->re_kind = RPC_KIND_SYNC | (mode & RPC_KIND_NOTHROW);
-#else
+#else /* TASK_SYNC_RPC_FNOTHROW == RPC_KIND_NOTHROW */
 	result->re_kind = RPC_KIND_SYNC;
 	if (mode & TASK_SYNC_RPC_FNOTHROW)
 		result->re_kind |= RPC_KIND_NOTHROW;
-#endif
+#endif /* TASK_SYNC_RPC_FNOTHROW != RPC_KIND_NOTHROW */
 #endif /* !RPC_USER */
 
 #ifdef RPC_NOEXCEPT
@@ -368,15 +326,9 @@ done:
 	return result;
 }
 
-
 #undef TARGET_HAS_TERMINATED_RETURN_VALUE
 #undef SUCCESS_RETURN_VALUE
-
-#undef RPC_ALLOC_ARGS
-#undef RPC_FUNCTION_ARGS
 #undef RPC_NOEXCEPT
-#undef RPC_SIMPLE
 #undef RPC_USER
-
 
 DECL_END

@@ -214,7 +214,6 @@ DEFINE_SYSCALL1(errno_t, iopl, syscall_ulong_t, level) {
 	                       NULL,
 	                       TASK_RPC_FHIGHPRIO |
 	                       TASK_USER_RPC_FINTR,
-	                       NULL,
 	                       GFP_NORMAL);
 	__builtin_unreachable();
 }

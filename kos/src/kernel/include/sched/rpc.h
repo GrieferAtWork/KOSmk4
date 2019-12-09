@@ -26,16 +26,6 @@
 
 DECL_BEGIN
 
-/* TODO: Get rid of the `completed' signal! It's never really used, since
- *       doing so is unsafe in all cases except when the signal is a global
- *       variable, which doesn't really make much sense. And besides: It's
- *       always possible to pass a signal that gets broadcast after the
- *       RPC via the RPC function's arg-pointer (in which case the signal
- *       can be allocated in the heap and be reference counted and freed
- *       regardless of the sender dying, or the servicing thread reaching
- *       the signal) */
-
-
 /* RPCs are served under the following, different circumstantial conditions.
  * NOTE: The order in which RPCs are executed (irregardless of their type)
  *       is never guarantied and can be completely random.
@@ -110,15 +100,11 @@ struct rpc_syscall_info;
  * @return: TASK_RPC_RESTART_SYSCALL: [valid_if(reason == TASK_RPC_REASON_SYSCALL)]
  *                                    The interrupted system call should be restarted
  *                                    without ever returning back to user-space. */
-typedef struct icpustate *(FCALL *task_rpc_t)(void *arg,
-                                              struct icpustate *__restrict state,
-                                              unsigned int reason,
-                                              struct rpc_syscall_info const *sc_info);
-
-/* A simplified RPC function.
- * WARNING: When scheduled with the `TASK_SYNC_RPC_FNOTHROW' flag,
- *          this function _must_ never throw an exception. */
-typedef void (FCALL *task_srpc_t)(void *arg);
+typedef WUNUSED NONNULL((2)) struct icpustate *
+(FCALL *task_rpc_t)(void *arg,
+                    struct icpustate *__restrict state,
+                    unsigned int reason,
+                    struct rpc_syscall_info const *sc_info);
 
 #endif /* __CC__ */
 
@@ -162,10 +148,14 @@ typedef void (FCALL *task_srpc_t)(void *arg);
                                              *          the aid of an exception, the used reason will be `TASK_RPC_REASON_ASYNCUSER'
                                              *          instead. */
 #define TASK_RPC_REASON_SHUTDOWN     0x0004 /* The RPC is being serviced because the hosting thread is currently exiting.
-                                             * This reason is only ever given for any remaining synchronous RPC that is
-                                             * serviced at a time when the hosting thread has already called `task_exit()',
-                                             * and no further RPC can ever be schedule again on that thread (attempting
-                                             * to do so will fail, indicating that the thread is terminating).
+                                             * This reason is given in one of two cases:
+                                             *  - To service any remaining synchronous RPC that is when `task_exit()' is called
+                                             *  - To service an asynchronous RPC when the target thread has terminated, but wasn't
+                                             *    yet terminated when `task_schedule_asynchronous_rpc()' already returned `true'
+                                             *    WARNING: In this case, the RPC is executed by an arbitrary thread on the same
+                                             *             CPU that the thread was scheduled on between the associated call to
+                                             *             `task_schedule_asynchronous_rpc()', and the thread being terminated.
+                                             *             Note that this is never the actual intended target thread!
                                              * Any exception thrown when this reason is given will simply be discarded,
                                              * though non-signaling exceptions will be logged using `printk(KERN_ERR)' */
 
@@ -202,13 +192,6 @@ typedef void (FCALL *task_srpc_t)(void *arg);
                                           *    system calls, as well as interrupts caused by things other than system
                                           *    calls. */
 #define TASK_USER_RPC_FNOTHROW    0x0010 /* The RPC may be serviced by `task_serve_nx()'. */
-/* SIGALT status broadcast to the `completed' signal of user-RPCs when
- * the associated thread has terminated before returning to user-space.
- * If you instead intend to wait for the RPC to start execution, thus
- * preventing the need of this kind of signal, you may instead use
- * `task_exec_user_rpc()' in order to wait for the target to finish
- * unwinding their stack and start executing the RPC. */
-#define TASK_USER_RPC_SIGALT_TERMINATED  (__CCAST(struct sig *)(-1))
 
 
 /* Asynchronous RPC flags. */
@@ -229,33 +212,28 @@ typedef void (FCALL *task_srpc_t)(void *arg);
  *                 set, meaning it can never return to user-space,
  *                 since it only exists in kernel-space. */
 FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) NONNULL((1, 2)) bool KCALL
-task_schedule_user_rpc(struct task *__restrict target, task_rpc_t func,
-                       void *arg DFL(__NULLPTR), uintptr_t mode DFL(TASK_RPC_FNORMAL|TASK_USER_RPC_FNORMAL),
-                       struct sig *completed DFL(__NULLPTR), gfp_t rpc_gfp DFL(GFP_NORMAL))
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_INTERRUPT_USER_RPC);
-FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) NONNULL((1, 2)) bool KCALL
-task_schedule_user_srpc(struct task *__restrict target, task_srpc_t func,
-                        void *arg DFL(__NULLPTR), uintptr_t mode DFL(TASK_RPC_FNORMAL|TASK_USER_RPC_FNORMAL),
-                        struct sig *completed DFL(__NULLPTR), gfp_t rpc_gfp DFL(GFP_NORMAL))
+task_schedule_user_rpc(struct task *__restrict target,
+                       task_rpc_t func,
+                       void *arg DFL(__NULLPTR),
+                       uintptr_t mode DFL(TASK_RPC_FNORMAL|TASK_USER_RPC_FNORMAL),
+                       gfp_t rpc_gfp DFL(GFP_NORMAL))
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_INTERRUPT_USER_RPC);
 
 /* No-except variants of the above functions.
  * @return: * : One of `TASK_SCHEDULE_USER_RPC_*' */
 FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) NONNULL((1, 2)) int
-NOTHROW(KCALL task_schedule_user_rpc_nx)(struct task *__restrict target, task_rpc_t func,
-                                         void *arg DFL(__NULLPTR), uintptr_t mode DFL(TASK_RPC_FNORMAL|TASK_USER_RPC_FNORMAL),
-                                         struct sig *completed DFL(__NULLPTR), gfp_t rpc_gfp DFL(GFP_NORMAL));
-FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) NONNULL((1, 2)) int
-NOTHROW(KCALL task_schedule_user_srpc_nx)(struct task *__restrict target, task_srpc_t func,
-                                          void *arg DFL(__NULLPTR), uintptr_t mode DFL(TASK_RPC_FNORMAL|TASK_USER_RPC_FNORMAL),
-                                          struct sig *completed DFL(__NULLPTR), gfp_t rpc_gfp DFL(GFP_NORMAL));
-#define TASK_SCHEDULE_USER_RPC_INTERRUPTED   1  /* The calling thread is the same as the target, and `TASK_USER_RPC_FINTR' was set
+NOTHROW(KCALL task_schedule_user_rpc_nx)(struct task *__restrict target,
+                                         task_rpc_t func,
+                                         void *arg DFL(__NULLPTR),
+                                         uintptr_t mode DFL(TASK_RPC_FNORMAL | TASK_USER_RPC_FNORMAL),
+                                         gfp_t rpc_gfp DFL(GFP_NORMAL));
+#define TASK_SCHEDULE_USER_RPC_INTERRUPTED 1    /* The calling thread is the same as the target, and `TASK_USER_RPC_FINTR' was set
                                                  * NOTE: This return value still indicates success! */
-#define TASK_SCHEDULE_USER_RPC_SUCCESS       0  /* The RPC was successfully delivered. */
+#define TASK_SCHEDULE_USER_RPC_SUCCESS     0    /* The RPC was successfully delivered. */
 #define TASK_SCHEDULE_USER_RPC_TERMINATED  (-1) /* The target thread has already terminated. */
 #define TASK_SCHEDULE_USER_RPC_KERNTHREAD  (-2) /* The target thread is a kernel thread that never reaches user-space. */
 #define TASK_SCHEDULE_USER_RPC_BADALLOC    (-3) /* `kmalloc_nx(..., rpc_gfp)' returned `NULL'. */
-#define TASK_SCHEDULE_USER_RPC_WASOK(x)  ((x) >= 0) /* When `false', `arg' wasn't inherited */
+#define TASK_SCHEDULE_USER_RPC_WASOK(x)    ((x) >= 0) /* When `false', `arg' wasn't inherited */
 #endif /* __CC__ */
 
 
@@ -270,29 +248,24 @@ NOTHROW(KCALL task_schedule_user_srpc_nx)(struct task *__restrict target, task_s
  * @return: false: The RPC could not be scheduled, because
  *                `target' has terminated, or is terminating. */
 FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) NONNULL((1, 2)) bool KCALL
-task_schedule_synchronous_rpc(struct task *__restrict target, task_rpc_t func,
-                              void *arg DFL(__NULLPTR), uintptr_t mode DFL(TASK_RPC_FNORMAL | TASK_SYNC_RPC_FNORMAL),
-                              struct sig *completed DFL(__NULLPTR), gfp_t rpc_gfp DFL(GFP_NORMAL))
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
-FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) NONNULL((1, 2)) bool KCALL
-task_schedule_synchronous_srpc(struct task *__restrict target, task_srpc_t func,
-                               void *arg DFL(__NULLPTR), uintptr_t mode DFL(TASK_RPC_FNORMAL | TASK_SYNC_RPC_FNORMAL),
-                               struct sig *completed DFL(__NULLPTR), gfp_t rpc_gfp DFL(GFP_NORMAL))
+task_schedule_synchronous_rpc(struct task *__restrict target,
+                              task_rpc_t func,
+                              void *arg DFL(__NULLPTR),
+                              uintptr_t mode DFL(TASK_RPC_FNORMAL | TASK_SYNC_RPC_FNORMAL),
+                              gfp_t rpc_gfp DFL(GFP_NORMAL))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 /* No-except variants of the above functions.
  * @return: * : One of `TASK_SCHEDULE_SYNCHRONOUS_RPC_*' */
 FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) NONNULL((1, 2)) int
-NOTHROW(KCALL task_schedule_synchronous_rpc_nx)(struct task *__restrict target, task_rpc_t func,
-                                                void *arg DFL(__NULLPTR), uintptr_t mode DFL(TASK_RPC_FNORMAL|TASK_SYNC_RPC_FNORMAL),
-                                                struct sig *completed DFL(__NULLPTR), gfp_t rpc_gfp DFL(GFP_NORMAL));
-FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) NONNULL((1, 2)) int
-NOTHROW(KCALL task_schedule_synchronous_srpc_nx)(struct task *__restrict target, task_srpc_t func,
-                                                 void *arg DFL(__NULLPTR), uintptr_t mode DFL(TASK_RPC_FNORMAL|TASK_SYNC_RPC_FNORMAL),
-                                                 struct sig *completed DFL(__NULLPTR), gfp_t rpc_gfp DFL(GFP_NORMAL));
-#define TASK_SCHEDULE_SYNCHRONOUS_RPC_BADALLOC    (-2) /* `kmalloc_nx(...,rpc_gfp)' returned `NULL'. */
+NOTHROW(KCALL task_schedule_synchronous_rpc_nx)(struct task *__restrict target,
+                                                task_rpc_t func,
+                                                void *arg DFL(__NULLPTR),
+                                                uintptr_t mode DFL(TASK_RPC_FNORMAL | TASK_SYNC_RPC_FNORMAL),
+                                                gfp_t rpc_gfp DFL(GFP_NORMAL));
+#define TASK_SCHEDULE_SYNCHRONOUS_RPC_SUCCESS     0    /* The RPC was successfully delivered. */
 #define TASK_SCHEDULE_SYNCHRONOUS_RPC_TERMINATED  (-1) /* The target thread has already terminated. */
-#define TASK_SCHEDULE_SYNCHRONOUS_RPC_SUCCESS       0  /* The RPC was successfully delivered. */
+#define TASK_SCHEDULE_SYNCHRONOUS_RPC_BADALLOC    (-2) /* `kmalloc_nx(..., rpc_gfp)' returned `NULL'. */
 #endif /* __CC__ */
 
 
@@ -305,27 +278,17 @@ NOTHROW(KCALL task_schedule_synchronous_srpc_nx)(struct task *__restrict target,
  *          been enabled at the time of the call being made!
  * @param: mode:   Set of `TASK_RPC_F* | TASK_ASYNC_RPC_F*'
  * @return: true:  The RPC has been scheduled.
- *                 If the task is running on a different core and terminates in the
- *                 mean time, `TASK_ASYNC_RPC_SIGALT_TERMINATED' will be broadcast
- *                 to the given `completed' signal, indicating execution failure.
+ *                 If the task is running on a different core and terminates in the mean
+ *                 time, `func' will be invoked from a different thread on some CPU which
+ *                 `target' used to run under at one point, using `TASK_RPC_REASON_SHUTDOWN'
  *                 If this happening isn't an option, use `task_exec_asynchronous_rpc()' instead.
  * @return: false: The RPC could not be scheduled, because `target' has terminated. */
 FUNDEF NOBLOCK NONNULL((1, 2)) bool
-NOTHROW(KCALL task_schedule_asynchronous_rpc)(struct task *__restrict target, task_rpc_t func,
-                                              void *arg DFL(__NULLPTR), uintptr_t mode DFL(TASK_RPC_FNORMAL|TASK_ASYNC_RPC_FNORMAL),
-                                              struct sig *completed DFL(__NULLPTR));
-FUNDEF NOBLOCK NONNULL((1, 2)) bool
-NOTHROW(KCALL task_schedule_asynchronous_srpc)(struct task *__restrict target, task_srpc_t func,
-                                               void *arg DFL(__NULLPTR), uintptr_t mode DFL(TASK_RPC_FNORMAL|TASK_ASYNC_RPC_FNORMAL),
-                                               struct sig *completed DFL(__NULLPTR));
+NOTHROW(KCALL task_schedule_asynchronous_rpc)(struct task *__restrict target,
+                                              task_rpc_t func,
+                                              void *arg DFL(__NULLPTR),
+                                              uintptr_t mode DFL(TASK_RPC_FNORMAL | TASK_ASYNC_RPC_FNORMAL));
 #endif /* __CC__ */
-
-/* Alternative signal values broadcast by `task_schedule_asynchronous_rpc()' to `completed'
- * when the RPC could not be executed for some reason, despite having been scheduled before. */
-#define TASK_ASYNC_RPC_SIGALT_TERMINATED (__CCAST(struct sig *)(-1)) /* The task has terminated in the mean time.
-                                                                      * NOTE: Only sent if the task is running on a different cpu. */
-
-
 
 
 #ifdef __CC__
@@ -338,13 +301,10 @@ NOTHROW(KCALL task_schedule_asynchronous_srpc)(struct task *__restrict target, t
  * @return: true:  The RPC has been scheduled and is guarantied to be executed.
  * @return: false: The RPC could not be scheduled because `target' has terminated. */
 FUNDEF NOBLOCK_IF(!PREEMPTION_ENABLED()) NONNULL((1, 2)) bool
-NOTHROW(KCALL task_exec_asynchronous_rpc)(struct task *__restrict target, task_rpc_t func,
-                                          void *arg DFL(__NULLPTR), uintptr_t mode DFL(TASK_RPC_FNORMAL|TASK_ASYNC_RPC_FNORMAL),
-                                          struct sig *completed DFL(__NULLPTR));
-FUNDEF NOBLOCK_IF(!PREEMPTION_ENABLED()) NONNULL((1, 2)) bool
-NOTHROW(KCALL task_exec_asynchronous_srpc)(struct task *__restrict target, task_srpc_t func,
-                                           void *arg DFL(__NULLPTR), uintptr_t mode DFL(TASK_RPC_FNORMAL|TASK_ASYNC_RPC_FNORMAL),
-                                           struct sig *completed DFL(__NULLPTR));
+NOTHROW(KCALL task_exec_asynchronous_rpc)(struct task *__restrict target,
+                                          task_rpc_t func,
+                                          void *arg DFL(__NULLPTR),
+                                          uintptr_t mode DFL(TASK_RPC_FNORMAL | TASK_ASYNC_RPC_FNORMAL));
 
 /* Same as `task_exec_asynchronous_rpc()', but pass a variable
  * amount of argument data to `func' when executed in `target',
@@ -354,24 +314,20 @@ NOTHROW(KCALL task_exec_asynchronous_srpc)(struct task *__restrict target, task_
  * may not be visible in the provided buffer.
  * @param: mode:   Set of `TASK_RPC_F* | TASK_ASYNC_RPC_F*' */
 FUNDEF NOBLOCK_IF(!PREEMPTION_ENABLED()) NONNULL((1, 2)) bool
-NOTHROW(KCALL task_exec_asynchronous_rpc_v)(struct task *__restrict target, task_rpc_t func,
-                                            void const *buf DFL(__NULLPTR), size_t bufsize DFL(0),
-                                            uintptr_t mode DFL(TASK_RPC_FNORMAL|TASK_ASYNC_RPC_FNORMAL),
-                                            struct sig *completed DFL(__NULLPTR));
+NOTHROW(KCALL task_exec_asynchronous_rpc_v)(struct task *__restrict target,
+                                            task_rpc_t func,
+                                            void const *buf DFL(__NULLPTR),
+                                            size_t bufsize DFL(0),
+                                            uintptr_t mode DFL(TASK_RPC_FNORMAL | TASK_ASYNC_RPC_FNORMAL));
 
 
-#if 1 /* Internal functions */
 /* Execute a given RPC function using the caller's source
  * location, and `TASK_RPC_REASON_ASYNC' as reason for execution.
  * Then, load the `icpustate' returned by `func' and continue
  * execution there (when `func' doesn't modify `state' and
- * re-returns it, this function then returns normally)
- * In all cases, when `completed' is non-NULL, call
- * `sig_broadcast(completed)' before resuming, even when
- * `func' modified the CPU state to which to return to. */
+ * re-returns it, this function then returns normally) */
 FUNDEF NOBLOCK NONNULL((1)) void FCALL
-task_rpc_exec_here(task_rpc_t func, void *arg DFL(__NULLPTR),
-                   struct sig *completed DFL(__NULLPTR));
+task_rpc_exec_here(task_rpc_t func, void *arg DFL(__NULLPTR));
 
 /* Similar to `task_rpc_exec_here()', but don't restore modifications made
  * to the register state, or the register state return by `func'. - Simply
@@ -381,15 +337,13 @@ FUNDEF NOBLOCK NONNULL((1)) void FCALL
 task_rpc_exec_here_onexit(task_rpc_t func, void *arg DFL(__NULLPTR));
 
 /* Modify `state' to insert an asynchronous call to the given RPC function.
- * When that function then returns, the old state will restored, and (if provided)
- * the `completed' signal will be broadcast.
+ * When that function then returns, the old state will restored.
  * The reason passed to `func' is either `TASK_RPC_REASON_ASYNCUSER' if the
  * old state points into user-space, or `TASK_RPC_REASON_ASYNC' if not. */
 FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
 NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
                                           task_rpc_t func,
-                                          void *arg DFL(__NULLPTR),
-                                          struct sig *completed DFL(__NULLPTR));
+                                          void *arg DFL(__NULLPTR));
 
 /* Same as `task_push_asynchronous_rpc()', but pass a copy
  * of the given buffer as value for `arg' to the given `func'. */
@@ -397,15 +351,7 @@ FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
 NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
                                             task_rpc_t func,
                                             void const *buf DFL(__NULLPTR),
-                                            size_t bufsize DFL(0),
-                                            struct sig *completed DFL(__NULLPTR));
-
-/* A simplified variant of an RPC callback */
-FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
-NOTHROW(FCALL task_push_asynchronous_srpc)(struct scpustate *__restrict state,
-                                           task_srpc_t func,
-                                           void *arg DFL(__NULLPTR),
-                                           struct sig *completed DFL(__NULLPTR));
+                                            size_t bufsize DFL(0));
 
 /* An arch-specific function used to re-direct the given task's user-space
  * return target to instead point back towards a kernel-space function which is then
@@ -437,7 +383,6 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self);
  *                 though this has to be detected in some different manner. */
 FUNDEF NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL task_redirect_usercode_rpc)(struct task *__restrict target, uintptr_t mode);
-#endif
 
 
 
@@ -539,7 +484,7 @@ FUNDEF unsigned int NOTHROW(FCALL blocking_cleanup_service)(void);
 FUNDEF NOBLOCK void NOTHROW(FCALL blocking_cleanup_prioritize)(void);
 
 /* Helper macro to schedule a blocking cleanup operation. */
-#define BLOCKING_CLEANUP_SCHEDULE(data, fun_field, nxt_field) \
+#define BLOCKING_CLEANUP_SCHEDULE(data, fun_field, nxt_field)                                                          \
 	do {                                                                                                               \
 		void *_bcs_next;                                                                                               \
 		do                                                                                                             \
@@ -548,7 +493,7 @@ FUNDEF NOBLOCK void NOTHROW(FCALL blocking_cleanup_prioritize)(void);
 		                                    __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));                                      \
 		blocking_cleanup_prioritize();                                                                                 \
 	} __WHILE0
-#define BLOCKING_CLEANUP_SCHEDULE_P(data, fun_path, nxt_path) \
+#define BLOCKING_CLEANUP_SCHEDULE_P(data, fun_path, nxt_path)                                                       \
 	do {                                                                                                            \
 		void *_bcs_next;                                                                                            \
 		do                                                                                                          \

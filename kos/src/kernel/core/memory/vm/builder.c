@@ -471,10 +471,14 @@ rpc_count_chain(struct rpc_entry const *self) {
 	return result;
 }
 
-PRIVATE void FCALL
-vmb_apply_terminate_thread(void *UNUSED(arg)) {
-	if (!(PERTASK_GET(this_task.t_flags) & TASK_FTERMINATING))
+PRIVATE WUNUSED NONNULL((2)) struct icpustate *FCALL
+vmb_apply_terminate_thread(void *UNUSED(arg),
+                           struct icpustate *__restrict state,
+                           unsigned int reason,
+                           struct rpc_syscall_info const *UNUSED(sc_info)) {
+	if (reason != TASK_RPC_REASON_SHUTDOWN)
 		THROW(E_EXIT_THREAD, W_EXITCODE(0, 0));
+	return state;
 }
 
 
@@ -778,11 +782,10 @@ handle_remove_write_error:
 			if (thread_count > alloc_count) {
 				do {
 					struct rpc_entry *rpc;
-					rpc = task_alloc_user_srpc_nx(&vmb_apply_terminate_thread,
-					                              NULL,
-					                              TASK_RPC_FNORMAL,
-					                              NULL,
-					                              GFP_ATOMIC);
+					rpc = task_alloc_user_rpc_nx(&vmb_apply_terminate_thread,
+					                             NULL,
+					                             TASK_RPC_FNORMAL,
+					                             GFP_ATOMIC);
 					if unlikely(!rpc) {
 						/* Must allocate the remaining RPCs whilst blocking. */
 						vm_tasklock_endwrite(target);
@@ -790,11 +793,10 @@ handle_remove_write_error:
 						pointer_set_unlock_vm_dataparts_and_clear(&locked_parts);
 						do {
 							TRY {
-								rpc = task_alloc_user_srpc(&vmb_apply_terminate_thread,
-								                           NULL,
-								                           TASK_RPC_FNORMAL,
-								                           NULL,
-								                           GFP_NORMAL);
+								rpc = task_alloc_user_rpc(&vmb_apply_terminate_thread,
+								                          NULL,
+								                          TASK_RPC_FNORMAL,
+								                          GFP_NORMAL);
 							} EXCEPT {
 								rpc_free_chain(task_terminate_rpcs);
 								pointer_set_fini(&locked_parts);

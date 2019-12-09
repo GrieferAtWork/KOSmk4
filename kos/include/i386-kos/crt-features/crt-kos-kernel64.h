@@ -17,7 +17,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-
+#include "crt-kos-kernel32.h"
 #define __CRT_HAVE__Unwind_Resume 1
 #define __CRT_HAVE__ZSt9terminatev 1
 #define __CRT_HAVE___acheck 1

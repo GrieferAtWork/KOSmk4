@@ -20,7 +20,9 @@
 #define GUARD_KERNEL_INCLUDE_SCHED_RPC_INTERNAL_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/types.h>
+
 #include "rpc.h"
 
 DECL_BEGIN
@@ -48,18 +50,13 @@ DECL_BEGIN
 #define RPC_KIND_NOTHROW         0x0010 /* FLAG: Non-throwing RPC */
 #define RPC_KIND_NONSYSCALL      0x0400 /* FLAG: (for `RPC_KIND_USER_INTR_SYNC'): The RPC may be serviced for reasons other than `TASK_RPC_REASON_SYSCALL' */
 #define RPC_KIND_CANSERVE        0x0800 /* FLAG: (for `RPC_KIND_USER_INTR_SYNC'): The thread did invoke `task_serve()' (set internally ) */
-#define RPC_KIND_SRPC            0x8000 /* FLAG: Simple-rpc */
 
 #ifdef __CC__
 struct rpc_entry {
-	struct rpc_entry *re_next;  /* [0..1][const] Next pending RPC function. */
-	union {
-		task_rpc_t    re_func;  /* [1..1][const][valid_if(!RPC_KIND_SRPC)] RPC function. */
-		task_srpc_t   re_sfunc; /* [1..1][const][valid_if(RPC_KIND_SRPC)] RPC S-function. */
-	};
-	void             *re_arg;   /* [?..?][const] RPC argument. */
-	struct sig       *re_done;  /* [0..1][const] Optional signal to broadcast upon RPC completion. */
-	uintptr_t         re_kind;  /* [const] The kind of RPC (One of `RPC_KIND_*'). */
+	struct rpc_entry *re_next; /* [0..1][const] Next pending RPC function. */
+	task_rpc_t        re_func; /* [1..1][const][valid_if(!RPC_KIND_SRPC)] RPC function. */
+	void             *re_arg;  /* [?..?][const] RPC argument. */
+	uintptr_t         re_kind; /* [const] The kind of RPC (One of `RPC_KIND_*'). */
 };
 
 
@@ -78,44 +75,28 @@ struct rpc_entry {
  * NOTE: The *_nx variants return `NULL' if the allocation failed. */
 FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED
 ATTR_MALLOC ATTR_RETNONNULL NONNULL((1)) struct rpc_entry *
-(KCALL task_alloc_user_rpc)(task_rpc_t func, void *arg DFL(__NULLPTR),
-                            uintptr_t mode DFL(TASK_RPC_FNORMAL|TASK_USER_RPC_FNORMAL),
-                            struct sig *completed DFL(__NULLPTR), gfp_t rpc_gfp DFL(GFP_NORMAL))
+(KCALL task_alloc_user_rpc)(task_rpc_t func,
+                            void *arg DFL(__NULLPTR),
+                            uintptr_t mode DFL(TASK_RPC_FNORMAL | TASK_USER_RPC_FNORMAL),
+                            gfp_t rpc_gfp DFL(GFP_NORMAL))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
+FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED ATTR_MALLOC NONNULL((1)) struct rpc_entry *
+NOTHROW(KCALL task_alloc_user_rpc_nx)(task_rpc_t func,
+                                      void *arg DFL(__NULLPTR),
+                                      uintptr_t mode DFL(TASK_RPC_FNORMAL | TASK_USER_RPC_FNORMAL),
+                                      gfp_t rpc_gfp DFL(GFP_NORMAL));
 FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED
 ATTR_MALLOC ATTR_RETNONNULL NONNULL((1)) struct rpc_entry *
-(KCALL task_alloc_user_srpc)(task_srpc_t func, void *arg DFL(__NULLPTR),
-                             uintptr_t mode DFL(TASK_RPC_FNORMAL|TASK_USER_RPC_FNORMAL),
-                             struct sig *completed DFL(__NULLPTR), gfp_t rpc_gfp DFL(GFP_NORMAL))
+(KCALL task_alloc_synchronous_rpc)(task_rpc_t func,
+                                   void *arg DFL(__NULLPTR),
+                                   uintptr_t mode DFL(TASK_RPC_FNORMAL | TASK_SYNC_RPC_FNORMAL),
+                                   gfp_t rpc_gfp DFL(GFP_NORMAL))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED ATTR_MALLOC NONNULL((1)) struct rpc_entry *
-NOTHROW(KCALL task_alloc_user_rpc_nx)(task_rpc_t func, void *arg DFL(__NULLPTR),
-                                      uintptr_t mode DFL(TASK_RPC_FNORMAL|TASK_USER_RPC_FNORMAL),
-                                      struct sig *completed DFL(__NULLPTR), gfp_t rpc_gfp DFL(GFP_NORMAL));
-FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED ATTR_MALLOC NONNULL((1)) struct rpc_entry *
-NOTHROW(KCALL task_alloc_user_srpc_nx)(task_srpc_t func, void *arg DFL(__NULLPTR),
-                                       uintptr_t mode DFL(TASK_RPC_FNORMAL|TASK_USER_RPC_FNORMAL),
-                                       struct sig *completed DFL(__NULLPTR), gfp_t rpc_gfp DFL(GFP_NORMAL));
-FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED
-ATTR_MALLOC ATTR_RETNONNULL NONNULL((1)) struct rpc_entry *
-(KCALL task_alloc_synchronous_rpc)(task_rpc_t func, void *arg DFL(__NULLPTR),
-                                   uintptr_t mode DFL(TASK_RPC_FNORMAL|TASK_SYNC_RPC_FNORMAL),
-                                   struct sig *completed DFL(__NULLPTR), gfp_t rpc_gfp DFL(GFP_NORMAL))
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
-FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED
-ATTR_MALLOC ATTR_RETNONNULL NONNULL((1)) struct rpc_entry *
-(KCALL task_alloc_synchronous_srpc)(task_srpc_t func, void *arg DFL(__NULLPTR),
-                                    uintptr_t mode DFL(TASK_RPC_FNORMAL|TASK_SYNC_RPC_FNORMAL),
-                                    struct sig *completed DFL(__NULLPTR), gfp_t rpc_gfp DFL(GFP_NORMAL))
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
-FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED ATTR_MALLOC NONNULL((1)) struct rpc_entry *
-NOTHROW(KCALL task_alloc_synchronous_rpc_nx)(task_rpc_t func, void *arg DFL(__NULLPTR),
-                                             uintptr_t mode DFL(TASK_RPC_FNORMAL|TASK_SYNC_RPC_FNORMAL),
-                                             struct sig *completed DFL(__NULLPTR), gfp_t rpc_gfp DFL(GFP_NORMAL));
-FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED ATTR_MALLOC NONNULL((1)) struct rpc_entry *
-NOTHROW(KCALL task_alloc_synchronous_srpc_nx)(task_srpc_t func, void *arg DFL(__NULLPTR),
-                                              uintptr_t mode DFL(TASK_RPC_FNORMAL|TASK_SYNC_RPC_FNORMAL),
-                                              struct sig *completed DFL(__NULLPTR), gfp_t rpc_gfp DFL(GFP_NORMAL));
+NOTHROW(KCALL task_alloc_synchronous_rpc_nx)(task_rpc_t func,
+                                             void *arg DFL(__NULLPTR),
+                                             uintptr_t mode DFL(TASK_RPC_FNORMAL | TASK_SYNC_RPC_FNORMAL),
+                                             gfp_t rpc_gfp DFL(GFP_NORMAL));
 
 
 /* Free a previously allocated RPC that hasn't been (successfully) delivered.

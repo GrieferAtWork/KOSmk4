@@ -580,7 +580,6 @@ DEFINE_SYSCALL32_6(void, sigreturn,
 	                       NULL,
 	                       TASK_RPC_FHIGHPRIO |
 	                       TASK_USER_RPC_FINTR,
-	                       NULL,
 	                       GFP_NORMAL);
 	__builtin_unreachable();
 }
@@ -632,7 +631,6 @@ DEFINE_SYSCALL32_2(errno_t, raiseat,
 	                       NULL,
 	                       TASK_RPC_FHIGHPRIO |
 	                       TASK_USER_RPC_FINTR,
-	                       NULL,
 	                       GFP_NORMAL);
 	__builtin_unreachable();
 }
@@ -723,7 +721,6 @@ DEFINE_SYSCALL64_2(errno_t, raiseat,
 	                       NULL,
 	                       TASK_RPC_FHIGHPRIO |
 	                       TASK_USER_RPC_FINTR,
-	                       NULL,
 	                       GFP_NORMAL);
 	__builtin_unreachable();
 }

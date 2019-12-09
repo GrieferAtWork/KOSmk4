@@ -421,7 +421,6 @@ DEFINE_SYSCALL2(errno_t, debugtrap,
 		                       NULL,
 		                       TASK_RPC_FHIGHPRIO |
 		                       TASK_USER_RPC_FINTR,
-		                       NULL,
 		                       GFP_NORMAL);
 	}
 	return -ENOENT;
@@ -439,7 +438,6 @@ DEFINE_SYSCALL32_2(errno_t, debugtrap,
 		                       NULL,
 		                       TASK_RPC_FHIGHPRIO |
 		                       TASK_USER_RPC_FINTR,
-		                       NULL,
 		                       GFP_NORMAL);
 	}
 	return -ENOENT;

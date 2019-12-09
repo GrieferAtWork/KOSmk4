@@ -45,8 +45,11 @@ DECL_BEGIN
 INTERN REF struct task *GDBServer_FallbackHost = NULL;
 
 
-PRIVATE void FCALL
-GDBServer_TerminateFallbackHostRPC(void *UNUSED(arg)) {
+PRIVATE struct icpustate *FCALL
+GDBServer_TerminateFallbackHostRPC(void *UNUSED(arg),
+                                   struct icpustate *__restrict UNUSED(state),
+                                   unsigned int UNUSED(reason),
+                                   struct rpc_syscall_info const *UNUSED(sc_info)) {
 	THROW(E_EXIT_THREAD);
 }
 
@@ -63,8 +66,8 @@ PRIVATE DRIVER_INIT void KCALL GDBServer_Fini(void) {
 
 	/* Terminate the fallback-host thread */
 	if (GDBServer_FallbackHost) {
-		task_schedule_synchronous_srpc(GDBServer_FallbackHost,
-		                               &GDBServer_TerminateFallbackHostRPC);
+		task_schedule_synchronous_rpc(GDBServer_FallbackHost,
+		                              &GDBServer_TerminateFallbackHostRPC);
 		decref(GDBServer_FallbackHost);
 		GDBServer_FallbackHost = NULL;
 	}

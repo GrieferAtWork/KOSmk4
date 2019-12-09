@@ -3071,7 +3071,6 @@ kernel_execveat(struct icpustate *__restrict state,
 				                                   &kernel_exec_rpc_func,
 				                                   data,
 				                                   TASK_RPC_FHIGHPRIO,
-				                                   NULL,
 				                                   GFP_NORMAL)) {
 					/* The main thread was already terminated. - Propagate its
 					 * termination signal manually (since we may not have received
@@ -3169,7 +3168,6 @@ DEFINE_SYSCALL5(errno_t, execveat, fd_t, dirfd,
 	                       NULL,
 	                       TASK_RPC_FHIGHPRIO |
 	                       TASK_USER_RPC_FINTR,
-	                       NULL,
 	                       GFP_NORMAL);
 	/* Shouldn't get here... */
 	return -EOK;
@@ -3206,7 +3204,6 @@ DEFINE_SYSCALL3(errno_t, execve,
 	                       NULL,
 	                       TASK_RPC_FHIGHPRIO |
 	                       TASK_USER_RPC_FINTR,
-	                       NULL,
 	                       GFP_NORMAL);
 	/* Shouldn't get here... */
 	return -EOK;

@@ -887,7 +887,6 @@ send_signal_rpc_to_self(/*inherit(always)*/ struct sigqueue_entry *__restrict en
 		                       &task_signal_rpc_handler,
 		                       entry,
 		                       TASK_USER_RPC_FINTR,
-		                       NULL,
 		                       GFP_NORMAL);
 		__builtin_unreachable();
 	} EXCEPT {
@@ -906,7 +905,6 @@ send_signal_rpc_to_self_after_syscall(/*inherit(always)*/ struct sigqueue_entry 
 		                       &task_signal_rpc_handler_after_syscall,
 		                       entry,
 		                       TASK_USER_RPC_FINTR,
-		                       NULL,
 		                       GFP_NORMAL);
 		__builtin_unreachable();
 	} EXCEPT {
@@ -991,7 +989,6 @@ no_perthread_pending:
 		                       &task_sigmask_check_rpc_handler,
 		                       NULL,
 		                       TASK_USER_RPC_FINTR,
-		                       NULL,
 		                       GFP_NORMAL);
 		__builtin_unreachable();
 	}
@@ -1056,7 +1053,6 @@ no_perthread_pending:
 		                       &task_sigmask_check_rpc_handler_after_syscall,
 		                       (void *)syscall_result,
 		                       TASK_USER_RPC_FINTR,
-		                       NULL,
 		                       GFP_NORMAL);
 		__builtin_unreachable();
 	}
@@ -1811,7 +1807,6 @@ again_scan_prqueue:
 		                       &task_sigmask_check_rpc_handler,
 		                       NULL,
 		                       TASK_USER_RPC_FINTR,
-		                       NULL,
 		                       GFP_NORMAL);
 		__builtin_unreachable();
 	}
@@ -2054,7 +2049,6 @@ no_perthread_pending:
 		                       &task_sigmask_check_rpc_handler,
 		                       NULL,
 		                       TASK_USER_RPC_FINTR,
-		                       NULL,
 		                       GFP_NORMAL);
 		__builtin_unreachable();
 	}

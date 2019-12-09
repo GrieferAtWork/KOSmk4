@@ -33,7 +33,7 @@ EXTERN(__x86_asm64_syscall_break)
 #define __SYSCALL_UNUSED(sysno) .quad __x86_asm64_syscall_break;
 #define __TSYSCALL_TABLE_END(table_id, ...) \
 	END(x86_sysroute##table_id##_asm64_syscall)
-#include <asm/ls-syscalls64.h>
+#include "../../../../../../include/i386-kos/asm/ls-syscalls64.h"
 
 
 /* Define `x86_sysrouteN_c' */
@@ -45,7 +45,7 @@ EXTERN(sys_break)
 #define __SYSCALL_UNUSED(sysno) .quad sys_break;
 #define __TSYSCALL_TABLE_END(table_id, ...) \
 	END(x86_sysroute##table_id##_c)
-#include <asm/ls-syscalls64.h>
+#include "../../../../../../include/i386-kos/asm/ls-syscalls64.h"
 
 
 

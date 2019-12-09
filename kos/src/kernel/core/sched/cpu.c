@@ -822,9 +822,13 @@ INTDEF pertask_onexit_t __kernel_pertask_onexit_start[];
 INTDEF pertask_onexit_t __kernel_pertask_onexit_end[];
 
 
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL task_decref_for_exit)(struct task *__restrict self) {
-	decref(self);
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) struct icpustate *
+NOTHROW(FCALL task_decref_for_exit)(void *arg,
+                                    struct icpustate *__restrict state,
+                                    unsigned int UNUSED(reason),
+                                    struct rpc_syscall_info const *UNUSED(sc_info)) {
+	decref((struct task *)arg);
+	return state;
 }
 
 
@@ -898,10 +902,9 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	/* Hi-jack the execution stack of the next thread to have it do the decref()
 	 * of our own thread, thus preventing the undefined behavior that would be
 	 * caused if we tried to decref (and possibly destroy) ourself. */
-	next->t_sched.s_state = task_push_asynchronous_srpc(next->t_sched.s_state,
-	                                                    (task_srpc_t)&task_decref_for_exit,
-	                                                    caller,
-	                                                    NULL);
+	next->t_sched.s_state = task_push_asynchronous_rpc(next->t_sched.s_state,
+	                                                   &task_decref_for_exit,
+	                                                   caller);
 
 	/* Set the flag to indicate that we've been fully terminated.
 	 * NOTE: Also ensure that a couple of other flags are set/cleared correctly. */

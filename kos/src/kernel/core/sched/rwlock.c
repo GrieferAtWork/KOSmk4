@@ -919,12 +919,17 @@ wait_for_unshare:
 }
 
 
-PRIVATE NONNULL((1)) void
-(FCALL kill_reader)(struct rwlock *__restrict lock) {
+PRIVATE WUNUSED NONNULL((1, 2)) struct icpustate *
+(FCALL kill_reader)(void *arg,
+                    struct icpustate *__restrict state,
+                    unsigned int UNUSED(reason),
+                    struct rpc_syscall_info const *UNUSED(sc_info)) {
+	struct rwlock *lock;
+	lock = (struct rwlock *)arg;
 	/* Check if the calling thread has a read-lock on `lock',
 	 * and throw an `E_RETRY_RWLOCK' exception if it does. */
 	if (!rwlock_find_readlock(lock))
-		return;
+		return state;
 	/* Apparently we are using that lock in particular.
 	 * So as already mentioned, to deal with this we simply throw
 	 * an exception that'll cause the read-lock to be re-acquired. */
@@ -972,9 +977,10 @@ kill_rwlock_reader(struct task *__restrict thread,
 	} else {
 use_rpc:
 		/* Send an RPC to the thread to check if it's using our lock. */
-		task_schedule_synchronous_srpc(thread,
-		                               (task_srpc_t)&kill_reader, lock,
-		                               TASK_RPC_FHIGHPRIO);
+		task_schedule_synchronous_rpc(thread,
+		                              &kill_reader,
+		                              lock,
+		                              TASK_RPC_FHIGHPRIO);
 	}
 done:
 	return true;

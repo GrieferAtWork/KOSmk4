@@ -1777,12 +1777,8 @@
 #define __CRT_HAVE_task_alloc 1
 #define __CRT_HAVE_task_alloc_synchronous_rpc 1
 #define __CRT_HAVE_task_alloc_synchronous_rpc_nx 1
-#define __CRT_HAVE_task_alloc_synchronous_srpc 1
-#define __CRT_HAVE_task_alloc_synchronous_srpc_nx 1
 #define __CRT_HAVE_task_alloc_user_rpc 1
 #define __CRT_HAVE_task_alloc_user_rpc_nx 1
-#define __CRT_HAVE_task_alloc_user_srpc 1
-#define __CRT_HAVE_task_alloc_user_srpc_nx 1
 #define __CRT_HAVE_task_connect 1
 #define __CRT_HAVE_task_connect_c 1
 #define __CRT_HAVE_task_connect_ghost 1
@@ -1796,7 +1792,6 @@
 #define __CRT_HAVE_task_enable_redirect_usercode_rpc 1
 #define __CRT_HAVE_task_exec_asynchronous_rpc 1
 #define __CRT_HAVE_task_exec_asynchronous_rpc_v 1
-#define __CRT_HAVE_task_exec_asynchronous_srpc 1
 #define __CRT_HAVE_task_exit 1
 #define __CRT_HAVE_task_free_rpc 1
 #define __CRT_HAVE_task_gethandlemanager 1
@@ -1806,7 +1801,6 @@
 #define __CRT_HAVE_task_popconnections 1
 #define __CRT_HAVE_task_push_asynchronous_rpc 1
 #define __CRT_HAVE_task_push_asynchronous_rpc_v 1
-#define __CRT_HAVE_task_push_asynchronous_srpc 1
 #define __CRT_HAVE_task_pushconnections 1
 #define __CRT_HAVE_task_raisesignalprocess 1
 #define __CRT_HAVE_task_raisesignalprocess_nx 1
@@ -1818,15 +1812,10 @@
 #define __CRT_HAVE_task_rpc_exec_here 1
 #define __CRT_HAVE_task_rpc_exec_here_onexit 1
 #define __CRT_HAVE_task_schedule_asynchronous_rpc 1
-#define __CRT_HAVE_task_schedule_asynchronous_srpc 1
 #define __CRT_HAVE_task_schedule_synchronous_rpc 1
 #define __CRT_HAVE_task_schedule_synchronous_rpc_nx 1
-#define __CRT_HAVE_task_schedule_synchronous_srpc 1
-#define __CRT_HAVE_task_schedule_synchronous_srpc_nx 1
 #define __CRT_HAVE_task_schedule_user_rpc 1
 #define __CRT_HAVE_task_schedule_user_rpc_nx 1
-#define __CRT_HAVE_task_schedule_user_srpc 1
-#define __CRT_HAVE_task_schedule_user_srpc_nx 1
 #define __CRT_HAVE_task_serve 1
 #define __CRT_HAVE_task_serve_nx 1
 #define __CRT_HAVE_task_sethandlemanager 1

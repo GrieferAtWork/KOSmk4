@@ -228,7 +228,6 @@ DEFINE_SYSCALL32_6(errno_t, coredump,
 	                       NULL,
 	                       TASK_RPC_FHIGHPRIO |
 	                       TASK_USER_RPC_FINTR,
-	                       NULL,
 	                       GFP_NORMAL);
 	__builtin_unreachable();
 }

@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_SCHED_RPC64_S
+#define GUARD_KERNEL_CORE_ARCH_I386_SCHED_RPC64_S 1
 
 #include <kernel/compiler.h>
 
@@ -85,15 +87,15 @@ PUBLIC_FUNCTION(x86_rpc_user_redirection)
 	/* Entry point for redirected RPC callbacks
 	 * Note that our current %gs.base still points to kernel-space. */
 
-	pushq_cfi  %gs:this_x86_rpc_redirection_iret + 32 /* ir_ss */
+	pushq_cfi  %gs:(this_x86_rpc_redirection_iret + 32) /* ir_ss */
 	.cfi_rel_offset %ss, 0
-	pushq_cfi  %gs:this_x86_rpc_redirection_iret + 24 /* ir_rsp */
+	pushq_cfi  %gs:(this_x86_rpc_redirection_iret + 24) /* ir_rsp */
 	.cfi_rel_offset %rsp, 0
-	pushq_cfi  %gs:this_x86_rpc_redirection_iret + 16 /* ir_rflags */
+	pushq_cfi  %gs:(this_x86_rpc_redirection_iret + 16) /* ir_rflags */
 	.cfi_rel_offset %rflags, 0
-	pushq_cfi  %gs:this_x86_rpc_redirection_iret + 8  /* ir_cs */
+	pushq_cfi  %gs:(this_x86_rpc_redirection_iret + 8)  /* ir_cs */
 	.cfi_rel_offset %cs, 0
-	pushq_cfi  %gs:this_x86_rpc_redirection_iret + 0  /* ir_rip */
+	pushq_cfi  %gs:(this_x86_rpc_redirection_iret + 0)  /* ir_rip */
 	.cfi_rel_offset %rip, 0
 
 	/* Re-enable interrupts, now that everything important has been saved. */
@@ -126,13 +128,13 @@ INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 	je     1f
 
 	/* Check if exceptions are propagated to user-space, or kernel-space */
-	testq  $(3), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS(%rsp)
+	testq  $(3), (OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS)(%rsp)
 	jnz    2f
 	/* Kernel-space target! */
 
 	/* Check if the only reason we're still directed to kernel-space
 	 * was another IRET redirection to `x86_rpc_user_redirection' */
-	cmpq   $x86_rpc_user_redirection, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_RIP(%rsp)
+	cmpq   $(x86_rpc_user_redirection), (OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_RIP)(%rsp)
 	/* Load the saved CPU state, which will bring us back up to the
 	 * start of `x86_rpc_user_redirection'.
 	 * From there, we automatically restore the actual user-space
@@ -195,28 +197,6 @@ END(x86_rpc_kernel_redirection_handler)
 	.cfi_startproc simple
 	.cfi_signal_frame
 	/* TODO: .cfi_* */
-	EXTERN(x86_rpc_kernel_redirection_c_personality)
-	.cfi_personality 0, x86_rpc_kernel_redirection_c_personality
-	nop /* Required to allow for detection during unwinding. */
-INTERN_FUNCTION(x86_rpc_kernel_redirection_c)
-	call kernel_panic_here /* TODO */
-END(x86_rpc_kernel_redirection_c)
-.cfi_endproc
-
-.section .text
-INTERN_FUNCTION(x86_rpc_kernel_redirection_c_handler)
-	.cfi_startproc simple
-	.cfi_signal_frame
-	/* TODO: .cfi_* */
-	call kernel_panic_here /* TODO */
-END(x86_rpc_kernel_redirection_handler)
-.cfi_endproc
-
-
-.section .text
-	.cfi_startproc simple
-	.cfi_signal_frame
-	/* TODO: .cfi_* */
 	EXTERN(x86_srpc_kernel_redirection_personality)
 	.cfi_personality 0, x86_srpc_kernel_redirection_personality
 	nop /* Required to allow for detection during unwinding. */
@@ -234,29 +214,6 @@ INTERN_FUNCTION(x86_srpc_kernel_redirection_handler)
 END(x86_srpc_kernel_redirection_handler)
 .cfi_endproc
 
-.section .text
-	.cfi_startproc simple
-	.cfi_signal_frame
-	/* TODO: .cfi_* */
-	EXTERN(x86_srpc_kernel_redirection_c_personality)
-	.cfi_personality 0, x86_srpc_kernel_redirection_c_personality
-	nop    /* Required to allow for detection during unwinding. */
-INTERN_FUNCTION(x86_srpc_kernel_redirection_c)
-	call kernel_panic_here /* TODO */
-END(x86_srpc_kernel_redirection_c)
-.cfi_endproc
-
-.section .text
-INTERN_FUNCTION(x86_srpc_kernel_redirection_c_handler)
-	.cfi_startproc simple
-	.cfi_signal_frame
-	/* TODO: .cfi_* */
-	call kernel_panic_here /* TODO */
-END(x86_srpc_kernel_redirection_c_handler)
-.cfi_endproc
-
-
-
 
 
 
@@ -266,7 +223,6 @@ PUBLIC_FUNCTION(task_rpc_exec_here)
 	.cfi_signal_frame
 	/* RDI:    <task_rpc_t func>
 	 * RSI:    <void *arg>
-	 * RDX:    <struct sig *completed>
 	 * 0(RSP): <return address>
 	 */
 	popq_cfi %rax
@@ -283,24 +239,13 @@ PUBLIC_FUNCTION(task_rpc_exec_here)
 	.cfi_rel_offset %rip, 0
 	ASM_PUSH_GPREGSNSP_CFI_R
 
-	movq   %rdx, %rbp                   /* <struct sig *completed> */
 	movq   %rdi, %rax                   /* <task_rpc_t func> */
 	movq   %rsi, %rdi                   /* <void *arg> */
 	leaq   8(%rsp), %rsi                /* <struct icpustate *state> */
 	movq   $TASK_RPC_REASON_ASYNC, %rdx /* <unsigned int reason> */
 	xorq   %rcx, %rcx                   /* <struct rpc_syscall_info *sc_info> */
 	call   *%rax
-	.cfi_def_cfa_register %rax
-	testq  %rbp, %rbp
-	jz     1f
-	movq   %rbp, %rdi                   /* <struct sig *completed> */
-	movq   %rax, %rbp
-	.cfi_def_cfa_register %rbp
-	call   sig_broadcast
-	movq   %rbp, %rax
-	.cfi_def_cfa_register %rax
-1:	movq   %rax, %rsp
-	.cfi_def_cfa_register %rsp
+	movq   %rax, %rsp
 
 	ASM_POP_GPREGSNSP_CFI_R
 	intr_exit
@@ -459,7 +404,7 @@ PUBLIC_FUNCTION(task_serve_nx)
 
 #if 1 /* Service blocking cleanup operations. */
 	call   blocking_cleanup_service
-	orq    %rax, OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RAX(%rsp)
+	orq    %rax, (OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RAX)(%rsp)
 #endif
 
 	ASM_POP_GPREGSNSP_CFI_R
@@ -472,30 +417,4 @@ END(task_serve_nx)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_RPC64_S */

@@ -26,8 +26,8 @@
 #include <kernel/except.h>
 #include <kernel/malloc.h>
 #include <kernel/printk.h>
-#include <kernel/syscall.h>
 #include <kernel/syscall-properties.h>
+#include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
@@ -83,13 +83,7 @@ NOTHROW(KCALL cleanup_pending_rpcs)(void) {
 	while (chain) {
 		next = chain->re_next;
 		TRY {
-			if (chain->re_kind & RPC_KIND_SRPC)
-				(*chain->re_sfunc)(chain->re_arg);
-			else {
-				task_rpc_exec_here_onexit(chain->re_func, chain->re_arg);
-			}
-			if (chain->re_done)
-				sig_altbroadcast(chain->re_done, TASK_USER_RPC_SIGALT_TERMINATED);
+			task_rpc_exec_here_onexit(chain->re_func, chain->re_arg);
 		} EXCEPT {
 			/* Dump the exception if it is non-signaling */
 			error_class_t cls = error_class();
@@ -181,23 +175,15 @@ task_serve_one_impl(struct icpustate *__restrict state) {
 	ATOMIC_FETCHDEC(PERTASK(this_rpc_pending_sync_count));
 	TRY {
 		/* Service the RPC. */
-		if likely(my_entry->re_kind & RPC_KIND_SRPC) {
-			(*my_entry->re_sfunc)(my_entry->re_arg);
-		} else {
-			state = (*my_entry->re_func)(my_entry->re_arg,
-			                             state,
-			                             TASK_RPC_REASON_SYNC,
-			                             NULL);
-		}
+		state = (*my_entry->re_func)(my_entry->re_arg,
+		                             state,
+		                             TASK_RPC_REASON_SYNC,
+		                             NULL);
 	} EXCEPT {
 		assert(!(my_entry->re_kind & RPC_KIND_NOTHROW));
-		if (my_entry->re_done)
-			sig_broadcast(my_entry->re_done);
 		rpcentry_free(my_entry);
 		RETHROW();
 	}
-	if (my_entry->re_done)
-		sig_broadcast(my_entry->re_done);
 	rpcentry_free(my_entry);
 	return state;
 }
@@ -228,17 +214,12 @@ NOTHROW(FCALL task_serve_one_nx_impl)(struct icpustate *__restrict state) {
 	reinsert_pending_rpcs(chain, iter);
 	ATOMIC_FETCHDEC(PERTASK(this_rpc_pending_sync_count_nx));
 	ATOMIC_FETCHDEC(PERTASK(this_rpc_pending_sync_count));
+	assert(my_entry->re_kind & RPC_KIND_NOTHROW);
 	/* Service the RPC. */
-	if likely(my_entry->re_kind & RPC_KIND_SRPC) {
-		(*my_entry->re_sfunc)(my_entry->re_arg);
-	} else {
-		state = (*my_entry->re_func)(my_entry->re_arg,
-		                             state,
-		                             TASK_RPC_REASON_SYNC,
-		                             NULL);
-	}
-	if (my_entry->re_done)
-		sig_broadcast(my_entry->re_done);
+	state = (*my_entry->re_func)(my_entry->re_arg,
+	                             state,
+	                             TASK_RPC_REASON_SYNC,
+	                             NULL);
 	rpcentry_free(my_entry);
 	return state;
 }
@@ -403,6 +384,10 @@ NOTHROW(FCALL blocking_cleanup_prioritize)(void) {
 }
 
 
+/* The task has terminated in the mean time.
+ * may be send through `rpc_completed' */
+#define USER_RPC_SIGALT_TERMINATED (__CCAST(struct sig *)(-1))
+
 struct user_rpc_data {
 	WEAK refcnt_t                rpc_refcnt;    /* Reference counter. */
 	USER CHECKED   byte_t const *rpc_program;   /* [1..1] The program to execute */
@@ -453,7 +438,7 @@ user_rpc_callback(void *arg, struct icpustate *__restrict state,
 				/* Special case: We can't service the RPC because we're being terminated. */
 				SET_STATUS(RPC_STATUS_TERMINATED);
 				sig_altbroadcast(&data->rpc_completed,
-				                 TASK_USER_RPC_SIGALT_TERMINATED);
+				                 USER_RPC_SIGALT_TERMINATED);
 			} else {
 				byte_t *reader, opcode, operand;
 				struct rpc_register_state program_state;
@@ -970,7 +955,6 @@ DEFINE_SYSCALL4(syscall_slong_t, rpc_schedule,
 		                                 &user_rpc_callback,
 		                                 args_packet,
 		                                 rpc_mode,
-		                                 NULL,
 		                                 GFP_PREFLT);
 	} EXCEPT {
 		if (flags & RPC_SCHEDULE_FLAG_WAITFORSTART)
@@ -1010,10 +994,10 @@ DEFINE_SYSCALL4(syscall_slong_t, rpc_schedule,
 			}
 			/* Check if the RPC was able to execute its transformation-program.
 			 * If the RPC was invoked because the target was terminating, it will
-			 * have broadcast a status message of `TASK_USER_RPC_SIGALT_TERMINATED'
+			 * have broadcast a status message of `USER_RPC_SIGALT_TERMINATED'
 			 * to us, which we can then re-interpret to inform the user that the
 			 * target thread has terminated before it could service the given RPC. */
-			if (status == TASK_USER_RPC_SIGALT_TERMINATED) {
+			if (status == USER_RPC_SIGALT_TERMINATED) {
 				decref(args_packet);
 				return 1;
 			}
@@ -1035,30 +1019,18 @@ DECL_END
 #ifndef __INTELLISENSE__
 #define RPC_SERVE_ALL 1
 #include "rpc-serveuser.c.inl"
+/**/
 #include "rpc-serveuser.c.inl"
-
 
 /* User RPCs */
 #define RPC_USER      1
 #include "rpc-schedule-impl.c.inl"
-#define RPC_SIMPLE    1
-#define RPC_USER      1
-#include "rpc-schedule-impl.c.inl"
-#define RPC_NOEXCEPT  1
-#define RPC_USER      1
-#include "rpc-schedule-impl.c.inl"
-#define RPC_SIMPLE    1
 #define RPC_NOEXCEPT  1
 #define RPC_USER      1
 #include "rpc-schedule-impl.c.inl"
 
 /* Non-user RPCs */
 #include "rpc-schedule-impl.c.inl"
-#define RPC_SIMPLE    1
-#include "rpc-schedule-impl.c.inl"
-#define RPC_NOEXCEPT  1
-#include "rpc-schedule-impl.c.inl"
-#define RPC_SIMPLE    1
 #define RPC_NOEXCEPT  1
 #include "rpc-schedule-impl.c.inl"
 #endif

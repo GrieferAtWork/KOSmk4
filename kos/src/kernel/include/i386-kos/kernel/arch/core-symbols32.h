@@ -1102,10 +1102,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak dbg_getpagedir; .long dbg_getpagedir
 	.reloc ., R_386_SIZE32, dbg_getpagedir; .long 0
 	.long 0xea86112
-	.long .Lname275 /* index: 275 */
-	.weak this_exception_class; .long this_exception_class
-	.reloc ., R_386_SIZE32, this_exception_class; .long 0
-	.long 0x698dd83
+	.long 0 /* index: 275 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname276 /* index: 276 */
 	.weak sys_linkat; .long sys_linkat
 	.reloc ., R_386_SIZE32, sys_linkat; .long 0
@@ -3006,10 +3006,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak unwind_setreg_icpustate; .long unwind_setreg_icpustate
 	.reloc ., R_386_SIZE32, unwind_setreg_icpustate; .long 0
 	.long 0xb8d35b5
-	.long .Lname751 /* index: 751 */
-	.weak task_alloc_synchronous_srpc; .long task_alloc_synchronous_srpc
-	.reloc ., R_386_SIZE32, task_alloc_synchronous_srpc; .long 0
-	.long 0xaea5df3
+	.long 0 /* index: 751 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname752 /* index: 752 */
 	.weak pagedir_unsetchanged_p; .long pagedir_unsetchanged_p
 	.reloc ., R_386_SIZE32, pagedir_unsetchanged_p; .long 0
@@ -4430,10 +4430,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak inode_recent_getcur; .long inode_recent_getcur
 	.reloc ., R_386_SIZE32, inode_recent_getcur; .long 0
 	.long 0xd308452
-	.long .Lname1107 /* index: 1107 */
-	.weak task_schedule_user_srpc; .long task_schedule_user_srpc
-	.reloc ., R_386_SIZE32, task_schedule_user_srpc; .long 0
-	.long 0x2cca453
+	.long 0 /* index: 1107 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname1108 /* index: 1108 */
 	.weak atomic64_fetchadd; .long atomic64_fetchadd
 	.reloc ., R_386_SIZE32, atomic64_fetchadd; .long 0
@@ -4494,10 +4494,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_readdir; .long sys_readdir
 	.reloc ., R_386_SIZE32, sys_readdir; .long 0
 	.long 0x8cca462
-	.long .Lname1123 /* index: 1123 */
-	.weak task_alloc_user_srpc; .long task_alloc_user_srpc
-	.reloc ., R_386_SIZE32, task_alloc_user_srpc; .long 0
-	.long 0x79c9463
+	.long 0 /* index: 1123 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 1124 */
 	.long 0
 	.long 0
@@ -5875,9 +5875,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, this_exception_info; .long 0
 	.long 0x2692b9f
 	.long .Lname1468 /* index: 1468 */
-	.weak task_push_asynchronous_srpc; .long task_push_asynchronous_srpc
-	.reloc ., R_386_SIZE32, task_push_asynchronous_srpc; .long 0
-	.long 0xd4ea653
+	.weak task_schedule_synchronous_rpc; .long task_schedule_synchronous_rpc
+	.reloc ., R_386_SIZE32, task_schedule_synchronous_rpc; .long 0
+	.long 0xc9ef653
 	.long .Lname1469 /* index: 1469 */
 	.weak vm_datapart_write; .long vm_datapart_write
 	.reloc ., R_386_SIZE32, vm_datapart_write; .long 0
@@ -10850,10 +10850,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vio_writew; .long vio_writew
 	.reloc ., R_386_SIZE32, vio_writew; .long 0
 	.long 0x6f0da97
-	.long .Lname2712 /* index: 2712 */
-	.weak task_schedule_user_srpc_nx; .long task_schedule_user_srpc_nx
-	.reloc ., R_386_SIZE32, task_schedule_user_srpc_nx; .long 0
-	.long 0xa45ba98
+	.long 0 /* index: 2712 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname2713 /* index: 2713 */
 	.weak memset; .long memset
 	.reloc ., R_386_SIZE32, memset; .long 0
@@ -10894,10 +10894,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vio_readb; .long vio_readb
 	.reloc ., R_386_SIZE32, vio_readb; .long 0
 	.long 0x568caa2
-	.long .Lname2723 /* index: 2723 */
-	.weak task_schedule_synchronous_srpc; .long task_schedule_synchronous_srpc
-	.reloc ., R_386_SIZE32, task_schedule_synchronous_srpc; .long 0
-	.long 0x9ef5aa3
+	.long 0 /* index: 2723 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 2724 */
 	.long 0
 	.long 0
@@ -11458,10 +11458,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname2864 /* index: 2864 */
-	.weak this_task; .long this_task
-	.reloc ., R_386_SIZE32, this_task; .long 0
-	.long 0x96d26b
+	.long 0 /* index: 2864 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 2865 */
 	.long 0
 	.long 0
@@ -12846,10 +12846,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname3211 /* index: 3211 */
-	.weak task_schedule_synchronous_srpc_nx; .long task_schedule_synchronous_srpc_nx
-	.reloc ., R_386_SIZE32, task_schedule_synchronous_srpc_nx; .long 0
-	.long 0x5aa2ca8
+	.long 0 /* index: 3211 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname3212 /* index: 3212 */
 	.weak mouse_device_ioctl; .long mouse_device_ioctl
 	.reloc ., R_386_SIZE32, mouse_device_ioctl; .long 0
@@ -12982,10 +12982,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname3245 /* index: 3245 */
-	.weak task_schedule_synchronous_rpc; .long task_schedule_synchronous_rpc
-	.reloc ., R_386_SIZE32, task_schedule_synchronous_rpc; .long 0
-	.long 0xc9ef653
+	.long 0 /* index: 3245 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname3246 /* index: 3246 */
 	.weak sys_perf_event_open; .long sys_perf_event_open
 	.reloc ., R_386_SIZE32, sys_perf_event_open; .long 0
@@ -13839,9 +13839,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sys_pipe2; .long 0
 	.long 0x9677d82
 	.long .Lname3459 /* index: 3459 */
-	.weak task_exec_asynchronous_srpc; .long task_exec_asynchronous_srpc
-	.reloc ., R_386_SIZE32, task_exec_asynchronous_srpc; .long 0
-	.long 0x640f073
+	.weak this_exception_class; .long this_exception_class
+	.reloc ., R_386_SIZE32, this_exception_class; .long 0
+	.long 0x698dd83
 	.long .Lname3460 /* index: 3460 */
 	.weak sys_getdents64; .long sys_getdents64
 	.reloc ., R_386_SIZE32, sys_getdents64; .long 0
@@ -13922,10 +13922,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak thisvm_x86_dr7; .long thisvm_x86_dr7
 	.reloc ., R_386_SIZE32, thisvm_x86_dr7; .long 0
 	.long 0x4b28d97
-	.long .Lname3480 /* index: 3480 */
-	.weak task_alloc_user_srpc_nx; .long task_alloc_user_srpc_nx
-	.reloc ., R_386_SIZE32, task_alloc_user_srpc_nx; .long 0
-	.long 0x9470d98
+	.long 0 /* index: 3480 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 3481 */
 	.long 0
 	.long 0
@@ -14150,10 +14150,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname3537 /* index: 3537 */
-	.weak task_alloc_synchronous_srpc_nx; .long task_alloc_synchronous_srpc_nx
-	.reloc ., R_386_SIZE32, task_alloc_synchronous_srpc_nx; .long 0
-	.long 0x5df3cf8
+	.long 0 /* index: 3537 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname3538 /* index: 3538 */
 	.weak slab_kmalloc_nx32; .long slab_kmalloc_nx32
 	.reloc ., R_386_SIZE32, slab_kmalloc_nx32; .long 0
@@ -14863,9 +14863,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, this_x86_rpc_redirection_iret; .long 0
 	.long 0x6fa7f94
 	.long .Lname3715 /* index: 3715 */
-	.weak task_schedule_asynchronous_srpc; .long task_schedule_asynchronous_srpc
-	.reloc ., R_386_SIZE32, task_schedule_asynchronous_srpc; .long 0
-	.long 0xf54ce83
+	.weak this_task; .long this_task
+	.reloc ., R_386_SIZE32, this_task; .long 0
+	.long 0x96d26b
 	.long .Lname3716 /* index: 3716 */
 	.weak sys_memfd_create; .long sys_memfd_create
 	.reloc ., R_386_SIZE32, sys_memfd_create; .long 0
@@ -16706,8 +16706,6 @@ END(kernel_symbol_table)
 	.string "cpu_deepsleep"
 .Lname274:
 	.string "dbg_getpagedir"
-.Lname275:
-	.string "this_exception_class"
 .Lname276:
 	.string "sys_linkat"
 .Lname277:
@@ -17294,8 +17292,6 @@ END(kernel_symbol_table)
 	.string "sys_epoll_create"
 .Lname750:
 	.string "unwind_setreg_icpustate"
-.Lname751:
-	.string "task_alloc_synchronous_srpc"
 .Lname752:
 	.string "pagedir_unsetchanged_p"
 .Lname755:
@@ -17716,8 +17712,6 @@ END(kernel_symbol_table)
 	.string "vm_unmap"
 .Lname1106:
 	.string "inode_recent_getcur"
-.Lname1107:
-	.string "task_schedule_user_srpc"
 .Lname1108:
 	.string "atomic64_fetchadd"
 .Lname1109:
@@ -17740,8 +17734,6 @@ END(kernel_symbol_table)
 	.string "setreg_scpustate_p"
 .Lname1122:
 	.string "sys_readdir"
-.Lname1123:
-	.string "task_alloc_user_srpc"
 .Lname1125:
 	.string "driver_clear_fde_cache"
 .Lname1129:
@@ -18145,7 +18137,7 @@ END(kernel_symbol_table)
 .Lname1467:
 	.string "this_exception_info"
 .Lname1468:
-	.string "task_push_asynchronous_srpc"
+	.string "task_schedule_synchronous_rpc"
 .Lname1469:
 	.string "vm_datapart_write"
 .Lname1471:
@@ -19562,8 +19554,6 @@ END(kernel_symbol_table)
 	.string "cpu_private_function_callbuf"
 .Lname2711:
 	.string "vio_writew"
-.Lname2712:
-	.string "task_schedule_user_srpc_nx"
 .Lname2713:
 	.string "memset"
 .Lname2715:
@@ -19580,8 +19570,6 @@ END(kernel_symbol_table)
 	.string "directory_getcaseentry_p"
 .Lname2722:
 	.string "vio_readb"
-.Lname2723:
-	.string "task_schedule_synchronous_srpc"
 .Lname2725:
 	.string "kernel_debugtrap_r_fcpustate"
 .Lname2726:
@@ -19736,8 +19724,6 @@ END(kernel_symbol_table)
 	.string "keyboard_buffer_getkey"
 .Lname2859:
 	.string "sys_fanotify_mark"
-.Lname2864:
-	.string "this_task"
 .Lname2866:
 	.string "sys_linux_stat32"
 .Lname2867:
@@ -20172,8 +20158,6 @@ END(kernel_symbol_table)
 	.string "block_device_lookup_nx"
 .Lname3209:
 	.string "vm_tasklock_write"
-.Lname3211:
-	.string "task_schedule_synchronous_srpc_nx"
 .Lname3212:
 	.string "mouse_device_ioctl"
 .Lname3214:
@@ -20204,8 +20188,6 @@ END(kernel_symbol_table)
 	.string "devfs_lock_read_nx"
 .Lname3243:
 	.string "mall_print_traceback"
-.Lname3245:
-	.string "task_schedule_synchronous_rpc"
 .Lname3246:
 	.string "sys_perf_event_open"
 .Lname3248:
@@ -20477,7 +20459,7 @@ END(kernel_symbol_table)
 .Lname3458:
 	.string "sys_pipe2"
 .Lname3459:
-	.string "task_exec_asynchronous_srpc"
+	.string "this_exception_class"
 .Lname3460:
 	.string "sys_getdents64"
 .Lname3461:
@@ -20508,8 +20490,6 @@ END(kernel_symbol_table)
 	.string "this_trampoline_node"
 .Lname3479:
 	.string "thisvm_x86_dr7"
-.Lname3480:
-	.string "task_alloc_user_srpc_nx"
 .Lname3483:
 	.string "sys_rmdir"
 .Lname3484:
@@ -20572,8 +20552,6 @@ END(kernel_symbol_table)
 	.string "get_stack_for"
 .Lname3534:
 	.string "vm_find_last_node_lower_equal"
-.Lname3537:
-	.string "task_alloc_synchronous_srpc_nx"
 .Lname3538:
 	.string "slab_kmalloc_nx32"
 .Lname3539:
@@ -20805,7 +20783,7 @@ END(kernel_symbol_table)
 .Lname3714:
 	.string "this_x86_rpc_redirection_iret"
 .Lname3715:
-	.string "task_schedule_asynchronous_srpc"
+	.string "this_task"
 .Lname3716:
 	.string "sys_memfd_create"
 .Lname3717:

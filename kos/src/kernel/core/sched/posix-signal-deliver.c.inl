@@ -123,14 +123,12 @@ task_raisesignalthread(struct task *__restrict target,
 				                                   &task_sigmask_check_rpc_handler,
 				                                   NULL,
 				                                   TASK_USER_RPC_FINTR,
-				                                   NULL,
 				                                   rpc_flags);
 #else /* DELIVER_NX */
 				result = task_schedule_user_rpc(target,
 				                                &task_sigmask_check_rpc_handler,
 				                                NULL,
 				                                TASK_USER_RPC_FINTR,
-				                                NULL,
 				                                rpc_flags);
 #endif /* !DELIVER_NX */
 				return result;
@@ -146,7 +144,6 @@ task_raisesignalthread(struct task *__restrict target,
 	                                   &task_signal_rpc_handler,
 	                                   entry,
 	                                   TASK_USER_RPC_FINTR,
-	                                   NULL,
 	                                   rpc_flags);
 	if unlikely(!TASK_SCHEDULE_USER_RPC_WASOK(result))
 		kfree(entry);
@@ -156,7 +153,6 @@ task_raisesignalthread(struct task *__restrict target,
 		                                &task_signal_rpc_handler,
 		                                entry,
 		                                TASK_USER_RPC_FINTR,
-		                                NULL,
 		                                rpc_flags);
 	} EXCEPT {
 		if (error_code() != ERROR_CODEOF(E_INTERRUPT_USER_RPC))
@@ -278,7 +274,6 @@ NOTHROW_NX(KCALL FUNC(deliver_signal_to_some_thread_in_process))(struct task *__
 		                                   &task_process_signal_rpc_handler,
 		                                   info,
 		                                   TASK_USER_RPC_FINTR,
-		                                   NULL,
 		                                   rpc_flags);
 		decref_unlikely(target);
 		if (!TASK_SCHEDULE_USER_RPC_WASOK(result))
@@ -300,7 +295,6 @@ NOTHROW_NX(KCALL FUNC(deliver_signal_to_some_thread_in_process))(struct task *__
 			                                &task_process_signal_rpc_handler,
 			                                info,
 			                                TASK_USER_RPC_FINTR,
-			                                NULL,
 			                                rpc_flags);
 		} EXCEPT {
 			if (error_code() != ERROR_CODEOF(E_INTERRUPT_USER_RPC))
@@ -360,7 +354,6 @@ again_find_late_target:
 		                                   &task_sigmask_check_rpc_handler,
 		                                   NULL,
 		                                   TASK_USER_RPC_FINTR,
-		                                   NULL,
 		                                   rpc_flags);
 		decref_unlikely(target);
 		if (result == TASK_SCHEDULE_USER_RPC_TERMINATED)
@@ -377,7 +370,6 @@ again_find_late_target:
 		                                    &task_sigmask_check_rpc_handler,
 		                                    NULL,
 		                                    TASK_USER_RPC_FINTR,
-		                                    NULL,
 		                                    rpc_flags)) {
 			/* The chosen target has terminated. - Try to find another candidate. */
 			goto again_find_late_target;
