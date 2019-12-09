@@ -44,6 +44,8 @@ __SYSDECL_BEGIN
 #define __SIZEOF_ELF64_VERSYM__   __SIZEOF_ELF64_HALF__
 
 #ifdef __CC__
+#ifndef _ELF_TYPES_DEFINED
+#define _ELF_TYPES_DEFINED 1
 /* Type for a 16-bit quantity. */
 typedef __UINT16_TYPE__ Elf32_Half;
 typedef __UINT16_TYPE__ Elf64_Half;
@@ -75,6 +77,7 @@ typedef __UINT16_TYPE__ Elf64_Section;
 /* Type for version symbol information. */
 typedef Elf32_Half Elf32_Versym;
 typedef Elf64_Half Elf64_Versym;
+#endif /* !_ELF_TYPES_DEFINED */
 #endif /* __CC__ */
 
 __SYSDECL_END

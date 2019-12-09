@@ -30,19 +30,32 @@ import * from errors;
 import * from ..libmagic;
 import OPT_LINK_OUTPUT from .c;
 
+#include "../../../include/elf.h"
+
+local function file_read1(fp: File): int {
+	return int.frombytes(fp.read(1), "little", false);
+}
 local function file_read2le(fp: File): int {
 	return int.frombytes(fp.read(2), "little", false);
 }
 local function file_read4le(fp: File): int {
 	return int.frombytes(fp.read(4), "little", false);
 }
+local function file_read8le(fp: File): int {
+	return int.frombytes(fp.read(8), "little", false);
+}
 local function file_write4le(fp: File, v: int) {
 	fp.write(v.tobytes(4, "little", false));
+}
+local function file_write8le(fp: File, v: int) {
+	fp.write(v.tobytes(8, "little", false));
 }
 
 
 @@Option: string
 global final OPT_ELF_DIHACK_FILE: string = "ELF_DIHACK.input";
+@@Option: int   -- Offset between physical and virtual memory
+global final OPT_ELF_DIHACK_PHYS2VIRT: string = "ELF_DIHACK.phys2virt";
 
 class ElfDebuginfoParams {
 	this = default;
@@ -80,7 +93,8 @@ again:
 }
 
 @@Hack to make .debug_* sections allocated in the produced binary
-function elfDebuginfoAllocatedHack(self: BoundStep, filename: string) {
+function elfDebuginfoAllocatedHack(
+		self: BoundStep, filename: string, phys2virtOffset: int) {
 	try {
 		/* The kernel's shdr and phdr vectors have been set up such that
 		 * for every .debug_* section $NAME, the following exists:
@@ -240,13 +254,23 @@ function elfDebuginfoAllocatedHack(self: BoundStep, filename: string) {
 //		for (local name, data: sections)
 //			print repr(name), ":", repr(data);
 		with (local fp = File.open(filename, "rb+,nobuf")) {
-			/* TODO: Support for Elf64_Ehdr */
-			fp.seek(28); /* offsetof(Elf32_Ehdr, e_phoff); */
-			local e_phoff = file_read4le(fp);
-			local e_shoff = file_read4le(fp);
-			fp.seek(42); /* offsetof(Elf32_Ehdr, e_phentsize); */
+			if (fp.read(SELFMAG) != ELFMAG)
+				throw Error("Bad ELF magic");
+			local elfclass = file_read1(fp);
+			local is64 = false;
+			if (elfclass == ELFCLASS64) {
+				is64 = true;
+			} else if (elfclass != ELFCLASS32) {
+				throw Error("Unrecognized ELF class: " + repr(elfclass));
+			}
+			local file_readple = is64 ? file_read8le : file_read4le;
+#define OFFSET(x) (is64 ? __OFFSET_ELF64_##x : __OFFSET_ELF32_##x)
+			fp.seek(OFFSET(EHDR_PHOFF));
+			local e_phoff = file_readple(fp);
+			local e_shoff = file_readple(fp);
+			fp.seek(OFFSET(EHDR_PHENTSIZE));
 			local e_phentsize = file_read2le(fp);
-			fp.seek(46); /* offsetof(Elf32_Ehdr, e_shentsize); */
+			fp.seek(OFFSET(EHDR_SHENTSIZE));
 			local e_shentsize = file_read2le(fp);
 
 #if 0 /* GDB and addr2line doesn't like it when SHF_ALLOC is set for debug sections. \
@@ -257,12 +281,13 @@ function elfDebuginfoAllocatedHack(self: BoundStep, filename: string) {
 			/* orig.sh_flags |= SHF_ALLOC; */
 			for (local name, s: sections) {
 				try {
-					local flags_pos = (e_shoff + (s.shdr_debug_xxx_index * e_shentsize))
-						+ 8 /* offsetof(Elf32_Shdr, sh_flags) */;
+					local flags_pos =
+						(e_shoff + (s.shdr_debug_xxx_index * e_shentsize)) +
+						OFFSET(SHDR_FLAGS);
 					fp.seek(flags_pos);
 					local f = file_read4le(fp);
 					fp.seek(flags_pos);
-					file_write4le(fp, f | 0x02 /* SHF_ALLOC */);
+					file_write4le(fp, f | SHF_ALLOC);
 				} catch (...) {
 					print File.stderr: "Error while setting SHF_ALLOC for", repr(name);
 					throw;
@@ -277,12 +302,13 @@ function elfDebuginfoAllocatedHack(self: BoundStep, filename: string) {
 			/* shdr.sh_flags &= ~SHF_ALLOC; */
 			for (local name, s: sections) {
 				try {
-					local flags_pos = (e_shoff + (s.shdr_debug_xxx_wrapper_index * e_shentsize))
-						+ 8 /* offsetof(Elf32_Shdr, sh_flags) */;
+					local flags_pos =
+						(e_shoff + (s.shdr_debug_xxx_wrapper_index * e_shentsize))
+						+ OFFSET(SHDR_FLAGS);
 					fp.seek(flags_pos);
 					local f = file_read4le(fp);
 					fp.seek(flags_pos);
-					file_write4le(fp, f & ~0x02 /* SHF_ALLOC */);
+					file_write4le(fp, f & ~SHF_ALLOC);
 				} catch (...) {
 					print File.stderr: "Error while clearing SHF_ALLOC for", repr(name);
 					throw;
@@ -298,14 +324,25 @@ function elfDebuginfoAllocatedHack(self: BoundStep, filename: string) {
 			for (local name, s: sections) {
 				try {
 					local phdr_pos = (e_phoff + (s.phdr_debug_xxx_wrapper_index * e_phentsize));
-					fp.seek(phdr_pos + 4 /* offsetof(Elf32_Phdr, p_offset) */);
-					file_write4le(fp, s.shdr_debug_xxx_offset); /* p_offset */
-					fp.seek(phdr_pos + 12 /* offsetof(Elf32_Phdr, p_paddr) */);
-					file_write4le(fp, s.symt___kernel_debug_xxx_start - 0xc0000000); /* p_paddr */
-					file_write4le(fp, s.shdr_debug_xxx_size); /* p_filesz */
-					file_write4le(fp, s.shdr_debug_xxx_size); /* p_memsz */
-					file_write4le(fp, 0x04 /* PF_R */); /* p_flags */
-					file_write4le(fp, s.shdr_debug_xxx_align); /* p_filesz */
+					if (is64) {
+						fp.seek(phdr_pos + __OFFSET_ELF64_PHDR_FLAGS);
+						file_write4le(fp, PF_R);                   /* p_flags */
+						file_write8le(fp, s.shdr_debug_xxx_offset); /* p_offset */
+						fp.seek(phdr_pos + __OFFSET_ELF64_PHDR_PADDR);
+						file_write8le(fp, s.symt___kernel_debug_xxx_start - phys2virtOffset); /* p_paddr */
+						file_write8le(fp, s.shdr_debug_xxx_size);  /* p_filesz */
+						file_write8le(fp, s.shdr_debug_xxx_size);  /* p_memsz */
+						file_write8le(fp, s.shdr_debug_xxx_align); /* p_align */
+					} else {
+						fp.seek(phdr_pos + __OFFSET_ELF32_PHDR_OFFSET);
+						file_write4le(fp, s.shdr_debug_xxx_offset); /* p_offset */
+						fp.seek(phdr_pos + __OFFSET_ELF32_PHDR_PADDR);
+						file_write4le(fp, s.symt___kernel_debug_xxx_start - phys2virtOffset); /* p_paddr */
+						file_write4le(fp, s.shdr_debug_xxx_size);  /* p_filesz */
+						file_write4le(fp, s.shdr_debug_xxx_size);  /* p_memsz */
+						file_write4le(fp, PF_R);                   /* p_flags */
+						file_write4le(fp, s.shdr_debug_xxx_align); /* p_align */
+					}
 				} catch (...) {
 					print File.stderr: "Error while overwriting PHDR for", repr(name);
 					throw;
@@ -326,7 +363,12 @@ local final function ELF_DIHACK_run(self: BoundStep): {Waitable...} {
 		local filename = options.get(OPT_ELF_DIHACK_FILE);
 		if (filename is none)
 			filename = options[OPT_LINK_OUTPUT];
-		elfDebuginfoAllocatedHack(self, group.fixFilename(filename));
+		local phys2virtOffset = options.get(OPT_ELF_DIHACK_PHYS2VIRT);
+		if (phys2virtOffset is none)
+			phys2virtOffset = 0;
+		elfDebuginfoAllocatedHack(
+			self, group.fixFilename(filename),
+			phys2virtOffset);
 	}, (self, ));
 	th.start();
 	yield WaitableJoin(th);
@@ -355,6 +397,7 @@ global final ELF_DIHACK: Step = Step(
 	name: "ELF_DIHACK",
 	options: {
 		OPT_ELF_DIHACK_FILE,
+		OPT_ELF_DIHACK_PHYS2VIRT,
 		OPT_LINK_OUTPUT,
 	},
 	run: ELF_DIHACK_run,

@@ -21,12 +21,17 @@
 
 /* Standard ELF types. */
 #include "__stdinc.h"
-//#include <features.h>
-//#include <bits/elf-types.h>
+#ifdef __KOS_SYSTEM_HEADERS__
+#include "features.h"
+#endif /* __KOS_SYSTEM_HEADERS__ */
 
 #ifdef __CC__
 #include <stdint.h>
+#ifdef __KOS_SYSTEM_HEADERS__
+#include <bits/elf-types.h>
+#endif /* __KOS_SYSTEM_HEADERS__ */
 #endif /* __CC__ */
+
 #ifdef __USE_KOS
 #include <bits/elf.h>
 #include <hybrid/host.h>
@@ -57,50 +62,57 @@ __DECL_BEGIN
 #define __SIZEOF_ELF32_HALF__     2
 #define __SIZEOF_ELF64_HALF__     2
 #define __SIZEOF_ELF32_WORD__     4
+#define __SIZEOF_ELF32_SWORD__    4
 #define __SIZEOF_ELF64_WORD__     4
+#define __SIZEOF_ELF64_SWORD__    4
 #define __SIZEOF_ELF32_XWORD__    8
+#define __SIZEOF_ELF32_SXWORD__   8
 #define __SIZEOF_ELF64_XWORD__    8
+#define __SIZEOF_ELF64_SXWORD__   8
 #define __SIZEOF_ELF32_ADDR__     4
 #define __SIZEOF_ELF64_ADDR__     8
 #define __SIZEOF_ELF32_OFF__      4
 #define __SIZEOF_ELF64_OFF__      8
 #define __SIZEOF_ELF32_SECTION__  2
 #define __SIZEOF_ELF64_SECTION__  2
-#define __SIZEOF_ELF32_VERSYM__   2
-#define __SIZEOF_ELF64_VERSYM__   2
+#define __SIZEOF_ELF32_VERSYM__   __SIZEOF_ELF32_HALF__
+#define __SIZEOF_ELF64_VERSYM__   __SIZEOF_ELF64_HALF__
 
 #ifdef __CC__
+#ifndef _ELF_TYPES_DEFINED
+#define _ELF_TYPES_DEFINED 1
 /* Type for a 16-bit quantity. */
-typedef uint16_t Elf32_Half;
-typedef uint16_t Elf64_Half;
+typedef __UINT16_TYPE__ Elf32_Half;
+typedef __UINT16_TYPE__ Elf64_Half;
 
 /* Types for signed and unsigned 32-bit quantities. */
-typedef uint32_t Elf32_Word;
-typedef int32_t  Elf32_Sword;
-typedef uint32_t Elf64_Word;
-typedef int32_t  Elf64_Sword;
+typedef __UINT32_TYPE__ Elf32_Word;
+typedef __INT32_TYPE__  Elf32_Sword;
+typedef __UINT32_TYPE__ Elf64_Word;
+typedef __INT32_TYPE__  Elf64_Sword;
 
 /* Types for signed and unsigned 64-bit quantities. */
-typedef uint64_t Elf32_Xword;
-typedef int64_t  Elf32_Sxword;
-typedef uint64_t Elf64_Xword;
-typedef int64_t  Elf64_Sxword;
+typedef __UINT64_TYPE__ Elf32_Xword;
+typedef __INT64_TYPE__  Elf32_Sxword;
+typedef __UINT64_TYPE__ Elf64_Xword;
+typedef __INT64_TYPE__  Elf64_Sxword;
 
 /* Type of addresses. */
-typedef uint32_t Elf32_Addr;
-typedef uint64_t Elf64_Addr;
+typedef __UINT32_TYPE__ Elf32_Addr;
+typedef __UINT64_TYPE__ Elf64_Addr;
 
 /* Type of file offsets. */
-typedef uint32_t Elf32_Off;
-typedef uint64_t Elf64_Off;
+typedef __UINT32_TYPE__ Elf32_Off;
+typedef __UINT64_TYPE__ Elf64_Off;
 
 /* Type for section indices, which are 16-bit quantities. */
-typedef uint16_t Elf32_Section;
-typedef uint16_t Elf64_Section;
+typedef __UINT16_TYPE__ Elf32_Section;
+typedef __UINT16_TYPE__ Elf64_Section;
 
 /* Type for version symbol information. */
 typedef Elf32_Half Elf32_Versym;
 typedef Elf64_Half Elf64_Versym;
+#endif /* !_ELF_TYPES_DEFINED */
 #endif /* __CC__ */
 
 
@@ -481,8 +493,15 @@ typedef struct elf64_shdr /*[PREFIX(sh_)]*/ {
 
 /* Symbol table entry. */
 
+#define __OFFSET_ELF32_SYM_NAME  0
+#define __OFFSET_ELF32_SYM_VALUE 4
+#define __OFFSET_ELF32_SYM_SIZE  8
+#define __OFFSET_ELF32_SYM_INFO  12
+#define __OFFSET_ELF32_SYM_OTHER 13
+#define __OFFSET_ELF32_SYM_SHNDX 14
+#define __SIZEOF_ELF32_SYM       16
 #ifdef __CC__
-typedef struct {
+typedef struct elf32_sym /*[PREFIX(st_)]*/ {
 	Elf32_Word    st_name;                /* Symbol name (string tbl index) */
 	Elf32_Addr    st_value;               /* Symbol value */
 	Elf32_Word    st_size;                /* Symbol size */
@@ -490,8 +509,17 @@ typedef struct {
 	unsigned char st_other;               /* Symbol visibility */
 	Elf32_Section st_shndx;               /* Section index */
 } Elf32_Sym;
+#endif /* __CC__ */
 
-typedef struct {
+#define __OFFSET_ELF64_SYM_NAME  0
+#define __OFFSET_ELF64_SYM_INFO  4
+#define __OFFSET_ELF64_SYM_OTHER 5
+#define __OFFSET_ELF64_SYM_SHNDX 6
+#define __OFFSET_ELF64_SYM_VALUE 8
+#define __OFFSET_ELF64_SYM_SIZE  16
+#define __SIZEOF_ELF64_SYM       24
+#ifdef __CC__
+typedef struct elf64_sym /*[PREFIX(st_)]*/ {
 	Elf64_Word    st_name;                /* Symbol name (string tbl index) */
 	unsigned char st_info;                /* Symbol type and binding */
 	unsigned char st_other;               /* Symbol visibility */
@@ -499,16 +527,27 @@ typedef struct {
 	Elf64_Addr    st_value;               /* Symbol value */
 	Elf64_Xword   st_size;                /* Symbol size */
 } Elf64_Sym;
+#endif /* __CC__ */
+
 
 /* The syminfo section if available contains additional information about
    every dynamic symbol. */
 
-typedef struct {
+#define __OFFSET_ELF32_SYMINFO_BOUNDTO 0
+#define __OFFSET_ELF32_SYMINFO_FLAGS   2
+#define __SIZEOF_ELF32_SYMINFO         4
+#ifdef __CC__
+typedef struct elf32_syminfo /*[PREFIX(si_)]*/ {
 	Elf32_Half si_boundto;                /* Direct bindings, symbol bound to */
 	Elf32_Half si_flags;                  /* Per symbol flags */
 } Elf32_Syminfo;
+#endif /* __CC__ */
 
-typedef struct {
+#define __OFFSET_ELF64_SYMINFO_BOUNDTO 0
+#define __OFFSET_ELF64_SYMINFO_FLAGS   2
+#define __SIZEOF_ELF64_SYMINFO         4
+#ifdef __CC__
+typedef struct elf64_syminfo /*[PREFIX(si_)]*/ {
 	Elf64_Half si_boundto;                /* Direct bindings, symbol bound to */
 	Elf64_Half si_flags;                  /* Per symbol flags */
 } Elf64_Syminfo;
@@ -637,8 +676,18 @@ typedef struct {
 
 /* Program segment header. */
 
+
+#define __OFFSET_ELF32_PHDR_TYPE    0
+#define __OFFSET_ELF32_PHDR_OFFSET  4
+#define __OFFSET_ELF32_PHDR_VADDR   8
+#define __OFFSET_ELF32_PHDR_PADDR   12
+#define __OFFSET_ELF32_PHDR_FILESZ  16
+#define __OFFSET_ELF32_PHDR_MEMSZ   20
+#define __OFFSET_ELF32_PHDR_FLAGS   24
+#define __OFFSET_ELF32_PHDR_ALIGN   28
+#define __SIZEOF_ELF32_PHDR         32
 #ifdef __CC__
-typedef struct {
+typedef struct elf32_phdr /*[PREFIX(p_)]*/ {
 	Elf32_Word    p_type;                 /* Segment type */
 	Elf32_Off     p_offset;               /* Segment file offset */
 	Elf32_Addr    p_vaddr;                /* Segment virtual address */
@@ -651,9 +700,20 @@ typedef struct {
 
 #define ELF32_PHDR_INIT(type, offset, vaddr, paddr, filesz, memsz, flags, align) \
 	{ type, offset, vaddr, paddr, filesz, memsz, flags, align }
+#endif /* __CC__ */
 
 
-typedef struct {
+#define __OFFSET_ELF64_PHDR_TYPE    0
+#define __OFFSET_ELF64_PHDR_FLAGS   4
+#define __OFFSET_ELF64_PHDR_OFFSET  8
+#define __OFFSET_ELF64_PHDR_VADDR   16
+#define __OFFSET_ELF64_PHDR_PADDR   24
+#define __OFFSET_ELF64_PHDR_FILESZ  32
+#define __OFFSET_ELF64_PHDR_MEMSZ   40
+#define __OFFSET_ELF64_PHDR_ALIGN   48
+#define __SIZEOF_ELF64_PHDR         56
+#ifdef __CC__
+typedef struct elf64_phdr /*[PREFIX(p_)]*/ {
 	Elf64_Word    p_type;                 /* Segment type */
 	Elf64_Word    p_flags;                /* Segment flags */
 	Elf64_Off     p_offset;               /* Segment file offset */
@@ -666,7 +726,6 @@ typedef struct {
 
 #define ELF64_PHDR_INIT(type, offset, vaddr, paddr, filesz, memsz, flags, align) \
 	{ type, flags, offset, vaddr, paddr, filesz, memsz, align }
-
 #define ELF_PHDR32TO64(dst, src)      \
 	((dst).p_type   = (src).p_type,   \
 	 (dst).p_flags  = (src).p_flags,  \

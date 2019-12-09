@@ -250,6 +250,11 @@ BEGIN
 			}),
 		};
 
+		options[OPT_ELF_DIHACK_PHYS2VIRT] = {
+			"i386"   : 0xc0000000,         /* KERNEL_CORE_BASE */
+			"x86_64" : 0xffffffff80000000, /* KERNEL_CORE_BASE */
+		}.get(TARGET_ARCH);
+
 		LINKER_SCRIPT("arch/" + TARGET_XARCH + "/_kernel.ld")
 		SET_OUTPUT(KERNEL_BINARY)
 		SET_DISKFILE("/os/kernel.bin")

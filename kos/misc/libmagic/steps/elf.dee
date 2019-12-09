@@ -30,11 +30,16 @@ import * from errors;
 import * from ..libmagic;
 import OPT_LINK_OUTPUT from .c;
 
+#include "../../../include/elf.h"
+
 local function file_read2le(fp: File): int {
 	return int.frombytes(fp.read(2), "little", false);
 }
 local function file_read4le(fp: File): int {
 	return int.frombytes(fp.read(4), "little", false);
+}
+local function file_read8le(fp: File): int {
+	return int.frombytes(fp.read(8), "little", false);
 }
 
 function ElfSymbolHash(name: string): int {

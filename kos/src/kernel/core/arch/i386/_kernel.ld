@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386__KERNEL_LD
+#define GUARD_KERNEL_CORE_ARCH_I386__KERNEL_LD 1
 #define __LINKER__ 1
 #define _KOS_SOURCE 1
 #define _KOS_KERNEL_SOURCE 1
@@ -590,3 +592,5 @@ SECTIONS {
 		*(.note.gnu.build-id)
 	}
 }
+
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386__KERNEL_LD */

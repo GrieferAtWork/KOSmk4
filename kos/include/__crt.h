@@ -20,7 +20,7 @@
 #define ___CRT_H 1
 
 #include "__stdinc.h"
-#include <hybrid/host.h>
+#include "hybrid/host.h"
 
 /* Automatically detect the linked CRT
  *   - __CRT_DOS          (windows / msvcrt.dll)

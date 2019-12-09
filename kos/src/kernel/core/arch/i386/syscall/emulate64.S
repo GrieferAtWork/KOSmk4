@@ -140,12 +140,12 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 	jmp    .Lnormal_return64
 
 .Lcall_sysex64:
-	cmpq   $(__NR64_syscall1_min), %rax
-	jb     .Lbad_sysno64
 	cmpq   $(__NR64_syscall1_max), %rax
 	ja     .Lbad_sysno64
+	subq   $(__NR64_syscall1_min), %rax
+	jb     .Lbad_sysno64
 	EXTERN(x86_sysroute1_c)
-	callq  *(x86_sysroute1_c - ((__NR64_syscall1_min * 8) & 0xffffffffffffffff))(,%rax,8)
+	callq  *x86_sysroute1_c(,%rax,8)
 .Lnormal_return64:
 	.cfi_remember_state
 	/* Return to user-space. */
@@ -206,12 +206,12 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 	jmp    .Lnormal_return32
 
 .Lcall_sysex32:
-	cmpl   $(__NR32_syscall1_min), %eax
-	jb     .Lbad_sysno32
 	cmpl   $(__NR32_syscall1_max), %eax
 	ja     .Lbad_sysno32
+	subl   $(__NR32_syscall1_min), %eax
+	jb     .Lbad_sysno32
 	EXTERN(x86_sysroute1_c32)
-	callq  *(x86_sysroute1_c32 - ((__NR32_syscall1_min * 8) & 0xffffffffffffffff))(,%rax,8)
+	callq  *x86_sysroute1_c32(,%rax,8)
 .Lnormal_return32:
 
 

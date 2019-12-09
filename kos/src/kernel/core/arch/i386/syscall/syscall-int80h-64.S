@@ -67,8 +67,12 @@ PUBLIC_FUNCTION(x86_idt_syscall)
 	jb     __x86_asm64_syscall_break
 	cmpq   $(__NR64_syscall1_max), %rax
 	ja     __x86_asm64_syscall_break
+	pushq_cfi_r %rax
+	subq   $(__NR64_syscall1_min), %rax
 	EXTERN(x86_sysroute1_asm64_syscall)
-	jmpq   *(x86_sysroute1_asm64_syscall - ((__NR64_syscall1_min * 8) & 0xffffffffffffffff))(,%rax,8)
+	movq   x86_sysroute1_asm64_syscall(,%rax,8), %rax
+	xchgq  0(%rsp), %rax /* Restore RAX and store syscall entry in 0(%rsp) */
+	ret                  /* Jump to the syscall entry */
 
 .Lsyscall_int80_32bit:
 	movzlq %eax, %rax /* Zero-extend to ensure that the upper 32 bit are zero */

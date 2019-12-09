@@ -20,8 +20,6 @@
 #define _FEATURES_H 1
 
 #include "__stdinc.h"
-#include "__crt.h"
-#include <hybrid/typecore.h>
 
 //#undef __USE_KOS        /* __KOS_VERSION__ >= 100 */
 //#undef __USE_KXS        /* __KOS_VERSION__ >= 200/300 */
@@ -95,7 +93,7 @@
 #if defined(_BROKEN_CCOMPAT_SOURCE) || defined(_GLIBCXX_SHARED)
 #undef __USE_BROKEN_CCOMPAT
 #define __USE_BROKEN_CCOMPAT 1
-#endif
+#endif /* _BROKEN_CCOMPAT_SOURCE || _GLIBCXX_SHARED */
 
 /* When exposed in headers, the behavior of memmem() and memrmem()
  * differs from the behavior found in glibc's implementation (of memmem())
@@ -123,7 +121,7 @@
 #if defined(_KOS_KERNEL_SOURCE) || \
    (defined(__KOS__) && defined(__KERNEL__) && !defined(__USE_ISOC_PURE))
 #define __USE_KOS_KERNEL 1
-#endif /* _KOS_KERNEL_SOURCE || (__KOS__ && __KERNEL__) */
+#endif /* _KOS_KERNEL_SOURCE || (__KOS__ && __KERNEL__ && !__USE_ISOC_PURE) */
 
 #ifdef _STRING_BWLQ_SOURCE
 #define __USE_STRING_BWLQ 1
@@ -378,9 +376,13 @@
 #define __USE_GNU 1
 #endif /* _GNU_SOURCE */
 
-#if (defined(_REENTRANT) || defined(_THREAD_SAFE)) || \
-    (defined(__CRT_CYG) && defined(__DYNAMIC_REENT__) && !defined(__SINGLE_THREAD__))
+#if defined(_REENTRANT) || defined(_THREAD_SAFE)
 #define __USE_REENTRANT 1
+#elif defined(__DYNAMIC_REENT__) && !defined(__SINGLE_THREAD__)
+#include "__crt.h"
+#ifdef __CRT_CYG
+#define __USE_REENTRANT 1
+#endif /* __CRT_CYG */
 #endif
 
 /* Enable additional utf16/32 functions in system headers. */
@@ -505,7 +507,17 @@
 #endif /* __KERNEL__ && __KOS__ */
 
 
-#ifdef __USE_KOS
+#ifndef __CC__
+#define __STDC_INT_AS_SSIZE_T   /* nothing */
+#define __STDC_INT_AS_SIZE_T    /* nothing */
+#define __STDC_INT32_AS_SSIZE_T /* nothing */
+#define __STDC_INT32_AS_SIZE_T  /* nothing */
+#define __STDC_UINT_AS_SIZE_T   /* nothing */
+#define __STDC_UINT32_AS_SIZE_T /* nothing */
+#elif defined(__USE_KOS)
+#if !defined(__SIZEOF_SIZE_T__) || !defined(__SIZEOF_INT__)
+#include "hybrid/typecore.h"
+#endif /* !__SIZEOF_SIZE_T__ || !__SIZEOF_INT__ */
 #if __SIZEOF_SIZE_T__ <= __SIZEOF_INT__
 #define __STDC_INT_AS_SSIZE_T   __ssize_t
 #define __STDC_INT_AS_SIZE_T    __size_t

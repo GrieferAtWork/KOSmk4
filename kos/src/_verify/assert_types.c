@@ -439,6 +439,56 @@ STATIC_ASSERT(offsetof(struct elf64_shdr, sh_size) == __OFFSET_ELF64_SHDR_SIZE);
 STATIC_ASSERT(offsetof(struct elf64_shdr, sh_type) == __OFFSET_ELF64_SHDR_TYPE);
 STATIC_ASSERT(sizeof(struct elf64_shdr) == __SIZEOF_ELF64_SHDR);
 
+/* struct elf32_sym */
+STATIC_ASSERT(offsetof(struct elf32_sym, st_info) == __OFFSET_ELF32_SYM_INFO);
+STATIC_ASSERT(offsetof(struct elf32_sym, st_name) == __OFFSET_ELF32_SYM_NAME);
+STATIC_ASSERT(offsetof(struct elf32_sym, st_other) == __OFFSET_ELF32_SYM_OTHER);
+STATIC_ASSERT(offsetof(struct elf32_sym, st_shndx) == __OFFSET_ELF32_SYM_SHNDX);
+STATIC_ASSERT(offsetof(struct elf32_sym, st_size) == __OFFSET_ELF32_SYM_SIZE);
+STATIC_ASSERT(offsetof(struct elf32_sym, st_value) == __OFFSET_ELF32_SYM_VALUE);
+STATIC_ASSERT(sizeof(struct elf32_sym) == __SIZEOF_ELF32_SYM);
+
+/* struct elf64_sym */
+STATIC_ASSERT(offsetof(struct elf64_sym, st_info) == __OFFSET_ELF64_SYM_INFO);
+STATIC_ASSERT(offsetof(struct elf64_sym, st_name) == __OFFSET_ELF64_SYM_NAME);
+STATIC_ASSERT(offsetof(struct elf64_sym, st_other) == __OFFSET_ELF64_SYM_OTHER);
+STATIC_ASSERT(offsetof(struct elf64_sym, st_shndx) == __OFFSET_ELF64_SYM_SHNDX);
+STATIC_ASSERT(offsetof(struct elf64_sym, st_size) == __OFFSET_ELF64_SYM_SIZE);
+STATIC_ASSERT(offsetof(struct elf64_sym, st_value) == __OFFSET_ELF64_SYM_VALUE);
+STATIC_ASSERT(sizeof(struct elf64_sym) == __SIZEOF_ELF64_SYM);
+
+/* struct elf32_syminfo */
+STATIC_ASSERT(offsetof(struct elf32_syminfo, si_flags) == __OFFSET_ELF32_SYMINFO_FLAGS);
+STATIC_ASSERT(offsetof(struct elf32_syminfo, si_boundto) == __OFFSET_ELF32_SYMINFO_BOUNDTO);
+STATIC_ASSERT(sizeof(struct elf32_syminfo) == __SIZEOF_ELF32_SYMINFO);
+
+/* struct elf64_syminfo */
+STATIC_ASSERT(offsetof(struct elf64_syminfo, si_flags) == __OFFSET_ELF64_SYMINFO_FLAGS);
+STATIC_ASSERT(offsetof(struct elf64_syminfo, si_boundto) == __OFFSET_ELF64_SYMINFO_BOUNDTO);
+STATIC_ASSERT(sizeof(struct elf64_syminfo) == __SIZEOF_ELF64_SYMINFO);
+
+/* struct elf32_phdr */
+STATIC_ASSERT(offsetof(struct elf32_phdr, p_align) == __OFFSET_ELF32_PHDR_ALIGN);
+STATIC_ASSERT(offsetof(struct elf32_phdr, p_filesz) == __OFFSET_ELF32_PHDR_FILESZ);
+STATIC_ASSERT(offsetof(struct elf32_phdr, p_flags) == __OFFSET_ELF32_PHDR_FLAGS);
+STATIC_ASSERT(offsetof(struct elf32_phdr, p_memsz) == __OFFSET_ELF32_PHDR_MEMSZ);
+STATIC_ASSERT(offsetof(struct elf32_phdr, p_offset) == __OFFSET_ELF32_PHDR_OFFSET);
+STATIC_ASSERT(offsetof(struct elf32_phdr, p_paddr) == __OFFSET_ELF32_PHDR_PADDR);
+STATIC_ASSERT(offsetof(struct elf32_phdr, p_type) == __OFFSET_ELF32_PHDR_TYPE);
+STATIC_ASSERT(offsetof(struct elf32_phdr, p_vaddr) == __OFFSET_ELF32_PHDR_VADDR);
+STATIC_ASSERT(sizeof(struct elf32_phdr) == __SIZEOF_ELF32_PHDR);
+
+/* struct elf64_phdr */
+STATIC_ASSERT(offsetof(struct elf64_phdr, p_align) == __OFFSET_ELF64_PHDR_ALIGN);
+STATIC_ASSERT(offsetof(struct elf64_phdr, p_filesz) == __OFFSET_ELF64_PHDR_FILESZ);
+STATIC_ASSERT(offsetof(struct elf64_phdr, p_flags) == __OFFSET_ELF64_PHDR_FLAGS);
+STATIC_ASSERT(offsetof(struct elf64_phdr, p_memsz) == __OFFSET_ELF64_PHDR_MEMSZ);
+STATIC_ASSERT(offsetof(struct elf64_phdr, p_offset) == __OFFSET_ELF64_PHDR_OFFSET);
+STATIC_ASSERT(offsetof(struct elf64_phdr, p_paddr) == __OFFSET_ELF64_PHDR_PADDR);
+STATIC_ASSERT(offsetof(struct elf64_phdr, p_type) == __OFFSET_ELF64_PHDR_TYPE);
+STATIC_ASSERT(offsetof(struct elf64_phdr, p_vaddr) == __OFFSET_ELF64_PHDR_VADDR);
+STATIC_ASSERT(sizeof(struct elf64_phdr) == __SIZEOF_ELF64_PHDR);
+
 /* struct elf32_chdr */
 STATIC_ASSERT(offsetof(struct elf32_chdr, ch_addralign) == __OFFSET_ELF32_CHDR_ADDRALIGN);
 STATIC_ASSERT(offsetof(struct elf32_chdr, ch_size) == __OFFSET_ELF32_CHDR_SIZE);

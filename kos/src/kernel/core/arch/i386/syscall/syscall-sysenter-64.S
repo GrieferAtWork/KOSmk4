@@ -92,8 +92,12 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter)
 	jb     __x86_asm32_sysenter_break
 	cmpl   $(__NR32_syscall1_max), %eax
 	ja     __x86_asm32_sysenter_break
+	pushq_cfi_r %rax
+	subl   $(__NR32_syscall1_min), %eax
 	EXTERN(x86_sysroute1_asm32_sysenter)
-	jmpq   *x86_sysroute1_asm32_sysenter - ((__NR32_syscall1_min * 8) & 0xffffffffffffffff)(,%rax,8)
+	movq   x86_sysroute1_asm32_sysenter(,%rax,8), %rax
+	xchgq  0(%rsp), %rax /* Restore RAX and store syscall entry in 0(%rsp) */
+	ret                  /* Jump to the syscall entry */
 	.cfi_endproc
 END(x86_syscall32_sysenter)
 
