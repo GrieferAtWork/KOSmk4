@@ -92,31 +92,54 @@ function flattenElfBinary(
 	with (local o = File.open(outputFile, "wb,nobuf")) {
 		local e_entry;
 		with (local i = File.open(inputFile, "rb")) {
+			if (i.read(SELFMAG) != ELFMAG)
+				throw Error("Bad ELF magic");
+			local elfclass = i.getc();
+			local is64 = false;
+			if (elfclass == ELFCLASS64) {
+				is64 = true;
+			} else if (elfclass != ELFCLASS32) {
+				throw Error("Unrecognized ELF class: " + repr(elfclass));
+			}
+			local file_readple = is64 ? file_read8le : file_read4le;
+#define OFFSET(x) (is64 ? __OFFSET_ELF64_##x : __OFFSET_ELF32_##x)
 			/* TODO: Support for Elf64_Ehdr */
-			i.seek(24); /* offsetof(Elf32_Ehdr, e_entry); */
-			e_entry = file_read4le(i);
-			//i.seek(28); /* offsetof(Elf32_Ehdr, e_phoff); */
-			local e_phoff = file_read4le(i);
-			i.seek(42); /* offsetof(Elf32_Ehdr, e_phentsize); */
+			i.seek(OFFSET(EHDR_ENTRY));
+			e_entry = file_readple(i);
+			//i.seek(OFFSET(EHDR_PHOFF));
+			local e_phoff = file_readple(i);
+			i.seek(OFFSET(EHDR_PHENTSIZE));
 			local e_phentsize = file_read2le(i);
 			local e_phnum = file_read2le(i);
 			for (local phi = 0; phi < e_phnum; ++phi) {
 				i.seek(e_phoff + (phi * e_phentsize));
 				local p_type = file_read4le(i);
-				if (p_type == 1 ||                          /* PT_LOAD */
-				   (requireNoRelocations && p_type == 2)) { /* PT_DYNAMIC */
-					if (p_type == 1 && allowedHeaders !is none && phi !in allowedHeaders)
+				if (p_type == PT_LOAD ||
+				   (requireNoRelocations && p_type == PT_DYNAMIC)) {
+					if (p_type == PT_LOAD &&
+					    allowedHeaders !is none &&
+					    phi !in allowedHeaders)
 						continue; /* Ignore this header! */
-					local p_offset = file_read4le(i);
-					local p_vaddr  = file_read4le(i);
-					local p_paddr  = file_read4le(i);
-					local p_filesz = file_read4le(i);
-					local p_memsz  = file_read4le(i);
-					local p_flags  = file_read4le(i);
-					local p_align  = file_read4le(i);
-					print "PHDR:", p_vaddr.hex(), p_paddr.hex(), p_offset.hex(), 
-						p_memsz.hex(), p_filesz.hex();
-					if (p_type == 2) { /* PT_DYNAMIC */
+					local p_offset, p_vaddr, p_paddr, p_filesz, p_memsz;
+					if (is64) {
+						file_read4le(i); /* p_flags */
+						p_offset = file_read8le(i);
+						p_vaddr  = file_read8le(i);
+						p_paddr  = file_read8le(i);
+						p_filesz = file_read8le(i);
+						p_memsz  = file_read8le(i);
+					} else {
+						p_offset = file_read4le(i);
+						p_vaddr  = file_read4le(i);
+						p_paddr  = file_read4le(i);
+						p_filesz = file_read4le(i);
+						p_memsz  = file_read4le(i);
+					}
+					print "PHDR: v:{}, p:{}, o:{}, ms:{}, fs:{}".format({
+						p_vaddr.hex(), p_paddr.hex(), p_offset.hex(),
+						p_memsz.hex(), p_filesz.hex()
+					});
+					if (p_type == PT_DYNAMIC) {
 						assert requireNoRelocations;
 						/* TODO */
 						continue;

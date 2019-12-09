@@ -1286,6 +1286,7 @@ PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_map)(void) {
 		vga_oldmapping[i] = oldword;
 	}
 }
+
 PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_unmap)(void) {
 	unsigned int i;
 	if (vga_real_terminal_start == NULL)

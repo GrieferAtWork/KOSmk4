@@ -32,9 +32,6 @@ import OPT_LINK_OUTPUT from .c;
 
 #include "../../../include/elf.h"
 
-local function file_read1(fp: File): int {
-	return int.frombytes(fp.read(1), "little", false);
-}
 local function file_read2le(fp: File): int {
 	return int.frombytes(fp.read(2), "little", false);
 }
@@ -256,7 +253,7 @@ function elfDebuginfoAllocatedHack(
 		with (local fp = File.open(filename, "rb+,nobuf")) {
 			if (fp.read(SELFMAG) != ELFMAG)
 				throw Error("Bad ELF magic");
-			local elfclass = file_read1(fp);
+			local elfclass = fp.getc();
 			local is64 = false;
 			if (elfclass == ELFCLASS64) {
 				is64 = true;
