@@ -471,12 +471,15 @@ INTERN_FUNCTION(_start)
 
 
 #define CALL_IF_Z(func) \
-	jz  991f; call func; 991:
+	jnz    991f;        \
+	call   func;        \
+991:
+
 
 
 	/* Test the LM bit. */
 	testl  $(CPUID_80000001D_LM), %edx
-	jnz     boot_failure_no_longmode
+	jz     boot_failure_no_longmode
 
 	/* Test the PAE bit. */
 	testl  $(CPUID_80000001D_PAE), %edx
