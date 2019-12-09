@@ -140,7 +140,26 @@ got_exe:
 		}
 	}
 	if (targetArch == "x86_64") {
-		/* TODO: Must create+use a custom kernel binary with e_machine = EM_386 */
+		/* Must create+use a custom kernel binary with e_machine = EM_386 */
+		local kernel386 = "{}em386-{}".format({
+			fs.headof(kernelFile),
+			fs.tailof(kernelFile),
+		});
+		local x32modified = getLastModfiedTime(kernel386);
+		if (x32modified !is none) {
+			local x64modified = getLastModfiedTime(kernelFile);
+			if (x64modified !is none && x64modified <= x32modified)
+				goto did_update_x86_64_kernel;
+			try fs.unlink(kernel386); catch (...);
+		}
+		print "[qemu] Updating kernel shadow", repr kernel386;
+		fs.copyfile(kernelFile, kernel386);
+		with (local fp = File.open(kernel386, "rb+,nobuf")) {
+			fp.seek(18); /* __OFFSET_ELF64_EHDR_MACHINE */
+			fp.write((3).tobytes(2, "little", false)); /* EM_386 */
+		}
+did_update_x86_64_kernel:
+		kernelFile = kernel386;
 	}
 	if (boot_drivers) {
 		qemu_arguments.append("-initrd");
