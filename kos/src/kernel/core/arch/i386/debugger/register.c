@@ -575,12 +575,12 @@ NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *arg,
 					break;
 #else /* __x86_64__ */
 				case X86_DBG_STATEKIND_ICPU:
-					if (unwind_setreg_icpustate_exclusive(&x86_dbg_trapstate, cfi_regno, buf))
+					if (unwind_setreg_icpustate_exclusive_p(&x86_dbg_trapstate, cfi_regno, buf))
 						goto ok;
 					break;
 
 				case X86_DBG_STATEKIND_SCPU:
-					if (unwind_setreg_scpustate_exclusive(&x86_dbg_trapstate, cfi_regno, buf))
+					if (unwind_setreg_scpustate_exclusive_p(&x86_dbg_trapstate, cfi_regno, buf))
 						goto ok;
 					break;
 #endif /* !__x86_64__ */

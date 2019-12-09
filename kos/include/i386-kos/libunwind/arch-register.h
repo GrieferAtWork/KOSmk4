@@ -86,10 +86,10 @@ typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE)(/
 typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE_EXCLUSIVE)(/*struct scpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
 typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE_EXCLUSIVE)(/*struct icpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
 #else /* __x86_64__ */
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE)(/*struct scpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE)(/*struct icpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE_EXCLUSIVE)(/*struct scpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE_EXCLUSIVE)(/*struct icpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE_P)(/*struct scpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE_P)(/*struct icpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE_EXCLUSIVE_P)(/*struct scpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE_EXCLUSIVE_P)(/*struct icpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
 #endif /* !__x86_64__ */
 #endif /* __KERNEL__ */
 #ifdef LIBUNWIND_WANT_PROTOTYPES
@@ -128,10 +128,10 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_s
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate_exclusive)(/*struct scpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate_exclusive)(/*struct icpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
 #else /* __x86_64__ */
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate)(/*struct scpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate)(/*struct icpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate_exclusive)(/*struct scpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate_exclusive)(/*struct icpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate_p)(/*struct scpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate_p)(/*struct icpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate_exclusive_p)(/*struct scpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate_exclusive_p)(/*struct icpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
 #endif /* !__x86_64__ */
 #endif /* __KERNEL__ */
 #endif /* LIBUNWIND_WANT_PROTOTYPES */

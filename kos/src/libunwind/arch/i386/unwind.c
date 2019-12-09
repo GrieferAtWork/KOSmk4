@@ -55,11 +55,16 @@
 
 DECL_BEGIN
 
-
 #ifdef __x86_64__
-#define SET_IRREGS_PTR_INDIRECTION *
+#define IRREGS_LOADSELF(T) /* nothing */
+#define IRREGS_SELF        self
+#define IRREGS_INDIRECTION *
+#define IRREGS_NAME(x)     x
 #else /* __x86_64__ */
-#define SET_IRREGS_PTR_INDIRECTION **
+#define IRREGS_LOADSELF(T) T *self = *pself;
+#define IRREGS_SELF        pself
+#define IRREGS_INDIRECTION **
+#define IRREGS_NAME(x)     x##_p
 #endif /* !__x86_64__ */
 
 struct lcpustate;
@@ -92,13 +97,13 @@ INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_getreg_fcpustate_exclusi
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_setreg_fcpustate_exclusive)(struct fcpustate *__restrict self, uintptr_half_t regno, void const *__restrict src);
 #if defined(__KERNEL__) || defined(__INTELLISENSE__)
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_getreg_scpustate)(struct scpustate const *__restrict self, uintptr_half_t regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_setreg_scpustate)(struct scpustate SET_IRREGS_PTR_INDIRECTION __restrict self, uintptr_half_t regno, void const *__restrict src);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC IRREGS_NAME(libuw_unwind_setreg_scpustate))(struct scpustate IRREGS_INDIRECTION __restrict self, uintptr_half_t regno, void const *__restrict src);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_getreg_icpustate)(struct icpustate const *__restrict self, uintptr_half_t regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_setreg_icpustate)(struct icpustate SET_IRREGS_PTR_INDIRECTION __restrict self, uintptr_half_t regno, void const *__restrict src);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC IRREGS_NAME(libuw_unwind_setreg_icpustate))(struct icpustate IRREGS_INDIRECTION __restrict self, uintptr_half_t regno, void const *__restrict src);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_getreg_scpustate_exclusive)(struct scpustate const *__restrict self, uintptr_half_t regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_setreg_scpustate_exclusive)(struct scpustate SET_IRREGS_PTR_INDIRECTION __restrict self, uintptr_half_t regno, void const *__restrict src);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC IRREGS_NAME(libuw_unwind_setreg_scpustate_exclusive))(struct scpustate IRREGS_INDIRECTION __restrict self, uintptr_half_t regno, void const *__restrict src);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_getreg_icpustate_exclusive)(struct icpustate const *__restrict self, uintptr_half_t regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_setreg_icpustate_exclusive)(struct icpustate SET_IRREGS_PTR_INDIRECTION __restrict self, uintptr_half_t regno, void const *__restrict src);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC IRREGS_NAME(libuw_unwind_setreg_icpustate_exclusive))(struct icpustate IRREGS_INDIRECTION __restrict self, uintptr_half_t regno, void const *__restrict src);
 #endif /* __KERNEL__ || __INTELLISENSE */
 #if !defined(__KERNEL__) || defined(__INTELLISENSE__)
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_getreg_ucontext)(struct ucontext const *__restrict self, uintptr_half_t regno, void *__restrict dst);
@@ -937,9 +942,9 @@ NOTHROW_NCX(CC libuw_unwind_getreg_scpustate_base)(struct scpustate const *__res
 }
 
 LOCAL NONNULL((1, 3)) bool
-NOTHROW_NCX(CC libuw_unwind_setreg_scpustate_base)(struct scpustate **__restrict pself,
-                                                   uintptr_half_t regno,
-                                                   void const *__restrict src) {
+NOTHROW_NCX(CC libuw_unwind_setreg_scpustate_base_p)(struct scpustate **__restrict pself,
+                                                     uintptr_half_t regno,
+                                                     void const *__restrict src) {
 	struct scpustate *self = *pself;
 	switch (regno) {
 	case CFI_386_UNWIND_REGISTER_EDI: self->scs_gpregs.gp_edi = *(u32 const *)src; break;
@@ -1011,9 +1016,9 @@ NOTHROW_NCX(CC libuw_unwind_getreg_icpustate_base)(struct icpustate const *__res
 }
 
 LOCAL NONNULL((1, 3)) bool
-NOTHROW_NCX(CC libuw_unwind_setreg_icpustate_base)(struct icpustate **__restrict pself,
-                                                   uintptr_half_t regno,
-                                                   void const *__restrict src) {
+NOTHROW_NCX(CC libuw_unwind_setreg_icpustate_base_p)(struct icpustate **__restrict pself,
+                                                     uintptr_half_t regno,
+                                                     void const *__restrict src) {
 	struct icpustate *self = *pself;
 	switch (regno) {
 	case CFI_386_UNWIND_REGISTER_EDI:    self->ics_gpregs.gp_edi = *(u32 const *)src; break;
@@ -1568,22 +1573,22 @@ DEFINE_CPUSTATE_GETTERS(struct kcpustate const *,
                         libuw_unwind_setreg_kcpustate_exclusive)
 #if defined(__KERNEL__) || defined(__INTELLISENSE__)
 DEFINE_CPUSTATE_GETTERS(struct scpustate const *,
-                        struct scpustate SET_IRREGS_PTR_INDIRECTION,
+                        struct scpustate IRREGS_INDIRECTION,
                         libuw_unwind_getreg_scpustate,
                         libuw_unwind_getreg_scpustate_base,
                         libuw_unwind_getreg_scpustate_exclusive,
-                        libuw_unwind_setreg_scpustate,
-                        libuw_unwind_setreg_scpustate_base,
-                        libuw_unwind_setreg_scpustate_exclusive)
+                        IRREGS_NAME(libuw_unwind_setreg_scpustate),
+                        IRREGS_NAME(libuw_unwind_setreg_scpustate_base),
+                        IRREGS_NAME(libuw_unwind_setreg_scpustate_exclusive))
 DEFINE_CPUSTATE_GETTERS(struct icpustate const *,
-                        struct icpustate SET_IRREGS_PTR_INDIRECTION,
+                        struct icpustate IRREGS_INDIRECTION,
                         libuw_unwind_getreg_icpustate,
                         libuw_unwind_getreg_icpustate_base,
                         libuw_unwind_getreg_icpustate_exclusive,
-                        libuw_unwind_setreg_icpustate,
-                        libuw_unwind_setreg_icpustate_base,
-                        libuw_unwind_setreg_icpustate_exclusive)
-#undef SET_IRREGS_PTR_INDIRECTION
+                        IRREGS_NAME(libuw_unwind_setreg_icpustate),
+                        IRREGS_NAME(libuw_unwind_setreg_icpustate_base),
+                        IRREGS_NAME(libuw_unwind_setreg_icpustate_exclusive))
+#undef IRREGS_INDIRECTION
 #endif /* __KERNEL__ || __INTELLISENSE__ */
 
 #if !defined(__KERNEL__) || defined(__INTELLISENSE__)
@@ -1618,8 +1623,6 @@ DEFINE_CPUSTATE_GETTERS(struct xfpustate const *,
                         libuw_unwind_setreg_xfpustate_exclusive)
 #undef DEFINE_CPUSTATE_GETTERS
 
-#undef SET_IRREGS_PTR_INDIRECTION
-
 DEFINE_PUBLIC_ALIAS(unwind_getreg_lcpustate, libuw_unwind_getreg_lcpustate);
 DEFINE_PUBLIC_ALIAS(unwind_setreg_lcpustate, libuw_unwind_setreg_lcpustate);
 DEFINE_PUBLIC_ALIAS(unwind_getreg_ucpustate, libuw_unwind_getreg_ucpustate);
@@ -1639,13 +1642,13 @@ DEFINE_PUBLIC_ALIAS(unwind_setreg_fcpustate_exclusive, libuw_unwind_setreg_fcpus
 
 #if defined(__KERNEL__) || defined(__INTELLISENSE__)
 DEFINE_PUBLIC_ALIAS(unwind_getreg_scpustate, libuw_unwind_getreg_scpustate);
-DEFINE_PUBLIC_ALIAS(unwind_setreg_scpustate, libuw_unwind_setreg_scpustate);
+DEFINE_PUBLIC_ALIAS(IRREGS_NAME(unwind_setreg_scpustate), IRREGS_NAME(libuw_unwind_setreg_scpustate));
 DEFINE_PUBLIC_ALIAS(unwind_getreg_icpustate, libuw_unwind_getreg_icpustate);
-DEFINE_PUBLIC_ALIAS(unwind_setreg_icpustate, libuw_unwind_setreg_icpustate);
+DEFINE_PUBLIC_ALIAS(IRREGS_NAME(unwind_setreg_icpustate), IRREGS_NAME(libuw_unwind_setreg_icpustate));
 DEFINE_PUBLIC_ALIAS(unwind_getreg_scpustate_exclusive, libuw_unwind_getreg_scpustate_exclusive);
-DEFINE_PUBLIC_ALIAS(unwind_setreg_scpustate_exclusive, libuw_unwind_setreg_scpustate_exclusive);
+DEFINE_PUBLIC_ALIAS(IRREGS_NAME(unwind_setreg_scpustate_exclusive), IRREGS_NAME(libuw_unwind_setreg_scpustate_exclusive));
 DEFINE_PUBLIC_ALIAS(unwind_getreg_icpustate_exclusive, libuw_unwind_getreg_icpustate_exclusive);
-DEFINE_PUBLIC_ALIAS(unwind_setreg_icpustate_exclusive, libuw_unwind_setreg_icpustate_exclusive);
+DEFINE_PUBLIC_ALIAS(IRREGS_NAME(unwind_setreg_icpustate_exclusive), IRREGS_NAME(libuw_unwind_setreg_icpustate_exclusive));
 #endif /* __KERNEL__ || __INTELLISENSE */
 
 #if !defined(__KERNEL__) || defined(__INTELLISENSE__)
@@ -1667,6 +1670,11 @@ DEFINE_PUBLIC_ALIAS(unwind_getreg_sfpustate_exclusive, libuw_unwind_getreg_sfpus
 DEFINE_PUBLIC_ALIAS(unwind_setreg_sfpustate_exclusive, libuw_unwind_setreg_sfpustate_exclusive);
 DEFINE_PUBLIC_ALIAS(unwind_getreg_xfpustate_exclusive, libuw_unwind_getreg_xfpustate_exclusive);
 DEFINE_PUBLIC_ALIAS(unwind_setreg_xfpustate_exclusive, libuw_unwind_setreg_xfpustate_exclusive);
+
+#undef IRREGS_NAME
+#undef IRREGS_INDIRECTION
+#undef IRREGS_SELF
+#undef IRREGS_LOADSELF
 
 DECL_END
 

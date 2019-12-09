@@ -210,6 +210,11 @@ NOTHROW(KCALL cpu_enable_preemptive_interrupts_nopr)(void) {
 
 #ifdef __x86_64__
 
+/* TODO: Come up with, and document the register state here. */
+INTDEF void ASMCALL x86_rpc_kernel_redirection(void);
+INTDEF void ASMCALL x86_rpc_kernel_redirection_handler(void);
+
+
 
 /* Modify `state' to insert an asynchronous call to the given RPC function.
  * When that function then returns, the old state will restored.
@@ -559,7 +564,7 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 	return true;
 }
 
-
+#endif /* !__x86_64__ */
 
 /* Personality functions for RPC wrappers. */
 INTERN unsigned int
@@ -585,8 +590,6 @@ NOTHROW(KCALL x86_rpc_kernel_redirection_personality)(struct unwind_fde_struct *
 	}
 	return DWARF_PERSO_CONTINUE_UNWIND;
 }
-
-#endif /* !__x86_64__ */
 
 
 

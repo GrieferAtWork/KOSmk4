@@ -39,6 +39,7 @@
 #include <hybrid/atomic.h>
 
 #include <asm/cpu-cpuid.h>
+#include <asm/cpu-flags.h>
 
 #include <assert.h>
 #include <stdint.h>
@@ -1844,6 +1845,28 @@ NOTHROW(FCALL x86_get_cpu_iob_pointer_p64)(struct cpu *__restrict self) {
 	return e1_pointer;
 }
 
+PRIVATE ATTR_FREERODATA byte_t const
+x86_pagedir_syncall_cr3_text[] = {
+	/* TODO: Re-write this assembly for x86_64! */
+	0x0f, 0x20, 0xd8, /* movl %cr3, %eax             */
+	0x0f, 0x22, 0xd8, /* movl %eax, %cr3             */
+	                  /* --- TLB reload happens here */
+	0xc3              /* ret                         */
+};
+
+PRIVATE ATTR_FREERODATA byte_t const
+x86_pagedir_syncall_cr4_text[] = {
+	/* TODO: Re-write this assembly for x86_64! */
+	0x9c,                            /* pushfl                      */
+	0xfa,                            /* cli                         */
+	0x0f, 0x20, 0xe0,                /* movl   %cr4, %eax           */
+	0x8d, 0x48, ((-CR4_PGE) & 0xff), /* leal   -CR4_PGE(%eax), %ecx */
+	0x0f, 0x22, 0xe1,                /* movl   %ecx, %cr4           */
+	                                 /* --- TLB reload happens here */
+	0x0f, 0x22, 0xe0,                /* movl   %eax, %cr4           */
+	0x9d,                            /* popfl                       */
+	0xc3,                            /* ret                         */
+};
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_paging)(void) {
@@ -1855,6 +1878,29 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 		for (i = 0; i < COMPILER_LENOF(p64_pageperm_matrix); ++i)
 			p64_pageperm_matrix[i] &= ~P64_PAGE_FNOEXEC;
 	}
+
+	/* Check if we must re-write our implementation of `pagedir_syncall()'.
+	 * Currently, it looks like this:
+	 * >> movq   $2, %rax
+	 * >> invpcid (%rax), %rax // The first operand is ignored.
+	 * >> ret */
+	if (!HAVE_PAGE_GLOBAL_BIT) {
+		/* If global TLBs don't exist, we can simply use the mov-to-cr3 trick to flush TLBs */
+		/* Also: Since global TLBs don't exist, we can re-write `x86_pagedir_syncall_maybe_global'
+		 *       to always unconditionally reload cr3 with the same code we already use
+		 *       for `pagedir_syncall' */
+		memcpy((void *)&pagedir_syncall, x86_pagedir_syncall_cr3_text, sizeof(x86_pagedir_syncall_cr3_text));
+		memcpy((void *)&x86_pagedir_syncall_maybe_global, x86_pagedir_syncall_cr3_text, sizeof(x86_pagedir_syncall_cr3_text));
+	} else if (!HAVE_INSTR_INVPCID) {
+		/* From `4.10.4.1     Operations that Invalidate TLBs and Paging-Structure Caches'
+		 *  `MOV to CR4. The behavior of the instruction depends on the bits being modified:'
+		 *   `The instruction invalidates all TLB entries (including global entries) and all entries
+		 *    in all paging-structure caches (for all PCIDs) if ... it changes the value of CR4.PGE ...' */
+		/* In other words: Toggling the PGE bit twice will get rid of all global TLBs */
+		memcpy((void *)&pagedir_syncall, x86_pagedir_syncall_cr4_text, sizeof(x86_pagedir_syncall_cr4_text));
+	}
+
+
 	/* Initialize the `_bootcpu.thiscpu_x86_iobnode_pagedir_identity' pointer. */
 	FORCPU(&_bootcpu, thiscpu_x86_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer_p64(&_bootcpu);
 }

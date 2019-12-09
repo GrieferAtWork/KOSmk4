@@ -47,6 +47,18 @@
 #pragma GCC diagnostic ignored "-Waddress-of-packed-member"
 #endif /* __GNUC__ */
 
+#ifdef __x86_64__
+#define IRREGS_LOADSELF(T) /* nothing */
+#define IRREGS_SELF        self
+#define IRREGS_INDIRECTION *
+#define IRREGS_NAME(x)     x
+#else /* __x86_64__ */
+#define IRREGS_LOADSELF(T) T *self = *pself;
+#define IRREGS_SELF        pself
+#define IRREGS_INDIRECTION **
+#define IRREGS_NAME(x)     x##_p
+#endif /* !__x86_64__ */
+
 DECL_BEGIN
 
 PRIVATE size_t
@@ -1294,11 +1306,11 @@ NOTHROW_NCX(CC libcpu_getreg_irregs)(LIBCPUSTATE_IRREGS_STRUCT_TYPE const *__res
 }
 
 INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_setreg_irregs_p)(LIBCPUSTATE_IRREGS_STRUCT_TYPE **__restrict pself,
-                                       unsigned int regno, void const *__restrict buf, size_t buflen) {
+NOTHROW_NCX(CC IRREGS_NAME(libcpu_setreg_irregs))(LIBCPUSTATE_IRREGS_STRUCT_TYPE IRREGS_INDIRECTION __restrict IRREGS_SELF,
+                                                  unsigned int regno, void const *__restrict buf, size_t buflen) {
 	size_t result;
 	uintptr_t value;
-	LIBCPUSTATE_IRREGS_STRUCT_TYPE *self = *pself;
+	IRREGS_LOADSELF(LIBCPUSTATE_IRREGS_STRUCT_TYPE)
 	switch (regno & X86_REGISTER_SIZEMASK) {
 
 	case X86_REGISTER_SIZEMASK_1BYTE:
@@ -1385,7 +1397,8 @@ done:
 }
 
 INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_getreg_icpustate)(struct icpustate const *__restrict self, unsigned int regno,
+NOTHROW_NCX(CC libcpu_getreg_icpustate)(struct icpustate const *__restrict self,
+                                        unsigned int regno,
                                         void *__restrict buf, size_t buflen) {
 	size_t result;
 #ifdef __x86_64__
@@ -1427,11 +1440,13 @@ done:
 }
 
 INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_setreg_icpustate_p)(struct icpustate **__restrict pself, unsigned int regno,
-                                          void const *__restrict buf, size_t buflen) {
+NOTHROW_NCX(CC IRREGS_NAME(libcpu_setreg_icpustate))(struct icpustate IRREGS_INDIRECTION __restrict IRREGS_SELF,
+                                                     unsigned int regno,
+                                                     void const *__restrict buf,
+                                                     size_t buflen) {
 	size_t result;
 	uintptr_t value;
-	struct icpustate *self = *pself;
+	IRREGS_LOADSELF(struct icpustate)
 	switch (regno & X86_REGISTER_SIZEMASK) {
 
 	case X86_REGISTER_SIZEMASK_1BYTE:
@@ -1473,7 +1488,11 @@ NOTHROW_NCX(CC libcpu_setreg_icpustate_p)(struct icpustate **__restrict pself, u
 	case (X86_REGISTER_SEGMENT_CS & ~X86_REGISTER_SIZEMASK): icpustate_setcs(self, value); break;
 	case (X86_REGISTER_MISC_PFLAGS & ~X86_REGISTER_SIZEMASK): icpustate_setpflags(self, value); break;
 	case (X86_REGISTER_GENERAL_PURPOSE_PSP & ~X86_REGISTER_SIZEMASK):
+#ifdef __x86_64__
+		icpustate64_setrsp(self, value);
+#else /* __x86_64__ */
 		*pself = icpustate_setsp_p(self, value);
+#endif /* !__x86_64__ */
 		break;
 	case (X86_REGISTER_SEGMENT_SS & ~X86_REGISTER_SIZEMASK):
 		if (!icpustate_trysetss(self, value))
@@ -1557,11 +1576,13 @@ done:
 }
 
 INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_setreg_scpustate_p)(struct scpustate **__restrict pself, unsigned int regno,
-                                          void const *__restrict buf, size_t buflen) {
+NOTHROW_NCX(CC IRREGS_NAME(libcpu_setreg_scpustate))(struct scpustate IRREGS_INDIRECTION __restrict IRREGS_SELF,
+                                                     unsigned int regno,
+                                                     void const *__restrict buf,
+                                                     size_t buflen) {
 	size_t result;
 	uintptr_t value;
-	struct scpustate *self = *pself;
+	IRREGS_LOADSELF(struct scpustate)
 	switch (regno & X86_REGISTER_SIZEMASK) {
 
 	case X86_REGISTER_SIZEMASK_1BYTE:
@@ -1603,7 +1624,11 @@ NOTHROW_NCX(CC libcpu_setreg_scpustate_p)(struct scpustate **__restrict pself, u
 	case (X86_REGISTER_SEGMENT_CS & ~X86_REGISTER_SIZEMASK): scpustate_setcs(self, value); break;
 	case (X86_REGISTER_MISC_PFLAGS & ~X86_REGISTER_SIZEMASK): scpustate_setpflags(self, value); break;
 	case (X86_REGISTER_GENERAL_PURPOSE_PSP & ~X86_REGISTER_SIZEMASK):
+#ifdef __x86_64__
+		scpustate64_setrsp(self, value);
+#else /* __x86_64__ */
 		*pself = scpustate_setsp_p(self, value);
+#endif /* !__x86_64__ */
 		break;
 	case (X86_REGISTER_SEGMENT_SS & ~X86_REGISTER_SIZEMASK):
 		if (!scpustate_trysetss(self, value))
@@ -1672,19 +1697,25 @@ DEFINE_PUBLIC_ALIAS(setreg_gpregsnsp, libcpu_setreg_gpregsnsp);
 DEFINE_PUBLIC_ALIAS(getreg_sgbase, libcpu_getreg_sgbase);
 DEFINE_PUBLIC_ALIAS(setreg_sgbase, libcpu_setreg_sgbase);
 #endif /* __x86_64__ */
-#ifndef __KERNEL__
+#if !defined(__KERNEL__) || defined(__INTELLISENSE__)
 DEFINE_PUBLIC_ALIAS(getreg_mcontext, libcpu_getreg_mcontext);
 DEFINE_PUBLIC_ALIAS(setreg_mcontext, libcpu_setreg_mcontext);
 DEFINE_PUBLIC_ALIAS(getreg_ucontext, libcpu_getreg_ucontext);
 DEFINE_PUBLIC_ALIAS(setreg_ucontext, libcpu_setreg_ucontext);
-#else /* !__KERNEL__ */
+#endif /* !__KERNEL__ || __INTELLISENSE__ */
+#if defined(__KERNEL__) || defined(__INTELLISENSE__)
 DEFINE_PUBLIC_ALIAS(getreg_irregs, libcpu_getreg_irregs);
-DEFINE_PUBLIC_ALIAS(setreg_irregs_p, libcpu_setreg_irregs_p);
+DEFINE_PUBLIC_ALIAS(IRREGS_NAME(setreg_irregs), IRREGS_NAME(libcpu_setreg_irregs));
 DEFINE_PUBLIC_ALIAS(getreg_icpustate, libcpu_getreg_icpustate);
-DEFINE_PUBLIC_ALIAS(setreg_icpustate_p, libcpu_setreg_icpustate_p);
+DEFINE_PUBLIC_ALIAS(IRREGS_NAME(setreg_icpustate), IRREGS_NAME(libcpu_setreg_icpustate));
 DEFINE_PUBLIC_ALIAS(getreg_scpustate, libcpu_getreg_scpustate);
-DEFINE_PUBLIC_ALIAS(setreg_scpustate_p, libcpu_setreg_scpustate_p);
-#endif /* __KERNEL__ */
+DEFINE_PUBLIC_ALIAS(IRREGS_NAME(setreg_scpustate), IRREGS_NAME(libcpu_setreg_scpustate));
+#endif /* __KERNEL__ || __INTELLISENSE__ */
+
+#undef IRREGS_NAME
+#undef IRREGS_INDIRECTION
+#undef IRREGS_SELF
+#undef IRREGS_LOADSELF
 
 DECL_END
 

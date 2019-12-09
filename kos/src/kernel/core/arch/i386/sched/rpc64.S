@@ -177,6 +177,7 @@ END(x86_rpc_user_redirection)
 	.cfi_personality 0, x86_rpc_kernel_redirection_personality
 	nop /* Required to allow for detection during unwinding. */
 INTERN_FUNCTION(x86_rpc_kernel_redirection)
+	/* TODO: Come up with, and document the register state here. */
 	call kernel_panic_here /* TODO */
 END(x86_rpc_kernel_redirection)
 .cfi_endproc
@@ -187,32 +188,12 @@ INTERN_FUNCTION(x86_rpc_kernel_redirection_handler)
 	.cfi_startproc simple
 	.cfi_signal_frame
 	/* TODO: .cfi_* */
+	/* TODO: Come up with, and document the register state here. */
 	call kernel_panic_here /* TODO */
 END(x86_rpc_kernel_redirection_handler)
 .cfi_endproc
 
 
-
-.section .text
-	.cfi_startproc simple
-	.cfi_signal_frame
-	/* TODO: .cfi_* */
-	EXTERN(x86_srpc_kernel_redirection_personality)
-	.cfi_personality 0, x86_srpc_kernel_redirection_personality
-	nop /* Required to allow for detection during unwinding. */
-INTERN_FUNCTION(x86_srpc_kernel_redirection)
-	call kernel_panic_here /* TODO */
-END(x86_srpc_kernel_redirection)
-.cfi_endproc
-
-.section .text
-INTERN_FUNCTION(x86_srpc_kernel_redirection_handler)
-	.cfi_startproc simple
-	.cfi_signal_frame
-	/* TODO: .cfi_* */
-	call kernel_panic_here /* TODO */
-END(x86_srpc_kernel_redirection_handler)
-.cfi_endproc
 
 
 

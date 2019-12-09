@@ -28,6 +28,8 @@
 #include <kernel/user.h>
 #include <sched/except-handler.h>
 
+#include <hybrid/host.h>
+
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
@@ -215,6 +217,49 @@ err:
 }
 
 
+
+#ifdef __x86_64__
+/* The personality function used to handle exceptions propagated through
+ * system calls. - Specifically, the special handling that is required for
+ * servicing an RPC as `rpc_serve_user_redirection_all' */
+INTERN unsigned int
+NOTHROW(KCALL x86_syscall_personality_asm64_syscall)(struct unwind_fde_struct *__restrict fde,
+                                                     struct kcpustate *__restrict state,
+                                                     byte_t *__restrict lsda) {
+	struct ucpustate ustate;
+	unsigned int error;
+	struct rpc_syscall_info info;
+	kcpustate_to_ucpustate(state, &ustate);
+	{
+		unwind_cfa_sigframe_state_t cfa;
+		void *pc = (void *)(ucpustate_getpc(&ustate) - 1);
+		error = unwind_fde_sigframe_exec(fde, &cfa, pc);
+		if unlikely(error != UNWIND_SUCCESS)
+			goto err;
+		error = unwind_cfa_sigframe_apply(&cfa, fde, pc,
+		                                  &unwind_getreg_kcpustate, state,
+		                                  &unwind_setreg_ucpustate, &ustate);
+		if unlikely(error != UNWIND_SUCCESS)
+			goto err;
+	}
+	/* Check if the return state actually points into user-space,
+	 * or alternatively: indicates a user-space redirection. */
+	if (ucpustate_iskernel(&ustate) &&
+	    ucpustate_getpc(&ustate) != (uintptr_t)&x86_rpc_user_redirection)
+		return DWARF_PERSO_ABORT_SEARCH;
+	/* System calls encode their vector number as the LSDA pointer, so that
+	 * when unwinding we can reverse-engineer that number in order to decide
+	 * on special actions to perform based on the called function, as well as
+	 * inform user-space of which function caused the exception, as well as
+	 * implement system call restarting. */
+	gpregs_setpax(&ustate.ucs_gpregs, (uintptr_t)lsda);
+	scinfo_get32_int80h(&info, &ustate);
+	x86_userexcept_unwind(&ustate, &info);
+err:
+	halt_unhandled_exception(error, state);
+	return DWARF_PERSO_ABORT_SEARCH;
+}
+#endif /* __x86_64__ */
 
 DECL_END
 

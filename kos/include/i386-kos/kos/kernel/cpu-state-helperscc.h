@@ -37,7 +37,7 @@
 #include "cpu-state32.h"
 #include "cpu-state64.h"
 
-
+#ifndef __CPUSTATE_GET_USER_FSBASE
 #ifdef __KERNEL__
 #include <kernel/gdt.h>
 #define __CPUSTATE_GET_USER_FSBASE() get_user_fsbase()
@@ -46,6 +46,7 @@
 #define __CPUSTATE_GET_USER_FSBASE() ((__uintptr_t)__rdfsbase())
 #define __CPUSTATE_GET_USER_GSBASE() ((__uintptr_t)__rdgsbase())
 #endif /* !__KERNEL__ */
+#endif /* !__CPUSTATE_GET_USER_FSBASE */
 
 
 #if defined(__CC__) || defined(__DEEMON__)

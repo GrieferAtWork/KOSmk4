@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGING32_S
-#define GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGING32_S 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGING64_S
+#define GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGING64_S 1
 
 #include <kernel/compiler.h>
 
@@ -44,8 +44,8 @@
 /* FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncall)(void); */
 PUBLIC_FUNCTION(pagedir_syncall)
 	.cfi_startproc
-	movl   $(2), %eax
-	invpcid 1f, %eax
+	movq   $(2), %rax
+	invpcid 1f, %rax
 	ret
 1:	.long 0x00000000, 0x00000000
 	PAD_FOR(pagedir_syncall, RELOAD_WITH_CR3_TEXTSIZE)
@@ -59,49 +59,36 @@ END(pagedir_syncall)
 /* FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_syncall_maybe_global)(VIRT vm_virt_t virt_addr, size_t num_pages); */
 PUBLIC_FUNCTION(x86_pagedir_syncall_maybe_global)
 	.cfi_startproc
-	shll   $(12), %edx
-	addl   %edx, %ecx
+	shlq   $(12), %rsi
+	addq   %rsi, %rdi
 	jo8    pagedir_syncall /* sync up until, or past the end of the address space. */
-	cmpl   $(KERNEL_BASE), %ecx
-	ja8    pagedir_syncall
+	cmpq   $(0), %rdi
+	jl8    pagedir_syncall
 	/* Only invalidate user-space. */
-	movl   %cr3, %eax
-	movl   %eax, %cr3
+	movq   %cr3, %rax
+	movq   %rax, %cr3
 	ret
 	PAD_FOR(x86_pagedir_syncall_maybe_global, RELOAD_WITH_CR3_TEXTSIZE)
 	.cfi_endproc
 END(x86_pagedir_syncall_maybe_global)
 
 
-/* X86-specific implementation for invalidating the TLB of a single page. */
-/* FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_syncone)(VIRT vm_virt_t virt_addr); */
-PUBLIC_FUNCTION(x86_pagedir_syncone)
-	.cfi_startproc
-	invlpg (%ecx)
-	ret
-	PAD_FOR(x86_pagedir_syncone, RELOAD_WITH_CR3_TEXTSIZE)
-	PAD_FOR(x86_pagedir_syncone, RELOAD_WITH_CR4_TEXTSIZE)
-	.cfi_endproc
-END(x86_pagedir_syncone)
-
 
 /* X86-specific implementation for invalidating every TLB over a given range. */
 /* FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_sync)(VIRT vm_virt_t virt_addr, size_t num_pages); */
 PUBLIC_FUNCTION(x86_pagedir_sync)
 	.cfi_startproc
-	cmpl   $(CONFIG_PAGEDIR_LARGESYNC_THRESHOLD), %edx
+	cmpq   $(CONFIG_PAGEDIR_LARGESYNC_THRESHOLD), %rsi
 	jae8   x86_pagedir_syncall_maybe_global
-	movl   %ecx, %eax
-	movl   %edx, %ecx
-	testl  %ecx, %ecx
+	movq   %rdi, %rax
+	movq   %rsi, %rdi
+	testq  %rdi, %rdi
 	jz8    2f
-1:	invlpg (%eax)
-	addl   $(4096), %eax
+1:	invlpg (%rax)
+	addq   $(4096), %rax
 	loop   1b
 2:	ret
-	PAD_FOR(x86_pagedir_sync, RELOAD_WITH_CR3_TEXTSIZE)
-	PAD_FOR(x86_pagedir_sync, RELOAD_WITH_CR4_TEXTSIZE)
 	.cfi_endproc
 END(x86_pagedir_sync)
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGING32_S */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGING64_S */

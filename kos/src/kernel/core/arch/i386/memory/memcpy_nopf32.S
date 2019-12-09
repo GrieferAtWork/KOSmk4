@@ -16,7 +16,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_MEMORY_MEMCPY_NOPF32_S
+#define GUARD_KERNEL_CORE_ARCH_I386_MEMORY_MEMCPY_NOPF32_S 1
+
 #include <kernel/compiler.h>
+
 #include <asm/cfi.h>
 
 
@@ -62,4 +66,4 @@ END(x86_memcpy_nopf_ret_pointer)
 END(x86_memcpy_nopf)
 
 
-
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MEMORY_MEMCPY_NOPF32_S */

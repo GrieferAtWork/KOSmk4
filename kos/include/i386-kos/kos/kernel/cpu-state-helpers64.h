@@ -35,6 +35,17 @@
 #include <sched/arch/task.h>
 #endif /* __KERNEL__ && __x86_64__ */
 
+#ifndef __CPUSTATE_GET_USER_FSBASE
+#ifdef __KERNEL__
+#include <kernel/gdt.h>
+#define __CPUSTATE_GET_USER_FSBASE() get_user_fsbase()
+#define __CPUSTATE_GET_USER_GSBASE() get_user_gsbase()
+#else /* __KERNEL__ */
+#define __CPUSTATE_GET_USER_FSBASE() ((__uintptr_t)__rdfsbase())
+#define __CPUSTATE_GET_USER_GSBASE() ((__uintptr_t)__rdgsbase())
+#endif /* !__KERNEL__ */
+#endif /* !__CPUSTATE_GET_USER_FSBASE */
+
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -270,8 +281,8 @@ __LOCAL __NOBLOCK void
 __NOTHROW_NCX(lcpustate64_to_ucpustate64)(struct lcpustate64 const *__restrict __self,
                                           struct ucpustate64 *__restrict __result) {
 	lcpustate64_to_ucpustate64_ex(__self, __result,
-	                              (__u64)__rdfsbase(),
-	                              (__u64)__rdgsbase(),
+	                              (__u64)__CPUSTATE_GET_USER_FSBASE(),
+	                              (__u64)__CPUSTATE_GET_USER_GSBASE(),
 	                              0, 0, 0, 0, 0, 0, 0, 0, 0,
 	                              __rdgs(), __rdfs(), __rdes(), __rdds(),
 	                              SEGMENT_CURRENT_CODE_RPL,
@@ -337,8 +348,8 @@ __LOCAL __NOBLOCK void
 __NOTHROW_NCX(kcpustate64_to_ucpustate64)(struct kcpustate64 const *__restrict __self,
                                           struct ucpustate64 *__restrict __result) {
 	kcpustate64_to_ucpustate64_ex(__self, __result,
-	                              (__u64)__rdfsbase(),
-	                              (__u64)__rdgsbase(),
+	                              (__u64)__CPUSTATE_GET_USER_FSBASE(),
+	                              (__u64)__CPUSTATE_GET_USER_GSBASE(),
 	                              __rdgs(),
 #if defined(__KERNEL__) && !defined(__x86_64__)
 	                              SEGMENT_KERNEL_FSBASE,
@@ -402,8 +413,8 @@ __LOCAL __NOBLOCK __ATTR_RETNONNULL struct scpustate64 *
 __NOTHROW_NCX(kcpustate64_to_scpustate64_p)(struct kcpustate64 const *__restrict __self,
                                             void *__restrict __kernel_rsp) {
 	return kcpustate64_to_scpustate64_p_ex(__self, __kernel_rsp,
-	                                       (__u64)__rdfsbase(),
-	                                       (__u64)__rdgsbase(),
+	                                       (__u64)__CPUSTATE_GET_USER_FSBASE(),
+	                                       (__u64)__CPUSTATE_GET_USER_GSBASE(),
 	                                       __rdgs(),
 #if defined(__KERNEL__) && !defined(__x86_64__)
 	                                       SEGMENT_KERNEL_FSBASE,
@@ -492,8 +503,12 @@ __LOCAL __NOBLOCK void
 __NOTHROW_NCX(icpustate64_to_ucpustate64)(struct icpustate64 const *__restrict __self,
                                           struct ucpustate64 *__restrict __result) {
 	icpustate64_to_ucpustate64_ex(__self, __result,
-	                              (__u64)__rdgsbase(), (__u64)__rdfsbase(),
-	                              __rdgs(), __rdfs(), __rdes(), __rdds());
+	                              (__u64)__CPUSTATE_GET_USER_FSBASE(),
+	                              (__u64)__CPUSTATE_GET_USER_GSBASE(),
+	                              __rdgs(),
+	                              __rdfs(),
+	                              __rdes(),
+	                              __rdds());
 }
 #define icpustate64_user_to_ucpustate64_ex icpustate64_to_ucpustate64_ex
 #define icpustate64_user_to_ucpustate64    icpustate64_to_ucpustate64
@@ -546,8 +561,12 @@ __LOCAL __NOBLOCK __ATTR_RETNONNULL struct scpustate64 *
 __NOTHROW_NCX(icpustate64_to_scpustate64_p)(struct icpustate64 const *__restrict __self,
                                             void *__restrict __kernel_rsp) {
 	return icpustate64_to_scpustate64_p_ex(__self, __kernel_rsp,
-	                                       (__u64)__rdgsbase(), (__u64)__rdfsbase(),
-	                                       __rdgs(), __rdfs(), __rdes(), __rdds());
+	                                       (__u64)__CPUSTATE_GET_USER_FSBASE(),
+	                                       (__u64)__CPUSTATE_GET_USER_GSBASE(),
+	                                       __rdgs(),
+	                                       __rdfs(),
+	                                       __rdes(),
+	                                       __rdds());
 }
 #define icpustate64_user_to_scpustate64_p_ex icpustate64_to_scpustate64_p_ex
 #define icpustate64_user_to_scpustate64_p    icpustate64_to_scpustate64_p
@@ -829,8 +848,12 @@ __LOCAL __NOBLOCK void
 __NOTHROW_NCX(fcpustate64_assign_icpustate64)(struct fcpustate64 *__restrict __self,
                                               struct icpustate64 const *__restrict __data) {
 	fcpustate64_assign_icpustate64_ex(__self, __data,
-	                                  (__u64)__rdgsbase(), (__u64)__rdfsbase(),
-	                                  __rdgs(), __rdfs(), __rdes(), __rdds());
+	                                  (__u64)__CPUSTATE_GET_USER_FSBASE(),
+	                                  (__u64)__CPUSTATE_GET_USER_GSBASE(),
+	                                  __rdgs(),
+	                                  __rdfs(),
+	                                  __rdes(),
+	                                  __rdds());
 }
 __LOCAL __NOBLOCK __ATTR_RETNONNULL struct icpustate64 *
 __NOTHROW_NCX(fcpustate64_to_icpustate64_p)(struct fcpustate64 const *__restrict __self,
