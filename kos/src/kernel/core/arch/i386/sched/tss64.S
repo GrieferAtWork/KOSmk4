@@ -16,11 +16,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_SCHED_TSS64_S
+#define GUARD_KERNEL_CORE_ARCH_I386_SCHED_TSS64_S 1
+
 #include <kernel/compiler.h>
 
 #include <kos/kernel/gdt.h>
 #include <kos/kernel/paging.h>
-
 
 .section .data.percpu.tss
 INTERN_OBJECT(__kernel_percpu_tss)
@@ -45,3 +47,5 @@ INTERN_OBJECT(__kernel_percpu_tss)
 	EXTERN(__x86_cputss_iob_offset)
 	/* u16   t_iomap; */ .word __x86_cputss_iob_offset
 END(__kernel_percpu_tss)
+
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_TSS64_S */

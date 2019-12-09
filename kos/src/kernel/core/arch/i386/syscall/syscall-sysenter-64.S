@@ -16,6 +16,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_SYSCALL_SYSENTER_64_S
+#define GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_SYSCALL_SYSENTER_64_S 1
+
 #include <hybrid/compiler.h>
 
 #include <kernel/except.h>
@@ -354,4 +357,4 @@ INTERN_FUNCTION(__x86_asm32_sysenter_break)
 	.cfi_endproc
 END(__x86_asm32_sysenter_break)
 
-
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_SYSCALL_SYSENTER_64_S */

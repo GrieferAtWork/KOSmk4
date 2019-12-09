@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_FASTPASS32_S
+#define GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_FASTPASS32_S 1
 
 #include <hybrid/compiler.h>
 #include <kernel/syscall.h>
@@ -36,5 +38,4 @@
 #include "fastpass32-impl.S.inl"
 #endif
 
-
-
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_FASTPASS32_S */

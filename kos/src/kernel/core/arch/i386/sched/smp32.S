@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_SCHED_SMP32_S
+#define GUARD_KERNEL_CORE_ARCH_I386_SCHED_SMP32_S 1
 #define _KOS_KERNEL_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -828,3 +830,4 @@ END(cpu_enter_deepsleep)
 
 #endif /* !CONFIG_NO_SMP */
 
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_SMP32_S */

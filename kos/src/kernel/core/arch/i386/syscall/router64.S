@@ -16,10 +16,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_ROUTER64_S
+#define GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_ROUTER64_S 1
 
 #include <kernel/compiler.h>
-#include <hybrid/host.h>
 
+#include <hybrid/host.h>
 
 /* Include the 32-bit router for compatibility mode. */
 #include "router32.S"
@@ -47,5 +49,4 @@ EXTERN(sys_break)
 	END(x86_sysroute##table_id##_c)
 #include "../../../../../../include/i386-kos/asm/ls-syscalls64.h"
 
-
-
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_ROUTER64_S */

@@ -16,6 +16,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_EMULATE64_S
+#define GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_EMULATE64_S 1
+
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
@@ -233,4 +236,4 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_end):
 	.cfi_endproc
 END(syscall_emulate_r)
 
-
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_EMULATE64_S */

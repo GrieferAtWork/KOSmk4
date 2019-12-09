@@ -16,8 +16,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_ROUTER32_S
+#define GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_ROUTER32_S 1
 
 #include <kernel/compiler.h>
+
 #include <hybrid/host.h>
 
 #ifdef __x86_64__
@@ -71,3 +74,4 @@ EXTERN(sys_break)
 #endif /* !__x86_64__ */
 #include "../../../../../../include/i386-kos/asm/ls-syscalls32.h"
 
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_ROUTER32_S */

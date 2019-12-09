@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc67dab3d */
+/* HASH CRC-32:0x384c89f5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_WRAPPERS64_S
+#define GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_WRAPPERS64_S 1
+
 #include <kernel/compiler.h>
 
 #include <asm/cfi.h>
@@ -29986,3 +29989,5 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_recvmmsg64)
 
+
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_WRAPPERS64_S */

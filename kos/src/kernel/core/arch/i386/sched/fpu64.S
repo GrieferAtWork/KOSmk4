@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_SCHED_FPU64_S
+#define GUARD_KERNEL_CORE_ARCH_I386_SCHED_FPU64_S 1
 
 #include <kernel/compiler.h>
 
@@ -269,25 +271,4 @@ END(x86_fxrstor_section_loadxmm)
 	.cfi_endproc
 END(x86_fxrstor)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_FPU64_S */

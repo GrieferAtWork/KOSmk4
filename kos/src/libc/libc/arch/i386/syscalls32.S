@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ef5715 */
+/* HASH CRC-32:0x6c9fbdbf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBC_LIBC_ARCH_I386_SYSCALLS32_S
+#define GUARD_LIBC_LIBC_ARCH_I386_SYSCALLS32_S 1
+
 #include <hybrid/compiler.h>
 
 #include <asm/cfi.h>
@@ -8246,3 +8249,4 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xrecvmmsg64, libc_sys_Xrecvmmsg64)
  * some exception-enabled functions onto system calls. */
 #include "../../syscalls-ammend.S.inl"
 
+#endif /* GUARD_LIBC_LIBC_ARCH_I386_SYSCALLS32_S */

@@ -16,6 +16,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_SYSCALL_LCALL7_32_S
+#define GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_SYSCALL_LCALL7_32_S 1
+
 #include <hybrid/compiler.h>
 
 #include <asm/cfi.h>
@@ -154,5 +157,4 @@ PUBLIC_FUNCTION(x86_syscall32_lcall7_iret)
 END(x86_syscall32_lcall7_iret)
 END(x86_syscall32_lcall7)
 
-
-
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_SYSCALL_LCALL7_32_S */

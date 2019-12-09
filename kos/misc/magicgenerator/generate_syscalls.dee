@@ -2018,7 +2018,13 @@ function generateKernelCoreArchSyscallWrappersAssembly(
 		fp: File, context: ParserContext, arch/*: SyscallArch*/,
 		ARCH: {string: Object/*SyscallArch*/},
 		archContexts: {string: ParserContext}) {
+	local guard = arch
+		.formatPath("GUARD_KERNEL_CORE_ARCH_{arch}_SYSCALL_WRAPPERS{suffix}_S")
+		.upper();
 	fp << copyright << "\n";
+	fp << "#ifndef " << guard << "\n";
+	fp << "#define " << guard << " 1\n";
+	fp << "\n";
 	fp << "#include <kernel/compiler.h>\n";
 	fp << "\n";
 	arch.platformKernelSyscallWrappersCommon(fp);
@@ -2039,12 +2045,20 @@ function generateKernelCoreArchSyscallWrappersAssembly(
 			fp << "\n";
 		}
 	}
+	fp << "\n";
+	fp << "#endif /* !" << guard << " */\n";
 }
 
 @@Generate src/libc/libc/arch/{name}/syscalls{suffix}.S
 function generateLibcArchSyscallAssembly(
 		fp: File, context: ParserContext, arch/*: SyscallArch*/) {
+	local guard = arch
+		.formatPath("GUARD_LIBC_LIBC_ARCH_{arch}_SYSCALLS{suffix}_S")
+		.upper();
 	fp << copyright << "\n";
+	fp << "#ifndef " << guard << "\n";
+	fp << "#define " << guard << " 1\n";
+	fp << "\n";
 	fp << "#include <hybrid/compiler.h>\n";
 	fp << "\n";
 	arch.platformLibcSyscallCommon(fp);
@@ -2075,6 +2089,7 @@ function generateLibcArchSyscallAssembly(
 	fp << " * some exception-enabled functions onto system calls. */\n";
 	fp << "#include \"../../syscalls-ammend.S.inl\"\n";
 	fp << "\n";
+	fp << "#endif /* " << guard << " */\n";
 }
 
 function generateSyscallCompatibilityHeader(
