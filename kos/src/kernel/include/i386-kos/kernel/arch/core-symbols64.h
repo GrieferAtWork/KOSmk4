@@ -774,10 +774,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak directory_readnext_p; .quad directory_readnext_p
 	.reloc ., R_X86_64_SIZE32, directory_readnext_p; .int 0
 	.int 0x431e0c0
-	.quad 0 /* index: 193 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname193 /* index: 193 */
+	.weak thiscpu_idle_x86_kernel_psp0; .quad thiscpu_idle_x86_kernel_psp0
+	.reloc ., R_X86_64_SIZE32, thiscpu_idle_x86_kernel_psp0; .int 0
+	.int 0xd0cc020
 	.quad .Lname194 /* index: 194 */
 	.weak kmalloc_noslab; .quad kmalloc_noslab
 	.reloc ., R_X86_64_SIZE32, kmalloc_noslab; .int 0
@@ -15878,10 +15878,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad .Lname3969 /* index: 3969 */
-	.weak this_idle_x86_kernel_psp0; .quad this_idle_x86_kernel_psp0
-	.reloc ., R_X86_64_SIZE32, this_idle_x86_kernel_psp0; .int 0
-	.int 0x19c4d40
+	.quad 0 /* index: 3969 */
+	.quad 0
+	.int 0
+	.int 0
 	.quad .Lname3970 /* index: 3970 */
 	.weak sys32_get_exception_handler; .quad sys32_get_exception_handler
 	.reloc ., R_X86_64_SIZE32, sys32_get_exception_handler; .int 0
@@ -16666,6 +16666,8 @@ END(kernel_symbol_table)
 	.string "vm_datapart_read_unsafe"
 .Lname192:
 	.string "directory_readnext_p"
+.Lname193:
+	.string "thiscpu_idle_x86_kernel_psp0"
 .Lname194:
 	.string "kmalloc_noslab"
 .Lname195:
@@ -21858,8 +21860,6 @@ END(kernel_symbol_table)
 	.string "sys_shmat"
 .Lname3967:
 	.string "vfs_clone"
-.Lname3969:
-	.string "this_idle_x86_kernel_psp0"
 .Lname3970:
 	.string "sys32_get_exception_handler"
 .Lname3971:

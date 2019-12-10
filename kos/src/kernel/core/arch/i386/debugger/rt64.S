@@ -62,8 +62,17 @@ PUBLIC_FUNCTION(dbg_exit)
 	EXTERN(dbg_stack)
 	movq   $(dbg_stack + KERNEL_DEBUG_STACKSIZE), %rsp
 
-	/* Load the current thread (needed to get someplace that we can put the IRET tail) */
-	movq   %gs:0, %rbp
+	/* Load the current thread (needed to get someplace that we can put the IRET tail)
+	 * NOTE: This must be done before we call `dbg_fini()', since `thiscpu_idle_x86_kernel_psp0(THIS_CPU)'
+	 *       is one of the fields which was saved and overwritten during debugger initialization.
+	 *       By leaving the debugger, that field once again gets restored and may no longer be
+	 *       initialized in case the debugger was entered early on during booting, or in case
+	 *       the field became corrupt for some reason. */
+	movq   %gs:0, %rbx /* THIS_TASK */
+	EXTERN(this_cpu)
+	movq   this_cpu(%rbx), %rbp
+	EXTERN(thiscpu_idle_x86_kernel_psp0)
+	movq   thiscpu_idle_x86_kernel_psp0(%rbp), %rbp /* thiscpu_idle_x86_kernel_psp0(THIS_CPU) */
 
 	/* Clear the dbg-active flag.
 	 * NOTE: Since this flag is also cleared during `x86_dbg_init()',
@@ -123,7 +132,7 @@ PUBLIC_FUNCTION(dbg_exit)
 	movw   (x86_dbg_exitstate + OFFSET_FCPUSTATE_ES), %es
 
 	/* Restore segment base registers. */
-	wrgsbaseq %rbp /* THIS_TASK */
+	wrgsbaseq %rbx /* THIS_TASK */
 	movq   (x86_dbg_exitstate + OFFSET_FCPUSTATE_SGBASE + OFFSET_SGBASE_FSBASE), %rax
 	wrfsbaseq %rax
 	wrkgsbaseq (x86_dbg_exitstate + OFFSET_FCPUSTATE_SGBASE + OFFSET_SGBASE_GSBASE)
@@ -139,18 +148,15 @@ PUBLIC_FUNCTION(dbg_exit)
 	movq   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_R8),  %r8
 	movq   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RDI), %rdi
 	movq   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RSI), %rsi
-	movq   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RBX), %rbx
 	movq   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RDX), %rdx
+	movq   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RBX), %rbx
 	movq   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RCX), %rcx
 	movq   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RAX), %rax
 
 	/* Load the end of the current cpu's IDLE thread's stack
-	 * to (ab-)use as temporary storage for an IRET tail. */
-	EXTERN(this_cpu)
-	movq   this_cpu(%rbp), %rbp
-	EXTERN(this_idle_x86_kernel_psp0)
-	movq   this_idle_x86_kernel_psp0(%rbp), %rsp
-	subq   $(KERNEL_IDLE_STACKSIZE - SIZEOF_IRREGS), %rsp
+	 * to (ab-)use as temporary storage for an IRET tail.
+	 * NOTE: The stack location we had already loaded above! */
+	leaq   -(KERNEL_IDLE_STACKSIZE - SIZEOF_IRREGS)(%rbp), %rsp
 	movq   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RBP), %rbp
 
 	/* Push an IRET tail onto the stack. */

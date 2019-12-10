@@ -538,7 +538,7 @@ SECTIONS {
 	PROVIDE_HIDDEN(__x86_kernel_ld_elf_startpage = ABSOLUTE(kernel_ld_elf) / PAGESIZE);
 	PROVIDE_HIDDEN(__x86_kernel_ld_elf_numpages  = ABSOLUTE(__x86_kernel_ld_elf_size) / PAGESIZE);
 	PROVIDE(this_idle_sched_state = ABSOLUTE(ABSOLUTE(thiscpu_idle) + ABSOLUTE(this_sched_state)));
-	PROVIDE(this_idle_x86_kernel_psp0 = ABSOLUTE(ABSOLUTE(thiscpu_idle) + ABSOLUTE(this_x86_kernel_psp0)));
+	PROVIDE(thiscpu_idle_x86_kernel_psp0 = ABSOLUTE(ABSOLUTE(thiscpu_idle) + ABSOLUTE(this_x86_kernel_psp0)));
 
 	PROVIDE_HIDDEN(x86_dbg_cpu_temporary_b0 = (ABSOLUTE(dbg_cpu_temporary) & 0x000000ff) >> 0);
 	PROVIDE_HIDDEN(x86_dbg_cpu_temporary_b1 = (ABSOLUTE(dbg_cpu_temporary) & 0x0000ff00) >> 8);

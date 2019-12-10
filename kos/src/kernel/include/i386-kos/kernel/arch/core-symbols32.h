@@ -774,10 +774,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak directory_readnext_p; .long directory_readnext_p
 	.reloc ., R_386_SIZE32, directory_readnext_p; .long 0
 	.long 0x431e0c0
-	.long 0 /* index: 193 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname193 /* index: 193 */
+	.weak thiscpu_idle_x86_kernel_psp0; .long thiscpu_idle_x86_kernel_psp0
+	.reloc ., R_386_SIZE32, thiscpu_idle_x86_kernel_psp0; .long 0
+	.long 0xd0cc020
 	.long .Lname194 /* index: 194 */
 	.weak kmalloc_noslab; .long kmalloc_noslab
 	.reloc ., R_386_SIZE32, kmalloc_noslab; .long 0
@@ -15878,10 +15878,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname3969 /* index: 3969 */
-	.weak this_idle_x86_kernel_psp0; .long this_idle_x86_kernel_psp0
-	.reloc ., R_386_SIZE32, this_idle_x86_kernel_psp0; .long 0
-	.long 0x19c4d40
+	.long 0 /* index: 3969 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 3970 */
 	.long 0
 	.long 0
@@ -16614,6 +16614,8 @@ END(kernel_symbol_table)
 	.string "vm_datapart_read_unsafe"
 .Lname192:
 	.string "directory_readnext_p"
+.Lname193:
+	.string "thiscpu_idle_x86_kernel_psp0"
 .Lname194:
 	.string "kmalloc_noslab"
 .Lname195:
@@ -21098,8 +21100,6 @@ END(kernel_symbol_table)
 	.string "vm_set_aslr_disabled"
 .Lname3967:
 	.string "vfs_clone"
-.Lname3969:
-	.string "this_idle_x86_kernel_psp0"
 .Lname3971:
 	.string "system_clearcaches"
 .Lname3972:

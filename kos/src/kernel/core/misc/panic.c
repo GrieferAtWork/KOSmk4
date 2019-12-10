@@ -326,8 +326,8 @@ panic_assert_chk_dbg_main(void *arg) {
 		uintptr_t acheck_result;
 handle_retry_or_ignore:
 		acheck_result = option == ASSERTION_OPTION_RETRY ? 1 : 0;
-		/* TODO: Make this part arch-independent */
 		dbg_current = THIS_TASK;
+		/* TODO: Make this part arch-independent */
 #ifdef __x86_64__
 		x86_dbg_setregbyidp(DBG_REGLEVEL_TRAP,
 		                    X86_REGISTER_GENERAL_PURPOSE_RAX,

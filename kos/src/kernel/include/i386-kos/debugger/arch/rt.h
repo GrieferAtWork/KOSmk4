@@ -26,15 +26,19 @@
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <kernel/except.h>
 #include <kernel/types.h>
+#include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/rwlock-intern.h>
 #include <sched/signal-intern.h>
+
+#include <hybrid/sequence/list.h>
 
 #include <asm/registers-compat.h>
 #include <asm/registers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
 #include <kos/kernel/segment.h>
+#include <kos/kernel/types.h>
 
 DECL_BEGIN
 
@@ -123,17 +127,33 @@ struct x86_dbg_cpustate {
 	struct x86_dbg_cpuammend *dcs_iammend;  /* [valid_if(dcs_istate)] CPU state ammendment of this CPU. */
 };
 #endif /* !CONFIG_NO_SMP */
+struct x86_dbg_psp0threadstate {
+	uintptr_t               dpts_this_psp0;                                  /* Saved `this_x86_kernel_psp0' */
+	struct vm_datapart     *dpts_this_kernel_stacknode_part;                 /* Saved `this_kernel_stacknode.vn_part' */
+	struct vm_node        **dpts_this_kernel_stacknode_link_pself;           /* Saved `this_kernel_stacknode.vn_link.ln_pself' */
+	LLIST(struct vm_node)   dpts_this_kernel_stackpart_srefs;                /* Saved `this_kernel_stackpart.dp_srefs' */
+	struct vm_ramblock     *dpts_this_kernel_stackpart_ramdata_blockv;       /* Saved `this_kernel_stackpart.dp_ramdata.rd_blockv' */
+	vm_vpage_t              dpts_this_kernel_stacknode_node_vmin;            /* Saved `this_kernel_stacknode.vn_node.a_vmin' */
+	vm_vpage_t              dpts_this_kernel_stacknode_node_vmax;            /* Saved `this_kernel_stacknode.vn_node.a_vmax' */
+	vm_ppage_t              dpts_this_kernel_stackpart_ramdata_block0_start; /* Saved `this_kernel_stackpart.dp_ramdata.rd_block0.rb_start' */
+	vm_dpage_t              dpts_this_kernel_stackpart_tree_vmax;            /* Saved `this_kernel_stackpart.dp_tree.a_vmax' */
+	size_t                  dpts_this_kernel_stackpart_ramdata_block0_size;  /* Saved `this_kernel_stackpart.dp_ramdata.rd_block0.rb_size' */
+};
+struct x86_dbg_psp0state {
+	struct x86_dbg_psp0threadstate dps_thistask; /* Saved psp0 information about `THIS_TASK' */
+	struct x86_dbg_psp0threadstate dps_thisidle; /* Saved psp0 information about `&PERCPU(thiscpu_idle)' */
+};
 struct x86_dbg_hoststate {
-	struct exception_info   dhs_except;    /* Saved exception info. */
-	struct task            *dhs_taskself;  /* Saved `this_task.t_self' */
-	uintptr_t               dhs_taskflags; /* Saved `this_task.t_flags' */
-	uintptr_t               dhs_psp0;      /* Saved `this_x86_kernel_psp0' */
-	struct task            *dhs_override;  /* Saved `THIS_CPU->c_override' */
-	struct read_locks       dhs_readlocks; /* Saved `this_read_locks' */
-	struct task_connections dhs_signals;   /* Saved signal connections. */
-	bool                    dhs_pint;      /* Set to true if preemptive interrupts were enabled. */
+	struct exception_info    dhs_except;    /* Saved exception info. */
+	struct task             *dhs_taskself;  /* Saved `this_task.t_self' */
+	uintptr_t                dhs_taskflags; /* Saved `this_task.t_flags' */
+	struct x86_dbg_psp0state dhs_psp0;      /* Saved `this_x86_kernel_psp0' */
+	struct task             *dhs_override;  /* Saved `THIS_CPU->c_override' */
+	struct read_locks        dhs_readlocks; /* Saved `this_read_locks' */
+	struct task_connections  dhs_signals;   /* Saved signal connections. */
+	bool                     dhs_pint;      /* Set to true if preemptive interrupts were enabled. */
 #ifndef CONFIG_NO_SMP
-	struct x86_dbg_cpustate dhs_cpus[CONFIG_MAX_CPU_COUNT];
+	struct x86_dbg_cpustate  dhs_cpus[CONFIG_MAX_CPU_COUNT];
 #endif /* !CONFIG_NO_SMP */
 };
 

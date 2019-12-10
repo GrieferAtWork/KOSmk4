@@ -120,8 +120,8 @@ PUBLIC_FUNCTION(dbg_exit)
 	/* Check if we're about to return to VM86 */
 	testl  $(EFLAGS_VM), (x86_dbg_exitstate + OFFSET_FCPUSTATE_EFLAGS)
 	jz     1f
-	EXTERN(this_idle_x86_kernel_psp0)
-	movl   this_idle_x86_kernel_psp0(%ebp), %esp
+	EXTERN(thiscpu_idle_x86_kernel_psp0)
+	movl   thiscpu_idle_x86_kernel_psp0(%ebp), %esp
 	subl   $(KERNEL_IDLE_STACKSIZE - SIZEOF_IRREGS_VM86), %esp
 	movl   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EBP), %ebp
 	pushl  (x86_dbg_exitstate + OFFSET_FCPUSTATE_GS)
@@ -144,8 +144,8 @@ PUBLIC_FUNCTION(dbg_exit)
 	/* Check if we're about to return to user-space */
 	testl  $(3), (x86_dbg_exitstate + OFFSET_FCPUSTATE_CS)
 	jz     1f
-	EXTERN(this_idle_x86_kernel_psp0)
-	movl   this_idle_x86_kernel_psp0(%ebp), %esp
+	EXTERN(thiscpu_idle_x86_kernel_psp0)
+	movl   thiscpu_idle_x86_kernel_psp0(%ebp), %esp
 	subl   $(KERNEL_IDLE_STACKSIZE - SIZEOF_IRREGS_USER), %esp
 	pushl  (x86_dbg_exitstate + OFFSET_FCPUSTATE_SS)
 	pushl  (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESP)
