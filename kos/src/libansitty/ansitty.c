@@ -728,13 +728,13 @@ handle_control_character(struct ansitty *__restrict self, char32_t ch) {
 		if (self->at_ttyflag & ANSITTY_FLAG_CRM)
 			PUTUNILAST(0x2418);
 		ansitty_setstate_text(self);
-		break;
+		goto done;
 
 	case CC_ESC:
 		if (self->at_ttyflag & ANSITTY_FLAG_CRM)
 			PUTUNILAST(0x241b);
 		self->at_state = STATE_ESC;
-		break;
+		goto done;
 
 	case 0x01: case 0x02: case 0x03: case 0x04:
 	case 0x06: case 0x11: case 0x12: case 0x13:
