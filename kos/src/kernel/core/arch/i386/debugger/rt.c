@@ -333,6 +333,19 @@ INTDEF void KCALL dbg_reset_tty(void);
 INTDEF void KCALL x86_debug_initialize_ps2_keyboard(void);
 INTDEF void KCALL x86_debug_finalize_ps2_keyboard(void);
 
+/* Flagset of components that could be preserved (used to make the
+ * debugger initialization more robust against recursively entering
+ * itself) (set of `INITOK_*') */
+PRIVATE ATTR_DBGBSS volatile uintptr_t initok = 0;
+#define INITOK_THIS_EXCEPTION_INFO   0x0001
+#define INITOK_TASKSELF              0x0002
+#define INITOK_TASKFLAGS             0x0004
+#define INITOK_PSP0                  0x0008
+#define INITOK_SCHED_OVERRIDE        0x0010
+#define INITOK_READLOCKS             0x0020
+#define INITOK_CONNECTIONS           0x0040
+#define INITOK_PREEMPTIVE_INTERRUPTS 0x0080
+
 
 INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 	struct cpu *mycpu;
@@ -348,22 +361,41 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 	x86_dbg_initialize_segments(mycpu, mythread);
 
 	/* Re-configure the hosting cpu/thread */
-	memcpy(&x86_dbg_hostbackup.dhs_except,
-	       &FORTASK(mythread, this_exception_info),
-	       sizeof(struct exception_info));
-	x86_dbg_hostbackup.dhs_taskself  = mythread->t_self;
-	mythread->t_self                 = mythread;
-	x86_dbg_hostbackup.dhs_taskflags = ATOMIC_FETCHOR(mythread->t_flags, TASK_FKEEPCORE);
-	x86_dbg_hostbackup.dhs_override  = mycpu->c_override;
-	mycpu->c_override                = mythread;
-
-	x86_dbg_hostbackup.dhs_psp0 = FORTASK(mythread, this_x86_kernel_psp0_);
+	if (!(initok & INITOK_THIS_EXCEPTION_INFO)) {
+		memcpy(&x86_dbg_hostbackup.dhs_except,
+		       &FORTASK(mythread, this_exception_info),
+		       sizeof(struct exception_info));
+		initok |= INITOK_THIS_EXCEPTION_INFO;
+	}
+	if (!(initok & INITOK_TASKSELF)) {
+		x86_dbg_hostbackup.dhs_taskself = mythread->t_self;
+		initok |= INITOK_TASKSELF;
+	}
+	mythread->t_self = mythread;
+	if (!(initok & INITOK_TASKFLAGS)) {
+		x86_dbg_hostbackup.dhs_taskflags = ATOMIC_FETCHOR(mythread->t_flags, TASK_FKEEPCORE);
+		initok |= INITOK_TASKFLAGS;
+	} else {
+		ATOMIC_FETCHOR(mythread->t_flags, TASK_FKEEPCORE);
+	}
+	if (!(initok & INITOK_PSP0)) {
+		x86_dbg_hostbackup.dhs_psp0 = FORTASK(mythread, this_x86_kernel_psp0_);
+		initok |= INITOK_PSP0;
+	}
 	init_this_x86_kernel_psp0(mythread);
+	if (!(initok & INITOK_SCHED_OVERRIDE)) {
+		x86_dbg_hostbackup.dhs_override = mycpu->c_override;
+		initok |= INITOK_SCHED_OVERRIDE;
+	}
+	mycpu->c_override = mythread;
 
 	/* Save held read-locks, and re-initialize the per-thread descriptor. */
-	memcpy(&x86_dbg_hostbackup.dhs_readlocks,
-	       &FORTASK(mythread, this_read_locks),
-	       sizeof(struct read_locks));
+	if (!(initok & INITOK_READLOCKS)) {
+		memcpy(&x86_dbg_hostbackup.dhs_readlocks,
+		       &FORTASK(mythread, this_read_locks),
+		       sizeof(struct read_locks));
+		initok |= INITOK_READLOCKS;
+	}
 	pertask_readlocks_init(mythread);
 
 	/* Make sure that the signal connections sub-system is initialized. */
@@ -371,11 +403,26 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 	    FORTASK(mythread, this_connections).tc_signals.ts_thread != mythread)
 		pertask_init_task_connections(mythread);
 	/* Push active connections. */
-	task_pushconnections(&x86_dbg_hostbackup.dhs_signals);
-
-	x86_dbg_hostbackup.dhs_pint = are_preemptive_interrupts_enabled();
-	if (x86_dbg_hostbackup.dhs_pint)
-		cpu_disable_preemptive_interrupts_nopr();
+	if (!(initok & INITOK_CONNECTIONS)) {
+		/* NOTE: Also guard against attempts to re-push the same connection
+		 *       set, as might happen if something after this point goes wrong,
+		 *       and the debugger tries to enter itself, which would lead to
+		 *       an assertion failure in `task_pushconnections()':
+		 *       `Connection <addressof(x86_dbg_hostbackup.dhs_signals)> set was already pushed'
+		 * Technically, this should already be prevented by `initok & INITOK_CONNECTIONS',
+		 * however given that this is all about making this code be robust against broken
+		 * code elsewhere within the kernel, double-checking isn't a problem here! */
+		if (FORTASK(mythread, this_connections).tc_static_v != x86_dbg_hostbackup.dhs_signals.tc_static) {
+			task_pushconnections(&x86_dbg_hostbackup.dhs_signals);
+			initok |= INITOK_CONNECTIONS;
+		}
+	}
+	if (!(initok & INITOK_PREEMPTIVE_INTERRUPTS)) {
+		x86_dbg_hostbackup.dhs_pint = are_preemptive_interrupts_enabled();
+		if (x86_dbg_hostbackup.dhs_pint)
+			cpu_disable_preemptive_interrupts_nopr();
+		initok |= INITOK_PREEMPTIVE_INTERRUPTS;
+	}
 
 	/* Suspend execution on all other CPUs. */
 #ifndef CONFIG_NO_SMP
@@ -494,22 +541,33 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 	}
 #endif /* !CONFIG_NO_SMP */
 
-	/* Load per-thread context information from the hostbackup restore area. */
-	memcpy(&FORTASK(mythread, this_exception_info),
-	       &x86_dbg_hostbackup.dhs_except,
-	       sizeof(struct exception_info));
-	mythread->t_self = x86_dbg_hostbackup.dhs_taskself;
-	if (!(x86_dbg_hostbackup.dhs_taskflags & TASK_FKEEPCORE))
-		ATOMIC_FETCHAND(mythread->t_self, ~TASK_FKEEPCORE);
-	FORTASK(mythread, this_x86_kernel_psp0_) = x86_dbg_hostbackup.dhs_psp0;
-	mycpu->c_override = x86_dbg_hostbackup.dhs_override;
-	memcpy(&FORTASK(mythread, this_read_locks),
-	       &x86_dbg_hostbackup.dhs_readlocks,
-	       sizeof(struct read_locks));
-	task_popconnections(&x86_dbg_hostbackup.dhs_signals);
-
-	if (x86_dbg_hostbackup.dhs_pint)
-		cpu_enable_preemptive_interrupts_nopr();
+	/* Restore per-thread context information from the hostbackup restore area. */
+	if (initok & INITOK_THIS_EXCEPTION_INFO) {
+		memcpy(&FORTASK(mythread, this_exception_info),
+		       &x86_dbg_hostbackup.dhs_except,
+		       sizeof(struct exception_info));
+	}
+	if (initok & INITOK_TASKSELF)
+		mythread->t_self = x86_dbg_hostbackup.dhs_taskself;
+	if (initok & INITOK_TASKFLAGS) {
+		if (!(x86_dbg_hostbackup.dhs_taskflags & TASK_FKEEPCORE))
+			ATOMIC_FETCHAND(mythread->t_self, ~TASK_FKEEPCORE);
+	}
+	if (initok & INITOK_PSP0)
+		FORTASK(mythread, this_x86_kernel_psp0_) = x86_dbg_hostbackup.dhs_psp0;
+	if (initok & INITOK_SCHED_OVERRIDE)
+		mycpu->c_override = x86_dbg_hostbackup.dhs_override;
+	if (initok & INITOK_READLOCKS) {
+		memcpy(&FORTASK(mythread, this_read_locks),
+		       &x86_dbg_hostbackup.dhs_readlocks,
+		       sizeof(struct read_locks));
+	}
+	if (initok & INITOK_CONNECTIONS)
+		task_popconnections(&x86_dbg_hostbackup.dhs_signals);
+	if (initok & INITOK_PREEMPTIVE_INTERRUPTS) {
+		if (x86_dbg_hostbackup.dhs_pint)
+			cpu_enable_preemptive_interrupts_nopr();
+	}
 
 	/* Update the debugger exit state to have `dbg_enter_r()' return
 	 * the updated trap state descriptor pointer. This pointer has to
@@ -519,6 +577,8 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 	 * within the `x86_dbg_trapstate' pointer. */
 	if (x86_dbg_trapstatekind != X86_DBG_STATEKIND_NONE)
 		x86_dbg_exitstate.fcs_gpregs.gp_pax = (uintptr_t)x86_dbg_trapstate;
+
+	initok = 0;
 }
 
 
