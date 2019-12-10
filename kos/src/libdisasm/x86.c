@@ -790,17 +790,24 @@ da_print_modrm_rm(struct disassembler *__restrict self,
 			s32 offset;
 			disasm_print_format(self, DISASSEMBLER_FORMAT_OFFSET_PREFIX);
 			offset = rm->mi_offset;
-			if (offset < 0 && offset != INT32_MIN) {
+			/* Only render small negative offsets as actually being negative.
+			 * Very large offsets are probably absolute pointers, unless a base
+			 * register is given. In that case, always render negative number
+			 * as actually being negative! */
+			if (offset < 0 && (rm->mi_rm != 0xff
+			                   ? offset != INT32_MIN /* Special case for INT32_MIN (always render as being positive) */
+			                   : offset > INT16_MIN)) {
 				if (offset >= INT8_MIN) {
-					disasm_printf(self, "-%#" PRIu32, (u32)-offset);
+					disasm_printf(self, "-%" PRIu32, (u32)-offset);
 				} else {
 					disasm_printf(self, "-%#" PRIx32, (u32)-offset);
 				}
 			} else {
-				if (offset <= INT8_MAX) {
-					disasm_printf(self, "%#" PRIu32, (u32)offset);
+				if ((u32)offset <= INT8_MAX) {
+					disasm_printf(self, "%" PRIu32, (u32)offset);
 				} else {
-					disasm_printf(self, "%#" PRIx32, (u32)offset);
+					disasm_printf(self, "%#" PRIxPTR,
+					              (uintptr_t)(intptr_t)offset);
 				}
 			}
 			disasm_print_format(self, DISASSEMBLER_FORMAT_OFFSET_SUFFIX);
