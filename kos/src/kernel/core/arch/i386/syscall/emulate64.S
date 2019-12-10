@@ -226,7 +226,7 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_end):
 	/* Store the upper 32 bit of the return value in %rdx */
 	movq   %rax, %rdx
 	shrq   $(32), %rdx
-	movq   %rdx, (OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGS_RDX)(%esp)
+	movq   %rdx, (OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGS_RDX)(%rsp)
 1:
 	/* Restore GP registers (except for %eax, which holds the syscall return value) */
 	ASM_POP_GPREGSNSP_NORAX_CFI_R

@@ -62,8 +62,8 @@ PUBLIC_FUNCTION(dbg_exit)
 	EXTERN(dbg_stack)
 	movq   $(dbg_stack + KERNEL_DEBUG_STACKSIZE), %rsp
 
-	/* Load the current CPU (may be needed to get somewhere to put the IRET tail) */
-	movq   %gs:this_cpu, %rbp
+	/* Load the current thread (needed to get someplace that we can put the IRET tail) */
+	movq   %gs:0, %rbp
 
 	/* Clear the dbg-active flag.
 	 * NOTE: Since this flag is also cleared during `x86_dbg_init()',
@@ -144,16 +144,21 @@ PUBLIC_FUNCTION(dbg_exit)
 	movq   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RCX), %rcx
 	movq   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RAX), %rax
 
-	/* Check if we're about to return to user-space */
+	/* Load the end of the current cpu's IDLE thread's stack
+	 * to (ab-)use as temporary storage for an IRET tail. */
+	EXTERN(this_cpu)
+	movq   this_cpu(%rbp), %rbp
 	EXTERN(this_idle_x86_kernel_psp0)
 	movq   this_idle_x86_kernel_psp0(%rbp), %rsp
 	subq   $(KERNEL_IDLE_STACKSIZE - SIZEOF_IRREGS), %rsp
+	movq   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RBP), %rbp
+
+	/* Push an IRET tail onto the stack. */
 	pushq  (x86_dbg_exitstate + OFFSET_FCPUSTATE_SS)
 	pushq  (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RSP)
 	pushq  (x86_dbg_exitstate + OFFSET_FCPUSTATE_RFLAGS)
 	pushq  (x86_dbg_exitstate + OFFSET_FCPUSTATE_CS)
 	pushq  (x86_dbg_exitstate + OFFSET_FCPUSTATE_RIP)
-	movq   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RBP), %rbp
 
 	/* Release the master debugger lock now that all that's missing for us to
 	 * do is to perform an IRET to return to the origin of `x86_dbg_exitstate'. */

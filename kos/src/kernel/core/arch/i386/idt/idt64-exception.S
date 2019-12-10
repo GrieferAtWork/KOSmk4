@@ -30,7 +30,7 @@ IDT_HANDLER_BEGIN
 	.cfi_iret_signal_frame
 #if IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID)
 	.cfi_def_cfa %rsp, 8 /* Adjust for the error code. */
-	popq_cfi -(SIZEOF_GPREGSNSP + 8)(%esp) /* ECODE */
+	popq_cfi -(SIZEOF_GPREGSNSP + 8)(%rsp) /* ECODE */
 #else /* IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */
 	.cfi_def_cfa %rsp, 0
 #endif /* !IDT_CONFIG_PUSHESERRORS(IDT_VECTOR_ID) */

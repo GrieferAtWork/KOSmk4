@@ -138,7 +138,7 @@ INTERN_FUNCTION(libdl_load_lazy_relocation)
 	popq_cfi_r %rax
 	popfq_cfi_r
 
-	xchgq  %rax, (%rsp) /* RESTORE(EAX); 0(%esp) = RESOLVED_ADDRESS */
+	xchgq  %rax, (%rsp) /* RESTORE(EAX); 0(%rsp) = RESOLVED_ADDRESS */
 	.cfi_same_value %rax
 	.cfi_rel_offset %rip, 0
 	ret    $(8)         /* EIP = [ESP]; ESP += (4 + 8);
