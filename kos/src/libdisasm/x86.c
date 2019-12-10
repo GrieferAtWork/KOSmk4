@@ -773,14 +773,16 @@ da_print_modrm_rm(struct disassembler *__restrict self,
 			da_print_reg8(self, rm->mi_rm, flags);
 		}
 	} else {
+		bool has_register;
 		if ((flags & F_SEGMASK) != 0)
 			disasm_print(self, segment_prefix[((flags & F_SEGMASK) >> F_SEGSHIFT) - 1], 4);
-		if (rm->mi_offset) {
+		has_register = rm->mi_rm != 0xff || rm->mi_index != 0xff;
+		if (rm->mi_offset || !has_register) {
 			disasm_print_format(self, DISASSEMBLER_FORMAT_OFFSET_PREFIX);
 			disasm_printf(self, "%#tx", (intptr_t)rm->mi_offset);
 			disasm_print_format(self, DISASSEMBLER_FORMAT_OFFSET_SUFFIX);
 		}
-		if (rm->mi_rm != 0xff || rm->mi_index != 0xff) {
+		if (has_register) {
 			disasm_print(self, "(", 1);
 			if (rm->mi_rm != 0xff) {
 				if (DA86_IS64(self)) {
