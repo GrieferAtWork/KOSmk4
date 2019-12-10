@@ -178,6 +178,8 @@ NOTHROW(KCALL vm_corepair_alloc_impl)(void) {
 		       (vm_corepage_free > 2));
 	}
 	vm_corepage_free -= 2;
+	assert(result.cp_part->dp_flags == VM_DATAPART_FLAG_COREPRT);
+	assert(result.cp_node->vn_flags == VM_NODE_FLAG_COREPRT);
 	return result;
 }
 
@@ -345,6 +347,8 @@ again_tryhard_mapping_target:
 		goto allocate_from_corepage;
 	}
 	sync_endwrite(&vm_corepage_lock);
+	assert(result.cp_part->dp_flags == VM_DATAPART_FLAG_COREPRT);
+	assert(result.cp_node->vn_flags == VM_NODE_FLAG_COREPRT);
 done:
 	return result;
 }

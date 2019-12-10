@@ -51,9 +51,9 @@
 
 #undef TEST_DX_MASK
 #if 1
-#define TEST_DX_MASK(mask) testb $mask, %dl
+#define TEST_DX_MASK(mask) testb $(mask), %dl
 #else
-#define TEST_DX_MASK(mask) testq $mask, %rdx
+#define TEST_DX_MASK(mask) testq $(mask), %rdx
 #endif
 
 
@@ -98,10 +98,10 @@ INTERN_FUNCTION(F(libc_memcpy))
 	jnc    1f /* if (!(n_dwords & 1)) goto 1f; */
 	movsl
 1:
-#else
+#else /* N... */
 	movq   %rdx, %rcx
 	rep    movsq
-#endif
+#endif /* !N... */
 #if RETURN_PCPY
 	movq   %rdi, %rax
 #endif /* RETURN_PCPY */
@@ -168,6 +168,7 @@ INTERN_FUNCTION(F(libc_memset))
 #if !RETURN_PCPY
 	movq   %rdi, %r8
 #endif /* !RETURN_PCPY */
+	movq   %rdx, %rcx
 	shrq   $(2), %rcx
 	rep    stosq
 	jnc    1f /* if (!(n_words & 2)) goto 1f; */
@@ -193,6 +194,7 @@ INTERN_FUNCTION(F(libc_memset))
 #if !RETURN_PCPY
 	movq   %rdi, %r8
 #endif /* !RETURN_PCPY */
+	movq   %rdx, %rcx
 	shrq   $(3), %rcx
 	rep    stosq
 	jnc    1f /* if (!(n_bytes & 4)) goto 1f; */
@@ -209,9 +211,9 @@ INTERN_FUNCTION(F(libc_memset))
 #else /* RETURN_PCPY */
 	movq   %r8, %rax
 #endif /* !RETURN_PCPY */
-#else
+#else /* N... */
 #error "INVALID N"
-#endif
+#endif /* !N... */
 	ret
 	.cfi_endproc
 #if RETURN_PCPY

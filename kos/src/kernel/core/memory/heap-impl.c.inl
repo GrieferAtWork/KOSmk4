@@ -71,8 +71,8 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 	               *   `block0_size >= num_pages' check above will be           \
 	               *   `1 >= 1', meaning we'll never get here! */               \
 	)
-	TRACE("core_page_alloc(%p,%p,%Iu,%Iu,%#x)\n", self, mapping_target, num_pages, alignment_in_pages, flags);
 	struct vm_corepair_ptr corepair;
+	TRACE("core_page_alloc(%p,%p,%Iu,%Iu,%#x)\n", self, mapping_target, num_pages, alignment_in_pages, flags);
 	HEAP_ASSERT(num_pages != 0);
 	/* Throw a would-block error if we're not allowed to map new memory. */
 	if (flags & GFP_NOMMAP)
