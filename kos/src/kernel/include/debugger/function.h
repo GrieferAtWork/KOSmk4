@@ -73,14 +73,14 @@ dbg_getfunc_start(char const *__restrict name);
 #define REGISTER_DEBUG_FUNCTION_EX(name, help, main)                                                                      \
 	PRIVATE ATTR_SECTION(".rodata.cold.debug_function_str") char const _DBG_PRIVATE_FUNCTION_NAME(_debug_name_)[] = name; \
 	PRIVATE ATTR_SECTION(".rodata.cold.debug_function_str") char const _DBG_PRIVATE_FUNCTION_NAME(_debug_help_)[] = help; \
-	PRIVATE ATTR_SECTION(".rodata.cold.debug_functions") ATTR_USED                                                        \
+	PRIVATE ATTR_SECTION(".rodata.cold.debug_functions") ATTR_USED ATTR_ALIGNED(__SIZEOF_POINTER__)                       \
 	struct debug_function const _DBG_PRIVATE_FUNCTION_NAME(_debug_def) =                                                  \
 		{ &main, _DBG_PRIVATE_FUNCTION_NAME(_debug_name_), _DBG_PRIVATE_FUNCTION_NAME(_debug_help_) }
 #define DEFINE_DEBUG_FUNCTION(name, help, argc, argv)                                                                     \
-	PRIVATE uintptr_t DBG_CALL _DBG_PRIVATE_FUNCTION_NAME(_debug_main_)(size_t argc, char *argv[]);                     \
+	PRIVATE uintptr_t DBG_CALL _DBG_PRIVATE_FUNCTION_NAME(_debug_main_)(size_t argc, char *argv[]);                       \
 	PRIVATE ATTR_SECTION(".rodata.cold.debug_function_str") char const _DBG_PRIVATE_FUNCTION_NAME(_debug_name_)[] = name; \
 	PRIVATE ATTR_SECTION(".rodata.cold.debug_function_str") char const _DBG_PRIVATE_FUNCTION_NAME(_debug_help_)[] = help; \
-	PRIVATE ATTR_SECTION(".rodata.cold.debug_functions") ATTR_USED                                                        \
+	PRIVATE ATTR_SECTION(".rodata.cold.debug_functions") ATTR_USED ATTR_ALIGNED(__SIZEOF_POINTER__)                       \
 	struct debug_function const _DBG_PRIVATE_FUNCTION_NAME(_debug_def) =                                                  \
 		{	&_DBG_PRIVATE_FUNCTION_NAME(_debug_main_),                                                                    \
 			_DBG_PRIVATE_FUNCTION_NAME(_debug_name_),                                                                     \
