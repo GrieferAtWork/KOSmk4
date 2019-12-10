@@ -48,10 +48,10 @@
 #ifdef __KERNEL__
 #include <kernel/except.h>
 #include <kernel/gdt.h>
-#else
+#else /* __KERNEL__ */
 #include <hybrid/atomic.h>
 #include <dlfcn.h>
-#endif
+#endif /* !__KERNEL__ */
 
 
 DECL_BEGIN
@@ -78,7 +78,11 @@ err:               \
 
 #ifdef __x86_64__
 #define GPREGS_COUNT 16
+#if 1
+#define GPREGS_LEN(id) 2
+#else
 #define GPREGS_LEN(id) ((id) >= 8 && (id) <= 9 ? 1 : 2)
+#endif
 #define GPREGS_MAXLEN  2
 #define GPREGS_FIRSTCH 'r'
 PRIVATE char const gpregs_names[GPREGS_COUNT][2] = {
@@ -90,8 +94,8 @@ PRIVATE char const gpregs_names[GPREGS_COUNT][2] = {
 	{ 'd', 'x' },
 	{ 'c', 'x' },
 	{ 'a', 'x' },
-	{ '8', 0 },
-	{ '9', 0 },
+	{ '8', ' ' },
+	{ '9', ' ' },
 	{ '1', '0' },
 	{ '1', '1' },
 	{ '1', '2' },
