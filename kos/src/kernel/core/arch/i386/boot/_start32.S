@@ -116,11 +116,11 @@ INTERN_FUNCTION(_start)
 #if 1 /* Fixup required when loaded via bochs's `load32bitOSImage' function */
 	/* Prematurely load our GDT, so we can manually set valid segments for %ds, %es and %ss,
 	 * as we only want to rely on the boot loader to have set up a valid %ds and %cs */
-	movw   $(SEGMENT_COUNT * 8 - 1), %ds:-6(%esp)
-	EXTERN(__x86_template_gdt)
-	/* Load from template, as the boot cpu's hasn't been initialized, yet. */
-	movl   $(V2P(__x86_template_gdt)), %ds:-4(%esp)
-	lgdtl  %ds:-6(%esp)
+	.pushsection .rodata.free
+1:	.word  (SEGMENT_COUNT * 8 - 1)
+	.long  V2P(__x86_template_gdt)
+	.popsection
+	lgdtl  %ds:V2P(1b)
 	movw   $(SEGMENT_KERNEL_DATA), %ax
 	movw   %ax, %ss
 	movw   %ax, %ds

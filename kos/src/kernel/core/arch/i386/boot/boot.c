@@ -102,19 +102,19 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	printk(FREESTR(KERN_NOTICE "[boot] Begin kernel initialization\n"));
 	printk(FREESTR(KERN_INFO "[boot] CPU brand: %q\n"), x86_bootcpu_cpuid.ci_brand);
 
-	/* Initialize the paging configuration */
-	x86_initialize_paging();
+#ifdef __x86_64__
+	/* Initialize (rd|wr)(fs|gs)base support and (if necessary)
+	 * patch the kernel to user (rd|wr)msr if unavailable. */
+	x86_initialize_fsgsbase();
+#endif /* __x86_64__ */
 
 #ifndef __x86_64__
 	/* Initialize the atomic64 configuration */
 	x86_initialize_atomic64();
 #endif /* !__x86_64__ */
 
-#ifdef __x86_64__
-	/* Initialize (rd|wr)(fs|gs)base support and (if necessary)
-	 * patch the kernel to user (rd|wr)msr if unavailable. */
-	x86_initialize_fsgsbase();
-#endif /* __x86_64__ */
+	/* Initialize the paging configuration */
+	x86_initialize_paging();
 
 	/* Initialize per-task/per-cpu structures */
 	kernel_initialize_scheduler();

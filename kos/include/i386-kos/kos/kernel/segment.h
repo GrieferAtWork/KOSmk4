@@ -402,7 +402,8 @@ struct __ATTR_PACKED segment {
 					unsigned int d_limit1: 4;         /* [valid_if(d_present == 1)] Segment limit 16-19 */
 					unsigned int d_avl: 1;            /* [valid_if(d_present == 1)] Unused bit (available for use by system software; unused in KOS) */
 					unsigned int d_long: 1;           /* [valid_if(d_present == 1)] L-bit: Set to 1 if this is a 64-bit code segment (for x86_64). */
-					unsigned int d_defop: 1;          /* [valid_if(d_present == 1)] D/B-bit: Default operand size (0=16, 1=32) (this affects the 66h-prefix). */
+					unsigned int d_defop: 1;          /* [valid_if(d_present == 1)] D/B-bit: Default operand size (0=16, 1=32) (this affects the 66h-prefix).
+					                                   * NOTE: When `d_long' is set, then this bit _must_ be cleared! */
 					unsigned int d_granularity: 1;    /* [valid_if(d_present == 1)] G-bit: When set, `REAL_LIMIT = (LIMIT * 0x1000) + 0xfff'. */
 				};
 			};

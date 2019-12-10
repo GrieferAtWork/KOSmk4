@@ -358,12 +358,12 @@ INTERN_FUNCTION(_start)
 #if 1 /* Fixup required when loaded via bochs's `load32bitOSImage' function */
 	/* Prematurely load our GDT, so we can manually set valid segments for %ds, %es and %ss,
 	 * as we only want to rely on the boot loader to have set up a valid %ds and %cs */
-	movw   $(SEGMENT_COUNT * 8 - 1), %ds:-6(%esp)
-	EXTERN(__x86_template_gdt)
-	/* Load from template, as the boot cpu's hasn't been initialized, yet. */
-	movl   $(V2P(__x86_template_gdt)), %ds:-4(%esp)
-	lgdtl  %ds:-6(%esp)
-	movw   $(SEGMENT_KERNEL_DATA), %ax
+	.pushsection .rodata.free
+1:	.word  (SEGMENT_COUNT * 8 - 1)
+	.long  V2P(__x86_template_gdt)
+	.popsection
+	lgdtl  %ds:V2P(1b)
+	movw   $(SEGMENT_KERNEL_DATA32), %ax
 	movw   %ax, %ss
 	movw   %ax, %ds
 	movw   %ax, %es
@@ -725,7 +725,7 @@ INTERN_FUNCTION(_start)
 	lgdtl  SYM(enterlong_gdt_pointer)
 
 	/* Load 64-bit segment registers. */
-	movw   $(0x10), %ax /* DATA */
+	movw   $(SEGMENT_KERNEL_DATA), %ax /* DATA */
 	movw   %ax, %ds
 	movw   %ax, %es
 	movw   %ax, %fs
@@ -733,7 +733,7 @@ INTERN_FUNCTION(_start)
 	movw   %ax, %ss
 
 	/* And finally, jump into 64-bit mode! */
-	ljmpl  $(0x08), $(SYM(_start64))
+	ljmpl  $(SEGMENT_KERNEL_CODE), $(SYM(_start64))
 END(_start)
 
 

@@ -510,12 +510,14 @@ SECTIONS {
 
 	/* Pre-calculate TSS and TLS segment initializers. */
 #ifdef __x86_64__
-#define GDT_L 1
+#define GDT_L  1
+#define GDT_DB 0
 #define DEFINE_SEGMENT_SYMBOLS(name, TYPE, args) \
 	PROVIDE_HIDDEN(name##_lo = SEGMENT_##TYPE##_INIT_U    args); \
 	PROVIDE_HIDDEN(name##_hi = SEGMENT_##TYPE##_HI_INIT_U args);
 #else /* __x86_64__ */
-#define GDT_L 0
+#define GDT_L  0
+#define GDT_DB 1
 #define DEFINE_SEGMENT_SYMBOLS(name, TYPE, args) \
 	PROVIDE_HIDDEN(name##_lo = SEGMENT_##TYPE##_INIT_UL args); \
 	PROVIDE_HIDDEN(name##_hi = SEGMENT_##TYPE##_INIT_UH args);
@@ -525,11 +527,12 @@ SECTIONS {
 #ifndef __x86_64__
 	DEFINE_SEGMENT_SYMBOLS(__x86_ldt_lcall7_main, CALLGATE, (x86_syscall32_lcall7, SEGMENT_KERNEL_CODE, SEGMENT_DESCRIPTOR_TYPE_CALLGATE, 0, 3, 1))
 	DEFINE_SEGMENT_SYMBOLS(__x86_gdt_tss_df, TSS, (TSS_DF_BASE, SIZEOF_TSS - 1, SEGMENT_DESCRIPTOR_TYPE_TSS_AVL, 0, 1, 0, 0))
-	DEFINE_SEGMENT_SYMBOLS(__x86_gdt_kernel_tls, DESCRIPTOR, (_boottask, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 0, 1, 0, GDT_L, 1, 1))
+	DEFINE_SEGMENT_SYMBOLS(__x86_gdt_kernel_tls, DESCRIPTOR, (_boottask, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 0, 1, 0, GDT_L, GDT_DB, 1))
 #else /* !__x86_64__ */
 	DEFINE_SEGMENT_SYMBOLS(__x86_ldt_lcall7_main, CALLGATE, (x86_syscall32_lcall7, SEGMENT_KERNEL_CODE, SEGMENT_DESCRIPTOR_TYPE_CALLGATE, 3, 1))
 #endif /* __x86_64__ */
 #undef DEFINE_SEGMENT_SYMBOLS
+#undef GDT_DB
 #undef GDT_L
 
 	PROVIDE_HIDDEN(__x86_kernel_ld_elf_startpage = ABSOLUTE(kernel_ld_elf) / PAGESIZE);

@@ -65,7 +65,9 @@ __SYSDECL_BEGIN
 #define SEGMENT_USER_CODE64_RPL 0x005b /* SEGMENT_USER_CODE64 | 3 */
 #define SEGMENT_USER_DATA64     0x0060 /* Ring #3 64-bit data segment (%ss, %ds, %es) */
 #define SEGMENT_USER_DATA64_RPL 0x0063 /* SEGMENT_USER_DATA64 | 3 */
-#define SEGMENT_COUNT           13
+#define SEGMENT_KERNEL_CODE32   0x0068 /* Ring #0 32-bit code segment (%cs) */
+#define SEGMENT_KERNEL_DATA32   0x0070 /* Ring #0 32-bit data segment (%ss) */
+#define SEGMENT_COUNT           15
 #else /* __x86_64__ */
 #define SEGMENT_COUNT           11
 #endif /* !__x86_64__ */

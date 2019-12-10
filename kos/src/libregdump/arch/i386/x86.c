@@ -247,18 +247,22 @@ get_segment_value_name(uint16_t seg) {
 	CASE(KERNEL_DATA);
 	CASE(USER_CODE);
 	CASE(USER_DATA);
-#ifdef __x86_64__
-	CASE(USER_CODE32);
-	CASE(USER_DATA32);
 	CASE(CPU_LDT);
 	CASE(CPU_TSS);
-#else /* __x86_64__ */
-	CASE(CPU_TSS);
-	CASE(CPU_TSS_DF);
-	CASE(KERNEL_FSBASE);
 	CASE(USER_FSBASE);
 	CASE(USER_GSBASE);
+#ifdef __x86_64__
+	CASE(CPU_LDT2);
+	CASE(CPU_TSS2);
+	CASE(USER_CODE32);
+	CASE(USER_DATA32);
+	CASE(KERNEL_CODE32);
+	CASE(KERNEL_DATA32);
+#else /* __x86_64__ */
+	CASE(CPU_TSS_DF);
+	CASE(KERNEL_FSBASE);
 #endif /* !__x86_64__ */
+
 #undef CASE
 	default: break;
 	}
