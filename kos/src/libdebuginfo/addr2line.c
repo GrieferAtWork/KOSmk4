@@ -589,7 +589,7 @@ NOTHROW_NCX(CC libdi_debug_sections_addr2line)(di_debug_sections_t const *__rest
 		di_debuginfo_cu_parser_t cu;
 		di_debuginfo_cu_abbrev_t abbrev;
 		di_debuginfo_cu_parser_sections_t cu_sections;
-		uint32_t debuginfo_cu_offset;
+		uintptr_t debuginfo_cu_offset;
 		byte_t *cu_start;
 		bool has_corruptions;
 		cu_sections.cps_debug_abbrev_start = sections->ds_debug_abbrev_start;

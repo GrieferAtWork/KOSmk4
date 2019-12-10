@@ -392,11 +392,10 @@ typedef struct unwind_emulator_struct {
 	                                                * which get terminated and cause `UNWIND_EMULATOR_LOOP' to be returned)
 	                                                * During initialization, you may simply assign `UNWIND_EMULATOR_BJMPREM_DEFAULT'
 	                                                * to this field. */
-#if __SIZEOF_POINTER__ > 4
-	__uint8_t               ue_pad[(sizeof(void *)/2) - 2];
-#endif /* __SIZEOF_POINTER__ > 4 */
 	__uint8_t               ue_addrsize;           /* [const] Address size (one of 1,2,4 or 8) (operand size of `DW_OP_addr') */
+	__uint8_t               ue_ptrsize;            /* [const] DWARF pointer size (4 for 32-bit dwarf; 8 for 64-bit dwarf) */
 	__uint8_t               ue_piecewrite;         /* [const] Non-zero if data pieces should be written, rather than read. */
+	__uint8_t               ue_pad;                /* ... */
 	__byte_t               *ue_piecebuf;           /* [0..sm_piecesiz][const] Pointer to a buffer to receive data from `DW_OP_piece' */
 	__size_t                ue_piecesiz;           /* [const] Size of the `sm_piecebuf' buffer in bytes. */
 	__size_t                ue_piecebits;          /* [<= sm_piecesiz * 8] Number of _BITS_ within the `sm_piecebuf' buffer that are in use. */
@@ -450,12 +449,16 @@ unwind_emulator_exec_autostack(unwind_emulator_t *__restrict self,
  * -> Useful for dumping unwind instruction without having to take care
  *    of handling all possible instruction (after all: CFI has a CISC
  *    instruction set with variable-length instructions)
+ * @param: addrsize: Size of a target address.
+ * @param: ptrsize:  Size of a DWARF pointer (4 for 32-bit dwarf; 8 for 64-bit dwarf).
  * @return: NULL: The instruction at `unwind_pc' wasn't recognized. */
 typedef /*__ATTR_PURE*/ __ATTR_WUNUSED __ATTR_NONNULL((1)) __byte_t const *
-(LIBUNWIND_CC *PUNWIND_INSTRUCTION_SUCC)(__byte_t const *__restrict unwind_pc, __uint8_t addrsize);
+(LIBUNWIND_CC *PUNWIND_INSTRUCTION_SUCC)(__byte_t const *__restrict unwind_pc,
+                                         __uint8_t addrsize, __uint8_t ptrsize);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __byte_t const *
-__NOTHROW_NCX(LIBUNWIND_CC unwind_instruction_succ)(__byte_t const *__restrict unwind_pc, __uint8_t addrsize);
+__NOTHROW_NCX(LIBUNWIND_CC unwind_instruction_succ)(__byte_t const *__restrict unwind_pc,
+                                                    __uint8_t addrsize, __uint8_t ptrsize);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 /* Return a pointer to a CFI expression that is applicable for `cu_base + module_relative_pc'
@@ -501,6 +504,7 @@ __NOTHROW_NCX(LIBUNWIND_CC debuginfo_location_select)(di_debuginfo_location_t co
  * @param: frame_base_expression: The expression used to calculate the frame-base address (or NULL if unknown)
  * @param: objaddr:               The address of the base-object (used e.g. for structure member expressions)
  * @param: addrsize:              Size of an address (defined by the associated CU, and usually == sizeof(void *))
+ * @param: ptrsize:               DWARF pointer size (4 for 32-bit dwarf; 8 for 64-bit dwarf)
  * @return: * :                               One of `UNWIND_*'
  * @return: UNWIND_EMULATOR_NOT_WRITABLE:     Attempted to write to a read-only location expression.
  * @return: UNWIND_EMULATOR_BUFFER_TOO_SMALL: The given `bufsize' is too small.
@@ -514,7 +518,7 @@ typedef __ATTR_NONNULL((1, 3, 7, 9)) unsigned int
                                              void *__restrict buf, __size_t bufsize,
                                              __size_t *__restrict pnum_written_bits,
                                              di_debuginfo_location_t const *frame_base_expression,
-                                             void *objaddr, __uint8_t addrsize);
+                                             void *objaddr, __uint8_t addrsize, __uint8_t ptrsize);
 typedef __ATTR_NONNULL((1, 3, 5, 9, 11)) unsigned int
 (LIBUNWIND_CC *PDEBUGINFO_LOCATION_SETVALUE)(di_debuginfo_location_t const *__restrict self,
                                              unwind_emulator_sections_t const *sectinfo,
@@ -525,7 +529,7 @@ typedef __ATTR_NONNULL((1, 3, 5, 9, 11)) unsigned int
                                              void const *__restrict buf, __size_t bufsize,
                                              __size_t *__restrict pnum_read_bits,
                                              di_debuginfo_location_t const *frame_base_expression,
-                                             void *objaddr, __uint8_t addrsize);
+                                             void *objaddr, __uint8_t addrsize, __uint8_t ptrsize);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 7, 9)) unsigned int LIBUNWIND_CC
 debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self,
@@ -536,7 +540,7 @@ debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self,
                             void *__restrict buf, __size_t bufsize,
                             __size_t *__restrict pnum_written_bits,
                             di_debuginfo_location_t const *frame_base_expression,
-                            void *objaddr, __uint8_t addrsize);
+                            void *objaddr, __uint8_t addrsize, __uint8_t ptrsize);
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 5, 9, 11)) unsigned int LIBUNWIND_CC
 debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self,
                             unwind_emulator_sections_t const *sectinfo,
@@ -547,7 +551,7 @@ debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self,
                             void const *__restrict buf, __size_t bufsize,
                             __size_t *__restrict pnum_read_bits,
                             di_debuginfo_location_t const *frame_base_expression,
-                            void *objaddr, __uint8_t addrsize);
+                            void *objaddr, __uint8_t addrsize, __uint8_t ptrsize);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 

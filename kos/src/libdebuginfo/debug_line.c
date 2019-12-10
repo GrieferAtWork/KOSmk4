@@ -37,6 +37,7 @@ if (gcc_opt.remove("-O3"))
 
 #include <kos/types.h>
 
+#include <stdint.h>
 #include <string.h>
 
 #include <libdebuginfo/debug_line.h>
@@ -66,7 +67,7 @@ again:
 	if (length <= 15)     /* 15: Minimum size of the DWARF LineInfo header. */
 		goto section_eof; /* Sentinel */
 	reader += 4;
-	if unlikely(length == (uint32_t)-1) {
+	if unlikely(length == UINT32_C(0xffffffff)) {
 		length = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader);
 		if (length <= 15)
 			goto section_eof; /* Sentinel */

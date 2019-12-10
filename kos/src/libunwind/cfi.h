@@ -61,9 +61,12 @@ libuw_unwind_emulator_exec_autostack(unwind_emulator_t *__restrict self,
  * -> Useful for dumping unwind instruction without having to take care
  *    of handling all possible instruction (after all: CFI has a CISC
  *    instruction set with variable-length instructions)
+ * @param: addrsize: Size of a target address.
+ * @param: ptrsize:  Size of a DWARF pointer (4 for 32-bit dwarf; 8 for 64-bit dwarf).
  * @return: NULL: The instruction at `unwind_pc' wasn't recognized. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) byte_t const *
-NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc, uint8_t addrsize);
+NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc,
+                                              uint8_t addrsize, uint8_t ptrsize);
 
 /* Return a pointer to a CFI expression that is applicable for `module_relative_pc'
  * If no such expression exists, return `NULL' instead. */
@@ -99,6 +102,7 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
  * @param: frame_base_expression: The expression used to calculate the frame-base address (or NULL if unknown)
  * @param: objaddr:               The address of the base-object (used e.g. for structure member expressions)
  * @param: addrsize:              Size of an address (defined by the associated CU, and usually == sizeof(void *))
+ * @param: ptrsize:               DWARF pointer size (4 for 32-bit dwarf; 8 for 64-bit dwarf)
  * @return: * :                               One of `UNWIND_*'
  * @return: UNWIND_EMULATOR_NOT_WRITABLE:     Attempted to write to a read-only location expression.
  * @return: UNWIND_EMULATOR_BUFFER_TOO_SMALL: The given `bufsize' is too small.
@@ -111,7 +115,7 @@ libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self
                                   void *__restrict buf, size_t bufsize,
                                   size_t *__restrict pnum_written_bits,
                                   di_debuginfo_location_t const *frame_base_expression,
-                                  void *objaddr, uint8_t addrsize);
+                                  void *objaddr, uint8_t addrsize, uint8_t ptrsize);
 INTDEF NONNULL((1, 3, 5, 9, 11)) unsigned int CC
 libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self,
                                   unwind_emulator_sections_t const *sectinfo,
@@ -121,7 +125,7 @@ libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self
                                   void const *__restrict buf, size_t bufsize,
                                   size_t *__restrict pnum_read_bits,
                                   di_debuginfo_location_t const *frame_base_expression,
-                                  void *objaddr, uint8_t addrsize);
+                                  void *objaddr, uint8_t addrsize, uint8_t ptrsize);
 
 
 DECL_END

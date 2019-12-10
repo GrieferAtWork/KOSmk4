@@ -1275,24 +1275,18 @@ do_read_bit_pieces:
 				ERROR(err_illegal_instruction);
 			self->ue_pc = pc - 1;
 			if (opcode == DW_OP_call2) {
-				component_address = self->ue_sectinfo->ues_debug_info_start + UNALIGNED_GET16((uint16_t *)pc);
+				component_address = self->ue_sectinfo->ues_debug_info_start +
+					                (uintptr_t)UNALIGNED_GET16((uint16_t *)pc);
 				pc += 2;
-			} else if (opcode == DW_OP_call4) {
-				component_address = self->ue_sectinfo->ues_debug_info_start + UNALIGNED_GET32((uint32_t *)pc);
+			} else if (opcode == DW_OP_call4 || self->ue_ptrsize == 4) {
+				component_address = self->ue_sectinfo->ues_debug_info_start +
+					                (uintptr_t)UNALIGNED_GET32((uint32_t *)pc);
 				pc += 4;
 			} else {
-				if (self->ue_addrsize >= sizeof(uintptr_t)) {
-					component_address = self->ue_sectinfo->ues_debug_info_start + UNALIGNED_GET((uintptr_t *)pc);
-#if __SIZEOF_POINTER__ > 4
-				} else if (self->ue_addrsize >= 4) {
-					component_address = self->ue_sectinfo->ues_debug_info_start + (uintptr_t)UNALIGNED_GET32((uint32_t *)pc);
-#endif
-				} else if (self->ue_addrsize >= 2) {
-					component_address = self->ue_sectinfo->ues_debug_info_start + (uintptr_t)UNALIGNED_GET16((uint16_t *)pc);
-				} else {
-					component_address = self->ue_sectinfo->ues_debug_info_start + (uintptr_t) * (uint8_t *)pc;
-				}
-				pc += self->ue_addrsize;
+				assert(self->ue_ptrsize == 8);
+				component_address = self->ue_sectinfo->ues_debug_info_start +
+					                (uintptr_t)UNALIGNED_GET64((uint64_t *)pc);
+				pc += 8;
 			}
 			if unlikely(component_address < self->ue_sectinfo->ues_debug_info_start ||
 			            component_address >= self->ue_sectinfo->ues_debug_info_end) {
@@ -1587,10 +1581,12 @@ err_no_return_value:
  * -> Useful for dumping unwind instruction without having to take care
  *    of handling all possible instruction (after all: CFI has a CISC
  *    instruction set with variable-length instructions)
+ * @param: addrsize: Size of a target address.
+ * @param: ptrsize:  Size of a DWARF pointer (4 for 32-bit dwarf; 8 for 64-bit dwarf).
  * @return: NULL: The instruction at `unwind_pc' wasn't recognized. */
 INTERN ATTR_PURE WUNUSED NONNULL((1)) byte_t const *
 NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc,
-                                              uint8_t addrsize) {
+                                              uint8_t addrsize, uint8_t ptrsize) {
 	byte_t op = *unwind_pc++;
 	switch (op) {
 
@@ -1729,8 +1725,11 @@ NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc
 	case DW_OP_constu:
 	case DW_OP_regx:
 	case DW_OP_piece:
-	case DW_OP_call_ref:
 		dwarf_decode_uleb128((byte_t **)&unwind_pc);
+		break;
+
+	case DW_OP_call_ref:
+		unwind_pc += ptrsize;
 		break;
 
 	case DW_OP_consts:
@@ -1900,6 +1899,7 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
  * @param: frame_base_expression: The expression used to calculate the frame-base address (or NULL if unknown)
  * @param: objaddr:               The address of the base-object (used e.g. for structure member expressions)
  * @param: addrsize:              Size of an address (defined by the associated CU, and usually == sizeof(void *))
+ * @param: ptrsize:               DWARF pointer size (4 for 32-bit dwarf; 8 for 64-bit dwarf)
  * @return: * :                               One of `UNWIND_*'
  * @return: UNWIND_EMULATOR_NOT_WRITABLE:     Attempted to write to a read-only location expression.
  * @return: UNWIND_EMULATOR_BUFFER_TOO_SMALL: The given `bufsize' is too small.
@@ -1912,7 +1912,7 @@ libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self
                                   void *__restrict buf, size_t bufsize,
                                   size_t *__restrict pnum_written_bits,
                                   di_debuginfo_location_t const *frame_base_expression,
-                                  void *objaddr, uint8_t addrsize) {
+                                  void *objaddr, uint8_t addrsize, uint8_t ptrsize) {
 	unwind_ste_t ste_top;
 	unwind_emulator_t emulator;
 	size_t expr_length;
@@ -1936,6 +1936,7 @@ libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self
 	emulator.ue_objaddr            = objaddr;
 	emulator.ue_bjmprem            = UNWIND_EMULATOR_BJMPREM_DEFAULT;
 	emulator.ue_addrsize           = addrsize;
+	emulator.ue_ptrsize            = ptrsize;
 	emulator.ue_piecebuf           = (byte_t *)buf;
 	emulator.ue_piecesiz           = bufsize;
 	emulator.ue_module_base        = cu_base;
@@ -1970,7 +1971,7 @@ libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self
                                   void const *__restrict buf, size_t bufsize,
                                   size_t *__restrict pnum_read_bits,
                                   di_debuginfo_location_t const *frame_base_expression,
-                                  void *objaddr, uint8_t addrsize) {
+                                  void *objaddr, uint8_t addrsize, uint8_t ptrsize) {
 	unwind_ste_t ste_top;
 	unwind_emulator_t emulator;
 	size_t expr_length;
@@ -1995,6 +1996,7 @@ libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self
 	emulator.ue_objaddr            = objaddr;
 	emulator.ue_bjmprem            = UNWIND_EMULATOR_BJMPREM_DEFAULT;
 	emulator.ue_addrsize           = addrsize;
+	emulator.ue_ptrsize            = ptrsize;
 	emulator.ue_piecewrite         = 1;
 	emulator.ue_piecebuf           = (byte_t *)buf;
 	emulator.ue_piecesiz           = bufsize;

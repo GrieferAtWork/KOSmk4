@@ -372,33 +372,55 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadunit)(byte_t **__restrict pdebug_in
                                                    di_debuginfo_cu_parser_t *__restrict result,
                                                    di_debuginfo_cu_abbrev_t *__restrict abbrev,
                                                    byte_t *first_component_pointer) {
-	uint32_t temp;
+	uintptr_t temp;
 	byte_t *reader;
 	reader = *pdebug_info_reader;
 again:
 	if (reader >= debug_info_end)
 		return DEBUG_INFO_ERROR_NOFRAME;
 	result->dup_cu_info_hdr = reader;
-	temp                    = UNALIGNED_GET32((uint32_t *)reader);
+	/* 7.5.1.1   Compilation Unit Header */
+	temp = UNALIGNED_GET32((uint32_t *)reader); /* unit_length */
 	reader += 4;
+	result->dup_ptrsize = 4;
+	if (temp >= UINT32_C(0xfffffff0)) {
+		if (temp == UINT32_C(0xffffffff)) {
+			/* 7.4 32-Bit and 64-Bit DWARF Formats
+			 * In the 64-bit DWARF format, an initial length field is 96 bits in size, and has two parts:
+			 *  - The first 32-bits have the value 0xffffffff.
+			 *  - The following 64-bits contain the actual length represented as an unsigned 64-bit integer. */
+			result->dup_ptrsize = 8;
+			temp = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader);
+			reader += 8;
+		} else {
+			/* 7.2.2 Initial Length Values
+			 * ...
+			 * values 0xfffffff0 through 0xffffffff are reserved by DWARF */
+			return DEBUG_INFO_ERROR_CORRUPT;
+		}
+	}
 	*pdebug_info_reader = result->dup_cu_info_end;
 	if (OVERFLOW_UADD((uintptr_t)reader, temp, (uintptr_t *)&result->dup_cu_info_end) ||
 	    result->dup_cu_info_end > debug_info_end)
 		result->dup_cu_info_end = debug_info_end;
-	result->dup_version = UNALIGNED_GET16((uint16_t *)reader);
+	result->dup_version = UNALIGNED_GET16((uint16_t *)reader); /* version */
 	reader += 2;
 #if 0
 	if unlikely(result->dup_version != 2)
 		return DEBUG_INFO_ERROR_CORRUPT;
 #endif
-	temp = UNALIGNED_GET32((uint32_t *)reader);
+	temp = UNALIGNED_GET32((uint32_t *)reader); /* debug_abbrev_offset */
 	reader += 4;
+	if (temp == 0xffffffff) {
+		temp = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader);
+		reader += 8;
+	}
 	if unlikely(OVERFLOW_UADD((uintptr_t)sectinfo->cps_debug_abbrev_start, temp,
 	                          (uintptr_t *)&abbrev->dua_abbrev_start) ||
 	            abbrev->dua_abbrev_start >= sectinfo->cps_debug_abbrev_end)
 		return DEBUG_INFO_ERROR_CORRUPT;
 	abbrev->dua_abbrev_end = sectinfo->cps_debug_abbrev_end;
-	result->dup_addrsize   = *(uint8_t *)reader;
+	result->dup_addrsize   = *(uint8_t *)reader; /* address_size */
 	reader += 1;
 #if __SIZEOF_POINTER__ > 4
 	if unlikely(result->dup_addrsize != 1 &&
@@ -449,10 +471,13 @@ decode_form:
 	switch (form) {
 
 	case DW_FORM_addr:
+		self->dup_cu_info_pos += self->dup_addrsize;
+		break;
+
 	case DW_FORM_ref_addr:
 	case DW_FORM_strp:
 	case DW_FORM_sec_offset:
-		self->dup_cu_info_pos += self->dup_addrsize;
+		self->dup_cu_info_pos += self->dup_ptrsize;
 		break;
 
 	case DW_FORM_block1: {
@@ -631,13 +656,9 @@ decode_form:
 	case DW_FORM_strp: {
 		char *result;
 		uintptr_t offset;
-		switch (self->dup_addrsize) {
-		case 1: offset = *(uint8_t *)reader; break;
-		case 2: offset = UNALIGNED_GET16((uint16_t *)reader); break;
-		case 4: offset = UNALIGNED_GET32((uint32_t *)reader); break;
-#if __SIZEOF_POINTER__ > 4
-		case 8: offset = UNALIGNED_GET64((uint64_t *)reader); break;
-#endif
+		switch (self->dup_ptrsize) {
+		case 4: offset = (uintptr_t)UNALIGNED_GET32((uint32_t *)reader); break;
+		case 8: offset = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader); break;
 		default: __builtin_unreachable();
 		}
 		result = (char *)self->dup_sections->cps_debug_str_start + offset;
@@ -683,7 +704,7 @@ decode_form:
 		case 4: *presult = UNALIGNED_GET32((uint32_t *)reader); break;
 #if __SIZEOF_POINTER__ > 4
 		case 8: *presult = UNALIGNED_GET64((uint64_t *)reader); break;
-#endif
+#endif /* __SIZEOF_POINTER__ > 4 */
 		default: __builtin_unreachable();
 		}
 		return true;
@@ -707,21 +728,9 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst)(di_debuginfo_cu_parser_t cons
 decode_form:
 	switch (form) {
 	case DW_FORM_sec_offset:
-		switch (self->dup_addrsize) {
-		case 1:
-			*presult = *(uint8_t *)reader;
-			break;
-		case 2:
-			*presult = UNALIGNED_GET16((uint16_t *)reader);
-			break;
-		case 4:
-			*presult = UNALIGNED_GET32((uint32_t *)reader);
-			break;
-#if __SIZEOF_POINTER__ > 4
-		case 8:
-			*presult = UNALIGNED_GET64((uint64_t *)reader);
-			break;
-#endif
+		switch (self->dup_ptrsize) {
+		case 4: *presult = (uintptr_t)UNALIGNED_GET32((uint32_t *)reader); break;
+		case 8: *presult = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader); break;
 		default: __builtin_unreachable();
 		}
 		return true;
@@ -798,21 +807,9 @@ decode_form:
 	switch (form) {
 
 	case DW_FORM_ref_addr:
-		switch (self->dup_addrsize) {
-		case 1:
-			offset = *(uint8_t *)reader;
-			break;
-		case 2:
-			offset = UNALIGNED_GET16((uint16_t *)reader);
-			break;
-		case 4:
-			offset = UNALIGNED_GET32((uint32_t *)reader);
-			break;
-#if __SIZEOF_POINTER__ > 4
-		case 8:
-			offset = UNALIGNED_GET64((uint64_t *)reader);
-			break;
-#endif
+		switch (self->dup_ptrsize) {
+		case 4: offset = (uintptr_t)UNALIGNED_GET32((uint32_t *)reader); break;
+		case 8: offset = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader); break;
 		default: __builtin_unreachable();
 		}
 		break;
@@ -867,21 +864,9 @@ decode_form:
 
 	case DW_FORM_sec_offset: {
 		uintptr_t offset;
-		switch (self->dup_addrsize) {
-		case 1:
-			offset = *(uint8_t *)reader;
-			break;
-		case 2:
-			offset = UNALIGNED_GET16((uint16_t *)reader);
-			break;
-		case 4:
-			offset = UNALIGNED_GET32((uint32_t *)reader);
-			break;
-#if __SIZEOF_POINTER__ > 4
-		case 8:
-			offset = UNALIGNED_GET64((uint64_t *)reader);
-			break;
-#endif
+		switch (self->dup_ptrsize) {
+		case 4: offset = (uintptr_t)UNALIGNED_GET32((uint32_t *)reader); break;
+		case 8: offset = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader); break;
 		default: __builtin_unreachable();
 		}
 		result->l_expr  = NULL;
@@ -2060,7 +2045,7 @@ generic_print_address:
 			if (datasize >= 8)
 				addr = UNALIGNED_GET64((uint64_t *)data);
 			else
-#endif
+#endif /* __SIZEOF_POINTER__ >= 8 */
 			if (datasize >= 4)
 				addr = UNALIGNED_GET32((uint32_t *)data);
 			else if (datasize >= 2)
@@ -2826,7 +2811,7 @@ libdi_debuginfo_enum_locals(di_enum_locals_sections_t const *__restrict sectinfo
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_cu_abbrev_t abbrev;
 	byte_t *debug_info_reader;
-	uint32_t cu_offset;
+	uintptr_t cu_offset;
 	/* Try to make use of `.debug_aranges' to quickly locate the CU. */
 	if (libdi_debugaranges_locate(sectinfo->el_debug_aranges_start,
 	                              sectinfo->el_debug_aranges_end,

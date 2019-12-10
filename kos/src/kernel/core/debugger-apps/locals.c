@@ -167,7 +167,8 @@ do_print_local(void *UNUSED(arg),
 	                                    &num_bits,
 	                                    &sp->sp_frame_base,
 	                                    NULL,
-	                                    parser->dup_addrsize);
+	                                    parser->dup_addrsize,
+	                                    parser->dup_ptrsize);
 	if unlikely(error == UNWIND_SUCCESS) {
 		/* Print the local variable. */
 		debuginfo_print_value(&dbg_printer,

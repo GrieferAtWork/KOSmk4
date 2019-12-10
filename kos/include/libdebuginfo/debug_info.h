@@ -158,6 +158,7 @@ typedef struct di_debuginfo_cu_parser_struct {
 	__byte_t                 *dup_cu_info_pos; /* [1..1][>= dup_cu_info_hdr && <= dup_cu_info_pos] Current position in debug information data (in .debug_info). */
 	__uintptr_t               dup_child_depth; /* The child-recursion-depth of `dp_comp' */
 	di_debuginfo_component_t  dup_comp;        /* The component currently being parsed. */
+	__uint8_t                 dup_ptrsize;     /* Pointer size (4 in 32-bit DWARF; 8 in 64-bit DWARF). */
 	__uint8_t                 dup_addrsize;    /* Address size */
 	__uint16_t                dup_version;     /* DWARF version */
 } di_debuginfo_cu_parser_t;
@@ -420,9 +421,8 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_ranges_contains)(di_debuginfo_ranges_t c
 	if (DEBUGINFO_RANGES_ISSINGLERANGE(self)) {
 		return (module_relative_pc >= self->r_startpc &&
 		        module_relative_pc < self->r_endpc)
-		      ? DEBUG_INFO_ERROR_SUCCESS
-		      : DEBUG_INFO_ERROR_NOFRAME
-		      ;
+		       ? DEBUG_INFO_ERROR_SUCCESS
+		       : DEBUG_INFO_ERROR_NOFRAME;
 	}
 	if __unlikely(self->r_ranges_offset >= (__size_t)(debug_ranges_end - debug_ranges_start))
 		return DEBUG_INFO_ERROR_CORRUPT;
