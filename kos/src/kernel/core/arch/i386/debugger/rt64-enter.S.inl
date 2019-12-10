@@ -222,7 +222,7 @@ L(.Ldone_lapicid_lock):
 	movq   %rdi, (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RDI)
 	movq   %rsi, (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RSI)
 	movq   %rbp, (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RBP)
-	leaq   24(%esp), %rax           /* %esp */
+	leaq   24(%rsp), %rax       /* %rsp */
 	movq   %rax, (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RSP)
 	movq   %rbx, (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RBX)
 	movq   %rdx, (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RDX)
@@ -235,7 +235,7 @@ L(.Ldone_lapicid_lock):
 	movq   %r10, (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_R10)
 	movq   %r9,  (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_R9)
 	movq   %r8,  (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_R8)
-	movq   16(%esp), %rax        /* %eip */
+	movq   16(%rsp), %rax        /* %rip */
 	movq   %rax, (x86_dbg_exitstate + OFFSET_FCPUSTATE_RIP)
 	movq   %es, %rax
 	movq   %rax, (x86_dbg_exitstate + OFFSET_FCPUSTATE_ES)
