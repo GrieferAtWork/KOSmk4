@@ -39,6 +39,7 @@ if (gcc_opt.remove("-O3"))
 
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
+#include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state.h>
 
 #include <string.h>
@@ -80,13 +81,8 @@ NOTHROW(FCALL x86_handle_dbg_pagefault)(struct icpustate *__restrict state, uint
 	}
 	addr = __rdcr2();
 #define IS_USER() (ecode & PAGEFAULT_F_USERSPACE)
-#ifdef __x86_64__
-	if (state->ics_irregs.ir_rflags & EFLAGS_IF)
+	if (state->ics_irregs.ir_pflags & EFLAGS_IF)
 		__sti();
-#else /* __x86_64__ */
-	if (state->ics_irregs_k.ir_eflags & EFLAGS_IF)
-		__sti();
-#endif /* !__x86_64__ */
 	pc = irregs_rdip(&state->ics_irregs);
 #if 1
 	printk(DBGSTR(KERN_DEBUG "[dbg] Page fault at %p [pc=%p] [ecode=%#x]\n"),
