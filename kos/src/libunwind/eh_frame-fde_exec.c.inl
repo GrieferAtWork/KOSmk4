@@ -18,10 +18,10 @@
  */
 #ifdef __INTELLISENSE__
 #include "eh_frame.c"
-//#define EH_FRAME_FDE_EXEC_CFA_STATE 1
+#define EH_FRAME_FDE_EXEC_CFA_STATE 1
 //#define EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE 1
 //#define EH_FRAME_FDE_EXEC_CFA_VALUE 1
-#define EH_FRAME_FDE_EXEC_CFA_RULE 1
+//#define EH_FRAME_FDE_EXEC_CFA_RULE 1
 //#define EH_FRAME_FDE_EXEC_LANDING_PAD_ADJUSTMENT 1
 #endif
 
@@ -320,7 +320,8 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 		} else {                                                          \
 			temp = cfi_unwind_local_register_dw2uncommon(dw_regid);       \
 			if unlikely(temp >= CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT) \
-				ERROR(err_invalid_register);                              \
+				ERRORF(err_invalid_register, "regno=%u\n",                \
+				       (unsigned int)(dw_regid));                         \
 			/* Uncommon register */                                       \
 			if unlikely(*porder == (unwind_order_index_t)-1) {            \
 				SYM(set_uncommon_order_ffh)(result, temp);                \
@@ -345,7 +346,8 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 			}                                                      \
 			__VA_ARGS__;                                           \
 		} else {                                                   \
-			ERROR(err_invalid_register);                           \
+			ERRORF(err_invalid_register, "regno=%u\n",             \
+			       (unsigned int)(dw_regid));                      \
 		}                                                          \
 	}
 #endif /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT == 0 */
@@ -356,7 +358,8 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 		uintptr_half_t temp;                                          \
 		temp = cfi_unwind_local_register_dw2uncommon(dw_regid);       \
 		if unlikely(temp >= CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT) \
-			ERROR(err_invalid_register);                              \
+			ERRORF(err_invalid_register, "regno=%u\n",                \
+			       (unsigned int)(dw_regid));                         \
 		/* Uncommon register */                                       \
 		if unlikely(*porder == (unwind_order_index_t)-1) {            \
 			SYM(set_uncommon_order_ffh)(result, temp);                \
@@ -365,9 +368,10 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 		}                                                             \
 	}
 #else /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0 */
-#define SET_REGISTER(dw_regid, ...)  \
-	{                                \
-		ERROR(err_invalid_register); \
+#define SET_REGISTER(dw_regid, ...)                \
+	{                                              \
+		ERRORF(err_invalid_register, "regno=%u\n", \
+		       (unsigned int)(dw_regid));          \
 	}
 #endif /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT == 0 */
 #endif /* CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT == 0 */
@@ -426,14 +430,14 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 #if CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0
 					temp = cfi_unwind_local_register_dw2uncommon(operand);
 					if unlikely(temp >= CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT)
-						ERROR(err_invalid_register);
+						ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)operand);
 					if unlikely(!uncommon_init_regs) {
 						result->cs_uncorder[temp] = 0;
 					} else {
 						result->cs_uncorder[temp] = uncommon_init_regs[temp];
 					}
 #else /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0 */
-					ERROR(err_invalid_register);
+					ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)operand);
 #endif /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT == 0 */
 				}
 			}
@@ -473,7 +477,7 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 				reader += 4;
 				break;
 
-#if defined(EH_FRAME_FDE_EXEC_CFA_STATE) || \
+#if defined(EH_FRAME_FDE_EXEC_CFA_STATE) ||          \
     defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE) || \
     defined(EH_FRAME_FDE_EXEC_CFA_RULE)
 			CASE(DW_CFA_offset_extended) {
@@ -510,14 +514,14 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 #if CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0
 						temp = cfi_unwind_local_register_dw2uncommon(reg);
 						if unlikely(temp >= CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT)
-							ERROR(err_invalid_register);
+							ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)reg);
 						if unlikely(!uncommon_init_regs) {
 							result->cs_uncorder[temp] = 0;
 						} else {
 							result->cs_uncorder[temp] = uncommon_init_regs[temp];
 						}
 #else /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0 */
-						ERROR(err_invalid_register);
+						ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)reg);
 #endif /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT == 0 */
 					}
 				}
@@ -569,10 +573,10 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 #if CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0
 					temp = cfi_unwind_local_register_dw2uncommon(reg);
 					if __untraced(temp >= CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT)
-						ERROR(err_invalid_register);
+						ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)reg);
 					result->cs_uncorder[temp] = 0; /* Don't evaluate */
 #else /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0 */
-					ERROR(err_invalid_register);
+					ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)reg);
 #endif /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT == 0 */
 				}
 #endif /* !EH_FRAME_FDE_EXEC_CFA_RULE */
@@ -584,7 +588,7 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 				reg1 = (uintptr_half_t)dwarf_decode_uleb128((byte_t **)&reader);
 				reg2 = dwarf_decode_uleb128((byte_t **)&reader);
 				if unlikely(reg2 >= CFI_UNWIND_REGISTER_COUNT)
-					ERROR(err_invalid_register);
+					ERRORF(err_invalid_register, "regno=%Iu\n", reg2);
 				SET_REGISTER(reg1, {
 					rule->cr_rule  = DW_CFA_register_rule_register;
 					rule->cr_value = (intptr_t)reg2;
@@ -636,7 +640,7 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 					/* Check if we have enough stack space left to create a backup. */
 #ifdef __KERNEL__
 					if (get_stack_avail() < ((256 * sizeof(void *)) + sizeof(SYM(unwind_cfa_backup_state_t))))
-						ERROR(err_nomem);
+						ERRORF(err_nomem, "get_stack_avail()=%Iu", get_stack_avail());
 					backup = (SYM(unwind_cfa_backup_state_t) *)alloca(sizeof(SYM(unwind_cfa_backup_state_t)));
 #else /* __KERNEL__ */
 					backup = (SYM(unwind_cfa_backup_state_t) *)malloc(sizeof(SYM(unwind_cfa_backup_state_t)));
@@ -679,10 +683,14 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 				uintptr_t expr_size;
 skip_expression:
 				expr_size = dwarf_decode_uleb128((byte_t **)&reader);
-				if (OVERFLOW_UADD((uintptr_t)reader, expr_size, (uintptr_t *)(byte_t **)&reader))
-					ERROR(err_illegal_instruction);
-				if (reader > end)
-					ERROR(err_illegal_instruction);
+				if unlikely(OVERFLOW_UADD((uintptr_t)reader, expr_size,
+				                          (uintptr_t *)(byte_t **)&reader) ||
+				            reader > end) {
+					ERRORF(err_illegal_instruction,
+					       "reader=%p, expr_size=%Iu(%#Ix), end=%p",
+					       (uintptr_t)reader - expr_size,
+					       expr_size, expr_size, end);
+				}
 			}	break;
 
 #ifdef EH_FRAME_FDE_EXEC_CFA_RULE
@@ -714,7 +722,7 @@ skip_expression:
 				uintptr_t reg;
 				reg = dwarf_decode_uleb128((byte_t **)&reader);
 				if unlikely(reg >= CFI_UNWIND_REGISTER_COUNT)
-					ERROR(err_invalid_register);
+					ERRORF(err_invalid_register, "regno=%Iu\n", reg);
 				RESULT_CFA.cv_type = UNWIND_CFA_VALUE_REGISTER;
 				RESULT_CFA.cv_reg = (uintptr_half_t)reg;
 				RESULT_CFA.cv_value = (intptr_t)dwarf_decode_uleb128((byte_t **)&reader);
@@ -724,7 +732,7 @@ skip_expression:
 				uintptr_t reg;
 				reg = dwarf_decode_uleb128((byte_t **)&reader);
 				if unlikely(reg >= CFI_UNWIND_REGISTER_COUNT)
-					ERROR(err_invalid_register);
+					ERRORF(err_invalid_register, "regno=%Iu\n", reg);
 				RESULT_CFA.cv_type = UNWIND_CFA_VALUE_REGISTER;
 				RESULT_CFA.cv_reg = (uintptr_half_t)reg;
 				RESULT_CFA.cv_value = (intptr_t)(dwarf_decode_sleb128((byte_t **)&reader) * self->f_dataalign);
@@ -732,24 +740,30 @@ skip_expression:
 
 			CASE(DW_CFA_def_cfa_register) {
 				uintptr_t reg;
-				if unlikely(RESULT_CFA.cv_type != UNWIND_CFA_VALUE_REGISTER)
-					ERROR(err_illegal_instruction); /* Only allowed when using a register. */
+				if unlikely(RESULT_CFA.cv_type != UNWIND_CFA_VALUE_REGISTER) {
+					/* Only allowed when using a register. */
+					ERRORF(err_illegal_instruction, "cv_type=%u", (unsigned int)RESULT_CFA.cv_type);
+				}
 				reg = dwarf_decode_uleb128((byte_t **)&reader);
 				if unlikely(reg >= CFI_UNWIND_REGISTER_COUNT)
-					ERROR(err_invalid_register);
+					ERRORF(err_invalid_register, "regno=%Iu\n", reg);
 				RESULT_CFA.cv_reg = (uintptr_half_t)reg;
 				/*RESULT_CFA.cv_value = ...;*/ /* Keep the old offset */
 			}	break;
 
 			CASE(DW_CFA_def_cfa_offset)
-				if unlikely(RESULT_CFA.cv_type != UNWIND_CFA_VALUE_REGISTER)
-					ERROR(err_illegal_instruction); /* Only allowed when using a register. */
+				if unlikely(RESULT_CFA.cv_type != UNWIND_CFA_VALUE_REGISTER) {
+					/* Only allowed when using a register. */
+					ERRORF(err_illegal_instruction, "cv_type=%u", (unsigned int)RESULT_CFA.cv_type);
+				}
 				RESULT_CFA.cv_value = (intptr_t)dwarf_decode_uleb128((byte_t **)&reader);
 				break;
 
 			CASE(DW_CFA_def_cfa_offset_sf)
-				if unlikely(RESULT_CFA.cv_type != UNWIND_CFA_VALUE_REGISTER)
-					ERROR(err_illegal_instruction); /* Only allowed when using a register. */
+				if unlikely(RESULT_CFA.cv_type != UNWIND_CFA_VALUE_REGISTER) {
+					/* Only allowed when using a register. */
+					ERRORF(err_illegal_instruction, "cv_type=%u", (unsigned int)RESULT_CFA.cv_type);
+				}
 				RESULT_CFA.cv_value = (intptr_t)(dwarf_decode_sleb128((byte_t **)&reader) * self->f_dataalign);
 				break;
 
@@ -759,10 +773,14 @@ skip_expression:
 				RESULT_CFA.cv_expr = reader;
 skip_expression:
 				expr_size = dwarf_decode_uleb128((byte_t **)&reader);
-				if unlikely(OVERFLOW_UADD((uintptr_t)reader, expr_size, (uintptr_t *)(byte_t **)&reader))
-					ERROR(err_illegal_instruction);
-				if unlikely(reader > end)
-					ERROR(err_illegal_instruction);
+				if unlikely(OVERFLOW_UADD((uintptr_t)reader,
+				                          expr_size, (uintptr_t *)(byte_t **)&reader) ||
+				            reader > end) {
+					ERRORF(err_illegal_instruction,
+					       "reader=%p, expr_size=%Iu(%#Ix), end=%p",
+					       (uintptr_t)reader - expr_size,
+					       expr_size, expr_size, end);
+				}
 			}	break;
 
 #undef RESULT_CFA
@@ -857,7 +875,7 @@ skip_expression:
 				break;
 
 			default:
-				ERRORF(err_unknown_instruction, "operand = %#.2I8x\n", operand);
+				ERRORF(err_unknown_instruction, "operand=%#.2I8x\n", operand);
 			}
 		}
 	}

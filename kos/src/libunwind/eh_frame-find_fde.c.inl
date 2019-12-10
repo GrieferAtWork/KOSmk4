@@ -87,7 +87,8 @@ again:
 	fde_reader = reader + 4;
 	if unlikely(!((byte_t *)cie >= eh_frame_start &&
 	              (byte_t *)cie < eh_frame_end))
-		ERROR(err_noframe);
+		ERRORF(err_noframe, "cie=%p, eh_frame_start=%p, eh_frame_end=%p",
+		       cie, eh_frame_start, eh_frame_end);
 	/* Load the augmentation string of the associated CIE. */
 	cie_reader = (byte_t *)cie;
 	cie_reader += 4; /* c_length */
@@ -121,8 +122,11 @@ again:
 		byte_t *aug_end;
 		aug_length = dwarf_decode_uleb128(&cie_reader); /* c_auglength */
 		aug_end    = cie_reader + aug_length;
-		if unlikely(aug_end < cie_reader || aug_end > eh_frame_end)
-			ERROR(err_noframe); /* Check for overflow/underflow. */
+		if unlikely(aug_end < cie_reader || aug_end > eh_frame_end) {
+			/* Check for overflow/underflow. */
+			ERRORF(err_noframe, "cie_reader=%p, aug_end=%p, eh_frame_end=%p",
+			       cie_reader, aug_end, eh_frame_end);
+		}
 		while (*++aug_iter && cie_reader < aug_end) {
 			if (*aug_iter == 'L') {
 				result->f_enclsda = *cie_reader++;
@@ -211,8 +215,10 @@ again:
 #endif /* FIND_SPECIFIC_ADDRESS */
 	return UNWIND_SUCCESS;
 do_next_chunk:
-	if unlikely(next_chunk < reader)
-		ERROR(err_noframe); /* Underflow */
+	if unlikely(next_chunk < reader) {
+		/* Underflow */
+		ERRORF(err_noframe, "next_chunk=%p, reader=%p", next_chunk, reader);
+	}
 	reader = next_chunk;
 	goto again;
 err_noframe:

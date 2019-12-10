@@ -20,9 +20,10 @@
 #define GUARD_LIBUNWIND_CFI_C 1
 #define _KOS_SOURCE 1
 
-#include "cfi.h"
-
 #include "api.h"
+/**/
+
+#include "cfi.h"
 
 #include <hybrid/compiler.h>
 

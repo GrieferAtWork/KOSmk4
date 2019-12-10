@@ -236,46 +236,6 @@ __NOTHROW(cfi_x86_64_unwind_register_dw2common)(__UINTPTR_HALF_TYPE__ __dw_regno
 	__UINTPTR_HALF_TYPE__ __result;
 	switch (__dw_regno) {
 
-	case CFI_X86_64_UNWIND_COMMON_REGISTER_RBX:
-		__result = CFI_X86_64_UNWIND_REGISTER_RBX;
-		break;
-
-	case CFI_X86_64_UNWIND_COMMON_REGISTER_RBP:
-		__result = CFI_X86_64_UNWIND_REGISTER_RBP;
-		break;
-
-	case CFI_X86_64_UNWIND_COMMON_REGISTER_R12:
-		__result = CFI_X86_64_UNWIND_REGISTER_R12;
-		break;
-
-	case CFI_X86_64_UNWIND_COMMON_REGISTER_R13:
-		__result = CFI_X86_64_UNWIND_REGISTER_R13;
-		break;
-
-	case CFI_X86_64_UNWIND_COMMON_REGISTER_R14:
-		__result = CFI_X86_64_UNWIND_REGISTER_R14;
-		break;
-
-	case CFI_X86_64_UNWIND_COMMON_REGISTER_R15:
-		__result = CFI_X86_64_UNWIND_REGISTER_R15;
-		break;
-
-	case CFI_X86_64_UNWIND_COMMON_REGISTER_RIP:
-		__result = CFI_X86_64_UNWIND_REGISTER_RIP;
-		break;
-
-	default:
-		__result = CFI_X86_64_UNWIND_REGISTER_COUNT;
-		break;
-	}
-	return __result;
-}
-
-__LOCAL __ATTR_CONST __UINTPTR_HALF_TYPE__
-__NOTHROW(cfi_x86_64_unwind_register_common2dw)(__UINTPTR_HALF_TYPE__ __com_regno) {
-	__UINTPTR_HALF_TYPE__ __result;
-	switch (__com_regno) {
-
 	case CFI_X86_64_UNWIND_REGISTER_RBX:
 		__result = CFI_X86_64_UNWIND_COMMON_REGISTER_RBX;
 		break;
@@ -306,6 +266,46 @@ __NOTHROW(cfi_x86_64_unwind_register_common2dw)(__UINTPTR_HALF_TYPE__ __com_regn
 
 	default:
 		__result = CFI_X86_64_UNWIND_COMMON_REGISTER_COUNT;
+		break;
+	}
+	return __result;
+}
+
+__LOCAL __ATTR_CONST __UINTPTR_HALF_TYPE__
+__NOTHROW(cfi_x86_64_unwind_register_common2dw)(__UINTPTR_HALF_TYPE__ __com_regno) {
+	__UINTPTR_HALF_TYPE__ __result;
+	switch (__com_regno) {
+
+	case CFI_X86_64_UNWIND_COMMON_REGISTER_RBX:
+		__result = CFI_X86_64_UNWIND_REGISTER_RBX;
+		break;
+
+	case CFI_X86_64_UNWIND_COMMON_REGISTER_RBP:
+		__result = CFI_X86_64_UNWIND_REGISTER_RBP;
+		break;
+
+	case CFI_X86_64_UNWIND_COMMON_REGISTER_R12:
+		__result = CFI_X86_64_UNWIND_REGISTER_R12;
+		break;
+
+	case CFI_X86_64_UNWIND_COMMON_REGISTER_R13:
+		__result = CFI_X86_64_UNWIND_REGISTER_R13;
+		break;
+
+	case CFI_X86_64_UNWIND_COMMON_REGISTER_R14:
+		__result = CFI_X86_64_UNWIND_REGISTER_R14;
+		break;
+
+	case CFI_X86_64_UNWIND_COMMON_REGISTER_R15:
+		__result = CFI_X86_64_UNWIND_REGISTER_R15;
+		break;
+
+	case CFI_X86_64_UNWIND_COMMON_REGISTER_RIP:
+		__result = CFI_X86_64_UNWIND_REGISTER_RIP;
+		break;
+
+	default:
+		__result = CFI_X86_64_UNWIND_REGISTER_COUNT;
 		break;
 	}
 	return __result;

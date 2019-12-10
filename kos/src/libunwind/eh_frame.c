@@ -259,11 +259,11 @@ libuw_unwind_cfa_calculate_cfa(unwind_cfa_value_t const *__restrict self,
 	/* Calculate the CFA value. */
 	if (self->cv_type == UNWIND_CFA_VALUE_REGISTER) {
 		if unlikely(CFI_REGISTER_SIZE(self->cv_reg) != sizeof(uintptr_t))
-			ERROR(err_noaddr_register);
+			ERRORF(err_noaddr_register, "regno=%u", (unsigned int)self->cv_reg);
 		if unlikely(!(*reg_getter)(reg_callback_arg,
 		                           self->cv_reg,
 		                           presult))
-			ERROR(err_invalid_register);
+			ERRORF(err_invalid_register, "regno=%u", (unsigned int)self->cv_reg);
 		*presult += self->cv_value;
 	} else if (self->cv_type == UNWIND_CFA_VALUE_EXPRESSION) {
 		/* Use a CFI emulator to calculate the CFA base value. */

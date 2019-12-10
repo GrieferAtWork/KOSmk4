@@ -19,13 +19,14 @@
 #ifndef GUARD_LIBUNWIND_CFI_H
 #define GUARD_LIBUNWIND_CFI_H 1
 
+#include "api.h"
+/**/
+
 #include <hybrid/compiler.h>
 
 #include <kos/types.h>
 
 #include <libunwind/cfi.h>
-
-#include "api.h"
 
 DECL_BEGIN
 
