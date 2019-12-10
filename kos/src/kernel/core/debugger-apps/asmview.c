@@ -557,6 +557,7 @@ NOTHROW(FCALL av_main)(void *addr) {
 		unsigned int key;
 		if (start_addr > addr)
 			start_addr = addr;
+		dbg_beginupdate();
 		end_addr = av_printscreen(start_addr, &addr, display_addr2line);
 		if (addr >= end_addr) {
 			unsigned int n = dbg_screen_height;
@@ -571,6 +572,7 @@ NOTHROW(FCALL av_main)(void *addr) {
 				--n;
 			}
 		}
+		dbg_endupdate(true);
 		do {
 			key = dbg_getkey();
 		} while (key & KEY_FRELEASED);

@@ -344,6 +344,8 @@ dbg_main(uintptr_t show_welcome) {
 		dbg_attr_t attr;
 		size_t argc;
 		struct debug_function const *cmd;
+		/* Force-enable render-to-screen. */
+		dbg_endupdate(true);
 		/* Add a visual indicator for when the exit state doesn't match the currently
 		 * viewed state (thus informing the user that they need to type `apply' before
 		 * exit if they wish to return to the modified state) */
