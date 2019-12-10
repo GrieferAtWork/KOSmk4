@@ -85,7 +85,8 @@ NOTHROW(KCALL fixup_potential_system_inconsistencies)(void) {
 	struct task *mythread = THIS_TASK;
 	fixup_uninitialized_thread(&_boottask);
 	fixup_uninitialized_thread(&_bootidle);
-	if (mythread != &_boottask && mythread != &_bootidle)
+	if (mythread != &_boottask &&
+	    mythread != &_bootidle && mythread != NULL)
 		fixup_uninitialized_thread(mythread);
 }
 
