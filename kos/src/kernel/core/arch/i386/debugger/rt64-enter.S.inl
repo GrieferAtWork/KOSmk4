@@ -343,10 +343,10 @@ L(.Lalready_active):
 	EXTERN(x86_dbg_trapstate)
 	EXTERN(x86_dbg_trapstatekind)
 #ifdef X86_DBG_STATEKIND_XCPU
-	movq   $(X86_DBG_STATEKIND_XCPU), x86_dbg_trapstatekind
+	movl   $(X86_DBG_STATEKIND_XCPU), x86_dbg_trapstatekind
 	movq   %rsi, x86_dbg_trapstate
 #else /* X86_DBG_STATEKIND_XCPU */
-	movq   $(X86_DBG_STATEKIND_NONE), x86_dbg_trapstatekind
+	movl   $(X86_DBG_STATEKIND_NONE), x86_dbg_trapstatekind
 	movq   $(0), x86_dbg_trapstate
 #endif /* !X86_DBG_STATEKIND_XCPU */
 1:
