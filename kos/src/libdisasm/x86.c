@@ -804,6 +804,7 @@ da_print_modrm_rm(struct disassembler *__restrict self,
 				}
 			} else {
 				if ((u32)offset <= INT8_MAX) {
+					/* Render small, positive numbers as decimals, rather than hex. */
 					disasm_printf(self, "%" PRIu32, (u32)offset);
 				} else {
 					disasm_printf(self, "%#" PRIxPTR,
