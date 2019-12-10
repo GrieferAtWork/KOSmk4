@@ -105,10 +105,11 @@ again_calculate_vecN:
 	vec3 = P64_PDIR_VEC3INDEX_VPAGE(trampoline_page);
 	vec4 = P64_PDIR_VEC4INDEX_VPAGE(trampoline_page);
 	if unlikely_untraced(vec1 == 511) {
-		/* Make sure that the two pages used as located in the same E1-vector. */
+		/* Make sure that the two pages used are located in the same E1-vector. */
 		++trampoline_page;
 		goto again_calculate_vecN;
 	}
+	assert(IS_ALIGNED((u64)boot_trampoline_e1v, 4096));
 	assert(P64_PDIR_E4_IDENTITY[vec4].p_vec3.v_present);
 	assert(P64_PDIR_E3_IDENTITY[vec4][vec3].p_vec2.v_present);
 	assert(!P64_PDIR_E3_IDENTITY[vec4][vec3].p_1gib.d_1gib_1);
@@ -120,6 +121,8 @@ again_calculate_vecN:
 	        "%p != %p",
 	        (uintptr_t)pagedir_translate(VM_PAGE2ADDR(trampoline_page)),
 	        (uintptr_t)e1_word);
+	/* Since we need to set-up the whole E1-vector, adjust so we start at its base */
+	e1_word -= vec1 * 4096;
 	e1_word |= (P64_PAGE_FPRESENT | P64_PAGE_FWRITE |
 	            P64_PAGE_FACCESSED | P64_PAGE_FDIRTY |
 	            USED_P64_PAGE_FGLOBAL);
@@ -131,7 +134,7 @@ again_calculate_vecN:
 	boot_trampoline_e1v[vec1 + 0].p_word |= P64_PAGE_FPREPARED;
 	boot_trampoline_e1v[vec1 + 1].p_word |= P64_PAGE_FPREPARED;
 	/* Setup the replacement E2-word */
-	e2_word = (u64)boot_trampoline_e1v - KERNEL_CORE_BASE;
+	e2_word = (u64)boot_trampoline_e1v - KERNEL_CORE_BASE; /* virt2phys() */
 	e2_word |= (P64_PAGE_FPRESENT | P64_PAGE_FWRITE |
 	            P64_PAGE_FACCESSED | P64_PAGE_FDIRTY);
 	COMPILER_WRITE_BARRIER();

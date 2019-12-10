@@ -162,7 +162,7 @@ function flattenElfBinary(
 		}
 		if (overrideEntry) {
 			o.seek(0);
-			o.putc(0xe9);               /* jmp rel32 */
+			o.putc(0xe9); /* jmp rel32 */
 			local off = (e_entry - virtBase) - 5;
 			o.putc(off & 0xff);
 			o.putc((off >> 8) & 0xff);

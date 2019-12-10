@@ -141,7 +141,7 @@ got_exe:
 	}
 	if (targetArch == "x86_64") {
 		/* Must create+use a custom kernel binary with e_machine = EM_386 */
-		local kernel386 = "{}em386-{}".format({
+		local kernel386 = "{}.em386-{}".format({
 			fs.headof(kernelFile),
 			fs.tailof(kernelFile),
 		});

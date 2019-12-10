@@ -100,12 +100,15 @@ got_bios:
 	local flat_last_modified = getLastModfiedTime(kernelFlatFilename);
 	if (flat_last_modified is none ||
 	    flat_last_modified < getLastModfiedTime(kernelFile)) {
-		print "[bochs] Create", repr kernelFlatFilename;
+		print "[bochs] Updating kernel shadow", repr kernelFlatFilename;
 		flattenElfBinary(
 			inputFile: kernelFile,
 			outputFile: kernelFlatFilename,
-			physBase: 0x00100000, /* 1M */
-			virtBase: 0xc0100000, /* 3G + 1M */
+			physBase: 0x00100000, /* 1MiB */
+			virtBase: {
+				"i386"   : 0xc0100000, /* 3GiB + 1MiB */
+				"x86_64" : 0xffffffff80100000, /* -2GiB + 1MiB */
+			}[targetArch],
 			keepBss: true,
 			overrideEntry: false);
 		/* In order to be accepted by BOCHS, the size of kernelFlatFilename
@@ -143,6 +146,14 @@ got_bios:
 		rc << "port_e9_hack: enabled=1\n";
 		rc << "clock: sync=none\n";
 //		rc << "debug: action=report\n";
+		local gdb_mode = options.get(opt.QEMU_GDB);
+		if (gdb_mode !is none) {
+			if (gdb_mode == "qemu")
+				rc << "gdbstub: enabled=1, port=1234\n";
+			else {
+				throw Error("bochs only supports --gdb=qemu mode");
+			}
+		}
 
 //		rc << "load32bitOSImage: os=nullkernel, path=" << repr(kernelFlatFilename) << ", iolog=, initrd=\n";
 //		rc << "plugin_ctrl: unmapped=1, biosdev=1, speaker=1, extfpuirq=1, parallel=1, serial=1, gameport=1\n";

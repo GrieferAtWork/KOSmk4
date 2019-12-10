@@ -652,7 +652,7 @@ INTERN_FUNCTION(_start)
 	loop   1b
 	/* Setup the page directory identity mapping
 	 * >> pagedir_kernel.p_e4[257] = &pagedir_kernel.p_e4[0] + FLAGS_VECTOR; */
-	movl   $(pagedir_kernel_p_e4(0)), pagedir_kernel_p_e4(257)
+	movl   $(pagedir_kernel_p_e4(0) + FLAGS_VECTOR), pagedir_kernel_p_e4(257)
 	/* HINT: Right now our VM looks like this:
 	 * [0] 0000000000000000..000000007fffffff --> 0000000000000000..000000007fffffff
 	 * [1] 0000007f80000000..0000007fffffffff --> 0000000000000000..000000007fffffff (Redundant, unavoidable, and never used)
