@@ -31,10 +31,28 @@
 
 
 /* Known disassembler target IDs. */
+/*[[[enum]]]*/
+#ifdef __CC__
+enum {
+	DISASSEMBLER_TARGET_UNKNOWN = 0x0000, /* Unknown target */
+	DISASSEMBLER_TARGET_8086    = 0x8086, /* Disassemble for 8086 (16-bit mode)  (in AT&T syntax) */
+	DISASSEMBLER_TARGET_I386    = 0x0386, /* Disassemble for i386+ (32-bit mode)  (in AT&T syntax) */
+	DISASSEMBLER_TARGET_X86_64  = 0x8664, /* Disassemble for long mode (64-bit mode)  (in AT&T syntax) */
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define DISASSEMBLER_TARGET_UNKNOWN DISASSEMBLER_TARGET_UNKNOWN /* Unknown target */
+#define DISASSEMBLER_TARGET_8086    DISASSEMBLER_TARGET_8086    /* Disassemble for 8086 (16-bit mode)  (in AT&T syntax) */
+#define DISASSEMBLER_TARGET_I386    DISASSEMBLER_TARGET_I386    /* Disassemble for i386+ (32-bit mode)  (in AT&T syntax) */
+#define DISASSEMBLER_TARGET_X86_64  DISASSEMBLER_TARGET_X86_64  /* Disassemble for long mode (64-bit mode)  (in AT&T syntax) */
+#else /* __COMPILER_PREFERR_ENUMS */
 #define DISASSEMBLER_TARGET_UNKNOWN 0x0000 /* Unknown target */
 #define DISASSEMBLER_TARGET_8086    0x8086 /* Disassemble for 8086 (16-bit mode)  (in AT&T syntax) */
 #define DISASSEMBLER_TARGET_I386    0x0386 /* Disassemble for i386+ (32-bit mode)  (in AT&T syntax) */
 #define DISASSEMBLER_TARGET_X86_64  0x8664 /* Disassemble for long mode (64-bit mode)  (in AT&T syntax) */
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 /* The target ID for the hosting machine. */
 #ifdef __x86_64__
