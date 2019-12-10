@@ -651,7 +651,8 @@ err_e3_vector:
 		vm_ppage_t e2_vector; /* 511 * 2MiB + 1 * VEC1 */
 		union p64_pdir_e2 e2_word;
 		u64 new_word, new_e3_word;
-		X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was);
+		if (VEC4_IS_USERSPACE)
+			X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was);
 		/* Create an E1 vector and mark all of the requested items as being prepared. */
 		e2_word.p_word = p64_e3word_to_e2word(e3.p_word);
 		/* Adjust the E2-word such that it properly represent a 2MiB page
@@ -694,7 +695,8 @@ err_e3_vector:
 		new_word = ATOMIC_READ(P64_PDIR_E4_IDENTITY[vec4].p_word);
 		if unlikely(e4.p_word != new_word) {
 word_changed_after_e2_vector:
-			X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was);
+			if (VEC4_IS_USERSPACE)
+				X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was);
 			page_freeone(e2_vector);
 			page_freeone(e1_vector);
 			goto again;
