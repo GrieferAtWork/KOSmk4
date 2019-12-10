@@ -303,9 +303,9 @@ INTERN_FUNCTION(libc___acheck)
 	.cfi_same_value %r14
 	movq   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_R15(%rax), %r15
 	.cfi_same_value %r15
-	pushq  OFFSET_KCPUSTATE_RIP(%eax)
+	pushq  OFFSET_KCPUSTATE_RIP(%rax)
 	.cfi_reg_value %rsp, 8, %rsp
-	pushq  OFFSET_KCPUSTATE_RFLAGS(%eax)
+	pushq  OFFSET_KCPUSTATE_RFLAGS(%rax)
 	.cfi_reg_value %rsp, 16, %rsp
 	.cfi_reg_offset %rflags, 0, %rsp
 	.cfi_reg_offset %rip, 8, %rsp
