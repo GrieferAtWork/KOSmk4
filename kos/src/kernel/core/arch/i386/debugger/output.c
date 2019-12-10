@@ -1264,26 +1264,43 @@ dbg_pprintf(int x, int y, /*utf-8*/ char const *__restrict format, ...) {
 
 
 PRIVATE ATTR_DBGBSS pagedir_pushval_t vga_oldmapping[VGA_VRAM_SIZE / PAGESIZE];
+#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+PRIVATE ATTR_DBGBSS bool vga_oldmapping_did_prepare = false;
+#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+
+
 PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_map)(void) {
 	unsigned int i;
 	if (vga_real_terminal_start != NULL)
 		return;
 	vga_vram_offset         = VGA_VRAM_TEXT - VGA_VRAM_BASE;
-	vga_real_terminal_start = (u16 *)(KERNEL_BASE + VGA_VRAM_TEXT);
+	vga_real_terminal_start = (u16 *)(KERNEL_CORE_BASE + VGA_VRAM_TEXT);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	/* TODO: We might get here so early during booting that the page frame allocator
-	 *       has yet to be initialized, at which point prepare would fail. - However,
-	 *       at that point we'd still have access to the physical identity map, so we
-	 *       should instead also support its use instead of only hacking around to
-	 *       place a temporary mapping of the VGA display just before the kernel. */
-	pagedir_prepare_map(VM_ADDR2PAGE((vm_virt_t)vga_real_terminal_start), VGA_VRAM_SIZE / PAGESIZE);
+	if (pagedir_ismapped(VM_ADDR2PAGE((vm_virt_t)vga_real_terminal_start)) &&
+	    pagedir_translate((vm_virt_t)vga_real_terminal_start) == (vm_phys_t)VGA_VRAM_TEXT) {
+		vga_oldmapping_did_prepare = false;
+		return;
+	}
+	/* We might get here so early during booting that the page frame allocator
+	 * has yet to be initialized, at which point prepare would fail. - However,
+	 * at that point we'd still have access to the physical identity map, so we
+	 * should instead also support its use instead of only hacking around to
+	 * place a temporary mapping of the VGA display just before the kernel. */
+	vga_oldmapping_did_prepare = pagedir_prepare_map(VM_ADDR2PAGE((vm_virt_t)vga_real_terminal_start),
+		                                             VGA_VRAM_SIZE / PAGESIZE);
+	if (!vga_oldmapping_did_prepare) {
+		printk(DBGSTR(KERN_CRIT "[dbg] Failed to find suitable location to map "
+		                        "VGA video memory. - This shouldn't happen\n"));
+	} else
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-	for (i = 0; i < COMPILER_LENOF(vga_oldmapping); ++i) {
-		pagedir_pushval_t oldword;
-		vm_vpage_t vp = VM_ADDR2PAGE((vm_virt_t)vga_real_terminal_start) + i;
-		oldword = pagedir_push_mapone(vp, VM_ADDR2PAGE((vm_phys_t)VGA_VRAM_TEXT) + i,
-		                              PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
-		vga_oldmapping[i] = oldword;
+	{
+		for (i = 0; i < COMPILER_LENOF(vga_oldmapping); ++i) {
+			pagedir_pushval_t oldword;
+			vm_vpage_t vp = VM_ADDR2PAGE((vm_virt_t)vga_real_terminal_start) + i;
+			oldword = pagedir_push_mapone(vp, VM_ADDR2PAGE((vm_phys_t)VGA_VRAM_TEXT) + i,
+			                              PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+			vga_oldmapping[i] = oldword;
+		}
 	}
 }
 
@@ -1291,6 +1308,11 @@ PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_unmap)(void) {
 	unsigned int i;
 	if (vga_real_terminal_start == NULL)
 		return;
+#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+	if (!vga_oldmapping_did_prepare)
+		return;
+	vga_oldmapping_did_prepare = false;
+#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	for (i = 0; i < COMPILER_LENOF(vga_oldmapping); ++i) {
 		vm_vpage_t vp = VM_ADDR2PAGE((vm_virt_t)vga_real_terminal_start) + i;
 		pagedir_pop_mapone(vp, vga_oldmapping[i]);
@@ -1469,6 +1491,19 @@ NOTHROW(KCALL vga_vram)(u32 vram_offset) {
 	vram_offset = vram_offset & ~(pagesize - 1);
 	if (vga_vram_offset != vram_offset) {
 		vm_vpage_t vp;
+#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+		if (!vga_oldmapping_did_prepare) {
+			byte_t *result;
+			result = (byte_t *)(KERNEL_CORE_BASE + VGA_VRAM_BASE + vram_offset);
+			if (pagedir_ismapped(VM_ADDR2PAGE((vm_virt_t)result)) &&
+			    pagedir_translate((vm_virt_t)result) == (vm_phys_t)(VGA_VRAM_BASE + vram_offset)) {
+				vga_vram_offset = vram_offset;
+				return result + offset;
+			}
+			printk(DBGSTR(KERN_CRIT "[dbg] Video memory not prepared, and not "
+			                        "identity-mapped. This will probably go wrong...\n"));
+		}
+#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		vp = VM_ADDR2PAGE((vm_virt_t)vga_real_terminal_start);
 		pagedir_map(vp, 1,
 		            VM_ADDR2PAGE((vm_phys_t)(VGA_VRAM_BASE + vram_offset)),
