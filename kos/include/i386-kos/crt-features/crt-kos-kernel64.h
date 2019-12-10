@@ -304,6 +304,7 @@
 #define __CRT_HAVE_dbg_getallregs 1
 #define __CRT_HAVE_dbg_getc 1
 #define __CRT_HAVE_dbg_getcur 1
+#define __CRT_HAVE_dbg_getcur_visible 1
 #define __CRT_HAVE_dbg_getfunc 1
 #define __CRT_HAVE_dbg_getfunc_fuzzy 1
 #define __CRT_HAVE_dbg_getfunc_start 1

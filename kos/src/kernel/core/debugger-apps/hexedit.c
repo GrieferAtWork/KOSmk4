@@ -296,7 +296,7 @@ hd_printscreen(void *start_addr, void *sel_addr,
 	sel_column = sel_byte / hd_bytes_per_word;
 	sel_byte += hd_hex_nibble / 2;
 	/* Always hide the cursor during rendering. */
-	dbg_setcur_visible(DBG_SETCUR_VISIBLE_HIDE);
+	dbg_setcur_visible(false);
 	for (line = 0; line < dbg_screen_height - 1; ++line) {
 		void *line_addr = (byte_t *)start_addr + line * hd_linesize;
 		bool is_line_selected;
@@ -501,7 +501,7 @@ hd_printscreen(void *start_addr, void *sel_addr,
 		/* Display the cursor at a custom location */
 		dbg_setcur(DBG_GETCUR_X(dst_cursor_pos),
 		           DBG_GETCUR_Y(dst_cursor_pos));
-		dbg_setcur_visible(DBG_SETCUR_VISIBLE_SHOW);
+		dbg_setcur_visible(true);
 	}
 }
 
@@ -702,7 +702,7 @@ NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
 
 		case KEY_ESC:
 			if (hd_has_changes()) {
-				dbg_setcur_visible(DBG_SETCUR_VISIBLE_HIDE);
+				dbg_setcur_visible(false);
 				dbg_setcolor(DBG_COLOR_BLACK, DBG_COLOR_LIGHT_GRAY);
 				dbg_messagebox(DBGSTR("Really Exit?"),
 				               DBGSTR("Unsaved changes still exist\n"
@@ -717,7 +717,7 @@ NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
 			goto done;
 
 		case KEY_F1:
-			dbg_setcur_visible(DBG_SETCUR_VISIBLE_HIDE);
+			dbg_setcur_visible(false);
 			dbg_setcolor(DBG_COLOR_BLACK, DBG_COLOR_LIGHT_GRAY);
 			dbg_messagebox(DBGSTR("Help"), hd_help);
 			/* Wait until the user presses ESC or F1 */
@@ -892,8 +892,7 @@ NOTHROW(FCALL dbg_hexedit)(void *addr, bool is_readonly) {
 	bool old_show_le;
 
 	/* Save terminal settings and display contents. */
-	was_cursor_visible = dbg_setcur_visible(DBG_SETCUR_VISIBLE_TEST);
-	dbg_setcur_visible(DBG_SETCUR_VISIBLE_HIDE);
+	was_cursor_visible = dbg_setcur_visible(false);
 	buf     = alloca(dbg_screen_width * dbg_screen_height * dbg_screen_cellsize);
 	oldcur  = dbg_getcur();
 	oldattr = dbg_attr;
@@ -924,8 +923,7 @@ NOTHROW(FCALL dbg_hexedit)(void *addr, bool is_readonly) {
 	dbg_setscreendata(0, 0, dbg_screen_width, dbg_screen_height, buf);
 	dbg_attr = oldattr;
 	dbg_setcur(DBG_GETCUR_X(oldcur), DBG_GETCUR_Y(oldcur));
-	if (was_cursor_visible)
-		dbg_setcur_visible(DBG_SETCUR_VISIBLE_SHOW);
+	dbg_setcur_visible(was_cursor_visible);
 	return result;
 }
 

@@ -60,13 +60,13 @@ NOTHROW(FCALL dbg_drawedit)(int x, int y, unsigned int field_width,
 	}
 	if (textptr < leftptr) {
 do_hide_cursor:
-		dbg_setcur_visible(DBG_SETCUR_VISIBLE_HIDE);
+		dbg_setcur_visible(false);
 	} else {
 		text_offset = (unsigned int)(textptr - leftptr);
 		if unlikely(text_offset > field_width)
 			goto do_hide_cursor;
 		dbg_setcur(x + text_offset, y);
-		dbg_setcur_visible(DBG_SETCUR_VISIBLE_SHOW);
+		dbg_setcur_visible(true);
 	}
 }
 

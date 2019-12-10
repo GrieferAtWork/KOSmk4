@@ -129,21 +129,18 @@ FUNDEF NONNULL((5)) void KCALL dbg_getscreendata(int x, int y, unsigned int size
 FUNDEF NONNULL((5)) void KCALL dbg_setscreendata(int x, int y, unsigned int size_x, unsigned int size_y, void const *__restrict buf);
 
 
-/* Set if the current cursor position should be visible.
- * @return: true:  The cursor is (now) visible.
- * @return: false: The cursor is (now) hidden. */
-FUNDEF bool NOTHROW(KCALL dbg_setcur_visible)(unsigned int cmd);
-#define DBG_SETCUR_VISIBLE_HIDE 0 /* Hide the cursor. */
-#define DBG_SETCUR_VISIBLE_SHOW 1 /* Show the cursor. */
-#define DBG_SETCUR_VISIBLE_TEST 2 /* Check if the cursor is visible. */
+/* Get/Set if the current cursor position should be visible.
+ * @return: * : The cursor-was-visible state prior to the call being made. */
+FUNDEF ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_getcur_visible)(void);
+FUNDEF bool NOTHROW(FCALL dbg_setcur_visible)(bool visible);
 
 /* Hints towards the screen driver to temporarily stop drawing to the screen,
  * but instead draw to a separate buffer, thus preventing flickering in the
  * case of whole screen redraw operations.
  * NOTE: Also affects updates made to the cursor position
  * @param: force: When true, force updates to stop. */
-FUNDEF void NOTHROW(KCALL dbg_beginupdate)(void);
-FUNDEF void NOTHROW(KCALL dbg_endupdate)(bool force DFL(false));
+FUNDEF void NOTHROW(FCALL dbg_beginupdate)(void);
+FUNDEF void NOTHROW(FCALL dbg_endupdate)(bool force DFL(false));
 
 /* TTY show-screen support (display the contents of the monitor before the debugger was enabled) */
 FUNDEF void NOTHROW(KCALL dbg_beginshowscreen)(void);

@@ -432,7 +432,7 @@ NOTHROW(FCALL av_printscreen)(void *start_addr, void **psel_addr,
 	            DISASSEMBLER_FNOADDR | DISASSEMBLER_FNOBYTES, 0);
 	da.d_format = &av_format;
 	da.d_symbol = &av_symbol_printer;
-	dbg_setcur_visible(DBG_SETCUR_VISIBLE_HIDE);
+	dbg_setcur_visible(false);
 	line = 0;
 	if (display_addr2line)
 		line = 1;
@@ -692,7 +692,7 @@ PUBLIC void *NOTHROW(FCALL dbg_asmview)(void *addr) {
 	u32 oldcur;
 	dbg_attr_t oldattr;
 	/* Save terminal settings and display contents. */
-	was_cursor_visible = dbg_setcur_visible(DBG_SETCUR_VISIBLE_TEST);
+	was_cursor_visible = dbg_getcur_visible();
 	buf = alloca(dbg_screen_width * dbg_screen_height * dbg_screen_cellsize);
 	oldcur = dbg_getcur();
 	oldattr = dbg_attr;
@@ -704,8 +704,7 @@ PUBLIC void *NOTHROW(FCALL dbg_asmview)(void *addr) {
 	dbg_setscreendata(0, 0, dbg_screen_width, dbg_screen_height, buf);
 	dbg_attr = oldattr;
 	dbg_setcur(DBG_GETCUR_X(oldcur), DBG_GETCUR_Y(oldcur));
-	if (was_cursor_visible)
-		dbg_setcur_visible(DBG_SETCUR_VISIBLE_SHOW);
+	dbg_setcur_visible(was_cursor_visible);
 	return result;
 }
 

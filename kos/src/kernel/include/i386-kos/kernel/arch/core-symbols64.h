@@ -12886,10 +12886,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak pagedir_isuserwritable; .quad pagedir_isuserwritable
 	.reloc ., R_X86_64_SIZE32, pagedir_isuserwritable; .int 0
 	.int 0xa749315
-	.quad 0 /* index: 3221 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname3221 /* index: 3221 */
+	.weak dbg_getcur_visible; .quad dbg_getcur_visible
+	.reloc ., R_X86_64_SIZE32, dbg_getcur_visible; .int 0
+	.int 0x70bec95
 	.quad 0 /* index: 3222 */
 	.quad 0
 	.int 0
@@ -20778,6 +20778,8 @@ END(kernel_symbol_table)
 	.string "task_free_rpc"
 .Lname3220:
 	.string "pagedir_isuserwritable"
+.Lname3221:
+	.string "dbg_getcur_visible"
 .Lname3223:
 	.string "sys32_sched_setaffinity"
 .Lname3225:

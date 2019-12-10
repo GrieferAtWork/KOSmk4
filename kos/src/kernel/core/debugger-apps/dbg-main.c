@@ -354,9 +354,9 @@ dbg_main(uintptr_t show_welcome) {
 		dbg_print(DBGSTR("> "));
 		attr = dbg_attr;
 		dbg_setfgcolor(DBG_COLOR_WHITE);
-		dbg_setcur_visible(DBG_SETCUR_VISIBLE_SHOW);
+		dbg_setcur_visible(true);
 		dbg_readline(cmdline, DBG_MAXLINE, &dbg_autocomplete_command);
-		dbg_setcur_visible(DBG_SETCUR_VISIBLE_HIDE);
+		dbg_setcur_visible(false);
 		dbg_attr = attr;
 		argc     = split_cmdline(cmdline, argv, DBG_ARGC_MAX);
 		if (!argc)

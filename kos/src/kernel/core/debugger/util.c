@@ -208,10 +208,12 @@ NOTHROW(KCALL dbg_menuex)(char const *__restrict title,
 	unsigned int message_end_y;
 	void *buf;
 	dbg_attr_t attr = dbg_attr;
+	bool was_cursor_visible;
 	dbg_setcolor(DBG_COLOR_LIGHT_GRAY, DBG_COLOR_BLACK);
 	buf = alloca(dbg_screen_width *
 	             dbg_screen_height *
 	             dbg_screen_cellsize);
+	was_cursor_visible = dbg_setcur_visible(false);
 	dbg_getscreendata(0, 0, dbg_screen_width, dbg_screen_height, buf);
 	dbg_fillscreen(' ');
 	dbg_fillrect_doublestroke(0, 0, dbg_screen_width, dbg_screen_height);
@@ -237,11 +239,13 @@ NOTHROW(KCALL dbg_menuex)(char const *__restrict title,
 	for (;;) {
 		unsigned int key;
 		dbg_setcur(1, message_end_y);
+		dbg_beginupdate();
 		for (i = 0; options[i]; ++i) {
 			dbg_setcolor(DBG_COLOR_WHITE, i == default_option ? DBG_COLOR_LIGHT_GRAY : DBG_COLOR_BLACK);
 			dbg_hline(1, message_end_y + i, dbg_screen_width - 2, ' ');
 			dbg_pprintf(5, message_end_y + i, DBGSTR("%s"), options[i]);
 		}
+		dbg_endupdate(true);
 		key = dbg_getkey();
 		switch (key) {
 		case KEY_ENTER:
@@ -263,6 +267,7 @@ NOTHROW(KCALL dbg_menuex)(char const *__restrict title,
 	}
 done:
 	dbg_setscreendata(0, 0, dbg_screen_width, dbg_screen_height, buf);
+	dbg_setcur_visible(was_cursor_visible);
 	dbg_attr = attr;
 	return default_option;
 }

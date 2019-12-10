@@ -12886,10 +12886,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak pagedir_isuserwritable; .long pagedir_isuserwritable
 	.reloc ., R_386_SIZE32, pagedir_isuserwritable; .long 0
 	.long 0xa749315
-	.long 0 /* index: 3221 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3221 /* index: 3221 */
+	.weak dbg_getcur_visible; .long dbg_getcur_visible
+	.reloc ., R_386_SIZE32, dbg_getcur_visible; .long 0
+	.long 0x70bec95
 	.long 0 /* index: 3222 */
 	.long 0
 	.long 0
@@ -20166,6 +20166,8 @@ END(kernel_symbol_table)
 	.string "mouse_device_moveto_nopr"
 .Lname3220:
 	.string "pagedir_isuserwritable"
+.Lname3221:
+	.string "dbg_getcur_visible"
 .Lname3225:
 	.string "sys_fchmod"
 .Lname3227:

@@ -355,20 +355,23 @@ done:
 }
 
 
+PUBLIC ATTR_DBGTEXT ATTR_PURE WUNUSED bool
+NOTHROW(FCALL dbg_getcur_visible)(void) {
+	return vga_terminal_showcur;
+}
 PUBLIC ATTR_DBGTEXT bool
-NOTHROW(KCALL dbg_setcur_visible)(unsigned int cmd) {
-	if (cmd == DBG_SETCUR_VISIBLE_SHOW) {
-		if (!vga_terminal_showcur) {
-			if (!vga_backlog_scrollpos && !vga_suppress_update)
+NOTHROW(FCALL dbg_setcur_visible)(bool visible) {
+	bool result;
+	result = vga_terminal_showcur;
+	if (result != visible) {
+		if (!vga_backlog_scrollpos && !vga_suppress_update) {
+			if (visible)
 				vga_update_cursor_pos();
-			vga_terminal_showcur = true;
-		}
-	} else if (cmd == DBG_SETCUR_VISIBLE_HIDE) {
-		if (vga_terminal_showcur) {
-			if (!vga_backlog_scrollpos && !vga_suppress_update)
+			else {
 				vga_disable_cursor();
-			vga_terminal_showcur = false;
+			}
 		}
+		vga_terminal_showcur = visible;
 	}
 	return vga_terminal_showcur;
 }
@@ -405,13 +408,13 @@ NOTHROW(KCALL vga_disable_offscreen_buffer)(void) {
  * case of whole screen redraw operations.
  * NOTE: Also affects updates made to the cursor position
  * @param: force: When true, force updates to stop. */
-PUBLIC ATTR_DBGTEXT void NOTHROW(KCALL dbg_beginupdate)(void) {
+PUBLIC ATTR_DBGTEXT void NOTHROW(FCALL dbg_beginupdate)(void) {
 	++vga_suppress_update;
 	if (vga_suppress_update == 1)
 		vga_enable_offscreen_buffer();
 }
 
-PUBLIC ATTR_DBGTEXT void NOTHROW(KCALL dbg_endupdate)(bool force) {
+PUBLIC ATTR_DBGTEXT void NOTHROW(FCALL dbg_endupdate)(bool force) {
 	if (vga_suppress_update == 0)
 		return; /* Missing `dbg_beginupdate()' */
 	if (force) {
@@ -1697,6 +1700,13 @@ INTERN ATTR_DBGTEXT void NOTHROW(KCALL dbg_reset_tty)(void) {
 	dbg_last_character           = 0;
 	vga_cursor_is_shown          = false;
 	memsetw(vga_real_terminal_start, VGA_EMPTY, VGA_WIDTH * VGA_HEIGHT);
+	{
+		u8 cursor_start;
+		/* Make sure that the text-mode cursor is hidden by default. */
+		cursor_start = vga_rcrt(VGA_CRTC_CURSOR_START);
+		if (!(cursor_start & VGA_CRA_FCURSOR_DISABLE))
+			vga_wcrt(VGA_CRTC_CURSOR_START, cursor_start | VGA_CRA_FCURSOR_DISABLE);
+	}
 }
 
 
