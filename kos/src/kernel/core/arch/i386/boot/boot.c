@@ -110,6 +110,12 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	x86_initialize_atomic64();
 #endif /* !__x86_64__ */
 
+#ifdef __x86_64__
+	/* Initialize (rd|wr)(fs|gs)base support and (if necessary)
+	 * patch the kernel to user (rd|wr)msr if unavailable. */
+	x86_initialize_fsgsbase();
+#endif /* __x86_64__ */
+
 	/* Initialize per-task/per-cpu structures */
 	kernel_initialize_scheduler();
 

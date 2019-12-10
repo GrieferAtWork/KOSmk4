@@ -18,6 +18,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_FSGSBASE64_C
 #define GUARD_KERNEL_CORE_ARCH_I386_FSGSBASE64_C 1
+#define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -25,11 +26,14 @@
 #include <hybrid/host.h>
 #ifdef __x86_64__
 
+#include <kernel/cpuid.h>
 #include <kernel/fsgsbase.h>
 #include <kernel/panic.h>
 #include <kernel/types.h>
 
 #include <hybrid/unaligned.h>
+
+#include <asm/cpu-cpuid.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -55,7 +59,7 @@ DECL_BEGIN
 	callback(r13)                         \
 	callback(r14)                         \
 	callback(r15)
-#define DEFINE_FSGSBASE_FUNCTIONS(reg)       \
+#define DEFINE_FSGSBASE_FUNCTIONS(reg)    \
 	INTDEF byte_t __x64_rdfsbase_##reg[]; \
 	INTDEF byte_t __x64_rdgsbase_##reg[]; \
 	INTDEF byte_t __x64_wrfsbase_##reg[]; \
@@ -107,7 +111,7 @@ PRIVATE ATTR_COLDRODATA fsgsbase_patches_t const fsgsbase_patches = {
  * @return: false: The given code location was already patched,
  *                 or isn't one of the above instructions. */
 PUBLIC ATTR_COLDTEXT NOBLOCK bool
-NOTHROW(KCALL x86_fsgsbase_patch)(void *__restrict pc) {
+NOTHROW(FCALL x86_fsgsbase_patch)(void *__restrict pc) {
 	/* F3 REX.W 0F AE /0 RDFSBASE r64 */
 	/* F3 REX.W 0F AE /1 RDGSBASE r64 */
 	/* F3 REX.W 0F AE /2 WRFSBASE r64 */
@@ -128,7 +132,7 @@ NOTHROW(KCALL x86_fsgsbase_patch)(void *__restrict pc) {
 		return false; /* Missing REX/F3 prefix */
 	}
 	rex = byte & 0xf;
-	if (!(rex & F_REX_W))
+	if (!(rex & 8)) /* REX.W */
 		return false; /* Wrong REX prefix */
 	if (code[2] != 0x0f)
 		return false; /* Wrong instruction */
@@ -138,7 +142,7 @@ NOTHROW(KCALL x86_fsgsbase_patch)(void *__restrict pc) {
 	if ((byte & MODRM_MOD_MASK) != (0x3 << MODRM_MOD_SHIFT))
 		return false; /* Not a register operand. */
 	regno = MODRM_GETRM(byte);
-	if (rex & F_REX_B)
+	if (rex & 0x1) /* REX.B */
 		regno |= 0x8;
 	method = MODRM_GETREG(byte);
 	if unlikely(method >= 4)
@@ -165,16 +169,19 @@ NOTHROW(KCALL x86_fsgsbase_patch)(void *__restrict pc) {
 }
 
 
-INTDEF uint32_t __x64_fixup_fsgsbase_start[];
-INTDEF uint32_t __x64_fixup_fsgsbase_end[];
+INTDEF FREE uint32_t __x64_fixup_fsgsbase_start[];
+INTDEF FREE uint32_t __x64_fixup_fsgsbase_end[];
 
 /* Patch all (rd|wr)(fs|gs)base text location within the kernel core. */
 INTERN NOBLOCK ATTR_FREETEXT void
-NOTHROW(KCALL fsgsbase_patch_kernel)(void) {
+NOTHROW(KCALL x86_initialize_fsgsbase)(void) {
 	uint32_t *iter;
-	/* TODO: Call this function from _start64.S if the boot
-	 *       CPU doesn't support the fsgsbase instruction set. */
-
+	/* Check if our CPU supports fsgsbase. If it does, the we don't have
+	 * to do anything, and we can NOP out calls to `x86_fsgsbase_patch()' */
+	if (x86_bootcpu_cpuid.ci_7b & CPUID_7B_FSGSBASE) {
+		*((byte_t *)x86_fsgsbase_patch + 0) = 0xc3;
+		return;
+	}
 	/* Patch all fsgsbase instructions within the kernel core. */
 	for (iter = __x64_fixup_fsgsbase_start;
 	     iter < __x64_fixup_fsgsbase_end; ++iter) {
