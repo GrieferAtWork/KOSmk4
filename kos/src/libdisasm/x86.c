@@ -70,7 +70,7 @@ DECL_BEGIN
 #define R_R13    13 /* R13 */
 #define R_R14    14 /* R14 */
 #define R_R15    15 /* R15 */
-#define R_FREX 0x10 /* FLAG: A REX prefix is being used (only affects `x86_reg8_offsets'). */
+#define R_RIP    16 /* %rip (special value that may appear in `mi_rm') */
 
 PRIVATE char const gp_register_names8[16][5] = {
 	{ '%', 'a', 'l', 0, 0 },
@@ -129,7 +129,7 @@ PRIVATE char const gp_register_names16[16][5] = {
 	{ '%', 'r', '1', '5', 'w' },
 };
 
-PRIVATE char const gp_register_names32[16][5] = {
+PRIVATE char const gp_register_names32[17][5] = {
 	{ '%', 'e', 'a', 'x', 0 },
 	{ '%', 'e', 'c', 'x', 0 },
 	{ '%', 'e', 'd', 'x', 0 },
@@ -146,9 +146,10 @@ PRIVATE char const gp_register_names32[16][5] = {
 	{ '%', 'r', '1', '3', 'd' },
 	{ '%', 'r', '1', '4', 'd' },
 	{ '%', 'r', '1', '5', 'd' },
+	{ '%', 'e', 'i', 'p', 0 },
 };
 
-PRIVATE char const gp_register_names64[16][4] = {
+PRIVATE char const gp_register_names64[17][4] = {
 	{ '%', 'r', 'a', 'x' },
 	{ '%', 'r', 'c', 'x' },
 	{ '%', 'r', 'd', 'x' },
@@ -165,6 +166,7 @@ PRIVATE char const gp_register_names64[16][4] = {
 	{ '%', 'r', '1', '3' },
 	{ '%', 'r', '1', '4' },
 	{ '%', 'r', '1', '5' },
+	{ '%', 'r', 'i', 'p' }  /* R_RIP */
 };
 
 PRIVATE char const sreg_register_names[16][4] = {
@@ -436,8 +438,6 @@ decode_modrm(struct disassembler *__restrict self,
 		}
 	} else {
 		info->mi_rm = MODRM_GETRM(rmbyte);
-		if (flags & F_HASREX)
-			info->mi_reg |= 0x10;
 		if (flags & F_REX_R)
 			info->mi_reg |= 0x8;
 		if (flags & F_REX_B)
@@ -452,6 +452,8 @@ decode_modrm(struct disassembler *__restrict self,
 				info->mi_index  = 0xff;
 				info->mi_offset = UNALIGNED_GET32((uint32_t *)self->d_pc);
 				self->d_pc += 4;
+				if (DA86_IS64(self))
+					info->mi_rm = R_RIP; /* RIP-relative addressing */
 			} else if (info->mi_rm == R_ESP) {
 				sibbyte         = *self->d_pc++;
 				info->mi_offset = 0;
@@ -464,8 +466,11 @@ parse_sib_byte:
 				if (info->mi_index == R_ESP)
 					info->mi_index = 0xff;
 				if ((info->mi_rm == R_EBP) &&
-				    (rmbyte & MODRM_MOD_MASK) == (0x0 << MODRM_MOD_SHIFT))
-					info->mi_rm = 0xff;
+				    (rmbyte & MODRM_MOD_MASK) == (0x0 << MODRM_MOD_SHIFT)) {
+					info->mi_rm = 0xff; /* disp32 */
+					info->mi_offset = UNALIGNED_GET32((u32 *)self->d_pc);
+					self->d_pc += 4;
+				}
 			} else {
 				info->mi_index  = 0xff;
 				info->mi_offset = 0;
@@ -696,7 +701,8 @@ da_print_reg16(struct disassembler *__restrict self, u8 regno) {
 
 PRIVATE void CC
 da_print_reg32(struct disassembler *__restrict self, u8 regno) {
-	char const *name = gp_register_names32[regno & 15];
+	char const *name;
+	name = gp_register_names32[regno <= R_RIP ? regno : (regno & 15)];
 	disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_PREFIX);
 	disasm_print(self, name, name[4] ? 5 : 4);
 	disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_SUFFIX);
@@ -704,7 +710,8 @@ da_print_reg32(struct disassembler *__restrict self, u8 regno) {
 
 PRIVATE void CC
 da_print_reg64(struct disassembler *__restrict self, u8 regno) {
-	char const *name = gp_register_names64[regno & 15];
+	char const *name;
+	name = gp_register_names64[regno <= R_RIP ? regno : (regno & 15)];
 	disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_PREFIX);
 	disasm_print(self, name, name[3] ? 4 : 3);
 	disasm_print_format(self, DISASSEMBLER_FORMAT_REGISTER_SUFFIX);
@@ -786,8 +793,11 @@ da_print_modrm_rm(struct disassembler *__restrict self,
 			disasm_print(self, "(", 1);
 			if (rm->mi_rm != 0xff) {
 				if (DA86_IS64(self)) {
+					if (flags & F_67)
+						goto do_print_base32;
 					da_print_reg64(self, rm->mi_rm);
 				} else if (DA86_IS32(self) ^ ((flags & F_67) != 0)) {
+do_print_base32:
 					da_print_reg32(self, rm->mi_rm);
 				} else {
 					da_print_reg16(self, rm->mi_rm);
@@ -796,8 +806,11 @@ da_print_modrm_rm(struct disassembler *__restrict self,
 			if (rm->mi_index != 0xff) {
 				disasm_print(self, ",", 1);
 				if (DA86_IS64(self)) {
+					if (flags & F_67)
+						goto do_print_index32;
 					da_print_reg64(self, rm->mi_index);
 				} else if (DA86_IS32(self) ^ ((flags & F_67) != 0)) {
+do_print_index32:
 					da_print_reg32(self, rm->mi_index);
 				} else {
 					da_print_reg16(self, rm->mi_index);
@@ -3166,9 +3179,7 @@ no_jcc_sel:
 					if (rm.mi_type == MODRM_REGISTER ||
 					    rm.mi_index == 0xff ||
 					    rm.mi_rm == 0xff) {
-						disasm_print(self, "??"
-						                   "? /*",
-						             6);
+						disasm_print(self, "??" "? /*", 6);
 						da_print_modrm_rm(self, &rm, flags, DA86_IS64(self) ? 8 : 4);
 						disasm_print(self, "*/", 2);
 					} else if (DA86_IS64(self)) {
