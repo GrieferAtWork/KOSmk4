@@ -115,7 +115,7 @@ INTERN_FUNCTION(libc___afail)
 	pushq_cfi %rdx /* aa_line */
 	pushq_cfi %rsi /* aa_file */
 	pushq_cfi %rdi /* aa_expr */
-	pushq_cfi (6*8)(%rsp) /* aa_state.kcs_rip */
+	pushq_cfi (5*8)(%rsp) /* aa_state.kcs_rip */
 	pushfq_cfi_r          /* aa_state.kcs_rflags */
 	pushq_cfi_r %rax      /* [C] Accumulator register */
 	pushq_cfi_r %rcx      /* [C] Count register */
@@ -165,7 +165,7 @@ INTERN_FUNCTION(libc___afailf)
 	pushq_cfi %rdx /* aa_line */
 	pushq_cfi %rsi /* aa_file */
 	pushq_cfi %rdi /* aa_expr */
-	pushq_cfi (6*8)(%rsp) /* aa_state.kcs_rip */
+	pushq_cfi (5*8)(%rsp) /* aa_state.kcs_rip */
 	pushfq_cfi_r          /* aa_state.kcs_rflags */
 	pushq_cfi_r %rax      /* [C] Accumulator register */
 	pushq_cfi_r %rcx      /* [C] Count register */
@@ -187,7 +187,7 @@ INTERN_FUNCTION(libc___afailf)
 	leaq   ((6*8) - OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9)(%rsp), %rcx
 	pushq_cfi %rcx        /* vl_reg_save_area (== &aa_state.kcs_gpregs.gp_r9 - OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9) */
 	pushq_cfi %rdx        /* vl_overflow_arg_area (== aa_state.kcs_gpregs.gp_rsp) */
-	pushq  $(5 * 8)       /* vl_gp_offset */
+	pushq_cfi $(5 * 8)    /* vl_gp_offset */
 	movq   %rsp, %rdi     /* libc_assertion_failure_core:args */
 #ifndef __NO_FPU
 	/* Check if FPU registers need saving */
@@ -227,7 +227,7 @@ INTERN_FUNCTION(libc___acheck)
 	pushq_cfi %rdx /* aa_line */
 	pushq_cfi %rsi /* aa_file */
 	pushq_cfi %rdi /* aa_expr */
-	pushq_cfi (6*8)(%rsp) /* aa_state.kcs_rip */
+	pushq_cfi (5*8)(%rsp) /* aa_state.kcs_rip */
 	pushfq_cfi_r          /* aa_state.kcs_rflags */
 	pushq_cfi_r %rax      /* [C] Accumulator register */
 	pushq_cfi_r %rcx      /* [C] Count register */
@@ -338,7 +338,7 @@ INTERN_FUNCTION(libc___acheckf)
 	pushq_cfi %rdx /* aa_line */
 	pushq_cfi %rsi /* aa_file */
 	pushq_cfi %rdi /* aa_expr */
-	pushq_cfi (6*8)(%rsp) /* aa_state.kcs_rip */
+	pushq_cfi (5*8)(%rsp) /* aa_state.kcs_rip */
 	pushfq_cfi_r          /* aa_state.kcs_rflags */
 	pushq_cfi_r %rax      /* [C] Accumulator register */
 	pushq_cfi_r %rcx      /* [C] Count register */
@@ -360,7 +360,7 @@ INTERN_FUNCTION(libc___acheckf)
 	leaq   ((6*8) - OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9)(%rsp), %rcx
 	pushq_cfi %rcx        /* vl_reg_save_area (== &aa_state.kcs_gpregs.gp_r9 - OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9) */
 	pushq_cfi %rdx        /* vl_overflow_arg_area (== aa_state.kcs_gpregs.gp_rsp) */
-	pushq  $(5 * 8)       /* vl_gp_offset */
+	pushq_cfi $(5 * 8)    /* vl_gp_offset */
 	movq   %rsp, %rdi     /* libc_assertion_failure_core:args */
 #ifndef __NO_FPU
 	/* Check if FPU registers need saving */
@@ -401,12 +401,12 @@ INTERN_FUNCTION(libc___assert_func)
 	 * %rsi: unsigned int line
 	 * %rdx: char const *func
 	 * %rcx: char const *expr */
-	pushq_cfi $(0)   /* aa_format */
+	pushq_cfi $(0) /* aa_format */
 	pushq_cfi %rdx /* aa_func */
 	pushq_cfi %rsi /* aa_line */
 	pushq_cfi %rdi /* aa_file */
 	pushq_cfi %rcx /* aa_expr */
-	pushq_cfi (6*8)(%rsp) /* aa_state.kcs_rip */
+	pushq_cfi (5*8)(%rsp) /* aa_state.kcs_rip */
 	pushfq_cfi_r          /* aa_state.kcs_rflags */
 	pushq_cfi_r %rax      /* [C] Accumulator register */
 	pushq_cfi_r %rcx      /* [C] Count register */
@@ -445,7 +445,7 @@ INTERN_FUNCTION(libc___assert)
 	pushq_cfi %rsi /* aa_line */
 	pushq_cfi %rdi /* aa_file */
 	pushq_cfi %rdx /* aa_expr */
-	pushq_cfi (6*8)(%rsp) /* aa_state.kcs_rip */
+	pushq_cfi (5*8)(%rsp) /* aa_state.kcs_rip */
 	pushfq_cfi_r          /* aa_state.kcs_rflags */
 	pushq_cfi_r %rax      /* [C] Accumulator register */
 	pushq_cfi_r %rcx      /* [C] Count register */
@@ -484,7 +484,7 @@ INTERN_FUNCTION(libc__assert)
 	pushq_cfi %rdx /* aa_line */
 	pushq_cfi %rsi /* aa_file */
 	pushq_cfi %rdi /* aa_expr */
-	pushq_cfi (6*8)(%rsp) /* aa_state.kcs_rip */
+	pushq_cfi (5*8)(%rsp) /* aa_state.kcs_rip */
 	pushfq_cfi_r          /* aa_state.kcs_rflags */
 	pushq_cfi_r %rax      /* [C] Accumulator register */
 	pushq_cfi_r %rcx      /* [C] Count register */
