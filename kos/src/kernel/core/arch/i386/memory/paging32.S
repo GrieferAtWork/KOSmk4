@@ -56,7 +56,9 @@ END(pagedir_syncall)
 /* Hybrid of `pagedir_syncall()' and `pagedir_syncall_user()': When the given range
  * overlaps with kernel-space, behave the same as `pagedir_syncall()', otherwise,
  * behave the same as `pagedir_syncall_user()' */
-/* FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_syncall_maybe_global)(VIRT vm_virt_t virt_addr, size_t num_pages); */
+/* >> FUNDEF NOBLOCK void
+ * >> NOTHROW(FCALL x86_pagedir_syncall_maybe_global)(VIRT vm_virt_t virt_addr,
+ * >>                                                 size_t num_pages); */
 PUBLIC_FUNCTION(x86_pagedir_syncall_maybe_global)
 	.cfi_startproc
 	shll   $(12), %edx

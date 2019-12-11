@@ -44,6 +44,36 @@
 #include "paging32-com.h"
 
 
+#ifdef CONFIG_USE_NEW_PAGING
+#define FOREACH_PAGING_FUNCTION(callback)     \
+	callback(pagedir_init);                   \
+	callback(pagedir_fini);                   \
+	callback(npagedir_prepare_mapone);        \
+	callback(npagedir_prepare_map);           \
+	callback(npagedir_prepare_map_keep);      \
+	callback(npagedir_unprepare_mapone);      \
+	callback(npagedir_unprepare_map);         \
+	callback(npagedir_maphintone);            \
+	callback(npagedir_maphint);               \
+	callback(npagedir_gethint);               \
+	callback(npagedir_mapone);                \
+	callback(npagedir_map);                   \
+	callback(npagedir_push_mapone);           \
+	callback(npagedir_pop_mapone);            \
+	callback(npagedir_unmapone);              \
+	callback(npagedir_unmap);                 \
+	callback(npagedir_unwriteone);            \
+	callback(npagedir_unwrite);               \
+	callback(pagedir_unmap_userspace);        \
+	callback(pagedir_unmap_userspace_nosync); \
+	callback(pagedir_translate);              \
+	callback(npagedir_ismapped);              \
+	callback(npagedir_iswritable);            \
+	callback(npagedir_isuseraccessible);      \
+	callback(npagedir_isuserwritable);        \
+	callback(npagedir_haschanged);            \
+	callback(npagedir_unsetchanged);
+#else /* CONFIG_USE_NEW_PAGING */
 #define FOREACH_PAGING_FUNCTION(callback)     \
 	callback(pagedir_init);                   \
 	callback(pagedir_fini);                   \
@@ -72,6 +102,7 @@
 	callback(pagedir_isuserwritable);         \
 	callback(pagedir_haschanged);             \
 	callback(pagedir_unsetchanged);
+#endif /* !CONFIG_USE_NEW_PAGING */
 
 
 

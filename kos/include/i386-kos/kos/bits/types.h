@@ -24,10 +24,10 @@
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
-#define __SIZEOF_VM_VPAGE_T__   __SIZEOF_POINTER__
-#define __SIZEOF_VM_PPAGE_T__   __SIZEOF_POINTER__
-#define __SIZEOF_VM_SPAGE_T__   __SIZEOF_POINTER__
-#define __SIZEOF_VM_VIRT_T__    __SIZEOF_POINTER__
+#define __SIZEOF_VM_VPAGE_T__   __SIZEOF_POINTER__ /* DEPRECATED; REMOVE ME */
+#define __SIZEOF_VM_PPAGE_T__   __SIZEOF_POINTER__ /* DEPRECATED; REMOVE ME */
+#define __SIZEOF_VM_SPAGE_T__   __SIZEOF_POINTER__ /* DEPRECATED; REMOVE ME */
+#define __SIZEOF_VM_VIRT_T__    __SIZEOF_POINTER__ /* DEPRECATED; REMOVE ME */
 #define __SIZEOF_VM_PHYS_T__    8
 
 #ifdef __CC__
@@ -79,25 +79,25 @@ typedef __bitwise __UINT64_TYPE__ __be64;
 #endif
 #endif /* !____le8_defined */
 #if defined(__KERNEL__) && defined(ALTERNATIVE_TYPE)
-typedef /*VIRT*/ ALTERNATIVE_TYPE(__ULONGPTR_TYPE__) __vm_vpage_t; /* Virtual memory page index (`virtual_address / getpagesize()'). */
-typedef /*PHYS*/ ALTERNATIVE_TYPE(__ULONGPTR_TYPE__) __vm_ppage_t; /* Physical memory page index (`physical_address / getpagesize()'). */
-typedef /*SWAP*/ ALTERNATIVE_TYPE(__ULONGPTR_TYPE__) __vm_spage_t; /* Swap memory page index (`swap_address / getpagesize()'). */
-typedef /*VIRT*/ ALTERNATIVE_TYPE(__ULONGPTR_TYPE__) __vm_virt_t;  /* A virtual memory pointer. */
-typedef /*PHYS*/ ALTERNATIVE_TYPE(__UINT64_TYPE__)   __vm_phys_t;  /* A physical memory pointer. */
+typedef /*VIRT*/ ALTERNATIVE_TYPE(__ULONGPTR_TYPE__) __vm_vpage_t; /* Virtual memory page index (`virtual_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
+typedef /*PHYS*/ ALTERNATIVE_TYPE(__ULONGPTR_TYPE__) __vm_ppage_t; /* Physical memory page index (`physical_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
+typedef /*SWAP*/ ALTERNATIVE_TYPE(__ULONGPTR_TYPE__) __vm_spage_t; /* Swap memory page index (`swap_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
+typedef /*VIRT*/ ALTERNATIVE_TYPE(__ULONGPTR_TYPE__) __vm_virt_t;  /* A virtual memory pointer. */ /* DEPRECATED; REMOVE ME */
+typedef /*PHYS*/ ALTERNATIVE_TYPE(__UINT64_TYPE__)   __vm_phys_t;  /* A physical memory pointer. */ /* TODO: Rename to `__phys_t' */
 #else
-typedef /*VIRT*/ __ULONGPTR_TYPE__ __vm_vpage_t;                   /* Virtual memory page index (`virtual_address / getpagesize()'). */
-typedef /*PHYS*/ __ULONGPTR_TYPE__ __vm_ppage_t;                   /* Physical memory page index (`physical_address / getpagesize()'). */
-typedef /*SWAP*/ __ULONGPTR_TYPE__ __vm_spage_t;                   /* Swap memory page index (`swap_address / getpagesize()'). */
-typedef /*VIRT*/ __ULONGPTR_TYPE__ __vm_virt_t;                    /* A virtual memory pointer. */
-typedef /*PHYS*/ __UINT64_TYPE__   __vm_phys_t;                    /* A physical memory pointer. */
+typedef /*VIRT*/ __ULONGPTR_TYPE__ __vm_vpage_t;                   /* Virtual memory page index (`virtual_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
+typedef /*PHYS*/ __ULONGPTR_TYPE__ __vm_ppage_t;                   /* Physical memory page index (`physical_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
+typedef /*SWAP*/ __ULONGPTR_TYPE__ __vm_spage_t;                   /* Swap memory page index (`swap_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
+typedef /*VIRT*/ __ULONGPTR_TYPE__ __vm_virt_t;                    /* A virtual memory pointer. */ /* DEPRECATED; REMOVE ME */
+typedef /*PHYS*/ __UINT64_TYPE__   __vm_phys_t;                    /* A physical memory pointer. */ /* TODO: Rename to `phys_t'; TODO: Move into <kernel/arch/paging.h> */
 #endif
 
 #if __SIZEOF_LONG__ >= 8
-typedef __vm_vpage_t __vm_vpage64_t;
+typedef __vm_vpage_t __vm_vpage64_t; /* DEPRECATED; REMOVE ME */
 #elif defined(__KERNEL__) && defined(ALTERNATIVE_TYPE)
-typedef ALTERNATIVE_TYPE(__UINT64_TYPE__) __vm_vpage64_t;
+typedef ALTERNATIVE_TYPE(__UINT64_TYPE__) __vm_vpage64_t; /* DEPRECATED; REMOVE ME */
 #else
-typedef __UINT64_TYPE__ __vm_vpage64_t;
+typedef __UINT64_TYPE__ __vm_vpage64_t; /* DEPRECATED; REMOVE ME */
 #endif
 
 
@@ -115,11 +115,11 @@ __SYSDECL_END
  */
 
 #ifdef __x86_64__
-#define __VM_VPAGE_MAX __CCAST(__vm_vpage_t)__UINT64_C(0xfffffffffffff) /* (4096Tib / 4096) - 1 */
-#define __VM_PPAGE_MAX __CCAST(__vm_ppage_t)__UINT64_C(0xfffffffffffff) /* (4096Tib / 4096) - 1 */
+#define __VM_VPAGE_MAX __CCAST(__vm_vpage_t)__UINT64_C(0xfffffffffffff) /* (4096Tib / 4096) - 1 */ /* DEPRECATED; REMOVE ME */
+#define __VM_PPAGE_MAX __CCAST(__vm_ppage_t)__UINT64_C(0xfffffffffffff) /* (4096Tib / 4096) - 1 */ /* DEPRECATED; REMOVE ME */
 #else /* __x86_64__ */
-#define __VM_VPAGE_MAX __CCAST(__vm_vpage_t)0xfffff  /* (4Gib / 4096) - 1 */
-#define __VM_PPAGE_MAX __CCAST(__vm_ppage_t)0xffffff /* (64Gib / 4096) - 1 */
+#define __VM_VPAGE_MAX __CCAST(__vm_vpage_t)0xfffff  /* (4Gib / 4096) - 1 */ /* DEPRECATED; REMOVE ME */
+#define __VM_PPAGE_MAX __CCAST(__vm_ppage_t)0xffffff /* (64Gib / 4096) - 1 */ /* DEPRECATED; REMOVE ME */
 #endif /* !__x86_64__ */
 
 
@@ -138,13 +138,13 @@ __INT64_TYPE__ ____intellisense_vm_addr2page(__INT64_TYPE__ __x);
 __UINT64_TYPE__ ____intellisense_vm_addr2page(__UINT64_TYPE__ __x);
 #endif /* __SIZEOF_POINTER__ != 8 */
 }}
-#define __VM_PPAGE2ADDR  __intern::____intellisense_vm_ppage2addr
-#define __VM_PAGE2ADDR   __intern::____intellisense_vm_page2addr
-#define __VM_ADDR2PAGE   __intern::____intellisense_vm_addr2page
+#define __VM_PPAGE2ADDR  __intern::____intellisense_vm_ppage2addr /* DEPRECATED; REMOVE ME */
+#define __VM_PAGE2ADDR   __intern::____intellisense_vm_page2addr /* DEPRECATED; REMOVE ME */
+#define __VM_ADDR2PAGE   __intern::____intellisense_vm_addr2page /* DEPRECATED; REMOVE ME */
 #else
-#define __VM_PPAGE2ADDR(page)   (__CCAST(__vm_phys_t)(page)*4096)
-#define __VM_PAGE2ADDR(page)    ((page)*4096)
-#define __VM_ADDR2PAGE(addr)    ((addr)/4096)
+#define __VM_PPAGE2ADDR(page)   (__CCAST(__vm_phys_t)(page)*4096) /* DEPRECATED; REMOVE ME */
+#define __VM_PAGE2ADDR(page)    ((page)*4096) /* DEPRECATED; REMOVE ME */
+#define __VM_ADDR2PAGE(addr)    ((addr)/4096) /* DEPRECATED; REMOVE ME */
 #endif
 
 #endif /* !_I386_KOS_KOS_BITS_TYPES_H */

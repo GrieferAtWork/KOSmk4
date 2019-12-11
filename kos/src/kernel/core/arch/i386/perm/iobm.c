@@ -182,7 +182,7 @@ ioperm_bitmap_copyf(struct ioperm_bitmap const *__restrict self, gfp_t flags) TH
 		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 2);
 	}
 	/* Copy I/O permission bits. */
-	vm_pagesinphys(iob, self->ib_pages, 2);
+	vm_copypagesinphys(iob, self->ib_pages, 2);
 	result->ib_pages  = iob;
 	result->ib_refcnt = 1;
 	result->ib_share  = 1;
@@ -201,7 +201,7 @@ NOTHROW(KCALL ioperm_bitmap_copyf_nx)(struct ioperm_bitmap const *__restrict sel
 			return NULL;
 		}
 		/* Copy I/O permission bits. */
-		vm_pagesinphys(iob, self->ib_pages, 2);
+		vm_copypagesinphys(iob, self->ib_pages, 2);
 		result->ib_pages  = iob;
 		result->ib_refcnt = 1;
 		result->ib_share  = 1;

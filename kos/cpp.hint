@@ -62,6 +62,7 @@
 #define __NOCONNECT
 #define NOBLOCK_IF(x)
 #define __NOBLOCK_IF(x)
+#define PAGEDIR_PAGEALIGNED
 #define THROWS(...)
 #define __THROWS(...)
 #define THROWS_INDIRECT(...)

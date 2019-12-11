@@ -26,6 +26,11 @@
 
 #include "compiler-branch-tracer.h"
 
+#undef CONFIG_USE_NEW_PAGING
+#if 1
+#define CONFIG_USE_NEW_PAGING 1
+#endif
+
 #if defined(__CC__) && defined(__cplusplus) && defined(__GNUC__) && __GNUC__ >= 6
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"
 #endif

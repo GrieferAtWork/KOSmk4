@@ -28,7 +28,6 @@
 #include <stdbool.h>
 
 
-
 /* Since the entire kernel-space has its E1-vectors pre-allocated (so-as
  * to allow them to be share across all page-directories), page directory
  * mappings within kernel space itself do not require and sort of
@@ -190,6 +189,10 @@ typedef union {
 #endif /* __CC__ */
 
 
+#ifndef PAGEDIR_PAGEALIGNED
+#define PAGEDIR_PAGEALIGNED /* Annotation for variables that need to be aligned on page boundaries. */
+#endif /* !PAGEDIR_PAGEALIGNED */
+
 
 /* x86 uses a 32-/64-bit pointer for `cr3', meaning that physical memory
  * which may exist outside of the address space also addressable without
@@ -226,8 +229,13 @@ NOTHROW(KCALL pagedir_set)(PHYS pagedir_t *__restrict value) {
  * than performing that number of single-page TLB invalidations, invalidate
  * everything instead. */
 #ifndef CONFIG_PAGEDIR_LARGESYNC_THRESHOLD
-#define CONFIG_PAGEDIR_LARGESYNC_THRESHOLD 256
+#define CONFIG_PAGEDIR_LARGESYNC_THRESHOLD 256 /* TODO: REMOVE ME */
 #endif /* !CONFIG_PAGEDIR_LARGESYNC_THRESHOLD */
+
+/* TODO: Rename me to `CONFIG_PAGEDIR_LARGESYNC_THRESHOLD' */
+#ifndef CONFIG_NPAGEDIR_LARGESYNC_THRESHOLD
+#define CONFIG_NPAGEDIR_LARGESYNC_THRESHOLD 0x100000 /* 256 pages */
+#endif /* !CONFIG_NPAGEDIR_LARGESYNC_THRESHOLD */
 
 
 #undef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_SYNCALL
@@ -285,21 +293,57 @@ FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncall)(void);
 /* Hybrid of `pagedir_syncall()' and `pagedir_syncall_user()': When the given range
  * overlaps with kernel-space, behave the same as `pagedir_syncall()', otherwise,
  * behave the same as `pagedir_syncall_user()' */
-FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_syncall_maybe_global)(VIRT vm_virt_t virt_addr, size_t num_pages);
+FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_syncall_maybe_global)(VIRT void *virt_addr, size_t num_pages);
 
 /* X86-specific implementation for invalidating the TLB of a single page. */
-FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_syncone)(VIRT vm_virt_t virt_addr);
+FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_syncone)(VIRT void *virt_addr);
 
 /* X86-specific implementation for invalidating every TLB over a given range. */
-FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_sync)(VIRT vm_virt_t virt_addr, size_t num_pages);
+FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_sync)(VIRT void *virt_addr, size_t num_pages);
 
 /* Synchronize mappings within the given address range. */
+#ifdef CONFIG_USE_NEW_PAGING
+FORCELOCAL NOBLOCK void
+NOTHROW(FCALL npagedir_syncone)(VIRT void *addr) {
+	/* TODO: Rename `x86_pagedir_syncone()' to `pagedir_syncone()'
+	 *       once `CONFIG_USE_NEW_PAGING' becomes the standard. */
+	x86_pagedir_syncone(addr);
+}
+#else /* CONFIG_USE_NEW_PAGING */
 FORCELOCAL NOBLOCK void
 NOTHROW(FCALL pagedir_syncone)(VIRT vm_vpage_t virt_page) {
-	x86_pagedir_syncone(VM_PAGE2ADDR(virt_page));
+	x86_pagedir_syncone((void *)VM_PAGE2ADDR(virt_page));
 }
+#endif /* !CONFIG_USE_NEW_PAGING */
 
 /* Synchronize mappings within the given address range. */
+#ifdef CONFIG_USE_NEW_PAGING
+FORCELOCAL NOBLOCK void
+NOTHROW(FCALL npagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                             PAGEDIR_PAGEALIGNED size_t num_bytes) {
+#ifndef __OMIT_PAGING_CONSTANT_P_WRAPPERS
+	if (__builtin_constant_p(num_bytes)) {
+		if (num_bytes == 0)
+			return;
+		if (num_bytes == 1) {
+			npagedir_syncone(addr);
+			return;
+		}
+		if (num_bytes > KERNEL_BASE) {
+			/* We know that the address always _has_ to
+			 * fall into kernel-space in this case! */
+			pagedir_syncall();
+			return;
+		}
+		if (num_bytes >= CONFIG_NPAGEDIR_LARGESYNC_THRESHOLD) {
+			x86_pagedir_syncall_maybe_global(addr, num_bytes / 4096);
+			return;
+		}
+	}
+#endif /* !__OMIT_PAGING_CONSTANT_P_WRAPPERS */
+	x86_pagedir_sync(addr, num_bytes / 4096);
+}
+#else /* CONFIG_USE_NEW_PAGING */
 FORCELOCAL NOBLOCK void
 NOTHROW(FCALL pagedir_sync)(VIRT vm_vpage_t virt_page, size_t num_pages) {
 #ifndef __OMIT_PAGING_CONSTANT_P_WRAPPERS
@@ -317,13 +361,14 @@ NOTHROW(FCALL pagedir_sync)(VIRT vm_vpage_t virt_page, size_t num_pages) {
 			return;
 		}
 		if (num_pages > CONFIG_PAGEDIR_LARGESYNC_THRESHOLD) {
-			x86_pagedir_syncall_maybe_global(VM_PAGE2ADDR(virt_page), num_pages);
+			x86_pagedir_syncall_maybe_global((void *)VM_PAGE2ADDR(virt_page), num_pages);
 			return;
 		}
 	}
 #endif /* !__OMIT_PAGING_CONSTANT_P_WRAPPERS */
-	x86_pagedir_sync(VM_PAGE2ADDR(virt_page), num_pages);
+	x86_pagedir_sync((void *)VM_PAGE2ADDR(virt_page), num_pages);
 }
+#endif /* !CONFIG_USE_NEW_PAGING */
 #endif /* __CC__ */
 
 

@@ -76,35 +76,35 @@ typedef __uintptr_t refcnt_t;
 #endif /* !__refcnt_t_defined */
 
 
-typedef /*VIRT*/ __vm_vpage_t   vm_vpage_t;   /* Virtual memory page index (`virtual_address / getpagesize()'). */
-typedef /*VIRT*/ __vm_vpage64_t vm_vpage64_t; /* Virtual memory page index (with at least 64 bits). */
-typedef /*PHYS*/ __vm_ppage_t   vm_ppage_t;   /* Physical memory page index (`physical_address / getpagesize()'). */
-typedef /*PHYS*/ __vm_spage_t   vm_spage_t;   /* Swap memory page index (`swap_address / getpagesize()'). */
-typedef /*VIRT*/ __vm_virt_t    vm_virt_t;    /* A virtual memory pointer. */
-typedef /*PHYS*/ __vm_phys_t    vm_phys_t;    /* A physical memory pointer. */
+typedef /*VIRT*/ __vm_vpage_t   vm_vpage_t;   /* Virtual memory page index (`virtual_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
+typedef /*VIRT*/ __vm_vpage64_t vm_vpage64_t; /* Virtual memory page index (with at least 64 bits). */ /* DEPRECATED; REMOVE ME */
+typedef /*PHYS*/ __vm_ppage_t   vm_ppage_t;   /* Physical memory page index (`physical_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
+typedef /*PHYS*/ __vm_spage_t   vm_spage_t;   /* Swap memory page index (`swap_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
+typedef /*VIRT*/ __vm_virt_t    vm_virt_t;    /* A virtual memory pointer. */ /* DEPRECATED; REMOVE ME */
+typedef /*PHYS*/ __vm_phys_t    vm_phys_t;    /* A physical memory pointer. */ /* TODO: Rename to `phys_t'; TODO: Move into <kernel/arch/paging.h> */
 
 #if __SIZEOF_VM_PHYS_T__ >= 8
-#define FORMAT_VM_PHYS_T  "%I64p"
+#define FORMAT_VM_PHYS_T  "%I64p" /* DEPRECATED; REMOVE ME */
 #else
-#define FORMAT_VM_PHYS_T  "%p"
+#define FORMAT_VM_PHYS_T  "%p" /* DEPRECATED; REMOVE ME */
 #endif
 
 #if __SIZEOF_VM_PPAGE_T__ >= 8
-#define FORMAT_VM_PPAGE_T "%I64p"
+#define FORMAT_VM_PPAGE_T "%I64p" /* DEPRECATED; REMOVE ME */
 #else
-#define FORMAT_VM_PPAGE_T "%p"
+#define FORMAT_VM_PPAGE_T "%p" /* DEPRECATED; REMOVE ME */
 #endif
 
 #ifndef VM_VPAGE_MAX
-#define VM_VPAGE_MAX       __VM_VPAGE_MAX
-#define VM_PPAGE_MAX       __VM_PPAGE_MAX
+#define VM_VPAGE_MAX       __VM_VPAGE_MAX /* DEPRECATED; REMOVE ME */
+#define VM_PPAGE_MAX       __VM_PPAGE_MAX /* DEPRECATED; REMOVE ME */
 #endif /* !VM_VPAGE_MAX */
 #ifndef VM_PPAGE2ADDR
-#define VM_PPAGE2ADDR(page) __VM_PPAGE2ADDR(page)
+#define VM_PPAGE2ADDR(page) __VM_PPAGE2ADDR(page) /* DEPRECATED; REMOVE ME */
 #endif /* !VM_PPAGE2ADDR */
 #ifndef VM_PAGE2ADDR
-#define VM_PAGE2ADDR(page)  __VM_PAGE2ADDR(page)
-#define VM_ADDR2PAGE(addr)  __VM_ADDR2PAGE(addr)
+#define VM_PAGE2ADDR(page)  __VM_PAGE2ADDR(page) /* DEPRECATED; REMOVE ME */
+#define VM_ADDR2PAGE(addr)  __VM_ADDR2PAGE(addr) /* DEPRECATED; REMOVE ME */
 #endif /* !VM_PAGE2ADDR */
 
 #endif /* __CC__ */

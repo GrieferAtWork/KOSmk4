@@ -605,8 +605,8 @@ NOTHROW(KCALL vm_copytophys_onepage_nopf)(PHYS vm_phys_t dst,
 
 /* Copy a whole page to/from physical memory. */
 PUBLIC void KCALL
-vm_pagefromphys(USER CHECKED void *dst,
-                PHYS vm_ppage_t src)
+vm_copypagefromphys(USER CHECKED void *dst,
+                    PHYS vm_ppage_t src)
 		THROWS(E_SEGFAULT) {
 	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
@@ -634,8 +634,8 @@ vm_pagefromphys(USER CHECKED void *dst,
 }
 
 PUBLIC void KCALL
-vm_pagetophys(PHYS vm_ppage_t dst,
-              USER CHECKED void const *src)
+vm_copypagetophys(PHYS vm_ppage_t dst,
+                  USER CHECKED void const *src)
 		THROWS(E_SEGFAULT) {
 	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
@@ -663,7 +663,8 @@ vm_pagetophys(PHYS vm_ppage_t dst,
 }
 
 PUBLIC NOBLOCK void
-NOTHROW(KCALL vm_pageinphys)(PHYS vm_ppage_t dst, PHYS vm_ppage_t src) {
+NOTHROW(KCALL vm_copypageinphys)(PHYS vm_ppage_t dst,
+                                 PHYS vm_ppage_t src) {
 	size_t bufsize;
 	size_t pagesize;
 	byte_t *buf;
@@ -677,13 +678,13 @@ NOTHROW(KCALL vm_pageinphys)(PHYS vm_ppage_t dst, PHYS vm_ppage_t src) {
 			       pagesize);
 		} else {
 			/* SRC:identity */
-			vm_pagetophys(dst, PHYS_TO_IDENTITY_PAGE(src));
+			vm_copypagetophys(dst, PHYS_TO_IDENTITY_PAGE(src));
 		}
 		return;
 	} else {
 		if (PHYS_IS_IDENTITY_PAGE(dst)) {
 			/* DST:identity */
-			vm_pagefromphys(PHYS_TO_IDENTITY_PAGE(dst), src);
+			vm_copypagefromphys(PHYS_TO_IDENTITY_PAGE(dst), src);
 			return;
 		}
 	}
@@ -727,16 +728,16 @@ NOTHROW(KCALL vm_pageinphys)(PHYS vm_ppage_t dst, PHYS vm_ppage_t src) {
 	return;
 use_whole_page_buffer:
 	buf = (byte_t *)alloca(pagesize);
-	vm_pagefromphys(buf, src);
-	vm_pagetophys(dst, buf);
+	vm_copypagefromphys(buf, src);
+	vm_copypagetophys(dst, buf);
 }
 
 PUBLIC NOBLOCK void
-NOTHROW(KCALL vm_pagesinphys)(PHYS vm_ppage_t dst,
-                              PHYS vm_ppage_t src,
-                              size_t num_pages) {
+NOTHROW(KCALL vm_copypagesinphys)(PHYS vm_ppage_t dst,
+                                  PHYS vm_ppage_t src,
+                                  size_t num_pages) {
 	while (num_pages) {
-		vm_pageinphys(dst, src);
+		vm_copypageinphys(dst, src);
 		--num_pages;
 		++dst;
 		++src;
@@ -796,7 +797,7 @@ NOTHROW(KCALL vm_memsetphyspages)(PHYS vm_ppage_t dst, int byte, size_t num_page
 }
 
 PUBLIC NOBLOCK WUNUSED size_t
-NOTHROW(KCALL vm_pagefromphys_nopf)(USER CHECKED void *dst, PHYS vm_ppage_t src) {
+NOTHROW(KCALL vm_copypagefromphys_nopf)(USER CHECKED void *dst, PHYS vm_ppage_t src) {
 	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	size_t result, pagesize;
@@ -815,7 +816,7 @@ NOTHROW(KCALL vm_pagefromphys_nopf)(USER CHECKED void *dst, PHYS vm_ppage_t src)
 }
 
 PUBLIC NOBLOCK WUNUSED size_t
-NOTHROW(KCALL vm_pagetophys_nopf)(PHYS vm_ppage_t dst, USER CHECKED void const *src) {
+NOTHROW(KCALL vm_copypagetophys_nopf)(PHYS vm_ppage_t dst, USER CHECKED void const *src) {
 	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	size_t result, pagesize;

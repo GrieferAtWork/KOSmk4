@@ -181,14 +181,14 @@ FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copyfromphys_onepage_nopf)(USER C
 FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copytophys_onepage_nopf)(PHYS vm_phys_t dst, USER CHECKED void const *src, size_t num_bytes);
 
 /* Copy a whole page to/from physical memory. (s.a. `pagedir_pagesize()') */
-FUNDEF void KCALL vm_pagefromphys(USER CHECKED void *dst, PHYS vm_ppage_t src) THROWS(E_SEGFAULT);
-FUNDEF void KCALL vm_pagetophys(PHYS vm_ppage_t dst, USER CHECKED void const *src) THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_pageinphys)(PHYS vm_ppage_t dst, PHYS vm_ppage_t src);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_pagesinphys)(PHYS vm_ppage_t dst, PHYS vm_ppage_t src, size_t num_pages);
+FUNDEF void KCALL vm_copypagefromphys(USER CHECKED void *dst, PHYS vm_ppage_t src) THROWS(E_SEGFAULT);
+FUNDEF void KCALL vm_copypagetophys(PHYS vm_ppage_t dst, USER CHECKED void const *src) THROWS(E_SEGFAULT);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_copypageinphys)(PHYS vm_ppage_t dst, PHYS vm_ppage_t src);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_copypagesinphys)(PHYS vm_ppage_t dst, PHYS vm_ppage_t src, size_t num_pages);
 FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphyspage)(PHYS vm_ppage_t dst, int byte);
 FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphyspages)(PHYS vm_ppage_t dst, int byte, size_t num_pages);
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_pagefromphys_nopf)(USER CHECKED void *dst, PHYS vm_ppage_t src);
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_pagetophys_nopf)(PHYS vm_ppage_t dst, USER CHECKED void const *src);
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copypagefromphys_nopf)(USER CHECKED void *dst, PHYS vm_ppage_t src);
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copypagetophys_nopf)(PHYS vm_ppage_t dst, USER CHECKED void const *src);
 
 /* A single page of virtual memory in the kernel VM, that is always
  * prepared for being used for whatever purposes a thread has in mind.
@@ -202,6 +202,7 @@ DATDEF ATTR_PERTASK vm_vpage_t this_trampoline_page;
 /* TODO: Go through all uses of `THIS_TRAMPOLINE_PAGE' and add
  *       optimizations for supporting `PHYS_IS_IDENTITY()' */
 #define THIS_TRAMPOLINE_PAGE PERTASK_GET(this_trampoline_page)
+#define THIS_TRAMPOLINE_BASE ((void *)VM_PAGE2ADDR(THIS_TRAMPOLINE_PAGE))
 
 /* A VM node used to describe a single, reserved page. */
 DATDEF ATTR_PERTASK struct vm_node this_trampoline_node;
