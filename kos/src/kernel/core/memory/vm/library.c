@@ -55,7 +55,7 @@ LOCAL void KCALL getuser(struct vm *__restrict effective_vm,
                          KERNEL void *__restrict dst,
                          USER void const *src, size_t num_bytes) {
 	validate_readable(src, num_bytes);
-	vm_read(dst, effective_vm, src, num_bytes, false);
+	vm_read(effective_vm, src, dst, num_bytes, false);
 }
 
 

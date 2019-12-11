@@ -18,6 +18,7 @@
  */
 #ifndef GUARD_MODGDBSERVER_GDB_INFO_C
 #define GUARD_MODGDBSERVER_GDB_INFO_C 1
+#define _GNU_SOURCE 1
 
 #include "gdb-info.h"
 
@@ -203,7 +204,7 @@ GDB_PrintRemoteVMString(pformatprinter printer, void *arg,
 		maxread = pagesize - ((uintptr_t)string & (pagesize - 1));
 		if (maxread > sizeof(buf))
 			maxread = sizeof(buf);
-		vm_read(buf, effective_vm, string, maxread, true);
+		vm_read(effective_vm, string, buf, maxread, true);
 		partlen = strnlen(buf, maxread);
 		assert(partlen <= maxread);
 		DO(print_repr ? format_escape(printer, arg, buf, partlen, FORMAT_ESCAPE_FPRINTRAW)

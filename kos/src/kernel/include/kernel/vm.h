@@ -1955,24 +1955,18 @@ FUNDEF NOBLOCK void NOTHROW(FCALL vm_kernel_syncall)(void);
  * will only ever copy _true_ RAM, and never access VIO or cause LOA/COW.
  * @return: 0 : The copy operation completed without any problems.
  * @return: * : The number of bytes that could not be transfered.
- *              The affected memory ranges are:
- *               - `dst + num_bytes - return ... dst + num_bytes - 1'
- *               - `src + num_bytes - return ... src + num_bytes - 1' */
+ *              The affected memory range is:
+ *               - `buf + num_bytes - return ... buf + num_bytes - 1' */
+FUNDEF NOBLOCK size_t
+NOTHROW(KCALL vm_read_nopf)(struct vm *__restrict self, UNCHECKED void const *addr,
+                            USER CHECKED void *buf, size_t num_bytes);
+FUNDEF NOBLOCK size_t
+NOTHROW(KCALL vm_write_nopf)(struct vm *__restrict self, UNCHECKED void *addr,
+                             USER CHECKED void const *buf, size_t num_bytes);
 /* TODO: Change the argument order of this function, so that the
  *       VM comes first, and the VM-address becomes a `vm_virt_t' */
 FUNDEF NOBLOCK size_t
-NOTHROW(KCALL vm_read_nopf)(USER CHECKED void *dst, struct vm *__restrict src_vm,
-                            UNCHECKED void const *src_addr, size_t num_bytes);
-/* TODO: Change the argument order of this function, so that the
- *       VM comes first, and the VM-address becomes a `vm_virt_t' */
-FUNDEF NOBLOCK size_t
-NOTHROW(KCALL vm_write_nopf)(struct vm *__restrict dst_vm, UNCHECKED void *dst_addr,
-                             USER CHECKED void const *src, size_t num_bytes);
-/* TODO: Change the argument order of this function, so that the
- *       VM comes first, and the VM-address becomes a `vm_virt_t' */
-FUNDEF NOBLOCK size_t
-NOTHROW(KCALL vm_memset_nopf)(
-                              struct vm *__restrict dst_vm, UNCHECKED void *dst_addr,
+NOTHROW(KCALL vm_memset_nopf)(struct vm *__restrict self, UNCHECKED void *addr,
                               int byte, size_t num_bytes);
 
 
@@ -1980,28 +1974,22 @@ NOTHROW(KCALL vm_memset_nopf)(
  * These functions do all the things necessary to read/write memory
  * the same way a regular memory access would, including LOA/COW, as
  * well as properly accessing VIO.
- * @param: force_readable_source:      When true, force `src_addr' to be readable, ignoring `VM_PROT_READ'
- * @param: force_writable_destination: When true, force `dst_addr' to be writable, invoking COW as needed.  */
-/* TODO: Change the argument order of this function, so that the
- *       VM comes first, and the VM-address becomes a `vm_virt_t' */
+ * @param: force_readable_source:      When true, force `addr' to be readable, ignoring `VM_PROT_READ'
+ * @param: force_writable_destination: When true, force `addr' to be writable, invoking COW as needed.  */
 FUNDEF void KCALL
-vm_read(USER CHECKED void *dst, struct vm *__restrict src_vm,
-        UNCHECKED void const *src_addr, size_t num_bytes,
-        bool force_readable_source DFL(false))
+vm_read(struct vm *__restrict self,
+        UNCHECKED void const *addr, USER CHECKED void *buf,
+        size_t num_bytes, bool force_readable_source DFL(false))
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
-/* TODO: Change the argument order of this function, so that the
- *       VM comes first, and the VM-address becomes a `vm_virt_t' */
 FUNDEF void KCALL
-vm_write(struct vm *__restrict dst_vm, UNCHECKED void *dst_addr,
-         USER CHECKED void const *src, size_t num_bytes,
-         bool force_writable_destination DFL(false))
+vm_write(struct vm *__restrict self,
+         UNCHECKED void *addr, USER CHECKED void const *buf,
+         size_t num_bytes, bool force_writable_destination DFL(false))
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 /* Same as `vm_write()', but implement memset() semantics instead. */
-/* TODO: Change the argument order of this function, so that the
- *       VM comes first, and the VM-address becomes a `vm_virt_t' */
 FUNDEF void KCALL
-vm_memset(struct vm *__restrict dst_vm, UNCHECKED void *dst_addr,
-          int byte, size_t num_bytes,
+vm_memset(struct vm *__restrict self,
+          UNCHECKED void *addr, int byte, size_t num_bytes,
           bool force_writable_destination DFL(false))
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 

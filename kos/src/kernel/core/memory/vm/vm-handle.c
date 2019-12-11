@@ -44,7 +44,7 @@ INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_vm_pread(struct vm *__restrict self,
                 USER CHECKED void *dst, size_t num_bytes,
                 pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
-	vm_read(dst, self, (void *)(uintptr_t)addr, num_bytes, false);
+	vm_read(self, (void *)(uintptr_t)addr, dst, num_bytes, false);
 	return num_bytes;
 }
 

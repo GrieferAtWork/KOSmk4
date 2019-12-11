@@ -123,12 +123,12 @@ INTERN NONNULL((1, 3)) size_t
 NOTHROW(FCALL GDB_VM_ReadMemoryWithoutSwBreak)(struct vm *__restrict effective_vm,
                                                vm_virt_t addr, void *buf, size_t num_bytes) {
 	size_t result;
-	result = vm_read_nopf(buf, effective_vm, (void const *)addr, num_bytes);
+	result = vm_read_nopf(effective_vm, (void const *)addr, buf, num_bytes);
 	if (result) {
 		TRY {
 			/* TODO: vm_read() may invoke RPC callbacks, which may in
 			 *       turn throw exceptions such as `E_EXIT_THREAD' */
-			vm_read(buf, effective_vm, (void const *)addr, num_bytes, true);
+			vm_read(effective_vm, (void const *)addr, buf, num_bytes, true);
 			result = 0;
 		} EXCEPT {
 		}

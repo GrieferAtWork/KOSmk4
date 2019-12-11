@@ -198,39 +198,36 @@ NOTHROW(KCALL memset_into_vm_nopf)(struct vm *__restrict dst_vm,
 /* read/write memory to/form the address space of a given VM
  * Note that these functions behave similar to memcpy_nopf(), in that they
  * will only ever copy _true_ RAM, and never access VIO or cause LOA/COW.
- * @param: ignore_access_protection: When true, allow writes regardless
- *                                   of memory protections in `dst_vm'.
  * @return: 0 : The copy operation completed without any problems.
  * @return: * : The number of bytes that could not be transfered.
- *              The affected memory ranges are:
- *               - `dst + num_bytes - return ... dst + num_bytes - 1'
- *               - `src + num_bytes - return ... src + num_bytes - 1' */
+ *              The affected memory range is:
+ *               - `buf + num_bytes - return ... buf + num_bytes - 1' */
 PUBLIC NOBLOCK size_t
-NOTHROW(KCALL vm_read_nopf)(USER CHECKED void *dst, struct vm *__restrict src_vm,
-                            UNCHECKED void const *src_addr, size_t num_bytes) {
+NOTHROW(KCALL vm_read_nopf)(struct vm *__restrict self, UNCHECKED void const *addr,
+                            USER CHECKED void *buf, size_t num_bytes) {
 	size_t result = 0;
-	if unlikely((uintptr_t)src_addr + num_bytes < (uintptr_t)src_addr) {
-		uintptr_t temp = (uintptr_t)src_addr + num_bytes;
+	if unlikely((uintptr_t)addr + num_bytes < (uintptr_t)addr) {
+		uintptr_t temp = (uintptr_t)addr + num_bytes;
 		result    += ((uintptr_t)0 - temp);
 		num_bytes -= ((uintptr_t)0 - temp);
 	}
-	if unlikely((uintptr_t)dst + num_bytes < (uintptr_t)dst) {
-		uintptr_t temp = (uintptr_t)dst + num_bytes;
+	if unlikely((uintptr_t)buf + num_bytes < (uintptr_t)buf) {
+		uintptr_t temp = (uintptr_t)buf + num_bytes;
 		result    += ((uintptr_t)0 - temp);
 		num_bytes -= ((uintptr_t)0 - temp);
 	}
-	if (ARANGE_IS_KERNEL((uintptr_t)src_addr, (uintptr_t)src_addr + num_bytes)) {
+	if (ARANGE_IS_KERNEL((uintptr_t)addr, (uintptr_t)addr + num_bytes)) {
 		/* Simple case: read from kernel memory (can just be copied directly). */
 direct_copy:
-		result += memcpy_nopf(dst, src_addr, num_bytes);
+		result += memcpy_nopf(buf, addr, num_bytes);
 	} else {
-		if (THIS_VM == src_vm)
+		if (THIS_VM == self)
 			goto direct_copy; /* Simple case: same VM */
-		if (ARANGE_IS_KERNEL((uintptr_t)dst, (uintptr_t)dst + num_bytes)) {
+		if (ARANGE_IS_KERNEL((uintptr_t)buf, (uintptr_t)buf + num_bytes)) {
 			/* Target buffer is located in kernel-space.
 			 * For this case, we can simply switch to the other VM and directly copy data. */
-			result += copy_kernelspace_from_vm_nopf(dst, src_vm,
-			                                        src_addr, num_bytes);
+			result += copy_kernelspace_from_vm_nopf(buf, self,
+			                                        addr, num_bytes);
 		} else {
 			/* The most difficult case: copy from one userspace buffer into another. */
 			byte_t *buffer; size_t bufsize;
@@ -248,8 +245,8 @@ direct_copy:
 				transfer_size = bufsize;
 				if (transfer_size > num_bytes)
 					transfer_size = num_bytes;
-				error = copy_kernelspace_from_vm_nopf(buffer, src_vm,
-				                                      src_addr, transfer_size);
+				error = copy_kernelspace_from_vm_nopf(buffer, self,
+				                                      addr, transfer_size);
 				if unlikely(error) {
 handle_transfer_error:
 					result += error;
@@ -257,13 +254,13 @@ handle_transfer_error:
 					result -= transfer_size;
 					goto done;
 				}
-				error = memcpy_nopf(dst, buffer, transfer_size);
+				error = memcpy_nopf(buf, buffer, transfer_size);
 				if unlikely(error)
 					goto handle_transfer_error;
 				if (transfer_size >= num_bytes)
 					break;
-				dst      = (byte_t *)dst + transfer_size;
-				src_addr = (byte_t *)src_addr + transfer_size;
+				buf      = (byte_t *)buf + transfer_size;
+				addr = (byte_t *)addr + transfer_size;
 				num_bytes -= transfer_size;
 			}
 		}
@@ -273,31 +270,31 @@ done:
 }
 
 PUBLIC NOBLOCK size_t
-NOTHROW(KCALL vm_write_nopf)(struct vm *__restrict dst_vm, UNCHECKED void *dst_addr,
-                             USER CHECKED void const *src, size_t num_bytes) {
+NOTHROW(KCALL vm_write_nopf)(struct vm *__restrict self, UNCHECKED void *addr,
+                             USER CHECKED void const *buf, size_t num_bytes) {
 	size_t result = 0;
-	if unlikely((uintptr_t)dst_addr + num_bytes < (uintptr_t)dst_addr) {
-		uintptr_t temp = (uintptr_t)dst_addr + num_bytes;
+	if unlikely((uintptr_t)addr + num_bytes < (uintptr_t)addr) {
+		uintptr_t temp = (uintptr_t)addr + num_bytes;
 		result    += ((uintptr_t)0 - temp);
 		num_bytes -= ((uintptr_t)0 - temp);
 	}
-	if unlikely((uintptr_t)src + num_bytes < (uintptr_t)src) {
-		uintptr_t temp = (uintptr_t)src + num_bytes;
+	if unlikely((uintptr_t)buf + num_bytes < (uintptr_t)buf) {
+		uintptr_t temp = (uintptr_t)buf + num_bytes;
 		result    += ((uintptr_t)0 - temp);
 		num_bytes -= ((uintptr_t)0 - temp);
 	}
-	if (ARANGE_IS_KERNEL((uintptr_t)dst_addr, (uintptr_t)dst_addr + num_bytes)) {
+	if (ARANGE_IS_KERNEL((uintptr_t)addr, (uintptr_t)addr + num_bytes)) {
 		/* Simple case: write to kernel memory (can just be copied directly). */
 direct_copy:
-		result += memcpy_nopf(dst_addr, src, num_bytes);
+		result += memcpy_nopf(addr, buf, num_bytes);
 	} else {
-		if (THIS_VM == dst_vm)
+		if (THIS_VM == self)
 			goto direct_copy; /* Simple case: same VM */
-		if (ARANGE_IS_KERNEL((uintptr_t)src, (uintptr_t)src + num_bytes)) {
+		if (ARANGE_IS_KERNEL((uintptr_t)buf, (uintptr_t)buf + num_bytes)) {
 			/* Source buffer is located in kernel-space.
 			 * For this case, we can simply switch to the other VM and directly copy data. */
-			result += copy_kernelspace_into_vm_nopf(dst_vm, dst_addr,
-			                                        src, num_bytes);
+			result += copy_kernelspace_into_vm_nopf(self, addr,
+			                                        buf, num_bytes);
 		} else {
 			/* The most difficult case: copy from one userspace buffer into another. */
 			byte_t *buffer; size_t bufsize;
@@ -315,7 +312,7 @@ direct_copy:
 				transfer_size = bufsize;
 				if (transfer_size > num_bytes)
 					transfer_size = num_bytes;
-				error = memcpy_nopf(buffer, src, transfer_size);
+				error = memcpy_nopf(buffer, buf, transfer_size);
 				if unlikely(error) {
 handle_transfer_error:
 					result += error;
@@ -323,14 +320,14 @@ handle_transfer_error:
 					result -= transfer_size;
 					goto done;
 				}
-				error = copy_kernelspace_into_vm_nopf(dst_vm, dst_addr,
+				error = copy_kernelspace_into_vm_nopf(self, addr,
 				                                      buffer, transfer_size);
 				if unlikely(error)
 					goto handle_transfer_error;
 				if (transfer_size >= num_bytes)
 					break;
-				src      = (byte_t *)src + transfer_size;
-				dst_addr = (byte_t *)dst_addr + transfer_size;
+				buf      = (byte_t *)buf + transfer_size;
+				addr = (byte_t *)addr + transfer_size;
 				num_bytes -= transfer_size;
 			}
 		}
@@ -340,22 +337,22 @@ done:
 }
 
 PUBLIC NOBLOCK size_t
-NOTHROW(KCALL vm_memset_nopf)(struct vm *__restrict dst_vm, UNCHECKED void *dst_addr,
+NOTHROW(KCALL vm_memset_nopf)(struct vm *__restrict self, UNCHECKED void *addr,
                               int byte, size_t num_bytes) {
 	size_t result = 0;
-	if unlikely((uintptr_t)dst_addr + num_bytes < (uintptr_t)dst_addr) {
-		uintptr_t temp = (uintptr_t)dst_addr + num_bytes;
+	if unlikely((uintptr_t)addr + num_bytes < (uintptr_t)addr) {
+		uintptr_t temp = (uintptr_t)addr + num_bytes;
 		result    += ((uintptr_t)0 - temp);
 		num_bytes -= ((uintptr_t)0 - temp);
 	}
-	if (ARANGE_IS_KERNEL((uintptr_t)dst_addr, (uintptr_t)dst_addr + num_bytes)) {
+	if (ARANGE_IS_KERNEL((uintptr_t)addr, (uintptr_t)addr + num_bytes)) {
 		/* Simple case: write to kernel memory (can just be copied directly). */
 direct_copy:
-		result += memset_nopf(dst_addr, byte, num_bytes);
+		result += memset_nopf(addr, byte, num_bytes);
 	} else {
-		if (THIS_VM == dst_vm)
+		if (THIS_VM == self)
 			goto direct_copy; /* Simple case: same VM */
-		result += memset_into_vm_nopf(dst_vm, dst_addr, byte, num_bytes);
+		result += memset_into_vm_nopf(self, addr, byte, num_bytes);
 	}
 	return result;
 }
@@ -403,29 +400,29 @@ memset_into_vm(struct vm *__restrict effective_vm,
  * the same way a regular memory access would, including LOA/COW, as
  * well as properly accessing VIO. */
 PUBLIC void KCALL
-vm_read(USER CHECKED void *dst, struct vm *__restrict src_vm,
-        UNCHECKED void const *src_addr, size_t num_bytes,
-        bool force_readable_source)
+vm_read(struct vm *__restrict self,
+        UNCHECKED void const *addr, USER CHECKED void *buf,
+        size_t num_bytes, bool force_readable_source)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
-	if unlikely((uintptr_t)src_addr + num_bytes < (uintptr_t)src_addr)
+	if unlikely((uintptr_t)addr + num_bytes < (uintptr_t)addr)
 		THROW(E_SEGFAULT_UNMAPPED, (void *)-1, E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_NONCANON);
-	if unlikely((uintptr_t)dst + num_bytes < (uintptr_t)dst)
+	if unlikely((uintptr_t)buf + num_bytes < (uintptr_t)buf)
 		THROW(E_SEGFAULT_UNMAPPED, (void *)-1, E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_WRITING | E_SEGFAULT_CONTEXT_NONCANON);
-	if (ARANGE_IS_KERNEL((uintptr_t)src_addr, (uintptr_t)src_addr + num_bytes)) {
+	if (ARANGE_IS_KERNEL((uintptr_t)addr, (uintptr_t)addr + num_bytes)) {
 		/* Simple case: read from kernel memory (can just be copied directly). */
 		TRY {
-			memcpy(dst, src_addr, num_bytes);
+			memcpy(buf, addr, num_bytes);
 		} EXCEPT {
 			if (!force_readable_source || !was_thrown(E_SEGFAULT_NOTREADABLE))
 				RETHROW();
-			src_vm = &vm_kernel;
+			self = &vm_kernel;
 			goto copy_from_vm;
 		}
 	} else {
-		if (THIS_VM == src_vm) {
+		if (THIS_VM == self) {
 			/* Simple case: same VM */
 			TRY {
-				memcpy(dst, src_addr, num_bytes);
+				memcpy(buf, addr, num_bytes);
 			} EXCEPT {
 				if (!force_readable_source || !was_thrown(E_SEGFAULT_NOTREADABLE))
 					RETHROW();
@@ -434,11 +431,11 @@ vm_read(USER CHECKED void *dst, struct vm *__restrict src_vm,
 			return;
 		}
 copy_from_vm:
-		if (ARANGE_IS_KERNEL((uintptr_t)dst, (uintptr_t)dst + num_bytes)) {
+		if (ARANGE_IS_KERNEL((uintptr_t)buf, (uintptr_t)buf + num_bytes)) {
 			/* Target buffer is located in kernel-space.
 			 * For this case, we can simply switch to the other VM and directly copy data. */
-			copy_kernelspace_from_vm(dst, src_vm,
-			                         src_addr, num_bytes,
+			copy_kernelspace_from_vm(buf, self,
+			                         addr, num_bytes,
 			                         force_readable_source);
 		} else {
 			/* The most difficult case: copy from one userspace buffer into another. */
@@ -457,14 +454,14 @@ copy_from_vm:
 				transfer_size = bufsize;
 				if (transfer_size > num_bytes)
 					transfer_size = num_bytes;
-				copy_kernelspace_from_vm(buffer, src_vm,
-				                         src_addr, transfer_size,
+				copy_kernelspace_from_vm(buffer, self,
+				                         addr, transfer_size,
 				                         force_readable_source);
-				memcpy(dst, buffer, transfer_size);
+				memcpy(buf, buffer, transfer_size);
 				if (transfer_size >= num_bytes)
 					break;
-				dst      = (byte_t *)dst + transfer_size;
-				src_addr = (byte_t *)src_addr + transfer_size;
+				buf      = (byte_t *)buf + transfer_size;
+				addr = (byte_t *)addr + transfer_size;
 				num_bytes -= transfer_size;
 			}
 		}
@@ -473,29 +470,29 @@ copy_from_vm:
 
 
 PUBLIC void KCALL
-vm_write(struct vm *__restrict dst_vm, UNCHECKED void *dst_addr,
-         USER CHECKED void const *src, size_t num_bytes,
-         bool force_writable_destination)
+vm_write(struct vm *__restrict self,
+         UNCHECKED void *addr, USER CHECKED void const *buf,
+         size_t num_bytes, bool force_writable_destination)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
-	if unlikely((uintptr_t)dst_addr + num_bytes < (uintptr_t)dst_addr)
+	if unlikely((uintptr_t)addr + num_bytes < (uintptr_t)addr)
 		THROW(E_SEGFAULT_UNMAPPED, (void *)-1, E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_WRITING | E_SEGFAULT_CONTEXT_NONCANON);
-	if unlikely((uintptr_t)src + num_bytes < (uintptr_t)src)
+	if unlikely((uintptr_t)buf + num_bytes < (uintptr_t)buf)
 		THROW(E_SEGFAULT_UNMAPPED, (void *)-1, E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_NONCANON);
-	if (ARANGE_IS_KERNEL((uintptr_t)dst_addr, (uintptr_t)dst_addr + num_bytes)) {
+	if (ARANGE_IS_KERNEL((uintptr_t)addr, (uintptr_t)addr + num_bytes)) {
 		/* Simple case: write to kernel memory (can just be copied directly). */
 		TRY {
-			memcpy(dst_addr, src, num_bytes);
+			memcpy(addr, buf, num_bytes);
 		} EXCEPT {
 			if (!force_writable_destination || !was_thrown(E_SEGFAULT_READONLY))
 				RETHROW();
-			dst_vm = &vm_kernel;
+			self = &vm_kernel;
 			goto copy_to_vm;
 		}
 	} else {
-		if (THIS_VM == dst_vm) {
+		if (THIS_VM == self) {
 			/* Simple case: same VM */
 			TRY {
-				memcpy(dst_addr, src, num_bytes);
+				memcpy(addr, buf, num_bytes);
 			} EXCEPT {
 				if (!force_writable_destination || !was_thrown(E_SEGFAULT_READONLY))
 					RETHROW();
@@ -504,11 +501,11 @@ vm_write(struct vm *__restrict dst_vm, UNCHECKED void *dst_addr,
 			return;
 		}
 copy_to_vm:
-		if (ARANGE_IS_KERNEL((uintptr_t)src, (uintptr_t)src + num_bytes)) {
+		if (ARANGE_IS_KERNEL((uintptr_t)buf, (uintptr_t)buf + num_bytes)) {
 			/* Source buffer is located in kernel-space.
 			 * For this case, we can simply switch to the other VM and directly copy data. */
-			copy_kernelspace_into_vm(dst_vm, dst_addr,
-			                         src, num_bytes,
+			copy_kernelspace_into_vm(self, addr,
+			                         buf, num_bytes,
 			                         force_writable_destination);
 		} else {
 			/* The most difficult case: copy from one userspace buffer into another. */
@@ -527,14 +524,14 @@ copy_to_vm:
 				transfer_size = bufsize;
 				if (transfer_size > num_bytes)
 					transfer_size = num_bytes;
-				memcpy(buffer, src, transfer_size);
-				copy_kernelspace_into_vm(dst_vm, dst_addr,
+				memcpy(buffer, buf, transfer_size);
+				copy_kernelspace_into_vm(self, addr,
 				                         buffer, transfer_size,
 				                         force_writable_destination);
 				if (transfer_size >= num_bytes)
 					break;
-				src      = (byte_t *)src + transfer_size;
-				dst_addr = (byte_t *)dst_addr + transfer_size;
+				buf      = (byte_t *)buf + transfer_size;
+				addr = (byte_t *)addr + transfer_size;
 				num_bytes -= transfer_size;
 			}
 		}
@@ -544,26 +541,27 @@ copy_to_vm:
 
 /* Same as `vm_write()', but implement memset() semantics instead. */
 PUBLIC void KCALL
-vm_memset(struct vm *__restrict dst_vm, UNCHECKED void *dst_addr,
-          int byte, size_t num_bytes, bool force_writable_destination)
+vm_memset(struct vm *__restrict self,
+          UNCHECKED void *addr, int byte, size_t num_bytes,
+          bool force_writable_destination)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
-	if unlikely((uintptr_t)dst_addr + num_bytes < (uintptr_t)dst_addr)
+	if unlikely((uintptr_t)addr + num_bytes < (uintptr_t)addr)
 		THROW(E_SEGFAULT_UNMAPPED, (void *)-1, E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_WRITING | E_SEGFAULT_CONTEXT_NONCANON);
-	if (ARANGE_IS_KERNEL((uintptr_t)dst_addr, (uintptr_t)dst_addr + num_bytes)) {
+	if (ARANGE_IS_KERNEL((uintptr_t)addr, (uintptr_t)addr + num_bytes)) {
 		/* Simple case: write to kernel memory (can just be copied directly). */
 		TRY {
-			memset(dst_addr, byte, num_bytes);
+			memset(addr, byte, num_bytes);
 		} EXCEPT {
 			if (!force_writable_destination || !was_thrown(E_SEGFAULT_READONLY))
 				RETHROW();
-			dst_vm = &vm_kernel;
+			self = &vm_kernel;
 			goto copy_to_vm;
 		}
 	} else {
-		if (THIS_VM == dst_vm) {
+		if (THIS_VM == self) {
 			/* Simple case: same VM */
 			TRY {
-				memset(dst_addr, byte, num_bytes);
+				memset(addr, byte, num_bytes);
 			} EXCEPT {
 				if (!force_writable_destination || !was_thrown(E_SEGFAULT_READONLY))
 					RETHROW();
@@ -572,7 +570,7 @@ vm_memset(struct vm *__restrict dst_vm, UNCHECKED void *dst_addr,
 			return;
 		}
 copy_to_vm:
-		memset_into_vm(dst_vm, dst_addr,
+		memset_into_vm(self, addr,
 		               byte, num_bytes,
 		               force_writable_destination);
 	}

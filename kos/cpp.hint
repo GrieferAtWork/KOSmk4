@@ -377,6 +377,7 @@
 #define __DEFINE_SYNC_RWLOCK(...)
 #define __DEFINE_SYNC_MUTEX(...)
 #define __DEFINE_SYNC_SEMAPHORE(...)
+#define __DEFINE_SYNC_POLL(...)
 
 #define ASMCALL
 
