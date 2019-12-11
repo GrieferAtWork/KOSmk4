@@ -87,7 +87,7 @@ FUNDEF NOBLOCK NONNULL((1)) void FCALL
 pagedir_init(VIRT pagedir_t *__restrict self,
              PHYS vm_phys_t phys_self) THROWS(E_BADALLOC);
 #endif /* !CONFIG_PAGEDIR_INIT_IS_NOEXCEPT */
-#define pagedir_init1(self)            pagedir_init(self, pagedir_translate((vm_virt_t)(self)))
+#define pagedir_init1(self)            pagedir_init(self, pagedir_translate(self))
 #define pagedir_init2(self, phys_self) pagedir_init(self, phys_self)
 #else /* CONFIG_PAGEDIR_INIT_NEED_PHYS_SELF */
 #ifdef CONFIG_PAGEDIR_INIT_IS_NOEXCEPT
@@ -108,7 +108,7 @@ pagedir_init(VIRT pagedir_t *__restrict self) THROWS(E_BADALLOC);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL pagedir_fini)(VIRT pagedir_t *__restrict self,
                             PHYS vm_phys_t phys_self);
-#define pagedir_fini1(self)            pagedir_fini(self, pagedir_translate((vm_virt_t)(self)))
+#define pagedir_fini1(self)            pagedir_fini(self, pagedir_translate(self))
 #define pagedir_fini2(self, phys_self) pagedir_fini(self, phys_self)
 #else /* CONFIG_PAGEDIR_FINI_NEED_PHYS_SELF */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -183,8 +183,8 @@ FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncone)(VIRT vm_vpage_t virt_page);
 #endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_SYNCONE */
 
 /* Translate a virtual address into its physical counterpart. */
-FUNDEF NOBLOCK WUNUSED PHYS vm_phys_t NOTHROW(FCALL pagedir_translate)(VIRT vm_virt_t virt_addr);
-FUNDEF NOBLOCK PHYS vm_phys_t NOTHROW(KCALL pagedir_translate_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_virt_t virt_addr);
+FUNDEF NOBLOCK WUNUSED PHYS vm_phys_t NOTHROW(FCALL pagedir_translate)(VIRT void *addr);
+FUNDEF NOBLOCK PHYS vm_phys_t NOTHROW(KCALL pagedir_translate_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
 
 /* Low-level Get/Set the physical address of the currently active page directory. */
 #ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_GETSET

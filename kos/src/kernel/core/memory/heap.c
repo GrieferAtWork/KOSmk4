@@ -360,7 +360,7 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 			        "PHYS: %I64p",
 			        &iter->mf_size, (uintptr_t)&iter->mf_size + sizeof(size_t) - 1,
 			        iter, iter->mf_size, i, COMPILER_LENOF(self->h_size),
-			        (u64)pagedir_translate((vm_virt_t)&iter->mf_size));
+			        (u64)pagedir_translate(&iter->mf_size));
 			assertf(IS_ALIGNED(iter->mf_size, HEAP_ALIGNMENT),
 			        "\tPotential USE-AFTER-FREE of <%p...%p>\n"
 			        "Size of free node at %p...%p (%Iu;%#Ix bytes) isn't aligned by `HEAP_ALIGNMENT'",

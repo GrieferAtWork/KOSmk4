@@ -1292,18 +1292,18 @@ again_read_word:
 
 /* Translate a virtual address into its physical counterpart. */
 INTERN NOBLOCK WUNUSED PHYS vm_phys_t
-NOTHROW(FCALL p32_pagedir_translate)(VIRT vm_virt_t virt_addr) {
+NOTHROW(FCALL p32_pagedir_translate)(VIRT void *addr) {
 	u32 word;
 	unsigned int vec2, vec1;
-	vec2 = P32_PDIR_VEC2INDEX(virt_addr);
+	vec2 = P32_PDIR_VEC2INDEX(addr);
 	word = P32_PDIR_E2_IDENTITY[vec2].p_word;
-	assertf(word & P32_PAGE_FPRESENT, "Page at %p is not mapped", virt_addr);
+	assertf(word & P32_PAGE_FPRESENT, "Page at %p is not mapped", addr);
 	if unlikely(word & P32_PAGE_F4MIB)
-		return (vm_phys_t)((word & P32_PAGE_FADDR_4MIB) | P32_PDIR_PAGEINDEX_4MIB(virt_addr));
-	vec1 = P32_PDIR_VEC1INDEX(virt_addr);
+		return (vm_phys_t)((word & P32_PAGE_FADDR_4MIB) | P32_PDIR_PAGEINDEX_4MIB(addr));
+	vec1 = P32_PDIR_VEC1INDEX(addr);
 	word = P32_PDIR_E1_IDENTITY[vec2][vec1].p_word;
-	assertf(word & P32_PAGE_FPRESENT, "Page at %p is not mapped", virt_addr);
-	return (vm_phys_t)((word & P32_PAGE_FADDR_4KIB) | P32_PDIR_PAGEINDEX_4KIB(virt_addr));
+	assertf(word & P32_PAGE_FPRESENT, "Page at %p is not mapped", addr);
+	return (vm_phys_t)((word & P32_PAGE_FADDR_4KIB) | P32_PDIR_PAGEINDEX_4KIB(addr));
 }
 
 /* Check if the given page is mapped. */
@@ -1563,7 +1563,8 @@ vm_copytophys_small_aligned(PHYS u32 dst,
 
 
 INTERN NOBLOCK PHYS vm_phys_t
-NOTHROW(KCALL pagedir_translate_p)(VIRT pagedir_t *__restrict self, VIRT vm_virt_t virt_addr) {
+NOTHROW(KCALL pagedir_translate_p)(VIRT pagedir_t *__restrict self,
+                                   VIRT void *virt_addr) {
 	u32 result;
 	result = self->p_e2[X86_PDIR_VEC2INDEX(virt_addr)].p_data;
 	if (result & X86_PAGE_F4MIB)

@@ -57,7 +57,7 @@ STATIC_ASSERT(SHARED_RWLOCK_RMASK >= (VM_VPAGE_MAX + 1));
  * @param: lockcnt:    Number of available DMA lock slots (allocated length (not size) of `lockvec')
  * @param: vaddr:     [vm_startdma[_nx]] The base address where locking should start.
  * @param: num_bytes: [vm_startdma[_nx]] The number of continuous bytes that should be locked.
- * @param: buf:       [vm_startdmav[_nx]] The scatter-gather list of virtual memory ranges to lock.
+ * @param: vaddr_buf:       [vm_startdmav[_nx]] The scatter-gather list of virtual memory ranges to lock.
  * @param: for_writing:When true, unshare copy-on-write mappings of associated memory, allowing the
  *                     caller to then write to the acquired memory ranges without accidentally having
  *                     any changes made appear in PRIVATE mappings of the associated memory region.
@@ -75,7 +75,7 @@ NOTHROW(KCALL vm_startdmav_nx)(struct vm *__restrict effective_vm,
                                vm_dmarangefunc_t prange,
                                vm_dmaresetfunc_t preset, void *arg,
                                struct vm_dmalock *__restrict lockvec, size_t lockcnt,
-                               struct aio_buffer const *__restrict buf,
+                               struct aio_buffer const *__restrict vaddr_buf,
                                bool for_writing)
 #else /* DMA_VECTOR */
 PUBLIC NONNULL((1, 2, 3, 5)) size_t
@@ -83,7 +83,7 @@ NOTHROW(KCALL vm_startdma_nx)(struct vm *__restrict effective_vm,
                               vm_dmarangefunc_t prange,
                               vm_dmaresetfunc_t preset, void *arg,
                               struct vm_dmalock *__restrict lockvec,
-                              size_t lockcnt, vm_virt_t vaddr,
+                              size_t lockcnt, UNCHECKED void *vaddr,
                               size_t num_bytes, bool for_writing)
 #endif /* !DMA_VECTOR */
 #else /* DMA_NX */
@@ -93,7 +93,7 @@ vm_startdmav(struct vm *__restrict effective_vm,
              vm_dmarangefunc_t prange,
              vm_dmaresetfunc_t preset, void *arg,
              struct vm_dmalock *__restrict lockvec, size_t lockcnt,
-             struct aio_buffer const *__restrict buf,
+             struct aio_buffer const *__restrict vaddr_buf,
              bool for_writing)
 #else /* DMA_VECTOR */
 PUBLIC NONNULL((1, 2, 3, 5)) size_t KCALL
@@ -101,7 +101,7 @@ vm_startdma(struct vm *__restrict effective_vm,
             vm_dmarangefunc_t prange,
             vm_dmaresetfunc_t preset, void *arg,
             struct vm_dmalock *__restrict lockvec,
-            size_t lockcnt, vm_virt_t vaddr,
+            size_t lockcnt, UNCHECKED void *vaddr,
             size_t num_bytes, bool for_writing)
 #endif /* !DMA_VECTOR */
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
@@ -115,13 +115,13 @@ vm_startdma(struct vm *__restrict effective_vm,
  * @param: arg:        Argument passed to `prange' upon execution.
  * @param: vaddr:     [vm_startdma[_nx]] The base address where locking should start.
  * @param: num_bytes: [vm_startdma[_nx]] The number of continuous bytes that should be locked.
- * @param: buf:       [vm_startdmav[_nx]] The scatter-gather list of virtual memory ranges to lock.
+ * @param: vaddr_buf:       [vm_startdmav[_nx]] The scatter-gather list of virtual memory ranges to lock.
  * @param: for_writing:When true, unshare copy-on-write mappings of associated memory, allowing the
  *                     caller to then write to the acquired memory ranges without accidentally having
  *                     any changes made appear in PRIVATE mappings of the associated memory region.
  * @return: * : The number of DMA bytes successfully enumerated (sum of
  *             `num_bytes' in all calls to `*prange', where `true' was returned)
- *              Upon full success, this is identical to the given `num_bytes' / `aio_buffer_size(buf)',
+ *              Upon full success, this is identical to the given `num_bytes' / `aio_buffer_size(vaddr_buf)',
  *              though for the same reasons that `vm_startdma[v][_nx]' can fail (s.a. its `@return: 0' cases),
  *              this may be less than that */
 #ifdef DMA_NX
@@ -129,13 +129,13 @@ vm_startdma(struct vm *__restrict effective_vm,
 PUBLIC NONNULL((1, 2, 4)) size_t
 NOTHROW(KCALL vm_enumdmav_nx)(struct vm *__restrict effective_vm,
                               vm_dmarangefunc_t prange, void *arg,
-                              struct aio_buffer const *__restrict buf,
+                              struct aio_buffer const *__restrict vaddr_buf,
                               bool for_writing)
 #else /* DMA_VECTOR */
 PUBLIC NONNULL((1, 2)) size_t
 NOTHROW(KCALL vm_enumdma_nx)(struct vm *__restrict effective_vm,
                              vm_dmarangefunc_t prange, void *arg,
-                             vm_virt_t vaddr, size_t num_bytes,
+                             UNCHECKED void *vaddr, size_t num_bytes,
                              bool for_writing)
 #endif /* !DMA_VECTOR */
 #else /* DMA_NX */
@@ -143,13 +143,13 @@ NOTHROW(KCALL vm_enumdma_nx)(struct vm *__restrict effective_vm,
 PUBLIC NONNULL((1, 2, 4)) size_t KCALL
 vm_enumdmav(struct vm *__restrict effective_vm,
             vm_dmarangefunc_t prange, void *arg,
-            struct aio_buffer const *__restrict buf,
+            struct aio_buffer const *__restrict vaddr_buf,
             bool for_writing)
 #else /* DMA_VECTOR */
 PUBLIC NONNULL((1, 2)) size_t KCALL
 vm_enumdma(struct vm *__restrict effective_vm,
            vm_dmarangefunc_t prange, void *arg,
-           vm_virt_t vaddr, size_t num_bytes,
+           UNCHECKED void *vaddr, size_t num_bytes,
            bool for_writing)
 #endif /* !DMA_VECTOR */
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
@@ -165,10 +165,10 @@ vm_enumdma(struct vm *__restrict effective_vm,
 #ifdef DMA_VECTOR
 	struct aio_buffer_entry ent;
 #ifdef __INTELLISENSE__
-	vm_virt_t vaddr;
+	UNCHECKED void *vaddr;
 	size_t num_bytes;
 #else
-#define vaddr ent.ab_base
+#define vaddr     ent.ab_base
 #define num_bytes ent.ab_size
 #endif
 #ifndef DMA_ENUM
@@ -184,7 +184,7 @@ again:
 #else /* DMA_NX */
 	sync_read(effective_vm);
 #endif /* !DMA_NX */
-	AIO_BUFFER_FOREACH(ent, buf)
+	AIO_BUFFER_FOREACH(ent, vaddr_buf)
 #else /* DMA_VECTOR */
 #ifndef DMA_ENUM
 again:

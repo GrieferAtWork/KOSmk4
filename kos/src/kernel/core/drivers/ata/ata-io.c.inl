@@ -55,55 +55,55 @@
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
 #define FUNC_VP(x)  x##v_phys
 #define FUNC_VP2(x) x##VectorPhys
-#define FUNC2    FUNC1(VectorPhys)
+#define FUNC2       FUNC1(VectorPhys)
 #define BUFFER_TYPE struct aio_pbuffer *__restrict
 #define VECTOR_TYPE struct aio_pbuffer
 #elif defined(DEFINE_IO_VECTOR)
 #define FUNC_VP(x)  x##v
 #define FUNC_VP2(x) x##Vector
-#define FUNC2    FUNC1(Vector)
+#define FUNC2       FUNC1(Vector)
 #define BUFFER_TYPE struct aio_buffer *__restrict
 #define VECTOR_TYPE struct aio_buffer
 #elif defined(DEFINE_IO_PHYS)
 #define FUNC_VP(x)  x##_phys
 #define FUNC_VP2(x) x##Phys
-#define FUNC2    FUNC1(Phys)
+#define FUNC2       FUNC1(Phys)
 #define BUFFER_TYPE vm_phys_t
 #elif defined(DEFINE_IO_READ)
-#define FUNC_VP(x)     x
-#define FUNC_VP2(x)    x
-#define FUNC2    FUNC0(Read)
+#define FUNC_VP(x)  x
+#define FUNC_VP2(x) x
+#define FUNC2       FUNC0(Read)
 #define BUFFER_TYPE USER CHECKED void *
 #else
-#define FUNC_VP(x)     x
-#define FUNC_VP2(x)    x
-#define FUNC2    FUNC0(Write)
+#define FUNC_VP(x)  x
+#define FUNC_VP2(x) x
+#define FUNC2       FUNC0(Write)
 #define BUFFER_TYPE USER CHECKED void const *
 #endif
 
 
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
-#define AtaPRD_INIT_FROM_BUF(prd_buf,prd_siz,buf,num_bytes,handle) \
-        AtaPRD_InitFromPhysVector(prd_buf,prd_siz,buf,num_bytes)
+#define AtaPRD_INIT_FROM_BUF(prd_buf, prd_siz, buf, num_bytes, handle) \
+	AtaPRD_InitFromPhysVector(prd_buf, prd_siz, buf, num_bytes)
 #elif defined(DEFINE_IO_PHYS)
-#define AtaPRD_INIT_FROM_BUF(prd_buf,prd_siz,buf,num_bytes,handle) \
-        AtaPRD_InitFromPhys(prd_buf,prd_siz,buf,num_bytes)
+#define AtaPRD_INIT_FROM_BUF(prd_buf, prd_siz, buf, num_bytes, handle) \
+	AtaPRD_InitFromPhys(prd_buf, prd_siz, buf, num_bytes)
 #elif defined(DEFINE_IO_VECTOR)
 #ifdef DEFINE_IO_READ
-#define AtaPRD_INIT_FROM_BUF(prd_buf,prd_siz,buf,num_bytes,handle) \
-        AtaPRD_InitFromVirtVector(prd_buf,prd_siz,buf,num_bytes,handle,false)
-#else
-#define AtaPRD_INIT_FROM_BUF(prd_buf,prd_siz,buf,num_bytes,handle) \
-        AtaPRD_InitFromVirtVector(prd_buf,prd_siz,buf,num_bytes,handle,true)
-#endif
+#define AtaPRD_INIT_FROM_BUF(prd_buf, prd_siz, buf, num_bytes, handle) \
+	AtaPRD_InitFromVirtVector(prd_buf, prd_siz, buf, num_bytes, handle, false)
+#else /* DEFINE_IO_READ */
+#define AtaPRD_INIT_FROM_BUF(prd_buf, prd_siz, buf, num_bytes, handle) \
+	AtaPRD_InitFromVirtVector(prd_buf, prd_siz, buf, num_bytes, handle, true)
+#endif /* !DEFINE_IO_READ */
 #else
 #ifdef DEFINE_IO_READ
-#define AtaPRD_INIT_FROM_BUF(prd_buf,prd_siz,buf,num_bytes,handle) \
-        AtaPRD_InitFromVirt(prd_buf,prd_siz,(vm_virt_t)(buf),num_bytes,handle,true)
-#else
-#define AtaPRD_INIT_FROM_BUF(prd_buf,prd_siz,buf,num_bytes,handle) \
-        AtaPRD_InitFromVirt(prd_buf,prd_siz,(vm_virt_t)(buf),num_bytes,handle,false)
-#endif
+#define AtaPRD_INIT_FROM_BUF(prd_buf, prd_siz, buf, num_bytes, handle) \
+	AtaPRD_InitFromVirt(prd_buf, prd_siz, buf, num_bytes, handle, true)
+#else /* DEFINE_IO_READ */
+#define AtaPRD_INIT_FROM_BUF(prd_buf, prd_siz, buf, num_bytes, handle) \
+	AtaPRD_InitFromVirt(prd_buf, prd_siz, (void *)(buf), num_bytes, handle, false)
+#endif /* !DEFINE_IO_READ */
 #endif
 
 
@@ -209,9 +209,9 @@ FUNC2(
 	 * operation, and schedule it for execution at a later point in time. */
 #ifdef DEFINE_IO_READ
 	data->hd_flags = ATA_AIO_HANDLE_FSINGLE;
-#else
+#else /* DEFINE_IO_READ */
 	data->hd_flags = ATA_AIO_HANDLE_FSINGLE | ATA_AIO_HANDLE_FWRITING;
-#endif
+#endif /* !DEFINE_IO_READ */
 	prd_count = AtaPRD_INIT_FROM_BUF(&prd0,
 	                                 1,
 	                                 buf,
@@ -421,18 +421,18 @@ again_service_io:
 			                                         self,
 #if defined(DEFINE_IO_PHYS) || defined(DEFINE_IO_VECTOR)
 			                                         buf,
-#else
+#else /* DEFINE_IO_PHYS || DEFINE_IO_VECTOR */
 			                                         (byte_t *)buf,
-#endif
+#endif /* !DEFINE_IO_PHYS && !DEFINE_IO_VECTOR */
 			                                         part_sectors);
 #else /* DEFINE_IO_READ */
 			error = FUNC_VP2(Ata_TransmitDataSectors)(bus,
 			                                          self,
 #if defined(DEFINE_IO_PHYS) || defined(DEFINE_IO_VECTOR)
 			                                          buf,
-#else
+#else /* DEFINE_IO_PHYS || DEFINE_IO_VECTOR */
 			                                          (byte_t const *)buf,
-#endif
+#endif /* !DEFINE_IO_PHYS && !DEFINE_IO_VECTOR */
 			                                          part_sectors);
 #endif /* !DEFINE_IO_READ */
 			assert(!task_isconnected());

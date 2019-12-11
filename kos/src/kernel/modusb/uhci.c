@@ -98,10 +98,10 @@ again_read:
 		result = (struct uhci_ostd *)kmemalign(UHCI_FLE_ALIGN,
 		                                       sizeof(struct uhci_ostd),
 		                                       GFP_LOCKED | GFP_PREFLT);
-		result->td_self = (u32)pagedir_translate((vm_virt_t)result);
+		result->td_self = (u32)pagedir_translate(result);
 	}
 	assert(IS_ALIGNED((uintptr_t)result, UHCI_FLE_ALIGN));
-	assert(result->td_self == (u32)pagedir_translate((vm_virt_t)result));
+	assert(result->td_self == (u32)pagedir_translate(result));
 	return result;
 }
 
@@ -120,10 +120,10 @@ again_read:
 		result = (struct uhci_osqh *)kmemalign(UHCI_FLE_ALIGN,
 		                                       sizeof(struct uhci_osqh),
 		                                       GFP_LOCKED | GFP_PREFLT);
-		result->qh_self = (u32)pagedir_translate((vm_virt_t)result);
+		result->qh_self = (u32)pagedir_translate(result);
 	}
 	assert(IS_ALIGNED((uintptr_t)result, UHCI_FLE_ALIGN));
-	assert(result->qh_self == (u32)pagedir_translate((vm_virt_t)result));
+	assert(result->qh_self == (u32)pagedir_translate(result));
 	return result;
 }
 
@@ -2268,7 +2268,7 @@ uhci_interrupt_frameentry_init(struct uhci_interrupt_frameentry *__restrict self
 		COMPILER_WRITE_BARRIER();
 		*(u8 *)ptr.hp_ptr = 0;
 		COMPILER_WRITE_BARRIER();
-		addr = pagedir_translate((vm_virt_t)ptr.hp_ptr);
+		addr = pagedir_translate(ptr.hp_ptr);
 		TRY {
 			uhci_construct_tds_for_interrupt(&pnexttd,
 			                                 ptok, cs, maxpck,
@@ -2302,9 +2302,9 @@ uhci_interrupt_frameentry_init(struct uhci_interrupt_frameentry *__restrict self
 				size_t maxlen;
 				num_cont      = 1;
 				num_remaining = num_pages - i;
-				start = VM_ADDR2PAGE(pagedir_translate((vm_virt_t)((byte_t *)buf + i * PAGESIZE)));
+				start = VM_ADDR2PAGE(pagedir_translate((byte_t *)buf + i * PAGESIZE));
 				while (num_remaining &&
-				       VM_ADDR2PAGE(pagedir_translate((vm_virt_t)((byte_t *)buf + (i + num_cont) * PAGESIZE))) ==
+				       VM_ADDR2PAGE(pagedir_translate((byte_t *)buf + (i + num_cont) * PAGESIZE)) ==
 				       start + num_cont) {
 					++num_cont;
 					--num_remaining;
@@ -3003,8 +3003,8 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 	result->uc_transfer        = &uhci_transfer;
 	result->uc_interrupt       = &uhci_register_interrupt;
 	result->uc_framelist       = (u32 *)vpage_alloc(1, 1, GFP_LOCKED | GFP_PREFLT);
-	result->uc_framelist_phys  = (u32)pagedir_translate((vm_virt_t)result->uc_framelist);
-	result->uc_qhstart.qh_self = (u32)pagedir_translate((vm_virt_t)&result->uc_qhstart);
+	result->uc_framelist_phys  = (u32)pagedir_translate(result->uc_framelist);
+	result->uc_qhstart.qh_self = (u32)pagedir_translate(&result->uc_qhstart);
 
 	/* Fill in the frame list */
 	for (i = 0; i < UHCI_FRAMELIST_COUNT; ++i)

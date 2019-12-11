@@ -117,9 +117,9 @@ again_calculate_vecN:
 	assert(P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_2mib.d_2mib_1);
 	/* Figure out the physical address surrounding the trampoline's E1-vector. */
 	e1_word = (u64)((trampoline_page - KERNEL_CORE_PAGE) * 4096);
-	assertf(pagedir_translate(VM_PAGE2ADDR(trampoline_page)) == (vm_phys_t)e1_word,
+	assertf(pagedir_translate((void *)VM_PAGE2ADDR(trampoline_page)) == (vm_phys_t)e1_word,
 	        "%p != %p",
-	        (uintptr_t)pagedir_translate(VM_PAGE2ADDR(trampoline_page)),
+	        (uintptr_t)pagedir_translate((void *)VM_PAGE2ADDR(trampoline_page)),
 	        (uintptr_t)e1_word);
 	/* Since we need to set-up the whole E1-vector, adjust so we start at its base */
 	e1_word -= vec1 * 4096;
@@ -1955,25 +1955,25 @@ NOTHROW(FCALL p64_pagedir_unmap_userspace_nosync)(void) {
 
 /* Translate a virtual address into its physical counterpart. */
 INTERN NOBLOCK WUNUSED PHYS vm_phys_t
-NOTHROW(FCALL p64_pagedir_translate)(VIRT vm_virt_t virt_addr) {
+NOTHROW(FCALL p64_pagedir_translate)(VIRT void *addr) {
 	u64 word;
 	unsigned int vec4, vec3, vec2, vec1;
-	vec4 = P64_PDIR_VEC4INDEX(virt_addr);
-	vec3 = P64_PDIR_VEC3INDEX(virt_addr);
-	vec2 = P64_PDIR_VEC2INDEX(virt_addr);
+	vec4 = P64_PDIR_VEC4INDEX(addr);
+	vec3 = P64_PDIR_VEC3INDEX(addr);
+	vec2 = P64_PDIR_VEC2INDEX(addr);
 	assert(P64_PDIR_E4_IDENTITY[vec4].p_word & P64_PAGE_FPRESENT);
 	word = P64_PDIR_E3_IDENTITY[vec4][vec3].p_word;
-	assertf(word & P64_PAGE_FPRESENT, "Page at %p is not mapped", virt_addr);
+	assertf(word & P64_PAGE_FPRESENT, "Page at %p is not mapped", addr);
 	if unlikely(word & P64_PAGE_F1GIB)
-		return (vm_phys_t)((word & P64_PAGE_FADDR_1GIB) | P64_PDIR_PAGEINDEX_1GIB(virt_addr));
+		return (vm_phys_t)((word & P64_PAGE_FADDR_1GIB) | P64_PDIR_PAGEINDEX_1GIB(addr));
 	word = P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word;
-	assertf(word & P64_PAGE_FPRESENT, "Page at %p is not mapped", virt_addr);
+	assertf(word & P64_PAGE_FPRESENT, "Page at %p is not mapped", addr);
 	if unlikely(word & P64_PAGE_F2MIB)
-		return (vm_phys_t)((word & P64_PAGE_FADDR_2MIB) | P64_PDIR_PAGEINDEX_2MIB(virt_addr));
-	vec1 = P64_PDIR_VEC1INDEX(virt_addr);
+		return (vm_phys_t)((word & P64_PAGE_FADDR_2MIB) | P64_PDIR_PAGEINDEX_2MIB(addr));
+	vec1 = P64_PDIR_VEC1INDEX(addr);
 	word = P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word;
-	assertf(word & P64_PAGE_FPRESENT, "Page at %p is not mapped", virt_addr);
-	return (vm_phys_t)((word & P64_PAGE_FADDR_4KIB) | P64_PDIR_PAGEINDEX_4KIB(virt_addr));
+	assertf(word & P64_PAGE_FPRESENT, "Page at %p is not mapped", addr);
+	return (vm_phys_t)((word & P64_PAGE_FADDR_4KIB) | P64_PDIR_PAGEINDEX_4KIB(addr));
 }
 
 /* Check if the given page is mapped. */

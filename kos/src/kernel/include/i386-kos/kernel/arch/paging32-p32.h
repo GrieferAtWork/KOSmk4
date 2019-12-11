@@ -424,7 +424,7 @@ INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unmap_userspace)(struct vm *__rest
 INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unmap_userspace_nosync)(void);
 
 /* Translate a virtual address into its physical counterpart. */
-INTDEF NOBLOCK WUNUSED PHYS vm_phys_t NOTHROW(FCALL p32_pagedir_translate)(VIRT vm_virt_t virt_addr);
+INTDEF NOBLOCK WUNUSED PHYS vm_phys_t NOTHROW(FCALL p32_pagedir_translate)(VIRT void *addr);
 
 /* Check if the given page is mapped. */
 #ifdef CONFIG_USE_NEW_PAGING

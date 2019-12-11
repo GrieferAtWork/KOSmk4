@@ -143,7 +143,7 @@ again_memcpy_nopf_kernel:
 			if (pagedir_ismapped(VM_ADDR2PAGE((vm_virt_t)addr))) {
 				vm_phys_t phys;
 				size_t copybytes, pagesize;
-				phys      = pagedir_translate((vm_virt_t)addr);
+				phys      = pagedir_translate(addr);
 				pagesize  = pagedir_pagesize();
 				copybytes = pagesize - ((uintptr_t)addr & (pagesize - 1));
 				if (copybytes > num_bytes)
@@ -176,7 +176,7 @@ again_memcpy_nopf:
 		if (pagedir_ismapped_p(pdir, VM_ADDR2PAGE((vm_virt_t)addr))) {
 			vm_phys_t phys;
 			size_t copybytes, pagesize;
-			phys      = pagedir_translate_p(pdir, (vm_virt_t)addr);
+			phys      = pagedir_translate_p(pdir, addr);
 			pagesize  = pagedir_pagesize_p(pdir);
 			copybytes = pagesize - ((uintptr_t)addr & (pagesize - 1));
 			if (copybytes > num_bytes)

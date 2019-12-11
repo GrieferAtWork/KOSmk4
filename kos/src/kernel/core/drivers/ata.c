@@ -171,7 +171,7 @@ NOTHROW(KCALL ata_dma_acquire_func)(void *arg, vm_phys_t paddr, size_t num_bytes
  * @param: for_writing: When true, the target buffer is intended to be
  *                      written to, else only intended to be read from. */
 INTERN WUNUSED size_t KCALL
-AtaPRD_InitFromVirt(AtaPRD *__restrict prd_buf, size_t prd_siz, vm_virt_t base,
+AtaPRD_InitFromVirt(AtaPRD *__restrict prd_buf, size_t prd_siz, CHECKED void *base,
                     size_t num_bytes, AtaAIOHandleData *__restrict handle, bool for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	struct vm *effective_vm = &vm_kernel;
@@ -193,7 +193,7 @@ AtaPRD_InitFromVirt(AtaPRD *__restrict prd_buf, size_t prd_siz, vm_virt_t base,
 	                        num_bytes,
 	                        for_writing);
 	if (!req_locks)
-		return 0; /* Not encodeable as PRD physical memory. */
+		return 0; /* Not encodable as PRD physical memory. */
 	req_prd = (size_t)(data.ad_buf - data.ad_base);
 	assert(req_prd != 0);
 	assertf(pagedir_translate(base) == (vm_phys_t)prd_buf->p_bufaddr,
@@ -302,7 +302,7 @@ AtaPRD_InitFromVirtVector(AtaPRD *__restrict prd_buf, size_t prd_siz, struct aio
 	                         buf,
 	                         for_writing);
 	if (!req_locks)
-		return 0; /* Not encodeable as PRD physical memory. */
+		return 0; /* Not encodable as PRD physical memory. */
 	req_prd = (size_t)(data.ad_buf - data.ad_base);
 	assert(req_prd != 0);
 	if (req_locks == 1) {
@@ -654,7 +654,7 @@ again:
 	assert(handle->ah_type == &Ata_DmaHandleType);
 #if 0
 	outl(self->b_dmaio + DMA_PRIMARY_PRDT,
-	     (u32)pagedir_translate((vm_virt_t)self->b_prdt));
+	     (u32)pagedir_translate(self->b_prdt));
 #endif
 	outb(self->b_dmaio + DMA_PRIMARY_COMMAND,
 	     data->hd_flags & ATA_AIO_HANDLE_FWRITING ? 0 : DMA_COMMAND_FREADMODE);
@@ -736,7 +736,7 @@ handle_io_error:
 	{
 		vm_phys_t phys;
 		/* Re-set the PRDT address. */
-		phys = pagedir_translate((vm_virt_t)self->b_prdt);
+		phys = pagedir_translate(self->b_prdt);
 		assert(phys <= (vm_phys_t)0xffffffff);
 		outl(self->b_dmaio + DMA_PRIMARY_PRDT, (u32)phys);
 	}
@@ -1226,7 +1226,7 @@ NOTHROW(KCALL Ata_ResetAndReinitializeBus)(struct ata_bus *__restrict self) {
 	if (self->b_dmaio != (port_t)-1) {
 		vm_phys_t phys;
 		/* Re-set the PRDT address. */
-		phys = pagedir_translate((vm_virt_t)self->b_prdt);
+		phys = pagedir_translate(self->b_prdt);
 		assert(phys <= (vm_phys_t)0xffffffff);
 		outl(self->b_dmaio + DMA_PRIMARY_PRDT, (u32)phys);
 	}
@@ -1508,7 +1508,7 @@ reset_bus_and_fail:
 						vm_phys_t phys;
 						bus->b_prdt = (AtaPRD *)vpage_alloc_untraced(1, 1, GFP_LOCKED | GFP_PREFLT);
 						/* Re-set the PRDT address. */
-						phys = pagedir_translate((vm_virt_t)bus->b_prdt);
+						phys = pagedir_translate(bus->b_prdt);
 						/* TODO: Ensure that a physical page <= 0xfffff000 is allocated for this VPAGE */
 						assertf(phys <= (vm_phys_t)0xffffffff, "TODO");
 						outl(bus->b_dmaio + DMA_PRIMARY_PRDT, (u32)phys);

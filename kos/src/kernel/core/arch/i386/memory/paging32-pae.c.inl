@@ -1615,20 +1615,20 @@ again_read_word:
 
 /* Translate a virtual address into its physical counterpart. */
 INTERN NOBLOCK WUNUSED PHYS vm_phys_t
-NOTHROW(FCALL pae_pagedir_translate)(VIRT vm_virt_t virt_addr) {
+NOTHROW(FCALL pae_pagedir_translate)(VIRT void *addr) {
 	u64 word;
 	unsigned int vec3, vec2, vec1;
-	vec3 = PAE_PDIR_VEC3INDEX(virt_addr);
-	vec2 = PAE_PDIR_VEC2INDEX(virt_addr);
+	vec3 = PAE_PDIR_VEC3INDEX(addr);
+	vec2 = PAE_PDIR_VEC2INDEX(addr);
 	assert(PAE_PDIR_E3_IDENTITY[vec3].p_word & PAE_PAGE_FPRESENT);
 	word = PAE_PDIR_E2_IDENTITY[vec3][vec2].p_word;
-	assertf(word & PAE_PAGE_FPRESENT, "Page at %p is not mapped", virt_addr);
+	assertf(word & PAE_PAGE_FPRESENT, "Page at %p is not mapped", addr);
 	if unlikely(word & PAE_PAGE_F2MIB)
-		return (vm_phys_t)((word & PAE_PAGE_FADDR_2MIB) | PAE_PDIR_PAGEINDEX_2MIB(virt_addr));
-	vec1 = PAE_PDIR_VEC1INDEX(virt_addr);
+		return (vm_phys_t)((word & PAE_PAGE_FADDR_2MIB) | PAE_PDIR_PAGEINDEX_2MIB(addr));
+	vec1 = PAE_PDIR_VEC1INDEX(addr);
 	word = PAE_PDIR_E1_IDENTITY[vec3][vec2][vec1].p_word;
-	assertf(word & PAE_PAGE_FPRESENT, "Page at %p is not mapped", virt_addr);
-	return (vm_phys_t)((word & PAE_PAGE_FADDR_4KIB) | PAE_PDIR_PAGEINDEX_4KIB(virt_addr));
+	assertf(word & PAE_PAGE_FPRESENT, "Page at %p is not mapped", addr);
+	return (vm_phys_t)((word & PAE_PAGE_FADDR_4KIB) | PAE_PDIR_PAGEINDEX_4KIB(addr));
 }
 
 /* Check if the given page is mapped. */

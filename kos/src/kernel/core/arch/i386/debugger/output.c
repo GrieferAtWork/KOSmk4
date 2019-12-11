@@ -1280,7 +1280,7 @@ PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_map)(void) {
 	vga_real_terminal_start = (u16 *)(KERNEL_CORE_BASE + VGA_VRAM_TEXT);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if (pagedir_ismapped(VM_ADDR2PAGE((vm_virt_t)vga_real_terminal_start)) &&
-	    pagedir_translate((vm_virt_t)vga_real_terminal_start) == (vm_phys_t)VGA_VRAM_TEXT) {
+	    pagedir_translate(vga_real_terminal_start) == (vm_phys_t)VGA_VRAM_TEXT) {
 		vga_oldmapping_did_prepare = false;
 		return;
 	}
@@ -1499,7 +1499,7 @@ NOTHROW(KCALL vga_vram)(u32 vram_offset) {
 			byte_t *result;
 			result = (byte_t *)(KERNEL_CORE_BASE + VGA_VRAM_BASE + vram_offset);
 			if (pagedir_ismapped(VM_ADDR2PAGE((vm_virt_t)result)) &&
-			    pagedir_translate((vm_virt_t)result) == (vm_phys_t)(VGA_VRAM_BASE + vram_offset)) {
+			    pagedir_translate(result) == (vm_phys_t)(VGA_VRAM_BASE + vram_offset)) {
 				vga_vram_offset = vram_offset;
 				return result + offset;
 			}

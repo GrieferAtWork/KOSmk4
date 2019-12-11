@@ -69,7 +69,7 @@ vm_alloc(void) THROWS(E_BADALLOC) {
 	memcpy((byte_t *)result + PAGEDIR_SIZE, __kernel_pervm_start,
 	       (size_t)__kernel_pervm_size);
 	/* Setup and initialize the VM's page directory. */
-	result->v_pdir_phys = pagedir_translate((vm_virt_t)result);
+	result->v_pdir_phys = pagedir_translate(result);
 	result->v_refcnt    = 1;
 	assert(result->v_weakrefcnt == 1);
 	result->v_tree      = &result->v_kernreserve;

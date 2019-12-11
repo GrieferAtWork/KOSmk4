@@ -1420,9 +1420,9 @@ struct vm {
 		PHYS pagedir_t        *v_pdir_phys_ptr; /* [1..1][const] Physical pointer of the page directory */
 #ifdef __INTELLISENSE__
 		struct { PHYS vm_phys_t v_pdir_phys;    /* [1..1][const] Physical pointer of the page directory */ };
-#else
+#else /* __INTELLISENSE__ */
 		PHYS vm_phys_t         v_pdir_phys;     /* [1..1][const] Physical pointer of the page directory */
-#endif
+#endif /* !__INTELLISENSE__ */
 	};
 	WEAK refcnt_t              v_refcnt;        /* Reference counter */
 	WEAK refcnt_t              v_weakrefcnt;    /* Weak reference counter */
@@ -1963,8 +1963,6 @@ NOTHROW(KCALL vm_read_nopf)(struct vm *__restrict self, UNCHECKED void const *ad
 FUNDEF NOBLOCK size_t
 NOTHROW(KCALL vm_write_nopf)(struct vm *__restrict self, UNCHECKED void *addr,
                              USER CHECKED void const *buf, size_t num_bytes);
-/* TODO: Change the argument order of this function, so that the
- *       VM comes first, and the VM-address becomes a `vm_virt_t' */
 FUNDEF NOBLOCK size_t
 NOTHROW(KCALL vm_memset_nopf)(struct vm *__restrict self, UNCHECKED void *addr,
                               int byte, size_t num_bytes);
@@ -2096,24 +2094,24 @@ FUNDEF NONNULL((1, 2, 3, 5)) size_t KCALL
 vm_startdma(struct vm *__restrict effective_vm,
             vm_dmarangefunc_t prange, vm_dmaresetfunc_t preset, void *arg,
             struct vm_dmalock *__restrict lockvec, size_t lockcnt,
-            vm_virt_t vaddr, size_t num_bytes, bool for_writing)
+            UNCHECKED void *vaddr, size_t num_bytes, bool for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1, 2, 3, 5, 7)) size_t KCALL
 vm_startdmav(struct vm *__restrict effective_vm,
              vm_dmarangefunc_t prange, vm_dmaresetfunc_t preset, void *arg,
              struct vm_dmalock *__restrict lockvec, size_t lockcnt,
-             struct aio_buffer const *__restrict buf, bool for_writing)
+             struct aio_buffer const *__restrict vaddr_buf, bool for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1, 2, 3, 5)) size_t
 NOTHROW(KCALL vm_startdma_nx)(struct vm *__restrict effective_vm,
                               vm_dmarangefunc_t prange, vm_dmaresetfunc_t preset, void *arg,
                               struct vm_dmalock *__restrict lockvec, size_t lockcnt,
-                              vm_virt_t vaddr, size_t num_bytes, bool for_writing);
+                              UNCHECKED void *vaddr, size_t num_bytes, bool for_writing);
 FUNDEF NONNULL((1, 2, 3, 5, 7)) size_t
 NOTHROW(KCALL vm_startdmav_nx)(struct vm *__restrict effective_vm,
                                vm_dmarangefunc_t prange, vm_dmaresetfunc_t preset, void *arg,
                                struct vm_dmalock *__restrict lockvec, size_t lockcnt,
-                               struct aio_buffer const *__restrict buf, bool for_writing);
+                               struct aio_buffer const *__restrict vaddr_buf, bool for_writing);
 
 /* Similar to `vm_startdma[v][_nx]', however instead used to enumerate the DMA memory range individually.
  * @param: prange:     A callback that is invoked for each affected physical memory range
@@ -2135,21 +2133,25 @@ NOTHROW(KCALL vm_startdmav_nx)(struct vm *__restrict effective_vm,
 FUNDEF NONNULL((1, 2)) size_t KCALL
 vm_enumdma(struct vm *__restrict effective_vm,
            vm_dmarangefunc_t prange, void *arg,
-           vm_virt_t vaddr, size_t num_bytes, bool for_writing)
+           UNCHECKED void *vaddr, size_t num_bytes,
+           bool for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1, 2, 4)) size_t KCALL
 vm_enumdmav(struct vm *__restrict effective_vm,
             vm_dmarangefunc_t prange, void *arg,
-            struct aio_buffer const *__restrict buf, bool for_writing)
+            struct aio_buffer const *__restrict vaddr_buf,
+            bool for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1, 2)) size_t
 NOTHROW(KCALL vm_enumdma_nx)(struct vm *__restrict effective_vm,
                              vm_dmarangefunc_t prange, void *arg,
-                             vm_virt_t vaddr, size_t num_bytes, bool for_writing);
+                             UNCHECKED void *vaddr, size_t num_bytes,
+                             bool for_writing);
 FUNDEF NONNULL((1, 2, 4)) size_t
 NOTHROW(KCALL vm_enumdmav_nx)(struct vm *__restrict effective_vm,
                               vm_dmarangefunc_t prange, void *arg,
-                              struct aio_buffer const *__restrict buf, bool for_writing);
+                              struct aio_buffer const *__restrict vaddr_buf,
+                              bool for_writing);
 
 
 /* Stop DMAing by releasing all of the specified DMA locks.

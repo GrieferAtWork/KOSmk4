@@ -217,7 +217,7 @@ INTDEF WUNUSED size_t NOTHROW(KCALL AtaPRD_InitFromPhysVector)(AtaPRD *__restric
  * @param: for_writing: When true, the target buffer is intended to be
  *                      written to, else only intended to be read from. */
 INTDEF WUNUSED size_t KCALL
-AtaPRD_InitFromVirt(AtaPRD *__restrict prd_buf, size_t prd_siz, vm_virt_t base,
+AtaPRD_InitFromVirt(AtaPRD *__restrict prd_buf, size_t prd_siz, CHECKED void *base,
                     size_t num_bytes, AtaAIOHandleData *__restrict handle, bool for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 INTDEF WUNUSED size_t KCALL
