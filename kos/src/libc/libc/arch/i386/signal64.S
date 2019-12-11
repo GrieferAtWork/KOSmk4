@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBC_LIBC_ARCH_I386_SIGNAL64_S
+#define GUARD_LIBC_LIBC_ARCH_I386_SIGNAL64_S 1
 #define _KOS_KERNEL_SOURCE 1
 
 #include <hybrid/compiler.h>
@@ -36,21 +38,4 @@ INTERN_FUNCTION(libc_sig_restore)
 	.cfi_endproc
 END(libc_sig_restore)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif /* !GUARD_LIBC_LIBC_ARCH_I386_SIGNAL64_S */

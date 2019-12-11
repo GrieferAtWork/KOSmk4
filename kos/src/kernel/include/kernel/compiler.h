@@ -153,19 +153,13 @@ FUNDEF void NOTHROW(KCALL BREAKPOINT)(void);
 #define BREAKPOINT()     (void)0 /* ??? */
 #endif
 
-#if defined(__INTELLISENSE__) && defined(__cplusplus)
-#define ALTERNATIVE_TYPE(T) __intern::____intellisense_altint< __LINE__, T >
-#else
-#define ALTERNATIVE_TYPE(T) T
-#endif
-
-#define __COMPILER_UNIQUE_IMPL2(x, y) x ## y
+#define __COMPILER_UNIQUE_IMPL2(x, y) x##y
 #define __COMPILER_UNIQUE_IMPL(x, y) __COMPILER_UNIQUE_IMPL2(x, y)
 #ifdef __COUNTER__
 #define __COMPILER_UNIQUE(x) __COMPILER_UNIQUE_IMPL(x, __COUNTER__)
-#else
+#else /* __COUNTER__ */
 #define __COMPILER_UNIQUE(x) __COMPILER_UNIQUE_IMPL(x, __LINE__)
-#endif
+#endif /* !__COUNTER__ */
 
 
 

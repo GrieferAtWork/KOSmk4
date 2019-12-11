@@ -354,7 +354,7 @@ SECTIONS {
 		PROVIDE_HIDDEN(_bootcpu_x86_tss = ABSOLUTE(.));
 		STATIC_ASSERT((ABSOLUTE(.) & (PAGESIZE - 1)) == 0);
 		. = ABSOLUTE(_bootcpu + thiscpu_x86_iob);
-		/* Re-use the phyiscal memory allocated for _bootcpu's IOB
+		/* Re-use the physical memory allocated for _bootcpu's IOB
 		 * vector as the pages used to describe the empty IOB vector. */
 		PROVIDE_HIDDEN(__x86_iob_empty_base = ABSOLUTE(.));
 		PROVIDE_HIDDEN(__x86_iob_empty_vpageno = ABSOLUTE(__x86_iob_empty_base) / PAGESIZE);

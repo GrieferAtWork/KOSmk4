@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBC_LIBC_ARCH_I386_MSABI64_S
+#define GUARD_LIBC_LIBC_ARCH_I386_MSABI64_S 1
 
 #include <hybrid/compiler.h>
 
@@ -622,8 +624,4 @@ for (local n: [1:CRT_MAX_ALIASES]) {
 #include "../../../../../include/crt-features/crt-kos-functions.h"
 #endif /* !__INTELLISENSE__ */
 
-
-
-
-
-
+#endif /* !GUARD_LIBC_LIBC_ARCH_I386_MSABI64_S */

@@ -1135,16 +1135,6 @@ typedef __CHAR32_TYPE__ char32_t;
 #endif /* !__CHAR32_TYPE__ */
 #endif /* !__cplusplus */
 
-template<unsigned int __uid, class __T, class __S> typename __intern::____INTELLISENSE_promote<__S>::__type operator + (__S,__intern::____intellisense_altint<__uid, __T>);
-template<unsigned int __uid, class __T, class __S> typename __intern::____INTELLISENSE_promote<__S>::__type operator - (__S,__intern::____intellisense_altint<__uid, __T>);
-template<unsigned int __uid, class __T, class __S> typename __intern::____INTELLISENSE_promote<__S>::__type operator * (__S,__intern::____intellisense_altint<__uid, __T>);
-template<unsigned int __uid, class __T, class __S> typename __intern::____INTELLISENSE_promote<__S>::__type operator / (__S,__intern::____intellisense_altint<__uid, __T>);
-template<unsigned int __uid, class __T, class __S> typename __intern::____INTELLISENSE_promote<__S>::__type operator % (__S,__intern::____intellisense_altint<__uid, __T>);
-template<unsigned int __uid, class __T, class __S> typename __intern::____INTELLISENSE_promote<__S>::__type operator & (__S,__intern::____intellisense_altint<__uid, __T>);
-template<unsigned int __uid, class __T, class __S> typename __intern::____INTELLISENSE_promote<__S>::__type operator | (__S,__intern::____intellisense_altint<__uid, __T>);
-template<unsigned int __uid, class __T, class __S> typename __intern::____INTELLISENSE_promote<__S>::__type operator ^ (__S,__intern::____intellisense_altint<__uid, __T>);
-
-
 
 /* Sparse emulation */
 #define __CHECKER__    1

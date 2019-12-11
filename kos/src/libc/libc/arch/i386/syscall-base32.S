@@ -1,4 +1,3 @@
-/* HASH 0x5d854235 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBC_LIBC_ARCH_I386_SYSCALL_BASE32_S
+#define GUARD_LIBC_LIBC_ARCH_I386_SYSCALL_BASE32_S 1
 
 #include <hybrid/compiler.h>
 
@@ -285,3 +286,4 @@ DEFINE_PUBLIC_ALIAS(Syscall64, libc_Syscall)
 DEFINE_PUBLIC_ALIAS(__i386_syscall, libc___i386_syscall)
 DEFINE_PUBLIC_ALIAS(__i386_Xsyscall, libc___i386_Xsyscall)
 
+#endif /* !GUARD_LIBC_LIBC_ARCH_I386_SYSCALL_BASE32_S */

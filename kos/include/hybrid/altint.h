@@ -16,29 +16,21 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_HYBRID_ARCH_I386_STRING32_S
-#define GUARD_LIBC_HYBRID_ARCH_I386_STRING32_S 1
+#ifndef __GUARD_HYBRID_ALTINT_H
+#define __GUARD_HYBRID_ALTINT_H 1
 
-#if 1
-#define N 1
-#define RETURN_PCPY 1
-#include "string32-template.S"
-#define N 2
-#define RETURN_PCPY 1
-#include "string32-template.S"
-#define N 4
-#define RETURN_PCPY 1
-#include "string32-template.S"
+/* Alternative integer type
+ * For use with Intellisense to aid in highlighting unwanted use of types
+ * >> ALTINT_UID(myaltint1)
+ * >> ALTINT_UID(myaltint2)
+ * >> typedef ALTINT(myaltint1, uint32_t) my_uint32_t;
+ * >> typedef ALTINT(myaltint2, uint32_t) my_uint32_alt_t;
+ * >> ALTINT_COMPAT(my_uint32_t, my_uint32_alt_t)
+ */
+#include "__altint.h"
+#define ALTINT         __HYBRID_ALTINT
+#define ALTINT_UID     __HYBRID_ALTINT_UID
+#define ALTINT_COMPAT  __HYBRID_ALTINT_COMPAT
+#define ALTINT_TYPEDEF __HYBRID_ALTINT_TYPEDEF
 
-#define N 1
-#define RETURN_PCPY 0
-#include "string32-template.S"
-#define N 2
-#define RETURN_PCPY 0
-#include "string32-template.S"
-#define N 4
-#define RETURN_PCPY 0
-#include "string32-template.S"
-#endif
-
-#endif /* !GUARD_LIBC_HYBRID_ARCH_I386_STRING32_S */
+#endif /* !__GUARD_HYBRID_ALTINT_H */

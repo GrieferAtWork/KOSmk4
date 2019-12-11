@@ -21,9 +21,11 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/paging.h>
 #include <kernel/types.h>
 #include <sched/rwlock.h>
 
+#include <hybrid/__altint.h>
 #include <hybrid/sequence/atree.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-rwlock.h>
@@ -37,7 +39,7 @@ DECL_BEGIN
 struct block_device;
 struct aio_buffer;
 struct aio_pbuffer;
-typedef ALTERNATIVE_TYPE(u64) lba_t;          /* LinearBlockAddress */
+__HYBRID_ALTINT_TYPEDEF(u64, lba_t, false); /* LinearBlockAddress */
 
 struct block_device_type {
 	/* [0..1] Finalizer callback.

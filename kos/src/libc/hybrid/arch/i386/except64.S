@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBC_HYBRID_ARCH_I386_EXCEPT64_S
+#define GUARD_LIBC_HYBRID_ARCH_I386_EXCEPT64_S 1
 #define _KOS_KERNEL_SOURCE 1
 
 #include <hybrid/compiler.h>
@@ -609,10 +611,4 @@ END(x86_userexcept_unwind_interrupt)
 
 #endif /* __KERNEL__ */
 
-
-
-
-
-
-
-
+#endif /* !GUARD_LIBC_HYBRID_ARCH_I386_EXCEPT64_S */

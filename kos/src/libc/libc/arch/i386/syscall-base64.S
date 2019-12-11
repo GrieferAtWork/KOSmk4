@@ -1,4 +1,3 @@
-/* HASH 0x5d854235 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,11 +16,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBC_LIBC_ARCH_I386_SYSCALL_BASE64_S
+#define GUARD_LIBC_LIBC_ARCH_I386_SYSCALL_BASE64_S 1
 
 #include <hybrid/compiler.h>
+
 #include <asm/cfi.h>
 #include <sys/syscall.h>
-
 
 .section .text.crt.system.utility.syscall
 INTERN_FUNCTION(libc_syscall)
@@ -68,3 +69,4 @@ DEFINE_INTERN_ALIAS(libc_Syscall64, libc_Syscall)
 DEFINE_PUBLIC_ALIAS(Syscall, libc_Syscall)
 DEFINE_PUBLIC_ALIAS(Syscall64, libc_Syscall64)
 
+#endif /* !GUARD_LIBC_LIBC_ARCH_I386_SYSCALL_BASE64_S */

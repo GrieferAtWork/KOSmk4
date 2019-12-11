@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBC_LIBC_ARCH_I386_SIGNAL32_S
+#define GUARD_LIBC_LIBC_ARCH_I386_SIGNAL32_S 1
 #define _KOS_KERNEL_SOURCE 1
 
 #include <hybrid/compiler.h>
@@ -32,18 +34,18 @@ INTERN_FUNCTION(libc_sig_restore)
 	/* %ebx: [0..1] struct fpustate const *restore_fpu   FPU context */
 	/* %esi: [0..1] sigset_t const *restore_sigmask      Signal mask */
 	/* %edi: [0..1] struct rpc_syscall_info *sc_info     Restartable system call */
-	.cfi_reg_offset %ebp, OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EBP, %ebp
-	.cfi_reg_offset %edi, OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EDI, %ebp
-	.cfi_reg_offset %esi, OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESI, %ebp
-	.cfi_reg_offset %esp, OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESP, %ebp
-	.cfi_reg_offset %ebx, OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EBX, %ebp
-	.cfi_reg_offset %edx, OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EDX, %ebp
-	.cfi_reg_offset %ecx, OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ECX, %ebp
-	.cfi_reg_offset %eax, OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EAX, %ebp
-	.cfi_reg_offset %gs, OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_GS, %ebp
-	.cfi_reg_offset %fs, OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_FS, %ebp
-	.cfi_reg_offset %es, OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_ES, %ebp
-	.cfi_reg_offset %ds, OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_DS, %ebp
+	.cfi_reg_offset %ebp, (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EBP), %ebp
+	.cfi_reg_offset %edi, (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EDI), %ebp
+	.cfi_reg_offset %esi, (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESI), %ebp
+	.cfi_reg_offset %esp, (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESP), %ebp
+	.cfi_reg_offset %ebx, (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EBX), %ebp
+	.cfi_reg_offset %edx, (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EDX), %ebp
+	.cfi_reg_offset %ecx, (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ECX), %ebp
+	.cfi_reg_offset %eax, (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EAX), %ebp
+	.cfi_reg_offset %gs, (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_GS), %ebp
+	.cfi_reg_offset %fs, (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_FS), %ebp
+	.cfi_reg_offset %es, (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_ES), %ebp
+	.cfi_reg_offset %ds, (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_DS), %ebp
 	.cfi_reg_offset %cs, OFFSET_UCPUSTATE_CS, %ebp
 	.cfi_reg_offset %ss, OFFSET_UCPUSTATE_SS, %ebp
 	.cfi_reg_offset %eflags, OFFSET_UCPUSTATE_EFLAGS, %ebp
@@ -63,21 +65,4 @@ INTERN_FUNCTION(libc_sig_restore)
 	.cfi_endproc
 END(libc_sig_restore)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif /* !GUARD_LIBC_LIBC_ARCH_I386_SIGNAL32_S */

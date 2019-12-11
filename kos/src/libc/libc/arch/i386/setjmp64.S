@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBC_LIBC_ARCH_I386_SETJMP64_S
+#define GUARD_LIBC_LIBC_ARCH_I386_SETJMP64_S 1
 
 #include <hybrid/compiler.h>
 #include <bits/sigaction.h>
@@ -153,4 +155,4 @@ END(libc_siglongjmp)
 DEFINE_PUBLIC_ALIAS(siglongjmp, libc_siglongjmp)
 DEFINE_PUBLIC_ALIAS(__siglongjmp, libc_siglongjmp)
 
-
+#endif /* !GUARD_LIBC_LIBC_ARCH_I386_SETJMP64_S */

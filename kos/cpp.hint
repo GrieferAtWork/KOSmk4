@@ -510,3 +510,7 @@
 #define DBG_CALL
 #define DEFINE_DEBUG_FUNCTION(name, help, argc, argv) uintptr_t _debug_main_xxx(size_t argc, char *argv[])
 
+#define __HYBRID_ALTINT(UID, allow_int_ops, ...) __VA_ARGS__
+#define __HYBRID_ALTINT_UID(UID)
+#define __HYBRID_ALTINT_COMPAT(Ta, Tb)
+#define __HYBRID_ALTINT_TYPEDEF(Told, Tnew, allow_int_ops) typedef Told Tnew

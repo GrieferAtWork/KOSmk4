@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBC_LIBC_ARCH_I386_CLONE32_S
+#define GUARD_LIBC_LIBC_ARCH_I386_CLONE32_S 1
 #define _KOS_KERNEL_SOURCE 1
 
 #include <hybrid/compiler.h>
@@ -79,5 +81,4 @@ END(libc_clone)
 DEFINE_PUBLIC_ALIAS(clone, libc_clone)
 DEFINE_PUBLIC_ALIAS(__clone, libc_clone)
 
-
-
+#endif /* !GUARD_LIBC_LIBC_ARCH_I386_CLONE32_S */

@@ -200,8 +200,8 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread) {
 DATDEF ATTR_PERTASK struct task this_task; /* The current task (for use with `PERTASK') */
 #endif /* !__this_task_defined */
 
-DATDEF struct task _boottask;  /* The boot task (aka. /proc/0) */
-DATDEF struct task _bootidle;  /* The idle thread for the boot CPU */
+DATDEF struct task _boottask; /* The boot task (aka. `/proc/1'; aka. `/bin/init') */
+DATDEF struct task _bootidle; /* The idle thread for the boot CPU */
 
 /* [const] VM node referring to the kernel stack of the current thread.
  * WARNING: These structures for `_boottask' and `_bootidle' are not actually part of the kernel VM!
@@ -212,8 +212,8 @@ DATDEF struct task _bootidle;  /* The idle thread for the boot CPU */
  */
 DATDEF ATTR_PERTASK struct vm_node const this_kernel_stacknode;
 DATDEF ATTR_PERTASK struct vm_datapart const this_kernel_stackpart;
-#define THIS_KERNEL_STACK       (&PERTASK(this_kernel_stacknode))
-#define THIS_KERNEL_STACK_PART  (&PERTASK(this_kernel_stackpart))
+#define THIS_KERNEL_STACK      (&PERTASK(this_kernel_stacknode))
+#define THIS_KERNEL_STACK_PART (&PERTASK(this_kernel_stackpart))
 
 /* Return some rough estimates for the available/used stack memory.
  * These `get_stack_avail()' is usually called prior to `alloca()' in order

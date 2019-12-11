@@ -16,7 +16,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBC_HYBRID_ARCH_I386_ASSERT32_S
+#define GUARD_LIBC_HYBRID_ARCH_I386_ASSERT32_S 1
 #define _KOS_KERNEL_SOURCE 1
+
 #include <hybrid/compiler.h>
 #include <asm/cfi.h>
 #include <kos/kernel/cpu-state.h>
@@ -80,16 +83,16 @@ INTERN_FUNCTION(libc___afail)
 	pushfl_cfi_r
 	pushal_cfi_r
 	ADJUST_ESP(4, 16)
-	movl   SIZEOF_KCPUSTATE+4(%esp), %eax  /* char const *expr */
-	movl   %eax, SIZEOF_KCPUSTATE+0(%esp)  /* aa_expr */
-	movl   SIZEOF_KCPUSTATE+8(%esp), %eax  /* char const *file */
-	movl   %eax, SIZEOF_KCPUSTATE+4(%esp)  /* aa_file */
-	movl   SIZEOF_KCPUSTATE+12(%esp), %eax /* unsigned int line */
-	movl   %eax, SIZEOF_KCPUSTATE+8(%esp)  /* aa_line */
-	movl   SIZEOF_KCPUSTATE+16(%esp), %eax /* char const *func */
-	movl   %eax, SIZEOF_KCPUSTATE+12(%esp) /* aa_func */
-	movl   $(0), SIZEOF_KCPUSTATE+16(%esp) /* aa_format */
-	pushl_cfi $(0)                         /* aa_args */
+	movl   (SIZEOF_KCPUSTATE + 4)(%esp), %eax  /* char const *expr */
+	movl   %eax, (SIZEOF_KCPUSTATE + 0)(%esp)  /* aa_expr */
+	movl   (SIZEOF_KCPUSTATE + 8)(%esp), %eax  /* char const *file */
+	movl   %eax, (SIZEOF_KCPUSTATE + 4)(%esp)  /* aa_file */
+	movl   (SIZEOF_KCPUSTATE + 12)(%esp), %eax /* unsigned int line */
+	movl   %eax, (SIZEOF_KCPUSTATE + 8)(%esp)  /* aa_line */
+	movl   (SIZEOF_KCPUSTATE + 16)(%esp), %eax /* char const *func */
+	movl   %eax, (SIZEOF_KCPUSTATE + 12)(%esp) /* aa_func */
+	movl   $(0), (SIZEOF_KCPUSTATE + 16)(%esp) /* aa_format */
+	pushl_cfi $(0)                             /* aa_args */
 	movl   %esp, %ecx
 	INTERN(libc_assertion_failure_core)
 	call   libc_assertion_failure_core
@@ -104,7 +107,7 @@ INTERN_FUNCTION(libc___afailf)
 	pushfl_cfi_r
 	pushal_cfi_r
 	ADJUST_ESP(0, 0) /* This one is CDECL, so we never need to adjust for argument count! */
-	leal   SIZEOF_KCPUSTATE+20(%esp), %eax
+	leal   (SIZEOF_KCPUSTATE + 20)(%esp), %eax
 	pushl_cfi %eax                         /* aa_args */
 	movl   %esp, %ecx
 	INTERN(libc_assertion_failure_core)
@@ -116,7 +119,7 @@ DEFINE_PUBLIC_ALIAS(__afailf, libc___afailf)
 
 
 
-#ifdef __KERNEL__
+#if defined(__KERNEL__) || defined(__INTELLISENSE__)
 /* Support for __acheck[f]() */
 
 .section ASSERTION_SECTION(__acheck)
@@ -129,15 +132,15 @@ INTERN_FUNCTION(libc___acheck)
 	pushfl_cfi_r
 	pushal_cfi_r
 	ADJUST_ESP(4, 0) /* `__acheck()' is CDECL */
-	movl   SIZEOF_KCPUSTATE+4(%esp), %eax  /* char const *expr */
-	movl   %eax, SIZEOF_KCPUSTATE+0(%esp)  /* aa_expr */
-	movl   SIZEOF_KCPUSTATE+8(%esp), %eax  /* char const *file */
-	movl   %eax, SIZEOF_KCPUSTATE+4(%esp)  /* aa_file */
-	movl   SIZEOF_KCPUSTATE+12(%esp), %eax /* unsigned int line */
-	movl   %eax, SIZEOF_KCPUSTATE+8(%esp)  /* aa_line */
-	movl   SIZEOF_KCPUSTATE+16(%esp), %eax /* char const *func */
-	movl   %eax, SIZEOF_KCPUSTATE+12(%esp) /* aa_func */
-	movl   $(0), SIZEOF_KCPUSTATE+16(%esp) /* aa_format */
+	movl   (SIZEOF_KCPUSTATE + 4)(%esp), %eax  /* char const *expr */
+	movl   %eax, (SIZEOF_KCPUSTATE + 0)(%esp)  /* aa_expr */
+	movl   (SIZEOF_KCPUSTATE + 8)(%esp), %eax  /* char const *file */
+	movl   %eax, (SIZEOF_KCPUSTATE + 4)(%esp)  /* aa_file */
+	movl   (SIZEOF_KCPUSTATE + 12)(%esp), %eax /* unsigned int line */
+	movl   %eax, (SIZEOF_KCPUSTATE + 8)(%esp)  /* aa_line */
+	movl   (SIZEOF_KCPUSTATE + 16)(%esp), %eax /* char const *func */
+	movl   %eax, (SIZEOF_KCPUSTATE + 12)(%esp) /* aa_func */
+	movl   $(0), (SIZEOF_KCPUSTATE + 16)(%esp) /* aa_format */
 	pushl_cfi $(0)                         /* aa_args */
 	movl   %esp, %ecx
 	INTERN(libc_assertion_check_core)
@@ -147,29 +150,29 @@ INTERN_FUNCTION(libc___acheck)
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %esp, 0
-	.cfi_reg_offset %eax, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_EAX, %eax
-	.cfi_reg_offset %ecx, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_ECX, %eax
-	.cfi_reg_offset %edx, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_EDX, %eax
-	.cfi_reg_offset %ebx, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_EBX, %eax
-	.cfi_reg_offset %esp, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_ESP, %eax
-	.cfi_reg_offset %ebp, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_EBP, %eax
-	.cfi_reg_offset %esi, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_ESI, %eax
-	.cfi_reg_offset %edi, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_EDI, %eax
+	.cfi_reg_offset %eax, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX), %eax
+	.cfi_reg_offset %ecx, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX), %eax
+	.cfi_reg_offset %edx, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX), %eax
+	.cfi_reg_offset %ebx, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBX), %eax
+	.cfi_reg_offset %esp, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP), %eax
+	.cfi_reg_offset %ebp, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBP), %eax
+	.cfi_reg_offset %esi, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESI), %eax
+	.cfi_reg_offset %edi, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDI), %eax
 	.cfi_reg_offset %eflags, OFFSET_KCPUSTATE_EFLAGS, %eax
 	.cfi_reg_offset %eip, OFFSET_KCPUSTATE_EIP, %eax
-	movl   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_ECX(%eax), %ecx
+	movl   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ECX)(%eax), %ecx
 	.cfi_same_value %ecx
-	movl   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_EDX(%eax), %edx
+	movl   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDX)(%eax), %edx
 	.cfi_same_value %edx
-	movl   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_EBX(%eax), %ebx
+	movl   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBX)(%eax), %ebx
 	.cfi_same_value %ebx
-	movl   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_ESP(%eax), %esp
+	movl   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP)(%eax), %esp
 	.cfi_same_value %esp
-	movl   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_EBP(%eax), %ebp
+	movl   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EBP)(%eax), %ebp
 	.cfi_same_value %ebp
-	movl   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_ESI(%eax), %esi
+	movl   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESI)(%eax), %esi
 	.cfi_same_value %esi
-	movl   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_EDI(%eax), %edi
+	movl   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EDI)(%eax), %edi
 	.cfi_same_value %edi
 	pushl  OFFSET_KCPUSTATE_EIP(%eax)
 	.cfi_reg_value %esp, 4, %esp
@@ -177,7 +180,7 @@ INTERN_FUNCTION(libc___acheck)
 	.cfi_reg_value %esp, 8, %esp
 	.cfi_reg_offset %eflags, 0, %esp
 	.cfi_reg_offset %eip, 4, %esp
-	movl   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_EAX(%eax), %eax
+	movl   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_EAX)(%eax), %eax
 	.cfi_same_value %eax
 	popfl
 	.cfi_same_value %eflags
@@ -195,7 +198,7 @@ INTERN_FUNCTION(libc___acheckf)
 	pushfl_cfi_r
 	pushal_cfi_r
 	ADJUST_ESP(0, 0) /* This one is CDECL, so we never need to adjust for argument count! */
-	leal   SIZEOF_KCPUSTATE+20(%esp), %eax
+	leal   (SIZEOF_KCPUSTATE + 20)(%esp), %eax
 	pushl_cfi %eax                         /* aa_args */
 	movl   %esp, %ecx
 	INTERN(libc_assertion_check_core)
@@ -204,7 +207,7 @@ INTERN_FUNCTION(libc___acheckf)
 	.cfi_endproc
 END(libc___acheckf)
 DEFINE_PUBLIC_ALIAS(__acheckf, libc___acheckf)
-#endif /* __KERNEL__ */
+#endif /* __KERNEL__ || __INTELLISENSE__ */
 
 
 
@@ -222,10 +225,10 @@ INTERN_FUNCTION(libc___assert_func)
 	pushfl_cfi_r
 	pushal_cfi_r
 	ADJUST_ESP(4, 16)
-	movl   SIZEOF_KCPUSTATE+16(%esp), %eax /* char const *expr */
-	movl   %eax, SIZEOF_KCPUSTATE+0(%esp)  /* aa_expr */
-	movl   $(0), SIZEOF_KCPUSTATE+16(%esp) /* aa_format */
-	pushl_cfi $(0)                         /* aa_args */
+	movl   (SIZEOF_KCPUSTATE + 16)(%esp), %eax /* char const *expr */
+	movl   %eax, (SIZEOF_KCPUSTATE + 0)(%esp)  /* aa_expr */
+	movl   $(0), (SIZEOF_KCPUSTATE + 16)(%esp) /* aa_format */
+	pushl_cfi $(0)                             /* aa_args */
 	movl   %esp, %ecx
 	INTERN(libc_assertion_failure_core)
 	call   libc_assertion_failure_core
@@ -241,8 +244,8 @@ INTERN_FUNCTION(libc___assertfail)
 	pushfl_cfi_r
 	pushal_cfi_r
 	ADJUST_ESP(0, 20)
-	movl   $(0), SIZEOF_KCPUSTATE+16(%esp) /* aa_format */
-	pushl_cfi $(0)                         /* aa_args */
+	movl   $(0), (SIZEOF_KCPUSTATE + 16)(%esp) /* aa_format */
+	pushl_cfi $(0)                             /* aa_args */
 	movl   %esp, %ecx
 	INTERN(libc_assertion_failure_core)
 	call   libc_assertion_failure_core
@@ -267,15 +270,15 @@ INTERN_FUNCTION(libc___assert)
 	ADJUST_ESP(8, 12)
 	/*                -,                -, char const  *file, unsigned int line, char const *expr */
 	/* char const *expr, char const *file, unsigned int line, char const  *func, char const *format */
-	movl   SIZEOF_KCPUSTATE+8(%esp), %eax  /* char const *file */
-	movl   %eax, SIZEOF_KCPUSTATE+4(%esp)  /* aa_file */
-	movl   SIZEOF_KCPUSTATE+12(%esp), %eax /* unsigned int line */
-	movl   %eax, SIZEOF_KCPUSTATE+8(%esp)  /* aa_line */
-	movl   SIZEOF_KCPUSTATE+16(%esp), %eax /* char const *expr */
-	movl   %eax, SIZEOF_KCPUSTATE+0(%esp)  /* aa_expr */
-	movl   $(0), SIZEOF_KCPUSTATE+12(%esp) /* aa_func */
-	movl   $(0), SIZEOF_KCPUSTATE+16(%esp) /* aa_format */
-	pushl_cfi $(0)                         /* aa_args */
+	movl   (SIZEOF_KCPUSTATE + 8)(%esp), %eax  /* char const *file */
+	movl   %eax, (SIZEOF_KCPUSTATE + 4)(%esp)  /* aa_file */
+	movl   (SIZEOF_KCPUSTATE + 12)(%esp), %eax /* unsigned int line */
+	movl   %eax, (SIZEOF_KCPUSTATE + 8)(%esp)  /* aa_line */
+	movl   (SIZEOF_KCPUSTATE + 16)(%esp), %eax /* char const *expr */
+	movl   %eax, (SIZEOF_KCPUSTATE + 0)(%esp)  /* aa_expr */
+	movl   $(0), (SIZEOF_KCPUSTATE + 12)(%esp) /* aa_func */
+	movl   $(0), (SIZEOF_KCPUSTATE + 16)(%esp) /* aa_format */
+	pushl_cfi $(0)                             /* aa_args */
 	movl   %esp, %ecx
 	INTERN(libc_assertion_failure_core)
 	call   libc_assertion_failure_core
@@ -300,15 +303,15 @@ INTERN_FUNCTION(libc__assert)
 	ADJUST_ESP(8, 12)
 	/*                -,                -, char const  *expr, char const *file, unsigned int line */
 	/* char const *expr, char const *file, unsigned int line, char const *func, char const  *format */
-	movl   SIZEOF_KCPUSTATE+8(%esp), %eax  /* char const *expr */
-	movl   %eax, SIZEOF_KCPUSTATE+0(%esp)  /* aa_expr */
-	movl   SIZEOF_KCPUSTATE+12(%esp), %eax /* char const *file */
-	movl   %eax, SIZEOF_KCPUSTATE+4(%esp)  /* aa_file */
-	movl   SIZEOF_KCPUSTATE+16(%esp), %eax /* unsigned int line */
-	movl   %eax, SIZEOF_KCPUSTATE+8(%esp)  /* aa_line */
-	movl   $(0), SIZEOF_KCPUSTATE+12(%esp) /* aa_func */
-	movl   $(0), SIZEOF_KCPUSTATE+16(%esp) /* aa_format */
-	pushl_cfi $(0)                         /* aa_args */
+	movl   (SIZEOF_KCPUSTATE + 8)(%esp), %eax  /* char const *expr */
+	movl   %eax, (SIZEOF_KCPUSTATE + 0)(%esp)  /* aa_expr */
+	movl   (SIZEOF_KCPUSTATE + 12)(%esp), %eax /* char const *file */
+	movl   %eax, (SIZEOF_KCPUSTATE + 4)(%esp)  /* aa_file */
+	movl   (SIZEOF_KCPUSTATE + 16)(%esp), %eax /* unsigned int line */
+	movl   %eax, (SIZEOF_KCPUSTATE + 8)(%esp)  /* aa_line */
+	movl   $(0), (SIZEOF_KCPUSTATE + 12)(%esp) /* aa_func */
+	movl   $(0), (SIZEOF_KCPUSTATE + 16)(%esp) /* aa_format */
+	pushl_cfi $(0)                             /* aa_args */
 	movl   %esp, %ecx
 	INTERN(libc_assertion_failure_core)
 	call   libc_assertion_failure_core
@@ -317,8 +320,4 @@ END(libc__assert)
 DEFINE_PUBLIC_ALIAS(_assert, libc__assert)
 #endif /* !__KERNEL__ */
 
-
-
-
-
-
+#endif /* !GUARD_LIBC_HYBRID_ARCH_I386_ASSERT32_S */

@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBC_LIBC_ARCH_I386_PTHREAD64_S
+#define GUARD_LIBC_LIBC_ARCH_I386_PTHREAD64_S 1
 #define _KOS_KERNEL_SOURCE 1
 
 #include "../../pthread.h"
@@ -93,6 +95,4 @@ INTERN_FUNCTION(libc_pthread_unmap_stack_and_exit)
 	/* -unreachable- */
 END(libc_pthread_unmap_stack_and_exit)
 
-
-
-
+#endif /* !GUARD_LIBC_LIBC_ARCH_I386_PTHREAD64_S */

@@ -21,6 +21,7 @@
 
 #include <kernel/compiler.h>
 
+#include <hybrid/__altint.h>
 #include <hybrid/typecore.h>
 
 #include <bits/timespec.h>
@@ -31,14 +32,16 @@ DECL_BEGIN
 #ifdef __CC__
 #ifndef __port_t_defined
 #define __port_t_defined 1
-typedef ALTERNATIVE_TYPE(u16) port_t;
+__HYBRID_ALTINT_TYPEDEF(u16, port_t, false);
 #endif /* !__port_t_defined */
+
 #ifndef __IOPORT_T
 #define __IOPORT_T     port_t
-#endif
+#endif /* !__IOPORT_T */
+
 #ifndef __IOPORT
 #define __IOPORT(x)  ((__IOPORT_T)x)
-#endif
+#endif /* !__IOPORT */
 
 #ifndef __intptr_half_t_defined
 #define __intptr_half_t_defined 1

@@ -16,7 +16,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBC_HYBRID_ARCH_I386_ASSERT64_S
+#define GUARD_LIBC_HYBRID_ARCH_I386_ASSERT64_S 1
 #define _KOS_KERNEL_SOURCE 1
+
 #include <__crt.h> /* __NO_FPU */
 #include <hybrid/compiler.h>
 #include <asm/cfi.h>
@@ -204,7 +207,7 @@ INTERN_FUNCTION(libc___afailf)
 	call   libc_assertion_failure_core
 1:	.cfi_restore_state
 #endif /* !__NO_FPU */
-	movl   $SIZEOF_X86_64_VA_LIST_REG_SAVE_AREA, OFFSET_X86_64_VA_LIST_STRUCT_FP_OFFSET(%rdi)
+	movl   $(SIZEOF_X86_64_VA_LIST_REG_SAVE_AREA), OFFSET_X86_64_VA_LIST_STRUCT_FP_OFFSET(%rdi)
 	INTERN(libc_assertion_failure_core)
 	call   libc_assertion_failure_core
 	.cfi_endproc
@@ -255,53 +258,53 @@ INTERN_FUNCTION(libc___acheck)
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %rsp, 0
-	.cfi_reg_offset %rax, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_RAX, %rax
-	.cfi_reg_offset %rcx, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_RCX, %rax
-	.cfi_reg_offset %rdx, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_RDX, %rax
-	.cfi_reg_offset %rbx, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_RBX, %rax
-	.cfi_reg_offset %rsp, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_RSP, %rax
-	.cfi_reg_offset %rbp, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_RBP, %rax
-	.cfi_reg_offset %rsi, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_RSI, %rax
-	.cfi_reg_offset %rdi, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_RDI, %rax
-	.cfi_reg_offset %r8, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_R8, %rax
-	.cfi_reg_offset %r9, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_R9, %rax
-	.cfi_reg_offset %r10, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_R10, %rax
-	.cfi_reg_offset %r11, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_R11, %rax
-	.cfi_reg_offset %r12, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_R12, %rax
-	.cfi_reg_offset %r13, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_R13, %rax
-	.cfi_reg_offset %r14, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_R14, %rax
-	.cfi_reg_offset %r15, OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_R15, %rax
+	.cfi_reg_offset %rax, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RAX), %rax
+	.cfi_reg_offset %rcx, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RCX), %rax
+	.cfi_reg_offset %rdx, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RDX), %rax
+	.cfi_reg_offset %rbx, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RBX), %rax
+	.cfi_reg_offset %rsp, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RSP), %rax
+	.cfi_reg_offset %rbp, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RBP), %rax
+	.cfi_reg_offset %rsi, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RSI), %rax
+	.cfi_reg_offset %rdi, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RDI), %rax
+	.cfi_reg_offset %r8, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R8), %rax
+	.cfi_reg_offset %r9, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R9), %rax
+	.cfi_reg_offset %r10, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R10), %rax
+	.cfi_reg_offset %r11, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R11), %rax
+	.cfi_reg_offset %r12, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R12), %rax
+	.cfi_reg_offset %r13, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R13), %rax
+	.cfi_reg_offset %r14, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R14), %rax
+	.cfi_reg_offset %r15, (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R15), %rax
 	.cfi_reg_offset %rflags, OFFSET_KCPUSTATE_RFLAGS, %rax
 	.cfi_reg_offset %rip, OFFSET_KCPUSTATE_RIP, %rax
-	movq   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_RCX(%rax), %rcx
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RCX)(%rax), %rcx
 	.cfi_same_value %rcx
-	movq   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_RDX(%rax), %rdx
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RDX)(%rax), %rdx
 	.cfi_same_value %rdx
-	movq   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_RBX(%rax), %rbx
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RBX)(%rax), %rbx
 	.cfi_same_value %rbx
-	movq   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_RSP(%rax), %rsp
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RSP)(%rax), %rsp
 	.cfi_same_value %rsp
-	movq   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_RBP(%rax), %rbp
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RBP)(%rax), %rbp
 	.cfi_same_value %rbp
-	movq   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_RSI(%rax), %rsi
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RSI)(%rax), %rsi
 	.cfi_same_value %rsi
-	movq   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_RDI(%rax), %rdi
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RDI)(%rax), %rdi
 	.cfi_same_value %rdi
-	movq   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_R8(%rax), %r8
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R8)(%rax), %r8
 	.cfi_same_value %r8
-	movq   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_R9(%rax), %r9
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R9)(%rax), %r9
 	.cfi_same_value %r9
-	movq   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_R10(%rax), %r10
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R10)(%rax), %r10
 	.cfi_same_value %r10
-	movq   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_R11(%rax), %r11
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R11)(%rax), %r11
 	.cfi_same_value %r11
-	movq   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_R12(%rax), %r12
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R12)(%rax), %r12
 	.cfi_same_value %r12
-	movq   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_R13(%rax), %r13
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R13)(%rax), %r13
 	.cfi_same_value %r13
-	movq   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_R14(%rax), %r14
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R14)(%rax), %r14
 	.cfi_same_value %r14
-	movq   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_R15(%rax), %r15
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R15)(%rax), %r15
 	.cfi_same_value %r15
 	pushq  OFFSET_KCPUSTATE_RIP(%rax)
 	.cfi_reg_value %rsp, 8, %rsp
@@ -309,7 +312,7 @@ INTERN_FUNCTION(libc___acheck)
 	.cfi_reg_value %rsp, 16, %rsp
 	.cfi_reg_offset %rflags, 0, %rsp
 	.cfi_reg_offset %rip, 8, %rsp
-	movq   OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_RAX(%rax), %rax
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RAX)(%rax), %rax
 	.cfi_same_value %rax
 	popfq
 	.cfi_same_value %rflags
@@ -357,7 +360,7 @@ INTERN_FUNCTION(libc___acheckf)
 	pushq_cfi_r %r13      /* [P] General purpose register #13 */
 	pushq_cfi_r %r14      /* [P] General purpose register #14 */
 	pushq_cfi_r %r15      /* [P] General purpose register #15 */
-	leaq   ((6*8) - OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9)(%rsp), %rcx
+	leaq   ((6 * 8) - OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9)(%rsp), %rcx
 	pushq_cfi %rcx        /* vl_reg_save_area (== &aa_state.kcs_gpregs.gp_r9 - OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9) */
 	pushq_cfi %rdx        /* vl_overflow_arg_area (== aa_state.kcs_gpregs.gp_rsp) */
 	pushq_cfi $(5 * 8)    /* vl_gp_offset */
@@ -370,14 +373,14 @@ INTERN_FUNCTION(libc___acheckf)
 	subq_imm_cfi (1 * 8 + X86_64_VA_LIST_XMM_COUNT * 16), %rsp
 	leaq   -OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9(%rsp), %rcx
 	movq   %rcx, OFFSET_X86_64_VA_LIST_STRUCT_REG_SAVE_AREA(%rdi)
-	movl   $(0),   OFFSET_X86_64_VA_LIST_STRUCT_FP_OFFSET(%rdi)
-	movq   %r9,  0(%rsp)
+	movl   $(0), OFFSET_X86_64_VA_LIST_STRUCT_FP_OFFSET(%rdi)
+	movq   %r9, 0(%rsp)
 	X86_64_VA_LIST_SAVE_XMM(8(%rsp))
 	INTERN(libc_assertion_failure_core)
 	call   libc_assertion_failure_core
 1:	.cfi_restore_state
 #endif /* !__NO_FPU */
-	movl   $SIZEOF_X86_64_VA_LIST_REG_SAVE_AREA, OFFSET_X86_64_VA_LIST_STRUCT_FP_OFFSET(%rdi)
+	movl   $(SIZEOF_X86_64_VA_LIST_REG_SAVE_AREA), OFFSET_X86_64_VA_LIST_STRUCT_FP_OFFSET(%rdi)
 	INTERN(libc_assertion_check_core)
 	call   libc_assertion_check_core
 	jmp    .Lload_kcpustate_eax
@@ -512,4 +515,4 @@ END(libc__assert)
 DEFINE_PUBLIC_ALIAS(_assert, libc__assert)
 #endif /* !__KERNEL__ */
 
-
+#endif /* !GUARD_LIBC_HYBRID_ARCH_I386_ASSERT64_S */

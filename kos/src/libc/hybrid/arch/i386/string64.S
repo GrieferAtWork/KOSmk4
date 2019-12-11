@@ -16,38 +16,35 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBC_HYBRID_ARCH_I386_STRING64_S
+#define GUARD_LIBC_HYBRID_ARCH_I386_STRING64_S 1
 
 #if 1
 #define N 1
 #define RETURN_PCPY 1
-#include "string64_template.S"
+#include "string64-template.S"
 #define N 2
 #define RETURN_PCPY 1
-#include "string64_template.S"
+#include "string64-template.S"
 #define N 4
 #define RETURN_PCPY 1
-#include "string64_template.S"
+#include "string64-template.S"
 #define N 8
 #define RETURN_PCPY 1
-#include "string64_template.S"
+#include "string64-template.S"
 
 #define N 1
 #define RETURN_PCPY 0
-#include "string64_template.S"
+#include "string64-template.S"
 #define N 2
 #define RETURN_PCPY 0
-#include "string64_template.S"
+#include "string64-template.S"
 #define N 4
 #define RETURN_PCPY 0
-#include "string64_template.S"
+#include "string64-template.S"
 #define N 8
 #define RETURN_PCPY 0
-#include "string64_template.S"
+#include "string64-template.S"
 #endif
 
-
-
-
-
-
-
+#endif /* !GUARD_LIBC_HYBRID_ARCH_I386_STRING64_S */
