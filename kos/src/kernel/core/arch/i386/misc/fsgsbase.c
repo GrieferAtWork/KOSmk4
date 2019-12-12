@@ -160,7 +160,7 @@ NOTHROW(FCALL x86_fsgsbase_patch)(void *__restrict pc) {
 		return false; /* Code is too far apart. */
 #else
 	assertf(pcrel >= INT32_MIN || pcrel <= INT32_MAX,
-	        "Attempted to patch code at %p, which is outside of the -2Gib...+2Gib range");
+	        "Attempted to patch code at %p, which is outside of the -2Gib...+2Gib range", pc);
 #endif
 	/* Patch the affected code location. */
 	code[0] = 0xe8;
