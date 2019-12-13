@@ -219,7 +219,7 @@ DEFINE_DEBUG_FUNCTION(
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	if (argc >= 3) {
 		if (!strcmp(argv[2], DBGSTR("page")))
-			count = pagedir_pagesize() - (addr & (pagedir_pagesize() - 1));
+			count = PAGESIZE - (addr & (PAGESIZE - 1));
 		else if (!dbg_evalexpr(argv[2], &count)) {
 			return DBG_FUNCTION_INVALID_ARGUMENTS;
 		}
@@ -247,7 +247,7 @@ DEFINE_DEBUG_FUNCTION(
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	if (argc >= 3) {
 		if (!strcmp(argv[2], DBGSTR("page")))
-			count = pagedir_pagesize() - (addr & (pagedir_pagesize() - 1));
+			count = PAGESIZE - (addr & (PAGESIZE - 1));
 		else if (!dbg_evalexpr(argv[2], &count)) {
 			return DBG_FUNCTION_INVALID_ARGUMENTS;
 		}

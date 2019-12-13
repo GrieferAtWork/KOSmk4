@@ -22,8 +22,10 @@
 /* DISCLAIMER: _STRONGLY_ Based on '/usr/include/i386-linux-gnu/bits/posix1_lim.h' */
 
 #include <__stdinc.h>
-#include <hybrid/__limits.h>
+
 #include <hybrid/limitcore.h>
+
+#include <asm/pagesize.h>
 
 /* Copyright (C) 1996-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -53,62 +55,78 @@
    if this is indeed fixed by the underlying system. */
 
 #ifndef PAGESIZE
-#define PAGESIZE          __SIZEOF_PAGE__
+#ifdef __ARCH_PAGESIZE
+#define PAGESIZE __ARCH_PAGESIZE
+#endif /* __ARCH_PAGESIZE */
 #endif /* !PAGESIZE */
+
 #ifndef PAGE_SIZE
-#define PAGE_SIZE         __SIZEOF_PAGE__
+#ifdef __ARCH_PAGESIZE
+#define PAGE_SIZE __ARCH_PAGESIZE
+#endif /* __ARCH_PAGESIZE */
 #endif /* !PAGE_SIZE */
+
 #ifndef IOV_MAX
-#define IOV_MAX           1024
+#define IOV_MAX 1024
 #endif /* !IOV_MAX */
+
 #ifndef _XOPEN_IOV_MAX
-#define _XOPEN_IOV_MAX    _POSIX_UIO_MAXIOV /* Maximum number of `iovec' structures that one process has available for use with `readv' or writev'. */
+#define _XOPEN_IOV_MAX _POSIX_UIO_MAXIOV /* Maximum number of `iovec' structures that one process has available for use with `readv' or writev'. */
 #endif /* !_XOPEN_IOV_MAX */
+
 #ifndef NL_ARGMAX
-#define NL_ARGMAX         _POSIX_ARG_MAX    /* Maximum value of `digit' in calls to the `printf' and `scanf' functions. We have no limit, so return a reasonable value. */
+#define NL_ARGMAX _POSIX_ARG_MAX /* Maximum value of `digit' in calls to the `printf' and `scanf' functions. We have no limit, so return a reasonable value. */
 #endif /* !NL_ARGMAX */
+
 #ifndef NL_LANGMAX
-#define NL_LANGMAX        _POSIX2_LINE_MAX  /* Maximum number of bytes in a `LANG' name. We have no limit. */
+#define NL_LANGMAX _POSIX2_LINE_MAX /* Maximum number of bytes in a `LANG' name. We have no limit. */
 #endif /* !NL_LANGMAX */
+
 #ifndef NL_MSGMAX
-#define NL_MSGMAX         __INT_MAX__       /* Maximum message number. We have no limit. */
+#define NL_MSGMAX __INT_MAX__ /* Maximum message number. We have no limit. */
 #endif /* !NL_MSGMAX */
+
 #ifndef NL_NMAX
-#define NL_NMAX           __INT_MAX__       /* Maximum number of bytes in N-to-1 collation mapping. We have no limit. */
+#define NL_NMAX __INT_MAX__ /* Maximum number of bytes in N-to-1 collation mapping. We have no limit. */
 #endif /* !NL_NMAX */
+
 #ifndef NL_SETMAX
-#define NL_SETMAX         __INT_MAX__       /* Maximum set number. We have no limit. */
+#define NL_SETMAX __INT_MAX__ /* Maximum set number. We have no limit. */
 #endif /* !NL_SETMAX */
+
 #ifndef NL_TEXTMAX
-#define NL_TEXTMAX        __INT_MAX__       /* Maximum number of bytes in a message. We have no limit. */
+#define NL_TEXTMAX __INT_MAX__ /* Maximum number of bytes in a message. We have no limit. */
 #endif /* !NL_TEXTMAX */
+
 #ifndef NZERO
-#define NZERO             20                /* Default process priority. */
+#define NZERO 20 /* Default process priority. */
 #endif /* !NZERO */
+
 #ifndef WORD_BIT
 #if __INT_MAX__ == __INT8_MAX__
-#   define WORD_BIT       8                 /* Number of bits in a word of type `int'. */
+#define WORD_BIT 8 /* Number of bits in a word of type `int'. */
 #elif __INT_MAX__ == __INT16_MAX__
-#   define WORD_BIT       16                /* Number of bits in a word of type `int'. */
+#define WORD_BIT 16 /* Number of bits in a word of type `int'. */
 #elif __INT_MAX__ == __INT32_MAX__
-#   define WORD_BIT       32                /* Number of bits in a word of type `int'. */
+#define WORD_BIT 32 /* Number of bits in a word of type `int'. */
 #elif __INT_MAX__ == __INT64_MAX__
-#   define WORD_BIT       64                /* Number of bits in a word of type `int'. */
+#define WORD_BIT 64 /* Number of bits in a word of type `int'. */
 #else
-#   define WORD_BIT      (__SIZEOF_INT__*8) /* Number of bits in a word of type `int'. */
+#define WORD_BIT (__SIZEOF_INT__ * 8) /* Number of bits in a word of type `int'. */
 #endif
 #endif /* !WORD_BIT */
+
 #ifndef LONG_BIT
 #if __LONG_MAX__ == __INT8_MAX__
-#   define LONG_BIT       8                 /* Number of bits in a word of type `long int'. */
+#define LONG_BIT 8 /* Number of bits in a word of type `long int'. */
 #elif __LONG_MAX__ == __INT16_MAX__
-#   define LONG_BIT       16                /* Number of bits in a word of type `long int'. */
+#define LONG_BIT 16 /* Number of bits in a word of type `long int'. */
 #elif __LONG_MAX__ == __INT32_MAX__
-#   define LONG_BIT       32                /* Number of bits in a word of type `long int'. */
+#define LONG_BIT 32 /* Number of bits in a word of type `long int'. */
 #elif __LONG_MAX__ == __INT64_MAX__
-#   define LONG_BIT       64                /* Number of bits in a word of type `long int'. */
+#define LONG_BIT 64 /* Number of bits in a word of type `long int'. */
 #else
-#   define LONG_BIT      (__SIZEOF_INT__*8) /* Number of bits in a word of type `long int'. */
+#define LONG_BIT (__SIZEOF_INT__ * 8) /* Number of bits in a word of type `long int'. */
 #endif
 #endif /* !LONG_BIT */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f31da8a */
+/* HASH CRC-32:0xf3ab03d6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __LOCAL_LIBC(memcdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED _
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcdup))(void const *__restrict __ptr,
                                                      int __needle,
                                                      __SIZE_TYPE__ __n_bytes) {
-#line 181 "kos/src/libc/magic/malloc.c"
+#line 180 "kos/src/libc/magic/malloc.c"
 	if __likely(__n_bytes) {
 		void const *__endaddr;
 		__endaddr = __localdep_memchr(__ptr, __needle, __n_bytes - 1);

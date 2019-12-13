@@ -31,8 +31,7 @@
 #include <sched/cpu.h>
 #include <sched/task.h>
 
-#include <hybrid/limits.h>
-
+#include <asm/cacheline.h>
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
@@ -69,7 +68,7 @@ DECL_BEGIN
 #define bus_acquirelock()     COMPILER_BARRIER()
 #define bus_releaselock()     COMPILER_BARRIER()
 #else /* CONFIG_NO_SMP */
-PRIVATE ATTR_CACHELINE_ALIGNED bool volatile bus_flags[CONFIG_MAX_CPU_COUNT];
+PRIVATE ATTR_ALIGNED(__ARCH_CACHELINESIZE) bool volatile bus_flags[CONFIG_MAX_CPU_COUNT];
 PRIVATE ATTR_PERCPU bool thiscpu_busline7 = false;
 
 PRIVATE NOBLOCK bool

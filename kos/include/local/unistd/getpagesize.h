@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11745010 */
+/* HASH CRC-32:0xd064f7a5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,19 +18,17 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getpagesize_defined
+#include <asm/pagesize.h>
+#ifdef __ARCH_PAGESIZE
 #define __local_getpagesize_defined 1
-#include <hybrid/__limits.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
 __LOCAL_LIBC(getpagesize) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getpagesize))(void) {
-#line 1421 "kos/src/libc/magic/unistd.c"
-#ifdef __SIZEOF_PAGE__
-	return __SIZEOF_PAGE__;
-#else
-	return 4096;
-#endif
+#line 1422 "kos/src/libc/magic/unistd.c"
+	return __ARCH_PAGESIZE;
 }
 __NAMESPACE_LOCAL_END
+#endif /* __ARCH_PAGESIZE */
 #endif /* !__local_getpagesize_defined */

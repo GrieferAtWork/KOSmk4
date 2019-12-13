@@ -611,30 +611,6 @@ NOTHROW(FCALL pagedir_sync)(VIRT vm_vpage_t virt_page, size_t num_pages) {
 #endif /* !CONFIG_USE_NEW_PAGING */
 #endif /* __CC__ */
 
-
-#undef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_PAGESIZE
-#define CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_PAGESIZE 1
-
-
-/* Return the smallest active page size/alignment/number-of-bytes-per-page
- * possible with the current page directory.
- * Note that this value is always:
- *    - `>= PAGEDIR_MIN_PAGESIZE'
- *    - `<= PAGEDIR_MAX_PAGESIZE'
- *    - A power-of-2 value */
-#ifdef __INTELLISENSE__
-FUNDEF NOBLOCK ATTR_CONST WUNUSED size_t NOTHROW(KCALL pagedir_pagesize)(void);
-#else /* __INTELLISENSE__ */
-#undef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_PAGESIZE_P
-#define CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_PAGESIZE_P 1
-#define pagedir_pagesize()          __CCAST(size_t)4096
-#define pagedir_pagesize_p(pagedir) __CCAST(size_t)4096
-#endif /* !__INTELLISENSE__ */
-
-#define PAGEDIR_MIN_PAGESIZE 4096
-#define PAGEDIR_MAX_PAGESIZE 4096
-
-
 DECL_END
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_PAGING64_H */

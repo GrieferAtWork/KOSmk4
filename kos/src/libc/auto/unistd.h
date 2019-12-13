@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x464c86f9 */
+/* HASH CRC-32:0xc43ab00a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,6 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* >> getpagesize(3)
- * Return the size of a PAGE (in bytes) */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_getpagesize)(void);
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_getdtablesize)(void);
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains

@@ -142,10 +142,9 @@ again_memcpy_nopf_kernel:
 			num_bytes = error;
 			if (pagedir_ismapped(VM_ADDR2PAGE((vm_virt_t)addr))) {
 				vm_phys_t phys;
-				size_t copybytes, pagesize;
+				size_t copybytes;
 				phys      = pagedir_translate(addr);
-				pagesize  = pagedir_pagesize();
-				copybytes = pagesize - ((uintptr_t)addr & (pagesize - 1));
+				copybytes = PAGESIZE - ((uintptr_t)addr & (PAGESIZE - 1));
 				if (copybytes > num_bytes)
 					copybytes = num_bytes;
 				vm_copytophys(phys, buf, copybytes);
@@ -175,10 +174,9 @@ again_memcpy_nopf:
 		num_bytes = error;
 		if (pagedir_ismapped_p(pdir, VM_ADDR2PAGE((vm_virt_t)addr))) {
 			vm_phys_t phys;
-			size_t copybytes, pagesize;
+			size_t copybytes;
 			phys      = pagedir_translate_p(pdir, addr);
-			pagesize  = pagedir_pagesize_p(pdir);
-			copybytes = pagesize - ((uintptr_t)addr & (pagesize - 1));
+			copybytes = PAGESIZE - ((uintptr_t)addr & (PAGESIZE - 1));
 			if (copybytes > num_bytes)
 				copybytes = num_bytes;
 			vm_copytophys(phys, buf, copybytes);

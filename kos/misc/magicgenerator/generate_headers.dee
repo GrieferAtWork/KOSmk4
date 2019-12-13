@@ -1034,7 +1034,7 @@ function parse_return_type_annotations(
 						}
 						if (alignment_argi !is none) {
 							function_attr.append("ATTR_ALLOC_ALIGN({})".format({ alignment_argi + 1 }));
-						} else if (alignment in ["PAGESIZE", "__SIZEOF_PAGE__"] ||
+						} else if (alignment in ["PAGESIZE", "__ARCH_PAGESIZE"] ||
 						           alignment.replace(" ", "") in ["getpagesize()"]) {
 							function_attr.append("ATTR_MALL_PAGEALIGNED");
 						} else {

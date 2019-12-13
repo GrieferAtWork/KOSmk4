@@ -212,14 +212,10 @@ DECL_BEGIN
 
 #define MALL_HEAP_FLAGS  (GFP_NORMAL | GFP_LOCKED | GFP_PREFLT)
 
-#ifndef HEAP_THRESHOLD_PAGESIZE
-#define HEAP_THRESHOLD_PAGESIZE PAGEDIR_MIN_PAGESIZE
-#endif /* !HEAP_THRESHOLD_PAGESIZE */
-
 /* Debug-heap used for allocating `struct mallnode' objects. */
 INTERN struct heap mall_heap =
-HEAP_INIT(HEAP_THRESHOLD_PAGESIZE * 4,
-          HEAP_THRESHOLD_PAGESIZE * 16,
+HEAP_INIT(PAGESIZE * 4,
+          PAGESIZE * 16,
           (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_DHEAP),
           HINT_GETMODE(KERNEL_VMHINT_DHEAP));
 DEFINE_VALIDATABLE_HEAP(mall_heap);
@@ -850,7 +846,7 @@ NOTHROW(KCALL mall_reachable_data)(byte_t *base, size_t num_bytes) {
 	}
 	while (num_bytes >= sizeof(void *)) {
 		void *ptr;
-		size_t page_bytes = pagedir_pagesize() - ((uintptr_t)base & (pagedir_pagesize() - 1));
+		size_t page_bytes = PAGESIZE - ((uintptr_t)base & (PAGESIZE - 1));
 		/* Only scan writable pages. */
 		if (!pagedir_iswritable(VM_ADDR2PAGE((vm_virt_t)base))) {
 			if (page_bytes >= num_bytes)

@@ -71,7 +71,6 @@
 #define HAVE_MREMAP 0 /* TODO */
 #define MMAP_CLEARS 1
 #define USE_BUILTIN_FFS 1
-#define malloc_getpagesize PAGESIZE
 #define USE_DEV_RANDOM 0
 #define NO_MALLINFO 0
 #define MALLINFO_FIELD_TYPE size_t
@@ -133,18 +132,24 @@
 
 #include <hybrid/compiler.h>
 #include <hybrid/typecore.h>
-#include <hybrid/limits.h>
+#include <asm/pagesize.h>
 #include <dlfcn.h>
 #include <__crt.h>
 #include <string.h>
 #include <assert.h>
+#include <unistd.h>
+
+#ifdef __ARCH_PAGESIZE
+#define malloc_getpagesize __ARCH_PAGESIZE
+#else /* __ARCH_PAGESIZE */
+#define malloc_getpagesize getpagesize()
+#endif /* !__ARCH_PAGESIZE */
 
 
 #if MALLOC_ALIGNMENT < 8
 #undef MALLOC_ALIGNMENT
 #define MALLOC_ALIGNMENT 8
-#endif
-
+#endif /* MALLOC_ALIGNMENT < 8 */
 
 DECL_BEGIN
 

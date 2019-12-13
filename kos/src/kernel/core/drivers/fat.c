@@ -2397,19 +2397,19 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 		    !disk_header.bpb.bpb_reserved_sectors) /* What's the first sector, then? */
 			THROW(E_FSERROR_WRONG_FILE_SYSTEM);
 		sector_size = LESWAP16(disk_header.bpb.bpb_bytes_per_sector);
-#if defined(PAGESIZE) && PAGESIZE < 512
+#if PAGESIZE < 512
 #error "System page size is too small to support any FAT variation"
 #endif
 		if (sector_size == 512) {
 			STATIC_ASSERT(1 << 9 == 512);
 			self->db_pageshift = PAGESHIFT - 9;
-		} else if (pagedir_pagesize() >= 1024 && sector_size == 1024) {
+		} else if (PAGESIZE >= 1024 && sector_size == 1024) {
 			STATIC_ASSERT(1 << 10 == 1024);
 			self->db_pageshift = PAGESHIFT - 10;
-		} else if (pagedir_pagesize() >= 2048 && sector_size == 2048) {
+		} else if (PAGESIZE >= 2048 && sector_size == 2048) {
 			STATIC_ASSERT(1 << 11 == 2048);
 			self->db_pageshift = PAGESHIFT - 11;
-		} else if (pagedir_pagesize() >= 4096 && sector_size == 4096) {
+		} else if (PAGESIZE >= 4096 && sector_size == 4096) {
 			STATIC_ASSERT(1 << 12 == 4096);
 			self->db_pageshift = PAGESHIFT - 12;
 		} else {

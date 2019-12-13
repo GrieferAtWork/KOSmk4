@@ -44,8 +44,8 @@ struct pending_free_part {
 };
 
 
-PRIVATE ATTR_ALIGNED(VM_COREPARTS_PAGESIZE)
-ATTR_BSS struct vm_corepage vm_corepage_start;
+PRIVATE ATTR_BSS ATTR_ALIGNED(PAGESIZE)
+struct vm_corepage vm_corepage_start;
 
 
 /* Core page controller globals. */

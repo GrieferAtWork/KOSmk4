@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb717a2d */
+/* HASH CRC-32:0xaaf647f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,7 +20,6 @@
 #ifndef __local_valloc_defined
 #if defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)
 #define __local_valloc_defined 1
-#include <hybrid/__limits.h>
 /* Dependency: "memalign" from "malloc" */
 #ifndef ____localdep_memalign_defined
 #define ____localdep_memalign_defined 1
@@ -48,17 +47,22 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_getpagesize
  * Return the size of a PAGE (in bytes) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_getpagesize,(void),__getpagesize,())
 #else /* LIBC: getpagesize */
+#include <asm/pagesize.h>
+#ifdef __ARCH_PAGESIZE
 #include <local/unistd/getpagesize.h>
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
 #define __localdep_getpagesize (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpagesize))
+#else /* CUSTOM: getpagesize */
+#undef ____localdep_getpagesize_defined
+#endif /* getpagesize... */
 #endif /* getpagesize... */
 #endif /* !____localdep_getpagesize_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(valloc) __ATTR_MALL_PAGEALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(valloc))(__SIZE_TYPE__ __n_bytes) {
-#line 96 "kos/src/libc/magic/malloc.c"
+#line 95 "kos/src/libc/magic/malloc.c"
 	return __localdep_memalign(__localdep_getpagesize(), __n_bytes);
 }
 __NAMESPACE_LOCAL_END

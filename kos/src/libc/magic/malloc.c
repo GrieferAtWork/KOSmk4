@@ -90,7 +90,6 @@ pvalloc:(size_t n_bytes) -> void *;
 [noexport][guard]
 [ATTR_WUNUSED][ATTR_MALL_PAGEALIGNED][ATTR_ALLOC_SIZE((1))]
 [requires($has_function(memalign))]
-[dependency_include(<hybrid/__limits.h>)]
 [section(.text.crt.heap.rare_helpers)]
 valloc:($size_t n_bytes) -> void * {
 	return memalign(getpagesize(), n_bytes);

@@ -44,7 +44,6 @@
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
-#include <hybrid/limits.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/atree.h>
 #include <hybrid/sequence/list.h>
@@ -691,10 +690,10 @@ NOTHROW(KCALL driver_section_do_destroy_with_sections_lock_held)(struct driver_s
 		sect_base = (uintptr_t)self->ds_data;
 		if (sect_base != (uintptr_t)-1) {
 			sect_size = self->ds_size;
-			sect_size += sect_base & (pagedir_pagesize() - 1);
-			sect_base &= ~(pagedir_pagesize() - 1);
+			sect_size += sect_base & (PAGESIZE - 1);
+			sect_base &= ~(PAGESIZE - 1);
 			vpage_free((void *)sect_base,
-			           (size_t)CEILDIV(sect_size, pagedir_pagesize()));
+			           (size_t)CEILDIV(sect_size, PAGESIZE));
 		}
 	}
 	kfree(self);
@@ -764,13 +763,13 @@ NOTHROW(KCALL driver_destroy)(struct driver *__restrict self) {
 			continue;
 		progaddr = (uintptr_t)(self->d_loadaddr + self->d_phdr[i].p_vaddr);
 		progsize = self->d_phdr[i].p_memsz;
-		progsize += progaddr & (pagedir_pagesize() - 1);
-		progaddr &= ~(pagedir_pagesize() - 1);
+		progsize += progaddr & (PAGESIZE - 1);
+		progaddr &= ~(PAGESIZE - 1);
 		/* NOTE: During finalization, all write-only program headers were re-mapped
 		 *       as read/write, so-as to allow us to free them as kernel-ram at this
 		 *       point. */
 		vm_unmap_kernel_ram((vm_vpage_t)VM_ADDR2PAGE(progaddr),
-		                    (size_t)CEILDIV(progsize, pagedir_pagesize()),
+		                    (size_t)CEILDIV(progsize, PAGESIZE),
 		                    false);
 	}
 	/* Free heap-allocated structures. */
@@ -2374,7 +2373,7 @@ again_lock_sections_after_free_result:
 		void *base;
 		size_t num_pages;
 		/* Load section into memory. */
-		num_pages = CEILDIV(sect->sh_size, pagedir_pagesize());
+		num_pages = CEILDIV(sect->sh_size, PAGESIZE);
 		TRY {
 			struct regular_node *file;
 			file = driver_getfile(self);
@@ -3257,10 +3256,10 @@ unmap_range(uintptr_t loadaddr, Elf_Phdr *__restrict headers, size_t count) {
 		if unlikely(!size)
 			continue;
 		addr += loadaddr;
-		size += addr & (pagedir_pagesize() - 1);
-		addr &= ~(pagedir_pagesize() - 1);
+		size += addr & (PAGESIZE - 1);
+		addr &= ~(PAGESIZE - 1);
 		vm_unmap_kernel_ram(VM_ADDR2PAGE((vm_virt_t)addr),
-		                    CEILDIV(size, pagedir_pagesize()), false);
+		                    CEILDIV(size, PAGESIZE), false);
 	}
 }
 
@@ -3278,15 +3277,15 @@ contains_illegal_overlap(Elf_Phdr *__restrict headers,
 			continue;
 		addr = headers[i].p_vaddr;
 		size = headers[i].p_memsz;
-		if (OVERFLOW_UADD(size, addr & (pagedir_pagesize() - 1), &size))
+		if (OVERFLOW_UADD(size, addr & (PAGESIZE - 1), &size))
 			goto yes;
-		addr &= ~(pagedir_pagesize() - 1);
+		addr &= ~(PAGESIZE - 1);
 		min_page = VM_ADDR2PAGE((vm_virt_t)addr);
 		if (OVERFLOW_UADD(addr, size, &addr))
 			goto yes;
-		if (OVERFLOW_UADD(addr, (Elf_Addr)(pagedir_pagesize() - 1), &addr))
+		if (OVERFLOW_UADD(addr, (Elf_Addr)(PAGESIZE - 1), &addr))
 			goto yes;
-		max_page = (vm_vpage_t)(addr / pagedir_pagesize()) - 1;
+		max_page = (vm_vpage_t)(addr / PAGESIZE) - 1;
 		for (j = i + 1; j < count; ++j) {
 			vm_vpage_t other_min_page;
 			vm_vpage_t other_max_page;
@@ -3294,15 +3293,15 @@ contains_illegal_overlap(Elf_Phdr *__restrict headers,
 				continue;
 			addr = headers[j].p_vaddr;
 			size = headers[j].p_memsz;
-			if (OVERFLOW_UADD(size, addr & (pagedir_pagesize() - 1), &size))
+			if (OVERFLOW_UADD(size, addr & (PAGESIZE - 1), &size))
 				goto yes;
-			addr &= ~(pagedir_pagesize() - 1);
+			addr &= ~(PAGESIZE - 1);
 			other_min_page = VM_ADDR2PAGE((vm_virt_t)addr);
 			if (OVERFLOW_UADD(addr, size, &addr))
 				goto yes;
-			if (OVERFLOW_UADD(addr, (Elf_Addr)(pagedir_pagesize() - 1), &addr))
+			if (OVERFLOW_UADD(addr, (Elf_Addr)(PAGESIZE - 1), &addr))
 				goto yes;
-			other_max_page = (vm_vpage_t)(addr / pagedir_pagesize()) - 1;
+			other_max_page = (vm_vpage_t)(addr / PAGESIZE) - 1;
 			if (other_min_page < max_page &&
 			    other_max_page > min_page)
 				goto yes;
@@ -3339,12 +3338,12 @@ driver_map_into_memory(struct driver *__restrict self,
 		align = self->d_phdr[i].p_align;
 		if unlikely(!size)
 			continue;
-		align = CEILDIV(align, pagedir_pagesize());
+		align = CEILDIV(align, PAGESIZE);
 		if (min_page_alignment < align)
 			min_page_alignment = align;
-		size += addr & (pagedir_pagesize() - 1);
-		addr &= ~(pagedir_pagesize() - 1);
-		size = CEIL_ALIGN(size, pagedir_pagesize());
+		size += addr & (PAGESIZE - 1);
+		addr &= ~(PAGESIZE - 1);
+		size = CEIL_ALIGN(size, PAGESIZE);
 		if (min_addr > addr)
 			min_addr = addr;
 		if (OVERFLOW_UADD(addr, size - 1, &addr))
@@ -3356,8 +3355,8 @@ driver_map_into_memory(struct driver *__restrict self,
 		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOSEGMENTS);
 	self->d_loadstart = min_addr;
 	self->d_loadend   = max_addr + 1;
-	total_pages = (CEILDIV(max_addr, pagedir_pagesize()) -
-	               FLOORDIV(min_addr, pagedir_pagesize()));
+	total_pages = (CEILDIV(max_addr, PAGESIZE) -
+	               FLOORDIV(min_addr, PAGESIZE));
 	assert(total_pages != 0);
 	if unlikely(min_page_alignment & (min_page_alignment - 1))
 		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_ALIGN);
@@ -3428,7 +3427,7 @@ find_new_candidate_tryhard:
 			 *       improvement, since we're faulting all of the memory below anyways...) */
 			if (!vm_mapat(&vm_kernel,
 			              VM_ADDR2PAGE((vm_virt_t)addr),
-			              CEILDIV(size + (addr & (pagedir_pagesize() - 1)), pagedir_pagesize()),
+			              CEILDIV(size + (addr & (PAGESIZE - 1)), PAGESIZE),
 			              &vm_datablock_anonymous,
 			              0,
 			              prot,
@@ -3962,7 +3961,7 @@ driver_insmod_file(struct regular_node *__restrict driver_inode,
 	filesize = ATOMIC_READ(driver_inode->i_filesize);
 	if (filesize >= (pos_t)0x10000000)
 		THROW(E_NOT_EXECUTABLE_TOOLARGE);
-	num_pages = CEILDIV((size_t)filesize, pagedir_pagesize());
+	num_pages = CEILDIV((size_t)filesize, PAGESIZE);
 	temp_page = vm_map(&vm_kernel,
 	                   (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
 	                   num_pages,

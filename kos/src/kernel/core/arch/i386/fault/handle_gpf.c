@@ -33,8 +33,6 @@
 #include <sched/except-handler.h>
 #include <sched/task.h>
 
-#include <hybrid/limits.h>
-
 #include <asm/cpu-flags.h>
 #include <asm/cpu-msr.h>
 #include <asm/intrin.h>

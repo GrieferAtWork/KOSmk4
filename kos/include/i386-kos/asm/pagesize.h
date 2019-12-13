@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x22b93273 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,31 +16,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_malloc_trim_defined
-#define __local_malloc_trim_defined 1
-/* Dependency: "_heapmin" from "malloc" */
-#ifndef ____localdep__heapmin_defined
-#define ____localdep__heapmin_defined 1
-#ifdef __CRT_HAVE__heapmin
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep__heapmin,(void),_heapmin,())
-#else /* LIBC: _heapmin */
-#undef ____localdep__heapmin_defined
-#endif /* _heapmin... */
-#endif /* !____localdep__heapmin_defined */
+#ifndef _I386_KOS_ASM_PAGESIZE_H
+#define _I386_KOS_ASM_PAGESIZE_H 1
 
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(malloc_trim) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(malloc_trim))(__SIZE_TYPE__ __pad) {
-#line 130 "kos/src/libc/magic/malloc.c"
-#ifdef __CRT_HAVE__heapmin
-	(void)__pad;
-	return __localdep__heapmin() ? 1 : 0;
-#else
-	/* NO-OP (indicate failure to release memory) */
-	__COMPILER_IMPURE();
-	(void)__pad;
-	return 0;
-#endif
-}
-__NAMESPACE_LOCAL_END
-#endif /* !__local_malloc_trim_defined */
+#undef __ARCH_PAGESIZE
+#undef __ARCH_PAGESHIFT
+#define __ARCH_PAGESIZE  4096
+#define __ARCH_PAGESHIFT 12
+
+#endif /* !_I386_KOS_ASM_PAGESIZE_H */

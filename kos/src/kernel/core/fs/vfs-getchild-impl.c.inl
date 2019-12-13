@@ -24,6 +24,8 @@
 
 #include <kernel/malloc.h>
 
+#include <asm/cacheline.h>
+
 #include <alloca.h>
 
 DECL_BEGIN
@@ -35,12 +37,12 @@ PRIVATE NOBLOCK WUNUSED ssize_t
 NOTHROW(KCALL memcaseeq_ku_nopf)(KERNEL void const *kernel_buffer,
                                  USER CHECKED void const *user_buffer,
                                  size_t num_bytes) {
-	byte_t rhs_buffer[__SIZEOF_CACHELINE__];
+	byte_t rhs_buffer[__ARCH_CACHELINESIZE];
 	while (num_bytes) {
 		size_t error, temp;
 		temp = num_bytes;
-		if (temp > __SIZEOF_CACHELINE__)
-			temp = __SIZEOF_CACHELINE__;
+		if (temp > __ARCH_CACHELINESIZE)
+			temp = __ARCH_CACHELINESIZE;
 		error = memcpy_nopf(rhs_buffer, user_buffer, temp);
 		if unlikely(error)
 			return -1; /* Right buffer is faulty. */

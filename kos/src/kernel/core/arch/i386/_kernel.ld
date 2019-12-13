@@ -31,8 +31,8 @@
 #include <sched/tss.h>
 
 #include <hybrid/align.h>
-#include <hybrid/limits.h>
 
+#include <asm/cacheline.h>
 #include <kos/kernel/gdt.h>
 #include <kos/kernel/segment.h>
 
@@ -224,7 +224,7 @@ SECTIONS {
 	PEROBJECT_SECTION(.percpu, __kernel_percpu, {
 		KEEP(*(.data.percpu.head))
 		KEEP(*(.data.percpu))
-		PROVIDE(thiscpu_idle = ABSOLUTE(ALIGN(__SIZEOF_CACHELINE__)));
+		PROVIDE(thiscpu_idle = ABSOLUTE(ALIGN(__ARCH_CACHELINESIZE)));
 		PROVIDE(thiscpu_x86_tss = CEIL_ALIGN(ABSOLUTE(thiscpu_idle + __kernel_pertask_size), PAGESIZE));
 		PROVIDE(thiscpu_x86_iob = ABSOLUTE(thiscpu_x86_tss) + PAGESIZE);
 		PROVIDE_HIDDEN(__kernel_percpu_full_pagecnt = CEILDIV(ABSOLUTE(thiscpu_x86_iob) + 8192 + 1, PAGESIZE));
@@ -245,11 +245,11 @@ SECTIONS {
 	PROVIDE_HIDDEN(__kernel_data_startpage = ABSOLUTE(.) / PAGESIZE);
 	SECTION(.data) {
 
-		IP_ALIGN(__SIZEOF_CACHELINE__);
+		IP_ALIGN(__ARCH_CACHELINESIZE);
 		*(.data.hot.read_mostly)
 		*(.data.hot.read_mostly.tail)
 
-		IP_ALIGN(__SIZEOF_CACHELINE__);
+		IP_ALIGN(__ARCH_CACHELINESIZE);
 		*(.data.hot.write_mostly)
 		*(.data.hot.write_mostly.tail)
 
@@ -258,14 +258,14 @@ SECTIONS {
 		*(.data.local.*)
 
 #ifdef CONFIG_NO_SMP
-		IP_ALIGN(__SIZEOF_CACHELINE__);
+		IP_ALIGN(__ARCH_CACHELINESIZE);
 		PROVIDE_HIDDEN(__kernel_percpu_start = ABSOLUTE(.));
 		PROVIDE(_bootcpu = ABSOLUTE(.));
 		KEEP(*(.data.percpu.head))
 		KEEP(*(.data.percpu))
 		PROVIDE_HIDDEN(__kernel_percpu_end = ABSOLUTE(.));
 		PROVIDE_HIDDEN(__kernel_percpu_size = ABSOLUTE(ABSOLUTE(__kernel_percpu_end) - ABSOLUTE(__kernel_percpu_start)));
-		IP_ALIGN(__SIZEOF_CACHELINE__);
+		IP_ALIGN(__ARCH_CACHELINESIZE);
 		PROVIDE(_bootidle = ABSOLUTE(.));
 		PROVIDE(thiscpu_idle = ABSOLUTE(.));
 		. += __kernel_pertask_size;
@@ -368,7 +368,7 @@ SECTIONS {
 		/* The value stored in `thiscpu_x86_iob.t_iomap' */
 		PROVIDE_HIDDEN(__x86_cputss_iob_offset = ABSOLUTE(thiscpu_x86_iob - thiscpu_x86_tss));
 
-		IP_ALIGN(__SIZEOF_CACHELINE__);
+		IP_ALIGN(__ARCH_CACHELINESIZE);
 		PROVIDE(_boottask = ABSOLUTE(.));
 		. += __kernel_pertask_size;
 

@@ -20,8 +20,11 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_MALLOC_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/types.h>
-#include <hybrid/__limits.h>
+
+#include <asm/pagesize.h>
+
 #include "malloc-defs.h"
 
 DECL_BEGIN
@@ -105,14 +108,14 @@ NOTHROW(KCALL slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) {
 /* Allocate/Reallocate/Free virtual kernel memory (as whole pages).
  * @throw: E_BADALLOC:   Not enough available memory.
  * @throw: E_WOULDBLOCK: The operation would have blocked. */
-FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__SIZEOF_PAGE__) VIRT /*page-aligned*/ void *KCALL vpage_alloc(size_t num_pages, size_t alignment_in_pages, gfp_t flags);
-FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__SIZEOF_PAGE__) VIRT /*page-aligned*/ void *KCALL vpage_alloc_untraced(size_t num_pages, size_t alignment_in_pages, gfp_t flags);
-FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__SIZEOF_PAGE__) VIRT /*page-aligned*/ void *NOTHROW(KCALL vpage_alloc_nx)(size_t num_pages, size_t alignment_in_pages, gfp_t flags);
-FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__SIZEOF_PAGE__) VIRT /*page-aligned*/ void *NOTHROW(KCALL vpage_alloc_untraced_nx)(size_t num_pages, size_t alignment_in_pages, gfp_t flags);
-FUNDEF WUNUSED ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__SIZEOF_PAGE__) VIRT /*page-aligned*/ void *KCALL vpage_realloc(VIRT /*page-aligned*/ void *old_base, size_t old_pages, size_t new_pages, size_t alignment_in_pages, gfp_t alloc_flags, gfp_t free_flags);
-FUNDEF WUNUSED ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__SIZEOF_PAGE__) VIRT /*page-aligned*/ void *KCALL vpage_realloc_untraced(VIRT /*page-aligned*/ void *old_base, size_t old_pages, size_t new_pages, size_t alignment_in_pages, gfp_t alloc_flags, gfp_t free_flags);
-FUNDEF WUNUSED ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__SIZEOF_PAGE__) VIRT /*page-aligned*/ void *NOTHROW(KCALL vpage_realloc_nx)(VIRT /*page-aligned*/ void *old_base, size_t old_pages, size_t new_pages, size_t alignment_in_pages, gfp_t alloc_flags, gfp_t free_flags);
-FUNDEF WUNUSED ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__SIZEOF_PAGE__) VIRT /*page-aligned*/ void *NOTHROW(KCALL vpage_realloc_untraced_nx)(VIRT /*page-aligned*/ void *old_base, size_t old_pages, size_t new_pages, size_t alignment_in_pages, gfp_t alloc_flags, gfp_t free_flags);
+FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__ARCH_PAGESIZE) VIRT /*page-aligned*/ void *KCALL vpage_alloc(size_t num_pages, size_t alignment_in_pages, gfp_t flags);
+FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__ARCH_PAGESIZE) VIRT /*page-aligned*/ void *KCALL vpage_alloc_untraced(size_t num_pages, size_t alignment_in_pages, gfp_t flags);
+FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__ARCH_PAGESIZE) VIRT /*page-aligned*/ void *NOTHROW(KCALL vpage_alloc_nx)(size_t num_pages, size_t alignment_in_pages, gfp_t flags);
+FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__ARCH_PAGESIZE) VIRT /*page-aligned*/ void *NOTHROW(KCALL vpage_alloc_untraced_nx)(size_t num_pages, size_t alignment_in_pages, gfp_t flags);
+FUNDEF WUNUSED ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__ARCH_PAGESIZE) VIRT /*page-aligned*/ void *KCALL vpage_realloc(VIRT /*page-aligned*/ void *old_base, size_t old_pages, size_t new_pages, size_t alignment_in_pages, gfp_t alloc_flags, gfp_t free_flags);
+FUNDEF WUNUSED ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__ARCH_PAGESIZE) VIRT /*page-aligned*/ void *KCALL vpage_realloc_untraced(VIRT /*page-aligned*/ void *old_base, size_t old_pages, size_t new_pages, size_t alignment_in_pages, gfp_t alloc_flags, gfp_t free_flags);
+FUNDEF WUNUSED ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__ARCH_PAGESIZE) VIRT /*page-aligned*/ void *NOTHROW(KCALL vpage_realloc_nx)(VIRT /*page-aligned*/ void *old_base, size_t old_pages, size_t new_pages, size_t alignment_in_pages, gfp_t alloc_flags, gfp_t free_flags);
+FUNDEF WUNUSED ATTR_RETNONNULL ATTR_ASSUME_ALIGNED(__ARCH_PAGESIZE) VIRT /*page-aligned*/ void *NOTHROW(KCALL vpage_realloc_untraced_nx)(VIRT /*page-aligned*/ void *old_base, size_t old_pages, size_t new_pages, size_t alignment_in_pages, gfp_t alloc_flags, gfp_t free_flags);
 FUNDEF NOBLOCK void NOTHROW(KCALL vpage_free)(VIRT /*page-aligned*/ void *base, size_t num_pages);
 FUNDEF NOBLOCK void NOTHROW(KCALL vpage_ffree)(VIRT /*page-aligned*/ void *base, size_t num_pages, gfp_t flags);
 FUNDEF NOBLOCK void NOTHROW(KCALL vpage_free_untraced)(VIRT /*page-aligned*/ void *base, size_t num_pages);

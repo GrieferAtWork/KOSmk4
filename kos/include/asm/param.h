@@ -21,25 +21,27 @@
 
 #ifndef HZ
 #if defined(__KERNEL__) && defined(CONFIG_HZ)
-#   define HZ            CONFIG_HZ
+#define HZ CONFIG_HZ
 #elif 1
-#   define HZ            20
+#define HZ 20
 #else
-#   define HZ            100
+#define HZ 100
 #endif
-#endif
+#endif /* ! */
 
 #ifndef EXEC_PAGESIZE
-#include <hybrid/__limits.h>
-#define EXEC_PAGESIZE    __SIZEOF_PAGE__
-#endif
+#include <asm/pagesize.h>
+#ifdef __ARCH_PAGESIZE
+#define EXEC_PAGESIZE __ARCH_PAGESIZE
+#endif /* __ARCH_PAGESIZE */
+#endif /* !EXEC_PAGESIZE */
 
 #ifndef NOGROUP
-#define NOGROUP        (-1)
-#endif
+#define NOGROUP (-1)
+#endif /* !NOGROUP */
 
 #ifndef MAXHOSTNAMELEN
-#define MAXHOSTNAMELEN   64 /* max length of hostname. */
-#endif
+#define MAXHOSTNAMELEN 64 /* max length of hostname. */
+#endif /* !MAXHOSTNAMELEN */
 
 #endif /* !_ASM_PARAM_H */

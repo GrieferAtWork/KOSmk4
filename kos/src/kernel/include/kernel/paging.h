@@ -20,12 +20,25 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_PAGING_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/arch/paging.h>
 #include <kernel/types.h>
+
+#include <asm/pagesize.h>
 #include <kos/kernel/paging.h>
+
 #ifndef PAGESIZE
-#include <hybrid/limits.h>
-#endif /* !PAGESIZE */
+#define PAGESIZE __ARCH_PAGESIZE
+#elif PAGESIZE != __ARCH_PAGESIZE
+#error "Miss-configured: `PAGESIZE != __ARCH_PAGESIZE'"
+#endif
+
+#ifndef PAGESHIFT
+#define PAGESHIFT __ARCH_PAGESHIFT
+#elif PAGESHIFT != __ARCH_PAGESHIFT
+#error "Miss-configured: `PAGESHIFT != __ARCH_PAGESHIFT'"
+#endif
+
 
 DECL_BEGIN
 
@@ -40,14 +53,11 @@ DECL_BEGIN
 #define VM_PAGE2ADDR(page) __VM_PAGE2ADDR(page) /* DEPRECATED; REMOVE ME */
 #define VM_ADDR2PAGE(addr) __VM_ADDR2PAGE(addr) /* DEPRECATED; REMOVE ME */
 #endif /* !VM_PAGE2ADDR */
-#ifndef PAGEALIGN
-#define PAGEALIGN PAGESIZE /* DEPRECATED; REMOVE ME */
-#endif /* !PAGEALIGN */
 #ifndef PAGEDIR_ALIGN
-#define PAGEDIR_ALIGN 1
+#define PAGEDIR_ALIGN PAGESIZE
 #endif /* !PAGEDIR_ALIGN */
 #ifndef PAGEDIR_SIZE
-#error "Missing `#define PAGEDIR_SIZE'"
+#define PAGEDIR_SIZE PAGESIZE
 #endif /* !PAGEDIR_SIZE */
 
 #ifndef __pagedir_pushval_t_defined
@@ -58,10 +68,6 @@ DECL_BEGIN
 typedef uintptr_t pagedir_pushval_t;
 #endif /* __CC__ */
 #endif /* !__pagedir_pushval_t_defined */
-
-#if !defined(PAGEDIR_MIN_PAGESIZE) || !defined(PAGEDIR_MAX_PAGESIZE)
-#error "Arch forgot to define PAGEDIR_MIN_PAGESIZE/PAGEDIR_MAX_PAGESIZE"
-#endif /* !PAGEDIR_MIN_PAGESIZE || !PAGEDIR_MAX_PAGESIZE */
 
 
 #ifdef __CC__
@@ -212,28 +218,6 @@ FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unmap_userspace_p)(PAGEDIR_P_SELFTYPE 
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unmap_userspace_nosync_p)(PAGEDIR_P_SELFTYPE self);
 #endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_UNMAP_USERSPACE_P */
 
-/* Return the smallest active page size/alignment/number-of-bytes-per-page
- * possible with the current page directory.
- * Note that this value is always:
- *    - `>= PAGEDIR_MIN_PAGESIZE'
- *    - `<= PAGEDIR_MAX_PAGESIZE'
- *    - A power-of-2 value */
-#ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_PAGESIZE
-#if (PAGEDIR_MIN_PAGESIZE == PAGEDIR_MAX_PAGESIZE) && !defined(__INTELLISENSE__)
-#define pagedir_pagesize()  PAGEDIR_MIN_PAGESIZE
-#else /* PAGEDIR_MIN_PAGESIZE == PAGEDIR_MAX_PAGESIZE */
-FUNDEF NOBLOCK ATTR_CONST WUNUSED size_t NOTHROW(KCALL pagedir_pagesize)(void);
-#endif /* PAGEDIR_MIN_PAGESIZE != PAGEDIR_MAX_PAGESIZE */
-#endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_PAGESIZE */
-
-#ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_PAGESIZE_P
-#if (PAGEDIR_MIN_PAGESIZE == PAGEDIR_MAX_PAGESIZE) && !defined(__INTELLISENSE__)
-#define pagedir_pagesize_p(self)  PAGEDIR_MIN_PAGESIZE
-#else /* PAGEDIR_MIN_PAGESIZE == PAGEDIR_MAX_PAGESIZE */
-FUNDEF NOBLOCK ATTR_CONST WUNUSED size_t NOTHROW(KCALL pagedir_pagesize_p)(PAGEDIR_P_SELFTYPE self);
-#endif /* PAGEDIR_MIN_PAGESIZE != PAGEDIR_MAX_PAGESIZE */
-#endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_PAGESIZE_P */
-
 /* Temporarily switch to a different page directory `self'
  * @param: self: The page directory to switch to (of type `PAGEDIR_P_SELFTYPE') */
 #ifdef __INTELLISENSE__
@@ -310,7 +294,7 @@ NOTHROW(FCALL npagedir_prepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
 			return true;
-		if (num_bytes <= pagedir_pagesize())
+		if (num_bytes <= PAGESIZE)
 			return npagedir_prepare_mapone(addr);
 	}
 	return __os_npagedir_prepare_map(addr, num_bytes);
@@ -322,7 +306,7 @@ NOTHROW(FCALL npagedir_prepare_map_keep)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
 			return true;
-		if (num_bytes <= pagedir_pagesize())
+		if (num_bytes <= PAGESIZE)
 			return npagedir_prepare_mapone(addr);
 	}
 	return __os_npagedir_prepare_map_keep(addr, num_bytes);
@@ -334,7 +318,7 @@ NOTHROW(FCALL npagedir_unprepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
 			return;
-		if (num_bytes <= pagedir_pagesize()) {
+		if (num_bytes <= PAGESIZE) {
 			npagedir_unprepare_mapone(addr);
 			return;
 		}
@@ -385,7 +369,7 @@ NOTHROW(FCALL npagedir_maphint)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
 			return;
-		if (num_bytes <= pagedir_pagesize()) {
+		if (num_bytes <= PAGESIZE) {
 			npagedir_maphintone(addr, hint);
 			return;
 		}
@@ -428,7 +412,7 @@ NOTHROW(FCALL npagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
 			return;
-		if (num_bytes <= pagedir_pagesize()) {
+		if (num_bytes <= PAGESIZE) {
 			npagedir_mapone(addr, phys, perm);
 			return;
 		}
@@ -475,7 +459,7 @@ NOTHROW(FCALL npagedir_unmap)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
 			return;
-		if (num_bytes <= pagedir_pagesize()) {
+		if (num_bytes <= PAGESIZE) {
 			npagedir_unmapone(addr);
 			return;
 		}
@@ -506,7 +490,7 @@ NOTHROW(FCALL npagedir_unwrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
 			return;
-		if (num_bytes <= pagedir_pagesize()) {
+		if (num_bytes <= PAGESIZE) {
 			npagedir_unwriteone(addr);
 			return;
 		}
@@ -534,7 +518,7 @@ NOTHROW(FCALL npagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
 			return;
-		if (num_bytes <= npagedir_pagesize()) {
+		if (num_bytes <= PAGESIZE) {
 			npagedir_syncone(addr);
 			return;
 		}
@@ -634,7 +618,7 @@ NOTHROW(KCALL npagedir_prepare_map_p)(PAGEDIR_P_SELFTYPE self,
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
 			return true;
-		if (num_bytes <= pagedir_pagesize_p(self))
+		if (num_bytes <= PAGESIZE)
 			return npagedir_prepare_mapone_p(self, addr);
 	}
 	return __os_npagedir_prepare_map_p(self, addr, num_bytes);
@@ -646,7 +630,7 @@ NOTHROW(KCALL npagedir_prepare_map_keep_p)(PAGEDIR_P_SELFTYPE self,
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
 			return true;
-		if (num_bytes <= pagedir_pagesize_p(self))
+		if (num_bytes <= PAGESIZE)
 			return npagedir_prepare_mapone_p(self, addr);
 	}
 	return __os_npagedir_prepare_map_keep_p(self, addr, num_bytes);
@@ -658,7 +642,7 @@ NOTHROW(KCALL npagedir_unprepare_map_p)(PAGEDIR_P_SELFTYPE self,
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
 			return;
-		if (num_bytes <= pagedir_pagesize_p(self)) {
+		if (num_bytes <= PAGESIZE) {
 			npagedir_unprepare_mapone_p(self, addr);
 			return;
 		}
@@ -673,7 +657,7 @@ NOTHROW(KCALL npagedir_maphint_p)(PAGEDIR_P_SELFTYPE self,
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
 			return;
-		if (num_bytes <= pagedir_pagesize_p(self)) {
+		if (num_bytes <= PAGESIZE) {
 			npagedir_maphintone_p(self, addr, hint);
 			return;
 		}
@@ -689,7 +673,7 @@ NOTHROW(KCALL npagedir_map_p)(PAGEDIR_P_SELFTYPE self,
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
 			return;
-		if (num_bytes <= pagedir_pagesize_p(self)) {
+		if (num_bytes <= PAGESIZE) {
 			npagedir_mapone_p(self, addr, phys, perm);
 			return;
 		}
@@ -703,7 +687,7 @@ NOTHROW(KCALL npagedir_unmap_p)(PAGEDIR_P_SELFTYPE self,
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
 			return;
-		if (num_bytes <= pagedir_pagesize_p(self)) {
+		if (num_bytes <= PAGESIZE) {
 			npagedir_unmapone_p(self, addr);
 			return;
 		}
@@ -718,7 +702,7 @@ NOTHROW(KCALL npagedir_unwrite_p)(PAGEDIR_P_SELFTYPE self,
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
 			return;
-		if (num_bytes <= pagedir_pagesize_p(self)) {
+		if (num_bytes <= PAGESIZE) {
 			npagedir_unwriteone_p(self, addr);
 			return;
 		}

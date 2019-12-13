@@ -16,39 +16,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __GUARD_HYBRID___LIMITS_H
-#define __GUARD_HYBRID___LIMITS_H 1
+#ifndef _ASM_CACELINE_H
+#define _ASM_CACELINE_H 1
 
-#include "host.h"
 
-#ifndef __SIZEOF_PAGE__
-#ifdef __PAGESIZE
-#define __SIZEOF_PAGE__        __PAGESIZE
-#elif defined(PAGESIZE)
-#define __SIZEOF_PAGE__        PAGESIZE
-#elif defined(__i386__) || defined(__x86_64__) || defined(__arm__)
-#define __SIZEOF_PAGE__        4096
-#endif
-#endif /* !__SIZEOF_PAGE__ */
+/* Different architectures may override this function to define the preprocessor constants:
+ *  - __ARCH_CACHELINESIZE
+ * The size/alignment of a memory cache-line.
+ * May be used to optimize certain aspects of memory accesses in order to optimize execution. */
 
-#ifndef __SIZEOF_CACHELINE__
-#ifdef __CACHELINE
-#   define __SIZEOF_CACHELINE__  __CACHELINE
-#elif defined(CACHELINE)
-#   define __SIZEOF_CACHELINE__  CACHELINE
-#elif defined(__i386__) || defined(__x86_64__)
-#   define __SIZEOF_CACHELINE__  64
-#elif 0
-#   define __SIZEOF_CACHELINE__  64 /* Just guess... */
-#endif
-#endif /* __SIZEOF_CACHELINE__ */
+#ifndef __ARCH_CACHELINESIZE
+#define __ARCH_CACHELINESIZE 64
+#endif /* !__ARCH_CACHELINESIZE */
 
-#ifndef __ATTR_CACHELINE_ALIGNED
-#ifdef __SIZEOF_CACHELINE__
-#define __ATTR_CACHELINE_ALIGNED __ATTR_ALIGNED(__SIZEOF_CACHELINE__)
-#else /* __SIZEOF_CACHELINE__ */
-#define __ATTR_CACHELINE_ALIGNED /* nothing */
-#endif /* !__SIZEOF_CACHELINE__ */
-#endif /* !__ATTR_CACHELINE_ALIGNED */
-
-#endif /* !__GUARD_HYBRID___LIMITS_H */
+#endif /* !_ASM_CACELINE_H */

@@ -19,6 +19,7 @@
 #ifndef GUARD_MODGDBSERVER_SERVER_C
 #define GUARD_MODGDBSERVER_SERVER_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include "server.h"
 
@@ -1211,7 +1212,7 @@ handle_set_register_error:
 		/* Really weird packet, but easy enough to implement... */
 		for (;;) {
 			uintptr_t pagebase, search_size;
-			pagebase    = ((uintptr_t)addr - 3) & ~(pagedir_pagesize() - 1);
+			pagebase    = ((uintptr_t)addr - 3) & ~(PAGESIZE - 1);
 			search_size = ((uintptr_t)addr - pagebase) + 3;
 			if (GDB_ReadMemory(GDB_CurrentThread_general.ts_thread,
 			                   (vm_virt_t)pagebase,

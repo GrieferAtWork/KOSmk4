@@ -16,26 +16,27 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#include <hybrid/limits.h>
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_LIBDL_BINARY_S
+#define GUARD_KERNEL_CORE_ARCH_I386_LIBDL_BINARY_S 1
+
 #include <hybrid/host.h>
+
+#include <asm/pagesize.h>
 
 .section .rodata.kernel_ld_elf
 	.hidden kernel_ld_elf
 	.global kernel_ld_elf
-	.align  PAGESIZE
+	.align  __ARCH_PAGESIZE
 kernel_ld_elf:
 #ifdef __x86_64__
 	.incbin "bin/x86_64-kos/lib/libdl.rtld-flat.bin"
-#else
+#else /* __x86_64__ */
 	.incbin "bin/i386-kos/lib/libdl.rtld-flat.bin"
-#endif
-	.align  PAGESIZE
+#endif /* !__x86_64__ */
+	.align  __ARCH_PAGESIZE
 .hidden __x86_kernel_ld_elf_size
 .global __x86_kernel_ld_elf_size
 	__x86_kernel_ld_elf_size = . - kernel_ld_elf
 .size kernel_ld_elf, . - kernel_ld_elf
 
-
-
-
-
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_LIBDL_BINARY_S */

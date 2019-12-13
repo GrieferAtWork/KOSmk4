@@ -20,7 +20,7 @@
 #define GUARD_LIBC_LIBC_ARCH_I386__LIBC_LD 1
 
 #include <hybrid/compiler.h>
-#include <hybrid/limits.h>
+#include <asm/pagesize.h>
 
 /* #include <crt-features/crt-kos-sections-order.h> */
 /* Include as relative so we get a dependency on that header.
@@ -68,12 +68,12 @@ SECTIONS {
 		ENUMERATE_SECTIONS(.text)
 	} PHDR(text)
 
-	. = ALIGN(PAGESIZE);
+	. = ALIGN(__ARCH_PAGESIZE);
 	.xdata : {
 		ENUMERATE_SECTIONS(.xdata)
 	} PHDR(xdata)
 
-	. = ALIGN(PAGESIZE);
+	. = ALIGN(__ARCH_PAGESIZE);
 	.rodata : {
 		*(.rodata.hot .rodata.likely .rodata.hot.* .rodata.likely.*)
 		*(.rodata .rodata.str* .rodata.*.str* .rodata.cst* .rodata.*.cst*)
@@ -126,7 +126,7 @@ SECTIONS {
 		*(.tcommon)
 	} PHDR(tls)
 
-	. = ALIGN(PAGESIZE);
+	. = ALIGN(__ARCH_PAGESIZE);
 	.dynamic : {
 		*(.dynamic)
 	} PHDR(data) PHDR(dynamic)
@@ -156,7 +156,7 @@ SECTIONS {
 		KEEP(*(SORT_BY_INIT_PRIORITY(.fini_array*) SORT_BY_INIT_PRIORITY(.dtors.*)))
 	} PHDR(data)
 
-	. = ALIGN(PAGESIZE);
+	. = ALIGN(__ARCH_PAGESIZE);
 	.bss : {
 		ENUMERATE_SECTIONS(.bss)
 	} PHDR(data)

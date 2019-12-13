@@ -23,10 +23,9 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/paging.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
-
-#include <hybrid/limits.h>
 
 #include <assert.h>
 #include <string.h>

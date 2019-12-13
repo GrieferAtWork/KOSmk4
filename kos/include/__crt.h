@@ -205,24 +205,25 @@
 #ifndef __LIBC_MALLOC_ALIGNMENT
 #include <hybrid/typecore.h>
 #ifdef __ALIGNOF_MAX_ALIGN_T__
-#define __LIBC_MALLOC_ALIGNMENT  __ALIGNOF_MAX_ALIGN_T__
-#else
-#define __LIBC_MALLOC_ALIGNMENT  __SIZEOF_POINTER__
-#endif
-#endif
+#define __LIBC_MALLOC_ALIGNMENT __ALIGNOF_MAX_ALIGN_T__
+#else /* __ALIGNOF_MAX_ALIGN_T__ */
+#define __LIBC_MALLOC_ALIGNMENT __SIZEOF_POINTER__
+#endif /* !__ALIGNOF_MAX_ALIGN_T__ */
+#endif /* !__LIBC_MALLOC_ALIGNMENT */
 
 #ifndef __ATTR_MALL_DEFAULT_ALIGNED
 #define __ATTR_MALL_DEFAULT_ALIGNED \
-        __ATTR_ASSUME_ALIGNED(__LIBC_MALLOC_ALIGNMENT)
-#endif
+	__ATTR_ASSUME_ALIGNED(__LIBC_MALLOC_ALIGNMENT)
+#endif /* !__ATTR_MALL_DEFAULT_ALIGNED */
+
 #ifndef __ATTR_MALL_PAGEALIGNED
-#include <hybrid/__limits.h>
-#ifdef __SIZEOF_PAGE__
-#define __ATTR_MALL_PAGEALIGNED __ATTR_ASSUME_ALIGNED(__SIZEOF_PAGE__)
-#else
+#include <asm/pagesize.h>
+#ifdef __ARCH_PAGESIZE
+#define __ATTR_MALL_PAGEALIGNED __ATTR_ASSUME_ALIGNED(__ARCH_PAGESIZE)
+#else /* __ARCH_PAGESIZE */
 #define __ATTR_MALL_PAGEALIGNED __ATTR_MALL_DEFAULT_ALIGNED
-#endif
-#endif
+#endif /* !__ARCH_PAGESIZE */
+#endif /* !__ATTR_MALL_PAGEALIGNED */
 
 #undef __LIBC_BIND_OPTIMIZATIONS
 #if !defined(__INTELLISENSE__) && \
@@ -381,13 +382,13 @@
  *    functions as C-standard, portable `static' (PRIVATE) definitions. */
 #ifndef __LOCAL_LIBC
 #if !defined(__NO_ATTR_INLINE) && 1
-#define __LOCAL_LIBC(name)    __LOCAL
+#define __LOCAL_LIBC(name) __LOCAL
 #elif !defined(__NO_ATTR_SELECTANY)
-#define __LOCAL_LIBC(name)    __INTERN __ATTR_SELECTANY __ATTR_UNUSED
+#define __LOCAL_LIBC(name) __INTERN __ATTR_SELECTANY __ATTR_UNUSED
 #elif !defined(__NO_ATTR_WEAK)
-#define __LOCAL_LIBC(name)    __INTERN __ATTR_WEAK __ATTR_UNUSED
+#define __LOCAL_LIBC(name) __INTERN __ATTR_WEAK __ATTR_UNUSED
 #else
-#define __LOCAL_LIBC(name)    __PRIVATE __ATTR_UNUSED
+#define __LOCAL_LIBC(name) __PRIVATE __ATTR_UNUSED
 #endif
 #endif /* !__LOCAL_LIBC */
 
@@ -401,11 +402,11 @@
 
 #ifndef __LOCAL_LIBC_DATA
 #if !defined(__NO_ATTR_SELECTANY) && 1
-#define __LOCAL_LIBC_DATA(name)    __INTERN __ATTR_SELECTANY __ATTR_UNUSED __LOCAL_LIBC_DATA_SECTION(name)
+#define __LOCAL_LIBC_DATA(name) __INTERN __ATTR_SELECTANY __ATTR_UNUSED __LOCAL_LIBC_DATA_SECTION(name)
 #elif !defined(__NO_ATTR_WEAK) && 1
-#define __LOCAL_LIBC_DATA(name)    __INTERN __ATTR_WEAK __ATTR_UNUSED __LOCAL_LIBC_DATA_SECTION(name)
+#define __LOCAL_LIBC_DATA(name) __INTERN __ATTR_WEAK __ATTR_UNUSED __LOCAL_LIBC_DATA_SECTION(name)
 #else
-#define __LOCAL_LIBC_DATA(name)    __PRIVATE __ATTR_UNUSED __LOCAL_LIBC_DATA_SECTION(name)
+#define __LOCAL_LIBC_DATA(name) __PRIVATE __ATTR_UNUSED __LOCAL_LIBC_DATA_SECTION(name)
 #endif
 #endif /* !__LOCAL_LIBC_DATA */
 
@@ -545,9 +546,9 @@ __CDECLARE_VOID(__ATTR_NORETURN,,__crt_unreachable,(void),())
 __DECL_END
 #undef __builtin_unreachable
 #if __has_builtin(__builtin_unreachable)
-#define __builtin_unreachable() (__crt_unreachable(),__builtin_unreachable())
+#define __builtin_unreachable() (__crt_unreachable(), __builtin_unreachable())
 #else /* __builtin_unreachable */
-#define __builtin_unreachable()  __crt_unreachable()
+#define __builtin_unreachable() __crt_unreachable()
 #endif /* !__builtin_unreachable */
 #endif /* __BUILDING_LIBC || __CRT_HAVE___crt_unreachable */
 #endif /* __CC__ */

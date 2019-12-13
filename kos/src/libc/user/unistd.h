@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b5c96b1 */
+/* HASH CRC-32:0xf39139c6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -353,6 +353,9 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_setpgrp)(void);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setreuid)(uid_t ruid, uid_t euid);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setregid)(gid_t rgid, gid_t egid);
 INTDEF WUNUSED long int NOTHROW_NCX(LIBCCALL libc_gethostid)(void);
+/* >> getpagesize(3)
+ * Return the size of a PAGE (in bytes) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_getpagesize)(void);
 /* >> seteuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success

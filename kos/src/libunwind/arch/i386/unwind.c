@@ -26,8 +26,6 @@
 
 #include <hybrid/compiler.h>
 
-#include <hybrid/limits.h>
-
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state-helpers.h>

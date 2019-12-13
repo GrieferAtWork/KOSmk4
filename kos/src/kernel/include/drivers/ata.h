@@ -28,8 +28,6 @@
 #include <kernel/vm.h>
 #include <sched/signal.h>
 
-#include <hybrid/limits.h>
-
 DECL_BEGIN
 
 #define DEFAULT_ATA_SECTOR_SIZE     512
@@ -159,7 +157,7 @@ typedef struct ATTR_PACKED ATTR_ALIGNED(4) {
 #define PRD_FLAST   0x8000 /* Must be set for the last AtaPRD */
 
 /* Max number of continuous PRDs allowed for a single IO operation. */
-#define ATA_PRD_MAXCOUNT  (PAGESIZE/SIZEOF_ATAPRD)
+#define ATA_PRD_MAXCOUNT (PAGESIZE / SIZEOF_ATAPRD)
 
 #ifdef __CC__
 struct ata_bus;

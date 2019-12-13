@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c5ffa29 */
+/* HASH CRC-32:0x7ae5f836 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,10 +44,15 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_getpagesize
  * Return the size of a PAGE (in bytes) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_getpagesize,(void),__getpagesize,())
 #else /* LIBC: getpagesize */
+#include <asm/pagesize.h>
+#ifdef __ARCH_PAGESIZE
 #include <local/unistd/getpagesize.h>
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
 #define __localdep_getpagesize (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpagesize))
+#else /* CUSTOM: getpagesize */
+#undef ____localdep_getpagesize_defined
+#endif /* getpagesize... */
 #endif /* getpagesize... */
 #endif /* !____localdep_getpagesize_defined */
 

@@ -43,7 +43,7 @@ DECL_BEGIN
 
 #ifndef PHYS_IS_IDENTITY_PAGE
 #define PHYS_IS_IDENTITY_PAGE(pageno) \
-	PHYS_IS_IDENTITY(VM_PPAGE2ADDR(pageno), pagedir_pagesize())
+	PHYS_IS_IDENTITY(VM_PPAGE2ADDR(pageno), PAGESIZE)
 #define PHYS_TO_IDENTITY_PAGE(addr) \
 	PHYS_TO_IDENTITY(VM_PPAGE2ADDR(pageno))
 #endif /* !PHYS_IS_IDENTITY_PAGE */
@@ -172,7 +172,7 @@ FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copyfromphys_nopf)(USER CHECKED v
 FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copytophys_nopf)(PHYS vm_phys_t dst, USER CHECKED void const *src, size_t num_bytes);
 
 /* Same as the functions above, however all memory accesses are guarantied to happen within the same page.
- * In other words: `(PHYS & ~(pagedir_pagesize() - 1)) == ((PHYS + num_bytes - 1) & ~(pagedir_pagesize() - 1))' */
+ * In other words: `(PHYS & ~(PAGESIZE - 1)) == ((PHYS + num_bytes - 1) & ~(PAGESIZE - 1))' */
 FUNDEF void KCALL vm_copyfromphys_onepage(USER CHECKED void *dst, PHYS vm_phys_t src, size_t num_bytes) THROWS(E_SEGFAULT);
 FUNDEF void KCALL vm_copytophys_onepage(PHYS vm_phys_t dst, USER CHECKED void const *src, size_t num_bytes) THROWS(E_SEGFAULT);
 FUNDEF NOBLOCK void NOTHROW(KCALL vm_copyinphys_onepage)(PHYS vm_phys_t dst, PHYS vm_phys_t src, size_t num_bytes);
@@ -180,7 +180,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphys_onepage)(PHYS vm_phys_t dst, int
 FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copyfromphys_onepage_nopf)(USER CHECKED void *dst, PHYS vm_phys_t src, size_t num_bytes);
 FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copytophys_onepage_nopf)(PHYS vm_phys_t dst, USER CHECKED void const *src, size_t num_bytes);
 
-/* Copy a whole page to/from physical memory. (s.a. `pagedir_pagesize()') */
+/* Copy a whole page to/from physical memory. (s.a. `PAGESIZE') */
 FUNDEF void KCALL vm_copypagefromphys(USER CHECKED void *dst, PHYS vm_ppage_t src) THROWS(E_SEGFAULT);
 FUNDEF void KCALL vm_copypagetophys(PHYS vm_ppage_t dst, USER CHECKED void const *src) THROWS(E_SEGFAULT);
 FUNDEF NOBLOCK void NOTHROW(KCALL vm_copypageinphys)(PHYS vm_ppage_t dst, PHYS vm_ppage_t src);
@@ -264,7 +264,7 @@ NOTHROW(KCALL vm_ptram_map)(struct vm_ptram *__restrict self,
 		return (byte_t *)PHYS_TO_IDENTITY(addr);
 #endif /* !NO_PHYS_IDENTITY */
 	result = vm_ptram_mappage_noidentity(self, VM_ADDR2PAGE(addr), writable);
-	result += (uintptr_t)(addr & (pagedir_pagesize() - 1));
+	result += (uintptr_t)(addr & (PAGESIZE - 1));
 	return result;
 }
 

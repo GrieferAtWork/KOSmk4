@@ -107,7 +107,7 @@ inode_do_save_datapart_pages(struct inode *__restrict self,
 				continue;
 			}
 			/* (at least) a part of this RAMBLOCK must be written. */
-			num_block_bytes = (block_size_in_ppages - first_ppage_index) * pagedir_pagesize();
+			num_block_bytes = (block_size_in_ppages - first_ppage_index) * PAGESIZE;
 			if (num_block_bytes > num_bytes)
 				num_block_bytes = num_bytes;
 			phys_buf = VM_PPAGE2ADDR(blocks[i].rb_start + first_ppage_index);

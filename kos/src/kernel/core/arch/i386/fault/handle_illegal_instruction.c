@@ -43,7 +43,6 @@
 #include <hybrid/atomic.h>
 #include <hybrid/bit.h>
 #include <hybrid/byteswap.h>
-#include <hybrid/limits.h>
 
 #include <asm/cpu-flags.h>
 #include <asm/cpu-msr.h>

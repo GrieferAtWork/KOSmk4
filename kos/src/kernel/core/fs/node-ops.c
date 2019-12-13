@@ -88,7 +88,7 @@ inode_file_pwrite_with_write(struct inode *__restrict self, vm_phys_t src,
 		TRY {
 			(*self->i_type->it_file.f_write)(self,
 			                                 (void const *)(VM_PAGE2ADDR(vp) +
-			                                                (uintptr_t)(src & (pagedir_pagesize() - 1))),
+			                                                (uintptr_t)(src & (PAGESIZE - 1))),
 			                                 num_bytes, file_position, aio);
 		} EXCEPT {
 			vm_unmap(&vm_kernel, vp, np);

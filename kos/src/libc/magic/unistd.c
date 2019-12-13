@@ -1416,13 +1416,10 @@ setregid:($gid_t rgid, $gid_t egid) -> int;
 @@Return the size of a PAGE (in bytes)
 [section(.text.crt.system.configuration)]
 [ATTR_CONST][ATTR_WUNUSED][export_alias(__getpagesize)]
-[dependency_include(<hybrid/__limits.h>)]
+[requires_include(<asm/pagesize.h>)]
+[requires(defined(__ARCH_PAGESIZE))]
 getpagesize:() -> int {
-#ifdef __SIZEOF_PAGE__
-	return __SIZEOF_PAGE__;
-#else
-	return 4096;
-#endif
+	return __ARCH_PAGESIZE;
 }
 
 %

@@ -44,12 +44,12 @@ __SYSDECL_BEGIN
 #ifdef __KERNEL__
 #define __MALLOCA_MAX   256 /* Without guard pages, don't be excessive */
 #else /* __KERNEL__ */
-#include <hybrid/__limits.h>
-#ifdef __SIZEOF_PAGE__
-#define __MALLOCA_MAX   __SIZEOF_PAGE__
-#else /* __SIZEOF_PAGE__ */
-#define __MALLOCA_MAX   256
-#endif /* !__SIZEOF_PAGE__ */
+#include <asm/pagesize.h>
+#ifdef __ARCH_PAGESIZE
+#define __MALLOCA_MAX __ARCH_PAGESIZE
+#else /* __ARCH_PAGESIZE */
+#define __MALLOCA_MAX 256
+#endif /* !__ARCH_PAGESIZE */
 #endif /* !__KERNEL__ */
 #ifdef NDEBUG
 #define __MALLOCA_KEY_ALLOCA        0

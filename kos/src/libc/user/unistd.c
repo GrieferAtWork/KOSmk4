@@ -25,18 +25,18 @@
 /**/
 #include <hybrid/align.h>
 #include <hybrid/host.h>
-#include <hybrid/limits.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
+#include <asm/pagesize.h>
 #include <kos/syscalls.h>
 #include <sys/mman.h>
 #include <sys/param.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
+#include <sys/syscall.h>
 #include <sys/sysinfo.h>
 #include <sys/time.h>
 #include <sys/utsname.h>
-#include <sys/syscall.h>
 
 #include <assert.h>
 #include <dirent.h>
@@ -57,6 +57,12 @@
 #include "../libc/capture-varargs.h"
 #include "stdlib.h"
 #include "unistd.h"
+
+#ifdef __ARCH_PAGESIZE
+#define OS_PAGESIZE __ARCH_PAGESIZE
+#else /* __ARCH_PAGESIZE */
+#define OS_PAGESIZE getpagesize()
+#endif /* !__ARCH_PAGESIZE */
 
 DECL_BEGIN
 
@@ -2160,11 +2166,11 @@ PRIVATE int LIBCCALL do_brk(void *addr) {
 		void *temp = dlsym(RTLD_DEFAULT, "_end");
 		if unlikely(!temp && dlerror())
 			goto err_perm;
-		real_oldbrk = (byte_t *)CEIL_ALIGN((uintptr_t)temp, PAGESIZE);
+		real_oldbrk = (byte_t *)CEIL_ALIGN((uintptr_t)temp, OS_PAGESIZE);
 	} else {
-		real_oldbrk = (byte_t *)CEIL_ALIGN((uintptr_t)real_oldbrk, PAGESIZE);
+		real_oldbrk = (byte_t *)CEIL_ALIGN((uintptr_t)real_oldbrk, OS_PAGESIZE);
 	}
-	real_newbrk = (byte_t *)CEIL_ALIGN((uintptr_t)addr, PAGESIZE);
+	real_newbrk = (byte_t *)CEIL_ALIGN((uintptr_t)addr, OS_PAGESIZE);
 	if (real_newbrk < real_oldbrk) {
 		/* Release memory */
 		if unlikely(munmap(real_newbrk, real_oldbrk - real_newbrk) == -1)
@@ -2223,7 +2229,7 @@ NOTHROW_NCX(LIBCCALL libc_sbrk)(intptr_t delta)
 		void *temp = dlsym(RTLD_DEFAULT, "_end");
 		if unlikely(!temp && dlerror())
 			goto err_perm;
-		result = (byte_t *)CEIL_ALIGN((uintptr_t)temp, PAGESIZE);
+		result = (byte_t *)CEIL_ALIGN((uintptr_t)temp, OS_PAGESIZE);
 	}
 	if (do_brk(result + delta) != 0)
 		result = (byte_t *)-1;
@@ -2523,7 +2529,7 @@ NOTHROW_NCX(LIBCCALL libc_sysconf)(int name)
 		break;
 
 	case _SC_PAGESIZE:
-		result = PAGESIZE;
+		result = OS_PAGESIZE;
 		break;
 
 	case _SC_RTSIG_MAX:
@@ -3805,11 +3811,25 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 }
 /*[[[end:ctermid_r]]]*/
 
+/*[[[head:getpagesize,hash:CRC-32=0x18122e46]]]*/
+/* >> getpagesize(3)
+ * Return the size of a PAGE (in bytes) */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.system.configuration.getpagesize") int
+NOTHROW_NCX(LIBCCALL libc_getpagesize)(void)
+/*[[[body:getpagesize]]]*/
+{
+	CRT_UNIMPLEMENTED("getpagesize"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+/*[[[end:getpagesize]]]*/
+
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe277419c]]]*/
+/*[[[start:exports,hash:CRC-32=0x5fb2aba2]]]*/
 #undef execl
 #undef _execl
 #undef execle
@@ -3950,6 +3970,8 @@ DEFINE_PUBLIC_WEAK_ALIAS(setpgrp, libc_setpgrp);
 DEFINE_PUBLIC_WEAK_ALIAS(setreuid, libc_setreuid);
 DEFINE_PUBLIC_WEAK_ALIAS(setregid, libc_setregid);
 DEFINE_PUBLIC_WEAK_ALIAS(gethostid, libc_gethostid);
+DEFINE_PUBLIC_WEAK_ALIAS(getpagesize, libc_getpagesize);
+DEFINE_PUBLIC_WEAK_ALIAS(__getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_WEAK_ALIAS(seteuid, libc_seteuid);
 DEFINE_PUBLIC_WEAK_ALIAS(setegid, libc_setegid);
 DEFINE_PUBLIC_WEAK_ALIAS(ttyslot, libc_ttyslot);

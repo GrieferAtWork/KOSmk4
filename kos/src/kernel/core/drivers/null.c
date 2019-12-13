@@ -330,7 +330,7 @@ port_mmap(struct character_device *__restrict UNUSED(self),
           vm_vpage64_t *__restrict UNUSED(pminpage),
           vm_vpage64_t *__restrict pmaxpage) THROWS(...) {
 	vm_vpage_t port_count = ((vm_vpage_t)((port_t)-1)+1);
-	*pmaxpage = (vm_vpage64_t)((port_count / pagedir_pagesize()) - 1);
+	*pmaxpage = (vm_vpage64_t)((port_count / PAGESIZE) - 1);
 	return incref(&port_datablock);
 }
 

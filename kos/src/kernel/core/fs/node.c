@@ -4381,7 +4381,7 @@ superblock_open(struct superblock_type *__restrict type,
 		result->db_addrshift = PAGESHIFT - result->db_pageshift;
 		result->db_pagealign = (size_t)1 << result->db_pageshift;
 		result->db_pagemask  = result->db_pagealign - 1;
-		result->db_pagesize  = (size_t)pagedir_pagesize() >> result->db_pageshift;
+		result->db_pagesize  = (size_t)PAGESIZE >> result->db_pageshift;
 #endif
 		/* Add the new superblock to the chain of known file-systems. */
 		SLIST_INSERT(fs_filesystems.f_superblocks, result, s_filesystems);

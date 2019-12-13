@@ -23,7 +23,7 @@
 #include "../api.h"
 /**/
 
-#include <hybrid/limits.h> /* PAGESIZE */
+#include <asm/pagesize.h> /* __ARCH_PAGESIZE */
 
 #include <kos/process.h> /* ELF_HOST_REQUIRED_MACHINE */
 
@@ -45,6 +45,13 @@ DECL_BEGIN
 
 PRIVATE ATTR_SECTION(".rodata.crt.system.getauxval") char const elf_host_platform_string[] = ELF_HOST_PLATFORM;
 
+#ifdef __ARCH_PAGESIZE
+#define OS_PAGESIZE __ARCH_PAGESIZE
+#else /* __ARCH_PAGESIZE */
+#define OS_PAGESIZE getpagesize()
+#endif /* !__ARCH_PAGESIZE */
+
+
 #if defined(__i386__) && !defined(__x86_64__)
 PRIVATE ATTR_SECTION(".rodata.crt.system.getauxval") char const
 elf_host_platform_string_x86_64[] = "x86_64";
@@ -61,7 +68,7 @@ PRIVATE bool LIBCCALL libc_has_kernel64(void) {
 	 *     `E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY:2' (2 being the number of pages we attempted to map)
 	 *     when for some reason that address range has been mapped by something
 	 */
-	addr = sys_mmap((void *)0xfffff000, 2 * PAGESIZE,
+	addr = sys_mmap((void *)0xfffff000, 2 * OS_PAGESIZE,
 	                PROT_READ | PROT_WRITE,
 	                MAP_FIXED | MAP_DONT_MAP | MAP_ANONYMOUS,
 	                -1, 0);
@@ -111,7 +118,7 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 	}	break;
 
 	case AT_PAGESZ:
-		result = PAGESIZE;
+		result = OS_PAGESIZE;
 		break;
 
 	case AT_BASE: {

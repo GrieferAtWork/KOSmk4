@@ -365,7 +365,7 @@ ramfs_open(struct superblock *__restrict self,
 	self->db_addrshift = PAGESHIFT;
 	self->db_pagealign = 1;
 	self->db_pagemask  = 0;
-	self->db_pagesize  = pagedir_pagesize();
+	self->db_pagesize  = PAGESIZE;
 #endif /* !CONFIG_VM_DATABLOCK_MIN_PAGEINFO */
 	self->i_fileino           = (ino_t)(uintptr_t)self;
 	self->i_filesize          = 0;

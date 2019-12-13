@@ -30,26 +30,14 @@
 
 DECL_BEGIN
 
-/* A single memory page containing everything required to
- * allocate at least 2 datapart/node pairs (or 4 of either).
- * Must fit into `VM_COREPARTS_PAGESIZE' bytes.
- * This way, a corepage can be used to both replicate itself, as
- * well as be used to allocate additional pages for the purposes
- * of general purpose heap.
- * The first corepage is allocated statically, as part of the
- * kernel's .bss */
 union vm_corepart {
 	struct vm_datapart cp_part; /* DATA-part */
 	struct vm_node     cp_node; /* NODE-part */
 };
 
 
-#ifndef VM_COREPARTS_PAGESIZE
-#define VM_COREPARTS_PAGESIZE PAGEDIR_MIN_PAGESIZE
-#endif /* !VM_COREPARTS_PAGESIZE */
-
 #define VM_COREPARTS_PER_PAGE_UNADJUSTED \
-	(VM_COREPARTS_PAGESIZE / sizeof(union vm_corepart))
+	(PAGESIZE / sizeof(union vm_corepart))
 
 struct vm_corepage;
 struct vm_corepage_controller {
@@ -65,10 +53,18 @@ struct vm_corepage_controller {
 };
 
 #define VM_COREPAIRS_PER_PAGE \
-	((VM_COREPARTS_PAGESIZE - sizeof(struct vm_corepage_controller)) / sizeof(union vm_corepart))
+	((PAGESIZE - sizeof(struct vm_corepage_controller)) / sizeof(union vm_corepart))
 STATIC_ASSERT_MSG(VM_COREPAIRS_PER_PAGE >= 4,
                   "VM controller structures are too large to sustain themself");
 
+/* A single memory page containing everything required to
+ * allocate at least 2 datapart/node pairs (or 4 of either).
+ * Must fit into `PAGESIZE' bytes.
+ * This way, a corepage can be used to both replicate itself, as
+ * well as be used to allocate additional pages for the purposes
+ * of general purpose heap.
+ * The first corepage is allocated statically, as part of the
+ * kernel's .bss */
 struct vm_corepage {
 	/* The free VM parts of this page. */
 	union vm_corepart             cp_parts[VM_COREPAIRS_PER_PAGE];
@@ -77,7 +73,7 @@ struct vm_corepage {
 };
 
 /* Returns the COREPAGE that a given `x' is apart of. */
-#define VM_COREPAGE_OF(x) ((struct vm_corepage *)((uintptr_t)(x) & ~(VM_COREPARTS_PAGESIZE - 1)))
+#define VM_COREPAGE_OF(x) ((struct vm_corepage *)((uintptr_t)(x) & ~(PAGESIZE - 1)))
 
 
 /* Core page controller globals. */

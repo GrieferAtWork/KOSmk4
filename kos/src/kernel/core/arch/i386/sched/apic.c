@@ -46,7 +46,6 @@
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
-#include <hybrid/limits.h>
 
 #include <asm/intrin.h>
 #include <asm/param.h>

@@ -23,8 +23,8 @@
 #include <features.h>
 
 #include <hybrid/host.h>
-#include <hybrid/limits.h>
 
+#include <asm/pagesize.h>
 #include <bits/types.h>
 
 __SYSDECL_BEGIN
@@ -62,14 +62,14 @@ __SYSDECL_BEGIN
 
 /* Segment low boundary address multiple.  */
 #ifndef SHMLBA
-#if defined(__CC__) && defined(__CRT_HAVE_getpagesize)
+#ifdef __ARCH_PAGESIZE
+#define SHMLBA __ARCH_PAGESIZE
+#elif defined(__CC__) && defined(__CRT_HAVE_getpagesize)
 #ifndef ____libc_getpagesize_defined
 #define ____libc_getpagesize_defined 1
 __CREDIRECT(__ATTR_CONST,int,__NOTHROW,__libc_getpagesize,(void),getpagesize,())
 #endif /* !____libc_getpagesize_defined */
 #define SHMLBA __libc_getpagesize()
-#else
-#define SHMLBA PAGESIZE
 #endif
 #endif /* !SHMLBA */
 

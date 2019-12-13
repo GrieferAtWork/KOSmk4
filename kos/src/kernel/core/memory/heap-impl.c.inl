@@ -448,7 +448,7 @@ again_tryhard_mapping_target:
 							vm_vpage_t vpage = mapping_target + mapping_offset + j;
 							vm_ppage_t ppage = blocks[i].rb_start + j;
 							if (!page_iszero(ppage)) {
-								memset((void *)VM_PAGE2ADDR(vpage), 0, pagedir_pagesize());
+								memset((void *)VM_PAGE2ADDR(vpage), 0, PAGESIZE);
 #ifdef CONFIG_HAVE_PAGEDIR_CHANGED
 								pagedir_unsetchanged(vpage);
 #endif /* CONFIG_HAVE_PAGEDIR_CHANGED */
@@ -463,7 +463,7 @@ again_tryhard_mapping_target:
 							vm_vpage_t vpage = mapping_target + mapping_offset + j;
 							mempatl((void *)VM_PAGE2ADDR(vpage),
 							        DEBUGHEAP_FRESH_MEMORY,
-							        pagedir_pagesize());
+							        PAGESIZE);
 #ifdef CONFIG_HAVE_PAGEDIR_CHANGED
 							pagedir_unsetchanged(vpage);
 #endif /* CONFIG_HAVE_PAGEDIR_CHANGED */
@@ -744,27 +744,27 @@ search_heap:
 	{
 		vm_vpage_t pageaddr;
 		size_t page_bytes, unused_size;
-		if unlikely(OVERFLOW_UADD(result.hp_siz, pagedir_pagesize() - 1, &page_bytes))
+		if unlikely(OVERFLOW_UADD(result.hp_siz, PAGESIZE - 1, &page_bytes))
 			IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, result.hp_siz));
 		if (!(flags & GFP_NOOVER)) {
 			/* Add overhead for overallocation. */
 			if unlikely(OVERFLOW_UADD(page_bytes, self->h_overalloc, &page_bytes))
 				goto allocate_without_overalloc;
 		}
-		page_bytes &= ~(pagedir_pagesize() - 1);
+		page_bytes &= ~(PAGESIZE - 1);
 		pageaddr = core_page_alloc_nx(self,
 		                              CORE_PAGE_MALLOC_AUTO,
-		                              page_bytes / pagedir_pagesize(),
+		                              page_bytes / PAGESIZE,
 		                              1,
 		                              flags);
 		if unlikely(pageaddr == CORE_PAGE_MALLOC_ERROR) {
 allocate_without_overalloc:
 			/* Try again without overallocation. */
-			page_bytes = result.hp_siz + (pagedir_pagesize() - 1);
-			page_bytes &= ~(pagedir_pagesize() - 1);
+			page_bytes = result.hp_siz + (PAGESIZE - 1);
+			page_bytes &= ~(PAGESIZE - 1);
 			pageaddr = FUNC(core_page_alloc)(self,
 			                                 CORE_PAGE_MALLOC_AUTO,
-			                                 page_bytes / pagedir_pagesize(),
+			                                 page_bytes / PAGESIZE,
 			                                 1,
 			                                 flags);
 #ifdef HEAP_NX
@@ -800,9 +800,9 @@ allocate_without_overalloc:
 					mempatl(unused_begin, DEBUGHEAP_NO_MANS_LAND, unused_size);
 				} else {
 					uintptr_t page_remainder;
-					page_remainder = CEIL_ALIGN((uintptr_t)unused_begin, pagedir_pagesize()) - (uintptr_t)unused_begin;
+					page_remainder = CEIL_ALIGN((uintptr_t)unused_begin, PAGESIZE) - (uintptr_t)unused_begin;
 					if (page_remainder < SIZEOF_MFREE)
-						page_remainder += pagedir_pagesize();
+						page_remainder += PAGESIZE;
 					if (page_remainder > unused_size)
 						page_remainder = unused_size;
 					mempatl(unused_begin, DEBUGHEAP_NO_MANS_LAND, page_remainder);
@@ -816,7 +816,7 @@ allocate_without_overalloc:
 		if (vm_kernel_treelock_trywrite()) {
 			/* Try to optimize the VM by merging the new mapping with adjacent nodes. */
 			vm_merge_before(&vm_kernel, pageaddr);
-			vm_merge_before(&vm_kernel, pageaddr + page_bytes / pagedir_pagesize());
+			vm_merge_before(&vm_kernel, pageaddr + page_bytes / PAGESIZE);
 			vm_kernel_treelock_endwrite();
 		}
 #endif
@@ -872,12 +872,12 @@ again:
 			return 0;
 #ifdef CONFIG_DEBUG_HEAP
 		memsetl((void *)VM_PAGE2ADDR(ptr_page),
-		        DEBUGHEAP_NO_MANS_LAND, pagedir_pagesize() / 4);
+		        DEBUGHEAP_NO_MANS_LAND, PAGESIZE / 4);
 #endif /* CONFIG_DEBUG_HEAP */
 		/* Release the page to the heap and allocate again.
 		 * NOTE: Set the `GFP_NOTRIM' to prevent the memory
 		 *       from be unmapped immediately. */
-		heap_free_raw(self, (void *)VM_PAGE2ADDR(ptr_page), pagedir_pagesize(),
+		heap_free_raw(self, (void *)VM_PAGE2ADDR(ptr_page), PAGESIZE,
 		              flags | GFP_NOTRIM);
 #if 0
 		if (vm_kernel_treelock_trywrite()) {
@@ -922,7 +922,7 @@ again:
 			 *       been allocated (meaning this allocation is impossible) */
 			vm_vpage_t slot_page;
 			sync_endwrite(&self->h_lock);
-			if (MFREE_BEGIN(slot) & (pagedir_pagesize() - 1))
+			if (MFREE_BEGIN(slot) & (PAGESIZE - 1))
 				return 0; /* Not page-aligned. */
 			slot_page = VM_ADDR2PAGE(MFREE_BEGIN(slot));
 			if unlikely(slot_page == 0)
@@ -939,10 +939,10 @@ again:
 			 *       from be unmapped immediately. */
 #ifdef CONFIG_DEBUG_HEAP
 			memsetl((void *)VM_PAGE2ADDR(slot_page),
-			        DEBUGHEAP_NO_MANS_LAND, pagedir_pagesize() / 4);
+			        DEBUGHEAP_NO_MANS_LAND, PAGESIZE / 4);
 #endif /* CONFIG_DEBUG_HEAP */
 			heap_free_raw(self, (void *)VM_PAGE2ADDR(slot_page),
-			              pagedir_pagesize(),
+			              PAGESIZE,
 			              (flags & (__GFP_HEAPMASK | GFP_INHERIT)) | GFP_NOTRIM);
 #if 0
 			if (vm_kernel_treelock_trywrite()) {
@@ -959,7 +959,7 @@ again:
 			/* Too close to the back. - Try to allocate the next page. */
 			vm_virt_t slot_end = MFREE_END(slot);
 			sync_endwrite(&self->h_lock);
-			if (slot_end & (pagedir_pagesize() - 1))
+			if (slot_end & (PAGESIZE - 1))
 				return 0; /* Not page-aligned. */
 			if (FUNC(core_page_alloc_check_hint)(self,
 			                                     VM_ADDR2PAGE(slot_end),
@@ -969,9 +969,9 @@ again:
 			    CORE_PAGE_MALLOC_ERROR)
 				return 0; /* Failed to allocate the associated core-page. */
 #ifdef CONFIG_DEBUG_HEAP
-			memsetl((void *)slot_end, DEBUGHEAP_NO_MANS_LAND, pagedir_pagesize() / 4);
+			memsetl((void *)slot_end, DEBUGHEAP_NO_MANS_LAND, PAGESIZE / 4);
 #endif /* CONFIG_DEBUG_HEAP */
-			heap_free_raw(self, (void *)slot_end, pagedir_pagesize(),
+			heap_free_raw(self, (void *)slot_end, PAGESIZE,
 			              (flags & (__GFP_HEAPMASK | GFP_INHERIT)) |
 			              GFP_NOTRIM);
 			goto again;
@@ -1447,7 +1447,7 @@ err:
 
 
 PUBLIC WUNUSED ATTR_MALLOC ATTR_RETNONNULL
-ATTR_ASSUME_ALIGNED(PAGEDIR_MIN_PAGESIZE) VIRT /*page-aligned*/ void *
+ATTR_ASSUME_ALIGNED(PAGESIZE) VIRT /*page-aligned*/ void *
 NOTHROW_NX(KCALL FUNC(vpage_alloc_untraced))(size_t num_pages,
                                              size_t alignment_in_pages,
                                              gfp_t flags) {
@@ -1465,19 +1465,19 @@ NOTHROW_NX(KCALL FUNC(vpage_alloc_untraced))(size_t num_pages,
 }
 
 PUBLIC WUNUSED ATTR_RETNONNULL
-ATTR_ASSUME_ALIGNED(PAGEDIR_MIN_PAGESIZE) VIRT /*page-aligned*/ void *
+ATTR_ASSUME_ALIGNED(PAGESIZE) VIRT /*page-aligned*/ void *
 NOTHROW_NX(KCALL FUNC(vpage_realloc_untraced))(VIRT /*page-aligned*/ void *old_base,
                                                size_t old_pages, size_t new_pages,
                                                size_t alignment_in_pages,
                                                gfp_t alloc_flags, gfp_t free_flags) {
 	vm_vpage_t result;
-	assertf(!old_pages || IS_ALIGNED((uintptr_t)old_base, pagedir_pagesize()),
+	assertf(!old_pages || IS_ALIGNED((uintptr_t)old_base, PAGESIZE),
 	        "old_base = %p\n"
 	        "old_pages = %Iu (%#Ix)",
 	        old_base, old_pages, old_pages);
 	if (new_pages <= old_pages) {
 		/* Special case: Free trailing memory. */
-		vpage_ffree_untraced((byte_t *)old_base + new_pages * pagedir_pagesize(),
+		vpage_ffree_untraced((byte_t *)old_base + new_pages * PAGESIZE,
 		                     old_pages - new_pages,
 		                     free_flags);
 		return old_base;
@@ -1515,7 +1515,7 @@ NOTHROW_NX(KCALL FUNC(vpage_realloc_untraced))(VIRT /*page-aligned*/ void *old_b
 		TRY {
 			memcpyl((void *)VM_PAGE2ADDR(result),
 			        old_base,
-			        old_pages * pagedir_pagesize() / 4);
+			        old_pages * PAGESIZE / 4);
 		} EXCEPT {
 			vm_unmap_kernel_ram(result, new_pages, false);
 #ifdef HEAP_NX

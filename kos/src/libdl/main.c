@@ -25,9 +25,8 @@
 #include "elf.h"
 /**/
 
-#include <hybrid/limits.h>
-
 #include <asm/intrin.h>
+#include <asm/pagesize.h>
 #include <kos/debugtrap.h>
 #include <kos/library-listdef.h>
 #include <kos/process.h>
@@ -91,13 +90,13 @@ INTERN DlModule ld_rtld_module = {
 	.dm_phnum    = 1,
 	.dm_phdr     = {
 		ELF_PHDR_INIT(/* type:   */ PT_LOAD,
-		              /* offset: */ PAGESIZE,
+		              /* offset: */ __ARCH_PAGESIZE,
 		              /* vaddr:  */ 0,
 		              /* paddr:  */ 0,
 		              /* filesz: */ (Elf_Word)0,
 		              /* memsz:  */ (Elf_Word)0,
 		              /* flags:  */ PF_R | PF_X | PF_W,
-		              /* align:  */ PAGESIZE)
+		              /* align:  */ __ARCH_PAGESIZE)
 	}
 };
 

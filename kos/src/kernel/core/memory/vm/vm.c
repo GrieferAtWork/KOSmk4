@@ -3421,8 +3421,8 @@ again:
 				                                    partrel_maxdpage);
 			}
 			/* Keep track of the number of actually synced bytes.
-			 * We use bytes for this as it represents a common base-line in
-			 * terms of `VM_DATABLOCK_PAGESHIFT()' vs. `pagedir_pagesize()' */
+			 * We use bytes for this as it represents a common base-line
+			 * in terms of `VM_DATABLOCK_PAGESHIFT()' vs. `PAGESIZE' */
 			result += (u64)num_synced_pages << addrshift;
 			/* NOTE: We don't do a check `if (used_maxpage >= maxpage) break;', because
 			 *       the associated data part may have been truncated or replaced with

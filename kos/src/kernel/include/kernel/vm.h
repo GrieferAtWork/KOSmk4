@@ -31,7 +31,6 @@
 
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
-#include <hybrid/limits.h>
 #include <hybrid/sequence/atree.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-rwlock.h>

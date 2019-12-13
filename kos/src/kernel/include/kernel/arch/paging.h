@@ -20,8 +20,10 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_ARCH_PAGING_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/types.h>
-#include <hybrid/limits.h>
+
+#include <asm/pagesize.h>
 #include <kos/kernel/paging.h>
 
 #undef CONFIG_PAGEDIR_INIT_IS_NOEXCEPT
@@ -34,27 +36,15 @@
 #undef CONFIG_PAGEDIR_GETSET_USES_POINTER
 #undef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_GETSET
 
-#ifndef PAGEALIGN
-#define PAGEALIGN      PAGESIZE
-#endif /* !PAGEALIGN */
-
 DECL_BEGIN
 
 #ifndef PAGEDIR_MAPHINT_ALIGNMENT
 #define PAGEDIR_MAPHINT_ALIGNMENT  8 /* Guess... */
 #endif /* !PAGEDIR_MAPHINT_ALIGNMENT */
 
-#ifndef PAGEDIR_ALIGN
-#define PAGEDIR_ALIGN    PAGESIZE
-#endif /* !PAGEDIR_ALIGN */
-
-#ifndef PAGEDIR_SIZE
-#define PAGEDIR_SIZE     PAGESIZE
-#endif /* !PAGEDIR_SIZE */
-
 #ifdef __CC__
-typedef struct ATTR_ALIGNED(PAGEDIR_ALIGN) {
-	byte_t __pd_data[PAGEDIR_SIZE];
+typedef struct ATTR_ALIGNED(__ARCH_PAGESIZE) {
+	byte_t __pd_data[__ARCH_PAGESIZE];
 } pagedir_t;
 #endif /* __CC__ */
 

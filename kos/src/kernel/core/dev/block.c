@@ -478,7 +478,7 @@ block_device_alloc(size_t sector_size, size_t structure_size)
 	result->bd_max_retry   = 2;
 	result->bd_sector_size = sector_size;
 	atomic_rwlock_cinit(&result->bd_parts_lock);
-	sector_align = pagedir_pagesize();
+	sector_align = PAGESIZE;
 	if unlikely(sector_size >= sector_align)
 		sector_align = CEIL_ALIGN(sector_size, sector_align);
 	else {
@@ -491,7 +491,7 @@ block_device_alloc(size_t sector_size, size_t structure_size)
 	TRY {
 		struct heapptr cacheptr;
 		byte_t volatile *iter, *end;
-		if unlikely(sector_size > pagedir_pagesize()) {
+		if unlikely(sector_size > PAGESIZE) {
 			kernel_panic("TODO: Ensure that the cache is allocated as physically continuous memory");
 		}
 		cacheptr = heap_align(&kernel_locked_heap,
@@ -503,7 +503,7 @@ block_device_alloc(size_t sector_size, size_t structure_size)
 		/* Make sure that all cache pages have been pre-faulted. */
 		iter = (byte_t *)cacheptr.hp_ptr;
 		end  = iter + cacheptr.hp_siz;
-		for (; iter < end; iter += pagedir_pagesize())
+		for (; iter < end; iter += PAGESIZE)
 			*iter = 0xcc;
 
 		result->bd_cache_base = (byte_t *)cacheptr.hp_ptr;
@@ -1249,7 +1249,7 @@ _block_device_read_phys(struct block_device *__restrict self,
 			vm_ppage_t pageaddr;
 			size_t page_bytes;
 			pageaddr   = (vm_ppage_t)VM_ADDR2PAGE(dst);
-			page_bytes = pagedir_pagesize() - (dst & (pagedir_pagesize() - 1));
+			page_bytes = PAGESIZE - (dst & (PAGESIZE - 1));
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;
 			if (is_first) {
@@ -1262,7 +1262,7 @@ _block_device_read_phys(struct block_device *__restrict self,
 			pagedir_syncone(tramp);
 			/* Copy memory. */
 			block_device_read(self,
-			                  (void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(dst & (pagedir_pagesize() - 1))),
+			                  (void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(dst & (PAGESIZE - 1))),
 			                  page_bytes, device_position);
 			if (page_bytes >= num_bytes)
 				break;
@@ -1294,7 +1294,7 @@ _block_device_write_phys(struct block_device *__restrict self,
 			vm_ppage_t pageaddr;
 			size_t page_bytes;
 			pageaddr   = (vm_ppage_t)VM_ADDR2PAGE(src);
-			page_bytes = pagedir_pagesize() - (src & (pagedir_pagesize() - 1));
+			page_bytes = PAGESIZE - (src & (PAGESIZE - 1));
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;
 			if (is_first) {
@@ -1307,7 +1307,7 @@ _block_device_write_phys(struct block_device *__restrict self,
 			pagedir_syncone(tramp);
 			/* Copy memory. */
 			block_device_write(self,
-			                   (void const *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(src & (pagedir_pagesize() - 1))),
+			                   (void const *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(src & (PAGESIZE - 1))),
 			                   page_bytes, device_position);
 			if (page_bytes >= num_bytes)
 				break;

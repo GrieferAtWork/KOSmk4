@@ -18,7 +18,7 @@
  */
 
 #include <hybrid/compiler.h>
-#include <hybrid/limits.h>
+#include <asm/pagesize.h>
 
 #if 0
 #define PHDR(x) 
@@ -66,7 +66,7 @@ SECTIONS {
 		PROVIDE_HIDDEN(__rtld_gcc_except_table_end = .);
 	} PHDR(text)
 
-	. = ALIGN(PAGESIZE);
+	. = ALIGN(__ARCH_PAGESIZE);
 
 	.data BLOCK(1) : {
 		PROVIDE_HIDDEN(__rtld_data_start = .);
@@ -81,7 +81,7 @@ SECTIONS {
 		PROVIDE_HIDDEN(__rtld_end = .);
 	} PHDR(data)
 
-	. = ALIGN(PAGESIZE);
+	. = ALIGN(__ARCH_PAGESIZE);
 	.dynamic BLOCK(1) : {
 		*(.dynamic)
 	} PHDR(rel) PHDR(dynamic)
