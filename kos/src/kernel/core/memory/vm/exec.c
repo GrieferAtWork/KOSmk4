@@ -307,8 +307,8 @@ vm_exec(struct vm *__restrict effective_vm,
 					vm_virt_t bss_start;
 					bool map_ok;
 					/* Load entry into memory. */
-					if ((phdr_vector[i].p_offset & (PAGESIZE - 1)) !=
-					    (phdr_vector[i].p_vaddr & (PAGESIZE - 1))) {
+					if ((phdr_vector[i].p_offset & PAGEMASK) !=
+					    (phdr_vector[i].p_vaddr & PAGEMASK)) {
 						THROW(E_NOT_EXECUTABLE_FAULTY,
 						      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,
 						      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_UNALIGNEDSEGMENT);
@@ -316,8 +316,8 @@ vm_exec(struct vm *__restrict effective_vm,
 					page_index = VM_ADDR2PAGE((vm_virt_t)phdr_vector[i].p_vaddr);
 					if (loadstart > phdr_vector[i].p_vaddr)
 						loadstart = phdr_vector[i].p_vaddr;
-					adjusted_filsize = phdr_vector[i].p_filesz + (phdr_vector[i].p_vaddr & (PAGESIZE - 1));
-					adjusted_memsize = phdr_vector[i].p_memsz + (phdr_vector[i].p_vaddr & (PAGESIZE - 1));
+					adjusted_filsize = phdr_vector[i].p_filesz + (phdr_vector[i].p_vaddr & PAGEMASK);
+					adjusted_memsize = phdr_vector[i].p_memsz + (phdr_vector[i].p_vaddr & PAGEMASK);
 					num_pages        = CEILDIV(adjusted_filsize, PAGESIZE);
 					num_total        = CEILDIV(adjusted_memsize, PAGESIZE);
 					bss_start        = (vm_virt_t)(phdr_vector[i].p_vaddr + phdr_vector[i].p_filesz);
@@ -379,7 +379,7 @@ err_overlap:
 							assert(phdr_vector[i].p_memsz > phdr_vector[i].p_filesz);
 							bss_total_size = phdr_vector[i].p_memsz -
 							                 phdr_vector[i].p_filesz;
-							bss_start_offset = (size_t)(bss_start & (PAGESIZE - 1));
+							bss_start_offset = (size_t)(bss_start & PAGEMASK);
 							bss_overlap = PAGESIZE - bss_start_offset;
 							if (bss_overlap > bss_total_size)
 								bss_overlap = bss_total_size;

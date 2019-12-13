@@ -61,7 +61,7 @@ vio_copytovio_from_phys(struct vio_args *__restrict args,
 			vm_ppage_t pageaddr;
 			size_t page_bytes;
 			pageaddr   = (vm_ppage_t)VM_ADDR2PAGE(PHYS_BUF);
-			page_bytes = PAGESIZE - (PHYS_BUF & (PAGESIZE - 1));
+			page_bytes = PAGESIZE - (PHYS_BUF & PAGEMASK);
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;
 #ifdef DEFINE_IO_READ
@@ -85,13 +85,13 @@ vio_copytovio_from_phys(struct vio_args *__restrict args,
 			/* Copy memory. */
 #ifdef DEFINE_IO_READ
 			vio_copyfromvio(args,
-			                (byte_t *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(PHYS_BUF & (PAGESIZE - 1))),
+			                (byte_t *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(PHYS_BUF & PAGEMASK)),
 			                src,
 			                page_bytes);
 #elif defined(DEFINE_IO_WRITE)
 			vio_copytovio(args,
 			              dst,
-			              (byte_t *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(PHYS_BUF & (PAGESIZE - 1))),
+			              (byte_t *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(PHYS_BUF & PAGEMASK)),
 			              page_bytes);
 #endif
 			if (page_bytes >= num_bytes)

@@ -81,7 +81,7 @@ struct slab {
 	 * `SLAB_FCALLOC' for 0, and undefined/DEBUGHEAP_NO_MANS_LAND otherwise. */
 };
 
-#define SLAB_GET(ptr) ((struct slab *)((uintptr_t)(ptr) & ~(PAGESIZE - 1)))
+#define SLAB_GET(ptr) ((struct slab *)((uintptr_t)(ptr) & ~PAGEMASK))
 
 
 #define PRIVATE_SLAB_SEGMENT_COUNT(segment_size) \

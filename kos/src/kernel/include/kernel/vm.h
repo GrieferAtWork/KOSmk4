@@ -1400,7 +1400,7 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
 #define VM_NODE_END(self)   ((self)->vn_node.a_vmax + 1)
 
 #define VM_NODE_MINADDR(self)   VM_PAGE2ADDR((self)->vn_node.a_vmin)
-#define VM_NODE_MAXADDR(self)   ((vm_virt_t)(((self)->vn_node.a_vmax * PAGESIZE) + (PAGESIZE - 1)))
+#define VM_NODE_MAXADDR(self)   ((vm_virt_t)(((self)->vn_node.a_vmax * PAGESIZE) + PAGEMASK))
 #define VM_NODE_STARTADDR(self) VM_PAGE2ADDR((self)->vn_node.a_vmin)
 #define VM_NODE_ENDADDR(self)   VM_PAGE2ADDR((self)->vn_node.a_vmax + 1)
 #define VM_NODE_BYTESIZE(self)  (size_t)(VM_NODE_SIZE(self) * PAGESIZE)

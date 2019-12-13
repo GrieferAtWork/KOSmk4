@@ -751,12 +751,12 @@ NOTHROW(FCALL p32_pagedir_assert_e1_word_prepared)(unsigned int vec2,
 	        "Page vector #%u for page %p...%p isn't allocated",
 	        (unsigned int)vec2,
 	        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1)),
-	        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1) + (PAGESIZE - 1)));
+	        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1) + PAGEMASK));
 	assertf(!(e2.p_word & P32_PAGE_F4MIB),
 	        "Page %p...%p exists as a present 4MiB page #%u"
 	        "Page vector #%u for page %p...%p isn't allocated",
 	        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1)),
-	        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1) + (PAGESIZE - 1)),
+	        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1) + PAGEMASK),
 	        (unsigned int)vec2);
 	if (vec2 < P32_PDIR_VEC2INDEX(KERNEL_BASE)) {
 		union p32_pdir_e1 e1;
@@ -764,7 +764,7 @@ NOTHROW(FCALL p32_pagedir_assert_e1_word_prepared)(unsigned int vec2,
 		assertf(e1.p_word & P32_PAGE_FPREPARED || P32_PDIR_E1_ISHINT(e1.p_word),
 		        "Page %p...%p [vec2=%u,vec1=%u] hasn't been prepared",
 		        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1)),
-		        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1) + (PAGESIZE - 1)),
+		        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1) + PAGEMASK),
 		        vec2, vec1);
 	}
 }
@@ -1528,7 +1528,7 @@ LOCAL u32 KCALL vm_readphys32_small_aligned(PHYS u32 src) {
 	                             (vm_ppage_t)VM_ADDR2PAGE(src),
 	                             PAGEDIR_MAP_FREAD);
 	pagedir_syncone(tramp);
-	result = *(u32 *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(src & (PAGESIZE - 1)));
+	result = *(u32 *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(src & PAGEMASK));
 	pagedir_pop_mapone(tramp, backup);
 	return result;
 }
@@ -1543,7 +1543,7 @@ vm_copyfromphys_small_aligned(void *__restrict dst,
 	                             (vm_ppage_t)VM_ADDR2PAGE(src),
 	                             PAGEDIR_MAP_FREAD);
 	pagedir_syncone(tramp);
-	memcpy(dst, (void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(src & (PAGESIZE - 1))), num_bytes);
+	memcpy(dst, (void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(src & PAGEMASK)), num_bytes);
 	pagedir_pop_mapone(tramp, backup);
 }
 
@@ -1557,7 +1557,7 @@ vm_copytophys_small_aligned(PHYS u32 dst,
 	                             (vm_ppage_t)VM_ADDR2PAGE(dst),
 	                             PAGEDIR_MAP_FREAD);
 	pagedir_syncone(tramp);
-	memcpy((void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(dst & (PAGESIZE - 1))), src, num_bytes);
+	memcpy((void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(dst & PAGEMASK)), src, num_bytes);
 	pagedir_pop_mapone(tramp, backup);
 }
 

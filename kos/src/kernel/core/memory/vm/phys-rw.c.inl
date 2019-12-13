@@ -102,7 +102,7 @@ NOTHROW(KCALL FUNC(physb))(PHYS vm_phys_t addr VALUE_ARG(u8)) {
 	                             USED_PAGEDIR_PROT);
 	pagedir_syncone(tramp);
 	/* Copy memory. */
-	DORW_AND_CONTINUE(8, VM_PAGE2ADDR(tramp) + (ptrdiff_t)(addr & (PAGESIZE - 1)));
+	DORW_AND_CONTINUE(8, VM_PAGE2ADDR(tramp) + (ptrdiff_t)(addr & PAGEMASK));
 	pagedir_pop_mapone(tramp, backup);
 	IFRD(return result);
 }
@@ -122,14 +122,14 @@ NOTHROW(KCALL FUNC(physw))(PHYS vm_phys_t addr VALUE_ARG(u16)) {
 	                             USED_PAGEDIR_PROT);
 	pagedir_syncone(tramp);
 #ifdef DEFINE_PHYS_UNALIGNED
-	if unlikely((size_t)(addr & (PAGESIZE - 1)) >= (PAGESIZE - 1)) {
+	if unlikely((size_t)(addr & PAGEMASK) >= PAGEMASK) {
 		/* Read from 2 pages. */
 		union {
 			u16 word;
 			u8 bytes[2];
 		} buf;
 		IFWR(buf.word = value);
-		TRANSFER_RW(buf.bytes[0], *(u8 *)(VM_PAGE2ADDR(tramp) + (PAGESIZE - 1)));
+		TRANSFER_RW(buf.bytes[0], *(u8 *)(VM_PAGE2ADDR(tramp) + PAGEMASK));
 		pagedir_mapone(tramp, (vm_ppage_t)VM_ADDR2PAGE(addr + 1), USED_PAGEDIR_PROT);
 		pagedir_syncone(tramp);
 		TRANSFER_RW(buf.bytes[1], *(u8 *)VM_PAGE2ADDR(tramp));
@@ -141,7 +141,7 @@ NOTHROW(KCALL FUNC(physw))(PHYS vm_phys_t addr VALUE_ARG(u16)) {
 		assertf((addr & 1) == 0, "Unaligned address %I64p", (u64)addr);
 #endif /* !DEFINE_PHYS_UNALIGNED */
 		/* Copy memory. */
-		DORW_AND_CONTINUE(16, VM_PAGE2ADDR(tramp) + (ptrdiff_t)(addr & (PAGESIZE - 1)));
+		DORW_AND_CONTINUE(16, VM_PAGE2ADDR(tramp) + (ptrdiff_t)(addr & PAGEMASK));
 	}
 	pagedir_pop_mapone(tramp, backup);
 	IFRD(return result);
@@ -161,7 +161,7 @@ NOTHROW(KCALL FUNC(physl))(PHYS vm_phys_t addr VALUE_ARG(u32)) {
 	                             USED_PAGEDIR_PROT);
 	pagedir_syncone(tramp);
 #ifdef DEFINE_PHYS_UNALIGNED
-	if unlikely((size_t)(addr & (PAGESIZE - 1)) >= (PAGESIZE - 3)) {
+	if unlikely((size_t)(addr & PAGEMASK) >= (PAGESIZE - 3)) {
 		/* Read from 2 pages. */
 		union {
 			u32 dword;
@@ -169,12 +169,12 @@ NOTHROW(KCALL FUNC(physl))(PHYS vm_phys_t addr VALUE_ARG(u32)) {
 			u8 bytes[4];
 		} buf;
 		size_t bytes_in_first_page;
-		bytes_in_first_page = PAGESIZE - (size_t)(addr & (PAGESIZE - 1));
+		bytes_in_first_page = PAGESIZE - (size_t)(addr & PAGEMASK);
 		assert(bytes_in_first_page >= 1);
 		assert(bytes_in_first_page <= 3);
 		IFWR(buf.dword = value);
 		if (bytes_in_first_page == 1) {
-			TRANSFER_RW(buf.bytes[0], *(u8 *)(VM_PAGE2ADDR(tramp) + (PAGESIZE - 1)));
+			TRANSFER_RW(buf.bytes[0], *(u8 *)(VM_PAGE2ADDR(tramp) + PAGEMASK));
 			pagedir_mapone(tramp, (vm_ppage_t)VM_ADDR2PAGE(addr + 3), USED_PAGEDIR_PROT);
 			pagedir_syncone(tramp);
 			TRANSFER_RW(buf.bytes[1], *(u8 *)VM_PAGE2ADDR(tramp));
@@ -189,7 +189,7 @@ NOTHROW(KCALL FUNC(physl))(PHYS vm_phys_t addr VALUE_ARG(u32)) {
 			assert(bytes_in_first_page == 3);
 			IFELSERW(buf.words[0] = UNALIGNED_GET16((u16 *)(VM_PAGE2ADDR(tramp) + (PAGESIZE - 3))),
 			         UNALIGNED_SET16((u16 *)(VM_PAGE2ADDR(tramp) + (PAGESIZE - 3)), buf.words[0]));
-			TRANSFER_RW(buf.bytes[2], *(u8 *)(VM_PAGE2ADDR(tramp) + (PAGESIZE - 1)));
+			TRANSFER_RW(buf.bytes[2], *(u8 *)(VM_PAGE2ADDR(tramp) + PAGEMASK));
 			pagedir_mapone(tramp, (vm_ppage_t)VM_ADDR2PAGE(addr + 3), USED_PAGEDIR_PROT);
 			pagedir_syncone(tramp);
 			TRANSFER_RW(buf.bytes[3], *(u8 *)VM_PAGE2ADDR(tramp));
@@ -202,7 +202,7 @@ NOTHROW(KCALL FUNC(physl))(PHYS vm_phys_t addr VALUE_ARG(u32)) {
 		assertf((addr & 3) == 0, "Unaligned address %I64p", (u64)addr);
 #endif /* !DEFINE_PHYS_UNALIGNED */
 		/* Copy memory. */
-		DORW_AND_CONTINUE(32, VM_PAGE2ADDR(tramp) + (ptrdiff_t)(addr & (PAGESIZE - 1)));
+		DORW_AND_CONTINUE(32, VM_PAGE2ADDR(tramp) + (ptrdiff_t)(addr & PAGEMASK));
 	}
 	pagedir_pop_mapone(tramp, backup);
 	IFRD(return result);
@@ -222,7 +222,7 @@ NOTHROW(KCALL FUNC(physq))(PHYS vm_phys_t addr VALUE_ARG(u64)) {
 	                             USED_PAGEDIR_PROT);
 	pagedir_syncone(tramp);
 #ifdef DEFINE_PHYS_UNALIGNED
-	if unlikely((size_t)(addr & (PAGESIZE - 1)) >= (PAGESIZE - 7)) {
+	if unlikely((size_t)(addr & PAGEMASK) >= (PAGESIZE - 7)) {
 		/* Read from 2 pages. */
 		union {
 			u64 qword;
@@ -231,7 +231,7 @@ NOTHROW(KCALL FUNC(physq))(PHYS vm_phys_t addr VALUE_ARG(u64)) {
 			u8 bytes[8];
 		} buf;
 		size_t bytes_in_first_page, offset;
-		offset              = (size_t)(addr & (PAGESIZE - 1));
+		offset              = (size_t)(addr & PAGEMASK);
 		bytes_in_first_page = PAGESIZE - offset;
 		assert(bytes_in_first_page >= 1);
 		assert(bytes_in_first_page <= 7);
@@ -250,7 +250,7 @@ NOTHROW(KCALL FUNC(physq))(PHYS vm_phys_t addr VALUE_ARG(u64)) {
 		assertf((addr & 7) == 0, "Unaligned address %I64p", (u64)addr);
 #endif /* !DEFINE_PHYS_UNALIGNED */
 		/* Copy memory. */
-		DORW_AND_CONTINUE(64, VM_PAGE2ADDR(tramp) + (ptrdiff_t)(addr & (PAGESIZE - 1)));
+		DORW_AND_CONTINUE(64, VM_PAGE2ADDR(tramp) + (ptrdiff_t)(addr & PAGEMASK));
 	}
 	pagedir_pop_mapone(tramp, backup);
 	IFRD(return result);

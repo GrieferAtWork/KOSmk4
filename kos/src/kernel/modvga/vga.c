@@ -1669,7 +1669,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 		                   VM_NODE_FLAG_NORMAL, 0);
 		TRY {
 			vga_device->v_vram = (byte_t *)VM_PAGE2ADDR(vram_page) +
-			                     (uintptr_t)(vga_device->v_vram_addr & (PAGESIZE - 1));
+			                     (uintptr_t)(vga_device->v_vram_addr & PAGEMASK);
 			vga_device->v_crt_i = VGA_CRT_IC;
 			vga_device->v_crt_d = VGA_CRT_DC;
 			vga_device->v_is1_r = VGA_IS1_RC;

@@ -1488,8 +1488,8 @@ NOTHROW(KCALL VGA_GetPalette)(void *__restrict pal, size_t num_bytes) {
 PRIVATE ATTR_DBGTEXT byte_t *
 NOTHROW(KCALL vga_vram)(u32 vram_offset) {
 	u32 offset;
-	offset      = vram_offset & (PAGESIZE - 1);
-	vram_offset = vram_offset & ~(PAGESIZE - 1);
+	offset      = vram_offset & PAGEMASK;
+	vram_offset = vram_offset & ~PAGEMASK;
 	if (vga_vram_offset != vram_offset) {
 		vm_vpage_t vp;
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE

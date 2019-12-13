@@ -80,7 +80,7 @@ LOCAL void KCALL vm_outsw_phys(port_t port, vm_phys_t buf, size_t count)
 			vm_ppage_t pageaddr;
 			size_t page_words;
 			pageaddr   = (vm_ppage_t)VM_ADDR2PAGE(buf);
-			page_words = (PAGESIZE - (buf & (PAGESIZE - 1))) / 2;
+			page_words = (PAGESIZE - (buf & PAGEMASK)) / 2;
 			if (page_words > count)
 				page_words = count;
 			if (is_first) {
@@ -94,16 +94,16 @@ LOCAL void KCALL vm_outsw_phys(port_t port, vm_phys_t buf, size_t count)
 			/* Transfer to/from memory. */
 			assert(tramp != 0);
 #ifdef DEFINE_IO_READ
-			insw(port, (void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(buf & (PAGESIZE - 1))), page_words);
+			insw(port, (void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(buf & PAGEMASK)), page_words);
 #elif 1 /* ATA output apparently requires a small pause before every written word. */
 			{
 				size_t i;
-				u16 *src = (u16 *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(buf & (PAGESIZE - 1)));
+				u16 *src = (u16 *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(buf & PAGEMASK));
 				for (i = 0; i < page_words; ++i)
 					outw(port, *src++);
 			}
 #else
-			outsw(port, (void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(buf & (PAGESIZE - 1))), page_words);
+			outsw(port, (void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(buf & PAGEMASK)), page_words);
 #endif
 			if (page_words >= count)
 				break;

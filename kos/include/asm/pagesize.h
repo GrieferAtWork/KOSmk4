@@ -21,8 +21,10 @@
 
 
 /* Different architectures may override this function to define the preprocessor constants:
+ *  - __ARCH_PAGEMASK
  *  - __ARCH_PAGESIZE
  *  - __ARCH_PAGESHIFT
+ * Where `__ARCH_PAGEMASK == __ARCH_PAGESIZE - 1'
  * Where `__ARCH_PAGESIZE == 1 << __ARCH_PAGESHIFT'
  * and   `__ARCH_PAGESHIFT == CTZ(__ARCH_PAGESIZE)'
  *
@@ -37,81 +39,56 @@
 
 #ifndef __ARCH_PAGESIZE
 #ifdef __ARCH_PAGESHIFT
-#if __ARCH_PAGESHIFT == 0
-#define __ARCH_PAGESIZE 1
-#elif __ARCH_PAGESHIFT == 1
-#define __ARCH_PAGESIZE 2
-#elif __ARCH_PAGESHIFT == 2
-#define __ARCH_PAGESIZE 4
-#elif __ARCH_PAGESHIFT == 3
-#define __ARCH_PAGESIZE 8
-#elif __ARCH_PAGESHIFT == 4
-#define __ARCH_PAGESIZE 16
-#elif __ARCH_PAGESHIFT == 5
-#define __ARCH_PAGESIZE 32
-#elif __ARCH_PAGESHIFT == 6
-#define __ARCH_PAGESIZE 64
-#elif __ARCH_PAGESHIFT == 7
-#define __ARCH_PAGESIZE 128
-#elif __ARCH_PAGESHIFT == 8
-#define __ARCH_PAGESIZE 256
-#elif __ARCH_PAGESHIFT == 9
-#define __ARCH_PAGESIZE 512
-#elif __ARCH_PAGESHIFT == 10
-#define __ARCH_PAGESIZE 1024
-#elif __ARCH_PAGESHIFT == 11
-#define __ARCH_PAGESIZE 2048
-#elif __ARCH_PAGESHIFT == 12
-#define __ARCH_PAGESIZE 4096
-#elif __ARCH_PAGESHIFT == 13
-#define __ARCH_PAGESIZE 8192
-#elif __ARCH_PAGESHIFT == 14
-#define __ARCH_PAGESIZE 16384
-#elif __ARCH_PAGESHIFT == 15
-#define __ARCH_PAGESIZE 32768
-#else
 #define __ARCH_PAGESIZE (1 << __ARCH_PAGESHIFT)
-#endif
+#elif defined(__ARCH_PAGEMASK)
+#define __ARCH_PAGESIZE (__ARCH_PAGEMASK + 1)
 #elif defined(__KERNEL__)
 #error "Missing macros `__ARCH_PAGESHIFT' and `__ARCH_PAGESIZE' in kernel-mode"
 #endif
-#elif !defined(__ARCH_PAGESHIFT)
-#if __ARCH_PAGESHIFT == 01
-#define __ARCH_PAGESIZE 1
-#elif __ARCH_PAGESHIFT == 2
-#define __ARCH_PAGESIZE 2
-#elif __ARCH_PAGESHIFT == 4
-#define __ARCH_PAGESIZE 3
-#elif __ARCH_PAGESHIFT == 8
-#define __ARCH_PAGESIZE 4
-#elif __ARCH_PAGESHIFT == 16
-#define __ARCH_PAGESIZE 5
-#elif __ARCH_PAGESHIFT == 32
-#define __ARCH_PAGESIZE 6
-#elif __ARCH_PAGESHIFT == 64
-#define __ARCH_PAGESIZE 7
-#elif __ARCH_PAGESHIFT == 128
-#define __ARCH_PAGESIZE 8
-#elif __ARCH_PAGESHIFT == 256
-#define __ARCH_PAGESIZE 9
-#elif __ARCH_PAGESHIFT == 512
-#define __ARCH_PAGESIZE 10
-#elif __ARCH_PAGESHIFT == 1024
-#define __ARCH_PAGESIZE 11
-#elif __ARCH_PAGESHIFT == 2048
-#define __ARCH_PAGESIZE 12
-#elif __ARCH_PAGESHIFT == 4096
-#define __ARCH_PAGESIZE 13
-#elif __ARCH_PAGESHIFT == 8192
-#define __ARCH_PAGESIZE 14
-#elif __ARCH_PAGESHIFT == 16384
-#define __ARCH_PAGESIZE 15
-#elif __ARCH_PAGESHIFT == 32768
-#define __ARCH_PAGESIZE 
+#endif /* __ARCH_PAGESIZE */
+
+#ifndef __ARCH_PAGEMASK
+#ifdef __ARCH_PAGESIZE
+#define __ARCH_PAGEMASK (__ARCH_PAGESIZE + 1)
+#endif /* __ARCH_PAGESIZE */
+#endif /* !__ARCH_PAGEMASK */
+
+#if !defined(__ARCH_PAGESHIFT) && defined(__ARCH_PAGESIZE)
+#if __ARCH_PAGESIZE == 1
+#define __ARCH_PAGESHIFT 1
+#elif __ARCH_PAGESIZE == 2
+#define __ARCH_PAGESHIFT 2
+#elif __ARCH_PAGESIZE == 4
+#define __ARCH_PAGESHIFT 3
+#elif __ARCH_PAGESIZE == 8
+#define __ARCH_PAGESHIFT 4
+#elif __ARCH_PAGESIZE == 16
+#define __ARCH_PAGESHIFT 5
+#elif __ARCH_PAGESIZE == 32
+#define __ARCH_PAGESHIFT 6
+#elif __ARCH_PAGESIZE == 64
+#define __ARCH_PAGESHIFT 7
+#elif __ARCH_PAGESIZE == 128
+#define __ARCH_PAGESHIFT 8
+#elif __ARCH_PAGESIZE == 256
+#define __ARCH_PAGESHIFT 9
+#elif __ARCH_PAGESIZE == 512
+#define __ARCH_PAGESHIFT 10
+#elif __ARCH_PAGESIZE == 1024
+#define __ARCH_PAGESHIFT 11
+#elif __ARCH_PAGESIZE == 2048
+#define __ARCH_PAGESHIFT 12
+#elif __ARCH_PAGESIZE == 4096
+#define __ARCH_PAGESHIFT 13
+#elif __ARCH_PAGESIZE == 8192
+#define __ARCH_PAGESHIFT 14
+#elif __ARCH_PAGESIZE == 16384
+#define __ARCH_PAGESHIFT 15
+#elif __ARCH_PAGESIZE == 32768
+#define __ARCH_PAGESHIFT 16
 #else
 #error "Unsupported `__ARCH_PAGESHIFT' (please pre-define `__ARCH_PAGESHIFT' alongside `__ARCH_PAGESIZE')"
 #endif
-#endif
-
+#endif /* !__ARCH_PAGESHIFT && __ARCH_PAGESIZE */
 
 #endif /* !_ASM_PAGESIZE_H */

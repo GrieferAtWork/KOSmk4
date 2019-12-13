@@ -1212,7 +1212,7 @@ handle_set_register_error:
 		/* Really weird packet, but easy enough to implement... */
 		for (;;) {
 			uintptr_t pagebase, search_size;
-			pagebase    = ((uintptr_t)addr - 3) & ~(PAGESIZE - 1);
+			pagebase    = ((uintptr_t)addr - 3) & ~PAGEMASK;
 			search_size = ((uintptr_t)addr - pagebase) + 3;
 			if (GDB_ReadMemory(GDB_CurrentThread_general.ts_thread,
 			                   (vm_virt_t)pagebase,

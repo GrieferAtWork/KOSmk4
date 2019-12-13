@@ -435,7 +435,7 @@ do_inode_flexread_phys(struct inode *__restrict self,
 			vm_ppage_t pageaddr;
 			size_t page_bytes;
 			pageaddr   = (vm_ppage_t)VM_ADDR2PAGE(buf);
-			page_bytes = PAGESIZE - (buf & (PAGESIZE - 1));
+			page_bytes = PAGESIZE - (buf & PAGEMASK);
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;
 			if (is_first) {
@@ -448,7 +448,7 @@ do_inode_flexread_phys(struct inode *__restrict self,
 			pagedir_syncone(tramp);
 			/* Copy memory. */
 			temp = (*self->i_type->it_file.f_flexread)(self,
-			                                           (void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(buf & (PAGESIZE - 1))),
+			                                           (void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(buf & PAGEMASK)),
 			                                           page_bytes, file_position);
 			result += temp;
 			if (temp < page_bytes)

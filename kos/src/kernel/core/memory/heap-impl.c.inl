@@ -751,7 +751,7 @@ search_heap:
 			if unlikely(OVERFLOW_UADD(page_bytes, self->h_overalloc, &page_bytes))
 				goto allocate_without_overalloc;
 		}
-		page_bytes &= ~(PAGESIZE - 1);
+		page_bytes &= ~PAGEMASK;
 		pageaddr = core_page_alloc_nx(self,
 		                              CORE_PAGE_MALLOC_AUTO,
 		                              page_bytes / PAGESIZE,
@@ -760,8 +760,8 @@ search_heap:
 		if unlikely(pageaddr == CORE_PAGE_MALLOC_ERROR) {
 allocate_without_overalloc:
 			/* Try again without overallocation. */
-			page_bytes = result.hp_siz + (PAGESIZE - 1);
-			page_bytes &= ~(PAGESIZE - 1);
+			page_bytes = result.hp_siz + PAGEMASK;
+			page_bytes &= ~PAGEMASK;
 			pageaddr = FUNC(core_page_alloc)(self,
 			                                 CORE_PAGE_MALLOC_AUTO,
 			                                 page_bytes / PAGESIZE,
@@ -922,7 +922,7 @@ again:
 			 *       been allocated (meaning this allocation is impossible) */
 			vm_vpage_t slot_page;
 			sync_endwrite(&self->h_lock);
-			if (MFREE_BEGIN(slot) & (PAGESIZE - 1))
+			if (MFREE_BEGIN(slot) & PAGEMASK)
 				return 0; /* Not page-aligned. */
 			slot_page = VM_ADDR2PAGE(MFREE_BEGIN(slot));
 			if unlikely(slot_page == 0)
@@ -959,7 +959,7 @@ again:
 			/* Too close to the back. - Try to allocate the next page. */
 			vm_virt_t slot_end = MFREE_END(slot);
 			sync_endwrite(&self->h_lock);
-			if (slot_end & (PAGESIZE - 1))
+			if (slot_end & PAGEMASK)
 				return 0; /* Not page-aligned. */
 			if (FUNC(core_page_alloc_check_hint)(self,
 			                                     VM_ADDR2PAGE(slot_end),

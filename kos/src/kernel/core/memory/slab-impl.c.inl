@@ -55,7 +55,7 @@ NOTHROW(KCALL FUNC(slab_dofreeptr))(struct slab *__restrict self,
 	assert(self->s_size == SEGMENT_SIZE);
 	if ((self->s_flags & SLAB_FCALLOC) && !(flags & GFP_CALLOC))
 		memset(ptr, 0, SEGMENT_SIZE);
-	index = (((uintptr_t)ptr & (PAGESIZE - 1)) - SEGMENT_OFFSET) / SEGMENT_SIZE;
+	index = (((uintptr_t)ptr & PAGEMASK) - SEGMENT_OFFSET) / SEGMENT_SIZE;
 	assert(index < SEGMENT_COUNT);
 	assert(index == (size_t)((struct FUNC(segment) *)ptr - SEGMENTS(self)));
 	assertf(BITSET(self)[index / BITS_PER_POINTER] & (uintptr_t)1 << (index % BITS_PER_POINTER),

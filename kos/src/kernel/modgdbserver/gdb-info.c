@@ -200,7 +200,7 @@ GDB_PrintRemoteVMString(pformatprinter printer, void *arg,
 	for (;;) {
 		size_t partlen, maxread;
 		/* Stay within the same page when reading memory. */
-		maxread = PAGESIZE - ((uintptr_t)string & (PAGESIZE - 1));
+		maxread = PAGESIZE - ((uintptr_t)string & PAGEMASK);
 		if (maxread > sizeof(buf))
 			maxread = sizeof(buf);
 		vm_read(effective_vm, string, buf, maxread, true);
@@ -271,7 +271,7 @@ NOTHROW(FCALL GDBInfo_PrintKernelDriverList)(pformatprinter printer, void *arg) 
 			if (d->d_phdr[j].p_offset >= lowest_segment_offset)
 				continue;
 			lowest_segment_offset = d->d_phdr[j].p_offset;
-			alignment_offset      = lowest_segment_offset & (PAGESIZE - 1);
+			alignment_offset      = lowest_segment_offset & PAGEMASK;
 		}
 		if (d->d_filename) {
 			PRINTF("<library name=\"%#q\">", d->d_filename);

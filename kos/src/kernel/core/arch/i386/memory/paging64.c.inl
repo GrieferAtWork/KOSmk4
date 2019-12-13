@@ -1317,34 +1317,34 @@ NOTHROW(FCALL p64_pagedir_assert_e1_word_prepared)(unsigned int vec4,
 	        "Page vector #%u for page %p...%p isn't allocated",
 	        (unsigned int)vec4,
 	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1)),
-	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + (PAGESIZE - 1)));
+	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + PAGEMASK));
 	e3 = P64_PDIR_E3_IDENTITY[vec4][vec3];
 	assertf(e3.p_word & P64_PAGE_FPRESENT,
 	        "Page vector #%u:%u for page %p...%p isn't allocated",
 	        (unsigned int)vec4, (unsigned int)vec3,
 	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1)),
-	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + (PAGESIZE - 1)));
+	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + PAGEMASK));
 	assertf(!(e3.p_word & P64_PAGE_F1GIB),
 	        "Page %p...%p exists as a present 1GiB page #%u:%u",
 	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1)),
-	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + (PAGESIZE - 1)),
+	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + PAGEMASK),
 	        (unsigned int)vec4, (unsigned int)vec3);
 	e2 = P64_PDIR_E2_IDENTITY[vec4][vec3][vec2];
 	assertf(e2.p_word & P64_PAGE_FPRESENT,
 	        "Page vector #%u:%u:%u for page %p...%p isn't allocated",
 	        (unsigned int)vec4, (unsigned int)vec3, (unsigned int)vec2,
 	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1)),
-	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + (PAGESIZE - 1)));
+	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + PAGEMASK));
 	assertf(!(e2.p_word & P64_PAGE_F2MIB),
 	        "Page %p...%p exists as a present 2MiB page #%u:%u:%u",
 	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1)),
-	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + (PAGESIZE - 1)),
+	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + PAGEMASK),
 	        (unsigned int)vec4, (unsigned int)vec3, (unsigned int)vec2);
 	e1 = P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1];
 	assertf(e1.p_word & P64_PAGE_FPREPARED || P64_PDIR_E1_ISHINT(e1.p_word),
 	        "Page %p...%p [vec4=%u,vec3=%u,vec2=%u,vec1=%u] hasn't been prepared",
 	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1)),
-	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + (PAGESIZE - 1)),
+	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + PAGEMASK),
 	        vec4, vec3, vec2, vec1);
 }
 #endif /* !NDEBUG */

@@ -73,7 +73,7 @@ struct vm_corepage {
 };
 
 /* Returns the COREPAGE that a given `x' is apart of. */
-#define VM_COREPAGE_OF(x) ((struct vm_corepage *)((uintptr_t)(x) & ~(PAGESIZE - 1)))
+#define VM_COREPAGE_OF(x) ((struct vm_corepage *)((uintptr_t)(x) & ~PAGEMASK))
 
 
 /* Core page controller globals. */

@@ -147,8 +147,8 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 	if (smp_memsum(table, table->tab_length))
 		return;
 	/* Remember the LAPIC base address. */
-	if (table->tab_lapicaddr & (PAGESIZE - 1)) {
-		_x86_lapicbase = (byte_t *)(uintptr_t)(table->tab_lapicaddr & (PAGESIZE - 1));
+	if (table->tab_lapicaddr & PAGEMASK) {
+		_x86_lapicbase = (byte_t *)(uintptr_t)(table->tab_lapicaddr & PAGEMASK);
 		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_start = VM_ADDR2PAGE((vm_phys_t)table->tab_lapicaddr);
 		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_size  = 2;
 		x86_vm_part_lapic.dp_tree.a_vmin                = (vm_dpage_t)0;

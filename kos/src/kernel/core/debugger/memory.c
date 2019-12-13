@@ -144,7 +144,7 @@ again_memcpy_nopf_kernel:
 				vm_phys_t phys;
 				size_t copybytes;
 				phys      = pagedir_translate(addr);
-				copybytes = PAGESIZE - ((uintptr_t)addr & (PAGESIZE - 1));
+				copybytes = PAGESIZE - ((uintptr_t)addr & PAGEMASK);
 				if (copybytes > num_bytes)
 					copybytes = num_bytes;
 				vm_copytophys(phys, buf, copybytes);
@@ -176,7 +176,7 @@ again_memcpy_nopf:
 			vm_phys_t phys;
 			size_t copybytes;
 			phys      = pagedir_translate_p(pdir, addr);
-			copybytes = PAGESIZE - ((uintptr_t)addr & (PAGESIZE - 1));
+			copybytes = PAGESIZE - ((uintptr_t)addr & PAGEMASK);
 			if (copybytes > num_bytes)
 				copybytes = num_bytes;
 			vm_copytophys(phys, buf, copybytes);

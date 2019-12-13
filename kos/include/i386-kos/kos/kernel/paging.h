@@ -33,8 +33,8 @@
 #define HIGH_MEMORY_KERNEL 1
 
 #ifdef __x86_64__
-#define USERSPACE_END           __UINT64_C(0x0001000000000000) /* Upper address space limit for user-space (first invalid address) */
-#define USERSPACE_END_I                    0x0001000000000000  /* Upper address space limit for user-space (first invalid address) */
+#define USERSPACE_END           __UINT64_C(0x0000800000000000) /* Upper address space limit for user-space (first invalid address) */
+#define USERSPACE_END_I                    0x0000800000000000  /* Upper address space limit for user-space (first invalid address) */
 #define KERNEL_BASE             __UINT64_C(0xffff800000000000) /* Lower address space limit for kernel-space */
 #define KERNEL_BASE_I                      0xffff800000000000  /* Lower address space limit for kernel-space */
 #define KERNEL_CORE_BASE        __UINT64_C(0xffffffff80000000) /* Load address of the kernel core. (-2GB) */
@@ -80,7 +80,7 @@
 #define X86_64_ADDRBUS_NONCANONBITS     16
 #define X86_64_ADDRBUS_NONCANONMASK     __UINT64_C(0xffff000000000000)
 
-#define X86_64_ADDRBUS_NONCANON_MIN     __UINT64_C(0x0001000000000000)
+#define X86_64_ADDRBUS_NONCANON_MIN     __UINT64_C(0x0000800000000000)
 #define X86_64_ADDRBUS_NONCANON_MAX     __UINT64_C(0xffff7fffffffffff)
 #define ADDR_IS_NONCANON(addr)  ((addr) >= X86_64_ADDRBUS_NONCANON_MIN && (addr) <= X86_64_ADDRBUS_NONCANON_MAX)
 #define ADDR_IS_CANON(addr)     (!ADDR_IS_NONCANON(addr))

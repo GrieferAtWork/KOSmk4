@@ -290,7 +290,7 @@ KCALL vm_datablock_vio_write
 			vm_ppage_t pageaddr;
 			size_t page_bytes;
 			pageaddr   = (vm_ppage_t)VM_ADDR2PAGE(buf);
-			page_bytes = PAGESIZE - (buf & (PAGESIZE - 1));
+			page_bytes = PAGESIZE - (buf & PAGEMASK);
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;
 #ifdef DEFINE_IO_READ
@@ -318,7 +318,7 @@ KCALL vm_datablock_vio_write
 			vm_datablock_vio_write
 #endif /* !DEFINE_IO_READ */
 			                      (self,
-			                       (byte_t *)VM_PAGE2ADDR(tramp) + (ptrdiff_t)(buf & (PAGESIZE - 1)),
+			                       (byte_t *)VM_PAGE2ADDR(tramp) + (ptrdiff_t)(buf & PAGEMASK),
 			                       page_bytes,
 			                       src_offset);
 			if (page_bytes >= num_bytes)

@@ -67,7 +67,7 @@ getdatablock_from_handle(unsigned int fd,
 
 DEFINE_SYSCALL2(errno_t, munmap, void *, addr, size_t, length) {
 	size_t offset;
-	offset = (uintptr_t)addr & (PAGESIZE - 1);
+	offset = (uintptr_t)addr & PAGEMASK;
 	if (OVERFLOW_UADD(length, offset, &length))
 		length = (size_t)-1;
 	vm_unmap(THIS_VM,
@@ -82,7 +82,7 @@ DEFINE_SYSCALL3(errno_t, mprotect,
                 void *, addr, size_t, length,
                 syscall_ulong_t, prot) {
 	size_t offset;
-	offset = (uintptr_t)addr & (PAGESIZE - 1);
+	offset = (uintptr_t)addr & PAGEMASK;
 	if (OVERFLOW_UADD(length, offset, &length))
 		length = (size_t)-1;
 	VALIDATE_FLAGSET(prot,
@@ -125,12 +125,12 @@ unmap_range(struct vm *__restrict v,
 		continue;
 		if (ATOMIC_READ(headers[count].p_filesz)) {
 			uintptr_t alignment;
-			alignment = offset & (PAGESIZE - 1);
+			alignment = offset & PAGEMASK;
 			addr -= alignment;
 			size += alignment;
 		}
-		size += addr & (PAGESIZE - 1);
-		addr &= ~(PAGESIZE - 1);
+		size += addr & PAGEMASK;
+		addr &= ~PAGEMASK;
 		vm_unmap(v,
 		         loadpage + VM_ADDR2PAGE((vm_virt_t)addr),
 		         CEILDIV(size, PAGESIZE),
@@ -159,31 +159,31 @@ contains_illegal_overlap(USER CHECKED Elf_Phdr *headers,
 		offset = ATOMIC_READ(headers[i].p_offset);
 		if (ATOMIC_READ(headers[i].p_filesz)) {
 			uintptr_t alignment;
-			alignment = offset & (PAGESIZE - 1);
+			alignment = offset & PAGEMASK;
 			if (OVERFLOW_USUB(addr, alignment, &addr))
 				goto yes;
 			if (OVERFLOW_UADD(size, alignment, &size))
 				goto yes;
 			/* Validate the consistency of the page alignment. */
-			if ((addr & (PAGESIZE - 1)) != addr_page_offset) {
+			if ((addr & PAGEMASK) != addr_page_offset) {
 				if (!is_first)
 					goto yes;
-				addr_page_offset = addr & (PAGESIZE - 1);
+				addr_page_offset = addr & PAGEMASK;
 			}
 			addr -= addr_page_offset;
 			if (OVERFLOW_UADD(size, addr_page_offset, &size))
 				goto yes;
 			is_first = false;
-			assert(!(addr & (PAGESIZE - 1)));
+			assert(!(addr & PAGEMASK));
 		} else {
-			if (OVERFLOW_UADD(size, addr & (PAGESIZE - 1), &size))
+			if (OVERFLOW_UADD(size, addr & PAGEMASK, &size))
 				goto yes;
-			addr &= ~(PAGESIZE - 1);
+			addr &= ~PAGEMASK;
 		}
 		min_page = VM_ADDR2PAGE((vm_virt_t)addr);
 		if (OVERFLOW_UADD(addr, size, &addr))
 			goto yes;
-		if (OVERFLOW_UADD(addr, (Elf_Addr)(PAGESIZE - 1), &addr))
+		if (OVERFLOW_UADD(addr, (Elf_Addr)PAGEMASK, &addr))
 			goto yes;
 		max_page = (vm_vpage_t)(addr / PAGESIZE) - 1;
 		for (j = i + 1; j < count; ++j) {
@@ -196,31 +196,31 @@ contains_illegal_overlap(USER CHECKED Elf_Phdr *headers,
 			offset = ATOMIC_READ(headers[j].p_offset);
 			if (ATOMIC_READ(headers[j].p_filesz)) {
 				uintptr_t alignment;
-				alignment = offset & (PAGESIZE - 1);
+				alignment = offset & PAGEMASK;
 				if (OVERFLOW_USUB(addr, alignment, &addr))
 					goto yes;
 				if (OVERFLOW_UADD(size, alignment, &size))
 					goto yes;
 				/* Validate the consistency of the page alignment. */
-				if ((addr & (PAGESIZE - 1)) != addr_page_offset) {
+				if ((addr & PAGEMASK) != addr_page_offset) {
 					if (!is_first)
 						goto yes;
-					addr_page_offset = addr & (PAGESIZE - 1);
+					addr_page_offset = addr & PAGEMASK;
 				}
 				addr -= addr_page_offset;
 				if (OVERFLOW_UADD(size, addr_page_offset, &size))
 					goto yes;
 				is_first = false;
-				assert(!(addr & (PAGESIZE - 1)));
+				assert(!(addr & PAGEMASK));
 			} else {
-				if (OVERFLOW_UADD(size, addr & (PAGESIZE - 1), &size))
+				if (OVERFLOW_UADD(size, addr & PAGEMASK, &size))
 					goto yes;
-				addr &= ~(PAGESIZE - 1);
+				addr &= ~PAGEMASK;
 			}
 			other_min_page = VM_ADDR2PAGE((vm_virt_t)addr);
 			if (OVERFLOW_UADD(addr, size, &addr))
 				goto yes;
-			if (OVERFLOW_UADD(addr, (Elf_Addr)(PAGESIZE - 1), &addr))
+			if (OVERFLOW_UADD(addr, (Elf_Addr)PAGEMASK, &addr))
 				goto yes;
 			other_max_page = (vm_vpage_t)(addr / PAGESIZE) - 1;
 			if (other_min_page < max_page &&
@@ -259,7 +259,7 @@ DEFINE_SYSCALL5(void *, maplibrary,
 		if unlikely(!hdrc)
 			return addr;
 		result           = (vm_vpage_t)VM_ADDR2PAGE((uintptr_t)addr);
-		addr_page_offset = (uintptr_t)addr & (PAGESIZE - 1);
+		addr_page_offset = (uintptr_t)addr & PAGEMASK;
 		if (flags & MAP_DONT_MAP) {
 			bool isused;
 			uintptr_t min_addr, max_addr;
@@ -320,29 +320,29 @@ DEFINE_SYSCALL5(void *, maplibrary,
 				min_page_alignment = align;
 			if (filesize) {
 				uintptr_t alignment;
-				alignment = offset & (PAGESIZE - 1);
+				alignment = offset & PAGEMASK;
 				addr -= alignment;
 				offset -= alignment;
 				size += alignment;
 				/* Validate the consistency of the page alignment. */
-				if ((addr & (PAGESIZE - 1)) != addr_page_offset) {
+				if ((addr & PAGEMASK) != addr_page_offset) {
 					if (!(flags & MAP_FIXED) && is_first)
-						addr_page_offset = addr & (PAGESIZE - 1);
+						addr_page_offset = addr & PAGEMASK;
 					else {
 						THROW(E_INVALID_ARGUMENT_BAD_ALIGNMENT,
 						      E_INVALID_ARGUMENT_CONTEXT_LOADLIBRARY_SECADDRALIGN,
 						      (uintptr_t)addr,
-						      PAGESIZE - 1,
+						      PAGEMASK,
 						      addr_page_offset);
 					}
 				}
 				addr -= addr_page_offset;
 				size += addr_page_offset;
 				is_first = false;
-				assert(!(addr & (PAGESIZE - 1)));
+				assert(!(addr & PAGEMASK));
 			} else {
-				size += addr & (PAGESIZE - 1);
-				addr &= ~(PAGESIZE - 1);
+				size += addr & PAGEMASK;
+				addr &= ~PAGEMASK;
 			}
 			size = CEIL_ALIGN(size, PAGESIZE);
 			if (min_addr > addr)
@@ -409,21 +409,21 @@ again_map_segments:
 #endif
 			if (filesize) {
 				uintptr_t alignment;
-				alignment = offset & (PAGESIZE - 1);
+				alignment = offset & PAGEMASK;
 				addr -= alignment;
 				offset -= alignment;
 				size += alignment;
 				filesize += alignment;
 				/* Validate the consistency of the page alignment. */
-				if ((addr & (PAGESIZE - 1)) != addr_page_offset) {
+				if ((addr & PAGEMASK) != addr_page_offset) {
 					if (!(flags & MAP_FIXED) && is_first)
-						addr_page_offset = addr & (PAGESIZE - 1);
+						addr_page_offset = addr & PAGEMASK;
 					else {
 						unmap_range(v, result, headers, i);
 						THROW(E_INVALID_ARGUMENT_BAD_ALIGNMENT,
 						      E_INVALID_ARGUMENT_CONTEXT_LOADLIBRARY_SECADDRALIGN,
 						      (uintptr_t)addr,
-						      PAGESIZE - 1,
+						      PAGEMASK,
 						      addr_page_offset);
 					}
 				}
@@ -437,10 +437,10 @@ again_map_segments:
 				is_first      = false;
 				if unlikely(filesize > size)
 					filesize = size;
-				assert(!(addr & (PAGESIZE - 1)));
+				assert(!(addr & PAGEMASK));
 			} else {
-				size += addr & (PAGESIZE - 1);
-				addr &= ~(PAGESIZE - 1);
+				size += addr & PAGEMASK;
+				addr &= ~PAGEMASK;
 				unaligned_size     = size;
 				unaligned_filesize = filesize;
 				size = CEIL_ALIGN(size, PAGESIZE);
@@ -476,11 +476,11 @@ unmap_check_overlap_and_find_new_candidate:
 				}
 			}
 			if (filesize) {
-				if ((offset & (PAGESIZE - 1)) != 0) {
+				if ((offset & PAGEMASK) != 0) {
 					THROW(E_INVALID_ARGUMENT_BAD_ALIGNMENT,
 					      E_INVALID_ARGUMENT_CONTEXT_LOADLIBRARY_SECFILEALIGN,
 					      (uintptr_t)(offset + addr_page_offset),
-					      PAGESIZE - 1,
+					      PAGEMASK,
 					      addr_page_offset);
 				}
 				if (!file) {
@@ -531,7 +531,7 @@ unmap_check_overlap_and_find_new_candidate:
 						/* The .bss area isn't page-aligned, meaning it overlaps with the data-area... */
 						size_t bss_overlap, bss_total_size;
 						bss_total_size = unaligned_size - unaligned_filesize;
-						bss_overlap    = PAGESIZE - (size_t)(bss_start & (PAGESIZE - 1));
+						bss_overlap    = PAGESIZE - (size_t)(bss_start & PAGEMASK);
 						if (bss_overlap > bss_total_size)
 							bss_overlap = bss_total_size;
 						/* Must `memset(bss_start, 0, bss_overlap)' */
@@ -624,18 +624,18 @@ DEFINE_SYSCALL6(void *, mmap,
 		COMPILER_READ_BARRIER();
 	}
 #endif /* MAP_OFFSET64_POINTER */
-	result_offset = (uintptr_t)file_offset & (PAGESIZE - 1);
+	result_offset = (uintptr_t)file_offset & PAGEMASK;
 	if (flags & MAP_ANONYMOUS) {
 		result_offset = 0;
 		if (flags & MAP_FIXED)
-			result_offset = (uintptr_t)addr & (PAGESIZE - 1);
+			result_offset = (uintptr_t)addr & PAGEMASK;
 	} else {
 		if (flags & MAP_FIXED) {
-			if (result_offset != ((uintptr_t)addr & (PAGESIZE - 1))) {
+			if (result_offset != ((uintptr_t)addr & PAGEMASK)) {
 				THROW(E_INVALID_ARGUMENT_BAD_ALIGNMENT,
 				      E_INVALID_ARGUMENT_CONTEXT_MMAP_ADDR,
 				      (uintptr_t)addr,
-				      PAGESIZE - 1,
+				      PAGEMASK,
 				      result_offset);
 			}
 		}

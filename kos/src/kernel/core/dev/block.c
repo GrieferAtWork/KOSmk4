@@ -1249,7 +1249,7 @@ _block_device_read_phys(struct block_device *__restrict self,
 			vm_ppage_t pageaddr;
 			size_t page_bytes;
 			pageaddr   = (vm_ppage_t)VM_ADDR2PAGE(dst);
-			page_bytes = PAGESIZE - (dst & (PAGESIZE - 1));
+			page_bytes = PAGESIZE - (dst & PAGEMASK);
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;
 			if (is_first) {
@@ -1262,7 +1262,7 @@ _block_device_read_phys(struct block_device *__restrict self,
 			pagedir_syncone(tramp);
 			/* Copy memory. */
 			block_device_read(self,
-			                  (void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(dst & (PAGESIZE - 1))),
+			                  (void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(dst & PAGEMASK)),
 			                  page_bytes, device_position);
 			if (page_bytes >= num_bytes)
 				break;
@@ -1294,7 +1294,7 @@ _block_device_write_phys(struct block_device *__restrict self,
 			vm_ppage_t pageaddr;
 			size_t page_bytes;
 			pageaddr   = (vm_ppage_t)VM_ADDR2PAGE(src);
-			page_bytes = PAGESIZE - (src & (PAGESIZE - 1));
+			page_bytes = PAGESIZE - (src & PAGEMASK);
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;
 			if (is_first) {
@@ -1307,7 +1307,7 @@ _block_device_write_phys(struct block_device *__restrict self,
 			pagedir_syncone(tramp);
 			/* Copy memory. */
 			block_device_write(self,
-			                   (void const *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(src & (PAGESIZE - 1))),
+			                   (void const *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(src & PAGEMASK)),
 			                   page_bytes, device_position);
 			if (page_bytes >= num_bytes)
 				break;

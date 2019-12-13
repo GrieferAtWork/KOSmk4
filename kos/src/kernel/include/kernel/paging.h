@@ -39,6 +39,12 @@
 #error "Miss-configured: `PAGESHIFT != __ARCH_PAGESHIFT'"
 #endif
 
+#ifndef PAGEMASK
+#define PAGEMASK __ARCH_PAGEMASK
+#elif PAGEMASK != __ARCH_PAGEMASK
+#error "Miss-configured: `PAGEMASK != __ARCH_PAGEMASK'"
+#endif
+
 
 DECL_BEGIN
 

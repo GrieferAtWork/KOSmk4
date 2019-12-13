@@ -503,7 +503,7 @@ endread_and_decref_part_and_set_readonly:
 #ifdef IS_WRITING
 do_transfer_ram:
 #endif /* IS_WRITING */
-				page_offset    = (uintptr_t)USERSPACE_VM_ADDRESS & (PAGESIZE - 1);
+				page_offset    = (uintptr_t)USERSPACE_VM_ADDRESS & PAGEMASK;
 				page_remainder = PAGESIZE - page_offset;
 				/* Make sure not to copy beyond the associated page. */
 				if (transfer_bytes > page_remainder)

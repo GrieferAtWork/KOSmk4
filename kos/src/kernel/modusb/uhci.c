@@ -1696,7 +1696,7 @@ usb_transfer_allocate_pbuffer(struct uhci_syncheap *__restrict heap,
 			u32 addr;
 			size_t reqbytes;
 			reqbytes = i == req_pages - 1
-			           ? num_bytes & (PAGESIZE - 1)
+			           ? num_bytes & PAGEMASK
 			           : PAGESIZE;
 			addr = uhci_syncheap_alloc(heap, reqbytes);
 			if unlikely(addr == UHCI_SYNCHEAP_ALLOC_FAILED)

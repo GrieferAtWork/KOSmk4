@@ -180,7 +180,7 @@ load_bootloader_driver2(PHYS u32 blob_addr, size_t blob_size, char *cmdline) {
 	size_t num_pages;
 	vm_vpage_t vpage;
 	REF struct driver *drv;
-	num_pages = CEILDIV(blob_size + (blob_addr & (PAGESIZE - 1)), PAGESIZE);
+	num_pages = CEILDIV(blob_size + (blob_addr & PAGEMASK), PAGESIZE);
 	/* Create a temporary mapping of prepared virtual memory which
 	 * we can then use to map the driver's data blob into virtual memory. */
 	vpage = vm_mapres(&vm_kernel,
@@ -200,7 +200,7 @@ load_bootloader_driver2(PHYS u32 blob_addr, size_t blob_size, char *cmdline) {
 		 *    -> That way, driver dependencies can be loaded in the same manner,
 		 *       thus not relying on file-system drivers not having any dependencies. */
 		drv = driver_insmod_blob((byte_t *)(VM_PAGE2ADDR(vpage) +
-		                                    (blob_addr & (PAGESIZE - 1))),
+		                                    (blob_addr & PAGEMASK)),
 		                         blob_size,
 		                         cmdline,
 		                         NULL,

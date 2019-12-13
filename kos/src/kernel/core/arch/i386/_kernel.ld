@@ -347,12 +347,12 @@ SECTIONS {
 		. += thiscpu_idle;
 		PROVIDE(_bootidle = ABSOLUTE(.));
 		. += __kernel_pertask_size;
-		STATIC_ASSERT((_bootcpu & (PAGESIZE - 1)) == 0);
-		STATIC_ASSERT((thiscpu_x86_tss & (PAGESIZE - 1)) == 0);
-		STATIC_ASSERT((thiscpu_x86_iob & (PAGESIZE - 1)) == 0);
+		STATIC_ASSERT((_bootcpu & PAGEMASK) == 0);
+		STATIC_ASSERT((thiscpu_x86_tss & PAGEMASK) == 0);
+		STATIC_ASSERT((thiscpu_x86_iob & PAGEMASK) == 0);
 		. = ABSOLUTE(_bootcpu + thiscpu_x86_tss);
 		PROVIDE_HIDDEN(_bootcpu_x86_tss = ABSOLUTE(.));
-		STATIC_ASSERT((ABSOLUTE(.) & (PAGESIZE - 1)) == 0);
+		STATIC_ASSERT((ABSOLUTE(.) & PAGEMASK) == 0);
 		. = ABSOLUTE(_bootcpu + thiscpu_x86_iob);
 		/* Re-use the physical memory allocated for _bootcpu's IOB
 		 * vector as the pages used to describe the empty IOB vector. */
@@ -360,7 +360,7 @@ SECTIONS {
 		PROVIDE_HIDDEN(__x86_iob_empty_vpageno = ABSOLUTE(__x86_iob_empty_base) / PAGESIZE);
 		PROVIDE_HIDDEN(__x86_iob_empty_ppageno = ABSOLUTE(__x86_iob_empty_vpageno) - KERNEL_CORE_PAGE);
 		PROVIDE_HIDDEN(__x86_kernel_bss_before_iob_pages = ABSOLUTE(__x86_iob_empty_vpageno - __kernel_bss_startpage));
-		STATIC_ASSERT((ABSOLUTE(.) & (PAGESIZE - 1)) == 0);
+		STATIC_ASSERT((ABSOLUTE(.) & PAGEMASK) == 0);
 		. += 8192; /* Make space for the IOBM table. */
 		. += 1;    /* Trailing FFh-byte */
 #endif /* !CONFIG_NO_SMP */

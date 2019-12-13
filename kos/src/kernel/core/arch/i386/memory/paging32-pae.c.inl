@@ -1033,11 +1033,11 @@ NOTHROW(FCALL pae_pagedir_assert_e1_word_prepared)(unsigned int vec3,
 	        "Page vector #%u:%u for page %p...%p isn't allocated",
 	        (unsigned int)vec3, (unsigned int)vec2,
 	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1)),
-	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + (PAGESIZE - 1)));
+	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + PAGEMASK));
 	assertf(!(e2.p_word & PAE_PAGE_F2MIB),
 	        "Page %p...%p exists as a present 2MiB page #%u:%u",
 	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1)),
-	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + (PAGESIZE - 1)),
+	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + PAGEMASK),
 	        (unsigned int)vec3, (unsigned int)vec2);
 	if (vec3 < PAE_PDIR_VEC3INDEX(KERNEL_BASE)) {
 		union pae_pdir_e1 e1;
@@ -1045,7 +1045,7 @@ NOTHROW(FCALL pae_pagedir_assert_e1_word_prepared)(unsigned int vec3,
 		assertf(e1.p_word & PAE_PAGE_FPREPARED || PAE_PDIR_E1_ISHINT(e1.p_word),
 		        "Page %p...%p [vec3=%u,vec2=%u,vec1=%u] hasn't been prepared",
 		        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1)),
-		        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + (PAGESIZE - 1)),
+		        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + PAGEMASK),
 		        vec3, vec2, vec1);
 	}
 }

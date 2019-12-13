@@ -320,7 +320,7 @@ again:
 		if ((VM_PPAGE2ADDR(bank_alloc_page) + num_bytes - 1) >= (vm_phys_t)(uintptr_t)-1) {
 			vm_phys_t bank_alloc_addr;
 			bank_alloc_addr = (vm_phys_t)(uintptr_t)-1 - (num_bytes - 1);
-			bank_alloc_addr &= ~(PAGESIZE - 1);
+			bank_alloc_addr &= ~PAGEMASK;
 			if (bank_alloc_addr < PMEMBANK_TYPE_START(kernel_membanks_initial[i]))
 				break; /* Bank doesn't cover the last possible mapping location. */
 			waste = (vm_ppage_t)-2; /* A lot of waste this way... */
@@ -339,10 +339,10 @@ again:
 				vm_phys_t gain_min;
 				vm_phys_t gain_end;
 				gain_end = PMEMBANK_TYPE_END(kernel_membanks_initial[i]);
-				if ((gain_end & (PAGESIZE - 1)) != 0) {
+				if ((gain_end & PAGEMASK) != 0) {
 					vm_phys_t used_end;
 					size_t gain;
-					gain_min = gain_end & ~(PAGESIZE - 1);
+					gain_min = gain_end & ~PAGEMASK;
 					used_end = VM_PPAGE2ADDR(bank_alloc_page) + num_bytes;
 					assert(used_end >= gain_min && used_end <= gain_end);
 					gain = (size_t)(used_end - gain_min);
@@ -475,7 +475,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
 	 * For this, we prefer using banked memory that is not aligned by whole
 	 * pages, as it would otherwise go unused forever, since page_malloc()
 	 * is not capable of allocating sub-page memory. */
-	req_pages = (req_bytes + (PAGESIZE - 1)) / PAGESIZE;
+	req_pages = (req_bytes + PAGEMASK) / PAGESIZE;
 	kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start = minfo_allocate_part_pagedata(req_bytes);
 	printk(FREESTR(KERN_DEBUG "Allocate paging control structures at "
 	               FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " (%Iu bytes in %Iu pages)\n"),

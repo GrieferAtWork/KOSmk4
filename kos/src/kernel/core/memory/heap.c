@@ -236,7 +236,7 @@ NOTHROW(KCALL find_modified_address)(byte_t *start, u32 pattern, size_t num_byte
 		--num_bytes, ++start;
 	}
 	while (num_bytes > 4) {
-		if __untraced(!((uintptr_t)start & (PAGESIZE - 1))) {
+		if __untraced(!((uintptr_t)start & PAGEMASK)) {
 			for (;;) {
 				vm_vpage_t page = VM_ADDR2PAGE((vm_virt_t)start);
 #if 0
@@ -445,8 +445,8 @@ NOTHROW(KCALL reset_heap_data)(byte_t *ptr, u32 pattern, size_t num_bytes) {
 	if (num_bytes < PAGESIZE)
 		goto do_remainder;
 	/* Only write pages that have been allocated. */
-	if ((uintptr_t)ptr & (PAGESIZE - 1)) {
-		size_t inpage_free = PAGESIZE - ((uintptr_t)ptr & (PAGESIZE - 1));
+	if ((uintptr_t)ptr & PAGEMASK) {
+		size_t inpage_free = PAGESIZE - ((uintptr_t)ptr & PAGEMASK);
 		if (inpage_free > num_bytes)
 			inpage_free = num_bytes;
 		mempatl(ptr, pattern, inpage_free);
@@ -1164,8 +1164,8 @@ NOTHROW(KCALL heap_free_overallocation)(struct heap *__restrict self,
 		 * then we must MEMPAT(DEBUGHEAP_NO_MANS_LAND) that high page, as it will
 		 * be initialized by `heap_free_raw()'. */
 		uintptr_t high_page_addr;
-		high_page_addr = ((uintptr_t)overallocation_base + SIZEOF_MFREE - 1) & ~(PAGESIZE - 1);
-		if ((((uintptr_t)overallocation_base) & ~(PAGESIZE - 1)) != high_page_addr) {
+		high_page_addr = ((uintptr_t)overallocation_base + SIZEOF_MFREE - 1) & ~PAGEMASK;
+		if ((((uintptr_t)overallocation_base) & ~PAGEMASK) != high_page_addr) {
 			/* Page-boundary within the mfree structure. */
 			if ((uintptr_t)overallocation_base + num_free_bytes >=
 			    (uintptr_t)high_page_addr + PAGESIZE) {
@@ -1192,9 +1192,9 @@ NOTHROW(KCALL heap_free_overallocation)(struct heap *__restrict self,
 			 *    If this is the case, then we must MEMPAT overallocation_base...END_OF_SAME_PAGE,
 			 *    though only if the entirety of that area is apart of the overallocation.
 			 */
-			if (((uintptr_t)overallocation_base & (PAGESIZE - 1)) != 0) {
+			if (((uintptr_t)overallocation_base & PAGEMASK) != 0) {
 				uintptr_t end_of_page;
-				end_of_page = ((uintptr_t)overallocation_base & ~(PAGESIZE - 1)) + PAGESIZE;
+				end_of_page = ((uintptr_t)overallocation_base & ~PAGEMASK) + PAGESIZE;
 				if ((uintptr_t)overallocation_base + num_free_bytes >= end_of_page) {
 					/* Must MEMPAT all memory within the original page */
 					if (IS_FRESH_MEMORY(overallocation_base)) {
@@ -1250,7 +1250,7 @@ NOTHROW(KCALL heap_free_underallocation)(struct heap *__restrict self,
 		 * If it doesn't, then we can assume that some other mfree
 		 * exists for the area below, meaning that the first page
 		 * will have already been initialized. */
-		if (((uintptr_t)underallocation_base & (PAGESIZE - 1)) == 0) {
+		if (((uintptr_t)underallocation_base & PAGEMASK) == 0) {
 			/* Must initialize data at underallocation_base...MIN(END_OF_FREE_RANGE,END_OF_PAGE(underallocation_base)) */
 			HEAP_ASSERT(num_free_bytes >= 4);
 			if (IS_FRESH_MEMORY(underallocation_base)) {
@@ -1265,8 +1265,8 @@ NOTHROW(KCALL heap_free_underallocation)(struct heap *__restrict self,
 			 * and the higher of the 2 pages is entirely contained within
 			 * the underallocation, then we must initialize the page. */
 			uintptr_t page_base;
-			page_base = ((uintptr_t)underallocation_base + SIZEOF_MFREE - 1) & ~(PAGESIZE - 1);
-			if ((((uintptr_t)underallocation_base) & ~(PAGESIZE - 1)) != page_base) {
+			page_base = ((uintptr_t)underallocation_base + SIZEOF_MFREE - 1) & ~PAGEMASK;
+			if ((((uintptr_t)underallocation_base) & ~PAGEMASK) != page_base) {
 				/* Descriptor crosses a page boundary. */
 				size_t num_reset_bytes;
 				HEAP_ASSERT(underallocation_end > page_base);
@@ -1283,11 +1283,11 @@ NOTHROW(KCALL heap_free_underallocation)(struct heap *__restrict self,
 		/* Must clear all data before the start of `underallocation_end', and
 		 * within the same page, if `underallocation_end' isn't located at the
 		 * start of a page. */
-		if ((underallocation_end & (PAGESIZE - 1)) != 0) {
+		if ((underallocation_end & PAGEMASK) != 0) {
 			STATIC_ASSERT(SIZEOF_MFREE >= 7);
 			if (IS_FRESH_MEMORY((underallocation_end & ~(4 - 1)) - 4)) {
 				uintptr_t clear_size;
-				clear_size = underallocation_end & (PAGESIZE - 1);
+				clear_size = underallocation_end & PAGEMASK;
 				if (clear_size > num_free_bytes)
 					clear_size = num_free_bytes;
 				mempatl((void *)(underallocation_end - clear_size),
