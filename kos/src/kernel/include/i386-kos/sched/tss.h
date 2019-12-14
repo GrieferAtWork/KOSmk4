@@ -58,8 +58,8 @@ INTDEF ATTR_PERCPU void *thiscpu_x86_iobnode_pagedir_identity;
  * During preemption:
  *     >> if (OLD_THREAD->IOPERM_BITMAP != NEW_THREAD->IOPERM_BITMAP &&
  *     >>     IS_IOPERM_BITMAP_LOADED(THIS_CPU)) {
- *     >>     npagedir_unmap(THIS_CPU:thiscpu_x86_iob, 2 * PAGESIZE);
- *     >>     npagedir_sync(THIS_CPU:thiscpu_x86_iob, 2 * PAGESIZE);
+ *     >>     pagedir_unmap(THIS_CPU:thiscpu_x86_iob, 2 * PAGESIZE);
+ *     >>     pagedir_sync(THIS_CPU:thiscpu_x86_iob, 2 * PAGESIZE);
  *     >>     SET_IOPERM_BITMAP_LOADED(THIS_CPU, false);
  *     >> }
  * During #PF handling:
@@ -73,9 +73,9 @@ INTDEF ATTR_PERCPU void *thiscpu_x86_iobnode_pagedir_identity;
  *     >>         iob = ioperm_bitmap_copy(iob);
  *     >>         PERTASK_SET(this_x86_ioperm_bitmap, iob);
  *     >>     }
- *     >>     npagedir_map(THIS_CPU:thiscpu_x86_iob, 2 * PAGESIZE,
- *     >>                  iob->ib_pages, IS_WRITING() ? (PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE)
- *     >>                                              : PAGEDIR_MAP_FREAD);
+ *     >>     pagedir_map(THIS_CPU:thiscpu_x86_iob, 2 * PAGESIZE,
+ *     >>                 iob->ib_pages, IS_WRITING() ? (PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE)
+ *     >>                                             : PAGEDIR_MAP_FREAD);
  *     >>     SET_IOPERM_BITMAP_LOADED(THIS_CPU, true);
  *     >>     return;
  *     >> }

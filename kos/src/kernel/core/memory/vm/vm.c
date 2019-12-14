@@ -624,10 +624,10 @@ NOTHROW(KCALL pprop_memcpy)(uintptr_t *__restrict dst_base,
  * page directory at the specified location, using the specified permissions.
  * NOTE: The caller is responsible to ensure that `self' doesn't change state
  *       or size, as well as to ensure that the given address range isn't already
- *       in use. - This function is merely a thin wrapper around `npagedir_map',
+ *       in use. - This function is merely a thin wrapper around `pagedir_map',
  *       which automatically allows for dealing with multi-part ram blocks.
  * NOTE: The caller is responsible to ensure that the target region of memory
- *       has been prepared in a prior call to `npagedir_prepare_map'
+ *       has been prepared in a prior call to `pagedir_prepare_map'
  * @param: perm: Set of `PAGEDIR_MAP_F*' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_map_ram)(struct vm_datapart *__restrict self,
@@ -636,19 +636,19 @@ NOTHROW(KCALL vm_datapart_map_ram)(struct vm_datapart *__restrict self,
 	       self->dp_state == VM_DATAPART_STATE_LOCKED);
 	if (self->dp_ramdata.rd_blockv == &self->dp_ramdata.rd_block0) {
 		assert(vm_datapart_numvpages(self) == self->dp_ramdata.rd_block0.rb_size);
-		npagedir_map(addr,
-		             self->dp_ramdata.rd_block0.rb_size * PAGESIZE,
-		             page2addr(self->dp_ramdata.rd_block0.rb_start),
-		             perm);
+		pagedir_map(addr,
+		            self->dp_ramdata.rd_block0.rb_size * PAGESIZE,
+		            page2addr(self->dp_ramdata.rd_block0.rb_start),
+		            perm);
 	} else {
 		size_t i;
 		struct vm_ramblock *blocks;
 		blocks = self->dp_ramdata.rd_blockv;
 		for (i = 0; i < self->dp_ramdata.rd_blockc; ++i) {
-			npagedir_map(addr,
-			             blocks[i].rb_size * PAGESIZE,
-			             page2addr(blocks[i].rb_start),
-			             perm);
+			pagedir_map(addr,
+			            blocks[i].rb_size * PAGESIZE,
+			            page2addr(blocks[i].rb_start),
+			            perm);
 			addr = (byte_t *)addr + blocks[i].rb_size * PAGESIZE;
 		}
 	}
@@ -662,21 +662,21 @@ NOTHROW(KCALL vm_datapart_map_ram_p)(struct vm_datapart *__restrict self,
 	       self->dp_state == VM_DATAPART_STATE_LOCKED);
 	if (self->dp_ramdata.rd_blockv == &self->dp_ramdata.rd_block0) {
 		assert(vm_datapart_numvpages(self) == self->dp_ramdata.rd_block0.rb_size);
-		npagedir_map_p(pdir,
-		               addr,
-		               self->dp_ramdata.rd_block0.rb_size * PAGESIZE,
-		               page2addr(self->dp_ramdata.rd_block0.rb_start),
-		               perm);
+		pagedir_map_p(pdir,
+		              addr,
+		              self->dp_ramdata.rd_block0.rb_size * PAGESIZE,
+		              page2addr(self->dp_ramdata.rd_block0.rb_start),
+		              perm);
 	} else {
 		size_t i;
 		struct vm_ramblock *blocks;
 		blocks = self->dp_ramdata.rd_blockv;
 		for (i = 0; i < self->dp_ramdata.rd_blockc; ++i) {
-			npagedir_map_p(pdir,
-			               addr,
-			               blocks[i].rb_size * PAGESIZE,
-			               page2addr(blocks[i].rb_start),
-			               perm);
+			pagedir_map_p(pdir,
+			              addr,
+			              blocks[i].rb_size * PAGESIZE,
+			              page2addr(blocks[i].rb_start),
+			              perm);
 			addr = (byte_t *)addr + blocks[i].rb_size * PAGESIZE;
 		}
 	}
@@ -746,10 +746,10 @@ NOTHROW(KCALL vm_datapart_map_ram_autoprop)(struct vm_datapart *__restrict self,
 				if (new_perm != use_perm)
 					break;
 			}
-			npagedir_map((byte_t *)addr + (start_offset * PAGESIZE),
-			             (offset - start_offset) * PAGESIZE,
-			             page2addr(self->dp_ramdata.rd_block0.rb_start + start_offset),
-			             use_perm);
+			pagedir_map((byte_t *)addr + (start_offset * PAGESIZE),
+			            (offset - start_offset) * PAGESIZE,
+			            page2addr(self->dp_ramdata.rd_block0.rb_start + start_offset),
+			            use_perm);
 		} while (offset < count);
 	} else {
 		size_t i;
@@ -766,10 +766,10 @@ NOTHROW(KCALL vm_datapart_map_ram_autoprop)(struct vm_datapart *__restrict self,
 					if (new_perm != use_perm)
 						break;
 				}
-				npagedir_map((byte_t *)addr + (start_offset * PAGESIZE),
-				             (offset - start_offset) * PAGESIZE,
-				             page2addr(blocks[i].rb_start + start_offset),
-				             use_perm);
+				pagedir_map((byte_t *)addr + (start_offset * PAGESIZE),
+				            (offset - start_offset) * PAGESIZE,
+				            page2addr(blocks[i].rb_start + start_offset),
+				            use_perm);
 			} while (offset < count);
 			assert(offset == count);
 			assert(count == blocks[i].rb_size);
@@ -799,11 +799,11 @@ NOTHROW(KCALL vm_datapart_map_ram_autoprop_p)(struct vm_datapart *__restrict sel
 				if (new_perm != use_perm)
 					break;
 			}
-			npagedir_map_p(pdir,
-			               (byte_t *)addr + (start_offset * PAGESIZE),
-			               (offset - start_offset) * PAGESIZE,
-			               page2addr(self->dp_ramdata.rd_block0.rb_start + start_offset),
-			               use_perm);
+			pagedir_map_p(pdir,
+			              (byte_t *)addr + (start_offset * PAGESIZE),
+			              (offset - start_offset) * PAGESIZE,
+			              page2addr(self->dp_ramdata.rd_block0.rb_start + start_offset),
+			              use_perm);
 		} while (offset < count);
 	} else {
 		size_t i;
@@ -820,11 +820,11 @@ NOTHROW(KCALL vm_datapart_map_ram_autoprop_p)(struct vm_datapart *__restrict sel
 					if (new_perm != use_perm)
 						break;
 				}
-				npagedir_map_p(pdir,
-				               (byte_t *)addr + (start_offset * PAGESIZE),
-				               (offset - start_offset) * PAGESIZE,
-				               page2addr(blocks[i].rb_start + start_offset),
-				               use_perm);
+				pagedir_map_p(pdir,
+				              (byte_t *)addr + (start_offset * PAGESIZE),
+				              (offset - start_offset) * PAGESIZE,
+				              page2addr(blocks[i].rb_start + start_offset),
+				              use_perm);
 			} while (offset < count);
 			assert(offset == count);
 			assert(count == blocks[i].rb_size);
@@ -2290,11 +2290,11 @@ again_lock_datapart:
 					continue;
 				/* Make sure that the associated page mapping has been prepared. */
 				if unlikely(!(v == myvm || vm_node_iskernelspace(node)
-				              ? npagedir_prepare_map(vm_node_getstart(node),
-				                                     vm_node_getsize(node))
-				              : npagedir_prepare_map_p(PAGEDIR_P_SELFOFVM(v),
-				                                       vm_node_getstart(node),
-				                                       vm_node_getsize(node)))) {
+				              ? pagedir_prepare_map(vm_node_getstart(node),
+				                                    vm_node_getsize(node))
+				              : pagedir_prepare_map_p(PAGEDIR_P_SELFOFVM(v),
+				                                      vm_node_getstart(node),
+				                                      vm_node_getsize(node)))) {
 					vm_set_lockendwrite_all(&vms);
 					sync_endread(self);
 					/*vm_set_clear(&vms); // Done by the EXCEPT below */
@@ -2967,12 +2967,12 @@ NOTHROW(KCALL vm_node_destroy)(struct vm_node *__restrict self) {
 				if (self->vn_vm == THIS_VM)
 #endif /* !CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 				{
-					npagedir_unprepare_map_p(PAGEDIR_P_SELFOFVM(self->vn_vm),
-					                         vm_node_getstart(self),
-					                         vm_node_getsize(self));
+					pagedir_unprepare_map_p(PAGEDIR_P_SELFOFVM(self->vn_vm),
+					                        vm_node_getstart(self),
+					                        vm_node_getsize(self));
 				} else {
-					npagedir_unprepare_map(vm_node_getstart(self),
-					                       vm_node_getsize(self));
+					pagedir_unprepare_map(vm_node_getstart(self),
+					                      vm_node_getsize(self));
 				}
 			}
 		}
@@ -3066,7 +3066,7 @@ NOTHROW(KCALL vm_node_update_write_access)(struct vm_node *__restrict self) {
 	log_updating_access_rights(self);
 	if (self->vn_vm == THIS_VM) {
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED)) {
-			if (!npagedir_prepare_map(addr, size)) {
+			if (!pagedir_prepare_map(addr, size)) {
 				vm_sync_abort(self->vn_vm);
 				sync_endwrite(self->vn_vm);
 				return VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC;
@@ -3075,16 +3075,16 @@ NOTHROW(KCALL vm_node_update_write_access)(struct vm_node *__restrict self) {
 		/* By simply deleting the write-permission bit when it is set,
 		 * we can drastically reduce the number of required #PFs */
 #ifdef CONFIG_HAVE_PAGEDIR_UNWRITE
-		npagedir_unwrite(addr, size);
+		pagedir_unwrite(addr, size);
 #else /* CONFIG_HAVE_PAGEDIR_UNWRITE */
-		npagedir_unmap(addr, size);
+		pagedir_unmap(addr, size);
 #endif /* !CONFIG_HAVE_PAGEDIR_UNWRITE */
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED))
-			npagedir_unprepare_map(addr, size);
+			pagedir_unprepare_map(addr, size);
 	} else {
 		PAGEDIR_P_SELFTYPE pdir = PAGEDIR_P_SELFOFVM(self->vn_vm);
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED)) {
-			if (!npagedir_prepare_map_p(pdir, addr, size)) {
+			if (!pagedir_prepare_map_p(pdir, addr, size)) {
 				vm_sync_abort(self->vn_vm);
 				sync_endwrite(self->vn_vm);
 				return VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC;
@@ -3093,12 +3093,12 @@ NOTHROW(KCALL vm_node_update_write_access)(struct vm_node *__restrict self) {
 		/* By simply deleting the write-permission bit when it is set,
 		 * we can drastically reduce the number of required #PFs */
 #ifdef CONFIG_HAVE_PAGEDIR_UNWRITE
-		npagedir_unwrite_p(pdir, addr, size);
+		pagedir_unwrite_p(pdir, addr, size);
 #else /* CONFIG_HAVE_PAGEDIR_UNWRITE */
-		npagedir_unmap_p(pdir, addr, size);
+		pagedir_unmap_p(pdir, addr, size);
 #endif /* !CONFIG_HAVE_PAGEDIR_UNWRITE */
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED))
-			npagedir_unprepare_map_p(pdir, addr, size);
+			pagedir_unprepare_map_p(pdir, addr, size);
 	}
 	vm_sync_end(self->vn_vm, addr, size);
 	sync_endwrite(self->vn_vm);
@@ -3130,7 +3130,7 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
 	log_updating_access_rights(self);
 	if (self->vn_vm == THIS_VM) {
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED)) {
-			if (!npagedir_prepare_map(addr, size)) {
+			if (!pagedir_prepare_map(addr, size)) {
 				vm_sync_abort(self->vn_vm);
 				if (self->vn_vm != locked_vm)
 					sync_endwrite(self->vn_vm);
@@ -3140,16 +3140,16 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
 		/* By simply deleting the write-permission bit when it is set,
 		 * we can drastically reduce the number of required #PFs */
 #ifdef CONFIG_HAVE_PAGEDIR_UNWRITE
-		npagedir_unwrite(addr, size);
+		pagedir_unwrite(addr, size);
 #else /* CONFIG_HAVE_PAGEDIR_UNWRITE */
-		npagedir_unmap(addr, size);
+		pagedir_unmap(addr, size);
 #endif /* !CONFIG_HAVE_PAGEDIR_UNWRITE */
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED))
-			npagedir_unprepare_map(addr, size);
+			pagedir_unprepare_map(addr, size);
 	} else {
 		PAGEDIR_P_SELFTYPE pdir = PAGEDIR_P_SELFOFVM(self->vn_vm);
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED)) {
-			if (!npagedir_prepare_map_p(pdir, addr, size)) {
+			if (!pagedir_prepare_map_p(pdir, addr, size)) {
 				vm_sync_abort(self->vn_vm);
 				if (self->vn_vm != locked_vm)
 					sync_endwrite(self->vn_vm);
@@ -3159,12 +3159,12 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
 		/* By simply deleting the write-permission bit when it is set,
 		 * we can drastically reduce the number of required #PFs */
 #ifdef CONFIG_HAVE_PAGEDIR_UNWRITE
-		npagedir_unwrite_p(pdir, addr, size);
+		pagedir_unwrite_p(pdir, addr, size);
 #else /* CONFIG_HAVE_PAGEDIR_UNWRITE */
-		npagedir_unmap_p(pdir, addr, size);
+		pagedir_unmap_p(pdir, addr, size);
 #endif /* !CONFIG_HAVE_PAGEDIR_UNWRITE */
 		if (!(self->vn_flags & VM_NODE_FLAG_PREPARED))
-			npagedir_unprepare_map_p(pdir, addr, size);
+			pagedir_unprepare_map_p(pdir, addr, size);
 	}
 	vm_sync_end(self->vn_vm, addr, size);
 	if (self->vn_vm != locked_vm)
@@ -3461,14 +3461,14 @@ no_changes_in_node:
 PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL ipi_invtlb_one)(struct icpustate *__restrict state,
                               void *args[CPU_IPI_ARGCOUNT]) {
-	npagedir_syncone(args[0]);
+	pagedir_syncone(args[0]);
 	return state;
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL ipi_invtlb)(struct icpustate *__restrict state,
                           void *args[CPU_IPI_ARGCOUNT]) {
-	npagedir_sync(args[0], (size_t)args[1]);
+	pagedir_sync(args[0], (size_t)args[1]);
 	return state;
 }
 
@@ -3484,7 +3484,7 @@ PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL ipi_invtlb_one_for)(struct icpustate *__restrict state,
                                   void *args[CPU_IPI_ARGCOUNT]) {
 	if (THIS_VM == (struct vm *)args[0])
-		npagedir_syncone(args[1]);
+		pagedir_syncone(args[1]);
 	return state;
 }
 
@@ -3492,7 +3492,7 @@ PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL ipi_invtlb_for)(struct icpustate *__restrict state,
                               void *args[CPU_IPI_ARGCOUNT]) {
 	if (THIS_VM == (struct vm *)args[0]) {
-		npagedir_sync(args[1], (size_t)args[2]);
+		pagedir_sync(args[1], (size_t)args[2]);
 	}
 	return state;
 }
@@ -3627,11 +3627,11 @@ NOTHROW(FCALL vm_syncall_locked)(struct vm *__restrict effective_vm) {
 
 
 /* Begin/end syncing page directory mappings:
- * >> npagedir_prepare_map_p(my_vm, start, count);                       // Prepare      (make sure that `npagedir_unmap_p()' will succeed)
- * >> vm_sync_begin(my_vm);                                              // Lock         (make sure we'll be able to sync)
- * >> npagedir_unmap_p(PAGEDIR_P_SELFOFVM(my_vm), start, count);         // Unmap        (Actually delete page mappings)
- * >> vm_paged_sync_end(my_vm, start, count);                            // Unlock+sync  (Make sure that all CPUs got the message about pages having gone away)
- * >> npagedir_unprepare_map_p(PAGEDIR_P_SELFOFVM(my_vm), start, count); // Free         (Clean up memory used to describe the mapping)
+ * >> pagedir_prepare_map_p(my_vm, start, count);                       // Prepare      (make sure that `pagedir_unmap_p()' will succeed)
+ * >> vm_sync_begin(my_vm);                                             // Lock         (make sure we'll be able to sync)
+ * >> pagedir_unmap_p(PAGEDIR_P_SELFOFVM(my_vm), start, count);         // Unmap        (Actually delete page mappings)
+ * >> vm_paged_sync_end(my_vm, start, count);                           // Unlock+sync  (Make sure that all CPUs got the message about pages having gone away)
+ * >> pagedir_unprepare_map_p(PAGEDIR_P_SELFOFVM(my_vm), start, count); // Free         (Clean up memory used to describe the mapping)
  * This order to calls is required to prevent problems at a
  * point in time when those problems could no longer be handled,
  * since the regular vm_paged_sync() functions may throw an E_WOULDBLOCK
@@ -3665,7 +3665,7 @@ NOTHROW(FCALL vm_paged_sync)(struct vm *__restrict effective_vm,
                              pageid_t page_index, size_t num_pages) {
 	if (effective_vm == THIS_VM ||
 	    effective_vm == &vm_kernel)
-		npagedir_sync(PAGEID_DECODE(page_index), num_pages * PAGESIZE);
+		pagedir_sync(PAGEID_DECODE(page_index), num_pages * PAGESIZE);
 }
 
 PUBLIC NOBLOCK void
@@ -3673,7 +3673,7 @@ NOTHROW(FCALL vm_paged_syncone)(struct vm *__restrict effective_vm,
                           pageid_t page_index) {
 	if (effective_vm == THIS_VM ||
 	    effective_vm == &vm_kernel)
-		npagedir_syncone(PAGEID_DECODE(page_index));
+		pagedir_syncone(PAGEID_DECODE(page_index));
 }
 
 PUBLIC NOBLOCK void
@@ -3707,7 +3707,7 @@ NOTHROW(FCALL vm_paged_kernel_sync)(pageid_t page_index, size_t num_pages) {
 		cpu_broadcastipi(&ipi_invtlb, args, CPU_IPI_FWAITFOR);
 	}
 #else /* !CONFIG_NO_SMP */
-	npagedir_sync(PAGEID_DECODE(page_index), num_pages * PAGESIZE);
+	pagedir_sync(PAGEID_DECODE(page_index), num_pages * PAGESIZE);
 #endif /* CONFIG_NO_SMP */
 }
 
@@ -3720,7 +3720,7 @@ NOTHROW(FCALL vm_paged_kernel_syncone)(pageid_t page_index) {
 		cpu_broadcastipi(&ipi_invtlb_one, args, CPU_IPI_FWAITFOR);
 	}
 #else /* !CONFIG_NO_SMP */
-	npagedir_syncone(PAGEID_DECODE(page_index));
+	pagedir_syncone(PAGEID_DECODE(page_index));
 #endif /* CONFIG_NO_SMP */
 }
 

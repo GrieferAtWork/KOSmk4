@@ -371,8 +371,8 @@ upgrade_and_recheck_vm_for_node:
 					/* If the node isn't prepared, make sure that we can map memory. */
 					if (!(node->vn_flags & VM_NODE_FLAG_PREPARED)) {
 						if unlikely(!(self == THIS_VM || self == &vm_kernel
-						              ? npagedir_prepare_mapone(pageaddr)
-						              : npagedir_prepare_mapone_p(PAGEDIR_P_SELFOFVM(self), pageaddr))) {
+						              ? pagedir_prepare_mapone(pageaddr)
+						              : pagedir_prepare_mapone_p(PAGEDIR_P_SELFOFVM(self), pageaddr))) {
 							sync_endwrite(self);
 							sync_endwrite(part);
 							page_freeone(new_ppage);
@@ -418,10 +418,10 @@ upgrade_and_recheck_vm_for_node:
 
 					/* Actually map the accessed page! */
 					if (self == THIS_VM || self == &vm_kernel) {
-						npagedir_mapone(pageaddr, page2addr(new_ppage), prot);
+						pagedir_mapone(pageaddr, page2addr(new_ppage), prot);
 					} else {
-						npagedir_mapone_p(PAGEDIR_P_SELFOFVM(self), pageaddr,
-						                  page2addr(new_ppage), prot);
+						pagedir_mapone_p(PAGEDIR_P_SELFOFVM(self), pageaddr,
+						                 page2addr(new_ppage), prot);
 					}
 					vm_paged_sync_endone(self, pageid);
 

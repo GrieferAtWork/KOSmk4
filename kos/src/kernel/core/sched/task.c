@@ -320,10 +320,10 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 	        "self                                 = %p\n",
 	        node, &FORTASK(self, this_trampoline_node), self);
 	addr = vm_node_getstart(node);
-	npagedir_unmapone(addr);
-	npagedir_syncone(addr);
+	pagedir_unmapone(addr);
+	pagedir_syncone(addr);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	npagedir_unprepare_mapone(addr);
+	pagedir_unprepare_mapone(addr);
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Unlink + unmap the stack node. */
@@ -335,10 +335,10 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 	        node, &FORTASK(self, this_kernel_stacknode_), self);
 	addr = vm_node_getstart(node);
 	size = vm_node_getsize(node);
-	npagedir_unmap(addr, size);
-	npagedir_sync(addr, size);
+	pagedir_unmap(addr, size);
+	pagedir_sync(addr, size);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	npagedir_unprepare_map(addr, size);
+	pagedir_unprepare_map(addr, size);
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Deallocate the kernel stack. */
@@ -455,7 +455,7 @@ again_lock_vm:
 			FORTASK(result, this_kernel_stacknode_).vn_node.a_vmin = PAGEID_ENCODE((byte_t *)stack_addr);
 			FORTASK(result, this_kernel_stacknode_).vn_node.a_vmax = PAGEID_ENCODE((byte_t *)stack_addr + CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE) - 1);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-			if unlikely(!npagedir_prepare_map(stack_addr, CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE))) {
+			if unlikely(!pagedir_prepare_map(stack_addr, CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE))) {
 				vm_kernel_treelock_endwrite();
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 			}
@@ -477,7 +477,7 @@ again_lock_vm:
 			FORTASK(result, this_trampoline_node).vn_node.a_vmin = PAGEID_ENCODE(trampoline_addr);
 			FORTASK(result, this_trampoline_node).vn_node.a_vmax = PAGEID_ENCODE(trampoline_addr);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-			if unlikely(!npagedir_prepare_mapone(trampoline_addr))
+			if unlikely(!pagedir_prepare_mapone(trampoline_addr))
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			/* Load the trampoline node into the kernel VM. */

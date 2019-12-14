@@ -338,21 +338,21 @@ again_next_slab_page_tryhard:
 			}
 			/* Now to map the new page. */
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-			if unlikely(!npagedir_prepare_mapone(next_slab_addr)) {
+			if unlikely(!pagedir_prepare_mapone(next_slab_addr)) {
 				vm_kernel_treelock_endwrite();
 				goto err_corepair_content;
 			}
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			/* Map all pre-allocated pages. */
-			npagedir_mapone(next_slab_addr,
-			                page2addr(corepair.cp_part->dp_ramdata.rd_block0.rb_start),
-			                PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+			pagedir_mapone(next_slab_addr,
+			               page2addr(corepair.cp_part->dp_ramdata.rd_block0.rb_start),
+			               PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 			if (flags & GFP_CALLOC) {
 				/* Write zeros to all random-content pages. */
 				if (!page_iszero(corepair.cp_part->dp_ramdata.rd_block0.rb_start)) {
 					memset(next_slab_addr, 0, PAGESIZE);
 #ifdef CONFIG_HAVE_PAGEDIR_CHANGED
-					npagedir_unsetchanged(next_slab_addr);
+					pagedir_unsetchanged(next_slab_addr);
 #endif /* CONFIG_HAVE_PAGEDIR_CHANGED */
 				}
 			}
@@ -363,7 +363,7 @@ again_next_slab_page_tryhard:
 				        DEBUGHEAP_NO_MANS_LAND,
 				        PAGESIZE);
 #ifdef CONFIG_HAVE_PAGEDIR_CHANGED
-				npagedir_unsetchanged(next_slab_addr);
+				pagedir_unsetchanged(next_slab_addr);
 #endif /* CONFIG_HAVE_PAGEDIR_CHANGED */
 			}
 #endif /* CONFIG_DEBUG_HEAP */

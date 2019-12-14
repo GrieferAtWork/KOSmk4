@@ -22,7 +22,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/arch/paging.h> /* `pagedir_pushval_t' */
-#include <kernel/paging.h>      /* `npagedir_push_mapone()' */
+#include <kernel/paging.h>      /* `pagedir_push_mapone()' */
 #include <kernel/types.h>
 #include <sched/pertask.h> /* PERTASK_GET() */
 
@@ -206,7 +206,7 @@ DATDEF ATTR_PERTASK pageid_t this_trampoline_page;
 DATDEF ATTR_PERTASK struct vm_node this_trampoline_node;
 
 
-/* Helper for unifying `PHYS_IS_IDENTITY()' and `npagedir_push_mapone(THIS_TRAMPOLINE)' */
+/* Helper for unifying `PHYS_IS_IDENTITY()' and `pagedir_push_mapone(THIS_TRAMPOLINE)' */
 struct vm_ptram {
 	/* VM_PhysTRAMpoline */
 	pagedir_pushval_t pt_pushval; /* The pushed value (or `PAGEDIR_PUSHVAL_INVALID' if nothing was pushed) */
@@ -221,7 +221,7 @@ struct vm_ptram {
 #define vm_ptram_fini(self)                        \
 	((self)->pt_pushval == PAGEDIR_PUSHVAL_INVALID \
 	 ? (void)0                                     \
-	 : npagedir_pop_mapone(THIS_TRAMPOLINE_BASE, (self)->pt_pushval))
+	 : pagedir_pop_mapone(THIS_TRAMPOLINE_BASE, (self)->pt_pushval))
 
 LOCAL NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) byte_t *
 NOTHROW(KCALL vm_ptram_mappage_noidentity)(struct vm_ptram *__restrict self,
@@ -229,13 +229,13 @@ NOTHROW(KCALL vm_ptram_mappage_noidentity)(struct vm_ptram *__restrict self,
 	byte_t *tramp;
 	tramp = THIS_TRAMPOLINE_BASE;
 	if (self->pt_pushval == PAGEDIR_PUSHVAL_INVALID) {
-		self->pt_pushval = npagedir_push_mapone(tramp, page2addr(page),
-		                                        writable ? PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE
-		                                                 : PAGEDIR_MAP_FREAD);
+		self->pt_pushval = pagedir_push_mapone(tramp, page2addr(page),
+		                                       writable ? PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE
+		                                                : PAGEDIR_MAP_FREAD);
 	} else {
-		npagedir_mapone(tramp, page2addr(page),
-		                writable ? PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE
-		                         : PAGEDIR_MAP_FREAD);
+		pagedir_mapone(tramp, page2addr(page),
+		               writable ? PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE
+		                        : PAGEDIR_MAP_FREAD);
 	}
 	return tramp;
 }

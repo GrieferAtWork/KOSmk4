@@ -473,10 +473,10 @@ NOTHROW(KCALL vm_do_freeram)(struct vm_ramblock *__restrict pblock0,
  * page directory at the specified location, using the specified permissions.
  * NOTE: The caller is responsible to ensure that `self' doesn't change state
  *       or size, as well as to ensure that the given address range isn't already
- *       in use. - This function is merely a thin wrapper around `npagedir_map',
+ *       in use. - This function is merely a thin wrapper around `pagedir_map',
  *       which automatically allows for dealing with multi-part ram blocks.
  * NOTE: The caller is responsible to ensure that the target region of memory
- *       has been prepared in a prior call to `npagedir_prepare_map'
+ *       has been prepared in a prior call to `pagedir_prepare_map'
  * @param: perm: Set of `PAGEDIR_MAP_F*' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_map_ram)(struct vm_datapart *__restrict self,
@@ -1296,12 +1296,12 @@ DATDEF struct vm_datablock_type vm_ramfile_type;
 #define VM_NODE_FLAG_PARTITIONED  0x0002 /* Set if the node has been split when the associated data part was split.
                                           * This flag affects how the page directory is un-prepared when the node
                                           * gets unmapped. When set, associated memory must be unmapped as:
-                                          * >> npagedir_prepare_map(vm_node_getstart(self), vm_node_getsize(self)); // NOTE: This may cause an error!
-                                          * >> npagedir_unmap(vm_node_getstart(self), vm_node_getsize(self));
-                                          * >> npagedir_unprepare_map(vm_node_getstart(self), vm_node_getsize(self));
+                                          * >> pagedir_prepare_map(vm_node_getstart(self), vm_node_getsize(self)); // NOTE: This may cause an error!
+                                          * >> pagedir_unmap(vm_node_getstart(self), vm_node_getsize(self));
+                                          * >> pagedir_unprepare_map(vm_node_getstart(self), vm_node_getsize(self));
                                           * When not set, associated memory can simply be unmapped as:
-                                          * >> npagedir_unmap(vm_node_getstart(self), vm_node_getsize(self));
-                                          * >> npagedir_unprepare_map(vm_node_getstart(self), vm_node_getsize(self)); */
+                                          * >> pagedir_unmap(vm_node_getstart(self), vm_node_getsize(self));
+                                          * >> pagedir_unprepare_map(vm_node_getstart(self), vm_node_getsize(self)); */
 #define VM_NODE_FLAG_GROWSUP      0x0004 /* When guarding, the node grows up rather than down. */
 #define VM_NODE_FLAG_HINTED       0x1000 /* [const] Uninitialized pages apart of this node hint towards it.
                                           * This flag is set for memory mapping that can be initialized atomically.
@@ -2204,11 +2204,11 @@ vm_syncone_locked(struct vm *__restrict self, UNCHECKED void *addr) THROWS(E_WOU
 }
 
 /* Begin/end syncing page directory mappings:
- * >> npagedir_prepare_map_p(my_vm, start, count);                       // Prepare      (make sure that `npagedir_unmap_p()' will succeed)
- * >> vm_sync_begin(my_vm);                                              // Lock         (make sure we'll be able to sync)
- * >> npagedir_unmap_p(PAGEDIR_P_SELFOFVM(my_vm), start, count);         // Unmap        (Actually delete page mappings)
- * >> vm_paged_sync_end(my_vm, start, count);                            // Unlock+sync  (Make sure that all CPUs got the message about pages having gone away)
- * >> npagedir_unprepare_map_p(PAGEDIR_P_SELFOFVM(my_vm), start, count); // Free         (Clean up memory used to describe the mapping)
+ * >> pagedir_prepare_map_p(my_vm, start, count);                       // Prepare      (make sure that `pagedir_unmap_p()' will succeed)
+ * >> vm_sync_begin(my_vm);                                             // Lock         (make sure we'll be able to sync)
+ * >> pagedir_unmap_p(PAGEDIR_P_SELFOFVM(my_vm), start, count);         // Unmap        (Actually delete page mappings)
+ * >> vm_paged_sync_end(my_vm, start, count);                           // Unlock+sync  (Make sure that all CPUs got the message about pages having gone away)
+ * >> pagedir_unprepare_map_p(PAGEDIR_P_SELFOFVM(my_vm), start, count); // Free         (Clean up memory used to describe the mapping)
  * This order to calls is required to prevent problems at a
  * point in time when those problems could no longer be handled,
  * since the regular vm_paged_sync() functions may throw an E_WOULDBLOCK

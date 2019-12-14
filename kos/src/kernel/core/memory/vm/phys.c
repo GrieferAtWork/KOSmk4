@@ -78,16 +78,16 @@ vm_copyfromphys(USER CHECKED void *dst,
 		if (page_bytes > num_bytes)
 			page_bytes = num_bytes;
 		if (is_first) {
-			backup = npagedir_push_mapone(tramp,
-			                              src & ~PAGEMASK,
-			                              PAGEDIR_MAP_FREAD);
+			backup = pagedir_push_mapone(tramp,
+			                             src & ~PAGEMASK,
+			                             PAGEDIR_MAP_FREAD);
 			is_first = true;
 		} else {
-			npagedir_mapone(tramp,
-			                src & PAGEMASK,
-			                PAGEDIR_MAP_FREAD);
+			pagedir_mapone(tramp,
+			               src & PAGEMASK,
+			               PAGEDIR_MAP_FREAD);
 		}
-		npagedir_syncone(tramp);
+		pagedir_syncone(tramp);
 		TRY {
 			/* Copy memory. */
 			memcpy(dst,
@@ -96,7 +96,7 @@ vm_copyfromphys(USER CHECKED void *dst,
 		} EXCEPT {
 			/* Try-catch is required, because `dst' may be a user-buffer,
 			 * in which case access may cause an exception to be thrown. */
-			npagedir_pop_mapone(tramp, backup);
+			pagedir_pop_mapone(tramp, backup);
 			RETHROW();
 		}
 		if (page_bytes >= num_bytes)
@@ -105,7 +105,7 @@ vm_copyfromphys(USER CHECKED void *dst,
 		src += page_bytes;
 		dst = (byte_t *)dst + page_bytes;
 	}
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 }
 
 PUBLIC void KCALL
@@ -132,16 +132,16 @@ vm_copytophys(PHYS vm_phys_t dst,
 		if (page_bytes > num_bytes)
 			page_bytes = num_bytes;
 		if (is_first) {
-			backup = npagedir_push_mapone(tramp,
-			                              dst & ~PAGEMASK,
-			                              PAGEDIR_MAP_FWRITE);
+			backup = pagedir_push_mapone(tramp,
+			                             dst & ~PAGEMASK,
+			                             PAGEDIR_MAP_FWRITE);
 			is_first = false;
 		} else {
-			npagedir_mapone(tramp,
-			                dst & ~PAGEMASK,
-			                PAGEDIR_MAP_FWRITE);
+			pagedir_mapone(tramp,
+			               dst & ~PAGEMASK,
+			               PAGEDIR_MAP_FWRITE);
 		}
-		npagedir_syncone(tramp);
+		pagedir_syncone(tramp);
 		TRY {
 			/* Copy memory. */
 			memcpy(tramp + ((ptrdiff_t)dst & PAGEMASK),
@@ -150,7 +150,7 @@ vm_copytophys(PHYS vm_phys_t dst,
 		} EXCEPT {
 			/* Try-catch is required, because `src' may be a user-buffer,
 			 * in which case access may cause an exception to be thrown. */
-			npagedir_pop_mapone(tramp, backup);
+			pagedir_pop_mapone(tramp, backup);
 			RETHROW();
 		}
 		if (page_bytes >= num_bytes)
@@ -159,7 +159,7 @@ vm_copytophys(PHYS vm_phys_t dst,
 		dst += page_bytes;
 		src = (void *)((byte_t *)src + page_bytes);
 	}
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 }
 
 /* no-#PF variants of `vm_copy(from|to)phys()'.
@@ -189,16 +189,16 @@ NOTHROW(KCALL vm_copyfromphys_nopf)(USER CHECKED void *dst,
 		if (page_bytes > num_bytes)
 			page_bytes = num_bytes;
 		if (is_first) {
-			backup = npagedir_push_mapone(tramp,
-			                              src & ~PAGEMASK,
-			                              PAGEDIR_MAP_FREAD);
+			backup = pagedir_push_mapone(tramp,
+			                             src & ~PAGEMASK,
+			                             PAGEDIR_MAP_FREAD);
 			is_first = false;
 		} else {
-			npagedir_mapone(tramp,
-			                src & ~PAGEMASK,
-			                PAGEDIR_MAP_FREAD);
+			pagedir_mapone(tramp,
+			               src & ~PAGEMASK,
+			               PAGEDIR_MAP_FREAD);
 		}
-		npagedir_syncone(tramp);
+		pagedir_syncone(tramp);
 		/* Copy memory. */
 		copy_error = memcpy_nopf(dst,
 		                         tramp + ((ptrdiff_t)src & PAGEMASK),
@@ -215,7 +215,7 @@ NOTHROW(KCALL vm_copyfromphys_nopf)(USER CHECKED void *dst,
 		src += page_bytes;
 		dst = (byte_t *)dst + page_bytes;
 	}
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 done:
 	return result;
 }
@@ -242,16 +242,16 @@ NOTHROW(KCALL vm_copytophys_nopf)(PHYS vm_phys_t dst,
 		if (page_bytes > num_bytes)
 			page_bytes = num_bytes;
 		if (is_first) {
-			backup = npagedir_push_mapone(tramp,
-			                              dst & ~PAGEMASK,
-			                              PAGEDIR_MAP_FWRITE);
+			backup = pagedir_push_mapone(tramp,
+			                             dst & ~PAGEMASK,
+			                             PAGEDIR_MAP_FWRITE);
 			is_first = false;
 		} else {
-			npagedir_mapone(tramp,
-			                dst & ~PAGEMASK,
-			                PAGEDIR_MAP_FWRITE);
+			pagedir_mapone(tramp,
+			               dst & ~PAGEMASK,
+			               PAGEDIR_MAP_FWRITE);
 		}
-		npagedir_syncone(tramp);
+		pagedir_syncone(tramp);
 		/* Copy memory. */
 		copy_error = memcpy_nopf(tramp + ((ptrdiff_t)dst & PAGEMASK),
 		                         src,
@@ -268,7 +268,7 @@ NOTHROW(KCALL vm_copytophys_nopf)(PHYS vm_phys_t dst,
 		dst += page_bytes;
 		src = (void *)((byte_t *)src + page_bytes);
 	}
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 done:
 	return result;
 }
@@ -357,16 +357,16 @@ NOTHROW(KCALL vm_memsetphys)(PHYS vm_phys_t dst, int byte, size_t num_bytes) {
 		if (page_bytes > num_bytes)
 			page_bytes = num_bytes;
 		if (is_first) {
-			backup = npagedir_push_mapone(tramp,
-			                              dst & ~PAGEMASK,
-			                              PAGEDIR_MAP_FWRITE);
+			backup = pagedir_push_mapone(tramp,
+			                             dst & ~PAGEMASK,
+			                             PAGEDIR_MAP_FWRITE);
 			is_first = false;
 		} else {
-			npagedir_mapone(tramp,
-			                dst & ~PAGEMASK,
-			                PAGEDIR_MAP_FWRITE);
+			pagedir_mapone(tramp,
+			               dst & ~PAGEMASK,
+			               PAGEDIR_MAP_FWRITE);
 		}
-		npagedir_syncone(tramp);
+		pagedir_syncone(tramp);
 		/* Fill memory. */
 		memset(tramp + ((ptrdiff_t)dst & PAGEMASK),
 		       byte,
@@ -376,7 +376,7 @@ NOTHROW(KCALL vm_memsetphys)(PHYS vm_phys_t dst, int byte, size_t num_bytes) {
 		num_bytes -= page_bytes;
 		dst += page_bytes;
 	}
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 }
 
 
@@ -406,10 +406,10 @@ vm_copyfromphys_onepage(USER CHECKED void *dst,
 	}
 #endif /* !NO_PHYS_IDENTITY */
 	tramp = THIS_TRAMPOLINE_BASE;
-	backup = npagedir_push_mapone(tramp,
-	                              src & ~PAGEMASK,
-	                              PAGEDIR_MAP_FREAD);
-	npagedir_syncone(tramp);
+	backup = pagedir_push_mapone(tramp,
+	                             src & ~PAGEMASK,
+	                             PAGEDIR_MAP_FREAD);
+	pagedir_syncone(tramp);
 	TRY {
 		/* Copy memory. */
 		memcpy(dst,
@@ -418,10 +418,10 @@ vm_copyfromphys_onepage(USER CHECKED void *dst,
 	} EXCEPT {
 		/* Try-catch is required, because `dst' may be a user-buffer,
 		 * in which case access may cause an exception to be thrown. */
-		npagedir_pop_mapone(tramp, backup);
+		pagedir_pop_mapone(tramp, backup);
 		RETHROW();
 	}
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 }
 
 PUBLIC void KCALL
@@ -439,10 +439,10 @@ vm_copytophys_onepage(PHYS vm_phys_t dst,
 	}
 #endif /* !NO_PHYS_IDENTITY */
 	tramp = THIS_TRAMPOLINE_BASE;
-	backup = npagedir_push_mapone(tramp,
-	                              dst & ~PAGEMASK,
-	                              PAGEDIR_MAP_FWRITE);
-	npagedir_syncone(tramp);
+	backup = pagedir_push_mapone(tramp,
+	                             dst & ~PAGEMASK,
+	                             PAGEDIR_MAP_FWRITE);
+	pagedir_syncone(tramp);
 	TRY {
 		/* Copy memory. */
 		memcpy(tramp + ((ptrdiff_t)dst & PAGEMASK),
@@ -451,10 +451,10 @@ vm_copytophys_onepage(PHYS vm_phys_t dst,
 	} EXCEPT {
 		/* Try-catch is required, because `dst' may be a user-buffer,
 		 * in which case access may cause an exception to be thrown. */
-		npagedir_pop_mapone(tramp, backup);
+		pagedir_pop_mapone(tramp, backup);
 		RETHROW();
 	}
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 }
 
 PUBLIC NOBLOCK void
@@ -533,14 +533,14 @@ NOTHROW(KCALL vm_memsetphys_onepage)(PHYS vm_phys_t dst,
 	}
 #endif /* !NO_PHYS_IDENTITY */
 	tramp  = THIS_TRAMPOLINE_BASE;
-	backup = npagedir_push_mapone(tramp,
-	                              dst & ~PAGEMASK,
-	                              PAGEDIR_MAP_FWRITE);
-	npagedir_syncone(tramp);
+	backup = pagedir_push_mapone(tramp,
+	                             dst & ~PAGEMASK,
+	                             PAGEDIR_MAP_FWRITE);
+	pagedir_syncone(tramp);
 	/* Fill memory. */
 	memset(tramp + ((ptrdiff_t)dst & PAGEMASK),
 	       byte, num_bytes);
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 }
 
 PUBLIC NOBLOCK WUNUSED size_t
@@ -556,15 +556,15 @@ NOTHROW(KCALL vm_copyfromphys_onepage_nopf)(USER CHECKED void *dst,
 		return memcpy_nopf(dst, PHYS_TO_IDENTITY(src), num_bytes);
 #endif /* !NO_PHYS_IDENTITY */
 	tramp  = THIS_TRAMPOLINE_BASE;
-	backup = npagedir_push_mapone(tramp,
-	                              src & ~PAGEMASK,
-	                              PAGEDIR_MAP_FREAD);
-	npagedir_syncone(tramp);
+	backup = pagedir_push_mapone(tramp,
+	                             src & ~PAGEMASK,
+	                             PAGEDIR_MAP_FREAD);
+	pagedir_syncone(tramp);
 	/* Copy memory. */
 	result = memcpy_nopf(dst,
 	                     tramp + ((ptrdiff_t)src & PAGEMASK),
 	                     num_bytes);
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 	return result;
 }
 
@@ -581,15 +581,15 @@ NOTHROW(KCALL vm_copytophys_onepage_nopf)(PHYS vm_phys_t dst,
 		return memcpy_nopf(PHYS_TO_IDENTITY(dst), src, num_bytes);
 #endif /* !NO_PHYS_IDENTITY */
 	tramp  = THIS_TRAMPOLINE_BASE;
-	backup = npagedir_push_mapone(tramp,
-	                              dst & ~PAGEMASK,
-	                              PAGEDIR_MAP_FWRITE);
-	npagedir_syncone(tramp);
+	backup = pagedir_push_mapone(tramp,
+	                             dst & ~PAGEMASK,
+	                             PAGEDIR_MAP_FWRITE);
+	pagedir_syncone(tramp);
 	/* Copy memory. */
 	result = memcpy_nopf(tramp + ((ptrdiff_t)dst & PAGEMASK),
 	                     src,
 	                     num_bytes);
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 	return result;
 }
 
@@ -609,20 +609,20 @@ vm_copypagefromphys(USER CHECKED void *dst,
 	}
 #endif /* !NO_PHYS_IDENTITY */
 	tramp  = THIS_TRAMPOLINE_BASE;
-	backup = npagedir_push_mapone(tramp,
-	                              src,
-	                              PAGEDIR_MAP_FREAD);
-	npagedir_syncone(tramp);
+	backup = pagedir_push_mapone(tramp,
+	                             src,
+	                             PAGEDIR_MAP_FREAD);
+	pagedir_syncone(tramp);
 	TRY {
 		/* Copy memory. */
 		memcpy(dst, tramp, PAGESIZE);
 	} EXCEPT {
 		/* Try-catch is required, because `dst' may be a user-buffer,
 		 * in which case access may cause an exception to be thrown. */
-		npagedir_pop_mapone(tramp, backup);
+		pagedir_pop_mapone(tramp, backup);
 		RETHROW();
 	}
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 }
 
 PUBLIC void KCALL
@@ -639,20 +639,20 @@ vm_copypagetophys(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst,
 	}
 #endif /* !NO_PHYS_IDENTITY */
 	tramp  = THIS_TRAMPOLINE_BASE;
-	backup = npagedir_push_mapone(tramp,
-	                              dst,
-	                              PAGEDIR_MAP_FWRITE);
-	npagedir_syncone(tramp);
+	backup = pagedir_push_mapone(tramp,
+	                             dst,
+	                             PAGEDIR_MAP_FWRITE);
+	pagedir_syncone(tramp);
 	TRY {
 		/* Copy memory. */
 		memcpy(tramp, src, PAGESIZE);
 	} EXCEPT {
 		/* Try-catch is required, because `dst' may be a user-buffer,
 		 * in which case access may cause an exception to be thrown. */
-		npagedir_pop_mapone(tramp, backup);
+		pagedir_pop_mapone(tramp, backup);
 		RETHROW();
 	}
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 }
 
 PUBLIC NOBLOCK void
@@ -752,13 +752,13 @@ NOTHROW(KCALL vm_memsetphyspage)(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst,
 	}
 #endif /* !NO_PHYS_IDENTITY */
 	tramp  = THIS_TRAMPOLINE_BASE;
-	backup = npagedir_push_mapone(tramp,
-	                              dst,
-	                              PAGEDIR_MAP_FWRITE);
-	npagedir_syncone(tramp);
+	backup = pagedir_push_mapone(tramp,
+	                             dst,
+	                             PAGEDIR_MAP_FWRITE);
+	pagedir_syncone(tramp);
 	/* Fill memory. */
 	memset(tramp, byte, PAGESIZE);
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 }
 
 PUBLIC NOBLOCK void
@@ -778,20 +778,20 @@ NOTHROW(KCALL vm_memsetphyspages)(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst,
 	}
 #endif /* !NO_PHYS_IDENTITY */
 	tramp  = THIS_TRAMPOLINE_BASE;
-	backup = npagedir_push_mapone(tramp,
-	                              dst,
-	                              PAGEDIR_MAP_FWRITE);
-	npagedir_syncone(tramp);
+	backup = pagedir_push_mapone(tramp,
+	                             dst,
+	                             PAGEDIR_MAP_FWRITE);
+	pagedir_syncone(tramp);
 	/* Fill memory. */
 	memset(tramp, byte, PAGESIZE);
 	while (num_pages >= 2) {
 		dst += PAGESIZE;
-		npagedir_mapone(tramp, dst, PAGEDIR_MAP_FWRITE);
-		npagedir_syncone(tramp);
+		pagedir_mapone(tramp, dst, PAGEDIR_MAP_FWRITE);
+		pagedir_syncone(tramp);
 		memset(tramp, byte, PAGESIZE);
 		--num_pages;
 	}
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 }
 
 PUBLIC NOBLOCK WUNUSED size_t
@@ -806,13 +806,13 @@ NOTHROW(KCALL vm_copypagefromphys_nopf)(USER CHECKED void *dst,
 		return memcpy_nopf(dst, PHYS_TO_IDENTITY(src), PAGESIZE);
 #endif /* !NO_PHYS_IDENTITY */
 	tramp  = THIS_TRAMPOLINE_BASE;
-	backup = npagedir_push_mapone(tramp,
-	                              src,
-	                              PAGEDIR_MAP_FREAD);
-	npagedir_syncone(tramp);
+	backup = pagedir_push_mapone(tramp,
+	                             src,
+	                             PAGEDIR_MAP_FREAD);
+	pagedir_syncone(tramp);
 	/* Copy memory. */
 	result = memcpy_nopf(dst, tramp, PAGESIZE);
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 	return result;
 }
 
@@ -828,13 +828,13 @@ NOTHROW(KCALL vm_copypagetophys_nopf)(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst,
 		return memcpy_nopf(PHYS_TO_IDENTITY(dst), src, PAGESIZE);
 #endif /* !NO_PHYS_IDENTITY */
 	tramp  = THIS_TRAMPOLINE_BASE;
-	backup = npagedir_push_mapone(tramp,
-	                              dst,
-	                              PAGEDIR_MAP_FWRITE);
-	npagedir_syncone(tramp);
+	backup = pagedir_push_mapone(tramp,
+	                             dst,
+	                             PAGEDIR_MAP_FWRITE);
+	pagedir_syncone(tramp);
 	/* Copy memory. */
 	result = memcpy_nopf(tramp, src, PAGESIZE);
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 	return result;
 }
 

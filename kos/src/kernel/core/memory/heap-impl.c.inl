@@ -428,13 +428,13 @@ again_tryhard_mapping_target:
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			/* Prepare to map all of the new blocks. */
 			for (i = 0; i < blockc; ++i) {
-				if unlikely(!npagedir_prepare_map(mapping_target + mapping_offset,
-				                                  blocks[i].rb_size * PAGESIZE)) {
+				if unlikely(!pagedir_prepare_map(mapping_target + mapping_offset,
+				                                 blocks[i].rb_size * PAGESIZE)) {
 					/* Failed to map a part of the resulting data block. */
 					while (i--) {
 						mapping_offset -= blocks[i].rb_size * PAGESIZE;
-						npagedir_unprepare_map(mapping_target + mapping_offset,
-						                       blocks[i].rb_size * PAGESIZE);
+						pagedir_unprepare_map(mapping_target + mapping_offset,
+						                      blocks[i].rb_size * PAGESIZE);
 					}
 					IFELSE_NX(goto err_corepair_content,
 					          THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE));
@@ -447,10 +447,10 @@ again_tryhard_mapping_target:
 			if (flags & GFP_PREFLT) {
 				/* Map all pre-allocated pages. */
 				for (i = 0; i < blockc; ++i) {
-					npagedir_map((byte_t *)mapping_target + mapping_offset,
-					             blocks[i].rb_size * PAGESIZE,
-					             page2addr(blocks[i].rb_start),
-					             PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+					pagedir_map((byte_t *)mapping_target + mapping_offset,
+					            blocks[i].rb_size * PAGESIZE,
+					            page2addr(blocks[i].rb_start),
+					            PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 					if (flags & GFP_CALLOC) {
 						/* Write zeros to all random-content pages. */
 						pagecnt_t j;
@@ -461,7 +461,7 @@ again_tryhard_mapping_target:
 								pageaddr = (byte_t *)mapping_target + mapping_offset + j * PAGESIZE;
 								memset(pageaddr, 0, PAGESIZE);
 #ifdef CONFIG_HAVE_PAGEDIR_CHANGED
-								npagedir_unsetchanged(pageaddr);
+								pagedir_unsetchanged(pageaddr);
 #endif /* CONFIG_HAVE_PAGEDIR_CHANGED */
 							}
 						}
@@ -477,7 +477,7 @@ again_tryhard_mapping_target:
 							        DEBUGHEAP_FRESH_MEMORY,
 							        PAGESIZE);
 #ifdef CONFIG_HAVE_PAGEDIR_CHANGED
-							npagedir_unsetchanged(pageaddr);
+							pagedir_unsetchanged(pageaddr);
 #endif /* CONFIG_HAVE_PAGEDIR_CHANGED */
 						}
 					}
@@ -490,9 +490,9 @@ again_tryhard_mapping_target:
 				corepair.cp_node->vn_flags |= VM_NODE_FLAG_HINTED;
 				/* Set paging hints to allow for atomic initialization. */
 				for (i = 0; i < blockc; ++i) {
-					npagedir_maphint((byte_t *)mapping_target + mapping_offset,
-					                 blocks[i].rb_size * PAGESIZE,
-					                 corepair.cp_node);
+					pagedir_maphint((byte_t *)mapping_target + mapping_offset,
+					                blocks[i].rb_size * PAGESIZE,
+					                corepair.cp_node);
 				}
 			}
 		}

@@ -83,14 +83,14 @@ NOTHROW(KCALL vm_outsw_phys)(port_t port, vm_phys_t buf, size_t count)
 		if (page_words > count)
 			page_words = count;
 		if (is_first) {
-			backup = npagedir_push_mapone(tramp, buf & ~PAGEMASK,
-			                              PAGEDIR_MAPPING_FLAGS);
+			backup = pagedir_push_mapone(tramp, buf & ~PAGEMASK,
+			                             PAGEDIR_MAPPING_FLAGS);
 			is_first = false;
 		} else {
-			npagedir_mapone(tramp, buf & ~PAGEMASK,
-			                PAGEDIR_MAPPING_FLAGS);
+			pagedir_mapone(tramp, buf & ~PAGEMASK,
+			               PAGEDIR_MAPPING_FLAGS);
 		}
-		npagedir_syncone(tramp);
+		pagedir_syncone(tramp);
 		/* Transfer to/from memory. */
 		assert(tramp != 0);
 #ifdef DEFINE_IO_READ
@@ -110,7 +110,7 @@ NOTHROW(KCALL vm_outsw_phys)(port_t port, vm_phys_t buf, size_t count)
 		count -= page_words;
 		buf += page_words * 2;
 	}
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 #undef PAGEDIR_MAPPING_FLAGS
 }
 #endif /* !(INSW|OUTSW)_PHYS_DEFINED */

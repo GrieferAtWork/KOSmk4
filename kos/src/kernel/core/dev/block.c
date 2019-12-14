@@ -1251,14 +1251,14 @@ _block_device_read_phys(struct block_device *__restrict self,
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;
 			if (is_first) {
-				backup = npagedir_push_mapone(tramp, dst & ~PAGEMASK,
-				                              PAGEDIR_MAP_FWRITE);
+				backup = pagedir_push_mapone(tramp, dst & ~PAGEMASK,
+				                             PAGEDIR_MAP_FWRITE);
 				is_first = false;
 			} else {
-				npagedir_mapone(tramp, dst & ~PAGEMASK,
-				                PAGEDIR_MAP_FWRITE);
+				pagedir_mapone(tramp, dst & ~PAGEMASK,
+				               PAGEDIR_MAP_FWRITE);
 			}
-			npagedir_syncone(tramp);
+			pagedir_syncone(tramp);
 			/* Copy memory. */
 			block_device_read(self,
 			                  tramp + ((ptrdiff_t)dst & PAGEMASK),
@@ -1270,10 +1270,10 @@ _block_device_read_phys(struct block_device *__restrict self,
 			device_position += (pos_t)page_bytes;
 		}
 	} EXCEPT {
-		npagedir_pop_mapone(tramp, backup);
+		pagedir_pop_mapone(tramp, backup);
 		RETHROW();
 	}
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 }
 
 PUBLIC NONNULL((1)) void KCALL
@@ -1295,14 +1295,14 @@ _block_device_write_phys(struct block_device *__restrict self,
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;
 			if (is_first) {
-				backup = npagedir_push_mapone(tramp, src & ~PAGEMASK,
-                                              PAGEDIR_MAP_FWRITE);
+				backup = pagedir_push_mapone(tramp, src & ~PAGEMASK,
+				                             PAGEDIR_MAP_FWRITE);
 				is_first = false;
 			} else {
-				npagedir_mapone(tramp, src & ~PAGEMASK,
-				                PAGEDIR_MAP_FWRITE);
+				pagedir_mapone(tramp, src & ~PAGEMASK,
+				               PAGEDIR_MAP_FWRITE);
 			}
-			npagedir_syncone(tramp);
+			pagedir_syncone(tramp);
 			/* Copy memory. */
 			block_device_write(self,
 			                   tramp + ((ptrdiff_t)src & PAGEMASK),
@@ -1314,10 +1314,10 @@ _block_device_write_phys(struct block_device *__restrict self,
 			device_position += (pos_t)page_bytes;
 		}
 	} EXCEPT {
-		npagedir_pop_mapone(tramp, backup);
+		pagedir_pop_mapone(tramp, backup);
 		RETHROW();
 	}
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 }
 
 

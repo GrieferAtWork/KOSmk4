@@ -293,28 +293,28 @@ KCALL vm_datablock_vio_write
 			page_bytes = num_bytes;
 #ifdef DEFINE_IO_READ
 		if (is_first) {
-			backup = npagedir_push_mapone(tramp,
-			                              buf & ~PAGEMASK,
-			                              PAGEDIR_MAP_FWRITE);
+			backup = pagedir_push_mapone(tramp,
+			                             buf & ~PAGEMASK,
+			                             PAGEDIR_MAP_FWRITE);
 			is_first = false;
 		} else {
-			npagedir_mapone(tramp,
-			                buf & ~PAGEMASK,
-			                PAGEDIR_MAP_FWRITE);
+			pagedir_mapone(tramp,
+			               buf & ~PAGEMASK,
+			               PAGEDIR_MAP_FWRITE);
 		}
 #else /* DEFINE_IO_READ */
 		if (is_first) {
-			backup = npagedir_push_mapone(tramp,
-			                              buf & ~PAGEMASK,
-			                              PAGEDIR_MAP_FREAD);
+			backup = pagedir_push_mapone(tramp,
+			                             buf & ~PAGEMASK,
+			                             PAGEDIR_MAP_FREAD);
 			is_first = false;
 		} else {
-			npagedir_mapone(tramp,
-			                buf & ~PAGEMASK,
-			                PAGEDIR_MAP_FREAD);
+			pagedir_mapone(tramp,
+			               buf & ~PAGEMASK,
+			               PAGEDIR_MAP_FREAD);
 		}
 #endif /* !DEFINE_IO_READ */
-		npagedir_syncone(tramp);
+		pagedir_syncone(tramp);
 		/* Perform VIO memory access. */
 		TRY {
 #ifdef DEFINE_IO_READ
@@ -329,7 +329,7 @@ KCALL vm_datablock_vio_write
 		} EXCEPT {
 			/* Try-catch is required, because `dst' may be a user-buffer,
 			 * in which case access may cause an exception to be thrown. */
-			npagedir_pop_mapone(tramp, backup);
+			pagedir_pop_mapone(tramp, backup);
 			RETHROW();
 		}
 		if (page_bytes >= num_bytes)
@@ -338,7 +338,7 @@ KCALL vm_datablock_vio_write
 		src_offset += page_bytes;
 		buf += page_bytes;
 	}
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 #else
 	struct vio_args args;
 	args.va_type            = self->db_vio;

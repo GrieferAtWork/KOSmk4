@@ -159,20 +159,20 @@ NOTHROW(KCALL debug_pat_loadpart)(struct vm_datablock *__restrict UNUSED(self),
 	HEAP_ASSERT((buffer & PAGEMASK) == 0);
 	HEAP_ASSERT(num_data_pages != 0);
 	tramp  = THIS_TRAMPOLINE_BASE;
-	backup = npagedir_push_mapone(tramp, buffer,
-	                              PAGEDIR_MAP_FREAD |
-	                              PAGEDIR_MAP_FWRITE);
+	backup = pagedir_push_mapone(tramp, buffer,
+	                             PAGEDIR_MAP_FREAD |
+	                             PAGEDIR_MAP_FWRITE);
 	for (;;) {
-		npagedir_syncone(tramp);
+		pagedir_syncone(tramp);
 		memsetl(tramp, DEBUGHEAP_FRESH_MEMORY, PAGESIZE / 4);
 		if (!--num_data_pages)
 			break;
 		buffer += PAGESIZE;
-		npagedir_mapone(tramp, buffer,
-		                PAGEDIR_MAP_FREAD |
-		                PAGEDIR_MAP_FWRITE);
+		pagedir_mapone(tramp, buffer,
+		               PAGEDIR_MAP_FREAD |
+		               PAGEDIR_MAP_FWRITE);
 	}
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 }
 
 PUBLIC struct vm_datablock_type vm_datablock_debugheap_type = {
@@ -239,12 +239,12 @@ NOTHROW(KCALL find_modified_address)(byte_t *start, u32 pattern, size_t num_byte
 #if 0
 #elif defined(CONFIG_HAVE_PAGEDIR_CHANGED)
 				/* If supported by the host, speed this up using page directory dirty bits. */
-				if (npagedir_haschanged(start)) {
-					npagedir_unsetchanged(start);
+				if (pagedir_haschanged(start)) {
+					pagedir_unsetchanged(start);
 					break;
 				}
 #else
-				if (npagedir_ismapped(start))
+				if (pagedir_ismapped(start))
 					break;
 #endif
 				if (num_bytes <= PAGESIZE)
@@ -396,7 +396,7 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 			if unlikely_untraced(faulting_address) {
 				u8 *fault_start = (u8 *)faulting_address - 32;
 				PREEMPTION_DISABLE();
-				if __untraced(!npagedir_ismapped(fault_start))
+				if __untraced(!pagedir_ismapped(fault_start))
 					fault_start = (u8 *)FLOOR_ALIGN((uintptr_t)faulting_address, PAGESIZE);
 				if __untraced(fault_start < (u8 *)iter->mf_data)
 					fault_start = (u8 *)iter->mf_data;
@@ -454,7 +454,7 @@ NOTHROW(KCALL reset_heap_data)(byte_t *ptr, u32 pattern, size_t num_bytes) {
 		/* Only reset pages that have been allocated.
 		 * This optimization goes hand-in-hand with `heap_validate_all()'
 		 * not checking pages that haven't been allocated. */
-		if (npagedir_ismapped(ptr))
+		if (pagedir_ismapped(ptr))
 			memsetl(ptr, pattern, PAGESIZE / 4);
 		num_bytes -= PAGESIZE;
 		ptr += PAGESIZE;

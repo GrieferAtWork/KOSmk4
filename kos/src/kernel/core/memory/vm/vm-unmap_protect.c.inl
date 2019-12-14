@@ -153,10 +153,10 @@ do_throw_first_unmapped:
 				    (node->vn_flags & (VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_PARTITIONED)) !=
 				    VM_NODE_FLAG_PREPARED) {
 					if unlikely(!((effective_vm == myvm || vm_node_iskernelspace(node))
-					              ? npagedir_prepare_map(vm_node_getstart(node), vm_node_getsize(node))
-					              : npagedir_prepare_map_p(PAGEDIR_P_SELFOFVM(effective_vm),
-					                                       vm_node_getstart(node),
-					                                       vm_node_getsize(node)))) {
+					              ? pagedir_prepare_map(vm_node_getstart(node), vm_node_getsize(node))
+					              : pagedir_prepare_map_p(PAGEDIR_P_SELFOFVM(effective_vm),
+					                                      vm_node_getstart(node),
+					                                      vm_node_getsize(node)))) {
 						sync_endwrite(effective_vm);
 						THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
 					}
@@ -468,12 +468,12 @@ do_update_page_directory:
 #endif /* VM_DEFINE_PROTECT */
 
 					if (effective_vm == myvm || vm_node_iskernelspace(node)) {
-						npagedir_unmap(vm_node_getstart(node),
-						               vm_node_getsize(node));
+						pagedir_unmap(vm_node_getstart(node),
+						              vm_node_getsize(node));
 					} else {
-						npagedir_unmap_p(PAGEDIR_P_SELFOFVM(effective_vm),
-						                 vm_node_getstart(node),
-						                 vm_node_getsize(node));
+						pagedir_unmap_p(PAGEDIR_P_SELFOFVM(effective_vm),
+						                vm_node_getstart(node),
+						                vm_node_getsize(node));
 					}
 					must_sync = true;
 #ifdef VM_DEFINE_UNMAP

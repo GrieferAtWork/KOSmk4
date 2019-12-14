@@ -152,9 +152,9 @@ again:
 		/* Initialize the inner vector.
 		 * We can safely make use of our trampoline, since kernel-space is always prepared. */
 		e1_p   = (union p32_pdir_e1 *)THIS_TRAMPOLINE_BASE;
-		backup = p32_npagedir_push_mapone(e1_p, (vm_phys_t)((u32)new_e1_vector * 4096),
-		                                  PAGEDIR_MAP_FWRITE);
-		npagedir_syncone(e1_p);
+		backup = p32_pagedir_push_mapone(e1_p, (vm_phys_t)((u32)new_e1_vector * 4096),
+		                                 PAGEDIR_MAP_FWRITE);
+		pagedir_syncone(e1_p);
 		COMPILER_WRITE_BARRIER();
 		/* If the 4MiB entry was marked as prepared, always mark every entry
 		 * within the E1-vector as prepared. */
@@ -168,7 +168,7 @@ again:
 			        1024 - (vec1_prepare_start + vec1_prepare_size));
 		}
 		COMPILER_WRITE_BARRIER();
-		p32_npagedir_pop_mapone(e1_p, backup);
+		p32_pagedir_pop_mapone(e1_p, backup);
 		/* Map the new vector. */
 		new_e2_word = VM_PAGE2ADDR((u32)new_e1_vector) |
 		              P32_PAGE_FPRESENT | P32_PAGE_FWRITE | P32_PAGE_FACCESSED;
@@ -199,9 +199,9 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 		if (e2.p_word & P32_PAGE_FPAT_4MIB)
 			e1.p_word |= P32_PAGE_FPAT_4KIB;
 		e1_p   = (union p32_pdir_e1 *)THIS_TRAMPOLINE_BASE;
-		backup = p32_npagedir_push_mapone(e1_p, (vm_phys_t)((u32)new_e1_vector * 4096),
-		                                  PAGEDIR_MAP_FWRITE);
-		npagedir_syncone(e1_p);
+		backup = p32_pagedir_push_mapone(e1_p, (vm_phys_t)((u32)new_e1_vector * 4096),
+		                                 PAGEDIR_MAP_FWRITE);
+		pagedir_syncone(e1_p);
 		if (vec1_prepare_size == 1024) {
 			assert(vec1_prepare_start == 0);
 			e1.p_word |= P32_PAGE_FPREPARED;
@@ -219,7 +219,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 			     vec1 < vec1_prepare_start + vec1_prepare_size; ++vec1)
 				e1_p[vec1].p_word |= P32_PAGE_FPREPARED;
 		}
-		p32_npagedir_pop_mapone(e1_p, backup);
+		p32_pagedir_pop_mapone(e1_p, backup);
 		COMPILER_WRITE_BARRIER();
 		new_e2_word  = VM_PAGE2ADDR((u32)new_e1_vector);
 		new_e2_word |= P32_PAGE_FPRESENT | P32_PAGE_FWRITE;
@@ -418,7 +418,7 @@ again_try_exchange_e2_word:
  * @return: true:  Successfully allocated structures required for creating mappings.
  * @return: false: Insufficient physical memory to change mappings. */
 INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p32_npagedir_prepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
+NOTHROW(FCALL p32_pagedir_prepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec2, vec1;
 	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
 	if unlikely((byte_t *)addr >= (byte_t *)KERNEL_BASE)
@@ -429,7 +429,7 @@ NOTHROW(FCALL p32_npagedir_prepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) 
 }
 
 INTERN NOBLOCK void
-NOTHROW(FCALL p32_npagedir_unprepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
+NOTHROW(FCALL p32_pagedir_unprepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec2, vec1;
 	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
 	if unlikely((byte_t *)addr >= (byte_t *)KERNEL_BASE)
@@ -440,8 +440,8 @@ NOTHROW(FCALL p32_npagedir_unprepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr
 }
 
 INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p32_npagedir_prepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                        PAGEDIR_PAGEALIGNED size_t num_bytes) {
+NOTHROW(FCALL p32_pagedir_prepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                       PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	unsigned int vec2_min, vec2_max;
 	unsigned int vec1_min, vec1_end;
 	unsigned int vec2;
@@ -456,7 +456,7 @@ NOTHROW(FCALL p32_npagedir_prepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	if (!num_bytes)
 		return true;
 	if (num_bytes == 4096)
-		return p32_npagedir_prepare_mapone(addr);
+		return p32_pagedir_prepare_mapone(addr);
 	vec2_min = P32_PDIR_VEC2INDEX(addr);
 	vec2_max = P32_PDIR_VEC2INDEX((byte_t *)addr + num_bytes - 1);
 	vec1_min = P32_PDIR_VEC1INDEX(addr);
@@ -491,8 +491,8 @@ err_0:
 }
 
 INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p32_npagedir_prepare_map_keep)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                             PAGEDIR_PAGEALIGNED size_t num_bytes) {
+NOTHROW(FCALL p32_pagedir_prepare_map_keep)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                            PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	unsigned int vec2_min, vec2_max;
 	unsigned int vec1_min, vec1_end;
 	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
@@ -506,7 +506,7 @@ NOTHROW(FCALL p32_npagedir_prepare_map_keep)(PAGEDIR_PAGEALIGNED VIRT void *addr
 	if (!num_bytes)
 		return true;
 	if (num_bytes == 4096)
-		return p32_npagedir_prepare_mapone(addr);
+		return p32_pagedir_prepare_mapone(addr);
 	vec2_min = P32_PDIR_VEC2INDEX(addr);
 	vec2_max = P32_PDIR_VEC2INDEX((byte_t *)addr + num_bytes - 1);
 	vec1_min = P32_PDIR_VEC1INDEX(addr);
@@ -536,8 +536,8 @@ err:
 
 
 INTERN NOBLOCK void
-NOTHROW(FCALL p32_npagedir_unprepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                          PAGEDIR_PAGEALIGNED size_t num_bytes) {
+NOTHROW(FCALL p32_pagedir_unprepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                         PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	unsigned int vec2_min, vec2_max;
 	unsigned int vec1_min, vec1_end;
 	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
@@ -551,7 +551,7 @@ NOTHROW(FCALL p32_npagedir_unprepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	if (!num_bytes)
 		return;
 	if (num_bytes == 4096) {
-		p32_npagedir_unprepare_mapone(addr);
+		p32_pagedir_unprepare_mapone(addr);
 		return;
 	}
 	vec2_min = P32_PDIR_VEC2INDEX(addr);
@@ -697,8 +697,8 @@ NOTHROW(FCALL p32_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
  * them to be used by the PAGE_FAULT handler, while still ensuring that
  * access remains non-blocking. */
 INTERN NOBLOCK void
-NOTHROW(FCALL p32_npagedir_maphintone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                       VIRT /*ALIGNED(P32_PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint) {
+NOTHROW(FCALL p32_pagedir_maphintone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                      VIRT /*ALIGNED(P32_PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint) {
 	unsigned int vec2, vec1;
 	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
 	assertf(IS_ALIGNED((uintptr_t)hint, P32_PAGEDIR_MAPHINT_ALIGNMENT), "hint = %p", hint);
@@ -708,9 +708,9 @@ NOTHROW(FCALL p32_npagedir_maphintone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 }
 
 INTERN NOBLOCK void
-NOTHROW(FCALL p32_npagedir_maphint)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                    PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                    VIRT /*ALIGNED(P32_PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint) {
+NOTHROW(FCALL p32_pagedir_maphint)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                   PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                   VIRT /*ALIGNED(P32_PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint) {
 	size_t i;
 	u32 e1_word;
 	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
@@ -730,7 +730,7 @@ NOTHROW(FCALL p32_npagedir_maphint)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 
 /* Return the given of the given page, or NULL if no hint has been mapped. */
 INTERN NOBLOCK WUNUSED void *
-NOTHROW(FCALL p32_npagedir_gethint)(VIRT void *addr) {
+NOTHROW(FCALL p32_pagedir_gethint)(VIRT void *addr) {
 	u32 word;
 	unsigned int vec2, vec1;
 	vec2 = P32_PDIR_VEC2INDEX(addr);
@@ -749,9 +749,9 @@ NOTHROW(FCALL p32_npagedir_gethint)(VIRT void *addr) {
 /* Create/delete a page-directory mapping.
  * @param: perm: A set of `PAGEDIR_MAP_F*' detailing how memory should be mapped. */
 INTERN NOBLOCK void
-NOTHROW(FCALL p32_npagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                   PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
-                                   u16 perm) {
+NOTHROW(FCALL p32_pagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                  PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
+                                  u16 perm) {
 	u32 e1_word;
 	unsigned int vec2, vec1;
 	e1_word = p32_pagedir_encode_4kib(addr, phys, perm);
@@ -761,9 +761,9 @@ NOTHROW(FCALL p32_npagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 }
 
 INTERN NOBLOCK void
-NOTHROW(FCALL p32_npagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
+NOTHROW(FCALL p32_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                               PAGEDIR_PAGEALIGNED size_t num_bytes,
+                               PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
                                 u16 perm) {
 	size_t i;
 	u32 e1_word;
@@ -782,17 +782,17 @@ NOTHROW(FCALL p32_npagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	}
 }
 
-/* Special variants of `npagedir_mapone()' that should be used to
+/* Special variants of `pagedir_mapone()' that should be used to
  * temporary override the mapping of a single, prepared page.
  * These functions are mainly intended for use with `this_trampoline_page', allowing
  * each thread to push/pop its trampoline page, with doing so actually being an atomic
  * operation in the sense that the data is entirely thread-private, while modifications
  * do not require any kind of lock.
- * NOTE: If the page had been mapped, `npagedir_pop_mapone()' will automatically sync the page. */
+ * NOTE: If the page had been mapped, `pagedir_pop_mapone()' will automatically sync the page. */
 INTERN NOBLOCK WUNUSED p32_pagedir_pushval_t
-NOTHROW(FCALL p32_npagedir_push_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                        PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
-                                        u16 perm) {
+NOTHROW(FCALL p32_pagedir_push_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                       PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
+                                       u16 perm) {
 	u32 e1_word, result;
 	unsigned int vec2, vec1;
 	e1_word = p32_pagedir_encode_4kib(addr, phys, perm);
@@ -803,8 +803,8 @@ NOTHROW(FCALL p32_npagedir_push_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 }
 
 INTERN NOBLOCK void
-NOTHROW(FCALL p32_npagedir_pop_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                       p32_pagedir_pushval_t backup) {
+NOTHROW(FCALL p32_pagedir_pop_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                      p32_pagedir_pushval_t backup) {
 	u32 old_word;
 	unsigned int vec2, vec1;
 	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
@@ -812,12 +812,12 @@ NOTHROW(FCALL p32_npagedir_pop_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	vec1 = P32_PDIR_VEC1INDEX(addr);
 	old_word = p32_pagedir_xch_e1_word(vec2, vec1, (u32)backup);
 	if (old_word & P32_PAGE_FPRESENT)
-		npagedir_syncone(addr); /* The old mapping was also present (explicitly refresh the page). */
+		pagedir_syncone(addr); /* The old mapping was also present (explicitly refresh the page). */
 }
 
 /* Unmap pages from the given address range. (requires that the given area be prepared) */
 INTERN NOBLOCK void
-NOTHROW(FCALL p32_npagedir_unmapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
+NOTHROW(FCALL p32_pagedir_unmapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec2, vec1;
 	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
 	vec2 = P32_PDIR_VEC2INDEX(addr);
@@ -828,8 +828,8 @@ NOTHROW(FCALL p32_npagedir_unmapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 }
 
 INTERN NOBLOCK void
-NOTHROW(FCALL p32_npagedir_unmap)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                  PAGEDIR_PAGEALIGNED size_t num_bytes) {
+NOTHROW(FCALL p32_pagedir_unmap)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                 PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	size_t i;
 	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
 	assertf(IS_ALIGNED((uintptr_t)num_bytes, 4096), "num_bytes = %#Ix", num_bytes);
@@ -848,7 +848,7 @@ NOTHROW(FCALL p32_npagedir_unmap)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 
 /* Remove write-permissions from the given address range. (requires that the given area be prepared) */
 INTERN NOBLOCK void
-NOTHROW(FCALL p32_npagedir_unwriteone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
+NOTHROW(FCALL p32_pagedir_unwriteone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec2, vec1;
 	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
 	vec2 = P32_PDIR_VEC2INDEX(addr);
@@ -857,8 +857,8 @@ NOTHROW(FCALL p32_npagedir_unwriteone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 }
 
 INTERN NOBLOCK void
-NOTHROW(FCALL p32_npagedir_unwrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                    PAGEDIR_PAGEALIGNED size_t num_bytes) {
+NOTHROW(FCALL p32_pagedir_unwrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                   PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	size_t i;
 	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
 	assertf(IS_ALIGNED((uintptr_t)num_bytes, 4096), "num_bytes = %#Ix", num_bytes);
@@ -958,7 +958,7 @@ NOTHROW(FCALL p32_pagedir_translate)(VIRT void *addr) {
 
 /* Check if the given page is mapped. */
 INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p32_npagedir_ismapped)(VIRT void *addr) {
+NOTHROW(FCALL p32_pagedir_ismapped)(VIRT void *addr) {
 	u32 word;
 	unsigned int vec2, vec1;
 	vec2 = P32_PDIR_VEC2INDEX(addr);
@@ -973,7 +973,7 @@ NOTHROW(FCALL p32_npagedir_ismapped)(VIRT void *addr) {
 }
 
 INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p32_npagedir_iswritable)(VIRT void *addr) {
+NOTHROW(FCALL p32_pagedir_iswritable)(VIRT void *addr) {
 	u32 word;
 	unsigned int vec2, vec1;
 	vec2 = P32_PDIR_VEC2INDEX(addr);
@@ -989,7 +989,7 @@ NOTHROW(FCALL p32_npagedir_iswritable)(VIRT void *addr) {
 }
 
 INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p32_npagedir_isuseraccessible)(VIRT void *addr) {
+NOTHROW(FCALL p32_pagedir_isuseraccessible)(VIRT void *addr) {
 	u32 word;
 	unsigned int vec2, vec1;
 	vec2 = P32_PDIR_VEC2INDEX(addr);
@@ -1005,7 +1005,7 @@ NOTHROW(FCALL p32_npagedir_isuseraccessible)(VIRT void *addr) {
 }
 
 INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p32_npagedir_isuserwritable)(VIRT void *addr) {
+NOTHROW(FCALL p32_pagedir_isuserwritable)(VIRT void *addr) {
 	u32 word;
 	unsigned int vec2, vec1;
 	vec2 = P32_PDIR_VEC2INDEX(addr);
@@ -1022,7 +1022,7 @@ NOTHROW(FCALL p32_npagedir_isuserwritable)(VIRT void *addr) {
 }
 
 INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p32_npagedir_haschanged)(VIRT void *addr) {
+NOTHROW(FCALL p32_pagedir_haschanged)(VIRT void *addr) {
 	u32 word;
 	unsigned int vec2, vec1;
 	/* TODO: Figure out a better design for this function
@@ -1040,7 +1040,7 @@ NOTHROW(FCALL p32_npagedir_haschanged)(VIRT void *addr) {
 }
 
 INTERN NOBLOCK void
-NOTHROW(FCALL p32_npagedir_unsetchanged)(VIRT void *addr) {
+NOTHROW(FCALL p32_pagedir_unsetchanged)(VIRT void *addr) {
 	u32 word;
 	unsigned int vec2, vec1;
 	/* TODO: Figure out a better design for this function

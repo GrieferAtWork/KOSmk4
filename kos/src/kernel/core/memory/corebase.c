@@ -300,7 +300,7 @@ again_tryhard_mapping_target:
 		}
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 		/* Map the page into our current page directory. */
-		if (!npagedir_prepare_mapone(mapping_target)) {
+		if (!pagedir_prepare_mapone(mapping_target)) {
 			vm_kernel_treelock_endwrite();
 			sync_endwrite(&vm_corepage_lock);
 			page_ccfree(mapping_backend, 1);
@@ -311,9 +311,9 @@ again_tryhard_mapping_target:
 			goto done;
 		}
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-		npagedir_mapone(mapping_target,
-		                page2addr(mapping_backend),
-		                PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+		pagedir_mapone(mapping_target,
+		               page2addr(mapping_backend),
+		               PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 
 		/* Allocate (reserve) 2 of the remaining corebase components,
 		 * which will then be used to describe the new corebase page

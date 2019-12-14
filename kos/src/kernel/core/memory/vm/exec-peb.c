@@ -203,7 +203,7 @@ string_size_changed:
 		/* Lock the kernel VM, so we can steal the PEB node. */
 		sync_write(&vm_kernel);
 		/* Ensure that the page directory is prepared to erase the temporary PEB mapping. */
-		if unlikely(!npagedir_prepare_map(peb_temp_base, peb_total_size)) {
+		if unlikely(!pagedir_prepare_map(peb_temp_base, peb_total_size)) {
 			sync_endwrite(&vm_kernel);
 			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
 		}
@@ -219,9 +219,9 @@ string_size_changed:
 	/* Delete the temporary PEB mapping, and sync the address range.
 	 * NOTE: Since the mapping was strictly private to us,
 	 *       there is no need to sync this with another CPU! */
-	npagedir_unmap(peb_temp_base, peb_total_size);
-	npagedir_sync(peb_temp_base, peb_total_size);
-	npagedir_unprepare_map(peb_temp_base, peb_total_size);
+	pagedir_unmap(peb_temp_base, peb_total_size);
+	pagedir_sync(peb_temp_base, peb_total_size);
+	pagedir_unprepare_map(peb_temp_base, peb_total_size);
 	sync_endwrite(&vm_kernel);
 
 	/* Make sure that the PEB node has the expected state. */

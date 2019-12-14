@@ -58,28 +58,28 @@ vio_copytovio_from_phys(struct vio_args *__restrict args,
 			page_bytes = num_bytes;
 #ifdef DEFINE_IO_READ
 		if (is_first) {
-			backup = npagedir_push_mapone(tramp,
-			                              buf & ~PAGEMASK,
-			                              PAGEDIR_MAP_FWRITE);
+			backup = pagedir_push_mapone(tramp,
+			                             buf & ~PAGEMASK,
+			                             PAGEDIR_MAP_FWRITE);
 			is_first = false;
 		} else {
-			npagedir_mapone(tramp,
-			                buf & ~PAGEMASK,
-			                PAGEDIR_MAP_FWRITE);
+			pagedir_mapone(tramp,
+			               buf & ~PAGEMASK,
+			               PAGEDIR_MAP_FWRITE);
 		}
 #elif defined(DEFINE_IO_WRITE)
 		if (is_first) {
-			backup = npagedir_push_mapone(tramp,
-			                              buf & ~PAGEMASK,
-			                              PAGEDIR_MAP_FREAD);
+			backup = pagedir_push_mapone(tramp,
+			                             buf & ~PAGEMASK,
+			                             PAGEDIR_MAP_FREAD);
 			is_first = false;
 		} else {
-			npagedir_mapone(tramp,
-			                buf & ~PAGEMASK,
-			                PAGEDIR_MAP_FREAD);
+			pagedir_mapone(tramp,
+			               buf & ~PAGEMASK,
+			               PAGEDIR_MAP_FREAD);
 		}
 #endif
-		npagedir_syncone(tramp);
+		pagedir_syncone(tramp);
 		TRY {
 			/* Copy memory. */
 #ifdef DEFINE_IO_READ
@@ -95,7 +95,7 @@ vio_copytovio_from_phys(struct vio_args *__restrict args,
 #endif
 		} EXCEPT {
 			/* Try-catch is required, because VIO access may throw exceptions. */
-			npagedir_pop_mapone(tramp, backup);
+			pagedir_pop_mapone(tramp, backup);
 			RETHROW();
 		}
 		if (page_bytes >= num_bytes)
@@ -104,7 +104,7 @@ vio_copytovio_from_phys(struct vio_args *__restrict args,
 		buf += page_bytes;
 		offset += page_bytes;
 	}
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 }
 
 

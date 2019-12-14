@@ -345,13 +345,13 @@ NOTHROW(KCALL simple_insert_and_activate)(struct vm_node *__restrict node,
 	assert(vm_node_getsize(node) == vm_datapart_numbytes(part));
 	addr = vm_node_getstart(node);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (!npagedir_prepare_map(addr, part->dp_ramdata.rd_block0.rb_size * PAGESIZE)) {
+	if (!pagedir_prepare_map(addr, part->dp_ramdata.rd_block0.rb_size * PAGESIZE)) {
 		kernel_panic(FREESTR("Failed to prepare kernel mapping at %p...%p\n"),
 		             vm_node_getmin(node), vm_node_getmax(node));
 	}
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-	npagedir_map(addr, part->dp_ramdata.rd_block0.rb_size * PAGESIZE,
-	             page2addr(part->dp_ramdata.rd_block0.rb_start), prot);
+	pagedir_map(addr, part->dp_ramdata.rd_block0.rb_size * PAGESIZE,
+	            page2addr(part->dp_ramdata.rd_block0.rb_start), prot);
 	assertf(part->dp_ramdata.rd_blockv == &part->dp_ramdata.rd_block0,
 	        "part->dp_ramdata.rd_blockv  = %p\n"
 	        "&part->dp_ramdata.rd_block0 = %p\n",
@@ -381,10 +381,10 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 
 	/* Unmap everything before the kernel. */
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (npagedir_prepare_map((void *)KERNEL_BASE, (uintptr_t)__kernel_text_start - KERNEL_BASE))
+	if (pagedir_prepare_map((void *)KERNEL_BASE, (uintptr_t)__kernel_text_start - KERNEL_BASE))
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
-		npagedir_unmap((void *)KERNEL_BASE, (uintptr_t)__kernel_text_start - KERNEL_BASE);
+		pagedir_unmap((void *)KERNEL_BASE, (uintptr_t)__kernel_text_start - KERNEL_BASE);
 	}
 	assert(kernel_vm_node_pagedata.vn_node.a_vmin != 0);
 
@@ -416,7 +416,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 	 * The contents of this section are mainly required for SMP initialization,
 	 * though can also be used for other things that require being placed at a
 	 * known physical memory location. */
-	if (!npagedir_prepare_map(__kernel_pdata_start - KERNEL_BASE, (size_t)__kernel_pdata_numbytes))
+	if (!pagedir_prepare_map(__kernel_pdata_start - KERNEL_BASE, (size_t)__kernel_pdata_numbytes))
 		kernel_panic(FREESTR("Failed to prepare kernel VM for mapping .pdata\n"));
 	simple_insert_and_activate(&x86_vm_node_pdata, PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 #ifndef NDEBUG
@@ -460,10 +460,10 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 				break; /* The previous node should have been `X86_KERNEL_VMMAPPING_IDENTITY_RESERVE' at this point. */
 			pagedata_next_min = vm_node_getstart(iter);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-			if (npagedir_prepare_map((byte_t *)pagedata_prev_end, (size_t)((byte_t *)pagedata_next_min - (byte_t *)pagedata_prev_end)))
-				npagedir_unmap((byte_t *)pagedata_prev_end, (size_t)((byte_t *)pagedata_next_min - (byte_t *)pagedata_prev_end));
+			if (pagedir_prepare_map((byte_t *)pagedata_prev_end, (size_t)((byte_t *)pagedata_next_min - (byte_t *)pagedata_prev_end)))
+				pagedir_unmap((byte_t *)pagedata_prev_end, (size_t)((byte_t *)pagedata_next_min - (byte_t *)pagedata_prev_end));
 #else /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-			npagedir_unmap(pagedata_prev_end, (size_t)((byte_t *)pagedata_next_min - (byte_t *)pagedata_prev_end));
+			pagedir_unmap(pagedata_prev_end, (size_t)((byte_t *)pagedata_next_min - (byte_t *)pagedata_prev_end));
 #endif /* !CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		}
 	}
@@ -477,36 +477,36 @@ NOTHROW(KCALL x86_initialize_kernel_vm_readonly)(void) {
 	 * This affects the kernel's .text and .rodata section, which previously
 	 * allowed self-modifying code to replace itself with an optimized/more
 	 * appropriate version. */
-	npagedir_map(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_TEXT].vn_node.a_vmin),
-	             x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_TEXT].dp_ramdata.rd_block0.rb_size * PAGESIZE,
-	             page2addr(x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_TEXT].dp_ramdata.rd_block0.rb_start),
-	             PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD);
-	npagedir_map(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_RODATA].vn_node.a_vmin),
-	             x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_RODATA].dp_ramdata.rd_block0.rb_size * PAGESIZE,
-	             page2addr(x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_RODATA].dp_ramdata.rd_block0.rb_start),
-	             PAGEDIR_MAP_FREAD);
-	assert(!npagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_TEXT].vn_node.a_vmin)));
-	assert(!npagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_RODATA].vn_node.a_vmin)));
+	pagedir_map(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_TEXT].vn_node.a_vmin),
+	            x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_TEXT].dp_ramdata.rd_block0.rb_size * PAGESIZE,
+	            page2addr(x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_TEXT].dp_ramdata.rd_block0.rb_start),
+	            PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD);
+	pagedir_map(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_RODATA].vn_node.a_vmin),
+	            x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_RODATA].dp_ramdata.rd_block0.rb_size * PAGESIZE,
+	            page2addr(x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_RODATA].dp_ramdata.rd_block0.rb_start),
+	            PAGEDIR_MAP_FREAD);
+	assert(!pagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_TEXT].vn_node.a_vmin)));
+	assert(!pagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_RODATA].vn_node.a_vmin)));
 #ifdef X86_KERNEL_VMMAPPING_CORE_DATA
-	assert(npagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA].vn_node.a_vmin)));
+	assert(pagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA].vn_node.a_vmin)));
 #else /* X86_KERNEL_VMMAPPING_CORE_DATA */
-	assert(npagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA1].vn_node.a_vmin)));
-	assert(npagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA2].vn_node.a_vmin)));
+	assert(pagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA1].vn_node.a_vmin)));
+	assert(pagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA2].vn_node.a_vmin)));
 #endif /* !X86_KERNEL_VMMAPPING_CORE_DATA */
-	assert(npagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_XDATA].vn_node.a_vmin)));
+	assert(pagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_XDATA].vn_node.a_vmin)));
 #ifdef X86_KERNEL_VMMAPPING_CORE_BSS
-	assert(npagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS].vn_node.a_vmin)));
+	assert(pagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS].vn_node.a_vmin)));
 #else /* X86_KERNEL_VMMAPPING_CORE_BSS */
-	assert(npagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS1].vn_node.a_vmin)));
-	assert(npagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS2].vn_node.a_vmin)));
+	assert(pagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS1].vn_node.a_vmin)));
+	assert(pagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS2].vn_node.a_vmin)));
 #endif /* !X86_KERNEL_VMMAPPING_CORE_BSS */
 
 	/* Get rid of the page guarding the end of the boot-task stack. */
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (npagedir_prepare_mapone(__kernel_boottask_stack_guard))
+	if (pagedir_prepare_mapone(__kernel_boottask_stack_guard))
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
-		npagedir_unmapone(__kernel_boottask_stack_guard);
+		pagedir_unmapone(__kernel_boottask_stack_guard);
 	}
 }
 
@@ -535,12 +535,12 @@ void KCALL x86_kernel_unload_free_and_jump_to_userspace(void) {
 	 * NOTE: Make sure not to unmap the first couple of pages which
 	 *       are now used by the relocated BRK data. */
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (npagedir_prepare_map(__kernel_free_start, (size_t)__kernel_free_size))
+	if (pagedir_prepare_map(__kernel_free_start, (size_t)__kernel_free_size))
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
-		npagedir_unmap(__kernel_free_start, (size_t)__kernel_free_size);
+		pagedir_unmap(__kernel_free_start, (size_t)__kernel_free_size);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-		npagedir_unprepare_map(__kernel_free_start, (size_t)__kernel_free_size);
+		pagedir_unprepare_map(__kernel_free_start, (size_t)__kernel_free_size);
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	}
 

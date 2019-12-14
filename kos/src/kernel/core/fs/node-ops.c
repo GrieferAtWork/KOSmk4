@@ -61,17 +61,17 @@ inode_file_pwrite_with_write(struct inode *__restrict self, vm_phys_t src,
 		if unlikely(!num_bytes)
 			return;
 		tramp  = THIS_TRAMPOLINE_BASE;
-		backup = npagedir_push_mapone(tramp, minpageaddr, PAGEDIR_MAP_FREAD);
-		npagedir_syncone(tramp);
+		backup = pagedir_push_mapone(tramp, minpageaddr, PAGEDIR_MAP_FREAD);
+		pagedir_syncone(tramp);
 		TRY {
 			(*self->i_type->it_file.f_write)(self,
 			                                 tramp + ((ptrdiff_t)src & PAGEMASK),
 			                                 num_bytes, file_position, aio);
 		} EXCEPT {
-			npagedir_pop_mapone(tramp, backup);
+			pagedir_pop_mapone(tramp, backup);
 			RETHROW();
 		}
-		npagedir_pop_mapone(tramp, backup);
+		pagedir_pop_mapone(tramp, backup);
 	} else {
 		void *tempbase;
 		size_t aligned_num_bytes = (size_t)((maxpageaddr - minpageaddr) + PAGESIZE);

@@ -255,8 +255,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, vm_paged_mapat_subrange; .int 0
 	.int 0x38dd445
 	.quad .Lname63 /* index: 63 */
-	.weak npagedir_unwrite; .quad npagedir_unwrite
-	.reloc ., R_X86_64_SIZE32, npagedir_unwrite; .int 0
+	.weak pagedir_unwrite; .quad pagedir_unwrite
+	.reloc ., R_X86_64_SIZE32, pagedir_unwrite; .int 0
 	.int 0x7e0e2b5
 	.quad .Lname64 /* index: 64 */
 	.weak vmb_fini; .quad vmb_fini
@@ -359,8 +359,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname89 /* index: 89 */
-	.weak npagedir_ismapped; .quad npagedir_ismapped
-	.reloc ., R_X86_64_SIZE32, npagedir_ismapped; .int 0
+	.weak pagedir_ismapped; .quad pagedir_ismapped
+	.reloc ., R_X86_64_SIZE32, pagedir_ismapped; .int 0
 	.int 0x3dd5564
 	.quad .Lname90 /* index: 90 */
 	.weak vio_readw_aligned; .quad vio_readw_aligned
@@ -963,8 +963,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, this_exception_trace; .int 0
 	.int 0x6a572b5
 	.quad .Lname240 /* index: 240 */
-	.weak npagedir_prepare_map_p; .quad npagedir_prepare_map_p
-	.reloc ., R_X86_64_SIZE32, npagedir_prepare_map_p; .int 0
+	.weak pagedir_prepare_map_p; .quad pagedir_prepare_map_p
+	.reloc ., R_X86_64_SIZE32, pagedir_prepare_map_p; .int 0
 	.int 0x171c0f0
 	.quad .Lname241 /* index: 241 */
 	.weak sys32_epoll_create1; .quad sys32_epoll_create1
@@ -1731,8 +1731,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname432 /* index: 432 */
-	.weak npagedir_prepare_map; .quad npagedir_prepare_map
-	.reloc ., R_X86_64_SIZE32, npagedir_prepare_map; .int 0
+	.weak pagedir_prepare_map; .quad pagedir_prepare_map
+	.reloc ., R_X86_64_SIZE32, pagedir_prepare_map; .int 0
 	.int 0xa9171b0
 	.quad 0 /* index: 433 */
 	.quad 0
@@ -2275,8 +2275,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname568 /* index: 568 */
-	.weak npagedir_prepare_mapone; .quad npagedir_prepare_mapone
-	.reloc ., R_X86_64_SIZE32, npagedir_prepare_mapone; .int 0
+	.weak pagedir_prepare_mapone; .quad pagedir_prepare_mapone
+	.reloc ., R_X86_64_SIZE32, pagedir_prepare_mapone; .int 0
 	.int 0x71bdd55
 	.quad .Lname569 /* index: 569 */
 	.weak fs_destroy; .quad fs_destroy
@@ -2563,8 +2563,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, fs_filesystems_lock_trywrite; .int 0
 	.int 0xe4fb15
 	.quad .Lname640 /* index: 640 */
-	.weak npagedir_maphintone_p; .quad npagedir_maphintone_p
-	.reloc ., R_X86_64_SIZE32, npagedir_maphintone_p; .int 0
+	.weak pagedir_maphintone_p; .quad pagedir_maphintone_p
+	.reloc ., R_X86_64_SIZE32, pagedir_maphintone_p; .int 0
 	.int 0x657c280
 	.quad .Lname641 /* index: 641 */
 	.weak sys_io_setup; .quad sys_io_setup
@@ -3011,8 +3011,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, sys32_listxattr; .int 0
 	.int 0xcd6b1b2
 	.quad .Lname752 /* index: 752 */
-	.weak npagedir_unsetchanged_p; .quad npagedir_unsetchanged_p
-	.reloc ., R_X86_64_SIZE32, npagedir_unsetchanged_p; .int 0
+	.weak pagedir_unsetchanged_p; .quad pagedir_unsetchanged_p
+	.reloc ., R_X86_64_SIZE32, pagedir_unsetchanged_p; .int 0
 	.int 0xa3432f0
 	.quad 0 /* index: 753 */
 	.quad 0
@@ -3927,8 +3927,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, json_parser_getint64; .int 0
 	.int 0xf5873d4
 	.quad .Lname981 /* index: 981 */
-	.weak npagedir_push_mapone; .quad npagedir_push_mapone
-	.reloc ., R_X86_64_SIZE32, npagedir_push_mapone; .int 0
+	.weak pagedir_push_mapone; .quad pagedir_push_mapone
+	.reloc ., R_X86_64_SIZE32, pagedir_push_mapone; .int 0
 	.int 0x82223d5
 	.quad .Lname982 /* index: 982 */
 	.weak sys32_preadvf; .quad sys32_preadvf
@@ -4119,8 +4119,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, block_device_partition_read; .int 0
 	.int 0x6052404
 	.quad .Lname1029 /* index: 1029 */
-	.weak npagedir_unprepare_mapone; .quad npagedir_unprepare_mapone
-	.reloc ., R_X86_64_SIZE32, npagedir_unprepare_mapone; .int 0
+	.weak pagedir_unprepare_mapone; .quad pagedir_unprepare_mapone
+	.reloc ., R_X86_64_SIZE32, pagedir_unprepare_mapone; .int 0
 	.int 0x9dfa405
 	.quad 0 /* index: 1030 */
 	.quad 0
@@ -4307,8 +4307,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, vm_datablock_sync; .int 0
 	.int 0x2ec68b3
 	.quad .Lname1076 /* index: 1076 */
-	.weak npagedir_unsetchanged; .quad npagedir_unsetchanged
-	.reloc ., R_X86_64_SIZE32, npagedir_unsetchanged; .int 0
+	.weak pagedir_unsetchanged; .quad pagedir_unsetchanged
+	.reloc ., R_X86_64_SIZE32, pagedir_unsetchanged; .int 0
 	.int 0x89a3434
 	.quad .Lname1077 /* index: 1077 */
 	.weak task_pause; .quad task_pause
@@ -4803,8 +4803,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname1200 /* index: 1200 */
-	.weak npagedir_unprepare_mapone_p; .quad npagedir_unprepare_mapone_p
-	.reloc ., R_X86_64_SIZE32, npagedir_unprepare_mapone_p; .int 0
+	.weak pagedir_unprepare_mapone_p; .quad pagedir_unprepare_mapone_p
+	.reloc ., R_X86_64_SIZE32, pagedir_unprepare_mapone_p; .int 0
 	.int 0xfa404b0
 	.quad .Lname1201 /* index: 1201 */
 	.weak rawmemlenq; .quad rawmemlenq
@@ -5911,8 +5911,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, sys32_sigsuspend; .int 0
 	.int 0xc4b45c4
 	.quad .Lname1477 /* index: 1477 */
-	.weak npagedir_unmapone; .quad npagedir_unmapone
-	.reloc ., R_X86_64_SIZE32, npagedir_unmapone; .int 0
+	.weak pagedir_unmapone; .quad pagedir_unmapone
+	.reloc ., R_X86_64_SIZE32, pagedir_unmapone; .int 0
 	.int 0xdd55c5
 	.quad 0 /* index: 1478 */
 	.quad 0
@@ -6059,8 +6059,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, directory_getentry; .int 0
 	.int 0x17325e9
 	.quad .Lname1514 /* index: 1514 */
-	.weak npagedir_mapone; .quad npagedir_mapone
-	.reloc ., R_X86_64_SIZE32, npagedir_mapone; .int 0
+	.weak pagedir_mapone; .quad pagedir_mapone
+	.reloc ., R_X86_64_SIZE32, pagedir_mapone; .int 0
 	.int 0x3e39165
 	.quad .Lname1515 /* index: 1515 */
 	.weak vm_datapart_lock_upgrade_nx; .quad vm_datapart_lock_upgrade_nx
@@ -6279,8 +6279,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, sys32_eventfd; .int 0
 	.int 0x7ce32e4
 	.quad .Lname1569 /* index: 1569 */
-	.weak npagedir_unmapone_p; .quad npagedir_unmapone_p
-	.reloc ., R_X86_64_SIZE32, npagedir_unmapone_p; .int 0
+	.weak pagedir_unmapone_p; .quad pagedir_unmapone_p
+	.reloc ., R_X86_64_SIZE32, pagedir_unmapone_p; .int 0
 	.int 0xd55cbb0
 	.quad .Lname1570 /* index: 1570 */
 	.weak block_device_aread_sector; .quad block_device_aread_sector
@@ -6503,8 +6503,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, sys32_pselect6_64; .int 0
 	.int 0x3bb3cd4
 	.quad .Lname1625 /* index: 1625 */
-	.weak npagedir_maphint; .quad npagedir_maphint
-	.reloc ., R_X86_64_SIZE32, npagedir_maphint; .int 0
+	.weak pagedir_maphint; .quad pagedir_maphint
+	.reloc ., R_X86_64_SIZE32, pagedir_maphint; .int 0
 	.int 0xe38be64
 	.quad .Lname1626 /* index: 1626 */
 	.weak vmb_overlay; .quad vmb_overlay
@@ -6787,8 +6787,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, unwind_getreg_sfpustate; .int 0
 	.int 0xb8c43c5
 	.quad .Lname1696 /* index: 1696 */
-	.weak npagedir_haschanged_p; .quad npagedir_haschanged_p
-	.reloc ., R_X86_64_SIZE32, npagedir_haschanged_p; .int 0
+	.weak pagedir_haschanged_p; .quad pagedir_haschanged_p
+	.reloc ., R_X86_64_SIZE32, pagedir_haschanged_p; .int 0
 	.int 0x67ec6a0
 	.quad .Lname1697 /* index: 1697 */
 	.weak setreg_ucpustate; .quad setreg_ucpustate
@@ -8515,8 +8515,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname2128 /* index: 2128 */
-	.weak npagedir_maphint_p; .quad npagedir_maphint_p
-	.reloc ., R_X86_64_SIZE32, npagedir_maphint_p; .int 0
+	.weak pagedir_maphint_p; .quad pagedir_maphint_p
+	.reloc ., R_X86_64_SIZE32, pagedir_maphint_p; .int 0
 	.int 0x8be6850
 	.quad 0 /* index: 2129 */
 	.quad 0
@@ -8643,8 +8643,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname2160 /* index: 2160 */
-	.weak npagedir_unmap_p; .quad npagedir_unmap_p
-	.reloc ., R_X86_64_SIZE32, npagedir_unmap_p; .int 0
+	.weak pagedir_unmap_p; .quad pagedir_unmap_p
+	.reloc ., R_X86_64_SIZE32, pagedir_unmap_p; .int 0
 	.int 0x80dd870
 	.quad .Lname2161 /* index: 2161 */
 	.weak memcpyq; .quad memcpyq
@@ -9727,8 +9727,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname2431 /* index: 2431 */
-	.weak npagedir_isuseraccessible; .quad npagedir_isuseraccessible
-	.reloc ., R_X86_64_SIZE32, npagedir_isuseraccessible; .int 0
+	.weak pagedir_isuseraccessible; .quad pagedir_isuseraccessible
+	.reloc ., R_X86_64_SIZE32, pagedir_isuseraccessible; .int 0
 	.int 0x425195
 	.quad 0 /* index: 2432 */
 	.quad 0
@@ -9751,8 +9751,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname2437 /* index: 2437 */
-	.weak npagedir_pop_mapone; .quad npagedir_pop_mapone
-	.reloc ., R_X86_64_SIZE32, npagedir_pop_mapone; .int 0
+	.weak pagedir_pop_mapone; .quad pagedir_pop_mapone
+	.reloc ., R_X86_64_SIZE32, pagedir_pop_mapone; .int 0
 	.int 0x119b985
 	.quad 0 /* index: 2438 */
 	.quad 0
@@ -9855,8 +9855,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname2463 /* index: 2463 */
-	.weak npagedir_unwriteone; .quad npagedir_unwriteone
-	.reloc ., R_X86_64_SIZE32, npagedir_unwriteone; .int 0
+	.weak pagedir_unwriteone; .quad pagedir_unwriteone
+	.reloc ., R_X86_64_SIZE32, pagedir_unwriteone; .int 0
 	.int 0xe2bdc45
 	.quad .Lname2464 /* index: 2464 */
 	.weak task_connect; .quad task_connect
@@ -10391,8 +10391,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, json_writer_beginobject; .int 0
 	.int 0x79b1a24
 	.quad .Lname2597 /* index: 2597 */
-	.weak npagedir_iswritable; .quad npagedir_iswritable
-	.reloc ., R_X86_64_SIZE32, npagedir_iswritable; .int 0
+	.weak pagedir_iswritable; .quad pagedir_iswritable
+	.reloc ., R_X86_64_SIZE32, pagedir_iswritable; .int 0
 	.int 0xe29aa25
 	.quad .Lname2598 /* index: 2598 */
 	.weak sys32_process_vm_writev; .quad sys32_process_vm_writev
@@ -10755,8 +10755,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, page_freeone; .int 0
 	.int 0xaec7f15
 	.quad .Lname2688 /* index: 2688 */
-	.weak npagedir_mapone_p; .quad npagedir_mapone_p
-	.reloc ., R_X86_64_SIZE32, npagedir_mapone_p; .int 0
+	.weak pagedir_mapone_p; .quad pagedir_mapone_p
+	.reloc ., R_X86_64_SIZE32, pagedir_mapone_p; .int 0
 	.int 0x3916a80
 	.quad .Lname2689 /* index: 2689 */
 	.weak x86_dbg_hostbackup; .quad x86_dbg_hostbackup
@@ -11267,8 +11267,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, rwlock_pollwrite; .int 0
 	.int 0x89689d5
 	.quad .Lname2816 /* index: 2816 */
-	.weak npagedir_unprepare_map_p; .quad npagedir_unprepare_map_p
-	.reloc ., R_X86_64_SIZE32, npagedir_unprepare_map_p; .int 0
+	.weak pagedir_unprepare_map_p; .quad pagedir_unprepare_map_p
+	.reloc ., R_X86_64_SIZE32, pagedir_unprepare_map_p; .int 0
 	.int 0x49dfb00
 	.quad .Lname2817 /* index: 2817 */
 	.weak task_rpc_exec_here; .quad task_rpc_exec_here
@@ -11395,8 +11395,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, thiscpu_idle; .int 0
 	.int 0x1af485
 	.quad .Lname2848 /* index: 2848 */
-	.weak npagedir_isuseraccessible_p; .quad npagedir_isuseraccessible_p
-	.reloc ., R_X86_64_SIZE32, npagedir_isuseraccessible_p; .int 0
+	.weak pagedir_isuseraccessible_p; .quad pagedir_isuseraccessible_p
+	.reloc ., R_X86_64_SIZE32, pagedir_isuseraccessible_p; .int 0
 	.int 0x2519b20
 	.quad 0 /* index: 2849 */
 	.quad 0
@@ -11971,8 +11971,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, validate_executable_opt; .int 0
 	.int 0xd67bb34
 	.quad .Lname2992 /* index: 2992 */
-	.weak npagedir_ismapped_p; .quad npagedir_ismapped_p
-	.reloc ., R_X86_64_SIZE32, npagedir_ismapped_p; .int 0
+	.weak pagedir_ismapped_p; .quad pagedir_ismapped_p
+	.reloc ., R_X86_64_SIZE32, pagedir_ismapped_p; .int 0
 	.int 0xd556bb0
 	.quad 0 /* index: 2993 */
 	.quad 0
@@ -12483,8 +12483,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname3120 /* index: 3120 */
-	.weak npagedir_map_p; .quad npagedir_map_p
-	.reloc ., R_X86_64_SIZE32, npagedir_map_p; .int 0
+	.weak pagedir_map_p; .quad pagedir_map_p
+	.reloc ., R_X86_64_SIZE32, pagedir_map_p; .int 0
 	.int 0x23e3c30
 	.quad .Lname3121 /* index: 3121 */
 	.weak task_redirect_usercode_rpc; .quad task_redirect_usercode_rpc
@@ -12883,8 +12883,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, task_free_rpc; .int 0
 	.int 0x2317cc3
 	.quad .Lname3220 /* index: 3220 */
-	.weak npagedir_isuserwritable; .quad npagedir_isuserwritable
-	.reloc ., R_X86_64_SIZE32, npagedir_isuserwritable; .int 0
+	.weak pagedir_isuserwritable; .quad pagedir_isuserwritable
+	.reloc ., R_X86_64_SIZE32, pagedir_isuserwritable; .int 0
 	.int 0xa269315
 	.quad .Lname3221 /* index: 3221 */
 	.weak dbg_getcur_visible; .quad dbg_getcur_visible
@@ -13123,8 +13123,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname3280 /* index: 3280 */
-	.weak npagedir_prepare_map_keep; .quad npagedir_prepare_map_keep
-	.reloc ., R_X86_64_SIZE32, npagedir_prepare_map_keep; .int 0
+	.weak pagedir_prepare_map_keep; .quad pagedir_prepare_map_keep
+	.reloc ., R_X86_64_SIZE32, pagedir_prepare_map_keep; .int 0
 	.int 0xc0d0cd0
 	.quad .Lname3281 /* index: 3281 */
 	.weak this_sched_state; .quad this_sched_state
@@ -14019,8 +14019,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, fs_filesystems_lock_endwrite; .int 0
 	.int 0x254f815
 	.quad .Lname3504 /* index: 3504 */
-	.weak npagedir_unwriteone_p; .quad npagedir_unwriteone_p
-	.reloc ., R_X86_64_SIZE32, npagedir_unwriteone_p; .int 0
+	.weak pagedir_unwriteone_p; .quad pagedir_unwriteone_p
+	.reloc ., R_X86_64_SIZE32, pagedir_unwriteone_p; .int 0
 	.int 0xbdc4540
 	.quad .Lname3505 /* index: 3505 */
 	.weak sys_get_thread_area; .quad sys_get_thread_area
@@ -14147,8 +14147,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, task_setprocessgroupleader; .int 0
 	.int 0x6fbbb2
 	.quad .Lname3536 /* index: 3536 */
-	.weak npagedir_unmap; .quad npagedir_unmap
-	.reloc ., R_X86_64_SIZE32, npagedir_unmap; .int 0
+	.weak pagedir_unmap; .quad pagedir_unmap
+	.reloc ., R_X86_64_SIZE32, pagedir_unmap; .int 0
 	.int 0x2180dd0
 	.quad 0 /* index: 3537 */
 	.quad 0
@@ -14275,8 +14275,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname3568 /* index: 3568 */
-	.weak npagedir_unprepare_map; .quad npagedir_unprepare_map
-	.reloc ., R_X86_64_SIZE32, npagedir_unprepare_map; .int 0
+	.weak pagedir_unprepare_map; .quad pagedir_unprepare_map
+	.reloc ., R_X86_64_SIZE32, pagedir_unprepare_map; .int 0
 	.int 0xf649df0
 	.quad .Lname3569 /* index: 3569 */
 	.weak x86_syscall_emulate32_cdecl_r; .quad x86_syscall_emulate32_cdecl_r
@@ -14531,8 +14531,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname3632 /* index: 3632 */
-	.weak npagedir_map; .quad npagedir_map
-	.reloc ., R_X86_64_SIZE32, npagedir_map; .int 0
+	.weak pagedir_map; .quad pagedir_map
+	.reloc ., R_X86_64_SIZE32, pagedir_map; .int 0
 	.int 0xe523e30
 	.quad .Lname3633 /* index: 3633 */
 	.weak slab_malloc8; .quad slab_malloc8
@@ -14599,8 +14599,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname3649 /* index: 3649 */
-	.weak npagedir_prepare_map_keep_p; .quad npagedir_prepare_map_keep_p
-	.reloc ., R_X86_64_SIZE32, npagedir_prepare_map_keep_p; .int 0
+	.weak pagedir_prepare_map_keep_p; .quad pagedir_prepare_map_keep_p
+	.reloc ., R_X86_64_SIZE32, pagedir_prepare_map_keep_p; .int 0
 	.int 0xd0cda60
 	.quad .Lname3650 /* index: 3650 */
 	.weak task_schedule_asynchronous_rpc; .quad task_schedule_asynchronous_rpc
@@ -14787,8 +14787,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, unicode_readutf8_rev_n; .int 0
 	.int 0xd4e74be
 	.quad .Lname3696 /* index: 3696 */
-	.weak npagedir_prepare_mapone_p; .quad npagedir_prepare_mapone_p
-	.reloc ., R_X86_64_SIZE32, npagedir_prepare_mapone_p; .int 0
+	.weak pagedir_prepare_mapone_p; .quad pagedir_prepare_mapone_p
+	.reloc ., R_X86_64_SIZE32, pagedir_prepare_mapone_p; .int 0
 	.int 0xbdd5e70
 	.quad .Lname3697 /* index: 3697 */
 	.weak regdump_sgregs; .quad regdump_sgregs
@@ -14803,8 +14803,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, thiscpu_jiffies; .int 0
 	.int 0x66ce73
 	.quad .Lname3700 /* index: 3700 */
-	.weak npagedir_gethint; .quad npagedir_gethint
-	.reloc ., R_X86_64_SIZE32, npagedir_gethint; .int 0
+	.weak pagedir_gethint; .quad pagedir_gethint
+	.reloc ., R_X86_64_SIZE32, pagedir_gethint; .int 0
 	.int 0x74be74
 	.quad .Lname3701 /* index: 3701 */
 	.weak heap_truncate; .quad heap_truncate
@@ -14851,8 +14851,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, strnend; .int 0
 	.int 0xab94c34
 	.quad .Lname3712 /* index: 3712 */
-	.weak npagedir_unwrite_p; .quad npagedir_unwrite_p
-	.reloc ., R_X86_64_SIZE32, npagedir_unwrite_p; .int 0
+	.weak pagedir_unwrite_p; .quad pagedir_unwrite_p
+	.reloc ., R_X86_64_SIZE32, pagedir_unwrite_p; .int 0
 	.int 0xe2be80
 	.quad .Lname3713 /* index: 3713 */
 	.weak vm86_step; .quad vm86_step
@@ -14975,8 +14975,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, sys32_setregid; .int 0
 	.int 0xcde3cd4
 	.quad .Lname3743 /* index: 3743 */
-	.weak npagedir_maphintone; .quad npagedir_maphintone
-	.reloc ., R_X86_64_SIZE32, npagedir_maphintone; .int 0
+	.weak pagedir_maphintone; .quad pagedir_maphintone
+	.reloc ., R_X86_64_SIZE32, pagedir_maphintone; .int 0
 	.int 0xbe657c5
 	.quad .Lname3744 /* index: 3744 */
 	.weak kernel_debugtrap; .quad kernel_debugtrap
@@ -15123,8 +15123,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, aio_buffer_copytophys; .int 0
 	.int 0x9aa3ec3
 	.quad .Lname3780 /* index: 3780 */
-	.weak npagedir_haschanged; .quad npagedir_haschanged
-	.reloc ., R_X86_64_SIZE32, npagedir_haschanged; .int 0
+	.weak pagedir_haschanged; .quad pagedir_haschanged
+	.reloc ., R_X86_64_SIZE32, pagedir_haschanged; .int 0
 	.int 0xcc67ec4
 	.quad .Lname3781 /* index: 3781 */
 	.weak driver_getfile; .quad driver_getfile
@@ -15879,8 +15879,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname3969 /* index: 3969 */
-	.weak npagedir_iswritable_p; .quad npagedir_iswritable_p
-	.reloc ., R_X86_64_SIZE32, npagedir_iswritable_p; .int 0
+	.weak pagedir_iswritable_p; .quad pagedir_iswritable_p
+	.reloc ., R_X86_64_SIZE32, pagedir_iswritable_p; .int 0
 	.int 0x9aa2540
 	.quad .Lname3970 /* index: 3970 */
 	.weak sys32_get_exception_handler; .quad sys32_get_exception_handler
@@ -16479,7 +16479,7 @@ END(kernel_symbol_table)
 .Lname62:
 	.string "vm_paged_mapat_subrange"
 .Lname63:
-	.string "npagedir_unwrite"
+	.string "pagedir_unwrite"
 .Lname64:
 	.string "vmb_fini"
 .Lname66:
@@ -16515,7 +16515,7 @@ END(kernel_symbol_table)
 .Lname85:
 	.string "sys32_time"
 .Lname89:
-	.string "npagedir_ismapped"
+	.string "pagedir_ismapped"
 .Lname90:
 	.string "vio_readw_aligned"
 .Lname91:
@@ -16733,7 +16733,7 @@ END(kernel_symbol_table)
 .Lname239:
 	.string "this_exception_trace"
 .Lname240:
-	.string "npagedir_prepare_map_p"
+	.string "pagedir_prepare_map_p"
 .Lname241:
 	.string "sys32_epoll_create1"
 .Lname243:
@@ -17003,7 +17003,7 @@ END(kernel_symbol_table)
 .Lname429:
 	.string "vm_paged_unmap_kernel_ram"
 .Lname432:
-	.string "npagedir_prepare_map"
+	.string "pagedir_prepare_map"
 .Lname434:
 	.string "block_device_awritev_sector"
 .Lname435:
@@ -17201,7 +17201,7 @@ END(kernel_symbol_table)
 .Lname566:
 	.string "block_device_readv"
 .Lname568:
-	.string "npagedir_prepare_mapone"
+	.string "pagedir_prepare_mapone"
 .Lname569:
 	.string "fs_destroy"
 .Lname571:
@@ -17305,7 +17305,7 @@ END(kernel_symbol_table)
 .Lname639:
 	.string "fs_filesystems_lock_trywrite"
 .Lname640:
-	.string "npagedir_maphintone_p"
+	.string "pagedir_maphintone_p"
 .Lname641:
 	.string "sys_io_setup"
 .Lname642:
@@ -17455,7 +17455,7 @@ END(kernel_symbol_table)
 .Lname751:
 	.string "sys32_listxattr"
 .Lname752:
-	.string "npagedir_unsetchanged_p"
+	.string "pagedir_unsetchanged_p"
 .Lname754:
 	.string "sys32_lchown32"
 .Lname755:
@@ -17759,7 +17759,7 @@ END(kernel_symbol_table)
 .Lname980:
 	.string "json_parser_getint64"
 .Lname981:
-	.string "npagedir_push_mapone"
+	.string "pagedir_push_mapone"
 .Lname982:
 	.string "sys32_preadvf"
 .Lname983:
@@ -17835,7 +17835,7 @@ END(kernel_symbol_table)
 .Lname1028:
 	.string "block_device_partition_read"
 .Lname1029:
-	.string "npagedir_unprepare_mapone"
+	.string "pagedir_unprepare_mapone"
 .Lname1031:
 	.string "memcmpw"
 .Lname1032:
@@ -17901,7 +17901,7 @@ END(kernel_symbol_table)
 .Lname1075:
 	.string "vm_datablock_sync"
 .Lname1076:
-	.string "npagedir_unsetchanged"
+	.string "pagedir_unsetchanged"
 .Lname1077:
 	.string "task_pause"
 .Lname1079:
@@ -18055,7 +18055,7 @@ END(kernel_symbol_table)
 .Lname1198:
 	.string "page_malloc_between"
 .Lname1200:
-	.string "npagedir_unprepare_mapone_p"
+	.string "pagedir_unprepare_mapone_p"
 .Lname1201:
 	.string "rawmemlenq"
 .Lname1202:
@@ -18421,7 +18421,7 @@ END(kernel_symbol_table)
 .Lname1476:
 	.string "sys32_sigsuspend"
 .Lname1477:
-	.string "npagedir_unmapone"
+	.string "pagedir_unmapone"
 .Lname1479:
 	.string "unwind_fde_find"
 .Lname1481:
@@ -18477,7 +18477,7 @@ END(kernel_symbol_table)
 .Lname1513:
 	.string "directory_getentry"
 .Lname1514:
-	.string "npagedir_mapone"
+	.string "pagedir_mapone"
 .Lname1515:
 	.string "vm_datapart_lock_upgrade_nx"
 .Lname1517:
@@ -18567,7 +18567,7 @@ END(kernel_symbol_table)
 .Lname1568:
 	.string "sys32_eventfd"
 .Lname1569:
-	.string "npagedir_unmapone_p"
+	.string "pagedir_unmapone_p"
 .Lname1570:
 	.string "block_device_aread_sector"
 .Lname1571:
@@ -18635,7 +18635,7 @@ END(kernel_symbol_table)
 .Lname1624:
 	.string "sys32_pselect6_64"
 .Lname1625:
-	.string "npagedir_maphint"
+	.string "pagedir_maphint"
 .Lname1626:
 	.string "vmb_overlay"
 .Lname1628:
@@ -18729,7 +18729,7 @@ END(kernel_symbol_table)
 .Lname1695:
 	.string "unwind_getreg_sfpustate"
 .Lname1696:
-	.string "npagedir_haschanged_p"
+	.string "pagedir_haschanged_p"
 .Lname1697:
 	.string "setreg_ucpustate"
 .Lname1698:
@@ -19269,7 +19269,7 @@ END(kernel_symbol_table)
 .Lname2125:
 	.string "task_gethandlemanager"
 .Lname2128:
-	.string "npagedir_maphint_p"
+	.string "pagedir_maphint_p"
 .Lname2130:
 	.string "cpu_enable_preemptive_interrupts_nopr"
 .Lname2131:
@@ -19311,7 +19311,7 @@ END(kernel_symbol_table)
 .Lname2158:
 	.string "x86_syscall_emulate32_sysenter_r"
 .Lname2160:
-	.string "npagedir_unmap_p"
+	.string "pagedir_unmap_p"
 .Lname2161:
 	.string "memcpyq"
 .Lname2163:
@@ -19669,13 +19669,13 @@ END(kernel_symbol_table)
 .Lname2428:
 	.string "sys_socketpair"
 .Lname2431:
-	.string "npagedir_isuseraccessible"
+	.string "pagedir_isuseraccessible"
 .Lname2434:
 	.string "memrchr"
 .Lname2435:
 	.string "ringbuffer_write_nonblock"
 .Lname2437:
-	.string "npagedir_pop_mapone"
+	.string "pagedir_pop_mapone"
 .Lname2439:
 	.string "vio_subq"
 .Lname2440:
@@ -19713,7 +19713,7 @@ END(kernel_symbol_table)
 .Lname2460:
 	.string "sys_kill"
 .Lname2463:
-	.string "npagedir_unwriteone"
+	.string "pagedir_unwriteone"
 .Lname2464:
 	.string "task_connect"
 .Lname2466:
@@ -19905,7 +19905,7 @@ END(kernel_symbol_table)
 .Lname2596:
 	.string "json_writer_beginobject"
 .Lname2597:
-	.string "npagedir_iswritable"
+	.string "pagedir_iswritable"
 .Lname2598:
 	.string "sys32_process_vm_writev"
 .Lname2599:
@@ -20043,7 +20043,7 @@ END(kernel_symbol_table)
 .Lname2687:
 	.string "page_freeone"
 .Lname2688:
-	.string "npagedir_mapone_p"
+	.string "pagedir_mapone_p"
 .Lname2689:
 	.string "x86_dbg_hostbackup"
 .Lname2690:
@@ -20207,7 +20207,7 @@ END(kernel_symbol_table)
 .Lname2815:
 	.string "rwlock_pollwrite"
 .Lname2816:
-	.string "npagedir_unprepare_map_p"
+	.string "pagedir_unprepare_map_p"
 .Lname2817:
 	.string "task_rpc_exec_here"
 .Lname2818:
@@ -20243,7 +20243,7 @@ END(kernel_symbol_table)
 .Lname2847:
 	.string "thiscpu_idle"
 .Lname2848:
-	.string "npagedir_isuseraccessible_p"
+	.string "pagedir_isuseraccessible_p"
 .Lname2850:
 	.string "sys32_faccessat"
 .Lname2851:
@@ -20435,7 +20435,7 @@ END(kernel_symbol_table)
 .Lname2991:
 	.string "validate_executable_opt"
 .Lname2992:
-	.string "npagedir_ismapped_p"
+	.string "pagedir_ismapped_p"
 .Lname2994:
 	.string "block_device_awrite_sector"
 .Lname2995:
@@ -20613,7 +20613,7 @@ END(kernel_symbol_table)
 .Lname3118:
 	.string "validate_writable_opt"
 .Lname3120:
-	.string "npagedir_map_p"
+	.string "pagedir_map_p"
 .Lname3121:
 	.string "task_redirect_usercode_rpc"
 .Lname3122:
@@ -20777,7 +20777,7 @@ END(kernel_symbol_table)
 .Lname3219:
 	.string "task_free_rpc"
 .Lname3220:
-	.string "npagedir_isuserwritable"
+	.string "pagedir_isuserwritable"
 .Lname3221:
 	.string "dbg_getcur_visible"
 .Lname3223:
@@ -20869,7 +20869,7 @@ END(kernel_symbol_table)
 .Lname3277:
 	.string "inodes_recent_lim"
 .Lname3280:
-	.string "npagedir_prepare_map_keep"
+	.string "pagedir_prepare_map_keep"
 .Lname3281:
 	.string "this_sched_state"
 .Lname3283:
@@ -21193,7 +21193,7 @@ END(kernel_symbol_table)
 .Lname3503:
 	.string "fs_filesystems_lock_endwrite"
 .Lname3504:
-	.string "npagedir_unwriteone_p"
+	.string "pagedir_unwriteone_p"
 .Lname3505:
 	.string "sys_get_thread_area"
 .Lname3506:
@@ -21243,7 +21243,7 @@ END(kernel_symbol_table)
 .Lname3535:
 	.string "task_setprocessgroupleader"
 .Lname3536:
-	.string "npagedir_unmap"
+	.string "pagedir_unmap"
 .Lname3538:
 	.string "slab_kmalloc_nx32"
 .Lname3539:
@@ -21289,7 +21289,7 @@ END(kernel_symbol_table)
 .Lname3566:
 	.string "kmemalign"
 .Lname3568:
-	.string "npagedir_unprepare_map"
+	.string "pagedir_unprepare_map"
 .Lname3569:
 	.string "x86_syscall_emulate32_cdecl_r"
 .Lname3570:
@@ -21373,7 +21373,7 @@ END(kernel_symbol_table)
 .Lname3627:
 	.string "empty_kernel_sigmask"
 .Lname3632:
-	.string "npagedir_map"
+	.string "pagedir_map"
 .Lname3633:
 	.string "slab_malloc8"
 .Lname3634:
@@ -21397,7 +21397,7 @@ END(kernel_symbol_table)
 .Lname3647:
 	.string "cmdline_encode"
 .Lname3649:
-	.string "npagedir_prepare_map_keep_p"
+	.string "pagedir_prepare_map_keep_p"
 .Lname3650:
 	.string "task_schedule_asynchronous_rpc"
 .Lname3651:
@@ -21467,7 +21467,7 @@ END(kernel_symbol_table)
 .Lname3695:
 	.string "unicode_readutf8_rev_n"
 .Lname3696:
-	.string "npagedir_prepare_mapone_p"
+	.string "pagedir_prepare_mapone_p"
 .Lname3697:
 	.string "regdump_sgregs"
 .Lname3698:
@@ -21475,7 +21475,7 @@ END(kernel_symbol_table)
 .Lname3699:
 	.string "thiscpu_jiffies"
 .Lname3700:
-	.string "npagedir_gethint"
+	.string "pagedir_gethint"
 .Lname3701:
 	.string "heap_truncate"
 .Lname3702:
@@ -21491,7 +21491,7 @@ END(kernel_symbol_table)
 .Lname3711:
 	.string "strnend"
 .Lname3712:
-	.string "npagedir_unwrite_p"
+	.string "pagedir_unwrite_p"
 .Lname3713:
 	.string "vm86_step"
 .Lname3714:
@@ -21543,7 +21543,7 @@ END(kernel_symbol_table)
 .Lname3742:
 	.string "sys32_setregid"
 .Lname3743:
-	.string "npagedir_maphintone"
+	.string "pagedir_maphintone"
 .Lname3744:
 	.string "kernel_debugtrap"
 .Lname3745:
@@ -21589,7 +21589,7 @@ END(kernel_symbol_table)
 .Lname3779:
 	.string "aio_buffer_copytophys"
 .Lname3780:
-	.string "npagedir_haschanged"
+	.string "pagedir_haschanged"
 .Lname3781:
 	.string "driver_getfile"
 .Lname3783:
@@ -21861,7 +21861,7 @@ END(kernel_symbol_table)
 .Lname3967:
 	.string "vfs_clone"
 .Lname3969:
-	.string "npagedir_iswritable_p"
+	.string "pagedir_iswritable_p"
 .Lname3970:
 	.string "sys32_get_exception_handler"
 .Lname3971:

@@ -95,7 +95,7 @@ DECL_BEGIN
  *       block of `union p64_pdir_e3[512]' that are shared between all page directories.
  */
 
-/* The minimum alignment required for pointers passed to `npagedir_maphint()' */
+/* The minimum alignment required for pointers passed to `pagedir_maphint()' */
 #define PAGEDIR_MAPHINT_ALIGNMENT 4
 
 
@@ -451,7 +451,7 @@ typedef struct p64_pdir pagedir_t;
 #undef CONFIG_HAVE_PAGEDIR_CHANGED
 #define CONFIG_HAVE_PAGEDIR_CHANGED 1
 
-/* x86 implements the `npagedir_unwrite' API (delete low-level write permissions). */
+/* x86 implements the `pagedir_unwrite' API (delete low-level write permissions). */
 #undef CONFIG_HAVE_PAGEDIR_UNWRITE
 #define CONFIG_HAVE_PAGEDIR_UNWRITE 1
 
@@ -532,7 +532,7 @@ FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_sync)(VIRT void *virt_addr, size_t
 
 /* Synchronize mappings within the given address range. */
 FORCELOCAL NOBLOCK void
-NOTHROW(FCALL npagedir_syncone)(VIRT void *addr) {
+NOTHROW(FCALL pagedir_syncone)(VIRT void *addr) {
 	COMPILER_BARRIER();
 	__asm__("invlpg %0" : : "m" (*(u8 *)addr));
 	COMPILER_BARRIER();
@@ -540,14 +540,14 @@ NOTHROW(FCALL npagedir_syncone)(VIRT void *addr) {
 
 /* Synchronize mappings within the given address range. */
 FORCELOCAL NOBLOCK void
-NOTHROW(FCALL npagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                             PAGEDIR_PAGEALIGNED size_t num_bytes) {
+NOTHROW(FCALL pagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                            PAGEDIR_PAGEALIGNED size_t num_bytes) {
 #ifndef __OMIT_PAGING_CONSTANT_P_WRAPPERS
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
 			return;
 		if (num_bytes <= 4096) {
-			npagedir_syncone(addr);
+			pagedir_syncone(addr);
 			return;
 		}
 		if (num_bytes > KERNEL_BASE) {

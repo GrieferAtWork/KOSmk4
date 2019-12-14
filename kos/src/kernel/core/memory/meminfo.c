@@ -681,7 +681,7 @@ NOTHROW(KCALL minfo_relocate_appropriate)(void) {
 	kernel_vm_node_pagedata.vn_node.a_vmax = PAGEID_ENCODE(dest + num_bytes - 1);
 	vm_node_insert(&kernel_vm_node_pagedata);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if unlikely(!npagedir_prepare_map(dest, num_bytes)) {
+	if unlikely(!pagedir_prepare_map(dest, num_bytes)) {
 		printk(FREESTR(KERN_ERR "Failed to prepare VM for relocated memory "
 		                        "information at %p...%p\n"),
 		       dest, dest + num_bytes - 1);
@@ -691,11 +691,11 @@ NOTHROW(KCALL minfo_relocate_appropriate)(void) {
 	assert(vm_datapart_numdpages(&kernel_vm_part_pagedata) == num_bytes / PAGESIZE);
 	assert(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_size == num_bytes / PAGESIZE);
 	/* Remove the page directory mapping. */
-	npagedir_unmap(old_addr, num_bytes);
+	pagedir_unmap(old_addr, num_bytes);
 	/* Create a new page directory mapping. */
-	npagedir_map(dest, num_bytes,
-	             page2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start),
-	             PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+	pagedir_map(dest, num_bytes,
+	            page2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start),
+	            PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 	/* Now apply relocations. */
 #define REL(x) ((x) = (__typeof__(x))((byte_t *)(x) + relocation_offset))
 	REL(minfo.mb_banks);

@@ -71,11 +71,11 @@ PP_CAT2(anon_zero_loadpart, DATAPAGE_SHIFT)(struct vm_datablock *__restrict UNUS
 			continue;
 		}
 		tramp  = THIS_TRAMPOLINE_BASE;
-		backup = npagedir_push_mapone(tramp, phys,
+		backup = pagedir_push_mapone(tramp, phys,
 		                              PAGEDIR_MAP_FREAD |
 		                              PAGEDIR_MAP_FWRITE);
 		for (;;) {
-			npagedir_syncone(tramp);
+			pagedir_syncone(tramp);
 #if DATA_PAGES_PER_V_PAGE == 1
 			CLEAR_DATA_PAGE(tramp, 1);
 			/* Skip all pages that are already zero-initialized. */
@@ -107,12 +107,12 @@ PP_CAT2(anon_zero_loadpart, DATAPAGE_SHIFT)(struct vm_datablock *__restrict UNUS
 				phys += PAGESIZE;
 			}
 #endif /* DATA_PAGES_PER_V_PAGE != 1 */
-			npagedir_mapone(tramp, phys,
-			                PAGEDIR_MAP_FREAD |
-			                PAGEDIR_MAP_FWRITE);
+			pagedir_mapone(tramp, phys,
+			               PAGEDIR_MAP_FREAD |
+			               PAGEDIR_MAP_FWRITE);
 		}
 done:
-		npagedir_pop_mapone(tramp, backup);
+		pagedir_pop_mapone(tramp, backup);
 		break;
 	}
 }

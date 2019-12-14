@@ -424,14 +424,14 @@ do_inode_flexread_phys(struct inode *__restrict self,
 		if (page_bytes > num_bytes)
 			page_bytes = num_bytes;
 		if (is_first) {
-			backup = npagedir_push_mapone(tramp, buf & ~PAGEMASK,
-			                              PAGEDIR_MAP_FWRITE);
+			backup = pagedir_push_mapone(tramp, buf & ~PAGEMASK,
+			                             PAGEDIR_MAP_FWRITE);
 			is_first = false;
 		} else {
-			npagedir_mapone(tramp, buf & ~PAGEMASK,
-			                PAGEDIR_MAP_FWRITE);
+			pagedir_mapone(tramp, buf & ~PAGEMASK,
+			               PAGEDIR_MAP_FWRITE);
 		}
-		npagedir_syncone(tramp);
+		pagedir_syncone(tramp);
 		/* Copy memory. */
 		TRY {
 			temp = (*self->i_type->it_file.f_flexread)(self,
@@ -440,7 +440,7 @@ do_inode_flexread_phys(struct inode *__restrict self,
 		} EXCEPT {
 			/* Try-catch is required, because `src' may be a user-buffer,
 			 * in which case access may cause an exception to be thrown. */
-			npagedir_pop_mapone(tramp, backup);
+			pagedir_pop_mapone(tramp, backup);
 			RETHROW();
 		}
 		result += temp;
@@ -452,7 +452,7 @@ do_inode_flexread_phys(struct inode *__restrict self,
 		buf += page_bytes;
 		file_position += page_bytes;
 	}
-	npagedir_pop_mapone(tramp, backup);
+	pagedir_pop_mapone(tramp, backup);
 	return result;
 }
 

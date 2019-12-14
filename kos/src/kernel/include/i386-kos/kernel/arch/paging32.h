@@ -39,7 +39,7 @@
 #undef CONFIG_HAVE_PAGEDIR_CHANGED
 #define CONFIG_HAVE_PAGEDIR_CHANGED 1
 
-/* x86 implements the `npagedir_unwrite' API (delete low-level write permissions). */
+/* x86 implements the `pagedir_unwrite' API (delete low-level write permissions). */
 #undef CONFIG_HAVE_PAGEDIR_UNWRITE
 #define CONFIG_HAVE_PAGEDIR_UNWRITE 1
 
@@ -66,7 +66,7 @@ DECL_BEGIN
 /* Amount of memory reserved for page-directory self-modifications. */
 #define X86_VM_KERNEL_PDIR_RESERVED_SIZE P32_VM_KERNEL_PDIR_RESERVED_SIZE
 
-/* The minimum alignment required for pointers passed to `npagedir_maphint()' */
+/* The minimum alignment required for pointers passed to `pagedir_maphint()' */
 #define PAGEDIR_MAPHINT_ALIGNMENT  P32_PAGEDIR_MAPHINT_ALIGNMENT
 
 /* Define platform-independent symbols. */
@@ -95,7 +95,7 @@ DECL_BEGIN
 /* Amount of memory reserved for page-directory self-modifications. */
 #define X86_VM_KERNEL_PDIR_RESERVED_SIZE PAE_VM_KERNEL_PDIR_RESERVED_SIZE
 
-/* The minimum alignment required for pointers passed to `npagedir_maphint()' */
+/* The minimum alignment required for pointers passed to `pagedir_maphint()' */
 #define PAGEDIR_MAPHINT_ALIGNMENT  PAE_PAGEDIR_MAPHINT_ALIGNMENT
 
 /* Define platform-independent symbols. */
@@ -150,7 +150,7 @@ DECL_BEGIN
 #endif /* Diff-reservations */
 
 
-/* The minimum alignment required for pointers passed to `npagedir_maphint()' */
+/* The minimum alignment required for pointers passed to `pagedir_maphint()' */
 #if P32_PAGEDIR_MAPHINT_ALIGNMENT > PAE_PAGEDIR_MAPHINT_ALIGNMENT
 #define PAGEDIR_MAPHINT_ALIGNMENT  P32_PAGEDIR_MAPHINT_ALIGNMENT
 #else /* P32_PAGEDIR_MAPHINT_ALIGNMENT > PAE_PAGEDIR_MAPHINT_ALIGNMENT */
@@ -303,21 +303,21 @@ FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_sync)(VIRT void *virt_addr, size_t
 
 /* Synchronize mappings within the given address range. */
 FORCELOCAL NOBLOCK void
-NOTHROW(FCALL npagedir_syncone)(VIRT void *addr) {
-	/* TODO: Rename `x86_pagedir_syncone()' to `npagedir_syncone()' */
+NOTHROW(FCALL pagedir_syncone)(VIRT void *addr) {
+	/* TODO: Rename `x86_pagedir_syncone()' to `pagedir_syncone()' */
 	x86_pagedir_syncone(addr);
 }
 
 /* Synchronize mappings within the given address range. */
 FORCELOCAL NOBLOCK void
-NOTHROW(FCALL npagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                             PAGEDIR_PAGEALIGNED size_t num_bytes) {
+NOTHROW(FCALL pagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                            PAGEDIR_PAGEALIGNED size_t num_bytes) {
 #ifndef __OMIT_PAGING_CONSTANT_P_WRAPPERS
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
 			return;
 		if (num_bytes <= 4096) {
-			npagedir_syncone(addr);
+			pagedir_syncone(addr);
 			return;
 		}
 		if (num_bytes > KERNEL_BASE) {

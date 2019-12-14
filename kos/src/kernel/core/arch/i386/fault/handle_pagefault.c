@@ -116,11 +116,11 @@ handle_iob_access(struct cpu *__restrict mycpu,
 		decref(iob);
 		iob = cow;
 	}
-	npagedir_map(FORCPU(mycpu, thiscpu_x86_iob),
-	             2 * PAGESIZE,
-	             iob->ib_pages,
-	             is_writing ? (PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE)
-	                        : (PAGEDIR_MAP_FREAD));
+	pagedir_map(FORCPU(mycpu, thiscpu_x86_iob),
+	            2 * PAGESIZE,
+	            iob->ib_pages,
+	            is_writing ? (PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE)
+	                       : (PAGEDIR_MAP_FREAD));
 	FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) = iob;
 #undef GET_GFP_FLAGS
 	return true;
@@ -263,7 +263,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	    pageid >= PAGEID_ENCODE(KERNEL_BASE)) {
 	    /* Check if a hint was defined for this page. */
 		struct vm_node *hinted_node;
-		if ((hinted_node = (struct vm_node *)npagedir_gethint(addr)) != NULL) {
+		if ((hinted_node = (struct vm_node *)pagedir_gethint(addr)) != NULL) {
 			/* This is a hinted node (perform assertions on all
 			 * of the requirements documented for such a node) */
 			pageptr_t ppage;
@@ -297,7 +297,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 			 *       tracking. */
 			if ((hinted_node->vn_part->dp_flags & VM_DATAPART_FLAG_TRKCHNG) && !has_changed)
 				prot &= ~PAGEDIR_MAP_FWRITE;
-			npagedir_mapone(pageaddr, page2addr(ppage), prot);
+			pagedir_mapone(pageaddr, page2addr(ppage), prot);
 			goto done;
 		}
 	}
@@ -359,7 +359,7 @@ do_handle_iob_node_access:
 							/* Check for special case: even if the IOPERM bitmap is already
 							 * mapped, allow a mapping upgrade if it was mapped read-only
 							 * before, but is now needed as read-write. */
-							if ((ecode & X86_PAGEFAULT_ECODE_WRITING) && !npagedir_iswritable(addr))
+							if ((ecode & X86_PAGEFAULT_ECODE_WRITING) && !pagedir_iswritable(addr))
 								; /* Upgrade the mapping */
 							else {
 								goto pop_connections_and_throw_segfault;
@@ -739,7 +739,7 @@ upgrade_and_recheck_vm_for_node:
 							}
 							/* If the node isn't prepared, make sure that we can map memory. */
 							if (!(node->vn_flags & VM_NODE_FLAG_PREPARED)) {
-								if unlikely(!npagedir_prepare_mapone(pageaddr)) {
+								if unlikely(!pagedir_prepare_mapone(pageaddr)) {
 									sync_endwrite(effective_vm);
 									sync_endwrite(part);
 									page_free(new_ppage, 1);
@@ -784,7 +784,7 @@ upgrade_and_recheck_vm_for_node:
 #endif /* !CONFIG_NO_SMP */
 
 							/* Actually map the accessed page! */
-							npagedir_mapone(pageaddr, page2addr(new_ppage), prot);
+							pagedir_mapone(pageaddr, page2addr(new_ppage), prot);
 							vm_sync_endone(effective_vm, pageaddr);
 
 							/* Unlink the given node from the old part's chain. */
@@ -943,23 +943,23 @@ endread_and_decref_part_and_set_noexec:
 					prot |= PAGEDIR_MAP_FUSER;
 				/* If the node isn't prepared, make sure that we can map memory. */
 				if (!(node->vn_flags & VM_NODE_FLAG_PREPARED)) {
-					if unlikely(!npagedir_prepare_mapone(pageaddr)) {
+					if unlikely(!pagedir_prepare_mapone(pageaddr)) {
 						sync_endwrite(effective_vm);
 						sync_endread(part);
 						THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
 					}
 				}
 				/* Actually map the accessed page! */
-				npagedir_mapone(pageaddr, page2addr(ppage), prot);
+				pagedir_mapone(pageaddr, page2addr(ppage), prot);
 
 				/* Make sure that the performed access can now succeed */
 				assertf(ecode & X86_PAGEFAULT_ECODE_WRITING
 				        ? (ecode & X86_PAGEFAULT_ECODE_USERSPACE
-				           ? npagedir_isuserwritable(addr)
-				           : npagedir_iswritable(addr))
+				           ? pagedir_isuserwritable(addr)
+				           : pagedir_iswritable(addr))
 				        : (ecode & X86_PAGEFAULT_ECODE_USERSPACE
-				           ? npagedir_isuseraccessible(addr)
-				           : npagedir_ismapped(addr)),
+				           ? pagedir_isuseraccessible(addr)
+				           : pagedir_ismapped(addr)),
 				        "ecode         = %p\n"
 				        "prot          = %p\n"
 				        "node->vn_prot = %p\n"
@@ -1003,7 +1003,7 @@ pop_connections_and_set_exception_pointers:
 		}
 	}
 done:
-	npagedir_syncone(addr);
+	pagedir_syncone(addr);
 	return state;
 throw_segfault:
 	if (pc == (uintptr_t)addr) {

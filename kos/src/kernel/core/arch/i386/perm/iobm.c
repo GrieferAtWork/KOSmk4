@@ -72,10 +72,10 @@ NOTHROW(KCALL ioperm_bitmap_unset_write_access)(struct ioperm_bitmap *__restrict
 	mycpu = THIS_CPU;
 	if (FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == self) {
 		/* Re-map, and only include read permissions. */
-		npagedir_map(FORCPU(mycpu, thiscpu_x86_iob),
-		             2 * PAGESIZE,
-		             self->ib_pages,
-		             PAGEDIR_MAP_FREAD);
+		pagedir_map(FORCPU(mycpu, thiscpu_x86_iob),
+		            2 * PAGESIZE,
+		            self->ib_pages,
+		            PAGEDIR_MAP_FREAD);
 	}
 	PREEMPTION_POP(was);
 }
@@ -305,11 +305,11 @@ NOTHROW(KCALL x86_initialize_iobm)(void) {
 #endif /* !__x86_64__ */
 	/* Prepare the IOB region for lazy memory mappings. */
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (!npagedir_prepare_map(__x86_iob_empty_base, 2 * PAGESIZE))
+	if (!pagedir_prepare_map(__x86_iob_empty_base, 2 * PAGESIZE))
 		kernel_panic(FREESTR("Failed to prepare _bootcpu.tss.iob"));
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	/* Unmap the initial IOB of the boot CPU. */
-	npagedir_unmap(__x86_iob_empty_base, 2 * PAGESIZE);
+	pagedir_unmap(__x86_iob_empty_base, 2 * PAGESIZE);
 }
 
 
