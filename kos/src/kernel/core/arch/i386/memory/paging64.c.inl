@@ -89,7 +89,7 @@ STATIC_ASSERT(P64_PDIR_E1_IDENTITY_BASE == P64_VM_KERNEL_PDIR_IDENTITY_BASE);
 PRIVATE ATTR_SECTION(".free.unmap_but_keep_allocated") ATTR_ALIGNED(4096)
 union p64_pdir_e1 boot_trampoline_e1v[512];
 
-INTDEF byte_t __kernel_free_endpage[];
+INTDEF byte_t __kernel_free_endpageid[];
 
 /* Prepare 2 consecutive (and 2-page aligned) pages of virtual
  * memory for the purpose of doing the initial prepare required
@@ -101,7 +101,7 @@ NOTHROW(FCALL kernel_initialize_boot_trampolines)(void) {
 	unsigned int vec1, vec2, vec3, vec4, i;
 	/* We allocate the boot trampoline immediately after the
 	 * end of the kernel's .free section in virtual memory. */
-	trampoline_page = (vm_vpage_t)(uintptr_t)__kernel_free_endpage;
+	trampoline_page = (vm_vpage_t)(uintptr_t)__kernel_free_endpageid;
 again_calculate_vecN:
 	vec1 = P64_PDIR_VEC1INDEX_VPAGE(trampoline_page);
 	vec2 = P64_PDIR_VEC2INDEX_VPAGE(trampoline_page);

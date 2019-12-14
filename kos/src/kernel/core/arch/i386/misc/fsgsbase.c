@@ -169,8 +169,8 @@ NOTHROW(FCALL x86_fsgsbase_patch)(void *__restrict pc) {
 }
 
 
-INTDEF FREE uint32_t __x64_fixup_fsgsbase_start[];
-INTDEF FREE uint32_t __x64_fixup_fsgsbase_end[];
+INTDEF FREE uint32_t __x86_fixup_fsgsbase_start[];
+INTDEF FREE uint32_t __x86_fixup_fsgsbase_end[];
 
 /* Patch all (rd|wr)(fs|gs)base text location within the kernel core. */
 INTERN NOBLOCK ATTR_FREETEXT void
@@ -183,8 +183,8 @@ NOTHROW(KCALL x86_initialize_fsgsbase)(void) {
 		return;
 	}
 	/* Patch all fsgsbase instructions within the kernel core. */
-	for (iter = __x64_fixup_fsgsbase_start;
-	     iter < __x64_fixup_fsgsbase_end; ++iter) {
+	for (iter = __x86_fixup_fsgsbase_start;
+	     iter < __x86_fixup_fsgsbase_end; ++iter) {
 		uintptr_t pc = KERNEL_CORE_BASE + *iter;
 		bool was_ok = x86_fsgsbase_patch((void *)pc);
 		if unlikely(!was_ok)

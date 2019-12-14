@@ -42,32 +42,43 @@
 
 DECL_BEGIN
 
-/* TODO: Implement the pageid / pageptr split for the linker constants in this file! */
-INTDEF byte_t __kernel_text_startpage[];
-INTDEF byte_t __kernel_text_endpage[];
+INTDEF byte_t __kernel_text_start[] ASMNAME("__kernel_sect_text_start");
+INTDEF byte_t __kernel_text_startpageid[];
+INTDEF byte_t __kernel_text_startpageptr[];
+INTDEF byte_t __kernel_text_endpageid[];
 INTDEF byte_t __kernel_text_numpages[];
 
-INTDEF byte_t __kernel_rodata_startpage[];
-INTDEF byte_t __kernel_rodata_endpage[];
+INTDEF byte_t __kernel_rodata_startpageid[];
+INTDEF byte_t __kernel_rodata_startpageptr[];
+INTDEF byte_t __kernel_rodata_endpageid[];
 INTDEF byte_t __kernel_rodata_numpages[];
 
-INTDEF byte_t __kernel_data_startpage[];
-INTDEF byte_t __kernel_data_endpage[];
+INTDEF byte_t __kernel_data_startpageid[];
+INTDEF byte_t __kernel_data_startpageptr[];
+INTDEF byte_t __kernel_data_endpageid[];
 INTDEF byte_t __kernel_data_numpages[];
 
-INTDEF byte_t __kernel_pdata_startpage[];
-INTDEF byte_t __kernel_pdata_endpage[];
+INTDEF byte_t __kernel_pdata_start[];
+INTDEF byte_t __kernel_pdata_startpageid[];
+INTDEF byte_t __kernel_pdata_startpageptr[];
+INTDEF byte_t __kernel_pdata_end[];
+INTDEF byte_t __kernel_pdata_endpageid[];
+INTDEF byte_t __kernel_pdata_endpageptr[];
 INTDEF byte_t __kernel_pdata_numpages[];
+INTDEF byte_t __kernel_pdata_numbytes[];
 
-INTDEF byte_t __kernel_xdata_startpage[];
-INTDEF byte_t __kernel_xdata_endpage[];
+INTDEF byte_t __kernel_xdata_startpageid[];
+INTDEF byte_t __kernel_xdata_startpageptr[];
+INTDEF byte_t __kernel_xdata_endpageid[];
 INTDEF byte_t __kernel_xdata_numpages[];
 
-INTDEF byte_t __kernel_bss_startpage[];
-INTDEF byte_t __kernel_bss_endpage[];
+INTDEF byte_t __kernel_bss_startpageid[];
+INTDEF byte_t __kernel_bss_startpageptr[];
+INTDEF byte_t __kernel_bss_endpageid[];
 INTDEF byte_t __kernel_bss_numpages[];
 
-INTDEF byte_t __kernel_bootiob_startpage[] ASMNAME("__x86_iob_empty_vpageno");
+INTDEF byte_t __kernel_bootiob_startpageid[] ASMNAME("__x86_iob_empty_pageid");
+INTDEF byte_t __kernel_bootiob_startpageptr[] ASMNAME("__x86_iob_empty_pageptr");
 
 #undef CONFIG_BOOTCPU_IOB_LIES_IN_BSS
 #undef CONFIG_BOOTCPU_IOB_LIES_IN_DATA
@@ -92,12 +103,14 @@ INTDEF byte_t __kernel_bootiob_startpage[] ASMNAME("__x86_iob_empty_vpageno");
 #define X86_KERNEL_VMMAPPING_CORE_BSS2        5 /* .bss */
 INTDEF byte_t __x86_kernel_bss_before_iob_pages[];
 INTDEF byte_t __x86_kernel_bss_after_iob_pages[];
-#define __kernel_bss1_startpage  __kernel_bss_startpage
-#define __kernel_bss1_endpage    __kernel_bootiob_startpage
-#define __kernel_bss1_numpages   __x86_kernel_bss_before_iob_pages
-#define __kernel_bss2_startpage  (__kernel_bootiob_startpage + 2) /* 2: Number of pages in TSS.IOB */
-#define __kernel_bss2_endpage    __kernel_bss_endpage
-#define __kernel_bss2_numpages   (__x86_kernel_bss_after_iob_pages - 2)
+#define __kernel_bss1_startpageid  __kernel_bss_startpageid
+#define __kernel_bss1_startpageptr __kernel_bss_startpageptr
+#define __kernel_bss1_endpageid    __kernel_bootiob_startpageid
+#define __kernel_bss1_numpages     __x86_kernel_bss_before_iob_pages
+#define __kernel_bss2_startpageid  (__kernel_bootiob_startpageid + 2)  /* 2: Number of pages in TSS.IOB */
+#define __kernel_bss2_startpageptr (__kernel_bootiob_startpageptr + 2) /* 2: Number of pages in TSS.IOB */
+#define __kernel_bss2_endpageid    __kernel_bss_endpageid
+#define __kernel_bss2_numpages     (__x86_kernel_bss_after_iob_pages - 2)
 #else /* CONFIG_BOOTCPU_IOB_LIES_IN_BSS */
 #define X86_KERNEL_VMMAPPING_CORE_DATA1       2 /* .data */
 #define X86_KERNEL_VMMAPPING_CORE_DATA2       3 /* .data */
@@ -105,12 +118,14 @@ INTDEF byte_t __x86_kernel_bss_after_iob_pages[];
 #define X86_KERNEL_VMMAPPING_CORE_BSS         5 /* .bss */
 INTDEF byte_t __x86_kernel_data_before_iob_pages[];
 INTDEF byte_t __x86_kernel_data_after_iob_pages[];
-#define __kernel_data1_startpage  __kernel_data_startpage
-#define __kernel_data1_endpage    __kernel_bootiob_startpage
-#define __kernel_data1_numpages   __x86_kernel_data_before_iob_pages
-#define __kernel_data2_startpage  (__kernel_bootiob_startpage + 2) /* 2: Number of pages in TSS.IOB */
-#define __kernel_data2_endpage    __kernel_data_endpage
-#define __kernel_data2_numpages   (__x86_kernel_data_after_iob_pages - 2)
+#define __kernel_data1_startpageid  __kernel_data_startpageid
+#define __kernel_data1_startpageptr __kernel_data_startpageptr
+#define __kernel_data1_endpageid    __kernel_bootiob_startpageid
+#define __kernel_data1_numpages     __x86_kernel_data_before_iob_pages
+#define __kernel_data2_startpageid  (__kernel_bootiob_startpageid + 2) /* 2: Number of pages in TSS.IOB */
+#define __kernel_data2_startpageptr (__kernel_bootiob_startpageptr + 2) /* 2: Number of pages in TSS.IOB */
+#define __kernel_data2_endpageid    __kernel_data_endpageid
+#define __kernel_data2_numpages     (__x86_kernel_data_after_iob_pages - 2)
 #endif /* !CONFIG_BOOTCPU_IOB_LIES_IN_BSS */
 #define X86_KERNEL_VMMAPPING_IDENTITY_RESERVE 6 /* A memory reservation made for the page directory identity mapping. */
 
@@ -121,57 +136,57 @@ INTDEF struct vm_node x86_kernel_vm_nodes[];
 INTDEF struct vm_node x86_vmnode_transition_reserve;
 
 
-#define INIT_DATAPART(self, dp_srefs_, startpage, numpages)                                     \
-	{                                                                                           \
-		/* .dp_refcnt = */ 2, /* 2 == 1(myself) + 1(node) */                                    \
-		/* .dp_lock   = */ SHARED_RWLOCK_INIT,                                                  \
-		{                                                                                       \
-			/* .dp_tree_ptr = */ { NULL, NULL, 0, (size_t)(numpages) - 1 }                      \
-		},                                                                                      \
-		/* .dp_crefs = */ LLIST_INIT,                                                           \
-		/* .dp_srefs = */ dp_srefs_,                                                            \
-		/* .dp_stale = */ NULL,                                                                 \
-		/* .dp_block = */ &vm_datablock_anonymous,                                              \
-		/* .dp_flags = */ VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,                  \
-		/* .dp_state = */ VM_DATAPART_STATE_LOCKED,                                             \
-		{                                                                                       \
-			/* .dp_ramdata = */ {                                                               \
-				/* .rd_blockv = */ &(self).dp_ramdata.rd_block0,                                \
-				{                                                                               \
-					/* .rd_block0 = */ {                                                        \
-						/* .rb_start = */ (pageptr_t)(uintptr_t)(startpage) - KERNEL_BASE_PAGE, \
-						/* .rb_size  = */ (size_t)(numpages)                                    \
-					}                                                                           \
-				}                                                                               \
-			}                                                                                   \
-		}                                                                                       \
+#define INIT_DATAPART(self, dp_srefs_, pageptr, numpages)                      \
+	{                                                                          \
+		/* .dp_refcnt = */ 2, /* 2 == 1(myself) + 1(node) */                   \
+		/* .dp_lock   = */ SHARED_RWLOCK_INIT,                                 \
+		{                                                                      \
+			/* .dp_tree_ptr = */ { NULL, NULL, 0, (size_t)(numpages) - 1 }     \
+		},                                                                     \
+		/* .dp_crefs = */ LLIST_INIT,                                          \
+		/* .dp_srefs = */ dp_srefs_,                                           \
+		/* .dp_stale = */ NULL,                                                \
+		/* .dp_block = */ &vm_datablock_anonymous,                             \
+		/* .dp_flags = */ VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP, \
+		/* .dp_state = */ VM_DATAPART_STATE_LOCKED,                            \
+		{                                                                      \
+			/* .dp_ramdata = */ {                                              \
+				/* .rd_blockv = */ &(self).dp_ramdata.rd_block0,               \
+				{                                                              \
+					/* .rd_block0 = */ {                                       \
+						/* .rb_start = */ (pageptr_t)(uintptr_t)(pageptr),     \
+						/* .rb_size  = */ (size_t)(numpages)                   \
+					}                                                          \
+				}                                                              \
+			}                                                                  \
+		}                                                                      \
 	}
 
 INTERN struct vm_datapart x86_kernel_vm_parts[6] = {
 #define DO_INIT_DATAPART(id, startpage, numpages) \
 	INIT_DATAPART(x86_kernel_vm_parts[id], &x86_kernel_vm_nodes[id], startpage, numpages)
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_TEXT, __kernel_text_startpage, __kernel_text_numpages),
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_RODATA, __kernel_rodata_startpage, __kernel_rodata_numpages),
+	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_TEXT, __kernel_text_startpageptr, __kernel_text_numpages),
+	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_RODATA, __kernel_rodata_startpageptr, __kernel_rodata_numpages),
 #ifdef X86_KERNEL_VMMAPPING_CORE_DATA
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_DATA, __kernel_data_startpage, __kernel_data_numpages),
+	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_DATA, __kernel_data_startpageptr, __kernel_data_numpages),
 #else /* X86_KERNEL_VMMAPPING_CORE_DATA */
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_DATA1, __kernel_data1_startpage, __kernel_data1_numpages),
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_DATA2, __kernel_data2_startpage, __kernel_data2_numpages),
+	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_DATA1, __kernel_data1_startpageptr, __kernel_data1_numpages),
+	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_DATA2, __kernel_data2_startpageptr, __kernel_data2_numpages),
 #endif /* !X86_KERNEL_VMMAPPING_CORE_DATA */
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_XDATA, __kernel_xdata_startpage, __kernel_xdata_numpages),
+	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_XDATA, __kernel_xdata_startpageptr, __kernel_xdata_numpages),
 #ifdef X86_KERNEL_VMMAPPING_CORE_BSS
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_BSS, __kernel_bss_startpage, __kernel_bss_numpages),
+	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_BSS, __kernel_bss_startpageptr, __kernel_bss_numpages),
 #else /* X86_KERNEL_VMMAPPING_CORE_BSS */
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_BSS1, __kernel_bss1_startpage, __kernel_bss1_numpages),
-	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_BSS2, __kernel_bss2_startpage, __kernel_bss2_numpages),
+	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_BSS1, __kernel_bss1_startpageptr, __kernel_bss1_numpages),
+	DO_INIT_DATAPART(X86_KERNEL_VMMAPPING_CORE_BSS2, __kernel_bss2_startpageptr, __kernel_bss2_numpages),
 #endif /* !X86_KERNEL_VMMAPPING_CORE_BSS */
 #undef DO_INIT_DATAPART
 };
 
 
-#define INIT_NODE_RESERVE(self, min, max, prot, part)                                           \
+#define INIT_NODE_RESERVE(self, minpid, maxpid, prot, part)                                     \
 	{                                                                                           \
-		/* .vn_node   = */ { NULL, NULL, min, max },                                            \
+		/* .vn_node   = */ { NULL, NULL, minpid, maxpid },                                      \
 		/* .vn_byaddr = */ LLIST_INITNODE,                                                      \
 		/* .vn_prot   = */ prot | VM_PROT_SHARED,                                               \
 		/* .vn_flags  = */ VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_KERNPRT, \
@@ -181,9 +196,9 @@ INTERN struct vm_datapart x86_kernel_vm_parts[6] = {
 		/* .vn_link   = */ LLIST_INITNODE,                                                      \
 		/* .vn_guard  = */ 0                                                                    \
 	}
-#define INIT_NODE(self, min, max, prot, part)                                                   \
+#define INIT_NODE(self, minpid, maxpid, prot, part)                                             \
 	{                                                                                           \
-		/* .vn_node   = */ { NULL, NULL, min, max },                                            \
+		/* .vn_node   = */ { NULL, NULL, minpid, maxpid },                                      \
 		/* .vn_byaddr = */ LLIST_INITNODE,                                                      \
 		/* .vn_prot   = */ prot | VM_PROT_SHARED,                                               \
 		/* .vn_flags  = */ VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_KERNPRT, \
@@ -195,6 +210,7 @@ INTERN struct vm_datapart x86_kernel_vm_parts[6] = {
 	}
 
 
+/* Special VM node used to describe the memory reservation at the user-/kernel-space split. */
 INTERN struct vm_node x86_vmnode_transition_reserve =
 	INIT_NODE_RESERVE(x86_vmnode_transition_reserve,
 	                  PAGEID_ENCODE(KERNEL_BASE),
@@ -203,26 +219,26 @@ INTERN struct vm_node x86_vmnode_transition_reserve =
 	                  kernel_vm_single_reserved_page);
 
 INTERN struct vm_node x86_kernel_vm_nodes[8] = {
-#define DO_INIT_NODE(id, startpage, endpage, prot) \
-	INIT_NODE(x86_kernel_vm_nodes[id],             \
-	          (uintptr_t)(startpage),              \
-	          (uintptr_t)(endpage)-1,              \
-	          prot,                                \
+#define DO_INIT_NODE(id, startpageid, endpageid, prot) \
+	INIT_NODE(x86_kernel_vm_nodes[id],                 \
+	          (pageid_t)(startpageid),                 \
+	          (pageid_t)(endpageid)-1,                 \
+	          prot,                                    \
 	          x86_kernel_vm_parts[id])
-	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_TEXT, __kernel_text_startpage, __kernel_text_endpage, VM_PROT_READ | VM_PROT_EXEC),
-	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_RODATA, __kernel_rodata_startpage, __kernel_rodata_endpage, VM_PROT_READ),
+	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_TEXT, __kernel_text_startpageid, __kernel_text_endpageid, VM_PROT_READ | VM_PROT_EXEC),
+	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_RODATA, __kernel_rodata_startpageid, __kernel_rodata_endpageid, VM_PROT_READ),
 #ifdef X86_KERNEL_VMMAPPING_CORE_DATA
-	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_DATA, __kernel_data_startpage, __kernel_data_endpage, VM_PROT_READ | VM_PROT_WRITE),
+	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_DATA, __kernel_data_startpageid, __kernel_data_endpageid, VM_PROT_READ | VM_PROT_WRITE),
 #else /* X86_KERNEL_VMMAPPING_CORE_DATA */
-	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_DATA1, __kernel_data1_startpage, __kernel_data1_endpage, VM_PROT_READ | VM_PROT_WRITE),
-	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_DATA2, __kernel_data2_startpage, __kernel_data2_endpage, VM_PROT_READ | VM_PROT_WRITE),
+	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_DATA1, __kernel_data1_startpageid, __kernel_data1_endpageid, VM_PROT_READ | VM_PROT_WRITE),
+	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_DATA2, __kernel_data2_startpageid, __kernel_data2_endpageid, VM_PROT_READ | VM_PROT_WRITE),
 #endif /* !X86_KERNEL_VMMAPPING_CORE_DATA */
-	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_XDATA, __kernel_xdata_startpage, __kernel_xdata_endpage, VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC),
+	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_XDATA, __kernel_xdata_startpageid, __kernel_xdata_endpageid, VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC),
 #ifdef X86_KERNEL_VMMAPPING_CORE_BSS
-	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_BSS, __kernel_bss_startpage, __kernel_bss_endpage, VM_PROT_READ | VM_PROT_WRITE),
+	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_BSS, __kernel_bss_startpageid, __kernel_bss_endpageid, VM_PROT_READ | VM_PROT_WRITE),
 #else /* X86_KERNEL_VMMAPPING_CORE_BSS */
-	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_BSS1, __kernel_bss1_startpage, __kernel_bss1_endpage, VM_PROT_READ | VM_PROT_WRITE),
-	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_BSS2, __kernel_bss2_startpage, __kernel_bss2_endpage, VM_PROT_READ | VM_PROT_WRITE),
+	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_BSS1, __kernel_bss1_startpageid, __kernel_bss1_endpageid, VM_PROT_READ | VM_PROT_WRITE),
+	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_BSS2, __kernel_bss2_startpageid, __kernel_bss2_endpageid, VM_PROT_READ | VM_PROT_WRITE),
 #endif /* !X86_KERNEL_VMMAPPING_CORE_BSS */
 #undef DO_INIT_NODE
 
@@ -248,11 +264,12 @@ INTDEF struct vm_node x86_vm_node_pdata;
 
 INTERN struct vm_datapart x86_vm_part_pdata =
 	INIT_DATAPART(x86_vm_part_pdata, &x86_vm_node_pdata,
-	              __kernel_pdata_startpage, __kernel_pdata_numpages);
+	              __kernel_pdata_startpageptr,
+	              __kernel_pdata_numpages);
 INTERN struct vm_node x86_vm_node_pdata =
 	INIT_NODE(x86_vm_node_pdata,
-	          (uintptr_t)__kernel_pdata_startpage - KERNEL_BASE_PAGE,
-	          (uintptr_t)__kernel_pdata_endpage - (KERNEL_BASE_PAGE + 1),
+	          (pageid_t)__kernel_pdata_startpageptr,
+	          (pageid_t)__kernel_pdata_endpageptr - 1,
 	           VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC,
 	           x86_vm_part_pdata);
 
@@ -264,17 +281,21 @@ INTERN struct vm_node x86_vm_node_pdata =
 INTDEF struct vm_datapart x86_kernel_vm_part_free;
 INTDEF struct vm_node x86_kernel_vm_node_free;
 
-INTDEF byte_t __kernel_free_startpage[];
-INTDEF byte_t __kernel_free_endpage[];
+INTDEF byte_t __kernel_free_start[];
+INTDEF byte_t __kernel_free_size[];
+INTDEF byte_t __kernel_free_startpageid[];
+INTDEF byte_t __kernel_free_startpageptr[];
+INTDEF byte_t __kernel_free_endpageid[];
 INTDEF byte_t __kernel_free_numpages[];
 
 INTERN ATTR_FREEDATA struct vm_datapart x86_kernel_vm_part_free =
 	INIT_DATAPART(x86_kernel_vm_part_free, &x86_kernel_vm_node_free,
-	              __kernel_free_startpage, __kernel_free_numpages);
+	              __kernel_free_startpageptr,
+	              __kernel_free_numpages);
 INTERN ATTR_FREEDATA struct vm_node x86_kernel_vm_node_free =
 	INIT_NODE(x86_kernel_vm_node_free,
-	          (uintptr_t)__kernel_free_startpage,
-	          (uintptr_t)__kernel_free_endpage - 1,
+	          (pageid_t)__kernel_free_startpageid,
+	          (pageid_t)__kernel_free_endpageid - 1,
 	          VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC,
 	          x86_kernel_vm_part_free);
 
@@ -312,6 +333,7 @@ PRIVATE ATTR_FREETEXT void
 NOTHROW(KCALL simple_insert_and_activate)(struct vm_node *__restrict node,
                                           u16 prot) {
 	struct vm_datapart *part;
+	void *addr;
 	assert(node->vn_vm == &vm_kernel);
 	assertf(node->vn_part->dp_ramdata.rd_blockv == &node->vn_part->dp_ramdata.rd_block0,
 	        "node->vn_part->dp_ramdata.rd_blockv  = %p\n"
@@ -320,18 +342,16 @@ NOTHROW(KCALL simple_insert_and_activate)(struct vm_node *__restrict node,
 	        &node->vn_part->dp_ramdata.rd_block0);
 	vm_node_insert(node);
 	part = node->vn_part;
+	assert(vm_node_getsize(node) == vm_datapart_numbytes(part));
+	addr = vm_node_getstart(node);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (!pagedir_prepare_map(node->vn_node.a_vmin,
-	                         part->dp_ramdata.rd_block0.rb_start)) {
+	if (!npagedir_prepare_map(addr, part->dp_ramdata.rd_block0.rb_size * PAGESIZE)) {
 		kernel_panic(FREESTR("Failed to prepare kernel mapping at %p...%p\n"),
-		             (uintptr_t)VM_PAGE2ADDR(node->vn_node.a_vmin),
-		             (uintptr_t)VM_PAGE2ADDR(node->vn_node.a_vmin + part->dp_ramdata.rd_block0.rb_start) - 1);
+		             vm_node_getmin(node), vm_node_getmax(node));
 	}
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-	pagedir_map(node->vn_node.a_vmin,
-	            part->dp_ramdata.rd_block0.rb_size,
-	            part->dp_ramdata.rd_block0.rb_start,
-	            prot);
+	npagedir_map(addr, part->dp_ramdata.rd_block0.rb_size * PAGESIZE,
+	             page2addr(part->dp_ramdata.rd_block0.rb_start), prot);
 	assertf(part->dp_ramdata.rd_blockv == &part->dp_ramdata.rd_block0,
 	        "part->dp_ramdata.rd_blockv  = %p\n"
 	        "&part->dp_ramdata.rd_block0 = %p\n",
@@ -345,7 +365,7 @@ NOTHROW(KCALL simple_insert_and_activate)(struct vm_node *__restrict node,
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
-DATDEF VIRT byte_t volatile *_x86_lapicbase ASMNAME("x86_lapicbase");
+DATDEF VIRT byte_t volatile *x86_lapicbase_ ASMNAME("x86_lapicbase");
 
 
 INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
@@ -361,11 +381,10 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 
 	/* Unmap everything before the kernel. */
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (npagedir_prepare_map((void *)KERNEL_BASE, ((uintptr_t)__kernel_text_startpage - KERNEL_BASE_PAGE) * PAGESIZE))
+	if (npagedir_prepare_map((void *)KERNEL_BASE, (uintptr_t)__kernel_text_start - KERNEL_BASE))
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
-		npagedir_unmap((void *)KERNEL_BASE,
-		               ((uintptr_t)__kernel_text_startpage - KERNEL_BASE_PAGE) * PAGESIZE);
+		npagedir_unmap((void *)KERNEL_BASE, (uintptr_t)__kernel_text_start - KERNEL_BASE);
 	}
 	assert(kernel_vm_node_pagedata.vn_node.a_vmin != 0);
 
@@ -397,15 +416,14 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 	 * The contents of this section are mainly required for SMP initialization,
 	 * though can also be used for other things that require being placed at a
 	 * known physical memory location. */
-	if (!pagedir_prepare_map((vm_vpage_t)__kernel_pdata_startpage - KERNEL_BASE_PAGE,
-	                         (size_t)__kernel_pdata_numpages))
+	if (!npagedir_prepare_map(__kernel_pdata_start - KERNEL_BASE, (size_t)__kernel_pdata_numbytes))
 		kernel_panic(FREESTR("Failed to prepare kernel VM for mapping .pdata\n"));
 	simple_insert_and_activate(&x86_vm_node_pdata, PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 #ifndef NDEBUG
 	{
 		u32 virt_word, phys_word;
-		virt_word = *(u32 *)VM_PAGE2ADDR((vm_vpage_t)__kernel_pdata_startpage);
-		phys_word = *(u32 *)VM_PAGE2ADDR((vm_vpage_t)__kernel_pdata_startpage - KERNEL_BASE_PAGE);
+		virt_word = *(u32 *)(__kernel_pdata_start);
+		phys_word = *(u32 *)(__kernel_pdata_start - KERNEL_BASE);
 		assert(virt_word == phys_word);
 	}
 #endif /* !NDEBUG */
@@ -427,7 +445,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 		simple_insert_and_activate(&x86_vm_node_lapic,
 		                           PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 		/* Remember where we mapped the LAPIC */
-		_x86_lapicbase += (uintptr_t)lapic_addr;
+		x86_lapicbase_ += (uintptr_t)lapic_addr;
 	}
 
 	{
@@ -494,8 +512,8 @@ NOTHROW(KCALL x86_initialize_kernel_vm_readonly)(void) {
 
 
 /* The actual page ranges that should be released as general-purpose RAM. */
-INTDEF byte_t __kernel_pfree_startpage[];
-INTDEF byte_t __kernel_pfree_endpage[];
+INTDEF byte_t __kernel_pfree_startpageptr[];
+INTDEF byte_t __kernel_pfree_endpageptr[];
 INTDEF byte_t __kernel_pfree_numpages[];
 
 /* This function can't be made apart of the .free section, because if it was,
@@ -511,27 +529,24 @@ INTDEF byte_t __kernel_pfree_numpages[];
 INTERN ATTR_SECTION(".text.xdata.x86.free_unloader") ATTR_NORETURN
 void KCALL x86_kernel_unload_free_and_jump_to_userspace(void) {
 #if 1
-	vm_paged_node_remove(&vm_kernel, (vm_vpage_t)__kernel_free_startpage);
+	vm_paged_node_remove(&vm_kernel, (pageid_t)__kernel_free_startpageid);
 
 	/* Unmap the entire .free section (in the kernel page directory)
 	 * NOTE: Make sure not to unmap the first couple of pages which
 	 *       are now used by the relocated BRK data. */
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (pagedir_prepare_map((vm_vpage_t)__kernel_free_startpage,
-	                        (size_t)__kernel_free_numpages))
+	if (npagedir_prepare_map(__kernel_free_start, (size_t)__kernel_free_size))
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
-		pagedir_unmap((vm_vpage_t)__kernel_free_startpage,
-		              (size_t)__kernel_free_numpages);
+		npagedir_unmap(__kernel_free_start, (size_t)__kernel_free_size);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-		pagedir_unprepare_map((vm_vpage_t)__kernel_free_startpage,
-		                      (size_t)__kernel_free_numpages);
+		npagedir_unprepare_map(__kernel_free_start, (size_t)__kernel_free_size);
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	}
 
 	/* Release all pages of the .free section, as well as those
 	 * previously used by BRK data to the physical memory allocator. */
-	page_free((pageptr_t)((vm_vpage_t)__kernel_pfree_startpage - KERNEL_CORE_PAGE),
+	page_free((pageptr_t)__kernel_pfree_startpageptr,
 	          (size_t)__kernel_pfree_numpages);
 
 	/* TODO: Go through memory information and find the first `PMEMBANK_TYPE_KFREE'

@@ -756,8 +756,6 @@ size_t __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(size_t num_pages);
 #define __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages) ((size_t)(num_pages) * 4096)
 #endif /* !__INTELLISENSE__ */
 #endif /* !__PAGEDIR_COMPAT_VIRTPAGE2ADDR */
-#define pagedir_prepare_mapone(virt_page)                          npagedir_prepare_mapone(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page))
-#define pagedir_unprepare_mapone(virt_page)                        npagedir_unprepare_mapone(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page))
 #define pagedir_prepare_map(virt_page, num_pages)                  npagedir_prepare_map(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages))
 #define pagedir_prepare_map_keep(virt_page, num_pages)             npagedir_prepare_map_keep(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages))
 #define pagedir_unprepare_map(virt_page, num_pages)                npagedir_unprepare_map(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages))

@@ -93,7 +93,8 @@ SECTIONS {
 
 	IP_ALIGN(PAGESIZE);
 	PROVIDE_HIDDEN(__kernel_sect_text_start = ABSOLUTE(.));
-	PROVIDE_HIDDEN(__kernel_text_startpage = ABSOLUTE(.) / PAGESIZE);
+	PROVIDE_HIDDEN(__kernel_text_startpageid = addr2pageid(ABSOLUTE(.)));
+	PROVIDE_HIDDEN(__kernel_text_startpageptr = addr2pageptr(ABSOLUTE(.)));
 	SECTION(.text) {
 		*(.text.hot .text.likely .text.hot.*)
 		*(.text .text._ZN*)
@@ -124,11 +125,12 @@ SECTIONS {
 
 	IP_ALIGN(PAGESIZE);
 	PROVIDE_HIDDEN(__kernel_sect_text_size = ABSOLUTE(ABSOLUTE(.) - ABSOLUTE(__kernel_sect_text_start)));
-	PROVIDE_HIDDEN(__kernel_text_endpage = ABSOLUTE(.) / PAGESIZE);
-	PROVIDE_HIDDEN(__kernel_text_numpages = ABSOLUTE(ABSOLUTE(__kernel_text_endpage) - ABSOLUTE(__kernel_text_startpage)));
+	PROVIDE_HIDDEN(__kernel_text_endpageid = addr2pageid(ABSOLUTE(.)));
+	PROVIDE_HIDDEN(__kernel_text_numpages = ABSOLUTE(ABSOLUTE(__kernel_text_endpageid) - ABSOLUTE(__kernel_text_startpageid)));
 
 	PROVIDE_HIDDEN(__kernel_sect_rodata_start = ABSOLUTE(.));
-	PROVIDE_HIDDEN(__kernel_rodata_startpage = ABSOLUTE(.) / PAGESIZE);
+	PROVIDE_HIDDEN(__kernel_rodata_startpageid = addr2pageid(ABSOLUTE(.)));
+	PROVIDE_HIDDEN(__kernel_rodata_startpageptr = addr2pageptr(ABSOLUTE(.)));
 	SECTION(.rodata) {
 		*(.rodata.hot .rodata.likely .rodata.hot.*)
 		*(.rodata.x86.*)
@@ -241,12 +243,13 @@ SECTIONS {
 	IP_ALIGN(PAGESIZE);
 	PROVIDE_HIDDEN(__kernel_rodata_end = ABSOLUTE(.));
 	PROVIDE_HIDDEN(__kernel_rodata_size = ABSOLUTE(ABSOLUTE(__kernel_rodata_end) - ABSOLUTE(__kernel_start)));
-	PROVIDE_HIDDEN(__kernel_rodata_endpage = ABSOLUTE(.) / PAGESIZE);
-	PROVIDE_HIDDEN(__kernel_rodata_numpages = ABSOLUTE(ABSOLUTE(__kernel_rodata_endpage) - ABSOLUTE(__kernel_rodata_startpage)));
+	PROVIDE_HIDDEN(__kernel_rodata_endpageid = addr2pageid(ABSOLUTE(.)));
+	PROVIDE_HIDDEN(__kernel_rodata_numpages = ABSOLUTE(ABSOLUTE(__kernel_rodata_endpageid) - ABSOLUTE(__kernel_rodata_startpageid)));
 
 	PROVIDE_HIDDEN(__debug_malloc_tracked_start = ABSOLUTE(.));
 	PROVIDE_HIDDEN(__kernel_sect_data_start = ABSOLUTE(.));
-	PROVIDE_HIDDEN(__kernel_data_startpage = ABSOLUTE(.) / PAGESIZE);
+	PROVIDE_HIDDEN(__kernel_data_startpageid = addr2pageid(ABSOLUTE(.)));
+	PROVIDE_HIDDEN(__kernel_data_startpageptr = addr2pageptr(ABSOLUTE(.)));
 	SECTION(.data) {
 
 		IP_ALIGN(__ARCH_CACHELINESIZE);
@@ -280,9 +283,9 @@ SECTIONS {
 		IP_ALIGN(PAGESIZE);
 		PROVIDE(thiscpu_x86_iob = ABSOLUTE(.));
 		PROVIDE_HIDDEN(__x86_iob_empty_base = ABSOLUTE(.));
-		PROVIDE_HIDDEN(__x86_iob_empty_vpageno = ABSOLUTE(__x86_iob_empty_base) / PAGESIZE);
-		PROVIDE_HIDDEN(__x86_iob_empty_ppageno = ABSOLUTE(__x86_iob_empty_vpageno) - KERNEL_CORE_PAGE);
-		PROVIDE_HIDDEN(__x86_kernel_data_before_iob_pages = ABSOLUTE(__x86_iob_empty_vpageno - __kernel_data_startpage));
+		PROVIDE_HIDDEN(__x86_iob_empty_pageid = addr2pageid(ABSOLUTE(.)));
+		PROVIDE_HIDDEN(__x86_iob_empty_pageptr = addr2pageptr(ABSOLUTE(.)));
+		PROVIDE_HIDDEN(__x86_kernel_data_before_iob_pages = ABSOLUTE(__x86_iob_empty_pageid - __kernel_data_startpageid));
 		. += 8192; /* Make space for the IOBM table. */
 		. += 1;    /* Trailing FFh-byte */
 #endif /* CONFIG_NO_SMP */
@@ -303,21 +306,27 @@ SECTIONS {
 		*(.data.cold .data.unlikely .data.cold.*)
 
 		IP_ALIGN(PAGESIZE);
-		PROVIDE_HIDDEN(__kernel_data_endpage = ABSOLUTE(.) / PAGESIZE);
-		PROVIDE_HIDDEN(__kernel_data_numpages = ABSOLUTE(ABSOLUTE(__kernel_data_endpage) - ABSOLUTE(__kernel_data_startpage)));
+		PROVIDE_HIDDEN(__kernel_data_endpageid = addr2pageid(ABSOLUTE(.)));
+		PROVIDE_HIDDEN(__kernel_data_numpages = ABSOLUTE(ABSOLUTE(__kernel_data_endpageid) - ABSOLUTE(__kernel_data_startpageid)));
 #ifdef CONFIG_NO_SMP
-		PROVIDE_HIDDEN(__x86_kernel_bata_after_iob_pages = ABSOLUTE(__kernel_bss_endpage - __x86_iob_empty_vpageno));
+		PROVIDE_HIDDEN(__x86_kernel_bata_after_iob_pages = ABSOLUTE(__kernel_bss_endpageid - __x86_iob_empty_pageid));
 #endif /* CONFIG_NO_SMP */
 
-		PROVIDE_HIDDEN(__kernel_xdata_startpage = ABSOLUTE(.) / PAGESIZE);
+		PROVIDE_HIDDEN(__kernel_xdata_startpageid = addr2pageid(ABSOLUTE(.)));
+		PROVIDE_HIDDEN(__kernel_xdata_startpageptr = addr2pageptr(ABSOLUTE(.)));
 		/* PDATA: Memory that remains mapping at VADDR=PADDR within the kernel VM.
 		 *        Note however that this memory is linked by its virtual address! */
-		PROVIDE_HIDDEN(__kernel_pdata_startpage = ABSOLUTE(.) / PAGESIZE);
+		PROVIDE_HIDDEN(__kernel_pdata_start = ABSOLUTE(.));
+		PROVIDE_HIDDEN(__kernel_pdata_startpageid = addr2pageid(ABSOLUTE(.)));
+		PROVIDE_HIDDEN(__kernel_pdata_startpageptr = addr2pageptr(ABSOLUTE(.)));
 		KEEP(*(.text.pdata.hot .pdata.hot .text.pdata.likely .pdata.likely))
 		KEEP(*(.text.pdata .pdata))
 		KEEP(*(.text.pdata.cold .pdata.cold .text.pdata.unlikely .pdata.unlikely))
-		PROVIDE_HIDDEN(__kernel_pdata_endpage = ABSOLUTE(ALIGN(PAGESIZE)) / PAGESIZE);
-		PROVIDE_HIDDEN(__kernel_pdata_numpages = ABSOLUTE(ABSOLUTE(__kernel_pdata_endpage) - ABSOLUTE(__kernel_pdata_startpage)));
+		PROVIDE_HIDDEN(__kernel_pdata_end = ALIGN(PAGESIZE));
+		PROVIDE_HIDDEN(__kernel_pdata_endpageid = addr2pageid(ABSOLUTE(ALIGN(PAGESIZE))));
+		PROVIDE_HIDDEN(__kernel_pdata_endpageptr = addr2pageptr(ABSOLUTE(ALIGN(PAGESIZE))));
+		PROVIDE_HIDDEN(__kernel_pdata_numpages = ABSOLUTE(ABSOLUTE(__kernel_pdata_endpageid) - ABSOLUTE(__kernel_pdata_startpageid)));
+		PROVIDE_HIDDEN(__kernel_pdata_numbytes = ABSOLUTE(ABSOLUTE(__kernel_pdata_end) - ABSOLUTE(__kernel_pdata_start)));
 
 		*(.text.xdata.hot .xdata.hot .text.xdata.likely .xdata.likely)
 		*(.text.xdata .xdata)
@@ -336,10 +345,11 @@ SECTIONS {
 		*(.xbss)
 		*(.xbss.cold .xbss.unlikely .xbss.cold.*)
 		IP_ALIGN(PAGESIZE);
-		PROVIDE_HIDDEN(__kernel_xdata_endpage = ABSOLUTE(.) / PAGESIZE);
-		PROVIDE_HIDDEN(__kernel_xdata_numpages = ABSOLUTE(ABSOLUTE(__kernel_xdata_endpage) - ABSOLUTE(__kernel_xdata_startpage)));
+		PROVIDE_HIDDEN(__kernel_xdata_endpageid = addr2pageid(ABSOLUTE(.)));
+		PROVIDE_HIDDEN(__kernel_xdata_numpages = ABSOLUTE(ABSOLUTE(__kernel_xdata_endpageid) - ABSOLUTE(__kernel_xdata_startpageid)));
 
-		PROVIDE_HIDDEN(__kernel_bss_startpage = ABSOLUTE(.) / PAGESIZE);
+		PROVIDE_HIDDEN(__kernel_bss_startpageid = addr2pageid(ABSOLUTE(.)));
+		PROVIDE_HIDDEN(__kernel_bss_startpageptr = addr2pageptr(ABSOLUTE(.)));
 		*(.bss.hot .bss.likely .bss.hot.*)
 		*(.bss)
 		*(.bss.cold .bss.unlikely .bss.cold.*)
@@ -361,9 +371,9 @@ SECTIONS {
 		/* Re-use the physical memory allocated for _bootcpu's IOB
 		 * vector as the pages used to describe the empty IOB vector. */
 		PROVIDE_HIDDEN(__x86_iob_empty_base = ABSOLUTE(.));
-		PROVIDE_HIDDEN(__x86_iob_empty_vpageno = ABSOLUTE(__x86_iob_empty_base) / PAGESIZE);
-		PROVIDE_HIDDEN(__x86_iob_empty_ppageno = ABSOLUTE(__x86_iob_empty_vpageno) - KERNEL_CORE_PAGE);
-		PROVIDE_HIDDEN(__x86_kernel_bss_before_iob_pages = ABSOLUTE(__x86_iob_empty_vpageno - __kernel_bss_startpage));
+		PROVIDE_HIDDEN(__x86_iob_empty_pageid = addr2pageid(ABSOLUTE(.)));
+		PROVIDE_HIDDEN(__x86_iob_empty_pageptr = addr2pageptr(ABSOLUTE(.)));
+		PROVIDE_HIDDEN(__x86_kernel_bss_before_iob_pages = ABSOLUTE(__x86_iob_empty_pageid - __kernel_bss_startpageid));
 		STATIC_ASSERT((ABSOLUTE(.) & PAGEMASK) == 0);
 		. += 8192; /* Make space for the IOBM table. */
 		. += 1;    /* Trailing FFh-byte */
@@ -417,15 +427,16 @@ SECTIONS {
 	PROVIDE_HIDDEN(__kernel_sect_bss_size = ABSOLUTE(ABSOLUTE(.) - ABSOLUTE(__kernel_sect_bss_start)));
 
 	IP_ALIGN(PAGESIZE);
-	PROVIDE_HIDDEN(__kernel_bss_endpage = ABSOLUTE(.) / PAGESIZE);
-	PROVIDE_HIDDEN(__kernel_bss_numpages = ABSOLUTE(ABSOLUTE(__kernel_bss_endpage) - ABSOLUTE(__kernel_bss_startpage)));
+	PROVIDE_HIDDEN(__kernel_bss_endpageid = addr2pageid(ABSOLUTE(.)));
+	PROVIDE_HIDDEN(__kernel_bss_numpages = ABSOLUTE(ABSOLUTE(__kernel_bss_endpageid) - ABSOLUTE(__kernel_bss_startpageid)));
 #ifndef CONFIG_NO_SMP
-	PROVIDE_HIDDEN(__x86_kernel_bss_after_iob_pages = ABSOLUTE(__kernel_bss_endpage - __x86_iob_empty_vpageno));
+	PROVIDE_HIDDEN(__x86_kernel_bss_after_iob_pages = ABSOLUTE(__kernel_bss_endpageid - __x86_iob_empty_pageid));
 #endif /* !CONFIG_NO_SMP */
 
 
 	PROVIDE_HIDDEN(__kernel_free_start = ABSOLUTE(.));
-	PROVIDE_HIDDEN(__kernel_free_startpage = ABSOLUTE(.) / PAGESIZE);
+	PROVIDE_HIDDEN(__kernel_free_startpageid = addr2pageid(ABSOLUTE(.)));
+	PROVIDE_HIDDEN(__kernel_free_startpageptr = addr2pageptr(ABSOLUTE(.)));
 	PROVIDE_HIDDEN(__kernel_size_nofree = ABSOLUTE(ABSOLUTE(__kernel_free_start) - ABSOLUTE(__kernel_start)));
 	SECTION(.free) {
 		/* A special section where data can go that will be unmapped, but have
@@ -434,7 +445,8 @@ SECTIONS {
 		 * specifically its `kernel_initialize_boot_trampolines()' function */
 		KEEP(*(.free.unmap_but_keep_allocated))
 		IP_ALIGN(PAGESIZE);
-		PROVIDE_HIDDEN(__kernel_pfree_startpage = ABSOLUTE(.) / PAGESIZE);
+		/* Start of the page-free section. */
+		PROVIDE_HIDDEN(__kernel_pfree_startpageptr = addr2pageptr(ABSOLUTE(.)));
 		*(.text.free)
 
 		IP_ALIGN(__SIZEOF_POINTER__);
@@ -458,9 +470,9 @@ SECTIONS {
 		PROVIDE_HIDDEN(__kernel_commandline_late_end = ABSOLUTE(.));
 
 #ifdef __x86_64__
-		PROVIDE_HIDDEN(__x64_fixup_fsgsbase_start = ABSOLUTE(.));
-		KEEP(*(.rodata.fixup.fsgsbase.free))
-		PROVIDE_HIDDEN(__x64_fixup_fsgsbase_end = ABSOLUTE(.));
+		PROVIDE_HIDDEN(__x86_fixup_fsgsbase_start = ABSOLUTE(.));
+		KEEP(*(.rodata.free.x86.fixup_fsgsbase))
+		PROVIDE_HIDDEN(__x86_fixup_fsgsbase_end = ABSOLUTE(.));
 #endif /* __x86_64__ */
 
 #ifndef CONFIG_NO_SMP
@@ -478,12 +490,12 @@ SECTIONS {
 		/* TODO: Check if the outer `ABSOLUTE()' here is actually necessary (remove if it is not). */
 		PROVIDE_HIDDEN(__kernel_size = ABSOLUTE(ABSOLUTE(__kernel_end) - ABSOLUTE(__kernel_start)));
 
-		PROVIDE_HIDDEN(__kernel_pfree_endpage = ABSOLUTE(.) / PAGESIZE);
-		PROVIDE_HIDDEN(__kernel_pfree_numpages = ABSOLUTE(ABSOLUTE(__kernel_pfree_endpage) - ABSOLUTE(__kernel_pfree_startpage)));
+		PROVIDE_HIDDEN(__kernel_pfree_endpageptr = addr2pageid(ABSOLUTE(.)));
+		PROVIDE_HIDDEN(__kernel_pfree_numpages = ABSOLUTE(ABSOLUTE(__kernel_pfree_endpageptr) - ABSOLUTE(__kernel_pfree_startpageptr)));
 
 		PROVIDE_HIDDEN(__kernel_free_size = ABSOLUTE(ABSOLUTE(.) - ABSOLUTE(__kernel_free_start)));
-		PROVIDE_HIDDEN(__kernel_free_endpage = ABSOLUTE(.) / PAGESIZE);
-		PROVIDE_HIDDEN(__kernel_free_numpages = ABSOLUTE(ABSOLUTE(__kernel_free_endpage) - ABSOLUTE(__kernel_free_startpage)));
+		PROVIDE_HIDDEN(__kernel_free_endpageid = addr2pageid(ABSOLUTE(.)));
+		PROVIDE_HIDDEN(__kernel_free_numpages = ABSOLUTE(ABSOLUTE(__kernel_free_endpageid) - ABSOLUTE(__kernel_free_startpageid)));
 	}
 
 	PROVIDE(jiffies = ABSOLUTE(_bootcpu + thiscpu_jiffies));
@@ -518,13 +530,13 @@ SECTIONS {
 #ifdef __x86_64__
 #define GDT_L  1
 #define GDT_DB 0
-#define DEFINE_SEGMENT_SYMBOLS(name, TYPE, args) \
+#define DEFINE_SEGMENT_SYMBOLS(name, TYPE, args)                 \
 	PROVIDE_HIDDEN(name##_lo = SEGMENT_##TYPE##_INIT_U    args); \
 	PROVIDE_HIDDEN(name##_hi = SEGMENT_##TYPE##_HI_INIT_U args);
 #else /* __x86_64__ */
 #define GDT_L  0
 #define GDT_DB 1
-#define DEFINE_SEGMENT_SYMBOLS(name, TYPE, args) \
+#define DEFINE_SEGMENT_SYMBOLS(name, TYPE, args)               \
 	PROVIDE_HIDDEN(name##_lo = SEGMENT_##TYPE##_INIT_UL args); \
 	PROVIDE_HIDDEN(name##_hi = SEGMENT_##TYPE##_INIT_UH args);
 #endif /* !__x86_64__ */

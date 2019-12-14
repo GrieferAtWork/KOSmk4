@@ -301,6 +301,8 @@ DATDEF ATTR_PERTASK struct vm_node this_kernel_stacknode_ ASMNAME("this_kernel_s
 INTERN NOBLOCK void
 NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 	struct vm_node *node;
+	void *addr;
+	size_t size;
 	assertf(self != &_boottask &&
 	        self != &_bootidle,
 	        "Cannot destroy the BOOT or IDLE task of CPU0\n"
@@ -317,10 +319,11 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 	        "&FORTASK(self,this_trampoline_node) = %p\n"
 	        "self                                 = %p\n",
 	        node, &FORTASK(self, this_trampoline_node), self);
-	pagedir_unmapone(node->vn_node.a_vmin);
-	pagedir_syncone(node->vn_node.a_vmin);
+	addr = vm_node_getstart(node);
+	npagedir_unmapone(addr);
+	npagedir_syncone(addr);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_mapone(node->vn_node.a_vmin);
+	npagedir_unprepare_mapone(addr);
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Unlink + unmap the stack node. */
@@ -330,10 +333,12 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 	        "&FORTASK(self,this_kernel_stacknode_) = %p\n"
 	        "self                               = %p\n",
 	        node, &FORTASK(self, this_kernel_stacknode_), self);
-	pagedir_unmap(vm_node_getstartpageid(node), vm_node_getpagecount(node));
-	pagedir_sync(vm_node_getstartpageid(node), vm_node_getpagecount(node));
+	addr = vm_node_getstart(node);
+	size = vm_node_getsize(node);
+	npagedir_unmap(addr, size);
+	npagedir_sync(addr, size);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_map(vm_node_getstartpageid(node), vm_node_getpagecount(node));
+	npagedir_unprepare_map(addr, size);
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Deallocate the kernel stack. */

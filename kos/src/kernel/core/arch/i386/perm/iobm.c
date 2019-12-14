@@ -278,13 +278,13 @@ NOTHROW(KCALL ioperm_bitmap_setrange)(struct ioperm_bitmap *__restrict self,
 
 
 INTDEF byte_t __x86_iob_empty_base[];
-INTDEF byte_t __x86_iob_empty_vpageno[];
-INTDEF byte_t __x86_iob_empty_ppageno[];
+INTDEF byte_t __x86_iob_empty_pageid[];
+INTDEF byte_t __x86_iob_empty_pageptr[];
 
 PUBLIC struct ioperm_bitmap ioperm_bitmap_empty = {
 	/* .ib_refcnt = */ 1, /* _ioperm_bitmap_empty */
 	/* .ib_share  = */ 2, /* Prevent modifications */
-	/* .ib_pages  = */ (pageptr_t)(uintptr_t)__x86_iob_empty_ppageno
+	/* .ib_pages  = */ (pageptr_t)(uintptr_t)__x86_iob_empty_pageptr
 };
 
 
@@ -300,11 +300,11 @@ NOTHROW(KCALL x86_initialize_iobm)(void) {
 #endif /* !__x86_64__ */
 	/* Prepare the IOB region for lazy memory mappings. */
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (!pagedir_prepare_map((vm_vpage_t)__x86_iob_empty_vpageno, 2))
+	if (!npagedir_prepare_map(__x86_iob_empty_base, 2 * PAGESIZE))
 		kernel_panic(FREESTR("Failed to prepare _bootcpu.tss.iob"));
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	/* Unmap the initial IOB of the boot CPU. */
-	pagedir_unmap((vm_vpage_t)__x86_iob_empty_vpageno, 2);
+	npagedir_unmap(__x86_iob_empty_base, 2 * PAGESIZE);
 }
 
 
