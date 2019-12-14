@@ -1738,7 +1738,7 @@ LOCAL PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
 nvm_map(struct vm *__restrict self,
         PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
         PAGEDIR_PAGEALIGNED size_t num_bytes,
-        PAGEDIR_PAGEALIGNED size_t min_alignment DFL(1),
+        PAGEDIR_PAGEALIGNED size_t min_alignment DFL(PAGESIZE),
         unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
         struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
         PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),
@@ -1779,6 +1779,7 @@ vm_map_subrange(struct vm *__restrict effective_vm,
                 uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
                 uintptr_t guard DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
 
 
 /* A combination of `vm_getfree' + `vm_mapresat'

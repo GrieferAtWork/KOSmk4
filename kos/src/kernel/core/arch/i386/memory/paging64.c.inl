@@ -548,9 +548,9 @@ NOTHROW(FCALL p64_pagedir_prepare_impl_widen)(unsigned int vec4,
 again:
 	e4.p_word = ATOMIC_READ(P64_PDIR_E4_IDENTITY[vec4].p_word);
 	if (!P64_PDIR_E4_ISVEC3(e4.p_word)) {
-		vm_ppage_t e3_vector; /* 511 * P64_PAGE_ABSENT + 1 * VEC2 */
-		vm_ppage_t e2_vector; /* 511 * P64_PAGE_ABSENT + 1 * VEC1 */
-		vm_ppage_t e1_vector; /* 512 * P64_PAGE_ABSENT */
+		pageptr_t e3_vector; /* 511 * P64_PAGE_ABSENT + 1 * VEC2 */
+		pageptr_t e2_vector; /* 511 * P64_PAGE_ABSENT + 1 * VEC1 */
+		pageptr_t e1_vector; /* 512 * P64_PAGE_ABSENT */
 		u64 new_e4_word;
 		union p64_pdir_e3 *e3_p;
 		union p64_pdir_e2 *e2_p;
@@ -650,8 +650,8 @@ err_e3_vector:
 		/* Convert the 1GiB mapping into
 		 *  - 511 * 2MiB mappings + 512 * 4KiB mappings (the later being `vec2') */
 		struct vm_ptram ptram;
-		vm_ppage_t e1_vector; /* 512 * 4KiB */
-		vm_ppage_t e2_vector; /* 511 * 2MiB + 1 * VEC1 */
+		pageptr_t e1_vector; /* 512 * 4KiB */
+		pageptr_t e2_vector; /* 511 * 2MiB + 1 * VEC1 */
 		union p64_pdir_e2 e2_word;
 		u64 new_word, new_e3_word;
 		if (VEC4_IS_USERSPACE)

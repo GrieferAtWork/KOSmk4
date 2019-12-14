@@ -33,11 +33,32 @@
 
 DECL_BEGIN
 
+#if defined(__INTELLISENSE__) && defined(__CC__)
+vm_phys_t (page2addr)(pageptr_t pageptr);
+pageptr_t (addr2page)(vm_phys_t physaddr);
+#define page2addr page2addr
+#define addr2page addr2page
+#else /* __INTELLISENSE__ && __CC__ */
+#define page2addr(pageptr)  (__CCAST(vm_phys_t)(pageptr) * PAGESIZE)
+#define addr2page(physaddr) (__CCAST(pageptr_t)((physaddr) / PAGESIZE))
+#endif /* !__INTELLISENSE__ || !__CC__ */
+
+#ifndef PAGEPTR_INVALID
+#define PAGEPTR_INVALID (__CCAST(pageptr_t)-1)
+#endif /* !PAGEPTR_INVALID */
+
+#define FORMAT_PAGEPTR_T FORMAT_VM_PPAGE_T
+#if __SIZEOF_VM_PPAGE_T__ >= 8
+#define FORMAT_PAGECNT_T "%I64u"
+#else /* __SIZEOF_VM_PPAGE_T__ >= 8 */
+#define FORMAT_PAGECNT_T "%Iu"
+#endif /* __SIZEOF_VM_PPAGE_T__ < 8 */
+
+
 
 /* A page pointer is just like a normal physical pointer, but divided by PAGESIZE */
 #define __SIZEOF_PAGEPTR_T__ __SIZEOF_VM_PPAGE_T__
 #ifdef __CC__
-typedef PHYS vm_ppage_t pageptr_t;
 #if __SIZEOF_VM_PPAGE_T__ == 4
 typedef u32             pagecnt_t;
 #elif __SIZEOF_VM_PPAGE_T__ == 8
@@ -46,14 +67,6 @@ typedef u64             pagecnt_t;
 typedef vm_ppage_t      pagecnt_t;
 #endif
 #endif /* __CC__ */
-#define PAGEPTR_INVALID (__CCAST(pageptr_t)-1)
-
-#define FORMAT_PAGEPTR_T FORMAT_VM_PPAGE_T
-#if __SIZEOF_VM_PPAGE_T__ >= 8
-#define FORMAT_PAGECNT_T "%I64u"
-#else /* __SIZEOF_VM_PPAGE_T__ >= 8 */
-#define FORMAT_PAGECNT_T "%Iu"
-#endif /* __SIZEOF_VM_PPAGE_T__ < 8 */
 
 
 #define PMEMBANK_TYPE_UNDEF      0 /* Undefined memory (Handled identically to `PMEMBANK_TYPE_BADRAM') */
@@ -75,11 +88,11 @@ typedef vm_ppage_t      pagecnt_t;
 #ifdef __CC__
 struct pmembank {
 	union {
-		uintptr_t  mb_startptr; /* Memory block starting address. */
-		vm_phys_t  mb_start;    /* Memory block starting address. */
+		uintptr_t mb_startptr; /* Memory block starting address. */
+		vm_phys_t mb_start;    /* Memory block starting address. */
 	};
-	u16            mb_type;     /* Memory bank type. (One of `PMEMBANK_TYPE_*') */
-	u16            mb_pad[(sizeof(vm_phys_t)-2)/2]; /* ... */
+	u16           mb_type;     /* Memory bank type. (One of `PMEMBANK_TYPE_*') */
+	u16           mb_pad[(sizeof(vm_phys_t) - 2) / 2]; /* ... */
 };
 #define PMEMBANK_INIT(startptr, type) { { startptr }, type, { } }
 

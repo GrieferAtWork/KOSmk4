@@ -120,7 +120,7 @@
 #define KERNEL_VMHINT_LHEAP        (0xe1a00, VM_GETFREE_ABOVE) /* Hint for the locked kernel heap. */
 #define KERNEL_VMHINT_SLAB         (0xe8000, VM_GETFREE_BELOW) /* Hint for the slab allocator. */
 #define KERNEL_VMHINT_DHEAP        (0xe0000, VM_GETFREE_BELOW) /* Hint for the kernel heap used for allocating debug controllers. */
-#define KERNEL_VMHINT_COREPAGE     (0xf0000, VM_GETFREE_BELOW) /* Hint for core-base pointers. */
+#define KERNEL_VMHINT_COREPAGE     ((void *)0xf0000000, VM_GETFREE_BELOW) /* Hint for core-base pointers. */
 #define KERNEL_VMHINT_PHYSINFO     (0xf0000, VM_GETFREE_BELOW) /* Hint for physical memory information/controller data. */
 #define KERNEL_VMHINT_LAPIC        (0xf0000, VM_GETFREE_BELOW) /* Hint for the LAPIC (if present). */
 #define KERNEL_VMHINT_TRAMPOLINE   (0xeffe0, VM_GETFREE_BELOW) /* Hint for per-task trampoline pages. */

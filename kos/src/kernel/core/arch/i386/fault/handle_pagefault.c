@@ -237,7 +237,6 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	vm_vpage_t page;
 	struct vm *effective_vm;
 	uintptr_half_t prot;
-	vm_ppage_t ppage;
 	bool has_changed;
 	/* Check for memcpy_nopf() */
 	pc = state->ics_irregs.ir_pip;
@@ -263,6 +262,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 		if ((hinted_node = (struct vm_node *)pagedir_gethint(page)) != NULL) {
 			/* This is a hinted node (perform assertions on all
 			 * of the requirements documented for such a node) */
+			pageptr_t ppage;
 			assert(hinted_node->vn_flags & VM_NODE_FLAG_HINTED);
 			assert(hinted_node->vn_prot & VM_PROT_SHARED);
 			assert(hinted_node->vn_flags & VM_NODE_FLAG_PREPARED);
@@ -440,6 +440,7 @@ do_handle_iob_node_access:
 			has_changed = ecode & X86_PAGEFAULT_ECODE_WRITING;
 			/* Acquire a lock to the affected data part. */
 			TRY {
+				pageptr_t ppage;
 				/* Need at least a read-lock for part initialization */
 #ifdef CONFIG_VIO
 				if (part->dp_state == VM_DATAPART_STATE_VIOPRT) {
@@ -596,7 +597,7 @@ do_unshare_cow:
 							/* No need to copy the part. - we're already the only ones actually using it! */
 						} else {
 							struct vm_datapart *new_part;
-							vm_ppage_t old_ppage, new_ppage;
+							pageptr_t old_ppage, new_ppage;
 							/* Verify that the access being made is valid. */
 							if unlikely(!(node->vn_prot & VM_PROT_WRITE))
 								goto endread_and_decref_part_and_set_readonly;

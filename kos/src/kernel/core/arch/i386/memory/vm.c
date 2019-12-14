@@ -120,30 +120,30 @@ INTDEF struct vm_node x86_kernel_vm_nodes[];
 INTDEF struct vm_node x86_vmnode_transition_reserve;
 
 
-#define INIT_DATAPART(self, dp_srefs_, startpage, numpages)                                      \
-	{                                                                                            \
-		/* .dp_refcnt = */ 2, /* 2 == 1(myself) + 1(node) */                                     \
-		/* .dp_lock   = */ SHARED_RWLOCK_INIT,                                                   \
-		{                                                                                        \
-			/* .dp_tree_ptr = */ { NULL, NULL, 0, (size_t)(numpages) - 1 }                       \
-		},                                                                                       \
-		/* .dp_crefs = */ LLIST_INIT,                                                            \
-		/* .dp_srefs = */ dp_srefs_,                                                             \
-		/* .dp_stale = */ NULL,                                                                  \
-		/* .dp_block = */ &vm_datablock_anonymous,                                               \
-		/* .dp_flags = */ VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,                   \
-		/* .dp_state = */ VM_DATAPART_STATE_LOCKED,                                              \
-		{                                                                                        \
-			/* .dp_ramdata = */ {                                                                \
-				/* .rd_blockv = */ &(self).dp_ramdata.rd_block0,                                 \
-				{                                                                                \
-					/* .rd_block0 = */ {                                                         \
-						/* .rb_start = */ (vm_ppage_t)(uintptr_t)(startpage) - KERNEL_BASE_PAGE, \
-						/* .rb_size  = */ (size_t)(numpages)                                     \
-					}                                                                            \
-				}                                                                                \
-			}                                                                                    \
-		}                                                                                        \
+#define INIT_DATAPART(self, dp_srefs_, startpage, numpages)                                     \
+	{                                                                                           \
+		/* .dp_refcnt = */ 2, /* 2 == 1(myself) + 1(node) */                                    \
+		/* .dp_lock   = */ SHARED_RWLOCK_INIT,                                                  \
+		{                                                                                       \
+			/* .dp_tree_ptr = */ { NULL, NULL, 0, (size_t)(numpages) - 1 }                      \
+		},                                                                                      \
+		/* .dp_crefs = */ LLIST_INIT,                                                           \
+		/* .dp_srefs = */ dp_srefs_,                                                            \
+		/* .dp_stale = */ NULL,                                                                 \
+		/* .dp_block = */ &vm_datablock_anonymous,                                              \
+		/* .dp_flags = */ VM_DATAPART_FLAG_KERNPRT | VM_DATAPART_FLAG_HEAPPPP,                  \
+		/* .dp_state = */ VM_DATAPART_STATE_LOCKED,                                             \
+		{                                                                                       \
+			/* .dp_ramdata = */ {                                                               \
+				/* .rd_blockv = */ &(self).dp_ramdata.rd_block0,                                \
+				{                                                                               \
+					/* .rd_block0 = */ {                                                        \
+						/* .rb_start = */ (pageptr_t)(uintptr_t)(startpage) - KERNEL_BASE_PAGE, \
+						/* .rb_size  = */ (size_t)(numpages)                                    \
+					}                                                                           \
+				}                                                                               \
+			}                                                                                   \
+		}                                                                                       \
 	}
 
 INTERN struct vm_datapart x86_kernel_vm_parts[6] = {

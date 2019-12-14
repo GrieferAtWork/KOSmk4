@@ -104,6 +104,24 @@ vmb_mapat(struct vmb *__restrict self,
           uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
           uintptr_t guard DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
+LOCAL bool KCALL
+nvmb_mapat(struct vmb *__restrict self,
+           PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+           PAGEDIR_PAGEALIGNED size_t num_bytes,
+           struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+           PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),
+           uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
+           uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
+           uintptr_t guard DFL(0))
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
+	__hybrid_assert((num_bytes & PAGEMASK) == 0);
+	__hybrid_assert((data_start_offset & PAGEMASK) == 0);
+	return vmb_mapat(self, (vm_vpage_t)__ARCH_PAGEID_ENCODE(addr),
+	                 num_bytes / PAGESIZE, data,
+	                 (vm_vpage64_t)(data_start_offset / PAGESIZE),
+	                 prot, flag, guard);
+}
 
 
 /* Determine a suitable, free memory location for `num_pages'
@@ -170,6 +188,30 @@ vmb_map(struct vmb *__restrict self,
         uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
         uintptr_t guard DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
+LOCAL PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
+nvmb_map(struct vmb *__restrict self,
+         PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
+         PAGEDIR_PAGEALIGNED size_t num_bytes,
+         PAGEDIR_PAGEALIGNED size_t min_alignment DFL(PAGESIZE),
+         unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
+         struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+         pos_t data_start_offset DFL(0),
+         uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
+         uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
+         uintptr_t guard DFL(0))
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	vm_vpage_t result;
+	__hybrid_assert(((uintptr_t)hint & PAGEMASK) == 0);
+	__hybrid_assert((num_bytes & PAGEMASK) == 0);
+	__hybrid_assert((min_alignment & PAGEMASK) == 0);
+	__hybrid_assert((data_start_offset & PAGEMASK) == 0);
+	result = vmb_map(self, (vm_vpage_t)__ARCH_PAGEID_ENCODE(hint),
+	                 num_bytes / PAGESIZE,
+	                 min_alignment / PAGESIZE, getfree_mode,
+	                 data, (vm_vpage64_t)(data_start_offset / PAGESIZE),
+	                 prot, flag, guard);
+	return __ARCH_PAGEID_DECODE(result);
+}
 
 
 
@@ -206,6 +248,11 @@ NOTHROW(KCALL vmb_node_remove)(struct vmb *__restrict self,
 /* Get the node associated with the given `page' */
 FUNDEF NOBLOCK WUNUSED struct vm_node *
 NOTHROW(FCALL vmb_getnodeof)(struct vmb *__restrict self, vm_vpage_t page);
+
+LOCAL NOBLOCK WUNUSED struct vm_node *
+NOTHROW(FCALL nvmb_getnodeof)(struct vmb *__restrict self, UNCHECKED void *addr) {
+	return vmb_getnodeof(self, (vm_vpage_t)__ARCH_PAGEID_ENCODE(addr));
+}
 
 /* Check if some part of the given address range is currently in use. */
 FUNDEF NOBLOCK WUNUSED bool

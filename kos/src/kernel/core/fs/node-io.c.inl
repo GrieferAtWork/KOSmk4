@@ -426,46 +426,45 @@ do_inode_flexread_phys(struct inode *__restrict self,
                        pos_t file_position) {
 	size_t temp, result = 0;
 	pagedir_pushval_t backup;
-	vm_vpage_t tramp;
+	byte_t *tramp;
 	bool is_first;
 	is_first = true;
-	tramp    = THIS_TRAMPOLINE_PAGE;
-	TRY {
-		for (;;) {
-			vm_ppage_t pageaddr;
-			size_t page_bytes;
-			pageaddr   = (vm_ppage_t)VM_ADDR2PAGE(buf);
-			page_bytes = PAGESIZE - (buf & PAGEMASK);
-			if (page_bytes > num_bytes)
-				page_bytes = num_bytes;
-			if (is_first) {
-				backup = pagedir_push_mapone(tramp, pageaddr,
-				                             PAGEDIR_MAP_FWRITE);
-			} else {
-				pagedir_mapone(tramp, pageaddr,
-				               PAGEDIR_MAP_FWRITE);
-			}
-			pagedir_syncone(tramp);
-			/* Copy memory. */
-			temp = (*self->i_type->it_file.f_flexread)(self,
-			                                           (void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(buf & PAGEMASK)),
-			                                           page_bytes, file_position);
-			result += temp;
-			if (temp < page_bytes)
-				break;
-			if (page_bytes >= num_bytes)
-				break;
-			num_bytes -= page_bytes;
-			buf += page_bytes;
-			file_position += page_bytes;
+	tramp    = THIS_TRAMPOLINE_BASE;
+	for (;;) {
+		size_t page_bytes;
+		page_bytes = PAGESIZE - (buf & PAGEMASK);
+		if (page_bytes > num_bytes)
+			page_bytes = num_bytes;
+		if (is_first) {
+			backup = npagedir_push_mapone(tramp, buf & ~PAGEMASK,
+			                              PAGEDIR_MAP_FWRITE);
+			is_first = false;
+		} else {
+			npagedir_mapone(tramp, buf & ~PAGEMASK,
+			                PAGEDIR_MAP_FWRITE);
 		}
-	} EXCEPT {
-		/* Try-catch is required, because `src' may be a user-buffer,
-		 * in which case access may cause an exception to be thrown. */
-		pagedir_pop_mapone(tramp, backup);
-		RETHROW();
+		npagedir_syncone(tramp);
+		/* Copy memory. */
+		TRY {
+			temp = (*self->i_type->it_file.f_flexread)(self,
+			                                           tramp + ((ptrdiff_t)buf & PAGEMASK),
+			                                           page_bytes, file_position);
+		} EXCEPT {
+			/* Try-catch is required, because `src' may be a user-buffer,
+			 * in which case access may cause an exception to be thrown. */
+			npagedir_pop_mapone(tramp, backup);
+			RETHROW();
+		}
+		result += temp;
+		if (temp < page_bytes)
+			break;
+		if (page_bytes >= num_bytes)
+			break;
+		num_bytes -= page_bytes;
+		buf += page_bytes;
+		file_position += page_bytes;
 	}
-	pagedir_pop_mapone(tramp, backup);
+	npagedir_pop_mapone(tramp, backup);
 	return result;
 }
 

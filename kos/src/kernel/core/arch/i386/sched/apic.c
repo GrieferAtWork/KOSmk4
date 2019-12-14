@@ -840,7 +840,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 		u32 num_ticks;
 #ifndef CONFIG_NO_SMP
 		cpuid_t i;
-		vm_ppage_t entry_page;
+		pageptr_t entry_page;
 		/* Allocate low physical memory for the SMP initialization entry page. */
 		entry_page = page_malloc_between((pageptr_t)((vm_phys_t)0x00000000 / PAGESIZE),
 		                                 (pageptr_t)((vm_phys_t)0x000fffff / PAGESIZE),

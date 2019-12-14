@@ -221,8 +221,8 @@ allocate_from_corepage:
 		result = vm_corepair_alloc_impl();
 	} else {
 		/* It's our responsibility to allocate a new corepage. */
-		vm_vpage_t mapping_target;
-		vm_ppage_t mapping_backend;
+		void *mapping_target;
+		pageptr_t mapping_backend;
 		struct vm_corepage *new_page;
 		/* Safely acquire the VM-lock, while also keeping the COREPAGE lock. */
 		while (!vm_kernel_treelock_trywrite()) {
@@ -255,10 +255,11 @@ allocate_from_corepage:
 			goto allocate_from_corepage;
 		}
 		/* XXX: Check if we can simply extend an existing core page? */
-		mapping_target = vm_getfree(&vm_kernel,
-		                            (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_COREPAGE), 1, 1,
-		                            HINT_GETMODE(KERNEL_VMHINT_COREPAGE));
-		if unlikely(mapping_target == VM_GETFREE_ERROR) {
+		mapping_target = nvm_getfree(&vm_kernel,
+		                             HINT_GETADDR(KERNEL_VMHINT_COREPAGE),
+		                             PAGESIZE, PAGESIZE,
+		                             HINT_GETMODE(KERNEL_VMHINT_COREPAGE));
+		if unlikely(mapping_target == NVM_GETFREE_ERROR) {
 			uintptr_t version;
 			vm_kernel_treelock_endwrite();
 			sync_endwrite(&vm_corepage_lock);
@@ -269,16 +270,17 @@ allocate_from_corepage:
 			version = 0;
 again_tryhard_mapping_target:
 			vm_kernel_treelock_read();
-			mapping_target = vm_getfree(&vm_kernel,
-			                            (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_COREPAGE), 1, 1,
-			                            HINT_GETMODE(KERNEL_VMHINT_COREPAGE));
+			mapping_target = nvm_getfree(&vm_kernel,
+			                             HINT_GETADDR(KERNEL_VMHINT_COREPAGE),
+			                             PAGESIZE, PAGESIZE,
+			                             HINT_GETMODE(KERNEL_VMHINT_COREPAGE));
 			vm_kernel_treelock_endread();
-			if (mapping_target != VM_GETFREE_ERROR)
+			if (mapping_target != NVM_GETFREE_ERROR)
 				goto again;
 			if (system_clearcaches_s(&version))
 				goto again_tryhard_mapping_target;
 			if (!nothrow)
-				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, 1);
+				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, PAGESIZE);
 			result.cp_node = NULL;
 			result.cp_part = NULL;
 			goto done;
@@ -286,29 +288,32 @@ again_tryhard_mapping_target:
 		/* All right! We've got a virtual memory location, where we can map our new
 		 * data block. Now all that we still need is 1 page of physical memory which
 		 * we can then use to map at that location! */
-		mapping_backend = page_malloc(1);
+		mapping_backend = page_mallocone();
 		if (mapping_backend == PAGEPTR_INVALID) {
 			vm_kernel_treelock_endwrite();
 			sync_endwrite(&vm_corepage_lock);
 			if (!nothrow)
-				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 			result.cp_node = NULL;
 			result.cp_part = NULL;
 			goto done;
 		}
+#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 		/* Map the page into our current page directory. */
-		if (!pagedir_prepare_mapone(mapping_target)) {
+		if (!npagedir_prepare_mapone(mapping_target)) {
 			vm_kernel_treelock_endwrite();
 			sync_endwrite(&vm_corepage_lock);
 			page_ccfree(mapping_backend, 1);
 			if (!nothrow)
-				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 			result.cp_node = NULL;
 			result.cp_part = NULL;
 			goto done;
 		}
-		pagedir_mapone(mapping_target, mapping_backend,
-		               PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+		npagedir_mapone(mapping_target,
+		                page2addr(mapping_backend),
+		                PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 
 		/* Allocate (reserve) 2 of the remaining corebase components,
 		 * which will then be used to describe the new corebase page
@@ -317,8 +322,8 @@ again_tryhard_mapping_target:
 
 		/* With everything now allocated, fill in node data
 		 * and register the node in the kernel VM. */
-		result.cp_node->vn_node.a_vmin = mapping_target;
-		result.cp_node->vn_node.a_vmax = mapping_target;
+		result.cp_node->vn_node.a_vmin = (vm_vpage_t)__ARCH_PAGEID_ENCODE(mapping_target);
+		result.cp_node->vn_node.a_vmax = result.cp_node->vn_node.a_vmin;
 		result.cp_part->dp_block       = incref(&vm_datablock_anonymous);
 		result.cp_node->vn_block       = incref(&vm_datablock_anonymous);
 		result.cp_node->vn_prot        = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED;
@@ -333,9 +338,10 @@ again_tryhard_mapping_target:
 		result.cp_part->dp_ramdata.rd_blockv          = &result.cp_part->dp_ramdata.rd_block0;
 		result.cp_part->dp_ramdata.rd_block0.rb_start = mapping_backend;
 		vm_node_insert(result.cp_node);
+		COMPILER_BARRIER();
 
 		/* Now initialize the new CORE page, and link it. */
-		new_page = (struct vm_corepage *)VM_PAGE2ADDR(mapping_target);
+		new_page = (struct vm_corepage *)mapping_target;
 		if (!page_iszero(mapping_backend))
 			memset(&new_page->cp_ctrl, 0, sizeof(new_page->cp_ctrl));
 		new_page->cp_ctrl.cpc_prev = vm_corepage_head;
