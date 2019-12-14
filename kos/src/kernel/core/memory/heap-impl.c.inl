@@ -428,16 +428,16 @@ again_tryhard_mapping_target:
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			/* Prepare to map all of the new blocks. */
 			for (i = 0; i < blockc; ++i) {
-				if unlikely(!pagedir_prepare_map(mapping_target + mapping_offset,
-				                                 blocks[i].rb_size)) {
+				if unlikely(!npagedir_prepare_map(mapping_target + mapping_offset,
+				                                  blocks[i].rb_size * PAGESIZE)) {
 					/* Failed to map a part of the resulting data block. */
 					while (i--) {
 						mapping_offset -= blocks[i].rb_size * PAGESIZE;
-						pagedir_unprepare_map(mapping_target + mapping_offset,
-						                      blocks[i].rb_size);
+						npagedir_unprepare_map(mapping_target + mapping_offset,
+						                       blocks[i].rb_size * PAGESIZE);
 					}
 					IFELSE_NX(goto err_corepair_content,
-					          THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1));
+					          THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE));
 				}
 				mapping_offset += blocks[i].rb_size * PAGESIZE;
 			}

@@ -476,7 +476,7 @@ NOTHROW(KCALL vm_do_freeram)(struct vm_ramblock *__restrict pblock0,
  *       in use. - This function is merely a thin wrapper around `pagedir_map',
  *       which automatically allows for dealing with multi-part ram blocks.
  * NOTE: The caller is responsible to ensure that the target region of memory
- *       has been prepared in a prior call to `pagedir_prepare_map'
+ *       has been prepared in a prior call to `npagedir_prepare_map'
  * @param: perm: Set of `PAGEDIR_MAP_F*' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_map_ram)(struct vm_datapart *__restrict self,
@@ -1296,12 +1296,12 @@ DATDEF struct vm_datablock_type vm_ramfile_type;
 #define VM_NODE_FLAG_PARTITIONED  0x0002 /* Set if the node has been split when the associated data part was split.
                                           * This flag affects how the page directory is un-prepared when the node
                                           * gets unmapped. When set, associated memory must be unmapped as:
-                                          * >> pagedir_prepare_map(vm_node_getstartpageid(self),vm_node_getpagecount(self)); // NOTE: This may cause an error!
-                                          * >> pagedir_unmap(vm_node_getstartpageid(self),vm_node_getpagecount(self));
-                                          * >> pagedir_unprepare_map(vm_node_getstartpageid(self),vm_node_getpagecount(self));
+                                          * >> npagedir_prepare_map(vm_node_getstart(self), vm_node_getsize(self)); // NOTE: This may cause an error!
+                                          * >> npagedir_unmap(vm_node_getstart(self), vm_node_getsize(self));
+                                          * >> npagedir_unprepare_map(vm_node_getstart(self), vm_node_getsize(self));
                                           * When not set, associated memory can simply be unmapped as:
-                                          * >> pagedir_unmap(vm_node_getstartpageid(self),vm_node_getpagecount(self));
-                                          * >> pagedir_unprepare_map(vm_node_getstartpageid(self),vm_node_getpagecount(self)); */
+                                          * >> npagedir_unmap(vm_node_getstart(self), vm_node_getsize(self));
+                                          * >> npagedir_unprepare_map(vm_node_getstart(self), vm_node_getsize(self)); */
 #define VM_NODE_FLAG_GROWSUP      0x0004 /* When guarding, the node grows up rather than down. */
 #define VM_NODE_FLAG_HINTED       0x1000 /* [const] Uninitialized pages apart of this node hint towards it.
                                           * This flag is set for memory mapping that can be initialized atomically.
@@ -1624,16 +1624,6 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_tryservice)(struct vm
  * @return: true:  Successfully created the mapping.
  * @return: false: Another mapping already exists. */
 FUNDEF bool KCALL
-vm_paged_mapat(struct vm *__restrict self,
-               pageid_t page_index, size_t num_pages,
-               struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
-               vm_vpage64_t data_start_vpage DFL(0),
-               uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
-               uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
-               uintptr_t guard DFL(0))
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
-
-LOCAL bool KCALL
 vm_mapat(struct vm *__restrict self,
          PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
          PAGEDIR_PAGEALIGNED size_t num_bytes,
@@ -1642,14 +1632,21 @@ vm_mapat(struct vm *__restrict self,
          uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
          uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
          uintptr_t guard DFL(0))
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
+LOCAL bool KCALL
+vm_paged_mapat(struct vm *__restrict self,
+               pageid_t page_index, size_t num_pages,
+               struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+               vm_vpage64_t data_start_vpage DFL(0),
+               uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
+               uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
+               uintptr_t guard DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
-	__hybrid_assert((num_bytes & PAGEMASK) == 0);
-	__hybrid_assert((data_start_offset & PAGEMASK) == 0);
-	return vm_paged_mapat(self, PAGEID_ENCODE(addr),
-	                      num_bytes / PAGESIZE, data,
-	                      (vm_vpage64_t)(data_start_offset / PAGESIZE),
-	                      prot, flag, guard);
+	return vm_mapat(self, PAGEID_DECODE(page_index),
+	                num_pages * PAGESIZE,
+	                data,
+	                (pos_t)data_start_vpage * PAGESIZE,
+	                prot, flag, guard);
 }
 
 /* Same as `vm_paged_mapat()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
@@ -1700,8 +1697,9 @@ vm_mapat_subrange(struct vm *__restrict self,
  * @return: true:  Successfully created the mapping.
  * @return: false: Another mapping already exists. */
 FUNDEF bool KCALL
-vm_mapresat(struct vm *__restrict effective_vm,
-            pageid_t page_index, size_t num_pages,
+vm_mapresat(struct vm *__restrict self,
+            PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+            PAGEDIR_PAGEALIGNED size_t num_bytes,
             uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
@@ -1800,46 +1798,42 @@ NOTHROW(KCALL vm_find_last_node_lower_equal)(struct vm *__restrict effective_vm,
 
 /* A combination of `vm_paged_getfree' + `vm_paged_mapat'
  * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target. */
-FUNDEF pageid_t KCALL
+FUNDEF PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
 vm_map(struct vm *__restrict self,
-       pageid_t hint,
-       size_t num_pages,
-       size_t min_alignment_in_pages DFL(1),
+       PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
+       PAGEDIR_PAGEALIGNED size_t num_bytes,
+       PAGEDIR_PAGEALIGNED size_t min_alignment DFL(PAGESIZE),
        unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
        struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
-       vm_vpage64_t data_start_vpage DFL(0),
+       PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),
        uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
        uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
        uintptr_t guard DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
-LOCAL PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
-nvm_map(struct vm *__restrict self,
-        PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
-        PAGEDIR_PAGEALIGNED size_t num_bytes,
-        PAGEDIR_PAGEALIGNED size_t min_alignment DFL(PAGESIZE),
-        unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
-        struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
-        PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),
-        uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
-        uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
-        uintptr_t guard DFL(0))
+LOCAL pageid_t KCALL
+vm_paged_map(struct vm *__restrict self,
+             pageid_t hint,
+             size_t num_pages,
+             size_t min_alignment_in_pages DFL(1),
+             unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
+             struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+             vm_vpage64_t data_start_vpage DFL(0),
+             uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
+             uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
+             uintptr_t guard DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	pageid_t result;
-	__hybrid_assert(((uintptr_t)hint & PAGEMASK) == 0);
-	__hybrid_assert((num_bytes & PAGEMASK) == 0);
-	__hybrid_assert((min_alignment & PAGEMASK) == 0);
-	__hybrid_assert((data_start_offset & PAGEMASK) == 0);
+	void *result;
 	result = vm_map(self,
-	                PAGEID_ENCODE(hint),
-	                num_bytes / PAGESIZE,
-	                min_alignment / PAGESIZE,
+	                PAGEID_DECODE(hint),
+	                num_pages * PAGESIZE,
+	                min_alignment_in_pages * PAGESIZE,
 	                getfree_mode, data,
-	                (vm_vpage64_t)(data_start_offset / PAGESIZE),
+	                (pos_t)data_start_vpage * PAGESIZE,
 	                prot, flag, guard);
-	return PAGEID_DECODE(result);
+	return PAGEID_ENCODE(result);
 }
 
-/* Same as `vm_map()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
+/* Same as `vm_paged_map()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
  * to be mapped from `data'. - Any attempted to map data from outside that range will instead cause
  * memory from `vm_datablock_anonymous_zero' to be mapped.
  * Additionally, `data_start_vpage' is an offset from `data_subrange_minvpage' */
@@ -1895,32 +1889,14 @@ vm_map_subrange(struct vm *__restrict self,
 
 /* A combination of `vm_paged_getfree' + `vm_mapresat'
  * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target. */
-FUNDEF pageid_t KCALL /* TODO: Remove me */
+FUNDEF UNCHECKED void *KCALL
 vm_mapres(struct vm *__restrict self,
-          pageid_t hint, size_t num_pages,
-          size_t min_alignment_in_pages DFL(1),
+          PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
+          PAGEDIR_PAGEALIGNED size_t num_bytes,
+          PAGEDIR_PAGEALIGNED size_t min_alignment DFL(PAGESIZE),
           unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
           uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
-
-LOCAL UNCHECKED void *KCALL
-nvm_mapres(struct vm *__restrict effective_vm, /* TODO: Rename to `vm_mapres()' */
-           PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
-           PAGEDIR_PAGEALIGNED size_t num_bytes,
-           PAGEDIR_PAGEALIGNED size_t min_alignment DFL(PAGESIZE),
-           unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
-           uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL))
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	pageid_t result;
-	__hybrid_assert(((uintptr_t)hint & PAGEMASK) == 0);
-	__hybrid_assert((num_bytes & PAGEMASK) == 0);
-	__hybrid_assert((min_alignment & PAGEMASK) == 0);
-	result = vm_mapres(effective_vm, PAGEID_ENCODE(hint),
-	                   num_bytes / PAGESIZE,
-	                   min_alignment / PAGESIZE,
-	                   getfree_mode, flag);
-	return PAGEID_DECODE(result);
-}
 
 
 
@@ -1963,7 +1939,7 @@ vm_paged_unmap(struct vm *__restrict self,
  * @return: * :       The actual number of unmapped bytes of memory (when `VM_UNMAP_SEGFAULTIFUNUSED'
  *                    is given, this is always equal to `num_bytes') */
 LOCAL size_t KCALL
-vm_unmap(struct vm *__restrict self, /* TODO: Rename to `vm_mapres()' */
+vm_unmap(struct vm *__restrict self, /* TODO: Rename to `vm_paged_mapres()' */
          PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
          PAGEDIR_PAGEALIGNED size_t num_bytes,
          unsigned int how DFL(VM_UNMAP_ANYTHING))
@@ -2034,7 +2010,8 @@ NOTHROW(FCALL vm_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
 	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
 	__hybrid_assert((num_bytes & PAGEMASK) == 0);
 	vm_paged_unmap_kernel_ram(PAGEID_ENCODE(addr),
-	                    num_bytes / PAGESIZE, is_zero);
+	                          num_bytes / PAGESIZE,
+	                          is_zero);
 }
 
 

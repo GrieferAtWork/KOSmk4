@@ -905,8 +905,8 @@ NOTHROW(KCALL vm_kernel_treelock_service)(gfp_t flags) {
 /* Without blocking, unmap the given range of kernel RAM. */
 PUBLIC NOBLOCK void
 NOTHROW(FCALL vm_paged_unmap_kernel_ram)(pageid_t page_index,
-                                   size_t num_pages,
-                                   bool is_zero) {
+                                         size_t num_pages,
+                                         bool is_zero) {
 	if unlikely(!num_pages)
 		return;
 	assert(page_index >= (pageid_t)KERNEL_BASE_PAGE);

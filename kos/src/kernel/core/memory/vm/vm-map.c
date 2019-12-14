@@ -402,44 +402,50 @@ handle_remove_write_error:
  * @return: true:  Successfully created the mapping.
  * @return: false: Another mapping already exists. */
 PUBLIC bool KCALL
-vm_paged_mapat(struct vm *__restrict effective_vm,
-               pageid_t page_index, size_t num_pages,
-               struct vm_datablock *__restrict data,
-               vm_vpage64_t data_start_vpage, uintptr_half_t prot,
-               uintptr_half_t flag, uintptr_t guard)
-		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	size_t i;
+vm_mapat(struct vm *__restrict self,
+         PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+         PAGEDIR_PAGEALIGNED size_t num_bytes,
+         struct vm_datablock *__restrict data,
+         PAGEDIR_PAGEALIGNED pos_t data_start_offset,
+         uintptr_half_t prot, uintptr_half_t flag, uintptr_t guard) {
+	size_t i, num_pages;
 	struct partnode_pair_vector parts;
+	pageid_t pageid;
+	assert(((uintptr_t)addr & PAGEMASK) == 0);
+	assert((num_bytes & PAGEMASK) == 0);
+	assert((data_start_offset & PAGEMASK) == 0);
 	assert(!(flag & (VM_NODE_FLAG_COREPRT | VM_NODE_FLAG_KERNPRT | VM_NODE_FLAG_HINTED | VM_NODE_FLAG_GROWSUP)));
 	assert(!(prot & ~(VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ | VM_PROT_LOOSE | VM_PROT_SHARED)));
-	if unlikely(!num_pages)
+	if unlikely(!num_bytes)
 		return true;
 	/* Load parts & acquire locks. */
+	num_pages = num_bytes / PAGESIZE;
+	pageid    = PAGEID_ENCODE(addr);
 	vm_collect_and_lock_parts_and_vm(&parts,
-	                                 effective_vm,
+	                                 self,
 	                                 data,
-	                                 data_start_vpage,
+	                                 (vm_vpage64_t)(data_start_offset / PAGESIZE),
 	                                 num_pages,
 	                                 prot);
 	/* The rest of this function is already NOEXCEPT at this point.
 	 * However, we still need to check that the indicated range isn't
 	 * already being used by some other mapping! */
-	if unlikely(vm_nodetree_rlocate(effective_vm->v_tree,
-	                                page_index,
-	                                page_index + num_pages - 1)) {
+	if unlikely(vm_nodetree_rlocate(self->v_tree,
+	                                pageid,
+	                                pageid + num_pages - 1)) {
 		/* It _is_ already being used... */
-		sync_endwrite(effective_vm);
+		sync_endwrite(self);
 		partnode_pair_vector_fini_and_unlock_parts(&parts);
 		return false;
 	}
-	printk(KERN_DEBUG "Map %p...%p against %Iu data parts\n",
-	       VM_PAGE2ADDR(page_index),
-	       VM_PAGE2ADDR(page_index + num_pages) - 1,
+	printk(KERN_DEBUG "[vm] Map %p...%p against %Iu data parts\n",
+	       (byte_t *)addr,
+	       (byte_t *)addr + num_bytes - 1,
 	       parts.pv_cnt);
 	/* Must prepare the given address range beforehand! */
 	if (flag & VM_NODE_FLAG_PREPARED) {
-		if (!pagedir_prepare_map(page_index, num_pages)) {
-			sync_endwrite(effective_vm);
+		if (!npagedir_prepare_map(addr, num_bytes)) {
+			sync_endwrite(self);
 			partnode_pair_vector_fini_and_unlock_parts(&parts);
 			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
 		}
@@ -458,11 +464,11 @@ vm_paged_mapat(struct vm *__restrict effective_vm,
 
 		/* Initialize the given node. */
 		part_pages           = vm_datapart_numvpages(part);
-		node->vn_node.a_vmin = page_index;
-		node->vn_node.a_vmax = page_index + part_pages - 1;
+		node->vn_node.a_vmin = pageid;
+		node->vn_node.a_vmax = pageid + part_pages - 1;
 		node->vn_prot        = prot;
 		node->vn_flags       = flag & VM_NODE_FLAG_PREPARED;
-		node->vn_vm          = effective_vm;
+		node->vn_vm          = self;
 		node->vn_part        = part; /* Inherit reference */
 		node->vn_block       = incref(data);
 		node->vn_guard       = 0;
@@ -475,7 +481,7 @@ vm_paged_mapat(struct vm *__restrict effective_vm,
 		vm_node_insert(node);
 		/* Release the write-lock from parts, as they are mapped. */
 		sync_endwrite(part);
-		page_index += part_pages;
+		pageid += part_pages;
 	}
 
 	/* Apply a guard to the appropriate page. */
@@ -487,7 +493,7 @@ vm_paged_mapat(struct vm *__restrict effective_vm,
 			parts.pv_vec[0].pn_node->vn_guard = guard;
 		}
 	}
-	sync_endwrite(effective_vm);
+	sync_endwrite(self);
 	partnode_pair_vector_fini_caller_inherited_parts(&parts);
 	return true;
 }
@@ -498,52 +504,59 @@ vm_paged_mapat(struct vm *__restrict effective_vm,
  * @return: true:  Successfully created the mapping.
  * @return: false: Another mapping already exists. */
 PUBLIC bool KCALL
-vm_mapresat(struct vm *__restrict effective_vm,
-            pageid_t page_index, size_t num_pages,
+vm_mapresat(struct vm *__restrict self,
+            PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+            PAGEDIR_PAGEALIGNED size_t num_bytes,
             uintptr_half_t flag)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	struct vm_node *node;
+	pageid_t pageid;
+	size_t num_pages;
+	assert(((uintptr_t)addr & PAGEMASK) == 0);
+	assert((num_bytes & PAGEMASK) == 0);
 	assert(!(flag & ~(VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_NOMERGE)));
-	if unlikely(!num_pages)
+	if unlikely(!num_bytes)
 		return true;
+	pageid    = PAGEID_ENCODE(addr);
+	num_pages = num_bytes / PAGESIZE;
 	node = (struct vm_node *)kmalloc(sizeof(struct vm_node),
 	                                 GFP_LOCKED | GFP_PREFLT | GFP_VCBASE);
-	node->vn_node.a_vmin = page_index;
-	node->vn_node.a_vmax = page_index + num_pages - 1;
+	node->vn_node.a_vmin = pageid;
+	node->vn_node.a_vmax = pageid + num_pages - 1;
 	node->vn_prot        = VM_PROT_NONE;
 	node->vn_flags       = flag;
-	node->vn_vm          = effective_vm;
+	node->vn_vm          = self;
 	node->vn_part        = NULL;
 	node->vn_block       = NULL;
 #ifndef NDEBUG
 	memset(&node->vn_link, 0xcc, sizeof(node->vn_link));
-#endif
+#endif /* !NDEBUG */
 	node->vn_guard = 0;
 	TRY {
-		sync_write(effective_vm);
+		sync_write(self);
 	} EXCEPT {
 		kfree(node);
 		RETHROW();
 	}
 	/* Check if the specified range is already in use. */
-	if unlikely(vm_nodetree_rlocate(effective_vm->v_tree,
-	                                page_index,
-	                                page_index + num_pages - 1)) {
-		sync_endwrite(effective_vm);
+	if unlikely(vm_nodetree_rlocate(self->v_tree,
+	                                pageid,
+	                                pageid + num_pages - 1)) {
+		sync_endwrite(self);
 		kfree(node);
 		return false;
 	}
 	/* Must prepare the given address range beforehand! */
 	if (flag & VM_NODE_FLAG_PREPARED) {
-		if (!pagedir_prepare_map(page_index, num_pages)) {
-			sync_endwrite(effective_vm);
+		if (!npagedir_prepare_map(addr, num_bytes)) {
+			sync_endwrite(self);
 			kfree(node);
 			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
 		}
 	}
 	/* Insert the new node into the given VM. */
 	vm_node_insert(node);
-	sync_endwrite(effective_vm);
+	sync_endwrite(self);
 	return true;
 }
 
@@ -551,63 +564,62 @@ vm_mapresat(struct vm *__restrict effective_vm,
 
 /* A combination of `vm_paged_getfree' + `vm_paged_mapat'
  * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target. */
-PUBLIC pageid_t KCALL
-vm_map(struct vm *__restrict effective_vm,
-       pageid_t hint, size_t num_pages,
-       size_t min_alignment_in_pages,
+FUNDEF PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
+vm_map(struct vm *__restrict self,
+       PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
+       PAGEDIR_PAGEALIGNED size_t num_bytes,
+       PAGEDIR_PAGEALIGNED size_t min_alignment,
        unsigned int getfree_mode,
        struct vm_datablock *__restrict data,
-       vm_vpage64_t data_start_vpage, uintptr_half_t prot,
-       uintptr_half_t flag, uintptr_t guard)
+       PAGEDIR_PAGEALIGNED pos_t data_start_offset,
+       uintptr_half_t prot,
+       uintptr_half_t flag,
+       uintptr_t guard)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	size_t i;
-	pageid_t result, offset;
-	struct partnode_pair_vector parts;
+	void *result;
+	pageid_t result_pageid, offset_pageid;
 	uintptr_t version = 0;
+	struct partnode_pair_vector parts;
+	assert(((uintptr_t)hint & PAGEMASK) == 0);
+	assert((num_bytes & PAGEMASK) == 0);
+	assert((min_alignment & PAGEMASK) == 0);
+	assert((data_start_offset & PAGEMASK) == 0);
 	assert(!(flag & (VM_NODE_FLAG_COREPRT | VM_NODE_FLAG_KERNPRT | VM_NODE_FLAG_HINTED)));
 	assert(!(prot & ~(VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ | VM_PROT_LOOSE | VM_PROT_SHARED)));
-	if unlikely(!num_pages)
-		num_pages = 1;
+	if unlikely(!num_bytes)
+		num_bytes = PAGESIZE;
 again:
 	/* Load parts & acquire locks. */
 	vm_collect_and_lock_parts_and_vm(&parts,
-	                                 effective_vm,
+	                                 self,
 	                                 data,
-	                                 data_start_vpage,
-	                                 num_pages,
+	                                 (vm_vpage64_t)(data_start_offset / PAGESIZE),
+	                                 num_bytes / PAGESIZE,
 	                                 prot);
 	/* The rest of this function is already NOEXCEPT at this point.
 	 * However, we still need to check that the indicated range isn't
 	 * already being used by some other mapping! */
-	result = vm_paged_getfree(effective_vm,
-	                    hint,
-	                    num_pages,
-	                    min_alignment_in_pages,
-	                    getfree_mode);
-	if unlikely(result == VM_PAGED_GETFREE_ERROR) {
+	result = vm_getfree(self, hint, num_bytes, min_alignment, getfree_mode);
+	if unlikely(result == VM_GETFREE_ERROR) {
 		/* It _is_ already being used... */
-		sync_endwrite(effective_vm);
+		sync_endwrite(self);
 		partnode_pair_vector_fini_and_unlock_parts(&parts);
 		if (system_clearcaches_s(&version))
 			goto again;
 		THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
-		      num_pages);
+		      num_bytes);
 	}
-	assertf(!vm_paged_isused(effective_vm, result, result + num_pages - 1),
-	        "result             = %p (%p)\n"
-	        "num_pages          = %Iu\n"
-	        "result + num_pages = %p (%p)\n",
-	        VM_PAGE2ADDR(result), result, num_pages,
-	        VM_PAGE2ADDR(result + num_pages), result + num_pages);
-
-	printk(KERN_DEBUG "Map %p...%p against %Iu data parts\n",
-	       VM_PAGE2ADDR(result),
-	       VM_PAGE2ADDR(result + num_pages) - 1,
+	assertf(!vm_isused(self, result, num_bytes),
+	        "result = %p...%p\n",
+	        result, (byte_t *)result + num_bytes - 1);
+	printk(KERN_DEBUG "[vm] Map %p...%p against %Iu data parts\n",
+	       result, (byte_t *)result + num_bytes - 1,
 	       parts.pv_cnt);
 	/* Must prepare the given address range beforehand! */
 	if (flag & VM_NODE_FLAG_PREPARED) {
-		if (!pagedir_prepare_map(result, num_pages)) {
-			sync_endwrite(effective_vm);
+		if (!npagedir_prepare_map(result, num_bytes)) {
+			sync_endwrite(self);
 			partnode_pair_vector_fini_and_unlock_parts(&parts);
 			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
 		}
@@ -615,7 +627,8 @@ again:
 
 	/* Now to use what we were given, and initialize the memory mapping! */
 	assert(parts.pv_cnt != 0);
-	offset = result;
+	result_pageid = PAGEID_ENCODE(result);
+	offset_pageid = result_pageid;
 	for (i = 0; i < parts.pv_cnt; ++i) {
 		struct vm_datapart *part;
 		struct vm_node *node;
@@ -627,34 +640,24 @@ again:
 
 		/* Initialize the given node. */
 		part_pages = vm_datapart_numvpages(part);
-		assertf(offset + part_pages <= result + num_pages,
-		        "offset              = %p (%p)\n"
-		        "part_pages          = %Iu\n"
-		        "result              = %p (%p)\n"
-		        "num_pages           = %Iu\n"
-		        "offset + part_pages = %p (%p)\n"
-		        "result + num_pages  = %p (%p)\n",
-		        VM_PAGE2ADDR(offset), offset, part_pages,
-		        VM_PAGE2ADDR(result), result, num_pages,
-		        VM_PAGE2ADDR(offset + part_pages), offset + part_pages,
-		        VM_PAGE2ADDR(result + num_pages), result + num_pages);
-		assertf(!vm_paged_isused(effective_vm, offset, offset + part_pages - 1),
-		        "offset              = %p (%p)\n"
-		        "part_pages          = %Iu\n"
-		        "result              = %p (%p)\n"
-		        "num_pages           = %Iu\n"
-		        "offset + part_pages = %p (%p)\n"
-		        "result + num_pages  = %p (%p)\n",
-		        VM_PAGE2ADDR(offset), offset, part_pages,
-		        VM_PAGE2ADDR(result), result, num_pages,
-		        VM_PAGE2ADDR(offset + part_pages), offset + part_pages,
-		        VM_PAGE2ADDR(result + num_pages), result + num_pages);
-
-		node->vn_node.a_vmin = offset;
-		node->vn_node.a_vmax = offset + part_pages - 1;
+		assertf(offset_pageid + part_pages <=
+		        result_pageid + num_bytes / PAGESIZE,
+		        "offset = %p...%p (%Iu pages)\n"
+		        "result = %p...%p (%Iu pages)\n",
+		        (byte_t *)PAGEID_DECODE(offset_pageid),
+		        (byte_t *)PAGEID_DECODE(offset_pageid + part_pages) - 1, part_pages,
+		        result, (byte_t *)result + num_bytes - 1, num_bytes / PAGESIZE);
+		assertf(!vm_paged_isused(self, offset_pageid, offset_pageid + part_pages - 1),
+		        "offset = %p...%p (%Iu pages)\n"
+		        "result = %p...%p (%Iu pages)\n",
+		        (byte_t *)PAGEID_DECODE(offset_pageid),
+		        (byte_t *)PAGEID_DECODE(offset_pageid + part_pages) - 1, part_pages,
+		        result, (byte_t *)result + num_bytes - 1, num_bytes / PAGESIZE);
+		node->vn_node.a_vmin = offset_pageid;
+		node->vn_node.a_vmax = offset_pageid + part_pages - 1;
 		node->vn_prot        = prot;
 		node->vn_flags       = flag & VM_NODE_FLAG_PREPARED;
-		node->vn_vm          = effective_vm;
+		node->vn_vm          = self;
 		node->vn_part        = part; /* Inherit reference */
 		node->vn_block       = incref(data);
 		node->vn_guard       = 0;
@@ -667,15 +670,16 @@ again:
 		vm_node_insert(node);
 		/* Release the write-lock from parts, as they are mapped. */
 		sync_endwrite(part);
-		offset += part_pages;
+		offset_pageid += part_pages;
 	}
-	assertf(offset == result + num_pages,
+	assertf(offset_pageid == result_pageid + num_bytes / PAGESIZE,
 	        "offset             = %p\n"
-	        "result + num_pages = %p\n"
+	        "result + num_bytes = %p\n"
 	        "result             = %p\n"
-	        "num_pages          = %Iu\n",
-	        offset, result + num_pages,
-	        result, num_pages);
+	        "num_bytes          = %Iu\n",
+	        PAGEID_DECODE(offset_pageid),
+	        (byte_t *)result + num_bytes,
+	        (byte_t *)result, num_bytes);
 
 	/* Apply a guard to the appropriate page. */
 	if (guard != 0) {
@@ -686,7 +690,7 @@ again:
 			parts.pv_vec[0].pn_node->vn_guard = guard;
 		}
 	}
-	sync_endwrite(effective_vm);
+	sync_endwrite(self);
 	partnode_pair_vector_fini_caller_inherited_parts(&parts);
 	return result;
 }
@@ -696,64 +700,71 @@ again:
 
 /* A combination of `vm_paged_getfree' + `vm_mapresat'
  * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target. */
-PUBLIC pageid_t KCALL
-vm_mapres(struct vm *__restrict effective_vm,
-          pageid_t hint, size_t num_pages,
-          size_t min_alignment_in_pages,
-          unsigned int getfree_mode, uintptr_half_t flag) {
+PUBLIC UNCHECKED void *KCALL
+vm_mapres(struct vm *__restrict self,
+          PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
+          PAGEDIR_PAGEALIGNED size_t num_bytes,
+          PAGEDIR_PAGEALIGNED size_t min_alignment,
+          unsigned int getfree_mode,
+          uintptr_half_t flag)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	struct vm_node *node;
-	pageid_t result;
+	UNCHECKED void *result;
 	uintptr_t version = 0;
+	assert(((uintptr_t)hint & PAGEMASK) == 0);
+	assert((num_bytes & PAGEMASK) == 0);
+	assert((min_alignment & PAGEMASK) == 0);
 	assert(!(flag & ~(VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_NOMERGE)));
-	if unlikely(!num_pages)
-		num_pages = 1;
+	if unlikely(!num_bytes)
+		num_bytes = PAGESIZE;
+
 	node = (struct vm_node *)kmalloc(sizeof(struct vm_node),
 	                                 GFP_LOCKED | GFP_PREFLT | GFP_VCBASE);
 	node->vn_prot  = VM_PROT_NONE;
 	node->vn_flags = flag;
-	node->vn_vm    = effective_vm;
+	node->vn_vm    = self;
 	node->vn_part  = NULL;
 	node->vn_block = NULL;
 #ifndef NDEBUG
 	memset(&node->vn_link, 0xcc, sizeof(node->vn_link));
-#endif
+#endif /* !NDEBUG */
 	node->vn_guard = 0;
 again_lock_vm:
 	TRY {
-		sync_write(effective_vm);
+		sync_write(self);
 	} EXCEPT {
 		kfree(node);
 		RETHROW();
 	}
 	/* Figure out a suitable mapping location */
-	result = vm_paged_getfree(effective_vm,
+	result = vm_getfree(self,
 	                    hint,
-	                    num_pages,
-	                    min_alignment_in_pages,
+	                    num_bytes,
+	                    min_alignment,
 	                    getfree_mode);
-	if unlikely(result == VM_PAGED_GETFREE_ERROR) {
+	if unlikely(result == VM_GETFREE_ERROR) {
 		/* It _is_ already being used... */
-		sync_endwrite(effective_vm);
+		sync_endwrite(self);
 		if (system_clearcaches_s(&version))
 			goto again_lock_vm;
 		kfree(node);
 		THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
-		      num_pages);
+		      num_bytes);
 	}
 
-	node->vn_node.a_vmin = result;
-	node->vn_node.a_vmax = result + num_pages - 1;
+	node->vn_node.a_vmin = PAGEID_ENCODE(result);
+	node->vn_node.a_vmax = node->vn_node.a_vmin + (num_bytes / PAGESIZE) - 1;
 	/* Must prepare the given address range beforehand! */
 	if (flag & VM_NODE_FLAG_PREPARED) {
-		if (!pagedir_prepare_map(result, num_pages)) {
-			sync_endwrite(effective_vm);
+		if (!npagedir_prepare_map(result, num_bytes)) {
+			sync_endwrite(self);
 			kfree(node);
 			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
 		}
 	}
 	/* Insert the new node into the given VM. */
 	vm_node_insert(node);
-	sync_endwrite(effective_vm);
+	sync_endwrite(self);
 	return result;
 }
 
@@ -935,7 +946,7 @@ NOTHROW(KCALL vm_map_subrange_descriptors_insert_into_vm)(struct vm_map_subrange
 }
 
 
-/* Same as `vm_map()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
+/* Same as `vm_paged_map()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
  * to be mapped from `data'. - Any attempted to map data from outside that range will instead cause
  * memory from `vm_datablock_anonymous_zero' to be mapped.
  * Additionally, `data_start_vpage' is an offset from `data_subrange_minvpage' */
@@ -961,7 +972,7 @@ vm_paged_map_subrange(struct vm *__restrict effective_vm,
 		data_minmappage > data_subrange_maxvpage) {
 		/* The entire range is out-of-bounds.
 		 * Map everything as ANON+ZERO */
-		result = vm_map(effective_vm,
+		result = vm_paged_map(effective_vm,
 		                hint,
 		                num_pages,
 		                min_alignment_in_pages,
@@ -1027,7 +1038,7 @@ again_create_sr:
 
 	/* The entire mapping fits into the allowed mapping-range of the given data-block.
 	 * -> We can just map the memory normally. */
-	result = vm_map(effective_vm,
+	result = vm_paged_map(effective_vm,
 	                hint,
 	                num_pages,
 	                min_alignment_in_pages,
@@ -1044,7 +1055,7 @@ done:
 
 
 
-/* Same as `vm_paged_mapat()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
+/* Same as `vm_mapat()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
  * to be mapped from `data'. - Any attempted to map data from outside that range will instead cause
  * memory from `vm_datablock_anonymous_zero' to be mapped.
  * Additionally, `data_start_vpage' is an offset from `data_subrange_minvpage' */

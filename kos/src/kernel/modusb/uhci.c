@@ -2984,7 +2984,7 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 		result->uc_base.uc_iobase = (port_t)dev->pd_res[PD_RESOURCE_BAR(pci_bar)].pr_start;
 	} else {
 		void *addr;
-		addr = nvm_map(&vm_kernel,
+		addr = vm_map(&vm_kernel,
 		               HINT_GETADDR(KERNEL_VMHINT_DEVICE), 1, 1,
 		               HINT_GETMODE(KERNEL_VMHINT_DEVICE),
 		               &vm_datablock_physical,

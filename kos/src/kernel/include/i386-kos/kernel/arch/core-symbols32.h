@@ -9710,10 +9710,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname2427 /* index: 2427 */
-	.weak vm_paged_mapat; .long vm_paged_mapat
-	.reloc ., R_386_SIZE32, vm_paged_mapat; .long 0
-	.long 0xb45fce4
+	.long 0 /* index: 2427 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname2428 /* index: 2428 */
 	.weak sys_socketpair; .long sys_socketpair
 	.reloc ., R_386_SIZE32, sys_socketpair; .long 0
@@ -12702,10 +12702,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_set_library_listdef; .long sys_set_library_listdef
 	.reloc ., R_386_SIZE32, sys_set_library_listdef; .long 0
 	.long 0x3315c66
-	.long 0 /* index: 3175 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3175 /* index: 3175 */
+	.weak vm_mapat; .long vm_mapat
+	.reloc ., R_386_SIZE32, vm_mapat; .long 0
+	.long 0x3638154
 	.long 0 /* index: 3176 */
 	.long 0
 	.long 0
@@ -19204,8 +19204,6 @@ END(kernel_symbol_table)
 	.string "vpage_realloc_nx"
 .Lname2425:
 	.string "sys_fchdir"
-.Lname2427:
-	.string "vm_paged_mapat"
 .Lname2428:
 	.string "sys_socketpair"
 .Lname2431:
@@ -20118,6 +20116,8 @@ END(kernel_symbol_table)
 	.string "driver_get_state"
 .Lname3174:
 	.string "sys_set_library_listdef"
+.Lname3175:
+	.string "vm_mapat"
 .Lname3177:
 	.string "vmb_apply"
 .Lname3178:

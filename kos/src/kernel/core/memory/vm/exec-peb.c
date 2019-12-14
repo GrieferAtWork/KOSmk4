@@ -111,16 +111,16 @@ again:
 
 	/* Create a temporary kernel-space mapping for initializing the PEB */
 	peb_total_size = CEIL_ALIGN(peb_total_size, PAGESIZE);
-	peb_temp_base = (byte_t *)nvm_map(&vm_kernel,
-	                                  HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
-	                                  peb_total_size,
-	                                  PAGESIZE,
-	                                  HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
-	                                  &vm_datablock_anonymous_zero,
-	                                  0,
-	                                  VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED,
-	                                  VM_NODE_FLAG_NORMAL,
-	                                  0);
+	peb_temp_base = (byte_t *)vm_map(&vm_kernel,
+	                                 HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
+	                                 peb_total_size,
+	                                 PAGESIZE,
+	                                 HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
+	                                 &vm_datablock_anonymous_zero,
+	                                 0,
+	                                 VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED,
+	                                 VM_NODE_FLAG_NORMAL,
+	                                 0);
 	TRY {
 		byte_t *writer;
 		USER uintptr_t *peb_argv;
@@ -187,10 +187,10 @@ string_size_changed:
 
 		/* Figure out where we want to map the PEB within the VM builder. */
 		result = vmb_getfree(self,
-		                      HINT_GETADDR(KERNEL_VMHINT_USER_PEB),
-		                      peb_total_size,
-		                      PAGESIZE,
-		                      HINT_GETMODE(KERNEL_VMHINT_USER_PEB));
+		                     HINT_GETADDR(KERNEL_VMHINT_USER_PEB),
+		                     peb_total_size,
+		                     PAGESIZE,
+		                     HINT_GETMODE(KERNEL_VMHINT_USER_PEB));
 
 		/* Relocate pointers within the PEB to make them absolute */
 		peb->pp_argv = (char **)((byte_t *)peb->pp_argv + (uintptr_t)result);
@@ -210,8 +210,8 @@ string_size_changed:
 	} EXCEPT {
 		/* Delete the temporary PEB mapping as general-purpose kernel RAM. */
 		vm_unmap_kernel_ram(peb_temp_base,
-		                     peb_total_size,
-		                     false);
+		                    peb_total_size,
+		                    false);
 		RETHROW();
 	}
 	/* Steal the node used to hold the PEB */

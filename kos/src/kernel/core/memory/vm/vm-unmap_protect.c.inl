@@ -152,11 +152,11 @@ do_throw_first_unmapped:
 				if (SHOULD_UPDATE(node) &&
 				    (node->vn_flags & (VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_PARTITIONED)) !=
 				    VM_NODE_FLAG_PREPARED) {
-					if unlikely(!(effective_vm == myvm || PRANGE_IS_KERNEL(vm_node_getstartpageid(node), vm_node_getendpageid(node))
-					              ? pagedir_prepare_map(vm_node_getstartpageid(node), vm_node_getpagecount(node))
-					              : pagedir_prepare_map_p(PAGEDIR_P_SELFOFVM(effective_vm),
-					                                      vm_node_getstartpageid(node),
-					                                      vm_node_getpagecount(node)))) {
+					if unlikely(!((effective_vm == myvm || vm_node_iskernelspace(node))
+					              ? npagedir_prepare_map(vm_node_getstart(node), vm_node_getsize(node))
+					              : npagedir_prepare_map_p(PAGEDIR_P_SELFOFVM(effective_vm),
+					                                       vm_node_getstart(node),
+					                                       vm_node_getsize(node)))) {
 						sync_endwrite(effective_vm);
 						THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
 					}

@@ -3959,7 +3959,7 @@ driver_insmod_file(struct regular_node *__restrict driver_inode,
 	if (filesize >= (pos_t)0x10000000)
 		THROW(E_NOT_EXECUTABLE_TOOLARGE);
 	num_bytes = CEIL_ALIGN((size_t)filesize, PAGESIZE);
-	temp_mapping = nvm_map(&vm_kernel,
+	temp_mapping = vm_map(&vm_kernel,
 	                       HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
 	                       num_bytes,
 	                       PAGESIZE,

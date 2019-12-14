@@ -198,7 +198,7 @@ struct task_sigset {
  * A value of ONE(1) would suffice, but a static buffer is mandatory
  * due to the fact that allocating a dynamic buffer (using `kmalloc()')
  * may need to acquire its own locks in case that new memory must be
- * vm_map()-ed. In this case, when locking needs to be done, a logic
+ * vm_paged_map()-ed. In this case, when locking needs to be done, a logic
  * recursion can only be prevented if it is possible to use at least
  * one signal slot that is allocated statically (`task_connect()' uses
  * `task_push_connections()' to free up that static slot before calling

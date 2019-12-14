@@ -41,10 +41,19 @@
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 #ifdef __x86_64__
+#include <__stdinc.h>
 #define __ARCH_PAGEID_TYPE_SIZEOF  8
 #define __ARCH_PAGEID_TYPE         __UINT64_TYPE__
 #define __ARCH_PAGEID_BITS         36 /* 48-bit address space minus 12-bit PAGESHIFT */
 #define __ARCH_PAGEID_MAX          __UINT64_C(0xfffffffff) /* 36-bit */
+#if defined(__INTELLISENSE__) && defined(__CC__) && defined(__cplusplus)
+extern "C++" {
+#define __ARCH_PAGEID_ENCODE __ARCH_PAGEID_ENCODE
+#define __ARCH_PAGEID_DECODE __ARCH_PAGEID_DECODE
+__UINT64_TYPE__ (__ARCH_PAGEID_ENCODE)(void *addr);
+void *(__ARCH_PAGEID_DECODE)(__UINT64_TYPE__ addr);
+}
+#else /* __INTELLISENSE__ && __CC__ && __cplusplus */
 #define __ARCH_PAGEID_ENCODE(addr) ((__CCAST(__UINT64_TYPE__)(addr) >> 12) & __ARCH_PAGEID_MAX)
 /* Re-construct the sign extension for kernel-space addresses */
 #ifdef __CC__
@@ -55,14 +64,27 @@
 	(((((pageid) >> 35) & 1) * __UINT64_C(0xffff000000000000)) | \
 	 ((pageid)&__UINT64_C(0x7ffffffff)) << 12)
 #endif /* !__CC__ */
-
+#endif /* !__INTELLISENSE__ || !__CC__ || !__cplusplus */
 #else /* __x86_64__ */
 #define __ARCH_PAGEID_TYPE_SIZEOF    4
 #define __ARCH_PAGEID_TYPE           __UINT32_TYPE__
 #define __ARCH_PAGEID_BITS           20 /* 32-bit address space minus 12-bit PAGESHIFT */
 #define __ARCH_PAGEID_MAX            __UINT64_C(0xfffff) /* 20-bit */
+#ifdef __INTELLISENSE__
+#include <__stdinc.h>
+#if defined(__CC__) && defined(__cplusplus)
+extern "C++" {
+#define __ARCH_PAGEID_ENCODE __ARCH_PAGEID_ENCODE
+#define __ARCH_PAGEID_DECODE __ARCH_PAGEID_DECODE
+__UINT32_TYPE__ (__ARCH_PAGEID_ENCODE)(void *addr);
+void *(__ARCH_PAGEID_DECODE)(__UINT32_TYPE__ addr);
+}
+#endif /* __CC__ && __cplusplus */
+#endif /* __INTELLISENSE__ */
+#ifndef __ARCH_PAGEID_ENCODE
 #define __ARCH_PAGEID_ENCODE(addr)   (__CCAST(__UINT32_TYPE__)(addr) >> 12)
 #define __ARCH_PAGEID_DECODE(pageid) (__CCAST(void *)(__CCAST(__UINT32_TYPE__)(pageid) << 12))
+#endif /* !__ARCH_PAGEID_ENCODE */
 #endif /* !__x86_64__ */
 #endif /* !__ARCH_PAGEID_ENCODE */
 

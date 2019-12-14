@@ -2249,6 +2249,7 @@
 #define __CRT_HAVE_vm_kernel_treelock_writef_nx 1
 #define __CRT_HAVE_vm_library_enumerate 1
 #define __CRT_HAVE_vm_map 1
+#define __CRT_HAVE_vm_mapat 1
 #define __CRT_HAVE_vm_mapres 1
 #define __CRT_HAVE_vm_mapresat 1
 #define __CRT_HAVE_vm_memset 1
@@ -2271,7 +2272,6 @@
 #define __CRT_HAVE_vm_paged_kernel_sync 1
 #define __CRT_HAVE_vm_paged_kernel_syncone 1
 #define __CRT_HAVE_vm_paged_map_subrange 1
-#define __CRT_HAVE_vm_paged_mapat 1
 #define __CRT_HAVE_vm_paged_mapat_subrange 1
 #define __CRT_HAVE_vm_paged_node_remove 1
 #define __CRT_HAVE_vm_paged_protect 1

@@ -627,7 +627,7 @@ NOTHROW(KCALL pprop_memcpy)(uintptr_t *__restrict dst_base,
  *       in use. - This function is merely a thin wrapper around `pagedir_map',
  *       which automatically allows for dealing with multi-part ram blocks.
  * NOTE: The caller is responsible to ensure that the target region of memory
- *       has been prepared in a prior call to `pagedir_prepare_map'
+ *       has been prepared in a prior call to `npagedir_prepare_map'
  * @param: perm: Set of `PAGEDIR_MAP_F*' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_map_ram)(struct vm_datapart *__restrict self,

@@ -746,18 +746,18 @@ NOTHROW(KCALL npagedir_unwrite_p)(PAGEDIR_P_SELFTYPE self,
 #if 1
 #ifndef __PAGEDIR_COMPAT_VIRTPAGE2ADDR
 #ifdef __INTELLISENSE__
+extern "C++" {
 void *__PAGEDIR_COMPAT_VIRTPAGE2ADDR(vm_vpage_t virt_page);
 void *__PAGEDIR_COMPAT_VIRTPAGE2ADDR(uintptr_t virt_page); /* __ARCH_PAGEID_TYPE */
 vm_phys_t __PAGEDIR_COMPAT_PHYSPAGE2PHYS(pageptr_t phys_page);
 size_t __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(size_t num_pages);
+}
 #else /* __INTELLISENSE__ */
 #define __PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page)     (void *)((uintptr_t)(virt_page) * 4096)
 #define __PAGEDIR_COMPAT_PHYSPAGE2PHYS(phys_page)     (vm_phys_t)((uintptr_t)(phys_page) * 4096)
 #define __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages) ((size_t)(num_pages) * 4096)
 #endif /* !__INTELLISENSE__ */
 #endif /* !__PAGEDIR_COMPAT_VIRTPAGE2ADDR */
-#define pagedir_prepare_map(virt_page, num_pages)                  npagedir_prepare_map(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages))
-#define pagedir_prepare_map_keep(virt_page, num_pages)             npagedir_prepare_map_keep(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages))
 #define pagedir_unprepare_map(virt_page, num_pages)                npagedir_unprepare_map(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages))
 #define pagedir_maphintone(virt_page, hint)                        npagedir_maphintone(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), hint)
 #define pagedir_maphint(virt_page, num_pages, hint)                npagedir_maphint(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages), hint)

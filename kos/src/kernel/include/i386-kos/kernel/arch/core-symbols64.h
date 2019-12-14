@@ -2751,8 +2751,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname687 /* index: 687 */
-	.weak vm_mapres; .quad vm_mapres
-	.reloc ., R_X86_64_SIZE32, vm_mapres; .int 0
+	.weak vm_paged_mapres; .quad vm_paged_mapres
+	.reloc ., R_X86_64_SIZE32, vm_paged_mapres; .int 0
 	.int 0x63805f3
 	.quad .Lname688 /* index: 688 */
 	.weak unwind_getreg_ucpustate_exclusive; .quad unwind_getreg_ucpustate_exclusive
@@ -3587,8 +3587,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, superblock_mountlock_endwrite; .int 0
 	.int 0x4a9c095
 	.quad .Lname896 /* index: 896 */
-	.weak vm_map; .quad vm_map
-	.reloc ., R_X86_64_SIZE32, vm_map; .int 0
+	.weak vm_paged_map; .quad vm_paged_map
+	.reloc ., R_X86_64_SIZE32, vm_paged_map; .int 0
 	.int 0x7d36380
 	.quad .Lname897 /* index: 897 */
 	.weak memrendq; .quad memrendq
@@ -17365,7 +17365,7 @@ END(kernel_symbol_table)
 .Lname683:
 	.string "handle_get_datablock"
 .Lname687:
-	.string "vm_mapres"
+	.string "vm_paged_mapres"
 .Lname688:
 	.string "unwind_getreg_ucpustate_exclusive"
 .Lname689:
@@ -17643,7 +17643,7 @@ END(kernel_symbol_table)
 .Lname895:
 	.string "superblock_mountlock_endwrite"
 .Lname896:
-	.string "vm_map"
+	.string "vm_paged_map"
 .Lname897:
 	.string "memrendq"
 .Lname899:
