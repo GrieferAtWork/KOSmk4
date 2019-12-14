@@ -123,9 +123,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname30 /* index: 30 */
-	.weak ramfs_type; .long ramfs_type
-	.reloc ., R_386_SIZE32, ramfs_type; .long 0
-	.long 0xd914855
+	.weak pagedir_syncone; .long pagedir_syncone
+	.reloc ., R_386_SIZE32, pagedir_syncone; .long 0
+	.long 0x75ff855
 	.long 0 /* index: 31 */
 	.long 0
 	.long 0
@@ -607,9 +607,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname151 /* index: 151 */
-	.weak sys_getpeername; .long sys_getpeername
-	.reloc ., R_386_SIZE32, sys_getpeername; .long 0
-	.long 0x296f855
+	.weak ramfs_type; .long ramfs_type
+	.reloc ., R_386_SIZE32, ramfs_type; .long 0
+	.long 0xd914855
 	.long .Lname152 /* index: 152 */
 	.weak path_traversefull_ex; .long path_traversefull_ex
 	.reloc ., R_386_SIZE32, path_traversefull_ex; .long 0
@@ -1294,10 +1294,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak character_device_register; .long character_device_register
 	.reloc ., R_386_SIZE32, character_device_register; .long 0
 	.long 0x4292142
-	.long 0 /* index: 323 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname323 /* index: 323 */
+	.weak x86_userexcept_unwind_i; .long x86_userexcept_unwind_i
+	.reloc ., R_386_SIZE32, x86_userexcept_unwind_i; .long 0
+	.long 0x1010019
 	.long .Lname324 /* index: 324 */
 	.weak debuginfo_cu_parser_nextparent; .long debuginfo_cu_parser_nextparent
 	.reloc ., R_386_SIZE32, debuginfo_cu_parser_nextparent; .long 0
@@ -4726,10 +4726,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname1181 /* index: 1181 */
-	.weak x86_pagedir_syncone; .long x86_pagedir_syncone
-	.reloc ., R_386_SIZE32, x86_pagedir_syncone; .long 0
-	.long 0xd040825
+	.long 0 /* index: 1181 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 1182 */
 	.long 0
 	.long 0
@@ -10091,9 +10091,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, swap_read; .long 0
 	.long 0x866f1a4
 	.long .Lname2522 /* index: 2522 */
-	.weak x86_userexcept_unwind_i; .long x86_userexcept_unwind_i
-	.reloc ., R_386_SIZE32, x86_userexcept_unwind_i; .long 0
-	.long 0x1010019
+	.weak sys_getpeername; .long sys_getpeername
+	.reloc ., R_386_SIZE32, sys_getpeername; .long 0
+	.long 0x296f855
 	.long 0 /* index: 2523 */
 	.long 0
 	.long 0
@@ -16425,7 +16425,7 @@ END(kernel_symbol_table)
 .Lname28:
 	.string "vm_getfutex_existing"
 .Lname30:
-	.string "ramfs_type"
+	.string "pagedir_syncone"
 .Lname32:
 	.string "sys_setresgid"
 .Lname34:
@@ -16557,7 +16557,7 @@ END(kernel_symbol_table)
 .Lname149:
 	.string "block_device_acquire_partlock_write"
 .Lname151:
-	.string "sys_getpeername"
+	.string "ramfs_type"
 .Lname152:
 	.string "path_traversefull_ex"
 .Lname153:
@@ -16758,6 +16758,8 @@ END(kernel_symbol_table)
 	.string "unwind_setreg_scpustate_exclusive_p"
 .Lname322:
 	.string "character_device_register"
+.Lname323:
+	.string "x86_userexcept_unwind_i"
 .Lname324:
 	.string "debuginfo_cu_parser_nextparent"
 .Lname327:
@@ -17794,8 +17796,6 @@ END(kernel_symbol_table)
 	.string "dbg_getuni"
 .Lname1178:
 	.string "unicode_16to32"
-.Lname1181:
-	.string "x86_pagedir_syncone"
 .Lname1183:
 	.string "sys_setfsgid"
 .Lname1186:
@@ -19305,7 +19305,7 @@ END(kernel_symbol_table)
 .Lname2521:
 	.string "swap_read"
 .Lname2522:
-	.string "x86_userexcept_unwind_i"
+	.string "sys_getpeername"
 .Lname2526:
 	.string "page_free"
 .Lname2527:

@@ -1012,6 +1012,7 @@
 #define __CRT_HAVE_pagedir_prepare_mapone_p 1
 #define __CRT_HAVE_pagedir_push_mapone 1
 #define __CRT_HAVE_pagedir_syncall 1
+#define __CRT_HAVE_pagedir_syncone 1
 #define __CRT_HAVE_pagedir_translate 1
 #define __CRT_HAVE_pagedir_translate_p 1
 #define __CRT_HAVE_pagedir_unmap 1
@@ -2403,7 +2404,6 @@
 #define __CRT_HAVE_x86_memcpy_nopf_ret_pointer 1
 #define __CRT_HAVE_x86_pagedir_sync 1
 #define __CRT_HAVE_x86_pagedir_syncall_maybe_global 1
-#define __CRT_HAVE_x86_pagedir_syncone 1
 #define __CRT_HAVE_x86_pit_lock 1
 #define __CRT_HAVE_x86_rpc_user_redirection 1
 #define __CRT_HAVE_x86_setiopl 1

@@ -76,15 +76,15 @@ END(x86_pagedir_syncall_maybe_global)
 
 
 /* X86-specific implementation for invalidating the TLB of a single page. */
-/* FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_syncone)(VIRT vm_virt_t virt_addr); */
-PUBLIC_FUNCTION(x86_pagedir_syncone)
+/* FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncone)(VIRT vm_virt_t virt_addr); */
+PUBLIC_FUNCTION(pagedir_syncone)
 	.cfi_startproc
 	invlpg (%ecx)
 	ret
-	PAD_FOR(x86_pagedir_syncone, RELOAD_WITH_CR3_TEXTSIZE)
-	PAD_FOR(x86_pagedir_syncone, RELOAD_WITH_CR4_TEXTSIZE)
+	PAD_FOR(pagedir_syncone, RELOAD_WITH_CR3_TEXTSIZE)
+	PAD_FOR(pagedir_syncone, RELOAD_WITH_CR4_TEXTSIZE)
 	.cfi_endproc
-END(x86_pagedir_syncone)
+END(pagedir_syncone)
 
 
 /* X86-specific implementation for invalidating every TLB over a given range. */

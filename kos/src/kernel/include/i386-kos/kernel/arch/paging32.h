@@ -295,18 +295,11 @@ FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncall)(void);
  * behave the same as `pagedir_syncall_user()' */
 FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_syncall_maybe_global)(VIRT void *virt_addr, size_t num_pages);
 
-/* X86-specific implementation for invalidating the TLB of a single page. */
-FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_syncone)(VIRT void *virt_addr);
-
 /* X86-specific implementation for invalidating every TLB over a given range. */
 FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_sync)(VIRT void *virt_addr, size_t num_pages);
 
 /* Synchronize mappings within the given address range. */
-FORCELOCAL NOBLOCK void
-NOTHROW(FCALL pagedir_syncone)(VIRT void *addr) {
-	/* TODO: Rename `x86_pagedir_syncone()' to `pagedir_syncone()' */
-	x86_pagedir_syncone(addr);
-}
+FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncone)(VIRT void *virt_addr);
 
 /* Synchronize mappings within the given address range. */
 FORCELOCAL NOBLOCK void
