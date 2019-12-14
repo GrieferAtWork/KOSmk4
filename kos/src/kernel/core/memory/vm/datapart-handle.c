@@ -344,8 +344,8 @@ handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd,
 		{
 			FINALLY_DECREF_UNLIKELY(block);
 			has_changed = vm_datapart_haschanged(self,
-			                                     VM_DATABLOCK_DADDR2DPAGE(block, (vm_daddr_t)data->dhc_minbyte),
-			                                     VM_DATABLOCK_DADDR2DPAGE(block, (vm_daddr_t)data->dhc_maxbyte));
+			                                     VM_DATABLOCK_DADDR2DPAGE(block, (pos_t)data->dhc_minbyte),
+			                                     VM_DATABLOCK_DADDR2DPAGE(block, (pos_t)data->dhc_maxbyte));
 		}
 		COMPILER_WRITE_BARRIER();
 		data->dhc_result = has_changed ? HOP_DATABLOCK_HASCHANGED_FLAG_DIDCHANGE

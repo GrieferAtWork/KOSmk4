@@ -723,10 +723,10 @@ handle_characterdevice_ioctl(struct character_device *__restrict self, syscall_u
 
 INTERN NONNULL((1)) REF struct vm_datablock *KCALL
 handle_characterdevice_mmap(struct character_device *__restrict self,
-                            vm_vpage64_t *__restrict pminpage,
-                            vm_vpage64_t *__restrict pmaxpage) THROWS(...) {
+                            pos_t *__restrict pminoffset,
+                            pos_t *__restrict pnumbytes) THROWS(...) {
 	if (self->cd_type.ct_mmap)
-		return (*self->cd_type.ct_mmap)(self, pminpage, pmaxpage);
+		return (*self->cd_type.ct_mmap)(self, pminoffset, pnumbytes);
 	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
 	      E_FILESYSTEM_OPERATION_MMAP);
 }

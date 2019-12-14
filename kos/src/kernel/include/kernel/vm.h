@@ -72,22 +72,37 @@ struct vm_futex_controller;
 #define __gfp_t_defined 1
 typedef unsigned int gfp_t;
 #endif /* !__gfp_t_defined */
+
+#ifndef __pageid_t_defined
+#define __pageid_t_defined 1
+typedef __ARCH_PAGEID_TYPE pageid_t;
+#endif /* !__pageid_t_defined */
 #endif /* __CC__ */
+#define PAGEID_ENCODE        __ARCH_PAGEID_ENCODE
+#define PAGEID_DECODE        __ARCH_PAGEID_DECODE /* TODO: Go through all use-cases and optimize for `PAGEID_DECODE(_USER|_KERNEL)' */
+#ifdef __ARCH_PAGEID_DECODE_USER
+#define PAGEID_DECODE_USER   __ARCH_PAGEID_DECODE_USER
+#else /* __ARCH_PAGEID_DECODE_USER */
+#define PAGEID_DECODE_USER   __ARCH_PAGEID_DECODE
+#endif /* !__ARCH_PAGEID_DECODE_USER */
+#ifdef __ARCH_PAGEID_DECODE_KERNEL
+#define PAGEID_DECODE_KERNEL __ARCH_PAGEID_DECODE_KERNEL
+#else /* __ARCH_PAGEID_DECODE_KERNEL */
+#define PAGEID_DECODE_KERNEL __ARCH_PAGEID_DECODE
+#endif /* !__ARCH_PAGEID_DECODE_KERNEL */
 
-
-#define __SIZEOF_VM_DPAGE_T__ 8
-#define __SIZEOF_VM_DADDR_T__ __FS_SIZEOF(OFF)
 
 #ifdef __CC__
-__HYBRID_ALTINT_TYPEDEF(u64, vm_dpage_t, false); /* Data block page number. */
-typedef pos_t vm_daddr_t;                        /* Data block address. */
-
+#ifndef __datapage_t_defined
+#define __datapage_t_defined 1
+__HYBRID_ALTINT_TYPEDEF(u64, datapage_t, false); /* Data part page number. */
+#endif /* !__datapage_t_defined */
 
 struct vm_ramblock {
 	pageptr_t  rb_start; /* Starting page number of physical memory associated with the ram block. */
-	size_t      rb_size;  /* Number of continuous physical memory pages used by this block. */
+	size_t     rb_size;  /* Number of continuous physical memory pages used by this block. */
 #if __SIZEOF_PAGEPTR_T__ > __SIZEOF_SIZE_T__
-	byte_t      rb_pad[__SIZEOF_PAGEPTR_T__ - __SIZEOF_SIZE_T__];
+	byte_t     rb_pad[__SIZEOF_PAGEPTR_T__ - __SIZEOF_SIZE_T__];
 #endif /* __SIZEOF_PAGEPTR_T__ > __SIZEOF_SIZE_T__ */
 };
 
@@ -147,21 +162,21 @@ struct vm_datapart {
 			union ATTR_PACKED {
 				uintptr_t       a_vmin_ptr; /* Lower bound. */
 #ifdef __INTELLISENSE__
-				struct { vm_dpage_t a_vmin; /* Lower bound. */ };
+				struct { datapage_t a_vmin; /* Lower bound. */ };
 #else /* __INTELLISENSE__ */
-				vm_dpage_t      a_vmin;     /* Lower bound. */
+				datapage_t      a_vmin;     /* Lower bound. */
 #endif /* !__INTELLISENSE__ */
 			};
 			union ATTR_PACKED {
 				uintptr_t       a_vmax_ptr; /* Upper bound. */
 #ifdef __INTELLISENSE__
-				struct { vm_dpage_t a_vmax; /* Upper bound. */ };
+				struct { datapage_t a_vmax; /* Upper bound. */ };
 #else /* __INTELLISENSE__ */
-				vm_dpage_t      a_vmax;     /* Upper bound. */
+				datapage_t      a_vmax;     /* Upper bound. */
 #endif /* !__INTELLISENSE__ */
 			};
 		}                              dp_tree_ptr;
-		ATREE_NODE(struct vm_datapart, vm_dpage_t)
+		ATREE_NODE(struct vm_datapart, datapage_t)
 		                               dp_tree;   /* [lock(READ(dp_block || dp_lock))]
 		                                           * [lock(WRITE(a_vmin,a_vmax:dp_block && dp_lock))]
 		                                           * [lock(WRITE(a_min,a_max:dp_block))]
@@ -337,37 +352,37 @@ __DEFINE_SYNC_POLL(struct vm_datapart,
 /* The size of the given datapart, either in data-pages, or in virt-pages.
  * NOTE: The caller must be holding a read-lock on `self', or `self' must not be shared.
  * DATA-PAGES: Usually same as `virt-pages', but often 512-bytes large for files.
- * VIRT-PAGES: Same as `vm_vpage_t' (PAGESIZE-bytes large) */
-NOBLOCK u64 NOTHROW(KCALL vm_datapart_numbytes)(struct vm_datapart *__restrict self);
-NOBLOCK u64 NOTHROW(KCALL vm_datapart_numdpages)(struct vm_datapart *__restrict self);
-NOBLOCK size_t NOTHROW(KCALL vm_datapart_numvpages)(struct vm_datapart *__restrict self); /* XXX: Overflow */
-NOBLOCK vm_daddr_t NOTHROW(KCALL vm_datapart_minbyte)(struct vm_datapart *__restrict self);
-NOBLOCK vm_dpage_t NOTHROW(KCALL vm_datapart_mindpage)(struct vm_datapart *__restrict self);
+ * VIRT-PAGES: Same as `pageid_t' (PAGESIZE-bytes large) */
+NOBLOCK size_t NOTHROW(KCALL vm_datapart_numbytes)(struct vm_datapart *__restrict self);  /* TODO: Fix-up users of this macro that cast the return value to u64 */
+NOBLOCK size_t NOTHROW(KCALL vm_datapart_numdpages)(struct vm_datapart *__restrict self); /* TODO: Fix-up users of this macro that cast the return value to u64 */
+NOBLOCK size_t NOTHROW(KCALL vm_datapart_numvpages)(struct vm_datapart *__restrict self);
+NOBLOCK pos_t NOTHROW(KCALL vm_datapart_minbyte)(struct vm_datapart *__restrict self);
+NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_mindpage)(struct vm_datapart *__restrict self);
 NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_minvpage)(struct vm_datapart *__restrict self);
-NOBLOCK vm_daddr_t NOTHROW(KCALL vm_datapart_maxbyte)(struct vm_datapart *__restrict self);
-NOBLOCK vm_dpage_t NOTHROW(KCALL vm_datapart_maxdpage)(struct vm_datapart *__restrict self);
+NOBLOCK pos_t NOTHROW(KCALL vm_datapart_maxbyte)(struct vm_datapart *__restrict self);
+NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_maxdpage)(struct vm_datapart *__restrict self);
 NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_maxvpage)(struct vm_datapart *__restrict self);
-NOBLOCK vm_daddr_t NOTHROW(KCALL vm_datapart_startbyte)(struct vm_datapart *__restrict self);
-NOBLOCK vm_dpage_t NOTHROW(KCALL vm_datapart_startdpage)(struct vm_datapart *__restrict self);
+NOBLOCK pos_t NOTHROW(KCALL vm_datapart_startbyte)(struct vm_datapart *__restrict self);
+NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_startdpage)(struct vm_datapart *__restrict self);
 NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_startvpage)(struct vm_datapart *__restrict self);
-NOBLOCK vm_daddr_t NOTHROW(KCALL vm_datapart_endbyte)(struct vm_datapart *__restrict self);
-NOBLOCK vm_dpage_t NOTHROW(KCALL vm_datapart_enddpage)(struct vm_datapart *__restrict self);
+NOBLOCK pos_t NOTHROW(KCALL vm_datapart_endbyte)(struct vm_datapart *__restrict self);
+NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_enddpage)(struct vm_datapart *__restrict self);
 NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_endvpage)(struct vm_datapart *__restrict self);
 #else /* __INTELLISENSE__ */
-#define vm_datapart_numbytes(self)   ((u64)(((self)->dp_tree.a_vmax - (self)->dp_tree.a_vmin) + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
-#define vm_datapart_numdpages(self)  ((u64)(((self)->dp_tree.a_vmax - (self)->dp_tree.a_vmin) + 1))
+#define vm_datapart_numbytes(self)   ((size_t)(((self)->dp_tree.a_vmax - (self)->dp_tree.a_vmin) + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
+#define vm_datapart_numdpages(self)  ((size_t)(((self)->dp_tree.a_vmax - (self)->dp_tree.a_vmin) + 1))
 #define vm_datapart_numvpages(self)  ((size_t)(((self)->dp_tree.a_vmax - (self)->dp_tree.a_vmin) + 1) >> VM_DATABLOCK_PAGESHIFT((self)->dp_block))
-#define vm_datapart_minbyte(self)    ((vm_daddr_t)(self)->dp_tree.a_vmin << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
-#define vm_datapart_mindpage(self)   ((vm_dpage_t)(self)->dp_tree.a_vmin)
+#define vm_datapart_minbyte(self)    ((pos_t)(self)->dp_tree.a_vmin << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
+#define vm_datapart_mindpage(self)   ((datapage_t)(self)->dp_tree.a_vmin)
 #define vm_datapart_minvpage(self)   ((vm_vpage64_t)(self)->dp_tree.a_vmin >> VM_DATABLOCK_PAGESHIFT((self)->dp_block))
-#define vm_datapart_maxbyte(self)    ((((vm_daddr_t)(self)->dp_tree.a_vmax + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block)) - 1)
-#define vm_datapart_maxdpage(self)   ((vm_dpage_t)(self)->dp_tree.a_vmax)
+#define vm_datapart_maxbyte(self)    ((((pos_t)(self)->dp_tree.a_vmax + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block)) - 1)
+#define vm_datapart_maxdpage(self)   ((datapage_t)(self)->dp_tree.a_vmax)
 #define vm_datapart_maxvpage(self)   ((vm_vpage64_t)((self)->dp_tree.a_vmax >> VM_DATABLOCK_PAGESHIFT((self)->dp_block)))
 #define vm_datapart_startbyte(self)  vm_datapart_minbyte(self)
 #define vm_datapart_startdpage(self) vm_datapart_mindpage(self)
 #define vm_datapart_startvpage(self) vm_datapart_minvpage(self)
-#define vm_datapart_endbyte(self)    (((vm_daddr_t)(self)->dp_tree.a_vmax + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
-#define vm_datapart_enddpage(self)   ((vm_dpage_t)(self)->dp_tree.a_vmax + 1)
+#define vm_datapart_endbyte(self)    (((pos_t)(self)->dp_tree.a_vmax + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
+#define vm_datapart_enddpage(self)   ((datapage_t)(self)->dp_tree.a_vmax + 1)
 #define vm_datapart_endvpage(self)   (vm_datapart_maxvpage(self) + 1)
 #endif /* !__INTELLISENSE__ */
 
@@ -465,11 +480,11 @@ NOTHROW(KCALL vm_do_freeram)(struct vm_ramblock *__restrict pblock0,
  * @param: perm: Set of `PAGEDIR_MAP_F*' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_map_ram)(struct vm_datapart *__restrict self,
-                                   VIRT vm_vpage_t virt_page, u16 perm);
+                                   PAGEDIR_PAGEALIGNED VIRT void *addr, u16 perm);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_map_ram_p)(struct vm_datapart *__restrict self,
                                      PAGEDIR_P_SELFTYPE pdir,
-                                     VIRT vm_vpage_t virt_page, u16 perm);
+                                     PAGEDIR_PAGEALIGNED VIRT void *addr, u16 perm);
 
 /* Same as `vm_datapart_map_ram()', but automatically restrict permissions:
  *  - Pages not fully marked as changed are mapped as read-only, unless
@@ -479,11 +494,13 @@ NOTHROW(KCALL vm_datapart_map_ram_p)(struct vm_datapart *__restrict self,
  * @param: perm: Set of `PAGEDIR_MAP_F*' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_map_ram_autoprop)(struct vm_datapart *__restrict self,
-                                            VIRT vm_vpage_t virt_page, u16 perm);
+                                            PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                            u16 perm);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_map_ram_autoprop_p)(struct vm_datapart *__restrict self,
                                               PAGEDIR_P_SELFTYPE pdir,
-                                              VIRT vm_vpage_t virt_page, u16 perm);
+                                              PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                              u16 perm);
 
 
 /* Check if the given datapart `self' has modified
@@ -494,8 +511,8 @@ NOTHROW(KCALL vm_datapart_map_ram_autoprop_p)(struct vm_datapart *__restrict sel
  *       the associated data-block, so-long as `self' hasn't been anonymized) */
 FUNDEF NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL vm_datapart_haschanged)(struct vm_datapart *__restrict self,
-                                      vm_dpage_t partrel_min_dpage DFL((vm_dpage_t)0),
-                                      vm_dpage_t partrel_max_dpage DFL((vm_dpage_t)-1));
+                                      datapage_t partrel_min_dpage DFL((datapage_t)0),
+                                      datapage_t partrel_max_dpage DFL((datapage_t)-1));
 
 /* Synchronize all modified pages within the given part-relative address range.
  * If the given part-relative address range is out-size of the bounds of `self'
@@ -525,10 +542,10 @@ NOTHROW(KCALL vm_datapart_haschanged)(struct vm_datapart *__restrict self,
  *                                             been told in one way or another that there
  *                                             probably are changed pages within the given range.
  * @return: * : The number of saved data pages. */
-FUNDEF NONNULL((1)) vm_dpage_t KCALL
+FUNDEF NONNULL((1)) datapage_t KCALL
 vm_datapart_sync(struct vm_datapart *__restrict self,
-                 vm_dpage_t partrel_min_dpage DFL(0),
-                 vm_dpage_t partrel_max_dpage DFL((vm_dpage_t)-1),
+                 datapage_t partrel_min_dpage DFL(0),
+                 datapage_t partrel_max_dpage DFL((datapage_t)-1),
                  bool recheck_modifications_before_remap DFL(false))
 		THROWS(E_WOULDBLOCK, ...);
 
@@ -540,10 +557,10 @@ vm_datapart_sync(struct vm_datapart *__restrict self,
  *       TRACKCHANGES bit is set)
  * NOTE: The caller must be holding a read-lock to `self', as well as ensure
  *       that `self' is either INCORE or LOCKED */
-FUNDEF NONNULL((1)) void KCALL vm_datapart_do_read(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, vm_daddr_t src_offset) THROWS(E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) void KCALL vm_datapart_do_write(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, vm_daddr_t dst_offset) THROWS(E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) void KCALL vm_datapart_do_read_phys(struct vm_datapart *__restrict self, vm_phys_t dst, size_t num_bytes, vm_daddr_t src_offset) THROWS(...);
-FUNDEF NONNULL((1)) void KCALL vm_datapart_do_write_phys(struct vm_datapart *__restrict self, vm_phys_t src, size_t num_bytes, vm_daddr_t dst_offset) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL vm_datapart_do_read(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) void KCALL vm_datapart_do_write(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) void KCALL vm_datapart_do_read_phys(struct vm_datapart *__restrict self, vm_phys_t dst, size_t num_bytes, pos_t src_offset) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL vm_datapart_do_write_phys(struct vm_datapart *__restrict self, vm_phys_t src, size_t num_bytes, pos_t dst_offset) THROWS(...);
 
 /* Same as `vm_datapart_do_read()' / `vm_datapart_do_write()', but copy memory
  * into the supplied user-space buffer `dst' / `src' using `memcpy_nopf()', meaning
@@ -557,8 +574,8 @@ FUNDEF NONNULL((1)) void KCALL vm_datapart_do_write_phys(struct vm_datapart *__r
  *              byte previously read/allocated, before finally moving on to reading/writing
  *              into the remainder of the original buffer, once again allowing for user-space
  *              memory faults. */
-FUNDEF NONNULL((1)) size_t KCALL vm_datapart_do_read_nopf(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, vm_daddr_t src_offset) THROWS(...);
-FUNDEF NONNULL((1)) size_t KCALL vm_datapart_do_write_nopf(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, vm_daddr_t dst_offset) THROWS(...);
+FUNDEF NONNULL((1)) size_t KCALL vm_datapart_do_read_nopf(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(...);
+FUNDEF NONNULL((1)) size_t KCALL vm_datapart_do_write_nopf(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(...);
 
 
 /* Read/write data to/from the given data part.
@@ -575,22 +592,22 @@ FUNDEF NONNULL((1)) size_t KCALL vm_datapart_do_write_nopf(struct vm_datapart *_
  *                      Usually the same as `num_bytes'
  * @return: * : The number of read/written bytes (limited by `num_bytes',
  *              and `vm_datapart_numbytes(self) - (src|dst)_offset'). */
-FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, vm_daddr_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) size_t KCALL vm_datapart_write(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, size_t split_bytes, vm_daddr_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read_phys(struct vm_datapart *__restrict self, vm_phys_t dst, size_t num_bytes, vm_daddr_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1)) size_t KCALL vm_datapart_write_phys(struct vm_datapart *__restrict self, vm_phys_t src, size_t num_bytes, size_t split_bytes, vm_daddr_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_readv(struct vm_datapart *__restrict self, struct aio_buffer const *__restrict buf, vm_daddr_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_writev(struct vm_datapart *__restrict self, struct aio_buffer const *__restrict buf, size_t split_bytes, vm_daddr_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_readv_phys(struct vm_datapart *__restrict self, struct aio_pbuffer const *__restrict buf, vm_daddr_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_writev_phys(struct vm_datapart *__restrict self, struct aio_pbuffer const *__restrict buf, size_t split_bytes, vm_daddr_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) size_t KCALL vm_datapart_write(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, size_t split_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read_phys(struct vm_datapart *__restrict self, vm_phys_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1)) size_t KCALL vm_datapart_write_phys(struct vm_datapart *__restrict self, vm_phys_t src, size_t num_bytes, size_t split_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_readv(struct vm_datapart *__restrict self, struct aio_buffer const *__restrict buf, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_writev(struct vm_datapart *__restrict self, struct aio_buffer const *__restrict buf, size_t split_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_readv_phys(struct vm_datapart *__restrict self, struct aio_pbuffer const *__restrict buf, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_writev_phys(struct vm_datapart *__restrict self, struct aio_pbuffer const *__restrict buf, size_t split_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Same as the `vm_datapart_(read|write)', however make the assumption that the
  * memory backing is `safe' (i.e. access could never cause a #PF attempting to
  * acquire a lock to `self' when doing so is impossible; i.e. `dst'/`src' are
  * guarantied to not be apart of a mapping of `self', or be otherwise accessed
  * by code called from a page-fault handler) */
-FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_read_unsafe(struct vm_datapart *__restrict self, void *__restrict dst, size_t num_bytes, vm_daddr_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_write_unsafe(struct vm_datapart *__restrict self, void const *__restrict src, size_t num_bytes, size_t split_bytes, vm_daddr_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_read_unsafe(struct vm_datapart *__restrict self, void *__restrict dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_write_unsafe(struct vm_datapart *__restrict self, void const *__restrict src, size_t num_bytes, size_t split_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 
 /* Read/Write memory to/from the given data part without causing a #PF due
  * to access made to the given `dst'/`src' buffers (s.a. `memcpy_nopf()').
@@ -617,12 +634,12 @@ FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_write_unsafe(struct vm_datapart 
 FUNDEF NONNULL((1, 2)) ssize_t KCALL
 vm_datapart_read_nopf(struct vm_datapart *__restrict self,
                       USER CHECKED void *dst, size_t num_bytes,
-                      vm_daddr_t src_offset)
+                      pos_t src_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1, 2)) ssize_t KCALL
 vm_datapart_write_nopf(struct vm_datapart *__restrict self,
                        USER CHECKED void const *src, size_t num_bytes,
-                       size_t split_bytes, vm_daddr_t dst_offset)
+                       size_t split_bytes, pos_t dst_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Perform I/O using an intermediate buffer, thus solving the deadlock
@@ -640,8 +657,8 @@ vm_datapart_write_nopf(struct vm_datapart *__restrict self,
  * VIO, as well as faulting memory mappings. (s.a. `vm_prefault()')
  * @return: * : The number of read/written bytes (limited by `num_bytes',
  *              and `vm_datapart_numbytes(self) - (src|dst)_offset'). */
-FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read_buffered(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, vm_daddr_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) size_t KCALL vm_datapart_write_buffered(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, size_t split_bytes, vm_daddr_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read_buffered(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) size_t KCALL vm_datapart_write_buffered(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, size_t split_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 
 
 /* Enumerate physical memory of `self' within the given address range.
@@ -729,7 +746,7 @@ vm_datapart_loadpage(struct vm_datapart *__restrict self,
  * page, rather than a whole virtual memory page. (used to implement `vm_datapart_do_(read|write)[p]') */
 FUNDEF NONNULL((1)) vm_phys_t KCALL
 vm_datapart_loaddatapage(struct vm_datapart *__restrict self,
-                         vm_dpage_t dpage_offset, bool for_writing)
+                         datapage_t dpage_offset, bool for_writing)
 		THROWS(...);
 
 
@@ -752,7 +769,7 @@ vm_datapart_loaddatapage(struct vm_datapart *__restrict self,
 	vm_datapart_setstate_impl(self, relative_pageno, state)
 LOCAL __BOOL KCALL
 vm_datapart_setstate_impl(struct vm_datapart *__restrict self,
-                          vm_dpage_t relative_pageno,
+                          datapage_t relative_pageno,
                           unsigned int state) {
 	__hybrid_assert(!(state & ~VM_DATAPART_PPP_MASK));
 	__hybrid_assert((u64)relative_pageno < vm_datapart_numdpages(self));
@@ -784,7 +801,7 @@ vm_datapart_setstate_impl(struct vm_datapart *__restrict self,
 	vm_datapart_cmpxchstate_impl(self, relative_pageno, oldval, newval)
 LOCAL __BOOL KCALL
 vm_datapart_cmpxchstate_impl(struct vm_datapart *__restrict self,
-                             vm_dpage_t relative_pageno,
+                             datapage_t relative_pageno,
                              unsigned int oldval, unsigned int newval) {
 	__hybrid_assert(!(oldval & ~VM_DATAPART_PPP_MASK));
 	__hybrid_assert(!(newval & ~VM_DATAPART_PPP_MASK));
@@ -845,12 +862,12 @@ struct vm_datablock_type {
 	 * @assume(num_data_pages != 0);
 	 * @assume(IS_ALIGNED(buffer,VM_DATABLOCK_PAGESIZE(self)));
 	 * NOTE: `num_data_pages' refers to data-pages, not physical pages! */
-	NONNULL((1)) void (KCALL *dt_loadpart)(struct vm_datablock *__restrict self, vm_dpage_t start, vm_phys_t buffer, size_t num_data_pages);
+	NONNULL((1)) void (KCALL *dt_loadpart)(struct vm_datablock *__restrict self, datapage_t start, vm_phys_t buffer, size_t num_data_pages);
 	/* [0..1] Save the given data buffer.
 	 * @assume(num_data_pages != 0);
 	 * @assume(IS_ALIGNED(buffer,VM_DATABLOCK_PAGESIZE(self)));
 	 * NOTE: `num_data_pages' refers to data-pages, not physical pages! */
-	NONNULL((1)) void (KCALL *dt_savepart)(struct vm_datablock *__restrict self, vm_dpage_t start, vm_phys_t buffer, size_t num_data_pages);
+	NONNULL((1)) void (KCALL *dt_savepart)(struct vm_datablock *__restrict self, datapage_t start, vm_phys_t buffer, size_t num_data_pages);
 	/* [0..1] Called the first time the `VM_DATAPART_FLAG_CHANGED' flag is set for `part'.
 	 * WARNING: While this function is allowed to block and throw exceptions,
 	 *          you should rather think of it as being required to be NOBLOCK,
@@ -900,7 +917,7 @@ struct vm_datablock {
 	 * >> db_pagesize  = PAGESIZE;
 	 */
 	unsigned int              db_pageshift; /* [const][<= PAGESHIFT] Shift applied to page indices for converting between
-	                                         * `vm_vpage_t' and `vm_dpage_t', or `vm_virt_t' and `vm_daddr_t' or `pos_t'.
+	                                         * `pageid_t' and `datapage_t', or `vm_virt_t' and `pos_t' or `pos_t'.
 	                                         * -> Since loading file data is most efficient when done in blocks,
 	                                         *    which are usually 512 bytes large, it would be a waste if any
 	                                         *    form of file access that wishes to use VM data-blocks as access
@@ -912,7 +929,7 @@ struct vm_datablock {
 	                                         *    simply require to load 8 continuous blocks at once. */
 #ifndef CONFIG_VM_DATABLOCK_MIN_PAGEINFO
 	unsigned int              db_addrshift; /* [const][== PAGESHIFT - db_pageshift]
-	                                         * Shift that must be applied to convert between `vm_dpage_t' and `vm_daddr_t' or `pos_t' or `vm_virt_t'. */
+	                                         * Shift that must be applied to convert between `datapage_t' and `pos_t' or `pos_t' or `vm_virt_t'. */
 	size_t                    db_pagealign; /* [const][== 1 << db_pageshift]
 	                                         * The minimum alignment for the `vm_datapart_startdpage()' / `vm_datapart_enddpage()'
 	                                         * of any data part found within this data block.
@@ -990,30 +1007,30 @@ struct vm_datablock {
 
 
 /* Convert between different address types.
- *    vm_dpage_t DPAGE: DataPAGE (usually identical to sector numbers)
- *    vm_vpage_t VPAGE: VirtualPAGE (Virtual page number, referring to the host's understanding of PAGESIZE)
- *    vm_daddr_t DADDR: DataADDRess (alias for `pos_t', used to specific exact in-file positions)
+ *    datapage_t DPAGE: DataPAGE (usually identical to sector numbers)
+ *    pageid_t VPAGE: VirtualPAGE (Virtual page number, referring to the host's understanding of PAGESIZE)
+ *    pos_t DADDR: DataADDRess (alias for `pos_t', used to specific exact in-file positions)
  *    vm_virt_t  VADDR: VirtualADDRess (Virtual memory address. - Same as `DADDR', but intended for memory addressing) */
 #ifdef __INTELLISENSE__
 #define VM_DATABLOCK_DPAGE2DADDR VM_DATABLOCK_DPAGE2DADDR
 #define VM_DATABLOCK_DPAGE2VADDR VM_DATABLOCK_DPAGE2VADDR
-#define VM_DATABLOCK_DPAGE2VPAGE VM_DATABLOCK_DPAGE2VPAGE
+#define VM_DATABLOCK_DATAPAGE2PAGEID VM_DATABLOCK_DATAPAGE2PAGEID
 #define VM_DATABLOCK_DADDR2DPAGE VM_DATABLOCK_DADDR2DPAGE
 #define VM_DATABLOCK_VADDR2DPAGE VM_DATABLOCK_VADDR2DPAGE
-#define VM_DATABLOCK_VPAGE2DPAGE VM_DATABLOCK_VPAGE2DPAGE
-vm_daddr_t VM_DATABLOCK_DPAGE2DADDR(struct vm_datablock const *__restrict self, vm_dpage_t dpage);
-vm_virt_t VM_DATABLOCK_DPAGE2VADDR(struct vm_datablock const *__restrict self, vm_dpage_t dpage);
-vm_vpage_t VM_DATABLOCK_DPAGE2VPAGE(struct vm_datablock const *__restrict self, vm_dpage_t dpage);
-vm_dpage_t VM_DATABLOCK_DADDR2DPAGE(struct vm_datablock const *__restrict self, vm_daddr_t daddr);
-vm_dpage_t VM_DATABLOCK_VADDR2DPAGE(struct vm_datablock const *__restrict self, vm_virt_t vaddr);
-vm_dpage_t VM_DATABLOCK_VPAGE2DPAGE(struct vm_datablock const *__restrict self, vm_vpage_t vpage);
+#define VM_DATABLOCK_PAGEID2DATAPAGE VM_DATABLOCK_PAGEID2DATAPAGE
+pos_t VM_DATABLOCK_DPAGE2DADDR(struct vm_datablock const *__restrict self, datapage_t dpage);
+vm_virt_t VM_DATABLOCK_DPAGE2VADDR(struct vm_datablock const *__restrict self, datapage_t dpage);
+pageid_t VM_DATABLOCK_DATAPAGE2PAGEID(struct vm_datablock const *__restrict self, datapage_t dpage);
+datapage_t VM_DATABLOCK_DADDR2DPAGE(struct vm_datablock const *__restrict self, pos_t daddr);
+datapage_t VM_DATABLOCK_VADDR2DPAGE(struct vm_datablock const *__restrict self, vm_virt_t vaddr);
+datapage_t VM_DATABLOCK_PAGEID2DATAPAGE(struct vm_datablock const *__restrict self, pageid_t vpage);
 #else /* __INTELLISENSE__ */
-#define VM_DATABLOCK_DPAGE2DADDR(self,dpage) ((vm_daddr_t)(dpage) << VM_DATABLOCK_ADDRSHIFT(self))
+#define VM_DATABLOCK_DPAGE2DADDR(self,dpage) ((pos_t)(dpage) << VM_DATABLOCK_ADDRSHIFT(self))
 #define VM_DATABLOCK_DPAGE2VADDR(self,dpage) ((vm_virt_t)(dpage) << VM_DATABLOCK_ADDRSHIFT(self))
-#define VM_DATABLOCK_DPAGE2VPAGE(self,dpage) ((vm_vpage_t)(dpage) >> VM_DATABLOCK_PAGESHIFT(self))
-#define VM_DATABLOCK_DADDR2DPAGE(self,daddr) ((vm_dpage_t)(daddr) >> VM_DATABLOCK_ADDRSHIFT(self))
-#define VM_DATABLOCK_VADDR2DPAGE(self,vaddr) ((vm_dpage_t)(vaddr) >> VM_DATABLOCK_ADDRSHIFT(self))
-#define VM_DATABLOCK_VPAGE2DPAGE(self,vpage) ((vm_dpage_t)(vpage) << VM_DATABLOCK_PAGESHIFT(self))
+#define VM_DATABLOCK_DATAPAGE2PAGEID(self,dpage) ((pageid_t)(dpage) >> VM_DATABLOCK_PAGESHIFT(self))
+#define VM_DATABLOCK_DADDR2DPAGE(self,daddr) ((datapage_t)(daddr) >> VM_DATABLOCK_ADDRSHIFT(self))
+#define VM_DATABLOCK_VADDR2DPAGE(self,vaddr) ((datapage_t)(vaddr) >> VM_DATABLOCK_ADDRSHIFT(self))
+#define VM_DATABLOCK_PAGEID2DATAPAGE(self,vpage) ((datapage_t)(vpage) << VM_DATABLOCK_PAGESHIFT(self))
 #endif /* !__INTELLISENSE__ */
 
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -1126,18 +1143,18 @@ NOTHROW(KCALL vm_datablock_deanonymize)(struct vm_datablock *__restrict self);
  * When called, this function will go through all data parts of `self', and
  * save any changed data pages using `self->db_type->dt_savepart'
  * @return: * : The number of saved data pages. */
-FUNDEF NONNULL((1)) vm_dpage_t KCALL
+FUNDEF NONNULL((1)) datapage_t KCALL
 vm_datablock_sync(struct vm_datablock *__restrict self,
-                  vm_dpage_t minpage DFL((vm_dpage_t)0),
-                  vm_dpage_t maxpage DFL((vm_dpage_t)-1))
+                  datapage_t minpage DFL((datapage_t)0),
+                  datapage_t maxpage DFL((datapage_t)-1))
 		THROWS(E_WOULDBLOCK, ...);
 
 /* Check if there are changed parts within the specified address range.
  * NOTE: The caller must be holding a read-lock on `self' */
 FUNDEF NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL vm_datablock_haschanged)(struct vm_datablock *__restrict self,
-                                       vm_dpage_t minpage DFL((vm_dpage_t)0),
-                                       vm_dpage_t maxpage DFL((vm_dpage_t)-1));
+                                       datapage_t minpage DFL((datapage_t)0),
+                                       datapage_t maxpage DFL((datapage_t)-1));
 
 
 /* Construct a new datapart for the given address range.
@@ -1184,39 +1201,39 @@ vm_datablock_locatepart_exact(struct vm_datablock *__restrict self,
  *          In other words, it is up to `dt_loadpart()' to still initialize
  *          memory past the end of a file properly (usually by zero-initializing it)
  * @return: * : The number of transferred bytes. */
-FUNDEF NONNULL((1)) void KCALL vm_datablock_read(struct vm_datablock *__restrict self, USER CHECKED void *dst, size_t num_bytes, vm_daddr_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) void KCALL vm_datablock_write(struct vm_datablock *__restrict self, USER CHECKED void const *src, size_t num_bytes, vm_daddr_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) void KCALL vm_datablock_read_phys(struct vm_datablock *__restrict self, vm_phys_t dst, size_t num_bytes, vm_daddr_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1)) void KCALL vm_datablock_write_phys(struct vm_datablock *__restrict self, vm_phys_t src, size_t num_bytes, vm_daddr_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_readv(struct vm_datablock *__restrict self, struct aio_buffer const *__restrict buf, size_t num_bytes, vm_daddr_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_writev(struct vm_datablock *__restrict self, struct aio_buffer const *__restrict buf, size_t num_bytes, vm_daddr_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_readv_phys(struct vm_datablock *__restrict self, struct aio_pbuffer const *__restrict buf, size_t num_bytes, vm_daddr_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_writev_phys(struct vm_datablock *__restrict self, struct aio_pbuffer const *__restrict buf, size_t num_bytes, vm_daddr_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1)) void KCALL vm_datablock_read(struct vm_datablock *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) void KCALL vm_datablock_write(struct vm_datablock *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) void KCALL vm_datablock_read_phys(struct vm_datablock *__restrict self, vm_phys_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1)) void KCALL vm_datablock_write_phys(struct vm_datablock *__restrict self, vm_phys_t src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_readv(struct vm_datablock *__restrict self, struct aio_buffer const *__restrict buf, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_writev(struct vm_datablock *__restrict self, struct aio_buffer const *__restrict buf, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_readv_phys(struct vm_datablock *__restrict self, struct aio_pbuffer const *__restrict buf, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_writev_phys(struct vm_datablock *__restrict self, struct aio_pbuffer const *__restrict buf, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Same as the `vm_datablock_(read|write)', however make the assumption that the
  * memory backing is `safe' (i.e. access could never cause a #PF attempting to
  * acquire a lock to `self' when doing so is impossible) */
-FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_read_unsafe(struct vm_datablock *__restrict self, void *__restrict dst, size_t num_bytes, vm_daddr_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_write_unsafe(struct vm_datablock *__restrict self, void const *__restrict src, size_t num_bytes, vm_daddr_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_read_unsafe(struct vm_datablock *__restrict self, void *__restrict dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_write_unsafe(struct vm_datablock *__restrict self, void const *__restrict src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 
 
 #ifndef CONFIG_NO_VIO
 /* Perform datablock access through VIO callbacks. */
-FUNDEF NONNULL((1)) void KCALL vm_datablock_vio_read(struct vm_datablock *__restrict self, USER CHECKED void *dst, size_t num_bytes, vm_daddr_t src_offset) THROWS(E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) void KCALL vm_datablock_vio_write(struct vm_datablock *__restrict self, USER CHECKED void const *src, size_t num_bytes, vm_daddr_t dst_offset) THROWS(E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) void KCALL vm_datablock_vio_read_phys(struct vm_datablock *__restrict self, vm_phys_t dst, size_t num_bytes, vm_daddr_t src_offset) THROWS(...);
-FUNDEF NONNULL((1)) void KCALL vm_datablock_vio_write_phys(struct vm_datablock *__restrict self, vm_phys_t src, size_t num_bytes, vm_daddr_t dst_offset) THROWS(...);
-FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_readv(struct vm_datablock *__restrict self, struct aio_buffer const *__restrict buf, vm_daddr_t src_offset) THROWS(E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_writev(struct vm_datablock *__restrict self, struct aio_buffer const *__restrict buf, vm_daddr_t dst_offset) THROWS(E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_readv_phys(struct vm_datablock *__restrict self, struct aio_pbuffer const *__restrict buf, vm_daddr_t src_offset) THROWS(...);
-FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_writev_phys(struct vm_datablock *__restrict self, struct aio_pbuffer const *__restrict buf, vm_daddr_t dst_offset) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL vm_datablock_vio_read(struct vm_datablock *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) void KCALL vm_datablock_vio_write(struct vm_datablock *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) void KCALL vm_datablock_vio_read_phys(struct vm_datablock *__restrict self, vm_phys_t dst, size_t num_bytes, pos_t src_offset) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL vm_datablock_vio_write_phys(struct vm_datablock *__restrict self, vm_phys_t src, size_t num_bytes, pos_t dst_offset) THROWS(...);
+FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_readv(struct vm_datablock *__restrict self, struct aio_buffer const *__restrict buf, pos_t src_offset) THROWS(E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_writev(struct vm_datablock *__restrict self, struct aio_buffer const *__restrict buf, pos_t dst_offset) THROWS(E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_readv_phys(struct vm_datablock *__restrict self, struct aio_pbuffer const *__restrict buf, pos_t src_offset) THROWS(...);
+FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_writev_phys(struct vm_datablock *__restrict self, struct aio_pbuffer const *__restrict buf, pos_t dst_offset) THROWS(...);
 #endif /* !CONFIG_NO_VIO */
 
 
 
 /* Builtin data blocks */
 
-/* Provide direct access to physical memory (the `vm_daddr_t' is actually the `vm_phys_t'). */
+/* Provide direct access to physical memory (the `pos_t' is actually the `vm_phys_t'). */
 DATDEF struct vm_datablock vm_datablock_physical;
 DATDEF struct vm_datablock_type vm_datablock_physical_type;
 
@@ -1279,12 +1296,12 @@ DATDEF struct vm_datablock_type vm_ramfile_type;
 #define VM_NODE_FLAG_PARTITIONED  0x0002 /* Set if the node has been split when the associated data part was split.
                                           * This flag affects how the page directory is un-prepared when the node
                                           * gets unmapped. When set, associated memory must be unmapped as:
-                                          * >> pagedir_prepare_map(VM_NODE_START(self),VM_NODE_SIZE(self)); // NOTE: This may cause an error!
-                                          * >> pagedir_unmap(VM_NODE_START(self),VM_NODE_SIZE(self));
-                                          * >> pagedir_unprepare_map(VM_NODE_START(self),VM_NODE_SIZE(self));
+                                          * >> pagedir_prepare_map(vm_node_getstartpageid(self),vm_node_getpagecount(self)); // NOTE: This may cause an error!
+                                          * >> pagedir_unmap(vm_node_getstartpageid(self),vm_node_getpagecount(self));
+                                          * >> pagedir_unprepare_map(vm_node_getstartpageid(self),vm_node_getpagecount(self));
                                           * When not set, associated memory can simply be unmapped as:
-                                          * >> pagedir_unmap(VM_NODE_START(self),VM_NODE_SIZE(self));
-                                          * >> pagedir_unprepare_map(VM_NODE_START(self),VM_NODE_SIZE(self)); */
+                                          * >> pagedir_unmap(vm_node_getstartpageid(self),vm_node_getpagecount(self));
+                                          * >> pagedir_unprepare_map(vm_node_getstartpageid(self),vm_node_getpagecount(self)); */
 #define VM_NODE_FLAG_GROWSUP      0x0004 /* When guarding, the node grows up rather than down. */
 #define VM_NODE_FLAG_HINTED       0x1000 /* [const] Uninitialized pages apart of this node hint towards it.
                                           * This flag is set for memory mapping that can be initialized atomically.
@@ -1317,7 +1334,7 @@ DATDEF struct vm_datablock_type vm_ramfile_type;
                                           *         result in kernel panic. */
 
 struct vm_node {
-	ATREE_NODE(struct vm_node, vm_vpage_t)
+	ATREE_NODE(struct vm_node, pageid_t)
 	                         vn_node;   /* [lock(vn_vm->v_treelock,OWNER)] VM Node controller. */
 	LLIST_NODE(struct vm_node)
 	                         vn_byaddr; /* [lock(vn_vm->v_treelock,OWNER)][const_if(VM_NODE_FLAG_KERNPRT)] Order chain of nodes mapped within #vn_vm. */
@@ -1391,18 +1408,52 @@ FUNDEF NOBLOCK unsigned int
 NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict self,
                                                      struct vm *__restrict locked_vm);
 
+#ifdef __INTELLISENSE__
+/* Return the address range bounds of the given VM node. */
+#define vm_node_getmin   vm_node_getmin
+#define vm_node_getmax   vm_node_getmax
+#define vm_node_getstart vm_node_getstart
+#define vm_node_getend   vm_node_getend
+#define vm_node_getsize  vm_node_getsize
+PAGEDIR_PAGEALIGNED UNCHECKED void *(vm_node_getmin)(struct vm_node const *__restrict self);
+void *(vm_node_getmax)(struct vm_node const *__restrict self);
+PAGEDIR_PAGEALIGNED UNCHECKED void *(vm_node_getstart)(struct vm_node const *__restrict self);
+PAGEDIR_PAGEALIGNED UNCHECKED void *(vm_node_getend)(struct vm_node const *__restrict self);
+PAGEDIR_PAGEALIGNED size_t (vm_node_getsize)(struct vm_node const *__restrict self); /* in bytes */
 
-#define VM_NODE_MIN(self)   ((self)->vn_node.a_vmin)
-#define VM_NODE_MAX(self)   ((self)->vn_node.a_vmax)
-#define VM_NODE_START(self) ((self)->vn_node.a_vmin)
-#define VM_NODE_SIZE(self)  ((size_t)(((self)->vn_node.a_vmax - (self)->vn_node.a_vmin) + 1))
-#define VM_NODE_END(self)   ((self)->vn_node.a_vmax + 1)
+/* Return the internal page-indices used for mapping the given VM node. */
+#define vm_node_getminpageid vm_node_getminpageid
+#define vm_node_getmaxpageid vm_node_getmaxpageid
+#define vm_node_getstartpageid vm_node_getstartpageid
+#define vm_node_getendpageid vm_node_getendpageid
+#define vm_node_getpagecount vm_node_getpagecount
+pageid_t (vm_node_getminpageid)(struct vm_node const *__restrict self);
+pageid_t (vm_node_getmaxpageid)(struct vm_node const *__restrict self);
+pageid_t (vm_node_getstartpageid)(struct vm_node const *__restrict self);
+pageid_t (vm_node_getendpageid)(struct vm_node const *__restrict self);
+size_t (vm_node_getpagecount)(struct vm_node const *__restrict self);
 
-#define VM_NODE_MINADDR(self)   VM_PAGE2ADDR((self)->vn_node.a_vmin)
-#define VM_NODE_MAXADDR(self)   ((vm_virt_t)(((self)->vn_node.a_vmax * PAGESIZE) + PAGEMASK))
-#define VM_NODE_STARTADDR(self) VM_PAGE2ADDR((self)->vn_node.a_vmin)
-#define VM_NODE_ENDADDR(self)   VM_PAGE2ADDR((self)->vn_node.a_vmax + 1)
-#define VM_NODE_BYTESIZE(self)  (size_t)(VM_NODE_SIZE(self) * PAGESIZE)
+/* Check if the given VM Node points into user- or kernel-space. */
+#define vm_node_isuserspace   vm_node_isuserspace
+#define vm_node_iskernelspace vm_node_iskernelspace
+bool (vm_node_isuserspace)(struct vm_node const *__restrict self);
+bool (vm_node_iskernelspace)(struct vm_node const *__restrict self);
+#else /* __INTELLISENSE__ */
+#define vm_node_getmin(self)     PAGEID_DECODE((self)->vn_node.a_vmin)
+#define vm_node_getmax(self)     ((void *)((byte_t *)PAGEID_DECODE((self)->vn_node.a_vmax) + PAGESIZE - 1))
+#define vm_node_getstart(self)   PAGEID_DECODE((self)->vn_node.a_vmin)
+#define vm_node_getend(self)     PAGEID_DECODE((self)->vn_node.a_vmax + 1)
+#define vm_node_getsize(self)        ((size_t)(((self)->vn_node.a_vmax - (self)->vn_node.a_vmin) + 1) * PAGESIZE)
+
+#define vm_node_getminpageid(self)   ((self)->vn_node.a_vmin)
+#define vm_node_getmaxpageid(self)   ((self)->vn_node.a_vmax)
+#define vm_node_getstartpageid(self) ((self)->vn_node.a_vmin)
+#define vm_node_getpagecount(self)   ((size_t)(((self)->vn_node.a_vmax - (self)->vn_node.a_vmin) + 1))
+#define vm_node_getendpageid(self)   ((self)->vn_node.a_vmax + 1)
+
+#define vm_node_isuserspace(self)    PRANGE_IS_USER(vm_node_getstartpageid(self), vm_node_getendpageid(self))
+#define vm_node_iskernelspace(self)  PRANGE_IS_KERNEL(vm_node_getstartpageid(self), vm_node_getendpageid(self))
+#endif /* !__INTELLISENSE__ */
 
 #define VM_NODE_HASNEXT(self, vm) ((self)->vn_byaddr.ln_next != NULL)
 #define VM_NODE_HASPREV(self, vm) ((self)->vn_byaddr.ln_pself != &LLIST_HEAD((vm)->v_byaddr))
@@ -1413,7 +1464,7 @@ struct vm {
 	/* Top-level controller for virtual memory bindings. */
 #ifndef __VM_INTERNAL_EXCLUDE_PAGEDIR
 	pagedir_t                  v_pagedir;       /* [lock(v_treelock)] The page directory associated with the VM. */
-#endif
+#endif /* !__VM_INTERNAL_EXCLUDE_PAGEDIR */
 	union {
 		PHYS pagedir_t        *v_pdir_phys_ptr; /* [1..1][const] Physical pointer of the page directory */
 #ifdef __INTELLISENSE__
@@ -1564,7 +1615,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_tryservice)(struct vm
 
 
 /* Map the memory region into the given VM.
- * The caller may invoke `vm_sync()' after changes have been made.
+ * The caller may invoke `vm_paged_sync()' after changes have been made.
  * @param: prot:   Set of `VM_PROT_*'.
  * @param: flag:   Set of `VM_NODE_FLAG_*'.
  * @param: data_start_vpage: The memory page index where mapping of `data' starts.
@@ -1573,49 +1624,76 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_tryservice)(struct vm
  * @return: true:  Successfully created the mapping.
  * @return: false: Another mapping already exists. */
 FUNDEF bool KCALL
-vm_mapat(struct vm *__restrict self,
-         vm_vpage_t page_index, size_t num_pages,
-         struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
-         vm_vpage64_t data_start_vpage DFL(0),
-         uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
-         uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
-         uintptr_t guard DFL(0))
+vm_paged_mapat(struct vm *__restrict self,
+               pageid_t page_index, size_t num_pages,
+               struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+               vm_vpage64_t data_start_vpage DFL(0),
+               uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
+               uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
+               uintptr_t guard DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 LOCAL bool KCALL
-nvm_mapat(struct vm *__restrict self,
-          PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
-          PAGEDIR_PAGEALIGNED size_t num_bytes,
-          struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
-          PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),
-          uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
-          uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
-          uintptr_t guard DFL(0))
+vm_mapat(struct vm *__restrict self,
+         PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+         PAGEDIR_PAGEALIGNED size_t num_bytes,
+         struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+         PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),
+         uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
+         uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
+         uintptr_t guard DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
 	__hybrid_assert((num_bytes & PAGEMASK) == 0);
 	__hybrid_assert((data_start_offset & PAGEMASK) == 0);
-	return vm_mapat(self, (vm_vpage_t)__ARCH_PAGEID_ENCODE(addr),
-	                num_bytes / PAGESIZE, data,
-	                (vm_vpage64_t)(data_start_offset / PAGESIZE),
-	                prot, flag, guard);
+	return vm_paged_mapat(self, PAGEID_ENCODE(addr),
+	                      num_bytes / PAGESIZE, data,
+	                      (vm_vpage64_t)(data_start_offset / PAGESIZE),
+	                      prot, flag, guard);
 }
 
-/* Same as `vm_mapat()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
+/* Same as `vm_paged_mapat()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
  * to be mapped from `data'. - Any attempted to map data from outside that range will instead cause
  * memory from `vm_datablock_anonymous_zero' to be mapped.
  * Additionally, `data_start_vpage' is an offset from `data_subrange_minvpage' */
 FUNDEF bool KCALL
-vm_mapat_subrange(struct vm *__restrict effective_vm,
-                  vm_vpage_t page_index, size_t num_pages,
+vm_paged_mapat_subrange(struct vm *__restrict self,
+                        pageid_t page_index, size_t num_pages,
+                        struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+                        vm_vpage64_t data_start_vpage DFL(0),
+                        vm_vpage64_t data_subrange_minvpage DFL(0),
+                        vm_vpage64_t data_subrange_maxvpage DFL((vm_vpage64_t)-1),
+                        uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
+                        uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
+                        uintptr_t guard DFL(0))
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
+LOCAL bool KCALL
+vm_mapat_subrange(struct vm *__restrict self,
+                  PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+                  PAGEDIR_PAGEALIGNED size_t num_bytes,
                   struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
-                  vm_vpage64_t data_start_vpage DFL(0),
-                  vm_vpage64_t data_subrange_minvpage DFL(0),
-                  vm_vpage64_t data_subrange_maxvpage DFL((vm_vpage64_t)-1),
+                  PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),
+                  PAGEDIR_PAGEALIGNED pos_t data_subrange_minoffset DFL(0),
+                  PAGEDIR_PAGEALIGNED pos_t data_subrange_numbytes DFL((pos_t)-1),
                   uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
                   uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
                   uintptr_t guard DFL(0))
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
+	__hybrid_assert((num_bytes & PAGEMASK) == 0);
+	__hybrid_assert((data_start_offset & PAGEMASK) == 0);
+	__hybrid_assert((data_subrange_minoffset & PAGEMASK) == 0);
+	__hybrid_assert((data_subrange_numbytes & PAGEMASK) == 0);
+	return vm_paged_mapat_subrange(self,
+	                               PAGEID_ENCODE(addr),
+	                               num_bytes / PAGESIZE,
+	                               data,
+	                               (vm_vpage64_t)(data_start_offset / PAGESIZE),
+	                               (vm_vpage64_t)(data_subrange_minoffset / PAGESIZE),
+	                               (vm_vpage64_t)((data_subrange_minoffset + data_subrange_numbytes - 1) / PAGESIZE),
+	                               prot, flag, guard);
+}
 
 /* Create a memory reservation mapping at the given address.
  * @param: flag: Set of `VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_NOMERGE'
@@ -1623,7 +1701,7 @@ vm_mapat_subrange(struct vm *__restrict effective_vm,
  * @return: false: Another mapping already exists. */
 FUNDEF bool KCALL
 vm_mapresat(struct vm *__restrict effective_vm,
-            vm_vpage_t page_index, size_t num_pages,
+            pageid_t page_index, size_t num_pages,
             uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
@@ -1652,17 +1730,17 @@ vm_mapresat(struct vm *__restrict effective_vm,
  *        - VM_GETFREE_BELOW + VM_GETFREE_ASLR:
  *          Return the `x = 1 - (rand() / RAND_MAX); x*x*NUM_CANDIDATES'th candidate
  *   #2: Repeat step #1, but ignore the potentials of GUARD nodes.
- *   #3: Return `VM_GETFREE_ERROR'
+ *   #3: Return `VM_PAGED_GETFREE_ERROR'
  * NOTE: The caller must be holding a read-lock to `self'.
  * @param: mode:                   Set of `VM_GETFREE_F*'
  * @param: hint:                   A hint used as base when searching for free memory ranges.
  * @param: min_alignment_in_pages: The minimum alignment required from the returned pointer (or `1')
- * @return: VM_GETFREE_ERROR:      No more virtual memory available. */
-FUNDEF NOBLOCK WUNUSED vm_vpage_t
-NOTHROW(KCALL vm_getfree)(struct vm *__restrict self,
-                          vm_vpage_t hint, size_t num_pages,
-                          size_t min_alignment_in_pages,
-                          unsigned int mode);
+ * @return: VM_PAGED_GETFREE_ERROR: No more virtual memory available. */
+FUNDEF NOBLOCK WUNUSED pageid_t
+NOTHROW(KCALL vm_paged_getfree)(struct vm *__restrict self,
+                                pageid_t hint, size_t num_pages,
+                                size_t min_alignment_in_pages,
+                                unsigned int mode);
 #define VM_GETFREE_ABOVE  0x0000 /* Search for viable, free mappings that are `>= hint' */
 #define VM_GETFREE_BELOW  0x0001 /* Search for viable, free mappings that are `<= hint-num_pages'  */
 #define VM_GETFREE_STRICT 0x0002 /* After a search for free space failed to yielding a viable memory
@@ -1671,26 +1749,26 @@ NOTHROW(KCALL vm_getfree)(struct vm *__restrict self,
 #define VM_GETFREE_ASLR   0x0004 /* Randomize return values (see above) */
 /* TODO: Flag `VM_GETFREE_USER'  --  When `self' is `&vm_kernel', allow returned pointers
  *       to be apart of user-space, as opposed to only ever returning kernel-space pointers. */
-#define VM_GETFREE_ERROR  (VM_VPAGE_MAX + __CCAST(vm_vpage_t)1)
+#define VM_PAGED_GETFREE_ERROR  (__CCAST(pageid_t)(__ARCH_PAGEID_MAX + 1))
 
 
-#define NVM_GETFREE_ERROR ((void *)-1)
+#define VM_GETFREE_ERROR ((void *)-1)
 LOCAL NOBLOCK WUNUSED PAGEDIR_PAGEALIGNED UNCHECKED void *
-NOTHROW(KCALL nvm_getfree)(struct vm *__restrict self,
-                           PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
-                           PAGEDIR_PAGEALIGNED size_t num_bytes,
-                           PAGEDIR_PAGEALIGNED size_t min_alignment,
-                           unsigned int mode) {
-	vm_vpage_t result;
+NOTHROW(KCALL vm_getfree)(struct vm *__restrict self,
+                          PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
+                          PAGEDIR_PAGEALIGNED size_t num_bytes,
+                          PAGEDIR_PAGEALIGNED size_t min_alignment,
+                          unsigned int mode) {
+	pageid_t result;
 	__hybrid_assert(((uintptr_t)hint & PAGEMASK) == 0);
 	__hybrid_assert((num_bytes & PAGEMASK) == 0);
 	__hybrid_assert((min_alignment & PAGEMASK) == 0);
-	result = vm_getfree(self, (vm_vpage_t)__ARCH_PAGEID_ENCODE(hint),
+	result = vm_paged_getfree(self, PAGEID_ENCODE(hint),
 	                    num_bytes / PAGESIZE,
 	                    min_alignment / PAGESIZE, mode);
-	if (result == VM_GETFREE_ERROR)
-		return NVM_GETFREE_ERROR;
-	return __ARCH_PAGEID_DECODE(result);
+	if (result == VM_PAGED_GETFREE_ERROR)
+		return VM_GETFREE_ERROR;
+	return PAGEID_DECODE(result);
 }
 
 
@@ -1698,33 +1776,33 @@ NOTHROW(KCALL nvm_getfree)(struct vm *__restrict self,
 /* Get/set ASLR-disabled (defaults to `false'; can also be
  * enabled by passing `noaslr' on the kernel commandline)
  * When enabled, the `VM_GETFREE_ASLR' is simply ignored
- * when passed to either `vm_getfree()' or `vmb_getfree()'
+ * when passed to either `vm_paged_getfree()' or `vmb_paged_getfree()'
  * @return: * : The state of ASLR_DISABLED prior to the call being made. */
 FUNDEF bool NOTHROW(KCALL vm_get_aslr_disabled)(void);
 FUNDEF bool NOTHROW(KCALL vm_set_aslr_disabled)(bool new_disabled);
 
 
 
-/* Find the first node with `VM_NODE_MIN(return) >= min_page_index'
+/* Find the first node with `vm_node_getminpageid(return) >= min_page_index'
  * If no such node exists, return `NULL' instead.
  * NOTE: The caller must be holding a read-lock to `effective_vm'. */
 FUNDEF NOBLOCK WUNUSED struct vm_node *
 NOTHROW(KCALL vm_find_first_node_greater_equal)(struct vm *__restrict effective_vm,
-                                                vm_vpage_t min_page_index);
+                                                pageid_t min_page_index);
 
-/* Find the last node with `VM_NODE_MAX(return) <= max_page_index'
+/* Find the last node with `vm_node_getmaxpageid(return) <= max_page_index'
  * If no such node exists, return `NULL' instead.
  * NOTE: The caller must be holding a read-lock to `effective_vm'. */
 FUNDEF NOBLOCK WUNUSED struct vm_node *
 NOTHROW(KCALL vm_find_last_node_lower_equal)(struct vm *__restrict effective_vm,
-                                             vm_vpage_t max_page_index);
+                                             pageid_t max_page_index);
 
 
-/* A combination of `vm_getfree' + `vm_mapat'
+/* A combination of `vm_paged_getfree' + `vm_paged_mapat'
  * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target. */
-FUNDEF vm_vpage_t KCALL
+FUNDEF pageid_t KCALL
 vm_map(struct vm *__restrict self,
-       vm_vpage_t hint,
+       pageid_t hint,
        size_t num_pages,
        size_t min_alignment_in_pages DFL(1),
        unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
@@ -1746,47 +1824,80 @@ nvm_map(struct vm *__restrict self,
         uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
         uintptr_t guard DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	vm_vpage_t result;
+	pageid_t result;
 	__hybrid_assert(((uintptr_t)hint & PAGEMASK) == 0);
 	__hybrid_assert((num_bytes & PAGEMASK) == 0);
 	__hybrid_assert((min_alignment & PAGEMASK) == 0);
 	__hybrid_assert((data_start_offset & PAGEMASK) == 0);
 	result = vm_map(self,
-	                (vm_vpage_t)__ARCH_PAGEID_ENCODE(hint),
+	                PAGEID_ENCODE(hint),
 	                num_bytes / PAGESIZE,
 	                min_alignment / PAGESIZE,
 	                getfree_mode, data,
 	                (vm_vpage64_t)(data_start_offset / PAGESIZE),
 	                prot, flag, guard);
-	return __ARCH_PAGEID_DECODE(result);
+	return PAGEID_DECODE(result);
 }
 
 /* Same as `vm_map()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
  * to be mapped from `data'. - Any attempted to map data from outside that range will instead cause
  * memory from `vm_datablock_anonymous_zero' to be mapped.
  * Additionally, `data_start_vpage' is an offset from `data_subrange_minvpage' */
-FUNDEF vm_vpage_t KCALL
-vm_map_subrange(struct vm *__restrict effective_vm,
-                vm_vpage_t hint,
-                size_t num_pages,
-                size_t min_alignment_in_pages DFL(1),
+FUNDEF pageid_t KCALL
+vm_paged_map_subrange(struct vm *__restrict self,
+                      pageid_t hint,
+                      size_t num_pages,
+                      size_t min_alignment_in_pages DFL(1),
+                      unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
+                      struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+                      vm_vpage64_t data_start_vpage DFL(0),
+                      vm_vpage64_t data_subrange_minvpage DFL(0),
+                      vm_vpage64_t data_subrange_maxvpage DFL((vm_vpage64_t)-1),
+                      uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
+                      uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
+                      uintptr_t guard DFL(0))
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
+LOCAL PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
+vm_map_subrange(struct vm *__restrict self,
+                PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
+                PAGEDIR_PAGEALIGNED size_t num_bytes,
+                PAGEDIR_PAGEALIGNED size_t min_alignment DFL(PAGESIZE),
                 unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
                 struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
-                vm_vpage64_t data_start_vpage DFL(0),
-                vm_vpage64_t data_subrange_minvpage DFL(0),
-                vm_vpage64_t data_subrange_maxvpage DFL((vm_vpage64_t)-1),
+                PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),
+                PAGEDIR_PAGEALIGNED pos_t data_subrange_minoffset DFL(0),
+                PAGEDIR_PAGEALIGNED pos_t data_subrange_numbytes DFL((pos_t)-1),
                 uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
                 uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
                 uintptr_t guard DFL(0))
-		THROWS(E_WOULDBLOCK, E_BADALLOC);
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	pageid_t result;
+	__hybrid_assert(((uintptr_t)hint & PAGEMASK) == 0);
+	__hybrid_assert((num_bytes & PAGEMASK) == 0);
+	__hybrid_assert((min_alignment & PAGEMASK) == 0);
+	__hybrid_assert((data_start_offset & PAGEMASK) == 0);
+	__hybrid_assert((data_subrange_minoffset & PAGEMASK) == 0);
+	__hybrid_assert((data_subrange_numbytes & PAGEMASK) == 0);
+	result = vm_paged_map_subrange(self,
+	                               PAGEID_ENCODE(hint),
+	                               num_bytes / PAGESIZE,
+	                               min_alignment / PAGESIZE,
+	                               getfree_mode,
+	                               data,
+	                               (vm_vpage64_t)(data_start_offset / PAGESIZE),
+	                               (vm_vpage64_t)(data_subrange_minoffset / PAGESIZE),
+	                               (vm_vpage64_t)((data_subrange_minoffset + data_subrange_numbytes - 1) / PAGESIZE),
+	                               prot, flag, guard);
+	return PAGEID_DECODE(result);
+}
 
 
 
-/* A combination of `vm_getfree' + `vm_mapresat'
+/* A combination of `vm_paged_getfree' + `vm_mapresat'
  * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target. */
-FUNDEF vm_vpage_t KCALL /* TODO: Remove me */
-vm_mapres(struct vm *__restrict effective_vm,
-          vm_vpage_t hint, size_t num_pages,
+FUNDEF pageid_t KCALL /* TODO: Remove me */
+vm_mapres(struct vm *__restrict self,
+          pageid_t hint, size_t num_pages,
           size_t min_alignment_in_pages DFL(1),
           unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
           uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL))
@@ -1800,15 +1911,15 @@ nvm_mapres(struct vm *__restrict effective_vm, /* TODO: Rename to `vm_mapres()' 
            unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
            uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL))
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	vm_vpage_t result;
+	pageid_t result;
 	__hybrid_assert(((uintptr_t)hint & PAGEMASK) == 0);
 	__hybrid_assert((num_bytes & PAGEMASK) == 0);
 	__hybrid_assert((min_alignment & PAGEMASK) == 0);
-	result = vm_mapres(effective_vm, (vm_vpage_t)__ARCH_PAGEID_ENCODE(hint),
+	result = vm_mapres(effective_vm, PAGEID_ENCODE(hint),
 	                   num_bytes / PAGESIZE,
 	                   min_alignment / PAGESIZE,
 	                   getfree_mode, flag);
-	return __ARCH_PAGEID_DECODE(result);
+	return PAGEID_DECODE(result);
 }
 
 
@@ -1840,9 +1951,9 @@ nvm_mapres(struct vm *__restrict effective_vm, /* TODO: Rename to `vm_mapres()' 
  * @return: * :       The actual number of unmapped pages of memory (when `VM_UNMAP_SEGFAULTIFUNUSED'
  *                    is given, this is always equal to `num_pages') */
 FUNDEF size_t KCALL /* TODO: Remove me */
-vm_unmap(struct vm *__restrict effective_vm,
-         vm_vpage_t base, size_t num_pages,
-         unsigned int how DFL(VM_UNMAP_ANYTHING))
+vm_paged_unmap(struct vm *__restrict self,
+               pageid_t base, size_t num_pages,
+               unsigned int how DFL(VM_UNMAP_ANYTHING))
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 
 /* Unmap all memory mappings within the given address range.
@@ -1852,16 +1963,16 @@ vm_unmap(struct vm *__restrict effective_vm,
  * @return: * :       The actual number of unmapped bytes of memory (when `VM_UNMAP_SEGFAULTIFUNUSED'
  *                    is given, this is always equal to `num_bytes') */
 LOCAL size_t KCALL
-nvm_unmap(struct vm *__restrict effective_vm, /* TODO: Rename to `vm_mapres()' */
-          PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
-          PAGEDIR_PAGEALIGNED size_t num_bytes,
-          unsigned int how DFL(VM_UNMAP_ANYTHING))
+vm_unmap(struct vm *__restrict self, /* TODO: Rename to `vm_mapres()' */
+         PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+         PAGEDIR_PAGEALIGNED size_t num_bytes,
+         unsigned int how DFL(VM_UNMAP_ANYTHING))
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
 	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
 	__hybrid_assert((num_bytes & PAGEMASK) == 0);
-	return vm_unmap(effective_vm,
-	                (vm_vpage_t)__ARCH_PAGEID_ENCODE(addr),
-	                num_bytes / PAGESIZE, how) *
+	return vm_paged_unmap(self,
+	                      PAGEID_ENCODE(addr),
+	                      num_bytes / PAGESIZE, how) *
 	       PAGESIZE;
 }
 
@@ -1875,11 +1986,23 @@ nvm_unmap(struct vm *__restrict effective_vm, /* TODO: Rename to `vm_mapres()' *
  * @return: * :        The actual number of updated pages of memory (when `VM_UNMAP_SEGFAULTIFUNUSED'
  *                     is given, this is always equal to `num_pages') */
 FUNDEF size_t KCALL
-vm_protect(struct vm *__restrict effective_vm,
-           vm_vpage_t base, size_t num_pages,
+vm_paged_protect(struct vm *__restrict self,
+                 pageid_t base, size_t num_pages,
+                 uintptr_t prot_mask, uintptr_t prot_flags,
+                 unsigned int how DFL(VM_UNMAP_ANYTHING))
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+LOCAL size_t KCALL
+vm_protect(struct vm *__restrict self,
+           PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+           PAGEDIR_PAGEALIGNED size_t num_bytes,
            uintptr_t prot_mask, uintptr_t prot_flags,
            unsigned int how DFL(VM_UNMAP_ANYTHING))
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
+	return vm_paged_protect(self, PAGEID_ENCODE(addr),
+	                        num_bytes / PAGESIZE,
+	                        prot_mask, prot_flags, how) *
+	       PAGESIZE;
+}
 
 
 
@@ -1891,26 +2014,26 @@ NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self);
 /* Remove a given node from the specified VM.
  * NOTE: The caller must be holding a write-lock to the associated VM. */
 FUNDEF NOBLOCK NONNULL((1)) struct vm_node *
-NOTHROW(KCALL vm_node_remove)(struct vm *__restrict self, vm_vpage_t page);
+NOTHROW(KCALL vm_paged_node_remove)(struct vm *__restrict self, pageid_t page);
 
 LOCAL NOBLOCK NONNULL((1)) struct vm_node *
-NOTHROW(KCALL nvm_node_remove)(struct vm *__restrict self,
-                               UNCHECKED void *addr) {
-	return vm_node_remove(self, (vm_vpage_t)__ARCH_PAGEID_ENCODE(addr));
+NOTHROW(KCALL vm_node_remove)(struct vm *__restrict self,
+                              UNCHECKED void *addr) {
+	return vm_paged_node_remove(self, PAGEID_ENCODE(addr));
 }
 
 /* Without blocking, unmap the given range of kernel RAM. */
 FUNDEF NOBLOCK void
-NOTHROW(FCALL vm_unmap_kernel_ram)(vm_vpage_t page_index,
-                                   size_t num_pages,
-                                   bool is_zero);
+NOTHROW(FCALL vm_paged_unmap_kernel_ram)(pageid_t page_index,
+                                         size_t num_pages,
+                                         bool is_zero);
 LOCAL NOBLOCK void
-NOTHROW(FCALL nvm_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
-                                    PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                    bool is_zero) {
+NOTHROW(FCALL vm_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+                                   PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                   bool is_zero) {
 	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
 	__hybrid_assert((num_bytes & PAGEMASK) == 0);
-	vm_unmap_kernel_ram((vm_vpage_t)__ARCH_PAGEID_ENCODE(addr),
+	vm_paged_unmap_kernel_ram(PAGEID_ENCODE(addr),
 	                    num_bytes / PAGESIZE, is_zero);
 }
 
@@ -1918,21 +2041,30 @@ NOTHROW(FCALL nvm_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
 /* Get the node associated with the given `page'
  * NOTE: The caller must be holding a read-lock on `self'. */
 FUNDEF NOBLOCK WUNUSED struct vm_node *
-NOTHROW(FCALL vm_getnodeof)(struct vm *__restrict self, vm_vpage_t page);
-
+NOTHROW(FCALL vm_getnodeofpageid)(struct vm *__restrict self,
+                                  __ARCH_PAGEID_TYPE page);
 LOCAL NOBLOCK WUNUSED struct vm_node *
-NOTHROW(FCALL nvm_getnodeof)(struct vm *__restrict self,
-                             UNCHECKED void *addr) {
-	return vm_getnodeof(self, (vm_vpage_t)__ARCH_PAGEID_ENCODE(addr));
+NOTHROW(FCALL vm_getnodeofaddress)(struct vm *__restrict self,
+                                   UNCHECKED void *addr) {
+	return vm_getnodeofpageid(self, PAGEID_ENCODE(addr));
 }
 
 
 /* Check if some part of the given address range is currently in use.
- * NOTE: The caller must be holding a read-lock on `effective_vm'. */
+ * NOTE: The caller must be holding a read-lock on `self'. */
 FUNDEF NOBLOCK WUNUSED bool
-NOTHROW(FCALL vm_isused)(struct vm *__restrict effective_vm,
-                         vm_vpage_t min_page,
-                         vm_vpage_t max_page);
+NOTHROW(FCALL vm_paged_isused)(struct vm *__restrict self,
+                               pageid_t min_page, pageid_t max_page);
+LOCAL NOBLOCK WUNUSED bool
+NOTHROW(FCALL vm_isused)(struct vm *__restrict self,
+                         PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+                         PAGEDIR_PAGEALIGNED size_t num_bytes) {
+	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
+	__hybrid_assert((num_bytes & PAGEMASK) == 0);
+	return vm_paged_isused(self,
+	                       PAGEID_ENCODE((byte_t *)addr),
+	                       PAGEID_ENCODE((byte_t *)addr + num_bytes - 1));
+}
 
 /* Try to prefault memory for the given address range within the current VM.
  * This function is intended to be used in conjunction with `memcpy_nopf()',
@@ -1989,9 +2121,9 @@ FUNDEF size_t FCALL vm_prefault(USER CHECKED void const *addr,
  * that can be made to be backed by RAM.
  * Any VIO mappings within the specified range are simply ignored (and will not count
  * towards the returned value)
- * @return: * : The total number of V-pages that become faulted as the resule of this
+ * @return: * : The total number of bytes that become faulted as the resule of this
  *              function being called. Note that even if you may be expecting that some
- *              specified page within the range wasn't faulted before, you must still
+ *              specified address within the range wasn't faulted before, you must still
  *              allow for this function to return `0', since there always exists a
  *              possibility of some other thread changing the backing mappings, or
  *              faulting the mappings themself.
@@ -2002,14 +2134,28 @@ FUNDEF size_t FCALL vm_prefault(USER CHECKED void const *addr,
  *       within the indicated address range (whilst still checking it for errors for
  *       the even of the mapping changing, or the mapping being a VIO mapping) becomes
  *       possible immediately, without having to force any soft of additional memory
- *       access (note though that this only applies to the page directory of `effective_vm',
+ *       access (note though that this only applies to the page directory of `self',
  *       though also note that if some datapart within the range was already faulted, its
- *       page directory mapping in `effective_vm' will still be updated). */
+ *       page directory mapping in `self' will still be updated). */
 FUNDEF size_t FCALL
-vm_forcefault(struct vm *__restrict effective_vm,
-              vm_vpage_t minpage,
-              vm_vpage_t maxpage, bool for_writing)
+vm_paged_forcefault(struct vm *__restrict self,
+                    pageid_t minpageid,
+                    pageid_t maxpageid,
+                    bool for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+LOCAL size_t FCALL
+vm_forcefault(struct vm *__restrict self,
+              PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+              PAGEDIR_PAGEALIGNED size_t num_bytes,
+              bool for_writing)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
+	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
+	__hybrid_assert((num_bytes & PAGEMASK) == 0);
+	return vm_paged_forcefault(self,
+	                           PAGEID_ENCODE((byte_t *)addr),
+	                           PAGEID_ENCODE((byte_t *)addr + num_bytes - 1),
+	                           for_writing);
+}
 
 
 /* Sync changes made to file mappings within the given address
@@ -2017,38 +2163,84 @@ vm_forcefault(struct vm *__restrict effective_vm,
  * NOTE: Memory ranges that aren't actually mapped are simply ignored.
  * @return: * : The number of sychronozed bytes. (yes: those are bytes and not pages) */
 FUNDEF u64 FCALL
-vm_syncmem(struct vm *__restrict effective_vm,
-           vm_vpage_t minpage DFL((vm_vpage_t)0),
-           vm_vpage_t maxpage DFL((vm_vpage_t)-1))
+vm_paged_syncmem(struct vm *__restrict self,
+                 pageid_t minpage DFL((pageid_t)0),
+                 pageid_t maxpage DFL((pageid_t)-1))
 		THROWS(E_WOULDBLOCK, ...);
+LOCAL u64 FCALL
+vm_syncmem(struct vm *__restrict self,
+           PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+           PAGEDIR_PAGEALIGNED size_t num_bytes)
+		THROWS(E_WOULDBLOCK, ...) {
+	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
+	__hybrid_assert((num_bytes & PAGEMASK) == 0);
+	return vm_paged_syncmem(self,
+	                        PAGEID_ENCODE((byte_t *)addr),
+	                        PAGEID_ENCODE((byte_t *)addr + num_bytes - 1));
+}
 
 
-/* Synchronize changes to `effective_vm' in the given address range.
+/* Synchronize changes to `self' in the given address range.
  * In SMP, this function will automatically communicate changes to other
  * CPUs making use of the same VM, and doing this synchronously.
  * If the given address range is located within the kernel
  * share-segment, or if `vm_syncall()' was called, a
  * did-change RPC is broadcast to all other CPUs. */
-FUNDEF void FCALL vm_sync(struct vm *__restrict effective_vm, vm_vpage_t page_index, size_t num_pages) THROWS(E_WOULDBLOCK);
-FUNDEF void FCALL vm_syncone(struct vm *__restrict effective_vm, vm_vpage_t page_index) THROWS(E_WOULDBLOCK);
-FUNDEF void FCALL vm_syncall(struct vm *__restrict effective_vm) THROWS(E_WOULDBLOCK);
+FUNDEF void FCALL vm_paged_sync(struct vm *__restrict self, pageid_t page_index, size_t num_pages) THROWS(E_WOULDBLOCK);
+FUNDEF void FCALL vm_paged_syncone(struct vm *__restrict self, pageid_t page_index) THROWS(E_WOULDBLOCK);
+FUNDEF void FCALL vm_syncall(struct vm *__restrict self) THROWS(E_WOULDBLOCK);
+LOCAL void FCALL
+vm_sync(struct vm *__restrict self,
+        PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+        PAGEDIR_PAGEALIGNED size_t num_bytes) THROWS(E_WOULDBLOCK) {
+	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
+	__hybrid_assert((num_bytes & PAGEMASK) == 0);
+	vm_paged_sync(self,
+	              PAGEID_ENCODE((byte_t *)addr),
+	              num_bytes / PAGESIZE);
+}
+LOCAL void FCALL
+vm_syncone(struct vm *__restrict self, UNCHECKED void *addr) THROWS(E_WOULDBLOCK) {
+	vm_paged_syncone(self, PAGEID_ENCODE((byte_t *)addr));
+}
+
 /* Sync functions for when the caller is already holding a lock to the VM's set of running tasks. */
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_sync_locked)(struct vm *__restrict effective_vm, vm_vpage_t page_index, size_t num_pages);
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_syncone_locked)(struct vm *__restrict effective_vm, vm_vpage_t page_index);
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_syncall_locked)(struct vm *__restrict effective_vm);
+FUNDEF NOBLOCK void NOTHROW(FCALL vm_paged_sync_locked)(struct vm *__restrict self, pageid_t page_index, size_t num_pages);
+FUNDEF NOBLOCK void NOTHROW(FCALL vm_paged_syncone_locked)(struct vm *__restrict self, pageid_t page_index);
+FUNDEF NOBLOCK void NOTHROW(FCALL vm_syncall_locked)(struct vm *__restrict self);
+LOCAL void FCALL
+vm_sync_locked(struct vm *__restrict self,
+               PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+               PAGEDIR_PAGEALIGNED size_t num_bytes) THROWS(E_WOULDBLOCK) {
+	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
+	__hybrid_assert((num_bytes & PAGEMASK) == 0);
+	vm_paged_sync_locked(self,
+	                     PAGEID_ENCODE((byte_t *)addr),
+	                     num_bytes / PAGESIZE);
+}
+LOCAL void FCALL
+vm_syncone_locked(struct vm *__restrict self, UNCHECKED void *addr) THROWS(E_WOULDBLOCK) {
+	vm_paged_syncone_locked(self, PAGEID_ENCODE((byte_t *)addr));
+}
 
 /* Begin/end syncing page directory mappings:
  * >> pagedir_prepare_map_p(my_vm, start, count);                       // Prepare      (make sure that `pagedir_unmap_p()' will succeed)
  * >> vm_sync_begin(my_vm);                                             // Lock         (make sure we'll be able to sync)
  * >> pagedir_unmap_p(PAGEDIR_P_SELFOFVM(my_vm), start, count);         // Unmap        (Actually delete page mappings)
- * >> vm_sync_end(my_vm, start, count);                                 // Unlock+sync  (Make sure that all CPUs got the message about pages having gone away)
+ * >> vm_paged_sync_end(my_vm, start, count);                                 // Unlock+sync  (Make sure that all CPUs got the message about pages having gone away)
  * >> pagedir_unprepare_map_p(PAGEDIR_P_SELFOFVM(my_vm), start, count); // Free         (Clean up memory used to describe the mapping)
  * This order to calls is required to prevent problems at a
  * point in time when those problems could no longer be handled,
- * since the regular vm_sync() functions may throw an E_WOULDBLOCK
+ * since the regular vm_paged_sync() functions may throw an E_WOULDBLOCK
  * exception when failing to acquire a lock to `v_tasklock', which
  * is required in order to gather the set of CPUs containing tasks
  * which may need to be synced as well. */
+/* TODO: The whole VM sync mechanims was made too complicated.
+ *       Instead of forcing a lock to the VM's thread list, we could
+ *       instead simply broadcast a TLB shootdown to all CPUs when we
+ *       cannot acquire a lock to the task list. That way, the task
+ *       list lock doesn't need to be held by the caller, and `vm_sync_begin()'
+ *       can fall away entirely! */
 #ifdef __INTELLISENSE__
 FUNDEF void KCALL vm_sync_begin(struct vm *__restrict effective_vm) THROWS(E_WOULDBLOCK);
 FUNDEF bool NOTHROW(KCALL vm_sync_begin_nx)(struct vm *__restrict effective_vm);
@@ -2065,16 +2257,44 @@ FUNDEF NOBLOCK void NOTHROW(KCALL vm_sync_abort)(struct vm *__restrict effective
 #define vm_sync_trybegin(effective_vm) vm_tasklock_tryread(effective_vm)
 #define vm_sync_abort(effective_vm)    vm_tasklock_endread(effective_vm)
 #endif
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_sync_end)(struct vm *__restrict effective_vm, vm_vpage_t page_index, size_t num_pages);
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_sync_endone)(struct vm *__restrict effective_vm, vm_vpage_t page_index);
+FUNDEF NOBLOCK void NOTHROW(FCALL vm_paged_sync_end)(struct vm *__restrict effective_vm, pageid_t page_index, size_t num_pages);
+FUNDEF NOBLOCK void NOTHROW(FCALL vm_paged_sync_endone)(struct vm *__restrict effective_vm, pageid_t page_index);
 FUNDEF NOBLOCK void NOTHROW(FCALL vm_sync_endall)(struct vm *__restrict effective_vm);
+LOCAL NOBLOCK void
+NOTHROW(FCALL vm_sync_end)(struct vm *__restrict self,
+                           PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+                           PAGEDIR_PAGEALIGNED size_t num_bytes) {
+	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
+	__hybrid_assert((num_bytes & PAGEMASK) == 0);
+	vm_paged_sync_end(self,
+	                  PAGEID_ENCODE((byte_t *)addr),
+	                  num_bytes / PAGESIZE);
+}
+LOCAL NOBLOCK void
+NOTHROW(FCALL vm_sync_endone)(struct vm *__restrict self, UNCHECKED void *addr) {
+	vm_paged_sync_endone(self, PAGEID_ENCODE((byte_t *)addr));
+}
+
 
 /* Similar to the user-variants above, however sync a kernel-VM range instead,
  * and causing the did-change RPC to be broadcast to _all_ CPUs, instead of
  * having to figure out the specific sub-set of CPUs that would be affected. */
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_kernel_sync)(vm_vpage_t page_index, size_t num_pages);
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_kernel_syncone)(vm_vpage_t page_index);
+FUNDEF NOBLOCK void NOTHROW(FCALL vm_paged_kernel_sync)(pageid_t page_index, size_t num_pages);
+FUNDEF NOBLOCK void NOTHROW(FCALL vm_paged_kernel_syncone)(pageid_t page_index);
 FUNDEF NOBLOCK void NOTHROW(FCALL vm_kernel_syncall)(void);
+
+LOCAL NOBLOCK void
+NOTHROW(FCALL vm_kernel_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+                              PAGEDIR_PAGEALIGNED size_t num_bytes) {
+	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
+	__hybrid_assert((num_bytes & PAGEMASK) == 0);
+	vm_paged_kernel_sync(PAGEID_ENCODE((byte_t *)addr),
+	                     num_bytes / PAGESIZE);
+}
+LOCAL NOBLOCK void
+NOTHROW(FCALL vm_kernel_syncone)(UNCHECKED void *addr) {
+	vm_paged_kernel_syncone(PAGEID_ENCODE((byte_t *)addr));
+}
 
 /* read/write memory to/form the address space of a given VM
  * Note that these functions behave similar to memcpy_nopf(), in that they

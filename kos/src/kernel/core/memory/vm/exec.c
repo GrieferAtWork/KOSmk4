@@ -275,12 +275,12 @@ vm_exec(struct vm *__restrict effective_vm,
 	TRY {
 		struct vmb builder = VMB_INIT;
 		PAGEDIR_PAGEALIGNED UNCHECKED void *peb_base;
-		vm_vpage_t stack_page;
-		vm_vpage_t linker_base;
+		PAGEDIR_PAGEALIGNED UNCHECKED void *stack_base;
+		PAGEDIR_PAGEALIGNED UNCHECKED void *linker_base;
 		uintptr_t loadstart = (uintptr_t)-1;
 		TRY {
 			bool need_dyn_linker = false;
-			linker_base          = (vm_vpage_t)-1;
+			linker_base = (UNCHECKED void *)-1;
 			Elf_Half i;
 			/* Read the program segment header table into memory. */
 			inode_readall(exec_node,
@@ -300,12 +300,12 @@ vm_exec(struct vm *__restrict effective_vm,
 					break;
 
 				case PT_LOAD: {
-					vm_vpage_t page_index;
+					pageid_t page_index;
 					size_t num_pages, num_total;
 					uintptr_half_t prot;
 					size_t adjusted_filsize;
 					size_t adjusted_memsize;
-					vm_virt_t bss_start;
+					void *bss_start;
 					bool map_ok;
 					/* Load entry into memory. */
 					if ((phdr_vector[i].p_offset & PAGEMASK) !=
@@ -314,17 +314,17 @@ vm_exec(struct vm *__restrict effective_vm,
 						      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,
 						      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_UNALIGNEDSEGMENT);
 					}
-					page_index = VM_ADDR2PAGE((vm_virt_t)phdr_vector[i].p_vaddr);
+					page_index = PAGEID_ENCODE(phdr_vector[i].p_vaddr);
 					if (loadstart > phdr_vector[i].p_vaddr)
 						loadstart = phdr_vector[i].p_vaddr;
 					adjusted_filsize = phdr_vector[i].p_filesz + (phdr_vector[i].p_vaddr & PAGEMASK);
 					adjusted_memsize = phdr_vector[i].p_memsz + (phdr_vector[i].p_vaddr & PAGEMASK);
 					num_pages        = CEILDIV(adjusted_filsize, PAGESIZE);
 					num_total        = CEILDIV(adjusted_memsize, PAGESIZE);
-					bss_start        = (vm_virt_t)(phdr_vector[i].p_vaddr + phdr_vector[i].p_filesz);
+					bss_start        = (void *)(phdr_vector[i].p_vaddr + phdr_vector[i].p_filesz);
 					/* Check if we're going to need a .bss overlap fixup page */
 					if (adjusted_memsize > adjusted_filsize) {
-						if ((bss_start & (PAGESIZE-1)) != 0)
+						if (((uintptr_t)bss_start & PAGEMASK) != 0)
 							--num_pages;
 					}
 #if PF_X == VM_PROT_EXEC && PF_W == VM_PROT_WRITE && PF_R == VM_PROT_READ
@@ -373,19 +373,19 @@ err_overlap:
 						 * `START_OF_BSS ... MIN(MAX_BSS_BYTE, MAX_BYTE_OF_PAGE(PAGE_OF(START_OF_BSS)))' being forcibly
 						 * initialized to all ZEROes, causing the page to be faulted and become initialized properly.
 						 */
-						if ((bss_start & (PAGESIZE-1)) != 0) {
-							vm_vpage_t bss_overlap_page;
+						if (((uintptr_t)bss_start & PAGEMASK) != 0) {
+							pageid_t bss_overlap_page;
 							size_t bss_start_offset, bss_overlap, bss_total_size;
 							struct vm_node *overlap_node;
 							assert(phdr_vector[i].p_memsz > phdr_vector[i].p_filesz);
 							bss_total_size = phdr_vector[i].p_memsz -
 							                 phdr_vector[i].p_filesz;
-							bss_start_offset = (size_t)(bss_start & PAGEMASK);
+							bss_start_offset = (size_t)((uintptr_t)bss_start & PAGEMASK);
 							bss_overlap = PAGESIZE - bss_start_offset;
 							if (bss_overlap > bss_total_size)
 								bss_overlap = bss_total_size;
 							bss_overlap_page = page_index + num_pages;
-							assert(bss_overlap_page == VM_ADDR2PAGE(bss_start));
+							assert(bss_overlap_page == PAGEID_ENCODE(bss_start));
 							if unlikely(vmb_getnodeof(&builder, bss_overlap_page) != NULL)
 								goto err_overlap; /* Already in use... */
 							overlap_node = create_bss_overlap_node(exec_node,
@@ -422,37 +422,34 @@ err_overlap:
 			}
 			/* If necessary, load the dynamic linker. */
 			if (need_dyn_linker) {
-				linker_base = vmb_map(&builder,
+				linker_base = nvmb_map(&builder,
+				                       HINT_GETADDR(KERNEL_VMHINT_USER_DYNLINK),
+				                       kernel_ld_elf_ramfile.rf_data.rb_size * PAGESIZE,
+				                       PAGESIZE,
 #if !defined(NDEBUG) && 1 /* XXX: Remove me */
-				                      (vm_vpage_t)VM_ADDR2PAGE(0xbf100000),
-				                      kernel_ld_elf_ramfile.rf_data.rb_size,
-				                      1,
-				                      VM_GETFREE_ABOVE,
+				                       VM_GETFREE_ABOVE,
 #else
-				                      (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_USER_DYNLINK),
-				                      kernel_ld_elf_ramfile.rf_data.rb_size,
-				                      1,
-				                      HINT_GETMODE(KERNEL_VMHINT_USER_DYNLINK),
+				                       HINT_GETMODE(KERNEL_VMHINT_USER_DYNLINK),
 #endif
-				                      &kernel_ld_elf_ramfile.rf_block,
-				                      0,
-				                      VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC | VM_PROT_PRIVATE,
-				                      VM_NODE_FLAG_NORMAL,
-				                      0);
+				                       &kernel_ld_elf_ramfile.rf_block,
+				                       0,
+				                       VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC | VM_PROT_PRIVATE,
+				                       VM_NODE_FLAG_NORMAL,
+				                       0);
 			}
 
 #define USER_STACK_NUM_PAGES 8 /* TODO: Don't put this here! */
 			/* Allocate a new user-space stack for the calling thread. */
-			stack_page = vmb_map(&builder,
-			                     (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_USER_STACK),
-			                     USER_STACK_NUM_PAGES,
-			                     1,
-			                     HINT_GETMODE(KERNEL_VMHINT_USER_STACK),
-			                     &vm_datablock_anonymous_zero, /* XXX: Use memory with a debug initializer? */
-			                     0,
-			                     VM_PROT_READ | VM_PROT_WRITE,
-			                     VM_NODE_FLAG_NORMAL,
-			                     0);
+			stack_base = nvmb_map(&builder,
+			                      HINT_GETADDR(KERNEL_VMHINT_USER_STACK),
+			                      USER_STACK_NUM_PAGES * PAGESIZE,
+			                      PAGESIZE,
+			                      HINT_GETMODE(KERNEL_VMHINT_USER_STACK),
+			                      &vm_datablock_anonymous_zero, /* XXX: Use memory with a debug initializer? */
+			                      0,
+			                      VM_PROT_READ | VM_PROT_WRITE,
+			                      VM_NODE_FLAG_NORMAL,
+			                      0);
 
 			/* Create a memory mapping for the PEB containing `argv' and `envp' */
 			peb_base = vmb_alloc_peb(&builder,
@@ -482,18 +479,18 @@ err_overlap:
 		/* Set the entry point for the loaded binary. */
 		user_state = exec_initialize_entry(user_state,
 		                                   peb_base,
-		                                   (USER void *)VM_PAGE2ADDR(stack_page),
+		                                   stack_base,
 		                                   USER_STACK_NUM_PAGES * PAGESIZE,
 		                                   (USER void *)ehdr.e_entry);
 
 		/* Initialize the RTLD portion of the user-space bootstrap process. */
-		if (linker_base != (vm_vpage_t)-1) {
+		if (linker_base != (void *)-1) {
 			user_state = exec_initialize_elf_rtld(/* user_state:           */ user_state,
 			                                      /* exec_path:            */ exec_path,
 			                                      /* exec_dentry:          */ exec_dentry,
 			                                      /* exec_node:            */ exec_node,
 			                                      /* application_loadaddr: */ (uintptr_t)0,
-			                                      /* linker_loadaddr:      */ (uintptr_t)VM_PAGE2ADDR(linker_base),
+			                                      /* linker_loadaddr:      */ (uintptr_t)linker_base,
 			                                      /* phdr_vec:             */ phdr_vector,
 			                                      /* phdr_cnt:             */ ehdr.e_phnum);
 		}

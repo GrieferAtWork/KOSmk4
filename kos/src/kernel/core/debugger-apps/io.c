@@ -262,7 +262,7 @@ NOTHROW(KCALL is_pc)(uintptr_t pc) {
 	struct vm_node *node;
 	if (pc < KERNEL_BASE)
 		return false;
-	node = vm_getnodeof(&vm_kernel, VM_ADDR2PAGE((vm_virt_t)pc));
+	node = vm_getnodeofpageid(&vm_kernel, VM_ADDR2PAGE((vm_virt_t)pc));
 	if (!node)
 		return false;
 	return (node->vn_prot & VM_PROT_EXEC) != 0;

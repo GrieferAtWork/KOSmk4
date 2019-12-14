@@ -41,30 +41,28 @@ DECL_BEGIN
 #ifdef COPY_USER2KERNEL
 #define IS_READING 1
 LOCAL void KCALL
-copy_kernelspace_from_vm(KERNEL CHECKED void *dst,
-                         struct vm *__restrict effective_vm,
-                         UNCHECKED void const *src,
+copy_kernelspace_from_vm(struct vm *__restrict self,
+                         UNCHECKED void const *addr,
+                         KERNEL CHECKED void *buf,
                          size_t num_bytes,
                          bool force_accessible)
-#define USERSPACE_VM_ADDRESS     src
 #else /* COPY_USER2KERNEL */
 #define IS_WRITING 1
 #ifdef VM_MEMSET_IMPL
 LOCAL void KCALL
-memset_into_vm(struct vm *__restrict effective_vm,
-               UNCHECKED void *dst,
+memset_into_vm(struct vm *__restrict self,
+               UNCHECKED void *addr,
                int byte,
                size_t num_bytes,
                bool force_accessible)
 #else /* VM_MEMSET_IMPL */
 LOCAL void KCALL
-copy_kernelspace_into_vm(struct vm *__restrict effective_vm,
-                         UNCHECKED void *dst,
-                         KERNEL CHECKED void const *src,
+copy_kernelspace_into_vm(struct vm *__restrict self,
+                         UNCHECKED void *addr,
+                         KERNEL CHECKED void const *buf,
                          size_t num_bytes,
                          bool force_accessible)
 #endif /* !VM_MEMSET_IMPL */
-#define USERSPACE_VM_ADDRESS     dst
 #endif /* !COPY_USER2KERNEL */
 		THROWS(E_SEGFAULT, E_WOULDBLOCK)
 {
@@ -72,17 +70,17 @@ copy_kernelspace_into_vm(struct vm *__restrict effective_vm,
 again:
 	/* Try to perform the copy without page faults. */
 #if defined(COPY_USER2KERNEL)
-	error = copy_kernelspace_from_vm_nopf(dst, effective_vm, src, num_bytes);
+	error = copy_kernelspace_from_vm_nopf(self, addr, buf, num_bytes);
 #elif defined(COPY_KERNEL2USER)
-	error = copy_kernelspace_into_vm_nopf(effective_vm, dst, src, num_bytes);
+	error = copy_kernelspace_into_vm_nopf(self, addr, buf, num_bytes);
 #elif defined(VM_MEMSET_IMPL)
-	error = memset_into_vm_nopf(effective_vm, dst, byte, num_bytes);
+	error = memset_into_vm_nopf(self, addr, byte, num_bytes);
 #endif
 	if (!error)
 		return;
-	dst = (byte_t *)dst + num_bytes - error;
+	addr = (byte_t *)addr + num_bytes - error;
 #ifndef VM_MEMSET_IMPL
-	src = (byte_t *)src + num_bytes - error;
+	buf = (byte_t *)buf + num_bytes - error;
 #endif /* !VM_MEMSET_IMPL */
 	num_bytes = error;
 	{
@@ -91,29 +89,32 @@ again:
 #ifdef IS_WRITING
 		bool try_merge_part;
 #endif /* IS_WRITING */
-		vm_vpage_t page;
+		void *pageaddr;
+		pageid_t pageid;
 		size_t vpage_offset; /* Offset (in vpages) of the accessed page from the start of `node' */
 		size_t transfer_bytes;
-		page = VM_ADDR2PAGE((vm_virt_t)USERSPACE_VM_ADDRESS);
+		pageaddr = (void *)((uintptr_t)addr & ~PAGEMASK);
+		pageid   = PAGEID_ENCODE(addr);
+		assert(pageid == PAGEID_ENCODE(pageaddr));
 		/* Must manually copy data by explicitly locking the user-space VM and
 		 * looking at what kind of VM node is mapped at the target location. */
 again_lookup_node:
-		sync_read(effective_vm);
+		sync_read(self);
 #ifdef IS_WRITING
 again_lookup_node_already_locked:
 		try_merge_part = false;
 #endif /* IS_WRITING */
-		node = vm_getnodeof(effective_vm, page);
+		node = vm_getnodeofpageid(self, pageid);
 		if unlikely(!node || !node->vn_part) {
-			sync_endread(effective_vm);
+			sync_endread(self);
 #ifdef CONFIG_VIO
 throw_segfault:
 #endif /* CONFIG_VIO */
 #ifdef IS_WRITING
-			THROW(E_SEGFAULT_UNMAPPED, USERSPACE_VM_ADDRESS,
+			THROW(E_SEGFAULT_UNMAPPED, addr,
 			      E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_WRITING);
 #else /* IS_WRITING */
-			THROW(E_SEGFAULT_UNMAPPED, USERSPACE_VM_ADDRESS,
+			THROW(E_SEGFAULT_UNMAPPED, addr,
 			      E_SEGFAULT_CONTEXT_FAULT);
 #endif /* !IS_WRITING */
 		}
@@ -122,24 +123,24 @@ throw_segfault:
 		}
 		assert(!wasdestroyed(node->vn_part));
 		part         = incref(node->vn_part);
-		vpage_offset = (size_t)(page - VM_NODE_MIN(node));
+		vpage_offset = (size_t)(pageid - vm_node_getminpageid(node));
 
 		/* Figure out how many bytes to transfer */
-		transfer_bytes = VM_NODE_BYTESIZE(node) - vpage_offset;
+		transfer_bytes = vm_node_getsize(node) - vpage_offset;
 		if (transfer_bytes > num_bytes)
 			transfer_bytes = num_bytes;
 
-		assert(VM_NODE_SIZE(node) == vm_datapart_numvpages(part));
+		assert(vm_node_getpagecount(node) == vm_datapart_numvpages(part));
 #ifdef CONFIG_VIO
 		/* Check for a VIO memory segment */
 		if (part->dp_state == VM_DATAPART_STATE_VIOPRT) {
 			uintptr_half_t nodeprot;
 			struct vio_args args;
-			vm_daddr_t vio_addr;
+			pos_t vio_addr;
 
 			nodeprot = node->vn_prot;
 			COMPILER_READ_BARRIER();
-			sync_endread(effective_vm);
+			sync_endread(self);
 			TRY {
 				sync_read(part);
 			} EXCEPT {
@@ -147,12 +148,12 @@ throw_segfault:
 				RETHROW();
 			}
 			args.va_block = incref(part->dp_block);
-			args.va_access_partoff = ((vm_daddr_t)(vpage_offset +
+			args.va_access_partoff = ((pos_t)(vpage_offset +
 			                                       vm_datapart_mindpage(part))
 			                          << VM_DATABLOCK_ADDRSHIFT(args.va_block));
 			/* Figure out the staring VIO address that is being accessed. */
-			vio_addr = ((vm_daddr_t)vm_datapart_mindpage(part) << VM_DATABLOCK_ADDRSHIFT(args.va_block)) +
-			            (vm_daddr_t)((vm_virt_t)USERSPACE_VM_ADDRESS - VM_NODE_MINADDR(node));
+			vio_addr = ((pos_t)vm_datapart_mindpage(part) << VM_DATABLOCK_ADDRSHIFT(args.va_block)) +
+			            (pos_t)((byte_t *)addr - (byte_t *)vm_node_getmin(node));
 
 			sync_endread(part);
 			args.va_type = args.va_block->db_vio;
@@ -162,9 +163,9 @@ vio_decref_and_throw_segfault:
 				decref_unlikely(part);
 				goto throw_segfault;
 			}
-			args.va_part            = part; /* Inherit reference */
-			args.va_access_pageaddr = page;
-			args.va_state           = NULL;
+			args.va_part          = part; /* Inherit reference */
+			args.va_access_pageid = pageid;
+			args.va_state         = NULL;
 			/* Make sure that the segment was mapped with the proper protection */
 #ifdef IS_READING
 			if unlikely(!force_accessible && !(nodeprot & VM_PROT_READ))
@@ -177,16 +178,16 @@ vio_decref_and_throw_segfault:
 			FINALLY_DECREF_UNLIKELY(args.va_block);
 			FINALLY_DECREF_UNLIKELY(part);
 #ifdef IS_READING
-			vio_copyfromvio(&args, dst, vio_addr, transfer_bytes);
+			vio_copyfromvio(&args, vio_addr, buf, transfer_bytes);
 #elif !defined(VM_MEMSET_IMPL)
-			vio_copytovio(&args, vio_addr, src, transfer_bytes);
+			vio_copytovio(&args, vio_addr, buf, transfer_bytes);
 #else /* IS_READING */
 			vio_memset(&args, vio_addr, byte, transfer_bytes);
 #endif /* !IS_READING */
 			goto done_part_transfer;
 		}
 #endif /* CONFIG_VIO */
-		sync_endread(effective_vm);
+		sync_endread(self);
 		TRY {
 #ifdef IS_WRITING
 			if (node->vn_prot & VM_PROT_SHARED) {
@@ -259,8 +260,8 @@ do_unshare_cow:
 					}
 					assert(vpage_offset == 0);
 					assert(vm_datapart_numvpages(part) == 1);
-					assert(VM_NODE_START(node) == page);
-					assert(VM_NODE_SIZE(node) == 1);
+					assert(vm_node_getstartpageid(node) == pageid);
+					assert(vm_node_getpagecount(node) == 1);
 
 					/* Make sure that PAGE#0 of `part' has been initialized!
 					 * If it wasn't, we need to initialize it now, since
@@ -305,21 +306,21 @@ do_unshare_cow:
 					} else if (!sync_tryupgrade(part)) {
 						sync_endread(part);
 upgrade_and_recheck_vm_for_node:
-						sync_read(effective_vm);
-						if unlikely(vm_getnodeof(effective_vm, page) != node ||
+						sync_read(self);
+						if unlikely(vm_getnodeofpageid(self, pageid) != node ||
 						            node->vn_part != part ||
 						            (node->vn_prot & VM_PROT_SHARED)) {
 							decref_unlikely(part);
 							kfree(new_part);
 							printk(KERN_DEBUG "Race condition: Mapping target at %p has changed during unshare (#1)\n",
-							       VM_PAGE2ADDR(page));
+							       VM_PAGE2ADDR(pageid));
 							goto again_lookup_node_already_locked;
 						}
-						sync_endread(effective_vm);
+						sync_endread(self);
 						vm_datapart_lockwrite_setcore(part);
 					}
 					/* Allocate the physical memory used for backing the vm-local copy. */
-					new_ppage = page_malloc(1);
+					new_ppage = page_mallocone();
 					/* Check if the allocation failed. */
 					if unlikely(new_ppage == PAGEPTR_INVALID) {
 						sync_endwrite(part);
@@ -346,35 +347,35 @@ upgrade_and_recheck_vm_for_node:
 					new_part->dp_futex                      = NULL;
 					assert(new_part->dp_state == VM_DATAPART_STATE_INCORE ||
 					       new_part->dp_state == VM_DATAPART_STATE_LOCKED);
-					if (!sync_trywrite(effective_vm)) {
+					if (!sync_trywrite(self)) {
 						sync_endwrite(part);
-						page_free(new_ppage, 1);
+						page_freeone(new_ppage);
 						kfree(new_part);
-						sync_write(effective_vm);
-						sync_downgrade(effective_vm);
+						sync_write(self);
+						sync_downgrade(self);
 						decref_unlikely(part);
 						goto again_lookup_node_already_locked;
 					}
-					if unlikely(vm_getnodeof(effective_vm, page) != node ||
+					if unlikely(vm_getnodeofpageid(self, pageid) != node ||
 					            node->vn_part != part ||
 					            (node->vn_prot & VM_PROT_SHARED)) {
-						sync_downgrade(effective_vm);
+						sync_downgrade(self);
 						sync_endwrite(part);
-						page_free(new_ppage, 1);
+						page_freeone(new_ppage);
 						kfree(new_part);
 						decref_unlikely(part);
 						printk(KERN_DEBUG "Race condition: Mapping target at %p has changed during unshare (#2)\n",
-						       VM_PAGE2ADDR(page));
+						       VM_PAGE2ADDR(pageid));
 						goto again_lookup_node_already_locked;
 					}
 					/* If the node isn't prepared, make sure that we can map memory. */
 					if (!(node->vn_flags & VM_NODE_FLAG_PREPARED)) {
-						if unlikely(!(effective_vm == THIS_VM || effective_vm == &vm_kernel
-						              ? pagedir_prepare_mapone(page)
-						              : pagedir_prepare_mapone_p(PAGEDIR_P_SELFOFVM(effective_vm), page))) {
-							sync_endwrite(effective_vm);
+						if unlikely(!(self == THIS_VM || self == &vm_kernel
+						              ? npagedir_prepare_mapone(pageaddr)
+						              : npagedir_prepare_mapone_p(PAGEDIR_P_SELFOFVM(self), pageaddr))) {
+							sync_endwrite(self);
 							sync_endwrite(part);
-							page_free(new_ppage, 1);
+							page_freeone(new_ppage);
 							kfree(new_part);
 							decref_unlikely(part);
 							THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
@@ -387,11 +388,11 @@ upgrade_and_recheck_vm_for_node:
 
 					new_part->dp_block = incref(&vm_datablock_anonymous_zero_vec[VM_DATABLOCK_PAGESHIFT(part->dp_block)]);
 
-					/* Must update the page directory mapping _before_ calling `sync_endwrite(effective_vm)'
-					 * Otherwise, `part' may be destroyed while `effective_vm' still contains the mapping
+					/* Must update the page directory mapping _before_ calling `sync_endwrite(self)'
+					 * Otherwise, `part' may be destroyed while `self' still contains the mapping
 					 * of the already destroyed (and potentially re-purposed) part. */
 					prot = node->vn_prot & (PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
-					if (effective_vm != &vm_kernel)
+					if (self != &vm_kernel)
 						prot |= PAGEDIR_MAP_FUSER;
 
 					/* Since we're changing an existing mapping such that the
@@ -399,15 +400,15 @@ upgrade_and_recheck_vm_for_node:
 					 * Otherwise, some cached TLB entry may still reference the old
 					 * datapart once that part has been destroyed. */
 #ifndef CONFIG_NO_SMP
-					if unlikely(!vm_sync_begin_nx(effective_vm)) {
-						sync_endwrite(effective_vm);
+					if unlikely(!vm_sync_begin_nx(self)) {
+						sync_endwrite(self);
 						sync_endwrite(part);
-						page_free(new_ppage, 1);
+						page_freeone(new_ppage);
 						kfree(new_part);
 						/* Block until the task lock becomes available, then try again. */
-						vm_tasklock_read(effective_vm);
-						vm_tasklock_endread(effective_vm);
-						/* decref() is below `vm_tasklock_read(effective_vm)' because we're still
+						vm_tasklock_read(self);
+						vm_tasklock_endread(self);
+						/* decref() is below `vm_tasklock_read(self)' because we're still
 						 * inside of the `TRY { ... } EXCEPT { decref_unlikely(part); }' block */
 						decref_unlikely(part);
 						goto again_lookup_node_already_locked;
@@ -415,13 +416,13 @@ upgrade_and_recheck_vm_for_node:
 #endif /* !CONFIG_NO_SMP */
 
 					/* Actually map the accessed page! */
-					if (effective_vm == THIS_VM || effective_vm == &vm_kernel) {
-						pagedir_mapone(page, new_ppage, prot);
+					if (self == THIS_VM || self == &vm_kernel) {
+						npagedir_mapone(pageaddr, page2addr(new_ppage), prot);
 					} else {
-						pagedir_mapone_p(PAGEDIR_P_SELFOFVM(effective_vm), page,
-						                 new_ppage, prot);
+						npagedir_mapone_p(PAGEDIR_P_SELFOFVM(self), pageaddr,
+						                  page2addr(new_ppage), prot);
 					}
-					vm_sync_endone(effective_vm, page);
+					vm_paged_sync_endone(self, pageid);
 
 					/* Unlink the given node from the old part's chain. */
 					LLIST_REMOVE(node, vn_link);
@@ -439,18 +440,18 @@ upgrade_and_recheck_vm_for_node:
 					assert(new_part->dp_crefs == node);
 					assert(node->vn_link.ln_pself == &new_part->dp_crefs);
 					assert(node->vn_link.ln_next == NULL);
-					sync_endwrite(effective_vm);
+					sync_endwrite(self);
 
 					decref_unlikely(part); /* The reference created by `part = incref(node->vn_part);' above */
 					/* Try to merge `part' during the decref() below! */
 					try_merge_part = true;
 
 #if 1
-					printk(KERN_TRACE "Unshared page at %p (RW) [tid=%u]\n",
-					       __ARCH_PAGEID_DECODE(page), task_getroottid_s());
+					printk(KERN_TRACE "Unshared page at %p (%p) (RW) [tid=%u]\n",
+					       pageaddr, addr, task_getroottid_s());
 #else
-					printk(KERN_TRACE "Unshared page at %p (RW) [tid=%u,oldpage=" FORMAT_VM_PHYS_T ",newpage=" FORMAT_VM_PHYS_T "]\n",
-					       __ARCH_PAGEID_DECODE(page), task_getroottid_s(),
+					printk(KERN_TRACE "Unshared page at %p (%p) (RW) [tid=%u,oldpage=" FORMAT_VM_PHYS_T ",newpage=" FORMAT_VM_PHYS_T "]\n",
+					       pageaddr, addr, task_getroottid_s(),
 					       page2addr(old_ppage), page2addr(new_ppage));
 #endif
 					part = new_part;
@@ -483,13 +484,13 @@ upgrade_and_recheck_vm_for_node:
 				/* Read-only memory */
 endread_and_decref_part_and_set_readonly:
 				sync_endread(part);
-				THROW(E_SEGFAULT_READONLY, USERSPACE_VM_ADDRESS, E_SEGFAULT_CONTEXT_WRITING);
+				THROW(E_SEGFAULT_READONLY, addr, E_SEGFAULT_CONTEXT_WRITING);
 			}
 #else /* IS_WRITING */
 			if unlikely(!force_accessible && !(node->vn_prot & VM_PROT_READ)) {
 				/* Write-only memory */
 				sync_endread(part);
-				THROW(E_SEGFAULT_NOTREADABLE, USERSPACE_VM_ADDRESS, 0);
+				THROW(E_SEGFAULT_NOTREADABLE, addr, 0);
 			}
 #endif /* !IS_WRITING */
 			{
@@ -500,7 +501,7 @@ endread_and_decref_part_and_set_readonly:
 #ifdef IS_WRITING
 do_transfer_ram:
 #endif /* IS_WRITING */
-				page_offset    = (uintptr_t)USERSPACE_VM_ADDRESS & PAGEMASK;
+				page_offset    = (uintptr_t)addr & PAGEMASK;
 				page_remainder = PAGESIZE - page_offset;
 				/* Make sure not to copy beyond the associated page. */
 				if (transfer_bytes > page_remainder)
@@ -520,12 +521,12 @@ do_transfer_ram:
 				}
 				/* Actually transfer low-level RAM data. */
 #ifdef IS_READING
-				vm_copyfromphys(dst,
+				vm_copyfromphys(buf,
 				                page2addr(ppage) + page_offset,
 				                transfer_bytes);
 #elif !defined(VM_MEMSET_IMPL)
 				vm_copytophys(page2addr(ppage) + page_offset,
-				              src,
+				              buf,
 				              transfer_bytes);
 #else /* IS_READING */
 				vm_memsetphys(page2addr(ppage) + page_offset,
@@ -554,16 +555,15 @@ done_part_transfer:
 		if (transfer_bytes >= num_bytes)
 			return;
 		num_bytes -= transfer_bytes;
-		dst = (byte_t *)dst + transfer_bytes;
+		addr = (byte_t *)addr + transfer_bytes;
 #ifndef VM_MEMSET_IMPL
-		src = (byte_t *)src + transfer_bytes;
+		buf = (byte_t *)buf + transfer_bytes;
 #endif /* !VM_MEMSET_IMPL */
 		goto again;
 	}
 }
 
 
-#undef USERSPACE_VM_ADDRESS
 #undef VM_MEMSET_IMPL
 #undef COPY_USER2KERNEL
 #undef COPY_KERNEL2USER

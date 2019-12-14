@@ -35,25 +35,25 @@ DECL_BEGIN
 #ifdef CONFIG_VIO
 
 PRIVATE ATTR_NORETURN void KCALL
-vio_illegal_read(struct vio_args *__restrict args, vm_daddr_t addr) {
-	addr -= (vm_daddr_t)args->va_access_partoff;
-	addr += (vm_daddr_t)args->va_access_pageaddr * PAGESIZE;
+vio_illegal_read(struct vio_args *__restrict args, pos_t addr) {
+	addr -= (pos_t)args->va_access_partoff;
+	addr += (pos_t)args->va_access_pageid * PAGESIZE;
 	THROW(E_SEGFAULT_NOTREADABLE, (uintptr_t)addr,
 	      E_SEGFAULT_CONTEXT_FAULT);
 }
 
 PRIVATE ATTR_NORETURN void KCALL
-vio_illegal_write(struct vio_args *__restrict args, vm_daddr_t addr) {
-	addr -= (vm_daddr_t)args->va_access_partoff;
-	addr += (vm_daddr_t)args->va_access_pageaddr * PAGESIZE;
+vio_illegal_write(struct vio_args *__restrict args, pos_t addr) {
+	addr -= (pos_t)args->va_access_partoff;
+	addr += (pos_t)args->va_access_pageid * PAGESIZE;
 	THROW(E_SEGFAULT_READONLY, (uintptr_t)addr,
 	      E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_WRITING);
 }
 
 PRIVATE ATTR_NORETURN void KCALL
-vio_nonatomic_operation(struct vio_args *__restrict args, vm_daddr_t addr, size_t size) {
-	addr -= (vm_daddr_t)args->va_access_partoff;
-	addr += (vm_daddr_t)args->va_access_pageaddr * PAGESIZE;
+vio_nonatomic_operation(struct vio_args *__restrict args, pos_t addr, size_t size) {
+	addr -= (pos_t)args->va_access_partoff;
+	addr += (pos_t)args->va_access_pageid * PAGESIZE;
 	if ((uintptr_t)(uintptr_t)addr & (size - 1))
 		THROW(E_INVALID_ALIGNMENT_POINTER, (uintptr_t)addr, size);
 	THROW(E_ILLEGAL_INSTRUCTION_VIO_NONATOMIC_OPERAND,
@@ -254,7 +254,7 @@ typedef union ATTR_PACKED {
 
 /* Invoke VIO callbacks, automatically substituting operators for one-another.
  * If an operation is impossible, these functions will throw a SEGFAULT exception. */
-PUBLIC NONNULL((1)) u8 KCALL vio_readb(struct vio_args *__restrict args, vm_daddr_t addr) {
+PUBLIC NONNULL((1)) u8 KCALL vio_readb(struct vio_args *__restrict args, pos_t addr) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	if (type->dtv_read.f_byte) return (*type->dtv_read.f_byte)(args, addr);
 	if (type->dtv_read.f_word) { word x = { (*type->dtv_read.f_word)(args, AW) }; return B1; }
@@ -289,7 +289,7 @@ PUBLIC NONNULL((1)) u8 KCALL vio_readb(struct vio_args *__restrict args, vm_dadd
 
 
 
-PUBLIC NONNULL((1)) u16 KCALL vio_readw(struct vio_args *__restrict args, vm_daddr_t addr) {
+PUBLIC NONNULL((1)) u16 KCALL vio_readw(struct vio_args *__restrict args, pos_t addr) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	if (((uintptr_t)addr & 1) != 1) {
 		if (type->dtv_read.f_word) return (*type->dtv_read.f_word)(args, addr);
@@ -391,7 +391,7 @@ PUBLIC NONNULL((1)) u16 KCALL vio_readw(struct vio_args *__restrict args, vm_dad
 	vio_illegal_read(args, addr);
 }
 
-PUBLIC NONNULL((1)) u32 KCALL vio_readl(struct vio_args *__restrict args, vm_daddr_t addr) {
+PUBLIC NONNULL((1)) u32 KCALL vio_readl(struct vio_args *__restrict args, pos_t addr) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	if (((uintptr_t)addr & 3) == 0) {
 		if (type->dtv_read.f_dword) return (*type->dtv_read.f_dword)(args, addr);
@@ -498,7 +498,7 @@ PUBLIC NONNULL((1)) u32 KCALL vio_readl(struct vio_args *__restrict args, vm_dad
 	vio_illegal_read(args, addr);
 }
 
-PUBLIC NONNULL((1)) u16 KCALL vio_readw_aligned(struct vio_args *__restrict args, vm_daddr_t addr) {
+PUBLIC NONNULL((1)) u16 KCALL vio_readw_aligned(struct vio_args *__restrict args, pos_t addr) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	assert(((uintptr_t)addr & 1) == 0);
 	if (type->dtv_read.f_word) return (*type->dtv_read.f_word)(args, addr);
@@ -542,7 +542,7 @@ PUBLIC NONNULL((1)) u16 KCALL vio_readw_aligned(struct vio_args *__restrict args
 	vio_illegal_read(args, addr);
 }
 
-PUBLIC NONNULL((1)) u32 KCALL vio_readl_aligned(struct vio_args *__restrict args, vm_daddr_t addr) {
+PUBLIC NONNULL((1)) u32 KCALL vio_readl_aligned(struct vio_args *__restrict args, pos_t addr) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	assert(((uintptr_t)addr & 3) == 0);
 	if (type->dtv_read.f_dword) return (*type->dtv_read.f_dword)(args, addr);
@@ -598,7 +598,7 @@ PUBLIC NONNULL((1)) u32 KCALL vio_readl_aligned(struct vio_args *__restrict args
 
 
 #ifdef CONFIG_VIO_HAS_QWORD
-PUBLIC NONNULL((1)) u64 KCALL vio_readq(struct vio_args *__restrict args, vm_daddr_t addr) {
+PUBLIC NONNULL((1)) u64 KCALL vio_readq(struct vio_args *__restrict args, pos_t addr) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	if (((uintptr_t)addr & 7) == 0) {
 		if (type->dtv_read.f_qword) return (*type->dtv_read.f_qword)(args, addr);
@@ -717,7 +717,7 @@ PUBLIC NONNULL((1)) u64 KCALL vio_readq(struct vio_args *__restrict args, vm_dad
 #undef READ_8X_READB
 	vio_illegal_read(args, addr);
 }
-PUBLIC NONNULL((1)) u64 KCALL vio_readq_aligned(struct vio_args *__restrict args, vm_daddr_t addr) {
+PUBLIC NONNULL((1)) u64 KCALL vio_readq_aligned(struct vio_args *__restrict args, pos_t addr) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	assert(((uintptr_t)addr & 7) == 0);
 	if (type->dtv_read.f_qword) return (*type->dtv_read.f_qword)(args, addr);
@@ -787,7 +787,7 @@ PUBLIC NONNULL((1)) u64 KCALL vio_readq_aligned(struct vio_args *__restrict args
 #define IF_WW(name, ...) { __auto_type func = type->dtv_write.name; if (func) { __VA_ARGS__ } }
 #define IF_WX(name, ...) { __auto_type func = type->dtv_xch.name; if (func) { __VA_ARGS__ } }
 
-PUBLIC NONNULL((1)) void KCALL vio_writeb(struct vio_args *__restrict args, vm_daddr_t addr, u8 value) {
+PUBLIC NONNULL((1)) void KCALL vio_writeb(struct vio_args *__restrict args, pos_t addr, u8 value) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	IF_WW(f_byte, { (*func)(args, addr, value); return; })
 	IF_WX(f_byte, { (*func)(args, addr, value, false); return; })
@@ -838,7 +838,7 @@ PUBLIC NONNULL((1)) void KCALL vio_writeb(struct vio_args *__restrict args, vm_d
 
 
 PUBLIC NONNULL((1)) void KCALL
-vio_writew(struct vio_args *__restrict args, vm_daddr_t addr, u16 value) {
+vio_writew(struct vio_args *__restrict args, pos_t addr, u16 value) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	if (((uintptr_t)addr & 1) == 0) {
 		IF_WW(f_word, { (*func)(args, addr, value); return; })
@@ -904,7 +904,7 @@ vio_writew(struct vio_args *__restrict args, vm_daddr_t addr, u16 value) {
 }
 
 PUBLIC NONNULL((1)) void KCALL
-vio_writew_aligned(struct vio_args *__restrict args, vm_daddr_t addr, u16 value) {
+vio_writew_aligned(struct vio_args *__restrict args, pos_t addr, u16 value) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	assert(((uintptr_t)addr & 1) == 0);
 	IF_WW(f_word, { (*func)(args, addr, value); return; })
@@ -956,7 +956,7 @@ vio_writew_aligned(struct vio_args *__restrict args, vm_daddr_t addr, u16 value)
 
 PUBLIC NONNULL((1)) void KCALL
 vio_writel(struct vio_args *__restrict args,
-           vm_daddr_t addr, u32 value) {
+           pos_t addr, u32 value) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	if (((uintptr_t)addr & 3) == 0) {
 		IF_WW(f_dword, { (*func)(args, addr, value); return; })
@@ -1088,7 +1088,7 @@ vio_writel(struct vio_args *__restrict args,
 
 PUBLIC NONNULL((1)) void KCALL
 vio_writel_aligned(struct vio_args *__restrict args,
-                   vm_daddr_t addr, u32 value) {
+                   pos_t addr, u32 value) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	assert(((uintptr_t)addr & 3) == 0);
 	IF_WW(f_dword, { (*func)(args, addr, value); return; })
@@ -1143,7 +1143,7 @@ vio_writel_aligned(struct vio_args *__restrict args,
 #ifdef CONFIG_VIO_HAS_QWORD
 PUBLIC NONNULL((1)) void KCALL
 vio_writeq(struct vio_args *__restrict args,
-           vm_daddr_t addr, u64 value) {
+           pos_t addr, u64 value) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	if (((uintptr_t)addr & 7) == 0) {
 		IF_WW(f_qword, { (*func)(args, addr, value); return; })
@@ -1277,7 +1277,7 @@ vio_writeq(struct vio_args *__restrict args,
 }
 PUBLIC NONNULL((1)) void KCALL
 vio_writeq_aligned(struct vio_args *__restrict args,
-                   vm_daddr_t addr, u64 value) {
+                   pos_t addr, u64 value) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	assert(((uintptr_t)addr & 7) == 0);
 	IF_WW(f_qword, { (*func)(args, addr, value); return; })
@@ -1341,7 +1341,7 @@ vio_writeq_aligned(struct vio_args *__restrict args,
 
 PUBLIC NONNULL((1)) u8 KCALL
 vio_cmpxchb(struct vio_args *__restrict args,
-            vm_daddr_t addr, u8 oldvalue, u8 newvalue, bool atomic) {
+            pos_t addr, u8 oldvalue, u8 newvalue, bool atomic) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	if (type->dtv_cmpxch.f_byte)
 		return (*type->dtv_cmpxch.f_byte)(args, addr, oldvalue, newvalue, atomic);
@@ -1405,7 +1405,7 @@ vio_cmpxchb(struct vio_args *__restrict args,
 
 PUBLIC NONNULL((1)) u16 KCALL
 vio_cmpxchw(struct vio_args *__restrict args,
-            vm_daddr_t addr, u16 oldvalue, u16 newvalue, bool atomic) {
+            pos_t addr, u16 oldvalue, u16 newvalue, bool atomic) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	if (type->dtv_cmpxch.f_word && ((uintptr_t)addr & 1) == 0)
 		return (*type->dtv_cmpxch.f_word)(args, addr, oldvalue, newvalue, atomic);
@@ -1456,7 +1456,7 @@ vio_cmpxchw(struct vio_args *__restrict args,
 
 PUBLIC NONNULL((1)) u32 KCALL
 vio_cmpxchl(struct vio_args *__restrict args,
-            vm_daddr_t addr, u32 oldvalue, u32 newvalue, bool atomic) {
+            pos_t addr, u32 oldvalue, u32 newvalue, bool atomic) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	if (type->dtv_cmpxch.f_dword && ((uintptr_t)addr & 3) == 0)
 		return (*type->dtv_cmpxch.f_dword)(args, addr, oldvalue, newvalue, atomic);
@@ -1494,7 +1494,7 @@ vio_cmpxchl(struct vio_args *__restrict args,
 #if defined(CONFIG_VIO_HAS_QWORD) || defined(CONFIG_VIO_HAS_QWORD_CMPXCH)
 PUBLIC NONNULL((1)) u64 KCALL
 vio_cmpxchq(struct vio_args *__restrict args,
-            vm_daddr_t addr, u64 oldvalue, u64 newvalue, bool atomic) {
+            pos_t addr, u64 oldvalue, u64 newvalue, bool atomic) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	if (type->dtv_cmpxch.f_qword && ((uintptr_t)addr & 7) == 0)
 		return (*type->dtv_cmpxch.f_qword)(args, addr, oldvalue, newvalue, atomic);
@@ -1525,7 +1525,7 @@ vio_cmpxchq(struct vio_args *__restrict args,
 #ifdef CONFIG_VIO_HAS_INT128_CMPXCH
 PUBLIC NONNULL((1)) uint128_t KCALL
 vio_cmpxch128(struct vio_args *__restrict args,
-              vm_daddr_t addr, uint128_t oldvalue,
+              pos_t addr, uint128_t oldvalue,
               uint128_t newvalue, bool atomic) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	if (type->dtv_cmpxch.f_int128 && ((uintptr_t)addr & 15) == 0)
@@ -1565,7 +1565,7 @@ vio_cmpxch128(struct vio_args *__restrict args,
 
 PUBLIC NONNULL((1)) u8 KCALL
 vio_cmpxch_or_writeb(struct vio_args *__restrict args,
-                     vm_daddr_t addr, u8 oldvalue,
+                     pos_t addr, u8 oldvalue,
                      u8 newvalue, bool atomic) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	if (type->dtv_cmpxch.f_byte)
@@ -1626,7 +1626,7 @@ vio_cmpxch_or_writeb(struct vio_args *__restrict args,
 
 PUBLIC NONNULL((1)) u16 KCALL
 vio_cmpxch_or_writew(struct vio_args *__restrict args,
-                     vm_daddr_t addr, u16 oldvalue,
+                     pos_t addr, u16 oldvalue,
                      u16 newvalue, bool atomic) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	if (type->dtv_cmpxch.f_word && ((uintptr_t)addr & 1) == 0)
@@ -1674,7 +1674,7 @@ vio_cmpxch_or_writew(struct vio_args *__restrict args,
 
 PUBLIC NONNULL((1)) u32 KCALL
 vio_cmpxch_or_writel(struct vio_args *__restrict args,
-                     vm_daddr_t addr, u32 oldvalue,
+                     pos_t addr, u32 oldvalue,
                      u32 newvalue, bool atomic) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	if (type->dtv_cmpxch.f_dword && ((uintptr_t)addr & 3) == 0)
@@ -1709,7 +1709,7 @@ vio_cmpxch_or_writel(struct vio_args *__restrict args,
 #ifdef CONFIG_VIO_HAS_QWORD
 PUBLIC NONNULL((1)) u64 KCALL
 vio_cmpxch_or_writeq(struct vio_args *__restrict args,
-                     vm_daddr_t addr, u64 oldvalue,
+                     pos_t addr, u64 oldvalue,
                      u64 newvalue, bool atomic) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	if (type->dtv_cmpxch.f_qword && ((uintptr_t)addr & 7) == 0)
@@ -1727,164 +1727,164 @@ vio_cmpxch_or_writeq(struct vio_args *__restrict args,
 /* Copy memory to/from VIO */
 PUBLIC NONNULL((1)) void KCALL
 vio_copyfromvio(struct vio_args *__restrict args,
-                USER CHECKED void *dst,
-                vm_daddr_t src,
+                pos_t offset,
+                USER CHECKED void *buf,
                 size_t num_bytes)
 		THROWS(E_SEGFAULT, ...) {
 	if (!num_bytes)
 		return;
-	if (src & 1) {
-		u8 temp = vio_readb_aligned(args, src);
-		*(u8 *)dst = temp;
-		dst = (byte_t *)dst + 1;
+	if (offset & 1) {
+		u8 temp = vio_readb_aligned(args, offset);
+		*(u8 *)buf = temp;
+		buf = (byte_t *)buf + 1;
 		--num_bytes;
-		++src;
+		++offset;
 	}
-	if ((src & 2) && num_bytes >= 2) {
-		u16 temp = vio_readw_aligned(args, src);
-		UNALIGNED_SET16((u16 *)dst, temp);
-		dst = (byte_t *)dst + 2;
+	if ((offset & 2) && num_bytes >= 2) {
+		u16 temp = vio_readw_aligned(args, offset);
+		UNALIGNED_SET16((u16 *)buf, temp);
+		buf = (byte_t *)buf + 2;
 		num_bytes -= 2;
-		src += 2;
+		offset += 2;
 	}
 #ifdef CONFIG_VIO_HAS_QWORD
-	if ((src & 4) && num_bytes >= 4) {
-		u32 temp = vio_readl_aligned(args, src);
-		UNALIGNED_SET32((u32 *)dst, temp);
-		dst = (byte_t *)dst + 4;
+	if ((offset & 4) && num_bytes >= 4) {
+		u32 temp = vio_readl_aligned(args, offset);
+		UNALIGNED_SET32((u32 *)buf, temp);
+		buf = (byte_t *)buf + 4;
 		num_bytes -= 4;
-		src += 4;
+		offset += 4;
 	}
 	while (num_bytes >= 8) {
-		u64 temp = vio_readq_aligned(args, src);
-		UNALIGNED_SET64((u64 *)dst, temp);
-		dst = (byte_t *)dst + 8;
+		u64 temp = vio_readq_aligned(args, offset);
+		UNALIGNED_SET64((u64 *)buf, temp);
+		buf = (byte_t *)buf + 8;
 		num_bytes -= 8;
-		src += 8;
+		offset += 8;
 	}
 	if (num_bytes >= 4) {
-		u32 temp = vio_readl_aligned(args, src);
-		UNALIGNED_SET32((u32 *)dst, temp);
-		dst = (byte_t *)dst + 4;
+		u32 temp = vio_readl_aligned(args, offset);
+		UNALIGNED_SET32((u32 *)buf, temp);
+		buf = (byte_t *)buf + 4;
 		num_bytes -= 4;
-		src += 4;
+		offset += 4;
 	}
 #else /* CONFIG_VIO_HAS_QWORD */
 	while (num_bytes >= 4) {
-		u32 temp = vio_readl_aligned(args, src);
-		UNALIGNED_SET32((u32 *)dst, temp);
-		dst = (byte_t *)dst + 4;
+		u32 temp = vio_readl_aligned(args, offset);
+		UNALIGNED_SET32((u32 *)buf, temp);
+		buf = (byte_t *)buf + 4;
 		num_bytes -= 4;
-		src += 4;
+		offset += 4;
 	}
 #endif /* !CONFIG_VIO_HAS_QWORD */
 	assert(num_bytes <= 3);
 	if (num_bytes >= 2) {
-		u16 temp = vio_readw_aligned(args, src);
-		UNALIGNED_SET16((u16 *)dst, temp);
-		dst = (byte_t *)dst + 2;
+		u16 temp = vio_readw_aligned(args, offset);
+		UNALIGNED_SET16((u16 *)buf, temp);
+		buf = (byte_t *)buf + 2;
 		num_bytes -= 2;
-		src += 2;
+		offset += 2;
 	}
 	if (num_bytes) {
-		u8 temp = vio_readb_aligned(args, src);
-		*(u8 *)dst = temp;
+		u8 temp = vio_readb_aligned(args, offset);
+		*(u8 *)buf = temp;
 	}
 }
 
 PUBLIC NONNULL((1)) void KCALL
 vio_copytovio(struct vio_args *__restrict args,
-              vm_daddr_t dst,
-              USER CHECKED void const *src,
+              pos_t offset,
+              USER CHECKED void const *buf,
               size_t num_bytes)
 		THROWS(E_SEGFAULT, ...) {
 	if (!num_bytes)
 		return;
-	if (dst & 1) {
-		u8 temp = *(u8 *)src;
-		vio_writeb_aligned(args, dst, temp);
-		src = (byte_t *)src + 1;
+	if (offset & 1) {
+		u8 temp = *(u8 *)buf;
+		vio_writeb_aligned(args, offset, temp);
+		buf = (byte_t *)buf + 1;
 		--num_bytes;
-		++dst;
+		++offset;
 	}
-	if ((dst & 2) && num_bytes >= 2) {
-		u16 temp = UNALIGNED_GET16((u16 *)src);
-		vio_writew_aligned(args, dst, temp);
-		src = (byte_t *)src + 2;
+	if ((offset & 2) && num_bytes >= 2) {
+		u16 temp = UNALIGNED_GET16((u16 *)buf);
+		vio_writew_aligned(args, offset, temp);
+		buf = (byte_t *)buf + 2;
 		num_bytes -= 2;
-		dst += 2;
+		offset += 2;
 	}
 #ifdef CONFIG_VIO_HAS_QWORD
-	if ((dst & 4) && num_bytes >= 4) {
-		u32 temp = UNALIGNED_GET32((u32 *)src);
-		vio_writel_aligned(args, dst, temp);
-		src = (byte_t *)src + 4;
+	if ((offset & 4) && num_bytes >= 4) {
+		u32 temp = UNALIGNED_GET32((u32 *)buf);
+		vio_writel_aligned(args, offset, temp);
+		buf = (byte_t *)buf + 4;
 		num_bytes -= 4;
-		dst += 4;
+		offset += 4;
 	}
 	while (num_bytes >= 8) {
-		u64 temp = UNALIGNED_GET64((u64 *)src);
-		vio_writeq_aligned(args, dst, temp);
-		src = (byte_t *)src + 8;
+		u64 temp = UNALIGNED_GET64((u64 *)buf);
+		vio_writeq_aligned(args, offset, temp);
+		buf = (byte_t *)buf + 8;
 		num_bytes -= 8;
-		dst += 8;
+		offset += 8;
 	}
 	if (num_bytes >= 4) {
-		u32 temp = UNALIGNED_GET32((u32 *)src);
-		vio_writel_aligned(args, dst, temp);
-		src = (byte_t *)src + 4;
+		u32 temp = UNALIGNED_GET32((u32 *)buf);
+		vio_writel_aligned(args, offset, temp);
+		buf = (byte_t *)buf + 4;
 		num_bytes -= 4;
-		dst += 4;
+		offset += 4;
 	}
 #else /* CONFIG_VIO_HAS_QWORD */
 	while (num_bytes >= 4) {
-		u32 temp = UNALIGNED_GET32((u32 *)src);
-		vio_writel_aligned(args, dst, temp);
-		src = (byte_t *)src + 4;
+		u32 temp = UNALIGNED_GET32((u32 *)buf);
+		vio_writel_aligned(args, offset, temp);
+		buf = (byte_t *)buf + 4;
 		num_bytes -= 4;
-		dst += 4;
+		offset += 4;
 	}
 #endif /* !CONFIG_VIO_HAS_QWORD */
 	assert(num_bytes <= 3);
 	if (num_bytes >= 2) {
-		u16 temp = UNALIGNED_GET16((u16 *)src);
-		vio_writew_aligned(args, dst, temp);
-		src = (byte_t *)src + 2;
+		u16 temp = UNALIGNED_GET16((u16 *)buf);
+		vio_writew_aligned(args, offset, temp);
+		buf = (byte_t *)buf + 2;
 		num_bytes -= 2;
-		dst += 2;
+		offset += 2;
 	}
 	if (num_bytes) {
-		u8 temp = *(u8 *)src;
-		vio_writeb_aligned(args, dst, temp);
+		u8 temp = *(u8 *)buf;
+		vio_writeb_aligned(args, offset, temp);
 	}
 }
 
 PUBLIC NONNULL((1)) void KCALL
 vio_memset(struct vio_args *__restrict args,
-           vm_daddr_t dst,
+           pos_t offset,
            int byte,
            size_t num_bytes)
 		THROWS(E_SEGFAULT, ...) {
 	if (!num_bytes)
 		return;
-	if (dst & 1) {
-		vio_writeb_aligned(args, dst, (u8)byte);
+	if (offset & 1) {
+		vio_writeb_aligned(args, offset, (u8)byte);
 		--num_bytes;
-		++dst;
+		++offset;
 	}
-	if ((dst & 2) && num_bytes >= 2) {
+	if ((offset & 2) && num_bytes >= 2) {
 		u16 temp = (u16)byte | (u16)byte << 8;
-		vio_writew_aligned(args, dst, temp);
+		vio_writew_aligned(args, offset, temp);
 		num_bytes -= 2;
-		dst += 2;
+		offset += 2;
 	}
 #ifdef CONFIG_VIO_HAS_QWORD
-	if ((dst & 4) && num_bytes >= 4) {
+	if ((offset & 4) && num_bytes >= 4) {
 		u32 temp = (u32)byte | (u32)byte << 8 |
 		           (u32)byte << 16 | (u32)byte << 24;
-		vio_writel_aligned(args, dst, temp);
+		vio_writel_aligned(args, offset, temp);
 		num_bytes -= 4;
-		dst += 4;
+		offset += 4;
 	}
 	if (num_bytes >= 8) {
 		u64 temp = (u64)byte | (u64)byte << 8 |
@@ -1892,38 +1892,38 @@ vio_memset(struct vio_args *__restrict args,
 		           (u64)byte << 32 | (u64)byte << 40 |
 		           (u64)byte << 48 | (u64)byte << 56;
 		while (num_bytes >= 8) {
-			vio_writeq_aligned(args, dst, temp);
+			vio_writeq_aligned(args, offset, temp);
 			num_bytes -= 8;
-			dst += 8;
+			offset += 8;
 		}
 	}
 	if (num_bytes >= 4) {
 		u32 temp = (u32)byte | (u32)byte << 8 |
 		           (u32)byte << 16 | (u32)byte << 24;
-		vio_writel_aligned(args, dst, temp);
+		vio_writel_aligned(args, offset, temp);
 		num_bytes -= 4;
-		dst += 4;
+		offset += 4;
 	}
 #else /* CONFIG_VIO_HAS_QWORD */
 	if (num_bytes >= 4) {
 		u32 temp = (u32)byte | (u32)byte << 8 |
 		           (u32)byte << 16 | (u32)byte << 24;
 		while (num_bytes >= 4) {
-			vio_writel_aligned(args, dst, temp);
+			vio_writel_aligned(args, offset, temp);
 			num_bytes -= 4;
-			dst += 4;
+			offset += 4;
 		}
 	}
 #endif /* !CONFIG_VIO_HAS_QWORD */
 	assert(num_bytes <= 3);
 	if (num_bytes >= 2) {
 		u16 temp = (u16)byte | (u16)byte << 8;
-		vio_writew_aligned(args, dst, temp);
+		vio_writew_aligned(args, offset, temp);
 		num_bytes -= 2;
-		dst += 2;
+		offset += 2;
 	}
 	if (num_bytes) {
-		vio_writeb_aligned(args, dst, (u8)byte);
+		vio_writeb_aligned(args, offset, (u8)byte);
 	}
 }
 

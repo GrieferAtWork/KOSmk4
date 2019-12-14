@@ -48,10 +48,6 @@
 
 DECL_BEGIN
 
-#ifndef VM_VPAGE_MAX
-#define VM_VPAGE_MAX       __VM_VPAGE_MAX /* DEPRECATED; REMOVE ME */
-#define VM_PPAGE_MAX       __VM_PPAGE_MAX /* DEPRECATED; REMOVE ME */
-#endif /* !VM_VPAGE_MAX */
 #ifndef VM_PAGE2ADDR
 #define VM_PAGE2ADDR(page) __VM_PAGE2ADDR(page) /* DEPRECATED; REMOVE ME */
 #define VM_ADDR2PAGE(addr) __VM_ADDR2PAGE(addr) /* DEPRECATED; REMOVE ME */
@@ -757,6 +753,7 @@ NOTHROW(KCALL npagedir_unwrite_p)(PAGEDIR_P_SELFTYPE self,
 #ifndef __PAGEDIR_COMPAT_VIRTPAGE2ADDR
 #ifdef __INTELLISENSE__
 void *__PAGEDIR_COMPAT_VIRTPAGE2ADDR(vm_vpage_t virt_page);
+void *__PAGEDIR_COMPAT_VIRTPAGE2ADDR(uintptr_t virt_page); /* __ARCH_PAGEID_TYPE */
 vm_phys_t __PAGEDIR_COMPAT_PHYSPAGE2PHYS(pageptr_t phys_page);
 size_t __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(size_t num_pages);
 #else /* __INTELLISENSE__ */

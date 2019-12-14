@@ -138,7 +138,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			      futex_op & LFUTEX_FLAGMASK);
 		}
 		validate_user(uaddr, 1);
-		f = vm_getfutex_existing(THIS_VM, (vm_virt_t)uaddr);
+		f = vm_getfutex_existing(THIS_VM, uaddr);
 		result = 0;
 		if (f) {
 			if (count == (size_t)-1) {
@@ -205,13 +205,13 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			      futex_op & LFUTEX_FLAGMASK);
 		}
 		validate_user(uaddr, 1);
-		f = vm_getfutex_existing(THIS_VM, (vm_virt_t)uaddr);
+		f = vm_getfutex_existing(THIS_VM, uaddr);
 		result = 0;
 		if (!f) {
 			APPLY_MASK();
 			/* Do a second check for the futex, thus ensuring
 			 * that we're interlocked with `APPLY_MASK()' */
-			f = vm_getfutex_existing(THIS_VM, (vm_virt_t)uaddr);
+			f = vm_getfutex_existing(THIS_VM, uaddr);
 			if unlikely(f) {
 				result = sig_broadcast(&f->f_signal);
 				decref_unlikely(f);
@@ -262,7 +262,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 
 	case LFUTEX_WAIT: {
 		validate_user(uaddr, 1);
-		f = vm_getfutex(THIS_VM, (vm_virt_t)uaddr);
+		f = vm_getfutex(THIS_VM, uaddr);
 		FINALLY_DECREF(f);
 		task_connect(&f->f_signal);
 		/* NOTE: The futex `f' must be kept alive during the wait,
@@ -293,7 +293,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			 * is-waiting bit and sleep until it becomes available) */
 			newval = oldval | LFUTEX_WAIT_LOCK_WAITERS;
 			{
-				f = vm_getfutex(THIS_VM, (vm_virt_t)uaddr);
+				f = vm_getfutex(THIS_VM, uaddr);
 				FINALLY_DECREF(f);
 				task_connect(&f->f_signal);
 				if (!ATOMIC_CMPXCH_WEAK(*uaddr, oldval, newval)) {
@@ -313,7 +313,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 		validate(uaddr, sizeof(*uaddr));                           \
 		/* Connect to the futex first, thus performing the         \
 		 * should-wait checked in a manner that is interlocked. */ \
-		f = vm_getfutex(THIS_VM, (vm_virt_t)uaddr);                \
+		f = vm_getfutex(THIS_VM, uaddr);                           \
 		FINALLY_DECREF(f);                                         \
 		task_connect(&f->f_signal);                                \
 		/* Read the futex value. */                                \

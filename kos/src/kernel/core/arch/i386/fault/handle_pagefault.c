@@ -283,7 +283,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 			has_changed = ecode & X86_PAGEFAULT_ECODE_WRITING;
 			/* Load the affected page into the core. */
 			ppage = vm_datapart_loadpage(hinted_node->vn_part,
-			                             (size_t)(page - VM_NODE_MIN(hinted_node)),
+			                             (size_t)(page - vm_node_getminpageid(hinted_node)),
 			                             &has_changed);
 			/* Map the affected page, overriding the mapping hint that originally got us here. */
 			prot = hinted_node->vn_prot & (PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
@@ -313,7 +313,7 @@ again_lookup_node_already_locked:
 			assert(sync_reading(effective_vm));
 			assert(!sync_writing(effective_vm));
 			/* Lookup the node associated with the given page. */
-			node = vm_getnodeof(effective_vm, page);
+			node = vm_getnodeofpageid(effective_vm, page);
 			if unlikely(!node) {
 				sync_endread(effective_vm);
 				if (page >= (vm_vpage_t)KERNEL_BASE_PAGE &&
@@ -323,7 +323,7 @@ again_lookup_node_already_locked:
 					 * the calling thread.
 					 * In this case, we must re-attempt the lookup within kernel-space. */
 					sync_read(&vm_kernel);
-					node = vm_getnodeof(&vm_kernel, page);
+					node = vm_getnodeofpageid(&vm_kernel, page);
 					if (node && !node->vn_part) {
 						sync_endread(&vm_kernel);
 						/* Reservation node. */
@@ -419,8 +419,8 @@ do_handle_iob_node_access:
 					 * To prevent the possibility of repeating the access to the IOB vector during
 					 * this check (in case a bad jump caused IP to end up within the IOB vector),
 					 * also make sure that `pc' isn't apart of said vector! */
-					if (pc >= (uintptr_t)VM_NODE_MINADDR(node) &&
-					    pc <= (uintptr_t)VM_NODE_MAXADDR(node))
+					if (pc >= (uintptr_t)vm_node_getmin(node) &&
+					    pc <= (uintptr_t)vm_node_getmax(node))
 						goto pop_connections_and_throw_segfault;
 					/* If we got here cause of an I/O instruction, just return to the caller and
 					 * have them attempt the access once again, hopefully without accessing  */
@@ -435,8 +435,8 @@ do_handle_iob_node_access:
 			}
 			assert(!wasdestroyed(node->vn_part));
 			part         = incref(node->vn_part);
-			vpage_offset = (size_t)(page - VM_NODE_MIN(node));
-			assert(VM_NODE_SIZE(node) == vm_datapart_numvpages(part));
+			vpage_offset = (size_t)(page - vm_node_getminpageid(node));
+			assert(vm_node_getpagecount(node) == vm_datapart_numvpages(part));
 			has_changed = ecode & X86_PAGEFAULT_ECODE_WRITING;
 			/* Acquire a lock to the affected data part. */
 			TRY {
@@ -452,7 +452,7 @@ do_handle_iob_node_access:
 					/* VIO Emulation */
 					sync_read(part);
 					args.ma_args.va_block = incref(part->dp_block);
-					args.ma_args.va_access_partoff = ((vm_daddr_t)(vpage_offset +
+					args.ma_args.va_access_partoff = ((pos_t)(vpage_offset +
 					                                               vm_datapart_mindpage(part))
 					                                  << VM_DATABLOCK_ADDRSHIFT(args.ma_args.va_block));
 					sync_endread(part);
@@ -463,7 +463,7 @@ do_handle_iob_node_access:
 						goto pop_connections_and_throw_segfault;
 					}
 					args.ma_args.va_part            = part; /* Inherit reference */
-					args.ma_args.va_access_pageaddr = page;
+					args.ma_args.va_access_pageid = page;
 					args.ma_args.va_state           = state;
 					args.ma_oldcons                 = &con; /* Inherit */
 					/* Check for special case: call into VIO memory */
@@ -474,7 +474,7 @@ do_handle_iob_node_access:
 						}
 						/* Special case: call into VIO memory */
 						TRY {
-							vm_daddr_t vio_addr;
+							pos_t vio_addr;
 							uintptr_t callsite_eip;
 							uintptr_t sp;
 							/* Must unwind the stack to restore the IP of the VIO call-site. */
@@ -511,9 +511,9 @@ do_handle_iob_node_access:
 							}
 #endif /* !__x86_64__ */
 							/* Figure out the exact VIO address that got called. */
-							vio_addr = (vm_daddr_t)addr;
-							vio_addr -= (vm_daddr_t)args.ma_args.va_access_pageaddr * PAGESIZE;
-							vio_addr += (vm_daddr_t)args.ma_args.va_access_partoff;
+							vio_addr = (pos_t)addr;
+							vio_addr -= (pos_t)args.ma_args.va_access_pageid * PAGESIZE;
+							vio_addr += (pos_t)args.ma_args.va_access_partoff;
 							/* Invoke the VIO call operator. */
 							state = (*args.ma_args.va_type->dtv_call)(&args.ma_args,
 							                                          state,
@@ -622,8 +622,8 @@ do_unshare_cow:
 							}
 							assert(vpage_offset == 0);
 							assert(vm_datapart_numvpages(part) == 1);
-							assert(VM_NODE_START(node) == page);
-							assert(VM_NODE_SIZE(node) == 1);
+							assert(vm_node_getstartpageid(node) == page);
+							assert(vm_node_getpagecount(node) == 1);
 
 							/* Make sure that PAGE#0 of `part' has been initialized!
 							 * If it wasn't, we need to initialize it now, since
@@ -670,7 +670,7 @@ do_unshare_cow:
 								sync_endread(part);
 upgrade_and_recheck_vm_for_node:
 								sync_read(effective_vm);
-								if unlikely(vm_getnodeof(effective_vm, page) != node ||
+								if unlikely(vm_getnodeofpageid(effective_vm, page) != node ||
 								            node->vn_part != part ||
 								            (node->vn_prot & VM_PROT_SHARED)) {
 									decref_unlikely(part);
@@ -721,7 +721,7 @@ upgrade_and_recheck_vm_for_node:
 								decref_unlikely(part);
 								goto again_lookup_node_already_locked;
 							}
-							if unlikely(vm_getnodeof(effective_vm, page) != node ||
+							if unlikely(vm_getnodeofpageid(effective_vm, page) != node ||
 							            node->vn_part != part ||
 							            (node->vn_prot & VM_PROT_SHARED)) {
 								sync_downgrade(effective_vm);
@@ -780,7 +780,7 @@ upgrade_and_recheck_vm_for_node:
 
 							/* Actually map the accessed page! */
 							pagedir_mapone(page, new_ppage, prot);
-							vm_sync_endone(effective_vm, page);
+							vm_paged_sync_endone(effective_vm, page);
 
 							/* Unlink the given node from the old part's chain. */
 							LLIST_REMOVE(node, vn_link);
@@ -882,7 +882,7 @@ endread_and_decref_part_and_set_noexec:
 
 				/* Check to ensure that the mapped target hasn't changed
 				 * while we were loading the affected page into the core. */
-				if unlikely(vm_getnodeof(effective_vm, page) != node ||
+				if unlikely(vm_getnodeofpageid(effective_vm, page) != node ||
 				            node->vn_part != part) {
 					sync_endread(part);
 					decref_unlikely(part);

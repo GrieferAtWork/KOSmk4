@@ -35,7 +35,7 @@ DECL_BEGIN
 #define COMPONENT        COMPONENT2(DEFINE_VIO_NAME)
 
 PUBLIC NONNULL((1)) u8 KCALL
-FUNC(b)(struct vio_args *__restrict args, vm_daddr_t addr, u8 value, bool atomic) {
+FUNC(b)(struct vio_args *__restrict args, pos_t addr, u8 value, bool atomic) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	u8 result, new_result;
 	if (type->COMPONENT.f_byte)
@@ -47,7 +47,7 @@ FUNC(b)(struct vio_args *__restrict args, vm_daddr_t addr, u8 value, bool atomic
 }
 
 PUBLIC NONNULL((1)) u16 KCALL
-FUNC(w)(struct vio_args *__restrict args, vm_daddr_t addr, u16 value, bool atomic) {
+FUNC(w)(struct vio_args *__restrict args, pos_t addr, u16 value, bool atomic) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	u16 result, new_result;
 	if (type->COMPONENT.f_word && ((uintptr_t)addr & 1) == 0)
@@ -59,7 +59,7 @@ FUNC(w)(struct vio_args *__restrict args, vm_daddr_t addr, u16 value, bool atomi
 }
 
 PUBLIC NONNULL((1)) u32 KCALL
-FUNC(l)(struct vio_args *__restrict args, vm_daddr_t addr, u32 value, bool atomic) {
+FUNC(l)(struct vio_args *__restrict args, pos_t addr, u32 value, bool atomic) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	u32 result, new_result;
 	if (type->COMPONENT.f_dword && ((uintptr_t)addr & 3) == 0)
@@ -72,7 +72,7 @@ FUNC(l)(struct vio_args *__restrict args, vm_daddr_t addr, u32 value, bool atomi
 
 #ifdef CONFIG_VIO_HAS_QWORD
 PUBLIC NONNULL((1)) u64 KCALL
-FUNC(q)(struct vio_args *__restrict args, vm_daddr_t addr, u64 value, bool atomic) {
+FUNC(q)(struct vio_args *__restrict args, pos_t addr, u64 value, bool atomic) {
 	struct vm_datablock_type_vio const *type = args->va_type;
 	u64 result, new_result;
 	if (type->COMPONENT.f_qword && ((uintptr_t)addr & 7) == 0)

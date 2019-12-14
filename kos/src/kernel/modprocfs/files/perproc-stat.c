@@ -287,7 +287,7 @@ nofproc:
 		for (iter = v->v_byaddr; iter; iter = iter->vn_byaddr.ln_next) {
 			if (iter == &v->v_kernreserve)
 				continue;
-			vsize += VM_NODE_BYTESIZE(iter);
+			vsize += vm_node_getsize(iter);
 		}
 		sync_endread(v);
 		if (format_printf(printer, arg, "%Iu ", vsize) < 0)

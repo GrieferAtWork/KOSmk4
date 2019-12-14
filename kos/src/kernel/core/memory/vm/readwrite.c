@@ -151,45 +151,44 @@ typedef PHYS vm_phys_t  pdir_set_type_t;
 
 
 LOCAL NOBLOCK size_t
-NOTHROW(KCALL copy_kernelspace_from_vm_nopf)(KERNEL CHECKED void *dst,
-                                             struct vm *__restrict src_vm,
-                                             UNCHECKED void const *src_addr,
+NOTHROW(KCALL copy_kernelspace_from_vm_nopf)(struct vm *__restrict self,
+                                             UNCHECKED void const *addr,
+                                             KERNEL CHECKED void *buf,
                                              size_t num_bytes) {
 	size_t result;
 	/* Temporarily switch to the foreign VM */
 	/* XXX: What about TLB shootdowns happening while we do this? */
-	DEFINE_PAGEDIR_P_BEGIN(src_vm->v_pdir_phys_ptr) {
-		result = memcpy_nopf(dst, src_addr, num_bytes);
+	DEFINE_PAGEDIR_P_BEGIN(self->v_pdir_phys_ptr) {
+		result = memcpy_nopf(buf, addr, num_bytes);
 	}
 	DEFINE_PAGEDIR_P_END;
 	return result;
 }
 
 LOCAL NOBLOCK size_t
-NOTHROW(KCALL copy_kernelspace_into_vm_nopf)(struct vm *__restrict dst_vm,
-                                             UNCHECKED void *dst_addr,
-                                             KERNEL CHECKED void const *src,
+NOTHROW(KCALL copy_kernelspace_into_vm_nopf)(struct vm *__restrict self,
+                                             UNCHECKED void *addr,
+                                             KERNEL CHECKED void const *buf,
                                              size_t num_bytes) {
 	size_t result;
 	/* Temporarily switch to the foreign VM */
 	/* XXX: What about TLB shootdowns happening while we do this? */
-	DEFINE_PAGEDIR_P_BEGIN(dst_vm->v_pdir_phys_ptr) {
-		result = memcpy_nopf(dst_addr, src, num_bytes);
+	DEFINE_PAGEDIR_P_BEGIN(self->v_pdir_phys_ptr) {
+		result = memcpy_nopf(addr, buf, num_bytes);
 	}
 	DEFINE_PAGEDIR_P_END;
 	return result;
 }
 
 LOCAL NOBLOCK size_t
-NOTHROW(KCALL memset_into_vm_nopf)(struct vm *__restrict dst_vm,
-                                   UNCHECKED void *dst_addr,
-                                   int byte,
-                                   size_t num_bytes) {
+NOTHROW(KCALL memset_into_vm_nopf)(struct vm *__restrict self,
+                                   UNCHECKED void *addr,
+                                   int byte, size_t num_bytes) {
 	size_t result;
 	/* Temporarily switch to the foreign VM */
 	/* XXX: What about TLB shootdowns happening while we do this? */
-	DEFINE_PAGEDIR_P_BEGIN(dst_vm->v_pdir_phys_ptr) {
-		result = memset_nopf(dst_addr, byte, num_bytes);
+	DEFINE_PAGEDIR_P_BEGIN(self->v_pdir_phys_ptr) {
+		result = memset_nopf(addr, byte, num_bytes);
 	}
 	DEFINE_PAGEDIR_P_END;
 	return result;
@@ -228,8 +227,7 @@ direct_copy:
 		if (ARANGE_IS_KERNEL((uintptr_t)buf, (uintptr_t)buf + num_bytes)) {
 			/* Target buffer is located in kernel-space.
 			 * For this case, we can simply switch to the other VM and directly copy data. */
-			result += copy_kernelspace_from_vm_nopf(buf, self,
-			                                        addr, num_bytes);
+			result += copy_kernelspace_from_vm_nopf(self, addr, buf, num_bytes);
 		} else {
 			/* The most difficult case: copy from one userspace buffer into another. */
 			byte_t *buffer; size_t bufsize;
@@ -247,8 +245,10 @@ direct_copy:
 				transfer_size = bufsize;
 				if (transfer_size > num_bytes)
 					transfer_size = num_bytes;
-				error = copy_kernelspace_from_vm_nopf(buffer, self,
-				                                      addr, transfer_size);
+				error = copy_kernelspace_from_vm_nopf(self,
+				                                      addr,
+				                                      buffer,
+				                                      transfer_size);
 				if unlikely(error) {
 handle_transfer_error:
 					result += error;
@@ -374,25 +374,19 @@ DECL_BEGIN
 #else
 
 LOCAL void KCALL
-copy_kernelspace_from_vm(KERNEL CHECKED void *dst,
-                         struct vm *__restrict effective_vm,
-                         UNCHECKED void const *src,
-                         size_t num_bytes,
-                         bool force_accessible)
+copy_kernelspace_from_vm(struct vm *__restrict effective_vm,
+                         UNCHECKED void const *addr, KERNEL CHECKED void *buf,
+                         size_t num_bytes, bool force_accessible)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 LOCAL void KCALL
 copy_kernelspace_into_vm(struct vm *__restrict effective_vm,
-                         UNCHECKED void *dst,
-                         KERNEL CHECKED void const *src,
-                         size_t num_bytes,
-                         bool force_accessible)
+                         UNCHECKED void *addr, KERNEL CHECKED void const *buf,
+                         size_t num_bytes, bool force_accessible)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 LOCAL void KCALL
 memset_into_vm(struct vm *__restrict effective_vm,
-               UNCHECKED void *dst,
-               int byte,
-               size_t num_bytes,
-               bool force_accessible)
+               UNCHECKED void *addr, int byte,
+               size_t num_bytes, bool force_accessible)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 
 #endif
@@ -436,8 +430,10 @@ copy_from_vm:
 		if (ARANGE_IS_KERNEL((uintptr_t)buf, (uintptr_t)buf + num_bytes)) {
 			/* Target buffer is located in kernel-space.
 			 * For this case, we can simply switch to the other VM and directly copy data. */
-			copy_kernelspace_from_vm(buf, self,
-			                         addr, num_bytes,
+			copy_kernelspace_from_vm(self,
+			                         addr,
+			                         buf,
+			                         num_bytes,
 			                         force_readable_source);
 		} else {
 			/* The most difficult case: copy from one userspace buffer into another. */
@@ -456,8 +452,10 @@ copy_from_vm:
 				transfer_size = bufsize;
 				if (transfer_size > num_bytes)
 					transfer_size = num_bytes;
-				copy_kernelspace_from_vm(buffer, self,
-				                         addr, transfer_size,
+				copy_kernelspace_from_vm(self,
+				                         addr,
+				                         buffer,
+				                         transfer_size,
 				                         force_readable_source);
 				memcpy(buf, buffer, transfer_size);
 				if (transfer_size >= num_bytes)

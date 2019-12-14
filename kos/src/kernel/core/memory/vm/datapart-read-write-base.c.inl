@@ -64,7 +64,7 @@ FUNC0(vm_datapart_do_)(struct vm_datapart *__restrict self,
                        USER CHECKED void const *buf,
 #endif
                        size_t num_bytes,
-                       vm_daddr_t offset)
+                       pos_t offset)
 #ifdef DEFINE_IO_PHYS
 		THROWS(...)
 #else /* DEFINE_IO_PHYS */
@@ -89,7 +89,7 @@ FUNC0(vm_datapart_do_)(struct vm_datapart *__restrict self,
 			if (max_io > num_bytes)
 				max_io = num_bytes;
 			data_base = vm_datapart_loaddatapage(self,
-			                                     (vm_dpage_t)(offset >> VM_DATABLOCK_ADDRSHIFT(self->dp_block)),
+			                                     (datapage_t)(offset >> VM_DATABLOCK_ADDRSHIFT(self->dp_block)),
 #ifdef DEFINE_IO_READ
 			                                     false
 #else /* DEFINE_IO_READ */
@@ -172,13 +172,13 @@ PUBLIC NONNULL((1, 2)) ssize_t KCALL
 vm_datapart_read_nopf(struct vm_datapart *__restrict self,
                       USER CHECKED void *buf,
                       size_t num_bytes,
-                      vm_daddr_t offset)
+                      pos_t offset)
 #else /* DEFINE_IO_READ */
 vm_datapart_write_nopf(struct vm_datapart *__restrict self,
                        USER CHECKED void const *buf,
                        size_t num_bytes,
                        size_t split_bytes,
-                       vm_daddr_t offset)
+                       pos_t offset)
 #endif /* !DEFINE_IO_READ */
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
 #elif defined(DEFINE_IO_PHYS)
@@ -203,7 +203,7 @@ FUNC0(vm_datapart_)(struct vm_datapart *__restrict self,
 #ifdef DEFINE_IO_WRITE
                     size_t split_bytes,
 #endif /* DEFINE_IO_WRITE */
-                    vm_daddr_t offset)
+                    pos_t offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
 #else /* ... */
 /* Same as the `vm_datapart_(read|write)', however make the assumption that the
@@ -216,13 +216,13 @@ PUBLIC NONNULL((1, 2)) size_t KCALL
 vm_datapart_read_unsafe(struct vm_datapart *__restrict self,
                         void *__restrict buf,
                         size_t num_bytes,
-                        vm_daddr_t offset)
+                        pos_t offset)
 #else /* DEFINE_IO_READ */
 vm_datapart_write_unsafe(struct vm_datapart *__restrict self,
                          void const *__restrict buf,
                          size_t num_bytes,
                          size_t split_bytes,
-                         vm_daddr_t offset)
+                         pos_t offset)
 #endif /* !DEFINE_IO_READ */
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...)
 #endif /* !... */
@@ -287,14 +287,14 @@ vm_datapart_write_unsafe(struct vm_datapart *__restrict self,
 do_has_part:
 #endif /* !DEFINE_IO_READ */
 	TRY {
-		if unlikely(offset >= (vm_daddr_t)vm_datapart_numbytes(self))
+		if unlikely(offset >= (pos_t)vm_datapart_numbytes(self))
 			result = 0;
 		else {
 #ifdef DEFINE_IO_NOPF
 			size_t transferr_error;
 #endif /* DEFINE_IO_NOPF */
 #if __SIZEOF_SIZE_T__ >= 8
-			result = (size_t)((vm_daddr_t)vm_datapart_numbytes(self) - offset);
+			result = (size_t)((pos_t)vm_datapart_numbytes(self) - offset);
 #else /* __SIZEOF_SIZE_T__ >= 8 */
 			if (OVERFLOW_USUB(vm_datapart_numbytes(self), (u64)offset, &result))
 				result = (size_t)-1; /* Handle overflows */

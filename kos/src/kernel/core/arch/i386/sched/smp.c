@@ -131,8 +131,8 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 		/* Default configuration. */
 		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_start = (pageptr_t)(UINT32_C(0xfee00000) / PAGESIZE);
 		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_size  = 1;
-		x86_vm_part_lapic.dp_tree.a_vmin                = (vm_dpage_t)0;
-		x86_vm_part_lapic.dp_tree.a_vmax                = (vm_dpage_t)0;
+		x86_vm_part_lapic.dp_tree.a_vmin                = (datapage_t)0;
+		x86_vm_part_lapic.dp_tree.a_vmax                = (datapage_t)0;
 		FORCPU(&_bootcpu, _thiscpu_x86_lapicid)                  = 0xff; /* Read later using the LAPIC */
 		FORCPU(&_bootcpu, _thiscpu_x86_lapicversion)             = fps->mp_defcfg > 4 ? APICVER_INTEGRATED : APICVER_82489DX;
 		return;
@@ -152,13 +152,13 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 		_x86_lapicbase = (byte_t *)(uintptr_t)(table->tab_lapicaddr & PAGEMASK);
 		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_start = (pageptr_t)(table->tab_lapicaddr / PAGESIZE);
 		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_size  = 2;
-		x86_vm_part_lapic.dp_tree.a_vmin                = (vm_dpage_t)0;
-		x86_vm_part_lapic.dp_tree.a_vmax                = (vm_dpage_t)1;
+		x86_vm_part_lapic.dp_tree.a_vmin                = (datapage_t)0;
+		x86_vm_part_lapic.dp_tree.a_vmax                = (datapage_t)1;
 	} else {
 		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_start = (pageptr_t)(table->tab_lapicaddr / PAGESIZE);
 		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_size  = 1;
-		x86_vm_part_lapic.dp_tree.a_vmin                = (vm_dpage_t)0;
-		x86_vm_part_lapic.dp_tree.a_vmax                = (vm_dpage_t)0;
+		x86_vm_part_lapic.dp_tree.a_vmin                = (datapage_t)0;
+		x86_vm_part_lapic.dp_tree.a_vmax                = (datapage_t)0;
 	}
 	/* Process configuration entries. */
 	{

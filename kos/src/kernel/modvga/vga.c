@@ -1609,11 +1609,11 @@ VGA_Ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
 
 PRIVATE NONNULL((1)) REF struct vm_datablock *KCALL
 VGA_MMap(struct character_device *__restrict self,
-         vm_vpage64_t *__restrict pminpage,
-         vm_vpage64_t *__restrict pmaxpage) THROWS(...) {
+         pos_t *__restrict pminoffset,
+         pos_t *__restrict pnumbytes) THROWS(...) {
 	VGA *me = (VGA *)self;
-	*pminpage = (vm_vpage64_t)VM_ADDR2PAGE(me->v_vram_addr);
-	*pmaxpage = (vm_vpage64_t)VM_ADDR2PAGE(me->v_vram_addr + me->v_vram_size + PAGESIZE - 1) - 1;
+	*pminoffset = (pos_t)me->v_vram_addr;
+	*pnumbytes  = (pos_t)me->v_vram_size;
 	return incref(&vm_datablock_physical);
 }
 
@@ -1706,7 +1706,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 			/* Register the VGA adapter device. */
 			character_device_register_auto(vga_device);
 		} EXCEPT {
-			nvm_unmap(&vm_kernel, vram_base, CEIL_ALIGN(vga_device->v_vram_size, PAGESIZE));
+			vm_unmap(&vm_kernel, vram_base, CEIL_ALIGN(vga_device->v_vram_size, PAGESIZE));
 			RETHROW();
 		}
 	} EXCEPT {

@@ -152,29 +152,27 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree, mf_data));
 #ifdef CONFIG_DEBUG_HEAP
 PRIVATE void
 NOTHROW(KCALL debug_pat_loadpart)(struct vm_datablock *__restrict UNUSED(self),
-                                  vm_dpage_t UNUSED(start),
+                                  datapage_t UNUSED(start),
                                   vm_phys_t buffer, size_t num_data_pages) {
 	pagedir_pushval_t backup;
-	vm_vpage_t tramp;
-	pageptr_t phys = VM_ADDR2PAGE(buffer);
+	byte_t *tramp;
+	HEAP_ASSERT((buffer & PAGEMASK) == 0);
 	HEAP_ASSERT(num_data_pages != 0);
-	tramp  = THIS_TRAMPOLINE_PAGE;
-	backup = pagedir_push_mapone(tramp, phys,
-	                             PAGEDIR_MAP_FREAD |
-	                             PAGEDIR_MAP_FWRITE);
+	tramp  = THIS_TRAMPOLINE_BASE;
+	backup = npagedir_push_mapone(tramp, buffer,
+	                              PAGEDIR_MAP_FREAD |
+	                              PAGEDIR_MAP_FWRITE);
 	for (;;) {
-		pagedir_syncone(tramp);
-		memsetl((void *)VM_PAGE2ADDR(tramp),
-		        DEBUGHEAP_FRESH_MEMORY,
-		        PAGESIZE / 4);
+		npagedir_syncone(tramp);
+		memsetl(tramp, DEBUGHEAP_FRESH_MEMORY, PAGESIZE / 4);
 		if (!--num_data_pages)
 			break;
-		++phys;
-		pagedir_mapone(tramp, phys,
-		               PAGEDIR_MAP_FREAD |
-		               PAGEDIR_MAP_FWRITE);
+		buffer += PAGESIZE;
+		npagedir_mapone(tramp, buffer,
+		                PAGEDIR_MAP_FREAD |
+		                PAGEDIR_MAP_FWRITE);
 	}
-	pagedir_pop_mapone(tramp, backup);
+	npagedir_pop_mapone(tramp, backup);
 }
 
 PUBLIC struct vm_datablock_type vm_datablock_debugheap_type = {
@@ -216,11 +214,11 @@ PUBLIC struct heap kernel_heaps[__GFP_HEAPCOUNT] = {
 	/* Define the controller structures for the builtin kernel heaps. */
 	/* [GFP_NORMAL] = */ HEAP_INIT(DEFAULT_OVERALLOC,
 	                               DEFAULT_FREETHRESH,
-	                               (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_HEAP),
+	                               HINT_GETADDR(KERNEL_VMHINT_HEAP),
 	                               HINT_GETMODE(KERNEL_VMHINT_HEAP)),
 	/* [GFP_LOCKED] = */ HEAP_INIT(DEFAULT_OVERALLOC,
 	                               DEFAULT_FREETHRESH,
-	                               (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_LHEAP),
+	                               HINT_GETADDR(KERNEL_VMHINT_LHEAP),
 	                               HINT_GETMODE(KERNEL_VMHINT_LHEAP)),
 };
 
@@ -238,16 +236,15 @@ NOTHROW(KCALL find_modified_address)(byte_t *start, u32 pattern, size_t num_byte
 	while (num_bytes > 4) {
 		if __untraced(!((uintptr_t)start & PAGEMASK)) {
 			for (;;) {
-				vm_vpage_t page = VM_ADDR2PAGE((vm_virt_t)start);
 #if 0
 #elif defined(CONFIG_HAVE_PAGEDIR_CHANGED)
 				/* If supported by the host, speed this up using page directory dirty bits. */
-				if (pagedir_haschanged(page)) {
-					pagedir_unsetchanged(page);
+				if (npagedir_haschanged(start)) {
+					npagedir_unsetchanged(start);
 					break;
 				}
 #else
-				if (pagedir_ismapped(page))
+				if (npagedir_ismapped(start))
 					break;
 #endif
 				if (num_bytes <= PAGESIZE)
@@ -399,7 +396,7 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 			if unlikely_untraced(faulting_address) {
 				u8 *fault_start = (u8 *)faulting_address - 32;
 				PREEMPTION_DISABLE();
-				if __untraced(!pagedir_ismapped(VM_ADDR2PAGE((vm_virt_t)fault_start)))
+				if __untraced(!npagedir_ismapped(fault_start))
 					fault_start = (u8 *)FLOOR_ALIGN((uintptr_t)faulting_address, PAGESIZE);
 				if __untraced(fault_start < (u8 *)iter->mf_data)
 					fault_start = (u8 *)iter->mf_data;
@@ -457,7 +454,7 @@ NOTHROW(KCALL reset_heap_data)(byte_t *ptr, u32 pattern, size_t num_bytes) {
 		/* Only reset pages that have been allocated.
 		 * This optimization goes hand-in-hand with `heap_validate_all()'
 		 * not checking pages that haven't been allocated. */
-		if (pagedir_ismapped(VM_ADDR2PAGE((vm_virt_t)ptr)))
+		if (npagedir_ismapped(ptr))
 			memsetl(ptr, pattern, PAGESIZE / 4);
 		num_bytes -= PAGESIZE;
 		ptr += PAGESIZE;
@@ -893,70 +890,73 @@ load_new_slot:
 		/*  When a slot grows larger than `self->h_freethresh' and
 		 * `GFP_NOMMAP' isn't set, free as much of it as possible by
 		 *  passing its memory to `core_page_free()' */
-		vm_vpage_t free_minpage = (vm_vpage_t)CEILDIV(MFREE_MIN(new_slot), PAGESIZE);
-		vm_vpage_t free_endpage = (vm_vpage_t)FLOORDIV(MFREE_END(new_slot), PAGESIZE);
-		if (free_minpage < free_endpage) {
-			vm_virt_t hkeep, tkeep;
-			vm_vpage_t old_hint;
+		void *free_minaddr = (void *)CEIL_ALIGN(MFREE_MIN(new_slot), PAGESIZE);
+		void *free_endaddr = (void *)FLOOR_ALIGN(MFREE_END(new_slot), PAGESIZE);
+		if (free_minaddr < free_endaddr) {
+			void *old_hint, *hkeep, *tkeep;
 			size_t hkeep_size, tkeep_size;
 			/* Figure out the header and tail which we can't release. */
-			hkeep      = (vm_virt_t)MFREE_MIN(new_slot);
-			tkeep      = VM_PAGE2ADDR(free_endpage);
-			hkeep_size = (size_t)(VM_PAGE2ADDR(free_minpage) - hkeep);
-			HEAP_ASSERTF(MFREE_END(new_slot) >= tkeep,
+			hkeep      = (void *)MFREE_MIN(new_slot);
+			tkeep      = free_endaddr;
+			hkeep_size = (size_t)((byte_t *)free_minaddr - (byte_t *)hkeep);
+			HEAP_ASSERTF((byte_t *)MFREE_END(new_slot) >= (byte_t *)tkeep,
 			             "new_slot = %p...%p\n"
 			             "tkeep    = %p\n",
 			             MFREE_MIN(new_slot),
-			             MFREE_MAX(new_slot), tkeep);
-			tkeep_size = (size_t)(MFREE_END(new_slot) - tkeep);
+			             MFREE_MAX(new_slot),
+			             tkeep);
+			tkeep_size = (size_t)((byte_t *)MFREE_END(new_slot) - (byte_t *)tkeep);
 			flags &= ~GFP_CALLOC;
 			flags |= new_slot->mf_flags;
 			/* Ensure that the keep-segments are large enough. */
 			if unlikely(hkeep_size && hkeep_size < HEAP_MINSIZE) {
 				hkeep_size += PAGESIZE;
-				++free_minpage;
+				free_minaddr = (byte_t *)free_minaddr + PAGESIZE;
 			}
 			if unlikely(tkeep_size && tkeep_size < HEAP_MINSIZE) {
 				tkeep_size += PAGESIZE;
-				tkeep -= PAGESIZE;
-				--free_endpage;
+				tkeep = (byte_t *)tkeep - PAGESIZE;
+				free_endaddr = (byte_t *)free_endaddr - PAGESIZE;
 			}
-			if unlikely(free_minpage >= free_endpage)
+			if unlikely(free_minaddr >= free_endaddr)
 				goto do_load_new_slot;
 			sync_endwrite(&self->h_lock);
 
 			/* Release this slot to the VM. */
 			if (hkeep_size) {
 				if (flags & GFP_CALLOC)
-					memset((void *)hkeep, 0, SIZEOF_MFREE);
+					memset(hkeep, 0, SIZEOF_MFREE);
 #ifdef CONFIG_DEBUG_HEAP
 				else {
-					mempatl((void *)hkeep, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
+					mempatl(hkeep, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
 				}
 #endif /* CONFIG_DEBUG_HEAP */
 			}
 			if (tkeep_size) {
 				if (flags & GFP_CALLOC)
-					memset((void *)tkeep, 0, SIZEOF_MFREE);
+					memset(tkeep, 0, SIZEOF_MFREE);
 #ifdef CONFIG_DEBUG_HEAP
 				else {
-					mempatl((void *)tkeep, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
+					mempatl(tkeep, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
 				}
 #endif /* CONFIG_DEBUG_HEAP */
 			}
 			PRINTK_SYSTEM_ALLOCATION("Release kernel heap: [%p+%#Ix head] %p...%p [%p+%#Ix tail]\n",
-			                         hkeep, hkeep_size, VM_PAGE2ADDR(free_minpage), VM_PAGE2ADDR(free_endpage) - 1,
+			                         hkeep, hkeep_size,
+			                         (byte_t *)free_minaddr,
+			                         (byte_t *)free_endaddr - 1,
 			                         tkeep, tkeep_size);
 
 			/* Free unused header and tail data. */
 			if (hkeep_size)
-				heap_free_raw(self, (void *)hkeep, hkeep_size, flags);
+				heap_free_raw(self, hkeep, hkeep_size, flags);
 			if (tkeep_size)
-				heap_free_raw(self, (void *)tkeep, tkeep_size, flags);
+				heap_free_raw(self, tkeep, tkeep_size, flags);
 
 			/* Release full pages back to the system. */
-			vm_unmap_kernel_ram(free_minpage,
-			                    (size_t)(free_endpage - free_minpage),
+			vm_unmap_kernel_ram(free_minaddr,
+			                    (size_t)((byte_t *)free_endaddr -
+			                             (byte_t *)free_minaddr),
 			                    !!(flags & GFP_CALLOC));
 
 			/* Reset the heap hint in a way that will keep our heap
@@ -964,14 +964,14 @@ load_new_slot:
 			 * crawling across the entire address space. */
 			if (self->h_hintmode & VM_GETFREE_BELOW) {
 				do {
-					if ((old_hint = ATOMIC_READ(self->h_hintpage)) >= free_endpage)
+					if ((old_hint = ATOMIC_READ(self->h_hintaddr)) >= free_endaddr)
 						break;
-				} while (!ATOMIC_CMPXCH_WEAK(self->h_hintpage, old_hint, free_endpage));
+				} while (!ATOMIC_CMPXCH_WEAK(self->h_hintaddr, old_hint, free_endaddr));
 			} else {
 				do {
-					if ((old_hint = ATOMIC_READ(self->h_hintpage)) <= free_minpage)
+					if ((old_hint = ATOMIC_READ(self->h_hintaddr)) <= free_minaddr)
 						break;
-				} while (!ATOMIC_CMPXCH_WEAK(self->h_hintpage, old_hint, free_minpage));
+				} while (!ATOMIC_CMPXCH_WEAK(self->h_hintaddr, old_hint, free_minaddr));
 			}
 			heap_validate_all_after_free();
 			return false;
@@ -1074,7 +1074,7 @@ again:
 		return 0;
 	for (; iter != end; ++iter) {
 		struct mfree *chain;
-		vm_vpage_t free_min, free_end;
+		void *free_minaddr, *free_endaddr;
 		size_t head_keep, tail_keep;
 		void *tail_pointer;
 		u8 free_flags;
@@ -1089,14 +1089,14 @@ again:
 		if (!chain)
 			continue;
 		/* Figure out how much we can actually return to the core. */
-		free_min = (vm_vpage_t)CEILDIV(MFREE_BEGIN(chain), PAGESIZE);
-		free_end = (vm_vpage_t)FLOORDIV(MFREE_END(chain), PAGESIZE);
-		if unlikely(free_min >= free_end)
+		free_minaddr = (void *)CEIL_ALIGN(MFREE_BEGIN(chain), PAGESIZE);
+		free_endaddr = (void *)FLOOR_ALIGN(MFREE_END(chain), PAGESIZE);
+		if unlikely(free_minaddr >= free_endaddr)
 			continue; /* Even though the range is large enough, due to alignment it doesn't span a whole page */
 		/* Figure out how much memory must be kept in the
 		 * head and tail portions of the free data block. */
-		head_keep = (size_t)(VM_PAGE2ADDR(free_min) - MFREE_BEGIN(chain));
-		tail_keep = (size_t)(MFREE_END(chain) - VM_PAGE2ADDR(free_end));
+		head_keep = (size_t)((byte_t *)free_minaddr - (byte_t *)MFREE_BEGIN(chain));
+		tail_keep = (size_t)((byte_t *)MFREE_END(chain) - (byte_t *)free_endaddr);
 		/* Make sure that data blocks that cannot be freed are still
 		 * large enough to remain representable as their own blocks. */
 		if (head_keep && head_keep < HEAP_MINSIZE)
@@ -1127,12 +1127,13 @@ again:
 			heap_free_raw(self, tail_pointer, tail_keep, free_flags);
 
 		/* Release full pages in-between back to the core. */
-		vm_unmap_kernel_ram(free_min,
-		                    (size_t)(free_end - free_min),
+		vm_unmap_kernel_ram(free_minaddr,
+		                    (size_t)((byte_t *)free_endaddr -
+		                             (byte_t *)free_minaddr),
 		                    !!(free_flags & GFP_CALLOC));
 
 		/* Keep track of how much has already been released to the core. */
-		result += (size_t)((free_end - free_min) * PAGESIZE);
+		result += (size_t)((byte_t *)free_endaddr - (byte_t *)free_minaddr);
 		goto again;
 	}
 	sync_endwrite(&self->h_lock);
@@ -1171,7 +1172,7 @@ NOTHROW(KCALL heap_free_overallocation)(struct heap *__restrict self,
 			    (uintptr_t)high_page_addr + PAGESIZE) {
 				/* The high-page is entirely contained in the overallocation
 				 * NOTE: Technically, we don't need to initialize the first
-				 *      `((uintptr_t)overallocation_base + SIZEOF_MFREE - 1) & (PAGESIZE-1)'
+				 *      `((uintptr_t)overallocation_base + SIZEOF_MFREE - 1) & PAGEMASK'
 				 *       bytes of the high page (those will be used by `heap_free_raw'),
 				 *       but calculating that amount is more complicated at this point,
 				 *       and so insignificant in the end that it's simpler to always just
@@ -1327,14 +1328,14 @@ PUBLIC NOBLOCK void
 NOTHROW(KCALL vpage_free_untraced)(VIRT /*page-aligned*/ void *base,
                                    size_t num_pages) {
 	assertf(IS_ALIGNED((uintptr_t)base, PAGESIZE), "base = %p", base);
-	vm_unmap_kernel_ram(VM_ADDR2PAGE((vm_virt_t)base), num_pages, false);
+	vm_unmap_kernel_ram(base, num_pages * PAGESIZE, false);
 }
 
 PUBLIC NOBLOCK void
 NOTHROW(KCALL vpage_ffree_untraced)(VIRT /*page-aligned*/ void *base,
                                     size_t num_pages, gfp_t flags) {
 	assertf(IS_ALIGNED((uintptr_t)base, PAGESIZE), "base = %p", base);
-	vm_unmap_kernel_ram(VM_ADDR2PAGE((vm_virt_t)base), num_pages, !!(flags & GFP_CALLOC));
+	vm_unmap_kernel_ram(base, num_pages * PAGESIZE, !!(flags & GFP_CALLOC));
 }
 
 

@@ -78,8 +78,8 @@ INTDEF pertask_clone_t __kernel_pertask_clone_end[];
 INTDEF byte_t __kernel_pertask_start[];
 INTDEF byte_t __kernel_pertask_size[];
 
-DATDEF ATTR_PERTASK struct vm_node _this_kernel_stacknode ASMNAME("this_kernel_stacknode");
-DATDEF ATTR_PERTASK struct vm_datapart _this_kernel_stackpart ASMNAME("this_kernel_stackpart");
+DATDEF ATTR_PERTASK struct vm_node this_kernel_stacknode_ ASMNAME("this_kernel_stacknode");
+DATDEF ATTR_PERTASK struct vm_datapart this_kernel_stackpart_ ASMNAME("this_kernel_stackpart");
 
 #define HINT_ADDR(x, y) x
 #define HINT_MODE(x, y) y
@@ -147,74 +147,77 @@ x86_task_clone(struct icpustate const *__restrict init_state,
 		memcpy(result, __kernel_pertask_start, (size_t)__kernel_pertask_size);
 		result->t_heapsz = resptr.hp_siz;
 		result->t_self   = result;
-		incref(&vm_datablock_anonymous); /* FORTASK(result,_this_kernel_stacknode).vn_block */
-		incref(&vm_datablock_anonymous); /* FORTASK(result,_this_kernel_stackpart).dp_block */
+		incref(&vm_datablock_anonymous); /* FORTASK(result,this_kernel_stacknode_).vn_block */
+		incref(&vm_datablock_anonymous); /* FORTASK(result,this_kernel_stackpart_).dp_block */
 #define REL(x) ((x) = (__typeof__(x))(uintptr_t)((byte_t *)(x) + (uintptr_t)result))
-		REL(FORTASK(result, _this_kernel_stacknode).vn_part);
-		REL(FORTASK(result, _this_kernel_stacknode).vn_link.ln_pself);
-		REL(FORTASK(result, _this_kernel_stackpart).dp_srefs);
+		REL(FORTASK(result, this_kernel_stacknode_).vn_part);
+		REL(FORTASK(result, this_kernel_stacknode_).vn_link.ln_pself);
+		REL(FORTASK(result, this_kernel_stackpart_).dp_srefs);
 #undef REL
 		TRY {
-			vm_datapart_do_allocram(&FORTASK(result, _this_kernel_stackpart));
+			vm_datapart_do_allocram(&FORTASK(result, this_kernel_stackpart_));
 			TRY {
 				uintptr_t cache_version;
-				vm_vpage_t stack_page;
-				vm_vpage_t trampoline_page;
+				void *stack_addr;
+				void *trampoline_addr;
 				cache_version = 0;
 again_lock_vm:
 				sync_write(&vm_kernel.v_treelock);
-				stack_page = vm_getfree(&vm_kernel,
-				                        (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_KERNSTACK),
-				                        CEILDIV(KERNEL_STACKSIZE, PAGESIZE), 1,
+				stack_addr = vm_getfree(&vm_kernel,
+				                        HINT_GETADDR(KERNEL_VMHINT_KERNSTACK),
+				                        CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE),
+				                        PAGESIZE,
 				                        HINT_GETMODE(KERNEL_VMHINT_KERNSTACK));
-				if unlikely(stack_page == VM_GETFREE_ERROR) {
+				if unlikely(stack_addr == VM_GETFREE_ERROR) {
 					sync_endwrite(&vm_kernel.v_treelock);
 					if (system_clearcaches_s(&cache_version))
 						goto again_lock_vm;
 					THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
-					      (uintptr_t)CEILDIV(KERNEL_STACKSIZE, PAGESIZE));
+					      CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE));
 				}
-				FORTASK(result, _this_kernel_stacknode).vn_node.a_vmin = stack_page;
-				FORTASK(result, _this_kernel_stacknode).vn_node.a_vmax = stack_page + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1;
+				FORTASK(result, this_kernel_stacknode_).vn_node.a_vmin = PAGEID_ENCODE((byte_t *)stack_addr);
+				FORTASK(result, this_kernel_stacknode_).vn_node.a_vmax = PAGEID_ENCODE((byte_t *)stack_addr + CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE) - 1);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-				if unlikely(!pagedir_prepare_map(stack_page, CEILDIV(KERNEL_STACKSIZE, PAGESIZE))) {
+				if unlikely(!npagedir_prepare_map(stack_addr, CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE))) {
 					sync_endwrite(&vm_kernel.v_treelock);
-					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, (uintptr_t)1);
+					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, CEIL_ALIGN(KERNEL_STACKSIZE, PAGESIZE));
 				}
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-				vm_node_insert(&FORTASK(result, _this_kernel_stacknode));
+				vm_node_insert(&FORTASK(result, this_kernel_stacknode_));
 
 				/* Map the trampoline node. */
-				trampoline_page = vm_getfree(&vm_kernel,
-				                             (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_TRAMPOLINE), 1, 1,
+				trampoline_addr = vm_getfree(&vm_kernel,
+				                             HINT_GETADDR(KERNEL_VMHINT_TRAMPOLINE),
+				                             PAGESIZE, PAGESIZE,
 				                             HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
-				if unlikely(trampoline_page == VM_GETFREE_ERROR) {
-					vm_node_remove(&vm_kernel, stack_page);
+				if unlikely(trampoline_addr == VM_GETFREE_ERROR) {
+					vm_node_remove(&vm_kernel, stack_addr);
 					sync_endwrite(&vm_kernel.v_treelock);
 					if (system_clearcaches_s(&cache_version))
 						goto again_lock_vm;
-					THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, (uintptr_t)1);
+					THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, PAGESIZE);
 				}
-				FORTASK(result, this_trampoline_node).vn_node.a_vmin = trampoline_page;
-				FORTASK(result, this_trampoline_node).vn_node.a_vmax = trampoline_page;
+				FORTASK(result, this_trampoline_node).vn_node.a_vmin = PAGEID_ENCODE(trampoline_addr);
+				FORTASK(result, this_trampoline_node).vn_node.a_vmax = PAGEID_ENCODE(trampoline_addr);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-				if unlikely(!pagedir_prepare_mapone(trampoline_page))
-					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, (uintptr_t)1);
+				if unlikely(!npagedir_prepare_mapone(trampoline_addr))
+					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 				/* Load the trampoline node into the kernel VM. */
 				vm_node_insert(&FORTASK(result, this_trampoline_node));
 
 				/* Map the stack into memory */
-				vm_datapart_map_ram(&FORTASK(result, _this_kernel_stackpart), stack_page,
+				vm_datapart_map_ram(&FORTASK(result, this_kernel_stackpart_),
+				                    stack_addr,
 				                    PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 				sync_endwrite(&vm_kernel.v_treelock);
 			} EXCEPT {
-				vm_datapart_do_ccfreeram(&FORTASK(result, _this_kernel_stackpart));
+				vm_datapart_do_ccfreeram(&FORTASK(result, this_kernel_stackpart_));
 				RETHROW();
 			}
 		} EXCEPT {
-			decref_nokill(&vm_datablock_anonymous); /* FORTASK(result,_this_kernel_stackpart).dp_block */
-			decref_nokill(&vm_datablock_anonymous); /* FORTASK(result,_this_kernel_stacknode).vn_block */
+			decref_nokill(&vm_datablock_anonymous); /* FORTASK(result,this_kernel_stackpart_).dp_block */
+			decref_nokill(&vm_datablock_anonymous); /* FORTASK(result,this_kernel_stacknode_).vn_block */
 			heap_free(&kernel_locked_heap,
 			          resptr.hp_ptr,
 			          resptr.hp_siz,
@@ -230,7 +233,7 @@ again_lock_vm:
 		struct scpustate *state;
 		void *kernel_stack;
 		/* Initial the task's initial CPU state. */
-		kernel_stack = (void *)VM_NODE_ENDADDR(&FORTASK(result, this_kernel_stacknode));
+		kernel_stack = (void *)vm_node_getend(&FORTASK(result, this_kernel_stacknode));
 		state        = icpustate_to_scpustate_p(init_state, kernel_stack);
 
 		/* Reset iopl() for the child thread/process */

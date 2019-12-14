@@ -38,26 +38,26 @@ DECL_BEGIN
 #define DATA_PAGES_PER_V_PAGE  (1 << DATAPAGE_SHIFT)
 
 #if __SIZEOF_POINTER__ >= 8 && (DATA_PAGESIZE % 8) == 0
-#define CLEAR_DATA_PAGE(base,n)   memsetq((void *)(base),0,(n) * (DATA_PAGESIZE / 8))
+#define CLEAR_DATA_PAGE(base, n) memsetq(base, 0, (n) * (DATA_PAGESIZE / 8))
 #elif __SIZEOF_POINTER__ >= 4 && (DATA_PAGESIZE % 4) == 0
-#define CLEAR_DATA_PAGE(base,n)   memsetl((void *)(base),0,(n) * (DATA_PAGESIZE / 4))
+#define CLEAR_DATA_PAGE(base, n) memsetl(base, 0, (n) * (DATA_PAGESIZE / 4))
 #else
-#define CLEAR_DATA_PAGE(base,n)   memset((void *)(base),0,(n) * DATA_PAGESIZE)
+#define CLEAR_DATA_PAGE(base, n) memset(base, 0, (n)*DATA_PAGESIZE)
 #endif
 
 
 PRIVATE NONNULL((1)) void KCALL
 PP_CAT2(anon_zero_loadpart, DATAPAGE_SHIFT)(struct vm_datablock *__restrict UNUSED(self),
-                                            vm_dpage_t UNUSED(start),
+                                            datapage_t UNUSED(start),
                                             vm_phys_t buffer,
                                             size_t num_pages) {
 	pagedir_pushval_t backup;
-	vm_vpage_t tramp;
-	pageptr_t phys = VM_ADDR2PAGE(buffer);
+	byte_t *tramp;
+	vm_phys_t phys = buffer & ~PAGEMASK;
 	assert(num_pages != 0);
 	for (;;) {
 		/* Skip all pages that are already zero-initialized. */
-		if (page_iszero(phys)) {
+		if (page_iszero(addr2page(phys))) {
 #if DATA_PAGES_PER_V_PAGE == 1
 			if (!num_pages)
 				break;
@@ -67,23 +67,23 @@ PP_CAT2(anon_zero_loadpart, DATAPAGE_SHIFT)(struct vm_datablock *__restrict UNUS
 				break;
 			num_pages -= DATA_PAGES_PER_V_PAGE;
 #endif /* DATA_PAGES_PER_V_PAGE != 1 */
-			++phys;
+			phys += PAGESIZE;
 			continue;
 		}
-		tramp  = THIS_TRAMPOLINE_PAGE;
-		backup = pagedir_push_mapone(tramp, phys,
-		                             PAGEDIR_MAP_FREAD |
-		                             PAGEDIR_MAP_FWRITE);
+		tramp  = THIS_TRAMPOLINE_BASE;
+		backup = npagedir_push_mapone(tramp, phys,
+		                              PAGEDIR_MAP_FREAD |
+		                              PAGEDIR_MAP_FWRITE);
 		for (;;) {
-			pagedir_syncone(tramp);
+			npagedir_syncone(tramp);
 #if DATA_PAGES_PER_V_PAGE == 1
-			CLEAR_DATA_PAGE(VM_PAGE2ADDR(tramp), 1);
+			CLEAR_DATA_PAGE(tramp, 1);
 			/* Skip all pages that are already zero-initialized. */
 			do {
 				if (!--num_pages)
 					goto done;
-				++phys;
-			} while (page_iszero(phys));
+				phys += PAGESIZE;
+			} while (page_iszero(addr2page(phys)));
 #else /* DATA_PAGES_PER_V_PAGE == 1 */
 			{
 				size_t off_pages, max_pages;
@@ -91,29 +91,28 @@ PP_CAT2(anon_zero_loadpart, DATAPAGE_SHIFT)(struct vm_datablock *__restrict UNUS
 				max_pages = DATA_PAGES_PER_V_PAGE - off_pages;
 				if (max_pages > num_pages)
 					max_pages = num_pages;
-				CLEAR_DATA_PAGE(VM_PAGE2ADDR(tramp) +
-				                (off_pages << DATA_PAGESHIFT),
+				CLEAR_DATA_PAGE(tramp + (off_pages << DATA_PAGESHIFT),
 				                max_pages);
 				if (max_pages >= num_pages)
 					goto done;
 				num_pages -= max_pages;
 				buffer = 0;
-				++phys;
+				phys += max_pages * PAGESIZE;
 			}
 			/* Skip pages that have already been zero-initialized. */
-			while (page_iszero(phys)) {
+			while (page_iszero(addr2page(phys))) {
 				if (num_pages <= DATA_PAGES_PER_V_PAGE)
 					goto done;
 				num_pages -= DATA_PAGES_PER_V_PAGE;
-				++phys;
+				phys += PAGESIZE;
 			}
 #endif /* DATA_PAGES_PER_V_PAGE != 1 */
-			pagedir_mapone(tramp, phys,
-			               PAGEDIR_MAP_FREAD |
-			               PAGEDIR_MAP_FWRITE);
+			npagedir_mapone(tramp, phys,
+			                PAGEDIR_MAP_FREAD |
+			                PAGEDIR_MAP_FWRITE);
 		}
 done:
-		pagedir_pop_mapone(tramp, backup);
+		npagedir_pop_mapone(tramp, backup);
 		break;
 	}
 }

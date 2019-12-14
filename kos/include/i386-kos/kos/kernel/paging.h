@@ -116,26 +116,26 @@
 /* TODO: Adjust these hints to work better in a 64-bit address space */
 #else /* __x86_64__ */
 #endif /* !__x86_64__ */
-#define KERNEL_VMHINT_HEAP         (0xe1200, VM_GETFREE_ABOVE) /* Hint for the regular kernel heap. */
-#define KERNEL_VMHINT_LHEAP        (0xe1a00, VM_GETFREE_ABOVE) /* Hint for the locked kernel heap. */
-#define KERNEL_VMHINT_SLAB         (0xe8000, VM_GETFREE_BELOW) /* Hint for the slab allocator. */
-#define KERNEL_VMHINT_DHEAP        (0xe0000, VM_GETFREE_BELOW) /* Hint for the kernel heap used for allocating debug controllers. */
-#define KERNEL_VMHINT_COREPAGE     ((void *)0xf0000000, VM_GETFREE_BELOW) /* Hint for core-base pointers. */
-#define KERNEL_VMHINT_PHYSINFO     (0xf0000, VM_GETFREE_BELOW) /* Hint for physical memory information/controller data. */
-#define KERNEL_VMHINT_LAPIC        (0xf0000, VM_GETFREE_BELOW) /* Hint for the LAPIC (if present). */
-#define KERNEL_VMHINT_TRAMPOLINE   (0xeffe0, VM_GETFREE_BELOW) /* Hint for per-task trampoline pages. */
-#define KERNEL_VMHINT_KERNSTACK    (0xeb000, VM_GETFREE_BELOW) /* Hint for kernel stacks. */
-#define KERNEL_VMHINT_ALTIDLE      (0xeeeee, VM_GETFREE_ABOVE) /* Hint for secondary CPU control structures. */
-#define KERNEL_VMHINT_IDLESTACK    (0xf0000, VM_GETFREE_BELOW) /* Hint for per-cpu IDLE stacks. */
-#define KERNEL_VMHINT_DFSTACK      (0xf0000, VM_GETFREE_BELOW) /* Hint for per-cpu #DF stacks. */
-#define KERNEL_VMHINT_DRIVER       ((void *)0xd0000000, VM_GETFREE_ABOVE) /* Hint for the custom kernel-space drivers. */
-#define KERNEL_VMHINT_DEVICE       ((void *)0xf0000000, VM_GETFREE_BELOW) /* Hint for device memory mappings. */
-#define KERNEL_VMHINT_TEMPORARY    ((void *)0xf0000000, VM_GETFREE_ABOVE) /* Hint for temporary memory mappings. */
-#define KERNEL_VMHINT_USER_HEAP    (0x10000, VM_GETFREE_ABOVE | VM_GETFREE_ASLR) /* Hint for user-space heap memory. */
-#define KERNEL_VMHINT_USER_STACK   (0x80000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space stack memory. */
-#define KERNEL_VMHINT_USER_LIBRARY (0x0e000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space dynamic libraries. */
-#define KERNEL_VMHINT_USER_DYNLINK (0xbf100, VM_GETFREE_ASLR)  /* Hint for user-space dynamic linkers. */
-#define KERNEL_VMHINT_USER_PEB     ((void *)0xc0000000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space process environment blocks. */
+#define KERNEL_VMHINT_HEAP         (__CCAST(void *)0xe1200000, VM_GETFREE_ABOVE) /* Hint for the regular kernel heap. */
+#define KERNEL_VMHINT_LHEAP        (__CCAST(void *)0xe1a00000, VM_GETFREE_ABOVE) /* Hint for the locked kernel heap. */
+#define KERNEL_VMHINT_SLAB         (__CCAST(void *)0xe8000000, VM_GETFREE_BELOW) /* Hint for the slab allocator. */
+#define KERNEL_VMHINT_DHEAP        (__CCAST(void *)0xe0000000, VM_GETFREE_BELOW) /* Hint for the kernel heap used for allocating debug controllers. */
+#define KERNEL_VMHINT_COREPAGE     (__CCAST(void *)0xf0000000, VM_GETFREE_BELOW) /* Hint for core-base pointers. */
+#define KERNEL_VMHINT_PHYSINFO     (__CCAST(void *)0xf0000000, VM_GETFREE_BELOW) /* Hint for physical memory information/controller data. */
+#define KERNEL_VMHINT_LAPIC        (__CCAST(void *)0xf0000000, VM_GETFREE_BELOW) /* Hint for the LAPIC (if present). */
+#define KERNEL_VMHINT_TRAMPOLINE   (__CCAST(void *)0xeffe0000, VM_GETFREE_BELOW) /* Hint for per-task trampoline pages. */
+#define KERNEL_VMHINT_KERNSTACK    (__CCAST(void *)0xeb000000, VM_GETFREE_BELOW) /* Hint for kernel stacks. */
+#define KERNEL_VMHINT_ALTCORE      (__CCAST(void *)0xeeeee000, VM_GETFREE_ABOVE) /* Hint for secondary CPU control structures. */
+#define KERNEL_VMHINT_IDLESTACK    (__CCAST(void *)0xf0000000, VM_GETFREE_BELOW) /* Hint for per-cpu IDLE stacks. */
+#define KERNEL_VMHINT_DFSTACK      (__CCAST(void *)0xf0000000, VM_GETFREE_BELOW) /* Hint for per-cpu #DF stacks. */
+#define KERNEL_VMHINT_DRIVER       (__CCAST(void *)0xd0000000, VM_GETFREE_ABOVE) /* Hint for the custom kernel-space drivers. */
+#define KERNEL_VMHINT_DEVICE       (__CCAST(void *)0xf0000000, VM_GETFREE_BELOW) /* Hint for device memory mappings. */
+#define KERNEL_VMHINT_TEMPORARY    (__CCAST(void *)0xf0000000, VM_GETFREE_ABOVE) /* Hint for temporary memory mappings. */
+#define KERNEL_VMHINT_USER_HEAP    (__CCAST(void *)0x10000000, VM_GETFREE_ABOVE | VM_GETFREE_ASLR) /* Hint for user-space heap memory. */
+#define KERNEL_VMHINT_USER_STACK   (__CCAST(void *)0x80000000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space stack memory. */
+#define KERNEL_VMHINT_USER_LIBRARY (__CCAST(void *)0x0e000000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space dynamic libraries. */
+#define KERNEL_VMHINT_USER_DYNLINK (__CCAST(void *)0xbf100000, VM_GETFREE_ABOVE | VM_GETFREE_ASLR)  /* Hint for user-space dynamic linkers. */
+#define KERNEL_VMHINT_USER_PEB     (__CCAST(void *)0xc0000000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space process environment blocks. */
 
 
 
@@ -164,10 +164,6 @@
 #define KERNEL_DEBUG_STACKSIZE (KERNEL_STACKSIZE * 4)
 #endif /* !KERNEL_DEBUG_STACKSIZE */
 
-#ifndef VM_VPAGE_MAX
-#define VM_VPAGE_MAX       __VM_VPAGE_MAX
-#define VM_PPAGE_MAX       __VM_PPAGE_MAX
-#endif /* !VM_VPAGE_MAX */
 #ifndef VM_PAGE2ADDR
 #define VM_PAGE2ADDR(page) __VM_PAGE2ADDR(page)
 #define VM_ADDR2PAGE(addr) __VM_ADDR2PAGE(addr)

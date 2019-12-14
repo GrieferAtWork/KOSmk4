@@ -90,10 +90,10 @@ inode_file_pwrite_with_write(struct inode *__restrict self, vm_phys_t src,
 			                                 (byte_t *)tempbase + ((ptrdiff_t)src & PAGEMASK),
 			                                 num_bytes, file_position, aio);
 		} EXCEPT {
-			nvm_unmap(&vm_kernel, tempbase, aligned_num_bytes);
+			vm_unmap(&vm_kernel, tempbase, aligned_num_bytes);
 			RETHROW();
 		}
-		nvm_unmap(&vm_kernel, tempbase, aligned_num_bytes);
+		vm_unmap(&vm_kernel, tempbase, aligned_num_bytes);
 	}
 }
 

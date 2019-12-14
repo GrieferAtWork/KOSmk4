@@ -102,18 +102,18 @@ PUBLIC
 #endif
 #ifdef DEFINE_IO_ASYNC
 #if defined(DEFINE_IO_VECTOR) || defined(DEFINE_IO_KERNEL)
-    NONNULL((1, 2, 5))
+	NONNULL((1, 2, 5))
 #else /* DEFINE_IO_VECTOR */
-    NONNULL((1, 5))
+	NONNULL((1, 5))
 #endif /* !DEFINE_IO_VECTOR */
 #else /* DEFINE_IO_ASYNC */
 #if defined(DEFINE_IO_VECTOR) || defined(DEFINE_IO_KERNEL)
-    NONNULL((1, 2))
+	NONNULL((1, 2))
 #else /* DEFINE_IO_VECTOR */
-    NONNULL((1))
+	NONNULL((1))
 #endif /* !DEFINE_IO_VECTOR */
 #endif /* !DEFINE_IO_ASYNC */
-    void
+	void
 #ifdef DEFINE_IO_ASYNC
 NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
@@ -260,13 +260,13 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 			assert(args.va_type);
 			args.va_block           = self;
 			args.va_part            = NULL;
-			args.va_access_pageaddr = 0;
+			args.va_access_pageid = 0;
 			args.va_access_partoff  = 0;
 			args.va_state           = NULL;
 			/* Invoke VIO callbacks as vio_read() operations. */
 #if defined(DEFINE_IO_PHYS) && !defined(DEFINE_IO_VECTOR)
 #ifdef DEFINE_IO_READ
-			vio_copyfromvio_to_phys(&args, buf, file_position, num_bytes);
+			vio_copyfromvio_to_phys(&args, file_position, buf, num_bytes);
 #else /* DEFINE_IO_READ */
 			vio_copytovio_from_phys(&args, file_position, buf, num_bytes);
 #endif /* !DEFINE_IO_READ */
@@ -284,27 +284,15 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 						ent.ab_size = num_bytes;
 #ifdef DEFINE_IO_PHYS
 #ifdef DEFINE_IO_READ
-					vio_copyfromvio_to_phys(&args,
-					                        ent.ab_base,
-					                        file_position,
-					                        ent.ab_size);
+					vio_copyfromvio_to_phys(&args, file_position, ent.ab_base, ent.ab_size);
 #else /* DEFINE_IO_READ */
-					vio_copytovio_from_phys(&args,
-					                        ent.ab_base,
-					                        file_position,
-					                        ent.ab_size);
+					vio_copytovio_from_phys(&args, file_position, ent.ab_base, ent.ab_size);
 #endif /* !DEFINE_IO_READ */
 #else /* DEFINE_IO_PHYS */
 #ifdef DEFINE_IO_READ
-					vio_copyfromvio(&args,
-					                (byte_t *)ent.ab_base,
-					                file_position,
-					                ent.ab_size);
+					vio_copyfromvio(&args, file_position, (byte_t *)ent.ab_base, ent.ab_size);
 #else /* DEFINE_IO_READ */
-					vio_copytovio(&args,
-					              file_position,
-					              (byte_t *)ent.ab_base,
-					              ent.ab_size);
+					vio_copytovio(&args, file_position, (byte_t *)ent.ab_base, ent.ab_size);
 #endif /* !DEFINE_IO_READ */
 #endif /* !DEFINE_IO_PHYS */
 					if (ent.ab_size >= num_bytes)
@@ -314,7 +302,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 				}
 			}
 #elif defined(DEFINE_IO_READ)
-			vio_copyfromvio(&args, buf, file_position, num_bytes);
+			vio_copyfromvio(&args, file_position, buf, num_bytes);
 #else
 			vio_copytovio(&args, file_position, buf, num_bytes);
 #endif
@@ -333,7 +321,7 @@ load_next_part:
 		                               (vm_vpage64_t)(file_position / PAGESIZE),
 		                               CEILDIV(num_bytes + (file_position % PAGESIZE), PAGESIZE));
 		TRY {
-			vm_daddr_t part_offset = (vm_daddr_t)(file_position - vm_datapart_startbyte(part));
+			pos_t part_offset = (pos_t)(file_position - vm_datapart_startbyte(part));
 #ifdef DEFINE_IO_VECTOR
 #ifdef DEFINE_IO_PHYS
 			struct aio_pbuffer view;
@@ -475,18 +463,18 @@ do_inode_flexread_phys(struct inode *__restrict self,
 
 #ifdef DEFINE_IO_ASYNC
 #ifdef DEFINE_IO_VECTOR
-    NONNULL((1, 2, 5))
+	NONNULL((1, 2, 5))
 #else /* DEFINE_IO_VECTOR */
-    NONNULL((1, 5))
+	NONNULL((1, 5))
 #endif /* !DEFINE_IO_VECTOR */
 #else /* DEFINE_IO_ASYNC */
 #ifdef DEFINE_IO_VECTOR
-    NONNULL((1, 2))
+	NONNULL((1, 2))
 #else /* DEFINE_IO_VECTOR */
-    NONNULL((1))
+	NONNULL((1))
 #endif /* !DEFINE_IO_VECTOR */
 #endif /* !DEFINE_IO_ASYNC */
-    size_t
+	size_t
 #ifdef DEFINE_IO_ASYNC
 NOTHROW(KCALL FUNC2_READ(inode_))(struct inode *__restrict self,
 #if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)

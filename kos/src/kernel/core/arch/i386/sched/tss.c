@@ -185,25 +185,24 @@ DEFINE_DBG_BZERO(&PERCPU(thiscpu_x86_tssdf).t_ecx, sizeof(thiscpu_x86_tssdf.t_ec
 
 PUBLIC NOBLOCK WUNUSED ATTR_PURE size_t
 NOTHROW(KCALL get_stack_avail)(void) {
-	vm_virt_t start, end;
-	vm_virt_t sp = (vm_virt_t)__rdsp();
+	void *start, *end, *sp = __rdsp();
 #ifndef __x86_64__
 	struct cpu *c = THIS_CPU;
 	if unlikely(FORCPU(c, thiscpu_x86_tssdf.t_ecx)) {
 		struct vm_node const *node;
 		node  = &FORCPU(c, thiscpu_x86_dfstacknode);
-		start = VM_NODE_STARTADDR(node);
-		end   = VM_NODE_ENDADDR(node);
+		start = vm_node_getstart(node);
+		end   = vm_node_getend(node);
 	} else
 #endif /* !__x86_64__ */
 	{
 		struct vm_node const *node;
 		node  = THIS_KERNEL_STACK;
-		start = VM_NODE_STARTADDR(node);
-		end   = VM_NODE_ENDADDR(node);
+		start = vm_node_getstart(node);
+		end   = vm_node_getend(node);
 	}
 	if likely(sp >= start && sp < end)
-		return (size_t)(sp - start);
+		return (size_t)((byte_t *)sp - (byte_t *)start);
 	/* FIXME: This is an ugly work-around for when the kernel is
 	 *        running from a custom stack, such as the debugger stack,
 	 *        or the stack defined by the GDB server driver. */
@@ -212,25 +211,24 @@ NOTHROW(KCALL get_stack_avail)(void) {
 
 PUBLIC NOBLOCK WUNUSED ATTR_PURE size_t
 NOTHROW(KCALL get_stack_inuse)(void) {
-	vm_virt_t start, end;
-	vm_virt_t sp = (vm_virt_t)__rdsp();
+	void *start, *end, *sp = __rdsp();
 #ifndef __x86_64__
 	struct cpu *c = THIS_CPU;
 	if unlikely(FORCPU(c, thiscpu_x86_tssdf.t_ecx)) {
 		struct vm_node const *node;
 		node  = &FORCPU(c, thiscpu_x86_dfstacknode);
-		start = VM_NODE_STARTADDR(node);
-		end   = VM_NODE_ENDADDR(node);
+		start = vm_node_getstart(node);
+		end   = vm_node_getend(node);
 	} else
 #endif /* !__x86_64__ */
 	{
 		struct vm_node const *node;
 		node  = THIS_KERNEL_STACK;
-		start = VM_NODE_STARTADDR(node);
-		end   = VM_NODE_ENDADDR(node);
+		start = vm_node_getstart(node);
+		end   = vm_node_getend(node);
 	}
 	if likely(sp >= start && sp < end)
-		return (size_t)(end - sp);
+		return (size_t)((byte_t *)end - (byte_t *)sp);
 	return 0;
 }
 
@@ -239,25 +237,25 @@ NOTHROW(KCALL get_stack_inuse)(void) {
  * @param: pend:  Filled with a pointer one past the highest-address byte that is still apart of the stack. */
 PUBLIC NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp) {
-	vm_virt_t start, end;
+	void *start, *end;
 #ifndef __x86_64__
 	struct cpu *c = THIS_CPU;
 	if unlikely(FORCPU(c, thiscpu_x86_tssdf.t_ecx)) {
 		struct vm_node const *node;
 		node  = &FORCPU(c, thiscpu_x86_dfstacknode);
-		start = VM_NODE_STARTADDR(node);
-		end   = VM_NODE_ENDADDR(node);
+		start = vm_node_getstart(node);
+		end   = vm_node_getend(node);
 	} else
 #endif /* !__x86_64__ */
 	{
 		struct vm_node const *node;
 		node  = THIS_KERNEL_STACK;
-		start = VM_NODE_STARTADDR(node);
-		end   = VM_NODE_ENDADDR(node);
+		start = vm_node_getstart(node);
+		end   = vm_node_getend(node);
 	}
-	if likely((vm_virt_t)sp >= start && (vm_virt_t)sp < end) {
-		*pbase = (void *)start;
-		*pend  = (void *)end;
+	if likely(sp >= start && sp < end) {
+		*pbase = start;
+		*pend  = end;
 		return;
 	}
 	/* FIXME: This is an ugly work-around for when the kernel is
@@ -269,7 +267,7 @@ NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp) {
 
 PUBLIC NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL get_current_stack)(void **pbase, void **pend) {
-	get_stack_for(pbase, pend, (void *)__rdsp());
+	get_stack_for(pbase, pend, __rdsp());
 }
 
 

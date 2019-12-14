@@ -60,11 +60,11 @@ struct mfree {
 #endif /* CONFIG_DEBUG_HEAP */
 	COMPILER_FLEXIBLE_ARRAY(byte_t,mf_data); /* Block data. */
 };
-#define MFREE_MIN(self)   ((vm_virt_t)(self))
-#define MFREE_MAX(self)   ((vm_virt_t)(self)+(self)->mf_size-1)
-#define MFREE_BEGIN(self) ((vm_virt_t)(self))
-#define MFREE_END(self)   ((vm_virt_t)(self)+(self)->mf_size)
-#define MFREE_SIZE(self)              (self)->mf_size
+#define MFREE_MIN(self)   ((uintptr_t)(self))
+#define MFREE_MAX(self)   ((uintptr_t)(self) + (self)->mf_size - 1)
+#define MFREE_BEGIN(self) ((uintptr_t)(self))
+#define MFREE_END(self)   ((uintptr_t)(self) + (self)->mf_size)
+#define MFREE_SIZE(self)  (self)->mf_size
 
 
 /* Heap configuration:
@@ -95,8 +95,8 @@ struct mfree {
 #define HEAP_BUCKET_MINSIZE(i)   (1 << ((i)+HEAP_BUCKET_OFFSET-1))
 #define HEAP_BUCKET_COUNT       ((__SIZEOF_SIZE_T__*8)-(HEAP_BUCKET_OFFSET-1))
 
-#define HEAP_INIT(overalloc,freethresh,hintpage,hintmode) \
-	{ ATOMIC_RWLOCK_INIT, NULL, { }, overalloc, freethresh, hintpage, hintmode }
+#define HEAP_INIT(overalloc, freethresh, hintaddr, hintmode) \
+	{ ATOMIC_RWLOCK_INIT, NULL, { }, overalloc, freethresh, hintaddr, hintmode }
 
 struct heap_pending_free {
 	struct heap_pending_free *hpf_next;  /* [0..1] Next pending free block. */
@@ -113,7 +113,7 @@ struct heap {
 	                                         * NOTE: Set to ZERO(0) to disable overallocation. */
 	WEAK size_t               h_freethresh; /* Threshold that must be reached before any continuous block of free
 	                                         * data is unmapped from the kernel VM. (Should always be `>= PAGESIZE') */
-	WEAK vm_vpage_t           h_hintpage;   /* Page number to use as next allocation hint. */
+	WEAK void                *h_hintaddr;   /* Address to use as next allocation hint. */
 	WEAK uintptr_t            h_hintmode;   /* Mode used when searching for new pages. */
 	WEAK struct heap_pending_free *h_pfree; /* [0..1] Atomic linked list of pending free operations.
 	                                         * -> Used to ensure that `heap_free()' is always an atomic
@@ -203,10 +203,10 @@ FUNDEF WUNUSED NONNULL((1)) struct heapptr NOTHROW(KCALL __os_heap_realign_nx)(s
  *       - GFP_NOCLRC|GFP_NOSWAP -- Behavioral modifiers for swapping memory
  *    heap_free_untraced:
  *       - GFP_CALLOC            -- The given memory block is ZERO-initialized (allows for some internal optimizations)
- *       - GFP_NOTRIM            -- Do not `vm_unmap()' free memory blocks larger than
+ *       - GFP_NOTRIM            -- Do not `vm_paged_unmap()' free memory blocks larger than
  *                                 `h_freethresh', but keep them in cache instead.
  * NOTE: `heap_free_untraced()' always completes without blocking.
- *        If `vm_unmap()' needs to be called, the free() operation
+ *        If `vm_paged_unmap()' needs to be called, the free() operation
  *        is either postponed until the next call to a heap function
  *        that is allowed to block, or is simply kept in cache, as
  *        though `GFP_NOMAP'  has been passed.

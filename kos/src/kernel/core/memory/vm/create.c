@@ -83,11 +83,11 @@ vm_alloc(void) THROWS(E_BADALLOC) {
 	result->v_kernreserve.vn_node.a_min = NULL;
 	result->v_kernreserve.vn_node.a_max = NULL;
 #ifdef HIGH_MEMORY_KERNEL
-	result->v_kernreserve.vn_node.a_vmin = (vm_vpage_t)KERNEL_BASE_PAGE;
-	result->v_kernreserve.vn_node.a_vmax = (vm_vpage_t)VM_VPAGE_MAX;
+	result->v_kernreserve.vn_node.a_vmin = PAGEID_ENCODE(KERNEL_BASE);
+	result->v_kernreserve.vn_node.a_vmax = __ARCH_PAGEID_MAX;
 #else /* HIGH_MEMORY_KERNEL */
-	result->v_kernreserve.vn_node.a_vmin = (vm_vpage_t)0;
-	result->v_kernreserve.vn_node.a_vmax = (vm_vpage_t)KERNEL_MAX_PAGE;
+	result->v_kernreserve.vn_node.a_vmin = 0;
+	result->v_kernreserve.vn_node.a_vmax = PAGEID_ENCODE(KERNEL_END - 1);
 #endif /* !HIGH_MEMORY_KERNEL */
 	result->v_kernreserve.vn_byaddr.ln_pself = &result->v_byaddr;
 	result->v_kernreserve.vn_byaddr.ln_next  = NULL;

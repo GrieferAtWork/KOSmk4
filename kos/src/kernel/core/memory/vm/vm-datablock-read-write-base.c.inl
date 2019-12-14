@@ -134,7 +134,7 @@ KCALL vm_datablock_write
                            USER CHECKED void const *buf,
 #endif
                            size_t num_bytes,
-                           vm_daddr_t src_offset)
+                           pos_t src_offset)
 #ifdef DEFINE_IO_PHYS
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
 #else /* DEFINE_IO_PHYS */
@@ -249,7 +249,7 @@ KCALL vm_datablock_vio_write
                                USER CHECKED void const *buf,
                                size_t num_bytes,
 #endif
-                               vm_daddr_t src_offset)
+                               pos_t src_offset)
 #ifdef DEFINE_IO_PHYS
        THROWS(...)
 #else /* DEFINE_IO_PHYS */
@@ -280,67 +280,72 @@ KCALL vm_datablock_vio_write
 		src_offset += ent.ab_size;
 	}
 #elif defined(DEFINE_IO_PHYS)
-	pagedir_pushval_t backup; vm_vpage_t tramp;
+	pagedir_pushval_t backup;
+	byte_t *tramp;
 	bool is_first;
 	if unlikely(!num_bytes) return;
 	is_first = true;
-	tramp = THIS_TRAMPOLINE_PAGE;
-	TRY {
-		for (;;) {
-			pageptr_t pageaddr;
-			size_t page_bytes;
-			pageaddr   = (pageptr_t)VM_ADDR2PAGE(buf);
-			page_bytes = PAGESIZE - (buf & PAGEMASK);
-			if (page_bytes > num_bytes)
-				page_bytes = num_bytes;
+	tramp = THIS_TRAMPOLINE_BASE;
+	for (;;) {
+		size_t page_bytes;
+		page_bytes = PAGESIZE - (buf & PAGEMASK);
+		if (page_bytes > num_bytes)
+			page_bytes = num_bytes;
 #ifdef DEFINE_IO_READ
-			if (is_first) {
-				backup = pagedir_push_mapone(tramp, pageaddr,
-				                             PAGEDIR_MAP_FWRITE);
-			} else {
-				pagedir_mapone(tramp, pageaddr,
-				               PAGEDIR_MAP_FWRITE);
-			}
+		if (is_first) {
+			backup = npagedir_push_mapone(tramp,
+			                              buf & ~PAGEMASK,
+			                              PAGEDIR_MAP_FWRITE);
+			is_first = false;
+		} else {
+			npagedir_mapone(tramp,
+			                buf & ~PAGEMASK,
+			                PAGEDIR_MAP_FWRITE);
+		}
 #else /* DEFINE_IO_READ */
-			if (is_first) {
-				backup = pagedir_push_mapone(tramp, pageaddr,
-				                             PAGEDIR_MAP_FREAD);
-			} else {
-				pagedir_mapone(tramp, pageaddr,
-				               PAGEDIR_MAP_FREAD);
-			}
+		if (is_first) {
+			backup = npagedir_push_mapone(tramp,
+			                              buf & ~PAGEMASK,
+			                              PAGEDIR_MAP_FREAD);
+			is_first = false;
+		} else {
+			npagedir_mapone(tramp,
+			                buf & ~PAGEMASK,
+			                PAGEDIR_MAP_FREAD);
+		}
 #endif /* !DEFINE_IO_READ */
-			pagedir_syncone(tramp);
-			/* Perform VIO memory access. */
+		npagedir_syncone(tramp);
+		/* Perform VIO memory access. */
+		TRY {
 #ifdef DEFINE_IO_READ
 			vm_datablock_vio_read
 #else /* DEFINE_IO_READ */
 			vm_datablock_vio_write
 #endif /* !DEFINE_IO_READ */
 			                      (self,
-			                       (byte_t *)VM_PAGE2ADDR(tramp) + (ptrdiff_t)(buf & PAGEMASK),
+			                       tramp + ((ptrdiff_t)buf & PAGEMASK),
 			                       page_bytes,
 			                       src_offset);
-			if (page_bytes >= num_bytes)
-				break;
-			num_bytes -= page_bytes;
-			src_offset += page_bytes;
-			buf += page_bytes;
+		} EXCEPT {
+			/* Try-catch is required, because `dst' may be a user-buffer,
+			 * in which case access may cause an exception to be thrown. */
+			npagedir_pop_mapone(tramp, backup);
+			RETHROW();
 		}
-	} EXCEPT {
-		/* Try-catch is required, because `dst' may be a user-buffer,
-		 * in which case access may cause an exception to be thrown. */
-		pagedir_pop_mapone(tramp, backup);
-		RETHROW();
+		if (page_bytes >= num_bytes)
+			break;
+		num_bytes -= page_bytes;
+		src_offset += page_bytes;
+		buf += page_bytes;
 	}
-	pagedir_pop_mapone(tramp, backup);
+	npagedir_pop_mapone(tramp, backup);
 #else
 	struct vio_args args;
 	args.va_type            = self->db_vio;
 	args.va_block           = self;
 	args.va_part            = NULL;
 	args.va_access_partoff  = 0;
-	args.va_access_pageaddr = 0;
+	args.va_access_pageid = 0;
 	args.va_state           = NULL;
 #ifdef CONFIG_VIO_HAS_QWORD
 #define VIO_LARGEBLOCK_SIZE 8

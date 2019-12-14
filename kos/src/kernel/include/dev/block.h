@@ -199,7 +199,7 @@ struct block_device
 	 *       performance when interfacing with DMA. */
 	byte_t                              *bd_cache_base; /* [lock(bd_cache_lock)][const]
 	                                                     * [1..BD_MAX_CACHE_SECTORS * bd_cache_ssiz]
-	                                                     * [owned][== VM_NODE_MINADDR(&bd_cache_node)]
+	                                                     * [owned][== vm_node_getmin(&bd_cache_node)]
 	                                                     * Base address for the sector cache. */
 	size_t                               bd_cache_ssiz; /* [const][!0][>= bd_sector_size] offset between sectors in `bd_cache_base'.
 	                                                     * Cached data for cache-index `i' can then be found at `bd_cache_base + i * bd_cache_ssiz',

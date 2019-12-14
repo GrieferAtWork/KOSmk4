@@ -88,7 +88,7 @@ again:
 			validate_readable(string, 1);
 			temp = (strlen(string) + 1) * sizeof(char);
 			if unlikely(OVERFLOW_UADD(strings_total_size, temp, &strings_total_size))
-				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, VM_VPAGE_MAX);
+				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, (size_t)-1);
 			++argc_user;
 			++iter;
 		}
@@ -99,7 +99,7 @@ again:
 			validate_readable(string, 1);
 			temp = (strlen(string) + 1) * sizeof(char);
 			if unlikely(OVERFLOW_UADD(strings_total_size, temp, &strings_total_size))
-				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, VM_VPAGE_MAX);
+				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, (size_t)-1);
 			++envc_user;
 			++iter;
 		}
@@ -179,14 +179,14 @@ again:
 		/* If something about the amount of string data changed, start over */
 		if unlikely(strings_total_copied > strings_total_size) {
 string_size_changed:
-			nvm_unmap_kernel_ram(peb_temp_base,
+			vm_unmap_kernel_ram(peb_temp_base,
 			                     peb_total_size,
 			                     false);
 			goto again;
 		}
 
 		/* Figure out where we want to map the PEB within the VM builder. */
-		result = nvmb_getfree(self,
+		result = vmb_getfree(self,
 		                      HINT_GETADDR(KERNEL_VMHINT_USER_PEB),
 		                      peb_total_size,
 		                      PAGESIZE,
@@ -209,13 +209,13 @@ string_size_changed:
 		}
 	} EXCEPT {
 		/* Delete the temporary PEB mapping as general-purpose kernel RAM. */
-		nvm_unmap_kernel_ram(peb_temp_base,
+		vm_unmap_kernel_ram(peb_temp_base,
 		                     peb_total_size,
 		                     false);
 		RETHROW();
 	}
 	/* Steal the node used to hold the PEB */
-	stolen_node = nvm_node_remove(&vm_kernel, peb_temp_base);
+	stolen_node = vm_node_remove(&vm_kernel, peb_temp_base);
 	/* Delete the temporary PEB mapping, and sync the address range.
 	 * NOTE: Since the mapping was strictly private to us,
 	 *       there is no need to sync this with another CPU! */
@@ -226,8 +226,8 @@ string_size_changed:
 
 	/* Make sure that the PEB node has the expected state. */
 	assert(stolen_node);
-	assert(VM_NODE_START(stolen_node) == (vm_vpage_t)__ARCH_PAGEID_ENCODE(peb_temp_base));
-	assert(VM_NODE_SIZE(stolen_node) == (peb_total_size / PAGESIZE));
+	assert(vm_node_getstartpageid(stolen_node) == PAGEID_ENCODE(peb_temp_base));
+	assert(vm_node_getpagecount(stolen_node) == (peb_total_size / PAGESIZE));
 	assert(stolen_node->vn_block == &vm_datablock_anonymous_zero);
 	assert(stolen_node->vn_part);
 	assert(!isshared(stolen_node->vn_part));
@@ -259,8 +259,8 @@ string_size_changed:
 #endif /* !NDEBUG */
 
 	/* Update the mapping location of the PEB memory node */
-	stolen_node->vn_node.a_vmin = (vm_vpage_t)__ARCH_PAGEID_ENCODE(result);
-	stolen_node->vn_node.a_vmax = (vm_vpage_t)__ARCH_PAGEID_ENCODE(result) + (peb_total_size / PAGESIZE) - 1;
+	stolen_node->vn_node.a_vmin = PAGEID_ENCODE(result);
+	stolen_node->vn_node.a_vmax = PAGEID_ENCODE(result) + (peb_total_size / PAGESIZE) - 1;
 
 	/* Load the stolen node into the VMB */
 	vmb_node_insert(self, stolen_node);

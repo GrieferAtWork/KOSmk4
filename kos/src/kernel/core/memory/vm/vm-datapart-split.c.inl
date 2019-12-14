@@ -1053,7 +1053,7 @@ done_futex:
 				assert(i ? (iter->vn_prot & VM_PROT_SHARED)
 				         : !(iter->vn_prot & VM_PROT_SHARED));
 				assert(node_index < vm_node_count);
-				assert(VM_NODE_SIZE(iter) == vm_datapart_numvpages(self));
+				assert(vm_node_getpagecount(iter) == vm_datapart_numvpages(self));
 				assert(!(iter->vn_flags & VM_NODE_FLAG_KERNPRT));
 				high                 = vm_node_vector[node_index];
 				high->vn_node.a_vmin = iter->vn_node.a_vmin + vpage_offset;
@@ -1119,17 +1119,17 @@ done_futex:
 		vm_parttree_remove(&self->dp_block->db_parts,
 		                   self->dp_tree.a_vmin);
 		self->dp_tree.a_vmax = self->dp_tree.a_vmin;
-		self->dp_tree.a_vmax += ((vm_dpage_t)vpage_offset << VM_DATABLOCK_PAGESHIFT(self->dp_block)) - 1;
+		self->dp_tree.a_vmax += ((datapage_t)vpage_offset << VM_DATABLOCK_PAGESHIFT(self->dp_block)) - 1;
 		vm_parttree_insert(&self->dp_block->db_parts, self);
 		vm_parttree_insert(&self->dp_block->db_parts, incref(result));
 		sync_endwrite(self->dp_block);
 	} else {
 #if 1
 		self->dp_tree.a_vmax = self->dp_tree.a_vmin;
-		self->dp_tree.a_vmax += ((vm_dpage_t)vpage_offset << VM_DATABLOCK_PAGESHIFT(self->dp_block)) - 1;
+		self->dp_tree.a_vmax += ((datapage_t)vpage_offset << VM_DATABLOCK_PAGESHIFT(self->dp_block)) - 1;
 #else
 		assert(self->dp_tree.a_vmin == 0);
-		self->dp_tree.a_vmax = ((vm_dpage_t)vpage_offset << VM_DATABLOCK_PAGESHIFT(self->dp_block)) - 1;
+		self->dp_tree.a_vmax = ((datapage_t)vpage_offset << VM_DATABLOCK_PAGESHIFT(self->dp_block)) - 1;
 		result->dp_tree.a_vmax -= result->dp_tree.a_vmin;
 		result->dp_tree.a_vmin = 0;
 #endif
@@ -1147,9 +1147,9 @@ done_futex:
 				assert(i ? (iter->vn_prot & VM_PROT_SHARED)
 				         : !(iter->vn_prot & VM_PROT_SHARED));
 				assert(iter->vn_part == self);
-				assertf(VM_NODE_SIZE(iter) == vm_datapart_numvpages(self),
+				assertf(vm_node_getpagecount(iter) == vm_datapart_numvpages(self),
 				        "Node size missmatch (%Iu != %Iu)",
-				        VM_NODE_SIZE(iter), vm_datapart_numvpages(self));
+				        vm_node_getpagecount(iter), vm_datapart_numvpages(self));
 			}
 		}
 	}

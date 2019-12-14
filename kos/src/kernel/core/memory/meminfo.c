@@ -476,7 +476,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
 	 * For this, we prefer using banked memory that is not aligned by whole
 	 * pages, as it would otherwise go unused forever, since page_malloc()
 	 * is not capable of allocating sub-page memory. */
-	req_pages = (req_bytes + PAGEMASK) / PAGESIZE;
+	req_pages = CEILDIV(req_bytes, PAGESIZE);
 	kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start = minfo_allocate_part_pagedata(req_bytes);
 	printk(FREESTR(KERN_DEBUG "Allocate paging control structures at "
 	               FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " (%Iu bytes in %Iu pages)\n"),
@@ -484,9 +484,8 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
 	       (vm_phys_t)(page2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start) + req_bytes - 1),
 	       req_bytes, req_pages);
 	kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_size = req_pages;
-	kernel_vm_part_pagedata.dp_tree.a_vmax = (vm_dpage_t)(req_pages - 1);
-	kernel_vm_node_pagedata.vn_node.a_vmin = (vm_vpage_t)(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start +
-                                                          KERNEL_BASE_PAGE);
+	kernel_vm_part_pagedata.dp_tree.a_vmax = (datapage_t)(req_pages - 1);
+	kernel_vm_node_pagedata.vn_node.a_vmin = PAGEID_ENCODE(KERNEL_BASE + page2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start));
 	kernel_vm_node_pagedata.vn_node.a_vmax = kernel_vm_node_pagedata.vn_node.a_vmin + req_pages - 1;
 	buffer = (byte_t *)VM_PAGE2ADDR(kernel_vm_node_pagedata.vn_node.a_vmin);
 	/* With the required buffer now allocated, we can move on to populating it with data.
@@ -618,15 +617,15 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
 	mzones.pm_last->mz_next = NULL;
 	/* Now just allocate the last part as the relocated memory information vector. */
 	minfo.mb_banks = (struct pmembank *)buffer;
-	assertf((vm_virt_t)(buffer + (minfo.mb_bankc + 1) * sizeof(struct pmembank)) <=
-	        VM_PAGE2ADDR(kernel_vm_node_pagedata.vn_node.a_vmin) + req_bytes,
+	assertf((buffer + (minfo.mb_bankc + 1) * sizeof(struct pmembank)) <=
+	        ((byte_t *)vm_node_getstart(&kernel_vm_node_pagedata) + req_bytes),
 	        "Too little memory allocated for memory construct structures\n"
 	        "buffer     = %p\n"
 	        "buffer_min = %p\n"
 	        "buffer_max = %p\n",
-	        (vm_virt_t)(buffer + (minfo.mb_bankc + 1) * sizeof(struct pmembank)),
-	        VM_PAGE2ADDR(kernel_vm_node_pagedata.vn_node.a_vmin),
-	        VM_PAGE2ADDR(kernel_vm_node_pagedata.vn_node.a_vmin) + req_bytes - 1);
+	        buffer + (minfo.mb_bankc + 1) * sizeof(struct pmembank),
+	        vm_node_getstart(&kernel_vm_node_pagedata),
+	        (byte_t *)vm_node_getstart(&kernel_vm_node_pagedata) + req_bytes - 1);
 	memcpy(buffer, kernel_membanks_initial,
 	       minfo.mb_bankc + 1,
 	       sizeof(struct pmembank));
@@ -651,52 +650,52 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
  * and causing problems for other code. */
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL minfo_relocate_appropriate)(void) {
-	size_t num_pages;
-	vm_vpage_t dest, old_page;
+	size_t num_bytes;
+	byte_t *dest, *old_addr;
 	ptrdiff_t relocation_offset;
-	num_pages = VM_NODE_SIZE(&kernel_vm_node_pagedata);
-	dest = vm_getfree(&vm_kernel,
-	                  (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_PHYSINFO), num_pages, 1,
-	                  HINT_GETMODE(KERNEL_VMHINT_PHYSINFO));
+	num_bytes = vm_node_getsize(&kernel_vm_node_pagedata);
+	dest = (byte_t *)vm_getfree(&vm_kernel,
+	                            HINT_GETADDR(KERNEL_VMHINT_PHYSINFO),
+	                            num_bytes, PAGESIZE,
+	                            HINT_GETMODE(KERNEL_VMHINT_PHYSINFO));
 	if unlikely(dest == VM_GETFREE_ERROR) {
 		printk(FREESTR(KERN_ERR "Failed to relocate memory information\n"));
 		return;
 	}
 	printk(FREESTR(KERN_DEBUG "Relocate RAM control structures to %p...%p\n"),
-	       (uintptr_t)VM_PAGE2ADDR(dest),
-	       (uintptr_t)VM_PAGE2ADDR(dest + num_pages) - 1);
+	       dest, dest + num_bytes - 1);
 
 	/* Pop the node concerning the memory information, so we can modify it. */
 #ifdef NDEBUG
-	vm_node_remove(&vm_kernel, kernel_vm_node_pagedata.vn_node.a_vmin);
+	vm_paged_node_remove(&vm_kernel, kernel_vm_node_pagedata.vn_node.a_vmin);
 #else /* NDEBUG */
 	{
 		struct vm_node *node;
-		node = vm_node_remove(&vm_kernel, kernel_vm_node_pagedata.vn_node.a_vmin);
+		node = vm_paged_node_remove(&vm_kernel, kernel_vm_node_pagedata.vn_node.a_vmin);
 		assert(node == &kernel_vm_node_pagedata);
 	}
 #endif /* !NDEBUG */
-	old_page = kernel_vm_node_pagedata.vn_node.a_vmin;
-	relocation_offset = (ptrdiff_t)(dest - old_page) * PAGESIZE;
-	kernel_vm_node_pagedata.vn_node.a_vmin = dest;
-	kernel_vm_node_pagedata.vn_node.a_vmax = dest + num_pages - 1;
+	old_addr = (byte_t *)vm_node_getstart(&kernel_vm_node_pagedata);
+	relocation_offset = dest - old_addr;
+	kernel_vm_node_pagedata.vn_node.a_vmin = PAGEID_ENCODE(dest);
+	kernel_vm_node_pagedata.vn_node.a_vmax = PAGEID_ENCODE(dest + num_bytes - 1);
 	vm_node_insert(&kernel_vm_node_pagedata);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if unlikely(!pagedir_prepare_map(kernel_vm_node_pagedata.vn_node.a_vmin, num_pages)) {
+	if unlikely(!npagedir_prepare_map(dest, num_bytes)) {
 		printk(FREESTR(KERN_ERR "Failed to prepare VM for relocated memory "
-		                        "information at " FORMAT_PAGEPTR_T "+%Iu\n"),
-		       kernel_vm_node_pagedata.vn_node.a_vmin, num_pages);
+		                        "information at %p...%p\n"),
+		       dest, dest + num_bytes - 1);
 		return;
 	}
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-	assert(vm_datapart_numdpages(&kernel_vm_part_pagedata) == num_pages);
-	assert(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_size == num_pages);
+	assert(vm_datapart_numdpages(&kernel_vm_part_pagedata) == num_bytes / PAGESIZE);
+	assert(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_size == num_bytes / PAGESIZE);
 	/* Remove the page directory mapping. */
-	pagedir_unmap(old_page, num_pages);
+	npagedir_unmap(old_addr, num_bytes);
 	/* Create a new page directory mapping. */
-	pagedir_map(kernel_vm_node_pagedata.vn_node.a_vmin, num_pages,
-	            kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start,
-	            PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+	npagedir_map(dest, num_bytes,
+	             page2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start),
+	             PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 	/* Now apply relocations. */
 #define REL(x) ((x) = (__typeof__(x))((byte_t *)(x) + relocation_offset))
 	REL(minfo.mb_banks);

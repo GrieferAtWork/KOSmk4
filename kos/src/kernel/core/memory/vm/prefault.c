@@ -25,6 +25,8 @@
 #include <kernel/panic.h>
 #include <kernel/vm.h>
 
+#include <hybrid/align.h>
+
 #include <assert.h>
 
 DECL_BEGIN
@@ -133,7 +135,7 @@ vm_prefault(USER CHECKED void const *addr,
 	 *     >>     break;
 	 *     >> }
 	 *     Where ITER_ADDR is initialized to `addr', and during `continue' is updated to
-	 *     instead refer to `VM_NODE_ENDADDR(CURRENT_NODE)'.
+	 *     instead refer to `vm_node_getend(CURRENT_NODE)'.
 	 * Regardless of why iteration stops, always return `0' at this point, indicating that
 	 * at least some part of the given range can be accessed using direct I/O.
 	 */
@@ -155,9 +157,9 @@ vm_prefault(USER CHECKED void const *addr,
  * that can be made to be backed by RAM.
  * Any VIO mappings within the specified range are simply ignored (and will not count
  * towards the returned value)
- * @return: * : The total number of V-pages that become faulted as the resule of this
+ * @return: * : The total number of bytes that become faulted as the resule of this
  *              function being called. Note that even if you may be expecting that some
- *              specified page within the range wasn't faulted before, you must still
+ *              specified address within the range wasn't faulted before, you must still
  *              allow for this function to return `0', since there always exists a
  *              possibility of some other thread changing the backing mappings, or
  *              faulting the mappings themself.
@@ -168,20 +170,22 @@ vm_prefault(USER CHECKED void const *addr,
  *       within the indicated address range (whilst still checking it for errors for
  *       the even of the mapping changing, or the mapping being a VIO mapping) becomes
  *       possible immediately, without having to force any soft of additional memory
- *       access (note though that this only applies to the page directory of `effective_vm',
+ *       access (note though that this only applies to the page directory of `self',
  *       though also note that if some datapart within the range was already faulted, its
- *       page directory mapping in `effective_vm' will still be updated). */
-PUBLIC size_t FCALL
-vm_forcefault(struct vm *__restrict effective_vm,
-              vm_vpage_t minpage,
-              vm_vpage_t maxpage, bool for_writing)
+ *       page directory mapping in `self' will still be updated). */
+FUNDEF size_t FCALL
+vm_paged_forcefault(struct vm *__restrict self,
+                    pageid_t minpageid,
+                    pageid_t maxpageid,
+                    bool for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
+	assert(minpageid <= maxpageid);
+	(void)self;
+	(void)minpageid;
+	(void)maxpageid;
+	(void)for_writing;
 
 	kernel_panic("TODO");
-	(void)effective_vm;
-	(void)minpage;
-	(void)maxpage;
-	(void)for_writing;
 
 	return 0;
 }

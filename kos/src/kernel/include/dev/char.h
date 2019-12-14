@@ -44,7 +44,7 @@ struct character_device_type {
 	NONNULL((1)) size_t (KCALL *ct_pread)(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 	NONNULL((1)) size_t (KCALL *ct_pwrite)(struct character_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 	NONNULL((1)) syscall_slong_t (KCALL *ct_ioctl)(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-	NONNULL((1)) REF struct vm_datablock *(KCALL *ct_mmap)(struct character_device *__restrict self, vm_vpage64_t *__restrict pminpage, vm_vpage64_t *__restrict pmaxpage) THROWS(...);
+	NONNULL((1)) REF struct vm_datablock *(KCALL *ct_mmap)(struct character_device *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes) THROWS(...);
 	NONNULL((1)) void (KCALL *ct_sync)(struct character_device *__restrict self) THROWS(...);
 	NONNULL((1)) void (KCALL *ct_stat)(struct character_device *__restrict self, USER CHECKED struct stat *result) THROWS(...);
 	/* @return: * : Set of available signals. */
@@ -166,7 +166,7 @@ FUNDEF NONNULL((1)) size_t KCALL character_device_write(struct character_device 
 FUNDEF NONNULL((1)) size_t KCALL character_device_pread(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) size_t KCALL character_device_pwrite(struct character_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) syscall_slong_t KCALL character_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) REF struct vm_datablock *KCALL character_device_mmap(struct character_device *__restrict self, vm_vpage64_t *__restrict pminpage, vm_vpage64_t *__restrict pmaxpage) THROWS(...);
+FUNDEF NONNULL((1)) REF struct vm_datablock *KCALL character_device_mmap(struct character_device *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes) THROWS(...);
 FUNDEF NONNULL((1)) void KCALL character_device_sync(struct character_device *__restrict self) THROWS(...);
 FUNDEF NONNULL((1)) void KCALL character_device_stat(struct character_device *__restrict self, USER CHECKED struct stat *result) THROWS(...);
 FUNDEF NONNULL((1)) poll_mode_t KCALL character_device_poll(struct character_device *__restrict self, poll_mode_t what) THROWS(...);

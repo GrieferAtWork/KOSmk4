@@ -96,8 +96,8 @@ NOTHROW(KCALL vmb_fini)(struct vmb *__restrict self) {
 
 PRIVATE NOBLOCK void
 NOTHROW(KCALL vmb_do_delete_whole_nodes)(struct vmb *__restrict self,
-                                         vm_vpage_t minpage,
-                                         vm_vpage_t maxpage) {
+                                         pageid_t minpage,
+                                         pageid_t maxpage) {
 	struct vm_node *node;
 	/* Remove all nodes within the given range. */
 	for (;;) {
@@ -115,7 +115,7 @@ NOTHROW(KCALL vmb_do_delete_whole_nodes)(struct vmb *__restrict self,
 
 PRIVATE void KCALL
 vmb_do_mapat(struct vmb *__restrict self,
-             vm_vpage_t page_index, size_t num_pages,
+             pageid_t page_index, size_t num_pages,
              struct vm_datablock *__restrict data,
              vm_vpage64_t data_start_vpage,
              uintptr_half_t prot,
@@ -125,7 +125,7 @@ vmb_do_mapat(struct vmb *__restrict self,
 	struct vm_node *node;
 	size_t num_vpages;
 	REF struct vm_datapart *part;
-	vm_vpage_t initial_page_index;
+	pageid_t initial_page_index;
 	assert(!(flag & (VM_NODE_FLAG_COREPRT | VM_NODE_FLAG_KERNPRT | VM_NODE_FLAG_HINTED)));
 	assert(!(prot & ~(VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ | VM_PROT_LOOSE | VM_PROT_SHARED)));
 	if unlikely(!num_pages)
@@ -133,7 +133,7 @@ vmb_do_mapat(struct vmb *__restrict self,
 	initial_page_index = page_index;
 	assert(page_index + num_pages > page_index);
 	assert(!PRANGE_IS_KERNEL_PARTIAL(page_index, page_index + num_pages - 1));
-	assert(!vmb_isused(self, page_index, page_index + num_pages - 1));
+	assert(!vmb_paged_isused(self, page_index, page_index + num_pages - 1));
 again:
 	TRY {
 		node = (struct vm_node *)kmalloc(sizeof(struct vm_node),
@@ -229,14 +229,14 @@ again:
  * @return: false: Another mapping already exists. */
 PUBLIC bool KCALL
 vmb_mapat(struct vmb *__restrict self,
-          vm_vpage_t page_index, size_t num_pages,
+          pageid_t page_index, size_t num_pages,
           struct vm_datablock *__restrict data,
           vm_vpage64_t data_start_vpage,
           uintptr_half_t prot,
           uintptr_half_t flag,
           uintptr_t guard)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	vm_vpage_t endpage;
+	pageid_t endpage;
 	/* Use an overflow-addition, so we can indicate failure if the
 	 * mapping range overflows (in which case we must indicate failure) */
 	if unlikely(OVERFLOW_UADD(page_index, num_pages, &endpage))
@@ -245,7 +245,7 @@ vmb_mapat(struct vmb *__restrict self,
 	if unlikely(PRANGE_IS_KERNEL_PARTIAL(page_index, endpage - 1))
 		return num_pages == 0;
 	/* Check if some portion of the given page-range is already in use. */
-	if unlikely(vmb_isused(self, page_index, endpage - 1))
+	if unlikely(vmb_paged_isused(self, page_index, endpage - 1))
 		goto err;
 	/* With those validation out of the way, move on to actually create the mapping! */
 	vmb_do_mapat(self,
@@ -262,30 +262,30 @@ err:
 }
 
 
-/* Find the first node with `VM_NODE_MIN(return) >= min_page_index'
+/* Find the first node with `vm_node_getminpageid(return) >= min_page_index'
  * If no such node exists, return `NULL' instead. */
 PUBLIC NOBLOCK WUNUSED struct vm_node *
 NOTHROW(KCALL vmb_find_first_node_greater_equal)(struct vmb *__restrict self,
-                                                 vm_vpage_t min_page_index) {
+                                                 pageid_t min_page_index) {
 	struct vm_node *result;
 	for (result = self->v_byaddr; result;
 	     result = result->vn_byaddr.ln_next) {
-		if (VM_NODE_MIN(result) >= min_page_index)
+		if (vm_node_getminpageid(result) >= min_page_index)
 			break;
 	}
 	return result;
 }
 
-/* Find the last node with `VM_NODE_MAX(return) <= max_page_index'
+/* Find the last node with `vm_node_getmaxpageid(return) <= max_page_index'
  * If no such node exists, return `NULL' instead. */
 PUBLIC NOBLOCK WUNUSED struct vm_node *
 NOTHROW(KCALL vmb_find_last_node_lower_equal)(struct vmb *__restrict self,
-                                              vm_vpage_t max_page_index) {
+                                              pageid_t max_page_index) {
 	struct vm_node *result = NULL;
 	struct vm_node *iter;
 	for (iter = self->v_byaddr; iter;
 	     iter = iter->vn_byaddr.ln_next) {
-		if (VM_NODE_MAX(iter) <= max_page_index)
+		if (vm_node_getmaxpageid(iter) <= max_page_index)
 			result = iter;
 		else {
 			break;
@@ -304,11 +304,11 @@ DECL_END
 DECL_BEGIN
 #endif
 
-/* A combination of `vmb_getfree' + `vmb_mapat'
+/* A combination of `vmb_paged_getfree' + `vmb_mapat'
  * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target. */
-PUBLIC vm_vpage_t KCALL
+PUBLIC pageid_t KCALL
 vmb_map(struct vmb *__restrict self,
-        vm_vpage_t hint,
+        pageid_t hint,
         size_t num_pages,
         size_t min_alignment_in_pages,
         unsigned int getfree_mode,
@@ -318,13 +318,13 @@ vmb_map(struct vmb *__restrict self,
         uintptr_half_t flag,
         uintptr_t guard)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	vm_vpage_t result;
-	result = vmb_getfree(self,
+	pageid_t result;
+	result = vmb_paged_getfree(self,
 	                     hint,
 	                     num_pages,
 	                     min_alignment_in_pages,
 	                     getfree_mode);
-	if unlikely(result == VM_GETFREE_ERROR)
+	if unlikely(result == VM_PAGED_GETFREE_ERROR)
 		THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, num_pages);
 	vmb_do_mapat(self,
 	             result,
@@ -343,12 +343,12 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vmb_node_insert)(struct vmb *__restrict self,
                                struct vm_node *__restrict node) {
 	struct vm_node **pinsert, *insert_before;
-	assertf(VM_NODE_MIN(node) <= VM_NODE_MAX(node),
+	assertf(vm_node_getminpageid(node) <= vm_node_getmaxpageid(node),
 	        "Unordered node: MIN(%p) >= MAX(%p)",
-	        VM_NODE_MINADDR(node), VM_NODE_MAXADDR(node));
-	assertf(VM_NODE_MAX(node) <= VM_VPAGE_MAX,
+	        vm_node_getmin(node), vm_node_getmax(node));
+	assertf(vm_node_getmaxpageid(node) <= __ARCH_PAGEID_MAX,
 	        "Mapping of node covering pages %p...%p is out-of-bounds",
-	        VM_NODE_MIN(node), VM_NODE_MAX(node));
+	        vm_node_getminpageid(node), vm_node_getmaxpageid(node));
 	assert(node->vn_block != NULL);
 	assert(node->vn_part != NULL);
 	assert((self->v_tree != NULL) == (self->v_byaddr != NULL));
@@ -368,8 +368,8 @@ NOTHROW(KCALL vmb_node_insert)(struct vmb *__restrict self,
 	        "insert_before  = %p:%p...%p\n"
 	        "node           = %p:%p...%p\n"
 	        "node->vn_flags = %#.4I16x\n",
-	        insert_before, VM_NODE_MINADDR(insert_before), VM_NODE_MAXADDR(insert_before),
-	        node, VM_NODE_MINADDR(node), VM_NODE_MAXADDR(node),
+	        insert_before, vm_node_getmin(insert_before), vm_node_getmax(insert_before),
+	        node, vm_node_getmin(node), vm_node_getmax(node),
 	        node->vn_flags);
 	/* Insert the node before `insert' at `pinsert' */
 	node->vn_byaddr.ln_pself = pinsert;
@@ -382,7 +382,7 @@ NOTHROW(KCALL vmb_node_insert)(struct vmb *__restrict self,
 /* Remove a given node from the specified VM Builder. */
 PUBLIC NOBLOCK NONNULL((1)) struct vm_node *
 NOTHROW(KCALL vmb_node_remove)(struct vmb *__restrict self,
-                               vm_vpage_t page) {
+                               pageid_t page) {
 	struct vm_node *result;
 	result = vm_nodetree_remove(&self->v_tree, page);
 	if likely(result)
@@ -392,16 +392,16 @@ NOTHROW(KCALL vmb_node_remove)(struct vmb *__restrict self,
 
 /* Get the node associated with the given `page' */
 PUBLIC NOBLOCK WUNUSED struct vm_node *
-NOTHROW(FCALL vmb_getnodeof)(struct vmb *__restrict self, vm_vpage_t page) {
+NOTHROW(FCALL vmb_getnodeof)(struct vmb *__restrict self, pageid_t page) {
 	return vm_nodetree_locate(self->v_tree,
 	                          page);
 }
 
 /* Check if some part of the given address range is currently in use. */
 PUBLIC NOBLOCK WUNUSED bool
-NOTHROW(FCALL vmb_isused)(struct vmb *__restrict self,
-                          vm_vpage_t min_page,
-                          vm_vpage_t max_page) {
+NOTHROW(FCALL vmb_paged_isused)(struct vmb *__restrict self,
+                          pageid_t min_page,
+                          pageid_t max_page) {
 	return vm_nodetree_rlocate(self->v_tree,
 	                           min_page,
 	                           max_page) != NULL;
@@ -572,11 +572,11 @@ again_lock_parts:
 		{
 			size_t part_vpages;
 			part_vpages = vm_datapart_numvpages(node->vn_part);
-			assertf(part_vpages <= VM_NODE_SIZE(node),
+			assertf(part_vpages <= vm_node_getpagecount(node),
 			        "part_vpages        = %Iu\n"
-			        "VM_NODE_SIZE(node) = %Iu\n",
-			        part_vpages, VM_NODE_SIZE(node));
-			if unlikely(part_vpages < VM_NODE_SIZE(node)) {
+			        "vm_node_getpagecount(node) = %Iu\n",
+			        part_vpages, vm_node_getpagecount(node));
+			if unlikely(part_vpages < vm_node_getpagecount(node)) {
 				/* Must create an additional node in order to map the missing portion.
 				 * Note however that since there isn't a non-blocking `vm_datablock_locatepart_nx()'
 				 * function, we must always do this while not holding locks to any of the aforementioned
@@ -594,7 +594,7 @@ again_lock_parts:
 				 * HINT: If the block was unshared, `dp_block' will have been set to
 				 *       one of the `vm_datablock_anonymous_zero_vec[*]' descriptors. */
 				part_block         = incref(node->vn_part->dp_block);
-				num_missing_vpages = VM_NODE_SIZE(node) - part_vpages;
+				num_missing_vpages = vm_node_getpagecount(node) - part_vpages;
 				off_missing_vpages = vm_datapart_startvpage(node->vn_part) + part_vpages;
 
 				/* Release all previously held locks (including the one for `node->vn_part') */
@@ -874,9 +874,9 @@ handle_remove_write_error:
 		/* Unlink the kernel-reserve node. */
 #ifndef NDEBUG
 #ifdef HIGH_MEMORY_KERNEL
-		node = vm_nodetree_remove(&target->v_tree, (vm_vpage_t)KERNEL_BASE_PAGE);
+		node = vm_nodetree_remove(&target->v_tree, (pageid_t)KERNEL_BASE_PAGE);
 #else /* HIGH_MEMORY_KERNEL */
-		node = vm_nodetree_remove(&target->v_tree, (vm_vpage_t)0);
+		node = vm_nodetree_remove(&target->v_tree, (pageid_t)0);
 #endif /* !HIGH_MEMORY_KERNEL */
 		assertf(node == &target->v_kernreserve,
 		        "node                   = %p\n"
@@ -884,9 +884,9 @@ handle_remove_write_error:
 		        node, &target->v_kernreserve);
 #else /* !NDEBUG */
 #ifdef HIGH_MEMORY_KERNEL
-		vm_nodetree_remove(&target->v_tree, (vm_vpage_t)KERNEL_BASE_PAGE);
+		vm_nodetree_remove(&target->v_tree, (pageid_t)KERNEL_BASE_PAGE);
 #else /* HIGH_MEMORY_KERNEL */
-		vm_nodetree_remove(&target->v_tree, (vm_vpage_t)0);
+		vm_nodetree_remove(&target->v_tree, (pageid_t)0);
 #endif /* !HIGH_MEMORY_KERNEL */
 #endif /* NDEBUG */
 		LLIST_REMOVE(&target->v_kernreserve, vn_byaddr);
@@ -909,8 +909,8 @@ handle_remove_write_error:
 					LLIST_INSERT(node->vn_part->dp_crefs, node, vn_link);
 				}
 				printk(KERN_DEBUG "Map %p...%p against 1 data part\n",
-				       VM_NODE_MINADDR(node),
-				       VM_NODE_MAXADDR(node));
+				       vm_node_getmin(node),
+				       vm_node_getmax(node));
 			} while ((node = node->vn_byaddr.ln_next) != NULL);
 		}
 

@@ -40,8 +40,8 @@
 
 DECL_BEGIN
 
-#define CORE_PAGE_MALLOC_ERROR  (VM_VPAGE_MAX + 1)
-#define CORE_PAGE_MALLOC_AUTO   (VM_VPAGE_MAX + 1)
+#define CORE_PAGE_MALLOC_ERROR  ((void *)-1)
+#define CORE_PAGE_MALLOC_AUTO   ((void *)-1)
 /* @param: mapping_target: The target page number where memory should be mapped.
  *                         When `CORE_PAGE_MALLOC_AUTO', automatically search
  *                         for a suitable location, otherwise _always_ return
@@ -49,31 +49,36 @@ DECL_BEGIN
  *                         another kernel VM mapping already exists at that location.
  *                   NOTE: When this is used to specify a fixed target, the caller
  *                         should do an additional check for pre-existing nodes within
- *                         VPAGE range `mapping_target ... mapping_target + num_pages - 1',
+ *                         range `mapping_target ... mapping_target + num_bytes - 1',
  *                         as this function will check for an existing mapping within
  *                         that range very late, and in a way that is not optimized
  *                         for this.
- * @param: num_pages:      The number of pages to allocate.
- * @param: alignment_in_pages: The minimum alignment (in pages) required from automatic
- *                             mapping_target detection. */
-PRIVATE VIRT vm_vpage_t
+ * @param: num_bytes:      The number of bytes to allocate.
+ * @param: min_alignment:  The minimum alignment required from automatic mapping_target
+ *                         detection. */
+PRIVATE VIRT void *
 NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
-                                        vm_vpage_t mapping_target, size_t num_pages,
-                                        size_t alignment_in_pages, gfp_t flags) {
-#define CORE_ALLOC_FLAGS                                                        \
-	(GFP_LOCKED |                                                               \
-	 GFP_PREFLT |                                                               \
-	 GFP_VCBASE | /* Instruct the heap to only consider allocating from VCbase, \
-	               * thus preventing an infinite loop. */                       \
-	 GFP_NOOVER   /* Don't overallocate to prevent infinite recursion!          \
-	               * -> This flag guaranties that upon recursion, at most 1     \
-	               *    page will get allocated, in which case the              \
-	               *   `block0_size >= num_pages' check above will be           \
-	               *   `1 >= 1', meaning we'll never get here! */               \
+                                        PAGEDIR_PAGEALIGNED void *mapping_target,
+                                        PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                        PAGEDIR_PAGEALIGNED size_t min_alignment,
+                                        gfp_t flags) {
+#define CORE_ALLOC_FLAGS                                                         \
+	(GFP_LOCKED |                                                                \
+	 GFP_PREFLT |                                                                \
+	 GFP_VCBASE | /* Instruct the heap to only consider allocating from VCbase,  \
+	               * thus preventing an infinite loop. */                        \
+	 GFP_NOOVER   /* Don't overallocate to prevent infinite recursion!           \
+	               * -> This flag guaranties that upon recursion, at most 1      \
+	               *    page will get allocated, in which case the               \
+	               *   `block0_size * PAGESIZE >= num_bytes' check above will be \
+	               *   `1 >= 1', meaning we'll never get here! */                \
 	)
 	struct vm_corepair_ptr corepair;
-	TRACE("core_page_alloc(%p,%p,%Iu,%Iu,%#x)\n", self, mapping_target, num_pages, alignment_in_pages, flags);
-	HEAP_ASSERT(num_pages != 0);
+	TRACE("core_page_alloc(%p,%p,%Iu,%Iu,%#x)\n", self, mapping_target, num_bytes, min_alignment, flags);
+	HEAP_ASSERT(num_bytes != 0);
+	HEAP_ASSERT(((uintptr_t)mapping_target & PAGEMASK) == 0 || mapping_target == CORE_PAGE_MALLOC_AUTO);
+	HEAP_ASSERT((num_bytes & PAGEMASK) == 0);
+	HEAP_ASSERT((min_alignment & PAGEMASK) == 0);
 	/* Throw a would-block error if we're not allowed to map new memory. */
 	if (flags & GFP_NOMMAP)
 		IFELSE_NX(return CORE_PAGE_MALLOC_ERROR, THROW(E_WOULDBLOCK_PREEMPTED));
@@ -136,7 +141,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 	corepair.cp_node->vn_part          = corepair.cp_part;
 	corepair.cp_node->vn_link.ln_pself = &LLIST_HEAD(corepair.cp_part->dp_srefs);
 	corepair.cp_part->dp_srefs         = corepair.cp_node;
-	corepair.cp_part->dp_tree.a_vmax   = (vm_dpage_t)(num_pages - 1);
+	corepair.cp_part->dp_tree.a_vmax   = (datapage_t)((num_bytes / PAGESIZE) - 1);
 	{
 		pageptr_t block0_addr;
 		pagecnt_t block0_size;
@@ -144,7 +149,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 		                             ? VM_DATAPART_STATE_LOCKED
 		                             : VM_DATAPART_STATE_INCORE;
 		/* Allocate / initialize the did-init bitset. */
-		if (num_pages <= BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS) {
+		if (num_bytes <= (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS) * PAGESIZE) {
 			corepair.cp_part->dp_pprop = (flags & GFP_PREFLT) ? (uintptr_t)-1 : 0;
 		} else if (flags & GFP_PREFLT) {
 			/* When pre-faulting, we can simply assign a `NULL' */
@@ -152,7 +157,9 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 			corepair.cp_part->dp_flags |= VM_DATAPART_FLAG_HEAPPPP;
 		} else {
 			/* Need the bitset to be dynamically allocated! */
-			size_t bitset_size = (num_pages + ((BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS) - 1)) & ~((BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS) - 1);
+			size_t bitset_size = ((num_bytes / PAGESIZE) +
+			                      ((BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS) - 1)) &
+			                     ~((BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS) - 1);
 #ifdef HEAP_NX
 			corepair.cp_part->dp_pprop_p = (uintptr_t *)kmalloc_nx(bitset_size,
 			                                                       CORE_ALLOC_FLAGS | GFP_CALLOC |
@@ -174,7 +181,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 #endif /* !HEAP_NX */
 			corepair.cp_part->dp_flags |= VM_DATAPART_FLAG_HEAPPPP;
 		}
-		block0_addr = page_malloc_part(1, num_pages, &block0_size);
+		block0_addr = page_malloc_part(1, num_bytes / PAGESIZE, &block0_size);
 		if unlikely(block0_addr == PAGEPTR_INVALID) {
 			/* Allocation failed. */
 #ifdef HEAP_NX
@@ -186,12 +193,12 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 			decref_nokill(corepair.cp_part->dp_block);
 			vm_node_free(corepair.cp_node);
 			vm_datapart_free(corepair.cp_part);
-			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, num_pages);
+			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, num_bytes);
 #endif /* !HEAP_NX */
 		}
-		HEAP_ASSERTF(block0_size >= 1, "num_pages = %Iu", num_pages);
-		HEAP_ASSERT(block0_size <= num_pages);
-		if likely(block0_size >= num_pages) {
+		HEAP_ASSERTF(block0_size >= 1, "num_bytes = %Iu", num_bytes);
+		HEAP_ASSERT(block0_size <= num_bytes / PAGESIZE);
+		if likely(block0_size >= num_bytes / PAGESIZE) {
 			/* All requested memory could be served as part of a single block. */
 			corepair.cp_part->dp_ramdata.rd_blockv          = &corepair.cp_part->dp_ramdata.rd_block0;
 			corepair.cp_part->dp_ramdata.rd_block0.rb_size  = block0_size;
@@ -210,7 +217,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 			blocks[0].rb_start = block0_addr;
 			blocks[0].rb_size  = block0_size;
 			/* Allocate more blocks and populate the block-vector. */
-			while (block0_size < num_pages) {
+			while (block0_size < (num_bytes / PAGESIZE)) {
 				pagecnt_t new_block_size;
 				if (blockc >= (kmalloc_usable_size(blocks) / sizeof(struct vm_ramblock))) {
 					new_blocks = (struct vm_ramblock *)krealloc_nx(blocks, (blockc * 2) * sizeof(struct vm_ramblock),
@@ -233,7 +240,7 @@ err_blocks:
 				}
 				/* Allocate the next part. */
 				block0_addr = page_malloc_part(1,
-				                               num_pages - block0_size,
+				                               (num_bytes / PAGESIZE) - block0_size,
 				                               &new_block_size);
 				if unlikely(block0_addr == PAGEPTR_INVALID)
 					goto err_blocks;
@@ -250,7 +257,7 @@ err_blocks:
 				blocks[blockc].rb_size  = new_block_size;
 #endif
 				block0_size += new_block_size;
-				HEAP_ASSERT(block0_size <= num_pages);
+				HEAP_ASSERT(block0_size <= (num_bytes / PAGESIZE));
 				++blockc;
 			}
 #else /* HEAP_NX */
@@ -265,7 +272,7 @@ err_blocks:
 				blocks[0].rb_start = block0_addr;
 				blocks[0].rb_size = block0_size;
 				/* Allocate more blocks and populate the block-vector. */
-				while (block0_size < num_pages) {
+				while (block0_size < (num_bytes / PAGESIZE)) {
 					pagecnt_t new_block_size;
 					if (blockc >= (kmalloc_usable_size(blocks) / sizeof(struct vm_ramblock))) {
 						new_blocks = (struct vm_ramblock *)krealloc_nx(blocks, (blockc * 2) * sizeof(struct vm_ramblock),
@@ -288,7 +295,7 @@ err_blocks:
 					}
 					/* Allocate the next part. */
 					block0_addr = page_malloc_part(1,
-					                               num_pages - block0_size,
+					                               (num_bytes / PAGESIZE) - block0_size,
 					                               &new_block_size);
 					if unlikely(block0_addr == PAGEPTR_INVALID) {
 						while (blockc--) {
@@ -296,12 +303,12 @@ err_blocks:
 							            blocks[blockc].rb_size);
 						}
 						kfree(blocks);
-						THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, num_pages);
+						THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, num_bytes);
 					}
 					blocks[blockc].rb_start = block0_addr;
 					blocks[blockc].rb_size = new_block_size;
 					block0_size += new_block_size;
-					HEAP_ASSERT(block0_size <= num_pages);
+					HEAP_ASSERT(block0_size <= (num_bytes / PAGESIZE));
 					++blockc;
 				}
 			} EXCEPT {
@@ -339,14 +346,14 @@ again_lock_vm:
 #endif /* !HEAP_NX */
 		if (mapping_target == CORE_PAGE_MALLOC_AUTO) {
 			/* search for a suitable location. */
-			vm_vpage_t mapping_hint;
+			void *mapping_hint;
 			unsigned int mapping_mode;
-			mapping_hint   = ATOMIC_READ(self->h_hintpage);
+			mapping_hint   = ATOMIC_READ(self->h_hintaddr);
 			mapping_mode   = ATOMIC_READ(self->h_hintmode);
 			mapping_target = vm_getfree(&vm_kernel,
 			                            mapping_hint,
-			                            num_pages,
-			                            alignment_in_pages,
+			                            num_bytes,
+			                            min_alignment,
 			                            mapping_mode);
 			if (mapping_target == VM_GETFREE_ERROR) {
 				uintptr_t version;
@@ -360,8 +367,8 @@ again_tryhard_mapping_target:
 				vm_kernel_treelock_read();
 				mapping_target = vm_getfree(&vm_kernel,
 				                            mapping_hint,
-				                            num_pages,
-				                            alignment_in_pages,
+				                            num_bytes,
+				                            min_alignment,
 				                            mapping_mode);
 				vm_kernel_treelock_endread();
 				if (mapping_target != VM_GETFREE_ERROR)
@@ -369,15 +376,15 @@ again_tryhard_mapping_target:
 				if (system_clearcaches_s(&version))
 					goto again_tryhard_mapping_target;
 				IFELSE_NX(goto err_corepair_content,
-				          THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, (uintptr_t)num_pages));
+				          THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, num_bytes));
 			}
 			/* Update the hint for the next allocation to be adjacent to this one. */
-			ATOMIC_CMPXCH(self->h_hintpage, mapping_hint,
-			              mapping_mode & VM_GETFREE_BELOW ? (mapping_target)
-			                                              : (mapping_target + num_pages));
+			ATOMIC_CMPXCH(self->h_hintaddr, mapping_hint,
+			              mapping_mode & VM_GETFREE_BELOW ? ((byte_t *)mapping_target)
+			                                              : ((byte_t *)mapping_target + num_bytes));
 		} else {
 			/* Check if there is already a mapping at the specified target address. */
-			if (vm_isused(&vm_kernel, mapping_target, mapping_target + num_pages - 1)) {
+			if (vm_isused(&vm_kernel, mapping_target, num_bytes)) {
 				/* There is... (crap!) */
 #ifdef HEAP_NX
 				goto err_corepair_content;
@@ -407,13 +414,13 @@ again_tryhard_mapping_target:
 			}
 		}
 
-		corepair.cp_node->vn_node.a_vmin = mapping_target;
-		corepair.cp_node->vn_node.a_vmax = mapping_target + num_pages - 1;
+		corepair.cp_node->vn_node.a_vmin = PAGEID_ENCODE((byte_t *)mapping_target);
+		corepair.cp_node->vn_node.a_vmax = PAGEID_ENCODE((byte_t *)mapping_target + num_bytes - 1);
 		{
 			/* Map the node to the kernel page directory & do initialization. */
 			struct vm_ramblock *blocks;
 			size_t blockc, i;
-			vm_vpage_t mapping_offset = 0;
+			size_t mapping_offset = 0;
 			blocks = corepair.cp_part->dp_ramdata.rd_blockv;
 			blockc = blocks == &corepair.cp_part->dp_ramdata.rd_block0
 			         ? 1
@@ -425,32 +432,36 @@ again_tryhard_mapping_target:
 				                                 blocks[i].rb_size)) {
 					/* Failed to map a part of the resulting data block. */
 					while (i--) {
-						mapping_offset -= blocks[i].rb_size;
+						mapping_offset -= blocks[i].rb_size * PAGESIZE;
 						pagedir_unprepare_map(mapping_target + mapping_offset,
 						                      blocks[i].rb_size);
 					}
 					IFELSE_NX(goto err_corepair_content,
 					          THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1));
 				}
+				mapping_offset += blocks[i].rb_size * PAGESIZE;
 			}
+			HEAP_ASSERT(mapping_offset == num_bytes);
+			mapping_offset = 0;
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			if (flags & GFP_PREFLT) {
 				/* Map all pre-allocated pages. */
 				for (i = 0; i < blockc; ++i) {
-					pagedir_map(mapping_target + mapping_offset,
-					            blocks[i].rb_size,
-					            blocks[i].rb_start,
-					            PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+					npagedir_map((byte_t *)mapping_target + mapping_offset,
+					             blocks[i].rb_size * PAGESIZE,
+					             page2addr(blocks[i].rb_start),
+					             PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 					if (flags & GFP_CALLOC) {
 						/* Write zeros to all random-content pages. */
 						pagecnt_t j;
 						for (j = 0; j < blocks[i].rb_size; ++j) {
-							vm_vpage_t vpage = mapping_target + mapping_offset + j;
 							pageptr_t ppage = blocks[i].rb_start + j;
 							if (!page_iszero(ppage)) {
-								memset((void *)VM_PAGE2ADDR(vpage), 0, PAGESIZE);
+								void *pageaddr;
+								pageaddr = (byte_t *)mapping_target + mapping_offset + j * PAGESIZE;
+								memset(pageaddr, 0, PAGESIZE);
 #ifdef CONFIG_HAVE_PAGEDIR_CHANGED
-								pagedir_unsetchanged(vpage);
+								npagedir_unsetchanged(pageaddr);
 #endif /* CONFIG_HAVE_PAGEDIR_CHANGED */
 							}
 						}
@@ -460,27 +471,28 @@ again_tryhard_mapping_target:
 						/* Fill memory using the fresh-memory pattern. */
 						pagecnt_t j;
 						for (j = 0; j < blocks[i].rb_size; ++j) {
-							vm_vpage_t vpage = mapping_target + mapping_offset + j;
-							mempatl((void *)VM_PAGE2ADDR(vpage),
+							void *pageaddr;
+							pageaddr = (byte_t *)mapping_target + mapping_offset + j * PAGESIZE;
+							mempatl(pageaddr,
 							        DEBUGHEAP_FRESH_MEMORY,
 							        PAGESIZE);
 #ifdef CONFIG_HAVE_PAGEDIR_CHANGED
-							pagedir_unsetchanged(vpage);
+							npagedir_unsetchanged(pageaddr);
 #endif /* CONFIG_HAVE_PAGEDIR_CHANGED */
 						}
 					}
 #endif /* CONFIG_DEBUG_HEAP */
-					mapping_offset += blocks[i].rb_size;
+					mapping_offset += blocks[i].rb_size * PAGESIZE;
 				}
-				HEAP_ASSERT((size_t)mapping_offset == num_pages);
+				HEAP_ASSERT(mapping_offset == num_bytes);
 			} else if (flags & GFP_LOCKED) {
 				/* Indicate that this node is being used with hinting. */
 				corepair.cp_node->vn_flags |= VM_NODE_FLAG_HINTED;
 				/* Set paging hints to allow for atomic initialization. */
 				for (i = 0; i < blockc; ++i) {
-					pagedir_maphint(mapping_target + mapping_offset,
-					                blocks[i].rb_size,
-					                corepair.cp_node);
+					npagedir_maphint((byte_t *)mapping_target + mapping_offset,
+					                 blocks[i].rb_size * PAGESIZE,
+					                 corepair.cp_node);
 				}
 			}
 		}
@@ -537,10 +549,12 @@ err:
 }
 
 
-PRIVATE VIRT vm_vpage_t
+PRIVATE VIRT void *
 NOTHROW_NX(KCALL FUNC(core_page_alloc_check_hint))(struct heap *__restrict self,
-                                                   vm_vpage_t mapping_target, size_t num_pages,
-                                                   size_t alignment_in_pages, gfp_t flags) {
+                                                   PAGEDIR_PAGEALIGNED void *mapping_target,
+                                                   PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                                   PAGEDIR_PAGEALIGNED size_t min_alignment,
+                                                   gfp_t flags) {
 	bool is_used;
 	HEAP_ASSERT(mapping_target != CORE_PAGE_MALLOC_AUTO);
 	/* Checking beforehand is much faster if the memory is already in use.
@@ -557,14 +571,14 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc_check_hint))(struct heap *__restrict self,
 	/* Check if the given address range is already in use! */
 	is_used = vm_isused(&vm_kernel,
 	                    mapping_target,
-	                    mapping_target + num_pages - 1);
+	                    num_bytes);
 	vm_kernel_treelock_endwrite(); /* TODO: A read-lock is sufficient for us! */
 	if (is_used)
 		return CORE_PAGE_MALLOC_ERROR;
 	return FUNC(core_page_alloc)(self,
 	                             mapping_target,
-	                             num_pages,
-	                             alignment_in_pages,
+	                             num_bytes,
+	                             min_alignment,
 	                             flags);
 }
 
@@ -742,9 +756,9 @@ search_heap:
 
 	/* No pre-allocated memory found. -> Allocate new memory. */
 	{
-		vm_vpage_t pageaddr;
+		void *pageaddr;
 		size_t page_bytes, unused_size;
-		if unlikely(OVERFLOW_UADD(result.hp_siz, PAGESIZE - 1, &page_bytes))
+		if unlikely(OVERFLOW_UADD(result.hp_siz, (size_t)(PAGESIZE - 1), &page_bytes))
 			IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, result.hp_siz));
 		if (!(flags & GFP_NOOVER)) {
 			/* Add overhead for overallocation. */
@@ -754,18 +768,17 @@ search_heap:
 		page_bytes &= ~PAGEMASK;
 		pageaddr = core_page_alloc_nx(self,
 		                              CORE_PAGE_MALLOC_AUTO,
-		                              page_bytes / PAGESIZE,
-		                              1,
+		                              page_bytes,
+		                              PAGESIZE,
 		                              flags);
 		if unlikely(pageaddr == CORE_PAGE_MALLOC_ERROR) {
 allocate_without_overalloc:
 			/* Try again without overallocation. */
-			page_bytes = result.hp_siz + PAGEMASK;
-			page_bytes &= ~PAGEMASK;
+			page_bytes = CEIL_ALIGN(result.hp_siz, PAGESIZE);
 			pageaddr = FUNC(core_page_alloc)(self,
 			                                 CORE_PAGE_MALLOC_AUTO,
-			                                 page_bytes / PAGESIZE,
-			                                 1,
+			                                 page_bytes,
+			                                 PAGESIZE,
 			                                 flags);
 #ifdef HEAP_NX
 			if unlikely(pageaddr == CORE_PAGE_MALLOC_ERROR)
@@ -773,10 +786,10 @@ allocate_without_overalloc:
 #endif /* HEAP_NX */
 		}
 		PRINTK_SYSTEM_ALLOCATION("Acquire kernel heap: %p...%p\n",
-		                         VM_PAGE2ADDR(pageaddr),
-		                         VM_PAGE2ADDR(pageaddr) + page_bytes - 1);
+		                         pageaddr,
+		                         (byte_t *)pageaddr + page_bytes - 1);
 		/* Got it! */
-		result.hp_ptr = (VIRT void *)VM_PAGE2ADDR(pageaddr);
+		result.hp_ptr = pageaddr;
 		unused_size   = page_bytes - result.hp_siz;
 		if unlikely(unused_size < HEAP_MINSIZE)
 			result.hp_siz = page_bytes;
@@ -812,14 +825,6 @@ allocate_without_overalloc:
 			/* Release the unused memory. */
 			heap_free_raw(self, unused_begin, unused_size, flags);
 		}
-#if 0
-		if (vm_kernel_treelock_trywrite()) {
-			/* Try to optimize the VM by merging the new mapping with adjacent nodes. */
-			vm_merge_before(&vm_kernel, pageaddr);
-			vm_merge_before(&vm_kernel, pageaddr + page_bytes / PAGESIZE);
-			vm_kernel_treelock_endwrite();
-		}
-#endif
 	}
 	HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_ptr, HEAP_ALIGNMENT));
 	HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_siz, HEAP_ALIGNMENT));
@@ -859,39 +864,29 @@ again:
 	pslot = mfree_tree_plocate_at(&self->h_addr, (uintptr_t)ptr,
 	                              &addr_semi, &addr_level);
 	if (!pslot) {
-		vm_vpage_t ptr_page;
+		PAGEDIR_PAGEALIGNED void *pageaddr;
 		sync_endwrite(&self->h_lock);
 		/* Not in cache. Try to allocate associated core memory. */
-		ptr_page = VM_ADDR2PAGE((vm_virt_t)ptr);
-		ptr_page = FUNC(core_page_alloc_check_hint)(self,
-		                                            ptr_page,
-		                                            1,
-		                                            1,
+		pageaddr = (void *)((uintptr_t)ptr & ~PAGEMASK);
+		pageaddr = FUNC(core_page_alloc_check_hint)(self,
+		                                            pageaddr,
+		                                            PAGESIZE,
+		                                            PAGESIZE,
 		                                            flags);
-		if (ptr_page == CORE_PAGE_MALLOC_ERROR)
+		if (pageaddr == CORE_PAGE_MALLOC_ERROR)
 			return 0;
 #ifdef CONFIG_DEBUG_HEAP
-		memsetl((void *)VM_PAGE2ADDR(ptr_page),
-		        DEBUGHEAP_NO_MANS_LAND, PAGESIZE / 4);
+		memsetl(pageaddr, DEBUGHEAP_NO_MANS_LAND, PAGESIZE / 4);
 #endif /* CONFIG_DEBUG_HEAP */
 		/* Release the page to the heap and allocate again.
 		 * NOTE: Set the `GFP_NOTRIM' to prevent the memory
 		 *       from be unmapped immediately. */
-		heap_free_raw(self, (void *)VM_PAGE2ADDR(ptr_page), PAGESIZE,
-		              flags | GFP_NOTRIM);
-#if 0
-		if (vm_kernel_treelock_trywrite()) {
-			/* Try to optimize the VM by merging the new mapping with adjacent nodes. */
-			vm_merge_before(&vm_kernel, ptr_page);
-			vm_merge_before(&vm_kernel, ptr_page + 1);
-			vm_kernel_treelock_endwrite();
-		}
-#endif
+		heap_free_raw(self, pageaddr, PAGESIZE, flags | GFP_NOTRIM);
 		goto again;
 	}
 	slot = *pslot;
-	HEAP_ASSERT((vm_virt_t)ptr >= MFREE_BEGIN(slot));
-	if ((vm_virt_t)ptr == MFREE_BEGIN(slot)) {
+	HEAP_ASSERT(ptr >= (void *)MFREE_BEGIN(slot));
+	if (ptr == (void *)MFREE_BEGIN(slot)) {
 		/* Allocate this entire slot, then remove unused memory from the end. */
 		HEAP_ASSERTE(mfree_tree_pop_at(pslot, addr_semi, addr_level) == slot);
 		LLIST_REMOVE(slot, mf_lsize);
@@ -920,58 +915,50 @@ again:
 			 * NOTE: If the slot doesn't start at a page boundary,
 			 *       we already know that the requested part has already
 			 *       been allocated (meaning this allocation is impossible) */
-			vm_vpage_t slot_page;
+			PAGEDIR_PAGEALIGNED void *slot_pageaddr;
 			sync_endwrite(&self->h_lock);
 			if (MFREE_BEGIN(slot) & PAGEMASK)
 				return 0; /* Not page-aligned. */
-			slot_page = VM_ADDR2PAGE(MFREE_BEGIN(slot));
-			if unlikely(slot_page == 0)
+			slot_pageaddr = (void *)MFREE_BEGIN(slot);
+			if unlikely(slot_pageaddr == 0)
 				return 0; /* Shouldn't happen: can't allocate previous page that doesn't exist. */
-			slot_page = FUNC(core_page_alloc_check_hint)(self,
-			                                             slot_page - 1,
-			                                             1,
-			                                             1,
-			                                             flags);
-			if (slot_page == CORE_PAGE_MALLOC_ERROR)
+			slot_pageaddr = FUNC(core_page_alloc_check_hint)(self,
+			                                                 (byte_t *)slot_pageaddr - PAGESIZE,
+			                                                 PAGESIZE,
+			                                                 PAGESIZE,
+			                                                 flags);
+			if (slot_pageaddr == CORE_PAGE_MALLOC_ERROR)
 				return 0; /* Failed to allocate the associated core-page. */
 			/* Free the page, so-as to try and merge it with the slot from before.
 			 * NOTE: Set the `GFP_NOTRIM' to prevent the memory
 			 *       from be unmapped immediately. */
 #ifdef CONFIG_DEBUG_HEAP
-			memsetl((void *)VM_PAGE2ADDR(slot_page),
-			        DEBUGHEAP_NO_MANS_LAND, PAGESIZE / 4);
+			memsetl(slot_pageaddr, DEBUGHEAP_NO_MANS_LAND, PAGESIZE / 4);
 #endif /* CONFIG_DEBUG_HEAP */
-			heap_free_raw(self, (void *)VM_PAGE2ADDR(slot_page),
+			heap_free_raw(self,
+			              slot_pageaddr,
 			              PAGESIZE,
 			              (flags & (__GFP_HEAPMASK | GFP_INHERIT)) | GFP_NOTRIM);
-#if 0
-			if (vm_kernel_treelock_trywrite()) {
-				/* Try to optimize the VM by merging the new mapping with adjacent nodes. */
-				vm_merge_before(&vm_kernel, slot_page);
-				vm_merge_before(&vm_kernel, slot_page + 1);
-				vm_kernel_treelock_endwrite();
-			}
-#endif
 			goto again;
 		}
 		result = slot->mf_size - free_offset;
 		if unlikely(result < HEAP_MINSIZE) {
 			/* Too close to the back. - Try to allocate the next page. */
-			vm_virt_t slot_end = MFREE_END(slot);
+			void *slot_end = (void *)MFREE_END(slot);
 			sync_endwrite(&self->h_lock);
-			if (slot_end & PAGEMASK)
+			if ((uintptr_t)slot_end & PAGEMASK)
 				return 0; /* Not page-aligned. */
 			if (FUNC(core_page_alloc_check_hint)(self,
-			                                     VM_ADDR2PAGE(slot_end),
-			                                     1,
-			                                     1,
+			                                     slot_end,
+			                                     PAGESIZE,
+			                                     PAGESIZE,
 			                                     flags) ==
 			    CORE_PAGE_MALLOC_ERROR)
 				return 0; /* Failed to allocate the associated core-page. */
 #ifdef CONFIG_DEBUG_HEAP
-			memsetl((void *)slot_end, DEBUGHEAP_NO_MANS_LAND, PAGESIZE / 4);
+			memsetl(slot_end, DEBUGHEAP_NO_MANS_LAND, PAGESIZE / 4);
 #endif /* CONFIG_DEBUG_HEAP */
-			heap_free_raw(self, (void *)slot_end, PAGESIZE,
+			heap_free_raw(self, slot_end, PAGESIZE,
 			              (flags & (__GFP_HEAPMASK | GFP_INHERIT)) |
 			              GFP_NOTRIM);
 			goto again;
@@ -1105,7 +1092,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 			struct mfree *chain;
 			void *hkeep, *tkeep;
 			gfp_t chain_flags;
-			vm_virt_t alignment_base;
+			byte_t *alignment_base;
 			size_t hkeep_size, tkeep_size;
 #ifdef CONFIG_HEAP_TRACE_DANGLE
 			size_t dangle_size;
@@ -1121,12 +1108,12 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 			if (!chain)
 				continue;
 			/* Check if this chain entry can sustain our required alignment. */
-			alignment_base = (vm_virt_t)chain;
+			alignment_base = (byte_t *)chain;
 			alignment_base += offset;
 			alignment_base += (min_alignment - 1);
-			alignment_base &= ~(min_alignment - 1);
+			alignment_base = (byte_t *)((uintptr_t)alignment_base & ~(min_alignment - 1));
 			alignment_base -= offset;
-			if unlikely(alignment_base < (vm_virt_t)chain)
+			if unlikely(alignment_base < (byte_t *)chain)
 				alignment_base += min_alignment;
 
 			/* `alignment_base' is now the effective base address which we want to use.
@@ -1134,12 +1121,12 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 			 * the nearest correctly aligned address (by adding `min_alignment').
 			 * This is required to ensure that the unused portion at `chain' continues
 			 * to be large enough to be re-freed (should we choose to use this node) */
-			if (alignment_base != (vm_virt_t)chain) {
-				while ((size_t)(alignment_base - (vm_virt_t)chain) < HEAP_MINSIZE)
+			if (alignment_base != (byte_t *)chain) {
+				while ((size_t)(alignment_base - (byte_t *)chain) < HEAP_MINSIZE)
 					alignment_base += min_alignment;
 			}
 			/* Check if the node still contains enough memory for the requested allocation. */
-			if ((alignment_base + alloc_bytes) > MFREE_END(chain))
+			if ((alignment_base + alloc_bytes) > (byte_t *)MFREE_END(chain))
 				continue; /* The chain entry is too small once alignment was taken into consideration. */
 			HEAP_ASSERTE(mfree_tree_remove(&self->h_addr, (uintptr_t)MFREE_BEGIN(chain)) == chain);
 			LLIST_REMOVE(chain, mf_lsize);
@@ -1149,7 +1136,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 			HEAP_ADD_DANGLE(self, dangle_size);
 #endif /* CONFIG_HEAP_TRACE_DANGLE */
 			sync_endwrite(&self->h_lock);
-			HEAP_ASSERT(IS_ALIGNED(alignment_base + offset, min_alignment));
+			HEAP_ASSERT(IS_ALIGNED((uintptr_t)(alignment_base + offset), min_alignment));
 
 			/* All right! we can actually use this one! */
 			result.hp_ptr = (VIRT void *)alignment_base;
@@ -1157,9 +1144,9 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 			/* Figure out how much memory should be re-freed at the front and back. */
 			chain_flags = chain->mf_flags;
 			hkeep       = (void *)chain;
-			hkeep_size  = (size_t)(alignment_base - (vm_virt_t)chain);
+			hkeep_size  = (size_t)(alignment_base - (byte_t *)chain);
 			tkeep       = (void *)((uintptr_t)result.hp_ptr + alloc_bytes);
-			tkeep_size  = (size_t)(MFREE_END(chain) - (vm_virt_t)tkeep);
+			tkeep_size  = (size_t)(MFREE_END(chain) - (uintptr_t)tkeep);
 #ifdef CONFIG_HEAP_RANDOMIZE_OFFSETS
 			if (tkeep_size > min_alignment) {
 				/* Add a random offset to the resulting pointer. */
@@ -1448,29 +1435,29 @@ err:
 
 PUBLIC WUNUSED ATTR_MALLOC ATTR_RETNONNULL
 ATTR_ASSUME_ALIGNED(PAGESIZE) VIRT /*page-aligned*/ void *
-NOTHROW_NX(KCALL FUNC(vpage_alloc_untraced))(size_t num_pages,
+NOTHROW_NX(KCALL FUNC(vpage_alloc_untraced))(size_t num_pages, /* TODO: This function should take byte counts! */
                                              size_t alignment_in_pages,
                                              gfp_t flags) {
-	vm_vpage_t result;
+	void *result;
 	result = FUNC(core_page_alloc)(&kernel_heaps[flags & GFP_LOCKED],
 	                               CORE_PAGE_MALLOC_AUTO,
-	                               num_pages,
-	                               alignment_in_pages,
+	                               num_pages * PAGESIZE,
+	                               alignment_in_pages * PAGESIZE,
 	                               flags);
 #ifdef HEAP_NX
 	if unlikely(result == CORE_PAGE_MALLOC_ERROR)
 		return NULL;
 #endif /* HEAP_NX */
-	return (void *)VM_PAGE2ADDR(result);
+	return result;
 }
 
 PUBLIC WUNUSED ATTR_RETNONNULL
 ATTR_ASSUME_ALIGNED(PAGESIZE) VIRT /*page-aligned*/ void *
 NOTHROW_NX(KCALL FUNC(vpage_realloc_untraced))(VIRT /*page-aligned*/ void *old_base,
-                                               size_t old_pages, size_t new_pages,
+                                               size_t old_pages, size_t new_pages, /* TODO: This function should take byte counts! */
                                                size_t alignment_in_pages,
                                                gfp_t alloc_flags, gfp_t free_flags) {
-	vm_vpage_t result;
+	void *result;
 	assertf(!old_pages || IS_ALIGNED((uintptr_t)old_base, PAGESIZE),
 	        "old_base = %p\n"
 	        "old_pages = %Iu (%#Ix)",
@@ -1486,8 +1473,8 @@ NOTHROW_NX(KCALL FUNC(vpage_realloc_untraced))(VIRT /*page-aligned*/ void *old_b
 		/* Special case: Allocate from ZERO. */
 		result = FUNC(core_page_alloc)(&kernel_heaps[alloc_flags & GFP_LOCKED],
 		                               CORE_PAGE_MALLOC_AUTO,
-		                               new_pages,
-		                               alignment_in_pages,
+		                               new_pages * PAGESIZE,
+		                               alignment_in_pages * PAGESIZE,
 		                               alloc_flags);
 #ifdef HEAP_NX
 		if unlikely(result == CORE_PAGE_MALLOC_ERROR)
@@ -1496,39 +1483,37 @@ NOTHROW_NX(KCALL FUNC(vpage_realloc_untraced))(VIRT /*page-aligned*/ void *old_b
 	} else {
 		/* Generic case: Try to extent a given memory mapping. */
 		result = FUNC(core_page_alloc_check_hint)(&kernel_heaps[alloc_flags & GFP_LOCKED],
-		                                          VM_ADDR2PAGE((vm_virt_t)old_base) + old_pages,
-		                                          new_pages - old_pages,
-		                                          1,
+		                                          (byte_t *)old_base + old_pages * PAGESIZE,
+		                                          (new_pages - old_pages) * PAGESIZE,
+		                                          PAGESIZE,
 		                                          alloc_flags);
 		if (result != CORE_PAGE_MALLOC_ERROR)
 			return old_base; /* Extension was successful */
 		/* Must allocate a new block, then copy data from the old one into it. */
 		result = FUNC(core_page_alloc)(&kernel_heaps[alloc_flags & GFP_LOCKED],
 		                               CORE_PAGE_MALLOC_AUTO,
-		                               new_pages,
-		                               alignment_in_pages,
+		                               new_pages * PAGESIZE,
+		                               alignment_in_pages * PAGESIZE,
 		                               alloc_flags);
 #ifdef HEAP_NX
 		if unlikely(result == CORE_PAGE_MALLOC_ERROR)
 			return NULL;
 #endif /* HEAP_NX */
 		TRY {
-			memcpyl((void *)VM_PAGE2ADDR(result),
-			        old_base,
-			        old_pages * PAGESIZE / 4);
+			memcpy(result, old_base, old_pages, PAGESIZE);
 		} EXCEPT {
-			vm_unmap_kernel_ram(result, new_pages, false);
+			vm_unmap_kernel_ram(result, new_pages * PAGESIZE, false);
 #ifdef HEAP_NX
 			return NULL;
 #else /* HEAP_NX */
 			RETHROW();
 #endif /* !HEAP_NX */
 		}
-		vm_unmap_kernel_ram(VM_ADDR2PAGE((vm_virt_t)old_base),
-		                    old_pages,
+		vm_unmap_kernel_ram(old_base,
+		                    old_pages * PAGESIZE,
 		                    !!(free_flags & GFP_CALLOC));
 	}
-	return (void *)VM_PAGE2ADDR(result);
+	return result;
 }
 
 

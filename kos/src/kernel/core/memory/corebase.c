@@ -121,7 +121,7 @@ NOTHROW(KCALL do_free_part)(void *__restrict part) {
 			*ppage = page->cp_ctrl.cpc_prev;
 			vm_corepage_free -= VM_COREPAIRS_PER_PAGE;
 			/* Atomically unmap the containing page. */
-			vm_unmap_kernel_ram((vm_vpage_t)VM_ADDR2PAGE((uintptr_t)page), 1, false);
+			vm_unmap_kernel_ram(page, PAGESIZE, false);
 		}
 	}
 }
@@ -255,11 +255,11 @@ allocate_from_corepage:
 			goto allocate_from_corepage;
 		}
 		/* XXX: Check if we can simply extend an existing core page? */
-		mapping_target = nvm_getfree(&vm_kernel,
-		                             HINT_GETADDR(KERNEL_VMHINT_COREPAGE),
-		                             PAGESIZE, PAGESIZE,
-		                             HINT_GETMODE(KERNEL_VMHINT_COREPAGE));
-		if unlikely(mapping_target == NVM_GETFREE_ERROR) {
+		mapping_target = vm_getfree(&vm_kernel,
+		                            HINT_GETADDR(KERNEL_VMHINT_COREPAGE),
+		                            PAGESIZE, PAGESIZE,
+		                            HINT_GETMODE(KERNEL_VMHINT_COREPAGE));
+		if unlikely(mapping_target == VM_GETFREE_ERROR) {
 			uintptr_t version;
 			vm_kernel_treelock_endwrite();
 			sync_endwrite(&vm_corepage_lock);
@@ -270,12 +270,12 @@ allocate_from_corepage:
 			version = 0;
 again_tryhard_mapping_target:
 			vm_kernel_treelock_read();
-			mapping_target = nvm_getfree(&vm_kernel,
+			mapping_target = vm_getfree(&vm_kernel,
 			                             HINT_GETADDR(KERNEL_VMHINT_COREPAGE),
 			                             PAGESIZE, PAGESIZE,
 			                             HINT_GETMODE(KERNEL_VMHINT_COREPAGE));
 			vm_kernel_treelock_endread();
-			if (mapping_target != NVM_GETFREE_ERROR)
+			if (mapping_target != VM_GETFREE_ERROR)
 				goto again;
 			if (system_clearcaches_s(&version))
 				goto again_tryhard_mapping_target;
@@ -322,7 +322,7 @@ again_tryhard_mapping_target:
 
 		/* With everything now allocated, fill in node data
 		 * and register the node in the kernel VM. */
-		result.cp_node->vn_node.a_vmin = (vm_vpage_t)__ARCH_PAGEID_ENCODE(mapping_target);
+		result.cp_node->vn_node.a_vmin = PAGEID_ENCODE(mapping_target);
 		result.cp_node->vn_node.a_vmax = result.cp_node->vn_node.a_vmin;
 		result.cp_part->dp_block       = incref(&vm_datablock_anonymous);
 		result.cp_node->vn_block       = incref(&vm_datablock_anonymous);

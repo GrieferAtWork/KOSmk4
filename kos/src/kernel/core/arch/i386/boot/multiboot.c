@@ -208,13 +208,13 @@ load_bootloader_driver2(PHYS u32 blob_addr, size_t blob_size, char *cmdline) {
 		/* Drop the reference returned by driver_insmod_blob() */
 		decref(drv);
 	} EXCEPT {
-		nvm_unmap(&vm_kernel,
+		vm_unmap(&vm_kernel,
 		          blob,
 		          aligned_blob_size,
 		          VM_UNMAP_RESERVE);
 		RETHROW();
 	}
-	nvm_unmap(&vm_kernel,
+	vm_unmap(&vm_kernel,
 	          blob,
 	          aligned_blob_size,
 	          VM_UNMAP_RESERVE);

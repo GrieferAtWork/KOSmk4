@@ -196,16 +196,16 @@ INTERN struct vm_datapart x86_kernel_vm_parts[6] = {
 
 INTERN struct vm_node x86_vmnode_transition_reserve =
 	INIT_NODE_RESERVE(x86_vmnode_transition_reserve,
-	                 (vm_vpage_t)KERNEL_BASE_PAGE,
-	                 (vm_vpage_t)KERNEL_BASE_PAGE,
+	                  PAGEID_ENCODE(KERNEL_BASE),
+	                  PAGEID_ENCODE(KERNEL_BASE),
 	                  VM_PROT_NONE,
 	                  kernel_vm_single_reserved_page);
 
 INTERN struct vm_node x86_kernel_vm_nodes[8] = {
 #define DO_INIT_NODE(id, startpage, endpage, prot) \
 	INIT_NODE(x86_kernel_vm_nodes[id],             \
-	          (vm_vpage_t)(uintptr_t)(startpage),  \
-	          (vm_vpage_t)(uintptr_t)(endpage)-1,  \
+	          (uintptr_t)(startpage),              \
+	          (uintptr_t)(endpage)-1,              \
 	          prot,                                \
 	          x86_kernel_vm_parts[id])
 	DO_INIT_NODE(X86_KERNEL_VMMAPPING_CORE_TEXT, __kernel_text_startpage, __kernel_text_endpage, VM_PROT_READ | VM_PROT_EXEC),
@@ -228,8 +228,8 @@ INTERN struct vm_node x86_kernel_vm_nodes[8] = {
 	/* [X86_KERNEL_VMMAPPING_IDENTITY_RESERVE] = */
 #ifdef X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE
 		INIT_NODE_RESERVE(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE],
-		                  (vm_vpage_t)0, /* Calculated below */
-		                  (vm_vpage_t)0, /* Calculated below */
+		                  0, /* Calculated below */
+		                  0, /* Calculated below */
 		                  VM_PROT_NONE,
 		                  x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE]),
 #else /* X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE */
@@ -250,8 +250,8 @@ INTERN struct vm_datapart x86_vm_part_pdata =
 	              __kernel_pdata_startpage, __kernel_pdata_numpages);
 INTERN struct vm_node x86_vm_node_pdata =
 	INIT_NODE(x86_vm_node_pdata,
-	          (vm_vpage_t)((uintptr_t)__kernel_pdata_startpage - KERNEL_BASE_PAGE),
-	          (vm_vpage_t)((uintptr_t)__kernel_pdata_endpage - (KERNEL_BASE_PAGE + 1)),
+	          (uintptr_t)__kernel_pdata_startpage - KERNEL_BASE_PAGE,
+	          (uintptr_t)__kernel_pdata_endpage - (KERNEL_BASE_PAGE + 1),
 	           VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC,
 	           x86_vm_part_pdata);
 
@@ -272,8 +272,8 @@ INTERN ATTR_FREEDATA struct vm_datapart x86_kernel_vm_part_free =
 	              __kernel_free_startpage, __kernel_free_numpages);
 INTERN ATTR_FREEDATA struct vm_node x86_kernel_vm_node_free =
 	INIT_NODE(x86_kernel_vm_node_free,
-	          (vm_vpage_t)((uintptr_t)__kernel_free_startpage),
-	          (vm_vpage_t)((uintptr_t)__kernel_free_endpage - 1),
+	          (uintptr_t)__kernel_free_startpage,
+	          (uintptr_t)__kernel_free_endpage - 1,
 	          VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC,
 	          x86_kernel_vm_part_free);
 
@@ -351,11 +351,8 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 #ifdef X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE
 	{
 		/* Calculate the PDIR Identity reservation at runtime. */
-		vm_vpage_t min = (vm_vpage_t)(X86_VM_KERNEL_PDIR_RESERVED_BASE / PAGESIZE);
-		vm_vpage_t max = (vm_vpage_t)(X86_VM_KERNEL_PDIR_RESERVED_BASE +
-		                              X86_VM_KERNEL_PDIR_RESERVED_SIZE -
-		                              PAGESIZE) /
-		                 PAGESIZE;
+		pageid_t min = PAGEID_ENCODE(X86_VM_KERNEL_PDIR_RESERVED_BASE);
+		pageid_t max = PAGEID_ENCODE(X86_VM_KERNEL_PDIR_RESERVED_BASE + X86_VM_KERNEL_PDIR_RESERVED_SIZE - 1);
 		x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE].vn_node.a_vmin = min;
 		x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE].vn_node.a_vmax = max;
 	}
@@ -363,12 +360,11 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 
 	/* Unmap everything before the kernel. */
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (pagedir_prepare_map((vm_vpage_t)KERNEL_BASE_PAGE,
-	                        ((uintptr_t)__kernel_text_startpage - KERNEL_BASE_PAGE)))
+	if (npagedir_prepare_map((void *)KERNEL_BASE, ((uintptr_t)__kernel_text_startpage - KERNEL_BASE_PAGE) * PAGESIZE))
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
-		pagedir_unmap((vm_vpage_t)KERNEL_BASE_PAGE,
-		              ((uintptr_t)__kernel_text_startpage - KERNEL_BASE_PAGE));
+		npagedir_unmap((void *)KERNEL_BASE,
+		               ((uintptr_t)__kernel_text_startpage - KERNEL_BASE_PAGE) * PAGESIZE);
 	}
 	assert(kernel_vm_node_pagedata.vn_node.a_vmin != 0);
 
@@ -415,38 +411,40 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 
 	/* Map the LAPIC into the kernel VM. */
 	if (x86_vm_part_lapic.dp_tree.a_vmax >= x86_vm_part_lapic.dp_tree.a_vmin) {
+		void *lapic_addr;
 		assert(vm_datapart_numdpages(&x86_vm_part_lapic) ==
 		       x86_vm_part_lapic.dp_ramdata.rd_block0.rb_size);
-		x86_vm_node_lapic.vn_node.a_vmin = vm_getfree(&vm_kernel,
-		                                                (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_LAPIC),
-		                                                vm_datapart_numdpages(&x86_vm_part_lapic), 1,
-		                                                HINT_GETMODE(KERNEL_VMHINT_LAPIC));
-		if unlikely(x86_vm_node_lapic.vn_node.a_vmin == VM_GETFREE_ERROR)
+		lapic_addr = vm_getfree(&vm_kernel,
+		                        HINT_GETADDR(KERNEL_VMHINT_LAPIC),
+		                        vm_datapart_numbytes(&x86_vm_part_lapic), PAGESIZE,
+		                        HINT_GETMODE(KERNEL_VMHINT_LAPIC));
+		if unlikely(lapic_addr == VM_GETFREE_ERROR)
 			kernel_panic(FREESTR("Failed to map the LAPIC somewhere\n"));
+		x86_vm_node_lapic.vn_node.a_vmin = PAGEID_ENCODE(lapic_addr);
 		x86_vm_node_lapic.vn_node.a_vmax = x86_vm_node_lapic.vn_node.a_vmin;
 		x86_vm_node_lapic.vn_node.a_vmax += vm_datapart_numdpages(&x86_vm_part_lapic) - 1;
 		simple_insert_and_activate(&x86_vm_node_lapic,
 		                           PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 		/* Remember where we mapped the LAPIC */
-		_x86_lapicbase += (uintptr_t)VM_PAGE2ADDR(x86_vm_node_lapic.vn_node.a_vmin);
+		_x86_lapicbase += (uintptr_t)lapic_addr;
 	}
 
 	{
 		/* Unmap unused memory above the kernel. */
 		struct vm_node *iter = &x86_kernel_vm_node_free;
 		for (;;) {
-			vm_vpage_t pagedata_prev_end;
-			vm_vpage_t pagedata_next_min;
-			pagedata_prev_end = VM_NODE_END(iter);
+			void *pagedata_prev_end;
+			void *pagedata_next_min;
+			pagedata_prev_end = vm_node_getend(iter);
 			iter = iter->vn_byaddr.ln_next;
 			if (!iter)
 				break; /* The previous node should have been `X86_KERNEL_VMMAPPING_IDENTITY_RESERVE' at this point. */
-			pagedata_next_min = VM_NODE_MIN(iter);
+			pagedata_next_min = vm_node_getstart(iter);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-			if (pagedir_prepare_map(pagedata_prev_end, (size_t)(pagedata_next_min - pagedata_prev_end)))
-				pagedir_unmap(pagedata_prev_end, (size_t)(pagedata_next_min - pagedata_prev_end));
+			if (npagedir_prepare_map((byte_t *)pagedata_prev_end, (size_t)((byte_t *)pagedata_next_min - (byte_t *)pagedata_prev_end)))
+				npagedir_unmap((byte_t *)pagedata_prev_end, (size_t)((byte_t *)pagedata_next_min - (byte_t *)pagedata_prev_end));
 #else /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-			pagedir_unmap(pagedata_prev_end, (size_t)(pagedata_next_min - pagedata_prev_end));
+			npagedir_unmap(pagedata_prev_end, (size_t)((byte_t *)pagedata_next_min - (byte_t *)pagedata_prev_end));
 #endif /* !CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		}
 	}
@@ -460,36 +458,36 @@ NOTHROW(KCALL x86_initialize_kernel_vm_readonly)(void) {
 	 * This affects the kernel's .text and .rodata section, which previously
 	 * allowed self-modifying code to replace itself with an optimized/more
 	 * appropriate version. */
-	pagedir_map(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_TEXT].vn_node.a_vmin,
-	            x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_TEXT].dp_ramdata.rd_block0.rb_size,
-	            x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_TEXT].dp_ramdata.rd_block0.rb_start,
-	            PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD);
-	pagedir_map(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_RODATA].vn_node.a_vmin,
-	            x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_RODATA].dp_ramdata.rd_block0.rb_size,
-	            x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_RODATA].dp_ramdata.rd_block0.rb_start,
-	            PAGEDIR_MAP_FREAD);
-	assert(!pagedir_iswritable(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_TEXT].vn_node.a_vmin));
-	assert(!pagedir_iswritable(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_RODATA].vn_node.a_vmin));
+	npagedir_map(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_TEXT].vn_node.a_vmin),
+	             x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_TEXT].dp_ramdata.rd_block0.rb_size * PAGESIZE,
+	             page2addr(x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_TEXT].dp_ramdata.rd_block0.rb_start),
+	             PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD);
+	npagedir_map(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_RODATA].vn_node.a_vmin),
+	             x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_RODATA].dp_ramdata.rd_block0.rb_size * PAGESIZE,
+	             page2addr(x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_RODATA].dp_ramdata.rd_block0.rb_start),
+	             PAGEDIR_MAP_FREAD);
+	assert(!npagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_TEXT].vn_node.a_vmin)));
+	assert(!npagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_RODATA].vn_node.a_vmin)));
 #ifdef X86_KERNEL_VMMAPPING_CORE_DATA
-	assert(pagedir_iswritable(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA].vn_node.a_vmin));
+	assert(npagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA].vn_node.a_vmin)));
 #else /* X86_KERNEL_VMMAPPING_CORE_DATA */
-	assert(pagedir_iswritable(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA1].vn_node.a_vmin));
-	assert(pagedir_iswritable(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA2].vn_node.a_vmin));
+	assert(npagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA1].vn_node.a_vmin)));
+	assert(npagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_DATA2].vn_node.a_vmin)));
 #endif /* !X86_KERNEL_VMMAPPING_CORE_DATA */
-	assert(pagedir_iswritable(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_XDATA].vn_node.a_vmin));
+	assert(npagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_XDATA].vn_node.a_vmin)));
 #ifdef X86_KERNEL_VMMAPPING_CORE_BSS
-	assert(pagedir_iswritable(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS].vn_node.a_vmin));
+	assert(npagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS].vn_node.a_vmin)));
 #else /* X86_KERNEL_VMMAPPING_CORE_BSS */
-	assert(pagedir_iswritable(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS1].vn_node.a_vmin));
-	assert(pagedir_iswritable(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS2].vn_node.a_vmin));
+	assert(npagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS1].vn_node.a_vmin)));
+	assert(npagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_BSS2].vn_node.a_vmin)));
 #endif /* !X86_KERNEL_VMMAPPING_CORE_BSS */
 
 	/* Get rid of the page guarding the end of the boot-task stack. */
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (pagedir_prepare_mapone((vm_vpage_t)__kernel_boottask_stack_guard))
+	if (npagedir_prepare_mapone(__kernel_boottask_stack_guard))
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
-		pagedir_unmapone((vm_vpage_t)__kernel_boottask_stack_guard);
+		npagedir_unmapone(__kernel_boottask_stack_guard);
 	}
 }
 
@@ -512,7 +510,7 @@ INTDEF byte_t __kernel_pfree_numpages[];
 INTERN ATTR_SECTION(".text.xdata.x86.free_unloader") ATTR_NORETURN
 void KCALL x86_kernel_unload_free_and_jump_to_userspace(void) {
 #if 1
-	vm_node_remove(&vm_kernel, (vm_vpage_t)__kernel_free_startpage);
+	vm_paged_node_remove(&vm_kernel, (vm_vpage_t)__kernel_free_startpage);
 
 	/* Unmap the entire .free section (in the kernel page directory)
 	 * NOTE: Make sure not to unmap the first couple of pages which

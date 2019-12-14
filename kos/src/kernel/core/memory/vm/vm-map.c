@@ -393,7 +393,7 @@ handle_remove_write_error:
 
 
 /* Map the memory region into the given VM.
- * The caller may invoke `vm_sync()' after changes have been made.
+ * The caller may invoke `vm_paged_sync()' after changes have been made.
  * @param: prot:   Set of `VM_PROT_*'.
  * @param: flag:   Set of `VM_NODE_FLAG_*'.
  * @param: data_start_vpage: The memory page index where mapping of `data' starts.
@@ -402,11 +402,11 @@ handle_remove_write_error:
  * @return: true:  Successfully created the mapping.
  * @return: false: Another mapping already exists. */
 PUBLIC bool KCALL
-vm_mapat(struct vm *__restrict effective_vm,
-         vm_vpage_t page_index, size_t num_pages,
-         struct vm_datablock *__restrict data,
-         vm_vpage64_t data_start_vpage, uintptr_half_t prot,
-         uintptr_half_t flag, uintptr_t guard)
+vm_paged_mapat(struct vm *__restrict effective_vm,
+               pageid_t page_index, size_t num_pages,
+               struct vm_datablock *__restrict data,
+               vm_vpage64_t data_start_vpage, uintptr_half_t prot,
+               uintptr_half_t flag, uintptr_t guard)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	size_t i;
 	struct partnode_pair_vector parts;
@@ -499,7 +499,7 @@ vm_mapat(struct vm *__restrict effective_vm,
  * @return: false: Another mapping already exists. */
 PUBLIC bool KCALL
 vm_mapresat(struct vm *__restrict effective_vm,
-            vm_vpage_t page_index, size_t num_pages,
+            pageid_t page_index, size_t num_pages,
             uintptr_half_t flag)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	struct vm_node *node;
@@ -549,11 +549,11 @@ vm_mapresat(struct vm *__restrict effective_vm,
 
 
 
-/* A combination of `vm_getfree' + `vm_mapat'
+/* A combination of `vm_paged_getfree' + `vm_paged_mapat'
  * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target. */
-PUBLIC vm_vpage_t KCALL
+PUBLIC pageid_t KCALL
 vm_map(struct vm *__restrict effective_vm,
-       vm_vpage_t hint, size_t num_pages,
+       pageid_t hint, size_t num_pages,
        size_t min_alignment_in_pages,
        unsigned int getfree_mode,
        struct vm_datablock *__restrict data,
@@ -561,7 +561,7 @@ vm_map(struct vm *__restrict effective_vm,
        uintptr_half_t flag, uintptr_t guard)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	size_t i;
-	vm_vpage_t result, offset;
+	pageid_t result, offset;
 	struct partnode_pair_vector parts;
 	uintptr_t version = 0;
 	assert(!(flag & (VM_NODE_FLAG_COREPRT | VM_NODE_FLAG_KERNPRT | VM_NODE_FLAG_HINTED)));
@@ -579,12 +579,12 @@ again:
 	/* The rest of this function is already NOEXCEPT at this point.
 	 * However, we still need to check that the indicated range isn't
 	 * already being used by some other mapping! */
-	result = vm_getfree(effective_vm,
+	result = vm_paged_getfree(effective_vm,
 	                    hint,
 	                    num_pages,
 	                    min_alignment_in_pages,
 	                    getfree_mode);
-	if unlikely(result == VM_GETFREE_ERROR) {
+	if unlikely(result == VM_PAGED_GETFREE_ERROR) {
 		/* It _is_ already being used... */
 		sync_endwrite(effective_vm);
 		partnode_pair_vector_fini_and_unlock_parts(&parts);
@@ -593,7 +593,7 @@ again:
 		THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
 		      num_pages);
 	}
-	assertf(!vm_isused(effective_vm, result, result + num_pages - 1),
+	assertf(!vm_paged_isused(effective_vm, result, result + num_pages - 1),
 	        "result             = %p (%p)\n"
 	        "num_pages          = %Iu\n"
 	        "result + num_pages = %p (%p)\n",
@@ -638,7 +638,7 @@ again:
 		        VM_PAGE2ADDR(result), result, num_pages,
 		        VM_PAGE2ADDR(offset + part_pages), offset + part_pages,
 		        VM_PAGE2ADDR(result + num_pages), result + num_pages);
-		assertf(!vm_isused(effective_vm, offset, offset + part_pages - 1),
+		assertf(!vm_paged_isused(effective_vm, offset, offset + part_pages - 1),
 		        "offset              = %p (%p)\n"
 		        "part_pages          = %Iu\n"
 		        "result              = %p (%p)\n"
@@ -694,15 +694,15 @@ again:
 
 
 
-/* A combination of `vm_getfree' + `vm_mapresat'
+/* A combination of `vm_paged_getfree' + `vm_mapresat'
  * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target. */
-PUBLIC vm_vpage_t KCALL
+PUBLIC pageid_t KCALL
 vm_mapres(struct vm *__restrict effective_vm,
-          vm_vpage_t hint, size_t num_pages,
+          pageid_t hint, size_t num_pages,
           size_t min_alignment_in_pages,
           unsigned int getfree_mode, uintptr_half_t flag) {
 	struct vm_node *node;
-	vm_vpage_t result;
+	pageid_t result;
 	uintptr_t version = 0;
 	assert(!(flag & ~(VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_NOMERGE)));
 	if unlikely(!num_pages)
@@ -726,12 +726,12 @@ again_lock_vm:
 		RETHROW();
 	}
 	/* Figure out a suitable mapping location */
-	result = vm_getfree(effective_vm,
+	result = vm_paged_getfree(effective_vm,
 	                    hint,
 	                    num_pages,
 	                    min_alignment_in_pages,
 	                    getfree_mode);
-	if unlikely(result == VM_GETFREE_ERROR) {
+	if unlikely(result == VM_PAGED_GETFREE_ERROR) {
 		/* It _is_ already being used... */
 		sync_endwrite(effective_vm);
 		if (system_clearcaches_s(&version))
@@ -841,20 +841,20 @@ NOTHROW(KCALL vm_map_subrange_descriptors_insert_into_vm)(struct vm_map_subrange
                                                           struct vm_datablock *__restrict data,
                                                           size_t num_datavpages,
                                                           size_t num_zerovpages,
-                                                          vm_vpage_t base_offset,
+                                                          pageid_t base_offset,
                                                           uintptr_half_t prot,
                                                           uintptr_half_t flag,
                                                           uintptr_t guard) {
 	struct partnode_pair *partvec;
 	size_t i, partcnt;
-	vm_vpage_t node_minpage;
+	pageid_t node_minpage;
 	assert(num_datavpages);
 	assert(num_zerovpages);
 	assert((size_t)(num_datavpages + num_zerovpages) > num_datavpages);
 	assert((size_t)(num_datavpages + num_zerovpages) > num_zerovpages);
-	assert((vm_vpage_t)(base_offset + num_datavpages + num_zerovpages - 1) >= base_offset);
+	assert((pageid_t)(base_offset + num_datavpages + num_zerovpages - 1) >= base_offset);
 	assert(sync_writing(effective_vm));
-	assert(!vm_isused(effective_vm, base_offset, base_offset + num_datavpages + num_zerovpages - 1));
+	assert(!vm_paged_isused(effective_vm, base_offset, base_offset + num_datavpages + num_zerovpages - 1));
 	assert(!(flag & (VM_NODE_FLAG_COREPRT | VM_NODE_FLAG_KERNPRT | VM_NODE_FLAG_HINTED)));
 	assert(!(prot & ~(VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ | VM_PROT_LOOSE | VM_PROT_SHARED)));
 	partvec = self->sd_dataparts.pv_vec;
@@ -939,9 +939,9 @@ NOTHROW(KCALL vm_map_subrange_descriptors_insert_into_vm)(struct vm_map_subrange
  * to be mapped from `data'. - Any attempted to map data from outside that range will instead cause
  * memory from `vm_datablock_anonymous_zero' to be mapped.
  * Additionally, `data_start_vpage' is an offset from `data_subrange_minvpage' */
-PUBLIC vm_vpage_t KCALL
-vm_map_subrange(struct vm *__restrict effective_vm,
-                vm_vpage_t hint,
+PUBLIC pageid_t KCALL
+vm_paged_map_subrange(struct vm *__restrict effective_vm,
+                pageid_t hint,
                 size_t num_pages,
                 size_t min_alignment_in_pages,
                 unsigned int getfree_mode,
@@ -953,7 +953,7 @@ vm_map_subrange(struct vm *__restrict effective_vm,
                 uintptr_half_t flag,
                 uintptr_t guard)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	vm_vpage_t result;
+	pageid_t result;
 	vm_vpage64_t data_minmappage, data_maxmappage;
 	if unlikely(!num_pages)
 		num_pages = 1;
@@ -997,12 +997,12 @@ again_create_sr:
 		                                                       num_zerovpages,
 		                                                       prot);
 		/* Figure out where the mapping should go. */
-		result = vm_getfree(effective_vm,
+		result = vm_paged_getfree(effective_vm,
 		                    hint,
 		                    num_pages,
 		                    min_alignment_in_pages,
 		                    getfree_mode);
-		if unlikely(result == VM_GETFREE_ERROR) {
+		if unlikely(result == VM_PAGED_GETFREE_ERROR) {
 			sync_endwrite(effective_vm);
 			vm_map_subrange_descriptors_fini_and_unlock_parts(&sr);
 			if (system_clearcaches_s(&version))
@@ -1044,34 +1044,34 @@ done:
 
 
 
-/* Same as `vm_mapat()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
+/* Same as `vm_paged_mapat()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
  * to be mapped from `data'. - Any attempted to map data from outside that range will instead cause
  * memory from `vm_datablock_anonymous_zero' to be mapped.
  * Additionally, `data_start_vpage' is an offset from `data_subrange_minvpage' */
 PUBLIC bool KCALL
-vm_mapat_subrange(struct vm *__restrict effective_vm,
-                  vm_vpage_t page_index, size_t num_pages,
-                  struct vm_datablock *__restrict data,
-                  vm_vpage64_t data_start_vpage,
-                  vm_vpage64_t data_subrange_minvpage,
-                  vm_vpage64_t data_subrange_maxvpage,
-                  uintptr_half_t prot,
-                  uintptr_half_t flag,
-                  uintptr_t guard)
+vm_paged_mapat_subrange(struct vm *__restrict effective_vm,
+                        pageid_t page_index, size_t num_pages,
+                        struct vm_datablock *__restrict data,
+                        vm_vpage64_t data_start_vpage,
+                        vm_vpage64_t data_subrange_minvpage,
+                        vm_vpage64_t data_subrange_maxvpage,
+                        uintptr_half_t prot,
+                        uintptr_half_t flag,
+                        uintptr_t guard)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	vm_vpage64_t data_minmappage, data_maxmappage;
-	vm_vpage_t maxvpage;
+	pageid_t maxvpage;
 	if unlikely(!num_pages)
 		num_pages = 1;
 	/* Make sure that the mapping doesn't end up out-of-bounds! */
 	if (OVERFLOW_UADD(page_index, num_pages - 1, &maxvpage) ||
-	    maxvpage > VM_VPAGE_MAX)
+	    maxvpage > __ARCH_PAGEID_MAX)
 		return false;
 	if (OVERFLOW_UADD(data_subrange_minvpage, data_start_vpage, &data_minmappage) ||
 		data_minmappage > data_subrange_maxvpage) {
 		/* The entire range is out-of-bounds.
 		 * Map everything as ANON+ZERO */
-		return vm_mapat(effective_vm,
+		return vm_paged_mapat(effective_vm,
 		                page_index,
 		                num_pages,
 		                &vm_datablock_anonymous_zero,
@@ -1102,7 +1102,7 @@ vm_mapat_subrange(struct vm *__restrict effective_vm,
 		                                                       num_zerovpages,
 		                                                       prot);
 		/* Figure out where the mapping should go. */
-		if unlikely(vm_isused(effective_vm, page_index, maxvpage)) {
+		if unlikely(vm_paged_isused(effective_vm, page_index, maxvpage)) {
 			sync_endwrite(effective_vm);
 			vm_map_subrange_descriptors_fini_and_unlock_parts(&sr);
 			return false;
@@ -1124,7 +1124,7 @@ vm_mapat_subrange(struct vm *__restrict effective_vm,
 
 	/* The entire mapping fits into the allowed mapping-range of the given data-block.
 	 * -> We can just map the memory normally. */
-	return vm_mapat(effective_vm,
+	return vm_paged_mapat(effective_vm,
 	                page_index,
 	                num_pages,
 	                data,

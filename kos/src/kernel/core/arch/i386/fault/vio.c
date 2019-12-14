@@ -276,7 +276,7 @@ INTERN struct icpustate *
 NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args, uintptr_t cr2) {
 	/* Exceptions always point to the instruction _after_ the faulting one! */
 	byte_t *orig_pc, *pc;
-	vm_daddr_t vio_addr;
+	pos_t vio_addr;
 	struct modrm mod;
 	struct icpustate *state = args->ma_args.va_state;
 	uintptr_t value, temp;
@@ -285,9 +285,9 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args
 	bool isuser;
 	isuser  = icpustate_isuser(state);
 	orig_pc = (byte_t *)icpustate_getpc(state);
-	vio_addr = (vm_daddr_t)cr2;
-	vio_addr -= (vm_daddr_t)args->ma_args.va_access_pageaddr * PAGESIZE;
-	vio_addr += (vm_daddr_t)args->ma_args.va_access_partoff;
+	vio_addr = (pos_t)cr2;
+	vio_addr -= (pos_t)args->ma_args.va_access_pageid * PAGESIZE;
+	vio_addr += (pos_t)args->ma_args.va_access_partoff;
 	TRY {
 		pc     = orig_pc;
 		opcode = x86_decode_instruction(state, &pc, &op_flags);

@@ -79,25 +79,25 @@ NOTHROW(KCALL krand_exponential)(uintptr_t rand_limit, uintptr_t rand_avg) {
 
 
 #if !defined(NDEBUG) && 1
-#define ASSERT_RESULT(result) \
-	(assertf(!(result & (min_alignment_in_pages - 1)), \
-	        #result "                = %p (%p)\n" \
-	         "num_pages              = %Iu\n" \
-	        #result " + num_pages    = %p (%p)\n" \
-	         "mode                   = %#x\n" \
-	         "min_alignment_in_pages = %Iu\n" \
-	         , VM_PAGE2ADDR(result), result, num_pages \
-	         , VM_PAGE2ADDR(result+num_pages), result+num_pages \
-	         , mode, min_alignment_in_pages), \
-	 assertf(!VM_FUNCTION(isused)(self, result, result + num_pages - 1), \
-	        #result "                = %p (%p)\n" \
-	         "num_pages              = %Iu\n" \
-	        #result " + num_pages    = %p (%p)\n" \
-	         "mode                   = %#x\n" \
-	         "min_alignment_in_pages = %Iu\n" \
-	         , VM_PAGE2ADDR(result), result, num_pages \
-	         , VM_PAGE2ADDR(result+num_pages), result+num_pages \
-	         , mode, min_alignment_in_pages))
+#define ASSERT_RESULT(result)                                                  \
+	(assertf(!(result & (min_alignment_in_pages - 1)),                         \
+	        #result "                = %p (%p)\n"                              \
+	         "num_pages              = %Iu\n"                                  \
+	        #result " + num_pages    = %p (%p)\n"                              \
+	         "mode                   = %#x\n"                                  \
+	         "min_alignment_in_pages = %Iu\n",                                 \
+	         PAGEID_DECODE(result), result, num_pages,                         \
+	         PAGEID_DECODE(result + num_pages), result + num_pages,            \
+	         mode, min_alignment_in_pages),                                    \
+	 assertf(!VM_FUNCTION(paged_isused)(self, result, result + num_pages - 1), \
+	        #result "                = %p (%p)\n"                              \
+	         "num_pages              = %Iu\n"                                  \
+	        #result " + num_pages    = %p (%p)\n"                              \
+	         "mode                   = %#x\n"                                  \
+	         "min_alignment_in_pages = %Iu\n",                                 \
+	         PAGEID_DECODE(result), result, num_pages,                         \
+	         PAGEID_DECODE(result + num_pages), result + num_pages,            \
+	         mode, min_alignment_in_pages))
 #else
 #define ASSERT_RESULT(result) (void)0
 #endif
@@ -108,7 +108,7 @@ NOTHROW(KCALL krand_exponential)(uintptr_t rand_limit, uintptr_t rand_avg) {
 /* Get/set ASLR-disabled (defaults to `false'; can also be
  * enabled by passing `noaslr' on the kernel commandline)
  * When enabled, the `VM_GETFREE_ASLR' is simply ignored
- * when passed to either `vm_getfree()' or `vmb_getfree()'
+ * when passed to either `vm_paged_getfree()' or `vmb_paged_getfree()'
  * @return: * : The state of ASLR_DISABLED prior to the call being made. */
 #ifdef VM_GETFREE_VMB
 INTDEF bool vm_aslr_disabled;
@@ -147,30 +147,30 @@ PUBLIC bool NOTHROW(KCALL vm_set_aslr_disabled)(bool new_disabled) {
  *        - VM_GETFREE_BELOW + VM_GETFREE_ASLR:
  *          Return the `x = 1 - (rand() / RAND_MAX); x*x*NUM_CANDIDATES'th candidate
  *   #2: Repeat step #1, but ignore the potentials of GUARD nodes.
- *   #3: Return `VM_GETFREE_ERROR'
+ *   #3: Return `VM_PAGED_GETFREE_ERROR'
  * WARNING: The caller must be holding a read-lock to `self'.
  * @param: mode:                   Set of `VM_GETFREE_F*'
  * @param: hint:                   A hint used as base when searching for free memory ranges.
  * @param: min_alignment_in_pages: The minimum alignment required from the returned pointer (or `1')
- * @return: VM_GETFREE_ERROR:      No more virtual memory available. */
+ * @return: VM_PAGED_GETFREE_ERROR:      No more virtual memory available. */
 #ifdef VM_GETFREE_VMB
-PUBLIC NOBLOCK WUNUSED vm_vpage_t
-NOTHROW(KCALL vmb_getfree)(struct vmb *__restrict self,
-                           vm_vpage_t hint, size_t num_pages,
-                           size_t min_alignment_in_pages,
-                           unsigned int mode)
+PUBLIC NOBLOCK WUNUSED pageid_t
+NOTHROW(KCALL vmb_paged_getfree)(struct vmb *__restrict self,
+                                 pageid_t hint, size_t num_pages,
+                                 size_t min_alignment_in_pages,
+                                 unsigned int mode)
 #else /* VM_GETFREE_VMB */
-PUBLIC NOBLOCK WUNUSED vm_vpage_t
-NOTHROW(KCALL vm_getfree)(struct vm *__restrict self,
-                          vm_vpage_t hint, size_t num_pages,
-                          size_t min_alignment_in_pages,
-                          unsigned int mode)
+PUBLIC NOBLOCK WUNUSED pageid_t
+NOTHROW(KCALL vm_paged_getfree)(struct vm *__restrict self,
+                                pageid_t hint, size_t num_pages,
+                                size_t min_alignment_in_pages,
+                                unsigned int mode)
 #endif /* !VM_GETFREE_VMB */
 {
 	bool ignore_guard = false;
 	bool was_strict   = mode & VM_GETFREE_STRICT;
 	vm_nodetree_minmax_t minmax;
-	vm_vpage_t minpage, maxpage;
+	pageid_t minpage, maxpage;
 	/* When ASLR disabled, clear the ASLR flag from `mode', effectively disabling it. */
 	if (vm_aslr_disabled)
 		mode &= ~VM_GETFREE_ASLR;
@@ -189,7 +189,7 @@ again:
 		if (OVERFLOW_USUB(hint, num_pages, &minpage)) {
 			if (mode & VM_GETFREE_STRICT)
 				goto err;
-			if unlikely(num_pages > (size_t)VM_VPAGE_MAX)
+			if unlikely(num_pages > (size_t)__ARCH_PAGEID_MAX)
 				goto err;
 			hint = 0;
 			mode &= ~VM_GETFREE_BELOW;
@@ -209,7 +209,7 @@ again:
 				struct vm_node *next_below;
 				struct vm_node *next_above;
 				size_t rand_size;
-				vm_vpage_t prev_end;
+				pageid_t prev_end;
 #ifdef VM_GETFREE_VMB
 				if (PRANGE_IS_KERNEL_PARTIAL(minpage, maxpage + 1)) {
 					/* Must not return locations in kernel memory.
@@ -217,7 +217,7 @@ again:
 					 *    we don't have that luxury and must therefor manually check for
 					 *    any potential overlaps with kernel-space! */
 #ifdef HIGH_MEMORY_KERNEL
-					maxpage = (vm_vpage_t)KERNEL_BASE_PAGE - 1;
+					maxpage = (pageid_t)KERNEL_BASE_PAGE - 1;
 					goto set_new_minpage_below;
 #else /* HIGH_MEMORY_KERNEL */
 					break; /* Mapping can't go below here! */
@@ -227,11 +227,11 @@ again:
 				if (ignore_guard) {
 					if (mode & VM_GETFREE_ASLR) {
 						next_below = minpage ? VM_FUNCTION(find_last_node_lower_equal)(self, minpage - 1) : NULL;
-						prev_end   = next_below ? VM_NODE_END(next_below) : (vm_vpage_t)0;
+						prev_end   = next_below ? vm_node_getendpageid(next_below) : (pageid_t)0;
 #ifdef VM_GETFREE_VMB
 #ifdef LOW_MEMORY_KERNEL
-						if (prev_end < (vm_vpage_t)KERNEL_CEILING_PAGE)
-							prev_end = (vm_vpage_t)KERNEL_CEILING_PAGE;
+						if (prev_end < (pageid_t)KERNEL_CEILING_PAGE)
+							prev_end = (pageid_t)KERNEL_CEILING_PAGE;
 #endif /* LOW_MEMORY_KERNEL */
 #endif /* VM_GETFREE_VMB */
 						rand_size = (size_t)(minpage - prev_end);
@@ -243,7 +243,7 @@ again:
 							minpage &= ~(min_alignment_in_pages - 1);
 						}
 					}
-					assertf(!VM_FUNCTION(isused)(self, minpage, minpage + num_pages - 1),
+					assertf(!VM_FUNCTION(paged_isused)(self, minpage, minpage + num_pages - 1),
 					        "minpage                = %p (%p)\n"
 					        "num_pages              = %Iu\n"
 					        "minpage + num_pages    = %p (%p)\n"
@@ -263,25 +263,25 @@ again:
 				next_below = VM_FUNCTION(find_last_node_lower_equal)(self, minpage - 1);
 				if (next_below && next_below->vn_guard &&
 				    (next_below->vn_flags & VM_NODE_FLAG_GROWSUP)) {
-					vm_vpage_t guard_maxpage = VM_NODE_MAX(next_below);
+					pageid_t guard_maxpage = vm_node_getmaxpageid(next_below);
 					if (OVERFLOW_UADD(guard_maxpage, next_below->vn_guard, &guard_maxpage))
-						guard_maxpage = (vm_vpage_t)-1;
+						guard_maxpage = (pageid_t)-1;
 					if (guard_maxpage >= minpage) {
-						if (!VM_NODE_MIN(next_below))
+						if (!vm_node_getminpageid(next_below))
 							break;
-						maxpage = VM_NODE_MIN(next_below) - 1;
+						maxpage = vm_node_getminpageid(next_below) - 1;
 						goto set_new_minpage_below;
 					}
 				}
 				next_above = VM_FUNCTION(find_first_node_greater_equal)(self, maxpage + 1);
 				if (next_above && next_above->vn_guard &&
 				    !(next_above->vn_flags & VM_NODE_FLAG_GROWSUP)) {
-					vm_vpage_t guard_minpage = VM_NODE_MIN(next_above);
-					vm_vpage_t guard_limit   = next_below ? VM_NODE_END(next_below) : (vm_vpage_t)0;
+					pageid_t guard_minpage = vm_node_getminpageid(next_above);
+					pageid_t guard_limit   = next_below ? vm_node_getendpageid(next_below) : (pageid_t)0;
 #ifdef VM_GETFREE_VMB
 #ifdef LOW_MEMORY_KERNEL
-					if (guard_limit < (vm_vpage_t)KERNEL_CEILING_PAGE)
-						guard_limit = (vm_vpage_t)KERNEL_CEILING_PAGE;
+					if (guard_limit < (pageid_t)KERNEL_CEILING_PAGE)
+						guard_limit = (pageid_t)KERNEL_CEILING_PAGE;
 #endif /* LOW_MEMORY_KERNEL */
 #endif /* VM_GETFREE_VMB */
 					if (OVERFLOW_USUB(guard_minpage, next_above->vn_guard, &guard_minpage))
@@ -294,11 +294,11 @@ again:
 					}
 				}
 				if (mode & VM_GETFREE_ASLR) {
-					prev_end = next_below ? VM_NODE_END(next_below) : (vm_vpage_t)0;
+					prev_end = next_below ? vm_node_getendpageid(next_below) : (pageid_t)0;
 #ifdef VM_GETFREE_VMB
 #ifdef LOW_MEMORY_KERNEL
-					if (prev_end < (vm_vpage_t)KERNEL_CEILING_PAGE)
-						prev_end = (vm_vpage_t)KERNEL_CEILING_PAGE;
+					if (prev_end < (pageid_t)KERNEL_CEILING_PAGE)
+						prev_end = (pageid_t)KERNEL_CEILING_PAGE;
 #endif /* LOW_MEMORY_KERNEL */
 #endif /* VM_GETFREE_VMB */
 					rand_size = (size_t)(minpage - prev_end);
@@ -327,10 +327,10 @@ set_new_minpage_below:
 	} else {
 		minpage = hint & ~(min_alignment_in_pages - 1);
 		if (OVERFLOW_UADD(minpage, num_pages - 1, &maxpage) ||
-		    maxpage > VM_VPAGE_MAX) {
+		    maxpage > __ARCH_PAGEID_MAX) {
 			if (mode & VM_GETFREE_STRICT)
 				goto err;
-			hint = VM_VPAGE_MAX - num_pages;
+			hint = __ARCH_PAGEID_MAX - num_pages;
 			mode |= (VM_GETFREE_BELOW | VM_GETFREE_STRICT);
 			goto again;
 		}
@@ -345,7 +345,7 @@ set_new_minpage_below:
 				struct vm_node *next_below;
 				struct vm_node *next_above;
 				size_t rand_size;
-				vm_vpage_t next_start;
+				pageid_t next_start;
 #ifdef VM_GETFREE_VMB
 				if (PRANGE_IS_KERNEL_PARTIAL(minpage, maxpage + 1)) {
 					/* Must not return locations in kernel memory.
@@ -353,7 +353,7 @@ set_new_minpage_below:
 					 *    we don't have that luxury and must therefor manually check for
 					 *    any potential overlaps with kernel-space! */
 #ifdef LOW_MEMORY_KERNEL
-					minpage = ((vm_vpage_t)KERNEL_CEILING_PAGE - 1 + min_alignment_in_pages) & ~(min_alignment_in_pages - 1);
+					minpage = ((pageid_t)KERNEL_CEILING_PAGE - 1 + min_alignment_in_pages) & ~(min_alignment_in_pages - 1);
 					goto set_new_maxpage_above;
 #else /* LOW_MEMORY_KERNEL */
 					break; /* Mapping can't go above here! */
@@ -363,11 +363,11 @@ set_new_minpage_below:
 				if (ignore_guard) {
 					if (mode & VM_GETFREE_ASLR) {
 						next_above = VM_FUNCTION(find_first_node_greater_equal)(self, maxpage + 1);
-						next_start = next_above ? VM_NODE_MIN(next_above) : (vm_vpage_t)VM_VPAGE_MAX;
+						next_start = next_above ? vm_node_getminpageid(next_above) : (pageid_t)__ARCH_PAGEID_MAX;
 #ifdef VM_GETFREE_VMB
 #ifdef HIGH_MEMORY_KERNEL
-						if (next_start > (vm_vpage_t)KERNEL_BASE_PAGE)
-							next_start = (vm_vpage_t)KERNEL_BASE_PAGE;
+						if (next_start > (pageid_t)KERNEL_BASE_PAGE)
+							next_start = (pageid_t)KERNEL_BASE_PAGE;
 #endif /* HIGH_MEMORY_KERNEL */
 #endif /* VM_GETFREE_VMB */
 						rand_size = (size_t)(next_start - maxpage);
@@ -385,27 +385,27 @@ set_new_minpage_below:
 				next_above = VM_FUNCTION(find_first_node_greater_equal)(self, maxpage + 1);
 				if (next_above && next_above->vn_guard &&
 				    !(next_above->vn_flags & VM_NODE_FLAG_GROWSUP)) {
-					vm_vpage_t guard_minpage = VM_NODE_MIN(next_above);
+					pageid_t guard_minpage = vm_node_getminpageid(next_above);
 					if (OVERFLOW_USUB(guard_minpage, next_above->vn_guard, &guard_minpage))
 						guard_minpage = 0;
 					if (guard_minpage <= maxpage) {
-						minpage = VM_NODE_MAX(next_above) + 1;
+						minpage = vm_node_getmaxpageid(next_above) + 1;
 						goto set_new_maxpage_above;
 					}
 				}
 				next_below = VM_FUNCTION(find_last_node_lower_equal)(self, minpage - 1);
 				if (next_below && next_below->vn_guard &&
 				    (next_below->vn_flags & VM_NODE_FLAG_GROWSUP)) {
-					vm_vpage_t guard_maxpage = VM_NODE_MAX(next_below);
-					vm_vpage_t guard_limit   = next_above ? VM_NODE_MIN(next_above) - 1 : (vm_vpage_t)VM_VPAGE_MAX;
+					pageid_t guard_maxpage = vm_node_getmaxpageid(next_below);
+					pageid_t guard_limit   = next_above ? vm_node_getminpageid(next_above) - 1 : (pageid_t)__ARCH_PAGEID_MAX;
 #ifdef VM_GETFREE_VMB
 #ifdef HIGH_MEMORY_KERNEL
-					if (guard_limit > (vm_vpage_t)KERNEL_BASE_PAGE)
-						guard_limit = (vm_vpage_t)KERNEL_BASE_PAGE;
+					if (guard_limit > (pageid_t)KERNEL_BASE_PAGE)
+						guard_limit = (pageid_t)KERNEL_BASE_PAGE;
 #endif /* HIGH_MEMORY_KERNEL */
 #endif /* VM_GETFREE_VMB */
 					if (OVERFLOW_UADD(guard_maxpage, next_below->vn_guard, &guard_maxpage))
-						guard_maxpage = (vm_vpage_t)-1;
+						guard_maxpage = (pageid_t)-1;
 					if (guard_maxpage > guard_limit)
 						guard_maxpage = guard_limit;
 					if (guard_maxpage >= minpage) {
@@ -414,11 +414,11 @@ set_new_minpage_below:
 					}
 				}
 				if (mode & VM_GETFREE_ASLR) {
-					next_start = next_above ? VM_NODE_MIN(next_above) : (vm_vpage_t)VM_VPAGE_MAX;
+					next_start = next_above ? vm_node_getminpageid(next_above) : (pageid_t)__ARCH_PAGEID_MAX;
 #ifdef VM_GETFREE_VMB
 #ifdef HIGH_MEMORY_KERNEL
-					if (next_start > (vm_vpage_t)KERNEL_BASE_PAGE)
-						next_start = (vm_vpage_t)KERNEL_BASE_PAGE;
+					if (next_start > (pageid_t)KERNEL_BASE_PAGE)
+						next_start = (pageid_t)KERNEL_BASE_PAGE;
 #endif /* HIGH_MEMORY_KERNEL */
 #endif /* VM_GETFREE_VMB */
 					rand_size = (size_t)(next_start - maxpage);
@@ -437,7 +437,7 @@ set_new_minpage_below:
 			minpage = (minmax.mm_max_max + min_alignment_in_pages) & ~(min_alignment_in_pages - 1);
 set_new_maxpage_above:
 			if (OVERFLOW_UADD(minpage, num_pages - 1, &maxpage) ||
-			    maxpage > VM_VPAGE_MAX)
+			    maxpage > __ARCH_PAGEID_MAX)
 				break;
 		}
 		if (!(mode & VM_GETFREE_STRICT)) {
@@ -453,7 +453,7 @@ set_new_maxpage_above:
 		goto again;
 	}
 err:
-	return VM_GETFREE_ERROR;
+	return VM_PAGED_GETFREE_ERROR;
 }
 
 #undef ASSERT_RESULT

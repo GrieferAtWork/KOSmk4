@@ -51,12 +51,12 @@ DECL_BEGIN
 
 LOCAL REF struct vm_datablock *KCALL
 getdatablock_from_handle(unsigned int fd,
-                         vm_vpage64_t *__restrict pminpage,
-                         vm_vpage64_t *__restrict pmaxpage) {
+                         pos_t *__restrict pminoffset,
+                         pos_t *__restrict pnumbytes) {
 	REF struct vm_datablock *result;
 	struct handle hnd = handle_lookup(fd);
 	TRY {
-		result = handle_mmap(hnd, pminpage, pmaxpage);
+		result = handle_mmap(hnd, pminoffset, pnumbytes);
 	} EXCEPT {
 		decref(hnd);
 		RETHROW();
@@ -68,11 +68,12 @@ getdatablock_from_handle(unsigned int fd,
 DEFINE_SYSCALL2(errno_t, munmap, void *, addr, size_t, length) {
 	size_t offset;
 	offset = (uintptr_t)addr & PAGEMASK;
+	addr   = (void *)((uintptr_t)addr & ~PAGEMASK);
 	if (OVERFLOW_UADD(length, offset, &length))
 		length = (size_t)-1;
 	vm_unmap(THIS_VM,
-	         VM_ADDR2PAGE((vm_virt_t)addr),
-	         CEILDIV(length, PAGESIZE),
+	         addr,
+	         CEIL_ALIGN(length, PAGESIZE),
 	         VM_UNMAP_ANYTHING |
 	         VM_UNMAP_NOKERNPART);
 	return -EOK;
@@ -83,14 +84,15 @@ DEFINE_SYSCALL3(errno_t, mprotect,
                 syscall_ulong_t, prot) {
 	size_t offset;
 	offset = (uintptr_t)addr & PAGEMASK;
+	addr   = (void *)((uintptr_t)addr & ~PAGEMASK);
 	if (OVERFLOW_UADD(length, offset, &length))
 		length = (size_t)-1;
 	VALIDATE_FLAGSET(prot,
 	                 PROT_EXEC | PROT_WRITE | PROT_READ,
 	                 E_INVALID_ARGUMENT_CONTEXT_MPROTECT_PROT);
 	vm_protect(THIS_VM,
-	           VM_ADDR2PAGE((vm_virt_t)addr),
-	           CEILDIV(length, PAGESIZE),
+	           addr,
+	           CEIL_ALIGN(length, PAGESIZE),
 	           VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC,
 	           prot,
 	           VM_UNMAP_ANYTHING | VM_UNMAP_NOKERNPART);
@@ -108,7 +110,7 @@ STATIC_ASSERT(PROT_SHARED == VM_PROT_SHARED);
 
 PRIVATE void KCALL
 unmap_range(struct vm *__restrict v,
-            vm_vpage_t loadpage,
+            PAGEDIR_PAGEALIGNED UNCHECKED void *loadaddr,
             USER CHECKED Elf_Phdr *headers,
             size_t count) {
 	Elf_Addr addr;
@@ -132,8 +134,8 @@ unmap_range(struct vm *__restrict v,
 		size += addr & PAGEMASK;
 		addr &= ~PAGEMASK;
 		vm_unmap(v,
-		         loadpage + VM_ADDR2PAGE((vm_virt_t)addr),
-		         CEILDIV(size, PAGESIZE),
+		         (byte_t *)loadaddr + addr,
+		         CEIL_ALIGN(size, PAGESIZE),
 		         VM_UNMAP_ANYTHING |
 		         VM_UNMAP_NOKERNPART);
 	}
@@ -147,8 +149,8 @@ contains_illegal_overlap(USER CHECKED Elf_Phdr *headers,
 	uintptr_t addr_page_offset = 0;
 	bool is_first              = true;
 	for (i = 0; i < count; ++i) {
-		vm_vpage_t min_page;
-		vm_vpage_t max_page;
+		uintptr_t min_page;
+		uintptr_t max_page;
 		Elf_Addr addr;
 		Elf_Word size;
 		Elf_Off offset;
@@ -180,15 +182,15 @@ contains_illegal_overlap(USER CHECKED Elf_Phdr *headers,
 				goto yes;
 			addr &= ~PAGEMASK;
 		}
-		min_page = VM_ADDR2PAGE((vm_virt_t)addr);
+		min_page = addr / PAGESIZE;
 		if (OVERFLOW_UADD(addr, size, &addr))
 			goto yes;
 		if (OVERFLOW_UADD(addr, (Elf_Addr)PAGEMASK, &addr))
 			goto yes;
-		max_page = (vm_vpage_t)(addr / PAGESIZE) - 1;
+		max_page = (addr / PAGESIZE) - 1;
 		for (j = i + 1; j < count; ++j) {
-			vm_vpage_t other_min_page;
-			vm_vpage_t other_max_page;
+			uintptr_t other_min_page;
+			uintptr_t other_max_page;
 			if (ATOMIC_READ(headers[j].p_type) != PT_LOAD)
 				continue;
 			addr   = ATOMIC_READ(headers[j].p_vaddr);
@@ -217,12 +219,12 @@ contains_illegal_overlap(USER CHECKED Elf_Phdr *headers,
 					goto yes;
 				addr &= ~PAGEMASK;
 			}
-			other_min_page = VM_ADDR2PAGE((vm_virt_t)addr);
+			other_min_page = addr / PAGESIZE;
 			if (OVERFLOW_UADD(addr, size, &addr))
 				goto yes;
 			if (OVERFLOW_UADD(addr, (Elf_Addr)PAGEMASK, &addr))
 				goto yes;
-			other_max_page = (vm_vpage_t)(addr / PAGESIZE) - 1;
+			other_max_page = (addr / PAGESIZE) - 1;
 			if (other_min_page < max_page &&
 			    other_max_page > min_page)
 				goto yes;
@@ -237,18 +239,18 @@ yes:
 DEFINE_SYSCALL5(void *, maplibrary,
                 void *, addr, syscall_ulong_t, flags,
                 fd_t, fd, void *, hdrv, size_t, hdrc) {
-	vm_vpage_t result;
+	byte_t *result;
 	struct vm *v = THIS_VM;
 	size_t i;
 	USER CHECKED Elf_Phdr *headers = (Elf_Phdr *)hdrv;
 	uintptr_t addr_page_offset     = 0; /* Sub-page offset for the load address (usually 0) */
 	uintptr_t min_page             = 0;
 	REF struct vm_datablock *file  = NULL;
-	vm_vpage64_t file_minpage = 0;
-	vm_vpage64_t file_maxpage = (vm_vpage64_t)-1;
+	pos_t file_minoffset           = 0;
+	pos_t file_maxnumbytes         = (pos_t)-1;
 	bool is_first;
-	size_t min_page_alignment = 1;
-	size_t total_pages        = 0;
+	size_t min_alignment = PAGESIZE;
+	size_t total_bytes   = 0;
 	validate_readablem(hdrv, hdrc, sizeof(Elf_Phdr));
 	VALIDATE_FLAGSET(flags,
 	                 MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
@@ -258,13 +260,13 @@ DEFINE_SYSCALL5(void *, maplibrary,
 	if (flags & MAP_FIXED) {
 		if unlikely(!hdrc)
 			return addr;
-		result           = (vm_vpage_t)VM_ADDR2PAGE((uintptr_t)addr);
+		result           = (byte_t *)((uintptr_t)addr & ~PAGEMASK);
 		addr_page_offset = (uintptr_t)addr & PAGEMASK;
 		if (flags & MAP_DONT_MAP) {
 			bool isused;
 			uintptr_t min_addr, max_addr;
 			if unlikely(!hdrc)
-				return (void *)VM_PAGE2ADDR((vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_USER_LIBRARY));
+				return HINT_GETADDR(KERNEL_VMHINT_USER_LIBRARY);
 			min_addr = (uintptr_t)-1;
 			max_addr = 0;
 			/* Figure out the min/max byte offsets for program segments. */
@@ -283,21 +285,22 @@ DEFINE_SYSCALL5(void *, maplibrary,
 				if (max_addr < addr)
 					max_addr = addr;
 			}
-			total_pages = (CEILDIV(max_addr, PAGESIZE) -
-			               FLOORDIV(min_addr, PAGESIZE));
+			total_bytes = (CEILDIV(max_addr, PAGESIZE) -
+			               FLOORDIV(min_addr, PAGESIZE)) *
+			              PAGESIZE;
 			sync_read(THIS_VM);
 			isused = vm_isused(THIS_VM,
 			                   result,
-			                   result + total_pages - 1);
+			                   total_bytes);
 			sync_endread(THIS_VM);
 			if (isused)
-				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, total_pages);
+				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, total_bytes);
 			goto done;
 		}
 	} else {
 		uintptr_t min_addr, max_addr;
 		if unlikely(!hdrc)
-			return (void *)VM_PAGE2ADDR((vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_USER_LIBRARY));
+			return HINT_GETADDR(KERNEL_VMHINT_USER_LIBRARY);
 		min_addr = (uintptr_t)-1;
 		max_addr = 0;
 		/* Figure out the min/max byte offsets for program segments. */
@@ -315,9 +318,8 @@ DEFINE_SYSCALL5(void *, maplibrary,
 			align    = ATOMIC_READ(headers[i].p_align);
 			if unlikely(!size)
 				continue;
-			align = CEILDIV(align, PAGESIZE);
-			if (min_page_alignment < align)
-				min_page_alignment = align;
+			if (min_alignment < align)
+				min_alignment = align;
 			if (filesize) {
 				uintptr_t alignment;
 				alignment = offset & PAGEMASK;
@@ -352,26 +354,26 @@ DEFINE_SYSCALL5(void *, maplibrary,
 				max_addr = addr;
 		}
 		min_page    = FLOORDIV(min_addr, PAGESIZE);
-		total_pages = (CEILDIV(max_addr, PAGESIZE) - min_page);
-		if unlikely(min_page_alignment & (min_page_alignment - 1)) {
+		total_bytes = (CEILDIV(max_addr, PAGESIZE) - min_page) * PAGESIZE;
+		if unlikely(min_alignment & (min_alignment - 1)) {
 			THROW(E_INVALID_ARGUMENT_BAD_ALIGNMENT,
 			      E_INVALID_ARGUMENT_CONTEXT_LOADLIBRARY_SECDATAALIGN,
-			      (uintptr_t)min_page_alignment,
-			      min_page_alignment - 1,
+			      min_alignment,
+			      min_alignment - 1,
 			      0);
 		}
 		/* Find a suitable target location where we can map the library. */
 find_new_candidate:
 		sync_read(v);
-		result = vm_getfree(v,
-		                    (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_USER_LIBRARY),
-		                    total_pages,
-		                    min_page_alignment,
-		                    HINT_GETMODE(KERNEL_VMHINT_USER_LIBRARY));
+		result = (byte_t *)vm_getfree(v,
+		                              HINT_GETADDR(KERNEL_VMHINT_USER_LIBRARY),
+		                              total_bytes,
+		                              min_alignment,
+		                              HINT_GETMODE(KERNEL_VMHINT_USER_LIBRARY));
 		sync_endread(v);
-		if unlikely(result == VM_GETFREE_ERROR)
-			THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, total_pages);
-		result -= min_page;
+		if unlikely(result == (byte_t *)VM_GETFREE_ERROR)
+			THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, total_bytes);
+		result -= min_page * PAGESIZE;
 		if (flags & MAP_DONT_MAP)
 			goto done;
 	}
@@ -448,8 +450,8 @@ again_map_segments:
 			if (size > filesize) {
 				/* Map BSS */
 				if (!vm_mapat(v,
-				              result + VM_ADDR2PAGE((vm_virt_t)addr + filesize),
-				              (size - filesize) / PAGESIZE,
+				              result + addr + filesize,
+				              size - filesize,
 				              &vm_datablock_anonymous_zero,
 				              0,
 				              prot,
@@ -458,21 +460,20 @@ again_map_segments:
 unmap_check_overlap_and_find_new_candidate:
 					/* Check for illegal overlap */
 					if (contains_illegal_overlap(headers, hdrc))
-						THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, size / PAGESIZE);
+						THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, size);
 					if (!(flags & MAP_FIXED)) {
 						unmap_range(v, result, headers, i);
 						goto find_new_candidate;
 					}
 					if (!(flags & MAP_DONT_OVERRIDE)) {
 						vm_unmap(v,
-						         result + VM_ADDR2PAGE((vm_virt_t)addr),
-						         size / PAGESIZE,
+						         result + addr,
+						         size,
 						         VM_UNMAP_ANYTHING |
 						         VM_UNMAP_NOKERNPART);
 						goto again_map_segments;
 					}
-					THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
-					      size / PAGESIZE);
+					THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, size);
 				}
 			}
 			if (filesize) {
@@ -485,17 +486,22 @@ unmap_check_overlap_and_find_new_candidate:
 				}
 				if (!file) {
 					file = getdatablock_from_handle((unsigned int)fd,
-					                                &file_minpage,
-					                                &file_maxpage);
+					                                &file_minoffset,
+					                                &file_maxnumbytes);
+					/* Make sure that the offset and byte counts are aligned by the pagesize. */
+					file_maxnumbytes += file_minoffset & PAGEMASK;
+					file_minoffset &= ~PAGEMASK;
+					file_maxnumbytes += PAGESIZE - 1;
+					file_maxnumbytes &= ~PAGEMASK;
 				}
 				/* Map file contents */
 				if (!vm_mapat_subrange(v,
-				                       result + VM_ADDR2PAGE((vm_virt_t)addr),
-				                       filesize / PAGESIZE,
+				                       result + addr,
+				                       filesize,
 				                       file,
-				                       (vm_vpage64_t)(offset / PAGESIZE),
-				                       file_minpage,
-				                       file_maxpage,
+				                       (pos_t)offset,
+				                       file_minoffset,
+				                       file_maxnumbytes,
 				                       prot,
 				                       VM_NODE_FLAG_NORMAL,
 				                       0))
@@ -525,18 +531,18 @@ unmap_check_overlap_and_find_new_candidate:
 				assert(unaligned_filesize != 0);
 				if (unaligned_size > unaligned_filesize) {
 					/* There is a .bss area! */
-					vm_virt_t bss_start;
-					bss_start = VM_PAGE2ADDR(result) + (vm_virt_t)addr + unaligned_filesize;
-					if ((bss_start & (PAGESIZE-1)) != 0) {
+					byte_t *bss_start;
+					bss_start = result + addr + unaligned_filesize;
+					if (((uintptr_t)bss_start & PAGEMASK) != 0) {
 						/* The .bss area isn't page-aligned, meaning it overlaps with the data-area... */
 						size_t bss_overlap, bss_total_size;
 						bss_total_size = unaligned_size - unaligned_filesize;
-						bss_overlap    = PAGESIZE - (size_t)(bss_start & PAGEMASK);
+						bss_overlap    = PAGESIZE - (size_t)((uintptr_t)bss_start & PAGEMASK);
 						if (bss_overlap > bss_total_size)
 							bss_overlap = bss_total_size;
 						/* Must `memset(bss_start, 0, bss_overlap)' */
 						if (prot & VM_PROT_WRITE) {
-							memset((void *)bss_start, 0, bss_overlap);
+							memset(bss_start, 0, bss_overlap);
 						} else {
 							/* Complicated case: Must write to memory mapped as read-only...
 							 * Note that this really shouldn't be something that happens normally,
@@ -544,7 +550,7 @@ unmap_check_overlap_and_find_new_candidate:
 							 * But still: It is something that is technically allowed by ELF, and
 							 *            maybe someone needed a really large section of 0-bytes
 							 *            for some kind of stub-implementation... */
-							vm_memset(v, (void *)bss_start, 0, bss_overlap, true);
+							vm_memset(v, bss_start, 0, bss_overlap, true);
 						}
 					}
 				}
@@ -557,18 +563,19 @@ unmap_check_overlap_and_find_new_candidate:
 	}
 	xdecref(file);
 done:
-	return (void *)(uintptr_t)(VM_PAGE2ADDR(result) + addr_page_offset);
+	return result + addr_page_offset;
 }
 
 
 DEFINE_SYSCALL6(void *, mmap,
                 void *, addr, size_t, length, syscall_ulong_t, prot,
                 syscall_ulong_t, flags, fd_t, fd, syscall_ulong_t, offset) {
-	vm_vpage_t result;
+	byte_t *result;
 	uintptr_t result_offset;
-	vm_daddr_t file_offset;
+	pos_t file_offset;
 	REF struct vm_datablock *datablock;
-	vm_vpage64_t file_minpage, file_maxpage;
+	pos_t file_minoffset;
+	pos_t file_maxnumbytes;
 	/* Check for unknown flags. */
 #ifdef MAP_OFFSET64_POINTER
 	VALIDATE_FLAGSET(flags,
@@ -615,12 +622,12 @@ DEFINE_SYSCALL6(void *, mmap,
 	                 E_INVALID_ARGUMENT_CONTEXT_MMAP_PROT);
 	if ((flags & MAP_TYPE) == MAP_SHARED)
 		prot |= PROT_SHARED;
-	file_offset = (vm_daddr_t)offset;
+	file_offset = (pos_t)offset;
 #ifdef MAP_OFFSET64_POINTER
 	if (flags & (MAP_OFFSET64_POINTER)) {
 		validate_readable((byte_t *)(uintptr_t)offset, 8);
 		COMPILER_READ_BARRIER();
-		file_offset = (vm_daddr_t)(*(u64 *)(uintptr_t)offset);
+		file_offset = (pos_t)(*(u64 *)(uintptr_t)offset);
 		COMPILER_READ_BARRIER();
 	}
 #endif /* MAP_OFFSET64_POINTER */
@@ -642,12 +649,14 @@ DEFINE_SYSCALL6(void *, mmap,
 	}
 
 	/* Load the requested data block. */
-	file_minpage = 0;
-	file_maxpage = (vm_vpage64_t)-1;
+	file_minoffset   = 0;
+	file_maxnumbytes = (pos_t)-1;
 	/* Figure out which datablock should be mapped. */
 	if (!(flags & MAP_ANONYMOUS)) {
 		/* File mapping */
-		datablock = getdatablock_from_handle(fd, &file_minpage, &file_maxpage);
+		datablock = getdatablock_from_handle(fd,
+		                                     &file_minoffset,
+		                                     &file_maxnumbytes);
 	} else if (!(flags & MAP_UNINITIALIZED)) {
 		/* Zero-initialized, anonymous memory */
 		datablock = incref(&vm_datablock_anonymous_zero);
@@ -656,8 +665,13 @@ DEFINE_SYSCALL6(void *, mmap,
 		cred_require_mmap_uninitialized();
 		datablock = incref(&vm_datablock_anonymous);
 	}
+	/* Make sure that the offset and byte counts are aligned by the pagesize. */
+	file_maxnumbytes += file_minoffset & PAGEMASK;
+	file_minoffset &= ~PAGEMASK;
+	file_maxnumbytes += PAGESIZE - 1;
+	file_maxnumbytes &= ~PAGEMASK;
 	TRY {
-		size_t num_pages, guard;
+		size_t num_bytes, guard;
 		uintptr_half_t node_flags;
 		/* Make sure that the given `length' is neither too small, nor too large. */
 		if unlikely(!length) {
@@ -666,14 +680,14 @@ err_bad_length:
 			      E_INVALID_ARGUMENT_CONTEXT_MMAP_LENGTH,
 			      length);
 		}
-		if unlikely(OVERFLOW_UADD(length, (size_t)result_offset, &num_pages))
+		if unlikely(OVERFLOW_UADD(length, (size_t)result_offset, &num_bytes))
 			goto err_bad_length;
-		num_pages = CEILDIV(num_pages, PAGESIZE);
+		num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
 #ifdef HIGH_MEMORY_KERNEL
-		if unlikely(num_pages > (size_t)KERNEL_BASE_PAGE)
+		if unlikely(num_bytes > (size_t)KERNEL_BASE)
 			goto err_bad_length;
 #else /* HIGH_MEMORY_KERNEL */
-		if unlikely(num_pages > (((size_t)VM_VPAGE_MAX + 1) - (size_t)KERNEL_CEILING_PAGE))
+		if unlikely(num_bytes > ((size_t)0 - KERNEL_END))
 			goto err_bad_length;
 #endif /* !HIGH_MEMORY_KERNEL */
 		/* TODO: MAP_LOCKED */
@@ -683,52 +697,52 @@ err_bad_length:
 
 		if (flags & MAP_FIXED) {
 			bool isused;
-			result = (vm_vpage_t)VM_ADDR2PAGE((uintptr_t)addr);
+			result = (byte_t *)((uintptr_t)addr & ~PAGEMASK);
 			if (flags & MAP_DONT_MAP) {
 				/* Don't actually map memory. - Just check if the region is already in use */
 				sync_read(THIS_VM);
 				isused = vm_isused(THIS_VM,
 				                   result,
-				                   result + num_pages - 1);
+				                   num_bytes);
 				sync_endread(THIS_VM);
 			} else {
 				guard      = 0;
 				node_flags = VM_NODE_FLAG_NORMAL;
 				if (flags & MAP_GROWSUP) {
-					guard     = num_pages - 1;
-					num_pages = 1;
+					guard     = num_bytes - PAGESIZE;
+					num_bytes = PAGESIZE;
 					node_flags |= VM_NODE_FLAG_GROWSUP;
 				} else if (flags & MAP_GROWSDOWN) {
-					guard     = num_pages - 1;
-					num_pages = 1;
+					guard     = num_bytes - PAGESIZE;
+					num_bytes = PAGESIZE;
 				}
 again_mapat:
 				/* XXX: vm_mapat_override(...)? */
 				isused = !vm_mapat_subrange(THIS_VM,
 				                            result,
-				                            num_pages,
+				                            num_bytes,
 				                            datablock,
-				                            (vm_vpage64_t)(file_offset / PAGESIZE),
-				                            file_minpage,
-				                            file_maxpage,
+				                            file_offset & ~PAGEMASK,
+				                            file_minoffset,
+				                            file_maxnumbytes,
 				                            prot & (PROT_EXEC | PROT_WRITE | PROT_READ | PROT_LOOSE | PROT_SHARED),
 				                            node_flags,
-				                            guard);
+				                            guard / PAGESIZE);
 				if (isused && !(flags & MAP_DONT_OVERRIDE)) {
 					if (vm_unmap(THIS_VM,
 					             result,
-					             num_pages + guard,
+					             num_bytes + guard,
 					             VM_UNMAP_ANYTHING |
 					             VM_UNMAP_NOKERNPART) ||
 					    /* Check if the given range overlaps with KERNEL-SPACE */
-					    !PRANGE_IS_KERNEL_PARTIAL(result, num_pages + guard))
+					    !PRANGE_IS_KERNEL_PARTIAL(result, num_bytes + guard))
 						goto again_mapat; /* Try again, now that the existing mapping was deleted. */
 				}
 			}
 			if unlikely(isused)
-				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, num_pages);
+				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, num_bytes);
 		} else {
-			vm_vpage_t hint;
+			PAGEDIR_PAGEALIGNED UNCHECKED void *hint;
 			unsigned int getfree_mode;
 #if __SIZEOF_POINTER__ > 4
 			/* TODO: MAP_32BIT */
@@ -736,51 +750,52 @@ again_mapat:
 			if (!addr) {
 				/* Choose the hints for automatic mmap() target selection. */
 				if (flags & MAP_STACK) {
-					hint         = (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_USER_STACK);
+					hint         = HINT_GETADDR(KERNEL_VMHINT_USER_STACK);
 					getfree_mode = HINT_GETMODE(KERNEL_VMHINT_USER_STACK);
 				} else {
-					hint         = (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_USER_HEAP);
+					hint         = HINT_GETADDR(KERNEL_VMHINT_USER_HEAP);
 					getfree_mode = HINT_GETMODE(KERNEL_VMHINT_USER_HEAP);
 				}
 			} else {
-				hint         = (vm_vpage_t)VM_ADDR2PAGE((uintptr_t)addr);
+				hint         = (void *)((uintptr_t)addr & ~PAGEMASK);
 				getfree_mode = VM_GETFREE_ABOVE | VM_GETFREE_ASLR;
 			}
 			if (flags & MAP_DONT_MAP) {
 				/* Don't actually map memory. - Just find a free region */
 				sync_read(THIS_VM);
-				result = vm_getfree(THIS_VM,
-				                    hint,
-				                    num_pages,
-				                    1,
-				                    getfree_mode);
+				result = (byte_t *)vm_getfree(THIS_VM,
+				                              hint,
+				                              num_bytes,
+				                              PAGESIZE,
+				                              getfree_mode);
 				sync_endread(THIS_VM);
-				if unlikely(result == VM_GETFREE_ERROR)
-					THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, num_pages);
+				if unlikely(result == (byte_t *)VM_GETFREE_ERROR)
+					THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, num_bytes);
 			} else {
 				/* Support for MAP_GROWSDOWN, MAP_GROWSUP  (create a growing guard mapping) */
 				node_flags = VM_NODE_FLAG_NORMAL;
 				guard      = 0;
 				if (flags & MAP_GROWSUP) {
-					guard     = num_pages - 1;
-					num_pages = 1;
+					guard     = num_bytes - PAGESIZE;
+					num_bytes = PAGESIZE;
 					node_flags |= VM_NODE_FLAG_GROWSUP;
 				} else if (flags & MAP_GROWSDOWN) {
-					guard     = num_pages - 1;
-					num_pages = 1;
+					guard     = num_bytes - PAGESIZE;
+					num_bytes = PAGESIZE;
 				}
-				result = vm_map_subrange(THIS_VM,
-				                         hint,
-				                         num_pages,
-				                         1,
-				                         getfree_mode,
-				                         datablock,
-				                         (vm_vpage64_t)(file_offset / PAGESIZE),
-				                         file_minpage,
-				                         file_maxpage,
-				                         prot & (PROT_EXEC | PROT_WRITE | PROT_READ | PROT_LOOSE | PROT_SHARED),
-				                         node_flags,
-				                         guard);
+				result = (byte_t *)vm_map_subrange(THIS_VM,
+				                                   hint,
+				                                   num_bytes,
+				                                   PAGESIZE,
+				                                   getfree_mode,
+				                                   datablock,
+				                                   file_offset & ~PAGEMASK,
+				                                   file_minoffset,
+				                                   file_maxnumbytes,
+				                                   prot & (PROT_EXEC | PROT_WRITE | PROT_READ |
+				                                           PROT_LOOSE | PROT_SHARED),
+				                                   node_flags,
+				                                   guard / PAGESIZE);
 			}
 		}
 	} EXCEPT {
@@ -788,7 +803,7 @@ again_mapat:
 		RETHROW();
 	}
 	decref(datablock);
-	return (byte_t *)VM_PAGE2ADDR(result) + result_offset;
+	return result + result_offset;
 }
 
 //TODO:FUNDEF void *(__ARCH_SYSCALLCC sys_mremap)(void *old_address, size_t old_size, size_t new_size, syscall_ulong_t flags, void *new_address) THROWS(...);

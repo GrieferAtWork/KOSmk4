@@ -755,7 +755,7 @@ NOTHROW(KCALL driver_destroy)(struct driver *__restrict self) {
 	assert(!self->d_dangsect);
 	/* Go through all of the module's program headers and unload them from memory.
 	 * Because drivers are mapped as anonymous memory, rather than file mappings,
-	 * we can simply use the NOEXCEPT,NOBLOCK `vm_unmap_kernel_ram()' function! */
+	 * we can simply use the NOEXCEPT,NOBLOCK `vm_paged_unmap_kernel_ram()' function! */
 	for (i = 0; i < self->d_phnum; ++i) {
 		uintptr_t progaddr;
 		size_t progsize;
@@ -768,7 +768,7 @@ NOTHROW(KCALL driver_destroy)(struct driver *__restrict self) {
 		/* NOTE: During finalization, all write-only program headers were re-mapped
 		 *       as read/write, so-as to allow us to free them as kernel-ram at this
 		 *       point. */
-		nvm_unmap_kernel_ram((void *)progaddr,
+		vm_unmap_kernel_ram((void *)progaddr,
 		                     CEIL_ALIGN(progsize, PAGESIZE),
 		                     false);
 	}
@@ -1427,7 +1427,7 @@ driver_enable_textrel(struct driver *__restrict self)
 		/* Must make this header writable! */
 		if (!did_lock_kernel)
 			vm_kernel_treelock_write();
-		node = nvm_getnodeof(&vm_kernel,
+		node = vm_getnodeofaddress(&vm_kernel,
 		                    (void *)(self->d_loadaddr + self->d_phdr[i].p_vaddr));
 		assertf(node, "Missing node for driver %q's program segment #%I16u mapped at %p",
 		        self->d_name, (uint16_t)i, (void *)(self->d_loadaddr + self->d_phdr[i].p_vaddr));
@@ -1454,7 +1454,7 @@ driver_disable_textrel(struct driver *__restrict self)
 		/* Must make this header writable! */
 		if (!did_lock_kernel)
 			vm_kernel_treelock_write();
-		node = nvm_getnodeof(&vm_kernel,
+		node = vm_getnodeofaddress(&vm_kernel,
 		                     (void *)(self->d_loadaddr + self->d_phdr[i].p_vaddr));
 		assertf(node, "Missing node for driver %q's program segment #%I16u mapped at %p",
 		        self->d_name, (uint16_t)i,
@@ -1468,7 +1468,7 @@ driver_disable_textrel(struct driver *__restrict self)
 				perm |= PAGEDIR_MAP_FEXEC;
 			/* Re-map the node's datapart without write-permissions */
 			vm_datapart_map_ram_autoprop(node->vn_part,
-			                             VM_NODE_START(node),
+			                             vm_node_getstart(node),
 			                             perm);
 			must_sync_kernel = true;
 		}
@@ -3257,7 +3257,7 @@ unmap_range(uintptr_t loadaddr,
 		addr += loadaddr;
 		size += addr & PAGEMASK;
 		addr &= ~PAGEMASK;
-		nvm_unmap_kernel_ram((void *)addr,
+		vm_unmap_kernel_ram((void *)addr,
 		                     CEIL_ALIGN(size, PAGESIZE),
 		                     false);
 	}
@@ -3363,13 +3363,13 @@ driver_map_into_memory(struct driver *__restrict self,
 	/* Find a suitable target location where we can map the library. */
 find_new_candidate:
 	vm_kernel_treelock_read();
-	loadaddr = (uintptr_t)nvm_getfree(&vm_kernel,
+	loadaddr = (uintptr_t)vm_getfree(&vm_kernel,
 	                                  HINT_GETADDR(KERNEL_VMHINT_DRIVER),
 	                                  total_bytes,
 	                                  min_alignment,
 	                                  HINT_GETMODE(KERNEL_VMHINT_DRIVER));
 	vm_kernel_treelock_endread();
-	if unlikely(loadaddr == (uintptr_t)NVM_GETFREE_ERROR) {
+	if unlikely(loadaddr == (uintptr_t)VM_GETFREE_ERROR) {
 		uintptr_t version;
 #ifndef __OPTIMIZE_SIZE__
 		if (system_clearcaches())
@@ -3378,13 +3378,13 @@ find_new_candidate:
 		version = 0;
 find_new_candidate_tryhard:
 		vm_kernel_treelock_read();
-		loadaddr = (uintptr_t)nvm_getfree(&vm_kernel,
+		loadaddr = (uintptr_t)vm_getfree(&vm_kernel,
 		                                  HINT_GETADDR(KERNEL_VMHINT_DRIVER),
 		                                  total_bytes,
 		                                  min_alignment,
 		                                  HINT_GETMODE(KERNEL_VMHINT_DRIVER));
 		vm_kernel_treelock_endread();
-		if (loadaddr == (uintptr_t)VM_GETFREE_ERROR) {
+		if (loadaddr == (uintptr_t)VM_PAGED_GETFREE_ERROR) {
 			if (system_clearcaches_s(&version))
 				goto find_new_candidate_tryhard;
 			THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, total_bytes);
@@ -3425,7 +3425,7 @@ find_new_candidate_tryhard:
 			/* Create the program segment. */
 			/* TODO: Prefault this mapping! (although technically, this would only be a performance
 			 *       improvement, since we're faulting all of the memory below anyways...) */
-			if (!nvm_mapat(&vm_kernel,
+			if (!vm_mapat(&vm_kernel,
 			               (void *)(addr & ~PAGEMASK),
 			               CEIL_ALIGN(size + (addr & PAGEMASK), PAGESIZE),
 			               &vm_datablock_anonymous, 0,
@@ -3980,12 +3980,12 @@ driver_insmod_file(struct regular_node *__restrict driver_inode,
 		                               driver_dentry,
 		                               flags);
 	} EXCEPT {
-		nvm_unmap(&vm_kernel, temp_mapping, num_bytes,
+		vm_unmap(&vm_kernel, temp_mapping, num_bytes,
 		          VM_UNMAP_NORMAL | VM_UNMAP_NOSPLIT);
 		RETHROW();
 	}
 	TRY {
-		nvm_unmap(&vm_kernel, temp_mapping, num_bytes,
+		vm_unmap(&vm_kernel, temp_mapping, num_bytes,
 		          VM_UNMAP_NORMAL | VM_UNMAP_NOSPLIT);
 	} EXCEPT {
 		decref(result);

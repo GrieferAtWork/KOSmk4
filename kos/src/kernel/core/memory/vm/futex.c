@@ -156,18 +156,18 @@ NOTHROW(KCALL vm_futex_destroy)(struct vm_futex *__restrict self) {
 
 
 
-/* Return a reference to the futex associated with `addr' bytes into the given data part.
+/* Return a reference to the futex associated with `datapart_offset' bytes into the given data part.
  * If no such futex already exists, use this chance to allocate it, as well as a potentially
  * missing `vm_futex_controller' when `self->dp_futex' was `NULL' when this function was called.
- * @return: * : A reference to the futex associated with `addr'
+ * @return: * : A reference to the futex associated with `datapart_offset'
  * @return: VM_DATAPART_GETFUTEX_OUTOFRANGE:
- *              The given `addr' is greater than `vm_datapart_numbytes(self)', which
+ *              The given `datapart_offset' is greater than `vm_datapart_numbytes(self)', which
  *              may be the case even if you checked before that it wasn't (or simply
  *              used `vm_datablock_locatepart()' in order to lookup the associated part),
  *              because there always exists the possibility that any data part gets split
  *              into multiple smaller parts. */
 PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm_futex *
-(KCALL vm_datapart_getfutex)(struct vm_datapart *__restrict self, uintptr_t addr)
+(KCALL vm_datapart_getfutex)(struct vm_datapart *__restrict self, uintptr_t datapart_offset)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct vm_futex *result;
 	struct vm_futex_controller *fc;
@@ -197,12 +197,12 @@ do_alloc_fc:
 		}
 	}
 	/* Verify the bounds of the given data part. */
-	if unlikely((u64)addr > vm_datapart_numbytes(self)) {
+	if unlikely(datapart_offset > vm_datapart_numbytes(self)) {
 		sync_endread(self);
 		return VM_DATAPART_GETFUTEX_OUTOFRANGE;
 	}
 	/* Search for an existing futex. */
-	result = vm_futextree_locate_at(fc->fc_tree, addr,
+	result = vm_futextree_locate_at(fc->fc_tree, datapart_offset,
 	                                fc->fc_semi0,
 	                                fc->fc_level0);
 	if (result) {
@@ -278,7 +278,8 @@ do_recheck_existing_futex_and_controller:
 			 * However, we must still re-check if the futex already exists. */
 			assert(fc);
 			assert(result);
-			new_result = vm_futextree_locate_at(fc->fc_tree, addr,
+			new_result = vm_futextree_locate_at(fc->fc_tree,
+			                                    datapart_offset,
 			                                    fc->fc_semi0,
 			                                    fc->fc_level0);
 			if unlikely(new_result) {
@@ -295,13 +296,13 @@ do_recheck_existing_futex_and_controller:
 	}
 	/* At this point, we...
 	 *  ... have got a freshly allocated futex in `result'
-	 *  ... know that there is no pre-existing futex for `addr'
+	 *  ... know that there is no pre-existing futex for `datapart_offset'
 	 *  ... know that a futex controller has been allocated
 	 *  ... are holding a lock to `self'
 	 * In other words, this is the part where we initialize a new futex. */
 	result->f_refcnt = 1; /* The reference we'll eventually return */
 	xatomic_weaklyref_init(&result->f_part, self);
-	result->f_tree.a_vaddr = addr;
+	result->f_tree.a_vaddr = datapart_offset;
 	sig_init(&result->f_signal);
 	/* Insert the new futex into the tree. */
 	vm_futextree_insert_at(&fc->fc_tree,
@@ -316,17 +317,17 @@ do_recheck_existing_futex_and_controller:
 
 
 /* Same as `vm_datapart_getfutex()', but don't allocate a new
- * futex object if none already exists for the given `addr'
- * @return: * :   A reference to the futex bound to the given `addr'
- * @return: NULL: No futex exists for the given `addr', even though `addr'
+ * futex object if none already exists for the given `datapart_offset'
+ * @return: * :   A reference to the futex bound to the given `datapart_offset'
+ * @return: NULL: No futex exists for the given `datapart_offset', even though `datapart_offset'
  *                was located within the bounds of the given data part at
  *                the time of the call being made.
  * @return: VM_DATAPART_GETFUTEX_OUTOFRANGE:
- *               The given `addr' is greater than `vm_datapart_numbytes(self)'
+ *               The given `datapart_offset' is greater than `vm_datapart_numbytes(self)'
  *               s.a. `vm_datapart_getfutex()' */
 PUBLIC WUNUSED NONNULL((1)) REF struct vm_futex *
 (KCALL vm_datapart_getfutex_existing)(struct vm_datapart *__restrict self,
-                                      uintptr_t addr)
+                                      uintptr_t datapart_offset)
 		THROWS(E_WOULDBLOCK) {
 	REF struct vm_futex *result;
 	struct vm_futex_controller *fc;
@@ -338,7 +339,7 @@ PUBLIC WUNUSED NONNULL((1)) REF struct vm_futex *
 	}
 	/* Lookup the futex within the futex tree. */
 	result = vm_futextree_locate_at(fc->fc_tree,
-	                                addr,
+	                                datapart_offset,
 	                                fc->fc_semi0,
 	                                fc->fc_level0);
 	if (result) {
@@ -348,7 +349,7 @@ PUBLIC WUNUSED NONNULL((1)) REF struct vm_futex *
 	} else {
 		/* Check if we didn't find anything because the address is out-of-bounds. */
 done_check_oob:
-		if unlikely((u64)addr >= vm_datapart_numbytes(self))
+		if unlikely(datapart_offset >= vm_datapart_numbytes(self))
 			result = VM_DATAPART_GETFUTEX_OUTOFRANGE;
 	}
 	sync_endread(self);
@@ -371,34 +372,34 @@ done_check_oob:
  *       -> In the end, there exists no API also found on linux that would make use of this
  *          function, however on KOS it is possible to access this function through use of
  *          the HANDLE_TYPE_DATABLOCK-specific hop() function `HOP_DATABLOCK_OPEN_FUTEX[_EXISTING]'
- * @return: * : The futex associated with the given `addr' */
+ * @return: * : The futex associated with the given `offset' */
 PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm_futex *
-(KCALL vm_datablock_getfutex)(struct vm_datablock *__restrict self, vm_daddr_t addr)
+(KCALL vm_datablock_getfutex)(struct vm_datablock *__restrict self, pos_t offset)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct vm_futex *result;
 	REF struct vm_datapart *part;
-	vm_daddr_t partrel_addr;
+	pos_t partrel_addr;
 again:
 	/* Lookup the datapart that should contain the associated futex. */
-	part = vm_datablock_locatepart(self, (vm_vpage64_t)VM_ADDR2PAGE((u64)addr), 1);
-	partrel_addr = (vm_daddr_t)(addr - vm_datapart_minbyte(part));
-#if __SIZEOF_POINTER__ < __SIZEOF_VM_DADDR_T__
+	part = vm_datablock_locatepart(self, (vm_vpage64_t)VM_ADDR2PAGE((u64)offset), 1);
+	partrel_addr = (pos_t)(offset - vm_datapart_minbyte(part));
+#if __SIZEOF_POINTER__ < __FS_SIZEOF(OFF)
 	/* Make sure that the part-relative address offset
 	 * doesn't overflow. If it does, force a split! */
-	if (partrel_addr > (vm_daddr_t)(uintptr_t)-1) {
+	if (partrel_addr > (pos_t)(uintptr_t)-1) {
 		REF struct vm_datapart *used_part;
 		TRY {
-			used_part = vm_datablock_locatepart_exact(self, (vm_vpage64_t)VM_ADDR2PAGE((u64)addr), 1);
+			used_part = vm_datablock_locatepart_exact(self, (vm_vpage64_t)VM_ADDR2PAGE((u64)offset), 1);
 		} EXCEPT {
 			decref_unlikely(part);
 			RETHROW();
 		}
 		decref_unlikely(part);
 		part         = used_part;
-		partrel_addr = (vm_daddr_t)(addr - vm_datapart_minbyte(part));
+		partrel_addr = (pos_t)(offset - vm_datapart_minbyte(part));
 	}
-	assert(partrel_addr <= (vm_daddr_t)(uintptr_t)-1);
-#endif /* __SIZEOF_POINTER__ < __SIZEOF_VM_DADDR_T__ */
+	assert(partrel_addr <= (pos_t)(uintptr_t)-1);
+#endif /* __SIZEOF_POINTER__ < __FS_SIZEOF(OFF) */
 	{
 		FINALLY_DECREF_UNLIKELY(part);
 		/* Using the datapart, lookup the futex. */
@@ -412,11 +413,11 @@ again:
 }
 
 /* Same as `vm_datablock_getfutex()', but don't allocate a new
- * futex object if none already exists for the given `addr'
- * @return: * : The futex associated with the given `addr'
+ * futex object if none already exists for the given `offset'
+ * @return: * : The futex associated with the given `offset'
  * @return: NULL: No futex exists for the given address. */
 PUBLIC WUNUSED NONNULL((1)) REF struct vm_futex *
-(KCALL vm_datablock_getfutex_existing)(struct vm_datablock *__restrict self, vm_daddr_t addr)
+(KCALL vm_datablock_getfutex_existing)(struct vm_datablock *__restrict self, pos_t offset)
 		THROWS(E_WOULDBLOCK) {
 	REF struct vm_futex *result;
 	REF struct vm_datapart *part;
@@ -432,7 +433,7 @@ again:
 		return NULL;
 	}
 	part = vm_parttree_locate(self->db_parts,
-	                          VM_DATABLOCK_DADDR2DPAGE(self, addr));
+	                          VM_DATABLOCK_DADDR2DPAGE(self, offset));
 	if (!part) {
 		/* No part exists for the given address. */
 		sync_endread(self);
@@ -442,15 +443,15 @@ again:
 	sync_endread(self);
 	/* Got the associated data part! */
 	{
-		vm_daddr_t partrel_addr;
+		pos_t partrel_addr;
 		FINALLY_DECREF_UNLIKELY(part);
-		partrel_addr = (vm_daddr_t)(addr - vm_datapart_minbyte(part));
-#if __SIZEOF_POINTER__ < __SIZEOF_VM_DADDR_T__
+		partrel_addr = (pos_t)(offset - vm_datapart_minbyte(part));
+#if __SIZEOF_POINTER__ < __FS_SIZEOF(OFF)
 		/* Make sure that the part-relative address offset doesn't overflow. */
-		if (partrel_addr > (vm_daddr_t)(uintptr_t)-1) {
+		if (partrel_addr > (pos_t)(uintptr_t)-1) {
 			result = NULL;
 		} else
-#endif /* __SIZEOF_POINTER__ < __SIZEOF_VM_DADDR_T__ */
+#endif /* __SIZEOF_POINTER__ < __FS_SIZEOF(OFF) */
 		{
 			result = vm_datapart_getfutex_existing(part,
 			                                       (uintptr_t)partrel_addr);
@@ -466,28 +467,28 @@ again:
 /* Return the futex object that is associated with the given virtual memory address.
  * In the event that `addr' isn't  */
 PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm_futex *
-(KCALL vm_getfutex)(struct vm *__restrict effective_vm, vm_virt_t addr)
+(KCALL vm_getfutex)(struct vm *__restrict effective_vm, UNCHECKED void *addr)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT) {
 	struct vm_node *node;
 	REF struct vm_futex *result;
 	REF struct vm_datapart *part;
-	vm_virt_t node_minaddr;
+	void *node_minaddr;
 again:
 	sync_read(effective_vm);
-	node = vm_getnodeof(effective_vm, VM_ADDR2PAGE(addr));
+	node = vm_getnodeofaddress(effective_vm, addr);
 	if unlikely(!node || (part = node->vn_part) == NULL) {
 		sync_endread(effective_vm);
 		THROW(E_SEGFAULT_UNMAPPED,
 		      addr,
 		      E_SEGFAULT_CONTEXT_FAULT);
 	}
-	node_minaddr = VM_NODE_MINADDR(node);
+	node_minaddr = vm_node_getmin(node);
 	incref(part);
 	sync_endread(effective_vm);
 	{
 		uintptr_t partrel_addr;
 		FINALLY_DECREF_UNLIKELY(part);
-		partrel_addr = (uintptr_t)(addr - node_minaddr);
+		partrel_addr = (uintptr_t)((byte_t *)addr - (byte_t *)node_minaddr);
 		/* Lookup the futex within the detected data part. */
 		result = vm_datapart_getfutex(part, partrel_addr);
 	}
@@ -503,28 +504,28 @@ again:
  * @return: * : The futex associated with the given `addr'
  * @return: NULL: No futex exists for the given address. */
 PUBLIC WUNUSED NONNULL((1)) REF struct vm_futex *
-(KCALL vm_getfutex_existing)(struct vm *__restrict effective_vm, vm_virt_t addr)
+(KCALL vm_getfutex_existing)(struct vm *__restrict effective_vm, UNCHECKED void *addr)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
 	struct vm_node *node;
 	REF struct vm_futex *result;
 	REF struct vm_datapart *part;
-	vm_virt_t node_minaddr;
+	void *node_minaddr;
 again:
 	sync_read(effective_vm);
-	node = vm_getnodeof(effective_vm, VM_ADDR2PAGE(addr));
+	node = vm_getnodeofaddress(effective_vm, addr);
 	if unlikely(!node || (part = node->vn_part) == NULL) {
 		sync_endread(effective_vm);
 		THROW(E_SEGFAULT_UNMAPPED,
 		      addr,
 		      E_SEGFAULT_CONTEXT_FAULT);
 	}
-	node_minaddr = VM_NODE_MINADDR(node);
+	node_minaddr = vm_node_getmin(node);
 	incref(part);
 	sync_endread(effective_vm);
 	{
 		uintptr_t partrel_addr;
 		FINALLY_DECREF_UNLIKELY(part);
-		partrel_addr = (uintptr_t)(addr - node_minaddr);
+		partrel_addr = (uintptr_t)((byte_t *)addr - (byte_t *)node_minaddr);
 		/* Lookup the futex within the detected data part. */
 		result = vm_datapart_getfutex_existing(part, partrel_addr);
 	}
@@ -537,14 +538,14 @@ again:
 
 /* Broadcast to all thread waiting for a futex at `futex_address' within the current VM */
 PUBLIC void FCALL
-vm_futex_broadcast(void *futex_address)
+vm_futex_broadcast(UNCHECKED void *futex_address)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
 	REF struct vm_futex *f;
 	struct vm *effective_vm = THIS_VM;
 	if (ADDR_IS_KERNEL(futex_address))
 		effective_vm = &vm_kernel;
 	/* Lookup a futex at the given address. */
-	f = vm_getfutex_existing(effective_vm, (vm_virt_t)futex_address);
+	f = vm_getfutex_existing(effective_vm, futex_address);
 	if (f) {
 		sig_broadcast(&f->f_signal);
 		decref_unlikely(f);

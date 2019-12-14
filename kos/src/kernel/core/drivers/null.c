@@ -286,27 +286,27 @@ kmsg_poll(struct character_device *__restrict UNUSED(self),
 
 
 #ifdef CONFIG_VIO
-PRIVATE u8 KCALL port_rdb(struct vio_args *__restrict UNUSED(args), vm_daddr_t addr) {
+PRIVATE u8 KCALL port_rdb(struct vio_args *__restrict UNUSED(args), pos_t addr) {
 	return inb((port_t)addr);
 }
 
-PRIVATE u16 KCALL port_rdw(struct vio_args *__restrict UNUSED(args), vm_daddr_t addr) {
+PRIVATE u16 KCALL port_rdw(struct vio_args *__restrict UNUSED(args), pos_t addr) {
 	return inw((port_t)addr);
 }
 
-PRIVATE u32 KCALL port_rdl(struct vio_args *__restrict UNUSED(args), vm_daddr_t addr) {
+PRIVATE u32 KCALL port_rdl(struct vio_args *__restrict UNUSED(args), pos_t addr) {
 	return inl((port_t)addr);
 }
 
-PRIVATE void KCALL port_wrb(struct vio_args *__restrict UNUSED(args), vm_daddr_t addr, u8 value) {
+PRIVATE void KCALL port_wrb(struct vio_args *__restrict UNUSED(args), pos_t addr, u8 value) {
 	outb((port_t)addr, value);
 }
 
-PRIVATE void KCALL port_wrw(struct vio_args *__restrict UNUSED(args), vm_daddr_t addr, u16 value) {
+PRIVATE void KCALL port_wrw(struct vio_args *__restrict UNUSED(args), pos_t addr, u16 value) {
 	outw((port_t)addr, value);
 }
 
-PRIVATE void KCALL port_wrl(struct vio_args *__restrict UNUSED(args), vm_daddr_t addr, u32 value) {
+PRIVATE void KCALL port_wrl(struct vio_args *__restrict UNUSED(args), pos_t addr, u32 value) {
 	outl((port_t)addr, value);
 }
 
@@ -335,20 +335,20 @@ port_mmap(struct character_device *__restrict UNUSED(self),
 }
 
 
-PRIVATE u8 KCALL random_rdb(struct vio_args *__restrict UNUSED(args), vm_daddr_t UNUSED(addr)) {
+PRIVATE u8 KCALL random_rdb(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return krand8_nondeterministic();
 }
 
-PRIVATE u16 KCALL random_rdw(struct vio_args *__restrict UNUSED(args), vm_daddr_t UNUSED(addr)) {
+PRIVATE u16 KCALL random_rdw(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return krand16_nondeterministic();
 }
 
-PRIVATE u32 KCALL random_rdl(struct vio_args *__restrict UNUSED(args), vm_daddr_t UNUSED(addr)) {
+PRIVATE u32 KCALL random_rdl(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return krand32_nondeterministic();
 }
 
 #ifdef CONFIG_VIO_HAS_QWORD
-PRIVATE u64 KCALL random_rdq(struct vio_args *__restrict UNUSED(args), vm_daddr_t UNUSED(addr)) {
+PRIVATE u64 KCALL random_rdq(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return ((u64)krand32_nondeterministic()) |
 	       ((u64)krand32_nondeterministic() << 32);
 }
@@ -367,20 +367,20 @@ random_mmap(struct character_device *__restrict UNUSED(self),
 	return incref(&random_datablock);
 }
 
-PRIVATE u8 KCALL urandom_rdb(struct vio_args *__restrict UNUSED(args), vm_daddr_t UNUSED(addr)) {
+PRIVATE u8 KCALL urandom_rdb(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return (u8)krand();
 }
 
-PRIVATE u16 KCALL urandom_rdw(struct vio_args *__restrict UNUSED(args), vm_daddr_t UNUSED(addr)) {
+PRIVATE u16 KCALL urandom_rdw(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return (u16)krand();
 }
 
-PRIVATE u32 KCALL urandom_rdl(struct vio_args *__restrict UNUSED(args), vm_daddr_t UNUSED(addr)) {
+PRIVATE u32 KCALL urandom_rdl(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return krand();
 }
 
 #ifdef CONFIG_VIO_HAS_QWORD
-PRIVATE u64 KCALL urandom_rdq(struct vio_args *__restrict UNUSED(args), vm_daddr_t UNUSED(addr)) {
+PRIVATE u64 KCALL urandom_rdq(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
 	return krand64();
 }
 #endif /* CONFIG_VIO_HAS_QWORD */

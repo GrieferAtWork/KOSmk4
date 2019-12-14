@@ -76,8 +76,8 @@ DEFINE_DEBUG_FUNCTION(
 		, argc, argv) {
 	struct vm *v = &vm_kernel;
 	struct vm_node *iter;
-	vm_virt_t minaddr = 0;
-	vm_virt_t maxaddr = (vm_virt_t)-1;
+	void *minaddr = (void *)0;
+	void *maxaddr = (void *)-1;
 	--argc;
 	++argv;
 	if (argc) {
@@ -106,15 +106,15 @@ DEFINE_DEBUG_FUNCTION(
 		struct vm_datapart *part;
 		struct vm_datablock *block;
 		char const *state_name;
-		if (VM_NODE_MAXADDR(iter) < minaddr)
+		if (vm_node_getmax(iter) < minaddr)
 			continue;
-		if (VM_NODE_MINADDR(iter) > maxaddr)
+		if (vm_node_getmin(iter) > maxaddr)
 			break;
 		part = iter->vn_part;
 		if (!part) {
 			dbg_printf(DBGSTR("%p-%p [%c%c%c%c] [%c%c%c%c%c%c] reserved\n"),
-			           VM_NODE_MINADDR(iter),
-			           VM_NODE_MAXADDR(iter),
+			           vm_node_getmin(iter),
+			           vm_node_getmax(iter),
 			           (iter->vn_prot & VM_PROT_READ) ? 'r' : '-',
 			           (iter->vn_prot & VM_PROT_WRITE) ? 'w' : '-',
 			           (iter->vn_prot & VM_PROT_EXEC) ? 'x' : '-',
@@ -129,8 +129,8 @@ DEFINE_DEBUG_FUNCTION(
 		}
 		block = iter->vn_block;
 		dbg_printf(DBGSTR("%p-%p [%c%c%c%c] [%c%c%c%c%c%c] [%c%c%c%c] "),
-		           VM_NODE_MINADDR(iter),
-		           VM_NODE_MAXADDR(iter),
+		           vm_node_getmin(iter),
+		           vm_node_getmax(iter),
 		           (iter->vn_prot & VM_PROT_READ) ? 'r' : '-',
 		           (iter->vn_prot & VM_PROT_WRITE) ? 'w' : '-',
 		           (iter->vn_prot & VM_PROT_EXEC) ? 'x' : '-',

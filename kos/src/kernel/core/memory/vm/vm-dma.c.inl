@@ -27,15 +27,16 @@
 
 DECL_BEGIN
 
-#if defined(DMA_NX)
+#ifdef DMA_NX
 #define FUNC0(x) x##_nx
-#else
+#else /* DMA_NX */
 #define FUNC0(x) x
-#endif
+#endif /* !DMA_NX */
 
-#ifndef __INTELLISENSE__
-STATIC_ASSERT(SHARED_RWLOCK_RMASK >= (VM_VPAGE_MAX + 1));
-#endif
+#ifndef DID_ASSERT_SHARED_RWLOCK_RMASK
+#define DID_ASSERT_SHARED_RWLOCK_RMASK 1
+STATIC_ASSERT(SHARED_RWLOCK_RMASK >= (__ARCH_PAGEID_MAX + 1));
+#endif /* !DID_ASSERT_SHARED_RWLOCK_RMASK */
 
 
 #ifndef DMA_ENUM
@@ -202,7 +203,7 @@ again:
 #endif /* !DMA_VECTOR */
 	if likely(num_bytes) {
 		vm_nodetree_minmax_t minmax;
-		vm_vpage_t minpage, maxpage;
+		pageid_t minpage, maxpage;
 		struct vm_node *node;
 		struct vm_datapart *part;
 #ifdef DMA_ENUM
@@ -212,8 +213,8 @@ again_reset:
 		assert(!lockcnt || lockvec != NULL);
 #endif /* !DMA_ENUM */
 		minmax.mm_min = minmax.mm_max = NULL;
-		minpage                       = VM_ADDR2PAGE((vm_virt_t)vaddr);
-		maxpage                       = VM_ADDR2PAGE((vm_virt_t)vaddr + num_bytes - 1);
+		minpage                       = PAGEID_ENCODE((byte_t *)vaddr);
+		maxpage                       = PAGEID_ENCODE((byte_t *)vaddr + num_bytes - 1);
 		vm_nodetree_minmaxlocate(effective_vm->v_tree, minpage, maxpage, &minmax);
 		assert((minmax.mm_min != NULL) == (minmax.mm_max != NULL));
 		if unlikely(!minmax.mm_min)
@@ -370,7 +371,7 @@ unshare_copy_on_write_for_part:
 				vm_datapart_do_enumdma(part,
 				                       prange,
 				                       arg,
-				                       (size_t)((vm_virt_t)vaddr - VM_NODE_STARTADDR(node)),
+				                       (size_t)((byte_t *)vaddr - (byte_t *)vm_node_getstart(node)),
 				                       num_bytes,
 				                       &lock);
 			}
@@ -384,7 +385,7 @@ unshare_copy_on_write_for_part:
 				vm_datapart_do_enumdma(part,
 				                       prange,
 				                       arg,
-				                       (size_t)((vm_virt_t)vaddr - VM_NODE_STARTADDR(node)),
+				                       (size_t)((byte_t *)vaddr - (byte_t *)vm_node_getstart(node)),
 				                       num_bytes,
 				                       &lockvec[lock_used]);
 				++lock_used;
@@ -405,8 +406,8 @@ unshare_copy_on_write_for_part:
 			/* Multi-node memory range */
 			node = minmax.mm_min;
 			for (;;) {
-				vm_vpage_t node_minpage;
-				vm_vpage_t node_maxpage;
+				pageid_t node_minpage;
+				pageid_t node_maxpage;
 				size_t noderel_startaddr;
 				size_t noderel_num_bytes;
 
@@ -429,10 +430,13 @@ unshare_copy_on_write_for_part:
 				if (state != VM_DATAPART_STATE_INCORE &&
 				    state != VM_DATAPART_STATE_LOCKED)
 					goto loadcore_part_and_try_again;
-				node_minpage = VM_NODE_MIN(node);
-				node_maxpage = VM_NODE_MAX(node);
+				node_minpage = vm_node_getminpageid(node);
+				node_maxpage = vm_node_getmaxpageid(node);
 				if (for_writing &&
-				    (node->vn_prot & VM_PROT_SHARED ? ATOMIC_READ(part->dp_crefs) != NULL : (ATOMIC_READ(part->dp_crefs) != node || node->vn_link.ln_next))) {
+				    (node->vn_prot & VM_PROT_SHARED
+				     ? ATOMIC_READ(part->dp_crefs) != NULL
+				     : (ATOMIC_READ(part->dp_crefs) != node ||
+				        node->vn_link.ln_next))) {
 					/* Check if we should split the part, so-as to allow our page
 					 * range to better fit the requested range of parts once we have
 					 * to unshare copy-on-write references. */
@@ -453,10 +457,12 @@ unshare_copy_on_write_for_part:
 				assert(sync_reading(part));
 				assert(part->dp_state == VM_DATAPART_STATE_INCORE ||
 				       part->dp_state == VM_DATAPART_STATE_LOCKED);
-				noderel_startaddr = node == minmax.mm_min ? (size_t)((vm_virt_t)vaddr - VM_NODE_MINADDR(node)) : 0;
-				noderel_num_bytes = VM_NODE_BYTESIZE(node);
+				noderel_startaddr = node == minmax.mm_min
+				                    ? (size_t)((byte_t *)vaddr - (byte_t *)vm_node_getmin(node))
+				                    : 0;
+				noderel_num_bytes = vm_node_getsize(node);
 				if (node == minmax.mm_max)
-					noderel_num_bytes = (size_t)(((vm_virt_t)vaddr + num_bytes) - VM_NODE_MINADDR(node));
+					noderel_num_bytes = (size_t)(((byte_t *)vaddr + num_bytes) - (byte_t *)vm_node_getmin(node));
 #ifdef DMA_ENUM
 				{
 					struct vm_dmalock lock;
@@ -500,7 +506,7 @@ unshare_copy_on_write_for_part:
 					struct vm_node *next;
 					next = node->vn_byaddr.ln_next;
 					/* Make sure that the node form a continuous line of memory! */
-					if (VM_NODE_START(next) != VM_NODE_END(node))
+					if (vm_node_getstartpageid(next) != vm_node_getendpageid(node))
 						goto err_unmapped;
 					node = next;
 				}

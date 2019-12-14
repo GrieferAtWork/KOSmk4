@@ -77,32 +77,34 @@ struct vm_futex_controller {
 #define vm_futex_controller_free(p)              kfree(p)
 
 
-/* Return a reference to the futex associated with `addr' bytes into the given data part.
+/* Return a reference to the futex associated with `datapart_offset' bytes into the given data part.
  * If no such futex already exists, use this chance to allocate it, as well as a potentially
  * missing `vm_futex_controller' when `self->dp_futex' was `NULL' when this function was called.
- * @return: * : A reference to the futex associated with `addr'
+ * @return: * : A reference to the futex associated with `datapart_offset'
  * @return: VM_DATAPART_GETFUTEX_OUTOFRANGE:
- *              The given `addr' is greater than `vm_datapart_numbytes(self)', which
+ *              The given `datapart_offset' is greater than `vm_datapart_numbytes(self)', which
  *              may be the case even if you checked before that it wasn't (or simply
  *              used `vm_datablock_locatepart()' in order to lookup the associated part),
  *              because there always exists the possibility that any data part gets split
  *              into multiple smaller parts. */
 FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm_futex *
-(KCALL vm_datapart_getfutex)(struct vm_datapart *__restrict self, uintptr_t addr)
+(KCALL vm_datapart_getfutex)(struct vm_datapart *__restrict self,
+                             uintptr_t datapart_offset)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 #define VM_DATAPART_GETFUTEX_OUTOFRANGE ((REF struct vm_futex *)-1)
 
 /* Same as `vm_datapart_getfutex()', but don't allocate a new
- * futex object if none already exists for the given `addr'
- * @return: * :   A reference to the futex bound to the given `addr'
- * @return: NULL: No futex exists for the given `addr', even though `addr'
+ * futex object if none already exists for the given `datapart_offset'
+ * @return: * :   A reference to the futex bound to the given `datapart_offset'
+ * @return: NULL: No futex exists for the given `datapart_offset', even though `datapart_offset'
  *                was located within the bounds of the given data part at
  *                the time of the call being made.
  * @return: VM_DATAPART_GETFUTEX_OUTOFRANGE:
- *               The given `addr' is greater than `vm_datapart_numbytes(self)'
+ *               The given `datapart_offset' is greater than `vm_datapart_numbytes(self)'
  *               s.a. `vm_datapart_getfutex()' */
 FUNDEF WUNUSED NONNULL((1)) REF struct vm_futex *
-(KCALL vm_datapart_getfutex_existing)(struct vm_datapart *__restrict self, uintptr_t addr)
+(KCALL vm_datapart_getfutex_existing)(struct vm_datapart *__restrict self,
+                                      uintptr_t datapart_offset)
 		THROWS(E_WOULDBLOCK);
 
 /* Lookup a futex at a given address that is offset from the start of a given
@@ -121,23 +123,23 @@ FUNDEF WUNUSED NONNULL((1)) REF struct vm_futex *
  *       -> In the end, there exists no API also found on linux that would make use of this
  *          function, however on KOS it is possible to access this function through use of
  *          the HANDLE_TYPE_DATABLOCK-specific hop() function `HOP_DATABLOCK_OPEN_FUTEX[_EXISTING]'
- * @return: * : The futex associated with the given `addr' */
+ * @return: * : The futex associated with the given `offset' */
 FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm_futex *
-(KCALL vm_datablock_getfutex)(struct vm_datablock *__restrict self, vm_daddr_t addr)
+(KCALL vm_datablock_getfutex)(struct vm_datablock *__restrict self, pos_t offset)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
 /* Same as `vm_datablock_getfutex()', but don't allocate a new
- * futex object if none already exists for the given `addr'
- * @return: * : The futex associated with the given `addr'
+ * futex object if none already exists for the given `offset'
+ * @return: * : The futex associated with the given `offset'
  * @return: NULL: No futex exists for the given address. */
 FUNDEF WUNUSED NONNULL((1)) REF struct vm_futex *
-(KCALL vm_datablock_getfutex_existing)(struct vm_datablock *__restrict self, vm_daddr_t addr)
+(KCALL vm_datablock_getfutex_existing)(struct vm_datablock *__restrict self, pos_t offset)
 		THROWS(E_WOULDBLOCK);
 
 /* Return the futex object that is associated with the given virtual memory address.
  * In the event that `addr' isn't  */
 FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm_futex *
-(KCALL vm_getfutex)(struct vm *__restrict effective_vm, vm_virt_t addr)
+(KCALL vm_getfutex)(struct vm *__restrict effective_vm, UNCHECKED void *addr)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT);
 
 /* Same as `vm_getfutex()', but don't allocate a new
@@ -145,12 +147,12 @@ FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm_futex *
  * @return: * : The futex associated with the given `addr'
  * @return: NULL: No futex exists for the given address. */
 FUNDEF WUNUSED NONNULL((1)) REF struct vm_futex *
-(KCALL vm_getfutex_existing)(struct vm *__restrict effective_vm, vm_virt_t addr)
+(KCALL vm_getfutex_existing)(struct vm *__restrict effective_vm, UNCHECKED void *addr)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT);
 
 /* Broadcast to all thread waiting for a futex at `futex_address' within the current VM */
 FUNDEF void FCALL
-vm_futex_broadcast(void *futex_address)
+vm_futex_broadcast(UNCHECKED void *futex_address)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT);
 
 

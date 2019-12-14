@@ -97,7 +97,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL vmb_fini)(struct vmb *__restrict self);
  * @return: false: Another mapping already exists. */
 FUNDEF bool KCALL
 vmb_mapat(struct vmb *__restrict self,
-          vm_vpage_t page_index, size_t num_pages,
+          pageid_t page_index, size_t num_pages,
           struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
           vm_vpage64_t data_start_vpage DFL(0),
           uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
@@ -117,7 +117,7 @@ nvmb_mapat(struct vmb *__restrict self,
 	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
 	__hybrid_assert((num_bytes & PAGEMASK) == 0);
 	__hybrid_assert((data_start_offset & PAGEMASK) == 0);
-	return vmb_mapat(self, (vm_vpage_t)__ARCH_PAGEID_ENCODE(addr),
+	return vmb_mapat(self, __ARCH_PAGEID_ENCODE(addr),
 	                 num_bytes / PAGESIZE, data,
 	                 (vm_vpage64_t)(data_start_offset / PAGESIZE),
 	                 prot, flag, guard);
@@ -145,28 +145,28 @@ nvmb_mapat(struct vmb *__restrict self,
  *        - VM_GETFREE_BELOW + VM_GETFREE_ASLR:
  *          Return the `x = 1 - (rand() / RAND_MAX); x*x*NUM_CANDIDATES'th candidate
  *   #2: Repeat step #1, but ignore the potentials of GUARD nodes.
- *   #3: Return `VM_GETFREE_ERROR'
+ *   #3: Return `VM_PAGED_GETFREE_ERROR'
  * @param: mode:                   Set of `VM_GETFREE_F*'
  * @param: hint:                   A hint used as base when searching for free memory ranges.
  * @param: min_alignment_in_pages: The minimum alignment required from the returned pointer (or `1')
- * @return: VM_GETFREE_ERROR:      No more virtual memory available. */
-FUNDEF NOBLOCK WUNUSED vm_vpage_t
-NOTHROW(KCALL vmb_getfree)(struct vmb *__restrict self,
-                           vm_vpage_t hint, size_t num_pages,
-                           size_t min_alignment_in_pages,
-                           unsigned int mode);
+ * @return: VM_PAGED_GETFREE_ERROR:      No more virtual memory available. */
+FUNDEF NOBLOCK WUNUSED pageid_t
+NOTHROW(KCALL vmb_paged_getfree)(struct vmb *__restrict self,
+                                 pageid_t hint, size_t num_pages,
+                                 size_t min_alignment_in_pages,
+                                 unsigned int mode);
 LOCAL NOBLOCK WUNUSED PAGEDIR_PAGEALIGNED UNCHECKED void *
-NOTHROW(KCALL nvmb_getfree)(struct vmb *__restrict self,
-                            PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
-                            PAGEDIR_PAGEALIGNED size_t num_bytes,
-                            PAGEDIR_PAGEALIGNED size_t min_alignment,
-                            unsigned int mode) {
-	vm_vpage_t result;
+NOTHROW(KCALL vmb_getfree)(struct vmb *__restrict self,
+                           PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
+                           PAGEDIR_PAGEALIGNED size_t num_bytes,
+                           PAGEDIR_PAGEALIGNED size_t min_alignment,
+                           unsigned int mode) {
+	pageid_t result;
 	__hybrid_assert(((uintptr_t)hint & PAGEMASK) == 0);
 	__hybrid_assert((num_bytes & PAGEMASK) == 0);
 	__hybrid_assert((min_alignment & PAGEMASK) == 0);
-	result = vmb_getfree(self,
-	                     (vm_vpage_t)__ARCH_PAGEID_ENCODE(hint),
+	result = vmb_paged_getfree(self,
+	                     __ARCH_PAGEID_ENCODE(hint),
 	                     num_bytes / PAGESIZE,
 	                     min_alignment / PAGESIZE,
 	                     mode);
@@ -174,11 +174,11 @@ NOTHROW(KCALL nvmb_getfree)(struct vmb *__restrict self,
 }
 
 
-/* A combination of `vmb_getfree' + `vmb_mapat'
+/* A combination of `vmb_paged_getfree' + `vmb_mapat'
  * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target. */
-FUNDEF vm_vpage_t KCALL
+FUNDEF pageid_t KCALL
 vmb_map(struct vmb *__restrict self,
-        vm_vpage_t hint,
+        pageid_t hint,
         size_t num_pages,
         size_t min_alignment_in_pages DFL(1),
         unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
@@ -200,12 +200,12 @@ nvmb_map(struct vmb *__restrict self,
          uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
          uintptr_t guard DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	vm_vpage_t result;
+	pageid_t result;
 	__hybrid_assert(((uintptr_t)hint & PAGEMASK) == 0);
 	__hybrid_assert((num_bytes & PAGEMASK) == 0);
 	__hybrid_assert((min_alignment & PAGEMASK) == 0);
 	__hybrid_assert((data_start_offset & PAGEMASK) == 0);
-	result = vmb_map(self, (vm_vpage_t)__ARCH_PAGEID_ENCODE(hint),
+	result = vmb_map(self, __ARCH_PAGEID_ENCODE(hint),
 	                 num_bytes / PAGESIZE,
 	                 min_alignment / PAGESIZE, getfree_mode,
 	                 data, (vm_vpage64_t)(data_start_offset / PAGESIZE),
@@ -243,34 +243,34 @@ NOTHROW(KCALL vmb_node_insert)(struct vmb *__restrict self,
 /* Remove a given node from the specified VM Builder. */
 FUNDEF NOBLOCK NONNULL((1)) struct vm_node *
 NOTHROW(KCALL vmb_node_remove)(struct vmb *__restrict self,
-                               vm_vpage_t page);
+                               pageid_t page);
 
 /* Get the node associated with the given `page' */
 FUNDEF NOBLOCK WUNUSED struct vm_node *
-NOTHROW(FCALL vmb_getnodeof)(struct vmb *__restrict self, vm_vpage_t page);
+NOTHROW(FCALL vmb_getnodeof)(struct vmb *__restrict self, pageid_t page);
 
 LOCAL NOBLOCK WUNUSED struct vm_node *
 NOTHROW(FCALL nvmb_getnodeof)(struct vmb *__restrict self, UNCHECKED void *addr) {
-	return vmb_getnodeof(self, (vm_vpage_t)__ARCH_PAGEID_ENCODE(addr));
+	return vmb_getnodeof(self, __ARCH_PAGEID_ENCODE(addr));
 }
 
 /* Check if some part of the given address range is currently in use. */
 FUNDEF NOBLOCK WUNUSED bool
-NOTHROW(FCALL vmb_isused)(struct vmb *__restrict self,
-                          vm_vpage_t min_page,
-                          vm_vpage_t max_page);
+NOTHROW(FCALL vmb_paged_isused)(struct vmb *__restrict self,
+                                pageid_t min_page,
+                                pageid_t max_page);
 
-/* Find the first node with `VM_NODE_MIN(return) >= min_page_index'
+/* Find the first node with `vm_node_getminpageid(return) >= min_page_index'
  * If no such node exists, return `NULL' instead. */
 FUNDEF NOBLOCK WUNUSED struct vm_node *
 NOTHROW(KCALL vmb_find_first_node_greater_equal)(struct vmb *__restrict self,
-                                                 vm_vpage_t min_page_index);
+                                                 pageid_t min_page_index);
 
-/* Find the last node with `VM_NODE_MAX(return) <= max_page_index'
+/* Find the last node with `vm_node_getmaxpageid(return) <= max_page_index'
  * If no such node exists, return `NULL' instead. */
 FUNDEF NOBLOCK WUNUSED struct vm_node *
 NOTHROW(KCALL vmb_find_last_node_lower_equal)(struct vmb *__restrict self,
-                                              vm_vpage_t max_page_index);
+                                              pageid_t max_page_index);
 
 
 struct vm_execinfo_struct;

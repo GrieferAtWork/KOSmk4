@@ -115,15 +115,17 @@ struct handle_types {
 	void (NONNULL((1)) KCALL *h_truncate[HANDLE_TYPE_COUNT])(void *__restrict ptr, pos_t new_size)
 			THROWS(...);
 
-	/* @param: pminpage: Set to a base virt-page-offset to-be added to the mmap file-offset when mapping memory.
-	 *                   Handle operators are not required to set this value. - It is default initialized to 0
-	 * @param: pmaxpage: Set to the max virt-page for which mapping into memory is allows.
-	 *                   Handle operators are not required to set this value. - It is default initialized to `(vm_vpage64_t)-1'
-	 * @return: * :      The datablock to-be used for mapping this handle into memory (never NULL). */
+	/* @param: pminoffset: Set to a base offset to-be added to the mmap file-offset when mapping memory.
+	 *                     Handle operators are not required to set this value.
+	 *                     It is default initialized to `(pos_t)0'
+	 * @param: pnumbytes:  Set to the max number of bytes which may be mapped, starting at `*pminoffset'.
+	 *                     Handle operators are not required to set this value.
+	 *                     It is default initialized to `(pos_t)-1'
+	 * @return: * :        The datablock to-be used for mapping this handle into memory (never NULL). */
 	REF struct vm_datablock *
 	(WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3)) KCALL *h_mmap[HANDLE_TYPE_COUNT])(void *__restrict ptr,
-	                                                                              vm_vpage64_t *__restrict pminpage,
-	                                                                              vm_vpage64_t *__restrict pmaxpage)
+	                                                                              pos_t *__restrict pminoffset,
+	                                                                              pos_t *__restrict pnumbytes)
 			THROWS(...);
 
 	/* @return: * : The amount of newly allocated bytes (or `0' if the
@@ -227,7 +229,7 @@ FUNDEF bool KCALL handle_datasize(struct handle const *__restrict self, pos_t *_
 #define handle_ioctl(self, cmd, arg)                             HANDLE_FUNC(self, h_ioctl)((self).h_data, cmd, arg, (self).h_mode)
 #define handle_ioctlf(self, cmd, arg, flags)                     HANDLE_FUNC(self, h_ioctl)((self).h_data, cmd, arg, flags)
 #define handle_truncate(self, new_size)                          HANDLE_FUNC(self, h_truncate)((self).h_data, new_size)
-#define handle_mmap(self, pminpage, pmaxpage)                    HANDLE_FUNC(self, h_mmap)((self).h_data, pminpage, pmaxpage)
+#define handle_mmap(self, pminoffset, pnumbytes)                 HANDLE_FUNC(self, h_mmap)((self).h_data, pminoffset, pnumbytes)
 #define handle_allocate(self, mode, start, length)               HANDLE_FUNC(self, h_allocate)((self).h_data, mode, start, length)
 #define handle_sync(self)                                        HANDLE_FUNC(self, h_sync)((self).h_data)
 #define handle_datasync(self)                                    HANDLE_FUNC(self, h_datasync)((self).h_data)

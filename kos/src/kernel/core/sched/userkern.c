@@ -60,12 +60,12 @@ INTDEF NONNULL((1)) bool KCALL userkern_set_arch_specific_field_compat(struct vi
 
 #ifdef __INTELLISENSE__
 #if __SIZEOF_POINTER__ == 4 || defined(__ARCH_HAVE_COMPAT)
-PRIVATE NONNULL((1)) u32 KCALL userkern_segment_readl(struct vio_args *__restrict args, vm_daddr_t addr);
-PRIVATE NONNULL((1)) void KCALL userkern_segment_writel(struct vio_args *__restrict args, vm_daddr_t addr, u32 value);
+PRIVATE NONNULL((1)) u32 KCALL userkern_segment_readl(struct vio_args *__restrict args, pos_t addr);
+PRIVATE NONNULL((1)) void KCALL userkern_segment_writel(struct vio_args *__restrict args, pos_t addr, u32 value);
 #endif /* __SIZEOF_POINTER__ == 4 || __ARCH_HAVE_COMPAT */
 #if __SIZEOF_POINTER__ == 8 || defined(__ARCH_HAVE_COMPAT)
-PRIVATE NONNULL((1)) u64 KCALL userkern_segment_readq(struct vio_args *__restrict args, vm_daddr_t addr);
-PRIVATE NONNULL((1)) void KCALL userkern_segment_writeq(struct vio_args *__restrict args, vm_daddr_t addr, u64 value);
+PRIVATE NONNULL((1)) u64 KCALL userkern_segment_readq(struct vio_args *__restrict args, pos_t addr);
+PRIVATE NONNULL((1)) void KCALL userkern_segment_writeq(struct vio_args *__restrict args, pos_t addr, u64 value);
 #endif /* __SIZEOF_POINTER__ == 8 || __ARCH_HAVE_COMPAT */
 #else /* __INTELLISENSE__ */
 DECL_END
@@ -113,7 +113,7 @@ DECL_BEGIN
 
 
 PRIVATE NONNULL((1)) u32 KCALL
-userkern_segment_readl_real(struct vio_args *__restrict args, vm_daddr_t addr) {
+userkern_segment_readl_real(struct vio_args *__restrict args, pos_t addr) {
 	if (IS32(args->va_state)) {
 		/* 32-bit */
 		return userkern_segment_readl(args, addr);
@@ -123,7 +123,7 @@ userkern_segment_readl_real(struct vio_args *__restrict args, vm_daddr_t addr) {
 	}
 }
 PRIVATE NONNULL((1)) u64 KCALL
-userkern_segment_readq_real(struct vio_args *__restrict args, vm_daddr_t addr) {
+userkern_segment_readq_real(struct vio_args *__restrict args, pos_t addr) {
 	if (IS32(args->va_state)) {
 		/* 32-bit */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -143,7 +143,7 @@ userkern_segment_readq_real(struct vio_args *__restrict args, vm_daddr_t addr) {
 
 PRIVATE NONNULL((1)) void KCALL
 userkern_segment_writel_real(struct vio_args *__restrict args,
-                             vm_daddr_t addr, u32 value) {
+                             pos_t addr, u32 value) {
 	if (IS32(args->va_state)) {
 		/* 32-bit */
 		userkern_segment_writel(args, addr, value);
@@ -155,7 +155,7 @@ userkern_segment_writel_real(struct vio_args *__restrict args,
 
 PRIVATE NONNULL((1)) void KCALL
 userkern_segment_writeq_real(struct vio_args *__restrict args,
-                             vm_daddr_t addr, u64 value) {
+                             pos_t addr, u64 value) {
 	if (IS32(args->va_state)) {
 		/* 32-bit */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -179,7 +179,7 @@ userkern_segment_writeq_real(struct vio_args *__restrict args,
 PRIVATE struct icpustate *KCALL
 userkern_segment_call(struct vio_args *__restrict args,
                       struct icpustate *__restrict regs,
-                      vm_daddr_t addr) {
+                      pos_t addr) {
 	uintptr_t reladdr;
 	uintptr_t base = get_userkern_base();
 	if (!ADDR_IS_KERNEL(base))
@@ -198,8 +198,8 @@ userkern_segment_call(struct vio_args *__restrict args,
 	                                (reladdr & USERKERN_SYSCALL_EXCEPTBIT) != 0);
 	return regs;
 err_invalid_addr:
-	addr -= (vm_daddr_t)args->va_access_partoff;
-	addr += (vm_daddr_t)args->va_access_pageaddr * PAGESIZE;
+	addr -= (pos_t)args->va_access_partoff;
+	addr += (pos_t)args->va_access_pageid * PAGESIZE;
 	THROW(E_SEGFAULT_UNMAPPED,
 	      (uintptr_t)addr,
 	      E_SEGFAULT_CONTEXT_FAULT |

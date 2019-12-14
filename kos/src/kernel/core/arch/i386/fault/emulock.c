@@ -174,17 +174,17 @@ handle_vio_or_not_faulted:
 		/* Check if this is a VIO segment (or maybe not mapped at all) */
 		struct vm *effective_vm = THIS_VM;
 		struct vm_node *node;
-		vm_vpage_t addr_page;
+		pageid_t addr_page;
 #ifdef CONFIG_VIO
-		vm_vpage_t node_minpage;
+		void *node_minaddr;
 		REF struct vm_datapart *part;
 		REF struct vm_datablock *block;
 #endif /* CONFIG_VIO */
 		if (ADDR_IS_KERNEL(addr))
 			effective_vm = &vm_kernel;
-		addr_page = VM_ADDR2PAGE((vm_virt_t)addr);
+		addr_page = PAGEID_ENCODE(addr);
 		sync_read(effective_vm);
-		node = vm_getnodeof(effective_vm, addr_page);
+		node = vm_getnodeofpageid(effective_vm, addr_page);
 		/* Check for an unmapped memory location. */
 		if (!node || !node->vn_block) {
 			uintptr_t context;
@@ -218,7 +218,7 @@ handle_vio_or_not_faulted:
 			}
 		}
 #ifdef CONFIG_VIO
-		node_minpage = VM_NODE_MIN(node);
+		node_minaddr = vm_node_getmin(node);
 		block        = incref(node->vn_block);
 		part         = xincref(node->vn_part);
 #endif /* CONFIG_VIO */
@@ -230,15 +230,15 @@ handle_vio_or_not_faulted:
 			if (block->db_vio) {
 				/* Handle VIO memory access. */
 				struct vio_args args;
-				vm_daddr_t vio_addr;
+				pos_t vio_addr;
 				args.va_type            = block->db_vio;
 				args.va_block           = block;
 				args.va_part            = part;
 				args.va_access_partoff  = vm_datapart_minbyte(part);
-				args.va_access_pageaddr = addr_page;
+				args.va_access_pageid   = addr_page;
 				args.va_state           = *pstate;
 				vio_addr = args.va_access_partoff + ((uintptr_t)addr -
-				                                     (uintptr_t)VM_PAGE2ADDR(node_minpage));
+				                                     (uintptr_t)node_minaddr);
 				switch (num_bytes) {
 
 #ifdef CONFIG_EMULOCK_HAVE_CMPXCHG8
@@ -295,10 +295,10 @@ handle_vio_or_not_faulted:
 		}
 #endif /* CONFIG_VIO */
 		/* We can get here if the given address hasn't been pre-faulted, yet. */
-		vm_forcefault(effective_vm,
-		              addr_page,
-		              VM_ADDR2PAGE((vm_virt_t)addr + num_bytes - 1),
-		              true);
+		vm_paged_forcefault(effective_vm,
+		                    addr_page,
+		                    PAGEID_ENCODE((byte_t *)addr + num_bytes - 1),
+		                    true);
 		goto again;
 	}
 }

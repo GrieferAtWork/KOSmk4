@@ -4511,7 +4511,7 @@ NOTHROW(KCALL inode_destroy)(struct inode *__restrict self) {
 }
 
 PRIVATE NONNULL((1)) void KCALL
-db_inode_loadpart(struct inode *__restrict self, vm_dpage_t start,
+db_inode_loadpart(struct inode *__restrict self, datapage_t start,
                   vm_phys_t buffer, size_t num_data_pages) {
 	struct inode_type *type = self->i_type;
 	assert(type);
@@ -4520,7 +4520,7 @@ db_inode_loadpart(struct inode *__restrict self, vm_dpage_t start,
 	inode_loadattr(self);
 	{
 		size_t num_bytes;
-		vm_daddr_t daddr, filesize;
+		pos_t daddr, filesize;
 		struct aio_multihandle_generic hand;
 		daddr     = VM_DATABLOCK_DPAGE2DADDR(self, start);
 		num_bytes = num_data_pages << VM_DATABLOCK_ADDRSHIFT(self);
@@ -4562,7 +4562,7 @@ db_inode_loadpart(struct inode *__restrict self, vm_dpage_t start,
 }
 
 PRIVATE NONNULL((1)) void KCALL
-db_inode_savepart(struct inode *__restrict self, vm_dpage_t start,
+db_inode_savepart(struct inode *__restrict self, datapage_t start,
                   vm_phys_t buffer, size_t num_data_pages) {
 	struct inode_type *type = self->i_type;
 	assert(type);
@@ -4570,7 +4570,7 @@ db_inode_savepart(struct inode *__restrict self, vm_dpage_t start,
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_WRITE);
 	{
 		size_t num_bytes;
-		vm_daddr_t daddr, filesize;
+		pos_t daddr, filesize;
 		struct aio_multihandle_generic hand;
 		daddr     = VM_DATABLOCK_DPAGE2DADDR(self, start);
 		num_bytes = num_data_pages << VM_DATABLOCK_ADDRSHIFT(self);
@@ -4612,8 +4612,8 @@ db_inode_changed(struct inode *__restrict self,
 PUBLIC struct vm_datablock_type inode_datablock_type = {
 	/* .dt_destroy  = */ (NOBLOCK void(KCALL *)(struct vm_datablock *__restrict))&inode_destroy,
 	/* .dt_initpart = */ NULL,
-	/* .dt_loadpart = */ (void(KCALL *)(struct vm_datablock *__restrict,vm_dpage_t,vm_phys_t,size_t))&db_inode_loadpart,
-	/* .dt_savepart = */ (void(KCALL *)(struct vm_datablock *__restrict,vm_dpage_t,vm_phys_t,size_t))&db_inode_savepart,
+	/* .dt_loadpart = */ (void(KCALL *)(struct vm_datablock *__restrict,datapage_t,vm_phys_t,size_t))&db_inode_loadpart,
+	/* .dt_savepart = */ (void(KCALL *)(struct vm_datablock *__restrict,datapage_t,vm_phys_t,size_t))&db_inode_savepart,
 	/* .dt_changed  = */ (void(KCALL *)(struct vm_datablock *__restrict,struct vm_datapart *__restrict))&db_inode_changed
 };
 

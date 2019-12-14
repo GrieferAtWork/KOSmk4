@@ -88,7 +88,7 @@ NOTHROW(KCALL pool_do_free)(struct slab_pool *__restrict self,
 		return;
 	}
 	/* Actually release the page as kernel-RAM. */
-	vm_unmap_kernel_ram(VM_ADDR2PAGE((vm_virt_t)page), 1, false);
+	vm_unmap_kernel_ram(page, PAGESIZE, false);
 }
 
 PRIVATE NOBLOCK void
@@ -177,7 +177,7 @@ NOTHROW(KCALL slab_freepage)(struct slab *__restrict self) {
  * NOTE: This value starts out as `KERNEL_SLAB_INITIAL', and is only
  *       ever extended in one direction, based on the slab growth
  *       direction. */
-PUBLIC uintptr_t kernel_slab_break = KERNEL_SLAB_INITIAL;
+PUBLIC void *kernel_slab_break = KERNEL_SLAB_INITIAL;
 
 struct slab_pending_free {
 	struct slab_pending_free *spf_next; /* [0..1] Next pending free. */
@@ -286,8 +286,8 @@ again:
 		if unlikely(corepair.cp_part->dp_ramdata.rd_block0.rb_start == PAGEPTR_INVALID)
 			goto err_corepair;
 		{
-			vm_vpage_t next_slab_page;
-			vm_vpage_t slab_end_page;
+			void *next_slab_addr;
+			void *slab_end_addr;
 again_lock_vm:
 			if unlikely(!vm_kernel_treelock_writef_nx(flags))
 				goto err_corepair_content;
@@ -295,16 +295,17 @@ again_lock_vm:
 #define HINT_MODE(x, y) y
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
-			slab_end_page  = VM_ADDR2PAGE((vm_virt_t)kernel_slab_break);
-			next_slab_page = vm_getfree(&vm_kernel,
-			                            (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_SLAB), 1, 1,
+			slab_end_addr  = kernel_slab_break;
+			next_slab_addr = vm_getfree(&vm_kernel,
+			                            HINT_GETADDR(KERNEL_VMHINT_SLAB),
+			                            PAGESIZE, PAGESIZE,
 			                            HINT_GETMODE(KERNEL_VMHINT_SLAB));
 #ifdef CONFIG_SLAB_GROWS_DOWNWARDS
-			if (next_slab_page == VM_GETFREE_ERROR ||
-			    next_slab_page < slab_end_page - 1)
+			if (next_slab_addr == VM_GETFREE_ERROR ||
+			    next_slab_addr < (byte_t *)slab_end_addr - PAGESIZE)
 #else /* CONFIG_SLAB_GROWS_DOWNWARDS */
-			if (next_slab_page == VM_GETFREE_ERROR ||
-			    next_slab_page > slab_end_page)
+			if (next_slab_addr == VM_GETFREE_ERROR ||
+			    next_slab_addr > (byte_t *)slab_end_addr)
 #endif /* !CONFIG_SLAB_GROWS_DOWNWARDS */
 			{
 				uintptr_t version;
@@ -317,17 +318,18 @@ again_lock_vm:
 again_next_slab_page_tryhard:
 				if unlikely(!vm_kernel_treelock_writef_nx(flags))
 					goto err_corepair_content;
-				next_slab_page = vm_getfree(&vm_kernel,
-				                            (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_SLAB), 1, 1,
+				next_slab_addr = vm_getfree(&vm_kernel,
+				                            HINT_GETADDR(KERNEL_VMHINT_SLAB),
+				                            PAGESIZE, PAGESIZE,
 				                            HINT_GETMODE(KERNEL_VMHINT_SLAB));
 				vm_kernel_treelock_endwrite();
 #ifdef CONFIG_SLAB_GROWS_DOWNWARDS
-				if (next_slab_page != VM_GETFREE_ERROR &&
-				    next_slab_page >= slab_end_page - 1)
+				if (next_slab_addr != VM_GETFREE_ERROR &&
+				    next_slab_addr >= (byte_t *)slab_end_addr - PAGESIZE)
 					goto again_lock_vm;
 #else /* CONFIG_SLAB_GROWS_DOWNWARDS */
-				if (next_slab_page != VM_GETFREE_ERROR &&
-				    next_slab_page <= slab_end_page)
+				if (next_slab_addr != VM_PAGED_GETFREE_ERROR &&
+				    next_slab_addr <= (byte_t *)slab_end_addr)
 					goto again_lock_vm;
 #endif /* !CONFIG_SLAB_GROWS_DOWNWARDS */
 				if (system_clearcaches_s(&version))
@@ -336,52 +338,52 @@ again_next_slab_page_tryhard:
 			}
 			/* Now to map the new page. */
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-			if unlikely(!pagedir_prepare_mapone(next_slab_page)) {
+			if unlikely(!npagedir_prepare_mapone(next_slab_addr)) {
 				vm_kernel_treelock_endwrite();
 				goto err_corepair_content;
 			}
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			/* Map all pre-allocated pages. */
-			pagedir_mapone(next_slab_page,
-			               corepair.cp_part->dp_ramdata.rd_block0.rb_start,
-			               PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+			npagedir_mapone(next_slab_addr,
+			                page2addr(corepair.cp_part->dp_ramdata.rd_block0.rb_start),
+			                PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 			if (flags & GFP_CALLOC) {
 				/* Write zeros to all random-content pages. */
 				if (!page_iszero(corepair.cp_part->dp_ramdata.rd_block0.rb_start)) {
-					memset((void *)VM_PAGE2ADDR(next_slab_page), 0, PAGESIZE);
+					memset(next_slab_addr, 0, PAGESIZE);
 #ifdef CONFIG_HAVE_PAGEDIR_CHANGED
-					pagedir_unsetchanged(next_slab_page);
+					npagedir_unsetchanged(next_slab_addr);
 #endif /* CONFIG_HAVE_PAGEDIR_CHANGED */
 				}
 			}
 #ifdef CONFIG_DEBUG_HEAP
 			else {
 				/* Fill memory using the no-mans-land pattern. */
-				mempatl((void *)VM_PAGE2ADDR(next_slab_page),
+				mempatl(next_slab_addr,
 				        DEBUGHEAP_NO_MANS_LAND,
 				        PAGESIZE);
 #ifdef CONFIG_HAVE_PAGEDIR_CHANGED
-				pagedir_unsetchanged(next_slab_page);
+				npagedir_unsetchanged(next_slab_addr);
 #endif /* CONFIG_HAVE_PAGEDIR_CHANGED */
 			}
 #endif /* CONFIG_DEBUG_HEAP */
 			/* Set the returned slab */
-			result = (struct slab *)VM_PAGE2ADDR(next_slab_page);
+			result = (struct slab *)next_slab_addr;
 			/* Update the slab breaking point. */
 #ifdef CONFIG_SLAB_GROWS_DOWNWARDS
-			kernel_slab_break = (uintptr_t)result;
+			kernel_slab_break = (byte_t *)result;
 #else /* CONFIG_SLAB_GROWS_DOWNWARDS */
-			kernel_slab_break = (uintptr_t)result + PAGESIZE;
+			kernel_slab_break = (byte_t *)result + PAGESIZE;
 #endif /* !CONFIG_SLAB_GROWS_DOWNWARDS */
 			/* Insert the node into the kernel VM. */
-			corepair.cp_node->vn_node.a_vmin = next_slab_page;
-			corepair.cp_node->vn_node.a_vmax = next_slab_page;
+			corepair.cp_node->vn_node.a_vmin = PAGEID_ENCODE(next_slab_addr);
+			corepair.cp_node->vn_node.a_vmax = corepair.cp_node->vn_node.a_vmin;
 			vm_node_insert(corepair.cp_node);
 			vm_kernel_treelock_endwrite();
 			return result;
 		}
 err_corepair_content:
-		page_free(corepair.cp_part->dp_ramdata.rd_block0.rb_start, 1);
+		page_freeone(corepair.cp_part->dp_ramdata.rd_block0.rb_start);
 err_corepair:
 		decref(corepair.cp_node->vn_block);
 		decref(corepair.cp_part->dp_block);

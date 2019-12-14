@@ -384,7 +384,7 @@ SECTIONS {
 
 		PROVIDE_HIDDEN(kernel_membanks_initial = ABSOLUTE(.));
 		IP_ALIGN(PAGESIZE);
-		PROVIDE_HIDDEN(__kernel_boottask_stack_guard = ABSOLUTE(ABSOLUTE(.) / PAGESIZE));
+		PROVIDE_HIDDEN(__kernel_boottask_stack_guard = ABSOLUTE(.));
 		/* Insert a placeholder page to catch stack overflows */
 		. += PAGESIZE;
 		PROVIDE_HIDDEN(__kernel_boottask_stack = ABSOLUTE(.));

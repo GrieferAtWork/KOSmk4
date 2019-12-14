@@ -136,7 +136,7 @@ struct x86_dbg_psp0threadstate {
 	vm_vpage_t              dpts_this_kernel_stacknode_node_vmin;            /* Saved `this_kernel_stacknode.vn_node.a_vmin' */
 	vm_vpage_t              dpts_this_kernel_stacknode_node_vmax;            /* Saved `this_kernel_stacknode.vn_node.a_vmax' */
 	pageptr_t              dpts_this_kernel_stackpart_ramdata_block0_start; /* Saved `this_kernel_stackpart.dp_ramdata.rd_block0.rb_start' */
-	vm_dpage_t              dpts_this_kernel_stackpart_tree_vmax;            /* Saved `this_kernel_stackpart.dp_tree.a_vmax' */
+	datapage_t              dpts_this_kernel_stackpart_tree_vmax;            /* Saved `this_kernel_stackpart.dp_tree.a_vmax' */
 	size_t                  dpts_this_kernel_stackpart_ramdata_block0_size;  /* Saved `this_kernel_stackpart.dp_ramdata.rd_block0.rb_size' */
 };
 struct x86_dbg_psp0state {

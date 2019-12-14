@@ -48,24 +48,24 @@ DECL_BEGIN
 #define VALUE_TYPE   u32
 PRIVATE NONNULL((1)) u32 KCALL
 userkern_segment_readl(struct vio_args *__restrict args,
-                       vm_daddr_t addr)
+                       pos_t addr)
 #elif USERKERN_WIDTH == 8
 #define VALUE_TYPE   u64
 PRIVATE NONNULL((1)) u64 KCALL
 userkern_segment_readq(struct vio_args *__restrict args,
-                       vm_daddr_t addr)
+                       pos_t addr)
 #endif /* USERKERN_WIDTH == ... */
 #elif defined(DEFINE_IO_WRITE)
 #if USERKERN_WIDTH == 4
 #define VALUE_TYPE   u32
 PRIVATE NONNULL((1)) void KCALL
 userkern_segment_writel(struct vio_args *__restrict args,
-                        vm_daddr_t addr, u32 value)
+                        pos_t addr, u32 value)
 #elif USERKERN_WIDTH == 8
 #define VALUE_TYPE   u64
 PRIVATE NONNULL((1)) void KCALL
 userkern_segment_writeq(struct vio_args *__restrict args,
-                        vm_daddr_t addr, u64 value)
+                        pos_t addr, u64 value)
 #endif /* USERKERN_WIDTH == ... */
 #endif /* DEFINE_IO_WRITE */
 {
@@ -229,8 +229,8 @@ userkern_segment_writeq(struct vio_args *__restrict args,
 #endif /* !DEFINE_IO_READ */
 		{
 			if (reladdr < sizeof(USERKERN_STRUCT)) {
-				addr -= (vm_daddr_t)args->va_access_partoff;
-				addr += (vm_daddr_t)args->va_access_pageaddr * PAGESIZE;
+				addr -= (pos_t)args->va_access_partoff;
+				addr += (pos_t)args->va_access_pageid * PAGESIZE;
 #ifdef DEFINE_IO_READ
 				THROW(E_SEGFAULT_NOTREADABLE,
 				      (uintptr_t)addr,
@@ -250,8 +250,8 @@ userkern_segment_writeq(struct vio_args *__restrict args,
 	return;
 #endif /* !DEFINE_IO_READ */
 err_invalid_addr:
-	addr -= (vm_daddr_t)args->va_access_partoff;
-	addr += (vm_daddr_t)args->va_access_pageaddr * PAGESIZE;
+	addr -= (pos_t)args->va_access_partoff;
+	addr += (pos_t)args->va_access_pageid * PAGESIZE;
 	THROW(E_SEGFAULT_UNMAPPED,
 	      (uintptr_t)addr,
 	      E_SEGFAULT_CONTEXT_FAULT |

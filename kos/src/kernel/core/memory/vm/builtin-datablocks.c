@@ -234,7 +234,7 @@ NOTHROW(KCALL vm_ramfile_initpart)(struct vm_datapart *__restrict self) {
 	struct vm_ramfile *file;
 	assert(self->dp_state == VM_DATAPART_STATE_ABSENT);
 	file = (struct vm_ramfile *)self->dp_block;
-	if (self->dp_tree.a_vmax < (vm_dpage_t)file->rf_data.rb_size) {
+	if (self->dp_tree.a_vmax < (datapage_t)file->rf_data.rb_size) {
 		self->dp_state = VM_DATAPART_STATE_LOCKED;
 		self->dp_flags |= (VM_DATAPART_FLAG_LOCKED | VM_DATAPART_FLAG_KEEPRAM);
 		self->dp_ramdata.rd_blockv          = &self->dp_ramdata.rd_block0;

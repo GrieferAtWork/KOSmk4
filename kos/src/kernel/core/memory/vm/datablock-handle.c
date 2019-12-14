@@ -335,7 +335,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 	}	break;
 
 	case HOP_DATABLOCK_SYNCALL: {
-		vm_dpage_t count;
+		datapage_t count;
 		count = vm_datablock_sync(self);
 		if (arg) {
 			validate_writable(arg, sizeof(u64));
@@ -352,8 +352,8 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (struct_size != sizeof(struct hop_datablock_syncpages))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_stat), struct_size);
 		range->dsp_count = (u64)vm_datablock_sync(self,
-		                                          (vm_dpage_t)range->dsp_minpage,
-		                                          (vm_dpage_t)range->dsp_maxpage);
+		                                          (datapage_t)range->dsp_minpage,
+		                                          (datapage_t)range->dsp_maxpage);
 	}	break;
 
 	case HOP_DATABLOCK_SYNCBYTES: {
@@ -365,8 +365,8 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (struct_size != sizeof(struct hop_datablock_syncbytes))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_stat), struct_size);
 		range->dsb_count = (u64)vm_datablock_sync(self,
-		                                          (vm_dpage_t)range->dsb_minbyte >> VM_DATABLOCK_ADDRSHIFT(self),
-		                                          (vm_dpage_t)((range->dsb_maxbyte +
+		                                          (datapage_t)range->dsb_minbyte >> VM_DATABLOCK_ADDRSHIFT(self),
+		                                          (datapage_t)((range->dsb_maxbyte +
 		                                                        VM_DATABLOCK_PAGESIZE(self)) >>
 		                                                       VM_DATABLOCK_ADDRSHIFT(self)))
 		                   << VM_DATABLOCK_ADDRSHIFT(self);
@@ -420,8 +420,8 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (struct_size != sizeof(struct hop_datablock_haschanged))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_haschanged), struct_size);
 		haschanged = vm_datablock_haschanged(self,
-		                                     VM_DATABLOCK_DADDR2DPAGE(self, (vm_daddr_t)data->dhc_minbyte),
-		                                     VM_DATABLOCK_DADDR2DPAGE(self, (vm_daddr_t)data->dhc_maxbyte));
+		                                     VM_DATABLOCK_DADDR2DPAGE(self, (pos_t)data->dhc_minbyte),
+		                                     VM_DATABLOCK_DADDR2DPAGE(self, (pos_t)data->dhc_maxbyte));
 		COMPILER_WRITE_BARRIER();
 		data->dhc_result = haschanged ? HOP_DATABLOCK_HASCHANGED_FLAG_DIDCHANGE
 		                              : HOP_DATABLOCK_HASCHANGED_FLAG_UNCHANGED;
@@ -441,11 +441,11 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (struct_size != sizeof(struct hop_datablock_open_futex))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_open_futex), struct_size);
 		if (cmd == HOP_DATABLOCK_OPEN_FUTEX_EXISTING) {
-			ftx = vm_datablock_getfutex_existing(self, (vm_daddr_t)data->dof_address);
+			ftx = vm_datablock_getfutex_existing(self, (pos_t)data->dof_address);
 			if (!ftx)
 				return -ENOENT;
 		} else {
-			ftx = vm_datablock_getfutex(self, (vm_daddr_t)data->dof_address);
+			ftx = vm_datablock_getfutex(self, (pos_t)data->dof_address);
 		}
 		FINALLY_DECREF_UNLIKELY(ftx);
 		hnd.h_type = HANDLE_TYPE_FUTEX;

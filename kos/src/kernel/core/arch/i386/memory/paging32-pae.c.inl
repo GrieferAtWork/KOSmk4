@@ -1036,11 +1036,11 @@ NOTHROW(FCALL pae_pagedir_assert_e1_word_prepared)(unsigned int vec3,
 	        "Page vector #%u:%u for page %p...%p isn't allocated",
 	        (unsigned int)vec3, (unsigned int)vec2,
 	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1)),
-	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + PAGEMASK));
+	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + PAGESIZE - 1));
 	assertf(!(e2.p_word & PAE_PAGE_F2MIB),
 	        "Page %p...%p exists as a present 2MiB page #%u:%u",
 	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1)),
-	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + PAGEMASK),
+	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + PAGESIZE - 1),
 	        (unsigned int)vec3, (unsigned int)vec2);
 	if (vec3 < PAE_PDIR_VEC3INDEX(KERNEL_BASE)) {
 		union pae_pdir_e1 e1;
@@ -1048,7 +1048,7 @@ NOTHROW(FCALL pae_pagedir_assert_e1_word_prepared)(unsigned int vec3,
 		assertf(e1.p_word & PAE_PAGE_FPREPARED || PAE_PDIR_E1_ISHINT(e1.p_word),
 		        "Page %p...%p [vec3=%u,vec2=%u,vec1=%u] hasn't been prepared",
 		        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1)),
-		        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + PAGEMASK),
+		        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + PAGESIZE - 1),
 		        vec3, vec2, vec1);
 	}
 }
@@ -1202,7 +1202,7 @@ INTERN NOBLOCK void
 NOTHROW(FCALL pae_pagedir_maphintone)(VIRT vm_vpage_t virt_page,
                                       VIRT /*ALIGNED(PAE_PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint) {
 	unsigned int vec3, vec2, vec1;
-	assertf(virt_page <= VM_VPAGE_MAX, "Invalid page %I64p", (u64)virt_page);
+	assertf(virt_page <= __ARCH_PAGEID_MAX, "Invalid page %I64p", (u64)virt_page);
 	assertf(IS_ALIGNED((uintptr_t)hint, PAE_PAGEDIR_MAPHINT_ALIGNMENT), "hint = %p", hint);
 	vec3 = PAE_PDIR_VEC3INDEX_VPAGE(virt_page);
 	vec2 = PAE_PDIR_VEC2INDEX_VPAGE(virt_page);
@@ -1215,9 +1215,9 @@ NOTHROW(FCALL pae_pagedir_maphint)(VIRT vm_vpage_t virt_page, size_t num_pages,
                                    VIRT /*ALIGNED(PAE_PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint) {
 	size_t i;
 	u64 e1_word;
-	assertf(virt_page <= VM_VPAGE_MAX, "Invalid page range %I64p...%I64p", (u64)virt_page, (u64)virt_page + num_pages - 1);
+	assertf(virt_page <= __ARCH_PAGEID_MAX, "Invalid page range %I64p...%I64p", (u64)virt_page, (u64)virt_page + num_pages - 1);
 	assertf(virt_page + num_pages >= virt_page, "Invalid page %I64p...%I64p", (u64)virt_page, (u64)virt_page + num_pages - 1);
-	assertf(virt_page + num_pages <= VM_VPAGE_MAX, "Invalid page %I64p...%I64p", (u64)virt_page, (u64)virt_page + num_pages - 1);
+	assertf(virt_page + num_pages <= __ARCH_PAGEID_MAX, "Invalid page %I64p...%I64p", (u64)virt_page, (u64)virt_page + num_pages - 1);
 	assertf(IS_ALIGNED((uintptr_t)hint, PAE_PAGEDIR_MAPHINT_ALIGNMENT), "hint = %p", hint);
 	e1_word = (u64)(uintptr_t)hint | PAE_PAGE_FISAHINT;
 	for (i = 0; i < num_pages; ++i) {
@@ -1335,11 +1335,11 @@ NOTHROW(FCALL pae_pagedir_map)(VIRT vm_vpage_t virt_page, size_t num_pages,
                                PHYS pageptr_t phys_page, u16 perm) {
 	size_t i;
 	u64 e1_word;
-	assertf(virt_page <= VM_VPAGE_MAX, "Invalid page range %I64p...%I64p",
+	assertf(virt_page <= __ARCH_PAGEID_MAX, "Invalid page range %I64p...%I64p",
 	        (u64)virt_page, (u64)virt_page + num_pages - 1);
 	assertf(virt_page + num_pages >= virt_page, "Invalid page %I64p...%I64p",
 	        (u64)virt_page, (u64)virt_page + num_pages - 1);
-	assertf(virt_page + num_pages <= VM_VPAGE_MAX, "Invalid page %I64p...%I64p",
+	assertf(virt_page + num_pages <= __ARCH_PAGEID_MAX, "Invalid page %I64p...%I64p",
 	        (u64)virt_page, (u64)virt_page + num_pages - 1);
 	e1_word = pae_pagedir_encode_4kib(virt_page, phys_page, perm);
 	for (i = 0; i < num_pages; ++i) {
@@ -1464,11 +1464,11 @@ NOTHROW(FCALL pae_pagedir_unmapone)(VIRT vm_vpage_t virt_page) {
 INTERN NOBLOCK void
 NOTHROW(FCALL pae_pagedir_unmap)(VIRT vm_vpage_t virt_page, size_t num_pages) {
 	size_t i;
-	assertf(virt_page <= VM_VPAGE_MAX, "Invalid page range %I64p...%I64p",
+	assertf(virt_page <= __ARCH_PAGEID_MAX, "Invalid page range %I64p...%I64p",
 	        (u64)virt_page, (u64)virt_page + num_pages - 1);
 	assertf(virt_page + num_pages >= virt_page, "Invalid page %I64p...%I64p",
 	        (u64)virt_page, (u64)virt_page + num_pages - 1);
-	assertf(virt_page + num_pages <= VM_VPAGE_MAX, "Invalid page %I64p...%I64p",
+	assertf(virt_page + num_pages <= __ARCH_PAGEID_MAX, "Invalid page %I64p...%I64p",
 	        (u64)virt_page, (u64)virt_page + num_pages - 1);
 	for (i = 0; i < num_pages; ++i) {
 		unsigned int vec3, vec2, vec1;
@@ -1524,11 +1524,11 @@ NOTHROW(FCALL pae_pagedir_unwriteone)(VIRT vm_vpage_t virt_page) {
 INTERN NOBLOCK void
 NOTHROW(FCALL pae_pagedir_unwrite)(VIRT vm_vpage_t virt_page, size_t num_pages) {
 	size_t i;
-	assertf(virt_page <= VM_VPAGE_MAX, "Invalid page range %I64p...%I64p",
+	assertf(virt_page <= __ARCH_PAGEID_MAX, "Invalid page range %I64p...%I64p",
 	        (u64)virt_page, (u64)virt_page + num_pages - 1);
 	assertf(virt_page + num_pages >= virt_page, "Invalid page %I64p...%I64p",
 	        (u64)virt_page, (u64)virt_page + num_pages - 1);
-	assertf(virt_page + num_pages <= VM_VPAGE_MAX, "Invalid page %I64p...%I64p",
+	assertf(virt_page + num_pages <= __ARCH_PAGEID_MAX, "Invalid page %I64p...%I64p",
 	        (u64)virt_page, (u64)virt_page + num_pages - 1);
 	for (i = 0; i < num_pages; ++i) {
 		unsigned int vec3, vec2, vec1;

@@ -116,8 +116,8 @@ struct slab {
 #endif
 
 
-#define KERNEL_SLAB_INITIAL   \
-	((uintptr_t)VM_PAGE2ADDR(__CCAST(vm_vpage_t)PRIVATE_SLAB_GET_ADDR(KERNEL_VMHINT_SLAB)))
+#define KERNEL_SLAB_INITIAL \
+	PRIVATE_SLAB_GET_ADDR(KERNEL_VMHINT_SLAB)
 
 /* [lock(vm_kernel)]
  * The pointer to either the lowest (CONFIG_SLAB_GROWS_DOWNWARDS), or
@@ -129,27 +129,27 @@ struct slab {
  * NOTE: This value starts out as `KERNEL_SLAB_INITIAL', and is only
  *       ever extended in one direction, based on the slab growth
  *       direction. */
-DATDEF uintptr_t kernel_slab_break;
+DATDEF void *kernel_slab_break;
 
 
 /* The starting/end address of slab allocated memory. */
 #ifdef CONFIG_SLAB_GROWS_DOWNWARDS
-#define KERNEL_SLAB_START    kernel_slab_break
-#define KERNEL_SLAB_END      KERNEL_SLAB_INITIAL
-#define KERNEL_SLAB_MIN      kernel_slab_break
-#define KERNEL_SLAB_MAX     (KERNEL_SLAB_INITIAL - 1)
-#else
-#define KERNEL_SLAB_START    KERNEL_SLAB_INITIAL
-#define KERNEL_SLAB_END      kernel_slab_break
-#define KERNEL_SLAB_MIN      KERNEL_SLAB_INITIAL
-#define KERNEL_SLAB_MAX     (kernel_slab_break - 1)
-#endif
+#define KERNEL_SLAB_START kernel_slab_break
+#define KERNEL_SLAB_END   KERNEL_SLAB_INITIAL
+#define KERNEL_SLAB_MIN   kernel_slab_break
+#define KERNEL_SLAB_MAX   __CCAST(void *)(__CCAST(byte_t *)KERNEL_SLAB_INITIAL - PAGESIZE)
+#else /* CONFIG_SLAB_GROWS_DOWNWARDS */
+#define KERNEL_SLAB_START KERNEL_SLAB_INITIAL
+#define KERNEL_SLAB_END   kernel_slab_break
+#define KERNEL_SLAB_MIN   KERNEL_SLAB_INITIAL
+#define KERNEL_SLAB_MAX   __CCAST(void *)(__CCAST(byte_t *)kernel_slab_break - PAGESIZE)
+#endif /* !CONFIG_SLAB_GROWS_DOWNWARDS */
 
 /* Check if a given pointer belongs to the slab allocator,
  * and can be passed to `SLAB_GET()' in order to determine
  * the associated page, as well as meta-data. */
 #define KERNEL_SLAB_CHECKPTR(x) \
-	((uintptr_t)(x) >= KERNEL_SLAB_START && (uintptr_t)(x) < KERNEL_SLAB_END)
+	((x) >= KERNEL_SLAB_START && (x) < KERNEL_SLAB_END)
 
 
 #endif /* __CC__ */

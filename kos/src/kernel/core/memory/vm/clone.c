@@ -143,14 +143,14 @@ again_lock_vm:
 			if (node == &self->v_kernreserve ||
 			    ((node->vn_prot & VM_PROT_LOOSE) && !keep_loose_mappings))
 				continue; /* Ignore this node! */
-			assertf(!PRANGE_IS_KERNEL_PARTIAL(VM_NODE_START(node),
-			                                  VM_NODE_END(node)),
+			assertf(!PRANGE_IS_KERNEL_PARTIAL(vm_node_getstartpageid(node),
+			                                  vm_node_getendpageid(node)),
 			        "%p...%p\n"
 			        "%p...%p\n",
-			        (uintptr_t)VM_NODE_MINADDR(node),
-			        (uintptr_t)VM_NODE_MAXADDR(node),
-			        (uintptr_t)VM_NODE_START(node),
-			        (uintptr_t)VM_NODE_END(node));
+			        (uintptr_t)vm_node_getmin(node),
+			        (uintptr_t)vm_node_getmax(node),
+			        (uintptr_t)vm_node_getstartpageid(node),
+			        (uintptr_t)vm_node_getendpageid(node));
 			node_part = node->vn_part;
 			if (node_part) {
 				pointer_set_assert_writing_vm_dataparts(&locked_parts);
@@ -312,20 +312,20 @@ handle_remove_write_error:
 				}
 			}
 			resnode->vn_guard = node->vn_guard;
-			assertf(!PRANGE_IS_KERNEL_PARTIAL(VM_NODE_START(resnode),
-			                                  VM_NODE_END(resnode)),
+			assertf(!PRANGE_IS_KERNEL_PARTIAL(vm_node_getstartpageid(resnode),
+			                                  vm_node_getendpageid(resnode)),
 			        "%p...%p\n"
 			        "%p...%p\n",
-			        (uintptr_t)VM_NODE_MINADDR(resnode),
-			        (uintptr_t)VM_NODE_MAXADDR(resnode),
-			        (uintptr_t)VM_NODE_START(resnode),
-			        (uintptr_t)VM_NODE_END(resnode));
+			        (uintptr_t)vm_node_getmin(resnode),
+			        (uintptr_t)vm_node_getmax(resnode),
+			        (uintptr_t)vm_node_getstartpageid(resnode),
+			        (uintptr_t)vm_node_getendpageid(resnode));
 			if (resnode->vn_flags & VM_NODE_FLAG_PREPARED) {
 				/* Try to keep already prepared nodes also prepared within the VM clone.
 				 * However, if this fails, just ignore the error and unset the PREPARED bit. */
-				if (!pagedir_prepare_map_p(PAGEDIR_P_SELFOFVM(result),
-				                           VM_NODE_MIN(resnode),
-				                           VM_NODE_SIZE(resnode)))
+				if (!npagedir_prepare_map_p(PAGEDIR_P_SELFOFVM(result),
+				                            vm_node_getstart(resnode),
+				                            vm_node_getsize(resnode)))
 					resnode->vn_flags &= ~VM_NODE_FLAG_PREPARED;
 			}
 			/* Insert the cloned node into the resulting VM. */

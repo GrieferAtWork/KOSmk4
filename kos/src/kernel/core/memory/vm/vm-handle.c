@@ -71,7 +71,7 @@ DEFINE_HANDLE_APWRITEV_FROM_PWRITEV(vm, struct vm)
 
 INTERN NONNULL((1)) void KCALL
 handle_vm_sync(struct vm *__restrict self) THROWS(...) {
-	vm_syncmem(self);
+	vm_paged_syncmem(self);
 }
 DEFINE_INTERN_ALIAS(handle_vm_datasync, handle_vm_sync);
 

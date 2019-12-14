@@ -98,10 +98,6 @@ typedef /*PHYS*/ __vm_phys_t    vm_phys_t;    /* A physical memory pointer. */ /
 #define FORMAT_PAGEPTR_T "%p" /* DEPRECATED; REMOVE ME */
 #endif
 
-#ifndef VM_VPAGE_MAX
-#define VM_VPAGE_MAX       __VM_VPAGE_MAX /* DEPRECATED; REMOVE ME */
-#define VM_PPAGE_MAX       __VM_PPAGE_MAX /* DEPRECATED; REMOVE ME */
-#endif /* !VM_VPAGE_MAX */
 #ifndef VM_PAGE2ADDR
 #define VM_PAGE2ADDR(page)  __VM_PAGE2ADDR(page) /* DEPRECATED; REMOVE ME */
 #define VM_ADDR2PAGE(addr)  __VM_ADDR2PAGE(addr) /* DEPRECATED; REMOVE ME */
