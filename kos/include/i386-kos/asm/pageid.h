@@ -51,6 +51,7 @@ extern "C++" {
 #define __ARCH_PAGEID_ENCODE __ARCH_PAGEID_ENCODE
 #define __ARCH_PAGEID_DECODE __ARCH_PAGEID_DECODE
 __UINT64_TYPE__ (__ARCH_PAGEID_ENCODE)(void *addr);
+__UINT64_TYPE__ (__ARCH_PAGEID_ENCODE)(__UINTPTR_TYPE__ addr);
 void *(__ARCH_PAGEID_DECODE)(__UINT64_TYPE__ addr);
 }
 #else /* __INTELLISENSE__ && __CC__ && __cplusplus */
@@ -77,6 +78,7 @@ extern "C++" {
 #define __ARCH_PAGEID_ENCODE __ARCH_PAGEID_ENCODE
 #define __ARCH_PAGEID_DECODE __ARCH_PAGEID_DECODE
 __UINT32_TYPE__ (__ARCH_PAGEID_ENCODE)(void *addr);
+__UINT32_TYPE__ (__ARCH_PAGEID_ENCODE)(__UINTPTR_TYPE__ addr);
 void *(__ARCH_PAGEID_DECODE)(__UINT32_TYPE__ addr);
 }
 #endif /* __CC__ && __cplusplus */

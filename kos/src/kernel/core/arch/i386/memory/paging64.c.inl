@@ -1431,7 +1431,7 @@ NOTHROW(FCALL p64_npagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	}
 }
 
-/* Special variants of `pagedir_mapone()' that should be used to
+/* Special variants of `npagedir_mapone()' that should be used to
  * temporary override the mapping of a single, prepared page.
  * These functions are mainly intended for use with `this_trampoline_page', allowing
  * each thread to push/pop its trampoline page, with doing so actually being an atomic

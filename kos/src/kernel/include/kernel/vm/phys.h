@@ -179,14 +179,14 @@ FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copyfromphys_onepage_nopf)(USER C
 FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copytophys_onepage_nopf)(PHYS vm_phys_t dst, USER CHECKED void const *src, size_t num_bytes);
 
 /* Copy a whole page to/from physical memory. (s.a. `PAGESIZE') */
-FUNDEF void KCALL vm_copypagefromphys(USER CHECKED void *dst, PHYS pageptr_t src) THROWS(E_SEGFAULT);
-FUNDEF void KCALL vm_copypagetophys(PHYS pageptr_t dst, USER CHECKED void const *src) THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_copypageinphys)(PHYS pageptr_t dst, PHYS pageptr_t src);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_copypagesinphys)(PHYS pageptr_t dst, PHYS pageptr_t src, size_t num_pages);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphyspage)(PHYS pageptr_t dst, int byte);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphyspages)(PHYS pageptr_t dst, int byte, size_t num_pages);
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copypagefromphys_nopf)(USER CHECKED void *dst, PHYS pageptr_t src);
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copypagetophys_nopf)(PHYS pageptr_t dst, USER CHECKED void const *src);
+FUNDEF void KCALL vm_copypagefromphys(USER CHECKED void *dst, PAGEDIR_PAGEALIGNED PHYS vm_phys_t src) THROWS(E_SEGFAULT);
+FUNDEF void KCALL vm_copypagetophys(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst, USER CHECKED void const *src) THROWS(E_SEGFAULT);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_copypageinphys)(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst, PAGEDIR_PAGEALIGNED PHYS vm_phys_t src);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_copypagesinphys)(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst, PAGEDIR_PAGEALIGNED PHYS vm_phys_t src, size_t num_pages);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphyspage)(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst, int byte);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphyspages)(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst, int byte, size_t num_pages);
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copypagefromphys_nopf)(USER CHECKED void *dst, PAGEDIR_PAGEALIGNED PHYS vm_phys_t src);
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copypagetophys_nopf)(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst, USER CHECKED void const *src);
 
 /* A single page of virtual memory in the kernel VM, that is always
  * prepared for being used for whatever purposes a thread has in mind.
@@ -226,18 +226,18 @@ struct vm_ptram {
 LOCAL NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) byte_t *
 NOTHROW(KCALL vm_ptram_mappage_noidentity)(struct vm_ptram *__restrict self,
                                            pageptr_t page, __BOOL writable DFL(true)) {
-	vm_vpage_t trampoline;
-	trampoline = THIS_TRAMPOLINE_PAGE;
+	byte_t *tramp;
+	tramp = THIS_TRAMPOLINE_BASE;
 	if (self->pt_pushval == PAGEDIR_PUSHVAL_INVALID) {
-		self->pt_pushval = pagedir_push_mapone(trampoline, page,
-		                                       writable ? PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE
-		                                                : PAGEDIR_MAP_FREAD);
+		self->pt_pushval = npagedir_push_mapone(tramp, page2addr(page),
+		                                        writable ? PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE
+		                                                 : PAGEDIR_MAP_FREAD);
 	} else {
-		pagedir_mapone(trampoline, page,
-		               writable ? PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE
-		                        : PAGEDIR_MAP_FREAD);
+		npagedir_mapone(tramp, page2addr(page),
+		                writable ? PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE
+		                         : PAGEDIR_MAP_FREAD);
 	}
-	return (byte_t *)VM_PAGE2ADDR(trampoline);
+	return tramp;
 }
 
 /* Return a (possibly temporary) virtual memory mapping of `page' */
@@ -261,7 +261,7 @@ NOTHROW(KCALL vm_ptram_map)(struct vm_ptram *__restrict self,
 	if (PHYS_IS_IDENTITY(addr, 1))
 		return (byte_t *)PHYS_TO_IDENTITY(addr);
 #endif /* !NO_PHYS_IDENTITY */
-	result = vm_ptram_mappage_noidentity(self, VM_ADDR2PAGE(addr), writable);
+	result = vm_ptram_mappage_noidentity(self, addr2page(addr), writable);
 	result += (uintptr_t)(addr & PAGEMASK);
 	return result;
 }

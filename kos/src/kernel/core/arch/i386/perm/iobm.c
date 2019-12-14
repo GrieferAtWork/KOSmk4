@@ -72,8 +72,10 @@ NOTHROW(KCALL ioperm_bitmap_unset_write_access)(struct ioperm_bitmap *__restrict
 	mycpu = THIS_CPU;
 	if (FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == self) {
 		/* Re-map, and only include read permissions. */
-		pagedir_map(FORCPU(mycpu, thiscpu_x86_iobnode.vn_node.a_vmin),
-		            2, self->ib_pages, PAGEDIR_MAP_FREAD);
+		npagedir_map(FORCPU(mycpu, thiscpu_x86_iob),
+		             2 * PAGESIZE,
+		             self->ib_pages,
+		             PAGEDIR_MAP_FREAD);
 	}
 	PREEMPTION_POP(was);
 }
@@ -119,7 +121,7 @@ DEFINE_PERTASK_CLONE(clone_this_ioperm_bitmap);
 PUBLIC NOBLOCK void
 NOTHROW(FCALL ioperm_bitmap_destroy)(struct ioperm_bitmap *__restrict self) {
 	assert(PERCPU(thiscpu_x86_ioperm_bitmap) != self);
-	page_free(self->ib_pages, 2);
+	page_free(addr2page(self->ib_pages), 2);
 	kfree(self);
 }
 
@@ -134,10 +136,10 @@ REF struct ioperm_bitmap *KCALL ioperm_bitmap_allocf(gfp_t flags) THROWS(E_BADAL
 		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 2);
 	}
 	/* Fill both pages of memory with all ones (indicating that I/O access is denied) */
-	vm_memsetphyspages(iob, 0xff, 2);
-	result->ib_pages  = iob;
+	result->ib_pages  = page2addr(iob);
 	result->ib_refcnt = 1;
 	result->ib_share  = 1;
+	vm_memsetphyspages(result->ib_pages, 0xff, 2);
 	return result;
 }
 
@@ -153,10 +155,10 @@ REF struct ioperm_bitmap *NOTHROW(KCALL ioperm_bitmap_allocf_nx)(gfp_t flags) {
 			return NULL;
 		}
 		/* Fill both pages of memory with all ones (indicating that I/O access is denied) */
-		vm_memsetphyspages(iob, 0xff, 2);
-		result->ib_pages  = iob;
+		result->ib_pages  = page2addr(iob);
 		result->ib_refcnt = 1;
 		result->ib_share  = 1;
+		vm_memsetphyspages(result->ib_pages, 0xff, 2);
 	}
 	return result;
 }
@@ -182,10 +184,10 @@ ioperm_bitmap_copyf(struct ioperm_bitmap const *__restrict self, gfp_t flags) TH
 		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 2);
 	}
 	/* Copy I/O permission bits. */
-	vm_copypagesinphys(iob, self->ib_pages, 2);
-	result->ib_pages  = iob;
+	result->ib_pages  = page2addr(iob);
 	result->ib_refcnt = 1;
 	result->ib_share  = 1;
+	vm_copypagesinphys(result->ib_pages, self->ib_pages, 2);
 	return result;
 }
 
@@ -201,10 +203,10 @@ NOTHROW(KCALL ioperm_bitmap_copyf_nx)(struct ioperm_bitmap const *__restrict sel
 			return NULL;
 		}
 		/* Copy I/O permission bits. */
-		vm_copypagesinphys(iob, self->ib_pages, 2);
-		result->ib_pages  = iob;
+		result->ib_pages  = page2addr(iob);
 		result->ib_refcnt = 1;
 		result->ib_share  = 1;
+		vm_copypagesinphys(result->ib_pages, self->ib_pages, 2);
 	}
 	return result;
 }
@@ -221,7 +223,7 @@ NOTHROW(KCALL ioperm_bitmap_maskbyte)(struct ioperm_bitmap *__restrict self,
                                       size_t byte_index, u8 byte_mask, u8 byte_flag) {
 	u8 *byte, oldval;
 	struct vm_ptram pt = VM_PTRAM_INIT;
-	byte = vm_ptram_map(&pt, page2addr(self->ib_pages) + byte_index);
+	byte = vm_ptram_map(&pt, self->ib_pages + byte_index);
 	do {
 		oldval = ATOMIC_READ(*byte);
 	} while (!ATOMIC_CMPXCH_WEAK(*byte, oldval, (oldval & byte_mask) | byte_flag));
@@ -268,7 +270,7 @@ NOTHROW(KCALL ioperm_bitmap_setrange)(struct ioperm_bitmap *__restrict self,
 	ioperm_bitmap_maskbyte_c(self, maxbyte, 0, (maxport & 7) + 1, turn_on);
 	/* Fill in all intermediate bytes. */
 	if (minbyte + 1 < maxbyte) {
-		vm_memsetphys(page2addr(self->ib_pages) + minbyte,
+		vm_memsetphys(self->ib_pages + minbyte,
 		              turn_on ? 0x00 : 0xff,
 		              (maxbyte - minbyte) - 1);
 	}
@@ -278,13 +280,16 @@ NOTHROW(KCALL ioperm_bitmap_setrange)(struct ioperm_bitmap *__restrict self,
 
 
 INTDEF byte_t __x86_iob_empty_base[];
-INTDEF byte_t __x86_iob_empty_pageid[];
-INTDEF byte_t __x86_iob_empty_pageptr[];
-
 PUBLIC struct ioperm_bitmap ioperm_bitmap_empty = {
 	/* .ib_refcnt = */ 1, /* _ioperm_bitmap_empty */
 	/* .ib_share  = */ 2, /* Prevent modifications */
-	/* .ib_pages  = */ (pageptr_t)(uintptr_t)__x86_iob_empty_pageptr
+	/* .ib_pages  = */ {
+		{ (uintptr_t)__x86_iob_empty_base - KERNEL_CORE_BASE
+#if __SIZEOF_VM_PHYS_T__ > __SIZEOF_POINTER__
+		, 0
+#endif /* __SIZEOF_VM_PHYS_T__ > __SIZEOF_POINTER__ */
+		}
+	}
 };
 
 

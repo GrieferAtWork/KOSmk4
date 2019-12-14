@@ -95,7 +95,7 @@ DECL_BEGIN
  *       block of `union p64_pdir_e3[512]' that are shared between all page directories.
  */
 
-/* The minimum alignment required for pointers passed to `pagedir_maphint()' */
+/* The minimum alignment required for pointers passed to `npagedir_maphint()' */
 #define PAGEDIR_MAPHINT_ALIGNMENT 4
 
 

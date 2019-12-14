@@ -74,9 +74,9 @@ vio_copytovio_from_phys(struct vio_args *__restrict args,
 			                              PAGEDIR_MAP_FREAD);
 			is_first = false;
 		} else {
-			pagedir_mapone(tramp,
-			               buf & ~PAGEMASK,
-			               PAGEDIR_MAP_FREAD);
+			npagedir_mapone(tramp,
+			                buf & ~PAGEMASK,
+			                PAGEDIR_MAP_FREAD);
 		}
 #endif
 		npagedir_syncone(tramp);

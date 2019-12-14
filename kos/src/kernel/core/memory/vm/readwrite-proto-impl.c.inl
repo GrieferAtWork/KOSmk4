@@ -384,7 +384,8 @@ upgrade_and_recheck_vm_for_node:
 
 					/* Copy the contents of the page being unshared. */
 					old_ppage = part->dp_ramdata.rd_blockv[0].rb_start;
-					vm_copypageinphys(new_ppage, old_ppage);
+					vm_copypageinphys(page2addr(new_ppage),
+					                  page2addr(old_ppage));
 
 					new_part->dp_block = incref(&vm_datablock_anonymous_zero_vec[VM_DATABLOCK_PAGESHIFT(part->dp_block)]);
 

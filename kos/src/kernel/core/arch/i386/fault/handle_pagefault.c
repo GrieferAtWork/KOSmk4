@@ -69,9 +69,10 @@ STATIC_ASSERT(PAGEDIR_MAP_FREAD == VM_PROT_READ);
 
 /* @return: true:  Success
  * @return: false: Must try again (preemption had to be enabled) */
-LOCAL bool FCALL handle_iob_access(struct cpu *__restrict mycpu,
-                                   bool is_writing,
-                                   bool allow_preemption) {
+LOCAL bool FCALL
+handle_iob_access(struct cpu *__restrict mycpu,
+                  bool is_writing,
+                  bool allow_preemption) {
 #define GET_GFP_FLAGS()                           \
 	(allow_preemption ? (GFP_LOCKED | GFP_PREFLT) \
 	                  : (GFP_LOCKED | GFP_PREFLT | GFP_ATOMIC))
@@ -115,9 +116,11 @@ LOCAL bool FCALL handle_iob_access(struct cpu *__restrict mycpu,
 		decref(iob);
 		iob = cow;
 	}
-	pagedir_map(FORCPU(mycpu, thiscpu_x86_iobnode.vn_node.a_vmin), 2, iob->ib_pages,
-	            is_writing ? (PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE)
-	                       : (PAGEDIR_MAP_FREAD));
+	npagedir_map(FORCPU(mycpu, thiscpu_x86_iob),
+	             2 * PAGESIZE,
+	             iob->ib_pages,
+	             is_writing ? (PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE)
+	                        : (PAGEDIR_MAP_FREAD));
 	FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) = iob;
 #undef GET_GFP_FLAGS
 	return true;
@@ -748,7 +751,8 @@ upgrade_and_recheck_vm_for_node:
 
 							/* Copy the contents of the page being unshared. */
 							old_ppage = part->dp_ramdata.rd_blockv[0].rb_start;
-							vm_copypageinphys(new_ppage, old_ppage);
+							vm_copypageinphys(page2addr(new_ppage),
+							                  page2addr(old_ppage));
 
 							new_part->dp_block = incref(&vm_datablock_anonymous_zero_vec[VM_DATABLOCK_PAGESHIFT(part->dp_block)]);
 

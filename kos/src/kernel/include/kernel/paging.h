@@ -758,11 +758,6 @@ size_t __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(size_t num_pages);
 #define __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages) ((size_t)(num_pages) * 4096)
 #endif /* !__INTELLISENSE__ */
 #endif /* !__PAGEDIR_COMPAT_VIRTPAGE2ADDR */
-#define pagedir_unprepare_map(virt_page, num_pages)                npagedir_unprepare_map(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages))
-#define pagedir_maphintone(virt_page, hint)                        npagedir_maphintone(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), hint)
-#define pagedir_maphint(virt_page, num_pages, hint)                npagedir_maphint(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages), hint)
-#define pagedir_gethint(virt_page)                                 npagedir_gethint(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page))
-#define pagedir_mapone(virt_page, phys_page, perm)                 npagedir_mapone(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_PHYSPAGE2PHYS(phys_page), perm)
 #define pagedir_map(virt_page, num_pages, phys_page, perm)         npagedir_map(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages), __PAGEDIR_COMPAT_PHYSPAGE2PHYS(phys_page), perm)
 #define pagedir_push_mapone(virt_page, phys_page, perm)            npagedir_push_mapone(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_PHYSPAGE2PHYS(phys_page), perm)
 #define pagedir_pop_mapone(virt_page, backup)                      npagedir_pop_mapone(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), backup)

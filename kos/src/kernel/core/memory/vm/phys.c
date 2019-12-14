@@ -27,7 +27,9 @@
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
 
+#include <hybrid/align.h>
 #include <hybrid/minmax.h>
+
 #include <alloca.h>
 #include <assert.h>
 #include <string.h>
@@ -595,19 +597,20 @@ NOTHROW(KCALL vm_copytophys_onepage_nopf)(PHYS vm_phys_t dst,
 /* Copy a whole page to/from physical memory. */
 PUBLIC void KCALL
 vm_copypagefromphys(USER CHECKED void *dst,
-                    PHYS pageptr_t src)
+                    PAGEDIR_PAGEALIGNED PHYS vm_phys_t src)
 		THROWS(E_SEGFAULT) {
 	pagedir_pushval_t backup;
 	byte_t *tramp;
+	assert(IS_ALIGNED(src, PAGESIZE));
 #ifndef NO_PHYS_IDENTITY
-	if (PHYS_IS_IDENTITY_PAGE(src)) {
-		memcpy(dst, PHYS_TO_IDENTITY_PAGE(src), PAGESIZE);
+	if (PHYS_IS_IDENTITY(src, PAGESIZE)) {
+		memcpy(dst, PHYS_TO_IDENTITY(src), PAGESIZE);
 		return;
 	}
 #endif /* !NO_PHYS_IDENTITY */
 	tramp  = THIS_TRAMPOLINE_BASE;
 	backup = npagedir_push_mapone(tramp,
-	                              page2addr(src),
+	                              src,
 	                              PAGEDIR_MAP_FREAD);
 	npagedir_syncone(tramp);
 	TRY {
@@ -623,20 +626,21 @@ vm_copypagefromphys(USER CHECKED void *dst,
 }
 
 PUBLIC void KCALL
-vm_copypagetophys(PHYS pageptr_t dst,
+vm_copypagetophys(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst,
                   USER CHECKED void const *src)
 		THROWS(E_SEGFAULT) {
 	pagedir_pushval_t backup;
 	byte_t *tramp;
+	assert(IS_ALIGNED(dst, PAGESIZE));
 #ifndef NO_PHYS_IDENTITY
-	if (PHYS_IS_IDENTITY_PAGE(dst)) {
-		memcpy(PHYS_TO_IDENTITY_PAGE(dst), src, PAGESIZE);
+	if (PHYS_IS_IDENTITY(dst, PAGESIZE)) {
+		memcpy(PHYS_TO_IDENTITY(dst), src, PAGESIZE);
 		return;
 	}
 #endif /* !NO_PHYS_IDENTITY */
 	tramp  = THIS_TRAMPOLINE_BASE;
 	backup = npagedir_push_mapone(tramp,
-	                              page2addr(dst),
+	                              dst,
 	                              PAGEDIR_MAP_FWRITE);
 	npagedir_syncone(tramp);
 	TRY {
@@ -652,26 +656,28 @@ vm_copypagetophys(PHYS pageptr_t dst,
 }
 
 PUBLIC NOBLOCK void
-NOTHROW(KCALL vm_copypageinphys)(PHYS pageptr_t dst,
-                                 PHYS pageptr_t src) {
+NOTHROW(KCALL vm_copypageinphys)(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst,
+                                 PAGEDIR_PAGEALIGNED PHYS vm_phys_t src) {
 	size_t bufsize;
 	byte_t *buf;
+	assert(IS_ALIGNED(dst, PAGESIZE));
+	assert(IS_ALIGNED(src, PAGESIZE));
 #ifndef NO_PHYS_IDENTITY
-	if (PHYS_IS_IDENTITY_PAGE(src)) {
-		if (PHYS_IS_IDENTITY_PAGE(dst)) {
+	if (PHYS_IS_IDENTITY(src, PAGESIZE)) {
+		if (PHYS_IS_IDENTITY(dst, PAGESIZE)) {
 			/* SRC|DST:identity */
-			memcpy(PHYS_TO_IDENTITY_PAGE(dst),
-			       PHYS_TO_IDENTITY_PAGE(src),
+			memcpy(PHYS_TO_IDENTITY(dst),
+			       PHYS_TO_IDENTITY(src),
 			       PAGESIZE);
 		} else {
 			/* SRC:identity */
-			vm_copypagetophys(dst, PHYS_TO_IDENTITY_PAGE(src));
+			vm_copypagetophys(dst, PHYS_TO_IDENTITY(src));
 		}
 		return;
 	} else {
-		if (PHYS_IS_IDENTITY_PAGE(dst)) {
+		if (PHYS_IS_IDENTITY(dst, PAGESIZE)) {
 			/* DST:identity */
-			vm_copypagefromphys(PHYS_TO_IDENTITY_PAGE(dst), src);
+			vm_copypagefromphys(PHYS_TO_IDENTITY(dst), src);
 			return;
 		}
 	}
@@ -698,8 +704,8 @@ NOTHROW(KCALL vm_copypageinphys)(PHYS pageptr_t dst,
 	assert(bufsize != 0);
 	buf = (byte_t *)alloca(bufsize);
 	{
-		vm_phys_t pdst = page2addr(dst);
-		vm_phys_t psrc = page2addr(src);
+		vm_phys_t pdst = dst;
+		vm_phys_t psrc = src;
 		size_t pagebytes = PAGESIZE;
 		do {
 			size_t copysize;
@@ -721,31 +727,33 @@ use_whole_page_buffer:
 }
 
 PUBLIC NOBLOCK void
-NOTHROW(KCALL vm_copypagesinphys)(PHYS pageptr_t dst,
-                                  PHYS pageptr_t src,
+NOTHROW(KCALL vm_copypagesinphys)(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst,
+                                  PAGEDIR_PAGEALIGNED PHYS vm_phys_t src,
                                   size_t num_pages) {
 	while (num_pages) {
 		vm_copypageinphys(dst, src);
 		--num_pages;
-		++dst;
-		++src;
+		dst += PAGESIZE;
+		src += PAGESIZE;
 	}
 }
 
 
 PUBLIC NOBLOCK void
-NOTHROW(KCALL vm_memsetphyspage)(PHYS pageptr_t dst, int byte) {
+NOTHROW(KCALL vm_memsetphyspage)(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst,
+                                 int byte) {
 	pagedir_pushval_t backup;
 	byte_t *tramp;
+	assert(IS_ALIGNED(dst, PAGESIZE));
 #ifndef NO_PHYS_IDENTITY
-	if (PHYS_IS_IDENTITY_PAGE(dst)) {
-		memset(PHYS_TO_IDENTITY_PAGE(dst), byte, PAGESIZE);
+	if (PHYS_IS_IDENTITY(dst, PAGESIZE)) {
+		memset(PHYS_TO_IDENTITY(dst), byte, PAGESIZE);
 		return;
 	}
 #endif /* !NO_PHYS_IDENTITY */
 	tramp  = THIS_TRAMPOLINE_BASE;
 	backup = npagedir_push_mapone(tramp,
-	                              page2addr(dst),
+	                              dst,
 	                              PAGEDIR_MAP_FWRITE);
 	npagedir_syncone(tramp);
 	/* Fill memory. */
@@ -754,14 +762,16 @@ NOTHROW(KCALL vm_memsetphyspage)(PHYS pageptr_t dst, int byte) {
 }
 
 PUBLIC NOBLOCK void
-NOTHROW(KCALL vm_memsetphyspages)(PHYS pageptr_t dst, int byte, size_t num_pages) {
+NOTHROW(KCALL vm_memsetphyspages)(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst,
+                                  int byte, size_t num_pages) {
 	pagedir_pushval_t backup;
 	byte_t *tramp;
 	if unlikely(!num_pages)
 		return;
+	assert(IS_ALIGNED(dst, PAGESIZE));
 #ifndef NO_PHYS_IDENTITY
-	while (PHYS_IS_IDENTITY_PAGE(dst)) {
-		memset(PHYS_TO_IDENTITY_PAGE(dst), byte, PAGESIZE);
+	while (PHYS_IS_IDENTITY(dst)) {
+		memset(PHYS_TO_IDENTITY(dst), byte, PAGESIZE);
 		if (!--num_pages)
 			return;
 		++dst;
@@ -769,14 +779,14 @@ NOTHROW(KCALL vm_memsetphyspages)(PHYS pageptr_t dst, int byte, size_t num_pages
 #endif /* !NO_PHYS_IDENTITY */
 	tramp  = THIS_TRAMPOLINE_BASE;
 	backup = npagedir_push_mapone(tramp,
-	                              page2addr(dst),
+	                              dst,
 	                              PAGEDIR_MAP_FWRITE);
 	npagedir_syncone(tramp);
 	/* Fill memory. */
 	memset(tramp, byte, PAGESIZE);
 	while (num_pages >= 2) {
-		++dst;
-		npagedir_mapone(tramp, page2addr(dst), PAGEDIR_MAP_FWRITE);
+		dst += PAGESIZE;
+		npagedir_mapone(tramp, dst, PAGEDIR_MAP_FWRITE);
 		npagedir_syncone(tramp);
 		memset(tramp, byte, PAGESIZE);
 		--num_pages;
@@ -785,17 +795,19 @@ NOTHROW(KCALL vm_memsetphyspages)(PHYS pageptr_t dst, int byte, size_t num_pages
 }
 
 PUBLIC NOBLOCK WUNUSED size_t
-NOTHROW(KCALL vm_copypagefromphys_nopf)(USER CHECKED void *dst, PHYS pageptr_t src) {
+NOTHROW(KCALL vm_copypagefromphys_nopf)(USER CHECKED void *dst,
+                                        PAGEDIR_PAGEALIGNED PHYS vm_phys_t src) {
 	pagedir_pushval_t backup;
 	byte_t *tramp;
 	size_t result;
+	assert(IS_ALIGNED(src, PAGESIZE));
 #ifndef NO_PHYS_IDENTITY
-	if (PHYS_IS_IDENTITY_PAGE(src))
-		return memcpy_nopf(dst, PHYS_TO_IDENTITY_PAGE(src), PAGESIZE);
+	if (PHYS_IS_IDENTITY(src, PAGESIZE))
+		return memcpy_nopf(dst, PHYS_TO_IDENTITY(src), PAGESIZE);
 #endif /* !NO_PHYS_IDENTITY */
 	tramp  = THIS_TRAMPOLINE_BASE;
 	backup = npagedir_push_mapone(tramp,
-	                              page2addr(src),
+	                              src,
 	                              PAGEDIR_MAP_FREAD);
 	npagedir_syncone(tramp);
 	/* Copy memory. */
@@ -805,17 +817,19 @@ NOTHROW(KCALL vm_copypagefromphys_nopf)(USER CHECKED void *dst, PHYS pageptr_t s
 }
 
 PUBLIC NOBLOCK WUNUSED size_t
-NOTHROW(KCALL vm_copypagetophys_nopf)(PHYS pageptr_t dst, USER CHECKED void const *src) {
+NOTHROW(KCALL vm_copypagetophys_nopf)(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst,
+                                      USER CHECKED void const *src) {
 	pagedir_pushval_t backup;
 	byte_t *tramp;
 	size_t result;
+	assert(IS_ALIGNED(dst, PAGESIZE));
 #ifndef NO_PHYS_IDENTITY
-	if (PHYS_IS_IDENTITY_PAGE(dst))
-		return memcpy_nopf(PHYS_TO_IDENTITY_PAGE(dst), src, PAGESIZE);
+	if (PHYS_IS_IDENTITY(dst, PAGESIZE))
+		return memcpy_nopf(PHYS_TO_IDENTITY(dst), src, PAGESIZE);
 #endif /* !NO_PHYS_IDENTITY */
 	tramp  = THIS_TRAMPOLINE_BASE;
 	backup = npagedir_push_mapone(tramp,
-	                              page2addr(dst),
+	                              dst,
 	                              PAGEDIR_MAP_FWRITE);
 	npagedir_syncone(tramp);
 	/* Copy memory. */

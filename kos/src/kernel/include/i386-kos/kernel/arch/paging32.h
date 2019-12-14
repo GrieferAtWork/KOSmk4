@@ -66,7 +66,7 @@ DECL_BEGIN
 /* Amount of memory reserved for page-directory self-modifications. */
 #define X86_VM_KERNEL_PDIR_RESERVED_SIZE P32_VM_KERNEL_PDIR_RESERVED_SIZE
 
-/* The minimum alignment required for pointers passed to `pagedir_maphint()' */
+/* The minimum alignment required for pointers passed to `npagedir_maphint()' */
 #define PAGEDIR_MAPHINT_ALIGNMENT  P32_PAGEDIR_MAPHINT_ALIGNMENT
 
 /* Define platform-independent symbols. */
@@ -95,7 +95,7 @@ DECL_BEGIN
 /* Amount of memory reserved for page-directory self-modifications. */
 #define X86_VM_KERNEL_PDIR_RESERVED_SIZE PAE_VM_KERNEL_PDIR_RESERVED_SIZE
 
-/* The minimum alignment required for pointers passed to `pagedir_maphint()' */
+/* The minimum alignment required for pointers passed to `npagedir_maphint()' */
 #define PAGEDIR_MAPHINT_ALIGNMENT  PAE_PAGEDIR_MAPHINT_ALIGNMENT
 
 /* Define platform-independent symbols. */
@@ -150,7 +150,7 @@ DECL_BEGIN
 #endif /* Diff-reservations */
 
 
-/* The minimum alignment required for pointers passed to `pagedir_maphint()' */
+/* The minimum alignment required for pointers passed to `npagedir_maphint()' */
 #if P32_PAGEDIR_MAPHINT_ALIGNMENT > PAE_PAGEDIR_MAPHINT_ALIGNMENT
 #define PAGEDIR_MAPHINT_ALIGNMENT  P32_PAGEDIR_MAPHINT_ALIGNMENT
 #else /* P32_PAGEDIR_MAPHINT_ALIGNMENT > PAE_PAGEDIR_MAPHINT_ALIGNMENT */

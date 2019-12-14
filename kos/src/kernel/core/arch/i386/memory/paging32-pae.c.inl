@@ -173,16 +173,16 @@ NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self) {
 	 * >> e3[3].p_e2[510]     = e3[2];        // Identity mapping: 0xffc00000 ... 0xffdfffff
 	 * >> e3[3].p_e2[511]     = e3[3];        // Identity mapping: 0xffe00000 ... 0xffffffff
 	 */
-	if (!page_iszero((pageptr_t)e3[0]))
-		vm_memsetphyspage((pageptr_t)e3[0], 0);
-	if (!page_iszero((pageptr_t)e3[1]))
-		vm_memsetphyspage((pageptr_t)e3[1], 0);
-	if (!page_iszero((pageptr_t)e3[2]))
-		vm_memsetphyspage((pageptr_t)e3[2], 0);
 	e3[0] = (u64)page2addr((pageptr_t)e3[0]);
 	e3[1] = (u64)page2addr((pageptr_t)e3[1]);
 	e3[2] = (u64)page2addr((pageptr_t)e3[2]);
 	e3[3] = (u64)page2addr((pageptr_t)e3[3]);
+	if (!page_iszero((pageptr_t)e3[0]))
+		vm_memsetphyspage((vm_phys_t)e3[0], 0);
+	if (!page_iszero((pageptr_t)e3[1]))
+		vm_memsetphyspage((vm_phys_t)e3[1], 0);
+	if (!page_iszero((pageptr_t)e3[2]))
+		vm_memsetphyspage((vm_phys_t)e3[2], 0);
 	/* Kernel share (copy from our own page directory) */
 	vm_copytophys_onepage((vm_phys_t)e3[3], PAE_PDIR_E2_IDENTITY[3], 508 * 8);
 	self->p_e3[0].p_word = e3[0] | PAE_PAGE_FPRESENT;
@@ -1124,7 +1124,7 @@ NOTHROW(FCALL pae_npagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	}
 }
 
-/* Special variants of `pagedir_mapone()' that should be used to
+/* Special variants of `npagedir_mapone()' that should be used to
  * temporary override the mapping of a single, prepared page.
  * These functions are mainly intended for use with `this_trampoline_page', allowing
  * each thread to push/pop its trampoline page, with doing so actually being an atomic

@@ -68,7 +68,7 @@ DECL_BEGIN
  *       >> p_e3[3].p_e2[511]     = p_e3[3];      // Identity mapping: 0xffe00000 ... 0xffffffff
  */
 
-/* The minimum alignment required for pointers passed to `pagedir_maphint()' */
+/* The minimum alignment required for pointers passed to `npagedir_maphint()' */
 #define PAE_PAGEDIR_MAPHINT_ALIGNMENT  4
 
 #define PAE_PAGE_SHIFT      12 /* Shift to convert between pages and addresses. */
@@ -377,7 +377,7 @@ NOTHROW(FCALL pae_npagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                 PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
                                 u16 perm);
 
-/* Special variants of `pagedir_mapone()' that should be used to
+/* Special variants of `npagedir_mapone()' that should be used to
  * temporary override the mapping of a single, prepared page.
  * These functions are mainly intended for use with `this_trampoline_page', allowing
  * each thread to push/pop its trampoline page, with doing so actually being an atomic

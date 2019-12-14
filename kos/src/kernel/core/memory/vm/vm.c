@@ -1043,8 +1043,8 @@ NOTHROW(KCALL vm_datapart_do_copyram)(struct vm_datapart *__restrict dst,
 			/* SINGLE --> SINGLE */
 			assert(dst->dp_ramdata.rd_block0.rb_size ==
 			       src->dp_ramdata.rd_block0.rb_size);
-			vm_copypagesinphys(dst->dp_ramdata.rd_block0.rb_start,
-			                   src->dp_ramdata.rd_block0.rb_start,
+			vm_copypagesinphys(page2addr(dst->dp_ramdata.rd_block0.rb_start),
+			                   page2addr(src->dp_ramdata.rd_block0.rb_start),
 			                   src->dp_ramdata.rd_block0.rb_size);
 		} else {
 			/* SINGLE --> MULTIPLE */
@@ -1056,8 +1056,8 @@ NOTHROW(KCALL vm_datapart_do_copyram)(struct vm_datapart *__restrict dst,
 			for (i = 0; i < dst->dp_ramdata.rd_blockc; ++i) {
 				size_t num_pages;
 				num_pages = dst_blocks[i].rb_size;
-				vm_copypagesinphys(dst_blocks[i].rb_start,
-				                   src_page,
+				vm_copypagesinphys(page2addr(dst_blocks[i].rb_start),
+				                   page2addr(src_page),
 				                   num_pages);
 				src_page += num_pages;
 			}
@@ -1075,8 +1075,8 @@ NOTHROW(KCALL vm_datapart_do_copyram)(struct vm_datapart *__restrict dst,
 		for (i = 0; i < src->dp_ramdata.rd_blockc; ++i) {
 			size_t num_pages;
 			num_pages = src_blocks[i].rb_size;
-			vm_copypagesinphys(dst_page,
-			                   src_blocks[i].rb_start,
+			vm_copypagesinphys(page2addr(dst_page),
+			                   page2addr(src_blocks[i].rb_start),
 			                   num_pages);
 			dst_page += num_pages;
 		}
@@ -1096,21 +1096,21 @@ NOTHROW(KCALL vm_datapart_do_copyram)(struct vm_datapart *__restrict dst,
 		for (dst_i = 0; dst_i < dst_count; ++dst_i) {
 			struct vm_ramblock b = dst_blocks[dst_i];
 			while (b.rb_size) {
-				size_t copy_size = b.rb_size;
+				size_t pagecount = b.rb_size;
 				if (!src_block.rb_size) {
 					assert(src_i < src->dp_ramdata.rd_blockc);
 					src_block = src_blocks[src_i++];
 				}
 				assert(src_block.rb_size != 0);
-				if (copy_size > src_block.rb_size)
-					copy_size = src_block.rb_size;
-				vm_copypagesinphys(b.rb_start,
-				                   src_block.rb_start,
-				                   copy_size);
-				src_block.rb_start += copy_size;
-				src_block.rb_size -= copy_size;
-				b.rb_start += copy_size;
-				b.rb_size -= copy_size;
+				if (pagecount > src_block.rb_size)
+					pagecount = src_block.rb_size;
+				vm_copypagesinphys(page2addr(b.rb_start),
+				                   page2addr(src_block.rb_start),
+				                   pagecount);
+				src_block.rb_start += pagecount;
+				src_block.rb_size -= pagecount;
+				b.rb_start += pagecount;
+				b.rb_size -= pagecount;
 			}
 		}
 		assert(dst_i == dst_count);
