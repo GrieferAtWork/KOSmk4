@@ -232,9 +232,10 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 #else
 #define isuser() icpustate_isuser(state)
 #endif
-	vm_virt_t addr;
+	void *addr;
 	uintptr_t pc;
-	vm_vpage_t page;
+	pageid_t pageid;
+	void *pageaddr;
 	struct vm *effective_vm;
 	uintptr_half_t prot;
 	bool has_changed;
@@ -244,22 +245,22 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 		state->ics_irregs.ir_pip = (uintptr_t)x86_memcpy_nopf_ret_pointer;
 		return state;
 	}
-	addr = (vm_virt_t)__rdcr2();
+	addr = __rdcr2();
 	/* Re-enable interrupts if they were enabled before. */
 	if (state->ics_irregs.ir_pflags & EFLAGS_IF)
 		__sti();
-	page = VM_ADDR2PAGE(addr);
+	pageid     = PAGEID_ENCODE(addr);
+	pageaddr = (void *)((uintptr_t)addr & ~PAGEMASK);
 #if 0
 	printk(KERN_DEBUG "Page fault at %p (page %p) [pc=%p,sp=%p] [ecode=%#x] [pid=%u]\n",
-	       (uintptr_t)addr, (uintptr_t)VM_PAGE2ADDR(page),
-	       pc, icpustate_getsp(*state), ecode,
-	       (unsigned int)task_getroottid_s());
+	       (uintptr_t)addr, pageaddr, pc, icpustate_getsp(state),
+	       ecode, (unsigned int)task_getroottid_s());
 #endif
 	if ((ecode & (X86_PAGEFAULT_ECODE_PRESENT | X86_PAGEFAULT_ECODE_USERSPACE)) == 0 &&
-	    page >= (vm_vpage_t)KERNEL_BASE_PAGE) {
+	    pageid >= PAGEID_ENCODE(KERNEL_BASE)) {
 	    /* Check if a hint was defined for this page. */
 		struct vm_node *hinted_node;
-		if ((hinted_node = (struct vm_node *)pagedir_gethint(page)) != NULL) {
+		if ((hinted_node = (struct vm_node *)npagedir_gethint(addr)) != NULL) {
 			/* This is a hinted node (perform assertions on all
 			 * of the requirements documented for such a node) */
 			pageptr_t ppage;
@@ -283,7 +284,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 			has_changed = ecode & X86_PAGEFAULT_ECODE_WRITING;
 			/* Load the affected page into the core. */
 			ppage = vm_datapart_loadpage(hinted_node->vn_part,
-			                             (size_t)(page - vm_node_getminpageid(hinted_node)),
+			                             (size_t)(pageid - vm_node_getminpageid(hinted_node)),
 			                             &has_changed);
 			/* Map the affected page, overriding the mapping hint that originally got us here. */
 			prot = hinted_node->vn_prot & (PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
@@ -293,12 +294,12 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 			 *       tracking. */
 			if ((hinted_node->vn_part->dp_flags & VM_DATAPART_FLAG_TRKCHNG) && !has_changed)
 				prot &= ~PAGEDIR_MAP_FWRITE;
-			pagedir_mapone(page, ppage, prot);
+			npagedir_mapone(pageaddr, page2addr(ppage), prot);
 			goto done;
 		}
 	}
 	effective_vm = &vm_kernel;
-	if (page < (vm_vpage_t)KERNEL_BASE_PAGE || isuser())
+	if (pageid < PAGEID_ENCODE(KERNEL_BASE) || isuser())
 		effective_vm = THIS_VM;
 	{
 		struct task_connections con;
@@ -313,17 +314,17 @@ again_lookup_node_already_locked:
 			assert(sync_reading(effective_vm));
 			assert(!sync_writing(effective_vm));
 			/* Lookup the node associated with the given page. */
-			node = vm_getnodeofpageid(effective_vm, page);
+			node = vm_getnodeofpageid(effective_vm, pageid);
 			if unlikely(!node) {
 				sync_endread(effective_vm);
-				if (page >= (vm_vpage_t)KERNEL_BASE_PAGE &&
+				if (pageid >= PAGEID_ENCODE(KERNEL_BASE) &&
 				    effective_vm != &vm_kernel && isuser()) {
 					/* This can happen depending on what the CPU does when
 					 * attempting to access the IOB vector associated with
 					 * the calling thread.
 					 * In this case, we must re-attempt the lookup within kernel-space. */
 					sync_read(&vm_kernel);
-					node = vm_getnodeofpageid(&vm_kernel, page);
+					node = vm_getnodeofpageid(&vm_kernel, pageid);
 					if (node && !node->vn_part) {
 						sync_endread(&vm_kernel);
 						/* Reservation node. */
@@ -355,7 +356,7 @@ do_handle_iob_node_access:
 							/* Check for special case: even if the IOPERM bitmap is already
 							 * mapped, allow a mapping upgrade if it was mapped read-only
 							 * before, but is now needed as read-write. */
-							if ((ecode & X86_PAGEFAULT_ECODE_WRITING) && !pagedir_iswritable(page))
+							if ((ecode & X86_PAGEFAULT_ECODE_WRITING) && !npagedir_iswritable(addr))
 								; /* Upgrade the mapping */
 							else {
 								goto pop_connections_and_throw_segfault;
@@ -435,7 +436,7 @@ do_handle_iob_node_access:
 			}
 			assert(!wasdestroyed(node->vn_part));
 			part         = incref(node->vn_part);
-			vpage_offset = (size_t)(page - vm_node_getminpageid(node));
+			vpage_offset = (size_t)(pageid - vm_node_getminpageid(node));
 			assert(vm_node_getpagecount(node) == vm_datapart_numvpages(part));
 			has_changed = ecode & X86_PAGEFAULT_ECODE_WRITING;
 			/* Acquire a lock to the affected data part. */
@@ -462,10 +463,10 @@ do_handle_iob_node_access:
 						decref_unlikely(part);
 						goto pop_connections_and_throw_segfault;
 					}
-					args.ma_args.va_part            = part; /* Inherit reference */
-					args.ma_args.va_access_pageid = page;
-					args.ma_args.va_state           = state;
-					args.ma_oldcons                 = &con; /* Inherit */
+					args.ma_args.va_part          = part; /* Inherit reference */
+					args.ma_args.va_access_pageid = pageid;
+					args.ma_args.va_state         = state;
+					args.ma_oldcons               = &con; /* Inherit */
 					/* Check for special case: call into VIO memory */
 					if (args.ma_args.va_type->dtv_call && (uintptr_t)addr == pc) {
 						/* Make sure that memory mapping has execute permissions! */
@@ -622,7 +623,7 @@ do_unshare_cow:
 							}
 							assert(vpage_offset == 0);
 							assert(vm_datapart_numvpages(part) == 1);
-							assert(vm_node_getstartpageid(node) == page);
+							assert(vm_node_getstartpageid(node) == pageid);
 							assert(vm_node_getpagecount(node) == 1);
 
 							/* Make sure that PAGE#0 of `part' has been initialized!
@@ -670,13 +671,13 @@ do_unshare_cow:
 								sync_endread(part);
 upgrade_and_recheck_vm_for_node:
 								sync_read(effective_vm);
-								if unlikely(vm_getnodeofpageid(effective_vm, page) != node ||
+								if unlikely(vm_getnodeofpageid(effective_vm, pageid) != node ||
 								            node->vn_part != part ||
 								            (node->vn_prot & VM_PROT_SHARED)) {
 									decref_unlikely(part);
 									kfree(new_part);
 									printk(KERN_DEBUG "Race condition: Mapping target at %p has changed during unshare (#1)\n",
-									       VM_PAGE2ADDR(page));
+									       VM_PAGE2ADDR(pageid));
 									goto again_lookup_node_already_locked;
 								}
 								sync_endread(effective_vm);
@@ -721,7 +722,7 @@ upgrade_and_recheck_vm_for_node:
 								decref_unlikely(part);
 								goto again_lookup_node_already_locked;
 							}
-							if unlikely(vm_getnodeofpageid(effective_vm, page) != node ||
+							if unlikely(vm_getnodeofpageid(effective_vm, pageid) != node ||
 							            node->vn_part != part ||
 							            (node->vn_prot & VM_PROT_SHARED)) {
 								sync_downgrade(effective_vm);
@@ -729,13 +730,13 @@ upgrade_and_recheck_vm_for_node:
 								page_free(new_ppage, 1);
 								kfree(new_part);
 								decref_unlikely(part);
-								printk(KERN_DEBUG "Race condition: Mapping target at %p has changed during unshare (#2)\n",
-								       VM_PAGE2ADDR(page));
+								printk(KERN_DEBUG "Race condition: Mapping target at %p (%p) has changed during unshare (#2)\n",
+								       pageaddr, addr);
 								goto again_lookup_node_already_locked;
 							}
 							/* If the node isn't prepared, make sure that we can map memory. */
 							if (!(node->vn_flags & VM_NODE_FLAG_PREPARED)) {
-								if unlikely(!pagedir_prepare_mapone(page)) {
+								if unlikely(!npagedir_prepare_mapone(pageaddr)) {
 									sync_endwrite(effective_vm);
 									sync_endwrite(part);
 									page_free(new_ppage, 1);
@@ -779,8 +780,8 @@ upgrade_and_recheck_vm_for_node:
 #endif /* !CONFIG_NO_SMP */
 
 							/* Actually map the accessed page! */
-							pagedir_mapone(page, new_ppage, prot);
-							vm_paged_sync_endone(effective_vm, page);
+							npagedir_mapone(pageaddr, page2addr(new_ppage), prot);
+							vm_sync_endone(effective_vm, pageaddr);
 
 							/* Unlink the given node from the old part's chain. */
 							LLIST_REMOVE(node, vn_link);
@@ -807,10 +808,10 @@ upgrade_and_recheck_vm_for_node:
 
 #if 1
 							printk(KERN_TRACE "Unshared page at %p [tid=%u]\n",
-							       __ARCH_PAGEID_DECODE(page), task_getroottid_s());
+							       pageaddr, task_getroottid_s());
 #else
 							printk(KERN_TRACE "Unshared page at %p [tid=%u,oldpage=" FORMAT_VM_PHYS_T ",newpage=" FORMAT_VM_PHYS_T "]\n",
-							       __ARCH_PAGEID_DECODE(page), task_getroottid_s(),
+							       pageaddr, task_getroottid_s(),
 							       page2addr(old_ppage), page2addr(new_ppage));
 #endif
 							goto done_before_pop_connections;
@@ -882,13 +883,13 @@ endread_and_decref_part_and_set_noexec:
 
 				/* Check to ensure that the mapped target hasn't changed
 				 * while we were loading the affected page into the core. */
-				if unlikely(vm_getnodeofpageid(effective_vm, page) != node ||
+				if unlikely(vm_getnodeofpageid(effective_vm, pageid) != node ||
 				            node->vn_part != part) {
 					sync_endread(part);
 					decref_unlikely(part);
 					sync_downgrade(effective_vm);
 					printk(KERN_DEBUG "Race condition: Mapping target at %p has changed\n",
-					       VM_PAGE2ADDR(page));
+					       pageaddr);
 					goto again_lookup_node_already_locked;
 				}
 
@@ -910,7 +911,7 @@ endread_and_decref_part_and_set_noexec:
 					decref_unlikely(part);
 					sync_downgrade(effective_vm);
 					printk(KERN_DEBUG "Race condition: Must unshare node at %p because of write %u\n",
-					       VM_PAGE2ADDR(page));
+					       pageaddr);
 					goto again_lookup_node_already_locked;
 				}
 
@@ -938,23 +939,23 @@ endread_and_decref_part_and_set_noexec:
 					prot |= PAGEDIR_MAP_FUSER;
 				/* If the node isn't prepared, make sure that we can map memory. */
 				if (!(node->vn_flags & VM_NODE_FLAG_PREPARED)) {
-					if unlikely(!pagedir_prepare_mapone(page)) {
+					if unlikely(!npagedir_prepare_mapone(pageaddr)) {
 						sync_endwrite(effective_vm);
 						sync_endread(part);
 						THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
 					}
 				}
 				/* Actually map the accessed page! */
-				pagedir_mapone(page, ppage, prot);
+				npagedir_mapone(pageaddr, page2addr(ppage), prot);
 
 				/* Make sure that the performed access can now succeed */
 				assertf(ecode & X86_PAGEFAULT_ECODE_WRITING
 				        ? (ecode & X86_PAGEFAULT_ECODE_USERSPACE
-				           ? pagedir_isuserwritable(page)
-				           : pagedir_iswritable(page))
+				           ? npagedir_isuserwritable(addr)
+				           : npagedir_iswritable(addr))
 				        : (ecode & X86_PAGEFAULT_ECODE_USERSPACE
-				           ? pagedir_isuseraccessible(page)
-				           : pagedir_ismapped(page)),
+				           ? npagedir_isuseraccessible(addr)
+				           : npagedir_ismapped(addr)),
 				        "ecode         = %p\n"
 				        "prot          = %p\n"
 				        "node->vn_prot = %p\n"
@@ -966,7 +967,7 @@ endread_and_decref_part_and_set_noexec:
 				        (uintptr_t)prot,
 				        (uintptr_t)node->vn_prot,
 				        (uintptr_t)addr,
-				        (uintptr_t)page,
+				        (uintptr_t)pageaddr,
 				        (vm_phys_t)page2addr(ppage),
 				        (pageptr_t)ppage,
 				        (uintptr_t)effective_vm,
@@ -998,7 +999,7 @@ pop_connections_and_set_exception_pointers:
 		}
 	}
 done:
-	pagedir_syncone(page);
+	npagedir_syncone(addr);
 	return state;
 throw_segfault:
 	if (pc == (uintptr_t)addr) {
@@ -1095,9 +1096,8 @@ set_exception_pointers:
 	pc = (uintptr_t)instruction_trysucc((void const *)pc);
 #if 1
 	printk(KERN_DEBUG "Segmentation fault at %p (page %p) [pc=%p,%p] [ecode=%#x] [pid=%u]\n",
-	       (uintptr_t)addr, (uintptr_t)VM_PAGE2ADDR(page),
-	       icpustate_getpc(state), pc, ecode,
-	       (unsigned int)task_getroottid_s());
+	       addr, pageaddr, icpustate_getpc(state), pc,
+	       ecode, (unsigned int)task_getroottid_s());
 #endif
 	icpustate_setpc(state, pc);
 do_unwind_state:

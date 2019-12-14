@@ -35,15 +35,15 @@ DECL_BEGIN
  *       must also update these fields accordingly. - Otherwise,
  *       any changes made will become lost the next time the VM
  *       is changed. */
-PUBLIC ATTR_PERVM uintptr_t thisvm_x86_dr0 = 0;
-PUBLIC ATTR_PERVM uintptr_t thisvm_x86_dr1 = 0;
-PUBLIC ATTR_PERVM uintptr_t thisvm_x86_dr2 = 0;
-PUBLIC ATTR_PERVM uintptr_t thisvm_x86_dr3 = 0;
+PUBLIC ATTR_PERVM void *thisvm_x86_dr0 = 0;
+PUBLIC ATTR_PERVM void *thisvm_x86_dr1 = 0;
+PUBLIC ATTR_PERVM void *thisvm_x86_dr2 = 0;
+PUBLIC ATTR_PERVM void *thisvm_x86_dr3 = 0;
 PUBLIC ATTR_PERVM uintptr_t thisvm_x86_dr7 = 0;
 
 #define thisvm_x86_drN(n) (*thisvm_x86_drN_impl(n))
-LOCAL ATTR_CONST uintptr_t *KCALL thisvm_x86_drN_impl(unsigned int n) {
-	uintptr_t *result;
+LOCAL ATTR_CONST void **KCALL thisvm_x86_drN_impl(unsigned int n) {
+	void **result;
 	switch (n) {
 
 	case 0:
@@ -64,8 +64,8 @@ LOCAL ATTR_CONST uintptr_t *KCALL thisvm_x86_drN_impl(unsigned int n) {
 	return result;
 }
 
-LOCAL ATTR_PURE uintptr_t KCALL __rddrN0123(unsigned int n) {
-	uintptr_t result;
+LOCAL ATTR_PURE void *KCALL __rddrN0123(unsigned int n) {
+	void *result;
 	switch (n) {
 
 	case 0:
@@ -86,7 +86,7 @@ LOCAL ATTR_PURE uintptr_t KCALL __rddrN0123(unsigned int n) {
 	return result;
 }
 
-LOCAL void KCALL __wrdrN0123(unsigned int n, uintptr_t value) {
+LOCAL void KCALL __wrdrN0123(unsigned int n, void *value) {
 	switch (n) {
 
 	case 0:
@@ -138,11 +138,11 @@ NOTHROW(KCALL vm_addhwbreak)(struct vm *__restrict self,
 		dr7 &= ~(DR7_CN(i) | DR7_SN(i));
 		dr7 |= br_cond << DR7_CN_SHIFT(i);
 		dr7 |= br_size << DR7_SN_SHIFT(i);
-		FORVM(self, thisvm_x86_drN(i)) = (uintptr_t)addr;
+		FORVM(self, thisvm_x86_drN(i)) = addr;
 		FORVM(self, thisvm_x86_dr7) = dr7;
 		if (self == THIS_VM) {
 			/* Activate the breakpoint. */
-			__wrdrN0123(i, (uintptr_t)addr);
+			__wrdrN0123(i, addr);
 			__wrdr7(dr7);
 		}
 		result = true;
@@ -171,11 +171,11 @@ NOTHROW(KCALL vm_delhwbreak)(struct vm *__restrict self,
 	       br_size == DR_S4 || br_size == DR_S8);
 	dr7 = FORVM(self, thisvm_x86_dr7);
 	for (i = 0; i < DR7_BREAKPOINT_COUNT; ++i) {
-		uintptr_t br_addr;
+		void *br_addr;
 		if (!(dr7 & DR7_LN(i)))
 			continue; /* unused */
 		br_addr = FORVM(self, thisvm_x86_drN(i));
-		if (br_addr != (uintptr_t)addr)
+		if (br_addr != addr)
 			continue; /* Different address. */
 		if (((dr7 & DR7_CN(i)) >> DR7_CN_SHIFT(i)) != br_cond)
 			continue; /* Different break conditions. */

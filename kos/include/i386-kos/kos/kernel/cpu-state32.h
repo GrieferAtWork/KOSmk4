@@ -24,6 +24,7 @@
 
 #include <bits/types.h>
 #include <hybrid/host.h>
+#include <hybrid/__pointer.h>
 
 #include "gdt.h"
 
@@ -224,10 +225,10 @@ struct sgregs32 {
 #define SIZEOF_COREGS32     16
 #ifdef __CC__
 struct coregs32 {
-	__u32   co_cr0;    /* %cr0 (Set of `CR0_*' from `/include/i386-kos/asm/cpu-flags.h') */
-	__u32   co_cr2;    /* %cr2 (Page Fault Linear Address (PFLA) (when a #PF occurs, contains that fault's address)) */
-	__u32   co_cr3;    /* %cr3 (Page Directory Linear Address) */
-	__u32   co_cr4;    /* %cr4 (Set of `CR4_*' from `/include/i386-kos/asm/cpu-flags.h') */
+	__u32                co_cr0; /* %cr0 (Set of `CR0_*' from `/include/i386-kos/asm/cpu-flags.h') */
+	__HYBRID_PTR32(void) co_cr2; /* %cr2 (Page Fault Linear Address (PFLA) (when a #PF occurs, contains that fault's address)) */
+	__u32                co_cr3; /* %cr3 (Page Directory Linear Address) */
+	__u32                co_cr4; /* %cr4 (Set of `CR4_*' from `/include/i386-kos/asm/cpu-flags.h') */
 };
 #endif /* __CC__ */
 
@@ -242,12 +243,12 @@ struct coregs32 {
 #define SIZEOF_DRREGS32      24
 #ifdef __CC__
 struct drregs32 {
-	__u32   dr_dr0;    /* %dr0 (Linear address of first breakpoint) */
-	__u32   dr_dr1;    /* %dr1 (Linear address of second breakpoint) */
-	__u32   dr_dr2;    /* %dr2 (Linear address of third breakpoint) */
-	__u32   dr_dr3;    /* %dr3 (Linear address of fourth breakpoint) */
-	__u32   dr_dr6;    /* %dr6 (Debug status) */
-	__u32   dr_dr7;    /* %dr7 (Debug control (set of `DR7_*' from `/include/i386-kos/asm/cpu-flags.h')) */
+	__HYBRID_PTR32(void) dr_dr0; /* %dr0 (Linear address of first breakpoint) */
+	__HYBRID_PTR32(void) dr_dr1; /* %dr1 (Linear address of second breakpoint) */
+	__HYBRID_PTR32(void) dr_dr2; /* %dr2 (Linear address of third breakpoint) */
+	__HYBRID_PTR32(void) dr_dr3; /* %dr3 (Linear address of fourth breakpoint) */
+	__u32                dr_dr6; /* %dr6 (Debug status) */
+	__u32                dr_dr7; /* %dr7 (Debug control (set of `DR7_*' from `/include/i386-kos/asm/cpu-flags.h')) */
 };
 #endif /* __CC__ */
 

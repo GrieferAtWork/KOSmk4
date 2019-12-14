@@ -32,12 +32,16 @@
 
 #include <hybrid/align.h>
 
+#include <asm/pageid.h>
 #include <asm/cacheline.h>
 #include <kos/kernel/gdt.h>
 #include <kos/kernel/segment.h>
 
 #undef likely
 #undef unlikely
+
+#define addr2pageid(ptr)  __ARCH_PAGEID_ENCODE(ptr)
+#define addr2pageptr(ptr) (((ptr) - KERNEL_CORE_BASE) >> 12)
 
 #define IP_ALIGN(x)  . = ALIGN(x)
 #define SECTION(name) \
@@ -388,12 +392,14 @@ SECTIONS {
 		/* Insert a placeholder page to catch stack overflows */
 		. += PAGESIZE;
 		PROVIDE_HIDDEN(__kernel_boottask_stack = ABSOLUTE(.));
-		PROVIDE_HIDDEN(__kernel_boottask_stack_page = ABSOLUTE(ABSOLUTE(.) / PAGESIZE));
+		PROVIDE_HIDDEN(__kernel_boottask_stack_pageid = addr2pageid(ABSOLUTE(.)));
+		PROVIDE_HIDDEN(__kernel_boottask_stack_pageptr = addr2pageptr(ABSOLUTE(.)));
 		. += KERNEL_STACKSIZE;
 
 		IP_ALIGN(PAGESIZE);
 		PROVIDE_HIDDEN(__kernel_bootidle_stack = ABSOLUTE(.));
-		PROVIDE_HIDDEN(__kernel_bootidle_stack_page = ABSOLUTE(ABSOLUTE(.) / PAGESIZE));
+		PROVIDE_HIDDEN(__kernel_bootidle_stack_pageid = addr2pageid(ABSOLUTE(.)));
+		PROVIDE_HIDDEN(__kernel_bootidle_stack_pageptr = addr2pageptr(ABSOLUTE(.)));
 		. += KERNEL_IDLE_STACKSIZE;
 
 #ifndef CONFIG_NO_DEBUGGER

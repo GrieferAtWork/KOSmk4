@@ -187,11 +187,11 @@ __FORCELOCAL void (__boundl)(__INT32_TYPE__ const __limits[2], __INT32_TYPE__ __
 
 /* Read/Write control registers. */
 __FORCELOCAL __ATTR_WUNUSED __REGISTER_TYPE__ (__rdcr0)(void) { __register __REGISTER_TYPE__ __result; __asm__ __volatile__("mov %%cr0, %0" : "=r" (__result)); return __result; }
-__FORCELOCAL __ATTR_WUNUSED __REGISTER_TYPE__ (__rdcr2)(void) { __register __REGISTER_TYPE__ __result; __asm__ __volatile__("mov %%cr2, %0" : "=r" (__result)); return __result; }
+__FORCELOCAL __ATTR_WUNUSED void *(__rdcr2)(void) { __register void *__result; __asm__ __volatile__("mov %%cr2, %0" : "=r" (__result)); return __result; }
 __FORCELOCAL __ATTR_WUNUSED __REGISTER_TYPE__ (__rdcr3)(void) { __register __REGISTER_TYPE__ __result; __asm__ __volatile__("mov %%cr3, %0" : "=r" (__result)); return __result; }
 __FORCELOCAL __ATTR_WUNUSED __REGISTER_TYPE__ (__rdcr4)(void) { __register __REGISTER_TYPE__ __result; __asm__ __volatile__("mov %%cr4, %0" : "=r" (__result)); return __result; }
 __FORCELOCAL void (__wrcr0)(__REGISTER_TYPE__ __val) { __asm__ __volatile__("mov %0, %%cr0" : : "r" (__val)); }
-__FORCELOCAL void (__wrcr2)(__REGISTER_TYPE__ __val) { __asm__ __volatile__("mov %0, %%cr2" : : "r" (__val)); }
+__FORCELOCAL void (__wrcr2)(void *__val) { __asm__ __volatile__("mov %0, %%cr2" : : "r" (__val)); }
 __FORCELOCAL void (__wrcr3)(__REGISTER_TYPE__ __val) { __asm__ __volatile__("mov %0, %%cr3" : : "r" (__val)); }
 __FORCELOCAL void (__wrcr4)(__REGISTER_TYPE__ __val) { __asm__ __volatile__("mov %0, %%cr4" : : "r" (__val)); }
 #ifdef __x86_64__
@@ -201,16 +201,16 @@ __FORCELOCAL void (__wrcr8)(__REGISTER_TYPE__ __val) { __asm__ __volatile__("mov
 
 
 /* Read/Write debug registers. */
-__FORCELOCAL __ATTR_WUNUSED __REGISTER_TYPE__ (__rddr0)(void) { __register __REGISTER_TYPE__ __result; __asm__ __volatile__("mov %%dr0, %0" : "=r" (__result)); return __result; }
-__FORCELOCAL __ATTR_WUNUSED __REGISTER_TYPE__ (__rddr1)(void) { __register __REGISTER_TYPE__ __result; __asm__ __volatile__("mov %%dr1, %0" : "=r" (__result)); return __result; }
-__FORCELOCAL __ATTR_WUNUSED __REGISTER_TYPE__ (__rddr2)(void) { __register __REGISTER_TYPE__ __result; __asm__ __volatile__("mov %%dr2, %0" : "=r" (__result)); return __result; }
-__FORCELOCAL __ATTR_WUNUSED __REGISTER_TYPE__ (__rddr3)(void) { __register __REGISTER_TYPE__ __result; __asm__ __volatile__("mov %%dr3, %0" : "=r" (__result)); return __result; }
+__FORCELOCAL __ATTR_WUNUSED void *(__rddr0)(void) { __register void *__result; __asm__ __volatile__("mov %%dr0, %0" : "=r" (__result)); return __result; }
+__FORCELOCAL __ATTR_WUNUSED void *(__rddr1)(void) { __register void *__result; __asm__ __volatile__("mov %%dr1, %0" : "=r" (__result)); return __result; }
+__FORCELOCAL __ATTR_WUNUSED void *(__rddr2)(void) { __register void *__result; __asm__ __volatile__("mov %%dr2, %0" : "=r" (__result)); return __result; }
+__FORCELOCAL __ATTR_WUNUSED void *(__rddr3)(void) { __register void *__result; __asm__ __volatile__("mov %%dr3, %0" : "=r" (__result)); return __result; }
 __FORCELOCAL __ATTR_WUNUSED __REGISTER_TYPE__ (__rddr6)(void) { __register __REGISTER_TYPE__ __result; __asm__ __volatile__("mov %%dr6, %0" : "=r" (__result)); return __result; }
 __FORCELOCAL __ATTR_WUNUSED __REGISTER_TYPE__ (__rddr7)(void) { __register __REGISTER_TYPE__ __result; __asm__ __volatile__("mov %%dr7, %0" : "=r" (__result)); return __result; }
-__FORCELOCAL void (__wrdr0)(__REGISTER_TYPE__ __val) { __asm__ __volatile__("mov %0, %%dr0" : : "r" (__val)); }
-__FORCELOCAL void (__wrdr1)(__REGISTER_TYPE__ __val) { __asm__ __volatile__("mov %0, %%dr1" : : "r" (__val)); }
-__FORCELOCAL void (__wrdr2)(__REGISTER_TYPE__ __val) { __asm__ __volatile__("mov %0, %%dr2" : : "r" (__val)); }
-__FORCELOCAL void (__wrdr3)(__REGISTER_TYPE__ __val) { __asm__ __volatile__("mov %0, %%dr3" : : "r" (__val)); }
+__FORCELOCAL void (__wrdr0)(void *__val) { __asm__ __volatile__("mov %0, %%dr0" : : "r" (__val)); }
+__FORCELOCAL void (__wrdr1)(void *__val) { __asm__ __volatile__("mov %0, %%dr1" : : "r" (__val)); }
+__FORCELOCAL void (__wrdr2)(void *__val) { __asm__ __volatile__("mov %0, %%dr2" : : "r" (__val)); }
+__FORCELOCAL void (__wrdr3)(void *__val) { __asm__ __volatile__("mov %0, %%dr3" : : "r" (__val)); }
 __FORCELOCAL void (__wrdr6)(__REGISTER_TYPE__ __val) { __asm__ __volatile__("mov %0, %%dr6" : : "r" (__val)); }
 __FORCELOCAL void (__wrdr7)(__REGISTER_TYPE__ __val) { __asm__ __volatile__("mov %0, %%dr7" : : "r" (__val)); }
 
@@ -355,7 +355,7 @@ __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdfsbaseq)(void) { __register __U
 __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdgsbaseq)(void) { __register __UINT64_TYPE__ __result; __asm__("safe_rdgsbase %0" : "=r" (__result)); return __result; }
 __FORCELOCAL void (__wrfsbaseq)(__UINT64_TYPE__ __val) { __asm__("safe_wrfsbase %0" : : "r" (__val)); }
 __FORCELOCAL void (__wrgsbaseq)(__UINT64_TYPE__ __val) { __asm__("safe_wrgsbase %0" : : "r" (__val)); }
-#else
+#else /* __KERNEL__ */
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdfsbasel)(void) { __register __UINT32_TYPE__ __result; __asm__("rdfsbase %d0" : "=r" (__result)); return __result; }
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdgsbasel)(void) { __register __UINT32_TYPE__ __result; __asm__("rdgsbase %d0" : "=r" (__result)); return __result; }
 __FORCELOCAL void (__wrfsbasel)(__UINT32_TYPE__ __val) { __asm__("wrfsbase %d0" : : "r" (__val)); }
@@ -364,7 +364,7 @@ __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdfsbaseq)(void) { __register __U
 __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdgsbaseq)(void) { __register __UINT64_TYPE__ __result; __asm__("rdgsbase %0" : "=r" (__result)); return __result; }
 __FORCELOCAL void (__wrfsbaseq)(__UINT64_TYPE__ __val) { __asm__("wrfsbase %0" : : "r" (__val)); }
 __FORCELOCAL void (__wrgsbaseq)(__UINT64_TYPE__ __val) { __asm__("wrgsbase %0" : : "r" (__val)); }
-#endif
+#endif /* !__KERNEL__ */
 __FORCELOCAL void (__swapgs)(void) { __asm__ __volatile__("swapgs"); }
 
 /* Get/Set the fs/gs base as a pointer */
@@ -373,25 +373,25 @@ __ATTR_WUNUSED void *(__rdfsbase)(void);
 __ATTR_WUNUSED void *(__rdgsbase)(void);
 void (__wrfsbase)(void *__val);
 void (__wrgsbase)(void *__val);
-#else
-#define __rdfsbase()     ((void *)__rdfsbaseq())
-#define __rdgsbase()     ((void *)__rdgsbaseq())
-#define __wrfsbase(val)    __wrfsbaseq((__UINT64_TYPE__)(void *)(val))
-#define __wrgsbase(val)    __wrgsbaseq((__UINT64_TYPE__)(void *)(val))
-#endif
+#else /* __INTELLISENSE__ */
+#define __rdfsbase()    ((void *)__rdfsbaseq())
+#define __rdgsbase()    ((void *)__rdgsbaseq())
+#define __wrfsbase(val) __wrfsbaseq((__UINT64_TYPE__)(void *)(val))
+#define __wrgsbase(val) __wrgsbaseq((__UINT64_TYPE__)(void *)(val))
+#endif /* !__INTELLISENSE__ */
 
 #elif defined(__KOS__)
 
-#define __PRIVATE_EMIT_BYTE_REGISTER_SELECT(slot,b_eax,b_ecx,b_edx,b_ebx,b_esp,b_ebp,b_esi,b_edi) \
-	".ifc " slot ",%%eax\n\t.byte " b_eax "\n\t.else\n\t"                                         \
-	".ifc " slot ",%%ecx\n\t.byte " b_ecx "\n\t.else\n\t"                                         \
-	".ifc " slot ",%%edx\n\t.byte " b_edx "\n\t.else\n\t"                                         \
-	".ifc " slot ",%%ebx\n\t.byte " b_ebx "\n\t.else\n\t"                                         \
-	".ifc " slot ",%%esp\n\t.byte " b_esp "\n\t.else\n\t"                                         \
-	".ifc " slot ",%%ebp\n\t.byte " b_ebp "\n\t.else\n\t"                                         \
-	".ifc " slot ",%%esi\n\t.byte " b_esi "\n\t.else\n\t"                                         \
-	".ifc " slot ",%%edi\n\t.byte " b_edi "\n\t.else\n\t"                                         \
-	".error \"Invalid register " slot "\"\n\t"                                                    \
+#define __PRIVATE_EMIT_BYTE_REGISTER_SELECT(slot, b_eax, b_ecx, b_edx, b_ebx, b_esp, b_ebp, b_esi, b_edi) \
+	".ifc " slot ",%%eax\n\t.byte " b_eax "\n\t.else\n\t"                                                 \
+	".ifc " slot ",%%ecx\n\t.byte " b_ecx "\n\t.else\n\t"                                                 \
+	".ifc " slot ",%%edx\n\t.byte " b_edx "\n\t.else\n\t"                                                 \
+	".ifc " slot ",%%ebx\n\t.byte " b_ebx "\n\t.else\n\t"                                                 \
+	".ifc " slot ",%%esp\n\t.byte " b_esp "\n\t.else\n\t"                                                 \
+	".ifc " slot ",%%ebp\n\t.byte " b_ebp "\n\t.else\n\t"                                                 \
+	".ifc " slot ",%%esi\n\t.byte " b_esi "\n\t.else\n\t"                                                 \
+	".ifc " slot ",%%edi\n\t.byte " b_edi "\n\t.else\n\t"                                                 \
+	".error \"Invalid register " slot "\"\n\t"                                                            \
 	".endif\n\t.endif\n\t.endif\n\t.endif\n\t.endif\n\t.endif\n\t.endif\n\t.endif\n\t"
 
 /* The KOS kernel emulates the `(wr|rd)(fs|gs)base' instructions in 32-bit mode!
@@ -468,12 +468,12 @@ __ATTR_WUNUSED void *(__rdfsbase)(void);
 __ATTR_WUNUSED void *(__rdgsbase)(void);
 void (__wrfsbase)(void *__val);
 void (__wrgsbase)(void *__val);
-#else
+#else /* __INTELLISENSE__ */
 #define __rdfsbase()     ((void *)__rdfsbasel())
 #define __rdgsbase()     ((void *)__rdgsbasel())
 #define __wrfsbase(val)    __wrfsbasel((__UINT32_TYPE__)(void *)(val))
 #define __wrgsbase(val)    __wrgsbasel((__UINT32_TYPE__)(void *)(val))
-#endif
+#endif /* !__INTELLISENSE__ */
 #endif
 
 /* MachineSpecificRegisters (MSRs) */
@@ -482,12 +482,12 @@ __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdmsr)(__UINT32_TYPE__ __id) { un
 __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdpmc)(__UINT32_TYPE__ __id) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __result; } __res; __asm__ __volatile__("rdpmc" : "=a" (__res.__lohi[0]), "=d" (__res.__lohi[1]) : "c" (__id)); return __res.__result; }
 __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdtsc)(void) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __result; } __res; __asm__ __volatile__("rdtsc" : "=a" (__res.__lohi[0]), "=d" (__res.__lohi[1])); return __res.__result; }
 __FORCELOCAL void (__wrmsr)(__UINT32_TYPE__ __id, __UINT64_TYPE__ __val) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __val; } __arg; __arg.__val = __val; __asm__ __volatile__("wrmsr" : : "c" (__id), "a" (__arg.__lohi[0]), "d" (__arg.__lohi[1])); }
-#else
+#else /* __x86_64__ */
 __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdmsr)(__UINT32_TYPE__ __id) { __UINT64_TYPE__ __result; __asm__ __volatile__("rdmsr" : "=A" (__result) : "c" (__id)); return __result; }
 __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdpmc)(__UINT32_TYPE__ __id) { __UINT64_TYPE__ __result; __asm__ __volatile__("rdpmc" : "=A" (__result) : "c" (__id)); return __result; }
 __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdtsc)(void) { __UINT64_TYPE__ __result; __asm__ __volatile__("rdtsc" : "=A" (__result)); return __result; }
 __FORCELOCAL void (__wrmsr)(__UINT32_TYPE__ __id, __UINT64_TYPE__ __val) { __asm__ __volatile__("wrmsr" : : "c" (__id), "A" (__val)); }
-#endif
+#endif /* !__x86_64__ */
 
 #undef __PRIVATE_PREFIX_REP_CLD
 #elif defined(_MSC_VER)

@@ -548,20 +548,26 @@ NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 	/* Unmap, sync, & unprepare the mappings for the CPU's IDLE and #DF stacks.
 	 * NOTE: Because these mappings are private the the CPU itself, we don't
 	 *       need to be holding a lock to the kernel VM for this part! */
-	pagedir_unmap(vm_node_getminpageid(&FORCPU(self, _thiscpu_x86_dfstacknode)), vm_node_getpagecount(&FORCPU(self, _thiscpu_x86_dfstacknode)));
-	pagedir_sync(vm_node_getminpageid(&FORCPU(self, _thiscpu_x86_dfstacknode)), vm_node_getpagecount(&FORCPU(self, _thiscpu_x86_dfstacknode)));
+	npagedir_unmap(vm_node_getstart(&FORCPU(self, _thiscpu_x86_dfstacknode)),
+	               vm_node_getsize(&FORCPU(self, _thiscpu_x86_dfstacknode)));
+	npagedir_sync(vm_node_getstart(&FORCPU(self, _thiscpu_x86_dfstacknode)),
+	              vm_node_getsize(&FORCPU(self, _thiscpu_x86_dfstacknode)));
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_map(vm_node_getminpageid(&FORCPU(self, _thiscpu_x86_dfstacknode)), vm_node_getpagecount(&FORCPU(self, _thiscpu_x86_dfstacknode)));
+	npagedir_unprepare_map(vm_node_getstart(&FORCPU(self, _thiscpu_x86_dfstacknode)),
+	                       vm_node_getsize(&FORCPU(self, _thiscpu_x86_dfstacknode)));
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-	pagedir_unmap(vm_node_getminpageid(&FORTASK(myidle, _this_kernel_stacknode)), vm_node_getpagecount(&FORTASK(myidle, _this_kernel_stacknode)));
-	pagedir_sync(vm_node_getminpageid(&FORTASK(myidle, _this_kernel_stacknode)), vm_node_getpagecount(&FORTASK(myidle, _this_kernel_stacknode)));
+	npagedir_unmap(vm_node_getstart(&FORTASK(myidle, _this_kernel_stacknode)),
+	               vm_node_getsize(&FORTASK(myidle, _this_kernel_stacknode)));
+	npagedir_sync(vm_node_getstart(&FORTASK(myidle, _this_kernel_stacknode)),
+	              vm_node_getsize(&FORTASK(myidle, _this_kernel_stacknode)));
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_map(vm_node_getminpageid(&FORTASK(myidle, _this_kernel_stacknode)), vm_node_getpagecount(&FORTASK(myidle, _this_kernel_stacknode)));
+	npagedir_unprepare_map(vm_node_getstart(&FORTASK(myidle, _this_kernel_stacknode)),
+	                       vm_node_getsize(&FORTASK(myidle, _this_kernel_stacknode)));
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-	pagedir_unmapone(vm_node_getminpageid(&FORTASK(myidle, this_trampoline_node)));
-	pagedir_syncone(vm_node_getminpageid(&FORTASK(myidle, this_trampoline_node)));
+	npagedir_unmapone(vm_node_getstart(&FORTASK(myidle, this_trampoline_node)));
+	npagedir_syncone(vm_node_getstart(&FORTASK(myidle, this_trampoline_node)));
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	pagedir_unprepare_mapone(vm_node_getminpageid(&FORTASK(myidle, this_trampoline_node)));
+	npagedir_unprepare_mapone(vm_node_getstart(&FORTASK(myidle, this_trampoline_node)));
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Remove the #DF and IDLE stack nodes from the kernel VM */

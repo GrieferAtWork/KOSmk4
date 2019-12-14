@@ -42,6 +42,7 @@
 
 DECL_BEGIN
 
+/* TODO: Implement the pageid / pageptr split for the linker constants in this file! */
 INTDEF byte_t __kernel_text_startpage[];
 INTDEF byte_t __kernel_text_endpage[];
 INTDEF byte_t __kernel_text_numpages[];

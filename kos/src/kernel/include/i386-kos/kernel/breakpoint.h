@@ -34,10 +34,10 @@ DECL_BEGIN
  *       any changes made will become lost the next time the VM
  *       is changed.
  * NOTE: These fields are _NOT_ inherited during `vm_clone()'! */
-DATDEF ATTR_PERVM uintptr_t thisvm_x86_dr0;
-DATDEF ATTR_PERVM uintptr_t thisvm_x86_dr1;
-DATDEF ATTR_PERVM uintptr_t thisvm_x86_dr2;
-DATDEF ATTR_PERVM uintptr_t thisvm_x86_dr3;
+DATDEF ATTR_PERVM void *thisvm_x86_dr0;
+DATDEF ATTR_PERVM void *thisvm_x86_dr1;
+DATDEF ATTR_PERVM void *thisvm_x86_dr2;
+DATDEF ATTR_PERVM void *thisvm_x86_dr3;
 DATDEF ATTR_PERVM uintptr_t thisvm_x86_dr7;
 
 /* Add/Remove a local hardware breakpoint to the given VM.
