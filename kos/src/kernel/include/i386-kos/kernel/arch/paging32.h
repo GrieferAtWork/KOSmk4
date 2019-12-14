@@ -302,22 +302,13 @@ FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_syncone)(VIRT void *virt_addr);
 FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_sync)(VIRT void *virt_addr, size_t num_pages);
 
 /* Synchronize mappings within the given address range. */
-#ifdef CONFIG_USE_NEW_PAGING
 FORCELOCAL NOBLOCK void
 NOTHROW(FCALL npagedir_syncone)(VIRT void *addr) {
-	/* TODO: Rename `x86_pagedir_syncone()' to `pagedir_syncone()'
-	 *       once `CONFIG_USE_NEW_PAGING' becomes the standard. */
+	/* TODO: Rename `x86_pagedir_syncone()' to `npagedir_syncone()' */
 	x86_pagedir_syncone(addr);
 }
-#else /* CONFIG_USE_NEW_PAGING */
-FORCELOCAL NOBLOCK void
-NOTHROW(FCALL pagedir_syncone)(VIRT vm_vpage_t virt_page) {
-	x86_pagedir_syncone((void *)VM_PAGE2ADDR(virt_page));
-}
-#endif /* !CONFIG_USE_NEW_PAGING */
 
 /* Synchronize mappings within the given address range. */
-#ifdef CONFIG_USE_NEW_PAGING
 FORCELOCAL NOBLOCK void
 NOTHROW(FCALL npagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                              PAGEDIR_PAGEALIGNED size_t num_bytes) {
@@ -325,7 +316,7 @@ NOTHROW(FCALL npagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
 			return;
-		if (num_bytes == 1) {
+		if (num_bytes <= 4096) {
 			npagedir_syncone(addr);
 			return;
 		}
@@ -343,32 +334,6 @@ NOTHROW(FCALL npagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 #endif /* !__OMIT_PAGING_CONSTANT_P_WRAPPERS */
 	x86_pagedir_sync(addr, num_bytes / 4096);
 }
-#else /* CONFIG_USE_NEW_PAGING */
-FORCELOCAL NOBLOCK void
-NOTHROW(FCALL pagedir_sync)(VIRT vm_vpage_t virt_page, size_t num_pages) {
-#ifndef __OMIT_PAGING_CONSTANT_P_WRAPPERS
-	if (__builtin_constant_p(num_pages)) {
-		if (num_pages == 0)
-			return;
-		if (num_pages == 1) {
-			pagedir_syncone(virt_page);
-			return;
-		}
-		if (num_pages > KERNEL_BASE_PAGE) {
-			/* We know that the address always _has_ to
-			 * fall into kernel-space in this case! */
-			pagedir_syncall();
-			return;
-		}
-		if (num_pages > CONFIG_PAGEDIR_LARGESYNC_THRESHOLD) {
-			x86_pagedir_syncall_maybe_global((void *)VM_PAGE2ADDR(virt_page), num_pages);
-			return;
-		}
-	}
-#endif /* !__OMIT_PAGING_CONSTANT_P_WRAPPERS */
-	x86_pagedir_sync((void *)VM_PAGE2ADDR(virt_page), num_pages);
-}
-#endif /* !CONFIG_USE_NEW_PAGING */
 #endif /* __CC__ */
 
 DECL_END

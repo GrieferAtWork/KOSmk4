@@ -73,7 +73,7 @@ NOTHROW(FCALL x86_handle_dbg_pagefault)(struct icpustate *__restrict state, uint
 	 * Also: This way, the debugger accessing memory will never cause disk activity, or
 	 *       other side-effects such as VIO callbacks or the like. */
 	uintptr_t pc;
-	uintptr_t addr;
+	void *addr;
 	/* Check for memcpy_nopf() */
 	if unlikely(state->ics_irregs.ir_pip == (uintptr_t)x86_memcpy_nopf_rep_pointer) {
 		state->ics_irregs.ir_pip = (uintptr_t)x86_memcpy_nopf_ret_pointer;

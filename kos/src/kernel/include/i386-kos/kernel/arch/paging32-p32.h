@@ -102,14 +102,9 @@ DECL_BEGIN
 #define P32_PAGE_FPAT_4MIB  __UINT32_C(0x00001000) /* [bit(12)] Indirectly determines the memory type used to access the 4-MByte page referenced by this entry. */
 
 
-#define P32_PDIR_VEC1INDEX(ptr)  ((__CCAST(u32)(ptr) >> 12) & 0x3ff) /* For `struct p32_pdir::p_e2' */
-#define P32_PDIR_VEC2INDEX(ptr)   (__CCAST(u32)(ptr) >> 22)          /* For `union p32_pdir_e2::p_e1' */
-
-#ifndef CONFIG_USE_NEW_PAGING
-#define P32_PDIR_VEC1INDEX_VPAGE(vpage)   (__CCAST(u32)(vpage) & 0x3ff) /* For `struct p32_pdir::p_e2' */
-#define P32_PDIR_VEC2INDEX_VPAGE(vpage)   (__CCAST(u32)(vpage) >> 10)   /* For `union p32_pdir_e2::p_e1' */
-#endif /* !CONFIG_USE_NEW_PAGING */
-#define P32_PDIR_VECADDR(vec2, vec1)      ((__CCAST(u32)(vec2) << 22) | (__CCAST(u32)(vec1) << 12))
+#define P32_PDIR_VEC1INDEX(ptr)      ((__CCAST(u32)(ptr) >> 12) & 0x3ff) /* For `struct p32_pdir::p_e2' */
+#define P32_PDIR_VEC2INDEX(ptr)      (__CCAST(u32)(ptr) >> 22)           /* For `union p32_pdir_e2::p_e1' */
+#define P32_PDIR_VECADDR(vec2, vec1) ((__CCAST(u32)(vec2) << 22) | (__CCAST(u32)(vec1) << 12))
 
 /* Pagesizes of different page directory levels. */
 #define P32_PDIR_E1_SIZE     __UINT32_C(0x00001000) /* 4 KiB (Same as `PAGESIZE') */
@@ -305,7 +300,6 @@ NOTHROW(FCALL p32_pagedir_fini)(VIRT struct p32_pdir *__restrict self);
  *        were made in prior calls.
  * @return: true:  Successfully allocated structures required for creating mappings.
  * @return: false: Insufficient physical memory to change mappings. */
-#ifdef CONFIG_USE_NEW_PAGING
 INTDEF NOBLOCK WUNUSED bool
 NOTHROW(FCALL p32_npagedir_prepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr);
 INTDEF NOBLOCK WUNUSED bool
@@ -319,13 +313,6 @@ NOTHROW(FCALL p32_npagedir_unprepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr
 INTDEF NOBLOCK void
 NOTHROW(FCALL p32_npagedir_unprepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                           PAGEDIR_PAGEALIGNED size_t num_bytes);
-#else /* CONFIG_USE_NEW_PAGING */
-INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL p32_pagedir_prepare_mapone)(VIRT vm_vpage_t virt_page);
-INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL p32_pagedir_prepare_map)(VIRT vm_vpage_t virt_page, size_t num_pages);
-INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL p32_pagedir_prepare_map_keep)(VIRT vm_vpage_t virt_page, size_t num_pages);
-INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unprepare_mapone)(VIRT vm_vpage_t virt_page);
-INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unprepare_map)(VIRT vm_vpage_t virt_page, size_t num_pages);
-#endif /* !CONFIG_USE_NEW_PAGING */
 
 
 /* Set a mapping hint for pages apart of the given virtual memory range.
@@ -334,7 +321,6 @@ INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unprepare_map)(VIRT vm_vpage_t vir
  * Their main purpose is to be accessible through atomic means, allowing
  * them to be used by the PAGE_FAULT handler, while still ensuring that
  * access remains non-blocking. */
-#ifdef CONFIG_USE_NEW_PAGING
 INTDEF NOBLOCK void
 NOTHROW(FCALL p32_npagedir_maphintone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                        VIRT /*ALIGNED(P32_PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint);
@@ -342,22 +328,13 @@ INTDEF NOBLOCK void
 NOTHROW(FCALL p32_npagedir_maphint)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                     PAGEDIR_PAGEALIGNED size_t num_bytes,
                                     VIRT /*ALIGNED(P32_PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint);
-#else /* CONFIG_USE_NEW_PAGING */
-INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_maphintone)(VIRT vm_vpage_t virt_page, VIRT /*ALIGNED(P32_PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint);
-INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_maphint)(VIRT vm_vpage_t virt_page, size_t num_pages, VIRT /*ALIGNED(P32_PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint);
-#endif /* !CONFIG_USE_NEW_PAGING */
 
 /* Return the given of the given page, or NULL if no hint has been mapped. */
-#ifdef CONFIG_USE_NEW_PAGING
 INTDEF NOBLOCK WUNUSED void *
 NOTHROW(FCALL p32_npagedir_gethint)(PAGEDIR_PAGEALIGNED VIRT void *addr);
-#else /* CONFIG_USE_NEW_PAGING */
-INTDEF NOBLOCK WUNUSED void *NOTHROW(FCALL p32_pagedir_gethint)(VIRT vm_vpage_t virt_page);
-#endif /* !CONFIG_USE_NEW_PAGING */
 
 /* Create/delete a page-directory mapping.
  * @param: perm: A set of `PAGEDIR_MAP_F*' detailing how memory should be mapped. */
-#ifdef CONFIG_USE_NEW_PAGING
 INTDEF NOBLOCK void
 NOTHROW(FCALL p32_npagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                    PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
@@ -367,10 +344,6 @@ NOTHROW(FCALL p32_npagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                 PAGEDIR_PAGEALIGNED size_t num_bytes,
                                 PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
                                 u16 perm);
-#else /* CONFIG_USE_NEW_PAGING */
-INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_mapone)(VIRT vm_vpage_t virt_page, PHYS pageptr_t phys_page, u16 perm);
-INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_map)(VIRT vm_vpage_t virt_page, size_t num_pages, PHYS pageptr_t phys_page, u16 perm);
-#endif /* !CONFIG_USE_NEW_PAGING */
 
 /* Special variants of `pagedir_mapone()' that should be used to
  * temporary override the mapping of a single, prepared page.
@@ -379,7 +352,6 @@ INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_map)(VIRT vm_vpage_t virt_page, si
  * operation in the sense that the data is entirely thread-private, while modifications
  * do not require any kind of lock.
  * NOTE: If the page had been mapped, `pagedir_pop_mapone()' will automatically sync the page. */
-#ifdef CONFIG_USE_NEW_PAGING
 INTDEF NOBLOCK WUNUSED p32_pagedir_pushval_t
 NOTHROW(FCALL p32_npagedir_push_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                         PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
@@ -387,35 +359,20 @@ NOTHROW(FCALL p32_npagedir_push_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 INTDEF NOBLOCK void
 NOTHROW(FCALL p32_npagedir_pop_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                        p32_pagedir_pushval_t backup);
-#else /* CONFIG_USE_NEW_PAGING */
-INTDEF NOBLOCK WUNUSED p32_pagedir_pushval_t
-NOTHROW(FCALL p32_pagedir_push_mapone)(VIRT vm_vpage_t virt_page, PHYS pageptr_t phys_page, u16 perm);
-INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_pop_mapone)(VIRT vm_vpage_t virt_page, p32_pagedir_pushval_t backup);
-#endif /* !CONFIG_USE_NEW_PAGING */
 
 /* Unmap pages from the given address range. (requires that the given area be prepared) */
-#ifdef CONFIG_USE_NEW_PAGING
 INTDEF NOBLOCK void
 NOTHROW(FCALL p32_npagedir_unmapone)(PAGEDIR_PAGEALIGNED VIRT void *addr);
 INTDEF NOBLOCK void
 NOTHROW(FCALL p32_npagedir_unmap)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                   PAGEDIR_PAGEALIGNED size_t num_bytes);
-#else /* CONFIG_USE_NEW_PAGING */
-INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unmapone)(VIRT vm_vpage_t virt_page);
-INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unmap)(VIRT vm_vpage_t virt_page, size_t num_pages);
-#endif /* !CONFIG_USE_NEW_PAGING */
 
 /* Remove write-permissions from the given address range. (requires that the given area be prepared) */
-#ifdef CONFIG_USE_NEW_PAGING
 INTDEF NOBLOCK void
 NOTHROW(FCALL p32_npagedir_unwriteone)(PAGEDIR_PAGEALIGNED VIRT void *addr);
 INTDEF NOBLOCK void
 NOTHROW(FCALL p32_npagedir_unwrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                     PAGEDIR_PAGEALIGNED size_t num_bytes);
-#else /* CONFIG_USE_NEW_PAGING */
-INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unwriteone)(VIRT vm_vpage_t virt_page);
-INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unwrite)(VIRT vm_vpage_t virt_page, size_t num_pages);
-#endif /* !CONFIG_USE_NEW_PAGING */
 
 /* Unmap the entirety of user-space.
  * NOTE: Unlike all other unmap() functions, this one guaranties that it
@@ -427,59 +384,15 @@ INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unmap_userspace_nosync)(void);
 INTDEF NOBLOCK WUNUSED PHYS vm_phys_t NOTHROW(FCALL p32_pagedir_translate)(VIRT void *addr);
 
 /* Check if the given page is mapped. */
-#ifdef CONFIG_USE_NEW_PAGING
 INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL p32_npagedir_ismapped)(VIRT void *addr);
 INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL p32_npagedir_iswritable)(VIRT void *addr);
 INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL p32_npagedir_isuseraccessible)(VIRT void *addr);
 INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL p32_npagedir_isuserwritable)(VIRT void *addr);
-#else /* CONFIG_USE_NEW_PAGING */
-INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL p32_pagedir_ismapped)(VIRT vm_vpage_t vpage);
-INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL p32_pagedir_iswritable)(VIRT vm_vpage_t vpage);
-INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL p32_pagedir_isuseraccessible)(VIRT vm_vpage_t vpage);
-INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL p32_pagedir_isuserwritable)(VIRT vm_vpage_t vpage);
-#endif /* !CONFIG_USE_NEW_PAGING */
 
 /* TODO: Figure out a better design for these functions
  *       The current system is written under the assumption that 4MiB pages don't exist... */
-#ifdef CONFIG_USE_NEW_PAGING
 INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL p32_npagedir_haschanged)(VIRT void *addr);
 INTDEF NOBLOCK void NOTHROW(FCALL p32_npagedir_unsetchanged)(VIRT void *addr);
-#else /* CONFIG_USE_NEW_PAGING */
-INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL p32_pagedir_haschanged)(VIRT vm_vpage_t vpage);
-INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unsetchanged)(VIRT vm_vpage_t vpage);
-#endif /* !CONFIG_USE_NEW_PAGING */
-
-
-#ifndef CONFIG_USE_NEW_PAGING
-/* Forward-compatibility for the new paging system. */
-#ifndef __PAGEDIR_FORWARD_ADDR2VIRTPAGE
-#define __PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr)          (vm_vpage_t)((uintptr_t)(addr) / 4096)
-#define __PAGEDIR_FORWARD_PHYS2PHYSPAGE(phys)          (pageptr_t)((phys) / 4096)
-#define __PAGEDIR_FORWARD_NUMBYTES2NUMPAGES(num_bytes) ((size_t)(num_bytes) / 4096)
-#endif /* !__PAGEDIR_FORWARD_ADDR2VIRTPAGE */
-#define p32_npagedir_prepare_mapone(addr)              p32_pagedir_prepare_mapone(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr))
-#define p32_npagedir_prepare_map(addr, num_bytes)      p32_pagedir_prepare_map(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr), __PAGEDIR_FORWARD_NUMBYTES2NUMPAGES(num_bytes))
-#define p32_npagedir_prepare_map_keep(addr, num_bytes) p32_pagedir_prepare_map_keep(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr), __PAGEDIR_FORWARD_NUMBYTES2NUMPAGES(num_bytes))
-#define p32_npagedir_unprepare_mapone(addr)            p32_pagedir_unprepare_mapone(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr))
-#define p32_npagedir_unprepare_map(addr, num_bytes)    p32_pagedir_unprepare_map(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr), __PAGEDIR_FORWARD_NUMBYTES2NUMPAGES(num_bytes))
-#define p32_npagedir_maphintone(addr, hint)            p32_pagedir_maphintone(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr), hint)
-#define p32_npagedir_maphint(addr, num_bytes, hint)    p32_pagedir_maphint(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr), __PAGEDIR_FORWARD_NUMBYTES2NUMPAGES(num_bytes), hint)
-#define p32_npagedir_gethint(addr)                     p32_pagedir_gethint(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr))
-#define p32_npagedir_mapone(addr, phys, perm)          p32_pagedir_mapone(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr), __PAGEDIR_FORWARD_PHYS2PHYSPAGE(phys), perm)
-#define p32_npagedir_map(addr, num_bytes, phys, perm)  p32_pagedir_map(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr), __PAGEDIR_FORWARD_NUMBYTES2NUMPAGES(num_bytes), __PAGEDIR_FORWARD_PHYS2PHYSPAGE(phys), perm)
-#define p32_npagedir_push_mapone(addr, phys, perm)     p32_pagedir_push_mapone(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr), __PAGEDIR_FORWARD_PHYS2PHYSPAGE(phys), perm)
-#define p32_npagedir_pop_mapone(addr, backup)          p32_pagedir_pop_mapone(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr), backup)
-#define p32_npagedir_unmapone(addr)                    p32_pagedir_unmapone(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr))
-#define p32_npagedir_unmap(addr, num_bytes)            p32_pagedir_unmap(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr), __PAGEDIR_FORWARD_NUMBYTES2NUMPAGES(num_bytes))
-#define p32_npagedir_unwriteone(addr)                  p32_pagedir_unwriteone(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr))
-#define p32_npagedir_unwrite(addr, num_bytes)          p32_pagedir_unwrite(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr), __PAGEDIR_FORWARD_NUMBYTES2NUMPAGES(num_bytes))
-#define p32_npagedir_ismapped(addr)                    p32_pagedir_ismapped(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr))
-#define p32_npagedir_iswritable(addr)                  p32_pagedir_iswritable(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr))
-#define p32_npagedir_isuseraccessible(addr)            p32_pagedir_isuseraccessible(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr))
-#define p32_npagedir_isuserwritable(addr)              p32_pagedir_isuserwritable(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr))
-#define p32_npagedir_haschanged(addr)                  p32_pagedir_haschanged(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr))
-#define p32_npagedir_unsetchanged(addr)                p32_pagedir_unsetchanged(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr))
-#endif /* !CONFIG_USE_NEW_PAGING */
 
 #endif /* __CC__ && CONFIG_BUILDING_KERNEL_CORE */
 

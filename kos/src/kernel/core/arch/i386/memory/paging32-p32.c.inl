@@ -417,7 +417,6 @@ again_try_exchange_e2_word:
  *        were made in prior calls.
  * @return: true:  Successfully allocated structures required for creating mappings.
  * @return: false: Insufficient physical memory to change mappings. */
-#ifdef CONFIG_USE_NEW_PAGING
 INTERN NOBLOCK WUNUSED bool
 NOTHROW(FCALL p32_npagedir_prepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec2, vec1;
@@ -575,162 +574,6 @@ NOTHROW(FCALL p32_npagedir_unprepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 			p32_pagedir_unprepare_impl_flatten(vec2, 0, 1024);
 	}
 }
-#else /* CONFIG_USE_NEW_PAGING */
-INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p32_pagedir_prepare_mapone)(VIRT vm_vpage_t virt_page) {
-	unsigned int vec2, vec1;
-	if unlikely(virt_page >= (vm_vpage_t)KERNEL_BASE_PAGE)
-		return true;
-	vec2 = P32_PDIR_VEC2INDEX_VPAGE(virt_page);
-	vec1 = P32_PDIR_VEC1INDEX_VPAGE(virt_page);
-	return p32_pagedir_prepare_impl_widen(vec2, vec1, 1);
-}
-
-INTERN NOBLOCK void
-NOTHROW(FCALL p32_pagedir_unprepare_mapone)(VIRT vm_vpage_t virt_page) {
-	unsigned int vec2, vec1;
-	if unlikely(virt_page >= (vm_vpage_t)KERNEL_BASE_PAGE)
-		return;
-	vec2 = P32_PDIR_VEC2INDEX_VPAGE(virt_page);
-	vec1 = P32_PDIR_VEC1INDEX_VPAGE(virt_page);
-	p32_pagedir_unprepare_impl_flatten(vec2, vec1, 1);
-}
-
-INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p32_pagedir_prepare_map)(VIRT vm_vpage_t virt_page, size_t num_pages) {
-	unsigned int vec2_min, vec2_max;
-	unsigned int vec1_min, vec1_end;
-	unsigned int vec2;
-	if unlikely(virt_page >= (vm_vpage_t)KERNEL_BASE_PAGE)
-		return true;
-	assert(virt_page + num_pages >= virt_page);
-	if unlikely(virt_page + num_pages > (vm_vpage_t)KERNEL_BASE_PAGE)
-		num_pages = (size_t)((vm_vpage_t)KERNEL_BASE_PAGE - virt_page);
-	switch (num_pages) {
-	case 0:
-		return true;
-	case 1:
-		return p32_pagedir_prepare_mapone(virt_page);
-	default:
-		break;
-	}
-	vec2_min = P32_PDIR_VEC2INDEX_VPAGE(virt_page);
-	vec2_max = P32_PDIR_VEC2INDEX_VPAGE(virt_page + num_pages - 1);
-	vec1_min = P32_PDIR_VEC1INDEX_VPAGE(virt_page);
-	/* Prepare within the same 4MiB region. */
-	if likely(vec2_min == vec2_max)
-		return p32_pagedir_prepare_impl_widen(vec2_min, vec1_min, num_pages);
-	vec1_end = P32_PDIR_VEC1INDEX_VPAGE(virt_page + num_pages);
-	/* Prepare the partial range of the first 4MiB region. */
-	if unlikely(!p32_pagedir_prepare_impl_widen(vec2_min, vec1_min, 1024 - vec1_min))
-		goto err_0;
-	/* Prepare the partial range of the last 4MiB region. */
-	if unlikely(!p32_pagedir_prepare_impl_widen(vec2_max, 0, vec1_end))
-		goto err_1;
-	if unlikely(vec2_min + 1 < vec2_max) {
-		/* Now _fully_ prepare all of the intermediate 4MiB regions. */
-		for (vec2 = vec2_min + 1; vec2 < vec2_max; ++vec2) {
-			if unlikely(!p32_pagedir_prepare_impl_widen(vec2, 0, 1024))
-				goto err_2;
-		}
-	}
-	return true;
-err_2:
-	while (vec2 > vec2_min + 1) {
-		--vec2;
-		p32_pagedir_unprepare_impl_flatten(vec2, 0, 1024);
-	}
-	p32_pagedir_unprepare_impl_flatten(vec2_max, 0, vec1_end);
-err_1:
-	p32_pagedir_unprepare_impl_flatten(vec2_min, vec1_min, 1024 - vec1_min);
-err_0:
-	return false;
-}
-
-INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p32_pagedir_prepare_map_keep)(VIRT vm_vpage_t virt_page, size_t num_pages) {
-	unsigned int vec2_min, vec2_max;
-	unsigned int vec1_min, vec1_end;
-	if unlikely(virt_page >= (vm_vpage_t)KERNEL_BASE_PAGE)
-		return true;
-	assert(virt_page + num_pages >= virt_page);
-	if unlikely(virt_page + num_pages > (vm_vpage_t)KERNEL_BASE_PAGE)
-		num_pages = (size_t)((vm_vpage_t)KERNEL_BASE_PAGE - virt_page);
-	switch (num_pages) {
-	case 0:
-		return true;
-	case 1:
-		return p32_pagedir_prepare_mapone(virt_page);
-	default:
-		break;
-	}
-	vec2_min = P32_PDIR_VEC2INDEX_VPAGE(virt_page);
-	vec2_max = P32_PDIR_VEC2INDEX_VPAGE(virt_page + num_pages - 1);
-	vec1_min = P32_PDIR_VEC1INDEX_VPAGE(virt_page);
-	/* Prepare within the same 4MiB region. */
-	if likely(vec2_min == vec2_max)
-		return p32_pagedir_prepare_impl_widen(vec2_min, vec1_min, num_pages);
-	vec1_end = P32_PDIR_VEC1INDEX_VPAGE(virt_page + num_pages);
-	/* Prepare the partial range of the first 4MiB region. */
-	if unlikely(!p32_pagedir_prepare_impl_widen(vec2_min, vec1_min, 1024 - vec1_min))
-		goto err;
-	/* Prepare the partial range of the last 4MiB region. */
-	if unlikely(!p32_pagedir_prepare_impl_widen(vec2_max, 0, vec1_end))
-		goto err;
-	if unlikely(vec2_min + 1 < vec2_max) {
-		unsigned int vec2;
-		/* Now _fully_ prepare all of the intermediate 4MiB regions. */
-		for (vec2 = vec2_min + 1; vec2 < vec2_max; ++vec2) {
-			if unlikely(!p32_pagedir_prepare_impl_widen(vec2, 0, 1024))
-				goto err;
-		}
-	}
-	return true;
-err:
-	return false;
-}
-
-
-
-INTERN NOBLOCK void
-NOTHROW(FCALL p32_pagedir_unprepare_map)(VIRT vm_vpage_t virt_page, size_t num_pages) {
-	unsigned int vec2_min, vec2_max;
-	unsigned int vec1_min, vec1_end;
-	if unlikely(virt_page >= (vm_vpage_t)KERNEL_BASE_PAGE)
-		return;
-	assert(virt_page + num_pages >= virt_page);
-	if unlikely(virt_page + num_pages > (vm_vpage_t)KERNEL_BASE_PAGE)
-		num_pages = (size_t)((vm_vpage_t)KERNEL_BASE_PAGE - virt_page);
-	switch (num_pages) {
-	case 0:
-		return;
-	case 1:
-		p32_pagedir_unprepare_mapone(virt_page);
-		return;
-	default:
-		break;
-	}
-	vec2_min = P32_PDIR_VEC2INDEX_VPAGE(virt_page);
-	vec2_max = P32_PDIR_VEC2INDEX_VPAGE(virt_page + num_pages - 1);
-	vec1_min = P32_PDIR_VEC1INDEX_VPAGE(virt_page);
-	/* Unprepare within the same 4MiB region. */
-	if likely(vec2_min == vec2_max) {
-		p32_pagedir_unprepare_impl_flatten(vec2_min, vec1_min, num_pages);
-		return;
-	}
-	vec1_end = P32_PDIR_VEC1INDEX_VPAGE(virt_page + num_pages);
-	/* Unprepare the partial range of the first 4MiB region. */
-	p32_pagedir_unprepare_impl_flatten(vec2_min, vec1_min, 1024 - vec1_min);
-	/* Unprepare the partial range of the last 4MiB region. */
-	p32_pagedir_unprepare_impl_flatten(vec2_max, 0, vec1_end);
-	if unlikely(vec2_min + 1 < vec2_max) {
-		unsigned int vec2;
-		/* Now fully unprepare all of the intermediate 4MiB regions. */
-		for (vec2 = vec2_min + 1; vec2 < vec2_max; ++vec2)
-			p32_pagedir_unprepare_impl_flatten(vec2, 0, 1024);
-	}
-}
-#endif /* !CONFIG_USE_NEW_PAGING */
 
 
 #ifdef NDEBUG
@@ -819,7 +662,6 @@ PRIVATE u32 const p32_pageperm_matrix[16] = {
 #undef COMMON_PRESENT
 };
 
-#ifdef CONFIG_USE_NEW_PAGING
 LOCAL NOBLOCK u32
 NOTHROW(FCALL p32_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                        PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
@@ -844,28 +686,6 @@ NOTHROW(FCALL p32_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 		result |= USED_P32_PAGE_FGLOBAL;
 	return result;
 }
-#else /* CONFIG_USE_NEW_PAGING */
-LOCAL NOBLOCK u32
-NOTHROW(FCALL p32_pagedir_encode_4kib)(PHYS vm_vpage_t dest_page,
-                                       PHYS pageptr_t phys_page,
-                                       u16 perm) {
-	u32 result;
-	assertf(!(perm & ~PAGEDIR_MAP_FMASK),
-	        "Invalid page permissions: %#.4I16x", perm);
-	assertf(phys_page <= (pageptr_t)VM_ADDR2PAGE(0xfffff000),
-	        "Page cannot be mapped: " FORMAT_VM_PHYS_T,
-	        page2addr(phys_page));
-	result  = page2addr32(phys_page);
-#if PAGEDIR_MAP_FMASK == 0xf
-	result |= p32_pageperm_matrix[perm];
-#else /* PAGEDIR_MAP_FMASK == 0xf */
-	result |= p32_pageperm_matrix[perm & 0xf];
-#endif /* PAGEDIR_MAP_FMASK != 0xf */
-	if (dest_page >= (vm_vpage_t)KERNEL_BASE_PAGE)
-		result |= USED_P32_PAGE_FGLOBAL;
-	return result;
-}
-#endif /* !CONFIG_USE_NEW_PAGING */
 
 
 
@@ -876,7 +696,6 @@ NOTHROW(FCALL p32_pagedir_encode_4kib)(PHYS vm_vpage_t dest_page,
  * Their main purpose is to be accessible through atomic means, allowing
  * them to be used by the PAGE_FAULT handler, while still ensuring that
  * access remains non-blocking. */
-#ifdef CONFIG_USE_NEW_PAGING
 INTERN NOBLOCK void
 NOTHROW(FCALL p32_npagedir_maphintone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                        VIRT /*ALIGNED(P32_PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint) {
@@ -908,40 +727,8 @@ NOTHROW(FCALL p32_npagedir_maphint)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 		p32_pagedir_set_e1_word(vec2, vec1, e1_word);
 	}
 }
-#else /* CONFIG_USE_NEW_PAGING */
-INTERN NOBLOCK void
-NOTHROW(FCALL p32_pagedir_maphintone)(VIRT vm_vpage_t virt_page,
-                                      VIRT /*ALIGNED(P32_PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint) {
-	unsigned int vec2, vec1;
-	assertf(virt_page <= __ARCH_PAGEID_MAX, "Invalid page %I64p", (u64)virt_page);
-	assertf(IS_ALIGNED((uintptr_t)hint, P32_PAGEDIR_MAPHINT_ALIGNMENT), "hint = %p", hint);
-	vec2 = P32_PDIR_VEC2INDEX_VPAGE(virt_page);
-	vec1 = P32_PDIR_VEC1INDEX_VPAGE(virt_page);
-	p32_pagedir_set_e1_word(vec2, vec1, (u32)(uintptr_t)hint | P32_PAGE_FISAHINT);
-}
-
-INTERN NOBLOCK void
-NOTHROW(FCALL p32_pagedir_maphint)(VIRT vm_vpage_t virt_page, size_t num_pages,
-                                   VIRT /*ALIGNED(P32_PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint) {
-	size_t i;
-	u32 e1_word;
-	assertf(virt_page <= __ARCH_PAGEID_MAX, "Invalid page range %I64p...%I64p", (u64)virt_page, (u64)virt_page + num_pages - 1);
-	assertf(virt_page + num_pages >= virt_page, "Invalid page %I64p...%I64p", (u64)virt_page, (u64)virt_page + num_pages - 1);
-	assertf(virt_page + num_pages <= __ARCH_PAGEID_MAX, "Invalid page %I64p...%I64ps", (u64)virt_page, (u64)virt_page + num_pages - 1);
-	assertf(IS_ALIGNED((uintptr_t)hint, P32_PAGEDIR_MAPHINT_ALIGNMENT), "hint = %p", hint);
-	e1_word = (u32)(uintptr_t)hint | P32_PAGE_FISAHINT;
-	for (i = 0; i < num_pages; ++i) {
-		unsigned int vec2, vec1;
-		vm_vpage_t effective_virt_page = virt_page + i;
-		vec2 = P32_PDIR_VEC2INDEX_VPAGE(effective_virt_page);
-		vec1 = P32_PDIR_VEC1INDEX_VPAGE(effective_virt_page);
-		p32_pagedir_set_e1_word(vec2, vec1, e1_word);
-	}
-}
-#endif /* !CONFIG_USE_NEW_PAGING */
 
 /* Return the given of the given page, or NULL if no hint has been mapped. */
-#ifdef CONFIG_USE_NEW_PAGING
 INTERN NOBLOCK WUNUSED void *
 NOTHROW(FCALL p32_npagedir_gethint)(VIRT void *addr) {
 	u32 word;
@@ -958,28 +745,9 @@ NOTHROW(FCALL p32_npagedir_gethint)(VIRT void *addr) {
 		return NULL;
 	return (void *)(uintptr_t)(word & P32_PAGE_FHINT);
 }
-#else /* CONFIG_USE_NEW_PAGING */
-INTERN NOBLOCK WUNUSED void *
-NOTHROW(FCALL p32_pagedir_gethint)(VIRT vm_vpage_t virt_page) {
-	u32 word;
-	unsigned int vec2, vec1;
-	vec2 = P32_PDIR_VEC2INDEX_VPAGE(virt_page);
-	word = P32_PDIR_E2_IDENTITY[vec2].p_word;
-	if unlikely(!(word & P32_PAGE_FPRESENT))
-		return NULL; /* Not mapped */
-	if unlikely(word & P32_PAGE_F4MIB)
-		return NULL; /* 4MiB page */
-	vec1 = P32_PDIR_VEC1INDEX_VPAGE(virt_page);
-	word = ATOMIC_READ(P32_PDIR_E1_IDENTITY[vec2][vec1].p_word);
-	if unlikely(!P32_PDIR_E1_ISHINT(word))
-		return NULL;
-	return (void *)(uintptr_t)(word & P32_PAGE_FHINT);
-}
-#endif /* !CONFIG_USE_NEW_PAGING */
 
 /* Create/delete a page-directory mapping.
  * @param: perm: A set of `PAGEDIR_MAP_F*' detailing how memory should be mapped. */
-#ifdef CONFIG_USE_NEW_PAGING
 INTERN NOBLOCK void
 NOTHROW(FCALL p32_npagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                    PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
@@ -1013,40 +781,6 @@ NOTHROW(FCALL p32_npagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 		e1_word += 4096;
 	}
 }
-#else /* CONFIG_USE_NEW_PAGING */
-INTERN NOBLOCK void
-NOTHROW(FCALL p32_pagedir_mapone)(VIRT vm_vpage_t virt_page,
-                                  PHYS pageptr_t phys_page, u16 perm) {
-	u32 e1_word;
-	unsigned int vec2, vec1;
-	e1_word = p32_pagedir_encode_4kib(virt_page, phys_page, perm);
-	vec2 = P32_PDIR_VEC2INDEX_VPAGE(virt_page);
-	vec1 = P32_PDIR_VEC1INDEX_VPAGE(virt_page);
-	p32_pagedir_set_e1_word(vec2, vec1, e1_word);
-}
-
-INTERN NOBLOCK void
-NOTHROW(FCALL p32_pagedir_map)(VIRT vm_vpage_t virt_page, size_t num_pages,
-                               PHYS pageptr_t phys_page, u16 perm) {
-	size_t i;
-	u32 e1_word;
-	assertf(virt_page <= __ARCH_PAGEID_MAX, "Invalid page range %I64p...%I64p",
-	        (u64)virt_page, (u64)virt_page + num_pages - 1);
-	assertf(virt_page + num_pages >= virt_page, "Invalid page %I64p...%I64p",
-	        (u64)virt_page, (u64)virt_page + num_pages - 1);
-	assertf(virt_page + num_pages <= __ARCH_PAGEID_MAX, "Invalid page %I64p...%I64ps",
-	        (u64)virt_page, (u64)virt_page + num_pages - 1);
-	e1_word = p32_pagedir_encode_4kib(virt_page, phys_page, perm);
-	for (i = 0; i < num_pages; ++i) {
-		unsigned int vec2, vec1;
-		vm_vpage_t effective_virt_page = virt_page + i;
-		vec2 = P32_PDIR_VEC2INDEX_VPAGE(effective_virt_page);
-		vec1 = P32_PDIR_VEC1INDEX_VPAGE(effective_virt_page);
-		p32_pagedir_set_e1_word(vec2, vec1, e1_word);
-		e1_word += 4096;
-	}
-}
-#endif /* !CONFIG_USE_NEW_PAGING */
 
 /* Special variants of `pagedir_mapone()' that should be used to
  * temporary override the mapping of a single, prepared page.
@@ -1055,7 +789,6 @@ NOTHROW(FCALL p32_pagedir_map)(VIRT vm_vpage_t virt_page, size_t num_pages,
  * operation in the sense that the data is entirely thread-private, while modifications
  * do not require any kind of lock.
  * NOTE: If the page had been mapped, `pagedir_pop_mapone()' will automatically sync the page. */
-#ifdef CONFIG_USE_NEW_PAGING
 INTERN NOBLOCK WUNUSED p32_pagedir_pushval_t
 NOTHROW(FCALL p32_npagedir_push_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                         PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
@@ -1081,34 +814,8 @@ NOTHROW(FCALL p32_npagedir_pop_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	if (old_word & P32_PAGE_FPRESENT)
 		npagedir_syncone(addr); /* The old mapping was also present (explicitly refresh the page). */
 }
-#else /* CONFIG_USE_NEW_PAGING */
-INTERN NOBLOCK WUNUSED p32_pagedir_pushval_t
-NOTHROW(FCALL p32_pagedir_push_mapone)(VIRT vm_vpage_t virt_page,
-                                       PHYS pageptr_t phys_page, u16 perm) {
-	u32 e1_word, result;
-	unsigned int vec2, vec1;
-	e1_word = p32_pagedir_encode_4kib(virt_page, phys_page, perm);
-	vec2 = P32_PDIR_VEC2INDEX_VPAGE(virt_page);
-	vec1 = P32_PDIR_VEC1INDEX_VPAGE(virt_page);
-	result = p32_pagedir_xch_e1_word(vec2, vec1, e1_word);
-	return result;
-}
-
-INTERN NOBLOCK void
-NOTHROW(FCALL p32_pagedir_pop_mapone)(VIRT vm_vpage_t virt_page,
-                                      p32_pagedir_pushval_t backup) {
-	u32 old_word;
-	unsigned int vec2, vec1;
-	vec2 = P32_PDIR_VEC2INDEX_VPAGE(virt_page);
-	vec1 = P32_PDIR_VEC1INDEX_VPAGE(virt_page);
-	old_word = p32_pagedir_xch_e1_word(vec2, vec1, (u32)backup);
-	if (old_word & P32_PAGE_FPRESENT)
-		pagedir_syncone(virt_page); /* The old mapping was also present (explicitly refresh the page). */
-}
-#endif /* !CONFIG_USE_NEW_PAGING */
 
 /* Unmap pages from the given address range. (requires that the given area be prepared) */
-#ifdef CONFIG_USE_NEW_PAGING
 INTERN NOBLOCK void
 NOTHROW(FCALL p32_npagedir_unmapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec2, vec1;
@@ -1138,38 +845,8 @@ NOTHROW(FCALL p32_npagedir_unmap)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 		                        P32_PAGE_FPREPARED);
 	}
 }
-#else /* CONFIG_USE_NEW_PAGING */
-INTERN NOBLOCK void
-NOTHROW(FCALL p32_pagedir_unmapone)(VIRT vm_vpage_t virt_page) {
-	unsigned int vec2, vec1;
-	vec2 = P32_PDIR_VEC2INDEX_VPAGE(virt_page);
-	vec1 = P32_PDIR_VEC1INDEX_VPAGE(virt_page);
-	p32_pagedir_set_e1_word(vec2, vec1,
-	                        P32_PAGE_ABSENT | P32_PAGE_FPREPARED);
-}
-
-INTERN NOBLOCK void
-NOTHROW(FCALL p32_pagedir_unmap)(VIRT vm_vpage_t virt_page, size_t num_pages) {
-	size_t i;
-	assertf(virt_page <= __ARCH_PAGEID_MAX, "Invalid page range %I64p...%I64p",
-	        (u64)virt_page, (u64)virt_page + num_pages - 1);
-	assertf(virt_page + num_pages >= virt_page, "Invalid page %I64p...%I64p",
-	        (u64)virt_page, (u64)virt_page + num_pages - 1);
-	assertf(virt_page + num_pages <= __ARCH_PAGEID_MAX, "Invalid page %I64p...%I64ps",
-	        (u64)virt_page, (u64)virt_page + num_pages - 1);
-	for (i = 0; i < num_pages; ++i) {
-		unsigned int vec2, vec1;
-		vm_vpage_t effective_virt_page = virt_page + i;
-		vec2 = P32_PDIR_VEC2INDEX_VPAGE(effective_virt_page);
-		vec1 = P32_PDIR_VEC1INDEX_VPAGE(effective_virt_page);
-		p32_pagedir_set_e1_word(vec2, vec1,
-		                        P32_PAGE_ABSENT | P32_PAGE_FPREPARED);
-	}
-}
-#endif /* !CONFIG_USE_NEW_PAGING */
 
 /* Remove write-permissions from the given address range. (requires that the given area be prepared) */
-#ifdef CONFIG_USE_NEW_PAGING
 INTERN NOBLOCK void
 NOTHROW(FCALL p32_npagedir_unwriteone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec2, vec1;
@@ -1195,33 +872,6 @@ NOTHROW(FCALL p32_npagedir_unwrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 		p32_pagedir_andl_e1_word(vec2, vec1, ~P32_PAGE_FWRITE);
 	}
 }
-#else /* CONFIG_USE_NEW_PAGING */
-INTERN NOBLOCK void
-NOTHROW(FCALL p32_pagedir_unwriteone)(VIRT vm_vpage_t virt_page) {
-	unsigned int vec2, vec1;
-	vec2 = P32_PDIR_VEC2INDEX_VPAGE(virt_page);
-	vec1 = P32_PDIR_VEC1INDEX_VPAGE(virt_page);
-	p32_pagedir_andl_e1_word(vec2, vec1, ~P32_PAGE_FWRITE);
-}
-
-INTERN NOBLOCK void
-NOTHROW(FCALL p32_pagedir_unwrite)(VIRT vm_vpage_t virt_page, size_t num_pages) {
-	size_t i;
-	assertf(virt_page <= __ARCH_PAGEID_MAX, "Invalid page range %I64p...%I64p",
-	        (u64)virt_page, (u64)virt_page + num_pages - 1);
-	assertf(virt_page + num_pages >= virt_page, "Invalid page %I64p...%I64p",
-	        (u64)virt_page, (u64)virt_page + num_pages - 1);
-	assertf(virt_page + num_pages <= __ARCH_PAGEID_MAX, "Invalid page %I64p...%I64ps",
-	        (u64)virt_page, (u64)virt_page + num_pages - 1);
-	for (i = 0; i < num_pages; ++i) {
-		unsigned int vec2, vec1;
-		vm_vpage_t effective_virt_page = virt_page + i;
-		vec2 = P32_PDIR_VEC2INDEX_VPAGE(effective_virt_page);
-		vec1 = P32_PDIR_VEC1INDEX_VPAGE(effective_virt_page);
-		p32_pagedir_andl_e1_word(vec2, vec1, ~P32_PAGE_FWRITE);
-	}
-}
-#endif /* !CONFIG_USE_NEW_PAGING */
 
 /* Unmap the entirety of user-space.
  * NOTE: Unlike all other unmap() functions, this one guaranties that it
@@ -1307,7 +957,6 @@ NOTHROW(FCALL p32_pagedir_translate)(VIRT void *addr) {
 }
 
 /* Check if the given page is mapped. */
-#ifdef CONFIG_USE_NEW_PAGING
 INTERN NOBLOCK WUNUSED bool
 NOTHROW(FCALL p32_npagedir_ismapped)(VIRT void *addr) {
 	u32 word;
@@ -1411,111 +1060,6 @@ NOTHROW(FCALL p32_npagedir_unsetchanged)(VIRT void *addr) {
 	} while (!ATOMIC_CMPXCH_WEAK(P32_PDIR_E1_IDENTITY[vec2][vec1].p_word,
 	                             word, word & ~P32_PAGE_FDIRTY));
 }
-#else /* CONFIG_USE_NEW_PAGING */
-INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p32_pagedir_ismapped)(VIRT vm_vpage_t vpage) {
-	u32 word;
-	unsigned int vec2, vec1;
-	vec2 = P32_PDIR_VEC2INDEX_VPAGE(vpage);
-	word = P32_PDIR_E2_IDENTITY[vec2].p_word;
-	if (!(word & P32_PAGE_FPRESENT))
-		return false;
-	if unlikely(word & P32_PAGE_F4MIB)
-		return true;
-	vec1 = P32_PDIR_VEC1INDEX_VPAGE(vpage);
-	word = P32_PDIR_E1_IDENTITY[vec2][vec1].p_word;
-	return (word & P32_PAGE_FPRESENT) != 0;
-}
-
-INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p32_pagedir_iswritable)(VIRT vm_vpage_t vpage) {
-	u32 word;
-	unsigned int vec2, vec1;
-	vec2 = P32_PDIR_VEC2INDEX_VPAGE(vpage);
-	word = P32_PDIR_E2_IDENTITY[vec2].p_word;
-	if (!(word & P32_PAGE_FPRESENT))
-		return false;
-	if unlikely(word & P32_PAGE_F4MIB)
-		return (word & P32_PAGE_FWRITE) != 0;
-	vec1 = P32_PDIR_VEC1INDEX_VPAGE(vpage);
-	word = P32_PDIR_E1_IDENTITY[vec2][vec1].p_word;
-	return (word & (P32_PAGE_FWRITE | P32_PAGE_FPRESENT)) ==
-	       /*   */ (P32_PAGE_FWRITE | P32_PAGE_FPRESENT);
-}
-
-INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p32_pagedir_isuseraccessible)(VIRT vm_vpage_t vpage) {
-	u32 word;
-	unsigned int vec2, vec1;
-	vec2 = P32_PDIR_VEC2INDEX_VPAGE(vpage);
-	word = P32_PDIR_E2_IDENTITY[vec2].p_word;
-	if (!(word & P32_PAGE_FPRESENT))
-		return false;
-	if unlikely(word & P32_PAGE_F4MIB)
-		return (word & P32_PAGE_FUSER) != 0;
-	vec1 = P32_PDIR_VEC1INDEX_VPAGE(vpage);
-	word = P32_PDIR_E1_IDENTITY[vec2][vec1].p_word;
-	return (word & (P32_PAGE_FUSER | P32_PAGE_FPRESENT)) ==
-	       /*   */ (P32_PAGE_FUSER | P32_PAGE_FPRESENT);
-}
-
-INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p32_pagedir_isuserwritable)(VIRT vm_vpage_t vpage) {
-	u32 word;
-	unsigned int vec2, vec1;
-	vec2 = P32_PDIR_VEC2INDEX_VPAGE(vpage);
-	word = P32_PDIR_E2_IDENTITY[vec2].p_word;
-	if (!(word & P32_PAGE_FPRESENT))
-		return false;
-	if unlikely(word & P32_PAGE_F4MIB)
-		return (word & (P32_PAGE_FUSER | P32_PAGE_FWRITE)) ==
-		       /*   */ (P32_PAGE_FUSER | P32_PAGE_FWRITE);
-	vec1 = P32_PDIR_VEC1INDEX_VPAGE(vpage);
-	word = P32_PDIR_E1_IDENTITY[vec2][vec1].p_word;
-	return (word & (P32_PAGE_FUSER | P32_PAGE_FPRESENT | P32_PAGE_FWRITE)) ==
-	       /*   */ (P32_PAGE_FUSER | P32_PAGE_FPRESENT | P32_PAGE_FWRITE);
-}
-
-INTERN NOBLOCK WUNUSED bool
-NOTHROW(FCALL p32_pagedir_haschanged)(VIRT vm_vpage_t vpage) {
-	u32 word;
-	unsigned int vec2, vec1;
-	/* TODO: Figure out a better design for this function
-	 *       The current system is written under the assumption that 4MiB pages don't exist... */
-	vec2 = P32_PDIR_VEC2INDEX_VPAGE(vpage);
-	word = P32_PDIR_E2_IDENTITY[vec2].p_word;
-	if (!(word & P32_PAGE_FPRESENT))
-		return false;
-	if unlikely(word & P32_PAGE_F4MIB)
-		return true; /* 4MiB pages aren't supported for this purpose */
-	vec1 = P32_PDIR_VEC1INDEX_VPAGE(vpage);
-	word = P32_PDIR_E1_IDENTITY[vec2][vec1].p_word;
-	return (word & (P32_PAGE_FDIRTY | P32_PAGE_FPRESENT)) ==
-	       /*   */ (P32_PAGE_FDIRTY | P32_PAGE_FPRESENT);
-}
-
-INTERN NOBLOCK void
-NOTHROW(FCALL p32_pagedir_unsetchanged)(VIRT vm_vpage_t vpage) {
-	u32 word;
-	unsigned int vec2, vec1;
-	/* TODO: Figure out a better design for this function
-	 *       The current system is written under the assumption that 4MiB pages don't exist... */
-	vec2 = P32_PDIR_VEC2INDEX_VPAGE(vpage);
-	word = P32_PDIR_E2_IDENTITY[vec2].p_word;
-	if (!(word & P32_PAGE_FPRESENT))
-		return;
-	if unlikely(word & P32_PAGE_F4MIB)
-		return; /* 4MiB pages aren't supported for this purpose */
-	vec1 = P32_PDIR_VEC1INDEX_VPAGE(vpage);
-	do {
-		word = ATOMIC_READ(P32_PDIR_E1_IDENTITY[vec2][vec1].p_word);
-		if unlikely((word & (P32_PAGE_FPRESENT | P32_PAGE_FDIRTY)) ==
-		            /*   */ (P32_PAGE_FPRESENT | P32_PAGE_FDIRTY))
-			return;
-	} while (!ATOMIC_CMPXCH_WEAK(P32_PDIR_E1_IDENTITY[vec2][vec1].p_word,
-	                             word, word & ~P32_PAGE_FDIRTY));
-}
-#endif /* !CONFIG_USE_NEW_PAGING */
 
 
 #if 0 /* TODO */

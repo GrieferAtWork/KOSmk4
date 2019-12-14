@@ -119,10 +119,10 @@ __FORCELOCAL __ATTR_NORETURN void (__fastfail)(unsigned int __Code) {
 #define __writeeflags(Value) __wrflags(Value)
 __FORCELOCAL __ATTR_WUNUSED __REGISTER_TYPE__ (__readdr)(unsigned int __N) {
 	switch (__N) {
-	case 0: return __rddr0();
-	case 1: return __rddr1();
-	case 2: return __rddr2();
-	case 3: return __rddr3();
+	case 0: return (__REGISTER_TYPE__)__rddr0();
+	case 1: return (__REGISTER_TYPE__)__rddr1();
+	case 2: return (__REGISTER_TYPE__)__rddr2();
+	case 3: return (__REGISTER_TYPE__)__rddr3();
 	case 6: return __rddr6();
 	case 7: return __rddr7();
 	default: __builtin_unreachable();
@@ -130,10 +130,10 @@ __FORCELOCAL __ATTR_WUNUSED __REGISTER_TYPE__ (__readdr)(unsigned int __N) {
 }
 __FORCELOCAL void (__writedr)(unsigned int __N, __REGISTER_TYPE__ __Val) {
 	switch (__N) {
-	case 0: __wrdr0(__Val); break;
-	case 1: __wrdr1(__Val); break;
-	case 2: __wrdr2(__Val); break;
-	case 3: __wrdr3(__Val); break;
+	case 0: __wrdr0((void *)__Val); break;
+	case 1: __wrdr1((void *)__Val); break;
+	case 2: __wrdr2((void *)__Val); break;
+	case 3: __wrdr3((void *)__Val); break;
 	case 6: __wrdr6(__Val); break;
 	case 7: __wrdr7(__Val); break;
 	default: __builtin_unreachable();
