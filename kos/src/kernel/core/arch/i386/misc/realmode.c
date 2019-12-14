@@ -60,7 +60,7 @@ STATIC_ASSERT(sizeof(struct rmcpustate) == SIZEOF_RMCPUSTATE);
 
 #ifdef CONFIG_USE_LIBVM86_FOR_REALMODE
 
-//INTERN ATTR_FREEBSS vm_ppage_t x86_realmode_page;
+//INTERN ATTR_FREEBSS pageptr_t x86_realmode_page;
 INTERN ATTR_FREEBSS u16 x86_realmode_segment;
 INTERN ATTR_FREEBSS byte_t *x86_realmode_buffer_addr;
 INTERN uintptr_t x86_realmode_base = 0;
@@ -186,7 +186,7 @@ NOTHROW(KCALL x86_realmode_finalize)(void) {
 
 #else /* CONFIG_USE_LIBVM86_FOR_REALMODE */
 
-//INTERN ATTR_FREEBSS vm_ppage_t x86_realmode_page;
+//INTERN ATTR_FREEBSS pageptr_t x86_realmode_page;
 INTERN ATTR_FREEBSS u16 x86_realmode_segment;
 INTERN ATTR_FREEBSS byte_t *x86_realmode_buffer_addr;
 INTDEF uintptr_t x86_realmode_base;

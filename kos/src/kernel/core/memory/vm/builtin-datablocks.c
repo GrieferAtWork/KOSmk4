@@ -203,7 +203,7 @@ NOTHROW(KCALL vm_datablock_physical_initpart)(struct vm_datapart *__restrict sel
 	self->dp_state = VM_DATAPART_STATE_LOCKED;
 	self->dp_flags |= (VM_DATAPART_FLAG_LOCKED | VM_DATAPART_FLAG_KEEPRAM);
 	self->dp_ramdata.rd_blockv          = &self->dp_ramdata.rd_block0;
-	self->dp_ramdata.rd_block0.rb_start = (vm_ppage_t)self->dp_tree.a_vmin;
+	self->dp_ramdata.rd_block0.rb_start = (pageptr_t)self->dp_tree.a_vmin;
 	self->dp_ramdata.rd_block0.rb_size  = (size_t)(self->dp_tree.a_vmax - self->dp_tree.a_vmin) + 1;
 }
 
@@ -238,7 +238,7 @@ NOTHROW(KCALL vm_ramfile_initpart)(struct vm_datapart *__restrict self) {
 		self->dp_state = VM_DATAPART_STATE_LOCKED;
 		self->dp_flags |= (VM_DATAPART_FLAG_LOCKED | VM_DATAPART_FLAG_KEEPRAM);
 		self->dp_ramdata.rd_blockv          = &self->dp_ramdata.rd_block0;
-		self->dp_ramdata.rd_block0.rb_start = file->rf_data.rb_start + (vm_ppage_t)self->dp_tree.a_vmin;
+		self->dp_ramdata.rd_block0.rb_start = file->rf_data.rb_start + (pageptr_t)self->dp_tree.a_vmin;
 		self->dp_ramdata.rd_block0.rb_size  = (size_t)(self->dp_tree.a_vmax - self->dp_tree.a_vmin) + 1;
 	}
 }

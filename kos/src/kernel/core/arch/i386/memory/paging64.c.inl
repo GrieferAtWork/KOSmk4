@@ -1432,11 +1432,11 @@ NOTHROW(FCALL p64_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 #else /* CONFIG_USE_NEW_PAGING */
 LOCAL NOBLOCK u64
 NOTHROW(FCALL p64_pagedir_encode_4kib)(PHYS vm_vpage_t dest_page,
-                                       PHYS vm_ppage_t phys_page, u16 perm) {
+                                       PHYS pageptr_t phys_page, u16 perm) {
 	u64 result;
 	assertf(!(perm & ~PAGEDIR_MAP_FMASK),
 	        "Invalid page permissions: %#.4I16x", perm);
-	assertf(phys_page <= (vm_ppage_t)VM_ADDR2PAGE(UINT64_C(0x000ffffffffff000)),
+	assertf(phys_page <= (pageptr_t)VM_ADDR2PAGE(UINT64_C(0x000ffffffffff000)),
 	        "Page cannot be mapped: %p",
 	        (u64)VM_PPAGE2ADDR(phys_page));
 	result  = (u64)VM_PPAGE2ADDR(phys_page);
@@ -1625,7 +1625,7 @@ NOTHROW(FCALL p64_npagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 #else /* CONFIG_USE_NEW_PAGING */
 INTERN NOBLOCK void
 NOTHROW(FCALL p64_pagedir_mapone)(VIRT vm_vpage_t virt_page,
-                                  PHYS vm_ppage_t phys_page, u16 perm) {
+                                  PHYS pageptr_t phys_page, u16 perm) {
 	u64 e1_word;
 	unsigned int vec4, vec3, vec2, vec1;
 	e1_word = p64_pagedir_encode_4kib(virt_page, phys_page, perm);
@@ -1638,7 +1638,7 @@ NOTHROW(FCALL p64_pagedir_mapone)(VIRT vm_vpage_t virt_page,
 
 INTERN NOBLOCK void
 NOTHROW(FCALL p64_pagedir_map)(VIRT vm_vpage_t virt_page, size_t num_pages,
-                               PHYS vm_ppage_t phys_page, u16 perm) {
+                               PHYS pageptr_t phys_page, u16 perm) {
 	size_t i;
 	u64 e1_word;
 	assertf(virt_page <= VM_VPAGE_MAX, "Invalid page range %I64p...%I64p",
@@ -1701,7 +1701,7 @@ NOTHROW(FCALL p64_npagedir_pop_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 #else /* CONFIG_USE_NEW_PAGING */
 INTERN NOBLOCK WUNUSED pagedir_pushval_t
 NOTHROW(FCALL p64_pagedir_push_mapone)(VIRT vm_vpage_t virt_page,
-                                       PHYS vm_ppage_t phys_page, u16 perm) {
+                                       PHYS pageptr_t phys_page, u16 perm) {
 	u64 e1_word, result;
 	unsigned int vec4, vec3, vec2, vec1;
 	e1_word = p64_pagedir_encode_4kib(virt_page, phys_page, perm);

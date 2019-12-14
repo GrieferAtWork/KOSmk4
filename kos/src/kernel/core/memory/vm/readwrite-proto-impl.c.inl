@@ -237,7 +237,7 @@ do_unshare_cow:
 				} else {
 					struct vm_datapart *new_part;
 					uintptr_half_t prot;
-					vm_ppage_t old_ppage, new_ppage;
+					pageptr_t old_ppage, new_ppage;
 
 					/* Verify that the access being made is valid. */
 					if unlikely(!force_accessible && !(node->vn_prot & VM_PROT_WRITE))
@@ -497,7 +497,7 @@ endread_and_decref_part_and_set_readonly:
 #endif /* !IS_WRITING */
 			{
 				bool has_changed;
-				vm_ppage_t ppage;
+				pageptr_t ppage;
 				size_t page_remainder;
 				uintptr_t page_offset;
 #ifdef IS_WRITING

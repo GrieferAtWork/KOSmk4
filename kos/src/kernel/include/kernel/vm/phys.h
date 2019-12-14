@@ -181,14 +181,14 @@ FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copyfromphys_onepage_nopf)(USER C
 FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copytophys_onepage_nopf)(PHYS vm_phys_t dst, USER CHECKED void const *src, size_t num_bytes);
 
 /* Copy a whole page to/from physical memory. (s.a. `PAGESIZE') */
-FUNDEF void KCALL vm_copypagefromphys(USER CHECKED void *dst, PHYS vm_ppage_t src) THROWS(E_SEGFAULT);
-FUNDEF void KCALL vm_copypagetophys(PHYS vm_ppage_t dst, USER CHECKED void const *src) THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_copypageinphys)(PHYS vm_ppage_t dst, PHYS vm_ppage_t src);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_copypagesinphys)(PHYS vm_ppage_t dst, PHYS vm_ppage_t src, size_t num_pages);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphyspage)(PHYS vm_ppage_t dst, int byte);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphyspages)(PHYS vm_ppage_t dst, int byte, size_t num_pages);
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copypagefromphys_nopf)(USER CHECKED void *dst, PHYS vm_ppage_t src);
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copypagetophys_nopf)(PHYS vm_ppage_t dst, USER CHECKED void const *src);
+FUNDEF void KCALL vm_copypagefromphys(USER CHECKED void *dst, PHYS pageptr_t src) THROWS(E_SEGFAULT);
+FUNDEF void KCALL vm_copypagetophys(PHYS pageptr_t dst, USER CHECKED void const *src) THROWS(E_SEGFAULT);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_copypageinphys)(PHYS pageptr_t dst, PHYS pageptr_t src);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_copypagesinphys)(PHYS pageptr_t dst, PHYS pageptr_t src, size_t num_pages);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphyspage)(PHYS pageptr_t dst, int byte);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphyspages)(PHYS pageptr_t dst, int byte, size_t num_pages);
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copypagefromphys_nopf)(USER CHECKED void *dst, PHYS pageptr_t src);
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copypagetophys_nopf)(PHYS pageptr_t dst, USER CHECKED void const *src);
 
 /* A single page of virtual memory in the kernel VM, that is always
  * prepared for being used for whatever purposes a thread has in mind.
@@ -227,7 +227,7 @@ struct vm_ptram {
 
 LOCAL NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) byte_t *
 NOTHROW(KCALL vm_ptram_mappage_noidentity)(struct vm_ptram *__restrict self,
-                                           vm_ppage_t page, __BOOL writable DFL(true)) {
+                                           pageptr_t page, __BOOL writable DFL(true)) {
 	vm_vpage_t trampoline;
 	trampoline = THIS_TRAMPOLINE_PAGE;
 	if (self->pt_pushval == PAGEDIR_PUSHVAL_INVALID) {
@@ -246,7 +246,7 @@ NOTHROW(KCALL vm_ptram_mappage_noidentity)(struct vm_ptram *__restrict self,
 #ifndef NO_PHYS_IDENTITY
 LOCAL NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) byte_t *
 NOTHROW(KCALL vm_ptram_mappage)(struct vm_ptram *__restrict self,
-                                vm_ppage_t page, __BOOL writable DFL(true)) {
+                                pageptr_t page, __BOOL writable DFL(true)) {
 	if (PHYS_IS_IDENTITY_PAGE(page))
 		return (byte_t *)PHYS_TO_IDENTITY_PAGE(page);
 	return vm_ptram_mappage_noidentity(self, page, writable);

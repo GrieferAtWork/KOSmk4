@@ -98,7 +98,7 @@ NOTHROW(KCALL FUNC(physb))(PHYS vm_phys_t addr VALUE_ARG(u8)) {
 		DORW_AND_RETURN(8, addr);
 #endif /* !NO_PHYS_IDENTITY */
 	tramp    = THIS_TRAMPOLINE_PAGE;
-	backup = pagedir_push_mapone(tramp, (vm_ppage_t)VM_ADDR2PAGE(addr),
+	backup = pagedir_push_mapone(tramp, (pageptr_t)VM_ADDR2PAGE(addr),
 	                             USED_PAGEDIR_PROT);
 	pagedir_syncone(tramp);
 	/* Copy memory. */
@@ -118,7 +118,7 @@ NOTHROW(KCALL FUNC(physw))(PHYS vm_phys_t addr VALUE_ARG(u16)) {
 		DORW_AND_RETURN(16, PHYS_TO_IDENTITY(addr));
 #endif /* !NO_PHYS_IDENTITY */
 	tramp    = THIS_TRAMPOLINE_PAGE;
-	backup = pagedir_push_mapone(tramp, (vm_ppage_t)VM_ADDR2PAGE(addr),
+	backup = pagedir_push_mapone(tramp, (pageptr_t)VM_ADDR2PAGE(addr),
 	                             USED_PAGEDIR_PROT);
 	pagedir_syncone(tramp);
 #ifdef DEFINE_PHYS_UNALIGNED
@@ -130,7 +130,7 @@ NOTHROW(KCALL FUNC(physw))(PHYS vm_phys_t addr VALUE_ARG(u16)) {
 		} buf;
 		IFWR(buf.word = value);
 		TRANSFER_RW(buf.bytes[0], *(u8 *)(VM_PAGE2ADDR(tramp) + PAGEMASK));
-		pagedir_mapone(tramp, (vm_ppage_t)VM_ADDR2PAGE(addr + 1), USED_PAGEDIR_PROT);
+		pagedir_mapone(tramp, (pageptr_t)VM_ADDR2PAGE(addr + 1), USED_PAGEDIR_PROT);
 		pagedir_syncone(tramp);
 		TRANSFER_RW(buf.bytes[1], *(u8 *)VM_PAGE2ADDR(tramp));
 		IFRD(result = buf.word);
@@ -157,7 +157,7 @@ NOTHROW(KCALL FUNC(physl))(PHYS vm_phys_t addr VALUE_ARG(u32)) {
 		DORW_AND_RETURN(32, PHYS_TO_IDENTITY(addr));
 #endif /* !NO_PHYS_IDENTITY */
 	tramp    = THIS_TRAMPOLINE_PAGE;
-	backup = pagedir_push_mapone(tramp, (vm_ppage_t)VM_ADDR2PAGE(addr),
+	backup = pagedir_push_mapone(tramp, (pageptr_t)VM_ADDR2PAGE(addr),
 	                             USED_PAGEDIR_PROT);
 	pagedir_syncone(tramp);
 #ifdef DEFINE_PHYS_UNALIGNED
@@ -175,14 +175,14 @@ NOTHROW(KCALL FUNC(physl))(PHYS vm_phys_t addr VALUE_ARG(u32)) {
 		IFWR(buf.dword = value);
 		if (bytes_in_first_page == 1) {
 			TRANSFER_RW(buf.bytes[0], *(u8 *)(VM_PAGE2ADDR(tramp) + PAGEMASK));
-			pagedir_mapone(tramp, (vm_ppage_t)VM_ADDR2PAGE(addr + 3), USED_PAGEDIR_PROT);
+			pagedir_mapone(tramp, (pageptr_t)VM_ADDR2PAGE(addr + 3), USED_PAGEDIR_PROT);
 			pagedir_syncone(tramp);
 			TRANSFER_RW(buf.bytes[1], *(u8 *)VM_PAGE2ADDR(tramp));
 			IFELSERW(buf.words[1] = UNALIGNED_GET16((u16 *)(VM_PAGE2ADDR(tramp) + 1)),
 			         UNALIGNED_SET16((u16 *)(VM_PAGE2ADDR(tramp) + 1), buf.words[1]));
 		} else if (bytes_in_first_page == 2) {
 			TRANSFER_RW(buf.words[0], *(u16 *)(VM_PAGE2ADDR(tramp) + (PAGESIZE - 2)));
-			pagedir_mapone(tramp, (vm_ppage_t)VM_ADDR2PAGE(addr + 3), USED_PAGEDIR_PROT);
+			pagedir_mapone(tramp, (pageptr_t)VM_ADDR2PAGE(addr + 3), USED_PAGEDIR_PROT);
 			pagedir_syncone(tramp);
 			TRANSFER_RW(buf.words[1], *(u16 *)VM_PAGE2ADDR(tramp));
 		} else {
@@ -190,7 +190,7 @@ NOTHROW(KCALL FUNC(physl))(PHYS vm_phys_t addr VALUE_ARG(u32)) {
 			IFELSERW(buf.words[0] = UNALIGNED_GET16((u16 *)(VM_PAGE2ADDR(tramp) + (PAGESIZE - 3))),
 			         UNALIGNED_SET16((u16 *)(VM_PAGE2ADDR(tramp) + (PAGESIZE - 3)), buf.words[0]));
 			TRANSFER_RW(buf.bytes[2], *(u8 *)(VM_PAGE2ADDR(tramp) + PAGEMASK));
-			pagedir_mapone(tramp, (vm_ppage_t)VM_ADDR2PAGE(addr + 3), USED_PAGEDIR_PROT);
+			pagedir_mapone(tramp, (pageptr_t)VM_ADDR2PAGE(addr + 3), USED_PAGEDIR_PROT);
 			pagedir_syncone(tramp);
 			TRANSFER_RW(buf.bytes[3], *(u8 *)VM_PAGE2ADDR(tramp));
 		}
@@ -218,7 +218,7 @@ NOTHROW(KCALL FUNC(physq))(PHYS vm_phys_t addr VALUE_ARG(u64)) {
 		DORW_AND_RETURN(64, PHYS_TO_IDENTITY(addr));
 #endif /* !NO_PHYS_IDENTITY */
 	tramp    = THIS_TRAMPOLINE_PAGE;
-	backup = pagedir_push_mapone(tramp, (vm_ppage_t)VM_ADDR2PAGE(addr),
+	backup = pagedir_push_mapone(tramp, (pageptr_t)VM_ADDR2PAGE(addr),
 	                             USED_PAGEDIR_PROT);
 	pagedir_syncone(tramp);
 #ifdef DEFINE_PHYS_UNALIGNED
@@ -238,7 +238,7 @@ NOTHROW(KCALL FUNC(physq))(PHYS vm_phys_t addr VALUE_ARG(u64)) {
 		IFWR(buf.qword = value);
 		IFELSERW(memcpy(buf.bytes, (void *)(VM_PAGE2ADDR(tramp) + offset), bytes_in_first_page),
 		         memcpy((void *)(VM_PAGE2ADDR(tramp) + offset), buf.bytes, bytes_in_first_page));
-		pagedir_mapone(tramp, (vm_ppage_t)VM_ADDR2PAGE(addr + 7), USED_PAGEDIR_PROT);
+		pagedir_mapone(tramp, (pageptr_t)VM_ADDR2PAGE(addr + 7), USED_PAGEDIR_PROT);
 		pagedir_syncone(tramp);
 		IFELSERW(memcpy(buf.bytes + bytes_in_first_page, (void *)VM_PAGE2ADDR(tramp), 8 - bytes_in_first_page),
 		         memcpy((void *)VM_PAGE2ADDR(tramp), buf.bytes + bytes_in_first_page, 8 - bytes_in_first_page));

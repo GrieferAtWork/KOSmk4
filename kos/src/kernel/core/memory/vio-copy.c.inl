@@ -58,9 +58,9 @@ vio_copytovio_from_phys(struct vio_args *__restrict args,
 #define PHYS_BUF   src
 #endif
 		for (;;) {
-			vm_ppage_t pageaddr;
+			pageptr_t pageaddr;
 			size_t page_bytes;
-			pageaddr   = (vm_ppage_t)VM_ADDR2PAGE(PHYS_BUF);
+			pageaddr   = (pageptr_t)VM_ADDR2PAGE(PHYS_BUF);
 			page_bytes = PAGESIZE - (PHYS_BUF & PAGEMASK);
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;

@@ -72,7 +72,7 @@ INTDEF byte_t __x86_kernel_ld_elf_startpage[];
 INTDEF byte_t __x86_kernel_ld_elf_numpages[];
 
 INTERN struct vm_ramfile kernel_ld_elf_ramfile =
-	VM_RAMFILE_INIT((vm_ppage_t)__x86_kernel_ld_elf_startpage - KERNEL_BASE_PAGE,
+	VM_RAMFILE_INIT((pageptr_t)__x86_kernel_ld_elf_startpage - KERNEL_BASE_PAGE,
 	                (size_t)__x86_kernel_ld_elf_numpages);
 
 
@@ -151,7 +151,7 @@ create_bss_overlap_node(struct regular_node *__restrict exec_node,
                         size_t bss_num_bytes) {
 	struct vm_node *result_node;
 	struct vm_datapart *result_part;
-	vm_ppage_t overlap_page;
+	pageptr_t overlap_page;
 	result_node = (struct vm_node *)kmalloc(sizeof(struct vm_node),
 	                                        GFP_LOCKED | GFP_PREFLT);
 	TRY {

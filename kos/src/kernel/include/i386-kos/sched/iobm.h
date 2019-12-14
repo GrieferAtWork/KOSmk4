@@ -39,7 +39,7 @@ typedef unsigned int gfp_t;
 struct ioperm_bitmap {
 	WEAK refcnt_t ib_refcnt; /* Reference counter (when > 1, the bitmap becomes read-only/copy-on-write) */
 	WEAK refcnt_t ib_share;  /* Reference counter for how many threads share this I/O permissions bitmap. */
-	vm_ppage_t    ib_pages;  /* [owned(page_free(., 2))][const] First physical page containing io permission bits. */
+	pageptr_t    ib_pages;  /* [owned(page_free(., 2))][const] First physical page containing io permission bits. */
 };
 
 /* An empty I/O permissions map (that also musn't ever be modified) */

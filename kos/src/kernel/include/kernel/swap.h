@@ -48,8 +48,8 @@ FUNDEF NOBLOCK void NOTHROW(KCALL swap_free)(swapptr_t start, pagecnt_t num_page
  * NOTE: By default, swap reads/writes are performed using DMA, which
  *       is why operations must be followed by a call to `swap_sync()'
  *       in order to ensure completion. */
-FUNDEF void (KCALL swap_read)(swapptr_t start, vm_ppage_t buffer, pagecnt_t num_pages);
-FUNDEF void (KCALL swap_write)(swapptr_t start, vm_ppage_t buffer, pagecnt_t num_pages);
+FUNDEF void (KCALL swap_read)(swapptr_t start, pageptr_t buffer, pagecnt_t num_pages);
+FUNDEF void (KCALL swap_write)(swapptr_t start, pageptr_t buffer, pagecnt_t num_pages);
 
 /* Wait for all out-standing swap reads/writes to be completed.
  * @throw: E_IOERROR: The swap back-end has issued an I/O error. */

@@ -281,13 +281,13 @@ INTDEF struct vm_node kernel_vm_node_pagedata;
 INTDEF byte_t __kernel_start[];
 #endif
 
-PRIVATE ATTR_FREETEXT PHYS vm_ppage_t KCALL
+PRIVATE ATTR_FREETEXT PHYS pageptr_t KCALL
 minfo_allocate_part_pagedata(size_t num_bytes) {
 	/* Q: Huh? Candy? What are you talking about
 	 * A: Candy -> Candi -> Candidate */
 	size_t i, candy_bank = (size_t)-1;
-	vm_ppage_t candy        = (vm_ppage_t)-1;
-	vm_ppage_t candy_weight = (vm_ppage_t)-1;
+	pageptr_t candy        = (pageptr_t)-1;
+	pageptr_t candy_weight = (pageptr_t)-1;
 #if defined(__i386__) || defined(__x86_64__)
 	bool allow_beneath_kernel = false;
 again:
@@ -295,14 +295,14 @@ again:
 	assert(minfo.mb_banks == kernel_membanks_initial);
 	for (i = 0; i < minfo.mb_bankc; ++i) {
 		vm_phys_t bytes_avail;
-		vm_ppage_t waste;
-		vm_ppage_t bank_alloc_page;
+		pageptr_t waste;
+		pageptr_t bank_alloc_page;
 		if (kernel_membanks_initial[i].mb_type != PMEMBANK_TYPE_RAM)
 			continue; /* Not suitable for our purposes */
 		bytes_avail = PMEMBANK_TYPE_SIZE(kernel_membanks_initial[i]);
 		if unlikely(bytes_avail < (vm_phys_t)num_bytes)
 			continue; /* Too small in general (even without alignment) */
-		bank_alloc_page = (vm_ppage_t)((PMEMBANK_TYPE_END(kernel_membanks_initial[i]) - num_bytes) / PAGESIZE);
+		bank_alloc_page = (pageptr_t)((PMEMBANK_TYPE_END(kernel_membanks_initial[i]) - num_bytes) / PAGESIZE);
 		if unlikely(bank_alloc_page < PMEMBANK_TYPE_STARTPAGE(kernel_membanks_initial[i]))
 			continue; /* Too small with alignment */
 #if defined(__i386__) || defined(__x86_64__)
@@ -310,7 +310,7 @@ again:
 		 * which is already in short supply, and which we'll still be needing for
 		 * initialization of APIC/SMP trampoline code, or other real-mode/BIOS related
 		 * stuff that can only exist below the physical 1MiB (16-bit 0xffff) mark. */
-		if unlikely(bank_alloc_page <= (vm_ppage_t)VM_ADDR2PAGE((uintptr_t)__kernel_start - KERNEL_BASE) &&
+		if unlikely(bank_alloc_page <= (pageptr_t)VM_ADDR2PAGE((uintptr_t)__kernel_start - KERNEL_BASE) &&
 		            !allow_beneath_kernel)
 			continue;
 #endif /* __i386__ || __x86_64__ */
@@ -323,14 +323,14 @@ again:
 			bank_alloc_addr &= ~PAGEMASK;
 			if (bank_alloc_addr < PMEMBANK_TYPE_START(kernel_membanks_initial[i]))
 				break; /* Bank doesn't cover the last possible mapping location. */
-			waste = (vm_ppage_t)-2; /* A lot of waste this way... */
+			waste = (pageptr_t)-2; /* A lot of waste this way... */
 		} else
 #endif
 		{
 			/* See how much memory we're wasting with this allocation. */
 			assert(PMEMBANK_TYPE_END(kernel_membanks_initial[i]) >=
 			       (VM_PPAGE2ADDR(bank_alloc_page) + num_bytes));
-			waste = (vm_ppage_t)(PMEMBANK_TYPE_END(kernel_membanks_initial[i]) -
+			waste = (pageptr_t)(PMEMBANK_TYPE_END(kernel_membanks_initial[i]) -
 			                     (VM_PPAGE2ADDR(bank_alloc_page) + num_bytes));
 #if 0
 			{

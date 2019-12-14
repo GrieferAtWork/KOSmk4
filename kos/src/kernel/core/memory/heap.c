@@ -156,7 +156,7 @@ NOTHROW(KCALL debug_pat_loadpart)(struct vm_datablock *__restrict UNUSED(self),
                                   vm_phys_t buffer, size_t num_data_pages) {
 	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
-	vm_ppage_t phys = VM_ADDR2PAGE(buffer);
+	pageptr_t phys = VM_ADDR2PAGE(buffer);
 	HEAP_ASSERT(num_data_pages != 0);
 	tramp  = THIS_TRAMPOLINE_PAGE;
 	backup = pagedir_push_mapone(tramp, phys,

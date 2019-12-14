@@ -1047,7 +1047,7 @@ NOTHROW(KCALL vm_datapart_do_copyram)(struct vm_datapart *__restrict dst,
 		} else {
 			/* SINGLE --> MULTIPLE */
 			size_t i;
-			vm_ppage_t src_page;
+			pageptr_t src_page;
 			struct vm_ramblock *dst_blocks;
 			src_page   = src->dp_ramdata.rd_block0.rb_start;
 			dst_blocks = dst->dp_ramdata.rd_blockv;
@@ -1066,7 +1066,7 @@ NOTHROW(KCALL vm_datapart_do_copyram)(struct vm_datapart *__restrict dst,
 	} else if (dst->dp_ramdata.rd_blockv == &dst->dp_ramdata.rd_block0) {
 		/* MULTIPLE --> SINGLE */
 		size_t i;
-		vm_ppage_t dst_page;
+		pageptr_t dst_page;
 		struct vm_ramblock *src_blocks;
 		dst_page   = dst->dp_ramdata.rd_block0.rb_start;
 		src_blocks = src->dp_ramdata.rd_blockv;
@@ -1415,10 +1415,10 @@ do_unshare_cow:
 /* Return the address of a physical page at the given `vpage_offset'
  * The caller must be holding a read- or write-lock on `self',
  * as well as guaranty that the part is either INCORE or LOCKED. */
-PUBLIC NOBLOCK NONNULL((1)) vm_ppage_t
+PUBLIC NOBLOCK NONNULL((1)) pageptr_t
 NOTHROW(KCALL vm_datapart_pageaddr)(struct vm_datapart *__restrict self,
                                     size_t vpage_offset) {
-	vm_ppage_t result;
+	pageptr_t result;
 	assertf(vpage_offset < vm_datapart_numvpages(self),
 	        "vpage_offset                = %Iu\n"
 	        "vm_datapart_numvpages(self) = %Iu\n",
@@ -1453,13 +1453,13 @@ NOTHROW(KCALL vm_datapart_pageaddr)(struct vm_datapart *__restrict self,
  * @param: pchanged: [OUT] Set to true if all associated data-pages are marked as changed.
  * @throw: * : Only throws whatever exception may get thrown by `dt_loadpart', meaning that
  *             when the loadpart function is NOEXCEPT, then so is this function! */
-PUBLIC NONNULL((1, 3)) vm_ppage_t KCALL
+PUBLIC NONNULL((1, 3)) pageptr_t KCALL
 vm_datapart_loadpage(struct vm_datapart *__restrict self,
                      size_t vpage_offset,
                      bool *__restrict pchanged)
 		THROWS(...) {
 	unsigned int page_shift;
-	vm_ppage_t result;
+	pageptr_t result;
 	uintptr_t page_state;
 	assert(sync_reading(self) || !isshared(self) ||
 	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));

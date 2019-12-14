@@ -91,7 +91,7 @@ _current_x86_dfstackpart ASMNAME("thiscpu_x86_dfstackpart") = {
 			.rd_blockv = &__x86_bootcpu_dfstack_part.dp_ramdata.rd_block0,
 			{
 				.rd_block0 = {
-					.rb_start = (vm_ppage_t)(uintptr_t)__x86_bootcpu_df_stackpage - KERNEL_BASE_PAGE,
+					.rb_start = (pageptr_t)(uintptr_t)__x86_bootcpu_df_stackpage - KERNEL_BASE_PAGE,
 					.rb_size  = CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE)
 				}
 			}

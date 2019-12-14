@@ -74,7 +74,7 @@ NOTHROW(KCALL swap_free)(swapptr_t start, pagecnt_t num_pages) {
  *       in order to ensure completion. */
 PUBLIC void KCALL
 swap_read(swapptr_t start,
-          vm_ppage_t buffer,
+          pageptr_t buffer,
           pagecnt_t num_pages) {
 	(void)start;
 	(void)buffer;
@@ -84,7 +84,7 @@ swap_read(swapptr_t start,
 
 PUBLIC void KCALL
 swap_write(swapptr_t start,
-           vm_ppage_t buffer,
+           pageptr_t buffer,
            pagecnt_t num_pages) {
 	(void)start;
 	(void)buffer;

@@ -25,9 +25,9 @@
 #include <hybrid/typecore.h>
 
 #define __SIZEOF_VM_VPAGE_T__   __SIZEOF_POINTER__ /* DEPRECATED; REMOVE ME */
-#define __SIZEOF_VM_PPAGE_T__   __SIZEOF_POINTER__ /* DEPRECATED; REMOVE ME */
 #define __SIZEOF_VM_SPAGE_T__   __SIZEOF_POINTER__ /* DEPRECATED; REMOVE ME */
 #define __SIZEOF_VM_VIRT_T__    __SIZEOF_POINTER__ /* DEPRECATED; REMOVE ME */
+#define __SIZEOF_PAGEPTR_T__    __SIZEOF_POINTER__
 #define __SIZEOF_VM_PHYS_T__    8
 
 #ifdef __CC__
@@ -38,31 +38,31 @@ __SYSDECL_BEGIN
 #define ____le8_defined 1
 #ifdef __INTELLISENSE__
 #include <hybrid/__byteorder.h>
-typedef __intern::____intellisense_endianint<__ORDER_LITTLE_ENDIAN__,__UINT8_TYPE__> __le8;
-typedef __intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,__UINT8_TYPE__> __be8;
-typedef __intern::____intellisense_endianint<__ORDER_LITTLE_ENDIAN__,__UINT16_TYPE__> __le16;
-typedef __intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,__UINT16_TYPE__> __be16;
-typedef __intern::____intellisense_endianint<__ORDER_LITTLE_ENDIAN__,__UINT32_TYPE__> __le32;
-typedef __intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,__UINT32_TYPE__> __be32;
+typedef __intern::____intellisense_endianint<__ORDER_LITTLE_ENDIAN__, __UINT8_TYPE__> __le8;
+typedef __intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__, __UINT8_TYPE__> __be8;
+typedef __intern::____intellisense_endianint<__ORDER_LITTLE_ENDIAN__, __UINT16_TYPE__> __le16;
+typedef __intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__, __UINT16_TYPE__> __be16;
+typedef __intern::____intellisense_endianint<__ORDER_LITTLE_ENDIAN__, __UINT32_TYPE__> __le32;
+typedef __intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__, __UINT32_TYPE__> __be32;
 #ifdef __UINT64_TYPE__
-typedef __intern::____intellisense_endianint<__ORDER_LITTLE_ENDIAN__,__UINT64_TYPE__> __le64;
-typedef __intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,__UINT64_TYPE__> __be64;
+typedef __intern::____intellisense_endianint<__ORDER_LITTLE_ENDIAN__, __UINT64_TYPE__> __le64;
+typedef __intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__, __UINT64_TYPE__> __be64;
 #endif /* __UINT64_TYPE__ */
-#else
+#else /* __INTELLISENSE__ */
 
 #ifndef __bitwise__
 #ifdef __CHECKER__
-#   define __bitwise__ __attribute__((bitwise))
+#define __bitwise__ __attribute__((bitwise))
 #else /* __CHECKER__ */
-#   define __bitwise__
+#define __bitwise__
 #endif /* !__CHECKER__ */
 #endif /* !__bitwise__ */
 
 #ifndef __bitwise
 #ifdef __CHECK_ENDIAN__
-#   define __bitwise __bitwise__
+#define __bitwise __bitwise__
 #else /* __CHECK_ENDIAN__ */
-#   define __bitwise
+#define __bitwise
 #endif /* !__CHECK_ENDIAN__ */
 #endif /* !__bitwise */
 
@@ -76,8 +76,9 @@ typedef __bitwise __UINT32_TYPE__ __be32;
 typedef __bitwise __UINT64_TYPE__ __le64;
 typedef __bitwise __UINT64_TYPE__ __be64;
 #endif /* __UINT64_TYPE__ */
-#endif
+#endif /* !__INTELLISENSE__ */
 #endif /* !____le8_defined */
+
 #ifdef __KERNEL__
 #include <hybrid/__altint.h>
 __HYBRID_ALTINT_TYPEDEF(__ULONGPTR_TYPE__, __vm_vpage_t, false); /* Virtual memory page index (`virtual_address / PAGESIZE'). */ /* DEPRECATED; REMOVE ME */

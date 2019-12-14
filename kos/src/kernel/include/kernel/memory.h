@@ -33,39 +33,35 @@
 
 DECL_BEGIN
 
-#if defined(__INTELLISENSE__) && defined(__CC__)
+#if defined(__INTELLISENSE__) && defined(__CC__) && defined(__cplusplus)
+extern "C++" {
 vm_phys_t (page2addr)(pageptr_t pageptr);
 pageptr_t (addr2page)(vm_phys_t physaddr);
+pageptr_t (addr2page)(uintptr_t physaddr);
+}
 #define page2addr page2addr
 #define addr2page addr2page
-#else /* __INTELLISENSE__ && __CC__ */
+#else /* __INTELLISENSE__ && __CC__ && __cplusplus */
 #define page2addr(pageptr)  (__CCAST(vm_phys_t)(pageptr) * PAGESIZE)
 #define addr2page(physaddr) (__CCAST(pageptr_t)((physaddr) / PAGESIZE))
-#endif /* !__INTELLISENSE__ || !__CC__ */
+#endif /* !__INTELLISENSE__ || !__CC__ || !__cplusplus */
 
 #ifndef PAGEPTR_INVALID
 #define PAGEPTR_INVALID (__CCAST(pageptr_t)-1)
 #endif /* !PAGEPTR_INVALID */
 
 #define FORMAT_PAGEPTR_T FORMAT_VM_PPAGE_T
-#if __SIZEOF_VM_PPAGE_T__ >= 8
+#if __SIZEOF_PAGEPTR_T__ >= 8
 #define FORMAT_PAGECNT_T "%I64u"
-#else /* __SIZEOF_VM_PPAGE_T__ >= 8 */
+#else /* __SIZEOF_PAGEPTR_T__ >= 8 */
 #define FORMAT_PAGECNT_T "%Iu"
-#endif /* __SIZEOF_VM_PPAGE_T__ < 8 */
+#endif /* __SIZEOF_PAGEPTR_T__ < 8 */
 
 
 
 /* A page pointer is just like a normal physical pointer, but divided by PAGESIZE */
-#define __SIZEOF_PAGEPTR_T__ __SIZEOF_VM_PPAGE_T__
 #ifdef __CC__
-#if __SIZEOF_VM_PPAGE_T__ == 4
-typedef u32             pagecnt_t;
-#elif __SIZEOF_VM_PPAGE_T__ == 8
-typedef u64             pagecnt_t;
-#else
-typedef vm_ppage_t      pagecnt_t;
-#endif
+typedef size_t pagecnt_t;
 #endif /* __CC__ */
 
 
@@ -101,10 +97,10 @@ struct pmembank {
 #define PMEMBANK_TYPE_MAX(x)       ((&(x))[1].mb_start-1)
 #define PMEMBANK_TYPE_END(x)       ((&(x))[1].mb_start)
 #define PMEMBANK_TYPE_SIZE(x)      (PMEMBANK_TYPE_END(x) - PMEMBANK_TYPE_START(x))
-#define PMEMBANK_TYPE_STARTPAGE(x) ((vm_ppage_t)((PMEMBANK_TYPE_START(x) + (PAGESIZE-1)) / PAGESIZE))
-#define PMEMBANK_TYPE_MINPAGE(x)   ((vm_ppage_t)((PMEMBANK_TYPE_START(x) + (PAGESIZE-1)) / PAGESIZE))
-#define PMEMBANK_TYPE_MAXPAGE(x)   ((vm_ppage_t)((PMEMBANK_TYPE_END(x) / PAGESIZE) - 1))
-#define PMEMBANK_TYPE_ENDPAGE(x)   ((vm_ppage_t)(PMEMBANK_TYPE_END(x) / PAGESIZE))
+#define PMEMBANK_TYPE_STARTPAGE(x) ((pageptr_t)((PMEMBANK_TYPE_START(x) + (PAGESIZE-1)) / PAGESIZE))
+#define PMEMBANK_TYPE_MINPAGE(x)   ((pageptr_t)((PMEMBANK_TYPE_START(x) + (PAGESIZE-1)) / PAGESIZE))
+#define PMEMBANK_TYPE_MAXPAGE(x)   ((pageptr_t)((PMEMBANK_TYPE_END(x) / PAGESIZE) - 1))
+#define PMEMBANK_TYPE_ENDPAGE(x)   ((pageptr_t)(PMEMBANK_TYPE_END(x) / PAGESIZE))
 #define PMEMBANK_TYPE_NUMPAGES(x)  ((size_t)(PMEMBANK_TYPE_ENDPAGE(x) - PMEMBANK_TYPE_STARTPAGE(x)))
 
 struct pmeminfo {
@@ -269,6 +265,14 @@ NOTHROW(KCALL page_malloc_part_between)(pageptr_t min_page, pageptr_t max_page,
                                         pagecnt_t min_pages, pagecnt_t max_pages,
                                         pagecnt_t *__restrict res_pages);
 
+#if __SIZEOF_VM_PHYS_T__ > 4
+#define page_malloc32(num_pages)                           \
+	page_malloc_between(addr2page(__UINT32_C(0x00000000)), \
+	                    addr2page(__UINT32_C(0xffffffff)), \
+	                    num_pages)
+#else /* __SIZEOF_VM_PHYS_T__ > 4 */
+#define page_malloc32(num_pages) page_malloc(num_pages)
+#endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
 
 /* Free a given physical address range.
  * The caller is responsible to ensure that the given range has previously been allocated. */

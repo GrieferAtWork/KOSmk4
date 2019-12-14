@@ -72,9 +72,9 @@ vm_copyfromphys(USER CHECKED void *dst,
 	tramp    = THIS_TRAMPOLINE_PAGE;
 	TRY {
 		for (;;) {
-			vm_ppage_t pageaddr;
+			pageptr_t pageaddr;
 			size_t page_bytes;
-			pageaddr   = (vm_ppage_t)VM_ADDR2PAGE(src);
+			pageaddr   = (pageptr_t)VM_ADDR2PAGE(src);
 			page_bytes = PAGESIZE - (src & PAGEMASK);
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;
@@ -124,9 +124,9 @@ vm_copytophys(PHYS vm_phys_t dst,
 	tramp    = THIS_TRAMPOLINE_PAGE;
 	TRY {
 		for (;;) {
-			vm_ppage_t pageaddr;
+			pageptr_t pageaddr;
 			size_t page_bytes;
-			pageaddr   = (vm_ppage_t)VM_ADDR2PAGE(dst);
+			pageaddr   = (pageptr_t)VM_ADDR2PAGE(dst);
 			page_bytes = PAGESIZE - (dst & PAGEMASK);
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;
@@ -179,9 +179,9 @@ NOTHROW(KCALL vm_copyfromphys_nopf)(USER CHECKED void *dst,
 	tramp    = THIS_TRAMPOLINE_PAGE;
 	TRY {
 		for (;;) {
-			vm_ppage_t pageaddr;
+			pageptr_t pageaddr;
 			size_t page_bytes, copy_error;
-			pageaddr   = (vm_ppage_t)VM_ADDR2PAGE(src);
+			pageaddr   = (pageptr_t)VM_ADDR2PAGE(src);
 			page_bytes = PAGESIZE - (src & PAGEMASK);
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;
@@ -237,9 +237,9 @@ NOTHROW(KCALL vm_copytophys_nopf)(PHYS vm_phys_t dst,
 	tramp    = THIS_TRAMPOLINE_PAGE;
 	TRY {
 		for (;;) {
-			vm_ppage_t pageaddr;
+			pageptr_t pageaddr;
 			size_t page_bytes, copy_error;
-			pageaddr   = (vm_ppage_t)VM_ADDR2PAGE(dst);
+			pageaddr   = (pageptr_t)VM_ADDR2PAGE(dst);
 			page_bytes = PAGESIZE - (dst & PAGEMASK);
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;
@@ -356,9 +356,9 @@ NOTHROW(KCALL vm_memsetphys)(PHYS vm_phys_t dst, int byte, size_t num_bytes) {
 	is_first = true;
 	tramp    = THIS_TRAMPOLINE_PAGE;
 	for (;;) {
-		vm_ppage_t pageaddr;
+		pageptr_t pageaddr;
 		size_t page_bytes;
-		pageaddr   = (vm_ppage_t)VM_ADDR2PAGE(dst);
+		pageaddr   = (pageptr_t)VM_ADDR2PAGE(dst);
 		page_bytes = PAGESIZE - (dst & PAGEMASK);
 		if (page_bytes > num_bytes)
 			page_bytes = num_bytes;
@@ -409,7 +409,7 @@ vm_copyfromphys_onepage(USER CHECKED void *dst,
 #endif /* !NO_PHYS_IDENTITY */
 	tramp = THIS_TRAMPOLINE_PAGE;
 	TRY {
-		backup = pagedir_push_mapone(tramp, (vm_ppage_t)VM_ADDR2PAGE(src),
+		backup = pagedir_push_mapone(tramp, (pageptr_t)VM_ADDR2PAGE(src),
 		                             PAGEDIR_MAP_FREAD);
 		pagedir_syncone(tramp);
 		/* Copy memory. */
@@ -439,7 +439,7 @@ vm_copytophys_onepage(PHYS vm_phys_t dst,
 #endif /* !NO_PHYS_IDENTITY */
 	tramp = THIS_TRAMPOLINE_PAGE;
 	TRY {
-		backup = pagedir_push_mapone(tramp, (vm_ppage_t)VM_ADDR2PAGE(dst),
+		backup = pagedir_push_mapone(tramp, (pageptr_t)VM_ADDR2PAGE(dst),
 		                             PAGEDIR_MAP_FWRITE);
 		pagedir_syncone(tramp);
 		/* Copy memory. */
@@ -527,7 +527,7 @@ NOTHROW(KCALL vm_memsetphys_onepage)(PHYS vm_phys_t dst, int byte, size_t num_by
 	}
 #endif /* !NO_PHYS_IDENTITY */
 	tramp  = THIS_TRAMPOLINE_PAGE;
-	backup = pagedir_push_mapone(tramp, (vm_ppage_t)VM_ADDR2PAGE(dst),
+	backup = pagedir_push_mapone(tramp, (pageptr_t)VM_ADDR2PAGE(dst),
 	                             PAGEDIR_MAP_FWRITE);
 	pagedir_syncone(tramp);
 	/* Fill memory. */
@@ -549,7 +549,7 @@ NOTHROW(KCALL vm_copyfromphys_onepage_nopf)(USER CHECKED void *dst,
 		return memcpy_nopf(dst, PHYS_TO_IDENTITY(src), num_bytes);
 #endif /* !NO_PHYS_IDENTITY */
 	tramp = THIS_TRAMPOLINE_PAGE;
-	backup = pagedir_push_mapone(tramp, (vm_ppage_t)VM_ADDR2PAGE(src),
+	backup = pagedir_push_mapone(tramp, (pageptr_t)VM_ADDR2PAGE(src),
 	                             PAGEDIR_MAP_FREAD);
 	pagedir_syncone(tramp);
 	/* Copy memory. */
@@ -572,7 +572,7 @@ NOTHROW(KCALL vm_copytophys_onepage_nopf)(PHYS vm_phys_t dst,
 		return memcpy_nopf(PHYS_TO_IDENTITY(dst), src, num_bytes);
 #endif /* !NO_PHYS_IDENTITY */
 	tramp = THIS_TRAMPOLINE_PAGE;
-	backup = pagedir_push_mapone(tramp, (vm_ppage_t)VM_ADDR2PAGE(dst),
+	backup = pagedir_push_mapone(tramp, (pageptr_t)VM_ADDR2PAGE(dst),
 	                             PAGEDIR_MAP_FWRITE);
 	pagedir_syncone(tramp);
 	/* Copy memory. */
@@ -586,7 +586,7 @@ NOTHROW(KCALL vm_copytophys_onepage_nopf)(PHYS vm_phys_t dst,
 /* Copy a whole page to/from physical memory. */
 PUBLIC void KCALL
 vm_copypagefromphys(USER CHECKED void *dst,
-                    PHYS vm_ppage_t src)
+                    PHYS pageptr_t src)
 		THROWS(E_SEGFAULT) {
 	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
@@ -612,7 +612,7 @@ vm_copypagefromphys(USER CHECKED void *dst,
 }
 
 PUBLIC void KCALL
-vm_copypagetophys(PHYS vm_ppage_t dst,
+vm_copypagetophys(PHYS pageptr_t dst,
                   USER CHECKED void const *src)
 		THROWS(E_SEGFAULT) {
 	pagedir_pushval_t backup;
@@ -639,8 +639,8 @@ vm_copypagetophys(PHYS vm_ppage_t dst,
 }
 
 PUBLIC NOBLOCK void
-NOTHROW(KCALL vm_copypageinphys)(PHYS vm_ppage_t dst,
-                                 PHYS vm_ppage_t src) {
+NOTHROW(KCALL vm_copypageinphys)(PHYS pageptr_t dst,
+                                 PHYS pageptr_t src) {
 	size_t bufsize;
 	byte_t *buf;
 #ifndef NO_PHYS_IDENTITY
@@ -708,8 +708,8 @@ use_whole_page_buffer:
 }
 
 PUBLIC NOBLOCK void
-NOTHROW(KCALL vm_copypagesinphys)(PHYS vm_ppage_t dst,
-                                  PHYS vm_ppage_t src,
+NOTHROW(KCALL vm_copypagesinphys)(PHYS pageptr_t dst,
+                                  PHYS pageptr_t src,
                                   size_t num_pages) {
 	while (num_pages) {
 		vm_copypageinphys(dst, src);
@@ -721,7 +721,7 @@ NOTHROW(KCALL vm_copypagesinphys)(PHYS vm_ppage_t dst,
 
 
 PUBLIC NOBLOCK void
-NOTHROW(KCALL vm_memsetphyspage)(PHYS vm_ppage_t dst, int byte) {
+NOTHROW(KCALL vm_memsetphyspage)(PHYS pageptr_t dst, int byte) {
 	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 #ifndef NO_PHYS_IDENTITY
@@ -739,7 +739,7 @@ NOTHROW(KCALL vm_memsetphyspage)(PHYS vm_ppage_t dst, int byte) {
 }
 
 PUBLIC NOBLOCK void
-NOTHROW(KCALL vm_memsetphyspages)(PHYS vm_ppage_t dst, int byte, size_t num_pages) {
+NOTHROW(KCALL vm_memsetphyspages)(PHYS pageptr_t dst, int byte, size_t num_pages) {
 	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	if unlikely(!num_pages)
@@ -768,7 +768,7 @@ NOTHROW(KCALL vm_memsetphyspages)(PHYS vm_ppage_t dst, int byte, size_t num_page
 }
 
 PUBLIC NOBLOCK WUNUSED size_t
-NOTHROW(KCALL vm_copypagefromphys_nopf)(USER CHECKED void *dst, PHYS vm_ppage_t src) {
+NOTHROW(KCALL vm_copypagefromphys_nopf)(USER CHECKED void *dst, PHYS pageptr_t src) {
 	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	size_t result;
@@ -786,7 +786,7 @@ NOTHROW(KCALL vm_copypagefromphys_nopf)(USER CHECKED void *dst, PHYS vm_ppage_t 
 }
 
 PUBLIC NOBLOCK WUNUSED size_t
-NOTHROW(KCALL vm_copypagetophys_nopf)(PHYS vm_ppage_t dst, USER CHECKED void const *src) {
+NOTHROW(KCALL vm_copypagetophys_nopf)(PHYS pageptr_t dst, USER CHECKED void const *src) {
 	pagedir_pushval_t backup;
 	vm_vpage_t tramp;
 	size_t result;

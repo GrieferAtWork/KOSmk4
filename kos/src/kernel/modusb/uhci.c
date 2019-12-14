@@ -1608,12 +1608,12 @@ uhci_transfer(struct usb_controller *__restrict self,
               /*out*/ struct aio_handle *__restrict aio);
 
 struct uhci_syncheap_page {
-	vm_ppage_t shp_next;  /* Pointer to the next page (or `PAGEPTR_INVALID') */
+	pageptr_t shp_next;  /* Pointer to the next page (or `PAGEPTR_INVALID') */
 	size_t     shp_count; /* Number of consecutively allocated pages. */
 };
 
 struct uhci_syncheap {
-	vm_ppage_t sh_current; /* Physical address of a `struct uhci_syncheap_page' structure
+	pageptr_t sh_current; /* Physical address of a `struct uhci_syncheap_page' structure
 	                        * describing the next allocated page (or `PAGEPTR_INVALID'). */
 	size_t     sh_free;    /* Number of bytes, starting at `VM_PAGE2ADDR(sh_current) +
 	                        * sizeof(struct uhci_syncheap_page)'. */
@@ -1623,7 +1623,7 @@ struct uhci_syncheap {
 
 PRIVATE NOBLOCK void
 NOTHROW(KCALL uhci_syncheap_fini)(struct uhci_syncheap *__restrict self) {
-	vm_ppage_t page;
+	pageptr_t page;
 	/* Free all allocated pages of physical memory. */
 	page = self->sh_current;
 	while (page != PAGEPTR_INVALID) {
@@ -1652,17 +1652,11 @@ NOTHROW(KCALL uhci_syncheap_alloc)(struct uhci_syncheap *__restrict self,
 		header.shp_count = CEILDIV(num_bytes +
 		                           sizeof(struct uhci_syncheap_page),
 		                           PAGESIZE);
-#if __SIZEOF_VM_PHYS_T__ > 4
-		pg = page_malloc_between(0,
-		                         VM_ADDR2PAGE((vm_phys_t)0xffffffff),
-		                         header.shp_count);
-#else /* __SIZEOF_VM_PHYS_T__ > 4 */
-		pg = page_malloc(header.shp_count);
-#endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
+		pg = page_malloc32(header.shp_count);
 		if (pg == PAGEPTR_INVALID)
 			return UHCI_SYNCHEAP_ALLOC_FAILED;
 		header.shp_next = self->sh_current;
-		vm_copytophys_onepage(VM_PPAGE2ADDR(pg), &header, sizeof(header));
+		vm_copytophys_onepage(page2addr(pg), &header, sizeof(header));
 		self->sh_free = (header.shp_count * PAGESIZE) -
 		                sizeof(struct uhci_syncheap_page);
 		self->sh_current = pg;
@@ -2297,15 +2291,15 @@ uhci_interrupt_frameentry_init(struct uhci_interrupt_frameentry *__restrict self
 			size_t i;
 			i = 0;
 			while (i < num_pages) {
-				vm_ppage_t start;
+				vm_phys_t start;
 				size_t num_cont, num_remaining;
 				size_t maxlen;
 				num_cont      = 1;
 				num_remaining = num_pages - i;
-				start = VM_ADDR2PAGE(pagedir_translate((byte_t *)buf + i * PAGESIZE));
+				start = pagedir_translate((byte_t *)buf + i * PAGESIZE);
 				while (num_remaining &&
-				       VM_ADDR2PAGE(pagedir_translate((byte_t *)buf + (i + num_cont) * PAGESIZE)) ==
-				       start + num_cont) {
+				       pagedir_translate((byte_t *)buf + (i + num_cont) * PAGESIZE) ==
+				       start + num_cont * PAGESIZE) {
 					++num_cont;
 					--num_remaining;
 				}
@@ -2320,7 +2314,7 @@ uhci_interrupt_frameentry_init(struct uhci_interrupt_frameentry *__restrict self
 				}
 				uhci_construct_tds_for_interrupt(&pnexttd,
 				                                 ptok, cs, maxpck,
-				                                 VM_PPAGE2ADDR(start),
+				                                 start,
 				                                 maxlen);
 				i += num_cont;
 			}

@@ -84,15 +84,15 @@ typedef pos_t vm_daddr_t;                        /* Data block address. */
 
 
 struct vm_ramblock {
-	vm_ppage_t  rb_start; /* Starting page number of physical memory associated with the ram block. */
+	pageptr_t  rb_start; /* Starting page number of physical memory associated with the ram block. */
 	size_t      rb_size;  /* Number of continuous physical memory pages used by this block. */
-#if __SIZEOF_VM_PPAGE_T__ > __SIZEOF_SIZE_T__
-	byte_t      rb_pad[__SIZEOF_VM_PPAGE_T__ - __SIZEOF_SIZE_T__];
-#endif /* __SIZEOF_VM_PPAGE_T__ > __SIZEOF_SIZE_T__ */
+#if __SIZEOF_PAGEPTR_T__ > __SIZEOF_SIZE_T__
+	byte_t      rb_pad[__SIZEOF_PAGEPTR_T__ - __SIZEOF_SIZE_T__];
+#endif /* __SIZEOF_PAGEPTR_T__ > __SIZEOF_SIZE_T__ */
 };
 
 #ifndef CONFIG_NO_SWAP
-#if __SIZEOF_VM_SPAGE_T__ == __SIZEOF_VM_PPAGE_T__
+#if __SIZEOF_VM_SPAGE_T__ == __SIZEOF_PAGEPTR_T__
 #define VM_SWPBLOCK_EQUALS_RAMBLOCK 1
 #endif
 struct vm_swpblock {
@@ -702,7 +702,7 @@ FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(FCALL vm_datapart_lockread_setcore_unsh
 /* Return the address of a physical page at the given `vpage_offset'
  * The caller must be holding a read- or write-lock on `self',
  * as well as guaranty that the part is either INCORE or LOCKED. */
-FUNDEF NOBLOCK NONNULL((1)) vm_ppage_t
+FUNDEF NOBLOCK NONNULL((1)) pageptr_t
 NOTHROW(KCALL vm_datapart_pageaddr)(struct vm_datapart *__restrict self,
                                     size_t vpage_offset);
 
@@ -719,7 +719,7 @@ NOTHROW(KCALL vm_datapart_pageaddr)(struct vm_datapart *__restrict self,
  * @return: * : The underlying physical page of memory that is bound to `vpage_offset'
  * @throw: * :  Only throws whatever exception may get thrown by `dt_loadpart', meaning that
  *              when the loadpart function is NOEXCEPT, then so is this function! */
-FUNDEF NONNULL((1, 3)) vm_ppage_t KCALL
+FUNDEF NONNULL((1, 3)) pageptr_t KCALL
 vm_datapart_loadpage(struct vm_datapart *__restrict self,
                      size_t vpage_offset,
                      bool *__restrict pchanged)

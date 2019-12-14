@@ -847,12 +847,12 @@ NOTHROW(FCALL p32_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 #else /* CONFIG_USE_NEW_PAGING */
 LOCAL NOBLOCK u32
 NOTHROW(FCALL p32_pagedir_encode_4kib)(PHYS vm_vpage_t dest_page,
-                                       PHYS vm_ppage_t phys_page,
+                                       PHYS pageptr_t phys_page,
                                        u16 perm) {
 	u32 result;
 	assertf(!(perm & ~PAGEDIR_MAP_FMASK),
 	        "Invalid page permissions: %#.4I16x", perm);
-	assertf(phys_page <= (vm_ppage_t)VM_ADDR2PAGE(0xfffff000),
+	assertf(phys_page <= (pageptr_t)VM_ADDR2PAGE(0xfffff000),
 	        "Page cannot be mapped: %I64p",
 	        (u64)VM_PPAGE2ADDR(phys_page));
 	result  = (u32)VM_PPAGE2ADDR(phys_page);
@@ -1016,7 +1016,7 @@ NOTHROW(FCALL p32_npagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 #else /* CONFIG_USE_NEW_PAGING */
 INTERN NOBLOCK void
 NOTHROW(FCALL p32_pagedir_mapone)(VIRT vm_vpage_t virt_page,
-                                  PHYS vm_ppage_t phys_page, u16 perm) {
+                                  PHYS pageptr_t phys_page, u16 perm) {
 	u32 e1_word;
 	unsigned int vec2, vec1;
 	e1_word = p32_pagedir_encode_4kib(virt_page, phys_page, perm);
@@ -1027,7 +1027,7 @@ NOTHROW(FCALL p32_pagedir_mapone)(VIRT vm_vpage_t virt_page,
 
 INTERN NOBLOCK void
 NOTHROW(FCALL p32_pagedir_map)(VIRT vm_vpage_t virt_page, size_t num_pages,
-                               PHYS vm_ppage_t phys_page, u16 perm) {
+                               PHYS pageptr_t phys_page, u16 perm) {
 	size_t i;
 	u32 e1_word;
 	assertf(virt_page <= VM_VPAGE_MAX, "Invalid page range %I64p...%I64p",
@@ -1084,7 +1084,7 @@ NOTHROW(FCALL p32_npagedir_pop_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 #else /* CONFIG_USE_NEW_PAGING */
 INTERN NOBLOCK WUNUSED p32_pagedir_pushval_t
 NOTHROW(FCALL p32_pagedir_push_mapone)(VIRT vm_vpage_t virt_page,
-                                       PHYS vm_ppage_t phys_page, u16 perm) {
+                                       PHYS pageptr_t phys_page, u16 perm) {
 	u32 e1_word, result;
 	unsigned int vec2, vec1;
 	e1_word = p32_pagedir_encode_4kib(virt_page, phys_page, perm);
@@ -1525,7 +1525,7 @@ LOCAL u32 KCALL vm_readphys32_small_aligned(PHYS u32 src) {
 	vm_vpage_t tramp = THIS_TRAMPOLINE_PAGE;
 	pagedir_pushval_t backup;
 	backup = pagedir_push_mapone(tramp,
-	                             (vm_ppage_t)VM_ADDR2PAGE(src),
+	                             (pageptr_t)VM_ADDR2PAGE(src),
 	                             PAGEDIR_MAP_FREAD);
 	pagedir_syncone(tramp);
 	result = *(u32 *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(src & PAGEMASK));
@@ -1540,7 +1540,7 @@ vm_copyfromphys_small_aligned(void *__restrict dst,
 	vm_vpage_t tramp = THIS_TRAMPOLINE_PAGE;
 	pagedir_pushval_t backup;
 	backup = pagedir_push_mapone(tramp,
-	                             (vm_ppage_t)VM_ADDR2PAGE(src),
+	                             (pageptr_t)VM_ADDR2PAGE(src),
 	                             PAGEDIR_MAP_FREAD);
 	pagedir_syncone(tramp);
 	memcpy(dst, (void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(src & PAGEMASK)), num_bytes);
@@ -1554,7 +1554,7 @@ vm_copytophys_small_aligned(PHYS u32 dst,
 	vm_vpage_t tramp = THIS_TRAMPOLINE_PAGE;
 	pagedir_pushval_t backup;
 	backup = pagedir_push_mapone(tramp,
-	                             (vm_ppage_t)VM_ADDR2PAGE(dst),
+	                             (pageptr_t)VM_ADDR2PAGE(dst),
 	                             PAGEDIR_MAP_FREAD);
 	pagedir_syncone(tramp);
 	memcpy((void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(dst & PAGEMASK)), src, num_bytes);
@@ -1663,7 +1663,7 @@ NOTHROW(KCALL pagedir_unsetchanged_p)(VIRT pagedir_t *__restrict self, VIRT vm_v
 		return;
 	}
 	tramp  = THIS_TRAMPOLINE_PAGE;
-	backup = pagedir_push_mapone(tramp, (vm_ppage_t)VM_ADDR2PAGE(temp),
+	backup = pagedir_push_mapone(tramp, (pageptr_t)VM_ADDR2PAGE(temp),
 	                             PAGEDIR_MAP_FWRITE);
 	pagedir_syncone(tramp);
 	e1 = &((union x86_pdir_e2 *)tramp)[X86_PDIR_VEC1INDEX_VPAGE(vpage)].p_flag;
@@ -1680,12 +1680,12 @@ NOTHROW(KCALL pagedir_unsetchanged_p)(VIRT pagedir_t *__restrict self, VIRT vm_v
 INTERN NOBLOCK WUNUSED bool NOTHROW(KCALL pagedir_prepare_mapone_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page);
 INTERN NOBLOCK void NOTHROW(KCALL pagedir_unprepare_mapone_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page);
 INTERN NOBLOCK void NOTHROW(KCALL pagedir_maphintone_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page, VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint);
-INTERN NOBLOCK void NOTHROW(KCALL pagedir_mapone_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page, PHYS vm_ppage_t phys_page, u16 perm);
+INTERN NOBLOCK void NOTHROW(KCALL pagedir_mapone_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page, PHYS pageptr_t phys_page, u16 perm);
 INTERN NOBLOCK void NOTHROW(KCALL pagedir_unmapone_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page);
 INTERN NOBLOCK WUNUSED bool NOTHROW(KCALL pagedir_prepare_map_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page, size_t num_pages);
 INTERN NOBLOCK void NOTHROW(KCALL pagedir_unprepare_map_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page, size_t num_pages);
 INTERN NOBLOCK void NOTHROW(KCALL pagedir_maphint_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page, size_t num_pages, VIRT /*ALIGNED(PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint);
-INTERN NOBLOCK void NOTHROW(KCALL pagedir_map_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page, size_t num_pages, PHYS vm_ppage_t phys_page, u16 perm);
+INTERN NOBLOCK void NOTHROW(KCALL pagedir_map_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page, size_t num_pages, PHYS pageptr_t phys_page, u16 perm);
 INTERN NOBLOCK void NOTHROW(KCALL pagedir_unmap_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page, size_t num_pages);
 INTERN NOBLOCK void NOTHROW(KCALL pagedir_unwrite_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t virt_page, size_t num_pages);
 

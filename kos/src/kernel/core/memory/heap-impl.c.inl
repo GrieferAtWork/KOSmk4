@@ -446,7 +446,7 @@ again_tryhard_mapping_target:
 						pagecnt_t j;
 						for (j = 0; j < blocks[i].rb_size; ++j) {
 							vm_vpage_t vpage = mapping_target + mapping_offset + j;
-							vm_ppage_t ppage = blocks[i].rb_start + j;
+							pageptr_t ppage = blocks[i].rb_start + j;
 							if (!page_iszero(ppage)) {
 								memset((void *)VM_PAGE2ADDR(vpage), 0, PAGESIZE);
 #ifdef CONFIG_HAVE_PAGEDIR_CHANGED

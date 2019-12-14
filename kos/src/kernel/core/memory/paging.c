@@ -261,7 +261,7 @@ NOTHROW(KCALL pagedir_maphintone_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t vir
 
 PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_mapone_p") void
 NOTHROW(KCALL pagedir_mapone_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t virt_page,
-                                PHYS vm_ppage_t phys_page, u16 perm) {
+                                PHYS pageptr_t phys_page, u16 perm) {
 	PAGEDIR_P_BEGINUSE(self) {
 		pagedir_mapone(virt_page, phys_page, perm);
 	}
@@ -379,7 +379,7 @@ NOTHROW(KCALL pagedir_maphint_p)(PAGEDIR_P_SELFTYPE self, VIRT vm_vpage_t virt_p
 PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_map_p") void
 NOTHROW(KCALL pagedir_map_p)(PAGEDIR_P_SELFTYPE self,
                              VIRT vm_vpage_t virt_page, size_t num_pages,
-                             PHYS vm_ppage_t phys_page, u16 perm) {
+                             PHYS pageptr_t phys_page, u16 perm) {
 	PAGEDIR_P_BEGINUSE(self) {
 		pagedir_map(virt_page, num_pages, phys_page, perm);
 	}

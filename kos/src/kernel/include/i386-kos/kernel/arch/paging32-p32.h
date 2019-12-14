@@ -368,8 +368,8 @@ NOTHROW(FCALL p32_npagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                 PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
                                 u16 perm);
 #else /* CONFIG_USE_NEW_PAGING */
-INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_mapone)(VIRT vm_vpage_t virt_page, PHYS vm_ppage_t phys_page, u16 perm);
-INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_map)(VIRT vm_vpage_t virt_page, size_t num_pages, PHYS vm_ppage_t phys_page, u16 perm);
+INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_mapone)(VIRT vm_vpage_t virt_page, PHYS pageptr_t phys_page, u16 perm);
+INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_map)(VIRT vm_vpage_t virt_page, size_t num_pages, PHYS pageptr_t phys_page, u16 perm);
 #endif /* !CONFIG_USE_NEW_PAGING */
 
 /* Special variants of `pagedir_mapone()' that should be used to
@@ -389,7 +389,7 @@ NOTHROW(FCALL p32_npagedir_pop_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                        p32_pagedir_pushval_t backup);
 #else /* CONFIG_USE_NEW_PAGING */
 INTDEF NOBLOCK WUNUSED p32_pagedir_pushval_t
-NOTHROW(FCALL p32_pagedir_push_mapone)(VIRT vm_vpage_t virt_page, PHYS vm_ppage_t phys_page, u16 perm);
+NOTHROW(FCALL p32_pagedir_push_mapone)(VIRT vm_vpage_t virt_page, PHYS pageptr_t phys_page, u16 perm);
 INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_pop_mapone)(VIRT vm_vpage_t virt_page, p32_pagedir_pushval_t backup);
 #endif /* !CONFIG_USE_NEW_PAGING */
 
@@ -454,7 +454,7 @@ INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unsetchanged)(VIRT vm_vpage_t vpag
 /* Forward-compatibility for the new paging system. */
 #ifndef __PAGEDIR_FORWARD_ADDR2VIRTPAGE
 #define __PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr)          (vm_vpage_t)((uintptr_t)(addr) / 4096)
-#define __PAGEDIR_FORWARD_PHYS2PHYSPAGE(phys)          (vm_ppage_t)((phys) / 4096)
+#define __PAGEDIR_FORWARD_PHYS2PHYSPAGE(phys)          (pageptr_t)((phys) / 4096)
 #define __PAGEDIR_FORWARD_NUMBYTES2NUMPAGES(num_bytes) ((size_t)(num_bytes) / 4096)
 #endif /* !__PAGEDIR_FORWARD_ADDR2VIRTPAGE */
 #define p32_npagedir_prepare_mapone(addr)              p32_pagedir_prepare_mapone(__PAGEDIR_FORWARD_ADDR2VIRTPAGE(addr))

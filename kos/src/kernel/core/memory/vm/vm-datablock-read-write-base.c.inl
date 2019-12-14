@@ -287,9 +287,9 @@ KCALL vm_datablock_vio_write
 	tramp = THIS_TRAMPOLINE_PAGE;
 	TRY {
 		for (;;) {
-			vm_ppage_t pageaddr;
+			pageptr_t pageaddr;
 			size_t page_bytes;
-			pageaddr   = (vm_ppage_t)VM_ADDR2PAGE(buf);
+			pageaddr   = (pageptr_t)VM_ADDR2PAGE(buf);
 			page_bytes = PAGESIZE - (buf & PAGEMASK);
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;

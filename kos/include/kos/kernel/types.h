@@ -80,8 +80,6 @@ typedef __uintptr_t refcnt_t;
 typedef __pageptr_t pageptr_t; /* Physical memory page index (`physical_address / PAGESIZE'). */
 #endif /* !__pageptr_t_defined */
 
-typedef /*PHYS*/ __pageptr_t   vm_ppage_t;   /* Physical memory page index (`physical_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
-
 typedef /*VIRT*/ __vm_vpage_t   vm_vpage_t;   /* Virtual memory page index (`virtual_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
 typedef /*VIRT*/ __vm_vpage64_t vm_vpage64_t; /* Virtual memory page index (with at least 64 bits). */ /* DEPRECATED; REMOVE ME */
 typedef /*PHYS*/ __vm_spage_t   vm_spage_t;   /* Swap memory page index (`swap_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
@@ -94,7 +92,7 @@ typedef /*PHYS*/ __vm_phys_t    vm_phys_t;    /* A physical memory pointer. */ /
 #define FORMAT_VM_PHYS_T  "%p" /* DEPRECATED; REMOVE ME */
 #endif
 
-#if __SIZEOF_VM_PPAGE_T__ >= 8
+#if __SIZEOF_PAGEPTR_T__ >= 8
 #define FORMAT_VM_PPAGE_T "%I64p" /* DEPRECATED; REMOVE ME */
 #else
 #define FORMAT_VM_PPAGE_T "%p" /* DEPRECATED; REMOVE ME */
