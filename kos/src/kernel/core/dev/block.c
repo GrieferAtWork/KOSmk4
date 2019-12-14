@@ -1238,31 +1238,30 @@ _block_device_read_phys(struct block_device *__restrict self,
                         pos_t device_position)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	uintptr_t backup;
-	vm_vpage_t tramp;
+	byte_t *tramp;
 	bool is_first;
 	if unlikely(!num_bytes)
 		return;
 	is_first = true;
-	tramp    = THIS_TRAMPOLINE_PAGE;
+	tramp    = (byte_t *)THIS_TRAMPOLINE_BASE;
 	TRY {
 		for (;;) {
-			vm_ppage_t pageaddr;
 			size_t page_bytes;
-			pageaddr   = (vm_ppage_t)VM_ADDR2PAGE(dst);
 			page_bytes = PAGESIZE - (dst & PAGEMASK);
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;
 			if (is_first) {
-				backup = pagedir_push_mapone(tramp, pageaddr,
-				                             PAGEDIR_MAP_FWRITE);
+				backup = npagedir_push_mapone(tramp, dst & ~PAGEMASK,
+				                              PAGEDIR_MAP_FWRITE);
+				is_first = false;
 			} else {
-				pagedir_mapone(tramp, pageaddr,
-				               PAGEDIR_MAP_FWRITE);
+				npagedir_mapone(tramp, dst & ~PAGEMASK,
+				                PAGEDIR_MAP_FWRITE);
 			}
-			pagedir_syncone(tramp);
+			npagedir_syncone(tramp);
 			/* Copy memory. */
 			block_device_read(self,
-			                  (void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(dst & PAGEMASK)),
+			                  tramp + ((ptrdiff_t)dst & PAGEMASK),
 			                  page_bytes, device_position);
 			if (page_bytes >= num_bytes)
 				break;
@@ -1271,10 +1270,10 @@ _block_device_read_phys(struct block_device *__restrict self,
 			device_position += (pos_t)page_bytes;
 		}
 	} EXCEPT {
-		pagedir_pop_mapone(tramp, backup);
+		npagedir_pop_mapone(tramp, backup);
 		RETHROW();
 	}
-	pagedir_pop_mapone(tramp, backup);
+	npagedir_pop_mapone(tramp, backup);
 }
 
 PUBLIC NONNULL((1)) void KCALL
@@ -1283,31 +1282,30 @@ _block_device_write_phys(struct block_device *__restrict self,
                          pos_t device_position)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	pagedir_pushval_t backup;
-	vm_vpage_t tramp;
+	byte_t *tramp;
 	bool is_first;
 	if unlikely(!num_bytes)
 		return;
 	is_first = true;
-	tramp    = THIS_TRAMPOLINE_PAGE;
+	tramp    = (byte_t *)THIS_TRAMPOLINE_BASE;
 	TRY {
 		for (;;) {
-			vm_ppage_t pageaddr;
 			size_t page_bytes;
-			pageaddr   = (vm_ppage_t)VM_ADDR2PAGE(src);
 			page_bytes = PAGESIZE - (src & PAGEMASK);
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;
 			if (is_first) {
-				backup = pagedir_push_mapone(tramp, pageaddr,
-				                             PAGEDIR_MAP_FWRITE);
+				backup = npagedir_push_mapone(tramp, src & ~PAGEMASK,
+                                              PAGEDIR_MAP_FWRITE);
+				is_first = false;
 			} else {
-				pagedir_mapone(tramp, pageaddr,
-				               PAGEDIR_MAP_FWRITE);
+				npagedir_mapone(tramp, src & ~PAGEMASK,
+				                PAGEDIR_MAP_FWRITE);
 			}
-			pagedir_syncone(tramp);
+			npagedir_syncone(tramp);
 			/* Copy memory. */
 			block_device_write(self,
-			                   (void const *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(src & PAGEMASK)),
+			                   tramp + ((ptrdiff_t)src & PAGEMASK),
 			                   page_bytes, device_position);
 			if (page_bytes >= num_bytes)
 				break;
@@ -1316,10 +1314,10 @@ _block_device_write_phys(struct block_device *__restrict self,
 			device_position += (pos_t)page_bytes;
 		}
 	} EXCEPT {
-		pagedir_pop_mapone(tramp, backup);
+		npagedir_pop_mapone(tramp, backup);
 		RETHROW();
 	}
-	pagedir_pop_mapone(tramp, backup);
+	npagedir_pop_mapone(tramp, backup);
 }
 
 

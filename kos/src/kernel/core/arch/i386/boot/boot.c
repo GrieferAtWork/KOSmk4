@@ -155,8 +155,12 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 		}
 		printk(FREESTR(KERN_INFO "[boot] Located %Iu (%#Ix) bytes (%Iu %s) of usable RAM\n"),
 		       VM_PAGE2ADDR(total_pages), VM_PAGE2ADDR(total_pages),
-		       total_pages >= VM_ADDR2PAGE(0x100000) ? (total_pages / VM_ADDR2PAGE(0x100000)) : (total_pages * PAGESIZE) / 0x400,
-		       total_pages >= VM_ADDR2PAGE(0x100000) ? FREESTR("MiB") : FREESTR("KiB"));
+		       total_pages >= (0x100000 / PAGESIZE)
+		       ? (total_pages / (0x100000 / PAGESIZE))
+		       : (total_pages * PAGESIZE) / 0x400,
+		       total_pages >= (0x100000 / PAGESIZE)
+		       ? FREESTR("MiB")
+		       : FREESTR("KiB"));
 	}
 
 	/* Run task initialization callbacks on the boot task, initializing

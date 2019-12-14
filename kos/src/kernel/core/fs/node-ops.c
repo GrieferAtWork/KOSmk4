@@ -49,52 +49,51 @@ inode_file_pwrite_with_write(struct inode *__restrict self, vm_phys_t src,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
 		       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY,
 		       E_IOERROR, ...) {
-	vm_ppage_t minpage, maxpage;
+	vm_phys_t minpageaddr, maxpageaddr;
 	assert(self->i_type->it_file.f_write);
 	if (file_position != 0)
 		THROW(E_IOERROR_BADBOUNDS, E_IOERROR_SUBSYSTEM_FILE);
-	minpage = VM_ADDR2PAGE(src);
-	maxpage = VM_ADDR2PAGE(src + num_bytes);
-	if (minpage == maxpage) {
+	minpageaddr = (src) & ~PAGESIZE;
+	maxpageaddr = (src + num_bytes) & ~PAGESIZE;
+	if (minpageaddr == maxpageaddr) {
 		pagedir_pushval_t backup;
-		vm_vpage_t tramp;
+		byte_t *tramp;
 		if unlikely(!num_bytes)
 			return;
-		tramp = THIS_TRAMPOLINE_PAGE;
-		backup = pagedir_push_mapone(tramp, minpage,
-		                             PAGEDIR_MAP_FREAD);
-		pagedir_syncone(tramp);
+		tramp  = (byte_t *)THIS_TRAMPOLINE_BASE;
+		backup = npagedir_push_mapone(tramp, minpageaddr, PAGEDIR_MAP_FREAD);
+		npagedir_syncone(tramp);
 		TRY {
 			(*self->i_type->it_file.f_write)(self,
-			                                 (void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(src & PAGEMASK)),
+			                                 tramp + ((ptrdiff_t)src & PAGEMASK),
 			                                 num_bytes, file_position, aio);
 		} EXCEPT {
-			pagedir_pop_mapone(tramp, backup);
+			npagedir_pop_mapone(tramp, backup);
 			RETHROW();
 		}
-		pagedir_pop_mapone(tramp, backup);
+		npagedir_pop_mapone(tramp, backup);
 	} else {
-		vm_vpage_t vp;
-		size_t np = (size_t)((maxpage - minpage) + 1);
+		void *tempbase;
+		size_t aligned_num_bytes = (size_t)((maxpageaddr - minpageaddr) + PAGESIZE);
 		/* XXX: Instead of vm_map(), maybe just call `f_write()' multiple times?
 		 *      Or at the very least, do so when vm_map() fails! */
-		vp = vm_map(&vm_kernel,
-		            (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
-		            np, 1, HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
-		            &vm_datablock_physical,
-		            (vm_vpage64_t)minpage,
-		            VM_PROT_READ | VM_PROT_SHARED,
-		            VM_NODE_FLAG_NOMERGE);
+		tempbase = nvm_map(&vm_kernel,
+		                   HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
+		                   aligned_num_bytes, PAGESIZE,
+		                   HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
+		                   &vm_datablock_physical,
+		                   (pos_t)minpageaddr,
+		                   VM_PROT_READ | VM_PROT_SHARED,
+		                   VM_NODE_FLAG_NOMERGE);
 		TRY {
 			(*self->i_type->it_file.f_write)(self,
-			                                 (void const *)(VM_PAGE2ADDR(vp) +
-			                                                (uintptr_t)(src & PAGEMASK)),
+			                                 (byte_t *)tempbase + ((ptrdiff_t)src & PAGEMASK),
 			                                 num_bytes, file_position, aio);
 		} EXCEPT {
-			vm_unmap(&vm_kernel, vp, np);
+			nvm_unmap(&vm_kernel, tempbase, aligned_num_bytes);
 			RETHROW();
 		}
-		vm_unmap(&vm_kernel, vp, np);
+		nvm_unmap(&vm_kernel, tempbase, aligned_num_bytes);
 	}
 }
 

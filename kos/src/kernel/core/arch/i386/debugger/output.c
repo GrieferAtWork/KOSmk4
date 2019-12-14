@@ -1279,7 +1279,7 @@ PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_map)(void) {
 	vga_vram_offset         = VGA_VRAM_TEXT - VGA_VRAM_BASE;
 	vga_real_terminal_start = (u16 *)(KERNEL_CORE_BASE + VGA_VRAM_TEXT);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (pagedir_ismapped(VM_ADDR2PAGE((vm_virt_t)vga_real_terminal_start)) &&
+	if (npagedir_ismapped(vga_real_terminal_start) &&
 	    pagedir_translate(vga_real_terminal_start) == (vm_phys_t)VGA_VRAM_TEXT) {
 		vga_oldmapping_did_prepare = false;
 		return;
@@ -1289,8 +1289,8 @@ PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_map)(void) {
 	 * at that point we'd still have access to the physical identity map, so we
 	 * should instead also support its use instead of only hacking around to
 	 * place a temporary mapping of the VGA display just before the kernel. */
-	vga_oldmapping_did_prepare = pagedir_prepare_map(VM_ADDR2PAGE((vm_virt_t)vga_real_terminal_start),
-		                                             VGA_VRAM_SIZE / PAGESIZE);
+	vga_oldmapping_did_prepare = npagedir_prepare_map((void *)((uintptr_t)vga_real_terminal_start & ~PAGEMASK),
+	                                                  VGA_VRAM_SIZE / PAGESIZE);
 	if (!vga_oldmapping_did_prepare) {
 		printk(DBGSTR(KERN_CRIT "[dbg] Failed to find suitable location to map "
 		                        "VGA video memory. - This shouldn't happen\n"));
@@ -1299,9 +1299,10 @@ PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_map)(void) {
 	{
 		for (i = 0; i < COMPILER_LENOF(vga_oldmapping); ++i) {
 			pagedir_pushval_t oldword;
-			vm_vpage_t vp = VM_ADDR2PAGE((vm_virt_t)vga_real_terminal_start) + i;
-			oldword = pagedir_push_mapone(vp, VM_ADDR2PAGE((vm_phys_t)VGA_VRAM_TEXT) + i,
-			                              PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+			byte_t *addr = (byte_t *)((uintptr_t)vga_real_terminal_start & ~PAGEMASK) + i * PAGESIZE;
+			oldword = npagedir_push_mapone(addr,
+			                               (vm_phys_t)VGA_VRAM_TEXT + i * PAGESIZE,
+			                               PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 			vga_oldmapping[i] = oldword;
 		}
 	}
@@ -1317,8 +1318,8 @@ PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_unmap)(void) {
 	vga_oldmapping_did_prepare = false;
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	for (i = 0; i < COMPILER_LENOF(vga_oldmapping); ++i) {
-		vm_vpage_t vp = VM_ADDR2PAGE((vm_virt_t)vga_real_terminal_start) + i;
-		pagedir_pop_mapone(vp, vga_oldmapping[i]);
+		byte_t *addr = (byte_t *)vga_real_terminal_start + i * PAGESIZE;
+		npagedir_pop_mapone(addr, vga_oldmapping[i]);
 	}
 	vga_real_terminal_start = NULL;
 }
@@ -1491,12 +1492,12 @@ NOTHROW(KCALL vga_vram)(u32 vram_offset) {
 	offset      = vram_offset & PAGEMASK;
 	vram_offset = vram_offset & ~PAGEMASK;
 	if (vga_vram_offset != vram_offset) {
-		vm_vpage_t vp;
+		byte_t *addr;
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 		if (!vga_oldmapping_did_prepare) {
 			byte_t *result;
 			result = (byte_t *)(KERNEL_CORE_BASE + VGA_VRAM_BASE + vram_offset);
-			if (pagedir_ismapped(VM_ADDR2PAGE((vm_virt_t)result)) &&
+			if (npagedir_ismapped(result) &&
 			    pagedir_translate(result) == (vm_phys_t)(VGA_VRAM_BASE + vram_offset)) {
 				vga_vram_offset = vram_offset;
 				return result + offset;
@@ -1505,11 +1506,11 @@ NOTHROW(KCALL vga_vram)(u32 vram_offset) {
 			                        "identity-mapped. This will probably go wrong...\n"));
 		}
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-		vp = VM_ADDR2PAGE((vm_virt_t)vga_real_terminal_start);
-		pagedir_map(vp, 1,
-		            VM_ADDR2PAGE((vm_phys_t)(VGA_VRAM_BASE + vram_offset)),
-		            PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
-		pagedir_syncone(vp);
+		addr = (byte_t *)((uintptr_t)vga_real_terminal_start & ~PAGEMASK);
+		npagedir_map(addr, 1,
+		             (vm_phys_t)VGA_VRAM_BASE + vram_offset,
+		             PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+		npagedir_syncone(addr);
 		vga_vram_offset = vram_offset;
 	}
 	return (byte_t *)vga_real_terminal_start + offset;

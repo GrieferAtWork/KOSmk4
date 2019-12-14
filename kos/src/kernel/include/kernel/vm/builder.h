@@ -20,8 +20,12 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_VM_BUILDER_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/types.h>
 #include <kernel/vm.h>
+#include <hybrid/__assert.h>
+
+#include <asm/pageid.h>
 
 DECL_BEGIN
 
@@ -133,6 +137,23 @@ NOTHROW(KCALL vmb_getfree)(struct vmb *__restrict self,
                            vm_vpage_t hint, size_t num_pages,
                            size_t min_alignment_in_pages,
                            unsigned int mode);
+LOCAL NOBLOCK WUNUSED PAGEDIR_PAGEALIGNED UNCHECKED void *
+NOTHROW(KCALL nvmb_getfree)(struct vmb *__restrict self,
+                            PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
+                            PAGEDIR_PAGEALIGNED size_t num_bytes,
+                            PAGEDIR_PAGEALIGNED size_t min_alignment,
+                            unsigned int mode) {
+	vm_vpage_t result;
+	__hybrid_assert(((uintptr_t)hint & PAGEMASK) == 0);
+	__hybrid_assert((num_bytes & PAGEMASK) == 0);
+	__hybrid_assert((min_alignment & PAGEMASK) == 0);
+	result = vmb_getfree(self,
+	                     (vm_vpage_t)__ARCH_PAGEID_ENCODE(hint),
+	                     num_bytes / PAGESIZE,
+	                     min_alignment / PAGESIZE,
+	                     mode);
+	return __ARCH_PAGEID_DECODE(result);
+}
 
 
 /* A combination of `vmb_getfree' + `vmb_mapat'
@@ -163,7 +184,7 @@ vmb_map(struct vmb *__restrict self,
  * @param: argv:        User-space pointer to a NULL-terminated vector of argument strings
  * @param: envp:        User-space pointer to a NULL-terminated vector of environment strings
  * @return: * :         Page index of the PEB (to-be passed to the user-space program) */
-FUNDEF WUNUSED NONNULL((1)) vm_vpage_t KCALL
+FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
 vmb_alloc_peb(struct vmb *__restrict self,
               size_t argc_inject, KERNEL char const *const *argv_inject,
               USER UNCHECKED char const *USER CHECKED const *argv,

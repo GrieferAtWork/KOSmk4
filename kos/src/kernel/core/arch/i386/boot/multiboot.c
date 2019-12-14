@@ -177,30 +177,30 @@ PRIVATE ATTR_FREEBSS size_t x86_boot_driver_size = 0;    /* Size of boot driver 
 
 PRIVATE ATTR_FREETEXT void KCALL
 load_bootloader_driver2(PHYS u32 blob_addr, size_t blob_size, char *cmdline) {
-	size_t num_pages;
-	vm_vpage_t vpage;
+	void *blob;
+	size_t aligned_blob_size;
 	REF struct driver *drv;
-	num_pages = CEILDIV(blob_size + (blob_addr & PAGEMASK), PAGESIZE);
+	aligned_blob_size = blob_size + (blob_addr & PAGEMASK);
 	/* Create a temporary mapping of prepared virtual memory which
 	 * we can then use to map the driver's data blob into virtual memory. */
-	vpage = vm_mapres(&vm_kernel,
-	                  (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_TEMPORARY), num_pages, 1,
+	blob = nvm_mapres(&vm_kernel,
+	                  HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
+	                  aligned_blob_size, PAGESIZE,
 	                  HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
 	                  VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_NOMERGE);
 	TRY {
 		/* Map the driver blob into virtual memory. */
-		pagedir_map(vpage,
-		            num_pages,
-		            (vm_ppage_t)VM_ADDR2PAGE(blob_addr),
-		            PAGEDIR_MAP_FREAD);
+		npagedir_map(blob,
+		             aligned_blob_size,
+		             (vm_phys_t)(blob_addr & ~PAGEMASK),
+		             PAGEDIR_MAP_FREAD);
 		/* Load the mapped driver blob as a driver module.
 		 * NOTE: We pass the `DRIVER_INSMOD_FLAG_NOINIT' flag so-as to allow
 		 *       the driver to be initialized (and have its dependencies be bound)
 		 *       once all drivers specified by the boot loader have been loaded.
 		 *    -> That way, driver dependencies can be loaded in the same manner,
 		 *       thus not relying on file-system drivers not having any dependencies. */
-		drv = driver_insmod_blob((byte_t *)(VM_PAGE2ADDR(vpage) +
-		                                    (blob_addr & PAGEMASK)),
+		drv = driver_insmod_blob((byte_t *)blob + (blob_addr & PAGEMASK),
 		                         blob_size,
 		                         cmdline,
 		                         NULL,
@@ -208,16 +208,16 @@ load_bootloader_driver2(PHYS u32 blob_addr, size_t blob_size, char *cmdline) {
 		/* Drop the reference returned by driver_insmod_blob() */
 		decref(drv);
 	} EXCEPT {
-		vm_unmap(&vm_kernel,
-		         vpage,
-		         num_pages,
-		         VM_UNMAP_RESERVE);
+		nvm_unmap(&vm_kernel,
+		          blob,
+		          aligned_blob_size,
+		          VM_UNMAP_RESERVE);
 		RETHROW();
 	}
-	vm_unmap(&vm_kernel,
-	         vpage,
-	         num_pages,
-	         VM_UNMAP_RESERVE);
+	nvm_unmap(&vm_kernel,
+	          blob,
+	          aligned_blob_size,
+	          VM_UNMAP_RESERVE);
 }
 
 PRIVATE ATTR_FREETEXT void KCALL

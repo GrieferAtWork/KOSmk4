@@ -114,27 +114,8 @@
 /* VM hints for where to map different, dynamic kernel components. */
 #ifdef __x86_64__
 /* TODO: Adjust these hints to work better in a 64-bit address space */
-#define KERNEL_VMHINT_HEAP         (0xe1200, VM_GETFREE_ABOVE) /* Hint for the regular kernel heap. */
-#define KERNEL_VMHINT_LHEAP        (0xe1a00, VM_GETFREE_ABOVE) /* Hint for the locked kernel heap. */
-#define KERNEL_VMHINT_SLAB         (0xe8000, VM_GETFREE_BELOW) /* Hint for the slab allocator. */
-#define KERNEL_VMHINT_DHEAP        (0xe0000, VM_GETFREE_BELOW) /* Hint for the kernel heap used for allocating debug controllers. */
-#define KERNEL_VMHINT_COREPAGE     (0xf0000, VM_GETFREE_BELOW) /* Hint for core-base pointers. */
-#define KERNEL_VMHINT_PHYSINFO     (0xf0000, VM_GETFREE_BELOW) /* Hint for physical memory information/controller data. */
-#define KERNEL_VMHINT_LAPIC        (0xf0000, VM_GETFREE_BELOW) /* Hint for the LAPIC (if present). */
-#define KERNEL_VMHINT_TRAMPOLINE   (0xeffe0, VM_GETFREE_BELOW) /* Hint for per-task trampoline pages. */
-#define KERNEL_VMHINT_KERNSTACK    (0xeb000, VM_GETFREE_BELOW) /* Hint for kernel stacks. */
-#define KERNEL_VMHINT_ALTIDLE      (0xeeeee, VM_GETFREE_ABOVE) /* Hint for secondary CPU control structures. */
-#define KERNEL_VMHINT_IDLESTACK    (0xf0000, VM_GETFREE_BELOW) /* Hint for per-cpu IDLE stacks. */
-#define KERNEL_VMHINT_DFSTACK      (0xf0000, VM_GETFREE_BELOW) /* Hint for per-cpu #DF stacks. */
-#define KERNEL_VMHINT_DRIVER       (0xd0000, VM_GETFREE_ABOVE) /* Hint for the custom kernel-space drivers. */
-#define KERNEL_VMHINT_DEVICE       (0xf0000, VM_GETFREE_BELOW) /* Hint for device memory mappings. */
-#define KERNEL_VMHINT_TEMPORARY    (0xf0000, VM_GETFREE_ABOVE) /* Hint for temporary memory mappings. */
-#define KERNEL_VMHINT_USER_HEAP    (0x10000, VM_GETFREE_ABOVE | VM_GETFREE_ASLR) /* Hint for user-space heap memory. */
-#define KERNEL_VMHINT_USER_STACK   (0x80000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space stack memory. */
-#define KERNEL_VMHINT_USER_LIBRARY (0x0e000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space dynamic libraries. */
-#define KERNEL_VMHINT_USER_DYNLINK (0xbf100, VM_GETFREE_ASLR)  /* Hint for user-space dynamic linkers. */
-#define KERNEL_VMHINT_USER_PEB     (0xc0000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space process environment blocks. */
 #else /* __x86_64__ */
+#endif /* !__x86_64__ */
 #define KERNEL_VMHINT_HEAP         (0xe1200, VM_GETFREE_ABOVE) /* Hint for the regular kernel heap. */
 #define KERNEL_VMHINT_LHEAP        (0xe1a00, VM_GETFREE_ABOVE) /* Hint for the locked kernel heap. */
 #define KERNEL_VMHINT_SLAB         (0xe8000, VM_GETFREE_BELOW) /* Hint for the slab allocator. */
@@ -147,15 +128,14 @@
 #define KERNEL_VMHINT_ALTIDLE      (0xeeeee, VM_GETFREE_ABOVE) /* Hint for secondary CPU control structures. */
 #define KERNEL_VMHINT_IDLESTACK    (0xf0000, VM_GETFREE_BELOW) /* Hint for per-cpu IDLE stacks. */
 #define KERNEL_VMHINT_DFSTACK      (0xf0000, VM_GETFREE_BELOW) /* Hint for per-cpu #DF stacks. */
-#define KERNEL_VMHINT_DRIVER       (0xd0000, VM_GETFREE_ABOVE) /* Hint for the custom kernel-space drivers. */
-#define KERNEL_VMHINT_DEVICE       (0xf0000, VM_GETFREE_BELOW) /* Hint for device memory mappings. */
-#define KERNEL_VMHINT_TEMPORARY    (0xf0000, VM_GETFREE_ABOVE) /* Hint for temporary memory mappings. */
+#define KERNEL_VMHINT_DRIVER       ((void *)0xd0000000, VM_GETFREE_ABOVE) /* Hint for the custom kernel-space drivers. */
+#define KERNEL_VMHINT_DEVICE       ((void *)0xf0000000, VM_GETFREE_BELOW) /* Hint for device memory mappings. */
+#define KERNEL_VMHINT_TEMPORARY    ((void *)0xf0000000, VM_GETFREE_ABOVE) /* Hint for temporary memory mappings. */
 #define KERNEL_VMHINT_USER_HEAP    (0x10000, VM_GETFREE_ABOVE | VM_GETFREE_ASLR) /* Hint for user-space heap memory. */
 #define KERNEL_VMHINT_USER_STACK   (0x80000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space stack memory. */
 #define KERNEL_VMHINT_USER_LIBRARY (0x0e000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space dynamic libraries. */
 #define KERNEL_VMHINT_USER_DYNLINK (0xbf100, VM_GETFREE_ASLR)  /* Hint for user-space dynamic linkers. */
-#define KERNEL_VMHINT_USER_PEB     (0xc0000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space process environment blocks. */
-#endif /* !__x86_64__ */
+#define KERNEL_VMHINT_USER_PEB     ((void *)0xc0000000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space process environment blocks. */
 
 
 

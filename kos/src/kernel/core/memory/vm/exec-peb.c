@@ -57,7 +57,7 @@ DECL_BEGIN
  * @param: argv:        User-space pointer to a NULL-terminated vector of argument strings
  * @param: envp:        User-space pointer to a NULL-terminated vector of environment strings
  * @return: * :         Page index of the PEB (to-be passed to the user-space program) */
-PUBLIC WUNUSED NONNULL((1)) vm_vpage_t KCALL
+PUBLIC WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
 vmb_alloc_peb(struct vmb *__restrict self,
               size_t argc_inject, KERNEL char const *const *argv_inject,
               USER UNCHECKED char const *USER CHECKED const *argv,
@@ -68,10 +68,8 @@ vmb_alloc_peb(struct vmb *__restrict self,
 	size_t envc_user;
 	size_t strings_total_size;
 	size_t peb_total_size;
-	size_t peb_total_pages;
 	byte_t *peb_temp_base;
-	vm_vpage_t peb_temp_page;
-	vm_vpage_t result;
+	PAGEDIR_PAGEALIGNED UNCHECKED void *result;
 	struct vm_node *stolen_node;
 	USER UNCHECKED char const *string;
 	USER UNCHECKED char const *USER CHECKED const *iter;
@@ -112,18 +110,17 @@ again:
 	/* XXX: Check if `peb_total_size' is too large? */
 
 	/* Create a temporary kernel-space mapping for initializing the PEB */
-	peb_total_pages = CEILDIV(peb_total_size, PAGESIZE);
-	peb_temp_page = vm_map(&vm_kernel,
-	                       (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
-	                       peb_total_pages,
-	                       1,
-	                       HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
-	                       &vm_datablock_anonymous_zero,
-	                       0,
-	                       VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED,
-	                       VM_NODE_FLAG_NORMAL,
-	                       0);
-	peb_temp_base = (byte_t *)VM_PAGE2ADDR(peb_temp_page);
+	peb_total_size = CEIL_ALIGN(peb_total_size, PAGESIZE);
+	peb_temp_base = (byte_t *)nvm_map(&vm_kernel,
+	                                  HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
+	                                  peb_total_size,
+	                                  PAGESIZE,
+	                                  HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
+	                                  &vm_datablock_anonymous_zero,
+	                                  0,
+	                                  VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED,
+	                                  VM_NODE_FLAG_NORMAL,
+	                                  0);
 	TRY {
 		byte_t *writer;
 		USER uintptr_t *peb_argv;
@@ -182,59 +179,55 @@ again:
 		/* If something about the amount of string data changed, start over */
 		if unlikely(strings_total_copied > strings_total_size) {
 string_size_changed:
-			vm_unmap_kernel_ram(peb_temp_page,
-			                    peb_total_pages,
-			                    false);
+			nvm_unmap_kernel_ram(peb_temp_base,
+			                     peb_total_size,
+			                     false);
 			goto again;
 		}
 
 		/* Figure out where we want to map the PEB within the VM builder. */
-		result = vmb_getfree(self,
-		                     (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_USER_PEB),
-		                     peb_total_pages,
-		                     1,
-		                     HINT_GETMODE(KERNEL_VMHINT_USER_PEB));
+		result = nvmb_getfree(self,
+		                      HINT_GETADDR(KERNEL_VMHINT_USER_PEB),
+		                      peb_total_size,
+		                      PAGESIZE,
+		                      HINT_GETMODE(KERNEL_VMHINT_USER_PEB));
 
-		{
-			uintptr_t relbase;
-			relbase = (uintptr_t)VM_PAGE2ADDR(result);
-			/* Relocate pointers within the PEB to make them absolute */
-			peb->pp_argv = (char **)((byte_t *)peb->pp_argv + relbase);
-			peb->pp_envp = (char **)((byte_t *)peb->pp_envp + relbase);
-			for (i = 0; i < argc_inject + argc_user; ++i)
-				peb_argv[i] += relbase;
-			for (i = 0; i < envc_user; ++i)
-				peb_envp[i] += relbase;
-		}
+		/* Relocate pointers within the PEB to make them absolute */
+		peb->pp_argv = (char **)((byte_t *)peb->pp_argv + (uintptr_t)result);
+		peb->pp_envp = (char **)((byte_t *)peb->pp_envp + (uintptr_t)result);
+		for (i = 0; i < argc_inject + argc_user; ++i)
+			peb_argv[i] += (uintptr_t)result;
+		for (i = 0; i < envc_user; ++i)
+			peb_envp[i] += (uintptr_t)result;
 
 		/* Lock the kernel VM, so we can steal the PEB node. */
 		sync_write(&vm_kernel);
 		/* Ensure that the page directory is prepared to erase the temporary PEB mapping. */
-		if unlikely(!pagedir_prepare_map(peb_temp_page, peb_total_pages)) {
+		if unlikely(!npagedir_prepare_map(peb_temp_base, peb_total_size)) {
 			sync_endwrite(&vm_kernel);
 			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
 		}
 	} EXCEPT {
 		/* Delete the temporary PEB mapping as general-purpose kernel RAM. */
-		vm_unmap_kernel_ram(peb_temp_page,
-		                    peb_total_pages,
-		                    false);
+		nvm_unmap_kernel_ram(peb_temp_base,
+		                     peb_total_size,
+		                     false);
 		RETHROW();
 	}
 	/* Steal the node used to hold the PEB */
-	stolen_node = vm_node_remove(&vm_kernel, peb_temp_page);
+	stolen_node = nvm_node_remove(&vm_kernel, peb_temp_base);
 	/* Delete the temporary PEB mapping, and sync the address range.
 	 * NOTE: Since the mapping was strictly private to us,
 	 *       there is no need to sync this with another CPU! */
-	pagedir_unmap(peb_temp_page, peb_total_pages);
-	pagedir_sync(peb_temp_page, peb_total_pages);
-	pagedir_unprepare_map(peb_temp_page, peb_total_pages);
+	npagedir_unmap(peb_temp_base, peb_total_size);
+	npagedir_sync(peb_temp_base, peb_total_size);
+	npagedir_unprepare_map(peb_temp_base, peb_total_size);
 	sync_endwrite(&vm_kernel);
 
 	/* Make sure that the PEB node has the expected state. */
 	assert(stolen_node);
-	assert(VM_NODE_START(stolen_node) == peb_temp_page);
-	assert(VM_NODE_SIZE(stolen_node) == peb_total_pages);
+	assert(VM_NODE_START(stolen_node) == (vm_vpage_t)__ARCH_PAGEID_ENCODE(peb_temp_base));
+	assert(VM_NODE_SIZE(stolen_node) == (peb_total_size / PAGESIZE));
 	assert(stolen_node->vn_block == &vm_datablock_anonymous_zero);
 	assert(stolen_node->vn_part);
 	assert(!isshared(stolen_node->vn_part));
@@ -266,8 +259,8 @@ string_size_changed:
 #endif /* !NDEBUG */
 
 	/* Update the mapping location of the PEB memory node */
-	stolen_node->vn_node.a_vmin = result;
-	stolen_node->vn_node.a_vmax = result + peb_total_pages - 1;
+	stolen_node->vn_node.a_vmin = (vm_vpage_t)__ARCH_PAGEID_ENCODE(result);
+	stolen_node->vn_node.a_vmax = (vm_vpage_t)__ARCH_PAGEID_ENCODE(result) + (peb_total_size / PAGESIZE) - 1;
 
 	/* Load the stolen node into the VMB */
 	vmb_node_insert(self, stolen_node);

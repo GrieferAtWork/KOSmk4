@@ -42,7 +42,6 @@
 
 DECL_BEGIN
 
-
 STATIC_ASSERT(sizeof(struct p32_pdir) == P32_PDIR_SIZE);
 STATIC_ASSERT(sizeof(struct p32_pdir) == 4096);
 STATIC_ASSERT(sizeof(union p32_pdir_e2) == 4);
@@ -50,7 +49,8 @@ STATIC_ASSERT(sizeof(union p32_pdir_e1) == 4);
 STATIC_ASSERT(P32_PDIR_E1_IDENTITY_BASE == P32_VM_KERNEL_PDIR_IDENTITY_BASE);
 STATIC_ASSERT(P32_PDIR_E2_IDENTITY_BASE == (P32_PDIR_E1_IDENTITY_BASE + (P32_PDIR_VEC2INDEX(P32_PDIR_E1_IDENTITY_BASE) * P32_PDIR_E1_SIZE)));
 
-
+/* Return the physical page ID of a given physical address. */
+#define ppageof(paddr) (pageptr_t)((paddr) / PAGESIZE)
 
 /* Initialize the given page directory.
  * The caller is required to allocate the page directory
@@ -87,7 +87,7 @@ NOTHROW(FCALL p32_pagedir_fini)(VIRT struct p32_pdir *__restrict self) {
 	for (vec2 = 0; vec2 < 768; ++vec2) {
 		union p32_pdir_e2 e2 = self->p_e2[vec2];
 		if (P32_PDIR_E2_ISVEC1(e2.p_word))
-			page_free(VM_ADDR2PAGE((vm_phys_t)(e2.p_word & P32_PAGE_FVECTOR)), 1);
+			page_freeone(ppageof(e2.p_word & P32_PAGE_FVECTOR));
 	}
 }
 
@@ -152,7 +152,7 @@ again:
 		/* Initialize the inner vector.
 		 * We can safely make use of our trampoline, since kernel-space is always prepared. */
 		e1_p   = (union p32_pdir_e1 *)THIS_TRAMPOLINE_BASE;
-		backup = p32_npagedir_push_mapone(e1_p, (u32)new_e1_vector * 4096,
+		backup = p32_npagedir_push_mapone(e1_p, (vm_phys_t)((u32)new_e1_vector * 4096),
 		                                  PAGEDIR_MAP_FWRITE);
 		npagedir_syncone(e1_p);
 		COMPILER_WRITE_BARRIER();
@@ -199,7 +199,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 		if (e2.p_word & P32_PAGE_FPAT_4MIB)
 			e1.p_word |= P32_PAGE_FPAT_4KIB;
 		e1_p   = (union p32_pdir_e1 *)THIS_TRAMPOLINE_BASE;
-		backup = p32_npagedir_push_mapone(e1_p, (u32)new_e1_vector * 4096,
+		backup = p32_npagedir_push_mapone(e1_p, (vm_phys_t)((u32)new_e1_vector * 4096),
 		                                  PAGEDIR_MAP_FWRITE);
 		npagedir_syncone(e1_p);
 		if (vec1_prepare_size == 1024) {
@@ -398,7 +398,7 @@ again_try_exchange_e2_word:
 		}
 		/* Successfully merged the vector.
 		 * At this point, all that's left is to free the vector. */
-		page_free(VM_ADDR2PAGE((vm_phys_t)(e2.p_word & P32_PAGE_FVECTOR)), 1);
+		page_freeone(ppageof(e2.p_word & P32_PAGE_FVECTOR));
 	}
 }
 

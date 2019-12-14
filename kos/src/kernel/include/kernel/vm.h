@@ -22,18 +22,21 @@
 #include <kernel/compiler.h>
 
 #include <kernel/arch/vm.h>
+#include <kernel/driver-callbacks.h>
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/types.h>
-#include <kernel/driver-callbacks.h>
 #include <sched/rwlock.h>
 #include <sched/shared_rwlock.h>
 
+#include <hybrid/__altint.h>
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
 #include <hybrid/sequence/atree.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-rwlock.h>
+
+#include <asm/pageid.h>
 
 #include <stdbool.h>
 
@@ -76,12 +79,8 @@ typedef unsigned int gfp_t;
 #define __SIZEOF_VM_DADDR_T__ __FS_SIZEOF(OFF)
 
 #ifdef __CC__
-#ifdef ALTERNATIVE_TYPE
-typedef ALTERNATIVE_TYPE(u64) vm_dpage_t; /* Data block page number. */
-#else /* ALTERNATIVE_TYPE */
-typedef u64                   vm_dpage_t; /* Data block page number. */
-#endif /* !ALTERNATIVE_TYPE */
-typedef pos_t                 vm_daddr_t; /* Data block address. */
+__HYBRID_ALTINT_TYPEDEF(u64, vm_dpage_t, false); /* Data block page number. */
+typedef pos_t vm_daddr_t;                        /* Data block address. */
 
 
 struct vm_ramblock {
@@ -89,7 +88,7 @@ struct vm_ramblock {
 	size_t      rb_size;  /* Number of continuous physical memory pages used by this block. */
 #if __SIZEOF_VM_PPAGE_T__ > __SIZEOF_SIZE_T__
 	byte_t      rb_pad[__SIZEOF_VM_PPAGE_T__ - __SIZEOF_SIZE_T__];
-#endif
+#endif /* __SIZEOF_VM_PPAGE_T__ > __SIZEOF_SIZE_T__ */
 };
 
 #ifndef CONFIG_NO_SWAP
@@ -1574,7 +1573,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_tryservice)(struct vm
  * @return: true:  Successfully created the mapping.
  * @return: false: Another mapping already exists. */
 FUNDEF bool KCALL
-vm_mapat(struct vm *__restrict effective_vm,
+vm_mapat(struct vm *__restrict self,
          vm_vpage_t page_index, size_t num_pages,
          struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
          vm_vpage64_t data_start_vpage DFL(0),
@@ -1582,6 +1581,25 @@ vm_mapat(struct vm *__restrict effective_vm,
          uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
          uintptr_t guard DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
+LOCAL bool KCALL
+nvm_mapat(struct vm *__restrict self,
+          PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+          PAGEDIR_PAGEALIGNED size_t num_bytes,
+          struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+          PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),
+          uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
+          uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
+          uintptr_t guard DFL(0))
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
+	__hybrid_assert((num_bytes & PAGEMASK) == 0);
+	__hybrid_assert((data_start_offset & PAGEMASK) == 0);
+	return vm_mapat(self, (vm_vpage_t)__ARCH_PAGEID_ENCODE(addr),
+	                num_bytes / PAGESIZE, data,
+	                (vm_vpage64_t)(data_start_offset / PAGESIZE),
+	                prot, flag, guard);
+}
 
 /* Same as `vm_mapat()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
  * to be mapped from `data'. - Any attempted to map data from outside that range will instead cause
@@ -1635,13 +1653,13 @@ vm_mapresat(struct vm *__restrict effective_vm,
  *          Return the `x = 1 - (rand() / RAND_MAX); x*x*NUM_CANDIDATES'th candidate
  *   #2: Repeat step #1, but ignore the potentials of GUARD nodes.
  *   #3: Return `VM_GETFREE_ERROR'
- * NOTE: The caller must be holding a read-lock to `effective_vm'.
+ * NOTE: The caller must be holding a read-lock to `self'.
  * @param: mode:                   Set of `VM_GETFREE_F*'
  * @param: hint:                   A hint used as base when searching for free memory ranges.
  * @param: min_alignment_in_pages: The minimum alignment required from the returned pointer (or `1')
  * @return: VM_GETFREE_ERROR:      No more virtual memory available. */
 FUNDEF NOBLOCK WUNUSED vm_vpage_t
-NOTHROW(KCALL vm_getfree)(struct vm *__restrict effective_vm,
+NOTHROW(KCALL vm_getfree)(struct vm *__restrict self,
                           vm_vpage_t hint, size_t num_pages,
                           size_t min_alignment_in_pages,
                           unsigned int mode);
@@ -1651,9 +1669,30 @@ NOTHROW(KCALL vm_getfree)(struct vm *__restrict effective_vm,
                                   * location in accordance to `VM_GETFREE_ABOVE|VM_GETFREE_BELOW',
                                   * do _NOT_ re-attempt the search into the other direction. */
 #define VM_GETFREE_ASLR   0x0004 /* Randomize return values (see above) */
-/* TODO: Flag `VM_GETFREE_USER'  --  When `effective_vm' is `&vm_kernel', allow returned pointers
+/* TODO: Flag `VM_GETFREE_USER'  --  When `self' is `&vm_kernel', allow returned pointers
  *       to be apart of user-space, as opposed to only ever returning kernel-space pointers. */
 #define VM_GETFREE_ERROR  (VM_VPAGE_MAX + __CCAST(vm_vpage_t)1)
+
+
+#define NVM_GETFREE_ERROR ((void *)-1)
+LOCAL NOBLOCK WUNUSED PAGEDIR_PAGEALIGNED UNCHECKED void *
+NOTHROW(KCALL nvm_getfree)(struct vm *__restrict self,
+                           PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
+                           PAGEDIR_PAGEALIGNED size_t num_bytes,
+                           PAGEDIR_PAGEALIGNED size_t min_alignment,
+                           unsigned int mode) {
+	vm_vpage_t result;
+	__hybrid_assert(((uintptr_t)hint & PAGEMASK) == 0);
+	__hybrid_assert((num_bytes & PAGEMASK) == 0);
+	__hybrid_assert((min_alignment & PAGEMASK) == 0);
+	result = vm_getfree(self, (vm_vpage_t)__ARCH_PAGEID_ENCODE(hint),
+	                    num_bytes / PAGESIZE,
+	                    min_alignment / PAGESIZE, mode);
+	if (result == VM_GETFREE_ERROR)
+		return NVM_GETFREE_ERROR;
+	return __ARCH_PAGEID_DECODE(result);
+}
+
 
 
 /* Get/set ASLR-disabled (defaults to `false'; can also be
@@ -1684,7 +1723,7 @@ NOTHROW(KCALL vm_find_last_node_lower_equal)(struct vm *__restrict effective_vm,
 /* A combination of `vm_getfree' + `vm_mapat'
  * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target. */
 FUNDEF vm_vpage_t KCALL
-vm_map(struct vm *__restrict effective_vm,
+vm_map(struct vm *__restrict self,
        vm_vpage_t hint,
        size_t num_pages,
        size_t min_alignment_in_pages DFL(1),
@@ -1695,6 +1734,32 @@ vm_map(struct vm *__restrict effective_vm,
        uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
        uintptr_t guard DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
+LOCAL PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
+nvm_map(struct vm *__restrict self,
+        PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
+        PAGEDIR_PAGEALIGNED size_t num_bytes,
+        PAGEDIR_PAGEALIGNED size_t min_alignment DFL(1),
+        unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
+        struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+        PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),
+        uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
+        uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
+        uintptr_t guard DFL(0))
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	vm_vpage_t result;
+	__hybrid_assert(((uintptr_t)hint & PAGEMASK) == 0);
+	__hybrid_assert((num_bytes & PAGEMASK) == 0);
+	__hybrid_assert((min_alignment & PAGEMASK) == 0);
+	__hybrid_assert((data_start_offset & PAGEMASK) == 0);
+	result = vm_map(self,
+	                (vm_vpage_t)__ARCH_PAGEID_ENCODE(hint),
+	                num_bytes / PAGESIZE,
+	                min_alignment / PAGESIZE,
+	                getfree_mode, data,
+	                (vm_vpage64_t)(data_start_offset / PAGESIZE),
+	                prot, flag, guard);
+	return __ARCH_PAGEID_DECODE(result);
+}
 
 /* Same as `vm_map()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
  * to be mapped from `data'. - Any attempted to map data from outside that range will instead cause
@@ -1718,13 +1783,32 @@ vm_map_subrange(struct vm *__restrict effective_vm,
 
 /* A combination of `vm_getfree' + `vm_mapresat'
  * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target. */
-FUNDEF vm_vpage_t KCALL
+FUNDEF vm_vpage_t KCALL /* TODO: Remove me */
 vm_mapres(struct vm *__restrict effective_vm,
           vm_vpage_t hint, size_t num_pages,
           size_t min_alignment_in_pages DFL(1),
           unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
           uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
+LOCAL UNCHECKED void *KCALL
+nvm_mapres(struct vm *__restrict effective_vm, /* TODO: Rename to `vm_mapres()' */
+           PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
+           PAGEDIR_PAGEALIGNED size_t num_bytes,
+           PAGEDIR_PAGEALIGNED size_t min_alignment DFL(PAGESIZE),
+           unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
+           uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL))
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	vm_vpage_t result;
+	__hybrid_assert(((uintptr_t)hint & PAGEMASK) == 0);
+	__hybrid_assert((num_bytes & PAGEMASK) == 0);
+	__hybrid_assert((min_alignment & PAGEMASK) == 0);
+	result = vm_mapres(effective_vm, (vm_vpage_t)__ARCH_PAGEID_ENCODE(hint),
+	                   num_bytes / PAGESIZE,
+	                   min_alignment / PAGESIZE,
+	                   getfree_mode, flag);
+	return __ARCH_PAGEID_DECODE(result);
+}
 
 
 
@@ -1754,11 +1838,31 @@ vm_mapres(struct vm *__restrict effective_vm,
  * @param: how:       What memory may be unmapped, and how that memory should be unmapped (Set of `VM_UNMAP_*')
  * @return: * :       The actual number of unmapped pages of memory (when `VM_UNMAP_SEGFAULTIFUNUSED'
  *                    is given, this is always equal to `num_pages') */
-FUNDEF size_t KCALL
+FUNDEF size_t KCALL /* TODO: Remove me */
 vm_unmap(struct vm *__restrict effective_vm,
          vm_vpage_t base, size_t num_pages,
          unsigned int how DFL(VM_UNMAP_ANYTHING))
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+
+/* Unmap all memory mappings within the given address range.
+ * @param: addr:      The base address at which to start unmapping memory.
+ * @param: num_bytes: The number of continuous bytes of memory to unmap, starting at `addr'
+ * @param: how:       What memory may be unmapped, and how that memory should be unmapped (Set of `VM_UNMAP_*')
+ * @return: * :       The actual number of unmapped bytes of memory (when `VM_UNMAP_SEGFAULTIFUNUSED'
+ *                    is given, this is always equal to `num_bytes') */
+LOCAL size_t KCALL
+nvm_unmap(struct vm *__restrict effective_vm, /* TODO: Rename to `vm_mapres()' */
+          PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+          PAGEDIR_PAGEALIGNED size_t num_bytes,
+          unsigned int how DFL(VM_UNMAP_ANYTHING))
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
+	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
+	__hybrid_assert((num_bytes & PAGEMASK) == 0);
+	return vm_unmap(effective_vm,
+	                (vm_vpage_t)__ARCH_PAGEID_ENCODE(addr),
+	                num_bytes / PAGESIZE, how) *
+	       PAGESIZE;
+}
 
 
 /* Update access protection flags within the given address range.
@@ -1786,19 +1890,41 @@ NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self);
 /* Remove a given node from the specified VM.
  * NOTE: The caller must be holding a write-lock to the associated VM. */
 FUNDEF NOBLOCK NONNULL((1)) struct vm_node *
-NOTHROW(KCALL vm_node_remove)(struct vm *__restrict effective_vm, vm_vpage_t page);
+NOTHROW(KCALL vm_node_remove)(struct vm *__restrict self, vm_vpage_t page);
+
+LOCAL NOBLOCK NONNULL((1)) struct vm_node *
+NOTHROW(KCALL nvm_node_remove)(struct vm *__restrict self,
+                               UNCHECKED void *addr) {
+	return vm_node_remove(self, (vm_vpage_t)__ARCH_PAGEID_ENCODE(addr));
+}
 
 /* Without blocking, unmap the given range of kernel RAM. */
 FUNDEF NOBLOCK void
 NOTHROW(FCALL vm_unmap_kernel_ram)(vm_vpage_t page_index,
                                    size_t num_pages,
                                    bool is_zero);
+LOCAL NOBLOCK void
+NOTHROW(FCALL nvm_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+                                    PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                    bool is_zero) {
+	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
+	__hybrid_assert((num_bytes & PAGEMASK) == 0);
+	vm_unmap_kernel_ram((vm_vpage_t)__ARCH_PAGEID_ENCODE(addr),
+	                    num_bytes / PAGESIZE, is_zero);
+}
 
 
 /* Get the node associated with the given `page'
- * NOTE: The caller must be holding a read-lock on `effective_vm'. */
+ * NOTE: The caller must be holding a read-lock on `self'. */
 FUNDEF NOBLOCK WUNUSED struct vm_node *
-NOTHROW(FCALL vm_getnodeof)(struct vm *__restrict effective_vm, vm_vpage_t page);
+NOTHROW(FCALL vm_getnodeof)(struct vm *__restrict self, vm_vpage_t page);
+
+LOCAL NOBLOCK WUNUSED struct vm_node *
+NOTHROW(FCALL nvm_getnodeof)(struct vm *__restrict self,
+                             UNCHECKED void *addr) {
+	return vm_getnodeof(self, (vm_vpage_t)__ARCH_PAGEID_ENCODE(addr));
+}
+
 
 /* Check if some part of the given address range is currently in use.
  * NOTE: The caller must be holding a read-lock on `effective_vm'. */
@@ -2052,10 +2178,10 @@ struct vm_dmalock {
 #ifdef __INTELLISENSE__
 NOBLOCK NONNULL((1)) void
 NOTHROW(vm_dmalock_release)(struct vm_dmalock *__restrict self);
-#else
+#else /* __INTELLISENSE__ */
 #define vm_dmalock_release(x) \
 	(sync_endread((x)->dl_part), decref_unlikely((x)->dl_part))
-#endif
+#endif /* !__INTELLISENSE__ */
 
 
 

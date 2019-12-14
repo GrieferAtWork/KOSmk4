@@ -391,15 +391,15 @@ x86_init_psp0_thread(struct task *__restrict thread, size_t stack_size) {
 	FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_blockv = &FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0;
 	if (thread == &_boottask) {
 		FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin = (vm_vpage_t)(uintptr_t)__kernel_boottask_stack_page;
-		FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (vm_ppage_t)VM_ADDR2PAGE((uintptr_t)__kernel_boottask_stack_page - KERNEL_BASE);
+		FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)(uintptr_t)__kernel_boottask_stack_page - KERNEL_CORE_PAGE;
 	} else if (thread == &_bootidle) {
 		FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin = (vm_vpage_t)(uintptr_t)__kernel_bootidle_stack_page;
-		FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (vm_ppage_t)VM_ADDR2PAGE((uintptr_t)__kernel_bootidle_stack_page - KERNEL_BASE);
+		FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)(uintptr_t)__kernel_bootidle_stack_page - KERNEL_CORE_PAGE;
 	}
 	FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmax = FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin +
 	                                                         CEILDIV(stack_size, PAGESIZE) - 1;
 	FORTASK(thread, this_kernel_stackpart_).dp_tree.a_vmax = FORTASK(thread, this_kernel_stackpart_).dp_tree.a_vmin +
-	                                                         CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1;
+	                                                         CEILDIV(stack_size, PAGESIZE) - 1;
 	FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_size  = CEILDIV(stack_size, PAGESIZE);
 	init_this_x86_kernel_psp0(thread);
 }

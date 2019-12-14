@@ -273,7 +273,7 @@ vm_exec(struct vm *__restrict effective_vm,
 	phdr_vector = (Elf_Phdr *)malloca(ehdr.e_phnum * sizeof(Elf_Phdr));
 	TRY {
 		struct vmb builder = VMB_INIT;
-		vm_vpage_t peb_page;
+		PAGEDIR_PAGEALIGNED UNCHECKED void *peb_base;
 		vm_vpage_t stack_page;
 		vm_vpage_t linker_base;
 		uintptr_t loadstart = (uintptr_t)-1;
@@ -454,7 +454,7 @@ err_overlap:
 			                     0);
 
 			/* Create a memory mapping for the PEB containing `argv' and `envp' */
-			peb_page = vmb_alloc_peb(&builder,
+			peb_base = vmb_alloc_peb(&builder,
 			                         argc_inject,
 			                         argv_inject,
 			                         argv,
@@ -480,7 +480,7 @@ err_overlap:
 
 		/* Set the entry point for the loaded binary. */
 		user_state = exec_initialize_entry(user_state,
-		                                   (USER void *)VM_PAGE2ADDR(peb_page),
+		                                   peb_base,
 		                                   (USER void *)VM_PAGE2ADDR(stack_page),
 		                                   USER_STACK_NUM_PAGES * PAGESIZE,
 		                                   (USER void *)ehdr.e_entry);
@@ -502,7 +502,7 @@ err_overlap:
 			 *       it will override this fairly early on with its own version. */
 			struct library_listdef *lld = &FORVM(effective_vm, thisvm_library_listdef);
 			memcpy(lld, &peb_based_library_list, sizeof(struct library_listdef));
-			lld->lld_first = (USER void *)VM_PAGE2ADDR(peb_page);
+			lld->lld_first                     = peb_base;
 			lld->lld_module_offsetof_loadstart = loadstart;
 		}
 	} EXCEPT {

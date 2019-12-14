@@ -1654,22 +1654,21 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 	vga_disable_annoying_blinking();
 	vga_device = CHARACTER_DEVICE_ALLOC(VGA);
 	TRY {
-		vm_vpage_t vram_page;
+		void *vram_base;
 		atomic_rwlock_cinit(&vga_device->v_lock);
 		atomic_rwlock_cinit(&vga_device->v_textlock);
 		vga_device->v_vram_addr = (vm_phys_t)0xa0000;
 		vga_device->v_vram_size = 8192 * 4 * 4; /* 128K */
-		vram_page = vm_map(&vm_kernel,
-		                   (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_DEVICE),
-		                   CEILDIV(vga_device->v_vram_size, PAGESIZE),
-		                   1, HINT_GETMODE(KERNEL_VMHINT_DEVICE),
+		vram_base = nvm_map(&vm_kernel,
+		                   HINT_GETADDR(KERNEL_VMHINT_DEVICE),
+		                   CEIL_ALIGN(vga_device->v_vram_size, PAGESIZE),
+		                   PAGESIZE, HINT_GETMODE(KERNEL_VMHINT_DEVICE),
 		                   &vm_datablock_physical,
-		                   (vm_vpage64_t)(vm_ppage_t)VM_ADDR2PAGE(vga_device->v_vram_addr),
+		                   (pos_t)(vga_device->v_vram_addr & ~PAGEMASK),
 		                   VM_PROT_READ | VM_PROT_WRITE,
 		                   VM_NODE_FLAG_NORMAL, 0);
 		TRY {
-			vga_device->v_vram = (byte_t *)VM_PAGE2ADDR(vram_page) +
-			                     (uintptr_t)(vga_device->v_vram_addr & PAGEMASK);
+			vga_device->v_vram = (byte_t *)vram_base + (uintptr_t)(vga_device->v_vram_addr & PAGEMASK);
 			vga_device->v_crt_i = VGA_CRT_IC;
 			vga_device->v_crt_d = VGA_CRT_DC;
 			vga_device->v_is1_r = VGA_IS1_RC;
@@ -1707,7 +1706,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 			/* Register the VGA adapter device. */
 			character_device_register_auto(vga_device);
 		} EXCEPT {
-			vm_unmap(&vm_kernel, vram_page, CEILDIV(vga_device->v_vram_size, PAGESIZE));
+			nvm_unmap(&vm_kernel, vram_base, CEIL_ALIGN(vga_device->v_vram_size, PAGESIZE));
 			RETHROW();
 		}
 	} EXCEPT {

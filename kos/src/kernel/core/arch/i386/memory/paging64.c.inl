@@ -47,6 +47,9 @@
 
 DECL_BEGIN
 
+/* Return the physical page ID of a given physical address. */
+#define ppageof(paddr) (pageptr_t)((paddr) / PAGESIZE)
+
 /* Feature tests helpers */
 #define HAVE_PAGE_GLOBAL_BIT       (x86_bootcpu_cpuid.ci_1d & CPUID_1D_PGE)
 #define HAVE_PAGE_ATTRIBUTE_TABLE  (x86_bootcpu_cpuid.ci_1d & CPUID_1D_PAT)
@@ -284,13 +287,13 @@ NOTHROW(FCALL p64_pagedir_fini)(VIRT struct p64_pdir *__restrict self,
 						e2 = P64_PDIR_E2_IDENTITY[vec4][vec3][vec2];
 						/* Check if this is an allocated E1 vector. */
 						if (P64_PDIR_E2_ISVEC1(e2.p_word)) {
-							page_freeone(VM_ADDR2PAGE((vm_phys_t)(e2.p_word & P64_PAGE_FVECTOR)));
+							page_freeone(ppageof(e2.p_word & P64_PAGE_FVECTOR));
 						}
 					}
-					page_freeone(VM_ADDR2PAGE((vm_phys_t)(e3.p_word & P64_PAGE_FVECTOR)));
+					page_freeone(ppageof(e3.p_word & P64_PAGE_FVECTOR));
 				}
 			}
-			page_freeone(VM_ADDR2PAGE((vm_phys_t)(e4.p_word & P64_PAGE_FVECTOR)));
+			page_freeone(ppageof(e4.p_word & P64_PAGE_FVECTOR));
 		}
 	}
 	if (old_pagedir != NOT_SWITCHED) {

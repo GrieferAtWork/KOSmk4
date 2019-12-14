@@ -768,9 +768,9 @@ NOTHROW(KCALL driver_destroy)(struct driver *__restrict self) {
 		/* NOTE: During finalization, all write-only program headers were re-mapped
 		 *       as read/write, so-as to allow us to free them as kernel-ram at this
 		 *       point. */
-		vm_unmap_kernel_ram((vm_vpage_t)VM_ADDR2PAGE(progaddr),
-		                    (size_t)CEILDIV(progsize, PAGESIZE),
-		                    false);
+		nvm_unmap_kernel_ram((void *)progaddr,
+		                     CEIL_ALIGN(progsize, PAGESIZE),
+		                     false);
 	}
 	/* Free heap-allocated structures. */
 	if (self->d_eh_frame_cache)
@@ -1427,12 +1427,10 @@ driver_enable_textrel(struct driver *__restrict self)
 		/* Must make this header writable! */
 		if (!did_lock_kernel)
 			vm_kernel_treelock_write();
-		node = vm_getnodeof(&vm_kernel,
-		                    (vm_vpage_t)VM_ADDR2PAGE(self->d_loadaddr +
-		                                             self->d_phdr[i].p_vaddr));
+		node = nvm_getnodeof(&vm_kernel,
+		                    (void *)(self->d_loadaddr + self->d_phdr[i].p_vaddr));
 		assertf(node, "Missing node for driver %q's program segment #%I16u mapped at %p",
-		        self->d_name, (uint16_t)i,
-		        (void *)(self->d_loadaddr + self->d_phdr[i].p_vaddr));
+		        self->d_name, (uint16_t)i, (void *)(self->d_loadaddr + self->d_phdr[i].p_vaddr));
 		/* By simply adding write permissions here, a future #PF for nodes within this
 		 * memory range will simply propagate this permission bit into the page directory. */
 		ATOMIC_FETCHOR(node->vn_prot, VM_PROT_WRITE);
@@ -1456,9 +1454,8 @@ driver_disable_textrel(struct driver *__restrict self)
 		/* Must make this header writable! */
 		if (!did_lock_kernel)
 			vm_kernel_treelock_write();
-		node = vm_getnodeof(&vm_kernel,
-		                    (vm_vpage_t)VM_ADDR2PAGE(self->d_loadaddr +
-		                                             self->d_phdr[i].p_vaddr));
+		node = nvm_getnodeof(&vm_kernel,
+		                     (void *)(self->d_loadaddr + self->d_phdr[i].p_vaddr));
 		assertf(node, "Missing node for driver %q's program segment #%I16u mapped at %p",
 		        self->d_name, (uint16_t)i,
 		        (void *)(self->d_loadaddr + self->d_phdr[i].p_vaddr));
@@ -3245,7 +3242,9 @@ PUBLIC NONNULL((1)) bool
 
 
 PRIVATE NONNULL((2)) void KCALL
-unmap_range(uintptr_t loadaddr, Elf_Phdr *__restrict headers, size_t count) {
+unmap_range(uintptr_t loadaddr,
+            Elf_Phdr const *__restrict headers,
+            size_t count) {
 	Elf_Addr addr;
 	Elf_Word size;
 	while (count--) {
@@ -3258,8 +3257,9 @@ unmap_range(uintptr_t loadaddr, Elf_Phdr *__restrict headers, size_t count) {
 		addr += loadaddr;
 		size += addr & PAGEMASK;
 		addr &= ~PAGEMASK;
-		vm_unmap_kernel_ram(VM_ADDR2PAGE((vm_virt_t)addr),
-		                    CEILDIV(size, PAGESIZE), false);
+		nvm_unmap_kernel_ram((void *)addr,
+		                     CEIL_ALIGN(size, PAGESIZE),
+		                     false);
 	}
 }
 
@@ -3269,8 +3269,8 @@ contains_illegal_overlap(Elf_Phdr *__restrict headers,
                          size_t count) {
 	size_t i, j;
 	for (i = 0; i < count; ++i) {
-		vm_vpage_t min_page;
-		vm_vpage_t max_page;
+		uintptr_t min_page;
+		uintptr_t max_page;
 		Elf_Addr addr;
 		Elf_Word size;
 		if (headers[i].p_type != PT_LOAD)
@@ -3280,15 +3280,15 @@ contains_illegal_overlap(Elf_Phdr *__restrict headers,
 		if (OVERFLOW_UADD(size, addr & PAGEMASK, &size))
 			goto yes;
 		addr &= ~PAGEMASK;
-		min_page = VM_ADDR2PAGE((vm_virt_t)addr);
+		min_page = addr / PAGESIZE;
 		if (OVERFLOW_UADD(addr, size, &addr))
 			goto yes;
 		if (OVERFLOW_UADD(addr, (Elf_Addr)PAGEMASK, &addr))
 			goto yes;
-		max_page = (vm_vpage_t)(addr / PAGESIZE) - 1;
+		max_page = (addr / PAGESIZE) - 1;
 		for (j = i + 1; j < count; ++j) {
-			vm_vpage_t other_min_page;
-			vm_vpage_t other_max_page;
+			uintptr_t other_min_page;
+			uintptr_t other_max_page;
 			if (headers[j].p_type != PT_LOAD)
 				continue;
 			addr = headers[j].p_vaddr;
@@ -3296,12 +3296,12 @@ contains_illegal_overlap(Elf_Phdr *__restrict headers,
 			if (OVERFLOW_UADD(size, addr & PAGEMASK, &size))
 				goto yes;
 			addr &= ~PAGEMASK;
-			other_min_page = VM_ADDR2PAGE((vm_virt_t)addr);
+			other_min_page = addr / PAGESIZE;
 			if (OVERFLOW_UADD(addr, size, &addr))
 				goto yes;
 			if (OVERFLOW_UADD(addr, (Elf_Addr)PAGEMASK, &addr))
 				goto yes;
-			other_max_page = (vm_vpage_t)(addr / PAGESIZE) - 1;
+			other_max_page = (addr / PAGESIZE) - 1;
 			if (other_min_page < max_page &&
 			    other_max_page > min_page)
 				goto yes;
@@ -3319,14 +3319,13 @@ driver_map_into_memory(struct driver *__restrict self,
                        USER CHECKED byte_t *base,
                        size_t num_bytes)
 		THROWS(E_BADALLOC, E_SEGFAULT, E_WOULDBLOCK) {
-	vm_vpage_t loadpage;
 	Elf_Half i;
 	uintptr_t loadaddr, min_addr, max_addr;
-	size_t min_page_alignment = 1;
-	size_t total_pages;
+	size_t min_alignment = PAGESIZE;
+	size_t total_bytes;
 	assert(self->d_phnum);
 	min_addr = (uintptr_t)-1;
-	max_addr = 0;
+	max_addr = (uintptr_t)0;
 	/* Figure out the min/max byte offsets for program segments. */
 	for (i = 0; i < self->d_phnum; ++i) {
 		Elf_Addr addr;
@@ -3338,9 +3337,9 @@ driver_map_into_memory(struct driver *__restrict self,
 		align = self->d_phdr[i].p_align;
 		if unlikely(!size)
 			continue;
-		align = CEILDIV(align, PAGESIZE);
-		if (min_page_alignment < align)
-			min_page_alignment = align;
+		align = CEIL_ALIGN(align, PAGESIZE);
+		if (min_alignment < align)
+			min_alignment = align;
 		size += addr & PAGEMASK;
 		addr &= ~PAGEMASK;
 		size = CEIL_ALIGN(size, PAGESIZE);
@@ -3355,21 +3354,22 @@ driver_map_into_memory(struct driver *__restrict self,
 		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOSEGMENTS);
 	self->d_loadstart = min_addr;
 	self->d_loadend   = max_addr + 1;
-	total_pages = (CEILDIV(max_addr, PAGESIZE) -
-	               FLOORDIV(min_addr, PAGESIZE));
-	assert(total_pages != 0);
-	if unlikely(min_page_alignment & (min_page_alignment - 1))
+	total_bytes = (CEILDIV(max_addr, PAGESIZE) -
+                   FLOORDIV(min_addr, PAGESIZE)) *
+	              PAGESIZE;
+	assert(total_bytes != 0);
+	if unlikely(min_alignment & (min_alignment - 1))
 		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_ALIGN);
 	/* Find a suitable target location where we can map the library. */
 find_new_candidate:
 	vm_kernel_treelock_read();
-	loadpage = vm_getfree(&vm_kernel,
-	                      (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_DRIVER),
-	                      total_pages,
-	                      min_page_alignment,
-	                      HINT_GETMODE(KERNEL_VMHINT_DRIVER));
+	loadaddr = (uintptr_t)nvm_getfree(&vm_kernel,
+	                                  HINT_GETADDR(KERNEL_VMHINT_DRIVER),
+	                                  total_bytes,
+	                                  min_alignment,
+	                                  HINT_GETMODE(KERNEL_VMHINT_DRIVER));
 	vm_kernel_treelock_endread();
-	if unlikely(loadpage == VM_GETFREE_ERROR) {
+	if unlikely(loadaddr == (uintptr_t)NVM_GETFREE_ERROR) {
 		uintptr_t version;
 #ifndef __OPTIMIZE_SIZE__
 		if (system_clearcaches())
@@ -3378,19 +3378,19 @@ find_new_candidate:
 		version = 0;
 find_new_candidate_tryhard:
 		vm_kernel_treelock_read();
-		loadpage = vm_getfree(&vm_kernel,
-		                      (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_DRIVER),
-		                      total_pages,
-		                      min_page_alignment,
-		                      HINT_GETMODE(KERNEL_VMHINT_DRIVER));
+		loadaddr = (uintptr_t)nvm_getfree(&vm_kernel,
+		                                  HINT_GETADDR(KERNEL_VMHINT_DRIVER),
+		                                  total_bytes,
+		                                  min_alignment,
+		                                  HINT_GETMODE(KERNEL_VMHINT_DRIVER));
 		vm_kernel_treelock_endread();
-		if (loadpage == VM_GETFREE_ERROR) {
+		if (loadaddr == (uintptr_t)VM_GETFREE_ERROR) {
 			if (system_clearcaches_s(&version))
 				goto find_new_candidate_tryhard;
-			THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, total_pages);
+			THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY, total_bytes);
 		}
 	}
-	loadaddr = (uintptr_t)VM_PAGE2ADDR(loadpage) - min_addr;
+	loadaddr -= min_addr;
 	/* Now that we've got a suitable memory location, move on to actually map the library. */
 	i = 0;
 	TRY {
@@ -3425,14 +3425,11 @@ find_new_candidate_tryhard:
 			/* Create the program segment. */
 			/* TODO: Prefault this mapping! (although technically, this would only be a performance
 			 *       improvement, since we're faulting all of the memory below anyways...) */
-			if (!vm_mapat(&vm_kernel,
-			              VM_ADDR2PAGE((vm_virt_t)addr),
-			              CEILDIV(size + (addr & PAGEMASK), PAGESIZE),
-			              &vm_datablock_anonymous,
-			              0,
-			              prot,
-			              VM_NODE_FLAG_PREPARED,
-			              0)) {
+			if (!nvm_mapat(&vm_kernel,
+			               (void *)(addr & ~PAGEMASK),
+			               CEIL_ALIGN(size + (addr & PAGEMASK), PAGESIZE),
+			               &vm_datablock_anonymous, 0,
+			               prot, VM_NODE_FLAG_PREPARED, 0)) {
 				/* Check for illegal overlap */
 				if (contains_illegal_overlap(self->d_phdr, self->d_phnum))
 					THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP);
@@ -3944,8 +3941,8 @@ driver_insmod_file(struct regular_node *__restrict driver_inode,
                    unsigned int flags)
 		THROWS(E_SEGFAULT, E_NOT_EXECUTABLE, E_BADALLOC, E_IOERROR) {
 	pos_t filesize;
-	size_t num_pages;
-	vm_vpage_t temp_page;
+	size_t num_bytes;
+	void *temp_mapping;
 	REF struct driver *result;
 	/* Quick check: Is there a driver that is mapping the given INode? */
 	result = driver_with_file(driver_inode);
@@ -3961,20 +3958,20 @@ driver_insmod_file(struct regular_node *__restrict driver_inode,
 	filesize = ATOMIC_READ(driver_inode->i_filesize);
 	if (filesize >= (pos_t)0x10000000)
 		THROW(E_NOT_EXECUTABLE_TOOLARGE);
-	num_pages = CEILDIV((size_t)filesize, PAGESIZE);
-	temp_page = vm_map(&vm_kernel,
-	                   (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
-	                   num_pages,
-	                   1,
-	                   HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
-	                   driver_inode,
-	                   0,
-	                   VM_PROT_READ | VM_PROT_SHARED,
-	                   VM_NODE_FLAG_NOMERGE,
-	                   0);
+	num_bytes = CEIL_ALIGN((size_t)filesize, PAGESIZE);
+	temp_mapping = nvm_map(&vm_kernel,
+	                       HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
+	                       num_bytes,
+	                       PAGESIZE,
+	                       HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
+	                       driver_inode,
+	                       0,
+	                       VM_PROT_READ | VM_PROT_SHARED,
+	                       VM_NODE_FLAG_NOMERGE,
+	                       0);
 	TRY {
 		/* Load the driver from the file blob. */
-		result = driver_do_insmod_blob((byte_t *)VM_PAGE2ADDR(temp_page),
+		result = driver_do_insmod_blob((byte_t *)temp_mapping,
 		                               (size_t)filesize,
 		                               driver_cmdline,
 		                               pnew_driver_loaded,
@@ -3983,13 +3980,13 @@ driver_insmod_file(struct regular_node *__restrict driver_inode,
 		                               driver_dentry,
 		                               flags);
 	} EXCEPT {
-		vm_unmap(&vm_kernel, temp_page, num_pages,
-		         VM_UNMAP_NORMAL | VM_UNMAP_NOSPLIT);
+		nvm_unmap(&vm_kernel, temp_mapping, num_bytes,
+		          VM_UNMAP_NORMAL | VM_UNMAP_NOSPLIT);
 		RETHROW();
 	}
 	TRY {
-		vm_unmap(&vm_kernel, temp_page, num_pages,
-		         VM_UNMAP_NORMAL | VM_UNMAP_NOSPLIT);
+		nvm_unmap(&vm_kernel, temp_mapping, num_bytes,
+		          VM_UNMAP_NORMAL | VM_UNMAP_NOSPLIT);
 	} EXCEPT {
 		decref(result);
 		RETHROW();

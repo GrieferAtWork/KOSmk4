@@ -299,7 +299,7 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	REL(FORTASK(&_boottask, this_kernel_stackpart_).dp_ramdata.rd_blockv, &_boottask);
 	FORTASK(&_boottask, this_kernel_stacknode_).vn_node.a_vmin = (vm_vpage_t)((uintptr_t)__kernel_boottask_stack_page);
 	FORTASK(&_boottask, this_kernel_stacknode_).vn_node.a_vmax = (vm_vpage_t)((uintptr_t)__kernel_boottask_stack_page + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1);
-	FORTASK(&_boottask, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (vm_ppage_t)VM_ADDR2PAGE((uintptr_t)__kernel_boottask_stack_page - KERNEL_BASE);
+	FORTASK(&_boottask, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)(uintptr_t)__kernel_boottask_stack_page - KERNEL_CORE_PAGE;
 
 	REL(FORTASK(&_bootidle, this_kernel_stacknode_).vn_part, &_bootidle);
 	REL(FORTASK(&_bootidle, this_kernel_stacknode_).vn_link.ln_pself, &_bootidle);
@@ -307,9 +307,9 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	REL(FORTASK(&_bootidle, this_kernel_stackpart_).dp_ramdata.rd_blockv, &_bootidle);
 	FORTASK(&_bootidle, this_kernel_stacknode_).vn_node.a_vmin = (vm_vpage_t)((uintptr_t)__kernel_bootidle_stack_page);
 	FORTASK(&_bootidle, this_kernel_stacknode_).vn_node.a_vmax = (vm_vpage_t)((uintptr_t)__kernel_bootidle_stack_page + CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1);
-	FORTASK(&_bootidle, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (vm_ppage_t)VM_ADDR2PAGE((uintptr_t)__kernel_bootidle_stack_page - KERNEL_BASE);
-	FORTASK(&_bootidle, this_kernel_stackpart_).dp_tree.a_vmax                = (vm_dpage_t)(CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1);
+	FORTASK(&_bootidle, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)(uintptr_t)__kernel_bootidle_stack_page - KERNEL_CORE_PAGE;
 	FORTASK(&_bootidle, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_size  = CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE);
+	FORTASK(&_bootidle, this_kernel_stackpart_).dp_tree.a_vmax                = (vm_dpage_t)(CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1);
 #undef REL
 
 	FORTASK(&_boottask, this_fs)             = &fs_kernel;

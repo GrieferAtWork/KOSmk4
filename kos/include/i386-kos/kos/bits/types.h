@@ -78,12 +78,13 @@ typedef __bitwise __UINT64_TYPE__ __be64;
 #endif /* __UINT64_TYPE__ */
 #endif
 #endif /* !____le8_defined */
-#if defined(__KERNEL__) && defined(ALTERNATIVE_TYPE)
-typedef /*VIRT*/ ALTERNATIVE_TYPE(__ULONGPTR_TYPE__) __vm_vpage_t; /* Virtual memory page index (`virtual_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
-typedef /*PHYS*/ ALTERNATIVE_TYPE(__ULONGPTR_TYPE__) __vm_ppage_t; /* Physical memory page index (`physical_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
-typedef /*SWAP*/ ALTERNATIVE_TYPE(__ULONGPTR_TYPE__) __vm_spage_t; /* Swap memory page index (`swap_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
-typedef /*VIRT*/ ALTERNATIVE_TYPE(__ULONGPTR_TYPE__) __vm_virt_t;  /* A virtual memory pointer. */ /* DEPRECATED; REMOVE ME */
-typedef /*PHYS*/ ALTERNATIVE_TYPE(__UINT64_TYPE__)   __vm_phys_t;  /* A physical memory pointer. */ /* TODO: Rename to `__phys_t' */
+#ifdef __KERNEL__
+#include <hybrid/__altint.h>
+__HYBRID_ALTINT_TYPEDEF(__ULONGPTR_TYPE__, __vm_vpage_t, false); /* Virtual memory page index (`virtual_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
+__HYBRID_ALTINT_TYPEDEF(__ULONGPTR_TYPE__, __vm_ppage_t, false); /* Physical memory page index (`physical_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
+__HYBRID_ALTINT_TYPEDEF(__ULONGPTR_TYPE__, __vm_spage_t, false); /* Swap memory page index (`swap_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
+__HYBRID_ALTINT_TYPEDEF(__ULONGPTR_TYPE__, __vm_virt_t, false);  /* A virtual memory pointer. */ /* DEPRECATED; REMOVE ME */
+__HYBRID_ALTINT_TYPEDEF(__UINT64_TYPE__, __vm_phys_t, false);    /* A physical memory pointer. */ /* TODO: Rename to `__phys_t' */
 #else
 typedef /*VIRT*/ __ULONGPTR_TYPE__ __vm_vpage_t;                   /* Virtual memory page index (`virtual_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
 typedef /*PHYS*/ __ULONGPTR_TYPE__ __vm_ppage_t;                   /* Physical memory page index (`physical_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
@@ -94,8 +95,9 @@ typedef /*PHYS*/ __UINT64_TYPE__   __vm_phys_t;                    /* A physical
 
 #if __SIZEOF_LONG__ >= 8
 typedef __vm_vpage_t __vm_vpage64_t; /* DEPRECATED; REMOVE ME */
-#elif defined(__KERNEL__) && defined(ALTERNATIVE_TYPE)
-typedef ALTERNATIVE_TYPE(__UINT64_TYPE__) __vm_vpage64_t; /* DEPRECATED; REMOVE ME */
+#elif defined(__KERNEL__)
+#include <hybrid/__altint.h>
+__HYBRID_ALTINT_TYPEDEF(__UINT64_TYPE__, __vm_vpage64_t, false); /* DEPRECATED; REMOVE ME */
 #else
 typedef __UINT64_TYPE__ __vm_vpage64_t; /* DEPRECATED; REMOVE ME */
 #endif

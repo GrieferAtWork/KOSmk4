@@ -2989,15 +2989,15 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 	if (dev->pd_res[PD_RESOURCE_BAR(pci_bar)].pr_flags & PCI_RESOURCE_FIO) {
 		result->uc_base.uc_iobase = (port_t)dev->pd_res[PD_RESOURCE_BAR(pci_bar)].pr_start;
 	} else {
-		vm_vpage_t page;
-		page = vm_map(&vm_kernel,
-		              (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_DEVICE), 1,
-		              1, HINT_GETMODE(KERNEL_VMHINT_DEVICE),
-		              &vm_datablock_physical,
-		              (vm_vpage64_t)(vm_ppage_t)VM_ADDR2PAGE((vm_phys_t)dev->pd_res[PD_RESOURCE_BAR(pci_bar)].pr_start),
-		              VM_PROT_READ | VM_PROT_WRITE,
-		              VM_NODE_FLAG_NORMAL, 0);
-		result->uc_base.uc_mmbase = (byte_t *)VM_PAGE2ADDR(page);
+		void *addr;
+		addr = nvm_map(&vm_kernel,
+		               HINT_GETADDR(KERNEL_VMHINT_DEVICE), 1, 1,
+		               HINT_GETMODE(KERNEL_VMHINT_DEVICE),
+		               &vm_datablock_physical,
+		               (pos_t)(dev->pd_res[PD_RESOURCE_BAR(pci_bar)].pr_start & ~PAGEMASK),
+		               VM_PROT_READ | VM_PROT_WRITE,
+		               VM_NODE_FLAG_NORMAL, 0);
+		result->uc_base.uc_mmbase = (byte_t *)addr;
 		result->uc_flags |= UHCI_CONTROLLER_FLAG_USESMMIO;
 	}
 	result->uc_transfer        = &uhci_transfer;

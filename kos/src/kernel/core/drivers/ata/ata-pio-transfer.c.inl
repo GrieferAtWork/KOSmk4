@@ -55,6 +55,11 @@
 DECL_BEGIN
 
 #ifdef DEFINE_IO_PHYS
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif /* __GNUC__ */
+
 #if defined(DEFINE_IO_READ) ? !defined(INSW_PHYS_DEFINED) : !defined(OUTSW_PHYS_DEFINED)
 #ifdef DEFINE_IO_READ
 #define INSW_PHYS_DEFINED 1
@@ -66,44 +71,43 @@ LOCAL void KCALL vm_outsw_phys(port_t port, vm_phys_t buf, size_t count)
 {
 #ifdef DEFINE_IO_READ
 #define PAGEDIR_MAPPING_FLAGS  (PAGEDIR_MAP_FREAD|PAGEDIR_MAP_FWRITE)
-#else
+#else /* DEFINE_IO_READ */
 #define PAGEDIR_MAPPING_FLAGS   PAGEDIR_MAP_FREAD
-#endif
+#endif /* !DEFINE_IO_READ */
 	pagedir_pushval_t backup;
-	vm_vpage_t tramp;
+	byte_t *tramp;
 	bool is_first;
 	is_first = true;
-	tramp    = THIS_TRAMPOLINE_PAGE;
+	tramp    = (byte_t *)THIS_TRAMPOLINE_BASE;
 	assert(tramp != 0);
 	TRY {
 		for (;;) {
-			vm_ppage_t pageaddr;
 			size_t page_words;
-			pageaddr   = (vm_ppage_t)VM_ADDR2PAGE(buf);
 			page_words = (PAGESIZE - (buf & PAGEMASK)) / 2;
 			if (page_words > count)
 				page_words = count;
 			if (is_first) {
-				backup = pagedir_push_mapone(tramp, pageaddr,
-				                             PAGEDIR_MAPPING_FLAGS);
+				backup = npagedir_push_mapone(tramp, buf & ~PAGEMASK,
+				                              PAGEDIR_MAPPING_FLAGS);
+				is_first = false;
 			} else {
-				pagedir_mapone(tramp, pageaddr,
-				               PAGEDIR_MAPPING_FLAGS);
+				npagedir_mapone(tramp, buf & ~PAGEMASK,
+				                PAGEDIR_MAPPING_FLAGS);
 			}
-			pagedir_syncone(tramp);
+			npagedir_syncone(tramp);
 			/* Transfer to/from memory. */
 			assert(tramp != 0);
 #ifdef DEFINE_IO_READ
-			insw(port, (void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(buf & PAGEMASK)), page_words);
+			insw(port, tramp + ((ptrdiff_t)buf & PAGEMASK), page_words);
 #elif 1 /* ATA output apparently requires a small pause before every written word. */
 			{
 				size_t i;
-				u16 *src = (u16 *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(buf & PAGEMASK));
+				u16 *src = (u16 *)(tramp + ((ptrdiff_t)buf & PAGEMASK));
 				for (i = 0; i < page_words; ++i)
 					outw(port, *src++);
 			}
 #else
-			outsw(port, (void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(buf & PAGEMASK)), page_words);
+			outsw(port, tramp + ((ptrdiff_t)buf & PAGEMASK), page_words);
 #endif
 			if (page_words >= count)
 				break;
@@ -113,13 +117,17 @@ LOCAL void KCALL vm_outsw_phys(port_t port, vm_phys_t buf, size_t count)
 	} EXCEPT {
 		/* Try-catch is required, because `dst' may be a user-buffer,
 		 * in which case access may cause an exception to be thrown. */
-		pagedir_pop_mapone(tramp, backup);
+		npagedir_pop_mapone(tramp, backup);
 		RETHROW();
 	}
-	pagedir_pop_mapone(tramp, backup);
+	npagedir_pop_mapone(tramp, backup);
 #undef PAGEDIR_MAPPING_FLAGS
 }
 #endif /* !(INSW|OUTSW)_PHYS_DEFINED */
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif /* __GNUC__ */
 #endif /* DEFINE_IO_PHYS */
 
 

@@ -47,6 +47,9 @@
 
 DECL_BEGIN
 
+/* Return the physical page ID of a given physical address. */
+#define ppageof(paddr) (pageptr_t)((paddr) / PAGESIZE)
+
 #if defined(__cplusplus) && 0
 extern "C++" {
 template<class T, size_t len> using my_array_t = T[len];
@@ -257,7 +260,7 @@ NOTHROW(FCALL pae_pagedir_fini)(VIRT struct pae_pdir *__restrict self,
 			e2 = PAE_PDIR_E2_IDENTITY[vec3][vec2];
 			/* Free allocated E1-vectors from E2-entries. */
 			if unlikely(PAE_PDIR_E2_ISVEC1(e2.p_word))
-				page_freeone(VM_ADDR2PAGE((vm_phys_t)(e2.p_word & PAE_PAGE_FVECTOR)));
+				page_freeone(ppageof(e2.p_word & PAE_PAGE_FVECTOR));
 		}
 	}
 	pagedir_set(old_pagedir);
@@ -265,7 +268,7 @@ NOTHROW(FCALL pae_pagedir_fini)(VIRT struct pae_pdir *__restrict self,
 	/* Free the always-allocated E2-vectors */
 	for (vec3 = 0; vec3 < 4; ++vec3) {
 		assert(self->p_e3[vec3].p_vec2.v_present);
-		page_freeone(VM_ADDR2PAGE((vm_phys_t)(self->p_e3[vec3].p_word & PAE_PAGE_FVECTOR)));
+		page_freeone(ppageof(self->p_e3[vec3].p_word & PAE_PAGE_FVECTOR));
 	}
 }
 
@@ -340,7 +343,7 @@ again:
 		/* Initialize the inner vector.
 		 * We can safely make use of our trampoline, since kernel-space is always prepared. */
 		e1_p = (union pae_pdir_e1 *)THIS_TRAMPOLINE_BASE;
-		backup = pae_npagedir_push_mapone(e1_p, (u64)new_e1_vector * 4096,
+		backup = pae_npagedir_push_mapone(e1_p, (vm_phys_t)((u64)new_e1_vector * 4096),
 		                                  PAGEDIR_MAP_FWRITE);
 		npagedir_syncone(e1_p);
 		COMPILER_WRITE_BARRIER();
@@ -387,7 +390,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 		if (e2.p_word & PAE_PAGE_FPAT_2MIB)
 			e1.p_word |= PAE_PAGE_FPAT_4KIB;
 		e1_p   = (union pae_pdir_e1 *)THIS_TRAMPOLINE_BASE;
-		backup = pae_npagedir_push_mapone(e1_p, (u64)new_e1_vector * 4096,
+		backup = pae_npagedir_push_mapone(e1_p, (vm_phys_t)((u64)new_e1_vector * 4096),
 		                                  PAGEDIR_MAP_FWRITE);
 		npagedir_syncone(e1_p);
 		if (vec1_prepare_size == 512) {
@@ -589,7 +592,7 @@ again_try_exchange_e2_word:
 		}
 		/* Successfully merged the vector.
 		 * At this point, all that's left is to free the vector. */
-		page_freeone(VM_ADDR2PAGE((vm_phys_t)(e2.p_word & PAE_PAGE_FVECTOR)));
+		page_freeone(ppageof(e2.p_word & PAE_PAGE_FVECTOR));
 	}
 }
 

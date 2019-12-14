@@ -758,9 +758,15 @@ NOTHROW(KCALL npagedir_unwrite_p)(PAGEDIR_P_SELFTYPE self,
  *       don't worry about the fact that they assume a pagesize of 4096 bytes! */
 #if 1
 #ifndef __PAGEDIR_COMPAT_VIRTPAGE2ADDR
+#ifdef __INTELLISENSE__
+void *__PAGEDIR_COMPAT_VIRTPAGE2ADDR(vm_vpage_t virt_page);
+vm_phys_t __PAGEDIR_COMPAT_PHYSPAGE2PHYS(vm_ppage_t phys_page);
+size_t __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(size_t num_pages);
+#else /* __INTELLISENSE__ */
 #define __PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page)     (void *)((uintptr_t)(virt_page) * 4096)
 #define __PAGEDIR_COMPAT_PHYSPAGE2PHYS(phys_page)     (vm_phys_t)((uintptr_t)(phys_page) * 4096)
 #define __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages) ((size_t)(num_pages) * 4096)
+#endif /* !__INTELLISENSE__ */
 #endif /* !__PAGEDIR_COMPAT_VIRTPAGE2ADDR */
 #define pagedir_prepare_mapone(virt_page)                          npagedir_prepare_mapone(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page))
 #define pagedir_unprepare_mapone(virt_page)                        npagedir_unprepare_mapone(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page))

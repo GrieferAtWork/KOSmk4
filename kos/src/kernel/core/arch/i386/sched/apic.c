@@ -842,8 +842,8 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 		cpuid_t i;
 		vm_ppage_t entry_page;
 		/* Allocate low physical memory for the SMP initialization entry page. */
-		entry_page = page_malloc_between(VM_ADDR2PAGE((vm_phys_t)0x00000000),
-		                                 VM_ADDR2PAGE((vm_phys_t)0x000fffff),
+		entry_page = page_malloc_between((pageptr_t)((vm_phys_t)0x00000000 / PAGESIZE),
+		                                 (pageptr_t)((vm_phys_t)0x000fffff / PAGESIZE),
 		                                 CEILDIV((size_t)x86_smp_entry_size, PAGESIZE));
 		if unlikely(entry_page == PAGEPTR_INVALID)
 			kernel_panic(FREESTR("Failed to allocate SMP trampoline\n"));
