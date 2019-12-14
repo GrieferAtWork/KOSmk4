@@ -688,12 +688,12 @@ upgrade_and_recheck_vm_for_node:
 							}
 
 							/* Allocate the physical memory used for backing the vm-local copy. */
-							new_ppage = page_malloc(1);
+							new_ppage = page_mallocone();
 							/* Check if the allocation failed. */
 							if unlikely(new_ppage == PAGEPTR_INVALID) {
 								sync_endwrite(part);
 								kfree(new_part);
-								THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+								THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 							}
 
 							/* Initialize the new part. */
@@ -745,7 +745,7 @@ upgrade_and_recheck_vm_for_node:
 									page_free(new_ppage, 1);
 									kfree(new_part);
 									decref_unlikely(part);
-									THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+									THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 								}
 							}
 
@@ -946,7 +946,7 @@ endread_and_decref_part_and_set_noexec:
 					if unlikely(!pagedir_prepare_mapone(pageaddr)) {
 						sync_endwrite(effective_vm);
 						sync_endread(part);
-						THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+						THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 					}
 				}
 				/* Actually map the accessed page! */

@@ -269,7 +269,7 @@ INTDEF u32 x86_smp_gdt_pointer_base;
 
 INTDEF byte_t __kernel_percpu_start[];
 INTDEF byte_t __kernel_percpu_size[];
-INTDEF byte_t __kernel_percpu_full_pagecnt[];
+INTDEF byte_t __kernel_percpu_full_bytes[];
 INTDEF byte_t __kernel_pertask_start[];
 INTDEF byte_t __kernel_pertask_size[];
 INTDEF FREE struct tss __kernel_percpu_tss;
@@ -406,17 +406,17 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 			sync_write(&vm_kernel);
 			cpu_baseaddr = vm_getfree(&vm_kernel,
 			                          HINT_GETADDR(KERNEL_VMHINT_ALTCORE),
-			                          (size_t)__kernel_percpu_full_pagecnt * PAGESIZE, PAGESIZE,
+			                          (size_t)__kernel_percpu_full_bytes, PAGESIZE,
 			                          HINT_GETMODE(KERNEL_VMHINT_ALTCORE));
 			if unlikely(cpu_baseaddr == VM_GETFREE_ERROR) {
 				sync_endwrite(&vm_kernel);
 				THROW(E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY,
-				      (size_t)__kernel_percpu_full_pagecnt * PAGESIZE);
+				      (size_t)__kernel_percpu_full_bytes);
 			}
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			/* Make sure that the NODE2 portion of the CPU descriptor is always prepared. */
 			if (!pagedir_prepare_map(cpu_baseaddr + (size_t)__x86_cpu_part1_pages * PAGESIZE, 2 * PAGESIZE))
-				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		} EXCEPT {
 			vm_node_destroy_locked_ram(cpu_node3);

@@ -414,7 +414,7 @@ again_scan_nodes:
 #ifdef EXLOCK_NX
 					goto err_vms_copy_ramdata_ppp;
 #else /* EXLOCK_NX */
-					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 #endif /* !EXLOCK_NX */
 				}
 			} while ((node = node->vn_link.ln_next) != NULL);

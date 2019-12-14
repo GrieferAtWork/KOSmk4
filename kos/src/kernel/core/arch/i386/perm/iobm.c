@@ -133,7 +133,7 @@ REF struct ioperm_bitmap *KCALL ioperm_bitmap_allocf(gfp_t flags) THROWS(E_BADAL
 	iob = page_malloc(2);
 	if unlikely(iob == PAGEPTR_INVALID) {
 		kfree(result);
-		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 2);
+		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 2 * PAGESIZE);
 	}
 	/* Fill both pages of memory with all ones (indicating that I/O access is denied) */
 	result->ib_pages  = page2addr(iob);
@@ -181,7 +181,7 @@ ioperm_bitmap_copyf(struct ioperm_bitmap const *__restrict self, gfp_t flags) TH
 	iob = page_malloc(2);
 	if unlikely(iob == PAGEPTR_INVALID) {
 		kfree(result);
-		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 2);
+		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 2 * PAGESIZE);
 	}
 	/* Copy I/O permission bits. */
 	result->ib_pages  = page2addr(iob);

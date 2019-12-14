@@ -1694,7 +1694,7 @@ usb_transfer_allocate_pbuffer(struct uhci_syncheap *__restrict heap,
 			           : PAGESIZE;
 			addr = uhci_syncheap_alloc(heap, reqbytes);
 			if unlikely(addr == UHCI_SYNCHEAP_ALLOC_FAILED)
-				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, reqbytes);
 			entv[i].ab_base = (vm_phys_t)addr;
 			entv[i].ab_size = reqbytes;
 		}
@@ -1724,7 +1724,7 @@ usb_transfer_allocate_physbuf(struct usb_transfer *__restrict tx,
 		tx->ut_buftyp = USB_TRANSFER_BUFTYP_PHYSVEC;
 		return;
 	}
-	THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+	THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, tx->ut_buflen);
 }
 
 

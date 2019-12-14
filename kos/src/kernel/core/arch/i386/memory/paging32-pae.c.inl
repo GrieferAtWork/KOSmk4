@@ -219,7 +219,7 @@ INTERN NONNULL((1)) void FCALL
 pae_pagedir_init(VIRT struct pae_pdir *__restrict self)
 		THROWS(E_BADALLOC) {
 	if unlikely(!pae_pagedir_tryinit(self))
-		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 4);
+		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 4 * PAGESIZE);
 }
 
 /* Because we're omitting the `v_pagedir' field from the start of the VM, we have

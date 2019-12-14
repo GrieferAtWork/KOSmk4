@@ -66,11 +66,11 @@ struct slab {
 	u16          s_flags; /* Slab flags (Set of `SLAB_F*'). */
 	u16          s_size;  /* [const] Slab segment size (in bytes) */
 	WEAK u32     s_free;  /* Amount of free segments in this slab. */
-#else
+#else /* __SIZEOF_POINTER__ >= 8 */
 	u8           s_flags; /* Slab flags (Set of `SLAB_F*'). */
 	u8           s_size;  /* [const] Slab segment size (in bytes) */
 	WEAK u16     s_free;  /* Amount of free segments in this slab. */
-#endif
+#endif /* __SIZEOF_POINTER__ < 8 */
 	/* A bitset of allocated segments goes here (1-bits indicate allocated segments)
 	 * Note that the bitset works with whole words (uintptr_t),
 	 * so-as to ensure that the following segment vector is

@@ -107,19 +107,19 @@ class E_BADALLOC_INSUFFICIENT_HEAP_MEMORY: E_BADALLOC = 0x0001 {
 
 [message("Insufficient virtual address space")]
 class E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: E_BADALLOC = 0x0002 {
-	@@The number of pages that could not be allocated; TODO: Change to total number of bytes
+	@@The number of bytes that could not be allocated
 	member num_pages: size_t;
 }
 
 [message("Insufficient physical memory")]
 class E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY: E_BADALLOC = 0x0003 {
-	@@The number of pages that could not be allocated; TODO: Change to total number of bytes
+	@@The number of bytes that could not be allocated
 	member num_pages: size_t;
 }
 
 [message("Insufficient space in swap")]
 class E_BADALLOC_INSUFFICIENT_SWAP_SPACE: E_BADALLOC = 0x0004 {
-	@@The number of pages that could not be allocated; TODO: Change to total number of bytes
+	@@The number of bytes that could not be allocated
 	member num_pages: size_t;
 }
 

@@ -78,7 +78,7 @@ vm_do_allocram(struct vm_ramblock *__restrict pblock0,
 #ifdef ALLOC_NX
 		return NULL;
 #else /* ALLOC_NX */
-		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, num_pages);
+		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, num_pages * PAGESIZE);
 #endif /* !ALLOC_NX */
 	}
 	if (block0_size >= num_pages) {
@@ -138,7 +138,7 @@ vm_do_allocram(struct vm_ramblock *__restrict pblock0,
 				goto err_blocks;
 #else /* ALLOC_NX */
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY,
-				      num_pages - block0_size);
+				      (num_pages - block0_size) * PAGESIZE);
 #endif /* !ALLOC_NX */
 			}
 			/* Insert new blocks in the front, thus optimizing to better allocate
@@ -221,7 +221,7 @@ KCALL vm_datapart_allocswap(struct vm_datapart *__restrict self)
 		sync_endwrite(self);
 		THROW(IE(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY,
 		         E_BADALLOC_INSUFFICIENT_SWAP_SPACE),
-		      num_pages);
+		      num_pages * PAGESIZE);
 	}
 	if (block0_size >= num_pages) {
 		self->PART_DP_DATA.PART_RD_BLOCKV               = &self->PART_DP_DATA.PART_RD_BLOCK0;
@@ -294,7 +294,7 @@ realloc_without_locks:
 #else /* ALLOC_NX */
 					THROW(IE(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY,
 					         E_BADALLOC_INSUFFICIENT_SWAP_SPACE),
-					      num_pages - block0_size);
+					      num_pages - block0_size * PAGESIZE);
 #endif /* !ALLOC_NX */
 					}
 					/* Insert new blocks in the front, thus optimizing to better allocate
@@ -388,7 +388,7 @@ err_blocks:
 					kfree(blocks);
 					THROW(IE(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY,
 					         E_BADALLOC_INSUFFICIENT_SWAP_SPACE),
-					      num_pages - block0_size);
+					      (num_pages - block0_size) * PAGESIZE);
 #endif /* !ALLOC_NX */
 				}
 				/* Insert new blocks in the front, thus optimizing to better allocate

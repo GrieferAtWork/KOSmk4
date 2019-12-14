@@ -158,9 +158,9 @@ create_bss_overlap_node(struct regular_node *__restrict exec_node,
 		result_part = (struct vm_datapart *)kmalloc(sizeof(struct vm_datapart),
 		                                            GFP_LOCKED | GFP_PREFLT);
 		TRY {
-			overlap_page = page_malloc(1);
+			overlap_page = page_mallocone();
 			if unlikely(overlap_page == PAGEPTR_INVALID)
-				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 			TRY {
 				/* Load the overlapping file data into memory. */
 				inode_readall_phys(exec_node, page2addr(overlap_page),

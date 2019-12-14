@@ -227,7 +227,7 @@ again_lock_vm:
 handle_remove_write_error:
 							if (error == VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC) {
 								pointer_set_unlock_vm_dataparts(&locked_parts);
-								THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+								THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 							}
 							if (!tryincref(blocking_vm))
 								blocking_vm = NULL;

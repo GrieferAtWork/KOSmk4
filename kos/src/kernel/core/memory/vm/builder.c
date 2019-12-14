@@ -698,7 +698,7 @@ handle_remove_write_error:
 						pointer_set_unlock_vm_dataparts(&locked_parts);
 						pointer_set_fini(&locked_parts);
 						rpc_free_chain(task_terminate_rpcs);
-						THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+						THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 					}
 					if (!tryincref(blocking_vm))
 						blocking_vm = NULL;

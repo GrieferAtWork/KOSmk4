@@ -158,7 +158,7 @@ do_throw_first_unmapped:
 					                                      vm_node_getstart(node),
 					                                      vm_node_getsize(node)))) {
 						sync_endwrite(effective_vm);
-						THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+						THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 					}
 				}
 				if (node == minmax.mm_max)
@@ -417,7 +417,7 @@ do_throw_first_unmapped:
 											if (error == VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC) {
 												sync_endwrite(part);
 												sync_endwrite(effective_vm);
-												THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+												THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 											}
 											blocking_vm = sibling_shared->vn_vm;
 											if (!tryincref(blocking_vm))

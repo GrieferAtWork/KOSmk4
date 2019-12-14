@@ -205,7 +205,7 @@ string_size_changed:
 		/* Ensure that the page directory is prepared to erase the temporary PEB mapping. */
 		if unlikely(!pagedir_prepare_map(peb_temp_base, peb_total_size)) {
 			sync_endwrite(&vm_kernel);
-			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 		}
 	} EXCEPT {
 		/* Delete the temporary PEB mapping as general-purpose kernel RAM. */

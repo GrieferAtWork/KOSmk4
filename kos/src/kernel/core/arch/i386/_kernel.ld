@@ -233,7 +233,7 @@ SECTIONS {
 		PROVIDE(thiscpu_idle = ABSOLUTE(ALIGN(__ARCH_CACHELINESIZE)));
 		PROVIDE(thiscpu_x86_tss = CEIL_ALIGN(ABSOLUTE(thiscpu_idle + __kernel_pertask_size), PAGESIZE));
 		PROVIDE(thiscpu_x86_iob = ABSOLUTE(thiscpu_x86_tss) + PAGESIZE);
-		PROVIDE_HIDDEN(__kernel_percpu_full_pagecnt = CEILDIV(ABSOLUTE(thiscpu_x86_iob) + 8192 + 1, PAGESIZE));
+		PROVIDE_HIDDEN(__kernel_percpu_full_bytes = CEIL_ALIGN(ABSOLUTE(thiscpu_x86_iob) + 8192 + 1, PAGESIZE));
 		PROVIDE_HIDDEN(__x86_cpu_part1_pages = ABSOLUTE(thiscpu_x86_iob) / PAGESIZE);
 /*		PROVIDE_HIDDEN(__x86_cpu_part2_pages = ABSOLUTE(2)); */
 /*		PROVIDE_HIDDEN(__x86_cpu_part3_pages = ABSOLUTE(1)); */

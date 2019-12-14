@@ -325,7 +325,7 @@ upgrade_and_recheck_vm_for_node:
 					if unlikely(new_ppage == PAGEPTR_INVALID) {
 						sync_endwrite(part);
 						kfree(new_part);
-						THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+						THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 					}
 
 					/* Initialize the new part. */
@@ -378,7 +378,7 @@ upgrade_and_recheck_vm_for_node:
 							page_freeone(new_ppage);
 							kfree(new_part);
 							decref_unlikely(part);
-							THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+							THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 						}
 					}
 

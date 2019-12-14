@@ -2298,7 +2298,7 @@ again_lock_datapart:
 					vm_set_lockendwrite_all(&vms);
 					sync_endread(self);
 					/*vm_set_clear(&vms); // Done by the EXCEPT below */
-					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 				}
 				/* Don't propagate write permissions (those are lazily re-added during the next write-
 				 * attempt, which will once again mark our part as changed once we're all set & done) */

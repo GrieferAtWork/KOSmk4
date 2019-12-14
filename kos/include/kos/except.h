@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff4451fc */
+/* HASH CRC-32:0x757e3adf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -94,15 +94,15 @@ __DECL_BEGIN
  * 	member num_bytes: size_t; */
 #define E_BADALLOC_INSUFFICIENT_HEAP_MEMORY (E_BADALLOC,0x0001)
 /* Insufficient virtual address space
- * 	@@The number of pages that could not be allocated; TODO: Change to total number of bytes
+ * 	@@The number of bytes that could not be allocated
  * 	member num_pages: size_t; */
 #define E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY (E_BADALLOC,0x0002)
 /* Insufficient physical memory
- * 	@@The number of pages that could not be allocated; TODO: Change to total number of bytes
+ * 	@@The number of bytes that could not be allocated
  * 	member num_pages: size_t; */
 #define E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY (E_BADALLOC,0x0003)
 /* Insufficient space in swap
- * 	@@The number of pages that could not be allocated; TODO: Change to total number of bytes
+ * 	@@The number of bytes that could not be allocated
  * 	member num_pages: size_t; */
 #define E_BADALLOC_INSUFFICIENT_SWAP_SPACE (E_BADALLOC,0x0004)
 /* The caller is not allowed to allocate more handles without first closing some old ones

@@ -351,7 +351,7 @@ again_lock_all_parts:
 handle_remove_write_error:
 							if (error == VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC) {
 								partnode_pair_vector_endwrite_parts(info);
-								THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+								THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 							}
 							if (!tryincref(blocking_vm))
 								blocking_vm = NULL;
@@ -447,7 +447,7 @@ vm_mapat(struct vm *__restrict self,
 		if (!pagedir_prepare_map(addr, num_bytes)) {
 			sync_endwrite(self);
 			partnode_pair_vector_fini_and_unlock_parts(&parts);
-			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 		}
 	}
 
@@ -551,7 +551,7 @@ vm_mapresat(struct vm *__restrict self,
 		if (!pagedir_prepare_map(addr, num_bytes)) {
 			sync_endwrite(self);
 			kfree(node);
-			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 		}
 	}
 	/* Insert the new node into the given VM. */
@@ -621,7 +621,7 @@ again:
 		if (!pagedir_prepare_map(result, num_bytes)) {
 			sync_endwrite(self);
 			partnode_pair_vector_fini_and_unlock_parts(&parts);
-			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 		}
 	}
 
@@ -759,7 +759,7 @@ again_lock_vm:
 		if (!pagedir_prepare_map(result, num_bytes)) {
 			sync_endwrite(self);
 			kfree(node);
-			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 		}
 	}
 	/* Insert the new node into the given VM. */
