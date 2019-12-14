@@ -74,7 +74,7 @@ inode_do_save_datapart_pages(struct inode *__restrict self,
 		vm_phys_t phys_buf;
 		/* Simple case: physical memory was allocated linearly. */
 		assert(first_ppage_index < part->dp_ramdata.rd_block0.rb_size);
-		phys_buf = VM_PPAGE2ADDR(part->dp_ramdata.rd_block0.rb_start + first_ppage_index);
+		phys_buf = page2addr(part->dp_ramdata.rd_block0.rb_start + first_ppage_index);
 		phys_buf += ppage_offset;
 #ifdef DEFINE_IO_READ
 		(*self->i_type->it_file.f_pread)(self,
@@ -110,7 +110,7 @@ inode_do_save_datapart_pages(struct inode *__restrict self,
 			num_block_bytes = (block_size_in_ppages - first_ppage_index) * PAGESIZE;
 			if (num_block_bytes > num_bytes)
 				num_block_bytes = num_bytes;
-			phys_buf = VM_PPAGE2ADDR(blocks[i].rb_start + first_ppage_index);
+			phys_buf = page2addr(blocks[i].rb_start + first_ppage_index);
 			phys_buf += ppage_offset;
 #ifdef DEFINE_IO_READ
 			(*self->i_type->it_file.f_pread)(self,

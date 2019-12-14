@@ -383,10 +383,7 @@ upgrade_and_recheck_vm_for_node:
 
 					/* Copy the contents of the page being unshared. */
 					old_ppage = part->dp_ramdata.rd_blockv[0].rb_start;
-					/* TODO: Special function for copying whole pages. */
-					vm_copyinphys(VM_PPAGE2ADDR(new_ppage),
-					              VM_PPAGE2ADDR(old_ppage),
-					              PAGESIZE);
+					vm_copypageinphys(new_ppage, old_ppage);
 
 					new_part->dp_block = incref(&vm_datablock_anonymous_zero_vec[VM_DATABLOCK_PAGESHIFT(part->dp_block)]);
 
@@ -450,11 +447,11 @@ upgrade_and_recheck_vm_for_node:
 
 #if 1
 					printk(KERN_TRACE "Unshared page at %p (RW) [tid=%u]\n",
-					       (uintptr_t)VM_PAGE2ADDR(page), task_getroottid_s());
+					       __ARCH_PAGEID_DECODE(page), task_getroottid_s());
 #else
 					printk(KERN_TRACE "Unshared page at %p (RW) [tid=%u,oldpage=" FORMAT_VM_PHYS_T ",newpage=" FORMAT_VM_PHYS_T "]\n",
-					       (uintptr_t)VM_PAGE2ADDR(page), task_getroottid_s(),
-					       VM_PPAGE2ADDR(old_ppage), VM_PPAGE2ADDR(new_ppage));
+					       __ARCH_PAGEID_DECODE(page), task_getroottid_s(),
+					       page2addr(old_ppage), page2addr(new_ppage));
 #endif
 					part = new_part;
 					assert(sync_reading(part));
@@ -524,14 +521,14 @@ do_transfer_ram:
 				/* Actually transfer low-level RAM data. */
 #ifdef IS_READING
 				vm_copyfromphys(dst,
-				                (vm_phys_t)(VM_PPAGE2ADDR(ppage) + page_offset),
+				                page2addr(ppage) + page_offset,
 				                transfer_bytes);
 #elif !defined(VM_MEMSET_IMPL)
-				vm_copytophys((vm_phys_t)(VM_PPAGE2ADDR(ppage) + page_offset),
+				vm_copytophys(page2addr(ppage) + page_offset,
 				              src,
 				              transfer_bytes);
 #else /* IS_READING */
-				vm_memsetphys((vm_phys_t)(VM_PPAGE2ADDR(ppage) + page_offset),
+				vm_memsetphys(page2addr(ppage) + page_offset,
 				              byte,
 				              transfer_bytes);
 #endif /* !IS_READING */

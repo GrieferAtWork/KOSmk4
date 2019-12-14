@@ -174,15 +174,15 @@ NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self) {
 	 * >> e3[3].p_e2[511]     = e3[3];        // Identity mapping: 0xffe00000 ... 0xffffffff
 	 */
 	if (!page_iszero((pageptr_t)e3[0]))
-		vm_memsetphys_onepage(VM_PPAGE2ADDR((pageptr_t)e3[0]), 0, 512 * 8);
+		vm_memsetphyspage((pageptr_t)e3[0], 0);
 	if (!page_iszero((pageptr_t)e3[1]))
-		vm_memsetphys_onepage(VM_PPAGE2ADDR((pageptr_t)e3[1]), 0, 512 * 8);
+		vm_memsetphyspage((pageptr_t)e3[1], 0);
 	if (!page_iszero((pageptr_t)e3[2]))
-		vm_memsetphys_onepage(VM_PPAGE2ADDR((pageptr_t)e3[2]), 0, 512 * 8);
-	e3[0] = (u64)VM_PPAGE2ADDR((pageptr_t)e3[0]);
-	e3[1] = (u64)VM_PPAGE2ADDR((pageptr_t)e3[1]);
-	e3[2] = (u64)VM_PPAGE2ADDR((pageptr_t)e3[2]);
-	e3[3] = (u64)VM_PPAGE2ADDR((pageptr_t)e3[3]);
+		vm_memsetphyspage((pageptr_t)e3[2], 0);
+	e3[0] = (u64)page2addr((pageptr_t)e3[0]);
+	e3[1] = (u64)page2addr((pageptr_t)e3[1]);
+	e3[2] = (u64)page2addr((pageptr_t)e3[2]);
+	e3[3] = (u64)page2addr((pageptr_t)e3[3]);
 	/* Kernel share (copy from our own page directory) */
 	vm_copytophys_onepage((vm_phys_t)e3[3], PAE_PDIR_E2_IDENTITY[3], 508 * 8);
 	self->p_e3[0].p_word = e3[0] | PAE_PAGE_FPRESENT;
@@ -1139,9 +1139,9 @@ NOTHROW(FCALL pae_pagedir_encode_4kib)(PHYS vm_vpage_t dest_page,
 	assertf(!(perm & ~PAGEDIR_MAP_FMASK),
 	        "Invalid page permissions: %#.4I16x", perm);
 	assertf(phys_page <= (pageptr_t)VM_ADDR2PAGE(UINT64_C(0x000ffffffffff000)),
-	        "Page cannot be mapped: %I64p",
-	        (u64)VM_PPAGE2ADDR(phys_page));
-	result  = (u64)VM_PPAGE2ADDR(phys_page);
+	        "Page cannot be mapped: " FORMAT_VM_PHYS_T,
+	        page2addr(phys_page));
+	result  = (u64)page2addr(phys_page);
 #if PAGEDIR_MAP_FMASK == 0xf
 	result |= pae_pageperm_matrix[perm];
 #else /* PAGEDIR_MAP_FMASK == 0xf */

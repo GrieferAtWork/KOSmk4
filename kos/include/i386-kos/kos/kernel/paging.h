@@ -168,9 +168,6 @@
 #define VM_VPAGE_MAX       __VM_VPAGE_MAX
 #define VM_PPAGE_MAX       __VM_PPAGE_MAX
 #endif /* !VM_VPAGE_MAX */
-#ifndef VM_PPAGE2ADDR
-#define VM_PPAGE2ADDR(page) __VM_PPAGE2ADDR(page)
-#endif /* !VM_PPAGE2ADDR */
 #ifndef VM_PAGE2ADDR
 #define VM_PAGE2ADDR(page) __VM_PAGE2ADDR(page)
 #define VM_ADDR2PAGE(addr) __VM_ADDR2PAGE(addr)

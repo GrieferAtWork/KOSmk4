@@ -848,19 +848,19 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 		if unlikely(entry_page == PAGEPTR_INVALID)
 			kernel_panic(FREESTR("Failed to allocate SMP trampoline\n"));
 		printk(FREESTR(KERN_INFO "[apic] Allocating SMP trampoline at " FORMAT_VM_PHYS_T "\n"),
-		       VM_PPAGE2ADDR(entry_page));
+		       page2addr(entry_page));
 		x86_smp_entry_page = (u8)entry_page;
 		/* Apply some custom AP entry relocations. */
 		{
 			u32 gdt_addr;
 			gdt_addr = (u32)(x86_smp_gdt - x86_smp_entry);
-			gdt_addr += (u32)entry_page * PAGESIZE;
+			gdt_addr += page2addr32(entry_page);
 			x86_smp_entry_gdt_segment = (gdt_addr & 0xf0000) >> 4;
 			x86_smp_entry_gdt_offset  = (gdt_addr & 0x0ffff);
-			x86_smp_gdt_pointer_base += (u32)entry_page * PAGESIZE;
+			x86_smp_gdt_pointer_base += page2addr32(entry_page);
 		}
 		/* Copy AP entry code. */
-		vm_copytophys(VM_PPAGE2ADDR(entry_page),
+		vm_copytophys(page2addr(entry_page),
 		              x86_smp_entry,
 		              (size_t)x86_smp_entry_size);
 

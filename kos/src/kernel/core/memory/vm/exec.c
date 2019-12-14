@@ -163,12 +163,13 @@ create_bss_overlap_node(struct regular_node *__restrict exec_node,
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
 			TRY {
 				/* Load the overlapping file data into memory. */
-				inode_readall_phys(exec_node, VM_PPAGE2ADDR(overlap_page),
-				                   bss_start_page_offset, file_data_offset);
+				inode_readall_phys(exec_node, page2addr(overlap_page),
+				                   bss_start_page_offset,
+				                   file_data_offset);
 				/* Check if we must zero-initialize the BSS portion. */
 				if (!page_iszero(overlap_page)) {
 					/* Zero-initialize the BSS portion */
-					vm_memsetphys(VM_PPAGE2ADDR(overlap_page) + bss_start_page_offset,
+					vm_memsetphys(page2addr(overlap_page) + bss_start_page_offset,
 					              0, bss_num_bytes);
 				}
 			} EXCEPT {

@@ -221,7 +221,7 @@ NOTHROW(KCALL ioperm_bitmap_maskbyte)(struct ioperm_bitmap *__restrict self,
                                       size_t byte_index, u8 byte_mask, u8 byte_flag) {
 	u8 *byte, oldval;
 	struct vm_ptram pt = VM_PTRAM_INIT;
-	byte = vm_ptram_map(&pt, VM_PPAGE2ADDR(self->ib_pages) + byte_index);
+	byte = vm_ptram_map(&pt, page2addr(self->ib_pages) + byte_index);
 	do {
 		oldval = ATOMIC_READ(*byte);
 	} while (!ATOMIC_CMPXCH_WEAK(*byte, oldval, (oldval & byte_mask) | byte_flag));
@@ -268,7 +268,7 @@ NOTHROW(KCALL ioperm_bitmap_setrange)(struct ioperm_bitmap *__restrict self,
 	ioperm_bitmap_maskbyte_c(self, maxbyte, 0, (maxport & 7) + 1, turn_on);
 	/* Fill in all intermediate bytes. */
 	if (minbyte + 1 < maxbyte) {
-		vm_memsetphys(VM_PPAGE2ADDR(self->ib_pages) + minbyte,
+		vm_memsetphys(page2addr(self->ib_pages) + minbyte,
 		              turn_on ? 0x00 : 0xff,
 		              (maxbyte - minbyte) - 1);
 	}

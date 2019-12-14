@@ -747,10 +747,7 @@ upgrade_and_recheck_vm_for_node:
 
 							/* Copy the contents of the page being unshared. */
 							old_ppage = part->dp_ramdata.rd_blockv[0].rb_start;
-							/* TODO: Special function for copying whole pages. */
-							vm_copyinphys(VM_PPAGE2ADDR(new_ppage),
-							              VM_PPAGE2ADDR(old_ppage),
-							              PAGESIZE);
+							vm_copypageinphys(new_ppage, old_ppage);
 
 							new_part->dp_block = incref(&vm_datablock_anonymous_zero_vec[VM_DATABLOCK_PAGESHIFT(part->dp_block)]);
 
@@ -810,11 +807,11 @@ upgrade_and_recheck_vm_for_node:
 
 #if 1
 							printk(KERN_TRACE "Unshared page at %p [tid=%u]\n",
-							       (uintptr_t)VM_PAGE2ADDR(page), task_getroottid_s());
+							       __ARCH_PAGEID_DECODE(page), task_getroottid_s());
 #else
 							printk(KERN_TRACE "Unshared page at %p [tid=%u,oldpage=" FORMAT_VM_PHYS_T ",newpage=" FORMAT_VM_PHYS_T "]\n",
-							       (uintptr_t)VM_PAGE2ADDR(page), task_getroottid_s(),
-							       VM_PPAGE2ADDR(old_ppage), VM_PPAGE2ADDR(new_ppage));
+							       __ARCH_PAGEID_DECODE(page), task_getroottid_s(),
+							       page2addr(old_ppage), page2addr(new_ppage));
 #endif
 							goto done_before_pop_connections;
 						}
@@ -962,7 +959,7 @@ endread_and_decref_part_and_set_noexec:
 				        "prot          = %p\n"
 				        "node->vn_prot = %p\n"
 				        "addr          = %p (page %p)\n"
-				        "phys          = %I64p (page %I64p)\n"
+				        "phys          = " FORMAT_VM_PHYS_T " (page " FORMAT_PAGEPTR_T ")\n"
 				        "effective_vm  = %p\n"
 				        "has_changed   = %u\n",
 				        (uintptr_t)ecode,
@@ -970,8 +967,8 @@ endread_and_decref_part_and_set_noexec:
 				        (uintptr_t)node->vn_prot,
 				        (uintptr_t)addr,
 				        (uintptr_t)page,
-				        (u64)VM_PPAGE2ADDR(ppage),
-				        (u64)ppage,
+				        (vm_phys_t)page2addr(ppage),
+				        (pageptr_t)ppage,
 				        (uintptr_t)effective_vm,
 				        (unsigned int)has_changed);
 				sync_endwrite(effective_vm);

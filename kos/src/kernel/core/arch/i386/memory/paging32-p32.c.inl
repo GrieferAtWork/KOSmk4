@@ -853,9 +853,9 @@ NOTHROW(FCALL p32_pagedir_encode_4kib)(PHYS vm_vpage_t dest_page,
 	assertf(!(perm & ~PAGEDIR_MAP_FMASK),
 	        "Invalid page permissions: %#.4I16x", perm);
 	assertf(phys_page <= (pageptr_t)VM_ADDR2PAGE(0xfffff000),
-	        "Page cannot be mapped: %I64p",
-	        (u64)VM_PPAGE2ADDR(phys_page));
-	result  = (u32)VM_PPAGE2ADDR(phys_page);
+	        "Page cannot be mapped: " FORMAT_VM_PHYS_T,
+	        page2addr(phys_page));
+	result  = page2addr32(phys_page);
 #if PAGEDIR_MAP_FMASK == 0xf
 	result |= p32_pageperm_matrix[perm];
 #else /* PAGEDIR_MAP_FMASK == 0xf */

@@ -685,8 +685,8 @@ NOTHROW(KCALL vm_copypageinphys)(PHYS pageptr_t dst,
 	assert(bufsize != 0);
 	buf = (byte_t *)alloca(bufsize);
 	{
-		vm_phys_t pdst = VM_PPAGE2ADDR(dst);
-		vm_phys_t psrc = VM_PPAGE2ADDR(src);
+		vm_phys_t pdst = page2addr(dst);
+		vm_phys_t psrc = page2addr(src);
 		size_t pagebytes = PAGESIZE;
 		do {
 			size_t copysize;

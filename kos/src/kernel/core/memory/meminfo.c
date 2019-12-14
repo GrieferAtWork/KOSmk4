@@ -236,9 +236,10 @@ NOTHROW(KCALL pmemzone_init_bits)(struct pmemzone *__restrict self,
                                   pageptr_t start, pagecnt_t num_pages,
                                   uintptr_t mask) {
 #if 0
-	printk(FREESTR(KERN_DEBUG "INIT: %I64p...%I64p as %Ix\n"),
-	       (u64)VM_PPAGE2ADDR(start),
-	       (u64)VM_PPAGE2ADDR(start + num_pages) - 1, mask);
+	printk(FREESTR(KERN_DEBUG "INIT: " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " as %Ix\n"),
+	       (vm_phys_t)(page2addr(start)),
+	       (vm_phys_t)(page2addr(start + num_pages) - 1),
+	       mask);
 #endif
 	assert(start >= self->mz_start);
 	assert(start + num_pages >= start);
@@ -317,9 +318,9 @@ again:
 
 #if __SIZEOF_VM_PHYS_T__ > __SIZEOF_POINTER__
 		/* Make sure the allocation end doesn't exceed mapped physical memory. */
-		if ((VM_PPAGE2ADDR(bank_alloc_page) + num_bytes - 1) >= (vm_phys_t)(uintptr_t)-1) {
+		if ((page2addr(bank_alloc_page) + num_bytes - 1) >= (vm_phys_t)((uintptr_t)-1)) {
 			vm_phys_t bank_alloc_addr;
-			bank_alloc_addr = (vm_phys_t)(uintptr_t)-1 - (num_bytes - 1);
+			bank_alloc_addr = (vm_phys_t)((uintptr_t)-1) - (num_bytes - 1);
 			bank_alloc_addr &= ~PAGEMASK;
 			if (bank_alloc_addr < PMEMBANK_TYPE_START(kernel_membanks_initial[i]))
 				break; /* Bank doesn't cover the last possible mapping location. */
@@ -329,9 +330,9 @@ again:
 		{
 			/* See how much memory we're wasting with this allocation. */
 			assert(PMEMBANK_TYPE_END(kernel_membanks_initial[i]) >=
-			       (VM_PPAGE2ADDR(bank_alloc_page) + num_bytes));
+			       (page2addr(bank_alloc_page) + num_bytes));
 			waste = (pageptr_t)(PMEMBANK_TYPE_END(kernel_membanks_initial[i]) -
-			                     (VM_PPAGE2ADDR(bank_alloc_page) + num_bytes));
+			                    (page2addr(bank_alloc_page) + num_bytes));
 #if 0
 			{
 				/* Subtract the number of bytes used by this, that would otherwise go unused from `waste'
@@ -343,7 +344,7 @@ again:
 					vm_phys_t used_end;
 					size_t gain;
 					gain_min = gain_end & ~PAGEMASK;
-					used_end = VM_PPAGE2ADDR(bank_alloc_page) + num_bytes;
+					used_end = page2addr(bank_alloc_page) + num_bytes;
 					assert(used_end >= gain_min && used_end <= gain_end);
 					gain = (size_t)(used_end - gain_min);
 					if (gain > candy_weight)
@@ -387,7 +388,7 @@ again:
 	}
 	/* Reserve memory from the candy-bank. */
 	{
-		vm_phys_t candy_phys     = VM_PPAGE2ADDR(candy);
+		vm_phys_t candy_phys     = page2addr(candy);
 		vm_phys_t candy_phys_max = candy_phys + num_bytes - 1;
 		assert(candy_phys >= PMEMBANK_TYPE_MIN(kernel_membanks_initial[candy_bank]));
 		assert(candy_phys_max <= PMEMBANK_TYPE_MAX(kernel_membanks_initial[candy_bank]));
@@ -479,8 +480,8 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
 	kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start = minfo_allocate_part_pagedata(req_bytes);
 	printk(FREESTR(KERN_DEBUG "Allocate paging control structures at "
 	               FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " (%Iu bytes in %Iu pages)\n"),
-	       VM_PPAGE2ADDR(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start),
-	       VM_PPAGE2ADDR(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start) + req_bytes - 1,
+	       (vm_phys_t)(page2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start)),
+	       (vm_phys_t)(page2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start) + req_bytes - 1),
 	       req_bytes, req_pages);
 	kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_size = req_pages;
 	kernel_vm_part_pagedata.dp_tree.a_vmax = (vm_dpage_t)(req_pages - 1);
@@ -604,8 +605,8 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
 		        (size_t)zone->mz_rmax);
 		printk(FREESTR(KERN_INFO "Define memory zone %Iu at " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " (%Iu/%Iu free pages)\n"),
 		       (size_t)(zone_count - 1),
-		       VM_PPAGE2ADDR(zone->mz_start),
-		       VM_PPAGE2ADDR(bank_end_page) - 1,
+		       (vm_phys_t)(page2addr(zone->mz_start)),
+		       (vm_phys_t)(page2addr(bank_end_page) - 1),
 		       (size_t)zone->mz_cfree,
 		       (size_t)zone->mz_rmax + 1);
 		zone->mz_qfree = zone->mz_cfree; /* Everything is undefined in the beginning */
@@ -683,7 +684,7 @@ NOTHROW(KCALL minfo_relocate_appropriate)(void) {
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if unlikely(!pagedir_prepare_map(kernel_vm_node_pagedata.vn_node.a_vmin, num_pages)) {
 		printk(FREESTR(KERN_ERR "Failed to prepare VM for relocated memory "
-		                        "information at " FORMAT_VM_PPAGE_T "+%Iu\n"),
+		                        "information at " FORMAT_PAGEPTR_T "+%Iu\n"),
 		       kernel_vm_node_pagedata.vn_node.a_vmin, num_pages);
 		return;
 	}
@@ -767,9 +768,9 @@ use_floordiv_maxpage:
 			if (minpage <= maxpage) {
 				pagecnt_t temp;
 				temp = (pagecnt_t)(maxpage - minpage) + 1;
-				printk(FREESTR(KERN_DEBUG "Free preseved memory at %I64p...%I64p\n"),
-				       (u64)VM_PPAGE2ADDR(minpage),
-				       (u64)VM_PPAGE2ADDR(maxpage + 1) - 1);
+				printk(FREESTR(KERN_DEBUG "Free preseved memory at " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T "\n"),
+				       (vm_phys_t)(page2addr(minpage)),
+				       (vm_phys_t)(page2addr(maxpage + 1) - 1));
 				page_free(minpage, temp);
 				freed_pages_end = maxpage + 1;
 				num_released += temp;

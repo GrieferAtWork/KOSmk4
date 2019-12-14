@@ -191,17 +191,20 @@ do_print_part_position:
 		case VM_DATAPART_STATE_LOCKED:
 			if (part->dp_ramdata.rd_blockv == &part->dp_ramdata.rd_block0) {
 				vm_phys_t maxphys;
-				maxphys = VM_PPAGE2ADDR(part->dp_ramdata.rd_block0.rb_start +
-				                        part->dp_ramdata.rd_block0.rb_size) -
+				maxphys = page2addr(part->dp_ramdata.rd_block0.rb_start +
+				                    part->dp_ramdata.rd_block0.rb_size) -
 				          1;
-				if (maxphys <= (vm_phys_t)UINTPTR_MAX) {
-					dbg_printf(DBGSTR(" @%p-%p\n"),
-					           (uintptr_t)VM_PPAGE2ADDR(part->dp_ramdata.rd_block0.rb_start),
-					           maxphys);
-				} else {
+#if __SIZEOF_VM_PHYS_T__ > __SIZEOF_POINTER__
+				if (maxphys > (vm_phys_t)UINTPTR_MAX) {
 					dbg_printf(DBGSTR(" @%I64p-%I64p\n"),
-					           (u64)VM_PPAGE2ADDR(part->dp_ramdata.rd_block0.rb_start),
+					           (u64)page2addr(part->dp_ramdata.rd_block0.rb_start),
 					           (u64)maxphys);
+				} else
+#endif /* __SIZEOF_VM_PHYS_T__ > __SIZEOF_POINTER__ */
+				{
+					dbg_printf(DBGSTR(" @%p-%p\n"),
+					           (uintptr_t)page2addr(part->dp_ramdata.rd_block0.rb_start),
+					           maxphys);
 				}
 			} else {
 				size_t i;
@@ -210,8 +213,8 @@ do_print_part_position:
 					struct vm_ramblock *b;
 					b = &part->dp_ramdata.rd_blockv[i];
 					dbg_printf(DBGSTR("\tphys:%I64p-%I64p (%Iu pages)\n"),
-					           (u64)VM_PPAGE2ADDR(b->rb_start),
-					           (u64)VM_PPAGE2ADDR(b->rb_start + b->rb_size) - 1,
+					           (u64)page2addr(b->rb_start),
+					           (u64)page2addr(b->rb_start + b->rb_size) - 1,
 					           (size_t)b->rb_size);
 				}
 			}

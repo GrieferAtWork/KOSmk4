@@ -38,28 +38,23 @@ extern "C++" {
 vm_phys_t (page2addr)(pageptr_t pageptr);
 pageptr_t (addr2page)(vm_phys_t physaddr);
 pageptr_t (addr2page)(uintptr_t physaddr);
+u32 (page2addr32)(pageptr_t pageptr);
 }
 #define page2addr page2addr
 #define addr2page addr2page
+#define page2addr32 page2addr32
 #else /* __INTELLISENSE__ && __CC__ && __cplusplus */
-#define page2addr(pageptr)  (__CCAST(vm_phys_t)(pageptr) * PAGESIZE)
-#define addr2page(physaddr) (__CCAST(pageptr_t)((physaddr) / PAGESIZE))
+#define page2addr(pageptr)   (__CCAST(vm_phys_t)(pageptr) * PAGESIZE)
+#define addr2page(physaddr)  (__CCAST(pageptr_t)((physaddr) / PAGESIZE))
+#define page2addr32(pageptr) (__CCAST(u32)(pageptr) * PAGESIZE)
 #endif /* !__INTELLISENSE__ || !__CC__ || !__cplusplus */
 
 #ifndef PAGEPTR_INVALID
 #define PAGEPTR_INVALID (__CCAST(pageptr_t)-1)
 #endif /* !PAGEPTR_INVALID */
 
-#define FORMAT_PAGEPTR_T FORMAT_VM_PPAGE_T
-#if __SIZEOF_PAGEPTR_T__ >= 8
-#define FORMAT_PAGECNT_T "%I64u"
-#else /* __SIZEOF_PAGEPTR_T__ >= 8 */
-#define FORMAT_PAGECNT_T "%Iu"
-#endif /* __SIZEOF_PAGEPTR_T__ < 8 */
-
-
-
 /* A page pointer is just like a normal physical pointer, but divided by PAGESIZE */
+#define FORMAT_PAGECNT_T "%Iu"
 #ifdef __CC__
 typedef size_t pagecnt_t;
 #endif /* __CC__ */
