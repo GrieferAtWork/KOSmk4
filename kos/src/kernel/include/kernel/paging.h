@@ -739,67 +739,6 @@ NOTHROW(KCALL npagedir_unwrite_p)(PAGEDIR_P_SELFTYPE self,
 #endif /* CONFIG_HAVE_PAGEDIR_UNWRITE */
 #endif /* __OMIT_PAGING_CONSTANT_P_WRAPPERS */
 
-
-/* Old-style paging compatibility functions.
- * NOTE: These don't have to be portable, as they will be removed eventually, so
- *       don't worry about the fact that they assume a pagesize of 4096 bytes! */
-#if 1
-#ifndef __PAGEDIR_COMPAT_VIRTPAGE2ADDR
-#ifdef __INTELLISENSE__
-extern "C++" {
-void *__PAGEDIR_COMPAT_VIRTPAGE2ADDR(vm_vpage_t virt_page);
-void *__PAGEDIR_COMPAT_VIRTPAGE2ADDR(uintptr_t virt_page); /* __ARCH_PAGEID_TYPE */
-vm_phys_t __PAGEDIR_COMPAT_PHYSPAGE2PHYS(pageptr_t phys_page);
-size_t __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(size_t num_pages);
-}
-#else /* __INTELLISENSE__ */
-#define __PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page)     (void *)((uintptr_t)(virt_page) * 4096)
-#define __PAGEDIR_COMPAT_PHYSPAGE2PHYS(phys_page)     (vm_phys_t)((uintptr_t)(phys_page) * 4096)
-#define __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages) ((size_t)(num_pages) * 4096)
-#endif /* !__INTELLISENSE__ */
-#endif /* !__PAGEDIR_COMPAT_VIRTPAGE2ADDR */
-#define pagedir_map(virt_page, num_pages, phys_page, perm)         npagedir_map(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages), __PAGEDIR_COMPAT_PHYSPAGE2PHYS(phys_page), perm)
-#define pagedir_push_mapone(virt_page, phys_page, perm)            npagedir_push_mapone(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_PHYSPAGE2PHYS(phys_page), perm)
-#define pagedir_pop_mapone(virt_page, backup)                      npagedir_pop_mapone(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), backup)
-#define pagedir_unmapone(virt_page)                                npagedir_unmapone(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page))
-#define pagedir_unmap(virt_page, num_pages)                        npagedir_unmap(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages))
-#define pagedir_syncone(virt_page)                                 npagedir_syncone(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page))
-#define pagedir_sync(virt_page, num_pages)                         npagedir_sync(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages))
-#define pagedir_ismapped(vpage)                                    npagedir_ismapped(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(vpage))
-#define pagedir_iswritable(vpage)                                  npagedir_iswritable(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(vpage))
-#define pagedir_isuseraccessible(vpage)                            npagedir_isuseraccessible(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(vpage))
-#define pagedir_isuserwritable(vpage)                              npagedir_isuserwritable(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(vpage))
-#define pagedir_prepare_mapone_p(self, virt_page)                  npagedir_prepare_mapone_p(self, __PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page))
-#define pagedir_unprepare_mapone_p(self, virt_page)                npagedir_unprepare_mapone_p(self, __PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page))
-#define pagedir_maphintone_p(self, virt_page, hint)                npagedir_maphintone_p(self, __PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), hint)
-#define pagedir_mapone_p(self, virt_page, phys_page, perm)         npagedir_mapone_p(self, __PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_PHYSPAGE2PHYS(phys_page), perm)
-#define pagedir_unmapone_p(self, virt_page)                        npagedir_unmapone_p(self, __PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page))
-#define pagedir_ismapped_p(self, vpage)                            npagedir_ismapped_p(self, __PAGEDIR_COMPAT_VIRTPAGE2ADDR(vpage))
-#define pagedir_iswritable_p(self, vpage)                          npagedir_iswritable_p(self, __PAGEDIR_COMPAT_VIRTPAGE2ADDR(vpage))
-#define pagedir_isuseraccessible_p(self, vpage)                    npagedir_isuseraccessible_p(self, __PAGEDIR_COMPAT_VIRTPAGE2ADDR(vpage))
-#define pagedir_isuserwritable_p(self, vpage)                      npagedir_isuserwritable_p(self, __PAGEDIR_COMPAT_VIRTPAGE2ADDR(vpage))
-#define pagedir_prepare_map_p(self, virt_page, num_pages)          npagedir_prepare_map_p(self, __PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages))
-#define pagedir_prepare_map_keep_p(self, virt_page, num_pages)     npagedir_prepare_map_keep_p(self, __PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages))
-#define pagedir_unprepare_map_p(self, virt_page, num_pages)        npagedir_unprepare_map_p(self, __PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages))
-#define pagedir_maphint_p(self, virt_page, num_pages, hint)        npagedir_maphint_p(self, __PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages), hint)
-#define pagedir_map_p(self, virt_page, num_pages, phys_page, perm) npagedir_map_p(self, __PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages), __PAGEDIR_COMPAT_PHYSPAGE2PHYS(phys_page), perm)
-#define pagedir_unmap_p(self, virt_page, num_pages)                npagedir_unmap_p(self, __PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages))
-#ifdef CONFIG_HAVE_PAGEDIR_CHANGED
-#define pagedir_haschanged(vpage)           npagedir_haschanged(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(vpage))
-#define pagedir_unsetchanged(vpage)         npagedir_unsetchanged(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(vpage))
-#define pagedir_haschanged_p(self, vpage)   npagedir_haschanged_p(self, __PAGEDIR_COMPAT_VIRTPAGE2ADDR(vpage))
-#define pagedir_unsetchanged_p(self, vpage) npagedir_unsetchanged_p(self, __PAGEDIR_COMPAT_VIRTPAGE2ADDR(vpage))
-#endif /* CONFIG_HAVE_PAGEDIR_CHANGED */
-#ifdef CONFIG_HAVE_PAGEDIR_UNWRITE
-#define pagedir_unwriteone(virt_page)                 npagedir_unwriteone(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page))
-#define pagedir_unwrite(virt_page, num_pages)         npagedir_unwrite(__PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages))
-#define pagedir_unwriteone_p(self, virt_page)         npagedir_unwriteone_p(self, __PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page))
-#define pagedir_unwrite_p(self, virt_page, num_pages) npagedir_unwrite_p(self, __PAGEDIR_COMPAT_VIRTPAGE2ADDR(virt_page), __PAGEDIR_COMPAT_NUMPAGES2NUMBYTES(num_pages))
-#endif /* CONFIG_HAVE_PAGEDIR_UNWRITE */
-#endif /* 1 */
-
-
-
 #endif /* __CC__ */
 
 

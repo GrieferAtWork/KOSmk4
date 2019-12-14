@@ -624,7 +624,7 @@ NOTHROW(KCALL pprop_memcpy)(uintptr_t *__restrict dst_base,
  * page directory at the specified location, using the specified permissions.
  * NOTE: The caller is responsible to ensure that `self' doesn't change state
  *       or size, as well as to ensure that the given address range isn't already
- *       in use. - This function is merely a thin wrapper around `pagedir_map',
+ *       in use. - This function is merely a thin wrapper around `npagedir_map',
  *       which automatically allows for dealing with multi-part ram blocks.
  * NOTE: The caller is responsible to ensure that the target region of memory
  *       has been prepared in a prior call to `npagedir_prepare_map'
@@ -3627,11 +3627,11 @@ NOTHROW(FCALL vm_syncall_locked)(struct vm *__restrict effective_vm) {
 
 
 /* Begin/end syncing page directory mappings:
- * >> pagedir_prepare_map_p(my_vm, start, count);                       // Prepare      (make sure that `pagedir_unmap_p()' will succeed)
- * >> vm_sync_begin(my_vm);                                             // Lock         (make sure we'll be able to sync)
- * >> pagedir_unmap_p(PAGEDIR_P_SELFOFVM(my_vm), start, count);         // Unmap        (Actually delete page mappings)
- * >> vm_paged_sync_end(my_vm, start, count);                                 // Unlock+sync  (Make sure that all CPUs got the message about pages having gone away)
- * >> pagedir_unprepare_map_p(PAGEDIR_P_SELFOFVM(my_vm), start, count); // Free         (Clean up memory used to describe the mapping)
+ * >> npagedir_prepare_map_p(my_vm, start, count);                       // Prepare      (make sure that `npagedir_unmap_p()' will succeed)
+ * >> vm_sync_begin(my_vm);                                              // Lock         (make sure we'll be able to sync)
+ * >> npagedir_unmap_p(PAGEDIR_P_SELFOFVM(my_vm), start, count);         // Unmap        (Actually delete page mappings)
+ * >> vm_paged_sync_end(my_vm, start, count);                            // Unlock+sync  (Make sure that all CPUs got the message about pages having gone away)
+ * >> npagedir_unprepare_map_p(PAGEDIR_P_SELFOFVM(my_vm), start, count); // Free         (Clean up memory used to describe the mapping)
  * This order to calls is required to prevent problems at a
  * point in time when those problems could no longer be handled,
  * since the regular vm_paged_sync() functions may throw an E_WOULDBLOCK

@@ -451,7 +451,7 @@ typedef struct p64_pdir pagedir_t;
 #undef CONFIG_HAVE_PAGEDIR_CHANGED
 #define CONFIG_HAVE_PAGEDIR_CHANGED 1
 
-/* x86 implements the `pagedir_unwrite' API (delete low-level write permissions). */
+/* x86 implements the `npagedir_unwrite' API (delete low-level write permissions). */
 #undef CONFIG_HAVE_PAGEDIR_UNWRITE
 #define CONFIG_HAVE_PAGEDIR_UNWRITE 1
 

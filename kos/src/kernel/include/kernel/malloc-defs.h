@@ -34,7 +34,7 @@ DECL_BEGIN
  * ability of tracking use-after-free through `heap_validate()'
  * Note that `heap_validate()' attempts to optimize itself not
  * to check data blocks that haven't been modified since the
- * previous check, making use of `pagedir_haschanged()', should
+ * previous check, making use of `npagedir_haschanged()', should
  * the host support that function (`CONFIG_HAVE_PAGEDIR_CHANGED') */
 #ifndef CONFIG_DEBUG_HEAP
 #if !defined(CONFIG_NO_DEBUG_HEAP) && !defined(NDEBUG)

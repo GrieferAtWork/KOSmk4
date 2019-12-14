@@ -467,13 +467,13 @@ do_throw_first_unmapped:
 do_update_page_directory:
 #endif /* VM_DEFINE_PROTECT */
 
-					if (effective_vm == myvm || PRANGE_IS_KERNEL(vm_node_getstartpageid(node), vm_node_getendpageid(node))) {
-						pagedir_unmap(vm_node_getstartpageid(node),
-						              vm_node_getpagecount(node));
+					if (effective_vm == myvm || vm_node_iskernelspace(node)) {
+						npagedir_unmap(vm_node_getstart(node),
+						               vm_node_getsize(node));
 					} else {
-						pagedir_unmap_p(PAGEDIR_P_SELFOFVM(effective_vm),
-						                vm_node_getstartpageid(node),
-						                vm_node_getpagecount(node));
+						npagedir_unmap_p(PAGEDIR_P_SELFOFVM(effective_vm),
+						                 vm_node_getstart(node),
+						                 vm_node_getsize(node));
 					}
 					must_sync = true;
 #ifdef VM_DEFINE_UNMAP

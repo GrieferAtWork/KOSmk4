@@ -58,20 +58,24 @@ INTDEF ATTR_PERCPU void *thiscpu_x86_iobnode_pagedir_identity;
  * During preemption:
  *     >> if (OLD_THREAD->IOPERM_BITMAP != NEW_THREAD->IOPERM_BITMAP &&
  *     >>     IS_IOPERM_BITMAP_LOADED(THIS_CPU)) {
- *     >>     pagedir_unmap(VM_ADDR2PAGE((uintptr_t)&thiscpu_x86_tss) + 1, 2);
- *     >>     pagedir_sync(VM_ADDR2PAGE((uintptr_t)&thiscpu_x86_tss) + 1, 2);
+ *     >>     npagedir_unmap(THIS_CPU:thiscpu_x86_iob, 2 * PAGESIZE);
+ *     >>     npagedir_sync(THIS_CPU:thiscpu_x86_iob, 2 * PAGESIZE);
  *     >>     SET_IOPERM_BITMAP_LOADED(THIS_CPU, false);
  *     >> }
  * During #PF handling:
- *     >> if (CR2 >= (((uintptr_t)&thiscpu_x86_tss) + 1 * PAGESIZE) &&
- *     >>     CR2 <  (((uintptr_t)&thiscpu_x86_tss) + 3 * PAGESIZE)) {
+ *     >> if (CR2 in THIS_CPU:thiscpu_x86_iob) {
  *     >>     struct ioperm_bitmap *iob;
  *     >>     iob = PERTASK_GET(this_x86_ioperm_bitmap);
  *     >>     if (!iob) {
  *     >>         iob = incref(ioperm_bitmap_getempty());
  *     >>         PERTASK_SET(this_x86_ioperm_bitmap, iob);
+ *     >>     } else if (IS_WRITING() && isshared(iob)) {
+ *     >>         iob = ioperm_bitmap_copy(iob);
+ *     >>         PERTASK_SET(this_x86_ioperm_bitmap, iob);
  *     >>     }
- *     >>     pagedir_map(VM_ADDR2PAGE((uintptr_t)&thiscpu_x86_tss) + 1, 2, iob->ib_pages, PAGEDIR_MAP_FREAD);
+ *     >>     npagedir_map(THIS_CPU:thiscpu_x86_iob, 2 * PAGESIZE,
+ *     >>                  iob->ib_pages, IS_WRITING() ? (PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE)
+ *     >>                                              : PAGEDIR_MAP_FREAD);
  *     >>     SET_IOPERM_BITMAP_LOADED(THIS_CPU, true);
  *     >>     return;
  *     >> }
@@ -96,9 +100,9 @@ INTDEF ATTR_PERCPU void *thiscpu_x86_iobnode_pagedir_identity;
  *
  * 0 ... SIZEOF_TSS32 - 1:  struct tss
  *    NOTE: thiscpu_x86_tss.t_iomap == CEIL_ALIGN((uintptr_t)&thiscpu_x86_tss +
- *                                           SIZEOF_TSS32 +
- *                                           SIZEOF_INTERRUPT_REDIRECTION_BITMAP,
- *                                           4096) - (uintptr_t)&thiscpu_x86_tss
+ *                                                SIZEOF_TSS32 +
+ *                                                SIZEOF_INTERRUPT_REDIRECTION_BITMAP,
+ *                                                4096) - (uintptr_t)&thiscpu_x86_tss
  *          -> Meaning that it points to the first page boundry following
  *             the TSS, leaving enough space for the interrupt redirection bitmap.
  *

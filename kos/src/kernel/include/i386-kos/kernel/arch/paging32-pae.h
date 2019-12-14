@@ -383,7 +383,7 @@ NOTHROW(FCALL pae_npagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
  * each thread to push/pop its trampoline page, with doing so actually being an atomic
  * operation in the sense that the data is entirely thread-private, while modifications
  * do not require any kind of lock.
- * NOTE: If the page had been mapped, `pagedir_pop_mapone()' will automatically sync the page. */
+ * NOTE: If the page had been mapped, `npagedir_pop_mapone()' will automatically sync the page. */
 INTDEF NOBLOCK WUNUSED pae_pagedir_pushval_t
 NOTHROW(FCALL pae_npagedir_push_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                         PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,

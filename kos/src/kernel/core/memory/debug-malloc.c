@@ -848,7 +848,7 @@ NOTHROW(KCALL mall_reachable_data)(byte_t *base, size_t num_bytes) {
 		void *ptr;
 		size_t page_bytes = PAGESIZE - ((uintptr_t)base & PAGEMASK);
 		/* Only scan writable pages. */
-		if (!pagedir_iswritable(VM_ADDR2PAGE((vm_virt_t)base))) {
+		if (!npagedir_iswritable(base)) {
 			if (page_bytes >= num_bytes)
 				break;
 			base += page_bytes;
