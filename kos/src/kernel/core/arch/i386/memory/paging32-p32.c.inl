@@ -146,13 +146,13 @@ again:
 	e2.p_word = ATOMIC_READ(e2_p->p_word);
 	if (!e2.p_vec1.v_present) {
 		/* Not present */
-		new_e1_vector = page_malloc(1);
+		new_e1_vector = page_mallocone32();
 		if unlikely(new_e1_vector == PAGEPTR_INVALID)
 			return false;
 		/* Initialize the inner vector.
 		 * We can safely make use of our trampoline, since kernel-space is always prepared. */
 		e1_p   = (union p32_pdir_e1 *)THIS_TRAMPOLINE_BASE;
-		backup = p32_pagedir_push_mapone(e1_p, (vm_phys_t)((u32)new_e1_vector * 4096),
+		backup = p32_pagedir_push_mapone(e1_p, page2addr(new_e1_vector),
 		                                 PAGEDIR_MAP_FWRITE);
 		pagedir_syncone(e1_p);
 		COMPILER_WRITE_BARRIER();
@@ -170,7 +170,7 @@ again:
 		COMPILER_WRITE_BARRIER();
 		p32_pagedir_pop_mapone(e1_p, backup);
 		/* Map the new vector. */
-		new_e2_word = VM_PAGE2ADDR((u32)new_e1_vector) |
+		new_e2_word = page2addr32(new_e1_vector) |
 		              P32_PAGE_FPRESENT | P32_PAGE_FWRITE | P32_PAGE_FACCESSED;
 #if 0 /* This is always the case: Kernel-space always has all vectors allocated. */
 		if (vec2 < P32_PDIR_VEC2INDEX(KERNEL_BASE))
@@ -192,14 +192,14 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 		 * temporary mapping trampoline to temporarily map the new page
 		 * for initialization (Because the trampoline always uses
 		 * `P32_PAGE_FNOFLATTEN' when mapping, it is always prepared) */
-		new_e1_vector = page_malloc(1);
+		new_e1_vector = page_mallocone32();
 		if unlikely(new_e1_vector == PAGEPTR_INVALID)
 			return false;
 		e1.p_word = e2.p_word & ~(P32_PAGE_F4MIB | P32_PAGE_FPAT_4MIB);
 		if (e2.p_word & P32_PAGE_FPAT_4MIB)
 			e1.p_word |= P32_PAGE_FPAT_4KIB;
 		e1_p   = (union p32_pdir_e1 *)THIS_TRAMPOLINE_BASE;
-		backup = p32_pagedir_push_mapone(e1_p, (vm_phys_t)((u32)new_e1_vector * 4096),
+		backup = p32_pagedir_push_mapone(e1_p, page2addr(new_e1_vector),
 		                                 PAGEDIR_MAP_FWRITE);
 		pagedir_syncone(e1_p);
 		if (vec1_prepare_size == 1024) {
@@ -221,7 +221,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 		}
 		p32_pagedir_pop_mapone(e1_p, backup);
 		COMPILER_WRITE_BARRIER();
-		new_e2_word  = VM_PAGE2ADDR((u32)new_e1_vector);
+		new_e2_word  = page2addr32(new_e1_vector);
 		new_e2_word |= P32_PAGE_FPRESENT | P32_PAGE_FWRITE;
 		new_e2_word |= e2.p_word & (P32_PAGE_FUSER | P32_PAGE_FPWT |
 		                            P32_PAGE_FPCD | P32_PAGE_FACCESSED |

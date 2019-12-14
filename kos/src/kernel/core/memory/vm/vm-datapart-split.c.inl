@@ -629,10 +629,10 @@ again_lock_datapart:
 		 * futex allocated within the address range of the upper-half datapart. */
 		if (self->dp_futex && !result->dp_futex &&
 		    vm_futextree_rlocate_at(self->dp_futex->fc_tree,
-		                            (uintptr_t)VM_PAGE2ADDR(vpage_offset),
+		                            (uintptr_t)vpage_offset * PAGESIZE,
 		                            (uintptr_t)-1,
 		                            self->dp_futex->fc_semi0,
-		                            self->dp_futex->fc_level0)) {
+		                            self->dp_futex->fc_level0) != NULL) {
 			struct vm_futex_controller *hifc;
 			hifc = vm_futex_controller_allocf_nx(GFP_ATOMIC | GFP_PREFLT | GFP_VCBASE);
 			if (!hifc) {
@@ -912,7 +912,7 @@ again_incref_futexes:
 		 * We choose to use the greatest address for this, since this
 		 * prevents the possibly of an overflow when the the split
 		 * happens at an offset of `SIZE_MAX' */
-		lofc_maxaddr = (uintptr_t)VM_PAGE2ADDR(vpage_offset) - 1;
+		lofc_maxaddr = (uintptr_t)vpage_offset * PAGESIZE - 1;
 		if (maxaddr <= lofc_maxaddr) {
 			/* Simple case: The futex with the greatest address will still be apart of
 			 *              the lower-half (i.e. old; i.e. `self') datapart, meaning

@@ -265,8 +265,10 @@ NOTHROW(KCALL page_malloc_part_between)(pageptr_t min_page, pageptr_t max_page,
 	page_malloc_between(addr2page(__UINT32_C(0x00000000)), \
 	                    addr2page(__UINT32_C(0xffffffff)), \
 	                    num_pages)
+#define page_mallocone32() page_malloc32(1)
 #else /* __SIZEOF_VM_PHYS_T__ > 4 */
 #define page_malloc32(num_pages) page_malloc(num_pages)
+#define page_mallocone32()       page_mallocone()
 #endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
 
 /* Free a given physical address range.
@@ -322,7 +324,7 @@ NOTHROW(KCALL page_isfree)(pageptr_t page);
  *       >> page = page_malloc(1);
  *       >> pagedir_mapone(dest, page, PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
  *       >> if (!page_iszero(page))
- *       >>      memset(VM_PAGE2ADDR(dest), 0, PAGESIZE);
+ *       >>      vm_memsetphys(page2addr(dest), 0, PAGESIZE);
  *       In other words: The information is most useful in freshly
  *       allocated pages, in order to determine if the mapped memory
  *       already contains all zeros. */

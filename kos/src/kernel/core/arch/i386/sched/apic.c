@@ -698,7 +698,7 @@ i386_allocate_secondary_cores(void) {
 		 *    some future point in time when the CPU will be used again. */
 		{
 			struct scpustate *init_state;
-			init_state = (struct scpustate *)(VM_PAGE2ADDR(FORTASK(altidle, this_kernel_stacknode_).vn_node.a_vmax + 1) -
+			init_state = (struct scpustate *)((byte_t *)vm_node_getend(&FORTASK(altidle, this_kernel_stacknode_)) -
 			                                  (offsetafter(struct scpustate, scs_irregs) + sizeof(void *)));
 			memset(init_state, 0, offsetafter(struct scpustate, scs_irregs));
 			/* Set the return address to execute the IDLE main loop. */

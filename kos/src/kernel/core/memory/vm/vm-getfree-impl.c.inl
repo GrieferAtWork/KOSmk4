@@ -249,14 +249,18 @@ again:
 					        "minpage + num_pages    = %p (%p)\n"
 					        "mode                   = %#x\n"
 					        "min_alignment_in_pages = %Iu\n",
-					        VM_PAGE2ADDR(minpage), minpage, num_pages, VM_PAGE2ADDR(minpage + num_pages), minpage + num_pages, mode, min_alignment_in_pages);
+					        PAGEID_DECODE(minpage), minpage, num_pages,
+					        PAGEID_DECODE(minpage + num_pages), minpage + num_pages,
+					        mode, min_alignment_in_pages);
 					assertf(!(minpage & (min_alignment_in_pages - 1)),
 					        "minpage                = %p (%p)\n"
 					        "num_pages              = %Iu\n"
 					        "minpage + num_pages    = %p (%p)\n"
 					        "mode                   = %#x\n"
 					        "min_alignment_in_pages = %Iu\n",
-					        VM_PAGE2ADDR(minpage), minpage, num_pages, VM_PAGE2ADDR(minpage + num_pages), minpage + num_pages, mode, min_alignment_in_pages);
+					        PAGEID_DECODE(minpage), minpage, num_pages,
+					        PAGEID_DECODE(minpage + num_pages), minpage + num_pages,
+					        mode, min_alignment_in_pages);
 
 					return minpage;
 				}

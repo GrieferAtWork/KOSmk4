@@ -312,8 +312,8 @@ upgrade_and_recheck_vm_for_node:
 						            (node->vn_prot & VM_PROT_SHARED)) {
 							decref_unlikely(part);
 							kfree(new_part);
-							printk(KERN_DEBUG "Race condition: Mapping target at %p has changed during unshare (#1)\n",
-							       VM_PAGE2ADDR(pageid));
+							printk(KERN_DEBUG "[vm] Race condition: Mapping target at %p (%p) has changed during unshare (#1)\n",
+							       pageaddr, addr);
 							goto again_lookup_node_already_locked;
 						}
 						sync_endread(self);
@@ -364,8 +364,8 @@ upgrade_and_recheck_vm_for_node:
 						page_freeone(new_ppage);
 						kfree(new_part);
 						decref_unlikely(part);
-						printk(KERN_DEBUG "Race condition: Mapping target at %p has changed during unshare (#2)\n",
-						       VM_PAGE2ADDR(pageid));
+						printk(KERN_DEBUG "[vm] Race condition: Mapping target at %p (%p) has changed during unshare (#2)\n",
+						       pageaddr, addr);
 						goto again_lookup_node_already_locked;
 					}
 					/* If the node isn't prepared, make sure that we can map memory. */

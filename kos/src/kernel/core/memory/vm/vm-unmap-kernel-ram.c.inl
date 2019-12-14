@@ -500,21 +500,21 @@ again:
 			 * processes of operating with that node (which we subvert by doing
 			 * it's work ahead of time for all of the nodes that could possibly
 			 * be affected by this) */
-			pageid_t tail_start;
+			void *tail_start;
 			size_t tail_size;
 			assert(part->dp_state == VM_DATAPART_STATE_LOCKED);
 			/* Simply touch (thus initialize) all affected trailing pages,
 			 * thus forcing the page fault handler to initialize them. */
-			tail_start = unmap_max + 1;
+			tail_start = PAGEID_DECODE(unmap_max + 1);
 			tail_size  = (size_t)(vm_node_getmaxpageid(node) - unmap_max);
 			assert(tail_size >= 1);
 			do {
 #if __SIZEOF_POINTER__ >= 8
-				readq((uintptr_t)VM_PAGE2ADDR(tail_start));
+				readq(tail_start);
 #else
-				readl((uintptr_t)VM_PAGE2ADDR(tail_start));
+				readl(tail_start);
 #endif
-				++tail_start;
+				tail_start = (byte_t *)tail_start + PAGESIZE;
 			} while (--tail_size);
 		}
 		if (unmap_min <= vm_node_getminpageid(node)) {
@@ -857,7 +857,7 @@ NOTHROW(KCALL pending_unmap_merge)(struct pending_unmap_ram *__restrict self) {
 		if (!next)
 			break;
 		if ((self->pur_zero != next->pur_zero) ||
-		    ((uintptr_t)self + VM_PAGE2ADDR(self->pur_size) != (uintptr_t)next)) {
+		    ((uintptr_t)self + self->pur_size != (uintptr_t)next)) {
 			self = next;
 			continue;
 		}

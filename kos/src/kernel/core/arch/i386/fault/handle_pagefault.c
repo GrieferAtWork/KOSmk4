@@ -252,7 +252,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	/* Re-enable interrupts if they were enabled before. */
 	if (state->ics_irregs.ir_pflags & EFLAGS_IF)
 		__sti();
-	pageid     = PAGEID_ENCODE(addr);
+	pageid   = PAGEID_ENCODE(addr);
 	pageaddr = (void *)((uintptr_t)addr & ~PAGEMASK);
 #if 0
 	printk(KERN_DEBUG "Page fault at %p (page %p) [pc=%p,sp=%p] [ecode=%#x] [pid=%u]\n",
@@ -679,8 +679,8 @@ upgrade_and_recheck_vm_for_node:
 								            (node->vn_prot & VM_PROT_SHARED)) {
 									decref_unlikely(part);
 									kfree(new_part);
-									printk(KERN_DEBUG "Race condition: Mapping target at %p has changed during unshare (#1)\n",
-									       VM_PAGE2ADDR(pageid));
+									printk(KERN_DEBUG "Race condition: Mapping target at %p (%p) has changed during unshare (#1)\n",
+									       pageaddr, addr);
 									goto again_lookup_node_already_locked;
 								}
 								sync_endread(effective_vm);

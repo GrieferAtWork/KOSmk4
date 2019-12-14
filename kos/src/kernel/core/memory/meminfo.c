@@ -485,9 +485,9 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
 	       req_bytes, req_pages);
 	kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_size = req_pages;
 	kernel_vm_part_pagedata.dp_tree.a_vmax = (datapage_t)(req_pages - 1);
-	kernel_vm_node_pagedata.vn_node.a_vmin = PAGEID_ENCODE(KERNEL_BASE + page2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start));
+	buffer = (byte_t *)(KERNEL_BASE + page2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start));
+	kernel_vm_node_pagedata.vn_node.a_vmin = PAGEID_ENCODE(buffer);
 	kernel_vm_node_pagedata.vn_node.a_vmax = kernel_vm_node_pagedata.vn_node.a_vmin + req_pages - 1;
-	buffer = (byte_t *)VM_PAGE2ADDR(kernel_vm_node_pagedata.vn_node.a_vmin);
 	/* With the required buffer now allocated, we can move on to populating it with data.
 	 * NOTE: Since `minfo_allocate_part_pagedata()' only changed pages marked as `PMEMBANK_TYPE_RAM'
 	 *       to become `PMEMBANK_TYPE_ALLOCATED', both of which have the same properties when it
