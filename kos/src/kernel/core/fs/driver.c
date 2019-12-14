@@ -755,7 +755,7 @@ NOTHROW(KCALL driver_destroy)(struct driver *__restrict self) {
 	assert(!self->d_dangsect);
 	/* Go through all of the module's program headers and unload them from memory.
 	 * Because drivers are mapped as anonymous memory, rather than file mappings,
-	 * we can simply use the NOEXCEPT,NOBLOCK `vm_paged_unmap_kernel_ram()' function! */
+	 * we can simply use the NOEXCEPT,NOBLOCK `vm_unmap_kernel_ram()' function! */
 	for (i = 0; i < self->d_phnum; ++i) {
 		uintptr_t progaddr;
 		size_t progsize;

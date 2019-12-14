@@ -374,10 +374,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak error_as_signal; .long error_as_signal
 	.reloc ., R_386_SIZE32, error_as_signal; .long 0
 	.long 0xff7f05c
-	.long .Lname93 /* index: 93 */
-	.weak vm_paged_unmap_kernel_ram; .long vm_paged_unmap_kernel_ram
-	.reloc ., R_386_SIZE32, vm_paged_unmap_kernel_ram; .long 0
-	.long 0xa58905d
+	.long 0 /* index: 93 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname94 /* index: 94 */
 	.weak error_thrown; .long error_thrown
 	.reloc ., R_386_SIZE32, error_thrown; .long 0
@@ -1718,10 +1718,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak aio_multihandle_cancel; .long aio_multihandle_cancel
 	.reloc ., R_386_SIZE32, aio_multihandle_cancel; .long 0
 	.long 0xdde61ac
-	.long 0 /* index: 429 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname429 /* index: 429 */
+	.weak vm_unmap_kernel_ram; .long vm_unmap_kernel_ram
+	.reloc ., R_386_SIZE32, vm_unmap_kernel_ram; .long 0
+	.long 0x1d6b1ad
 	.long 0 /* index: 430 */
 	.long 0
 	.long 0
@@ -16486,8 +16486,6 @@ END(kernel_symbol_table)
 	.string "npagedir_ismapped"
 .Lname92:
 	.string "error_as_signal"
-.Lname93:
-	.string "vm_paged_unmap_kernel_ram"
 .Lname94:
 	.string "error_thrown"
 .Lname95:
@@ -16894,6 +16892,8 @@ END(kernel_symbol_table)
 	.string "vm_addhwbreak"
 .Lname428:
 	.string "aio_multihandle_cancel"
+.Lname429:
+	.string "vm_unmap_kernel_ram"
 .Lname432:
 	.string "npagedir_prepare_map"
 .Lname434:

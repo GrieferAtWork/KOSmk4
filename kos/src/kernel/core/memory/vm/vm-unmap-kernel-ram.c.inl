@@ -44,7 +44,7 @@ DECL_BEGIN
 
 struct pending_unmap_ram {
 	struct pending_unmap_ram *pur_next; /* [0..1] Next pending unmap. */
-	size_t                    pur_size; /* Pending unmap size (in pages) */
+	size_t                    pur_size; /* Pending unmap size (in bytes) */
 	bool                      pur_zero; /* Are bytes of pending unmap pages zero */
 };
 
@@ -67,16 +67,17 @@ NOTHROW(KCALL vm_kernel_treelock_service)(gfp_t flags);
 
 
 LOCAL NOBLOCK void
-NOTHROW(KCALL vm_do_pdir_unmap)(pageid_t page_index, size_t num_pages) {
+NOTHROW(KCALL vm_do_pdir_unmap)(PAGEDIR_PAGEALIGNED void *addr,
+                                PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	/* Unmap the associated memory, sync it, and unprepare it. */
-	pagedir_unmap(page_index, num_pages);
-	vm_paged_kernel_sync(page_index, num_pages);
+	npagedir_unmap(addr, num_bytes);
+	vm_kernel_sync(addr, num_bytes);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	/* NOTE: Only unprepare the range after all CPUs were notified about the unmap.
 	 *       If we were to free any descriptor pages before then, the pages may
 	 *       be allocated again, and become corrupt while other cores are still
 	 *       believing them to contain paging data. */
-	pagedir_unprepare_map(page_index, num_pages);
+	npagedir_unprepare_map(addr, num_bytes);
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 }
 
@@ -363,7 +364,8 @@ NOTHROW(KCALL vm_datapart_truncate_trailing)(struct vm_datapart *__restrict self
 
 
 PRIVATE /*NOBLOCK_IF(flags & GFP_ATOMIC)*/ void
-NOTHROW(KCALL vm_do_unmap_kernel_ram)(pageid_t page_index, size_t num_pages,
+NOTHROW(KCALL vm_do_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED void *addr,
+                                      PAGEDIR_PAGEALIGNED size_t num_bytes,
                                       bool is_zero, gfp_t flags) {
 	/* In order to unmap a sub-segment of a hinted VM nodes, the following must be done:
 	 *  - Because hinted VM nodes cannot be split (only truncated),
@@ -413,19 +415,23 @@ NOTHROW(KCALL vm_do_unmap_kernel_ram)(pageid_t page_index, size_t num_pages,
 	struct vm_node *node;
 	struct vm_datapart *part;
 	size_t effective_pages;
-	pageid_t unmap_max;
-	unmap_max = page_index + num_pages - 1;
+	pageid_t unmap_min, unmap_max;
+	size_t num_pages;
+	assert(IS_ALIGNED((uintptr_t)addr, PAGESIZE));
+	assert(IS_ALIGNED(num_bytes, PAGESIZE));
+	num_pages = num_bytes / PAGESIZE;
+	unmap_min = PAGEID_ENCODE(addr);
+	unmap_max = unmap_min + num_pages - 1;
 again:
 	assert(num_pages != 0);
-	assert(page_index >= (pageid_t)KERNEL_BASE_PAGE);
-	assert(unmap_max >= page_index);
+	assert(unmap_min >= (pageid_t)KERNEL_BASE_PAGE);
+	assert(unmap_max >= unmap_min);
 	assert(unmap_max <= __ARCH_PAGEID_MAX);
 	/* With the caller having acquired a write-lock to the kernel
 	 * VM for us, now it's time to actually perform the unmap! */
-	node = vm_paged_node_remove(&vm_kernel, page_index);
+	node = vm_paged_node_remove(&vm_kernel, unmap_min);
 	assertf(node, "Nothing mapped at %p...%p\n",
-	        VM_PAGE2ADDR(page_index),
-	        VM_PAGE2ADDR(page_index + num_pages) - 1);
+	        (byte_t *)addr, (byte_t *)addr + num_bytes - 1);
 	assertf(!(node->vn_flags & VM_NODE_FLAG_KERNPRT),
 	        "Attempted to unmap node at %p...%p, which is part of the kernel core",
 	        vm_node_getmin(node), vm_node_getmax(node));
@@ -443,7 +449,7 @@ again:
 	/* Check if the unmap request was split across multiple nodes. */
 	effective_pages = num_pages;
 	if (unmap_max > vm_node_getmaxpageid(node))
-		effective_pages = (size_t)((vm_node_getmaxpageid(node) - page_index) + 1);
+		effective_pages = (size_t)((vm_node_getmaxpageid(node) - unmap_min) + 1);
 	part = node->vn_part;
 	assertf(part->dp_crefs == NULL,
 	        "Datapart backing anonymous kernel-space node at %p...%p has copy-on-write references",
@@ -464,20 +470,21 @@ again:
 
 	if (unmap_max >= vm_node_getmaxpageid(node)) {
 		/* We can either unmap the entire node, or we can just truncate it. */
-		if (page_index <= vm_node_getminpageid(node)) {
+		assert(unmap_min == PAGEID_ENCODE(addr));
+		if (unmap_min <= vm_node_getminpageid(node)) {
 			/* Simply unmap the entire node. */
 			decref_unlikely(part->dp_block);
 			decref_unlikely(node->vn_block);
-			vm_do_pdir_unmap(page_index, effective_pages);
+			vm_do_pdir_unmap(addr, effective_pages * PAGESIZE);
 			part->dp_srefs = NULL;
 			vm_datapart_destroy(part, is_zero);
 			vm_node_free(node);
 		} else {
 			/* Must truncate the node at the end. */
-			vm_do_pdir_unmap(page_index, effective_pages);
-			vm_datapart_truncate_trailing(part, (size_t)(page_index - vm_node_getminpageid(node)), is_zero);
-			assert(page_index - 1 < node->vn_node.a_vmax);
-			node->vn_node.a_vmax = page_index - 1;
+			vm_do_pdir_unmap(addr, effective_pages * PAGESIZE);
+			vm_datapart_truncate_trailing(part, (size_t)(unmap_min - vm_node_getminpageid(node)), is_zero);
+			assert(unmap_min - 1 < node->vn_node.a_vmax);
+			node->vn_node.a_vmax = unmap_min - 1;
 			/* Re-insert the (now truncated) node */
 			vm_node_insert(node);
 		}
@@ -510,13 +517,14 @@ again:
 				++tail_start;
 			} while (--tail_size);
 		}
-		if (page_index <= vm_node_getminpageid(node)) {
+		if (unmap_min <= vm_node_getminpageid(node)) {
 			size_t num_truncate;
 			num_truncate = (size_t)((unmap_max + 1) - vm_node_getminpageid(node));
 			assert(num_truncate >= 1);
 			/* Unmap all leading memory from the node. */
 			node->vn_node.a_vmin = unmap_max + 1;
-			vm_do_pdir_unmap(page_index, effective_pages);
+			assert(unmap_min == PAGEID_ENCODE(addr));
+			vm_do_pdir_unmap(addr, effective_pages * PAGESIZE);
 			vm_datapart_truncate_leading(part, num_truncate, is_zero);
 			/* Re-insert the (now truncated) node */
 			vm_node_insert(node);
@@ -526,12 +534,12 @@ again:
 			 *    BEFORE: XXXX XXXXXXX XXXX
 			 *    AFTER:  XXXX YYYYYYY ZZZZ
 			 *            keep -unmap- keep */
-			size_t sizeof_leading  = (size_t)(page_index - vm_node_getminpageid(node));      /* SIZEOF(X) */
-			size_t sizeof_truncate = effective_pages;                               /* SIZEOF(Y) */
+			size_t sizeof_leading  = (size_t)(unmap_min - vm_node_getminpageid(node));       /* SIZEOF(X) */
+			size_t sizeof_truncate = effective_pages;                                        /* SIZEOF(Y) */
 			size_t sizeof_trailing = (size_t)(vm_node_getmaxpageid(node) - unmap_max);       /* SIZEOF(Z) */
 			size_t trailing_offset = (size_t)((unmap_max + 1) - vm_node_getminpageid(node)); /* Offset from the start of `Z' to the start of `X' */
 			uintptr_t *part_pprot_bitset;
-			assert(page_index > vm_node_getminpageid(node));
+			assert(unmap_min > vm_node_getminpageid(node));
 			assert(vm_node_getmaxpageid(node) > unmap_max);
 			corepair.cp_node = (struct vm_node *)kmalloc_nx(sizeof(struct vm_node),
 			                                                GFP_LOCKED | GFP_CALLOC | GFP_PREFLT |
@@ -556,8 +564,9 @@ restore_node_after_corepair_failure:
 					if (corepair.cp_node)
 						vm_node_free(corepair.cp_node);
 					vm_node_insert(node);
-					pend           = (struct pending_unmap_ram *)VM_PAGE2ADDR(page_index);
-					pend->pur_size = effective_pages;
+					assert(unmap_min == PAGEID_ENCODE(addr));
+					pend           = (struct pending_unmap_ram *)addr;
+					pend->pur_size = effective_pages * PAGESIZE;
 					pend->pur_zero = is_zero;
 					do {
 						next = ATOMIC_READ(vm_pending_unmap_kernel_ram);
@@ -587,7 +596,7 @@ restore_node_after_corepair_failure:
 			} else {
 				size_t bitset_size, i;
 				uintptr_t bit;
-				bitset_size                  = CEILDIV(sizeof_trailing, BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS);
+				bitset_size = CEILDIV(sizeof_trailing, BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS);
 				corepair.cp_part->dp_pprop_p = (uintptr_t *)kmalloc_nx(bitset_size,
 				                                                       GFP_LOCKED | GFP_CALLOC | GFP_PREFLT |
 				                                                       (flags & GFP_INHERIT));
@@ -612,7 +621,8 @@ page_properties_updated:
 					corepair.cp_part->dp_ramdata.rd_block0.rb_start = part->dp_ramdata.rd_block0.rb_start + trailing_offset;
 					corepair.cp_part->dp_ramdata.rd_block0.rb_size  = sizeof_trailing;
 					/* Free memory in between */
-					vm_do_pdir_unmap(page_index, effective_pages);
+					assert(unmap_min == PAGEID_ENCODE(addr));
+					vm_do_pdir_unmap(addr, effective_pages * PAGESIZE);
 					page_ffree(part->dp_ramdata.rd_block0.rb_start + sizeof_leading,
 					           sizeof_truncate, is_zero);
 					part->dp_ramdata.rd_block0.rb_size = sizeof_leading;
@@ -674,7 +684,8 @@ page_properties_updated:
 						part->dp_ramdata.rd_blockc = i;
 						part->dp_ramdata.rd_blockv[i].rb_size -= num_pages_from_first;
 					}
-					vm_do_pdir_unmap(page_index, effective_pages);
+					assert(unmap_min == PAGEID_ENCODE(addr));
+					vm_do_pdir_unmap(addr, effective_pages * PAGESIZE);
 					/* Truncate trailing RAM blocks from the new leading block. */
 					vm_datapart_truncate_trailing_ramblocks(part, sizeof_leading, is_zero);
 				}
@@ -688,7 +699,8 @@ page_properties_updated:
 					corepair.cp_part->dp_swpdata.sd_block0.sb_start = part->dp_swpdata.sd_block0.sb_start + trailing_offset;
 					corepair.cp_part->dp_swpdata.sd_block0.sb_size  = sizeof_trailing;
 					/* Free memory in between */
-					vm_do_pdir_unmap(page_index, effective_pages);
+					assert(unmap_min == PAGEID_ENCODE(addr));
+					vm_do_pdir_unmap(addr, effective_pages * PAGESIZE);
 					swap_free(part->dp_swpdata.sd_block0.sb_start + sizeof_leading,
 					          sizeof_truncate);
 					part->dp_swpdata.sd_block0.sb_size = sizeof_leading;
@@ -750,7 +762,8 @@ page_properties_updated:
 						part->dp_swpdata.sd_blockc = i;
 						part->dp_swpdata.sd_blockv[i].sb_size -= num_pages_from_first;
 					}
-					vm_do_pdir_unmap(page_index, effective_pages);
+					assert(unmap_min == PAGEID_ENCODE(addr));
+					vm_do_pdir_unmap(addr, effective_pages * PAGESIZE);
 					/* Truncate trailing RAM blocks from the new leading block. */
 					vm_datapart_truncate_trailing_swpblocks(part, sizeof_leading);
 				}
@@ -758,7 +771,8 @@ page_properties_updated:
 #endif /* !CONFIG_NO_SWAP */
 
 			default:
-				vm_do_pdir_unmap(page_index, effective_pages);
+				assert(unmap_min == PAGEID_ENCODE(addr));
+				vm_do_pdir_unmap(addr, effective_pages * PAGESIZE);
 				break;
 			}
 
@@ -778,7 +792,7 @@ page_properties_updated:
 			corepair.cp_part->dp_flags |= part->dp_flags & ~(VM_DATAPART_FLAG_COREPRT | VM_DATAPART_FLAG_HEAPPPP);
 			corepair.cp_part->dp_state = part->dp_state;
 			part->dp_tree.a_vmax       = (datapage_t)(sizeof_leading - 1);
-			node->vn_node.a_vmax       = page_index - 1;
+			node->vn_node.a_vmax       = unmap_min - 1;
 			if (part->dp_flags & VM_DATAPART_FLAG_HEAPPPP && part->dp_pprop_p != NULL) {
 				size_t new_bitset_size;
 				new_bitset_size = CEILDIV(sizeof_leading,
@@ -798,8 +812,10 @@ page_properties_updated:
 continue_with_next:
 	/* Check if the unmap request was split across multiple nodes. */
 	if (effective_pages < num_pages) {
-		page_index += effective_pages;
+		unmap_min += effective_pages;
 		num_pages -= effective_pages;
+		num_bytes -= effective_pages * PAGESIZE;
+		addr = (byte_t *)addr + effective_pages * PAGESIZE;
 		goto again;
 	}
 }
@@ -869,18 +885,19 @@ NOTHROW(KCALL vm_kernel_treelock_service)(gfp_t flags) {
 			pend = pending_unmap_sort(pend);
 			pending_unmap_merge(pend);
 			for (;;) {
-				size_t num_pages;
+				size_t num_bytes;
 				bool is_zero;
 				next      = pend->pur_next;
-				num_pages = pend->pur_size;
+				num_bytes = pend->pur_size;
 				is_zero   = pend->pur_zero;
 				assert(IS_ALIGNED((uintptr_t)pend, PAGESIZE));
-				assert(num_pages != 0);
+				assert(IS_ALIGNED((uintptr_t)num_bytes, PAGESIZE));
+				assert(num_bytes != 0);
 				/* Ensure a consistent memory state if zero-initialized memory is being unmapped. */
 				if (is_zero)
 					memset(pend, 0, sizeof(struct pending_unmap_ram));
-				vm_do_unmap_kernel_ram(PAGEID_ENCODE(pend),
-				                       num_pages,
+				vm_do_unmap_kernel_ram(pend,
+				                       num_bytes,
 				                       is_zero,
 				                       flags);
 				if (!next)
@@ -904,30 +921,30 @@ NOTHROW(KCALL vm_kernel_treelock_service)(gfp_t flags) {
 
 /* Without blocking, unmap the given range of kernel RAM. */
 PUBLIC NOBLOCK void
-NOTHROW(FCALL vm_paged_unmap_kernel_ram)(pageid_t page_index,
-                                         size_t num_pages,
-                                         bool is_zero) {
-	if unlikely(!num_pages)
+NOTHROW(FCALL vm_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+                                   PAGEDIR_PAGEALIGNED size_t num_bytes,
+                                   bool is_zero) {
+	assert(((uintptr_t)addr & PAGEMASK) == 0);
+	assert((num_bytes & PAGEMASK) == 0);
+	if unlikely(!num_bytes)
 		return;
-	assert(page_index >= (pageid_t)KERNEL_BASE_PAGE);
-	assert(page_index + num_pages >= page_index);
-	assert(page_index + num_pages - 1 <= __ARCH_PAGEID_MAX);
+	assert((uintptr_t)addr + num_bytes > (uintptr_t)addr);
+	assert(ARANGE_IS_KERNEL(addr, (byte_t *)addr + num_bytes));
 	printk(KERN_DEBUG "Unmap kernel RAM %p...%p%s\n",
-	       VM_PAGE2ADDR(page_index),
-	       VM_PAGE2ADDR(page_index + num_pages) - 1,
+	       addr, (byte_t *)addr + num_bytes - 1,
 	       is_zero ? " (zero-initialized)" : "");
 	if (vm_kernel_treelock_trywrite()) {
 		/* Immediately do the unmap. */
-		vm_do_unmap_kernel_ram(page_index,
-		                       num_pages,
+		vm_do_unmap_kernel_ram(addr,
+		                       num_bytes,
 		                       is_zero,
 		                       GFP_ATOMIC);
 		vm_kernel_treelock_endwrite();
 	} else {
 		/* Schedule the unmap as pending. */
 		struct pending_unmap_ram *pend, *next;
-		pend           = (struct pending_unmap_ram *)VM_PAGE2ADDR(page_index);
-		pend->pur_size = num_pages;
+		pend           = (struct pending_unmap_ram *)addr;
+		pend->pur_size = num_bytes;
 		pend->pur_zero = is_zero;
 		do {
 			next = ATOMIC_READ(vm_pending_unmap_kernel_ram);
@@ -939,7 +956,7 @@ NOTHROW(FCALL vm_paged_unmap_kernel_ram)(pageid_t page_index,
 
 
 /* Acquire a write-lock to the kernel VM, automatically serving any pending
- * requests for unmapping kernel memory, as scheduled by `vm_paged_unmap_kernel_ram()' */
+ * requests for unmapping kernel memory, as scheduled by `vm_unmap_kernel_ram()' */
 PUBLIC NOBLOCK_IF(flags & GFP_ATOMIC) bool KCALL
 vm_kernel_treelock_writef(gfp_t flags) THROWS(E_WOULDBLOCK) {
 	if (!sync_trywrite(&vm_kernel.v_treelock)) {

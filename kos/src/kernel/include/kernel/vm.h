@@ -2000,18 +2000,16 @@ NOTHROW(KCALL vm_node_remove)(struct vm *__restrict self,
 
 /* Without blocking, unmap the given range of kernel RAM. */
 FUNDEF NOBLOCK void
-NOTHROW(FCALL vm_paged_unmap_kernel_ram)(pageid_t page_index,
-                                         size_t num_pages,
-                                         bool is_zero);
-LOCAL NOBLOCK void
 NOTHROW(FCALL vm_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
                                    PAGEDIR_PAGEALIGNED size_t num_bytes,
-                                   bool is_zero) {
-	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
-	__hybrid_assert((num_bytes & PAGEMASK) == 0);
-	vm_paged_unmap_kernel_ram(PAGEID_ENCODE(addr),
-	                          num_bytes / PAGESIZE,
-	                          is_zero);
+                                   bool is_zero);
+LOCAL NOBLOCK void
+NOTHROW(FCALL vm_paged_unmap_kernel_ram)(pageid_t page_index,
+                                         size_t num_pages,
+                                         bool is_zero) {
+	vm_unmap_kernel_ram(PAGEID_DECODE(page_index),
+	                    num_pages * PAGESIZE,
+	                    is_zero);
 }
 
 
