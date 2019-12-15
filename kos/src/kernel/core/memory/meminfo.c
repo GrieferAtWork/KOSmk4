@@ -898,7 +898,7 @@ DEFINE_DEBUG_FUNCTION(
 		"lsmem",
 		"lsmem\n"
 		"\tList known memory banks, as well as their typing\n"
-		"\tZones are listed as <start-end type bytes>\n",
+		"\tBanks are listed as <start-end type bytes>\n",
 		argc, argv) {
 	size_t i;
 	if (argc != 1)
