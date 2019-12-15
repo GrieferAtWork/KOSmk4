@@ -1290,7 +1290,7 @@ PRIVATE ATTR_DBGTEXT void NOTHROW(KCALL vga_map)(void) {
 	 * should instead also support its use instead of only hacking around to
 	 * place a temporary mapping of the VGA display just before the kernel. */
 	vga_oldmapping_did_prepare = pagedir_prepare_map((void *)((uintptr_t)vga_real_terminal_start & ~PAGEMASK),
-	                                                 VGA_VRAM_SIZE / PAGESIZE);
+	                                                 VGA_VRAM_SIZE);
 	if (!vga_oldmapping_did_prepare) {
 		printk(DBGSTR(KERN_CRIT "[dbg] Failed to find suitable location to map "
 		                        "VGA video memory. - This shouldn't happen\n"));
@@ -1507,7 +1507,7 @@ NOTHROW(KCALL vga_vram)(u32 vram_offset) {
 		}
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		addr = (byte_t *)((uintptr_t)vga_real_terminal_start & ~PAGEMASK);
-		pagedir_map(addr, 1,
+		pagedir_map(addr, PAGESIZE,
 		            (vm_phys_t)VGA_VRAM_BASE + vram_offset,
 		            PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 		pagedir_syncone(addr);

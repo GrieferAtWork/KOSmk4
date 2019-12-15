@@ -540,7 +540,7 @@ NOTHROW(FCALL p64_pagedir_prepare_impl_widen)(unsigned int vec4,
 	union p64_pdir_e3 e3;
 	union p64_pdir_e2 e2;
 	pflag_t was = 0;
-	assert(vec3 < 4);
+	assert(vec3 < 512);
 	assert(vec2 < 512);
 	assert(vec1_prepare_start < 512);
 	assert(vec1_prepare_size != 0);
@@ -606,7 +606,7 @@ err_e3_vector:
 		{
 			memsetq(e2_p, P64_PAGE_ABSENT, 512);
 		}
-		e2_p[vec2].p_word = ((u64)e1_vector * 4096) | P64_PAGE_FPRESENT |
+		e2_p[vec2].p_word = (u64)page2addr(e1_vector) | P64_PAGE_FPRESENT |
 		                    P64_PAGE_FWRITE | P64_PAGE_FUSER;
 		/* Initialize the E3-vector. */
 		e3_p = (union p64_pdir_e3 *)vm_ptram_mappage(&ptram, e3_vector);
@@ -616,12 +616,13 @@ err_e3_vector:
 		{
 			memsetq(e3_p, P64_PAGE_ABSENT, 512);
 		}
-		e3_p[vec3].p_word = ((u64)e2_vector * 4096) | P64_PAGE_FPRESENT |
+		e3_p[vec3].p_word = (u64)page2addr(e2_vector) | P64_PAGE_FPRESENT |
 		                    P64_PAGE_FWRITE | P64_PAGE_FUSER;
+		COMPILER_BARRIER();
 		vm_ptram_fini(&ptram);
 		/* Try to install the new E3-vector as an E4-word. */
-		new_e4_word = (u64)e3_vector * 4096;
-		new_e4_word |= P64_PAGE_FPRESENT | P64_PAGE_FWRITE | P64_PAGE_FUSER;
+		new_e4_word = (u64)page2addr(e3_vector) | P64_PAGE_FPRESENT |
+		              P64_PAGE_FWRITE | P64_PAGE_FUSER;
 		if unlikely(!ATOMIC_CMPXCH(P64_PDIR_E4_IDENTITY[vec4].p_word,
 		                           e4.p_word, new_e4_word)) {
 /*word_changed_after_e3_vector:*/
@@ -681,6 +682,7 @@ err_e3_vector:
 		e2_vector = p64_create_e2_vector_from_e3_word_and_e1_vector(&ptram, e3.p_word,
 		                                                            vec2, e1_vector,
 		                                                            VEC4_IS_USERSPACE);
+		COMPILER_BARRIER();
 		vm_ptram_fini(&ptram);
 		if (e2_vector == PAGEPTR_INVALID) {
 			page_freeone(e1_vector);
@@ -730,6 +732,7 @@ word_changed_after_e2_vector:
 		e1_vector = p64_create_e1_vector_from_e2_word(&ptram, e2.p_word,
 		                                              vec1_prepare_start,
 		                                              vec1_prepare_size);
+		COMPILER_BARRIER();
 		vm_ptram_fini(&ptram);
 		if unlikely(e1_vector == PAGEPTR_INVALID)
 			goto err;
@@ -1059,6 +1062,49 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten_v4)(unsigned int vec4_min,
 		p64_pagedir_unprepare_impl_flatten_v3(vec4, 0, 511, 0, 511, 0, 511);
 }
 
+#ifdef NDEBUG
+#define assert_prepared(addr, num_bytes) (void)0
+#define assert_prepared_if(cond, addr, num_bytes) (void)0
+#else /* NDEBUG */
+PRIVATE NOBLOCK WUNUSED bool
+NOTHROW(FCALL p64_pagedir_isprepared)(VIRT void *addr) {
+	uintptr_t word;
+	unsigned int vec4, vec3, vec2, vec1;
+	vec4 = P64_PDIR_VEC4INDEX(addr);
+	word = P64_PDIR_E4_IDENTITY[vec4].p_word;
+	if unlikely(!(word & P64_PAGE_FPRESENT))
+		return false; /* Not mapped */
+	vec3 = P64_PDIR_VEC3INDEX(addr);
+	word = P64_PDIR_E3_IDENTITY[vec4][vec3].p_word;
+	if unlikely(!(word & P64_PAGE_FPRESENT))
+		return false; /* Not mapped */
+	if unlikely(word & P64_PAGE_F1GIB)
+		return false; /* 1GiB page */
+	vec2 = P64_PDIR_VEC2INDEX(addr);
+	word = P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word;
+	if unlikely(!(word & P64_PAGE_FPRESENT))
+		return false; /* Not mapped */
+	if unlikely(word & P64_PAGE_F2MIB)
+		return false; /* 2MiB page */
+	vec1 = P64_PDIR_VEC1INDEX(addr);
+	word = ATOMIC_READ(P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word);
+	return word & P64_PAGE_FPREPARED || P64_PDIR_E1_ISHINT(word);
+}
+#define assert_prepared_if(cond, addr, num_bytes) \
+	((cond) ? assert_prepared(addr, num_bytes) : (void)0)
+LOCAL NOBLOCK void
+NOTHROW(KCALL assert_prepared)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                               PAGEDIR_PAGEALIGNED size_t num_bytes) {
+	size_t i;
+	for (i = 0; i < num_bytes; i += PAGESIZE) {
+		void *ptr = (byte_t *)addr + i;
+		assertf(p64_pagedir_isprepared(ptr),
+		        "Page at %p of range %p...%p isn't prepared",
+		        ptr, addr, (byte_t *)addr + num_bytes - 1);
+	}
+}
+#endif /* !NDEBUG */
+
 
 
 /* Prepare the page directory for a future map() operation.
@@ -1075,13 +1121,16 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten_v4)(unsigned int vec4_min,
  * @return: false: Insufficient physical memory to change mappings. */
 INTERN NOBLOCK WUNUSED bool
 NOTHROW(FCALL p64_pagedir_prepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
+	bool result;
 	unsigned int vec4, vec3, vec2, vec1;
 	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
 	vec4 = P64_PDIR_VEC4INDEX(addr);
 	vec3 = P64_PDIR_VEC3INDEX(addr);
 	vec2 = P64_PDIR_VEC2INDEX(addr);
 	vec1 = P64_PDIR_VEC1INDEX(addr);
-	return p64_pagedir_prepare_impl_widen(vec4, vec3, vec2, vec1, 1);
+	result = p64_pagedir_prepare_impl_widen(vec4, vec3, vec2, vec1, 1);
+	assert_prepared_if(result, addr, PAGESIZE);
+	return result;
 }
 
 INTERN NOBLOCK void
@@ -1098,6 +1147,7 @@ NOTHROW(FCALL p64_pagedir_unprepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr)
 INTERN NOBLOCK WUNUSED bool
 NOTHROW(FCALL p64_pagedir_prepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                        PAGEDIR_PAGEALIGNED size_t num_bytes) {
+	bool result;
 	unsigned int vec4_min, vec4_max;
 	unsigned int vec3_min, vec3_max;
 	unsigned int vec2_min, vec2_max;
@@ -1118,15 +1168,18 @@ NOTHROW(FCALL p64_pagedir_prepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	vec2_max = P64_PDIR_VEC2INDEX((byte_t *)addr + num_bytes - 1);
 	vec1_min = P64_PDIR_VEC1INDEX(addr);
 	vec1_max = P64_PDIR_VEC1INDEX((byte_t *)addr + num_bytes - 1);
-	return p64_pagedir_prepare_impl_widen_v4(vec4_min, vec4_max,
-	                                         vec3_min, vec3_max,
-	                                         vec2_min, vec2_max,
-	                                         vec1_min, vec1_max);
+	result = p64_pagedir_prepare_impl_widen_v4(vec4_min, vec4_max,
+	                                           vec3_min, vec3_max,
+	                                           vec2_min, vec2_max,
+	                                           vec1_min, vec1_max);
+	assert_prepared_if(result, addr, num_bytes);
+	return result;
 }
 
 INTERN NOBLOCK WUNUSED bool
 NOTHROW(FCALL p64_pagedir_prepare_map_keep)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                             PAGEDIR_PAGEALIGNED size_t num_bytes) {
+	bool result;
 	unsigned int vec4_min, vec4_max;
 	unsigned int vec3_min, vec3_max;
 	unsigned int vec2_min, vec2_max;
@@ -1147,10 +1200,12 @@ NOTHROW(FCALL p64_pagedir_prepare_map_keep)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	vec2_max = P64_PDIR_VEC2INDEX((byte_t *)addr + num_bytes - 1);
 	vec1_min = P64_PDIR_VEC1INDEX(addr);
 	vec1_max = P64_PDIR_VEC1INDEX((byte_t *)addr + num_bytes - 1);
-	return p64_pagedir_prepare_impl_widen_v4_keep(vec4_min, vec4_max,
-	                                              vec3_min, vec3_max,
-	                                              vec2_min, vec2_max,
-	                                              vec1_min, vec1_max);
+	result = p64_pagedir_prepare_impl_widen_v4_keep(vec4_min, vec4_max,
+	                                                vec3_min, vec3_max,
+	                                                vec2_min, vec2_max,
+	                                                vec1_min, vec1_max);
+	assert_prepared_if(result, addr, num_bytes);
+	return result;
 }
 
 INTERN NOBLOCK void
@@ -1373,16 +1428,16 @@ NOTHROW(FCALL p64_pagedir_gethint)(VIRT void *addr) {
 	uintptr_t word;
 	unsigned int vec4, vec3, vec2, vec1;
 	vec4 = P64_PDIR_VEC4INDEX(addr);
-	vec3 = P64_PDIR_VEC3INDEX(addr);
-	vec2 = P64_PDIR_VEC2INDEX(addr);
 	word = P64_PDIR_E4_IDENTITY[vec4].p_word;
 	if unlikely(!(word & P64_PAGE_FPRESENT))
 		return NULL; /* Not mapped */
+	vec3 = P64_PDIR_VEC3INDEX(addr);
 	word = P64_PDIR_E3_IDENTITY[vec4][vec3].p_word;
 	if unlikely(!(word & P64_PAGE_FPRESENT))
 		return NULL; /* Not mapped */
 	if unlikely(word & P64_PAGE_F1GIB)
-		return NULL; /* 2MiB page */
+		return NULL; /* 1GiB page */
+	vec2 = P64_PDIR_VEC2INDEX(addr);
 	word = P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word;
 	if unlikely(!(word & P64_PAGE_FPRESENT))
 		return NULL; /* Not mapped */
@@ -1644,13 +1699,13 @@ NOTHROW(FCALL p64_pagedir_translate)(VIRT void *addr) {
 	unsigned int vec4, vec3, vec2, vec1;
 	vec4 = P64_PDIR_VEC4INDEX(addr);
 	vec3 = P64_PDIR_VEC3INDEX(addr);
-	vec2 = P64_PDIR_VEC2INDEX(addr);
 	word = P64_PDIR_E4_IDENTITY[vec4].p_word;
 	assertf(word & P64_PAGE_FPRESENT, "Page at %p is not mapped", addr);
 	word = P64_PDIR_E3_IDENTITY[vec4][vec3].p_word;
 	assertf(word & P64_PAGE_FPRESENT, "Page at %p is not mapped", addr);
 	if unlikely(word & P64_PAGE_F1GIB)
 		return (vm_phys_t)((word & P64_PAGE_FADDR_1GIB) | P64_PDIR_PAGEINDEX_1GIB(addr));
+	vec2 = P64_PDIR_VEC2INDEX(addr);
 	word = P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word;
 	assertf(word & P64_PAGE_FPRESENT, "Page at %p is not mapped", addr);
 	if unlikely(word & P64_PAGE_F2MIB)

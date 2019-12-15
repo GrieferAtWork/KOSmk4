@@ -237,6 +237,7 @@ NOTHROW(KCALL vm_ptram_mappage_noidentity)(struct vm_ptram *__restrict self,
 		               writable ? PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE
 		                        : PAGEDIR_MAP_FREAD);
 	}
+	pagedir_syncone(tramp);
 	return tramp;
 }
 

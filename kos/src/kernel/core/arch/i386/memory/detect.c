@@ -41,7 +41,7 @@ INTDEF byte_t __kernel_start[];
 INTDEF byte_t __kernel_free_start[];
 INTDEF byte_t __kernel_end[];
 
-#define V2P(x) ((uintptr_t)(x) - KERNEL_BASE)
+#define V2P(x) ((uintptr_t)(x) - KERNEL_CORE_BASE)
 PRIVATE ATTR_FREERODATA struct pmembank const default_memory_banks[] = {
 	PMEMBANK_INIT(0x00000000, PMEMBANK_TYPE_ALLOCATED),  /* Keep the first page as allocated */
 	PMEMBANK_INIT(0x00001000, PMEMBANK_TYPE_UNDEF),

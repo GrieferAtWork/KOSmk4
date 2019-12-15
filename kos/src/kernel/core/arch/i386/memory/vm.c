@@ -382,10 +382,14 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 
 	/* Unmap everything before the kernel. */
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (pagedir_prepare_map((void *)KERNEL_BASE, (uintptr_t)__kernel_text_start - KERNEL_BASE))
+	if (pagedir_prepare_map((void *)KERNEL_CORE_BASE, (uintptr_t)__kernel_text_start - KERNEL_CORE_BASE))
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
-		pagedir_unmap((void *)KERNEL_BASE, (uintptr_t)__kernel_text_start - KERNEL_BASE);
+		pagedir_unmap((void *)KERNEL_CORE_BASE,
+		              (uintptr_t)__kernel_text_start - KERNEL_CORE_BASE);
+#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+		pagedir_unprepare_map((void *)KERNEL_CORE_BASE, (uintptr_t)__kernel_text_start - KERNEL_CORE_BASE);
+#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	}
 	assert(kernel_vm_node_pagedata.vn_node.a_vmin != 0);
 
@@ -417,14 +421,14 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 	 * The contents of this section are mainly required for SMP initialization,
 	 * though can also be used for other things that require being placed at a
 	 * known physical memory location. */
-	if (!pagedir_prepare_map(__kernel_pdata_start - KERNEL_BASE, (size_t)__kernel_pdata_numbytes))
+	if (!pagedir_prepare_map(__kernel_pdata_start - KERNEL_CORE_BASE, (size_t)__kernel_pdata_numbytes))
 		kernel_panic(FREESTR("Failed to prepare kernel VM for mapping .pdata\n"));
 	simple_insert_and_activate(&x86_vm_node_pdata, PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 #ifndef NDEBUG
 	{
 		u32 virt_word, phys_word;
 		virt_word = *(u32 *)(__kernel_pdata_start);
-		phys_word = *(u32 *)(__kernel_pdata_start - KERNEL_BASE);
+		phys_word = *(u32 *)(__kernel_pdata_start - KERNEL_CORE_BASE);
 		assert(virt_word == phys_word);
 	}
 #endif /* !NDEBUG */

@@ -291,7 +291,7 @@ INTERN_LABEL(x86_smp_entry_gdt_offset):
 	orw    $(CR0_PE), %sp
 	movl   %esp, %cr0
 	/* Jump to protected mode. */
-	ljmpl  $(8), $(x86_smp_entry32 - KERNEL_BASE)
+	ljmpl  $(8), $(x86_smp_entry32 - KERNEL_CORE_BASE)
 INTERN_OBJECT(x86_smp_gdt)
 	.word  (3 * SIZEOF_SEGMENT_DESCRIPTOR) - 1
 INTERN_LABEL(x86_smp_gdt_pointer_base):
@@ -329,13 +329,13 @@ INTERN_FUNCTION(x86_smp_entry32)
 	/* Enable PAE support (if necessary for setting the page directory) */
 #ifndef CONFIG_NO_PAGING_P32
 	EXTERN(x86_bootcpu_cpuid)
-	testl  $(CPUID_1D_PAE), ((x86_bootcpu_cpuid - KERNEL_BASE) + OFFSET_CPUID_1D)
+	testl  $(CPUID_1D_PAE), ((x86_bootcpu_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_1D)
 	jz     1f
 #endif /* !CONFIG_NO_PAGING_P32 */
 	orl    $(CR4_PAE), %esp
 	/* Enable NX support (if necessary for setting the page directory) */
 	EXTERN(x86_bootcpu_cpuid)
-	testl  $(CPUID_80000001D_NX), ((x86_bootcpu_cpuid - KERNEL_BASE) + OFFSET_CPUID_80000001D)
+	testl  $(CPUID_80000001D_NX), ((x86_bootcpu_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_80000001D)
 	jz     1f
 	movl   $(IA32_EFER), %ecx
 	rdmsr
@@ -344,7 +344,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 1:
 #endif /* !CONFIG_NO_PAGING_PAE */
 	/* Enable PGE support (if necessary for setting the page directory) */
-	testl  $(CPUID_1D_PGE), ((x86_bootcpu_cpuid - KERNEL_BASE) + OFFSET_CPUID_1D)
+	testl  $(CPUID_1D_PGE), ((x86_bootcpu_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_1D)
 	jz     1f
 	orl    $(CR4_PGE), %esp
 1:	movl   %esp, %cr4
@@ -356,7 +356,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 	 *       paging in a context where the page directory we're enabling
 	 *       has our current location mapped to ourself.
 	 *       Later then, we'll jump into true virtual memory, but for
-	 *       now, our actual PC is offset by `KERNEL_BASE' */
+	 *       now, our actual PC is offset by `KERNEL_CORE_BASE' */
 	movl   $(pagedir_kernel_phys), %esp
 	movl   %esp, %cr3
 	movl   %cr0, %esp

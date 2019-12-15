@@ -72,7 +72,7 @@ NOTHROW(KCALL do_trace_external)(char const *method,
 	(TRACE_EXTERNAL("alloc", min, max),                                                                            \
 	 PRINT_ALLOCATION("Allocate physical ram " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " [tid=%u][%Iu-%Iu=%Iu]\n", \
 	                  (vm_phys_t)(min)*PAGESIZE, (vm_phys_t)((max) + 1) * PAGESIZE - 1, task_getroottid_s(),       \
-	                  (zone)->mz_cfree - (((max) - (min)) + 1), ((max) - (min)) + 1, (zone)->mz_cfree))
+	                  (zone)->mz_cfree + (((max) - (min)) + 1), ((max) - (min)) + 1, (zone)->mz_cfree))
 #define TRACE_FREE(zone, min, max)                                                                             \
 	(TRACE_EXTERNAL("free", min, max),                                                                         \
 	 PRINT_ALLOCATION("Free physical ram " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " [tid=%u][%Iu+%Iu=%Iu]\n", \
@@ -104,15 +104,15 @@ NOTHROW(KCALL do_trace_external)(char const *method,
 /* Mask of bits that are tested to determine if a page is free. */
 #if PMEMZONE_ISFREEBIT == 0
 #if __SIZEOF_POINTER__ == 4
-#define PMEMBITSET_FREEMASK   __UINTPTR_C(0x55555555)
+#define PMEMBITSET_FREEMASK   __UINT32_C(0x55555555)
 #else /* __SIZEOF_POINTER__ == 4 */
-#define PMEMBITSET_FREEMASK   __UINTPTR_C(0x5555555555555555)
+#define PMEMBITSET_FREEMASK   __UINT64_C(0x5555555555555555)
 #endif /* __SIZEOF_POINTER__ != 4 */
 #else /* PMEMZONE_ISFREEBIT == 0 */
 #if __SIZEOF_POINTER__ == 4
-#define PMEMBITSET_FREEMASK   __UINTPTR_C(0xAAAAAAAA)
+#define PMEMBITSET_FREEMASK   __UINT32_C(0xaaaaaaaa)
 #else /* __SIZEOF_POINTER__ == 4 */
-#define PMEMBITSET_FREEMASK   __UINTPTR_C(0xAAAAAAAAAAAAAAAA)
+#define PMEMBITSET_FREEMASK   __UINT64_C(0xaaaaaaaaaaaaaaaa)
 #endif /* __SIZEOF_POINTER__ != 4 */
 #endif /* PMEMZONE_ISFREEBIT != 0 */
 #define PMEMBITSET_UNDFMASK   (~PMEMBITSET_FREEMASK)
@@ -149,7 +149,8 @@ NOTHROW(KCALL zone_free_keepz)(struct pmemzone *__restrict self,
 	i = (size_t)(zone_relative_base / PAGES_PER_WORD);
 	num_qpages = 0;
 	if (num_pages == 1) {
-		mask   = PMEMZONE_ISFREEMASK << (unsigned int)((zone_relative_base % PAGES_PER_WORD) * PMEMZONE_BITSPERPAGE);
+		mask   = (uintptr_t)PMEMZONE_ISFREEMASK
+		       << (unsigned int)((zone_relative_base % PAGES_PER_WORD) * PMEMZONE_BITSPERPAGE);
 		oldval = ATOMIC_FETCHOR(self->mz_free[i], mask);
 		assertf(!(oldval & mask), "Double free at " FORMAT_PAGEPTR_T,
 		        (pageptr_t)(self->mz_start + zone_relative_base));
@@ -237,8 +238,9 @@ NOTHROW(KCALL zone_free)(struct pmemzone *__restrict self,
 	pmemzone_set_fmax(self, zone_relative_base + num_pages - 1);
 	i = (size_t)(zone_relative_base / PAGES_PER_WORD);
 	if (num_pages == 1) {
-		mask = (PMEMZONE_ISFREEMASK | PMEMZONE_ISUNDFBIT) << (unsigned int)((zone_relative_base % PAGES_PER_WORD) *
-		                                                                    PMEMZONE_BITSPERPAGE);
+		mask = (uintptr_t)(PMEMZONE_ISFREEMASK | PMEMZONE_ISUNDFBIT)
+		       << (unsigned int)((zone_relative_base % PAGES_PER_WORD) *
+		                         PMEMZONE_BITSPERPAGE);
 		ASSIGN_OLDVAL ATOMIC_FETCHOR(self->mz_free[i], mask);
 		assertf(!(oldval & (mask & PMEMBITSET_FREEMASK)),
 		        "Double free at " FORMAT_PAGEPTR_T,
@@ -348,8 +350,9 @@ NOTHROW(KCALL zone_cfree)(struct pmemzone *__restrict self,
 	pmemzone_set_fmax(self, zone_relative_base + num_pages - 1);
 	i = (size_t)(zone_relative_base / PAGES_PER_WORD);
 	if (num_pages == 1) {
-		mask = PMEMZONE_ISFREEMASK << (unsigned int)((zone_relative_base % PAGES_PER_WORD) *
-		                                             PMEMZONE_BITSPERPAGE);
+		mask = (uintptr_t)PMEMZONE_ISFREEMASK
+		       << (unsigned int)((zone_relative_base % PAGES_PER_WORD) *
+		                         PMEMZONE_BITSPERPAGE);
 		set_cfree_word(&self->mz_free[i], mask);
 	} else {
 		/* free partial pages. */
@@ -387,7 +390,7 @@ NOTHROW(KCALL zone_cfree)(struct pmemzone *__restrict self,
 
 
 
-#if !defined(NDEBUG) && 0 /* This isn't thread-safe */
+#if !defined(NDEBUG) && 1 /* This isn't thread-safe */
 #define assert_free(base, num_pages)                                                                               \
 	{                                                                                                              \
 		pagecnt_t i;                                                                                               \
@@ -428,7 +431,8 @@ NOTHROW(KCALL page_freeone)(pageptr_t page) {
 		j      = (unsigned int)(page % PAGES_PER_WORD);
 		ATOMIC_FETCHINC(zone->mz_cfree);
 		ATOMIC_FETCHINC(zone->mz_qfree);
-		mask   = (uintptr_t)(PMEMZONE_ISFREEMASK | PMEMZONE_ISUNDFMASK) << (j * PMEMZONE_BITSPERPAGE);
+		mask = (uintptr_t)(PMEMZONE_ISFREEMASK | PMEMZONE_ISUNDFMASK)
+		       << (j * PMEMZONE_BITSPERPAGE);
 #ifndef NDEBUG
 		oldval = ATOMIC_FETCHOR(zone->mz_free[i], mask);
 		assertf(!(oldval & (mask & PMEMBITSET_FREEMASK)),
@@ -466,9 +470,9 @@ NOTHROW(KCALL page_free)(pageptr_t base, pagecnt_t num_pages) {
 	for (;;) {
 		if (base <= zone->mz_max) {
 			assert(max_page <= zone->mz_max);
-			TRACE_FREE(zone, base, base + num_pages - 1);
 			if (base >= zone->mz_start) {
 				/* The remainder of the section to-be freed is located within this zone */
+				TRACE_FREE(zone, base, base + num_pages - 1);
 				zone_free(zone,
 				          base - zone->mz_start,
 				          num_pages);
@@ -504,9 +508,9 @@ NOTHROW(KCALL page_cfree)(pageptr_t base, pagecnt_t num_pages) {
 	for (;;) {
 		if (base <= zone->mz_max) {
 			assert(max_page <= zone->mz_max);
-			TRACE_FREE(zone, base, base + num_pages - 1);
 			if (base >= zone->mz_start) {
 				/* The remainder of the section to-be freed is located within this zone */
+				TRACE_FREE(zone, base, base + num_pages - 1);
 				zone_cfree(zone,
 				           base - zone->mz_start,
 				           num_pages);
@@ -558,9 +562,9 @@ NOTHROW(KCALL page_ccfree)(pageptr_t base, pagecnt_t num_pages) {
 	for (;;) {
 		if (base <= zone->mz_max) {
 			assert(max_page <= zone->mz_max);
-			TRACE_FREE(zone, base, base + num_pages - 1);
 			if (base >= zone->mz_start) {
 				/* The remainder of the section to-be freed is located within this zone */
+				TRACE_FREE(zone, base, base + num_pages - 1);
 				zone_free_keepz(zone,
 				                base - zone->mz_start,
 				                num_pages);
@@ -1138,7 +1142,7 @@ DECL_END
 #define ALLOC_MINMAX  1
 #include "memory-zonealloc-impl.c.inl"
 #include "memory-zonealloc-impl.c.inl"
-#endif
+#endif /* !__INTELLISENSE__ */
 
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MEMORY_C */
