@@ -167,6 +167,17 @@ NOTHROW(KCALL vm_paged_getfree)(struct vm *__restrict self,
                                 unsigned int mode)
 #endif /* !VM_GETFREE_VMB */
 {
+	/* TODO: When `vm_getfree()' is used with a `hint' located in kernel-space, then
+	 *       we should never be able to return user-space addresses. Note however that
+	 *       the kernel is still allowed to:
+	 *        - Map into the (apparent) user-space of `vm_kernel' (for use by kernel-space-only threads)
+	 *        - Map data of the current user-space thread (in order to implement `sys_mmap()' and the like)
+	 * -> A good solution might be to add an extended variant of `vm_getfree()' that allows
+	 *    the caller to specify lower/upper bounds for the address ranges which may be returned
+	 *    by the function, then simply have the regular `vm_getfree()' call that function with
+	 *    a range depending on the address space that the original `hint' was apart of, ensuring
+	 *    that free ranges discovered always share the address space with the given hint!
+	 */
 	bool ignore_guard = false;
 	bool was_strict   = mode & VM_GETFREE_STRICT;
 	vm_nodetree_minmax_t minmax;
