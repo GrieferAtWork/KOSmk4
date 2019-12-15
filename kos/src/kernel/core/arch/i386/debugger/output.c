@@ -1584,17 +1584,39 @@ NOTHROW(KCALL VGA_GetFont)(struct vga_font *__restrict font) {
 }
 
 
+struct vga_cursor_regs {
+	u8 crtc_cursor_start;
+	u8 crtc_cursor_hi;
+	u8 crtc_cursor_lo;
+};
+
+PRIVATE NOBLOCK ATTR_FREETEXT void
+NOTHROW(KCALL VGA_GetCursor)(struct vga_cursor_regs *__restrict self) {
+	self->crtc_cursor_start = vga_rcrt(VGA_CRTC_CURSOR_START);
+	self->crtc_cursor_hi    = vga_rcrt(VGA_CRTC_CURSOR_HI);
+	self->crtc_cursor_lo    = vga_rcrt(VGA_CRTC_CURSOR_LO);
+}
+
+PRIVATE NOBLOCK ATTR_FREETEXT void
+NOTHROW(KCALL VGA_SetCursor)(struct vga_cursor_regs const *__restrict self) {
+	vga_wcrt(VGA_CRTC_CURSOR_START, self->crtc_cursor_start);
+	vga_wcrt(VGA_CRTC_CURSOR_HI, self->crtc_cursor_hi);
+	vga_wcrt(VGA_CRTC_CURSOR_LO, self->crtc_cursor_lo);
+}
+
 
 PRIVATE ATTR_DBGRODATA struct vga_palette16 const vga_biospal = VGA_PALETTE_CGA_INIT;
 PRIVATE ATTR_DBGRODATA struct vga_mode const vga_textmode = VGA_BIOTEXT80x25_MODE_INIT(VGA_PALINDX_CGA_ANSI_INIT);
 PRIVATE ATTR_DBGBSS struct vga_font vga_textfont = {};
 PRIVATE ATTR_DBGBSS struct vga_mode vga_oldmode = {};
+PRIVATE ATTR_DBGBSS struct vga_cursor_regs vga_oldcursor = {};
 PRIVATE ATTR_DBGBSS struct vga_font vga_oldfont = {};
 PRIVATE ATTR_DBGBSS struct vga_palette256 vga_oldpal = {};
 PRIVATE ATTR_DBGBSS u16 vga_oldtext[VGA_WIDTH * VGA_HEIGHT] = {};
 
 PRIVATE ATTR_DBGBSS bool vga_did_initialized_textfont = false;
 PRIVATE ATTR_DBGBSS bool vga_showscreen_enabled = false;
+PRIVATE ATTR_DBGBSS struct vga_cursor_regs vga_showscreen_oldcursor = {};
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_debugger_textfont)(void) {
@@ -1611,12 +1633,14 @@ PUBLIC void NOTHROW(KCALL dbg_beginshowscreen)(void) {
 		if (vga_backlog_scrollpos)
 			vga_backlog_setscrollpos(0);
 		dbg_beginupdate();
+		VGA_GetCursor(&vga_showscreen_oldcursor);
 		memcpyw(vga_backlog_screen, vga_real_terminal_start, VGA_WIDTH * VGA_HEIGHT);
 		memcpyw(vga_real_terminal_start, vga_oldtext, VGA_WIDTH * VGA_HEIGHT);
 		if (vga_did_initialized_textfont)
 			VGA_SetFont(&vga_oldfont);
 		VGA_SetPalette(&vga_oldpal, sizeof(vga_oldpal));
 		VGA_SetMode(&vga_oldmode);
+		VGA_SetCursor(&vga_oldcursor);
 		vga_showscreen_enabled = true;
 	}
 }
@@ -1629,6 +1653,7 @@ PUBLIC void NOTHROW(KCALL dbg_endshowscreen)(void) {
 			VGA_SetFont(&vga_textfont);
 		memcpyw(vga_real_terminal_start, vga_backlog_screen, VGA_WIDTH * VGA_HEIGHT);
 		vga_showscreen_enabled = false;
+		VGA_SetCursor(&vga_showscreen_oldcursor);
 		dbg_endupdate();
 	}
 }
@@ -1638,6 +1663,7 @@ INTERN ATTR_DBGTEXT void NOTHROW(KCALL dbg_initialize_tty)(void) {
 	/* Map a portion of VRAM into memory. */
 	vga_map();
 	/* Save the old VGA mode. */
+	VGA_GetCursor(&vga_oldcursor);
 	VGA_GetMode(&vga_oldmode);
 	/* Save the old VGA palette. */
 	VGA_GetPalette(&vga_oldpal, sizeof(vga_oldpal));
@@ -1669,6 +1695,7 @@ INTERN ATTR_DBGTEXT void NOTHROW(KCALL dbg_finalize_tty)(void) {
 	VGA_SetPalette(&vga_oldpal, sizeof(vga_oldpal));
 	/* Restore the old video mode */
 	VGA_SetMode(&vga_oldmode);
+	VGA_SetCursor(&vga_oldcursor);
 	/* Unmap video memory. */
 	vga_unmap();
 }
