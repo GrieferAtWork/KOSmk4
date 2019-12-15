@@ -54,8 +54,8 @@ PRIVATE NONNULL((1)) void KCALL
 print_pagecount(pformatprinter printer, void *arg, pagecnt_t count) {
 	pagecnt_t adjusted_count;
 	char const *unit;
-	if (count >= VM_ADDR2PAGE(0x100000)) {
-		adjusted_count = count / VM_ADDR2PAGE(0x100000);
+	if (count >= (0x100000 / PAGESIZE)) {
+		adjusted_count = count / (0x100000 / PAGESIZE);
 		unit           = "MiB";
 	} else {
 		adjusted_count = (count * PAGESIZE) / 1024;

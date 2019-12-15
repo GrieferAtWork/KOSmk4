@@ -311,7 +311,7 @@ again:
 		 * which is already in short supply, and which we'll still be needing for
 		 * initialization of APIC/SMP trampoline code, or other real-mode/BIOS related
 		 * stuff that can only exist below the physical 1MiB (16-bit 0xffff) mark. */
-		if unlikely(bank_alloc_page <= (pageptr_t)VM_ADDR2PAGE((uintptr_t)__kernel_start - KERNEL_BASE) &&
+		if unlikely(bank_alloc_page <= addr2page((uintptr_t)__kernel_start - KERNEL_BASE) &&
 		            !allow_beneath_kernel)
 			continue;
 #endif /* __i386__ || __x86_64__ */

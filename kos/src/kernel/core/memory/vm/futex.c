@@ -381,7 +381,7 @@ PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm_futex *
 	pos_t partrel_addr;
 again:
 	/* Lookup the datapart that should contain the associated futex. */
-	part = vm_datablock_locatepart(self, (vm_vpage64_t)VM_ADDR2PAGE((u64)offset), 1);
+	part = vm_datablock_locatepart(self, (vm_vpage64_t)(offset / PAGESIZE), 1);
 	partrel_addr = (pos_t)(offset - vm_datapart_minbyte(part));
 #if __SIZEOF_POINTER__ < __FS_SIZEOF(OFF)
 	/* Make sure that the part-relative address offset
@@ -389,7 +389,7 @@ again:
 	if (partrel_addr > (pos_t)(uintptr_t)-1) {
 		REF struct vm_datapart *used_part;
 		TRY {
-			used_part = vm_datablock_locatepart_exact(self, (vm_vpage64_t)VM_ADDR2PAGE((u64)offset), 1);
+			used_part = vm_datablock_locatepart_exact(self, (vm_vpage64_t)(offset / PAGESIZE), 1);
 		} EXCEPT {
 			decref_unlikely(part);
 			RETHROW();

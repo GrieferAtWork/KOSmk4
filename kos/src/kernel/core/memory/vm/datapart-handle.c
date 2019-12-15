@@ -127,7 +127,7 @@ handle_datapart_truncate(struct vm_datapart *__restrict self, pos_t new_size) {
 	if (new_size > (pos_t)((u32)-1))
 		return;
 #endif /* __SIZEOF_POINTER__ < 8 */
-	xdecref(vm_datapart_split(self, (size_t)VM_ADDR2PAGE((vm_virt_t)new_size)));
+	xdecref(vm_datapart_split(self, (size_t)(new_size / PAGESIZE)));
 }
 
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct vm_datablock *KCALL

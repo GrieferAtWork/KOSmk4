@@ -164,9 +164,4 @@
 #define KERNEL_DEBUG_STACKSIZE (KERNEL_STACKSIZE * 4)
 #endif /* !KERNEL_DEBUG_STACKSIZE */
 
-#ifndef VM_PAGE2ADDR
-#define VM_PAGE2ADDR(page) __VM_PAGE2ADDR(page)
-#define VM_ADDR2PAGE(addr) __VM_ADDR2PAGE(addr)
-#endif /* !VM_PAGE2ADDR */
-
 #endif /* !_I386_KOS_KOS_KERNEL_PAGING_H */

@@ -31,38 +31,39 @@ DECL_BEGIN
 
 #if defined(VM_DEFINE_UNMAP)
 /* Unmap all memory mappings within the given address range.
- * @param: base:      The base page number at which to start unmapping memory.
- * @param: num_pages: The number of continuous pages of memory to unmap, starting at `base'
+ * @param: addr:      The base address at which to start unmapping memory.
+ * @param: num_bytes: The number of continuous bytes of memory to unmap, starting at `addr'
  * @param: how:       What memory may be unmapped, and how that memory should be unmapped (Set of `VM_UNMAP_*')
- * @return: * :       The actual number of unmapped pages of memory (when `VM_UNMAP_SEGFAULTIFUNUSED'
- *                    is given, this is always equal to `num_pages') */
+ * @return: * :       The actual number of unmapped bytes of memory (when `VM_UNMAP_SEGFAULTIFUNUSED'
+ *                    is given, this is always equal to `num_bytes') */
 PUBLIC size_t KCALL
-vm_paged_unmap(struct vm *__restrict effective_vm,
-               pageid_t base,
-               size_t num_pages,
-               unsigned int how)
+vm_unmap(struct vm *__restrict self,
+         PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+         PAGEDIR_PAGEALIGNED size_t num_bytes,
+         unsigned int how)
 #elif defined(VM_DEFINE_PROTECT)
 /* Update access protection flags within the given address range.
- * @param: base:       The base page number at which to start unmapping memory.
- * @param: num_pages:  The number of continuous pages of memory to unmap, starting at `base'
+ * @param: addr:       The base address at which to start changing protection.
+ * @param: num_bytes:  The number of continuous bytes of memory to change, starting at `addr'
  * @param: prot_mask:  Mask of protection bits that should be kept (Set of `VM_PROT_*').
  * @param: prot_flags: Set of protection bits that should be added (Set of `VM_PROT_*').
  * @param: how:        What memory may be updated, and how that memory should be updated (Set of `VM_UNMAP_*')
- * @return: * :        The actual number of updated pages of memory (when `VM_UNMAP_SEGFAULTIFUNUSED'
- *                     is given, this is always equal to `num_pages') */
+ * @return: * :        The actual number of updated bytes of memory (when `VM_UNMAP_SEGFAULTIFUNUSED'
+ *                     is given, this is always equal to `num_bytes') */
 PUBLIC size_t KCALL
-vm_paged_protect(struct vm *__restrict effective_vm,
-                 pageid_t base,
-                 size_t num_pages,
-                 uintptr_t prot_mask,
-                 uintptr_t prot_flags,
-                 unsigned int how)
+vm_protect(struct vm *__restrict self,
+           PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+           PAGEDIR_PAGEALIGNED size_t num_bytes,
+           uintptr_t prot_mask,
+           uintptr_t prot_flags,
+           unsigned int how)
 #endif /* ... */
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT)
 {
 	struct vm *myvm;
 	size_t result;
-	pageid_t maxpage;
+	pageid_t minpageid;
+	pageid_t maxpageid;
 	vm_nodetree_minmax_t minmax;
 	struct vm_node *new_node = NULL;
 	bool must_sync = false;
@@ -76,30 +77,32 @@ vm_paged_protect(struct vm *__restrict effective_vm,
 	                 ? ((node)->vn_guard ? (how & VM_UNMAP_GUARD) : (how & VM_UNMAP_NORMAL))                                    \
 	                 : ((node)->vn_guard ? ((how & (VM_UNMAP_GUARD | VM_UNMAP_RESERVE)) == (VM_UNMAP_GUARD | VM_UNMAP_RESERVE)) \
 	                                     : ((how & (VM_UNMAP_NORMAL | VM_UNMAP_RESERVE)) == (VM_UNMAP_NORMAL | VM_UNMAP_RESERVE))))))
+	assert(((uintptr_t)addr & PAGEMASK) == 0);
+	assert((num_bytes & PAGEMASK) == 0);
 #ifdef VM_DEFINE_PROTECT
-	assertf(!(prot_mask &
-	          ~(VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ | VM_PROT_LOOSE | VM_PROT_SHARED)),
+	assertf(!(prot_mask & ~(VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ | VM_PROT_LOOSE | VM_PROT_SHARED)),
 	        "prot_mask = %#Ix", (uintptr_t)prot_mask);
-	assertf(!(prot_flags &
-	          ~(VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ | VM_PROT_LOOSE | VM_PROT_SHARED)),
+	assertf(!(prot_flags & ~(VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ | VM_PROT_LOOSE | VM_PROT_SHARED)),
 	        "prot_flags = %#Ix", (uintptr_t)prot_flags);
 #endif /* VM_DEFINE_PROTECT */
-	if unlikely(!num_pages)
+	if unlikely(!num_bytes)
 		return 0; /* No-op */
-	if (OVERFLOW_UADD(base, num_pages - 1, &maxpage) || maxpage > __ARCH_PAGEID_MAX) {
+	minpageid = PAGEID_ENCODE((byte_t *)addr);
+	maxpageid = PAGEID_ENCODE((byte_t *)addr + num_bytes - 1);
+	if (maxpageid < minpageid) {
 		if (how & VM_UNMAP_SEGFAULTIFUNUSED)
 			THROW(E_SEGFAULT_UNMAPPED, (void *)-1, E_SEGFAULT_CONTEXT_UNMAP);
-		maxpage = __ARCH_PAGEID_MAX;
+		maxpageid = __ARCH_PAGEID_MAX;
 	}
 	myvm   = THIS_VM;
 	result = 0;
 	TRY {
 again_lock_vm:
-		sync_write(effective_vm);
+		sync_write(self);
 		minmax.mm_min = minmax.mm_max = NULL;
-		vm_nodetree_minmaxlocate(effective_vm->v_tree,
-		                         base,
-		                         maxpage,
+		vm_nodetree_minmaxlocate(self->v_tree,
+		                         minpageid,
+		                         maxpageid,
 		                         &minmax);
 		assert((minmax.mm_min != NULL) == (minmax.mm_max != NULL));
 		if unlikely(!minmax.mm_min) {
@@ -110,37 +113,36 @@ again_lock_vm:
 		if (how & VM_UNMAP_SEGFAULTIFUNUSED) {
 			struct vm_node *iter;
 			/* Check that the entire given address range is in use. */
-			if unlikely(base < minmax.mm_min_min) {
+			if unlikely(minpageid < minmax.mm_min_min) {
 do_throw_base_unmapped:
-				sync_endwrite(effective_vm);
-				THROW(E_SEGFAULT_UNMAPPED,
-				      VM_PAGE2ADDR(base),
+				sync_endwrite(self);
+				THROW(E_SEGFAULT_UNMAPPED, addr,
 				      E_SEGFAULT_CONTEXT_UNMAP);
 			}
 			iter = minmax.mm_min;
 			while (iter != minmax.mm_max) {
-				pageid_t first_unmapped;
+				void *first_unmapped;
 				struct vm_node *next;
 				if unlikely(!SHOULD_UPDATE(iter)) {
-					first_unmapped = vm_node_getstartpageid(iter);
+					first_unmapped = vm_node_getstart(iter);
 					goto do_throw_first_unmapped;
 				}
 				next = iter->vn_byaddr.ln_next;
 				assert(vm_node_getendpageid(iter) <= vm_node_getstartpageid(next));
 				if unlikely(vm_node_getendpageid(iter) != vm_node_getstartpageid(next)) {
-					first_unmapped = vm_node_getendpageid(iter);
+					first_unmapped = vm_node_getend(iter);
 do_throw_first_unmapped:
-					sync_endwrite(effective_vm);
+					sync_endwrite(self);
 					THROW(E_SEGFAULT_UNMAPPED,
-					      VM_PAGE2ADDR(first_unmapped),
+					      first_unmapped,
 					      E_SEGFAULT_CONTEXT_UNMAP);
 				}
 				iter = next;
 			}
-			if unlikely(maxpage > minmax.mm_max_max) {
-				sync_endwrite(effective_vm);
+			if unlikely(maxpageid > minmax.mm_max_max) {
+				sync_endwrite(self);
 				THROW(E_SEGFAULT_UNMAPPED,
-				      VM_PAGE2ADDR(minmax.mm_max_max + 1),
+				      PAGEID_DECODE(minmax.mm_max_max + 1),
 				      E_SEGFAULT_CONTEXT_UNMAP);
 			}
 		}
@@ -148,16 +150,16 @@ do_throw_first_unmapped:
 		{
 			struct vm_node *node = minmax.mm_min;
 			for (;;) {
-				assert(node->vn_vm == effective_vm);
+				assert(node->vn_vm == self);
 				if (SHOULD_UPDATE(node) &&
 				    (node->vn_flags & (VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_PARTITIONED)) !=
 				    VM_NODE_FLAG_PREPARED) {
-					if unlikely(!((effective_vm == myvm || vm_node_iskernelspace(node))
+					if unlikely(!((self == myvm || vm_node_iskernelspace(node))
 					              ? pagedir_prepare_map(vm_node_getstart(node), vm_node_getsize(node))
-					              : pagedir_prepare_map_p(PAGEDIR_P_SELFOFVM(effective_vm),
+					              : pagedir_prepare_map_p(PAGEDIR_P_SELFOFVM(self),
 					                                      vm_node_getstart(node),
 					                                      vm_node_getsize(node)))) {
-						sync_endwrite(effective_vm);
+						sync_endwrite(self);
 						THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 					}
 				}
@@ -166,7 +168,7 @@ do_throw_first_unmapped:
 				node = VM_NODE_NEXT(node);
 			}
 		}
-		if (base > minmax.mm_min_min) {
+		if (minpageid > minmax.mm_min_min) {
 			/* Must split the first page. */
 			if (!SHOULD_UPDATE(minmax.mm_min) || (how & VM_UNMAP_NOSPLIT)) {
 				if (how & VM_UNMAP_SEGFAULTIFUNUSED)
@@ -189,33 +191,33 @@ do_throw_first_unmapped:
 			} else if (!minmax.mm_min->vn_part) {
 				/* No part. -> The node can just be modified directly. */
 				struct vm_node *next = minmax.mm_min->vn_byaddr.ln_next;
-				vm_nodetree_remove(&effective_vm->v_tree, minmax.mm_min_min);
+				vm_nodetree_remove(&self->v_tree, minmax.mm_min_min);
 				LLIST_REMOVE(minmax.mm_min, vn_byaddr);
-				if (maxpage >= vm_node_getmaxpageid(minmax.mm_min)) {
-					printk(KERN_DEBUG "Unmap node at %p...%p (high_part of %p...%p)\n",
-					       VM_PAGE2ADDR(base),
-					       vm_node_getmaxpageid(minmax.mm_min),
-					       vm_node_getminpageid(minmax.mm_min),
-					       vm_node_getmaxpageid(minmax.mm_min));
-					result += (size_t)(vm_node_getendpageid(minmax.mm_min) - base);
-					minmax.mm_min->vn_node.a_vmax = base - 1;
+				if (maxpageid >= vm_node_getmaxpageid(minmax.mm_min)) {
+					printk(KERN_DEBUG "[vm] Unmap node at %p...%p (high_part of %p...%p)\n",
+					       PAGEID_DECODE(minpageid),
+					       vm_node_getmax(minmax.mm_min),
+					       vm_node_getmin(minmax.mm_min),
+					       vm_node_getmax(minmax.mm_min));
+					result += (size_t)(vm_node_getendpageid(minmax.mm_min) - minpageid);
+					minmax.mm_min->vn_node.a_vmax = minpageid - 1;
 					vm_node_insert(minmax.mm_min);
 					minmax.mm_min     = next;
 					minmax.mm_min_min = vm_node_getminpageid(next);
-					assert(minmax.mm_min_min >= base);
+					assert(minmax.mm_min_min >= minpageid);
 					if (minmax.mm_min == minmax.mm_max)
 						goto done;
 				} else {
 					/* Unmap a sub-segment of a reserved memory node.
 					 * For this, we need to allocate a new node to fill in the high part.
-					 * LOW:  vm_node_getminpageid(minmax.mm_min) ... base - 1
-					 * HIGH: maxpage + 1 ... vm_node_getminpageid(minmax.mm_min) */
+					 * LOW:  vm_node_getminpageid(minmax.mm_min) ... minpageid - 1
+					 * HIGH: maxpageid + 1 ... vm_node_getminpageid(minmax.mm_min) */
 					if (!new_node) {
 						new_node = (struct vm_node *)kmalloc_nx(sizeof(struct vm_node),
 						                                        GFP_ATOMIC | GFP_LOCKED |
 						                                        GFP_PREFLT | GFP_VCBASE);
 						if (!new_node) {
-							sync_endwrite(effective_vm);
+							sync_endwrite(self);
 							new_node = (struct vm_node *)kmalloc(sizeof(struct vm_node),
 							                                     GFP_LOCKED |
 							                                     GFP_PREFLT | GFP_VCBASE);
@@ -223,13 +225,13 @@ do_throw_first_unmapped:
 						}
 					}
 					printk(KERN_DEBUG "Unmap node at %p...%p (sub_segment of %p...%p)\n",
-					       VM_PAGE2ADDR(base),
-					       VM_PAGE2ADDR(maxpage + 1) - 1,
-					       vm_node_getminpageid(minmax.mm_min),
-					       vm_node_getmaxpageid(minmax.mm_min));
+					       PAGEID_DECODE(minpageid),
+					       (byte_t *)PAGEID_DECODE(maxpageid + 1) - 1,
+					       vm_node_getmin(minmax.mm_min),
+					       vm_node_getmax(minmax.mm_min));
 					assert(!(minmax.mm_min->vn_flags & VM_NODE_FLAG_HINTED));
-					result                   = (size_t)(maxpage - base) + 1;
-					new_node->vn_node.a_vmin = maxpage + 1;
+					result                   = (size_t)(maxpageid - minpageid) + 1;
+					new_node->vn_node.a_vmin = maxpageid + 1;
 					new_node->vn_node.a_vmax = minmax.mm_min->vn_node.a_vmax;
 					new_node->vn_prot        = minmax.mm_min->vn_prot;
 					new_node->vn_flags = minmax.mm_min->vn_flags & (VM_NODE_FLAG_PREPARED |
@@ -239,11 +241,11 @@ do_throw_first_unmapped:
 					                                                VM_NODE_FLAG_KERNPRT);
 					minmax.mm_min->vn_flags |= VM_NODE_FLAG_PARTITIONED;
 					new_node->vn_flags |= VM_NODE_FLAG_PARTITIONED;
-					new_node->vn_vm               = effective_vm;
+					new_node->vn_vm               = self;
 					new_node->vn_part             = NULL;
 					new_node->vn_block            = xincref(minmax.mm_min->vn_block);
 					new_node->vn_guard            = 0;
-					minmax.mm_min->vn_node.a_vmax = base - 1;
+					minmax.mm_min->vn_node.a_vmax = minpageid - 1;
 					if (minmax.mm_min->vn_guard &&
 					    minmax.mm_min->vn_flags & VM_NODE_FLAG_GROWSUP) {
 						new_node->vn_guard = minmax.mm_min->vn_guard;
@@ -252,17 +254,17 @@ do_throw_first_unmapped:
 					}
 					vm_node_insert(minmax.mm_min);
 					vm_node_insert(new_node);
-					sync_endwrite(effective_vm);
+					sync_endwrite(self);
 					return result;
 				}
 #endif /* VM_DEFINE_UNMAP */
 			} else {
 				REF struct vm_datapart *part;
 				size_t vpage_offset;
-				vpage_offset = (size_t)(base - minmax.mm_min_min);
+				vpage_offset = (size_t)(minpageid - minmax.mm_min_min);
 				assert(vpage_offset < vm_node_getpagecount(minmax.mm_min));
 				part = incref(minmax.mm_min->vn_part);
-				sync_endwrite(effective_vm);
+				sync_endwrite(self);
 				/* Split the part, so that our memory mapping
 				 * starts when the given range begins. */
 				TRY {
@@ -275,7 +277,7 @@ do_throw_first_unmapped:
 				goto again_lock_vm;
 			}
 		}
-		if (maxpage < minmax.mm_max_max) {
+		if (maxpageid < minmax.mm_max_max) {
 			/* Must split the last page. */
 			if (!SHOULD_UPDATE(minmax.mm_max) || (how & VM_UNMAP_NOSPLIT)) {
 				if (how & VM_UNMAP_SEGFAULTIFUNUSED)
@@ -298,30 +300,30 @@ do_throw_first_unmapped:
 			} else if (!minmax.mm_max->vn_part) {
 				/* No part. -> The node can just be modified directly. */
 				struct vm_node *prev = VM_NODE_PREV(minmax.mm_max);
-				vm_nodetree_remove(&effective_vm->v_tree, minmax.mm_max_max);
+				vm_nodetree_remove(&self->v_tree, minmax.mm_max_max);
 				LLIST_REMOVE(minmax.mm_max, vn_byaddr);
-				assert(base <= vm_node_getminpageid(minmax.mm_max));
+				assert(minpageid <= vm_node_getminpageid(minmax.mm_max));
 				printk(KERN_DEBUG "Unmap node at %p...%p (low_part of %p...%p)\n",
 				       vm_node_getminpageid(minmax.mm_max),
-				       VM_PAGE2ADDR(maxpage + 1) - 1,
+				       (byte_t *)PAGEID_DECODE(maxpageid + 1) - 1,
 				       vm_node_getminpageid(minmax.mm_max),
 				       vm_node_getmaxpageid(minmax.mm_max));
-				result += (size_t)((maxpage + 1) - vm_node_getminpageid(minmax.mm_max));
-				minmax.mm_max->vn_node.a_vmin = maxpage + 1;
+				result += (size_t)((maxpageid + 1) - vm_node_getminpageid(minmax.mm_max));
+				minmax.mm_max->vn_node.a_vmin = maxpageid + 1;
 				vm_node_insert(minmax.mm_max);
 				minmax.mm_max     = prev;
 				minmax.mm_max_max = vm_node_getmaxpageid(prev);
-				assert(minmax.mm_max_max <= maxpage);
+				assert(minmax.mm_max_max <= maxpageid);
 				if (minmax.mm_min == minmax.mm_max)
 					goto done;
 #endif /* VM_DEFINE_UNMAP */
 			} else {
 				REF struct vm_datapart *part;
 				size_t vpage_offset;
-				vpage_offset = (size_t)((maxpage + 1) - vm_node_getstartpageid(minmax.mm_max));
+				vpage_offset = (size_t)((maxpageid + 1) - vm_node_getstartpageid(minmax.mm_max));
 				assert(vpage_offset < vm_node_getpagecount(minmax.mm_max));
 				part = incref(minmax.mm_max->vn_part);
-				sync_endwrite(effective_vm);
+				sync_endwrite(self);
 				/* Split the part, so that our memory mapping
 				 * starts when the given range begins. */
 				TRY {
@@ -344,14 +346,14 @@ do_throw_first_unmapped:
 #endif /* !VM_DEFINE_PROTECT */
 			for (;;) {
 				struct vm_node *next = VM_NODE_NEXT(node);
-				assert(node->vn_vm == effective_vm);
+				assert(node->vn_vm == self);
 				if (SHOULD_UPDATE(node)) {
 #ifdef VM_DEFINE_PROTECT
 					uintptr_half_t old_prot;
 					uintptr_half_t new_prot;
 #endif /* VM_DEFINE_PROTECT */
-					assert(vm_node_getminpageid(node) >= base);
-					assert(vm_node_getmaxpageid(node) <= maxpage);
+					assert(vm_node_getminpageid(node) >= minpageid);
+					assert(vm_node_getmaxpageid(node) <= maxpageid);
 					/* Update this node! */
 					if unlikely(node->vn_flags & VM_NODE_FLAG_KERNPRT) {
 #ifdef VM_DEFINE_PROTECT
@@ -384,7 +386,7 @@ do_throw_first_unmapped:
 							struct vm_datapart *part = node->vn_part;
 							if (!sync_trywrite(part)) {
 								incref(part);
-								sync_endwrite(effective_vm);
+								sync_endwrite(self);
 								{
 									FINALLY_DECREF_UNLIKELY(part);
 									sync_write(part);
@@ -411,19 +413,19 @@ do_throw_first_unmapped:
 										if (sibling_shared == node)
 											continue;
 										error = vm_node_update_write_access_locked_vm(sibling_shared,
-										                                              effective_vm);
+										                                              self);
 										if unlikely(error != VM_NODE_UPDATE_WRITE_ACCESS_SUCCESS) {
 											REF struct vm *blocking_vm;
 											if (error == VM_NODE_UPDATE_WRITE_ACCESS_BADALLOC) {
 												sync_endwrite(part);
-												sync_endwrite(effective_vm);
+												sync_endwrite(self);
 												THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 											}
 											blocking_vm = sibling_shared->vn_vm;
 											if (!tryincref(blocking_vm))
 												blocking_vm = NULL;
 											sync_endwrite(part);
-											sync_endwrite(effective_vm);
+											sync_endwrite(self);
 											assert(error == VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK ||
 											       error == VM_NODE_UPDATE_WRITE_ACCESS_WOULDBLOCK_TASKS);
 											if (blocking_vm) {
@@ -467,20 +469,20 @@ do_throw_first_unmapped:
 do_update_page_directory:
 #endif /* VM_DEFINE_PROTECT */
 
-					if (effective_vm == myvm || vm_node_iskernelspace(node)) {
+					if (self == myvm || vm_node_iskernelspace(node)) {
 						pagedir_unmap(vm_node_getstart(node),
 						              vm_node_getsize(node));
 					} else {
-						pagedir_unmap_p(PAGEDIR_P_SELFOFVM(effective_vm),
+						pagedir_unmap_p(PAGEDIR_P_SELFOFVM(self),
 						                vm_node_getstart(node),
 						                vm_node_getsize(node));
 					}
 					must_sync = true;
 #ifdef VM_DEFINE_UNMAP
 					/* Remove the node from the VM. */
-					vm_nodetree_remove(&effective_vm->v_tree, vm_node_getstartpageid(node));
+					vm_nodetree_remove(&self->v_tree, vm_node_getstartpageid(node));
 					LLIST_REMOVE(node, vn_byaddr);
-					/* Destroy the old node. NOTE: This _MUST_ be done before we `sync_endwrite(effective_vm)',
+					/* Destroy the old node. NOTE: This _MUST_ be done before we `sync_endwrite(self)',
 					 * as other code will check for stale node pointers after having acquired a lock to the VMs
 					 * of all of the nodes associated with some data part. */
 					vm_node_destroy(node);
@@ -501,9 +503,9 @@ did_update_node:
 	}
 	/* Synchronize the affected address range. */
 	if (must_sync)
-		vm_paged_sync(effective_vm, base, (size_t)(maxpage - base) + 1);
+		vm_paged_sync(self, minpageid, (size_t)(maxpageid - minpageid) + 1);
 done:
-	sync_endwrite(effective_vm);
+	sync_endwrite(self);
 	if unlikely(new_node)
 		kfree(new_node);
 	return result;

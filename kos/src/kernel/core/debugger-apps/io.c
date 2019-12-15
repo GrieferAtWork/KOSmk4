@@ -258,11 +258,11 @@ DEFINE_DEBUG_FUNCTION(
 
 
 PRIVATE ATTR_DBGTEXT NOBLOCK bool
-NOTHROW(KCALL is_pc)(uintptr_t pc) {
+NOTHROW(KCALL is_pc)(void *pc) {
 	struct vm_node *node;
-	if (pc < KERNEL_BASE)
+	if (pc < (void *)KERNEL_BASE)
 		return false;
-	node = vm_getnodeofpageid(&vm_kernel, VM_ADDR2PAGE((vm_virt_t)pc));
+	node = vm_getnodeofaddress(&vm_kernel, pc);
 	if (!node)
 		return false;
 	return (node->vn_prot & VM_PROT_EXEC) != 0;
@@ -407,7 +407,7 @@ DEFINE_DEBUG_FUNCTION(
 				iter -= sizeof(void *);
 #endif /* __ARCH_STACK_GROWS_DOWNWARDS */
 				pc = *(void **)iter;
-				if (!is_pc((uintptr_t)pc))
+				if (!is_pc(pc))
 					continue;
 				if (is_first) {
 					dbg_printf(DBGSTR("Analyzing remainder of stack:\n"));

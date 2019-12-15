@@ -107,9 +107,9 @@ INTDEF ATTR_PERCPU void *thiscpu_x86_iobnode_pagedir_identity;
  *             the TSS, leaving enough space for the interrupt redirection bitmap.
  *
  * IOBM = (uintptr_t)&thiscpu_x86_tss + thiscpu_x86_tss.t_iomap = thiscpu_x86_iob;
- * VM_ADDR2PAGE(IOBM) + 0: Either unmapped memory, or mapped to `PERTASK_GET(this_x86_ioperm_bitmap)->ib_pages + 0'
- * VM_ADDR2PAGE(IOBM) + 1: Either unmapped memory, or mapped to `PERTASK_GET(this_x86_ioperm_bitmap)->ib_pages + 1'
- * VM_ADDR2PAGE(IOBM) + 2: The continuation of ATTR_PERCPU data, with the first byte being a const `0xff'
+ * IOBM + 0 * PAGESIZE: Either unmapped memory, or mapped to `PERTASK_GET(this_x86_ioperm_bitmap)->ib_pages + 0 * PAGESIZE'
+ * IOBM + 1 * PAGESIZE: Either unmapped memory, or mapped to `PERTASK_GET(this_x86_ioperm_bitmap)->ib_pages + 1 * PAGESIZE'
+ * IOBM + 2 * PAGESIZE: The continuation of ATTR_PERCPU data, with the first byte being a const `0xff'
  *
  * And the GDT entry for the TSS looks like this:
  * GDT[SEGMENT_CPU_TSS].base  = &thiscpu_x86_tss

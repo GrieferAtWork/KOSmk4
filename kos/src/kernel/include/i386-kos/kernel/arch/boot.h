@@ -20,9 +20,11 @@
 #define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_BOOT_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/types.h>
+
+#include <asm/pagesize.h>
 #include <kos/kernel/cpu-state32.h> /* fcpustate32 */
-#include <kos/kernel/paging.h>
 
 DECL_BEGIN
 
@@ -30,7 +32,7 @@ DECL_BEGIN
  * If less than this amount is detected, keep trying to find ways of
  * locating more (using different BIOS functions, or by simply guessing) */
 #define X86_BOOT_MINIMUM_AVAILABLE_RAM \
-	VM_ADDR2PAGE(0x100000) /* 1MB */
+	(0x100000 / __ARCH_PAGESIZE) /* 1MB */
 
 
 #ifdef __CC__
@@ -47,7 +49,7 @@ struct boot_device_info {
 	                           * If not available, set to 0xff. */
 };
 DATDEF struct boot_device_info boot_device;
-#define have_boot_device()    (boot_device.bdi_partition != 0xff)
+#define have_boot_device() (boot_device.bdi_partition != 0xff)
 
 
 

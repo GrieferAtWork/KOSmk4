@@ -107,25 +107,4 @@ typedef __UINT64_TYPE__ __vm_vpage64_t; /* DEPRECATED; REMOVE ME */
 __SYSDECL_END
 #endif /* __CC__ */
 
-
-#ifdef __INTELLISENSE__
-namespace __intern {extern "C++" {
-__UINTPTR_TYPE__ ____intellisense_vm_page2addr(__UINTPTR_TYPE__ __x);
-__vm_virt_t ____intellisense_vm_page2addr(__vm_vpage_t __x);
-__UINTPTR_TYPE__ ____intellisense_vm_addr2page(__UINTPTR_TYPE__ __x);
-__vm_vpage_t ____intellisense_vm_addr2page(__vm_virt_t __x);
-__pageptr_t ____intellisense_vm_addr2page(__vm_phys_t __x);
-#if __SIZEOF_POINTER__ != 8
-__INTPTR_TYPE__ ____intellisense_vm_addr2page(__INTPTR_TYPE__ __x);
-__INT64_TYPE__ ____intellisense_vm_addr2page(__INT64_TYPE__ __x);
-__UINT64_TYPE__ ____intellisense_vm_addr2page(__UINT64_TYPE__ __x);
-#endif /* __SIZEOF_POINTER__ != 8 */
-}}
-#define __VM_PAGE2ADDR   __intern::____intellisense_vm_page2addr /* DEPRECATED; REMOVE ME */
-#define __VM_ADDR2PAGE   __intern::____intellisense_vm_addr2page /* DEPRECATED; REMOVE ME */
-#else
-#define __VM_PAGE2ADDR(page)    ((page)*4096) /* DEPRECATED; REMOVE ME */
-#define __VM_ADDR2PAGE(addr)    ((addr)/4096) /* DEPRECATED; REMOVE ME */
-#endif
-
 #endif /* !_I386_KOS_KOS_BITS_TYPES_H */

@@ -1926,64 +1926,35 @@ vm_mapres(struct vm *__restrict self,
 #define VM_UNMAP_ANYTHING         0x0fff /* Unmap anything */
 
 /* Unmap all memory mappings within the given address range.
- * @param: base:      The base page number at which to start unmapping memory.
- * @param: num_pages: The number of continuous pages of memory to unmap, starting at `base'
- * @param: how:       What memory may be unmapped, and how that memory should be unmapped (Set of `VM_UNMAP_*')
- * @return: * :       The actual number of unmapped pages of memory (when `VM_UNMAP_SEGFAULTIFUNUSED'
- *                    is given, this is always equal to `num_pages') */
-FUNDEF size_t KCALL /* TODO: Remove me */
-vm_paged_unmap(struct vm *__restrict self,
-               pageid_t base, size_t num_pages,
-               unsigned int how DFL(VM_UNMAP_ANYTHING))
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
-
-/* Unmap all memory mappings within the given address range.
  * @param: addr:      The base address at which to start unmapping memory.
  * @param: num_bytes: The number of continuous bytes of memory to unmap, starting at `addr'
  * @param: how:       What memory may be unmapped, and how that memory should be unmapped (Set of `VM_UNMAP_*')
  * @return: * :       The actual number of unmapped bytes of memory (when `VM_UNMAP_SEGFAULTIFUNUSED'
  *                    is given, this is always equal to `num_bytes') */
-LOCAL size_t KCALL
-vm_unmap(struct vm *__restrict self, /* TODO: Rename to `vm_paged_mapres()' */
+FUNDEF size_t KCALL
+vm_unmap(struct vm *__restrict self,
          PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
          PAGEDIR_PAGEALIGNED size_t num_bytes,
          unsigned int how DFL(VM_UNMAP_ANYTHING))
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
-	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
-	__hybrid_assert((num_bytes & PAGEMASK) == 0);
-	return vm_paged_unmap(self,
-	                      PAGEID_ENCODE(addr),
-	                      num_bytes / PAGESIZE, how) *
-	       PAGESIZE;
-}
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+
 
 
 /* Update access protection flags within the given address range.
- * @param: base:       The base page number at which to start unmapping memory.
- * @param: num_pages:  The number of continuous pages of memory to unmap, starting at `base'
+ * @param: addr:       The base address at which to start changing protection.
+ * @param: num_bytes:  The number of continuous bytes of memory to change, starting at `addr'
  * @param: prot_mask:  Mask of protection bits that should be kept (Set of `VM_PROT_*').
  * @param: prot_flags: Set of protection bits that should be added (Set of `VM_PROT_*').
  * @param: how:        What memory may be updated, and how that memory should be updated (Set of `VM_UNMAP_*')
- * @return: * :        The actual number of updated pages of memory (when `VM_UNMAP_SEGFAULTIFUNUSED'
- *                     is given, this is always equal to `num_pages') */
+ * @return: * :        The actual number of updated bytes of memory (when `VM_UNMAP_SEGFAULTIFUNUSED'
+ *                     is given, this is always equal to `num_bytes') */
 FUNDEF size_t KCALL
-vm_paged_protect(struct vm *__restrict self,
-                 pageid_t base, size_t num_pages,
-                 uintptr_t prot_mask, uintptr_t prot_flags,
-                 unsigned int how DFL(VM_UNMAP_ANYTHING))
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
-LOCAL size_t KCALL
 vm_protect(struct vm *__restrict self,
            PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
            PAGEDIR_PAGEALIGNED size_t num_bytes,
            uintptr_t prot_mask, uintptr_t prot_flags,
            unsigned int how DFL(VM_UNMAP_ANYTHING))
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
-	return vm_paged_protect(self, PAGEID_ENCODE(addr),
-	                        num_bytes / PAGESIZE,
-	                        prot_mask, prot_flags, how) *
-	       PAGESIZE;
-}
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 
 
 

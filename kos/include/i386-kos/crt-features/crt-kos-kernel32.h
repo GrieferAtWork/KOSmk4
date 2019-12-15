@@ -2275,7 +2275,6 @@
 #define __CRT_HAVE_vm_paged_map_subrange 1
 #define __CRT_HAVE_vm_paged_mapat_subrange 1
 #define __CRT_HAVE_vm_paged_node_remove 1
-#define __CRT_HAVE_vm_paged_protect 1
 #define __CRT_HAVE_vm_paged_sync 1
 #define __CRT_HAVE_vm_paged_sync_end 1
 #define __CRT_HAVE_vm_paged_sync_endone 1
@@ -2283,8 +2282,8 @@
 #define __CRT_HAVE_vm_paged_syncmem 1
 #define __CRT_HAVE_vm_paged_syncone 1
 #define __CRT_HAVE_vm_paged_syncone_locked 1
-#define __CRT_HAVE_vm_paged_unmap 1
 #define __CRT_HAVE_vm_prefault 1
+#define __CRT_HAVE_vm_protect 1
 #define __CRT_HAVE_vm_ramfile_type 1
 #define __CRT_HAVE_vm_read 1
 #define __CRT_HAVE_vm_read_nopf 1
@@ -2318,6 +2317,7 @@
 #define __CRT_HAVE_vm_tasklock_upgrade_nx 1
 #define __CRT_HAVE_vm_tasklock_write 1
 #define __CRT_HAVE_vm_tasklock_write_nx 1
+#define __CRT_HAVE_vm_unmap 1
 #define __CRT_HAVE_vm_unmap_kernel_ram 1
 #define __CRT_HAVE_vm_write 1
 #define __CRT_HAVE_vm_write_nopf 1

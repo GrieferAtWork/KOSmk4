@@ -4018,10 +4018,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak x86_pit_lock; .long x86_pit_lock
 	.reloc ., R_386_SIZE32, x86_pit_lock; .long 0
 	.long 0x73ff3eb
-	.long .Lname1004 /* index: 1004 */
-	.weak x86_bootcpu_gdt; .long x86_bootcpu_gdt
-	.reloc ., R_386_SIZE32, x86_bootcpu_gdt; .long 0
-	.long 0x62460a4
+	.long 0 /* index: 1004 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname1005 /* index: 1005 */
 	.weak validate_userm; .long validate_userm
 	.reloc ., R_386_SIZE32, validate_userm; .long 0
@@ -4418,10 +4418,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 1104 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1104 /* index: 1104 */
+	.weak vm_unmap; .long vm_unmap
+	.reloc ., R_386_SIZE32, vm_unmap; .long 0
+	.long 0x36c5450
 	.long 0 /* index: 1105 */
 	.long 0
 	.long 0
@@ -7359,9 +7359,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname1839 /* index: 1839 */
-	.weak vm_paged_protect; .long vm_paged_protect
-	.reloc ., R_386_SIZE32, vm_paged_protect; .long 0
-	.long 0x20cc0a4
+	.weak x86_bootcpu_gdt; .long x86_bootcpu_gdt
+	.reloc ., R_386_SIZE32, x86_bootcpu_gdt; .long 0
+	.long 0x62460a4
 	.long 0 /* index: 1840 */
 	.long 0
 	.long 0
@@ -8978,10 +8978,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak error_subclass; .long error_subclass
 	.reloc ., R_386_SIZE32, error_subclass; .long 0
 	.long 0x220a8c3
-	.long 0 /* index: 2244 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2244 /* index: 2244 */
+	.weak vm_protect; .long vm_protect
+	.reloc ., R_386_SIZE32, vm_protect; .long 0
+	.long 0x79178c4
 	.long .Lname2245 /* index: 2245 */
 	.weak superblock_opennode; .long superblock_opennode
 	.reloc ., R_386_SIZE32, superblock_opennode; .long 0
@@ -11526,10 +11526,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak character_device_lookup; .long character_device_lookup
 	.reloc ., R_386_SIZE32, character_device_lookup; .long 0
 	.long 0x93bab40
-	.long .Lname2881 /* index: 2881 */
-	.weak vm_paged_unmap; .long vm_paged_unmap
-	.reloc ., R_386_SIZE32, vm_paged_unmap; .long 0
-	.long 0xb0e49e0
+	.long 0 /* index: 2881 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 2882 */
 	.long 0
 	.long 0
@@ -17590,8 +17590,6 @@ END(kernel_symbol_table)
 	.string "x86_pagedir_syncall_maybe_global"
 .Lname1003:
 	.string "x86_pit_lock"
-.Lname1004:
-	.string "x86_bootcpu_gdt"
 .Lname1005:
 	.string "validate_userm"
 .Lname1007:
@@ -17704,6 +17702,8 @@ END(kernel_symbol_table)
 	.string "rwlock_writing"
 .Lname1100:
 	.string "sys_afs_syscall"
+.Lname1104:
+	.string "vm_unmap"
 .Lname1106:
 	.string "inode_recent_getcur"
 .Lname1108:
@@ -18549,7 +18549,7 @@ END(kernel_symbol_table)
 .Lname1835:
 	.string "sys_symlink"
 .Lname1839:
-	.string "vm_paged_protect"
+	.string "x86_bootcpu_gdt"
 .Lname1842:
 	.string "x86_fxrstor"
 .Lname1843:
@@ -19004,6 +19004,8 @@ END(kernel_symbol_table)
 	.string "sys_listxattr"
 .Lname2243:
 	.string "error_subclass"
+.Lname2244:
+	.string "vm_protect"
 .Lname2245:
 	.string "superblock_opennode"
 .Lname2246:
@@ -19748,8 +19750,6 @@ END(kernel_symbol_table)
 	.string "sys_sendto"
 .Lname2880:
 	.string "character_device_lookup"
-.Lname2881:
-	.string "vm_paged_unmap"
 .Lname2884:
 	.string "sys_fstatfs64"
 .Lname2885:

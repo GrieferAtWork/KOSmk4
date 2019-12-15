@@ -92,11 +92,11 @@ NOTHROW(KCALL fixup_potential_system_inconsistencies)(void) {
 
 
 PRIVATE ATTR_COLDTEXT NOBLOCK bool
-NOTHROW(KCALL is_pc)(uintptr_t pc) {
+NOTHROW(KCALL is_pc)(void *pc) {
 	struct vm_node *node;
-	if (pc < KERNEL_BASE)
+	if (pc < (void *)KERNEL_BASE)
 		return false;
-	node = vm_getnodeofpageid(&vm_kernel, VM_ADDR2PAGE((vm_virt_t)pc));
+	node = vm_getnodeofaddress(&vm_kernel, pc);
 	if (!node)
 		return false;
 	return (node->vn_prot & VM_PROT_EXEC) != 0;
@@ -161,7 +161,7 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 				iter -= sizeof(void *);
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 				pc = *(void **)iter;
-				if (!is_pc((uintptr_t)pc))
+				if (!is_pc(pc))
 					continue;
 				if (is_first) {
 					format_printf(printer, arg, "Analyzing remainder of stack\n");

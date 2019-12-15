@@ -203,10 +203,10 @@ FUNDEF WUNUSED NONNULL((1)) struct heapptr NOTHROW(KCALL __os_heap_realign_nx)(s
  *       - GFP_NOCLRC|GFP_NOSWAP -- Behavioral modifiers for swapping memory
  *    heap_free_untraced:
  *       - GFP_CALLOC            -- The given memory block is ZERO-initialized (allows for some internal optimizations)
- *       - GFP_NOTRIM            -- Do not `vm_paged_unmap()' free memory blocks larger than
+ *       - GFP_NOTRIM            -- Do not `vm_unmap()' free memory blocks larger than
  *                                 `h_freethresh', but keep them in cache instead.
  * NOTE: `heap_free_untraced()' always completes without blocking.
- *        If `vm_paged_unmap()' needs to be called, the free() operation
+ *        If `vm_unmap()' needs to be called, the free() operation
  *        is either postponed until the next call to a heap function
  *        that is allowed to block, or is simply kept in cache, as
  *        though `GFP_NOMAP'  has been passed.

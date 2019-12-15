@@ -1614,9 +1614,9 @@ struct uhci_syncheap_page {
 
 struct uhci_syncheap {
 	pageptr_t sh_current; /* Physical address of a `struct uhci_syncheap_page' structure
-	                        * describing the next allocated page (or `PAGEPTR_INVALID'). */
-	size_t     sh_free;    /* Number of bytes, starting at `VM_PAGE2ADDR(sh_current) +
-	                        * sizeof(struct uhci_syncheap_page)'. */
+	                       * describing the next allocated page (or `PAGEPTR_INVALID'). */
+	size_t    sh_free;    /* Number of bytes, starting at `page2addr(sh_current) +
+	                       * sizeof(struct uhci_syncheap_page)'. */
 };
 
 #define UHCI_SYNCHEAP_INIT  { PAGEPTR_INVALID, 0 }
