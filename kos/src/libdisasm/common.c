@@ -278,6 +278,24 @@ PRIVATE void fini_libdebuginfo() {
 #endif /* !__KERNEL__ */
 #endif /* CONFIG_LOOKUP_SYMBOL_NAME */
 
+PRIVATE WUNUSED ATTR_CONST unsigned int CC
+address_width(uintptr_half_t target) {
+	switch (target) {
+
+	case DISASSEMBLER_TARGET_8086:
+		return 4;
+
+	case DISASSEMBLER_TARGET_I386:
+		return 8;
+
+	case DISASSEMBLER_TARGET_X86_64:
+		return 16;
+
+	default:
+		break;
+	}
+	return sizeof(void *) * 2;
+}
 
 /* Print the name+offset/address of a symbol at `symbol_addr'
  * @return: * : The sum of all printer callbacks ever executed with `self'
@@ -333,7 +351,9 @@ libda_disasm_print_symbol(struct disassembler *__restrict self,
 							disasm_printf(self, "%s", a2l_info.al_rawname);
 						} else {
 							/* If we can't determine the symbol's name, generate one using its address. */
-							disasm_printf(self, "sym_%p", a2l_info.al_symstart);
+							disasm_printf(self, "sym_%.*p",
+							              address_width(self->d_target),
+							              a2l_info.al_symstart);
 						}
 						/* Include the symbol offset (if non-zero) */
 						symbol_offset = (uintptr_t)((byte_t *)symbol_addr - (byte_t *)a2l_info.al_symstart);
@@ -365,7 +385,9 @@ generic_print_symbol_addr:
 #endif /* !__KERNEL__ */
 #endif /* CONFIG_LOOKUP_SYMBOL_NAME */
 				{
-					disasm_printf(self, "%#p", symbol_addr);
+					disasm_printf(self, "%#.*p",
+					              address_width(self->d_target),
+					              symbol_addr);
 				}
 			}
 		}
