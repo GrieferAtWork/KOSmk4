@@ -172,7 +172,7 @@ NOTHROW(KCALL initialize_predefined_vm_trampoline)(struct task *__restrict self,
 /* Prepare 2 consecutive (and 2-page aligned) pages of virtual
  * memory for the purpose of doing the initial prepare required
  * for `THIS_TRAMPOLINE_PAGE' of `_boottask' and also `_bootidle' */
-INTDEF NOBLOCK FREE pageid_t
+INTDEF NOBLOCK FREE void *
 NOTHROW(FCALL kernel_initialize_boot_trampolines)(void);
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
@@ -180,7 +180,7 @@ PUBLIC ATTR_PERTASK struct exception_info this_exception_info = {};
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_scheduler)(void) {
-	pageid_t boot_trampoline_pages;
+	void *boot_trampoline_pages;
 	DEFINE_PUBLIC_SYMBOL(this_task, offsetof(struct task, t_self), sizeof(struct task));
 	DEFINE_PUBLIC_SYMBOL(this_cpu, offsetof(struct task, t_cpu), sizeof(struct cpu *));
 	DEFINE_PUBLIC_SYMBOL(this_vm, offsetof(struct task, t_vm), sizeof(struct vm *));
@@ -218,16 +218,16 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	boot_trampoline_pages = kernel_initialize_boot_trampolines();
 #else /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-	boot_trampoline_pages = vm_paged_getfree(&vm_kernel,
-	                                         PAGEID_ENCODE(HINT_GETADDR(KERNEL_VMHINT_TRAMPOLINE)),
-	                                         /* num_pages: */ 2,
-	                                         /* alignment: */ 1,
-	                                         HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
+	boot_trampoline_pages = vm_getfree(&vm_kernel,
+	                                   HINT_GETADDR(KERNEL_VMHINT_TRAMPOLINE),
+	                                   /* num_pages: */ 2 * PAGESIZE,
+	                                   /* alignment: */ 1 * PAGESIZE,
+	                                   HINT_GETMODE(KERNEL_VMHINT_TRAMPOLINE));
 #endif /* !CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Construct the trampoline node for the predefined tasks. */
-	initialize_predefined_vm_trampoline(&_boottask, boot_trampoline_pages + 0);
-	initialize_predefined_vm_trampoline(&_bootidle, boot_trampoline_pages + 1);
+	initialize_predefined_vm_trampoline(&_boottask, PAGEID_ENCODE((byte_t *)boot_trampoline_pages + 0 * PAGESIZE));
+	initialize_predefined_vm_trampoline(&_bootidle, PAGEID_ENCODE((byte_t *)boot_trampoline_pages + 1 * PAGESIZE));
 
 #define REL(x, offset) ((x) = (__typeof__(x))(uintptr_t)((byte_t *)(x) + (uintptr_t)(offset)))
 	REL(FORTASK(&_boottask, this_kernel_stacknode_).vn_part, &_boottask);

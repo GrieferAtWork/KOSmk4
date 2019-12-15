@@ -135,26 +135,27 @@ DECL_BEGIN
 #define P64_PAGE_FNOEXEC    __UINT64_C(0x8000000000000000) /* [bit(63)] Memory within the page cannot be executed. */
 
 
-#define P64_PDIR_VEC1INDEX(ptr)  ((__CCAST(u64)(ptr) >> 12) & 0x1ff) /* For `union p64_pdir_e2::p_e1' */
-#define P64_PDIR_VEC2INDEX(ptr)  ((__CCAST(u64)(ptr) >> 21) & 0x1ff) /* For `union p64_pdir_e3::p_e2' */
-#define P64_PDIR_VEC3INDEX(ptr)  ((__CCAST(u64)(ptr) >> 30) & 0x1ff) /* For `union p64_pdir_e4::p_e3' */
-#define P64_PDIR_VEC4INDEX(ptr)  ((__CCAST(u64)(ptr) >> 39) & 0x1ff) /* For `struct p64_pdir::p_e4' */
+#define P64_PDIR_VEC1INDEX(ptr) ((__CCAST(u64)(ptr) >> 12) & 0x1ff) /* For `union p64_pdir_e2::p_e1' */
+#define P64_PDIR_VEC2INDEX(ptr) ((__CCAST(u64)(ptr) >> 21) & 0x1ff) /* For `union p64_pdir_e3::p_e2' */
+#define P64_PDIR_VEC3INDEX(ptr) ((__CCAST(u64)(ptr) >> 30) & 0x1ff) /* For `union p64_pdir_e4::p_e3' */
+#define P64_PDIR_VEC4INDEX(ptr) ((__CCAST(u64)(ptr) >> 39) & 0x1ff) /* For `struct p64_pdir::p_e4' */
+#ifdef __CC__
 #define P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) \
-	((__CCAST(u64)(vec4) << 39) |                \
-	 (__CCAST(u64)(vec3) << 30) |                \
-	 (__CCAST(u64)(vec2) << 21) |                \
-	 (__CCAST(u64)(vec1) << 12))
-
-#define P64_PDIR_VEC1INDEX_VPAGE(vpage)   (__CCAST(u64)(vpage) & 0x1ff)        /* For `union p64_pdir_e2::p_e1' */
-#define P64_PDIR_VEC2INDEX_VPAGE(vpage)  ((__CCAST(u64)(vpage) >> 9) & 0x1ff)  /* For `union p64_pdir_e3::p_e2' */
-#define P64_PDIR_VEC3INDEX_VPAGE(vpage)  ((__CCAST(u64)(vpage) >> 18) & 0x1ff) /* For `union p64_pdir_e4::p_e3' */
-#define P64_PDIR_VEC4INDEX_VPAGE(vpage)  ((__CCAST(u64)(vpage) >> 27) & 0x1ff) /* For `struct p64_pdir::p_e4' */
+	((u64)(((s64)(vec4) << 55) >> 16) |          \
+	 ((u64)(vec3) << 30) | ((u64)(vec2) << 21) | \
+	 ((u64)(vec1) << 12))
+#else /* __CC__ */
+#define P64_PDIR_VECADDR(vec4, vec3, vec2, vec1)        \
+	((((vec4)&0x100) * __UINT64_C(0xffff0000000000)) |  \
+	 ((vec4) << 39) | ((vec3) << 30) | ((vec2) << 21) | \
+	 ((vec1) << 12))
+#endif /* !__CC__ */
 
 /* Pagesizes of different page directory levels. */
-#define P64_PDIR_E1_SIZE     __UINT64_C(0x0000000000001000) /* 4 KiB (Same as `PAGESIZE') */
-#define P64_PDIR_E2_SIZE     __UINT64_C(0x0000000000200000) /* 2 MiB */
-#define P64_PDIR_E3_SIZE     __UINT64_C(0x0000000040000000) /* 1 GiB */
-#define P64_PDIR_E4_SIZE     __UINT64_C(0x0000008000000000) /* 512 GiB */
+#define P64_PDIR_E1_SIZE __UINT64_C(0x0000000000001000) /* 4 KiB (Same as `PAGESIZE') */
+#define P64_PDIR_E2_SIZE __UINT64_C(0x0000000000200000) /* 2 MiB */
+#define P64_PDIR_E3_SIZE __UINT64_C(0x0000000040000000) /* 1 GiB */
+#define P64_PDIR_E4_SIZE __UINT64_C(0x0000008000000000) /* 512 GiB */
 
 #define P64_IS_4KIB_ALIGNED(addr) (((addr) & __UINT64_C(0x0000000000000fff)) == 0)
 #define P64_IS_2MIB_ALIGNED(addr) (((addr) & __UINT64_C(0x00000000001fffff)) == 0)
@@ -162,9 +163,9 @@ DECL_BEGIN
 
 /* Return the in-page offset of a regular pointer mapping,
  * or one that has been mapped within a 2MiB page. */
-#define P64_PDIR_PAGEINDEX_4KIB(ptr) (__CCAST(u64)(__CCAST(vm_virt_t)(ptr) & 0xfff))
-#define P64_PDIR_PAGEINDEX_2MIB(ptr) (__CCAST(u64)(__CCAST(vm_virt_t)(ptr) & 0x1fffff))
-#define P64_PDIR_PAGEINDEX_1GIB(ptr) (__CCAST(u64)(__CCAST(vm_virt_t)(ptr) & 0x3fffffff))
+#define P64_PDIR_PAGEINDEX_4KIB(ptr) (__CCAST(u64)(ptr) & 0xfff)
+#define P64_PDIR_PAGEINDEX_2MIB(ptr) (__CCAST(u64)(ptr) & 0x1fffff)
+#define P64_PDIR_PAGEINDEX_1GIB(ptr) (__CCAST(u64)(ptr) & 0x3fffffff)
 
 #define P64_PDIR_ALIGN  4096 /* Alignment required for instances of `struct p64_pdir' */
 #define P64_PDIR_SIZE   4096 /* The total size of `struct p64_pdir' in bytes. */

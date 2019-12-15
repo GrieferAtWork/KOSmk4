@@ -252,8 +252,8 @@ INTERN struct vm_node x86_kernel_vm_nodes[8] = {
 		                  x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE]),
 #else /* X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE */
 		INIT_NODE_RESERVE(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE],
-		                  (X86_VM_KERNEL_PDIR_RESERVED_BASE) / PAGESIZE, /* TODO: This needs to be dynamically selected based on PAE-support */
-		                  (X86_VM_KERNEL_PDIR_RESERVED_BASE + X86_VM_KERNEL_PDIR_RESERVED_SIZE - PAGESIZE) / PAGESIZE,
+		                  PAGEID_ENCODE(X86_VM_KERNEL_PDIR_RESERVED_BASE), /* TODO: This needs to be dynamically selected based on PAE-support */
+		                  PAGEID_ENCODE(X86_VM_KERNEL_PDIR_RESERVED_BASE + X86_VM_KERNEL_PDIR_RESERVED_SIZE) - 1,
 		                  VM_PROT_NONE,
 		                  x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE]),
 #endif /* !X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE */

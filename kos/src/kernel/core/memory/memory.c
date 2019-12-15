@@ -23,6 +23,9 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
+#include <debugger/function.h>
+#include <debugger/io.h>
 #include <kernel/driver.h>
 #include <kernel/memory.h>
 #include <kernel/panic.h>
@@ -1123,6 +1126,37 @@ NOTHROW(KCALL page_ismapped)(pageptr_t page, pagecnt_t num_pages) {
 	} while ((zone = zone->mz_prev) != NULL);
 	return false;
 }
+
+#ifdef CONFIG_HAVE_DEBUGGER
+DEFINE_DEBUG_FUNCTION(
+		"lsram",
+		"lsram\n"
+		"\tList page allocation zones, as well as the amount of available ram\n"
+		"\tZones are listed as <id start-end 1.23456% used (used_pages/total_pages)>\n",
+		argc, argv) {
+	size_t i;
+	if (argc != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
+	for (i = 0; i < mzones.pm_zonec; ++i) {
+		struct pmemzone *zone;
+		size_t used_pages, total_pages;
+		unsigned int usage_percent;
+		zone = mzones.pm_zones[i];
+		total_pages = (size_t)zone->mz_rmax + 1;
+		used_pages  = total_pages - (size_t)zone->mz_cfree;
+		usage_percent = (unsigned int)(((u64)used_pages * 100 * 100000) / total_pages);
+		dbg_printf(DBGSTR("%Iu " DF_WHITE(FORMAT_VM_PHYS_T) "-" DF_WHITE(FORMAT_VM_PHYS_T) " %3u.%.5u%% (%Iu/%Iu)\n"),
+		           i,
+		           page2addr(zone->mz_start),
+		           page2addr(zone->mz_max + 1) - 1,
+		           usage_percent / 100000,
+		           usage_percent % 100000,
+		           used_pages, total_pages);
+	}
+	return 0;
+}
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 DECL_END

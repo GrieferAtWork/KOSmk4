@@ -89,7 +89,7 @@ struct pmembank {
 
 #define PMEMBANK_TYPE_START(x)     ((x).mb_start)
 #define PMEMBANK_TYPE_MIN(x)       ((x).mb_start)
-#define PMEMBANK_TYPE_MAX(x)       ((&(x))[1].mb_start-1)
+#define PMEMBANK_TYPE_MAX(x)       ((&(x))[1].mb_start - 1)
 #define PMEMBANK_TYPE_END(x)       ((&(x))[1].mb_start)
 #define PMEMBANK_TYPE_SIZE(x)      (PMEMBANK_TYPE_END(x) - PMEMBANK_TYPE_START(x))
 #define PMEMBANK_TYPE_STARTPAGE(x) ((pageptr_t)((PMEMBANK_TYPE_START(x) + PAGESIZE - 1) / PAGESIZE))

@@ -90,27 +90,28 @@ STATIC_ASSERT(P64_PDIR_E1_IDENTITY_BASE == P64_VM_KERNEL_PDIR_IDENTITY_BASE);
 PRIVATE ATTR_SECTION(".free.unmap_but_keep_allocated") ATTR_ALIGNED(4096)
 union p64_pdir_e1 boot_trampoline_e1v[512];
 
-INTDEF byte_t __kernel_free_endpageid[];
+INTDEF byte_t __kernel_free_end[] ASMNAME("__kernel_end");
 
 /* Prepare 2 consecutive (and 2-page aligned) pages of virtual
  * memory for the purpose of doing the initial prepare required
  * for `THIS_TRAMPOLINE_PAGE' of `_boottask' and also `_bootidle' */
-INTERN NOBLOCK ATTR_FREETEXT pageid_t
+INTERN NOBLOCK ATTR_FREETEXT void *
 NOTHROW(FCALL kernel_initialize_boot_trampolines)(void) {
 	u64 e1_word, e2_word;
-	pageid_t trampoline_page;
+	byte_t *trampoline_addr;
 	unsigned int vec1, vec2, vec3, vec4, i;
 	/* We allocate the boot trampoline immediately after the
 	 * end of the kernel's .free section in virtual memory. */
-	trampoline_page = (pageid_t)loadfarptr(__kernel_free_endpageid);
+	trampoline_addr = __kernel_free_end;
+	assert(IS_ALIGNED((uintptr_t)trampoline_addr, 4096));
 again_calculate_vecN:
-	vec1 = P64_PDIR_VEC1INDEX_VPAGE(trampoline_page);
-	vec2 = P64_PDIR_VEC2INDEX_VPAGE(trampoline_page);
-	vec3 = P64_PDIR_VEC3INDEX_VPAGE(trampoline_page);
-	vec4 = P64_PDIR_VEC4INDEX_VPAGE(trampoline_page);
+	vec1 = P64_PDIR_VEC1INDEX(trampoline_addr);
+	vec2 = P64_PDIR_VEC2INDEX(trampoline_addr);
+	vec3 = P64_PDIR_VEC3INDEX(trampoline_addr);
+	vec4 = P64_PDIR_VEC4INDEX(trampoline_addr);
 	if unlikely_untraced(vec1 == 511) {
 		/* Make sure that the two pages used are located in the same E1-vector. */
-		++trampoline_page;
+		trampoline_addr += PAGESIZE;
 		goto again_calculate_vecN;
 	}
 	assert(IS_ALIGNED((u64)boot_trampoline_e1v, 4096));
@@ -120,10 +121,10 @@ again_calculate_vecN:
 	assert(P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_2mib.d_present);
 	assert(P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_2mib.d_2mib_1);
 	/* Figure out the physical address surrounding the trampoline's E1-vector. */
-	e1_word = (u64)((trampoline_page - PAGEID_ENCODE(KERNEL_CORE_BASE)) * 4096);
-	assertf(pagedir_translate(PAGEID_DECODE_KERNEL(trampoline_page)) == (vm_phys_t)e1_word,
+	e1_word = (u64)trampoline_addr - KERNEL_CORE_BASE;
+	assertf(pagedir_translate(trampoline_addr) == (vm_phys_t)e1_word,
 	        "%p != %p",
-	        (uintptr_t)pagedir_translate(PAGEID_DECODE_KERNEL(trampoline_page)),
+	        (uintptr_t)pagedir_translate(trampoline_addr),
 	        (uintptr_t)e1_word);
 	/* Since we need to set-up the whole E1-vector, adjust so we start at its base */
 	e1_word -= vec1 * 4096;
@@ -146,7 +147,7 @@ again_calculate_vecN:
 	ATOMIC_WRITE(P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word, e2_word);
 	/* Return the virtual memory locations used for the
 	 * trampolines needed by `_boottask' and `_bootidle' */
-	return trampoline_page;
+	return trampoline_addr;
 }
 
 

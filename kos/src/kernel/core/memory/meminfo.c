@@ -23,6 +23,9 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
+#include <debugger/function.h>
+#include <debugger/io.h>
 #include <kernel/driver-param.h>
 #include <kernel/memory.h>
 #include <kernel/panic.h>
@@ -326,7 +329,7 @@ again:
 				break; /* Bank doesn't cover the last possible mapping location. */
 			waste = (pageptr_t)-2; /* A lot of waste this way... */
 		} else
-#endif
+#endif /* __SIZEOF_VM_PHYS_T__ > __SIZEOF_POINTER__ */
 		{
 			/* See how much memory we're wasting with this allocation. */
 			assert(PMEMBANK_TYPE_END(kernel_membanks_initial[i]) >=
@@ -368,7 +371,7 @@ again:
 			allow_beneath_kernel = true;
 			goto again;
 		}
-#endif
+#endif /* __i386__ || __x86_64__ */
 		for (i = 0; i < minfo.mb_bankc; ++i) {
 			if (minfo.mb_banks[i].mb_type == PMEMBANK_TYPE_UNDEF)
 				continue;
@@ -690,12 +693,13 @@ NOTHROW(KCALL minfo_relocate_appropriate)(void) {
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	assert(vm_datapart_numdpages(&kernel_vm_part_pagedata) == num_bytes / PAGESIZE);
 	assert(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_size == num_bytes / PAGESIZE);
-	/* Remove the page directory mapping. */
-	pagedir_unmap(old_addr, num_bytes);
 	/* Create a new page directory mapping. */
 	pagedir_map(dest, num_bytes,
 	            page2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start),
 	            PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+	pagedir_unprepare_map(dest, num_bytes);
+#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	/* Now apply relocations. */
 #define REL(x) ((x) = (__typeof__(x))((byte_t *)(x) + relocation_offset))
 	REL(minfo.mb_banks);
@@ -876,6 +880,43 @@ DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(kernel_handle_ram_cmdline,
                                             KERNEL_COMMANDLINE_OPTION_TYPE_FUNC,
                                             "ram");
 
+
+#ifdef CONFIG_HAVE_DEBUGGER
+PRIVATE char const pmembank_type_colors[PMEMBANK_TYPE_COUNT][6] = {
+	/* [PMEMBANK_TYPE_UNDEF]     = */ DF_SETFGCOLOR(DBG_COLOR_GREY),
+	/* [PMEMBANK_TYPE_RAM]       = */ DF_SETFGCOLOR(DBG_COLOR_LIME),
+	/* [PMEMBANK_TYPE_PRESERVE]  = */ DF_SETFGCOLOR(DBG_COLOR_GREEN),
+	/* [PMEMBANK_TYPE_ALLOCATED] = */ DF_SETFGCOLOR(DBG_COLOR_GREEN),
+	/* [PMEMBANK_TYPE_KFREE]     = */ DF_SETFGCOLOR(DBG_COLOR_GREEN),
+	/* [PMEMBANK_TYPE_KERNEL]    = */ DF_SETFGCOLOR(DBG_COLOR_GREY),
+	/* [PMEMBANK_TYPE_NVS]       = */ DF_SETFGCOLOR(DBG_COLOR_FUCHSIA),
+	/* [PMEMBANK_TYPE_DEVICE]    = */ DF_SETFGCOLOR(DBG_COLOR_AQUA),
+	/* [PMEMBANK_TYPE_BADRAM]    = */ DF_SETFGCOLOR(DBG_COLOR_MAROON),
+};
+
+DEFINE_DEBUG_FUNCTION(
+		"lsmem",
+		"lsmem\n"
+		"\tList known memory banks, as well as their typing\n"
+		"\tZones are listed as <start-end type bytes>\n",
+		argc, argv) {
+	size_t i;
+	if (argc != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
+	for (i = 0; i < minfo.mb_bankc; ++i) {
+		struct pmembank *bank;
+		bank = &minfo.mb_banks[i];
+		dbg_printf(DBGSTR(DF_WHITE(FORMAT_VM_PHYS_T) "-" DF_WHITE(FORMAT_VM_PHYS_T) " %s%-11s" DF_RESETATTR " %I64u\n"),
+		           PMEMBANK_TYPE_MIN(*bank),
+		           PMEMBANK_TYPE_MAX(*bank),
+		           bank->mb_type < PMEMBANK_TYPE_COUNT ? pmembank_type_colors[bank->mb_type] : "",
+		           bank->mb_type < PMEMBANK_TYPE_COUNT ? pmembank_type_names[bank->mb_type] : "?",
+		           PMEMBANK_TYPE_SIZE(*bank));
+	}
+	return 0;
+}
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 DECL_END
 
