@@ -59,7 +59,7 @@ DECL_BEGIN
 
 #ifndef CONFIG_NO_SMP
 /* Lock used to synchronize access to the PIT. */
-PUBLIC DEFINE_ATOMIC_RWLOCK(x86_pit_lock);
+PUBLIC struct atomic_rwlock x86_pit_lock = ATOMIC_RWLOCK_INIT;
 #endif /* !CONFIG_NO_SMP */
 
 INTDEF byte_t x86_pic_acknowledge[];
@@ -586,9 +586,6 @@ NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 PRIVATE ATTR_FREETEXT void KCALL
 i386_allocate_secondary_cores(void) {
 	cpuid_t i;
-
-	if (_cpu_count <= 1)
-		return; /* No secondary cores. */
 	for (i = 1; i < _cpu_count; ++i) {
 		struct cpu *altcore;
 		struct task *altidle;
@@ -844,32 +841,41 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 		u32 num_ticks;
 #ifndef CONFIG_NO_SMP
 		cpuid_t i;
-		pageptr_t entry_page;
-		/* Allocate low physical memory for the SMP initialization entry page. */
-		entry_page = page_malloc_between((pageptr_t)((vm_phys_t)0x00000000 / PAGESIZE),
-		                                 (pageptr_t)((vm_phys_t)0x000fffff / PAGESIZE),
-		                                 CEILDIV((size_t)x86_smp_entry_size, PAGESIZE));
-		if unlikely(entry_page == PAGEPTR_INVALID)
-			kernel_panic(FREESTR("Failed to allocate SMP trampoline\n"));
-		printk(FREESTR(KERN_INFO "[apic] Allocating SMP trampoline at " FORMAT_VM_PHYS_T "\n"),
-		       page2addr(entry_page));
-		x86_smp_entry_page = (u8)entry_page;
-		/* Apply some custom AP entry relocations. */
-		{
-			u32 gdt_addr;
-			gdt_addr = (u32)(x86_smp_gdt - x86_smp_entry);
-			gdt_addr += page2addr32(entry_page);
-			x86_smp_entry_gdt_segment = (gdt_addr & 0xf0000) >> 4;
-			x86_smp_entry_gdt_offset  = (gdt_addr & 0x0ffff);
-			x86_smp_gdt_pointer_base += page2addr32(entry_page);
+		if (_cpu_count > 1) {
+			pageptr_t entry_page;
+			/* Allocate low physical memory for the SMP initialization entry page. */
+			entry_page = page_malloc_between((pageptr_t)((vm_phys_t)0x00000000 / PAGESIZE),
+			                                 (pageptr_t)((vm_phys_t)0x000fffff / PAGESIZE),
+			                                 CEILDIV((size_t)x86_smp_entry_size, PAGESIZE));
+			if unlikely(entry_page == PAGEPTR_INVALID) {
+				printk(FREESTR(KERN_WARNING "[apic] Failed to allocate SMP trampoline (re-configure for single-core mode)\n"));
+				_cpu_count = 1;
+#ifdef __HAVE_CPUSET_FULL_MASK
+				CPUSET_SETONE(___cpuset_full_mask, 0); /* 0 == BOOTCPU_ID */
+#endif /* __HAVE_CPUSET_FULL_MASK */
+				goto done_early_altcore_init;
+			}
+			printk(FREESTR(KERN_INFO "[apic] Allocating SMP trampoline at " FORMAT_VM_PHYS_T "\n"),
+			       page2addr(entry_page));
+			x86_smp_entry_page = (u8)entry_page;
+			/* Apply some custom AP entry relocations. */
+			{
+				u32 gdt_addr;
+				gdt_addr = (u32)(x86_smp_gdt - x86_smp_entry);
+				gdt_addr += page2addr32(entry_page);
+				x86_smp_entry_gdt_segment = (gdt_addr & 0xf0000) >> 4;
+				x86_smp_entry_gdt_offset  = (gdt_addr & 0x0ffff);
+				x86_smp_gdt_pointer_base += page2addr32(entry_page);
+			}
+			/* Copy AP entry code. */
+			vm_copytophys(page2addr(entry_page),
+			              x86_smp_entry,
+			              (size_t)x86_smp_entry_size);
+	
+			/* Allocate control structures for secondary cores. */
+			i386_allocate_secondary_cores();
 		}
-		/* Copy AP entry code. */
-		vm_copytophys(page2addr(entry_page),
-		              x86_smp_entry,
-		              (size_t)x86_smp_entry_size);
-
-		/* Allocate control structures for secondary cores. */
-		i386_allocate_secondary_cores();
+done_early_altcore_init:
 #endif /* !CONFIG_NO_SMP */
 
 		printk(FREESTR(KERN_INFO "[apic] Using LAPIC for timings\n"));
@@ -940,7 +946,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 		/* Send start IPIs to all APs. */
 		for (i = 1; i < _cpu_count; ++i) {
 			apic_send_startup(FORCPU(cpu_vector[i], thiscpu_x86_lapicid),
-			                  (u8)entry_page);
+			                  x86_smp_entry_page);
 		}
 #endif /* !CONFIG_NO_SMP */
 		num_ticks = (((u32)-1) - num_ticks) * 100;
@@ -985,7 +991,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 				printk(FREESTR(KERN_WARNING "[apic] Re-attempting startup of processor #%u (LAPIC id %#.2I8x)\n"),
 				       i, FORCPU(cpu_vector[i], thiscpu_x86_lapicid));
 				apic_send_startup(FORCPU(cpu_vector[i], thiscpu_x86_lapicid),
-				                  (u8)entry_page);
+				                  x86_smp_entry_page);
 			}
 			/* Wait up to a full second for the (possibly slow?) CPUs to come online. */
 			timeout = HZ;
