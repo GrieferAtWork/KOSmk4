@@ -55,28 +55,6 @@ END(x86_dbgidt_pagefault)
 
 
 .section .text.cold
-INTERN_FUNCTION(x86_dbgidt_preemption) /* ISR_X86_f0 */
-	.cfi_startproc simple
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	intr_enter INTR
-
-	pushq_cfi_r %rax
-	/* Acknowledge the interrupt. */
-INTERN_FUNCTION(x86_debug_pic_acknowledge)
-	.byte  0x90, 0x90, 0x90, 0x90, 0x90
-	.byte  0x90, 0x90, 0x90, 0x90, 0x90
-	.byte  0x90, 0x90, 0x90, 0x90, 0x90
-END(x86_debug_pic_acknowledge)
-	popq_cfi_r %rax
-
-	intr_exit
-	.cfi_endproc
-END(x86_dbgidt_preemption)
-
-
-
-.section .text.cold
 INTERN_FUNCTION(x86_dbgidt_specific_00h) /* ISR_X86_f1 */
 	.cfi_startproc simple
 	.cfi_iret_signal_frame

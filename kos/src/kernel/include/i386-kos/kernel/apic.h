@@ -125,12 +125,12 @@ DECL_BEGIN
 
 
 #ifdef __CC__
-/* [const] Physical/Virtual base addresses of the local (per-cpu) APIC.
- *  NOTE: APIC stands for Advanced Programmable Interrupt Controller. */
-DATDEF VIRT volatile __byte_t *const x86_lapicbase; /* [const] Virtual base address of the LAPIC. */
-#define X86_HAVE_LAPIC              (x86_lapicbase != __NULLPTR)
-#define lapic_read(offset)           readl(x86_lapicbase+(offset))
-#define lapic_write(offset,value)    writel(x86_lapicbase+(offset),value)
+/* [const] Virtual base addresses of the local (per-cpu) APIC.
+ * HINT: APIC stands for Advanced Programmable Interrupt Controller. */
+DATDEF VIRT volatile __byte_t *const x86_lapicbase;
+#define X86_HAVE_LAPIC             (x86_lapicbase != __NULLPTR)
+#define lapic_read(offset)         readl(x86_lapicbase + (offset))
+#define lapic_write(offset, value) writel(x86_lapicbase + (offset), value)
 
 /* [valid_if(X86_HAVE_LAPIC)] The LAPIC ID of the controller associated with the CPU. */
 DATDEF ATTR_PERCPU __u8 const thiscpu_x86_lapicid;

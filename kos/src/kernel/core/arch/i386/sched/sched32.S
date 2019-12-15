@@ -21,6 +21,7 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
 #include <kernel/apic.h>
 #include <kernel/breakpoint.h>
 #include <kernel/except.h>
@@ -84,6 +85,21 @@ INTERN_FUNCTION(x86_idt_apic_spurious)
 END(x86_idt_apic_spurious)
 
 
+.section .rodata.free
+INTERN_FUNCTION(x86_ack_apic)
+	EXTERN(x86_lapicbase)
+	movl   x86_lapicbase, %eax
+	movl   $(APIC_EOI_FSIGNAL), APIC_EOI(%eax)
+INTERN_CONST(x86_ack_apic_size, . - x86_ack_apic)
+END(x86_ack_apic)
+
+.section .rodata.free
+INTERN_FUNCTION(x86_ack_pic)
+	movb   $(X86_PIC_CMD_EOI), %al
+	outb   %al, $(X86_PIC1_CMD)
+	.skip  x86_ack_apic_size - (. - x86_ack_pic), 0x90
+END(x86_ack_pic)
+
 
 /* The PIT interrupt handler -- Used for scheduling.
  * NOTE: If available, this interrupt will actually be fired by the LAPIC */
@@ -114,9 +130,9 @@ INTERN_FUNCTION(x86_idt_preemption)
 
 	/* Acknowledge the interrupt. */
 INTERN_FUNCTION(x86_pic_acknowledge)
-	.byte  0x90, 0x90, 0x90, 0x90, 0x90
-	.byte  0x90, 0x90, 0x90, 0x90, 0x90
-	.byte  0x90, 0x90, 0x90, 0x90, 0x90
+	.rept  x86_ack_apic_size
+	.byte  0x90
+	.endr
 END(x86_pic_acknowledge)
 
 	movl   %fs:0, %edx           /* cpu_scheduler_interrupt::struct task *__restrict thread */
@@ -251,6 +267,32 @@ END(__x86_lazy_disable_ioperm_bitmap_pae)
 	.cfi_endproc
 END(x86_load_thread_eax_cpu_ebx)
 END(x86_idt_preemption)
+
+
+#ifdef CONFIG_HAVE_DEBUGGER
+.section .text.cold
+INTERN_FUNCTION(x86_dbgidt_preemption) /* ISR_X86_f0 */
+	.cfi_startproc simple
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi_r %eax
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	/* Acknowledge the interrupt. */
+INTERN_FUNCTION(x86_debug_pic_acknowledge)
+	.rept  x86_ack_apic_size
+	.byte  0x90
+	.endr
+END(x86_debug_pic_acknowledge)
+	popl_cfi_r %eax
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(x86_dbgidt_preemption)
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 .section .text
@@ -684,7 +726,7 @@ PUBLIC_FUNCTION(cpu_quantum_remaining_nopr)
 	movzwl %cx, %eax
 	ret
 .if x86_apic_cpu_quantum_remaining_size_nopr > (. - cpu_quantum_remaining_nopr)
-.skip x86_apic_cpu_quantum_remaining_size_nopr - (. - cpu_quantum_remaining_nopr)
+.skip x86_apic_cpu_quantum_remaining_size_nopr - (. - cpu_quantum_remaining_nopr), 0x90
 .endif
 END(cpu_quantum_remaining_nopr)
 
@@ -705,7 +747,7 @@ PUBLIC_FUNCTION(cpu_quantum_remaining)
 	movzwl %cx, %eax
 	ret
 .if x86_apic_cpu_quantum_remaining_size > (. - cpu_quantum_remaining)
-.skip x86_apic_cpu_quantum_remaining_size - (. - cpu_quantum_remaining)
+.skip x86_apic_cpu_quantum_remaining_size - (. - cpu_quantum_remaining), 0x90
 .endif
 END(cpu_quantum_remaining)
 
@@ -723,7 +765,7 @@ PUBLIC_FUNCTION(cpu_quantum_elapsed_nopr)
 	subw   %cx, %ax
 	ret
 .if x86_apic_cpu_quantum_elapsed_size_nopr > (. - cpu_quantum_elapsed_nopr)
-.skip x86_apic_cpu_quantum_elapsed_size_nopr - (. - cpu_quantum_elapsed_nopr)
+.skip x86_apic_cpu_quantum_elapsed_size_nopr - (. - cpu_quantum_elapsed_nopr), 0x90
 .endif
 END(cpu_quantum_elapsed_nopr)
 
@@ -744,7 +786,7 @@ PUBLIC_FUNCTION(cpu_quantum_elapsed)
 	subw   %cx, %ax
 	ret
 .if x86_apic_cpu_quantum_elapsed_size > (. - cpu_quantum_elapsed)
-.skip x86_apic_cpu_quantum_elapsed_size - (. - cpu_quantum_elapsed)
+.skip x86_apic_cpu_quantum_elapsed_size - (. - cpu_quantum_elapsed), 0x90
 .endif
 END(cpu_quantum_elapsed)
 
@@ -772,7 +814,7 @@ INTERN_FUNCTION(x86_cpu_disable_preemptive_interrupts)
 	popfl
 	ret
 .if x86_apic_cpu_disable_preemptive_interrupts_size > (. - x86_cpu_disable_preemptive_interrupts)
-.skip x86_apic_cpu_disable_preemptive_interrupts_size - (. - x86_cpu_disable_preemptive_interrupts)
+.skip x86_apic_cpu_disable_preemptive_interrupts_size - (. - x86_cpu_disable_preemptive_interrupts), 0x90
 .endif
 END(x86_cpu_disable_preemptive_interrupts)
 
@@ -796,7 +838,7 @@ INTERN_FUNCTION(x86_cpu_disable_preemptive_interrupts_nopr)
 	 * in this semi-disabled mode until we reset it at a later point in time. */
 	ret
 .if x86_apic_cpu_disable_preemptive_interrupts_size_nopr > (. - x86_cpu_disable_preemptive_interrupts_nopr)
-.skip x86_apic_cpu_disable_preemptive_interrupts_size_nopr - (. - x86_cpu_disable_preemptive_interrupts_nopr)
+.skip x86_apic_cpu_disable_preemptive_interrupts_size_nopr - (. - x86_cpu_disable_preemptive_interrupts_nopr), 0x90
 .endif
 END(x86_cpu_disable_preemptive_interrupts_nopr)
 
@@ -827,7 +869,7 @@ INTERN_FUNCTION(x86_cpu_enable_preemptive_interrupts)
 	popfl
 	ret
 .if x86_apic_cpu_enable_preemptive_interrupts_size > (. - x86_cpu_enable_preemptive_interrupts)
-.skip x86_apic_cpu_enable_preemptive_interrupts_size - (. - x86_cpu_enable_preemptive_interrupts)
+.skip x86_apic_cpu_enable_preemptive_interrupts_size - (. - x86_cpu_enable_preemptive_interrupts), 0x90
 .endif
 END(x86_cpu_enable_preemptive_interrupts)
 
@@ -855,7 +897,7 @@ INTERN_FUNCTION(x86_cpu_enable_preemptive_interrupts_nopr)
 	outb   %al, $(X86_PIC1_DATA)
 	ret
 .if x86_apic_cpu_enable_preemptive_interrupts_size_nopr > (. - x86_cpu_enable_preemptive_interrupts_nopr)
-.skip x86_apic_cpu_enable_preemptive_interrupts_size_nopr - (. - x86_cpu_enable_preemptive_interrupts_nopr)
+.skip x86_apic_cpu_enable_preemptive_interrupts_size_nopr - (. - x86_cpu_enable_preemptive_interrupts_nopr), 0x90
 .endif
 END(x86_cpu_enable_preemptive_interrupts_nopr)
 
@@ -884,7 +926,7 @@ PUBLIC_FUNCTION(cpu_quantum_reset)
 	popfl
 	ret
 .if x86_apic_cpu_quantum_reset_size > (. - cpu_quantum_reset)
-.skip x86_apic_cpu_quantum_reset_size - (. - cpu_quantum_reset)
+.skip x86_apic_cpu_quantum_reset_size - (. - cpu_quantum_reset), 0x90
 .endif
 END(cpu_quantum_reset)
 
@@ -909,7 +951,7 @@ PUBLIC_FUNCTION(cpu_quantum_reset_nopr)
 	outb   %al, $(PIT_DATA0)
 	ret
 .if x86_apic_cpu_quantum_reset_size_nopr > (. - cpu_quantum_reset_nopr)
-.skip x86_apic_cpu_quantum_reset_size_nopr - (. - cpu_quantum_reset_nopr)
+.skip x86_apic_cpu_quantum_reset_size_nopr - (. - cpu_quantum_reset_nopr), 0x90
 .endif
 END(cpu_quantum_reset_nopr)
 
@@ -928,7 +970,7 @@ PUBLIC_FUNCTION(cpu_hwipi_pending)
 	setnz  %al
 	ret
 .if x86_apic_cpu_ipi_pending_size > (. - cpu_hwipi_pending)
-.skip x86_apic_cpu_ipi_pending_size - (. - cpu_hwipi_pending)
+.skip x86_apic_cpu_ipi_pending_size - (. - cpu_hwipi_pending), 0x90
 .endif
 END(cpu_hwipi_pending)
 

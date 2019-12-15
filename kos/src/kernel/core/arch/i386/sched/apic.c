@@ -67,54 +67,9 @@ INTDEF byte_t x86_pic_acknowledge[];
 INTDEF byte_t x86_debug_pic_acknowledge[];
 #endif /* CONFIG_HAVE_DEBUGGER */
 
-#ifdef __x86_64__
-PRIVATE ATTR_FREERODATA u8 const x86_ack_apic[18] = {
-	//TODO: movq x86_lapicbase, %rax
-	//TODO: movl $(APIC_EOI_FSIGNAL), APIC_EOI(%rax)
-};
-#else /* __x86_64__ */
-struct __ATTR_PACKED x86_ack_apic_data {
-	/* movl x86_lapicbase, %eax */
-	u8  b_a1;
-	u32 l_x86_lapic_base_address;
-	/* movl $(APIC_EOI_FSIGNAL), APIC_EOI(%eax) */
-	u8  b_c7;
-	u8  b_80;
-	u32 l_APIC_EOI;
-	u32 l_APIC_EOI_FSIGNAL;
-};
-PRIVATE ATTR_FREERODATA struct x86_ack_apic_data const x86_ack_apic = {
-	/* movl x86_lapicbase, %eax */
-	0xa1,
-	(u32)&x86_lapicbase,
-	/* movl $(APIC_EOI_FSIGNAL), APIC_EOI(%eax) */
-	0xc7,
-	0x80,
-	APIC_EOI,
-	APIC_EOI_FSIGNAL,
-};
-#endif /* !__x86_64__ */
-
-/* NOTE: This code must match the text size in `x86_pic_acknowledge' */
-#ifdef __x86_64__
-PRIVATE ATTR_FREERODATA u8 const x86_ack_pic[18] = {
-	0xb0, X86_PIC_CMD_EOI,   /* movb $X86_PIC_CMD_EOI, %al */
-	0xe6, (u8)X86_PIC1_CMD,  /* outb %al, $X86_PIC1_CMD */
-	/* Fill the remaining space with NOPs. */
-	0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
-	0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
-	0x90, 0x90
-};
-#else /* __x86_64__ */
-PRIVATE ATTR_FREERODATA u8 const x86_ack_pic[15] = {
-	0xb0, X86_PIC_CMD_EOI,  /* movb $X86_PIC_CMD_EOI, %al */
-	0xe6, (u8)X86_PIC1_CMD, /* outb %al, $X86_PIC1_CMD */
-	/* Fill the remaining space with NOPs. */
-	0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
-	0x90, 0x90, 0x90, 0x90, 0x90
-};
-#endif /* !__x86_64__ */
-STATIC_ASSERT(sizeof(x86_ack_apic) == sizeof(x86_ack_pic));
+INTDEF byte_t x86_ack_pic[];
+INTDEF byte_t x86_ack_apic[];
+INTDEF byte_t x86_ack_apic_size[];
 
 
 DATDEF ATTR_PERCPU quantum_diff_t _thiscpu_quantum_length ASMNAME("thiscpu_quantum_length");
@@ -892,9 +847,9 @@ done_early_altcore_init:
 		memcpy((void *)&cpu_quantum_reset, x86_apic_cpu_quantum_reset, (size_t)x86_apic_cpu_quantum_reset_size);
 		memcpy((void *)&cpu_quantum_reset_nopr, x86_apic_cpu_quantum_reset_nopr, (size_t)x86_apic_cpu_quantum_reset_size_nopr);
 		memcpy((void *)&cpu_hwipi_pending, x86_apic_cpu_ipi_pending, (size_t)x86_apic_cpu_ipi_pending_size);
-		memcpy(x86_pic_acknowledge, &x86_ack_apic, sizeof(x86_ack_apic));
+		memcpy(x86_pic_acknowledge, x86_ack_apic, (size_t)x86_ack_apic_size);
 #ifndef CONFIG_NO_DEBUGGER
-		memcpy(x86_debug_pic_acknowledge, &x86_ack_apic, sizeof(x86_ack_apic));
+		memcpy(x86_debug_pic_acknowledge, x86_ack_apic, (size_t)x86_ack_apic_size);
 #endif /* !CONFIG_NO_DEBUGGER */
 
 		/* Read out the boot cpu's LAPIC id if it couldn't be determined before now. */
@@ -1045,9 +1000,9 @@ all_online:
 		outb_p(X86_PIC2_DATA, 0);
 
 		/* Re-write the preemption code to acknowledge PIC interrupts. */
-		memcpy(x86_pic_acknowledge, x86_ack_pic, sizeof(x86_ack_pic));
+		memcpy(x86_pic_acknowledge, x86_ack_pic, (size_t)x86_ack_apic_size);
 #ifndef CONFIG_NO_DEBUGGER
-		memcpy(x86_debug_pic_acknowledge, x86_ack_pic, sizeof(x86_ack_pic));
+		memcpy(x86_debug_pic_acknowledge, x86_ack_pic, (size_t)x86_ack_apic_size);
 #endif /* !CONFIG_NO_DEBUGGER */
 
 		FORCPU(&_bootcpu, _thiscpu_quantum_length) = PIT_HZ_DIV(HZ);

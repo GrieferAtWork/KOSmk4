@@ -69,35 +69,6 @@ END(x86_dbgidt_pagefault)
 
 
 .section .text.cold
-INTERN_FUNCTION(x86_dbgidt_preemption) /* ISR_X86_f0 */
-	.cfi_startproc simple
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-
-	pushl_cfi_r %eax
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	/* Acknowledge the interrupt. */
-INTERN_FUNCTION(x86_debug_pic_acknowledge)
-	.byte  0x90, 0x90, 0x90, 0x90, 0x90
-	.byte  0x90, 0x90, 0x90, 0x90, 0x90
-	.byte  0x90, 0x90, 0x90, 0x90, 0x90
-END(x86_debug_pic_acknowledge)
-	popl_cfi_r %eax
-
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-
-	iret
-	.cfi_endproc
-END(x86_dbgidt_preemption)
-
-
-
-.section .text.cold
 INTERN_FUNCTION(x86_dbgidt_specific_00h) /* ISR_X86_f1 */
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
@@ -123,7 +94,7 @@ INTERN_FUNCTION(x86_dbgidt_specific_00h) /* ISR_X86_f1 */
 	EXTERN(x86_handle_dbg_ps2_interrupt)
 	call   x86_handle_dbg_ps2_interrupt
 
-	/* outb(X86_PIC1_CMD,X86_PIC_CMD_EOI); */
+	/* outb(X86_PIC1_CMD, X86_PIC_CMD_EOI); */
 	movb   $(X86_PIC_CMD_EOI), %al
 	outb   %al, $(X86_PIC1_CMD)
 
