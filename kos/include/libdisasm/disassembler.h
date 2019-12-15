@@ -115,7 +115,7 @@ typedef __pformatungetc pformatungetc;
 
 struct disassembler {
 	__byte_t              *d_pc;              /* [1..1] Next address to-be disassembled. */
-	__intptr_t             d_baseoff;         /* Offset added to `d_pc' for the purpose of relative relocations. */
+	__ptrdiff_t            d_baseoff;         /* Offset added to `d_pc' for the purpose of relative relocations. */
 	pformatprinter         d_printer;         /* [1..1][const] The printer used to output disassembly text. */
 	void                  *d_arg;             /* [const] Argument passed to `d_printer'. */
 	__ssize_t              d_result;          /* Sum of all calls to `d_printer' (When negative, don't print anymore) */
@@ -141,7 +141,7 @@ __NOTHROW_NCX(LIBDISASM_CC disasm_init)(struct disassembler *__restrict self,
                                         pformatprinter printer, void *arg, void const *pc,
                                         __UINTPTR_HALF_TYPE__ target __DFL(DISASSEMBLER_TARGET_CURRENT),
                                         __UINTPTR_HALF_TYPE__ flags __DFL(DISASSEMBLER_FNORMAL),
-                                        __intptr_t baseoff __DFL(0)) {
+                                        __ptrdiff_t baseoff __DFL(0)) {
 	self->d_pc         = (__byte_t *)pc;
 	self->d_baseoff    = baseoff;
 	self->d_printer    = printer;

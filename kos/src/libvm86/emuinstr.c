@@ -888,11 +888,16 @@ INTERN NONNULL((1)) int CC libvm86_step(vm86_state_t *__restrict self) {
 		struct disassembler da;
 		size_t len;
 		uint8_t *pc = (uint8_t *)vm86_state_ip(self);
-		if (self->vr_trans)
-			pc = (uint8_t *)self->vr_trans(self, pc);
+		ptrdiff_t baseoff = 0;
+		if (self->vr_trans) {
+			uint8_t *newpc;
+			newpc   = (uint8_t *)self->vr_trans(self, pc);
+			baseoff = (ptrdiff_t)(pc - newpc);
+			pc      = newpc;
+		}
 		disasm_init(&da, &kprinter, (void *)KERN_RAW,
 		            pc, DISASSEMBLER_TARGET_8086,
-		            DISASSEMBLER_FNORMAL, 0);
+		            DISASSEMBLER_FNORMAL, baseoff);
 		len = (size_t)disasm_print_line_nolf(&da);
 		if (len < 60)
 			printk(KERN_RAW "%*s", 60 - len, "");
