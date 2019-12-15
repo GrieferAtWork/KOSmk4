@@ -135,11 +135,11 @@
 #define KERNEL_VMHINT_DRIVER       __KERNEL_VMHINT(0xd0000000, 0xffffffffd0000000, VM_GETFREE_ABOVE) /* Hint for the custom kernel-space drivers. */
 #define KERNEL_VMHINT_DEVICE       __KERNEL_VMHINT(0xf0000000, 0xfffffffff0000000, VM_GETFREE_BELOW) /* Hint for device memory mappings. */
 #define KERNEL_VMHINT_TEMPORARY    __KERNEL_VMHINT(0xf0000000, 0xfffffffff0000000, VM_GETFREE_ABOVE) /* Hint for temporary memory mappings. */
-#define KERNEL_VMHINT_USER_HEAP    __KERNEL_VMHINT(0x10000000, 0xffffffff10000000, VM_GETFREE_ABOVE | VM_GETFREE_ASLR) /* Hint for user-space heap memory. */
-#define KERNEL_VMHINT_USER_STACK   __KERNEL_VMHINT(0x80000000, 0xffffffff80000000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space stack memory. */
-#define KERNEL_VMHINT_USER_LIBRARY __KERNEL_VMHINT(0x0e000000, 0xffffffff0e000000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space dynamic libraries. */
-#define KERNEL_VMHINT_USER_DYNLINK __KERNEL_VMHINT(0xbf100000, 0xffffffffbf100000, VM_GETFREE_ABOVE | VM_GETFREE_ASLR) /* Hint for user-space dynamic linkers. */
-#define KERNEL_VMHINT_USER_PEB     __KERNEL_VMHINT(0xc0000000, 0xffffffffc0000000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space process environment blocks. */
+#define KERNEL_VMHINT_USER_HEAP    __KERNEL_VMHINT(0x10000000, 0x0000000010000000, VM_GETFREE_ABOVE | VM_GETFREE_ASLR) /* Hint for user-space heap memory. */
+#define KERNEL_VMHINT_USER_STACK   __KERNEL_VMHINT(0x80000000, 0x0000000080000000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space stack memory. */
+#define KERNEL_VMHINT_USER_LIBRARY __KERNEL_VMHINT(0x0e000000, 0x000000000e000000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space dynamic libraries. */
+#define KERNEL_VMHINT_USER_DYNLINK __KERNEL_VMHINT(0xbf100000, 0x00000000bf100000, VM_GETFREE_ABOVE | VM_GETFREE_ASLR) /* Hint for user-space dynamic linkers. */
+#define KERNEL_VMHINT_USER_PEB     __KERNEL_VMHINT(0xc0000000, 0x00000000c0000000, VM_GETFREE_BELOW | VM_GETFREE_ASLR) /* Hint for user-space process environment blocks. */
 
 
 
