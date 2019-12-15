@@ -913,6 +913,13 @@ PUBLIC struct driver kernel_driver = {
 
 
 PRIVATE ATTR_NOINLINE ATTR_FREETEXT void
+NOTHROW(KCALL malformed_argument)(char const *__restrict optname,
+                                  char const *__restrict argstr) {
+	kernel_panic(FREESTR("Malformed commandline argument for %q: %q"),
+	             optname, argstr);
+}
+
+PRIVATE ATTR_NOINLINE ATTR_FREETEXT void
 NOTHROW(KCALL initialize_cmdline)(struct kernel_commandline_option const *start,
                                   struct kernel_commandline_option const *end) {
 	size_t i;
@@ -971,16 +978,22 @@ NOTHROW(KCALL initialize_cmdline)(struct kernel_commandline_option const *start,
 
 #if __SIZEOF_POINTER__ < 8
 				case KERNEL_COMMANDLINE_OPTION_TYPE_INT64: {
+					char *endp;
 					int64_t value;
-					value = strto64(arg, NULL, 0);
+					value = strto64(arg, &endp, 0);
+					if (*endp)
+						malformed_argument(start->co_name, arg);
 					*(int64_t *)start->co_option_addr = value;
 				}	break;
 #endif /* __SIZEOF_POINTER__ >= 8 */
 
 #if __SIZEOF_POINTER__ < 8
 				case KERNEL_COMMANDLINE_OPTION_TYPE_UINT64: {
+					char *endp;
 					uint64_t value;
-					value = strtou64(arg, NULL, 0);
+					value = strtou64(arg, &endp, 0);
+					if (*endp)
+						malformed_argument(start->co_name, arg);
 					*(uint64_t *)start->co_option_addr = value;
 				}	break;
 #endif /* __SIZEOF_POINTER__ >= 8 */
@@ -988,14 +1001,17 @@ NOTHROW(KCALL initialize_cmdline)(struct kernel_commandline_option const *start,
 				case KERNEL_COMMANDLINE_OPTION_TYPE_INT8:
 				case KERNEL_COMMANDLINE_OPTION_TYPE_INT16:
 				case KERNEL_COMMANDLINE_OPTION_TYPE_INT32: {
+					char *endp;
 #if __SIZEOF_POINTER__ < 8
 					int32_t value;
-					value = strto32(arg, NULL, 0);
+					value = strto32(arg, &endp, 0);
 #else /* __SIZEOF_POINTER__ < 8 */
 					int64_t value;
 				case KERNEL_COMMANDLINE_OPTION_TYPE_INT64:
-					value = strto64(arg, NULL, 0);
+					value = strto64(arg, &endp, 0);
 #endif /* __SIZEOF_POINTER__ >= 8 */
+					if (*endp)
+						malformed_argument(start->co_name, arg);
 					switch (start->co_type) {
 					case KERNEL_COMMANDLINE_OPTION_TYPE_INT8:
 						*(int8_t *)start->co_option_addr = (int8_t)value;
@@ -1018,14 +1034,17 @@ NOTHROW(KCALL initialize_cmdline)(struct kernel_commandline_option const *start,
 				case KERNEL_COMMANDLINE_OPTION_TYPE_UINT8:
 				case KERNEL_COMMANDLINE_OPTION_TYPE_UINT16:
 				case KERNEL_COMMANDLINE_OPTION_TYPE_UINT32: {
+					char *endp;
 #if __SIZEOF_POINTER__ < 8
 					uint32_t value;
-					value = strtou32(arg, NULL, 0);
+					value = strtou32(arg, &endp, 0);
 #else /* __SIZEOF_POINTER__ < 8 */
 					uint64_t value;
 				case KERNEL_COMMANDLINE_OPTION_TYPE_UINT64:
-					value = strtou64(arg, NULL, 0);
+					value = strtou64(arg, &endp, 0);
 #endif /* __SIZEOF_POINTER__ >= 8 */
+					if (*endp)
+						malformed_argument(start->co_name, arg);
 					switch (start->co_type) {
 					case KERNEL_COMMANDLINE_OPTION_TYPE_UINT8:
 						*(uint8_t *)start->co_option_addr = (uint8_t)value;

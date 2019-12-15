@@ -844,7 +844,7 @@ kernel_handle_ram_cmdline(char *__restrict arg) {
 				if (strcmp(ramdef.rd_type, pmembank_type_names[bank_type]) == 0)
 					goto got_bank_type;
 			}
-			printk(FREESTR(KERN_ERR "[cmdline] Unknown ram type %q"), ramdef.rd_type);
+			kernel_panic(FREESTR("Unknown ram type %q"), ramdef.rd_type);
 			goto next_definition;
 		}
 got_bank_type:
@@ -861,8 +861,8 @@ next_definition:
 		goto parser_error;
 	return;
 parser_error:
-	printk(FREESTR(KERN_ERR "[cmdline][error=%d] Malformed `ram' argument %q\n"),
-	       json_error, arg);
+	kernel_panic(FREESTR("Malformed `ram' argument %q (error=%d)\n"),
+	             json_error, arg);
 }
 
 /* 'ram=[{ "type": "ram", "start": 0x1000000, "size": 0x4000 }, { ... }]'
