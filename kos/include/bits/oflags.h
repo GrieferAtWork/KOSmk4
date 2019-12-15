@@ -28,7 +28,7 @@
 #define __O_RDWR            0x002 /* Read/Write file access */
 #define __O_ACCMODE_INVALID 0x003 /* Invalid ACCMODE value. */
 /*      __O_RDWR            0x003 */
-#endif
+#endif /* !__O_ACCMODE */
 
 #ifndef __O_TRUNC
 #define __O_TRUNC       0x200 /* Truncate (clear) the named file if it already exists,

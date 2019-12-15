@@ -896,9 +896,9 @@ INTERN NONNULL((1)) int CC libvm86_step(vm86_state_t *__restrict self) {
 		len = (size_t)disasm_print_line_nolf(&da);
 		if (len < 60)
 			printk(KERN_RAW "%*s", 60 - len, "");
-		printk(KERN_RAW "\t# eax=%p, ecx=%p, edx=%p, ebx=%p, "
-		                "esp=%.4I16p:%.4I16p, ebp:%p, esi:%.4I16p:%.4I16p, edi:%.4I16p:%.4I16p, "
-		                "eip=%.4I16p:%.4I16p\n",
+		printk(KERN_RAW "\t# eax=%I32p, ecx=%I32p, edx=%I32p, ebx=%I32p, "
+		                "esp=%I16p:%I16p, ebp:%I32p, esi:%I16p:%I16p, edi:%I16p:%I16p, "
+		                "eip=%I16p:%I16p\n",
 		       self->vr_regs.vr_eax, self->vr_regs.vr_ecx,
 		       self->vr_regs.vr_edx, self->vr_regs.vr_ebx,
 		       self->vr_regs.vr_ss, self->vr_regs.vr_sp,
@@ -2713,7 +2713,8 @@ do_81h_reg##id##_op16:                                                          
 			DO_MEMW(addr, operand16);                                                       \
 		}                                                                                   \
 		break;                                                                              \
-		do_81h_reg##id##_op32: if (mod.mi_type == MODRM_REGISTER) {                         \
+do_81h_reg##id##_op32:                                                                      \
+		if (mod.mi_type == MODRM_REGISTER) {                                                \
 			DO_REGL(REG32(mod.mi_rm), operand32);                                           \
 		} else {                                                                            \
 			uint32_t *addr;                                                                 \

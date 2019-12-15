@@ -595,9 +595,8 @@ halt_unhandled_exception(unsigned int unwind_error,
 			if (!info->ei_trace[i])
 				break;
 		}
-		prev_last_pc = i < EXCEPT_BACKTRACE_SIZE
-		               ? (uintptr_t)info->ei_trace[i - 1]
-		               : kcpustate_getpc(&info->ei_state);
+		prev_last_pc = i ? (uintptr_t)info->ei_trace[i - 1]
+		                 : kcpustate_getpc(&info->ei_state);
 		if (!my_last_pc)
 			my_last_pc = prev_last_pc;
 		else if (my_last_pc != prev_last_pc) {

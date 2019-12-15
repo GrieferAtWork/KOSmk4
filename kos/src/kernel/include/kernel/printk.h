@@ -36,11 +36,13 @@ DECL_BEGIN
 #define KERN_DEFAULT "\001" "d"
 #define KERN_RAW     "\001" "r"
 
+#ifdef __CC__
 FUNDEF NOBLOCK void (VCALL printk)(char const *__restrict format, ...);
 FUNDEF NOBLOCK void (KCALL vprintk)(char const *__restrict format, __builtin_va_list args);
 
 /* @param: level: [0..1] The print level (One of `KERN_*'). */
 FUNDEF NOBLOCK ssize_t (KCALL kprinter)(void *level, char const *__restrict data, size_t datalen);
+#endif /* __CC__ */
 
 
 DECL_END

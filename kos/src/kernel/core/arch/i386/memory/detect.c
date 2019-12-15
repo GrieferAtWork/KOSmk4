@@ -26,11 +26,14 @@
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
-#include <kernel/realmode.h>
 
 #include <asm/cpu-flags.h>
+#include <sys/io.h>
 
+#include <stddef.h>
 #include <string.h>
+
+#include <libvm86/emulator.h>
 
 DECL_BEGIN
 
@@ -54,16 +57,19 @@ PRIVATE ATTR_FREERODATA struct pmembank const default_memory_banks[] = {
 INTDEF struct pmembank kernel_membanks_initial[];
 PUBLIC ATTR_COLDDATA struct pmeminfo minfo = {
 	 .mb_total = {
-		/* TODO: These totals are incorrect! (they have to match the banks defined by `default_memory_banks') */
-		/* [PMEMBANK_TYPE_UNDEF]     = */ (vm_phys_t)(0),
-		/* [PMEMBANK_TYPE_RAM]       = */ (vm_phys_t)(0),
-		/* [PMEMBANK_TYPE_PRESERVE]  = */ (vm_phys_t)(0),
-		/* [PMEMBANK_TYPE_ALLOCATED] = */ (vm_phys_t)(0),
-		/* [PMEMBANK_TYPE_KFREE]     = */ (vm_phys_t)(0),
-		/* [PMEMBANK_TYPE_KERNEL]    = */ (vm_phys_t)(0),
-		/* [PMEMBANK_TYPE_NVS]       = */ (vm_phys_t)(0),
-		/* [PMEMBANK_TYPE_DEVICE]    = */ (vm_phys_t)(0),
-		/* [PMEMBANK_TYPE_BADRAM]    = */ (vm_phys_t)(0),
+		/* NOTE: Memory totals are initialized in `x86_initialize_default_memory_banks'
+		 *       technically, this could be initialized at compile-/link-time, however
+		 *       doing so would be quite complicated, so I'm going to act like I don't
+		 *       know about this potential optimization for the time being... */
+		/* [PMEMBANK_TYPE_UNDEF]     = */ 0,
+		/* [PMEMBANK_TYPE_RAM]       = */ 0,
+		/* [PMEMBANK_TYPE_PRESERVE]  = */ 0,
+		/* [PMEMBANK_TYPE_ALLOCATED] = */ 0,
+		/* [PMEMBANK_TYPE_KFREE]     = */ 0,
+		/* [PMEMBANK_TYPE_KERNEL]    = */ 0,
+		/* [PMEMBANK_TYPE_NVS]       = */ 0,
+		/* [PMEMBANK_TYPE_DEVICE]    = */ 0,
+		/* [PMEMBANK_TYPE_BADRAM]    = */ 0,
 	},
 	 .mb_bankc = COMPILER_LENOF(default_memory_banks) - 1,
 	 .mb_banks = kernel_membanks_initial
@@ -71,11 +77,85 @@ PUBLIC ATTR_COLDDATA struct pmeminfo minfo = {
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_default_memory_banks)(void) {
+	unsigned int i;
 	memcpy(kernel_membanks_initial,
 	       default_memory_banks,
 	       sizeof(default_memory_banks));
+	/* Setup initial memory type totals.
+	 * XXX: This could be done at compile-/link-time */
+	for (i = 0; i < COMPILER_LENOF(default_memory_banks); ++i) {
+		vm_phys_t size;
+		u16 type;
+		size = PMEMBANK_TYPE_SIZE(default_memory_banks[i]);
+		type = default_memory_banks[i].mb_type;
+		minfo.mb_total[PMEMBANK_TYPE_UNDEF] -= size;
+		minfo.mb_total[type] += size;
+	}
 }
 
+/* Base address where the virtual memory mapping for vm86 begins. */
+#define VM86_VIRT_OFFSET    KERNEL_CORE_BASE
+#define VM86_BASE           0x7c00
+#define VM86_BUFFER         (VM86_VIRT_OFFSET + VM86_BASE)
+#define VM86_BUFFER_OFFSET  (VM86_BASE & 0xffff)
+#define VM86_BUFFER_SEG     ((VM86_BASE & 0xf0000) >> 4)
+
+
+PRIVATE WUNUSED NONNULL((1)) void *LIBVM86_TRANSLATE_CC
+vm86_translate(vm86_state_t *__restrict UNUSED(self), void *ptr) {
+	return (void *)((uintptr_t)ptr + VM86_VIRT_OFFSET);
+}
+
+PRIVATE int LIBVM86_CC
+vm86_io(vm86_state_t *__restrict UNUSED(self),
+        u16 port, unsigned int action,
+        void *data) {
+	int result = VM86_SUCCESS;
+	switch (action) {
+	case VM86_HANDLE_IO_INB:
+		*(uint8_t *)data = inb((port_t)port);
+		break;
+	case VM86_HANDLE_IO_INW:
+		*(uint16_t *)data = inw((port_t)port);
+		break;
+	case VM86_HANDLE_IO_INL:
+		*(uint32_t *)data = inl((port_t)port);
+		break;
+	case VM86_HANDLE_IO_OUTB:
+		outb((port_t)port, *(uint8_t *)data);
+		break;
+	case VM86_HANDLE_IO_OUTW:
+		outw((port_t)port, *(uint16_t *)data);
+		break;
+	case VM86_HANDLE_IO_OUTL:
+		outl((port_t)port, *(uint32_t *)data);
+		break;
+	default:
+		result = VM86_BADPORT;
+		break;
+	}
+	return result;
+}
+
+PRIVATE bool
+NOTHROW(KCALL interrupt)(vm86_state_t *__restrict self, u8 intno) {
+	int error;
+	self->vr_trans = &vm86_translate;
+	self->vr_io    = &vm86_io;
+	self->vr_intr  = NULL;
+	memset(self->vr_intr_pending, 0,
+	       sizeof(*self) -
+	       offsetof(vm86_state_t, vr_intr_pending));
+	self->vr_regs.vr_esp = (VM86_BASE + 256) & 0xffff;
+	self->vr_regs.vr_ss  = ((VM86_BASE + 256) & 0xf0000) >> 4;
+	self->vr_regs.vr_eip = 0xffff;
+	self->vr_regs.vr_cs  = 0xffff;
+	/* Generate a software interrupt */
+	vm86_sw_intr(self, intno);
+	/* Execute VM86 code. */
+	error = vm86_exec(self);
+	return error >= 0;
+}
 
 
 struct smap_entry {
@@ -86,30 +166,30 @@ struct smap_entry {
 	u32 sm_type;
 	u32 sm_acpi;
 };
-#define SMAP_BUFFER   ((struct smap_entry *)x86_realmode_buffer_addr)
 
+#define SMAP_BUFFER ((struct smap_entry *)(VM86_VIRT_OFFSET + 0x7c00))
 INTDEF FREE u8 const memtype_bios_matrix[6];
 
 PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_e820)(void) {
 	struct smap_entry *entry;
-	struct rmcpustate state;
+	vm86_state_t state;
 	bool result = false;
-	memset(&state, 0, sizeof(state));
-	state.rmcs_ebx = 0; /* continue-id. */
-	entry          = SMAP_BUFFER;
+	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
+/*	state.vr_regs.vr_ebx = 0; * continue-id. */
+	entry                = SMAP_BUFFER;
 	do {
-		state.rmcs_eax   = 0xe820;
-		state.rmcs_ecx   = sizeof(struct smap_entry);
-		state.rmcs_edx   = 0x534d4150;
-		state.rmcs_edi   = x86_realmode_buffer_offset;
-		state.rmcs_es    = x86_realmode_buffer_segment;
-		state.rmcs_intno = 0x15;
-		x86_realmode_interrupt(&state); /* Execute realmode interrupt. */
-		if (state.rmcs_eflags & EFLAGS_CF)
+		state.vr_regs.vr_eax   = 0xe820;
+		state.vr_regs.vr_ecx   = sizeof(struct smap_entry);
+		state.vr_regs.vr_edx   = 0x534d4150;
+		state.vr_regs.vr_edi   = VM86_BUFFER_OFFSET;
+		state.vr_regs.vr_es    = VM86_BUFFER_SEG;
+		if (!interrupt(&state, 0x15))
+			break; /* Execute realmode interrupt. */
+		if (state.vr_regs.vr_eflags & EFLAGS_CF)
 			break; /* Unsupported. */
-		if (state.rmcs_eax != 0x534d4150)
+		if (state.vr_regs.vr_eax != 0x534d4150)
 			break; /* Error. */
-		if (state.rmcs_ecx > 20 && (entry->sm_acpi & 1) == 0)
+		if (state.vr_regs.vr_ecx > 20 && (entry->sm_acpi & 1) == 0)
 			continue; /* Ignored. */
 		if (entry->sm_type >= COMPILER_LENOF(memtype_bios_matrix))
 			entry->sm_type = 0;
@@ -119,44 +199,44 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_e820)(void) {
 		              (vm_phys_t)entry->sm_size_lo | (vm_phys_t)entry->sm_size_hi << 32,
 		              memtype_bios_matrix[entry->sm_type]);
 		result = true;
-	} while (state.rmcs_ebx);
+	} while (state.vr_regs.vr_ebx);
 	return result;
 }
 
 PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_e801)(void) {
-	struct rmcpustate state;
-	memset(&state, 0, sizeof(state));
-	state.rmcs_eax   = 0xe801;
-	state.rmcs_intno = 0x15;
-	x86_realmode_interrupt(&state); /* Execute realmode interrupt. */
-	if (state.rmcs_eflags & EFLAGS_CF)
+	vm86_state_t state;
+	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
+	state.vr_regs.vr_eax = 0xe801;
+	if (!interrupt(&state, 0x15))
+		return false; /* Execute realmode interrupt. */
+	if (state.vr_regs.vr_eflags & EFLAGS_CF)
 		return false; /* Check for errors. */
-	state.rmcs_eax &= 0xffff;
-	state.rmcs_ecx &= 0xffff;
-	state.rmcs_edx &= 0xffff;
-	state.rmcs_ebx &= 0xffff;
+	state.vr_regs.vr_eax &= 0xffff;
+	state.vr_regs.vr_ecx &= 0xffff;
+	state.vr_regs.vr_edx &= 0xffff;
+	state.vr_regs.vr_ebx &= 0xffff;
 	/* Fix broken BIOS return registers. */
-	if (!state.rmcs_ecx)
-		state.rmcs_ecx = state.rmcs_eax;
-	if (!state.rmcs_edx)
-		state.rmcs_edx = state.rmcs_ebx;
-	if (state.rmcs_ecx > 0x3c00)
+	if (!state.vr_regs.vr_ecx)
+		state.vr_regs.vr_ecx = state.vr_regs.vr_eax;
+	if (!state.vr_regs.vr_edx)
+		state.vr_regs.vr_edx = state.vr_regs.vr_ebx;
+	if (state.vr_regs.vr_ecx > 0x3c00)
 		return false; /* Don't trust a broken value... */
-	minfo_addbank((vm_phys_t)0x00100000, (vm_phys_t)state.rmcs_ecx * 1024, PMEMBANK_TYPE_RAM);
-	minfo_addbank((vm_phys_t)0x01000000, (vm_phys_t)state.rmcs_edx * 64 * 1024, PMEMBANK_TYPE_RAM);
+	minfo_addbank((vm_phys_t)0x00100000, (vm_phys_t)state.vr_regs.vr_ecx * 1024, PMEMBANK_TYPE_RAM);
+	minfo_addbank((vm_phys_t)0x01000000, (vm_phys_t)state.vr_regs.vr_edx * 64 * 1024, PMEMBANK_TYPE_RAM);
 	return true;
 }
 
 PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_da88)(void) {
-	struct rmcpustate state;
+	vm86_state_t state;
 	u32 count;
-	memset(&state, 0, sizeof(state));
-	state.rmcs_eax   = 0xda88;
-	state.rmcs_intno = 0x15;
-	x86_realmode_interrupt(&state); /* Execute realmode interrupt. */
-	if (state.rmcs_eflags & EFLAGS_CF)
+	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
+	state.vr_regs.vr_eax   = 0xda88;
+	if (!interrupt(&state, 0x15))
+		return false; /* Execute realmode interrupt. */
+	if (state.vr_regs.vr_eflags & EFLAGS_CF)
 		return false;
-	count = ((u32)(state.rmcs_ebx & 0xffff) << 8 | (u32)(state.rmcs_ecx & 0xff)) * 1024;
+	count = ((u32)(state.vr_regs.vr_ebx & 0xffff) << 8 | (u32)(state.vr_regs.vr_ecx & 0xff)) * 1024;
 	minfo_addbank((vm_phys_t)0x00100000,
 	              (vm_phys_t)count,
 	              PMEMBANK_TYPE_RAM);
@@ -164,15 +244,15 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_da88)(void) {
 }
 
 PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_88)(void) {
-	struct rmcpustate state;
+	vm86_state_t state;
 	u32 count;
-	memset(&state, 0, sizeof(state));
-	state.rmcs_eax   = 0x88;
-	state.rmcs_intno = 0x15;
-	x86_realmode_interrupt(&state); /* Execute realmode interrupt. */
-	if (state.rmcs_eflags & EFLAGS_CF)
+	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
+	state.vr_regs.vr_eax   = 0x88;
+	if (!interrupt(&state, 0x15))
+		return false; /* Execute realmode interrupt. */
+	if (state.vr_regs.vr_eflags & EFLAGS_CF)
 		return false;
-	count = (u32)(state.rmcs_eax & 0xffff) * 1024;
+	count = (u32)(state.vr_regs.vr_eax & 0xffff) * 1024;
 	minfo_addbank((vm_phys_t)0x00100000,
 	              (vm_phys_t)count,
 	              PMEMBANK_TYPE_RAM);
@@ -180,16 +260,16 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_88)(void) {
 }
 
 PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_8a)(void) {
-	struct rmcpustate state;
+	vm86_state_t state;
 	u32 count;
-	memset(&state, 0, sizeof(state));
-	state.rmcs_eax   = 0x8a;
-	state.rmcs_intno = 0x15;
-	x86_realmode_interrupt(&state); /* Execute realmode interrupt. */
-	if (state.rmcs_eflags & EFLAGS_CF)
+	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
+	state.vr_regs.vr_eax   = 0x8a;
+	if (!interrupt(&state, 0x15))
+		return false; /* Execute realmode interrupt. */
+	if (state.vr_regs.vr_eflags & EFLAGS_CF)
 		return false;
-	count = ((u32)(state.rmcs_edx & 0xffff) |
-	         (u32)(state.rmcs_eax & 0xffff) << 16) *
+	count = ((u32)(state.vr_regs.vr_edx & 0xffff) |
+	         (u32)(state.vr_regs.vr_eax & 0xffff) << 16) *
 	        1024;
 	minfo_addbank((vm_phys_t)0x00100000,
 	              (vm_phys_t)count,
@@ -203,18 +283,18 @@ struct c7_record {
 	u32 r_16x;  /* 06h: Amount of local memory between 16MB and 4GB, in 1KB blocks. */
 	/* There are more fields here, but they don't matter to us... */
 };
-#define C7_RECORD ((struct c7_record *)x86_realmode_buffer_addr)
+#define C7_RECORD ((struct c7_record *)VM86_BUFFER)
 
 PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_c7)(void) {
-	struct rmcpustate state;
-	memset(&state, 0, sizeof(state));
+	vm86_state_t state;
+	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
 	memset(C7_RECORD, 0, sizeof(*C7_RECORD));
-	state.rmcs_eax   = 0xc7;
-	state.rmcs_esi   = x86_realmode_buffer_offset;
-	state.rmcs_ds    = x86_realmode_buffer_segment;
-	state.rmcs_intno = 0x15;
-	x86_realmode_interrupt(&state); /* Execute realmode interrupt. */
-	if (state.rmcs_eflags & EFLAGS_CF)
+	state.vr_regs.vr_eax   = 0xc7;
+	state.vr_regs.vr_esi   = VM86_BUFFER_OFFSET;
+	state.vr_regs.vr_ds    = VM86_BUFFER_SEG;
+	if (!interrupt(&state, 0x15))
+		return false; /* Execute realmode interrupt. */
+	if (state.vr_regs.vr_eflags & EFLAGS_CF)
 		return false;
 	if (C7_RECORD->r_1x > 0x3c00)
 		return false; /* Don't trust a broken value... */
@@ -242,7 +322,6 @@ NOTHROW(KCALL log_badmethod)(char const *name) {
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_memory_via_bios)(void) {
-	x86_realmode_initialize();
 #define TRY_METHOD(name, func)                                              \
 	do {                                                                    \
 		char const *_name = FREESTR(name);                                  \
@@ -271,7 +350,7 @@ NOTHROW(KCALL x86_initialize_memory_via_bios)(void) {
 	/* ... */
 #undef RANGE
 done:
-	x86_realmode_finalize();
+	;
 }
 
 DECL_END

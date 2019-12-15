@@ -336,18 +336,18 @@ __nextfmt:
 				__length = __PRINTF_LENGTH_SIZE;
 			if (!(__flags & __PRINTF_F_HASPREC)) {
 				__precision = sizeof(void *) * 2;
-#if __SIZEOF_POINTER__ < 8
+#if __SIZEOF_POINTER__ != 8
 				if ((__length & 0xf0) == 0x30)
 					__precision = 16;
-#endif /* __SIZEOF_POINTER__ < 8 */
-#if __SIZEOF_POINTER__ < 4
+#endif /* __SIZEOF_POINTER__ != 8 */
+#if __SIZEOF_POINTER__ != 4
 				if ((__length & 0xf0) == 0x20)
 					__precision = 8;
-#endif /* __SIZEOF_POINTER__ < 4 */
-#if __SIZEOF_POINTER__ < 2
+#endif /* __SIZEOF_POINTER__ != 4 */
+#if __SIZEOF_POINTER__ != 2
 				if ((__length & 0xf0) == 0x10)
 					__precision = 4;
-#endif /* __SIZEOF_POINTER__ < 2 */
+#endif /* __SIZEOF_POINTER__ != 2 */
 				__flags |= __PRINTF_F_HASPREC;
 			}
 			__ATTR_FALLTHROUGH

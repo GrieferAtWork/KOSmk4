@@ -30,29 +30,20 @@
 #include <kernel/memory.h>
 #include <kernel/multiboot.h>
 #include <kernel/printk.h>
+#include <kernel/rand.h>
 #include <kernel/types.h>
 
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
 /**/
-#include <kernel/debugtrap.h> /* TODO: Remove me; `kernel_debugtrap()' should be called by _start32.S */
-#include <kos/debugtrap.h>    /* TODO: Remove me; `kernel_debugtrap()' should be called by _start32.S */
-#include <signal.h>           /* TODO: Remove me; `kernel_debugtrap()' should be called by _start32.S */
-
-/**/
 #include <kernel/syscall.h> /* TODO: Remove me; Only used for `syscall_tracing_setenabled()' */
 
 /**/
-#include <kernel/panic.h> /* TODO: Remove me; Only used for boot_partition-init */
+#include <dev/block.h>    /* TODO: Remove me; Only used for boot_partition-init */
 #include <fs/node.h>      /* TODO: Remove me; Only used for boot_partition-init */
 #include <fs/vfs.h>       /* TODO: Remove me; Only used for boot_partition-init */
-#include <dev/block.h>    /* TODO: Remove me; Only used for boot_partition-init */
-
-/**/
-#include <kernel/rand.h> /* TODO: Remove me; Only used for rand-init */
-#include <sys/io.h>      /* TODO: Remove me; Only used for rand-init */
-
+#include <kernel/panic.h> /* TODO: Remove me; Only used for boot_partition-init */
 
 /**/
 #include <assert.h>
@@ -125,6 +116,16 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Load default memory banks. */
 	x86_initialize_default_memory_banks();
 
+	/* Run task initialization callbacks on the boot task, initializing
+	 * important structures such as the r/w-lock descriptor and the task
+	 * signal connection manager.
+	 * NOTE: We do this now since r/w-locks and signal connections are
+	 *       required by the Unwind-FDE cache sub-system, meaning that
+	 *       they are also required for us to be able to handle exceptions.
+	 * In other words: Only once this function has been called can we
+	 *                 start making use of exceptions safely. */
+	kernel_initialize_scheduler_callbacks();
+
 	/* Load multiboot information.
 	 * NOTE: All information provided by the bootloader is assumed
 	 *       to be located within the first 1Gb of physical memory! */
@@ -163,16 +164,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 		       ? FREESTR("MiB")
 		       : FREESTR("KiB"));
 	}
-
-	/* Run task initialization callbacks on the boot task, initializing
-	 * important structures such as the r/w-lock descriptor and the task
-	 * signal connection manager.
-	 * NOTE: We do this now since r/w-locks and signal connections are
-	 *       required by the Unwind-FDE cache sub-system, meaning that
-	 *       they are also required for us to be able to handle exceptions.
-	 * In other words: Only once this function has been called can we
-	 *                 start making use of exceptions safely. */
-	kernel_initialize_scheduler_callbacks();
 
 	/* Initialize SMP.
 	 * NOTE: This must be done while the physical identity mapping is still

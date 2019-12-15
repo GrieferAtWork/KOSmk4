@@ -123,7 +123,7 @@ libvm86_sw_intr(vm86_state_t *__restrict self, uint8_t intno) {
 		uint16_t *volatile base = (uint16_t *)0;
 		uint16_t cs, ip;
 		if (self->vr_trans)
-			base = (uint16_t *)(*self->vr_trans)(self, NULL);
+			base = (uint16_t *)(*self->vr_trans)(self, 0);
 		TRY {
 			ip = base[(intno * 2) + 0];
 			cs = base[(intno * 2) + 1];
@@ -134,7 +134,9 @@ libvm86_sw_intr(vm86_state_t *__restrict self, uint8_t intno) {
 		}
 		if (!vm86_state_hasstack(self, 6))
 			return VM86_DOUBLE_FAULT;
-		sp     = (uint16_t *)vm86_state_sp(self);
+		sp = (uint16_t *)vm86_state_sp(self);
+		if (self->vr_trans)
+			sp = (uint16_t *)(*self->vr_trans)(self, sp);
 		sp[-1] = self->vr_regs.vr_flags;
 		sp[-2] = self->vr_regs.vr_cs;
 		sp[-3] = self->vr_regs.vr_ip;

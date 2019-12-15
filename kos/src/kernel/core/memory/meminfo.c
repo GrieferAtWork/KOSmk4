@@ -311,7 +311,7 @@ again:
 		 * which is already in short supply, and which we'll still be needing for
 		 * initialization of APIC/SMP trampoline code, or other real-mode/BIOS related
 		 * stuff that can only exist below the physical 1MiB (16-bit 0xffff) mark. */
-		if unlikely(bank_alloc_page <= addr2page((uintptr_t)__kernel_start - KERNEL_BASE) &&
+		if unlikely(bank_alloc_page <= addr2page((uintptr_t)__kernel_start - KERNEL_CORE_BASE) &&
 		            !allow_beneath_kernel)
 			continue;
 #endif /* __i386__ || __x86_64__ */
@@ -485,7 +485,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
 	       req_bytes, req_pages);
 	kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_size = req_pages;
 	kernel_vm_part_pagedata.dp_tree.a_vmax = (datapage_t)(req_pages - 1);
-	buffer = (byte_t *)(KERNEL_BASE + page2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start));
+	buffer = (byte_t *)(KERNEL_CORE_BASE + page2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start));
 	kernel_vm_node_pagedata.vn_node.a_vmin = PAGEID_ENCODE(buffer);
 	kernel_vm_node_pagedata.vn_node.a_vmax = kernel_vm_node_pagedata.vn_node.a_vmin + req_pages - 1;
 	/* With the required buffer now allocated, we can move on to populating it with data.

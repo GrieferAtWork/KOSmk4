@@ -33,7 +33,7 @@ typedef __UINT16_TYPE__ sa_family_t;
 #endif /* !__sa_family_t_defined */
 
 #define __SOCKADDR_COMMON(sa_prefix) sa_family_t sa_prefix##family
-#define __SOCKADDR_COMMON_SIZE      (sizeof(sa_family_t))
+#define __SOCKADDR_COMMON_SIZE       __SIZEOF_SA_FAMILY_T__
 #define _SS_SIZE                     128
 
 __SYSDECL_END

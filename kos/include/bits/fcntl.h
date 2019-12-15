@@ -19,11 +19,14 @@
 #ifndef _BITS_FCNTL_H
 #define _BITS_FCNTL_H 1
 
+#include <__crt.h>
 #include <__stdinc.h>
-#include <bits/types.h>
-#include <bits/oflags.h>
-#include <hybrid/typecore.h>
 #include <features.h>
+
+#include <hybrid/typecore.h>
+
+#include <bits/oflags.h>
+#include <bits/types.h>
 
 #ifdef __USE_GNU
 #include <bits/uio.h>

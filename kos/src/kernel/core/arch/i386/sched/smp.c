@@ -58,18 +58,18 @@ PRIVATE ATTR_FREETEXT MpFloatingPointerStructure *
 NOTHROW(KCALL Mp_LocateFloatingPointStructureInAddressRange)(VIRT uintptr_t base, size_t bytes) {
 	uintptr_t iter, end;
 	/* Make sure not to search unmapped memory! */
-	if (base < KERNEL_BASE) {
+	if (base < KERNEL_CORE_BASE) {
 		base += bytes;
-		if (base <= KERNEL_BASE)
+		if (base <= KERNEL_CORE_BASE)
 			return NULL;
-		bytes = base - KERNEL_BASE;
-		base  = KERNEL_BASE;
+		bytes = base - KERNEL_CORE_BASE;
+		base  = KERNEL_CORE_BASE;
 	}
 	if ((base + bytes) < base)
 		bytes = 0 - base;
 	end = (iter = (uintptr_t)base) + bytes;
 	printk(FREESTR(KERN_DEBUG "Searching for MpFloatingPointerStructure in %p...%p\n"),
-	       iter - KERNEL_BASE, (end - 1) - KERNEL_BASE);
+	       iter - KERNEL_CORE_BASE, (end - 1) - KERNEL_CORE_BASE);
 	/* Clamp the search area to a 16-byte alignment. */
 	iter = CEIL_ALIGN(iter, MPFPS_ALIGN);
 	end  = FLOOR_ALIGN(end, MPFPS_ALIGN);
@@ -93,15 +93,15 @@ NOTHROW(KCALL Mp_LocateFloatingPointStructure)(void) {
 	/* NOTE: No need to identity-map these, as they're all part of the
 	 *       first 1Gb of physical memory, which is fully mapped at this
 	 *       point, both in 32-bit and 64-bit mode. */
-	base   = (uintptr_t)*(u16 volatile *)(KERNEL_BASE + 0x40E);
-	result = Mp_LocateFloatingPointStructureInAddressRange(KERNEL_BASE + base, 1024);
+	base   = (uintptr_t)*(u16 volatile *)(KERNEL_CORE_BASE + 0x40E);
+	result = Mp_LocateFloatingPointStructureInAddressRange(KERNEL_CORE_BASE + base, 1024);
 	if (result)
 		goto done;
-	base   = (uintptr_t)*(u16 volatile *)(KERNEL_BASE + 0x413);
-	result = Mp_LocateFloatingPointStructureInAddressRange(KERNEL_BASE + base * 1024, 1024);
+	base   = (uintptr_t)*(u16 volatile *)(KERNEL_CORE_BASE + 0x413);
+	result = Mp_LocateFloatingPointStructureInAddressRange(KERNEL_CORE_BASE + base * 1024, 1024);
 	if (result)
 		goto done;
-	result = Mp_LocateFloatingPointStructureInAddressRange(KERNEL_BASE + 0x0f0000, 64 * 1024);
+	result = Mp_LocateFloatingPointStructureInAddressRange(KERNEL_CORE_BASE + 0x0f0000, 64 * 1024);
 done:
 	return result;
 }
@@ -126,7 +126,7 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 		return;
 	}
 	printk(FREESTR(KERN_DEBUG "MpFloatingPointerStructure located at %p (v1.%I8u; defcfg %I8u)\n"),
-	       ((uintptr_t)fps - KERNEL_BASE), fps->mp_specrev, fps->mp_defcfg);
+	       ((uintptr_t)fps - KERNEL_CORE_BASE), fps->mp_specrev, fps->mp_defcfg);
 	if (fps->mp_defcfg) {
 		/* Default configuration. */
 		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_start = (pageptr_t)(UINT32_C(0xfee00000) / PAGESIZE);
@@ -140,7 +140,7 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 	/* Check pointer location. */
 	if (fps->mp_cfgtab >= 0x40000000)
 		return;
-	table = (MpConfigurationTable *)((uintptr_t)fps->mp_cfgtab + KERNEL_BASE);
+	table = (MpConfigurationTable *)((uintptr_t)fps->mp_cfgtab + KERNEL_CORE_BASE);
 	/* Check signature. */
 	if (UNALIGNED_GET32((u32 *)table->tab_sig) != ENCODE_INT32('P', 'C', 'M', 'P'))
 		return;

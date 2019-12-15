@@ -79,18 +79,18 @@ PRIVATE ATTR_FREETEXT RSDPDescriptor *
 NOTHROW(KCALL RSDP_LocateInRange)(VIRT uintptr_t base, size_t bytes) {
 	uintptr_t iter, end;
 	/* Make sure not to search unmapped memory! */
-	if (base < KERNEL_BASE) {
+	if (base < KERNEL_CORE_BASE) {
 		base += bytes;
-		if (base <= KERNEL_BASE)
+		if (base <= KERNEL_CORE_BASE)
 			return NULL;
-		bytes = base - KERNEL_BASE;
-		base  = KERNEL_BASE;
+		bytes = base - KERNEL_CORE_BASE;
+		base  = KERNEL_CORE_BASE;
 	}
 	if ((base + bytes) < base)
 		bytes = 0 - base;
 	end = (iter = (uintptr_t)base) + bytes;
 	printk(FREESTR(KERN_DEBUG "Searching for RSDPDescriptor in %p...%p\n"),
-	       iter - KERNEL_BASE, (end - 1) - KERNEL_BASE);
+	       iter - KERNEL_CORE_BASE, (end - 1) - KERNEL_CORE_BASE);
 	/* Clamp the search area to a 16-byte alignment. */
 	iter = CEIL_ALIGN(iter, RSDPDESCRIPTOR_ALIGN);
 	end  = FLOOR_ALIGN(end, RSDPDESCRIPTOR_ALIGN);
@@ -118,11 +118,11 @@ PRIVATE ATTR_FREETEXT RSDPDescriptor *
 NOTHROW(KCALL RSDP_LocateDescriptor)(void) {
 	RSDPDescriptor *result;
 	uintptr_t base;
-	base = (uintptr_t)*(u16 volatile *)(KERNEL_BASE + 0x40E);
-	result = RSDP_LocateInRange(KERNEL_BASE + base, 1024);
+	base = (uintptr_t)*(u16 volatile *)(KERNEL_CORE_BASE + 0x40E);
+	result = RSDP_LocateInRange(KERNEL_CORE_BASE + base, 1024);
 	if (result)
 		goto done;
-	result = RSDP_LocateInRange(KERNEL_BASE + 0x0e0000, 0x020000);
+	result = RSDP_LocateInRange(KERNEL_CORE_BASE + 0x0e0000, 0x020000);
 done:
 	return result;
 }
@@ -141,7 +141,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 		return;
 	}
 	printk(FREESTR(KERN_DEBUG "RSDPDescriptor located at %p [oem: %.?q, rev: %I8u]\n"),
-	       (uintptr_t)rsdp - KERNEL_BASE,
+	       (uintptr_t)rsdp - KERNEL_CORE_BASE,
 	       COMPILER_LENOF(rsdp->rsdp_oemid),
 	       rsdp->rsdp_oemid,
 	       rsdp->rsdp_revision);

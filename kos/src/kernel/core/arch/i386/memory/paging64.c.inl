@@ -1375,8 +1375,14 @@ NOTHROW(FCALL p64_pagedir_gethint)(VIRT void *addr) {
 	vec4 = P64_PDIR_VEC4INDEX(addr);
 	vec3 = P64_PDIR_VEC3INDEX(addr);
 	vec2 = P64_PDIR_VEC2INDEX(addr);
-	assert(P64_PDIR_E4_IDENTITY[vec4].p_word & P64_PAGE_FPRESENT);
-	assert(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word & P64_PAGE_FPRESENT);
+	word = P64_PDIR_E4_IDENTITY[vec4].p_word;
+	if unlikely(!(word & P64_PAGE_FPRESENT))
+		return NULL; /* Not mapped */
+	word = P64_PDIR_E3_IDENTITY[vec4][vec3].p_word;
+	if unlikely(!(word & P64_PAGE_FPRESENT))
+		return NULL; /* Not mapped */
+	if unlikely(word & P64_PAGE_F1GIB)
+		return NULL; /* 2MiB page */
 	word = P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word;
 	if unlikely(!(word & P64_PAGE_FPRESENT))
 		return NULL; /* Not mapped */
@@ -1639,7 +1645,8 @@ NOTHROW(FCALL p64_pagedir_translate)(VIRT void *addr) {
 	vec4 = P64_PDIR_VEC4INDEX(addr);
 	vec3 = P64_PDIR_VEC3INDEX(addr);
 	vec2 = P64_PDIR_VEC2INDEX(addr);
-	assert(P64_PDIR_E4_IDENTITY[vec4].p_word & P64_PAGE_FPRESENT);
+	word = P64_PDIR_E4_IDENTITY[vec4].p_word;
+	assertf(word & P64_PAGE_FPRESENT, "Page at %p is not mapped", addr);
 	word = P64_PDIR_E3_IDENTITY[vec4][vec3].p_word;
 	assertf(word & P64_PAGE_FPRESENT, "Page at %p is not mapped", addr);
 	if unlikely(word & P64_PAGE_F1GIB)

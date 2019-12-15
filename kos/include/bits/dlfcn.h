@@ -120,7 +120,7 @@ __SYSDECL_BEGIN
 #ifndef RTLD_NOINIT
 #define RTLD_NOINIT    0x80000000
 #endif /* !RTLD_NOINIT */
-#endif
+#endif /* __USE_KOS && __KOS__ */
 
 #ifdef __USE_GNU
 #ifndef DL_CALL_FCT
@@ -135,11 +135,11 @@ __SYSDECL_BEGIN
  *      foo = DL_CALL_FCT(fctp,(arg1,arg2));
  */
 #ifdef __KERNEL__
-#define DL_CALL_FCT(fctp,args) (*(fctp)) args)
+#define DL_CALL_FCT(fctp, args) (*(fctp)) args)
 #else /* __KERNEL__ */
-#define DL_CALL_FCT(fctp,args) \
-       (_dl_mcount_wrapper_check((void *)(fctp)),(*(fctp)) args)
-extern void (_dl_mcount_wrapper_check)(void *__selfpc);
+#define DL_CALL_FCT(fctp, args) \
+	(_dl_mcount_wrapper_check((void *)(fctp)), (*(fctp))args)
+__IMPDEF void (_dl_mcount_wrapper_check)(void *__selfpc);
 #endif /* !__KERNEL__ */
 #endif /* !DL_CALL_FCT */
 #endif /* __USE_GNU */
