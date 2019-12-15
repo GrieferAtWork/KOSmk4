@@ -771,7 +771,7 @@ vm_datapart_loaddatapage(struct vm_datapart *__restrict self,
 	    : (__hybrid_atomic_load((self)->dp_pprop_p[(relative_datapageid) /                      \
 	                                               (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS)], \
 	                            __ATOMIC_ACQUIRE) >>                                            \
-	       (((relative_datapageid) % (BITSOF(uintptr_t) * VM_DATAPART_PPP_BITS)) *              \
+	       (((relative_datapageid) % (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS)) *              \
 	        VM_DATAPART_PPP_BITS)) &                                                            \
 	      VM_DATAPART_PPP_MASK))
 
