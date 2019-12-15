@@ -310,6 +310,13 @@ PRIVATE NOBLOCK ATTR_FREETEXT void
 NOTHROW(KCALL vm_node_destroy_locked_ram)(struct vm_node *__restrict self) {
 	assert(self->vn_block);
 	assert(self->vn_part);
+	assert(self->vn_link.ln_pself == &self->vn_part->dp_srefs);
+	assert(self->vn_link.ln_next == NULL);
+	assert(self->vn_part->dp_srefs == self);
+	/* Clear out the SREFS field, as `vm_datapart_destroy()'
+	 * will cause panic if that field is non-NULL */
+	self->vn_part->dp_srefs = NULL;
+	/* Drop references and free the node descriptor. */
 	decref_unlikely(self->vn_block);
 	decref_likely(self->vn_part);
 	kfree(self);
@@ -460,9 +467,13 @@ NOTHROW(KCALL cpu_free)(struct cpu *__restrict self) {
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 	cpu_basepage = PAGEID_ENCODE(self);
 	sync_write(&vm_kernel); /* Never throws due to early-boot guaranties. */
-	cpu_node1 = vm_paged_node_remove(&vm_kernel, cpu_basepage);
+	/* NOTE: Must remove `cpu_node2' first, since that vm_node object is actually
+	 *       stored inside of `cpu_node1', meaning that once that node is removed,
+	 *       the `cpu_node2' descriptor will automatically become invalid! */
 	cpu_node2 = vm_paged_node_remove(&vm_kernel, cpu_basepage + (size_t)__x86_cpu_part1_pages);
+	COMPILER_BARRIER();
 	cpu_node3 = vm_paged_node_remove(&vm_kernel, cpu_basepage + (size_t)__x86_cpu_part1_pages + 2);
+	cpu_node1 = vm_paged_node_remove(&vm_kernel, cpu_basepage);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if (!pagedir_prepare_map(self, ((size_t)__x86_cpu_part1_pages + 3) * PAGESIZE))
 		kernel_panic(FREESTR("Failed to prepare pagedir for unmapping CPU descriptor"));
@@ -475,12 +486,15 @@ NOTHROW(KCALL cpu_free)(struct cpu *__restrict self) {
 	assert(cpu_node1);
 	assert(cpu_node2);
 	assert(cpu_node3);
-	assert(vm_node_getminpageid(cpu_node1) == cpu_basepage);
-	assert(vm_node_getmaxpageid(cpu_node1) == cpu_basepage + (size_t)__x86_cpu_part1_pages - 1);
-	assert(vm_node_getminpageid(cpu_node2) == cpu_node1->vn_node.a_vmax + 1);
-	assert(vm_node_getmaxpageid(cpu_node2) == cpu_node2->vn_node.a_vmin + 1);
-	assert(vm_node_getminpageid(cpu_node3) == cpu_node2->vn_node.a_vmax + 1);
-	assert(vm_node_getmaxpageid(cpu_node3) == cpu_node3->vn_node.a_vmin);
+	assert(cpu_node1->vn_node.a_vmin == cpu_basepage);
+	assert(cpu_node1->vn_node.a_vmax == cpu_basepage + (size_t)__x86_cpu_part1_pages - 1);
+	/* NOTE: Because we've already removed the nodes from `vm_kernel', we must no longer
+	 *       access the `cpu_node2' structure, since the descriptor was contained inside
+	 *       of `cpu_node1' */
+	/*assert(cpu_node2->vn_node.a_vmin == cpu_node1->vn_node.a_vmax + 1);*/
+	/*assert(cpu_node2->vn_node.a_vmax == cpu_node1->vn_node.a_vmax + 2);*/
+	assert(cpu_node3->vn_node.a_vmin == cpu_node1->vn_node.a_vmax + 3);
+	assert(cpu_node3->vn_node.a_vmax == cpu_node3->vn_node.a_vmin);
 	assert(cpu_node2 == &FORCPU(self, thiscpu_x86_iobnode));
 	vm_node_destroy_locked_ram(cpu_node1);
 	vm_node_destroy_locked_ram(cpu_node3);
