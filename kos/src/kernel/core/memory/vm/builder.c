@@ -874,9 +874,9 @@ handle_remove_write_error:
 		/* Unlink the kernel-reserve node. */
 #ifndef NDEBUG
 #ifdef HIGH_MEMORY_KERNEL
-		node = vm_nodetree_remove(&target->v_tree, (pageid_t)KERNEL_BASE_PAGE);
+		node = vm_nodetree_remove(&target->v_tree, PAGEID_ENCODE(KERNEL_BASE));
 #else /* HIGH_MEMORY_KERNEL */
-		node = vm_nodetree_remove(&target->v_tree, (pageid_t)0);
+		node = vm_nodetree_remove(&target->v_tree, 0);
 #endif /* !HIGH_MEMORY_KERNEL */
 		assertf(node == &target->v_kernreserve,
 		        "node                   = %p\n"
@@ -884,9 +884,9 @@ handle_remove_write_error:
 		        node, &target->v_kernreserve);
 #else /* !NDEBUG */
 #ifdef HIGH_MEMORY_KERNEL
-		vm_nodetree_remove(&target->v_tree, (pageid_t)KERNEL_BASE_PAGE);
+		vm_nodetree_remove(&target->v_tree, PAGEID_ENCODE(KERNEL_BASE));
 #else /* HIGH_MEMORY_KERNEL */
-		vm_nodetree_remove(&target->v_tree, (pageid_t)0);
+		vm_nodetree_remove(&target->v_tree, 0);
 #endif /* !HIGH_MEMORY_KERNEL */
 #endif /* NDEBUG */
 		LLIST_REMOVE(&target->v_kernreserve, vn_byaddr);
