@@ -20,11 +20,15 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_HEAP_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/types.h>
+
 #include <hybrid/__bit.h>
 #include <hybrid/sequence/atree.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/typecore.h>
+
 #include "malloc-defs.h"
 
 DECL_BEGIN
@@ -32,10 +36,10 @@ DECL_BEGIN
 /* Heap debug initialization DWORDs */
 #ifdef CONFIG_DEBUG_HEAP
 #ifndef DEBUGHEAP_NO_MANS_LAND
-#define DEBUGHEAP_NO_MANS_LAND  0xdeadbeef /* Debug initialization of unallocated memory. */
+#define DEBUGHEAP_NO_MANS_LAND __UINT32_C(0xdeadbeef) /* Debug initialization of unallocated memory. */
 #endif /* !DEBUGHEAP_NO_MANS_LAND */
 #ifndef DEBUGHEAP_FRESH_MEMORY
-#define DEBUGHEAP_FRESH_MEMORY  0xaaaaaaaa /* Debug initialization of freshly allocated memory. */
+#define DEBUGHEAP_FRESH_MEMORY __UINT32_C(0xaaaaaaaa) /* Debug initialization of freshly allocated memory. */
 #endif /* !DEBUGHEAP_FRESH_MEMORY */
 #endif /* CONFIG_DEBUG_HEAP */
 

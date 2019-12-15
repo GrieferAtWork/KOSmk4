@@ -74,7 +74,8 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 	               *   `1 >= 1', meaning we'll never get here! */                \
 	)
 	struct vm_corepair_ptr corepair;
-	TRACE("core_page_alloc(%p,%p,%Iu,%Iu,%#x)\n", self, mapping_target, num_bytes, min_alignment, flags);
+	TRACE(PP_STR(FUNC(core_page_alloc)) "(%p, %p, %Iu, %Iu, %#x)\n",
+	      self, mapping_target, num_bytes, min_alignment, flags);
 	HEAP_ASSERT(num_bytes != 0);
 	HEAP_ASSERT(((uintptr_t)mapping_target & PAGEMASK) == 0 || mapping_target == CORE_PAGE_MALLOC_AUTO);
 	HEAP_ASSERT((num_bytes & PAGEMASK) == 0);
@@ -589,7 +590,7 @@ NOTHROW_NX(KCALL FUNC(heap_alloc_untraced))(struct heap *__restrict self,
                                             size_t num_bytes, gfp_t flags) {
 	struct heapptr result;
 	struct mfree **iter, **end;
-	TRACE("heap_alloc_untraced(%p,%Iu,%#x)\n", self, num_bytes, flags);
+	TRACE(PP_STR(FUNC(heap_alloc_untraced)) "(%p, %Iu, %#x)\n", self, num_bytes, flags);
 	if unlikely(OVERFLOW_UADD(num_bytes, (size_t)(HEAP_ALIGNMENT - 1), &result.hp_siz))
 		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes));
 	result.hp_siz &= ~(HEAP_ALIGNMENT - 1);
@@ -852,7 +853,7 @@ NOTHROW_NX(KCALL FUNC(heap_allat_partial))(struct heap *__restrict self,
 	size_t result;
 	struct mfree **pslot, *slot;
 	HEAP_ASSERT(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
-	TRACE("heap_allat_partial(%p,%p,%#x)\n", self, ptr, flags);
+	TRACE(PP_STR(FUNC(heap_allat_partial)) "(%p, %p, %#x)\n", self, ptr, flags);
 again:
 	addr_semi  = ATREE_SEMI0(uintptr_t);
 	addr_level = ATREE_LEVEL0(uintptr_t);
@@ -1005,7 +1006,7 @@ NOTHROW_NX(KCALL FUNC(heap_allat_untraced))(struct heap *__restrict self,
                                             size_t num_bytes, gfp_t flags) {
 	size_t unused_size, alloc_size;
 	size_t result = 0;
-	TRACE("heap_allat_untraced(%p,%p,%Iu,%#x)\n", self, ptr, num_bytes, flags);
+	TRACE(PP_STR(FUNC(heap_allat_untraced)) "(%p, %p, %Iu, %#x)\n", self, ptr, num_bytes, flags);
 	if unlikely(!IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT))
 		goto err; /* Badly aligned pointer (can't allocate anything here...) */
 	if unlikely(OVERFLOW_UADD(num_bytes, (size_t)(HEAP_ALIGNMENT - 1), &alloc_size))

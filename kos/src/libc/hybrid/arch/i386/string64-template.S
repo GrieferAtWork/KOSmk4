@@ -17,6 +17,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #include <hybrid/compiler.h>
+
 #include <asm/cfi.h>
 #include <asm/instr/movzxq.h>
 
@@ -140,10 +141,9 @@ INTERN_FUNCTION(F(libc_memset))
 	movq   %rdx, %rax
 #endif /* !RETURN_PCPY */
 #elif N == 4
-	movl   %esi, %esi /* RSI = ESI & 0xffffffff */
-	movl   %esi, %eax
-	shrq   $(32),  %rax
-	orq    %rsi, %rax /* RAX = ESI << 32 | ESI */
+	movzlq %esi, %rax /* RAX = ESI & 0xffffffff */
+	shlq   $(32),  %rsi
+	orq    %rsi, %rax /* RAX = ESI | ESI << 32 */
 	movq   %rdx, %rcx
 #if !RETURN_PCPY
 	movq   %rdi, %rdx
