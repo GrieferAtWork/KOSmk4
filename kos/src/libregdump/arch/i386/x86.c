@@ -18,6 +18,7 @@
  */
 #ifndef GUARD_LIBREGDUMP_ARCH_I386_X86_C
 #define GUARD_LIBREGDUMP_ARCH_I386_X86_C 1
+#define DISABLE_BRANCH_PROFILING 1
 #define _KOS_SOURCE 1
 #define _KOS_KERNEL_SOURCE 1
 
@@ -86,6 +87,14 @@ err:               \
 #define GPREGS_MAXLEN  2
 #define GPREGS_FIRSTCH 'r'
 PRIVATE char const gpregs_names[GPREGS_COUNT][2] = {
+	{ '1', '5' },
+	{ '1', '4' },
+	{ '1', '3' },
+	{ '1', '2' },
+	{ '1', '1' },
+	{ '1', '0' },
+	{ '9', ' ' },
+	{ '8', ' ' },
 	{ 'd', 'i' },
 	{ 's', 'i' },
 	{ 'b', 'p' },
@@ -94,14 +103,6 @@ PRIVATE char const gpregs_names[GPREGS_COUNT][2] = {
 	{ 'd', 'x' },
 	{ 'c', 'x' },
 	{ 'a', 'x' },
-	{ '8', ' ' },
-	{ '9', ' ' },
-	{ '1', '0' },
-	{ '1', '1' },
-	{ '1', '2' },
-	{ '1', '3' },
-	{ '1', '4' },
-	{ '1', '5' },
 };
 #else /* __x86_64__ */
 #define GPREGS_COUNT 8
