@@ -122,12 +122,12 @@ INTERN_FUNCTION(x86_pic_acknowledge)
 	.endr
 END(x86_pic_acknowledge)
 
-	movq   %gs:0, %rdi           /* cpu_scheduler_interrupt::struct task *__restrict thread */
+	movq   %gs:0, %rsi          /* cpu_scheduler_interrupt::struct task *__restrict thread */
 	EXTERN(this_sched_state)
-	movq   %rsp, this_sched_state(%rdi)
+	movq   %rsp, this_sched_state(%rsi)
 	EXTERN(this_cpu)
-	movq   this_cpu(%rdi), %rbx /* THIS_CPU */
-	movq   %rbx, %rcx            /* cpu_scheduler_interrupt::struct cpu *__restrict caller */
+	movq   this_cpu(%rsi), %rbx /* THIS_CPU */
+	movq   %rbx, %rdi           /* cpu_scheduler_interrupt::struct cpu *__restrict caller */
 
 	/* Invoke the C-level interrupt implementation. */
 	EXTERN(cpu_scheduler_interrupt)
@@ -148,9 +148,6 @@ INTERN_FUNCTION(x86_load_thread_rax_cpu_rbx)
 	EXTERN(thiscpu_x86_tss)
 	movq   %rcx, thiscpu_x86_tss + OFFSET_TSS_RSP0(%rbx)
 
-	/* Update the kernel TLS pointer. */
-	wrgsbaseq %rax
-
 #ifndef CONFIG_NO_FPU
 	/* Disable the FPU, preparing it to be loaded lazily. */
 	movq   %cr0, %rcx
@@ -166,29 +163,40 @@ INTERN_FUNCTION(x86_load_thread_rax_cpu_rbx)
 
 	/* Check if the old thread had its I/O permissions bitmap loaded. */
 	EXTERN(thiscpu_x86_ioperm_bitmap)
-	cmpq   $(0), thiscpu_x86_ioperm_bitmap(%ebx)
+	cmpq   $(0), thiscpu_x86_ioperm_bitmap(%rbx)
 	jnz    .Llazy_disable_ioperm_bitmap
 .Llazy_disable_ioperm_bitmap_return:
 
 	.cfi_remember_state
 
-
 	/* Update the used page directory pointer. */
 	EXTERN(this_vm)
 	movq   this_vm(%rax), %rcx
 	EXTERN(thisvm_pdir_phys_ptr)
-	movq   thisvm_pdir_phys_ptr(%rcx), %rax
+	movq   thisvm_pdir_phys_ptr(%rcx), %rdi
 	movq   %cr3, %rdx
-	cmpq   %rdx, %rax
+	cmpq   %rdx, %rdi
 	je     1f
-	movq   %rax, %cr3
+	movq   %rdi, %cr3
 	/* Reload debug registers */
-	reload_x86_debug_registers %rcx, %rax, %rdx, 1
+	reload_x86_debug_registers %rcx, %rdi, %rsi, 1
 1:
 
-.Lload_scpustate_rsp:
-	/* Load the underlying CPU state */
-	ASM_POP_SCPUSTATE_BEFORE_IRET_CFI_R
+.Lload_scpustate_rsp_gsbase_rax:
+	/* Load segment registers. */
+	ASM_POP_SGREGS_CFI_R(%rcx)
+
+	/* Update the kernel TLS pointer.
+	 * NOTE: This must be done _after_ segment registers were loaded! */
+	wrgsbaseq %rax
+
+	/* Load fsbase and kgsbase */
+	ASM_POP_SGBASE_CFI_R
+
+	/* Load GP registers. */
+	ASM_POP_GPREGSNSP_CFI_R
+
+	/* Resume execution */
 	intr_exit
 	.cfi_restore_state
 
@@ -280,9 +288,9 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 
 	/* Check for a scheduling override. */
 	EXTERN(this_cpu)
-	movq   this_cpu(%rbx), %rax
+	movq   this_cpu(%rbx), %rcx
 	EXTERN(thiscpu_override)
-	cmpq   $(0), thiscpu_override(%rax)
+	cmpq   $(0), thiscpu_override(%rcx)
 	jne    .Lyield_same_target_with_override
 
 	/* CURR: %rbx */
@@ -299,23 +307,24 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 	movq   this_cpu(%rbx), %rbx
 	EXTERN(thiscpu_current)
 	movq   %rbp, thiscpu_current(%rbx)
-	movq   %rbp, %rax
+	movq   %rbp, %rcx
 	jmp    x86_load_thread_rax_cpu_rbx
 .Lyield_same_target_with_override:
 #ifndef NDEBUG
 	EXTERN(thiscpu_override)
-	cmpq   %rbx, thiscpu_override(%rax)
+	cmpq   %rbx, thiscpu_override(%rcx)
 	je     .Lyield_same_target
 	int3   /* Assertion failed: CPU override does not match calling thread.
 	        * >> struct task *caller = %rbx;
-	        * >> struct cpu  *mycpu = %rax; */
+	        * >> struct cpu  *mycpu  = %rcx; */
 #endif /* !NDEBUG */
 .Lyield_same_target:
 	sti
 #ifndef CONFIG_NO_SMP
 	pause
 #endif /* !CONFIG_NO_SMP */
-	jmp    .Lload_scpustate_rsp
+	movq   %rbx, %rax
+	jmp    .Lload_scpustate_rsp_gsbase_rax
 	.cfi_restore_state
 .Lillegal_task_yield:
 	movq   $(ERROR_CODEOF(E_WOULDBLOCK_PREEMPTED)), %rdi
@@ -455,7 +464,8 @@ PUBLIC_FUNCTION(task_tryyield)
 #ifndef CONFIG_NO_SMP
 	pause
 #endif /* !CONFIG_NO_SMP */
-	jmp    .Lload_scpustate_rsp
+	movq   %rbx, %rax
+	jmp    .Lload_scpustate_rsp_gsbase_rax
 	.cfi_endproc
 END(task_tryyield)
 
