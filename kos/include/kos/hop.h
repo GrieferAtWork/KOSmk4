@@ -1014,10 +1014,10 @@ struct hop_datapart_stat /*[PREFIX(ds_)]*/ {
                                                               *  - 0: The data block wasn't anonymous (aka. was already deanonymized).
                                                               *  - 1: The data block has been deanonymized. */
 #define HOP_DATABLOCK_OPEN_PART                   0x00010007 /* [struct hop_datablock_openpart *arg] Lookup (and create if missing) the data
-                                                              * part associated with a given page offset (s.a. `vm_datablock_locatepart()')
+                                                              * part associated with a given page offset (s.a. `vm_paged_datablock_locatepart()')
                                                               * @return: * : The value written to `arg->dop_openfd.of_hint' */
 #define HOP_DATABLOCK_OPEN_PART_EXACT             0x00010008 /* [struct hop_datablock_openpart *arg] Same as `HOP_DATABLOCK_OPEN_PART', but make sure
-                                                              * that the part begins at the exact given offset (s.a. `vm_datablock_locatepart_exact()')
+                                                              * that the part begins at the exact given offset (s.a. `vm_paged_datablock_locatepart_exact()')
                                                               * @return: * : The value written to `arg->dop_openfd.of_hint' */
 #define HOP_DATABLOCK_HASCHANGED                  0x00010009 /* [struct hop_datablock_haschanged *arg] Check for changes within
                                                               * the given address range (s.a. `vm_datablock_haschanged()') */

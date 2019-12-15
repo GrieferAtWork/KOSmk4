@@ -163,7 +163,7 @@ NOTHROW(KCALL vm_futex_destroy)(struct vm_futex *__restrict self) {
  * @return: VM_DATAPART_GETFUTEX_OUTOFRANGE:
  *              The given `datapart_offset' is greater than `vm_datapart_numbytes(self)', which
  *              may be the case even if you checked before that it wasn't (or simply
- *              used `vm_datablock_locatepart()' in order to lookup the associated part),
+ *              used `vm_paged_datablock_locatepart()' in order to lookup the associated part),
  *              because there always exists the possibility that any data part gets split
  *              into multiple smaller parts. */
 PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm_futex *
@@ -381,7 +381,7 @@ PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm_futex *
 	pos_t partrel_addr;
 again:
 	/* Lookup the datapart that should contain the associated futex. */
-	part = vm_datablock_locatepart(self, (vm_vpage64_t)(offset / PAGESIZE), 1);
+	part = vm_paged_datablock_locatepart(self, (vm_vpage64_t)(offset / PAGESIZE), 1);
 	partrel_addr = (pos_t)(offset - vm_datapart_minbyte(part));
 #if __SIZEOF_POINTER__ < __FS_SIZEOF(OFF)
 	/* Make sure that the part-relative address offset
@@ -389,7 +389,7 @@ again:
 	if (partrel_addr > (pos_t)(uintptr_t)-1) {
 		REF struct vm_datapart *used_part;
 		TRY {
-			used_part = vm_datablock_locatepart_exact(self, (vm_vpage64_t)(offset / PAGESIZE), 1);
+			used_part = vm_paged_datablock_locatepart_exact(self, (vm_vpage64_t)(offset / PAGESIZE), 1);
 		} EXCEPT {
 			decref_unlikely(part);
 			RETHROW();

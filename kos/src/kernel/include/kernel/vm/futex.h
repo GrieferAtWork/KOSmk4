@@ -84,7 +84,7 @@ struct vm_futex_controller {
  * @return: VM_DATAPART_GETFUTEX_OUTOFRANGE:
  *              The given `datapart_offset' is greater than `vm_datapart_numbytes(self)', which
  *              may be the case even if you checked before that it wasn't (or simply
- *              used `vm_datablock_locatepart()' in order to lookup the associated part),
+ *              used `vm_paged_datablock_locatepart()' in order to lookup the associated part),
  *              because there always exists the possibility that any data part gets split
  *              into multiple smaller parts. */
 FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm_futex *

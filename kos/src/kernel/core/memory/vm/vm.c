@@ -2492,13 +2492,18 @@ NOTHROW(KCALL vm_datablock_haschanged)(struct vm_datablock *__restrict self,
  *    initialized as `VM_DATAPART_PPP_UNINITIALIZED'. */
 PUBLIC ATTR_RETNONNULL NONNULL((1)) REF struct vm_datapart *KCALL
 vm_datablock_createpart(struct vm_datablock *__restrict self,
-                        vm_vpage64_t pageno, size_t num_vpages)
+                        PAGEDIR_PAGEALIGNED pos_t start_offset,
+                        PAGEDIR_PAGEALIGNED size_t num_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct vm_datapart *result;
 	datapage_t data_pageno;
 	size_t num_dpages;
-	data_pageno = (datapage_t)pageno << VM_DATABLOCK_PAGESHIFT(self);
-	num_dpages  = num_vpages << VM_DATABLOCK_PAGESHIFT(self);
+	assert((start_offset & PAGEMASK) == 0);
+	assert((num_bytes & PAGEMASK) == 0);
+	assert(num_bytes != 0);
+	assert(start_offset + num_bytes > start_offset);
+	data_pageno = VM_DATABLOCK_DADDR2DPAGE(self, start_offset);
+	num_dpages  = num_bytes >> VM_DATABLOCK_ADDRSHIFT(self);
 	/* This one's considerably simpler, because we don't have to juggle around
 	 * holding a lock to `self', since there are no other parts which our's may
 	 * potentially collide with! */
@@ -2555,15 +2560,20 @@ vm_datablock_createpart(struct vm_datablock *__restrict self,
 
 PRIVATE ATTR_RETNONNULL NONNULL((1)) REF struct vm_datapart *KCALL
 vm_datablock_do_locatepart(struct vm_datablock *__restrict self,
-                           vm_vpage64_t pageno, size_t num_vpages_hint)
+                           PAGEDIR_PAGEALIGNED pos_t start_offset,
+                           PAGEDIR_PAGEALIGNED size_t num_bytes_hint)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	vm_parttree_minmax_t minmax;
 	REF struct vm_datapart *result;
 	size_t num_dpages;
 	uintptr_t *ppp;
 	datapage_t data_pageno;
-	data_pageno = (datapage_t)pageno << VM_DATABLOCK_PAGESHIFT(self);
-	num_dpages  = (size_t)num_vpages_hint << VM_DATABLOCK_PAGESHIFT(self);
+	assert((start_offset & PAGEMASK) == 0);
+	assert((num_bytes_hint & PAGEMASK) == 0);
+	assert(num_bytes_hint != 0);
+	assert(start_offset + num_bytes_hint > start_offset);
+	data_pageno = VM_DATABLOCK_DADDR2DPAGE(self, start_offset);
+	num_dpages  = num_bytes_hint >> VM_DATABLOCK_ADDRSHIFT(self);
 	sync_read(self);
 	/* Step #1: Check if there is a part containing the given page number! */
 	COMPILER_READ_BARRIER();
@@ -2781,29 +2791,32 @@ create_anon_endwrite:
 	sync_downgrade(self);
 create_anon_endread:
 	sync_endread(self);
-	return vm_datablock_createpart(self, pageno, num_vpages_hint);
+	return vm_datablock_createpart(self,
+	                               start_offset,
+	                               num_bytes_hint);
 }
 
 
 
-/* Lookup and return a reference the data part containing the given `pageno'
+/* Lookup and return a reference the data part containing the given `start_offset'
  * NOTE: When `self' is an anonymous data block (`self->db_parts == VM_DATABLOCK_ANONPARTS'),
  *       the the returned data part will be allocated anonymously as well, meaning that
  *       it will not be shared (`!isshared(return)'), and not be re-returned when the
  *       call is repeated with the same arguments passed once again. */
 PUBLIC ATTR_RETNONNULL NONNULL((1)) REF struct vm_datapart *KCALL
 vm_datablock_locatepart(struct vm_datablock *__restrict self,
-                        vm_vpage64_t pageno, size_t num_vpages_hint)
+                        PAGEDIR_PAGEALIGNED pos_t start_offset,
+                        PAGEDIR_PAGEALIGNED size_t num_bytes_hint)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct vm_datapart *result;
 	if (ATOMIC_READ(self->db_parts) == VM_DATABLOCK_ANONPARTS) {
 		result = vm_datablock_createpart(self,
-		                                 pageno,
-		                                 num_vpages_hint);
+		                                 start_offset,
+		                                 num_bytes_hint);
 	} else {
 		result = vm_datablock_do_locatepart(self,
-		                                    pageno,
-		                                    num_vpages_hint);
+		                                    start_offset,
+		                                    num_bytes_hint);
 	}
 	assertf((vm_datapart_startdpage(result) & VM_DATABLOCK_PAGEMASK(self)) == 0,
 	        "Invalid data part (start at %#I64x, end at %#I64x)\n",
@@ -2812,34 +2825,39 @@ vm_datablock_locatepart(struct vm_datablock *__restrict self,
 	return result;
 }
 
-/* Same as `vm_datablock_locatepart()', but ensure that the returned datapart
- * starts at exactly at `pageno', and that it doesn't have span more than
- * `max_num_vpages' pages of virtual memory (though it may still span less than that) */
+/* Same as `vm_paged_datablock_locatepart()', but ensure that the returned datapart
+ * starts at exactly at `start_offset', and that it doesn't have span more than
+ * `max_num_bytes' pages of virtual memory (though it may still span less than that) */
 PUBLIC ATTR_RETNONNULL NONNULL((1)) REF struct vm_datapart *KCALL
 vm_datablock_locatepart_exact(struct vm_datablock *__restrict self,
-                                      vm_vpage64_t pageno, size_t max_num_vpages)
+                              PAGEDIR_PAGEALIGNED pos_t start_offset,
+                              PAGEDIR_PAGEALIGNED size_t max_num_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct vm_datapart *result;
 	REF struct vm_datapart *new_result;
-	vm_vpage64_t start_page;
+	vm_vpage64_t start_page, part_start_page;
+	size_t max_pages;
+	assert((start_offset & PAGEMASK) == 0);
+	assert((max_num_bytes & PAGEMASK) == 0);
 	/* Check for special case: anonymous data block tree. */
 	if (ATOMIC_READ(self->db_parts) == VM_DATABLOCK_ANONPARTS) {
 		result = vm_datablock_createpart(self,
-		                                 pageno,
-		                                 max_num_vpages);
+		                                 start_offset,
+		                                 max_num_bytes);
 		goto done;
 	}
 again:
 	result = vm_datablock_do_locatepart(self,
-	                                    pageno,
-	                                    max_num_vpages);
-	start_page = vm_datapart_minvpage(result);
-	assert(pageno >= start_page);
-	if (pageno > start_page) {
+	                                    start_offset,
+	                                    max_num_bytes);
+	start_page      = (vm_vpage64_t)(start_offset / PAGESIZE);
+	part_start_page = vm_datapart_minvpage(result);
+	assert(start_page >= part_start_page);
+	if (start_page > part_start_page) {
 		TRY {
 			/* Split the part, so we get the portion that starts where we want it to! */
 			new_result = vm_datapart_split(result,
-			                               (size_t)(pageno - start_page));
+			                               (size_t)(start_page - part_start_page));
 		} EXCEPT {
 			vm_datapart_decref_and_merge(result);
 			RETHROW();
@@ -2853,9 +2871,9 @@ again:
 		/* Got it now! */
 		result = new_result;
 	}
-	assert(vm_datapart_minvpage(result) == pageno);
-
-	/* Make sure that the returned data part isn't larger than `max_num_vpages'
+	assert(vm_datapart_minvpage(result) == start_page);
+	max_pages = max_num_bytes / PAGESIZE;
+	/* Make sure that the returned data part isn't larger than `max_pages'
 	 * This is once again achieved by splitting the part if it is larger, but
 	 * discarding the high part and keeping the low one, instead of using the
 	 * high part as we did above when ensuring that the part starts where we
@@ -2864,10 +2882,10 @@ again:
 		size_t num_vpages;
 again_check_result_num_vpages:
 		num_vpages = vm_datapart_numvpages(result);
-		if (num_vpages > max_num_vpages) {
+		if (num_vpages > max_pages) {
 			TRY {
 				/* Split the part, so we get the portion that starts where we want it to! */
-				new_result = vm_datapart_split(result, max_num_vpages);
+				new_result = vm_datapart_split(result, max_pages);
 			} EXCEPT {
 				vm_datapart_decref_and_merge(result);
 				RETHROW();

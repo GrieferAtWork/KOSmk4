@@ -139,7 +139,7 @@ again:
 		node = (struct vm_node *)kmalloc(sizeof(struct vm_node),
 		                                 GFP_LOCKED | GFP_PREFLT);
 		TRY {
-			part = vm_datablock_locatepart_exact(data,
+			part = vm_paged_datablock_locatepart_exact(data,
 			                                     data_start_vpage,
 			                                     num_pages);
 		} EXCEPT {

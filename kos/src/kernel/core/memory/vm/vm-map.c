@@ -205,7 +205,7 @@ vm_collect_and_lock_parts_and_vm(struct partnode_pair_vector *__restrict info,
 			/* Create the associated part.
 			 * NOTE: Because we're the ones creating it, we don't have to look
 			 *       out for splitting parts, or anything in that manner. */
-			info->pv_buf[0].pn_part = vm_datablock_createpart(data,
+			info->pv_buf[0].pn_part = vm_paged_datablock_createpart(data,
 			                                                  data_start_vpage,
 			                                                  num_pages);
 			/* The caller wants us to give them some write-lock, so let's given them one! */
@@ -229,7 +229,7 @@ vm_collect_and_lock_parts_and_vm(struct partnode_pair_vector *__restrict info,
 		REF struct vm_datapart *part;
 		size_t total_pages;
 		/* Step #1: Collect all of the required parts. */
-		part = vm_datablock_locatepart_exact(data,
+		part = vm_paged_datablock_locatepart_exact(data,
 		                                     data_start_vpage,
 		                                     num_pages);
 		TRY {
@@ -244,7 +244,7 @@ vm_collect_and_lock_parts_and_vm(struct partnode_pair_vector *__restrict info,
 		/* Load additional parts which may span the specified range. */
 		total_pages = vm_datapart_numvpages_atomic(part);
 		while (total_pages < num_pages) {
-			part = vm_datablock_locatepart_exact(data,
+			part = vm_paged_datablock_locatepart_exact(data,
 			                                     data_start_vpage + total_pages,
 			                                     num_pages - total_pages);
 			TRY {
@@ -285,7 +285,7 @@ again_lock_all_parts:
 					continue; /* Continuous */
 				/* There's a part missing between `part_end' and `req_part_end' */
 				partnode_pair_vector_endwrite_parts(info);
-				part = vm_datablock_locatepart_exact(data, part_end,
+				part = vm_paged_datablock_locatepart_exact(data, part_end,
 				                                     (size_t)(req_part_end - part_end));
 				TRY {
 					partnode_pair_vector_insertpart(info, i + 1, part);
@@ -818,7 +818,7 @@ vm_map_subrange_descriptors_init_and_lock_parts_and_vm(struct vm_map_subrange_de
 	zeronode = (struct vm_node *)kmalloc(sizeof(struct vm_node),
 	                                     GFP_LOCKED | GFP_PREFLT | GFP_VCBASE);
 	TRY {
-		zeropart = vm_datablock_createpart(&vm_datablock_anonymous_zero,
+		zeropart = vm_paged_datablock_createpart(&vm_datablock_anonymous_zero,
 		                                   0, num_zerovpages);
 		assert(!isshared(zeropart));
 		TRY {

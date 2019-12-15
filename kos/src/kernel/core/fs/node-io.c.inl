@@ -317,7 +317,7 @@ load_next_part:
 
 		/* Locate the part concerning the requested IO, while trying to automatically
 		 * include all of the data-pages that the IO could potentially ever perform. */
-		part = vm_datablock_locatepart(self,
+		part = vm_paged_datablock_locatepart(self,
 		                               (vm_vpage64_t)(file_position / PAGESIZE),
 		                               CEILDIV(num_bytes + (file_position % PAGESIZE), PAGESIZE));
 		TRY {

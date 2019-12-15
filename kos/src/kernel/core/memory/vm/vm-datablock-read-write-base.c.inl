@@ -163,7 +163,7 @@ KCALL vm_datablock_write
 	for (;;) {
 		size_t temp;
 		REF struct vm_datapart *part;
-		part = vm_datablock_locatepart(self,
+		part = vm_paged_datablock_locatepart(self,
 		                               (vm_vpage64_t)(src_offset >> VM_DATABLOCK_ADDRSHIFT(self)),
 		                               CEILDIV(num_bytes + (src_offset & (VM_DATABLOCK_PAGESIZE(self) - 1)),
 		                                       PAGESIZE));

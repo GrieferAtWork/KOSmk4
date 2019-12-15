@@ -394,10 +394,10 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		if (struct_size != sizeof(struct hop_datablock_openpart))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_openpart), struct_size);
 		part = cmd == HOP_DATABLOCK_OPEN_PART_EXACT
-		       ? vm_datablock_locatepart_exact(self,
+		       ? vm_paged_datablock_locatepart_exact(self,
 		                                       (vm_vpage64_t)data->dop_pageno,
 		                                       (size_t)data->dop_pages_hint)
-		       : vm_datablock_locatepart(self,
+		       : vm_paged_datablock_locatepart(self,
 		                                 (vm_vpage64_t)data->dop_pageno,
 		                                 (size_t)data->dop_pages_hint);
 		FINALLY_DECREF_UNLIKELY(part);

@@ -6083,8 +6083,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname1520 /* index: 1520 */
-	.weak vm_datablock_locatepart_exact; .quad vm_datablock_locatepart_exact
-	.reloc ., R_X86_64_SIZE32, vm_datablock_locatepart_exact; .int 0
+	.weak vm_paged_datablock_locatepart_exact; .quad vm_paged_datablock_locatepart_exact
+	.reloc ., R_X86_64_SIZE32, vm_paged_datablock_locatepart_exact; .int 0
 	.int 0x4007254
 	.quad 0 /* index: 1521 */
 	.quad 0
@@ -6211,8 +6211,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, vio_copyfromvio; .int 0
 	.int 0x8f0560f
 	.quad .Lname1552 /* index: 1552 */
-	.weak vm_datablock_locatepart; .quad vm_datablock_locatepart
-	.reloc ., R_X86_64_SIZE32, vm_datablock_locatepart; .int 0
+	.weak vm_paged_datablock_locatepart; .quad vm_paged_datablock_locatepart
+	.reloc ., R_X86_64_SIZE32, vm_paged_datablock_locatepart; .int 0
 	.int 0xa5c95f4
 	.quad .Lname1553 /* index: 1553 */
 	.weak this_user_except_handler; .quad this_user_except_handler
@@ -9043,8 +9043,8 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, block_device_alloc; .int 0
 	.int 0xa69c8d3
 	.quad .Lname2260 /* index: 2260 */
-	.weak vm_datablock_createpart; .quad vm_datablock_createpart
-	.reloc ., R_X86_64_SIZE32, vm_datablock_createpart; .int 0
+	.weak vm_paged_datablock_createpart; .quad vm_paged_datablock_createpart
+	.reloc ., R_X86_64_SIZE32, vm_paged_datablock_createpart; .int 0
 	.int 0xa4308d4
 	.quad .Lname2261 /* index: 2261 */
 	.weak ringbuffer_writesome; .quad ringbuffer_writesome
@@ -18485,7 +18485,7 @@ END(kernel_symbol_table)
 .Lname1518:
 	.string "sys_gettimeofday"
 .Lname1520:
-	.string "vm_datablock_locatepart_exact"
+	.string "vm_paged_datablock_locatepart_exact"
 .Lname1523:
 	.string "cpu_broadcastipi_notthis"
 .Lname1524:
@@ -18539,7 +18539,7 @@ END(kernel_symbol_table)
 .Lname1551:
 	.string "vio_copyfromvio"
 .Lname1552:
-	.string "vm_datablock_locatepart"
+	.string "vm_paged_datablock_locatepart"
 .Lname1553:
 	.string "this_user_except_handler"
 .Lname1554:
@@ -19457,7 +19457,7 @@ END(kernel_symbol_table)
 .Lname2259:
 	.string "block_device_alloc"
 .Lname2260:
-	.string "vm_datablock_createpart"
+	.string "vm_paged_datablock_createpart"
 .Lname2261:
 	.string "ringbuffer_writesome"
 .Lname2262:

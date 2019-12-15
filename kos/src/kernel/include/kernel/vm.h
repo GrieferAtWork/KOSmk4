@@ -894,7 +894,7 @@ struct vm_datablock_type {
 
 
 /* Value for `db_parts' when all parts are not tracked as shared, but are instead
- * newly allocated each time they are accessed through `vm_datablock_locatepart()'. */
+ * newly allocated each time they are accessed through `vm_paged_datablock_locatepart()'. */
 #define VM_DATABLOCK_ANONPARTS       ((struct vm_datapart *)-1)
 #define VM_DATABLOCK_ANONPARTS_INIT    VM_DATABLOCK_ANONPARTS
 
@@ -1001,7 +1001,7 @@ struct vm_datablock {
 	/* .db_pagealign = */ (size_t)1 << (pageshift),       \
 	/* .db_pagemask  = */ ((size_t)1 << (pageshift)) - 1, \
 	/* .db_pagesize  = */ (size_t)PAGESIZE >> (pageshift)
-#define VM_DATABLOCK_ADDRSHIFT(x) ((x)->db_addrshift)
+#define VM_DATABLOCK_ADDRSHIFT(x) ((x)->db_addrshift) /* pos_t >> this == datapage_t */
 #define VM_DATABLOCK_PAGEALIGN(x) ((x)->db_pagealign)
 #define VM_DATABLOCK_PAGEMASK(x)  ((x)->db_pagemask)
 #define VM_DATABLOCK_PAGESIZE(x)  ((x)->db_pagesize)
@@ -1183,26 +1183,53 @@ NOTHROW(KCALL vm_datablock_haschanged)(struct vm_datablock *__restrict self,
  *    initialized as `VM_DATAPART_PPP_UNINITIALIZED'. */
 FUNDEF ATTR_RETNONNULL NONNULL((1)) REF struct vm_datapart *KCALL
 vm_datablock_createpart(struct vm_datablock *__restrict self,
-                        vm_vpage64_t pageno, size_t num_vpages)
+                        PAGEDIR_PAGEALIGNED pos_t start_offset,
+                        PAGEDIR_PAGEALIGNED size_t num_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
+LOCAL ATTR_RETNONNULL NONNULL((1)) REF struct vm_datapart *KCALL
+vm_paged_datablock_createpart(struct vm_datablock *__restrict self,
+                              vm_vpage64_t pageno, size_t num_vpages)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	return vm_datablock_createpart(self,
+	                               (pos_t)pageno * PAGESIZE,
+	                               num_vpages * PAGESIZE);
+}
 
-/* Lookup and return a reference the data part containing the given `pageno'
+/* Lookup and return a reference the data part containing the given `start_offset'
  * NOTE: When `self' is an anonymous data block (`self->db_parts == VM_DATABLOCK_ANONPARTS'),
  *       the the returned data part will be allocated anonymously as well, meaning that
  *       it will not be shared (`!isshared(return)'), and not be re-returned when the
  *       call is repeated with the same arguments passed once again. */
 FUNDEF ATTR_RETNONNULL NONNULL((1)) REF struct vm_datapart *KCALL
 vm_datablock_locatepart(struct vm_datablock *__restrict self,
-                        vm_vpage64_t pageno, size_t num_vpages_hint)
+                        PAGEDIR_PAGEALIGNED pos_t start_offset,
+                        PAGEDIR_PAGEALIGNED size_t num_bytes_hint)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
+LOCAL ATTR_RETNONNULL NONNULL((1)) REF struct vm_datapart *KCALL
+vm_paged_datablock_locatepart(struct vm_datablock *__restrict self,
+                              vm_vpage64_t pageno, size_t num_vpages_hint)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	return vm_datablock_locatepart(self,
+	                               (pos_t)pageno * PAGESIZE,
+	                               num_vpages_hint * PAGESIZE);
+}
 
-/* Same as `vm_datablock_locatepart()', but ensure that the returned datapart
- * starts at exactly at `pageno', and that it doesn't have span more than
- * `max_num_vpages' pages of virtual memory (though it may still span less than that) */
+/* Same as `vm_paged_datablock_locatepart()', but ensure that the returned datapart
+ * starts at exactly at `start_offset', and that it doesn't have span more than
+ * `max_num_bytes' pages of virtual memory (though it may still span less than that) */
 FUNDEF ATTR_RETNONNULL NONNULL((1)) REF struct vm_datapart *KCALL
 vm_datablock_locatepart_exact(struct vm_datablock *__restrict self,
-                              vm_vpage64_t pageno, size_t max_num_vpages)
+                              PAGEDIR_PAGEALIGNED pos_t start_offset,
+                              PAGEDIR_PAGEALIGNED size_t max_num_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
+LOCAL ATTR_RETNONNULL NONNULL((1)) REF struct vm_datapart *KCALL
+vm_paged_datablock_locatepart_exact(struct vm_datablock *__restrict self,
+                                    vm_vpage64_t pageno, size_t max_num_vpages)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	return vm_datablock_locatepart_exact(self,
+	                                     (pos_t)pageno * PAGESIZE,
+	                                     max_num_vpages * PAGESIZE);
+}
 
 
 /* Read/Write directory to/form a given VM datablock.
