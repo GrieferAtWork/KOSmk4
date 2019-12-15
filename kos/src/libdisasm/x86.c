@@ -23,6 +23,7 @@ if (gcc_opt.remove("-O3"))
  */
 #ifndef GUARD_LIBDISASM_X86_C
 #define GUARD_LIBDISASM_X86_C 1
+#define DISABLE_BRANCH_PROFILING 1
 #define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
 
