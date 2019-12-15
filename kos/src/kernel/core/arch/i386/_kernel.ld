@@ -490,7 +490,7 @@ SECTIONS {
 		/* TODO: Check if the outer `ABSOLUTE()' here is actually necessary (remove if it is not). */
 		PROVIDE_HIDDEN(__kernel_size = ABSOLUTE(ABSOLUTE(__kernel_end) - ABSOLUTE(__kernel_start)));
 
-		PROVIDE_HIDDEN(__kernel_pfree_endpageptr = addr2pageid(ABSOLUTE(.)));
+		PROVIDE_HIDDEN(__kernel_pfree_endpageptr = addr2pageptr(ABSOLUTE(.)));
 		PROVIDE_HIDDEN(__kernel_pfree_numpages = ABSOLUTE(ABSOLUTE(__kernel_pfree_endpageptr) - ABSOLUTE(__kernel_pfree_startpageptr)));
 
 		PROVIDE_HIDDEN(__kernel_free_size = ABSOLUTE(ABSOLUTE(.) - ABSOLUTE(__kernel_free_start)));

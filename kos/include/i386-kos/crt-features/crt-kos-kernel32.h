@@ -2332,14 +2332,14 @@
 #define __CRT_HAVE_vmb_find_first_node_greater_equal 1
 #define __CRT_HAVE_vmb_find_last_node_lower_equal 1
 #define __CRT_HAVE_vmb_fini 1
-#define __CRT_HAVE_vmb_getnodeof 1
-#define __CRT_HAVE_vmb_map 1
-#define __CRT_HAVE_vmb_mapat 1
+#define __CRT_HAVE_vmb_getnodeofpageid 1
 #define __CRT_HAVE_vmb_node_insert 1
 #define __CRT_HAVE_vmb_node_remove 1
 #define __CRT_HAVE_vmb_overlay 1
 #define __CRT_HAVE_vmb_paged_getfree 1
 #define __CRT_HAVE_vmb_paged_isused 1
+#define __CRT_HAVE_vmb_paged_map 1
+#define __CRT_HAVE_vmb_paged_mapat 1
 #define __CRT_HAVE_vpage_alloc 1
 #define __CRT_HAVE_vpage_alloc_nx 1
 #define __CRT_HAVE_vpage_alloc_untraced 1

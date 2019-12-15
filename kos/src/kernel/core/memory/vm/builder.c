@@ -63,7 +63,7 @@ NOTHROW(KCALL vmb_delete_node)(struct vm_node *__restrict node) {
  * >> vmb_init(&v);
  * >> TRY {
  * >>     // Create mappings
- * >>     vmb_map(&v,...);
+ * >>     vmb_paged_map(&v,...);
  * >>     ...
  * >>
  * >>     // Apply mappings
@@ -228,7 +228,7 @@ again:
  * @return: true:  Successfully created the mapping.
  * @return: false: Another mapping already exists. */
 PUBLIC bool KCALL
-vmb_mapat(struct vmb *__restrict self,
+vmb_paged_mapat(struct vmb *__restrict self,
           pageid_t page_index, size_t num_pages,
           struct vm_datablock *__restrict data,
           vm_vpage64_t data_start_vpage,
@@ -304,10 +304,10 @@ DECL_END
 DECL_BEGIN
 #endif
 
-/* A combination of `vmb_paged_getfree' + `vmb_mapat'
+/* A combination of `vmb_paged_getfree' + `vmb_paged_mapat'
  * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target. */
 PUBLIC pageid_t KCALL
-vmb_map(struct vmb *__restrict self,
+vmb_paged_map(struct vmb *__restrict self,
         pageid_t hint,
         size_t num_pages,
         size_t min_alignment_in_pages,
@@ -392,7 +392,7 @@ NOTHROW(KCALL vmb_node_remove)(struct vmb *__restrict self,
 
 /* Get the node associated with the given `page' */
 PUBLIC NOBLOCK WUNUSED struct vm_node *
-NOTHROW(FCALL vmb_getnodeof)(struct vmb *__restrict self, pageid_t page) {
+NOTHROW(FCALL vmb_getnodeofpageid)(struct vmb *__restrict self, pageid_t page) {
 	return vm_nodetree_locate(self->v_tree,
 	                          page);
 }

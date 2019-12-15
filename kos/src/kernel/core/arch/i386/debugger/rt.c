@@ -44,6 +44,7 @@ if (gcc_opt.remove("-O3"))
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 
+#include <asm/farptr.h>
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state.h>
@@ -392,11 +393,11 @@ x86_init_psp0_thread(struct task *__restrict thread, size_t stack_size) {
 	FORTASK(thread, this_kernel_stackpart_).dp_srefs             = &FORTASK(thread, this_kernel_stacknode_);
 	FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_blockv = &FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0;
 	if (thread == &_boottask) {
-		FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin = (pageid_t)__kernel_boottask_stack_pageid;
-		FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)__kernel_boottask_stack_pageptr;
+		FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin = (pageid_t)loadfarptr(__kernel_boottask_stack_pageid);
+		FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)loadfarptr(__kernel_boottask_stack_pageptr);
 	} else if (thread == &_bootidle) {
-		FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin = (pageid_t)__kernel_bootidle_stack_pageid;
-		FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)__kernel_bootidle_stack_pageptr;
+		FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin = (pageid_t)loadfarptr(__kernel_bootidle_stack_pageid);
+		FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)loadfarptr(__kernel_bootidle_stack_pageptr);
 	}
 	FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmax = FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin +
 	                                                         CEILDIV(stack_size, PAGESIZE) - 1;

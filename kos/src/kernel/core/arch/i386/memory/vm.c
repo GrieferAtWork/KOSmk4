@@ -33,6 +33,7 @@
 
 #include <hybrid/atomic.h>
 
+#include <asm/farptr.h>
 #include <asm/intrin.h>
 
 #include <assert.h>
@@ -251,8 +252,8 @@ INTERN struct vm_node x86_kernel_vm_nodes[8] = {
 		                  x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE]),
 #else /* X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE */
 		INIT_NODE_RESERVE(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE],
-		                  (vm_vpage_t)(X86_VM_KERNEL_PDIR_RESERVED_BASE / PAGESIZE), /* TODO: This needs to be dynamically selected based on PAE-support */
-		                  (vm_vpage_t)(X86_VM_KERNEL_PDIR_RESERVED_BASE + X86_VM_KERNEL_PDIR_RESERVED_SIZE - PAGESIZE) / PAGESIZE,
+		                  (X86_VM_KERNEL_PDIR_RESERVED_BASE) / PAGESIZE, /* TODO: This needs to be dynamically selected based on PAE-support */
+		                  (X86_VM_KERNEL_PDIR_RESERVED_BASE + X86_VM_KERNEL_PDIR_RESERVED_SIZE - PAGESIZE) / PAGESIZE,
 		                  VM_PROT_NONE,
 		                  x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_IDENTITY_RESERVE]),
 #endif /* !X86_VM_KERNEL_PDIR_RESERVED_BASE_IS_RUNTIME_VALUE */
@@ -529,7 +530,7 @@ INTDEF byte_t __kernel_pfree_numpages[];
 INTERN ATTR_SECTION(".text.xdata.x86.free_unloader") ATTR_NORETURN
 void KCALL x86_kernel_unload_free_and_jump_to_userspace(void) {
 #if 1
-	vm_paged_node_remove(&vm_kernel, (pageid_t)__kernel_free_startpageid);
+	vm_paged_node_remove(&vm_kernel, (pageid_t)loadfarptr(__kernel_free_startpageid));
 
 	/* Unmap the entire .free section (in the kernel page directory)
 	 * NOTE: Make sure not to unmap the first couple of pages which

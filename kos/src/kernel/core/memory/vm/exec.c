@@ -338,7 +338,7 @@ vm_exec(struct vm *__restrict effective_vm,
 					if (phdr_vector[i].p_flags & PF_R)
 						prot |= VM_PROT_READ;
 #endif
-					map_ok = vmb_mapat(&builder,
+					map_ok = vmb_paged_mapat(&builder,
 					                   page_index,
 					                   num_pages,
 					                   exec_node,
@@ -386,7 +386,7 @@ err_overlap:
 								bss_overlap = bss_total_size;
 							bss_overlap_page = page_index + num_pages;
 							assert(bss_overlap_page == PAGEID_ENCODE(bss_start));
-							if unlikely(vmb_getnodeof(&builder, bss_overlap_page) != NULL)
+							if unlikely(vmb_getnodeofpageid(&builder, bss_overlap_page) != NULL)
 								goto err_overlap; /* Already in use... */
 							overlap_node = create_bss_overlap_node(exec_node,
 							                                       (pos_t)(phdr_vector[i].p_offset +
@@ -404,7 +404,7 @@ err_overlap:
 							++num_pages; /* Adjust to not map the first (special) page of .bss */
 						}
 						/* Map BSS as anonymous, zero-initialized memory. */
-						map_ok = vmb_mapat(&builder,
+						map_ok = vmb_paged_mapat(&builder,
 						                   page_index + num_pages,
 						                   num_total - num_pages,
 						                   &vm_datablock_anonymous_zero,
@@ -422,7 +422,7 @@ err_overlap:
 			}
 			/* If necessary, load the dynamic linker. */
 			if (need_dyn_linker) {
-				linker_base = nvmb_map(&builder,
+				linker_base = vmb_map(&builder,
 				                       HINT_GETADDR(KERNEL_VMHINT_USER_DYNLINK),
 				                       kernel_ld_elf_ramfile.rf_data.rb_size * PAGESIZE,
 				                       PAGESIZE,
@@ -440,7 +440,7 @@ err_overlap:
 
 #define USER_STACK_NUM_PAGES 8 /* TODO: Don't put this here! */
 			/* Allocate a new user-space stack for the calling thread. */
-			stack_base = nvmb_map(&builder,
+			stack_base = vmb_map(&builder,
 			                      HINT_GETADDR(KERNEL_VMHINT_USER_STACK),
 			                      USER_STACK_NUM_PAGES * PAGESIZE,
 			                      PAGESIZE,

@@ -40,6 +40,7 @@
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
+#include <asm/farptr.h>
 #include <sys/wait.h>
 
 #include <assert.h>
@@ -233,17 +234,23 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	REL(FORTASK(&_boottask, this_kernel_stacknode_).vn_link.ln_pself, &_boottask);
 	REL(FORTASK(&_boottask, this_kernel_stackpart_).dp_srefs, &_boottask);
 	REL(FORTASK(&_boottask, this_kernel_stackpart_).dp_ramdata.rd_blockv, &_boottask);
-	FORTASK(&_boottask, this_kernel_stacknode_).vn_node.a_vmin = (pageid_t)__kernel_boottask_stack_pageid;
-	FORTASK(&_boottask, this_kernel_stacknode_).vn_node.a_vmax = (pageid_t)__kernel_boottask_stack_pageid + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1;
-	FORTASK(&_boottask, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)__kernel_boottask_stack_pageptr;
+	{
+		pageid_t boottask_stack_pageid = (pageid_t)loadfarptr(__kernel_boottask_stack_pageid);
+		FORTASK(&_boottask, this_kernel_stacknode_).vn_node.a_vmin = boottask_stack_pageid;
+		FORTASK(&_boottask, this_kernel_stacknode_).vn_node.a_vmax = boottask_stack_pageid + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1;
+	}
+	FORTASK(&_boottask, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)loadfarptr(__kernel_boottask_stack_pageptr);
 
 	REL(FORTASK(&_bootidle, this_kernel_stacknode_).vn_part, &_bootidle);
 	REL(FORTASK(&_bootidle, this_kernel_stacknode_).vn_link.ln_pself, &_bootidle);
 	REL(FORTASK(&_bootidle, this_kernel_stackpart_).dp_srefs, &_bootidle);
 	REL(FORTASK(&_bootidle, this_kernel_stackpart_).dp_ramdata.rd_blockv, &_bootidle);
-	FORTASK(&_bootidle, this_kernel_stacknode_).vn_node.a_vmin = (pageid_t)__kernel_bootidle_stack_pageid;
-	FORTASK(&_bootidle, this_kernel_stacknode_).vn_node.a_vmax = (pageid_t)__kernel_bootidle_stack_pageid + CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1;
-	FORTASK(&_bootidle, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)__kernel_bootidle_stack_pageptr;
+	{
+		pageid_t bootidle_stack_pageid = (pageid_t)loadfarptr(__kernel_bootidle_stack_pageid);
+		FORTASK(&_bootidle, this_kernel_stacknode_).vn_node.a_vmin = bootidle_stack_pageid;
+		FORTASK(&_bootidle, this_kernel_stacknode_).vn_node.a_vmax = bootidle_stack_pageid + CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1;
+	}
+	FORTASK(&_bootidle, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)loadfarptr(__kernel_bootidle_stack_pageptr);
 	FORTASK(&_bootidle, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_size  = CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE);
 	FORTASK(&_bootidle, this_kernel_stackpart_).dp_tree.a_vmax                = (datapage_t)(CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1);
 #undef REL

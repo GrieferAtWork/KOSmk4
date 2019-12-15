@@ -4034,10 +4034,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak timespec_to_qtime; .long timespec_to_qtime
 	.reloc ., R_386_SIZE32, timespec_to_qtime; .long 0
 	.long 0xf783b45
-	.long .Lname1008 /* index: 1008 */
-	.weak vmb_map; .long vmb_map
-	.reloc ., R_386_SIZE32, vmb_map; .long 0
-	.long 0xd3863f0
+	.long 0 /* index: 1008 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 1009 */
 	.long 0
 	.long 0
@@ -5158,10 +5158,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak heap_alloc_untraced_nx; .long heap_alloc_untraced_nx
 	.reloc ., R_386_SIZE32, heap_alloc_untraced_nx; .long 0
 	.long 0x8a12508
-	.long 0 /* index: 1289 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1289 /* index: 1289 */
+	.weak vmb_paged_mapat; .long vmb_paged_mapat
+	.reloc ., R_386_SIZE32, vmb_paged_mapat; .long 0
+	.long 0x2458604
 	.long 0 /* index: 1290 */
 	.long 0
 	.long 0
@@ -5634,10 +5634,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_tasklock_tryupgrade; .long vm_tasklock_tryupgrade
 	.reloc ., R_386_SIZE32, vm_tasklock_tryupgrade; .long 0
 	.long 0x8f7eb95
-	.long 0 /* index: 1408 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1408 /* index: 1408 */
+	.weak vmb_paged_map; .long vmb_paged_map
+	.reloc ., R_386_SIZE32, vmb_paged_map; .long 0
+	.long 0x824580
 	.long .Lname1409 /* index: 1409 */
 	.weak kffree; .long kffree
 	.reloc ., R_386_SIZE32, kffree; .long 0
@@ -5867,9 +5867,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, handle_get_directory_entry; .long 0
 	.long 0x463b5b9
 	.long .Lname1466 /* index: 1466 */
-	.weak x86_idt_modify_end; .long x86_idt_modify_end
-	.reloc ., R_386_SIZE32, x86_idt_modify_end; .long 0
-	.long 0x39f5c14
+	.weak vmb_getnodeofpageid; .long vmb_getnodeofpageid
+	.reloc ., R_386_SIZE32, vmb_getnodeofpageid; .long 0
+	.long 0x5ea2c14
 	.long .Lname1467 /* index: 1467 */
 	.weak this_exception_info; .long this_exception_info
 	.reloc ., R_386_SIZE32, this_exception_info; .long 0
@@ -8090,10 +8090,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak pci_getclassname; .long pci_getclassname
 	.reloc ., R_386_SIZE32, pci_getclassname; .long 0
 	.long 0xd7387e5
-	.long .Lname2022 /* index: 2022 */
-	.weak vmb_getnodeof; .long vmb_getnodeof
-	.reloc ., R_386_SIZE32, vmb_getnodeof; .long 0
-	.long 0x88df7e6
+	.long 0 /* index: 2022 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 2023 */
 	.long 0
 	.long 0
@@ -12942,10 +12942,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 3235 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3235 /* index: 3235 */
+	.weak x86_idt_modify_end; .long x86_idt_modify_end
+	.reloc ., R_386_SIZE32, x86_idt_modify_end; .long 0
+	.long 0x39f5c14
 	.long 0 /* index: 3236 */
 	.long 0
 	.long 0
@@ -13738,10 +13738,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_sysctl; .long sys_sysctl
 	.reloc ., R_386_SIZE32, sys_sysctl; .long 0
 	.long 0x6b72a3c
-	.long .Lname3434 /* index: 3434 */
-	.weak vmb_mapat; .long vmb_mapat
-	.reloc ., R_386_SIZE32, vmb_mapat; .long 0
-	.long 0x863fbb4
+	.long 0 /* index: 3434 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname3435 /* index: 3435 */
 	.weak pidns_trylookup_task; .long pidns_trylookup_task
 	.reloc ., R_386_SIZE32, pidns_trylookup_task; .long 0
@@ -17594,8 +17594,6 @@ END(kernel_symbol_table)
 	.string "validate_userm"
 .Lname1007:
 	.string "timespec_to_qtime"
-.Lname1008:
-	.string "vmb_map"
 .Lname1010:
 	.string "block_device_awrite_phys_sector"
 .Lname1011:
@@ -17928,6 +17926,8 @@ END(kernel_symbol_table)
 	.string "mempsetq"
 .Lname1288:
 	.string "heap_alloc_untraced_nx"
+.Lname1289:
+	.string "vmb_paged_mapat"
 .Lname1292:
 	.string "slab_kmalloc24"
 .Lname1294:
@@ -18054,6 +18054,8 @@ END(kernel_symbol_table)
 	.string "driver_symbol"
 .Lname1407:
 	.string "vm_tasklock_tryupgrade"
+.Lname1408:
+	.string "vmb_paged_map"
 .Lname1409:
 	.string "kffree"
 .Lname1411:
@@ -18129,7 +18131,7 @@ END(kernel_symbol_table)
 .Lname1465:
 	.string "handle_get_directory_entry"
 .Lname1466:
-	.string "x86_idt_modify_end"
+	.string "vmb_getnodeofpageid"
 .Lname1467:
 	.string "this_exception_info"
 .Lname1468:
@@ -18740,8 +18742,6 @@ END(kernel_symbol_table)
 	.string "ansitty_device_cinit"
 .Lname2021:
 	.string "pci_getclassname"
-.Lname2022:
-	.string "vmb_getnodeof"
 .Lname2024:
 	.string "character_device_lookup_nx"
 .Lname2027:
@@ -20180,6 +20180,8 @@ END(kernel_symbol_table)
 	.string "sys_geteuid"
 .Lname3233:
 	.string "vio_cmpxchq"
+.Lname3235:
+	.string "x86_idt_modify_end"
 .Lname3237:
 	.string "sys_uname"
 .Lname3238:
@@ -20424,8 +20426,6 @@ END(kernel_symbol_table)
 	.string "atomic64_xch"
 .Lname3433:
 	.string "sys_sysctl"
-.Lname3434:
-	.string "vmb_mapat"
 .Lname3435:
 	.string "pidns_trylookup_task"
 .Lname3437:

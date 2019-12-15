@@ -40,6 +40,7 @@
 
 #include <asm/cpu-cpuid.h>
 #include <asm/cpu-flags.h>
+#include <asm/farptr.h>
 
 #include <assert.h>
 #include <stdint.h>
@@ -101,7 +102,7 @@ NOTHROW(FCALL kernel_initialize_boot_trampolines)(void) {
 	unsigned int vec1, vec2, vec3, vec4, i;
 	/* We allocate the boot trampoline immediately after the
 	 * end of the kernel's .free section in virtual memory. */
-	trampoline_page = (pageid_t)__kernel_free_endpageid;
+	trampoline_page = (pageid_t)loadfarptr(__kernel_free_endpageid);
 again_calculate_vecN:
 	vec1 = P64_PDIR_VEC1INDEX_VPAGE(trampoline_page);
 	vec2 = P64_PDIR_VEC2INDEX_VPAGE(trampoline_page);
@@ -173,8 +174,8 @@ struct vm vm_kernel_head = {
 	/* .v_kernreserve = */ {
 		/* .vn_node   = */ { (struct vm_node *)UINT64_C(0xcccccccccccccccc),
 		                     (struct vm_node *)UINT64_C(0xcccccccccccccccc),
-		                     (vm_vpage_t)UINT64_C(0xcccccccccccccccc),
-		                     (vm_vpage_t)UINT64_C(0xcccccccccccccccc) },
+		                     UINT64_C(0xcccccccccccccccc),
+		                     UINT64_C(0xcccccccccccccccc) },
 		/* .vn_byaddr = */ { (struct vm_node *)UINT64_C(0xcccccccccccccccc),
 		                     (struct vm_node **)UINT64_C(0xcccccccccccccccc) },
 		/* .vn_prot   = */ UINT32_C(0xcccccccc),
