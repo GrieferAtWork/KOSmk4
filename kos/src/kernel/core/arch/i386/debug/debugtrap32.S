@@ -16,10 +16,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_DEBUG_DEBUGTRAP32_S
+#define GUARD_KERNEL_CORE_ARCH_I386_DEBUG_DEBUGTRAP32_S 1
+
 #include <kernel/compiler.h>
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
-
 
 .section .xdata
 PUBLIC_FUNCTION(kernel_debugtrap)
@@ -57,9 +59,6 @@ INTERN_FUNCTION(driver_invoke_initializer)
 	.cfi_endproc
 END(driver_invoke_initializer)
 
-
-
-
 #define CPUSTATE_IS_ICPUSTATE
 #define CPUSTATE icpustate
 #include "debugtrap32-impl.S"
@@ -80,3 +79,4 @@ END(driver_invoke_initializer)
 #define CPUSTATE fcpustate
 #include "debugtrap32-impl.S"
 
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUG_DEBUGTRAP32_S */

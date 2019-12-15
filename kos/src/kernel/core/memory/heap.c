@@ -407,11 +407,11 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 				             "Node offset:   %Iu (%#Ix)\n"
 				             "Expected byte: %.2I8x\n"
 				             "Found byte:    %.2I8x",
-				             16 + 2 * ((u8 *)faulting_address - fault_start), fault_start,
+				             (size_t)((size_t)16 + 2 * (size_t)((u8 *)faulting_address - fault_start)), fault_start,
 				             faulting_address,
 				             MFREE_MIN(iter), MFREE_MAX(iter),
-				             (uintptr_t)faulting_address - MFREE_MIN(iter),
-				             (uintptr_t)faulting_address - MFREE_MIN(iter),
+				             (size_t)((uintptr_t)faulting_address - MFREE_MIN(iter)),
+				             (size_t)((uintptr_t)faulting_address - MFREE_MIN(iter)),
 				             ((u8 *)&expected_data)[(uintptr_t)faulting_address & 3],
 				             *(u8 *)faulting_address);
 			}

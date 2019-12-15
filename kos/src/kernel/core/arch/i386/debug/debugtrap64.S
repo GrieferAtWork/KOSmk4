@@ -16,6 +16,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_DEBUG_DEBUGTRAP64_S
+#define GUARD_KERNEL_CORE_ARCH_I386_DEBUG_DEBUGTRAP64_S 1
+
 #include <kernel/compiler.h>
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
@@ -64,10 +67,6 @@ PUBLIC_FUNCTION(kernel_debugtrap)
 	.cfi_endproc
 END(kernel_debugtrap)
 
-
-
-
-
 #define CPUSTATE_IS_ICPUSTATE
 #define CPUSTATE icpustate
 #include "debugtrap64-impl.S"
@@ -88,3 +87,4 @@ END(kernel_debugtrap)
 #define CPUSTATE fcpustate
 #include "debugtrap64-impl.S"
 
+#endif /* 1GUARD_KERNEL_CORE_ARCH_I386_DEBUG_DEBUGTRAP64_S */

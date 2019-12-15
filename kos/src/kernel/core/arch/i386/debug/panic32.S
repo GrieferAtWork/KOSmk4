@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_DEBUG_PANIC32_S
+#define GUARD_KERNEL_CORE_ARCH_I386_DEBUG_PANIC32_S 1
 
 #include <kernel/compiler.h>
 #include <kernel/panic.h>
@@ -82,3 +84,5 @@ PUBLIC_FUNCTION(kernel_panic)
 	call   kernel_vpanic_ucpustate
 	.cfi_endproc
 END(kernel_panic)
+
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUG_PANIC32_S */

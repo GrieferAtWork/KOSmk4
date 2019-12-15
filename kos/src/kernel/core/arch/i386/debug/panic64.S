@@ -16,12 +16,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_DEBUG_PANIC64_S
+#define GUARD_KERNEL_CORE_ARCH_I386_DEBUG_PANIC64_S 1
 
 #include <kernel/compiler.h>
-#include <kernel/panic.h>
+
 #include <kernel/fsgsbase.h>
-#include <kos/kernel/cpu-state.h>
+#include <kernel/panic.h>
+
 #include <asm/cfi.h>
+#include <bits/va_list-struct.h>
+#include <kos/kernel/cpu-state.h>
 
 .section .text.cold
 /* ATTR_NORETURN void kernel_panic_here(void) */
@@ -145,19 +150,22 @@ PUBLIC_FUNCTION(kernel_panic)
 	pushq_cfi %rdx
 	pushq_cfi %rsi
 
+	movq   %rdi, %rsi          /* char const *format */
+	leaq   (8 * 5)(%rsp), %rdi /* struct ucpustate *__restrict state */
+
 	/* `rsa_rdi' is already consumed by `char const *format' */
 	/* x86_64_va_list_struct */
 	leaq   -8(%rsp), %rax
 	pushq_cfi %rax   /* vl_reg_save_area */
-	leaq   (8+(8*5)+SIZEOF_UCPUSTATE+8)(%rsp), %rax
+	leaq   (8 + (8 * 5) + SIZEOF_UCPUSTATE)(%rsp), %rax
 	pushq_cfi %rax   /* vl_overflow_arg_area */
-	pushq_cfi $(304) /* No FP-registers */
-	pushq_cfi $(1*8) /* 1 GP registers already in use */
-	movq   %rsp, %rdx                  /* __builtin_va_list args */
-	movq   %rdi, %rsi                  /* char const *format */
-	leaq   ((8*3)+8+(8*5))(%rsp), %rdi /* struct ucpustate *__restrict state */
+	pushq_cfi $(1*8) /* vl_gp_offset */
+	movl   $(SIZEOF_X86_64_VA_LIST_REG_SAVE_AREA), OFFSET_X86_64_VA_LIST_STRUCT_FP_OFFSET(%rsp)
+	movq   %rsp, %rdx /* __builtin_va_list args */
 
 	PUBLIC(kernel_vpanic_ucpustate)
 	call   kernel_vpanic_ucpustate
 	.cfi_endproc
 END(kernel_panic)
+
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUG_PANIC64_S */
