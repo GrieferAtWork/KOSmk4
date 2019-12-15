@@ -307,7 +307,7 @@ NOTHROW_NCX(CC libcpu_getreg_coregs)(struct coregs const *__restrict self, unsig
 	switch (regno & X86_REGISTER_IDMASK) {
 
 	case (X86_REGISTER_CONTROL_CR0 & X86_REGISTER_IDMASK): value = self->co_cr0; break;
-	case (X86_REGISTER_CONTROL_CR2 & X86_REGISTER_IDMASK): value = self->co_cr2; break;
+	case (X86_REGISTER_CONTROL_CR2 & X86_REGISTER_IDMASK): value = (uintptr_t)self->co_cr2; break;
 	case (X86_REGISTER_CONTROL_CR3 & X86_REGISTER_IDMASK): value = self->co_cr3; break;
 	case (X86_REGISTER_CONTROL_CR4 & X86_REGISTER_IDMASK): value = self->co_cr4; break;
 
@@ -327,7 +327,7 @@ NOTHROW_NCX(CC libcpu_setreg_coregs)(struct coregs *__restrict self, unsigned in
 	switch (regno & X86_REGISTER_IDMASK) {
 
 	case (X86_REGISTER_CONTROL_CR0 & X86_REGISTER_IDMASK): pvalue = &self->co_cr0; break;
-	case (X86_REGISTER_CONTROL_CR2 & X86_REGISTER_IDMASK): pvalue = &self->co_cr2; break;
+	case (X86_REGISTER_CONTROL_CR2 & X86_REGISTER_IDMASK): pvalue = (uintptr_t *)&self->co_cr2; break;
 	case (X86_REGISTER_CONTROL_CR3 & X86_REGISTER_IDMASK): pvalue = &self->co_cr3; break;
 	case (X86_REGISTER_CONTROL_CR4 & X86_REGISTER_IDMASK): pvalue = &self->co_cr4; break;
 
@@ -346,10 +346,10 @@ NOTHROW_NCX(CC libcpu_getreg_drregs)(struct drregs const *__restrict self, unsig
 		goto nope;
 	switch (regno & X86_REGISTER_IDMASK) {
 
-	case (X86_REGISTER_DEBUG_DR0 & X86_REGISTER_IDMASK): value = self->dr_dr0; break;
-	case (X86_REGISTER_DEBUG_DR1 & X86_REGISTER_IDMASK): value = self->dr_dr1; break;
-	case (X86_REGISTER_DEBUG_DR2 & X86_REGISTER_IDMASK): value = self->dr_dr2; break;
-	case (X86_REGISTER_DEBUG_DR3 & X86_REGISTER_IDMASK): value = self->dr_dr3; break;
+	case (X86_REGISTER_DEBUG_DR0 & X86_REGISTER_IDMASK): value = (uintptr_t)self->dr_dr0; break;
+	case (X86_REGISTER_DEBUG_DR1 & X86_REGISTER_IDMASK): value = (uintptr_t)self->dr_dr1; break;
+	case (X86_REGISTER_DEBUG_DR2 & X86_REGISTER_IDMASK): value = (uintptr_t)self->dr_dr2; break;
+	case (X86_REGISTER_DEBUG_DR3 & X86_REGISTER_IDMASK): value = (uintptr_t)self->dr_dr3; break;
 	case (X86_REGISTER_DEBUG_DR6 & X86_REGISTER_IDMASK): value = self->dr_dr6; break;
 	case (X86_REGISTER_DEBUG_DR7 & X86_REGISTER_IDMASK): value = self->dr_dr7; break;
 
@@ -368,10 +368,10 @@ NOTHROW_NCX(CC libcpu_setreg_drregs)(struct drregs *__restrict self, unsigned in
 		goto nope;
 	switch (regno & X86_REGISTER_IDMASK) {
 
-	case (X86_REGISTER_DEBUG_DR0 & X86_REGISTER_IDMASK): pvalue = &self->dr_dr0; break;
-	case (X86_REGISTER_DEBUG_DR1 & X86_REGISTER_IDMASK): pvalue = &self->dr_dr1; break;
-	case (X86_REGISTER_DEBUG_DR2 & X86_REGISTER_IDMASK): pvalue = &self->dr_dr2; break;
-	case (X86_REGISTER_DEBUG_DR3 & X86_REGISTER_IDMASK): pvalue = &self->dr_dr3; break;
+	case (X86_REGISTER_DEBUG_DR0 & X86_REGISTER_IDMASK): pvalue = (uintptr_t *)&self->dr_dr0; break;
+	case (X86_REGISTER_DEBUG_DR1 & X86_REGISTER_IDMASK): pvalue = (uintptr_t *)&self->dr_dr1; break;
+	case (X86_REGISTER_DEBUG_DR2 & X86_REGISTER_IDMASK): pvalue = (uintptr_t *)&self->dr_dr2; break;
+	case (X86_REGISTER_DEBUG_DR3 & X86_REGISTER_IDMASK): pvalue = (uintptr_t *)&self->dr_dr3; break;
 	case (X86_REGISTER_DEBUG_DR6 & X86_REGISTER_IDMASK): pvalue = &self->dr_dr6; break;
 	case (X86_REGISTER_DEBUG_DR7 & X86_REGISTER_IDMASK): pvalue = &self->dr_dr7; break;
 

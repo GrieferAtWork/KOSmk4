@@ -128,6 +128,7 @@ incdir("", "../../include");
 #include <arpa/inet.h>
 #include <asm/bitsperlong.h>
 #include <asm/byteswap.h>
+#include <asm/cacheline.h>
 #include <asm/int-l64.h>
 #include <asm/int-ll64.h>
 #include <asm/intrin-arith.h>
@@ -135,6 +136,8 @@ incdir("", "../../include");
 #include <asm/ioctl.h>
 #include <asm/ioctls.h>
 #include <asm/ls-syscalls.h>
+#include <asm/pageid.h>
+#include <asm/pagesize.h>
 #include <asm/param.h>
 #include <asm/posix_types.h>
 #include <asm/socket.h>
@@ -172,7 +175,9 @@ incdir("", "../../include");
 #include <bits/io-file.h>
 #include <bits/ioctl-types.h>
 #include <bits/ioctls.h>
+#include <bits/iovec-struct.h>
 #include <bits/ipc.h>
+#include <bits/itimerspec.h>
 #include <bits/itimerval.h>
 #include <bits/local_lim.h>
 #include <bits/locale.h>
@@ -320,6 +325,7 @@ incdir("", "../../include");
 #include <gnu/lib-names.h>
 #include <grp.h>
 #include <hybrid/__alloca.h>
+#include <hybrid/__altint.h>
 #include <hybrid/__asm.h>
 #include <hybrid/__assembly.h>
 #include <hybrid/__assert.h>
@@ -328,7 +334,6 @@ incdir("", "../../include");
 #include <hybrid/__byteorder.h>
 #include <hybrid/__byteswap.h>
 #include <hybrid/__debug-alignment.h>
-#include <hybrid/__limits.h>
 #include <hybrid/__minmax.h>
 #include <hybrid/__overflow.h>
 #include <hybrid/__pointer.h>
@@ -338,6 +343,7 @@ incdir("", "../../include");
 #include <hybrid/__wordbits.h>
 #include <hybrid/align.h>
 #include <hybrid/alloca.h>
+#include <hybrid/altint.h>
 #include <hybrid/atomic.h>
 #include <hybrid/bit.h>
 #include <hybrid/byteorder.h>
@@ -348,7 +354,6 @@ incdir("", "../../include");
 #include <hybrid/host.h>
 #include <hybrid/int128.h>
 #include <hybrid/limitcore.h>
-#include <hybrid/limits.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 #include <hybrid/pointer.h>
@@ -383,6 +388,7 @@ incdir("", "../../include");
 #include <kos/bits/exception_data.h>
 #include <kos/bits/futex-expr.h>
 #include <kos/bits/futex.h>
+#include <kos/bits/library-listdef.h>
 #include <kos/bits/library.h>
 #include <kos/bits/peb.h>
 #include <kos/bits/process.h>

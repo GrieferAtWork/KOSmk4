@@ -834,9 +834,9 @@ libregdump_coregs(struct regdump_printer *__restrict self,
 	END;
 }
 
-INTERN NONNULL((1)) ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 libregdump_do_drx(struct regdump_printer *__restrict self,
-                  unsigned int n, uintptr_t drx, uintptr_t dr7) {
+                  unsigned int n, void *drx, uintptr_t dr7) {
 	unsigned int mode;
 	BEGIN;
 	format(REGDUMP_FORMAT_REGISTER_PREFIX);
@@ -904,7 +904,7 @@ libregdump_do_drx(struct regdump_printer *__restrict self,
 		format(REGDUMP_FORMAT_VALUE_SUFFIX);
 		PRINT("-");
 		format(REGDUMP_FORMAT_VALUE_PREFIX);
-		printf("%p", drx + size - 1);
+		printf("%p", (byte_t *)drx + size - 1);
 		format(REGDUMP_FORMAT_VALUE_SUFFIX);
 		PRINT(")");
 	}
