@@ -22,6 +22,13 @@ BEGIN
 	REMOVE_GCC_FLAGS("-O3")
 	GCC_FLAGS({ "-Os", "-fno-rtti", "-ffreestanding" })
 
+	if (TARGET_ARCH == "x86_64") {
+		CC_FLAGS({
+			"-mno-red-zone",  /* Don't require the hosted application to comply with the red zone. */
+			"-mcmodel=large", /* Set the large code model to allow libdl to be loaded anywhere. */
+		})
+	}
+
 	/* Disable FPU access for libdl (it's not needed, but would add additional
 	 * overhead for saving FPU registers to varargs functions on x86_64) */
 	if (TARGET_ARCH in ["i386", "x86_64"]) {
