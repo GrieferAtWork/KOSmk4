@@ -246,7 +246,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 #ifndef CONFIG_NO_USERKERN_SEGMENT
 #ifdef __x86_64__
-	__wrgsbase((void *)init_this_x86_userkern());
+	set_user_gsbase(init_this_x86_userkern());
 #else /* __x86_64__ */
 	update_user_fsbase();
 #endif /* !__x86_64__ */
