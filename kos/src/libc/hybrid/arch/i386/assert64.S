@@ -138,6 +138,7 @@ INTERN_FUNCTION(libc___afail)
 	pushq_cfi_r %r14      /* [P] General purpose register #14 */
 	pushq_cfi_r %r15      /* [P] General purpose register #15 */
 	subq   $(SIZEOF_X86_64_VA_LIST_STRUCT), %rsp /* aa_args */
+	.cfi_adjust_cfa_offset SIZEOF_X86_64_VA_LIST_STRUCT
 	movq   %rsp, %rdi
 	INTERN(libc_assertion_failure_core)
 	call   libc_assertion_failure_core
@@ -250,6 +251,7 @@ INTERN_FUNCTION(libc___acheck)
 	pushq_cfi_r %r14      /* [P] General purpose register #14 */
 	pushq_cfi_r %r15      /* [P] General purpose register #15 */
 	subq   $(SIZEOF_X86_64_VA_LIST_STRUCT), %rsp /* aa_args */
+	.cfi_adjust_cfa_offset SIZEOF_X86_64_VA_LIST_STRUCT
 	movq   %rsp, %rdi
 	INTERN(libc_assertion_check_core)
 	call   libc_assertion_check_core
@@ -429,6 +431,7 @@ INTERN_FUNCTION(libc___assert_func)
 	pushq_cfi_r %r14      /* [P] General purpose register #14 */
 	pushq_cfi_r %r15      /* [P] General purpose register #15 */
 	subq   $(SIZEOF_X86_64_VA_LIST_STRUCT), %rsp /* aa_args */
+	.cfi_adjust_cfa_offset SIZEOF_X86_64_VA_LIST_STRUCT
 	movq   %rsp, %rdi
 	INTERN(libc_assertion_failure_core)
 	call   libc_assertion_failure_core
@@ -468,6 +471,7 @@ INTERN_FUNCTION(libc___assert)
 	pushq_cfi_r %r14      /* [P] General purpose register #14 */
 	pushq_cfi_r %r15      /* [P] General purpose register #15 */
 	subq   $(SIZEOF_X86_64_VA_LIST_STRUCT), %rsp /* aa_args */
+	.cfi_adjust_cfa_offset SIZEOF_X86_64_VA_LIST_STRUCT
 	movq   %rsp, %rdi
 	INTERN(libc_assertion_failure_core)
 	call   libc_assertion_failure_core
@@ -507,6 +511,7 @@ INTERN_FUNCTION(libc__assert)
 	pushq_cfi_r %r14      /* [P] General purpose register #14 */
 	pushq_cfi_r %r15      /* [P] General purpose register #15 */
 	subq   $(SIZEOF_X86_64_VA_LIST_STRUCT), %rsp /* aa_args */
+	.cfi_adjust_cfa_offset SIZEOF_X86_64_VA_LIST_STRUCT
 	movq   %rsp, %rdi
 	INTERN(libc_assertion_failure_core)
 	call   libc_assertion_failure_core
