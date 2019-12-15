@@ -760,19 +760,19 @@ vm_datapart_loaddatapage(struct vm_datapart *__restrict self,
 
 
 /* Get the state of a page (one of `VM_DATAPART_PPP_*') */
-#define VM_DATAPART_GETSTATE(self, relative_datapageid)                                        \
-	(__hybrid_assert((relative_datapageid) < vm_datapart_numdpages(self)),                     \
-	 !((self)->dp_flags & VM_DATAPART_FLAG_HEAPPPP)                                            \
-	 ? ((__hybrid_atomic_load((self)->dp_pprop, __ATOMIC_ACQUIRE) >>                           \
-	     ((relative_datapageid)*VM_DATAPART_PPP_BITS)) &                                       \
-	    VM_DATAPART_PPP_MASK)                                                                  \
-	 : (!(self)->dp_pprop_p                                                                    \
-	    ? VM_DATAPART_PPP_HASCHANGED                                                           \
-	    : __hybrid_atomic_load((self)->dp_pprop_p[(relative_datapageid) /                      \
-	                                              (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS)], \
-	                           __ATOMIC_ACQUIRE) >>                                            \
-	      (((relative_datapageid) % (BITSOF(uintptr_t) * VM_DATAPART_PPP_BITS)) *              \
-	       VM_DATAPART_PPP_BITS) &                                                             \
+#define VM_DATAPART_GETSTATE(self, relative_datapageid)                                         \
+	(__hybrid_assert((relative_datapageid) < vm_datapart_numdpages(self)),                      \
+	 !((self)->dp_flags & VM_DATAPART_FLAG_HEAPPPP)                                             \
+	 ? ((__hybrid_atomic_load((self)->dp_pprop, __ATOMIC_ACQUIRE) >>                            \
+	     ((relative_datapageid)*VM_DATAPART_PPP_BITS)) &                                        \
+	    VM_DATAPART_PPP_MASK)                                                                   \
+	 : (!(self)->dp_pprop_p                                                                     \
+	    ? VM_DATAPART_PPP_HASCHANGED                                                            \
+	    : (__hybrid_atomic_load((self)->dp_pprop_p[(relative_datapageid) /                      \
+	                                               (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS)], \
+	                            __ATOMIC_ACQUIRE) >>                                            \
+	       (((relative_datapageid) % (BITSOF(uintptr_t) * VM_DATAPART_PPP_BITS)) *              \
+	        VM_DATAPART_PPP_BITS)) &                                                            \
 	      VM_DATAPART_PPP_MASK))
 
 /* Returns true if the per-page state of @self is writable. */
