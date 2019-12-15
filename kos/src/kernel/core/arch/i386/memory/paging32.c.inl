@@ -96,8 +96,8 @@ struct vm vm_kernel_head = {
 	/* .v_kernreserve = */ {
 		/* .vn_node   = */ { (struct vm_node *)0xcccccccc,
 		                     (struct vm_node *)0xcccccccc,
-		                     (vm_vpage_t)0xcccccccc,
-		                     (vm_vpage_t)0xcccccccc },
+		                     0xcccccccc,
+		                     0xcccccccc },
 		/* .vn_byaddr = */ { (struct vm_node *)0xcccccccc, (struct vm_node **)0xcccccccc },
 		/* .vn_prot   = */ 0xcccc,
 		/* .vn_flags  = */ 0xcccc,
@@ -236,32 +236,10 @@ NOTHROW(KCALL kernel_initialize_paging_pae)(void) {
 #endif /* !CONFIG_NO_PAGING_PAE */
 
 
-PRIVATE ATTR_FREERODATA byte_t const
-x86_pagedir_syncall_cr3_text[] = {
-	0x0f, 0x20, 0xd8, /* movl %cr3, %eax             */
-	0x0f, 0x22, 0xd8, /* movl %eax, %cr3             */
-	                  /* --- TLB reload happens here */
-	0xc3              /* ret                         */
-};
-
-PRIVATE ATTR_FREERODATA byte_t const
-x86_pagedir_syncall_cr4_text[] = {
-	0x9c,                            /* pushfl                      */
-	0xfa,                            /* cli                         */
-	0x0f, 0x20, 0xe0,                /* movl   %cr4, %eax           */
-	0x8d, 0x48, ((-CR4_PGE) & 0xff), /* leal   -CR4_PGE(%eax), %ecx */
-	0x0f, 0x22, 0xe1,                /* movl   %ecx, %cr4           */
-	                                 /* --- TLB reload happens here */
-	0x0f, 0x22, 0xe0,                /* movl   %eax, %cr4           */
-	0x9d,                            /* popfl                       */
-	0xc3,                            /* ret                         */
-};
-
-
-STATIC_ASSERT_MSG(sizeof(x86_pagedir_syncall_cr3_text) == 7,
-                  "Update this, as well as the `RELOAD_WITH_CR3_TEXTSIZE' in `paging32.S'");
-STATIC_ASSERT_MSG(sizeof(x86_pagedir_syncall_cr4_text) == 16,
-                  "Update this, as well as the `RELOAD_WITH_CR4_TEXTSIZE' in `paging32.S'");
+INTDEF byte_t const x86_pagedir_syncall_cr3[];
+INTDEF byte_t x86_pagedir_syncall_cr3_size[];
+INTDEF byte_t const x86_pagedir_syncall_cr4[];
+INTDEF byte_t x86_pagedir_syncall_cr4_size[];
 
 
 #ifndef CONFIG_NO_PAGING_P32
@@ -362,30 +340,29 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 		/* Also: Since global TLBs don't exist, we can re-write `x86_pagedir_syncall_maybe_global'
 		 *       to always unconditionally reload cr3 with the same code we already use
 		 *       for `pagedir_syncall' */
-		memcpy((void *)&pagedir_syncall, x86_pagedir_syncall_cr3_text, sizeof(x86_pagedir_syncall_cr3_text));
-		memcpy((void *)&x86_pagedir_syncall_maybe_global, x86_pagedir_syncall_cr3_text, sizeof(x86_pagedir_syncall_cr3_text));
+		memcpy((void *)&pagedir_syncall, x86_pagedir_syncall_cr3, (size_t)x86_pagedir_syncall_cr3_size);
+		memcpy((void *)&x86_pagedir_syncall_maybe_global, x86_pagedir_syncall_cr3, (size_t)x86_pagedir_syncall_cr3_size);
 	} else if (!HAVE_INSTR_INVPCID) {
 		/* From `4.10.4.1     Operations that Invalidate TLBs and Paging-Structure Caches'
 		 *  `MOV to CR4. The behavior of the instruction depends on the bits being modified:'
 		 *   `The instruction invalidates all TLB entries (including global entries) and all entries
 		 *    in all paging-structure caches (for all PCIDs) if ... it changes the value of CR4.PGE ...' */
 		/* In other words: Toggling the PGE bit twice will get rid of all global TLBs */
-		memcpy((void *)&pagedir_syncall, x86_pagedir_syncall_cr4_text, sizeof(x86_pagedir_syncall_cr4_text));
+		memcpy((void *)&pagedir_syncall, x86_pagedir_syncall_cr4, (size_t)x86_pagedir_syncall_cr4_size);
 	}
 
 	if (!HAVE_INSTR_INVLPG) {
 		if (HAVE_PAGE_GLOBAL_BIT) {
 			/* Must re-write `pagedir_syncone' and `x86_pagedir_sync' to use cr4 for flushing */
-			memcpy((void *)&pagedir_syncone, x86_pagedir_syncall_cr4_text, sizeof(x86_pagedir_syncall_cr4_text));
-			memcpy((void *)&x86_pagedir_sync, x86_pagedir_syncall_cr4_text, sizeof(x86_pagedir_syncall_cr4_text));
+			memcpy((void *)&pagedir_syncone, x86_pagedir_syncall_cr4, (size_t)x86_pagedir_syncall_cr4_size);
+			memcpy((void *)&x86_pagedir_sync, x86_pagedir_syncall_cr4, (size_t)x86_pagedir_syncall_cr4_size);
 		} else {
 			/* Must re-write `pagedir_syncone' and `x86_pagedir_sync'
 			 * to use the cr3-trick for TLB invalidation */
-			memcpy((void *)&pagedir_syncone, x86_pagedir_syncall_cr3_text, sizeof(x86_pagedir_syncall_cr3_text));
-			memcpy((void *)&x86_pagedir_sync, x86_pagedir_syncall_cr3_text, sizeof(x86_pagedir_syncall_cr3_text));
+			memcpy((void *)&pagedir_syncone, x86_pagedir_syncall_cr3, (size_t)x86_pagedir_syncall_cr3_size);
+			memcpy((void *)&x86_pagedir_sync, x86_pagedir_syncall_cr3, (size_t)x86_pagedir_syncall_cr3_size);
 		}
 	}
-
 
 	/* TODO: Make use of `HAVE_PAGE_ATTRIBUTE_TABLE' to control
 	 *       availability of `P32_PAGE_FPAT_4KIB' / `P32_PAGE_FPAT_4MIB' */

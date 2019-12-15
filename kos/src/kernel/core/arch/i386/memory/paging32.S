@@ -29,13 +29,36 @@
 
 .section .text
 
-#define RELOAD_WITH_CR3_TEXTSIZE 7  /* == sizeof(x86_pagedir_syncall_cr3_text) */
-#define RELOAD_WITH_CR4_TEXTSIZE 16 /* == sizeof(x86_pagedir_syncall_cr4_text) */
-
 #define PAD_FOR(start, size) \
 	.if size > (.- start);   \
 	.skip size - (.- start); \
 	.endif;
+
+
+.section .rodata.free
+INTERN_FUNCTION(x86_pagedir_syncall_cr3)
+	movl %cr3, %eax
+	movl %eax, %cr3
+	/* --- TLB reload happens here */
+	ret
+INTERN_CONST(x86_pagedir_syncall_cr3_size, . - x86_pagedir_syncall_cr3)
+END(x86_pagedir_syncall_cr3)
+
+.section .rodata.free
+INTERN_FUNCTION(x86_pagedir_syncall_cr4)
+	pushfl
+	cli
+	movl   %cr4, %eax
+	leal   -CR4_PGE(%eax), %ecx
+	movl   %ecx, %cr4
+	/* --- TLB reload happens here */
+	movl   %eax, %cr4
+	popfl
+	ret
+INTERN_CONST(x86_pagedir_syncall_cr4_size, . - x86_pagedir_syncall_cr4)
+END(x86_pagedir_syncall_cr4)
+
+
 
 
 
@@ -46,10 +69,11 @@ PUBLIC_FUNCTION(pagedir_syncall)
 	.cfi_startproc
 	movl   $(2), %eax
 	invpcid 1f, %eax
+	/* --- TLB reload happens here */
 	ret
 1:	.long 0x00000000, 0x00000000
-	PAD_FOR(pagedir_syncall, RELOAD_WITH_CR3_TEXTSIZE)
-	PAD_FOR(pagedir_syncall, RELOAD_WITH_CR4_TEXTSIZE)
+	PAD_FOR(pagedir_syncall, x86_pagedir_syncall_cr3_size)
+	PAD_FOR(pagedir_syncall, x86_pagedir_syncall_cr4_size)
 	.cfi_endproc
 END(pagedir_syncall)
 
@@ -69,8 +93,9 @@ PUBLIC_FUNCTION(x86_pagedir_syncall_maybe_global)
 	/* Only invalidate user-space. */
 	movl   %cr3, %eax
 	movl   %eax, %cr3
+	/* --- TLB reload happens here */
 	ret
-	PAD_FOR(x86_pagedir_syncall_maybe_global, RELOAD_WITH_CR3_TEXTSIZE)
+	PAD_FOR(x86_pagedir_syncall_maybe_global, x86_pagedir_syncall_cr3_size)
 	.cfi_endproc
 END(x86_pagedir_syncall_maybe_global)
 
@@ -80,9 +105,10 @@ END(x86_pagedir_syncall_maybe_global)
 PUBLIC_FUNCTION(pagedir_syncone)
 	.cfi_startproc
 	invlpg (%ecx)
+	/* --- TLB reload happens here */
 	ret
-	PAD_FOR(pagedir_syncone, RELOAD_WITH_CR3_TEXTSIZE)
-	PAD_FOR(pagedir_syncone, RELOAD_WITH_CR4_TEXTSIZE)
+	PAD_FOR(pagedir_syncone, x86_pagedir_syncall_cr3_size)
+	PAD_FOR(pagedir_syncone, x86_pagedir_syncall_cr4_size)
 	.cfi_endproc
 END(pagedir_syncone)
 
@@ -98,11 +124,12 @@ PUBLIC_FUNCTION(x86_pagedir_sync)
 	testl  %ecx, %ecx
 	jz8    2f
 1:	invlpg (%eax)
+	/* --- TLB reload happens here */
 	addl   $(4096), %eax
 	loop   1b
 2:	ret
-	PAD_FOR(x86_pagedir_sync, RELOAD_WITH_CR3_TEXTSIZE)
-	PAD_FOR(x86_pagedir_sync, RELOAD_WITH_CR4_TEXTSIZE)
+	PAD_FOR(x86_pagedir_sync, x86_pagedir_syncall_cr3_size)
+	PAD_FOR(x86_pagedir_sync, x86_pagedir_syncall_cr4_size)
 	.cfi_endproc
 END(x86_pagedir_sync)
 
