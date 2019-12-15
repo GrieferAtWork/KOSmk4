@@ -314,45 +314,45 @@ END(boot_warning_no_fxsr)
 .section .text.free
 INTERN_FUNCTION(_start)
 	/* Boot loader entry point. */
-	movl   %edi, V2P(boot_cpustate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RDI)
-	movl   %esi, V2P(boot_cpustate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RSI)
-	movl   %ebp, V2P(boot_cpustate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RBP)
-	movl   %esp, V2P(boot_cpustate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RSP)
-	movl   %ebx, V2P(boot_cpustate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RBX)
-	movl   %edx, V2P(boot_cpustate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RDX)
-	movl   %ecx, V2P(boot_cpustate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RCX)
-	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_RAX)
-	sgdtl  V2P(boot_cpustate + OFFSET_FCPUSTATE_GDT + 2)
-	sidtl  V2P(boot_cpustate + OFFSET_FCPUSTATE_IDT + 2)
-	movl   $(V2P(_start)), V2P(boot_cpustate + OFFSET_FCPUSTATE_RIP)
-	movw   %gs, V2P(boot_cpustate + OFFSET_FCPUSTATE_GS)
-	movw   %fs, V2P(boot_cpustate + OFFSET_FCPUSTATE_FS)
-	movw   %es, V2P(boot_cpustate + OFFSET_FCPUSTATE_ES)
-	movw   %ds, V2P(boot_cpustate + OFFSET_FCPUSTATE_DS)
-	movw   %cs, V2P(boot_cpustate + OFFSET_FCPUSTATE_CS)
-	movw   %ss, V2P(boot_cpustate + OFFSET_FCPUSTATE_SS)
-	strw   V2P(boot_cpustate + OFFSET_FCPUSTATE_TR)
-	sldtw  V2P(boot_cpustate + OFFSET_FCPUSTATE_LDT)
+	movl   %edi, V2P(boot_cpustate + OFFSET_FCPUSTATE32_GPREGS + OFFSET_GPREGS32_EDI)
+	movl   %esi, V2P(boot_cpustate + OFFSET_FCPUSTATE32_GPREGS + OFFSET_GPREGS32_ESI)
+	movl   %ebp, V2P(boot_cpustate + OFFSET_FCPUSTATE32_GPREGS + OFFSET_GPREGS32_EBP)
+	movl   %esp, V2P(boot_cpustate + OFFSET_FCPUSTATE32_GPREGS + OFFSET_GPREGS32_ESP)
+	movl   %ebx, V2P(boot_cpustate + OFFSET_FCPUSTATE32_GPREGS + OFFSET_GPREGS32_EBX)
+	movl   %edx, V2P(boot_cpustate + OFFSET_FCPUSTATE32_GPREGS + OFFSET_GPREGS32_EDX)
+	movl   %ecx, V2P(boot_cpustate + OFFSET_FCPUSTATE32_GPREGS + OFFSET_GPREGS32_ECX)
+	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE32_GPREGS + OFFSET_GPREGS32_EAX)
+	sgdtl  V2P(boot_cpustate + OFFSET_FCPUSTATE32_GDT + 2)
+	sidtl  V2P(boot_cpustate + OFFSET_FCPUSTATE32_IDT + 2)
+	movl   $(V2P(_start)), V2P(boot_cpustate + OFFSET_FCPUSTATE32_EIP)
+	movw   %gs, V2P(boot_cpustate + OFFSET_FCPUSTATE32_GS)
+	movw   %fs, V2P(boot_cpustate + OFFSET_FCPUSTATE32_FS)
+	movw   %es, V2P(boot_cpustate + OFFSET_FCPUSTATE32_ES)
+	movw   %ds, V2P(boot_cpustate + OFFSET_FCPUSTATE32_DS)
+	movw   %cs, V2P(boot_cpustate + OFFSET_FCPUSTATE32_CS)
+	movw   %ss, V2P(boot_cpustate + OFFSET_FCPUSTATE32_SS)
+	strw   V2P(boot_cpustate + OFFSET_FCPUSTATE32_TR)
+	sldtw  V2P(boot_cpustate + OFFSET_FCPUSTATE32_LDT)
 	movl   %cr0, %eax
-	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE_COREGS + OFFSET_COREGS_CR0)
+	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE32_COREGS + OFFSET_COREGS32_CR0)
 	movl   %cr2, %eax
-	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE_COREGS + OFFSET_COREGS_CR2)
+	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE32_COREGS + OFFSET_COREGS32_CR2)
 	movl   %cr3, %eax
-	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE_COREGS + OFFSET_COREGS_CR3)
+	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE32_COREGS + OFFSET_COREGS32_CR3)
 	movl   %cr4, %eax
-	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE_COREGS + OFFSET_COREGS_CR4)
+	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE32_COREGS + OFFSET_COREGS32_CR4)
 	movl   %dr0, %eax
-	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE_DRREGS + OFFSET_DRREGS_DR0)
+	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE32_DRREGS + OFFSET_DRREGS32_DR0)
 	movl   %dr1, %eax
-	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE_DRREGS + OFFSET_DRREGS_DR1)
+	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE32_DRREGS + OFFSET_DRREGS32_DR1)
 	movl   %dr2, %eax
-	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE_DRREGS + OFFSET_DRREGS_DR2)
+	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE32_DRREGS + OFFSET_DRREGS32_DR2)
 	movl   %dr3, %eax
-	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE_DRREGS + OFFSET_DRREGS_DR3)
+	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE32_DRREGS + OFFSET_DRREGS32_DR3)
 	movl   %dr6, %eax
-	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE_DRREGS + OFFSET_DRREGS_DR6)
+	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE32_DRREGS + OFFSET_DRREGS32_DR6)
 	movl   %dr7, %eax
-	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE_DRREGS + OFFSET_DRREGS_DR7)
+	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE32_DRREGS + OFFSET_DRREGS32_DR7)
 	movl   $(V2P(__kernel_boottask_stack + KERNEL_STACKSIZE)), %esp
 
 #if 1 /* Fixup required when loaded via bochs's `load32bitOSImage' function */
@@ -371,7 +371,7 @@ INTERN_FUNCTION(_start)
 
 	pushfl
 	movl   0(%esp), %eax
-	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE_RFLAGS)
+	movl   %eax, V2P(boot_cpustate + OFFSET_FCPUSTATE32_EFLAGS)
 	/* Make sure that %eflags is in a valid state */
 	andl   $(~(EFLAGS_IF | /* Disable interrupts */                                      \
 	           EFLAGS_TF |                                                               \
