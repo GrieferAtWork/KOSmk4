@@ -2113,7 +2113,6 @@
 #define __CRT_HAVE_vm_datablock_debugheap 1
 #define __CRT_HAVE_vm_datablock_debugheap_type 1
 #define __CRT_HAVE_vm_datablock_destroy 1
-#define __CRT_HAVE_vm_datablock_findchanged 1
 #define __CRT_HAVE_vm_datablock_getfutex 1
 #define __CRT_HAVE_vm_datablock_getfutex_existing 1
 #define __CRT_HAVE_vm_datablock_haschanged 1

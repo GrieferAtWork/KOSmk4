@@ -56,13 +56,13 @@ PUBLIC NONNULL((1)) size_t KCALL
 vm_datapart_read(struct vm_datapart *__restrict self,
                  USER CHECKED void *buf /*dst*/,
                  size_t num_bytes,
-                 pos_t part_offset /*src_offset*/)
+                 size_t part_offset /*src_offset*/)
 #elif defined(DEFINE_IO_WRITE)
 vm_datapart_write(struct vm_datapart *__restrict self,
                   USER CHECKED void const *buf /*src*/,
                   size_t num_bytes,
                   size_t split_bytes,
-                  pos_t part_offset /*dst_offset*/)
+                  size_t part_offset /*dst_offset*/)
 #endif
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...)
 {

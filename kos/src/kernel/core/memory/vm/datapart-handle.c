@@ -65,14 +65,22 @@ INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_datapart_pread(struct vm_datapart *__restrict self,
                       USER CHECKED void *dst, size_t num_bytes,
                       pos_t addr, iomode_t UNUSED(mode)) {
-	return vm_datapart_read(self, dst, num_bytes, addr);
+#if __FS_SIZEOF(OFF) > __SIZEOF_SIZE_T__
+	if (addr > (pos_t)SIZE_MAX)
+		return 0;
+#endif /* __FS_SIZEOF(OFF) > __SIZEOF_SIZE_T__ */
+	return vm_datapart_read(self, dst, num_bytes, (size_t)addr);
 }
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_datapart_pwrite(struct vm_datapart *__restrict self,
                        USER CHECKED void const *src, size_t num_bytes,
                        pos_t addr, iomode_t UNUSED(mode)) {
-	return vm_datapart_write(self, src, num_bytes, num_bytes, addr);
+#if __FS_SIZEOF(OFF) > __SIZEOF_SIZE_T__
+	if (addr > (pos_t)SIZE_MAX)
+		return 0;
+#endif /* __FS_SIZEOF(OFF) > __SIZEOF_SIZE_T__ */
+	return vm_datapart_write(self, src, num_bytes, num_bytes, (size_t)addr);
 }
 
 INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
@@ -80,7 +88,11 @@ handle_datapart_preadv(struct vm_datapart *__restrict self,
                        struct aio_buffer *__restrict dst,
                        size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) {
 	assert(aio_buffer_size(dst) == num_bytes);
-	return vm_datapart_readv(self, dst, addr);
+#if __FS_SIZEOF(OFF) > __SIZEOF_SIZE_T__
+	if (addr > (pos_t)SIZE_MAX)
+		return 0;
+#endif /* __FS_SIZEOF(OFF) > __SIZEOF_SIZE_T__ */
+	return vm_datapart_readv(self, dst, (size_t)addr);
 }
 
 INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
@@ -88,7 +100,11 @@ handle_datapart_pwritev(struct vm_datapart *__restrict self,
                         struct aio_buffer *__restrict src,
                         size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) {
 	assert(aio_buffer_size(src) == num_bytes);
-	return vm_datapart_writev(self, src, num_bytes, addr);
+#if __FS_SIZEOF(OFF) > __SIZEOF_SIZE_T__
+	if (addr > (pos_t)SIZE_MAX)
+		return 0;
+#endif /* __FS_SIZEOF(OFF) > __SIZEOF_SIZE_T__ */
+	return vm_datapart_writev(self, src, num_bytes, (size_t)addr);
 }
 
 DEFINE_HANDLE_APREAD_FROM_PREAD(datapart, struct vm_datapart)
@@ -342,10 +358,11 @@ handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd,
 		block = incref(self->dp_block);
 		sync_endread(self);
 		{
+			size_t mindatapage, maxdatapage;
 			FINALLY_DECREF_UNLIKELY(block);
-			has_changed = vm_datapart_haschanged(self,
-			                                     VM_DATABLOCK_DADDR2DPAGE(block, (pos_t)data->dhc_minbyte),
-			                                     VM_DATABLOCK_DADDR2DPAGE(block, (pos_t)data->dhc_maxbyte));
+			mindatapage = (size_t)data->dhc_minbyte >> VM_DATABLOCK_ADDRSHIFT(block);
+			maxdatapage = (((size_t)data->dhc_maxbyte + VM_DATABLOCK_PAGESIZE(block)) >> VM_DATABLOCK_ADDRSHIFT(block)) - 1;
+			has_changed = vm_datapart_haschanged(self, mindatapage, maxdatapage);
 		}
 		COMPILER_WRITE_BARRIER();
 		data->dhc_result = has_changed ? HOP_DATABLOCK_HASCHANGED_FLAG_DIDCHANGE

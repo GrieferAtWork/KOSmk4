@@ -5351,9 +5351,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname1337 /* index: 1337 */
-	.weak vm_datablock_findchanged; .long vm_datablock_findchanged
-	.reloc ., R_386_SIZE32, vm_datablock_findchanged; .long 0
-	.long 0x718c634
+	.weak x86_dbg_trapstatekind; .long x86_dbg_trapstatekind
+	.reloc ., R_386_SIZE32, x86_dbg_trapstatekind; .long 0
+	.long 0xf7a9e34
 	.long .Lname1338 /* index: 1338 */
 	.weak unwind_getreg_xfpustate_exclusive; .long unwind_getreg_xfpustate_exclusive
 	.reloc ., R_386_SIZE32, unwind_getreg_xfpustate_exclusive; .long 0
@@ -10814,10 +10814,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname2703 /* index: 2703 */
-	.weak x86_dbg_trapstatekind; .long x86_dbg_trapstatekind
-	.reloc ., R_386_SIZE32, x86_dbg_trapstatekind; .long 0
-	.long 0xf7a9e34
+	.long 0 /* index: 2703 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 2704 */
 	.long 0
 	.long 0
@@ -17975,7 +17975,7 @@ END(kernel_symbol_table)
 .Lname1334:
 	.string "vm_memset_nopf"
 .Lname1337:
-	.string "vm_datablock_findchanged"
+	.string "x86_dbg_trapstatekind"
 .Lname1338:
 	.string "unwind_getreg_xfpustate_exclusive"
 .Lname1340:
@@ -19544,8 +19544,6 @@ END(kernel_symbol_table)
 	.string "task_waitfor_norpc_nx"
 .Lname2701:
 	.string "x86_syscall_emulate_sysenter_r"
-.Lname2703:
-	.string "x86_dbg_trapstatekind"
 .Lname2705:
 	.string "vm_getfutex"
 .Lname2706:

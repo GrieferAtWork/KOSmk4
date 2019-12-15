@@ -511,8 +511,8 @@ NOTHROW(KCALL vm_datapart_map_ram_autoprop_p)(struct vm_datapart *__restrict sel
  *       the associated data-block, so-long as `self' hasn't been anonymized) */
 FUNDEF NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL vm_datapart_haschanged)(struct vm_datapart *__restrict self,
-                                      datapage_t partrel_min_dpage DFL((datapage_t)0),
-                                      datapage_t partrel_max_dpage DFL((datapage_t)-1));
+                                      size_t partrel_min_dpage DFL(0),
+                                      size_t partrel_max_dpage DFL((size_t)-1));
 
 /* Synchronize all modified pages within the given part-relative address range.
  * If the given part-relative address range is out-size of the bounds of `self'
@@ -542,10 +542,10 @@ NOTHROW(KCALL vm_datapart_haschanged)(struct vm_datapart *__restrict self,
  *                                             been told in one way or another that there
  *                                             probably are changed pages within the given range.
  * @return: * : The number of saved data pages. */
-FUNDEF NONNULL((1)) datapage_t KCALL
+FUNDEF NONNULL((1)) size_t KCALL
 vm_datapart_sync(struct vm_datapart *__restrict self,
-                 datapage_t partrel_min_dpage DFL(0),
-                 datapage_t partrel_max_dpage DFL((datapage_t)-1),
+                 size_t partrel_min_dpage DFL(0),
+                 size_t partrel_max_dpage DFL((size_t)-1),
                  bool recheck_modifications_before_remap DFL(false))
 		THROWS(E_WOULDBLOCK, ...);
 
@@ -557,10 +557,10 @@ vm_datapart_sync(struct vm_datapart *__restrict self,
  *       TRACKCHANGES bit is set)
  * NOTE: The caller must be holding a read-lock to `self', as well as ensure
  *       that `self' is either INCORE or LOCKED */
-FUNDEF NONNULL((1)) void KCALL vm_datapart_do_read(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) void KCALL vm_datapart_do_write(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) void KCALL vm_datapart_do_read_phys(struct vm_datapart *__restrict self, vm_phys_t dst, size_t num_bytes, pos_t src_offset) THROWS(...);
-FUNDEF NONNULL((1)) void KCALL vm_datapart_do_write_phys(struct vm_datapart *__restrict self, vm_phys_t src, size_t num_bytes, pos_t dst_offset) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL vm_datapart_do_read(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, size_t src_offset) THROWS(E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) void KCALL vm_datapart_do_write(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, size_t dst_offset) THROWS(E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) void KCALL vm_datapart_do_read_phys(struct vm_datapart *__restrict self, vm_phys_t dst, size_t num_bytes, size_t src_offset) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL vm_datapart_do_write_phys(struct vm_datapart *__restrict self, vm_phys_t src, size_t num_bytes, size_t dst_offset) THROWS(...);
 
 /* Same as `vm_datapart_do_read()' / `vm_datapart_do_write()', but copy memory
  * into the supplied user-space buffer `dst' / `src' using `memcpy_nopf()', meaning
@@ -574,8 +574,8 @@ FUNDEF NONNULL((1)) void KCALL vm_datapart_do_write_phys(struct vm_datapart *__r
  *              byte previously read/allocated, before finally moving on to reading/writing
  *              into the remainder of the original buffer, once again allowing for user-space
  *              memory faults. */
-FUNDEF NONNULL((1)) size_t KCALL vm_datapart_do_read_nopf(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(...);
-FUNDEF NONNULL((1)) size_t KCALL vm_datapart_do_write_nopf(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(...);
+FUNDEF NONNULL((1)) size_t KCALL vm_datapart_do_read_nopf(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, size_t src_offset) THROWS(...);
+FUNDEF NONNULL((1)) size_t KCALL vm_datapart_do_write_nopf(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, size_t dst_offset) THROWS(...);
 
 
 /* Read/write data to/from the given data part.
@@ -592,22 +592,22 @@ FUNDEF NONNULL((1)) size_t KCALL vm_datapart_do_write_nopf(struct vm_datapart *_
  *                      Usually the same as `num_bytes'
  * @return: * : The number of read/written bytes (limited by `num_bytes',
  *              and `vm_datapart_numbytes(self) - (src|dst)_offset'). */
-FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) size_t KCALL vm_datapart_write(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, size_t split_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read_phys(struct vm_datapart *__restrict self, vm_phys_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1)) size_t KCALL vm_datapart_write_phys(struct vm_datapart *__restrict self, vm_phys_t src, size_t num_bytes, size_t split_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_readv(struct vm_datapart *__restrict self, struct aio_buffer const *__restrict buf, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_writev(struct vm_datapart *__restrict self, struct aio_buffer const *__restrict buf, size_t split_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_readv_phys(struct vm_datapart *__restrict self, struct aio_pbuffer const *__restrict buf, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_writev_phys(struct vm_datapart *__restrict self, struct aio_pbuffer const *__restrict buf, size_t split_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, size_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) size_t KCALL vm_datapart_write(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, size_t split_bytes, size_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read_phys(struct vm_datapart *__restrict self, vm_phys_t dst, size_t num_bytes, size_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1)) size_t KCALL vm_datapart_write_phys(struct vm_datapart *__restrict self, vm_phys_t src, size_t num_bytes, size_t split_bytes, size_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_readv(struct vm_datapart *__restrict self, struct aio_buffer const *__restrict buf, size_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_writev(struct vm_datapart *__restrict self, struct aio_buffer const *__restrict buf, size_t split_bytes, size_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_readv_phys(struct vm_datapart *__restrict self, struct aio_pbuffer const *__restrict buf, size_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_writev_phys(struct vm_datapart *__restrict self, struct aio_pbuffer const *__restrict buf, size_t split_bytes, size_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Same as the `vm_datapart_(read|write)', however make the assumption that the
  * memory backing is `safe' (i.e. access could never cause a #PF attempting to
  * acquire a lock to `self' when doing so is impossible; i.e. `dst'/`src' are
  * guarantied to not be apart of a mapping of `self', or be otherwise accessed
  * by code called from a page-fault handler) */
-FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_read_unsafe(struct vm_datapart *__restrict self, void *__restrict dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_write_unsafe(struct vm_datapart *__restrict self, void const *__restrict src, size_t num_bytes, size_t split_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_read_unsafe(struct vm_datapart *__restrict self, void *__restrict dst, size_t num_bytes, size_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_write_unsafe(struct vm_datapart *__restrict self, void const *__restrict src, size_t num_bytes, size_t split_bytes, size_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 
 /* Read/Write memory to/from the given data part without causing a #PF due
  * to access made to the given `dst'/`src' buffers (s.a. `memcpy_nopf()').
@@ -634,12 +634,12 @@ FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_write_unsafe(struct vm_datapart 
 FUNDEF NONNULL((1, 2)) ssize_t KCALL
 vm_datapart_read_nopf(struct vm_datapart *__restrict self,
                       USER CHECKED void *dst, size_t num_bytes,
-                      pos_t src_offset)
+                      size_t src_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1, 2)) ssize_t KCALL
 vm_datapart_write_nopf(struct vm_datapart *__restrict self,
                        USER CHECKED void const *src, size_t num_bytes,
-                       size_t split_bytes, pos_t dst_offset)
+                       size_t split_bytes, size_t dst_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 /* Perform I/O using an intermediate buffer, thus solving the deadlock
@@ -657,8 +657,16 @@ vm_datapart_write_nopf(struct vm_datapart *__restrict self,
  * VIO, as well as faulting memory mappings. (s.a. `vm_prefault()')
  * @return: * : The number of read/written bytes (limited by `num_bytes',
  *              and `vm_datapart_numbytes(self) - (src|dst)_offset'). */
-FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read_buffered(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) size_t KCALL vm_datapart_write_buffered(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, size_t split_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) size_t KCALL
+vm_datapart_read_buffered(struct vm_datapart *__restrict self,
+                          USER CHECKED void *dst, size_t num_bytes,
+                          size_t src_offset)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+FUNDEF NONNULL((1)) size_t KCALL
+vm_datapart_write_buffered(struct vm_datapart *__restrict self,
+                           USER CHECKED void const *src, size_t num_bytes,
+                           size_t split_bytes, size_t dst_offset)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 
 
 /* Enumerate physical memory of `self' within the given address range.
@@ -746,44 +754,51 @@ vm_datapart_loadpage(struct vm_datapart *__restrict self,
  * page, rather than a whole virtual memory page. (used to implement `vm_datapart_do_(read|write)[p]') */
 FUNDEF NONNULL((1)) vm_phys_t KCALL
 vm_datapart_loaddatapage(struct vm_datapart *__restrict self,
-                         datapage_t dpage_offset, bool for_writing)
+                         size_t dpage_offset, bool for_writing)
 		THROWS(...);
 
 
 
 /* Get the state of a page (one of `VM_DATAPART_PPP_*') */
-#define VM_DATAPART_GETSTATE(self, relative_pageno) \
-	(__hybrid_assert((u64)(relative_pageno) < vm_datapart_numdpages(self)), !((self)->dp_flags & VM_DATAPART_FLAG_HEAPPPP) \
-	 ? ((__hybrid_atomic_load((self)->dp_pprop, __ATOMIC_ACQUIRE) >> ((u64)(relative_pageno)*VM_DATAPART_PPP_BITS)) & VM_DATAPART_PPP_MASK) \
-	 : (!(self)->dp_pprop_p ? VM_DATAPART_PPP_HASCHANGED : \
-	     __hybrid_atomic_load((self)->dp_pprop_p[(u64)(relative_pageno) / (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS)], __ATOMIC_ACQUIRE) >> \
-	                                           (((u64)(relative_pageno) % (BITSOF(uintptr_t) * VM_DATAPART_PPP_BITS)) * \
-	                                              VM_DATAPART_PPP_BITS) & VM_DATAPART_PPP_MASK))
+#define VM_DATAPART_GETSTATE(self, relative_datapageid)                                        \
+	(__hybrid_assert((relative_datapageid) < vm_datapart_numdpages(self)),                     \
+	 !((self)->dp_flags & VM_DATAPART_FLAG_HEAPPPP)                                            \
+	 ? ((__hybrid_atomic_load((self)->dp_pprop, __ATOMIC_ACQUIRE) >>                           \
+	     ((relative_datapageid)*VM_DATAPART_PPP_BITS)) &                                       \
+	    VM_DATAPART_PPP_MASK)                                                                  \
+	 : (!(self)->dp_pprop_p                                                                    \
+	    ? VM_DATAPART_PPP_HASCHANGED                                                           \
+	    : __hybrid_atomic_load((self)->dp_pprop_p[(relative_datapageid) /                      \
+	                                              (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS)], \
+	                           __ATOMIC_ACQUIRE) >>                                            \
+	      (((relative_datapageid) % (BITSOF(uintptr_t) * VM_DATAPART_PPP_BITS)) *              \
+	       VM_DATAPART_PPP_BITS) &                                                             \
+	      VM_DATAPART_PPP_MASK))
 
 /* Returns true if the per-page state of @self is writable. */
 #define VM_DATAPART_HASWRITABLESTATE(self) \
 	(!((self)->dp_flags & VM_DATAPART_FLAG_HEAPPPP) || (self)->dp_pprop_p != NULL)
 
 /* Set the state of a page, returning true/false if the exchange was successful. */
-#define VM_DATAPART_SETSTATE(self, relative_pageno, state) \
-	vm_datapart_setstate_impl(self, relative_pageno, state)
+#define VM_DATAPART_SETSTATE(self, relative_datapageid, state) \
+	vm_datapart_setstate_impl(self, relative_datapageid, state)
 LOCAL __BOOL KCALL
 vm_datapart_setstate_impl(struct vm_datapart *__restrict self,
-                          datapage_t relative_pageno,
+                          size_t relative_datapageid,
                           unsigned int state) {
 	__hybrid_assert(!(state & ~VM_DATAPART_PPP_MASK));
-	__hybrid_assert((u64)relative_pageno < vm_datapart_numdpages(self));
+	__hybrid_assert(relative_datapageid < vm_datapart_numdpages(self));
 	if (!(self->dp_flags & VM_DATAPART_FLAG_HEAPPPP)) {
-		uintptr_t mask = VM_DATAPART_PPP_MASK << ((unsigned int)relative_pageno * VM_DATAPART_PPP_BITS);
-		uintptr_t newmask = state << ((unsigned int)relative_pageno * VM_DATAPART_PPP_BITS);
+		uintptr_t mask = VM_DATAPART_PPP_MASK << ((unsigned int)relative_datapageid * VM_DATAPART_PPP_BITS);
+		uintptr_t newmask = state << ((unsigned int)relative_datapageid * VM_DATAPART_PPP_BITS);
 		uintptr_t value;
 		do {
 			value = __hybrid_atomic_load(self->dp_pprop, __ATOMIC_ACQUIRE);
 		} while (!__hybrid_atomic_cmpxch_weak(self->dp_pprop, value, (value & ~mask) | newmask,
 		                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
 	} else {
-		size_t i = (size_t)((u64)relative_pageno / (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS));
-		unsigned int j = (unsigned int)((u64)relative_pageno % (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS));
+		size_t i = (size_t)(relative_datapageid / (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS));
+		unsigned int j = (unsigned int)(relative_datapageid % (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS));
 		uintptr_t mask = VM_DATAPART_PPP_MASK << (j * VM_DATAPART_PPP_BITS);
 		uintptr_t newmask = state << (j * VM_DATAPART_PPP_BITS);
 		uintptr_t value;
@@ -797,19 +812,19 @@ vm_datapart_setstate_impl(struct vm_datapart *__restrict self,
 }
 
 /* Atomically compare-exchange the state of a page, returning true/false if the exchange was successful. */
-#define VM_DATAPART_CMPXCHSTATE(self, relative_pageno, oldval, newval) \
-	vm_datapart_cmpxchstate_impl(self, relative_pageno, oldval, newval)
+#define VM_DATAPART_CMPXCHSTATE(self, relative_datapageid, oldval, newval) \
+	vm_datapart_cmpxchstate_impl(self, relative_datapageid, oldval, newval)
 LOCAL __BOOL KCALL
 vm_datapart_cmpxchstate_impl(struct vm_datapart *__restrict self,
-                             datapage_t relative_pageno,
+                             size_t relative_datapageid,
                              unsigned int oldval, unsigned int newval) {
 	__hybrid_assert(!(oldval & ~VM_DATAPART_PPP_MASK));
 	__hybrid_assert(!(newval & ~VM_DATAPART_PPP_MASK));
-	__hybrid_assert((u64)relative_pageno < vm_datapart_numdpages(self));
+	__hybrid_assert(relative_datapageid < vm_datapart_numdpages(self));
 	if (!(self->dp_flags & VM_DATAPART_FLAG_HEAPPPP)) {
-		uintptr_t mask = VM_DATAPART_PPP_MASK << ((unsigned int)relative_pageno * VM_DATAPART_PPP_BITS);
-		uintptr_t oldmask = oldval << ((unsigned int)relative_pageno * VM_DATAPART_PPP_BITS);
-		uintptr_t newmask = newval << ((unsigned int)relative_pageno * VM_DATAPART_PPP_BITS);
+		uintptr_t mask = VM_DATAPART_PPP_MASK << ((unsigned int)relative_datapageid * VM_DATAPART_PPP_BITS);
+		uintptr_t oldmask = oldval << ((unsigned int)relative_datapageid * VM_DATAPART_PPP_BITS);
+		uintptr_t newmask = newval << ((unsigned int)relative_datapageid * VM_DATAPART_PPP_BITS);
 		uintptr_t value;
 		do {
 			value = __hybrid_atomic_load(self->dp_pprop, __ATOMIC_ACQUIRE);
@@ -818,8 +833,8 @@ vm_datapart_cmpxchstate_impl(struct vm_datapart *__restrict self,
 		} while (!__hybrid_atomic_cmpxch_weak(self->dp_pprop, value, (value & ~mask) | newmask,
 		                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
 	} else {
-		size_t i = (size_t)((u64)relative_pageno / (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS));
-		unsigned int j = (unsigned int)(relative_pageno % (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS));
+		size_t i = (size_t)(relative_datapageid / (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS));
+		unsigned int j = (unsigned int)(relative_datapageid % (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS));
 		uintptr_t mask = VM_DATAPART_PPP_MASK << (j * VM_DATAPART_PPP_BITS);
 		uintptr_t oldmask = oldval << (j * VM_DATAPART_PPP_BITS);
 		uintptr_t newmask = newval << (j * VM_DATAPART_PPP_BITS);

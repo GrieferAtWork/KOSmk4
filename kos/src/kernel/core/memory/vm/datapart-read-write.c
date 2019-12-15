@@ -42,7 +42,7 @@ DECL_BEGIN
 PUBLIC NONNULL((1, 2)) size_t KCALL
 vm_datapart_readv(struct vm_datapart *__restrict self,
                   struct aio_buffer const *__restrict buf,
-                  pos_t src_offset)
+                  size_t src_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	struct aio_buffer_entry ent;
 	size_t temp, result = 0;
@@ -63,7 +63,7 @@ PUBLIC NONNULL((1, 2)) size_t KCALL
 vm_datapart_writev(struct vm_datapart *__restrict self,
                    struct aio_buffer const *__restrict buf,
                    size_t split_bytes,
-                   pos_t dst_offset)
+                   size_t dst_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	struct aio_buffer_entry ent;
 	size_t temp, result = 0;
@@ -86,7 +86,7 @@ vm_datapart_writev(struct vm_datapart *__restrict self,
 PUBLIC NONNULL((1, 2)) size_t KCALL
 vm_datapart_readv_phys(struct vm_datapart *__restrict self,
                        struct aio_pbuffer const *__restrict buf,
-                       pos_t src_offset)
+                       size_t src_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	struct aio_pbuffer_entry ent;
 	size_t temp, result = 0;
@@ -107,7 +107,7 @@ PUBLIC NONNULL((1, 2)) size_t KCALL
 vm_datapart_writev_phys(struct vm_datapart *__restrict self,
                         struct aio_pbuffer const *__restrict buf,
                         size_t split_bytes,
-                        pos_t dst_offset)
+                        size_t dst_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	struct aio_pbuffer_entry ent;
 	size_t temp, result = 0;

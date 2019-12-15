@@ -685,13 +685,12 @@ NOTHROW(KCALL vm_datapart_map_ram_p)(struct vm_datapart *__restrict self,
 
 LOCAL NOBLOCK u16
 NOTHROW(KCALL vm_datapart_get_page_permissions)(struct vm_datapart *__restrict self,
-                                                size_t offset, u16 perm) {
+                                                size_t vpage_offset, u16 perm) {
 	uintptr_t mode;
 	unsigned int shift;
 	shift = VM_DATABLOCK_PAGESHIFT(self->dp_block);
 	if (shift == 0) {
-		mode = VM_DATAPART_GETSTATE(self,
-		                            (datapage_t)offset);
+		mode = VM_DATAPART_GETSTATE(self, vpage_offset);
 		if (mode == VM_DATAPART_PPP_HASCHANGED)
 			;
 		else if (mode == VM_DATAPART_PPP_INITIALIZED) {
@@ -700,10 +699,9 @@ NOTHROW(KCALL vm_datapart_get_page_permissions)(struct vm_datapart *__restrict s
 		} else                               /*if (mode == VM_DATAPART_PPP_UNINITIALIZED)*/
 			perm &= ~(PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FEXEC);
 	} else {
-		size_t i;
-		datapage_t start_offset;
+		size_t i, start_offset;
 		size_t count = (size_t)1 << shift;
-		start_offset = (datapage_t)offset << shift;
+		start_offset = vpage_offset << shift;
 		for (i = 0; i < count; ++i) {
 			mode = VM_DATAPART_GETSTATE(self, start_offset + i);
 			if (mode == VM_DATAPART_PPP_HASCHANGED)
@@ -730,48 +728,48 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_map_ram_autoprop)(struct vm_datapart *__restrict self,
                                             PAGEDIR_PAGEALIGNED VIRT void *addr,
                                             u16 perm) {
-	size_t start_offset, offset, count;
+	size_t start_offset, vpage_offset, count;
 	u16 use_perm, new_perm;
 	assert(self->dp_state == VM_DATAPART_STATE_INCORE ||
 	       self->dp_state == VM_DATAPART_STATE_LOCKED);
 	if (self->dp_ramdata.rd_blockv == &self->dp_ramdata.rd_block0) {
 		assert(vm_datapart_numvpages(self) == self->dp_ramdata.rd_block0.rb_size);
-		offset = 0;
+		vpage_offset = 0;
 		count  = self->dp_ramdata.rd_block0.rb_size;
 		do {
-			start_offset = offset;
-			use_perm     = vm_datapart_get_page_permissions(self, offset, perm);
-			for (++offset; offset < count; ++offset) {
-				new_perm = vm_datapart_get_page_permissions(self, offset, perm);
+			start_offset = vpage_offset;
+			use_perm     = vm_datapart_get_page_permissions(self, vpage_offset, perm);
+			for (++vpage_offset; vpage_offset < count; ++vpage_offset) {
+				new_perm = vm_datapart_get_page_permissions(self, vpage_offset, perm);
 				if (new_perm != use_perm)
 					break;
 			}
 			pagedir_map((byte_t *)addr + (start_offset * PAGESIZE),
-			            (offset - start_offset) * PAGESIZE,
+			            (vpage_offset - start_offset) * PAGESIZE,
 			            page2addr(self->dp_ramdata.rd_block0.rb_start + start_offset),
 			            use_perm);
-		} while (offset < count);
+		} while (vpage_offset < count);
 	} else {
 		size_t i;
 		struct vm_ramblock *blocks;
-		offset = 0;
+		vpage_offset = 0;
 		blocks = self->dp_ramdata.rd_blockv;
 		for (i = 0; i < self->dp_ramdata.rd_blockc; ++i) {
 			count = blocks[i].rb_size;
 			do {
-				start_offset = offset;
-				use_perm     = vm_datapart_get_page_permissions(self, offset, perm);
-				for (++offset; offset < count; ++offset) {
-					new_perm = vm_datapart_get_page_permissions(self, offset, perm);
+				start_offset = vpage_offset;
+				use_perm     = vm_datapart_get_page_permissions(self, vpage_offset, perm);
+				for (++vpage_offset; vpage_offset < count; ++vpage_offset) {
+					new_perm = vm_datapart_get_page_permissions(self, vpage_offset, perm);
 					if (new_perm != use_perm)
 						break;
 				}
 				pagedir_map((byte_t *)addr + (start_offset * PAGESIZE),
-				            (offset - start_offset) * PAGESIZE,
+				            (vpage_offset - start_offset) * PAGESIZE,
 				            page2addr(blocks[i].rb_start + start_offset),
 				            use_perm);
-			} while (offset < count);
-			assert(offset == count);
+			} while (vpage_offset < count);
+			assert(vpage_offset == count);
 			assert(count == blocks[i].rb_size);
 			addr = (byte_t *)addr + count * PAGESIZE;
 		}
@@ -783,50 +781,50 @@ NOTHROW(KCALL vm_datapart_map_ram_autoprop_p)(struct vm_datapart *__restrict sel
                                               PAGEDIR_P_SELFTYPE pdir,
                                               PAGEDIR_PAGEALIGNED VIRT void *addr,
                                               u16 perm) {
-	size_t start_offset, offset, count;
+	size_t start_offset, vpage_offset, count;
 	u16 use_perm, new_perm;
 	assert(self->dp_state == VM_DATAPART_STATE_INCORE ||
 	       self->dp_state == VM_DATAPART_STATE_LOCKED);
 	if (self->dp_ramdata.rd_blockv == &self->dp_ramdata.rd_block0) {
 		assert(vm_datapart_numvpages(self) == self->dp_ramdata.rd_block0.rb_size);
-		offset = 0;
+		vpage_offset = 0;
 		count  = self->dp_ramdata.rd_block0.rb_size;
 		do {
-			start_offset = offset;
-			use_perm     = vm_datapart_get_page_permissions(self, offset, perm);
-			for (++offset; offset < count; ++offset) {
-				new_perm = vm_datapart_get_page_permissions(self, offset, perm);
+			start_offset = vpage_offset;
+			use_perm     = vm_datapart_get_page_permissions(self, vpage_offset, perm);
+			for (++vpage_offset; vpage_offset < count; ++vpage_offset) {
+				new_perm = vm_datapart_get_page_permissions(self, vpage_offset, perm);
 				if (new_perm != use_perm)
 					break;
 			}
 			pagedir_map_p(pdir,
 			              (byte_t *)addr + (start_offset * PAGESIZE),
-			              (offset - start_offset) * PAGESIZE,
+			              (vpage_offset - start_offset) * PAGESIZE,
 			              page2addr(self->dp_ramdata.rd_block0.rb_start + start_offset),
 			              use_perm);
-		} while (offset < count);
+		} while (vpage_offset < count);
 	} else {
 		size_t i;
 		struct vm_ramblock *blocks;
-		offset = 0;
+		vpage_offset = 0;
 		blocks = self->dp_ramdata.rd_blockv;
 		for (i = 0; i < self->dp_ramdata.rd_blockc; ++i) {
 			count = blocks[i].rb_size;
 			do {
-				start_offset = offset;
-				use_perm     = vm_datapart_get_page_permissions(self, offset, perm);
-				for (++offset; offset < count; ++offset) {
-					new_perm = vm_datapart_get_page_permissions(self, offset, perm);
+				start_offset = vpage_offset;
+				use_perm     = vm_datapart_get_page_permissions(self, vpage_offset, perm);
+				for (++vpage_offset; vpage_offset < count; ++vpage_offset) {
+					new_perm = vm_datapart_get_page_permissions(self, vpage_offset, perm);
 					if (new_perm != use_perm)
 						break;
 				}
 				pagedir_map_p(pdir,
 				              (byte_t *)addr + (start_offset * PAGESIZE),
-				              (offset - start_offset) * PAGESIZE,
+				              (vpage_offset - start_offset) * PAGESIZE,
 				              page2addr(blocks[i].rb_start + start_offset),
 				              use_perm);
-			} while (offset < count);
-			assert(offset == count);
+			} while (vpage_offset < count);
+			assert(vpage_offset == count);
 			assert(count == blocks[i].rb_size);
 			addr = (byte_t *)addr + count * PAGESIZE;
 		}
@@ -858,23 +856,22 @@ NOTHROW(KCALL vm_datapart_do_enumdma)(struct vm_datapart *__restrict self,
 		          num_bytes,
 		          lock);
 	} else {
-		size_t i, count;
-		u64 blocksize;
+		size_t i, count, blocksize;
 		struct vm_ramblock *blocks;
 		count  = self->dp_ramdata.rd_blockc;
 		blocks = self->dp_ramdata.rd_blockv;
 		for (i = 0;; ++i) {
 			assert(i < count);
-			blocksize = (u64)blocks[i].rb_size * PAGESIZE;
-			if ((u64)partrel_start < blocksize)
+			blocksize = blocks[i].rb_size * PAGESIZE;
+			if (partrel_start < blocksize)
 				break;
-			partrel_start -= (size_t)blocksize;
+			partrel_start -= blocksize;
 		}
 		blocksize -= partrel_start;
 		for (;;) {
 			size_t copysize = num_bytes;
-			if ((u64)copysize > blocksize)
-				copysize = (size_t)blocksize;
+			if (copysize > blocksize)
+				copysize = blocksize;
 			(*prange)(arg,
 			          page2addr(blocks[i].rb_start) + partrel_start,
 			          copysize,
@@ -884,7 +881,7 @@ NOTHROW(KCALL vm_datapart_do_enumdma)(struct vm_datapart *__restrict self,
 			num_bytes -= copysize;
 			++i;
 			assert(i < count);
-			blocksize     = (u64)blocks[i].rb_size * PAGESIZE;
+			blocksize     = blocks[i].rb_size * PAGESIZE;
 			partrel_start = 0;
 		}
 	}
@@ -1484,7 +1481,7 @@ again_readstate:
 		case VM_DATAPART_PPP_UNINITIALIZED:
 			/* It seems to fall upon us to initialize this page! */
 			if (!VM_DATAPART_CMPXCHSTATE(self,
-			                             (datapage_t)vpage_offset,
+			                             vpage_offset,
 			                             VM_DATAPART_PPP_UNINITIALIZED,
 			                             VM_DATAPART_PPP_INITIALIZING))
 				goto again_readstate;
@@ -1503,19 +1500,19 @@ again_readstate:
 				}
 			} EXCEPT {
 				VM_DATAPART_SETSTATE(self,
-				                     (datapage_t)vpage_offset,
+				                     vpage_offset,
 				                     VM_DATAPART_PPP_UNINITIALIZED);
 				RETHROW();
 			}
 			/* Update the part's state to either indicate change, or full initialization */
 			if (*pchanged) {
 				VM_DATAPART_SETSTATE(self,
-				                     (datapage_t)vpage_offset,
+				                     vpage_offset,
 				                     VM_DATAPART_PPP_HASCHANGED);
 				goto set_datapart_changed;
 			}
 			VM_DATAPART_SETSTATE(self,
-			                     (datapage_t)vpage_offset,
+			                     vpage_offset,
 			                     VM_DATAPART_PPP_INITIALIZED);
 			break;
 
@@ -1527,7 +1524,7 @@ again_readstate:
 		case VM_DATAPART_PPP_INITIALIZED:
 			if (*pchanged) {
 				if (!VM_DATAPART_CMPXCHSTATE(self,
-				                             (datapage_t)vpage_offset,
+				                             vpage_offset,
 				                             VM_DATAPART_PPP_INITIALIZED,
 				                             VM_DATAPART_PPP_HASCHANGED))
 					goto again_readstate;
@@ -1549,13 +1546,12 @@ set_datapart_changed:
 		default: __builtin_unreachable();
 		}
 	} else {
-		datapage_t starting_data_page;
-		size_t pagemask;
+		size_t pagemask, starting_data_page;
 		unsigned int n_data_pages, addrshift;
 		bool result_has_changed = false;
 		pagemask                = VM_DATABLOCK_PAGEMASK(self->dp_block);
 		addrshift               = VM_DATABLOCK_ADDRSHIFT(self->dp_block);
-		starting_data_page      = (datapage_t)vpage_offset << page_shift;
+		starting_data_page      = vpage_offset << page_shift;
 		n_data_pages            = 1 << page_shift;
 		for (; n_data_pages; --n_data_pages, ++starting_data_page) {
 again_readstate_multi:
@@ -1571,15 +1567,15 @@ again_readstate_multi:
 				                             VM_DATAPART_PPP_INITIALIZING))
 					goto again_readstate_multi;
 				num_init_pages = 1;
-				assertf(starting_data_page < (datapage_t)vm_datapart_numdpages(self),
-				        "starting_data_page          = %I64p\n"
-				        "vm_datapart_numdpages(self) = %I64p\n",
-				        (u64)starting_data_page, (u64)vm_datapart_numdpages(self));
-				assertf((starting_data_page + n_data_pages) <= (datapage_t)vm_datapart_numdpages(self),
-				        "starting_data_page          = %I64p\n"
+				assertf(starting_data_page < vm_datapart_numdpages(self),
+				        "starting_data_page          = %Iu\n"
+				        "vm_datapart_numdpages(self) = %Iu\n",
+				        starting_data_page, vm_datapart_numdpages(self));
+				assertf((starting_data_page + n_data_pages) <= vm_datapart_numdpages(self),
+				        "starting_data_page          = %Iu\n"
 				        "n_data_pages                = %u\n"
-				        "vm_datapart_numdpages(self) = %I64p\n",
-				        (u64)starting_data_page, n_data_pages, (u64)vm_datapart_numdpages(self));
+				        "vm_datapart_numdpages(self) = %Iu\n",
+				        starting_data_page, n_data_pages, vm_datapart_numdpages(self));
 				while (num_init_pages < n_data_pages &&
 				       VM_DATAPART_CMPXCHSTATE(self,
 				                               starting_data_page + num_init_pages,
@@ -1645,9 +1641,20 @@ again_readstate_multi:
 				        "Dangling `VM_DATAPART_PPP_INITIALIZING' part with only a single running thread\n"
 				        "self               = %p\n"
 				        "self->dp_flags     = %#Ix\n"
-				        "starting_data_page = %I64u (%#I64x)\n"
+				        "starting_data_page = %Iu (%#Ix)\n"
 				        "%I$[hex]\n",
-				        self, (uintptr_t)self->dp_flags, starting_data_page, starting_data_page, self->dp_flags & VM_DATAPART_FLAG_HEAPPPP ? (size_t)(!self->dp_pprop_p ? 0 : CEILDIV(vm_datapart_numdpages(self), BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS) * sizeof(uintptr_t)) : (size_t)sizeof(uintptr_t), self->dp_flags & VM_DATAPART_FLAG_HEAPPPP ? (void *)self->dp_pprop_p : (void *)&self->dp_pprop);
+				        self, (uintptr_t)self->dp_flags,
+				        starting_data_page, starting_data_page,
+				        self->dp_flags & VM_DATAPART_FLAG_HEAPPPP
+				        ? (size_t)(!self->dp_pprop_p
+				                   ? 0
+				                   : CEILDIV(vm_datapart_numdpages(self),
+				                             BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS) *
+				                     sizeof(uintptr_t))
+				        : (size_t)sizeof(uintptr_t),
+				        self->dp_flags & VM_DATAPART_FLAG_HEAPPPP
+				        ? (void *)self->dp_pprop_p
+				        : (void *)&self->dp_pprop);
 				goto again_readstate_multi;
 
 			case VM_DATAPART_PPP_HASCHANGED:
@@ -1687,7 +1694,7 @@ done_init:
  * page, rather than a whole virtual memory page. (used to implement `vm_datapart_do_(read|write)[p]') */
 PUBLIC NONNULL((1)) vm_phys_t KCALL
 vm_datapart_loaddatapage(struct vm_datapart *__restrict self,
-                         datapage_t dpage_offset, bool for_writing)
+                         size_t dpage_offset, bool for_writing)
 		THROWS(...) {
 	struct vm_datablock *block;
 	vm_phys_t result;
@@ -1696,11 +1703,11 @@ vm_datapart_loaddatapage(struct vm_datapart *__restrict self,
 	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
 	assert(self->dp_state == VM_DATAPART_STATE_INCORE ||
 	       self->dp_state == VM_DATAPART_STATE_LOCKED);
-	assertf(dpage_offset < (datapage_t)vm_datapart_numdpages(self),
-	        "dpage_offset                = %I64u\n"
-	        "vm_datapart_numdpages(self) = %I64u\n",
-	        (u64)dpage_offset,
-	        (u64)vm_datapart_numvpages(self));
+	assertf(dpage_offset < vm_datapart_numdpages(self),
+	        "dpage_offset                = %Iu\n"
+	        "vm_datapart_numdpages(self) = %Iu\n",
+	        dpage_offset,
+	        vm_datapart_numvpages(self));
 	/* Figure out the address of the associated physical memory page. */
 	block  = self->dp_block;
 	result = (vm_phys_t)vm_datapart_pageaddr(self,
@@ -1714,7 +1721,7 @@ again_readstate:
 	case VM_DATAPART_PPP_UNINITIALIZED:
 		/* It seems to fall upon us to initialize this page! */
 		if (!VM_DATAPART_CMPXCHSTATE(self,
-		                             (datapage_t)dpage_offset,
+		                             dpage_offset,
 		                             VM_DATAPART_PPP_UNINITIALIZED,
 		                             VM_DATAPART_PPP_INITIALIZING))
 			goto again_readstate;
@@ -1731,19 +1738,19 @@ again_readstate:
 			}
 		} EXCEPT {
 			VM_DATAPART_SETSTATE(self,
-			                     (datapage_t)dpage_offset,
+			                     dpage_offset,
 			                     VM_DATAPART_PPP_UNINITIALIZED);
 			RETHROW();
 		}
 		/* Update the part's state to either indicate change, or full initialization */
 		if (for_writing) {
 			VM_DATAPART_SETSTATE(self,
-			                     (datapage_t)dpage_offset,
+			                     dpage_offset,
 			                     VM_DATAPART_PPP_HASCHANGED);
 			goto set_datapart_changed;
 		}
 		VM_DATAPART_SETSTATE(self,
-		                     (datapage_t)dpage_offset,
+		                     dpage_offset,
 		                     VM_DATAPART_PPP_INITIALIZED);
 		break;
 
@@ -1755,7 +1762,7 @@ again_readstate:
 	case VM_DATAPART_PPP_INITIALIZED:
 		if (for_writing) {
 			if (!VM_DATAPART_CMPXCHSTATE(self,
-			                             (datapage_t)dpage_offset,
+			                             dpage_offset,
 			                             VM_DATAPART_PPP_INITIALIZED,
 			                             VM_DATAPART_PPP_HASCHANGED))
 				goto again_readstate;
@@ -2013,11 +2020,11 @@ done:
  *       the associated data-block, so-long as `self' hasn't been anonymized) */
 PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL vm_datapart_haschanged)(struct vm_datapart *__restrict self,
-                                      datapage_t partrel_min_dpage,
-                                      datapage_t partrel_max_dpage) {
-	datapage_t i;
-	assert((u64)partrel_min_dpage <= (u64)partrel_max_dpage);
-	assert((u64)partrel_max_dpage < vm_datapart_numdpages(self));
+                                      size_t partrel_min_dpage,
+                                      size_t partrel_max_dpage) {
+	size_t i;
+	assert(partrel_min_dpage <= partrel_max_dpage);
+	assert(partrel_max_dpage < vm_datapart_numdpages(self));
 	for (i = partrel_min_dpage; i <= partrel_max_dpage; ++i) {
 		uintptr_t state;
 		state = VM_DATAPART_GETSTATE(self, i);
@@ -2029,34 +2036,35 @@ NOTHROW(KCALL vm_datapart_haschanged)(struct vm_datapart *__restrict self,
 
 
 
-PUBLIC NOBLOCK NONNULL((1)) struct vm_datapart *
+PRIVATE NOBLOCK NONNULL((1)) struct vm_datapart *
 NOTHROW(KCALL vm_datablock_findchanged)(struct vm_datapart *__restrict tree,
                                         datapage_t minpage, datapage_t maxpage,
-                                        datapage_t *__restrict ppartrel_minpage,
-                                        datapage_t *__restrict ppartrel_maxpage,
+                                        size_t *__restrict ppartrel_minpage,
+                                        size_t *__restrict ppartrel_maxpage,
                                         ATREE_SEMI_T(datapage_t) addr_semi,
                                         ATREE_LEVEL_T addr_level) {
 again:
 	if ((ATOMIC_READ(tree->dp_flags) & VM_DATAPART_FLAG_CHANGED) &&
 	    minpage <= vm_datapart_maxdpage(tree) &&
 	    maxpage >= vm_datapart_mindpage(tree)) {
-		datapage_t partrel_minpage, partrel_maxpage;
+		size_t partrel_minpage, partrel_maxpage;
 		/* Check this one. */
 		if (minpage <= vm_datapart_mindpage(tree) &&
 		    maxpage >= vm_datapart_maxdpage(tree)) {
 			/* There ought to have been some changes made to this part! */
 			partrel_minpage = 0;
-			partrel_maxpage = (datapage_t)vm_datapart_numdpages(tree) - 1;
+			partrel_maxpage = vm_datapart_numdpages(tree) - 1;
 		} else {
-			partrel_minpage = vm_datapart_mindpage(tree);
-			partrel_maxpage = vm_datapart_maxdpage(tree);
-			if (maxpage < partrel_maxpage)
-				partrel_maxpage = maxpage - partrel_minpage;
+			datapage_t partmin, partmax;
+			partmin = vm_datapart_mindpage(tree);
+			partmax = vm_datapart_maxdpage(tree);
+			if (maxpage < partmax)
+				partrel_maxpage = (size_t)(maxpage - partmin);
 			else {
-				partrel_maxpage = (datapage_t)vm_datapart_numdpages(tree) - 1;
+				partrel_maxpage = vm_datapart_numdpages(tree) - 1;
 			}
-			if (minpage >= partrel_minpage)
-				partrel_minpage = minpage - partrel_minpage;
+			if (minpage >= partmin)
+				partrel_minpage = (size_t)(minpage - partmin);
 			else {
 				partrel_minpage = 0;
 			}
@@ -2107,7 +2115,7 @@ LOCAL NONNULL((1)) void KCALL
 vm_datapart_do_savepart(struct vm_datapart *__restrict self, struct vm_datablock *__restrict block,
                         NONNULL((1)) void(KCALL *dt_savepart)(struct vm_datablock *__restrict,
                                                               datapage_t, vm_phys_t, size_t),
-                        datapage_t partrel_min_dpage, u64 partrel_num_dpage)
+                        size_t partrel_min_dpage, size_t partrel_num_dpage)
 		THROWS(...) {
 	unsigned int addrshift;
 	assert(dt_savepart == block->db_type->dt_savepart);
@@ -2119,24 +2127,23 @@ vm_datapart_do_savepart(struct vm_datapart *__restrict self, struct vm_datablock
 		               vm_datapart_mindpage(self) + partrel_min_dpage,
 		               page2addr(self->dp_ramdata.rd_block0.rb_start) +
 		               ((vm_phys_t)partrel_min_dpage << addrshift),
-		               (size_t)partrel_num_dpage); /* XXX: Overflow? */
+		               partrel_num_dpage);
 	} else {
-		size_t i;
-		datapage_t dpage_pos       = partrel_min_dpage;
+		size_t i, dpage_pos = partrel_min_dpage;
 		struct vm_ramblock *blocks = self->dp_ramdata.rd_blockv;
 		for (i = 0;; ++i) {
-			u64 block_dpages;
+			size_t block_dpages;
 			assert(i < self->dp_ramdata.rd_blockc);
-			block_dpages = (u64)blocks[i].rb_size << VM_DATABLOCK_PAGESHIFT(block);
-			if (partrel_min_dpage <= (datapage_t)block_dpages)
+			block_dpages = blocks[i].rb_size << VM_DATABLOCK_PAGESHIFT(block);
+			if (partrel_min_dpage <= block_dpages)
 				break;
-			partrel_min_dpage -= (datapage_t)block_dpages;
+			partrel_min_dpage -= (size_t)block_dpages;
 		}
 		while (partrel_num_dpage) {
-			u64 block_dpages;
+			size_t block_dpages;
 			assert(i < self->dp_ramdata.rd_blockc);
-			block_dpages = (u64)blocks[i].rb_size << VM_DATABLOCK_PAGESHIFT(block);
-			block_dpages -= (u64)partrel_min_dpage;
+			block_dpages = blocks[i].rb_size << VM_DATABLOCK_PAGESHIFT(block);
+			block_dpages -= partrel_min_dpage;
 			if (block_dpages > partrel_num_dpage)
 				block_dpages = partrel_num_dpage;
 			(*dt_savepart)(block,
@@ -2180,14 +2187,14 @@ vm_datapart_do_savepart(struct vm_datapart *__restrict self, struct vm_datablock
  *                                             been told in one way or another that there
  *                                             probably are changed pages within the given range.
  * @return: * : The number of saved data pages. */
-PUBLIC NONNULL((1)) datapage_t KCALL
+PUBLIC NONNULL((1)) size_t KCALL
 vm_datapart_sync(struct vm_datapart *__restrict self,
-                 datapage_t partrel_min_dpage,
-                 datapage_t partrel_max_dpage,
+                 size_t partrel_min_dpage,
+                 size_t partrel_max_dpage,
                  bool recheck_modifications_before_remap)
 		THROWS(E_WOULDBLOCK, ...) {
 	struct vm_datablock *block;
-	datapage_t result = 0;
+	size_t result = 0;
 	struct pointer_set vms;
 #ifdef CONFIG_VIO
 	if unlikely(ATOMIC_READ(self->dp_state) == VM_DATAPART_STATE_VIOPRT)
@@ -2210,15 +2217,15 @@ again_lock_datapart:
 		if unlikely(!dt_savepart)
 			goto done_unlock;
 		/* Truncate the specified address range. */
-		if (partrel_max_dpage >= (datapage_t)vm_datapart_numdpages(self))
-			partrel_max_dpage = (datapage_t)vm_datapart_numdpages(self) - 1;
+		if (partrel_max_dpage >= vm_datapart_numdpages(self))
+			partrel_max_dpage = vm_datapart_numdpages(self) - 1;
 		/* Check if the range to sync is still non-empty. */
 		if unlikely(partrel_max_dpage < partrel_min_dpage)
 			goto done_unlock;
 		if (recheck_modifications_before_remap &&
 		    self->dp_srefs != NULL) {
 			if (partrel_min_dpage == 0 &&
-			    partrel_max_dpage >= (datapage_t)vm_datapart_numdpages(self))
+			    partrel_max_dpage >= vm_datapart_numdpages(self))
 				; /* The request spans the entirety of `self', meaning that due to the presence
 				   * of the CHANGED flag (which is checked above), we must assume that at least
 				   * some pages do have actually been modified (though it still is possible that
@@ -2327,8 +2334,7 @@ again_lock_datapart:
 		/* At this point, we can finally go through the range given to us by
 		 * the caller, searching for any page that has been marked as CHANGED. */
 		TRY {
-			datapage_t i;
-			u64 count;
+			size_t i, count;
 			for (i = partrel_min_dpage; i <= partrel_max_dpage;) {
 				if (VM_DATAPART_GETSTATE(self, i) != VM_DATAPART_PPP_HASCHANGED) {
 					++i;
@@ -2361,13 +2367,13 @@ again_lock_datapart:
 		}
 		assert(vm_datapart_numdpages(self) != 0);
 		if (partrel_min_dpage == 0 &&
-		    partrel_max_dpage >= (datapage_t)vm_datapart_numdpages(self) - 1) {
+		    partrel_max_dpage >= vm_datapart_numdpages(self) - 1) {
 			/* Upgrade to a write-lock so we can re-check if all pages are
 			 * still marked as INITIALIZED, rather than CHANGED. */
 			if likely(sync_upgrade(self) ||
 			          !(ATOMIC_READ(self->dp_flags) & VM_DATAPART_FLAG_CHANGED)) {
-				datapage_t i;
-				partrel_max_dpage = (datapage_t)vm_datapart_numdpages(self);
+				size_t i;
+				partrel_max_dpage = vm_datapart_numdpages(self);
 				for (i = 0; i < partrel_max_dpage; ++i) {
 					if unlikely(VM_DATAPART_GETSTATE(self, i) == VM_DATAPART_PPP_HASCHANGED)
 						goto done_unlock_write; /* Further changes happened in the mean time. */
@@ -2415,9 +2421,7 @@ again:
 		/* No parts reachable! */
 		sync_endread(self);
 	} else {
-		datapage_t temp;
-		datapage_t partrel_minpage;
-		datapage_t partrel_maxpage;
+		size_t temp, partrel_minpage, partrel_maxpage;
 		struct vm_datapart *part;
 		/* Search for modified parts within the given range. */
 		part = vm_datablock_findchanged(self->db_parts,
@@ -2459,8 +2463,8 @@ PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL vm_datablock_haschanged)(struct vm_datablock *__restrict self,
                                        datapage_t minpage, datapage_t maxpage) {
 	struct vm_datapart *part;
-	datapage_t partrel_minpage;
-	datapage_t partrel_maxpage;
+	size_t partrel_minpage;
+	size_t partrel_maxpage;
 	assert(sync_reading(self) || !isshared(self) ||
 	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
 	/* Search for modified parts within the given range. */
@@ -3390,9 +3394,9 @@ again:
 			REF struct vm_datapart *part;
 			pageid_t node_minpageid, node_maxpageid;
 			pageid_t used_minpageid, used_maxpageid;
-			pageid_t partrel_minpageid, partrel_maxpageid;
-			datapage_t partrel_mindatapage, partrel_maxdatapage;
-			datapage_t num_synced_pages;
+			size_t partrel_minpageid, partrel_maxpageid;
+			size_t partrel_mindatapage, partrel_maxdatapage;
+			size_t num_synced_datapages;
 			unsigned int addrshift;
 			if ((part = iter->vn_part) == NULL)
 				goto no_changes_in_node;
@@ -3410,10 +3414,10 @@ again:
 				used_minpageid = minpage;
 			if (used_maxpageid > maxpage)
 				used_maxpageid = maxpage;
-			partrel_minpageid  = used_minpageid - node_minpageid;
-			partrel_maxpageid  = used_maxpageid - node_minpageid;
-			partrel_mindatapage = VM_DATABLOCK_PAGEID2DATAPAGE(iter->vn_block, partrel_minpageid);
-			partrel_maxdatapage = VM_DATABLOCK_PAGEID2DATAPAGE(iter->vn_block, partrel_maxpageid);
+			partrel_minpageid   = (size_t)(used_minpageid - node_minpageid);
+			partrel_maxpageid   = (size_t)(used_maxpageid - node_minpageid);
+			partrel_mindatapage = partrel_minpageid << VM_DATABLOCK_PAGESHIFT(iter->vn_block);
+			partrel_maxdatapage = ((partrel_maxpageid + 1) << VM_DATABLOCK_PAGESHIFT(iter->vn_block)) - 1;
 			/* Do a full check for any changes within the given range.
 			 * If there are none, don't unlock the VM, but simply continue
 			 * searching for any changes that may need to be synced. */
@@ -3426,14 +3430,14 @@ again:
 			{
 				FINALLY_DECREF_UNLIKELY(part);
 				/* Sync changes that happened within this datapart. */
-				num_synced_pages = vm_datapart_sync(part,
-				                                    partrel_mindatapage,
-				                                    partrel_maxdatapage);
+				num_synced_datapages = vm_datapart_sync(part,
+				                                        partrel_mindatapage,
+				                                        partrel_maxdatapage);
 			}
 			/* Keep track of the number of actually synced bytes.
 			 * We use bytes for this as it represents a common base-line
 			 * in terms of `VM_DATABLOCK_PAGESHIFT()' vs. `PAGESIZE' */
-			result += (u64)num_synced_pages << addrshift;
+			result += (u64)num_synced_datapages << addrshift;
 			/* NOTE: We don't do a check `if (used_maxpage >= maxpage) break;', because
 			 *       the associated data part may have been truncated or replaced with
 			 *       a different mapping since we've unlocked the VM, meaning that in

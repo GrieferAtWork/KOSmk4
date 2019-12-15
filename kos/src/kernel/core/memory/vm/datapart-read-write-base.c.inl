@@ -43,6 +43,13 @@ DECL_BEGIN
 #define FUNC0(x) x##write
 #endif
 
+#ifdef DEFINE_IO_READ
+#define IFELSE_RW(ifr, ifw) ifr
+#else /* DEFINE_IO_READ */
+#define IFELSE_RW(ifr, ifw) ifw
+#endif /* !DEFINE_IO_READ */
+
+
 /* Directly copy memory to/from the given buffer and `self'
  * NOTE: These functions automatically deal with page properties, such
  *       that `vm_datapart_do_read()' will ensure INITIALIZED pages, whilst
@@ -64,7 +71,7 @@ FUNC0(vm_datapart_do_)(struct vm_datapart *__restrict self,
                        USER CHECKED void const *buf,
 #endif
                        size_t num_bytes,
-                       pos_t offset)
+                       size_t offset)
 #ifdef DEFINE_IO_PHYS
 		THROWS(...)
 #else /* DEFINE_IO_PHYS */
@@ -89,26 +96,15 @@ FUNC0(vm_datapart_do_)(struct vm_datapart *__restrict self,
 			if (max_io > num_bytes)
 				max_io = num_bytes;
 			data_base = vm_datapart_loaddatapage(self,
-			                                     (datapage_t)(offset >> VM_DATABLOCK_ADDRSHIFT(self->dp_block)),
-#ifdef DEFINE_IO_READ
-			                                     false
-#else /* DEFINE_IO_READ */
-			                                     true
-#endif /* !DEFINE_IO_READ */
-			                                     );
+			                                     offset >> VM_DATABLOCK_ADDRSHIFT(self->dp_block),
+			                                     IFELSE_RW(false, true));
 			/* Copy data to/from the data part memory back-end */
 #ifdef DEFINE_IO_PHYS
-#ifdef DEFINE_IO_READ
-			vm_copyinphys(buf, (vm_phys_t)(data_base + page_offset), max_io);
-#else /* DEFINE_IO_READ */
-			vm_copyinphys((vm_phys_t)(data_base + page_offset), buf, max_io);
-#endif /* !DEFINE_IO_READ */
+			IFELSE_RW(vm_copyinphys(buf, (vm_phys_t)(data_base + page_offset), max_io),
+			          vm_copyinphys((vm_phys_t)(data_base + page_offset), buf, max_io));
 #elif defined(DEFINE_IO_NOPF)
-#ifdef DEFINE_IO_READ
-			transferr_error = vm_copyfromphys_nopf(buf, (vm_phys_t)(data_base + page_offset), max_io);
-#else /* DEFINE_IO_READ */
-			transferr_error = vm_copytophys_nopf((vm_phys_t)(data_base + page_offset), buf, max_io);
-#endif /* !DEFINE_IO_READ */
+			transferr_error = IFELSE_RW(vm_copyfromphys_nopf(buf, (vm_phys_t)(data_base + page_offset), max_io),
+			                            vm_copytophys_nopf((vm_phys_t)(data_base + page_offset), buf, max_io));
 			/* Check if the data transfer failed. */
 			if unlikely(transferr_error != 0) {
 				size_t transfer_ok;
@@ -120,11 +116,8 @@ FUNC0(vm_datapart_do_)(struct vm_datapart *__restrict self,
 				return num_bytes - transfer_ok;
 			}
 #else /* ... */
-#ifdef DEFINE_IO_READ
-			vm_copyfromphys(buf, (vm_phys_t)(data_base + page_offset), max_io);
-#else /* DEFINE_IO_READ */
-			vm_copytophys((vm_phys_t)(data_base + page_offset), buf, max_io);
-#endif /* !DEFINE_IO_READ */
+			IFELSE_RW(vm_copyfromphys(buf, (vm_phys_t)(data_base + page_offset), max_io),
+			          vm_copytophys((vm_phys_t)(data_base + page_offset), buf, max_io));
 #endif /* !... */
 			if (max_io >= num_bytes)
 				break;
@@ -172,13 +165,13 @@ PUBLIC NONNULL((1, 2)) ssize_t KCALL
 vm_datapart_read_nopf(struct vm_datapart *__restrict self,
                       USER CHECKED void *buf,
                       size_t num_bytes,
-                      pos_t offset)
+                      size_t offset)
 #else /* DEFINE_IO_READ */
 vm_datapart_write_nopf(struct vm_datapart *__restrict self,
                        USER CHECKED void const *buf,
                        size_t num_bytes,
                        size_t split_bytes,
-                       pos_t offset)
+                       size_t offset)
 #endif /* !DEFINE_IO_READ */
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
 #elif defined(DEFINE_IO_PHYS)
@@ -203,7 +196,7 @@ FUNC0(vm_datapart_)(struct vm_datapart *__restrict self,
 #ifdef DEFINE_IO_WRITE
                     size_t split_bytes,
 #endif /* DEFINE_IO_WRITE */
-                    pos_t offset)
+                    size_t offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
 #else /* ... */
 /* Same as the `vm_datapart_(read|write)', however make the assumption that the
@@ -216,13 +209,13 @@ PUBLIC NONNULL((1, 2)) size_t KCALL
 vm_datapart_read_unsafe(struct vm_datapart *__restrict self,
                         void *__restrict buf,
                         size_t num_bytes,
-                        pos_t offset)
+                        size_t offset)
 #else /* DEFINE_IO_READ */
 vm_datapart_write_unsafe(struct vm_datapart *__restrict self,
                          void const *__restrict buf,
                          size_t num_bytes,
                          size_t split_bytes,
-                         pos_t offset)
+                         size_t offset)
 #endif /* !DEFINE_IO_READ */
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...)
 #endif /* !... */
@@ -287,16 +280,16 @@ vm_datapart_write_unsafe(struct vm_datapart *__restrict self,
 do_has_part:
 #endif /* !DEFINE_IO_READ */
 	TRY {
-		if unlikely(offset >= (pos_t)vm_datapart_numbytes(self))
+		if unlikely(offset >= vm_datapart_numbytes(self))
 			result = 0;
 		else {
 #ifdef DEFINE_IO_NOPF
 			size_t transferr_error;
 #endif /* DEFINE_IO_NOPF */
 #if __SIZEOF_SIZE_T__ >= 8
-			result = (size_t)((pos_t)vm_datapart_numbytes(self) - offset);
+			result = (size_t)(vm_datapart_numbytes(self) - offset);
 #else /* __SIZEOF_SIZE_T__ >= 8 */
-			if (OVERFLOW_USUB(vm_datapart_numbytes(self), (u64)offset, &result))
+			if (OVERFLOW_USUB(vm_datapart_numbytes(self), offset, &result))
 				result = (size_t)-1; /* Handle overflows */
 #endif /* __SIZEOF_SIZE_T__ < 8 */
 			if (result > num_bytes)
@@ -304,18 +297,15 @@ do_has_part:
 #ifdef DEFINE_IO_NOPF
 			assert((ssize_t)result >= 0);
 #endif /* DEFINE_IO_NOPF */
-#if defined(DEFINE_IO_READ) && defined(DEFINE_IO_NOPF)
-			transferr_error = vm_datapart_do_read_nopf(self, buf, result, offset);
-#elif defined(DEFINE_IO_NOPF)
-			transferr_error = vm_datapart_do_write_nopf(self, buf, result, offset);
-#elif defined(DEFINE_IO_READ) && defined(DEFINE_IO_PHYS)
-			vm_datapart_do_read_phys(self, buf, result, offset);
-#elif defined(DEFINE_IO_READ)
-			vm_datapart_do_read(self, buf, result, offset);
+#if defined(DEFINE_IO_NOPF)
+			transferr_error = IFELSE_RW(vm_datapart_do_read_nopf(self, buf, result, offset),
+			                            vm_datapart_do_write_nopf(self, buf, result, offset));
 #elif defined(DEFINE_IO_PHYS)
-			vm_datapart_do_write_phys(self, buf, result, offset);
+			IFELSE_RW(vm_datapart_do_read_phys(self, buf, result, offset),
+			          vm_datapart_do_write_phys(self, buf, result, offset));
 #else
-			vm_datapart_do_write(self, buf, result, offset);
+			IFELSE_RW(vm_datapart_do_read(self, buf, result, offset),
+			          vm_datapart_do_write(self, buf, result, offset));
 #endif
 #ifdef DEFINE_IO_NOPF
 			if unlikely(transferr_error != 0) {
@@ -346,6 +336,7 @@ do_has_part:
 
 DECL_END
 
+#undef IFELSE_RW
 #undef FUNC0
 #undef DEFINE_IO_PHYS
 #undef DEFINE_IO_READ
