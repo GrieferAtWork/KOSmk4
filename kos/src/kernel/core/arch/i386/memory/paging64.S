@@ -82,12 +82,11 @@ PUBLIC_FUNCTION(x86_pagedir_sync)
 	.cfi_startproc
 	cmpq   $(CONFIG_PAGEDIR_LARGESYNC_THRESHOLD), %rsi
 	jae8   x86_pagedir_syncall_maybe_global
-	movq   %rdi, %rax
-	movq   %rsi, %rdi
-	testq  %rdi, %rdi
+	testq  %rsi, %rsi
 	jz8    2f
-1:	invlpg (%rax)
-	addq   $(4096), %rax
+	movq   %rsi, %rcx
+1:	invlpg (%rdi)
+	addq   $(4096), %rdi
 	loop   1b
 2:	ret
 	.cfi_endproc
