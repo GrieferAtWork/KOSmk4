@@ -28,6 +28,7 @@
 #include <kernel/pic.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
+#include <kernel/driver-param.h>
 #include <sched/cpu.h>
 #include <sched/smp.h>
 #include <sched/task.h>
@@ -68,7 +69,7 @@ NOTHROW(KCALL Mp_LocateFloatingPointStructureInAddressRange)(VIRT uintptr_t base
 	if ((base + bytes) < base)
 		bytes = 0 - base;
 	end = (iter = (uintptr_t)base) + bytes;
-	printk(FREESTR(KERN_DEBUG "Searching for MpFloatingPointerStructure in %p...%p\n"),
+	printk(FREESTR(KERN_DEBUG "[smp] Searching for MpFloatingPointerStructure in %p...%p\n"),
 	       iter - KERNEL_CORE_BASE, (end - 1) - KERNEL_CORE_BASE);
 	/* Clamp the search area to a 16-byte alignment. */
 	iter = CEIL_ALIGN(iter, MPFPS_ALIGN);
@@ -114,6 +115,15 @@ DATDEF struct cpu *_cpu_vector[CONFIG_MAX_CPU_COUNT] ASMNAME("cpu_vector");
 
 PUBLIC VIRT byte_t volatile *_x86_lapicbase ASMNAME("x86_lapicbase") = NULL;
 
+#ifndef CONFIG_NO_SMP
+/* Commandline option to set the max number of CPUs which may be configured.
+ * e.g.: `maxcpu=1' (forces the kernel to boot in single-core mode) */
+INTERN u32 x86_config_max_cpu_count = CONFIG_MAX_CPU_COUNT;
+DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(x86_config_max_cpu_count,
+                                            KERNEL_COMMANDLINE_OPTION_TYPE_UINT32,
+                                            "maxcpu");
+#endif /* !CONFIG_NO_SMP */
+
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_smp)(void) {
 	MpFloatingPointerStructure *fps;
@@ -122,10 +132,10 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 	/* TODO: Commandline option to disable detection of this structure */
 	fps = Mp_LocateFloatingPointStructure();
 	if unlikely(!fps) {
-		printk(FREESTR(KERN_DEBUG "MpFloatingPointerStructure not found\n"));
+		printk(FREESTR(KERN_DEBUG "[smp] MpFloatingPointerStructure not found\n"));
 		return;
 	}
-	printk(FREESTR(KERN_DEBUG "MpFloatingPointerStructure located at %p (v1.%I8u; defcfg %I8u)\n"),
+	printk(FREESTR(KERN_DEBUG "[smp] MpFloatingPointerStructure located at %p (v1.%I8u; defcfg %I8u)\n"),
 	       ((uintptr_t)fps - KERNEL_CORE_BASE), fps->mp_specrev, fps->mp_defcfg);
 	if (fps->mp_defcfg) {
 		/* Default configuration. */
@@ -174,20 +184,20 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 				if (entry->mp_processor.p_cpuflag &
 				    (MP_PROCESSOR_FENABLED | MP_PROCESSOR_FBOOTPROCESSOR)) {
 					if (entry->mp_processor.p_cpuflag & MP_PROCESSOR_FBOOTPROCESSOR) {
-						printk(FREESTR(KERN_INFO "Found boot processor with lapic id %#.2I8x\n"),
+						printk(FREESTR(KERN_INFO "[smp] Found boot processor with lapic id %#.2I8x\n"),
 						       entry->mp_processor.p_lapicid);
 						FORCPU(&_bootcpu, _thiscpu_x86_lapicid) = entry->mp_processor.p_lapicid;
 					}
 #ifndef CONFIG_NO_SMP
-					else if unlikely(_cpu_count >= CONFIG_MAX_CPU_COUNT) {
-						printk(FREESTR(KERN_WARNING "Cannot configure additional Processor with lapic id %#.2I8x\n"),
+					else if unlikely(_cpu_count >= x86_config_max_cpu_count) {
+						printk(FREESTR(KERN_WARNING "[smp] Cannot configure additional Processor with lapic id %#.2I8x\n"),
 						       entry->mp_processor.p_lapicid);
 					} else {
 						/* Remember this additional CPU's LAPIC id.
 						 * NOTE: The CPU controller itself will then be allocated and initialized
 						 *       later on. - For right now, we only save its LAPIC id where its
 						 *       controller point will go later (s.a. `x86_initialize_apic()'). */
-						printk(FREESTR(KERN_INFO "Found secondary processor #%u with lapic id %#.2I8x\n"),
+						printk(FREESTR(KERN_INFO "[smp] Found secondary processor #%u with lapic id %#.2I8x\n"),
 						       _cpu_count, entry->mp_processor.p_lapicid);
 						/* This entry will later be replaced by a proper `struct cpu' structure! */
 						_cpu_vector[_cpu_count] = (struct cpu *)(uintptr_t)(((u16)entry->mp_processor.p_lapicid) |
