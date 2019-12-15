@@ -457,7 +457,7 @@ IU(	.cfi_remember_state)
 IU(	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY)
 IU(	INTERN(libc_error_info))
 IU(	call   libc_error_info)
-	movq   %rcx, FIELD_ERROR_CODE
+	movq   %rdi, FIELD_ERROR_CODE
 #if EXCEPTION_DATA_POINTERS != 0
 	.Lindex = 0
 	.rept EXCEPTION_DATA_POINTERS
