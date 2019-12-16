@@ -181,6 +181,7 @@ load_bootloader_driver2(PHYS u32 blob_addr, size_t blob_size, char *cmdline) {
 	size_t aligned_blob_size;
 	REF struct driver *drv;
 	aligned_blob_size = blob_size + (blob_addr & PAGEMASK);
+	aligned_blob_size = CEIL_ALIGN(aligned_blob_size, PAGESIZE);
 	/* Create a temporary mapping of prepared virtual memory which
 	 * we can then use to map the driver's data blob into virtual memory. */
 	blob = vm_mapres(&vm_kernel,
