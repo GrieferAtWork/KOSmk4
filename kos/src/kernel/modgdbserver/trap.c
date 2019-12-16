@@ -111,7 +111,7 @@ GDBServer_TrapCpuState(void *__restrict state,
                        struct debugtrap_reason const *__restrict reason,
                        unsigned int state_kind) {
 	struct task *oldhost;
-	bool was_preemption_enabled;
+	pflag_t was_preemption_enabled;
 	GDBThreadStopEvent stop_event;
 	/* Special handling for message traps. (think of it as KOS's version of `OutputDebugStringA()') */
 	if (reason->dtr_reason == DEBUGTRAP_REASON_MESSAGE) {
@@ -241,12 +241,10 @@ again_waitfor_resume:
 				goto do_become_gdb_host; /* Our async stop was already send out, so don't re-queue */
 			goto do_become_gdb_host_notif;
 		}
-		was_preemption_enabled = PREEMPTION_ENABLED();
-		PREEMPTION_ENABLE();
+		was_preemption_enabled = PREEMPTION_PUSHON();
 		if (!task_waitfor_norpc_nx(NULL))
 			task_disconnectall();
-		if (!was_preemption_enabled)
-			PREEMPTION_DISABLE();
+		PREEMPTION_POP(was_preemption_enabled);
 		{
 			uintptr_half_t resume_state;
 			resume_state = ATOMIC_READ(stop_event.tse_mayresume);
@@ -279,8 +277,7 @@ do_become_gdb_host:
 	ATOMIC_FETCHOR(stop_event.tse_thread->t_flags, TASK_FGDB_STOPPED);
 
 	/* Make sure that preemption is enabled while inside of GDB_Main() */
-	was_preemption_enabled = PREEMPTION_ENABLED();
-	PREEMPTION_ENABLE();
+	was_preemption_enabled = PREEMPTION_PUSHON();
 
 	/* Configure non-/all-stop mode */
 	GDBThread_IsNonStopModeActive = true;
@@ -312,8 +309,7 @@ again_gdb_main:
 #endif /* !NDEBUG */
 
 	/* Restore the old preemption behavior */
-	if (!was_preemption_enabled)
-		PREEMPTION_DISABLE();
+	PREEMPTION_POP(was_preemption_enabled);
 
 done_unlock:
 	/* Unlock the GDB server host lock */
