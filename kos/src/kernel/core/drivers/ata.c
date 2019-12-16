@@ -389,16 +389,15 @@ NOTHROW(KCALL AtaPRD_InitFromPhys)(AtaPRD *__restrict prd_buf,
                                    size_t prd_siz,
                                    vm_phys_t base,
                                    size_t num_bytes) {
-	ssize_t result;
+	size_t result;
 	struct ata_dma_acquire_data data;
 	data.ad_base = prd_buf;
-	data.ad_buf = prd_buf;
-	data.ad_siz = prd_siz;
-	result = ata_dma_acquire_func(&data, base, num_bytes);
-	if unlikely(result <= 0)
-		result = 0;
-	assert(!result || (size_t)result == (size_t)(data.ad_buf - prd_buf));
-	return (size_t)result;
+	data.ad_buf  = prd_buf;
+	data.ad_siz  = prd_siz;
+	if (!ata_dma_acquire_func(&data, base, num_bytes))
+		return 0;
+	result = (size_t)(data.ad_buf - data.ad_base);
+	return result;
 }
 
 INTERN WUNUSED size_t
@@ -406,24 +405,21 @@ NOTHROW(KCALL AtaPRD_InitFromPhysVector)(AtaPRD *__restrict prd_buf,
                                          size_t prd_siz,
                                          struct aio_pbuffer *__restrict buf,
                                          size_t num_bytes) {
+	size_t result;
 	struct aio_pbuffer_entry ent;
 	struct ata_dma_acquire_data data;
-	size_t result = 0;
-	ssize_t temp;
 	assert(aio_pbuffer_size(buf) == num_bytes);
 	(void)num_bytes;
 	data.ad_base = prd_buf;
-	data.ad_buf = prd_buf;
-	data.ad_siz = prd_siz;
+	data.ad_buf  = prd_buf;
+	data.ad_siz  = prd_siz;
 	AIO_PBUFFER_FOREACH(ent, buf) {
-		temp = ata_dma_acquire_func(&data,
-		                            ent.ab_base,
-		                            ent.ab_size);
-		if unlikely(temp <= 0)
+		if (!ata_dma_acquire_func(&data,
+		                          ent.ab_base,
+		                          ent.ab_size))
 			goto err;
-		result += (size_t)temp;
 	}
-	assert(result == (size_t)(data.ad_buf - prd_buf));
+	result = (size_t)(data.ad_buf - data.ad_base);
 	return result;
 err:
 	return 0;
