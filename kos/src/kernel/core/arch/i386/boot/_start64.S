@@ -483,11 +483,11 @@ INTERN_FUNCTION(_start)
 
 	/* Test the PAE bit. */
 	testl  $(CPUID_80000001D_PAE), %edx
-	jz     boot_failure_no_pae
+//	jz     boot_failure_no_pae
 
 	/* Test the PSE bit. */
 	testl  $(CPUID_80000001D_PSE), %edx
-	jz     boot_failure_no_pse
+//	jz     boot_failure_no_pse
 
 	/* Test the CX8 bit. */
 	testl  $(CPUID_80000001D_CX8), %edx
@@ -565,9 +565,9 @@ INTERN_FUNCTION(_start)
 	jnz    1f
 	EXTERN(used_pxx_page_fglobal)
 	movl   $(0), V2P(used_pxx_page_fglobal)
-#if (P64_PAGE_FGLOBAL > 0xffffffff)
+#if P64_PAGE_FGLOBAL > 0xffffffff
 	movl   $(0), V2P(used_pxx_page_fglobal) + 4
-#endif
+#endif /* P64_PAGE_FGLOBAL > 0xffffffff */
 1:
 
 	/* if (Family == 6 && Model < 3 && Stepping < 3)
@@ -605,7 +605,7 @@ INTERN_FUNCTION(_start)
 #define ks_share_e2(i, j) ks_share_e3(256 + i, j)
 #define pagedir_kernel_p_e4(i) V2P(pagedir_kernel + (i) * 8)
 
-#define FLAGS_PAGE2MIB ((P64_PAGE_FACCESSED | P64_PAGE_FWRITE | P64_PAGE_FPRESENT | P64_PAGE_F2MIB) & 0xffffffff)
+#define FLAGS_PAGE2MIB ((P64_PAGE_FACCESSED | P64_PAGE_FWRITE | P64_PAGE_FPRESENT | P64_PAGE_FDIRTY | P64_PAGE_F2MIB) & 0xffffffff)
 #define FLAGS_VECTOR   ((P64_PAGE_FACCESSED | P64_PAGE_FWRITE | P64_PAGE_FPRESENT) & 0xffffffff)
 
 	/* Initialize x86_64 paging:
@@ -655,12 +655,11 @@ INTERN_FUNCTION(_start)
 	movl   $(pagedir_kernel_p_e4(0) + FLAGS_VECTOR), pagedir_kernel_p_e4(257)
 	/* HINT: Right now our VM looks like this:
 	 * [0] 0000000000000000..000000007fffffff --> 0000000000000000..000000007fffffff
-	 * [1] 0000007f80000000..0000007fffffffff --> 0000000000000000..000000007fffffff (Redundant, unavoidable, and never used)
+	 * [1] ffff800000000000..ffff80007fffffff --> 0000000000000000..000000007fffffff (Redundant, unavoidable, and never used)
 	 * [2] ffff808000000000..ffff80ffffffffff --> <recursive page-directory self-mapping>
-	 * [3] ffffff8000000000..ffffff807fffffff --> 0000000000000000..000000007fffffff (Redundant, unavoidable, and never used)
-	 * [4] ffffffff80000000..ffffffffffffffff --> 0000000000000000..000000007fffffff
-	 * We're currently running from [0] and eventually want to end up running from [4]
-	 * Once we're at [4], we'll be deleting the mappings producing [0], [1] and [3] */
+	 * [3] ffffffff80000000..ffffffffffffffff --> 0000000000000000..000000007fffffff
+	 * We're currently running from [0] and eventually want to end up running from [3]
+	 * Once we're at [3], we'll be deleting the mappings producing [0] and [1] */
 
 	/* Prepare to enable paging. */
 	movl   $(pagedir_kernel_phys), %eax
@@ -783,6 +782,12 @@ INTERN_FUNCTION(_start64)
 	movq   $(0), (__x86_pagedir_kernel_share + 0)
 	movq   $(0), (__x86_pagedir_kernel_share + 8)
 	movq   $(0), (pagedir_kernel + 0)
+
+	/* HINT: Right now our VM looks like this:
+	 * [0] ffff808000000000..ffff80ffffffffff --> <recursive page-directory self-mapping>
+	 * [1] ffffffff80000000..ffffffffffffffff --> 0000000000000000..000000007fffffff
+	 * In this picture, we're currently running from [1] (mapped at -2GiB...0) */
+
 
 	/* Set the `%gs.base' (`THIS_TASK') register to point to `&_boottask'
 	 * Normally we'd just use `wrgsbase' for this, however we havn't yet

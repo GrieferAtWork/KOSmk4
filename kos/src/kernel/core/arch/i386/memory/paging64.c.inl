@@ -30,6 +30,7 @@
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
+#include <kernel/printk.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
 #include <sched/cpu.h>
@@ -47,6 +48,22 @@
 #include <string.h>
 
 DECL_BEGIN
+
+#if !defined(NDEBUG) && 0
+#define TRACE_MAP(addr, num_bytes, phys, perm)                            \
+	printk(KERN_TRACE "[pd] +mmap:%p-%p " FORMAT_VM_PHYS_T " %c%c%c%c\n", \
+	       addr, (byte_t *)(addr) + (num_bytes)-1, (vm_phys_t)(phys),     \
+	       perm & PAGEDIR_MAP_FEXEC ? 'x' : '-',                          \
+	       perm & PAGEDIR_MAP_FWRITE ? 'w' : '-',                         \
+	       perm & PAGEDIR_MAP_FREAD ? 'r' : '-',                          \
+	       perm & PAGEDIR_MAP_FUSER ? 'u' : '-')
+#define TRACE_UNMAP(addr, num_bytes)        \
+	printk(KERN_TRACE "[pd] -mmap:%p-%p\n", \
+	       addr, (byte_t *)(addr) + (num_bytes)-1)
+#else
+#define TRACE_MAP(addr, num_bytes, phys, perm) (void)0
+#define TRACE_UNMAP(addr, num_bytes)           (void)0
+#endif
 
 /* Return the physical page ID of a given physical address. */
 #define ppageof(paddr) (pageptr_t)((paddr) / PAGESIZE)
@@ -84,7 +101,12 @@ STATIC_ASSERT(sizeof(union p64_pdir_e4) == 8);
 STATIC_ASSERT(sizeof(union p64_pdir_e3) == 8);
 STATIC_ASSERT(sizeof(union p64_pdir_e2) == 8);
 STATIC_ASSERT(sizeof(union p64_pdir_e1) == 8);
+
 STATIC_ASSERT(P64_PDIR_E1_IDENTITY_BASE == P64_VM_KERNEL_PDIR_IDENTITY_BASE);
+STATIC_ASSERT(P64_PDIR_E2_IDENTITY_BASE == P64_PDIR_E1_IDENTITY_BASE + (P64_PDIR_VEC4INDEX(P64_PDIR_E1_IDENTITY_BASE) * P64_PDIR_E3_SIZE));
+STATIC_ASSERT(P64_PDIR_E3_IDENTITY_BASE == P64_PDIR_E2_IDENTITY_BASE + (P64_PDIR_VEC3INDEX(P64_PDIR_E2_IDENTITY_BASE) * P64_PDIR_E2_SIZE));
+STATIC_ASSERT(P64_PDIR_E4_IDENTITY_BASE == P64_PDIR_E3_IDENTITY_BASE + (P64_PDIR_VEC2INDEX(P64_PDIR_E3_IDENTITY_BASE) * P64_PDIR_E1_SIZE));
+
 
 
 PRIVATE ATTR_SECTION(".free.unmap_but_keep_allocated") ATTR_ALIGNED(4096)
@@ -238,7 +260,7 @@ NOTHROW(FCALL p64_pagedir_init)(VIRT struct p64_pdir *__restrict self,
 	memsetq(self->p_e4 + 0, P64_PAGE_ABSENT, 256);              /* user-space */
 	memcpyq(self->p_e4 + 256, P64_PDIR_E4_IDENTITY + 256, 256); /* kernel-space */
 	/* Set the control word for the page directory identity mapping. */
-	self->p_e4[267].p_word = (u64)phys_self | P64_PAGE_FACCESSED | P64_PAGE_FWRITE | P64_PAGE_FPRESENT;
+	self->p_e4[257].p_word = (u64)phys_self | P64_PAGE_FACCESSED | P64_PAGE_FWRITE | P64_PAGE_FPRESENT;
 }
 
 
@@ -540,6 +562,7 @@ NOTHROW(FCALL p64_pagedir_prepare_impl_widen)(unsigned int vec4,
 	union p64_pdir_e3 e3;
 	union p64_pdir_e2 e2;
 	pflag_t was = 0;
+	assert(vec4 < 512);
 	assert(vec3 < 512);
 	assert(vec2 < 512);
 	assert(vec1_prepare_start < 512);
@@ -749,11 +772,10 @@ word_changed_after_e1_vector:
 		new_word = ATOMIC_READ(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word);
 		if unlikely(e3.p_word != new_word)
 			goto word_changed_after_e1_vector;
-		new_e2_word = (u64)e1_vector * 4096;
-		new_e2_word |= P64_PAGE_FPRESENT | P64_PAGE_FWRITE;
+		new_e2_word = (u64)page2addr(e1_vector);
+		new_e2_word |= P64_PAGE_FPRESENT | P64_PAGE_FWRITE | P64_PAGE_FACCESSED;
 		new_e2_word |= e2.p_word & (P64_PAGE_FUSER | P64_PAGE_FPWT |
-		                            P64_PAGE_FPCD | P64_PAGE_FACCESSED |
-		                            P64_PAGE_FGLOBAL);
+		                            P64_PAGE_FPCD | P64_PAGE_FGLOBAL);
 		if (VEC4_IS_USERSPACE)
 			new_e2_word |= P64_PAGE_FUSER;
 		/* Try to install the new E1-vector. */
@@ -1461,6 +1483,7 @@ NOTHROW(FCALL p64_pagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                   u16 perm) {
 	u64 e1_word;
 	unsigned int vec4, vec3, vec2, vec1;
+	TRACE_MAP(addr, PAGESIZE, phys, perm);
 	e1_word = p64_pagedir_encode_4kib(addr, phys, perm);
 	vec4 = P64_PDIR_VEC4INDEX(addr);
 	vec3 = P64_PDIR_VEC3INDEX(addr);
@@ -1480,6 +1503,7 @@ NOTHROW(FCALL p64_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	assertf(IS_ALIGNED((uintptr_t)num_bytes, 4096), "num_bytes = %#Ix", num_bytes);
 	assertf((uintptr_t)addr + num_bytes >= (uintptr_t)addr, "Invalid range %p...%p",
 	        addr, (uintptr_t)addr + num_bytes - 1);
+	TRACE_MAP(addr, num_bytes, phys, perm);
 	e1_word = p64_pagedir_encode_4kib(addr, phys, perm);
 	for (i = 0; i < num_bytes; i += 4096) {
 		unsigned int vec4, vec3, vec2, vec1;
@@ -1506,6 +1530,7 @@ NOTHROW(FCALL p64_pagedir_push_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                        u16 perm) {
 	u64 e1_word, result;
 	unsigned int vec4, vec3, vec2, vec1;
+	TRACE_MAP(addr, PAGESIZE, phys, perm);
 	e1_word = p64_pagedir_encode_4kib(addr, phys, perm);
 	vec4 = P64_PDIR_VEC4INDEX(addr);
 	vec3 = P64_PDIR_VEC3INDEX(addr);
@@ -1535,6 +1560,7 @@ INTERN NOBLOCK void
 NOTHROW(FCALL p64_pagedir_unmapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec4, vec3, vec2, vec1;
 	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
+	TRACE_UNMAP(addr, PAGESIZE);
 	vec4 = P64_PDIR_VEC4INDEX(addr);
 	vec3 = P64_PDIR_VEC3INDEX(addr);
 	vec2 = P64_PDIR_VEC2INDEX(addr);
@@ -1551,6 +1577,7 @@ NOTHROW(FCALL p64_pagedir_unmap)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	assertf(IS_ALIGNED((uintptr_t)num_bytes, 4096), "num_bytes = %#Ix", num_bytes);
 	assertf((uintptr_t)addr + num_bytes >= (uintptr_t)addr, "Invalid range %p...%p",
 	        addr, (uintptr_t)addr + num_bytes - 1);
+	TRACE_UNMAP(addr, num_bytes);
 	for (i = 0; i < num_bytes; i += 4096) {
 		unsigned int vec4, vec3, vec2, vec1;
 		byte_t *effective_addr = (byte_t *)addr + i;
