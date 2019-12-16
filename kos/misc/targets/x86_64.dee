@@ -79,6 +79,12 @@ function build(magic: Module) {
 		magic.CONFIG_ONLY_BUILD_LIBRARIES = true;
 		/* Also output files into the x86_64 disk image! */
 		magic.toolchain.options[TOOLCHAIN_MTOOLS_DISK] = magic.TARGET_BINPATH[1:] + "/disk.img";
+		/* Re-configure the toolchain cache to use x86_64 paths, rather than i386 ones.
+		 * This is required to properly handle library dependencies for compatibility
+		 * mode system libraries. */
+		magic.toolchain._stdlibCache.clear();
+		magic.TARGET.provideToolchainCache(
+			magic.toolchain, "x86_64-kos-" + magic.getConfig());
 	});
 
 	/* Restore x86_64 settions */
