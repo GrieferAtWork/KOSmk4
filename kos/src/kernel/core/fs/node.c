@@ -4579,7 +4579,7 @@ db_inode_savepart(struct inode *__restrict self, datapage_t start,
 		filesize  = self->i_filesize;
 		COMPILER_READ_BARRIER();
 		/* Deal with out-of-bound writes. */
-		if unlikely(daddr + num_bytes >= filesize) {
+		if unlikely(daddr + num_bytes > filesize) {
 			if unlikely(daddr >= filesize)
 				return; /* Entirely out-of-bounds */
 			/* Partially out-of-bounds */
