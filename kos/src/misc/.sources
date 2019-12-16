@@ -21,7 +21,7 @@
 for (local x: fs.dir("kos/src/misc/keymaps")) {
 	BEGIN GROUP("keymaps." + x) { KEYMAP, MCOPY };
 		options[OPT_KEYMAP_SRC]   = { "keymaps/" + x };
-		options[OPT_LINK_OUTPUT]  = "/" + BINPATH + "/lib/keymap/" + x;
+		options[OPT_LINK_OUTPUT]  = TARGET_BINPATH + "/lib/keymap/" + x;
 		options[OPT_MCOPY_OUTPUT] = "/lib/keymap/" + x;
 	END
 }

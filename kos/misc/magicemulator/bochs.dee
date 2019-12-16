@@ -63,12 +63,12 @@ function enumerateBochsBiosLocations(): {string...} {
 function start(
 		groups: {Group...},
 		config: Config,
-		binPath: string,
-		kernelFile: string,
-		multibootDrivers: {(string, string)...},
-		targetArch: string,
-		targetCpu: string,
-		diskFile: string,
+		BINPATH: string,
+		KERNEL: string,
+		DRIVERS: {(string, string)...},
+		TARGET_ARCH: string,
+		TARGET: Module,
+		DISK_FILENAME: string,
 		options: {string: Object}) {
 	local bochs;
 	local bochs_bios;
@@ -94,21 +94,21 @@ got_exe:
 got_bios:
 	local bochs_arguments = [];
 	local kernelFlatFilename = fs.joinpath(
-		fs.headof(kernelFile),
-		"." + fs.fileof(kernelFile) + "-flat." + fs.extof(kernelFile));
+		fs.headof(KERNEL),
+		"." + fs.fileof(KERNEL) + "-flat." + fs.extof(KERNEL));
 	local bxrcFilename = kernelFlatFilename + ".bxrc";
 	local flat_last_modified = getLastModfiedTime(kernelFlatFilename);
 	if (flat_last_modified is none ||
-	    flat_last_modified < getLastModfiedTime(kernelFile)) {
+	    flat_last_modified < getLastModfiedTime(KERNEL)) {
 		print "[bochs] Updating kernel shadow", repr kernelFlatFilename;
 		flattenElfBinary(
-			inputFile: kernelFile,
+			inputFile: KERNEL,
 			outputFile: kernelFlatFilename,
 			physBase: 0x00100000, /* 1MiB */
 			virtBase: {
 				"i386"   : 0xc0100000, /* 3GiB + 1MiB */
 				"x86_64" : 0xffffffff80100000, /* -2GiB + 1MiB */
-			}[targetArch],
+			}[TARGET_ARCH],
 			keepBss: true,
 			overrideEntry: false);
 		/* In order to be accepted by BOCHS, the size of kernelFlatFilename
@@ -129,7 +129,7 @@ got_bios:
 			throw;
 		}
 	}
-	try fs.unlink(diskFile + ".lock"); catch (...);
+	try fs.unlink(DISK_FILENAME + ".lock"); catch (...);
 	try fs.unlink(kernelFlatFilename + ".lock"); catch (...);
 	with (local rc = File.open(bxrcFilename, "w")) {
 		rc << "romimage: file=" << repr(fs.joinpath(bochs_bios, BOCHS_BIOS)) << "\n";
@@ -137,7 +137,7 @@ got_bios:
 		rc << "boot: disk\n";
 		rc << "ata0-master: type=disk, path=" << repr(fs.tailof(kernelFlatFilename))
 			<< ", mode=flat, cylinders=0, heads=16, spt=63, model=\"Generic 1234\", biosdetect=auto, translation=auto\n";
-		rc << "ata1-master: type=disk, path=" << repr(fs.relpath(diskFile, fs.headof(kernelFlatFilename)))
+		rc << "ata1-master: type=disk, path=" << repr(fs.relpath(DISK_FILENAME, fs.headof(kernelFlatFilename)))
 			<< ", mode=flat, cylinders=0, heads=0, spt=0, model=\"Generic 1234\", biosdetect=auto, translation=auto\n";
 		rc << "cpuid: level=6, stepping=3, model=3, family=6, vendor_string=\"GenuineIntel\", brand_string=\"BOCHS         Intel(R) Pentium(R) 4 CPU        \"\n";
 		rc << "cpu: count=1, ips=4000000, model=bx_generic, reset_on_triple_fault=0, cpuid_limit_winnt=0, ignore_bad_msrs=1, mwait_is_nop=0\n";

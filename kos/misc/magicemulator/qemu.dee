@@ -86,12 +86,12 @@ function qemuMonitorBackend(addr: string, monitorPipe: File) {
 function start(
 		groups: {Group...},
 		config: Config,
-		binPath: string,
-		kernelFile: string,
-		multibootDrivers: {(string, string)...},
-		targetArch: string,
-		targetCpu: string,
-		diskFile: string,
+		BINPATH: string,
+		KERNEL: string,
+		DRIVERS: {(string, string)...},
+		TARGET_ARCH: string,
+		TARGET: Module,
+		DISK_FILENAME: string,
 		options: {string: Object}) {
 	local qemu = options.get(opt.QEMU_EXE)
 #ifdef __WINDOWS__
@@ -99,7 +99,7 @@ function start(
 #endif
 		;
 	if (qemu is none) {
-		qemu = "qemu-system-" + targetArch
+		qemu = "qemu-system-" + TARGET_ARCH
 #ifdef __WINDOWS__
 			+ ".exe"
 #endif
@@ -122,12 +122,12 @@ got_exe:
 	if (options.get(opt.QEMU_HOSTED, true))
 		qemu_arguments.extend({ "-no-reboot", "-no-shutdown" });
 	local gdb_mode = options.get(opt.QEMU_GDB);
-	local boot_drivers = List(multibootDrivers);
+	local boot_drivers = List(DRIVERS);
 	if (gdb_mode !is none) {
 		if (gdb_mode == "server") {
 			/* Make use of out GDB server driver */
 			boot_drivers.append((
-				binPath + "/os/drivers/gdbserver",
+				BINPATH + "/os/drivers/gdbserver",
 				"transport=serial:0x2f8:0xf3"
 			));
 			qemu_arguments.extend({ "-serial", "tcp::1234,server" });
@@ -139,27 +139,27 @@ got_exe:
 			throw Error("Invalid GDB mode: " + repr gdb_mode);
 		}
 	}
-	if (targetArch == "x86_64") {
+	if (TARGET_ARCH == "x86_64") {
 		/* Must create+use a custom kernel binary with e_machine = EM_386 */
 		local kernel386 = "{}.em386-{}".format({
-			fs.headof(kernelFile),
-			fs.tailof(kernelFile),
+			fs.headof(KERNEL),
+			fs.tailof(KERNEL),
 		});
 		local x32modified = getLastModfiedTime(kernel386);
 		if (x32modified !is none) {
-			local x64modified = getLastModfiedTime(kernelFile);
+			local x64modified = getLastModfiedTime(KERNEL);
 			if (x64modified !is none && x64modified <= x32modified)
 				goto did_update_x86_64_kernel;
 			try fs.unlink(kernel386); catch (...);
 		}
 		print "[qemu] Updating kernel shadow", repr kernel386;
-		fs.copyfile(kernelFile, kernel386);
+		fs.copyfile(KERNEL, kernel386);
 		with (local fp = File.open(kernel386, "rb+,nobuf")) {
 			fp.seek(18); /* __OFFSET_ELF64_EHDR_MACHINE */
 			fp.write((3).tobytes(2, "little", false)); /* EM_386 */
 		}
 did_update_x86_64_kernel:
-		kernelFile = kernel386;
+		KERNEL = kernel386;
 	}
 	if (boot_drivers) {
 		qemu_arguments.append("-initrd");
@@ -190,9 +190,9 @@ did_update_x86_64_kernel:
 	} catch (...) {
 	}
 	qemu_arguments.extend({
-		"-kernel", kernelFile,
+		"-kernel", KERNEL,
 //		"-initrd", "bin/i386-kos/drivers/ext2fs e f g h",
-		"-drive", "file=" + diskFile + ",format=raw,index=0,media=disk",
+		"-drive", "file=" + DISK_FILENAME + ",format=raw,index=0,media=disk",
 #if 0
 		"-drive", "file=bin/Postal2.iso,format=raw,index=1,media=disk",
 		"-drive", "file=bin/ext2.img,format=raw,index=2,media=disk",

@@ -17,33 +17,55 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
+if (!CONFIG_ONLY_BUILD_LIBRARIES) {
 BEGIN GROUP("apps.init") { COMPILE, LINK, MCOPY };
 	SET_LANGUAGE("c")
-	SET_OUTPUT("/" + BINPATH + "/bin/init")
-	SET_DISKFILE("/bin/init")
+	SET_OUTPUT("/bin/init")
 	SOURCE({ "init/*.c" })
 END
 
 BEGIN GROUP("apps.playground") { COMPILE, LINK, MCOPY };
-	SET_OUTPUT("/" + BINPATH + "/bin/playground")
-	SET_DISKFILE("/bin/playground")
+	SET_OUTPUT("/bin/playground")
 	SOURCE({ "playground/*.c" })
 END
 
 BEGIN GROUP("apps.rpc-service") { COMPILE, LINK, MCOPY };
 	SET_LANGUAGE("c")
-	SET_OUTPUT("/" + BINPATH + "/bin/rpc-service")
-	SET_DISKFILE("/bin/rpc-service")
+	SET_OUTPUT("/bin/rpc-service")
 	SOURCE({ "rpc-service/*.c" })
 END
 
+BEGIN GROUP("apps.keymap") { COMPILE, LINK, MCOPY };
+	SET_LANGUAGE("c")
+	SET_OUTPUT("/bin/keymap")
+	USELIB("libkeymap")
+	SOURCE({ "keymap/*.c" })
+END
 
+
+BEGIN GROUP("apps.gfx") { COMPILE, LINK, MCOPY };
+	SET_LANGUAGE("c")
+	SET_OUTPUT("/bin/gfx")
+	SOURCE({ "gfx/*.c" })
+END
+}
 
 BEGIN GROUP("apps.system-test") { COMPILE, LINK, MCOPY };
 	DEFINE("__INSIDE_LIBTEST")
-	LINKER_SCRIPT("system-test/arch/" + TARGET_XARCH + "/_linker.ld")
-	SET_OUTPUT("/" + BINPATH + "/bin/system-test")
-	SET_DISKFILE("/bin/system-test")
+	LINKER_SCRIPT("system-test/arch/" + XARCH + "/_linker.ld")
+	SET_OUTPUT("/bin/system-test")
+
+	/* When building the compatibility-mode system libraries for x86_64, also
+	 * include a regular 32-bit application /bin/system-test32 that is the 32-bit
+	 * variant of /bin/system-test, but will have to be executed in compatibility
+	 * mode, thus also testing the system's ability to run such applications!
+	 * NOTE: Aside from having a different filename, `/bin/system-test32' is
+	 *       exactly the same file as the /bin/system-test from an i386 disk
+	 *       image! */
+	if (TARGET_REAL_ARCH == "x86_64" && TARGET_ARCH == "i386") {
+		SET_OUTPUT("/bin/system-test32")
+	}
+
 	USELIB("libdl")
 	SOURCE({
 		"system-test/*.c",
@@ -56,23 +78,6 @@ BEGIN GROUP("apps.system-test") { COMPILE, LINK, MCOPY };
 
 	})
 END
-
-BEGIN GROUP("apps.keymap") { COMPILE, LINK, MCOPY };
-	SET_LANGUAGE("c")
-	SET_OUTPUT("/" + BINPATH + "/bin/keymap")
-	SET_DISKFILE("/bin/keymap")
-	USELIB("libkeymap")
-	SOURCE({ "keymap/*.c" })
-END
-
-
-BEGIN GROUP("apps.gfx") { COMPILE, LINK, MCOPY };
-	SET_LANGUAGE("c")
-	SET_OUTPUT("/" + BINPATH + "/bin/gfx")
-	SET_DISKFILE("/bin/gfx")
-	SOURCE({ "gfx/*.c" })
-END
-
 
 
 

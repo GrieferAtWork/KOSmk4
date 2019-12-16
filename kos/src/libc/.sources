@@ -47,8 +47,8 @@ BEGIN
 
 	BEGIN GROUP("libs.libc") { COMPILE };
 		SOURCE({
-			"hybrid/arch/" + TARGET_XARCH + "/*.c",
-			"libc/arch/" + TARGET_XARCH + "/*.c",
+			"hybrid/arch/" + XARCH + "/*.c",
+			"libc/arch/" + XARCH + "/*.c",
 			"libc/*.c",
 			"hybrid/*.c",
 			"auto/*.c",
@@ -58,16 +58,15 @@ BEGIN
 	BEGIN GROUP("libs.libc") { COMPILE };
 		SET_LANGUAGE("assembler-with-cpp")
 		SOURCE({
-			"hybrid/arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
-			"libc/arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
+			"hybrid/arch/" + XARCH_ASMFILES,
+			"libc/arch/" + XARCH_ASMFILES,
 		})
 	END
 
-	final local LIBC_FEATURES_HEADER = "/kos/include/" + TARGET_XARCH + "-kos/crt-features/crt-kos" + CONFIG_FEATURE_FILE_SUFFIX + ".h";
-	final local LIBC_LIB_BINARY = "/" + BINPATH + "/lib/libc.so";
+	final local LIBC_FEATURES_HEADER = "/kos/include/" + XARCH + "-kos/crt-features/crt-kos" + SUFFIX + ".h";
 	BEGIN GROUP("libs.libc") { LINK, ARCHIVE, MCOPY,
 			enumerateSymbolsStep(
-				elfBinary: LIBC_LIB_BINARY,
+				elfBinary: TARGET_BINPATH + DISK_LIBPATH + "libc.so",
 				callback: [](self: BoundStep, symbols: {(string,string,string,string,string)...}) {
 					local symbols_set: {string...} = HashSet();
 					final local CRT_DLSUBST_GLOBALS = {
@@ -117,15 +116,14 @@ BEGIN
 				LIBC_FEATURES_HEADER,
 			}),
 		};
-		SET_OUTPUT(LIBC_LIB_BINARY)
+		SET_OUTPUT_LIBDLL("libc")
 		LD_FLAGS({ "--gc-sections" })
-		SET_DISKFILE("/lib/libc.so")
-		LINKER_SCRIPT("libc/arch/" + TARGET_XARCH + "/_libc.ld")
+		LINKER_SCRIPT("libc/arch/" + XARCH + "/_libc.ld")
 
 		/* `libc' as a static library (link as `OBJECT("$OUTPATH/lib/libc.a")')
 		 * NOTE: Don't forget to turn on `L_FLAGS("-Wl,--gc-sections")', to prevent
 		 *       any function that you didn't use from clobbering your binary */
-		SET_STATIC_OUTPUT("/" + BINPATH + "/lib/libc.a")
+		SET_STATIC_OUTPUT(TARGET_BINPATH + "/lib/libc.a")
 		/* WARNING: Because `AR' is shitty and doesn't understand weak symbols,
 		 *          the order of SOURCE files here is important in that all files
 		 *          containing weak declarations must come _AFTER_ files which may
@@ -149,11 +147,11 @@ BEGIN
 		 * REF: https://stackoverflow.com/questions/23079997/override-weak-symbols-in-static-library
 		 */
 		SOURCE({
-			"hybrid/arch/" + TARGET_XARCH + "/*.c",
-			"hybrid/arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
+			"hybrid/arch/" + XARCH + "/*.c",
+			"hybrid/arch/" + XARCH_ASMFILES,
 			"hybrid/*.c",
-			"libc/arch/" + TARGET_XARCH + "/*.c",
-			"libc/arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
+			"libc/arch/" + XARCH + "/*.c",
+			"libc/arch/" + XARCH_ASMFILES,
 			"libc/*.c",
 			"user/*.c",
 			"auto/*.c",

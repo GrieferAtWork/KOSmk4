@@ -57,12 +57,12 @@ BEGIN
 
 	/* Pull in the actual source files for libdl/RTLD */
 	BEGIN GROUP("libs.libdl") { COMPILE };
-		SOURCE({ "arch/" + TARGET_XARCH + "/*.c", "./*.c" })
+		SOURCE({ "arch/" + XARCH + "/*.c", "./*.c" })
 	END
 	BEGIN GROUP("libs.libdl") { COMPILE };
 		/* Arch-specific files, as well as system call implementations */
 		SET_LANGUAGE("assembler-with-cpp")
-		SOURCE({ "arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S", })
+		SOURCE({ "arch/" + XARCH_ASMFILES })
 	END
 	/* Use dlmalloc to get an malloc() function. */
 	BEGIN GROUP("libs.libdl") { COMPILE };
@@ -74,7 +74,7 @@ BEGIN
 	END
 
 	BEGIN GROUP("libs.libdl") { LINK, MCOPY, ELF_FLATTEN };
-		options[OPT_ELF_FLATTEN_OUTPUT]                 = "/" + BINPATH + "/lib/libdl.rtld-flat.bin";
+		options[OPT_ELF_FLATTEN_OUTPUT]                 = TARGET_BINPATH + "/lib/libdl.rtld-flat.bin";
 		options[OPT_ELF_FLATTEN_PHYS_BASE]              = 0;
 		options[OPT_ELF_FLATTEN_VIRT_BASE]              = 0;
 		options[OPT_ELF_FLATTEN_KEEP_BSS]               = true;
@@ -82,13 +82,12 @@ BEGIN
 		options[OPT_ELF_FLATTEN_ALLOWED_HEADERS]        = [0, 1]; /* text + data (don't include rel + dynamic) */
 		options[OPT_ELF_FLATTEN_REQUIRE_NO_RELOCATIONS] = true;
 		STATIC_USELIBGCC()
-		LINKER_SCRIPT("arch/" + TARGET_XARCH + "/_rtld.ld")
-		SET_OUTPUT("/" + BINPATH + "/lib/libdl.so")
-		SET_DISKFILE("/lib/libdl.so")
+		LINKER_SCRIPT("arch/" + XARCH + "/_rtld.ld")
+		SET_OUTPUT_LIBDLL("libdl")
 		SOURCE({
 			"./*.c",
-			"arch/" + TARGET_XARCH + "/*.c",
-			"arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
+			"arch/" + XARCH + "/*.c",
+			"arch/" + XARCH_ASMFILES,
 			"../libdlmalloc/*.c",
 		})
 	END

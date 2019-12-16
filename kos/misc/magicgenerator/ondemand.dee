@@ -85,17 +85,16 @@ function runGenerateHeaders(): (string, ipc.Process) | none {
 	);
 }
 
-function updateAutomaticSourcesOnDemand(
-		TARGET_XARCH: string, TARGET_ARCH: string, TARGET_POINTER_SIZE: int) {
+function updateAutomaticSourcesOnDemand(TARGET: Module) {
 	local autoScripts: {(string, ipc.Process)...} = [];
 	function collect(x: (string, ipc.Process) | none) {
 		if (x !is none)
 			autoScripts.append(x);
 	}
-	local xarch_path = "kos/include/{}-kos".format({ TARGET_XARCH });
+	local xarch_path = "kos/include/{}-kos".format({ TARGET.XARCH });
 
 	collect(runGenerateErrors(xarch_path));
-	collect(runGenerateSyscalls(xarch_path, str(TARGET_POINTER_SIZE * 8)));
+	collect(runGenerateSyscalls(xarch_path, TARGET.SUFFIX));
 	collect(runGenerateHeaders());
 
 	while (autoScripts) {

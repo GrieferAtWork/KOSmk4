@@ -41,7 +41,7 @@ function getDefPath(filename: string) -> fs.relpath(fs.headof(filename),ROOTDIR)
 
 /* A whole bunch of useful helpers to quickly describe compilation rules. */
 #define SOURCE(...)              options.setdefault(OPT_COMPILE_SOURCES,[]).extend(__VA_ARGS__);
-#define SET_OUTPUT(name)         options[OPT_LINK_OUTPUT] = name;
+#define SET_LINK_OUTPUT(name)    options[OPT_LINK_OUTPUT] = name;
 #define SET_ARCHIVE_OUTPUT(name) options[OPT_ARCHIVE_OUTPUT] = name;
 #define SET_STATIC_OUTPUT(name)  options[OPT_ARCHIVE_OUTPUT] = name;
 #define SET_LANGUAGE(name)       options[OPT_COMPILE_LANGUAGE] = name;
@@ -57,9 +57,16 @@ function getDefPath(filename: string) -> fs.relpath(fs.headof(filename),ROOTDIR)
 #define REMOVE_LD_FLAGS(flag)    options.get(OPT_LINK_LDFLAGS).removeall(flag);
 #define OBJECT(...)              options.setdefault(OPT_LINK_OBJECTS,[]).extend(__VA_ARGS__);
 #define LINKER_SCRIPT(name)      options[OPT_LINK_SCRIPT] = name;
-#define SET_OUTPUT_DLL(name)     SET_OUTPUT((name)+".so")
-#define SET_OUTPUT_EXE(name)     SET_OUTPUT(name)
 #define SET_DISKFILE(name)       options[OPT_MCOPY_OUTPUT] = name;
+#define SET_OUTPUT(filename)                               \
+	options[OPT_LINK_OUTPUT]  = TARGET_BINPATH + filename; \
+	options[OPT_MCOPY_OUTPUT] = filename;
+#define SET_OUTPUT_DLL(filename)                                     \
+	options[OPT_LINK_OUTPUT]    = TARGET_BINPATH + filename + ".so"; \
+	options[OPT_ARCHIVE_OUTPUT] = TARGET_BINPATH + filename + ".a";  \
+	options[OPT_MCOPY_OUTPUT]   = filename + ".so";
+#define SET_OUTPUT_LIBDLL(name)     SET_OUTPUT_DLL(DISK_LIBPATH + name)
+#define SET_OUTPUT_USRLIBDLL(name)  SET_OUTPUT_DLL(DISK_USRLIBPATH + name)
 #define _DEFINE1(x)              options.setdefault(OPT_COMPILE_MACROS,Dict())[x] = none;
 #define _DEFINE2(x,y)            options.setdefault(OPT_COMPILE_MACROS,Dict())[x] = y;
 #define DEFINE(...)              _DEFINE##__VA_NARGS__(__VA_ARGS__)
@@ -186,11 +193,11 @@ END
 
 /* Copy libgcc.so.1 and libstdc++.so.1 to the disk */
 BEGIN_ANONYMOUS GROUP("libs.libgcc") { MCOPY };
-	options[OPT_MCOPY_OUTPUT] = "/lib/libgcc_s.so.1";
-	options[OPT_MCOPY_INPUT]  = "/bin/" + TARGET_ARCH + "-kos-common/lib/libgcc_s.so.1";
+	options[OPT_MCOPY_OUTPUT] = DISK_LIBPATH + "libgcc_s.so.1";
+	options[OPT_MCOPY_INPUT]  = "/bin/" + TARGET_ARCH + "-kos-common" + DISK_LIBPATH + "libgcc_s.so.1";
 END
 
 BEGIN_ANONYMOUS GROUP("libs.libstdc++") { MCOPY };
-	options[OPT_MCOPY_OUTPUT] = "/lib/libstdc++.so.6";
-	options[OPT_MCOPY_INPUT]  = "/bin/" + TARGET_ARCH + "-kos-common/lib/libstdc++.so.6";
+	options[OPT_MCOPY_OUTPUT] = DISK_LIBPATH + "libstdc++.so.6";
+	options[OPT_MCOPY_INPUT]  = "/bin/" + TARGET_ARCH + "-kos-common" + DISK_LIBPATH + "libstdc++.so.6";
 END

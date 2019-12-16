@@ -23,17 +23,17 @@ BEGIN
 	SET_NOSTDLIB()
 
 	local KENREL_LIBDL_BINARY_SOURCE =
-		"arch/" + TARGET_XARCH + "/libdl-binary.S";
+		"arch/" + XARCH + "/libdl-binary.S";
 	local KERNEL_ASM_SOURCES = [
-		"../../libc/hybrid/arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
-		"../../libunwind/arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
-		"../../libcpustate/arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
-		"arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
+		"../../libc/hybrid/arch/" + XARCH_ASMFILES,
+		"../../libunwind/arch/" + XARCH_ASMFILES,
+		"../../libcpustate/arch/" + XARCH_ASMFILES,
+		"arch/" + XARCH_ASMFILES,
 	];
 	local KERNEL_C_SOURCES = [
 		/* Include libc auto- and hybrid-sources */
 		"../../libc/auto/*.c",
-		"../../libc/hybrid/arch/" + TARGET_XARCH + "/*.c",
+		"../../libc/hybrid/arch/" + XARCH + "/*.c",
 		"../../libc/hybrid/*.c",
 
 		/* Compile a couple of user-space libraries as part of the kernel core */
@@ -52,15 +52,15 @@ BEGIN
 		"../../libinstrlen/*.c",
 
 		/* Required for: Exception handling, as well as tracebacks */
-		"../../libunwind/arch/" + TARGET_XARCH + "/*.c",
+		"../../libunwind/arch/" + XARCH + "/*.c",
 		"../../libunwind/*.c",
 
 		/* Required for: Kernel panic error logging */
-		"../../libregdump/arch/" + TARGET_XARCH + "/*.c",
+		"../../libregdump/arch/" + XARCH + "/*.c",
 		"../../libregdump/*.c",
 
 		/* Required for: General purpose cpu state operations */
-		"../../libcpustate/arch/" + TARGET_XARCH + "/*.c",
+		"../../libcpustate/arch/" + XARCH + "/*.c",
 		"../../libcpustate/*.c",
 
 		/* Required for: High-level ANSI TTY escape codes (`\e[0m') */
@@ -92,13 +92,13 @@ BEGIN
 		"sched/*.c",
 		"drivers/*.c",
 		"user/*.c",
-		"arch/" + TARGET_XARCH + "/*.c",
+		"arch/" + XARCH + "/*.c",
 	];
-	for (local x: fs.dir("kos/src/kernel/core/arch/" + TARGET_XARCH)) {
+	for (local x: fs.dir("kos/src/kernel/core/arch/" + XARCH)) {
 		if ("." in x || x.startswith("__"))
 			continue; /* Not a directory */
-		local path = "arch/{}/{}/".format({ TARGET_XARCH, x });
-		KERNEL_ASM_SOURCES.append(path + "*" + TARGET_BITS_PER_POINTER + ".S");
+		local path = "arch/{}/{}/".format({ XARCH, x });
+		KERNEL_ASM_SOURCES.append(path + ASMFILES);
 		KERNEL_C_SOURCES.append(path + "*.c");
 	}
 
@@ -133,15 +133,15 @@ BEGIN
 	 *               needs to have an artificial dependency on rtld-flat.bin */
 	BEGIN GROUP("kernel") {
 			stepWithDependencies(COMPILE,
-				{ "/" + BINPATH + "/lib/libdl.rtld-flat.bin" }) };
+				{ TARGET_BINPATH + "/lib/libdl.rtld-flat.bin" }) };
 		SET_LANGUAGE("assembler-with-cpp")
 		SOURCE({ KENREL_LIBDL_BINARY_SOURCE })
 	END
 
 	final local KERNEL_FEATURES_HEADER =
-		"/kos/include/" + TARGET_XARCH + "-kos/crt-features/crt-kos-kernel" + CONFIG_FEATURE_FILE_SUFFIX + ".h";
+		"/kos/include/" + XARCH + "-kos/crt-features/crt-kos-kernel" + SUFFIX + ".h";
 	final local KERNEL_EXPORTS_SOURCE =
-		"/kos/src/kernel/include/" + TARGET_XARCH + "-kos/kernel/arch/core-symbols" + CONFIG_FEATURE_FILE_SUFFIX + ".h";
+		"/kos/src/kernel/include/" + XARCH + "-kos/kernel/arch/core-symbols" + SUFFIX + ".h";
 
 	BEGIN GROUP("kernel") { LINK, MCOPY, ELF_DIHACK,
 			enumerateSymbolsStep(
@@ -173,19 +173,9 @@ BEGIN
 					});
 					updateFileContents(self.group.fixFilename(KERNEL_EXPORTS_SOURCE), [](fp: File) {
 						/* Generate the hash-vector */
-						local R_SIZE32, PTR, U32;
-						if (TARGET_ARCH == "i386") {
-							PTR = U32 = ".long";
-							R_SIZE32 = "R_386_SIZE32";
-						} else if (TARGET_ARCH == "x86_64") {
-							PTR = ".quad";
-							U32 = ".int";
-							R_SIZE32 = "R_X86_64_SIZE32";
-						} else {
-							PTR = ".pointer";
-							U32 = ".uint32";
-							R_SIZE32 = none;
-						}
+						local U32 = try TARGET.AS_I32 catch (...) ".int32";
+						local PTR = try TARGET.AS_PTR catch (...) ".pointer";
+						local R_SIZE32 = try TARGET.R_TARGET_SIZE32 catch (...) none;
 						local hash_mask = 1;
 						while (hash_mask <= #symbols_map) {
 							hash_mask = (hash_mask << 1) | 1;
@@ -193,7 +183,7 @@ BEGIN
 						if ((hash_mask - #symbols_map) < 64)
 							hash_mask = (hash_mask << 1) | 1;
 						symbols_map["kernel_symbol_table"] =
-							TARGET_POINTER_SIZE + ((hash_mask + 1) * (8 + (2 * TARGET_POINTER_SIZE)));
+							TARGET.POINTER_SIZE + ((hash_mask + 1) * (8 + (2 * TARGET.POINTER_SIZE)));
 						@@Hash-vector of (name,size,hash)
 						local hash_vector: {(string, int, int) | none...} = [none] * (hash_mask + 1);
 						for (local name: sorted_keys) {
@@ -250,14 +240,10 @@ BEGIN
 			}),
 		};
 
-		options[OPT_ELF_DIHACK_PHYS2VIRT] = {
-			"i386"   : 0xc0000000,         /* KERNEL_CORE_BASE */
-			"x86_64" : 0xffffffff80000000, /* KERNEL_CORE_BASE */
-		}.get(TARGET_ARCH);
+		options[OPT_ELF_DIHACK_PHYS2VIRT] = TARGET.KERNEL_CORE_BASE;
 
-		LINKER_SCRIPT("arch/" + TARGET_XARCH + "/_kernel.ld")
-		SET_OUTPUT(KERNEL_BINARY)
-		SET_DISKFILE("/os/kernel.bin")
+		LINKER_SCRIPT("arch/" + XARCH + "/_kernel.ld")
+		SET_OUTPUT("/os/kernel.bin")
 		STATIC_USELIBGCC()
 		SOURCE(KERNEL_ASM_SOURCES)
 		SOURCE(KERNEL_C_SOURCES)

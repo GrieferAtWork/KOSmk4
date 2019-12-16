@@ -1,0 +1,99 @@
+/* Copyright (c) 2018 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+
+@@Cross-Arch name:
+@@  - @"/kos/src/libc/hybrid/arch/{XARCH}/...
+@@  - @"/kos/include/{XARCH}-kos/...
+@@  - @"/bin/{XARCH}-kos-{CONFIG}/...
+@@  - ...
+global final XARCH = "i386";
+
+@@The GCC cross-compiler prefix
+global final CROSS_PREFIX = "binutils/i386-kos/bin/i686-kos-";
+
+@@sizeof(void *) of this target
+global final POINTER_SIZE = 4;
+
+@@Suffix for various files:
+@@  - Assembly files (e.g.: @"/kos/src/libc/hybrid/arch/{XARCH}/*{SUFFIX}.S")
+@@  - System call definition files (e.g. @"/kos/include/{XARCH}-kos/asm/syscalls{SUFFIX}.def")
+@@  - ...
+global final SUFFIX = "32";
+
+@@Query pattern for matching assembly file names:
+@@  - @"/kos/src/libc/hybrid/arch/{XARCH}/{ASMFILES}"
+global final ASMFILES = "*32.S";
+
+/* on-disk paths */
+global final DISK_LIBPATH = "/lib/";
+global final DISK_USRLIBPATH = "/usr/lib/";
+
+@@The value of @KERNEL_CORE_BASE for this target
+global final KERNEL_CORE_BASE = 0xc0000000;
+
+@@The ELF SIZE32 relocation for this target (if available)
+global R_TARGET_SIZE32 = "R_386_SIZE32";
+
+@@GNU AS pseudo-directive for emitting a pointer
+global final AS_PTR = ".long";
+
+@@GNU AS pseudo-directive for emitting a 32-bit integer
+global final AS_I32 = ".int";
+
+@@Provide a cache for the toolchain.
+function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
+	toolchain.provideStdlibCache(
+		("c++", ("-fstack-protector-strong", )), (
+			{	"binutils/i386-kos/lib/gcc/i686-kos/9.1.0",
+				"binutils/i386-kos/i686-kos/lib",
+				"binutils/i386-kos/lib",
+				"bin/" + TARGET_NAME + "/lib" },
+			{ "stdc++", "m", "ssp_nonshared", "ssp", "gcc", "c", "dl" },
+			{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
+		));
+	toolchain.provideStdlibCache(
+		("c++", ()), (
+			{	"binutils/i386-kos/lib/gcc/i686-kos/9.1.0",
+				"binutils/i386-kos/i686-kos/lib",
+				"binutils/i386-kos/lib",
+				"bin/" + TARGET_NAME + "/lib" },
+			{ "stdc++", "m", "gcc", "c", "dl" },
+			{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
+		));
+	toolchain.provideStdlibCache(
+		("c", ("-fstack-protector-strong",)), (
+			{	"binutils/i386-kos/lib/gcc/i686-kos/9.1.0",
+				"binutils/i386-kos/i686-kos/lib",
+				"binutils/i386-kos/lib",
+				"bin/" + TARGET_NAME + "/lib" },
+			{ "ssp_nonshared", "ssp", "gcc", "c", "dl" },
+			{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
+		));
+	toolchain.provideStdlibCache(
+		("c", ()), (
+			{	"binutils/i386-kos/lib/gcc/i686-kos/9.1.0",
+				"binutils/i386-kos/i686-kos/lib",
+				"binutils/i386-kos/lib",
+				"bin/" + TARGET_NAME + "/lib" },
+			{ "gcc", "c", "dl" },
+			{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
+		));
+}

@@ -44,50 +44,33 @@ File.stdout.setbuf("line");
 File.stderr.setbuf("line");
 
 global CONFIG_MAX_COMPILERS: int = 12; /* TODO: Don't hardcode 12! - Calculate dynamically as the number of cores on our host machine */
-global CONFIG_OPTIMIZE: bool = none;
-global CONFIG_DEBUG: bool = none;
-global TARGET_XARCH: string = none; /* Target cross-arch directory /include/$TARGET_XARCH-kos/... */
-global TARGET_ARCH: string  = none; /* Target architecture name */
-global TARGET_CPU: string   = none; /* Target cpu name */
-global TARGET_NAME: string; /* Target configuration name */
-global BINPATH: string;
-global KERNEL_BINARY: string;
 global CONFIG_EMULATOR_USED: string = "qemu"; /* none or "qemu" / "bochs" */
 global CONFIG_EMULATOR_OPTIONS: {string: Object} = Dict();
 global CONFIG_DONT_BUILD: bool = false;
+global CONFIG_ONLY_BUILD_LIBRARIES: bool = false;
 global CONFIG_EMULATOR_STARTED_PATTERN: string = none;
 global CONFIG_EMULATOR_GDB_MODE: string = none;
 global CONFIG_MULTIBOOT_DRIVERS: {(string, string)...} = List();
 global requiredOutputWhiteList: {(bool, string)...} | none = none;
 global requiredGroupWhiteList: {string...} | none = none;
 global requiredGroupOfSourceFileWhiteList: {string...} | none = none;
-global final EXE: string = "";
-global final DLL: string = ".so";
-global final TARGET_POINTER_SIZE: int;
-global final TARGET_BITS_PER_POINTER: int;
-global final CONFIG_FEATURE_FILE_SUFFIX = "";
-global final config: Config = Config(LIBRARY_SUFFIX: DLL);
+global final config: Config = Config(LIBRARY_SUFFIX: ".so");
 global final groups: {Group...} = [];
 global final options: {string: Object} = Dict();
 global final toolchain: Toolchain = GCCToolchain(config: config);
 
+/* Build configuration */
+global CONFIG_OPTIMIZE: bool;
+global CONFIG_DEBUG: bool;
 
-@@Returns (TARGET_ARCH, TARGET_CPU, TARGET_XARCH)
-function parseTarget(target: string): (string, string, string) {
-	return (
-		target,
-		{
-			"i386" : "i686"
-		}.get(target, target),
-		{
-			"x86_64" : "i386"
-		}.get(target, target)
-	);
-}
+/* Target configuration */
+global TARGET_REAL_ARCH: string; /* Real target architecture (e.g. "i386") */
+global TARGET_ARCH: string;      /* Target architecture (e.g. "i386") */
+global TARGET_NAME: string;      /* Target configuration name (e.g. "i386-kos-OD") */
+global TARGET: Module = none;    /* Target configuration module */
+global TARGET_BINPATH: string;   /* Target binpath (e.g. "/bin/i386-kos-OD") */
+global KERNEL_BINARY: string;
 
-function setTarget(target: string) {
-	TARGET_ARCH, TARGET_CPU, TARGET_XARCH = parseTarget(target)...;
-}
 
 function parseConfig(config: string): (bool, bool) {
 	return {
@@ -107,17 +90,12 @@ function loadMissingSettings() {
 		import(".kos.misc.scripts.vsautoconfig")
 			.parseCurrentVsConfiguration("kos/.vs/ProjectSettings.json")...;
 	print "Automatically loaded settings:", repr target, repr config;
-	local target_arch, target_cpu, target_xarch = parseTarget(target)...;
-	if (TARGET_ARCH is none)
-		TARGET_ARCH = target_arch;
-	if (TARGET_CPU is none)
-		TARGET_CPU = target_cpu;
-	if (TARGET_XARCH is none)
-		TARGET_XARCH = target_xarch;
+	if (TARGET_ARCH !is bound)
+		TARGET_ARCH = target;
 	local config_optimize, config_debug = parseConfig(config)...;
-	if (CONFIG_OPTIMIZE is none)
+	if (CONFIG_OPTIMIZE !is bound)
 		CONFIG_OPTIMIZE = config_optimize;
-	if (CONFIG_DEBUG is none)
+	if (CONFIG_DEBUG !is bound)
 		CONFIG_DEBUG = config_debug;
 }
 
@@ -163,6 +141,89 @@ function generateProjectOfInputFile(filename: string) {
 }
 
 
+function build(reconfigure: Callable = none) {
+	TARGET_NAME = "{}-kos-{}".format({ TARGET_ARCH, getConfig() });
+	{
+		/* Make sure that the correct bin-config is selected. */
+		local selConfig;
+		local selConfigFile = "bin/{}-kos".format({ TARGET_ARCH });
+		selConfig = cygwinReadLink(selConfigFile);
+		if (selConfig !is string || selConfig != TARGET_NAME) {
+			if (selConfig !is none)
+				fs.unlink(selConfigFile);
+			print "Changing libpath to", repr(TARGET_NAME);
+			local p = ipc.Process("bash", [ "-c",
+				"ln -s {!r} {!r}".format({ TARGET_NAME, selConfigFile })
+			]);
+			p.start();
+			joinProcess(p);
+		}
+	}
+
+	/* To speed up compilation, provide some known-good values
+	 * for standard library paths valid for the KOS toolchain */
+	TARGET.provideToolchainCache(toolchain, TARGET_NAME);
+
+	/* Apply target configurations. */
+	config.CROSS_PREFIX = TARGET.CROSS_PREFIX;
+	config.BUILD_PATH = "build/" + TARGET_NAME;
+	TARGET_BINPATH = "/bin/" + TARGET_NAME;
+	KERNEL_BINARY = TARGET_BINPATH + "/os/kernel.bin";
+
+	/* Configure MTOOLS build steps */
+	toolchain.options[TOOLCHAIN_MTOOLS_EXE]  = HOST_EXE("binutils/build-mtools/mtools");
+	toolchain.options[TOOLCHAIN_MTOOLS_DISK] = TARGET_BINPATH[1:] + "/disk.img";
+
+	import . as me;
+	reconfigure(me);
+
+	if (CONFIG_DONT_BUILD)
+		return;
+
+	{
+		final local XARCH  = TARGET.XARCH;
+		final local SUFFIX = TARGET.SUFFIX;
+		final local ASMFILES = TARGET.ASMFILES;
+		final local XARCH_ASMFILES = "{}/{}".format({ XARCH, ASMFILES });
+		final local DISK_LIBPATH = TARGET.DISK_LIBPATH;
+		final local DISK_USRLIBPATH = TARGET.DISK_USRLIBPATH;
+#define BEGIN           { local options = deepcopy __nth(2) options;
+#define BEGIN_ANONYMOUS { local options = Dict();
+#define END             }
+#include "kos/.sources"
+	}
+
+	/* Check that source generators are up-to-date. */
+	import updateAutomaticSourcesOnDemand from .kos.misc.magicgenerator.ondemand;
+	updateAutomaticSourcesOnDemand(TARGET);
+
+	/* Automatically re-build changed sources */
+	if (requiredOutputWhiteList !is none) {
+		buildGroupsWithOutputWhitelist(
+			toolchain:          toolchain,
+			groups:             groups,
+			outputWhiteList:    requiredOutputWhiteList,
+			maxParallelSteps:   CONFIG_MAX_COMPILERS);
+	} else if (requiredGroupWhiteList !is none) {
+		buildGroupsWithGroupWhitelist(
+			toolchain:          toolchain,
+			groups:             groups,
+			groupWhiteList:     requiredGroupWhiteList,
+			maxParallelSteps:   CONFIG_MAX_COMPILERS);
+	} else if (requiredGroupOfSourceFileWhiteList !is none) {
+		buildGroupsWithGroupOfInputFileWhitelist(
+			toolchain:          toolchain,
+			groups:             groups,
+			inputFileWhitelist: requiredGroupOfSourceFileWhiteList,
+			maxParallelSteps:   CONFIG_MAX_COMPILERS);
+	} else {
+		buildGroups(
+			toolchain:          toolchain,
+			groups:             groups,
+			maxParallelSteps:   CONFIG_MAX_COMPILERS);
+	}
+}
+
 function main(argv: {string...}) {
 	local args = List(argv);
 	print repr args;
@@ -198,6 +259,9 @@ function main(argv: {string...}) {
 			break;
 		case "--run-only":
 			CONFIG_DONT_BUILD = true;
+			break;
+		case "--libraries-only":
+			CONFIG_ONLY_BUILD_LIBRARIES = true;
 			break;
 		case "--build-only":
 		case "--no-emulator":
@@ -259,7 +323,7 @@ function main(argv: {string...}) {
 					CONFIG_EMULATOR_STARTED_PATTERN = value;
 					break;
 				case "--target":
-					setTarget(value);
+					TARGET_ARCH = value;
 					break;
 				case "--config":
 					setConfig(value);
@@ -273,7 +337,7 @@ function main(argv: {string...}) {
 					local target, config =
 						import(".kos.misc.scripts.vsautoconfig")
 						.parseCurrentVsConfiguration(value)...;
-					setTarget(target);
+					TARGET_ARCH = target;
 					setConfig(config);
 				}	break;
 
@@ -316,199 +380,46 @@ _err_unknown_argument:
 		}
 	}
 	fs.chdir(ROOTDIR);
-	if (CONFIG_OPTIMIZE is none || CONFIG_DEBUG is none ||
-	    TARGET_XARCH is none || TARGET_ARCH is none || TARGET_CPU is none)
+	if (CONFIG_OPTIMIZE !is bound || CONFIG_DEBUG !is bound || TARGET_ARCH !is bound)
 		loadMissingSettings();
-	TARGET_NAME = "{}-kos-{}".format({
-		TARGET_ARCH,
-		getConfig(),
-	});
 
-
-	{
-		/* Make sure that the correct bin-config is selected. */
-		local selConfig;
-		local selConfigFile = "bin/{}-kos".format({ TARGET_ARCH });
-		selConfig = cygwinReadLink(selConfigFile);
-		if (selConfig !is string || selConfig != TARGET_NAME) {
-			if (selConfig !is none)
-				fs.unlink(selConfigFile);
-			print "Changing libpath to", repr(TARGET_NAME);
-			local p = ipc.Process("bash", [ "-c",
-				"ln -s {!r} {!r}".format({ TARGET_NAME, selConfigFile })
-			]);
-			p.start();
-			joinProcess(p);
-		}
-	}
-
-	/* Driver name without any slashes are automatically
-	 * loaded from the /os/drivers directory. */
-	for (local i, elem: util.enumerate(CONFIG_MULTIBOOT_DRIVERS)) {
-		local name, cmdline = elem...;
-		if ("/" !in name && "\\" !in name) {
-			name = "bin/{}/os/drivers/{}".format({ TARGET_NAME, name });
-			CONFIG_MULTIBOOT_DRIVERS[i] = (name, cmdline);
-		}
-	}
-
-#if 1 /* To speed up compilation, provide some known-good values
-       * for standard library paths valid for the KOS toolchain */
-	switch (TARGET_ARCH) {
-	case "i386":
-		/* TODO: This cache should be stored in a dynamically loaded
-		 *       file `binutils/i386-kos/toolchain_cache.dee' */
-		toolchain.provideStdlibCache(
-			("c++", ("-fstack-protector-strong", )), (
-				{	"binutils/i386-kos/lib/gcc/i686-kos/9.1.0",
-					"binutils/i386-kos/i686-kos/lib",
-					"binutils/i386-kos/lib",
-					"bin/" + TARGET_NAME + "/lib" },
-				{ "stdc++", "m", "ssp_nonshared", "ssp", "gcc", "c", "dl" },
-				{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
-			));
-		toolchain.provideStdlibCache(
-			("c++", ()), (
-				{	"binutils/i386-kos/lib/gcc/i686-kos/9.1.0",
-					"binutils/i386-kos/i686-kos/lib",
-					"binutils/i386-kos/lib",
-					"bin/" + TARGET_NAME + "/lib" },
-				{ "stdc++", "m", "gcc", "c", "dl" },
-				{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
-			));
-		toolchain.provideStdlibCache(
-			("c", ("-fstack-protector-strong",)), (
-				{	"binutils/i386-kos/lib/gcc/i686-kos/9.1.0",
-					"binutils/i386-kos/i686-kos/lib",
-					"binutils/i386-kos/lib",
-					"bin/" + TARGET_NAME + "/lib" },
-				{ "ssp_nonshared", "ssp", "gcc", "c", "dl" },
-				{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
-			));
-		toolchain.provideStdlibCache(
-			("c", ()), (
-				{	"binutils/i386-kos/lib/gcc/i686-kos/9.1.0",
-					"binutils/i386-kos/i686-kos/lib",
-					"binutils/i386-kos/lib",
-					"bin/" + TARGET_NAME + "/lib" },
-				{ "gcc", "c", "dl" },
-				{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
-			));
-		break;
-	case "x86_64":
-		toolchain.provideStdlibCache(
-			("c++", ("-fstack-protector-strong", )), (
-				{	"binutils/x86_64-kos/lib/gcc/x86_64-kos/9.1.0",
-					"binutils/x86_64-kos/x86_64-kos/lib",
-					"binutils/x86_64-kos/lib",
-					"bin/" + TARGET_NAME + "/lib" },
-				{ "stdc++", "m", "ssp_nonshared", "ssp", "gcc", "c", "dl" },
-				{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
-			));
-		toolchain.provideStdlibCache(
-			("c++", ()), (
-				{	"binutils/x86_64-kos/lib/gcc/x86_64-kos/9.1.0",
-					"binutils/x86_64-kos/x86_64-kos/lib",
-					"binutils/x86_64-kos/lib",
-					"bin/" + TARGET_NAME + "/lib" },
-				{ "stdc++", "m", "gcc", "c", "dl" },
-				{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
-			));
-		toolchain.provideStdlibCache(
-			("c", ("-fstack-protector-strong", )), (
-				{	"binutils/x86_64-kos/lib/gcc/x86_64-kos/9.1.0",
-					"binutils/x86_64-kos/x86_64-kos/lib",
-					"binutils/x86_64-kos/lib",
-					"bin/" + TARGET_NAME + "/lib" },
-				{ "ssp_nonshared", "ssp", "gcc", "c", "dl" },
-				{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
-			));
-		toolchain.provideStdlibCache(
-			("c", ()), (
-				{	"binutils/x86_64-kos/lib/gcc/x86_64-kos/9.1.0",
-					"binutils/x86_64-kos/x86_64-kos/lib",
-					"binutils/x86_64-kos/lib",
-					"bin/" + TARGET_NAME + "/lib" },
-				{ "gcc", "c", "dl" },
-				{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
-			));
-		break;
-	default:
-		break;
-	}
-#endif
-	config.CROSS_PREFIX = "binutils/{}-kos/bin/{}-kos-".format({
-		TARGET_ARCH,
-		TARGET_CPU
-	});
-	config.BUILD_PATH = "build/" + TARGET_NAME;
-	BINPATH = "bin/" + TARGET_NAME;
-	KERNEL_BINARY = "/{}/os/kernel.bin".format({ BINPATH });
-	TARGET_POINTER_SIZE = {
-		"i386"   : 4,
-		"x86_64" : 8,
-	}[TARGET_ARCH];
-	TARGET_BITS_PER_POINTER = TARGET_POINTER_SIZE * 8;
-	if (TARGET_ARCH in ["i386", "x86_64"])
-		CONFIG_FEATURE_FILE_SUFFIX = TARGET_BITS_PER_POINTER;
-
-	/* Configure MTOOLS build steps */
-	toolchain.options.setdefault(TOOLCHAIN_MTOOLS_EXE, HOST_EXE("binutils/build-mtools/mtools"));
-	toolchain.options.setdefault(TOOLCHAIN_MTOOLS_DISK, BINPATH + "/disk.img");
-
-	{
-#define BEGIN           { local options = deepcopy __nth(2) options;
-#define BEGIN_ANONYMOUS { local options = Dict();
-#define END             }
-#include "kos/.sources"
-	}
-
-	/* Automatically re-build changed sources */
+	TARGET_REAL_ARCH = TARGET_ARCH;
+	TARGET = import(".kos.misc.targets." + TARGET_ARCH);
+	/* Build everything that was selected. */
 	if (!CONFIG_DONT_BUILD) {
-		/* Check that source generators are up-to-date. */
-		import updateAutomaticSourcesOnDemand from .kos.misc.magicgenerator.ondemand;
-		updateAutomaticSourcesOnDemand(
-			TARGET_XARCH, TARGET_ARCH, TARGET_POINTER_SIZE);
-		if (requiredOutputWhiteList !is none) {
-			buildGroupsWithOutputWhitelist(
-				toolchain:          toolchain,
-				groups:             groups,
-				outputWhiteList:    requiredOutputWhiteList,
-				maxParallelSteps:   CONFIG_MAX_COMPILERS);
-		} else if (requiredGroupWhiteList !is none) {
-			buildGroupsWithGroupWhitelist(
-				toolchain:          toolchain,
-				groups:             groups,
-				groupWhiteList:     requiredGroupWhiteList,
-				maxParallelSteps:   CONFIG_MAX_COMPILERS);
-		} else if (requiredGroupOfSourceFileWhiteList !is none) {
-			buildGroupsWithGroupOfInputFileWhitelist(
-				toolchain:          toolchain,
-				groups:             groups,
-				inputFileWhitelist: requiredGroupOfSourceFileWhiteList,
-				maxParallelSteps:   CONFIG_MAX_COMPILERS);
+		if (hasattr(TARGET, "build")) {
+			import . as me;
+			TARGET.build(me);
 		} else {
-			buildGroups(
-				toolchain:          toolchain,
-				groups:             groups,
-				maxParallelSteps:   CONFIG_MAX_COMPILERS);
+			build();
 		}
+	} else {
+		build();
 	}
 
 	/* Start KOS with the selected emulator (if any). */
 	if (CONFIG_EMULATOR_USED !is none) {
+		/* Driver name without any slashes are automatically
+		 * loaded from the /os/drivers directory. */
+		for (local i, elem: util.enumerate(CONFIG_MULTIBOOT_DRIVERS)) {
+			local name, cmdline = elem...;
+			if ("/" !in name && "\\" !in name) {
+				name = "bin/{}/os/drivers/{}".format({ TARGET_NAME, name });
+				CONFIG_MULTIBOOT_DRIVERS[i] = (name, cmdline);
+			}
+		}
 		if (CONFIG_EMULATOR_STARTED_PATTERN)
 			print CONFIG_EMULATOR_STARTED_PATTERN;
 		import(".kos.misc.magicemulator." + CONFIG_EMULATOR_USED).start(
-			groups:           groups,
-			config:           config,
-			binPath:          BINPATH,
-			kernelFile:       KERNEL_BINARY.lstrip("/"),
-			multibootDrivers: CONFIG_MULTIBOOT_DRIVERS,
-			targetArch:       TARGET_ARCH,
-			targetCpu:        TARGET_CPU,
-			diskFile:         toolchain.options[TOOLCHAIN_MTOOLS_DISK],
-			options:          CONFIG_EMULATOR_OPTIONS,
+			groups:        groups,
+			config:        config,
+			BINPATH:       TARGET_BINPATH[1:],
+			KERNEL:        KERNEL_BINARY[1:],
+			DRIVERS:       CONFIG_MULTIBOOT_DRIVERS,
+			TARGET_ARCH:   TARGET_ARCH,
+			TARGET:        TARGET,
+			DISK_FILENAME: toolchain.options[TOOLCHAIN_MTOOLS_DISK],
+			options:       CONFIG_EMULATOR_OPTIONS,
 		);
 	}
 }

@@ -22,7 +22,7 @@ BEGIN
 	DEFINE("__KERNEL__")
 	INCLUDE({
 		"/kos/src/kernel/include",
-		"/kos/src/kernel/include/" + TARGET_XARCH + "-kos",
+		"/kos/src/kernel/include/" + XARCH + "-kos",
 	})
 	//LD_FLAGS({ "--gc-sections" })
 	GCC_FLAGS({
@@ -60,7 +60,7 @@ BEGIN
 
 	BEGIN GROUP("kernelspace._verify") { COMPILE };
 		SOURCE({
-			"../_verify/arch/" + TARGET_XARCH + "/*.c",
+			"../_verify/arch/" + XARCH + "/*.c",
 			"../_verify/*.c",
 		})
 	END
@@ -74,7 +74,7 @@ BEGIN
 		SET_NOSTDLIB()
 		STATIC_USELIBGCC()
 		STATIC_USELIB("libssp")
-		LIBPATH({ "/" + BINPATH + "/os/drivers" })
+		LIBPATH({ TARGET_BINPATH + "/os/drivers" })
 		LD_FLAGS({
 			"--nmagic",
 			/* XXX: There shouldn't be a reason why we need to specify Bdynamic
@@ -90,32 +90,30 @@ BEGIN
 //			"-fPIC", /* Not needed, and would produce slower code... */
 		})
 
-#define DEFINE_SIMPLE_DRIVER(name, ...)                     \
-		BEGIN GROUP("mod." name) { COMPILE, LINK, MCOPY };  \
-			SET_OUTPUT("/" + BINPATH + "/os/drivers/" name) \
-			SET_DISKFILE("/os/drivers/" name)               \
-			LD_FLAGS({ "-soname=" name })                   \
-			SOURCE({ "mod" name "/" "*.c" })                \
-			__VA_ARGS__                                     \
+#define DEFINE_SIMPLE_DRIVER(name, ...)                    \
+		BEGIN GROUP("mod." name) { COMPILE, LINK, MCOPY }; \
+			SET_OUTPUT("/os/drivers/" name)                \
+			LD_FLAGS({ "-soname=" name })                  \
+			SOURCE({ "mod" name "/" "*.c" })               \
+			__VA_ARGS__                                    \
 		END
-#define DEFINE_SIMPLE_ARCH_DRIVER(name)                                                               \
-		BEGIN GROUP("mod." name) { COMPILE };                                                         \
-			SET_LANGUAGE("assembler-with-cpp")                                                        \
-			SOURCE({ "mod" name "/arch/" + TARGET_XARCH + "/" "*" + TARGET_BITS_PER_POINTER + ".S" }) \
-		END                                                                                           \
-		BEGIN GROUP("mod." name) { COMPILE };                                                         \
-			SOURCE({ "mod" name "/" "*.c" })                                                          \
-			SOURCE({ "mod" name "/arch/" + TARGET_XARCH + "/" "*.c" })                                \
-		END                                                                                           \
-		BEGIN GROUP("mod." name) { LINK, MCOPY };                                                     \
-			SET_OUTPUT("/" + BINPATH + "/os/drivers/" name)                                           \
-			SET_DISKFILE("/os/drivers/" name)                                                         \
-			LD_FLAGS({ "-soname=" name })                                                             \
-			SOURCE({                                                                                  \
-				"mod" name "/" "*.c",                                                                 \
-				"mod" name "/arch/" + TARGET_XARCH + "/" "*.c",                                       \
-				"mod" name "/arch/" + TARGET_XARCH + "/" "*" + TARGET_BITS_PER_POINTER + ".S",        \
-			})                                                                                        \
+#define DEFINE_SIMPLE_ARCH_DRIVER(name)                         \
+		BEGIN GROUP("mod." name) { COMPILE };                   \
+			SET_LANGUAGE("assembler-with-cpp")                  \
+			SOURCE({ "mod" name "/arch/" + XARCH_ASMFILES })    \
+		END                                                     \
+		BEGIN GROUP("mod." name) { COMPILE };                   \
+			SOURCE({ "mod" name "/" "*.c" })                    \
+			SOURCE({ "mod" name "/arch/" + XARCH + "/" "*.c" }) \
+		END                                                     \
+		BEGIN GROUP("mod." name) { LINK, MCOPY };               \
+			SET_OUTPUT("/os/drivers/" name)                     \
+			LD_FLAGS({ "-soname=" name })                       \
+			SOURCE({                                            \
+				"mod" name "/" "*.c",                           \
+				"mod" name "/arch/" + XARCH + "/" "*.c",        \
+				"mod" name "/arch/" + XARCH_ASMFILES,           \
+			})                                                  \
 		END
 
 		DEFINE_SIMPLE_DRIVER("ext2fs")
@@ -129,7 +127,7 @@ BEGIN
 		DEFINE_SIMPLE_DRIVER("procfs",
 			SOURCE({
 				"modprocfs/files/" "*.c",
-				"modprocfs/arch/" + TARGET_XARCH + "/" "*.c"
+				"modprocfs/arch/" + XARCH + "/" "*.c"
 			}))
 
 		DEFINE_SIMPLE_DRIVER("usb")

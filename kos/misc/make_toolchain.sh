@@ -16,7 +16,7 @@
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
 #     v -- Fix some problems with File.Buffer
-DEEMON_VERSION="f5a147bfb512d95a414a18fa4ace4426fe19aa71"
+DEEMON_VERSION="f9b095ac54edc9b0ea593eb600b4de5ba9eeb8d5"
 
 MAKE_PARALLEL_COUNT=$(grep -c ^processor /proc/cpuinfo)
 
@@ -46,6 +46,7 @@ GCC_VERSION_URL="https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION_NUMBER}/gcc-${GCC
 MTOOLS_VERSION="mtools-${MTOOLS_VERSION_NUMBER}"
 MTOOLS_VERSION_URL="ftp://ftp.gnu.org/gnu/mtools/mtools-${MTOOLS_VERSION_NUMBER}.tar.gz"
 
+KOS_MISC="$(dirname $(readlink -f "$0"))"
 
 if (($# < 1)); then
 	echo "Usage: ./make_toolchain.sh <TARGET>"
@@ -199,6 +200,14 @@ build_mtools() {
 
 
 
+cmd() {
+	$* || {
+		local error=$?
+		echo "ERROR: Command failed '$*' -> '$error'"
+		exit $error
+	}
+}
+
 
 
 
@@ -209,12 +218,20 @@ if [[ "$1" == i?86-kos ]]; then
 	NAME=i386-kos
 	INCLUDE_NAME=i386-kos
 	TARGET_GDB=i686-elf
+	BINLIBDIRNAME=lib
 	export TARGET=i686-kos
 elif [[ "$1" == x86_64-kos ]]; then
+	if ! [ -f "${KOS_MISC}/../../i386-kos/bin/i686-kos-gcc" ] && \
+	   ! [ -f "${KOS_MISC}/../../i386-kos/bin/i686-kos-gcc.exe" ]; then
+		# Because of compatibility mode, the x86_64-kos toolchain also requires i386-kos
+		# in order to build stuff such as the 32-bit libdl.so driver, among others.
+		cmd bash "${KOS_MISC}/make_toolchain.sh" i386-kos
+	fi
 	TARGET_NAME=x86_64
 	NAME=x86_64-kos
 	TARGET_GDB=x86_64-elf
 	INCLUDE_NAME=i386-kos
+	BINLIBDIRNAME=lib64
 	CONFIGURE_OPTIONS_BINUTILS="$CONFIGURE_OPTIONS_BINUTILS --enable-64-bit-bfd"
 	CONFIGURE_OPTIONS_GCC="$CONFIGURE_OPTIONS_GCC --enable-64-bit-bfd"
 	export TARGET=x86_64-kos
@@ -223,14 +240,6 @@ else
 	exit 1
 fi
 
-
-cmd() {
-	$* || {
-		local error=$?
-		echo "ERROR: Command failed '$*' -> '$error'"
-		exit $error
-	}
-}
 
 require_program() {
 	which $1 > /dev/null 2>&1 || {
@@ -241,7 +250,6 @@ require_program() {
 	}
 }
 
-KOS_MISC="$(dirname $(readlink -f "$0"))"
 KOS_PATCHES="${KOS_MISC}/patches"
 cd "$KOS_MISC/../../"
 KOS_ROOT="$(pwd)"
@@ -338,9 +346,9 @@ do_mkdir "$PREFIX/$TARGET/usr"
 
 # Make sure that our bin/lib paths were created, else GCC won't detect them...
 do_mkdir "$KOS_ROOT/bin/$NAME-$KOS_CONFIG_FOR_LINKING/bin"
-do_mkdir "$KOS_ROOT/bin/$NAME-$KOS_CONFIG_FOR_LINKING/lib"
+do_mkdir "$KOS_ROOT/bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME"
 do_mkdir "$KOS_ROOT/bin/$NAME-common/bin"
-do_mkdir "$KOS_ROOT/bin/$NAME-common/lib"
+do_mkdir "$KOS_ROOT/bin/$NAME-common/$BINLIBDIRNAME"
 
 # Also make sure that a valid KOS build configuration was been selected
 do_symlink "$NAME-$KOS_CONFIG_FOR_LINKING" "$KOS_ROOT/bin/$NAME"
@@ -349,12 +357,12 @@ do_symlink "$NAME-$KOS_CONFIG_FOR_LINKING" "$KOS_ROOT/bin/$NAME"
 # and system header paths (note that `../../../bin/$NAME' is another symlink
 # that gets automagically rotated by magic.dee depending on the last-used build
 # configuration, which is a set of OPTIMIZE=y/n and DEBUG=y/n)
-do_symlink "../../../bin/$NAME/bin"    "$PREFIX/usr/bin"
-do_symlink "../../../bin/$NAME/lib"    "$PREFIX/usr/lib"
-do_symlink "../../../kos/include"      "$PREFIX/usr/include"
-do_symlink "../../../../bin/$NAME/bin" "$PREFIX/$TARGET/usr/bin"
-do_symlink "../../../../bin/$NAME/lib" "$PREFIX/$TARGET/usr/lib"
-do_symlink "../../../../kos/include"   "$PREFIX/$TARGET/usr/include"
+do_symlink "../../../bin/$NAME/bin"     "$PREFIX/usr/bin"
+do_symlink "../../../bin/$NAME/$BINLIBDIRNAME"    "$PREFIX/usr/lib"
+do_symlink "../../../kos/include"       "$PREFIX/usr/include"
+do_symlink "../../../../bin/$NAME/bin"  "$PREFIX/$TARGET/usr/bin"
+do_symlink "../../../../bin/$NAME/$BINLIBDIRNAME" "$PREFIX/$TARGET/usr/lib"
+do_symlink "../../../../kos/include"    "$PREFIX/$TARGET/usr/include"
 
 
 echo "Checking if $BINUTILS_VERSION has been configured"
@@ -478,8 +486,8 @@ if ! [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ] || \
 	echo "    Making crt0.o and crt0S.o for $GCC_VERSION:libgcc"
 	cmd cd "$KOS_ROOT"
 	cmd deemon "magic.dee" \
-		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/lib/crt0.o" \
-		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/lib/crt0S.o" \
+		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0.o" \
+		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0S.o" \
 		--target="$TARGET_NAME" \
 		--config="$KOS_CONFIG_FOR_LINKING"
 	echo "    Making $GCC_VERSION:libgcc"
@@ -500,8 +508,8 @@ if ! [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ] || \
 		cmd cd "$KOS_ROOT"
 		remove_bad_fixinclude
 		cmd deemon "magic.dee" \
-			--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/lib/libc.so" \
-			--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/lib/libm.so" \
+			--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/libc.so" \
+			--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/libm.so" \
 			--target="$TARGET_NAME" \
 			--config="$KOS_CONFIG_FOR_LINKING"
 		cmd cd "$PREFIX/gcc"
@@ -544,10 +552,10 @@ if ! [ -f "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" ] || \
 	echo "    Making libc.so and libm.so for $GCC_VERSION:libstdc++"
 	cmd cd "$KOS_ROOT"
 	cmd deemon "magic.dee" \
-		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/lib/crt0.o" \
-		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/lib/crt0S.o" \
-		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/lib/libc.so" \
-		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/lib/libm.so" \
+		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0.o" \
+		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0S.o" \
+		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/libc.so" \
+		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/libm.so" \
 		--target="$TARGET_NAME" \
 		--config="$KOS_CONFIG_FOR_LINKING"
 	echo "    Making $GCC_VERSION:libstdc++"
@@ -622,7 +630,7 @@ install_libstdcxx_symlinks() {
 	if ! [ -f "$1/libstdc++.so.$LIBSTDCXX_VERSION" ]; then
 		echo "    Installing $GCC_VERSION:libstdc++ into $1"
 		cmd mkdir -p "$1"
-		cmd ln -s "../../${NAME}-common/lib/libstdc++.so.$LIBSTDCXX_VERSION" "$1/libstdc++.so.$LIBSTDCXX_VERSION"
+		cmd ln -s "../../${NAME}-common/$BINLIBDIRNAME/libstdc++.so.$LIBSTDCXX_VERSION" "$1/libstdc++.so.$LIBSTDCXX_VERSION"
 	else
 		echo "    $GCC_VERSION:libstdc++ has already installed to $1"
 	fi
@@ -630,16 +638,16 @@ install_libstdcxx_symlinks() {
 	if ! [ -f "$1/libgcc_s.so.$LIBGCC_VERSION" ]; then
 		echo "    Installing $GCC_VERSION:libgcc_s into $1"
 		cmd mkdir -p "$1"
-		cmd ln -s "../../${NAME}-common/lib/libgcc_s.so.$LIBGCC_VERSION_FULL" "$1/libgcc_s.so.$LIBGCC_VERSION_FULL"
+		cmd ln -s "../../${NAME}-common/$BINLIBDIRNAME/libgcc_s.so.$LIBGCC_VERSION_FULL" "$1/libgcc_s.so.$LIBGCC_VERSION_FULL"
 	else
 		echo "    $GCC_VERSION:libgcc_s has already been installed to $1"
 	fi
 }
 
 
-install_libstdcxx "${KOS_ROOT}/bin/${NAME}-common/lib"
+install_libstdcxx "${KOS_ROOT}/bin/${NAME}-common/$BINLIBDIRNAME"
 for BUILD_CONFIG in $(echo $KOS_VALID_BUILD_CONFIGS); do
-	install_libstdcxx_symlinks "${KOS_ROOT}/bin/${NAME}-${BUILD_CONFIG}/lib"
+	install_libstdcxx_symlinks "${KOS_ROOT}/bin/${NAME}-${BUILD_CONFIG}/$BINLIBDIRNAME"
 done
 
 
