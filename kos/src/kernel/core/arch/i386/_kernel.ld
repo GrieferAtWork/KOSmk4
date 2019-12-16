@@ -503,7 +503,8 @@ SECTIONS {
 	PROVIDE_HIDDEN(__x86_template_gdt = ABSOLUTE(__kernel_percpu_start + thiscpu_x86_gdt));
 	PROVIDE_HIDDEN(__x86_bootcpu_dfstack_node = ABSOLUTE(_bootcpu + thiscpu_x86_dfstacknode));
 	PROVIDE_HIDDEN(__x86_bootcpu_dfstack_part = ABSOLUTE(_bootcpu + thiscpu_x86_dfstackpart));
-	PROVIDE_HIDDEN(__x86_bootcpu_df_stackpage = ABSOLUTE(__x86_bootcpu_df_stack / PAGESIZE));
+	PROVIDE_HIDDEN(__x86_bootcpu_df_stackpageid = addr2pageid(ABSOLUTE(__x86_bootcpu_df_stack)));
+	PROVIDE_HIDDEN(__x86_bootcpu_df_stackpageptr = addr2pageptr(ABSOLUTE(__x86_bootcpu_df_stack)));
 	PROVIDE(x86_bootcpu_cpufeatures = ABSOLUTE(_bootcpu + thiscpu_x86_cpufeatures));
 	PROVIDE(x86_bootcpu_cpuid = ABSOLUTE(_bootcpu + thiscpu_x86_cpuid));
 	PROVIDE(x86_bootcpu_gdt = ABSOLUTE(_bootcpu + thiscpu_x86_gdt));
@@ -553,8 +554,8 @@ SECTIONS {
 #undef GDT_DB
 #undef GDT_L
 
-	PROVIDE_HIDDEN(__x86_kernel_ld_elf_startpage = ABSOLUTE(kernel_ld_elf) / PAGESIZE);
-	PROVIDE_HIDDEN(__x86_kernel_ld_elf_numpages  = ABSOLUTE(__x86_kernel_ld_elf_size) / PAGESIZE);
+	PROVIDE_HIDDEN(__x86_kernel_ld_elf_startpageptr = addr2pageptr(ABSOLUTE(kernel_ld_elf)));
+	PROVIDE_HIDDEN(__x86_kernel_ld_elf_numpages     = ABSOLUTE(__x86_kernel_ld_elf_size) / PAGESIZE);
 	PROVIDE(this_idle_sched_state = ABSOLUTE(ABSOLUTE(thiscpu_idle) + ABSOLUTE(this_sched_state)));
 	PROVIDE(thiscpu_idle_x86_kernel_psp0 = ABSOLUTE(ABSOLUTE(thiscpu_idle) + ABSOLUTE(this_x86_kernel_psp0)));
 

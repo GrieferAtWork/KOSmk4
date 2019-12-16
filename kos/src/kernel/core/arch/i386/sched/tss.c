@@ -65,7 +65,8 @@ INTERN ATTR_PERCPU void *thiscpu_x86_iobnode_pagedir_identity = NULL;
 
 
 
-INTDEF byte_t __x86_bootcpu_df_stackpage[];
+INTDEF byte_t __x86_bootcpu_df_stackpageid[];
+INTDEF byte_t __x86_bootcpu_df_stackpageptr[];
 INTDEF struct vm_node __x86_bootcpu_dfstack_node;
 INTDEF struct vm_datapart __x86_bootcpu_dfstack_part;
 
@@ -91,7 +92,7 @@ _current_x86_dfstackpart ASMNAME("thiscpu_x86_dfstackpart") = {
 			.rd_blockv = &__x86_bootcpu_dfstack_part.dp_ramdata.rd_block0,
 			{
 				.rd_block0 = {
-					.rb_start = (pageptr_t)(uintptr_t)__x86_bootcpu_df_stackpage - KERNEL_BASE_PAGE,
+					.rb_start = (pageptr_t)__x86_bootcpu_df_stackpageptr,
 					.rb_size  = CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE)
 				}
 			}
@@ -110,8 +111,8 @@ PUBLIC ATTR_PERCPU struct vm_node _thiscpu_x86_dfstacknode ASMNAME("thiscpu_x86_
 	.vn_node = {
 		NULL,
 		NULL,
-		(vm_vpage_t)(uintptr_t)__x86_bootcpu_df_stackpage,
-		(vm_vpage_t)(uintptr_t)__x86_bootcpu_df_stackpage + CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) - 1
+		(pageid_t)__x86_bootcpu_df_stackpageid,
+		(pageid_t)__x86_bootcpu_df_stackpageid + CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) - 1
 	},
 	.vn_byaddr = LLIST_INITNODE,
 	.vn_prot   = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED,

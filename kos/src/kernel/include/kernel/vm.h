@@ -1337,10 +1337,8 @@ struct vm_ramfile {
 /* The datablock type used by `vm_ramfile' */
 DATDEF struct vm_datablock_type vm_ramfile_type;
 
-#define VM_RAMFILE_INIT(start, size) \
-	{ VM_DATABLOCK_INIT(&vm_ramfile_type, NULL, 0), /* .rf_data = */ { start, size } }
-
-
+#define VM_RAMFILE_INIT(/*pageptr_t*/ start, /*size_t*/ num_pages) \
+	{ VM_DATABLOCK_INIT(&vm_ramfile_type, NULL, 0), /* .rf_data = */ { start, num_pages } }
 
 
 

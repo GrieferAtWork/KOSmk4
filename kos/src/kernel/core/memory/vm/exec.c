@@ -68,11 +68,11 @@ PUBLIC ATTR_PERVM struct vm_execinfo_struct thisvm_execinfo = {
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
-INTDEF byte_t __x86_kernel_ld_elf_startpage[];
+INTDEF byte_t __x86_kernel_ld_elf_startpageptr[];
 INTDEF byte_t __x86_kernel_ld_elf_numpages[];
 
 INTERN struct vm_ramfile kernel_ld_elf_ramfile =
-	VM_RAMFILE_INIT((pageptr_t)__x86_kernel_ld_elf_startpage - KERNEL_BASE_PAGE,
+	VM_RAMFILE_INIT((pageptr_t)__x86_kernel_ld_elf_startpageptr,
 	                (size_t)__x86_kernel_ld_elf_numpages);
 
 
