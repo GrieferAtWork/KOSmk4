@@ -19,7 +19,7 @@
 #ifdef __INTELLISENSE__
 #include "vfs-traverse.c"
 //#define TRAVERSE_N 1
-#endif
+#endif /* __INTELLISENSE__ */
 
 #include <kernel/handle.h>
 

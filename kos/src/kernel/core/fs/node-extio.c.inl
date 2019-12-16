@@ -22,7 +22,7 @@
 //#define DEFINE_IO_VECTOR 1
 //#define DEFINE_IO_ASYNC 1
 //#define DEFINE_IO_KERNEL 1
-#endif
+#endif /* __INTELLISENSE__ */
 
 #include <fs/node.h>
 #include <kernel/swap.h>
@@ -153,7 +153,7 @@ again_check_size:
 		rwlock_endread(&self->db_lock);
 		return;
 throw_bad_bounds:
-		THROW(E_IOERROR_BADBOUNDS,(uintptr_t)E_IOERROR_SUBSYSTEM_FILE);
+		THROW(E_IOERROR_BADBOUNDS, (uintptr_t)E_IOERROR_SUBSYSTEM_FILE);
 	}
 #ifdef DEFINE_IO_ASYNC
 	EXCEPT {

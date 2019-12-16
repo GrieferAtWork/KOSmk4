@@ -29,6 +29,8 @@
 #include <kernel/printk.h>
 #include <kernel/types.h>
 
+#include <kos/except-fs.h>
+
 #include <assert.h>
 #include <malloca.h>
 #include <string.h>

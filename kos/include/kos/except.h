@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x757e3adf */
+/* HASH CRC-32:0xe984900a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -354,22 +354,12 @@ __DECL_BEGIN
  * 	@@The reason/context in which the file was deleted (One of `E_FILESYSTEM_DELETED_*')
  * 	member reason: unsigned int; */
 #define E_FSERROR_DELETED (E_FSERROR,0x0001)
-/* The file being accessed was deleted. (set if the problem was caused by the last component of a path) */
-#define E_FILESYSTEM_DELETED_FILE 0x0001
-/* The path being accessed was deleted. (set if the problem was caused by some other than the last component of the path) */
-#define E_FILESYSTEM_DELETED_PATH 0x0002
-/* The hosting file system has been unmounted */
-#define E_FILESYSTEM_DELETED_UNMOUNTED 0x0003
 /* File not found */
 #define E_FSERROR_FILE_NOT_FOUND (E_FSERROR,0x0002)
 /* Path not found
  * 	@@The reason/context why the path wasn't found (One of `E_FILESYSTEM_PATH_NOT_FOUND_*')
  * 	member reason: unsigned int; */
 #define E_FSERROR_PATH_NOT_FOUND (E_FSERROR,0x0003)
-/* Directory does not exist */
-#define E_FILESYSTEM_PATH_NOT_FOUND_DIR 0x0001
-/* Drive does not exist */
-#define E_FILESYSTEM_PATH_NOT_FOUND_DRIVE 0x0002
 /* Illegal or malformed path */
 #define E_FSERROR_ILLEGAL_PATH (E_FSERROR,0x0004)
 /* A directory was expected, but something else was found
@@ -404,12 +394,6 @@ __DECL_BEGIN
  * 	@@The context in which a filesystem component was required to not be a directory, but was one (One of `E_FILESYSTEM_IS_A_DIRECTORY_*')
  * 	member action_context: uintptr_t; */
 #define E_FSERROR_IS_A_DIRECTORY (E_FSERROR,0x000b)
-/* Thrown as the result of `unlink(path)', where `path' is a directory */
-#define E_FILESYSTEM_IS_A_DIRECTORY_UNLINK 0x0001
-/* Thrown as the result of `exec(path)', where `path' is a directory */
-#define E_FILESYSTEM_IS_A_DIRECTORY_EXEC 0x0002
-/* Thrown as the result of attempting to read from a directory */
-#define E_FILESYSTEM_IS_A_DIRECTORY_READ 0x0003
 /* A symbolic link was expected when something else was found
  * 	@@The context in which a filesystem component was required to be a symlink, but was one (One of `E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_*')
  * 	member action_context: uintptr_t; */
@@ -456,48 +440,6 @@ __DECL_BEGIN
  * 	@@The unsupported operation (One of `E_FILESYSTEM_OPERATION_*')
  * 	member operation_id: uintptr_t; */
 #define E_FSERROR_UNSUPPORTED_OPERATION (E_FSERROR,0x0100)
-/* The object does not support reading */
-#define E_FILESYSTEM_OPERATION_READ 0x0001
-/* The object does not support writing */
-#define E_FILESYSTEM_OPERATION_WRITE 0x0002
-/* The object does not support being resized */
-#define E_FILESYSTEM_OPERATION_TRUNC 0x0003
-/* The object does not support being read from as a directory */
-#define E_FILESYSTEM_OPERATION_READDIR 0x0004
-/* The object does not support creation of new files */
-#define E_FILESYSTEM_OPERATION_CREAT 0x0005
-/* The object does not support creation of new directories */
-#define E_FILESYSTEM_OPERATION_MKDIR 0x0006
-/* The object does not support creation of symbolic links */
-#define E_FILESYSTEM_OPERATION_SYMLINK 0x0007
-/* The object does not support creation of device nodes */
-#define E_FILESYSTEM_OPERATION_MKNOD 0x0008
-/* The object does not support creation of hard links */
-#define E_FILESYSTEM_OPERATION_LINK 0x0009
-/* The object does not support renaming of items */
-#define E_FILESYSTEM_OPERATION_RENAME 0x000a
-/* The object does not support unlinking files */
-#define E_FILESYSTEM_OPERATION_UNLINK 0x000b
-/* The object does not support removal of directories */
-#define E_FILESYSTEM_OPERATION_RMDIR 0x000c
-/* The values specified by chmod() or chown() cannot be applied within the file system */
-#define E_FILESYSTEM_OPERATION_ATTRIB 0x000d
-/* The object does not support changes to attributes being written to disk */
-#define E_FILESYSTEM_OPERATION_WRATTR 0x000e
-/* The object does not support seeking in file stream */
-#define E_FILESYSTEM_OPERATION_SEEK 0x000f
-/* The object does not support mapping data into memory */
-#define E_FILESYSTEM_OPERATION_MMAP 0x0010
-/* The object does not the fsync() operator */
-#define E_FILESYSTEM_OPERATION_SYNC 0x0011
-/* The object does not the fdatasync() operator */
-#define E_FILESYSTEM_OPERATION_DATASYNC 0x0012
-/* The object does not the fstat() operator */
-#define E_FILESYSTEM_OPERATION_STAT 0x0013
-/* The object does not the poll() operator */
-#define E_FILESYSTEM_OPERATION_POLL 0x0014
-/* The object does not the fallocate() operator */
-#define E_FILESYSTEM_OPERATION_ALLOCATE 0x0015
 
 
 
@@ -540,14 +482,6 @@ __DECL_BEGIN
  * 	@@A more precise description of the error (One of `E_IOERROR_REASON_*')
  * 	member reason: uintptr_t; */
 #define E_IOERROR_NODATA (E_IOERROR,0x0005)
-/* The error stems from the physical disk faulting */
-#define E_IOERROR_SUBSYSTEM_HARDDISK 0x0001
-/* The error stems from an I/O-related file error */
-#define E_IOERROR_SUBSYSTEM_FILE 0x0002
-/* The error stems from a HumanInterfaceDevice-related connection error */
-#define E_IOERROR_SUBSYSTEM_HID 0x0003
-/* The error stems from the USB sub-system */
-#define E_IOERROR_SUBSYSTEM_USB 0x0004
 
 
 
@@ -566,84 +500,6 @@ __DECL_BEGIN
  * 	@@The format-specific reason why the load failed (One of `E_NOT_EXECUTABLE_FAULTY_REASON_*_*')
  * 	member reason: uintptr_t; */
 #define E_NOT_EXECUTABLE_FAULTY (E_NOT_EXECUTABLE,0x0004)
-/* ELF Binary */
-#define E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF 0x0001
-/* e_ident[EI_CLASS] != ELFCLASS32/64 (as required by the host) */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADCLASS 0x0001
-/* e_ident[EI_DATA] != ELFDATA2LSB/MSB (as required by the host) */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADORDER 0x0002
-/* e_ident[EI_VERSION] != EV_CURRENT */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADVERSION 0x0003
-/* e_version != EV_CURRENT */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADVERSION2 0x0004
-/* e_type != ET_EXEC (or in the case of a driver: e_type != ET_DYN) */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADTYPE 0x0005
-/* e_machine != EM_* (as required by the host) */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADMACH 0x0006
-/* e_ehsize < offsetafter(Elf_Ehdr,e_phnum) */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADHEADER 0x0007
-/* e_phnum == 0 */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOSEGMENTS 0x0008
-/* e_phentsize != sizeof(Elf_Phdr) */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADSEGMENTS 0x0009
-/* e_phnum > ... (hard limit imposed by the host; i386/x86_64 uses 64 for this) */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS 0x000a
-/* (p_offset & (getpagesize() - 1)) != (p_vaddr & (getpagesize() - 1)) */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_UNALIGNEDSEGMENT 0x000b
-/* Loading of static binary failed due to overlapping segments */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP 0x000c
-/* Only when loading drivers: The program headers pointer is out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_HEADERS 0x000d
-/* Only when loading drivers: No `PT_DYNAMIC' program header found */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_DYNAMIC 0x000e
-/* Only when loading drivers: The `PT_DYNAMIC' program header is out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNAMIC 0x000f
-/* Only when loading drivers: No `DT_SONAME' or `DT_STRTAB' tag found */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_SONAME 0x0010
-/* Only when loading drivers: The `DT_STRTAB' tag isn't mapped, or the `DT_SONAME' tag is out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SONAME 0x0011
-/* Only when loading drivers: The `e_shentsize' fields doesn't equal `sizeof(Elf_Shdr)' */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHENT 0x0012
-/* Only when loading drivers: The `e_shstrndx' field of the header is out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHSTRNDX 0x0013
-/* Only when loading drivers: The `e_shoff' / `e_shnum' fields of the header are out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHOFF 0x0014
-/* Only when loading drivers: The `.shstrtab' section header has a type `SHT_NOBITS' */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOBITS_SHSTRTAB 0x0015
-/* Only when loading drivers: The `.shstrtab' section header points out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHSTRTAB 0x0016
-/* Only when loading drivers: The virtual address bounds for one of the program headers overflow */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_VADDR 0x0017
-/* Only when loading drivers: The file offset one of the program headers is out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_OFFSET 0x0018
-/* Only when loading drivers: The alignment requirement of a program header isn't a power-of-2 */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_ALIGN 0x0019
-/* Only when loading drivers: The `.eh_frame' section doesn't have the `SHF_ALLOC' flag set. */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NALLOC_EH_FRAME 0x001a
-/* Only when loading drivers: The `.eh_frame' section address points out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_EH_FRAME 0x001b
-/* Only when loading drivers: The `DT_STRTAB' tag is mapped out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSTR 0x001c
-/* Only when loading drivers: The `DT_HASH' tag is mapped out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMHASH 0x001d
-/* Only when loading drivers: The `DT_DYNSYM' tag is mapped out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSYM 0x001e
-/* Only when loading drivers: The `DT_SYMENT' tag contains an invalid value */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMENT 0x001f
-/* Only when loading drivers: The `DT_RELAENT' tag contains an invalid value */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELAENT 0x0020
-/* Only when loading drivers: The `DT_RELENT' tag contains an invalid value */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELENT 0x0021
-/* Only when loading drivers: A constructor callback is located out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_INIT_FUNC 0x0022
-/* Only when loading drivers: Bad dependency (either an index miss-match, or a bad filename) */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_NEEDED 0x0023
-/* Only when loading drivers: Bad symbol index (symbol index is out-of-bounds) */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMBOL 0x0024
-/* Only when loading drivers: Bad symbol name (symbol name is out-of-bounds) */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMNAME 0x0025
-/* Only when loading drivers: Relocation against unknown symbol (s.a. system log) */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_SYMBOL 0x0026
 /* Only when loading drivers: Executable file is too large */
 #define E_NOT_EXECUTABLE_TOOLARGE (E_NOT_EXECUTABLE,0x0005)
 /* Only when loading drivers: Executable file is too small */

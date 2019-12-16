@@ -140,10 +140,12 @@ continue_parsing_enum_value:
 					while (iter < input_len && input.isspace(iter))
 						++iter;
 					if (iter < input_len && input[iter] in "+-*/&|^%?:~!") {
-						++iter;
-						while (iter < input_len && input.isspace(iter))
+						if (input.substr(iter, iter + 2) !in ["//", "/*"]) {
 							++iter;
-						goto continue_parsing_enum_value;
+							while (iter < input_len && input.isspace(iter))
+								++iter;
+							goto continue_parsing_enum_value;
+						}
 					}
 					if (enumValue.isanyspace() &&
 					    (!enumValue.startswith("(") ||

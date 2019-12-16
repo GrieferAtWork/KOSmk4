@@ -40,6 +40,7 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 
+#include <kos/except-fs.h>
 #include <kos/except-inval.h>
 #include <kos/hop.h>
 #include <kos/io.h>

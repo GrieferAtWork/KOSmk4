@@ -51,6 +51,7 @@
 
 #include <bits/elf.h> /* ELF_HOST_RELA_UNUSED */
 #include <kos/debugtrap.h>
+#include <kos/except-noexec.h>
 
 #include <assert.h>
 #include <ctype.h>

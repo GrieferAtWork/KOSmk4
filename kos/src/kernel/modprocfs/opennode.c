@@ -23,6 +23,9 @@
 
 #include <fs/vfs.h>
 #include <kernel/driver.h>
+#include <kernel/except.h>
+
+#include <kos/except-fs.h>
 
 #include <assert.h>
 

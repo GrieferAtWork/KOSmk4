@@ -25,6 +25,10 @@
 #include "../api.h"
 /**/
 
+#include <kos/except-fs.h>
+#include <kos/except-inval.h>
+#include <kos/except-io.h>
+#include <kos/except-noexec.h>
 #include <kos/except.h>
 
 #include <signal.h>

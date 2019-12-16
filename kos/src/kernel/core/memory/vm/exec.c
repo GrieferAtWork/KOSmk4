@@ -34,6 +34,8 @@
 
 #include <hybrid/align.h>
 
+#include <kos/except-fs.h>
+#include <kos/except-noexec.h>
 #include <kos/library-listdef.h>
 #include <kos/process.h>
 

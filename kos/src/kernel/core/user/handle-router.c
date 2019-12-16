@@ -28,6 +28,7 @@
 #include <kernel/types.h>
 #include <kernel/vm.h>
 
+#include <kos/except-fs.h>
 #include <kos/except-inval.h>
 #include <kos/kernel/handle.h>
 
@@ -229,7 +230,7 @@ INTERN WUNUSED NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.readdir"
 INTERN NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.seek") pos_t KCALL handle_undefined_seek(void *__restrict UNUSED(self), off_t UNUSED(offset), unsigned int UNUSED(whence)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_SEEK); }
 INTERN NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.ioctl") syscall_slong_t KCALL handle_undefined_ioctl(void *__restrict UNUSED(self), syscall_ulong_t cmd, USER UNCHECKED void *UNUSED(arg), iomode_t UNUSED(mode)) THROWS(...) { THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND, cmd); }
 INTERN NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.truncate") void KCALL handle_undefined_truncate(void *__restrict UNUSED(self), pos_t UNUSED(new_size)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_TRUNC); }
-INTERN WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3)) ATTR_SECTION(".text.kernel.handle_undefined.mmap") REF struct vm_datablock *KCALL handle_undefined_mmap(void *__restrict UNUSED(self), vm_vpage64_t *__restrict UNUSED(pminpage), vm_vpage64_t *__restrict UNUSED(pmaxpage)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_MMAP); }
+INTERN WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3)) ATTR_SECTION(".text.kernel.handle_undefined.mmap") REF struct vm_datablock *KCALL handle_undefined_mmap(void *__restrict UNUSED(self), pos_t *__restrict UNUSED(pminoffset), pos_t *__restrict UNUSED(pnumbytes)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_MMAP); }
 INTERN NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.allocate") pos_t KCALL handle_undefined_allocate(void *__restrict UNUSED(self), fallocate_mode_t UNUSED(mode), pos_t UNUSED(start), pos_t UNUSED(length)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_ALLOCATE); }
 INTERN NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.sync") void KCALL handle_undefined_sync(void *__restrict UNUSED(self)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_SYNC); }
 INTERN NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.datasync") void KCALL handle_undefined_datasync(void *__restrict UNUSED(self)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_DATASYNC); }
@@ -865,30 +866,30 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (void (KCALL *)(void *__restrict, pos_t))&handle_futexfd_truncate
 	},
 	/* .h_mmap = */ {
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_undefined_mmap,
-		/* [HANDLE_TYPE_DATABLOCK]              = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_datablock_mmap,
-		/* [HANDLE_TYPE_BLOCKDEVICE]            = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_blockdevice_mmap,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]         = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_directoryentry_mmap,
-		/* [HANDLE_TYPE_FILE]                   = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_file_mmap,
-		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_oneshot_directory_file_mmap,
-		/* [HANDLE_TYPE_PATH]                   = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_path_mmap,
-		/* [HANDLE_TYPE_FS]                     = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_fs_mmap,
-		/* [HANDLE_TYPE_VM]                     = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_vm_mmap,
-		/* [HANDLE_TYPE_TASK]                   = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_task_mmap,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_clock_mmap,
-		/* [HANDLE_TYPE_DRIVER]                 = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_driver_mmap,
-		/* [HANDLE_TYPE_PIPE]                   = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_pipe_mmap,
-		/* [HANDLE_TYPE_PIPE_READER]            = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_pipe_reader_mmap,
-		/* [HANDLE_TYPE_PIPE_WRITER]            = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_pipe_writer_mmap,
-		/* [HANDLE_TYPE_PIDNS]                  = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_pidns_mmap,
-		/* [HANDLE_TYPE_DRIVER_STATE]           = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_driver_state_mmap,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_characterdevice_mmap,
-		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_eventfd_fence_mmap,
-		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_eventfd_sema_mmap,
-		/* [HANDLE_TYPE_SIGNALFD]               = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_signalfd_mmap,
-		/* [HANDLE_TYPE_DATAPART]               = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_datapart_mmap,
-		/* [HANDLE_TYPE_FUTEX]                  = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_futex_mmap,
-		/* [HANDLE_TYPE_FUTEXFD]                = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, vm_vpage64_t *__restrict, vm_vpage64_t *__restrict))&handle_futexfd_mmap
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_undefined_mmap,
+		/* [HANDLE_TYPE_DATABLOCK]              = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_datablock_mmap,
+		/* [HANDLE_TYPE_BLOCKDEVICE]            = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_blockdevice_mmap,
+		/* [HANDLE_TYPE_DIRECTORYENTRY]         = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_directoryentry_mmap,
+		/* [HANDLE_TYPE_FILE]                   = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_file_mmap,
+		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_oneshot_directory_file_mmap,
+		/* [HANDLE_TYPE_PATH]                   = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_path_mmap,
+		/* [HANDLE_TYPE_FS]                     = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_fs_mmap,
+		/* [HANDLE_TYPE_VM]                     = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_vm_mmap,
+		/* [HANDLE_TYPE_TASK]                   = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_task_mmap,
+		/* [HANDLE_TYPE_CLOCK]                  = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_clock_mmap,
+		/* [HANDLE_TYPE_DRIVER]                 = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_driver_mmap,
+		/* [HANDLE_TYPE_PIPE]                   = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_pipe_mmap,
+		/* [HANDLE_TYPE_PIPE_READER]            = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_pipe_reader_mmap,
+		/* [HANDLE_TYPE_PIPE_WRITER]            = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_pipe_writer_mmap,
+		/* [HANDLE_TYPE_PIDNS]                  = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_pidns_mmap,
+		/* [HANDLE_TYPE_DRIVER_STATE]           = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_driver_state_mmap,
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_characterdevice_mmap,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_eventfd_fence_mmap,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_eventfd_sema_mmap,
+		/* [HANDLE_TYPE_SIGNALFD]               = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_signalfd_mmap,
+		/* [HANDLE_TYPE_DATAPART]               = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_datapart_mmap,
+		/* [HANDLE_TYPE_FUTEX]                  = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_futex_mmap,
+		/* [HANDLE_TYPE_FUTEXFD]                = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict))&handle_futexfd_mmap
 	},
 	/* .h_allocate = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_undefined_allocate,

@@ -23,8 +23,37 @@
 
 __DECL_BEGIN
 
-/* Reason codes for E_IOERROR exceptions */
+/* Sub-system codes for E_IOERROR exceptions */
+/*[[[enum]]]*/
+#ifdef __CC__
+enum {
+	E_IOERROR_SUBSYSTEM_GENERIC,  /* Generic I/O sub-system */
+	E_IOERROR_SUBSYSTEM_HARDDISK, /* The error stems from the physical disk faulting */
+	E_IOERROR_SUBSYSTEM_FILE,     /* The error stems from an I/O-related file error */
+	E_IOERROR_SUBSYSTEM_HID,      /* The error stems from a HumanInterfaceDevice-related connection error */
+	E_IOERROR_SUBSYSTEM_USB,      /* The error stems from the USB sub-system */
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define E_IOERROR_SUBSYSTEM_GENERIC  E_IOERROR_SUBSYSTEM_GENERIC  /* Generic I/O sub-system */
+#define E_IOERROR_SUBSYSTEM_HARDDISK E_IOERROR_SUBSYSTEM_HARDDISK /* The error stems from the physical disk faulting */
+#define E_IOERROR_SUBSYSTEM_FILE     E_IOERROR_SUBSYSTEM_FILE     /* The error stems from an I/O-related file error */
+#define E_IOERROR_SUBSYSTEM_HID      E_IOERROR_SUBSYSTEM_HID      /* The error stems from a HumanInterfaceDevice-related connection error */
+#define E_IOERROR_SUBSYSTEM_USB      E_IOERROR_SUBSYSTEM_USB      /* The error stems from the USB sub-system */
+#else /* __COMPILER_PREFERR_ENUMS */
+#define E_IOERROR_SUBSYSTEM_GENERIC  0 /* Generic I/O sub-system */
+#define E_IOERROR_SUBSYSTEM_HARDDISK 1 /* The error stems from the physical disk faulting */
+#define E_IOERROR_SUBSYSTEM_FILE     2 /* The error stems from an I/O-related file error */
+#define E_IOERROR_SUBSYSTEM_HID      3 /* The error stems from a HumanInterfaceDevice-related connection error */
+#define E_IOERROR_SUBSYSTEM_USB      4 /* The error stems from the USB sub-system */
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
+
+
+
+/* Reason codes for E_IOERROR exceptions */
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
@@ -71,7 +100,6 @@ enum {
 #define E_IOERROR_REASON_UHCI_INCOMPLETE 11 /* The `UHCI_TDCS_ACTIVE' bit got cleared without any apparent reason. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
-
 
 
 __DECL_END

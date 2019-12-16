@@ -31,6 +31,8 @@
 
 #include <hybrid/atomic.h>
 
+#include <kos/except-fs.h>
+
 #include <assert.h>
 #include <string.h>
 
