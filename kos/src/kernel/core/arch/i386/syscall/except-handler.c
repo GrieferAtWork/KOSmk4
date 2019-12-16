@@ -447,10 +447,10 @@ x86_userexcept_seterrno64(struct icpustate *__restrict state,
 	data   = error_data();
 	errval = -error_as_errno(data);
 	log_userexcept_errno_propagate(state, sc_info, data, errval);
-	gpregs_setpax(&state->ics_gpregs, errval);
+	gpregs_setpax(&state->ics_gpregs, (uintptr_t)(intptr_t)errval);
 	/* Check if the system call is double-wide so we
 	 * can sign-extend the error code if necessary. */
-	if (kernel_syscall64_doublewide(gpregs_getpax(&state->ics_gpregs)))
+	if (kernel_syscall64_doublewide(sc_info->rsi_sysno))
 		gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
 	/* Set an error flag (if any) */
 	state = x86_userexcept_set_error_flag(state, sc_info);
@@ -475,7 +475,7 @@ x86_userexcept_seterrno(struct icpustate *__restrict state,
 	gpregs_setpax(&state->ics_gpregs, errval);
 	/* Check if the system call is double-wide so we
 	 * can sign-extend the error code if necessary. */
-	if (kernel_syscall32_doublewide(gpregs_getpax(&state->ics_gpregs)))
+	if (kernel_syscall32_doublewide(sc_info->rsi_sysno))
 		gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
 	/* Set an error flag (if any) */
 	state = x86_userexcept_set_error_flag(state, sc_info);
