@@ -3726,7 +3726,10 @@ NOTHROW(FCALL vm_paged_kernel_sync)(pageid_t page_index, size_t num_pages) {
 		void *args[CPU_IPI_ARGCOUNT];
 		args[0] = PAGEID_DECODE(page_index);
 		args[1] = (void *)(num_pages * PAGESIZE);
-		cpu_broadcastipi(&ipi_invtlb, args, CPU_IPI_FWAITFOR);
+		cpu_broadcastipi(&ipi_invtlb,
+		                 args,
+		                 CPU_IPI_FWAITFOR |
+		                 CPU_IPI_FNOINTR);
 	}
 #else /* !CONFIG_NO_SMP */
 	pagedir_sync(PAGEID_DECODE(page_index), num_pages * PAGESIZE);
