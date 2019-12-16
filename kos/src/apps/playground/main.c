@@ -229,6 +229,28 @@ int main_fpu(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
+int main_fork(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
+	/* TODO: This currently breaks the kernel:
+	 * >> kos/include/hybrid/sequence/atree-abi.h(389) : mallnode_tree_insert_at : \
+	 *    !(newleaf_min <= ATREE_NODE_MAX(iter) && newleaf_max >= ATREE_NODE_MIN(iter))
+	 * HINT: Enabling the `sched_yield()' prevents the crash (though the crash
+	 *       itself doesn't seem to have anything to do with scheduling...)
+	 */
+	for (;;) {
+		if (fork() == 0)
+			_Exit(0);
+		/*sched_yield();*/
+	}
+	return 0;
+}
+/************************************************************************/
+
+
+
+
+
+/************************************************************************/
 int main_environ(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	printf("$PATH: %q\n", getenv("PATH"));
@@ -337,6 +359,7 @@ PRIVATE DEF defs[] = {
 	{ "rawterm", &main_rawterm },
 	{ "color", &main_color },
 	{ "fpu", &main_fpu },
+	{ "fork", &main_fork },
 	{ NULL, NULL },
 };
 
