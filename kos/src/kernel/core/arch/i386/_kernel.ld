@@ -134,7 +134,15 @@ SECTIONS {
 	SECTION(.rodata) {
 		*(.rodata.hot .rodata.likely .rodata.hot.*)
 		*(.rodata.x86.*)
-		KEEP(*(.rodata.kernel_ld_elf))
+		KEEP(*(.rodata.system_rtld))
+		PROVIDE_HIDDEN(system_rtld_startpageptr = addr2pageptr(ABSOLUTE(system_rtld)));
+		PROVIDE_HIDDEN(system_rtld_numpages     = ABSOLUTE(system_rtld_size) / PAGESIZE);
+#ifdef __x86_64__
+		/* Compatibility-mode libdl.so binary (32-bit application) */
+		KEEP(*(.rodata.system_rtld32))
+		PROVIDE_HIDDEN(system_rtld32_startpageptr = addr2pageptr(ABSOLUTE(system_rtld32)));
+		PROVIDE_HIDDEN(system_rtld32_numpages     = ABSOLUTE(system_rtld32_size) / PAGESIZE);
+#endif /* __x86_64__ */
 		*(.rodata .rodata.kernel_symtab .rodata.cst*)
 		*(.rodata.str* .rodata.*.str* .rodata.kernel_strtab)
 #ifndef CONFIG_NO_DEBUGGER
@@ -554,8 +562,6 @@ SECTIONS {
 #undef GDT_DB
 #undef GDT_L
 
-	PROVIDE_HIDDEN(__x86_kernel_ld_elf_startpageptr = addr2pageptr(ABSOLUTE(kernel_ld_elf)));
-	PROVIDE_HIDDEN(__x86_kernel_ld_elf_numpages     = ABSOLUTE(__x86_kernel_ld_elf_size) / PAGESIZE);
 	PROVIDE(this_idle_sched_state = ABSOLUTE(ABSOLUTE(thiscpu_idle) + ABSOLUTE(this_sched_state)));
 	PROVIDE(thiscpu_idle_x86_kernel_psp0 = ABSOLUTE(ABSOLUTE(thiscpu_idle) + ABSOLUTE(this_x86_kernel_psp0)));
 

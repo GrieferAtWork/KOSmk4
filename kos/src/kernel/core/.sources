@@ -19,11 +19,10 @@
 
 
 BEGIN
-	DEFINE("CONFIG_BUILDING_KERNEL_CORE")
+	DEFINE({ "CONFIG_BUILDING_KERNEL_CORE" : "1" })
 	SET_NOSTDLIB()
 
-	local KENREL_LIBDL_BINARY_SOURCE =
-		"arch/" + XARCH + "/libdl-binary.S";
+	local KENREL_LIBDL_BINARY_SOURCE = "arch/" + XARCH + "/rtld/libdl.S";
 	local KERNEL_ASM_SOURCES = [
 		"../../libc/hybrid/arch/" + XARCH_ASMFILES,
 		"../../libunwind/arch/" + XARCH_ASMFILES,
@@ -132,11 +131,20 @@ BEGIN
 	 *               order to do so safely, the associated assembler source file
 	 *               needs to have an artificial dependency on rtld-flat.bin */
 	BEGIN GROUP("kernel") {
-			stepWithDependencies(COMPILE,
-				{ TARGET_BINPATH + "/lib/libdl.rtld-flat.bin" }) };
+			stepWithDependencies(COMPILE, {
+				TARGET_BINPATH + DISK_LIBPATH + "libdl.rtld-flat.bin" }) };
 		SET_LANGUAGE("assembler-with-cpp")
 		SOURCE({ KENREL_LIBDL_BINARY_SOURCE })
 	END
+	if (TARGET_ARCH == "x86_64") {
+		/* For compatibility-mode (include the 32-bit version of libdl.so) */
+		BEGIN GROUP("kernel") {
+				stepWithDependencies(COMPILE, {
+					TARGET_BINPATH + "/lib/libdl.rtld-flat.bin" }) };
+			SET_LANGUAGE("assembler-with-cpp")
+			SOURCE({ "arch/" + XARCH + "/rtld/libdl-compat.S" })
+		END
+	}
 
 	final local KERNEL_FEATURES_HEADER =
 		"/kos/include/" + XARCH + "-kos/crt-features/crt-kos-kernel" + SUFFIX + ".h";
@@ -248,6 +256,10 @@ BEGIN
 		SOURCE(KERNEL_ASM_SOURCES)
 		SOURCE(KERNEL_C_SOURCES)
 		SOURCE({ KENREL_LIBDL_BINARY_SOURCE })
+		if (TARGET_ARCH == "x86_64") {
+			/* For compatibility-mode (include the 32-bit version of libdl.so) */
+			SOURCE({ "arch/" + XARCH + "/rtld/libdl-compat.S" })
+		}
 	END
 
 END

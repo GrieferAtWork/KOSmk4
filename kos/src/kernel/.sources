@@ -19,7 +19,7 @@
 
 
 BEGIN
-	DEFINE("__KERNEL__")
+	DEFINE({ "__KERNEL__" : "1" })
 	INCLUDE({
 		"/kos/src/kernel/include",
 		"/kos/src/kernel/include/" + XARCH + "-kos",

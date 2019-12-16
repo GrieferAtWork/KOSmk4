@@ -42,7 +42,7 @@ BEGIN
 		"-fini=libc_fini",
 	})
 
-	DEFINE("__BUILDING_LIBC")
+	DEFINE({ "__BUILDING_LIBC" : "1" })
 
 
 	BEGIN GROUP("libs.libc") { COMPILE };

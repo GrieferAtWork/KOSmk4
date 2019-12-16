@@ -51,7 +51,7 @@ END
 }
 
 BEGIN GROUP("apps.system-test") { COMPILE, LINK, MCOPY };
-	DEFINE("__INSIDE_LIBTEST")
+	DEFINE({ "__INSIDE_LIBTEST" : "1" })
 	LINKER_SCRIPT("system-test/arch/" + XARCH + "/_linker.ld")
 	SET_OUTPUT("/bin/system-test")
 

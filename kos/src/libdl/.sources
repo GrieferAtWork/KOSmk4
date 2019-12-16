@@ -43,7 +43,7 @@ BEGIN
 			"-mno-avx"
 		})
 		/* Indicate to hosted code that the FPU is disabled. */
-		DEFINE("__NO_FPU");
+		DEFINE({ "__NO_FPU" : "1" });
 	}
 
 
@@ -51,9 +51,11 @@ BEGIN
 	SET_NOSTDLIB()
 	SET_SHARED()
 
-	DEFINE("CONFIG_NO_USE_LIBDISASM")
-	DEFINE("CONFIG_NO_USE_LIBDEBUGINFO")
-	DEFINE("__LIBC", "__INTDEF")
+	DEFINE({
+		"CONFIG_NO_USE_LIBDISASM" : "1",
+		"CONFIG_NO_USE_LIBDEBUGINFO" : "1",
+		"__LIBC" : "__INTDEF",
+	})
 
 	/* Pull in the actual source files for libdl/RTLD */
 	BEGIN GROUP("libs.libdl") { COMPILE };
@@ -66,15 +68,17 @@ BEGIN
 	END
 	/* Use dlmalloc to get an malloc() function. */
 	BEGIN GROUP("libs.libdl") { COMPILE };
-		DEFINE("CONFIG_DLMALLOC_EXPORT_AS_INTERN")
-		DEFINE("CONFIG_DLMALLOC_FREESTANDING_SYSTEM_CALLS")
-		DEFINE("__CRT_HAVE___afail")
-		DEFINE("__CRT_HAVE___afailf")
+		DEFINE({
+			"CONFIG_DLMALLOC_EXPORT_AS_INTERN" : "1",
+			"CONFIG_DLMALLOC_FREESTANDING_SYSTEM_CALLS" : "1",
+			"__CRT_HAVE___afail" : "1",
+			"__CRT_HAVE___afailf" : "1",
+		})
 		SOURCE({ "../libdlmalloc/*.c" })
 	END
 
 	BEGIN GROUP("libs.libdl") { LINK, MCOPY, ELF_FLATTEN };
-		options[OPT_ELF_FLATTEN_OUTPUT]                 = TARGET_BINPATH + "/lib/libdl.rtld-flat.bin";
+		options[OPT_ELF_FLATTEN_OUTPUT]                 = TARGET_BINPATH + DISK_LIBPATH + "libdl.rtld-flat.bin";
 		options[OPT_ELF_FLATTEN_PHYS_BASE]              = 0;
 		options[OPT_ELF_FLATTEN_VIRT_BASE]              = 0;
 		options[OPT_ELF_FLATTEN_KEEP_BSS]               = true;

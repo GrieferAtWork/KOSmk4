@@ -2153,6 +2153,12 @@
 #define __CRT_HAVE_syscall_tracing_setenabled 1
 #define __CRT_HAVE_system_clearcaches 1
 #define __CRT_HAVE_system_clearcaches_s 1
+#define __CRT_HAVE_system_rtld 1
+#define __CRT_HAVE_system_rtld32 1
+#define __CRT_HAVE_system_rtld32_file 1
+#define __CRT_HAVE_system_rtld32_size 1
+#define __CRT_HAVE_system_rtld_file 1
+#define __CRT_HAVE_system_rtld_size 1
 #define __CRT_HAVE_system_trimheaps 1
 #define __CRT_HAVE_task_alloc 1
 #define __CRT_HAVE_task_alloc_synchronous_rpc 1

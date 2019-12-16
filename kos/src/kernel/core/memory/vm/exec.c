@@ -26,6 +26,7 @@
 #include <kernel/debugtrap.h>
 #include <kernel/driver-param.h>
 #include <kernel/except.h>
+#include <kernel/rtld.h>
 #include <kernel/vm.h>
 #include <kernel/vm/builder.h>
 #include <kernel/vm/exec.h>
@@ -69,14 +70,6 @@ PUBLIC ATTR_PERVM struct vm_execinfo_struct thisvm_execinfo = {
 #define HINT_MODE(x, y) y
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
-
-INTDEF byte_t __x86_kernel_ld_elf_startpageptr[];
-INTDEF byte_t __x86_kernel_ld_elf_numpages[];
-
-INTERN struct vm_ramfile kernel_ld_elf_ramfile =
-	VM_RAMFILE_INIT((pageptr_t)__x86_kernel_ld_elf_startpageptr,
-	                (size_t)__x86_kernel_ld_elf_numpages);
-
 
 /* List of callbacks that should be invoked after vm_exec()
  * These are called alongside stuff like `handle_manager_cloexec()'
@@ -426,14 +419,14 @@ err_overlap:
 			if (need_dyn_linker) {
 				linker_base = vmb_map(&builder,
 				                       HINT_GETADDR(KERNEL_VMHINT_USER_DYNLINK),
-				                       kernel_ld_elf_ramfile.rf_data.rb_size * PAGESIZE,
+				                       system_rtld_size,
 				                       PAGESIZE,
 #if !defined(NDEBUG) && 1 /* XXX: Remove me */
 				                       VM_GETFREE_ABOVE,
 #else
 				                       HINT_GETMODE(KERNEL_VMHINT_USER_DYNLINK),
 #endif
-				                       &kernel_ld_elf_ramfile.rf_block,
+				                       &system_rtld_file.rf_block,
 				                       0,
 				                       VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC | VM_PROT_PRIVATE,
 				                       VM_NODE_FLAG_NORMAL,

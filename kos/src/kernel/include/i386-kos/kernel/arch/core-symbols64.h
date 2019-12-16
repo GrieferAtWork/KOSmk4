@@ -2102,10 +2102,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak __predict_update_dl; .quad __predict_update_dl
 	.reloc ., R_X86_64_SIZE32, __predict_update_dl; .int 0
 	.int 0x45520c
-	.quad 0 /* index: 525 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname525 /* index: 525 */
+	.weak system_rtld32; .quad system_rtld32
+	.reloc ., R_X86_64_SIZE32, system_rtld32; .int 0
+	.int 0xd918b02
 	.quad .Lname526 /* index: 526 */
 	.weak cpu_idlemain; .quad cpu_idlemain
 	.reloc ., R_X86_64_SIZE32, cpu_idlemain; .int 0
@@ -7383,9 +7383,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, sys32_sched_rr_get_interval64; .int 0
 	.int 0x2626734
 	.quad .Lname1845 /* index: 1845 */
-	.weak vm_kernel_treelock_endwrite; .quad vm_kernel_treelock_endwrite
-	.reloc ., R_X86_64_SIZE32, vm_kernel_treelock_endwrite; .int 0
-	.int 0xf8e2735
+	.weak system_rtld_file; .quad system_rtld_file
+	.reloc ., R_X86_64_SIZE32, system_rtld_file; .int 0
+	.int 0x8631735
 	.quad .Lname1846 /* index: 1846 */
 	.weak vm_datablock_vio_readv; .quad vm_datablock_vio_readv
 	.reloc ., R_X86_64_SIZE32, vm_datablock_vio_readv; .int 0
@@ -7914,10 +7914,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak getreg_ucpustate; .quad getreg_ucpustate
 	.reloc ., R_X86_64_SIZE32, getreg_ucpustate; .int 0
 	.int 0xf711fb5
-	.quad 0 /* index: 1978 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname1978 /* index: 1978 */
+	.weak vm_datapart_read_buffered; .quad vm_datapart_read_buffered
+	.reloc ., R_X86_64_SIZE32, vm_datapart_read_buffered; .int 0
+	.int 0x6267f94
 	.quad 0 /* index: 1979 */
 	.quad 0
 	.int 0
@@ -10458,10 +10458,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak path_getcasechild_or_parent_inode; .quad path_getcasechild_or_parent_inode
 	.reloc ., R_X86_64_SIZE32, path_getcasechild_or_parent_inode; .int 0
 	.int 0x372aa35
-	.quad 0 /* index: 2614 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname2614 /* index: 2614 */
+	.weak system_rtld32_size; .quad system_rtld32_size
+	.reloc ., R_X86_64_SIZE32, system_rtld32_size; .int 0
+	.int 0xbf99b5
 	.quad .Lname2615 /* index: 2615 */
 	.weak dbg_ungetkey; .quad dbg_ungetkey
 	.reloc ., R_X86_64_SIZE32, dbg_ungetkey; .int 0
@@ -10542,10 +10542,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 2635 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname2635 /* index: 2635 */
+	.weak vm_kernel_treelock_endwrite; .quad vm_kernel_treelock_endwrite
+	.reloc ., R_X86_64_SIZE32, vm_kernel_treelock_endwrite; .int 0
+	.int 0xf8e2735
 	.quad .Lname2636 /* index: 2636 */
 	.weak sys32_tkill; .quad sys32_tkill
 	.reloc ., R_X86_64_SIZE32, sys32_tkill; .int 0
@@ -12098,10 +12098,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 3024 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname3024 /* index: 3024 */
+	.weak system_rtld32_file; .quad system_rtld32_file
+	.reloc ., R_X86_64_SIZE32, system_rtld32_file; .int 0
+	.int 0xbcd895
 	.quad 0 /* index: 3025 */
 	.quad 0
 	.int 0
@@ -12283,9 +12283,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname3070 /* index: 3070 */
-	.weak vm_datapart_read_buffered; .quad vm_datapart_read_buffered
-	.reloc ., R_X86_64_SIZE32, vm_datapart_read_buffered; .int 0
-	.int 0x6267f94
+	.weak vm_datapart_lockread_setcore_unsharecow; .quad vm_datapart_lockread_setcore_unsharecow
+	.reloc ., R_X86_64_SIZE32, vm_datapart_lockread_setcore_unsharecow; .int 0
+	.int 0x5b8fc37
 	.quad .Lname3071 /* index: 3071 */
 	.weak path_traverse; .quad path_traverse
 	.reloc ., R_X86_64_SIZE32, path_traverse; .int 0
@@ -12511,9 +12511,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, sys32_writef; .int 0
 	.int 0x1596c36
 	.quad .Lname3127 /* index: 3127 */
-	.weak vm_datapart_lockread_setcore_unsharecow; .quad vm_datapart_lockread_setcore_unsharecow
-	.reloc ., R_X86_64_SIZE32, vm_datapart_lockread_setcore_unsharecow; .int 0
-	.int 0x5b8fc37
+	.weak system_rtld; .quad system_rtld
+	.reloc ., R_X86_64_SIZE32, system_rtld; .int 0
+	.int 0xc6d9184
 	.quad .Lname3128 /* index: 3128 */
 	.weak unwind_getreg_kcpustate_exclusive; .quad unwind_getreg_kcpustate_exclusive
 	.reloc ., R_X86_64_SIZE32, unwind_getreg_kcpustate_exclusive; .int 0
@@ -15154,10 +15154,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_datablock_haschanged; .quad vm_datablock_haschanged
 	.reloc ., R_X86_64_SIZE32, vm_datablock_haschanged; .int 0
 	.int 0xb096dd4
-	.quad 0 /* index: 3788 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname3788 /* index: 3788 */
+	.weak system_rtld_size; .quad system_rtld_size
+	.reloc ., R_X86_64_SIZE32, system_rtld_size; .int 0
+	.int 0x8605a15
 	.quad .Lname3789 /* index: 3789 */
 	.weak sys32_fsetxattr; .quad sys32_fsetxattr
 	.reloc ., R_X86_64_SIZE32, sys32_fsetxattr; .int 0
@@ -17142,6 +17142,8 @@ END(kernel_symbol_table)
 	.string "inode_readk"
 .Lname524:
 	.string "__predict_update_dl"
+.Lname525:
+	.string "system_rtld32"
 .Lname526:
 	.string "cpu_idlemain"
 .Lname527:
@@ -18921,7 +18923,7 @@ END(kernel_symbol_table)
 .Lname1844:
 	.string "sys32_sched_rr_get_interval64"
 .Lname1845:
-	.string "vm_kernel_treelock_endwrite"
+	.string "system_rtld_file"
 .Lname1846:
 	.string "vm_datablock_vio_readv"
 .Lname1847:
@@ -19092,6 +19094,8 @@ END(kernel_symbol_table)
 	.string "page_cfree"
 .Lname1977:
 	.string "getreg_ucpustate"
+.Lname1978:
+	.string "vm_datapart_read_buffered"
 .Lname1980:
 	.string "sys_readv"
 .Lname1983:
@@ -19940,6 +19944,8 @@ END(kernel_symbol_table)
 	.string "_strtoi64"
 .Lname2613:
 	.string "path_getcasechild_or_parent_inode"
+.Lname2614:
+	.string "system_rtld32_size"
 .Lname2615:
 	.string "dbg_ungetkey"
 .Lname2616:
@@ -19970,6 +19976,8 @@ END(kernel_symbol_table)
 	.string "cpu_swipi_pending"
 .Lname2633:
 	.string "empty_directory_entry"
+.Lname2635:
+	.string "vm_kernel_treelock_endwrite"
 .Lname2636:
 	.string "sys32_tkill"
 .Lname2637:
@@ -20482,6 +20490,8 @@ END(kernel_symbol_table)
 	.string "x86_fpustate_save_noreset"
 .Lname3020:
 	.string "x86_sysroute1_c32"
+.Lname3024:
+	.string "system_rtld32_file"
 .Lname3027:
 	.string "regdump_flags"
 .Lname3028:
@@ -20541,7 +20551,7 @@ END(kernel_symbol_table)
 .Lname3067:
 	.string "inode_areadallk"
 .Lname3070:
-	.string "vm_datapart_read_buffered"
+	.string "vm_datapart_lockread_setcore_unsharecow"
 .Lname3071:
 	.string "path_traverse"
 .Lname3072:
@@ -20631,7 +20641,7 @@ END(kernel_symbol_table)
 .Lname3126:
 	.string "sys32_writef"
 .Lname3127:
-	.string "vm_datapart_lockread_setcore_unsharecow"
+	.string "system_rtld"
 .Lname3128:
 	.string "unwind_getreg_kcpustate_exclusive"
 .Lname3129:
@@ -21608,6 +21618,8 @@ END(kernel_symbol_table)
 	.string "terminal_iwrite"
 .Lname3787:
 	.string "vm_datablock_haschanged"
+.Lname3788:
+	.string "system_rtld_size"
 .Lname3789:
 	.string "sys32_fsetxattr"
 .Lname3790:

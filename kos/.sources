@@ -67,9 +67,7 @@ function getDefPath(filename: string) -> fs.relpath(fs.headof(filename),ROOTDIR)
 	options[OPT_MCOPY_OUTPUT]   = filename + ".so";
 #define SET_OUTPUT_LIBDLL(name)     SET_OUTPUT_DLL(DISK_LIBPATH + name)
 #define SET_OUTPUT_USRLIBDLL(name)  SET_OUTPUT_DLL(DISK_USRLIBPATH + name)
-#define _DEFINE1(x)              options.setdefault(OPT_COMPILE_MACROS,Dict())[x] = none;
-#define _DEFINE2(x,y)            options.setdefault(OPT_COMPILE_MACROS,Dict())[x] = y;
-#define DEFINE(...)              _DEFINE##__VA_NARGS__(__VA_ARGS__)
+#define DEFINE(...)              options.setdefault(OPT_COMPILE_MACROS,Dict()).update(__VA_ARGS__);
 #define INCLUDE(...)             options.setdefault(OPT_COMPILE_INCPATH,[]).extend(__VA_ARGS__);
 #define LIBPATH(...)             options.setdefault(OPT_LINK_LIBPATH,[]).extend(__VA_ARGS__);
 #define LIB(x)                   options.setdefault(OPT_LINK_LIBRARIES,[]).append(x);
@@ -78,7 +76,7 @@ function getDefPath(filename: string) -> fs.relpath(fs.headof(filename),ROOTDIR)
 
 
 SET_LANGUAGE("c++")
-DEFINE("__ELF__")
+DEFINE({ "__ELF__" : "1" })
 
 if (CONFIG_OPTIMIZE) {
 #if 1
@@ -96,7 +94,7 @@ if (CONFIG_OPTIMIZE) {
 if (CONFIG_DEBUG) {
 	GCC_FLAGS({ "-fstack-protector-strong" })
 } else {
-	DEFINE("NDEBUG")
+	DEFINE({ "NDEBUG" : "1" })
 }
 
 GCC_FLAGS({
