@@ -3227,7 +3227,11 @@ again:
 			 *            called), so-as to ensure that we don't skip one that
 			 *            turned out to be important for freeing some resource
 			 *            that had already been allocated successfully. */
-			/*ATOMIC_FETCHAND(self->d_flags, ~DRIVER_FLAG_INITIALIZING);*/
+#if 1
+			ATOMIC_FETCHOR(self->d_flags, DRIVER_FLAG_INITIALIZED);
+#else
+			ATOMIC_FETCHAND(self->d_flags, ~DRIVER_FLAG_INITIALIZING);
+#endif
 			RETHROW();
 		}
 		self->d_initthread = NULL;
