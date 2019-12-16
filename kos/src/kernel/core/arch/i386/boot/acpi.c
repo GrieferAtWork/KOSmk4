@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_ACPI_C
-#define GUARD_KERNEL_CORE_ARCH_I386_ACPI_C 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_BOOT_ACPI_C
+#define GUARD_KERNEL_CORE_ARCH_I386_BOOT_ACPI_C 1
 #define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
 #define _KOS_SOURCE 1
 
@@ -269,8 +269,6 @@ NOTHROW(KCALL acpi_lookup)(char const signature[4],
 	return 0;
 }
 
-
-
 DECL_END
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_ACPI_C */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_BOOT_ACPI_C */

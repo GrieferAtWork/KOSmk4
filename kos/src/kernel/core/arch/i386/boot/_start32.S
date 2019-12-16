@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_BOOT__START32_S
+#define GUARD_KERNEL_CORE_ARCH_I386_BOOT__START32_S 1
 
 #include <kernel/compiler.h>
 
@@ -620,3 +622,5 @@ END(__x86_paging_init_identity_mapped_text)
 	popl   %ds
 	iret
 END(_start)
+
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_BOOT__START32_S */

@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_BOOT__BOOT0_S
+#define GUARD_KERNEL_CORE_ARCH_I386_BOOT__BOOT0_S 1
 
 #include <kernel/compiler.h>
 
@@ -24,7 +26,6 @@
 #include <asm/cpu-flags.h>
 #include <asm/instr/jccN.h>
 #include <kos/kernel/segment.h>
-
 
 .macro call16 sym:req
 	.byte  0xe8
@@ -352,3 +353,4 @@ END(x86_boot0_sector)
 
 .code32
 
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_BOOT__BOOT0_S */

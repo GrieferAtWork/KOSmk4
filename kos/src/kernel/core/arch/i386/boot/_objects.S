@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_BOOT__OBJECTS_S
+#define GUARD_KERNEL_CORE_ARCH_I386_BOOT__OBJECTS_S 1
 
 #include <kernel/compiler.h>
 
@@ -51,4 +53,4 @@ EXPORT_AS_OBJECT_EX(thiscpu_idle_x86_kernel_psp0, __SIZEOF_POINTER__)
 #undef EXPORT_AS_OBJECT_EX
 #undef EXPORT_AS_OBJECT
 
-
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_BOOT__OBJECTS_S */
