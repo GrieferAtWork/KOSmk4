@@ -44,7 +44,7 @@
 #ifdef __x86_64__
 __ASM_BEGIN
 __ASM_L(.macro swapgs_if_user_iret)
-__ASM_L(	testq  $3, 8(%rsp)) /* 8 == OFFSET_IRREGS64_CS */
+__ASM_L(	testq  $(3), 8(%rsp)) /* 8 == OFFSET_IRREGS64_CS */
 __ASM_L(	jz     991f)
 __ASM_L(	swapgs)
 __ASM_L(991:)
@@ -57,7 +57,7 @@ __ASM_L(.endm)
 __ASM_L(.macro intr_enter type:req)
 __ASM_L(	swapgs_if_user_iret)
 __ASM_L(.ifc __ASM_ARG(\type),TRAP)
-__ASM_L(	testq  $0x200, 16(%rsp)) /* 16 == OFFSET_IRREGS64_RFLAGS */
+__ASM_L(	testq  $(0x200), 16(%rsp)) /* 16 == OFFSET_IRREGS64_RFLAGS */
 __ASM_L(	jz     991f)
 __ASM_L(	sti)
 __ASM_L(991:)

@@ -106,7 +106,6 @@ __NRFEAT_SYSCALL_TABLE_FOREACH(DEFINE_KERNEL_SYSCALL_ROUTES)
 
 /* Entry point for `sysenter' (32-bit system call invocation)
  * NOTE: When this function is called, no IRET tail exists, yet.
- *       This also means that interrupts must be disabled when this function is hit!
  * Method:
  *    RPC_SYSCALL_INFO_METHOD_SYSENTER_32
  * In:
@@ -151,6 +150,16 @@ FUNDEF void ASMCALL x86_syscall32_sysenter_traced(void);
  *                system calls may cause specific registers to become clobbered. */
 FUNDEF void ASMCALL x86_syscall32_int80(void) ASMNAME("x86_idt_syscall");
 FUNDEF void ASMCALL x86_syscall32_int80_traced(void) ASMNAME("x86_idt_syscall_traced");
+#ifdef __x86_64__
+/* int80 entry points for 64-bit mode.
+ * Note that these are actually identical to the 32-bit mode entry points, as the actual
+ * behavior to-be used is decided at run-time, based on whether the calling user-space
+ * code was running in compatibility mode.
+ * NOTE: The register conventions for a 64-bit int80h system call are identical to the
+ *       64-bit `syscall' system call (s.a. `x86_syscall64_syscall()') */
+FUNDEF void ASMCALL x86_syscall64_int80(void) ASMNAME("x86_idt_syscall");
+FUNDEF void ASMCALL x86_syscall64_int80_traced(void) ASMNAME("x86_idt_syscall_traced");
+#endif /* __x86_64__ */
 
 /* Entry point for `lcall $7, $SYS_xxx' (32-bit system call invocation)
  * Method:
@@ -176,6 +185,34 @@ FUNDEF void ASMCALL x86_syscall32_lcall7(void);
 FUNDEF void ASMCALL x86_syscall32_lcall7_iret(void);
 
 
+
+#ifdef __x86_64__
+/* Entry point for `syscall' (64-bit system call invocation)
+ * NOTE: When this function is called, no IRET tail exists, yet.
+ * Method:
+ *    RPC_SYSCALL_INFO_METHOD_INT80H_64
+ * In:
+ *    %rax:    System call number (`__NR64_*')
+ *    %rdi:    Arg #0  (If `kernel_syscall64_regcnt(%rax) >= 1')
+ *    %rsi:    Arg #1  (If `kernel_syscall64_regcnt(%rax) >= 2')
+ *    %rdx:    Arg #2  (If `kernel_syscall64_regcnt(%rax) >= 3')
+ *    %r10:    Arg #3  (If `kernel_syscall64_regcnt(%rax) >= 4')
+ *    %r8:     Arg #4  (If `kernel_syscall64_regcnt(%rax) >= 5')
+ *    %r9:     Arg #5  (If `kernel_syscall64_regcnt(%rax) >= 6')
+ *    %rcx:    Return-%rip
+ *    %r11:    Return-%rflags
+ *    %r11.CF: Set to enable exception propagation. (s.a. `sys_set_exception_handler()')
+ * Out:
+ *    %rax:       low  64-bit of return value
+ *    %rdx:       high 64-bit of return value (If `kernel_syscall64_doublewide(IN(%rax))')
+ *    %eip:       Always set to `IN(%edi)'
+ *    %rflags.CF: Always set to `IN(%r11)'
+ *                When cleared on entry, set on return if an exception was propagated
+ *    *:          All other registers are preserved by default, though individual
+ *                system calls may cause specific registers to become clobbered. */
+FUNDEF void ASMCALL x86_syscall64_syscall(void);
+FUNDEF void ASMCALL x86_syscall64_syscall_traced(void);
+#endif /* __x86_64__ */
 
 DECL_END
 #endif /* __CC__ */

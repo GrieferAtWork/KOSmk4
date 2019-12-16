@@ -573,7 +573,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 	movl   $(IA32_SYSENTER_ESP), %ecx
 	wrmsr
 
-	/* __wrmsr(IA32_SYSENTER_EIP, (uintptr_t)x86_syscall32_sysenter[_traced]); */
+	/* __wrmsr(IA32_SYSENTER_EIP, (uintptr_t)&x86_syscall32_sysenter[_traced]); */
 	EXTERN(x86_syscall32_sysenter)
 	movq   $(x86_syscall32_sysenter), %rax
 #ifndef CONFIG_NO_SYSCALL_TRACING
@@ -590,6 +590,41 @@ INTERN_FUNCTION(x86_smp_entry32)
 	movl   $(IA32_SYSENTER_EIP), %ecx
 	wrmsr
 .Ldone_sysenter:
+
+
+	/* If supported, initialize the `syscall' instruction */
+	testl  $(CPUID_80000001D_SYSCALL), OFFSET_CPUID_80000001D(R_CPU)
+	jz     .Ldone_syscall
+
+	/* __wrmsr(IA32_STAR, (u64)SEGMENT_KERNEL_CODE << 32); */
+	movl   $(SEGMENT_KERNEL_CODE), %edx
+	xorq   %rax, %rax
+	movl   $(IA32_STAR), %ecx
+	wrmsr
+
+	/* __wrmsr(IA32_FMASK, EFLAGS_IF); */
+	xorq   %rdx, %rdx
+	movl   $(EFLAGS_IF), %eax
+	movl   $(IA32_FMASK), %ecx
+	wrmsr
+
+	/* __wrmsr(IA32_LSTAR, (u64)&x86_syscall64_syscall[_traced]); */
+	EXTERN(x86_syscall64_syscall)
+	movq   $(x86_syscall64_syscall), %rax
+#ifndef CONFIG_NO_SYSCALL_TRACING
+	EXTERN(syscall_tracing_enabled)
+	cmpb   $(0), syscall_tracing_enabled
+	je     1f
+	EXTERN(x86_syscall64_syscall_traced)
+	movq   $(x86_syscall64_syscall_traced), %rax
+1:
+#endif /* !CONFIG_NO_SYSCALL_TRACING */
+	movq   %rax, %rdx
+	shrq   $(32), %rdx
+	movzlq %eax, %rax
+	movl   $(IA32_LSTAR), %ecx
+	wrmsr
+.Ldone_syscall:
 
 
 	/* Load the VM of the target task. */

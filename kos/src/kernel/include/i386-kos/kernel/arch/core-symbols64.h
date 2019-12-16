@@ -11050,10 +11050,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak ioperm_bitmap_destroy; .quad ioperm_bitmap_destroy
 	.reloc ., R_X86_64_SIZE32, ioperm_bitmap_destroy; .int 0
 	.int 0xcb05ac9
-	.quad 0 /* index: 2762 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname2762 /* index: 2762 */
+	.weak x86_syscall64_syscall_traced; .quad x86_syscall64_syscall_traced
+	.reloc ., R_X86_64_SIZE32, x86_syscall64_syscall_traced; .int 0
+	.int 0x26fbec4
 	.quad .Lname2763 /* index: 2763 */
 	.weak sys32_unlink; .quad sys32_unlink
 	.reloc ., R_X86_64_SIZE32, sys32_unlink; .int 0
@@ -12722,10 +12722,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_mq_unlink; .quad sys_mq_unlink
 	.reloc ., R_X86_64_SIZE32, sys_mq_unlink; .int 0
 	.int 0xdce4c6b
-	.quad 0 /* index: 3180 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname3180 /* index: 3180 */
+	.weak x86_syscall64_syscall; .quad x86_syscall64_syscall
+	.reloc ., R_X86_64_SIZE32, x86_syscall64_syscall; .int 0
+	.int 0x74d7c6c
 	.quad .Lname3181 /* index: 3181 */
 	.weak dbg_getcur; .quad dbg_getcur
 	.reloc ., R_X86_64_SIZE32, dbg_getcur; .int 0
@@ -20148,6 +20148,8 @@ END(kernel_symbol_table)
 	.string "sys_rt_sigpending"
 .Lname2761:
 	.string "ioperm_bitmap_destroy"
+.Lname2762:
+	.string "x86_syscall64_syscall_traced"
 .Lname2763:
 	.string "sys32_unlink"
 .Lname2764:
@@ -20714,6 +20716,8 @@ END(kernel_symbol_table)
 	.string "pagedir_kernel"
 .Lname3179:
 	.string "sys_mq_unlink"
+.Lname3180:
+	.string "x86_syscall64_syscall"
 .Lname3181:
 	.string "dbg_getcur"
 .Lname3184:

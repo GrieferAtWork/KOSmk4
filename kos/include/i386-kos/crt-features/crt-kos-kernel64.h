@@ -2792,6 +2792,8 @@
 #define __CRT_HAVE_x86_syscall32_lcall7_iret 1
 #define __CRT_HAVE_x86_syscall32_sysenter 1
 #define __CRT_HAVE_x86_syscall32_sysenter_traced 1
+#define __CRT_HAVE_x86_syscall64_syscall 1
+#define __CRT_HAVE_x86_syscall64_syscall_traced 1
 #define __CRT_HAVE_x86_syscall_emulate32_cdecl 1
 #define __CRT_HAVE_x86_syscall_emulate32_cdecl_r 1
 #define __CRT_HAVE_x86_syscall_emulate32_int80h 1

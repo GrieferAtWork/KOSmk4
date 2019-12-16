@@ -54,34 +54,6 @@
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 
-/* System call calling conventions:
- *
- * i386: lcall $7, $MAYBE_SYSNO
- *   - SYSNO:     MAYBE_SYSNO != 0 ? MAYBE_SYSNO : %eax
- *   - ARG0:      0(%esp)  // NOTE: Only accessed if used
- *   - ARG1:      4(%esp)  // NOTE: Only accessed if used
- *   - ARG2:      8(%esp)  // NOTE: Only accessed if used
- *   - ARG3:      12(%esp) // NOTE: Only accessed if used
- *   - ARG4:      16(%esp) // NOTE: Only accessed if used
- *   - ARG5:      20(%esp) // NOTE: Only accessed if used
- *   - RET0:      %eax
- *   - RET1:      %edx
- *
- * x86_64: syscall
- *   - SYSNO:     %rax
- *   - ARG0:      %rdi
- *   - ARG1:      %rsi
- *   - ARG2:      %rdx
- *   - ARG3:      %r10
- *   - ARG4:      %r8
- *   - ARG5:      %r9
- *   - RET0:      %rax
- *   - RET1:      %rdx
- *
- */
-
-
-
 #ifdef __CC__
 DECL_BEGIN
 

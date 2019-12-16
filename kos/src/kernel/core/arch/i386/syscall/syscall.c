@@ -210,6 +210,13 @@ NOTHROW(FCALL syscall_tracing_ipi)(struct icpustate *__restrict state,
 		        (u64)(uintptr_t)(args[0] ? (void *)&x86_syscall32_sysenter_traced
 		                                 : (void *)&x86_syscall32_sysenter));
 	}
+#ifdef __x86_64__
+	if (CURRENT_X86_CPUID.ci_80000001d & CPUID_80000001D_SYSCALL) {
+		__wrmsr(IA32_LSTAR,
+		        args[0] ? (u64)&x86_syscall64_syscall_traced
+		                : (u64)&x86_syscall64_syscall);
+	}
+#endif /* __x86_64__ */
 	__lidt_p(&x86_idt_ptr);
 	return state;
 }
@@ -262,6 +269,13 @@ PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
 		        enable ? (uintptr_t)&x86_syscall32_sysenter_traced
 		               : (uintptr_t)&x86_syscall32_sysenter);
 	}
+#ifdef __x86_64__
+	if (CURRENT_X86_CPUID.ci_80000001d & CPUID_80000001D_SYSCALL) {
+		__wrmsr(IA32_LSTAR,
+		        enable ? (u64)&x86_syscall64_syscall_traced
+		               : (u64)&x86_syscall64_syscall);
+	}
+#endif /* __x86_64__ */
 	__lidt_p(&x86_idt_ptr);
 	return result;
 }
@@ -290,6 +304,13 @@ NOTHROW(KCALL x86_initialize_sysenter)(void) {
 #endif /* !__x86_64__ */
 		__wrmsr(IA32_SYSENTER_EIP, (u64)(uintptr_t)(void *)&x86_syscall32_sysenter);
 	}
+#ifdef __x86_64__
+	if (CURRENT_X86_CPUID.ci_80000001d & CPUID_80000001D_SYSCALL) {
+		__wrmsr(IA32_STAR, (u64)SEGMENT_KERNEL_CODE << 32);
+		__wrmsr(IA32_LSTAR, (u64)&x86_syscall64_syscall);
+		__wrmsr(IA32_FMASK, EFLAGS_IF);
+	}
+#endif /* __x86_64__ */
 }
 
 DECL_END

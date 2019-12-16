@@ -51,7 +51,10 @@ PUBLIC_FUNCTION(x86_idt_syscall)
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
-	intr_enter TRAP
+	/* Because we can assume that we only get here from user-space with #IF enabled,
+	 * we don't have to swapgs or sti conditionally, but can simply always do so. */
+	swapgs
+	sti
 	/* Check if the system call was invoked from compatibility mode. */
 	cmpq   $(SEGMENT_USER_CODE32_RPL), OFFSET_IRREGS_CS(%rsp)
 	je     .Lsyscall_int80_32bit
