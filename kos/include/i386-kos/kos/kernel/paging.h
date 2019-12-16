@@ -26,48 +26,30 @@
 #include <kos/bits/types.h>
 
 
-#undef KERNEL_BASE
+#undef KERNELSPACE_BASE
 #undef KERNEL_CORE_BASE
-#undef KERNEL_BASE_PAGE
-#undef KERNEL_NUM_PAGES
 
-#undef LOW_MEMORY_KERNEL
-#define HIGH_MEMORY_KERNEL 1
+#undef KERNELSPACE_END
+#undef KERNELSPACE_LOWMEM
+#define KERNELSPACE_HIGHMEM 1
 
 #ifdef __x86_64__
-#define USERSPACE_END           __UINT64_C(0x0000800000000000) /* Upper address space limit for user-space (first invalid address) */
-#define USERSPACE_END_I                    0x0000800000000000  /* Upper address space limit for user-space (first invalid address) */
-#define KERNEL_BASE             __UINT64_C(0xffff800000000000) /* Lower address space limit for kernel-space */
-#define KERNEL_BASE_I                      0xffff800000000000  /* Lower address space limit for kernel-space */
-#define KERNEL_CORE_BASE        __UINT64_C(0xffffffff80000000) /* Load address of the kernel core. (-2GB) */
-#define KERNEL_CORE_BASE_I                 0xffffffff80000000  /* Load address of the kernel core. (-2GB) */
-#define KERNEL_BASE_PAGE        __UINT64_C(0xffff800000000)    /* Page index for the user/kernel address space split. */
-#define KERNEL_BASE_PAGE_I                 0xffff800000000     /* Page index for the user/kernel address space split. */
-#define KERNEL_CORE_PAGE        __UINT64_C(0xffffffff80000)    /* The page index of the kernel-base */
-#define KERNEL_CORE_PAGE_I                 0xffffffff80000     /* The page index of the kernel-base */
-#define KERNEL_NUM_PAGES        __UINT64_C(0x0000800000000)    /* The number of pages associated with the kernel. */
-#define KERNEL_NUM_PAGES_I                 0x0000800000000     /* The number of pages associated with the kernel. */
-#define KERNEL_NUM_CORE_PAGES   __UINT64_C(0x0000000080000)    /* The number of pages associated with the kernel. */
-#define KERNEL_NUM_CORE_PAGES_I            0x0000000080000     /* The number of pages associated with the kernel. */
-
-/* First first half of the kernel address space is used as identity mapping
- * for the first 64TiB (yes: that is Terrabyte) of physical memory. */
-#define KERNEL_PHYS2VIRT_BASE         __UINT64_C(0xffff880000000000) /* Start of the physical identity mapping */
-#define KERNEL_PHYS2VIRT_BASE_I                  0xffff880000000000  /* Start of the physical identity mapping */
-#define KERNEL_PHYS2VIRT_SIZE             __UINT64_C(0x400000000000) /* Size of the physical identity mapping (== 64TiB) */
-#define KERNEL_PHYS2VIRT_SIZE_I                      0x400000000000  /* Size of the physical identity mapping (== 64TiB) */
-#define KERNEL_PHYS2VIRT_PAGECOUNT        __UINT64_C(0x400000000)    /* Number of pages apart of the physical identity mapping */
-#define KERNEL_PHYS2VIRT_PAGECOUNT_I                 0x400000000     /* Number of pages apart of the physical identity mapping */
-#define KERNEL_PHYS2VIRT_MIN          KERNEL_PHYS2VIRT_BASE          /* Lowest address apart of the physical identity mapping */
-#define KERNEL_PHYS2VIRT_MIN_I        KERNEL_PHYS2VIRT_BASE_I        /* Lowest address apart of the physical identity mapping */
-#define KERNEL_PHYS2VIRT_MAX          __UINT64_C(0xffffc7ffffffffff) /* Greatest address apart of the physical identity mapping */
-#define KERNEL_PHYS2VIRT_MAX_I                   0xffffc7ffffffffff  /* Greatest address apart of the physical identity mapping */
-
-/* Accessor macros for physical identity translation. */
+#define USERSPACE_END    __UINT64_C(0x0000800000000000) /* Upper address space limit for user-space (first invalid address) */
+#define KERNELSPACE_BASE __UINT64_C(0xffff800000000000) /* Lower address space limit for kernel-space */
+#define KERNEL_CORE_BASE __UINT64_C(0xffffffff80000000) /* Load address of the kernel core. (-2GB) */
 
 /* Check if a given physical address range is identity mapped. */
 #if 0 /* TODO: Add a configuration option for this.
        * TODO: Must test the x86_64 kernel (once its working) with _and_ without the phyiscal identity mapping! */
+
+/* First first half of the kernel address space is used as identity mapping
+ * for the first 64TiB (yes: that is Terrabyte) of physical memory. */
+#define KERNEL_PHYS2VIRT_BASE __UINT64_C(0xffff880000000000) /* Start of the physical identity mapping */
+#define KERNEL_PHYS2VIRT_SIZE     __UINT64_C(0x400000000000) /* Size of the physical identity mapping (== 64TiB) */
+#define KERNEL_PHYS2VIRT_MIN  KERNEL_PHYS2VIRT_BASE          /* Lowest address apart of the physical identity mapping */
+#define KERNEL_PHYS2VIRT_MAX  __UINT64_C(0xffffc7ffffffffff) /* Greatest address apart of the physical identity mapping */
+
+/* Accessor macros for physical identity translation. */
 #define PHYS_IS_IDENTITY(base, num_bytes) (((__u64)(base) + (__u64)(num_bytes)) <= KERNEL_PHYS2VIRT_SIZE)
 #define PHYS_TO_IDENTITY(base)            ((void *)((__u64)(base) + KERNEL_PHYS2VIRT_BASE))
 #define PHYS_IS_IDENTITY_PAGE(pageno)     ((__u64)(pageno) <= KERNEL_PHYS2VIRT_PAGECOUNT)
@@ -77,41 +59,27 @@
 /* NOTE: All non-canonical bits must be equal to the most significant canonical bit.
  *       In other words: Memory addresses behave as signed with the bits 48-63 being
  *       a sign-extension of bit 47 */
-#define X86_64_ADDRBUS_CANONBITS        48
-#define X86_64_ADDRBUS_CANONMASK        __UINT64_C(0x0000ffffffffffff)
-#define X86_64_ADDRBUS_NONCANONBITS     16
-#define X86_64_ADDRBUS_NONCANONMASK     __UINT64_C(0xffff000000000000)
+#define X86_64_ADDRBUS_CANONBITS    48
+#define X86_64_ADDRBUS_CANONMASK    __UINT64_C(0x0000ffffffffffff)
+#define X86_64_ADDRBUS_NONCANONBITS 16
+#define X86_64_ADDRBUS_NONCANONMASK __UINT64_C(0xffff000000000000)
 
-#define X86_64_ADDRBUS_NONCANON_MIN     __UINT64_C(0x0000800000000000)
-#define X86_64_ADDRBUS_NONCANON_MAX     __UINT64_C(0xffff7fffffffffff)
-#define ADDR_IS_NONCANON(addr)  ((addr) >= X86_64_ADDRBUS_NONCANON_MIN && (addr) <= X86_64_ADDRBUS_NONCANON_MAX)
-#define ADDR_IS_CANON(addr)     (!ADDR_IS_NONCANON(addr))
+#define X86_64_ADDRBUS_NONCANON_MIN __UINT64_C(0x0000800000000000)
+#define X86_64_ADDRBUS_NONCANON_MAX __UINT64_C(0xffff7fffffffffff)
+#define ADDR_IS_NONCANON(addr)                                        \
+	(__CCAST(__UINT64_TYPE__)(addr) >= X86_64_ADDRBUS_NONCANON_MIN && \
+	 __CCAST(__UINT64_TYPE__)(addr) <= X86_64_ADDRBUS_NONCANON_MAX)
+#define ADDR_IS_CANON(addr)                                          \
+	(__CCAST(__UINT64_TYPE__)(addr) < X86_64_ADDRBUS_NONCANON_MIN || \
+	 __CCAST(__UINT64_TYPE__)(addr) > X86_64_ADDRBUS_NONCANON_MAX)
 
 #else /* __x86_64__ */
 #define USERSPACE_END         __UINT32_C(0xc0000000)         /* Upper address space limit for user-space */
-#define KERNEL_BASE           __UINT32_C(0xc0000000)         /* lower address space limit for kernel-space */
+#define KERNELSPACE_BASE           __UINT32_C(0xc0000000)         /* lower address space limit for kernel-space */
 #define KERNEL_CORE_BASE      __UINT32_C(0xc0000000)         /* Load address of the kernel core. */
-#define KERNEL_BASE_PAGE      __UINT32_C(0xc0000)            /* Page index for the user/kernel address space split. */
-#define KERNEL_CORE_PAGE      __UINT32_C(0xc0000)            /* The page index of the kernel-base */
-#define KERNEL_NUM_PAGES      __UINT32_C(0x40000)            /* The number of pages associated with the kernel. */
-#define KERNEL_NUM_CORE_PAGES __UINT32_C(0x40000)            /* The number of pages associated with the kernel. */
 #define ADDR_IS_NONCANON(addr)  0
 #define ADDR_IS_CANON(addr)     1
 #endif /* !__x86_64__ */
-
-#define ADDR_IS_KERNEL(ptr)            ((__UINTPTR_TYPE__)(ptr) >= KERNEL_BASE)
-#define PAGE_IS_KERNEL(ptr)            ((__UINTPTR_TYPE__)(ptr) >= KERNEL_BASE_PAGE)
-#define ADDR_IS_USER(ptr)              ((__UINTPTR_TYPE__)(ptr) < KERNEL_BASE)
-#define PAGE_IS_USER(ptr)              ((__UINTPTR_TYPE__)(ptr) < KERNEL_BASE_PAGE)
-#define ARANGE_IS_KERNEL(start, end)   ((__UINTPTR_TYPE__)(start) >= KERNEL_BASE)
-#define PRANGE_IS_KERNEL(start, end)   ((__UINTPTR_TYPE__)(start) >= KERNEL_BASE_PAGE)
-#define ARANGE_IS_USER(start, end)     ((__UINTPTR_TYPE__)(end) <= KERNEL_BASE)
-#define PRANGE_IS_USER(start, end)     ((__UINTPTR_TYPE__)(end) <= KERNEL_BASE_PAGE)
-#define ARANGE_IS_KERNEL_PARTIAL(start, end)   ((__UINTPTR_TYPE__)(end) > KERNEL_BASE)
-#define PRANGE_IS_KERNEL_PARTIAL(start, end)   ((__UINTPTR_TYPE__)(end) > KERNEL_BASE_PAGE)
-#define ARANGE_IS_USER_PARTIAL(start, end)     ((__UINTPTR_TYPE__)(start) < KERNEL_BASE)
-#define PRANGE_IS_USER_PARTIAL(start, end)     ((__UINTPTR_TYPE__)(start) < KERNEL_BASE_PAGE)
-
 
 /* VM hints for where to map different, dynamic kernel components. */
 #ifdef __x86_64__

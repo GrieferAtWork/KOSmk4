@@ -313,7 +313,7 @@ NOTHROW(FCALL pagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 			pagedir_syncone(addr);
 			return;
 		}
-		if (num_bytes > KERNEL_BASE) {
+		if (num_bytes > KERNELSPACE_BASE) {
 			/* We know that the address always _has_ to
 			 * fall into kernel-space in this case! */
 			pagedir_syncall();

@@ -26,7 +26,7 @@
 
 #include <kernel/coredump.h>
 #include <kernel/except.h>
-#include <kernel/paging.h> /* HIGH_MEMORY_KERNEL */
+#include <kernel/paging.h> /* KERNELSPACE_HIGHMEM */
 #include <kernel/printk.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
@@ -1260,9 +1260,9 @@ no_old_handler:
 		nhandler.sa_handler = act->sa_handler;
 		nhandler.sa_flags   = act->sa_flags;
 		COMPILER_READ_BARRIER();
-#ifndef HIGH_MEMORY_KERNEL
+#ifndef KERNELSPACE_HIGHMEM
 		if ((uintptr_t)nhandler.sa_handler >= (uintptr_t)KERNEL_SIG_GET)
-#endif /* !HIGH_MEMORY_KERNEL */
+#endif /* !KERNELSPACE_HIGHMEM */
 		{
 			validate_executable((void const *)nhandler.sa_handler);
 		}

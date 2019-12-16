@@ -243,13 +243,13 @@ INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL p64_pagedir_init)(VIRT struct p64_pdir *__restrict self,
                                 PHYS vm_phys_t phys_self) {
 	/* Make sure that the page directory identity mapping is located at the proper position.
-	 * Note that this position is `KERNEL_BASE + 512GiB', where KERNEL_BASE is at `0xffff800000000000',
+	 * Note that this position is `KERNELSPACE_BASE + 512GiB', where KERNELSPACE_BASE is at `0xffff800000000000',
 	 * meaning that the identity mapping is at: `0xffff808000000000 ... 0xffff80ffffffffff'
 	 * With this in mind, x86_64 is different from i386, in that the page directory identity
 	 * mapping isn't stored at the end of the kernel address space, but rather (near) the start
-	 * of it (we intentionally don't use `KERNEL_BASE' itself as base address in order to keep
+	 * of it (we intentionally don't use `KERNELSPACE_BASE' itself as base address in order to keep
 	 * the first page of kernel-space unmapped (meaning that given the 512GiB alignment
-	 * requirements of the identity mapping, we end up with `KERNEL_BASE + 512GiB')) */
+	 * requirements of the identity mapping, we end up with `KERNELSPACE_BASE + 512GiB')) */
 	STATIC_ASSERT(P64_PDIR_VEC4INDEX(P64_VM_KERNEL_PDIR_IDENTITY_BASE) == 257);
 	STATIC_ASSERT(P64_PDIR_VEC3INDEX(P64_VM_KERNEL_PDIR_IDENTITY_BASE) == 0);
 	STATIC_ASSERT(P64_PDIR_VEC2INDEX(P64_VM_KERNEL_PDIR_IDENTITY_BASE) == 0);
@@ -1392,7 +1392,7 @@ NOTHROW(FCALL p64_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 #else /* PAGEDIR_MAP_FMASK == 0xf */
 	result |= p64_pageperm_matrix[perm & 0xf];
 #endif /* PAGEDIR_MAP_FMASK != 0xf */
-	if ((byte_t *)addr >= (byte_t *)KERNEL_BASE)
+	if ((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
 		result |= USED_P64_PAGE_FGLOBAL;
 	return result;
 }

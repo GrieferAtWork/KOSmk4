@@ -23,6 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
+#include <kernel/paging.h>
 #include <kernel/syscall-properties.h>
 #include <kernel/syscall-tables.h>
 #include <kernel/syscall.h>
@@ -36,7 +37,6 @@
 #include <asm/cpu-flags.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/paging.h>
 
 #include <errno.h>
 #include <string.h>
@@ -72,7 +72,7 @@ NOTHROW(FCALL scinfo_get32_lcall7)(struct rpc_syscall_info *__restrict self,
 	if (argc != 0) {
 		USER UNCHECKED u32 *sp;
 		sp = (USER UNCHECKED u32 *)gpregs_getpsp(&state->ucs_gpregs);
-		if (ADDR_IS_USER(sp)) {
+		if (ADDR_ISUSER(sp)) {
 			struct exception_info old_info;
 			unsigned int i;
 			memcpy(&old_info, &THIS_EXCEPTION_INFO, sizeof(struct exception_info));
@@ -195,7 +195,7 @@ x86_syscall32_lcall7_main(struct x86_syscall32_lcall7_args *__restrict args,
 			return (syscall_ulong_t)-ENOSYS;
 		rpc_flags = RPC_SYSCALL_INFO_METHOD_LCALL7_32 |
 		            RPC_SYSCALL_INFO_FEXCEPT;
-		if likely(ADDR_IS_USER(usp)) {
+		if likely(ADDR_ISUSER(usp)) {
 			TRY {
 				argv[0] = ATOMIC_READ(usp[0]);
 				rpc_flags |= RPC_SYSCALL_INFO_FARGVALID(0);
@@ -218,7 +218,7 @@ x86_syscall32_lcall7_main(struct x86_syscall32_lcall7_args *__restrict args,
 		      argv[0], argv[1], argv[2],
 		      argv[3], argv[4], argv[5]);
 	}
-	if unlikely(!ADDR_IS_USER(usp)) {
+	if unlikely(!ADDR_ISUSER(usp)) {
 		if (argc != 0)
 			THROW(E_SEGFAULT_UNMAPPED, usp, E_SEGFAULT_CONTEXT_USERCODE);
 	} else {

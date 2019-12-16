@@ -683,13 +683,13 @@ err_bad_length:
 		if unlikely(OVERFLOW_UADD(length, (size_t)result_offset, &num_bytes))
 			goto err_bad_length;
 		num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
-#ifdef HIGH_MEMORY_KERNEL
-		if unlikely(num_bytes > (size_t)KERNEL_BASE)
+#ifdef KERNELSPACE_HIGHMEM
+		if unlikely(num_bytes > (size_t)KERNELSPACE_BASE)
 			goto err_bad_length;
-#else /* HIGH_MEMORY_KERNEL */
-		if unlikely(num_bytes > ((size_t)0 - KERNEL_END))
+#else /* KERNELSPACE_HIGHMEM */
+		if unlikely(num_bytes > ((size_t)0 - KERNELSPACE_END))
 			goto err_bad_length;
-#endif /* !HIGH_MEMORY_KERNEL */
+#endif /* !KERNELSPACE_HIGHMEM */
 		/* TODO: MAP_LOCKED */
 		/* TODO: MAP_NORESERVE */
 		/* TODO: MAP_POPULATE */
@@ -735,7 +735,7 @@ again_mapat:
 					             VM_UNMAP_ANYTHING |
 					             VM_UNMAP_NOKERNPART) ||
 					    /* Check if the given range overlaps with KERNEL-SPACE */
-					    !PRANGE_IS_KERNEL_PARTIAL(result, num_bytes + guard))
+					    !PAGEIDRANGE_ISKERN_PARTIAL(result, num_bytes + guard))
 						goto again_mapat; /* Try again, now that the existing mapping was deleted. */
 				}
 			}

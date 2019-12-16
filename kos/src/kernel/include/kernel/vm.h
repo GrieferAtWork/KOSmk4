@@ -91,6 +91,44 @@ typedef __ARCH_PAGEID_TYPE pageid_t;
 #define PAGEID_DECODE_KERNEL __ARCH_PAGEID_DECODE
 #endif /* !__ARCH_PAGEID_DECODE_KERNEL */
 
+/* Check if a given `pageid' or [startpageid,endpageid)
+ * is consider apart of user- or kernel-space.
+ * The *_PARTIAL functions check if the range has any overlapping
+ * parts with the named address space, while the non-_PARTIAL functions
+ * check that the entire range is apart of the named address space.
+ * Note that the range-checking functions are allowed to assume that
+ * `endpageid >= startpageid'. In the case where `endpageid == startpageid',
+ * the range-checking functions behave identical to `ADDR_IS(KERN|USER)',
+ * or in other words: will use `endpageid = startpageid+1' */
+#ifdef KERNELSPACE_HIGHMEM
+#define KERNELSPACE_MINPAGEID   PAGEID_ENCODE(KERNELSPACE_BASE)
+#define KERNELSPACE_MAXPAGEID   __ARCH_PAGEID_MAX
+#define PAGEID_ISKERN(pageid)                              (__CCAST(pageid_t)(pageid) >= PAGEID_ENCODE(KERNELSPACE_BASE))
+#define PAGEID_ISUSER(pageid)                              (__CCAST(pageid_t)(pageid) < PAGEID_ENCODE(KERNELSPACE_BASE))
+#define PAGEIDRANGE_ISKERN(startpageid, endpageid)         (__CCAST(pageid_t)(startpageid) >= PAGEID_ENCODE(KERNELSPACE_BASE))
+#define PAGEIDRANGE_ISUSER(startpageid, endpageid)         (__CCAST(pageid_t)(endpageid) <= PAGEID_ENCODE(KERNELSPACE_BASE))
+#define PAGEIDRANGE_ISKERN_PARTIAL(startpageid, endpageid) (__CCAST(pageid_t)(endpageid) > PAGEID_ENCODE(KERNELSPACE_BASE))
+#define PAGEIDRANGE_ISUSER_PARTIAL(startpageid, endpageid) (__CCAST(pageid_t)(startpageid) < PAGEID_ENCODE(KERNELSPACE_BASE))
+#elif defined(KERNELSPACE_LOWMEM)
+#define KERNELSPACE_MINPAGEID   0
+#define KERNELSPACE_MAXPAGEID   (PAGEID_ENCODE(KERNELSPACE_END) - 1)
+#define PAGEID_ISKERN(pageid)                              (__CCAST(pageid_t)(pageid) < PAGEID_ENCODE(KERNELSPACE_END))
+#define PAGEID_ISUSER(pageid)                              (__CCAST(pageid_t)(pageid) >= PAGEID_ENCODE(KERNELSPACE_END))
+#define PAGEIDRANGE_ISKERN(startpageid, endpageid)         (__CCAST(pageid_t)(endpageid) <= PAGEID_ENCODE(KERNELSPACE_END))
+#define PAGEIDRANGE_ISUSER(startpageid, endpageid)         (__CCAST(pageid_t)(startpageid) >= PAGEID_ENCODE(KERNELSPACE_END))
+#define PAGEIDRANGE_ISKERN_PARTIAL(startpageid, endpageid) (__CCAST(pageid_t)(startpageid) < PAGEID_ENCODE(KERNELSPACE_END))
+#define PAGEIDRANGE_ISUSER_PARTIAL(startpageid, endpageid) (__CCAST(pageid_t)(endpageid) > PAGEID_ENCODE(KERNELSPACE_END))
+#else
+#define KERNELSPACE_MINPAGEID   PAGEID_ENCODE(KERNELSPACE_BASE)
+#define KERNELSPACE_MAXPAGEID   (PAGEID_ENCODE(KERNELSPACE_END) - 1)
+#define PAGEID_ISKERN(pageid)                              (__CCAST(pageid_t)(pageid) >= PAGEID_ENCODE(KERNELSPACE_BASE) && __CCAST(pageid_t)(pageid) < PAGEID_ENCODE(KERNELSPACE_END))
+#define PAGEID_ISUSER(pageid)                              (__CCAST(pageid_t)(pageid) < PAGEID_ENCODE(KERNELSPACE_BASE) && __CCAST(pageid_t)(pageid) >= PAGEID_ENCODE(KERNELSPACE_END))
+#define PAGEIDRANGE_ISKERN(startpageid, endpageid)         (__CCAST(pageid_t)(startpageid) >= PAGEID_ENCODE(KERNELSPACE_BASE) && __CCAST(pageid_t)(endpageid) <= PAGEID_ENCODE(KERNELSPACE_END))
+#define PAGEIDRANGE_ISUSER(startpageid, endpageid)         (__CCAST(pageid_t)(startpageid) >= PAGEID_ENCODE(KERNELSPACE_END) || __CCAST(pageid_t)(endpageid) <= PAGEID_ENCODE(KERNELSPACE_BASE))
+#define PAGEIDRANGE_ISKERN_PARTIAL(startpageid, endpageid) (__CCAST(pageid_t)(startpageid) < PAGEID_ENCODE(KERNELSPACE_END) || __CCAST(pageid_t)(endpageid) > PAGEID_ENCODE(KERNELSPACE_BASE))
+#define PAGEIDRANGE_ISUSER_PARTIAL(startpageid, endpageid) (__CCAST(pageid_t)(startpageid) < PAGEID_ENCODE(KERNELSPACE_BASE) && __CCAST(pageid_t)(endpageid) > PAGEID_ENCODE(KERNELSPACE_END))
+#endif
+
 
 #ifdef __CC__
 #ifndef __datapage_t_defined
@@ -1514,13 +1552,13 @@ bool (vm_node_iskernelspace)(struct vm_node const *__restrict self);
 #define vm_node_getpagecount(self)   ((size_t)(((self)->vn_node.a_vmax - (self)->vn_node.a_vmin) + 1))
 #define vm_node_getendpageid(self)   ((self)->vn_node.a_vmax + 1)
 
-#ifdef HIGH_MEMORY_KERNEL
-#define vm_node_isuserspace(self)    (vm_node_getmaxpageid(self) < PAGEID_ENCODE(KERNEL_BASE))
-#define vm_node_iskernelspace(self)  (vm_node_getmaxpageid(self) >= PAGEID_ENCODE(KERNEL_BASE))
-#else /* HIGH_MEMORY_KERNEL */
-#define vm_node_isuserspace(self)    (vm_node_getminpageid(self) > PAGEID_ENCODE(KERNEL_END))
-#define vm_node_iskernelspace(self)  (vm_node_getminpageid(self) <= PAGEID_ENCODE(KERNEL_END))
-#endif /* !HIGH_MEMORY_KERNEL */
+#ifdef KERNELSPACE_HIGHMEM
+#define vm_node_isuserspace(self)    (vm_node_getmaxpageid(self) < PAGEID_ENCODE(KERNELSPACE_BASE))
+#define vm_node_iskernelspace(self)  (vm_node_getmaxpageid(self) >= PAGEID_ENCODE(KERNELSPACE_BASE))
+#else /* KERNELSPACE_HIGHMEM */
+#define vm_node_isuserspace(self)    (vm_node_getminpageid(self) > PAGEID_ENCODE(KERNELSPACE_END))
+#define vm_node_iskernelspace(self)  (vm_node_getminpageid(self) <= PAGEID_ENCODE(KERNELSPACE_END))
+#endif /* !KERNELSPACE_HIGHMEM */
 #endif /* !__INTELLISENSE__ */
 
 #define VM_NODE_HASNEXT(self, vm) ((self)->vn_byaddr.ln_next != NULL)

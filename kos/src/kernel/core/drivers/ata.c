@@ -177,7 +177,7 @@ AtaPRD_InitFromVirt(AtaPRD *__restrict prd_buf, size_t prd_siz, CHECKED void *ba
 	struct vm *effective_vm = &vm_kernel;
 	struct ata_dma_acquire_data data;
 	size_t req_locks, req_prd;
-	if (ADDR_IS_USER(base))
+	if (ADDR_ISUSER(base))
 		effective_vm = THIS_VM;
 	data.ad_base = data.ad_buf = prd_buf;
 	data.ad_siz = data.ad_max = prd_siz;
@@ -287,7 +287,7 @@ AtaPRD_InitFromVirtVector(AtaPRD *__restrict prd_buf, size_t prd_siz, struct aio
 	struct vm *effective_vm = &vm_kernel;
 	struct ata_dma_acquire_data data;
 	size_t req_locks, req_prd;
-	if (ADDR_IS_USER(buf->ab_head.ab_base))
+	if (ADDR_ISUSER(buf->ab_head.ab_base))
 		effective_vm = THIS_VM;
 	assert(num_bytes == aio_buffer_size(buf));
 	data.ad_base = data.ad_buf = prd_buf;

@@ -260,7 +260,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	       ecode, (unsigned int)task_getroottid_s());
 #endif
 	if ((ecode & (X86_PAGEFAULT_ECODE_PRESENT | X86_PAGEFAULT_ECODE_USERSPACE)) == 0 &&
-	    pageid >= PAGEID_ENCODE(KERNEL_BASE)) {
+	    pageid >= PAGEID_ENCODE(KERNELSPACE_BASE)) {
 	    /* Check if a hint was defined for this page. */
 		struct vm_node *hinted_node;
 		if ((hinted_node = (struct vm_node *)pagedir_gethint(addr)) != NULL) {
@@ -302,7 +302,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 		}
 	}
 	effective_vm = &vm_kernel;
-	if (pageid < PAGEID_ENCODE(KERNEL_BASE) || isuser())
+	if (pageid < PAGEID_ENCODE(KERNELSPACE_BASE) || isuser())
 		effective_vm = THIS_VM;
 	{
 		struct task_connections con;
@@ -320,7 +320,7 @@ again_lookup_node_already_locked:
 			node = vm_getnodeofpageid(effective_vm, pageid);
 			if unlikely(!node) {
 				sync_endread(effective_vm);
-				if (pageid >= PAGEID_ENCODE(KERNEL_BASE) &&
+				if (pageid >= PAGEID_ENCODE(KERNELSPACE_BASE) &&
 				    effective_vm != &vm_kernel && isuser()) {
 					/* This can happen depending on what the CPU does when
 					 * attempting to access the IOB vector associated with
@@ -483,7 +483,7 @@ do_handle_iob_node_access:
 							uintptr_t sp;
 							/* Must unwind the stack to restore the IP of the VIO call-site. */
 							sp = icpustate_getsp(state);
-							if (isuser() && sp >= KERNEL_BASE)
+							if (isuser() && sp >= KERNELSPACE_BASE)
 								goto do_normal_vio; /* Validate the stack-pointer for user-space. */
 							TRY {
 								callsite_eip = *(uintptr_t *)sp;
@@ -494,19 +494,19 @@ do_handle_iob_node_access:
 							}
 							/* Unwind the stack, and remember the call-site instruction pointer. */
 #ifdef __x86_64__
-							if (isuser() != (callsite_eip < KERNEL_BASE))
+							if (isuser() != (callsite_eip < KERNELSPACE_BASE))
 								goto do_normal_vio;
 							irregs_wrip(&state->ics_irregs, callsite_eip);
 							irregs_wrsp(&state->ics_irregs, sp + 8);
 #else /* __x86_64__ */
 							if (sp != (uintptr_t)(&state->ics_irregs_k + 1) ||
 							    isuser()) {
-								if (callsite_eip >= KERNEL_BASE)
+								if (callsite_eip >= KERNELSPACE_BASE)
 									goto do_normal_vio;
 								irregs_wrip(&state->ics_irregs_k, callsite_eip);
 								state->ics_irregs_u.ir_esp += 4;
 							} else {
-								if (callsite_eip < KERNEL_BASE)
+								if (callsite_eip < KERNELSPACE_BASE)
 									goto do_normal_vio;
 								state->ics_irregs_k.ir_eip = callsite_eip;
 								state = (struct icpustate *)memmoveup((byte_t *)state + sizeof(void *), state,
@@ -1012,7 +1012,7 @@ throw_segfault:
 		 * -> Try to unwind this happening. */
 		uintptr_t old_eip;
 		uintptr_t sp = irregs_rdsp(&state->ics_irregs);
-		if (sp != (uintptr_t)(&state->ics_irregs + 1) && sp >= KERNEL_BASE)
+		if (sp != (uintptr_t)(&state->ics_irregs + 1) && sp >= KERNELSPACE_BASE)
 			goto not_a_badcall;
 		TRY {
 			old_eip = *(uintptr_t *)sp;
@@ -1025,18 +1025,18 @@ throw_segfault:
 			goto not_a_badcall;
 		}
 #ifdef __x86_64__
-		if (isuser() != (old_eip >= KERNEL_BASE))
+		if (isuser() != (old_eip >= KERNELSPACE_BASE))
 			goto not_a_badcall;
 		irregs_wrip(&state->ics_irregs, old_eip);
 		irregs_wrsp(&state->ics_irregs, sp + 8);
 #else /* __x86_64__ */
 		if (sp != (uintptr_t)(&state->ics_irregs_k + 1) || isuser()) {
-			if (old_eip >= KERNEL_BASE)
+			if (old_eip >= KERNELSPACE_BASE)
 				goto not_a_badcall;
 			irregs_wrip(&state->ics_irregs_k, old_eip);
 			state->ics_irregs_u.ir_esp += 4;
 		} else {
-			if (old_eip < KERNEL_BASE)
+			if (old_eip < KERNELSPACE_BASE)
 				goto not_a_badcall;
 			state->ics_irregs_k.ir_eip = old_eip;
 			state = (struct icpustate *)memmoveup((byte_t *)state + sizeof(void *), state,

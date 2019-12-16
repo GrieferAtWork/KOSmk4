@@ -222,17 +222,17 @@ again:
 				size_t rand_size;
 				pageid_t prev_end;
 #ifdef VM_GETFREE_VMB
-				if (PRANGE_IS_KERNEL_PARTIAL(minpage, maxpage + 1)) {
+				if (PAGEIDRANGE_ISKERN_PARTIAL(minpage, maxpage + 1)) {
 					/* Must not return locations in kernel memory.
 					 * -> Regular VMs prevent this with the kernel-reserve-page, however
 					 *    we don't have that luxury and must therefor manually check for
 					 *    any potential overlaps with kernel-space! */
-#ifdef HIGH_MEMORY_KERNEL
-					maxpage = (pageid_t)KERNEL_BASE_PAGE - 1;
+#ifdef KERNELSPACE_HIGHMEM
+					maxpage = (pageid_t)PAGEID_ENCODE(KERNELSPACE_BASE) - 1;
 					goto set_new_minpage_below;
-#else /* HIGH_MEMORY_KERNEL */
+#else /* KERNELSPACE_HIGHMEM */
 					break; /* Mapping can't go below here! */
-#endif /* !HIGH_MEMORY_KERNEL */
+#endif /* !KERNELSPACE_HIGHMEM */
 				}
 #endif /* VM_GETFREE_VMB */
 				if (ignore_guard) {
@@ -240,10 +240,10 @@ again:
 						next_below = minpage ? VM_FUNCTION(find_last_node_lower_equal)(self, minpage - 1) : NULL;
 						prev_end   = next_below ? vm_node_getendpageid(next_below) : (pageid_t)0;
 #ifdef VM_GETFREE_VMB
-#ifdef LOW_MEMORY_KERNEL
+#ifdef KERNELSPACE_LOWMEM
 						if (prev_end < (pageid_t)KERNEL_CEILING_PAGE)
 							prev_end = (pageid_t)KERNEL_CEILING_PAGE;
-#endif /* LOW_MEMORY_KERNEL */
+#endif /* KERNELSPACE_LOWMEM */
 #endif /* VM_GETFREE_VMB */
 						rand_size = (size_t)(minpage - prev_end);
 						if (rand_size > 1) {
@@ -294,10 +294,10 @@ again:
 					pageid_t guard_minpage = vm_node_getminpageid(next_above);
 					pageid_t guard_limit   = next_below ? vm_node_getendpageid(next_below) : (pageid_t)0;
 #ifdef VM_GETFREE_VMB
-#ifdef LOW_MEMORY_KERNEL
+#ifdef KERNELSPACE_LOWMEM
 					if (guard_limit < (pageid_t)KERNEL_CEILING_PAGE)
 						guard_limit = (pageid_t)KERNEL_CEILING_PAGE;
-#endif /* LOW_MEMORY_KERNEL */
+#endif /* KERNELSPACE_LOWMEM */
 #endif /* VM_GETFREE_VMB */
 					if (OVERFLOW_USUB(guard_minpage, next_above->vn_guard, &guard_minpage))
 						guard_minpage = 0;
@@ -311,10 +311,10 @@ again:
 				if (mode & VM_GETFREE_ASLR) {
 					prev_end = next_below ? vm_node_getendpageid(next_below) : (pageid_t)0;
 #ifdef VM_GETFREE_VMB
-#ifdef LOW_MEMORY_KERNEL
+#ifdef KERNELSPACE_LOWMEM
 					if (prev_end < (pageid_t)KERNEL_CEILING_PAGE)
 						prev_end = (pageid_t)KERNEL_CEILING_PAGE;
-#endif /* LOW_MEMORY_KERNEL */
+#endif /* KERNELSPACE_LOWMEM */
 #endif /* VM_GETFREE_VMB */
 					rand_size = (size_t)(minpage - prev_end);
 					if (rand_size > 1) {
@@ -362,17 +362,17 @@ set_new_minpage_below:
 				size_t rand_size;
 				pageid_t next_start;
 #ifdef VM_GETFREE_VMB
-				if (PRANGE_IS_KERNEL_PARTIAL(minpage, maxpage + 1)) {
+				if (PAGEIDRANGE_ISKERN_PARTIAL(minpage, maxpage + 1)) {
 					/* Must not return locations in kernel memory.
 					 * -> Regular VMs prevent this with the kernel-reserve-page, however
 					 *    we don't have that luxury and must therefor manually check for
 					 *    any potential overlaps with kernel-space! */
-#ifdef LOW_MEMORY_KERNEL
+#ifdef KERNELSPACE_LOWMEM
 					minpage = ((pageid_t)KERNEL_CEILING_PAGE - 1 + min_alignment_in_pages) & ~(min_alignment_in_pages - 1);
 					goto set_new_maxpage_above;
-#else /* LOW_MEMORY_KERNEL */
+#else /* KERNELSPACE_LOWMEM */
 					break; /* Mapping can't go above here! */
-#endif /* !LOW_MEMORY_KERNEL */
+#endif /* !KERNELSPACE_LOWMEM */
 				}
 #endif /* VM_GETFREE_VMB */
 				if (ignore_guard) {
@@ -380,10 +380,10 @@ set_new_minpage_below:
 						next_above = VM_FUNCTION(find_first_node_greater_equal)(self, maxpage + 1);
 						next_start = next_above ? vm_node_getminpageid(next_above) : (pageid_t)__ARCH_PAGEID_MAX;
 #ifdef VM_GETFREE_VMB
-#ifdef HIGH_MEMORY_KERNEL
-						if (next_start > (pageid_t)KERNEL_BASE_PAGE)
-							next_start = (pageid_t)KERNEL_BASE_PAGE;
-#endif /* HIGH_MEMORY_KERNEL */
+#ifdef KERNELSPACE_HIGHMEM
+						if (next_start > PAGEID_ENCODE(KERNELSPACE_BASE))
+							next_start = PAGEID_ENCODE(KERNELSPACE_BASE);
+#endif /* KERNELSPACE_HIGHMEM */
 #endif /* VM_GETFREE_VMB */
 						rand_size = (size_t)(next_start - maxpage);
 						if (rand_size > 1) {
@@ -414,10 +414,10 @@ set_new_minpage_below:
 					pageid_t guard_maxpage = vm_node_getmaxpageid(next_below);
 					pageid_t guard_limit   = next_above ? vm_node_getminpageid(next_above) - 1 : (pageid_t)__ARCH_PAGEID_MAX;
 #ifdef VM_GETFREE_VMB
-#ifdef HIGH_MEMORY_KERNEL
-					if (guard_limit > (pageid_t)KERNEL_BASE_PAGE)
-						guard_limit = (pageid_t)KERNEL_BASE_PAGE;
-#endif /* HIGH_MEMORY_KERNEL */
+#ifdef KERNELSPACE_HIGHMEM
+					if (guard_limit > PAGEID_ENCODE(KERNELSPACE_BASE))
+						guard_limit = PAGEID_ENCODE(KERNELSPACE_BASE);
+#endif /* KERNELSPACE_HIGHMEM */
 #endif /* VM_GETFREE_VMB */
 					if (OVERFLOW_UADD(guard_maxpage, next_below->vn_guard, &guard_maxpage))
 						guard_maxpage = (pageid_t)-1;
@@ -431,10 +431,10 @@ set_new_minpage_below:
 				if (mode & VM_GETFREE_ASLR) {
 					next_start = next_above ? vm_node_getminpageid(next_above) : (pageid_t)__ARCH_PAGEID_MAX;
 #ifdef VM_GETFREE_VMB
-#ifdef HIGH_MEMORY_KERNEL
-					if (next_start > (pageid_t)KERNEL_BASE_PAGE)
-						next_start = (pageid_t)KERNEL_BASE_PAGE;
-#endif /* HIGH_MEMORY_KERNEL */
+#ifdef KERNELSPACE_HIGHMEM
+					if (next_start > PAGEID_ENCODE(KERNELSPACE_BASE))
+						next_start = PAGEID_ENCODE(KERNELSPACE_BASE);
+#endif /* KERNELSPACE_HIGHMEM */
 #endif /* VM_GETFREE_VMB */
 					rand_size = (size_t)(next_start - maxpage);
 					if (rand_size > 1) {

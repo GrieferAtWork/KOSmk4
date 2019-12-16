@@ -330,7 +330,7 @@ NOTHROW(FCALL pae_pagedir_prepare_impl_widen)(unsigned int vec3,
 	assert(vec1_prepare_start + vec1_prepare_size > vec1_prepare_start);
 	assert(vec1_prepare_start + vec1_prepare_size <= 512);
 	assert(PAE_PDIR_E3_IDENTITY[vec3].p_word & PAE_PAGE_FPRESENT);
-	assertf(vec3 < PAE_PDIR_VEC3INDEX(KERNEL_BASE),
+	assertf(vec3 < PAE_PDIR_VEC3INDEX(KERNELSPACE_BASE),
 	        "The caller must ensure that no kernel-space addresses get here");
 	e2_p = &PAE_PDIR_E2_IDENTITY[vec3][vec2];
 again:
@@ -364,7 +364,7 @@ again:
 		new_e2_word = ((u64)new_e1_vector * 4096) |
 		              PAE_PAGE_FPRESENT | PAE_PAGE_FWRITE | PAE_PAGE_FACCESSED;
 #if 0 /* This is always the case: Kernel-space always has all vectors allocated. */
-		if (vec3 < PAE_PDIR_VEC3INDEX(KERNEL_BASE))
+		if (vec3 < PAE_PDIR_VEC3INDEX(KERNELSPACE_BASE))
 #endif
 		{
 			/* Allow user-space access of stuff that will eventually mapped by this page. */
@@ -527,7 +527,7 @@ NOTHROW(FCALL pae_pagedir_unprepare_impl_flatten)(unsigned int vec3,
 	assert(vec1_unprepare_start + vec1_unprepare_size > vec1_unprepare_start);
 	assert(vec1_unprepare_start + vec1_unprepare_size <= 512);
 	assert(PAE_PDIR_E3_IDENTITY[vec3].p_word & PAE_PAGE_FPRESENT);
-	assertf(vec3 < PAE_PDIR_VEC3INDEX(KERNEL_BASE),
+	assertf(vec3 < PAE_PDIR_VEC3INDEX(KERNELSPACE_BASE),
 	        "The caller must ensure that no kernel-space addresses get here");
 	e2_p = &PAE_PDIR_E2_IDENTITY[vec3][vec2];
 	e2.p_word = ATOMIC_READ64(e2_p->p_word);
@@ -618,7 +618,7 @@ INTERN NOBLOCK WUNUSED bool
 NOTHROW(FCALL pae_pagedir_prepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec3, vec2, vec1;
 	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
-	if unlikely((byte_t *)addr >= (byte_t *)KERNEL_BASE)
+	if unlikely((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
 		return true;
 	vec3 = PAE_PDIR_VEC3INDEX(addr);
 	vec2 = PAE_PDIR_VEC2INDEX(addr);
@@ -630,7 +630,7 @@ INTERN NOBLOCK void
 NOTHROW(FCALL pae_pagedir_unprepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec3, vec2, vec1;
 	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
-	if unlikely((byte_t *)addr >= (byte_t *)KERNEL_BASE)
+	if unlikely((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
 		return;
 	vec3 = PAE_PDIR_VEC3INDEX(addr);
 	vec2 = PAE_PDIR_VEC2INDEX(addr);
@@ -821,10 +821,10 @@ NOTHROW(FCALL pae_pagedir_prepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	assertf(IS_ALIGNED((uintptr_t)num_bytes, 4096), "num_bytes = %#Ix", num_bytes);
 	assertf((uintptr_t)addr + num_bytes >= (uintptr_t)addr, "Invalid range %p...%p",
 	        addr, (uintptr_t)addr + num_bytes - 1);
-	if unlikely((byte_t *)addr >= (byte_t *)KERNEL_BASE)
+	if unlikely((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
 		return true;
-	if unlikely((byte_t *)addr + num_bytes > (byte_t *)KERNEL_BASE)
-		num_bytes = (size_t)((byte_t *)KERNEL_BASE - (byte_t *)addr);
+	if unlikely((byte_t *)addr + num_bytes > (byte_t *)KERNELSPACE_BASE)
+		num_bytes = (size_t)((byte_t *)KERNELSPACE_BASE - (byte_t *)addr);
 	if (!num_bytes)
 		return true;
 	if (num_bytes == 4096)
@@ -850,10 +850,10 @@ NOTHROW(FCALL pae_pagedir_prepare_map_keep)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	assertf(IS_ALIGNED((uintptr_t)num_bytes, 4096), "num_bytes = %#Ix", num_bytes);
 	assertf((uintptr_t)addr + num_bytes >= (uintptr_t)addr, "Invalid range %p...%p",
 	        addr, (uintptr_t)addr + num_bytes - 1);
-	if unlikely(addr >= (byte_t *)KERNEL_BASE)
+	if unlikely(addr >= (byte_t *)KERNELSPACE_BASE)
 		return true;
-	if unlikely((byte_t *)addr + num_bytes > (byte_t *)KERNEL_BASE)
-		num_bytes = (size_t)((byte_t *)KERNEL_BASE - (byte_t *)addr);
+	if unlikely((byte_t *)addr + num_bytes > (byte_t *)KERNELSPACE_BASE)
+		num_bytes = (size_t)((byte_t *)KERNELSPACE_BASE - (byte_t *)addr);
 	if (!num_bytes)
 		return true;
 	if (num_bytes == 4096)
@@ -879,10 +879,10 @@ NOTHROW(FCALL pae_pagedir_unprepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	assertf(IS_ALIGNED((uintptr_t)num_bytes, 4096), "num_bytes = %#Ix", num_bytes);
 	assertf((uintptr_t)addr + num_bytes >= (uintptr_t)addr, "Invalid range %p...%p",
 	        addr, (uintptr_t)addr + num_bytes - 1);
-	if unlikely(addr >= (byte_t *)KERNEL_BASE)
+	if unlikely(addr >= (byte_t *)KERNELSPACE_BASE)
 		return;
-	if unlikely((byte_t *)addr + num_bytes > (byte_t *)KERNEL_BASE)
-		num_bytes = (size_t)((byte_t *)KERNEL_BASE - (byte_t *)addr);
+	if unlikely((byte_t *)addr + num_bytes > (byte_t *)KERNELSPACE_BASE)
+		num_bytes = (size_t)((byte_t *)KERNELSPACE_BASE - (byte_t *)addr);
 	if (!num_bytes)
 		return;
 	if (num_bytes == 4096) {
@@ -928,7 +928,7 @@ NOTHROW(FCALL pae_pagedir_assert_e1_word_prepared)(unsigned int vec3,
 	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1)),
 	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + PAGESIZE - 1),
 	        (unsigned int)vec3, (unsigned int)vec2);
-	if (vec3 < PAE_PDIR_VEC3INDEX(KERNEL_BASE)) {
+	if (vec3 < PAE_PDIR_VEC3INDEX(KERNELSPACE_BASE)) {
 		union pae_pdir_e1 e1;
 		e1 = PAE_PDIR_E1_IDENTITY[vec3][vec2][vec1];
 		assertf(e1.p_word & PAE_PAGE_FPREPARED || PAE_PDIR_E1_ISHINT(e1.p_word),
@@ -1012,7 +1012,7 @@ NOTHROW(FCALL pae_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 #else /* PAGEDIR_MAP_FMASK == 0xf */
 	result |= pae_pageperm_matrix[perm & 0xf];
 #endif /* PAGEDIR_MAP_FMASK != 0xf */
-	if ((byte_t *)addr >= (byte_t *)KERNEL_BASE)
+	if ((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
 		result |= USED_PAE_PAGE_FGLOBAL;
 	return result;
 }

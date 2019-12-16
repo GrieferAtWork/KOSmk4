@@ -397,11 +397,11 @@ struct user_rpc_data {
 };
 DEFINE_REFCOUNT_FUNCTIONS(struct user_rpc_data, rpc_refcnt, kfree)
 
-#ifdef HIGH_MEMORY_KERNEL
-#define UNUSED_FUTEX_POINTER ((uintptr_t *)KERNEL_BASE)
-#else /* HIGH_MEMORY_KERNEL */
+#ifdef KERNELSPACE_HIGHMEM
+#define UNUSED_FUTEX_POINTER ((uintptr_t *)KERNELSPACE_BASE)
+#else /* KERNELSPACE_HIGHMEM */
 #define UNUSED_FUTEX_POINTER ((uintptr_t *)KERNEL_CEILING - 1)
-#endif /* !HIGH_MEMORY_KERNEL */
+#endif /* !KERNELSPACE_HIGHMEM */
 
 PRIVATE struct icpustate *FCALL
 user_rpc_callback(void *arg, struct icpustate *__restrict state,
@@ -416,12 +416,12 @@ user_rpc_callback(void *arg, struct icpustate *__restrict state,
 		/* Make sure that the arguments pointer is located in user-space.
 		 * NOTE: The pointer isn't required to be loaded in user-space
 		 *       if the program doesn't make use of any arguments. */
-		if unlikely(!ADDR_IS_USER(data->rpc_arguments)) {
-#ifdef HIGH_MEMORY_KERNEL
+		if unlikely(!ADDR_ISUSER(data->rpc_arguments)) {
+#ifdef KERNELSPACE_HIGHMEM
 			data->rpc_arguments = NULL;
-#else /* HIGH_MEMORY_KERNEL */
+#else /* KERNELSPACE_HIGHMEM */
 			data->rpc_arguments = (void **)-1;
-#endif /* !HIGH_MEMORY_KERNEL */
+#endif /* !KERNELSPACE_HIGHMEM */
 		}
 		assert(reason == TASK_RPC_REASON_ASYNCUSER ||
 		       reason == TASK_RPC_REASON_SYSCALL ||

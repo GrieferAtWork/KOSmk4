@@ -424,7 +424,7 @@ NOTHROW(KCALL vm_do_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED void *addr,
 	unmap_max = unmap_min + num_pages - 1;
 again:
 	assert(num_pages != 0);
-	assert(unmap_min >= (pageid_t)KERNEL_BASE_PAGE);
+	assert(unmap_min >= PAGEID_ENCODE(KERNELSPACE_BASE));
 	assert(unmap_max >= unmap_min);
 	assert(unmap_max <= __ARCH_PAGEID_MAX);
 	/* With the caller having acquired a write-lock to the kernel
@@ -929,7 +929,7 @@ NOTHROW(FCALL vm_unmap_kernel_ram)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
 	if unlikely(!num_bytes)
 		return;
 	assert((uintptr_t)addr + num_bytes > (uintptr_t)addr);
-	assert(ARANGE_IS_KERNEL(addr, (byte_t *)addr + num_bytes));
+	assert(ADDRRANGE_ISKERN(addr, (byte_t *)addr + num_bytes));
 	printk(KERN_DEBUG "Unmap kernel RAM %p...%p%s\n",
 	       addr, (byte_t *)addr + num_bytes - 1,
 	       is_zero ? " (zero-initialized)" : "");

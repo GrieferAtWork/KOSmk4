@@ -77,7 +77,7 @@ DECL_BEGIN
                          ".hidden .Ltracepoint_%=\n\t"  \
                          ".pushsection " section "\n\t" \
                          "991:\n\t"                     \
-                         "\t.reloc ., R_X86_64_32, .Ltracepoint_%= - " __PP_STR(KERNEL_CORE_BASE_I) "\n\t" \
+                         "\t.reloc ., R_X86_64_32, .Ltracepoint_%= - 0xffffffff80000000\n\t" \
                          "\t.int 0\n\t"                 \
                          "\t.int %p0\n\t"               \
                          "\t.int 0\n\t"                 \

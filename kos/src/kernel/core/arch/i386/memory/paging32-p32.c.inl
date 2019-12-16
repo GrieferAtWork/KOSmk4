@@ -60,8 +60,8 @@ INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL p32_pagedir_init)(VIRT struct p32_pdir *__restrict self,
                                 PHYS vm_phys_t phys_self) {
 	/* Assert some constants assumed below. */
-	STATIC_ASSERT(P32_PDIR_VEC2INDEX(KERNEL_BASE) == 768);
-	STATIC_ASSERT(P32_PDIR_VEC1INDEX(KERNEL_BASE) == 0);
+	STATIC_ASSERT(P32_PDIR_VEC2INDEX(KERNELSPACE_BASE) == 768);
+	STATIC_ASSERT(P32_PDIR_VEC1INDEX(KERNELSPACE_BASE) == 0);
 	STATIC_ASSERT(P32_PDIR_VEC2INDEX(P32_VM_KERNEL_PDIR_IDENTITY_BASE) == 1023);
 	STATIC_ASSERT(P32_PDIR_VEC1INDEX(P32_VM_KERNEL_PDIR_IDENTITY_BASE) == 0);
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
@@ -139,7 +139,7 @@ NOTHROW(FCALL p32_pagedir_prepare_impl_widen)(unsigned int vec2,
 	assert(vec1_prepare_size != 0);
 	assert(vec1_prepare_start + vec1_prepare_size > vec1_prepare_start);
 	assert(vec1_prepare_start + vec1_prepare_size <= 1024);
-	assertf(vec2 < P32_PDIR_VEC2INDEX(KERNEL_BASE),
+	assertf(vec2 < P32_PDIR_VEC2INDEX(KERNELSPACE_BASE),
 	        "The caller must ensure that no kernel-space addresses get here");
 	e2_p = &P32_PDIR_E2_IDENTITY[vec2];
 again:
@@ -173,7 +173,7 @@ again:
 		new_e2_word = page2addr32(new_e1_vector) |
 		              P32_PAGE_FPRESENT | P32_PAGE_FWRITE | P32_PAGE_FACCESSED;
 #if 0 /* This is always the case: Kernel-space always has all vectors allocated. */
-		if (vec2 < P32_PDIR_VEC2INDEX(KERNEL_BASE))
+		if (vec2 < P32_PDIR_VEC2INDEX(KERNELSPACE_BASE))
 #endif
 		{
 			/* Allow user-space access of stuff that will eventually mapped by this page. */
@@ -333,7 +333,7 @@ NOTHROW(FCALL p32_pagedir_unprepare_impl_flatten)(unsigned int vec2,
 	assert(vec1_unprepare_size != 0);
 	assert(vec1_unprepare_start + vec1_unprepare_size > vec1_unprepare_start);
 	assert(vec1_unprepare_start + vec1_unprepare_size <= 1024);
-	assertf(vec2 < P32_PDIR_VEC2INDEX(KERNEL_BASE),
+	assertf(vec2 < P32_PDIR_VEC2INDEX(KERNELSPACE_BASE),
 	        "The caller must ensure that no kernel-space addresses get here");
 	e2_p = &P32_PDIR_E2_IDENTITY[vec2];
 	e2.p_word = ATOMIC_READ(e2_p->p_word);
@@ -421,7 +421,7 @@ INTERN NOBLOCK WUNUSED bool
 NOTHROW(FCALL p32_pagedir_prepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec2, vec1;
 	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
-	if unlikely((byte_t *)addr >= (byte_t *)KERNEL_BASE)
+	if unlikely((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
 		return true;
 	vec2 = P32_PDIR_VEC2INDEX(addr);
 	vec1 = P32_PDIR_VEC1INDEX(addr);
@@ -432,7 +432,7 @@ INTERN NOBLOCK void
 NOTHROW(FCALL p32_pagedir_unprepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec2, vec1;
 	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
-	if unlikely((byte_t *)addr >= (byte_t *)KERNEL_BASE)
+	if unlikely((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
 		return;
 	vec2 = P32_PDIR_VEC2INDEX(addr);
 	vec1 = P32_PDIR_VEC1INDEX(addr);
@@ -449,10 +449,10 @@ NOTHROW(FCALL p32_pagedir_prepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	assertf(IS_ALIGNED((uintptr_t)num_bytes, 4096), "num_bytes = %#Ix", num_bytes);
 	assertf((uintptr_t)addr + num_bytes >= (uintptr_t)addr, "Invalid range %p...%p",
 	        addr, (uintptr_t)addr + num_bytes - 1);
-	if unlikely((byte_t *)addr >= (byte_t *)KERNEL_BASE)
+	if unlikely((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
 		return true;
-	if unlikely((byte_t *)addr + num_bytes > (byte_t *)KERNEL_BASE)
-		num_bytes = (size_t)((byte_t *)KERNEL_BASE - (byte_t *)addr);
+	if unlikely((byte_t *)addr + num_bytes > (byte_t *)KERNELSPACE_BASE)
+		num_bytes = (size_t)((byte_t *)KERNELSPACE_BASE - (byte_t *)addr);
 	if (!num_bytes)
 		return true;
 	if (num_bytes == 4096)
@@ -499,10 +499,10 @@ NOTHROW(FCALL p32_pagedir_prepare_map_keep)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	assertf(IS_ALIGNED((uintptr_t)num_bytes, 4096), "num_bytes = %#Ix", num_bytes);
 	assertf((uintptr_t)addr + num_bytes >= (uintptr_t)addr, "Invalid range %p...%p",
 	        addr, (uintptr_t)addr + num_bytes - 1);
-	if unlikely((byte_t *)addr >= (byte_t *)KERNEL_BASE)
+	if unlikely((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
 		return true;
-	if unlikely((byte_t *)addr + num_bytes > (byte_t *)KERNEL_BASE)
-		num_bytes = (size_t)((byte_t *)KERNEL_BASE - (byte_t *)addr);
+	if unlikely((byte_t *)addr + num_bytes > (byte_t *)KERNELSPACE_BASE)
+		num_bytes = (size_t)((byte_t *)KERNELSPACE_BASE - (byte_t *)addr);
 	if (!num_bytes)
 		return true;
 	if (num_bytes == 4096)
@@ -544,10 +544,10 @@ NOTHROW(FCALL p32_pagedir_unprepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	assertf(IS_ALIGNED((uintptr_t)num_bytes, 4096), "num_bytes = %#Ix", num_bytes);
 	assertf((uintptr_t)addr + num_bytes >= (uintptr_t)addr, "Invalid range %p...%p",
 	        addr, (uintptr_t)addr + num_bytes - 1);
-	if unlikely((byte_t *)addr >= (byte_t *)KERNEL_BASE)
+	if unlikely((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
 		return;
-	if unlikely((byte_t *)addr + num_bytes > (byte_t *)KERNEL_BASE)
-		num_bytes = (size_t)((byte_t *)KERNEL_BASE - (byte_t *)addr);
+	if unlikely((byte_t *)addr + num_bytes > (byte_t *)KERNELSPACE_BASE)
+		num_bytes = (size_t)((byte_t *)KERNELSPACE_BASE - (byte_t *)addr);
 	if (!num_bytes)
 		return;
 	if (num_bytes == 4096) {
@@ -601,7 +601,7 @@ NOTHROW(FCALL p32_pagedir_assert_e1_word_prepared)(unsigned int vec2,
 	        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1)),
 	        (uintptr_t)(P32_PDIR_VECADDR(vec2, vec1) + PAGESIZE - 1),
 	        (unsigned int)vec2);
-	if (vec2 < P32_PDIR_VEC2INDEX(KERNEL_BASE)) {
+	if (vec2 < P32_PDIR_VEC2INDEX(KERNELSPACE_BASE)) {
 		union p32_pdir_e1 e1;
 		e1 = P32_PDIR_E1_IDENTITY[vec2][vec1];
 		assertf(e1.p_word & P32_PAGE_FPREPARED || P32_PDIR_E1_ISHINT(e1.p_word),
@@ -682,7 +682,7 @@ NOTHROW(FCALL p32_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 #else /* PAGEDIR_MAP_FMASK == 0xf */
 	result |= p32_pageperm_matrix[perm & 0xf];
 #endif /* PAGEDIR_MAP_FMASK != 0xf */
-	if ((byte_t *)addr >= (byte_t *)KERNEL_BASE)
+	if ((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
 		result |= USED_P32_PAGE_FGLOBAL;
 	return result;
 }
@@ -881,7 +881,7 @@ NOTHROW(FCALL p32_pagedir_unmap_userspace)(struct vm *__restrict sync_vm) {
 	unsigned int vec2, free_count = 0;
 	u32 free_pages[64];
 	/* Map all pages before the share-segment as absent. */
-	for (vec2 = 0; vec2 < P32_PDIR_VEC2INDEX(KERNEL_BASE); ++vec2) {
+	for (vec2 = 0; vec2 < P32_PDIR_VEC2INDEX(KERNELSPACE_BASE); ++vec2) {
 		union p32_pdir_e2 e2;
 		u32 pageptr;
 again_read_word:
@@ -923,7 +923,7 @@ INTERN NOBLOCK void
 NOTHROW(FCALL p32_pagedir_unmap_userspace_nosync)(void) {
 	unsigned int vec2;
 	/* Map all pages before the share-segment as absent. */
-	for (vec2 = 0; vec2 < P32_PDIR_VEC2INDEX(KERNEL_BASE); ++vec2) {
+	for (vec2 = 0; vec2 < P32_PDIR_VEC2INDEX(KERNELSPACE_BASE); ++vec2) {
 		union p32_pdir_e2 e2;
 		u32 pageptr;
 again_read_word:

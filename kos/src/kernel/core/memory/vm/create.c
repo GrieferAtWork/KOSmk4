@@ -80,15 +80,10 @@ vm_alloc(void) THROWS(E_BADALLOC) {
 	/*atomic_rwlock_init(&result->v_tasklock);*/
 	assert(result->v_deltasks == NULL);
 	/*shared_rwlock_init(&result->v_dma_lock);*/
-	result->v_kernreserve.vn_node.a_min = NULL;
-	result->v_kernreserve.vn_node.a_max = NULL;
-#ifdef HIGH_MEMORY_KERNEL
-	result->v_kernreserve.vn_node.a_vmin = PAGEID_ENCODE(KERNEL_BASE);
-	result->v_kernreserve.vn_node.a_vmax = __ARCH_PAGEID_MAX;
-#else /* HIGH_MEMORY_KERNEL */
-	result->v_kernreserve.vn_node.a_vmin = 0;
-	result->v_kernreserve.vn_node.a_vmax = PAGEID_ENCODE(KERNEL_END - 1);
-#endif /* !HIGH_MEMORY_KERNEL */
+	result->v_kernreserve.vn_node.a_min      = NULL;
+	result->v_kernreserve.vn_node.a_max      = NULL;
+	result->v_kernreserve.vn_node.a_vmin     = KERNELSPACE_MINPAGEID;
+	result->v_kernreserve.vn_node.a_vmax     = KERNELSPACE_MAXPAGEID;
 	result->v_kernreserve.vn_byaddr.ln_pself = &result->v_byaddr;
 	result->v_kernreserve.vn_byaddr.ln_next  = NULL;
 	result->v_kernreserve.vn_prot = (VM_PROT_NONE | VM_PROT_PRIVATE

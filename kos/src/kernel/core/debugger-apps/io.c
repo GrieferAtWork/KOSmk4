@@ -260,7 +260,7 @@ DEFINE_DEBUG_FUNCTION(
 PRIVATE ATTR_DBGTEXT NOBLOCK bool
 NOTHROW(KCALL is_pc)(void *pc) {
 	struct vm_node *node;
-	if (pc < (void *)KERNEL_BASE)
+	if (pc < (void *)KERNELSPACE_BASE)
 		return false;
 	node = vm_getnodeofaddress(&vm_kernel, pc);
 	if (!node)
@@ -386,7 +386,7 @@ DEFINE_DEBUG_FUNCTION(
 	if (error != UNWIND_NO_FRAME)
 		dbg_printf(DBGSTR("Unwind failure: %u\n"), error);
 #ifdef LOG_STACK_REMAINDER
-	if (ADDR_IS_KERNEL(last_good_sp)) {
+	if (ADDR_ISKERN(last_good_sp)) {
 		void *minaddr, *endaddr;
 		get_stack_for(&minaddr, &endaddr, (void *)last_good_sp);
 		if (last_good_sp >= (uintptr_t)minaddr &&

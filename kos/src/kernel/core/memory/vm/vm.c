@@ -2984,7 +2984,7 @@ NOTHROW(KCALL vm_node_destroy)(struct vm_node *__restrict self) {
 #endif /* !CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			{
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-				if (self->vn_vm == THIS_VM || PAGE_IS_KERNEL(vm_node_getstartpageid(self)))
+				if (self->vn_vm == THIS_VM || PAGEID_ISKERN(vm_node_getstartpageid(self)))
 #else /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 				if (self->vn_vm == THIS_VM)
 #endif /* !CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */

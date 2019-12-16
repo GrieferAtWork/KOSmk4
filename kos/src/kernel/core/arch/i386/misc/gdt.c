@@ -127,7 +127,7 @@ NOTHROW(KCALL init_this_x86_userkern)(struct task *__restrict self)
 	/* Assign a random (pointer-aligned) offset into kernel-space
 	 * as the base address for the userkern segment. */
 	offset = (uintptr_t)(krand() * USERKERN_SEGMENT_ALIGN);
-	offset %= (((uintptr_t)KERNEL_NUM_PAGES * PAGESIZE) - (USERKERN_SYSCALL_MAXVALID + 1));
+	offset %= ((uintptr_t)0 - KERNELSPACE_BASE) - (USERKERN_SYSCALL_MAXVALID + 1);
 	offset += KERNEL_CORE_BASE;
 #ifdef __x86_64__
 	return offset;

@@ -214,8 +214,8 @@ INTERN struct vm_datapart x86_kernel_vm_parts[6] = {
 /* Special VM node used to describe the memory reservation at the user-/kernel-space split. */
 INTERN struct vm_node x86_vmnode_transition_reserve =
 	INIT_NODE_RESERVE(x86_vmnode_transition_reserve,
-	                  PAGEID_ENCODE(KERNEL_BASE),
-	                  PAGEID_ENCODE(KERNEL_BASE),
+	                  PAGEID_ENCODE(KERNELSPACE_BASE),
+	                  PAGEID_ENCODE(KERNELSPACE_BASE),
 	                  VM_PROT_NONE,
 	                  kernel_vm_single_reserved_page);
 

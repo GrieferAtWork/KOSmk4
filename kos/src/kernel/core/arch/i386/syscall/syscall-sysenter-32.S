@@ -189,7 +189,7 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	cmpb   $(4), %cl
 	jbe    .Lgot_sysenter_args
 	/* Must load one (%cl == 5) or two (%cl == 6) arguments */
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    .Lbad_args_pointer
 	movl   0(%ebp), %eax
 	movl   %eax, 20(%esp) /* ARG[4] */
@@ -438,7 +438,7 @@ PRIVATE_FUNCTION(copy_extended_user_arguments)
 	movl   $(RPC_SYSCALL_INFO_METHOD_SYSENTER_32 | RPC_SYSCALL_INFO_FEXCEPT |  \
 	         RPC_SYSCALL_INFO_FARGVALID(0) | RPC_SYSCALL_INFO_FARGVALID(1) |   \
 	         RPC_SYSCALL_INFO_FARGVALID(2) | RPC_SYSCALL_INFO_FARGVALID(3)), %eax
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    1f
 .Lsysenter_guard_start:
 	movl   0(%ebp), %ecx

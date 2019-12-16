@@ -46,6 +46,40 @@
 #endif
 
 
+/* Check if a given `addr' or [startaddr,endaddr)
+ * is consider apart of user- or kernel-space.
+ * The *_PARTIAL functions check if the range has any overlapping
+ * parts with the named address space, while the non-_PARTIAL functions
+ * check that the entire range is apart of the named address space.
+ * Note that the range-checking functions are allowed to assume that
+ * `endaddr >= startaddr'. In the case where `endaddr == startaddr',
+ * the range-checking functions behave identical to `ADDR_IS(KERN|USER)',
+ * or in other words: will use `endaddr = startaddr+1' */
+#ifdef KERNELSPACE_HIGHMEM
+#define ADDR_ISKERN(addr)                            (__CCAST(__UINTPTR_TYPE__)(addr) >= KERNELSPACE_BASE)
+#define ADDR_ISUSER(addr)                            (__CCAST(__UINTPTR_TYPE__)(addr) < KERNELSPACE_BASE)
+#define ADDRRANGE_ISKERN(startaddr, endaddr)         (__CCAST(__UINTPTR_TYPE__)(startaddr) >= KERNELSPACE_BASE)
+#define ADDRRANGE_ISUSER(startaddr, endaddr)         (__CCAST(__UINTPTR_TYPE__)(endaddr) <= KERNELSPACE_BASE)
+#define ADDRRANGE_ISKERN_PARTIAL(startaddr, endaddr) (__CCAST(__UINTPTR_TYPE__)(endaddr) > KERNELSPACE_BASE)
+#define ADDRRANGE_ISUSER_PARTIAL(startaddr, endaddr) (__CCAST(__UINTPTR_TYPE__)(startaddr) < KERNELSPACE_BASE)
+#elif defined(KERNELSPACE_LOWMEM)
+#define ADDR_ISKERN(addr)                            (__CCAST(__UINTPTR_TYPE__)(addr) < KERNELSPACE_END)
+#define ADDR_ISUSER(addr)                            (__CCAST(__UINTPTR_TYPE__)(addr) >= KERNELSPACE_END)
+#define ADDRRANGE_ISKERN(startaddr, endaddr)         (__CCAST(__UINTPTR_TYPE__)(endaddr) <= KERNELSPACE_END)
+#define ADDRRANGE_ISUSER(startaddr, endaddr)         (__CCAST(__UINTPTR_TYPE__)(startaddr) >= KERNELSPACE_END)
+#define ADDRRANGE_ISKERN_PARTIAL(startaddr, endaddr) (__CCAST(__UINTPTR_TYPE__)(startaddr) < KERNELSPACE_END)
+#define ADDRRANGE_ISUSER_PARTIAL(startaddr, endaddr) (__CCAST(__UINTPTR_TYPE__)(endaddr) > KERNELSPACE_END)
+#else
+#define ADDR_ISKERN(addr)                            (__CCAST(__UINTPTR_TYPE__)(addr) >= KERNELSPACE_BASE && __CCAST(__UINTPTR_TYPE__)(addr) < KERNELSPACE_END)
+#define ADDR_ISUSER(addr)                            (__CCAST(__UINTPTR_TYPE__)(addr) < KERNELSPACE_BASE && __CCAST(__UINTPTR_TYPE__)(addr) >= KERNELSPACE_END)
+#define ADDRRANGE_ISKERN(startaddr, endaddr)         (__CCAST(__UINTPTR_TYPE__)(startaddr) >= KERNELSPACE_BASE && __CCAST(__UINTPTR_TYPE__)(endaddr) <= KERNELSPACE_END)
+#define ADDRRANGE_ISUSER(startaddr, endaddr)         (__CCAST(__UINTPTR_TYPE__)(startaddr) >= KERNELSPACE_END || __CCAST(__UINTPTR_TYPE__)(endaddr) <= KERNELSPACE_BASE)
+#define ADDRRANGE_ISKERN_PARTIAL(startaddr, endaddr) (__CCAST(__UINTPTR_TYPE__)(startaddr) < KERNELSPACE_END || __CCAST(__UINTPTR_TYPE__)(endaddr) > KERNELSPACE_BASE)
+#define ADDRRANGE_ISUSER_PARTIAL(startaddr, endaddr) (__CCAST(__UINTPTR_TYPE__)(startaddr) < KERNELSPACE_BASE && __CCAST(__UINTPTR_TYPE__)(endaddr) > KERNELSPACE_END)
+#endif
+
+
+
 DECL_BEGIN
 
 #ifndef PAGEDIR_ALIGN

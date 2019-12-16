@@ -217,14 +217,14 @@ NOTHROW(KCALL vm_read_nopf)(struct vm *__restrict self, UNCHECKED void const *ad
 		result    += ((uintptr_t)0 - temp);
 		num_bytes -= ((uintptr_t)0 - temp);
 	}
-	if (ARANGE_IS_KERNEL((uintptr_t)addr, (uintptr_t)addr + num_bytes)) {
+	if (ADDRRANGE_ISKERN((uintptr_t)addr, (uintptr_t)addr + num_bytes)) {
 		/* Simple case: read from kernel memory (can just be copied directly). */
 direct_copy:
 		result += memcpy_nopf(buf, addr, num_bytes);
 	} else {
 		if (THIS_VM == self)
 			goto direct_copy; /* Simple case: same VM */
-		if (ARANGE_IS_KERNEL((uintptr_t)buf, (uintptr_t)buf + num_bytes)) {
+		if (ADDRRANGE_ISKERN((uintptr_t)buf, (uintptr_t)buf + num_bytes)) {
 			/* Target buffer is located in kernel-space.
 			 * For this case, we can simply switch to the other VM and directly copy data. */
 			result += copy_kernelspace_from_vm_nopf(self, addr, buf, num_bytes);
@@ -285,14 +285,14 @@ NOTHROW(KCALL vm_write_nopf)(struct vm *__restrict self, UNCHECKED void *addr,
 		result    += ((uintptr_t)0 - temp);
 		num_bytes -= ((uintptr_t)0 - temp);
 	}
-	if (ARANGE_IS_KERNEL((uintptr_t)addr, (uintptr_t)addr + num_bytes)) {
+	if (ADDRRANGE_ISKERN((uintptr_t)addr, (uintptr_t)addr + num_bytes)) {
 		/* Simple case: write to kernel memory (can just be copied directly). */
 direct_copy:
 		result += memcpy_nopf(addr, buf, num_bytes);
 	} else {
 		if (THIS_VM == self)
 			goto direct_copy; /* Simple case: same VM */
-		if (ARANGE_IS_KERNEL((uintptr_t)buf, (uintptr_t)buf + num_bytes)) {
+		if (ADDRRANGE_ISKERN((uintptr_t)buf, (uintptr_t)buf + num_bytes)) {
 			/* Source buffer is located in kernel-space.
 			 * For this case, we can simply switch to the other VM and directly copy data. */
 			result += copy_kernelspace_into_vm_nopf(self, addr,
@@ -347,7 +347,7 @@ NOTHROW(KCALL vm_memset_nopf)(struct vm *__restrict self, UNCHECKED void *addr,
 		result    += ((uintptr_t)0 - temp);
 		num_bytes -= ((uintptr_t)0 - temp);
 	}
-	if (ARANGE_IS_KERNEL((uintptr_t)addr, (uintptr_t)addr + num_bytes)) {
+	if (ADDRRANGE_ISKERN((uintptr_t)addr, (uintptr_t)addr + num_bytes)) {
 		/* Simple case: write to kernel memory (can just be copied directly). */
 direct_copy:
 		result += memset_nopf(addr, byte, num_bytes);
@@ -404,7 +404,7 @@ vm_read(struct vm *__restrict self,
 		THROW(E_SEGFAULT_UNMAPPED, (void *)-1, E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_NONCANON);
 	if unlikely((uintptr_t)buf + num_bytes < (uintptr_t)buf)
 		THROW(E_SEGFAULT_UNMAPPED, (void *)-1, E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_WRITING | E_SEGFAULT_CONTEXT_NONCANON);
-	if (ARANGE_IS_KERNEL((uintptr_t)addr, (uintptr_t)addr + num_bytes)) {
+	if (ADDRRANGE_ISKERN((uintptr_t)addr, (uintptr_t)addr + num_bytes)) {
 		/* Simple case: read from kernel memory (can just be copied directly). */
 		TRY {
 			memcpy(buf, addr, num_bytes);
@@ -427,7 +427,7 @@ vm_read(struct vm *__restrict self,
 			return;
 		}
 copy_from_vm:
-		if (ARANGE_IS_KERNEL((uintptr_t)buf, (uintptr_t)buf + num_bytes)) {
+		if (ADDRRANGE_ISKERN((uintptr_t)buf, (uintptr_t)buf + num_bytes)) {
 			/* Target buffer is located in kernel-space.
 			 * For this case, we can simply switch to the other VM and directly copy data. */
 			copy_kernelspace_from_vm(self,
@@ -478,7 +478,7 @@ vm_write(struct vm *__restrict self,
 		THROW(E_SEGFAULT_UNMAPPED, (void *)-1, E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_WRITING | E_SEGFAULT_CONTEXT_NONCANON);
 	if unlikely((uintptr_t)buf + num_bytes < (uintptr_t)buf)
 		THROW(E_SEGFAULT_UNMAPPED, (void *)-1, E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_NONCANON);
-	if (ARANGE_IS_KERNEL((uintptr_t)addr, (uintptr_t)addr + num_bytes)) {
+	if (ADDRRANGE_ISKERN((uintptr_t)addr, (uintptr_t)addr + num_bytes)) {
 		/* Simple case: write to kernel memory (can just be copied directly). */
 		TRY {
 			memcpy(addr, buf, num_bytes);
@@ -501,7 +501,7 @@ vm_write(struct vm *__restrict self,
 			return;
 		}
 copy_to_vm:
-		if (ARANGE_IS_KERNEL((uintptr_t)buf, (uintptr_t)buf + num_bytes)) {
+		if (ADDRRANGE_ISKERN((uintptr_t)buf, (uintptr_t)buf + num_bytes)) {
 			/* Source buffer is located in kernel-space.
 			 * For this case, we can simply switch to the other VM and directly copy data. */
 			copy_kernelspace_into_vm(self, addr,
@@ -547,7 +547,7 @@ vm_memset(struct vm *__restrict self,
 		THROWS(E_SEGFAULT, E_WOULDBLOCK) {
 	if unlikely((uintptr_t)addr + num_bytes < (uintptr_t)addr)
 		THROW(E_SEGFAULT_UNMAPPED, (void *)-1, E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_WRITING | E_SEGFAULT_CONTEXT_NONCANON);
-	if (ARANGE_IS_KERNEL((uintptr_t)addr, (uintptr_t)addr + num_bytes)) {
+	if (ADDRRANGE_ISKERN((uintptr_t)addr, (uintptr_t)addr + num_bytes)) {
 		/* Simple case: write to kernel memory (can just be copied directly). */
 		TRY {
 			memset(addr, byte, num_bytes);

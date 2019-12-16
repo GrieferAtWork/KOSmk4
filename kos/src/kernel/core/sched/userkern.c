@@ -182,11 +182,11 @@ userkern_segment_call(struct vio_args *__restrict args,
                       pos_t addr) {
 	uintptr_t reladdr;
 	uintptr_t base = get_userkern_base();
-	if (!ADDR_IS_KERNEL(base))
+	if (!ADDR_ISKERN(base))
 		goto err_invalid_addr;
-#ifdef HIGH_MEMORY_KERNEL
-	base -= KERNEL_BASE;
-#endif /* HIGH_MEMORY_KERNEL */
+#ifdef KERNELSPACE_HIGHMEM
+	base -= KERNELSPACE_BASE;
+#endif /* KERNELSPACE_HIGHMEM */
 	if ((uintptr_t)addr < base)
 		goto err_invalid_addr;
 	reladdr = (uintptr_t)addr - base;
@@ -259,7 +259,7 @@ PUBLIC struct vm_datapart userkern_segment_part = {
 				/* .a_vmin_ptr = */ 0
 			},
 			{
-				/* .a_vmax_ptr = */ KERNEL_NUM_PAGES - 1
+				/* .a_vmax_ptr = */ (KERNELSPACE_MAXPAGEID - KERNELSPACE_MINPAGEID)
 			},
 		}
 	},

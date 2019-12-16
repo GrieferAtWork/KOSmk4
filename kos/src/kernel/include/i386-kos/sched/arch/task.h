@@ -31,7 +31,7 @@
 
 #ifdef __x86_64__
 #include <kos/kernel/gdt.h>
-#include <kos/kernel/paging.h>
+#include <kernel/paging.h>
 #endif /* __x86_64__ */
 
 DECL_BEGIN
@@ -316,7 +316,7 @@ FORCELOCAL NOBLOCK WUNUSED uintptr_t
 NOTHROW(FCALL irregs_rdsp)(struct irregs const *__restrict self) {
 	/* NOTE: The read-order here is very important! */
 	uintptr_t result = __hybrid_atomic_load(self->ir_rsp, __ATOMIC_ACQUIRE);
-	if (ADDR_IS_KERNEL(result)) {
+	if (ADDR_ISKERN(result)) {
 		uintptr_t eip = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
 		if (eip == (uintptr_t)&x86_rpc_user_redirection)
 			result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_rsp);

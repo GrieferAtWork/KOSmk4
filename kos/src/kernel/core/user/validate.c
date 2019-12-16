@@ -30,13 +30,13 @@
 
 DECL_BEGIN
 
-#ifdef HIGH_MEMORY_KERNEL
-#define VALID_USER_PTR(p)           ((uintptr_t)(p) < KERNEL_BASE)
-#define VALID_USER_RANGE(start,end) ((uintptr_t)(end) <= KERNEL_BASE)
-#else /* HIGH_MEMORY_KERNEL */
-#define VALID_USER_PTR(p)           ((uintptr_t)(p) >= KERNEL_END)
-#define VALID_USER_RANGE(start,end) ((uintptr_t)(start) >= KERNEL_END)
-#endif /* !HIGH_MEMORY_KERNEL */
+#ifdef KERNELSPACE_HIGHMEM
+#define VALID_USER_PTR(p)           ((uintptr_t)(p) < KERNELSPACE_BASE)
+#define VALID_USER_RANGE(start,end) ((uintptr_t)(end) <= KERNELSPACE_BASE)
+#else /* KERNELSPACE_HIGHMEM */
+#define VALID_USER_PTR(p)           ((uintptr_t)(p) >= KERNELSPACE_END)
+#define VALID_USER_RANGE(start,end) ((uintptr_t)(start) >= KERNELSPACE_END)
+#endif /* !KERNELSPACE_HIGHMEM */
 
 /* Validate user-pointers for being allowed to be used for the specified operations.
  * Since the kernel is allowed to access memory that is marked as `PROT_NOUSER',
@@ -89,13 +89,13 @@ validate_executable(UNCHECKED USER void const *base) THROWS(E_SEGFAULT) {
 		THROW(E_SEGFAULT_NOTEXECUTABLE, base, E_SEGFAULT_CONTEXT_USERCODE);
 }
 
-#ifdef HIGH_MEMORY_KERNEL
+#ifdef KERNELSPACE_HIGHMEM
 DEFINE_PUBLIC_ALIAS(validate_readable_opt, validate_readable);
 DEFINE_PUBLIC_ALIAS(validate_readablem_opt, validate_readablem);
 DEFINE_PUBLIC_ALIAS(validate_writable_opt, validate_writable);
 DEFINE_PUBLIC_ALIAS(validate_writablem_opt, validate_writablem);
 DEFINE_PUBLIC_ALIAS(validate_executable_opt, validate_executable);
-#else /* HIGH_MEMORY_KERNEL */
+#else /* KERNELSPACE_HIGHMEM */
 
 PUBLIC void KCALL
 validate_readable_opt(UNCHECKED USER void const *base, size_t num_bytes) THROWS(E_SEGFAULT) {
@@ -127,7 +127,7 @@ validate_executable_opt(UNCHECKED USER void const *base) THROWS(E_SEGFAULT) {
 		validate_executable(base);
 }
 
-#endif /* !HIGH_MEMORY_KERNEL */
+#endif /* !KERNELSPACE_HIGHMEM */
 
 
 DECL_END

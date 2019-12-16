@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5b869ff */
+/* HASH CRC-32:0xd51b9785 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17816,7 +17816,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mount)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -20053,7 +20053,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_select)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -20363,7 +20363,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mmap)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
@@ -21451,7 +21451,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigreturn)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
@@ -21495,7 +21495,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clone)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -22243,7 +22243,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter__llseek)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -23097,7 +23097,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mremap)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -23743,7 +23743,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pread64)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -23786,7 +23786,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwrite64)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -24199,7 +24199,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mmap2)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
@@ -25382,7 +25382,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setxattr)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -25425,7 +25425,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lsetxattr)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -25468,7 +25468,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fsetxattr)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -25926,7 +25926,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_futex)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
@@ -26517,7 +26517,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_remap_file_pages)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -27527,7 +27527,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -28019,7 +28019,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fchownat)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -28217,7 +28217,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linkat)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -28417,7 +28417,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pselect6)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
@@ -28461,7 +28461,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ppoll)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -28616,7 +28616,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_splice)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
@@ -28660,7 +28660,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sync_file_range)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
@@ -28856,7 +28856,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_epoll_pwait)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -29395,7 +29395,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadv)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -29438,7 +29438,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritev)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -29558,7 +29558,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -29715,7 +29715,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_name_to_handle_at)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -29945,7 +29945,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_readv)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
@@ -29989,7 +29989,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_writev)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
@@ -30033,7 +30033,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kcmp)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -30188,7 +30188,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_renameat2)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -30380,7 +30380,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_execveat)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -30651,7 +30651,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getsockopt)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -30696,7 +30696,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setsockopt)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -30814,7 +30814,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sendto)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
@@ -30895,7 +30895,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvfrom)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
@@ -31489,7 +31489,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_frealpathat)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -31619,7 +31619,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_openpty)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -31938,7 +31938,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutex)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -32047,7 +32047,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutexexpr)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -32117,7 +32117,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutexlockexpr)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
@@ -32273,7 +32273,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_coredump)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
@@ -32539,7 +32539,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_select64)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -32592,7 +32592,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_maplibrary)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -32974,7 +32974,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pread64f)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
@@ -33018,7 +33018,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwrite64f)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
@@ -33173,7 +33173,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kreaddirf)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -33520,7 +33520,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fmknodat)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -33641,7 +33641,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_frenameat)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -33725,7 +33725,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_freadlinkat)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -33768,7 +33768,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pselect6_64)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
@@ -33812,7 +33812,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ppoll64)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
@@ -33895,7 +33895,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fallocate64)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
@@ -34019,7 +34019,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadvf)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
@@ -34063,7 +34063,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritevf)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
@@ -34107,7 +34107,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg64)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */

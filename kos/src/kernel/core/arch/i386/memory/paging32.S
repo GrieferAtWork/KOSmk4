@@ -88,7 +88,7 @@ PUBLIC_FUNCTION(x86_pagedir_syncall_maybe_global)
 	shll   $(12), %edx
 	addl   %edx, %ecx
 	jo8    pagedir_syncall /* sync up until, or past the end of the address space. */
-	cmpl   $(KERNEL_BASE), %ecx
+	cmpl   $(KERNELSPACE_BASE), %ecx
 	ja8    pagedir_syncall
 	/* Only invalidate user-space. */
 	movl   %cr3, %eax

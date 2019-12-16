@@ -94,7 +94,7 @@ NOTHROW(KCALL fixup_potential_system_inconsistencies)(void) {
 PRIVATE ATTR_COLDTEXT NOBLOCK bool
 NOTHROW(KCALL is_pc)(void *pc) {
 	struct vm_node *node;
-	if (pc < (void *)KERNEL_BASE)
+	if (pc < (void *)KERNELSPACE_BASE)
 		return false;
 	node = vm_getnodeofaddress(&vm_kernel, pc);
 	if (!node)

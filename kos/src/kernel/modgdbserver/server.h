@@ -21,7 +21,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/paging.h> /* HIGH_MEMORY_KERNEL */
+#include <kernel/paging.h> /* KERNELSPACE_HIGHMEM */
 
 #include "gdb.h"
 
@@ -120,21 +120,21 @@ INTDEF u8 const GDB_HexValues[256];
 
 /* TID management. */
 #define GDB_KERNEL_PID          ((pid_t)(upid_t)0x7fffffff)
-#ifdef HIGH_MEMORY_KERNEL
+#ifdef KERNELSPACE_HIGHMEM
 #if 1
-#define GDB_KERNEL_TID(thread)  ((pid_t)((uintptr_t)(thread) - KERNEL_BASE))
-#define GDB_KERNEL_TID_GET(tid) ((struct task *)((uintptr_t)(tid) + KERNEL_BASE))
-#define GDB_KERNEL_TID_CHK(tid) ADDR_IS_KERNEL((uintptr_t)(tid) + KERNEL_BASE)
+#define GDB_KERNEL_TID(thread)  ((pid_t)((uintptr_t)(thread) - KERNELSPACE_BASE))
+#define GDB_KERNEL_TID_GET(tid) ((struct task *)((uintptr_t)(tid) + KERNELSPACE_BASE))
+#define GDB_KERNEL_TID_CHK(tid) ADDR_ISKERN((uintptr_t)(tid) + KERNELSPACE_BASE)
 #else
 #define GDB_KERNEL_TID(thread)  ((pid_t)((uintptr_t)(thread)))
 #define GDB_KERNEL_TID_GET(tid) ((struct task *)((uintptr_t)(tid)))
-#define GDB_KERNEL_TID_CHK(tid) ADDR_IS_KERNEL((uintptr_t)(tid))
+#define GDB_KERNEL_TID_CHK(tid) ADDR_ISKERN((uintptr_t)(tid))
 #endif
-#else /* HIGH_MEMORY_KERNEL */
+#else /* KERNELSPACE_HIGHMEM */
 #define GDB_KERNEL_TID(thread)  ((pid_t)((uintptr_t)(thread)/* - KERNEL_CEILING*/))
 #define GDB_KERNEL_TID_GET(tid) ((struct task *)((uintptr_t)(tid)/* + KERNEL_CEILING*/))
-#define GDB_KERNEL_TID_CHK(tid) ADDR_IS_KERNEL((uintptr_t)(tid)/* + KERNEL_CEILING*/)
-#endif /* !HIGH_MEMORY_KERNEL */
+#define GDB_KERNEL_TID_CHK(tid) ADDR_ISKERN((uintptr_t)(tid)/* + KERNEL_CEILING*/)
+#endif /* !KERNELSPACE_HIGHMEM */
 
 
 

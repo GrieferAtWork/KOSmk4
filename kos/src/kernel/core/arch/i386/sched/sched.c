@@ -449,7 +449,7 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 	    !(result->ir_eflags & 0xffff0000) &&
 	    (((u32 *)result)[-2] & (EFLAGS_VM | EFLAGS_IF)) == (EFLAGS_VM | EFLAGS_IF) &&
 	    !(((u32 *)result)[-3] & 0xffff0000) &&
-	    ADDR_IS_USER(((u32 *)result)[-4])) {
+	    ADDR_ISUSER(((u32 *)result)[-4])) {
 		/* There is a very good chance that this is a vm86 thread, however we _really_
 		 * have to be sure about this, and the only way to be 100% sure, is to unwind
 		 * the stack until we hit user-space, at which point we can unwind the %eflags

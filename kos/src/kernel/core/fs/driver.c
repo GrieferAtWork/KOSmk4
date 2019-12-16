@@ -2437,7 +2437,7 @@ NOTHROW(FCALL driver_at_address)(void const *static_pointer) {
 	    static_pointer < (void *)kernel_driver.d_loadend)
 		return incref(&kernel_driver);
 	/* Check for special case: The pointer isn't located in kernel-space. */
-	if (!ADDR_IS_KERNEL((uintptr_t)static_pointer))
+	if (!ADDR_ISKERN((uintptr_t)static_pointer))
 		return NULL;
 	ds = current_driver_state.get();
 	for (i = 0; i < ds->ds_count; ++i) {
@@ -3657,7 +3657,7 @@ done_tags_for_soname:
 		}
 		/* Load the driver's program segments into memory */
 		driver_map_into_memory(result, base, num_bytes);
-		assert(ADDR_IS_KERNEL(result->d_loadaddr));
+		assert(ADDR_ISKERN(result->d_loadaddr));
 		TRY {
 			/* With the driver program now loaded into memory, we can scan it for
 			 * the different program sections we'll be needing in the future, and

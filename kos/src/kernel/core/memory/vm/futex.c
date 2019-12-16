@@ -542,7 +542,7 @@ vm_futex_broadcast(UNCHECKED void *futex_address)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
 	REF struct vm_futex *f;
 	struct vm *effective_vm = THIS_VM;
-	if (ADDR_IS_KERNEL(futex_address))
+	if (ADDR_ISKERN(futex_address))
 		effective_vm = &vm_kernel;
 	/* Lookup a futex at the given address. */
 	f = vm_getfutex_existing(effective_vm, futex_address);

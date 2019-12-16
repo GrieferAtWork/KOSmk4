@@ -384,7 +384,7 @@ function i386_printKernelSyscallWrapper_sysenter(fp: File, f: Function, sysno: i
 		break;
 	case 6:
 	case 5:
-		fp << "	cmpl   $(KERNEL_BASE), %ebp\n";
+		fp << "	cmpl   $(KERNELSPACE_BASE), %ebp\n";
 		fp << "	jae    __asm32_bad_sysenter_extension\n";
 		if (registerCount == 6) {
 			fp << "	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */\n";

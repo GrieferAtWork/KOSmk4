@@ -74,11 +74,11 @@ userkern_segment_writeq(struct vio_args *__restrict args,
 #endif /* DEFINE_IO_READ */
 	uintptr_t reladdr;
 	uintptr_t base = get_userkern_base();
-	if (!ADDR_IS_KERNEL(base))
+	if (!ADDR_ISKERN(base))
 		goto err_invalid_addr;
-#ifdef HIGH_MEMORY_KERNEL
-	base -= KERNEL_BASE;
-#endif /* HIGH_MEMORY_KERNEL */
+#ifdef KERNELSPACE_HIGHMEM
+	base -= KERNELSPACE_BASE;
+#endif /* KERNELSPACE_HIGHMEM */
 	if ((uintptr_t)addr < base)
 		goto err_invalid_addr;
 	reladdr = (uintptr_t)addr - base;
@@ -89,7 +89,7 @@ userkern_segment_writeq(struct vio_args *__restrict args,
 #ifdef DEFINE_IO_READ
 		result = base;
 #else /* DEFINE_IO_READ */
-		if (!ADDR_IS_KERNEL(value))
+		if (!ADDR_ISKERN(value))
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_USERKERN_BASE,
 			      value);

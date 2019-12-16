@@ -111,7 +111,7 @@ NOTHROW(KCALL dbg_readmemory)(void const *addr,
                               size_t num_bytes) {
 	size_t error;
 	PAGEDIR_P_SELFTYPE pdir;
-	if (ARANGE_IS_KERNEL(addr, (byte_t *)addr + num_bytes))
+	if (ADDRRANGE_ISKERN(addr, (byte_t *)addr + num_bytes))
 		return memcpy_nopf(buf, addr, num_bytes);
 	pdir = dbg_getpagedir();
 	if (!dbg_verifypagedir(pdir))
@@ -131,7 +131,7 @@ NOTHROW(KCALL dbg_writememory)(void *addr,
 	PAGEDIR_P_SELFTYPE pdir;
 	if (!num_bytes)
 		return 0; /* Nothing to do here. */
-	if (ARANGE_IS_KERNEL(addr, (byte_t *)addr + num_bytes)) {
+	if (ADDRRANGE_ISKERN(addr, (byte_t *)addr + num_bytes)) {
 again_memcpy_nopf_kernel:
 		error = memcpy_nopf(addr, buf, num_bytes);
 		if (error != 0 && force) {

@@ -70,7 +70,7 @@ INTERN_FUNCTION(FUNC(execveat))
 	pushl_cfi %fs
 	.cfi_restore_iret_fs_or_offset -12
 #ifdef SYSCALL_DEFMODE_SYSENTER
-	cmpl   $(KERNEL_BASE), %ebp
+	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
 #endif /* SYSCALL_DEFMODE_SYSENTER */
 	pushal_cfi_r

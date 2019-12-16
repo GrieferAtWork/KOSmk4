@@ -281,7 +281,7 @@ gdb_cpustate64_from_kcpustate64(struct gdb_cpustate64 *__restrict dst,
 	dst->gcs_r15    = src->kcs_gpregs.gp_r15;
 	dst->gcs_rip    = src->kcs_rip;
 	dst->gcs_rflags = src->kcs_rflags;
-	if (ADDR_IS_KERNEL(dst->gcs_rip)) {
+	if (dst->gcs_rip >= KERNELSPACE_BASE) {
 		dst->gcs_cs = SEGMENT_KERNEL_CODE;
 		dst->gcs_ss = SEGMENT_KERNEL_DATA;
 	} else {
@@ -315,7 +315,7 @@ gdb_cpustate64_from_lcpustate64(struct gdb_cpustate64 *__restrict dst,
 	dst->gcs_r15    = src->lcs_r15;
 	dst->gcs_rip    = src->lcs_rip;
 	dst->gcs_rflags = 0;
-	if (ADDR_IS_KERNEL(dst->gcs_rip)) {
+	if (dst->gcs_rip >= KERNELSPACE_BASE) {
 		dst->gcs_cs = SEGMENT_KERNEL_CODE;
 		dst->gcs_ss = SEGMENT_KERNEL_DATA;
 	} else {

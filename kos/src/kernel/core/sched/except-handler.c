@@ -187,7 +187,7 @@ DEFINE_SYSCALL2(errno_t, sigaltstack,
 			oss->ss_size = 0;
 		} else {
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
-#ifdef HIGH_MEMORY_KERNEL
+#ifdef KERNELSPACE_HIGHMEM
 			if unlikely((uintptr_t)sp <= PAGESIZE) {
 				oss->ss_sp   = 0;
 				oss->ss_size = (uintptr_t)sp;
@@ -195,7 +195,7 @@ DEFINE_SYSCALL2(errno_t, sigaltstack,
 				oss->ss_sp   = (void *)PAGESIZE;
 				oss->ss_size = (uintptr_t)sp - PAGESIZE;
 			}
-#else /* HIGH_MEMORY_KERNEL */
+#else /* KERNELSPACE_HIGHMEM */
 			if unlikely((uintptr_t)sp <= KERNEL_CEILING) {
 				oss->ss_sp   = 0;
 				oss->ss_size = (uintptr_t)sp;
@@ -203,15 +203,15 @@ DEFINE_SYSCALL2(errno_t, sigaltstack,
 				oss->ss_sp   = (void *)KERNEL_CEILING;
 				oss->ss_size = (uintptr_t)sp - KERNEL_CEILING;
 			}
-#endif /* !HIGH_MEMORY_KERNEL */
+#endif /* !KERNELSPACE_HIGHMEM */
 #else /* __ARCH_STACK_GROWS_DOWNWARDS */
-#ifdef HIGH_MEMORY_KERNEL
+#ifdef KERNELSPACE_HIGHMEM
 			oss->ss_sp   = sp;
-			oss->ss_size = (uintptr_t)KERNEL_BASE - (uintptr_t)sp;
-#else /* HIGH_MEMORY_KERNEL */
+			oss->ss_size = (uintptr_t)KERNELSPACE_BASE - (uintptr_t)sp;
+#else /* KERNELSPACE_HIGHMEM */
 			oss->ss_sp   = sp;
 			oss->ss_size = sp == 0 ? (uintptr_t)-1 : (uintptr_t)0 - (uintptr_t)sp;
-#endif /* !HIGH_MEMORY_KERNEL */
+#endif /* !KERNELSPACE_HIGHMEM */
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 		}
 	}

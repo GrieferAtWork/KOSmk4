@@ -806,10 +806,10 @@ NOTHROW(KCALL mall_reachable_pointer)(void *ptr) {
 #endif /* X86_PAGING_ISNONCANON */
 	if (((uintptr_t)ptr & (sizeof(void *) - 1)) != 0)
 		return 0; /* Unaligned pointer -> not a heap pointer */
-#ifdef HIGH_MEMORY_KERNEL
-	if ((uintptr_t)ptr < KERNEL_BASE)
+#ifdef KERNELSPACE_HIGHMEM
+	if ((uintptr_t)ptr < KERNELSPACE_BASE)
 		return 0;
-#elif defined(LOW_MEMORY_KERNEL)
+#elif defined(KERNELSPACE_LOWMEM)
 	if ((uintptr_t)ptr >= KERNEL_CEILING)
 		return 0;
 #endif

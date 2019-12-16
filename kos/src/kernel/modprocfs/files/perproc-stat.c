@@ -300,17 +300,17 @@ nofproc:
 		goto done; /* TODO: rss */
 	if ((*printer)(arg, "1 ", 2) < 0)
 		goto done; /* TODO: rsslim */
-#ifdef HIGH_MEMORY_KERNEL
+#ifdef KERNELSPACE_HIGHMEM
 	if ((*printer)(arg, "0 ", 2) < 0)
 		goto done; /* TODO: startcode */
-	if (format_printf(printer, arg, "%Iu ", KERNEL_BASE) < 0)
+	if (format_printf(printer, arg, "%Iu ", KERNELSPACE_BASE) < 0)
 		goto done; /* TODO: endcode */
-#else /* HIGH_MEMORY_KERNEL */
+#else /* KERNELSPACE_HIGHMEM */
 	if (format_printf(printer, arg, "%Iu ", KERNEL_CEILING) < 0)
 		goto done; /* TODO: startcode */
 	if (format_printf(printer, arg, "%Iu ", (void *)-1) < 0)
 		goto done; /* TODO: endcode */
-#endif /* !HIGH_MEMORY_KERNEL */
+#endif /* !KERNELSPACE_HIGHMEM */
 	if (format_printf(printer, arg, "%Iu ", (void *)1234) < 0)
 		goto done; /* TODO: startstack */
 	if (format_printf(printer, arg, "%Iu ", (void *)1234) < 0)
@@ -347,17 +347,17 @@ nofproc:
 		goto done; /* TODO: guest_time */
 	if (format_printf(printer, arg, "%Id ", 0) < 0)
 		goto done; /* TODO: cguest_time */
-#ifdef HIGH_MEMORY_KERNEL
+#ifdef KERNELSPACE_HIGHMEM
 	if ((*printer)(arg, "0 ", 2) < 0)
 		goto done; /* TODO: start_data */
-	if (format_printf(printer, arg, "%Iu ", KERNEL_BASE) < 0)
+	if (format_printf(printer, arg, "%Iu ", KERNELSPACE_BASE) < 0)
 		goto done; /* TODO: end_data */
-#else /* HIGH_MEMORY_KERNEL */
+#else /* KERNELSPACE_HIGHMEM */
 	if (format_printf(printer, arg, "%Iu ", KERNEL_CEILING) < 0)
 		goto done; /* TODO: start_data */
 	if (format_printf(printer, arg, "%Iu ", (void *)-1) < 0)
 		goto done; /* TODO: end_data */
-#endif /* !HIGH_MEMORY_KERNEL */
+#endif /* !KERNELSPACE_HIGHMEM */
 	if (format_printf(printer, arg, "%Iu ", 0) < 0)
 		goto done; /* start_brk... (NOTE: This is maintained by libc, so we can't actually know this one...) */
 	if (format_printf(printer, arg, "%Iu ", 0) < 0)

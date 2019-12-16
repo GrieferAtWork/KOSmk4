@@ -262,7 +262,7 @@ NOTHROW(KCALL cpu_broadcastipi_notthis_early_boot_aware)(cpu_ipi_t func,
 		 * this type of address information only uses the lower-most 16
 		 * bits, we can infer that anything that isn't >= 0xc000000 in i386,
 		 * or `0xffff800000000000' on x86_64 isn't an initialized CPU pointer. */
-		if ((uintptr_t)target < KERNEL_BASE)
+		if ((uintptr_t)target < KERNELSPACE_BASE)
 			continue;
 		if (cpu_sendipi(target, func, args, flags))
 			++result;
@@ -288,7 +288,7 @@ NOTHROW(KCALL x86_dbg_get_hostcpu)(void) {
 		u8 id = (u8)(lapic_read(APIC_ID) >> APIC_ID_FSHIFT);
 		result = &_bootcpu;
 		for (i = 0; i < cpu_count; ++i) {
-			if unlikely((uintptr_t)cpu_vector[i] < KERNEL_BASE)
+			if unlikely((uintptr_t)cpu_vector[i] < KERNELSPACE_BASE)
 				continue; /* At one point during booting, `cpu_vector' contains LAPIC IDs. */
 			if (FORCPU(cpu_vector[i], thiscpu_x86_lapicid) == id) {
 				result = cpu_vector[i];

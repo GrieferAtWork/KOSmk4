@@ -45,14 +45,14 @@
 #include "_objects.S"
 /**/
 
-#define P2V(x) ((x) + KERNEL_BASE)
-#define V2P(x) ((x) - KERNEL_BASE)
+#define P2V(x) ((x) + KERNELSPACE_BASE)
+#define V2P(x) ((x) - KERNELSPACE_BASE)
 
 /* The starting VEC2-index (in `x86_pdir::p_e2') and amount
  * of continuous indices thereafter of the kernel-share segment.
  * That is the segment where the kernel itself resides at, which
  * is then mapped again in all other page directories. */
-#define VEC2_SHARE_BEGIN     X86_PDIR_VEC2INDEX(KERNEL_BASE)
+#define VEC2_SHARE_BEGIN     X86_PDIR_VEC2INDEX(KERNELSPACE_BASE)
 #define VEC2_SHARE_SIZE     (VEC2_IDENTITY_BEGIN - VEC2_SHARE_BEGIN)
 
 /* Similar to the SHARE indices, but for the identity mapping instead. */
@@ -526,8 +526,8 @@ INTERN_FUNCTION(_start)
 	.align 8, 0x90  /* Align by padding with nop (nop == 0x90) */
 INTERN_BEGIN(__x86_paging_init_identity_mapped_text)
 	.byte  0x0f, 0x22, 0xc0 /* movl   %eax, %cr0 */
-	.byte  0xe9             /* jmp    1f + KERNEL_BASE; 1: */
-	.long  KERNEL_BASE
+	.byte  0xe9             /* jmp    1f + KERNELSPACE_BASE; 1: */
+	.long  KERNELSPACE_BASE
 END(__x86_paging_init_identity_mapped_text)
 
 

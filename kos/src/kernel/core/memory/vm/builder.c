@@ -132,7 +132,7 @@ vmb_do_mapat(struct vmb *__restrict self,
 		return;
 	initial_page_index = page_index;
 	assert(page_index + num_pages > page_index);
-	assert(!PRANGE_IS_KERNEL_PARTIAL(page_index, page_index + num_pages - 1));
+	assert(!PAGEIDRANGE_ISKERN_PARTIAL(page_index, page_index + num_pages - 1));
 	assert(!vmb_paged_isused(self, page_index, page_index + num_pages - 1));
 again:
 	TRY {
@@ -242,7 +242,7 @@ vmb_paged_mapat(struct vmb *__restrict self,
 	if unlikely(OVERFLOW_UADD(page_index, num_pages, &endpage))
 		goto err;
 	/* Check if some portion the given page-range is apart of kernel-space. */
-	if unlikely(PRANGE_IS_KERNEL_PARTIAL(page_index, endpage - 1))
+	if unlikely(PAGEIDRANGE_ISKERN_PARTIAL(page_index, endpage - 1))
 		return num_pages == 0;
 	/* Check if some portion of the given page-range is already in use. */
 	if unlikely(vmb_paged_isused(self, page_index, endpage - 1))
@@ -873,21 +873,21 @@ handle_remove_write_error:
 		struct vm_node *old_node_list;
 		/* Unlink the kernel-reserve node. */
 #ifndef NDEBUG
-#ifdef HIGH_MEMORY_KERNEL
-		node = vm_nodetree_remove(&target->v_tree, PAGEID_ENCODE(KERNEL_BASE));
-#else /* HIGH_MEMORY_KERNEL */
+#ifdef KERNELSPACE_HIGHMEM
+		node = vm_nodetree_remove(&target->v_tree, PAGEID_ENCODE(KERNELSPACE_BASE));
+#else /* KERNELSPACE_HIGHMEM */
 		node = vm_nodetree_remove(&target->v_tree, 0);
-#endif /* !HIGH_MEMORY_KERNEL */
+#endif /* !KERNELSPACE_HIGHMEM */
 		assertf(node == &target->v_kernreserve,
 		        "node                   = %p\n"
 		        "&target->v_kernreserve = %p\n",
 		        node, &target->v_kernreserve);
 #else /* !NDEBUG */
-#ifdef HIGH_MEMORY_KERNEL
-		vm_nodetree_remove(&target->v_tree, PAGEID_ENCODE(KERNEL_BASE));
-#else /* HIGH_MEMORY_KERNEL */
+#ifdef KERNELSPACE_HIGHMEM
+		vm_nodetree_remove(&target->v_tree, PAGEID_ENCODE(KERNELSPACE_BASE));
+#else /* KERNELSPACE_HIGHMEM */
 		vm_nodetree_remove(&target->v_tree, 0);
-#endif /* !HIGH_MEMORY_KERNEL */
+#endif /* !KERNELSPACE_HIGHMEM */
 #endif /* NDEBUG */
 		LLIST_REMOVE(&target->v_kernreserve, vn_byaddr);
 

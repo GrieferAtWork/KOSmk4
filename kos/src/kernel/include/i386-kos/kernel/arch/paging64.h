@@ -298,11 +298,11 @@ union p64_pdir_e4 {
 #define P64_PDIR_E4_ISUNUSED(e3_word)     ((e3_word) == P64_PAGE_ABSENT)
 	PHYS union p64_pdir_e3 (*p_e3)[512]; /* [MASK(P64_PAGE_FVECTOR)]
 	                                      * [owned_if(P64_PDIR_E4_ISVEC3(p_word) &&
-	                                      *           ((self - :p_e4) < P64_PDIR_VEC4INDEX(KERNEL_BASE)))]
-	                                      * [const_if((self - :p_e4) >= P64_PDIR_VEC4INDEX(KERNEL_BASE))]
+	                                      *           ((self - :p_e4) < P64_PDIR_VEC4INDEX(KERNELSPACE_BASE)))]
+	                                      * [const_if((self - :p_e4) >= P64_PDIR_VEC4INDEX(KERNELSPACE_BASE))]
 	                                      * [valid_if(P64_PAGE_FPRESENT)]
 	                                      * _Physical_ pointer to a level #3 paging vector.
-	                                      * NOTE: If `(self - :p_e4) >= P64_PDIR_E4_INDEX(KERNEL_BASE_PAGE)',
+	                                      * NOTE: If `(self - :p_e4) >= P64_PDIR_VEC4INDEX(KERNELSPACE_BASE)',
 	                                      *       then the caller can assume that the `P64_PAGE_FPRESENT' flag
 	                                      *       has been set, and that a vector is assigned. */
 	struct ATTR_PACKED {
@@ -317,7 +317,7 @@ union p64_pdir_e4 {
 		u64          v_ignore_global : 1; /* [valid_if(v_present)] Ignored...  (P64_PAGE_FGLOBAL) */
 		u64          v_unused1_ign : 3;   /* [valid_if(v_present)] Ignored...  (0x200, 0x400, 0x800) */
 		u64          v_e3 : 40;           /* [valid_if(v_present)][TYPE(union p64_pdir_e3(*)[512])]
-		                                   * [owned_if((self - :p_e4) < P64_PDIR_VEC4INDEX(KERNEL_BASE))] P64_PAGE_FVECTOR */
+		                                   * [owned_if((self - :p_e4) < P64_PDIR_VEC4INDEX(KERNELSPACE_BASE))] P64_PAGE_FVECTOR */
 		u64          v_unused2_ign : 11;  /* [valid_if(v_present)] Ignored...  (Bits 52:62) */
 		u64          v_noexec : 1;        /* [valid_if(v_present)] P64_PAGE_FNOEXEC */
 	} p_vec3;
@@ -332,7 +332,7 @@ struct p64_pdir {
 #endif /* __CC__ */
 
 
-#define P64_VM_KERNEL_PDIR_IDENTITY_BASE  __UINT64_C(0xffff808000000000) /* KERNEL_BASE + 512GiB */
+#define P64_VM_KERNEL_PDIR_IDENTITY_BASE  __UINT64_C(0xffff808000000000) /* KERNELSPACE_BASE + 512GiB */
 #define P64_VM_KERNEL_PDIR_IDENTITY_SIZE  __UINT64_C(0x0000008000000000) /* 512GiB */
 #define P64_VM_KERNEL_PDIR_RESERVED_BASE  __UINT64_C(0xffff808000000000) /* Start of the address range reserved for page-directory self-modifications. */
 #define P64_VM_KERNEL_PDIR_RESERVED_SIZE  __UINT64_C(0x0000008000000000) /* Amount of memory reserved for page-directory self-modifications. */
@@ -342,7 +342,7 @@ struct p64_pdir {
 
 
 /* Page directory self-mapping addresses.
- * NOTE: We put the self-mapping 512 GIB after `KERNEL_BASE', just
+ * NOTE: We put the self-mapping 512 GIB after `KERNELSPACE_BASE', just
  *       so we can ensure that the first kernel-page can remain
  *       unmapped, meaning that the kernel can allow user-space
  *       pointers to overflow into kernel-space, at which point
@@ -352,7 +352,7 @@ struct p64_pdir {
  *       is that since the self-mapping takes up a total of 512 GIB
  *       of memory (at most), we can only place it with a granularity
  *       of that same size. */
-#define P64_PDIR_E1_IDENTITY_BASE  __UINT64_C(0xffff808000000000) /* KERNEL_BASE + 512GiB */
+#define P64_PDIR_E1_IDENTITY_BASE  __UINT64_C(0xffff808000000000) /* KERNELSPACE_BASE + 512GiB */
 #define P64_PDIR_E2_IDENTITY_BASE  __UINT64_C(0xffff80c040000000)
 #define P64_PDIR_E3_IDENTITY_BASE  __UINT64_C(0xffff80c060200000)
 #define P64_PDIR_E4_IDENTITY_BASE  __UINT64_C(0xffff80c060301000)
@@ -551,7 +551,7 @@ NOTHROW(FCALL pagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 			pagedir_syncone(addr);
 			return;
 		}
-		if (num_bytes > KERNEL_BASE) {
+		if (num_bytes > KERNELSPACE_BASE) {
 			/* We know that the address always _has_ to
 			 * fall into kernel-space in this case! */
 			pagedir_syncall();

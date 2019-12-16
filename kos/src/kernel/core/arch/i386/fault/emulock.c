@@ -180,7 +180,7 @@ handle_vio_or_not_faulted:
 		REF struct vm_datapart *part;
 		REF struct vm_datablock *block;
 #endif /* CONFIG_VIO */
-		if (ADDR_IS_KERNEL(addr))
+		if (ADDR_ISKERN(addr))
 			effective_vm = &vm_kernel;
 		addr_page = PAGEID_ENCODE(addr);
 		sync_read(effective_vm);

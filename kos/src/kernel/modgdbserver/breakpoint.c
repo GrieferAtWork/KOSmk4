@@ -43,7 +43,7 @@ NOTHROW(FCALL GDB_AddBreak)(struct task *__restrict thread,
                             unsigned int type,
                             vm_virt_t addr, unsigned int kind) {
 	errno_t result;
-	if (ADDR_IS_KERNEL(addr)) {
+	if (ADDR_ISKERN(addr)) {
 		result = GDB_VM_AddBreak(&vm_kernel, type, addr, kind);
 	} else {
 		REF struct vm *effective_vm;
@@ -59,7 +59,7 @@ NOTHROW(FCALL GDB_DelBreak)(struct task *__restrict thread,
                             unsigned int type,
                             vm_virt_t addr, unsigned int kind) {
 	errno_t result;
-	if (ADDR_IS_KERNEL(addr)) {
+	if (ADDR_ISKERN(addr)) {
 		result = GDB_VM_DelBreak(&vm_kernel, type, addr, kind);
 	} else {
 		REF struct vm *effective_vm;
