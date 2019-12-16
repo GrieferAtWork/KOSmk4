@@ -306,20 +306,20 @@ union p64_pdir_e4 {
 	                                      *       then the caller can assume that the `P64_PAGE_FPRESENT' flag
 	                                      *       has been set, and that a vector is assigned. */
 	struct ATTR_PACKED {
-		u64         v_present : 1;       /* P64_PAGE_FPRESENT */
-		u64         v_writable : 1;      /* [valid_if(v_present)] P64_PAGE_FWRITE */
-		u64         v_user : 1;          /* [valid_if(v_present)] P64_PAGE_FUSER */
-		u64         v_pwt : 1;           /* [valid_if(v_present)] P64_PAGE_FPWT */
-		u64         v_pcd : 1;           /* [valid_if(v_present)] P64_PAGE_FPCD */
-		u64         v_accessed : 1;      /* [valid_if(v_present)] P64_PAGE_FACCESSED */
-		u64         v_dirty_ign : 1;     /* [valid_if(v_present)] Ignored...  (P64_PAGE_FDIRTY) */
-		u64         v_bigpage_0 : 1;     /* [valid_if(v_present)] Must be zero  (P64_PAGE_F2MIB / P64_PAGE_F1GIB) */
-		u64         v_ignore_global : 1; /* [valid_if(v_present)] Ignored...  (P64_PAGE_FGLOBAL) */
-		u64         v_unused1_ign : 3;   /* [valid_if(v_present)] Ignored...  (0x200, 0x400, 0x800) */
-		u64         v_e3 : 40;           /* [valid_if(v_present)][TYPE(union p64_pdir_e3(*)[512])]
-		                                  * [owned_if((self - :p_e4) < P64_PDIR_VEC4INDEX(KERNEL_BASE))] P64_PAGE_FVECTOR */
-		u64         v_unused2_ign : 11;  /* [valid_if(v_present)] Ignored...  (Bits 52:62) */
-		u64         v_noexec : 1;        /* [valid_if(v_present)] P64_PAGE_FNOEXEC */
+		u64          v_present : 1;       /* P64_PAGE_FPRESENT */
+		u64          v_writable : 1;      /* [valid_if(v_present)] P64_PAGE_FWRITE */
+		u64          v_user : 1;          /* [valid_if(v_present)] P64_PAGE_FUSER */
+		u64          v_pwt : 1;           /* [valid_if(v_present)] P64_PAGE_FPWT */
+		u64          v_pcd : 1;           /* [valid_if(v_present)] P64_PAGE_FPCD */
+		u64          v_accessed : 1;      /* [valid_if(v_present)] P64_PAGE_FACCESSED */
+		u64          v_dirty_ign : 1;     /* [valid_if(v_present)] Ignored...  (P64_PAGE_FDIRTY) */
+		u64          v_bigpage_0 : 1;     /* [valid_if(v_present)] Must be zero  (P64_PAGE_F2MIB / P64_PAGE_F1GIB) */
+		u64          v_ignore_global : 1; /* [valid_if(v_present)] Ignored...  (P64_PAGE_FGLOBAL) */
+		u64          v_unused1_ign : 3;   /* [valid_if(v_present)] Ignored...  (0x200, 0x400, 0x800) */
+		u64          v_e3 : 40;           /* [valid_if(v_present)][TYPE(union p64_pdir_e3(*)[512])]
+		                                   * [owned_if((self - :p_e4) < P64_PDIR_VEC4INDEX(KERNEL_BASE))] P64_PAGE_FVECTOR */
+		u64          v_unused2_ign : 11;  /* [valid_if(v_present)] Ignored...  (Bits 52:62) */
+		u64          v_noexec : 1;        /* [valid_if(v_present)] P64_PAGE_FNOEXEC */
 	} p_vec3;
 };
 #endif /* __CC__ */

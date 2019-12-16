@@ -353,21 +353,21 @@ __DEFINE_SYNC_POLL(struct vm_datapart,
  * NOTE: The caller must be holding a read-lock on `self', or `self' must not be shared.
  * DATA-PAGES: Usually same as `virt-pages', but often 512-bytes large for files.
  * VIRT-PAGES: Same as `pageid_t' (PAGESIZE-bytes large) */
-NOBLOCK size_t NOTHROW(KCALL vm_datapart_numbytes)(struct vm_datapart *__restrict self);  /* TODO: Fix-up users of this macro that cast the return value to u64 */
-NOBLOCK size_t NOTHROW(KCALL vm_datapart_numdpages)(struct vm_datapart *__restrict self); /* TODO: Fix-up users of this macro that cast the return value to u64 */
-NOBLOCK size_t NOTHROW(KCALL vm_datapart_numvpages)(struct vm_datapart *__restrict self);
-NOBLOCK pos_t NOTHROW(KCALL vm_datapart_minbyte)(struct vm_datapart *__restrict self);
-NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_mindpage)(struct vm_datapart *__restrict self);
-NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_minvpage)(struct vm_datapart *__restrict self);
-NOBLOCK pos_t NOTHROW(KCALL vm_datapart_maxbyte)(struct vm_datapart *__restrict self);
-NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_maxdpage)(struct vm_datapart *__restrict self);
-NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_maxvpage)(struct vm_datapart *__restrict self);
-NOBLOCK pos_t NOTHROW(KCALL vm_datapart_startbyte)(struct vm_datapart *__restrict self);
-NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_startdpage)(struct vm_datapart *__restrict self);
-NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_startvpage)(struct vm_datapart *__restrict self);
-NOBLOCK pos_t NOTHROW(KCALL vm_datapart_endbyte)(struct vm_datapart *__restrict self);
-NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_enddpage)(struct vm_datapart *__restrict self);
-NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_endvpage)(struct vm_datapart *__restrict self);
+NOBLOCK size_t NOTHROW(KCALL vm_datapart_numbytes)(struct vm_datapart const *__restrict self);  /* TODO: Fix-up users of this macro that cast the return value to u64 */
+NOBLOCK size_t NOTHROW(KCALL vm_datapart_numdpages)(struct vm_datapart const *__restrict self); /* TODO: Fix-up users of this macro that cast the return value to u64 */
+NOBLOCK size_t NOTHROW(KCALL vm_datapart_numvpages)(struct vm_datapart const *__restrict self);
+NOBLOCK pos_t NOTHROW(KCALL vm_datapart_minbyte)(struct vm_datapart const *__restrict self);
+NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_mindpage)(struct vm_datapart const *__restrict self);
+NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_minvpage)(struct vm_datapart const *__restrict self);
+NOBLOCK pos_t NOTHROW(KCALL vm_datapart_maxbyte)(struct vm_datapart const *__restrict self);
+NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_maxdpage)(struct vm_datapart const *__restrict self);
+NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_maxvpage)(struct vm_datapart const *__restrict self);
+NOBLOCK pos_t NOTHROW(KCALL vm_datapart_startbyte)(struct vm_datapart const *__restrict self);
+NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_startdpage)(struct vm_datapart const *__restrict self);
+NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_startvpage)(struct vm_datapart const *__restrict self);
+NOBLOCK pos_t NOTHROW(KCALL vm_datapart_endbyte)(struct vm_datapart const *__restrict self);
+NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_enddpage)(struct vm_datapart const *__restrict self);
+NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_endvpage)(struct vm_datapart const *__restrict self);
 #else /* __INTELLISENSE__ */
 #define vm_datapart_numbytes(self)   ((size_t)(((self)->dp_tree.a_vmax - (self)->dp_tree.a_vmin) + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
 #define vm_datapart_numdpages(self)  ((size_t)(((self)->dp_tree.a_vmax - (self)->dp_tree.a_vmin) + 1))
@@ -760,91 +760,114 @@ vm_datapart_loaddatapage(struct vm_datapart *__restrict self,
 
 
 /* Get the state of a page (one of `VM_DATAPART_PPP_*') */
-#define VM_DATAPART_GETSTATE(self, relative_datapageid)                                         \
-	(__hybrid_assert((relative_datapageid) < vm_datapart_numdpages(self)),                      \
-	 !((self)->dp_flags & VM_DATAPART_FLAG_HEAPPPP)                                             \
-	 ? ((__hybrid_atomic_load((self)->dp_pprop, __ATOMIC_ACQUIRE) >>                            \
-	     ((relative_datapageid)*VM_DATAPART_PPP_BITS)) &                                        \
-	    VM_DATAPART_PPP_MASK)                                                                   \
-	 : (!(self)->dp_pprop_p                                                                     \
-	    ? VM_DATAPART_PPP_HASCHANGED                                                            \
-	    : (__hybrid_atomic_load((self)->dp_pprop_p[(relative_datapageid) /                      \
-	                                               (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS)], \
-	                            __ATOMIC_ACQUIRE) >>                                            \
-	       (((relative_datapageid) % (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS)) *              \
-	        VM_DATAPART_PPP_BITS)) &                                                            \
-	      VM_DATAPART_PPP_MASK))
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) unsigned int
+NOTHROW(KCALL vm_datapart_getstate)(struct vm_datapart const *__restrict self,
+                                    size_t relative_datapageid) {
+	__hybrid_assert(relative_datapageid < vm_datapart_numdpages(self));
+	if (!(self->dp_flags & VM_DATAPART_FLAG_HEAPPPP)) {
+		uintptr_t word;
+		word = __hybrid_atomic_load(self->dp_pprop, __ATOMIC_ACQUIRE);
+		word >>= relative_datapageid * VM_DATAPART_PPP_BITS;
+		return word & VM_DATAPART_PPP_MASK;
+	} else {
+		uintptr_t word;
+		size_t index;
+		unsigned int shift;
+		if (!self->dp_pprop_p)
+			return VM_DATAPART_PPP_HASCHANGED;
+		index = /* */ (size_t)(relative_datapageid / (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS));
+		shift = (unsigned int)(relative_datapageid % (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS));
+		word = __hybrid_atomic_load(self->dp_pprop_p[index], __ATOMIC_ACQUIRE);
+		word >>= shift * VM_DATAPART_PPP_BITS;
+		return word & VM_DATAPART_PPP_MASK;
+	}
+}
 
-/* Returns true if the per-page state of @self is writable. */
-#define VM_DATAPART_HASWRITABLESTATE(self) \
-	(!((self)->dp_flags & VM_DATAPART_FLAG_HEAPPPP) || (self)->dp_pprop_p != NULL)
+/* Returns true if the per-page state of `self' is writable. */
+LOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
+NOTHROW(KCALL vm_datapart_isstatewritable)(struct vm_datapart const *__restrict self) {
+	if (!(self->dp_flags & VM_DATAPART_FLAG_HEAPPPP))
+		return 1;
+	return self->dp_pprop_p != NULL;
+}
 
-/* Set the state of a page, returning true/false if the exchange was successful. */
-#define VM_DATAPART_SETSTATE(self, relative_datapageid, state) \
-	vm_datapart_setstate_impl(self, relative_datapageid, state)
-LOCAL __BOOL KCALL
-vm_datapart_setstate_impl(struct vm_datapart *__restrict self,
-                          size_t relative_datapageid,
-                          unsigned int state) {
+/* Set the state of a page. */
+LOCAL NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL vm_datapart_setstate)(struct vm_datapart *__restrict self,
+                                    size_t relative_datapageid,
+                                    unsigned int state) {
 	__hybrid_assert(!(state & ~VM_DATAPART_PPP_MASK));
 	__hybrid_assert(relative_datapageid < vm_datapart_numdpages(self));
 	if (!(self->dp_flags & VM_DATAPART_FLAG_HEAPPPP)) {
-		uintptr_t mask = VM_DATAPART_PPP_MASK << ((unsigned int)relative_datapageid * VM_DATAPART_PPP_BITS);
-		uintptr_t newmask = state << ((unsigned int)relative_datapageid * VM_DATAPART_PPP_BITS);
-		uintptr_t value;
+		uintptr_t valmask, newmask, oldword;
+		unsigned int shift;
+		shift   = (unsigned int)relative_datapageid * VM_DATAPART_PPP_BITS;
+		valmask = (uintptr_t)VM_DATAPART_PPP_MASK << shift;
+		newmask = (uintptr_t)state << shift;
 		do {
-			value = __hybrid_atomic_load(self->dp_pprop, __ATOMIC_ACQUIRE);
-		} while (!__hybrid_atomic_cmpxch_weak(self->dp_pprop, value, (value & ~mask) | newmask,
+			oldword = __hybrid_atomic_load(self->dp_pprop, __ATOMIC_ACQUIRE);
+		} while (!__hybrid_atomic_cmpxch_weak(self->dp_pprop,
+		                                      oldword, (oldword & ~valmask) | newmask,
 		                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
 	} else {
-		size_t i = (size_t)(relative_datapageid / (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS));
-		unsigned int j = (unsigned int)(relative_datapageid % (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS));
-		uintptr_t mask = VM_DATAPART_PPP_MASK << (j * VM_DATAPART_PPP_BITS);
-		uintptr_t newmask = state << (j * VM_DATAPART_PPP_BITS);
-		uintptr_t value;
+		size_t index;
+		unsigned int shift;
+		uintptr_t valmask, newmask, oldword;
 		__hybrid_assert(self->dp_pprop_p);
+		index = /* */ (size_t)(relative_datapageid / (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS));
+		shift = (unsigned int)(relative_datapageid % (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS));
+		shift *= VM_DATAPART_PPP_BITS;
+		valmask = (uintptr_t)VM_DATAPART_PPP_MASK << shift;
+		newmask = (uintptr_t)state << shift;
 		do {
-			value = __hybrid_atomic_load(self->dp_pprop_p[i], __ATOMIC_ACQUIRE);
-		} while (!__hybrid_atomic_cmpxch_weak(self->dp_pprop_p[i], value, (value & ~mask) | newmask,
+			oldword = __hybrid_atomic_load(self->dp_pprop_p[index], __ATOMIC_ACQUIRE);
+		} while (!__hybrid_atomic_cmpxch_weak(self->dp_pprop_p[index],
+		                                      oldword, (oldword & ~valmask) | newmask,
 		                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
 	}
-	return 1;
 }
 
-/* Atomically compare-exchange the state of a page, returning true/false if the exchange was successful. */
-#define VM_DATAPART_CMPXCHSTATE(self, relative_datapageid, oldval, newval) \
-	vm_datapart_cmpxchstate_impl(self, relative_datapageid, oldval, newval)
-LOCAL __BOOL KCALL
-vm_datapart_cmpxchstate_impl(struct vm_datapart *__restrict self,
-                             size_t relative_datapageid,
-                             unsigned int oldval, unsigned int newval) {
+/* Atomically compare-exchange the state of a page,
+ * returning true/false if the exchange was successful. */
+LOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
+NOTHROW(KCALL vm_datapart_cmpxchstate)(struct vm_datapart *__restrict self,
+                                       size_t relative_datapageid,
+                                       unsigned int oldval,
+                                       unsigned int newval) {
 	__hybrid_assert(!(oldval & ~VM_DATAPART_PPP_MASK));
 	__hybrid_assert(!(newval & ~VM_DATAPART_PPP_MASK));
 	__hybrid_assert(relative_datapageid < vm_datapart_numdpages(self));
 	if (!(self->dp_flags & VM_DATAPART_FLAG_HEAPPPP)) {
-		uintptr_t mask = VM_DATAPART_PPP_MASK << ((unsigned int)relative_datapageid * VM_DATAPART_PPP_BITS);
-		uintptr_t oldmask = oldval << ((unsigned int)relative_datapageid * VM_DATAPART_PPP_BITS);
-		uintptr_t newmask = newval << ((unsigned int)relative_datapageid * VM_DATAPART_PPP_BITS);
-		uintptr_t value;
+		unsigned int shift;
+		uintptr_t valmask, oldmask, newmask, oldword;
+		shift   = (unsigned int)relative_datapageid * VM_DATAPART_PPP_BITS;
+		valmask = (uintptr_t)VM_DATAPART_PPP_MASK << shift;
+		oldmask = (uintptr_t)oldval << shift;
+		newmask = (uintptr_t)newval << shift;
 		do {
-			value = __hybrid_atomic_load(self->dp_pprop, __ATOMIC_ACQUIRE);
-			if ((value & mask) != oldmask)
+			oldword = __hybrid_atomic_load(self->dp_pprop, __ATOMIC_ACQUIRE);
+			if ((oldword & valmask) != oldmask)
 				return 0;
-		} while (!__hybrid_atomic_cmpxch_weak(self->dp_pprop, value, (value & ~mask) | newmask,
+		} while (!__hybrid_atomic_cmpxch_weak(self->dp_pprop,
+		                                      oldword, (oldword & ~valmask) | newmask,
 		                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
 	} else {
-		size_t i = (size_t)(relative_datapageid / (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS));
-		unsigned int j = (unsigned int)(relative_datapageid % (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS));
-		uintptr_t mask = VM_DATAPART_PPP_MASK << (j * VM_DATAPART_PPP_BITS);
-		uintptr_t oldmask = oldval << (j * VM_DATAPART_PPP_BITS);
-		uintptr_t newmask = newval << (j * VM_DATAPART_PPP_BITS);
-		uintptr_t value;
+		size_t index;
+		unsigned int shift;
+		uintptr_t valmask, oldmask, newmask, value;
 		__hybrid_assert(self->dp_pprop_p);
+		index = /* */ (size_t)(relative_datapageid / (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS));
+		shift = (unsigned int)(relative_datapageid % (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS));
+		shift *= VM_DATAPART_PPP_BITS;
+		valmask = (uintptr_t)VM_DATAPART_PPP_MASK << shift;
+		oldmask = (uintptr_t)oldval << shift;
+		newmask = (uintptr_t)newval << shift;
 		do {
-			value = __hybrid_atomic_load(self->dp_pprop_p[i], __ATOMIC_ACQUIRE);
-			if ((value & mask) != oldmask)
+			value = __hybrid_atomic_load(self->dp_pprop_p[index], __ATOMIC_ACQUIRE);
+			if ((value & valmask) != oldmask)
 				return 0;
-		} while (!__hybrid_atomic_cmpxch_weak(self->dp_pprop_p[i], value, (value & ~mask) | newmask,
+		} while (!__hybrid_atomic_cmpxch_weak(self->dp_pprop_p[index],
+		                                      value, (value & ~valmask) | newmask,
 		                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
 	}
 	return 1;

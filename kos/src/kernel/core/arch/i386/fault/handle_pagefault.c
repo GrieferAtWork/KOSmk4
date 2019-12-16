@@ -639,7 +639,7 @@ do_unshare_cow:
 								count = VM_DATABLOCK_PAGEALIGN(part->dp_block);
 								for (i = 0; i < count; ++i) {
 									unsigned int part_state;
-									part_state = VM_DATAPART_GETSTATE(part, i);
+									part_state = vm_datapart_getstate(part, i);
 									if (VM_DATAPART_PPP_ISINITIALIZED(part_state))
 										continue;
 									/* Must initialize the part's first page! */
@@ -1004,6 +1004,7 @@ pop_connections_and_set_exception_pointers:
 	}
 done:
 	pagedir_syncone(addr);
+	pagedir_syncall();
 	return state;
 throw_segfault:
 	if (pc == (uintptr_t)addr) {

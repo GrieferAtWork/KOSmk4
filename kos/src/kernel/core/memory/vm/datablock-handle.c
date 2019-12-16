@@ -245,7 +245,7 @@ do_track_ramblocks:
 	}
 	for (i = 0; i < num_dpages; ++i) {
 		uintptr_t page_state;
-		page_state = VM_DATAPART_GETSTATE(self, i);
+		page_state = vm_datapart_getstate(self, i);
 		switch (page_state) {
 		case VM_DATAPART_PPP_UNINITIALIZED:
 			++st->ds_part_uninit_pages;

@@ -23,34 +23,35 @@
 #define _KOS_KERNEL_SOURCE 1
 
 #include "../../api.h"
-#include "x86.h"
+/**/
 
 #include <hybrid/compiler.h>
 
+#include <asm/cpu-flags.h>
+#include <asm/intrin.h>
+#include <kos/except.h>
+#include <kos/hybrid/library.h>
+#include <kos/kernel/cpu-state.h>
+#include <kos/kernel/gdt.h>
 #include <kos/types.h>
 
-#include <libregdump/x86.h>
-
 #include <format-printer.h>
-#include <asm/cpu-flags.h>
+#include <stdbool.h>
 #include <string.h>
-#include <kos/except.h>
+
+#include <libdebuginfo/addr2line.h>
 #include <libdisasm/disassembler.h>
 #include <libinstrlen/instrlen.h>
-#include <libdebuginfo/addr2line.h>
+#include <libregdump/x86.h>
 
-#include <kos/kernel/gdt.h>
-#include <kos/kernel/cpu-state.h>
-
-#include <asm/intrin.h>
-#include <stdbool.h>
-#include <kos/hybrid/library.h>
+#include "x86.h"
 
 #ifdef __KERNEL__
 #include <kernel/except.h>
 #include <kernel/gdt.h>
 #else /* __KERNEL__ */
 #include <hybrid/atomic.h>
+
 #include <dlfcn.h>
 #endif /* !__KERNEL__ */
 
@@ -73,9 +74,9 @@ err:               \
 
 #ifdef __x86_64__
 #define RPF  "r" /* RegisterPreFix */
-#else
+#else /* __x86_64__ */
 #define RPF  "e" /* RegisterPreFix */
-#endif
+#endif /* !__x86_64__ */
 
 #ifdef __x86_64__
 #define GPREGS_COUNT 16

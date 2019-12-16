@@ -272,7 +272,7 @@ do_unshare_cow:
 						unsigned int i, count, state;
 						count = VM_DATABLOCK_PAGEALIGN(part->dp_block);
 						for (i = 0; i < count; ++i) {
-							state = VM_DATAPART_GETSTATE(part, i);
+							state = vm_datapart_getstate(part, i);
 							if (VM_DATAPART_PPP_ISINITIALIZED(state))
 								continue;
 							/* Must initialize the part's first page! */

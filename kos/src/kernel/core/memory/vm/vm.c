@@ -690,7 +690,7 @@ NOTHROW(KCALL vm_datapart_get_page_permissions)(struct vm_datapart *__restrict s
 	unsigned int shift;
 	shift = VM_DATABLOCK_PAGESHIFT(self->dp_block);
 	if (shift == 0) {
-		mode = VM_DATAPART_GETSTATE(self, vpage_offset);
+		mode = vm_datapart_getstate(self, vpage_offset);
 		if (mode == VM_DATAPART_PPP_HASCHANGED)
 			;
 		else if (mode == VM_DATAPART_PPP_INITIALIZED) {
@@ -703,7 +703,7 @@ NOTHROW(KCALL vm_datapart_get_page_permissions)(struct vm_datapart *__restrict s
 		size_t count = (size_t)1 << shift;
 		start_offset = vpage_offset << shift;
 		for (i = 0; i < count; ++i) {
-			mode = VM_DATAPART_GETSTATE(self, start_offset + i);
+			mode = vm_datapart_getstate(self, start_offset + i);
 			if (mode == VM_DATAPART_PPP_HASCHANGED)
 				;
 			else if (mode == VM_DATAPART_PPP_INITIALIZED) {
@@ -1475,12 +1475,12 @@ vm_datapart_loadpage(struct vm_datapart *__restrict self,
 	if (page_shift == 0) {
 		/* No page shift --> Only a single bit to check/modify */
 again_readstate:
-		page_state = VM_DATAPART_GETSTATE(self, vpage_offset);
+		page_state = vm_datapart_getstate(self, vpage_offset);
 		switch (page_state) {
 
 		case VM_DATAPART_PPP_UNINITIALIZED:
 			/* It seems to fall upon us to initialize this page! */
-			if (!VM_DATAPART_CMPXCHSTATE(self,
+			if (!vm_datapart_cmpxchstate(self,
 			                             vpage_offset,
 			                             VM_DATAPART_PPP_UNINITIALIZED,
 			                             VM_DATAPART_PPP_INITIALIZING))
@@ -1499,19 +1499,19 @@ again_readstate:
 					assert(!wasdestroyed(self));
 				}
 			} EXCEPT {
-				VM_DATAPART_SETSTATE(self,
+				vm_datapart_setstate(self,
 				                     vpage_offset,
 				                     VM_DATAPART_PPP_UNINITIALIZED);
 				RETHROW();
 			}
 			/* Update the part's state to either indicate change, or full initialization */
 			if (*pchanged) {
-				VM_DATAPART_SETSTATE(self,
+				vm_datapart_setstate(self,
 				                     vpage_offset,
 				                     VM_DATAPART_PPP_HASCHANGED);
 				goto set_datapart_changed;
 			}
-			VM_DATAPART_SETSTATE(self,
+			vm_datapart_setstate(self,
 			                     vpage_offset,
 			                     VM_DATAPART_PPP_INITIALIZED);
 			break;
@@ -1523,7 +1523,7 @@ again_readstate:
 
 		case VM_DATAPART_PPP_INITIALIZED:
 			if (*pchanged) {
-				if (!VM_DATAPART_CMPXCHSTATE(self,
+				if (!vm_datapart_cmpxchstate(self,
 				                             vpage_offset,
 				                             VM_DATAPART_PPP_INITIALIZED,
 				                             VM_DATAPART_PPP_HASCHANGED))
@@ -1555,13 +1555,13 @@ set_datapart_changed:
 		n_data_pages            = 1 << page_shift;
 		for (; n_data_pages; --n_data_pages, ++starting_data_page) {
 again_readstate_multi:
-			page_state = VM_DATAPART_GETSTATE(self, starting_data_page);
+			page_state = vm_datapart_getstate(self, starting_data_page);
 			switch (page_state) {
 
 			case VM_DATAPART_PPP_UNINITIALIZED: {
 				unsigned int i, num_init_pages;
 				/* Try to initialize multiple consecutive parts all at once! */
-				if (!VM_DATAPART_CMPXCHSTATE(self,
+				if (!vm_datapart_cmpxchstate(self,
 				                             starting_data_page,
 				                             VM_DATAPART_PPP_UNINITIALIZED,
 				                             VM_DATAPART_PPP_INITIALIZING))
@@ -1577,7 +1577,7 @@ again_readstate_multi:
 				        "vm_datapart_numdpages(self) = %Iu\n",
 				        starting_data_page, n_data_pages, vm_datapart_numdpages(self));
 				while (num_init_pages < n_data_pages &&
-				       VM_DATAPART_CMPXCHSTATE(self,
+				       vm_datapart_cmpxchstate(self,
 				                               starting_data_page + num_init_pages,
 				                               VM_DATAPART_PPP_UNINITIALIZED,
 				                               VM_DATAPART_PPP_INITIALIZING))
@@ -1597,7 +1597,7 @@ again_readstate_multi:
 					}
 				} EXCEPT {
 					for (i = 0; i < num_init_pages; ++i) {
-						VM_DATAPART_SETSTATE(self,
+						vm_datapart_setstate(self,
 						                     starting_data_page + i,
 						                     VM_DATAPART_PPP_UNINITIALIZED);
 					}
@@ -1605,7 +1605,7 @@ again_readstate_multi:
 				}
 				if (*pchanged) {
 					for (i = 0; i < num_init_pages; ++i) {
-						VM_DATAPART_SETSTATE(self,
+						vm_datapart_setstate(self,
 						                     starting_data_page + i,
 						                     VM_DATAPART_PPP_HASCHANGED);
 					}
@@ -1620,7 +1620,7 @@ again_readstate_multi:
 					}
 				} else {
 					for (i = 0; i < num_init_pages; ++i) {
-						VM_DATAPART_SETSTATE(self,
+						vm_datapart_setstate(self,
 						                     starting_data_page + i,
 						                     VM_DATAPART_PPP_INITIALIZED);
 					}
@@ -1635,9 +1635,9 @@ again_readstate_multi:
 			case VM_DATAPART_PPP_INITIALIZING:
 				/* Wait for the initialization to be completed. */
 				task_tryyield_or_pause();
-				assertf(VM_DATAPART_GETSTATE(self, starting_data_page) != VM_DATAPART_PPP_INITIALIZING ||
+				assertf(vm_datapart_getstate(self, starting_data_page) != VM_DATAPART_PPP_INITIALIZING ||
 				        !task_isonlythread() ||
-				        VM_DATAPART_GETSTATE(self, starting_data_page) != VM_DATAPART_PPP_INITIALIZING,
+				        vm_datapart_getstate(self, starting_data_page) != VM_DATAPART_PPP_INITIALIZING,
 				        "Dangling `VM_DATAPART_PPP_INITIALIZING' part with only a single running thread\n"
 				        "self               = %p\n"
 				        "self->dp_flags     = %#Ix\n"
@@ -1663,7 +1663,7 @@ again_readstate_multi:
 
 			case VM_DATAPART_PPP_INITIALIZED:
 				if (*pchanged) {
-					if (!VM_DATAPART_CMPXCHSTATE(self,
+					if (!vm_datapart_cmpxchstate(self,
 					                             starting_data_page,
 					                             VM_DATAPART_PPP_INITIALIZED,
 					                             VM_DATAPART_PPP_HASCHANGED))
@@ -1715,12 +1715,12 @@ vm_datapart_loaddatapage(struct vm_datapart *__restrict self,
 	         PAGESIZE;
 	result += (uintptr_t)(dpage_offset & VM_DATABLOCK_PAGEMASK(block)) << VM_DATABLOCK_ADDRSHIFT(block);
 again_readstate:
-	page_state = VM_DATAPART_GETSTATE(self, dpage_offset);
+	page_state = vm_datapart_getstate(self, dpage_offset);
 	switch (page_state) {
 
 	case VM_DATAPART_PPP_UNINITIALIZED:
 		/* It seems to fall upon us to initialize this page! */
-		if (!VM_DATAPART_CMPXCHSTATE(self,
+		if (!vm_datapart_cmpxchstate(self,
 		                             dpage_offset,
 		                             VM_DATAPART_PPP_UNINITIALIZED,
 		                             VM_DATAPART_PPP_INITIALIZING))
@@ -1737,19 +1737,19 @@ again_readstate:
 				               1);
 			}
 		} EXCEPT {
-			VM_DATAPART_SETSTATE(self,
+			vm_datapart_setstate(self,
 			                     dpage_offset,
 			                     VM_DATAPART_PPP_UNINITIALIZED);
 			RETHROW();
 		}
 		/* Update the part's state to either indicate change, or full initialization */
 		if (for_writing) {
-			VM_DATAPART_SETSTATE(self,
+			vm_datapart_setstate(self,
 			                     dpage_offset,
 			                     VM_DATAPART_PPP_HASCHANGED);
 			goto set_datapart_changed;
 		}
-		VM_DATAPART_SETSTATE(self,
+		vm_datapart_setstate(self,
 		                     dpage_offset,
 		                     VM_DATAPART_PPP_INITIALIZED);
 		break;
@@ -1761,7 +1761,7 @@ again_readstate:
 
 	case VM_DATAPART_PPP_INITIALIZED:
 		if (for_writing) {
-			if (!VM_DATAPART_CMPXCHSTATE(self,
+			if (!vm_datapart_cmpxchstate(self,
 			                             dpage_offset,
 			                             VM_DATAPART_PPP_INITIALIZED,
 			                             VM_DATAPART_PPP_HASCHANGED))
@@ -2027,7 +2027,7 @@ NOTHROW(KCALL vm_datapart_haschanged)(struct vm_datapart *__restrict self,
 	assert(partrel_max_dpage < vm_datapart_numdpages(self));
 	for (i = partrel_min_dpage; i <= partrel_max_dpage; ++i) {
 		uintptr_t state;
-		state = VM_DATAPART_GETSTATE(self, i);
+		state = vm_datapart_getstate(self, i);
 		if (state == VM_DATAPART_PPP_HASCHANGED)
 			return true;
 	}
@@ -2336,14 +2336,14 @@ again_lock_datapart:
 		TRY {
 			size_t i, count;
 			for (i = partrel_min_dpage; i <= partrel_max_dpage;) {
-				if (VM_DATAPART_GETSTATE(self, i) != VM_DATAPART_PPP_HASCHANGED) {
+				if (vm_datapart_getstate(self, i) != VM_DATAPART_PPP_HASCHANGED) {
 					++i;
 					continue;
 				}
 				/* Search for continuous strips of modified pages. */
 				count = 1;
 				while (i + count <= partrel_max_dpage &&
-				       VM_DATAPART_GETSTATE(self, i) == VM_DATAPART_PPP_HASCHANGED)
+				       vm_datapart_getstate(self, i) == VM_DATAPART_PPP_HASCHANGED)
 					++count;
 				/* Actually save the data backing of the given range. */
 				vm_datapart_do_savepart(self,
@@ -2355,7 +2355,7 @@ again_lock_datapart:
 				 * NOTE: Some of them may have already changed in this manner, in case some other
 				 *       thread is/has also synced our part. */
 				for (; count--; ++i) {
-					if (VM_DATAPART_CMPXCHSTATE(self, i,
+					if (vm_datapart_cmpxchstate(self, i,
 					                            VM_DATAPART_PPP_HASCHANGED,
 					                            VM_DATAPART_PPP_INITIALIZED))
 						++result; /* Track the number of parts which we've actually synced */
@@ -2375,7 +2375,7 @@ again_lock_datapart:
 				size_t i;
 				partrel_max_dpage = vm_datapart_numdpages(self);
 				for (i = 0; i < partrel_max_dpage; ++i) {
-					if unlikely(VM_DATAPART_GETSTATE(self, i) == VM_DATAPART_PPP_HASCHANGED)
+					if unlikely(vm_datapart_getstate(self, i) == VM_DATAPART_PPP_HASCHANGED)
 						goto done_unlock_write; /* Further changes happened in the mean time. */
 				}
 				/* Unset the CHANGED bit, now that we're certain there aren't any further changes. */

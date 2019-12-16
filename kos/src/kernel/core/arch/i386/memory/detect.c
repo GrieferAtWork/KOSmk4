@@ -167,7 +167,7 @@ struct smap_entry {
 	u32 sm_acpi;
 };
 
-#define SMAP_BUFFER ((struct smap_entry *)(VM86_VIRT_OFFSET + 0x7c00))
+#define SMAP_BUFFER ((struct smap_entry *)VM86_BUFFER)
 INTDEF FREE u8 const memtype_bios_matrix[6];
 
 PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_e820)(void) {
@@ -231,7 +231,7 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_da88)(void) {
 	vm86_state_t state;
 	u32 count;
 	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
-	state.vr_regs.vr_eax   = 0xda88;
+	state.vr_regs.vr_eax = 0xda88;
 	if (!interrupt(&state, 0x15))
 		return false; /* Execute realmode interrupt. */
 	if (state.vr_regs.vr_eflags & EFLAGS_CF)
@@ -247,7 +247,7 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_88)(void) {
 	vm86_state_t state;
 	u32 count;
 	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
-	state.vr_regs.vr_eax   = 0x88;
+	state.vr_regs.vr_eax = 0x88;
 	if (!interrupt(&state, 0x15))
 		return false; /* Execute realmode interrupt. */
 	if (state.vr_regs.vr_eflags & EFLAGS_CF)
@@ -263,7 +263,7 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_8a)(void) {
 	vm86_state_t state;
 	u32 count;
 	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
-	state.vr_regs.vr_eax   = 0x8a;
+	state.vr_regs.vr_eax = 0x8a;
 	if (!interrupt(&state, 0x15))
 		return false; /* Execute realmode interrupt. */
 	if (state.vr_regs.vr_eflags & EFLAGS_CF)
@@ -289,9 +289,9 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_c7)(void) {
 	vm86_state_t state;
 	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
 	memset(C7_RECORD, 0, sizeof(*C7_RECORD));
-	state.vr_regs.vr_eax   = 0xc7;
-	state.vr_regs.vr_esi   = VM86_BUFFER_OFFSET;
-	state.vr_regs.vr_ds    = VM86_BUFFER_SEG;
+	state.vr_regs.vr_eax = 0xc7;
+	state.vr_regs.vr_esi = VM86_BUFFER_OFFSET;
+	state.vr_regs.vr_ds  = VM86_BUFFER_SEG;
 	if (!interrupt(&state, 0x15))
 		return false; /* Execute realmode interrupt. */
 	if (state.vr_regs.vr_eflags & EFLAGS_CF)
@@ -311,12 +311,12 @@ NOTHROW(KCALL log_beginmethod)(char const *name) {
 
 PRIVATE ATTR_FREETEXT void
 NOTHROW(KCALL log_okmethod)(char const *name) {
-	printk(FREESTR(KERN_INFO "[bios] Attempting memory detection method: %s (Ok)\n"), name);
+	printk(FREESTR(KERN_INFO "[bios] Attempting memory detection method: %s (ok)\n"), name);
 }
 
 PRIVATE ATTR_FREETEXT void
 NOTHROW(KCALL log_badmethod)(char const *name) {
-	printk(FREESTR(KERN_INFO "[bios] Attempting memory detection method: %s (Failed)\n"), name);
+	printk(FREESTR(KERN_INFO "[bios] Attempting memory detection method: %s (failed)\n"), name);
 }
 
 
@@ -342,8 +342,8 @@ NOTHROW(KCALL x86_initialize_memory_via_bios)(void) {
 	TRY_METHOD("c7", detect_c7());
 #undef TRY_METHOD
 	printk(FREESTR(KERN_WARNING "[bios] Insufficient memory detected. Try to guess available RAM\n"));
-#define RANGE(a, b) \
-	minfo_addbank((vm_phys_t)(a), (vm_phys_t)(b - a) + 1, PMEMBANK_TYPE_RAM)
+#define RANGE(min, max) \
+	minfo_addbank((vm_phys_t)(min), (vm_phys_t)((max) - (min)) + 1, PMEMBANK_TYPE_RAM)
 	/* Most likely that at least this memory exists... */
 	RANGE(0x00000500, 0x0008ffff);
 	/* TODO: Probe linear memory after the kernel core through trial-and-error */
