@@ -50,6 +50,25 @@ if (gcc_opt.remove("-O3"))
 
 #include "ps2-keymaps.h"
 
+/* TODO: Add a virtual indirection layer to the debugger input sub-system
+ * -> When it comes to user-input, the debugger should make use of
+ *    other kernel keyboard drivers to provide it with input, and
+ *    only fall-back to using this built-in PS/2 driver when no
+ *    keyboard device has yet to be registered.
+ * -> Currently, this PS/2 fallback driver breaks when the user
+ *    has a USB keyboard, and the USB driver has already disabled
+ *    PS/2-through-USB emulation. In this case, we'd have to poll
+ *    data from the keyboard driver instead!
+ * -> This would also solve the keymap problem by allowing the use
+ *    of whatever keymap has been loaded into individual keyboard
+ *    devices! */
+/* TODO: Re-enable PS/2-through-USB emulation after it has already been enabled.
+ *       This is required to ensure that the debugger works correctly when used
+ *       after emulation was already disabled, as might be the case following a
+ *       soft-reboot, or the debugger being invoked during USB initialization,
+ *       after PS/2 emulation was disabled, but before a USB keyboard was fully
+ *       initialized. */
+
 DECL_BEGIN
 
 LOCAL ATTR_DBGTEXT bool NOTHROW(KCALL ps2_write_cmd)(u8 cmd) {
