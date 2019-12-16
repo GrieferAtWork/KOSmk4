@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBDL_ARCH_I386_RT64_S
+#define GUARD_LIBDL_ARCH_I386_RT64_S 1
 
 #include <hybrid/compiler.h>
 #include <asm/cfi.h>
@@ -146,4 +148,4 @@ INTERN_FUNCTION(libdl_load_lazy_relocation)
 	.cfi_endproc
 END(libdl_load_lazy_relocation)
 
-
+#endif /* !GUARD_LIBDL_ARCH_I386_RT64_S */

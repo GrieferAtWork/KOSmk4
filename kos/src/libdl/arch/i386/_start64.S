@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBDL_ARCH_I386__START64_S
+#define GUARD_LIBDL_ARCH_I386__START64_S 1
 
 #include <hybrid/compiler.h>
 
@@ -48,8 +50,4 @@ INTERN_FUNCTION(linker_entry)
 	                    * PC = (struct process_rtld_elf)::pr_entry; */
 END(linker_entry)
 
-
-
-
-
-
+#endif /* !GUARD_LIBDL_ARCH_I386__START64_S */

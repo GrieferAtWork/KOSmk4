@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBDL_ARCH_I386__RTLD_LD
+#define GUARD_LIBDL_ARCH_I386__RTLD_LD 1
 
 #include <hybrid/compiler.h>
 #include <asm/pagesize.h>
@@ -129,3 +131,5 @@ SECTIONS {
 		*(.data.rel.local.DW.ref.__gxx_personality_v0)
 	}
 }
+
+#endif /* !GUARD_LIBDL_ARCH_I386__RTLD_LD */
