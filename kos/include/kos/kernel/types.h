@@ -80,7 +80,6 @@ typedef __uintptr_t refcnt_t;
 typedef __pageptr_t pageptr_t; /* Physical memory page index (`physical_address / PAGESIZE'). */
 #endif /* !__pageptr_t_defined */
 
-typedef /*VIRT*/ __vm_vpage_t   vm_vpage_t;   /* Virtual memory page index (`virtual_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
 typedef /*VIRT*/ __vm_vpage64_t vm_vpage64_t; /* Virtual memory page index (with at least 64 bits). */ /* DEPRECATED; REMOVE ME */
 typedef /*PHYS*/ __vm_spage_t   vm_spage_t;   /* Swap memory page index (`swap_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
 typedef /*VIRT*/ __vm_virt_t    vm_virt_t;    /* A virtual memory pointer. */ /* DEPRECATED; REMOVE ME */

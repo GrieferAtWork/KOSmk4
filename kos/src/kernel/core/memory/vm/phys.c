@@ -67,7 +67,7 @@ vm_copyfromphys(USER CHECKED void *dst,
 	if unlikely(!num_bytes) {
 		DEFINE_PUBLIC_SYMBOL(this_trampoline_page,
 		                     &this_trampoline_node.vn_node.a_vmin,
-		                     sizeof(vm_vpage_t));
+		                     sizeof(pageid_t));
 		return;
 	}
 	is_first = true;

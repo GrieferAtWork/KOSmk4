@@ -43,13 +43,13 @@
 
 DECL_BEGIN
 
-INTDEF byte_t __kernel_bootiob_startpage[] ASMNAME("__x86_iob_empty_pageid");
+INTDEF byte_t __x86_bootcpu_iob_startpage[] ASMNAME("__x86_iob_empty_pageid");
 
 /* The VM node used to represent the IOB mapping of the current CPU */
 PUBLIC ATTR_PERCPU struct vm_node thiscpu_x86_iobnode = {
 	/* .vn_node   = */ { NULL, NULL,
-	                     (vm_vpage_t)__kernel_bootiob_startpage,
-	                     (vm_vpage_t)__kernel_bootiob_startpage + 1 },
+	                     (pageid_t)__x86_bootcpu_iob_startpage,
+	                     (pageid_t)__x86_bootcpu_iob_startpage + 1 },
 	/* .vn_byaddr = */ LLIST_INITNODE,
 	/* .vn_prot   = */ VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED,
 	/* .vn_flags  = */ VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_KERNPRT,

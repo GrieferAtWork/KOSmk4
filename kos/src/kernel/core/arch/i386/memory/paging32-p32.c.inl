@@ -1078,7 +1078,7 @@ NOTHROW(KCALL pagedir_translate_p)(VIRT pagedir_t *__restrict self,
 }
 
 INTERN NOBLOCK bool
-NOTHROW(KCALL pagedir_ismapped_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t vpage) {
+NOTHROW(KCALL pagedir_ismapped_p)(VIRT pagedir_t *__restrict self, VIRT pageid_t vpage) {
 	u32 temp;
 	unsigned int vec2;
 	vec2 = P32_PDIR_VEC2INDEX_VPAGE(vpage);
@@ -1092,7 +1092,7 @@ NOTHROW(KCALL pagedir_ismapped_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage
 }
 
 INTERN NOBLOCK bool
-NOTHROW(KCALL pagedir_iswritable_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t vpage) {
+NOTHROW(KCALL pagedir_iswritable_p)(VIRT pagedir_t *__restrict self, VIRT pageid_t vpage) {
 	u32 temp;
 	unsigned int vec2;
 	vec2 = P32_PDIR_VEC2INDEX_VPAGE(vpage);
@@ -1106,7 +1106,7 @@ NOTHROW(KCALL pagedir_iswritable_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpa
 }
 
 INTERN NOBLOCK bool
-NOTHROW(KCALL pagedir_isuseraccessible_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t vpage) {
+NOTHROW(KCALL pagedir_isuseraccessible_p)(VIRT pagedir_t *__restrict self, VIRT pageid_t vpage) {
 	u32 temp;
 	unsigned int vec2;
 	vec2 = P32_PDIR_VEC2INDEX_VPAGE(vpage);
@@ -1120,7 +1120,7 @@ NOTHROW(KCALL pagedir_isuseraccessible_p)(VIRT pagedir_t *__restrict self, VIRT 
 }
 
 INTERN NOBLOCK bool
-NOTHROW(KCALL pagedir_isuserwritable_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t vpage) {
+NOTHROW(KCALL pagedir_isuserwritable_p)(VIRT pagedir_t *__restrict self, VIRT pageid_t vpage) {
 	u32 temp;
 	unsigned int vec2;
 	vec2 = P32_PDIR_VEC2INDEX_VPAGE(vpage);
@@ -1134,7 +1134,7 @@ NOTHROW(KCALL pagedir_isuserwritable_p)(VIRT pagedir_t *__restrict self, VIRT vm
 }
 
 INTERN NOBLOCK WUNUSED bool
-NOTHROW(KCALL pagedir_haschanged_p)(VIRT pagedir_t *__restrict self, VIRT vm_vpage_t vpage) {
+NOTHROW(KCALL pagedir_haschanged_p)(VIRT pagedir_t *__restrict self, VIRT pageid_t vpage) {
 	u32 temp;
 	unsigned int vec2;
 	vec2 = P32_PDIR_VEC2INDEX_VPAGE(vpage);
