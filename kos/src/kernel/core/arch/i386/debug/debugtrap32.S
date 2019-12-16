@@ -50,14 +50,14 @@ END(kernel_debugtrap)
 
 
 .section .text
-INTERN_FUNCTION(driver_invoke_initializer)
+INTERN_FUNCTION(driver_do_invoke_initializer)
 	.cfi_startproc
 	EXTERN(driver_initializer_personality)
 	.cfi_personality 0, driver_initializer_personality
 	call   *%ecx
 	ret
 	.cfi_endproc
-END(driver_invoke_initializer)
+END(driver_do_invoke_initializer)
 
 #define CPUSTATE_IS_ICPUSTATE
 #define CPUSTATE icpustate

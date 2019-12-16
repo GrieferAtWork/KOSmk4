@@ -1380,19 +1380,49 @@ err:
 	return NULL;
 }
 
-PRIVATE NONNULL((1)) void
-(KCALL call_destructor_at)(struct driver *__restrict self, uintptr_t funcaddr) {
-	if likely(funcaddr >= self->d_loadstart &&
-	          funcaddr < self->d_loadend) {
-		(*(void (*)(void))funcaddr)();
+/* Registers/thread-local variables that are saved/restored unconditionally
+ * before/after invocation of driver initializers/finalizers.
+ * This is done since driver init/fini functions may leave certain registers
+ * clobbered, such as `PREEMPTION_ENABLED()', which we must make certain to
+ * properly restore after invocation, as not doing so may cause later code
+ * to throw `E_WOULDBLOCK' when `task_yield()' is called with preemption
+ * disabled after a driver initializer failed to restore the preemption-
+ * enabled state. */
+struct driver_initstate {
+	pflag_t di_preemption; /* The old preemption state. */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL driver_init_savestate)(struct driver_initstate *__restrict self) {
+	self->di_preemption = PREEMPTION_PUSH();
+}
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL driver_init_loadstate)(struct driver_initstate const *__restrict self) {
+	PREEMPTION_POP(self->di_preemption);
+}
+
+
+PRIVATE NONNULL((1)) void FCALL
+call_destructor_at(struct driver *__restrict self, uintptr_t func) {
+	if likely(func >= self->d_loadstart &&
+	          func < self->d_loadend) {
+		struct driver_initstate st;
+		driver_init_savestate(&st);
+		TRY {
+			(*(void (*)(void))func)();
+		} EXCEPT {
+			driver_init_loadstate(&st);
+			RETHROW();
+		}
+		driver_init_loadstate(&st);
 	} else {
 		printk(KERN_ERR "Driver %q destructor at %p is out-of-bounds of %p...%p\n",
-		       self->d_name, funcaddr, self->d_loadstart, self->d_loadend);
+		       self->d_name, func, self->d_loadstart, self->d_loadend);
 	}
 }
 
-PRIVATE NONNULL((1)) void
-(KCALL driver_invoke_destructors)(struct driver *__restrict self) {
+PRIVATE NONNULL((1)) void KCALL
+driver_invoke_destructors(struct driver *__restrict self) {
 	uintptr_t fini_func        = 0;
 	uintptr_t *fini_array_base = NULL;
 	size_t fini_array_size     = 0;
@@ -3119,8 +3149,8 @@ again:
 	return true;
 }
 
-INTERN ATTR_WEAK NONNULL((1)) void FCALL
-driver_invoke_initializer(void (*func)(void)) {
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.driver.driver_do_invoke_initializer")
+NONNULL((1)) void FCALL driver_do_invoke_initializer(void (*func)(void)) {
 	TRY {
 		(*func)();
 	} EXCEPT {
@@ -3130,6 +3160,19 @@ driver_invoke_initializer(void (*func)(void)) {
 		RETHROW();
 	}
 }
+
+LOCAL void FCALL driver_invoke_initializer(void (*func)(void)) {
+	struct driver_initstate st;
+	driver_init_savestate(&st);
+	TRY {
+		driver_do_invoke_initializer(func);
+	} EXCEPT {
+		driver_init_loadstate(&st);
+		RETHROW();
+	}
+	driver_init_loadstate(&st);
+}
+
 
 PRIVATE NONNULL((1)) void KCALL
 driver_do_run_initializers(struct driver *__restrict self) THROWS(...) {
@@ -3983,15 +4026,15 @@ driver_insmod_file(struct regular_node *__restrict driver_inode,
 		THROW(E_NOT_EXECUTABLE_TOOLARGE);
 	num_bytes = CEIL_ALIGN((size_t)filesize, PAGESIZE);
 	temp_mapping = vm_map(&vm_kernel,
-	                       HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
-	                       num_bytes,
-	                       PAGESIZE,
-	                       HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
-	                       driver_inode,
-	                       0,
-	                       VM_PROT_READ | VM_PROT_SHARED,
-	                       VM_NODE_FLAG_NOMERGE,
-	                       0);
+	                      HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
+	                      num_bytes,
+	                      PAGESIZE,
+	                      HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
+	                      driver_inode,
+	                      0,
+	                      VM_PROT_READ | VM_PROT_SHARED,
+	                      VM_NODE_FLAG_NOMERGE,
+	                      0);
 	TRY {
 		/* Load the driver from the file blob. */
 		result = driver_do_insmod_blob((byte_t *)temp_mapping,

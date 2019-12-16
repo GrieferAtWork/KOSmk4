@@ -40,12 +40,14 @@ DECL_BEGIN
 
 #ifdef __CC__
 #define task_pause()    x86_pause()
-FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_pause)(void) {
+FORCELOCAL NOBLOCK void
+NOTHROW(KCALL x86_pause)(void) {
 	__asm__ __volatile__("pause");
 }
 
 /* Preemption control. */
-FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_enable)(void) {
+FORCELOCAL NOBLOCK void
+NOTHROW(KCALL x86_interrupt_enable)(void) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("sti"
 	                     :
@@ -54,7 +56,8 @@ FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_enable)(void) {
 	COMPILER_BARRIER();
 }
 
-FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_enable_wait)(void) {
+FORCELOCAL NOBLOCK void
+NOTHROW(KCALL x86_interrupt_enable_wait)(void) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("sti\n\t"
 	                     "hlt"
@@ -64,7 +67,8 @@ FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_enable_wait)(void) {
 	COMPILER_BARRIER();
 }
 
-FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_enable_wait_disable)(void) {
+FORCELOCAL NOBLOCK void
+NOTHROW(KCALL x86_interrupt_enable_wait_disable)(void) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("sti\n\t"
 	                     "hlt\n\t"
@@ -75,7 +79,8 @@ FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_enable_wait_disable)(void) {
 	COMPILER_BARRIER();
 }
 
-FORCELOCAL void NOTHROW(KCALL x86_interrupt_wait)(void) {
+FORCELOCAL void
+NOTHROW(KCALL x86_interrupt_wait)(void) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("hlt"
 	                     :
@@ -84,7 +89,8 @@ FORCELOCAL void NOTHROW(KCALL x86_interrupt_wait)(void) {
 	COMPILER_BARRIER();
 }
 
-FORCELOCAL ATTR_NORETURN void NOTHROW(KCALL x86_interrupt_halt)(void) {
+FORCELOCAL ATTR_NORETURN void
+NOTHROW(KCALL x86_interrupt_halt)(void) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("cli\n\t"
 	                     "hlt"
@@ -96,7 +102,8 @@ FORCELOCAL ATTR_NORETURN void NOTHROW(KCALL x86_interrupt_halt)(void) {
 	COMPILER_BARRIER();
 }
 
-FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_enable_p)(void) {
+FORCELOCAL NOBLOCK void
+NOTHROW(KCALL x86_interrupt_enable_p)(void) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("sti\n\t"
 	                     "nop"
@@ -106,7 +113,8 @@ FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_enable_p)(void) {
 	COMPILER_BARRIER();
 }
 
-FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_disable)(void) {
+FORCELOCAL NOBLOCK void
+NOTHROW(KCALL x86_interrupt_disable)(void) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("cli"
 	                     :
@@ -118,7 +126,8 @@ FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_disable)(void) {
 typedef uintptr_t pflag_t;
 
 #ifdef __x86_64__
-FORCELOCAL NOBLOCK pflag_t NOTHROW(KCALL x86_interrupt_enabled)(void) {
+FORCELOCAL NOBLOCK pflag_t
+NOTHROW(KCALL x86_interrupt_enabled)(void) {
 	pflag_t result;
 	__asm__ __volatile__("pushfq\n\t"
 	                     "popq %0"
@@ -128,7 +137,35 @@ FORCELOCAL NOBLOCK pflag_t NOTHROW(KCALL x86_interrupt_enabled)(void) {
 	return result & 0x00000200; /* EFLAGS_IF */
 }
 
-FORCELOCAL NOBLOCK pflag_t NOTHROW(KCALL x86_interrupt_pushoff)(void) {
+FORCELOCAL NOBLOCK pflag_t
+NOTHROW(KCALL x86_interrupt_push)(void) {
+	pflag_t result;
+	COMPILER_BARRIER();
+	__asm__ __volatile__("pushfq\n\t"
+	                     "popq %0"
+	                     : "=g" (result)
+	                     :
+	                     : "memory");
+	COMPILER_BARRIER();
+	return result & 0x00000200; /* EFLAGS_IF */
+}
+
+FORCELOCAL NOBLOCK pflag_t
+NOTHROW(KCALL x86_interrupt_pushon)(void) {
+	pflag_t result;
+	COMPILER_BARRIER();
+	__asm__ __volatile__("pushfq\n\t"
+	                     "popq %0\n\t"
+	                     "sti"
+	                     : "=g" (result)
+	                     :
+	                     : "memory");
+	COMPILER_BARRIER();
+	return result & 0x00000200; /* EFLAGS_IF */
+}
+
+FORCELOCAL NOBLOCK pflag_t
+NOTHROW(KCALL x86_interrupt_pushoff)(void) {
 	pflag_t result;
 	COMPILER_BARRIER();
 	__asm__ __volatile__("pushfq\n\t"
@@ -141,7 +178,8 @@ FORCELOCAL NOBLOCK pflag_t NOTHROW(KCALL x86_interrupt_pushoff)(void) {
 	return result & 0x00000200; /* EFLAGS_IF */
 }
 
-FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_pop)(pflag_t flag) {
+FORCELOCAL NOBLOCK void
+NOTHROW(KCALL x86_interrupt_pop)(pflag_t flag) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("pushq %0\n\t"
 	                     "popfq"
@@ -153,7 +191,8 @@ FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_pop)(pflag_t flag) {
 
 #else /* __x86_64__ */
 
-FORCELOCAL NOBLOCK pflag_t NOTHROW(KCALL x86_interrupt_enabled)(void) {
+FORCELOCAL NOBLOCK pflag_t
+NOTHROW(KCALL x86_interrupt_enabled)(void) {
 	pflag_t result;
 	__asm__ __volatile__("pushfl\n\t"
 	                     "popl %0"
@@ -163,7 +202,35 @@ FORCELOCAL NOBLOCK pflag_t NOTHROW(KCALL x86_interrupt_enabled)(void) {
 	return result & 0x00000200; /* EFLAGS_IF */
 }
 
-FORCELOCAL NOBLOCK pflag_t NOTHROW(KCALL x86_interrupt_pushoff)(void) {
+FORCELOCAL NOBLOCK pflag_t
+NOTHROW(KCALL x86_interrupt_push)(void) {
+	pflag_t result;
+	COMPILER_BARRIER();
+	__asm__ __volatile__("pushfl\n\t"
+	                     "popl %0"
+	                     : "=g" (result)
+	                     :
+	                     : "memory");
+	COMPILER_BARRIER();
+	return result & 0x00000200; /* EFLAGS_IF */
+}
+
+FORCELOCAL NOBLOCK pflag_t
+NOTHROW(KCALL x86_interrupt_pushon)(void) {
+	pflag_t result;
+	COMPILER_BARRIER();
+	__asm__ __volatile__("pushfl\n\t"
+	                     "popl %0\n\t"
+	                     "sti"
+	                     : "=g" (result)
+	                     :
+	                     : "memory");
+	COMPILER_BARRIER();
+	return result & 0x00000200; /* EFLAGS_IF */
+}
+
+FORCELOCAL NOBLOCK pflag_t
+NOTHROW(KCALL x86_interrupt_pushoff)(void) {
 	pflag_t result;
 	COMPILER_BARRIER();
 	__asm__ __volatile__("pushfl\n\t"
@@ -176,7 +243,8 @@ FORCELOCAL NOBLOCK pflag_t NOTHROW(KCALL x86_interrupt_pushoff)(void) {
 	return result & 0x00000200; /* EFLAGS_IF */
 }
 
-FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_pop)(pflag_t flag) {
+FORCELOCAL NOBLOCK void
+NOTHROW(KCALL x86_interrupt_pop)(pflag_t flag) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("pushl %0\n\t"
 	                     "popfl"
@@ -193,6 +261,8 @@ FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_pop)(pflag_t flag) {
 #define PREEMPTION_ENABLE_P()            x86_interrupt_enable_p()
 #define PREEMPTION_DISABLE()             x86_interrupt_disable()
 #define PREEMPTION_ENABLED()             x86_interrupt_enabled()
+#define PREEMPTION_PUSH()                x86_interrupt_push()
+#define PREEMPTION_PUSHON()              x86_interrupt_pushon()
 #define PREEMPTION_PUSHOFF()             x86_interrupt_pushoff()
 #define PREEMPTION_WASENABLED(flag)    ((flag) & 0x00000200 /* EFLAGS_IF */)
 #define PREEMPTION_WAIT()                x86_interrupt_wait()
