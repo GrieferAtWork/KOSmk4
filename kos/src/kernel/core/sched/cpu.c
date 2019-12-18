@@ -852,7 +852,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	caller = THIS_TASK;
 	assert(caller->t_flags & TASK_FRUNNING);
 	if unlikely(caller->t_flags & TASK_FCRITICAL) {
-		kernel_panic("Attempted to exit critical thread %p [tid=%u]",
+		kernel_panic("Critical thread %p [tid=%u] has exited",
 		             caller, task_getroottid_of_s(caller));
 	}
 
