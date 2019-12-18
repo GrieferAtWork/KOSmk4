@@ -39,8 +39,8 @@ INTERN_FUNCTION(x86_dbgidt_pagefault)
 	.cfi_startproc simple
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 8 /* Adjust for the error code. */
-	intr_enter INTR
 	popq_cfi -(SIZEOF_GPREGSNSP + 8)(%rsp) /* ECODE */
+	intr_enter INTR
 	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
 	movq   -8(%rsp), %rsi /* ECODE */
 	movq   %rsp, %rdi
