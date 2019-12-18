@@ -406,7 +406,11 @@ DEFINE_DEBUG_FUNCTION(
 #ifndef __ARCH_STACK_GROWS_DOWNWARDS
 				iter -= sizeof(void *);
 #endif /* __ARCH_STACK_GROWS_DOWNWARDS */
-				pc = *(void **)iter;
+				TRY {
+					pc = *(void **)iter;
+				} EXCEPT {
+					break;
+				}
 				if (!is_pc(pc))
 					continue;
 				if (is_first) {

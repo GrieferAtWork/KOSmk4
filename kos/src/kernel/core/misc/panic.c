@@ -107,11 +107,13 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
                            struct ucpustate const *__restrict dumpstate) {
 	unsigned int error;
 	struct ucpustate state;
+	struct exception_info saved_info;
 #ifdef LOG_STACK_REMAINDER
 	uintptr_t last_good_sp;
 #endif /* LOG_STACK_REMAINDER */
 	fixup_potential_system_inconsistencies();
 	memcpy(&state, dumpstate, sizeof(struct ucpustate));
+	memcpy(&saved_info, &THIS_EXCEPTION_INFO, sizeof(struct exception_info));
 #ifdef LOG_STACK_REMAINDER
 	last_good_sp = ucpustate_getsp(&state);
 #endif /* LOG_STACK_REMAINDER */
@@ -160,7 +162,11 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 #ifndef __ARCH_STACK_GROWS_DOWNWARDS
 				iter -= sizeof(void *);
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
-				pc = *(void **)iter;
+				TRY {
+					pc = *(void **)iter;
+				} EXCEPT {
+					break;
+				}
 				if (!is_pc(pc))
 					continue;
 				if (is_first) {
@@ -176,6 +182,7 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 		}
 	}
 #endif /* LOG_STACK_REMAINDER */
+	memcpy(&THIS_EXCEPTION_INFO, &saved_info, sizeof(struct exception_info));
 }
 
 
