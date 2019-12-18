@@ -201,12 +201,14 @@ NOTHROW(KCALL saveorig)(void) {
 		 * undefined registers ripple down to the exit state. */
 		set_trapstate_from_fcpustate(&x86_dbg_origstate);
 #ifndef CONFIG_NO_SMP
-	} else if (dbg_current->t_cpu->c_current == dbg_current) {
+	} else if (dbg_current->t_cpu &&
+	           dbg_current->t_cpu->c_current == dbg_current) {
 		cpuid_t cpuid;
 		struct icpustate *ist;
 		struct x86_dbg_cpuammend *ammend;
 		/* The current thread of a different CPU. */
 		cpuid  = dbg_current->t_cpu->c_id;
+		assert(cpuid < COMPILER_LENOF(x86_dbg_hostbackup.dhs_cpus));
 		ist    = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_istate;
 		ammend = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_iammend;
 		assert(ist);
@@ -254,6 +256,8 @@ NOTHROW(KCALL saveorig)(void) {
 			if unlikely(!dbg_current->t_cpu)
 				goto nocpu;
 			cpuid = dbg_current->t_cpu->c_id;
+			if unlikely(cpuid >= COMPILER_LENOF(x86_dbg_hostbackup.dhs_cpus))
+				goto nocpu;
 			if (x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_istate) {
 				struct x86_dbg_cpuammend *ammend;
 				ammend = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_iammend;
@@ -307,13 +311,15 @@ NOTHROW(KCALL loadview)(void) {
 			/* DBG_REGLEVEL_ORIG = DBG_REGLEVEL_TRAP */
 			get_fcpustate_from_trapstate(&x86_dbg_origstate);
 #ifndef CONFIG_NO_SMP
-		} else if (dbg_current->t_cpu->c_current == dbg_current) {
+		} else if (dbg_current->t_cpu &&
+		           dbg_current->t_cpu->c_current == dbg_current) {
 			cpuid_t cpuid;
 			struct icpustate *ist;
 			struct x86_dbg_cpuammend *ammend;
 			uintptr_t psp;
 			/* The current thread of a different CPU. */
 			cpuid  = dbg_current->t_cpu->c_id;
+			assert(cpuid < COMPILER_LENOF(x86_dbg_hostbackup.dhs_cpus));
 			ist    = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_istate;
 			ammend = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_iammend;
 			assert(ist);
@@ -408,6 +414,8 @@ NOTHROW(KCALL loadview)(void) {
 				if unlikely(!dbg_current->t_cpu)
 					goto nocpu;
 				cpuid = dbg_current->t_cpu->c_id;
+				if unlikely(cpuid >= COMPILER_LENOF(x86_dbg_hostbackup.dhs_cpus))
+					goto nocpu;
 				if (x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_istate) {
 					struct x86_dbg_cpuammend *ammend;
 					ammend = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_iammend;
