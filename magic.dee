@@ -177,9 +177,6 @@ function build(reconfigure: Callable = none) {
 	import . as me;
 	reconfigure(me);
 
-	if (CONFIG_DONT_BUILD)
-		return;
-
 	{
 		final local XARCH  = TARGET.XARCH;
 		final local SUFFIX = TARGET.SUFFIX;
@@ -192,6 +189,10 @@ function build(reconfigure: Callable = none) {
 #define END             }
 #include "kos/.sources"
 	}
+
+	/* NOTE: Must always load groups for stuff like like magic-driven %{vinfo} */
+	if (CONFIG_DONT_BUILD)
+		return;
 
 	/* Check that source generators are up-to-date. */
 	import updateAutomaticSourcesOnDemand from .kos.misc.magicgenerator.ondemand;

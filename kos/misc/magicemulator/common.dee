@@ -397,6 +397,7 @@ again_find_match:
 					for (local file, line, func: a2l.addr2line(address)) {
 						if (!is_first)
 							writeData("\n");
+						is_first = false;
 						printFormattedAddr2line(
 							outFile: outFile,
 							format: argument,
@@ -404,7 +405,20 @@ again_find_match:
 							line: line,
 							func: func,
 							addr: req_address);
-						is_first = false;
+					}
+					if (is_first) {
+						printFormattedAddr2line(
+							outFile: outFile,
+							format: argument,
+							file: "??" "?",
+							line: 0,
+							func: "??" "?",
+							addr: req_address);
+						writeData(" (a2l:{!r}:{!r}:{})".format({
+							findDiskFileOrigin(groups, binary),
+							binary,
+							address
+						}));
 					}
 				}	break;
 				case "vload":
