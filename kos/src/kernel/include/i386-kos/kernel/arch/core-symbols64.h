@@ -5250,10 +5250,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak path_lock_write; .quad path_lock_write
 	.reloc ., R_X86_64_SIZE32, path_lock_write; .int 0
 	.int 0xb88f385
-	.quad .Lname1312 /* index: 1312 */
-	.weak x86_userexcept_unwind_interrupt_esp; .quad x86_userexcept_unwind_interrupt_esp
-	.reloc ., R_X86_64_SIZE32, x86_userexcept_unwind_interrupt_esp; .int 0
-	.int 0x3239520
+	.quad 0 /* index: 1312 */
+	.quad 0
+	.int 0
+	.int 0
 	.quad 0 /* index: 1313 */
 	.quad 0
 	.int 0
@@ -8578,10 +8578,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak debuginfo_print_value; .quad debuginfo_print_value
 	.reloc ., R_X86_64_SIZE32, debuginfo_print_value; .int 0
 	.int 0x8b66165
-	.quad .Lname2144 /* index: 2144 */
-	.weak x86_userexcept_unwind_interrupt_kernel_esp; .quad x86_userexcept_unwind_interrupt_kernel_esp
-	.reloc ., R_X86_64_SIZE32, x86_userexcept_unwind_interrupt_kernel_esp; .int 0
-	.int 0x69cd860
+	.quad 0 /* index: 2144 */
+	.quad 0
+	.int 0
+	.int 0
 	.quad 0 /* index: 2145 */
 	.quad 0
 	.int 0
@@ -13698,10 +13698,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak error_info; .quad error_info
 	.reloc ., R_X86_64_SIZE32, error_info; .int 0
 	.int 0x6834d5f
-	.quad 0 /* index: 3424 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname3424 /* index: 3424 */
+	.weak x86_userexcept_unwind_interrupt_kernel_rsp; .quad x86_userexcept_unwind_interrupt_kernel_rsp
+	.reloc ., R_X86_64_SIZE32, x86_userexcept_unwind_interrupt_kernel_rsp; .int 0
+	.int 0x69ced60
 	.quad .Lname3425 /* index: 3425 */
 	.weak memrlenq; .quad memrlenq
 	.reloc ., R_X86_64_SIZE32, memrlenq; .int 0
@@ -15618,10 +15618,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak format_quote; .quad format_quote
 	.reloc ., R_X86_64_SIZE32, format_quote; .int 0
 	.int 0xbe3535
-	.quad 0 /* index: 3904 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname3904 /* index: 3904 */
+	.weak x86_userexcept_unwind_interrupt_rsp; .quad x86_userexcept_unwind_interrupt_rsp
+	.reloc ., R_X86_64_SIZE32, x86_userexcept_unwind_interrupt_rsp; .int 0
+	.int 0x323a020
 	.quad .Lname3905 /* index: 3905 */
 	.weak dbg_setscreendata; .quad dbg_setscreendata
 	.reloc ., R_X86_64_SIZE32, dbg_setscreendata; .int 0
@@ -18208,8 +18208,6 @@ END(kernel_symbol_table)
 	.string "vm_datapart_do_read_phys"
 .Lname1311:
 	.string "path_lock_write"
-.Lname1312:
-	.string "x86_userexcept_unwind_interrupt_esp"
 .Lname1315:
 	.string "sys32_getcpu"
 .Lname1316:
@@ -19302,8 +19300,6 @@ END(kernel_symbol_table)
 	.string "path_lock_trywrite"
 .Lname2143:
 	.string "debuginfo_print_value"
-.Lname2144:
-	.string "x86_userexcept_unwind_interrupt_kernel_esp"
 .Lname2148:
 	.string "json_parser_rewind"
 .Lname2149:
@@ -21090,6 +21086,8 @@ END(kernel_symbol_table)
 	.string "vm_datapart_lock_downgrade"
 .Lname3423:
 	.string "error_info"
+.Lname3424:
+	.string "x86_userexcept_unwind_interrupt_kernel_rsp"
 .Lname3425:
 	.string "memrlenq"
 .Lname3426:
@@ -21792,6 +21790,8 @@ END(kernel_symbol_table)
 	.string "syscall_tracing_setenabled"
 .Lname3903:
 	.string "format_quote"
+.Lname3904:
+	.string "x86_userexcept_unwind_interrupt_rsp"
 .Lname3905:
 	.string "dbg_setscreendata"
 .Lname3906:

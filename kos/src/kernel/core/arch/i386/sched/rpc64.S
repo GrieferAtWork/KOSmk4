@@ -102,7 +102,7 @@ PUBLIC_FUNCTION(x86_rpc_user_redirection)
 	sti
 
 	/* Now save all of the user-space GP registers to create an icpustate. */
-	ASM_PUSH_GPREGSNSP_CFI_R
+	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
 
 INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 
@@ -142,8 +142,8 @@ INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 	 * getting here while the current IRET tail still points into
 	 * userspace when `x86_userexcept_propagate()' is invoked! */
 	je     1f
-	PUBLIC(x86_userexcept_unwind_interrupt_kernel_esp)
-	jmp    x86_userexcept_unwind_interrupt_kernel_esp
+	PUBLIC(x86_userexcept_unwind_interrupt_kernel_rsp)
+	jmp    x86_userexcept_unwind_interrupt_kernel_rsp
 
 2:	/* User-space target */
 	movq   %rsp, %rdi /* struct icpustate *__restrict state */
@@ -155,7 +155,7 @@ INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 	.cfi_def_cfa_register %rsp
 
 1:	/* Restore the state after exception propagation. */
-	ASM_POP_GPREGSNSP_CFI_R
+	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
 	intr_exit
 	.cfi_endproc
 END(x86_serve_user_rpc_and_propagate_exceptions)
@@ -172,13 +172,28 @@ END(x86_rpc_user_redirection)
 .section .text
 	.cfi_startproc simple
 	.cfi_signal_frame
-	/* TODO: .cfi_* */
+	.cfi_def_cfa %rbp, 0
+	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
 	EXTERN(x86_rpc_kernel_redirection_personality)
 	.cfi_personality 0, x86_rpc_kernel_redirection_personality
 	nop /* Required to allow for detection during unwinding. */
 INTERN_FUNCTION(x86_rpc_kernel_redirection)
-	/* TODO: Come up with, and document the register state here. */
-	call kernel_panic_here /* TODO */
+	/* RAX:    <task_rpc_t func>
+	 * RDI:    <void *arg>
+	 * RSI:    <struct icpustate *>    (contains the return location; also used for CFI)
+	 * RDX:    <unsigned int reason>
+	 * RCX:    <(struct rpc_syscall_info *)0>
+	 * RSP:    <struct icpustate *>    (Alias for `RSI')
+	 * EFLAGS: <0>                     (interrupts are disabled)
+	 * CS:     <SEGMENT_KERNEL_CODE>
+	 * SS:     <SEGMENT_KERNEL_DATA>
+	 * GS.BASE:<THIS_TASK>
+	 * *:      Undefined */
+	call   *%rax
+	movq   %rax, %rsp
+	.cfi_def_cfa_register %rsp
+	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
+	intr_exit
 END(x86_rpc_kernel_redirection)
 .cfi_endproc
 
@@ -187,9 +202,25 @@ END(x86_rpc_kernel_redirection)
 INTERN_FUNCTION(x86_rpc_kernel_redirection_handler)
 	.cfi_startproc simple
 	.cfi_signal_frame
-	/* TODO: .cfi_* */
-	/* TODO: Come up with, and document the register state here. */
-	call kernel_panic_here /* TODO */
+	.cfi_def_cfa %rbp, 0
+	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
+	/* RAX:    <task_rpc_t func>
+	 * RDI:    <void *arg>
+	 * RSI:    <struct icpustate *>    (contains the return location; also used for CFI)
+	 * RDX:    <unsigned int reason>
+	 * RCX:    <(struct rpc_syscall_info *)0>
+	 * RSP:    <struct icpustate *>    (Alias for `RSI')
+	 * EFLAGS: <0>                     (interrupts are disabled)
+	 * CS:     <SEGMENT_KERNEL_CODE>
+	 * SS:     <SEGMENT_KERNEL_DATA>
+	 * GS.BASE:<THIS_TASK>
+	 * *:      Undefined */
+	call   *%rax
+	movq   %rax, %rsp
+	.cfi_def_cfa_register %rsp
+	/* Continue unwinding the exception that brought us here. */
+	EXTERN(x86_userexcept_unwind_interrupt_rsp)
+	jmp    x86_userexcept_unwind_interrupt_rsp
 END(x86_rpc_kernel_redirection_handler)
 .cfi_endproc
 
@@ -218,7 +249,7 @@ PUBLIC_FUNCTION(task_rpc_exec_here)
 	.cfi_rel_offset %cs, 0
 	pushq_cfi %rax                   /* ir_rip */
 	.cfi_rel_offset %rip, 0
-	ASM_PUSH_GPREGSNSP_CFI_R
+	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
 
 	movq   %rdi, %rax                     /* <task_rpc_t func> */
 	movq   %rsi, %rdi                     /* <void *arg> */
@@ -228,7 +259,7 @@ PUBLIC_FUNCTION(task_rpc_exec_here)
 	call   *%rax
 	movq   %rax, %rsp
 
-	ASM_POP_GPREGSNSP_CFI_R
+	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
 	intr_exit
 	.cfi_endproc
 END(task_rpc_exec_here)
@@ -247,7 +278,7 @@ PUBLIC_FUNCTION(task_rpc_exec_here_onexit)
 	pushfq_cfi                       /* ir_rflags */
 	pushq_cfi $(SEGMENT_KERNEL_CODE) /* ir_cs */
 	pushq_cfi (5 * 8)(%rsp)          /* ir_rip */
-	ASM_PUSH_GPREGSNSP_CFI_R
+	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
 
 	movq   %rdi, %rax                        /* <task_rpc_t func> */
 	movq   %rsi, %rdi                        /* <void *arg> */
@@ -304,7 +335,7 @@ PUBLIC_FUNCTION(task_serve)
 
 	movq   $(1), %rax /* Return $1 later on (unless overwritten by RPC functions themself) */
 
-	ASM_PUSH_GPREGSNSP_CFI_R
+	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
 
 1:	movq   %rsp, %rdi
 	/* Service a single RPC function */
@@ -323,7 +354,7 @@ PUBLIC_FUNCTION(task_serve)
 	je     1b
 #endif
 
-	ASM_POP_GPREGSNSP_CFI_R
+	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
 	intr_exit
 	.cfi_endproc
 END(task_serve)
@@ -370,7 +401,7 @@ PUBLIC_FUNCTION(task_serve_nx)
 
 	/* Return $1 later on (unless overwritten by RPC functions themself) */
 	movq   $(TASK_SERVE_NX_DIDRUN), %rax
-	ASM_PUSH_GPREGSNSP_CFI_R
+	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
 
 1:	movq   %rsp, %rdi
 	/* Service a single RPC function */
@@ -388,7 +419,7 @@ PUBLIC_FUNCTION(task_serve_nx)
 	orq    %rax, (OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RAX)(%rsp)
 #endif
 
-	ASM_POP_GPREGSNSP_CFI_R
+	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
 	cmpq   $(0), %gs:this_rpc_pending_sync_count
 	je     1f
 	orq    $(TASK_SERVE_NX_XPENDING), %rax

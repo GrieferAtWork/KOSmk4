@@ -298,10 +298,11 @@ INTERN_FUNCTION(x86_rpc_kernel_redirection)
 	 * FS:     <SEGMENT_KERNEL_FSBASE>
 	 * GS:     Already restored
 	 * *:      Undefined */
-	pushl  $(0)   /* `struct rpc_syscall_info *sc_info' */
-	pushl  %ebx /* `unsigned int reason' */
+	pushl  $(0)  /* `struct rpc_syscall_info *sc_info' */
+	pushl  %ebx  /* `unsigned int reason' */
 	call   *%eax
 	movl   %eax, %esp
+	.cfi_def_cfa_register %esp
 
 	/* Load the updated CPU state */
 	popal_cfi_r
@@ -355,6 +356,7 @@ INTERN_FUNCTION(x86_rpc_kernel_redirection_handler)
 	pushl  %ebx /* reason */
 	call   *%eax
 	movl   %eax, %esp
+	.cfi_def_cfa_register %esp
 	/* Continue unwinding the exception that brought us here. */
 	EXTERN(x86_userexcept_unwind_interrupt_esp)
 	jmp    x86_userexcept_unwind_interrupt_esp

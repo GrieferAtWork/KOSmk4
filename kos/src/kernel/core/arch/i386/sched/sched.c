@@ -210,7 +210,18 @@ NOTHROW(KCALL cpu_enable_preemptive_interrupts_nopr)(void) {
 
 #ifdef __x86_64__
 
-/* TODO: Come up with, and document the register state here. */
+/* RAX:    <task_rpc_t func>
+ * RDI:    <void *arg>
+ * RSI:    <struct icpustate *>    (contains the return location; also used for CFI)
+ * RDX:    <unsigned int reason>
+ * RCX:    <(struct rpc_syscall_info *)0>
+ * RSP:    <struct icpustate *>    (Alias for `RSI')
+ * RBP:    <struct icpustate *>    (Alias for `RSI')
+ * EFLAGS: <0>                     (interrupts are disabled)
+ * CS:     <SEGMENT_KERNEL_CODE>
+ * SS:     <SEGMENT_KERNEL_DATA>
+ * GS.BASE:<THIS_TASK>
+ * *:      Undefined */
 INTDEF void ASMCALL x86_rpc_kernel_redirection(void);
 INTDEF void ASMCALL x86_rpc_kernel_redirection_handler(void);
 
@@ -224,10 +235,32 @@ PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
 NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
                                           task_rpc_t func,
                                           void *arg) {
-	(void)state;
-	(void)func;
-	(void)arg;
-	kernel_panic("TODO");
+	struct icpustate *rpc_state;   /* The state used/returned by `func()' */
+	struct scpustate *sched_state; /* The new scheduler state that we will return (and that will invoke `x86_rpc_kernel_redirection') */
+	rpc_state   = (struct icpustate *)(((byte_t *)state + SIZEOF_SCPUSTATE) - SIZEOF_ICPUSTATE);
+	sched_state = (struct scpustate *)((byte_t *)rpc_state - SIZEOF_SCPUSTATE);
+	sched_state->scs_sgregs = state->scs_sgregs; /* Have the scheduler load the same segment registers */
+	sched_state->scs_sgbase = state->scs_sgbase; /* Have the scheduler load the same segment bases */
+	memmoveup(&rpc_state->ics_gpregs, &state->scs_gpregs, sizeof(struct gpregsnsp)); /* Pass the original GP registers to `func' */
+	assert(&rpc_state->ics_irregs == &state->scs_irregs);
+	/* Set-up the register state for calling `x86_rpc_kernel_redirection()' */
+#ifndef NDEBUG
+	memset(&sched_state->scs_gpregs, 0xcc, sizeof(sched_state->scs_gpregs));
+#endif /* !NDEBUG */
+	sched_state->scs_irregs.ir_ss     = SEGMENT_KERNEL_DATA;
+	sched_state->scs_irregs.ir_rsp    = (u64)rpc_state;
+	sched_state->scs_irregs.ir_rflags = 0;
+	sched_state->scs_irregs.ir_cs     = SEGMENT_KERNEL_CODE;
+	sched_state->scs_irregs.ir_rip    = (u64)(void *)&x86_rpc_kernel_redirection;
+	sched_state->scs_gpregs.gp_rax    = (u64)(void *)func;
+	sched_state->scs_gpregs.gp_rdi    = (u64)arg;
+	sched_state->scs_gpregs.gp_rsi    = (u64)rpc_state;
+	sched_state->scs_gpregs.gp_rbp    = (u64)rpc_state;
+	sched_state->scs_gpregs.gp_rdx    = icpustate_isuser(rpc_state) /* FIXME: This uses THIS_TASK, but should use the thread of `state' */
+	                                    ? TASK_RPC_REASON_ASYNCUSER
+	                                    : TASK_RPC_REASON_ASYNC;
+	sched_state->scs_gpregs.gp_rcx    = 0;
+	return sched_state;
 }
 
 
@@ -238,11 +271,35 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
                                             task_rpc_t func,
                                             void const *buf,
                                             size_t bufsize) {
-	(void)state;
-	(void)func;
-	(void)buf;
-	(void)bufsize;
-	kernel_panic("TODO");
+	struct icpustate *rpc_state;   /* The state used/returned by `func()' */
+	struct scpustate *sched_state; /* The new scheduler state that we will return (and that will invoke `x86_rpc_kernel_redirection') */
+	void *bufcopy;
+	rpc_state   = (struct icpustate *)(((byte_t *)state + SIZEOF_SCPUSTATE) - SIZEOF_ICPUSTATE);
+	bufcopy     = (byte_t *)rpc_state - bufsize;
+	sched_state = (struct scpustate *)((byte_t *)bufcopy - SIZEOF_SCPUSTATE);
+	sched_state->scs_sgregs = state->scs_sgregs; /* Have the scheduler load the same segment registers */
+	sched_state->scs_sgbase = state->scs_sgbase; /* Have the scheduler load the same segment bases */
+	memmoveup(&rpc_state->ics_gpregs, &state->scs_gpregs, sizeof(struct gpregsnsp)); /* Pass the original GP registers to `func' */
+	assert(&rpc_state->ics_irregs == &state->scs_irregs);
+	/* Set-up the register state for calling `x86_rpc_kernel_redirection()' */
+#ifndef NDEBUG
+	memset(&sched_state->scs_gpregs, 0xcc, sizeof(sched_state->scs_gpregs));
+#endif /* !NDEBUG */
+	memcpy(bufcopy, buf, bufsize);
+	sched_state->scs_irregs.ir_ss     = SEGMENT_KERNEL_DATA;
+	sched_state->scs_irregs.ir_rsp    = (u64)rpc_state;
+	sched_state->scs_irregs.ir_rflags = 0;
+	sched_state->scs_irregs.ir_cs     = SEGMENT_KERNEL_CODE;
+	sched_state->scs_irregs.ir_rip    = (u64)(void *)&x86_rpc_kernel_redirection;
+	sched_state->scs_gpregs.gp_rax    = (u64)(void *)func;
+	sched_state->scs_gpregs.gp_rdi    = (u64)bufcopy;
+	sched_state->scs_gpregs.gp_rsi    = (u64)rpc_state;
+	sched_state->scs_gpregs.gp_rbp    = (u64)rpc_state;
+	sched_state->scs_gpregs.gp_rdx    = icpustate_isuser(rpc_state) /* FIXME: This uses THIS_TASK, but should use the thread of `state' */
+	                                    ? TASK_RPC_REASON_ASYNCUSER
+	                                    : TASK_RPC_REASON_ASYNC;
+	sched_state->scs_gpregs.gp_rcx    = 0;
+	return sched_state;
 }
 
 
@@ -321,7 +378,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
 	result = (struct scpustate *)dest;
 	/* Fill in the new state to generate a redirection towards the RPC wrapper. */
 	result->scs_gpregs.gp_ebp   = (uintptr_t)istate;
-	result->scs_gpregs.gp_ebx   = irregs_isuser(&istate->ics_irregs)
+	result->scs_gpregs.gp_ebx   = icpustate_isuser(istate) /* FIXME: This uses THIS_TASK, but should use the thread of `state' */
 	                              ? TASK_RPC_REASON_ASYNCUSER
 	                              : TASK_RPC_REASON_ASYNC;
 	result->scs_gpregs.gp_edx   = (uintptr_t)istate;
@@ -372,7 +429,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
 	result = (struct scpustate *)dest;
 	/* Fill in the new state to generate a redirection towards the RPC wrapper. */
 	result->scs_gpregs.gp_ebp = (uintptr_t)istate;
-	result->scs_gpregs.gp_ebx = irregs_isuser(&istate->ics_irregs)
+	result->scs_gpregs.gp_ebx = icpustate_isuser(istate) /* FIXME: This uses THIS_TASK, but should use the thread of `state' */
 	                            ? TASK_RPC_REASON_ASYNCUSER
 	                            : TASK_RPC_REASON_ASYNC;
 	result->scs_gpregs.gp_edx = (uintptr_t)istate;

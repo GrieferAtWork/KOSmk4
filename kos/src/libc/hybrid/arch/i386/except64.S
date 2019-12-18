@@ -524,36 +524,22 @@ END(libc_error_throw)
 PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt)
 	.cfi_startproc simple
 	.cfi_signal_frame
-	.cfi_restore_iret_rip
-	.cfi_restore_iret_cs
-	.cfi_restore_iret_rflags
-	.cfi_restore_iret_rsp
-	.cfi_restore_iret_ss
-	.cfi_def_cfa %rdi, OFFSET_ICPUSTATE_IRREGS
-	ASM_CFI_REL_OFFSET_RESTORE_GPREGSNSP(OFFSET_ICPUSTATE_GPREGSNSP)
+	.cfi_def_cfa %rdi, 0
+	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
 	movq   %rdi, %rsp
 	.cfi_def_cfa_register %rsp
-PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_esp)
+PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_rsp)
 	/* Check if the interrupt state points into user-space. */
 	testq  $(3), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS(%rsp)
 	EXTERN(x86_serve_user_rpc_and_propagate_exceptions)
 	jnz    x86_serve_user_rpc_and_propagate_exceptions
-	.cfi_endproc
-
 
 	/* The interrupt points into kernel-space (or possibly towards
 	 * `x86_rpc_user_redirection', which is also kernel-space). */
-	.cfi_startproc simple
-	.cfi_signal_frame
-	.cfi_def_cfa %rsp, SIZEOF_ICPUSTATE
-	ASM_CFI_REL_OFFSET_RESTORE_GPREGSNSP(OFFSET_ICPUSTATE_GPREGSNSP)
-	.cfi_rel_offset %rflags, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_RFLAGS
-	.cfi_rel_offset %rip, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_RIP
-	.cfi_rel_offset %rsp, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_RSP
-/*	.cfi_rel_offset %cs, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS */
-/*	.cfi_rel_offset %ss, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_SS */
+	.cfi_same_value %cs
+	.cfi_same_value %ss
 
-PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_kernel_esp)
+PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_kernel_rsp)
 	/* NOTE: RPC guaranties never to modify a kernel-target iret tail, meaning
 	 *       we're entirely safe to modify the tail without having to worry
 	 *       about intervention of RPC callbacks! */
@@ -605,8 +591,8 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_kernel_esp)
 
 	jmp    .Ldo_unwind_rsp
 	.cfi_endproc
-END(x86_userexcept_unwind_interrupt_kernel_esp)
-END(x86_userexcept_unwind_interrupt_esp)
+END(x86_userexcept_unwind_interrupt_kernel_rsp)
+END(x86_userexcept_unwind_interrupt_rsp)
 END(x86_userexcept_unwind_interrupt)
 
 #endif /* __KERNEL__ */

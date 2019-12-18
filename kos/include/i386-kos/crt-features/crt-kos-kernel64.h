@@ -2834,8 +2834,8 @@
 #define __CRT_HAVE_x86_userexcept_unwind 1
 #define __CRT_HAVE_x86_userexcept_unwind_i 1
 #define __CRT_HAVE_x86_userexcept_unwind_interrupt 1
-#define __CRT_HAVE_x86_userexcept_unwind_interrupt_esp 1
-#define __CRT_HAVE_x86_userexcept_unwind_interrupt_kernel_esp 1
+#define __CRT_HAVE_x86_userexcept_unwind_interrupt_kernel_rsp 1
+#define __CRT_HAVE_x86_userexcept_unwind_interrupt_rsp 1
 #define __CRT_HAVE_zlib_reader_feed 1
 #define __CRT_HAVE_zlib_reader_fini 1
 #define __CRT_HAVE_zlib_reader_init 1
