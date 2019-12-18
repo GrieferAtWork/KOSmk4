@@ -207,7 +207,6 @@ NOTHROW(KCALL vm_datapart_service_stale)(struct vm_datapart *__restrict self) {
 		assert(chain->vn_part == self);
 		LLIST_REMOVE(chain, vn_link);
 		weakdecref(chain->vn_vm); /* `weakincref()' in `vm_node_destroy()' */
-		decref_unlikely(chain->vn_block);
 		/*decref_nokill(self); // The reference to `vn_part' was already dropped! (s.a. `vm_node_destroy()') */
 		vm_node_free(chain);
 		chain = next;
