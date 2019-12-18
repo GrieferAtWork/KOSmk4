@@ -294,6 +294,8 @@ PRIVATE ATTR_DBGTEXT struct av_sections_lock *
 NOTHROW(FCALL av_lock_sections)(uintptr_t symbol_addr) {
 	unsigned int i;
 	struct av_sections_lock *resent = NULL;
+	if unlikely(!ADDR_ISKERN(symbol_addr))
+		goto done;
 	for (i = 0; i < COMPILER_LENOF(av_sections_cache); ++i) {
 		if (!av_sections_cache[i].sl_driver) {
 			if (!resent)
@@ -315,7 +317,8 @@ NOTHROW(FCALL av_lock_sections)(uintptr_t symbol_addr) {
 	}
 	resent->sl_driver = NULL;
 	if (!av_do_lock_sections(resent, symbol_addr))
-		return NULL;
+		resent = NULL;
+done:
 	return resent;
 }
 
@@ -355,6 +358,8 @@ PRIVATE ATTR_DBGTEXT struct av_symbol *
 NOTHROW(FCALL av_lookup_symbol)(uintptr_t symbol_addr) {
 	unsigned int i;
 	struct av_symbol *resent = NULL;
+	if unlikely(!ADDR_ISKERN(symbol_addr))
+		goto done;
 	for (i = 0; i < COMPILER_LENOF(av_symbol_cache); ++i) {
 		if (!av_symbol_cache[i].s_name) {
 			if (!resent)
@@ -380,8 +385,9 @@ NOTHROW(FCALL av_lookup_symbol)(uintptr_t symbol_addr) {
 		resent->s_name  = (char *)-2;
 		resent->s_start = symbol_addr;
 		resent->s_end   = symbol_addr + 1;
-		return NULL;
+		resent = NULL;
 	}
+done:
 	return resent;
 }
 

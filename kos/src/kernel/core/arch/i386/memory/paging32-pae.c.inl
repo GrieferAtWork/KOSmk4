@@ -193,12 +193,11 @@ NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self) {
 	e3[1] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
 	e3[2] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
 	e3[3] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
-	vm_copytophys_onepage((vm_phys_t)(e3[3] & ~(PAE_PAGE_FACCESSED |
-	                                            PAE_PAGE_FWRITE |
-	                                            PAE_PAGE_FPRESENT)) +
+	/* Identity mapping */
+	vm_copytophys_onepage((vm_phys_t)(e3[3] & PAE_PAGE_FVECTOR) +
 	                      508 * 8,
 	                      e3,
-	                      4 * 8); /* Identity mapping */
+	                      4 * 8);
 	return true;
 err_3:
 	page_ccfree((pageptr_t)e3[2], 1);

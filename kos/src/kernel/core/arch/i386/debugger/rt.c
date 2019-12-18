@@ -24,6 +24,7 @@ if (gcc_opt.remove("-O3"))
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_RT_C
 #define GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_RT_C 1
 #define DISABLE_BRANCH_PROFILING 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -37,12 +38,14 @@ if (gcc_opt.remove("-O3"))
 #include <kernel/gdt.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
+#include <kernel/vm/phys.h>
 #include <sched/cpu.h>
 #include <sched/task.h>
 #include <sched/tss.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+#include <hybrid/host.h>
 
 #include <asm/farptr.h>
 #include <asm/intrin.h>
@@ -51,6 +54,7 @@ if (gcc_opt.remove("-O3"))
 
 #include <alloca.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include <libcpustate/apply.h>
@@ -540,6 +544,90 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 	               __kernel_dbg_init_end);
 }
 
+#ifdef __x86_64__
+PRIVATE ATTR_DBGTEXT void KCALL
+reset_pdir_p64(struct p64_pdir *__restrict self, u64 phys_self) {
+	/* kernel-space */
+	memcpyq(self->p_e4 + 256, P64_PDIR_E4_IDENTITY + 256, 256);
+	/* Set the control word for the page directory identity mapping. */
+	self->p_e4[257].p_word = (u64)phys_self | P64_PAGE_FACCESSED | P64_PAGE_FWRITE | P64_PAGE_FPRESENT;
+}
+#else /* __x86_64__ */
+#ifndef CONFIG_NO_PAGING_PAE
+PRIVATE ATTR_DBGTEXT bool KCALL
+reset_pdir_pae(struct pae_pdir *__restrict self) {
+	u64 e3[4];
+	unsigned int i;
+	for (i = 0; i < 4; ++i) {
+		e3[i] = self->p_e3[i].p_word;
+		if (!(e3[i] & PAE_PAGE_FPRESENT))
+			return false;
+	}
+	/* Kernel share (copy from our own page directory) */
+	vm_copytophys_onepage((vm_phys_t)e3[3] & PAE_PAGE_FVECTOR,
+	                      PAE_PDIR_E2_IDENTITY[3], 508 * 8);
+	e3[0] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
+	e3[1] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
+	e3[2] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
+	e3[3] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
+	/* Identity mapping */
+	vm_copytophys_onepage((vm_phys_t)(e3[3] & PAE_PAGE_FVECTOR) +
+	                      508 * 8,
+	                      e3,
+	                      4 * 8); /* Identity mapping */
+	return true;
+}
+#endif /* !CONFIG_NO_PAGING_PAE */
+
+#ifndef CONFIG_NO_PAGING_P32
+PRIVATE ATTR_DBGTEXT void KCALL
+reset_pdir_p32(struct p32_pdir *__restrict self, u32 phys_self) {
+	/* Copy P2 pointers that are shared with the kernel. */
+	memcpyl(&self->p_e2[768], &P32_PDIR_E2_IDENTITY[768], 1023 - 768);
+
+	/* Create the identity mapping */
+	self->p_e2[1023].p_word = ((u32)phys_self |
+	                           (P32_PAGE_FACCESSED | P32_PAGE_FWRITE |
+	                            P32_PAGE_FPRESENT));
+}
+#endif /* !CONFIG_NO_PAGING_P32 */
+#endif /* !__x86_64__ */
+
+PRIVATE ATTR_DBGTEXT void KCALL
+reset_pdir(struct task *mythread) {
+	struct vm *myvm;
+	myvm = mythread->t_vm;
+	if unlikely(!myvm)
+		return;
+	if unlikely((vm_phys_t)myvm->v_pdir_phys_ptr != pagedir_translate(&myvm->v_pagedir))
+		return;
+	if unlikely(((uintptr_t)myvm->v_pdir_phys & PAGEMASK) != 0)
+		return;
+	if (myvm == &vm_kernel)
+		return; /* nothing to do here. */
+
+	/* Make sure that the kernel-share segment of `myvm' is initialized correctly! */
+#ifdef __x86_64__
+	reset_pdir_p64(&myvm->v_pagedir, (u64)myvm->v_pdir_phys_ptr);
+#elif defined(CONFIG_NO_PAGING_PAE)
+	reset_pdir_p32(&myvm->v_pagedir.pd_p32, (u32)myvm->v_pdir_phys_ptr);
+#elif defined(CONFIG_NO_PAGING_P32)
+	if (!reset_pdir_pae(&myvm->v_pagedir.pd_pae))
+		return;
+#else
+	if (X86_PAGEDIR_USES_PAE()) {
+		if (!reset_pdir_pae(&myvm->v_pagedir.pd_pae))
+			return;
+	} else {
+		reset_pdir_p32(&myvm->v_pagedir.pd_p32, (u32)myvm->v_pdir_phys_ptr);
+	}
+#endif
+
+	/* The page directory seems to be consistent. -> Use it instead to
+	 * minimize the number of necessary page directory switches when
+	 * inspecting memory. */
+	pagedir_set(myvm->v_pdir_phys_ptr);
+}
 
 INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 	struct cpu *mycpu;
@@ -569,6 +657,9 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 	/* Set our own thread as the current thread. */
 	dbg_current        = mythread;
 	x86_dbg_viewthread = NULL;
+
+	/* Try to make use of the ~real~ page directory of `mythread' */
+	reset_pdir(mythread);
 
 	/* Reset the debugger TTY */
 	dbg_reset_tty();
