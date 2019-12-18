@@ -76,7 +76,11 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 #define R_USED_PC32           R_X86_64_PC32
 #define R_USED_PC64           R_X86_64_PC64
 #define R_USED_GLOB_DAT       R_X86_64_GLOB_DAT
+#if __SIZEOF_POINTER__ == 4
 #define R_USED_RELATIVE32     R_X86_64_RELATIVE
+#else /* __SIZEOF_POINTER__ == 4 */
+#define R_USED_RELATIVE64_ALT R_X86_64_RELATIVE
+#endif /* __SIZEOF_POINTER__ != 4 */
 #define R_USED_RELATIVE64     R_X86_64_RELATIVE64
 #define R_USED_IRELATIVE64    R_X86_64_IRELATIVE
 #define R_USED_SIZE32         R_X86_64_SIZE32
@@ -106,12 +110,18 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 #endif /* R_USED_RELATIVE32 */
 
 
+#if defined(R_USED_RELATIVE64) || defined(R_USED_RELATIVE64_ALT)
 #ifdef R_USED_RELATIVE64
 		case R_USED_RELATIVE64:
 #undef R_USED_RELATIVE64
+#endif /* R_USED_RELATIVE64 */
+#ifdef R_USED_RELATIVE64_ALT
+		case R_USED_RELATIVE64_ALT:
+#undef R_USED_RELATIVE64_ALT
+#endif /* R_USED_RELATIVE64_ALT */
 			*(u64 *)reladdr SET_OR_INPLACE_ADD (u64)(uintptr_t)(loadaddr + REL_ADDEND);
 			break;
-#endif /* R_USED_RELATIVE64 */
+#endif /* R_USED_RELATIVE64 || R_USED_RELATIVE64_ALT */
 
 
 #ifdef R_USED_IRELATIVE32

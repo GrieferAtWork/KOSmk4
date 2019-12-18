@@ -2693,7 +2693,8 @@ typedef Elf32_Addr Elf32_Conflict;
 #define R_X86_64_GLOB_DAT       6       /* [RTLD] Create GOT entry */
 #define R_X86_64_JUMP_SLOT      7       /* [RTLD] Create PLT entry */
 #define R_X86_64_JMP_SLOT R_X86_64_JUMP_SLOT
-#define R_X86_64_RELATIVE       8       /* [RTLD] 32-bit adjust by program base */
+#define R_X86_64_RELATIVE       8       /* [RTLD] 64-bit adjust by program base (x64)
+                                         * [RTLD] 32-bit adjust by program base (x32) */
 #define R_X86_64_GOTPCREL       9       /* 32 bit signed PC relative offset to GOT */
 #define R_X86_64_32             10      /* [RTLD] Direct 32 bit zero extended */
 #define R_X86_64_32S            11      /* [RTLD] Direct 32 bit sign extended */

@@ -25,6 +25,8 @@
 #include "elf.h"
 /**/
 
+#include <hybrid/typecore.h>
+
 #include <kos/process.h>
 #include <kos/syscalls.h>
 
