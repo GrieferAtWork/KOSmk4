@@ -123,11 +123,13 @@ PRIVATE char const gpregs_names[GPREGS_COUNT][2] = {
 #endif /* !__x86_64__ */
 
 #ifdef __x86_64__
+#define GPREGS_PER_LINE 2
 INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_gpregs_with_sp(struct regdump_printer *__restrict self,
                           struct gpregsnsp const *__restrict data,
                           uintptr_t sp)
 #else /* __x86_64__ */
+#define GPREGS_PER_LINE 4
 INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_gpregs_with_sp(struct regdump_printer *__restrict self,
                           struct gpregs const *__restrict data,
@@ -163,8 +165,8 @@ libregdump_gpregs_with_sp(struct regdump_printer *__restrict self,
 		printf("%p", i == 3 ? sp : ((uintptr_t *)data)[i]);
 #endif /* !__x86_64__ */
 		format(REGDUMP_FORMAT_VALUE_SUFFIX);
-		print((i % 4) == 3 ? "\n" : " ", 1);
-		if ((i % 4) == 3 && i != GPREGS_COUNT - 1)
+		print((i % GPREGS_PER_LINE) == (GPREGS_PER_LINE - 1) ? "\n" : " ", 1);
+		if ((i % GPREGS_PER_LINE) == (GPREGS_PER_LINE - 1) && i != GPREGS_COUNT - 1)
 			format(REGDUMP_FORMAT_INDENT);
 	}
 	END;
@@ -973,7 +975,7 @@ libregdump_flags(struct regdump_printer *__restrict self,
 	format(REGDUMP_FORMAT_REGISTER_SUFFIX);
 	PRINT(" ");
 	format(REGDUMP_FORMAT_VALUE_PREFIX);
-	printf("%p", flags);
+	printf("%.4p", flags);
 	format(REGDUMP_FORMAT_VALUE_SUFFIX);
 	PRINT(" [");
 	arith[0] = flags & EFLAGS_CF ? 'c' : '-';

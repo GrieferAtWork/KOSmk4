@@ -39,6 +39,8 @@
 #include <stddef.h>
 #include <string.h>
 
+#include <libinstrlen/instrlen.h>
+
 DECL_BEGIN
 
 /* Note that unlike all other interrupt handlers, the double-fault handler
@@ -103,8 +105,10 @@ INTERN struct df_cpustate *FCALL
 x86_handle_double_fault(struct df_cpustate *__restrict state) {
 #ifdef __x86_64__
 	printk(KERN_EMERG "Double fault at %p\n", state->dcs_regs.ics_irregs.ir_rip);
+	state->dcs_regs.ics_irregs.ir_rip = (uintptr_t)instruction_trysucc((void *)state->dcs_regs.ics_irregs.ir_rip);
 #else /* __x86_64__ */
 	printk(KERN_EMERG "Double fault at %p\n", state->dcs_regs.ucs_eip);
+	state->dcs_regs.ucs_eip = (uintptr_t)instruction_trysucc((void *)state->dcs_regs.ucs_eip);
 #endif /* !__x86_64__ */
 	{
 		struct ucpustate ustate;

@@ -37,6 +37,7 @@
 #include <sched/cpu.h>
 #include <sched/task.h>
 
+#include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
@@ -132,6 +133,8 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 	rd_printer.rdp_format      = &indent_regdump_print_format;
 	regdump_gpregs(&rd_printer, &ustate->ucs_gpregs);
 	regdump_ip(&rd_printer, ucpustate_getpc(ustate));
+	regdump_flags(&rd_printer, ustate->ucs_pflags);
+	printk(KERN_EMERG "\n");
 	regdump_sgregs_with_cs_ss_tr_ldt(&rd_printer, &ustate->ucs_sgregs,
 	                                 ustate->ucs_cs, ustate->ucs_ss,
 	                                 __str(), __sldt());
