@@ -749,7 +749,7 @@ NOTHROW(KCALL driver_destroy)(struct driver *__restrict self) {
 	/* Invoke dynamic driver unloading callbacks. */
 	driver_unloaded_callbacks(self);
 
-	printk(KERN_NOTICE "[-] Delmod: %q\n", self->d_name);
+	printk(KERN_NOTICE "[mod][-] Delmod: %q\n", self->d_name);
 
 	/* Service any remaining dead sections! */
 	driver_do_service_dead_sections(self);
@@ -1410,14 +1410,14 @@ call_destructor_at(struct driver *__restrict self, uintptr_t func) {
 		struct driver_initstate st;
 		driver_init_savestate(&st);
 		TRY {
-			(*(void (*)(void))func)();
+			(*(void(*)(void))func)();
 		} EXCEPT {
 			driver_init_loadstate(&st);
 			RETHROW();
 		}
 		driver_init_loadstate(&st);
 	} else {
-		printk(KERN_ERR "Driver %q destructor at %p is out-of-bounds of %p...%p\n",
+		printk(KERN_ERR "[mod] Driver %q destructor at %p is out-of-bounds of %p...%p\n",
 		       self->d_name, func, self->d_loadstart, self->d_loadend);
 	}
 }
@@ -1441,7 +1441,7 @@ driver_invoke_destructors(struct driver *__restrict self) {
 			                                self->d_dynhdr[i].d_un.d_ptr);
 			break;
 		case DT_FINI_ARRAYSZ:
-			fini_array_size = (size_t)self->d_dynhdr[i].d_un.d_val / sizeof(void (*)(void));
+			fini_array_size = (size_t)self->d_dynhdr[i].d_un.d_val / sizeof(void(*)(void));
 			break;
 		default: break;
 		}
@@ -2959,7 +2959,7 @@ found_symbol:
 		dep      = self;
 		goto found_symbol;
 	}
-	printk(KERN_ERR "Relocation against unknown symbol %q in driver %q\n",
+	printk(KERN_ERR "[mod] Relocation against unknown symbol %q in driver %q\n",
 	       symbol_name, self->d_name);
 	THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_SYMBOL);
 }
@@ -3174,6 +3174,16 @@ LOCAL void FCALL driver_invoke_initializer(void (*func)(void)) {
 	driver_init_loadstate(&st);
 }
 
+LOCAL void FCALL
+driver_invoke_initializer_s(uintptr_t func, struct driver *__restrict self) {
+	if unlikely(func < self->d_loadstart || func >= self->d_loadend) {
+		printk(KERN_ERR "[mod] Bad init function in driver %q (%p is out-of-bounds of %p...%p, loadaddr:%p)\n",
+		       self->d_name, func, self->d_loadstart, self->d_loadend - 1, self->d_loadaddr);
+		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_INIT_FUNC);
+	}
+	driver_invoke_initializer((void(*)(void))func);
+}
+
 
 PRIVATE NONNULL((1)) void KCALL
 driver_do_run_initializers(struct driver *__restrict self) THROWS(...) {
@@ -3198,7 +3208,7 @@ driver_do_run_initializers(struct driver *__restrict self) THROWS(...) {
 			break;
 
 		case DT_PREINIT_ARRAYSZ:
-			preinit_array_size = (size_t)self->d_dynhdr[dyni].d_un.d_val / sizeof(void (*)(void));
+			preinit_array_size = (size_t)self->d_dynhdr[dyni].d_un.d_val / sizeof(void(*)(void));
 			break;
 
 		case DT_INIT_ARRAY:
@@ -3206,7 +3216,7 @@ driver_do_run_initializers(struct driver *__restrict self) THROWS(...) {
 			break;
 
 		case DT_INIT_ARRAYSZ:
-			init_array_size = (size_t)self->d_dynhdr[dyni].d_un.d_val / sizeof(void (*)(void));
+			init_array_size = (size_t)self->d_dynhdr[dyni].d_un.d_val / sizeof(void(*)(void));
 			break;
 
 		default: break;
@@ -3216,23 +3226,16 @@ done_dyntag:
 	for (i = 0; i < preinit_array_size; ++i) {
 		uintptr_t init_addr;
 		init_addr = preinit_array_base[i] /* + self->d_loadaddr*/;
-		if unlikely(init_addr < self->d_loadstart || init_addr >= self->d_loadend)
-			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_INIT_FUNC);
-		driver_invoke_initializer(*(void (*)(void))init_addr);
+		driver_invoke_initializer_s(init_addr, self);
 	}
 	/* Service a init function, if one was specified. */
-	if (init_func) {
-		if unlikely(init_func < self->d_loadstart || init_func >= self->d_loadend)
-			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_INIT_FUNC);
-		driver_invoke_initializer(*(void (*)(void))init_func);
-	}
+	if (init_func)
+		driver_invoke_initializer_s(init_func, self);
 	/* Service init-array functions in forward order. */
 	for (i = 0; i < init_array_size; ++i) {
 		uintptr_t init_addr;
 		init_addr = init_array_base[i] /* + self->d_loadaddr*/;
-		if unlikely(init_addr < self->d_loadstart || init_addr >= self->d_loadend)
-			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_INIT_FUNC);
-		driver_invoke_initializer((void (*)(void))init_addr);
+		driver_invoke_initializer_s(init_addr, self);
 	}
 }
 
@@ -3944,7 +3947,7 @@ done_dynsym:
 		kfree(result);
 		RETHROW();
 	}
-	printk(KERN_NOTICE "[+] Insmod: %q\n", result->d_name);
+	printk(KERN_NOTICE "[mod][+] Insmod: %q\n", result->d_name);
 	if (!(flags & DRIVER_INSMOD_FLAG_NOINIT)) {
 		TRY {
 			/* Load dependencies of the driver. */
