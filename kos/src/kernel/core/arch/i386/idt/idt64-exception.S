@@ -18,12 +18,16 @@
  */
 #ifdef __INTELLISENSE__
 #include "idt64.S"
-#define IDT_VECTOR 0e
+#define IDT_VECTOR 08
 #endif /* __INTELLISENSE__ */
 
 #if IDT_CONFIG_GETDPL(IDT_VECTOR_ID) == 3
 IDT_HANDLER_SETDPL(3)
 #endif /* IDT_CONFIG_GETDPL(IDT_VECTOR_ID) == 3 */
+
+#if IDT_VECTOR_ID == 0x8
+IDT_HANDLER_SETIST(1)
+#endif /* IDT_VECTOR_ID == 0x8 */
 
 IDT_HANDLER_BEGIN
 	.cfi_startproc simple

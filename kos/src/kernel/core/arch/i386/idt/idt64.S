@@ -49,6 +49,9 @@
 #define IDT_HANDLER_SETDPL(dpl)                    \
 	INTERN(PP_CAT2(x86_idtdpl_, IDT_VECTOR_NAME)); \
 	.set PP_CAT2(x86_idtdpl_, IDT_VECTOR_NAME), dpl;
+#define IDT_HANDLER_SETIST(ist)                    \
+	INTERN(PP_CAT2(x86_idtist_, IDT_VECTOR_NAME)); \
+	.set PP_CAT2(x86_idtist_, IDT_VECTOR_NAME), ist;
 #define IDT_HANDLER_BEGIN                          \
 	_idt_set_impl_section asmirq, IDT_VECTOR_NAME; \
 	INTERN_FUNCTION(PP_CAT2(x86_idt_, IDT_VECTOR_NAME))

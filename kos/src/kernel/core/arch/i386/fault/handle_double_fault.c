@@ -51,10 +51,10 @@ DECL_BEGIN
  * with the double-fault handler simply using the alternate-stack mechanism for
  * safely executing on an alternate stack. */
 struct df_cpustate {
-	PHYS pagedir_t  *dcs_cr3;
 #ifdef __x86_64__
 	struct icpustate dcs_regs;
 #else /* __x86_64__ */
+	PHYS pagedir_t  *dcs_cr3;
 	struct ucpustate dcs_regs;
 #endif /* !__x86_64__ */
 };
@@ -69,15 +69,23 @@ INTDEF struct task *x86_dbg_viewthread;
 INTDEF struct fcpustate x86_dbg_origstate;
 INTDEF struct fcpustate x86_dbg_viewstate;
 
+#ifdef __x86_64__
 PRIVATE ATTR_DBGTEXT void KCALL
-panic_df_dbg_main(void *cr3) {
+panic_df_dbg_main(void)
+#else /* __x86_64__ */
+PRIVATE ATTR_DBGTEXT void KCALL
+panic_df_dbg_main(void *cr3)
+#endif /* !__x86_64__ */
+{
 	/* Inject the correct information about the CR3 register */
+#ifndef __x86_64__
 	x86_dbg_exitstate.fcs_coregs.co_cr3 = (uintptr_t)cr3;
 	if (x86_dbg_viewthread == THIS_TASK) {
 		if (x86_dbg_viewstate.fcs_coregs.co_cr3 == x86_dbg_origstate.fcs_coregs.co_cr3)
 			x86_dbg_viewstate.fcs_coregs.co_cr3 = (uintptr_t)cr3;
 		x86_dbg_origstate.fcs_coregs.co_cr3 = (uintptr_t)cr3;
 	}
+#endif /* !__x86_64__ */
 	dbg_printf(DBGSTR(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON, "Double fault") "\n"
 	                  "%[vinfo:"
 	                  "file: " DF_WHITE("%f") " (line " DF_WHITE("%l") ", column " DF_WHITE("%c") ")\n"
@@ -102,16 +110,21 @@ x86_handle_double_fault(struct df_cpustate *__restrict state) {
 		struct ucpustate ustate;
 #ifdef __x86_64__
 		icpustate_to_ucpustate(&state->dcs_regs, &ustate);
+		x86_dump_ucpustate_register_state(&ustate, (PHYS pagedir_t *)__rdcr3());
 #else /* __x86_64__ */
 		ucpustate_to_ucpustate(&state->dcs_regs, &ustate);
-#endif /* !__x86_64__ */
 		x86_dump_ucpustate_register_state(&ustate, state->dcs_cr3);
+#endif /* !__x86_64__ */
 	}
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_UNHANDLED_INTERRUPT))
 		kernel_debugtrap(&state->dcs_regs, SIGBUS);
 #ifndef CONFIG_NO_DEBUGGER
+#ifdef __x86_64__
+	dbg_enter(&panic_df_dbg_main, &state->dcs_regs);
+#else /* __x86_64__ */
 	dbg_enter(&panic_df_dbg_main, state->dcs_cr3, &state->dcs_regs);
+#endif /* !__x86_64__ */
 #else /* !CONFIG_NO_DEBUGGER */
 	PREEMPTION_HALT();
 #endif /* CONFIG_NO_DEBUGGER */
