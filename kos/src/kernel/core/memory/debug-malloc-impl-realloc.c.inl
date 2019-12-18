@@ -157,7 +157,7 @@ NOTHROW_NX(KCALL FUNC(krealign_offset))(VIRT void *ptr, size_t min_alignment,
 #endif /* !IS_INPLACE */
 	}
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
-	if (!mall_acquire(flags))
+	if (!IFELSE_NX(mall_acquire_nx(flags), mall_acquire(flags)))
 		IFELSE_NX(goto err, THROW(E_WOULDBLOCK_PREEMPTED));
 	node = mallnode_tree_remove(&mall_tree, (uintptr_t)ptr);
 again_check_node:
@@ -206,7 +206,7 @@ again_check_node:
 
 			/* Re-insert the node, so-as to continue tracking it. */
 			mallnode_tree_insert(&mall_tree, node);
-			sync_endwrite(&mall_lock);
+			mall_release();
 			/* Now just free trailing memory. */
 			flags = (flags & ~(__GFP_HEAPMASK | GFP_CALLOC)) | (heap_flags & __GFP_HEAPMASK);
 			heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
@@ -215,7 +215,7 @@ again_check_node:
 realloc_unchanged:
 			/* Don't change the allocated node size. */
 			mallnode_tree_insert(&mall_tree, node);
-			sync_endwrite(&mall_lock);
+			mall_release();
 		}
 		return ptr;
 	}
@@ -238,7 +238,7 @@ realloc_unchanged:
 			/* The extension fail, but that may have just been because of the `GFP_ATOMIC'
 			 * -> Restore the user's node, unlock `mall_lock', then try again without `GFP_ATOMIC'. */
 			mallnode_tree_insert(&mall_tree, node);
-			sync_endwrite(&mall_lock);
+			mall_release();
 			num_allocated = FUNC(heap_allat_untraced)(&kernel_heaps[extension_flags & __GFP_HEAPMASK],
 			                                          extension_base, num_extend, extension_flags);
 			if (!num_allocated) {
@@ -261,7 +261,7 @@ realloc_unchanged:
 #endif /* !HAVE_MIN_ALIGNMENT */
 				IFELSE_NX(if (result.hp_ptr == NULL) goto err;, )
 				/* Re-lock the MALL sub-system, and pop the node associated with the original pointer. */
-				if (!mall_acquire(flags))
+				if (!IFELSE_NX(mall_acquire_nx(flags), mall_acquire(flags)))
 					IFELSE_NX(goto err, THROW(E_WOULDBLOCK_PREEMPTED));
 				node = mallnode_tree_remove(&mall_tree, (uintptr_t)ptr);
 				/* Check to make sure that the associated node hasn't changed. */
@@ -287,7 +287,7 @@ realloc_unchanged:
 				node->m_tree.a_vmax = (uintptr_t)result.hp_ptr + result.hp_siz - 1;
 				/* Insert the updated node into MALL-tree */
 				mall_insert_tree(node);
-				sync_endwrite(&mall_lock);
+				mall_release();
 
 				result.hp_ptr = (void *)((byte_t *)result.hp_ptr +
 				                         CONFIG_MALL_PREFIX_SIZE +
@@ -304,7 +304,7 @@ realloc_unchanged:
 			}
 
 			/* Re-acquire a lock to the MALL subsystem, and access the node again. */
-			if (!mall_acquire(flags)) {
+			if (!IFELSE_NX(mall_acquire_nx(flags), mall_acquire(flags))) {
 				heap_free_untraced(&kernel_heaps[extension_flags & __GFP_HEAPMASK],
 				                   extension_base, num_allocated, extension_flags);
 				IFELSE_NX(goto err, THROW(E_WOULDBLOCK_PREEMPTED));
@@ -339,7 +339,7 @@ realloc_unchanged:
 #endif /* CONFIG_MALL_TAIL_SIZE != 0 */
 		/* Re-insert the node, so-as to continue tracking it. */
 		mall_insert_tree(node);
-		sync_endwrite(&mall_lock);
+		mall_release();
 		/* Re-write the old tail into becoming ZERO-bytes, when GFP_CALLOC was set. */
 #if CONFIG_MALL_TAIL_SIZE != 0
 		if (flags & GFP_CALLOC) {

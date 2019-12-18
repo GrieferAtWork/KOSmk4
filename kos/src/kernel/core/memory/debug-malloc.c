@@ -265,16 +265,12 @@ struct mallnode {
 /* The global descriptor table of known MALL nodes. */
 
 /* Lock for accessing `mall_lock'. */
-PRIVATE ATTR_MALL_UNTRACKED DEFINE_ATOMIC_RWLOCK(mall_lock);
+PRIVATE ATTR_MALL_UNTRACKED struct atomic_rwlock mall_lock = ATOMIC_RWLOCK_INIT;
 DEFINE_DBG_BZERO_OBJECT(mall_lock);
 
 
 /* [0..1] Tree of MALL Nodes allocated within this heap. */
 PRIVATE ATTR_MALL_UNTRACKED VIRT ATREE_HEAD(struct mallnode) mall_tree;
-
-/* [0..1] Chain of nodes that are pending to-be added to `mall_tree'
- * NOTE: The nodes themself are chained through `m_tree.a_min' */
-PRIVATE WEAK ATTR_MALL_UNTRACKED struct mallnode *mall_pending_newnodes = NULL;
 
 STATIC_ASSERT(CONFIG_MALL_PREFIX_SIZE >= __SIZEOF_SIZE_T__);
 
@@ -375,8 +371,7 @@ PRIVATE WEAK ATTR_MALL_UNTRACKED size_t mall_inconsistent_head_exist = 0;
 PRIVATE WEAK ATTR_MALL_UNTRACKED struct pending_malloc_free *mall_pending_mallocfree = NULL;
 
 #define MALL_HAS_PENDING_COMMANDS()                  \
-	(ATOMIC_READ(mall_pending_newnodes) != NULL ||   \
-	 ATOMIC_READ(mall_pending_mallocfree) != NULL || \
+	(ATOMIC_READ(mall_pending_mallocfree) != NULL || \
 	 ATOMIC_READ(mall_pending_untrace_count) != 0)
 
 
@@ -391,19 +386,50 @@ PRIVATE NOBLOCK bool NOTHROW(KCALL mall_serve_pending_commands)(gfp_t flags);
  * given `flags'. */
 LOCAL NOBLOCK bool
 NOTHROW(KCALL mall_acquire_atomic)(void) {
+again:
 	if (!sync_trywrite(&mall_lock))
 		return false;
-	return mall_serve_pending_commands(GFP_ATOMIC);
+	if (!mall_serve_pending_commands(GFP_ATOMIC))
+		goto again;
+	return true;
 }
 
-LOCAL NOBLOCK_IF(flags &GFP_ATOMIC) bool
-NOTHROW(KCALL mall_acquire)(gfp_t flags) {
+LOCAL NOBLOCK_IF(flags & GFP_ATOMIC) bool
+NOTHROW(KCALL mall_acquire_nx)(gfp_t flags) {
+again:
+	if (!sync_trywrite(&mall_lock)) {
+		if (flags & GFP_ATOMIC)
+			return false;
+		if (!sync_write_nx(&mall_lock))
+			return false;
+	}
+	if (!mall_serve_pending_commands(flags))
+		goto again;
+	return true;
+}
+
+LOCAL NOBLOCK_IF(flags & GFP_ATOMIC)
+bool KCALL mall_acquire(gfp_t flags) {
+again:
 	if (!sync_trywrite(&mall_lock)) {
 		if (flags & GFP_ATOMIC)
 			return false;
 		sync_write(&mall_lock);
 	}
-	return mall_serve_pending_commands(flags);
+	if (!mall_serve_pending_commands(flags))
+		goto again;
+	return true;
+}
+
+LOCAL NOBLOCK void
+NOTHROW(KCALL mall_release)(void) {
+again:
+	if (mall_serve_pending_commands(GFP_ATOMIC))
+		sync_endwrite(&mall_lock);
+	if (MALL_HAS_PENDING_COMMANDS()) {
+		if (sync_trywrite(&mall_lock))
+			goto again;
+	}
 }
 
 
@@ -464,7 +490,7 @@ generic_handle_node:
 			/* Restore the original node and unlock `mall_lock', then re-
 			 * attempt allocating the secondary node without `GFP_ATOMIC'. */
 			mallnode_tree_insert(&mall_tree, node);
-			sync_endwrite(&mall_lock);
+			mall_release();
 			hinode = mallnode_alloc_nx(flags);
 			if unlikely(!hinode) {
 				/* Add the untrace as a pending operation. */
@@ -472,7 +498,7 @@ generic_handle_node:
 				return false;
 			}
 			/* Re-acquire a lock to the MALL sub-system. */
-			if (!mall_acquire(flags)) {
+			if (!mall_acquire_nx(flags)) {
 				mallnode_free(hinode);
 				mall_add_pending_untrace_n(ptr, num_bytes);
 				return false;
@@ -524,21 +550,11 @@ again:
 	}
 }
 
-
 /* Upon entry, `mall_lock' must be held.
  * @return: true:  `mall_lock' remains locked.
  * @return: false: `mall_lock' was unlocked. */
 PRIVATE NOBLOCK bool
 NOTHROW(KCALL mall_serve_pending_commands)(gfp_t flags) {
-	{
-		struct mallnode *pend, *next;
-		pend = ATOMIC_XCH(mall_pending_newnodes, NULL);
-		while unlikely(pend) {
-			next = pend->m_tree.a_min;
-			mallnode_tree_insert(&mall_tree, pend);
-			pend = next;
-		}
-	}
 	{
 		struct pending_malloc_free *pend, *next;
 		pend = ATOMIC_XCH(mall_pending_mallocfree, NULL);
@@ -634,7 +650,6 @@ NOTHROW(KCALL mall_serve_pending_commands)(gfp_t flags) {
 				if (pend.pu_size == 0) {
 					struct mallnode *node;
 					node = mallnode_tree_remove(&mall_tree, (uintptr_t)pend.pu_base);
-					sync_endwrite(&mall_lock);
 					if unlikely(!node) {
 						COMPILER_READ_BARRIER();
 						if (ATOMIC_READ(mall_valid_user_node_version_number))
@@ -680,7 +695,7 @@ NOTHROW(KCALL mall_do_free)(void *__restrict ptr, gfp_t flags, bool should_unloc
 	/* Lookup  */
 	node = mallnode_tree_remove(&mall_tree, (uintptr_t)ptr);
 	if (should_unlock)
-		sync_endwrite(&mall_lock);
+		mall_release();
 	if unlikely(!node) {
 		if (!should_unlock)
 			sync_endwrite(&mall_lock);
@@ -761,6 +776,8 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 	if (!mall_acquire_atomic()) {
 		/* Use a pending chain to ensure that kfree() is atomic for all cases. */
 		mall_add_pending_free(ptr, flags);
+		if (sync_trywrite(&mall_lock))
+			mall_release();
 		return;
 	}
 	mall_do_free(ptr, flags, true);
@@ -779,6 +796,8 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 	if (!mall_acquire_atomic()) {
 		/* Use a pending chain to ensure that kfree() is atomic for all cases. */
 		mall_add_pending_free(ptr, GFP_NORMAL);
+		if (sync_trywrite(&mall_lock))
+			mall_release();
 		return;
 	}
 	mall_do_free(ptr, GFP_NORMAL, true);
@@ -1304,7 +1323,7 @@ again:
 	if (!mall_acquire(flags))
 		return 0;
 	if (!vm_kernel_treelock_trywrite()) {
-		sync_endwrite(&mall_lock);
+		mall_release();
 		if (!vm_kernel_treelock_writef(flags))
 			return 0;
 		if (!mall_acquire_atomic()) {
@@ -1335,7 +1354,7 @@ again:
 				ATOMIC_FETCHAND(me->t_flags, ~TASK_FKEEPCORE);
 			PREEMPTION_POP(was);
 			vm_kernel_treelock_endwrite();
-			sync_endwrite(&mall_lock);
+			mall_release();
 			task_pause();
 			goto again;
 		}
@@ -1364,7 +1383,7 @@ again:
 	}
 
 	vm_kernel_treelock_endwrite();
-	sync_endwrite(&mall_lock);
+	mall_release();
 	return result;
 }
 
@@ -1481,6 +1500,7 @@ again:
 
 PUBLIC NOBLOCK void
 NOTHROW(KCALL mall_validate_padding)(void) {
+again:
 	if (!sync_tryread(&mall_lock))
 		return;
 	if (MALL_HAS_PENDING_COMMANDS()) {
@@ -1492,13 +1512,13 @@ upgrade_and_serve_commands:
 		} else {
 do_serve_commands:
 			if (!mall_serve_pending_commands(GFP_ATOMIC))
-				return;
+				goto again;
 		}
 		if (mall_tree) {
 			if (mall_validate_padding_impl(mall_tree))
 				goto do_serve_commands;
 		}
-		sync_endwrite(&mall_lock);
+		mall_release();
 	} else {
 		if (mall_tree) {
 			if (mall_validate_padding_impl(mall_tree))
@@ -1657,15 +1677,11 @@ mall_trace_impl(void *base, size_t num_bytes, gfp_t flags, void *context) {
 	node->m_tracetid    = task_gettid_s();
 	/* Insert the new node into the tree of user-defined tracing points. */
 	if (!mall_acquire(flags)) {
-		/* Register the node as a pending allocation. */
-		do {
-			node->m_tree.a_min = ATOMIC_READ(mall_pending_newnodes);
-		} while (!ATOMIC_CMPXCH_WEAK(mall_pending_newnodes,
-		                             node->m_tree.a_min, node));
-		return base;
+		mallnode_free(node);
+		THROW(E_WOULDBLOCK_PREEMPTED);
 	}
 	mall_insert_tree(node);
-	sync_endwrite(&mall_lock);
+	mall_release();
 	return base;
 }
 
@@ -1683,16 +1699,12 @@ NOTHROW(KCALL mall_trace_impl_nx)(void *base, size_t num_bytes, gfp_t flags, voi
 	node->m_userver     = mall_valid_user_node_version_number;
 	node->m_tracetid    = task_gettid_s();
 	/* Insert the new node into the tree of user-defined tracing points. */
-	if (!mall_acquire(flags)) {
-		/* Register the node as a pending allocation. */
-		do {
-			node->m_tree.a_min = ATOMIC_READ(mall_pending_newnodes);
-		} while (!ATOMIC_CMPXCH_WEAK(mall_pending_newnodes,
-		                             node->m_tree.a_min, node));
-		return base;
+	if (!mall_acquire_nx(flags)) {
+		mallnode_free(node);
+		return NULL;
 	}
 	mall_insert_tree(node);
-	sync_endwrite(&mall_lock);
+	mall_release();
 	return base;
 }
 
@@ -1742,12 +1754,14 @@ NOTHROW(KCALL mall_print_traceback)(void *ptr, gfp_t flags) {
 PUBLIC NOBLOCK_IF(flags & GFP_ATOMIC) void
 NOTHROW(KCALL mall_untrace)(void *ptr, gfp_t flags) {
 	struct mallnode *node;
-	if (!mall_acquire(flags)) {
+	if (!mall_acquire_nx(flags)) {
 		mall_add_pending_untrace(ptr);
+		if (sync_trywrite(&mall_lock))
+			mall_release();
 		return;
 	}
 	node = mallnode_tree_remove(&mall_tree, (uintptr_t)ptr);
-	sync_endwrite(&mall_lock);
+	mall_release();
 	if unlikely(!node) {
 		if (mall_valid_user_node_version_number)
 			return; /* Because of the possibility of a failed split in `mall_insert_tree()' */
@@ -1763,13 +1777,15 @@ NOTHROW(KCALL mall_untrace_n)(void *ptr, size_t num_bytes, gfp_t flags) {
 	bool remains_locked;
 	if (!num_bytes)
 		return;
-	if (!mall_acquire(flags)) {
+	if (!mall_acquire_nx(flags)) {
 		mall_add_pending_untrace_n(ptr, num_bytes);
+		if (sync_trywrite(&mall_lock))
+			mall_release();
 		return;
 	}
 	remains_locked = mall_untrace_n_impl(ptr, num_bytes, flags);
 	if (remains_locked)
-		sync_endwrite(&mall_lock);
+		mall_release();
 }
 
 
