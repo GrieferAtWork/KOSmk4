@@ -381,6 +381,8 @@ L(.Lalready_active):
 	movq   OFFSET_DBG_ENTRY_INFO_ARGC(%rbp), %rcx /* >>     %rcx = OFFSET_DBG_ENTRY_INFO_ARGC(%rbp);           */
 	cmpq   $(6), %rcx                             /* >>     if (%rcx < 6)                                      */
 	jnb    1f                                     /* >>     {                                                  */
+	testq  %rcx, %rcx                             /* >>         if (!%rcx)                                     */
+	jz     L(.Ldone_copy)                         /* >>         goto done_copy;                                */
 	movq   $(6), %rdx                             /* >>         %rdx = 6;                                      */
 	subq   %rcx, %rdx                             /* >>         %rdx = %rdx - %rcx; // %rdx = 6 - %rcx         */
 	leaq   (,%rdx,8), %rdx                        /* >>         %rdx = %rdx * 8;    // %rdx = (6 - %rcx) * 8   */
@@ -393,7 +395,7 @@ L(.Lalready_active):
 	cmpq   %rsi, %rdi                             /* >>     if (%rdi > %rsi)                                   */
 	ja     L(.Lcopy_down)                         /* >>         goto copy_down;                                */
 	jb     L(.Lcopy_up)                           /* >>     if (%rdi < %rsi) goto copy_up;                     */
-	jmp    L(.Ldone_copy)                        /* >>     goto push_entry;                                   */
+	jmp    L(.Ldone_copy)                         /* >>     goto push_entry;                                   */
 L(.Lcopy_down):                                   /* >> copy_down:                                             */
 	std                                           /* >>         RFLAGS.DF = 1;                                 */
 	leaq   -8(%rdi,%rcx,8), %rdi                  /* >>         %rdi = (%rdi + (%rcx * 8)) - 8;                */
