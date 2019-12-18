@@ -293,7 +293,7 @@ driver_do_apply_relocations_vector(struct driver *__restrict self,
 #undef R_USED_GLOB_DAT
 #endif /* R_USED_GLOB_DAT */
 			LOOKUP_SYMBOL();
-			*(u32 *)reladdr SET_OR_INPLACE_ADD (u32)(value + REL_ADDEND);
+			*(uintptr_t *)reladdr SET_OR_INPLACE_ADD (uintptr_t)(value + REL_ADDEND);
 			break;
 #endif /* R_USED_GLOB_DAT || R_USED_JMP_SLOT */
 
