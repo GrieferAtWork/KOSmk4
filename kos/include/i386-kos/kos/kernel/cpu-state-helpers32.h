@@ -318,8 +318,7 @@ __NOTHROW_NCX(kcpustate32_to_scpustate32_p_ex)(struct kcpustate32 const *__restr
 	struct scpustate32 *__result;
 	if (__self->kcs_eflags & 0x20000) {
 		__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
-		                                  OFFSET_SCPUSTATE32_IRREGS +
-		                                  SIZEOF_IRREGS32_VM86);
+		                                  (OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_VM86));
 		__result->scs_irregs_v.ir_esp = __self->kcs_gpregs.gp_esp;
 		__result->scs_irregs_v.ir_ss  = __v_ss;
 		__result->scs_irregs_v.ir_es  = __v_es;
@@ -338,14 +337,12 @@ __NOTHROW_NCX(kcpustate32_to_scpustate32_p_ex)(struct kcpustate32 const *__restr
 	} else {
 		if (__v_cs & 3) {
 			__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
-			                                  OFFSET_SCPUSTATE32_IRREGS +
-			                                  SIZEOF_IRREGS32_USER);
+			                                  (OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_USER));
 			__result->scs_irregs_u.ir_esp = __self->kcs_gpregs.gp_esp;
 			__result->scs_irregs_u.ir_ss  = __v_ss;
 		} else {
 			__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
-			                                  OFFSET_SCPUSTATE32_IRREGS +
-			                                  SIZEOF_IRREGS32_KERNEL);
+			                                  (OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_KERNEL));
 		}
 		__result->scs_sgregs.sg_fs = __v_fs;
 		__result->scs_sgregs.sg_gs = __v_gs;
@@ -381,8 +378,7 @@ __NOTHROW_NCX(kcpustate32_to_icpustate32_p_ex)(struct kcpustate32 const *__restr
 	struct icpustate32 *__result;
 	if (__self->kcs_eflags & 0x20000) {
 		__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
-		                                  OFFSET_ICPUSTATE32_IRREGS +
-		                                  SIZEOF_IRREGS32_VM86);
+		                                  (OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_VM86));
 		__result->ics_irregs_v.ir_esp = __self->kcs_gpregs.gp_esp;
 		__result->ics_irregs_v.ir_ss  = __v_ss;
 		__result->ics_irregs_v.ir_es  = __v_es;
@@ -399,14 +395,12 @@ __NOTHROW_NCX(kcpustate32_to_icpustate32_p_ex)(struct kcpustate32 const *__restr
 	} else {
 		if (__v_cs & 3) {
 			__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
-			                                  OFFSET_ICPUSTATE32_IRREGS +
-			                                  SIZEOF_IRREGS32_USER);
+			                                  (OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_USER));
 			__result->ics_irregs_u.ir_esp = __self->kcs_gpregs.gp_esp;
 			__result->ics_irregs_u.ir_ss  = __v_ss;
 		} else {
 			__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
-			                                  OFFSET_ICPUSTATE32_IRREGS +
-			                                  SIZEOF_IRREGS32_KERNEL);
+			                                  (OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_KERNEL));
 		}
 		__result->ics_fs = __v_fs;
 		__result->ics_es = __v_es;
@@ -590,8 +584,7 @@ __NOTHROW_NCX(icpustate32_to_scpustate32_p_ex)(struct icpustate32 const *__restr
 	__u32 __v_eflags = icpustate32_geteflags(__self);
 	if (__v_eflags & 0x20000) {
 		__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
-		                                  OFFSET_SCPUSTATE32_IRREGS +
-		                                  SIZEOF_IRREGS32_VM86);
+		                                  (OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_VM86));
 		__result->scs_irregs_v.ir_esp = icpustate32_getuseresp(__self);
 		__result->scs_irregs_v.ir_ss  = icpustate32_getuserss(__self);
 		__result->scs_irregs_v.ir_es  = __self->ics_irregs_v.ir_es16;
@@ -605,14 +598,12 @@ __NOTHROW_NCX(icpustate32_to_scpustate32_p_ex)(struct icpustate32 const *__restr
 	} else {
 		if (__v_cs & 3) {
 			__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
-			                                  OFFSET_SCPUSTATE32_IRREGS +
-			                                  SIZEOF_IRREGS32_USER);
+			                                  (OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_USER));
 			__result->scs_irregs_u.ir_esp = icpustate32_getuseresp(__self);
 			__result->scs_irregs_u.ir_ss  = icpustate32_getuserss(__self);
 		} else {
 			__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
-			                                  OFFSET_SCPUSTATE32_IRREGS +
-			                                  SIZEOF_IRREGS32_KERNEL);
+			                                  (OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_KERNEL));
 		}
 		__result->scs_sgregs.sg_gs = __v_nonvm86_gs;
 		__result->scs_sgregs.sg_fs = __self->ics_fs16;
@@ -634,8 +625,7 @@ __NOTHROW_NCX(icpustate32_user_to_scpustate32_p_ex)(struct icpustate32 const *__
 	__u32 __v_eflags = icpustate32_geteflags(__self);
 	if (__v_eflags & 0x20000) {
 		__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
-		                                  OFFSET_SCPUSTATE32_IRREGS +
-		                                  SIZEOF_IRREGS32_VM86);
+		                                  (OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_VM86));
 		__result->scs_irregs_v.ir_esp = icpustate32_getuseresp(__self);
 		__result->scs_irregs_v.ir_ss  = icpustate32_getuserss(__self);
 		__result->scs_irregs_v.ir_es  = __self->ics_irregs_v.ir_es16;
@@ -649,8 +639,7 @@ __NOTHROW_NCX(icpustate32_user_to_scpustate32_p_ex)(struct icpustate32 const *__
 	} else {
 		__hybrid_assert(icpustate32_getcs(__self) & 3);
 		__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
-		                                  OFFSET_SCPUSTATE32_IRREGS +
-		                                  SIZEOF_IRREGS32_USER);
+		                                  (OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_USER));
 		__result->scs_irregs_u.ir_esp = icpustate32_getuseresp(__self);
 		__result->scs_irregs_u.ir_ss  = icpustate32_getuserss(__self);
 		__result->scs_sgregs.sg_gs = __v_nonvm86_gs;
@@ -683,8 +672,7 @@ __NOTHROW_NCX(icpustate32_to_icpustate32_p)(struct icpustate32 const *__restrict
 	__u32 __v_eflags = icpustate32_geteflags(__self);
 	if (__v_eflags & 0x20000) {
 		__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
-		                                  OFFSET_ICPUSTATE32_IRREGS +
-		                                  SIZEOF_IRREGS32_VM86);
+		                                  (OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_VM86));
 		__result->ics_irregs_v.ir_esp = icpustate32_getuseresp(__self);
 		__result->ics_irregs_v.ir_ss  = icpustate32_getuserss(__self);
 		__result->ics_irregs_v.ir_es  = __self->ics_irregs_v.ir_es16;
@@ -697,14 +685,12 @@ __NOTHROW_NCX(icpustate32_to_icpustate32_p)(struct icpustate32 const *__restrict
 	} else {
 		if (__v_cs & 3) {
 			__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
-			                                  OFFSET_ICPUSTATE32_IRREGS +
-			                                  SIZEOF_IRREGS32_USER);
+			                                  (OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_USER));
 			__result->ics_irregs_u.ir_esp = icpustate32_getuseresp(__self);
 			__result->ics_irregs_u.ir_ss  = icpustate32_getuserss(__self);
 		} else {
 			__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
-			                                  OFFSET_ICPUSTATE32_IRREGS +
-			                                  SIZEOF_IRREGS32_KERNEL);
+			                                  (OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_KERNEL));
 		}
 		__result->ics_fs = __self->ics_fs16;
 		__result->ics_es = __self->ics_es16;
@@ -724,8 +710,7 @@ __NOTHROW_NCX(icpustate32_user_to_icpustate32_p)(struct icpustate32 const *__res
 	__u32 __v_eflags = icpustate32_geteflags(__self);
 	if (__v_eflags & 0x20000) {
 		__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
-		                                  OFFSET_ICPUSTATE32_IRREGS +
-		                                  SIZEOF_IRREGS32_VM86);
+		                                  (OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_VM86));
 		__result->ics_irregs_v.ir_esp = icpustate32_getuseresp(__self);
 		__result->ics_irregs_v.ir_ss  = icpustate32_getuserss(__self);
 		__result->ics_irregs_v.ir_es  = __self->ics_irregs_v.ir_es16;
@@ -738,8 +723,7 @@ __NOTHROW_NCX(icpustate32_user_to_icpustate32_p)(struct icpustate32 const *__res
 	} else {
 		__hybrid_assert(icpustate32_getcs(__self) & 3);
 		__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
-		                                  OFFSET_ICPUSTATE32_IRREGS +
-		                                  SIZEOF_IRREGS32_USER);
+		                                  (OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_USER));
 		__result->ics_irregs_u.ir_esp = icpustate32_getuseresp(__self);
 		__result->ics_irregs_u.ir_ss  = icpustate32_getuserss(__self);
 		__result->ics_fs = __self->ics_fs16;
@@ -894,8 +878,7 @@ __NOTHROW_NCX(scpustate32_to_icpustate32_p)(struct scpustate32 const *__restrict
 	__u32 __v_eflags = scpustate32_geteflags(__self);
 	if (__v_eflags & 0x20000) {
 		__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
-		                                  OFFSET_ICPUSTATE32_IRREGS +
-		                                  SIZEOF_IRREGS32_VM86);
+		                                  (OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_VM86));
 		__result->ics_irregs_v.ir_esp = scpustate32_getuseresp(__self);
 		__result->ics_irregs_v.ir_ss  = scpustate32_getuserss(__self);
 		__result->ics_irregs_v.ir_es  = __self->scs_irregs_v.ir_es16;
@@ -908,14 +891,12 @@ __NOTHROW_NCX(scpustate32_to_icpustate32_p)(struct scpustate32 const *__restrict
 	} else {
 		if (__v_cs & 3) {
 			__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
-			                                  OFFSET_ICPUSTATE32_IRREGS +
-			                                  SIZEOF_IRREGS32_USER);
+			                                  (OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_USER));
 			__result->ics_irregs_u.ir_esp = scpustate32_getuseresp(__self);
 			__result->ics_irregs_u.ir_ss  = scpustate32_getuserss(__self);
 		} else {
 			__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
-			                                  OFFSET_ICPUSTATE32_IRREGS +
-			                                  SIZEOF_IRREGS32_KERNEL);
+			                                  (OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_KERNEL));
 		}
 		__result->ics_fs = __self->scs_sgregs.sg_fs16;
 		__result->ics_es = __self->scs_sgregs.sg_es16;
@@ -935,8 +916,7 @@ __NOTHROW_NCX(scpustate32_user_to_icpustate32_p)(struct scpustate32 const *__res
 	__u32 __v_eflags = scpustate32_geteflags(__self);
 	if (__v_eflags & 0x20000) {
 		__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
-		                                  OFFSET_ICPUSTATE32_IRREGS +
-		                                  SIZEOF_IRREGS32_VM86);
+		                                  (OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_VM86));
 		__result->ics_irregs_v.ir_esp = scpustate32_getuseresp(__self);
 		__result->ics_irregs_v.ir_ss  = scpustate32_getuserss(__self);
 		__result->ics_irregs_v.ir_es  = __self->scs_irregs_v.ir_es16;
@@ -949,8 +929,7 @@ __NOTHROW_NCX(scpustate32_user_to_icpustate32_p)(struct scpustate32 const *__res
 	} else {
 		__hybrid_assert(scpustate32_getcs(__self) & 3);
 		__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
-		                                  OFFSET_ICPUSTATE32_IRREGS +
-		                                  SIZEOF_IRREGS32_USER);
+		                                  (OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_USER));
 		__result->ics_irregs_u.ir_esp = scpustate32_getuseresp(__self);
 		__result->ics_irregs_u.ir_ss  = scpustate32_getuserss(__self);
 		__result->ics_fs = __self->scs_sgregs.sg_fs16;
@@ -988,8 +967,7 @@ __NOTHROW_NCX(scpustate32_user_to_scpustate32_p)(struct scpustate32 const *__res
 	__u32 __v_eflags = scpustate32_geteflags(__self);
 	if (__v_eflags & 0x20000) {
 		__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
-		                                  OFFSET_SCPUSTATE32_IRREGS +
-		                                  SIZEOF_IRREGS32_VM86);
+		                                  (OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_VM86));
 		__result->scs_irregs_v.ir_esp = scpustate32_getuseresp(__self);
 		__result->scs_irregs_v.ir_ss  = scpustate32_getuserss(__self);
 		__result->scs_irregs_v.ir_es  = __self->scs_irregs_v.ir_es16;
@@ -1000,8 +978,7 @@ __NOTHROW_NCX(scpustate32_user_to_scpustate32_p)(struct scpustate32 const *__res
 	} else {
 		__hybrid_assert(scpustate32_getcs(__self) & 3);
 		__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
-		                                  OFFSET_SCPUSTATE32_IRREGS +
-		                                  SIZEOF_IRREGS32_USER);
+		                                  (OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_USER));
 		__result->scs_irregs_u.ir_esp = scpustate32_getuseresp(__self);
 		__result->scs_irregs_u.ir_ss  = scpustate32_getuserss(__self);
 		__result->scs_sgregs = __self->scs_sgregs;
@@ -1088,8 +1065,7 @@ __NOTHROW_NCX(ucpustate32_to_icpustate32_p)(struct ucpustate32 const *__restrict
 	struct icpustate32 *__result;
 	if (ucpustate32_isvm86(__self)) {
 		__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
-		                                  OFFSET_ICPUSTATE32_IRREGS +
-		                                  SIZEOF_IRREGS32_VM86);
+		                                  (OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_VM86));
 		__result->ics_irregs_v.ir_esp = __self->ucs_gpregs.gp_esp;
 		__result->ics_irregs_v.ir_ss  = __self->ucs_ss16;
 		__result->ics_irregs_v.ir_es  = __self->ucs_sgregs.sg_es16;
@@ -1106,14 +1082,12 @@ __NOTHROW_NCX(ucpustate32_to_icpustate32_p)(struct ucpustate32 const *__restrict
 	} else {
 		if (ucpustate32_isuser_novm86(__self)) {
 			__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
-			                                  OFFSET_ICPUSTATE32_IRREGS +
-			                                  SIZEOF_IRREGS32_USER);
+			                                  (OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_USER));
 			__result->ics_irregs_u.ir_esp = __self->ucs_gpregs.gp_esp;
 			__result->ics_irregs_u.ir_ss  = __self->ucs_ss16;
 		} else {
 			__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
-			                                  OFFSET_ICPUSTATE32_IRREGS +
-			                                  SIZEOF_IRREGS32_KERNEL);
+			                                  (OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_KERNEL));
 		}
 		__result->ics_ds = __self->ucs_sgregs.sg_ds16;
 		__result->ics_es = __self->ucs_sgregs.sg_es16;
@@ -1131,8 +1105,7 @@ __NOTHROW_NCX(ucpustate32_to_scpustate32_p)(struct ucpustate32 const *__restrict
 	struct scpustate32 *__result;
 	if (ucpustate32_isvm86(__self)) {
 		__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
-		                                  OFFSET_SCPUSTATE32_IRREGS +
-		                                  SIZEOF_IRREGS32_VM86);
+		                                  (OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_VM86));
 		__result->scs_irregs_v.ir_esp = __self->ucs_gpregs.gp_esp;
 		__result->scs_irregs_v.ir_ss  = __self->ucs_ss16;
 		__result->scs_irregs_v.ir_es  = __self->ucs_sgregs.sg_es16;
@@ -1151,14 +1124,12 @@ __NOTHROW_NCX(ucpustate32_to_scpustate32_p)(struct ucpustate32 const *__restrict
 	} else {
 		if (ucpustate32_isuser_novm86(__self)) {
 			__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
-			                                  OFFSET_SCPUSTATE32_IRREGS +
-			                                  SIZEOF_IRREGS32_USER);
+			                                  (OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_USER));
 			__result->scs_irregs_u.ir_esp = __self->ucs_gpregs.gp_esp;
 			__result->scs_irregs_u.ir_ss  = __self->ucs_ss16;
 		} else {
 			__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
-			                                  OFFSET_SCPUSTATE32_IRREGS +
-			                                  SIZEOF_IRREGS32_KERNEL);
+			                                  (OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_KERNEL));
 		}
 		__result->scs_sgregs = __self->ucs_sgregs;
 	}
@@ -1320,8 +1291,7 @@ __NOTHROW_NCX(fcpustate32_to_icpustate32_p)(struct fcpustate32 const *__restrict
 	struct icpustate32 *__result;
 	if (fcpustate32_isvm86(__self)) {
 		__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
-		                                  OFFSET_ICPUSTATE32_IRREGS +
-		                                  SIZEOF_IRREGS32_VM86);
+		                                  (OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_VM86));
 		__result->ics_irregs_v.ir_esp = __self->fcs_gpregs.gp_esp;
 		__result->ics_irregs_v.ir_ss  = __self->fcs_sgregs.sg_ss16;
 		__result->ics_irregs_v.ir_es  = __self->fcs_sgregs.sg_es16;
@@ -1338,14 +1308,12 @@ __NOTHROW_NCX(fcpustate32_to_icpustate32_p)(struct fcpustate32 const *__restrict
 	} else {
 		if (fcpustate32_isuser_novm86(__self)) {
 			__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
-			                                  OFFSET_ICPUSTATE32_IRREGS +
-			                                  SIZEOF_IRREGS32_USER);
+			                                  (OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_USER));
 			__result->ics_irregs_u.ir_esp = __self->fcs_gpregs.gp_esp;
 			__result->ics_irregs_u.ir_ss  = __self->fcs_sgregs.sg_ss16;
 		} else {
 			__result = (struct icpustate32 *)((__byte_t *)__kernel_esp -
-			                                  OFFSET_ICPUSTATE32_IRREGS +
-			                                  SIZEOF_IRREGS32_KERNEL);
+			                                  (OFFSET_ICPUSTATE32_IRREGS + SIZEOF_IRREGS32_KERNEL));
 		}
 		__result->ics_ds = __self->fcs_sgregs.sg_ds16;
 		__result->ics_es = __self->fcs_sgregs.sg_es16;
@@ -1363,8 +1331,7 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 	struct scpustate32 *__result;
 	if (fcpustate32_isvm86(__self)) {
 		__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
-		                                  OFFSET_SCPUSTATE32_IRREGS +
-		                                  SIZEOF_IRREGS32_VM86);
+		                                  (OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_VM86));
 		__result->scs_irregs_v.ir_esp = __self->fcs_gpregs.gp_esp;
 		__result->scs_irregs_v.ir_ss  = __self->fcs_sgregs.sg_ss16;
 		__result->scs_irregs_v.ir_es  = __self->fcs_sgregs.sg_es16;
@@ -1383,14 +1350,12 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 	} else {
 		if (fcpustate32_isuser_novm86(__self)) {
 			__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
-			                                  OFFSET_SCPUSTATE32_IRREGS +
-			                                  SIZEOF_IRREGS32_USER);
+			                                  (OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_USER));
 			__result->scs_irregs_u.ir_esp = __self->fcs_gpregs.gp_esp;
 			__result->scs_irregs_u.ir_ss  = __self->fcs_sgregs.sg_ss16;
 		} else {
 			__result = (struct scpustate32 *)((__byte_t *)__kernel_esp -
-			                                  OFFSET_SCPUSTATE32_IRREGS +
-			                                  SIZEOF_IRREGS32_KERNEL);
+			                                  (OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_KERNEL));
 		}
 		__result->scs_sgregs.sg_gs = __self->fcs_sgregs.sg_gs16;
 		__result->scs_sgregs.sg_fs = __self->fcs_sgregs.sg_fs16;
