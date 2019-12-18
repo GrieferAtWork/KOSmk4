@@ -147,7 +147,7 @@ INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 
 2:	/* User-space target */
 	movq   %rsp, %rdi /* struct icpustate *__restrict state */
-	xorq   %rdx, %rsi /* struct rpc_syscall_info *sc_info */
+	xorq   %rsi, %rsi /* struct rpc_syscall_info *sc_info */
 	PUBLIC(x86_userexcept_propagate)
 	call   x86_userexcept_propagate
 	.cfi_def_cfa_register %rax
@@ -220,11 +220,11 @@ PUBLIC_FUNCTION(task_rpc_exec_here)
 	.cfi_rel_offset %rip, 0
 	ASM_PUSH_GPREGSNSP_CFI_R
 
-	movq   %rdi, %rax                   /* <task_rpc_t func> */
-	movq   %rsi, %rdi                   /* <void *arg> */
-	leaq   8(%rsp), %rsi                /* <struct icpustate *state> */
-	movq   $TASK_RPC_REASON_ASYNC, %rdx /* <unsigned int reason> */
-	xorq   %rcx, %rcx                   /* <struct rpc_syscall_info *sc_info> */
+	movq   %rdi, %rax                     /* <task_rpc_t func> */
+	movq   %rsi, %rdi                     /* <void *arg> */
+	leaq   8(%rsp), %rsi                  /* <struct icpustate *state> */
+	movq   $(TASK_RPC_REASON_ASYNC), %rdx /* <unsigned int reason> */
+	xorq   %rcx, %rcx                     /* <struct rpc_syscall_info *sc_info> */
 	call   *%rax
 	movq   %rax, %rsp
 
@@ -249,11 +249,11 @@ PUBLIC_FUNCTION(task_rpc_exec_here_onexit)
 	pushq_cfi (5 * 8)(%rsp)          /* ir_rip */
 	ASM_PUSH_GPREGSNSP_CFI_R
 
-	movq   %rdi, %rax                           /* <task_rpc_t func> */
-	movq   %rsi, %rdi                           /* <void *arg> */
-	movq   %rsp, %rsi                           /* <struct icpustate *__restrict state> */
-	movq   $(TASK_RPC_REASON_SHUTDOWN), %rdx    /* <unsigned int reason> */
-	xorq   %rcx, %rcx                           /* <struct rpc_syscall_info const *sc_info> */
+	movq   %rdi, %rax                        /* <task_rpc_t func> */
+	movq   %rsi, %rdi                        /* <void *arg> */
+	movq   %rsp, %rsi                        /* <struct icpustate *__restrict state> */
+	movq   $(TASK_RPC_REASON_SHUTDOWN), %rdx /* <unsigned int reason> */
+	xorq   %rcx, %rcx                        /* <struct rpc_syscall_info const *sc_info> */
 
 	call   *%rax
 
