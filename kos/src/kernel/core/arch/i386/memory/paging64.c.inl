@@ -24,6 +24,9 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
+#include <debugger/function.h>
+#include <debugger/io.h>
 #include <kernel/arch/paging64.h>
 #include <kernel/cpuid.h>
 #include <kernel/except.h>
@@ -1289,35 +1292,35 @@ NOTHROW(FCALL p64_pagedir_assert_e1_word_prepared)(unsigned int vec4,
 	assertf(e4.p_word & P64_PAGE_FPRESENT,
 	        "Page vector #%u for page %p...%p isn't allocated",
 	        (unsigned int)vec4,
-	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1)),
-	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + PAGESIZE - 1));
+	        (byte_t *)P64_PDIR_VECADDR(vec4, vec3, vec2, vec1),
+	        (byte_t *)P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + PAGESIZE - 1);
 	e3 = P64_PDIR_E3_IDENTITY[vec4][vec3];
 	assertf(e3.p_word & P64_PAGE_FPRESENT,
 	        "Page vector #%u:%u for page %p...%p isn't allocated",
 	        (unsigned int)vec4, (unsigned int)vec3,
-	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1)),
-	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + PAGESIZE - 1));
+	        (byte_t *)P64_PDIR_VECADDR(vec4, vec3, vec2, vec1),
+	        (byte_t *)P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + PAGESIZE - 1);
 	assertf(!(e3.p_word & P64_PAGE_F1GIB),
 	        "Page %p...%p exists as a present 1GiB page #%u:%u",
-	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1)),
-	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + PAGESIZE - 1),
+	        (byte_t *)P64_PDIR_VECADDR(vec4, vec3, vec2, vec1),
+	        (byte_t *)P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + PAGESIZE - 1,
 	        (unsigned int)vec4, (unsigned int)vec3);
 	e2 = P64_PDIR_E2_IDENTITY[vec4][vec3][vec2];
 	assertf(e2.p_word & P64_PAGE_FPRESENT,
 	        "Page vector #%u:%u:%u for page %p...%p isn't allocated",
 	        (unsigned int)vec4, (unsigned int)vec3, (unsigned int)vec2,
-	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1)),
-	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + PAGESIZE - 1));
+	        (byte_t *)P64_PDIR_VECADDR(vec4, vec3, vec2, vec1),
+	        (byte_t *)P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + PAGESIZE - 1);
 	assertf(!(e2.p_word & P64_PAGE_F2MIB),
 	        "Page %p...%p exists as a present 2MiB page #%u:%u:%u",
-	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1)),
-	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + PAGESIZE - 1),
+	        (byte_t *)P64_PDIR_VECADDR(vec4, vec3, vec2, vec1),
+	        (byte_t *)P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + PAGESIZE - 1,
 	        (unsigned int)vec4, (unsigned int)vec3, (unsigned int)vec2);
 	e1 = P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1];
 	assertf(e1.p_word & P64_PAGE_FPREPARED || P64_PDIR_E1_ISHINT(e1.p_word),
 	        "Page %p...%p [vec4=%u,vec3=%u,vec2=%u,vec1=%u] hasn't been prepared",
-	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1)),
-	        (uintptr_t)(P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + PAGESIZE - 1),
+	        (byte_t *)P64_PDIR_VECADDR(vec4, vec3, vec2, vec1),
+	        (byte_t *)P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) + PAGESIZE - 1,
 	        vec4, vec3, vec2, vec1);
 }
 #endif /* !NDEBUG */
@@ -1995,6 +1998,364 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 	/* Initialize the `_bootcpu.thiscpu_x86_iobnode_pagedir_identity' pointer. */
 	FORCPU(&_bootcpu, thiscpu_x86_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer_p64(&_bootcpu);
 }
+
+
+
+#ifdef CONFIG_HAVE_DEBUGGER
+
+/* NOTE: This function must do its own tracing of continuous page ranges.
+ *       The caller is may not necessary ensure that the function is only
+ *       called once for a single, continous range.
+ * @param: word: The page directory starting control word.
+ *               When `P64_PAGE_FPRESENT' is set, refers to a mapped page range
+ *               When `P64_PAGE_FISAHINT' is set, refers to a mapped page range */
+typedef void (KCALL *p64_enumfun_t)(void *arg, void *start, size_t num_bytes, u64 word);
+
+#define P64_PAGE_CASCADING \
+	(P64_PAGE_FPRESENT | P64_PAGE_FWRITE | P64_PAGE_FUSER | P64_PAGE_FNOEXEC)
+
+#define P64_PAGE_FPAT P64_PAGE_FPAT_4KIB
+/* Convert an En | n >= 2 word into an E1 word */
+PRIVATE ATTR_DBGTEXT ATTR_CONST u64 KCALL
+p64_convert_en_to_e1(u64 word) {
+	assert(word & P64_PAGE_FPRESENT);
+	assert(word & P64_PAGE_F2MIB);
+	word &= ~P64_PAGE_F2MIB;
+	if (word & P64_PAGE_FPAT_2MIB) {
+		word &= ~P64_PAGE_FPAT_2MIB;
+		word |= P64_PAGE_FPAT_4KIB;
+	}
+	return word;
+}
+
+#define P64_PDIR_E1_ISUSED(e1_word) (((e1_word) & (P64_PAGE_FPRESENT | P64_PAGE_FISAHINT | P64_PAGE_FPREPARED)) != 0)
+PRIVATE ATTR_DBGTEXT void KCALL
+p64_enum_e1(p64_enumfun_t func, void *arg,
+            unsigned int vec4,
+            unsigned int vec3,
+            unsigned int vec2, u64 mask) {
+	unsigned int vec1, laststart = 0;
+	union p64_pdir_e1 *e1 = P64_PDIR_E1_IDENTITY[vec4][vec3][vec2];
+	union p64_pdir_e1 lastword = e1[0];
+	lastword.p_word ^= P64_PAGE_FNOEXEC;
+	lastword.p_word &= mask;
+	for (vec1 = 1; vec1 < 512; ++vec1) {
+		union p64_pdir_e1 word;
+		word = e1[vec1];
+		word.p_word ^= P64_PAGE_FNOEXEC;
+		word.p_word &= mask;
+		if (P64_PDIR_E1_IS1KIB(word.p_4kib.d_present)) {
+			union p64_pdir_e1 expected_word;
+			expected_word = lastword;
+			expected_word.p_word += (u64)(vec1 - laststart) * 4096;
+			if (word.p_word != expected_word.p_word) {
+docall:
+				if (P64_PDIR_E1_ISUSED(lastword.p_word)) {
+					(*func)(arg, P64_PDIR_VECADDR(vec4, vec3, vec2, laststart),
+					        (size_t)(vec1 - laststart) * 4096,
+					        lastword.p_word ^ P64_PAGE_FNOEXEC);
+				}
+				laststart = vec1;
+				lastword  = word;
+			}
+#if 0
+		} else if (P64_PDIR_E1_ISHINT(word.p_word)) {
+			if (word.p_word != lastword.p_word)
+				goto docall;
+#endif
+		} else {
+			if (word.p_word != lastword.p_word)
+				goto docall;
+		}
+	}
+	if (P64_PDIR_E1_ISUSED(lastword.p_word)) {
+		(*func)(arg, P64_PDIR_VECADDR(vec4, vec3, vec2, laststart),
+		        (size_t)(512 - laststart) * 4096,
+		        lastword.p_word ^ P64_PAGE_FNOEXEC);
+	}
+}
+
+PRIVATE ATTR_DBGTEXT void KCALL
+p64_enum_e2(p64_enumfun_t func, void *arg,
+            unsigned int vec4,
+            unsigned int vec3, u64 mask) {
+	unsigned int vec2 = 1, laststart = 0;
+	union p64_pdir_e2 *e2 = P64_PDIR_E2_IDENTITY[vec4][vec3];
+	union p64_pdir_e2 word, lastword = e2[0];
+	lastword.p_word ^= P64_PAGE_FNOEXEC;
+	lastword.p_word &= (mask ^ P64_PAGE_FNOEXEC);
+	if (P64_PDIR_E3_ISVEC2(lastword.p_word)) {
+		word = lastword;
+		vec2 = 0;
+		goto do_enum_e1;
+	}
+	for (; vec2 < 512; ++vec2) {
+		word = e2[vec2];
+		word.p_word ^= P64_PAGE_FNOEXEC;
+		word.p_word &= mask;
+		if (P64_PDIR_E2_ISVEC1(word.p_word)) {
+			if (P64_PDIR_E2_IS2MIB(lastword.p_word)) {
+				(*func)(arg, P64_PDIR_VECADDR(vec4, vec3, laststart, 0),
+				        (size_t)(vec2 - laststart) * 4096 * 512,
+				        p64_convert_en_to_e1(lastword.p_word & ~(u64)0x1ff000) ^
+				        P64_PAGE_FNOEXEC);
+			}
+do_enum_e1:
+			p64_enum_e1(func, arg, vec4, vec3, vec2,
+			            word.p_word | ~(u64)P64_PAGE_CASCADING);
+			laststart = vec2;
+			lastword  = word;
+		} else if (P64_PDIR_E2_IS2MIB(word.p_word)) {
+			union p64_pdir_e2 expected_word;
+			expected_word = lastword;
+			expected_word.p_word += (u64)(vec2 - laststart) * 4096 * 512;
+			if (word.p_word != expected_word.p_word) {
+docall:
+				if (P64_PDIR_E2_IS2MIB(lastword.p_word)) {
+					(*func)(arg, P64_PDIR_VECADDR(vec4, vec3, laststart, 0),
+					        (size_t)(vec2 - laststart) * 4096 * 512,
+					        p64_convert_en_to_e1(lastword.p_word & ~(u64)0x1ff000) ^
+					        P64_PAGE_FNOEXEC);
+				}
+				laststart = vec2;
+				lastword  = word;
+			}
+		} else {
+			if (word.p_word != lastword.p_word)
+				goto docall;
+		}
+	}
+	if (P64_PDIR_E2_IS2MIB(lastword.p_word)) {
+		(*func)(arg, P64_PDIR_VECADDR(vec4, vec3, laststart, 0),
+		        (size_t)(512 - laststart) * 4096 * 512,
+		        p64_convert_en_to_e1(lastword.p_word & ~(u64)0x1ff000) ^
+		        P64_PAGE_FNOEXEC);
+	}
+}
+
+PRIVATE ATTR_DBGTEXT void KCALL
+p64_enum_e3(p64_enumfun_t func, void *arg,
+            unsigned int vec4, u64 mask) {
+	unsigned int vec3 = 1, laststart = 0;
+	union p64_pdir_e3 *e3 = P64_PDIR_E3_IDENTITY[vec4];
+	union p64_pdir_e3 word, lastword = e3[0];
+	lastword.p_word ^= P64_PAGE_FNOEXEC;
+	lastword.p_word &= mask;
+	if (P64_PDIR_E3_ISVEC2(lastword.p_word)) {
+		word = lastword;
+		vec3 = 0;
+		goto do_enum_e2;
+	}
+	for (; vec3 < 512; ++vec3) {
+		word = e3[vec3];
+		word.p_word ^= P64_PAGE_FNOEXEC;
+		word.p_word &= mask;
+		if (P64_PDIR_E3_ISVEC2(word.p_word)) {
+			if (P64_PDIR_E3_IS1GIB(lastword.p_word)) {
+				(*func)(arg, P64_PDIR_VECADDR(vec4, laststart, 0, 0),
+				        (size_t)(vec3 - laststart) * 4096 * 512 * 512,
+				        p64_convert_en_to_e1(lastword.p_word & ~(u64)0x3ffff000) ^
+				        P64_PAGE_FNOEXEC);
+			}
+do_enum_e2:
+			p64_enum_e2(func, arg, vec4, vec3,
+			            word.p_word | ~(u64)P64_PAGE_CASCADING);
+			laststart = vec3;
+			lastword  = word;
+		} else if (P64_PDIR_E2_IS2MIB(word.p_word)) {
+			union p64_pdir_e3 expected_word;
+			expected_word = lastword;
+			expected_word.p_word += (u64)(vec3 - laststart) * 4096 * 512 * 512;
+			if (word.p_word != expected_word.p_word) {
+docall:
+				if (P64_PDIR_E3_IS1GIB(lastword.p_word)) {
+					(*func)(arg, P64_PDIR_VECADDR(vec4, laststart, 0, 0),
+					        (size_t)(vec3 - laststart) * 4096 * 512 * 512,
+					        p64_convert_en_to_e1(lastword.p_word & ~(u64)0x3ffff000) ^
+					        P64_PAGE_FNOEXEC);
+				}
+				laststart = vec3;
+				lastword  = word;
+			}
+		} else {
+			if (word.p_word != lastword.p_word)
+				goto docall;
+		}
+	}
+	if (P64_PDIR_E3_IS1GIB(lastword.p_word)) {
+		(*func)(arg, P64_PDIR_VECADDR(vec4, laststart, 0, 0),
+		        (size_t)(512 - laststart) * 4096 * 512 * 512,
+		        p64_convert_en_to_e1(lastword.p_word & ~(u64)0x3ffff000) ^
+		        P64_PAGE_FNOEXEC);
+	}
+}
+
+PRIVATE ATTR_DBGTEXT void KCALL
+p64_enum_e4(p64_enumfun_t func, void *arg) {
+	unsigned int vec4;
+	union p64_pdir_e4 *e4 = P64_PDIR_E4_IDENTITY;
+	for (vec4 = 0; vec4 < 512; ++vec4) {
+		union p64_pdir_e4 word;
+		word = e4[vec4];
+		if (P64_PDIR_E4_ISVEC3(word.p_word)) {
+			word.p_word ^= P64_PAGE_FNOEXEC;
+			p64_enum_e3(func, arg, vec4,
+			            word.p_word | ~(u64)P64_PAGE_CASCADING);
+		}
+	}
+}
+
+struct p64_enumdat {
+	void  *ed_prevstart;
+	size_t ed_prevsize;
+	u64    ed_prevword;
+	u64    ed_mask;
+	size_t ed_identcnt;
+	bool   ed_skipident;
+};
+
+PRIVATE void KCALL
+p64_printident(struct p64_enumdat *__restrict data) {
+	dbg_printf(DBGSTR(DF_WHITE("%p") "-" DF_WHITE("%p") ": " DF_WHITE("%Iu") " identity mappings\n"),
+	           (byte_t *)P64_VM_KERNEL_PDIR_IDENTITY_BASE,
+	           (byte_t *)P64_VM_KERNEL_PDIR_IDENTITY_BASE + P64_VM_KERNEL_PDIR_IDENTITY_SIZE - 1,
+	           data->ed_identcnt);
+	data->ed_identcnt = 0;
+}
+
+PRIVATE void KCALL
+p64_doenum(struct p64_enumdat *__restrict data,
+           void *start, size_t num_bytes, u64 word, u64 mask) {
+	assert((word & P64_PAGE_FPRESENT) || (word & P64_PAGE_FISAHINT));
+	if (data->ed_identcnt)
+		p64_printident(data);
+	dbg_printf(DBGSTR(DF_WHITE("%p") "-" DF_WHITE("%p")),
+	           start, (byte_t *)start + num_bytes - 1);
+	if (word & P64_PAGE_FPRESENT) {
+		size_t indent;
+		dbg_printf(DBGSTR(": " DF_WHITE("%p") "+" DF_SETWHITE),
+		           word & P64_PAGE_FADDR_4KIB);
+		if ((num_bytes >= ((u64)1024 * 1024 * 1024)) &&
+		    (num_bytes % ((u64)1024 * 1024 * 1024)) == 0) {
+			indent = dbg_printf(DBGSTR("%Iu" DF_RESETATTR "GiB"), (size_t)(num_bytes / ((u64)1024 * 1024 * 1024)));
+		} else if ((num_bytes >= ((u64)1024 * 1024)) &&
+		           (num_bytes % ((u64)1024 * 1024)) == 0) {
+			indent = dbg_printf(DBGSTR("%Iu" DF_RESETATTR "MiB"), (size_t)(num_bytes / ((u64)1024 * 1024)));
+		} else if ((num_bytes >= ((u64)1024)) &&
+		           (num_bytes % ((u64)1024)) == 0) {
+			indent = dbg_printf(DBGSTR("%Iu" DF_RESETATTR "KiB"), (size_t)(num_bytes / ((u64)1024)));
+		} else {
+			indent = dbg_printf(DBGSTR("%Iu" DF_RESETATTR "B"), num_bytes);
+		}
+#define COMMON_INDENT (9 + 3)
+		if (indent < COMMON_INDENT)
+			dbg_printf(DBGSTR("%*s"), COMMON_INDENT - indent, "");
+#undef COMMON_INDENT
+		dbg_print(DBGSTR(" ["));
+#define PUTMASK(_mask, on)                           \
+		do {                                         \
+			if (mask & _mask) {                      \
+				dbg_attr = oldattr;                  \
+				if (word & _mask)                    \
+					dbg_setfgcolor(DBG_COLOR_WHITE); \
+				dbg_putc(word & _mask ? (on) : '-'); \
+			}                                        \
+		} __WHILE0
+		{
+			dbg_attr_t oldattr = dbg_attr;
+			word ^= P64_PAGE_FNOEXEC;
+			PUTMASK(P64_PAGE_FNOEXEC, 'x');
+			PUTMASK(P64_PAGE_FWRITE, 'w');
+			PUTMASK(P64_PAGE_FUSER, 'u');
+			PUTMASK(P64_PAGE_FGLOBAL, 'g');
+			PUTMASK(P64_PAGE_FACCESSED, 'a');
+			PUTMASK(P64_PAGE_FDIRTY, 'd');
+			PUTMASK(P64_PAGE_FPREPARED, 'p');
+			dbg_attr = oldattr;
+		}
+#undef PUTMASK
+		if (mask & (P64_PAGE_FPAT | P64_PAGE_FPWT | P64_PAGE_FPCD)) {
+			u8 state = 0;
+			if (word & P64_PAGE_FPWT)
+				state |= 1;
+			if (word & P64_PAGE_FPCD)
+				state |= 2;
+			if (word & P64_PAGE_FPAT)
+				state |= 4;
+			dbg_printf(DBGSTR("][" DF_SETWHITE "%x"), (unsigned int)state);
+		}
+		dbg_print(DBGSTR(DF_RESETATTR "]\n"));
+	} else {
+		dbg_printf(DBGSTR(":hint@" DF_WHITE("%p") "\n"),
+		           (void *)(word & P64_PAGE_FHINT));
+	}
+}
+
+PRIVATE void KCALL
+p64_enumfun(void *arg, void *start, size_t num_bytes, u64 word) {
+	struct p64_enumdat *data;
+	data = (struct p64_enumdat *)arg;
+	word &= data->ed_mask; /* Mask relevant bits. */
+	if (!((word & P64_PAGE_FPRESENT) || (word & P64_PAGE_FISAHINT)))
+		return;
+	if ((byte_t *)data->ed_prevstart + data->ed_prevsize == start) {
+		u64 expected_word;
+		if (!data->ed_prevsize)
+			expected_word = 0;
+		else if (word & P64_PAGE_FPRESENT)
+			expected_word = data->ed_prevword + data->ed_prevsize;
+		else {
+			assert(word & P64_PAGE_FISAHINT);
+			expected_word = data->ed_prevword;
+		}
+		if (expected_word == word) {
+			data->ed_prevsize += num_bytes;
+			return;
+		}
+	}
+	if (data->ed_prevsize) {
+		if ((byte_t *)data->ed_prevstart >= (byte_t *)P64_VM_KERNEL_PDIR_IDENTITY_BASE &&
+		    (byte_t *)data->ed_prevstart + data->ed_prevsize <= (byte_t *)(P64_VM_KERNEL_PDIR_IDENTITY_BASE +
+		                                                                   P64_VM_KERNEL_PDIR_IDENTITY_SIZE)) {
+			++data->ed_identcnt;
+			goto done_print; /* Skip entires within the identity mapping. */
+		}
+		p64_doenum(data, data->ed_prevstart, data->ed_prevsize, data->ed_prevword, data->ed_mask);
+	}
+done_print:
+	data->ed_prevstart   = start;
+	data->ed_prevsize    = num_bytes;
+	data->ed_prevword    = word;
+}
+
+
+
+DEFINE_DEBUG_FUNCTION(
+		"lspd",
+		"lspd [MODE:kernel|user=user]\n"
+		"\tDo a raw walk over the loaded page directory and enumerate mappings.\n"
+		"\t" DF_WHITE("mode") " can be specified as either " DF_WHITE("kernel") " or " DF_WHITE("user") " to select if " DF_WHITE("vm_kernel") "\n"
+		"\tor " DF_WHITE("THIS_VM") " should be dumped\n",
+		argc, argv) {
+	struct p64_enumdat data;
+	/* TODO: Parse `argv' (the `full') */
+	if (argc != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
+	data.ed_prevstart = 0;
+	data.ed_prevsize  = 0;
+	data.ed_prevword  = 0;
+	data.ed_skipident = true;
+	data.ed_identcnt  = 0;
+	data.ed_mask = P64_PAGE_FVECTOR | P64_PAGE_FPRESENT | P64_PAGE_FWRITE | P64_PAGE_FUSER |
+	               P64_PAGE_FPWT | P64_PAGE_FPCD | P64_PAGE_FPAT | P64_PAGE_FNOEXEC |
+	               P64_PAGE_FPREPARED | P64_PAGE_FGLOBAL | P64_PAGE_FACCESSED | P64_PAGE_FDIRTY;
+	p64_enum_e4(&p64_enumfun, &data);
+	if (data.ed_prevsize)
+		p64_doenum(&data, data.ed_prevstart, data.ed_prevsize, data.ed_prevword, data.ed_mask);
+	return 0;
+}
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 DECL_END

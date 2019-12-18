@@ -140,10 +140,10 @@ DECL_BEGIN
 #define P64_PDIR_VEC3INDEX(ptr) ((__CCAST(u64)(ptr) >> 30) & 0x1ff) /* For `union p64_pdir_e4::p_e3' */
 #define P64_PDIR_VEC4INDEX(ptr) ((__CCAST(u64)(ptr) >> 39) & 0x1ff) /* For `struct p64_pdir::p_e4' */
 #ifdef __CC__
-#define P64_PDIR_VECADDR(vec4, vec3, vec2, vec1) \
-	((u64)(((s64)(vec4) << 55) >> 16) |          \
-	 ((u64)(vec3) << 30) | ((u64)(vec2) << 21) | \
-	 ((u64)(vec1) << 12))
+#define P64_PDIR_VECADDR(vec4, vec3, vec2, vec1)         \
+	(void *)((u64)(((s64)(vec4) << 55) >> 16) |          \
+	         ((u64)(vec3) << 30) | ((u64)(vec2) << 21) | \
+	         ((u64)(vec1) << 12))
 #else /* __CC__ */
 #define P64_PDIR_VECADDR(vec4, vec3, vec2, vec1)        \
 	((((vec4)&0x100) * __UINT64_C(0xffff0000000000)) |  \
