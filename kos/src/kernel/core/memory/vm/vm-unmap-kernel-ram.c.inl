@@ -836,6 +836,8 @@ again:
 	while ((iter = *piter) != NULL) {
 		next = iter->pur_next;
 		if ((uintptr_t)next < (uintptr_t)iter) {
+			if (!next)
+				break;
 			*piter         = next;
 			next->pur_next = iter;
 			piter          = &next->pur_next;

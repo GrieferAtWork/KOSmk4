@@ -72,7 +72,7 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree, mf_data));
 #define heap_validate_all()    (void)0
 #endif /* NDEBUG */
 
-#if defined(NDEBUG) || 0 /* Pedantic heap validation enable/disable */
+#if defined(NDEBUG) || 1 /* Pedantic heap validation enable/disable */
 #define heap_validate_after_free(heap) (void)0
 #define heap_validate_all_after_free() (void)0
 #else /* NDEBUG */
