@@ -33,14 +33,14 @@ INTERN_FUNCTION(GDBX86Interrupt_AsmInt1Handler)
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	intr_enter TRAP
-	ASM_PUSH_GPREGSNSP_CFI_R
+	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
 
 	movq   %rsp, %rdi
 	EXTERN(GDBX86Interrupt_Int1Handler)
 	call   GDBX86Interrupt_Int1Handler
 	movq   %rax, %rsp
 
-	ASM_POP_GPREGSNSP_CFI_R
+	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
 	intr_exit
 	.cfi_endproc
 END(GDBX86Interrupt_AsmInt1Handler)
@@ -53,14 +53,14 @@ INTERN_FUNCTION(GDBX86Interrupt_AsmInt3Handler)
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	intr_enter TRAP
-	ASM_PUSH_GPREGSNSP_CFI_R
+	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
 
 	movq   %rsp, %rdi
 	EXTERN(GDBX86Interrupt_Int3Handler)
 	call   GDBX86Interrupt_Int3Handler
 	movq   %rax, %rsp
 
-	ASM_POP_GPREGSNSP_CFI_R
+	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
 	intr_exit
 	.cfi_endproc
 END(GDBX86Interrupt_AsmInt3Handler)

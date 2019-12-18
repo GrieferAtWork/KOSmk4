@@ -190,19 +190,9 @@ INTERN_FUNCTION(x86_execute_direct_ipi_nopr)
 	pushfl_cfi_r  /* EFLAGS */
 	pushl_cfi %cs
 	pushl_cfi %eax
-	.cfi_endproc
-
-	.cfi_startproc simple
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-
+	pushl_cfi_r %ds
+	pushl_cfi_r %es
+	pushl_cfi_r %fs
 	pushal_cfi_r
 
 	/* Invoke the IPI function */
@@ -230,19 +220,9 @@ INTERN_FUNCTION(x86_execute_direct_ipi)
 	orl    $(EFLAGS_IF), 0(%esp)
 	pushl_cfi %cs
 	pushl_cfi %eax
-	.cfi_endproc
-
-	.cfi_startproc simple
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-
+	pushl_cfi_r %ds
+	pushl_cfi_r %es
+	pushl_cfi_r %fs
 	pushal_cfi_r
 
 	/* Reset the used action mode. */

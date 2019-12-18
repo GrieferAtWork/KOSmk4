@@ -74,7 +74,7 @@ PRIVATE_FUNCTION(x86_idt_unused_common)
 	.cfi_def_cfa %rsp, 8
 	popq_cfi -(SIZEOF_GPREGS64 + 8)(%rsp) /* VECNO */
 	intr_enter INTR
-	ASM_PUSH_GPREGSNSP_CFI_R
+	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
 	movq   %rsp, %rdi     /* struct icpustate *state */
 	xorq   %rsi, %rsi     /* uintptr_t ecode */
 	movq   -8(%rsp), %rdx /* VECNO */
@@ -83,7 +83,7 @@ PRIVATE_FUNCTION(x86_idt_unused_common)
 	call   x86_handle_unhandled_idt
 	movq   %rax, %rsp
 
-	ASM_POP_GPREGSNSP_CFI_R
+	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
 	intr_exit
 END(x86_idt_unused_common)
 

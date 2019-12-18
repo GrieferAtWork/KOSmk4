@@ -92,7 +92,7 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	.cfi_def_cfa %rsp, 0
 	intr_enter INTR
 
-	ASM_PUSH_GPREGSNSP_CFI_R
+	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
 
 	/* Achnowledge the IPI beforehand, thus allowing another
 	 * to be delivered while we're still handling the old one.
@@ -155,7 +155,7 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 
 .Lipi_resume:
 	.cfi_remember_state
-	ASM_POP_GPREGSNSP_CFI_R
+	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
 
 	intr_exit
 	.cfi_restore_state
@@ -198,6 +198,7 @@ INTERN_FUNCTION(x86_execute_direct_ipi_nopr)
 	/* RDI: <cpu_ipi_t func> */
 	/* RSI: <cpu_ipi_t args> */
 	.cfi_startproc
+	.cfi_signal_frame
 	popq_cfi %rax
 	.cfi_register %rip, %rax
 	movq   %rsp, %rcx
@@ -208,12 +209,8 @@ INTERN_FUNCTION(x86_execute_direct_ipi_nopr)
 	pushq_cfi $(SEGMENT_KERNEL_CODE) /* %cs */
 	.cfi_rel_offset %cs, 0
 	pushq_cfi %rax
-	.cfi_endproc
-	.cfi_startproc simple
-	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
-
-	ASM_PUSH_GPREGSNSP_CFI_R
+	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
 
 	/* Invoke the IPI function */
 	movq   %rdi, %rax
@@ -234,6 +231,7 @@ INTERN_FUNCTION(x86_execute_direct_ipi)
 	/* RDI: <cpu_ipi_t func> */
 	/* RSI: <cpu_ipi_t args> */
 	.cfi_startproc
+	.cfi_signal_frame
 	popq_cfi %rax
 	.cfi_register %rip, %rax
 	movq   %rsp, %rcx
@@ -244,12 +242,8 @@ INTERN_FUNCTION(x86_execute_direct_ipi)
 	pushq_cfi $(SEGMENT_KERNEL_CODE) /* %cs */
 	.cfi_rel_offset %cs, 0
 	pushq_cfi %rax
-	.cfi_endproc
-	.cfi_startproc simple
-	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
-
-	ASM_PUSH_GPREGSNSP_CFI_R
+	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
 
 	/* Reset the used action mode. */
 	xorq   %rbp, %rbp
@@ -710,7 +704,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 	call   x86_serve_ipi
 	movq   %rax, %rsp
 
-	ASM_POP_GPREGSNSP_CFI_R
+	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
 	intr_exit
 	.cfi_endproc
 END(x86_smp_entry32)

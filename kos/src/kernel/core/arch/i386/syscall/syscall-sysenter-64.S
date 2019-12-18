@@ -247,13 +247,13 @@ PUBLIC_FUNCTION(x86_syscall_emulate_sysenter_r)
 	/* `struct icpustate *%rdi'
 	 * NOTE: ENDOF(%ecx->IRREGS) is located at the end (top) of our kernel-stack! */
 	.cfi_iret_signal_frame
-	.cfi_def_cfa %rdi, OFFSET_ICPUSTATE_IRREGS
-	ASM_CFI_REL_OFFSET_RESTORE_GPREGSNSP(OFFSET_ICPUSTATE_GPREGSNSP)
+	.cfi_def_cfa %rdi, 0
+	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
 	cli    /* Prevent corruptions while we're juggling with our stack. */
 	movq   %rdi, %rsp
 	.cfi_def_cfa_register %rsp
 	/* Restore user-space registers. */
-	ASM_POP_GPREGSNSP_CFI_R
+	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
 
 	/* Check if our user-space return location got re-directed.
 	 * If it was, we need to apply the register override at the
