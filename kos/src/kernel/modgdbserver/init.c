@@ -53,7 +53,7 @@ GDBServer_TerminateFallbackHostRPC(void *UNUSED(arg),
 	THROW(E_EXIT_THREAD);
 }
 
-PRIVATE DRIVER_INIT void KCALL GDBServer_Fini(void) {
+PRIVATE DRIVER_FINI void KCALL GDBServer_Fini(void) {
 	/* Finalize the remote API. */
 	GDBRemote_Fini();
 
