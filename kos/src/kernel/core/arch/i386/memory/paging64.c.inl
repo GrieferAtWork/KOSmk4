@@ -734,6 +734,7 @@ word_changed_after_e2_vector:
 		if unlikely(!ATOMIC_CMPXCH(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word,
 		                           e3.p_word, new_e3_word))
 			goto word_changed_after_e2_vector;
+		X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was);
 		goto success;
 	}
 
@@ -782,6 +783,7 @@ word_changed_after_e1_vector:
 		if unlikely(!ATOMIC_CMPXCH(P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word,
 		                           e2.p_word, new_e2_word))
 			goto word_changed_after_e1_vector;
+		X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was);
 		goto success;
 	}
 	/* The E1-vector already exists.
