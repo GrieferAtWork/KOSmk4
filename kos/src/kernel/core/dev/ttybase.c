@@ -37,6 +37,7 @@
 
 #include <asm/ioctls.h>
 #include <kos/except-inval.h>
+#include <kos/except-io.h>
 #include <linux/termios.h> /* struct termiox */
 #include <sys/stat.h>
 #include <sys/types.h> /* loff_t */
@@ -91,8 +92,9 @@ NOTHROW(KCALL ttybase_device_cinit)(struct ttybase_device *__restrict self,
 
 
 
-PUBLIC ssize_t LIBTERM_CC
-kernel_terminal_check_sigttou(struct terminal *__restrict self) {
+LOCAL void KCALL
+kernel_terminal_check_sigtty(struct terminal *__restrict self,
+                             bool is_SIGTTOU) {
 	struct ttybase_device *term;
 	REF struct task *my_leader;
 	term = container_of(self, struct ttybase_device, t_term);
@@ -106,7 +108,7 @@ kernel_terminal_check_sigttou(struct terminal *__restrict self) {
 		my_leader_pid = FORTASK(my_leader, this_taskpid);
 again_set_myleader_as_fproc:
 		if (term->t_fproc.cmpxch(NULL, my_leader_pid))
-			goto done; /* Lazily set the caller as the initial foreground process */
+			return; /* Lazily set the caller as the initial foreground process */
 		/* Check if the old foreground process has already
 		 * terminated, but hasn't been cleaned up, yet. */
 		oldpid = term->t_fproc.get();
@@ -120,7 +122,7 @@ do_try_override_fproc:
 			decref_likely(oldpid);
 			if unlikely(!xch_ok)
 				goto again_set_myleader_as_fproc;
-			goto done; /* All right! we've got the lock. */
+			return; /* All right! we've got the lock. */
 		}
 		if (ATOMIC_READ(oldproc->t_flags) & (TASK_FTERMINATING |
 		                                     TASK_FTERMINATED)) {
@@ -131,17 +133,67 @@ do_try_override_fproc:
 		decref_unlikely(oldpid);
 
 
-		printk(KERN_INFO "[tty:%q] Stop background process group %p [tid=%u] upon thread %p [tid=%u] trying to write\n",
-		       term->cd_name, my_leader, (unsigned int)task_getrootpid_of_s(my_leader),
-		       THIS_TASK, task_getroottid_s());
-		task_raisesignalprocessgroup(my_leader, SIGTTOU);
-		/* We might get here if the calling process changed its process group
-		 * in the mean time. - In this case, just re-raise `SIGTTOU' within the
-		 * calling process only. */
-		task_raisesignalprocess(task_getprocess(), SIGTTOU);
-		/* We really shouldn't get here */
+		/* 11.1.4 -- Terminal Access Control */
+		if (is_SIGTTOU) {
+			printk(KERN_INFO "[tty:%q] Background process group %p [tid=%u], thread %p [tid=%u] tried to write\n",
+			       term->cd_name, my_leader, (unsigned int)task_getrootpid_of_s(my_leader),
+			       THIS_TASK, task_getroottid_s());
+			/* ... Attempts by a process in a background process group to write to its controlling
+			 * terminal shall cause the process group to be sent a SIGTTOU signal unless one of the
+			 * following special cases applies:
+			 *   - If [...] the process is ignoring or blocking the SIGTTOU signal, the process
+			 *     is allowed to write to the terminal and the SIGTTOU signal is not sent.
+			 *   - If [...] the process group of the writing process is orphaned, and the writing
+			 *     process is not ignoring or blocking the SIGTTOU signal, the write() shall return -1
+			 *     with errno set to [EIO] and no signal shall be sent */
+			if (taskpid_isorphan_p(my_leader_pid)) {
+do_throw_ttou:
+				THROW(E_IOERROR_NODATA,
+				      E_IOERROR_SUBSYSTEM_TTY,
+				      E_IOERROR_REASON_TTY_ORPHAN_SIGTTOU);
+			}
+			/* NOTE: We also do the same if our process group leader has died, because once
+			 *       that has happened, any other process is allowed to steal the TTY! */
+			if (my_leader->t_flags & (TASK_FTERMINATING | TASK_FTERMINATED))
+				goto do_throw_ttou;
+			task_raisesignalprocessgroup(my_leader, SIGTTOU);
+			/* We might get here if the calling process changed its process group
+			 * in the mean time. - In this case, just re-raise `SIGTTIN' within the
+			 * calling process only. */
+			task_raisesignalprocess(task_getprocess(), SIGTTOU);
+			/* We might get here if `SIGTTOU' is being ignored by the calling thread.
+			 * -> As described by POSIX, allow the process to write in this szenario. */
+		} else {
+			printk(KERN_INFO "[tty:%q] Background process group %p [tid=%u], thread %p [tid=%u] tried to read\n",
+			       term->cd_name, my_leader, (unsigned int)task_getrootpid_of_s(my_leader),
+			       THIS_TASK, task_getroottid_s());
+			/* ... if the reading process is ignoring or blocking the SIGTTIN signal, or if
+			 * the process group of the reading process isorphaned, the read() shall return
+			 * -1, with errno set to [EIO] and no signal shall be sent. */
+			if (taskpid_isorphan_p(my_leader_pid))
+				goto do_throw_ttin;
+			/* NOTE: We also do the same if our process group leader has died, because once
+			 *       that has happened, any other process is allowed to steal the TTY! */
+			if (my_leader->t_flags & (TASK_FTERMINATING | TASK_FTERMINATED))
+				goto do_throw_ttin;
+			task_raisesignalprocessgroup(my_leader, SIGTTIN);
+			/* We might get here if the calling process changed its process group
+			 * in the mean time. - In this case, just re-raise `SIGTTIN' within the
+			 * calling process only. */
+			task_raisesignalprocess(task_getprocess(), SIGTTIN);
+			/* We might get here if `SIGTTIN' is being ignored by the calling thread. */
+do_throw_ttin:
+			THROW(E_IOERROR_NODATA,
+			      E_IOERROR_SUBSYSTEM_TTY,
+			      E_IOERROR_REASON_TTY_ORPHAN_SIGTTIN);
+		}
 	}
-done:
+}
+
+/* Kernel-level implementations for terminal system operators. */
+PUBLIC ssize_t LIBTERM_CC
+kernel_terminal_check_sigttou(struct terminal *__restrict self) {
+	kernel_terminal_check_sigtty(self, true);
 	return 0;
 }
 
@@ -165,6 +217,13 @@ kernel_terminal_raise(struct terminal *__restrict self,
 	return 0;
 }
 
+/* Check if the calling thread is allowed to read from `self'
+ * This function must be called by read-operator overrides! */
+PUBLIC void KCALL
+kernel_terminal_check_sigttin(struct terminal *__restrict self) {
+	kernel_terminal_check_sigtty(self, false);
+}
+
 /* Default character-device read/write operator implementations for tty devices
  * These functions will call forward to `terminal_iread()' and `terminal_owrite()' */
 PUBLIC NONNULL((1)) size_t KCALL
@@ -174,7 +233,8 @@ ttybase_device_iread(struct character_device *__restrict self,
 	size_t result;
 	struct ttybase_device *me;
 	assert(character_device_isattybase(self));
-	me     = (struct ttybase_device *)self;
+	me = (struct ttybase_device *)self;
+	kernel_terminal_check_sigtty(&me->t_term, false);
 	result = terminal_iread(&me->t_term, dst, num_bytes, mode);
 	assert(result <= num_bytes);
 	return result;

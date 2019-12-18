@@ -796,6 +796,7 @@
 #define __CRT_HAVE_kernel_syscall1_iscp 1
 #define __CRT_HAVE_kernel_syscall1_regcnt 1
 #define __CRT_HAVE_kernel_syscall1_restartmode 1
+#define __CRT_HAVE_kernel_terminal_check_sigttin 1
 #define __CRT_HAVE_kernel_terminal_check_sigttou 1
 #define __CRT_HAVE_kernel_terminal_raise 1
 #define __CRT_HAVE_kernel_uname 1

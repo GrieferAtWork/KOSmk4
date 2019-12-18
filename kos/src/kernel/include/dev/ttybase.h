@@ -79,6 +79,10 @@ DEFINE_REFCOUNT_TYPE_SUBCLASS(ttybase_device, character_device);
 FUNDEF ssize_t LIBTERM_CC kernel_terminal_check_sigttou(struct terminal *__restrict self);
 FUNDEF ssize_t LIBTERM_CC kernel_terminal_raise(struct terminal *__restrict self, unsigned int signo);
 
+/* Check if the calling thread is allowed to read from `self'
+ * This function must be called by read-operator overrides! */
+FUNDEF void KCALL kernel_terminal_check_sigttin(struct terminal *__restrict self);
+
 /* Check if a given character device is actually a ttybase */
 #define character_device_isattybase(self)                                                         \
 	((self)->cd_heapsize >= sizeof(struct ttybase_device) &&                                      \
@@ -89,7 +93,7 @@ FUNDEF ssize_t LIBTERM_CC kernel_terminal_raise(struct terminal *__restrict self
 /* Initialize a given TTY character device.
  * NOTE: This function initializes the following operators:
  *   - cd_type.ct_fini  = &ttybase_device_fini;  // Must be called as fallback by overrides
- *   - cd_type.ct_read  = &ttybase_device_iread;
+ *   - cd_type.ct_read  = &ttybase_device_iread; // Must invoke `kernel_terminal_check_sigttin()'
  *   - cd_type.ct_write = &ttybase_device_owrite;
  *   - cd_type.ct_ioctl = &ttybase_device_ioctl; // Must be called as fallback by overrides
  *   - cd_type.ct_poll  = &ttybase_device_poll;

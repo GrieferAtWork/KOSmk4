@@ -12410,10 +12410,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_ioperm; .long sys_ioperm
 	.reloc ., R_386_SIZE32, sys_ioperm; .int 0
 	.int 0x601dc1d
-	.long 0 /* index: 3102 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname3102 /* index: 3102 */
+	.weak kernel_terminal_check_sigttin; .long kernel_terminal_check_sigttin
+	.reloc ., R_386_SIZE32, kernel_terminal_check_sigttin; .int 0
+	.int 0xf867c1e
 	.long 0 /* index: 3103 */
 	.long 0
 	.int 0
@@ -20024,6 +20024,8 @@ END(kernel_symbol_table)
 	.string "dbg_setreg"
 .Lname3101:
 	.string "sys_ioperm"
+.Lname3102:
+	.string "kernel_terminal_check_sigttin"
 .Lname3104:
 	.string "vm_copytophys"
 .Lname3105:

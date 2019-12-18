@@ -12410,10 +12410,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_ioperm; .quad sys_ioperm
 	.reloc ., R_X86_64_SIZE32, sys_ioperm; .int 0
 	.int 0x601dc1d
-	.quad 0 /* index: 3102 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname3102 /* index: 3102 */
+	.weak kernel_terminal_check_sigttin; .quad kernel_terminal_check_sigttin
+	.reloc ., R_X86_64_SIZE32, kernel_terminal_check_sigttin; .int 0
+	.int 0xf867c1e
 	.quad 0 /* index: 3103 */
 	.quad 0
 	.int 0
@@ -20604,6 +20604,8 @@ END(kernel_symbol_table)
 	.string "sys32_munlockall"
 .Lname3101:
 	.string "sys_ioperm"
+.Lname3102:
+	.string "kernel_terminal_check_sigttin"
 .Lname3104:
 	.string "vm_copytophys"
 .Lname3105:

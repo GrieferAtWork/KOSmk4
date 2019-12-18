@@ -81,9 +81,9 @@ DEFINE_REFCOUNT_FUNCTIONS(struct taskpid, tp_refcnt, taskpid_destroy)
 #ifdef __INTELLISENSE__
 FORCELOCAL WUNUSED REF struct task *
 NOTHROW(KCALL taskpid_gettask)(struct taskpid *__restrict self);
-#else
+#else /* __INTELLISENSE__ */
 #define taskpid_gettask(self) (self)->tp_thread.get()
-#endif
+#endif /* !__INTELLISENSE__ */
 
 /* Return the PID of `self' within the given PID namespace. */
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1, 2)) upid_t
@@ -229,6 +229,11 @@ FORCELOCAL WUNUSED REF struct task *NOTHROW(KCALL task_getprocessparent_nx)(void
 FORCELOCAL WUNUSED REF struct taskpid *NOTHROW(KCALL task_getprocessparentpid_nx)(void);
 FORCELOCAL WUNUSED NONNULL((1)) REF struct task *NOTHROW(KCALL task_getprocessparent_of_nx)(struct task *__restrict thread);
 FORCELOCAL WUNUSED NONNULL((1)) REF struct taskpid *NOTHROW(KCALL task_getprocessparentpid_of_nx)(struct task *__restrict thread);
+
+/* Check if the given task was orphaned (no longer has a parent process) */
+FORCELOCAL WUNUSED ATTR_PURE bool NOTHROW(KCALL task_isorphan)(void);
+FORCELOCAL WUNUSED ATTR_PURE NONNULL((1)) bool NOTHROW(KCALL task_isorphan_p)(struct task *__restrict thread);
+FORCELOCAL WUNUSED ATTR_PURE NONNULL((1)) bool NOTHROW(KCALL taskpid_isorphan_p)(struct taskpid *__restrict self);
 
 /* Detach the given `thread' from its parent
  * @return: true:  Successfully detached the given `thread'.
@@ -569,6 +574,23 @@ NOTHROW(KCALL taskpid_getpid_s)(struct taskpid const *__restrict self,
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
 NOTHROW(KCALL taskpid_getrootpid)(struct taskpid const *__restrict self) {
 	return self->tp_pids[0];
+}
+
+/* Check if the given task was orphaned (no longer has a parent process) */
+FORCELOCAL WUNUSED ATTR_PURE bool
+NOTHROW(KCALL task_isorphan)(void) {
+	struct taskpid *proc = task_getprocesspid();
+	return __hybrid_atomic_load(proc->tp_siblings.ln_pself, __ATOMIC_ACQUIRE) == NULL;
+}
+
+FORCELOCAL WUNUSED ATTR_PURE NONNULL((1)) bool
+NOTHROW(KCALL task_isorphan_p)(struct task *__restrict thread) {
+	struct taskpid *proc = task_getprocesspid_of(thread);
+	return __hybrid_atomic_load(proc->tp_siblings.ln_pself, __ATOMIC_ACQUIRE) == NULL;
+}
+FORCELOCAL WUNUSED ATTR_PURE NONNULL((1)) bool
+NOTHROW(KCALL taskpid_isorphan_p)(struct taskpid *__restrict self) {
+	return __hybrid_atomic_load(self->tp_siblings.ln_pself, __ATOMIC_ACQUIRE) == NULL;
 }
 
 FORCELOCAL WUNUSED REF struct task *KCALL

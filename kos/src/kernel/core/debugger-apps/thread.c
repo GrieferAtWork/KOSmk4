@@ -207,8 +207,12 @@ DEFINE_DEBUG_FUNCTION(
 			if (wasdestroyed(pid))
 				continue;
 			if (!pid->tp_thread.m_pointer ||
-			    wasdestroyed(pid->tp_thread.m_pointer))
+			    wasdestroyed(pid->tp_thread.m_pointer)) {
+				dbg_printf(DBGSTR("%p %u\tdead\t?\t?\t?\n"),
+				           pid->tp_thread.m_pointer,
+				           pid->tp_pids[0]);
 				continue;
+			}
 			if (verify_thread_address_nopid(pid->tp_thread.m_pointer))
 				continue; /* Already enumerated. */
 			enum_thread(pid->tp_thread.m_pointer, THREAD_STATE_OTHER);

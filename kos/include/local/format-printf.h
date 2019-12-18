@@ -874,7 +874,7 @@ print_string:
 			__PRIVATE char const __vinfo_default_format[] = "%f(%l,%c) : %n";
 			void *__p = __builtin_va_arg(__FORMAT_ARGS, void *);
 			if (!__xformat_arg) {
-				__xformat_arg = __vinfo_default_format;
+				__xformat_arg     = __vinfo_default_format;
 				__xformat_argsize = __COMPILER_STRLEN(__vinfo_default_format);
 			}
 			{
@@ -917,13 +917,14 @@ print_string:
 				(*__p_debug_dllocksections)(__ptr_module, &__debug_sections, &__dl_debug_sections);
 				(*__p_debug_sections_addr2line)(&__debug_sections, &__info,
 				                               (__UINTPTR_TYPE__)__p - __modrel,
-				                                0, DEBUG_ADDR2LINE_FNORMAL);
+				                                DEBUG_ADDR2LINE_LEVEL_SOURCE,
+				                                DEBUG_ADDR2LINE_FNORMAL);
 #else /* !__KERNEL__ || !__KOS__ */
 				struct addr2line_buf __dl_debug_sections;
 				__UINTPTR_TYPE__ __rel;
 				__rel = addr2line_begin(&__dl_debug_sections, (__UINTPTR_TYPE__)__p);
 				__modrel = (__UINTPTR_TYPE__)__p - __rel;
-				addr2line(&__dl_debug_sections, __rel, &__info, 0);
+				addr2line(&__dl_debug_sections, __rel, &__info, DEBUG_ADDR2LINE_LEVEL_SOURCE);
 #endif /* __KERNEL__ && __KOS__ */
 				__xiter = __xflush = __xformat_arg;
 				__xend = __xformat_arg + __xformat_argsize;

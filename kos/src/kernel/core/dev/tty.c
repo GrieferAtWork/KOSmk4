@@ -90,19 +90,6 @@ NOTHROW(KCALL tty_device_fini)(struct character_device *__restrict self) {
 }
 
 
-PRIVATE NONNULL((1)) size_t KCALL
-tty_device_iread(struct character_device *__restrict self,
-                 USER CHECKED void *dst,
-                 size_t num_bytes, iomode_t mode) THROWS(...) {
-	struct tty_device *me;
-	size_t result;
-	me = (struct tty_device *)self;
-	result = terminal_iread(&me->t_term,
-	                        (byte_t *)dst,
-	                        num_bytes, mode);
-	return result;
-}
-
 
 PUBLIC NONNULL((1)) poll_mode_t KCALL
 tty_device_poll(struct character_device *__restrict self, poll_mode_t what) THROWS(...) {
@@ -344,16 +331,16 @@ predict_output_device_command:
 
 INTERN NONNULL((1)) REF struct vm_datablock *KCALL
 tty_device_mmap(struct character_device *__restrict self,
-                vm_vpage64_t *__restrict pminpage,
-                vm_vpage64_t *__restrict pmaxpage) THROWS(...) {
+                pos_t *__restrict pminoffset,
+                pos_t *__restrict pnumbytes) THROWS(...) {
 	struct tty_device *me;
 	REF struct vm_datablock *result;
 	me = (struct tty_device *)self;
 	/* mmap() may be implemented by the display handle (e.g. for direct framebuffer access),
 	 * so forward any request for mapping data into memory to it, and it alone. */
 	result = (*handle_type_db.h_mmap[me->t_ohandle_typ])(me->t_ohandle_ptr,
-	                                                     pminpage,
-	                                                     pmaxpage);
+	                                                     pminoffset,
+	                                                     pnumbytes);
 	return result;
 }
 
@@ -387,7 +374,6 @@ tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 	result = CHARACTER_DEVICE_ALLOC(struct tty_device);
 	ttybase_device_cinit(result, &tty_device_oprinter);
 	result->cd_type.ct_fini  = &tty_device_fini;
-	result->cd_type.ct_read  = &tty_device_iread;
 	result->cd_type.ct_write = &ttybase_device_owrite;
 	result->cd_type.ct_poll  = &tty_device_poll;
 	result->cd_type.ct_ioctl = &tty_device_ioctl;
