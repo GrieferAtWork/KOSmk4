@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <sched/cpu.h>
@@ -850,6 +851,10 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	struct cpu *mycpu;
 	caller = THIS_TASK;
 	assert(caller->t_flags & TASK_FRUNNING);
+	if unlikely(caller->t_flags & TASK_FCRITICAL) {
+		kernel_panic("Attempted to exit critical thread %p [tid=%u]",
+		             caller, task_getroottid_of_s(caller));
+	}
 
 	/* Set the bit to indicate that we've started termination. */
 	if (!(ATOMIC_FETCHOR(caller->t_flags, TASK_FTERMINATING) & TASK_FTERMINATING)) {

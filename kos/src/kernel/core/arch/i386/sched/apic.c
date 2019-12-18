@@ -571,7 +571,7 @@ i386_allocate_secondary_cores(void) {
 		altcore->c_override                  = NULL;
 		altidle->t_cpu                       = altcore;
 		altidle->t_self                      = altidle;
-		altidle->t_flags                     = TASK_FSTARTED | TASK_FRUNNING | TASK_FKEEPCORE;
+		altidle->t_flags                     = TASK_FSTARTED | TASK_FRUNNING | TASK_FKEEPCORE | TASK_FCRITICAL;
 		altidle->t_sched.s_running.sr_runnxt = altidle;
 		altidle->t_sched.s_running.sr_runprv = altidle;
 

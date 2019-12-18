@@ -144,7 +144,7 @@ again_lock_vm:
 			    ((node->vn_prot & VM_PROT_LOOSE) && !keep_loose_mappings))
 				continue; /* Ignore this node! */
 			assertf(!PAGEIDRANGE_ISKERN_PARTIAL(vm_node_getstartpageid(node),
-			                                  vm_node_getendpageid(node)),
+			                                    vm_node_getendpageid(node)),
 			        "%p...%p\n"
 			        "%p...%p\n",
 			        (uintptr_t)vm_node_getmin(node),
@@ -313,7 +313,7 @@ handle_remove_write_error:
 			}
 			resnode->vn_guard = node->vn_guard;
 			assertf(!PAGEIDRANGE_ISKERN_PARTIAL(vm_node_getstartpageid(resnode),
-			                                  vm_node_getendpageid(resnode)),
+			                                    vm_node_getendpageid(resnode)),
 			        "%p...%p\n"
 			        "%p...%p\n",
 			        (uintptr_t)vm_node_getmin(resnode),
