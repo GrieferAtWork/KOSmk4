@@ -132,8 +132,10 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 			case F_SEGES: effective_segment_value = icpustate_getes(state); break;
 			case F_SEGCS: effective_segment_value = icpustate_getcs(state); break;
 			case F_SEGSS: effective_segment_value = icpustate_getss(state); break;
-#endif /* !__x86_64__ */
 			default: __builtin_unreachable(); break;
+#else /* !__x86_64__ */
+			default: effective_segment_value = icpustate_getds(state); break;
+#endif /* !__x86_64__ */
 			}
 		}
 
