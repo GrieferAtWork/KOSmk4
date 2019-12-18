@@ -54,7 +54,6 @@ BEGIN
 		CC_FLAGS({
 			"-mpreferred-stack-boundary=3",
 			"-mno-red-zone",     /* Disable the red zone in kernel-space */
-			"-mcmodel=kernel",   /* Configure GCC for a memory model to address -2Gb...2Gb */
 		})
 	}
 
@@ -83,8 +82,11 @@ BEGIN
 			 * think that dynamic linking isn't supported in certain cases? */
 			"-Bdynamic"
 		})
-		if (TARGET_ARCH == "x86_64")
-			LD_FLAGS({ "-z", "noreloc-overflow" })
+		if (TARGET_ARCH == "x86_64") {
+//			LD_FLAGS({ "-z", "noreloc-overflow" })
+			GCC_FLAGS({ "-fno-plt" })
+			GCC_FLAGS({ "-fPIC" })
+		}
 		GCC_FLAGS({
 			"-shared",
 //			"-fPIC", /* Not needed, and would produce slower code... */

@@ -73,64 +73,71 @@ DECL_BEGIN
 #ifdef __x86_64__
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 #define __predict_dotrace(section, expr, expected)      \
-    __asm__ __volatile__(".weak .Ltracepoint_%=\n\t"    \
-                         ".local .Ltracepoint_%=\n\t"   \
-                         ".hidden .Ltracepoint_%=\n\t"  \
-                         ".pushsection " section "\n\t" \
-                         "991:\n\t"                     \
-                         "\t.reloc ., R_X86_64_32, .Ltracepoint_%= - 0xffffffff80000000\n\t" \
-                         "\t.int 0\n\t"                 \
-                         "\t.int %p0\n\t"               \
-                         "\t.int 0\n\t"                 \
-                         "\t.int 0\n\t"                 \
-                         ".popsection\n\t"              \
-                         ".Ltracepoint_%=:\n\t"         \
-                         "movq $991b,%%rdi\n\t"         \
-                         "_x86_call_predict_update %1"  \
-                         :                              \
-                         : "X" (expected)               \
-                         , "acdS" (expr)                \
-                         : "rdi")
+	__asm__ __volatile__(".weak .Ltracepoint_%=\n\t"    \
+	                     ".local .Ltracepoint_%=\n\t"   \
+	                     ".hidden .Ltracepoint_%=\n\t"  \
+	                     ".pushsection " section "\n\t" \
+	                     "991:\n\t"                     \
+	                     "\t.int .Ltracepoint_%= - 0xffffffff80000000\n\t" \
+	                     "\t.int 0\n\t"                 \
+	                     "\t.int 0\n\t"                 \
+	                     "\t.int %p0\n\t"               \
+	                     ".popsection\n\t"              \
+	                     ".Ltracepoint_%=:\n\t"         \
+	                     "movq $991b,%%rdi\n\t"         \
+	                     "_x86_call_predict_update %1"  \
+	                     :                              \
+	                     : "X" (expected)               \
+	                     , "acdS" (expr)                \
+	                     : "rdi")
 #else /* CONFIG_BUILDING_KERNEL_CORE */
+/* NOTE: I am well aware that `R_X86_64_64' isn't the correct type here!
+ *       However, LD will refuse to link `R_X86_64_32' or `R_X86_64_32S'
+ *       relocations in ~shared libraries~ (drivers)
+ *       So instead we use a 64-bit relocation of which we know that the
+ *       upper 32-bit will always be 0 (because the driver will always
+ *       be mapped above `0xffffffff80000000'), and have those upper 32
+ *       0-bits overflow into the `bp_wrong' field (which doesn't matter
+ *       since that field has to be initialized as 0 anyways...) */
 #define __predict_dotrace(section, expr, expected)      \
-    __asm__ __volatile__(".weak .Ltracepoint_%=\n\t"    \
-                         ".local .Ltracepoint_%=\n\t"   \
-                         ".hidden .Ltracepoint_%=\n\t"  \
-                         ".pushsection " section "\n\t" \
-                         "991:\n\t"                     \
-                         "\t.reloc ., R_X86_64_32, .Ltracepoint_%= - 0xffffffff80000000\n\t" \
-                         "\t.int 0\n\t"                 \
-                         "\t.int %p0\n\t"               \
-                         "\t.int 0\n\t"                 \
-                         "\t.int 0\n\t"                 \
-                         ".popsection\n\t"              \
-                         ".Ltracepoint_%=:\n\t"         \
-                         "leaq 991b(%%rip),%%rdi\n\t"   \
-                         "_x86_call_predict_update %1"  \
-                         :                              \
-                         : "X" (expected)               \
-                         , "acdS" (expr)                \
-                         : "rdi")
+	__asm__ __volatile__(".weak .Ltracepoint_%=\n\t"    \
+	                     ".local .Ltracepoint_%=\n\t"   \
+	                     ".hidden .Ltracepoint_%=\n\t"  \
+	                     ".pushsection " section "\n\t" \
+	                     "991:\n\t"                     \
+	                     "\t.reloc ., R_X86_64_64, .Ltracepoint_%= - 0xffffffff80000000\n\t" \
+	                     "\t.int 0\n\t"                 \
+	                     "\t.int 0\n\t"                 \
+	                     "\t.int 0\n\t"                 \
+	                     "\t.int %p0\n\t"               \
+	                     ".popsection\n\t"              \
+	                     ".Ltracepoint_%=:\n\t"         \
+	                     "leaq 991b(%%rip),%%rdi\n\t"   \
+	                     "_x86_call_predict_update %1"  \
+	                     :                              \
+	                     : "X" (expected)               \
+	                     , "acdS" (expr)                \
+	                     : "rdi")
 #endif /* !CONFIG_BUILDING_KERNEL_CORE */
 #else /* __x86_64__ */
 #define __predict_dotrace(section,expr,expected)        \
-    __asm__ __volatile__(".weak .Ltracepoint_%=\n\t"    \
-                         ".local .Ltracepoint_%=\n\t"   \
-                         ".hidden .Ltracepoint_%=\n\t"  \
-                         ".pushsection " section "\n\t" \
-                         "991:\n\t"                     \
-                         "\t.long .Ltracepoint_%=\n\t"  \
-                         "\t.long %p0\n\t"              \
-                         "\t.long 0\n\t"                \
-                         "\t.long 0\n\t"                \
-                         ".popsection\n\t"              \
-                         ".Ltracepoint_%=:\n\t"         \
-                         "movl $991b,%%ecx\n\t"         \
-                         "_x86_call_predict_update %1"  \
-                         :                              \
-                         : "X" (expected)               \
-                         , "ad" (expr)                  \
-                         : "ecx")
+	__asm__ __volatile__(".weak .Ltracepoint_%=\n\t"    \
+	                     ".local .Ltracepoint_%=\n\t"   \
+	                     ".hidden .Ltracepoint_%=\n\t"  \
+	                     ".pushsection " section "\n\t" \
+	                     "991:\n\t"                     \
+	                     "\t.long .Ltracepoint_%=\n\t"  \
+	                     "\t.long 0\n\t"                \
+	                     "\t.long 0\n\t"                \
+	                     "\t.long %p0\n\t"              \
+	                     ".popsection\n\t"              \
+	                     ".Ltracepoint_%=:\n\t"         \
+	                     "movl $991b,%%ecx\n\t"         \
+	                     "_x86_call_predict_update %1"  \
+	                     :                              \
+	                     : "X" (expected)               \
+	                     , "ad" (expr)                  \
+	                     : "ecx")
 #endif /* !__x86_64__ */
 
 

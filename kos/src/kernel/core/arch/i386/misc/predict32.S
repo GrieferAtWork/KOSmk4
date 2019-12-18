@@ -31,7 +31,7 @@ PUBLIC_FUNCTION(name);                \
 	.cfi_remember_state;              \
 	pushfl_cfi_r;                     \
 	pushl_cfi_r %eax;                 \
-	cmpX_reg, 4(%ecx);                \
+	cmpX_reg, 12(%ecx);               \
 	jmp    1f;                        \
 	.cfi_restore_state;               \
 END(name);                            \
@@ -45,11 +45,11 @@ DEFINE_VARIANT(__predict_update_ax, cmpw %ax)
 PUBLIC_FUNCTION(__predict_update_eax)
 	pushfl_cfi_r
 	pushl_cfi_r %eax
-	cmpl   %eax, 4(%ecx)
+	cmpl   %eax, 12(%ecx)
 1:	movl   $(0), %eax
 	sete   %al
 	/* Increment the miss/hit counter */
-	lock;  incl 8(%ecx,%eax,4)
+	lock;  incl 4(%ecx,%eax,4)
 	popl_cfi_r %eax
 	popfl_cfi_r
 	ret

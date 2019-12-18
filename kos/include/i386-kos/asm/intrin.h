@@ -239,24 +239,30 @@ __FORCELOCAL void (__wrcs)(__UINT16_TYPE__ __val) {
 #endif /* !__x86_64__ */
 	{
 #ifdef __x86_64__
-		__asm__ __volatile__("pushq %q0\n\t"
+		__register __REGISTER_TYPE__ __temp;
+		__asm__ __volatile__("movq %%ss, %q0\n\t"
+		                     "pushq %q0\n\t"
 		                     "pushq %%rsp\n\t"
 		                     "addq $8, 0(%%rsp)\n\t"
 		                     "pushfq\n\t"
 		                     "pushq %q1\n\t"
-		                     "pushq $1f\n\t"
+#if defined(__PIC__) || defined(__pic__) || defined(__PIE__) || defined(__pie__)
+		                     "leaq 991f(%%rip), %q0\n\t"
+		                     "pushq %q0\n\t"
+#else /* __PIC__ || __pic__ || __PIE__ || __pie__ */
+		                     "pushq $991f\n\t"
+#endif /* !__PIC__ && !__pic__ && !__PIE__ && !__pie__ */
 		                     "iretq\n\t"
-		                     "1:"
-		                     :
-		                     : "g" ((__UINT64_TYPE__)__rdss())
-		                     , "r" ((__UINT64_TYPE__)__val)
+		                     "991:"
+		                     : "=&r" (__temp)
+		                     : "r" ((__UINT64_TYPE__)__val)
 		                     : "memory");
 #else /* __x86_64__ */
 		__asm__ __volatile__("pushfl\n\t"
 		                     "pushl %k0\n\t"
-		                     "pushl $1f\n\t"
+		                     "pushl $991f\n\t"
 		                     "iret\n\t"
-		                     "1:"
+		                     "991:"
 		                     :
 		                     : "r" ((__UINT32_TYPE__)__val)
 		                     : "memory");

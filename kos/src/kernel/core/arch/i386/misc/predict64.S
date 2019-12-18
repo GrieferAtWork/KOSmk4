@@ -30,7 +30,7 @@ PUBLIC_FUNCTION(name);                \
 	.cfi_remember_state;              \
 	pushfq_cfi_r;                     \
 	pushq_cfi_r %rax;                 \
-	cmpX_reg, 4(%rdi);                \
+	cmpX_reg, 12(%rdi);               \
 	jmp    1f;                        \
 	.cfi_restore_state;               \
 END(name);                            \
@@ -57,11 +57,11 @@ DEFINE_VARIANT(__predict_update_eax, cmpl %eax)
 PUBLIC_FUNCTION(__predict_update_rax)
 	pushfq_cfi_r
 	pushq_cfi_r %rax
-	cmpl   %eax, 4(%rdi)
+	cmpl   %eax, 12(%rdi)
 1:	movq   $(0), %rax
 	sete   %al
 	/* Increment the miss/hit counter */
-	lock;  incl  8(%rdi,%rax,4)
+	lock;  incl  4(%rdi,%rax,4)
 	popq_cfi_r %rax
 	popfq_cfi_r
 	ret

@@ -50,7 +50,6 @@ DECL_BEGIN
 #define __branch_prediction_defined 1
 struct branch_prediction {
 	__BRANCH_PREDITION_ADDRESS_TYPE  bp_addr;   /* [const][1..1] Source location */
-	__BRANCH_PREDITION_EXPECTED_TYPE bp_expect; /* [const] The expected value */
 	union {
 		struct {  /* For annotated branches */
 			__BRANCH_PREDITION_RIGHT_WRONG_TYPE bp_wrong; /* Number of times that the prediction was wrong */
@@ -63,6 +62,7 @@ struct branch_prediction {
 		};
 		__BRANCH_PREDITION_RIGHT_WRONG_TYPE bp_miss_hit[2]; /* Array lookup to allow for condition indexing */
 	};
+	__BRANCH_PREDITION_EXPECTED_TYPE bp_expect; /* [const] The expected value */
 };
 #endif /* !__branch_prediction_defined */
 

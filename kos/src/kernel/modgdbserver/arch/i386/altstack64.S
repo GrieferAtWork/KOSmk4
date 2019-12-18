@@ -40,7 +40,7 @@ INTERN_FUNCTION(GDB_MainWithAlternateStack)
 	.cfi_def_cfa_register %rbp
 
 	/* Load the alternate stack and call the regular GDB_Main() function. */
-	movq   $(GDB_Main_alternate_stack + KERNEL_DEBUG_STACKSIZE), %rsp
+	leaq   (GDB_Main_alternate_stack + KERNEL_DEBUG_STACKSIZE)(%rip), %rsp
 	EXTERN(GDB_Main)
 	call   GDB_Main
 
