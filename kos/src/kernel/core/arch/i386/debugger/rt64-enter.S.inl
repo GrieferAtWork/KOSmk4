@@ -381,12 +381,12 @@ L(.Lalready_active):
 	movq   OFFSET_DBG_ENTRY_INFO_ARGC(%rbp), %rcx /* >>     %rcx = OFFSET_DBG_ENTRY_INFO_ARGC(%rbp);           */
 	cmpq   $(6), %rcx                             /* >>     if (%rcx < 6)                                      */
 	jnb    1f                                     /* >>     {                                                  */
-	testq  %rcx, %rcx                             /* >>         if (!%rcx)                                     */
-	jz     L(.Ldone_copy)                         /* >>         goto done_copy;                                */
 	movq   $(6), %rdx                             /* >>         %rdx = 6;                                      */
 	subq   %rcx, %rdx                             /* >>         %rdx = %rdx - %rcx; // %rdx = 6 - %rcx         */
 	leaq   (,%rdx,8), %rdx                        /* >>         %rdx = %rdx * 8;    // %rdx = (6 - %rcx) * 8   */
 	subq   %rdx, %rsp                             /* >>         %rsp = %rsp - %rdx; // %rsp = %rsp - (6 - %rcx) * 8 */
+	testq  %rcx, %rcx                             /* >>         if (!%rcx)                                     */
+	jz     L(.Ldone_copy)                         /* >>             goto done_copy;                            */
 1:	                                              /* >>     }                                                  */
 	leaq   (,%rcx,8), %rdx                        /* >>     %rdx = %rcx * 8;                                   */
 	subq   %rdx, %rsp                             /* >>     %rsp = %rsp - %rdx; // %rsp = %rsp - %rcx * 8;     */
