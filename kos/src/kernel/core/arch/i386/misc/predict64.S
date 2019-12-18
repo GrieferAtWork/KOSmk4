@@ -30,7 +30,7 @@ PUBLIC_FUNCTION(name);                \
 	.cfi_remember_state;              \
 	pushfq_cfi_r;                     \
 	pushq_cfi_r %rax;                 \
-	cmpX_reg, 8(%rdi);                \
+	cmpX_reg, 4(%rdi);                \
 	jmp    1f;                        \
 	.cfi_restore_state;               \
 END(name);                            \
@@ -38,17 +38,17 @@ END(name);                            \
 DEFINE_VARIANT(__predict_update_sil, cmpb %sil)
 DEFINE_VARIANT(__predict_update_si, cmpw %si)
 DEFINE_VARIANT(__predict_update_esi, cmpl %esi)
-DEFINE_VARIANT(__predict_update_rsi, cmpq %rsi)
+DEFINE_VARIANT(__predict_update_rsi, cmpl %esi)
 
 DEFINE_VARIANT(__predict_update_dl, cmpb %dl)
 DEFINE_VARIANT(__predict_update_dx, cmpw %dx)
 DEFINE_VARIANT(__predict_update_edx, cmpl %edx)
-DEFINE_VARIANT(__predict_update_rdx, cmpq %rdx)
+DEFINE_VARIANT(__predict_update_rdx, cmpl %edx)
 
 DEFINE_VARIANT(__predict_update_cl, cmpb %cl)
 DEFINE_VARIANT(__predict_update_cx, cmpw %cx)
 DEFINE_VARIANT(__predict_update_ecx, cmpl %ecx)
-DEFINE_VARIANT(__predict_update_rcx, cmpq %rcx)
+DEFINE_VARIANT(__predict_update_rcx, cmpl %ecx)
 
 DEFINE_VARIANT(__predict_update_al, cmpb %al)
 DEFINE_VARIANT(__predict_update_ax, cmpw %ax)
@@ -57,11 +57,11 @@ DEFINE_VARIANT(__predict_update_eax, cmpl %eax)
 PUBLIC_FUNCTION(__predict_update_rax)
 	pushfq_cfi_r
 	pushq_cfi_r %rax
-	cmpq   %rax, 8(%rdi)
+	cmpl   %eax, 4(%rdi)
 1:	movq   $(0), %rax
 	sete   %al
 	/* Increment the miss/hit counter */
-	lock;  incq 16(%rdi,%rax,8)
+	lock;  incl  8(%rdi,%rax,4)
 	popq_cfi_r %rax
 	popfq_cfi_r
 	ret

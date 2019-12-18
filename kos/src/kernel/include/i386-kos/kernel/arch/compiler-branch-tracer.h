@@ -71,6 +71,7 @@ DECL_BEGIN
 
 /* struct branch_prediction; */
 #ifdef __x86_64__
+#ifdef CONFIG_BUILDING_KERNEL_CORE
 #define __predict_dotrace(section, expr, expected)      \
     __asm__ __volatile__(".weak .Ltracepoint_%=\n\t"    \
                          ".local .Ltracepoint_%=\n\t"   \
@@ -90,6 +91,27 @@ DECL_BEGIN
                          : "X" (expected)               \
                          , "acdS" (expr)                \
                          : "rdi")
+#else /* CONFIG_BUILDING_KERNEL_CORE */
+#define __predict_dotrace(section, expr, expected)      \
+    __asm__ __volatile__(".weak .Ltracepoint_%=\n\t"    \
+                         ".local .Ltracepoint_%=\n\t"   \
+                         ".hidden .Ltracepoint_%=\n\t"  \
+                         ".pushsection " section "\n\t" \
+                         "991:\n\t"                     \
+                         "\t.reloc ., R_X86_64_32, .Ltracepoint_%= - 0xffffffff80000000\n\t" \
+                         "\t.int 0\n\t"                 \
+                         "\t.int %p0\n\t"               \
+                         "\t.int 0\n\t"                 \
+                         "\t.int 0\n\t"                 \
+                         ".popsection\n\t"              \
+                         ".Ltracepoint_%=:\n\t"         \
+                         "leaq 991b(%%rip),%%rdi\n\t"   \
+                         "_x86_call_predict_update %1"  \
+                         :                              \
+                         : "X" (expected)               \
+                         , "acdS" (expr)                \
+                         : "rdi")
+#endif /* !CONFIG_BUILDING_KERNEL_CORE */
 #else /* __x86_64__ */
 #define __predict_dotrace(section,expr,expected)        \
     __asm__ __volatile__(".weak .Ltracepoint_%=\n\t"    \
