@@ -270,6 +270,7 @@ NOTHROW(KCALL callback_list_detroy)(struct callback_list_struct *__restrict self
 		decref_unlikely(self->cl_list[i].cn_orig);
 	kfree(self);
 }
+
 PUBLIC bool
 (KCALL callback_list_insert)(__callback_list_t *__restrict self,
                              void (*func)(),
@@ -317,6 +318,7 @@ again:
 	destroy(new_state);
 	goto again;
 }
+
 PUBLIC bool
 (KCALL callback_list_remove)(__callback_list_t *__restrict self,
                              void (*func)())

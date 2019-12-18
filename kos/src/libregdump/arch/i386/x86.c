@@ -332,23 +332,26 @@ libregdump_do_segment(struct regdump_printer *__restrict self,
 		if ((uint16_t)(*pldt & ~7) >= (uint16_t)(tab.dt_limit + 1)) {
 			PRINT("] ");
 			format(REGDUMP_FORMAT_ERROR_PREFIX);
-			printf("CORRUPT LDT: %%ldt(%#.2x) >= %%gdt.size(%#.2x)%s\n",
-			       (unsigned int)(*pldt & ~7), (unsigned int)(tab.dt_limit + 1));
+			printf("BAD: %%ldtr:%#.2x exceeds %%gdt.limit=%#.2x",
+			       (unsigned int)*pldt,
+			       (unsigned int)tab.dt_limit);
 			format(REGDUMP_FORMAT_ERROR_SUFFIX);
 			goto done;
 		}
 		seg = &((struct segment *)tab.dt_base)[SEGMENT_INDEX(*pldt)];
 		if (!seg->s_descriptor.d_present) {
+			PRINT("] ");
 			format(REGDUMP_FORMAT_ERROR_PREFIX);
-			printf("CORRUPT LDT: %%ldt(%#.2x).present = 0\n",
-			       (unsigned int)(*pldt & ~7));
+			printf("BAD: %%gdt[%%ldtr:%#.2x].present = 0",
+			       (unsigned int)*pldt);
 			format(REGDUMP_FORMAT_ERROR_SUFFIX);
 			goto done;
 		}
 		if (seg->s_descriptor.d_type != SEGMENT_DESCRIPTOR_TYPE_LDT) {
+			PRINT("] ");
 			format(REGDUMP_FORMAT_ERROR_PREFIX);
-			printf("CORRUPT LDT: %%ldt(%#.2x).type = %#x (expected %x)\n",
-			       (unsigned int)(*pldt & ~7),
+			printf("BAD: %%gdt[%%ldtr:%#.2x].type = %#x (expected %x)",
+			       (unsigned int)*pldt,
 			       (unsigned int)seg->s_descriptor.d_type,
 			       (unsigned int)SEGMENT_DESCRIPTOR_TYPE_LDT);
 			format(REGDUMP_FORMAT_ERROR_SUFFIX);
@@ -356,6 +359,14 @@ libregdump_do_segment(struct regdump_printer *__restrict self,
 		}
 		tab.dt_base  = segment_rdbaseX(seg);
 		tab.dt_limit = (uint16_t)segment_rdlimit(seg);
+	}
+	if ((uint16_t)(value & ~7) >= (uint16_t)(tab.dt_limit + 1)) {
+		PRINT("] ");
+		format(REGDUMP_FORMAT_ERROR_PREFIX);
+		printf("BAD: exceeds %%%cdt.limit=%#.2x",
+		       value & 4 ? 'l' : 'g', (unsigned int)tab.dt_limit);
+		format(REGDUMP_FORMAT_ERROR_SUFFIX);
+		goto done;
 	}
 	seg = &((struct segment *)tab.dt_base)[SEGMENT_INDEX(value)];
 	PRINT(",dpl=");
