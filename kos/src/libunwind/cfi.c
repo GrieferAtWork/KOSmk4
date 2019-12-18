@@ -19,6 +19,7 @@
 #ifndef GUARD_LIBUNWIND_CFI_C
 #define GUARD_LIBUNWIND_CFI_C 1
 #define _KOS_SOURCE 1
+#define _KOS_KERNEL_SOURCE 1
 
 #include "api.h"
 /**/
@@ -69,17 +70,23 @@
 
 DECL_BEGIN
 
+#define EXCEPTION_INFO_SAVE()         \
+	struct exception_info old_except; \
+	memcpy(&old_except, error_info(), sizeof(struct exception_info))
+#define EXCEPTION_INFO_LOAD() \
+	memcpy(error_info(), &old_except, sizeof(struct exception_info))
+
+
 LOCAL WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readb)(uint8_t *ptr, uintptr_t *__restrict result) {
 	uint8_t value;
-	struct exception_data old_except;
-	memcpy(&old_except, error_data(), sizeof(struct exception_data));
+	EXCEPTION_INFO_SAVE();
 	TRY {
 		value = *ptr;
 	} EXCEPT {
 		if (!WAS_SEGFAULT_THROWN())
 			RETHROW(); /* This will panic() because we're NOTHROW */
-		memcpy(error_data(), &old_except, sizeof(struct exception_data));
+		EXCEPTION_INFO_LOAD();
 		return false;
 	}
 	*result = (uintptr_t)value;
@@ -89,14 +96,13 @@ NOTHROW(CC guarded_readb)(uint8_t *ptr, uintptr_t *__restrict result) {
 LOCAL WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readw)(uint16_t *ptr, uintptr_t *__restrict result) {
 	uint16_t value;
-	struct exception_data old_except;
-	memcpy(&old_except, error_data(), sizeof(struct exception_data));
+	EXCEPTION_INFO_SAVE();
 	TRY {
 		value = UNALIGNED_GET16(ptr);
 	} EXCEPT {
 		if (!WAS_SEGFAULT_THROWN())
 			RETHROW(); /* This will panic() because we're NOTHROW */
-		memcpy(error_data(), &old_except, sizeof(struct exception_data));
+		EXCEPTION_INFO_LOAD();
 		return false;
 	}
 	*result = (uintptr_t)value;
@@ -106,14 +112,13 @@ NOTHROW(CC guarded_readw)(uint16_t *ptr, uintptr_t *__restrict result) {
 LOCAL WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readl)(uint32_t *ptr, uintptr_t *__restrict result) {
 	uint32_t value;
-	struct exception_data old_except;
-	memcpy(&old_except, error_data(), sizeof(struct exception_data));
+	EXCEPTION_INFO_SAVE();
 	TRY {
 		value = UNALIGNED_GET32(ptr);
 	} EXCEPT {
 		if (!WAS_SEGFAULT_THROWN())
 			RETHROW(); /* This will panic() because we're NOTHROW */
-		memcpy(error_data(), &old_except, sizeof(struct exception_data));
+		EXCEPTION_INFO_LOAD();
 		return false;
 	}
 	*result = (uintptr_t)value;
@@ -124,14 +129,13 @@ NOTHROW(CC guarded_readl)(uint32_t *ptr, uintptr_t *__restrict result) {
 LOCAL WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readq)(uint64_t *ptr, uintptr_t *__restrict result) {
 	uint64_t value;
-	struct exception_data old_except;
-	memcpy(&old_except, error_data(), sizeof(struct exception_data));
+	EXCEPTION_INFO_SAVE();
 	TRY {
 		value = UNALIGNED_GET64(ptr);
 	} EXCEPT {
 		if (!WAS_SEGFAULT_THROWN())
 			RETHROW(); /* This will panic() because we're NOTHROW */
-		memcpy(error_data(), &old_except, sizeof(struct exception_data));
+		EXCEPTION_INFO_LOAD();
 		return false;
 	}
 	*result = (uintptr_t)value;
@@ -144,14 +148,13 @@ NOTHROW(CC guarded_readq)(uint64_t *ptr, uintptr_t *__restrict result) {
 
 INTERN WUNUSED bool
 NOTHROW(CC guarded_memcpy)(void *dst, void const *src, size_t num_bytes) {
-	struct exception_data old_except;
-	memcpy(&old_except, error_data(), sizeof(struct exception_data));
+	EXCEPTION_INFO_SAVE();
 	TRY {
 		memcpy(dst, src, num_bytes);
 	} EXCEPT {
 		if (!WAS_SEGFAULT_THROWN())
 			RETHROW(); /* This will panic() because we're NOTHROW */
-		memcpy(error_data(), &old_except, sizeof(struct exception_data));
+		EXCEPTION_INFO_LOAD();
 		return false;
 	}
 	return true;
