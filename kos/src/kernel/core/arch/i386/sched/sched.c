@@ -237,6 +237,8 @@ NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
                                           void *arg) {
 	struct icpustate *rpc_state;   /* The state used/returned by `func()' */
 	struct scpustate *sched_state; /* The new scheduler state that we will return (and that will invoke `x86_rpc_kernel_redirection') */
+	unsigned int reason;
+	reason      = scpustate_isuser(state) ? TASK_RPC_REASON_ASYNCUSER : TASK_RPC_REASON_ASYNC;
 	rpc_state   = (struct icpustate *)(((byte_t *)state + SIZEOF_SCPUSTATE) - SIZEOF_ICPUSTATE);
 	sched_state = (struct scpustate *)((byte_t *)rpc_state - SIZEOF_SCPUSTATE);
 	sched_state->scs_sgregs = state->scs_sgregs; /* Have the scheduler load the same segment registers */
@@ -256,9 +258,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
 	sched_state->scs_gpregs.gp_rdi    = (u64)arg;
 	sched_state->scs_gpregs.gp_rsi    = (u64)rpc_state;
 	sched_state->scs_gpregs.gp_rbp    = (u64)rpc_state;
-	sched_state->scs_gpregs.gp_rdx    = icpustate_isuser(rpc_state) /* FIXME: This uses THIS_TASK, but should use the thread of `state' */
-	                                    ? TASK_RPC_REASON_ASYNCUSER
-	                                    : TASK_RPC_REASON_ASYNC;
+	sched_state->scs_gpregs.gp_rdx    = reason;
 	sched_state->scs_gpregs.gp_rcx    = 0;
 	return sched_state;
 }
@@ -273,7 +273,9 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
                                             size_t bufsize) {
 	struct icpustate *rpc_state;   /* The state used/returned by `func()' */
 	struct scpustate *sched_state; /* The new scheduler state that we will return (and that will invoke `x86_rpc_kernel_redirection') */
+	unsigned int reason;
 	void *bufcopy;
+	reason      = scpustate_isuser(state) ? TASK_RPC_REASON_ASYNCUSER : TASK_RPC_REASON_ASYNC;
 	rpc_state   = (struct icpustate *)(((byte_t *)state + SIZEOF_SCPUSTATE) - SIZEOF_ICPUSTATE);
 	bufcopy     = (byte_t *)rpc_state - bufsize;
 	sched_state = (struct scpustate *)((byte_t *)bufcopy - SIZEOF_SCPUSTATE);
@@ -295,9 +297,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
 	sched_state->scs_gpregs.gp_rdi    = (u64)bufcopy;
 	sched_state->scs_gpregs.gp_rsi    = (u64)rpc_state;
 	sched_state->scs_gpregs.gp_rbp    = (u64)rpc_state;
-	sched_state->scs_gpregs.gp_rdx    = icpustate_isuser(rpc_state) /* FIXME: This uses THIS_TASK, but should use the thread of `state' */
-	                                    ? TASK_RPC_REASON_ASYNCUSER
-	                                    : TASK_RPC_REASON_ASYNC;
+	sched_state->scs_gpregs.gp_rdx    = reason;
 	sched_state->scs_gpregs.gp_rcx    = 0;
 	return sched_state;
 }
@@ -363,8 +363,10 @@ NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
 	};
 	struct icpustate *istate;
 	struct scpustate *result;
+	unsigned int reason;
 	struct buffer buf;
 	byte_t *dest;
+	reason = scpustate_isuser(state) ? TASK_RPC_REASON_ASYNCUSER : TASK_RPC_REASON_ASYNC;
 	memcpy(&buf, state, sizeof(buf));
 	dest = (byte_t *)state + sizeof(buf);
 #define SUBSP(x) (dest -= (x))
@@ -378,9 +380,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
 	result = (struct scpustate *)dest;
 	/* Fill in the new state to generate a redirection towards the RPC wrapper. */
 	result->scs_gpregs.gp_ebp   = (uintptr_t)istate;
-	result->scs_gpregs.gp_ebx   = icpustate_isuser(istate) /* FIXME: This uses THIS_TASK, but should use the thread of `state' */
-	                              ? TASK_RPC_REASON_ASYNCUSER
-	                              : TASK_RPC_REASON_ASYNC;
+	result->scs_gpregs.gp_ebx   = reason;
 	result->scs_gpregs.gp_edx   = (uintptr_t)istate;
 	result->scs_gpregs.gp_ecx   = (uintptr_t)arg;
 	result->scs_gpregs.gp_eax   = (uintptr_t)(void *)func;
@@ -407,11 +407,13 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
 		struct gpregs b_gpregs; /* General purpose registers. */
 		u32 b_gs;               /* G segment register (Usually `SEGMENT_USER_GSBASE_RPL') */
 	};
+	unsigned int reason;
 	struct icpustate *istate;
 	struct scpustate *result;
 	struct buffer regbuf;
 	byte_t *dest;
 	void *argbuffer;
+	reason = scpustate_isuser(state) ? TASK_RPC_REASON_ASYNCUSER : TASK_RPC_REASON_ASYNC;
 	memcpy(&regbuf, state, sizeof(regbuf));
 	dest = (byte_t *)state + sizeof(regbuf);
 #define SUBSP(x) (dest -= (x))
@@ -429,9 +431,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
 	result = (struct scpustate *)dest;
 	/* Fill in the new state to generate a redirection towards the RPC wrapper. */
 	result->scs_gpregs.gp_ebp = (uintptr_t)istate;
-	result->scs_gpregs.gp_ebx = icpustate_isuser(istate) /* FIXME: This uses THIS_TASK, but should use the thread of `state' */
-	                            ? TASK_RPC_REASON_ASYNCUSER
-	                            : TASK_RPC_REASON_ASYNC;
+	result->scs_gpregs.gp_ebx = reason;
 	result->scs_gpregs.gp_edx = (uintptr_t)istate;
 	result->scs_gpregs.gp_ecx = (uintptr_t)argbuffer;
 	result->scs_gpregs.gp_eax = (uintptr_t)(void *)func;
