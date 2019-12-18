@@ -113,7 +113,6 @@ INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 	EXTERN(rpc_serve_async_user_redirection)
 	call   rpc_serve_async_user_redirection
 
-	.cfi_def_cfa_register %rax
 	movq   %rax, %rsp
 	.cfi_def_cfa_register %rsp
 
@@ -150,7 +149,6 @@ INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 	xorq   %rsi, %rsi /* struct rpc_syscall_info *sc_info */
 	PUBLIC(x86_userexcept_propagate)
 	call   x86_userexcept_propagate
-	.cfi_def_cfa_register %rax
 	movq   %rax, %rsp
 	.cfi_def_cfa_register %rsp
 
@@ -340,7 +338,6 @@ PUBLIC_FUNCTION(task_serve)
 1:	movq   %rsp, %rdi
 	/* Service a single RPC function */
 	call   task_serve_one_impl
-	.cfi_def_cfa_register %rax
 	/* Load the modified register state. */
 	movq   %rax, %rsp
 	.cfi_def_cfa_register %rsp
@@ -406,7 +403,6 @@ PUBLIC_FUNCTION(task_serve_nx)
 1:	movq   %rsp, %rdi
 	/* Service a single RPC function */
 	call   task_serve_one_nx_impl
-	.cfi_def_cfa_register %rax
 	/* Load the modified register state. */
 	movq   %rax, %rsp
 	.cfi_def_cfa_register %rsp
