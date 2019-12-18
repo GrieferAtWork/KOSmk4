@@ -27,21 +27,24 @@ import * from errors;
 final global OPT_GCC_OPTIONS: string = "GCC.options";
 
 final local GCC_SYSTEM_LIBRARY_UNRELATED_FLAGS = {
-	"-fPIC", "-fno-PIC",
-	"-fPIE", "-fno-PIE",
-	"-fpic", "-fno-pic",
-	"-fpie", "-fno-pie",
-	"-shared",
-	"-static",
-	"-shared-libgcc",
-	"-static-libgcc",
-	"-frtti",
-	"-fno-rtti",
-	"-ffreestanding",
-	"-pipe",
-	"-fomit-frame-pointer",
-	"-fno-omit-frame-pointer",
+	"-fPIC", "-fpic", "-fPIE", "-fpie", "-fplt",
+	"-shared", "-static",
+	"-shared-libgcc", "-static-libgcc",
+	"-frtti", "-ffreestanding",
+	"-pipe", "-fomit-frame-pointer",
 };
+
+final function isUnrelatedGCCFlag(flag: string): bool {
+	if (flag.startswith("-O"))
+		return true;
+	if (flag.startswith("-g"))
+		return true;
+	if (flag in GCC_SYSTEM_LIBRARY_UNRELATED_FLAGS)
+		return true;
+	if (flag.startswith("-fno-") && (("-f" + flag[5:])) in GCC_SYSTEM_LIBRARY_UNRELATED_FLAGS)
+		return true;
+	return false;
+}
 
 
 #ifdef __WINDOWS__
@@ -637,8 +640,7 @@ global class GCCToolchain: Toolchain {
 			return result;
 		local simple_gcc_opt = List();
 		for (local x: gccOptions) {
-			if (!x.startswith("-O") && !x.startswith("-g") &&
-				x !in GCC_SYSTEM_LIBRARY_UNRELATED_FLAGS)
+			if (!isUnrelatedGCCFlag(x))
 				simple_gcc_opt.append(x);
 		}
 		local cacheKey = (language, Tuple(simple_gcc_opt));
@@ -674,7 +676,13 @@ global class GCCToolchain: Toolchain {
 		proc.start();
 		w.close();
 		local output = r.readall();
-		joinProcess(proc);
+		try {
+			joinProcess(proc);
+		} catch (...) {
+			for (local l: output.decode("utf-8").splitlines(false))
+				print ">>", l;
+			throw;
+		}
 		local collect2Cmdline = none;
 		output = output.decode("utf-8");
 		for (local l: output.splitlines()) {
