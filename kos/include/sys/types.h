@@ -21,13 +21,16 @@
 
 #include <__stdinc.h>
 #include <features.h>
+
 #include <bits/types.h>
 
 #ifdef __USE_MISC
-#include <endian.h>
 #include <sys/select.h>
 #include <sys/sysmacros.h>
+
+#include <endian.h>
 #endif /* __USE_MISC */
+
 #if defined(__USE_POSIX199506) || defined(__USE_UNIX98)
 #include <bits/pthreadtypes.h>
 #endif /* __USE_POSIX199506 || __USE_UNIX98 */
@@ -35,8 +38,11 @@
 __SYSDECL_BEGIN
 
 #ifdef __USE_KOS
+#ifndef __byte_t_defined
+#define __byte_t_defined 1
 typedef __byte_t byte_t;
-#endif
+#endif /* !__byte_t_defined */
+#endif /* __USE_KOS */
 
 #ifdef __USE_MISC
 #ifndef __u_char_defined
@@ -45,18 +51,32 @@ typedef __u_char   u_char;
 typedef __u_short  u_short;
 typedef __u_int    u_int;
 typedef __u_long   u_long;
+#endif /* !__u_char_defined */
+
+#ifndef __quad_t_defined
+#define __quad_t_defined 1
 typedef __quad_t   quad_t;
 typedef __u_quad_t u_quad_t;
+#endif /* !__quad_t_defined */
+
+#ifndef __fsid_t_defined
+#define __fsid_t_defined 1
 typedef __fsid_t   fsid_t;
-#endif /* !__u_char_defined */
+#endif /* !__fsid_t_defined */
+
 #ifndef __daddr_t_defined
 #define __daddr_t_defined 1
 typedef __daddr_t daddr_t;
 typedef __caddr_t caddr_t;
 #endif /* !__daddr_t_defined */
+
+#ifndef __ulong_defined
+#define __ulong_defined 1
 typedef unsigned long int  ulong;
 typedef unsigned short int ushort;
 typedef unsigned int       uint;
+#endif /* !__ulong_defined */
+
 #endif /* __USE_MISC */
 
 #ifndef __loff_t_defined
@@ -74,6 +94,7 @@ typedef __typedef_ino_t ino_t;
 #define __ino64_t_defined 1
 typedef __ino64_t ino64_t;
 #endif /* !__ino64_t_defined */
+
 #ifndef __off64_t_defined
 #define __off64_t_defined 1
 typedef __off64_t off64_t;
@@ -178,13 +199,13 @@ typedef __SIZE_TYPE__ size_t;
 #undef int8_t
 #undef int16_t
 #undef int32_t
-#undef int64_t
 typedef __INT8_TYPE__   int8_t;
 typedef __INT16_TYPE__  int16_t;
 typedef __INT32_TYPE__  int32_t;
 #ifdef __INT64_TYPE__
+#undef int64_t
 typedef __INT64_TYPE__  int64_t;
-#endif
+#endif /* __INT64_TYPE__ */
 #endif /* __int8_t_defined */
 
 #ifndef __u_int8_t_defined
@@ -194,7 +215,7 @@ typedef __UINT16_TYPE__  u_int16_t;
 typedef __UINT32_TYPE__  u_int32_t;
 #ifdef __UINT64_TYPE__
 typedef __UINT64_TYPE__  u_int64_t;
-#endif
+#endif /* __UINT64_TYPE__ */
 #endif /* !__u_int8_t_defined */
 
 #ifndef __register_t_defined
@@ -203,22 +224,23 @@ typedef __sregister_t register_t; /* This one's signed in GLIBc, so we make it s
 #endif /* !__register_t_defined */
 #endif /* !__BIT_TYPES_DEFINED__ */
 
-
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 #ifndef __blksize_t_defined
 #define __blksize_t_defined 1
 typedef __blksize_t blksize_t;
 #endif /* !__blksize_t_defined */
-#endif
+#endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 
 #ifndef __blkcnt_t_defined
 #define __blkcnt_t_defined 1
 typedef __FS_TYPE(blkcnt) blkcnt_t;
 #endif /* !__blkcnt_t_defined */
+
 #ifndef __fsblkcnt_t_defined
 #define __fsblkcnt_t_defined 1
 typedef __FS_TYPE(fsblkcnt) fsblkcnt_t;
 #endif /* !__fsblkcnt_t_defined */
+
 #ifndef __fsfilcnt_t_defined
 #define __fsfilcnt_t_defined 1
 typedef __FS_TYPE(fsfilcnt) fsfilcnt_t;
@@ -229,10 +251,12 @@ typedef __FS_TYPE(fsfilcnt) fsfilcnt_t;
 #define __blkcnt64_t_defined 1
 typedef __blkcnt64_t blkcnt64_t;
 #endif /* !__blkcnt64_t_defined */
+
 #ifndef __fsblkcnt64_t_defined
 #define __fsblkcnt64_t_defined 1
 typedef __fsblkcnt64_t fsblkcnt64_t;
 #endif /* !__fsblkcnt64_t_defined */
+
 #ifndef __fsfilcnt64_t_defined
 #define __fsfilcnt64_t_defined 1
 typedef __fsfilcnt64_t fsfilcnt64_t;
@@ -245,10 +269,12 @@ typedef __fsfilcnt64_t fsfilcnt64_t;
 #define _INO_T_DEFINED 1
 typedef __typedef_ino_t _ino_t;
 #endif /* !_INO_T_DEFINED */
+
 #ifndef _DEV_T_DEFINED
 #define _DEV_T_DEFINED 1
 typedef __typedef_dev_t _dev_t;
 #endif /* !_DEV_T_DEFINED */
+
 #ifndef _OFF_T_DEFINED
 #define _OFF_T_DEFINED 1
 typedef __typedef_off_t _off_t;

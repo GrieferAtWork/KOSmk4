@@ -277,27 +277,27 @@ __SYSDECL_END
 #define WINT_MAX          __WINT_MAX__
 
 #ifdef __CC__
-#   define INTMAX_C(x)       __INTMAX_C(x)
-#   define UINTMAX_C(x)      __UINTMAX_C(x)
-#   define INT8_C(x)         __INT8_C(x)
-#   define INT16_C(x)        __INT16_C(x)
-#   define INT32_C(x)        __INT32_C(x)
-#   define INT64_C(x)        __INT64_C(x)
-#   define UINT8_C(x)        __UINT8_C(x)
-#   define UINT16_C(x)       __UINT16_C(x)
-#   define UINT32_C(x)       __UINT32_C(x)
-#   define UINT64_C(x)       __UINT64_C(x)
+#define INTMAX_C(x)  __INTMAX_C(x)
+#define UINTMAX_C(x) __UINTMAX_C(x)
+#define INT8_C(x)    __INT8_C(x)
+#define INT16_C(x)   __INT16_C(x)
+#define INT32_C(x)   __INT32_C(x)
+#define INT64_C(x)   __INT64_C(x)
+#define UINT8_C(x)   __UINT8_C(x)
+#define UINT16_C(x)  __UINT16_C(x)
+#define UINT32_C(x)  __UINT32_C(x)
+#define UINT64_C(x)  __UINT64_C(x)
 #else /* __CC__ */
-#   define INTMAX_C(x)       x
-#   define UINTMAX_C(x)      x
-#   define INT8_C(x)         x
-#   define INT16_C(x)        x
-#   define INT32_C(x)        x
-#   define INT64_C(x)        x
-#   define UINT8_C(x)        x
-#   define UINT16_C(x)       x
-#   define UINT32_C(x)       x
-#   define UINT64_C(x)       x
+#define INTMAX_C(x)  x
+#define UINTMAX_C(x) x
+#define INT8_C(x)    x
+#define INT16_C(x)   x
+#define INT32_C(x)   x
+#define INT64_C(x)   x
+#define UINT8_C(x)   x
+#define UINT16_C(x)  x
+#define UINT32_C(x)  x
+#define UINT64_C(x)  x
 #endif /* !__CC__ */
 
 #ifdef __CXX_SYSTEM_HEADER

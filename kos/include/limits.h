@@ -21,17 +21,17 @@
 
 #include <__stdinc.h>
 #include <features.h>
-#include <hybrid/limitcore.h>
 
+#include <hybrid/limitcore.h>
 
 /* You should really just always using 'MB_CUR_MAX'... */
 #ifdef __CRT_DOS_PRIMARY
-#   define MB_LEN_MAX 5
+#define MB_LEN_MAX 5
 #elif defined(__CRT_CYG_PRIMARY)
-#   include <newlib.h>
-#   define MB_LEN_MAX _MB_LEN_MAX
+#include <newlib.h>
+#define MB_LEN_MAX _MB_LEN_MAX
 #else
-#   define MB_LEN_MAX 16
+#define MB_LEN_MAX 16
 #endif
 
 __SYSDECL_BEGIN
@@ -94,9 +94,11 @@ __SYSDECL_END
 #ifdef __USE_POSIX
 #include <bits/posix1_lim.h>
 #endif /* __USE_POSIX */
+
 #ifdef __USE_POSIX2
 #include <bits/posix2_lim.h>
 #endif /* __USE_POSIX2 */
+
 #ifdef __USE_XOPEN
 #include <bits/xopen_lim.h>
 #endif /* __USE_XOPEN */
