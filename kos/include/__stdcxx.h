@@ -28,13 +28,13 @@
 #ifndef __GCC_VERSION
 #ifdef __GNUC__
 #ifndef __GNUC_MINOR__
-#   define __GNUC_MINOR__ 0
+#define __GNUC_MINOR__ 0
 #endif /* !__GNUC_MINOR__ */
 #ifndef __GNUC_PATCH__
 #ifdef __GNUC_PATCHLEVEL__
-#   define __GNUC_PATCH__ __GNUC_PATCHLEVEL__
+#define __GNUC_PATCH__ __GNUC_PATCHLEVEL__
 #else /* __GNUC_PATCHLEVEL__ */
-#   define __GNUC_PATCH__ 0
+#define __GNUC_PATCH__ 0
 #endif /* !__GNUC_PATCHLEVEL__ */
 #endif /* !__GNUC_PATCH__ */
 #ifndef __GCC_VERSION_NUM
@@ -123,21 +123,26 @@
 #if __has_feature(defaulted_functions) || \
    (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180020827) || \
    (__GCC_VERSION(4, 4, 0) && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L))
-#   define __CXX_HAVE_DEFAULT_FUNCTIONS 1
-#   define __CXX_DEFAULT_CTOR(T)                 T() = default
-#   define __CXX_DEFAULT_DTOR(T)                 ~T() = default
+#define __CXX_HAVE_DEFAULT_FUNCTIONS 1
+#define __CXX_DEFAULT_CTOR(T)                      T() = default
+#define __CXX_DEFAULT_DTOR(T)                      ~T() = default
+#define __CXX_DEFAULT_COPY(T, other, ...)          T(T const &) = default
 #ifdef __COMPILER_HAVE_CXX11_NOEXCEPT
-#   define __CXX_DEFAULT_CTOR_NOEXCEPT(T)        T() __CXX_NOEXCEPT = default
-#   define __CXX_DEFAULT_DTOR_NOEXCEPT(T)        ~T() __CXX_NOEXCEPT = default
+#define __CXX_DEFAULT_CTOR_NOEXCEPT(T)             T() __CXX_NOEXCEPT = default
+#define __CXX_DEFAULT_DTOR_NOEXCEPT(T)             ~T() __CXX_NOEXCEPT = default
+#define __CXX_DEFAULT_COPY_NOEXCEPT(T, other, ...) T(T const &) __CXX_NOEXCEPT = default
 #else /* __COMPILER_HAVE_CXX11_NOEXCEPT */
-#   define __CXX_DEFAULT_CTOR_NOEXCEPT(T)        T() = default
-#   define __CXX_DEFAULT_DTOR_NOEXCEPT(T)        ~T() = default
+#define __CXX_DEFAULT_CTOR_NOEXCEPT(T)             T() = default
+#define __CXX_DEFAULT_DTOR_NOEXCEPT(T)             ~T() = default
+#define __CXX_DEFAULT_COPY_NOEXCEPT(T, other, ...) T(T const &) = default
 #endif /* !__COMPILER_HAVE_CXX11_NOEXCEPT */
 #else
-#   define __CXX_DEFAULT_CTOR(T)                 T() {}
-#   define __CXX_DEFAULT_DTOR(T)                 ~T() {}
-#   define __CXX_DEFAULT_CTOR_NOEXCEPT(T)        T() __CXX_NOEXCEPT {}
-#   define __CXX_DEFAULT_DTOR_NOEXCEPT(T)        ~T() __CXX_NOEXCEPT {}
+#define __CXX_DEFAULT_CTOR(T)                      T() {}
+#define __CXX_DEFAULT_DTOR(T)                      ~T() {}
+#define __CXX_DEFAULT_COPY(T, other, ...)          T(T const &other) __VA_ARGS__
+#define __CXX_DEFAULT_CTOR_NOEXCEPT(T)             T() __CXX_NOEXCEPT {}
+#define __CXX_DEFAULT_DTOR_NOEXCEPT(T)             ~T() __CXX_NOEXCEPT {}
+#define __CXX_DEFAULT_COPY_NOEXCEPT(T, other, ...) T(T const &other) __CXX_NOEXCEPT __VA_ARGS__
 #endif
 
 #ifndef __CXX_STATIC_CONST
@@ -156,22 +161,22 @@
 #if __has_feature(deleted_functions) || \
    (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180020827) || \
    (__GCC_VERSION(4, 4, 0) && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L))
-#   define __CXX_HAVE_DELETE_FUNCTIONS 1
-#   define __CXX_DELETE_CTOR(T)                 T() = delete
-#   define __CXX_DELETE_DTOR(T)                 ~T() = delete
-#   define __CXX_DELETE_COPY(T)                 T(T const&) = delete
-#   define __CXX_DELETE_COPY_ASSIGN(T)          T &operator = (T const&) = delete
+#define __CXX_HAVE_DELETE_FUNCTIONS 1
+#define __CXX_DELETE_CTOR(T)                 T() = delete
+#define __CXX_DELETE_DTOR(T)                 ~T() = delete
+#define __CXX_DELETE_COPY(T)                 T(T const&) = delete
+#define __CXX_DELETE_COPY_ASSIGN(T)          T &operator = (T const&) = delete
 #ifdef _MSC_VER
-#   define __CXX_DELETE_VOLATILE_COPY_ASSIGN(T) /* Nothing */
+#define __CXX_DELETE_VOLATILE_COPY_ASSIGN(T) /* Nothing */
 #else /* _MSC_VER */
-#   define __CXX_DELETE_VOLATILE_COPY_ASSIGN(T) T &operator = (T const&) volatile = delete
+#define __CXX_DELETE_VOLATILE_COPY_ASSIGN(T) T &operator = (T const&) volatile = delete
 #endif /* !_MSC_VER */
 #else
-#   define __CXX_DELETE_CTOR(T)                 private: T()
-#   define __CXX_DELETE_DTOR(T)                 private: ~T()
-#   define __CXX_DELETE_COPY(T)                 private: T(T const&)
-#   define __CXX_DELETE_COPY_ASSIGN(T)          private: T &operator = (T const&)
-#   define __CXX_DELETE_VOLATILE_COPY_ASSIGN(T) private: T &operator = (T const&) volatile
+#define __CXX_DELETE_CTOR(T)                 private: T()
+#define __CXX_DELETE_DTOR(T)                 private: ~T()
+#define __CXX_DELETE_COPY(T)                 private: T(T const&)
+#define __CXX_DELETE_COPY_ASSIGN(T)          private: T &operator = (T const&)
+#define __CXX_DELETE_VOLATILE_COPY_ASSIGN(T) private: T &operator = (T const&) volatile
 #endif
 
 #ifdef _MSC_VER
@@ -185,11 +190,11 @@
 #endif /* _MSC_VER */
 
 #ifdef __COMPILER_HAVE_CXX11_NOEXCEPT
-#   define __CXX_THROWS(...) /* Nothing */
+#define __CXX_THROWS(...) /* Nothing */
 #elif defined(_MSC_VER) && !defined(__INTELLISENSE__)
-#   define __CXX_THROWS(...) /* Nothing */
+#define __CXX_THROWS(...) /* Nothing */
 #else
-#   define __CXX_THROWS(...) throw(__VA_ARGS__)
+#define __CXX_THROWS(...) throw(__VA_ARGS__)
 #endif
 
 #ifndef __CXXDECL_BEGIN
