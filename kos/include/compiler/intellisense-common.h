@@ -240,7 +240,7 @@ template<> struct ____INTELLISENSE_isarith<wchar_t> { enum { __value = true }; }
 #if defined(_WCHAR_T_DEFINED) || defined(__GNUC__)
 template<> struct ____INTELLISENSE_isarith<char16_t> { enum { __value = true }; };
 template<> struct ____INTELLISENSE_isarith<char32_t> { enum { __value = true }; };
-#endif
+#endif /* _WCHAR_T_DEFINED || __GNUC__ */
 template<> struct ____INTELLISENSE_isarith<char> { enum { __value = true }; };
 template<> struct ____INTELLISENSE_isarith<signed char> { enum { __value = true }; };
 template<> struct ____INTELLISENSE_isarith<unsigned char> { enum { __value = true }; };
