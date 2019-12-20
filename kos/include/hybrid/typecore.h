@@ -54,6 +54,15 @@
 #endif /* __COMPILER_HAVE_LONGLONG */
 #endif /* !__SIZEOF_LONG_LONG__ */
 
+#ifndef __UINT128_TYPE__
+#if (defined(_INTEGRAL_MAX_BITS) && _INTEGRAL_MAX_BITS >= 128) || \
+    (defined(__SIZEOF_INT128__) && __SIZEOF_INT128__ == 16)
+#define __INT128_TYPE__ signed __int128
+#define __UINT128_TYPE__ unsigned __int128
+#endif
+#endif /* !__UINT128_TYPE__ */
+
+
 #ifndef __INT8_C
 #if defined(_MSC_VER) || __has_extension(tpp_msvc_integer_suffix)
 #define __INT8_C(c)    c##i8
