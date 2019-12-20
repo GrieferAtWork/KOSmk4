@@ -129,20 +129,26 @@
 #define __hybrid_uint128_shr32(var, shift)           (void)((var) >>= (shift))
 #define __hybrid_int128_shl32(var, shift)            (void)((var) <<= (shift))
 #define __hybrid_int128_shr32(var, shift)            (void)((var) >>= (shift))
-#define __hybrid_uint128_shl32_overflows(var, shift) (((__UINT128_TYPE__)((__UINT128_TYPE__)(var) << (shift)) >> (shift)) != (__UINT128_TYPE__)(var))
-#define __hybrid_int128_shl32_overflows(var, shift)  (((__INT128_TYPE__)((__INT128_TYPE__)(var) << (shift)) >> (shift)) != (__INT128_TYPE__)(var))
 #define __hybrid_uint128_shl64(var, shift)           (void)((var) <<= (shift))
 #define __hybrid_uint128_shr64(var, shift)           (void)((var) >>= (shift))
 #define __hybrid_int128_shl64(var, shift)            (void)((var) <<= (shift))
 #define __hybrid_int128_shr64(var, shift)            (void)((var) >>= (shift))
-#define __hybrid_uint128_shl64_overflows(var, shift) (((__UINT128_TYPE__)((__UINT128_TYPE__)(var) << (shift)) >> (shift)) != (__UINT128_TYPE__)(var))
-#define __hybrid_int128_shl64_overflows(var, shift)  (((__INT128_TYPE__)((__INT128_TYPE__)(var) << (shift)) >> (shift)) != (__INT128_TYPE__)(var))
 #define __hybrid_uint128_shl(var, shift)             (void)((var) <<= (shift))
 #define __hybrid_uint128_shr(var, shift)             (void)((var) >>= (shift))
 #define __hybrid_int128_shl(var, shift)              (void)((var) <<= (shift))
 #define __hybrid_int128_shr(var, shift)              (void)((var) >>= (shift))
 #define __hybrid_uint128_shl_overflows(var, shift)   (((__UINT128_TYPE__)((__UINT128_TYPE__)(var) << (shift)) >> (shift)) != (__UINT128_TYPE__)(var))
 #define __hybrid_int128_shl_overflows(var, shift)    (((__INT128_TYPE__)((__INT128_TYPE__)(var) << (shift)) >> (shift)) != (__INT128_TYPE__)(var))
+#define __hybrid_uint128_shl32_overflows             __hybrid_uint128_shl_overflows
+#define __hybrid_int128_shl32_overflows              __hybrid_int128_shl_overflows
+#define __hybrid_uint128_shl64_overflows             __hybrid_uint128_shl_overflows
+#define __hybrid_int128_shl64_overflows              __hybrid_int128_shl_overflows
+#define __hybrid_uint128_shr_overflows(var, shift)   (((var) & ((__UINT128_C(1) << (shift)) - 1)) != 0)
+#define __hybrid_int128_shr_overflows(var, shift)    (((var) & ((__INT128_C(1) << (shift)) - 1)) != 0)
+#define __hybrid_uint128_shr32_overflows             __hybrid_uint128_shr_overflows
+#define __hybrid_int128_shr32_overflows              __hybrid_int128_shr_overflows
+#define __hybrid_uint128_shr64_overflows             __hybrid_uint128_shr_overflows
+#define __hybrid_int128_shr64_overflows              __hybrid_int128_shr_overflows
 #define __hybrid_int128_setzero(var)                 (void)((var) = (__INT128_TYPE__)0)
 #define __hybrid_int128_iszero(var)                  ((var) == (__INT128_TYPE__)0)
 #define __hybrid_uint128_setzero(var)                (void)((var) = (__UINT128_TYPE__)0)
@@ -420,7 +426,7 @@
 #define __hybrid_uint128_shl32_overflows(var, shift) \
 	((__hybrid_uint128_vec32_significand(var, 3) >> (32 - (shift))) != 0)
 #ifdef __UINT64_TYPE__
-/* Unsigned <<= shift-left for `shift <= 64' */
+/* Unsigned <<= shift-left for `shift < 64' */
 #define __hybrid_uint128_shl64(var, shift)                                                       \
 	(__hybrid_uint128_vec64_significand(var, 1) <<= (shift),                                     \
 	 __hybrid_uint128_vec64_significand(var, 1) |= (__hybrid_uint128_vec64_significand(var, 0) & \
@@ -431,7 +437,7 @@
 	((__hybrid_uint128_vec64_significand(var, 3) >> (64 - (shift))) != 0)
 #define __hybrid_uint128_shl32 __hybrid_uint128_shl64
 #else /* __UINT64_TYPE__ */
-/* Unsigned <<= shift-left for `shift <= 32' */
+/* Unsigned <<= shift-left for `shift < 32' */
 #define __hybrid_uint128_shl32(var, shift)                                                       \
 	(__hybrid_uint128_vec32_significand(var, 3) <<= (shift),                                     \
 	 __hybrid_uint128_vec32_significand(var, 3) |= (__hybrid_uint128_vec64_significand(var, 2) & \
@@ -446,7 +452,7 @@
 	                                                ((__UINT32_C(1) << (32 - (shift))) - 1)) >>  \
 	                                               (32 - (shift)),                               \
 	 __hybrid_uint128_vec64_significand(var, 0) <<= (shift))
-/* Unsigned <<= shift-left for `shift <= 64' */
+/* Unsigned <<= shift-left for `shift < 64' */
 #define __hybrid_uint128_shl64(var, shift)                                                                                      \
 	((shift) < 32 ? __hybrid_uint128_shl32(var, shift)                                                                          \
 	              : (__hybrid_uint128_vec32_significand(var, 3) = __hybrid_uint128_vec32_significand(var, 2) << ((shift) % 32), \
@@ -459,7 +465,7 @@
 	                 (__hybrid_uint128_vec32_significand(var, 2) >> (32 - ((shift) % 32))) != 0))
 #endif /* !__UINT64_TYPE__ */
 
-/* Unsigned <<= shift-left for any `shift' */
+/* Unsigned <<= shift-left for `shift < 128' */
 #ifdef __UINT64_TYPE__
 #define __hybrid_uint128_shl(var, shift)                                                                                        \
 	((shift) < 64 ? __hybrid_uint128_shl64(var, shift)                                                                          \
@@ -498,7 +504,7 @@
 #define __hybrid_uint128_shr32_overflows(var, shift) \
 	((__hybrid_int128_vec32_significand(var, 0) & ((__UINT32_C(1) << (shift)) - 1)) != 0)
 #ifdef __UINT64_TYPE__
-/* Unsigned >>= shift-right for `shift <= 64' */
+/* Unsigned >>= shift-right for `shift < 64' */
 #define __hybrid_uint128_shr64(var, shift)                                                       \
 	(__hybrid_uint128_vec64_significand(var, 0) >>= (shift),                                     \
 	 __hybrid_uint128_vec64_significand(var, 0) |= (__hybrid_uint128_vec64_significand(var, 1) & \
@@ -509,7 +515,7 @@
 	((__hybrid_int128_vec64_significand(var, 0) & ((__UINT64_C(1) << (shift)) - 1)) != 0)
 #define __hybrid_uint128_shr32 __hybrid_uint128_shr64
 #else /* __UINT64_TYPE__ */
-/* Unsigned >>= shift-right for `shift <= 32' */
+/* Unsigned >>= shift-right for `shift < 32' */
 #define __hybrid_uint128_shr32(var, shift)                                                       \
 	(__hybrid_uint128_vec32_significand(var, 0) >>= (shift),                                     \
 	 __hybrid_uint128_vec32_significand(var, 0) |= (__hybrid_uint128_vec32_significand(var, 1) & \
@@ -524,7 +530,7 @@
 	                                                ((__UINT32_C(1) << (shift)) - 1))            \
 	                                               << (32 - (shift)),                            \
 	 __hybrid_uint128_vec32_significand(var, 3) >>= (shift))
-/* Unsigned >>= shift-right for `shift <= 64' */
+/* Unsigned >>= shift-right for `shift < 64' */
 #define __hybrid_uint128_shr64(var, shift)                                                                                      \
 	((shift) < 32 ? __hybrid_uint128_shr32(var, shift)                                                                          \
 	              : (__hybrid_uint128_vec32_significand(var, 0) = __hybrid_uint128_vec32_significand(var, 1) >> ((shift) % 32), \
@@ -537,7 +543,7 @@
 	                 (__hybrid_uint128_vec32_significand(var, 1) & ((__UINT32_C(1) << ((shift) % 32)) - 1)) != 0))
 #endif /* !__UINT64_TYPE__ */
 
-/* Unsigned >>= shift-right for any `shift' */
+/* Unsigned >>= shift-right for `shift < 128' */
 #ifdef __UINT64_TYPE__
 #define __hybrid_uint128_shr(var, shift)                                                                                        \
 	((shift) < 64 ? __hybrid_uint128_shr64(var, shift)                                                                          \
@@ -570,16 +576,16 @@
 #define __hybrid_int128_shr32_overflows __hybrid_uint128_shr32_overflows
 #define __hybrid_int128_shr64_overflows __hybrid_uint128_shr64_overflows
 #ifdef __UINT64_TYPE__
-/* Signed >>= shift-right for `shift <= 64' */
+/* Signed >>= shift-right for `shift < 64' */
 #define __hybrid_int128_shr64(var, shift)                                                        \
 	(__hybrid_uint128_vec64_significand(var, 0) >>= (shift),                                     \
 	 __hybrid_uint128_vec64_significand(var, 0) |= (__hybrid_uint128_vec64_significand(var, 1) & \
-	                                                ((__UINT64_C(1) << (shift)) - 1))             \
+	                                                ((__UINT64_C(1) << (shift)) - 1))            \
 	                                               << (64 - (shift)),                            \
 	 __hybrid_int128_vec64_significand(var, 1) >>= (shift))
 #define __hybrid_int128_shr32 __hybrid_int128_shr64
 #else /* __UINT64_TYPE__ */
-/* Signed >>= shift-right for `shift <= 32' */
+/* Signed >>= shift-right for `shift < 32' */
 #define __hybrid_int128_shr32(var, shift)                                                        \
 	(__hybrid_uint128_vec32_significand(var, 0) >>= (shift),                                     \
 	 __hybrid_uint128_vec32_significand(var, 0) |= (__hybrid_uint128_vec32_significand(var, 1) & \
@@ -594,7 +600,7 @@
 	                                                ((__UINT32_C(1) << (shift)) - 1))            \
 	                                               << (32 - (shift)),                            \
 	 __hybrid_int128_vec32_significand(var, 3) >>= (shift))
-/* Signed >>= shift-right for `shift <= 64' */
+/* Signed >>= shift-right for `shift < 64' */
 #define __hybrid_int128_shr64(var, shift)                                                                                       \
 	((shift) < 32 ? __hybrid_int128_shr32(var, shift)                                                                           \
 	              : (__hybrid_uint128_vec32_significand(var, 0) = __hybrid_uint128_vec32_significand(var, 1) >> ((shift) % 32), \
@@ -603,7 +609,7 @@
 	                 __hybrid_int128_vec32_significand(var, 3) = __hybrid_int128_isneg(var) ? -1 : 0))
 #endif /* !__UINT64_TYPE__ */
 
-/* Signed >>= shift-right for any `shift' */
+/* Signed >>= shift-right for `shift < 128' */
 #ifdef __UINT64_TYPE__
 #define __hybrid_int128_shr(var, shift)                                                                                         \
 	((shift) < 64 ? __hybrid_int128_shr64(var, shift)                                                                           \
@@ -723,10 +729,11 @@
 	       __hybrid_int128_vec32_significand(var, 3) = __PRIVATE_MIN_S4)
 #endif /* !__UINT64_TYPE__ */
 #define __hybrid_int128_iszero  __hybrid_uint128_iszero
+#define __hybrid_int128_setzero __hybrid_uint128_setzero
 #define __hybrid_int128_isone   __hybrid_uint128_isone
+#define __hybrid_int128_setone  __hybrid_uint128_setone
 #define __hybrid_uint128_ismin  __hybrid_uint128_iszero
 #define __hybrid_uint128_setmin __hybrid_uint128_setzero
-#define __hybrid_int128_setone  __hybrid_uint128_setone
 #define __hybrid_uint128_ismax  __hybrid_int128_isminusone
 #define __hybrid_uint128_setmax __hybrid_int128_setminusone
 
