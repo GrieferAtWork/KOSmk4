@@ -497,6 +497,7 @@ err_overlap:
 			memcpy(lld, &peb_based_library_list, sizeof(struct library_listdef));
 			lld->lld_first                     = peb_base;
 			lld->lld_module_offsetof_loadstart = loadstart;
+			/* TODO: Somehow include the RTLD in the initial library list! */
 		}
 	} EXCEPT {
 		freea(phdr_vector);

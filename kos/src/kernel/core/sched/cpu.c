@@ -902,7 +902,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	caller->t_sched.s_running.sr_runnxt = NULL;
 	assert(mycpu->c_current != caller);
 	assert(next->t_sched.s_state);
-	cpu_assert_integrity(/*ignored_thread:*/ THIS_TASK);
+	cpu_assert_integrity(/*ignored_thread:*/ caller);
 
 	/* Hi-jack the execution stack of the next thread to have it do the decref()
 	 * of our own thread, thus preventing the undefined behavior that would be

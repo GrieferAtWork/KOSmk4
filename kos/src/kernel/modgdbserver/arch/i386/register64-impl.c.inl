@@ -354,7 +354,7 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 
 	case GDB_REGISTER_X86_64_RSP:
 		GETSET8(icpustate64_getrsp(STATE),
-		        *pstate = icpustate64_setrsp_p(*pstate, value));
+		        icpustate64_setrsp(STATE, value));
 		break;
 
 	case GDB_REGISTER_X86_64_RIP:
@@ -416,7 +416,7 @@ NOTHROW(FCALL FUNC(SCpuStateRegister))(struct task *__restrict thread,
 
 	case GDB_REGISTER_X86_64_RSP:
 		GETSET8(scpustate64_getrsp(STATE),
-		        *pstate = scpustate64_setrsp_p(*pstate, value));
+		        scpustate64_setrsp(STATE, value));
 		break;
 
 	case GDB_REGISTER_X86_64_RIP:

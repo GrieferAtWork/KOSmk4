@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/debugtrap.h>
 #include <kernel/except.h>
 #include <kernel/printk.h>
 #include <kernel/syscall.h>
@@ -34,6 +35,7 @@
 #include <kos/library-listdef.h>
 
 #include <errno.h>
+#include <signal.h>
 #include <string.h>
 
 #define POINTER_SET_BUFSIZE 16
@@ -232,6 +234,16 @@ DEFINE_SYSCALL1(errno_t, set_library_listdef,
 	COMPILER_WRITE_BARRIER();
 	dst->lld_size = size; /* Mark the new definition as valid. */
 	COMPILER_WRITE_BARRIER();
+#if 0 /* TODO: Enable me once libdl loads the library list after initialization, and
+       *       the inital library list definition loaded by exec() already includes
+       *       both libdl _and_ the hosted application. */
+	if (kernel_debugtrap_enabled()) {
+		struct debugtrap_reason r;
+		r.dtr_signo  = SIGTRAP;
+		r.dtr_reason = DEBUGTRAP_REASON_LIBRARY;
+		kernel_debugtrap(&r);
+	}
+#endif
 	return -EOK;
 }
 
