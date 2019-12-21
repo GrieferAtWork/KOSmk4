@@ -83,6 +83,8 @@ DlModule_GetLocalSymbol(DlModule *__restrict self,
 nosym:
 	return NULL;
 nosym_no_elf_ht:
+	syslog(LOG_WARNING, "[rtld] Elf symbol hash table of %q is corrupt\n",
+	       self->dm_filename);
 	self->dm_hashtab = NULL;
 	goto nosym;
 }

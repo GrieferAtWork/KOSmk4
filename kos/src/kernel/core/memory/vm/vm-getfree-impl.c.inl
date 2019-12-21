@@ -208,7 +208,7 @@ again:
 			goto again;
 		}
 		minpage &= ~(min_alignment_in_pages - 1);
-		maxpage = hint - 1;
+		maxpage = minpage + num_pages - 1;
 		for (;;) {
 			minmax.mm_min = minmax.mm_max = NULL;
 			vm_nodetree_minmaxlocate(self->v_tree,

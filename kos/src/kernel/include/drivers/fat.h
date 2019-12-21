@@ -324,11 +324,11 @@ typedef FatSectorIndex (KCALL *PFatGetTableSector)(FatSuperblock const *__restri
 struct fat_superblock
 #ifdef __cplusplus
 	: superblock
-#endif
+#endif /* __cplusplus */
 {
 #ifndef __cplusplus
 	struct superblock f_block; /* The underlying superblock */
-#endif
+#endif /* !__cplusplus */
 	FatNode                 f_root;        /* Fat INode data for the root node. */
 	mode_t                  f_mode;        /* [valid_if(!(f_features & FAT_FEATURE_ARB))] Default permissions for every file on this filesystem (Defaults to 0777). */
 	uid_t                   f_uid;         /* [valid_if(!(f_features & FAT_FEATURE_UGID))] Owner UID for every file on this filesystem (Defaults to 0). */
@@ -353,9 +353,9 @@ struct fat_superblock
 #define FAT_SECTORSHIFT(x)  VM_DATABLOCK_ADDRSHIFT(x) /* `x << FAT_SECTORSHIFT(fat) == x * FAT_SECTORSIZE(fat)' */
 #ifdef __INTELLISENSE__
 	size_t                  f_sectorsize;  /* [const] Size of a sector (in bytes). */
-#else
+#else /* __INTELLISENSE__ */
 #define f_sectorsize        db_pagesize    /* TODO: Make use of the page-shift values. */
-#endif
+#endif /* !__INTELLISENSE__ */
 	size_t                  f_clustersize; /* [const][== f_sec4clus * f_sectorsize] Size of a cluster (in bytes). */
 	size_t                  f_fat_size;    /* [const][== f_sec4fat * f_sectorsize] Size of a single FileAllocationTable (in bytes). */
 	FatSectorIndex          f_sec4clus;    /* [const] Amount of sectors per cluster. */
@@ -391,12 +391,24 @@ struct fat_superblock
 	FatClusterIndex         f_free_pos;    /* [lock(f_fat_lock)] Next cluster index that should be considered when search for free clusters. */
 };
 
-#define FAT_META_GTLOAD(self,fat_sector_index) ((self)->f_fat_meta[(fat_sector_index)/(BITS_PER_POINTER/FAT_METABITS)] &   (FAT_METALOAD << (((fat_sector_index)%(BITS_PER_POINTER/FAT_METABITS))*FAT_METABITS)))
-#define FAT_META_STLOAD(self,fat_sector_index) ((self)->f_fat_meta[(fat_sector_index)/(BITS_PER_POINTER/FAT_METABITS)] |=  (FAT_METALOAD << (((fat_sector_index)%(BITS_PER_POINTER/FAT_METABITS))*FAT_METABITS)))
-#define FAT_META_UTLOAD(self,fat_sector_index) ((self)->f_fat_meta[(fat_sector_index)/(BITS_PER_POINTER/FAT_METABITS)] &= ~(FAT_METALOAD << (((fat_sector_index)%(BITS_PER_POINTER/FAT_METABITS))*FAT_METABITS)))
-#define FAT_META_GTCHNG(self,fat_sector_index) ((self)->f_fat_meta[(fat_sector_index)/(BITS_PER_POINTER/FAT_METABITS)] &   (FAT_METACHNG << (((fat_sector_index)%(BITS_PER_POINTER/FAT_METABITS))*FAT_METABITS)))
-#define FAT_META_STCHNG(self,fat_sector_index) ((self)->f_fat_meta[(fat_sector_index)/(BITS_PER_POINTER/FAT_METABITS)] |=  (FAT_METACHNG << (((fat_sector_index)%(BITS_PER_POINTER/FAT_METABITS))*FAT_METABITS)))
-#define FAT_META_UTCHNG(self,fat_sector_index) ((self)->f_fat_meta[(fat_sector_index)/(BITS_PER_POINTER/FAT_METABITS)] &= ~(FAT_METACHNG << (((fat_sector_index)%(BITS_PER_POINTER/FAT_METABITS))*FAT_METABITS)))
+#define FAT_META_GTLOAD(self, fat_sector_index)                                   \
+	((self)->f_fat_meta[(fat_sector_index) / (BITS_PER_POINTER / FAT_METABITS)] & \
+	 ((uintptr_t)FAT_METALOAD << (((fat_sector_index) % (BITS_PER_POINTER / FAT_METABITS)) * FAT_METABITS)))
+#define FAT_META_STLOAD(self, fat_sector_index)                                    \
+	((self)->f_fat_meta[(fat_sector_index) / (BITS_PER_POINTER / FAT_METABITS)] |= \
+	 ((uintptr_t)FAT_METALOAD << (((fat_sector_index) % (BITS_PER_POINTER / FAT_METABITS)) * FAT_METABITS)))
+#define FAT_META_UTLOAD(self, fat_sector_index)                                    \
+	((self)->f_fat_meta[(fat_sector_index) / (BITS_PER_POINTER / FAT_METABITS)] &= \
+	 ~((uintptr_t)FAT_METALOAD << (((fat_sector_index) % (BITS_PER_POINTER / FAT_METABITS)) * FAT_METABITS)))
+#define FAT_META_GTCHNG(self, fat_sector_index)                                   \
+	((self)->f_fat_meta[(fat_sector_index) / (BITS_PER_POINTER / FAT_METABITS)] & \
+	 ((uintptr_t)FAT_METACHNG << (((fat_sector_index) % (BITS_PER_POINTER / FAT_METABITS)) * FAT_METABITS)))
+#define FAT_META_STCHNG(self, fat_sector_index)                                    \
+	((self)->f_fat_meta[(fat_sector_index) / (BITS_PER_POINTER / FAT_METABITS)] |= \
+	 ((uintptr_t)FAT_METACHNG << (((fat_sector_index) % (BITS_PER_POINTER / FAT_METABITS)) * FAT_METABITS)))
+#define FAT_META_UTCHNG(self, fat_sector_index)                                    \
+	((self)->f_fat_meta[(fat_sector_index) / (BITS_PER_POINTER / FAT_METABITS)] &= \
+	 ~((uintptr_t)FAT_METACHNG << (((fat_sector_index) % (BITS_PER_POINTER / FAT_METABITS)) * FAT_METABITS)))
 
 
 /* Get/Set FAT indirection, automatically loading missing parts
@@ -483,15 +495,15 @@ Fat_GetAbsDiskPos(struct inode *__restrict self, pos_t pos);
 
 
 /* Returns the on-disk address of a given cluster number. */
-#define FAT_CLUSTERADDR(self,cluster_id) \
-	FAT_SECTORADDR(self,FAT_CLUSTERSTART(self,cluster_id))
+#define FAT_CLUSTERADDR(self, cluster_id) \
+	FAT_SECTORADDR(self, FAT_CLUSTERSTART(self, cluster_id))
 
 /* Returns the on-disk address of a given sector number. */
-#define FAT_SECTORADDR(self,sector_num)   \
+#define FAT_SECTORADDR(self, sector_num)   \
 	((pos_t)(sector_num) << FAT_SECTORSHIFT(self))
 
 /* Returns the sector number of a given cluster, which then spans `self->f_sec4clus' sectors. */
-#define FAT_CLUSTERSTART(self,cluster_id) \
+#define FAT_CLUSTERSTART(self, cluster_id) \
 	((FatSectorIndex)((self)->f_dat_start + (((cluster_id) - 2) * (self)->f_sec4clus)))
 
 /* In FAT, we store the raw 8.3 filename (without case-fix) immediately after the regular name. */
