@@ -391,6 +391,11 @@ done_dynamic:
 				self->dm_jmpsize   = jmp_size;
 #endif /* !ELF_ARCH_LAZYINDX */
 				self->dm_flags    |= RTLD_JMPRELA;
+				if ((ElfW(Rela) *)jmp_base == rela_base) {
+					size_t offset = rela_count * sizeof(ElfW(Rela));
+					jmp_base = (ElfW(Rel) *)((byte_t *)jmp_base + offset);
+					jmp_size -= offset;
+				}
 				if unlikely(DlModule_ApplyRelocationsWithAddend(self, (ElfW(Rela) *)jmp_base,
 				                                                jmp_size / sizeof(ElfW(Rela)),
 				                                                flags))
@@ -418,6 +423,11 @@ done_dynamic:
 #else /* ELF_ARCH_LAZYINDX */
 				self->dm_jmpsize   = jmp_size;
 #endif /* !ELF_ARCH_LAZYINDX */
+				if (jmp_base == rel_base) {
+					size_t offset = rel_count * sizeof(ElfW(Rel));
+					jmp_base = (ElfW(Rel) *)((byte_t *)jmp_base + offset);
+					jmp_size -= offset;
+				}
 				if unlikely(DlModule_ApplyRelocations(self, jmp_base,
 				                                      jmp_size / sizeof(ElfW(Rel)),
 				                                      flags))
@@ -439,11 +449,11 @@ done_dynamic:
 		DlModule_MakeTextReadonly(self);
 
 	/* Signal the initialization of the library to GDB _after_ relocations have been
-	 * applied. - Otherwise, GCC may place a breakpoint on an instruction that's going
+	 * applied. - Otherwise, GDB may place a breakpoint on an instruction that's going
 	 * to be modified by a relocation, causing undefined behavior when the relocation
 	 * is applied to the breakpoint-instruction, rather than the original instruction.
 	 * However: Still signal init before calling constructors, so that those are invoked
-	 *          after GCC has injected potential breakpoints, so-as to allow breakpoints
+	 *          after GDB has injected potential breakpoints, so-as to allow breakpoints
 	 *          to function properly within __attribute__((constructor)) functions. */
 	if (!sys_debugtrap_disabled) {
 		struct debugtrap_reason r;
