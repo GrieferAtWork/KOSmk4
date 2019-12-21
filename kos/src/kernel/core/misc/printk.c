@@ -40,6 +40,11 @@
 #include <string.h>
 #include <syslog.h>
 
+#undef CONFIG_PRINTK_DEDENT_LBRACKET_TEXT
+#if 1
+#define CONFIG_PRINTK_DEDENT_LBRACKET_TEXT 1
+#endif
+
 DECL_BEGIN
 
 #define LEVEL_EMERG   0
@@ -96,8 +101,14 @@ kprinter_impl(void *level_id,
 		if (print_len) {
 			if (!(ATOMIC_FETCHOR(level_states[(uintptr_t)level_id].ls_flags, LEVEL_FINLINE) & LEVEL_FINLINE)) {
 				char const *prefix;
-				prefix = level_prefix[(uintptr_t)level_id];
-				outsb(debug_port, prefix, strlen(prefix));
+				size_t prefix_len;
+				prefix     = level_prefix[(uintptr_t)level_id];
+				prefix_len = strlen(prefix);
+#ifdef CONFIG_PRINTK_DEDENT_LBRACKET_TEXT
+				if (prefix_len && data[0] == '[')
+					--prefix_len;
+#endif /* CONFIG_PRINTK_DEDENT_LBRACKET_TEXT */
+				outsb(debug_port, prefix, prefix_len);
 			}
 		}
 		if (print_len < datalen) {
