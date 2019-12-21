@@ -456,24 +456,6 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			}
 		}	break;
 
-
-		case 0x0f08: /* INVD */
-		case 0x0f09: /* WBINVD */
-			if (op_flags & (F_OP16 | F_AD16 | F_LOCK | F_REP | F_REPNE))
-				goto e_bad_prefix;
-			if (isuser())
-				goto e_privileged_instruction;
-			pagedir_syncall(); /* What other caches are there? */
-			break;
-
-		case 0x0f1f:
-			/* NOP r/m16  -- Added with SSE */
-			/* NOP r/m32  -- Added with SSE */
-			MOD_DECODE();
-			if (op_flags & (F_AD16 | F_REPNE))
-				goto e_bad_prefix;
-			break;
-
 #define DEFINE_MOVcc(opcode, cond_expr)                         \
 		case opcode: {                                          \
 			uintptr_t pflags;                                   \
@@ -596,223 +578,6 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			set_edx((u32)(result >> 32));
 		} break;
 
-		case 0x0fae:
-			MOD_DECODE();
-			switch (mod.mi_reg) {
-
-			case 0:
-				/* rdfsbase */
-				if ((op_flags & (F_AD16 | F_OP16 | F_LOCK | F_REPNE | F_REP)) != F_REP) {
-					uintptr_t addr;
-					if (op_flags & (F_LOCK))
-						goto e_bad_prefix;
-					if (mod.mi_type != MODRM_MEMORY)
-						goto e_bad_operand_addrmode;
-					/* FXSAVE m512byte */
-					addr = x86_decode_modrmgetmem(state, &mod, op_flags);
-					if (isuser())
-						validate_writable((void *)addr, 512);
-					x86_fxsave((USER CHECKED struct xfpustate *)(void *)addr);
-					break;
-				}
-				if (mod.mi_type != MODRM_REGISTER)
-					goto e_bad_operand_addrmode;
-#ifndef __x86_64__
-				{
-					u16 myfs = state->ics_fs16 & ~3;
-					u32 base;
-					if (myfs == SEGMENT_USER_FSBASE) {
-						base = get_user_fsbase();
-					} else if (myfs == SEGMENT_USER_GSBASE) {
-						base = get_user_gsbase();
-					} else {
-						base = 0;
-					}
-					WR_RMREGL(base);
-				}
-#else /* !__x86_64__ */
-				{
-					LOHI64 temp;
-					if (op_flags & F_REX_W) {
-						/* rdfsbase %r64 */
-						__asm__ __volatile__("rdmsr"
-						                     : "=a" (temp.lohi[0])
-						                     , "=d" (temp.lohi[1])
-						                     : "c" (IA32_FS_BASE));
-					} else {
-						/* rdfsbase %r32 */
-						__asm__ __volatile__("rdmsr"
-						                     : "=a" (temp.lohi[0])
-						                     : "c" (IA32_FS_BASE)
-						                     : "edx");
-						temp.lohi[1] = 0;
-					}
-					WR_RMREGQ(temp.val64);
-				}
-#endif /* __x86_64__ */
-				break;
-
-			case 1:
-				/* rdgsbase */
-				if ((op_flags & (F_AD16 | F_OP16 | F_LOCK | F_REPNE | F_REP)) != F_REP) {
-					uintptr_t addr;
-					if (op_flags & (F_LOCK))
-						goto e_bad_prefix;
-					if (mod.mi_type != MODRM_MEMORY)
-						goto e_bad_operand_addrmode;
-					/* FXRSTOR m512byte */
-					addr = x86_decode_modrmgetmem(state, &mod, op_flags);
-					if (isuser())
-						validate_readable((void *)addr, 512);
-					x86_fxrstor((USER CHECKED struct xfpustate *)(void *)addr);
-					break;
-				}
-				if (mod.mi_type != MODRM_REGISTER)
-					goto e_bad_operand_addrmode;
-#ifndef __x86_64__
-				{
-					u16 mygs = __rdgs() & ~3;
-					u32 base;
-					if (mygs == SEGMENT_USER_GSBASE) {
-						base = get_user_gsbase();
-					} else if (mygs == SEGMENT_USER_FSBASE) {
-						base = get_user_fsbase();
-					} else {
-						base = 0;
-					}
-					WR_RMREGL(base);
-				}
-#else /* !__x86_64__ */
-				{
-					LOHI64 temp;
-					/* NOTE: We must load `IA32_KERNEL_GS_BASE', since the `swapgs' invoked upon
-					 *       entry into kernel-space has caused the actual user-space GS to be
-					 *       saved within the `IA32_KERNEL_GS_BASE' msr */
-					u32 msr = isuser()
-					          ? IA32_KERNEL_GS_BASE
-					          : IA32_GS_BASE;
-					if (op_flags & F_REX_W) {
-						/* rdgsbase %r64 */
-						__asm__ __volatile__("rdmsr"
-						                     : "=a" (temp.lohi[0])
-						                     , "=d" (temp.lohi[1])
-						                     : "c" (msr));
-					} else {
-						/* rdgsbase %r32 */
-						__asm__ __volatile__("rdmsr"
-						                     : "=a" (temp.lohi[0])
-						                     : "c" (msr)
-						                     : "edx");
-						temp.lohi[1] = 0;
-					}
-					WR_RMREGQ(temp.val64);
-				}
-#endif /* __x86_64__ */
-				break;
-
-			case 2:
-				/* wrfsbase */
-				if (!(op_flags & F_REP))
-					goto generic_illegal_instruction;
-				if (mod.mi_type != MODRM_REGISTER)
-					goto e_bad_operand_addrmode;
-#ifndef __x86_64__
-				{
-					u16 myfs = state->ics_fs16 & ~3;
-					u32 val  = RD_RMREGL();
-					/* Check which segment `%fs' actually refers to */
-					if (myfs == SEGMENT_USER_FSBASE)
-						set_user_fsbase(val);
-					else if (myfs == SEGMENT_USER_GSBASE) {
-						set_user_gsbase(val);
-						update_user_fsbase(); /* Force a segment reload */
-					} else {
-						/* Don't allow user-space to set the bases of any other segment.
-						 * As such, throw an exception indicating a privileged register (which SOME_SEGMENT.base is) */
-						PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-						PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
-						PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_FS);
-						PERTASK_SET(this_exception_pointers[3], (uintptr_t)val);
-						goto set_generic_illegal_instruction_4;
-					}
-				}
-#else /* !__x86_64__ */
-				{
-					LOHI64 temp;
-					temp.val64 = RD_RMREGQ();
-					/* wrfsbase %r32 / %r64 */
-					if (!(op_flags & F_REX_W))
-						temp.lohi[1] = 0;
-					__wrmsr(IA32_FS_BASE, temp.val64);
-				}
-#endif /* __x86_64__ */
-				break;
-
-			case 3:
-				/* wrgsbase */
-				if (!(op_flags & F_REP))
-					goto generic_illegal_instruction;
-				if (mod.mi_type != MODRM_REGISTER)
-					goto e_bad_operand_addrmode;
-				/* XXX: Check if `%gs == SEGMENT_USER_GSBASE_RPL' */
-#ifndef __x86_64__
-				/* Check which segment `%gs' actually refers to */
-				{
-					u16 mygs = __rdgs() & ~3;
-					u32 val = RD_RMREGL();
-					if (mygs == SEGMENT_USER_GSBASE)
-						set_user_gsbase(val);
-					else if (mygs == SEGMENT_USER_FSBASE) {
-						set_user_fsbase(val);
-						update_user_gsbase(); /* Force a segment reload */
-					} else {
-						/* Don't allow user-space to set the bases of any other segment.
-						 * As such, throw an exception indicating a privileged register (which SOME_SEGMENT.base is) */
-						PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-						PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
-						PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_GS);
-						PERTASK_SET(this_exception_pointers[3], (uintptr_t)val);
-						goto set_generic_illegal_instruction_4;
-					}
-				}
-#else /* !__x86_64__ */
-				{
-					LOHI64 temp;
-					/* NOTE: We must write `IA32_KERNEL_GS_BASE', since the `swapgs' invoked upon
-					 *       entry into kernel-space has caused the actual user-space GS to be
-					 *       saved within the `IA32_KERNEL_GS_BASE' msr */
-					u32 msr = isuser()
-					          ? IA32_KERNEL_GS_BASE
-					          : IA32_GS_BASE;
-					temp.val64 = RD_RMREGQ();
-					/* wrgsbase %r32 / %r64 */
-					if (!(op_flags & F_REX_W))
-						temp.lohi[1] = 0;
-					__wrmsr(msr, temp.val64);
-				}
-#endif /* __x86_64__ */
-				break;
-
-			case 7:
-				/* sfence, lfence, mfence */
-				if (op_flags & (F_AD16 | F_LOCK | F_REP | F_REPNE))
-					goto e_bad_prefix;
-				/* Serialize memory by executing an atomic instruction. */
-				{
-					static int volatile atom = 0;
-					__asm__ __volatile__("xchgl %0, %1"
-					                     : "+m" (atom)
-					                     : "r" (1)
-					                     : "memory");
-				}
-				break;
-
-			default:
-				goto generic_illegal_instruction;
-			}
-			break;
-
-
 		case 0x0fa2: {
 			struct cpuinfo const *info;
 			/* CPUID */
@@ -891,6 +656,206 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 		}	break;
 
 #endif /* !__x86_64__ */
+
+		case 0x0fae:
+			MOD_DECODE();
+			switch (mod.mi_reg) {
+
+			case 0:
+				/* rdfsbase */
+				if ((op_flags & (F_AD16 | F_OP16 | F_LOCK | F_REPNE | F_REP)) != F_REP) {
+					uintptr_t addr;
+					if (op_flags & (F_LOCK))
+						goto e_bad_prefix;
+					if (mod.mi_type != MODRM_MEMORY)
+						goto e_bad_operand_addrmode;
+					/* FXSAVE m512byte */
+					addr = x86_decode_modrmgetmem(state, &mod, op_flags);
+					if (isuser())
+						validate_writable((void *)addr, 512);
+					x86_fxsave((USER CHECKED struct xfpustate *)(void *)addr);
+					break;
+				}
+				if (mod.mi_type != MODRM_REGISTER)
+					goto e_bad_operand_addrmode;
+#ifndef __x86_64__
+				{
+					u16 myfs = state->ics_fs16 & ~3;
+					u32 base;
+					if (myfs == SEGMENT_USER_FSBASE) {
+						base = get_user_fsbase();
+					} else if (myfs == SEGMENT_USER_GSBASE) {
+						base = get_user_gsbase();
+					} else {
+						base = 0;
+					}
+					WR_RMREGL(base);
+				}
+#else /* !__x86_64__ */
+				{
+					LOHI64 temp;
+					if (op_flags & F_REX_W) {
+						/* rdfsbase %r64 */
+						temp.val64 = __rdmsr(IA32_FS_BASE);
+					} else {
+						/* rdfsbase %r32 */
+						temp.lohi[0] = __rdmsr32(IA32_FS_BASE);
+						temp.lohi[1] = 0;
+					}
+					WR_RMREGQ(temp.val64);
+				}
+#endif /* __x86_64__ */
+				break;
+
+			case 1:
+				/* rdgsbase */
+				if ((op_flags & (F_AD16 | F_OP16 | F_LOCK | F_REPNE | F_REP)) != F_REP) {
+					uintptr_t addr;
+					if (op_flags & (F_LOCK))
+						goto e_bad_prefix;
+					if (mod.mi_type != MODRM_MEMORY)
+						goto e_bad_operand_addrmode;
+					/* FXRSTOR m512byte */
+					addr = x86_decode_modrmgetmem(state, &mod, op_flags);
+					if (isuser())
+						validate_readable((void *)addr, 512);
+					x86_fxrstor((USER CHECKED struct xfpustate *)(void *)addr);
+					break;
+				}
+				if (mod.mi_type != MODRM_REGISTER)
+					goto e_bad_operand_addrmode;
+#ifndef __x86_64__
+				{
+					u16 mygs = __rdgs() & ~3;
+					u32 base;
+					if (mygs == SEGMENT_USER_GSBASE) {
+						base = get_user_gsbase();
+					} else if (mygs == SEGMENT_USER_FSBASE) {
+						base = get_user_fsbase();
+					} else {
+						base = 0;
+					}
+					WR_RMREGL(base);
+				}
+#else /* !__x86_64__ */
+				{
+					LOHI64 temp;
+					/* NOTE: We must load `IA32_KERNEL_GS_BASE', since the `swapgs' invoked upon
+					 *       entry into kernel-space has caused the actual user-space GS to be
+					 *       saved within the `IA32_KERNEL_GS_BASE' msr */
+					u32 msr = isuser() ? IA32_KERNEL_GS_BASE : IA32_GS_BASE;
+					if (op_flags & F_REX_W) {
+						/* rdgsbase %r64 */
+						temp.val64 = __rdmsr(msr);
+					} else {
+						/* rdgsbase %r32 */
+						temp.lohi[0] = __rdmsr32(msr);
+						temp.lohi[1] = 0;
+					}
+					WR_RMREGQ(temp.val64);
+				}
+#endif /* __x86_64__ */
+				break;
+
+			case 2:
+				/* wrfsbase */
+				if (!(op_flags & F_REP))
+					goto generic_illegal_instruction;
+				if (mod.mi_type != MODRM_REGISTER)
+					goto e_bad_operand_addrmode;
+#ifndef __x86_64__
+				{
+					u16 myfs = state->ics_fs16 & ~3;
+					u32 val  = RD_RMREGL();
+					/* Check which segment `%fs' actually refers to */
+					if (myfs == SEGMENT_USER_FSBASE)
+						set_user_fsbase(val);
+					else if (myfs == SEGMENT_USER_GSBASE) {
+						set_user_gsbase(val);
+						update_user_fsbase(); /* Force a segment reload */
+					} else {
+						/* Don't allow user-space to set the bases of any other segment.
+						 * As such, throw an exception indicating a privileged register (which SOME_SEGMENT.base is) */
+						PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+						PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
+						PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_FS);
+						PERTASK_SET(this_exception_pointers[3], (uintptr_t)val);
+						goto set_generic_illegal_instruction_4;
+					}
+				}
+#else /* !__x86_64__ */
+				{
+					LOHI64 temp;
+					temp.val64 = RD_RMREGQ();
+					/* wrfsbase %r32 / %r64 */
+					if (!(op_flags & F_REX_W))
+						temp.lohi[1] = 0;
+					__wrmsr(IA32_FS_BASE, temp.val64);
+				}
+#endif /* __x86_64__ */
+				break;
+
+			case 3:
+				/* wrgsbase */
+				if (!(op_flags & F_REP))
+					goto generic_illegal_instruction;
+				if (mod.mi_type != MODRM_REGISTER)
+					goto e_bad_operand_addrmode;
+				/* XXX: Check if `%gs == SEGMENT_USER_GSBASE_RPL' */
+#ifndef __x86_64__
+				/* Check which segment `%gs' actually refers to */
+				{
+					u16 mygs = __rdgs() & ~3;
+					u32 val = RD_RMREGL();
+					if (mygs == SEGMENT_USER_GSBASE)
+						set_user_gsbase(val);
+					else if (mygs == SEGMENT_USER_FSBASE) {
+						set_user_fsbase(val);
+						update_user_gsbase(); /* Force a segment reload */
+					} else {
+						/* Don't allow user-space to set the bases of any other segment.
+						 * As such, throw an exception indicating a privileged register (which SOME_SEGMENT.base is) */
+						PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+						PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
+						PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_GS);
+						PERTASK_SET(this_exception_pointers[3], (uintptr_t)val);
+						goto set_generic_illegal_instruction_4;
+					}
+				}
+#else /* !__x86_64__ */
+				{
+					LOHI64 temp;
+					/* NOTE: We must write `IA32_KERNEL_GS_BASE', since the `swapgs' invoked upon
+					 *       entry into kernel-space has caused the actual user-space GS to be
+					 *       saved within the `IA32_KERNEL_GS_BASE' msr */
+					u32 msr = isuser() ? IA32_KERNEL_GS_BASE : IA32_GS_BASE;
+					temp.val64 = RD_RMREGQ();
+					/* wrgsbase %r32 / %r64 */
+					if (!(op_flags & F_REX_W))
+						temp.lohi[1] = 0;
+					__wrmsr(msr, temp.val64);
+				}
+#endif /* __x86_64__ */
+				break;
+
+			case 7:
+				/* sfence, lfence, mfence */
+				if (op_flags & (F_AD16 | F_LOCK | F_REP | F_REPNE))
+					goto e_bad_prefix;
+				/* Serialize memory by executing an atomic instruction. */
+				{
+					static int volatile atom = 0;
+					__asm__ __volatile__("xchgl %0, %1"
+					                     : "+m" (atom)
+					                     : "r" (1)
+					                     : "memory");
+				}
+				break;
+
+			default:
+				goto generic_illegal_instruction;
+			}
+			break;
 
 		case 0x0f01:
 			MOD_DECODE();

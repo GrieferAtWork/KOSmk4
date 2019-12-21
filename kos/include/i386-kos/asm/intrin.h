@@ -526,11 +526,17 @@ __FORCELOCAL void (__wrgs_keepbase)(__UINT16_TYPE__ __val) {
 __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdmsr)(__UINT32_TYPE__ __id) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __result; } __res; __asm__ __volatile__("rdmsr" : "=a" (__res.__lohi[0]), "=d" (__res.__lohi[1]) : "c" (__id)); return __res.__result; }
 __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdpmc)(__UINT32_TYPE__ __id) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __result; } __res; __asm__ __volatile__("rdpmc" : "=a" (__res.__lohi[0]), "=d" (__res.__lohi[1]) : "c" (__id)); return __res.__result; }
 __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdtsc)(void) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __result; } __res; __asm__ __volatile__("rdtsc" : "=a" (__res.__lohi[0]), "=d" (__res.__lohi[1])); return __res.__result; }
+__FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdmsr32)(__UINT32_TYPE__ __id) { __UINT32_TYPE__ __res; __asm__ __volatile__("rdmsr" : "=a" (__res) : "c" (__id) : "rdx"); return __res; }
+__FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdpmc32)(__UINT32_TYPE__ __id) { __UINT32_TYPE__ __res; __asm__ __volatile__("rdpmc" : "=a" (__res) : "c" (__id) : "rdx"); return __res; }
+__FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdtsc32)(void) { __UINT32_TYPE__ __res; __asm__ __volatile__("rdtsc" : "=a" (__res) : : "rdx"); return __res; }
 __FORCELOCAL void (__wrmsr)(__UINT32_TYPE__ __id, __UINT64_TYPE__ __val) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __val; } __arg; __arg.__val = __val; __asm__ __volatile__("wrmsr" : : "c" (__id), "a" (__arg.__lohi[0]), "d" (__arg.__lohi[1])); }
 #else /* __x86_64__ */
 __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdmsr)(__UINT32_TYPE__ __id) { __UINT64_TYPE__ __result; __asm__ __volatile__("rdmsr" : "=A" (__result) : "c" (__id)); return __result; }
 __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdpmc)(__UINT32_TYPE__ __id) { __UINT64_TYPE__ __result; __asm__ __volatile__("rdpmc" : "=A" (__result) : "c" (__id)); return __result; }
 __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdtsc)(void) { __UINT64_TYPE__ __result; __asm__ __volatile__("rdtsc" : "=A" (__result)); return __result; }
+__FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdmsr32)(__UINT32_TYPE__ __id) { __UINT32_TYPE__ __res; __asm__ __volatile__("rdmsr" : "=a" (__res) : "c" (__id) : "edx"); return __res; }
+__FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdpmc32)(__UINT32_TYPE__ __id) { __UINT32_TYPE__ __res; __asm__ __volatile__("rdpmc" : "=a" (__res) : "c" (__id) : "edx"); return __res; }
+__FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdtsc32)(void) { __UINT32_TYPE__ __res; __asm__ __volatile__("rdtsc" : "=a" (__res) : : "edx"); return __res; }
 __FORCELOCAL void (__wrmsr)(__UINT32_TYPE__ __id, __UINT64_TYPE__ __val) { __asm__ __volatile__("wrmsr" : : "c" (__id), "A" (__val)); }
 #endif /* !__x86_64__ */
 

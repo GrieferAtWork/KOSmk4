@@ -57,8 +57,6 @@ INTERN byte_t *(KCALL x86_decode_modrm)(byte_t *__restrict text,
 	info->mi_reg = MODRM_GETREG(rmbyte);
 	info->mi_rm  = MODRM_GETRM(rmbyte);
 #ifdef __x86_64__
-	if (flags & F_HASREX)
-		info->mi_reg |= 0x10;
 	if (flags & F_REX_R)
 		info->mi_reg |= 0x8;
 	if (flags & F_REX_B)
@@ -149,22 +147,6 @@ PRIVATE u16 const x86_icpustate_8bit_offsets[] = {
 	[R_R13]        = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R13,  /* %r13l */
 	[R_R14]        = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R14,  /* %r14l */
 	[R_R15]        = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R15,  /* %r15l */
-	[R_EAX|R_FREX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RAX,  /* %al */
-	[R_ECX|R_FREX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RCX,  /* %cl */
-	[R_EDX|R_FREX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RDX,  /* %dl */
-	[R_EBX|R_FREX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RBX,  /* %bl */
-	[R_ESP|R_FREX] = OFFSET_ICPUSTATE_IRREGS    + OFFSET_IRREGS_RSP,     /* %spl */
-	[R_EBP|R_FREX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RBP,  /* %bpl */
-	[R_ESI|R_FREX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RSI,  /* %sil */
-	[R_EDI|R_FREX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RDI,  /* %dil */
-	[R_R8 |R_FREX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R8,   /* %r8l */
-	[R_R9 |R_FREX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R9,   /* %r9l */
-	[R_R10|R_FREX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R10,  /* %r10l */
-	[R_R11|R_FREX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R11,  /* %r11l */
-	[R_R12|R_FREX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R12,  /* %r12l */
-	[R_R13|R_FREX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R13,  /* %r13l */
-	[R_R14|R_FREX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R14,  /* %r14l */
-	[R_R15|R_FREX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R15,  /* %r15l */
 #else /* __x86_64__ */
 	[R_EAX]        = OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EAX, /* %al */
 	[R_ECX]        = OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ECX, /* %cl */
@@ -176,6 +158,27 @@ PRIVATE u16 const x86_icpustate_8bit_offsets[] = {
 	[R_EDI]        = OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBX + 1  /* %bh */
 #endif /* !__x86_64__ */
 };
+
+#ifdef __x86_64__
+PRIVATE u16 const x86_icpustate_8bit_rex_offsets[] = {
+	[R_EAX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RAX,  /* %al */
+	[R_ECX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RCX,  /* %cl */
+	[R_EDX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RDX,  /* %dl */
+	[R_EBX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RBX,  /* %bl */
+	[R_ESP] = OFFSET_ICPUSTATE_IRREGS    + OFFSET_IRREGS_RSP,     /* %spl */
+	[R_EBP] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RBP,  /* %bpl */
+	[R_ESI] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RSI,  /* %sil */
+	[R_EDI] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RDI,  /* %dil */
+	[R_R8 ] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R8,   /* %r8l */
+	[R_R9 ] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R9,   /* %r9l */
+	[R_R10] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R10,  /* %r10l */
+	[R_R11] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R11,  /* %r11l */
+	[R_R12] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R12,  /* %r12l */
+	[R_R13] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R13,  /* %r13l */
+	[R_R14] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R14,  /* %r14l */
+	[R_R15] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_R15,  /* %r15l */
+};
+#endif /* __x86_64__ */
 
 #ifdef __x86_64__
 PRIVATE u16 const x86_icpustate_64bit_offsets[] = {
@@ -207,10 +210,21 @@ PRIVATE u16 const x86_icpustate_64bit_offsets[] = {
 
 /* @param: regno: One of `R_*' */
 INTERN WUNUSED ATTR_PURE NONNULL((1)) u8
-NOTHROW(FCALL x86_icpustate_get8)(struct icpustate *__restrict state, u8 regno) {
+NOTHROW(FCALL x86_icpustate_get8)(struct icpustate *__restrict state,
+                                  u8 regno
+#ifdef __x86_64__
+                                  ,
+                                  op_flag_t flags
+#endif /* __x86_64__ */
+                                  ) {
 	assert(regno < COMPILER_LENOF(x86_icpustate_8bit_offsets));
+#ifdef __x86_64__
+	if (flags & F_HASREX)
+		return *(u8 *)((byte_t *)state + x86_icpustate_8bit_rex_offsets[regno]);
+#endif /* __x86_64__ */
 	return *(u8 *)((byte_t *)state + x86_icpustate_8bit_offsets[regno]);
 }
+
 
 INTERN WUNUSED ATTR_PURE NONNULL((1)) u16
 NOTHROW(FCALL x86_icpustate_get16)(struct icpustate *__restrict state, u8 regno) {
@@ -245,9 +259,21 @@ NOTHROW(FCALL x86_icpustate_set64)(struct icpustate *__restrict state, u8 regno,
 
 
 INTERN NONNULL((1)) void
-NOTHROW(FCALL x86_icpustate_set8)(struct icpustate *__restrict state, u8 regno, u8 value) {
+NOTHROW(FCALL x86_icpustate_set8)(struct icpustate *__restrict state,
+                                  u8 regno,
+#ifdef __x86_64__
+                                  op_flag_t flags,
+#endif /* __x86_64__ */
+                                  u8 value) {
 	assert(regno < COMPILER_LENOF(x86_icpustate_8bit_offsets));
-	*(u8 *)((byte_t *)state + x86_icpustate_8bit_offsets[regno]) = value;
+#ifdef __x86_64__
+	if (flags & F_HASREX) {
+		*(u8 *)((byte_t *)state + x86_icpustate_8bit_rex_offsets[regno]) = value;
+	} else
+#endif /* __x86_64__ */
+	{
+		*(u8 *)((byte_t *)state + x86_icpustate_8bit_offsets[regno]) = value;
+	}
 }
 
 #ifdef __x86_64__
@@ -380,7 +406,7 @@ modrm_getrmb(struct icpustate *__restrict state,
 		THROWS(E_SEGFAULT) {
 	uintptr_t addr;
 	if (modrm->mi_type == MODRM_REGISTER)
-		return x86_icpustate_get8(state, modrm->mi_rm);
+		return x86_icpustate_get8(state, modrm->mi_rm, flags);
 	addr = x86_decode_modrmgetmem(state, modrm, flags);
 	if (irregs_isuser(IRREGS(state)))
 		validate_readable((void *)addr, 1);
@@ -393,7 +419,7 @@ modrm_setrmb(struct icpustate *__restrict state,
              op_flag_t flags, u8 value)
 		THROWS(E_SEGFAULT) {
 	if (modrm->mi_type == MODRM_REGISTER) {
-		x86_icpustate_set8(state, modrm->mi_rm, value);
+		x86_icpustate_set8(state, modrm->mi_rm, flags, value);
 	} else {
 		uintptr_t addr;
 		addr = x86_decode_modrmgetmem(state, modrm, flags);

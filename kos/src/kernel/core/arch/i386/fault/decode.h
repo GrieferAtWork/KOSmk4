@@ -132,10 +132,17 @@ INTDEF byte_t *(KCALL x86_decode_modrm)(byte_t *__restrict text, struct modrm *_
 
 
 /* @param: regno: One of `R_*' */
+#ifdef __x86_64__
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) u8 NOTHROW(FCALL x86_icpustate_get8)(struct icpustate *__restrict state, u8 regno, op_flag_t flags);
+INTDEF NONNULL((1)) void NOTHROW(FCALL x86_icpustate_set8)(struct icpustate *__restrict state, u8 regno, op_flag_t flags, u8 value);
+#else /* __x86_64__ */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) u8 NOTHROW(FCALL x86_icpustate_get8)(struct icpustate *__restrict state, u8 regno);
+INTDEF NONNULL((1)) void NOTHROW(FCALL x86_icpustate_set8)(struct icpustate *__restrict state, u8 regno, u8 value);
+#define x86_icpustate_get8(state, regno, flags)        x86_icpustate_get8(state, regno)
+#define x86_icpustate_set8(state, regno, flags, value) x86_icpustate_set8(state, regno, value)
+#endif /* !__x86_64__ */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) u16 NOTHROW(FCALL x86_icpustate_get16)(struct icpustate *__restrict state, u8 regno);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) u32 NOTHROW(FCALL x86_icpustate_get32)(struct icpustate *__restrict state, u8 regno);
-INTDEF NONNULL((1)) void NOTHROW(FCALL x86_icpustate_set8)(struct icpustate *__restrict state, u8 regno, u8 value);
 #ifdef __x86_64__
 INTDEF NONNULL((1)) void NOTHROW(FCALL x86_icpustate_set16)(struct icpustate *__restrict state, u8 regno, u16 value);
 INTDEF NONNULL((1)) void NOTHROW(FCALL x86_icpustate_set32)(struct icpustate *__restrict state, u8 regno, u32 value);
@@ -167,8 +174,8 @@ INTDEF u64 KCALL modrm_getrmq(struct icpustate *__restrict state, struct modrm *
 INTDEF void KCALL modrm_setrmq(struct icpustate *__restrict state, struct modrm *__restrict modrm, op_flag_t flags, u64 value) THROWS(E_SEGFAULT);
 #endif /* __x86_64__ */
 
-#define modrm_getregb(state, modrm, flags)        x86_icpustate_get8(state, (modrm)->mi_reg)
-#define modrm_setregb(state, modrm, flags, value) x86_icpustate_set8(state, (modrm)->mi_reg, value)
+#define modrm_getregb(state, modrm, flags)        x86_icpustate_get8(state, (modrm)->mi_reg, flags)
+#define modrm_setregb(state, modrm, flags, value) x86_icpustate_set8(state, (modrm)->mi_reg, flags, value)
 #define modrm_getregw(state, modrm, flags)        x86_icpustate_get16(state, (modrm)->mi_reg)
 #define modrm_setregw(state, modrm, flags, value) x86_icpustate_set16(state, (modrm)->mi_reg, value)
 #define modrm_getregl(state, modrm, flags)        x86_icpustate_get32(state, (modrm)->mi_reg)
@@ -178,13 +185,13 @@ INTDEF void KCALL modrm_setrmq(struct icpustate *__restrict state, struct modrm 
 #define modrm_setregq(state, modrm, flags, value) x86_icpustate_set64(state, (modrm)->mi_reg, value)
 #define modrm_getreg(state, modrm, flags)         x86_icpustate_get64(state, (modrm)->mi_reg)
 #define modrm_setreg(state, modrm, flags, value)  x86_icpustate_set64(state, (modrm)->mi_reg, value)
-#else
+#else /* __x86_64__ */
 #define modrm_getreg(state, modrm, flags)         x86_icpustate_get32(state, (modrm)->mi_reg)
 #define modrm_setreg(state, modrm, flags, value)  x86_icpustate_set32(state, (modrm)->mi_reg, value)
-#endif
+#endif /* !__x86_64__ */
 
-#define modrm_getrmregb(state, modrm, flags)        x86_icpustate_get8(state, (modrm)->mi_rm)
-#define modrm_setrmregb(state, modrm, flags, value) x86_icpustate_set8(state, (modrm)->mi_rm, value)
+#define modrm_getrmregb(state, modrm, flags)        x86_icpustate_get8(state, (modrm)->mi_rm, flags)
+#define modrm_setrmregb(state, modrm, flags, value) x86_icpustate_set8(state, (modrm)->mi_rm, flags, value)
 #define modrm_getrmregw(state, modrm, flags)        x86_icpustate_get16(state, (modrm)->mi_rm)
 #define modrm_setrmregw(state, modrm, flags, value) x86_icpustate_set16(state, (modrm)->mi_rm, value)
 #define modrm_getrmregl(state, modrm, flags)        x86_icpustate_get32(state, (modrm)->mi_rm)
@@ -194,10 +201,10 @@ INTDEF void KCALL modrm_setrmq(struct icpustate *__restrict state, struct modrm 
 #define modrm_setrmregq(state, modrm, flags, value) x86_icpustate_set64(state, (modrm)->mi_rm, value)
 #define modrm_getrmreg(state, modrm, flags)         x86_icpustate_get64(state, (modrm)->mi_rm)
 #define modrm_setrmreg(state, modrm, flags, value)  x86_icpustate_set64(state, (modrm)->mi_rm, value)
-#else
+#else /* __x86_64__ */
 #define modrm_getrmreg(state, modrm, flags)         x86_icpustate_get32(state, (modrm)->mi_rm)
 #define modrm_setrmreg(state, modrm, flags, value)  x86_icpustate_set32(state, (modrm)->mi_rm, value)
-#endif
+#endif /* !__x86_64__ */
 
 
 /* Read (and return) an X86 opcode from `*ptext', updating that pointer
