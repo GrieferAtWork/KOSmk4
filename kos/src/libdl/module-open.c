@@ -380,7 +380,7 @@ DlModule_LoadLoadedProgramHeaders(DlModule *__restrict self) {
 					}
 					break;
 
-#ifdef CONFIG_ELF_USING_RELA
+#if ELF_ARCH_USESRELA
 				case DT_RELAENT:
 					if (tag.d_un.d_val != sizeof(ElfW(Rela))) {
 						elf_setdlerrorf("%q: Invalid `DT_RELAENT' %Iu != %Iu",
@@ -389,7 +389,7 @@ DlModule_LoadLoadedProgramHeaders(DlModule *__restrict self) {
 						goto err;
 					}
 					break;
-#endif /* CONFIG_ELF_USING_RELA */
+#endif /* ELF_ARCH_USESRELA */
 
 				case DT_RELENT:
 					if (tag.d_un.d_val != sizeof(ElfW(Rel))) {

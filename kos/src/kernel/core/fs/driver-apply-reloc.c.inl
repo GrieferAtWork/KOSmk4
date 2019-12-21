@@ -194,8 +194,9 @@ driver_do_apply_relocations_vector(struct driver *__restrict self,
 			                                                    &src_module,
 			                                                    reloc_flags);
 			if unlikely(dst_sym->st_size != src_size) {
-				printk(KERN_WARNING "%q: Symbol %q imported with %Iu bytes, but exported with %Iu from %q\n",
-				       self->d_name, self->d_dynstr + dst_sym->st_name,
+				printk(KERN_WARNING "[mod] %q: Symbol %q imported with %Iu bytes, but exported with %Iu from %q\n",
+				       self->d_filename ? self->d_filename : self->d_name,
+				       self->d_dynstr + dst_sym->st_name,
 				       dst_sym->st_size, src_size, src_module->d_filename);
 			}
 			if unlikely(src_size > dst_sym->st_size)
@@ -300,10 +301,22 @@ driver_do_apply_relocations_vector(struct driver *__restrict self,
 
 
 		default:
-			printk(KERN_WARNING "%q: Relocation #%Iu has unknown type type %u (%#x)\n",
-			       self->d_name, (size_t)i,
+#ifdef APPLY_RELA
+			printk(KERN_WARNING "[mod] %q: Relocation #%Iu at %p (%#Ix+%#Ix) has unknown type %u (%#x) [addend=%s%#Ix]\n",
+			       self->d_filename ? self->d_filename : self->d_name,
+			       (size_t)i, reladdr, (uintptr_t)loadaddr, (uintptr_t)rel.r_offset,
+			       (unsigned int)ELF_R_TYPE(rel.r_info),
+			       (unsigned int)ELF_R_TYPE(rel.r_info),
+			       rel.r_addend < 0 ? "-" : "",
+			       rel.r_addend < 0 ? (uintptr_t)-rel.r_addend
+			                        : (uintptr_t)rel.r_addend);
+#else /* APPLY_RELA */
+			printk(KERN_WARNING "%q: Relocation #%Iu at %p (%#Ix+%#Ix) has unknown type %u (%#x)\n",
+			       self->d_filename ? self->d_filename : self->d_name,
+			       (size_t)i, reladdr, (uintptr_t)loadaddr, (uintptr_t)rel.r_offset,
 			       (unsigned int)ELF_R_TYPE(rel.r_info),
 			       (unsigned int)ELF_R_TYPE(rel.r_info));
+#endif /* !APPLY_RELA */
 			break;
 		}
 #undef REL_ADDEND

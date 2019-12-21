@@ -406,11 +406,22 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 #endif
 
 		default:
-			syslog(LOG_WARN, "%q: Relocation #%Iu has unknown type type %u (%#x)\n",
+#ifdef APPLY_RELA
+			syslog(LOG_WARN, "[rtld] %q: Relocation #%Iu at %p (%#Ix+%#Ix) has unknown type %u (%#x) [addend=%s%#Ix]\n",
 			       self->dm_filename,
-			       (size_t)i,
+			       (size_t)i, reladdr, (uintptr_t)loadaddr, (uintptr_t)rel.r_offset,
+			       (unsigned int)ELFW(R_TYPE)(rel.r_info),
+			       (unsigned int)ELFW(R_TYPE)(rel.r_info),
+			       rel.r_addend < 0 ? "-" : "",
+			       rel.r_addend < 0 ? (uintptr_t)-rel.r_addend
+			                        : (uintptr_t)rel.r_addend);
+#else /* APPLY_RELA */
+			syslog(LOG_WARN, "[rtld] %q: Relocation #%Iu at %p (%#Ix+%#Ix) has unknown type %u (%#x)\n",
+			       self->dm_filename,
+			       (size_t)i, reladdr, (uintptr_t)loadaddr, (uintptr_t)rel.r_offset,
 			       (unsigned int)ELFW(R_TYPE)(rel.r_info),
 			       (unsigned int)ELFW(R_TYPE)(rel.r_info));
+#endif /* !APPLY_RELA */
 			break;
 		}
 #undef REL_ADDEND
