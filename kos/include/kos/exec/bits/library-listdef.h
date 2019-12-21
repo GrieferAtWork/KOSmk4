@@ -46,7 +46,7 @@ struct library_listdef /*[prefix(lld_)]*/ {
 	void          *lld_first;                     /* [1..1] User-space pointer to the first module
 	                                               * When `LIBRARY_LISTDEF_FPFIRST' isn't set: `first = (MODULE *)gll_first'
 	                                               * When `LIBRARY_LISTDEF_FPFIRST' is set:    `first = *(MODULE **)gll_first' */
-	__size_t      *lld_count;                     /* [0..1] Optional: Number of loaded modules.
+	void          *lld_count;                     /* [0..1] Optional: Number of loaded modules. (the size of this field is `lld_sizeof_pointer')
 	                                               * When given, this is the max number of modules to enumerate before stopping.
 	                                               * When used without `LIBRARY_LISTDEF_FLINKLST', this is exact number of modules
 	                                               * When `LIBRARY_LISTDEF_FLINKLST' isn't set and this is field `NULL',

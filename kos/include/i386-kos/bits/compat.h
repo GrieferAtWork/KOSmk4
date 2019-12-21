@@ -30,6 +30,7 @@
 
 #define __ARCH_HAVE_COMPAT 1
 #define __ARCH_COMPAT_FUNCPTR(return, cc, name, args) __HYBRID_FUNCPTR32(return, cc, name, args)
+#define __ARCH_COMPAT(x)             x##32
 #define __ARCH_COMPAT_PTR(T)         __HYBRID_PTR32(T)
 #define __ARCH_COMPAT_SIZEOF_POINTER 4
 #define __ARCH_COMPAT_INTPTR_TYPE    __INT32_TYPE__

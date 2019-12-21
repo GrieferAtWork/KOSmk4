@@ -32,11 +32,16 @@
 
 #include <hybrid/atomic.h>
 
+#include <bits/compat.h>
 #include <kos/exec/library-listdef.h>
 
 #include <errno.h>
 #include <signal.h>
 #include <string.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <kos/exec/bits/library-listdef-compat.h>
+#endif /* __ARCH_HAVE_COMPAT */
 
 #define POINTER_SET_BUFSIZE 16
 #include <misc/pointer-set.h>
@@ -114,7 +119,7 @@ vm_library_enumerate(struct vm *__restrict effective_vm,
 		                 (USER void *)(uintptr_t)libdef.lld_module_offsetof_loadstart,
 		                 filename_maybe_relative);
 	} else if (!(libdef.lld_flags & LIBRARY_LISTDEF_FLINKLST)) {
-		/* User-space probides a module vector.
+		/* User-space provides a module vector.
 		 * This is declared as:
 		 * >> if (LIBRARY_LISTDEF_FPELEMENT) {
 		 * >>     MODULE **vector;
@@ -215,14 +220,9 @@ err:
 
 
 
-DEFINE_SYSCALL1(errno_t, set_library_listdef,
-                USER UNCHECKED struct library_listdef const *, listdef) {
-	size_t size;
+PRIVATE void KCALL
+do_set_library_listdef(struct library_listdef const *__restrict listdef) {
 	struct library_listdef *dst;
-	validate_readable(listdef, sizeof(*listdef));
-	size = ATOMIC_READ(listdef->lld_size);
-	if unlikely(size != sizeof(struct library_listdef))
-		THROW(E_BUFFER_TOO_SMALL, sizeof(struct library_listdef), size);
 	dst = &THIS_LIBRARY_LISTDEF;
 	COMPILER_WRITE_BARRIER();
 	dst->lld_size = 0; /* Invalidate the previous definition */
@@ -232,7 +232,7 @@ DEFINE_SYSCALL1(errno_t, set_library_listdef,
 	       (byte_t *)listdef + offsetafter(struct library_listdef, lld_size),
 	       (sizeof(struct library_listdef) - offsetafter(struct library_listdef, lld_size)));
 	COMPILER_WRITE_BARRIER();
-	dst->lld_size = size; /* Mark the new definition as valid. */
+	dst->lld_size = sizeof(struct library_listdef); /* Mark the new definition as valid. */
 	COMPILER_WRITE_BARRIER();
 #if 0 /* TODO: Enable me once libdl loads the library list after initialization, and
        *       the inital library list definition loaded by exec() already includes
@@ -244,8 +244,29 @@ DEFINE_SYSCALL1(errno_t, set_library_listdef,
 		kernel_debugtrap(&r);
 	}
 #endif
+}
+
+DEFINE_SYSCALL1(errno_t, set_library_listdef,
+                USER UNCHECKED struct library_listdef const *, listdef) {
+	struct library_listdef newdef;
+	validate_readable(listdef, sizeof(*listdef));
+	memcpy(&newdef, listdef, sizeof(struct library_listdef));
+	COMPILER_READ_BARRIER();
+	do_set_library_listdef(&newdef);
 	return -EOK;
 }
+
+#ifdef __ARCH_HAVE_COMPAT
+DEFINE_SYSCALL1_COMPAT(errno_t, set_library_listdef,
+                       USER UNCHECKED struct __ARCH_COMPAT(library_listdef) const *, listdef) {
+	struct library_listdef newdef;
+	validate_readable(listdef, sizeof(*listdef));
+	PP_CAT2(__ARCH_COMPAT(library_listdef), _to_library_listdef)(listdef, &newdef);
+	COMPILER_READ_BARRIER();
+	do_set_library_listdef(&newdef);
+	return -EOK;
+}
+#endif /* __ARCH_HAVE_COMPAT */
 
 
 DECL_END
