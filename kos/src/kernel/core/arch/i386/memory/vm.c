@@ -459,17 +459,36 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 		for (;;) {
 			void *pagedata_prev_end;
 			void *pagedata_next_min;
+			size_t num_bytes;
 			pagedata_prev_end = vm_node_getend(iter);
 			iter = iter->vn_byaddr.ln_next;
+#ifdef __x86_64__
+			/* Since the 64-bit page directory identity mapping isn't located
+			 * at the end of the kernel address space, we also have to unmap
+			 * memory following the last mapping. */
+			if (!iter) {
+				pagedata_next_min = (void *)0;
+			} else {
+				pagedata_next_min = vm_node_getstart(iter);
+			}
+#else /* __x86_64__ */
 			if (!iter)
 				break; /* The previous node should have been `X86_KERNEL_VMMAPPING_IDENTITY_RESERVE' at this point. */
 			pagedata_next_min = vm_node_getstart(iter);
+#endif /* !__x86_64__ */
+			num_bytes = (size_t)((byte_t *)pagedata_next_min - (byte_t *)pagedata_prev_end);
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-			if (pagedir_prepare_map((byte_t *)pagedata_prev_end, (size_t)((byte_t *)pagedata_next_min - (byte_t *)pagedata_prev_end)))
-				pagedir_unmap((byte_t *)pagedata_prev_end, (size_t)((byte_t *)pagedata_next_min - (byte_t *)pagedata_prev_end));
+			if (pagedir_prepare_map(pagedata_prev_end, num_bytes)) {
+				pagedir_unmap(pagedata_prev_end, num_bytes);
+				pagedir_unprepare_map(pagedata_prev_end, num_bytes);
+			}
 #else /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
-			pagedir_unmap(pagedata_prev_end, (size_t)((byte_t *)pagedata_next_min - (byte_t *)pagedata_prev_end));
+			pagedir_unmap(pagedata_prev_end, num_bytes);
 #endif /* !CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+#ifdef __x86_64__
+			if (!iter)
+				break;
+#endif /* !__x86_64__ */
 		}
 	}
 	/* All right! that's our entire kernel VM all cleaned up! */
