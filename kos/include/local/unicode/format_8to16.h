@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5e59e1d */
+/* HASH CRC-32:0x73afc895 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __LOCAL_LIBC(format_8to16) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_8to16))(/*struct format_8to16_data **/ void *__arg,
                                                           /*utf-8*/ char const *__data,
                                                           __SIZE_TYPE__ __datalen) {
-#line 1358 "kos/src/libc/magic/unicode.c"
+#line 1360 "kos/src/libc/magic/unicode.c"
 	struct __local_format_8to16_data {
 		__pc16formatprinter __fd_printer;    /* [1..1] Inner printer */
 		void               *__fd_arg;        /* Argument for `fd_printer' */

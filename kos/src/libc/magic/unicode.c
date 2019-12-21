@@ -27,12 +27,14 @@
 
 %{
 #include <features.h>
-#include <bits/mbstate.h>
-#include <bits/types.h>
-#include <bits/format-printer.h>
-#include <bits/uformat-printer.h>
+
 #include <hybrid/__byteorder.h>
 #include <hybrid/__byteswap.h>
+
+#include <bits/format-printer.h>
+#include <bits/mbstate.h>
+#include <bits/types.h>
+#include <bits/uformat-printer.h>
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -1683,7 +1685,10 @@ struct __unitraits {
 	__INT32_TYPE__  const __ut_upper; /* Delta added to the character to convert it to uppercase, or 0. */
 	__INT32_TYPE__  const __ut_title; /* Delta added to the character to convert it to titlecase, or 0. */
 };
+#ifndef ____unicode_descriptor_defined
+#define ____unicode_descriptor_defined 1
 __CDECLARE(__ATTR_RETNONNULL __ATTR_CONST,struct __unitraits *,__NOTHROW,__unicode_descriptor,(__CHAR32_TYPE__ __ch),(__ch))
+#endif /* !____unicode_descriptor_defined */
 #endif /* !__UNICODE_FPRINT */
 
 #ifdef __CRT_HAVE_unicode_fold
@@ -1710,7 +1715,7 @@ __NOTHROW_NCX(__LIBCCALL unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __b
 #define ____unicode_asciiflags_defined 1
 __LIBC __UINT16_TYPE__ const __unicode_asciiflags[256];
 #endif /* !____unicode_asciiflags_defined */
-#define __unicode_flags(ch)        (sizeof(ch) == 1 ? __unicode_asciiflags[(uint8_t)(ch)] : __unicode_descriptor(ch)->__ut_flags)
+#define __unicode_flags(ch)        (sizeof(ch) == 1 ? __unicode_asciiflags[(__uint8_t)(ch)] : __unicode_descriptor(ch)->__ut_flags)
 #define __unicode_asciiisupper(ch) (__unicode_asciiflags[(__UINT8_TYPE__)(ch)] & __UNICODE_FUPPER)
 #define __unicode_asciiislower(ch) (__unicode_asciiflags[(__UINT8_TYPE__)(ch)] & __UNICODE_FLOWER)
 #define __unicode_asciitolower(ch) (__unicode_asciiisupper(ch) ? (__UINT8_TYPE__)(ch) + 0x20 : (__UINT8_TYPE__)(ch))
@@ -1830,8 +1835,10 @@ struct __unitraits {
 	__INT32_TYPE__  const __ut_upper; /* Delta added to the character to convert it to uppercase, or 0. */
 	__INT32_TYPE__  const __ut_title; /* Delta added to the character to convert it to titlecase, or 0. */
 };
-__LIBC __ATTR_RETNONNULL __ATTR_CONST struct __unitraits *
-__NOTHROW(__LIBCCALL __unicode_descriptor)(__CHAR32_TYPE__ __ch);
+#ifndef ____unicode_descriptor_defined
+#define ____unicode_descriptor_defined 1
+__CDECLARE(__ATTR_RETNONNULL __ATTR_CONST,struct __unitraits *,__NOTHROW,__unicode_descriptor,(__CHAR32_TYPE__ __ch),(__ch))
+#endif /* !____unicode_descriptor_defined */
 #endif /* !__UNICODE_FPRINT */
 #ifdef __CRT_HAVE_unicode_fold
 #define __LIBC_UNICODE_FOLDED_MAX 3
@@ -1849,7 +1856,7 @@ __NOTHROW_NCX(__LIBCCALL __libc_unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYP
 #define ____unicode_asciiflags_defined 1
 __LIBC __UINT16_TYPE__ const __unicode_asciiflags[256];
 #endif /* !____unicode_asciiflags_defined */
-#define __libc_unicode_flags(ch)        (sizeof(ch) == 1 ? __unicode_asciiflags[(uint8_t)(ch)] : __unicode_descriptor(ch)->__ut_flags)
+#define __libc_unicode_flags(ch)        (sizeof(ch) == 1 ? __unicode_asciiflags[(__uint8_t)(ch)] : __unicode_descriptor(ch)->__ut_flags)
 #define __libc_unicode_asciiisupper(ch) (__unicode_asciiflags[(__UINT8_TYPE__)(ch)] & __UNICODE_FUPPER)
 #define __libc_unicode_asciiislower(ch) (__unicode_asciiflags[(__UINT8_TYPE__)(ch)] & __UNICODE_FLOWER)
 #define __libc_unicode_asciitolower(ch) (__libc_unicode_asciiisupper(ch) ? (__UINT8_TYPE__)(ch) + 0x20 : (__UINT8_TYPE__)(ch))

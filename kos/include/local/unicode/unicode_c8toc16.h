@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1d932c1 */
+/* HASH CRC-32:0xe88503f4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_c8toc16))(__CHAR16_TYPE__ *__
                                                              /*utf-8*/ char const *__restrict __s,
                                                              __SIZE_TYPE__ __n,
                                                              __mbstate_t *__restrict __mbs) {
-#line 1094 "kos/src/libc/magic/unicode.c"
+#line 1096 "kos/src/libc/magic/unicode.c"
 	__CHAR32_TYPE__ __resch;
 	__SIZE_TYPE__ __i;
 	if ((__mbs->__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
