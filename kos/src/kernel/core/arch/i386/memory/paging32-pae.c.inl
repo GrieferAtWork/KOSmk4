@@ -43,6 +43,7 @@
 
 #ifndef CONFIG_NO_PAGING_PAE
 
+#include "paging.h"
 #include "paging32-com.h"
 
 DECL_BEGIN
@@ -616,7 +617,7 @@ again_try_exchange_e2_word:
 INTERN NOBLOCK WUNUSED bool
 NOTHROW(FCALL pae_pagedir_prepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec3, vec2, vec1;
-	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
+	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	if unlikely((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
 		return true;
 	vec3 = PAE_PDIR_VEC3INDEX(addr);
@@ -628,7 +629,7 @@ NOTHROW(FCALL pae_pagedir_prepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 INTERN NOBLOCK void
 NOTHROW(FCALL pae_pagedir_unprepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec3, vec2, vec1;
-	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
+	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	if unlikely((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
 		return;
 	vec3 = PAE_PDIR_VEC3INDEX(addr);
@@ -816,10 +817,7 @@ NOTHROW(FCALL pae_pagedir_prepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	unsigned int vec3_min, vec3_max;
 	unsigned int vec2_min, vec2_max;
 	unsigned int vec1_min, vec1_max;
-	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
-	assertf(IS_ALIGNED((uintptr_t)num_bytes, 4096), "num_bytes = %#Ix", num_bytes);
-	assertf((uintptr_t)addr + num_bytes >= (uintptr_t)addr, "Invalid range %p...%p",
-	        addr, (uintptr_t)addr + num_bytes - 1);
+	PG_ASSERT_ALIGNED_ADDRESS_RANGE(addr, num_bytes);
 	if unlikely((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
 		return true;
 	if unlikely((byte_t *)addr + num_bytes > (byte_t *)KERNELSPACE_BASE)
@@ -845,10 +843,7 @@ NOTHROW(FCALL pae_pagedir_prepare_map_keep)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	unsigned int vec3_min, vec3_max;
 	unsigned int vec2_min, vec2_max;
 	unsigned int vec1_min, vec1_max;
-	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
-	assertf(IS_ALIGNED((uintptr_t)num_bytes, 4096), "num_bytes = %#Ix", num_bytes);
-	assertf((uintptr_t)addr + num_bytes >= (uintptr_t)addr, "Invalid range %p...%p",
-	        addr, (uintptr_t)addr + num_bytes - 1);
+	PG_ASSERT_ALIGNED_ADDRESS_RANGE(addr, num_bytes);
 	if unlikely(addr >= (byte_t *)KERNELSPACE_BASE)
 		return true;
 	if unlikely((byte_t *)addr + num_bytes > (byte_t *)KERNELSPACE_BASE)
@@ -874,10 +869,7 @@ NOTHROW(FCALL pae_pagedir_unprepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	unsigned int vec3_min, vec3_max;
 	unsigned int vec2_min, vec2_max;
 	unsigned int vec1_min, vec1_max;
-	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
-	assertf(IS_ALIGNED((uintptr_t)num_bytes, 4096), "num_bytes = %#Ix", num_bytes);
-	assertf((uintptr_t)addr + num_bytes >= (uintptr_t)addr, "Invalid range %p...%p",
-	        addr, (uintptr_t)addr + num_bytes - 1);
+	PG_ASSERT_ALIGNED_ADDRESS_RANGE(addr, num_bytes);
 	if unlikely(addr >= (byte_t *)KERNELSPACE_BASE)
 		return;
 	if unlikely((byte_t *)addr + num_bytes > (byte_t *)KERNELSPACE_BASE)
@@ -998,7 +990,7 @@ NOTHROW(FCALL pae_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                        PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
                                        u16 perm) {
 	u64 result;
-	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
+	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	assertf(IS_ALIGNED(phys, 4096), "phys = " FORMAT_VM_PHYS_T, phys);
 	assertf(!(perm & ~PAGEDIR_MAP_FMASK),
 	        "Invalid page permissions: %#.4I16x", perm);
@@ -1028,7 +1020,7 @@ INTERN NOBLOCK void
 NOTHROW(FCALL pae_pagedir_maphintone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                       VIRT /*ALIGNED(PAE_PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint) {
 	unsigned int vec3, vec2, vec1;
-	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
+	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	assertf(IS_ALIGNED((uintptr_t)hint, PAE_PAGEDIR_MAPHINT_ALIGNMENT), "hint = %p", hint);
 	vec3 = PAE_PDIR_VEC3INDEX(addr);
 	vec2 = PAE_PDIR_VEC2INDEX(addr);
@@ -1044,10 +1036,7 @@ NOTHROW(FCALL pae_pagedir_maphint)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                    VIRT /*ALIGNED(PAE_PAGEDIR_MAPHINT_ALIGNMENT)*/ void *hint) {
 	size_t i;
 	u64 e1_word;
-	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
-	assertf(IS_ALIGNED((uintptr_t)num_bytes, 4096), "num_bytes = %#Ix", num_bytes);
-	assertf((uintptr_t)addr + num_bytes >= (uintptr_t)addr, "Invalid range %p...%p",
-	        addr, (uintptr_t)addr + num_bytes - 1);
+	PG_ASSERT_ALIGNED_ADDRESS_RANGE(addr, num_bytes);
 	assertf(IS_ALIGNED((uintptr_t)hint, PAE_PAGEDIR_MAPHINT_ALIGNMENT), "hint = %p", hint);
 	e1_word = (u64)(uintptr_t)hint | PAE_PAGE_FISAHINT;
 	for (i = 0; i < num_bytes; i += 4096) {
@@ -1107,10 +1096,7 @@ NOTHROW(FCALL pae_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                u16 perm) {
 	size_t i;
 	u64 e1_word;
-	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
-	assertf(IS_ALIGNED((uintptr_t)num_bytes, 4096), "num_bytes = %#Ix", num_bytes);
-	assertf((uintptr_t)addr + num_bytes >= (uintptr_t)addr, "Invalid range %p...%p",
-	        addr, (uintptr_t)addr + num_bytes - 1);
+	PG_ASSERT_ALIGNED_ADDRESS_RANGE(addr, num_bytes);
 	e1_word = pae_pagedir_encode_4kib(addr, phys, perm);
 	for (i = 0; i < num_bytes; i += 4096) {
 		unsigned int vec3, vec2, vec1;
@@ -1149,7 +1135,7 @@ NOTHROW(FCALL pae_pagedir_pop_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                       pae_pagedir_pushval_t backup) {
 	u64 old_word;
 	unsigned int vec3, vec2, vec1;
-	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
+	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	vec3 = PAE_PDIR_VEC3INDEX(addr);
 	vec2 = PAE_PDIR_VEC2INDEX(addr);
 	vec1 = PAE_PDIR_VEC1INDEX(addr);
@@ -1162,7 +1148,7 @@ NOTHROW(FCALL pae_pagedir_pop_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 INTERN NOBLOCK void
 NOTHROW(FCALL pae_pagedir_unmapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec3, vec2, vec1;
-	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
+	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	vec3 = PAE_PDIR_VEC3INDEX(addr);
 	vec2 = PAE_PDIR_VEC2INDEX(addr);
 	vec1 = PAE_PDIR_VEC1INDEX(addr);
@@ -1175,10 +1161,7 @@ INTERN NOBLOCK void
 NOTHROW(FCALL pae_pagedir_unmap)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                  PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	size_t i;
-	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
-	assertf(IS_ALIGNED((uintptr_t)num_bytes, 4096), "num_bytes = %#Ix", num_bytes);
-	assertf((uintptr_t)addr + num_bytes >= (uintptr_t)addr, "Invalid range %p...%p",
-	        addr, (uintptr_t)addr + num_bytes - 1);
+	PG_ASSERT_ALIGNED_ADDRESS_RANGE(addr, num_bytes);
 	for (i = 0; i < num_bytes; i += 4096) {
 		unsigned int vec3, vec2, vec1;
 		byte_t *effective_addr = (byte_t *)addr + i;
@@ -1195,7 +1178,7 @@ NOTHROW(FCALL pae_pagedir_unmap)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 INTERN NOBLOCK void
 NOTHROW(FCALL pae_pagedir_unwriteone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec3, vec2, vec1;
-	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
+	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	vec3 = PAE_PDIR_VEC3INDEX(addr);
 	vec2 = PAE_PDIR_VEC2INDEX(addr);
 	vec1 = PAE_PDIR_VEC1INDEX(addr);
@@ -1206,10 +1189,7 @@ INTERN NOBLOCK void
 NOTHROW(FCALL pae_pagedir_unwrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                    PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	size_t i;
-	assertf(IS_ALIGNED((uintptr_t)addr, 4096), "addr = %p", addr);
-	assertf(IS_ALIGNED((uintptr_t)num_bytes, 4096), "num_bytes = %#Ix", num_bytes);
-	assertf((uintptr_t)addr + num_bytes >= (uintptr_t)addr, "Invalid range %p...%p",
-	        addr, (uintptr_t)addr + num_bytes - 1);
+	PG_ASSERT_ALIGNED_ADDRESS_RANGE(addr, num_bytes);
 	for (i = 0; i < num_bytes; i += 4096) {
 		unsigned int vec3, vec2, vec1;
 		byte_t *effective_addr = (byte_t *)addr + i;
