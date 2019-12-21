@@ -169,22 +169,22 @@ public:
 	__CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__PTR_T const *__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)__val; return *this; }
 	__CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__PTR_T volatile *__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)__val; return *this; }
 	__CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__PTR_T const volatile *__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)__val; return *this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T, __I2> const &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T, __I2> const volatile &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T const, __I2> const &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T const, __I2> const volatile &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T volatile, __I2> const &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T volatile, __I2> const volatile &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T const volatile, __I2> const &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T const volatile, __I2> const volatile &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T, __I2> const &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T const, __I2> const &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T const, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T volatile, __I2> const &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T volatile, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T const volatile, __I2> const &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T const volatile, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T, __I2> const &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T, __I2> const volatile &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T const, __I2> const &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T const, __I2> const volatile &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T volatile, __I2> const &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T volatile, __I2> const volatile &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T const volatile, __I2> const &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T const volatile, __I2> const volatile &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T, __I2> const &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T const, __I2> const &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T const, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T volatile, __I2> const &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T volatile, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T const volatile, __I2> const &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T const volatile, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
 #elif defined(__POINTER_CXX_CV_QUAL_IS_CONST)
 	__CXX_CLASSMEMBER __hybrid_ptr(__PTR_T *__val) __CXX_NOEXCEPT: __m_ptr((__I)(__UINTPTR_TYPE__)__val) {}
 	__CXX_CLASSMEMBER __hybrid_ptr(__PTR_T const *__val) __CXX_NOEXCEPT: __m_ptr((__I)(__UINTPTR_TYPE__)__val) {}
@@ -202,14 +202,14 @@ public:
 	__CXX_CLASSMEMBER __hybrid_ptr &operator=(__PTR_T const *__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)__val; return *this; }
 	__CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__PTR_T *__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)__val; return *this; }
 	__CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__PTR_T const *__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)__val; return *this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T, __I2> const &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T, __I2> const volatile &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T const, __I2> const &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T const, __I2> const volatile &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T, __I2> const &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T const, __I2> const &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T const, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T, __I2> const &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T, __I2> const volatile &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T const, __I2> const &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T const, __I2> const volatile &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T, __I2> const &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T const, __I2> const &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T const, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
 #elif defined(__POINTER_CXX_CV_QUAL_IS_VOLATILE)
 	__CXX_CLASSMEMBER __hybrid_ptr(__PTR_T *__val) __CXX_NOEXCEPT: __m_ptr((__I)(__UINTPTR_TYPE__)__val) {}
 	explicit __CXX_CLASSMEMBER __hybrid_ptr(__PTR_T const *__val) __CXX_NOEXCEPT: __m_ptr((__I)(__UINTPTR_TYPE__)__val) {}
@@ -227,14 +227,14 @@ public:
 	__CXX_CLASSMEMBER __hybrid_ptr &operator=(__PTR_T volatile *__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)__val; return *this; }
 	__CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__PTR_T *__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)__val; return *this; }
 	__CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__PTR_T volatile *__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)__val; return *this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T, __I2> const &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T, __I2> const volatile &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T volatile, __I2> const &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T volatile, __I2> const volatile &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T, __I2> const &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T volatile, __I2> const &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T volatile, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T, __I2> const &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T, __I2> const volatile &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T volatile, __I2> const &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T volatile, __I2> const volatile &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T, __I2> const &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T volatile, __I2> const &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T volatile, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
 #else
 	__CXX_CLASSMEMBER __hybrid_ptr(__PTR_T *__val) __CXX_NOEXCEPT: __m_ptr((__I)(__UINTPTR_TYPE__)__val) {}
 	explicit __CXX_CLASSMEMBER __hybrid_ptr(__PTR_T const *__val) __CXX_NOEXCEPT: __m_ptr((__I)(__UINTPTR_TYPE__)__val) {}
@@ -250,10 +250,10 @@ public:
 	template<class __I2> __CXX_CLASSMEMBER explicit __hybrid_ptr(__hybrid_ptr<__PTR_T const volatile, __I2> const volatile &__val) __CXX_NOEXCEPT: __m_ptr((__I)(__UINTPTR_TYPE__)(__PTR_T *)__val) {}
 	__CXX_CLASSMEMBER __hybrid_ptr &operator=(__PTR_T *__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)__val; return *this; }
 	__CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__PTR_T *__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)__val; return *this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T, __I2> const &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T, __I2> const volatile &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T, __I2> const &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
-	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T, __I2> const &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr &operator=(__hybrid_ptr<__PTR_T, __I2> const volatile &__val) __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T, __I2> const &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
+	template<class __I2> __CXX_CLASSMEMBER __hybrid_ptr volatile &operator=(__hybrid_ptr<__PTR_T, __I2> const volatile &__val) volatile __CXX_NOEXCEPT { __m_ptr = (__I)(__UINTPTR_TYPE__)(__PTR_T *)__val; return *this; }
 #endif
 
 	/* Pointer difference operators */

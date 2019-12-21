@@ -4058,10 +4058,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak kernel_debugtrap_lcpustate; .quad kernel_debugtrap_lcpustate
 	.reloc ., R_X86_64_SIZE32, kernel_debugtrap_lcpustate; .int 0
 	.int 0x96393f5
-	.quad 0 /* index: 1014 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname1014 /* index: 1014 */
+	.weak zlib_reader_setpos; .quad zlib_reader_setpos
+	.reloc ., R_X86_64_SIZE32, zlib_reader_setpos; .int 0
+	.int 0x639e343
 	.quad .Lname1015 /* index: 1015 */
 	.weak sys32_mq_notify; .quad sys32_mq_notify
 	.reloc ., R_X86_64_SIZE32, sys32_mq_notify; .int 0
@@ -7367,9 +7367,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname1841 /* index: 1841 */
-	.weak zlib_reader_setpos; .quad zlib_reader_setpos
-	.reloc ., R_X86_64_SIZE32, zlib_reader_setpos; .int 0
-	.int 0x639e343
+	.weak vmb_alloc_peb32; .quad vmb_alloc_peb32
+	.reloc ., R_X86_64_SIZE32, vmb_alloc_peb32; .int 0
+	.int 0x13ec502
 	.quad .Lname1842 /* index: 1842 */
 	.weak x86_fxrstor; .quad x86_fxrstor
 	.reloc ., R_X86_64_SIZE32, x86_fxrstor; .int 0
@@ -17814,6 +17814,8 @@ END(kernel_symbol_table)
 	.string "sys_utimes"
 .Lname1013:
 	.string "kernel_debugtrap_lcpustate"
+.Lname1014:
+	.string "zlib_reader_setpos"
 .Lname1015:
 	.string "sys32_mq_notify"
 .Lname1016:
@@ -18913,7 +18915,7 @@ END(kernel_symbol_table)
 .Lname1839:
 	.string "x86_bootcpu_gdt"
 .Lname1841:
-	.string "zlib_reader_setpos"
+	.string "vmb_alloc_peb32"
 .Lname1842:
 	.string "x86_fxrstor"
 .Lname1843:

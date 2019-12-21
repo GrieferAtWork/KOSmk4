@@ -23,9 +23,11 @@
 
 #include <kernel/types.h>
 #include <kernel/vm.h>
+
 #include <hybrid/__assert.h>
 
 #include <asm/pageid.h>
+#include <bits/compat.h> /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN
 
@@ -57,14 +59,14 @@ struct vmb {
 	LLIST(struct vm_node)      v_byaddr;        /* [0..1] By-address ordered list of nodes. */
 };
 
-#define VMB_INIT  { NULL, LLIST_INIT }
+#define VMB_INIT { NULL, LLIST_INIT }
 
 /* Initialize a given VM Builder. */
 #ifdef __INTELLISENSE__
 LOCAL NOBLOCK void NOTHROW(KCALL vmb_init)(struct vmb *__restrict self);
-#else
+#else /* __INTELLISENSE__ */
 #define vmb_init(self)  ((self)->v_tree = NULL,(self)->v_byaddr = NULL)
-#endif
+#endif /* !__INTELLISENSE__ */
 
 /* Finalize a given VM Builder.
  * NOTE: This function may not be called after a successful call to `vmb_apply()'!
@@ -232,7 +234,25 @@ vmb_alloc_peb(struct vmb *__restrict self,
               USER UNCHECKED char const *USER CHECKED const *argv,
               USER UNCHECKED char const *USER CHECKED const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
-
+#ifdef __ARCH_HAVE_COMPAT
+#if __ARCH_COMPAT_SIZEOF_POINTER == 4
+FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
+vmb_alloc_peb32(struct vmb *__restrict self,
+                size_t argc_inject, KERNEL char const *const *argv_inject,
+                USER UNCHECKED __ARCH_COMPAT_PTR(char const) USER CHECKED const *argv,
+                USER UNCHECKED __ARCH_COMPAT_PTR(char const) USER CHECKED const *envp)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+#define vmb_alloc_peb64 vmb_alloc_peb
+#elif __ARCH_COMPAT_SIZEOF_POINTER == 8
+FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
+vmb_alloc_peb64(struct vmb *__restrict self,
+                size_t argc_inject, KERNEL char const *const *argv_inject,
+                USER UNCHECKED __ARCH_COMPAT_PTR(char const) USER CHECKED const *argv,
+                USER UNCHECKED __ARCH_COMPAT_PTR(char const) USER CHECKED const *envp)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+#define vmb_alloc_peb32 vmb_alloc_peb
+#endif
+#endif /* __ARCH_HAVE_COMPAT */
 
 
 /* Insert the given node into the specified VM Builder */

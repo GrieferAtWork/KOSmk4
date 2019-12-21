@@ -21,6 +21,7 @@
 
 #include <kernel/compiler.h>
 
+#undef KERNEL_SYSCALL_PROPERTIES_COMPAT_ALIAS
 #ifdef __CC__
 #include <hybrid/host.h>
 
