@@ -28,15 +28,15 @@
 
 DECL_BEGIN
 
-/* Ansi box character set (translate to their unicode character equivalents) */
+/* Ansi box character set (translate to the unicode equivalents) */
 #define LDM_CHARS_START '_'
 PRIVATE char16_t const ldm_chars[] = {
 	/* s.a.: https://vt100.net/docs/vt100-ug/table3-9.html */
 #ifdef __INTELLISENSE__
 #define CHR(x) [x - LDM_CHARS_START] =
-#else
+#else /* __INTELLISENSE__ */
 #define CHR(x) /* nothing */
-#endif
+#endif /* !__INTELLISENSE__ */
 	CHR('_') ' ',    /* Blank */
 	CHR('`') 0x22c4, /* Diamond */
 	CHR('a') 0x2593, /* Checkerboard */
@@ -74,7 +74,7 @@ PRIVATE char16_t const ldm_chars[] = {
 
 INTERN WUNUSED ATTR_CONST char32_t
 NOTHROW(FCALL libansitty_decode_cp_ldm)(uint8_t byte) {
-	/* Translate line-draming-mode characters. */
+	/* Translate line-drawing-mode characters. */
 	if (byte >= LDM_CHARS_START &&
 	    byte < (LDM_CHARS_START + COMPILER_LENOF(ldm_chars)))
 		byte = (ldm_chars[byte - LDM_CHARS_START]);

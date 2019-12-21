@@ -42,19 +42,19 @@
 #endif
 #ifndef CASE
 #define CASE(x)         case x:
-#endif
+#endif /* !CASE */
 #ifndef ERROR
 #define ERROR(err)      goto err
-#endif
+#endif /* !ERROR */
 #ifndef ERRORF
 #define ERRORF(err,...) goto err
-#endif
+#endif /* !ERRORF */
 
 #ifdef DOTRACE
 #define TRACE  DOTRACE
-#else
+#else /* DOTRACE */
 #define DOTRACE  TRACE
-#endif
+#endif /* !DOTRACE */
 
 #if !defined(TRACE) || 1
 #undef TRACE
