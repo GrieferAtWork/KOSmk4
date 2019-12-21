@@ -524,22 +524,24 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 noncanon_read:
 				if (!ADDR_IS_NONCANON(nc_addr) && !ADDR_IS_NONCANON(nc_addr + 8))
 					goto done_noncanon_check;
-				PERTASK_SET(this_exception_pointers[2],
+				PERTASK_SET(this_exception_pointers[1],
 				            (uintptr_t)E_SEGFAULT_CONTEXT_NONCANON);
 				goto do_noncanon;
 noncanon_write:
 				if (!ADDR_IS_NONCANON(nc_addr) && !ADDR_IS_NONCANON(nc_addr + 8))
 					goto done_noncanon_check;
-				PERTASK_SET(this_exception_pointers[2],
+				PERTASK_SET(this_exception_pointers[1],
 				            (uintptr_t)E_SEGFAULT_CONTEXT_NONCANON | E_SEGFAULT_CONTEXT_WRITING);
 do_noncanon:
 				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
-				PERTASK_SET(this_exception_pointers[1], (uintptr_t)nc_addr);
+				PERTASK_SET(this_exception_pointers[0], (uintptr_t)nc_addr);
 				if (isuser()) {
 					PERTASK_SET(this_exception_pointers[1],
 					            (uintptr_t)PERTASK_GET(this_exception_pointers[1]) |
 					            E_SEGFAULT_CONTEXT_USERCODE);
 				}
+				for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
+					PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 				goto unwind_state;
 			}
 done_noncanon_check:
