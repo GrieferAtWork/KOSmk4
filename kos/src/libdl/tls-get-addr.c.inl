@@ -133,7 +133,7 @@ err_nomem:
 	elf_setdlerror_nomem();
 err:
 #ifdef FAIL_ON_ERROR
-	syslog(LOG_ERR, "[ld] Failed to allocate TLS segment for %q: %s\n",
+	syslog(LOG_ERR, "[rtld] Failed to allocate TLS segment for %q: %s\n",
 	       self->dm_filename, elf_dlerror_message);
 	sys_exit_group(EXIT_FAILURE);
 #else /* FAIL_ON_ERROR */

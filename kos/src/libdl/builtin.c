@@ -55,8 +55,8 @@ INTERN uintptr_t __stack_chk_guard = 0x123baf37;
 DEFINE_INTERN_ALIAS(__stack_chk_fail,__stack_chk_fail_local);
 INTERN ATTR_NORETURN void __stack_chk_fail_local(void) {
 	struct debugtrap_reason r;
-	syslog(LOG_ERR, "[rtld] Stack check failure [pc=%p]\n",
-	       __builtin_return_address(0));
+	void *pc = __builtin_return_address(0);
+	syslog(LOG_ERR, "[rtld] Stack check failure [pc=%p]\n", pc);
 	r.dtr_signo  = SIGABRT;
 	r.dtr_reason = DEBUGTRAP_REASON_NONE;
 	sys_debugtrap(NULL, &r);
@@ -75,7 +75,7 @@ struct assert_args {
 
 PRIVATE ATTR_NOINLINE ATTR_NORETURN void LIBCCALL
 assertion_failure_core(struct assert_args *__restrict args) {
-	syslog(LOG_ERR, "Assertion Failure [pc=%p]\n", args->pc);
+	syslog(LOG_ERR, "[rtld] Assertion Failure [pc=%p]\n", args->pc);
 	syslog(LOG_ERR, "%s(%d) : %s%s%s\n",
 	       args->file, args->line,
 	       args->func ? args->func : "",

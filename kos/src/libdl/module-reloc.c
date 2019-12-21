@@ -379,10 +379,10 @@ libdl_bind_lazy_relocation(DlModule *__restrict self,
 #endif /* !ELF_ARCH_LAZYINDX */
 	{
 #if ELF_ARCH_LAZYINDX
-		syslog(LOG_ERROR, "[ld] Invalid jmp-relocation index %Iu > %Iu in %q\n",
+		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation index %Iu > %Iu in %q\n",
 		       jmp_rel_index, self->dm_jmpcount, self->dm_filename);
 #else /* ELF_ARCH_LAZYINDX */
-		syslog(LOG_ERROR, "[ld] Invalid jmp-relocation offset %Iu > %Iu in %q\n",
+		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation offset %Iu > %Iu in %q\n",
 		       jmp_rel_offset, self->dm_jmpsize, self->dm_filename);
 #endif /* !ELF_ARCH_LAZYINDX */
 		sys_exit_group(EXIT_FAILURE);
@@ -402,7 +402,7 @@ libdl_bind_lazy_relocation(DlModule *__restrict self,
 #endif /* !ELF_ARCH_LAZYINDX */
 	if unlikely(ELFW(R_TYPE)(rel->r_info) != R_JMP_SLOT) {
 #if !ELF_ARCH_USESRELA
-		syslog(LOG_ERROR, "[ld] Invalid jmp-relocation at DT_JMPREL+%Iu "
+		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation at DT_JMPREL+%Iu "
 		                  "[r_offset=%#Ix,r_info=%#I32x] isn't `" PP_PRIVATE_STR(R_JMP_SLOT) "' in %q\n",
 #if ELF_ARCH_LAZYINDX
 		       (size_t)((byte_t *)rel - (byte_t *)self->dm_jmprel),
@@ -411,7 +411,7 @@ libdl_bind_lazy_relocation(DlModule *__restrict self,
 #endif /* !ELF_ARCH_LAZYINDX */
 		       rel->r_offset, rel->r_info, self->dm_filename);
 #else /* !ELF_ARCH_USESRELA */
-		syslog(LOG_ERROR, "[ld] Invalid jmp-relocation at DT_JMPREL+%Iu "
+		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation at DT_JMPREL+%Iu "
 		                  "[r_offset=%#Ix,r_info=%#I32x",
 #if ELF_ARCH_LAZYINDX
 		       (size_t)((byte_t *)rel - (byte_t *)self->dm_jmprel),
@@ -436,7 +436,7 @@ libdl_bind_lazy_relocation(DlModule *__restrict self,
 #endif /* !LAZY_TRACE */
 	{
 		ElfW(Sym) *sym = self->dm_dynsym_tab + ELFW(R_SYM)(rel->r_info);
-		syslog(LOG_ERROR, "[ld] Unable to resolve symbol %q in %q\n",
+		syslog(LOG_ERROR, "[rtld] Unable to resolve symbol %q in %q\n",
 		       self->dm_dynstr + sym->st_name,
 		       self->dm_filename);
 		sys_exit_group(EXIT_FAILURE);
@@ -447,7 +447,7 @@ libdl_bind_lazy_relocation(DlModule *__restrict self,
 		result += ((ElfW(Rela) *)rel)->r_addend;
 #endif /* ELF_ARCH_USESRELA */
 #ifdef LAZY_TRACE
-	syslog(LOG_DEBUG, "[ld] Lazy resolve %q in %q (to %p from %q)\n",
+	syslog(LOG_DEBUG, "[rtld] Lazy resolve %q in %q (to %p from %q)\n",
 	       self->dm_dynstr + self->dm_dynsym_tab[ELFW(R_SYM)(rel->r_info)].st_name,
 	       self->dm_filename, result, link_module->dm_filename);
 #endif /* LAZY_TRACE */
