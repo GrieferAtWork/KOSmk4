@@ -57,6 +57,10 @@ PUBLIC_FUNCTION(x86_memcpy_nopf)
 	.cfi_startproc
 	cld
 PUBLIC_FUNCTION(x86_memcpy_nopf_rep_pointer)
+	/* NOTE: The #GPF exception handler (as used when %rsi/%rdi are non-canonical)
+	 *       assumes that the actual instruction here is `movsb'. So if you ever
+	 *       choose to change something about that fact (for whatever reason),
+	 *       you must also update the #GPF handler to reflect that fact! */
 	rep;   movsb
 END(x86_memcpy_nopf_rep_pointer)
 PUBLIC_FUNCTION(x86_memcpy_nopf_ret_pointer)

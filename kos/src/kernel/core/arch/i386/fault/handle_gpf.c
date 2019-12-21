@@ -66,6 +66,10 @@ x86_handle_gpf(struct icpustate *__restrict state, uintptr_t ecode) {
 	return x86_handle_gpf_impl(state, ecode, false);
 }
 
+#ifdef __x86_64__
+DATDEF byte_t x86_memcpy_nopf_rep_pointer[];
+DATDEF byte_t x86_memcpy_nopf_ret_pointer[];
+#endif /* __x86_64__ */
 
 PRIVATE struct icpustate *FCALL
 x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is_ss) {
@@ -510,6 +514,14 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 				goto noncanon_write;
 
 			case 0xa4: /* movsb */
+				/* Check for special case: `memcpy_nopf()' was used with non-canonical pointers.
+				 * In this case, we mustn't throw an exception (or even clobber exception pointers),
+				 * but instead have to directly resume execution at `x86_memcpy_nopf_ret_pointer' */
+				if (orig_pc == x86_memcpy_nopf_rep_pointer) {
+					icpustate64_setrip(state, (uintptr_t)x86_memcpy_nopf_ret_pointer);
+					return state;
+				}
+				ATTR_FALLTHROUGH
 			case 0xa5: /* movsw / movsl / movsq */
 				nc_addr = state->ics_gpregs.gp_rsi;
 				if (ADDR_IS_NONCANON(nc_addr) ||
