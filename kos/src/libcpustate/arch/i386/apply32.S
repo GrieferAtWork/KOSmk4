@@ -16,6 +16,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBCPUSTATE_ARCH_I386_APPLY32_S
+#define GUARD_LIBCPUSTATE_ARCH_I386_APPLY32_S 1
+
 #include "../../api.h"
 /**/
 
@@ -409,4 +412,4 @@ END(libcpu_apply_fcpustate)
 END_TRAP(kernel_debugtrap_fcpustate)
 DEFINE_PUBLIC_ALIAS(cpu_apply_fcpustate, libcpu_apply_fcpustate)
 
-
+#endif /* !GUARD_LIBCPUSTATE_ARCH_I386_APPLY32_S */

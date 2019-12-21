@@ -201,10 +201,11 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 	__lidt_p(&ammend.dca_idt);
 #ifdef __x86_64__
 	__wrgs(ammend.dca_sgregs.sg_gs);
+	__wrgsbase(ammend.dca_thread);
 	__wrfs(ammend.dca_sgregs.sg_fs);
+	__wrfsbaseq(ammend.dca_sgbase.sg_fsbase);
 	__wres(ammend.dca_sgregs.sg_es);
 	__wrds(ammend.dca_sgregs.sg_ds);
-	__wrfsbaseq(ammend.dca_sgbase.sg_fsbase);
 	__wrmsr(IA32_KERNEL_GS_BASE, ammend.dca_sgbase.sg_gsbase);
 #else /* __x86_64__ */
 	__wrgs(ammend.dca_gs);

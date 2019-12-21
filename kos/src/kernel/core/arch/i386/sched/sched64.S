@@ -80,7 +80,7 @@ INTERN_FUNCTION(x86_idt_apic_spurious)
 	popq_cfi_r %rcx     /* [C] Count register */
 	popq_cfi_r %rax     /* [C] Accumulator register */
 
-	intr_exit
+	intr_exit intr_enabled=0
 	.cfi_endproc
 END(x86_idt_apic_spurious)
 
@@ -187,7 +187,8 @@ INTERN_FUNCTION(x86_load_thread_rax_cpu_rbx)
 	ASM_POP_SGREGS_CFI_R(%rcx)
 
 	/* Update the kernel TLS pointer.
-	 * NOTE: This must be done _after_ segment registers were loaded! */
+	 * NOTE: This must be done _after_ segment registers were loaded,
+	 *       as the use of `ASM_POP_SGREGS_CFI_R()' clobbered %gs.base! */
 	wrgsbaseq %rax
 
 	/* Load fsbase and kgsbase */
@@ -197,7 +198,7 @@ INTERN_FUNCTION(x86_load_thread_rax_cpu_rbx)
 	ASM_POP_GPREGSNSP_CFI_R
 
 	/* Resume execution */
-	intr_exit
+	intr_exit intr_enabled=0
 	.cfi_restore_state
 
 	/* Disable the I/O permissions bitmap. */
@@ -237,7 +238,7 @@ INTERN_FUNCTION(x86_debug_pic_acknowledge)
 	.endr
 END(x86_debug_pic_acknowledge)
 	popq_cfi_r %rax
-	intr_exit
+	intr_exit intr_enabled=0
 	.cfi_endproc
 END(x86_dbgidt_preemption)
 #endif /* CONFIG_HAVE_DEBUGGER */
@@ -319,11 +320,14 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 	        * >> struct cpu  *mycpu  = %rcx; */
 #endif /* !NDEBUG */
 .Lyield_same_target:
-	sti
 #ifndef CONFIG_NO_SMP
-	pause
-#endif /* !CONFIG_NO_SMP */
+	sti
 	movq   %rbx, %rax
+	pause
+	cli
+#else /* !CONFIG_NO_SMP */
+	movq   %rbx, %rax
+#endif /* CONFIG_NO_SMP */
 	jmp    .Lload_scpustate_rsp_gsbase_rax
 	.cfi_restore_state
 .Lillegal_task_yield:
@@ -457,7 +461,9 @@ PUBLIC_FUNCTION(task_tryyield)
 	movq   this_sched_runnxt(%rbx), %rbp
 	cmpq   %rbx, %rbp
 	jne    .Ldo_task_yield_rbx_to_rbp
+#ifndef CONFIG_NO_SMP
 	sti
+#endif /* !CONFIG_NO_SMP */
 
 	/* Same target... */
 	movq   $(TASK_TRYYIELD_NO_SUCCESSOR), (OFFSET_SCPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RAX)(%rsp)
@@ -465,6 +471,9 @@ PUBLIC_FUNCTION(task_tryyield)
 	pause
 #endif /* !CONFIG_NO_SMP */
 	movq   %rbx, %rax
+#ifndef CONFIG_NO_SMP
+	cli
+#endif /* !CONFIG_NO_SMP */
 	jmp    .Lload_scpustate_rsp_gsbase_rax
 	.cfi_endproc
 END(task_tryyield)

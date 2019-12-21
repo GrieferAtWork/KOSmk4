@@ -208,9 +208,9 @@ rpc_register_state64_apply_icpustate(struct rpc_register_state64 *__restrict sel
 	if (RPC_REGISTER_STATE64_ISVALID(*self, RPC_X86_64_REGISTER_DS))
 		__wrds((__uint16_t)self->rs_regs[RPC_X86_64_REGISTER_DS]);
 	if (RPC_REGISTER_STATE64_ISVALID(*self, RPC_X86_64_REGISTER_FS))
-		__wrfs((__uint16_t)self->rs_regs[RPC_X86_64_REGISTER_FS]);
+		__wrfs_keepbase((__uint16_t)self->rs_regs[RPC_X86_64_REGISTER_FS]);
 	if (RPC_REGISTER_STATE64_ISVALID(*self, RPC_X86_64_REGISTER_GS))
-		__wrgs((__uint16_t)self->rs_regs[RPC_X86_64_REGISTER_GS]);
+		__wrgs_keepbase((__uint16_t)self->rs_regs[RPC_X86_64_REGISTER_GS]);
 #else /* __x86_64__ */
 	if (is_vm86) {
 		LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_ES, state->ics_irregs_v.ir_es);

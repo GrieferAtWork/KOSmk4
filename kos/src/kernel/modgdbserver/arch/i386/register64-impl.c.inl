@@ -507,8 +507,8 @@ NOTHROW(FCALL FUNC(ActiveSegmentRegister))(uintptr_t regno,
 	case GDB_REGISTER_X86_64_SS: GETSET4(__rdss(), __wrss(value)); break;
 	case GDB_REGISTER_X86_64_DS: GETSET4(__rdds(), __wrds(value)); break;
 	case GDB_REGISTER_X86_64_ES: GETSET4(__rdes(), __wres(value)); break;
-	case GDB_REGISTER_X86_64_FS: GETSET4(__rdfs(), __wrfs(value)); break;
-	case GDB_REGISTER_X86_64_GS: GETSET4(__rdgs(), __wrgs(value)); break;
+	case GDB_REGISTER_X86_64_FS: GETSET4(__rdfs(), __wrfs_keepbase(value)); break;
+	case GDB_REGISTER_X86_64_GS: GETSET4(__rdgs(), __wrgs_keepbase(value)); break;
 
 	default:
 		break;

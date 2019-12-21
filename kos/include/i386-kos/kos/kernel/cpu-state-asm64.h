@@ -331,7 +331,8 @@
 	__ASM_L(pushq_cfi_r %fs)                    \
 	__ASM_L(pushq_cfi_r %gs)
 
-/* @param: clobber_gpreg: 64-bit gp-register which may be clobbered. */
+/* @param: clobber_gpreg: 64-bit gp-register which may be clobbered.
+ * WARNING: THIS MACRO WILL CLOBBER %fs.base and %gs.base!!! */
 #define ASM_POP_SGREGS_CFI_R(clobber_gpreg)    \
 	__ASM_L(popq_cfi_r %gs)                    \
 	__ASM_L(popq_cfi_r %fs)                    \
@@ -375,26 +376,12 @@
 	ASM_PUSH_SGBASE_CFI_R                   \
 	ASM_PUSH_SGREGS_CFI_R(%rax)
 
-/* Do the reverse of `ASM_PUSH_SCPUSTATE_AFTER_IRET_CFI_R' */
-#define ASM_POP_SCPUSTATE_BEFORE_IRET_CFI_R \
-	ASM_POP_SGREGS_CFI_R(%rax)             \
-	ASM_POP_SGBASE_CFI_R                   \
-	ASM_POP_GPREGSNSP_CFI_R
-
 /* Push everything necessary to create an `scpustate'
  * from an `icpustate' structure onto the stack.
  * CLOBBER: %rax, %rcx, %rdx and %rflags */
 #define ASM_PUSH_SCPUSTATE_AFTER_ICPUSTATE_CFI_R \
 	ASM_PUSH_SGBASE_CFI_R                        \
 	ASM_PUSH_SGREGS_CFI_R(%rax)
-
-/* Do the reverse of `ASM_PUSH_SCPUSTATE_AFTER_ICPUSTATE_CFI_R'
- * @param: clobber_gpreg: 64-bit gp-register which may be clobbered. */
-#define ASM_POP_SCPUSTATE_BEFORE_ICPUSTATE_CFI_R(clobber_gpreg) \
-	ASM_POP_SGREGS_CFI_R(clobber_gpreg)                         \
-	ASM_POP_SGBASE_CFI_R
-
-
 
 #endif /* __x86_64__ */
 

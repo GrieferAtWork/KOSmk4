@@ -16,6 +16,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBCPUSTATE_ARCH_I386_APPLY64_S
+#define GUARD_LIBCPUSTATE_ARCH_I386_APPLY64_S 1
+
 #include "../../api.h"
 /**/
 
@@ -77,8 +80,13 @@ INTERN_FUNCTION(libcpu_apply_scpustate)
 	movq  %rdi, %rsp
 	.cfi_def_cfa_register %rsp
 INTERN_FUNCTION(libcpu_apply_scpustate_rsp)
-	ASM_POP_SCPUSTATE_BEFORE_IRET_CFI_R
-	intr_exit
+	cli
+	movq   %gs:0, %rcx /* Must preserve %gs.base! */
+	ASM_POP_SGREGS_CFI_R(%rax)
+	wrgsbaseq %rcx
+	ASM_POP_SGBASE_CFI_R
+	ASM_POP_GPREGSNSP_CFI_R
+	intr_exit  intr_enabled=0
 	.cfi_endproc
 END(libcpu_apply_scpustate_rsp)
 END(libcpu_apply_scpustate)
@@ -392,4 +400,4 @@ END(libcpu_apply_fcpustate)
 END_TRAP(kernel_debugtrap_fcpustate)
 DEFINE_PUBLIC_ALIAS(cpu_apply_fcpustate, libcpu_apply_fcpustate)
 
-
+#endif /* !GUARD_LIBCPUSTATE_ARCH_I386_APPLY64_S */

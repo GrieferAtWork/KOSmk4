@@ -78,26 +78,18 @@ typedef byte_t *fsgsbase_method_patches_t[REGISTER_COUNT];
 typedef fsgsbase_method_patches_t fsgsbase_patches_t[4];
 
 PRIVATE ATTR_COLDRODATA fsgsbase_patches_t const fsgsbase_patches = {
-	{
 #define PATCH_RDFSBASE(reg) __x64_rdfsbase_##reg,
-		ENUM_FSGSBASE_REGISTERS(PATCH_RDFSBASE)
-#undef PATCH_RDFSBASE
-	},
-	{
 #define PATCH_RDGSBASE(reg) __x64_rdgsbase_##reg,
-		ENUM_FSGSBASE_REGISTERS(PATCH_RDGSBASE)
-#undef PATCH_RDGSBASE
-	},
-	{
 #define PATCH_WRFSBASE(reg) __x64_wrfsbase_##reg,
-		ENUM_FSGSBASE_REGISTERS(PATCH_WRFSBASE)
-#undef PATCH_WRFSBASE
-	},
-	{
 #define PATCH_WRGSBASE(reg) __x64_wrgsbase_##reg,
-		ENUM_FSGSBASE_REGISTERS(PATCH_WRGSBASE)
+	{ ENUM_FSGSBASE_REGISTERS(PATCH_RDFSBASE) },
+	{ ENUM_FSGSBASE_REGISTERS(PATCH_RDGSBASE) },
+	{ ENUM_FSGSBASE_REGISTERS(PATCH_WRFSBASE) },
+	{ ENUM_FSGSBASE_REGISTERS(PATCH_WRGSBASE) },
 #undef PATCH_WRGSBASE
-	},
+#undef PATCH_WRFSBASE
+#undef PATCH_RDGSBASE
+#undef PATCH_RDFSBASE
 };
 
 

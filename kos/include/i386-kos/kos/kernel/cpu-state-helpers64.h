@@ -459,9 +459,14 @@ __NOTHROW_NCX(kcpustate64_to_icpustate64_p)(struct kcpustate64 const *__restrict
 #define icpustate64_getes(self)                  __rdes()
 #define icpustate64_setes(self, value)           __wres(value)
 #define icpustate64_getfs(self)                  __rdfs()
-#define icpustate64_setfs(self, value)           __wrfs(value)
 #define icpustate64_getgs(self)                  __rdgs()
+#ifdef __x86_64__
+#define icpustate64_setfs(self, value)           __wrfs_keepbase(value)
+#define icpustate64_setgs(self, value)           __wrgs_keepbase(value)
+#else /* __x86_64__ */
+#define icpustate64_setfs(self, value)           __wrfs(value)
 #define icpustate64_setgs(self, value)           __wrgs(value)
+#endif /* !__x86_64__ */
 #define icpustate64_getrflags(self)              irregs64_getrflags(&(self)->ics_irregs)
 #define icpustate64_setrflags(self, value)       irregs64_setrflags(&(self)->ics_irregs, value)
 #define icpustate64_mskrflags(self, mask, value) irregs64_mskrflags(&(self)->ics_irregs, mask, value)

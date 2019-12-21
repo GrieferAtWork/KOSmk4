@@ -482,6 +482,45 @@ void (__wrgsbase)(void *__val);
 #endif /* !__INTELLISENSE__ */
 #endif
 
+
+#ifdef __x86_64__
+/* Set the %fs or %gs register index, but also preserve the segment base address values. */
+__FORCELOCAL void (__wrfs_keepbase)(__UINT16_TYPE__ __val) {
+	__UINT64_TYPE__ __fsbase;
+	__fsbase = __rdfsbaseq();
+	__wrfs(__val);
+	__wrfsbaseq(__fsbase);
+}
+
+__FORCELOCAL void (__wrgs_keepbase)(__UINT16_TYPE__ __val) {
+#ifdef __KERNEL__
+	__UINT64_TYPE__ __temp;
+	/* On x86_64, %gs.base is the THIS_TASK register in kernel-space.
+	 * As such, we must be extremely careful when setting %gs, as doing
+	 * so will always override %gs.base with the base value found within
+	 * the GDT at that time. As such, we disable interrupts while doing
+	 * this, and immediately restore the original %gs.base (aka. THIS_TASK)
+	 * value so-as to never allow our thread to be interrupted with an
+	 * invalid value set in %gs.base! */
+	__asm__ __volatile__("pushfq\n\t"
+	                     "cli\n\t"
+	                     "movq %%gs:0, %q0\n\t"
+	                     "movw %w0, %%gs\n\t"
+	                     "safe_wrgsbase %q0\n\t"
+	                     "popfq"
+	                     : "=&r" (__temp)
+	                     : "r" (__val)
+	                     : "memory");
+#else /* __KERNEL__ */
+	__UINT64_TYPE__ __gsbase;
+	__gsbase = __rdgsbaseq();
+	__wrgs(__val);
+	__wrgsbaseq(__gsbase);
+#endif /* !__KERNEL__ */
+}
+#endif /* __x86_64__ */
+
+
 /* MachineSpecificRegisters (MSRs) */
 #ifdef __x86_64__
 __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__ (__rdmsr)(__UINT32_TYPE__ __id) { union __ATTR_PACKED { __UINT32_TYPE__ __lohi[2]; __UINT64_TYPE__ __result; } __res; __asm__ __volatile__("rdmsr" : "=a" (__res.__lohi[0]), "=d" (__res.__lohi[1]) : "c" (__id)); return __res.__result; }

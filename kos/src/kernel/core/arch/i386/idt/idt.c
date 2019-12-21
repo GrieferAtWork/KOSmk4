@@ -243,15 +243,21 @@ PUBLIC ATTR_PERCPU struct x86_spurious_interrupts
 thiscpu_x86_spurious_interrupts = { 0, 0, 0 };
 
 INTERN void KCALL x86_pic1_spur(void) {
-	++PERCPU(thiscpu_x86_spurious_interrupts).sp_pic1;
+	struct x86_spurious_interrupts *spi;
+	spi = &PERCPU(thiscpu_x86_spurious_interrupts);
+	++spi->sp_pic1;
 }
 
 INTERN void KCALL x86_pic2_spur(void) {
-	++PERCPU(thiscpu_x86_spurious_interrupts).sp_pic2;
+	struct x86_spurious_interrupts *spi;
+	spi = &PERCPU(thiscpu_x86_spurious_interrupts);
+	++spi->sp_pic2;
 }
 
 INTERN void KCALL x86_apic_spur(void) {
-	++PERCPU(thiscpu_x86_spurious_interrupts).sp_apic;
+	struct x86_spurious_interrupts *spi;
+	spi = &PERCPU(thiscpu_x86_spurious_interrupts);
+	++spi->sp_apic;
 }
 
 

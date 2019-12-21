@@ -455,9 +455,9 @@ __NOTHROW_NCX(kcpustate32_to_icpustate32_p)(struct kcpustate32 const *__restrict
 #define icpustate32_getfs(self)                  (icpustate32_isvm86(self) ? (self)->ics_irregs_v.ir_fs16 : (self)->ics_fs16)
 #define icpustate32_setfs(self, value)           (icpustate32_isvm86(self) ? ((self)->ics_irregs_v.ir_fs = (value)) : ((self)->ics_fs = (value)))
 #define icpustate32_getgs_ex(self, v_nonvm86_gs) (icpustate32_isvm86(self) ? (self)->ics_irregs_v.ir_gs16 : (v_nonvm86_gs))
-#define icpustate32_getgs(self)                  icpustate32_getgs_ex(self, __rdgs())
-#define icpustate32_setgs(self, value)           (icpustate32_isvm86(self) ? (void)((self)->ics_irregs_v.ir_gs = (value)) : __wrgs(value))
-#define icpustate32_trysetgs(self, value)        (icpustate32_isvm86(self) ? ((self)->ics_irregs_v.ir_gs = (value), 1) : (__rdgs() == (value)))
+#define icpustate32_getgs(self)                  icpustate32_getgs_ex(self, icpustate32_setgs_novm86(self))
+#define icpustate32_setgs(self, value)           (icpustate32_isvm86(self) ? (void)((self)->ics_irregs_v.ir_gs = (value)) : icpustate32_setgs_novm86(self, value))
+#define icpustate32_trysetgs(self, value)        (icpustate32_isvm86(self) ? ((self)->ics_irregs_v.ir_gs = (value), 1) : (icpustate32_setgs_novm86(self) == (value)))
 #define icpustate32_getds_novm86(self)           ((__u16)(self)->ics_ds16)
 #define icpustate32_setds_novm86(self, value)    ((self)->ics_ds = (value))
 #define icpustate32_getes_novm86(self)           ((__u16)(self)->ics_es16)
@@ -465,7 +465,11 @@ __NOTHROW_NCX(kcpustate32_to_icpustate32_p)(struct kcpustate32 const *__restrict
 #define icpustate32_getfs_novm86(self)           ((__u16)(self)->ics_fs16)
 #define icpustate32_setfs_novm86(self, value)    ((self)->ics_fs = (value))
 #define icpustate32_getgs_novm86(self)           __rdgs()
+#ifdef __x86_64__
+#define icpustate32_setgs_novm86(self, value)    __wrgs_keepbase(value)
+#else /* __x86_64__ */
 #define icpustate32_setgs_novm86(self, value)    __wrgs(value)
+#endif /* !__x86_64__ */
 #define icpustate32_geteflags(self)              irregs32_geteflags(&(self)->ics_irregs)
 #define icpustate32_seteflags(self, value)       irregs32_seteflags(&(self)->ics_irregs, value)
 #define icpustate32_mskeflags(self, mask, value) irregs32_mskeflags(&(self)->ics_irregs, mask, value)

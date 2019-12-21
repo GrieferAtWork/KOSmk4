@@ -257,9 +257,9 @@ sys_do_debugtrap32_impl(struct icpustate *__restrict return_state,
 				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 				      X86_REGISTER_SEGMENT_SS, ss);
-			__wrgs(gs);
+			__wrgs_keepbase(gs);
 #ifdef __x86_64__
-			__wrfs(fs);
+			__wrfs_keepbase(fs);
 			__wres(es);
 			__wrds(ds);
 #else /* __x86_64__ */
@@ -336,8 +336,8 @@ sys_do_debugtrap64_impl(struct icpustate *__restrict return_state,
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 			      X86_REGISTER_SEGMENT_SS, ss);
-		__wrgs(gs);
-		__wrfs(fs);
+		__wrgs_keepbase(gs);
+		__wrfs_keepbase(fs);
 		__wres(es);
 		__wrds(ds);
 		icpustate_setcs(return_state, cs);

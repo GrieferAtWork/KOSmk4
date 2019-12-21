@@ -672,7 +672,11 @@ x86_userexcept_unwind(struct ucpustate *__restrict ustate,
 	__wrds(ustate->ucs_sgregs.sg_ds16);
 	__wres(ustate->ucs_sgregs.sg_es16);
 	__wrfs(ustate->ucs_sgregs.sg_fs16);
-	__wrgs(ustate->ucs_sgregs.sg_gs16);
+	{
+		struct task *me = THIS_TASK;
+		__wrgs(ustate->ucs_sgregs.sg_gs16);
+		__wrgsbase(me);
+	}
 	/* FIXME: Restoring segment base registers here is correct, however
 	 *        unnecessary in all current use cases. - The solution would
 	 *        be to have another kind of cpustate structure that is like
