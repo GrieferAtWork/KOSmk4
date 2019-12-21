@@ -44,9 +44,11 @@
 
 
 #ifdef __x86_64__
-#define ELF_ARCH_CLASS   ELF_ARCHX86_64_CLASS
-#define ELF_ARCH_MACHINE ELF_ARCHX86_64_MACHINE
-#define ELF_ARCH_DATA    ELF_ARCHX86_64_DATA
+#define ELF_ARCH_CLASS    ELF_ARCHX86_64_CLASS
+#define ELF_ARCH_MACHINE  ELF_ARCHX86_64_MACHINE
+#define ELF_ARCH_DATA     ELF_ARCHX86_64_DATA
+#define ELF_ARCH_USESRELA ELF_ARCHX86_64_USESRELA
+#define ELF_ARCH_LAZYINDX ELF_ARCHX86_64_LAZYINDX
 #define __OFFSET_PROCESS_RTLD_ELF_RTLDADDR  __OFFSET_PROCESS_RTLD_ELF64_RTLDADDR
 #define __OFFSET_PROCESS_RTLD_ELF_NUM       __OFFSET_PROCESS_RTLD_ELF64_NUM
 #define __OFFSET_PROCESS_RTLD_ELF_PHDR      __OFFSET_PROCESS_RTLD_ELF64_PHDR
@@ -65,9 +67,11 @@
 
 __DECL_BEGIN
 
-#define ELF_ARCHX86_64_CLASS   ELFCLASS64
-#define ELF_ARCHX86_64_MACHINE EM_X86_64
-#define ELF_ARCHX86_64_DATA    ELFDATA2LSB
+#define ELF_ARCHX86_64_CLASS    ELFCLASS64
+#define ELF_ARCHX86_64_MACHINE  EM_X86_64
+#define ELF_ARCHX86_64_DATA     ELFDATA2LSB
+#define ELF_ARCHX86_64_USESRELA 1 /* x86_64 uses addend-relocations */
+#define ELF_ARCHX86_64_LAZYINDX 1 /* Lazy relocations use indices, rather than offsets */
 
 /* The user-space register holding a pointer to the ProcessEnvironmentBlock
  * immediately following the initial transition to user-space after a call

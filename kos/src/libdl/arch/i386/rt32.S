@@ -164,10 +164,12 @@ INTERN_FUNCTION(libdl_load_lazy_relocation)
 	 */
 	.cfi_startproc
 	.cfi_adjust_cfa_offset 8 /* MODULE + JMPREL_offset */
+
 	/* Save registers */
 	pushl_cfi_r %eax
 	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
+
 	pushfl_cfi_r
 
 	movl   16(%esp), %ecx /* MODULE */
@@ -176,11 +178,13 @@ INTERN_FUNCTION(libdl_load_lazy_relocation)
 	/* Patch the relocation. */
 	INTERN(libdl_bind_lazy_relocation)
 	call   libdl_bind_lazy_relocation
-	.cfi_register %eip, %eax
 
 	popfl_cfi_r
+	.cfi_register %eip, %eax
+
 	popl_cfi_r %edx
 	popl_cfi_r %ecx
+
 	xchgl  %eax, (%esp) /* RESTORE(EAX); 0(%esp) = RESOLVED_ADDRESS */
 	.cfi_same_value %eax
 	.cfi_rel_offset %eip, 0

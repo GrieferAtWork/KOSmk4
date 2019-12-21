@@ -37,6 +37,14 @@
 #error "Arch must #define `ELF_ARCH_MACHINE' (as one of `EM_*')"
 #endif /* !ELF_ARCH_MACHINE */
 
+#ifndef ELF_ARCH_USESRELA
+#error "Arch must #define `ELF_ARCH_USESRELA' (as either `0' or `1')"
+#endif /* !ELF_ARCH_USESRELA */
+
+#ifndef ELF_ARCH_LAZYINDX
+#error "Arch must #define `ELF_ARCH_LAZYINDX' (as either `0' or `1')"
+#endif /* !ELF_ARCH_LAZYINDX */
+
 #ifndef ELF_ARCH_CLASSNAME
 #if ELF_ARCH_CLASS == ELFCLASS32
 #define ELF_ARCH_CLASSNAME "CLASS32"

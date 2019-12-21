@@ -360,32 +360,69 @@ STATIC_ASSERT(offsetof(Elf64_Rel, r_info) == offsetof(Elf64_Rela, r_info));
 
 INTERN ElfW(Addr) ATTR_FASTCALL
 libdl_bind_lazy_relocation(DlModule *__restrict self,
-                           uintptr_t jmp_rel_offset) {
+#if ELF_ARCH_LAZYINDX
+                           uintptr_t jmp_rel_index
+#else /* ELF_ARCH_LAZYINDX */
+                           uintptr_t jmp_rel_offset
+#endif /* !ELF_ARCH_LAZYINDX */
+                           ) {
 	ElfW(Rel) *rel;
 	byte_t *reladdr;
 	ElfW(Addr) result;
 #ifdef LAZY_TRACE
 	DlModule *link_module;
 #endif /* LAZY_TRACE */
-	if unlikely(jmp_rel_offset >= self->dm_jmpsize) {
+#if ELF_ARCH_LAZYINDX
+	if unlikely(jmp_rel_index >= self->dm_jmpcount)
+#else /* ELF_ARCH_LAZYINDX */
+	if unlikely(jmp_rel_offset >= self->dm_jmpsize)
+#endif /* !ELF_ARCH_LAZYINDX */
+	{
+#if ELF_ARCH_LAZYINDX
+		syslog(LOG_ERROR, "[ld] Invalid jmp-relocation index %Iu > %Iu in %q\n",
+		       jmp_rel_index, self->dm_jmpcount, self->dm_filename);
+#else /* ELF_ARCH_LAZYINDX */
 		syslog(LOG_ERROR, "[ld] Invalid jmp-relocation offset %Iu > %Iu in %q\n",
 		       jmp_rel_offset, self->dm_jmpsize, self->dm_filename);
+#endif /* !ELF_ARCH_LAZYINDX */
 		sys_exit_group(EXIT_FAILURE);
 	}
+#if ELF_ARCH_LAZYINDX
+#if ELF_ARCH_USESRELA
+	rel = (ElfW(Rel) *)((uintptr_t)self->dm_jmprel +
+	                    (self->dm_flags & RTLD_JMPRELA
+	                     ? (jmp_rel_index * sizeof(ElfW(Rela)))
+	                     : (jmp_rel_index * sizeof(ElfW(Rel)))));
+#else /* ELF_ARCH_USESRELA */
+	rel = (ElfW(Rel) *)((uintptr_t)self->dm_jmprel +
+	                    (jmp_rel_index * sizeof(ElfW(Rel))));
+#endif /* !ELF_ARCH_USESRELA */
+#else /* ELF_ARCH_LAZYINDX */
 	rel = (ElfW(Rel) *)((uintptr_t)self->dm_jmprel + jmp_rel_offset);
+#endif /* !ELF_ARCH_LAZYINDX */
 	if unlikely(ELFW(R_TYPE)(rel->r_info) != R_JMP_SLOT) {
-#ifdef ELF_HOST_RELA_UNUSED
+#if !ELF_ARCH_USESRELA
 		syslog(LOG_ERROR, "[ld] Invalid jmp-relocation at DT_JMPREL+%Iu "
 		                  "[r_offset=%#Ix,r_info=%#I32x] isn't `" PP_PRIVATE_STR(R_JMP_SLOT) "' in %q\n",
-		       jmp_rel_offset, rel->r_offset, rel->r_info, self->dm_filename);
-#else /* ELF_HOST_RELA_UNUSED */
+#if ELF_ARCH_LAZYINDX
+		       (size_t)((byte_t *)rel - (byte_t *)self->dm_jmprel),
+#else /* ELF_ARCH_LAZYINDX */
+		       (size_t)jmp_rel_offset,
+#endif /* !ELF_ARCH_LAZYINDX */
+		       rel->r_offset, rel->r_info, self->dm_filename);
+#else /* !ELF_ARCH_USESRELA */
 		syslog(LOG_ERROR, "[ld] Invalid jmp-relocation at DT_JMPREL+%Iu "
 		                  "[r_offset=%#Ix,r_info=%#I32x",
-		       jmp_rel_offset, rel->r_offset, rel->r_info);
+#if ELF_ARCH_LAZYINDX
+		       (size_t)((byte_t *)rel - (byte_t *)self->dm_jmprel),
+#else /* ELF_ARCH_LAZYINDX */
+		       (size_t)jmp_rel_offset,
+#endif /* !ELF_ARCH_LAZYINDX */
+		       rel->r_offset, rel->r_info);
 		if (self->dm_flags & RTLD_JMPRELA)
-			syslog(LOG_ERROR, ",r_addend=%Id\n", (ssize_t)((ElfW(Rela) *)rel)->r_addend);
+			syslog(LOG_ERROR, ",r_addend=%Id", (ssize_t)((ElfW(Rela) *)rel)->r_addend);
 		syslog(LOG_ERROR, "] isn't `" PP_PRIVATE_STR(R_JMP_SLOT) "' in %q\n", self->dm_filename);
-#endif /* !ELF_HOST_RELA_UNUSED */
+#endif /* ELF_ARCH_USESRELA */
 		sys_exit_group(EXIT_FAILURE);
 	}
 	reladdr = (byte_t *)self->dm_loadaddr + rel->r_offset;
@@ -404,11 +441,11 @@ libdl_bind_lazy_relocation(DlModule *__restrict self,
 		       self->dm_filename);
 		sys_exit_group(EXIT_FAILURE);
 	}
-#ifndef ELF_HOST_RELA_UNUSED
+#if ELF_ARCH_USESRELA
 	/* Extend the relocation result with its addend */
 	if (self->dm_flags & RTLD_JMPRELA)
 		result += ((ElfW(Rela) *)rel)->r_addend;
-#endif /* !ELF_HOST_RELA_UNUSED */
+#endif /* ELF_ARCH_USESRELA */
 #ifdef LAZY_TRACE
 	syslog(LOG_DEBUG, "[ld] Lazy resolve %q in %q (to %p from %q)\n",
 	       self->dm_dynstr + self->dm_dynsym_tab[ELFW(R_SYM)(rel->r_info)].st_name,
@@ -424,10 +461,10 @@ DECL_END
 #ifndef __INTELLISENSE__
 #undef APPLY_RELA
 #include "module-reloc-impl.c.inl"
-#ifndef ELF_HOST_RELA_UNUSED
+#if ELF_ARCH_USESRELA
 #define APPLY_RELA 1
 #include "module-reloc-impl.c.inl"
-#endif /* !ELF_HOST_RELA_UNUSED */
+#endif /* ELF_ARCH_USESRELA */
 #endif /* !__INTELLISENSE__ */
 
 

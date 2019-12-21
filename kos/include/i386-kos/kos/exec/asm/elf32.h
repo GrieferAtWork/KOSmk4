@@ -47,9 +47,11 @@
 
 
 #if !defined(__x86_64__) && defined(__i386__)
-#define ELF_ARCH_CLASS       ELF_ARCH386_CLASS
-#define ELF_ARCH_MACHINE     ELF_ARCH386_MACHINE
-#define ELF_ARCH_DATA        ELF_ARCH386_DATA
+#define ELF_ARCH_CLASS    ELF_ARCH386_CLASS
+#define ELF_ARCH_MACHINE  ELF_ARCH386_MACHINE
+#define ELF_ARCH_DATA     ELF_ARCH386_DATA
+#define ELF_ARCH_USESRELA ELF_ARCH386_USESRELA
+#define ELF_ARCH_LAZYINDX ELF_ARCH386_LAZYINDX
 #define __OFFSET_PROCESS_RTLD_ELF_RTLDADDR  __OFFSET_PROCESS_RTLD_ELF32_RTLDADDR
 #define __OFFSET_PROCESS_RTLD_ELF_NUM       __OFFSET_PROCESS_RTLD_ELF32_NUM
 #define __OFFSET_PROCESS_RTLD_ELF_PHDR      __OFFSET_PROCESS_RTLD_ELF32_PHDR
@@ -68,9 +70,11 @@
 
 __DECL_BEGIN
 
-#define ELF_ARCH386_CLASS   ELFCLASS32
-#define ELF_ARCH386_MACHINE EM_386
-#define ELF_ARCH386_DATA    ELFDATA2LSB
+#define ELF_ARCH386_CLASS    ELFCLASS32
+#define ELF_ARCH386_MACHINE  EM_386
+#define ELF_ARCH386_DATA     ELFDATA2LSB
+#define ELF_ARCH386_USESRELA 0 /* i386 doesn't use addend-relocations */
+#define ELF_ARCH386_LAZYINDX 0 /* Lazy relocations use offsets, rather than indices */
 
 /* The user-space register holding a pointer to the ProcessEnvironmentBlock
  * immediately following the initial transition to user-space after a call to exec()

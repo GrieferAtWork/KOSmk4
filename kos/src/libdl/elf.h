@@ -38,7 +38,6 @@
 #include <kos/kernel/types.h>
 #include <kos/thread.h>
 #include <kos/types.h>
-#include <bits/elf.h> /* ELF_HOST_RELA_UNUSED */
 
 #include <assert.h>
 #include <dlfcn.h>
@@ -82,10 +81,10 @@ preadall(fd_t fd, void *buf, size_t bufsize, ElfW(Off) offset);
  * -> Used to detect cyclic dependencies. */
 #define RTLD_LOADING    UINT32_C(0x40000000)
 
-#ifndef ELF_HOST_RELA_UNUSED
+#if ELF_ARCH_USESRELA
 /* jmp relocation have addends. */
 #define RTLD_JMPRELA    UINT32_C(0x20000000)
-#endif /* !ELF_HOST_RELA_UNUSED */
+#endif /* ELF_ARCH_USESRELA */
 
 typedef struct elf_dlsection DlSection;
 typedef struct elf_dlmodule DlModule;
@@ -180,15 +179,27 @@ struct elf_dlmodule {
 
 	/* Lazy relocations (JMPREL). */
 	ElfW(Addr)               *dm_pltgot;     /* [0..1][const] Pointed location of the module's `DT_PLTGOT' .dynamic entry. */
-#ifdef ELF_HOST_RELA_UNUSED
-	ElfW(Rel)                *dm_jmprel;     /* [0..dm_jmpsize/sizeof(ElfW(Rel))][const] Pointed jump-relocations to-be loaded lazily. */
-#else /* ELF_HOST_RELA_UNUSED */
+#if !ELF_ARCH_USESRELA
+	ElfW(Rel)                *dm_jmprel;     /* [0..DlModule_GetJmpCount(self)][const] Pointed jump-relocations to-be loaded lazily. */
+#else /* !ELF_ARCH_USESRELA */
 	union {
-		ElfW(Rel)            *dm_jmprel;     /* [0..dm_jmpsize/sizeof(ElfW(Rel))][const][valid_if(!RTLD_JMPRELA)] Pointed jump-relocations to-be loaded lazily. */
-		ElfW(Rela)           *dm_jmprela;    /* [0..dm_jmpsize/sizeof(ElfW(Rela))][const][valid_if(RTLD_JMPRELA)] Pointed jump-relocations to-be loaded lazily. */
+		ElfW(Rel)            *dm_jmprel;     /* [0..DlModule_GetJmpCount(self)][const][valid_if(!RTLD_JMPRELA)] Pointed jump-relocations to-be loaded lazily. */
+		ElfW(Rela)           *dm_jmprela;    /* [0..DlModule_GetJmpaCount(self)][const][valid_if(RTLD_JMPRELA)] Pointed jump-relocations to-be loaded lazily. */
 	};
-#endif /* !ELF_HOST_RELA_UNUSED */
+#endif /* ELF_ARCH_USESRELA */
+#if ELF_ARCH_LAZYINDX
+	size_t                    dm_jmpcount;   /* [const] Amount of jump-relocations. */
+#define DlModule_GetJmpCount(self)  ((self)->dm_jmpcount)
+#if ELF_ARCH_USESRELA
+#define DlModule_GetJmpaCount(self) ((self)->dm_jmpcount)
+#endif /* ELF_ARCH_USESRELA */
+#else /* ELF_ARCH_LAZYINDX */
 	size_t                    dm_jmpsize;    /* [const] Size of the jump-relocations table (in bytes). */
+#define DlModule_GetJmpCount(self)  ((self)->dm_jmpsize / sizeof(ElfW(Rel)))
+#if ELF_ARCH_USESRELA
+#define DlModule_GetJmpaCount(self) ((self)->dm_jmpsize / sizeof(ElfW(Rela)))
+#endif /* ELF_ARCH_USESRELA */
+#endif /* !ELF_ARCH_LAZYINDX */
 
 	/* Module dependencies (DT_NEEDED). */
 	size_t                    dm_depcnt;     /* [const] Number of dynamic definition headers. */
@@ -329,12 +340,12 @@ INTDEF int CC
 DlModule_ApplyRelocations(DlModule *__restrict self,
                           ElfW(Rel) *__restrict vector,
                           size_t count, unsigned int flags);
-#ifndef ELF_HOST_RELA_UNUSED
+#if ELF_ARCH_USESRELA
 INTDEF int CC
 DlModule_ApplyRelocationsWithAddend(DlModule *__restrict self,
                                     ElfW(Rela) *__restrict vector,
                                     size_t count, unsigned int flags);
-#endif /* !ELF_HOST_RELA_UNUSED */
+#endif /* ELF_ARCH_USESRELA */
 
 /* Run library initializers for `self' */
 INTDEF void CC

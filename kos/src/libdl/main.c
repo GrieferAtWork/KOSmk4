@@ -63,14 +63,18 @@ INTERN DlModule ld_rtld_module = {
 	.dm_loadstart     = 0,
 	.dm_loadend       = (uintptr_t)0,
 	.dm_pltgot        = NULL,
-#ifdef ELF_HOST_RELA_UNUSED
+#if !ELF_ARCH_USESRELA
 	.dm_jmprel        = NULL,
-#else /* ELF_HOST_RELA_UNUSED */
+#else /* !ELF_ARCH_USESRELA */
 	{
 		.dm_jmprel    = NULL,
 	},
-#endif /* !ELF_HOST_RELA_UNUSED */
+#endif /* ELF_ARCH_USESRELA */
+#if ELF_ARCH_LAZYINDX
+	.dm_jmpcount      = 0,
+#else /* ELF_ARCH_LAZYINDX */
 	.dm_jmpsize       = 0,
+#endif /* !ELF_ARCH_LAZYINDX */
 	.dm_depcnt        = 0,
 	.dm_depvec        = NULL,
 	.dm_dyncnt        = 0,

@@ -49,9 +49,9 @@
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
-#include <bits/elf.h> /* ELF_HOST_RELA_UNUSED */
 #include <kos/debugtrap.h>
 #include <kos/except-noexec.h>
+#include <kos/exec/elf.h> /* ELF_ARCH_USESRELA */
 
 #include <assert.h>
 #include <ctype.h>
@@ -2991,10 +2991,10 @@ found_symbol:
 #ifndef __INTELLISENSE__
 #undef APPLY_RELA
 #include "driver-apply-reloc.c.inl"
-#ifndef ELF_HOST_RELA_UNUSED
+#if ELF_ARCH_USESRELA
 #define APPLY_RELA 1
 #include "driver-apply-reloc.c.inl"
-#endif /* !ELF_HOST_RELA_UNUSED */
+#endif /* ELF_ARCH_USESRELA */
 #else /* !__INTELLISENSE__ */
 
 /* @param: reloc_flags: Set of `DRIVER_RELOC_FLAG_*' */
@@ -3020,11 +3020,11 @@ driver_do_apply_relocations(struct driver *__restrict self)
 	size_t rel_count  = 0;
 	Elf_Rel *jmp_base = NULL;
 	size_t jmp_size  = 0;
-#ifndef ELF_HOST_RELA_UNUSED
+#if ELF_ARCH_USESRELA
 	Elf_Rela *rela_base = NULL;
 	size_t rela_count  = 0;
 	bool jmp_rels_have_addend = false;
-#endif /* !ELF_HOST_RELA_UNUSED */
+#endif /* ELF_ARCH_USESRELA */
 	size_t i;
 
 	/* Service relocations of the module. */
@@ -3048,14 +3048,14 @@ driver_do_apply_relocations(struct driver *__restrict self)
 			break;
 
 		case DT_PLTRELSZ:
-#ifdef ELF_HOST_RELA_UNUSED
+#if !ELF_ARCH_USESRELA
 			jmp_size = tag.d_un.d_val / sizeof(Elf_Rel);
-#else /* ELF_HOST_RELA_UNUSED */
+#else /* !ELF_ARCH_USESRELA */
 			jmp_size = tag.d_un.d_val;
-#endif /* !ELF_HOST_RELA_UNUSED */
+#endif /* ELF_ARCH_USESRELA */
 			break;
 
-#ifndef ELF_HOST_RELA_UNUSED
+#if ELF_ARCH_USESRELA
 		case DT_RELA:
 			rela_base = (Elf_Rela *)(self->d_loadaddr + tag.d_un.d_ptr);
 			break;
@@ -3068,7 +3068,7 @@ driver_do_apply_relocations(struct driver *__restrict self)
 			if (tag.d_un.d_val == DT_RELA)
 				jmp_rels_have_addend = true;
 			break;
-#endif /* !ELF_HOST_RELA_UNUSED */
+#endif /* ELF_ARCH_USESRELA */
 
 		case DT_FLAGS:
 			if (tag.d_un.d_val & DF_SYMBOLIC)
@@ -3086,9 +3086,9 @@ done_dynamic:
 
 	/* Apply relocations. */
 	driver_do_apply_relocations_vector(self, rel_base, rel_count, reloc_flags);
-#ifdef ELF_HOST_RELA_UNUSED
+#if !ELF_ARCH_USESRELA
 	driver_do_apply_relocations_vector(self, jmp_base, jmp_size, reloc_flags);
-#else /* ELF_HOST_RELA_UNUSED */
+#else /* !ELF_ARCH_USESRELA */
 	driver_do_apply_relocations_vector_addend(self, rela_base, rela_count, reloc_flags);
 	if (jmp_rels_have_addend) {
 		driver_do_apply_relocations_vector_addend(self,
@@ -3100,7 +3100,7 @@ done_dynamic:
 		                                   jmp_size / sizeof(Elf_Rel),
 		                                   reloc_flags);
 	}
-#endif /* !ELF_HOST_RELA_UNUSED */
+#endif /* ELF_ARCH_USESRELA */
 
 	/* Disable text relocations for read-only program sections of the driver. */
 	driver_disable_textrel(self);

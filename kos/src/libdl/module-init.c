@@ -25,9 +25,9 @@
 #include "elf.h"
 /**/
 
-#include <bits/elf.h> /* ELF_HOST_RELA_UNUSED */
 #include <kos/debugtrap.h>
 #include <kos/exec/peb.h>
+#include <kos/exec/elf.h> /* ELF_ARCH_USESRELA */
 #include <kos/syscalls.h>
 #include <sys/mman.h>
 
@@ -215,11 +215,11 @@ DlModule_MakeTextReadonly(DlModule *__restrict self) {
  * @param: flags: Set of `DL_MODULE_INITIALIZE_F*' */
 INTERN int CC
 DlModule_Initialize(DlModule *__restrict self, unsigned int flags) {
-#ifndef ELF_HOST_RELA_UNUSED
+#if ELF_ARCH_USESRELA
 	ElfW(Rela) *rela_base = NULL;
 	size_t rela_count   = 0;
 	bool jmp_rels_have_addend = false;
-#endif /* !ELF_HOST_RELA_UNUSED */
+#endif /* ELF_ARCH_USESRELA */
 	ElfW(Rel) *rel_base = NULL;
 	size_t rel_count  = 0;
 	ElfW(Rel) *jmp_base = NULL;
@@ -331,7 +331,7 @@ DlModule_Initialize(DlModule *__restrict self, unsigned int flags) {
 			self->dm_pltgot = (ElfW(Addr) *)(self->dm_loadaddr + tag.d_un.d_ptr);
 			break;
 
-#ifndef ELF_HOST_RELA_UNUSED
+#if ELF_ARCH_USESRELA
 		case DT_RELA:
 			rela_base = (ElfW(Rela) *)(self->dm_loadaddr + tag.d_un.d_ptr);
 			break;
@@ -344,7 +344,7 @@ DlModule_Initialize(DlModule *__restrict self, unsigned int flags) {
 			if (tag.d_un.d_val == DT_RELA)
 				jmp_rels_have_addend = true;
 			break;
-#endif /* !ELF_HOST_RELA_UNUSED */
+#endif /* ELF_ARCH_USESRELA */
 
 		default: break;
 		}
@@ -370,14 +370,14 @@ done_dynamic:
 	if unlikely(DlModule_ApplyRelocations(self, rel_base, rel_count,
 	                                      flags | DL_MODULE_INITIALIZE_FBINDNOW))
 		goto err;
-#ifndef ELF_HOST_RELA_UNUSED
+#if ELF_ARCH_USESRELA
 	if unlikely(DlModule_ApplyRelocationsWithAddend(self, rela_base, rela_count,
 		                                            flags | DL_MODULE_INITIALIZE_FBINDNOW))
 		goto err;
-#endif /* ELF_HOST_RELA_UNUSED */
+#endif /* !ELF_ARCH_USESRELA */
 
 	if (jmp_size) {
-#ifndef ELF_HOST_RELA_UNUSED
+#if ELF_ARCH_USESRELA
 		if (jmp_rels_have_addend) {
 #ifdef R_JMP_SLOT
 			if (self->dm_pltgot && !(flags & DL_MODULE_INITIALIZE_FBINDNOW)) {
@@ -385,7 +385,11 @@ done_dynamic:
 				self->dm_pltgot[1] = (ElfW(Addr))self;
 				self->dm_pltgot[2] = (ElfW(Addr))&libdl_load_lazy_relocation;
 				self->dm_jmprela   = (ElfW(Rela) *)jmp_base;
+#if ELF_ARCH_LAZYINDX
+				self->dm_jmpcount  = jmp_size / sizeof(ElfW(Rela));
+#else /* ELF_ARCH_LAZYINDX */
 				self->dm_jmpsize   = jmp_size;
+#endif /* !ELF_ARCH_LAZYINDX */
 				self->dm_flags    |= RTLD_JMPRELA;
 				if unlikely(DlModule_ApplyRelocationsWithAddend(self, (ElfW(Rela) *)jmp_base,
 				                                                jmp_size / sizeof(ElfW(Rela)),
@@ -401,7 +405,7 @@ done_dynamic:
 					goto err;
 			}
 		} else
-#endif /* !ELF_HOST_RELA_UNUSED */
+#endif /* ELF_ARCH_USESRELA */
 		{
 #ifdef R_JMP_SLOT
 			if (self->dm_pltgot && !(flags & DL_MODULE_INITIALIZE_FBINDNOW)) {
@@ -409,7 +413,11 @@ done_dynamic:
 				self->dm_pltgot[1] = (ElfW(Addr))self;
 				self->dm_pltgot[2] = (ElfW(Addr))&libdl_load_lazy_relocation;
 				self->dm_jmprel    = jmp_base;
+#if ELF_ARCH_LAZYINDX
+				self->dm_jmpcount  = jmp_size / sizeof(ElfW(Rel));
+#else /* ELF_ARCH_LAZYINDX */
 				self->dm_jmpsize   = jmp_size;
+#endif /* !ELF_ARCH_LAZYINDX */
 				if unlikely(DlModule_ApplyRelocations(self, jmp_base,
 				                                      jmp_size / sizeof(ElfW(Rel)),
 				                                      flags))

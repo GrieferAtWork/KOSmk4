@@ -29,14 +29,6 @@
  *       but their names are non-standardized and should not be expected to be
  *       available on platforms other than KOS. */
 
-
-
-#undef ELF_HOST_RELA_UNUSED
-#ifndef __x86_64__
-#define ELF_HOST_RELA_UNUSED 1
-#endif /* !__x86_64__ */
-
-
 __SYSDECL_BEGIN
 
 /* Data structures for core file note segments. */
