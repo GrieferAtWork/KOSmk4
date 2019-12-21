@@ -37,7 +37,7 @@
 
 DECL_BEGIN
 
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) ElfW(Word) CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) size_t CC
 builtin_symbol_size(char const *__restrict name) {
 	if (!strcmp(name, "program_invocation_name"))
 		return sizeof(void *);
@@ -75,7 +75,7 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
                                      uintptr_t *__restrict phash_elf,
                                      uintptr_t *__restrict phash_gnu,
                                      ElfW(Addr) *__restrict presult,
-                                     ElfW(Word) *psize,
+                                     size_t *psize,
                                      DlModule **pmodule,
                                      struct dl_symbol *__restrict pweak_symbol,
                                      size_t depth) {
@@ -167,8 +167,7 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 PRIVATE ATTR_NOINLINE bool CC
 DlModule_FindSymbol(DlModule *__restrict self, uintptr_t symid,
                     ElfW(Addr) *__restrict presult,
-                    ElfW(Word) *psize,
-                    DlModule **pmodule) {
+                    size_t *psize, DlModule **pmodule) {
 	struct dl_symbol weak_symbol;
 	ElfW(Sym) const *symbol;
 	ElfW(Addr) result;
@@ -344,7 +343,7 @@ done_result:
 
 
 
-#ifdef R_JMP_SLOT
+#ifdef ELF_ARCH_IS_R_JMP_SLOT
 #undef LAZY_TRACE
 #if 1
 #define LAZY_TRACE 1
@@ -357,6 +356,9 @@ STATIC_ASSERT(offsetof(Elf64_Rel, r_offset) == offsetof(Elf64_Rela, r_offset));
 STATIC_ASSERT(offsetof(Elf32_Rel, r_info) == offsetof(Elf32_Rela, r_info));
 STATIC_ASSERT(offsetof(Elf64_Rel, r_info) == offsetof(Elf64_Rela, r_info));
 
+#ifndef ELF_ARCH_NAME_R_JMP_SLOT
+#define ELF_ARCH_NAME_R_JMP_SLOT "R_" ELF_ARCH_MACHINENAME "_JMP_SLOT"
+#endif /* !ELF_ARCH_NAME_R_JMP_SLOT */
 
 INTERN ElfW(Addr) ATTR_FASTCALL
 libdl_bind_lazy_relocation(DlModule *__restrict self,
@@ -400,10 +402,10 @@ libdl_bind_lazy_relocation(DlModule *__restrict self,
 #else /* ELF_ARCH_LAZYINDX */
 	rel = (ElfW(Rel) *)((uintptr_t)self->dm_jmprel + jmp_rel_offset);
 #endif /* !ELF_ARCH_LAZYINDX */
-	if unlikely(ELFW(R_TYPE)(rel->r_info) != R_JMP_SLOT) {
+	if unlikely(!ELF_ARCH_IS_R_JMP_SLOT(ELFW(R_TYPE)(rel->r_info))) {
 #if !ELF_ARCH_USESRELA
 		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation at DT_JMPREL+%Iu "
-		                  "[r_offset=%#Ix,r_info=%#I32x] isn't `" PP_PRIVATE_STR(R_JMP_SLOT) "' in %q\n",
+		                  "[r_offset=%#Ix,r_info=%#I32x] isn't `" ELF_ARCH_NAME_R_JMP_SLOT "' in %q\n",
 #if ELF_ARCH_LAZYINDX
 		       (size_t)((byte_t *)rel - (byte_t *)self->dm_jmprel),
 #else /* ELF_ARCH_LAZYINDX */
@@ -421,7 +423,7 @@ libdl_bind_lazy_relocation(DlModule *__restrict self,
 		       rel->r_offset, rel->r_info);
 		if (self->dm_flags & RTLD_JMPRELA)
 			syslog(LOG_ERROR, ",r_addend=%Id", (ssize_t)((ElfW(Rela) *)rel)->r_addend);
-		syslog(LOG_ERROR, "] isn't `" PP_PRIVATE_STR(R_JMP_SLOT) "' in %q\n", self->dm_filename);
+		syslog(LOG_ERROR, "] isn't `" ELF_ARCH_NAME_R_JMP_SLOT "' in %q\n", self->dm_filename);
 #endif /* ELF_ARCH_USESRELA */
 		sys_exit_group(EXIT_FAILURE);
 	}
@@ -454,7 +456,7 @@ libdl_bind_lazy_relocation(DlModule *__restrict self,
 	*(ElfW(Addr) *)reladdr = result;
 	return result;
 }
-#endif /* R_JMP_SLOT */
+#endif /* ELF_ARCH_IS_R_JMP_SLOT */
 
 DECL_END
 

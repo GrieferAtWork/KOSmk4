@@ -114,7 +114,7 @@ again:
 INTERN int LIBCCALL
 DlModule_InitStaticTLSBindings(void) {
 	DlModule *iter;
-	intptr_t endptr = 0;
+	ptrdiff_t endptr = 0;
 	/* Assign static TLS offsets to all currently loaded modules.
 	 * NOTE: Since we've yet to invoke a user-defined code (other than IFUNC selectors),
 	 *       we are allowed to assume that no threads other than the calling (main) thread

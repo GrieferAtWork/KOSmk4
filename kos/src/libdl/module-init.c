@@ -356,7 +356,7 @@ done_dynamic:
 			goto err;
 	}
 
-#ifdef R_JMP_SLOT
+#ifdef ELF_ARCH_IS_R_JMP_SLOT
 	/* Enable direct binding when `LD_BIND_NOW' is defined as non-empty */
 	{
 		char *ld_bind_now;
@@ -364,7 +364,7 @@ done_dynamic:
 		if (ld_bind_now && *ld_bind_now)
 			flags |= DL_MODULE_INITIALIZE_FBINDNOW;
 	}
-#endif /* R_JMP_SLOT */
+#endif /* ELF_ARCH_IS_R_JMP_SLOT */
 
 	/* Apply relocations. */
 	if unlikely(DlModule_ApplyRelocations(self, rel_base, rel_count,
@@ -379,7 +379,7 @@ done_dynamic:
 	if (jmp_size) {
 #if ELF_ARCH_USESRELA
 		if (jmp_rels_have_addend) {
-#ifdef R_JMP_SLOT
+#ifdef ELF_ARCH_IS_R_JMP_SLOT
 			if (self->dm_pltgot && !(flags & DL_MODULE_INITIALIZE_FBINDNOW)) {
 				/* Lazy binding of jump-relocations! */
 				self->dm_pltgot[1] = (ElfW(Addr))self;
@@ -401,7 +401,7 @@ done_dynamic:
 				                                                flags))
 					goto err;
 			} else
-#endif /* R_JMP_SLOT */
+#endif /* ELF_ARCH_IS_R_JMP_SLOT */
 			{
 				/* Directly bind jump-relocations. */
 				if unlikely(DlModule_ApplyRelocationsWithAddend(self, (ElfW(Rela) *)jmp_base,
@@ -412,7 +412,7 @@ done_dynamic:
 		} else
 #endif /* ELF_ARCH_USESRELA */
 		{
-#ifdef R_JMP_SLOT
+#ifdef ELF_ARCH_IS_R_JMP_SLOT
 			if (self->dm_pltgot && !(flags & DL_MODULE_INITIALIZE_FBINDNOW)) {
 				/* Lazy binding of jump-relocations! */
 				self->dm_pltgot[1] = (ElfW(Addr))self;
@@ -433,7 +433,7 @@ done_dynamic:
 				                                      flags))
 					goto err;
 			} else
-#endif /* R_JMP_SLOT */
+#endif /* ELF_ARCH_IS_R_JMP_SLOT */
 			{
 				/* Directly bind jump-relocations. */
 				if unlikely(DlModule_ApplyRelocations(self, jmp_base,

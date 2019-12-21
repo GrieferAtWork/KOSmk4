@@ -19,14 +19,16 @@
 #ifdef __INTELLISENSE__
 #include "driver.c"
 #define APPLY_RELA 1
-#endif
+#endif /* __INTELLISENSE__ */
 
 DECL_BEGIN
 
 #ifdef APPLY_RELA
 #define SET_OR_INPLACE_ADD =
+#define IFELSE_RELA(if_rel, if_rela) if_rela
 #else /* APPLY_RELA */
 #define SET_OR_INPLACE_ADD +=
+#define IFELSE_RELA(if_rel, if_rela) if_rel
 #endif /* !APPLY_RELA */
 
 
@@ -57,96 +59,49 @@ driver_do_apply_relocations_vector(struct driver *__restrict self,
 #endif /* !APPLY_RELA */
 		byte_t *reladdr = loadaddr + rel.r_offset;
 		switch (ELFW(R_TYPE)(rel.r_info)) {
-#define LOOKUP_SYMBOL() \
-		value = (ElfW(Addr))driver_find_symbol_for_relocation(self, ELFW(R_SYM)(rel.r_info), NULL, NULL, reloc_flags)
-
-#if defined(__x86_64__)
-#define R_USED_NONE           R_X86_64_NONE
-#define R_USED_COPY           R_X86_64_COPY
-#define R_USED_8              R_X86_64_8
-#define R_USED_16             R_X86_64_16
-#define R_USED_32             R_X86_64_32
-#define R_USED_32_ALT         R_X86_64_32S
-#define R_USED_64             R_X86_64_64
-#define R_USED_PC8            R_X86_64_PC8
-#define R_USED_PC16           R_X86_64_PC16
-#define R_USED_PC32           R_X86_64_PC32
-#define R_USED_PC64           R_X86_64_PC64
-#define R_USED_GLOB_DAT       R_X86_64_GLOB_DAT
-#define R_USED_JMP_SLOT       R_X86_64_JMP_SLOT
-#define R_USED_RELATIVE64     R_X86_64_RELATIVE
-#define R_USED_RELATIVE64_ALT R_X86_64_RELATIVE64
-#define R_USED_IRELATIVE64    R_X86_64_IRELATIVE
-#define R_USED_SIZE32         R_X86_64_SIZE32
-#define R_USED_SIZE64         R_X86_64_SIZE64
-#elif defined(__i386__)
-#define R_USED_NONE        R_386_NONE
-#define R_USED_COPY        R_386_COPY
-#define R_USED_8           R_386_8
-#define R_USED_16          R_386_16
-#define R_USED_32          R_386_32
-#define R_USED_PC8         R_386_PC8
-#define R_USED_PC16        R_386_PC16
-#define R_USED_PC32        R_386_PC32
-#define R_USED_GLOB_DAT    R_386_GLOB_DAT
-#define R_USED_JMP_SLOT    R_386_JMP_SLOT
-#define R_USED_RELATIVE32  R_386_RELATIVE
-#define R_USED_IRELATIVE32 R_386_IRELATIVE
-#else
-#error "Unsupported architecture"
-#endif
+#define LOOKUP_SYMBOL()                                                                  \
+	value = (ElfW(Addr))driver_find_symbol_for_relocation(self, ELFW(R_SYM)(rel.r_info), \
+	                                                      NULL, NULL, reloc_flags)
 
 
-#ifdef R_USED_RELATIVE32
-		case R_USED_RELATIVE32:
-#undef R_USED_RELATIVE32
+#ifdef ELF_ARCH_CASE_R_NONE
+		ELF_ARCH_CASE_R_NONE:
+			break;
+#endif /* ELF_ARCH_CASE_R_NONE */
+
+
+#ifdef ELF_ARCH_CASE_R_RELATIVE32
+		ELF_ARCH_CASE_R_RELATIVE32:
 			*(u32 *)reladdr SET_OR_INPLACE_ADD (u32)(uintptr_t)loadaddr;
 			break;
-#endif /* R_USED_RELATIVE32 */
+#endif /* ELF_ARCH_CASE_R_RELATIVE32 */
 
 
-#if defined(R_USED_RELATIVE64) || defined(R_USED_RELATIVE64_ALT)
-#ifdef R_USED_RELATIVE64
-		case R_USED_RELATIVE64:
-#undef R_USED_RELATIVE64
-#endif /* R_USED_RELATIVE64 */
-#ifdef R_USED_RELATIVE64_ALT
-		case R_USED_RELATIVE64_ALT:
-#undef R_USED_RELATIVE64_ALT
-#endif /* R_USED_RELATIVE64_ALT */
+#ifdef ELF_ARCH_CASE_R_RELATIVE64
+		ELF_ARCH_CASE_R_RELATIVE64:
 			*(u64 *)reladdr SET_OR_INPLACE_ADD (u64)(uintptr_t)(loadaddr + REL_ADDEND);
 			break;
-#endif /* R_USED_RELATIVE64 || R_USED_RELATIVE64_ALT */
+#endif /* ELF_ARCH_CASE_R_RELATIVE64 */
 
 
-#ifdef R_USED_IRELATIVE32
-		case R_USED_IRELATIVE32:
-#undef R_USED_IRELATIVE32
-#ifdef APPLY_RELA
-			*(u32 *)reladdr = (*(Elf32_Addr(*)(void))((uintptr_t)loadaddr + REL_ADDEND))();
-#else /* APPLY_RELA */
-			*(u32 *)reladdr = (*(Elf32_Addr(*)(void))((uintptr_t)*(u32 *)reladdr + (uintptr_t)loadaddr))();
-#endif /* !APPLY_RELA */
+#ifdef ELF_ARCH_CASE_R_IRELATIVE32
+		ELF_ARCH_CASE_R_IRELATIVE32:
+			*(u32 *)reladdr = IFELSE_RELA((*(Elf32_Addr(*)(void))((uintptr_t)*(u32 *)reladdr + (uintptr_t)loadaddr))(),
+			                              (*(Elf32_Addr(*)(void))((uintptr_t)loadaddr + REL_ADDEND))());
 			break;
-#endif /* R_USED_RELATIVE32 */
+#endif /* ELF_ARCH_CASE_R_IRELATIVE32 */
 
 
-#ifdef R_USED_IRELATIVE64
-		case R_USED_IRELATIVE64:
-#undef R_USED_IRELATIVE64
-#ifdef APPLY_RELA
-			*(u64 *)reladdr = (*(Elf64_Addr(*)(void))((uintptr_t)loadaddr + REL_ADDEND))();
-#else /* APPLY_RELA */
-			*(u64 *)reladdr = (*(Elf64_Addr(*)(void))((uintptr_t)*(u64 *)reladdr + (uintptr_t)loadaddr))();
-#endif /* !APPLY_RELA */
+#ifdef ELF_ARCH_CASE_R_IRELATIVE64
+		ELF_ARCH_CASE_R_IRELATIVE64:
+			*(u64 *)reladdr = IFELSE_RELA((*(Elf64_Addr(*)(void))((uintptr_t)*(u64 *)reladdr + (uintptr_t)loadaddr))(),
+			                              (*(Elf64_Addr(*)(void))((uintptr_t)loadaddr + REL_ADDEND))());
 			break;
-#endif /* R_USED_RELATIVE64 */
+#endif /* ELF_ARCH_CASE_R_IRELATIVE64 */
 
 
-#ifdef R_USED_SIZE32
-		case R_USED_SIZE32:
-#undef R_USED_SIZE32
-		{
+#ifdef ELF_ARCH_CASE_R_SIZE32
+		ELF_ARCH_CASE_R_SIZE32: {
 			size_t symbol_size;
 			driver_find_symbol_for_relocation(self,
 			                                  ELFW(R_SYM)(rel.r_info),
@@ -155,13 +110,11 @@ driver_do_apply_relocations_vector(struct driver *__restrict self,
 			                                  reloc_flags);
 			*(u32 *)reladdr SET_OR_INPLACE_ADD (u32)(symbol_size + REL_ADDEND);
 		}	break;
-#endif /* R_USED_SIZE32 */
+#endif /* ELF_ARCH_CASE_R_SIZE32 */
 
 
-#ifdef R_USED_SIZE64
-		case R_USED_SIZE64:
-#undef R_USED_SIZE64
-		{
+#ifdef ELF_ARCH_CASE_R_SIZE64
+		ELF_ARCH_CASE_R_SIZE64: {
 			size_t symbol_size;
 			driver_find_symbol_for_relocation(self,
 			                                  ELFW(R_SYM)(rel.r_info),
@@ -170,29 +123,20 @@ driver_do_apply_relocations_vector(struct driver *__restrict self,
 			                                  reloc_flags);
 			*(u64 *)reladdr SET_OR_INPLACE_ADD (u64)(symbol_size + REL_ADDEND);
 		}	break;
-#endif /* R_USED_SIZE64 */
+#endif /* ELF_ARCH_CASE_R_SIZE64 */
 
 
-#ifdef R_USED_NONE
-		case R_USED_NONE:
-#undef R_USED_NONE
-			break;
-#endif /* R_USED_COPY */
-
-
-#ifdef R_USED_COPY
-		case R_USED_COPY:
-#undef R_USED_COPY
-		{
+#ifdef ELF_ARCH_CASE_R_COPY
+		ELF_ARCH_CASE_R_COPY: {
 			ElfW(Sym) const *dst_sym;
 			size_t src_size;
 			struct driver *src_module;
 			dst_sym = self->d_dynsym_tab + ELFW(R_SYM)(rel.r_info);
 			value = (ElfW(Addr))driver_find_symbol_for_relocation(self,
-			                                                    ELFW(R_SYM)(rel.r_info),
-			                                                    &src_size,
-			                                                    &src_module,
-			                                                    reloc_flags);
+			                                                      ELFW(R_SYM)(rel.r_info),
+			                                                      &src_size,
+			                                                      &src_module,
+			                                                      reloc_flags);
 			if unlikely(dst_sym->st_size != src_size) {
 				printk(KERN_WARNING "[mod] %q: Symbol %q imported with %Iu bytes, but exported with %Iu from %q\n",
 				       self->d_filename ? self->d_filename : self->d_name,
@@ -203,101 +147,99 @@ driver_do_apply_relocations_vector(struct driver *__restrict self,
 				src_size = dst_sym->st_size;
 			memcpy((void *)reladdr, (void *)value, src_size);
 		}	break;
-#endif /* R_USED_COPY */
+#endif /* ELF_ARCH_CASE_R_COPY */
 
 
-#ifdef R_USED_8
-		case R_USED_8:
-#undef R_USED_8
+#if defined(ELF_ARCH_CASE_R_8) || defined(ELF_ARCH_CASE_R_8S)
+#ifdef ELF_ARCH_CASE_R_8
+		ELF_ARCH_CASE_R_8:
+#endif /* ELF_ARCH_CASE_R_8 */
+#ifdef ELF_ARCH_CASE_R_8S
+		ELF_ARCH_CASE_R_8S:
+#endif /* ELF_ARCH_CASE_R_8S */
 			LOOKUP_SYMBOL();
 			*(u8 *)reladdr SET_OR_INPLACE_ADD (u8)(value + REL_ADDEND);
 			break;
-#endif /* R_USED_8 */
+#endif /* ELF_ARCH_CASE_R_8 || ELF_ARCH_CASE_R_8S */
 
 
-#ifdef R_USED_PC8
-		case R_USED_PC8:
-#undef R_USED_PC8
+#ifdef ELF_ARCH_CASE_R_PC8
+		ELF_ARCH_CASE_R_PC8:
 			LOOKUP_SYMBOL();
 			*(u8 *)reladdr SET_OR_INPLACE_ADD (u8)((value + REL_ADDEND) - (uintptr_t)reladdr);
 			break;
-#endif /* R_USED_PC8 */
+#endif /* ELF_ARCH_CASE_R_PC8 */
 
 
-#ifdef R_USED_16
-		case R_USED_16:
-#undef R_USED_16
+#if defined(ELF_ARCH_CASE_R_16) || defined(ELF_ARCH_CASE_R_16S)
+#ifdef ELF_ARCH_CASE_R_16
+		ELF_ARCH_CASE_R_16:
+#endif /* ELF_ARCH_CASE_R_16 */
+#ifdef ELF_ARCH_CASE_R_16S
+		ELF_ARCH_CASE_R_16S:
+#endif /* ELF_ARCH_CASE_R_16S */
 			LOOKUP_SYMBOL();
 			*(u16 *)reladdr SET_OR_INPLACE_ADD (u16)(value + REL_ADDEND);
 			break;
-#endif /* R_USED_16 */
+#endif /* ELF_ARCH_CASE_R_16 || ELF_ARCH_CASE_R_16S */
 
 
-#ifdef R_USED_PC16
-		case R_USED_PC16:
-#undef R_USED_PC16
+#ifdef ELF_ARCH_CASE_R_PC16
+		ELF_ARCH_CASE_R_PC16:
 			LOOKUP_SYMBOL();
 			*(u16 *)reladdr SET_OR_INPLACE_ADD (u16)((value + REL_ADDEND) - (uintptr_t)reladdr);
 			break;
-#endif /* R_USED_PC16 */
+#endif /* ELF_ARCH_CASE_R_PC16 */
 
 
-#if defined(R_USED_32) || defined(R_USED_32_ALT)
-#ifdef R_USED_32
-		case R_USED_32:
-#undef R_USED_32
-#endif /* R_USED_32 */
-#ifdef R_USED_32_ALT
-		case R_USED_32_ALT:
-#undef R_USED_32_ALT
-#endif /* R_USED_32_ALT */
+#if defined(ELF_ARCH_CASE_R_32) || defined(ELF_ARCH_CASE_R_32S)
+#ifdef ELF_ARCH_CASE_R_32
+		ELF_ARCH_CASE_R_32:
+#endif /* ELF_ARCH_CASE_R_32 */
+#ifdef ELF_ARCH_CASE_R_32S
+		ELF_ARCH_CASE_R_32S:
+#endif /* ELF_ARCH_CASE_R_32S */
 			LOOKUP_SYMBOL();
 			*(u32 *)reladdr SET_OR_INPLACE_ADD (u32)(value + REL_ADDEND);
 			break;
-#endif /* R_USED_32 || R_USED_32_ALT */
+#endif /* ELF_ARCH_CASE_R_32 || ELF_ARCH_CASE_R_32S */
 
 
-#ifdef R_USED_PC32
-		case R_USED_PC32:
-#undef R_USED_PC32
+#ifdef ELF_ARCH_CASE_R_PC32
+		ELF_ARCH_CASE_R_PC32:
 			LOOKUP_SYMBOL();
 			*(u32 *)reladdr SET_OR_INPLACE_ADD (u32)((value + REL_ADDEND) - (uintptr_t)reladdr);
 			break;
-#endif /* R_USED_PC32 */
+#endif /* ELF_ARCH_CASE_R_PC32 */
 
 
-#ifdef R_USED_64
-		case R_USED_64:
-#undef R_USED_64
+#ifdef ELF_ARCH_CASE_R_64
+		ELF_ARCH_CASE_R_64:
 			LOOKUP_SYMBOL();
 			*(u64 *)reladdr SET_OR_INPLACE_ADD (u64)(value + REL_ADDEND);
 			break;
-#endif /* R_USED_64 */
+#endif /* ELF_ARCH_CASE_R_64 */
 
 
-#ifdef R_USED_PC64
-		case R_USED_PC64:
-#undef R_USED_PC64
+#ifdef ELF_ARCH_CASE_R_PC64
+		ELF_ARCH_CASE_R_PC64:
 			LOOKUP_SYMBOL();
 			*(u64 *)reladdr SET_OR_INPLACE_ADD (u64)((value + REL_ADDEND) - (uintptr_t)reladdr);
 			break;
-#endif /* R_USED_PC64 */
+#endif /* ELF_ARCH_CASE_R_PC64 */
 
 
-#if defined(R_USED_GLOB_DAT) || defined(R_USED_JMP_SLOT)
-#ifdef R_USED_JMP_SLOT
-		case R_USED_JMP_SLOT:
-#undef R_USED_JMP_SLOT
-#endif /* R_USED_JMP_SLOT */
-#ifdef R_USED_GLOB_DAT
-		case R_USED_GLOB_DAT:
-#undef R_USED_GLOB_DAT
-#endif /* R_USED_GLOB_DAT */
+#if defined(ELF_ARCH_CASE_R_JMP_SLOT) || defined(ELF_ARCH_CASE_R_GLOB_DAT)
+#ifdef ELF_ARCH_CASE_R_JMP_SLOT
+		ELF_ARCH_CASE_R_JMP_SLOT:
+#endif /* ELF_ARCH_CASE_R_JMP_SLOT */
+#ifdef ELF_ARCH_CASE_R_GLOB_DAT
+		ELF_ARCH_CASE_R_GLOB_DAT:
+#endif /* ELF_ARCH_CASE_R_GLOB_DAT */
 			LOOKUP_SYMBOL();
 			*(uintptr_t *)reladdr SET_OR_INPLACE_ADD (uintptr_t)(value + REL_ADDEND);
 			break;
-#endif /* R_USED_GLOB_DAT || R_USED_JMP_SLOT */
-
+#endif /* ELF_ARCH_CASE_R_JMP_SLOT || ELF_ARCH_CASE_R_GLOB_DAT */
 
 
 		default:
@@ -327,4 +269,5 @@ driver_do_apply_relocations_vector(struct driver *__restrict self,
 DECL_END
 
 #undef SET_OR_INPLACE_ADD
+#undef IFELSE_RELA
 #undef APPLY_RELA

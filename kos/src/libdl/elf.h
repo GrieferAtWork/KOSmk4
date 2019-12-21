@@ -34,6 +34,7 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <kos/except.h>
+#include <kos/exec/elf-rel.h> /* ELF_ARCH_*_R_* */
 #include <kos/exec/elf.h>
 #include <kos/kernel/types.h>
 #include <kos/thread.h>
@@ -51,14 +52,6 @@
 #define TRY         try
 #define EXCEPT      catch(...)
 #define RETHROW()   throw
-
-
-#ifdef __x86_64__
-#define R_JMP_SLOT R_X86_64_JUMP_SLOT
-#elif defined(__i386__)
-#define R_JMP_SLOT R_386_JMP_SLOT
-#endif
-
 
 DECL_BEGIN
 
@@ -149,9 +142,9 @@ struct elf_dlmodule {
 	size_t                    dm_tlsfsize;   /* [<= dm_tlsmsize] In-file size of this module's TLS template image. */
 	size_t                    dm_tlsmsize;   /* [>= dm_tlsfsize] In-member size of this module's TLS template image (or 0 if no TLS is defined). */
 	size_t                    dm_tlsalign;   /* [valid_if(dm_tlsmsize != 0)] Minimum alignment required for this module's TLS segment. */
-	intptr_t                  dm_tlsstoff;   /* [valid_if(!= 0)] Negative offset into the static TLS segment, where this thread's TLS descriptor is allocated.
+	ptrdiff_t                 dm_tlsstoff;   /* [valid_if(!= 0)] Offset added to the TLS pointer to access this module's static TLS segment.
 	                                          * NOTE: Only modules loaded by the initial application are part of the static TLS segment.
-	                                          *    -> All other modules loaded thereafter have their TLS segments mapped dynamically. */
+	                                          *    -> All other modules loaded thereafter have their TLS segments lazily loaded on first access. */
 	/* WARNING: TLS Initializers/Finalizers are _NOT_ invoked for modules apart of the static TLS image! */
 	void                    (*dm_tls_init)(void *arg, void *base); /* [valid_if(!dm_tlsstoff)][0..1] Optional callback for a TLS initializer. */
 	void                    (*dm_tls_fini)(void *arg, void *base); /* [valid_if(!dm_tlsstoff)][0..1] Optional callback for a TLS finalizer. */
@@ -471,7 +464,7 @@ INTDEF int LIBCCALL DlModule_InitStaticTLSBindings(void);
 /* Remove the given module from the table of static TLS bindings. */
 INTDEF void LIBCCALL DlModule_RemoveTLSExtension(DlModule *__restrict self);
 
-#ifdef R_JMP_SLOT
+#ifdef ELF_ARCH_IS_R_JMP_SLOT
 /* Called from JMP_SLOT relocations (s.a. `arch/i386/rt32.S') */
 INTDEF void libdl_load_lazy_relocation(void);
 /* Bind a lazy relocation, resolving its JMP relocation entry and returning the
@@ -480,7 +473,7 @@ INTDEF void libdl_load_lazy_relocation(void);
 INTDEF ElfW(Addr) ATTR_FASTCALL
 libdl_bind_lazy_relocation(DlModule *__restrict self,
                            uintptr_t jmp_rel_offset);
-#endif /* R_JMP_SLOT */
+#endif /* ELF_ARCH_IS_R_JMP_SLOT */
 
 
 

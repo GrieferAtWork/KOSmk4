@@ -2702,9 +2702,9 @@ typedef Elf32_Addr Elf32_Conflict;
 #define R_X86_64_PC16           13      /* [RTLD] 16 bit sign extended pc relative */
 #define R_X86_64_8              14      /* [RTLD] Direct 8 bit sign extended  */
 #define R_X86_64_PC8            15      /* [RTLD] 8 bit sign extended pc relative */
-#define R_X86_64_DTPMOD64       16      /* [RTLD] ID of module containing symbol */
-#define R_X86_64_DTPOFF64       17      /* [RTLD] Offset in module's TLS block */
-#define R_X86_64_TPOFF64        18      /* [RTLD] Offset in initial TLS block */
+#define R_X86_64_DTPMOD64       16      /* [RTLD] ID of module containing symbol (64-bit) */
+#define R_X86_64_DTPOFF64       17      /* [RTLD] Offset in module's TLS block (64-bit) */
+#define R_X86_64_TPOFF64        18      /* [RTLD] Offset in initial TLS block (64-bit) */
 #define R_X86_64_TLSGD          19      /* 32 bit signed PC relative offset to two GOT entries for GD symbol */
 #define R_X86_64_TLSLD          20      /* 32 bit signed PC relative offset to two GOT entries for LD symbol */
 #define R_X86_64_DTPOFF32       21      /* [RTLD] Offset in TLS block */

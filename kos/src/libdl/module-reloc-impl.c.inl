@@ -26,8 +26,10 @@ DECL_BEGIN
 
 #ifdef APPLY_RELA
 #define SET_OR_INPLACE_ADD =
+#define IFELSE_RELA(if_rel, if_rela) if_rela
 #else /* APPLY_RELA */
 #define SET_OR_INPLACE_ADD +=
+#define IFELSE_RELA(if_rel, if_rela) if_rel
 #endif /* !APPLY_RELA */
 
 /* Apply relocations for `self'
@@ -63,130 +65,68 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 		if unlikely(!DlModule_FindSymbol(self, ELFW(R_SYM)(rel.r_info), &value, NULL, NULL)) \
 			goto err
 
-#if defined(__x86_64__)
-#define R_USED_NONE           R_X86_64_NONE
-#define R_USED_COPY           R_X86_64_COPY
-#define R_USED_8              R_X86_64_8
-#define R_USED_16             R_X86_64_16
-#define R_USED_32             R_X86_64_32
-#define R_USED_32_ALT         R_X86_64_32S
-#define R_USED_64             R_X86_64_64
-#define R_USED_PC8            R_X86_64_PC8
-#define R_USED_PC16           R_X86_64_PC16
-#define R_USED_PC32           R_X86_64_PC32
-#define R_USED_PC64           R_X86_64_PC64
-#define R_USED_GLOB_DAT       R_X86_64_GLOB_DAT
-#if __SIZEOF_POINTER__ == 4
-#define R_USED_RELATIVE32     R_X86_64_RELATIVE
-#else /* __SIZEOF_POINTER__ == 4 */
-#define R_USED_RELATIVE64_ALT R_X86_64_RELATIVE
-#endif /* __SIZEOF_POINTER__ != 4 */
-#define R_USED_RELATIVE64     R_X86_64_RELATIVE64
-#define R_USED_IRELATIVE64    R_X86_64_IRELATIVE
-#define R_USED_SIZE32         R_X86_64_SIZE32
-#define R_USED_SIZE64         R_X86_64_SIZE64
-#elif defined(__i386__)
-#define R_USED_NONE        R_386_NONE
-#define R_USED_COPY        R_386_COPY
-#define R_USED_8           R_386_8
-#define R_USED_16          R_386_16
-#define R_USED_32          R_386_32
-#define R_USED_PC8         R_386_PC8
-#define R_USED_PC16        R_386_PC16
-#define R_USED_PC32        R_386_PC32
-#define R_USED_GLOB_DAT    R_386_GLOB_DAT
-#define R_USED_RELATIVE32  R_386_RELATIVE
-#define R_USED_IRELATIVE64 R_386_IRELATIVE
-#else
-#error "Unsupported architecture"
-#endif
+#ifdef ELF_ARCH_CASE_R_NONE
+		ELF_ARCH_CASE_R_NONE:
+			break;
+#endif /* ELF_ARCH_CASE_R_NONE */
 
 
-#ifdef R_USED_RELATIVE32
-		case R_USED_RELATIVE32:
-#undef R_USED_RELATIVE32
+#ifdef ELF_ARCH_CASE_R_RELATIVE32
+		ELF_ARCH_CASE_R_RELATIVE32:
 			*(u32 *)reladdr SET_OR_INPLACE_ADD (u32)(uintptr_t)loadaddr;
 			break;
-#endif /* R_USED_RELATIVE32 */
+#endif /* ELF_ARCH_CASE_R_RELATIVE32 */
 
 
-#if defined(R_USED_RELATIVE64) || defined(R_USED_RELATIVE64_ALT)
-#ifdef R_USED_RELATIVE64
-		case R_USED_RELATIVE64:
-#undef R_USED_RELATIVE64
-#endif /* R_USED_RELATIVE64 */
-#ifdef R_USED_RELATIVE64_ALT
-		case R_USED_RELATIVE64_ALT:
-#undef R_USED_RELATIVE64_ALT
-#endif /* R_USED_RELATIVE64_ALT */
+#ifdef ELF_ARCH_CASE_R_RELATIVE64
+		ELF_ARCH_CASE_R_RELATIVE64:
 			*(u64 *)reladdr SET_OR_INPLACE_ADD (u64)(uintptr_t)(loadaddr + REL_ADDEND);
 			break;
-#endif /* R_USED_RELATIVE64 || R_USED_RELATIVE64_ALT */
+#endif /* ELF_ARCH_CASE_R_RELATIVE64 */
 
 
-#ifdef R_USED_IRELATIVE32
-		case R_USED_IRELATIVE32:
-#undef R_USED_IRELATIVE32
-#ifdef APPLY_RELA
-			*(u32 *)reladdr = (*(Elf32_Addr(*)(void))((uintptr_t)loadaddr + REL_ADDEND))();
-#else /* APPLY_RELA */
-			*(u32 *)reladdr = (*(Elf32_Addr(*)(void))((uintptr_t)*(u32 *)reladdr + (uintptr_t)loadaddr))();
-#endif /* !APPLY_RELA */
+#ifdef ELF_ARCH_CASE_R_IRELATIVE32
+		ELF_ARCH_CASE_R_IRELATIVE32:
+			*(u32 *)reladdr = IFELSE_RELA((*(Elf32_Addr(*)(void))((uintptr_t)*(u32 *)reladdr + (uintptr_t)loadaddr))(),
+			                              (*(Elf32_Addr(*)(void))((uintptr_t)loadaddr + REL_ADDEND))());
 			break;
-#endif /* R_USED_RELATIVE32 */
+#endif /* ELF_ARCH_CASE_R_IRELATIVE32 */
 
 
-#ifdef R_USED_IRELATIVE64
-		case R_USED_IRELATIVE64:
-#undef R_USED_IRELATIVE64
-#ifdef APPLY_RELA
-			*(u64 *)reladdr = (*(Elf64_Addr(*)(void))((uintptr_t)loadaddr + REL_ADDEND))();
-#else /* APPLY_RELA */
-			*(u64 *)reladdr = (*(Elf64_Addr(*)(void))((uintptr_t)*(u64 *)reladdr + (uintptr_t)loadaddr))();
-#endif /* !APPLY_RELA */
+#ifdef ELF_ARCH_CASE_R_IRELATIVE64
+		ELF_ARCH_CASE_R_IRELATIVE64:
+			*(u64 *)reladdr = IFELSE_RELA((*(Elf64_Addr(*)(void))((uintptr_t)*(u64 *)reladdr + (uintptr_t)loadaddr))(),
+			                              (*(Elf64_Addr(*)(void))((uintptr_t)loadaddr + REL_ADDEND))());
 			break;
-#endif /* R_USED_RELATIVE64 */
+#endif /* ELF_ARCH_CASE_R_IRELATIVE64 */
 
 
-#ifdef R_USED_SIZE32
-		case R_USED_SIZE32:
-#undef R_USED_SIZE32
-		{
+#ifdef ELF_ARCH_CASE_R_SIZE32
+		ELF_ARCH_CASE_R_SIZE32: {
 			size_t symbol_size;
 			if unlikely(!DlModule_FindSymbol(self, ELFW(R_SYM)(rel.r_info),
-			                                 &symbol_size, NULL, NULL))
+			                                 &value, &symbol_size, NULL))
 				goto err;
 			*(u32 *)reladdr SET_OR_INPLACE_ADD (u32)(symbol_size + REL_ADDEND);
 		}	break;
-#endif /* R_USED_SIZE32 */
+#endif /* ELF_ARCH_CASE_R_SIZE32 */
 
 
-#ifdef R_USED_SIZE64
-		case R_USED_SIZE64:
-#undef R_USED_SIZE64
-		{
+#ifdef ELF_ARCH_CASE_R_SIZE64
+		ELF_ARCH_CASE_R_SIZE64: {
 			size_t symbol_size;
 			if unlikely(!DlModule_FindSymbol(self, ELFW(R_SYM)(rel.r_info),
-			                                 &symbol_size, NULL, NULL))
+			                                 &value, &symbol_size, NULL))
 				goto err;
 			*(u64 *)reladdr SET_OR_INPLACE_ADD (u64)(symbol_size + REL_ADDEND);
 		}	break;
-#endif /* R_USED_SIZE64 */
+#endif /* ELF_ARCH_CASE_R_SIZE64 */
 
 
-#ifdef R_USED_NONE
-		case R_USED_NONE:
-#undef R_USED_NONE
-			break;
-#endif /* R_USED_COPY */
-
-
-#ifdef R_USED_COPY
-		case R_USED_COPY:
-#undef R_USED_COPY
-		{
+#ifdef ELF_ARCH_CASE_R_COPY
+		ELF_ARCH_CASE_R_COPY: {
 			ElfW(Sym) *dst_sym;
-			ElfW(Word) src_size;
+			size_t src_size;
 			DlModule *src_module;
 			dst_sym = self->dm_dynsym_tab + ELFW(R_SYM)(rel.r_info);
 			if unlikely(!DlModule_FindSymbol(self,
@@ -203,7 +143,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 				if (src_size == 0 && src_module == &ld_rtld_module)
 					src_size = dst_sym->st_size;
 				else {
-					syslog(LOG_WARN, "%q: Symbol %q imported with %Iu bytes, but exported with %Iu from %q\n",
+					syslog(LOG_WARN, "[rtld] %q: Symbol %q imported with %Iu bytes, but exported with %Iu from %q\n",
 					       self->dm_filename, self->dm_dynstr + dst_sym->st_name,
 					       dst_sym->st_info, src_size, src_module->dm_filename);
 					/* NOTE: When `src_size' is ZERO(0), then always copy the size information
@@ -217,89 +157,99 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			       (void *)value,
 			       src_size);
 		}	break;
-#endif /* R_USED_COPY */
+#endif /* ELF_ARCH_CASE_R_COPY */
 
 
-#ifdef R_USED_8
-		case R_USED_8:
-#undef R_USED_8
+#if defined(ELF_ARCH_CASE_R_8) || defined(ELF_ARCH_CASE_R_8S)
+#ifdef ELF_ARCH_CASE_R_8
+		ELF_ARCH_CASE_R_8:
+#endif /* ELF_ARCH_CASE_R_8 */
+#ifdef ELF_ARCH_CASE_R_8S
+		ELF_ARCH_CASE_R_8S:
+#endif /* ELF_ARCH_CASE_R_8S */
 			LOOKUP_SYMBOL();
 			*(u8 *)reladdr SET_OR_INPLACE_ADD (u8)(value + REL_ADDEND);
 			break;
-#endif /* R_USED_8 */
+#endif /* ELF_ARCH_CASE_R_8 || ELF_ARCH_CASE_R_8S */
 
 
-#ifdef R_USED_PC8
-		case R_USED_PC8:
-#undef R_USED_PC8
+#ifdef ELF_ARCH_CASE_R_PC8
+		ELF_ARCH_CASE_R_PC8:
 			LOOKUP_SYMBOL();
 			*(u8 *)reladdr SET_OR_INPLACE_ADD (u8)((value + REL_ADDEND) - (uintptr_t)reladdr);
 			break;
-#endif /* R_USED_PC8 */
+#endif /* ELF_ARCH_CASE_R_PC8 */
 
 
-#ifdef R_USED_16
-		case R_USED_16:
-#undef R_USED_16
+#if defined(ELF_ARCH_CASE_R_16) || defined(ELF_ARCH_CASE_R_16S)
+#ifdef ELF_ARCH_CASE_R_16
+		ELF_ARCH_CASE_R_16:
+#endif /* ELF_ARCH_CASE_R_16 */
+#ifdef ELF_ARCH_CASE_R_16S
+		ELF_ARCH_CASE_R_16S:
+#endif /* ELF_ARCH_CASE_R_16S */
 			LOOKUP_SYMBOL();
 			*(u16 *)reladdr SET_OR_INPLACE_ADD (u16)(value + REL_ADDEND);
 			break;
-#endif /* R_USED_16 */
+#endif /* ELF_ARCH_CASE_R_16 || ELF_ARCH_CASE_R_16S */
 
 
-#ifdef R_USED_PC16
-		case R_USED_PC16:
-#undef R_USED_PC16
+#ifdef ELF_ARCH_CASE_R_PC16
+		ELF_ARCH_CASE_R_PC16:
 			LOOKUP_SYMBOL();
 			*(u16 *)reladdr SET_OR_INPLACE_ADD (u16)((value + REL_ADDEND) - (uintptr_t)reladdr);
 			break;
-#endif /* R_USED_PC16 */
+#endif /* ELF_ARCH_CASE_R_PC16 */
 
 
-#if defined(R_USED_32) || defined(R_USED_32_ALT)
-#ifdef R_USED_32
-		case R_USED_32:
-#undef R_USED_32
-#endif /* R_USED_32 */
-#ifdef R_USED_32_ALT
-		case R_USED_32_ALT:
-#undef R_USED_32_ALT
-#endif /* R_USED_32_ALT */
+#if defined(ELF_ARCH_CASE_R_32) || defined(ELF_ARCH_CASE_R_32S) || \
+    defined(ELF_ARCH_CASE_R_DTPOFF32)
+#ifdef ELF_ARCH_CASE_R_32
+		ELF_ARCH_CASE_R_32:
+#endif /* ELF_ARCH_CASE_R_32 */
+#ifdef ELF_ARCH_CASE_R_32S
+		ELF_ARCH_CASE_R_32S:
+#endif /* ELF_ARCH_CASE_R_32S */
+#ifdef ELF_ARCH_CASE_R_DTPOFF32
+		ELF_ARCH_CASE_R_DTPOFF32:
+#endif /* ELF_ARCH_CASE_R_DTPOFF32 */
 			LOOKUP_SYMBOL();
 			*(u32 *)reladdr SET_OR_INPLACE_ADD (u32)(value + REL_ADDEND);
 			break;
-#endif /* R_USED_32 || R_USED_32_ALT */
+#endif /* ELF_ARCH_CASE_R_32 || ELF_ARCH_CASE_R_32S || ELF_ARCH_CASE_R_DTPOFF32 */
 
 
-#ifdef R_USED_PC32
-		case R_USED_PC32:
-#undef R_USED_PC32
+#ifdef ELF_ARCH_CASE_R_PC32
+		ELF_ARCH_CASE_R_PC32:
 			LOOKUP_SYMBOL();
 			*(u32 *)reladdr SET_OR_INPLACE_ADD (u32)((value + REL_ADDEND) - (uintptr_t)reladdr);
 			break;
-#endif /* R_USED_PC32 */
+#endif /* ELF_ARCH_CASE_R_PC32 */
 
 
-#ifdef R_USED_64
-		case R_USED_64:
-#undef R_USED_64
+#if defined(ELF_ARCH_CASE_R_64) || defined(ELF_ARCH_CASE_R_DTPOFF64)
+#ifdef ELF_ARCH_CASE_R_64
+		ELF_ARCH_CASE_R_64:
+#endif /* ELF_ARCH_CASE_R_64 */
+#ifdef ELF_ARCH_CASE_R_DTPOFF64
+		ELF_ARCH_CASE_R_DTPOFF64:
+#endif /* ELF_ARCH_CASE_R_DTPOFF64 */
 			LOOKUP_SYMBOL();
 			*(u64 *)reladdr SET_OR_INPLACE_ADD (u64)(value + REL_ADDEND);
 			break;
-#endif /* R_USED_64 */
+#endif /* ELF_ARCH_CASE_R_64 || ELF_ARCH_CASE_R_DTPOFF64 */
 
 
-#ifdef R_USED_PC64
-		case R_USED_PC64:
-#undef R_USED_PC64
+#ifdef ELF_ARCH_CASE_R_PC64
+		ELF_ARCH_CASE_R_PC64:
 			LOOKUP_SYMBOL();
 			*(u64 *)reladdr SET_OR_INPLACE_ADD (u64)((value + REL_ADDEND) - (uintptr_t)reladdr);
 			break;
-#endif /* R_USED_PC64 */
+#endif /* ELF_ARCH_CASE_R_PC64 */
 
 
-#ifdef R_JMP_SLOT
-		case R_JMP_SLOT:
+#ifdef ELF_ARCH_CASE_R_JMP_SLOT
+		ELF_ARCH_CASE_R_JMP_SLOT:
 			if (!(flags & DL_MODULE_INITIALIZE_FBINDNOW)) {
 				/* Lazy binding. */
 				*(uintptr_t *)reladdr += (uintptr_t)loadaddr;
@@ -308,53 +258,42 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			LOOKUP_SYMBOL();
 			*(uintptr_t *)reladdr = (uintptr_t)(value + REL_ADDEND);
 			break;
-//#undef R_JMP_SLOT /* Don't undef this one! */
-#endif /* R_JMP_SLOT */
+#endif /* ELF_ARCH_CASE_R_JMP_SLOT */
 
-#ifdef R_USED_GLOB_DAT
-		case R_USED_GLOB_DAT:
+
+#ifdef ELF_ARCH_CASE_R_GLOB_DAT
+		ELF_ARCH_CASE_R_GLOB_DAT:
 			LOOKUP_SYMBOL();
 			*(uintptr_t *)reladdr SET_OR_INPLACE_ADD (uintptr_t)(value + REL_ADDEND);
 			break;
-#undef R_USED_GLOB_DAT
-#endif /* R_USED_GLOB_DAT */
+#endif /* ELF_ARCH_CASE_R_GLOB_DAT */
 
 
-
-
-#if defined(__x86_64__)
-
-			/* TODO */
-		case R_X86_64_DTPMOD64:
-			LOOKUP_SYMBOL();
-			break;
-
-		case R_X86_64_DTPOFF64:
-		case R_X86_64_TPOFF64:
-		case R_X86_64_DTPOFF32:
-		case R_X86_64_TPOFF32:
-		case R_X86_64_TLSDESC:
-
-#elif defined(__i386__)
-
-		case R_386_TLS_DTPMOD32:
+#ifdef ELF_ARCH_CASE_R_DTPMOD32
+		ELF_ARCH_CASE_R_DTPMOD32:
 			/* ID of module containing this relocation */
-			*(u32 *)reladdr SET_OR_INPLACE_ADD (u32)(self + REL_ADDEND);
+			*(u32 *)reladdr SET_OR_INPLACE_ADD (u32)((uintptr_t)self + REL_ADDEND);
 			break;
+#endif /* ELF_ARCH_CASE_R_DTPMOD32 */
 
-		case R_386_TLS_DTPOFF32:
-			/* Offset in TLS block */
-			LOOKUP_SYMBOL();
-			*(u32 *)reladdr SET_OR_INPLACE_ADD (u32)(value + REL_ADDEND);
+
+#ifdef ELF_ARCH_CASE_R_DTPMOD64
+		ELF_ARCH_CASE_R_DTPMOD64:
+			/* ID of module containing this relocation */
+			*(u64 *)reladdr SET_OR_INPLACE_ADD (u64)((uintptr_t)self + REL_ADDEND);
 			break;
+#endif /* ELF_ARCH_CASE_R_DTPMOD64 */
 
-		case R_386_TLS_TPOFF32: {
+
+#ifdef ELF_ARCH_CASE_R_NEG_TPOFF32
+#ifndef ELF_ARCH_NAME_R_NEG_TPOFF32
+#define ELF_ARCH_NAME_R_NEG_TPOFF32 "R_" ELF_ARCH_MACHINENAME "_NEG_TPOFF32"
+#endif /* !ELF_ARCH_NAME_R_NEG_TPOFF32 */
+		ELF_ARCH_CASE_R_NEG_TPOFF32: {
 			DlModule *tls_module;
 			/* Negated offset in static TLS block */
 			if unlikely(!DlModule_FindSymbol(self, ELFW(R_SYM)(rel.r_info),
-			                                 &value,
-			                                 NULL,
-			                                 &tls_module))
+			                                 &value, NULL, &tls_module))
 				goto err;
 			/* NOTE: `dm_tlsstoff' is negative, `sym.ds_symval' is positive.
 			 *        This relocation is applied to `movl %gs:symbol, %eax' (386)
@@ -363,25 +302,55 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			if unlikely(tls_module->dm_tlsstoff == 0) {
 				/* Symbol points to a module that isn't apart of the static TLS segment.
 				 * -> This relocation can _only_ be used for static TLS symbols. */
-				elf_setdlerrorf("%q: Cannot apply `R_386_TLS_TPOFF32' to %q stored in the dynamic TLS segment of %q",
+				elf_setdlerrorf("%q: Cannot apply `" ELF_ARCH_NAME_R_NEG_TPOFF32 "' to %q stored in the dynamic TLS segment of %q",
 				                self->dm_filename,
 				                self->dm_dynstr + self->dm_dynsym_tab[ELFW(R_SYM)(rel.r_info)].st_name,
 				                tls_module->dm_filename);
 				goto err;
 			}
-			*(s32 *)reladdr SET_OR_INPLACE_ADD -(tls_module->dm_tlsstoff + (value + REL_ADDEND));
+			*(s32 *)reladdr SET_OR_INPLACE_ADD (s32)-(tls_module->dm_tlsstoff + (value + REL_ADDEND));
 		}	break;
+#endif /* ELF_ARCH_CASE_R_NEG_TPOFF32 */
 
-		case R_386_TLS_TPOFF: {
+#ifdef ELF_ARCH_CASE_R_NEG_TPOFF64
+#ifndef ELF_ARCH_NAME_R_NEG_TPOFF64
+#define ELF_ARCH_NAME_R_NEG_TPOFF64 "R_" ELF_ARCH_MACHINENAME "_NEG_TPOFF64"
+#endif /* !ELF_ARCH_NAME_R_NEG_TPOFF64 */
+		ELF_ARCH_CASE_R_NEG_TPOFF64: {
+			DlModule *tls_module;
+			/* Negated offset in static TLS block */
+			if unlikely(!DlModule_FindSymbol(self, ELFW(R_SYM)(rel.r_info),
+			                                 &value, NULL, &tls_module))
+				goto err;
+			/* NOTE: `dm_tlsstoff' is negative, `sym.ds_symval' is positive.
+			 *        This relocation is applied to `movl %gs:symbol, %eax' (386)
+			 *        or `movq %fs:symbol, %rax' (x86_64), so we need to have
+			 *       `symbol' evaluate to its position within the static TLS segment. */
+			if unlikely(tls_module->dm_tlsstoff == 0) {
+				/* Symbol points to a module that isn't apart of the static TLS segment.
+				 * -> This relocation can _only_ be used for static TLS symbols. */
+				elf_setdlerrorf("%q: Cannot apply `" ELF_ARCH_NAME_R_NEG_TPOFF64 "' to %q stored in the dynamic TLS segment of %q",
+				                self->dm_filename,
+				                self->dm_dynstr + self->dm_dynsym_tab[ELFW(R_SYM)(rel.r_info)].st_name,
+				                tls_module->dm_filename);
+				goto err;
+			}
+			*(s64 *)reladdr SET_OR_INPLACE_ADD (s64)-(tls_module->dm_tlsstoff + (value + REL_ADDEND));
+		}	break;
+#endif /* ELF_ARCH_CASE_R_NEG_TPOFF64 */
+
+#ifdef ELF_ARCH_CASE_R_TPOFF32
+#ifndef ELF_ARCH_NAME_R_TPOFF32
+#define ELF_ARCH_NAME_R_TPOFF32 "R_" ELF_ARCH_MACHINENAME "_TPOFF32"
+#endif /* !ELF_ARCH_NAME_R_TPOFF32 */
+		ELF_ARCH_CASE_R_TPOFF32: {
 			DlModule *tls_module;
 			/* Offset in static TLS block */
 			if unlikely(!DlModule_FindSymbol(self, ELFW(R_SYM)(rel.r_info),
-			                                 &value,
-			                                 NULL,
-			                                 &tls_module))
+			                                 &value, NULL, &tls_module))
 				goto err;
 			if unlikely(tls_module->dm_tlsstoff == 0) {
-				elf_setdlerrorf("%q: Cannot apply `R_386_TLS_TPOFF' to %q stored in the dynamic TLS segment of %q",
+				elf_setdlerrorf("%q: Cannot apply `" ELF_ARCH_NAME_R_TPOFF32 "' to %q stored in the dynamic TLS segment of %q",
 				                self->dm_filename,
 				                self->dm_dynstr + self->dm_dynsym_tab[ELFW(R_SYM)(rel.r_info)].st_name,
 				                tls_module->dm_filename);
@@ -389,9 +358,34 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			}
 			*(s32 *)reladdr SET_OR_INPLACE_ADD (tls_module->dm_tlsstoff + (value + REL_ADDEND));
 		}	break;
+#endif /* ELF_ARCH_CASE_R_TPOFF32 */
+
+#ifdef ELF_ARCH_CASE_R_TPOFF64
+#ifndef ELF_ARCH_NAME_R_TPOFF64
+#define ELF_ARCH_NAME_R_TPOFF64 "R_" ELF_ARCH_MACHINENAME "_TPOFF64"
+#endif /* !ELF_ARCH_NAME_R_TPOFF64 */
+		ELF_ARCH_CASE_R_TPOFF64: {
+			DlModule *tls_module;
+			/* Offset in static TLS block */
+			if unlikely(!DlModule_FindSymbol(self, ELFW(R_SYM)(rel.r_info),
+			                                 &value, NULL, &tls_module))
+				goto err;
+			if unlikely(tls_module->dm_tlsstoff == 0) {
+				elf_setdlerrorf("%q: Cannot apply `" ELF_ARCH_NAME_R_TPOFF64 "' to %q stored in the dynamic TLS segment of %q",
+				                self->dm_filename,
+				                self->dm_dynstr + self->dm_dynsym_tab[ELFW(R_SYM)(rel.r_info)].st_name,
+				                tls_module->dm_filename);
+				goto err;
+			}
+			*(s64 *)reladdr SET_OR_INPLACE_ADD (tls_module->dm_tlsstoff + (value + REL_ADDEND));
+		}	break;
+#endif /* ELF_ARCH_CASE_R_TPOFF64 */
+
+
 
 #if 0
-		case R_386_TLS_DESC: {
+#ifdef ELF_ARCH_CASE_R_TLSDESC
+		ELF_ARCH_CASE_R_TLSDESC: {
 			struct tlsdesc;
 			typedef ptrdiff_t (__attribute__((regparm(1))) *PTLSDESC_ENTRY)(struct tlsdesc * self);
 			struct tlsdesc {
@@ -402,11 +396,9 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			desc = (struct tlsdesc *)reladdr;
 			/* ??? I don't get it... */
 		}	break;
+#endif /* ELF_ARCH_CASE_R_TLSDESC */
 #endif
 
-#else
-#error "Unsupported architecture"
-#endif
 
 		default:
 #ifdef APPLY_RELA
@@ -436,5 +428,6 @@ err:
 
 DECL_END
 
+#undef IFELSE_RELA
 #undef SET_OR_INPLACE_ADD
 #undef APPLY_RELA
