@@ -357,7 +357,11 @@ struct GDBInfo_PrintThreadList_Data {
 INTDEF char *
 NOTHROW(FCALL GDBThread_EncodeThreadID)(char *buf,
                                         struct task *__restrict thread);
+#if __SIZEOF_POINTER__ > 4
+#define GDBTHREAD_ENCODETHREADID_MAXCHARS 37 /* p-123456789abcdef0.-123456789abcdef0\0 */
+#else /* __SIZEOF_POINTER__ > 4 */
 #define GDBTHREAD_ENCODETHREADID_MAXCHARS 21 /* p-12345678.-12345678\0 */
+#endif /* __SIZEOF_POINTER__ <= 4 */
 
 
 PRIVATE ssize_t
@@ -666,20 +670,31 @@ NOTHROW(FCALL GDBInfo_PrintOSThreadList_Callback)(void *closure,
                                                   struct task *__restrict thread) {
 	ssize_t temp, result = 0;
 	pformatprinter printer; void *arg;
-	pid_t pid, tid;
-	pid = task_getrootpid_of_s(thread);
-	tid = task_getroottid_of_s(thread);
+	intptr_t pid, tid;
+	pid = (intptr_t)task_getrootpid_of_s(thread);
+	tid = (intptr_t)task_getroottid_of_s(thread);
 	if unlikely(!pid || !tid) {
 		pid = GDB_KERNEL_PID; /* Kernel thread. */
 		tid = GDB_KERNEL_TID(thread);
 	}
 	printer = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_printer;
 	arg     = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_arg;
-	PRINTF("<item>"
-	       "<column name=\"pid\">%I32x</column>"
-	       "<column name=\"tid\">%I32x</column>"
+	PRINT("<item>"
+	      "<column name=\"pid\">");
+	if (pid < 0) {
+		PRINT("-");
+		pid = -pid;
+	}
+	PRINTF("%Ix</column>"
+	       "<column name=\"tid\">",
+	       (uintptr_t)pid);
+	if (tid < 0) {
+		PRINT("-");
+		tid = -tid;
+	}
+	PRINTF("%Ix</column>"
 	       "<column name=\"program\">",
-	       pid, tid);
+	       (uintptr_t)tid);
 	DO(GDBInfo_PrintThreadExecFile(printer, arg, thread, false));
 	PRINT("</column>"
 	      "<column name=\"command\">");

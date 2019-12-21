@@ -262,28 +262,28 @@ NOTHROW(FCALL GDB_DecodeEscapedBinary)(char *buf, char *endptr) {
 
 
 PRIVATE char *
-NOTHROW(FCALL GDBEncode_IntAsHex)(char *buf, int v) {
+NOTHROW(FCALL GDBEncode_IntptrAsHex)(char *buf, intptr_t v) {
 	if (v < 0) {
 		*buf++ = '-';
 		v = -v;
 	}
-	buf += sprintf(buf, "%x", (unsigned int)v);
+	buf += sprintf(buf, "%Ix", (uintptr_t)v);
 	return buf;
 }
 
-LOCAL pid_t NOTHROW(FCALL GDBThread_GetPID)(struct task *__restrict thread) {
-	pid_t pid, tid;
-	pid = task_getrootpid_of_s(thread);
-	tid = task_getroottid_of_s(thread);
+LOCAL intptr_t NOTHROW(FCALL GDBThread_GetPID)(struct task *__restrict thread) {
+	intptr_t pid, tid;
+	pid = (intptr_t)task_getrootpid_of_s(thread);
+	tid = (intptr_t)task_getroottid_of_s(thread);
 	if unlikely(!pid || !tid)
 		pid = GDB_KERNEL_PID; /* Kernel thread. */
 	return pid;
 }
 
-LOCAL pid_t NOTHROW(FCALL GDBThread_GetTID)(struct task *__restrict thread) {
-	pid_t pid, tid;
-	pid = task_getrootpid_of_s(thread);
-	tid = task_getroottid_of_s(thread);
+LOCAL intptr_t NOTHROW(FCALL GDBThread_GetTID)(struct task *__restrict thread) {
+	intptr_t pid, tid;
+	pid = (intptr_t)task_getrootpid_of_s(thread);
+	tid = (intptr_t)task_getroottid_of_s(thread);
 	if unlikely(!pid || !tid)
 		tid = GDB_KERNEL_TID(thread); /* Kernel thread. */
 	return tid;
@@ -291,9 +291,9 @@ LOCAL pid_t NOTHROW(FCALL GDBThread_GetTID)(struct task *__restrict thread) {
 
 INTERN char *
 NOTHROW(FCALL GDBThread_EncodeThreadID)(char *buf, struct task *__restrict thread) {
-	pid_t pid, tid;
-	pid = task_getrootpid_of_s(thread);
-	tid = task_getroottid_of_s(thread);
+	intptr_t pid, tid;
+	pid = (intptr_t)task_getrootpid_of_s(thread);
+	tid = (intptr_t)task_getroottid_of_s(thread);
 	if unlikely(!pid || !tid) {
 		/* Kernel thread. */
 		pid = GDB_KERNEL_PID;
@@ -301,10 +301,10 @@ NOTHROW(FCALL GDBThread_EncodeThreadID)(char *buf, struct task *__restrict threa
 	}
 	if (GDBServer_Features & GDB_SERVER_FEATURE_MULTIPROCESS) {
 		*buf++ = 'p';
-		buf = GDBEncode_IntAsHex(buf, pid);
+		buf = GDBEncode_IntptrAsHex(buf, pid);
 		*buf++ = '.';
 	}
-	buf = GDBEncode_IntAsHex(buf, tid);
+	buf = GDBEncode_IntptrAsHex(buf, tid);
 	return buf;
 }
 
@@ -318,8 +318,10 @@ NOTHROW(FCALL GDBThreadSel_EncodeThreadID)(char *buf,
 		buf = STPCAT(buf, "-1");
 	} else if (thread->ts_mode == GDBTHREADSEL_MODE_PROCESS) {
 		if (GDBServer_Features & GDB_SERVER_FEATURE_MULTIPROCESS) {
+			intptr_t pid;
 			*buf++ = 'p';
-			buf = GDBEncode_IntAsHex(buf, GDBThread_GetPID(thread->ts_thread));
+			pid = GDBThread_GetPID(thread->ts_thread);
+			buf = GDBEncode_IntptrAsHex(buf, pid);
 			*buf++ = '.';
 		}
 		buf = STPCAT(buf, "-1");
@@ -356,7 +358,7 @@ NOTHROW(FCALL GDBThread_VerifyPointer)(struct task *__restrict thread) {
 }
 
 PRIVATE WUNUSED REF struct task *
-NOTHROW(FCALL GDBThread_DoLookupPID)(upid_t pid) {
+NOTHROW(FCALL GDBThread_DoLookupPID)(intptr_t pid) {
 	if (pid == 0) /* Any thread */
 		return incref(GDB_CurrentThread_general.ts_thread);
 	if (pid == GDB_KERNEL_PID)
@@ -370,7 +372,7 @@ NOTHROW(FCALL GDBThread_DoLookupPID)(upid_t pid) {
 }
 
 PRIVATE WUNUSED REF struct task *
-NOTHROW(FCALL GDBThread_DoLookupTID)(upid_t tid) {
+NOTHROW(FCALL GDBThread_DoLookupTID)(intptr_t tid) {
 	if (tid == 0) /* Any thread */
 		return incref(GDB_CurrentThread_general.ts_thread);
 	if (GDBThread_IsAllStopModeActive)
@@ -389,12 +391,12 @@ NOTHROW(FCALL GDBThread_DecodeThreadID)(char **__restrict preader,
                                         GDBThreadSel *__restrict result) {
 	char *reader = *preader;
 	if ((GDBServer_Features & GDB_SERVER_FEATURE_MULTIPROCESS) && (*reader == 'p')) {
-		pid_t pid, tid = -1;
+		intptr_t pid, tid = -1;
 		++reader;
-		pid = strto32(reader, &reader, 16);
+		pid = strtos(reader, &reader, 16);
 		if (*reader == '.') {
 			++reader;
-			tid = strto32(reader, &reader, 16);
+			tid = strtos(reader, &reader, 16);
 		}
 		if (pid == -1) {
 			result->ts_mode   = GDBTHREADSEL_MODE_ALL;
@@ -427,7 +429,7 @@ NOTHROW(FCALL GDBThread_DecodeThreadID)(char **__restrict preader,
 			} else {
 				/* Specific thread of arbitrary process. */
 				result->ts_mode   = GDBTHREADSEL_MODE_SINGLE;
-				result->ts_thread = GDBThread_DoLookupTID((upid_t)tid);
+				result->ts_thread = GDBThread_DoLookupTID(tid);
 				if (!result->ts_thread && GDB_KERNEL_TID_CHK(tid)) {
 					result->ts_thread = GDB_KERNEL_TID_GET(tid);
 					result->ts_thread = GDBThread_VerifyPointer(result->ts_thread);
@@ -436,15 +438,15 @@ NOTHROW(FCALL GDBThread_DecodeThreadID)(char **__restrict preader,
 		} else {
 			if (tid == -1) {
 				/* All threads of a specific process */
-				result->ts_thread = GDBThread_DoLookupTID((upid_t)pid);
+				result->ts_thread = GDBThread_DoLookupTID(pid);
 				result->ts_mode   = GDBTHREADSEL_MODE_PROCESS;
 			} else if (tid == 0) {
 				/* Any thread of a specific process */
-				result->ts_thread = GDBThread_DoLookupTID((upid_t)pid);
+				result->ts_thread = GDBThread_DoLookupTID(pid);
 				result->ts_mode   = GDBTHREADSEL_MODE_SINGLE;
 			} else {
 				/* Select a specific thread. */
-				result->ts_thread = GDBThread_DoLookupTID((upid_t)tid);
+				result->ts_thread = GDBThread_DoLookupTID(tid);
 				/* Verify the associated PID */
 				if (result->ts_thread &&
 				    unlikely(GDBThread_GetPID(result->ts_thread) != pid)) {
@@ -454,8 +456,8 @@ NOTHROW(FCALL GDBThread_DecodeThreadID)(char **__restrict preader,
 			}
 		}
 	} else {
-		pid_t tid;
-		tid = strto32(reader, &reader, 16);
+		intptr_t tid;
+		tid = strtos(reader, &reader, 16);
 		if (tid == -1) {
 			result->ts_mode   = GDBTHREADSEL_MODE_ALL;
 			result->ts_thread = incref(GDB_CurrentThread_general.ts_thread);
@@ -464,7 +466,7 @@ NOTHROW(FCALL GDBThread_DecodeThreadID)(char **__restrict preader,
 			result->ts_thread = incref(GDB_CurrentThread_general.ts_thread);
 		} else {
 			result->ts_mode   = GDBTHREADSEL_MODE_SINGLE;
-			result->ts_thread = GDBThread_DoLookupTID((upid_t)tid);
+			result->ts_thread = GDBThread_DoLookupTID(tid);
 			if (!result->ts_thread && GDB_KERNEL_TID_CHK(tid)) {
 				result->ts_thread = GDB_KERNEL_TID_GET(tid);
 				result->ts_thread = GDBThread_VerifyPointer(result->ts_thread);
@@ -590,8 +592,10 @@ NOTHROW(FCALL GDB_ConstructStopReply)(char *ptr,
 			w.w_status = (int)(unsigned int)reason->dtr_signo;
 			if (WIFSIGNALED(w)) {
 				if (GDBServer_Features & GDB_SERVER_FEATURE_MULTIPROCESS) {
+					intptr_t pid;
 					ptr += sprintf(ptr, "X%x;process:", WTERMSIG(w));
-					ptr = GDBEncode_IntAsHex(ptr, GDBThread_GetPID((struct task *)reason->dtr_ptrarg));
+					pid = GDBThread_GetPID((struct task *)reason->dtr_ptrarg);
+					ptr = GDBEncode_IntptrAsHex(ptr, pid);
 				} else {
 					*ptr++ = 'X';
 					*ptr++ = GDB_ToHex((WTERMSIG(w) >> 4) & 0xf);
@@ -599,8 +603,10 @@ NOTHROW(FCALL GDB_ConstructStopReply)(char *ptr,
 				}
 			} else {
 				if (GDBServer_Features & GDB_SERVER_FEATURE_MULTIPROCESS) {
+					intptr_t pid;
 					ptr += sprintf(ptr, "W%x;process:", WEXITSTATUS(w));
-					ptr = GDBEncode_IntAsHex(ptr, GDBThread_GetPID((struct task *)reason->dtr_ptrarg));
+					pid = GDBThread_GetPID((struct task *)reason->dtr_ptrarg);
+					ptr = GDBEncode_IntptrAsHex(ptr, pid);
 				} else {
 					*ptr++ = 'W';
 					*ptr++ = GDB_ToHex((WEXITSTATUS(w) >> 4) & 0xf);
@@ -702,7 +708,7 @@ do_fork_event:
 				ptr = STPCAT(ptr, "syscall_return:");
 			}
 			*ptr++ = ':';
-			ptr = GDBEncode_IntAsHex(ptr, (int)(unsigned int)reason->dtr_intarg);
+			ptr = GDBEncode_IntptrAsHex(ptr, (intptr_t)reason->dtr_intarg);
 			*ptr++ = ';';
 		}	break;
 
@@ -943,7 +949,7 @@ resume_nostep:
 		break;
 
 	case 'D': {
-		pid_t pid;
+		intptr_t pid;
 		GDBServer_DidDetachFromEverything = old_GDBServer_DidDetachFromEverything;
 		if (i == endptr) {
 			/* Gracefully detach */
@@ -955,7 +961,7 @@ send_ok_and_detach:
 		}
 		if (*i++ != ';')
 			ERROR(err_syntax);
-		pid = strto32(i, &i, 16); /* PID */
+		pid = strtos(i, &i, 16); /* PID */
 		if (i != endptr)
 			ERROR(err_syntax);
 		if (pid == -1)
@@ -981,6 +987,7 @@ send_ok_and_detach:
 
 	case 'g': {
 		struct gdb_cpustate st;
+		memset(&st, 0xcc, sizeof(st));
 		if (!GDB_GetRegisters(GDB_CurrentThread_general.ts_thread, &st))
 			ERROR(err_ESRCH);
 		o = GDB_EncodeHex(o, &st, sizeof(st));
@@ -1407,8 +1414,8 @@ done_vCont:
 			GDBThread_StopAllCpus();
 			goto send_ok;
 		} else if (ISNAME("Kill") && *nameEnd == ';') {
-			upid_t pid;
-			pid = (upid_t)strto32(nameEnd + 1, &nameEnd, 16);
+			intptr_t pid;
+			pid = strtos(nameEnd + 1, &nameEnd, 16);
 			if (nameEnd != endptr)
 				ERROR(err_syntax);
 			/* "vKill;1" and "vKill;7fffffff" both need to kill the kernel.
@@ -1549,9 +1556,9 @@ send_empty:
 			dst.ol_buf = o + 1;
 			/* Handle reading from different objects. */
 			if (ISNAME("exec-file") && isReadOperation) {
-				pid_t pid;
+				intptr_t pid;
 				REF struct task *proc;
-				pid = strto32(annex, &annex, 16);
+				pid = strtos(annex, &annex, 16);
 				if unlikely(*annex != 0)
 					ERROR(err_qXfer_syntax);
 				proc = GDBThread_DoLookupPID(pid);
@@ -1609,10 +1616,10 @@ send_empty:
 		} else if (ISNAME("Attached")) {
 			i = nameEnd;
 			if (*i == ':') {
-				pid_t pid;
+				intptr_t pid;
 				REF struct task *thread;
 				++i;
-				pid = strto32(i, &i, 16);
+				pid = strtos(i, &i, 16);
 				if (i != endptr)
 					ERROR(err_syntax);
 				/* Verify that the thread exists. */

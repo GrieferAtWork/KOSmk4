@@ -25,16 +25,13 @@
 #include <bits/types.h>
 #include <kos/anno.h>
 #include <kos/kernel/cpu-state64.h>
+#include <kos/kernel/cpu-state-helpers64.h>
 #include <kos/kernel/paging.h>
 
 #if !defined(__INTELLISENSE__) || 1
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <kos/kernel/gdt.h>
-
-#ifdef __KERNEL__
-#include <sched/arch/task.h>
-#endif /* __KERNEL__ */
 #endif /* !__INTELLISENSE__ */
 
 __SYSDECL_BEGIN
@@ -45,65 +42,65 @@ __SYSDECL_BEGIN
 #endif /* __x86_64__ */
 #define GDB_REGISTER_X86_64_MAXSIZE 16 /* Max register size (including extended registers). */
 
-#define GDB_REGISTER_X86_64_RAX    0x00 /* [C] Accumulator register */
-#define GDB_REGISTER_X86_64_RCX    0x01 /* [C] Count register */
-#define GDB_REGISTER_X86_64_RDX    0x02 /* [C] Data register */
-#define GDB_REGISTER_X86_64_RBX    0x03 /* [P] Base register */
-#define GDB_REGISTER_X86_64_RSP    0x04 /* [P] Stack pointer */
-#define GDB_REGISTER_X86_64_RBP    0x05 /* [P] Frame base pointer */
-#define GDB_REGISTER_X86_64_RSI    0x06 /* [C] Source pointer */
-#define GDB_REGISTER_X86_64_RDI    0x07 /* [C] Destination pointer */
-#define GDB_REGISTER_X86_64_R8     0x08 /* %r8 */
-#define GDB_REGISTER_X86_64_R9     0x09 /* %r9 */
-#define GDB_REGISTER_X86_64_R10    0x0a /* %r10 */
-#define GDB_REGISTER_X86_64_R11    0x0b /* %r11 */
-#define GDB_REGISTER_X86_64_R12    0x0c /* %r12 */
-#define GDB_REGISTER_X86_64_R13    0x0d /* %r13 */
-#define GDB_REGISTER_X86_64_R14    0x0e /* %r14 */
-#define GDB_REGISTER_X86_64_R15    0x0f /* %r15 */
-#define GDB_REGISTER_X86_64_RIP    0x10 /* Instruction pointer */
-#define GDB_REGISTER_X86_64_RFLAGS 0x11 /* Flags register */
-#define GDB_REGISTER_X86_64_CS     0x12 /* Code segment */
-#define GDB_REGISTER_X86_64_SS     0x13 /* Stack segment */
-#define GDB_REGISTER_X86_64_DS     0x14 /* D (destination) segment register */
-#define GDB_REGISTER_X86_64_ES     0x15 /* E (source) segment register */
-#define GDB_REGISTER_X86_64_FS     0x16 /* F segment register */
-#define GDB_REGISTER_X86_64_GS     0x17 /* G segment register */
-#define GDB_REGISTER_X86_64_ST0    0x18 /* %st(0) */
-#define GDB_REGISTER_X86_64_ST1    0x19 /* %st(1) */
-#define GDB_REGISTER_X86_64_ST2    0x1a /* %st(2) */
-#define GDB_REGISTER_X86_64_ST3    0x1b /* %st(3) */
-#define GDB_REGISTER_X86_64_ST4    0x1c /* %st(4) */
-#define GDB_REGISTER_X86_64_ST5    0x1d /* %st(5) */
-#define GDB_REGISTER_X86_64_ST6    0x1e /* %st(6) */
-#define GDB_REGISTER_X86_64_ST7    0x1f /* %st(7) */
-#define GDB_REGISTER_X86_64_FCW    0x20 /* fs_fcw (fctrl) */
-#define GDB_REGISTER_X86_64_FSW    0x21 /* fs_fsw (fstat) */
-#define GDB_REGISTER_X86_64_FTW    0x22 /* fs_ftw (ftag) */
-#define GDB_REGISTER_X86_64_FPUCS  0x23 /* fs_fcs (fiseg) */
-#define GDB_REGISTER_X86_64_FPUIP  0x24 /* fs_fip (fioff) */
-#define GDB_REGISTER_X86_64_FPUDS  0x25 /* fs_fds (foseg) */
-#define GDB_REGISTER_X86_64_FPUDP  0x26 /* fs_fdp (fooff) */
-#define GDB_REGISTER_X86_64_FOP    0x27 /* fs_fop (fop) */
-#define GDB_REGISTER_X86_64_XMM0   0x28 /* %xmm0 */
-#define GDB_REGISTER_X86_64_XMM1   0x29 /* %xmm1 */
-#define GDB_REGISTER_X86_64_XMM2   0x2a /* %xmm2 */
-#define GDB_REGISTER_X86_64_XMM3   0x2b /* %xmm3 */
-#define GDB_REGISTER_X86_64_XMM4   0x2c /* %xmm4 */
-#define GDB_REGISTER_X86_64_XMM5   0x2d /* %xmm5 */
-#define GDB_REGISTER_X86_64_XMM6   0x2e /* %xmm6 */
-#define GDB_REGISTER_X86_64_XMM7   0x2f /* %xmm7 */
-#define GDB_REGISTER_X86_64_XMM8   0x30 /* %xmm8 */
-#define GDB_REGISTER_X86_64_XMM9   0x31 /* %xmm9 */
-#define GDB_REGISTER_X86_64_XMM10  0x32 /* %xmm10 */
-#define GDB_REGISTER_X86_64_XMM11  0x33 /* %xmm11 */
-#define GDB_REGISTER_X86_64_XMM12  0x34 /* %xmm12 */
-#define GDB_REGISTER_X86_64_XMM13  0x35 /* %xmm13 */
-#define GDB_REGISTER_X86_64_XMM14  0x36 /* %xmm14 */
-#define GDB_REGISTER_X86_64_XMM15  0x37 /* %xmm15 */
-#define GDB_REGISTER_X86_64_MXCSR  0x38 /* %mxcsr */
-#define GDB_REGISTER_X86_64_FSBASE 0x40 /* %fs.base */
-#define GDB_REGISTER_X86_64_GSBASE 0x41 /* %gs.base */
+#define GDB_REGISTER_X86_64_RAX    0x00 /* 64-bit [C] Accumulator register */
+#define GDB_REGISTER_X86_64_RCX    0x01 /* 64-bit [C] Count register */
+#define GDB_REGISTER_X86_64_RDX    0x02 /* 64-bit [C] Data register */
+#define GDB_REGISTER_X86_64_RBX    0x03 /* 64-bit [P] Base register */
+#define GDB_REGISTER_X86_64_RSP    0x04 /* 64-bit [P] Stack pointer */
+#define GDB_REGISTER_X86_64_RBP    0x05 /* 64-bit [P] Frame base pointer */
+#define GDB_REGISTER_X86_64_RSI    0x06 /* 64-bit [C] Source pointer */
+#define GDB_REGISTER_X86_64_RDI    0x07 /* 64-bit [C] Destination pointer */
+#define GDB_REGISTER_X86_64_R8     0x08 /* 64-bit %r8 */
+#define GDB_REGISTER_X86_64_R9     0x09 /* 64-bit %r9 */
+#define GDB_REGISTER_X86_64_R10    0x0a /* 64-bit %r10 */
+#define GDB_REGISTER_X86_64_R11    0x0b /* 64-bit %r11 */
+#define GDB_REGISTER_X86_64_R12    0x0c /* 64-bit %r12 */
+#define GDB_REGISTER_X86_64_R13    0x0d /* 64-bit %r13 */
+#define GDB_REGISTER_X86_64_R14    0x0e /* 64-bit %r14 */
+#define GDB_REGISTER_X86_64_R15    0x0f /* 64-bit %r15 */
+#define GDB_REGISTER_X86_64_RIP    0x10 /* 64-bit Instruction pointer */
+#define GDB_REGISTER_X86_64_RFLAGS 0x11 /* 32-bit Flags register */
+#define GDB_REGISTER_X86_64_CS     0x12 /* 32-bit Code segment */
+#define GDB_REGISTER_X86_64_SS     0x13 /* 32-bit Stack segment */
+#define GDB_REGISTER_X86_64_DS     0x14 /* 32-bit D (destination) segment register */
+#define GDB_REGISTER_X86_64_ES     0x15 /* 32-bit E (source) segment register */
+#define GDB_REGISTER_X86_64_FS     0x16 /* 32-bit F segment register */
+#define GDB_REGISTER_X86_64_GS     0x17 /* 32-bit G segment register */
+#define GDB_REGISTER_X86_64_ST0    0x18 /* 80-bit %st(0) */
+#define GDB_REGISTER_X86_64_ST1    0x19 /* 80-bit %st(1) */
+#define GDB_REGISTER_X86_64_ST2    0x1a /* 80-bit %st(2) */
+#define GDB_REGISTER_X86_64_ST3    0x1b /* 80-bit %st(3) */
+#define GDB_REGISTER_X86_64_ST4    0x1c /* 80-bit %st(4) */
+#define GDB_REGISTER_X86_64_ST5    0x1d /* 80-bit %st(5) */
+#define GDB_REGISTER_X86_64_ST6    0x1e /* 80-bit %st(6) */
+#define GDB_REGISTER_X86_64_ST7    0x1f /* 80-bit %st(7) */
+#define GDB_REGISTER_X86_64_FCW    0x20 /* 32-bit fs_fcw (fctrl) */
+#define GDB_REGISTER_X86_64_FSW    0x21 /* 32-bit fs_fsw (fstat) */
+#define GDB_REGISTER_X86_64_FTW    0x22 /* 32-bit fs_ftw (ftag) */
+#define GDB_REGISTER_X86_64_FPUCS  0x23 /* 32-bit fs_fcs (fiseg) */
+#define GDB_REGISTER_X86_64_FPUIP  0x24 /* 32-bit fs_fip (fioff) */
+#define GDB_REGISTER_X86_64_FPUDS  0x25 /* 32-bit fs_fds (foseg) */
+#define GDB_REGISTER_X86_64_FPUDP  0x26 /* 32-bit fs_fdp (fooff) */
+#define GDB_REGISTER_X86_64_FOP    0x27 /* 32-bit fs_fop (fop) */
+#define GDB_REGISTER_X86_64_XMM0   0x28 /* 128-bit %xmm0 */
+#define GDB_REGISTER_X86_64_XMM1   0x29 /* 128-bit %xmm1 */
+#define GDB_REGISTER_X86_64_XMM2   0x2a /* 128-bit %xmm2 */
+#define GDB_REGISTER_X86_64_XMM3   0x2b /* 128-bit %xmm3 */
+#define GDB_REGISTER_X86_64_XMM4   0x2c /* 128-bit %xmm4 */
+#define GDB_REGISTER_X86_64_XMM5   0x2d /* 128-bit %xmm5 */
+#define GDB_REGISTER_X86_64_XMM6   0x2e /* 128-bit %xmm6 */
+#define GDB_REGISTER_X86_64_XMM7   0x2f /* 128-bit %xmm7 */
+#define GDB_REGISTER_X86_64_XMM8   0x30 /* 128-bit %xmm8 */
+#define GDB_REGISTER_X86_64_XMM9   0x31 /* 128-bit %xmm9 */
+#define GDB_REGISTER_X86_64_XMM10  0x32 /* 128-bit %xmm10 */
+#define GDB_REGISTER_X86_64_XMM11  0x33 /* 128-bit %xmm11 */
+#define GDB_REGISTER_X86_64_XMM12  0x34 /* 128-bit %xmm12 */
+#define GDB_REGISTER_X86_64_XMM13  0x35 /* 128-bit %xmm13 */
+#define GDB_REGISTER_X86_64_XMM14  0x36 /* 128-bit %xmm14 */
+#define GDB_REGISTER_X86_64_XMM15  0x37 /* 128-bit %xmm15 */
+#define GDB_REGISTER_X86_64_MXCSR  0x38 /* 32-bit %mxcsr */
+#define GDB_REGISTER_X86_64_FSBASE 0x40 /* 64-bit %fs.base */
+#define GDB_REGISTER_X86_64_GSBASE 0x41 /* 64-bit %gs.base */
 
 
 #ifdef __CC__
@@ -126,7 +123,7 @@ __SYSDECL_BEGIN
 #define gdb_cpustate_to_fcpustate   gdb_cpustate64_to_fcpustate64
 #endif /* !__x86_64__ */
 
-struct gdb_cpustate64 {
+struct __ATTR_PACKED gdb_cpustate64 {
 	/* The basic register state that is used by the `g' / `G' commands. */
 	__u64 gcs_rax;    /* [C] Accumulator register */
 	__u64 gcs_rcx;    /* [C] Count register */
@@ -145,13 +142,13 @@ struct gdb_cpustate64 {
 	__u64 gcs_r14;    /* %r14 */
 	__u64 gcs_r15;    /* %r15 */
 	__u64 gcs_rip;    /* Instruction pointer */
-	__u64 gcs_rflags; /* Flags register */
-	__u64 gcs_cs;     /* Code segment (zero-extended) */
-	__u64 gcs_ss;     /* Stack segment (zero-extended) */
-	__u64 gcs_ds;     /* D (destination) segment register (zero-extended) */
-	__u64 gcs_es;     /* E (source) segment register (zero-extended) */
-	__u64 gcs_fs;     /* F segment register (zero-extended) */
-	__u64 gcs_gs;     /* G segment register (zero-extended) */
+	__u32 gcs_eflags; /* Flags register */
+	__u32 gcs_cs;     /* Code segment (zero-extended) */
+	__u32 gcs_ss;     /* Stack segment (zero-extended) */
+	__u32 gcs_ds;     /* D (destination) segment register (zero-extended) */
+	__u32 gcs_es;     /* E (source) segment register (zero-extended) */
+	__u32 gcs_fs;     /* F segment register (zero-extended) */
+	__u32 gcs_gs;     /* G segment register (zero-extended) */
 };
 
 #define GDB_CPUSTATE64_PC(x) ((x).gcs_rip)
@@ -205,9 +202,9 @@ gdb_cpustate64_from_gpregsnsp64_and_irregs64(struct gdb_cpustate64 *__restrict d
 	dst->gcs_r14    = gpregs->gp_r14;
 	dst->gcs_r15    = gpregs->gp_r15;
 	dst->gcs_rip    = irregs->ir_rip;
-	dst->gcs_rflags = irregs->ir_rflags;
-	dst->gcs_cs     = irregs->ir_cs16;
-	dst->gcs_ss     = irregs->ir_ss16;
+	dst->gcs_eflags = (__u32)irregs->ir_rflags;
+	dst->gcs_cs     = (__u32)irregs->ir_cs16;
+	dst->gcs_ss     = (__u32)irregs->ir_ss16;
 }
 
 
@@ -251,13 +248,13 @@ gdb_cpustate64_from_ucpustate64(struct gdb_cpustate64 *__restrict dst,
 	dst->gcs_r14    = src->ucs_gpregs.gp_r14;
 	dst->gcs_r15    = src->ucs_gpregs.gp_r15;
 	dst->gcs_rip    = src->ucs_rip;
-	dst->gcs_rflags = src->ucs_rflags;
-	dst->gcs_cs     = src->ucs_cs16;
-	dst->gcs_ss     = src->ucs_ss16;
-	dst->gcs_ds     = src->ucs_sgregs.sg_ds16;
-	dst->gcs_es     = src->ucs_sgregs.sg_es16;
-	dst->gcs_fs     = src->ucs_sgregs.sg_fs16;
-	dst->gcs_gs     = src->ucs_sgregs.sg_gs16;
+	dst->gcs_eflags = (__u32)src->ucs_rflags;
+	dst->gcs_cs     = (__u32)src->ucs_cs16;
+	dst->gcs_ss     = (__u32)src->ucs_ss16;
+	dst->gcs_ds     = (__u32)src->ucs_sgregs.sg_ds16;
+	dst->gcs_es     = (__u32)src->ucs_sgregs.sg_es16;
+	dst->gcs_fs     = (__u32)src->ucs_sgregs.sg_fs16;
+	dst->gcs_gs     = (__u32)src->ucs_sgregs.sg_gs16;
 }
 
 __LOCAL void
@@ -280,7 +277,7 @@ gdb_cpustate64_from_kcpustate64(struct gdb_cpustate64 *__restrict dst,
 	dst->gcs_r14    = src->kcs_gpregs.gp_r14;
 	dst->gcs_r15    = src->kcs_gpregs.gp_r15;
 	dst->gcs_rip    = src->kcs_rip;
-	dst->gcs_rflags = src->kcs_rflags;
+	dst->gcs_eflags = (__u32)src->kcs_rflags;
 	if (dst->gcs_rip >= KERNELSPACE_BASE) {
 		dst->gcs_cs = SEGMENT_KERNEL_CODE;
 		dst->gcs_ss = SEGMENT_KERNEL_DATA;
@@ -314,7 +311,7 @@ gdb_cpustate64_from_lcpustate64(struct gdb_cpustate64 *__restrict dst,
 	dst->gcs_r14    = src->lcs_r14;
 	dst->gcs_r15    = src->lcs_r15;
 	dst->gcs_rip    = src->lcs_rip;
-	dst->gcs_rflags = 0;
+	dst->gcs_eflags = 0;
 	if (dst->gcs_rip >= KERNELSPACE_BASE) {
 		dst->gcs_cs = SEGMENT_KERNEL_CODE;
 		dst->gcs_ss = SEGMENT_KERNEL_DATA;
@@ -348,13 +345,13 @@ gdb_cpustate64_from_fcpustate64(struct gdb_cpustate64 *__restrict dst,
 	dst->gcs_r14    = src->fcs_gpregs.gp_r14;
 	dst->gcs_r15    = src->fcs_gpregs.gp_r15;
 	dst->gcs_rip    = src->fcs_rip;
-	dst->gcs_rflags = src->fcs_rflags;
-	dst->gcs_cs     = src->fcs_sgregs.sg_cs16;
-	dst->gcs_ss     = src->fcs_sgregs.sg_ss16;
-	dst->gcs_ds     = src->fcs_sgregs.sg_ds16;
-	dst->gcs_es     = src->fcs_sgregs.sg_es16;
-	dst->gcs_fs     = src->fcs_sgregs.sg_fs16;
-	dst->gcs_gs     = src->fcs_sgregs.sg_gs16;
+	dst->gcs_eflags = (__u32)src->fcs_rflags;
+	dst->gcs_cs     = (__u32)src->fcs_sgregs.sg_cs16;
+	dst->gcs_ss     = (__u32)src->fcs_sgregs.sg_ss16;
+	dst->gcs_ds     = (__u32)src->fcs_sgregs.sg_ds16;
+	dst->gcs_es     = (__u32)src->fcs_sgregs.sg_es16;
+	dst->gcs_fs     = (__u32)src->fcs_sgregs.sg_fs16;
+	dst->gcs_gs     = (__u32)src->fcs_sgregs.sg_gs16;
 }
 
 
@@ -377,17 +374,10 @@ gdb_cpustate64_to_icpustate64(struct icpustate64 *__restrict dst,
 	dst->ics_gpregs.gp_r13    = src->gcs_r13;
 	dst->ics_gpregs.gp_r14    = src->gcs_r14;
 	dst->ics_gpregs.gp_r15    = src->gcs_r15;
-#if defined(__KERNEL__) && defined(__x86_64__)
-	irregs_wrip(&dst->ics_irregs, src->gcs_rip);
-	irregs_wrflags(&dst->ics_irregs, src->gcs_rflags);
-	irregs_wrcs(&dst->ics_irregs, src->gcs_cs);
-	irregs_wrss(&dst->ics_irregs, src->gcs_ss);
-#else /* __KERNEL__ && __x86_64__ */
-	dst->ics_irregs.ir_rip    = src->gcs_rip;
-	dst->ics_irregs.ir_rflags = src->gcs_rflags;
-	dst->ics_irregs.ir_cs     = src->gcs_cs;
-	dst->ics_irregs.ir_ss     = src->gcs_ss;
-#endif /* !__KERNEL__ || !__x86_64__ */
+	icpustate64_setrip(dst, src->gcs_rip);
+	icpustate64_setrflags(dst, src->gcs_eflags);
+	icpustate64_setcs(dst, src->gcs_cs);
+	icpustate64_setss(dst, src->gcs_ss);
 	return dst;
 }
 
@@ -411,7 +401,7 @@ gdb_cpustate64_to_scpustate64(struct scpustate64 *__restrict dst,
 	dst->scs_gpregs.gp_r14    = src->gcs_r14;
 	dst->scs_gpregs.gp_r15    = src->gcs_r15;
 	dst->scs_irregs.ir_rip    = src->gcs_rip;
-	dst->scs_irregs.ir_rflags = src->gcs_rflags;
+	dst->scs_irregs.ir_rflags = src->gcs_eflags;
 	dst->scs_irregs.ir_cs     = src->gcs_cs;
 	dst->scs_irregs.ir_ss     = src->gcs_ss;
 	dst->scs_sgregs.sg_ds     = src->gcs_ds;
@@ -441,7 +431,7 @@ gdb_cpustate64_to_ucpustate64(struct ucpustate64 *__restrict dst,
 	dst->ucs_gpregs.gp_r14 = src->gcs_r14;
 	dst->ucs_gpregs.gp_r15 = src->gcs_r15;
 	dst->ucs_rip           = src->gcs_rip;
-	dst->ucs_rflags        = src->gcs_rflags;
+	dst->ucs_rflags        = src->gcs_eflags;
 	dst->ucs_cs            = src->gcs_cs;
 	dst->ucs_ss            = src->gcs_ss;
 	dst->ucs_sgregs.sg_ds  = src->gcs_ds;
@@ -471,7 +461,7 @@ gdb_cpustate64_to_kcpustate64(struct kcpustate64 *__restrict dst,
 	dst->kcs_gpregs.gp_r14 = src->gcs_r14;
 	dst->kcs_gpregs.gp_r15 = src->gcs_r15;
 	dst->kcs_rip           = src->gcs_rip;
-	dst->kcs_rflags        = src->gcs_rflags;
+	dst->kcs_rflags        = src->gcs_eflags;
 	return dst;
 }
 
@@ -509,7 +499,7 @@ gdb_cpustate64_to_fcpustate64(struct fcpustate64 *__restrict dst,
 	dst->fcs_gpregs.gp_r14 = src->gcs_r14;
 	dst->fcs_gpregs.gp_r15 = src->gcs_r15;
 	dst->fcs_rip           = src->gcs_rip;
-	dst->fcs_rflags        = src->gcs_rflags;
+	dst->fcs_rflags        = src->gcs_eflags;
 	dst->fcs_sgregs.sg_cs  = src->gcs_cs;
 	dst->fcs_sgregs.sg_ss  = src->gcs_ss;
 	dst->fcs_sgregs.sg_ds  = src->gcs_ds;

@@ -23,6 +23,8 @@
 
 #include <kernel/paging.h> /* KERNELSPACE_HIGHMEM */
 
+#include <hybrid/typecore.h>
+
 #include "gdb.h"
 
 #undef HAVE_GDB_DEBUG
@@ -119,21 +121,21 @@ INTDEF u8 const GDB_HexValues[256];
 
 
 /* TID management. */
-#define GDB_KERNEL_PID          ((pid_t)(upid_t)0x7fffffff)
+#if __SIZEOF_POINTER__ > 4
+#define GDB_KERNEL_PID          ((intptr_t)__INT64_C(0x7fffffffffffffff))
+#else /* __SIZEOF_POINTER__ > 4 */
+#define GDB_KERNEL_PID          ((intptr_t)__INT32_C(0x7fffffff))
+#endif /* __SIZEOF_POINTER__ <= 4 */
 #ifdef KERNELSPACE_HIGHMEM
-#if 1
-#define GDB_KERNEL_TID(thread)  ((pid_t)((uintptr_t)(thread) - KERNELSPACE_BASE))
-#define GDB_KERNEL_TID_GET(tid) ((struct task *)((uintptr_t)(tid) + KERNELSPACE_BASE))
-#define GDB_KERNEL_TID_CHK(tid) ADDR_ISKERN((uintptr_t)(tid) + KERNELSPACE_BASE)
-#else
-#define GDB_KERNEL_TID(thread)  ((pid_t)((uintptr_t)(thread)))
-#define GDB_KERNEL_TID_GET(tid) ((struct task *)((uintptr_t)(tid)))
-#define GDB_KERNEL_TID_CHK(tid) ADDR_ISKERN((uintptr_t)(tid))
-#endif
+#define GDB_KERNEL_TID(thread)  ((intptr_t)(thread) - KERNELSPACE_BASE)
+#define GDB_KERNEL_TID_GET(tid) ((struct task *)((intptr_t)(tid) + KERNELSPACE_BASE))
+#define GDB_KERNEL_TID_CHK(tid) ADDR_ISKERN((intptr_t)(tid) + KERNELSPACE_BASE)
+/* 123456789ABCDEF0 */
+/*     56789ABCDEF0 */
 #else /* KERNELSPACE_HIGHMEM */
-#define GDB_KERNEL_TID(thread)  ((pid_t)((uintptr_t)(thread)/* - KERNEL_CEILING*/))
-#define GDB_KERNEL_TID_GET(tid) ((struct task *)((uintptr_t)(tid)/* + KERNEL_CEILING*/))
-#define GDB_KERNEL_TID_CHK(tid) ADDR_ISKERN((uintptr_t)(tid)/* + KERNEL_CEILING*/)
+#define GDB_KERNEL_TID(thread)  ((intptr_t)(thread))
+#define GDB_KERNEL_TID_GET(tid) ((struct task *)(intptr_t)(tid))
+#define GDB_KERNEL_TID_CHK(tid) ADDR_ISKERN(intptr_t)(tid))
 #endif /* !KERNELSPACE_HIGHMEM */
 
 
