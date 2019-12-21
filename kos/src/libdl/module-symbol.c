@@ -46,16 +46,16 @@ elf_symhash(char const *__restrict name) {
 }
 
 /* Same as the functions above, but only return symbols defined within the same module! */
-INTERN Elf_Sym const *CC
+INTERN ElfW(Sym) const *CC
 DlModule_GetLocalSymbol(DlModule *__restrict self,
                         char const *__restrict name,
                         uintptr_t *__restrict phash_elf,
                         uintptr_t *__restrict phash_gnu) {
-	Elf_Sym *result;
-	Elf_HashTable *elf_ht;
+	ElfW(Sym) *result;
+	ElfW(HashTable) *elf_ht;
 	if ((elf_ht = self->dm_hashtab) != NULL) {
-		Elf_Word *ht_chains;
-		Elf_Word max_attempts, chain;
+		ElfW(Word) *ht_chains;
+		ElfW(Word) max_attempts, chain;
 		uintptr_t hash = *phash_elf;
 		if (hash == DLMODULE_GETLOCALSYMBOL_HASH_UNSET)
 			hash = *phash_elf = elf_symhash(name);

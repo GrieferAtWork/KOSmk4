@@ -177,7 +177,7 @@ done_dyntag:
 
 INTERN int CC
 DlModule_MakeTextWritable(DlModule *__restrict self) {
-	Elf_Half i;
+	ElfW(Half) i;
 	errno_t error;
 	for (i = 0; i < self->dm_phnum; ++i) {
 		if (self->dm_phdr[i].p_type != PT_LOAD)
@@ -199,7 +199,7 @@ err_mprotect_failed:
 
 INTERN void CC
 DlModule_MakeTextReadonly(DlModule *__restrict self) {
-	Elf_Half i;
+	ElfW(Half) i;
 	for (i = 0; i < self->dm_phnum; ++i) {
 		if (self->dm_phdr[i].p_type != PT_LOAD)
 			continue;
@@ -216,13 +216,13 @@ DlModule_MakeTextReadonly(DlModule *__restrict self) {
 INTERN int CC
 DlModule_Initialize(DlModule *__restrict self, unsigned int flags) {
 #ifndef ELF_HOST_RELA_UNUSED
-	Elf_Rela *rela_base = NULL;
+	ElfW(Rela) *rela_base = NULL;
 	size_t rela_count   = 0;
 	bool jmp_rels_have_addend = false;
 #endif /* !ELF_HOST_RELA_UNUSED */
-	Elf_Rel *rel_base = NULL;
+	ElfW(Rel) *rel_base = NULL;
 	size_t rel_count  = 0;
-	Elf_Rel *jmp_base = NULL;
+	ElfW(Rel) *jmp_base = NULL;
 	size_t jmp_size  = 0;
 	size_t i;
 	/* Load dependencies of the module. */
@@ -284,7 +284,7 @@ DlModule_Initialize(DlModule *__restrict self, unsigned int flags) {
 	}
 	/* Service relocations of the module. */
 	for (i = 0; i < self->dm_dyncnt; ++i) {
-		Elf_Dyn tag = self->dm_dynhdr[i];
+		ElfW(Dyn) tag = self->dm_dynhdr[i];
 		switch (tag.d_tag) {
 
 		case DT_NULL:
@@ -312,15 +312,15 @@ DlModule_Initialize(DlModule *__restrict self, unsigned int flags) {
 			break;
 
 		case DT_REL:
-			rel_base = (Elf_Rel *)(self->dm_loadaddr + tag.d_un.d_ptr);
+			rel_base = (ElfW(Rel) *)(self->dm_loadaddr + tag.d_un.d_ptr);
 			break;
 
 		case DT_RELSZ:
-			rel_count = tag.d_un.d_val / sizeof(Elf_Rel);
+			rel_count = tag.d_un.d_val / sizeof(ElfW(Rel));
 			break;
 
 		case DT_JMPREL:
-			jmp_base = (Elf_Rel *)(self->dm_loadaddr + tag.d_un.d_ptr);
+			jmp_base = (ElfW(Rel) *)(self->dm_loadaddr + tag.d_un.d_ptr);
 			break;
 
 		case DT_PLTRELSZ:
@@ -328,16 +328,16 @@ DlModule_Initialize(DlModule *__restrict self, unsigned int flags) {
 			break;
 
 		case DT_PLTGOT:
-			self->dm_pltgot = (Elf_Addr *)(self->dm_loadaddr + tag.d_un.d_ptr);
+			self->dm_pltgot = (ElfW(Addr) *)(self->dm_loadaddr + tag.d_un.d_ptr);
 			break;
 
 #ifndef ELF_HOST_RELA_UNUSED
 		case DT_RELA:
-			rela_base = (Elf_Rela *)(self->dm_loadaddr + tag.d_un.d_ptr);
+			rela_base = (ElfW(Rela) *)(self->dm_loadaddr + tag.d_un.d_ptr);
 			break;
 
 		case DT_RELASZ:
-			rela_count = tag.d_un.d_val / sizeof(Elf_Rela);
+			rela_count = tag.d_un.d_val / sizeof(ElfW(Rela));
 			break;
 
 		case DT_PLTREL:
@@ -382,21 +382,21 @@ done_dynamic:
 #ifdef R_JMP_SLOT
 			if (self->dm_pltgot && !(flags & DL_MODULE_INITIALIZE_FBINDNOW)) {
 				/* Lazy binding of jump-relocations! */
-				self->dm_pltgot[1] = (Elf_Addr)self;
-				self->dm_pltgot[2] = (Elf_Addr)&libdl_load_lazy_relocation;
-				self->dm_jmprela   = (Elf_Rela *)jmp_base;
+				self->dm_pltgot[1] = (ElfW(Addr))self;
+				self->dm_pltgot[2] = (ElfW(Addr))&libdl_load_lazy_relocation;
+				self->dm_jmprela   = (ElfW(Rela) *)jmp_base;
 				self->dm_jmpsize   = jmp_size;
 				self->dm_flags    |= RTLD_JMPRELA;
-				if unlikely(DlModule_ApplyRelocationsWithAddend(self, (Elf_Rela *)jmp_base,
-				                                                jmp_size / sizeof(Elf_Rela),
+				if unlikely(DlModule_ApplyRelocationsWithAddend(self, (ElfW(Rela) *)jmp_base,
+				                                                jmp_size / sizeof(ElfW(Rela)),
 				                                                flags))
 					goto err;
 			} else
 #endif /* R_JMP_SLOT */
 			{
 				/* Directly bind jump-relocations. */
-				if unlikely(DlModule_ApplyRelocationsWithAddend(self, (Elf_Rela *)jmp_base,
-				                                                jmp_size / sizeof(Elf_Rela),
+				if unlikely(DlModule_ApplyRelocationsWithAddend(self, (ElfW(Rela) *)jmp_base,
+				                                                jmp_size / sizeof(ElfW(Rela)),
 				                                                flags | DL_MODULE_INITIALIZE_FBINDNOW))
 					goto err;
 			}
@@ -406,12 +406,12 @@ done_dynamic:
 #ifdef R_JMP_SLOT
 			if (self->dm_pltgot && !(flags & DL_MODULE_INITIALIZE_FBINDNOW)) {
 				/* Lazy binding of jump-relocations! */
-				self->dm_pltgot[1] = (Elf_Addr)self;
-				self->dm_pltgot[2] = (Elf_Addr)&libdl_load_lazy_relocation;
+				self->dm_pltgot[1] = (ElfW(Addr))self;
+				self->dm_pltgot[2] = (ElfW(Addr))&libdl_load_lazy_relocation;
 				self->dm_jmprel    = jmp_base;
 				self->dm_jmpsize   = jmp_size;
 				if unlikely(DlModule_ApplyRelocations(self, jmp_base,
-				                                      jmp_size / sizeof(Elf_Rel),
+				                                      jmp_size / sizeof(ElfW(Rel)),
 				                                      flags))
 					goto err;
 			} else
@@ -419,7 +419,7 @@ done_dynamic:
 			{
 				/* Directly bind jump-relocations. */
 				if unlikely(DlModule_ApplyRelocations(self, jmp_base,
-				                                      jmp_size / sizeof(Elf_Rel),
+				                                      jmp_size / sizeof(ElfW(Rel)),
 				                                      flags | DL_MODULE_INITIALIZE_FBINDNOW))
 					goto err;
 			}

@@ -80,9 +80,9 @@ INTERN DlModule ld_rtld_module = {
 	.dm_dynstr        = NULL,
 	.dm_runpath       = NULL,
 	.dm_shoff         = 0,
-	.dm_shstrndx      = (Elf_Half)-1,
-	.dm_shnum         = (Elf_Half)BUILTIN_SECTIONS_COUNT,
-	.dm_shdr          = (Elf_Shdr *)(uintptr_t)-1,
+	.dm_shstrndx      = (ElfW(Half))-1,
+	.dm_shnum         = (ElfW(Half))BUILTIN_SECTIONS_COUNT,
+	.dm_shdr          = (ElfW(Shdr) *)(uintptr_t)-1,
 	.dm_sections_lock = ATOMIC_RWLOCK_INIT,
 	.dm_sections      = (DlSection **)(uintptr_t)-1,
 #ifndef CONFIG_NO_DANGLING_DL_SECTIONS
@@ -91,14 +91,14 @@ INTERN DlModule ld_rtld_module = {
 	.dm_shstrtab = (char *)(uintptr_t)-1,
 	.dm_phnum    = 1,
 	.dm_phdr     = {
-		ELF_PHDR_INIT(/* type:   */ PT_LOAD,
-		              /* offset: */ __ARCH_PAGESIZE,
-		              /* vaddr:  */ 0,
-		              /* paddr:  */ 0,
-		              /* filesz: */ (Elf_Word)0,
-		              /* memsz:  */ (Elf_Word)0,
-		              /* flags:  */ PF_R | PF_X | PF_W,
-		              /* align:  */ __ARCH_PAGESIZE)
+		ELFW(PHDR_INIT)(/* type:   */ PT_LOAD,
+		                /* offset: */ __ARCH_PAGESIZE,
+		                /* vaddr:  */ 0,
+		                /* paddr:  */ 0,
+		                /* filesz: */ (ElfW(Word))0,
+		                /* memsz:  */ (ElfW(Word))0,
+		                /* flags:  */ PF_R | PF_X | PF_W,
+		                /* align:  */ __ARCH_PAGESIZE)
 	}
 };
 
@@ -149,8 +149,8 @@ linker_main(struct elfexec_info *__restrict info,
 	ld_rtld_module.dm_loadstart = info->ei_rtldaddr;
 	ld_rtld_module.dm_loadend   = (uintptr_t)rtld_size;
 	ld_rtld_module.dm_loadend  += info->ei_rtldaddr;
-	ld_rtld_module.dm_phdr[0].p_filesz = (Elf_Word)rtld_size;
-	ld_rtld_module.dm_phdr[0].p_memsz  = (Elf_Word)rtld_size;
+	ld_rtld_module.dm_phdr[0].p_filesz = (ElfW(Word))rtld_size;
+	ld_rtld_module.dm_phdr[0].p_memsz  = (ElfW(Word))rtld_size;
 	ld_rtld_module.dm_modules.ln_pself = &DlModule_AllList;
 	DlModule_AllList                   = &ld_rtld_module;
 

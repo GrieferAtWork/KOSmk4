@@ -37,7 +37,7 @@
 
 DECL_BEGIN
 
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) Elf_Word CC
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) ElfW(Word) CC
 builtin_symbol_size(char const *__restrict name) {
 	if (!strcmp(name, "program_invocation_name"))
 		return sizeof(void *);
@@ -74,8 +74,8 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
                                      char const *__restrict name,
                                      uintptr_t *__restrict phash_elf,
                                      uintptr_t *__restrict phash_gnu,
-                                     Elf_Addr *__restrict presult,
-                                     Elf_Word *psize,
+                                     ElfW(Addr) *__restrict presult,
+                                     ElfW(Word) *psize,
                                      DlModule **pmodule,
                                      struct dl_symbol *__restrict pweak_symbol,
                                      size_t depth) {
@@ -115,7 +115,7 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 			void *addr;
 			addr = dlsym_builtin(name);
 			if (addr) {
-				*presult = (Elf_Addr)addr;
+				*presult = (ElfW(Addr))addr;
 				if unlikely(psize)
 					*psize = builtin_symbol_size(name);
 				if unlikely(pmodule)
@@ -130,7 +130,7 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 		if (symbol.ds_sym &&
 		    symbol.ds_sym->st_shndx != SHN_UNDEF) {
 			/* Found a symbol! */
-			if (ELF_ST_BIND(symbol.ds_sym->st_info) == STB_WEAK) {
+			if (ELFW(ST_BIND)(symbol.ds_sym->st_info) == STB_WEAK) {
 				/* Weak definition (remember if this is the first one) */
 				if (!pweak_symbol->ds_mod) {
 					DlModule_Incref(symbol.ds_mod);
@@ -138,13 +138,13 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 				}
 			} else {
 				/* Found the real, actual symbol! */
-				Elf_Addr result;
+				ElfW(Addr) result;
 				result = symbol.ds_sym->st_value;
 				if (symbol.ds_sym->st_shndx != SHN_ABS)
 					result += symbol.ds_mod->dm_loadaddr;
-				if (ELF_ST_TYPE(symbol.ds_sym->st_info) == STT_GNU_IFUNC) {
+				if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_GNU_IFUNC) {
 					TRY {
-						result = (*(Elf_Addr(*)(void))(void *)result)();
+						result = (*(ElfW(Addr)(*)(void))(void *)result)();
 					} EXCEPT {
 						if (pweak_symbol->ds_mod)
 							DlModule_Decref(pweak_symbol->ds_mod);
@@ -166,18 +166,18 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 
 PRIVATE ATTR_NOINLINE bool CC
 DlModule_FindSymbol(DlModule *__restrict self, uintptr_t symid,
-                    Elf_Addr *__restrict presult,
-                    Elf_Word *psize,
+                    ElfW(Addr) *__restrict presult,
+                    ElfW(Word) *psize,
                     DlModule **pmodule) {
 	struct dl_symbol weak_symbol;
-	Elf_Sym const *symbol;
-	Elf_Addr result;
+	ElfW(Sym) const *symbol;
+	ElfW(Addr) result;
 	char *name;
 	weak_symbol.ds_mod = NULL;
 	symbol             = self->dm_dynsym_tab + symid;
 	if ((symbol->st_shndx != SHN_UNDEF) && (self->dm_flags & RTLD_DEEPBIND)) {
 		/* Symbol has been defined locally. */
-		if (ELF_ST_BIND(symbol->st_info) == STB_WEAK) {
+		if (ELFW(ST_BIND)(symbol->st_info) == STB_WEAK) {
 			weak_symbol.ds_mod = self;
 			weak_symbol.ds_sym = symbol;
 			DlModule_Incref(self);
@@ -187,8 +187,8 @@ got_local_symbol:
 		result = symbol->st_value;
 		if (symbol->st_shndx != SHN_ABS)
 			result += self->dm_loadaddr;
-		if (ELF_ST_TYPE(symbol->st_info) == STT_GNU_IFUNC)
-			result = (*(Elf_Addr(*)(void))(void *)result)();
+		if (ELFW(ST_TYPE)(symbol->st_info) == STT_GNU_IFUNC)
+			result = (*(ElfW(Addr)(*)(void))(void *)result)();
 		if unlikely(psize)
 			*psize = symbol->st_size;
 		if unlikely(pmodule)
@@ -218,7 +218,7 @@ again_search_globals_next:
 again_search_globals_module:
 			assert(iter != self);
 			if (iter == &ld_rtld_module) {
-				result = (Elf_Addr)dlsym_builtin(name);
+				result = (ElfW(Addr))dlsym_builtin(name);
 				if (result) {
 					if (weak_symbol.ds_mod)
 						DlModule_Decref(weak_symbol.ds_mod);
@@ -234,7 +234,7 @@ again_search_globals_module:
 				                                 &hash_elf,
 				                                 &hash_gnu);
 				if (symbol && symbol->st_shndx != SHN_UNDEF) {
-					if (ELF_ST_BIND(symbol->st_info) == STB_WEAK) {
+					if (ELFW(ST_BIND)(symbol->st_info) == STB_WEAK) {
 						if (!weak_symbol.ds_mod) {
 							weak_symbol.ds_mod = iter; /* Inherit reference */
 							weak_symbol.ds_sym = symbol;
@@ -253,9 +253,9 @@ again_search_globals_module:
 						result = symbol->st_value;
 						if (symbol->st_shndx != SHN_ABS)
 							result += iter->dm_loadaddr;
-						if (ELF_ST_TYPE(symbol->st_info) == STT_GNU_IFUNC) {
+						if (ELFW(ST_TYPE)(symbol->st_info) == STT_GNU_IFUNC) {
 							TRY {
-								result = (*(Elf_Addr(*)(void))(void *)result)();
+								result = (*(ElfW(Addr)(*)(void))(void *)result)();
 							} EXCEPT {
 								DlModule_Decref(iter);
 								RETHROW();
@@ -311,9 +311,9 @@ again_search_globals_module:
 			result = weak_symbol.ds_sym->st_value;
 			if (weak_symbol.ds_sym->st_shndx != SHN_ABS)
 				result += weak_symbol.ds_mod->dm_loadaddr;
-			if (ELF_ST_TYPE(weak_symbol.ds_sym->st_info) == STT_GNU_IFUNC) {
+			if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_GNU_IFUNC) {
 				TRY {
-					result = (*(Elf_Addr(*)(void))(void *)result)();
+					result = (*(ElfW(Addr)(*)(void))(void *)result)();
 				} EXCEPT {
 					DlModule_Decref(weak_symbol.ds_mod);
 					RETHROW();
@@ -358,12 +358,12 @@ STATIC_ASSERT(offsetof(Elf32_Rel, r_info) == offsetof(Elf32_Rela, r_info));
 STATIC_ASSERT(offsetof(Elf64_Rel, r_info) == offsetof(Elf64_Rela, r_info));
 
 
-INTERN Elf_Addr ATTR_FASTCALL
+INTERN ElfW(Addr) ATTR_FASTCALL
 libdl_bind_lazy_relocation(DlModule *__restrict self,
                            uintptr_t jmp_rel_offset) {
-	Elf_Rel *rel;
+	ElfW(Rel) *rel;
 	byte_t *reladdr;
-	Elf_Addr result;
+	ElfW(Addr) result;
 #ifdef LAZY_TRACE
 	DlModule *link_module;
 #endif /* LAZY_TRACE */
@@ -372,8 +372,8 @@ libdl_bind_lazy_relocation(DlModule *__restrict self,
 		       jmp_rel_offset, self->dm_jmpsize, self->dm_filename);
 		sys_exit_group(EXIT_FAILURE);
 	}
-	rel = (Elf_Rel *)((uintptr_t)self->dm_jmprel + jmp_rel_offset);
-	if unlikely(ELF_R_TYPE(rel->r_info) != R_JMP_SLOT) {
+	rel = (ElfW(Rel) *)((uintptr_t)self->dm_jmprel + jmp_rel_offset);
+	if unlikely(ELFW(R_TYPE)(rel->r_info) != R_JMP_SLOT) {
 #ifdef ELF_HOST_RELA_UNUSED
 		syslog(LOG_ERROR, "[ld] Invalid jmp-relocation at DT_JMPREL+%Iu "
 		                  "[r_offset=%#Ix,r_info=%#I32x] isn't `" PP_PRIVATE_STR(R_JMP_SLOT) "' in %q\n",
@@ -383,7 +383,7 @@ libdl_bind_lazy_relocation(DlModule *__restrict self,
 		                  "[r_offset=%#Ix,r_info=%#I32x",
 		       jmp_rel_offset, rel->r_offset, rel->r_info);
 		if (self->dm_flags & RTLD_JMPRELA)
-			syslog(LOG_ERROR, ",r_addend=%Id\n", (ssize_t)((Elf_Rela *)rel)->r_addend);
+			syslog(LOG_ERROR, ",r_addend=%Id\n", (ssize_t)((ElfW(Rela) *)rel)->r_addend);
 		syslog(LOG_ERROR, "] isn't `" PP_PRIVATE_STR(R_JMP_SLOT) "' in %q\n", self->dm_filename);
 #endif /* !ELF_HOST_RELA_UNUSED */
 		sys_exit_group(EXIT_FAILURE);
@@ -391,14 +391,14 @@ libdl_bind_lazy_relocation(DlModule *__restrict self,
 	reladdr = (byte_t *)self->dm_loadaddr + rel->r_offset;
 	/* Resolve the symbol now. */
 #ifdef LAZY_TRACE
-	if unlikely(!DlModule_FindSymbol(self, ELF_R_SYM(rel->r_info), &result,
+	if unlikely(!DlModule_FindSymbol(self, ELFW(R_SYM)(rel->r_info), &result,
 	                                 NULL, &link_module))
 #else /* LAZY_TRACE */
-	if unlikely(!DlModule_FindSymbol(self, ELF_R_SYM(rel->r_info), &result,
+	if unlikely(!DlModule_FindSymbol(self, ELFW(R_SYM)(rel->r_info), &result,
 	                                 NULL, NULL))
 #endif /* !LAZY_TRACE */
 	{
-		Elf_Sym *sym = self->dm_dynsym_tab + ELF_R_SYM(rel->r_info);
+		ElfW(Sym) *sym = self->dm_dynsym_tab + ELFW(R_SYM)(rel->r_info);
 		syslog(LOG_ERROR, "[ld] Unable to resolve symbol %q in %q\n",
 		       self->dm_dynstr + sym->st_name,
 		       self->dm_filename);
@@ -407,14 +407,14 @@ libdl_bind_lazy_relocation(DlModule *__restrict self,
 #ifndef ELF_HOST_RELA_UNUSED
 	/* Extend the relocation result with its addend */
 	if (self->dm_flags & RTLD_JMPRELA)
-		result += ((Elf_Rela *)rel)->r_addend;
+		result += ((ElfW(Rela) *)rel)->r_addend;
 #endif /* !ELF_HOST_RELA_UNUSED */
 #ifdef LAZY_TRACE
 	syslog(LOG_DEBUG, "[ld] Lazy resolve %q in %q (to %p from %q)\n",
-	       self->dm_dynstr + self->dm_dynsym_tab[ELF_R_SYM(rel->r_info)].st_name,
+	       self->dm_dynstr + self->dm_dynsym_tab[ELFW(R_SYM)(rel->r_info)].st_name,
 	       self->dm_filename, result, link_module->dm_filename);
 #endif /* LAZY_TRACE */
-	*(Elf_Addr *)reladdr = result;
+	*(ElfW(Addr) *)reladdr = result;
 	return result;
 }
 #endif /* R_JMP_SLOT */

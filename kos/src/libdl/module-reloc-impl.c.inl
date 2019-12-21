@@ -35,32 +35,32 @@ DECL_BEGIN
 #ifdef APPLY_RELA
 INTERN int CC
 DlModule_ApplyRelocationsWithAddend(DlModule *__restrict self,
-                                    Elf_Rela *__restrict vector,
+                                    ElfW(Rela) *__restrict vector,
                                     size_t count,
                                     unsigned int flags)
 #else /* APPLY_RELA */
 INTERN int CC
 DlModule_ApplyRelocations(DlModule *__restrict self,
-                          Elf_Rel *__restrict vector,
+                          ElfW(Rel) *__restrict vector,
                           size_t count,
                           unsigned int flags)
 #endif /* !APPLY_RELA */
 {
 	size_t i;
-	Elf_Addr value;
+	ElfW(Addr) value;
 	byte_t *loadaddr = (byte_t *)self->dm_loadaddr;
 	for (i = 0; i < count; ++i) {
 #ifdef APPLY_RELA
-		Elf_Rela rel = vector[i];
+		ElfW(Rela) rel = vector[i];
 #define REL_ADDEND rel.r_addend
 #else /* APPLY_RELA */
-		Elf_Rel rel = vector[i];
+		ElfW(Rel) rel = vector[i];
 #define REL_ADDEND 0
 #endif /* !APPLY_RELA */
 		byte_t *reladdr = loadaddr + rel.r_offset;
-		switch (ELF_R_TYPE(rel.r_info)) {
+		switch (ELFW(R_TYPE)(rel.r_info)) {
 #define LOOKUP_SYMBOL() \
-		if unlikely(!DlModule_FindSymbol(self, ELF_R_SYM(rel.r_info), &value, NULL, NULL)) \
+		if unlikely(!DlModule_FindSymbol(self, ELFW(R_SYM)(rel.r_info), &value, NULL, NULL)) \
 			goto err
 
 #if defined(__x86_64__)
@@ -153,7 +153,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 #undef R_USED_SIZE32
 		{
 			size_t symbol_size;
-			if unlikely(!DlModule_FindSymbol(self, ELF_R_SYM(rel.r_info),
+			if unlikely(!DlModule_FindSymbol(self, ELFW(R_SYM)(rel.r_info),
 			                                 &symbol_size, NULL, NULL))
 				goto err;
 			*(u32 *)reladdr SET_OR_INPLACE_ADD (u32)(symbol_size + REL_ADDEND);
@@ -166,7 +166,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 #undef R_USED_SIZE64
 		{
 			size_t symbol_size;
-			if unlikely(!DlModule_FindSymbol(self, ELF_R_SYM(rel.r_info),
+			if unlikely(!DlModule_FindSymbol(self, ELFW(R_SYM)(rel.r_info),
 			                                 &symbol_size, NULL, NULL))
 				goto err;
 			*(u64 *)reladdr SET_OR_INPLACE_ADD (u64)(symbol_size + REL_ADDEND);
@@ -185,12 +185,12 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 		case R_USED_COPY:
 #undef R_USED_COPY
 		{
-			Elf_Sym *dst_sym;
-			Elf_Word src_size;
+			ElfW(Sym) *dst_sym;
+			ElfW(Word) src_size;
 			DlModule *src_module;
-			dst_sym = self->dm_dynsym_tab + ELF_R_SYM(rel.r_info);
+			dst_sym = self->dm_dynsym_tab + ELFW(R_SYM)(rel.r_info);
 			if unlikely(!DlModule_FindSymbol(self,
-			                                 ELF_R_SYM(rel.r_info),
+			                                 ELFW(R_SYM)(rel.r_info),
 			                                 &value,
 			                                 &src_size,
 			                                 &src_module))
@@ -348,7 +348,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 		case R_386_TLS_TPOFF32: {
 			DlModule *tls_module;
 			/* Negated offset in static TLS block */
-			if unlikely(!DlModule_FindSymbol(self, ELF_R_SYM(rel.r_info),
+			if unlikely(!DlModule_FindSymbol(self, ELFW(R_SYM)(rel.r_info),
 			                                 &value,
 			                                 NULL,
 			                                 &tls_module))
@@ -362,7 +362,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 				 * -> This relocation can _only_ be used for static TLS symbols. */
 				elf_setdlerrorf("%q: Cannot apply `R_386_TLS_TPOFF32' to %q stored in the dynamic TLS segment of %q",
 				                self->dm_filename,
-				                self->dm_dynstr + self->dm_dynsym_tab[ELF_R_SYM(rel.r_info)].st_name,
+				                self->dm_dynstr + self->dm_dynsym_tab[ELFW(R_SYM)(rel.r_info)].st_name,
 				                tls_module->dm_filename);
 				goto err;
 			}
@@ -372,7 +372,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 		case R_386_TLS_TPOFF: {
 			DlModule *tls_module;
 			/* Offset in static TLS block */
-			if unlikely(!DlModule_FindSymbol(self, ELF_R_SYM(rel.r_info),
+			if unlikely(!DlModule_FindSymbol(self, ELFW(R_SYM)(rel.r_info),
 			                                 &value,
 			                                 NULL,
 			                                 &tls_module))
@@ -380,7 +380,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			if unlikely(tls_module->dm_tlsstoff == 0) {
 				elf_setdlerrorf("%q: Cannot apply `R_386_TLS_TPOFF' to %q stored in the dynamic TLS segment of %q",
 				                self->dm_filename,
-				                self->dm_dynstr + self->dm_dynsym_tab[ELF_R_SYM(rel.r_info)].st_name,
+				                self->dm_dynstr + self->dm_dynsym_tab[ELFW(R_SYM)(rel.r_info)].st_name,
 				                tls_module->dm_filename);
 				goto err;
 			}
@@ -409,8 +409,8 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			syslog(LOG_WARN, "%q: Relocation #%Iu has unknown type type %u (%#x)\n",
 			       self->dm_filename,
 			       (size_t)i,
-			       (unsigned int)ELF_R_TYPE(rel.r_info),
-			       (unsigned int)ELF_R_TYPE(rel.r_info));
+			       (unsigned int)ELFW(R_TYPE)(rel.r_info),
+			       (unsigned int)ELFW(R_TYPE)(rel.r_info));
 			break;
 		}
 #undef REL_ADDEND

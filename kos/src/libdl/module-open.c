@@ -119,7 +119,7 @@ err_buffer:
 }
 
 INTERN NONNULL((2)) ssize_t CC
-preadall(fd_t fd, void *buf, size_t bufsize, Elf_Off offset) {
+preadall(fd_t fd, void *buf, size_t bufsize, ElfW(Off) offset) {
 	ssize_t result, temp;
 	result = sys_pread64(fd, buf, bufsize, offset);
 	if unlikely(E_ISERR(result))
@@ -336,13 +336,13 @@ DlModule_LoadLoadedProgramHeaders(DlModule *__restrict self) {
 
 		case PT_DYNAMIC: {
 			size_t i;
-			self->dm_dynhdr = (Elf_Dyn *)base;
-			self->dm_dyncnt = self->dm_phdr[pidx].p_memsz / sizeof(Elf_Dyn);
+			self->dm_dynhdr = (ElfW(Dyn) *)base;
+			self->dm_dyncnt = self->dm_phdr[pidx].p_memsz / sizeof(ElfW(Dyn));
 			self->dm_depcnt = 0;
 			/* Load dynamic tag meta-data. */
 			for (i = 0; i < self->dm_dyncnt; ++i) {
-				Elf_Dyn tag;
-				tag = ((Elf_Dyn *)base)[i];
+				ElfW(Dyn) tag;
+				tag = ((ElfW(Dyn) *)base)[i];
 
 				switch (tag.d_tag) {
 
@@ -360,7 +360,7 @@ DlModule_LoadLoadedProgramHeaders(DlModule *__restrict self) {
 					break;
 
 				case DT_HASH:
-					self->dm_hashtab = (Elf_HashTable *)(self->dm_loadaddr + tag.d_un.d_ptr);
+					self->dm_hashtab = (ElfW(HashTable) *)(self->dm_loadaddr + tag.d_un.d_ptr);
 					break;
 
 				case DT_STRTAB:
@@ -368,34 +368,34 @@ DlModule_LoadLoadedProgramHeaders(DlModule *__restrict self) {
 					break;
 
 				case DT_SYMTAB:
-					self->dm_dynsym_tab = (Elf_Sym *)(self->dm_loadaddr + tag.d_un.d_ptr);
+					self->dm_dynsym_tab = (ElfW(Sym) *)(self->dm_loadaddr + tag.d_un.d_ptr);
 					break;
 
 				case DT_SYMENT:
-					if (tag.d_un.d_val != sizeof(Elf_Sym)) {
+					if (tag.d_un.d_val != sizeof(ElfW(Sym))) {
 						elf_setdlerrorf("%q: Invalid `DT_SYMENT' %Iu != %Iu",
 						                (size_t)tag.d_un.d_val,
-						                (size_t)sizeof(Elf_Sym));
+						                (size_t)sizeof(ElfW(Sym)));
 						goto err;
 					}
 					break;
 
 #ifdef CONFIG_ELF_USING_RELA
 				case DT_RELAENT:
-					if (tag.d_un.d_val != sizeof(Elf_Rela)) {
+					if (tag.d_un.d_val != sizeof(ElfW(Rela))) {
 						elf_setdlerrorf("%q: Invalid `DT_RELAENT' %Iu != %Iu",
 						                (size_t)tag.d_un.d_val,
-						                (size_t)sizeof(Elf_Rela));
+						                (size_t)sizeof(ElfW(Rela)));
 						goto err;
 					}
 					break;
 #endif /* CONFIG_ELF_USING_RELA */
 
 				case DT_RELENT:
-					if (tag.d_un.d_val != sizeof(Elf_Rel)) {
+					if (tag.d_un.d_val != sizeof(ElfW(Rel))) {
 						elf_setdlerrorf("%q: Invalid `DT_RELENT' %Iu != %Iu",
 						                (size_t)tag.d_un.d_val,
-						                (size_t)sizeof(Elf_Rel));
+						                (size_t)sizeof(ElfW(Rel)));
 						goto err;
 					}
 					break;
@@ -461,16 +461,16 @@ err:
 
 INTERN REF_IF(!(mode & RTLD_NODELETE)) DlModule *CC
 DlModule_OpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filename,
-                                  uint16_t pnum, Elf_Phdr *__restrict phdr,
+                                  uint16_t pnum, ElfW(Phdr) *__restrict phdr,
                                   uintptr_t loadaddr, unsigned int mode) {
 	REF DlModule *result;
 	uint16_t pidx;
 	result = (REF DlModule *)calloc(1,
 	                                offsetof(DlModule, dm_phdr) +
-	                                (pnum * sizeof(Elf_Phdr)));
+	                                (pnum * sizeof(ElfW(Phdr))));
 	if unlikely(!result)
 		goto err_nomem;
-	memcpy(result->dm_phdr, phdr, pnum, sizeof(Elf_Phdr));
+	memcpy(result->dm_phdr, phdr, pnum, sizeof(ElfW(Phdr)));
 	result->dm_loadstart = (uintptr_t)-1;
 	/*result->dm_loadend = 0;*/
 	for (pidx = 0; pidx < pnum; ++pidx) {
@@ -489,8 +489,8 @@ DlModule_OpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict 
 	result->dm_filename = filename; /* Inherit data */
 	result->dm_loadaddr = loadaddr;
 	result->dm_phnum    = pnum;
-	result->dm_shnum    = (Elf_Half)-1; /* Unknown */
-	result->dm_shstrndx = (Elf_Half)-1; /* Unknown */
+	result->dm_shnum    = (ElfW(Half))-1; /* Unknown */
+	result->dm_shstrndx = (ElfW(Half))-1; /* Unknown */
 	result->dm_loadstart += loadaddr;
 	result->dm_loadend += loadaddr;
 	if unlikely(DlModule_LoadLoadedProgramHeaders(result))
@@ -506,7 +506,7 @@ err_r:
 
 
 INTERN int CC
-DlModule_VerifyEhdr(Elf_Ehdr const *__restrict ehdr,
+DlModule_VerifyEhdr(ElfW(Ehdr) const *__restrict ehdr,
                     char const *__restrict filename,
                     bool requires_ET_DYN) {
 	char const *reason;
@@ -536,14 +536,14 @@ DlModule_VerifyEhdr(Elf_Ehdr const *__restrict ehdr,
 	reason = "e_machine != EM_" ELF_ARCH_MACHINENAME;
 	if unlikely(ehdr->e_machine != ELF_ARCH_MACHINE)
 		goto err;
-	reason = "ehdr.e_ehsize < offsetafter(Elf_Ehdr, e_phnum)";
-	if unlikely(ehdr->e_ehsize < offsetafter(Elf_Ehdr, e_phnum))
+	reason = "ehdr.e_ehsize < offsetafter(ElfW(Ehdr), e_phnum)";
+	if unlikely(ehdr->e_ehsize < offsetafter(ElfW(Ehdr), e_phnum))
 		goto err;
 	reason = "ehdr.e_phnum == 0";
 	if unlikely(ehdr->e_phnum == 0)
 		goto err;
-	reason = "ehdr.e_phentsize != sizeof(Elf_Phdr)";
-	if unlikely(ehdr->e_phentsize != sizeof(Elf_Phdr))
+	reason = "ehdr.e_phentsize != sizeof(ElfW(Phdr))";
+	if unlikely(ehdr->e_phentsize != sizeof(ElfW(Phdr)))
 		goto err;
 	return 0;
 err:
@@ -555,7 +555,7 @@ err:
 PRIVATE REF DlModule *CC
 DlModule_MapProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filename,
                            /*inherit(on_success)*/ fd_t fd) {
-	Elf_Ehdr ehdr;
+	ElfW(Ehdr) ehdr;
 	uint16_t pidx;
 	REF DlModule *result;
 	if unlikely(preadall(fd, &ehdr, sizeof(ehdr), 0) <= 0)
@@ -565,10 +565,10 @@ DlModule_MapProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filenam
 
 	result = (REF DlModule *)calloc(1,
 	                                offsetof(DlModule, dm_phdr) +
-	                                (ehdr.e_phnum * sizeof(Elf_Phdr)));
+	                                (ehdr.e_phnum * sizeof(ElfW(Phdr))));
 	if unlikely(!result)
 		goto err_nomem;
-	if (preadall(fd, result->dm_phdr, ehdr.e_phnum * sizeof(Elf_Phdr), ehdr.e_phoff) <= 0)
+	if (preadall(fd, result->dm_phdr, ehdr.e_phnum * sizeof(ElfW(Phdr)), ehdr.e_phoff) <= 0)
 		goto err_r_io;
 	result->dm_filename = filename; /* Inherit data */
 	result->dm_file     = fd;       /* Inherit data */
@@ -576,10 +576,10 @@ DlModule_MapProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filenam
 	result->dm_shnum    = ehdr.e_shnum;
 	result->dm_shoff    = ehdr.e_shoff;
 	result->dm_shstrndx = ehdr.e_shstrndx;
-	if unlikely(ehdr.e_shentsize != sizeof(Elf_Shdr)) {
+	if unlikely(ehdr.e_shentsize != sizeof(ElfW(Shdr))) {
 		result->dm_shoff    = 0;
-		result->dm_shnum    = (Elf_Half)-1;
-		result->dm_shstrndx = (Elf_Half)-1;
+		result->dm_shnum    = (ElfW(Half))-1;
+		result->dm_shstrndx = (ElfW(Half))-1;
 	}
 	result->dm_refcnt    = 1;
 	result->dm_loadstart = (uintptr_t)-1;

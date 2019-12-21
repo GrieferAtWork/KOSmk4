@@ -38,7 +38,7 @@
 
 DECL_BEGIN
 
-INTERN Elf_Shdr empty_shdr[1] = { 0 };
+INTERN ElfW(Shdr) empty_shdr[1] = { 0 };
 
 /* DlModule functions */
 INTERN void CC
@@ -221,10 +221,10 @@ err:
  *  - self->dm_shstrndx
  *  - self->dm_shdr
  * @return: NULL: Error */
-INTERN Elf_Shdr *CC
+INTERN ElfW(Shdr) *CC
 DlModule_GetShdrs(DlModule *__restrict self) {
 	fd_t fd;
-	Elf_Shdr *result;
+	ElfW(Shdr) *result;
 	result = self->dm_shdr;
 	if (result != NULL)
 		return result;
@@ -232,10 +232,10 @@ DlModule_GetShdrs(DlModule *__restrict self) {
 	fd = DlModule_GetFd(self);
 	if unlikely(fd < 0)
 		goto err;
-	if (self->dm_shnum == (Elf_Half)-1 ||
+	if (self->dm_shnum == (ElfW(Half))-1 ||
 	    self->dm_shoff == 0 ||
-	    self->dm_shstrndx == (Elf_Half)-1) {
-		Elf_Ehdr ehdr;
+	    self->dm_shstrndx == (ElfW(Half))-1) {
+		ElfW(Ehdr) ehdr;
 		/* Must initialize information about section headers. */
 		if (preadall(fd, &ehdr, sizeof(ehdr), 0) <= 0)
 			goto err_read_ehdr;
@@ -249,20 +249,20 @@ DlModule_GetShdrs(DlModule *__restrict self) {
 		}
 		ATOMIC_CMPXCH(self->dm_shnum, (uint16_t)-1, ehdr.e_shnum);
 		ATOMIC_CMPXCH(self->dm_shoff, 0, ehdr.e_shoff);
-		ATOMIC_CMPXCH(self->dm_shstrndx, (Elf_Half)-1, ehdr.e_shstrndx);
+		ATOMIC_CMPXCH(self->dm_shstrndx, (ElfW(Half))-1, ehdr.e_shstrndx);
 	}
 	if unlikely(!self->dm_shnum) {
-		ATOMIC_CMPXCH(self->dm_shdr, NULL, (Elf_Shdr *)empty_shdr);
+		ATOMIC_CMPXCH(self->dm_shdr, NULL, (ElfW(Shdr) *)empty_shdr);
 		return empty_shdr;
 	}
 	/* Allocate the section header vector. */
-	result = (Elf_Shdr *)malloc(self->dm_shnum * sizeof(Elf_Shdr));
+	result = (ElfW(Shdr) *)malloc(self->dm_shnum * sizeof(ElfW(Shdr)));
 	if unlikely(!result)
 		goto err_nomem;
-	if (preadall(fd, result, self->dm_shnum * sizeof(Elf_Shdr), self->dm_shoff) <= 0)
+	if (preadall(fd, result, self->dm_shnum * sizeof(ElfW(Shdr)), self->dm_shoff) <= 0)
 		goto err_read_shdr;
 	{
-		Elf_Shdr *new_result;
+		ElfW(Shdr) *new_result;
 		/* Save the newly loaded section header vector. */
 		new_result = ATOMIC_CMPXCH_VAL(self->dm_shdr,
 		                               NULL,
@@ -283,7 +283,7 @@ err_nomem:
 	                self->dm_filename);
 	goto err;
 err_read_ehdr:
-	elf_setdlerrorf("%q: Failed to read Elf_Ehdr of",
+	elf_setdlerrorf("%q: Failed to read ElfW(Ehdr) of",
 	                self->dm_filename);
 err:
 	return NULL;
@@ -294,7 +294,7 @@ err:
 INTERN char *CC
 DlModule_GetShstrtab(DlModule *__restrict self) {
 	char *result;
-	Elf_Shdr *shdrs;
+	ElfW(Shdr) *shdrs;
 	result = self->dm_shstrtab;
 	if (result)
 		return result;
@@ -346,10 +346,10 @@ elf_setdlerror_nosect(DlModule *__restrict self,
 	                self->dm_filename, name);
 }
 
-INTERN Elf_Shdr *CC
+INTERN ElfW(Shdr) *CC
 DlModule_GetSection(DlModule *__restrict self,
                     char const *__restrict name) {
-	Elf_Shdr *result;
+	ElfW(Shdr) *result;
 	uint16_t i;
 	char *strtab = DlModule_GetShstrtab(self);
 	if unlikely(!strtab)

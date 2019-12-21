@@ -34,6 +34,7 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <kos/except.h>
+#include <kos/exec/elf.h>
 #include <kos/kernel/types.h>
 #include <kos/thread.h>
 #include <kos/types.h>
@@ -73,7 +74,7 @@ BUILTIN_GLOBALS_ENUMERATE(DECLARE_INTERN_OVERRIDE)
 /* Define our own private variants of a couple of functions
  * that aren't already automatically substituted in headers. */
 INTDEF NONNULL((2)) ssize_t CC
-preadall(fd_t fd, void *buf, size_t bufsize, Elf_Off offset);
+preadall(fd_t fd, void *buf, size_t bufsize, ElfW(Off) offset);
 
 
 #undef RTLD_LOADING
@@ -90,11 +91,11 @@ typedef struct elf_dlsection DlSection;
 typedef struct elf_dlmodule DlModule;
 
 typedef struct {
-	Elf_Word ht_nbuckts;      /* Total number of buckets. */
-	Elf_Word ht_nchains;      /* Total number of symbols. */
-	Elf_Word ht_table[1024];  /* [ht_nbuckts] Hash table. */
-	//Elf_Word ht_chains[1024]; /* [ht_nchains] Hash chains. */
-} Elf_HashTable;
+	ElfW(Word) ht_nbuckts;      /* Total number of buckets. */
+	ElfW(Word) ht_nchains;      /* Total number of symbols. */
+	ElfW(Word) ht_table[1024];  /* [ht_nbuckts] Hash table. */
+//	ElfW(Word) ht_chains[1024]; /* [ht_nchains] Hash chains. */
+} ElfW(HashTable);
 
 #define ELF_DLSECTION_FLAG_NORMAL 0x0000 /* Normal flags */
 #define ELF_DLSECTION_FLAG_OWNED  0x0001 /* Section data is owned by the section descriptor. */
@@ -144,7 +145,7 @@ INTDEF void CC DlSection_Destroy(DlSection *__restrict self);
 /* The actual data-structure to which a pointer is returned by `dlopen()' */
 struct elf_dlmodule {
 	/* TLS variables (PT_TLS). */
-	Elf_Off                   dm_tlsoff;     /* [valid_if(dm_tlsfsize != 0)] File offset to the TLS template. */
+	ElfW(Off)                 dm_tlsoff;     /* [valid_if(dm_tlsfsize != 0)] File offset to the TLS template. */
 	byte_t const             *dm_tlsinit;    /* [valid_if(dm_tlsfsize != 0)][0..dm_tlsfsize][lock(WRITE_ONCE)] Non-BSS TLS template data. */
 	size_t                    dm_tlsfsize;   /* [<= dm_tlsmsize] In-file size of this module's TLS template image. */
 	size_t                    dm_tlsmsize;   /* [>= dm_tlsfsize] In-member size of this module's TLS template image (or 0 if no TLS is defined). */
@@ -178,13 +179,13 @@ struct elf_dlmodule {
 	uintptr_t                 dm_loadend;    /* [const] Greatest address mapped by this module (already adjusted for `dm_loadaddr'). */
 
 	/* Lazy relocations (JMPREL). */
-	Elf_Addr                 *dm_pltgot;     /* [0..1][const] Pointed location of the module's `DT_PLTGOT' .dynamic entry. */
+	ElfW(Addr)               *dm_pltgot;     /* [0..1][const] Pointed location of the module's `DT_PLTGOT' .dynamic entry. */
 #ifdef ELF_HOST_RELA_UNUSED
-	Elf_Rel                  *dm_jmprel;     /* [0..dm_jmpsize/sizeof(Elf_Rel)][const] Pointed jump-relocations to-be loaded lazily. */
+	ElfW(Rel)                *dm_jmprel;     /* [0..dm_jmpsize/sizeof(ElfW(Rel))][const] Pointed jump-relocations to-be loaded lazily. */
 #else /* ELF_HOST_RELA_UNUSED */
 	union {
-		Elf_Rel              *dm_jmprel;     /* [0..dm_jmpsize/sizeof(Elf_Rel)][const][valid_if(!RTLD_JMPRELA)] Pointed jump-relocations to-be loaded lazily. */
-		Elf_Rela             *dm_jmprela;    /* [0..dm_jmpsize/sizeof(Elf_Rela)][const][valid_if(RTLD_JMPRELA)] Pointed jump-relocations to-be loaded lazily. */
+		ElfW(Rel)            *dm_jmprel;     /* [0..dm_jmpsize/sizeof(ElfW(Rel))][const][valid_if(!RTLD_JMPRELA)] Pointed jump-relocations to-be loaded lazily. */
+		ElfW(Rela)           *dm_jmprela;    /* [0..dm_jmpsize/sizeof(ElfW(Rela))][const][valid_if(RTLD_JMPRELA)] Pointed jump-relocations to-be loaded lazily. */
 	};
 #endif /* !ELF_HOST_RELA_UNUSED */
 	size_t                    dm_jmpsize;    /* [const] Size of the jump-relocations table (in bytes). */
@@ -196,18 +197,18 @@ struct elf_dlmodule {
 
 	/* The module's .dynamic section, and derivatives (.dynsym + .dynstr). */
 	size_t                    dm_dyncnt;     /* [const] Number of dynamic definition headers. */
-	Elf_Dyn                  *dm_dynhdr;     /* [0..dm_dyncnt][const] Vector of dynamic definition entries. */
-	Elf_Sym                  *dm_dynsym_tab; /* [0..1][const] Vector of dynamic symbols defined by this module.
+	ElfW(Dyn)                *dm_dynhdr;     /* [0..dm_dyncnt][const] Vector of dynamic definition entries. */
+	ElfW(Sym)                *dm_dynsym_tab; /* [0..1][const] Vector of dynamic symbols defined by this module.
 	                                          * HINT: If also non-NULL, the number of symbols is `dm_hashtab->ht_nchains' */
-	Elf_HashTable            *dm_hashtab;    /* [0..1][const] Symbol hash table. */
+	ElfW(HashTable)          *dm_hashtab;    /* [0..1][const] Symbol hash table. */
 	char                     *dm_dynstr;     /* [0..1][const] Dynamic string table. */
 	char                     *dm_runpath;    /* [0..1][const] Library path of this module. */
 
 	/* Named data sections of the module (for use with `dllocksection()'). */
-	Elf_Off                   dm_shoff;      /* File offset to section headers (or `0' if unknown). */
-	Elf_Half                  dm_shstrndx;   /* Index of the section header names section (or `(Elf_Half)-1' if unknown). */
-	Elf_Half                  dm_shnum;      /* (Max) number of section headers (or `(Elf_Half)-1' if unknown). */
-	Elf_Shdr                 *dm_shdr;       /* [lock(WRITE_ONCE)][0..dm_shnum][owned_if(!= empty_shdr)] Vector of section headers (or `NULL' if not loaded). */
+	ElfW(Off)                 dm_shoff;      /* File offset to section headers (or `0' if unknown). */
+	ElfW(Half)                dm_shstrndx;   /* Index of the section header names section (or `(ElfW(Half))-1' if unknown). */
+	ElfW(Half)                dm_shnum;      /* (Max) number of section headers (or `(ElfW(Half))-1' if unknown). */
+	ElfW(Shdr)               *dm_shdr;       /* [lock(WRITE_ONCE)][0..dm_shnum][owned_if(!= empty_shdr)] Vector of section headers (or `NULL' if not loaded). */
 	struct atomic_rwlock      dm_sections_lock; /* Lock for `dm_sections' */
 	DlSection               **dm_sections;   /* [0..1][weak][0..dm_shnum][owned][lock(dm_sections_lock)] Vector of locked sections. */
 #ifndef CONFIG_NO_DANGLING_DL_SECTIONS
@@ -216,8 +217,8 @@ struct elf_dlmodule {
 	char                     *dm_shstrtab;   /* [lock(WRITE_ONCE)][0..1][owned] Section headers name table (or `NULL' if not loaded). */
 
 	/* Module program headers */
-	Elf_Half                  dm_phnum;      /* [const] (Max) number of program headers. */
-	Elf_Phdr                  dm_phdr[];     /* [const][dm_phnum] Vector of program headers. */
+	ElfW(Half)                dm_phnum;      /* [const] (Max) number of program headers. */
+	ElfW(Phdr)                dm_phdr[];     /* [const][dm_phnum] Vector of program headers. */
 };
 
 /* [1..1] List of global modules / pointer to the root binary. */
@@ -308,7 +309,7 @@ INTDEF REF DlModule *CC DlModule_OpenFilenameInPathList(char const *__restrict p
 INTDEF REF DlModule *CC DlModule_OpenFilenameAndFd(/*inherit(on_success,HEAP)*/ char *__restrict filename,
                                                    /*inherit(on_success)*/ fd_t fd, unsigned int mode);
 INTDEF REF DlModule *CC DlModule_OpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filename,
-                                                          uint16_t pnum, Elf_Phdr *__restrict phdr,
+                                                          uint16_t pnum, ElfW(Phdr) *__restrict phdr,
                                                           uintptr_t loadaddr, unsigned int mode);
 /* Try to find an already-loaded module. */
 INTDEF REF DlModule *CC DlModule_FindFilenameInPathFromAll(char const *__restrict path, size_t pathlen,
@@ -326,12 +327,12 @@ INTDEF int CC DlModule_Initialize(DlModule *__restrict self, unsigned int flags)
  * @param: flags: Set of `DL_MODULE_INITIALIZE_F*' */
 INTDEF int CC
 DlModule_ApplyRelocations(DlModule *__restrict self,
-                          Elf_Rel *__restrict vector,
+                          ElfW(Rel) *__restrict vector,
                           size_t count, unsigned int flags);
 #ifndef ELF_HOST_RELA_UNUSED
 INTDEF int CC
 DlModule_ApplyRelocationsWithAddend(DlModule *__restrict self,
-                                    Elf_Rela *__restrict vector,
+                                    ElfW(Rela) *__restrict vector,
                                     size_t count, unsigned int flags);
 #endif /* !ELF_HOST_RELA_UNUSED */
 
@@ -341,7 +342,7 @@ DlModule_RunInitializers(DlModule *__restrict self);
 
 /* Verify that `ehdr' is valid */
 INTDEF int CC
-DlModule_VerifyEhdr(Elf_Ehdr const *__restrict ehdr,
+DlModule_VerifyEhdr(ElfW(Ehdr) const *__restrict ehdr,
                     char const *__restrict filename,
                     bool requires_ET_DYN);
 
@@ -358,7 +359,7 @@ INTDEF fd_t CC DlModule_GetFd(DlModule *__restrict self);
  *  - self->dm_shstrndx
  *  - self->dm_shdr
  * @return: NULL: Error (s.a. elf_dlerror_message) */
-INTDEF Elf_Shdr *CC DlModule_GetShdrs(DlModule *__restrict self);
+INTDEF ElfW(Shdr) *CC DlModule_GetShdrs(DlModule *__restrict self);
 
 /* Lazily allocate if necessary, and return the section header string table for `self'
  * @return: NULL: Error (s.a. elf_dlerror_message) */
@@ -366,16 +367,16 @@ INTDEF char *CC DlModule_GetShstrtab(DlModule *__restrict self);
 
 /* Return the section header associated with a given `name'
  * @return: NULL: Error (s.a. elf_dlerror_message) */
-INTDEF Elf_Shdr *CC DlModule_GetSection(DlModule *__restrict self,
+INTDEF ElfW(Shdr) *CC DlModule_GetSection(DlModule *__restrict self,
                                         char const *__restrict name);
 
 struct dl_symbol {
-	Elf_Sym  const *ds_sym;    /* [1..1] The actual symbol. */
+	ElfW(Sym)  const *ds_sym;    /* [1..1] The actual symbol. */
 	DlModule       *ds_mod;    /* [1..1] The associated module */
 };
 
 /* Same as the functions above, but only return symbols defined within the same module! */
-INTDEF Elf_Sym const *CC
+INTDEF ElfW(Sym) const *CC
 DlModule_GetLocalSymbol(DlModule *__restrict self,
                         char const *__restrict name,
                         uintptr_t *__restrict phash_elf,
@@ -465,7 +466,7 @@ INTDEF void libdl_load_lazy_relocation(void);
 /* Bind a lazy relocation, resolving its JMP relocation entry and returning the
  * absolute address of the bound symbol. - If the symbol can't be resolved, log
  * a system error and exit the calling application. */
-INTDEF Elf_Addr ATTR_FASTCALL
+INTDEF ElfW(Addr) ATTR_FASTCALL
 libdl_bind_lazy_relocation(DlModule *__restrict self,
                            uintptr_t jmp_rel_offset);
 #endif /* R_JMP_SLOT */
