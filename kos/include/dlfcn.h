@@ -351,13 +351,13 @@ __IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CALL dltlsaddr)(void *__tls_
  * @return: NULL: Error: Invalid `HANDLE' (s.a. dlerror()) */
 __IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CALL dlauxinfo)(void *__handle, unsigned int __type,
                                                                     void *__buf, __size_t *__pauxvlen);
-#define DLAUXINFO_ELF_PHDR       0xef01 /* Returns the module's vector of program headers (`Elf_Phdr *')
+#define DLAUXINFO_ELF_PHDR       0xef01 /* Returns the module's vector of program headers (`ElfW(Phdr) *')
                                          * Does not make use of `BUF' and stores the number of headers in `*PAUXVLEN' */
-#define DLAUXINFO_ELF_SHDR       0xef02 /* Returns the module's vector of section headers (`Elf_Shdr *')
+#define DLAUXINFO_ELF_SHDR       0xef02 /* Returns the module's vector of section headers (`ElfW(Shdr) *')
                                          * Does not make use of `BUF' and stores the number of headers in `*PAUXVLEN' */
-#define DLAUXINFO_ELF_DYN        0xef03 /* Returns the module's vector of dynamic tags (`Elf_Dyn *')
+#define DLAUXINFO_ELF_DYN        0xef03 /* Returns the module's vector of dynamic tags (`ElfW(Dyn) *')
                                          * Does not make use of `BUF' and stores the number of headers in `*PAUXVLEN' */
-#define DLAUXINFO_ELF_DYNSYM     0xef04 /* Returns the module's vector of dynamic symbol table (`Elf_Sym *')
+#define DLAUXINFO_ELF_DYNSYM     0xef04 /* Returns the module's vector of dynamic symbol table (`ElfW(Sym) *')
                                          * Does not make use of `BUF' and stores the number of symbols in `*PAUXVLEN'
                                          * If the number of symbols is unknown, store `(size_t)-1' in `*PAUXVLEN' */
 #define DLAUXINFO_ELF_DYNSTR     0xef05 /* Returns the module's dynamic string table (`char const *')

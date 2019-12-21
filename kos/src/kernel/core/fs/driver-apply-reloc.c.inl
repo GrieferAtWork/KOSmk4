@@ -34,31 +34,31 @@ DECL_BEGIN
 /* @param: reloc_flags: Set of `DRIVER_RELOC_FLAG_*' */
 INTERN NONNULL((1, 2)) void KCALL
 driver_do_apply_relocations_vector_addend(struct driver *__restrict self,
-                                          Elf_Rela *__restrict vector,
+                                          ElfW(Rela) *__restrict vector,
                                           size_t count, unsigned int reloc_flags)
 #else /* APPLY_RELA */
 /* @param: reloc_flags: Set of `DRIVER_RELOC_FLAG_*' */
 INTERN NONNULL((1, 2)) void KCALL
 driver_do_apply_relocations_vector(struct driver *__restrict self,
-                                   Elf_Rel *__restrict vector,
+                                   ElfW(Rel) *__restrict vector,
                                    size_t count, unsigned int reloc_flags)
 #endif /* !APPLY_RELA */
 {
 	size_t i;
-	Elf_Addr value;
+	ElfW(Addr) value;
 	byte_t *loadaddr = (byte_t *)self->d_loadaddr;
 	for (i = 0; i < count; ++i) {
 #ifdef APPLY_RELA
-		Elf_Rela rel = vector[i];
+		ElfW(Rela) rel = vector[i];
 #define REL_ADDEND rel.r_addend
 #else /* APPLY_RELA */
-		Elf_Rel rel = vector[i];
+		ElfW(Rel) rel = vector[i];
 #define REL_ADDEND 0
 #endif /* !APPLY_RELA */
 		byte_t *reladdr = loadaddr + rel.r_offset;
-		switch (ELF_R_TYPE(rel.r_info)) {
+		switch (ELFW(R_TYPE)(rel.r_info)) {
 #define LOOKUP_SYMBOL() \
-		value = (Elf_Addr)driver_find_symbol_for_relocation(self, ELF_R_SYM(rel.r_info), NULL, NULL, reloc_flags)
+		value = (ElfW(Addr))driver_find_symbol_for_relocation(self, ELFW(R_SYM)(rel.r_info), NULL, NULL, reloc_flags)
 
 #if defined(__x86_64__)
 #define R_USED_NONE           R_X86_64_NONE
@@ -149,7 +149,7 @@ driver_do_apply_relocations_vector(struct driver *__restrict self,
 		{
 			size_t symbol_size;
 			driver_find_symbol_for_relocation(self,
-			                                  ELF_R_SYM(rel.r_info),
+			                                  ELFW(R_SYM)(rel.r_info),
 			                                  &symbol_size,
 			                                  NULL,
 			                                  reloc_flags);
@@ -164,7 +164,7 @@ driver_do_apply_relocations_vector(struct driver *__restrict self,
 		{
 			size_t symbol_size;
 			driver_find_symbol_for_relocation(self,
-			                                  ELF_R_SYM(rel.r_info),
+			                                  ELFW(R_SYM)(rel.r_info),
 			                                  &symbol_size,
 			                                  NULL,
 			                                  reloc_flags);
@@ -184,12 +184,12 @@ driver_do_apply_relocations_vector(struct driver *__restrict self,
 		case R_USED_COPY:
 #undef R_USED_COPY
 		{
-			Elf_Sym const *dst_sym;
+			ElfW(Sym) const *dst_sym;
 			size_t src_size;
 			struct driver *src_module;
-			dst_sym = self->d_dynsym_tab + ELF_R_SYM(rel.r_info);
-			value = (Elf_Addr)driver_find_symbol_for_relocation(self,
-			                                                    ELF_R_SYM(rel.r_info),
+			dst_sym = self->d_dynsym_tab + ELFW(R_SYM)(rel.r_info);
+			value = (ElfW(Addr))driver_find_symbol_for_relocation(self,
+			                                                    ELFW(R_SYM)(rel.r_info),
 			                                                    &src_size,
 			                                                    &src_module,
 			                                                    reloc_flags);
@@ -305,8 +305,8 @@ driver_do_apply_relocations_vector(struct driver *__restrict self,
 			printk(KERN_WARNING "[mod] %q: Relocation #%Iu at %p (%#Ix+%#Ix) has unknown type %u (%#x) [addend=%s%#Ix]\n",
 			       self->d_filename ? self->d_filename : self->d_name,
 			       (size_t)i, reladdr, (uintptr_t)loadaddr, (uintptr_t)rel.r_offset,
-			       (unsigned int)ELF_R_TYPE(rel.r_info),
-			       (unsigned int)ELF_R_TYPE(rel.r_info),
+			       (unsigned int)ELFW(R_TYPE)(rel.r_info),
+			       (unsigned int)ELFW(R_TYPE)(rel.r_info),
 			       rel.r_addend < 0 ? "-" : "",
 			       rel.r_addend < 0 ? (uintptr_t)-rel.r_addend
 			                        : (uintptr_t)rel.r_addend);
@@ -314,8 +314,8 @@ driver_do_apply_relocations_vector(struct driver *__restrict self,
 			printk(KERN_WARNING "%q: Relocation #%Iu at %p (%#Ix+%#Ix) has unknown type %u (%#x)\n",
 			       self->d_filename ? self->d_filename : self->d_name,
 			       (size_t)i, reladdr, (uintptr_t)loadaddr, (uintptr_t)rel.r_offset,
-			       (unsigned int)ELF_R_TYPE(rel.r_info),
-			       (unsigned int)ELF_R_TYPE(rel.r_info));
+			       (unsigned int)ELFW(R_TYPE)(rel.r_info),
+			       (unsigned int)ELFW(R_TYPE)(rel.r_info));
 #endif /* !APPLY_RELA */
 			break;
 		}

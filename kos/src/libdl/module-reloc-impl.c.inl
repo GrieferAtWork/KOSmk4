@@ -326,6 +326,9 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 
 			/* TODO */
 		case R_X86_64_DTPMOD64:
+			LOOKUP_SYMBOL();
+			break;
+
 		case R_X86_64_DTPOFF64:
 		case R_X86_64_TPOFF64:
 		case R_X86_64_DTPOFF32:

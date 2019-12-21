@@ -770,9 +770,9 @@ typedef struct elf64_phdr /*[PREFIX(p_)]*/ {
 
 /* Legal values for note segment descriptor types for core files. */
 
-#define NT_PRSTATUS     1               /* [Elf_Prstatus] Contains copy of prstatus struct */
-#define NT_FPREGSET     2               /* [Elf_Fpregset] Contains copy of fpregset struct */
-#define NT_PRPSINFO     3               /* [Elf_Prpsinfo] Contains copy of prpsinfo struct */
+#define NT_PRSTATUS     1               /* [ElfW(Prstatus)] Contains copy of prstatus struct */
+#define NT_FPREGSET     2               /* [ElfW(Fpregset)] Contains copy of fpregset struct */
+#define NT_PRPSINFO     3               /* [ElfW(Prpsinfo)] Contains copy of prpsinfo struct */
 #define NT_PRXREG       4               /* Contains copy of prxregset struct */
 #define NT_TASKSTRUCT   4               /* Contains copy of task structure */
 #define NT_PLATFORM     5               /* String from sysinfo(SI_PLATFORM) */
@@ -813,7 +813,7 @@ typedef struct elf64_phdr /*[PREFIX(p_)]*/ {
 #define NT_ARM_HW_BREAK      0x402      /* AArch hardware breakpoint registers; note name must be "LINUX". */
 #define NT_ARM_HW_WATCH      0x403      /* AArch hardware watchpoint registers; note name must be "LINUX". */
 #define NT_SIGINFO           0x53494749 /* Fields of siginfo_t. */
-#define NT_FILE              0x46494c45 /* [Elf_Ntfile] Description of mapped files. */
+#define NT_FILE              0x46494c45 /* [ElfW(Ntfile)] Description of mapped files. */
 #endif /* __USE_KOS */
 
 

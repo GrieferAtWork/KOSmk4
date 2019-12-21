@@ -128,7 +128,7 @@ struct sysctl_driver_insmod /*[PREFIX(im_)]*/ {
 	union {
 		struct {
 			void const *b_base;               /* [1..b_size] Base address of the blob.
-			                                   * NOTE: This should point to an `Elf_Ehdr' structure. */
+			                                   * NOTE: This should point to an `ElfW(Ehdr)' structure. */
 			__SYSCTL_PAD_POINTER(__b_pad1);
 			__size_t    b_size;               /* Size of the blob (in bytes). */
 			__SYSCTL_PAD_POINTER(__b_pad2);

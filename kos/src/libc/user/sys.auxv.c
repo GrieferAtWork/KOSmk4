@@ -106,7 +106,7 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 		break;
 
 	case AT_PHENT:
-		result = sizeof(Elf_Phdr);
+		result = sizeof(ElfW(Phdr));
 		break;
 
 	case AT_PHNUM: {
@@ -128,9 +128,9 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 	}	break;
 
 	case AT_FLAGS: {
-		Elf_Dyn *dyn;
+		ElfW(Dyn) *dyn;
 		size_t i, dynum;
-		dyn = (Elf_Dyn *)dlauxinfo(NULL, DLAUXINFO_ELF_DYN, NULL, &dynum);
+		dyn = (ElfW(Dyn) *)dlauxinfo(NULL, DLAUXINFO_ELF_DYN, NULL, &dynum);
 		result = 0;
 		for (i = 0; i < dynum; ++i) {
 			if (dyn[i].d_tag != DT_FLAGS)
@@ -142,8 +142,8 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 
 	case AT_ENTRY: {
 		fd_t rootfd;
-		byte_t ehdr_data[offsetafter(Elf_Ehdr, e_entry)];
-		Elf_Ehdr *ehdr = (Elf_Ehdr *)ehdr_data;
+		byte_t ehdr_data[offsetafter(ElfW(Ehdr), e_entry)];
+		ElfW(Ehdr) *ehdr = (ElfW(Ehdr) *)ehdr_data;
 		rootfd = dlmodulefd(dlopen(NULL, 0));
 		if (preadall(rootfd, ehdr_data, sizeof(ehdr_data), 0) < (ssize_t)sizeof(ehdr_data))
 			goto not_found;
@@ -169,8 +169,8 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 
 	case AT_NOTELF: {
 		fd_t rootfd;
-		byte_t ehdr_data[offsetafter(Elf_Ehdr, e_entry)];
-		Elf_Ehdr *ehdr = (Elf_Ehdr *)ehdr_data;
+		byte_t ehdr_data[offsetafter(ElfW(Ehdr), e_entry)];
+		ElfW(Ehdr) *ehdr = (ElfW(Ehdr) *)ehdr_data;
 		rootfd = dlmodulefd(dlopen(NULL, 0));
 		if (preadall(rootfd, ehdr_data, sizeof(ehdr_data), 0) < (ssize_t)sizeof(ehdr_data)) {
 is_not_elf:

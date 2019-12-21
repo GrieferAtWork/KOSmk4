@@ -32,6 +32,7 @@ if (gcc_opt.remove("-O3"))
 
 #include <hybrid/compiler.h>
 
+#include <kos/exec/elf.h>
 #include <kos/exec/library.h>
 
 #include <ctype.h>
@@ -887,7 +888,7 @@ err_no_data:
 		sections->ds_symtab_end   = SECEND(dl_sections->dl_symtab);
 		sections->ds_symtab_ent   = dl_sections->dl_symtab->ds_entsize;
 		if (!sections->ds_symtab_ent)
-			sections->ds_symtab_ent = sizeof(Elf_Sym);
+			sections->ds_symtab_ent = sizeof(ElfW(Sym));
 	}
 	if (dl_sections->dl_strtab) {
 		sections->ds_strtab_start = SECSRT(dl_sections->dl_strtab);

@@ -68,27 +68,6 @@
 
 DECL_BEGIN
 
-/* Define Elf WORD types. */
-typedef ElfW(Half)      Elf_Half;
-typedef ElfW(Word)      Elf_Word;
-typedef ElfW(Ehdr)      Elf_Ehdr;
-typedef ElfW(Phdr)      Elf_Phdr;
-typedef ElfW(Shdr)      Elf_Shdr;
-typedef ElfW(Sym)       Elf_Sym;
-typedef ElfW(HashTable) Elf_HashTable;
-typedef ElfW(Dyn)       Elf_Dyn;
-typedef ElfW(Rel)       Elf_Rel;
-typedef ElfW(Rela)      Elf_Rela;
-typedef ElfW(Addr)      Elf_Addr;
-typedef ElfW(Off)       Elf_Off;
-#define ELF_PHDR_INIT  ELFW(PHDR_INIT)
-#define ELF_ST_TYPE    ELFW(ST_TYPE)
-#define ELF_ST_BIND    ELFW(ST_BIND)
-#define ELF_R_TYPE     ELFW(R_TYPE)
-#define ELF_R_SYM      ELFW(R_SYM)
-
-
-
 /* FDE Cache API */
 struct driver_fde_cache_node {
 	struct {
@@ -763,7 +742,7 @@ NOTHROW(KCALL driver_do_clear_dang_sections)(struct driver *__restrict self) {
 
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL driver_destroy)(struct driver *__restrict self) {
-	Elf_Half i;
+	ElfW(Half) i;
 	assert(wasdestroyed(self));
 	assertf(self->d_flags & DRIVER_FLAG_FINALIZED,
 	        "Without this flag, our reference count should not have been able to reach 0!");
@@ -831,7 +810,7 @@ PRIVATE ATTR_COLDRODATA char const kernel_driver_filename[] = KERNEL_DRIVER_FILE
 
 
 INTDEF char const kernel_shstrtab_data[];
-INTDEF Elf_Shdr const kernel_shdr[];
+INTDEF ElfW(Shdr) const kernel_shdr[];
 INTDEF struct driver_section *const kernel_sections[];
 
 #ifndef __INTELLISENSE__
@@ -911,7 +890,7 @@ PUBLIC struct driver kernel_driver = {
 #define KERNEL_PHDR_ALIGN __ALIGNOF_MAX_ALIGN_T__
 #endif /* !PAGESIZE */
 	{
-		/* [0] = */ ELF_PHDR_INIT(
+		/* [0] = */ ELFW(PHDR_INIT)(
 			/* .p_type   = */ PT_LOAD,
 			/* .p_offset = */ 0, /* Doesn't matter... */
 			/* .p_vaddr  = */ (uintptr_t)__kernel_start,
@@ -921,7 +900,7 @@ PUBLIC struct driver kernel_driver = {
 			/* .p_flags  = */ PF_X|PF_W|PF_R,
 			/* .p_align  = */ KERNEL_PHDR_ALIGN
 		),
-		/* [1] = */ ELF_PHDR_INIT(
+		/* [1] = */ ELFW(PHDR_INIT)(
 			/* .p_type   = */ PT_LOAD,
 			/* .p_offset = */ 0, /* Doesn't matter... */
 			/* .p_vaddr  = */ (uintptr_t)__kernel_free_start,
@@ -1175,7 +1154,7 @@ done_service_endwrite_decref:
 
 
 PRIVATE NONNULL((1)) void KCALL
-driver_verify_ehdr(Elf_Ehdr const *__restrict ehdr)
+driver_verify_ehdr(ElfW(Ehdr) const *__restrict ehdr)
 		THROWS(E_NOT_EXECUTABLE) {
 	unsigned int reason;
 	if unlikely(ehdr->e_ident[EI_MAG0] != ELFMAG0 ||
@@ -1202,13 +1181,13 @@ driver_verify_ehdr(Elf_Ehdr const *__restrict ehdr)
 	if unlikely(ehdr->e_machine != KERNEL_DRIVER_REQUIRED_MACHINE)
 		goto err_elf_reason;
 	reason = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADHEADER;
-	if unlikely(ehdr->e_ehsize < offsetafter(Elf_Ehdr, e_phnum))
+	if unlikely(ehdr->e_ehsize < offsetafter(ElfW(Ehdr), e_phnum))
 		goto err_elf_reason;
 	reason = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOSEGMENTS;
 	if unlikely(ehdr->e_phnum == 0)
 		goto err_elf_reason;
 	reason = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADSEGMENTS;
-	if unlikely(ehdr->e_phentsize != sizeof(Elf_Phdr))
+	if unlikely(ehdr->e_phentsize != sizeof(ElfW(Phdr)))
 		goto err_elf_reason;
 	return;
 err_elf_reason:
@@ -1300,28 +1279,28 @@ PUBLIC WUNUSED ATTR_CONST NONNULL((1)) char const *
  * @return: * :   Returns `self->d_shdr'
  * @return: NULL: Failed to load the section headers vector (the driver
  *                file wasn't found, or doesn't contain any sections) */
-PUBLIC WUNUSED ATTR_CONST NONNULL((1)) Elf_Shdr const *KCALL
+PUBLIC WUNUSED ATTR_CONST NONNULL((1)) ElfW(Shdr) const *KCALL
 driver_getshdrs(struct driver *__restrict self)
 		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC) {
 	struct regular_node *node;
-	Elf_Shdr *result;
+	ElfW(Shdr) *result;
 	if (self->d_shdr)
 		return self->d_shdr;
 	node = driver_getfile(self);
 	if unlikely(!node)
 		return NULL;
 	/* Allocate the section header vector. */
-	result = (Elf_Shdr *)kmalloc(self->d_shnum * sizeof(Elf_Shdr), GFP_PREFLT);
+	result = (ElfW(Shdr) *)kmalloc(self->d_shnum * sizeof(ElfW(Shdr)), GFP_PREFLT);
 	TRY {
-		inode_readallk(node, result, self->d_shnum * sizeof(Elf_Shdr), (pos_t)self->d_shoff);
+		inode_readallk(node, result, self->d_shnum * sizeof(ElfW(Shdr)), (pos_t)self->d_shoff);
 	} EXCEPT {
 		kfree(result);
 		RETHROW();
 	}
 	{
-		Elf_Shdr *new_result;
+		ElfW(Shdr) *new_result;
 		/* Save the newly loaded section header vector. */
-		new_result = (Elf_Shdr *)ATOMIC_CMPXCH_VAL(self->d_shdr,
+		new_result = (ElfW(Shdr) *)ATOMIC_CMPXCH_VAL(self->d_shdr,
 		                                           NULL,
 		                                           result);
 		if unlikely(new_result != NULL) {
@@ -1340,7 +1319,7 @@ PUBLIC WUNUSED ATTR_CONST NONNULL((1)) char const *KCALL
 driver_getshstrtab(struct driver *__restrict self)
 		THROWS(E_IOERROR,E_WOULDBLOCK, E_BADALLOC) {
 	char *result;
-	Elf_Shdr const *shdrs;
+	ElfW(Shdr) const *shdrs;
 	result = (char *)self->d_shstrtab;
 	if (result)
 		return result;
@@ -1383,11 +1362,11 @@ driver_getshstrtab(struct driver *__restrict self)
  * @return: NULL: No section exists that matches the given `name'
  * @return: NULL: Failed to load the section headers string table (the driver
  *                file wasn't found, or doesn't contain any sections) */
-PUBLIC WUNUSED NONNULL((1)) Elf_Shdr const *KCALL
+PUBLIC WUNUSED NONNULL((1)) ElfW(Shdr) const *KCALL
 driver_getsection(struct driver *__restrict self,
                   USER CHECKED char const *name)
 		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
-	Elf_Shdr const *result;
+	ElfW(Shdr) const *result;
 	uint16_t i;
 	char const *strtab;
 	strtab = driver_getshstrtab(self);
@@ -1489,7 +1468,7 @@ NOTHROW(KCALL driver_decref_dependencies)(struct driver *__restrict self) {
 PRIVATE NONNULL((1)) void KCALL
 driver_enable_textrel(struct driver *__restrict self)
 		THROWS(E_WOULDBLOCK) {
-	Elf_Half i;
+	ElfW(Half) i;
 	bool did_lock_kernel = false;
 	for (i = 0; i < self->d_phnum; ++i) {
 		struct vm_node *node;
@@ -1515,7 +1494,7 @@ driver_enable_textrel(struct driver *__restrict self)
 PRIVATE NONNULL((1)) void KCALL
 driver_disable_textrel(struct driver *__restrict self)
 		THROWS(E_WOULDBLOCK) {
-	Elf_Half i;
+	ElfW(Half) i;
 	bool did_lock_kernel  = false;
 	bool must_sync_kernel = false;
 	for (i = 0; i < self->d_phnum; ++i) {
@@ -1856,7 +1835,7 @@ driver_special_symbol(struct driver *__restrict self,
 					*psymbol_addr = self;
 				if (psymbol_size)
 					*psymbol_size = (offsetof(struct driver, d_phdr) +
-					                 self->d_phnum * sizeof(Elf_Phdr));
+					                 self->d_phnum * sizeof(ElfW(Phdr)));
 				return true;
 			}
 			if (strcmp(name + 1, "tart") == 0) {
@@ -2105,7 +2084,7 @@ driver_symbol_ex(struct driver *__restrict self,
                  /*in|out*/ uintptr_t *__restrict phash_elf,
                  /*in|out*/ uintptr_t *__restrict phash_gnu)
 		THROWS(E_SEGFAULT, ...) {
-	Elf_Sym const *elf_sym;
+	ElfW(Sym) const *elf_sym;
 	/* Check for special symbols in relation to this driver. */
 	if (driver_special_symbol(self,
 	                          name,
@@ -2131,7 +2110,7 @@ driver_symbol_ex(struct driver *__restrict self,
 			uintptr_t addr = elf_sym->st_value;
 			if (elf_sym->st_shndx != SHN_ABS)
 				addr += self->d_loadaddr;
-			if (ELF_ST_TYPE(elf_sym->st_info) == STT_GNU_IFUNC)
+			if (ELFW(ST_TYPE)(elf_sym->st_info) == STT_GNU_IFUNC)
 				addr = (*(uintptr_t(*)(void))addr)();
 			*psymbol_addr = (void *)addr;
 		}
@@ -2165,7 +2144,7 @@ NOTHROW(KCALL driver_symbol_at)(struct driver *__restrict self,
                                 uintptr_t driver_relative_address,
                                 uintptr_t *psymbol_relative_address,
                                 size_t *psymbol_size) {
-	Elf_Sym const *symbol;
+	ElfW(Sym) const *symbol;
 	if (self == &kernel_driver) {
 		/* Special case for the kernel core driver. */
 		return kernel_symbol_at(driver_relative_address,
@@ -2192,11 +2171,11 @@ NOTHROW(KCALL driver_symbol_at)(struct driver *__restrict self,
  * WARNING: This function cannot be used with `&kernel_driver', as
  *          the kernel core itself implements a custom protocol for
  *          specifying which variables are exported. */
-PUBLIC WUNUSED NONNULL((1)) Elf_Sym const *
+PUBLIC WUNUSED NONNULL((1)) ElfW(Sym) const *
 NOTHROW(KCALL driver_local_symbol_at)(struct driver *__restrict self,
                                       uintptr_t driver_relative_address) {
 	size_t i, count;
-	Elf_Sym const *result;
+	ElfW(Sym) const *result;
 	uintptr_t prev_symbol_end;
 	count = self->d_dynsym_cnt;
 	/* First pass: Search for a symbol that contains the given address exactly. */
@@ -2219,7 +2198,7 @@ NOTHROW(KCALL driver_local_symbol_at)(struct driver *__restrict self,
 	prev_symbol_end = 0;
 	result = NULL;
 	for (i = 0; i < count; ++i) {
-		Elf_Sym const *sym;
+		ElfW(Sym) const *sym;
 		sym = &self->d_dynsym_tab[i];
 		if (sym->st_shndx == SHN_UNDEF ||
 		    sym->st_shndx == SHN_ABS)
@@ -2257,17 +2236,17 @@ NOTHROW(KCALL driver_local_symbol_at)(struct driver *__restrict self,
  * WARNING: This function cannot be used with `&kernel_driver', as
  *          the kernel core itself implements a custom protocol for
  *          specifying which variables are exported. */
-PUBLIC WUNUSED NONNULL((1, 3, 4)) Elf_Sym const *KCALL
+PUBLIC WUNUSED NONNULL((1, 3, 4)) ElfW(Sym) const *KCALL
 driver_local_symbol(struct driver *__restrict self,
                     /*in*/ USER CHECKED char const *name,
                     /*in|out*/ uintptr_t *__restrict phash_elf,
                     /*in|out*/ uintptr_t *__restrict phash_gnu)
 		THROWS(E_SEGFAULT) {
-	Elf_Sym const *result;
-	Elf_HashTable const *elf_ht;
+	ElfW(Sym) const *result;
+	ElfW(HashTable) const *elf_ht;
 	if ((elf_ht = self->d_hashtab) != NULL) {
-		Elf_Word const *ht_chains;
-		Elf_Word max_attempts, chain;
+		ElfW(Word) const *ht_chains;
+		ElfW(Word) max_attempts, chain;
 		uintptr_t hash = *phash_elf;
 		if (hash == DRIVER_SYMBOL_HASH_UNSET)
 			hash = *phash_elf = elf_symhash(name);
@@ -2311,7 +2290,7 @@ driver_section_lock(struct driver *__restrict self,
                     USER CHECKED char const *name,
                     unsigned int flags)
 		THROWS(E_SEGFAULT, E_BADALLOC) {
-	Elf_Shdr const *sect;
+	ElfW(Shdr) const *sect;
 	size_t index;
 	REF struct driver_section *result;
 	assertf(!(flags & ~(DRIVER_SECTION_LOCK_FINDEX | DRIVER_SECTION_LOCK_FNODATA)),
@@ -2810,7 +2789,7 @@ driver_do_load_dependencies(struct driver *__restrict self)
 	depvec = (REF struct driver **)malloca(self->d_depcnt * sizeof(REF struct driver *));
 	TRY {
 		for (i = 0; i < self->d_dyncnt; ++i) {
-			Elf_Dyn tag;
+			ElfW(Dyn) tag;
 			char const *filename;
 			tag = self->d_dynhdr[i];
 			if (tag.d_tag == DT_NULL)
@@ -2893,7 +2872,7 @@ driver_find_symbol_for_relocation(struct driver *__restrict self,
 	char const *symbol_name;
 	size_t i;
 	uintptr_t elf_hash, gnu_hash;
-	Elf_Sym const *search_sym, *weak_symbol, *sym;
+	ElfW(Sym) const *search_sym, *weak_symbol, *sym;
 	struct driver *weak_symbol_driver, *dep;
 	if unlikely(symbol_id >= self->d_dynsym_cnt)
 		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMBOL);
@@ -2902,7 +2881,7 @@ driver_find_symbol_for_relocation(struct driver *__restrict self,
 	weak_symbol_driver = NULL;
 	if ((search_sym->st_shndx != SHN_UNDEF) &&
 	    (reloc_flags & DRIVER_RELOC_FLAG_DEEPBIND)) {
-		if (ELF_ST_BIND(search_sym->st_info) == STB_WEAK) {
+		if (ELFW(ST_BIND)(search_sym->st_info) == STB_WEAK) {
 			weak_symbol        = search_sym;
 			weak_symbol_driver = self;
 		} else {
@@ -2949,7 +2928,7 @@ driver_find_symbol_for_relocation(struct driver *__restrict self,
 		if (sym->st_shndx == SHN_UNDEF)
 			continue;
 		/* Found a viable candidate.*/
-		if (ELF_ST_BIND(sym->st_info) == STB_WEAK) {
+		if (ELFW(ST_BIND)(sym->st_info) == STB_WEAK) {
 			if (!weak_symbol) {
 				weak_symbol        = sym;
 				weak_symbol_driver = dep;
@@ -2961,7 +2940,7 @@ found_symbol:
 		symbol_addr = (void *)sym->st_value;
 		if (sym->st_shndx != SHN_ABS)
 			symbol_addr = (byte_t *)symbol_addr + dep->d_loadaddr;
-		if (ELF_ST_TYPE(sym->st_info) == STT_GNU_IFUNC)
+		if (ELFW(ST_TYPE)(sym->st_info) == STT_GNU_IFUNC)
 			symbol_addr = (*(void *(*)(void))symbol_addr)();
 		if (psymbol_size)
 			*psymbol_size = sym->st_size;
@@ -3000,13 +2979,13 @@ found_symbol:
 /* @param: reloc_flags: Set of `DRIVER_RELOC_FLAG_*' */
 INTDEF NONNULL((1, 2)) void KCALL
 driver_do_apply_relocations_vector(struct driver *__restrict self,
-                                   Elf_Rel *__restrict vector,
+                                   ElfW(Rel) *__restrict vector,
                                    size_t count, unsigned int reloc_flags);
 
 /* @param: reloc_flags: Set of `DRIVER_RELOC_FLAG_*' */
 INTDEF NONNULL((1, 2)) void KCALL
 driver_do_apply_relocations_vector_addend(struct driver *__restrict self,
-                                          Elf_Rela *__restrict vector,
+                                          ElfW(Rela) *__restrict vector,
                                           size_t count, unsigned int reloc_flags);
 
 #endif /* __INTELLISENSE__ */
@@ -3016,12 +2995,12 @@ PRIVATE NONNULL((1)) void KCALL
 driver_do_apply_relocations(struct driver *__restrict self)
 		THROWS(E_NOT_EXECUTABLE, E_WOULDBLOCK) {
 	unsigned int reloc_flags = 0;
-	Elf_Rel *rel_base = NULL;
+	ElfW(Rel) *rel_base = NULL;
 	size_t rel_count  = 0;
-	Elf_Rel *jmp_base = NULL;
+	ElfW(Rel) *jmp_base = NULL;
 	size_t jmp_size  = 0;
 #if ELF_ARCH_USESRELA
-	Elf_Rela *rela_base = NULL;
+	ElfW(Rela) *rela_base = NULL;
 	size_t rela_count  = 0;
 	bool jmp_rels_have_addend = false;
 #endif /* ELF_ARCH_USESRELA */
@@ -3029,27 +3008,27 @@ driver_do_apply_relocations(struct driver *__restrict self)
 
 	/* Service relocations of the module. */
 	for (i = 0; i < self->d_dyncnt; ++i) {
-		Elf_Dyn tag = self->d_dynhdr[i];
+		ElfW(Dyn) tag = self->d_dynhdr[i];
 		switch (tag.d_tag) {
 
 		case DT_NULL:
 			goto done_dynamic;
 
 		case DT_REL:
-			rel_base = (Elf_Rel *)(self->d_loadaddr + tag.d_un.d_ptr);
+			rel_base = (ElfW(Rel) *)(self->d_loadaddr + tag.d_un.d_ptr);
 			break;
 
 		case DT_RELSZ:
-			rel_count = tag.d_un.d_val / sizeof(Elf_Rel);
+			rel_count = tag.d_un.d_val / sizeof(ElfW(Rel));
 			break;
 
 		case DT_JMPREL:
-			jmp_base = (Elf_Rel *)(self->d_loadaddr + tag.d_un.d_ptr);
+			jmp_base = (ElfW(Rel) *)(self->d_loadaddr + tag.d_un.d_ptr);
 			break;
 
 		case DT_PLTRELSZ:
 #if !ELF_ARCH_USESRELA
-			jmp_size = tag.d_un.d_val / sizeof(Elf_Rel);
+			jmp_size = tag.d_un.d_val / sizeof(ElfW(Rel));
 #else /* !ELF_ARCH_USESRELA */
 			jmp_size = tag.d_un.d_val;
 #endif /* ELF_ARCH_USESRELA */
@@ -3057,11 +3036,11 @@ driver_do_apply_relocations(struct driver *__restrict self)
 
 #if ELF_ARCH_USESRELA
 		case DT_RELA:
-			rela_base = (Elf_Rela *)(self->d_loadaddr + tag.d_un.d_ptr);
+			rela_base = (ElfW(Rela) *)(self->d_loadaddr + tag.d_un.d_ptr);
 			break;
 
 		case DT_RELASZ:
-			rela_count = tag.d_un.d_val / sizeof(Elf_Rela);
+			rela_count = tag.d_un.d_val / sizeof(ElfW(Rela));
 			break;
 
 		case DT_PLTREL:
@@ -3092,12 +3071,12 @@ done_dynamic:
 	driver_do_apply_relocations_vector_addend(self, rela_base, rela_count, reloc_flags);
 	if (jmp_rels_have_addend) {
 		driver_do_apply_relocations_vector_addend(self,
-		                                          (Elf_Rela *)jmp_base,
-		                                          jmp_size / sizeof(Elf_Rela),
+		                                          (ElfW(Rela) *)jmp_base,
+		                                          jmp_size / sizeof(ElfW(Rela)),
 		                                          reloc_flags);
 	} else {
 		driver_do_apply_relocations_vector(self, jmp_base,
-		                                   jmp_size / sizeof(Elf_Rel),
+		                                   jmp_size / sizeof(ElfW(Rel)),
 		                                   reloc_flags);
 	}
 #endif /* ELF_ARCH_USESRELA */
@@ -3336,10 +3315,10 @@ PUBLIC NONNULL((1)) bool
 
 PRIVATE NONNULL((2)) void KCALL
 unmap_range(uintptr_t loadaddr,
-            Elf_Phdr const *__restrict headers,
+            ElfW(Phdr) const *__restrict headers,
             size_t count) {
-	Elf_Addr addr;
-	Elf_Word size;
+	ElfW(Addr) addr;
+	ElfW(Word) size;
 	while (count--) {
 		if (headers[count].p_type != PT_LOAD)
 			continue;
@@ -3358,14 +3337,14 @@ unmap_range(uintptr_t loadaddr,
 
 
 PRIVATE NONNULL((1)) bool KCALL
-contains_illegal_overlap(Elf_Phdr *__restrict headers,
+contains_illegal_overlap(ElfW(Phdr) *__restrict headers,
                          size_t count) {
 	size_t i, j;
 	for (i = 0; i < count; ++i) {
 		uintptr_t min_page;
 		uintptr_t max_page;
-		Elf_Addr addr;
-		Elf_Word size;
+		ElfW(Addr) addr;
+		ElfW(Word) size;
 		if (headers[i].p_type != PT_LOAD)
 			continue;
 		addr = headers[i].p_vaddr;
@@ -3376,7 +3355,7 @@ contains_illegal_overlap(Elf_Phdr *__restrict headers,
 		min_page = addr / PAGESIZE;
 		if (OVERFLOW_UADD(addr, size, &addr))
 			goto yes;
-		if (OVERFLOW_UADD(addr, (Elf_Addr)PAGEMASK, &addr))
+		if (OVERFLOW_UADD(addr, (ElfW(Addr))PAGEMASK, &addr))
 			goto yes;
 		max_page = (addr / PAGESIZE) - 1;
 		for (j = i + 1; j < count; ++j) {
@@ -3392,7 +3371,7 @@ contains_illegal_overlap(Elf_Phdr *__restrict headers,
 			other_min_page = addr / PAGESIZE;
 			if (OVERFLOW_UADD(addr, size, &addr))
 				goto yes;
-			if (OVERFLOW_UADD(addr, (Elf_Addr)PAGEMASK, &addr))
+			if (OVERFLOW_UADD(addr, (ElfW(Addr))PAGEMASK, &addr))
 				goto yes;
 			other_max_page = (addr / PAGESIZE) - 1;
 			if (other_min_page < max_page &&
@@ -3412,7 +3391,7 @@ driver_map_into_memory(struct driver *__restrict self,
                        USER CHECKED byte_t *base,
                        size_t num_bytes)
 		THROWS(E_BADALLOC, E_SEGFAULT, E_WOULDBLOCK) {
-	Elf_Half i;
+	ElfW(Half) i;
 	uintptr_t loadaddr, min_addr, max_addr;
 	size_t min_alignment = PAGESIZE;
 	size_t total_bytes;
@@ -3421,8 +3400,8 @@ driver_map_into_memory(struct driver *__restrict self,
 	max_addr = (uintptr_t)0;
 	/* Figure out the min/max byte offsets for program segments. */
 	for (i = 0; i < self->d_phnum; ++i) {
-		Elf_Addr addr;
-		Elf_Word size, align;
+		ElfW(Addr) addr;
+		ElfW(Word) size, align;
 		if (self->d_phdr[i].p_type != PT_LOAD)
 			continue;
 		addr  = self->d_phdr[i].p_vaddr;
@@ -3488,12 +3467,12 @@ find_new_candidate_tryhard:
 	i = 0;
 	TRY {
 		for (; i < self->d_phnum; ++i) {
-			Elf_Addr addr;
-			Elf_Word size;
-			Elf_Word filesize;
-			Elf_Off offset;
+			ElfW(Addr) addr;
+			ElfW(Word) size;
+			ElfW(Word) filesize;
+			ElfW(Off) offset;
 			uintptr_half_t prot;
-			Elf_Word segment_flags;
+			ElfW(Word) segment_flags;
 			if (self->d_phdr[i].p_type != PT_LOAD)
 				continue;
 			addr          = self->d_phdr[i].p_vaddr;
@@ -3561,14 +3540,14 @@ driver_do_insmod_blob(USER CHECKED byte_t *base, size_t num_bytes,
                       unsigned int flags)
 		THROWS(E_SEGFAULT, E_NOT_EXECUTABLE, E_BADALLOC, E_IOERROR) {
 	REF struct driver *result;
-	Elf_Half phdr_pt_dynamic, phdrc, i;
-	Elf_Phdr *phdrv;
-	if unlikely(num_bytes < sizeof(Elf_Ehdr))
+	ElfW(Half) phdr_pt_dynamic, phdrc, i;
+	ElfW(Phdr) *phdrv;
+	if unlikely(num_bytes < sizeof(ElfW(Ehdr)))
 		THROW(E_NOT_EXECUTABLE_TOOSMALL);
 	/* validate the presence of an ELF EHDR */
-	driver_verify_ehdr((Elf_Ehdr *)base);
-	phdrv = (Elf_Phdr *)(base + ((Elf_Ehdr *)base)->e_phoff);
-	phdrc = ((Elf_Ehdr *)base)->e_phnum;
+	driver_verify_ehdr((ElfW(Ehdr) *)base);
+	phdrv = (ElfW(Phdr) *)(base + ((ElfW(Ehdr) *)base)->e_phoff);
+	phdrc = ((ElfW(Ehdr) *)base)->e_phnum;
 	/* Validate the program header pointers. */
 	if unlikely(phdrc > KERNEL_DRIVER_MAXPROGRAMHEADERCOUNT)
 		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS);
@@ -3578,7 +3557,7 @@ driver_do_insmod_blob(USER CHECKED byte_t *base, size_t num_bytes,
 	            (byte_t *)phdrv + phdrc > base + num_bytes)
 		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_HEADERS);
 	{
-		Elf_Dyn *pt_dynamic, *pt_dynamic_end;
+		ElfW(Dyn) *pt_dynamic, *pt_dynamic_end;
 		/* Search for the .dynamic section.
 		 * We need find this section first, because it contains the DT_SONAME
 		 * tag which we need to determine the driver's name, which is used for
@@ -3592,8 +3571,8 @@ driver_do_insmod_blob(USER CHECKED byte_t *base, size_t num_bytes,
 		THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_DYNAMIC);
 found_dynamic:
 		/* Load the in-file range of the .dynamic program header */
-		pt_dynamic     = (Elf_Dyn *)(base + phdrv[phdr_pt_dynamic].p_offset);
-		pt_dynamic_end = (Elf_Dyn *)((byte_t *)pt_dynamic + phdrv[phdr_pt_dynamic].p_filesz);
+		pt_dynamic     = (ElfW(Dyn) *)(base + phdrv[phdr_pt_dynamic].p_offset);
+		pt_dynamic_end = (ElfW(Dyn) *)((byte_t *)pt_dynamic + phdrv[phdr_pt_dynamic].p_filesz);
 		/* Ensure that the .dynamic program header bounds are valid. */
 		if unlikely((void *)pt_dynamic > (void *)pt_dynamic_end ||
 		            (void *)pt_dynamic < (void *)base ||
@@ -3602,7 +3581,7 @@ found_dynamic:
 		{
 			uintptr_t dynstr_vla    = (uintptr_t)-1;
 			uintptr_t soname_offset = (uintptr_t)-1;
-			Elf_Dyn *pt_dynamic_iter;
+			ElfW(Dyn) *pt_dynamic_iter;
 			for (pt_dynamic_iter = pt_dynamic;
 			     pt_dynamic_iter < pt_dynamic_end; ++pt_dynamic_iter) {
 				uintptr_t tag;
@@ -3663,11 +3642,11 @@ done_tags_for_soname:
 	}
 	/* Load + initialize a new driver. */
 	result = (REF struct driver *)kmalloc(offsetof(struct driver, d_phdr) +
-	                                      phdrc * sizeof(Elf_Phdr),
+	                                      phdrc * sizeof(ElfW(Phdr)),
 	                                      GFP_LOCKED | GFP_CALLOC | GFP_PREFLT);
 	TRY {
 		/* Copy program headers. */
-		memcpy(result->d_phdr, phdrv, phdrc, sizeof(Elf_Phdr));
+		memcpy(result->d_phdr, phdrv, phdrc, sizeof(ElfW(Phdr)));
 		result->d_refcnt = 2; /* 2: +1:<return-value>, +1:Not setting the `DRIVER_FLAG_FINALIZED' flag */
 		result->d_phnum  = phdrc;
 		atomic_rwlock_cinit(&result->d_eh_frame_cache_lock);
@@ -3686,25 +3665,25 @@ done_tags_for_soname:
 			result->d_argv = (char **)kmalloc(1 * sizeof(char *),
 			                                  GFP_CALLOC | GFP_LOCKED | GFP_PREFLT);
 		}
-		result->d_shoff    = ((Elf_Ehdr *)base)->e_shoff;
-		result->d_shstrndx = ((Elf_Ehdr *)base)->e_shstrndx;
-		result->d_shnum    = ((Elf_Ehdr *)base)->e_shnum;
+		result->d_shoff    = ((ElfW(Ehdr) *)base)->e_shoff;
+		result->d_shstrndx = ((ElfW(Ehdr) *)base)->e_shstrndx;
+		result->d_shnum    = ((ElfW(Ehdr) *)base)->e_shnum;
 		COMPILER_READ_BARRIER();
-		if unlikely(ATOMIC_READ(((Elf_Ehdr *)base)->e_shentsize) != sizeof(Elf_Shdr))
+		if unlikely(ATOMIC_READ(((ElfW(Ehdr) *)base)->e_shentsize) != sizeof(ElfW(Shdr)))
 			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHENT);
 		/* Validate offsets for section headers */
 		if unlikely(result->d_shstrndx >= result->d_shnum)
 			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHSTRNDX);
 		if unlikely(result->d_shoff >= num_bytes ||
-		            result->d_shoff + (result->d_shnum * sizeof(Elf_Shdr)) > num_bytes)
+		            result->d_shoff + (result->d_shnum * sizeof(ElfW(Shdr))) > num_bytes)
 			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHOFF);
 		/* Load the sections header into memory. */
-		result->d_shdr = (Elf_Shdr *)kmalloc(result->d_shnum * sizeof(Elf_Shdr), GFP_PREFLT);
-		memcpy((Elf_Shdr *)result->d_shdr,
+		result->d_shdr = (ElfW(Shdr) *)kmalloc(result->d_shnum * sizeof(ElfW(Shdr)), GFP_PREFLT);
+		memcpy((ElfW(Shdr) *)result->d_shdr,
 		       base + result->d_shoff,
-		       result->d_shnum, sizeof(Elf_Shdr));
+		       result->d_shnum, sizeof(ElfW(Shdr)));
 		{
-			Elf_Shdr const *shstrtab;
+			ElfW(Shdr) const *shstrtab;
 			size_t shstrtab_size;
 			char const *shstrtab_base, *shstrtab_end;
 			shstrtab = &result->d_shdr[result->d_shstrndx];
@@ -3768,8 +3747,8 @@ done_tags_for_soname:
 				            (void *)(dyn_base + result->d_phdr[i].p_memsz) > (void *)result->d_loadend)
 					THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNAMIC);
 				/* Found it! */
-				result->d_dyncnt = result->d_phdr[i].p_memsz / sizeof(Elf_Dyn);
-				result->d_dynhdr = (Elf_Dyn *)dyn_base;
+				result->d_dyncnt = result->d_phdr[i].p_memsz / sizeof(ElfW(Dyn));
+				result->d_dynhdr = (ElfW(Dyn) *)dyn_base;
 				break;
 			}
 
@@ -3781,7 +3760,7 @@ done_tags_for_soname:
 				soname_offset = (uintptr_t)-1;
 				dynstr_size   = (size_t)-1;
 				for (i = 0; i < result->d_dyncnt; ++i) {
-					Elf_Dyn tag;
+					ElfW(Dyn) tag;
 					tag = result->d_dynhdr[i];
 					switch (tag.d_tag) {
 
@@ -3808,31 +3787,31 @@ done_tags_for_soname:
 						break;
 
 					case DT_HASH:
-						result->d_hashtab = (Elf_HashTable *)(result->d_loadaddr + tag.d_un.d_ptr);
+						result->d_hashtab = (ElfW(HashTable) *)(result->d_loadaddr + tag.d_un.d_ptr);
 						if unlikely((void *)result->d_hashtab < (void *)result->d_loadstart ||
 						            (void *)result->d_hashtab > (void *)result->d_loadend)
 							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMHASH);
 						break;
 
 					case DT_SYMTAB:
-						result->d_dynsym_tab = (Elf_Sym *)(result->d_loadaddr + tag.d_un.d_ptr);
+						result->d_dynsym_tab = (ElfW(Sym) *)(result->d_loadaddr + tag.d_un.d_ptr);
 						if unlikely((void *)result->d_dynsym_tab < (void *)result->d_loadstart ||
 						            (void *)result->d_dynsym_tab > (void *)result->d_loadend)
 							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSYM);
 						break;
 
 					case DT_SYMENT:
-						if unlikely(tag.d_un.d_val != sizeof(Elf_Sym))
+						if unlikely(tag.d_un.d_val != sizeof(ElfW(Sym)))
 							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMENT);
 						break;
 
 					case DT_RELAENT:
-						if unlikely(tag.d_un.d_val != sizeof(Elf_Rela))
+						if unlikely(tag.d_un.d_val != sizeof(ElfW(Rela)))
 							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELAENT);
 						break;
 
 					case DT_RELENT:
-						if unlikely(tag.d_un.d_val != sizeof(Elf_Rel))
+						if unlikely(tag.d_un.d_val != sizeof(ElfW(Rel)))
 							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELENT);
 						break;
 
@@ -3900,7 +3879,7 @@ do_dynstr_size:
 						    (void *)result->d_dynsym_tab < (void *)sect_end) {
 							/* Found the section */
 							result->d_dynsym_cnt = ((byte_t *)sect_end - (byte_t *)result->d_dynsym_tab) /
-							                       sizeof(Elf_Sym);
+							                       sizeof(ElfW(Sym));
 							goto done_dynsym;
 						}
 					}

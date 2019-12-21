@@ -49,9 +49,9 @@ enum {
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADVERSION2,      /* e_version != EV_CURRENT */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADTYPE,          /* e_type != ET_EXEC (or in the case of a driver: e_type != ET_DYN) */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADMACH,          /* e_machine != EM_* (as required by the host) */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADHEADER,        /* e_ehsize < offsetafter(Elf_Ehdr,e_phnum) */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADHEADER,        /* e_ehsize < offsetafter(ElfW(Ehdr), e_phnum) */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOSEGMENTS,       /* e_phnum == 0 */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADSEGMENTS,      /* e_phentsize != sizeof(Elf_Phdr) */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADSEGMENTS,      /* e_phentsize != sizeof(ElfW(Phdr)) */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS,  /* e_phnum > ... (hard limit imposed by the host; i386/x86_64 uses 64 for this) */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_UNALIGNEDSEGMENT, /* (p_offset & (getpagesize() - 1)) != (p_vaddr & (getpagesize() - 1)) */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP,   /* Loading of static binary failed due to overlapping segments */
@@ -60,7 +60,7 @@ enum {
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNAMIC,      /* Only when loading drivers: The `PT_DYNAMIC' program header is out-of-bounds */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_SONAME,        /* Only when loading drivers: No `DT_SONAME' or `DT_STRTAB' tag found */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SONAME,       /* Only when loading drivers: The `DT_STRTAB' tag isn't mapped, or the `DT_SONAME' tag is out-of-bounds */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHENT,        /* Only when loading drivers: The `e_shentsize' fields doesn't equal `sizeof(Elf_Shdr)' */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHENT,        /* Only when loading drivers: The `e_shentsize' fields doesn't equal `sizeof(ElfW(Shdr))' */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHSTRNDX,     /* Only when loading drivers: The `e_shstrndx' field of the header is out-of-bounds */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHOFF,        /* Only when loading drivers: The `e_shoff' / `e_shnum' fields of the header are out-of-bounds */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOBITS_SHSTRTAB,  /* Only when loading drivers: The `.shstrtab' section header has a type `SHT_NOBITS' */
@@ -91,9 +91,9 @@ enum {
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADVERSION2      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADVERSION2      /* e_version != EV_CURRENT */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADTYPE          E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADTYPE          /* e_type != ET_EXEC (or in the case of a driver: e_type != ET_DYN) */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADMACH          E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADMACH          /* e_machine != EM_* (as required by the host) */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADHEADER        E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADHEADER        /* e_ehsize < offsetafter(Elf_Ehdr,e_phnum) */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADHEADER        E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADHEADER        /* e_ehsize < offsetafter(ElfW(Ehdr), e_phnum) */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOSEGMENTS       E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOSEGMENTS       /* e_phnum == 0 */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADSEGMENTS      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADSEGMENTS      /* e_phentsize != sizeof(Elf_Phdr) */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADSEGMENTS      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADSEGMENTS      /* e_phentsize != sizeof(ElfW(Phdr)) */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS  E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS  /* e_phnum > ... (hard limit imposed by the host; i386/x86_64 uses 64 for this) */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_UNALIGNEDSEGMENT E_NOT_EXECUTABLE_FAULTY_REASON_ELF_UNALIGNEDSEGMENT /* (p_offset & (getpagesize() - 1)) != (p_vaddr & (getpagesize() - 1)) */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP   E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP   /* Loading of static binary failed due to overlapping segments */
@@ -102,7 +102,7 @@ enum {
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNAMIC      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNAMIC      /* Only when loading drivers: The `PT_DYNAMIC' program header is out-of-bounds */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_SONAME        E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_SONAME        /* Only when loading drivers: No `DT_SONAME' or `DT_STRTAB' tag found */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SONAME       E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SONAME       /* Only when loading drivers: The `DT_STRTAB' tag isn't mapped, or the `DT_SONAME' tag is out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHENT        E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHENT        /* Only when loading drivers: The `e_shentsize' fields doesn't equal `sizeof(Elf_Shdr)' */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHENT        E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHENT        /* Only when loading drivers: The `e_shentsize' fields doesn't equal `sizeof(ElfW(Shdr))' */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHSTRNDX     E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHSTRNDX     /* Only when loading drivers: The `e_shstrndx' field of the header is out-of-bounds */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHOFF        E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHOFF        /* Only when loading drivers: The `e_shoff' / `e_shnum' fields of the header are out-of-bounds */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOBITS_SHSTRTAB  E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOBITS_SHSTRTAB  /* Only when loading drivers: The `.shstrtab' section header has a type `SHT_NOBITS' */
@@ -130,9 +130,9 @@ enum {
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADVERSION2      4  /* e_version != EV_CURRENT */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADTYPE          5  /* e_type != ET_EXEC (or in the case of a driver: e_type != ET_DYN) */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADMACH          6  /* e_machine != EM_* (as required by the host) */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADHEADER        7  /* e_ehsize < offsetafter(Elf_Ehdr,e_phnum) */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADHEADER        7  /* e_ehsize < offsetafter(ElfW(Ehdr), e_phnum) */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOSEGMENTS       8  /* e_phnum == 0 */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADSEGMENTS      9  /* e_phentsize != sizeof(Elf_Phdr) */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADSEGMENTS      9  /* e_phentsize != sizeof(ElfW(Phdr)) */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS  10 /* e_phnum > ... (hard limit imposed by the host; i386/x86_64 uses 64 for this) */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_UNALIGNEDSEGMENT 11 /* (p_offset & (getpagesize() - 1)) != (p_vaddr & (getpagesize() - 1)) */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP   12 /* Loading of static binary failed due to overlapping segments */
@@ -141,7 +141,7 @@ enum {
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNAMIC      15 /* Only when loading drivers: The `PT_DYNAMIC' program header is out-of-bounds */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_SONAME        16 /* Only when loading drivers: No `DT_SONAME' or `DT_STRTAB' tag found */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SONAME       17 /* Only when loading drivers: The `DT_STRTAB' tag isn't mapped, or the `DT_SONAME' tag is out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHENT        18 /* Only when loading drivers: The `e_shentsize' fields doesn't equal `sizeof(Elf_Shdr)' */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHENT        18 /* Only when loading drivers: The `e_shentsize' fields doesn't equal `sizeof(ElfW(Shdr))' */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHSTRNDX     19 /* Only when loading drivers: The `e_shstrndx' field of the header is out-of-bounds */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHOFF        20 /* Only when loading drivers: The `e_shoff' / `e_shnum' fields of the header are out-of-bounds */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOBITS_SHSTRTAB  21 /* Only when loading drivers: The `.shstrtab' section header has a type `SHT_NOBITS' */
