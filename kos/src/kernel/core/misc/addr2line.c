@@ -71,7 +71,7 @@ PUBLIC_CONST ATTR_COLDRODATA di_debug_sections_t const kernel_debug_sections = {
 	/* .ds_debug_ranges_end    = */ (byte_t *)__kernel_debug_ranges_end,
 	/* .ds_symtab_start        = */ (byte_t *)NULL,
 	/* .ds_symtab_end          = */ (byte_t *)NULL,
-	/* .ds_symtab_ent          = */ sizeof(Elf_Sym),
+	/* .ds_symtab_ent          = */ sizeof(ElfW(Sym)),
 	/* .ds_strtab_start        = */ (byte_t *)NULL,
 	/* .ds_strtab_end          = */ (byte_t *)NULL
 };

@@ -68,6 +68,27 @@
 
 DECL_BEGIN
 
+/* Define Elf WORD types. */
+typedef ElfW(Half)      Elf_Half;
+typedef ElfW(Word)      Elf_Word;
+typedef ElfW(Ehdr)      Elf_Ehdr;
+typedef ElfW(Phdr)      Elf_Phdr;
+typedef ElfW(Shdr)      Elf_Shdr;
+typedef ElfW(Sym)       Elf_Sym;
+typedef ElfW(HashTable) Elf_HashTable;
+typedef ElfW(Dyn)       Elf_Dyn;
+typedef ElfW(Rel)       Elf_Rel;
+typedef ElfW(Rela)      Elf_Rela;
+typedef ElfW(Addr)      Elf_Addr;
+typedef ElfW(Off)       Elf_Off;
+#define ELF_PHDR_INIT  ELFW(PHDR_INIT)
+#define ELF_ST_TYPE    ELFW(ST_TYPE)
+#define ELF_ST_BIND    ELFW(ST_BIND)
+#define ELF_R_TYPE     ELFW(R_TYPE)
+#define ELF_R_SYM      ELFW(R_SYM)
+
+
+
 /* FDE Cache API */
 struct driver_fde_cache_node {
 	struct {

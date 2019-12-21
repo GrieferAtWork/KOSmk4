@@ -34,6 +34,7 @@
 #include <hybrid/overflow.h>
 
 #include <kos/except-inval.h>
+#include <kos/exec/elf.h>
 #include <sys/mman.h>
 
 #include <assert.h>
@@ -111,11 +112,11 @@ STATIC_ASSERT(PROT_SHARED == VM_PROT_SHARED);
 PRIVATE void KCALL
 unmap_range(struct vm *__restrict v,
             PAGEDIR_PAGEALIGNED UNCHECKED void *loadaddr,
-            USER CHECKED Elf_Phdr *headers,
+            USER CHECKED ElfW(Phdr) *headers,
             size_t count) {
-	Elf_Addr addr;
-	Elf_Off offset;
-	Elf_Word size;
+	ElfW(Addr) addr;
+	ElfW(Off) offset;
+	ElfW(Word) size;
 	while (count--) {
 		if (ATOMIC_READ(headers[count].p_type) != PT_LOAD)
 			continue;
@@ -143,7 +144,7 @@ unmap_range(struct vm *__restrict v,
 
 
 PRIVATE bool KCALL
-contains_illegal_overlap(USER CHECKED Elf_Phdr *headers,
+contains_illegal_overlap(USER CHECKED ElfW(Phdr) *headers,
                          size_t count) {
 	size_t i, j;
 	uintptr_t addr_page_offset = 0;
@@ -151,9 +152,9 @@ contains_illegal_overlap(USER CHECKED Elf_Phdr *headers,
 	for (i = 0; i < count; ++i) {
 		uintptr_t min_page;
 		uintptr_t max_page;
-		Elf_Addr addr;
-		Elf_Word size;
-		Elf_Off offset;
+		ElfW(Addr) addr;
+		ElfW(Word) size;
+		ElfW(Off) offset;
 		if (ATOMIC_READ(headers[i].p_type) != PT_LOAD)
 			continue;
 		addr   = ATOMIC_READ(headers[i].p_vaddr);
@@ -185,7 +186,7 @@ contains_illegal_overlap(USER CHECKED Elf_Phdr *headers,
 		min_page = addr / PAGESIZE;
 		if (OVERFLOW_UADD(addr, size, &addr))
 			goto yes;
-		if (OVERFLOW_UADD(addr, (Elf_Addr)PAGEMASK, &addr))
+		if (OVERFLOW_UADD(addr, (ElfW(Addr))PAGEMASK, &addr))
 			goto yes;
 		max_page = (addr / PAGESIZE) - 1;
 		for (j = i + 1; j < count; ++j) {
@@ -222,7 +223,7 @@ contains_illegal_overlap(USER CHECKED Elf_Phdr *headers,
 			other_min_page = addr / PAGESIZE;
 			if (OVERFLOW_UADD(addr, size, &addr))
 				goto yes;
-			if (OVERFLOW_UADD(addr, (Elf_Addr)PAGEMASK, &addr))
+			if (OVERFLOW_UADD(addr, (ElfW(Addr))PAGEMASK, &addr))
 				goto yes;
 			other_max_page = (addr / PAGESIZE) - 1;
 			if (other_min_page < max_page &&
@@ -242,7 +243,7 @@ DEFINE_SYSCALL5(void *, maplibrary,
 	byte_t *result;
 	struct vm *v = THIS_VM;
 	size_t i;
-	USER CHECKED Elf_Phdr *headers = (Elf_Phdr *)hdrv;
+	USER CHECKED ElfW(Phdr) *headers = (ElfW(Phdr) *)hdrv;
 	uintptr_t addr_page_offset     = 0; /* Sub-page offset for the load address (usually 0) */
 	uintptr_t min_page             = 0;
 	REF struct vm_datablock *file  = NULL;
@@ -251,7 +252,7 @@ DEFINE_SYSCALL5(void *, maplibrary,
 	bool is_first;
 	size_t min_alignment = PAGESIZE;
 	size_t total_bytes   = 0;
-	validate_readablem(hdrv, hdrc, sizeof(Elf_Phdr));
+	validate_readablem(hdrv, hdrc, sizeof(ElfW(Phdr)));
 	VALIDATE_FLAGSET(flags,
 	                 MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
 	                 MAP_NORESERVE | MAP_POPULATE | MAP_SYNC |
@@ -271,8 +272,8 @@ DEFINE_SYSCALL5(void *, maplibrary,
 			max_addr = 0;
 			/* Figure out the min/max byte offsets for program segments. */
 			for (i = 0; i < hdrc; ++i) {
-				Elf_Addr addr;
-				Elf_Word size;
+				ElfW(Addr) addr;
+				ElfW(Word) size;
 				if (ATOMIC_READ(headers[i].p_type) != PT_LOAD)
 					continue;
 				addr = ATOMIC_READ(headers[i].p_vaddr);
@@ -306,9 +307,9 @@ DEFINE_SYSCALL5(void *, maplibrary,
 		/* Figure out the min/max byte offsets for program segments. */
 		is_first = true;
 		for (i = 0; i < hdrc; ++i) {
-			Elf_Addr addr;
-			Elf_Off offset;
-			Elf_Word size, align, filesize;
+			ElfW(Addr) addr;
+			ElfW(Off) offset;
+			ElfW(Word) size, align, filesize;
 			if (ATOMIC_READ(headers[i].p_type) != PT_LOAD)
 				continue;
 			addr     = ATOMIC_READ(headers[i].p_vaddr);
@@ -383,12 +384,12 @@ again_map_segments:
 	TRY {
 		/* Now that we've got a suitable memory location, move on to actually map the library. */
 		for (; i < hdrc; ++i) {
-			Elf_Addr addr;
-			Elf_Word size, unaligned_size;
-			Elf_Word filesize, unaligned_filesize;
-			Elf_Off offset;
+			ElfW(Addr) addr;
+			ElfW(Word) size, unaligned_size;
+			ElfW(Word) filesize, unaligned_filesize;
+			ElfW(Off) offset;
+			ElfW(Word) segment_flags;
 			uintptr_half_t prot;
-			Elf_Word segment_flags;
 			if (ATOMIC_READ(headers[i].p_type) != PT_LOAD)
 				continue;
 			addr          = ATOMIC_READ(headers[i].p_vaddr);

@@ -234,23 +234,54 @@ vmb_alloc_peb(struct vmb *__restrict self,
               USER UNCHECKED char const *USER CHECKED const *argv,
               USER UNCHECKED char const *USER CHECKED const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+
 #ifdef __ARCH_HAVE_COMPAT
 #if __ARCH_COMPAT_SIZEOF_POINTER == 4
+#define vmb_alloc_peb64     vmb_alloc_peb
+#define vmb_alloc_peb64_p64 vmb_alloc_peb
+#define vmb_alloc_peb32_p32 vmb_alloc_peb32
 FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
 vmb_alloc_peb32(struct vmb *__restrict self,
                 size_t argc_inject, KERNEL char const *const *argv_inject,
-                USER UNCHECKED __ARCH_COMPAT_PTR(char const) USER CHECKED const *argv,
-                USER UNCHECKED __ARCH_COMPAT_PTR(char const) USER CHECKED const *envp)
+                USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *argv,
+                USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
-#define vmb_alloc_peb64 vmb_alloc_peb
+FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
+vmb_alloc_peb32_p64(struct vmb *__restrict self,
+                    size_t argc_inject, KERNEL char const *const *argv_inject,
+                    USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *argv,
+                    USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *envp)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
+vmb_alloc_peb64_p32(struct vmb *__restrict self,
+                    size_t argc_inject, KERNEL char const *const *argv_inject,
+                    USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *argv,
+                    USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *envp)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 #elif __ARCH_COMPAT_SIZEOF_POINTER == 8
+#define vmb_alloc_peb32     vmb_alloc_peb
+#define vmb_alloc_peb64_p64 vmb_alloc_peb64
+#define vmb_alloc_peb32_p32 vmb_alloc_peb
 FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
 vmb_alloc_peb64(struct vmb *__restrict self,
                 size_t argc_inject, KERNEL char const *const *argv_inject,
-                USER UNCHECKED __ARCH_COMPAT_PTR(char const) USER CHECKED const *argv,
-                USER UNCHECKED __ARCH_COMPAT_PTR(char const) USER CHECKED const *envp)
+                USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *argv,
+                USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
-#define vmb_alloc_peb32 vmb_alloc_peb
+FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
+vmb_alloc_peb64_p32(struct vmb *__restrict self,
+                    size_t argc_inject, KERNEL char const *const *argv_inject,
+                    USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *argv,
+                    USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *envp)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+FUNDEF WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
+vmb_alloc_peb32_p64(struct vmb *__restrict self,
+                    size_t argc_inject, KERNEL char const *const *argv_inject,
+                    USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *argv,
+                    USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *envp)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
+#else
+#error "Unsupported `__ARCH_COMPAT_SIZEOF_POINTER'"
 #endif
 #endif /* __ARCH_HAVE_COMPAT */
 

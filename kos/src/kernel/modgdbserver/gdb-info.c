@@ -254,7 +254,7 @@ NOTHROW(FCALL GDBInfo_PrintKernelDriverList)(pformatprinter printer, void *arg) 
 	state = driver_get_state();
 	for (i = 0; i < state->ds_count; ++i) {
 		struct driver *d = state->ds_drivers[i];
-		Elf_Half j;
+		ElfW(Half) j;
 		size_t lowest_segment_offset;
 		size_t alignment_offset;
 		/* One would expect that GDB wants `d_loadaddr', but that is incorrect.

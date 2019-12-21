@@ -1927,7 +1927,9 @@ struct superblock_type {
 DEFINE_REFCOUNT_FUNCTIONS(struct superblock_type, st_driver->d_refcnt, __private_superblock_type_destroy);
 
 
+#ifndef SUPERBLOCK_FNORMAL
 #define SUPERBLOCK_FNORMAL      0x0000 /* Normal superblock flags. */
+#endif /* !SUPERBLOCK_FNORMAL */
 #define SUPERBLOCK_FDOATIME     0x0001 /* [lock(atomic,weak)] Keep track of last-accessed timestamps (when opening streams to files). */
 #define SUPERBLOCK_FNOMTIME     0x0002 /* [lock(atomic,weak)] Do not update last-modified timestamps. */
 #define SUPERBLOCK_FUNMOUNTED   0x4000 /* [lock(WRITE_ONCE)] The superblock has been unmounted. */

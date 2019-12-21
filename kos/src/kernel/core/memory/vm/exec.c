@@ -34,7 +34,9 @@
 #include <kernel/vm/phys.h>
 
 #include <hybrid/align.h>
+#include <hybrid/pointer.h>
 
+#include <bits/compat.h>
 #include <kos/except-fs.h>
 #include <kos/except-noexec.h>
 #include <kos/exec/elf.h>
@@ -45,6 +47,10 @@
 #include <elf.h>
 #include <malloca.h>
 #include <string.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <kos/exec/asm/elf-compat.h>
+#endif /* __ARCH_HAVE_COMPAT */
 
 #include "vm-nodeapi.h"
 
@@ -102,43 +108,82 @@ PRIVATE struct library_listdef const peb_based_library_list = {
 
 
 LOCAL NOBLOCK WUNUSED NONNULL((1)) uintptr_t
-NOTHROW(KCALL elf_validate_ehdr)(Elf_Ehdr *__restrict ehdr) {
+NOTHROW(KCALL elf_validate_ehdr)(ElfW(Ehdr) *__restrict ehdr) {
 	uintptr_t result;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADCLASS;
-	if	unlikely(ehdr->e_ident[EI_CLASS] != ELF_ARCH_CLASS)
+	if unlikely(ehdr->e_ident[EI_CLASS] != ELF_ARCH_CLASS)
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADORDER;
-	if	unlikely(ehdr->e_ident[EI_DATA] != ELF_ARCH_DATA)
+	if unlikely(ehdr->e_ident[EI_DATA] != ELF_ARCH_DATA)
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADVERSION;
-	if	unlikely(ehdr->e_ident[EI_VERSION] != EV_CURRENT)
+	if unlikely(ehdr->e_ident[EI_VERSION] != EV_CURRENT)
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADVERSION2;
-	if	unlikely(ehdr->e_version != EV_CURRENT)
+	if unlikely(ehdr->e_version != EV_CURRENT)
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADTYPE;
-	if	unlikely(ehdr->e_type != ET_EXEC)
+	if unlikely(ehdr->e_type != ET_EXEC)
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADMACH;
-	if	unlikely(ehdr->e_machine != ELF_ARCH_MACHINE)
+	if unlikely(ehdr->e_machine != ELF_ARCH_MACHINE)
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADHEADER;
-	if	unlikely(ehdr->e_ehsize < offsetafter(Elf_Ehdr,e_phnum))
+	if unlikely(ehdr->e_ehsize < offsetafter(ElfW(Ehdr),e_phnum))
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOSEGMENTS;
-	if	unlikely(!ehdr->e_phnum)
+	if unlikely(!ehdr->e_phnum)
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADSEGMENTS;
-	if	unlikely(ehdr->e_phentsize != sizeof(Elf_Phdr))
+	if unlikely(ehdr->e_phentsize != sizeof(ElfW(Phdr)))
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS;
-	if	unlikely(ehdr->e_phnum > ELF_ARCH_MAXPHCOUNT)
+	if unlikely(ehdr->e_phnum > ELF_ARCH_MAXPHCOUNT)
 		goto done; /* Too many program headers. */
 	result = 0;
 done:
 	return result;
 }
 
+#ifdef __ARCH_HAVE_COMPAT
+LOCAL NOBLOCK WUNUSED NONNULL((1)) uintptr_t
+NOTHROW(KCALL __ARCH_COMPAT(elf_validate_ehdr))(COMPAT_ElfW(Ehdr) *__restrict ehdr) {
+	uintptr_t result;
+	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADCLASS;
+	if unlikely(ehdr->e_ident[EI_CLASS] != ELF_ARCHCOMPAT_CLASS)
+		goto done;
+	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADORDER;
+	if unlikely(ehdr->e_ident[EI_DATA] != ELF_ARCHCOMPAT_DATA)
+		goto done;
+	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADVERSION;
+	if unlikely(ehdr->e_ident[EI_VERSION] != EV_CURRENT)
+		goto done;
+	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADVERSION2;
+	if unlikely(ehdr->e_version != EV_CURRENT)
+		goto done;
+	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADTYPE;
+	if unlikely(ehdr->e_type != ET_EXEC)
+		goto done;
+	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADMACH;
+	if unlikely(ehdr->e_machine != ELF_ARCHCOMPAT_MACHINE)
+		goto done;
+	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADHEADER;
+	if unlikely(ehdr->e_ehsize < offsetafter(COMPAT_ElfW(Ehdr),e_phnum))
+		goto done;
+	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOSEGMENTS;
+	if unlikely(!ehdr->e_phnum)
+		goto done;
+	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADSEGMENTS;
+	if unlikely(ehdr->e_phentsize != sizeof(COMPAT_ElfW(Phdr)))
+		goto done;
+	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS;
+	if unlikely(ehdr->e_phnum > ELF_ARCH_MAXPHCOUNT)
+		goto done; /* Too many program headers. */
+	result = 0;
+done:
+	return result;
+}
+#endif /* __ARCH_HAVE_COMPAT */
 
 LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1)) struct vm_node *KCALL
 create_bss_overlap_node(struct regular_node *__restrict exec_node,
@@ -208,6 +253,71 @@ create_bss_overlap_node(struct regular_node *__restrict exec_node,
 }
 
 
+#ifndef __INTELLISENSE__
+DECL_END
+#define MY_PTR(x) x *
+#define MY_FUNC(x) x
+#define MY_ELFW ELFW
+#define MY_ElfW ElfW
+#define MY_SYSTEM_RTLD_SIZE system_rtld_size
+#define MY_SYSTEM_RTLD_FILE system_rtld_file
+#define MY_POINTERSIZE __SIZEOF_POINTER__
+#ifdef __ARCH_HAVE_COMPAT
+#define MY_EXEC_ARGV_SIZE 1
+#endif /* __ARCH_HAVE_COMPAT */
+#include "exec-impl.c.inl"
+
+#ifdef __ARCH_HAVE_COMPAT
+#define MY_PTR              __ARCH_COMPAT_PTR
+#define MY_FUNC             __ARCH_COMPAT
+#define MY_ELFW             COMPAT_ELFW
+#define MY_ElfW             COMPAT_ElfW
+#define MY_SYSTEM_RTLD_SIZE PP_CAT2(__ARCH_COMPAT(system_rtld), _size)
+#define MY_SYSTEM_RTLD_FILE PP_CAT2(__ARCH_COMPAT(system_rtld), _file)
+#define MY_POINTERSIZE      __ARCH_COMPAT_SIZEOF_POINTER
+#define MY_EXEC_ARGV_SIZE 1
+#include "exec-impl.c.inl"
+#endif /* __ARCH_HAVE_COMPAT */
+
+DECL_BEGIN
+#else /* !__INTELLISENSE__ */
+LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5, 10)) struct icpustate *KCALL
+vm_exec_impl(struct vm *__restrict effective_vm,
+             struct icpustate *__restrict user_state,
+             struct path *__restrict exec_path,
+             struct directory_entry *__restrict exec_dentry,
+             struct regular_node *__restrict exec_node,
+             size_t argc_inject, KERNEL char const *const *argv_inject,
+#ifdef __ARCH_HAVE_COMPAT
+             USER CHECKED void const *argv,
+             USER CHECKED void const *envp,
+#else /* __ARCH_HAVE_COMPAT */
+             USER UNCHECKED char const *USER CHECKED const *argv,
+             USER UNCHECKED char const *USER CHECKED const *envp,
+#endif /* !__ARCH_HAVE_COMPAT */
+             ElfW(Ehdr) const *__restrict ehdr
+#ifdef __ARCH_HAVE_COMPAT
+             ,
+             bool argv_is_compat
+#endif /* __ARCH_HAVE_COMPAT */
+             )
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR);
+#ifdef __ARCH_HAVE_COMPAT
+LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5, 10)) struct icpustate *KCALL
+__ARCH_COMPAT(vm_exec_impl)(struct vm *__restrict effective_vm,
+                            struct icpustate *__restrict user_state,
+                            struct path *__restrict exec_path,
+                            struct directory_entry *__restrict exec_dentry,
+                            struct regular_node *__restrict exec_node,
+                            size_t argc_inject, KERNEL char const *const *argv_inject,
+                            USER CHECKED void const *argv,
+                            USER CHECKED void const *envp,
+                            COMPAT_ElfW(Ehdr) const *__restrict ehdr,
+                            bool argv_is_compat)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR);
+#endif /* __ARCH_HAVE_COMPAT */
+#endif /* __INTELLISENSE__ */
+
 /* Load an executable binary `exec_node' into a temporary, emulated VM.
  * If this succeeds, clear all of the mappings from `effective_vm', and
  * replace them with the contents of the temporary, emulated VM (such
@@ -245,267 +355,73 @@ vm_exec(struct vm *__restrict effective_vm,
         struct directory_entry *__restrict exec_dentry,
         struct regular_node *__restrict exec_node,
         size_t argc_inject, KERNEL char const *const *argv_inject,
+#ifdef __ARCH_HAVE_COMPAT
+        USER CHECKED void const *argv,
+        USER CHECKED void const *envp,
+        bool argv_is_compat
+#else /* __ARCH_HAVE_COMPAT */
         USER UNCHECKED char const *USER CHECKED const *argv,
-        USER UNCHECKED char const *USER CHECKED const *envp)
+        USER UNCHECKED char const *USER CHECKED const *envp
+#endif /* !__ARCH_HAVE_COMPAT */
+        )
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR) {
-	Elf_Ehdr ehdr;
-	Elf_Phdr *phdr_vector;
+	uintptr_t reason;
+	union {
+		ElfW(Ehdr)        e;
+#ifdef __ARCH_HAVE_COMPAT
+		COMPAT_ElfW(Ehdr) c;
+#endif /* __ARCH_HAVE_COMPAT */
+	} ehdr;
+	/* Read in the ELF header. */
+	inode_readall(exec_node, &ehdr, sizeof(ehdr), 0);
+
 	/* TODO: Support for Shebang */
 	/* TODO: Support for PE */
-	inode_readall(exec_node, &ehdr, sizeof(ehdr), 0);
-	if unlikely(ehdr.e_ident[EI_MAG0] != ELFMAG0 ||
-	            ehdr.e_ident[EI_MAG1] != ELFMAG1 ||
-	            ehdr.e_ident[EI_MAG2] != ELFMAG2 ||
-	            ehdr.e_ident[EI_MAG3] != ELFMAG3)
+
+	/* Validate the ELF header. */
+	if unlikely(ehdr.e.e_ident[EI_MAG0] != ELFMAG0 ||
+	            ehdr.e.e_ident[EI_MAG1] != ELFMAG1 ||
+	            ehdr.e.e_ident[EI_MAG2] != ELFMAG2 ||
+	            ehdr.e.e_ident[EI_MAG3] != ELFMAG3)
 		THROW(E_NOT_EXECUTABLE_NOT_A_BINARY);
-	/* Validate the executable header. */
-	{
-		uintptr_t reason;
-		reason = elf_validate_ehdr(&ehdr);
-		if unlikely(reason != 0)
-			THROW(E_NOT_EXECUTABLE_FAULTY,
-			      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,
-			      reason);
+	reason = elf_validate_ehdr(&ehdr.e);
+	if (reason == 0) {
+		user_state = vm_exec_impl(effective_vm,
+		                          user_state,
+		                          exec_path,
+		                          exec_dentry,
+		                          exec_node,
+		                          argc_inject,
+		                          argv_inject,
+		                          argv,
+		                          envp,
+		                          &ehdr.e
+#ifdef __ARCH_HAVE_COMPAT
+		                          ,
+		                          argv_is_compat
+#endif /* __ARCH_HAVE_COMPAT */
+		                          );
+		return user_state;
 	}
-	phdr_vector = (Elf_Phdr *)malloca(ehdr.e_phnum * sizeof(Elf_Phdr));
-	TRY {
-		struct vmb builder = VMB_INIT;
-		PAGEDIR_PAGEALIGNED UNCHECKED void *peb_base;
-		PAGEDIR_PAGEALIGNED UNCHECKED void *stack_base;
-		PAGEDIR_PAGEALIGNED UNCHECKED void *linker_base;
-		uintptr_t loadstart = (uintptr_t)-1;
-		TRY {
-			bool need_dyn_linker = false;
-			linker_base = (UNCHECKED void *)-1;
-			Elf_Half i;
-			/* Read the program segment header table into memory. */
-			inode_readall(exec_node,
-			              phdr_vector,
-			              ehdr.e_phnum * sizeof(Elf_Phdr),
-			              (pos_t)ehdr.e_phoff);
-
-			/* Load program headers. */
-			for (i = 0; i < ehdr.e_phnum; ++i) {
-				switch (phdr_vector[i].p_type) {
-
-				case PT_NULL:
-					/* Unused entry. */
-					break;
-				case PT_NOTE:
-				case PT_PHDR:
-					break;
-
-				case PT_LOAD: {
-					pageid_t page_index;
-					size_t num_pages, num_total;
-					uintptr_half_t prot;
-					size_t adjusted_filsize;
-					size_t adjusted_memsize;
-					void *bss_start;
-					bool map_ok;
-					/* Load entry into memory. */
-					if ((phdr_vector[i].p_offset & PAGEMASK) !=
-					    (phdr_vector[i].p_vaddr & PAGEMASK)) {
-						THROW(E_NOT_EXECUTABLE_FAULTY,
-						      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,
-						      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_UNALIGNEDSEGMENT);
-					}
-					page_index = PAGEID_ENCODE(phdr_vector[i].p_vaddr);
-					if (loadstart > phdr_vector[i].p_vaddr)
-						loadstart = phdr_vector[i].p_vaddr;
-					adjusted_filsize = phdr_vector[i].p_filesz + (phdr_vector[i].p_vaddr & PAGEMASK);
-					adjusted_memsize = phdr_vector[i].p_memsz + (phdr_vector[i].p_vaddr & PAGEMASK);
-					num_pages        = CEILDIV(adjusted_filsize, PAGESIZE);
-					num_total        = CEILDIV(adjusted_memsize, PAGESIZE);
-					bss_start        = (void *)(phdr_vector[i].p_vaddr + phdr_vector[i].p_filesz);
-					/* Check if we're going to need a .bss overlap fixup page */
-					if (adjusted_memsize > adjusted_filsize) {
-						if (((uintptr_t)bss_start & PAGEMASK) != 0)
-							--num_pages;
-					}
-#if PF_X == VM_PROT_EXEC && PF_W == VM_PROT_WRITE && PF_R == VM_PROT_READ
-					prot = phdr_vector[i].p_flags & (PF_X | PF_W | PF_R);
-#else
-					prot = VM_PROT_NONE;
-					if (phdr_vector[i].p_flags & PF_X)
-						prot |= VM_PROT_EXEC;
-					if (phdr_vector[i].p_flags & PF_W)
-						prot |= VM_PROT_WRITE;
-					if (phdr_vector[i].p_flags & PF_R)
-						prot |= VM_PROT_READ;
-#endif
-					map_ok = vmb_paged_mapat(&builder,
-					                   page_index,
-					                   num_pages,
-					                   exec_node,
-					                   (vm_vpage64_t)(phdr_vector[i].p_offset / PAGESIZE),
-					                   prot | VM_PROT_PRIVATE);
-					if unlikely(!map_ok) {
-err_overlap:
-						THROW(E_NOT_EXECUTABLE_FAULTY,
-						      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,
-						      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP);
-					}
-					if (num_total > num_pages) {
-						/* LD sometimes produces really weird .bss sections that are neither whole
-						 * pages, nor are placed such that they exist at the end of some given file.
-						 * Because of this, we must manually check for segments that end in a
-						 * small (< PAGESIZE) section of bss memory when that segment doesn't hug the
-						 * end of the actual file, and memset() it to all ZEROes.
-						 *
-						 * Example (filesize == 0x22060):
-						 *     Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
-						 *     LOAD           0x000000 0x00000000 0x00000000 0x0e224 0x0e224 R E 0x1000
-						 *     LOAD           0x00e224 0x0000f224 0x0000f224 0x000ec 0x000fc RW  0x1000
-						 *     DYNAMIC        0x00e228 0x0000f228 0x0000f228 0x000a8 0x000a8 RW  0x4
-						 *
-						 * The second segment contains a BSS area of 0xfc-0xec == 0x10 bytes at 0xf310...0xf31f
-						 * Since this range is still part of the page that gets loaded from disk as a file mapping,
-						 * the associated file mapping at 0xf224...0xf30f is extended to the end of the associated
-						 * page at 0xffff (which includes (in this case) the entire .bss section).
-						 *
-						 * In a case like this where the .bss area overlaps with the extended file mapping, the first
-						 * page of the .bss area must be re-mapped as writable (if not already), followed by the area
-						 * `START_OF_BSS ... MIN(MAX_BSS_BYTE, MAX_BYTE_OF_PAGE(PAGE_OF(START_OF_BSS)))' being forcibly
-						 * initialized to all ZEROes, causing the page to be faulted and become initialized properly.
-						 */
-						if (((uintptr_t)bss_start & PAGEMASK) != 0) {
-							pageid_t bss_overlap_page;
-							size_t bss_start_offset, bss_overlap, bss_total_size;
-							struct vm_node *overlap_node;
-							assert(phdr_vector[i].p_memsz > phdr_vector[i].p_filesz);
-							bss_total_size = phdr_vector[i].p_memsz -
-							                 phdr_vector[i].p_filesz;
-							bss_start_offset = (size_t)((uintptr_t)bss_start & PAGEMASK);
-							bss_overlap = PAGESIZE - bss_start_offset;
-							if (bss_overlap > bss_total_size)
-								bss_overlap = bss_total_size;
-							bss_overlap_page = page_index + num_pages;
-							assert(bss_overlap_page == PAGEID_ENCODE(bss_start));
-							if unlikely(vmb_getnodeofpageid(&builder, bss_overlap_page) != NULL)
-								goto err_overlap; /* Already in use... */
-							overlap_node = create_bss_overlap_node(exec_node,
-							                                       (pos_t)(phdr_vector[i].p_offset +
-							                                               phdr_vector[i].p_filesz -
-							                                               bss_start_offset),
-							                                       bss_start_offset,
-							                                       bss_overlap);
-							overlap_node->vn_node.a_vmin = bss_overlap_page;
-							overlap_node->vn_node.a_vmax = bss_overlap_page;
-							assert(overlap_node->vn_part);
-							assert(overlap_node->vn_part->dp_block == &vm_datablock_anonymous_zero ||
-							       overlap_node->vn_part->dp_block == &vm_datablock_anonymous);
-							overlap_node->vn_prot = prot | VM_PROT_PRIVATE;
-							vmb_node_insert(&builder, overlap_node);
-							++num_pages; /* Adjust to not map the first (special) page of .bss */
-						}
-						/* Map BSS as anonymous, zero-initialized memory. */
-						map_ok = vmb_paged_mapat(&builder,
-						                   page_index + num_pages,
-						                   num_total - num_pages,
-						                   &vm_datablock_anonymous_zero,
-						                   0,
-						                   prot | VM_PROT_PRIVATE);
-						if unlikely(!map_ok)
-							goto err_overlap;
-					}
-				}	break;
-
-				default:
-					need_dyn_linker = true;
-					break;
-				}
-			}
-			/* If necessary, load the dynamic linker. */
-			if (need_dyn_linker) {
-				linker_base = vmb_map(&builder,
-				                       HINT_GETADDR(KERNEL_VMHINT_USER_DYNLINK),
-				                       system_rtld_size,
-				                       PAGESIZE,
-#if !defined(NDEBUG) && 1 /* XXX: Remove me */
-				                       VM_GETFREE_ABOVE,
-#else
-				                       HINT_GETMODE(KERNEL_VMHINT_USER_DYNLINK),
-#endif
-				                       &system_rtld_file.rf_block,
-				                       0,
-				                       VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC | VM_PROT_PRIVATE,
-				                       VM_NODE_FLAG_NORMAL,
-				                       0);
-			}
-
-#define USER_STACK_NUM_PAGES 8 /* TODO: Don't put this here! */
-			/* Allocate a new user-space stack for the calling thread. */
-			stack_base = vmb_map(&builder,
-			                      HINT_GETADDR(KERNEL_VMHINT_USER_STACK),
-			                      USER_STACK_NUM_PAGES * PAGESIZE,
-			                      PAGESIZE,
-			                      HINT_GETMODE(KERNEL_VMHINT_USER_STACK),
-			                      &vm_datablock_anonymous_zero, /* XXX: Use memory with a debug initializer? */
-			                      0,
-			                      VM_PROT_READ | VM_PROT_WRITE,
-			                      VM_NODE_FLAG_NORMAL,
-			                      0);
-
-			/* Create a memory mapping for the PEB containing `argv' and `envp' */
-			peb_base = vmb_alloc_peb(&builder,
-			                         argc_inject,
-			                         argv_inject,
-			                         argv,
-			                         envp);
-
-			/* Apply the newly loaded binary to the given VM and
-			 * terminate all threads using it except for the caller. */
-			{
-				struct vm_execinfo_struct ei;
-				ei.ei_node = exec_node;
-				ei.ei_dent = exec_dentry;
-				ei.ei_path = exec_path;
-				vmb_apply(&builder,
-				          effective_vm,
-				          VMB_APPLY_AA_TERMTHREADS |
-				          VMB_APPLY_AA_SETEXECINFO,
-				          &ei);
-			}
-		} EXCEPT {
-			vmb_fini(&builder);
-			RETHROW();
-		}
-
-		/* Set the entry point for the loaded binary. */
-		user_state = elfexec_init_entry(user_state,
-		                                peb_base,
-		                                stack_base,
-		                                USER_STACK_NUM_PAGES * PAGESIZE,
-		                                (USER void *)ehdr.e_entry);
-
-		/* Initialize the RTLD portion of the user-space bootstrap process. */
-		if (linker_base != (void *)-1) {
-			user_state = elfexec_init_rtld(/* user_state:           */ user_state,
-			                               /* exec_path:            */ exec_path,
-			                               /* exec_dentry:          */ exec_dentry,
-			                               /* exec_node:            */ exec_node,
-			                               /* application_loadaddr: */ (void *)0,
-			                               /* linker_loadaddr:      */ linker_base,
-			                               /* phdr_vec:             */ phdr_vector,
-			                               /* phdr_cnt:             */ ehdr.e_phnum);
-		}
-		{
-			/* Initialize the library definitions list to use the PEB
-			 * NOTE: When libdl was linked into the mix (see line above), then
-			 *       it will override this fairly early on with its own version. */
-			struct library_listdef *lld = &FORVM(effective_vm, thisvm_library_listdef);
-			memcpy(lld, &peb_based_library_list, sizeof(struct library_listdef));
-			lld->lld_first                     = peb_base;
-			lld->lld_module_offsetof_loadstart = loadstart;
-			/* TODO: Somehow include the RTLD in the initial library list! */
-		}
-	} EXCEPT {
-		freea(phdr_vector);
-		RETHROW();
+#ifdef __ARCH_HAVE_COMPAT
+	reason = __ARCH_COMPAT(elf_validate_ehdr)(&ehdr.c);
+	if (reason == 0) {
+		user_state = __ARCH_COMPAT(vm_exec_impl)(effective_vm,
+		                                         user_state,
+		                                         exec_path,
+		                                         exec_dentry,
+		                                         exec_node,
+		                                         argc_inject, argv_inject,
+		                                         argv,
+		                                         envp,
+		                                         &ehdr.c,
+		                                         argv_is_compat);
+		return user_state;
 	}
-	freea(phdr_vector);
-	return user_state;
+#endif /* __ARCH_HAVE_COMPAT */
+	THROW(E_NOT_EXECUTABLE_FAULTY,
+	      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,
+	      reason);
 }
 
 

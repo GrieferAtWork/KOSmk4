@@ -37,8 +37,13 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <asm/pageid.h>
+#include <bits/compat.h>
 
 #include <stdbool.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <hybrid/__pointer.h>
+#endif /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN
 
@@ -2600,9 +2605,73 @@ vm_exec(struct vm *__restrict effective_vm,
         struct directory_entry *__restrict exec_dentry,
         struct regular_node *__restrict exec_node,
         size_t argc_inject, KERNEL char const *const *argv_inject,
+#ifdef __ARCH_HAVE_COMPAT
+        USER CHECKED void const *argv,
+        USER CHECKED void const *envp,
+        bool argv_is_compat
+#else /* __ARCH_HAVE_COMPAT */
+        USER UNCHECKED char const *USER CHECKED const *argv,
+        USER UNCHECKED char const *USER CHECKED const *envp
+#endif /* !__ARCH_HAVE_COMPAT */
+        )
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR);
+
+#ifdef __ARCH_HAVE_COMPAT
+extern "C++" {
+LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5)) struct icpustate *KCALL
+vm_exec(struct vm *__restrict effective_vm,
+        struct icpustate *__restrict user_state,
+        struct path *__restrict exec_path,
+        struct directory_entry *__restrict exec_dentry,
+        struct regular_node *__restrict exec_node,
+        size_t argc_inject, KERNEL char const *const *argv_inject,
         USER UNCHECKED char const *USER CHECKED const *argv,
         USER UNCHECKED char const *USER CHECKED const *envp)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR);
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR) {
+	return vm_exec(effective_vm, user_state, exec_path,
+	               exec_dentry, exec_node, argc_inject,
+	               argv_inject, argv, envp, false);
+}
+}
+#if __ARCH_COMPAT_SIZEOF_POINTER == 4
+LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5)) struct icpustate *KCALL
+vm_exec32(struct vm *__restrict effective_vm,
+          struct icpustate *__restrict user_state,
+          struct path *__restrict exec_path,
+          struct directory_entry *__restrict exec_dentry,
+          struct regular_node *__restrict exec_node,
+          size_t argc_inject, KERNEL char const *const *argv_inject,
+          USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *argv,
+          USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *envp)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR) {
+	return vm_exec(effective_vm, user_state, exec_path,
+	               exec_dentry, exec_node, argc_inject,
+	               argv_inject, argv, envp, true);
+}
+#else /* __ARCH_COMPAT_SIZEOF_POINTER == 4 */
+#define vm_exec32 vm_exec
+#endif /* __ARCH_COMPAT_SIZEOF_POINTER != 4 */
+
+#if __ARCH_COMPAT_SIZEOF_POINTER == 8
+LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5)) struct icpustate *KCALL
+vm_exec64(struct vm *__restrict effective_vm,
+          struct icpustate *__restrict user_state,
+          struct path *__restrict exec_path,
+          struct directory_entry *__restrict exec_dentry,
+          struct regular_node *__restrict exec_node,
+          size_t argc_inject, KERNEL char const *const *argv_inject,
+          USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *argv,
+          USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *envp)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR) {
+	return vm_exec(effective_vm, user_state, exec_path,
+	               exec_dentry, exec_node, argc_inject,
+	               argv_inject, argv, envp, true);
+}
+#else /* __ARCH_COMPAT_SIZEOF_POINTER == 8 */
+#define vm_exec64 vm_exec
+#endif /* __ARCH_COMPAT_SIZEOF_POINTER != 8 */
+#endif /* __ARCH_HAVE_COMPAT */
+
 
 /* Assert that `self' is a regular node for the purpose of being used as the
  * file to-be executed in an exec() system call, by throwing one of the annotated

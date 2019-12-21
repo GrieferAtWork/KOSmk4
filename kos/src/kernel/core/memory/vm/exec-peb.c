@@ -53,19 +53,29 @@
 #endif /* __ARCH_HAVE_COMPAT */
 
 #ifndef __INTELLISENSE__
-#define PTR(x)         x *
-#define FUNC(x)        x
-#define UINTPTR_T      uintptr_t
+#define IN_POINTERSIZE __SIZEOF_POINTER__
+#define OU_POINTERSIZE __SIZEOF_POINTER__
 #include "exec-peb-impl.c.inl"
 
 #ifdef __ARCH_HAVE_COMPAT
-#if __ARCH_COMPAT_SIZEOF_POINTER == 4
-#define FUNC(x)        x##32
-#elif __ARCH_COMPAT_SIZEOF_POINTER == 8
-#define FUNC(x)        x##64
-#endif
-#define PTR            __ARCH_COMPAT_PTR
-#define UINTPTR_T      __ARCH_COMPAT_UINTPTR_TYPE
+#if __SIZEOF_POINTER__ != 4
+#define IN_POINTERSIZE 4
+#define OU_POINTERSIZE 4
+#include "exec-peb-impl.c.inl"
+#endif /* __SIZEOF_POINTER__ != 4 */
+
+#if __SIZEOF_POINTER__ != 8
+#define IN_POINTERSIZE 8
+#define OU_POINTERSIZE 8
+#include "exec-peb-impl.c.inl"
+#endif /* __SIZEOF_POINTER__ != 8 */
+
+#define IN_POINTERSIZE 4
+#define OU_POINTERSIZE 8
+#include "exec-peb-impl.c.inl"
+
+#define IN_POINTERSIZE 8
+#define OU_POINTERSIZE 4
 #include "exec-peb-impl.c.inl"
 #endif /* __ARCH_HAVE_COMPAT */
 

@@ -19,17 +19,50 @@
 #ifdef __INTELLISENSE__
 #include "exec-peb.c"
 #if defined(__x86_64__) && 1
-#define PTR(x)         __HYBRID_PTR32(x)
-#define FUNC(x)        x##32
-#define UINTPTR_T      uint32_t
+#define IN_POINTERSIZE 4
+#define OU_POINTERSIZE 8
 #else
-#define PTR(x)         x *
-#define FUNC(x)        x
-#define UINTPTR_T      uintptr_t
+#define IN_POINTERSIZE __SIZEOF_POINTER__
+#define OU_POINTERSIZE __SIZEOF_POINTER__
 #endif
 #endif /* __INTELLISENSE__ */
 
 DECL_BEGIN
+
+#if IN_POINTERSIZE == OU_POINTERSIZE && IN_POINTERSIZE == __SIZEOF_POINTER__
+#define MY_VMB_ALLOC_PEB vmb_alloc_peb
+#elif IN_POINTERSIZE == OU_POINTERSIZE && IN_POINTERSIZE == 4
+#define MY_VMB_ALLOC_PEB vmb_alloc_peb32
+#elif IN_POINTERSIZE == OU_POINTERSIZE && IN_POINTERSIZE == 8
+#define MY_VMB_ALLOC_PEB vmb_alloc_peb64
+#elif OU_POINTERSIZE == 8 && IN_POINTERSIZE == 4
+#define MY_VMB_ALLOC_PEB vmb_alloc_peb64_p32
+#elif OU_POINTERSIZE == 4 && IN_POINTERSIZE == 8
+#define MY_VMB_ALLOC_PEB vmb_alloc_peb32_p64
+#else
+#error "Invalid IN/OU pointer size combination"
+#endif
+
+#if IN_POINTERSIZE == 4
+#define IN_PTR __HYBRID_PTR32
+#define IN_UIP __UINT32_TYPE__
+#elif IN_POINTERSIZE == 8
+#define IN_PTR __HYBRID_PTR64
+#define IN_UIP __UINT64_TYPE__
+#else
+#error "Invalid `IN_POINTERSIZE'"
+#endif
+
+#if OU_POINTERSIZE == 4
+#define OU_PTR __HYBRID_PTR32
+#define OU_UIP __UINT32_TYPE__
+#elif OU_POINTERSIZE == 8
+#define OU_PTR __HYBRID_PTR64
+#define OU_UIP __UINT64_TYPE__
+#else
+#error "Invalid `OU_POINTERSIZE'"
+#endif
+
 
 /* Allocate a PEB (Process Environment Block) within the given VMB,
  * initializing its contents with the strings from the given argv+envp pair.
@@ -43,12 +76,20 @@ DECL_BEGIN
  * @param: envp:        User-space pointer to a NULL-terminated vector of environment strings
  * @return: * :         Page index of the PEB (to-be passed to the user-space program) */
 PUBLIC WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
-FUNC(vmb_alloc_peb)(struct vmb *__restrict self,
-                    size_t argc_inject, KERNEL char const *const *argv_inject,
-                    USER UNCHECKED PTR(char const) USER CHECKED const *argv,
-                    USER UNCHECKED PTR(char const) USER CHECKED const *envp)
+MY_VMB_ALLOC_PEB(struct vmb *__restrict self,
+                 size_t argc_inject, KERNEL char const *const *argv_inject,
+                 USER UNCHECKED IN_PTR(char const) USER CHECKED const *argv,
+                 USER UNCHECKED IN_PTR(char const) USER CHECKED const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
-#define ATOMC_READ_CHARP(p) (USER UNCHECKED PTR(char const))ATOMIC_READ(*(UINTPTR_T *)&(p))
+#define ATOMC_READ_IN_CHARP(p) \
+	(USER UNCHECKED IN_PTR(char const))ATOMIC_READ(*(IN_UIP *)&(p))
+#if OU_POINTERSIZE == __SIZEOF_POINTER__
+	typedef struct process_peb peb_t;
+#elif OU_POINTERSIZE == 4
+	typedef struct process_peb32 peb_t;
+#else
+	typedef struct process_peb64 peb_t;
+#endif
 	size_t i;
 	size_t argc_user;
 	size_t envc_user;
@@ -57,8 +98,8 @@ FUNC(vmb_alloc_peb)(struct vmb *__restrict self,
 	byte_t *peb_temp_base;
 	PAGEDIR_PAGEALIGNED UNCHECKED void *result;
 	struct vm_node *stolen_node;
-	USER UNCHECKED PTR(char const) string;
-	USER UNCHECKED PTR(char const) USER CHECKED const *iter;
+	USER UNCHECKED IN_PTR(char const) string;
+	USER UNCHECKED IN_PTR(char const) USER CHECKED const *iter;
 
 again:
 	argc_user          = 0;
@@ -69,7 +110,7 @@ again:
 	for (i = 0; i < argc_inject; ++i)
 		strings_total_size += (strlen(argv_inject[i]) + 1) * sizeof(char);
 	if likely((iter = argv) != NULL) {
-		while ((string = ATOMC_READ_CHARP(*iter)) != NULL) {
+		while ((string = ATOMC_READ_IN_CHARP(*iter)) != NULL) {
 			size_t temp;
 			validate_readable(string, 1);
 			temp = (strlen(string) + 1) * sizeof(char);
@@ -80,7 +121,7 @@ again:
 		}
 	}
 	if likely((iter = envp) != NULL) {
-		while ((string = ATOMC_READ_CHARP(*iter)) != NULL) {
+		while ((string = ATOMC_READ_IN_CHARP(*iter)) != NULL) {
 			size_t temp;
 			validate_readable(string, 1);
 			temp = (strlen(string) + 1) * sizeof(char);
@@ -90,8 +131,8 @@ again:
 			++iter;
 		}
 	}
-	peb_total_size = (offsetafter(struct FUNC(process_peb), pp_envp) +
-	                  (argc_inject + argc_user + envc_user + 2) * sizeof(USER PTR(char)) +
+	peb_total_size = (offsetafter(peb_t, pp_envp) +
+	                  (argc_inject + argc_user + envc_user + 2) * OU_POINTERSIZE +
 	                  strings_total_size);
 	/* XXX: Check if `peb_total_size' is too large? */
 
@@ -109,22 +150,22 @@ again:
 	                                 0);
 	TRY {
 		byte_t *writer;
-		USER UINTPTR_T *peb_argv;
-		USER UINTPTR_T *peb_envp;
-		USER struct FUNC(process_peb) *peb;
+		USER OU_UIP *peb_argv;
+		USER OU_UIP *peb_envp;
+		USER peb_t *peb;
 		size_t strings_total_copied;
 
 		/* Initialize the PEB. */
-		writer   = peb_temp_base + offsetafter(struct FUNC(process_peb), pp_envp);
-		peb_argv = (USER UINTPTR_T *)writer;
-		writer += (argc_inject + argc_user + 1) * sizeof(USER PTR(char));
-		peb_envp = (USER UINTPTR_T *)writer;
-		writer += (envc_user + 1) * sizeof(USER PTR(char));
-		peb = (USER struct FUNC(process_peb) *)peb_temp_base;
+		writer   = peb_temp_base + offsetafter(peb_t, pp_envp);
+		peb_argv = (USER OU_UIP *)writer;
+		writer += (argc_inject + argc_user + 1) * OU_POINTERSIZE;
+		peb_envp = (USER OU_UIP *)writer;
+		writer += (envc_user + 1) * OU_POINTERSIZE;
+		peb = (USER peb_t *)peb_temp_base;
 		peb->pp_argc = argc_inject + argc_user;
-		peb->pp_argv = (USER PTR(USER PTR(char)))(UINTPTR_T)(uintptr_t)((byte_t *)peb_argv - (uintptr_t)peb_temp_base);
+		peb->pp_argv = (USER OU_PTR(USER OU_PTR(char)))(OU_UIP)(uintptr_t)((byte_t *)peb_argv - (uintptr_t)peb_temp_base);
 		peb->pp_envc = envc_user;
-		peb->pp_envp = (USER PTR(USER PTR(char)))(UINTPTR_T)(uintptr_t)((byte_t *)peb_envp - (uintptr_t)peb_temp_base);
+		peb->pp_envp = (USER OU_PTR(USER OU_PTR(char)))(OU_UIP)(uintptr_t)((byte_t *)peb_envp - (uintptr_t)peb_temp_base);
 
 		/* Copy strings. */
 		strings_total_copied = 0;
@@ -132,32 +173,32 @@ again:
 			size_t temp;
 			temp = (strlen(argv_inject[i]) + 1) * sizeof(char);
 			memcpy(writer, argv_inject[i], temp);
-			peb_argv[i] = (UINTPTR_T)((uintptr_t)writer - (uintptr_t)peb_temp_base);
+			peb_argv[i] = (OU_UIP)(uintptr_t)(writer - (uintptr_t)peb_temp_base);
 			writer += temp;
 			strings_total_copied += temp;
 		}
 		for (i = 0; i < argc_user; ++i) {
 			size_t temp;
-			string = ATOMC_READ_CHARP(argv[i]);
+			string = ATOMC_READ_IN_CHARP(argv[i]);
 			validate_readable(string, 1);
 			temp = (strlen(string) + 1) * sizeof(char);
 			if unlikely(OVERFLOW_UADD(strings_total_copied, temp, &strings_total_copied) ||
 			            (strings_total_copied > strings_total_size))
 				goto string_size_changed;
 			memcpy(writer, string, temp);
-			peb_argv[argc_inject + i] = (UINTPTR_T)(uintptr_t)(writer - (uintptr_t)peb_temp_base);
+			peb_argv[argc_inject + i] = (OU_UIP)(uintptr_t)(writer - (uintptr_t)peb_temp_base);
 			writer += temp;
 		}
 		for (i = 0; i < envc_user; ++i) {
 			size_t temp;
-			string = ATOMC_READ_CHARP(envp[i]);
+			string = ATOMC_READ_IN_CHARP(envp[i]);
 			validate_readable(string, 1);
 			temp = (strlen(string) + 1) * sizeof(char);
 			if unlikely(OVERFLOW_UADD(strings_total_copied, temp, &strings_total_copied) ||
 			            (strings_total_copied > strings_total_size))
 				goto string_size_changed;
 			memcpy(writer, string, temp);
-			peb_envp[i] = (UINTPTR_T)(uintptr_t)(writer - (uintptr_t)peb_temp_base);
+			peb_envp[i] = (OU_UIP)(uintptr_t)(writer - (uintptr_t)peb_temp_base);
 			writer += temp;
 		}
 		assert(strings_total_copied <= strings_total_size);
@@ -173,7 +214,7 @@ string_size_changed:
 
 		/* Figure out where we want to map the PEB within the VM builder. */
 		/* TODO: Muse use `KERNEL_VMHINT_USER_PEB' depending on compatibility mode!
-		 * >> KERNEL_VMHINT_USER_PEB(32|64) depending on PTR(void)-size */
+		 * >> KERNEL_VMHINT_USER_PEB(32|64) depending on IN_PTR(void)-size */
 		result = vmb_getfree(self,
 		                     HINT_GETADDR(KERNEL_VMHINT_USER_PEB),
 		                     peb_total_size,
@@ -181,12 +222,12 @@ string_size_changed:
 		                     HINT_GETMODE(KERNEL_VMHINT_USER_PEB));
 
 		/* Relocate pointers within the PEB to make them absolute */
-		peb->pp_argv = (PTR(PTR(char)))(UINTPTR_T)((UINTPTR_T)peb->pp_argv + (UINTPTR_T)(uintptr_t)result);
-		peb->pp_envp = (PTR(PTR(char)))(UINTPTR_T)((UINTPTR_T)peb->pp_envp + (UINTPTR_T)(uintptr_t)result);
+		peb->pp_argv = (OU_PTR(OU_PTR(char)))((OU_UIP)peb->pp_argv + (OU_UIP)(uintptr_t)result);
+		peb->pp_envp = (OU_PTR(OU_PTR(char)))((OU_UIP)peb->pp_envp + (OU_UIP)(uintptr_t)result);
 		for (i = 0; i < argc_inject + argc_user; ++i)
-			peb_argv[i] += (UINTPTR_T)(uintptr_t)result;
+			peb_argv[i] += (OU_UIP)(uintptr_t)result;
 		for (i = 0; i < envc_user; ++i)
-			peb_envp[i] += (UINTPTR_T)(uintptr_t)result;
+			peb_envp[i] += (OU_UIP)(uintptr_t)result;
 
 		/* Lock the kernel VM, so we can steal the PEB node. */
 		sync_write(&vm_kernel);
@@ -254,11 +295,15 @@ string_size_changed:
 	vmb_node_insert(self, stolen_node);
 
 	return result;
-#undef ATOMC_READ_CHARP
+#undef ATOMC_READ_IN_CHARP
 }
 
 DECL_END
 
-#undef UINTPTR_T
-#undef FUNC
-#undef PTR
+#undef MY_VMB_ALLOC_PEB
+#undef OU_PTR
+#undef IN_PTR
+#undef OU_UIP
+#undef IN_UIP
+#undef OU_POINTERSIZE
+#undef IN_POINTERSIZE

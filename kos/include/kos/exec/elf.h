@@ -215,7 +215,7 @@
 #define ELF_ARCH_MAXPHCOUNT 64
 #endif /* !ELF_ARCH_MAXPHCOUNT */
 
-#ifndef ELF_ARCHW
+#ifndef ELFW
 #if ELF_ARCH_CLASS == ELFCLASS32
 #define ELFW(x) ELF32_##x
 #define ElfW(x) Elf32_##x
@@ -223,7 +223,7 @@
 #define ELFW(x) ELF64_##x
 #define ElfW(x) Elf64_##x
 #endif
-#endif /* !ELF_ARCHW */
+#endif /* !ELFW */
 
 #ifdef __KERNEL__
 #include <kernel/compiler.h>

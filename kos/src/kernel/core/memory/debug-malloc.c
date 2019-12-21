@@ -1057,7 +1057,7 @@ NOTHROW(KCALL mall_search_leaks_impl)(void) {
 		ds = driver_get_state();
 		for (i = 0; i < ds->ds_count; ++i) {
 			struct driver *d = ds->ds_drivers[i];
-			Elf_Half j;
+			ElfW(Half) j;
 			for (j = 0; j < d->d_phnum; ++j) {
 				uintptr_t progaddr;
 				size_t progsize;

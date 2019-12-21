@@ -39,6 +39,9 @@
 #include <sched/iopl.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
+#ifdef __x86_64__
+#include <kos/kernel/gdt.h>
+#endif /* __x86_64__ */
 #endif /* __x86_64__ || __i386__ */
 #endif /* __KERNEL__ */
 
@@ -68,7 +71,6 @@ __DECL_BEGIN
 #define ELF_ARCH386_CLASS   ELFCLASS32
 #define ELF_ARCH386_MACHINE EM_386
 #define ELF_ARCH386_DATA    ELFDATA2LSB
-#define ELF_386_HOST_MAXPROGRAMHEADERCOUNT 64
 
 /* The user-space register holding a pointer to the ProcessEnvironmentBlock
  * immediately following the initial transition to user-space after a call to exec()
@@ -118,6 +120,10 @@ elfexec_init_entry32(struct icpustate *__restrict user_state,
 	icpustate_setuserpsp(user_state, (__uintptr_t)ustack_base + ustack_size);
 	if (!x86_iopl_keep_after_exec)
 		icpustate_mskpflags(user_state, ~0x3000, 0); /* EFLAGS_IOPLMASK */
+#ifdef __x86_64__
+	icpustate_setcs(user_state, SEGMENT_USER_CODE32_RPL);
+	icpustate_setss(user_state, SEGMENT_USER_DATA32_RPL);
+#endif /* __x86_64__ */
 	return user_state;
 }
 
@@ -128,7 +134,7 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
                     struct regular_node *__restrict UNUSED(exec_node),
                     void *application_loadaddr,
                     void *linker_loadaddr,
-                    KERNEL Elf32_Phdr *__restrict phdr_vec,
+                    KERNEL Elf32_Phdr const *__restrict phdr_vec,
                     Elf32_Half phdr_cnt) {
 	/* The application-level entry point is stored
 	 * stored at the base of the user-space stack. */

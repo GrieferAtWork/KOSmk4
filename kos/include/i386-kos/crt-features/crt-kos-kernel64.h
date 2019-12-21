@@ -2721,6 +2721,8 @@
 #define __CRT_HAVE_vm_writephysw_unaligned 1
 #define __CRT_HAVE_vmb_alloc_peb 1
 #define __CRT_HAVE_vmb_alloc_peb32 1
+#define __CRT_HAVE_vmb_alloc_peb32_p64 1
+#define __CRT_HAVE_vmb_alloc_peb64_p32 1
 #define __CRT_HAVE_vmb_apply 1
 #define __CRT_HAVE_vmb_find_first_node_greater_equal 1
 #define __CRT_HAVE_vmb_find_last_node_lower_equal 1

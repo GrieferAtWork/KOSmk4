@@ -119,6 +119,10 @@ elfexec_init_entry64(struct icpustate *__restrict user_state,
 	icpustate_setuserpsp(user_state, (__uintptr_t)ustack_base + ustack_size);
 	if (!x86_iopl_keep_after_exec)
 		icpustate_mskpflags(user_state, ~0x3000, 0); /* EFLAGS_IOPLMASK */
+#ifdef __x86_64__
+	icpustate_setcs(user_state, SEGMENT_USER_CODE64_RPL);
+	icpustate_setss(user_state, SEGMENT_USER_DATA64_RPL);
+#endif /* __x86_64__ */
 	return user_state;
 }
 
@@ -129,7 +133,7 @@ elfexec_init_rtld64(struct icpustate *__restrict user_state,
                     struct regular_node *__restrict UNUSED(exec_node),
                     void *application_loadaddr,
                     void *linker_loadaddr,
-                    KERNEL Elf64_Phdr *__restrict phdr_vec,
+                    KERNEL Elf64_Phdr const *__restrict phdr_vec,
                     Elf64_Half phdr_cnt) {
 	/* The application-level entry point is stored
 	 * stored at the base of the user-space stack. */

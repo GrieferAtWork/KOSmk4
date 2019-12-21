@@ -2414,14 +2414,14 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 603 */
-	.quad 0
-	.int 0
-	.int 0
-	.quad 0 /* index: 604 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname603 /* index: 603 */
+	.weak vmb_alloc_peb64_p32; .quad vmb_alloc_peb64_p32
+	.reloc ., R_X86_64_SIZE32, vmb_alloc_peb64_p32; .int 0
+	.int 0x5f95da2
+	.quad .Lname604 /* index: 604 */
+	.weak x86_syscall64_syscall_traced; .quad x86_syscall64_syscall_traced
+	.reloc ., R_X86_64_SIZE32, x86_syscall64_syscall_traced; .int 0
+	.int 0x26fbec4
 	.quad .Lname605 /* index: 605 */
 	.weak vm_node_update_write_access_locked_vm; .quad vm_node_update_write_access_locked_vm
 	.reloc ., R_X86_64_SIZE32, vm_node_update_write_access_locked_vm; .int 0
@@ -11051,9 +11051,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, ioperm_bitmap_destroy; .int 0
 	.int 0xcb05ac9
 	.quad .Lname2762 /* index: 2762 */
-	.weak x86_syscall64_syscall_traced; .quad x86_syscall64_syscall_traced
-	.reloc ., R_X86_64_SIZE32, x86_syscall64_syscall_traced; .int 0
-	.int 0x26fbec4
+	.weak vmb_alloc_peb32_p64; .quad vmb_alloc_peb32_p64
+	.reloc ., R_X86_64_SIZE32, vmb_alloc_peb32_p64; .int 0
+	.int 0x5075d54
 	.quad .Lname2763 /* index: 2763 */
 	.weak sys32_unlink; .quad sys32_unlink
 	.reloc ., R_X86_64_SIZE32, sys32_unlink; .int 0
@@ -17262,6 +17262,10 @@ END(kernel_symbol_table)
 	.string "syscall_emulate64"
 .Lname601:
 	.string "keyboard_device_init"
+.Lname603:
+	.string "vmb_alloc_peb64_p32"
+.Lname604:
+	.string "x86_syscall64_syscall_traced"
 .Lname605:
 	.string "vm_node_update_write_access_locked_vm"
 .Lname606:
@@ -20155,7 +20159,7 @@ END(kernel_symbol_table)
 .Lname2761:
 	.string "ioperm_bitmap_destroy"
 .Lname2762:
-	.string "x86_syscall64_syscall_traced"
+	.string "vmb_alloc_peb32_p64"
 .Lname2763:
 	.string "sys32_unlink"
 .Lname2764:

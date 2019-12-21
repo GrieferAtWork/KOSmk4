@@ -66,7 +66,7 @@ enum {
 
 
 /* Define the ELF section header vector. */
-INTERN_CONST ATTR_COLDRODATA Elf_Shdr const kernel_shdr[KERNEL_SECTIONS_COUNT] = {
+INTERN_CONST ATTR_COLDRODATA ElfW(Shdr) const kernel_shdr[KERNEL_SECTIONS_COUNT] = {
 #define SECTION(name, type, flags, start, size, entsize, link, info)                          \
 	/* [SECTION_DESCRIPTOR_INDEX] = */ {                                                      \
 		/* .sh_name      = */ offsetof(struct kernel_shstrtab, SECTION_DESCRIPTOR_SHSTRNAME), \

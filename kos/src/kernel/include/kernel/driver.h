@@ -20,15 +20,27 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_DRIVER_H 1
 
 #include <kernel/compiler.h>
-#include <kernel/malloc.h>
-#include <kernel/types.h>
-#include <hybrid/sync/atomic-rwlock.h>
-#include <hybrid/sequence/list.h>
+
 #include <kernel/arch/driver.h>
 #include <kernel/driver-callbacks.h>
+#include <kernel/malloc.h>
+#include <kernel/types.h>
 #include <misc/atomic-ref.h>
+
+#include <hybrid/sequence/list.h>
+#include <hybrid/sync/atomic-rwlock.h>
+
 #include <elf.h>
 
+#ifndef ELFW
+#if __SIZEOF_POINTER__ == 4
+#define ELFW(x) ELF32_##x
+#define ElfW(x) Elf32_##x
+#elif __SIZEOF_POINTER__ == 8
+#define ELFW(x) ELF64_##x
+#define ElfW(x) Elf64_##x
+#endif
+#endif /* !ELFW */
 
 DECL_BEGIN
 
@@ -38,29 +50,6 @@ DECL_BEGIN
 
 
 #ifdef __CC__
-
-#ifndef __USE_KOS
-#ifndef ELF_POINTER_SIZE
-#define ELF_POINTER_SIZE __SIZEOF_POINTER__
-#endif
-#if ELF_POINTER_SIZE > 4
-#   define Elf(x) Elf64_##x
-#   define ELF(x) ELF64_##x
-#   define ELFCLASS ELFCLASS64
-#else
-#   define Elf(x) Elf32_##x
-#   define ELF(x) ELF32_##x
-#   define ELFCLASS ELFCLASS32
-#endif
-
-typedef Elf(Half) Elf_Half;
-typedef Elf(Word) Elf_Word;
-typedef Elf(Off)  Elf_Off;
-typedef Elf(Shdr) Elf_Shdr;
-typedef Elf(Sym)  Elf_Sym;
-typedef Elf(Phdr) Elf_Phdr;
-typedef Elf(Dyn)  Elf_Dyn;
-#endif
 
 
 /* KOS Kernel modules are implemented as shared ELF binaries (libraries)
@@ -221,18 +210,18 @@ DATDEF struct driver drv_self ASMNAME("kernel_driver");
 
 
 typedef struct {
-	Elf_Word ht_nbuckts;      /* Total number of buckets. */
-	Elf_Word ht_nchains;      /* Total number of symbols. */
-	Elf_Word ht_table[1024];  /* [ht_nbuckts] Hash table. */
-//	Elf_Word ht_chains[1024]; /* [ht_nchains] Hash chains. */
-} Elf_HashTable;
+	ElfW(Word) ht_nbuckts;      /* Total number of buckets. */
+	ElfW(Word) ht_nchains;      /* Total number of symbols. */
+	ElfW(Word) ht_table[1024];  /* [ht_nbuckts] Hash table. */
+//	ElfW(Word) ht_chains[1024]; /* [ht_nchains] Hash chains. */
+} ElfW(HashTable);
 
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 #define DRIVER_CONST  /* nothing */
-#else
+#else /* CONFIG_BUILDING_KERNEL_CORE */
 #define DRIVER_CONST  const
-#endif
+#endif /* !CONFIG_BUILDING_KERNEL_CORE */
 
 struct driver;
 #define DRIVER_DLSECTION_FNORMAL 0x0000 /* Normal flags */
@@ -329,22 +318,22 @@ struct driver {
 
 	/* The driver's .dynamic section, and derivatives (.dynsym + .dynstr). */
 	size_t       DRIVER_CONST d_dyncnt;     /* [const] Number of dynamic definition headers. */
-	Elf_Dyn const *DRIVER_CONST
+	ElfW(Dyn) const *DRIVER_CONST
 	                          d_dynhdr;     /* [0..d_dyncnt][const] Vector of dynamic definition entries. */
-	Elf_Sym const *DRIVER_CONST
+	ElfW(Sym) const *DRIVER_CONST
 	                          d_dynsym_tab; /* [0..1][const] Vector of dynamic symbols defined by this module.
 	                                         * HINT: If also non-NULL, the number of symbols is `d_hashtab->ht_nchains' */
 	size_t       DRIVER_CONST d_dynsym_cnt; /* [const] Number of dynamic symbols defined by this driver. */
-	Elf_HashTable const *DRIVER_CONST
+	ElfW(HashTable) const *DRIVER_CONST
 	                          d_hashtab;    /* [0..1][const] Symbol hash table. */
 	char const  *DRIVER_CONST d_dynstr;     /* [0..1][const] Dynamic string table. */
 	char const  *DRIVER_CONST d_dynstr_end; /* [0..1][const] End of the dynamic string table. */
 
 	/* Named data sections of the module (for use with `dllocksection()'). */
-	Elf_Off                   d_shoff;      /* [const] File offset to section headers. */
-	Elf_Half                  d_shstrndx;   /* [const] Index of the section header names section. */
-	Elf_Half                  d_shnum;      /* [const] (Max) number of section headers. */
-	Elf_Shdr const           *d_shdr;       /* [lock(WRITE_ONCE)][0..d_shnum][owned] Vector of section headers (or `NULL' if not loaded). */
+	ElfW(Off)                 d_shoff;      /* [const] File offset to section headers. */
+	ElfW(Half)                d_shstrndx;   /* [const] Index of the section header names section. */
+	ElfW(Half)                d_shnum;      /* [const] (Max) number of section headers. */
+	ElfW(Shdr) const         *d_shdr;       /* [lock(WRITE_ONCE)][0..d_shnum][owned] Vector of section headers (or `NULL' if not loaded). */
 	struct atomic_rwlock      d_sections_lock; /* Lock for `d_sections' */
 	struct driver_section   **d_sections;   /* [0..1][weak][0..d_shnum][owned][lock(d_sections_lock)] Vector of locked sections. */
 	struct driver_section    *d_deadsect;   /* [0..1][lock(ATOMIC)] Chain of dead sections (cleared whenever `d_sections_lock' is locked) */
@@ -353,8 +342,8 @@ struct driver {
 	char const               *d_shstrtab_end;/* [lock(WRITE_ONCE)][0..1] End pointer for the `d_shstrtab' section (points to a NUL-character). */
 
 	/* Module program headers */
-	Elf_Half     DRIVER_CONST d_phnum;      /* [const][valid_if(!DRIVER_FLAG_FINALIZED)][!0] (Max) number of program headers. */
-	Elf_Phdr     DRIVER_CONST d_phdr[];     /* [const][valid_if(!DRIVER_FLAG_FINALIZED)][d_phnum] Vector of program headers. */
+	ElfW(Half)   DRIVER_CONST d_phnum;      /* [const][valid_if(!DRIVER_FLAG_FINALIZED)][!0] (Max) number of program headers. */
+	ElfW(Phdr)   DRIVER_CONST d_phdr[];     /* [const][valid_if(!DRIVER_FLAG_FINALIZED)][d_phnum] Vector of program headers. */
 };
 
 #define driver_isfinalizing(self)                            \
@@ -508,7 +497,7 @@ driver_getfilename(struct driver *__restrict self)
  * @return: * :   Returns `self->d_shdr'
  * @return: NULL: Failed to load the section headers vector (the driver
  *                file wasn't found, or doesn't contain any sections) */
-FUNDEF WUNUSED ATTR_CONST NONNULL((1)) Elf_Shdr const *KCALL
+FUNDEF WUNUSED ATTR_CONST NONNULL((1)) ElfW(Shdr) const *KCALL
 driver_getshdrs(struct driver *__restrict self)
 		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC);
 
@@ -525,7 +514,7 @@ driver_getshstrtab(struct driver *__restrict self)
  * @return: NULL: No section exists that matches the given `name'
  * @return: NULL: Failed to load the section headers string table (the driver
  *                file wasn't found, or doesn't contain any sections) */
-FUNDEF WUNUSED NONNULL((1)) Elf_Shdr const *KCALL
+FUNDEF WUNUSED NONNULL((1)) ElfW(Shdr) const *KCALL
 driver_getsection(struct driver *__restrict self,
                   USER CHECKED char const *name)
 		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
@@ -661,7 +650,7 @@ NOTHROW(KCALL driver_symbol_at)(struct driver *__restrict self,
  * WARNING: This function cannot be used with `&kernel_driver', as
  *          the kernel core itself implements a custom protocol for
  *          specifying which variables are exported. */
-FUNDEF WUNUSED NONNULL((1, 3, 4)) Elf_Sym const *KCALL
+FUNDEF WUNUSED NONNULL((1, 3, 4)) ElfW(Sym) const *KCALL
 driver_local_symbol(struct driver *__restrict self,
                     /*in*/ USER CHECKED char const *name,
                     /*in|out*/ uintptr_t *__restrict phash_elf,
@@ -673,7 +662,7 @@ driver_local_symbol(struct driver *__restrict self,
  * WARNING: This function cannot be used with `&kernel_driver', as
  *          the kernel core itself implements a custom protocol for
  *          specifying which variables are exported. */
-FUNDEF WUNUSED NONNULL((1)) Elf_Sym const *
+FUNDEF WUNUSED NONNULL((1)) ElfW(Sym) const *
 NOTHROW(KCALL driver_local_symbol_at)(struct driver *__restrict self,
                                       uintptr_t driver_relative_address);
 
@@ -695,7 +684,7 @@ driver_symbol_ex(struct driver *__restrict self,
 	                       &hash_elf,
 	                       &hash_gnu);
 }
-FORCELOCAL WUNUSED NONNULL((1)) Elf_Sym const *KCALL
+FORCELOCAL WUNUSED NONNULL((1)) ElfW(Sym) const *KCALL
 driver_local_symbol(struct driver *__restrict self,
                     /*in*/ USER CHECKED char const *name)
 		THROWS(E_SEGFAULT) {

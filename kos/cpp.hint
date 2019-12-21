@@ -516,3 +516,9 @@
 #define __HYBRID_ALTINT_UID(UID)
 #define __HYBRID_ALTINT_COMPAT(Ta, Tb)
 #define __HYBRID_ALTINT_TYPEDEF(Told, Tnew, allow_int_ops) typedef Told Tnew
+
+#define ELFW(x) ELF64_##x
+#define ElfW(x) Elf64_##x
+#define COMPAT_ElfW(x) Elf32_##x
+#define COMPAT_ELFW(x) ELF32_##x
+#define __ARCH_COMPAT(x) x##32
