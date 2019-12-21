@@ -605,8 +605,12 @@ DlModule_MapProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filenam
 		                         fd,
 		                         result->dm_phdr,
 		                         result->dm_phnum);
-		if (E_ISERR(libbase))
-			goto err_r_map_failure;
+		if (E_ISERR(libbase)) {
+			free(result);
+			elf_setdlerrorf("%q: Failed to map library into memory: %u",
+			                filename, (unsigned int)(uintptr_t)-(intptr_t)libbase);
+			goto err;
+		}
 		result->dm_loadaddr = (uintptr_t)libbase;
 	}
 	result->dm_loadstart += result->dm_loadaddr;
@@ -616,10 +620,6 @@ err_r_io:
 	free(result);
 err_io:
 	elf_setdlerrorf("%q: Failed to read headers", filename);
-	goto err;
-err_r_map_failure:
-	free(result);
-	elf_setdlerrorf("%q: Failed to map library into memory", filename);
 	goto err;
 err_nomem:
 	elf_setdlerror_nomem();

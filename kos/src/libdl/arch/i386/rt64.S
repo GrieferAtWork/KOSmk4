@@ -143,7 +143,7 @@ INTERN_FUNCTION(libdl_load_lazy_relocation)
 	xchgq  %rax, (%rsp) /* RESTORE(EAX); 0(%rsp) = RESOLVED_ADDRESS */
 	.cfi_same_value %rax
 	.cfi_rel_offset %rip, 0
-	ret    $(8)         /* EIP = [ESP]; ESP += (4 + 8);
+	ret    $(16)        /* EIP = [ESP]; ESP += (8 + 16);
 	                     * Cleanup: RESOLVED_ADDRESS + MODULE + JMPREL_offset */
 	.cfi_endproc
 END(libdl_load_lazy_relocation)

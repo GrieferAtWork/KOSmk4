@@ -18,14 +18,17 @@
  */
 
 BEGIN
-	/* libdl should always be optimized for size, rather than speed! */
+	/* libdl should always be optimized for size, rather than speed!
+	 * NOTE: Don't turn this on in debug-mode, as it breaks meta-data... */
 	REMOVE_GCC_FLAGS("-O3")
-	GCC_FLAGS({ "-Os", "-fno-rtti", "-ffreestanding" })
+	if (!CONFIG_DEBUG) {
+		GCC_FLAGS({ "-Os" })
+	}
+	GCC_FLAGS({ "-fno-rtti", "-ffreestanding" })
 
 	if (TARGET_ARCH == "x86_64") {
 		CC_FLAGS({
 			"-mno-red-zone",  /* Don't require the hosted application to comply with the red zone. */
-			"-mcmodel=large", /* Set the large code model to allow libdl to be loaded anywhere. */
 		})
 	}
 

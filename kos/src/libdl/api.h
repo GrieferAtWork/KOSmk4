@@ -99,7 +99,11 @@
 #include <hybrid/host.h>
 #include <kos/types.h>
 
+#ifdef __x86_64__
+#define LIBDL_FILENAME "/lib64/libdl.so"
+#else /* __x86_64__ */
 #define LIBDL_FILENAME "/lib/libdl.so"
+#endif /* !__x86_64__ */
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define CC   ATTR_STDCALL
