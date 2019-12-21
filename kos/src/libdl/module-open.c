@@ -27,8 +27,9 @@
 
 #include <hybrid/minmax.h>
 
-#include <kos/io.h>
+#include <kos/exec/elf.h>
 #include <kos/hop.h>
+#include <kos/io.h>
 #include <kos/syscalls.h>
 
 #include <errno.h>
@@ -227,11 +228,10 @@ DlModule_OpenFilenameInPath(char const *__restrict path,
 	while (pathlen && path[pathlen - 1] == '/')
 		--pathlen;
 	/* TODO: The specs state that we must expand special tokens within library paths:
-	 *        - $ORIGIN / ${ORIGIN}:     DIRECTORY_WITHOUT_TRAILING_SLASH_OF(BASE_APPLICATINO)
-	 *        - $LIB / ${LIB}:           Expand to `ELF_HOST_LIB'
-	 *        - $PLATFORM / ${PLATFORM}: Expand to `ELF_HOST_PLATFORM'
+	 *        - $ORIGIN / ${ORIGIN}:     DIRECTORY_WITHOUT_TRAILING_SLASH_OF(BASE_APPLICATION)
+	 *        - $LIB / ${LIB}:           Expand to `RTLD_LIB'
+	 *        - $PLATFORM / ${PLATFORM}: Expand to `RTLD_PLATFORM'
 	 */
-
 	buf = (char *)malloca((pathlen + 1 + filenamelen + 1) *
 	                      sizeof(char));
 	if unlikely(!buf) {
@@ -516,11 +516,11 @@ DlModule_VerifyEhdr(Elf_Ehdr const *__restrict ehdr,
 	            ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
 	            ehdr->e_ident[EI_MAG3] != ELFMAG3)
 		goto err;
-	reason = "e_ident[EI_CLASS] != " ELF_HOST_REQUIRED_CLASS_S;
-	if unlikely(ehdr->e_ident[EI_CLASS] != ELF_HOST_REQUIRED_CLASS)
+	reason = "e_ident[EI_CLASS] != ELF" ELF_ARCH_CLASSNAME;
+	if unlikely(ehdr->e_ident[EI_CLASS] != ELF_ARCH_CLASS)
 		goto err;
-	reason = "e_ident[EI_DATA] != " ELF_HOST_REQUIRED_CLASS_S;
-	if unlikely(ehdr->e_ident[EI_DATA] != ELF_HOST_REQUIRED_CLASS)
+	reason = "e_ident[EI_DATA] != ELF" ELF_ARCH_DATANAME;
+	if unlikely(ehdr->e_ident[EI_DATA] != ELF_ARCH_DATA)
 		goto err;
 	reason = "e_ident[EI_VERSION] != EV_CURRENT";
 	if unlikely(ehdr->e_ident[EI_VERSION] != EV_CURRENT)
@@ -533,8 +533,8 @@ DlModule_VerifyEhdr(Elf_Ehdr const *__restrict ehdr,
 		if unlikely(ehdr->e_type != ET_DYN)
 			goto err;
 	}
-	reason = "e_machine != " ELF_HOST_REQUIRED_MACHINE_S;
-	if unlikely(ehdr->e_machine != ELF_HOST_REQUIRED_MACHINE)
+	reason = "e_machine != EM_" ELF_ARCH_MACHINENAME;
+	if unlikely(ehdr->e_machine != ELF_ARCH_MACHINE)
 		goto err;
 	reason = "ehdr.e_ehsize < offsetafter(Elf_Ehdr, e_phnum)";
 	if unlikely(ehdr->e_ehsize < offsetafter(Elf_Ehdr, e_phnum))

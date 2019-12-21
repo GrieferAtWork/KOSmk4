@@ -20,7 +20,7 @@
 #define __NO_WARNINGS 1
 
 
-#include <kos/hybrid/library.h> /* FIXME: This header cannot be included after <dlfcn.h> */
+#include <kos/exec/library.h> /* FIXME: This header cannot be included after <dlfcn.h> */
 
 /* In order to ensure that all of our system headers work nice with each other,
  * try to include every single one at the same time in the following configurations:
@@ -381,36 +381,43 @@ incdir("", "../../include");
 #include <iso646.h>
 #include <kos/anno.h>
 #include <kos/asm/except.h>
-#include <kos/asm/syscalls.h>
+#include <kos/asm/syscall.h>
 #include <kos/bits/debugtrap.h>
-#include <kos/bits/elf-reloc.h>
 #include <kos/bits/except-handler.h>
 #include <kos/bits/exception_data.h>
 #include <kos/bits/futex-expr.h>
 #include <kos/bits/futex.h>
-#include <kos/bits/library-listdef.h>
-#include <kos/bits/library.h>
-#include <kos/bits/peb.h>
-#include <kos/bits/process.h>
 #include <kos/bits/syscalls.h>
 #include <kos/bits/thread.h>
 #include <kos/bits/ukern-struct.h>
 #include <kos/bits/ukern.h>
 #include <kos/debugtrap.h>
 #include <kos/dev.h>
+#include <kos/except-fs.h>
 #include <kos/except-handler.h>
 #include <kos/except-inval.h>
 #include <kos/except-io.h>
+#include <kos/except-noexec.h>
 #include <kos/except.h>
+#include <kos/exec/asm/rtld.h>
+#include <kos/exec/asm/elf.h>
+#include <kos/exec/bits/library-listdef.h>
+#include <kos/exec/bits/library.h>
+#include <kos/exec/bits/peb.h>
+#include <kos/exec/elf.h>
+#include <kos/exec/lazybind.h>
+#include <kos/exec/library-listdef.h>
+#include <kos/exec/library.h>
+#include <kos/exec/peb.h>
+#include <kos/exec/rtld.h>
 #include <kos/fcntl.h>
 #include <kos/futex.h>
 #include <kos/futexexpr.h>
 #include <kos/futexlock.h>
 #include <kos/guid.h>
 #include <kos/hop.h>
-#include <kos/hybrid/heap.h>
-#include <kos/hybrid/library.h>
 #include <kos/hybrid/sched-signal.h>
+#include <kos/hybrid/heap.h>
 #include <kos/io/ohci.h>
 #include <kos/io/pci.h>
 #include <kos/io/ps2.h>
@@ -430,11 +437,8 @@ incdir("", "../../include");
 #include <kos/kernel/types.h>
 #include <kos/kernel/handle.h>
 #include <kos/keyboard.h>
-#include <kos/lazybind.h>
-#include <kos/library-listdef.h>
 #include <kos/malloc.h>
 #include <kos/personality.h>
-#include <kos/process.h>
 #include <kos/sys/stat.h>
 #include <kos/sys/ioctl.h>
 #include <kos/syscalls.h>

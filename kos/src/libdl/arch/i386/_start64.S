@@ -33,7 +33,7 @@ INTERN_FUNCTION(linker_entry)
 	 */
 
 	/* The current (expected) register/stack state looks like this:
-	 *   %rdi:  struct process_rtld_elf *info;     // Information about execution context (see the struct for more details)
+	 *   %rdi:  struct elfexec_info *info;     // Information about execution context (see the struct for more details)
 	 *                                             // Note that this struct is actually allocated in the stack, with its end
 	 *                                             // marking the base of the user-space stack
 	 *   %rsi:  uintptr_t                loadaddr; // Loadaddr (load offset) of the main binary (usually
@@ -42,12 +42,12 @@ INTERN_FUNCTION(linker_entry)
 	 */
 	INTERN(linker_main)
 	call   linker_main
-	movq   %rax, %rsp  /* %rax == &(struct process_rtld_elf)::pr_entry */
+	movq   %rax, %rsp  /* %rax == &(struct elfexec_info)::pr_entry */
 	/* Run user-level initializers */
 	INTERN(DlModule_RunAllStaticInitializers)
 	call   DlModule_RunAllStaticInitializers
-	ret                /* SP = &(struct process_rtld_elf)::pr_entry_sp;
-	                    * PC = (struct process_rtld_elf)::pr_entry; */
+	ret                /* SP = &(struct elfexec_info)::pr_entry_sp;
+	                    * PC = (struct elfexec_info)::pr_entry; */
 END(linker_entry)
 
 #endif /* !GUARD_LIBDL_ARCH_I386__START64_S */

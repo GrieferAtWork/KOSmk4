@@ -32,7 +32,7 @@
 
 #include <hybrid/atomic.h>
 
-#include <kos/library-listdef.h>
+#include <kos/exec/library-listdef.h>
 
 #include <errno.h>
 #include <signal.h>

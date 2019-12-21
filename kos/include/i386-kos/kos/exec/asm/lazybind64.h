@@ -16,8 +16,8 @@
  *   misrepresented as being the original software.                          *
  *3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_LAZYBIND64_H
-#define _I386_KOS_LAZYBIND64_H 1
+#ifndef _I386_KOS_KOS_EXEC_ASM_LAZYBIND64_H
+#define _I386_KOS_KOS_EXEC_ASM_LAZYBIND64_H 1
 
 #include <__stdinc.h>
 
@@ -32,4 +32,4 @@
 	TODO
 
 
-#endif /* !_I386_KOS_LAZYBIND64_H */
+#endif /* !_I386_KOS_KOS_EXEC_ASM_LAZYBIND64_H */

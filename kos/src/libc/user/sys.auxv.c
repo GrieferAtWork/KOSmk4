@@ -23,9 +23,9 @@
 #include "../api.h"
 /**/
 
-#include <asm/pagesize.h> /* __ARCH_PAGESIZE */
-
-#include <kos/process.h> /* ELF_HOST_REQUIRED_MACHINE */
+#include <asm/pagesize.h>  /* __ARCH_PAGESIZE */
+#include <kos/exec/elf.h>  /* ELF_ARCH_DATA */
+#include <kos/exec/rtld.h> /* RTLD_PLATFORM */
 
 #include <dlfcn.h>
 #include <stddef.h> /* offsetafter */
@@ -37,13 +37,12 @@
 #include <sys/mman.h>
 #endif /* __i386__ && !__x86_64__ */
 
-
-
 #include "sys.auxv.h"
 
 DECL_BEGIN
 
-PRIVATE ATTR_SECTION(".rodata.crt.system.getauxval") char const elf_host_platform_string[] = ELF_HOST_PLATFORM;
+PRIVATE ATTR_SECTION(".rodata.crt.system.getauxval") char const
+rtld_platform[] = RTLD_PLATFORM;
 
 #ifdef __ARCH_PAGESIZE
 #define OS_PAGESIZE __ARCH_PAGESIZE
@@ -153,9 +152,9 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 		    ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
 		    ehdr->e_ident[EI_MAG3] != ELFMAG3)
 			goto not_found;
-		if unlikely(ehdr->e_ident[EI_CLASS] != ELF_HOST_REQUIRED_CLASS)
+		if unlikely(ehdr->e_ident[EI_CLASS] != ELF_ARCH_CLASS)
 			goto not_found;
-		if unlikely(ehdr->e_ident[EI_DATA] != ELF_HOST_REQUIRED_CLASS)
+		if unlikely(ehdr->e_ident[EI_DATA] != ELF_ARCH_CLASS)
 			goto not_found;
 		if unlikely(ehdr->e_ident[EI_VERSION] != EV_CURRENT)
 			goto not_found;
@@ -163,7 +162,7 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 			goto not_found;
 		if unlikely(ehdr->e_type != ET_EXEC)
 			goto not_found;
-		if unlikely(ehdr->e_machine != ELF_HOST_REQUIRED_MACHINE)
+		if unlikely(ehdr->e_machine != ELF_ARCH_MACHINE)
 			goto not_found;
 		result = ehdr->e_entry;
 	}	break;
@@ -183,9 +182,9 @@ is_not_elf:
 		    ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
 		    ehdr->e_ident[EI_MAG3] != ELFMAG3)
 			goto is_not_elf;
-		if (ehdr->e_ident[EI_CLASS] != ELF_HOST_REQUIRED_CLASS)
+		if (ehdr->e_ident[EI_CLASS] != ELF_ARCH_CLASS)
 			goto is_not_elf;
-		if (ehdr->e_ident[EI_DATA] != ELF_HOST_REQUIRED_CLASS)
+		if (ehdr->e_ident[EI_DATA] != ELF_ARCH_DATA)
 			goto is_not_elf;
 		if (ehdr->e_ident[EI_VERSION] != EV_CURRENT)
 			goto is_not_elf;
@@ -193,7 +192,7 @@ is_not_elf:
 			goto is_not_elf;
 		if (ehdr->e_type != ET_EXEC)
 			goto is_not_elf;
-		if (ehdr->e_machine != ELF_HOST_REQUIRED_MACHINE)
+		if (ehdr->e_machine != ELF_ARCH_MACHINE)
 			goto is_not_elf;
 		goto not_found;
 	}	break;
@@ -229,7 +228,7 @@ is_not_elf:
 #endif /* __i386__ && !__x86_64__ */
 
 	case AT_PLATFORM:
-		result = (ulongptr_t)(void *)elf_host_platform_string;
+		result = (ulongptr_t)(void *)rtld_platform;
 		break;
 
 	default:

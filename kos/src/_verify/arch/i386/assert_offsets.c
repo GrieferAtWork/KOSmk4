@@ -63,12 +63,12 @@ local files = {
 	"../../../../include/i386-kos/kos/bits/debugtrap64.h",
 	"../../../../include/i386-kos/kos/bits/exception_data32.h",
 	"../../../../include/i386-kos/kos/bits/exception_data64.h",
-	"../../../../include/i386-kos/kos/bits/peb32.h",
-	"../../../../include/i386-kos/kos/bits/peb64.h",
-	"../../../../include/i386-kos/kos/bits/library-listdef32.h",
-	"../../../../include/i386-kos/kos/bits/library-listdef64.h",
-	"../../../../include/i386-kos/kos/bits/process32.h",
-	"../../../../include/i386-kos/kos/bits/process64.h",
+	"../../../../include/i386-kos/kos/exec/bits/peb32.h",
+	"../../../../include/i386-kos/kos/exec/bits/peb64.h",
+	"../../../../include/i386-kos/kos/exec/bits/library-listdef32.h",
+	"../../../../include/i386-kos/kos/exec/bits/library-listdef64.h",
+	"../../../../include/i386-kos/kos/exec/asm/elf32.h",
+	"../../../../include/i386-kos/kos/exec/asm/elf64.h",
 	"../../../../include/i386-kos/kos/bits/ukern-struct32.h",
 	"../../../../include/i386-kos/kos/bits/ukern-struct64.h",
 	"../../../../include/i386-kos/kos/kernel/cpu-state32.h",
@@ -583,7 +583,7 @@ STATIC_ASSERT(sizeof(struct exception_data64) == __SIZEOF_EXCEPTION_DATA64);
 
 
 
-#include <kos/bits/peb32.h>
+#include <kos/exec/bits/peb32.h>
 
 /* struct process_peb32 */
 STATIC_ASSERT(offsetof(struct process_peb32, pp_argc) == OFFSET_PROCESS_PEB32_ARGC);
@@ -595,7 +595,7 @@ STATIC_ASSERT(offsetof(struct process_peb32, pp_envp) == OFFSET_PROCESS_PEB32_EN
 
 
 
-#include <kos/bits/peb64.h>
+#include <kos/exec/bits/peb64.h>
 
 /* struct process_peb64 */
 STATIC_ASSERT(offsetof(struct process_peb64, pp_argc) == OFFSET_PROCESS_PEB64_ARGC);
@@ -607,7 +607,7 @@ STATIC_ASSERT(offsetof(struct process_peb64, pp_envp) == OFFSET_PROCESS_PEB64_EN
 
 
 
-#include <kos/bits/library-listdef32.h>
+#include <kos/exec/bits/library-listdef32.h>
 
 /* struct library_listdef32 */
 STATIC_ASSERT(offsetof(struct library_listdef32, lld_count) == __OFFSET_LIBRARY_LISTDEF32_COUNT);
@@ -626,7 +626,7 @@ STATIC_ASSERT(sizeof(struct library_listdef32) == __SIZEOF_LIBRARY_LISTDEF32);
 
 
 
-#include <kos/bits/library-listdef64.h>
+#include <kos/exec/bits/library-listdef64.h>
 
 /* struct library_listdef64 */
 STATIC_ASSERT(offsetof(struct library_listdef64, lld_count) == __OFFSET_LIBRARY_LISTDEF64_COUNT);
@@ -645,23 +645,19 @@ STATIC_ASSERT(sizeof(struct library_listdef64) == __SIZEOF_LIBRARY_LISTDEF64);
 
 
 
-#include <kos/bits/process32.h>
+#include <kos/exec/asm/elf32.h>
 
-/* struct process_rtld_elf32 */
-STATIC_ASSERT(offsetof(struct process_rtld_elf32, pr_phdr) == __OFFSET_PROCESS_RTLD_ELF32_PHDR);
-STATIC_ASSERT(offsetof(struct process_rtld_elf32, pr_pnum) == __OFFSET_PROCESS_RTLD_ELF32_PNUM);
-STATIC_ASSERT(offsetof(struct process_rtld_elf32, pr_rtldaddr) == __OFFSET_PROCESS_RTLD_ELF32_RTLDADDR);
+/* struct elfexec_info32 */
+/* ... */
 
 
 
 
 
-#include <kos/bits/process64.h>
+#include <kos/exec/asm/elf64.h>
 
-/* struct process_rtld_elf64 */
-STATIC_ASSERT(offsetof(struct process_rtld_elf64, pr_phdr) == __OFFSET_PROCESS_RTLD_ELF64_PHDR);
-STATIC_ASSERT(offsetof(struct process_rtld_elf64, pr_pnum) == __OFFSET_PROCESS_RTLD_ELF64_PNUM);
-STATIC_ASSERT(offsetof(struct process_rtld_elf64, pr_rtldaddr) == __OFFSET_PROCESS_RTLD_ELF64_RTLDADDR);
+/* struct elfexec_info64 */
+/* ... */
 
 
 
@@ -985,24 +981,24 @@ STATIC_ASSERT(sizeof(struct fcpustate64) == SIZEOF_FCPUSTATE64);
 #include <kos/kernel/fpu-sstate.h>
 
 /* struct sfpuenv */
-STATIC_ASSERT(offsetof(struct sfpuenv, fe_fcw) == OFFSET_SFPUENV_FCW);
-STATIC_ASSERT(offsetof(struct sfpuenv, fe_fop) == OFFSET_SFPUENV_FOP);
 STATIC_ASSERT(offsetof(struct sfpuenv, fe_fcs) == OFFSET_SFPUENV_FCS);
+STATIC_ASSERT(offsetof(struct sfpuenv, fe_fcw) == OFFSET_SFPUENV_FCW);
 STATIC_ASSERT(offsetof(struct sfpuenv, fe_fdp) == OFFSET_SFPUENV_FDP);
 STATIC_ASSERT(offsetof(struct sfpuenv, fe_fds) == OFFSET_SFPUENV_FDS);
 STATIC_ASSERT(offsetof(struct sfpuenv, fe_fip) == OFFSET_SFPUENV_FIP);
+STATIC_ASSERT(offsetof(struct sfpuenv, fe_fop) == OFFSET_SFPUENV_FOP);
 STATIC_ASSERT(offsetof(struct sfpuenv, fe_fsw) == OFFSET_SFPUENV_FSW);
 STATIC_ASSERT(offsetof(struct sfpuenv, fe_ftw) == OFFSET_SFPUENV_FTW);
 STATIC_ASSERT(sizeof(struct sfpuenv) == SIZEOF_SFPUENV);
 STATIC_ASSERT(alignof(struct sfpuenv) == ALIGNOF_SFPUENV);
 
 /* struct sfpustate */
-STATIC_ASSERT(offsetof(struct sfpustate, fs_fcw) == OFFSET_SFPUSTATE_FCW);
-STATIC_ASSERT(offsetof(struct sfpustate, fs_fop) == OFFSET_SFPUSTATE_FOP);
 STATIC_ASSERT(offsetof(struct sfpustate, fs_fcs) == OFFSET_SFPUSTATE_FCS);
+STATIC_ASSERT(offsetof(struct sfpustate, fs_fcw) == OFFSET_SFPUSTATE_FCW);
 STATIC_ASSERT(offsetof(struct sfpustate, fs_fdp) == OFFSET_SFPUSTATE_FDP);
 STATIC_ASSERT(offsetof(struct sfpustate, fs_fds) == OFFSET_SFPUSTATE_FDS);
 STATIC_ASSERT(offsetof(struct sfpustate, fs_fip) == OFFSET_SFPUSTATE_FIP);
+STATIC_ASSERT(offsetof(struct sfpustate, fs_fop) == OFFSET_SFPUSTATE_FOP);
 STATIC_ASSERT(offsetof(struct sfpustate, fs_fsw) == OFFSET_SFPUSTATE_FSW);
 STATIC_ASSERT(offsetof(struct sfpustate, fs_ftw) == OFFSET_SFPUSTATE_FTW);
 STATIC_ASSERT(sizeof(struct sfpustate) == SIZEOF_SFPUSTATE);
@@ -1015,12 +1011,12 @@ STATIC_ASSERT(alignof(struct sfpustate) == ALIGNOF_SFPUSTATE);
 #include <kos/kernel/fpu-state32.h>
 
 /* struct xfpustate32 */
-STATIC_ASSERT(offsetof(struct xfpustate32, fx_fcw) == OFFSET_XFPUSTATE32_FCW);
-STATIC_ASSERT(offsetof(struct xfpustate32, fx_fop) == OFFSET_XFPUSTATE32_FOP);
 STATIC_ASSERT(offsetof(struct xfpustate32, fx_fcs) == OFFSET_XFPUSTATE32_FCS);
+STATIC_ASSERT(offsetof(struct xfpustate32, fx_fcw) == OFFSET_XFPUSTATE32_FCW);
 STATIC_ASSERT(offsetof(struct xfpustate32, fx_fdp) == OFFSET_XFPUSTATE32_FDP);
 STATIC_ASSERT(offsetof(struct xfpustate32, fx_fds) == OFFSET_XFPUSTATE32_FDS);
 STATIC_ASSERT(offsetof(struct xfpustate32, fx_fip) == OFFSET_XFPUSTATE32_FIP);
+STATIC_ASSERT(offsetof(struct xfpustate32, fx_fop) == OFFSET_XFPUSTATE32_FOP);
 STATIC_ASSERT(offsetof(struct xfpustate32, fx_fsw) == OFFSET_XFPUSTATE32_FSW);
 STATIC_ASSERT(offsetof(struct xfpustate32, fx_ftw) == OFFSET_XFPUSTATE32_FTW);
 STATIC_ASSERT(offsetof(struct xfpustate32, fx_mxcsr) == OFFSET_XFPUSTATE32_MXCSR);
@@ -1040,9 +1036,9 @@ STATIC_ASSERT(alignof(struct fpustate32) == ALIGNOF_FPUSTATE32);
 
 /* struct xfpustate64 */
 STATIC_ASSERT(offsetof(struct xfpustate64, fx_fcw) == OFFSET_XFPUSTATE64_FCW);
-STATIC_ASSERT(offsetof(struct xfpustate64, fx_fop) == OFFSET_XFPUSTATE64_FOP);
 STATIC_ASSERT(offsetof(struct xfpustate64, fx_fdp) == OFFSET_XFPUSTATE64_FDP);
 STATIC_ASSERT(offsetof(struct xfpustate64, fx_fip) == OFFSET_XFPUSTATE64_FIP);
+STATIC_ASSERT(offsetof(struct xfpustate64, fx_fop) == OFFSET_XFPUSTATE64_FOP);
 STATIC_ASSERT(offsetof(struct xfpustate64, fx_fsw) == OFFSET_XFPUSTATE64_FSW);
 STATIC_ASSERT(offsetof(struct xfpustate64, fx_ftw) == OFFSET_XFPUSTATE64_FTW);
 STATIC_ASSERT(offsetof(struct xfpustate64, fx_mxcsr) == OFFSET_XFPUSTATE64_MXCSR);

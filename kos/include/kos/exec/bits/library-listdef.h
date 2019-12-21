@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_BITS_LIBRARY_LISTDEF_H
-#define _KOS_BITS_LIBRARY_LISTDEF_H 1
+#ifndef _KOS_EXEC_BITS_LIBRARY_LISTDEF_H
+#define _KOS_EXEC_BITS_LIBRARY_LISTDEF_H 1
 
 #include <__stdinc.h>
 
@@ -66,4 +66,4 @@ struct library_listdef /*[prefix(lld_)]*/ {
 
 __SYSDECL_END
 
-#endif /* !_KOS_BITS_LIBRARY_LISTDEF_H */
+#endif /* !_KOS_EXEC_BITS_LIBRARY_LISTDEF_H */

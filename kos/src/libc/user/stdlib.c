@@ -27,18 +27,18 @@
 #include <hybrid/sync/atomic-once.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
-#include <kos/process.h>
+#include <kos/exec/peb.h>
 #include <kos/syscalls.h>
 #include <parts/dos/errno.h>
 #include <parts/errno.h>
-#include <sys/wait.h>
 #include <sys/auxv.h>
+#include <sys/wait.h>
 
 #include <assert.h>
 #include <dlfcn.h>
 #include <fcntl.h>
-#include <malloc.h>
 #include <limits.h>
+#include <malloc.h>
 #include <string.h>
 #include <unistd.h>
 

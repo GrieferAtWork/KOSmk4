@@ -1,4 +1,3 @@
-/* HASH 0x93f678da */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,18 +16,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_ASM_SYSCALLS_H
-#define _KOS_ASM_SYSCALLS_H 1
+#ifndef _KOS_EXEC_LAZYBIND_H
+#define _KOS_EXEC_LAZYBIND_H 1
 
 #include <__stdinc.h>
+#include <kos/exec/asm/lazybind.h>
 
-#undef __HAVE_INLINE_SYSCALLS
-#ifdef __WANT_INLINE_SYSCALLS
-/* Inline system call support would go here! */
-/* #define __CDECLARE_SC(...)       ... */
-/* #define __CDECLARE_VOID_SC(...)  ... */
-/* #define __CDECLARE_XSC(...)      ... */
-/* #define __CDECLARE_VOID_XSC(...) ... */
-#endif /* __WANT_INLINE_SYSCALLS */
+/* >> (PRIVATE|INTERN|PUBLIC)_LAZYBIND(SYMBOL name, void *getaddr(void))
+ * Define a self-modifying function that lazily invokes `getaddr()', then uses that function's
+ * return value as a text location to jump to, permanently re-writing itself such that any future
+ * calls to `name' will always be forwarded to the initially returned address, without `getaddr()'
+ * having to be called ever again. */
 
-#endif /* !_KOS_ASM_SYSCALLS_H */
+#endif /* !_KOS_EXEC_LAZYBIND_H */

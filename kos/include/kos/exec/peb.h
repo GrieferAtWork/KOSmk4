@@ -16,33 +16,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_PROCESS_H
-#define _KOS_PROCESS_H 1
+#ifndef _KOS_EXEC_PEB_H
+#define _KOS_EXEC_PEB_H 1
 
-#include <__crt.h>
 #include <__stdinc.h>
 
 #include <bits/types.h>
-#include <kos/bits/peb.h>
-#include <kos/bits/process.h>
+#include <kos/exec/bits/peb.h>
 
 #include <libc/string.h>
-
-#if !defined(ELF_HOST_ISVALID_CLASS) && defined(ELF_HOST_REQUIRED_CLASS)
-#define ELF_HOST_ISVALID_CLASS(x)    ((x) == ELF_HOST_REQUIRED_CLASS)
-#endif /* !ELF_HOST_ISVALID_CLASS && ELF_HOST_REQUIRED_CLASS */
-#if !defined(ELF_HOST_ISVALID_DATA) && defined(ELF_HOST_REQUIRED_DATA)
-#define ELF_HOST_ISVALID_DATA(x)     ((x) == ELF_HOST_REQUIRED_DATA)
-#endif /* !ELF_HOST_ISVALID_DATA && ELF_HOST_REQUIRED_DATA */
-#if !defined(ELF_HOST_ISVALID_MACHINE) && defined(ELF_HOST_REQUIRED_MACHINE)
-#define ELF_HOST_ISVALID_MACHINE(x)  ((x) == ELF_HOST_REQUIRED_MACHINE)
-#endif /* !ELF_HOST_ISVALID_MACHINE && ELF_HOST_REQUIRED_MACHINE */
-#ifndef ELF_HOST_MAXPROGRAMHEADERCOUNT
-#define ELF_HOST_MAXPROGRAMHEADERCOUNT 64
-#endif /* !ELF_HOST_MAXPROGRAMHEADERCOUNT */
-#ifndef ELF_HOST_LIB
-#define ELF_HOST_LIB                   "lib"
-#endif /* !ELF_HOST_LIB */
 
 /* Information about data passed by the kernel following an exec() system call.
  * These are the data structures and formats for information about where to find
@@ -62,7 +44,6 @@ __LIBC struct process_peb __peb;
 #endif /* !____peb_defined */
 #endif /* __KOS__ && !__KERNEL__ */
 
-
 /* Helper functions to lookup an environment variable within a given PEB. */
 __LOCAL __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL process_peb_getenv)(struct process_peb *__restrict self,
@@ -80,12 +61,8 @@ __NOTHROW_NCX(__LIBCCALL process_peb_getenv)(struct process_peb *__restrict self
 	return __NULLPTR;
 }
 
-
-
-
 #endif /* __CC__ */
-
 
 __DECL_END
 
-#endif /* !_KOS_PROCESS_H */
+#endif /* !_KOS_EXEC_PEB_H */

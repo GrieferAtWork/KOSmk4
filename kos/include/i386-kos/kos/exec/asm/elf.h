@@ -16,9 +16,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_BITS_ELF_RELOC_H
-#define _KOS_BITS_ELF_RELOC_H 1
+#ifndef _I386_KOS_KOS_EXEC_ASM_ELF_H
+#define _I386_KOS_KOS_EXEC_ASM_ELF_H 1
 
-#include <__stdinc.h>
+#include <hybrid/host.h>
 
-#endif /* !_KOS_BITS_ELF_RELOC_H */
+#ifdef __x86_64__
+#include "elf64.h"
+#else /* __x86_64__ */
+#include "elf32.h"
+#endif /* !__x86_64__ */
+
+#endif /* !_I386_KOS_KOS_EXEC_ASM_ELF_H */

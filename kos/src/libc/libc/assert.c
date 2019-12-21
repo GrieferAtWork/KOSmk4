@@ -25,7 +25,6 @@
 /**/
 
 #include <kos/kernel/cpu-state.h>
-#include <kos/process.h>
 #include <kos/debugtrap.h>
 #include <sys/syslog.h>
 #include <kos/syscalls.h>

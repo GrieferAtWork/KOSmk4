@@ -28,8 +28,10 @@
 #include <asm/intrin.h>
 #include <asm/pagesize.h>
 #include <kos/debugtrap.h>
-#include <kos/library-listdef.h>
-#include <kos/process.h>
+#include <kos/exec/elf.h>
+#include <kos/exec/library-listdef.h>
+#include <kos/exec/peb.h>
+#include <kos/exec/rtld.h>
 #include <kos/syscalls.h>
 
 #include <malloc.h>
@@ -101,7 +103,7 @@ INTERN DlModule ld_rtld_module = {
 };
 
 
-PRIVATE char const ld_rtld_module_filename[] = LIBDL_FILENAME;
+PRIVATE char const ld_rtld_module_filename[] = RTLD_LIBDL;
 INTERN struct process_peb *root_peb = NULL;
 
 /* Set to true if the sys_debugtrap() system call is disabled. */
@@ -132,7 +134,7 @@ INTDEF byte_t __rtld_start[];
 
 
 INTERN void *FCALL
-linker_main(struct process_rtld_elf *__restrict info,
+linker_main(struct elfexec_info *__restrict info,
             uintptr_t loadaddr,
             struct process_peb *__restrict peb) {
 	char *filename;
@@ -143,10 +145,10 @@ linker_main(struct process_rtld_elf *__restrict info,
 	/* Initialize globals (not done statically because we can't have relocations). */
 	root_peb                    = peb;
 	ld_rtld_module.dm_filename  = (char *)ld_rtld_module_filename;
-	ld_rtld_module.dm_loadaddr  = info->pr_rtldaddr;
-	ld_rtld_module.dm_loadstart = info->pr_rtldaddr;
+	ld_rtld_module.dm_loadaddr  = info->ei_rtldaddr;
+	ld_rtld_module.dm_loadstart = info->ei_rtldaddr;
 	ld_rtld_module.dm_loadend   = (uintptr_t)rtld_size;
-	ld_rtld_module.dm_loadend  += info->pr_rtldaddr;
+	ld_rtld_module.dm_loadend  += info->ei_rtldaddr;
 	ld_rtld_module.dm_phdr[0].p_filesz = (Elf_Word)rtld_size;
 	ld_rtld_module.dm_phdr[0].p_memsz  = (Elf_Word)rtld_size;
 	ld_rtld_module.dm_modules.ln_pself = &DlModule_AllList;
@@ -157,8 +159,8 @@ linker_main(struct process_rtld_elf *__restrict info,
 	sys_set_library_listdef(&dl_library_layout);
 
 	/* Return a pointer to `&info->ed_entry' */
-	filename = process_rtld_elf_filename(info);
-	result   = &process_rtld_elf_entry(info);
+	filename = elfexec_info_getfilename(info);
+	result   = &elfexec_info_getentry(info);
 
 	filename = strdup(filename);
 	if unlikely(!filename) {
@@ -169,13 +171,15 @@ linker_main(struct process_rtld_elf *__restrict info,
 	/* Check for LD-specific environment variables. */
 	ld_library_path_env = process_peb_getenv(peb, "LD_LIBRARY_PATH");
 	if (!ld_library_path_env)
-		ld_library_path_env = (char *)"/usr/lib:/lib";
+		ld_library_path_env = (char *)RTLD_LIBRARY_PATH;
 
 	/* User-level initializers must be run _after_ we've initialized static TLS!
 	 * NOTE: this is done in `_start32.S' by manually calling `DlModule_RunAllStaticInitializers'
 	 *       just prior to jumping to the primary application's _start() function. */
-	base_module = DlModule_OpenLoadedProgramHeaders(filename, info->pr_pnum,
-	                                                info->pr_phdr, loadaddr,
+	base_module = DlModule_OpenLoadedProgramHeaders(filename,
+	                                                info->ei_pnum,
+	                                                info->ei_phdr,
+	                                                loadaddr,
 	                                                RTLD_LAZY | RTLD_GLOBAL |
 	                                                RTLD_NODELETE | RTLD_NOINIT);
 	if unlikely(!base_module)

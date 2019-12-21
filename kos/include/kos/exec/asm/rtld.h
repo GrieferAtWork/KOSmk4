@@ -1,3 +1,4 @@
+/* HASH 0x93f678da */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -16,15 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_KOS_BITS_PROCESS_H
-#define _I386_KOS_KOS_BITS_PROCESS_H 1
+#ifndef _KOS_EXEC_ASM_RTLD_H
+#define _KOS_EXEC_ASM_RTLD_H 1
 
-#include <hybrid/host.h>
+/* ... */
 
-#ifdef __x86_64__
-#include "process64.h"
-#else /* __x86_64__ */
-#include "process32.h"
-#endif /* !__x86_64__ */
-
-#endif /* !_I386_KOS_KOS_BITS_PROCESS_H */
+#endif /* !_KOS_EXEC_ASM_RTLD_H */

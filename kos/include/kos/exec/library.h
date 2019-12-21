@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_HYBRID_LIBRARY_H
-#define _KOS_HYBRID_LIBRARY_H 1
+#ifndef _KOS_EXEC_LIBRARY_H
+#define _KOS_EXEC_LIBRARY_H 1
 #ifndef _KOS_SOURCE
 #define _KOS_SOURCE 1
 #ifdef _DLFCN_H
@@ -39,13 +39,13 @@
 #include <__stdinc.h>
 
 #include <bits/types.h>
-#include <kos/bits/library.h>
+#include <kos/exec/bits/library.h>
 
 #ifdef __KERNEL__
 #include <kernel/driver.h>
-#else
+#else /* __KERNEL__ */
 #include <dlfcn.h>
-#endif
+#endif /* !__KERNEL__ */
 
 __DECL_BEGIN
 
@@ -154,4 +154,4 @@ __ATTR_NONNULL((1)) void library_decref(library_handle_t __lib);
 
 __DECL_END
 
-#endif /* !_KOS_HYBRID_LIBRARY_H */
+#endif /* !_KOS_EXEC_LIBRARY_H */

@@ -26,6 +26,7 @@
 /**/
 
 #include <kos/debugtrap.h>
+#include <kos/exec/peb.h>
 #include <kos/syscalls.h>
 #include <sys/mman.h>
 
@@ -63,13 +64,13 @@ INTERN ATTR_NORETURN void __stack_chk_fail_local(void) {
 }
 
 struct assert_args {
-	char const *expr;
-	char const *file;
+	char const  *expr;
+	char const  *file;
 	unsigned int line;
-	char const *func;
-	char const *format;
-	va_list args;
-	void *pc;
+	char const  *func;
+	char const  *format;
+	va_list      args;
+	void        *pc;
 };
 
 PRIVATE ATTR_NOINLINE ATTR_NORETURN void LIBCCALL

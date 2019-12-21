@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_LIBRARY_LISTDEF_H
-#define _KOS_LIBRARY_LISTDEF_H 1
+#ifndef _KOS_EXEC_LIBRARY_LISTDEF_H
+#define _KOS_EXEC_LIBRARY_LISTDEF_H 1
 
 /* Helper functions for telling the KOS kernel how to inspect/detect
  * source loaded into user-space, thus allowing the kernel gdb-stub driver to
@@ -25,7 +25,7 @@
 
 #include <__stdinc.h>
 
-#include <kos/bits/library-listdef.h>
+#include <kos/exec/bits/library-listdef.h>
 
 /* Module enumeration variants:
  *
@@ -131,5 +131,4 @@
 #endif /* !LIBRARY_LISTDEF_FSINGLE */
 
 
-
-#endif /* !_KOS_LIBRARY_LISTDEF_H */
+#endif /* !_KOS_EXEC_LIBRARY_LISTDEF_H */

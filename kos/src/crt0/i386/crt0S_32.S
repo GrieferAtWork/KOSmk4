@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_CRT0_I386_CRT0S_32_S
+#define GUARD_CRT0_I386_CRT0S_32_S 1
 
 #include <hybrid/compiler.h>
 
@@ -24,3 +26,4 @@ INTERN_OBJECT(__dso_handle)
 	.long __dso_handle
 END(__dso_handle)
 
+#endif /* !GUARD_CRT0_I386_CRT0S_32_S */

@@ -16,38 +16,33 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_CRT0_I386_CRT0_32_S
-#define GUARD_CRT0_I386_CRT0_32_S 1
+#ifndef _KOS_EXEC_BITS_PEB_H
+#define _KOS_EXEC_BITS_PEB_H 1
 
-#include <hybrid/compiler.h>
+#include <__stdinc.h>
 
-#include <kos/exec/asm/elf32.h>
-#include <kos/exec/peb.h>
+#include <hybrid/typecore.h>
 
-/* INTDEF int main(int argc, char *argv[], char *envp[]); */
-/* INTDEF ATTR_NORETURN void _start(void); */
+__DECL_BEGIN
 
-.section .text
-INTERN_FUNCTION(_start)
-	/* The PEB is initialized by the kernel */
-	pushl  OFFSET_PROCESS_PEB_ENVP(%ELF_ARCH386_PEB_REGISTER) /* envp */
-	pushl  OFFSET_PROCESS_PEB_ARGV(%ELF_ARCH386_PEB_REGISTER) /* argv */
-	pushl  OFFSET_PROCESS_PEB_ARGC(%ELF_ARCH386_PEB_REGISTER) /* argc */
-	INTERN(main)
-	call   main
-	movl   %eax, 0(%esp)
-	EXTERN(exit)
-	/* @PLT requires %ebx to be loaded, so load it now */
-	call   1f
-1:	popl   %ebx
-	addl   $(_GLOBAL_OFFSET_TABLE_ - (. - 1b)), %ebx
-	call   exit@PLT
-END(_start)
+#define OFFSET_PROCESS_PEB_ARGC    0
+#define OFFSET_PROCESS_PEB_ARGV   (__SIZEOF_POINTER__)
+#define OFFSET_PROCESS_PEB_ENVC (2*__SIZEOF_POINTER__)
+#define OFFSET_PROCESS_PEB_ENVP (3*__SIZEOF_POINTER__)
+#ifdef __CC__
+struct process_peb /*[PREFIX(pp_)]*/ {
+	__SIZE_TYPE__  pp_argc;  /* Number of arguments passed to the program. */
+	char         **pp_argv;  /* [1..pp_argc] Vector of argument strings (NOTE: pp_argv[pp_argc] == NULL). */
+	__SIZE_TYPE__  pp_envc;  /* Number of environment strings passed to the program. */
+	char         **pp_envp;  /* [1..pp_envc] Vector of environment strings (NOTE: pp_envv[pp_envc] == NULL). */
+	/* ... Possibly additional (maybe arch-specific) data goes here. */
+//	char          *pp_argv_vector[pp_argc]; /* [pp_argc + 1] Vector of pointers to argument strings */
+//	char          *pp_envp_vector[pp_argp]; /* [pp_envc + 1] Vector of pointers to environment strings */
+//	char           pp_argv_strings[];       /* Buffer containing argument strings */
+//	char           pp_envp_strings[];       /* Buffer containing environment strings */
+};
+#endif /* __CC__ */
 
+__DECL_END
 
-.section .bss.__dso_handle
-INTERN_OBJECT(__dso_handle)
-	.long 0
-END(__dso_handle)
-
-#endif /* !GUARD_CRT0_I386_CRT0_32_S */
+#endif /* !_KOS_EXEC_BITS_PEB_H */

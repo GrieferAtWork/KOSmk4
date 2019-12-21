@@ -16,15 +16,31 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_KOS_BITS_LIBRARY_LISTDEF_H
-#define _I386_KOS_KOS_BITS_LIBRARY_LISTDEF_H 1
+#ifndef _KOS_EXEC_RTLD_H
+#define _KOS_EXEC_RTLD_H 1
 
-#include <hybrid/host.h>
+#include <__stdinc.h>
 
-#ifdef __x86_64__
-#include "library-listdef64.h"
-#else /* __x86_64__ */
-#include "library-listdef32.h"
-#endif /* !__x86_64__ */
+#include <kos/exec/asm/rtld.h>
 
-#endif /* !_I386_KOS_KOS_BITS_LIBRARY_LISTDEF_H */
+/* Absolute path of the libdl driver itself. */
+#ifndef RTLD_LIBDL
+#define RTLD_LIBDL "/lib/libdl.so"
+#endif /* !RTLD_LIBDL */
+
+/* Default for `LD_LIBRARY_PATH' */
+#ifndef RTLD_LIBRARY_PATH
+#define RTLD_LIBRARY_PATH "/usr/lib:/lib"
+#endif /* !RTLD_LIBRARY_PATH */
+
+/* The string to which `$LIB' in library paths is expanded */
+#ifndef RTLD_LIB
+#define RTLD_LIB "lib"
+#endif /* !RTLD_LIB */
+
+/* The string to which `$PLATFORM' in library paths is expanded */
+#ifndef RTLD_PLATFORM
+#define RTLD_PLATFORM "?"
+#endif /* !RTLD_PLATFORM */
+
+#endif /* !_KOS_EXEC_RTLD_H */

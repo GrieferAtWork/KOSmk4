@@ -25,7 +25,7 @@
 #include "elf.h"
 /**/
 
-#include <kos/process.h>
+#include <kos/exec/peb.h>
 
 DECL_BEGIN
 

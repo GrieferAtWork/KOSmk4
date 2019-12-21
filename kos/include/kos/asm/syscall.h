@@ -1,3 +1,4 @@
+/* HASH 0x93f678da */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -16,42 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_BITS_LIBRARY_H
-#define _KOS_BITS_LIBRARY_H 1
+#ifndef _KOS_ASM_SYSCALL_H
+#define _KOS_ASM_SYSCALL_H 1
 
-#include <__crt.h>
 #include <__stdinc.h>
 
-#include <bits/types.h>
+#undef __HAVE_INLINE_SYSCALLS
+#ifdef __WANT_INLINE_SYSCALLS
+/* Inline system call support would go here! */
+/* #define __CDECLARE_SC(...)       ... */
+/* #define __CDECLARE_VOID_SC(...)  ... */
+/* #define __CDECLARE_XSC(...)      ... */
+/* #define __CDECLARE_VOID_XSC(...) ... */
+#endif /* __WANT_INLINE_SYSCALLS */
 
-__DECL_BEGIN
-
-#ifdef __CC__
-
-#ifdef __KERNEL__
-struct driver;
-typedef struct driver *library_handle_t;
-typedef struct driver_section *section_handle_t;
-#else /* __KERNEL__ */
-#ifdef GUARD_LIBDL_API_H
-struct elf_dlmodule;
-struct elf_dlsection;
-typedef struct elf_dlmodule *library_handle_t;
-typedef struct elf_dlsection *section_handle_t;
-#else /* GUARD_LIBDL_API_H */
-#ifdef __INTELLISENSE__
-struct __library_handle_struct;
-typedef struct __library_handle_struct *library_handle_t;
-#else
-typedef void *library_handle_t;
-#endif
-typedef struct dl_section *section_handle_t;
-#endif /* !GUARD_LIBDL_API_H */
-typedef __fd_t library_file_t;
-#endif /* !__KERNEL__ */
-
-#endif /* __CC__ */
-
-__DECL_END
-
-#endif /* !_KOS_BITS_LIBRARY_H */
+#endif /* !_KOS_ASM_SYSCALL_H */

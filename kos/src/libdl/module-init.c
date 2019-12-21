@@ -27,7 +27,7 @@
 
 #include <bits/elf.h> /* ELF_HOST_RELA_UNUSED */
 #include <kos/debugtrap.h>
-#include <kos/process.h>
+#include <kos/exec/peb.h>
 #include <kos/syscalls.h>
 #include <sys/mman.h>
 

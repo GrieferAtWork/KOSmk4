@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_KOS_BITS_PEB32_H
-#define _I386_KOS_KOS_BITS_PEB32_H 1
+#ifndef _I386_KOS_KOS_EXEC_BITS_PEB32_H
+#define _I386_KOS_KOS_EXEC_BITS_PEB32_H 1
 
 #include <__stdinc.h>
 #include <hybrid/typecore.h>
@@ -55,4 +55,4 @@ struct process_peb32 /*[PREFIX(pp_)]*/ {
 
 __DECL_END
 
-#endif /* !_I386_KOS_KOS_BITS_PEB32_H */
+#endif /* !_I386_KOS_KOS_EXEC_BITS_PEB32_H */

@@ -32,7 +32,7 @@
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
-#include <kos/process.h>
+#include <kos/exec/peb.h>
 
 #include <assert.h>
 #include <stddef.h>

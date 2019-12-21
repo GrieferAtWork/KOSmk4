@@ -16,38 +16,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_CRT0_I386_CRT0_32_S
-#define GUARD_CRT0_I386_CRT0_32_S 1
+#ifndef _I386_KOS_KOS_EXEC_BITS_LIBRARY_LISTDEF_H
+#define _I386_KOS_KOS_EXEC_BITS_LIBRARY_LISTDEF_H 1
 
-#include <hybrid/compiler.h>
+#include <hybrid/host.h>
 
-#include <kos/exec/asm/elf32.h>
-#include <kos/exec/peb.h>
+#ifdef __x86_64__
+#include "library-listdef64.h"
+#else /* __x86_64__ */
+#include "library-listdef32.h"
+#endif /* !__x86_64__ */
 
-/* INTDEF int main(int argc, char *argv[], char *envp[]); */
-/* INTDEF ATTR_NORETURN void _start(void); */
-
-.section .text
-INTERN_FUNCTION(_start)
-	/* The PEB is initialized by the kernel */
-	pushl  OFFSET_PROCESS_PEB_ENVP(%ELF_ARCH386_PEB_REGISTER) /* envp */
-	pushl  OFFSET_PROCESS_PEB_ARGV(%ELF_ARCH386_PEB_REGISTER) /* argv */
-	pushl  OFFSET_PROCESS_PEB_ARGC(%ELF_ARCH386_PEB_REGISTER) /* argc */
-	INTERN(main)
-	call   main
-	movl   %eax, 0(%esp)
-	EXTERN(exit)
-	/* @PLT requires %ebx to be loaded, so load it now */
-	call   1f
-1:	popl   %ebx
-	addl   $(_GLOBAL_OFFSET_TABLE_ - (. - 1b)), %ebx
-	call   exit@PLT
-END(_start)
-
-
-.section .bss.__dso_handle
-INTERN_OBJECT(__dso_handle)
-	.long 0
-END(__dso_handle)
-
-#endif /* !GUARD_CRT0_I386_CRT0_32_S */
+#endif /* !_I386_KOS_KOS_EXEC_BITS_LIBRARY_LISTDEF_H */

@@ -32,6 +32,8 @@ if (gcc_opt.remove("-O3"))
 
 #include <hybrid/compiler.h>
 
+#include <kos/exec/library.h>
+
 #include <ctype.h>
 #include <elf.h>
 #include <string.h>
@@ -48,11 +50,9 @@ if (gcc_opt.remove("-O3"))
 #include "debug_line.h"
 #include "symtab.h"
 
-#include <kos/hybrid/library.h>
-
 #ifdef __KERNEL__
 #include <kernel/driver.h>
-#endif
+#endif /* __KERNEL__ */
 
 
 DECL_BEGIN

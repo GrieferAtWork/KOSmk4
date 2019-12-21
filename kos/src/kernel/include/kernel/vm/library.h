@@ -20,9 +20,11 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_VM_LIBRARY_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/types.h>
 #include <kernel/vm.h>
-#include <kos/library-listdef.h>
+
+#include <kos/exec/library-listdef.h>
 
 DECL_BEGIN
 
@@ -64,9 +66,10 @@ typedef ssize_t
  *                      used internally. - However this set may get allocated on the heap...
  * @return: < 0:  Error (First negative return value of `*func')
  * @return: >= 0: Success (sum of all calls to `*func') */
-FUNDEF ssize_t KCALL vm_library_enumerate(struct vm *__restrict effective_vm,
-                                          vm_library_enumerate_callback_t func,
-                                          void *arg, size_t maxcount DFL((size_t)-1))
+FUNDEF ssize_t KCALL
+vm_library_enumerate(struct vm *__restrict effective_vm,
+                     vm_library_enumerate_callback_t func,
+                     void *arg, size_t maxcount DFL((size_t)-1))
 		THROWS(E_SEGFAULT, E_BADALLOC);
 
 

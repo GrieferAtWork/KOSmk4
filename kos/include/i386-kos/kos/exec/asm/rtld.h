@@ -1,3 +1,4 @@
+/* HASH 0x93f678da */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -16,32 +17,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_BITS_PEB_H
-#define _KOS_BITS_PEB_H 1
+#ifndef _I386_KOS_KOS_EXEC_ASM_RTLD_H
+#define _I386_KOS_KOS_EXEC_ASM_RTLD_H 1
 
-#include <__stdinc.h>
-#include <hybrid/typecore.h>
+#include <hybrid/host.h>
 
-__DECL_BEGIN
+/* On x86_64, RTLD paths are somewhat different due to multiarch */
+#ifdef __x86_64__
+#define RTLD_LIBDL        "/lib64/libdl.so"
+#define RTLD_LIBRARY_PATH "/usr/lib64:/lib64"
+#define RTLD_LIB          "lib64"
+#define RTLD_PLATFORM     "x86_64"
+#else /* __x86_64__ */
+#define RTLD_LIBDL        "/lib/libdl.so"
+#define RTLD_LIBRARY_PATH "/usr/lib:/lib"
+#define RTLD_LIB          "lib"
+#define RTLD_PLATFORM     "i386"
+#endif /* !__x86_64__ */
 
-#define OFFSET_PROCESS_PEB_ARGC    0
-#define OFFSET_PROCESS_PEB_ARGV   (__SIZEOF_POINTER__)
-#define OFFSET_PROCESS_PEB_ENVC (2*__SIZEOF_POINTER__)
-#define OFFSET_PROCESS_PEB_ENVP (3*__SIZEOF_POINTER__)
-#ifdef __CC__
-struct process_peb {
-	__SIZE_TYPE__  pp_argc;  /* Number of arguments passed to the program. */
-	char         **pp_argv;  /* [1..pp_argc] Vector of argument strings (NOTE: pp_argv[pp_argc] == NULL). */
-	__SIZE_TYPE__  pp_envc;  /* Number of environment strings passed to the program. */
-	char         **pp_envp;  /* [1..pp_envc] Vector of environment strings (NOTE: pp_envv[pp_envc] == NULL). */
-	/* ... Possibly additional (maybe arch-specific) data goes here. */
-//	char          *pp_argv_vector[pp_argc]; /* [pp_argc + 1] Vector of pointers to argument strings */
-//	char          *pp_envp_vector[pp_argp]; /* [pp_envc + 1] Vector of pointers to environment strings */
-//	char           pp_argv_strings[];       /* Buffer containing argument strings */
-//	char           pp_envp_strings[];       /* Buffer containing environment strings */
-};
-#endif /* __CC__ */
-
-__DECL_END
-
-#endif /* !_KOS_BITS_PEB_H */
+#endif /* !_I386_KOS_KOS_EXEC_ASM_RTLD_H */

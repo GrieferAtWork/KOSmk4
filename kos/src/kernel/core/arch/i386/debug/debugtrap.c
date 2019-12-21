@@ -257,12 +257,13 @@ sys_do_debugtrap32_impl(struct icpustate *__restrict return_state,
 				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 				      X86_REGISTER_SEGMENT_SS, ss);
-			__wrgs_keepbase(gs);
 #ifdef __x86_64__
+			__wrgs_keepbase(gs);
 			__wrfs_keepbase(fs);
 			__wres(es);
 			__wrds(ds);
 #else /* __x86_64__ */
+			__wrgs(gs);
 			return_state->ics_fs = fs;
 			return_state->ics_es = es;
 			return_state->ics_ds = ds;

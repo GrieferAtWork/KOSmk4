@@ -16,15 +16,41 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_KOS_BITS_PEB_H
-#define _I386_KOS_KOS_BITS_PEB_H 1
+#ifndef _KOS_EXEC_BITS_LIBRARY_H
+#define _KOS_EXEC_BITS_LIBRARY_H 1
 
-#include <hybrid/host.h>
+#include <__stdinc.h>
 
-#ifdef __x86_64__
-#include "peb64.h"
-#else /* __x86_64__ */
-#include "peb32.h"
-#endif /* !__x86_64__ */
+#include <bits/types.h>
 
-#endif /* !_I386_KOS_KOS_BITS_PEB_H */
+__DECL_BEGIN
+
+#ifdef __CC__
+
+#ifdef __KERNEL__
+struct driver;
+typedef struct driver *library_handle_t;
+typedef struct driver_section *section_handle_t;
+#else /* __KERNEL__ */
+#ifdef GUARD_LIBDL_API_H
+struct elf_dlmodule;
+struct elf_dlsection;
+typedef struct elf_dlmodule *library_handle_t;
+typedef struct elf_dlsection *section_handle_t;
+#else /* GUARD_LIBDL_API_H */
+#ifdef __INTELLISENSE__
+struct __library_handle_struct;
+typedef struct __library_handle_struct *library_handle_t;
+#else /* __INTELLISENSE__ */
+typedef void *library_handle_t;
+#endif /* !__INTELLISENSE__ */
+typedef struct dl_section *section_handle_t;
+#endif /* !GUARD_LIBDL_API_H */
+typedef __fd_t library_file_t;
+#endif /* !__KERNEL__ */
+
+#endif /* __CC__ */
+
+__DECL_END
+
+#endif /* !_KOS_EXEC_BITS_LIBRARY_H */

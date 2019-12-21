@@ -21,13 +21,6 @@
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
-/* TODO: Disable %[hex] support in format_printf()
- *       libdl is statically linked against that function,
- *       and we don't actually use that feature.
- *       As a matter of fact: there are a bunch of features
- *       we're not using that are none-the-less clobbering
- *       our binary image! */
-
 /* Keep this one the first */
 #include "api.h"
 /**/
@@ -42,7 +35,6 @@
 
 #include <kos/except.h>
 #include <kos/kernel/types.h>
-#include <kos/process.h>
 #include <kos/thread.h>
 #include <kos/types.h>
 #include <bits/elf.h> /* ELF_HOST_RELA_UNUSED */
@@ -70,13 +62,12 @@
 
 DECL_BEGIN
 
-#define DECLARE_INTERN_OVERRIDE(name) \
-__asm__(".type " #name ", @function\n\t" \
-        ".global " #name "\n\t" \
-        ".hidden " #name);
+#define DECLARE_INTERN_OVERRIDE(name)        \
+	__asm__(".type " #name ", @function\n\t" \
+	        ".global " #name "\n\t"          \
+	        ".hidden " #name);
 BUILTIN_GLOBALS_ENUMERATE(DECLARE_INTERN_OVERRIDE)
 #undef DECLARE_INTERN_OVERRIDE
-
 
 
 /* Define our own private variants of a couple of functions

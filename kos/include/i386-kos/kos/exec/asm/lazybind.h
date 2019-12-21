@@ -16,8 +16,8 @@
  *   misrepresented as being the original software.                          *
  *3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_LAZYBIND_H
-#define _I386_KOS_LAZYBIND_H 1
+#ifndef _I386_KOS_KOS_EXEC_ASM_LAZYBIND_H
+#define _I386_KOS_KOS_EXEC_ASM_LAZYBIND_H 1
 
 #include <__stdinc.h>
 #include <hybrid/host.h>
@@ -44,4 +44,4 @@
 #define PUBLIC_LAZYBIND(name, getaddr)  __I386_DO_LAZYBIND(name, getaddr,; .global name)
 #endif /* !__x86_64__ */
 
-#endif /* !_I386_KOS_LAZYBIND_H */
+#endif /* !_I386_KOS_KOS_EXEC_ASM_LAZYBIND_H */

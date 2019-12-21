@@ -37,8 +37,9 @@
 
 #include <kos/except-fs.h>
 #include <kos/except-noexec.h>
-#include <kos/library-listdef.h>
-#include <kos/process.h>
+#include <kos/exec/elf.h>
+#include <kos/exec/library-listdef.h>
+#include <kos/exec/peb.h>
 
 #include <assert.h>
 #include <elf.h>
@@ -104,10 +105,10 @@ LOCAL NOBLOCK WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(KCALL elf_validate_ehdr)(Elf_Ehdr *__restrict ehdr) {
 	uintptr_t result;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADCLASS;
-	if	unlikely(!ELF_HOST_ISVALID_CLASS(ehdr->e_ident[EI_CLASS]))
+	if	unlikely(ehdr->e_ident[EI_CLASS] != ELF_ARCH_CLASS)
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADORDER;
-	if	unlikely(!ELF_HOST_ISVALID_DATA(ehdr->e_ident[EI_DATA]))
+	if	unlikely(ehdr->e_ident[EI_DATA] != ELF_ARCH_DATA)
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADVERSION;
 	if	unlikely(ehdr->e_ident[EI_VERSION] != EV_CURRENT)
@@ -119,7 +120,7 @@ NOTHROW(KCALL elf_validate_ehdr)(Elf_Ehdr *__restrict ehdr) {
 	if	unlikely(ehdr->e_type != ET_EXEC)
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADMACH;
-	if	unlikely(!ELF_HOST_ISVALID_MACHINE(ehdr->e_machine))
+	if	unlikely(ehdr->e_machine != ELF_ARCH_MACHINE)
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADHEADER;
 	if	unlikely(ehdr->e_ehsize < offsetafter(Elf_Ehdr,e_phnum))
@@ -131,7 +132,7 @@ NOTHROW(KCALL elf_validate_ehdr)(Elf_Ehdr *__restrict ehdr) {
 	if	unlikely(ehdr->e_phentsize != sizeof(Elf_Phdr))
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS;
-	if	unlikely(ehdr->e_phnum > ELF_HOST_MAXPROGRAMHEADERCOUNT)
+	if	unlikely(ehdr->e_phnum > ELF_ARCH_MAXPHCOUNT)
 		goto done; /* Too many program headers. */
 	result = 0;
 done:
@@ -472,22 +473,22 @@ err_overlap:
 		}
 
 		/* Set the entry point for the loaded binary. */
-		user_state = exec_initialize_entry(user_state,
-		                                   peb_base,
-		                                   stack_base,
-		                                   USER_STACK_NUM_PAGES * PAGESIZE,
-		                                   (USER void *)ehdr.e_entry);
+		user_state = elfexec_init_entry(user_state,
+		                                peb_base,
+		                                stack_base,
+		                                USER_STACK_NUM_PAGES * PAGESIZE,
+		                                (USER void *)ehdr.e_entry);
 
 		/* Initialize the RTLD portion of the user-space bootstrap process. */
 		if (linker_base != (void *)-1) {
-			user_state = exec_initialize_elf_rtld(/* user_state:           */ user_state,
-			                                      /* exec_path:            */ exec_path,
-			                                      /* exec_dentry:          */ exec_dentry,
-			                                      /* exec_node:            */ exec_node,
-			                                      /* application_loadaddr: */ (uintptr_t)0,
-			                                      /* linker_loadaddr:      */ (uintptr_t)linker_base,
-			                                      /* phdr_vec:             */ phdr_vector,
-			                                      /* phdr_cnt:             */ ehdr.e_phnum);
+			user_state = elfexec_init_rtld(/* user_state:           */ user_state,
+			                               /* exec_path:            */ exec_path,
+			                               /* exec_dentry:          */ exec_dentry,
+			                               /* exec_node:            */ exec_node,
+			                               /* application_loadaddr: */ (void *)0,
+			                               /* linker_loadaddr:      */ linker_base,
+			                               /* phdr_vec:             */ phdr_vector,
+			                               /* phdr_cnt:             */ ehdr.e_phnum);
 		}
 		{
 			/* Initialize the library definitions list to use the PEB

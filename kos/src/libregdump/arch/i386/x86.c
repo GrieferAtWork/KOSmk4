@@ -30,7 +30,7 @@
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <kos/except.h>
-#include <kos/hybrid/library.h>
+#include <kos/exec/library.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
 #include <kos/types.h>

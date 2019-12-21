@@ -23,7 +23,7 @@
 #include <bits/types.h>
 #include <bits/format-printer.h>
 #include <libc/string.h>
-#include <kos/bits/library.h>
+#include <kos/exec/bits/library.h>
 
 #ifdef __CC__
 __DECL_BEGIN

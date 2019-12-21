@@ -33,13 +33,14 @@ if (gcc_opt.remove("-O3"))
 #include <hybrid/atomic.h>
 #include <hybrid/typecore.h>
 
+#include <kos/except.h>
+#include <kos/exec/library.h>
+
 #include <format-printer.h>
 #include <stddef.h>
 #include <string.h>
 
 #include <libdebuginfo/addr2line.h>
-#include <kos/hybrid/library.h>
-#include <kos/except.h>
 
 #include "x86.h"
 

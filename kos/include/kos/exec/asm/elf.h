@@ -16,52 +16,32 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_BITS_PROCESS_H
-#define _KOS_BITS_PROCESS_H 1
+#ifndef _KOS_EXEC_ASM_ELF_H
+#define _KOS_EXEC_ASM_ELF_H 1
 
 #include <__stdinc.h>
+
 #include <hybrid/typecore.h>
-#include <hybrid/__byteorder.h>
+
 #include <elf.h>
 
-#ifndef ELF_HOST_ISVALID_CLASS
-#ifndef ELF_HOST_REQUIRED_CLASS
+#ifndef ELF_ARCH_CLASS
 #if __SIZEOF_POINTER__ > 4
-#define ELF_HOST_REQUIRED_CLASS      ELFCLASS64
-#define ELF_HOST_REQUIRED_CLASS_S   "ELFCLASS64"
+#define ELF_ARCH_CLASS ELFCLASS64
 #else /* __SIZEOF_POINTER__ > 4 */
-#define ELF_HOST_REQUIRED_CLASS      ELFCLASS32
-#define ELF_HOST_REQUIRED_CLASS_S   "ELFCLASS32"
+#define ELF_ARCH_CLASS ELFCLASS32
 #endif /* __SIZEOF_POINTER__ <= 4 */
-#endif /* !ELF_HOST_REQUIRED_CLASS */
-#define ELF_HOST_ISVALID_CLASS(x)   ((x) == ELF_HOST_REQUIRED_CLASS)
-#endif /* !ELF_HOST_ISVALID_CLASS */
+#endif /* !ELF_ARCH_CLASS */
 
-#ifndef ELF_HOST_ISVALID_DATA
-#ifndef ELF_HOST_REQUIRED_DATA
+#ifndef ELF_ARCH_DATA
+#include <hybrid/__byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define ELF_HOST_REQUIRED_DATA       ELFDATA2LSB
-#define ELF_HOST_REQUIRED_DATA_S    "ELFDATA2LSB"
+#define ELF_ARCH_DATA ELFDATA2LSB
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define ELF_HOST_REQUIRED_DATA       ELFDATA2MSB
-#define ELF_HOST_REQUIRED_DATA_S    "ELFDATA2MSB"
+#define ELF_ARCH_DATA ELFDATA2MSB
 #else /* ... */
 #error "Unsupported endian"
-#endif/* !... */
-#endif /* !ELF_HOST_REQUIRED_DATA */
-#define ELF_HOST_ISVALID_DATA(x)    ((x) == ELF_HOST_REQUIRED_DATA)
-#endif /* !ELF_HOST_ISVALID_DATA */
+#endif /* !... */
+#endif /* !ELF_ARCH_DATA */
 
-#ifndef ELF_HOST_ISVALID_MACHINE
-#ifdef ELF_HOST_REQUIRED_MACHINE
-#define ELF_HOST_ISVALID_MACHINE(x)   ((x) == ELF_HOST_REQUIRED_MACHINE)
-#else /* ELF_HOST_REQUIRED_MACHINE */
-#define ELF_HOST_ISVALID_MACHINE(x)   0
-#endif /* !ELF_HOST_REQUIRED_MACHINE */
-#endif /* !ELF_HOST_ISVALID_MACHINE */
-
-#ifndef ELF_HOST_MAXPROGRAMHEADERCOUNT
-#define ELF_HOST_MAXPROGRAMHEADERCOUNT 64
-#endif /* !ELF_HOST_MAXPROGRAMHEADERCOUNT */
-
-#endif /* !_KOS_BITS_PROCESS_H */
+#endif /* !_KOS_EXEC_ASM_ELF_H */

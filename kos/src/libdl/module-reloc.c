@@ -27,7 +27,7 @@
 
 #include <hybrid/typecore.h>
 
-#include <kos/process.h>
+#include <kos/exec/peb.h> /* struct process_peb */
 #include <kos/syscalls.h>
 
 #include <elf.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfec91629 */
+/* HASH CRC-32:0x11544758 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@
 #include <kos/bits/except-handler64.h>
 #include <kos/bits/exception_data64.h>
 #include <kos/bits/futex-expr64.h>
-#include <kos/bits/library-listdef64.h>
+#include <kos/exec/bits/library-listdef64.h>
 #include <kos/kernel/cpu-state64.h>
 
 

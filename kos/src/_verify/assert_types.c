@@ -254,9 +254,11 @@ local files = {
 	"../../include/elf.h",
 	"../../include/kos/hop.h",
 	"../../include/kos/sysctl.h",
+	"../../include/kos/exec/elf.h",
+	"../../include/kos/exec/bits/peb.h",
+	"../../include/kos/exec/bits/library-listdef.h",
 	"../../include/kos/bits/ukern-struct.h",
 	"../../include/kos/bits/debugtrap.h",
-	"../../include/kos/bits/library-listdef.h",
 };
 
 local include_prefixes = {
@@ -847,6 +849,46 @@ STATIC_ASSERT(sizeof(struct sysctl_driver_set_library_path) == __SIZEOF_SYSCTL_D
 
 
 
+#include <kos/exec/elf.h>
+
+/* struct elfexec_info */
+/* ... */
+
+
+
+
+
+#include <kos/exec/bits/peb.h>
+
+/* struct process_peb */
+STATIC_ASSERT(offsetof(struct process_peb, pp_argc) == OFFSET_PROCESS_PEB_ARGC);
+STATIC_ASSERT(offsetof(struct process_peb, pp_argv) == OFFSET_PROCESS_PEB_ARGV);
+STATIC_ASSERT(offsetof(struct process_peb, pp_envc) == OFFSET_PROCESS_PEB_ENVC);
+STATIC_ASSERT(offsetof(struct process_peb, pp_envp) == OFFSET_PROCESS_PEB_ENVP);
+
+
+
+
+
+#include <kos/exec/bits/library-listdef.h>
+
+/* struct library_listdef */
+STATIC_ASSERT(offsetof(struct library_listdef, lld_count) == __OFFSET_LIBRARY_LISTDEF_COUNT);
+STATIC_ASSERT(offsetof(struct library_listdef, lld_entry_offsetof_module) == __OFFSET_LIBRARY_LISTDEF_ENTRY_OFFSETOF_MODULE);
+STATIC_ASSERT(offsetof(struct library_listdef, lld_entry_offsetof_next) == __OFFSET_LIBRARY_LISTDEF_ENTRY_OFFSETOF_NEXT);
+STATIC_ASSERT(offsetof(struct library_listdef, lld_first) == __OFFSET_LIBRARY_LISTDEF_FIRST);
+STATIC_ASSERT(offsetof(struct library_listdef, lld_flags) == __OFFSET_LIBRARY_LISTDEF_FLAGS);
+STATIC_ASSERT(offsetof(struct library_listdef, lld_module_offsetof_filename) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_FILENAME);
+STATIC_ASSERT(offsetof(struct library_listdef, lld_module_offsetof_loadaddr) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_LOADADDR);
+STATIC_ASSERT(offsetof(struct library_listdef, lld_module_offsetof_loadstart) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_LOADSTART);
+STATIC_ASSERT(offsetof(struct library_listdef, lld_size) == __OFFSET_LIBRARY_LISTDEF_SIZE);
+STATIC_ASSERT(offsetof(struct library_listdef, lld_sizeof_pointer) == __OFFSET_LIBRARY_LISTDEF_SIZEOF_POINTER);
+STATIC_ASSERT(sizeof(struct library_listdef) == __SIZEOF_LIBRARY_LISTDEF);
+
+
+
+
+
 #include <kos/bits/ukern-struct.h>
 
 /* struct userkern */
@@ -878,25 +920,6 @@ STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_reason) == __OFFSET_DEBUGTRA
 STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_signo) == __OFFSET_DEBUGTRAP_REASON_SIGNO);
 STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_strarg) == __OFFSET_DEBUGTRAP_REASON_STRARG);
 STATIC_ASSERT(sizeof(struct debugtrap_reason) == __SIZEOF_DEBUGTRAP_REASON);
-
-
-
-
-
-#include <kos/bits/library-listdef.h>
-
-/* struct library_listdef */
-STATIC_ASSERT(offsetof(struct library_listdef, lld_count) == __OFFSET_LIBRARY_LISTDEF_COUNT);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_entry_offsetof_module) == __OFFSET_LIBRARY_LISTDEF_ENTRY_OFFSETOF_MODULE);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_entry_offsetof_next) == __OFFSET_LIBRARY_LISTDEF_ENTRY_OFFSETOF_NEXT);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_first) == __OFFSET_LIBRARY_LISTDEF_FIRST);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_flags) == __OFFSET_LIBRARY_LISTDEF_FLAGS);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_module_offsetof_filename) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_FILENAME);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_module_offsetof_loadaddr) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_LOADADDR);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_module_offsetof_loadstart) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_LOADSTART);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_size) == __OFFSET_LIBRARY_LISTDEF_SIZE);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_sizeof_pointer) == __OFFSET_LIBRARY_LISTDEF_SIZEOF_POINTER);
-STATIC_ASSERT(sizeof(struct library_listdef) == __SIZEOF_LIBRARY_LISTDEF);
 //[[[end]]]
 
 

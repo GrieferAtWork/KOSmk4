@@ -16,16 +16,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_LAZYBIND_H
-#define _KOS_LAZYBIND_H 1
+#ifndef _I386_KOS_KOS_EXEC_BITS_PEB_H
+#define _I386_KOS_KOS_EXEC_BITS_PEB_H 1
 
-#include <__stdinc.h>
-#include <kos/asm/lazybind.h>
+#include <hybrid/host.h>
 
-/* >> (PRIVATE|INTERN|PUBLIC)_LAZYBIND(SYMBOL name, void *getaddr(void))
- * Define a self-modifying function that lazily invokes `getaddr()', then uses that function's
- * return value as a text location to jump to, permanently re-writing itself such that any future
- * calls to `name' will always be forwarded to the initially returned address, without `getaddr()'
- * having to be called ever again. */
+#ifdef __x86_64__
+#include "peb64.h"
+#else /* __x86_64__ */
+#include "peb32.h"
+#endif /* !__x86_64__ */
 
-#endif /* !_KOS_LAZYBIND_H */
+#endif /* !_I386_KOS_KOS_EXEC_BITS_PEB_H */
