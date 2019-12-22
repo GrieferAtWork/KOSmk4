@@ -75,22 +75,22 @@ PUBLIC_FUNCTION(syscall_emulate_r)
 	 * Note that that sc_info may already be overlapping with said target
 	 * area, meaning that we have to use memmove() semantics copying data
 	 * from the top down to the bottom */
+	leaq   -SIZEOF_RPC_SYSCALL_INFO(%rdi), %rsp /* Load %rsp to point to the start of the copied `sc_info' */
+	movq   %rsp, %rbx
+	.cfi_def_cfa  %rsp, (SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS)
 	subq   $(8), %rdi
 	addq   $(SIZEOF_RPC_SYSCALL_INFO - 8), %rsi
 	movq   $(SIZEOF_RPC_SYSCALL_INFO / 8), %rcx /* It's ok that this clobbers %rcx. - We can just load `%edi+4' once we're done */
-	cli    /* Disable interrupts (we're about to do some black voodoo with our stack...) */
-	cld    /* Clear direction bit, meaning that movsX now advances downwards */
+	std    /* Set the direction bit, meaning that movsX now advances downwards */
 	rep;   movsq /* memmove((byte_t *)state - SIZEOF_RPC_SYSCALL_INFO, sc_info, SIZEOF_RPC_SYSCALL_INFO); */
-	leaq   8(%rdi), %rsp /* Load %rsp to point to the start of the copied `sc_info' */
-	.cfi_def_cfa  %rsp, (SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS)
-	sti    /* We can now re-enable interrupt. */
 	/* At this point, our stack looks like this:
+	 * %rbx = %rsp
 	 * 0(%rsp):                                                 struct rpc_syscall_info sc_info;
 	 * SIZEOF_RPC_SYSCALL_INFO(%rsp):                           struct icpustate state;
 	 * SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS(%rsp): <END-OF-STACK> */
 
 	/* Check if this a 32-bit or 64-bit system call. */
-	movw   (SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS)(%rsp), %ax
+	movw   (SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_CS)(%rbx), %ax
 	cmpw   $(SEGMENT_USER_CODE64_RPL), %ax
 	jne    .Lsyscall_emulate_not_direct_64
 
@@ -98,14 +98,14 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 	/* 64-bit system call */
 .Lsyscall_emulate64_r:
 	/* Figure out which system call is actually being invoked. */
-	movq   OFFSET_RPC_SYSCALL_INFO_SYSNO(%rsp), %rax
+	movq   OFFSET_RPC_SYSCALL_INFO_SYSNO(%rbx), %rax
 	/* Load system call arguments (from `sc_info') */
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(0))(%rsp), %rdi
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(1))(%rsp), %rsi
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(2))(%rsp), %rdx
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(3))(%rsp), %rcx
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(4))(%rsp), %r8
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(5))(%rsp), %r9
+	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(0))(%rbx), %rdi
+	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(1))(%rbx), %rsi
+	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(2))(%rbx), %rdx
+	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(3))(%rbx), %rcx
+	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(4))(%rbx), %r8
+	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(5))(%rbx), %r9
 
 	cmpq   $(__NR64_syscall0_max), %rax
 	ja     .Lcall_sysex64
@@ -115,21 +115,21 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 	.cfi_adjust_cfa_offset -8
 .Lbad_sysno64:
 	/* %rax is a system call number that doesn't exist. */
-	testq  $(RPC_SYSCALL_INFO_FEXCEPT), OFFSET_RPC_SYSCALL_INFO_FLAGS(%rsp)
+	testq  $(RPC_SYSCALL_INFO_FEXCEPT), OFFSET_RPC_SYSCALL_INFO_FLAGS(%rbx)
 	jz     .Lbad_sysno64_ENOSYS
 
 .Lthrow_unknown_systemcall:
 	/* Throw an actual `E_UNKNOWN_SYSTEMCALL' exception! */
-	pushq_cfi %r9                                            /* ARGS[5] */
-	pushq_cfi %r8                                            /* ARGS[4] */
-	pushq_cfi %r10                                           /* ARGS[3] */
-	pushq_cfi %rdx                                           /* ARGS[2] */
-	movq   %rsi, %r9                                         /* ARGS[1] */
-	movq   %rdi, %r8                                         /* ARGS[0] */
-	movq   %rax, %rcx                                        /* sysno */
-	movq   ((4*8)+OFFSET_RPC_SYSCALL_INFO_FLAGS)(%rsp), %rdx /* flags */
-	movq   $(8), %rsi                                        /* argc */
-	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi       /* ecode */
+	pushq_cfi %r9                                      /* ARGS[5] */
+	pushq_cfi %r8                                      /* ARGS[4] */
+	pushq_cfi %r10                                     /* ARGS[3] */
+	pushq_cfi %rdx                                     /* ARGS[2] */
+	movq   %rsi, %r9                                   /* ARGS[1] */
+	movq   %rdi, %r8                                   /* ARGS[0] */
+	movq   %rax, %rcx                                  /* sysno */
+	movq   OFFSET_RPC_SYSCALL_INFO_FLAGS(%rbx), %rdx   /* flags */
+	movq   $(8), %rsi                                  /* argc */
+	movq   $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)), %rdi /* ecode */
 	call   error_thrown
 	.cfi_adjust_cfa_offset -32
 
@@ -178,17 +178,16 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 #endif /* !NDEBUG */
 
 .Lsyscall_emulate32_r:
-	/* TODO: 32-bit system call */
 	/* Figure out which system call is actually being invoked. */
-	movzlq OFFSET_RPC_SYSCALL_INFO_SYSNO(%rsp), %rax
+	movzlq OFFSET_RPC_SYSCALL_INFO_SYSNO(%rbx), %rax
 
 	/* Load system call arguments (from `sc_info') */
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(0))(%rsp), %rdi
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(1))(%rsp), %rsi
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(2))(%rsp), %rdx
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(3))(%rsp), %rcx
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(4))(%rsp), %r8
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(5))(%rsp), %r9
+	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(0))(%rbx), %rdi
+	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(1))(%rbx), %rsi
+	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(2))(%rbx), %rdx
+	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(3))(%rbx), %rcx
+	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(4))(%rbx), %r8
+	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(5))(%rbx), %r9
 
 	cmpl   $(__NR32_syscall0_max), %eax
 	ja     .Lcall_sysex32
@@ -198,7 +197,7 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 	.cfi_adjust_cfa_offset -8
 .Lbad_sysno32:
 	/* %rax is a system call number that doesn't exist. */
-	testq  $(RPC_SYSCALL_INFO_FEXCEPT), OFFSET_RPC_SYSCALL_INFO_FLAGS(%rsp)
+	testq  $(RPC_SYSCALL_INFO_FEXCEPT), OFFSET_RPC_SYSCALL_INFO_FLAGS(%rbx)
 	jnz    .Lthrow_unknown_systemcall /* Throw an actual `E_UNKNOWN_SYSTEMCALL' exception! */
 	/* Just return -ENOSYS (no need to go through all the hassle of throwing an exception) */
 	movq   $-ENOSYS, %rax

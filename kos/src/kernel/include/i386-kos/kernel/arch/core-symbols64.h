@@ -3950,10 +3950,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_sched_yield; .quad sys_sched_yield
 	.reloc ., R_X86_64_SIZE32, sys_sched_yield; .int 0
 	.int 0x1061f94
-	.quad .Lname987 /* index: 987 */
-	.weak x86_syscall32_lcall7_iret; .quad x86_syscall32_lcall7_iret
-	.reloc ., R_X86_64_SIZE32, x86_syscall32_lcall7_iret; .int 0
-	.int 0x95cdcf4
+	.quad 0 /* index: 987 */
+	.quad 0
+	.int 0
+	.int 0
 	.quad .Lname988 /* index: 988 */
 	.weak driver_with_namel; .quad driver_with_namel
 	.reloc ., R_X86_64_SIZE32, driver_with_namel; .int 0
@@ -5678,10 +5678,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_msgsnd; .quad sys_msgsnd
 	.reloc ., R_X86_64_SIZE32, sys_msgsnd; .int 0
 	.int 0x64e5ad4
-	.quad .Lname1419 /* index: 1419 */
-	.weak x86_syscall32_lcall7; .quad x86_syscall32_lcall7
-	.reloc ., R_X86_64_SIZE32, x86_syscall32_lcall7; .int 0
-	.int 0x8ed4397
+	.quad 0 /* index: 1419 */
+	.quad 0
+	.int 0
+	.int 0
 	.quad .Lname1420 /* index: 1420 */
 	.weak sys_arch_prctl; .quad sys_arch_prctl
 	.reloc ., R_X86_64_SIZE32, sys_arch_prctl; .int 0
@@ -17782,8 +17782,6 @@ END(kernel_symbol_table)
 	.string "directory_entry_destroy"
 .Lname986:
 	.string "sys_sched_yield"
-.Lname987:
-	.string "x86_syscall32_lcall7_iret"
 .Lname988:
 	.string "driver_with_namel"
 .Lname990:
@@ -18346,8 +18344,6 @@ END(kernel_symbol_table)
 	.string "__cxa_end_catch"
 .Lname1418:
 	.string "sys_msgsnd"
-.Lname1419:
-	.string "x86_syscall32_lcall7"
 .Lname1420:
 	.string "sys_arch_prctl"
 .Lname1421:

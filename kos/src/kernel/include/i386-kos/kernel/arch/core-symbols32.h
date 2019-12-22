@@ -3678,10 +3678,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.int 0
 	.int 0
-	.long .Lname919 /* index: 919 */
-	.weak x86_syscall32_lcall7; .long x86_syscall32_lcall7
-	.reloc ., R_386_SIZE32, x86_syscall32_lcall7; .int 0
-	.int 0x8ed4397
+	.long 0 /* index: 919 */
+	.long 0
+	.int 0
+	.int 0
 	.long 0 /* index: 920 */
 	.long 0
 	.int 0
@@ -3950,10 +3950,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_sched_yield; .long sys_sched_yield
 	.reloc ., R_386_SIZE32, sys_sched_yield; .int 0
 	.int 0x1061f94
-	.long .Lname987 /* index: 987 */
-	.weak x86_syscall32_lcall7_iret; .long x86_syscall32_lcall7_iret
-	.reloc ., R_386_SIZE32, x86_syscall32_lcall7_iret; .int 0
-	.int 0x95cdcf4
+	.long 0 /* index: 987 */
+	.long 0
+	.int 0
+	.int 0
 	.long .Lname988 /* index: 988 */
 	.weak driver_with_namel; .long driver_with_namel
 	.reloc ., R_386_SIZE32, driver_with_namel; .int 0
@@ -17482,8 +17482,6 @@ END(kernel_symbol_table)
 	.string "sys_eventfd"
 .Lname917:
 	.string "vm_clone"
-.Lname919:
-	.string "x86_syscall32_lcall7"
 .Lname921:
 	.string "vm_readphysl_unaligned"
 .Lname922:
@@ -17564,8 +17562,6 @@ END(kernel_symbol_table)
 	.string "directory_entry_destroy"
 .Lname986:
 	.string "sys_sched_yield"
-.Lname987:
-	.string "x86_syscall32_lcall7_iret"
 .Lname988:
 	.string "driver_with_namel"
 .Lname990:

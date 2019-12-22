@@ -28,12 +28,13 @@
 #include <kernel/idt.h>
 #include <kernel/multiboot.h>
 #include <kernel/paging.h>
+#include <kernel/syscall-tables.h>
 #include <sched/tss.h>
 
 #include <hybrid/align.h>
 
-#include <asm/pageid.h>
 #include <asm/cacheline.h>
+#include <asm/pageid.h>
 #include <kos/kernel/gdt.h>
 #include <kos/kernel/segment.h>
 
@@ -552,12 +553,12 @@ SECTIONS {
 	DEFINE_SEGMENT_SYMBOLS(__x86_gdt_tss, TSS, (TSS_BASE, SIZEOF_TSS_PLUS_IOB_VECTOR - 1, SEGMENT_DESCRIPTOR_TYPE_TSS_AVL, 0, 1, 0, 0))
 	DEFINE_SEGMENT_SYMBOLS(__x86_gdt_ldt, LDT, (LDT_BASE, (LDT_SEGMENT_COUNT * SIZEOF_SEGMENT_DESCRIPTOR) - 1, 3, 1, 0, 0))
 #ifndef __x86_64__
+#ifndef CONFIG_X86_EMULATE_LCALL7
 	DEFINE_SEGMENT_SYMBOLS(__x86_ldt_lcall7_main, CALLGATE, (x86_syscall32_lcall7, SEGMENT_KERNEL_CODE, SEGMENT_DESCRIPTOR_TYPE_CALLGATE, 0, 3, 1))
+#endif /* !CONFIG_X86_EMULATE_LCALL7 */
 	DEFINE_SEGMENT_SYMBOLS(__x86_gdt_tss_df, TSS, (TSS_DF_BASE, SIZEOF_TSS - 1, SEGMENT_DESCRIPTOR_TYPE_TSS_AVL, 0, 1, 0, 0))
 	DEFINE_SEGMENT_SYMBOLS(__x86_gdt_kernel_tls, DESCRIPTOR, (_boottask, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 0, 1, 0, GDT_L, GDT_DB, 1))
-#else /* !__x86_64__ */
-	DEFINE_SEGMENT_SYMBOLS(__x86_ldt_lcall7_main, CALLGATE, (x86_syscall32_lcall7, SEGMENT_KERNEL_CODE, SEGMENT_DESCRIPTOR_TYPE_CALLGATE, 3, 1))
-#endif /* __x86_64__ */
+#endif /* !__x86_64__ */
 #undef DEFINE_SEGMENT_SYMBOLS
 #undef GDT_DB
 #undef GDT_L

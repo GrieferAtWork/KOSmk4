@@ -2799,8 +2799,6 @@
 #define __CRT_HAVE_x86_pit_lock 1
 #define __CRT_HAVE_x86_rpc_user_redirection 1
 #define __CRT_HAVE_x86_setiopl 1
-#define __CRT_HAVE_x86_syscall32_lcall7 1
-#define __CRT_HAVE_x86_syscall32_lcall7_iret 1
 #define __CRT_HAVE_x86_syscall32_sysenter 1
 #define __CRT_HAVE_x86_syscall32_sysenter_traced 1
 #define __CRT_HAVE_x86_syscall64_syscall 1

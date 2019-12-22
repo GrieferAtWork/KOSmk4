@@ -23,6 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/gdt.h>
+#include <kernel/syscall-tables.h>
 #include <kernel/vm.h>
 #include <sched/pertask.h>
 #include <sched/task.h>
@@ -86,10 +87,30 @@ PUBLIC ATTR_PERCPU struct segment thiscpu_x86_gdt[SEGMENT_COUNT] = {
 #endif /* __x86_64__ */
 };
 
+#ifndef CONFIG_X86_EMULATE_LCALL7
 INTDEF byte_t __x86_ldt_lcall7_main_lo[];
 INTDEF byte_t __x86_ldt_lcall7_main_hi[];
+#endif /* !CONFIG_X86_EMULATE_LCALL7 */
+
 PUBLIC ATTR_PERCPU struct segment thiscpu_x86_ldt[LDT_SEGMENT_COUNT] = {
+#ifdef CONFIG_X86_EMULATE_LCALL7
+	/* Define the lcall7 segment as something that will cause a #GPF when accessed,
+	 * thus allowing us to emulate its behavior, rather than having to implement it
+	 * properly. As far as the reasoning for this goes, take a look at the emulation
+	 * implementation found in `/kos/src/kernel/core/arch/i386/fault/handle_gpf.c' */
+	/* NOTE: Setting the code segment of a call gate to 0 is documented as causing a #GPF */
+#ifdef __x86_64__
+	DEFINE_LOHI_SEGMENT(LDT_SEGMENT_SYSCALL,
+	                    SEGMENT_CALLGATE_INIT_U   (0, /*segment=*/0, SEGMENT_DESCRIPTOR_TYPE_CALLGATE, 3, 1),
+	                    SEGMENT_CALLGATE_HI_INIT_U(0, /*segment=*/0, SEGMENT_DESCRIPTOR_TYPE_CALLGATE, 3, 1))
+#else /* __x86_64__ */
+	DEFINE_LOHI_SEGMENT(LDT_SEGMENT_SYSCALL,
+	                    SEGMENT_CALLGATE_INIT_UL(0, /*segment=*/0, SEGMENT_DESCRIPTOR_TYPE_CALLGATE, 0, 3, 1),
+	                    SEGMENT_CALLGATE_INIT_UH(0, /*segment=*/0, SEGMENT_DESCRIPTOR_TYPE_CALLGATE, 0, 3, 1))
+#endif /* !__x86_64__ */
+#else /* CONFIG_X86_EMULATE_LCALL7 */
 	DEFINE_LOHI_SEGMENT(LDT_SEGMENT_SYSCALL, __x86_ldt_lcall7_main_lo, __x86_ldt_lcall7_main_hi),
+#endif /* !CONFIG_X86_EMULATE_LCALL7 */
 };
 
 

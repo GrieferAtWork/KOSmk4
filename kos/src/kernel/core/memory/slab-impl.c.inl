@@ -163,7 +163,8 @@ again:
 		for (i = 0;; ++i) {
 			uintptr_t word, mask;
 			u8 page_flags;
-			assert(i < LENGTHOF_BITSET);
+			assertf(i < LENGTHOF_BITSET, "i = %u, LENGTHOF_BITSET = %u",
+			        i, (unsigned int)LENGTHOF_BITSET);
 			word = BITSET(result_page)[i];
 			if (word == (uintptr_t)-1)
 				continue; /* Fully allocated */

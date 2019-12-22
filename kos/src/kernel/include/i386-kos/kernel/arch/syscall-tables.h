@@ -21,11 +21,28 @@
 
 #include <kernel/compiler.h>
 
+#include <hybrid/host.h>
+
 #include <asm/unistd.h>
 
 #ifndef __NR32FEAT_SYSCALL_TABLE_COUNT
 #include <asm/syscalls32_d.h>
 #endif /* !__NR32FEAT_SYSCALL_TABLE_COUNT */
+
+#ifdef __x86_64__
+/* Must always emulate lcall7 system call on x86_64:
+ * When lcall is used by user-space, preemption is _NOT_ disabled, and for the
+ * duration of a single instruction we could get interrupted whilst having the
+ * incorrect value set for %gs.base! */
+#undef CONFIG_X86_EMULATE_LCALL7
+#undef CONFIG_NO_X86_EMULATE_LCALL7
+#define CONFIG_X86_EMULATE_LCALL7 1
+#elif !defined(CONFIG_NO_X86_EMULATE_LCALL7)
+/* Emulate lcall7 even on i386 by default, since doing so greatly simplifies
+ * the implementation of `task_enable_redirect_usercode_rpc()' */
+#undef CONFIG_X86_EMULATE_LCALL7
+#define CONFIG_X86_EMULATE_LCALL7 1
+#endif
 
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
@@ -180,9 +197,11 @@ FUNDEF void ASMCALL x86_syscall64_int80_traced(void) ASMNAME("x86_idt_syscall_tr
  *    %eflags.CF: When cleared on entry, set on return if an exception was propagated
  *    *:          All other registers are preserved by default, though individual
  *                system calls may cause specific registers to become clobbered. */
+#ifndef CONFIG_X86_EMULATE_LCALL7
 FUNDEF void ASMCALL x86_syscall32_lcall7(void);
 /* Same as `x86_syscall32_lcall7()', but an IRET tail has already been created. */
 FUNDEF void ASMCALL x86_syscall32_lcall7_iret(void);
+#endif /* !CONFIG_X86_EMULATE_LCALL7 */
 
 
 

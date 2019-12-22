@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9985e63f */
+/* HASH CRC-32:0xfddbc7be */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -195,9 +195,13 @@
  * 	@@How was the register accessed (One of `E_ILLEGAL_INSTRUCTION_REGISTER_*')
  * 	member how: uintptr_t;
  * 	@@The accessed register index
+ * 	@@NOTE: When set to `X86_REGISTER_MSR', then the next 3
+ * 	@@      pointers are index(%ecx), loval(%eax), hival(%edx)
  * 	member regno: uintptr_t;
  * 	@@The associated register value (or 0 for read operations)
- * 	member regval: uintptr_t; */
+ * 	member regval: uintptr_t;
+ * 	@@An offset applied to the register (set in case of an illegal lcall/ljmp; 0 otherwise)
+ * 	member offset: uintptr_t; */
 #define E_ILLEGAL_INSTRUCTION_REGISTER (E_ILLEGAL_INSTRUCTION,0x0011)
 /* Read from invalid register */
 #define E_ILLEGAL_INSTRUCTION_REGISTER_RDINV 0x0001

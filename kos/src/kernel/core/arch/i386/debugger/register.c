@@ -746,12 +746,12 @@ NOTHROW(KCALL x86_dbg_getregbyid)(unsigned int level, unsigned int regno,
 #ifdef __x86_64__
 			if (regno == X86_REGISTER_MISC_KGSBASEL) {
 				if (buflen >= 4)
-					UNALIGNED_SET32(buf, (u32)x86_dbg_exitstate.de_kernel_gsbase);
+					UNALIGNED_SET32((u32 *)buf, (u32)x86_dbg_exitstate.de_kernel_gsbase);
 				return 4;
 			}
 			if (regno == X86_REGISTER_MISC_KGSBASEQ) {
 				if (buflen >= 8)
-					UNALIGNED_SET64(buf, (u64)x86_dbg_exitstate.de_kernel_gsbase);
+					UNALIGNED_SET64((u64 *)buf, (u64)x86_dbg_exitstate.de_kernel_gsbase);
 				return 8;
 			}
 #endif /* __x86_64__ */
@@ -771,7 +771,7 @@ NOTHROW(KCALL x86_dbg_getregbyid)(unsigned int level, unsigned int regno,
 				if (get_dbg_current_kernel_gs_base(&temp)) {
 					result = 4;
 					if (buflen >= 4)
-						UNALIGNED_SET32(buf, temp);
+						UNALIGNED_SET32((u32 *)buf, temp);
 				}
 				goto ok;
 			}
@@ -781,7 +781,7 @@ NOTHROW(KCALL x86_dbg_getregbyid)(unsigned int level, unsigned int regno,
 				if (get_dbg_current_kernel_gs_base(&temp)) {
 					result = 8;
 					if (buflen >= 8)
-						UNALIGNED_SET32(buf, temp);
+						UNALIGNED_SET64((u64 *)buf, temp);
 				}
 				goto ok;
 			}
@@ -861,12 +861,12 @@ NOTHROW(KCALL x86_dbg_setregbyid)(unsigned int level, unsigned int regno,
 #ifdef __x86_64__
 			if (regno == X86_REGISTER_MISC_KGSBASEL) {
 				if (buflen >= 4)
-					x86_dbg_exitstate.de_kernel_gsbase = UNALIGNED_GET32(buf);
+					x86_dbg_exitstate.de_kernel_gsbase = UNALIGNED_GET32((u32 *)buf);
 				return 4;
 			}
 			if (regno == X86_REGISTER_MISC_KGSBASEQ) {
 				if (buflen >= 8)
-					x86_dbg_exitstate.de_kernel_gsbase = UNALIGNED_GET64(buf);
+					x86_dbg_exitstate.de_kernel_gsbase = UNALIGNED_GET64((u64 *)buf);
 				return 8;
 			}
 #endif /* __x86_64__ */
@@ -885,7 +885,7 @@ NOTHROW(KCALL x86_dbg_setregbyid)(unsigned int level, unsigned int regno,
 			if (regno == X86_REGISTER_MISC_KGSBASEL) {
 				result = 4;
 				if (buflen >= 4) {
-					if (!set_dbg_current_kernel_gs_base(UNALIGNED_GET32(buf)))
+					if (!set_dbg_current_kernel_gs_base(UNALIGNED_GET32((u32 *)buf)))
 						result = 0;
 				} else {
 					u64 temp;
@@ -897,7 +897,7 @@ NOTHROW(KCALL x86_dbg_setregbyid)(unsigned int level, unsigned int regno,
 			if (regno == X86_REGISTER_MISC_KGSBASEQ) {
 				result = 8;
 				if (buflen >= 8) {
-					if (!set_dbg_current_kernel_gs_base(UNALIGNED_GET64(buf)))
+					if (!set_dbg_current_kernel_gs_base(UNALIGNED_GET64((u64 *)buf)))
 						result = 0;
 				} else {
 					u64 temp;

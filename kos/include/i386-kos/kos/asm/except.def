@@ -236,7 +236,7 @@ class E_ILLEGAL_INSTRUCTION_BAD_OPERAND: E_ILLEGAL_INSTRUCTION = 0x0010 {
 const E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE = 0x0001;
 
 
-[message("Invalid register")]
+[message("Invalid register access")]
 @@Attempted to access an invalid register `regno' (one of `<ARCH>_REGISTER_*')
 class E_ILLEGAL_INSTRUCTION_REGISTER: E_ILLEGAL_INSTRUCTION = 0x0011 {
 	@@The opcode that caused the exception
@@ -246,10 +246,15 @@ class E_ILLEGAL_INSTRUCTION_REGISTER: E_ILLEGAL_INSTRUCTION = 0x0011 {
 	[tostr(select("E_ILLEGAL_INSTRUCTION_REGISTER_*"))]
 	member how: uintptr_t;
 	@@The accessed register index
+	@@NOTE: When set to `X86_REGISTER_MSR', then the next 3
+	@@      pointers are index(%ecx), loval(%eax), hival(%edx)
 	member regno: uintptr_t;
 	@@The associated register value (or 0 for read operations)
 	member regval: uintptr_t;
+	@@An offset applied to the register (set in case of an illegal lcall/ljmp; 0 otherwise)
+	member offset: uintptr_t;
 }
+
 @@Read from invalid register
 const E_ILLEGAL_INSTRUCTION_REGISTER_RDINV = 0x0001;
 @@Read from privileged register
@@ -262,7 +267,7 @@ const E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV = 0x0012;
 const E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD = 0x0013;
 
 @@The memory-accessing instruction was is not recognized for use in VIO
-class E_ILLEGAL_INSTRUCTION_VIO_UNRECOGNIZED     : E_ILLEGAL_INSTRUCTION = 0x1001 {
+class E_ILLEGAL_INSTRUCTION_VIO_UNRECOGNIZED : E_ILLEGAL_INSTRUCTION = 0x1001 {
 	@@The opcode that caused the exception
 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
 	member opcode: uintptr_t;

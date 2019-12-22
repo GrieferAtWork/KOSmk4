@@ -593,6 +593,7 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 	assert(!PREEMPTION_ENABLED());
 	assert(self->t_cpu == THIS_CPU);
 	assert(!(self->t_flags & TASK_FKERNTHREAD));
+#ifndef CONFIG_X86_EMULATE_LCALL7
 	/* Check for special case: `self' was interrupted in
 	 * `x86_syscall32_lcall7' before it was able to complete its IRET tail.
 	 * NOTE: It is sufficient to only check for EIP == ENTRY_OF(x86_syscall32_lcall7),
@@ -627,6 +628,7 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 		((u32 *)fixup)[1] = ((u32 *)fixup)[2];
 		((u32 *)fixup)[2] = eflags;
 	}
+#endif /* !CONFIG_X86_EMULATE_LCALL7 */
 	thread_iret = x86_get_irregs(self);
 	if (thread_iret->ir_eip == (uintptr_t)&x86_rpc_user_redirection)
 		return false; /* Already redirected. */

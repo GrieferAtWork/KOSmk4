@@ -19,17 +19,18 @@
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_SYSCALL_LCALL7_32_S
 #define GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_SYSCALL_LCALL7_32_S 1
 
-#include <hybrid/compiler.h>
+#include <kernel/compiler.h>
+
+#include <kernel/syscall-tables.h>
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
 #include <asm/unistd.h>
-#include <kos/kernel/gdt.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/gdt.h>
 
 
-
-
+#ifndef CONFIG_X86_EMULATE_LCALL7
 .section .text
 PUBLIC_FUNCTION(x86_syscall32_lcall7)
 	/* Main entry point for `lcall $7'-style system calls */
@@ -156,5 +157,6 @@ PUBLIC_FUNCTION(x86_syscall32_lcall7_iret)
 	.cfi_endproc
 END(x86_syscall32_lcall7_iret)
 END(x86_syscall32_lcall7)
+#endif /* !CONFIG_X86_EMULATE_LCALL7 */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_SYSCALL_LCALL7_32_S */
