@@ -226,8 +226,8 @@ contains_illegal_overlap(USER CHECKED ElfW(Phdr) *headers,
 			if (OVERFLOW_UADD(addr, (ElfW(Addr))PAGEMASK, &addr))
 				goto yes;
 			other_max_page = (addr / PAGESIZE) - 1;
-			if (other_min_page < max_page &&
-			    other_max_page > min_page)
+			if (other_min_page <= max_page &&
+			    other_max_page >= min_page)
 				goto yes;
 		}
 	}
