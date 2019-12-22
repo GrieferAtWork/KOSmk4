@@ -322,12 +322,37 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
  * @return: false: The given thread has already been redirected. */
 PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
-	(void)self;
-	kernel_panic("TODO");
+	struct irregs_user *thread_iret;
+	struct irregs_user *thread_save;
+	assert(!PREEMPTION_ENABLED());
+	assert(self->t_cpu == THIS_CPU);
+	assert(!(self->t_flags & TASK_FKERNTHREAD));
+	thread_iret = x86_get_irregs(self);
+	if (thread_iret->ir_rip == (uintptr_t)&x86_rpc_user_redirection)
+		return false; /* Already redirected. */
+	/* Save the original IRET tail. */
+	thread_save = &FORTASK(self, this_x86_rpc_redirection_iret);
+	thread_save->ir_rip    = thread_iret->ir_rip;
+	thread_save->ir_cs     = thread_iret->ir_cs;
+	thread_save->ir_rflags = thread_iret->ir_rflags;
+	thread_save->ir_ss     = thread_iret->ir_ss;
+	thread_save->ir_rsp    = thread_iret->ir_rsp;
+	COMPILER_READ_BARRIER();
+	/* NOTE: The write-order of all of these is highly important,
+	 *       so just put a write-barrier around every write.
+	 *       For more information, see `irregs_rdip()' and friends. */
+	COMPILER_WRITE_BARRIER();
+	thread_iret->ir_rip = (uintptr_t)&x86_rpc_user_redirection;
+	COMPILER_WRITE_BARRIER();
+	thread_iret->ir_cs = SEGMENT_KERNEL_CODE;
+	COMPILER_WRITE_BARRIER();
+	thread_iret->ir_rflags = 0;
+	COMPILER_WRITE_BARRIER();
+	thread_iret->ir_ss  = SEGMENT_KERNEL_DATA;
+	thread_iret->ir_rsp = (u64)(thread_iret + 1);
+	COMPILER_WRITE_BARRIER();
 	return true;
 }
-
-/* TODO */
 
 #else /* __x86_64__ */
 
@@ -608,6 +633,7 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 	FORTASK(self, this_x86_rpc_redirection_iret).ir_eip    = thread_iret->ir_eip;
 	FORTASK(self, this_x86_rpc_redirection_iret).ir_cs     = thread_iret->ir_cs;
 	FORTASK(self, this_x86_rpc_redirection_iret).ir_eflags = thread_iret->ir_eflags;
+	COMPILER_READ_BARRIER();
 	/* NOTE: The write-order of all of these is highly important,
 	 *       so just put a write-barrier around every write.
 	 *       For more information, see `irregs_rdip()' and friends. */
