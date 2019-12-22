@@ -333,6 +333,8 @@ again:
 set_new_minpage_below:
 			if (OVERFLOW_USUB(maxpage, num_pages - 1, &minpage))
 				break;
+			minpage &= ~(min_alignment_in_pages - 1);
+			maxpage = minpage + num_pages - 1;
 		}
 		if (!(mode & VM_GETFREE_STRICT)) {
 			mode &= ~VM_GETFREE_BELOW;
@@ -449,8 +451,12 @@ set_new_minpage_below:
 				return minpage;
 			}
 			/* Continue searching above the limit. */
-			minpage = (minmax.mm_max_max + min_alignment_in_pages) & ~(min_alignment_in_pages - 1);
+			minpage = minmax.mm_max_max + 1;
 set_new_maxpage_above:
+			if (OVERFLOW_UADD(minpage, min_alignment_in_pages - 1, &minpage) ||
+			    minpage > __ARCH_PAGEID_MAX)
+				break;
+			minpage &= ~(min_alignment_in_pages - 1);
 			if (OVERFLOW_UADD(minpage, num_pages - 1, &maxpage) ||
 			    maxpage > __ARCH_PAGEID_MAX)
 				break;

@@ -205,7 +205,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Since `kernel_initialize_commandline_options_early()' may have overwritten
 	 * the initial seed set by `x86_initialize_rand_entropy()', only log the actually
 	 * used seed now so that the system logs remain consistent with the user's expectation. */
-	printk(FREESTR(KERN_INFO "[rand] Set pseudo RNG seed to %#I32p\n"), krand_seed);
+	printk(FREESTR(KERN_INFO "[rand] Set pseudo RNG seed to %#.8I32x\n"), krand_seed);
 
 	/* Initialize the kernel VM, and instigate strict memory protection,
 	 * unmapping virtual memory that isn't being used by the kernel, while
