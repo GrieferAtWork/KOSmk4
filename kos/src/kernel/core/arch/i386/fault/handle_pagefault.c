@@ -1011,7 +1011,7 @@ throw_segfault:
 		/* This can happen when trying to call an invalid function pointer.
 		 * -> Try to unwind this happening. */
 		uintptr_t old_eip;
-		uintptr_t sp = irregs_rdsp(&state->ics_irregs);
+		uintptr_t sp = icpustate_getsp(state);
 		if (sp != (uintptr_t)(&state->ics_irregs + 1) && sp >= KERNELSPACE_BASE)
 			goto not_a_badcall;
 		TRY {

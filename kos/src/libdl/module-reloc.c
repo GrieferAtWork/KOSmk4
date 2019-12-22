@@ -403,24 +403,31 @@ libdl_bind_lazy_relocation(DlModule *__restrict self,
 	rel = (ElfW(Rel) *)((uintptr_t)self->dm_jmprel + jmp_rel_offset);
 #endif /* !ELF_ARCH_LAZYINDX */
 	if unlikely(!ELF_ARCH_IS_R_JMP_SLOT(ELFW(R_TYPE)(rel->r_info))) {
+		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation at DT_JMPREL+%Iu (index:%Iu) "
+		                  "[r_offset=%#Ix,r_info=%#I32x"
 #if !ELF_ARCH_USESRELA
-		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation at DT_JMPREL+%Iu "
-		                  "[r_offset=%#Ix,r_info=%#I32x] isn't `" ELF_ARCH_NAME_R_JMP_SLOT "' in %q\n",
+		                  "] isn't `" ELF_ARCH_NAME_R_JMP_SLOT "' in %q\n"
+#endif /* !ELF_ARCH_USESRELA */
+		       ,
 #if ELF_ARCH_LAZYINDX
 		       (size_t)((byte_t *)rel - (byte_t *)self->dm_jmprel),
+		       jmp_rel_index,
 #else /* ELF_ARCH_LAZYINDX */
 		       (size_t)jmp_rel_offset,
+#if ELF_ARCH_USESRELA
+		       self->dm_flags & RTLD_JMPRELA ? (size_t)((ElfW(Rela) *)rel - self->dm_jmprela)
+		                                     : (size_t)(rel - self->dm_jmprel),
+#else /* ELF_ARCH_USESRELA */
+		       (size_t)(rel - self->dm_jmprel),
+#endif /* ELF_ARCH_USESRELA */
 #endif /* !ELF_ARCH_LAZYINDX */
-		       rel->r_offset, rel->r_info, self->dm_filename);
-#else /* !ELF_ARCH_USESRELA */
-		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation at DT_JMPREL+%Iu "
-		                  "[r_offset=%#Ix,r_info=%#I32x",
-#if ELF_ARCH_LAZYINDX
-		       (size_t)((byte_t *)rel - (byte_t *)self->dm_jmprel),
-#else /* ELF_ARCH_LAZYINDX */
-		       (size_t)jmp_rel_offset,
-#endif /* !ELF_ARCH_LAZYINDX */
-		       rel->r_offset, rel->r_info);
+		       rel->r_offset, rel->r_info
+#if !ELF_ARCH_USESRELA
+		       ,
+		       self->dm_filename
+#endif /* !ELF_ARCH_USESRELA */
+		       );
+#if ELF_ARCH_USESRELA
 		if (self->dm_flags & RTLD_JMPRELA)
 			syslog(LOG_ERROR, ",r_addend=%Id", (ssize_t)((ElfW(Rela) *)rel)->r_addend);
 		syslog(LOG_ERROR, "] isn't `" ELF_ARCH_NAME_R_JMP_SLOT "' in %q\n", self->dm_filename);

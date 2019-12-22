@@ -140,7 +140,6 @@ INTERN_FUNCTION(libdl_load_lazy_relocation)
 	popq_cfi_r %rsi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	popq_cfi_r %rax
 
 	xchgq  %rax, (%rsp) /* RESTORE(EAX); 0(%rsp) = RESOLVED_ADDRESS */
 	.cfi_same_value %rax
