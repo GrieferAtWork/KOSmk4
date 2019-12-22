@@ -46,6 +46,25 @@ PUBLIC_FUNCTION(x86_syscall32_lcall7)
 	 * since RFLAGS is missing between CS and SP.
 	 * The user-space RFLAGS value hasn't been changed and
 	 * is still stored in our current RFLAGS value. */
+
+	/* !!!FIXME!!!
+	 * When lcall is used by user-space, preemption is _NOT_ disabled, and for the
+	 * duration of a single instruction we could get interrupted whilst having the
+	 * incorrect value set for %gs.base!
+	 * -> Solution: Don't actually make use of call gates _at_ _all_!
+	 *              Instead, define LDT[0] as something different in such a way
+	 *              that trying to perform an lcall using it causes a #GPF (which
+	 *              includes a regular IRET tail). Then, add a special case in its
+	 *              instruction decoder to emulate lcall instructions!
+	 * -> Given the fact that lcall isn't actually used that often, and on-top of
+	 *    that: is only ever used by 32-bit code, and even then is quite the rarity,
+	 *    there is no need to do this properly, as in: add special cases to _all_
+	 *    interrupt handlers that check if the interrupt originated from lcall7 prior
+	 *    to %gs.base has been exchanged, and manually exchange %gs.base if that is
+	 *    the case. This would not only be extremely confusing, but also highly error-
+	 *    prone, with all of it being only for a feature that is rarely used at best.
+	 */
+
 	.cfi_def_cfa %rsp, 0
 	.cfi_rel_offset %rip, 0
 	.cfi_rel_offset %cs, 8
