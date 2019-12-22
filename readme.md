@@ -378,12 +378,12 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- Any header must always ensure that it includes `<__stdinc.h>` at some point, or includes another header that unconditionally includes it (this header is used to do all of the work of creating a common, cross-compiler basis of available features)
 	- Anything that only a C compiler could understand must be wrapped inside a `#ifdef __CC__` block (`CC` standing C/C++-Compiler)
 		- Always allow an assembler or linker script to include any arbirary header found in `/kos/include/`
-		- Related to the later, also consider if an assembly source file could reasonably need to make use of structures defined in your header, and if so: add `(__|)OFFSET_MYSTRUCT_MYFIELD` and `(__|)SIZEOF_MYSTRUCT` macros describing the absolute offsets of certain fields
+		- Related to the later, also consider if an assembly source file could reasonably need to make use of structures defined in your header, and if so: add `[__]OFFSET_MYSTRUCT_MYFIELD` and `[__]SIZEOF_MYSTRUCT` macros describing the absolute offsets of certain fields
 			- To assert that these offsets are valid, you may add the header to the list of checked headers in `$PROJPATH/kos/src/_verify/[arch/(i386|...)/]assert_types.c`
 - Libc:
 	- Try to maintain header (API) compatibility with GLIBc, MSVC and CYGWIN
 	- Try to maintain binary (ABI) compatibility with GLIBc and MSVC (CYGWIN only as far as that is possible)
-- KOS-specific, object-related kernel function can be exported as a `HOP\_*` command (s.a. `/kos/include/kos/hop.h`)
+- KOS-specific, object-related kernel function can be exported as a `HOP_*` command (s.a. `/kos/include/kos/hop.h`)
 
 
 
@@ -493,7 +493,7 @@ To help you understand how this script works to do what it does, here is a docum
 	- Force a full re-build of everything (except for re-formatting the KOS disk image)
 	- Passed by default when selecting `Rebuild kernel` in Visual Studio
 - `--format-error-messages`
-	- Format GCC's and LD's error messages in forms such as `file:line[:column]:...` into what is accepted by Visual Studio's `file(line[,column]) : ...` format (allowing you to click such lines within build output)
+	- Format GCC's and LD's error messages from forms such as `file:line[:column]:...` into what is accepted by Visual Studio's `file(line[,column]) : ...` format (allowing you to click such lines within build output)
 	- Passed by default when building was started by pressing CTRL+SHIFT+B in Visual Studio
 - `--`
 	- Join the remainder of the argument list into a single string seperated by 1-wide space characters and pass that string into the emulator for use as the kernel commandline
@@ -541,11 +541,13 @@ To help you understand how this script works to do what it does, here is a docum
 	- Inject a driver `NAME` into the kernel during boot, where `NAME` is either the driver's filename within `$PROJPATH/bin/$TARGET-kos-$CONFIG/os/drivers/`, or a filename within the host filesystem if it contains any slashes
 	- Optionally, a commandline `CMDLINE` may be given, which is then passed to the driver during initialization
 	- This method of loading drivers makes it possible to give KOS the ability to identify alternative devices or filesystems before having initialized its own filesystem, meaning that KOS can be booted from a device/fs combo not known to the kernel core
-	- Note that loading a driver that has dependencies on other driver(s) using this method, you must also inject all dependencies
-	- The order in which drivers are given affects their initialization order. However drivers that are dependencies of other drivers are always initialized first
+	- Note that when using this method to load a driver that has dependencies on other driver(s), you must also inject all dependencies
+	- The order in which drivers are given affects their initialization order. However drivers that are dependencies of other drivers are always initialized first (cyclic dependencies are not allowed)
 	- Example:
-		- `deemon magic.dee --driver=usb-storage:usb`
-			- OK: `usb` is a dependency of `usb-storage`
+		- `deemon magic.dee --driver=usb-storage:usb`, `deemon magic.dee --driver=usb:usb-storage`
+			- OK: `usb` is a dependency of `usb-storage`, and the initialization order is always:
+				- `usb`
+				- `usb-storage`
 		- `deemon magic.dee --driver=usb-storage`
 			- Wrong: This will cause a kernel panic telling you that the `usb` driver is missing
 
@@ -577,26 +579,26 @@ I personally use Visual Studio 2017 Community Edition for this, as it actually h
 
 I mean seriously: Even when you scoure the osdev wiki you'll come across references to [VisualGDB and VisualKernel](https://wiki.osdev.org/Kernel_Debugging), so I really don't understand who wrote that recommendataion. - I don't think any of us bare-metal, kernel-development enthusiats (especially newcomers who could use a real, and simple to use integrated debugging experience the most) would be willing to pay that much...
 
-Anyways. - Even though practically no documentation on this feature of Visual Studio (which you can get the Community Edition of for free by the way) exists, I managed to get it working through trial an error.
+Anyways. - Even though practically no documentation on this feature of Visual Studio (of which you can get the Community Edition for free by the way) exists, I managed to get it working through trial an error.
 
 And if you don't like Visual Studio (or aren't using Windows) I do know for a fact that Visual Studio Code also includes functionality for connecting to a GDB server/stub when you start diving into extensions
 
 So here are your options:
 
-- To debug the kernel, you must start it with one of the following 2 commandlines (both of which will run a GDB server/stub on `tcp:localhost:1234`, and have qemu wait until something connects to it):
+- To debug the kernel, you must start it with one of the following 2 commandlines (both of which will run a GDB stub/server on `tcp:localhost:1234`, and have qemu wait until something connects to it):
 	- `deemon magic.dee --run-only --gdb=server --target=i386 --config=OD` 
-	This one uses my own personal gdb server that gets loaded into the kernel as a driver. It offers out-of-the-box integrated support for enumerating libraries, drivers, and running threads/processes (offering both `multiprocess+` and `QNonStop:1` support)
+	This one uses my own personal gdb server that gets loaded into the kernel as a driver. It offers out-of-the-box support for enumerating libraries, drivers, and running threads/processes (offering both `multiprocess+` and `QNonStop:1` functionality)
 	- `deemon magic.dee --run-only --gdb=qemu --target=i386 --config=OD` 
 	This one uses qemu's built-in gdb stub, which offers less functionality since it won't know how to enumerate threads created by the KOS scheduler, or list all of the libraries/drivers loaded into the kernel, meaning that tracebacks will only include source locations from the kernel core.
 	This option is mainly meant for debugging things that happen before the GDB driver is loaded, or things that break the GDB stub driver itself (It's home-made and hacked together based on knowledge leared from observation, qemu's implementation, gdbserver, and bits and pieces of documentation from across the internet)
-- To connect to the server/stub, you can do one of the following:
+- To connect to the stub/server, you can do one of the following:
 	- Use Visual Studio's Open-Folder function to open the `$PROJPATH/kos` folder and have all of this happen in 1 step when you press the debug button
 	- Start a new instance of `gdb` built for a generic `i386` target and type `target remote localhost:1234`
 	- Screw around with Visual Studio Code until you get it to connect to that same port, and have it be your debugging experience (I know for a fact that this is possible since I managed to get it to work before figuring out how to get Visual Studio's Open-Folder method to do my bidding)
 
 Notes:
 
-- When opening KOS using Visual Studio, do _not_ just open `$PROJPATH`, but open `$PROJPATH/kos` instead. - Opening the former will not work properly and Visual Studio may even crash after a while since (at least for me) it seems unable to coax with the thousands of source files apart of binutils and gcc, and despite all of the methods that (supposedly) exist to have Visual Studio ignore certain paths within your source tree, all of them only function to hide folders from the Solution Explorer (despite their documentation claiming to also hide them from the source code scanners). So my solution was to move everything that's actually interesting to me into the `$PROJPATH/kos` sub-folder and always open that one when programming.
+- When opening KOS using Visual Studio, do _not_ just open `$PROJPATH`, but open `$PROJPATH/kos` instead. - Opening the former will not work properly and Visual Studio may even crash after a while since (at least for me) it seems unable to coax with the thousands of source files apart of binutils and gcc. And despite all of the methods that (supposedly) exist to have Visual Studio ignore certain paths within your source tree, all of them only function to hide folders from the Solution Explorer (despite their documentation claiming to also hide them from the source code scanners). So my solution was to move everything that's actually interesting to me into the `$PROJPATH/kos` sub-folder and always open that one when programming.
 - Before debugging with Visual Studio for the first time, make sure to have already run `make_toolchain.sh` at least once to ensure that it was able to generate the file `$PROJPATH/kos/.vs/launch.vs.json` (this has to be done dynamically since it must contain some absolute paths depending on where your `$PROJPATH` is located at) (for this purpose, it's likely to work even if `make_toolchain.sh` fails, since the creation of this file is one of the first things it does)
 
 
@@ -607,15 +609,15 @@ Notes:
 
 The KOS build system is quite complex, as KOS system headers depend on CRT feature definition files which it will automatically generate/update as features are added to, or removed from the kernel or libc.
 
-Some parts of the system headers and libraries automatically get generated. This normally happens automatically as part of invoking `deemon magic.dee`, which will check if changes happened to the sources of automatically generated files.
+Some parts of the system headers and libraries are automatically generated. This normally happens as part of invoking `deemon magic.dee`, which will check if changes happened to the sources of such files. (You can easily tell that a file is auto-generated by checking if it starts with `/* HASH CRC-32:... */`)
 
-Note however that you should not attempt to manually modify automatically generated pieces of code. - Doing so will cause the the build system to refuse to override your changes so-as to never accidentally override them without you realizing what happened.
+Note however that you should not attempt to manually modify automatically generated pieces of code. - Doing so will cause the build system to refuse to overwrite your changes so-as to never accidentally delete them without you realizing what happened.
 
-The most notable feature of the KOS build system is the way that I generate both libc headers, as well as source, inline-substitutions, and a few other files.
+The most notable feature of the KOS build system is the way that it generates libc headers, as well as sources, inline-substitutions, and a few other files.
 
-For this, the KOS system header folder contains crt feature files. These files are literally huge headers with thousands of `#define`s for every symbol publicly exported from either component (they are found in `/kos/include/i386-kos/crt-features/crt-kos[-kernel].h`).
+For this, the KOS system header folder contains crt feature files. These files are literally huge headers with thousands of `#define`s for every publicly exported symbol (they can be found in `/kos/include/i386-kos/crt-features/crt-kos[-kernel].h`).
 
-Using this system, the KOS system headers will automatically determine the features provided by the linked libc, and fill in the gaps, thus offering a much more complete API experience, regardless of what the underlying libraries actually offer.
+Using this system, KOS system headers will automatically determine the features provided by the linked libc, and fill in the gaps, thus offering a much more complete API experience, regardless of what the underlying libraries actually offer.
 
 Now assuming that some functionality is missing from linked libraries, this manifests itself by the automatic function substitution system kicking in and providing local definitions (aka. static/inline functions) for pretty much everything found in system headers (e.g. memcpy is immediatly implemented as an inline/static function in `/kos/include/local/string/memcpy.h`)
 
@@ -649,7 +651,7 @@ This system is tightly interwoven with the CRT feature files described in the se
 
 This is done via a custom function definition protocol implemented by a deemon program found in `$PROJPATH/kos/misc/magicgenerator/generate_headers.dee`, which when run, will parse and link the definition files from `$PROJPATH/kos/src/libc/magic/*.c` to gain knowledge of what goes where, how everything looks like, what annotations may be applied to functions, how functions are implemented, and so on...
 
-As the end result, KOS is able to provide definitions for many header functions while simultaniously exporting them from both libc (and sometimes the kernel) in such a way that the possibility of mistakes happening due to redundancy falls away (e.g. all function prototypes of memcpy() are annotated with `ATTR_NONNULL((1,2))`, and despite this specific annotation exists in possibly more than 20 places, any changes to it would only require a single modification of the tags in `/kos/src/libc/magic/string.c`)
+As the end result, KOS is able to provide definitions for many header functions while simultaniously exporting them from both libc (and sometimes the kernel) in such a way that the possibility of mistakes happening due to redundancy falls away (e.g. all function prototypes of memcpy() are annotated with `ATTR_NONNULL((1, 2))`, and despite this specific annotation exists in possibly more than 20 places, any changes to it would only require a single modification of the tags in `/kos/src/libc/magic/string.c`)
 
 Additionally, when using KOS headers with a CRT other than KOS, this makes it possible to substitute KOS-specific extensions such as `strend()` by automatically providing a local implementation of the function though `/kos/include/local/string/strend.h`, where this variant of the function is implemented identically to the variant exported by KOS's libc, meaning that in the event of changes having to be made to its implementation, all that's required is another single alteration in `/kos/src/libc/magic/string.c`
 
@@ -659,7 +661,7 @@ Another useful feature of this lies in the fact that it allows any source file t
 For example, an application could force the headers to provide a local implementation of `sprintf()`:
 
 ```c
-/* Load CRT features so we can modify them to our likeing */
+/* Load CRT features so we can modify them to our liking */
 #include <__crt.h>
 
 /* Delete sprintf() support from libc (`sprintf()' will now be
@@ -704,13 +706,13 @@ Lastly, if there ever ends up being some gaping flaw in how KOS defines function
 
 WARNING: NOTHING IN THE FOLLOWING SECTION IS LEGAL ADVICE, OR MAY BE CONSIDERED AS LEGALLY BINDING IN ANY SORT OF COURT! IT'S ONLY PURPOSE IS TO HELP CLARIFY HOW TO DEAL WITH CODE THAT IS LICENSED DIFFERENTLY!
 
-Certain components of KOS, its (system-)headers, libraries, or some other component found as part of its source tree, as one is presented with in whatever form of distribution you may encouter it (KOS's source tree) in, may contain certain parts that are not necessarily licensed under the ZLib license (the ZLib license being the primary license under which all of the ~new~ (as in: specifically written for the purpose of use with KOS) code falls)
+Certain components of KOS, its (system-)headers, libraries, or some other component found as part of its source tree, as one is presented with in whatever form of distribution you may encouter it (KOS's source tree) in, may contain few parts that are not necessarily licensed under the ZLib license (the ZLib license being the primary license under which all of the *new* (as in: specifically written for the purpose of use with KOS) code falls)
 
 One example for this would be the implementation of the libc function `qsort()`, as exported from the header `<stdlib.h>`, who's implementation has been lifted from GLibc (which is not licensed under ZLib, and as such requires derived code's direct (as in: static inclusion during linking, or automatic inline substitution during compilation, as opposed to dynamic linking at runtime) use in any derived software to also comply with its (GLibc's) license agreement)
 
 For this purpose, note that the ZLib license is compatible with GPL (which is the license that applies to the aformentioned `qsort()` function), meaning that use of KOS in its entirety in any product requires that product to comply with the requirements of both GPL, as well as ZLib.
 
-For the purpose of using only parts of KOS (such as copy-pasting a piece of KOS-specific code), it is usually sufficient to include a copy of the copyright notice that should be found in either the original source file, or can also be found at the top of this file, as well as include a reference (e.g. a link) to the original source, and document the fact if changes have been made. However, once any code is included that is not part of the aformentioned KOS-specific (~new~) code (such code is plainly marked as such), you once again will have to comply to its specific copyright requirements as well.
+For the purpose of using only parts of KOS (such as copy-pasting a piece of KOS-specific (*new*) code), it is usually sufficient to include a copy of the copyright notice that should be found at the top of the original source file, or can also be found in `$PROJPATH/LICENSE`, as well as include a reference (e.g. a link) to the original source, and document the fact if changes have been made. However, once any code is included that is not part of the aformentioned KOS-specific (*new*) code (such code is plainly marked as such), you once again will have to comply to its specific copyright requirements as well.
 
 Note that for this purpose, GPL was only mentioned as an example, but not as the rule, as other pieces of code may exist that use different licenses yet.
 
