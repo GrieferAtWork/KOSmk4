@@ -62,15 +62,17 @@ NOTHROW(KCALL syscall_emulate_r_personality)(struct unwind_fde_struct *__restric
 	struct icpustate *return_cpustate;
 	struct rpc_syscall_info *sc_info;
 	byte_t *pc;
-	/* Check if the exception happened while actually
-	 * in the process of servicing the system call. */
+	/* Check if the exception happened while actually in the process of
+	 * servicing the system call.
+	 * Technically, there shouldn't be a chance of an exception happening
+	 * for another reason, but better be careful and do this check properly. */
 	pc = (byte_t *)kcpustate_getpc(state);
 	if (pc <= __x86_syscall_emulate_r_protect_start ||
 	    pc > __x86_syscall_emulate_r_protect_end)
 		return DWARF_PERSO_CONTINUE_UNWIND;
 	/* Load cpu state structures from the base of the kernel stack. */
 #ifdef __x86_64__
-	sc_info = (struct rpc_syscall_info *)(state->kcs_gpregs.gp_edi + 4);
+	sc_info = (struct rpc_syscall_info *)state->kcs_gpregs.gp_rbx;
 #else /* __x86_64__ */
 	sc_info = (struct rpc_syscall_info *)(state->kcs_gpregs.gp_edi + 4);
 #endif /* !__x86_64__ */

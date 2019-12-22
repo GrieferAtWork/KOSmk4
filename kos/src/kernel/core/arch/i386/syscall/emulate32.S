@@ -100,34 +100,32 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 
 	/* Figure out which system call is actually being invoked. */
 	movl   (4 + OFFSET_RPC_SYSCALL_INFO_SYSNO)(%edi), %eax
+	.cfi_def_cfa %edi, (4 + SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS)
 
 	/* Push system call arguments. */
-	pushl_cfi (4 + OFFSET_RPC_SYSCALL_INFO_ARG(5))(%edi)
-	pushl_cfi (4 + OFFSET_RPC_SYSCALL_INFO_ARG(4))(%edi)
-	pushl_cfi (4 + OFFSET_RPC_SYSCALL_INFO_ARG(3))(%edi)
-	pushl_cfi (4 + OFFSET_RPC_SYSCALL_INFO_ARG(2))(%edi)
-	pushl_cfi (4 + OFFSET_RPC_SYSCALL_INFO_ARG(1))(%edi)
-	pushl_cfi (4 + OFFSET_RPC_SYSCALL_INFO_ARG(0))(%edi)
+	pushl  (4 + OFFSET_RPC_SYSCALL_INFO_ARG(5))(%edi)
+	pushl  (4 + OFFSET_RPC_SYSCALL_INFO_ARG(4))(%edi)
+	pushl  (4 + OFFSET_RPC_SYSCALL_INFO_ARG(3))(%edi)
+	pushl  (4 + OFFSET_RPC_SYSCALL_INFO_ARG(2))(%edi)
+	pushl  (4 + OFFSET_RPC_SYSCALL_INFO_ARG(1))(%edi)
+	pushl  (4 + OFFSET_RPC_SYSCALL_INFO_ARG(0))(%edi)
 
 	cmpl   $(__NR_syscall0_max), %eax
 	ja     .Lcall_sysex
-	pushl_cfi $.Lnormal_return
+	pushl  $.Lnormal_return
 	EXTERN(x86_sysroute0_c)
 	jmpl   *x86_sysroute0_c(,%eax,4)
-	.cfi_adjust_cfa_offset -4
 .Lbad_sysno:
 	/* %eax is a system call number that doesn't exist. */
 	testl  $(RPC_SYSCALL_INFO_FEXCEPT), (4 + OFFSET_RPC_SYSCALL_INFO_FLAGS)(%edi)
 	jz     .Lbad_sysno_ENOSYS
 
 	/* Throw an actual `E_UNKNOWN_SYSTEMCALL' exception! */
-	pushl_cfi %eax                                      /* sysno */
-	pushl_cfi (4 + OFFSET_RPC_SYSCALL_INFO_FLAGS)(%edi) /* flags */
-	pushl_cfi $(8)                                      /* argc */
-	pushl_cfi $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL))     /* ecode */
+	pushl  %eax                                      /* sysno */
+	pushl  (4 + OFFSET_RPC_SYSCALL_INFO_FLAGS)(%edi) /* flags */
+	pushl  $(8)                                      /* argc */
+	pushl  $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL))     /* ecode */
 	call   error_thrown
-	.cfi_adjust_cfa_offset -12
-
 
 .Lbad_sysno_ENOSYS:
 	/* Just return -ENOSYS (no need to go through all the hassle of throwing an exception) */
@@ -148,7 +146,7 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 INTERN_LABEL(__x86_syscall_emulate_r_protect_end):
 	/* Return to user-space. */
 	addl   $(24 + SIZEOF_RPC_SYSCALL_INFO), %esp
-	.cfi_adjust_cfa_offset -(24 + SIZEOF_RPC_SYSCALL_INFO)
+	.cfi_def_cfa %esp, OFFSET_ICPUSTATE_IRREGS
 
 	/* Check if we must sign-extend the error return value. */
 	TEST_DOUBLE_WIDE(%eax, %ecx, %cl, )

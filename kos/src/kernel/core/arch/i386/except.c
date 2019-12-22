@@ -727,6 +727,15 @@ search_fde:
 			/* At this point, we've got an exception that should be unwound
 			 * into user-space, with the user-space context at the unwind
 			 * location within user-space.
+			 *
+			 * This can happen when (e.g.) `x86_handle_pagefault()' throws
+			 * an exception directly (using `THROW()'), but should not happen
+			 * when a system call throws an exception, as system call entry
+			 * points and emulators are required to provide custom personality
+			 * functions that will also call `x86_userexcept_unwind()', however
+			 * will additionally provide the `sc_info' argument which is being
+			 * left as `NULL' here (indicating an async user-space exception).
+			 *
 			 * Now we must use that state to build a full `struct icpustate',
 			 * then pass that state to `x86_propagate_userspace_exception' */
 			x86_userexcept_unwind(&ustate, NULL);
