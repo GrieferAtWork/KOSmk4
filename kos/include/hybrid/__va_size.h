@@ -27,7 +27,9 @@
  *            as well as implement a more efficient `printf()' function. */
 #ifndef __VA_SIZE
 #if defined(__x86_64__)
-#define __VA_SIZE 8
+/* Must still be 4 because of gcc (understandably) doesn't sign-extend
+ * 32-bit integers to 64 bits when passed through ellipsis. */
+#define __VA_SIZE 4
 #elif defined(__i386__)
 #define __VA_SIZE 4
 #else
