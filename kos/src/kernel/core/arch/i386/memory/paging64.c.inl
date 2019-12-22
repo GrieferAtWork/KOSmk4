@@ -272,9 +272,12 @@ NOTHROW(FCALL p64_pagedir_fini)(VIRT struct p64_pdir *__restrict self,
 	assertf(VM_GET_V_PDIR_PHYS_PTR(THIS_VM) == pagedir_get(),
 	        "Wrong page directory set (%p != %p)",
 	        old_pagedir, pagedir_get());
-	assertf((self->p_e4[267].p_word & ~(P64_PAGE_FACCESSED)) ==
+	assertf((self->p_e4[257].p_word & ~(P64_PAGE_FACCESSED | P64_PAGE_FDIRTY)) ==
 	        ((u64)phys_self | P64_PAGE_FWRITE | P64_PAGE_FPRESENT),
-	        "Page directory does not contain a valid identity mapping");
+	        "Page directory does not contain a valid identity mapping\n"
+	        "self->p_e4[257].p_word = %p\n"
+	        "phys_self              = %p\n",
+	        self->p_e4[257].p_word, phys_self);
 	for (vec4 = 0; vec4 < 256; ++vec4) {
 		union p64_pdir_e4 e4;
 		e4 = self->p_e4[vec4];
