@@ -308,7 +308,7 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 	movq   this_cpu(%rbx), %rbx
 	EXTERN(thiscpu_current)
 	movq   %rbp, thiscpu_current(%rbx)
-	movq   %rbp, %rcx
+	movq   %rbp, %rax
 	jmp    x86_load_thread_rax_cpu_rbx
 .Lyield_same_target_with_override:
 #ifndef NDEBUG
