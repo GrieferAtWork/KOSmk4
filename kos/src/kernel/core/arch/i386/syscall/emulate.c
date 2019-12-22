@@ -23,6 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
+#include <kernel/syscall-info.h>
 #include <kernel/syscall-properties.h>
 #include <kernel/syscall-tables.h>
 #include <kernel/syscall.h>
@@ -47,150 +48,31 @@
 
 DECL_BEGIN
 
-/* Gather RPC system call information for a specific system call invocation method */
-LOCAL void FCALL
-scinfo_get32_int80h(struct rpc_syscall_info *__restrict self,
-                    struct icpustate const *__restrict state) {
-	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_INT80H_32 |
-	                  RPC_SYSCALL_INFO_FARGVALID(0) |
-	                  RPC_SYSCALL_INFO_FARGVALID(1) |
-	                  RPC_SYSCALL_INFO_FARGVALID(2) |
-	                  RPC_SYSCALL_INFO_FARGVALID(3) |
-	                  RPC_SYSCALL_INFO_FARGVALID(4) |
-	                  RPC_SYSCALL_INFO_FARGVALID(5);
-	if (icpustate_getpflags(state) & EFLAGS_CF)
-		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
-	self->rsi_sysno   = gpregs_getpax(&state->ics_gpregs);
-	self->rsi_args[0] = gpregs_getpbx(&state->ics_gpregs);
-	self->rsi_args[1] = gpregs_getpcx(&state->ics_gpregs);
-	self->rsi_args[2] = gpregs_getpdx(&state->ics_gpregs);
-	self->rsi_args[3] = gpregs_getpsi(&state->ics_gpregs);
-	self->rsi_args[4] = gpregs_getpdi(&state->ics_gpregs);
-	self->rsi_args[5] = gpregs_getpbp(&state->ics_gpregs);
-}
-
-LOCAL void FCALL
-scinfo_get32_sysenter(struct rpc_syscall_info *__restrict self,
-                      struct icpustate const *__restrict state) {
-	unsigned int regcount;
-	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_SYSENTER_32 |
-	                  RPC_SYSCALL_INFO_FARGVALID(0) |
-	                  RPC_SYSCALL_INFO_FARGVALID(1) |
-	                  RPC_SYSCALL_INFO_FARGVALID(2) |
-	                  RPC_SYSCALL_INFO_FARGVALID(3);
-	if (icpustate_getpflags(state) & EFLAGS_CF)
-		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
-	self->rsi_sysno   = gpregs_getpax(&state->ics_gpregs);
-	self->rsi_args[0] = gpregs_getpbx(&state->ics_gpregs);
-	self->rsi_args[1] = gpregs_getpcx(&state->ics_gpregs);
-	self->rsi_args[2] = gpregs_getpdx(&state->ics_gpregs);
-	self->rsi_args[3] = gpregs_getpsi(&state->ics_gpregs);
-	regcount = kernel_syscall32_regcnt(self->rsi_sysno);
-	if (regcount >= 5) {
-		u32 *ebp = (u32 *)(uintptr_t)(u32)gpregs_getpbp(&state->ics_gpregs);
-		validate_readable(ebp, 4);
-		self->rsi_args[4] = __hybrid_atomic_load(ebp[0], __ATOMIC_ACQUIRE);
-		self->rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(4);
-		if (regcount >= 6) {
-			self->rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(5);
-			self->rsi_args[5] = __hybrid_atomic_load(ebp[1], __ATOMIC_ACQUIRE);
-		}
-	}
-}
-
-LOCAL void FCALL
-scinfo_get32_cdecl(struct rpc_syscall_info *__restrict self,
-                   struct icpustate const *__restrict state,
-                   uintptr_t sysno, bool enable_except) {
-	unsigned int regcount, i;
-	u32 *esp;
-	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_CDECL_32;
-	if (enable_except)
-		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
-	self->rsi_sysno = sysno;
-	regcount = kernel_syscall32_regcnt(sysno);
-	if unlikely(!regcount)
-		return;
-	esp = (u32 *)(uintptr_t)(u32)icpustate_getuserpsp(state);
-	validate_readable(esp, regcount * 4);
-	for (i = 0; i < regcount; ++i) {
-		self->rsi_args[i] = __hybrid_atomic_load(esp[i], __ATOMIC_ACQUIRE);
-		self->rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(i);
-	}
-}
-
-
-#ifdef __x86_64__
-LOCAL void FCALL
-scinfo_get64_int80h(struct rpc_syscall_info *__restrict self,
-                    struct icpustate const *__restrict state) {
-	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_INT80H_64 |
-	                  RPC_SYSCALL_INFO_FARGVALID(0) |
-	                  RPC_SYSCALL_INFO_FARGVALID(1) |
-	                  RPC_SYSCALL_INFO_FARGVALID(2) |
-	                  RPC_SYSCALL_INFO_FARGVALID(3) |
-	                  RPC_SYSCALL_INFO_FARGVALID(4) |
-	                  RPC_SYSCALL_INFO_FARGVALID(5);
-	if (icpustate_getpflags(state) & EFLAGS_CF)
-		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
-	self->rsi_sysno   = gpregs_getpax(&state->ics_gpregs);
-	self->rsi_args[0] = gpregs_getpdi(&state->ics_gpregs);
-	self->rsi_args[1] = gpregs_getpsi(&state->ics_gpregs);
-	self->rsi_args[2] = gpregs_getpdx(&state->ics_gpregs);
-	self->rsi_args[3] = gpregs_getp10(&state->ics_gpregs);
-	self->rsi_args[4] = gpregs_getp8(&state->ics_gpregs);
-	self->rsi_args[5] = gpregs_getp9(&state->ics_gpregs);
-}
-
-LOCAL void FCALL
-scinfo_get64_sysvabi(struct rpc_syscall_info *__restrict self,
-                     struct icpustate const *__restrict state,
-                     uintptr_t sysno, bool enable_except) {
-	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_SYSVABI_64 |
-	                  RPC_SYSCALL_INFO_FARGVALID(0) |
-	                  RPC_SYSCALL_INFO_FARGVALID(1) |
-	                  RPC_SYSCALL_INFO_FARGVALID(2) |
-	                  RPC_SYSCALL_INFO_FARGVALID(3) |
-	                  RPC_SYSCALL_INFO_FARGVALID(4) |
-	                  RPC_SYSCALL_INFO_FARGVALID(5);
-	if (enable_except)
-		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
-	self->rsi_sysno   = sysno;
-	self->rsi_args[0] = gpregs_getpdi(&state->ics_gpregs);
-	self->rsi_args[1] = gpregs_getpsi(&state->ics_gpregs);
-	self->rsi_args[2] = gpregs_getpdx(&state->ics_gpregs);
-	self->rsi_args[3] = gpregs_getpcx(&state->ics_gpregs);
-	self->rsi_args[4] = gpregs_getp8(&state->ics_gpregs);
-	self->rsi_args[5] = gpregs_getp9(&state->ics_gpregs);
-}
-#endif /* __x86_64__ */
-
-
 PUBLIC ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate32_int80h") struct icpustate *FCALL
 x86_syscall_emulate32_int80h(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc;
-	scinfo_get32_int80h(&sc, state);
+	rpc_syscall_info_get32_int80h(&sc, state);
 	return syscall_emulate(state, &sc);
 }
 
 PUBLIC ATTR_NORETURN ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate32_int80h_r") void FCALL
 x86_syscall_emulate32_int80h_r(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc;
-	scinfo_get32_int80h(&sc, state);
+	rpc_syscall_info_get32_int80h(&sc, state);
 	syscall_emulate_r(state, &sc);
 }
 
 PUBLIC ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate32_sysenter") struct icpustate *FCALL
 x86_syscall_emulate32_sysenter(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc;
-	scinfo_get32_sysenter(&sc, state);
+	rpc_syscall_info_get32_sysenter(&sc, state);
 	return syscall_emulate(state, &sc);
 }
 
 PUBLIC ATTR_NORETURN ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate32_sysenter_r") void FCALL
 x86_syscall_emulate32_sysenter_r(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc;
-	scinfo_get32_sysenter(&sc, state);
+	rpc_syscall_info_get32_sysenter(&sc, state);
 	syscall_emulate_r(state, &sc);
 }
 
@@ -198,7 +80,7 @@ PUBLIC ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate32_cdecl") struct ic
 x86_syscall_emulate32_cdecl(struct icpustate *__restrict state,
                             syscall_ulong_t sysno, bool enable_except) {
 	struct rpc_syscall_info sc;
-	scinfo_get32_cdecl(&sc, state, sysno, enable_except);
+	rpc_syscall_info_get32_cdecl(&sc, state, sysno, enable_except);
 	return syscall_emulate(state, &sc);
 }
 
@@ -206,7 +88,7 @@ PUBLIC ATTR_NORETURN ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate32_cde
 x86_syscall_emulate32_cdecl_r(struct icpustate *__restrict state,
                               syscall_ulong_t sysno, bool enable_except) {
 	struct rpc_syscall_info sc;
-	scinfo_get32_cdecl(&sc, state, sysno, enable_except);
+	rpc_syscall_info_get32_cdecl(&sc, state, sysno, enable_except);
 	syscall_emulate_r(state, &sc);
 }
 
@@ -214,14 +96,14 @@ x86_syscall_emulate32_cdecl_r(struct icpustate *__restrict state,
 PUBLIC ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate64_int80h") struct icpustate *FCALL
 x86_syscall_emulate64_int80h(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc;
-	scinfo_get64_int80h(&sc, state);
+	rpc_syscall_info_get64_int80h(&sc, state);
 	return syscall_emulate(state, &sc);
 }
 
 PUBLIC ATTR_NORETURN ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate64_int80h_r") void FCALL
 x86_syscall_emulate64_int80h_r(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc;
-	scinfo_get64_int80h(&sc, state);
+	rpc_syscall_info_get64_int80h(&sc, state);
 	syscall_emulate_r(state, &sc);
 }
 
@@ -229,7 +111,7 @@ PUBLIC ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate64_sysvabi") struct 
 x86_syscall_emulate64_sysvabi(struct icpustate *__restrict state,
                               syscall_ulong_t sysno, bool enable_except) {
 	struct rpc_syscall_info sc;
-	scinfo_get64_sysvabi(&sc, state, sysno, enable_except);
+	rpc_syscall_info_get64_sysvabi(&sc, state, sysno, enable_except);
 	return syscall_emulate(state, &sc);
 }
 
@@ -237,7 +119,7 @@ PUBLIC ATTR_NORETURN ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate64_sys
 x86_syscall_emulate64_sysvabi_r(struct icpustate *__restrict state,
                                 syscall_ulong_t sysno, bool enable_except) {
 	struct rpc_syscall_info sc;
-	scinfo_get64_sysvabi(&sc, state, sysno, enable_except);
+	rpc_syscall_info_get64_sysvabi(&sc, state, sysno, enable_except);
 	syscall_emulate_r(state, &sc);
 }
 #endif /* __x86_64__ */
@@ -341,6 +223,7 @@ do_syscall:
 done:
 	return state;
 }
+
 PUBLIC ATTR_RETNONNULL WUNUSED struct icpustate *FCALL
 syscall_emulate32(struct icpustate *__restrict state,
                   struct rpc_syscall_info *__restrict sc_info)

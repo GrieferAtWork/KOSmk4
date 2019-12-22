@@ -125,7 +125,7 @@ NOTHROW(KCALL FUNC(x86_syscall_personality_asm32_sysenter))(struct unwind_fde_st
 	 * implement system call restarting. */
 	gpregs_setpax(&ustate.ucs_gpregs, (uintptr_t)lsda);
 #endif /* DEFINE_NORMAL */
-	rpc_syscall_info_get32_sysenter(&info, &ustate);
+	rpc_syscall_info_get32_sysenter_nx(&info, &ustate);
 	x86_userexcept_unwind(&ustate, &info);
 err:
 	halt_unhandled_exception(error, state);

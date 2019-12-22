@@ -46,11 +46,17 @@ DECL_BEGIN
 
 #ifdef __cplusplus
 extern "C++" {
-#define rpc_syscall_info_get32_int80h_ucpustate   rpc_syscall_info_get32_int80h
-#define rpc_syscall_info_get32_sysenter_ucpustate rpc_syscall_info_get32_sysenter
-#define rpc_syscall_info_get32_lcall7_ucpustate   rpc_syscall_info_get32_lcall7
+#define rpc_syscall_info_get32_int80h_ucpustate      rpc_syscall_info_get32_int80h
+#define rpc_syscall_info_get32_int80h_icpustate      rpc_syscall_info_get32_int80h
+#define rpc_syscall_info_get32_sysenter_icpustate    rpc_syscall_info_get32_sysenter
+#define rpc_syscall_info_get32_sysenter_ucpustate_nx rpc_syscall_info_get32_sysenter_nx
+#define rpc_syscall_info_get32_lcall7_icpustate      rpc_syscall_info_get32_lcall7
+#define rpc_syscall_info_get32_lcall7_ucpustate_nx   rpc_syscall_info_get32_lcall7_nx
+#define rpc_syscall_info_get32_cdecl_icpustate       rpc_syscall_info_get32_cdecl
 #ifdef __x86_64__
-#define rpc_syscall_info_get64_int80h_ucpustate   rpc_syscall_info_get64_int80h
+#define rpc_syscall_info_get64_int80h_ucpustate      rpc_syscall_info_get64_int80h
+#define rpc_syscall_info_get64_int80h_icpustate      rpc_syscall_info_get64_int80h
+#define rpc_syscall_info_get64_sysvabi_icpustate     rpc_syscall_info_get64_sysvabi
 #endif /* __x86_64__ */
 #endif /* __cplusplus */
 
@@ -76,10 +82,64 @@ NOTHROW(FCALL rpc_syscall_info_get32_int80h_ucpustate)(struct rpc_syscall_info *
 	self->rsi_args[5] = gpregs_getpbp(&state->ucs_gpregs);
 }
 
+/* 32-bit: int 80h */
+LOCAL NONNULL((1, 2)) void
+NOTHROW(FCALL rpc_syscall_info_get32_int80h_icpustate)(struct rpc_syscall_info *__restrict self,
+                                                       struct icpustate const *__restrict state) {
+	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_INT80H_32 |
+	                  RPC_SYSCALL_INFO_FARGVALID(0) |
+	                  RPC_SYSCALL_INFO_FARGVALID(1) |
+	                  RPC_SYSCALL_INFO_FARGVALID(2) |
+	                  RPC_SYSCALL_INFO_FARGVALID(3) |
+	                  RPC_SYSCALL_INFO_FARGVALID(4) |
+	                  RPC_SYSCALL_INFO_FARGVALID(5);
+	if (icpustate_getpflags(state) & EFLAGS_CF)
+		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
+	self->rsi_sysno   = gpregs_getpax(&state->ics_gpregs);
+	self->rsi_args[0] = gpregs_getpbx(&state->ics_gpregs);
+	self->rsi_args[1] = gpregs_getpcx(&state->ics_gpregs);
+	self->rsi_args[2] = gpregs_getpdx(&state->ics_gpregs);
+	self->rsi_args[3] = gpregs_getpsi(&state->ics_gpregs);
+	self->rsi_args[4] = gpregs_getpdi(&state->ics_gpregs);
+	self->rsi_args[5] = gpregs_getpbp(&state->ics_gpregs);
+}
+
+/* 32-bit: sysenter */
+LOCAL NONNULL((1, 2)) void FCALL
+rpc_syscall_info_get32_sysenter_icpustate(struct rpc_syscall_info *__restrict self,
+                                          struct icpustate const *__restrict state)
+		THROWS(E_SEGFAULT) {
+	unsigned int regcount;
+	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_SYSENTER_32 |
+	                  RPC_SYSCALL_INFO_FARGVALID(0) |
+	                  RPC_SYSCALL_INFO_FARGVALID(1) |
+	                  RPC_SYSCALL_INFO_FARGVALID(2) |
+	                  RPC_SYSCALL_INFO_FARGVALID(3);
+	if (icpustate_getpflags(state) & EFLAGS_CF)
+		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
+	self->rsi_sysno   = gpregs_getpax(&state->ics_gpregs);
+	self->rsi_args[0] = gpregs_getpbx(&state->ics_gpregs);
+	self->rsi_args[1] = gpregs_getpcx(&state->ics_gpregs);
+	self->rsi_args[2] = gpregs_getpdx(&state->ics_gpregs);
+	self->rsi_args[3] = gpregs_getpsi(&state->ics_gpregs);
+	regcount = kernel_syscall32_regcnt(self->rsi_sysno);
+	if (regcount >= 5) {
+		USER u32 *ebp;
+		ebp = (USER u32 *)(uintptr_t)(u32)gpregs_getpbp(&state->ics_gpregs);
+		validate_readable(ebp, 4);
+		self->rsi_args[4] = __hybrid_atomic_load(ebp[0], __ATOMIC_ACQUIRE);
+		self->rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(4);
+		if (regcount >= 6) {
+			self->rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(5);
+			self->rsi_args[5] = __hybrid_atomic_load(ebp[1], __ATOMIC_ACQUIRE);
+		}
+	}
+}
+
 /* 32-bit: sysenter */
 LOCAL NONNULL((1, 2)) void
-NOTHROW(FCALL rpc_syscall_info_get32_sysenter_ucpustate)(struct rpc_syscall_info *__restrict self,
-                                                         struct ucpustate const *__restrict state) {
+NOTHROW(FCALL rpc_syscall_info_get32_sysenter_ucpustate_nx)(struct rpc_syscall_info *__restrict self,
+                                                            struct ucpustate const *__restrict state) {
 	unsigned int regcount;
 	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_SYSENTER_32 |
 	                  RPC_SYSCALL_INFO_FARGVALID(0) |
@@ -117,12 +177,35 @@ restore_exception:
 	}
 }
 
+/* 32-bit: ATTR_CDECL */
+LOCAL NONNULL((1, 2)) void
+NOTHROW(FCALL rpc_syscall_info_get32_cdecl_icpustate)(struct rpc_syscall_info *__restrict self,
+                                                      struct icpustate const *__restrict state,
+                                                      u32 sysno, bool enable_except) {
+	unsigned int regcount;
+	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_CDECL_32;
+	if (enable_except)
+		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
+	self->rsi_sysno = sysno;
+	regcount = kernel_syscall32_regcnt(sysno);
+	if (regcount) {
+		USER u32 *esp;
+		unsigned int i;
+		esp = (USER u32 *)(uintptr_t)(u32)icpustate_getuserpsp(state);
+		validate_readable(esp, regcount * 4);
+		for (i = 0; i < regcount; ++i) {
+			self->rsi_args[i] = __hybrid_atomic_load(esp[i], __ATOMIC_ACQUIRE);
+			self->rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(i);
+		}
+	}
+}
+
 
 
 /* 32-bit: lcall7 */
 LOCAL NONNULL((1, 2)) void
-NOTHROW(FCALL rpc_syscall_info_get32_lcall7_ucpustate)(struct rpc_syscall_info *__restrict self,
-                                                       struct ucpustate const *__restrict state) {
+NOTHROW(FCALL rpc_syscall_info_get32_lcall7_ucpustate_nx)(struct rpc_syscall_info *__restrict self,
+                                                          struct ucpustate const *__restrict state) {
 	unsigned int argc;
 	/* NOTE: By being a program counter from user-space, PC
 	 *       is implicitly checked by the fact that user-space
@@ -192,6 +275,51 @@ NOTHROW(FCALL rpc_syscall_info_get64_int80h_ucpustate)(struct rpc_syscall_info *
 	self->rsi_args[3] = gpregs_getp10(&state->ucs_gpregs);
 	self->rsi_args[4] = gpregs_getp8(&state->ucs_gpregs);
 	self->rsi_args[5] = gpregs_getp9(&state->ucs_gpregs);
+}
+
+/* 64-bit: syscall / int 80h */
+LOCAL NONNULL((1, 2)) void /* or `rpc_syscall_info_get64_syscall_icpustate' */
+NOTHROW(FCALL rpc_syscall_info_get64_int80h_icpustate)(struct rpc_syscall_info *__restrict self,
+                                                       struct icpustate const *__restrict state) {
+	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_INT80H_64 |
+	                  RPC_SYSCALL_INFO_FARGVALID(0) |
+	                  RPC_SYSCALL_INFO_FARGVALID(1) |
+	                  RPC_SYSCALL_INFO_FARGVALID(2) |
+	                  RPC_SYSCALL_INFO_FARGVALID(3) |
+	                  RPC_SYSCALL_INFO_FARGVALID(4) |
+	                  RPC_SYSCALL_INFO_FARGVALID(5);
+	if (icpustate_getpflags(state) & EFLAGS_CF)
+		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
+	self->rsi_sysno   = gpregs_getpax(&state->ics_gpregs);
+	self->rsi_args[0] = gpregs_getpdi(&state->ics_gpregs);
+	self->rsi_args[1] = gpregs_getpsi(&state->ics_gpregs);
+	self->rsi_args[2] = gpregs_getpdx(&state->ics_gpregs);
+	self->rsi_args[3] = gpregs_getp10(&state->ics_gpregs);
+	self->rsi_args[4] = gpregs_getp8(&state->ics_gpregs);
+	self->rsi_args[5] = gpregs_getp9(&state->ics_gpregs);
+}
+
+/* 64-bit: ATTR_SYSVABI */
+LOCAL NONNULL((1, 2)) void FCALL
+rpc_syscall_info_get64_sysvabi_icpustate(struct rpc_syscall_info *__restrict self,
+                                         struct icpustate const *__restrict state,
+                                         u64 sysno, bool enable_except) {
+	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_SYSVABI_64 |
+	                  RPC_SYSCALL_INFO_FARGVALID(0) |
+	                  RPC_SYSCALL_INFO_FARGVALID(1) |
+	                  RPC_SYSCALL_INFO_FARGVALID(2) |
+	                  RPC_SYSCALL_INFO_FARGVALID(3) |
+	                  RPC_SYSCALL_INFO_FARGVALID(4) |
+	                  RPC_SYSCALL_INFO_FARGVALID(5);
+	if (enable_except)
+		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
+	self->rsi_sysno   = sysno;
+	self->rsi_args[0] = gpregs_getpdi(&state->ics_gpregs);
+	self->rsi_args[1] = gpregs_getpsi(&state->ics_gpregs);
+	self->rsi_args[2] = gpregs_getpdx(&state->ics_gpregs);
+	self->rsi_args[3] = gpregs_getpcx(&state->ics_gpregs);
+	self->rsi_args[4] = gpregs_getp8(&state->ics_gpregs);
+	self->rsi_args[5] = gpregs_getp9(&state->ics_gpregs);
 }
 #endif /* __x86_64__ */
 

@@ -568,10 +568,10 @@ restore_exception:
 			if likely(result)
 				goto done;
 		} EXCEPT {
-			goto restore_exception;
+			goto restore_exception2;
 		}
 		__IF0 {
-restore_exception:
+restore_exception2:
 			memcpy(&THIS_EXCEPTION_INFO, &info, sizeof(info));
 		}
 	}

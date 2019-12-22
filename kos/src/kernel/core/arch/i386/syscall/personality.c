@@ -119,7 +119,7 @@ NOTHROW(KCALL x86_syscall_personality_asm32_lcall7)(struct unwind_fde_struct *__
 	if (ucpustate_iskernel(&ustate) &&
 	    ucpustate_getpc(&ustate) != (uintptr_t)&x86_rpc_user_redirection)
 		return DWARF_PERSO_ABORT_SEARCH;
-	rpc_syscall_info_get32_lcall7(&info, &ustate);
+	rpc_syscall_info_get32_lcall7_nx(&info, &ustate);
 	x86_userexcept_unwind(&ustate, &info);
 err:
 	halt_unhandled_exception(error, state);
