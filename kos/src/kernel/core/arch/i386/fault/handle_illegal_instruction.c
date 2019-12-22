@@ -661,6 +661,12 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			MOD_DECODE();
 			switch (mod.mi_reg) {
 
+#if 1
+#define TRACE_SEGMENT_BASE_ACCESS(...) printk(KERN_DEBUG "[x86] emu: " __VA_ARGS__)
+#else
+#define TRACE_SEGMENT_BASE_ACCESS(...) (void)0
+#endif
+
 			case 0:
 				/* rdfsbase */
 				if ((op_flags & (F_AD16 | F_OP16 | F_LOCK | F_REPNE | F_REP)) != F_REP) {
@@ -689,6 +695,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 					} else {
 						base = 0;
 					}
+					TRACE_SEGMENT_BASE_ACCESS("rdfsbase():%#Ix\n", base);
 					WR_RMREGL(base);
 				}
 #else /* !__x86_64__ */
@@ -702,6 +709,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 						temp.lohi[0] = __rdmsr32(IA32_FS_BASE);
 						temp.lohi[1] = 0;
 					}
+					TRACE_SEGMENT_BASE_ACCESS("rdfsbase():%#Ix\n", temp.val64);
 					WR_RMREGQ(temp.val64);
 				}
 #endif /* __x86_64__ */
@@ -735,6 +743,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 					} else {
 						base = 0;
 					}
+					TRACE_SEGMENT_BASE_ACCESS("user:rdgsbase():%#Ix\n", base);
 					WR_RMREGL(base);
 				}
 #else /* !__x86_64__ */
@@ -752,6 +761,11 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 						temp.lohi[0] = __rdmsr32(msr);
 						temp.lohi[1] = 0;
 					}
+					TRACE_SEGMENT_BASE_ACCESS("%s:rdgsbase():%#Ix\n",
+					                          msr == IA32_KERNEL_GS_BASE
+					                          ? "user"
+					                          : "kernel",
+					                          temp.val64);
 					WR_RMREGQ(temp.val64);
 				}
 #endif /* __x86_64__ */
@@ -767,6 +781,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				{
 					u16 myfs = state->ics_fs16 & ~3;
 					u32 val  = RD_RMREGL();
+					TRACE_SEGMENT_BASE_ACCESS("wrfsbase(%#Ix)\n", val);
 					/* Check which segment `%fs' actually refers to */
 					if (myfs == SEGMENT_USER_FSBASE)
 						set_user_fsbase(val);
@@ -790,6 +805,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 					/* wrfsbase %r32 / %r64 */
 					if (!(op_flags & F_REX_W))
 						temp.lohi[1] = 0;
+					TRACE_SEGMENT_BASE_ACCESS("wrfsbase(%#Ix)\n", temp.val64);
 					__wrmsr(IA32_FS_BASE, temp.val64);
 				}
 #endif /* __x86_64__ */
@@ -807,6 +823,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				{
 					u16 mygs = __rdgs() & ~3;
 					u32 val = RD_RMREGL();
+					TRACE_SEGMENT_BASE_ACCESS("user:wrgsbase(%#Ix)\n", val);
 					if (mygs == SEGMENT_USER_GSBASE)
 						set_user_gsbase(val);
 					else if (mygs == SEGMENT_USER_FSBASE) {
@@ -833,6 +850,11 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 					/* wrgsbase %r32 / %r64 */
 					if (!(op_flags & F_REX_W))
 						temp.lohi[1] = 0;
+					TRACE_SEGMENT_BASE_ACCESS("%s:wrgsbase(%#Ix)\n",
+					                          msr == IA32_KERNEL_GS_BASE
+					                          ? "user"
+					                          : "kernel",
+					                          temp.val64);
 					__wrmsr(msr, temp.val64);
 				}
 #endif /* __x86_64__ */
