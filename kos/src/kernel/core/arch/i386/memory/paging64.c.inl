@@ -271,7 +271,7 @@ NOTHROW(FCALL p64_pagedir_fini)(VIRT struct p64_pdir *__restrict self,
 	assert(IS_ALIGNED((uintptr_t)phys_self, PAGESIZE));
 	assertf(VM_GET_V_PDIR_PHYS_PTR(THIS_VM) == pagedir_get(),
 	        "Wrong page directory set (%p != %p)",
-	        old_pagedir, pagedir_get());
+	        VM_GET_V_PDIR_PHYS_PTR(THIS_VM), pagedir_get());
 	assertf((self->p_e4[257].p_word & ~(P64_PAGE_FACCESSED | P64_PAGE_FDIRTY)) ==
 	        ((u64)phys_self | P64_PAGE_FWRITE | P64_PAGE_FPRESENT),
 	        "Page directory does not contain a valid identity mapping\n"
