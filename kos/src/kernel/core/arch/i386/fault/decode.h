@@ -213,11 +213,11 @@ INTDEF void KCALL modrm_setrmq(struct icpustate *__restrict state, struct modrm 
 #ifdef __x86_64__
 INTDEF u32 (KCALL x86_decode_instruction)(struct icpustate *__restrict state, byte_t **__restrict ptext, op_flag_t *__restrict pflags)
 		THROWS(E_SEGFAULT, E_ILLEGAL_INSTRUCTION);
-#else
+#else /* __x86_64__ */
 INTDEF u32 (KCALL x86_decode_instruction)(byte_t **__restrict ptext, op_flag_t *__restrict pflags)
 		THROWS(E_SEGFAULT);
 #define x86_decode_instruction(state, ptext, pflags) x86_decode_instruction(ptext, pflags)
-#endif
+#endif /* !__x86_64__ */
 
 
 DECL_END

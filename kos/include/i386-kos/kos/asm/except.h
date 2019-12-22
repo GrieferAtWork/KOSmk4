@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdeb54e93 */
+/* HASH CRC-32:0xccae536 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -241,6 +241,8 @@
 #define E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV 0x0012
 /* Bad value written to register */
 #define E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD 0x0013
+/* Attempted to assign a non-present segment */
+#define E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG 0x0014
 
 /* Helper macros to encode/decode the `opcode' field of `E_ILLEGAL_INSTRUCTION'
  * NOTE: If the instruction doesn't depend on `modrm_reg', set it directly. */

@@ -27,9 +27,6 @@
 #include <kernel/fault.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
-#include <kernel/syscall.h>
-#include <kernel/syscall-properties.h>
-#include <kernel/syscall-tables.h> /* CONFIG_X86_EMULATE_LCALL7 */
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/cpu.h>
@@ -54,7 +51,6 @@
 #include <string.h>
 
 #include <libinstrlen/instrlen.h>
-#include <librpc/rpc.h>
 
 #include "decode.h"
 
@@ -73,71 +69,6 @@ INTERN struct icpustate *FCALL
 x86_handle_gpf(struct icpustate *__restrict state, uintptr_t ecode) {
 	return x86_handle_gpf_impl(state, ecode, false);
 }
-
-#ifdef CONFIG_X86_EMULATE_LCALL7
-PRIVATE ATTR_NORETURN void FCALL
-x86_emulate_syscall32_lcall7(struct icpustate *__restrict state, u32 segment_offset) {
-	/* lcall7 emulation in compatibility mode. */
-	struct rpc_syscall_info sc_info;
-	unsigned int argc;
-	sc_info.rsi_sysno = segment_offset ? segment_offset
-	                                   : (u32)gpregs_getpax(&state->ics_gpregs);
-	sc_info.rsi_flags = RPC_SYSCALL_INFO_METHOD_LCALL7_32;
-	if (icpustate_getpflags(state) & EFLAGS_CF)
-		sc_info.rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
-	argc = kernel_syscall32_regcnt(sc_info.rsi_sysno);
-	if (argc) {
-		unsigned int i;
-		u32 *argv;
-		/* NOTE: cast ARGV to u32, thus truncating the pointer (this is intentional!) */
-		argv = (u32 *)(uintptr_t)(u32)icpustate_getuserpsp(state);
-		TRY {
-			/* Load system call arguments. */
-			validate_readable(argv, argc * 4);
-			for (i = 0; i < argc; ++i) {
-				u32 arg = ATOMIC_READ(argv[i]);
-				sc_info.rsi_args[i] = (syscall_ulong_t)arg;
-				sc_info.rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(i);
-			}
-		} EXCEPT {
-			x86_userexcept_unwind_i(state, &sc_info);
-		}
-	}
-	syscall_emulate_r(state, &sc_info);
-}
-
-#ifdef __x86_64__
-PRIVATE ATTR_NORETURN void FCALL
-x86_emulate_syscall64_lcall7(struct icpustate *__restrict state, u64 segment_offset) {
-	/* lcall7 emulation in compatibility mode. */
-	struct rpc_syscall_info sc_info;
-	unsigned int argc;
-	sc_info.rsi_sysno = segment_offset ? segment_offset
-	                                   : gpregs_getpax(&state->ics_gpregs);
-	sc_info.rsi_flags = RPC_SYSCALL_INFO_METHOD_LCALL7_64;
-	if (icpustate_getpflags(state) & EFLAGS_CF)
-		sc_info.rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
-	argc = kernel_syscall64_regcnt(sc_info.rsi_sysno);
-	if (argc) {
-		unsigned int i;
-		u64 *argv;
-		argv = (u64 *)icpustate_getuserpsp(state);
-		TRY {
-			/* Load system call arguments. */
-			validate_readable(argv, argc * 8);
-			for (i = 0; i < argc; ++i) {
-				u64 arg = ATOMIC_READ(argv[i]);
-				sc_info.rsi_args[i] = (syscall_ulong_t)arg;
-				sc_info.rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(i);
-			}
-		} EXCEPT {
-			x86_userexcept_unwind_i(state, &sc_info);
-		}
-	}
-	syscall_emulate_r(state, &sc_info);
-}
-#endif /* __x86_64__ */
-#endif /* CONFIG_X86_EMULATE_LCALL7 */
 
 #ifdef __x86_64__
 DATDEF byte_t x86_memcpy_nopf_rep_pointer[];
@@ -665,13 +596,6 @@ done_noncanon_check:
 			}
 			segment = UNALIGNED_GET16((u16 *)pc);
 			pc += 2;
-#ifdef CONFIG_X86_EMULATE_LCALL7
-			/* lcall7 emulation */
-			if (segment == 7 && (__sldt() & ~7) == SEGMENT_CPU_LDT) {
-				icpustate_setpc(state, (uintptr_t)pc);
-				x86_emulate_syscall32_lcall7(state, offset);
-			}
-#endif /* CONFIG_X86_EMULATE_LCALL7 */
 			/* Invalid use of the lcall instruction. */
 			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 			PERTASK_SET(this_exception_pointers[0], (uintptr_t)opcode);
@@ -709,21 +633,10 @@ done_noncanon_check:
 					segment = UNALIGNED_GET16((u16 *)(addr + 0));
 					offset  = UNALIGNED_GET16((u16 *)(addr + 2));
 				}
-#ifdef CONFIG_X86_EMULATE_LCALL7
-				/* lcall7 emulation */
-				if (segment == 7 && (__sldt() & ~7) == SEGMENT_CPU_LDT) {
-					icpustate_setpc(state, (uintptr_t)pc);
-#ifdef __x86_64__
-					if (!(flags & F_IS_X32))
-						x86_emulate_syscall64_lcall7(state, offset);
-#endif /* __x86_64__ */
-					x86_emulate_syscall32_lcall7(state, (u32)offset);
-				}
-#endif /* CONFIG_X86_EMULATE_LCALL7 */
 				/* Invalid use of the lcall instruction. */
 				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 				PERTASK_SET(this_exception_pointers[0],
-				            (uintptr_t)E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
+				            E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
 				PERTASK_SET(this_exception_pointers[1],
 				            !(segment & 3) && !isuser()
 				            ? (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV
@@ -744,7 +657,7 @@ done_noncanon_check:
 			for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
 				PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-			PERTASK_SET(this_exception_pointers[0], (uintptr_t)opcode);
+			PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
 			PERTASK_SET(this_exception_pointers[2], (uintptr_t)(X86_REGISTER_CONTROL + mod.mi_reg));
 			PERTASK_SET(this_exception_pointers[3], (uintptr_t)RD_REG());
 #ifdef __x86_64__
@@ -767,13 +680,14 @@ done_noncanon_check:
 			}
 			goto unwind_state;
 
+
 		case 0x0f20:
 			/* MOV r32,CRx */
 			MOD_DECODE();
 			for (i = 3; i < EXCEPTION_DATA_POINTERS; ++i)
 				PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-			PERTASK_SET(this_exception_pointers[0], (uintptr_t)opcode);
+			PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
 			PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_CONTROL + mod.mi_reg);
 #ifdef __x86_64__
 			if (mod.mi_reg == 1 || (mod.mi_reg > 4 && mod.mi_reg != 8))
@@ -791,6 +705,7 @@ done_noncanon_check:
 			}
 			goto unwind_state;
 
+
 		case 0x0f21:
 		case 0x0f23:
 			/* MOV r32, DR0-DR7 */
@@ -800,7 +715,7 @@ done_noncanon_check:
 			for (i = 3; i < EXCEPTION_DATA_POINTERS; ++i)
 				PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-			PERTASK_SET(this_exception_pointers[0], (uintptr_t)opcode);
+			PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
 			PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_CONTROL + mod.mi_reg);
 			if (opcode == 0x0f23) {
 				/* Save the value user-space tried to write. */
@@ -942,7 +857,7 @@ done_noncanon_check:
 			if (mod.mi_reg >= 6) {
 				/* Non-existent segment register */
 				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-				PERTASK_SET(this_exception_pointers[0], (uintptr_t)opcode);
+				PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
 				PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_RDINV);
 				PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_ES + mod.mi_reg);
 				for (i = 3; i < EXCEPTION_DATA_POINTERS; ++i)
@@ -955,7 +870,7 @@ done_noncanon_check:
 			/* MOV Sreg**,r/m16 */
 			MOD_DECODE();
 			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-			PERTASK_SET(this_exception_pointers[0], (uintptr_t)opcode);
+			PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
 			PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
 			PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_ES + mod.mi_reg);
 			PERTASK_SET(this_exception_pointers[3], (uintptr_t)RD_RMW());
@@ -1029,12 +944,12 @@ generic_failure:
 	/* Fallback: Choose between a NULL-segment and generic error. */
 	if (!effective_segment_value) {
 null_segment_error:
-		for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
-			PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 		PERTASK_SET(this_exception_pointers[0], (uintptr_t)opcode);
 		PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
 		PERTASK_SET(this_exception_pointers[3], (uintptr_t)effective_segment_value);
+		for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
+			PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 		switch (flags & F_SEGMASK) {
 		default:      PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_DS); break;
 		case F_SEGFS: PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_FS); break;

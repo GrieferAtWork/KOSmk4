@@ -421,7 +421,7 @@ PUBLIC WUNUSED NONNULL((1)) REF struct vm_futex *
 		THROWS(E_WOULDBLOCK) {
 	REF struct vm_futex *result;
 	REF struct vm_datapart *part;
-	/* An anonymous data-block can't referr to any existing
+	/* An anonymous data-block can't refer to any existing
 	 * data parts, so there can't be any existing futex objects! */
 again:
 	if unlikely(ATOMIC_READ(self->db_parts) == VM_DATABLOCK_ANONPARTS)

@@ -302,6 +302,8 @@ const E_ILLEGAL_INSTRUCTION_REGISTER_WRINV = 0x0011;
 const E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV = 0x0012;
 @@Bad value written to register
 const E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD = 0x0013;
+@@Attempted to assign a non-present segment
+const E_ILLEGAL_INSTRUCTION_REGISTER_WRNPSEG = 0x0014;
 
 %{
 

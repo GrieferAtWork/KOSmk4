@@ -2616,7 +2616,7 @@ vm_exec(struct vm *__restrict effective_vm,
         )
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR);
 
-#ifdef __ARCH_HAVE_COMPAT
+#if defined(__ARCH_HAVE_COMPAT) && defined(__cplusplus)
 extern "C++" {
 LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5)) struct icpustate *KCALL
 vm_exec(struct vm *__restrict effective_vm,
@@ -2670,7 +2670,7 @@ vm_exec64(struct vm *__restrict effective_vm,
 #else /* __ARCH_COMPAT_SIZEOF_POINTER == 8 */
 #define vm_exec64 vm_exec
 #endif /* __ARCH_COMPAT_SIZEOF_POINTER != 8 */
-#endif /* __ARCH_HAVE_COMPAT */
+#endif /* __ARCH_HAVE_COMPAT && __cplusplus */
 
 
 /* Assert that `self' is a regular node for the purpose of being used as the
