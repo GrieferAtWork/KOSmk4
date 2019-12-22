@@ -20,18 +20,18 @@
 #ifdef __INTELLISENSE__
 #include "fastpass32.S"
 #define SYSCALL_DEFMODE_INT80 1
-#endif
+#endif /* __INTELLISENSE__ */
 
 
 #ifdef SYSCALL_DEFMODE_INT80
+#define PERSO   x86_syscall_personality_asm32_int80
 #define FUNC    X86_ASMSYSCALL32_INT80
 #define SECT(x) .text.x86.asm32_syscall_int80.real_##x
-#define LSDA(x) x
 #define IRET    iret
 #elif defined(SYSCALL_DEFMODE_SYSENTER)
+#define PERSO   x86_syscall_personality_asm32_sysenter
 #define FUNC    X86_ASMSYSCALL32_SYSENTER
 #define SECT(x) .text.x86.asm32_syscall_sysenter.real_##x
-#define LSDA(x) (x) | 0x40000000
 #define IRET    X86_IRET_BUT_PREFER_SYSEXIT
 #else
 #error "No syscall mode defined"
@@ -53,13 +53,14 @@
  */
 
 
+EXTERN(PERSO)
 
 
 .section SECT(execveat)
 INTERN_FUNCTION(FUNC(execveat))
 	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality
-	.cfi_lsda 0, LSDA(SYS_execveat)
+	.cfi_personality 0, PERSO
+	.cfi_lsda 0, SYS_execveat
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	/* Must construct a full `struct icpustate' */
@@ -113,8 +114,8 @@ END(FUNC(execveat))
 .section SECT(execve)
 INTERN_FUNCTION(X86_ASMSYSCALL32_INT80(execve))
 	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality
-	.cfi_lsda 0, LSDA(SYS_execve)
+	.cfi_personality 0, PERSO
+	.cfi_lsda 0, SYS_execve
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 
@@ -162,8 +163,8 @@ DEFINE_INTERN_ALIAS(FUNC(execve), X86_ASMSYSCALL32_INT80(execve))
 .section SECT(debugtrap)
 INTERN_FUNCTION(X86_ASMSYSCALL32_INT80(debugtrap))
 	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality
-	.cfi_lsda 0, LSDA(SYS_debugtrap)
+	.cfi_personality 0, PERSO
+	.cfi_lsda 0, SYS_debugtrap
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
@@ -206,8 +207,8 @@ DEFINE_INTERN_ALIAS(FUNC(debugtrap), X86_ASMSYSCALL32_INT80(debugtrap))
 .section SECT(iopl)
 INTERN_FUNCTION(X86_ASMSYSCALL32_INT80(iopl))
 	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality
-	.cfi_lsda 0, LSDA(SYS_iopl)
+	.cfi_personality 0, PERSO
+	.cfi_lsda 0, SYS_iopl
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 
@@ -252,9 +253,9 @@ DEFINE_INTERN_ALIAS(FUNC(iopl), X86_ASMSYSCALL32_INT80(iopl))
 /* TODO: coredump() */
 
 
-
 #undef SYSCALL_DEFMODE_INT80
 #undef SYSCALL_DEFMODE_SYSENTER
+#undef PERSO
 #undef FUNC
 #undef SECT
 #undef LSDA

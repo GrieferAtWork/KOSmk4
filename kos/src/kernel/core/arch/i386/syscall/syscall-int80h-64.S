@@ -235,8 +235,8 @@ INTERN_FUNCTION(__x86_asm64_syscall_break)
 	/* For `int 80h' system calls:
 	 *   Called when a system call number hasn't been assigned (%eax:sysno) */
 	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality
-	.cfi_lsda 0, (-1 & ~0x40000000)
+	EXTERN(x86_syscall_personality_asm64_syscall_break)
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall_break
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 
@@ -276,8 +276,8 @@ INTERN_FUNCTION(__x86_asm32_int80_break)
 	/* For `int 80h' system calls:
 	 *   Called when a system call number hasn't been assigned (%eax:sysno) */
 	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality
-	.cfi_lsda 0, (-1 & ~0x40000000)
+	EXTERN(x86_syscall_personality_asm32_int80_break)
+	.cfi_personality 0, x86_syscall_personality_asm32_int80_break
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 

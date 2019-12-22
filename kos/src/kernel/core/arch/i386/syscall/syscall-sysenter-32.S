@@ -359,8 +359,8 @@ INTERN_FUNCTION(__asm32_bad_sysenter_extension)
 	/* Called when the %ebp pointer of a sysenter callback
 	 * is faulty (aka: points into kernel-space) */
 	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality
-	.cfi_lsda 0, -1
+	EXTERN(x86_syscall_personality_asm32_sysenter_break)
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter_break
 	.cfi_signal_frame
 	.cfi_restore_iret_eip
 	.cfi_restore_iret_cs
@@ -458,14 +458,14 @@ INTERN_FUNCTION(__x86_asm32_sysenter_break)
 	/* For `sysenter' system calls:
 	 *   Called when a system call number hasn't been assigned (%eax:sysno) */
 	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality
-	.cfi_lsda 0, -1
+	EXTERN(x86_syscall_personality_asm32_sysenter_break)
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter_break
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	/* Check IRET.EFLAGS.CF if an exception should be thrown */
 	testl  $(EFLAGS_CF), %ss:OFFSET_IRREGS_EFLAGS(%esp)
 	jnz    1f
-	movl   $-ENOSYS, %eax
+	movl   $(-ENOSYS), %eax
 	iret
 1:
 	pushl_cfi %ds
