@@ -73,10 +73,12 @@ SECTIONS {
 		ENUMERATE_SECTIONS(.text)
 	} PHDR(text)
 
+//	. = ALIGN(__ARCH_PAGESIZE);
 //	.xdata : {
 //		ENUMERATE_SECTIONS(.xdata)
 //	} PHDR(xdata)
 
+	. = ALIGN(__ARCH_PAGESIZE);
 	.rodata : {
 		*(.rodata.hot .rodata.likely .rodata.hot.* .rodata.likely.*)
 		*(.rodata .rodata.str* .rodata.*.str* .rodata.cst* .rodata.*.cst*)
