@@ -271,6 +271,7 @@ NOTHROW(KCALL cleanup_and_unwind_interrupt)(/*inherit(always)*/ vio_main_args_t 
 }
 
 
+/* TODO: Cleanup use of `irregs_wrip()' */
 
 INTERN struct icpustate *
 NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args, uintptr_t cr2) {
@@ -4477,11 +4478,11 @@ undefined_instruction:
 			fixed_pc = (uintptr_t)instruction_succ((void const *)end_pc);
 			if (fixed_pc > (uintptr_t)end_pc)
 				end_pc = (byte_t *)fixed_pc;
+			printk(KERN_WARNING "[vio] unrecognized instruction %#I32x (accessing %p)\n", opcode, cr2);
 			irregs_wrip(&state->ics_irregs, (uintptr_t)end_pc);
-			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_VIO_UNRECOGNIZED));
+			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE));
 			PERTASK_SET(this_exception_pointers[0], (uintptr_t)opcode);
-			PERTASK_SET(this_exception_pointers[1], (uintptr_t)cr2);
-			for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
+			for (i = 1; i < EXCEPTION_DATA_POINTERS; ++i)
 				PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 #if EXCEPT_BACKTRACE_SIZE != 0
 			for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)

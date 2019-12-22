@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x274eb69 */
+/* HASH CRC-32:0xd95d8811 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -124,26 +124,6 @@
 #define E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV 0x0012
 /* Bad value written to register */
 #define E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD 0x0013
-/* The memory-accessing instruction was is not recognized for use in VIO
- * 	@@The opcode that caused the exception
- * 	member opcode: uintptr_t;
- * 	@@The virtual memory address that was accessed (or `NULL' if unknown)
- * 	member addr: void *; */
-#define E_ILLEGAL_INSTRUCTION_VIO_UNRECOGNIZED (E_ILLEGAL_INSTRUCTION,0x1001)
-/* The memory location addressed by a lock-prefixed instruction cannot operation as a `size'-wide atomic operation
- * 	@@The opcode that caused the exception
- * 	member opcode: uintptr_t;
- * 	@@The virtual memory address that was accessed
- * 	member addr: void *;
- * 	@@The number of bytes that were accessed atomically (usually one of 1,2,4 or 8)
- * 	member size: size_t; */
-#define E_ILLEGAL_INSTRUCTION_VIO_NONATOMIC_OPERAND (E_ILLEGAL_INSTRUCTION,0x1002)
-/* Attempted to set a kernel-space ESP to an invalid value during a VIO operation (can only be thrown when the kernel accesses VIO memory)
- * 	@@The opcode that caused the exception
- * 	member opcode: uintptr_t;
- * 	@@The kernel SP value that was attempted to be assigned
- * 	member value: uintptr_t; */
-#define E_ILLEGAL_INSTRUCTION_VIO_INVALID_KERNEL_SP (E_ILLEGAL_INSTRUCTION,0x1011)
 
 
 
@@ -165,14 +145,5 @@
  * 	@@The high bound of valid indices
  * 	member max: intptr_t; */
 #define E_INDEX_ERROR_OUT_OF_BOUNDS (E_INDEX_ERROR,0x0001)
-
-
-
-
-/* The alignment of an operand was not valid */
-#define E_INVALID_ALIGNMENT (0xff07)
-/* 	member addr: void *;
- * 	member req_alignment: size_t; */
-#define E_INVALID_ALIGNMENT_POINTER (E_INVALID_ALIGNMENT,0x0001)
 
 #endif /* !_KOS_ASM_EXCEPT_H */

@@ -35,29 +35,99 @@ DECL_BEGIN
 #ifdef CONFIG_VIO
 
 PRIVATE ATTR_NORETURN void KCALL
-vio_illegal_read(struct vio_args *__restrict args, pos_t addr) {
+vio_illegal_read(struct vio_args const *__restrict args, pos_t addr) {
 	addr -= (pos_t)args->va_access_partoff;
 	addr += (pos_t)args->va_access_pageid * PAGESIZE;
 	THROW(E_SEGFAULT_NOTREADABLE, (uintptr_t)addr,
-	      E_SEGFAULT_CONTEXT_FAULT);
+	      E_SEGFAULT_CONTEXT_VIO);
 }
 
 PRIVATE ATTR_NORETURN void KCALL
-vio_illegal_write(struct vio_args *__restrict args, pos_t addr) {
+vio_illegal_write(struct vio_args const *__restrict args, pos_t addr) {
 	addr -= (pos_t)args->va_access_partoff;
 	addr += (pos_t)args->va_access_pageid * PAGESIZE;
 	THROW(E_SEGFAULT_READONLY, (uintptr_t)addr,
-	      E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_WRITING);
+	      E_SEGFAULT_CONTEXT_VIO | E_SEGFAULT_CONTEXT_WRITING);
+}
+
+#ifdef CONFIG_VIO_HAS_INT128_CMPXCH
+PRIVATE ATTR_NORETURN void KCALL
+vio_nonatomic_operation128(struct vio_args const *__restrict args,
+                           pos_t addr, uint128_t oldval, uint128_t newval) {
+	addr -= (pos_t)args->va_access_partoff;
+	addr += (pos_t)args->va_access_pageid * PAGESIZE;
+	if ((uintptr_t)(uintptr_t)addr & 15) {
+		THROW(E_SEGFAULT_UNALIGNED, (uintptr_t)addr,
+		      E_SEGFAULT_CONTEXT_VIO, 16);
+	}
+	THROW(E_SEGFAULT_NOTATOMIC, (uintptr_t)addr,
+	      E_SEGFAULT_CONTEXT_VIO | E_SEGFAULT_CONTEXT_WRITING, 16,
+	      uint128_vec64_significand(oldval, 0),
+		  uint128_vec64_significand(oldval, 1),
+		  uint128_vec64_significand(newval, 0),
+		  uint128_vec64_significand(newval, 1));
+}
+#endif /* CONFIG_VIO_HAS_INT128_CMPXCH */
+
+#if defined(CONFIG_VIO_HAS_QWORD) || defined(CONFIG_VIO_HAS_QWORD_CMPXCH)
+PRIVATE ATTR_NORETURN void KCALL
+vio_nonatomic_operation64(struct vio_args const *__restrict args,
+                          pos_t addr, u64 oldval, u64 newval) {
+	addr -= (pos_t)args->va_access_partoff;
+	addr += (pos_t)args->va_access_pageid * PAGESIZE;
+	if ((uintptr_t)(uintptr_t)addr & 7) {
+		THROW(E_SEGFAULT_UNALIGNED, (uintptr_t)addr,
+		      E_SEGFAULT_CONTEXT_VIO, 8);
+	}
+#ifdef __x86_64__
+	THROW(E_SEGFAULT_NOTATOMIC, (uintptr_t)addr,
+	      E_SEGFAULT_CONTEXT_VIO | E_SEGFAULT_CONTEXT_WRITING, 8,
+	      oldval, 0, newval);
+#else /* __x86_64__ */
+	THROW(E_SEGFAULT_NOTATOMIC, (uintptr_t)addr,
+	      E_SEGFAULT_CONTEXT_VIO | E_SEGFAULT_CONTEXT_WRITING, 8,
+	      (u32)oldval, (u32)(oldval >> 32),
+	      (u32)newval, (u32)(newval >> 32));
+#endif /* !__x86_64__ */
+}
+#endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
+
+PRIVATE ATTR_NORETURN void KCALL
+vio_nonatomic_operation32(struct vio_args const *__restrict args,
+                          pos_t addr, u32 oldval, u32 newval) {
+	addr -= (pos_t)args->va_access_partoff;
+	addr += (pos_t)args->va_access_pageid * PAGESIZE;
+	if ((uintptr_t)(uintptr_t)addr & 3) {
+		THROW(E_SEGFAULT_UNALIGNED, (uintptr_t)addr,
+		      E_SEGFAULT_CONTEXT_VIO, 4);
+	}
+	THROW(E_SEGFAULT_NOTATOMIC, (uintptr_t)addr,
+	      E_SEGFAULT_CONTEXT_VIO | E_SEGFAULT_CONTEXT_WRITING, 4,
+	      oldval, 0, newval);
 }
 
 PRIVATE ATTR_NORETURN void KCALL
-vio_nonatomic_operation(struct vio_args *__restrict args, pos_t addr, size_t size) {
+vio_nonatomic_operation16(struct vio_args const *__restrict args,
+                          pos_t addr, u16 oldval, u16 newval) {
 	addr -= (pos_t)args->va_access_partoff;
 	addr += (pos_t)args->va_access_pageid * PAGESIZE;
-	if ((uintptr_t)(uintptr_t)addr & (size - 1))
-		THROW(E_INVALID_ALIGNMENT_POINTER, (uintptr_t)addr, size);
-	THROW(E_ILLEGAL_INSTRUCTION_VIO_NONATOMIC_OPERAND,
-	      (uintptr_t)addr, size);
+	if ((uintptr_t)(uintptr_t)addr & 2) {
+		THROW(E_SEGFAULT_UNALIGNED, (uintptr_t)addr,
+		      E_SEGFAULT_CONTEXT_VIO, 2);
+	}
+	THROW(E_SEGFAULT_NOTATOMIC, (uintptr_t)addr,
+	      E_SEGFAULT_CONTEXT_VIO | E_SEGFAULT_CONTEXT_WRITING, 2,
+	      oldval, 0, newval);
+}
+
+PRIVATE ATTR_NORETURN void KCALL
+vio_nonatomic_operation8(struct vio_args const *__restrict args,
+                         pos_t addr, u8 oldval, u8 newval) {
+	addr -= (pos_t)args->va_access_partoff;
+	addr += (pos_t)args->va_access_pageid * PAGESIZE;
+	THROW(E_SEGFAULT_NOTATOMIC, (uintptr_t)addr,
+	      E_SEGFAULT_CONTEXT_VIO | E_SEGFAULT_CONTEXT_WRITING, 1,
+	      oldval, 0, newval);
 }
 
 typedef union ATTR_PACKED {
@@ -1393,7 +1463,7 @@ vio_cmpxchb(struct vio_args *__restrict args,
 #endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
 	/* Non-atomic compare-exchange */
 	if (atomic)
-		vio_nonatomic_operation(args, addr, 1);
+		vio_nonatomic_operation8(args, addr, oldvalue, newvalue);
 	{
 		u8 result = vio_readb(args, addr);
 		if (result == oldvalue)
@@ -1444,7 +1514,7 @@ vio_cmpxchw(struct vio_args *__restrict args,
 #endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
 	/* Non-atomic compare-exchange */
 	if (atomic)
-		vio_nonatomic_operation(args, addr, 2);
+		vio_nonatomic_operation16(args, addr, oldvalue, newvalue);
 	{
 		u16 result = vio_readw(args, addr);
 		if (result == oldvalue)
@@ -1482,7 +1552,7 @@ vio_cmpxchl(struct vio_args *__restrict args,
 #endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
 	/* Non-atomic compare-exchange */
 	if (atomic)
-		vio_nonatomic_operation(args, addr, 4);
+		vio_nonatomic_operation32(args, addr, oldvalue, newvalue);
 	{
 		u32 result = vio_readl(args, addr);
 		if (result == oldvalue)
@@ -1500,7 +1570,7 @@ vio_cmpxchq(struct vio_args *__restrict args,
 		return (*type->dtv_cmpxch.f_qword)(args, addr, oldvalue, newvalue, atomic);
 	/* Non-atomic compare-exchange */
 	if (atomic)
-		vio_nonatomic_operation(args, addr, 8);
+		vio_nonatomic_operation64(args, addr, oldvalue, newvalue);
 	{
 #ifdef CONFIG_VIO_HAS_QWORD
 		u64 result = vio_readq(args, addr);
@@ -1532,10 +1602,10 @@ vio_cmpxch128(struct vio_args *__restrict args,
 		return (*type->dtv_cmpxch.f_int128)(args, addr, oldvalue, newvalue, atomic);
 	/* Non-atomic compare-exchange */
 	if (atomic)
-		vio_nonatomic_operation(args, addr, 16);
+		vio_nonatomic_operation128(args, addr, oldvalue, newvalue);
 	{
 		union {
-			uint128_t v128;
+			uint128_t v128; /* FIXME: Intellisense says default constructor deleted */
 			u64       v64[2];
 			u32       v32[4];
 		} result;
@@ -1618,7 +1688,7 @@ vio_cmpxch_or_writeb(struct vio_args *__restrict args,
 #endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
 	/* Non-atomic compare-exchange */
 	if (atomic)
-		vio_nonatomic_operation(args, addr, 1);
+		vio_nonatomic_operation8(args, addr, oldvalue, newvalue);
 	vio_writeb(args, addr, newvalue);
 	return oldvalue;
 }
@@ -1666,7 +1736,7 @@ vio_cmpxch_or_writew(struct vio_args *__restrict args,
 #endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
 	/* Non-atomic compare-exchange */
 	if (atomic)
-		vio_nonatomic_operation(args, addr, 2);
+		vio_nonatomic_operation16(args, addr, oldvalue, newvalue);
 	vio_writew(args, addr, newvalue);
 	return oldvalue;
 }
@@ -1701,7 +1771,7 @@ vio_cmpxch_or_writel(struct vio_args *__restrict args,
 #endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
 	/* Non-atomic compare-exchange */
 	if (atomic)
-		vio_nonatomic_operation(args, addr, 4);
+		vio_nonatomic_operation32(args, addr, oldvalue, newvalue);
 	vio_writel(args, addr, newvalue);
 	return oldvalue;
 }
@@ -1716,7 +1786,7 @@ vio_cmpxch_or_writeq(struct vio_args *__restrict args,
 		return (*type->dtv_cmpxch.f_qword)(args, addr, oldvalue, newvalue, atomic);
 	/* Non-atomic compare-exchange */
 	if (atomic)
-		vio_nonatomic_operation(args, addr, 8);
+		vio_nonatomic_operation64(args, addr, oldvalue, newvalue);
 	vio_writeq(args, addr, newvalue);
 	return oldvalue;
 }

@@ -291,12 +291,18 @@ NOTHROW(FCALL x86_icpustate_set32)(struct icpustate *__restrict state,
 
 #else /* __x86_64__ */
 
+PRIVATE ATTR_NORETURN void FCALL
+throw_bad_kernel_esp(uintptr_t value) THROWS(E_ILLEGAL_INSTRUCTION_REGISTER) {
+	THROW(E_ILLEGAL_INSTRUCTION_REGISTER, 0,
+	      E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD, value,
+	      X86_REGISTER_GENERAL_PURPOSE_ESP, value);
+}
 INTERN void FCALL
 x86_icpustate_set16(struct icpustate *__restrict state,
                     u8 regno, u16 value) {
 	if (EFFECTIVE_REGNO(regno) == R_ESP) {
 		if (!icpustate_trysetsp(state, value))
-			THROW(E_ILLEGAL_INSTRUCTION_VIO_INVALID_KERNEL_SP, value);
+			throw_bad_kernel_esp(value);
 	}
 	ACCESS_GPREG(state, regno) = (uintptr_t)value;
 }
@@ -306,7 +312,7 @@ x86_icpustate_set32(struct icpustate *__restrict state,
                     u8 regno, u32 value) {
 	if (EFFECTIVE_REGNO(regno) == R_ESP) {
 		if (!icpustate_trysetsp(state, value))
-			THROW(E_ILLEGAL_INSTRUCTION_VIO_INVALID_KERNEL_SP, value);
+			throw_bad_kernel_esp(value);
 	}
 	ACCESS_GPREG(state, regno) = (uintptr_t)value;
 }

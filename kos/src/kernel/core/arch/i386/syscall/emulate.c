@@ -202,9 +202,9 @@ do_syscall:
 		error_code_t code = PERTASK_GET(this_exception_code);
 		must_restart_syscall = false;
 		state = rpc_serve_user_redirection_all(state,
-		                                      TASK_RPC_REASON_SYSCALL,
-		                                      sc_info,
-		                                      &must_restart_syscall);
+		                                       TASK_RPC_REASON_SYSCALL,
+		                                       sc_info,
+		                                       &must_restart_syscall);
 		if (code == ERROR_CODEOF(E_OK)) {
 			if unlikely(must_restart_syscall)
 				goto again; /* Do the restart */
@@ -295,9 +295,9 @@ do_syscall32:
 		error_code_t code = PERTASK_GET(this_exception_code);
 		must_restart_syscall = false;
 		state = rpc_serve_user_redirection_all(state,
-		                                      TASK_RPC_REASON_SYSCALL,
-		                                      sc_info,
-		                                      &must_restart_syscall);
+		                                       TASK_RPC_REASON_SYSCALL,
+		                                       sc_info,
+		                                       &must_restart_syscall);
 		if (code == ERROR_CODEOF(E_OK)) {
 			if unlikely(must_restart_syscall)
 				goto again; /* Do the restart */

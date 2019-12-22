@@ -49,6 +49,7 @@ class E_SEGFAULT_READONLY     : E_SEGFAULT = 0x0002 {
 	[tostr(flagset("E_SEGFAULT_CONTEXT_*"))]
 	member context: uintptr_t;
 }
+
 [message("Attempted to read from a memory location that is not readable")]
 class E_SEGFAULT_NOTREADABLE  : E_SEGFAULT = 0x0003 {
 	@@The virtual memory address where the fault happened
@@ -57,6 +58,7 @@ class E_SEGFAULT_NOTREADABLE  : E_SEGFAULT = 0x0003 {
 	[tostr(flagset("E_SEGFAULT_CONTEXT_*"))]
 	member context: uintptr_t;
 }
+
 [message("Attempted to execute a non-executable memory location")]
 class E_SEGFAULT_NOTEXECUTABLE: E_SEGFAULT = 0x0004 {
 	@@The virtual memory address where the fault happened
@@ -141,6 +143,7 @@ class E_ILLEGAL_INSTRUCTION_BAD_OPERAND: E_ILLEGAL_INSTRUCTION = 0x0010 {
 	[tostr(select("E_ILLEGAL_INSTRUCTION_BAD_OPERAND_*"))]
 	member what: uintptr_t;
 }
+
 @@Invalid addressing mode used with the instruction
 const E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE = 0x0001;
 
@@ -167,30 +170,6 @@ const E_ILLEGAL_INSTRUCTION_REGISTER_WRINV = 0x0011;
 const E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV = 0x0012;
 @@Bad value written to register
 const E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD = 0x0013;
-
-@@The memory-accessing instruction was is not recognized for use in VIO
-class E_ILLEGAL_INSTRUCTION_VIO_UNRECOGNIZED     : E_ILLEGAL_INSTRUCTION = 0x1001 {
-	@@The opcode that caused the exception
-	member opcode: uintptr_t;
-	@@The virtual memory address that was accessed (or `NULL' if unknown)
-	member addr: void *;
-}
-@@The memory location addressed by a lock-prefixed instruction cannot operation as a `size'-wide atomic operation
-class E_ILLEGAL_INSTRUCTION_VIO_NONATOMIC_OPERAND: E_ILLEGAL_INSTRUCTION = 0x1002 {
-	@@The opcode that caused the exception
-	member opcode: uintptr_t;
-	@@The virtual memory address that was accessed
-	member addr: void *;
-	@@The number of bytes that were accessed atomically (usually one of 1,2,4 or 8)
-	member size: size_t;
-}
-@@Attempted to set a kernel-space ESP to an invalid value during a VIO operation (can only be thrown when the kernel accesses VIO memory)
-class E_ILLEGAL_INSTRUCTION_VIO_INVALID_KERNEL_SP: E_ILLEGAL_INSTRUCTION = 0x1011 {
-	@@The opcode that caused the exception
-	member opcode: uintptr_t;
-	@@The kernel SP value that was attempted to be assigned
-	member value: uintptr_t;
-}
 
 %
 %
@@ -220,19 +199,6 @@ class E_INDEX_ERROR_OUT_OF_BOUNDS: E_INDEX_ERROR = 0x0001 {
 	member min: intptr_t;
 	@@The high bound of valid indices
 	member max: intptr_t;
-}
-
-%
-%
-%
-%
-
-[errno(EFAULT)]
-@@The alignment of an operand was not valid
-class E_INVALID_ALIGNMENT = 0xff07 {}
-class E_INVALID_ALIGNMENT_POINTER: E_INVALID_ALIGNMENT = 0x0001 {
-	member addr: void *;
-	member req_alignment: size_t;
 }
 
 

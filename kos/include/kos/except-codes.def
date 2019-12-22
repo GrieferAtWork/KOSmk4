@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbace6d56 */
+/* HASH CRC-32:0xa261ab89 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -160,6 +160,8 @@ CLASS(E_SEGFAULT,MESSAGE("Segmentation fault"),ERRNO(EFAULT),())
 	SUBCLASS(E_SEGFAULT_READONLY,MESSAGE("Attempted to write to a read-only memory location"),NO_ERRNO,(MEMBER(void *,addr) MEMBER(uintptr_t,context)))
 	SUBCLASS(E_SEGFAULT_NOTREADABLE,MESSAGE("Attempted to read from a memory location that is not readable"),NO_ERRNO,(MEMBER(void *,addr) MEMBER(uintptr_t,context)))
 	SUBCLASS(E_SEGFAULT_NOTEXECUTABLE,MESSAGE("Attempted to execute a non-executable memory location"),NO_ERRNO,(MEMBER(void *,addr) MEMBER(uintptr_t,context)))
+	SUBCLASS(E_SEGFAULT_NOTATOMIC,MESSAGE("Attempted to perform an impossible atomic operation"),NO_ERRNO,(MEMBER(void *,addr) MEMBER(uintptr_t,context) MEMBER(size_t,size) MEMBER(uintptr_t,oldval_lo) MEMBER(uintptr_t,oldval_hi) MEMBER(uintptr_t,newval_lo) MEMBER(uintptr_t,newval_hi)))
+	SUBCLASS(E_SEGFAULT_UNALIGNED,MESSAGE("Attempted to access an unaligned pointer"),NO_ERRNO,(MEMBER(void *,addr) MEMBER(uintptr_t,context) MEMBER(size_t,required_alignemnt)))
 END
 CLASS(E_BREAKPOINT,MESSAGE("Breakpoint"),ERRNO(EINVAL),())
 END
@@ -176,17 +178,11 @@ CLASS(E_ILLEGAL_INSTRUCTION,MESSAGE("Illegal instruction"),ERRNO(EPERM),())
 	SUBCLASS(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT,NO_MESSAGE,NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(uintptr_t,intno) MEMBER(uintptr_t,ecode) MEMBER(uintptr_t,segval)))
 	SUBCLASS(E_ILLEGAL_INSTRUCTION_BAD_OPERAND,MESSAGE("Invalid instruction operand"),NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(uintptr_t,what)))
 	SUBCLASS(E_ILLEGAL_INSTRUCTION_REGISTER,MESSAGE("Invalid register access"),NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(uintptr_t,how) MEMBER(uintptr_t,regno) MEMBER(uintptr_t,regval) MEMBER(uintptr_t,offset)))
-	SUBCLASS(E_ILLEGAL_INSTRUCTION_VIO_UNRECOGNIZED,NO_MESSAGE,NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(void *,addr)))
-	SUBCLASS(E_ILLEGAL_INSTRUCTION_VIO_NONATOMIC_OPERAND,NO_MESSAGE,NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(void *,addr) MEMBER(size_t,size)))
-	SUBCLASS(E_ILLEGAL_INSTRUCTION_VIO_INVALID_KERNEL_SP,NO_MESSAGE,NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(uintptr_t,value)))
 END
 CLASS(E_STACK_OVERFLOW,MESSAGE("Stack overflow"),ERRNO(EFAULT),())
 END
 CLASS(E_INDEX_ERROR,NO_MESSAGE,ERRNO(ERANGE),())
 	SUBCLASS(E_INDEX_ERROR_OUT_OF_BOUNDS,NO_MESSAGE,NO_ERRNO,(MEMBER(intptr_t,index) MEMBER(intptr_t,min) MEMBER(intptr_t,max)))
-END
-CLASS(E_INVALID_ALIGNMENT,NO_MESSAGE,ERRNO(EFAULT),())
-	SUBCLASS(E_INVALID_ALIGNMENT_POINTER,NO_MESSAGE,NO_ERRNO,(MEMBER(void *,addr) MEMBER(size_t,req_alignment)))
 END
 #else /* ARCH... */
 CLASS(E_SEGFAULT,MESSAGE("Segmentation fault"),ERRNO(EFAULT),())
@@ -207,17 +203,11 @@ CLASS(E_ILLEGAL_INSTRUCTION,MESSAGE("Illegal instruction"),ERRNO(EPERM),())
 	SUBCLASS(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE,MESSAGE("Privileged instruction"),NO_ERRNO,(MEMBER(uintptr_t,opcode)))
 	SUBCLASS(E_ILLEGAL_INSTRUCTION_BAD_OPERAND,MESSAGE("Invalid instruction operand"),NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(uintptr_t,what)))
 	SUBCLASS(E_ILLEGAL_INSTRUCTION_REGISTER,MESSAGE("Invalid register"),NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(uintptr_t,how) MEMBER(uintptr_t,regno) MEMBER(uintptr_t,regval)))
-	SUBCLASS(E_ILLEGAL_INSTRUCTION_VIO_UNRECOGNIZED,NO_MESSAGE,NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(void *,addr)))
-	SUBCLASS(E_ILLEGAL_INSTRUCTION_VIO_NONATOMIC_OPERAND,NO_MESSAGE,NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(void *,addr) MEMBER(size_t,size)))
-	SUBCLASS(E_ILLEGAL_INSTRUCTION_VIO_INVALID_KERNEL_SP,NO_MESSAGE,NO_ERRNO,(MEMBER(uintptr_t,opcode) MEMBER(uintptr_t,value)))
 END
 CLASS(E_STACK_OVERFLOW,MESSAGE("Stack overflow"),ERRNO(EFAULT),())
 END
 CLASS(E_INDEX_ERROR,NO_MESSAGE,ERRNO(ERANGE),())
 	SUBCLASS(E_INDEX_ERROR_OUT_OF_BOUNDS,NO_MESSAGE,NO_ERRNO,(MEMBER(intptr_t,index) MEMBER(intptr_t,min) MEMBER(intptr_t,max)))
-END
-CLASS(E_INVALID_ALIGNMENT,NO_MESSAGE,ERRNO(EFAULT),())
-	SUBCLASS(E_INVALID_ALIGNMENT_POINTER,NO_MESSAGE,NO_ERRNO,(MEMBER(void *,addr) MEMBER(size_t,req_alignment)))
 END
 #endif /* !ARCH... */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfddbc7be */
+/* HASH CRC-32:0xdeb54e93 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -110,6 +110,32 @@
  * 	@@Fault context (Set of `E_SEGFAULT_CONTEXT_*')
  * 	member context: uintptr_t; */
 #define E_SEGFAULT_NOTEXECUTABLE (E_SEGFAULT,0x0004)
+/* Attempted to perform an impossible atomic operation
+ * 	@@The virtual memory address where the access was attempted
+ * 	member addr: void *;
+ * 	@@Fault context (Set of `E_SEGFAULT_CONTEXT_*')
+ * 	member context: uintptr_t;
+ * 	@@The number of consecutive bytes accessed
+ * 	member size: size_t;
+ * 	@@Low data word of the expected old value
+ * 	member oldval_lo: uintptr_t;
+ * 	@@High data word of the expected old value
+ * 	member oldval_hi: uintptr_t;
+ * 	@@Low data word of the intended new value
+ * 	member newval_lo: uintptr_t;
+ * 	@@High data word of the intended new value
+ * 	member newval_hi: uintptr_t;
+ */
+#define E_SEGFAULT_NOTATOMIC (E_SEGFAULT,0x0005)
+/* Attempted to access an unaligned pointer
+ * 	@@The (unaligned) virtual memory address accessed
+ * 	member addr: void *;
+ * 	@@Fault context (Set of `E_SEGFAULT_CONTEXT_*')
+ * 	member context: uintptr_t;
+ * 	@@The required alignment of `addr' (power-of-2)
+ * 	member required_alignemnt: size_t; */
+#define E_SEGFAULT_UNALIGNED (E_SEGFAULT,0x0006)
+
 /* Faulty address */
 #define E_SEGFAULT_CONTEXT_FAULT 0x0001
 /* FLAG: The fault happened during a write operation */
@@ -120,6 +146,8 @@
 #define E_SEGFAULT_CONTEXT_NONCANON 0x0008
 /* Attempted to unmap an undefined memory address */
 #define E_SEGFAULT_CONTEXT_UNMAP 0x0010
+/* FLAG: The access was perform by VIO */
+#define E_SEGFAULT_CONTEXT_VIO 0x8000
 
 
 
@@ -213,29 +241,6 @@
 #define E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV 0x0012
 /* Bad value written to register */
 #define E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD 0x0013
-/* The memory-accessing instruction was is not recognized for use in VIO
- * 	@@The opcode that caused the exception
- * 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
- * 	member opcode: uintptr_t;
- * 	@@The virtual memory address that was accessed (or `NULL' if unknown)
- * 	member addr: void *; */
-#define E_ILLEGAL_INSTRUCTION_VIO_UNRECOGNIZED (E_ILLEGAL_INSTRUCTION,0x1001)
-/* The memory location addressed by a lock-prefixed instruction cannot operation as a `size'-wide atomic operation
- * 	@@The opcode that caused the exception
- * 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
- * 	member opcode: uintptr_t;
- * 	@@The virtual memory address that was accessed
- * 	member addr: void *;
- * 	@@The number of bytes that were accessed atomically (usually one of 1,2,4 or 8)
- * 	member size: size_t; */
-#define E_ILLEGAL_INSTRUCTION_VIO_NONATOMIC_OPERAND (E_ILLEGAL_INSTRUCTION,0x1002)
-/* Attempted to set a kernel-space ESP to an invalid value during a VIO operation (can only be thrown when the kernel accesses VIO memory)
- * 	@@The opcode that caused the exception
- * 	@@NOTE: This field should be decoded using `E_ILLEGAL_INSTRUCTION_X86_OPCODE_*'
- * 	member opcode: uintptr_t;
- * 	@@The kernel SP value that was attempted to be assigned
- * 	member value: uintptr_t; */
-#define E_ILLEGAL_INSTRUCTION_VIO_INVALID_KERNEL_SP (E_ILLEGAL_INSTRUCTION,0x1011)
 
 /* Helper macros to encode/decode the `opcode' field of `E_ILLEGAL_INSTRUCTION'
  * NOTE: If the instruction doesn't depend on `modrm_reg', set it directly. */
@@ -276,10 +281,5 @@
 
 
 
-/* The alignment of an operand was not valid */
-#define E_INVALID_ALIGNMENT (0xff07)
-/* 	member addr: void *;
- * 	member req_alignment: size_t; */
-#define E_INVALID_ALIGNMENT_POINTER (E_INVALID_ALIGNMENT,0x0001)
 
 #endif /* !_I386_KOS_KOS_ASM_EXCEPT_H */

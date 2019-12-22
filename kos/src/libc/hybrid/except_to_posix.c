@@ -140,11 +140,6 @@ NOTHROW_NCX_KERNEL(LIBCCALL libc_error_as_signal)(struct exception_data const *_
 		result->si_code  = FPE_INTOVF;
 		break;
 
-	case E_INVALID_ALIGNMENT:
-		result->si_signo = SIGBUS;
-		result->si_code  = BUS_ADRALN;
-		break;
-
 	case E_BREAKPOINT:
 		result->si_signo = SIGTRAP;
 		result->si_code  = TRAP_BRKPT;
@@ -164,11 +159,23 @@ NOTHROW_NCX_KERNEL(LIBCCALL libc_error_as_signal)(struct exception_data const *_
 		result->si_signo = SIGSEGV;
 		result->si_code  = SEGV_MAPERR;
 		switch (code) {
+
 		case ERROR_CODEOF(E_SEGFAULT_READONLY):
 		case ERROR_CODEOF(E_SEGFAULT_NOTREADABLE):
 		case ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE):
 			result->si_code = SEGV_ACCERR;
 			break;
+
+		case ERROR_CODEOF(E_SEGFAULT_NOTATOMIC):
+			result->si_signo = SIGBUS;
+			result->si_code  = BUS_OBJERR;
+			break;
+
+		case ERROR_CODEOF(E_SEGFAULT_UNALIGNED):
+			result->si_signo = SIGBUS;
+			result->si_code  = BUS_ADRALN;
+			break;
+
 		default: break;
 		}
 		result->si_addr  = (void *)data->e_pointers[0];
@@ -216,13 +223,7 @@ NOTHROW_NCX_KERNEL(LIBCCALL libc_error_as_signal)(struct exception_data const *_
 		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_X86_TOO_LONG):
 #endif /* E_ILLEGAL_INSTRUCTION_X86_TOO_LONG */
 		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE):
-		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_VIO_UNRECOGNIZED):
 			result->si_code = ILL_ILLOPC;
-			break;
-
-		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_VIO_NONATOMIC_OPERAND):
-		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_VIO_INVALID_KERNEL_SP):
-			result->si_code = ILL_ILLADR;
 			break;
 
 		default:

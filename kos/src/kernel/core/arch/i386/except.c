@@ -303,6 +303,7 @@ NOTHROW(KCALL print_exception_desc_of)(struct exception_data const *__restrict d
 	switch (data->e_class) {
 
 	case E_SEGFAULT:
+		/* TODO: Print extended information for SEGFAULT sub-classes */
 		format_printf(printer, arg, " [cr2=%p] [%c%c%c%c]",
 		              data->e_pointers[0],
 		              data->e_pointers[1] & E_SEGFAULT_CONTEXT_FAULT ? 'f' : '-',
@@ -369,30 +370,6 @@ NOTHROW(KCALL print_exception_desc_of)(struct exception_data const *__restrict d
 			}
 		}	break;
 
-		case E_ILLEGAL_INSTRUCTION_VIO_UNRECOGNIZED:
-			format_printf(printer, arg, " [addr=%p]", data->e_pointers[1]);
-			break;
-		case E_ILLEGAL_INSTRUCTION_VIO_NONATOMIC_OPERAND:
-			format_printf(printer, arg, " [addr=%p+%Iu]",
-			              data->e_pointers[1],
-			              data->e_pointers[2]);
-			break;
-		case E_ILLEGAL_INSTRUCTION_VIO_INVALID_KERNEL_SP:
-			format_printf(printer, arg, " [%%esp=%p]",
-			              data->e_pointers[1]);
-			break;
-
-		default: break;
-		}
-		break;
-
-	case E_INVALID_ALIGNMENT:
-		switch (data->e_subclass) {
-		case E_INVALID_ALIGNMENT_POINTER:
-			format_printf(printer, arg, " [ptr=%p,%p]",
-			              data->e_pointers[0],
-			              data->e_pointers[1]);
-			break;
 		default: break;
 		}
 		break;

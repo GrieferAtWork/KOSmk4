@@ -41,7 +41,7 @@ struct vio_args {
 	struct vm_datablock_type_vio const *va_type;  /* [1..1][== va_block->db_type->dt_vio] */
 	struct vm_datablock                *va_block; /* [1..1] The data block that is being accessed. */
 	struct vm_datapart                 *va_part;  /* [0..1] The part that is being accessed. */
-	pos_t                          va_access_partoff; /* Offset into `va_block' where `va_access_pageid' is mapped. */
+	pos_t                               va_access_partoff; /* Offset into `va_block' where `va_access_pageid' is mapped. */
 	pageid_t                            va_access_pageid;  /* The accessed page index. */
 	struct icpustate                   *va_state; /* [0..1] The CPU state at the time of the access being made (or `NULL' when accessed through other means). */
 };
