@@ -45,6 +45,7 @@
 #define X86_REGISTER_MISC_PIP             X86_REGISTER_MISC_RIP            /* %pip */
 #define X86_REGISTER_MISC_FSBASE          X86_REGISTER_MISC_FSBASEQ        /* %fs.base */
 #define X86_REGISTER_MISC_GSBASE          X86_REGISTER_MISC_GSBASEQ        /* %gs.base */
+#define X86_REGISTER_MISC_KGSBASE         X86_REGISTER_MISC_GSBASEQ        /* %kernel_gs.base */
 #define X86_REGISTER_MISC_GDT_BASE        X86_REGISTER_MISC_GDT_BASEQ      /* %gdt.base */
 #define X86_REGISTER_MISC_IDT_BASE        X86_REGISTER_MISC_IDT_BASEQ      /* %idt.base */
 #define X86_REGISTER_MISC_FIP             X86_REGISTER_MISC_FIPQ           /* %fip */

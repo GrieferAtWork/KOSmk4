@@ -63,7 +63,7 @@ DECL_BEGIN
 
 /* Host-thread special-state backup data. (saved/restored by `dbg_init()' and `dbg_fini()') */
 PUBLIC ATTR_DBGBSS struct x86_dbg_hoststate x86_dbg_hostbackup = {};
-PUBLIC ATTR_DBGBSS struct fcpustate x86_dbg_exitstate          = {};
+PUBLIC ATTR_DBGBSS struct x86_dbg_exitstate_struct x86_dbg_exitstate = {};
 
 /* [0..1] The thread who's view state is currently cached
  *        in `x86_dbg_viewstate' and `x86_dbg_origstate' */
@@ -158,6 +158,7 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 	ammend.dca_drregs.dr_dr6 = __rddr6();
 	ammend.dca_drregs.dr_dr7 = __rddr7();
 #ifdef __x86_64__
+	ammend.dca_kgsbase          = __rdgsbaseq();
 	ammend.dca_sgbase.sg_fsbase = __rdfsbaseq();
 	ammend.dca_sgbase.sg_gsbase = __rdmsr(IA32_KERNEL_GS_BASE);
 	ammend.dca_sgregs.sg_gs     = __rdgs();
@@ -201,7 +202,7 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 	__lidt_p(&ammend.dca_idt);
 #ifdef __x86_64__
 	__wrgs(ammend.dca_sgregs.sg_gs);
-	__wrgsbase(ammend.dca_thread);
+	__wrgsbaseq(ammend.dca_kgsbase);
 	__wrfs(ammend.dca_sgregs.sg_fs);
 	__wrfsbaseq(ammend.dca_sgbase.sg_fsbase);
 	__wres(ammend.dca_sgregs.sg_es);
@@ -750,8 +751,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 	 * as found in icpustate or scpustate, both of which may appear
 	 * within the `x86_dbg_trapstate' pointer. */
 	if (x86_dbg_trapstatekind != X86_DBG_STATEKIND_NONE)
-		x86_dbg_exitstate.fcs_gpregs.gp_pax = (uintptr_t)x86_dbg_trapstate;
-
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_pax = (uintptr_t)x86_dbg_trapstate;
 	initok = 0;
 }
 

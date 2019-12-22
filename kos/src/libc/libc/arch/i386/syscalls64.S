@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86ef2864 */
+/* HASH CRC-32:0x8c6224ca */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -9686,7 +9686,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xpwritevf, libc_sys_Xpwritevf)
 
 
 
-/* Include the system call ammendment in order to alias
+/* Include the system call amendment in order to alias
  * some exception-enabled functions onto system calls. */
 #include "../../syscalls-ammend.S.inl"
 

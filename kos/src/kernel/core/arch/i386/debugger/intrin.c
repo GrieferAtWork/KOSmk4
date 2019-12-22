@@ -40,6 +40,7 @@ if (gcc_opt.remove("-O3"))
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state-compat.h>
+#include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <sys/io.h>
 
@@ -334,7 +335,65 @@ DEFINE_DEBUG_FUNCTION(
 	re_printer.rdp_printer_arg = NULL;
 	re_printer.rdp_format      = &debug_regdump_print_format;
 	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
+	/* Implement a custom register dumping implementation so that we
+	 * can include %kernel_gs.base on x86_64 (because the value of that
+	 * register should have a constant value and be implied by ) */
+#ifdef __x86_64__
+	{
+		struct sgregs sg;
+		u64 kgsbase;
+		regdump_gpregs(&re_printer, &fst.fcs_gpregs);
+		regdump_ip(&re_printer, fcpustate_getpc(&fst));
+		sg.sg_gs = fst.fcs_sgregs.sg_gs16;
+		sg.sg_fs = fst.fcs_sgregs.sg_fs16;
+		sg.sg_es = fst.fcs_sgregs.sg_es16;
+		sg.sg_ds = fst.fcs_sgregs.sg_ds16;
+		regdump_sgregs_with_cs_ss_tr_ldt(&re_printer, &sg,
+		                                 fst.fcs_sgregs.sg_cs,
+		                                 fst.fcs_sgregs.sg_ss,
+		                                 fst.fcs_sgregs.sg_tr,
+		                                 fst.fcs_sgregs.sg_ldt);
+		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_INDENT);
+		regdump_sgbase(&re_printer, &fst.fcs_sgbase);
+		dbg_putc('\n');
+		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_INDENT);
+		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_REGISTER_PREFIX);
+		/* Special case: Also print the %kernel_gs.base register! */
+		if (x86_dbg_getregbyid(DBG_REGLEVEL_VIEW, X86_REGISTER_MISC_KGSBASEQ, &kgsbase, 8) != 8)
+			kgsbase = (u64)dbg_current;
+		dbg_print(DBGSTR("%kernel_gs.base"));
+		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_REGISTER_SUFFIX);
+		dbg_putc(' ');
+		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_VALUE_PREFIX);
+		dbg_printf(DBGSTR("%p"), kgsbase);
+		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_VALUE_SUFFIX);
+		if (kgsbase != (u64)dbg_current) {
+			/* Print an error indicator if %kernel_gs.base is incorrect
+			 * NOTE: There should never be a scenario where this register has a different
+			 *       value than the current thread. (even though the kernel is entered
+			 *       with the user-space %gs.base register value, there is no case where
+			 *       interrupts are enabled while %gs.base is still incorrect, so no thread
+			 *       should ever be interruptible with an incorrect %gs.base. If this can
+			 *       still happen somewhere, then that is a bug that would be indicate by this)
+			 *       Note that the debugger determines the calling thread using a different method.
+			 *       Namely: CURRENT_LAPIC_ID -> CURRENT_CPU -> c_current */
+			dbg_putc(' ');
+			debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_ERROR_PREFIX);
+			dbg_printf(DBGSTR("BAD: should be %p"), dbg_current);
+			debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_ERROR_SUFFIX);
+		}
+		dbg_putc('\n');
+		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_INDENT);
+		regdump_flags(&re_printer, fcpustate_getpflags(&fst));
+		dbg_putc('\n');
+		regdump_coregs(&re_printer, &fst.fcs_coregs);
+		regdump_drregs(&re_printer, &fst.fcs_drregs);
+		regdump_gdt(&re_printer, &fst.fcs_gdt);
+		regdump_idt(&re_printer, &fst.fcs_idt);
+	}
+#else /* __x86_64__ */
 	regdump_fcpustate(&re_printer, &fst);
+#endif /* !__x86_64__ */
 	return 0;
 }
 

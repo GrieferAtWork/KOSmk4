@@ -3042,10 +3042,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak keyboard_buffer_putkey; .quad keyboard_buffer_putkey
 	.reloc ., R_X86_64_SIZE32, keyboard_buffer_putkey; .int 0
 	.int 0x6a00b29
-	.quad 0 /* index: 760 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname760 /* index: 760 */
+	.weak vm_readphysw; .quad vm_readphysw
+	.reloc ., R_X86_64_SIZE32, vm_readphysw; .int 0
+	.int 0x65a817
 	.quad .Lname761 /* index: 761 */
 	.weak sys32_getpgid; .quad sys32_getpgid
 	.reloc ., R_X86_64_SIZE32, sys32_getpgid; .int 0
@@ -4863,9 +4863,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, sys32_timer_getoverrun; .int 0
 	.int 0xdc864be
 	.quad .Lname1215 /* index: 1215 */
-	.weak sys32_oldolduname; .quad sys32_oldolduname
-	.reloc ., R_X86_64_SIZE32, sys32_oldolduname; .int 0
-	.int 0xa856b75
+	.weak regdump_sgbase; .quad regdump_sgbase
+	.reloc ., R_X86_64_SIZE32, regdump_sgbase; .int 0
+	.int 0xd464b75
 	.quad 0 /* index: 1216 */
 	.quad 0
 	.int 0
@@ -8287,9 +8287,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname2071 /* index: 2071 */
-	.weak vm_readphysw; .quad vm_readphysw
-	.reloc ., R_X86_64_SIZE32, vm_readphysw; .int 0
-	.int 0x65a817
+	.weak sys32_oldolduname; .quad sys32_oldolduname
+	.reloc ., R_X86_64_SIZE32, sys32_oldolduname; .int 0
+	.int 0xa856b75
 	.quad .Lname2072 /* index: 2072 */
 	.weak heap_realign_untraced_nx; .quad heap_realign_untraced_nx
 	.reloc ., R_X86_64_SIZE32, heap_realign_untraced_nx; .int 0
@@ -17478,6 +17478,8 @@ END(kernel_symbol_table)
 	.string "json_parser_next"
 .Lname759:
 	.string "keyboard_buffer_putkey"
+.Lname760:
+	.string "vm_readphysw"
 .Lname761:
 	.string "sys32_getpgid"
 .Lname764:
@@ -18091,7 +18093,7 @@ END(kernel_symbol_table)
 .Lname1214:
 	.string "sys32_timer_getoverrun"
 .Lname1215:
-	.string "sys32_oldolduname"
+	.string "regdump_sgbase"
 .Lname1217:
 	.string "memendq"
 .Lname1219:
@@ -19201,7 +19203,7 @@ END(kernel_symbol_table)
 .Lname2069:
 	.string "cred_require_resource"
 .Lname2071:
-	.string "vm_readphysw"
+	.string "sys32_oldolduname"
 .Lname2072:
 	.string "heap_realign_untraced_nx"
 .Lname2073:

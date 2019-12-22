@@ -205,7 +205,7 @@ panic_uhi_dbg_main(void *arg) {
 	                  "func: " DF_WHITE("%n") "\n"
 	                  "addr: " DF_WHITE("%p") "\n"
 	                  "]"),
-	           fcpustate_getpc(&x86_dbg_exitstate));
+	           fcpustate_getpc(&x86_dbg_exitstate.de_state));
 	dbg_main(0);
 }
 #endif /* CONFIG_HAVE_DEBUGGER */

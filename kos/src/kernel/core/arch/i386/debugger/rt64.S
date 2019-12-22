@@ -68,9 +68,9 @@ PUBLIC_FUNCTION(dbg_exit)
 	 *       By leaving the debugger, that field once again gets restored and may no longer be
 	 *       initialized in case the debugger was entered early on during booting, or in case
 	 *       the field became corrupt for some reason. */
-	movq   %gs:0, %rbx /* THIS_TASK */
+	movq   %gs:0, %rbp /* THIS_TASK */
 	EXTERN(this_cpu)
-	movq   this_cpu(%rbx), %rbp
+	movq   this_cpu(%rbp), %rbp
 	EXTERN(thiscpu_idle_x86_kernel_psp0)
 	movq   thiscpu_idle_x86_kernel_psp0(%rbp), %rbp /* thiscpu_idle_x86_kernel_psp0(THIS_CPU) */
 
@@ -132,10 +132,11 @@ PUBLIC_FUNCTION(dbg_exit)
 	movw   (x86_dbg_exitstate + OFFSET_FCPUSTATE_ES), %es
 
 	/* Restore segment base registers. */
-	wrgsbaseq %rbx /* THIS_TASK */
+	movq   (x86_dbg_exitstate + SIZEOF_FCPUSTATE), %rax
+	wrgsbaseq %rax /* %kernel_gs.base */
 	movq   (x86_dbg_exitstate + OFFSET_FCPUSTATE_SGBASE + OFFSET_SGBASE_FSBASE), %rax
 	wrfsbaseq %rax
-	wrkgsbaseq (x86_dbg_exitstate + OFFSET_FCPUSTATE_SGBASE + OFFSET_SGBASE_GSBASE)
+	wrkgsbaseq (x86_dbg_exitstate + OFFSET_FCPUSTATE_SGBASE + OFFSET_SGBASE_GSBASE) /* %user_gs.base */
 
 	/* Restore most general-purpose registers */
 	movq   (x86_dbg_exitstate + OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_R15), %r15
@@ -171,7 +172,7 @@ PUBLIC_FUNCTION(dbg_exit)
 	EXTERN(x86_dbg_owner_lapicid)
 	movw   $(0), x86_dbg_owner_lapicid
 
-	intr_exit
+	intr_exit intr_enabled=0
 	.cfi_endproc
 END(dbg_exit)
 

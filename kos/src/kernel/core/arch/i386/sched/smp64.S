@@ -161,12 +161,8 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	.cfi_restore_state
 .Lipi_switch_tasks:
 	/* Complete the full scpustate structure. */
-	pushq_cfi_seg_r %fs.base, %rax
-	pushq_cfi_kernel_gs_base
-	pushq_cfi_seg_r %ds, %rax
-	pushq_cfi_seg_r %es, %rax
-	pushq_cfi_r %fs
-	pushq_cfi_r %gs
+	ASM_PUSH_SGBASE_CFI_R
+	ASM_PUSH_SGREGS_CFI_R(%rax)
 
 	EXTERN(this_cpu)
 	movq   %gs:this_cpu, %rbx
@@ -737,12 +733,8 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	.cfi_def_cfa %rsp, 0
 
 	ASM_PUSH_GPREGSNSP_CFI_R         /* gpregs */
-	pushq_cfi_seg_r %fs.base, %rax
-	pushq_cfi_kernel_gs_base
-	pushq_cfi_seg_r %ds, %rax
-	pushq_cfi_seg_r %es, %rax
-	pushq_cfi_r %fs
-	pushq_cfi_r %gs
+	ASM_PUSH_SGBASE_CFI_R
+	ASM_PUSH_SGREGS_CFI_R(%rax)
 
 #ifndef CONFIG_NO_FPU
 	/* With the CPU about to go OFFLINE, make sure to also save the current

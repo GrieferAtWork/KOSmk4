@@ -58,6 +58,9 @@
 __DECL_BEGIN
 
 struct gpregs;
+#ifdef __x86_64__
+struct gpregsnsp;
+#endif /* !__x86_64__ */
 struct sgregs;
 struct coregs;
 struct drregs;
@@ -72,10 +75,17 @@ struct desctab;
  * On x86_64, use `0-7' to indicate extended registers `r8-r15' */
 typedef __ATTR_NONNULL((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_GPREG)(struct regdump_printer *__restrict __self, char __id, __uintptr_t __value);
 typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_GPREGS)(struct regdump_printer *__restrict __self, struct gpregs const *__restrict __data);
+#ifdef __x86_64__
+typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_GPREGS_WITH_SP)(struct regdump_printer *__restrict __self, struct gpregsnsp const *__restrict __data, __uintptr_t __sp);
+#else /* __x86_64__ */
 typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_GPREGS_WITH_SP)(struct regdump_printer *__restrict __self, struct gpregs const *__restrict __data, __uintptr_t __sp);
+#endif /* !__x86_64__ */
 typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_SGREGS)(struct regdump_printer *__restrict __self, struct sgregs const *__restrict __data);
 typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_SGREGS_WITH_CS_SS)(struct regdump_printer *__restrict __self, struct sgregs const *__restrict __data, __uint16_t __cs, __uint16_t __ss);
 typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_SGREGS_WITH_CS_SS_TR_LDT)(struct regdump_printer *__restrict __self, struct sgregs const *__restrict __data, __uint16_t __cs, __uint16_t __ss, __uint16_t __tr, __uint16_t __ldt);
+#ifdef __x86_64__
+typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_SGBASE)(struct regdump_printer *__restrict __self, struct sgbase const *__restrict __data);
+#endif /* __x86_64__ */
 typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_COREGS)(struct regdump_printer *__restrict __self, struct coregs const *__restrict __data);
 typedef __ATTR_NONNULL((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_CR0)(struct regdump_printer *__restrict __self, __uintptr_t __cr0);
 typedef __ATTR_NONNULL((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_CR4)(struct regdump_printer *__restrict __self, __uintptr_t __cr4);
@@ -95,10 +105,17 @@ typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_IDT)(struct re
  * On x86_64, use `0-7' to indicate extended registers `r8-r15' */
 LIBREGDUMP_DECL __ATTR_NONNULL((1)) __ssize_t LIBREGDUMP_CC regdump_gpreg(struct regdump_printer *__restrict __self, char __id, __uintptr_t __value);
 LIBREGDUMP_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump_gpregs(struct regdump_printer *__restrict __self, struct gpregs const *__restrict __data);
+#ifdef __x86_64__
+LIBREGDUMP_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump_gpregs_with_sp(struct regdump_printer *__restrict __self, struct gpregsnsp const *__restrict __data, __uintptr_t __sp);
+#else /* __x86_64__ */
 LIBREGDUMP_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump_gpregs_with_sp(struct regdump_printer *__restrict __self, struct gpregs const *__restrict __data, __uintptr_t __sp);
+#endif /* !__x86_64__ */
 LIBREGDUMP_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump_sgregs(struct regdump_printer *__restrict __self, struct sgregs const *__restrict __data);
 LIBREGDUMP_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump_sgregs_with_cs_ss(struct regdump_printer *__restrict __self, struct sgregs const *__restrict __data, __uint16_t __cs, __uint16_t __ss);
 LIBREGDUMP_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump_sgregs_with_cs_ss_tr_ldt(struct regdump_printer *__restrict __self, struct sgregs const *__restrict __data, __uint16_t __cs, __uint16_t __ss, __uint16_t __tr, __uint16_t __ldt);
+#ifdef __x86_64__
+LIBREGDUMP_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump_sgbase(struct regdump_printer *__restrict __self, struct sgbase const *__restrict __data);
+#endif /* __x86_64__ */
 LIBREGDUMP_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump_coregs(struct regdump_printer *__restrict __self, struct coregs const *__restrict __data);
 LIBREGDUMP_DECL __ATTR_NONNULL((1)) __ssize_t LIBREGDUMP_CC regdump_cr0(struct regdump_printer *__restrict __self, __uintptr_t __cr0);
 LIBREGDUMP_DECL __ATTR_NONNULL((1)) __ssize_t LIBREGDUMP_CC regdump_cr4(struct regdump_printer *__restrict __self, __uintptr_t __cr4);

@@ -247,8 +247,26 @@
 #   define X86_REGISTER_MISC_FSBASEL    0xe420 /* %fs.basel */
 #   define X86_REGISTER_MISC_GSBASEL    0xe421 /* %gs.basel */
 #ifdef __x86_64__
-#   define X86_REGISTER_MISC_FSBASEQ    0xe020 /* %fs.baseq */
-#   define X86_REGISTER_MISC_GSBASEQ    0xe021 /* %gs.baseq */
+/* NOTE:
+ *   - `X86_REGISTER_MISC_GSBASE(L|Q)' always refers to the
+ *     user-space `%gs.base' register. As such, its value is:
+ *     >> #ifdef __KERNEL__
+ *     >> __rdmsr(IA32_KERNEL_GS_BASE);
+ *     >> #else
+ *     >> __rdmsr(IA32_GS_BASE); // or `__rdgsbase()'
+ *     >> #endif
+ *   - `X86_REGISTER_MISC_KGSBASE(L|Q)' always refers to the
+ *     kernel-space `%kernel_gs.base' register. As such, its value is:
+ *     >> #ifdef __KERNEL__
+ *     >> __rdmsr(IA32_GS_BASE); // or `__rdgsbase()', or `__rdgsptr(0)'
+ *     >> #else
+ *     >> // Not actually allowed to be read, but this is what you ~would~ have to do
+ *     >> __rdmsr(IA32_KERNEL_GS_BASE);
+ *     >> #endif */
+#   define X86_REGISTER_MISC_FSBASEQ    0xe020 /* %fs.baseq (user-space) */
+#   define X86_REGISTER_MISC_GSBASEQ    0xe021 /* %gs.baseq (user-space) */
+#   define X86_REGISTER_MISC_KGSBASEL   0xe422 /* %kernel_gs.baseq (kernel-space; should always equal `THIS_TASK') */
+#   define X86_REGISTER_MISC_KGSBASEQ   0xe022 /* %kernel_gs.baseq (kernel-space; should always equal `THIS_TASK') */
 #endif /* __x86_64__ */
 #   define X86_REGISTER_MISC_FCW        0xe830 /* %fcw (FpuControlWord; `sfpuenv::fe_fcw,sfpustate::fs_fcw,xfpustate::fx_fcw') */
 #   define X86_REGISTER_MISC_FSW        0xe831 /* %fsw (FpuStatusWord; `sfpuenv::fe_fsw,sfpustate::fs_fsw,xfpustate::fx_fsw') */

@@ -670,6 +670,41 @@ do_pax:
 			goto done;
 		}
 	}
+
+#ifdef __x86_64__
+	/* kernel_gsbase, kernel_gs.base */
+	if (namelen >= 13 &&
+	    EQNOCASE(name[0], 'k') && EQNOCASE(name[1], 'e') &&
+	    EQNOCASE(name[2], 'r') && EQNOCASE(name[3], 'n') &&
+	    EQNOCASE(name[4], 'e') && EQNOCASE(name[5], 'l') &&
+	    EQNOCASE(name[6], '_') && EQNOCASE(name[7], 'g') &&
+	    EQNOCASE(name[8], 's')) {
+		char const *temp = name + 9;
+		size_t templen   = namelen - 9;
+		if (*temp == '.') {
+			++temp;
+			--templen;
+		}
+		if (templen >= 4 &&
+		    EQNOCASE(temp[0], 'b') && EQNOCASE(temp[1], 'a') &&
+		    EQNOCASE(temp[2], 's') && EQNOCASE(temp[3], 'e')) {
+			if (templen == 4) {
+				result = X86_REGISTER_MISC_KGSBASE;
+				goto done;
+			}
+			if (templen == 5) {
+				if (EQNOCASE(temp[4], 'l')) {
+					result = X86_REGISTER_MISC_KGSBASEL;
+					goto done;
+				}
+				if (EQNOCASE(temp[4], 'q')) {
+					result = X86_REGISTER_MISC_KGSBASEQ;
+					goto done;
+				}
+			}
+		}
+	}
+#endif /* __x86_64__ */
 #undef SKIP_LEADING_SPACE
 
 unknown:

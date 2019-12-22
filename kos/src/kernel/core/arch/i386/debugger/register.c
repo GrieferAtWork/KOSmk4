@@ -36,6 +36,7 @@ if (gcc_opt.remove("-O3"))
 #include <kernel/vm.h>
 
 #include <hybrid/host.h>
+#include <hybrid/unaligned.h>
 
 #include <asm/cpu-flags.h>
 #include <asm/registers-compat.h>
@@ -117,49 +118,49 @@ NOTHROW(KCALL set_trapstate_from_fcpustate)(struct fcpustate const *__restrict s
 		fcpustate_to_lcpustate(state, (struct lcpustate *)x86_dbg_trapstate);
 #ifdef __x86_64__
 		/* Restore all registers except for `%r15', `%r14', `%r13', `%r12', ``rebp', `%rsp', `%rbx', `%rip' */
-		x86_dbg_exitstate.fcs_gpregs.gp_pdi = state->fcs_gpregs.gp_pdi;
-		x86_dbg_exitstate.fcs_gpregs.gp_psi = state->fcs_gpregs.gp_psi;
-		x86_dbg_exitstate.fcs_gpregs.gp_r11 = state->fcs_gpregs.gp_r11;
-		x86_dbg_exitstate.fcs_gpregs.gp_r10 = state->fcs_gpregs.gp_r10;
-		x86_dbg_exitstate.fcs_gpregs.gp_r9  = state->fcs_gpregs.gp_r9;
-		x86_dbg_exitstate.fcs_gpregs.gp_r8  = state->fcs_gpregs.gp_r8;
-		x86_dbg_exitstate.fcs_sgbase = state->fcs_sgbase;
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_pdi = state->fcs_gpregs.gp_pdi;
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_psi = state->fcs_gpregs.gp_psi;
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_r11 = state->fcs_gpregs.gp_r11;
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_r10 = state->fcs_gpregs.gp_r10;
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_r9  = state->fcs_gpregs.gp_r9;
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_r8  = state->fcs_gpregs.gp_r8;
+		x86_dbg_exitstate.de_state.fcs_sgbase = state->fcs_sgbase;
 #else /* __x86_64__ */
 		/* Restore all registers except for `%edi', `%esi', `%ebp', `%esp', `%ebx', `%eip' */
 #endif /* !__x86_64__ */
-		x86_dbg_exitstate.fcs_gpregs.gp_pax = state->fcs_gpregs.gp_pax;
-		x86_dbg_exitstate.fcs_gpregs.gp_pbx = state->fcs_gpregs.gp_pbx;
-		x86_dbg_exitstate.fcs_gpregs.gp_pdx = state->fcs_gpregs.gp_pdx;
-		x86_dbg_exitstate.fcs_gpregs.gp_pcx = state->fcs_gpregs.gp_pcx;
-		x86_dbg_exitstate.fcs_gpregs.gp_pax = state->fcs_gpregs.gp_pax;
-		x86_dbg_exitstate.fcs_sgregs.sg_es  = state->fcs_sgregs.sg_es;
-		x86_dbg_exitstate.fcs_sgregs.sg_cs  = state->fcs_sgregs.sg_cs;
-		x86_dbg_exitstate.fcs_sgregs.sg_ss  = state->fcs_sgregs.sg_ss;
-		x86_dbg_exitstate.fcs_sgregs.sg_ds  = state->fcs_sgregs.sg_ds;
-		x86_dbg_exitstate.fcs_sgregs.sg_fs  = state->fcs_sgregs.sg_fs;
-		x86_dbg_exitstate.fcs_sgregs.sg_gs  = state->fcs_sgregs.sg_gs;
-		x86_dbg_exitstate.fcs_pflags        = state->fcs_pflags;
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_pax = state->fcs_gpregs.gp_pax;
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_pbx = state->fcs_gpregs.gp_pbx;
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_pdx = state->fcs_gpregs.gp_pdx;
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_pcx = state->fcs_gpregs.gp_pcx;
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_pax = state->fcs_gpregs.gp_pax;
+		x86_dbg_exitstate.de_state.fcs_sgregs.sg_es  = state->fcs_sgregs.sg_es;
+		x86_dbg_exitstate.de_state.fcs_sgregs.sg_cs  = state->fcs_sgregs.sg_cs;
+		x86_dbg_exitstate.de_state.fcs_sgregs.sg_ss  = state->fcs_sgregs.sg_ss;
+		x86_dbg_exitstate.de_state.fcs_sgregs.sg_ds  = state->fcs_sgregs.sg_ds;
+		x86_dbg_exitstate.de_state.fcs_sgregs.sg_fs  = state->fcs_sgregs.sg_fs;
+		x86_dbg_exitstate.de_state.fcs_sgregs.sg_gs  = state->fcs_sgregs.sg_gs;
+		x86_dbg_exitstate.de_state.fcs_pflags        = state->fcs_pflags;
 		break;
 
 	case X86_DBG_STATEKIND_KCPU:
 		fcpustate_to_kcpustate(state, (struct kcpustate *)x86_dbg_trapstate);
-		x86_dbg_exitstate.fcs_sgregs.sg_es  = state->fcs_sgregs.sg_es;
-		x86_dbg_exitstate.fcs_sgregs.sg_cs  = state->fcs_sgregs.sg_cs;
-		x86_dbg_exitstate.fcs_sgregs.sg_ss  = state->fcs_sgregs.sg_ss;
-		x86_dbg_exitstate.fcs_sgregs.sg_ds  = state->fcs_sgregs.sg_ds;
-		x86_dbg_exitstate.fcs_sgregs.sg_fs  = state->fcs_sgregs.sg_fs;
-		x86_dbg_exitstate.fcs_sgregs.sg_gs  = state->fcs_sgregs.sg_gs;
+		x86_dbg_exitstate.de_state.fcs_sgregs.sg_es  = state->fcs_sgregs.sg_es;
+		x86_dbg_exitstate.de_state.fcs_sgregs.sg_cs  = state->fcs_sgregs.sg_cs;
+		x86_dbg_exitstate.de_state.fcs_sgregs.sg_ss  = state->fcs_sgregs.sg_ss;
+		x86_dbg_exitstate.de_state.fcs_sgregs.sg_ds  = state->fcs_sgregs.sg_ds;
+		x86_dbg_exitstate.de_state.fcs_sgregs.sg_fs  = state->fcs_sgregs.sg_fs;
+		x86_dbg_exitstate.de_state.fcs_sgregs.sg_gs  = state->fcs_sgregs.sg_gs;
 		break;
 
 	case X86_DBG_STATEKIND_ICPU:
 		x86_dbg_trapstate = fcpustate_to_icpustate_p(state, (struct icpustate *)x86_dbg_trapstate);
 #ifdef __x86_64__
-		x86_dbg_exitstate.fcs_sgbase       = state->fcs_sgbase;
-		x86_dbg_exitstate.fcs_sgregs.sg_es = state->fcs_sgregs.sg_es;
-		x86_dbg_exitstate.fcs_sgregs.sg_ds = state->fcs_sgregs.sg_ds;
-		x86_dbg_exitstate.fcs_sgregs.sg_fs = state->fcs_sgregs.sg_fs;
+		x86_dbg_exitstate.de_state.fcs_sgbase       = state->fcs_sgbase;
+		x86_dbg_exitstate.de_state.fcs_sgregs.sg_es = state->fcs_sgregs.sg_es;
+		x86_dbg_exitstate.de_state.fcs_sgregs.sg_ds = state->fcs_sgregs.sg_ds;
+		x86_dbg_exitstate.de_state.fcs_sgregs.sg_fs = state->fcs_sgregs.sg_fs;
 #endif /* __x86_64__ */
-		x86_dbg_exitstate.fcs_sgregs.sg_gs = state->fcs_sgregs.sg_gs;
+		x86_dbg_exitstate.de_state.fcs_sgregs.sg_gs = state->fcs_sgregs.sg_gs;
 		break;
 
 	case X86_DBG_STATEKIND_SCPU:
@@ -174,14 +175,79 @@ NOTHROW(KCALL set_trapstate_from_fcpustate)(struct fcpustate const *__restrict s
 	/* These registers are never present in trap states other than `X86_DBG_STATEKIND_FCPU'.
 	 * As such, changes to the values of these registers must cascade down to the debugger
 	 * exit state. */
-	x86_dbg_exitstate.fcs_sgregs.sg_tr  = state->fcs_sgregs.sg_tr16;
-	x86_dbg_exitstate.fcs_sgregs.sg_ldt = state->fcs_sgregs.sg_ldt16;
-	x86_dbg_exitstate.fcs_coregs        = state->fcs_coregs;
-	x86_dbg_exitstate.fcs_drregs        = state->fcs_drregs;
-	x86_dbg_exitstate.fcs_gdt           = state->fcs_gdt;
-	x86_dbg_exitstate.fcs_idt           = state->fcs_idt;
+	x86_dbg_exitstate.de_state.fcs_sgregs.sg_tr  = state->fcs_sgregs.sg_tr16;
+	x86_dbg_exitstate.de_state.fcs_sgregs.sg_ldt = state->fcs_sgregs.sg_ldt16;
+	x86_dbg_exitstate.de_state.fcs_coregs        = state->fcs_coregs;
+	x86_dbg_exitstate.de_state.fcs_drregs        = state->fcs_drregs;
+	x86_dbg_exitstate.de_state.fcs_gdt           = state->fcs_gdt;
+	x86_dbg_exitstate.de_state.fcs_idt           = state->fcs_idt;
 	return;
 }
+
+
+#ifdef __x86_64__
+/* Try to get/set the `%kernel_gs.base' register of `dbg_current'
+ * Note that doing this is only possible for `THIS_TASK', as well as
+ * the current thread of another CPU. All other threads have an implicit
+ * `%kernel_gs.base' register value set to the address of their `struct task'
+ * structure, which is non-relocatable. */
+PRIVATE ATTR_DBGTEXT bool
+NOTHROW(KCALL get_dbg_current_kernel_gs_base)(u64 *__restrict presult) {
+	if (!x86_dbg_viewthread)
+		return false;
+	if (dbg_current == THIS_TASK) {
+		/* Assign registers to the trap state, and let
+		 * undefined registers ripple down to the exit state. */
+		*presult = x86_dbg_exitstate.de_kernel_gsbase;
+		return true;
+	}
+#ifndef CONFIG_NO_SMP
+	else if (dbg_current->t_cpu &&
+	         dbg_current->t_cpu->c_current == dbg_current) {
+		cpuid_t cpuid;
+		struct x86_dbg_cpuammend *ammend;
+		/* The current thread of a different CPU. */
+		cpuid  = dbg_current->t_cpu->c_id;
+		assert(cpuid < COMPILER_LENOF(x86_dbg_hostbackup.dhs_cpus));
+		ammend = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_iammend;
+		assert(ammend);
+		assert(ammend->dca_cpu == dbg_current->t_cpu);
+		assert(ammend->dca_thread == dbg_current);
+		*presult = ammend->dca_kgsbase;
+		return true;
+	}
+#endif /* !CONFIG_NO_SMP */
+	return false;
+}
+PRIVATE ATTR_DBGTEXT bool
+NOTHROW(KCALL set_dbg_current_kernel_gs_base)(u64 value) {
+	if (!x86_dbg_viewthread)
+		return false;
+	if (dbg_current == THIS_TASK) {
+		/* Assign registers to the trap state, and let
+		 * undefined registers ripple down to the exit state. */
+		x86_dbg_exitstate.de_kernel_gsbase = value;
+		return true;
+	}
+#ifndef CONFIG_NO_SMP
+	else if (dbg_current->t_cpu &&
+	         dbg_current->t_cpu->c_current == dbg_current) {
+		cpuid_t cpuid;
+		struct x86_dbg_cpuammend *ammend;
+		/* The current thread of a different CPU. */
+		cpuid  = dbg_current->t_cpu->c_id;
+		assert(cpuid < COMPILER_LENOF(x86_dbg_hostbackup.dhs_cpus));
+		ammend = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_iammend;
+		assert(ammend);
+		assert(ammend->dca_cpu == dbg_current->t_cpu);
+		assert(ammend->dca_thread == dbg_current);
+		ammend->dca_kgsbase = value;
+		return true;
+	}
+#endif /* !CONFIG_NO_SMP */
+	return false;
+}
+#endif /* __x86_64__ */
 
 /* Write the contents of `x86_dbg_origstate', into the
  * state to-be loaded by `x86_dbg_viewthread' */
@@ -279,12 +345,12 @@ nocpu:
 		{
 			/* The target thread is running on our own CPU.
 			 * -> Use registers from `x86_dbg_exitstate' */
-			x86_dbg_exitstate.fcs_sgregs.sg_tr  = x86_dbg_origstate.fcs_sgregs.sg_tr16;
-			x86_dbg_exitstate.fcs_sgregs.sg_ldt = x86_dbg_origstate.fcs_sgregs.sg_ldt16;
-			x86_dbg_exitstate.fcs_coregs        = x86_dbg_origstate.fcs_coregs;
-			x86_dbg_exitstate.fcs_drregs        = x86_dbg_origstate.fcs_drregs;
-			x86_dbg_exitstate.fcs_gdt           = x86_dbg_origstate.fcs_gdt;
-			x86_dbg_exitstate.fcs_idt           = x86_dbg_origstate.fcs_idt;
+			x86_dbg_exitstate.de_state.fcs_sgregs.sg_tr  = x86_dbg_origstate.fcs_sgregs.sg_tr16;
+			x86_dbg_exitstate.de_state.fcs_sgregs.sg_ldt = x86_dbg_origstate.fcs_sgregs.sg_ldt16;
+			x86_dbg_exitstate.de_state.fcs_coregs        = x86_dbg_origstate.fcs_coregs;
+			x86_dbg_exitstate.de_state.fcs_drregs        = x86_dbg_origstate.fcs_drregs;
+			x86_dbg_exitstate.de_state.fcs_gdt           = x86_dbg_origstate.fcs_gdt;
+			x86_dbg_exitstate.de_state.fcs_idt           = x86_dbg_origstate.fcs_idt;
 		}
 
 	}
@@ -432,22 +498,22 @@ nocpu:
 					 * Fill in generic register information. */
 					x86_dbg_origstate.fcs_sgregs.sg_tr  = SEGMENT_CPU_TSS;
 					x86_dbg_origstate.fcs_sgregs.sg_ldt = SEGMENT_CPU_LDT;
-					x86_dbg_origstate.fcs_coregs        = x86_dbg_exitstate.fcs_coregs;
-					x86_dbg_origstate.fcs_drregs        = x86_dbg_exitstate.fcs_drregs;
-					x86_dbg_origstate.fcs_gdt           = x86_dbg_exitstate.fcs_gdt;
-					x86_dbg_origstate.fcs_idt           = x86_dbg_exitstate.fcs_idt;
+					x86_dbg_origstate.fcs_coregs        = x86_dbg_exitstate.de_state.fcs_coregs;
+					x86_dbg_origstate.fcs_drregs        = x86_dbg_exitstate.de_state.fcs_drregs;
+					x86_dbg_origstate.fcs_gdt           = x86_dbg_exitstate.de_state.fcs_gdt;
+					x86_dbg_origstate.fcs_idt           = x86_dbg_exitstate.de_state.fcs_idt;
 				}
 			} else
 #endif /* !CONFIG_NO_SMP */
 			{
 				/* The target thread is running on our own CPU.
 				 * -> Use registers from `x86_dbg_exitstate' */
-				x86_dbg_origstate.fcs_sgregs.sg_tr  = x86_dbg_exitstate.fcs_sgregs.sg_tr16;
-				x86_dbg_origstate.fcs_sgregs.sg_ldt = x86_dbg_exitstate.fcs_sgregs.sg_ldt16;
-				x86_dbg_origstate.fcs_coregs        = x86_dbg_exitstate.fcs_coregs;
-				x86_dbg_origstate.fcs_drregs        = x86_dbg_exitstate.fcs_drregs;
-				x86_dbg_origstate.fcs_gdt           = x86_dbg_exitstate.fcs_gdt;
-				x86_dbg_origstate.fcs_idt           = x86_dbg_exitstate.fcs_idt;
+				x86_dbg_origstate.fcs_sgregs.sg_tr  = x86_dbg_exitstate.de_state.fcs_sgregs.sg_tr16;
+				x86_dbg_origstate.fcs_sgregs.sg_ldt = x86_dbg_exitstate.de_state.fcs_sgregs.sg_ldt16;
+				x86_dbg_origstate.fcs_coregs        = x86_dbg_exitstate.de_state.fcs_coregs;
+				x86_dbg_origstate.fcs_drregs        = x86_dbg_exitstate.de_state.fcs_drregs;
+				x86_dbg_origstate.fcs_gdt           = x86_dbg_exitstate.de_state.fcs_gdt;
+				x86_dbg_origstate.fcs_idt           = x86_dbg_exitstate.de_state.fcs_idt;
 			}
 			/* Account for register overrides related to some thread-local components. */
 			if (dbg_current->t_vm) {
@@ -677,14 +743,50 @@ NOTHROW(KCALL x86_dbg_getregbyid)(unsigned int level, unsigned int regno,
 				default: break;
 				}
 			}
+#ifdef __x86_64__
+			if (regno == X86_REGISTER_MISC_KGSBASEL) {
+				if (buflen >= 4)
+					UNALIGNED_SET32(buf, (u32)x86_dbg_exitstate.de_kernel_gsbase);
+				return 4;
+			}
+			if (regno == X86_REGISTER_MISC_KGSBASEQ) {
+				if (buflen >= 8)
+					UNALIGNED_SET64(buf, (u64)x86_dbg_exitstate.de_kernel_gsbase);
+				return 8;
+			}
+#endif /* __x86_64__ */
 			/* Access the exit CPU state. */
-			return getreg(&x86_dbg_exitstate, regno, buf, buflen);
+			return getreg(&x86_dbg_exitstate.de_state, regno, buf, buflen);
 		}
 		ATTR_FALLTHROUGH
 	case DBG_REGLEVEL_ORIG:
 	case DBG_REGLEVEL_VIEW:
 		loadview();
 		result = getreg(VIEWSTATE(level), regno, buf, buflen);
+#ifdef __x86_64__
+		if (/*level == DBG_REGLEVEL_ORIG &&*/ result == 0) {
+			if (regno == X86_REGISTER_MISC_KGSBASEL) {
+				u64 temp;
+				result = 0;
+				if (get_dbg_current_kernel_gs_base(&temp)) {
+					result = 4;
+					if (buflen >= 4)
+						UNALIGNED_SET32(buf, temp);
+				}
+				goto ok;
+			}
+			if (regno == X86_REGISTER_MISC_KGSBASEQ) {
+				u64 temp;
+				result = 0;
+				if (get_dbg_current_kernel_gs_base(&temp)) {
+					result = 8;
+					if (buflen >= 8)
+						UNALIGNED_SET32(buf, temp);
+				}
+				goto ok;
+			}
+		}
+#endif /* __x86_64__ */
 		goto ok;
 
 	default:
@@ -756,8 +858,20 @@ NOTHROW(KCALL x86_dbg_setregbyid)(unsigned int level, unsigned int regno,
 				default: break;
 				}
 			}
+#ifdef __x86_64__
+			if (regno == X86_REGISTER_MISC_KGSBASEL) {
+				if (buflen >= 4)
+					x86_dbg_exitstate.de_kernel_gsbase = UNALIGNED_GET32(buf);
+				return 4;
+			}
+			if (regno == X86_REGISTER_MISC_KGSBASEQ) {
+				if (buflen >= 8)
+					x86_dbg_exitstate.de_kernel_gsbase = UNALIGNED_GET64(buf);
+				return 8;
+			}
+#endif /* __x86_64__ */
 			/* Access the exit CPU state. */
-			return setreg(&x86_dbg_exitstate, regno, buf, buflen);
+			return setreg(&x86_dbg_exitstate.de_state, regno, buf, buflen);
 		}
 		ATTR_FALLTHROUGH
 	case DBG_REGLEVEL_ORIG:
@@ -766,6 +880,34 @@ NOTHROW(KCALL x86_dbg_setregbyid)(unsigned int level, unsigned int regno,
 		result = setreg(VIEWSTATE(level), regno, buf, buflen);
 		if (level == DBG_REGLEVEL_ORIG && result != 0)
 			saveorig();
+#ifdef __x86_64__
+		else if (level == DBG_REGLEVEL_ORIG && result == 0) {
+			if (regno == X86_REGISTER_MISC_KGSBASEL) {
+				result = 4;
+				if (buflen >= 4) {
+					if (!set_dbg_current_kernel_gs_base(UNALIGNED_GET32(buf)))
+						result = 0;
+				} else {
+					u64 temp;
+					if (!get_dbg_current_kernel_gs_base(&temp))
+						result = 0;
+				}
+				goto ok;
+			}
+			if (regno == X86_REGISTER_MISC_KGSBASEQ) {
+				result = 8;
+				if (buflen >= 8) {
+					if (!set_dbg_current_kernel_gs_base(UNALIGNED_GET64(buf)))
+						result = 0;
+				} else {
+					u64 temp;
+					if (!get_dbg_current_kernel_gs_base(&temp))
+						result = 0;
+				}
+				goto ok;
+			}
+		}
+#endif /* __x86_64__ */
 		goto ok;
 
 	default:

@@ -105,26 +105,27 @@ struct task;
 struct x86_dbg_cpuammend {
 	struct cpu    *dca_cpu;       /* [1..1][const] The associated CPU (same as `cpu_vector[INDEXOF(this in dhs_cpus)]') */
 	struct task   *dca_thread;    /* [1..1][const] The associated thread (same as `cpu_vector[INDEXOF(this in dhs_cpus)]->c_current') */
-	struct coregs  dca_coregs;    /* Control registers. */
-	struct drregs  dca_drregs;    /* Debug registers. */
+	struct coregs  dca_coregs;    /* Control registers */
+	struct drregs  dca_drregs;    /* Debug registers */
 #ifdef __x86_64__
 	struct sgregs  dca_sgregs;    /* Saved segment registers */
-	struct sgbase  dca_sgbase;    /* Saved segment base register values. */
+	struct sgbase  dca_sgbase;    /* Saved segment base register values */
+	u64            dca_kgsbase;   /* Saved %kernel_gs.base */
 #else /* __x86_64__ */
-	u16            dca_gs;        /* Saved %gs. */
-	u16            dca_ss;        /* Saved %ss. */
+	u16            dca_gs;        /* Saved %gs */
+	u16            dca_ss;        /* Saved %ss */
 #endif /* !__x86_64__ */
-	u16            dca_tr;        /* Saved %tr. */
-	u16            dca_ldt;       /* Saved %ldtr. */
-	struct desctab dca_idt;       /* Saved IDT descriptor table. */
-	struct desctab dca_gdt;       /* Saved GDT descriptor table. */
+	u16            dca_tr;        /* Saved %tr */
+	u16            dca_ldt;       /* Saved %ldt. */
+	struct desctab dca_idt;       /* Saved IDT descriptor table */
+	struct desctab dca_gdt;       /* Saved GDT descriptor table */
 	struct task   *dca_override;  /* [0..1] Saved `c_override' of this CPU */
 	uintptr_t      dca_taskflags; /* Saved `dca_thread->t_flags' */
-	bool           dca_pint;      /* Set to true if preemptive interrupts were enabled. */
+	bool           dca_pint;      /* Set to true if preemptive interrupts were enabled */
 };
 struct x86_dbg_cpustate {
 	struct icpustate         *dcs_istate;   /* [0..1] Saved `icpustate' of this CPU */
-	struct x86_dbg_cpuammend *dcs_iammend;  /* [valid_if(dcs_istate)] CPU state ammendment of this CPU. */
+	struct x86_dbg_cpuammend *dcs_iammend;  /* [valid_if(dcs_istate)] CPU state amendment of this CPU */
 };
 #endif /* !CONFIG_NO_SMP */
 struct x86_dbg_psp0threadstate {
@@ -169,7 +170,22 @@ DATDEF unsigned int x86_dbg_trapstatekind;
 
 
 /* The CPU state that gets loaded when `dbg_exit()' is called. */
-DATDEF struct fcpustate x86_dbg_exitstate;
+struct x86_dbg_exitstate_struct {
+	struct fcpustate de_state;         /* Full CPU state */
+#ifdef __x86_64__
+	u64              de_kernel_gsbase; /* The debugger exit kernel %gs.base
+	                                    * NOTE: This the %gs.base value used if the debugger returns
+	                                    *       to kernel-space. If it returns to user-space, then
+	                                    *       `de_state.fcs_sgbase.sg_gsbase' is used instead.
+	                                    * NOTE: This field should always equal `THIS_TASK', as all
+	                                    *       kernel code is allowed to assume that the %gs.base
+	                                    *       register always points to the current thread.
+	                                    * This register can be accessed as `%kernel_gs.base' in
+	                                    * expressions, and the `r' command will display it as an
+	                                    * error if it does not equal `THIS_TASK' */
+#endif /* __x86_64__ */
+};
+DATDEF struct x86_dbg_exitstate_struct x86_dbg_exitstate;
 
 
 

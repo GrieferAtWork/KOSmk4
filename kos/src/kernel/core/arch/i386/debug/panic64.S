@@ -26,6 +26,7 @@
 
 #include <asm/cfi.h>
 #include <bits/va_list-struct.h>
+#include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>
 
 .section .text.cold
@@ -54,12 +55,8 @@ PUBLIC_FUNCTION(kernel_panic_here)
 	pushq_cfi_r %r15
 	pushq_cfi_seg_r %ss, %rax
 	pushq_cfi_seg_r %cs, %rax
-	pushq_cfi_seg_r %fs.base, %rax
-	pushq_cfi_seg_r %gs.base, %rax
-	pushq_cfi_seg_r %ds, %rax
-	pushq_cfi_seg_r %es, %rax
-	pushq_cfi_r %fs
-	pushq_cfi_r %gs
+	ASM_PUSH_SGBASE_CFI_R
+	ASM_PUSH_SGREGS_CFI_R(%rax)
 
 	xorq   %rdx, %rdx /* __builtin_va_list args */
 	xorq   %rsi, %rsi /* char const *format */
@@ -95,12 +92,8 @@ PUBLIC_FUNCTION(kernel_vpanic)
 	pushq_cfi_r %r15
 	pushq_cfi_seg_r %ss, %rax
 	pushq_cfi_seg_r %cs, %rax
-	pushq_cfi_seg_r %fs.base, %rax
-	pushq_cfi_seg_r %gs.base, %rax
-	pushq_cfi_seg_r %ds, %rax
-	pushq_cfi_seg_r %es, %rax
-	pushq_cfi_r %fs
-	pushq_cfi_r %gs
+	ASM_PUSH_SGBASE_CFI_R
+	ASM_PUSH_SGREGS_CFI_R(%rax)
 
 	movq   %rsi, %rdx /* __builtin_va_list args */
 	movq   %rdi, %rsi /* char const *format */
@@ -136,12 +129,8 @@ PUBLIC_FUNCTION(kernel_panic)
 	pushq_cfi_r %r15
 	pushq_cfi_seg_r %ss, %rax
 	pushq_cfi_seg_r %cs, %rax
-	pushq_cfi_seg_r %fs.base, %rax
-	pushq_cfi_seg_r %gs.base, %rax
-	pushq_cfi_seg_r %ds, %rax
-	pushq_cfi_seg_r %es, %rax
-	pushq_cfi_r %fs
-	pushq_cfi_r %gs
+	ASM_PUSH_SGBASE_CFI_R
+	ASM_PUSH_SGREGS_CFI_R(%rax)
 
 	/* struct x86_64_va_list_reg_save_area */
 	pushq_cfi %r9

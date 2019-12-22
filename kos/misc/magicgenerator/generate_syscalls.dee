@@ -2085,7 +2085,7 @@ function generateLibcArchSyscallAssembly(
 	}
 	fp << "\n";
 	fp << "\n";
-	fp << "/* Include the system call ammendment in order to alias\n";
+	fp << "/* Include the system call amendment in order to alias\n";
 	fp << " * some exception-enabled functions onto system calls. */\n";
 	fp << "#include \"../../syscalls-ammend.S.inl\"\n";
 	fp << "\n";

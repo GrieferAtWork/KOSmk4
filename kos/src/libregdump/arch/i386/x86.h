@@ -44,6 +44,9 @@ INTDEF NONNULL((1, 2)) ssize_t CC libregdump_sgregs(struct regdump_printer *__re
 INTDEF NONNULL((1)) ssize_t CC libregdump_cs_ss(struct regdump_printer *__restrict self, uint16_t cs, uint16_t ss);
 INTDEF NONNULL((1, 2)) ssize_t CC libregdump_sgregs_with_cs_ss(struct regdump_printer *__restrict self, struct sgregs const *__restrict data, uint16_t cs, uint16_t ss);
 INTDEF NONNULL((1, 2)) ssize_t CC libregdump_sgregs_with_cs_ss_tr_ldt(struct regdump_printer *__restrict self, struct sgregs const *__restrict data, uint16_t cs, uint16_t ss, uint16_t tr, uint16_t ldt);
+#ifdef __x86_64__
+INTDEF NONNULL((1, 2)) ssize_t CC libregdump_sgbase(struct regdump_printer *__restrict self, struct sgbase const *__restrict data);
+#endif /* __x86_64__ */
 INTDEF NONNULL((1, 2)) ssize_t CC libregdump_coregs(struct regdump_printer *__restrict self, struct coregs const *__restrict data);
 INTDEF NONNULL((1)) ssize_t CC libregdump_cr0(struct regdump_printer *__restrict self, uintptr_t cr0);
 INTDEF NONNULL((1)) ssize_t CC libregdump_cr4(struct regdump_printer *__restrict self, uintptr_t cr4);

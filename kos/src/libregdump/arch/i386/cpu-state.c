@@ -71,6 +71,11 @@ libregdump_ucpustate(struct regdump_printer *__restrict self,
 	BEGIN;
 	DO(libregdump_gpregs(self, &data->ucs_gpregs));
 	DO(libregdump_sgregs_with_cs_ss(self, &data->ucs_sgregs, data->ucs_cs, data->ucs_ss));
+#ifdef __x86_64__
+	format(REGDUMP_FORMAT_INDENT);
+	DO(libregdump_sgbase(self, &data->ucs_sgbase));
+	PRINT("\n");
+#endif /* __x86_64__ */
 	format(REGDUMP_FORMAT_INDENT);
 	DO(libregdump_flags(self, ucpustate_getpflags(data)));
 	PRINT("\n");
@@ -160,7 +165,9 @@ libregdump_scpustate(struct regdump_printer *__restrict self,
 	DO(libregdump_gpregs_with_sp(self, &data->scs_gpregs, scpustate_getsp(data)));
 	DO(libregdump_ip(self, scpustate_getpc(data)));
 #ifdef __x86_64__
-	/* TODO: SGBASE */
+	format(REGDUMP_FORMAT_INDENT);
+	DO(libregdump_sgbase(self, &data->scs_sgbase));
+	PRINT("\n");
 #endif /* __x86_64__ */
 	DO(libregdump_sgregs_with_cs_ss(self, &data->scs_sgregs,
 	                                scpustate_getcs(data),
@@ -188,10 +195,12 @@ libregdump_fcpustate(struct regdump_printer *__restrict self,
 	                                       data->fcs_sgregs.sg_ss,
 	                                       data->fcs_sgregs.sg_tr,
 	                                       data->fcs_sgregs.sg_ldt));
-	format(REGDUMP_FORMAT_INDENT);
 #ifdef __x86_64__
-	/* TODO: SGBASE */
+	format(REGDUMP_FORMAT_INDENT);
+	DO(libregdump_sgbase(self, &data->fcs_sgbase));
+	PRINT("\n");
 #endif /* __x86_64__ */
+	format(REGDUMP_FORMAT_INDENT);
 	DO(libregdump_flags(self, fcpustate_getpflags(data)));
 	PRINT("\n");
 	DO(libregdump_coregs(self, &data->fcs_coregs));
@@ -220,7 +229,6 @@ libregdump_mcontext(struct regdump_printer *__restrict self,
 #endif /* !__KERNEL__ */
 
 
-/* TODO: Add support for dumping fs/gs-base registers. */
 /* TODO: Dump functions for FPU registers */
 
 

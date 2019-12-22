@@ -81,7 +81,7 @@ panic_df_dbg_main(void *cr3)
 {
 	/* Inject the correct information about the CR3 register */
 #ifndef __x86_64__
-	x86_dbg_exitstate.fcs_coregs.co_cr3 = (uintptr_t)cr3;
+	x86_dbg_exitstate.de_state.fcs_coregs.co_cr3 = (uintptr_t)cr3;
 	if (x86_dbg_viewthread == THIS_TASK) {
 		if (x86_dbg_viewstate.fcs_coregs.co_cr3 == x86_dbg_origstate.fcs_coregs.co_cr3)
 			x86_dbg_viewstate.fcs_coregs.co_cr3 = (uintptr_t)cr3;
@@ -94,7 +94,7 @@ panic_df_dbg_main(void *cr3)
 	                  "func: " DF_WHITE("%n") "\n"
 	                  "addr: " DF_WHITE("%p") "\n"
 	                  "]"),
-	           fcpustate_getpc(&x86_dbg_exitstate));
+	           fcpustate_getpc(&x86_dbg_exitstate.de_state));
 	dbg_main(0);
 }
 #endif /* CONFIG_HAVE_DEBUGGER */

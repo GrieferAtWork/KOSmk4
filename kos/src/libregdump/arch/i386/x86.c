@@ -808,6 +808,39 @@ libregdump_sgregs_with_cs_ss_tr_ldt(struct regdump_printer *__restrict self,
 	END;
 }
 
+#ifdef __x86_64__
+PRIVATE NONNULL((1)) ssize_t CC
+libregdump_do_sgbase(struct regdump_printer *__restrict self,
+                     char name, uintptr_t value) {
+	char namestr[8];
+	BEGIN;
+	format(REGDUMP_FORMAT_REGISTER_PREFIX);
+	namestr[0] = '%';
+	namestr[1] = name;
+	namestr[2] = 's';
+	namestr[3] = '.';
+	namestr[4] = 'b';
+	namestr[5] = 'a';
+	namestr[6] = 's';
+	namestr[7] = 'e';
+	print(namestr, 8);
+	format(REGDUMP_FORMAT_REGISTER_SUFFIX);
+	PRINT(" ");
+	format(REGDUMP_FORMAT_VALUE_PREFIX);
+	printf("%p", value);
+	format(REGDUMP_FORMAT_VALUE_SUFFIX);
+	END;
+}
+INTERN NONNULL((1, 2)) ssize_t CC
+libregdump_sgbase(struct regdump_printer *__restrict self,
+                  struct sgbase const *__restrict data) {
+	BEGIN;
+	DO(libregdump_do_sgbase(self, 'f', data->sg_fsbase));
+	PRINT(" ");
+	DO(libregdump_do_sgbase(self, 'g', data->sg_gsbase));
+	END;
+}
+#endif /* __x86_64__ */
 
 /* Print a segment register (id is one of { d[s], e[s], f[s], g[s], c[s], s[s], t[r], l[dt] } (pass the character that doesn't appear in brackets)) */
 INTERN NONNULL((1)) ssize_t CC
@@ -1314,6 +1347,9 @@ DEFINE_PUBLIC_ALIAS(regdump_gpregs_with_sp, libregdump_gpregs_with_sp);
 DEFINE_PUBLIC_ALIAS(regdump_sgregs, libregdump_sgregs);
 DEFINE_PUBLIC_ALIAS(regdump_sgregs_with_cs_ss, libregdump_sgregs_with_cs_ss);
 DEFINE_PUBLIC_ALIAS(regdump_sgregs_with_cs_ss_tr_ldt, libregdump_sgregs_with_cs_ss_tr_ldt);
+#ifdef __x86_64__
+DEFINE_PUBLIC_ALIAS(regdump_sgbase, libregdump_sgbase);
+#endif /* __x86_64__ */
 DEFINE_PUBLIC_ALIAS(regdump_coregs, libregdump_coregs);
 DEFINE_PUBLIC_ALIAS(regdump_cr0, libregdump_cr0);
 DEFINE_PUBLIC_ALIAS(regdump_cr4, libregdump_cr4);

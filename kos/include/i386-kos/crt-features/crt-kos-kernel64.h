@@ -1168,6 +1168,7 @@
 #define __CRT_HAVE_regdump_kcpustate 1
 #define __CRT_HAVE_regdump_lcpustate 1
 #define __CRT_HAVE_regdump_scpustate 1
+#define __CRT_HAVE_regdump_sgbase 1
 #define __CRT_HAVE_regdump_sgregs 1
 #define __CRT_HAVE_regdump_sgregs_with_cs_ss 1
 #define __CRT_HAVE_regdump_sgregs_with_cs_ss_tr_ldt 1

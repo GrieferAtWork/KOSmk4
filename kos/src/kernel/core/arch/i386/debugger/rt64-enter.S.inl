@@ -253,6 +253,11 @@ L(.Ldone_lapicid_lock):
 	strw   (x86_dbg_exitstate + OFFSET_FCPUSTATE_TR)
 	movq   $(0), (x86_dbg_exitstate + OFFSET_FCPUSTATE_LDT)
 	sldtw  (x86_dbg_exitstate + OFFSET_FCPUSTATE_LDT)
+	rdgsbaseq %rax
+	movq   %rax, (x86_dbg_exitstate + SIZEOF_FCPUSTATE) /* %kernel_gs.base */
+	rdfsbaseq %rax
+	movq   %rax, (x86_dbg_exitstate + OFFSET_FCPUSTATE_SGBASE + OFFSET_SGBASE_FSBASE)
+	rdkgsbaseq (x86_dbg_exitstate + OFFSET_FCPUSTATE_SGBASE + OFFSET_SGBASE_GSBASE)
 	movq   %cr0, %rax
 	movq   %rax, (x86_dbg_exitstate + OFFSET_FCPUSTATE_COREGS + OFFSET_COREGS_CR0)
 	movq   %cr2, %rax
