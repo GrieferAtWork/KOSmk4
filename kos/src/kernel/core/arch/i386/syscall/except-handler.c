@@ -51,6 +51,7 @@
 #include <assert.h>
 #include <signal.h>
 #include <stddef.h>
+#include <string.h>
 
 #include <librpc/rpc.h>
 
@@ -492,9 +493,11 @@ PUBLIC WUNUSED ATTR_RETNONNULL struct icpustate *FCALL
 x86_userexcept_propagate(struct icpustate *__restrict state,
                          struct rpc_syscall_info *sc_info) {
 	struct icpustate *result;
+	error_code_t code;
 
 	/* Handle special exception codes */
-	switch (PERTASK_GET(this_exception_code)) {
+	code = PERTASK_GET(this_exception_code);
+	switch (code) {
 
 	case ERROR_CODEOF(E_EXIT_PROCESS):
 		process_exit((int)PERTASK_GET(this_exception_pointers[0]));
@@ -520,6 +523,8 @@ x86_userexcept_propagate(struct icpustate *__restrict state,
 	if (sc_info != NULL) {
 		if (sc_info->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) {
 			/* System call exceptions are enabled. */
+			struct exception_info info;
+			memcpy(&info, &THIS_EXCEPTION_INFO, sizeof(info));
 			TRY {
 				/* Propagate the exception to user-space if handlers are enabled. */
 				if ((PERTASK_GET(this_user_except_handler.ueh_mode) &
@@ -534,6 +539,7 @@ x86_userexcept_propagate(struct icpustate *__restrict state,
 					goto done;
 			} EXCEPT {
 			}
+			memcpy(&THIS_EXCEPTION_INFO, &info, sizeof(info));
 			/* If the exception still cannot be handled, terminate the program. */
 			goto terminate_app;
 		}
@@ -542,19 +548,24 @@ x86_userexcept_propagate(struct icpustate *__restrict state,
 		goto done;
 	}
 
-	TRY {
-		/* Check if signal exceptions should be propagated in non-syscall scenarios. */
-		if ((PERTASK_GET(this_user_except_handler.ueh_mode) &
-		     EXCEPT_HANDLER_MODE_MASK) == EXCEPT_HANDLER_MODE_SIGHAND) {
-			result = x86_userexcept_callhandler(state, sc_info);
+	{
+		struct exception_info info;
+		memcpy(&info, &THIS_EXCEPTION_INFO, sizeof(info));
+		TRY {
+			/* Check if signal exceptions should be propagated in non-syscall scenarios. */
+			if ((PERTASK_GET(this_user_except_handler.ueh_mode) &
+			     EXCEPT_HANDLER_MODE_MASK) == EXCEPT_HANDLER_MODE_SIGHAND) {
+				result = x86_userexcept_callhandler(state, sc_info);
+				if likely(result)
+					goto done;
+			}
+			/* Deliver a signal to the calling user-space thread. */
+			result = x86_userexcept_raisesignal_from_exception(state, sc_info);
 			if likely(result)
 				goto done;
+		} EXCEPT {
 		}
-		/* Deliver a signal to the calling user-space thread. */
-		result = x86_userexcept_raisesignal_from_exception(state, sc_info);
-		if likely(result)
-			goto done;
-	} EXCEPT {
+		memcpy(&THIS_EXCEPTION_INFO, &info, sizeof(info));
 	}
 
 terminate_app:
