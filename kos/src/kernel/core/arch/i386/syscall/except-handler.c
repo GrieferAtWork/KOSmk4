@@ -538,8 +538,12 @@ x86_userexcept_propagate(struct icpustate *__restrict state,
 				if likely(result)
 					goto done;
 			} EXCEPT {
+				goto restore_exception;
 			}
-			memcpy(&THIS_EXCEPTION_INFO, &info, sizeof(info));
+			__IF0 {
+restore_exception:
+				memcpy(&THIS_EXCEPTION_INFO, &info, sizeof(info));
+			}
 			/* If the exception still cannot be handled, terminate the program. */
 			goto terminate_app;
 		}
@@ -564,8 +568,12 @@ x86_userexcept_propagate(struct icpustate *__restrict state,
 			if likely(result)
 				goto done;
 		} EXCEPT {
+			goto restore_exception;
 		}
-		memcpy(&THIS_EXCEPTION_INFO, &info, sizeof(info));
+		__IF0 {
+restore_exception:
+			memcpy(&THIS_EXCEPTION_INFO, &info, sizeof(info));
+		}
 	}
 
 terminate_app:

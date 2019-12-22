@@ -22,6 +22,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
+#include <kernel/paging.h>
 #include <kernel/syscall-properties.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
@@ -94,23 +95,24 @@ NOTHROW(FCALL rpc_syscall_info_get32_sysenter_ucpustate)(struct rpc_syscall_info
 	self->rsi_args[3] = gpregs_getpsi(&state->ucs_gpregs);
 	regcount = kernel_syscall32_regcnt(self->rsi_sysno);
 	if (regcount >= 5) {
-		struct exception_info old_info;
-		memcpy(&old_info, &THIS_EXCEPTION_INFO, sizeof(struct exception_info));
-		TRY {
-			u32 *ebp = (u32 *)(uintptr_t)(u32)gpregs_getpbp(&state->ucs_gpregs);
-			validate_readable(ebp, 4);
-			self->rsi_args[4] = __hybrid_atomic_load(ebp[0], __ATOMIC_ACQUIRE);
-			self->rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(4);
-			if (regcount >= 6) {
-				self->rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(5);
-				self->rsi_args[5] = __hybrid_atomic_load(ebp[1], __ATOMIC_ACQUIRE);
+		u32 *ebp = (u32 *)(uintptr_t)(u32)gpregs_getpbp(&state->ucs_gpregs);
+		if (ADDR_ISUSER(ebp)) {
+			struct exception_info old_info;
+			memcpy(&old_info, &THIS_EXCEPTION_INFO, sizeof(struct exception_info));
+			TRY {
+				self->rsi_args[4] = __hybrid_atomic_load(ebp[0], __ATOMIC_ACQUIRE);
+				self->rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(4);
+				if (regcount >= 6) {
+					self->rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(5);
+					self->rsi_args[5] = __hybrid_atomic_load(ebp[1], __ATOMIC_ACQUIRE);
+				}
+			} EXCEPT {
+				goto restore_exception;
 			}
-		} EXCEPT {
-			goto restore_exception;
-		}
-		__IF0 {
+			__IF0 {
 restore_exception:
-			memcpy(&THIS_EXCEPTION_INFO, &old_info, sizeof(struct exception_info));
+				memcpy(&THIS_EXCEPTION_INFO, &old_info, sizeof(struct exception_info));
+			}
 		}
 	}
 }
