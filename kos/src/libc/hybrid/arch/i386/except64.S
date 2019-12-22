@@ -419,11 +419,11 @@ IU(	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R9(%rsp), %r9)
 	jbe    .Lclear_unused_exception_pointers /* 4 */
 	/* assume(%rsi >= 5); */
 	/* Copy any remaining arguments. */
+	leaq   -4(%rsi), %rcx
 	leaq   SIZEOF_KCPUSTATE(%rsp), %rsi /* %rsi = &ptr4 */
 IK(	movq   $(this_exception_pointers), %rdi)
 IK(	addq   %gs:0, %rdi  /* %rdi = &%gs:this_exception_pointers */)
 IU(	leaq   OFFSET_EXCEPTION_INFO_POINTERS(%rax), %rdi /* %rdi = &libc_error_info()->ei_pointers */)
-	leaq   -4(%rsi), %rcx
 	rep;   movsq
 #endif /* EXCEPTION_DATA_POINTERS >= 5 */
 .Lclear_unused_exception_pointers:
