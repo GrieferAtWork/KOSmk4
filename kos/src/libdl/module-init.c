@@ -391,11 +391,6 @@ done_dynamic:
 				self->dm_jmpsize   = jmp_size;
 #endif /* !ELF_ARCH_LAZYINDX */
 				self->dm_flags    |= RTLD_JMPRELA;
-				if ((ElfW(Rela) *)jmp_base == rela_base) {
-					size_t offset = rela_count * sizeof(ElfW(Rela));
-					jmp_base = (ElfW(Rel) *)((byte_t *)jmp_base + offset);
-					jmp_size -= offset;
-				}
 				if unlikely(DlModule_ApplyRelocationsWithAddend(self, (ElfW(Rela) *)jmp_base,
 				                                                jmp_size / sizeof(ElfW(Rela)),
 				                                                flags))
@@ -423,11 +418,6 @@ done_dynamic:
 #else /* ELF_ARCH_LAZYINDX */
 				self->dm_jmpsize   = jmp_size;
 #endif /* !ELF_ARCH_LAZYINDX */
-				if (jmp_base == rel_base) {
-					size_t offset = rel_count * sizeof(ElfW(Rel));
-					jmp_base = (ElfW(Rel) *)((byte_t *)jmp_base + offset);
-					jmp_size -= offset;
-				}
 				if unlikely(DlModule_ApplyRelocations(self, jmp_base,
 				                                      jmp_size / sizeof(ElfW(Rel)),
 				                                      flags))

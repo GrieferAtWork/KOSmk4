@@ -20,6 +20,7 @@
 #define GUARD_LIBC_LIBC_ARCH_I386__LIBC_LD 1
 
 #include <hybrid/compiler.h>
+
 #include <asm/pagesize.h>
 
 /* #include <crt-features/crt-kos-sections-order.h> */
@@ -62,6 +63,10 @@ PHDRS {
 
 
 SECTIONS {
+
+	.plt : {
+		*(.plt)
+	} PHDR(text)
 
 	.text : {
 		*(.text.__x86.*)
@@ -112,9 +117,6 @@ SECTIONS {
 
 	.rel.plt : {
 		*(.rel.plt)
-		PROVIDE_HIDDEN(__rel_iplt_start = .);
-		*(.rel.iplt)
-		PROVIDE_HIDDEN(__rel_iplt_end = .);
 	} PHDR(rodata)
 
 	.tdata : {
@@ -133,6 +135,10 @@ SECTIONS {
 
 	.got.plt : {
 		*(.got.plt)
+	} PHDR(data)
+
+	.got : {
+		*(.got)
 	} PHDR(data)
 
 	.data : {
