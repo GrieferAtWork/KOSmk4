@@ -818,7 +818,7 @@ done_wakeup:
 
 
 
-typedef void /*NOTHROW*/ ((KCALL *pertask_onexit_t)(void));
+typedef void /*NOTHROW*/ (KCALL *pertask_onexit_t)(void);
 INTDEF pertask_onexit_t __kernel_pertask_onexit_start[];
 INTDEF pertask_onexit_t __kernel_pertask_onexit_end[];
 

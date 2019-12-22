@@ -45,8 +45,12 @@ fi
 TARGET_NAME="$1"
 UTILITY_NAME="$2"
 TARGET_CPUNAME="$TARGET_NAME"
+TARGET_LIBPATH="lib"
 if [ "$TARGET_CPUNAME" == "i386" ]; then
 	TARGET_CPUNAME="i686"
+fi
+if [ "$TARGET_CPUNAME" == "x86_64" ]; then
+	TARGET_LIBPATH="lib64"
 fi
 
 
@@ -360,12 +364,12 @@ case $UTILITY_NAME in
 				--bindir="/bin" \
 				--includedir="/usr/include" \
 				--sysincludepaths="/usr/include/${TARGET_NAME}-kos:/usr/include" \
-				--libpaths="/usr/lib:/lib" \
-				--crtprefix="/usr/lib" \
-				--elfinterp="/lib/libdl.so" \
+				--libpaths="/usr/$TARGET_LIBPATH:/$TARGET_LIBPATH" \
+				--crtprefix="/usr/$TARGET_LIBPATH" \
+				--elfinterp="/$TARGET_LIBPATH/libdl.so" \
 				--config-mingw32=no
 			echo 'NATIVE_DEFINES+=-DTCC_TARGET_KOS="1"' >> config.mak
-			echo 'NATIVE_DEFINES+=-DCONFIG_TCCDIR="\"/usr/lib\""' >> config.mak
+			echo 'NATIVE_DEFINES+=-DCONFIG_TCCDIR="\"/usr/$TARGET_LIBPATH\""' >> config.mak
 			cmd make cross-$TARGET_NAME $TARGET_NAME-libtcc1-usegcc=yes
 			cat > "$OPTPATH/hello-world.c" <<EOF
 /* A simple hello-world example which you can compile & run from inside of KOS:
@@ -383,9 +387,9 @@ int main() {
 EOF
 		fi
 		install_file /bin/tcc "$OPTPATH/$TARGET_NAME-tcc"
-		install_file /usr/lib/$TARGET_NAME-libtcc1.a "$OPTPATH/$TARGET_NAME-libtcc1.a"
-		install_file /usr/lib/crt0S.o "${KOS_ROOT}/bin/${TARGET_NAME}-kos/lib/crt0S.o"
-		install_file /usr/lib/crt0.o "${KOS_ROOT}/bin/${TARGET_NAME}-kos/lib/crt0.o"
+		install_file /usr/$TARGET_LIBPATH/$TARGET_NAME-libtcc1.a "$OPTPATH/$TARGET_NAME-libtcc1.a"
+		install_file /usr/$TARGET_LIBPATH/crt0S.o "${KOS_ROOT}/bin/${TARGET_NAME}-kos/$TARGET_LIBPATH/crt0S.o"
+		install_file /usr/$TARGET_LIBPATH/crt0.o "${KOS_ROOT}/bin/${TARGET_NAME}-kos/$TARGET_LIBPATH/crt0.o"
 		install_file /usr/src/hello-world.c "$OPTPATH/hello-world.c"
 		;;
 ##############################################################################
@@ -440,7 +444,7 @@ EOF
 					--datadir="/usr/share" \
 					--sysconfdir="/etc" \
 					--localstatedir="/var" \
-					--libdir="/usr/lib" \
+					--libdir="/usr/$TARGET_LIBPATH" \
 					--includedir="/usr/include" \
 					--oldincludedir="/usr/include" \
 					--infodir="/usr/share/info" \
@@ -466,11 +470,11 @@ EOF
 			cmd make -j $MAKE_PARALLEL_COUNT
 		fi
 		install_ncurses_library() {
-			install_file /lib/${1}.so.$NCURSES_VERISON_MAJOR "$OPTPATH/lib/${1}.so.$NCURSES_VERISON"
-			install_symlink /lib/${1}.so.$NCURSES_VERISON ${1}.so.$NCURSES_VERISON_MAJOR
-			install_symlink /lib/${1}.so ${1}.so.$NCURSES_VERISON_MAJOR
-			install_file_nodisk /lib/${1}.a "$OPTPATH/lib/${1}.a"
-			install_file_nodisk /lib/${1}_g.a "$OPTPATH/lib/${1}_g.a"
+			install_file /$TARGET_LIBPATH/${1}.so.$NCURSES_VERISON_MAJOR "$OPTPATH/lib/${1}.so.$NCURSES_VERISON"
+			install_symlink /$TARGET_LIBPATH/${1}.so.$NCURSES_VERISON ${1}.so.$NCURSES_VERISON_MAJOR
+			install_symlink /$TARGET_LIBPATH/${1}.so ${1}.so.$NCURSES_VERISON_MAJOR
+			install_file_nodisk /$TARGET_LIBPATH/${1}.a "$OPTPATH/lib/${1}.a"
+			install_file_nodisk /$TARGET_LIBPATH/${1}_g.a "$OPTPATH/lib/${1}_g.a"
 		}
 		install_ncurses_library libform
 		install_ncurses_library libmenu
@@ -534,7 +538,7 @@ EOF
 					--datadir="/usr/share" \
 					--sysconfdir="/etc" \
 					--localstatedir="/var" \
-					--libdir="/usr/lib" \
+					--libdir="/usr/$TARGET_LIBPATH" \
 					--includedir="/usr/include" \
 					--oldincludedir="/usr/include" \
 					--infodir="/usr/share/info" \
@@ -578,8 +582,8 @@ EOF
 					--cross-prefix="$CROSS_PREFIX" \
 					--config-exe-extension="" \
 					--config-dll-extension=".so" \
-					--with-deemon-home="/usr/lib/deemon" \
-					--with-deemon-path="/usr/lib/deemon" \
+					--with-deemon-home="/usr/$TARGET_LIBPATH/deemon" \
+					--with-deemon-path="/usr/$TARGET_LIBPATH/deemon" \
 					--config-pthread=""
 			fi
 			cmd cd "$OPTPATH"
@@ -588,15 +592,15 @@ EOF
 		install_file /bin/deemon "$OPTPATH/deemon"
 		# install dex modules
 		for filename in $OPTPATH/lib/*.so; do
-			install_file "/usr/lib/deemon/$(basename -- "$filename")" "$filename"
+			install_file "/usr/$TARGET_LIBPATH/deemon/$(basename -- "$filename")" "$filename"
 		done
 		# install user-code modules
 		for filename in $SRCPATH/lib/*.dee; do
-			install_file "/usr/lib/deemon/$(basename -- "$filename")" "$filename"
+			install_file "/usr/$TARGET_LIBPATH/deemon/$(basename -- "$filename")" "$filename"
 		done
 		for folder in _codecs net python rt; do
 			for filename in $SRCPATH/lib/$folder/*.dee; do
-				install_file "/usr/lib/deemon/$folder/$(basename -- "$filename")" "$filename"
+				install_file "/usr/$TARGET_LIBPATH/deemon/$folder/$(basename -- "$filename")" "$filename"
 			done
 		done
 		;;
@@ -632,8 +636,8 @@ EOF
 				cmd bash ../../../src/zlib-$ZLIB_VERISON/configure \
 					--prefix=/ \
 					--eprefix=/ \
-					--libdir=/lib \
-					--sharedlibdir=/lib \
+					--libdir=/$TARGET_LIBPATH \
+					--sharedlibdir=/$TARGET_LIBPATH \
 					--includedir=/usr/include \
 					--enable-shared
 			fi
@@ -649,10 +653,10 @@ EOF
 		install_header "$OPTPATH/zconf.h" "zconf.h"
 		install_header "$SRCPATH/zlib.h"  "zlib.h"
 		# Install libraries
-		install_file /lib/libz.so.$ZLIB_VERISON_MAJOR "$OPTPATH/libz.so.$ZLIB_VERISON"
-		install_symlink /lib/libz.so.$ZLIB_VERISON libz.so.$ZLIB_VERISON_MAJOR
-		install_symlink /lib/libz.so libz.so.$ZLIB_VERISON_MAJOR
-		install_file_nodisk /lib/libz.a "$OPTPATH/libz.a"
+		install_file /$TARGET_LIBPATH/libz.so.$ZLIB_VERISON_MAJOR "$OPTPATH/libz.so.$ZLIB_VERISON"
+		install_symlink /$TARGET_LIBPATH/libz.so.$ZLIB_VERISON libz.so.$ZLIB_VERISON_MAJOR
+		install_symlink /$TARGET_LIBPATH/libz.so libz.so.$ZLIB_VERISON_MAJOR
+		install_file_nodisk /$TARGET_LIBPATH/libz.a "$OPTPATH/libz.a"
 		;;
 ##############################################################################
 
@@ -700,7 +704,7 @@ EOF
 					--libexecdir="/usr/libexec" \
 					--sharedstatedir="/usr/com" \
 					--localstatedir="/usr/var" \
-					--libdir="/lib" \
+					--libdir="/$TARGET_LIBPATH" \
 					--includedir="/usr/include" \
 					--oldincludedir="/usr/include" \
 					--datarootdir="/usr/share" \
@@ -731,12 +735,12 @@ EOF
 		# Install the python core
 		install_file /bin/python "$PYTHON_EXE"
 		PYTHON_LIB="libpython${PYTHON_VERISON_MAJOR}.${PYTHON_VERISON_MINOR}"
-		install_file /lib/${PYTHON_LIB}.so.1.0 "$OPTPATH/${PYTHON_LIB}.so.1.0"
-		install_symlink /lib/${PYTHON_LIB}.so ${PYTHON_LIB}.so.1.0
-		install_file_nodisk /lib/${PYTHON_LIB}.a "$OPTPATH/${PYTHON_LIB}.a"
+		install_file /$TARGET_LIBPATH/${PYTHON_LIB}.so.1.0 "$OPTPATH/${PYTHON_LIB}.so.1.0"
+		install_symlink /$TARGET_LIBPATH/${PYTHON_LIB}.so ${PYTHON_LIB}.so.1.0
+		install_file_nodisk /$TARGET_LIBPATH/${PYTHON_LIB}.a "$OPTPATH/${PYTHON_LIB}.a"
 		# Install modules under `/lib/python2.7/[os.py...]'
-		install_path_hardcopy /lib/python${PYTHON_VERISON_MAJOR}.${PYTHON_VERISON_MINOR} "${SRCPATH}/Lib"
-		install_path /lib/python${PYTHON_VERISON_MAJOR}.${PYTHON_VERISON_MINOR}/lib-dynload "${OPTPATH}/build/lib.linux2-${TARGET_NAME}-${PYTHON_VERISON_MAJOR}.${PYTHON_VERISON_MINOR}"
+		install_path_hardcopy /$TARGET_LIBPATH/python${PYTHON_VERISON_MAJOR}.${PYTHON_VERISON_MINOR} "${SRCPATH}/Lib"
+		install_path /$TARGET_LIBPATH/python${PYTHON_VERISON_MAJOR}.${PYTHON_VERISON_MINOR}/lib-dynload "${OPTPATH}/build/lib.linux2-${TARGET_NAME}-${PYTHON_VERISON_MAJOR}.${PYTHON_VERISON_MINOR}"
 		;;
 ##############################################################################
 
