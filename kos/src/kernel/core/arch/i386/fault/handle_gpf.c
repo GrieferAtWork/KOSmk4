@@ -31,6 +31,7 @@
 #include <kernel/user.h>
 #include <sched/cpu.h>
 #include <sched/except-handler.h>
+#include <sched/pid.h>
 #include <sched/task.h>
 
 #include <asm/cpu-flags.h>
@@ -445,13 +446,16 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 
 			case 0xa0:  /* MOV AL,moffs8* */
 				nc_addr = *(u8 *)pc;
+				pc += 1;
 				nc_addr += x86_decode_segmentbase(state, flags);
 				goto noncanon_read;
 			case 0xa1: /* MOV AX,moffs16*; MOV EAX,moffs32*; MOV RAX,moffs64* */
 				if (flags & F_AD64) {
 					nc_addr = *(u64 *)pc;
+					pc += 8;
 				} else {
 					nc_addr = *(u32 *)pc;
+					pc += 4;
 				}
 				nc_addr += x86_decode_segmentbase(state, flags);
 				goto noncanon_read;
@@ -486,13 +490,16 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 
 			case 0xa2: /* MOV moffs8*,AL */
 				nc_addr = *(u8 *)pc;
+				pc += 1;
 				nc_addr += x86_decode_segmentbase(state, flags);
 				goto noncanon_write;
 			case 0xa3: /* MOV moffs16*,AX; MOV moffs32*,EAX; MOV moffs64*,RAX */
 				if (flags & F_AD64) {
 					nc_addr = *(u64 *)pc;
+					pc += 8;
 				} else {
 					nc_addr = *(u32 *)pc;
+					pc += 4;
 				}
 				nc_addr += x86_decode_segmentbase(state, flags);
 				goto noncanon_write;
@@ -554,6 +561,10 @@ do_noncanon:
 				}
 				for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
 					PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
+#if 1
+				printk(KERN_DEBUG "Segmentation fault at %p [pc=%p,%p] [#GPF] [pid=%u]\n",
+				       nc_addr, old_pc, pc, (unsigned int)task_getroottid_s());
+#endif
 				goto unwind_state;
 			}
 done_noncanon_check:
