@@ -680,21 +680,16 @@ INTERN_FUNCTION(x86_smp_entry32)
 #endif /* !CONFIG_NO_FPU */
 
 	/* (Partially) load the underlying CPU state */
-	popq_cfi_r %gs
-	popq_cfi_r %fs
-	popq_cfi_seg_r %es, %rax
-	popq_cfi_seg_r %ds, %rax
+	ASM_POP_SGREGS_CFI_R(%rax)
+	ASM_POP_SGBASE_CFI_R
 	wrgsbaseq R_TASK
-	popq_cfi_kernel_gs_base
-	popq_cfi_seg_r %fs.base, %rax
 
 	/* Service pending IPIs for the first time.
 	 * -> Since we got here thanks to an INIT IPI, regular IPI callbacks
 	 *    would not have generated their IPI interrupt, meaning we have
 	 *    to manually check for callbacks this one time.
 	 * NOTE: Since `x86_serve_ipi()' expects an `icpustate' structure,
-	 *       we were forced to partially unwind the CPU state so-as to
-	 *       already pre-load the `%gs' register. */
+	 *       we were forced to partially unwind the CPU state. */
 	movq   %rsp, %rdi
 	EXTERN(x86_serve_ipi)
 	call   x86_serve_ipi
