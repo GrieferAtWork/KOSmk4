@@ -71,6 +71,7 @@
 #define __has_include_next(x) 0
 #endif /* !__has_include */
 
+#ifndef __TPP_VERSION__
 #undef __has_attribute
 #define __has_attribute(x) 0
 #define __NO_has_attribute 1
@@ -86,6 +87,12 @@
 #undef __has_builtin
 #define __has_builtin(x) 0
 #define __NO_has_builtin 1
+#else /* !__TPP_VERSION__ */
+#define __NO_has_attribute 1
+#define __NO_has_declspec_attribute 1
+#define __NO_has_cpp_attribute 1
+#define __NO_has_builtin 1
+#endif /* __TPP_VERSION__ */
 
 
 #ifdef __ASSEMBLER__
