@@ -196,7 +196,7 @@ function build(reconfigure: Callable = none) {
 
 	/* Check that source generators are up-to-date. */
 	import updateAutomaticSourcesOnDemand from .kos.misc.magicgenerator.ondemand;
-	updateAutomaticSourcesOnDemand(TARGET);
+	updateAutomaticSourcesOnDemand(TARGET_ARCH, TARGET);
 
 	/* Automatically re-build changed sources */
 	if (requiredOutputWhiteList !is none) {

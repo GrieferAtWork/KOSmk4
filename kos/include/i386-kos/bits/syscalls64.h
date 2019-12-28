@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x622567dc */
+/* HASH CRC-32:0x1877dcd6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -178,7 +178,7 @@
 #define SYS_rt_sigqueueinfo        __NR_rt_sigqueueinfo        /* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfo64_struct const *uinfo) */
 #define SYS_rt_sigsuspend          __NR_rt_sigsuspend          /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
 #define SYS_sigaltstack            __NR_sigaltstack            /* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
-#define SYS_utime                  __NR_utime                  /* errno_t utime(char const *filename, struct __utimbuf32 const *times) */
+#define SYS_utime                  __NR_utime                  /* errno_t utime(char const *filename, struct utimbuf const *times) */
 #define SYS_mknod                  __NR_mknod                  /* errno_t mknod(char const *nodename, mode_t mode, dev_t dev) */
 #define SYS_uselib                 __NR_uselib                 /* errno_t uselib(char const *library) */
 #define SYS_personality            __NR_personality            /* errno_t personality(int TODO_PROTOTYPE) */

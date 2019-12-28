@@ -3111,13 +3111,13 @@ kernel_execveat(struct icpustate *__restrict state,
 			 */
 #ifdef NDEBUG
 			task_waitfor(NULL);
-#else
+#else /* NDEBUG */
 			{
 				struct sig *recv;
 				recv = task_waitfor(NULL);
 				assert(recv == &data->er_error);
 			}
-#endif
+#endif /* !NDEBUG */
 			/* We only get here if the exec() failed, in which case the reason will have
 			 * been stored in `data->er_except'. */
 			memcpy(&THIS_EXCEPTION_DATA,

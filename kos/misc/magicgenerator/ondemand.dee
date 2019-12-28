@@ -23,8 +23,9 @@ import * from deemon;
 import * from ..libmagic.libmagic;
 
 
-function doRunDeemonScript(filename: string): ipc.Process {
-	local proc = ipc.Process("deemon", [filename]);
+function doRunDeemonScript(
+		filename: string, additionalArguments: {string...} = none): ipc.Process {
+	local proc = ipc.Process("deemon", [filename, additionalArguments...]);
 	proc.start();
 	return proc;
 }
@@ -32,20 +33,21 @@ function doRunDeemonScript(filename: string): ipc.Process {
 
 
 function doRunDeemonScriptIfFilesAreOutOfDate(
-		script: string, inputs: {string...}): (string, ipc.Process) | none {
+		script: string, inputs: {string...},
+		additionalArguments: {string...} = none): (string, ipc.Process) | none {
 	assert inputs;
 	local latest = normalizePath(getLatestFilenameOf(script), false);
 	local oldestOutput = getLastModfiedTime(latest);
 	if (oldestOutput is none) {
 		print "[PRE] Running script", repr script, "because it hasn't been run, yet";
-		return (latest, doRunDeemonScript(script));
+		return (latest, doRunDeemonScript(script, additionalArguments));
 	}
 	for (local x: inputs) {
 		x = normalizePath(x, false);
 		local tm = getLastModfiedTime(x);
 		if (tm > oldestOutput) {
 			print "[PRE] Running script", repr script, "because", repr x, "was changed";
-			return (latest, doRunDeemonScript(script));
+			return (latest, doRunDeemonScript(script, additionalArguments));
 		}
 	}
 }
@@ -68,14 +70,23 @@ function runGenerateErrors(xarch_path: string): (string, ipc.Process) | none {
 	);
 }
 
-function runGenerateSyscalls(xarch_path: string, targetSuffix: string): (string, ipc.Process) | none {
-	return doRunDeemonScriptIfFilesAreOutOfDate(
+function runGenerateSyscalls(
+		xarch_path: string, TARGET_ARCH: string,
+		TARGET: Module): (string, ipc.Process) | none {
+	/* Run for all architectures if the common definitions file was changed. */
+	local result = doRunDeemonScriptIfFilesAreOutOfDate(
 		script: "kos/misc/magicgenerator/generate_syscalls.dee",
-		inputs: {
-			"kos/include/asm/syscalls.def",
-			"{}/asm/syscalls{}.def".format({ xarch_path, targetSuffix }),
-		}
+		inputs: { "kos/include/asm/syscalls.def" }
 	);
+	if (result is none) {
+		/* Only run for the current architecture if its definitions file was changed. */
+		result = doRunDeemonScriptIfFilesAreOutOfDate(
+			script: "kos/misc/magicgenerator/generate_syscalls.dee",
+			inputs: { "{}/asm/syscalls{}.def".format({ xarch_path, TARGET.SUFFIX }), },
+			additionalArguments: { TARGET_ARCH }
+		);
+	}
+	return result;
 }
 
 function runGenerateHeaders(): (string, ipc.Process) | none {
@@ -85,7 +96,7 @@ function runGenerateHeaders(): (string, ipc.Process) | none {
 	);
 }
 
-function updateAutomaticSourcesOnDemand(TARGET: Module) {
+function updateAutomaticSourcesOnDemand(TARGET_ARCH: string, TARGET: Module) {
 	local autoScripts: {(string, ipc.Process)...} = [];
 	function collect(x: (string, ipc.Process) | none) {
 		if (x !is none)
@@ -94,7 +105,7 @@ function updateAutomaticSourcesOnDemand(TARGET: Module) {
 	local xarch_path = "kos/include/{}-kos".format({ TARGET.XARCH });
 
 	collect(runGenerateErrors(xarch_path));
-	collect(runGenerateSyscalls(xarch_path, TARGET.SUFFIX));
+	collect(runGenerateSyscalls(xarch_path, TARGET_ARCH, TARGET));
 	collect(runGenerateHeaders());
 
 	while (autoScripts) {

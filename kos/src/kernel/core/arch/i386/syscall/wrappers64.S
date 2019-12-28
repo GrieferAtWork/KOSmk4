@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78201291 */
+/* HASH CRC-32:0x589d3d77 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4036,7 +4036,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sigaltstack)
 	.cfi_endproc
 END(__x86_asm64_syscall_sigaltstack)
 
-/* errno_t utime(char const *filename, struct __utimbuf32 const *times) */
+/* errno_t utime(char const *filename, struct utimbuf const *times) */
 .section .text.x86.asm64_syscall.utime
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_utime)
 	.cfi_startproc simple
@@ -12060,8 +12060,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lchown)
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzwq %cx, %rsi /* ARG1 = REG1 (16-bit) */
+	movzwq %dx, %rdx /* ARG2 = REG2 (16-bit) */
 	EXTERN(sys32_lchown)
 	call   sys32_lchown
 	popq_cfi_r %r11
@@ -12284,7 +12284,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setuid)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzwq %bx, %rdi /* ARG0 = REG0 (16-bit) */
 	EXTERN(sys32_setuid)
 	call   sys32_setuid
 	popq_cfi_r %r11
@@ -13003,7 +13003,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgid)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzwq %bx, %rdi /* ARG0 = REG0 (16-bit) */
 	EXTERN(sys32_setgid)
 	call   sys32_setgid
 	popq_cfi_r %r11
@@ -13750,8 +13750,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setreuid)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movzwq %bx, %rdi /* ARG0 = REG0 (16-bit) */
+	movzwq %cx, %rsi /* ARG1 = REG1 (16-bit) */
 	EXTERN(sys32_setreuid)
 	call   sys32_setreuid
 	popq_cfi_r %r11
@@ -13782,8 +13782,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setregid)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movzwq %bx, %rdi /* ARG0 = REG0 (16-bit) */
+	movzwq %cx, %rsi /* ARG1 = REG1 (16-bit) */
 	EXTERN(sys32_setregid)
 	call   sys32_setregid
 	popq_cfi_r %r11
@@ -14566,8 +14566,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchown)
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzwq %cx, %rsi /* ARG1 = REG1 (16-bit) */
+	movzwq %dx, %rdx /* ARG2 = REG2 (16-bit) */
 	EXTERN(sys32_fchown)
 	call   sys32_fchown
 	popq_cfi_r %r11
@@ -15950,7 +15950,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsuid)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzwq %bx, %rdi /* ARG0 = REG0 (16-bit) */
 	EXTERN(sys32_setfsuid)
 	call   sys32_setfsuid
 	popq_cfi_r %r11
@@ -15981,7 +15981,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setfsgid)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzwq %bx, %rdi /* ARG0 = REG0 (16-bit) */
 	EXTERN(sys32_setfsgid)
 	call   sys32_setfsgid
 	popq_cfi_r %r11
@@ -16784,9 +16784,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresuid)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzwq %bx, %rdi /* ARG0 = REG0 (16-bit) */
+	movzwq %cx, %rsi /* ARG1 = REG1 (16-bit) */
+	movzwq %dx, %rdx /* ARG2 = REG2 (16-bit) */
 	EXTERN(sys32_setresuid)
 	call   sys32_setresuid
 	popq_cfi_r %r11
@@ -16976,9 +16976,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setresgid)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzwq %bx, %rdi /* ARG0 = REG0 (16-bit) */
+	movzwq %cx, %rsi /* ARG1 = REG1 (16-bit) */
+	movzwq %dx, %rdx /* ARG2 = REG2 (16-bit) */
 	EXTERN(sys32_setresgid)
 	call   sys32_setresgid
 	popq_cfi_r %r11
@@ -17390,8 +17390,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chown)
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzwq %cx, %rsi /* ARG1 = REG1 (16-bit) */
+	movzwq %dx, %rdx /* ARG2 = REG2 (16-bit) */
 	EXTERN(sys32_chown)
 	call   sys32_chown
 	popq_cfi_r %r11

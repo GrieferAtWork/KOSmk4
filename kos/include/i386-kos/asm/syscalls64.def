@@ -16,6 +16,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. */
 
+/* Define type sizes */
+%[typesize(x86_64:char  = 1)]
+%[typesize(x86_64:short = 2)]
+%[typesize(x86_64:int   = 4)]
+%[typesize(x86_64:long  = 8)]
+%[typesize(x86_64:llong = 8)]
+%[typesize(x86_64:socklen_t = 4)]
+%[typesize(x86_64:uintptr_t = 8)]
+%[typesize(x86_64:uintptr_half_t = 4)]
+
+/* Define type compatibilities between x86_64 and i386 */
+%[typecompat(x86_64:__sigset_struct = *:__sigset_struct)]
+%[typecompat(x86_64:sockaddr = *:sockaddr)]
+
+
+
 /* Delete all generic definitions from include/asm/syscalls.def */
 %[clear_syscall_id_table]
 

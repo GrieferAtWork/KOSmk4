@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc7604d9 */
+/* HASH CRC-32:0x6fcca6b5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,6 +74,7 @@ struct rusage;
 struct timespec;
 struct timeval;
 struct timezone;
+struct utimbuf;
 
 #if __CRT_HAVE_SC(accept)
 __CDECLARE_SC(,__errno_t,accept,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -303,6 +304,9 @@ __CDECLARE_SC(,__errno_t,timerfd_settime,(__fd_t __ufd, __syscall_ulong_t __flag
 #if __CRT_HAVE_SC(umount)
 __CDECLARE_SC(,__errno_t,umount,(char const *__special_file),(__special_file))
 #endif /* __CRT_HAVE_SC(umount) */
+#if __CRT_HAVE_SC(utime)
+__CDECLARE_SC(,__errno_t,utime,(char const *__filename, struct utimbuf const *__times),(__filename,__times))
+#endif /* __CRT_HAVE_SC(utime) */
 #if __CRT_HAVE_SC(utimensat)
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, struct timespec const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
@@ -548,6 +552,9 @@ __CDECLARE_XSC(,__errno_t,timerfd_settime,(__fd_t __ufd, __syscall_ulong_t __fla
 #if __CRT_HAVE_XSC(umount)
 __CDECLARE_XSC(,__errno_t,umount,(char const *__special_file),(__special_file))
 #endif /* __CRT_HAVE_XSC(umount) */
+#if __CRT_HAVE_XSC(utime)
+__CDECLARE_XSC(,__errno_t,utime,(char const *__filename, struct utimbuf const *__times),(__filename,__times))
+#endif /* __CRT_HAVE_XSC(utime) */
 #if __CRT_HAVE_XSC(utimensat)
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, struct timespec const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))

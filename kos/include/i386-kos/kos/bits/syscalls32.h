@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9d7a350 */
+/* HASH CRC-32:0x76a22a34 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,6 +90,7 @@ struct __timespecx32;
 struct __timespecx32_64;
 struct __timevalx32;
 struct __timevalx32_64;
+struct __utimbuf32;
 struct __utimbuf64;
 struct debugtrap_reason32;
 struct dirent;
@@ -1003,6 +1004,9 @@ __CDECLARE_SC(,__errno_t,ulimit,(void),())
 #if __CRT_HAVE_SC(umount)
 __CDECLARE_SC(,__errno_t,umount,(char const *__special_file),(__special_file))
 #endif /* __CRT_HAVE_SC(umount) */
+#if __CRT_HAVE_SC(utime)
+__CDECLARE_SC(,__errno_t,utime,(char const *__filename, struct __utimbuf32 const *__times),(__filename,__times))
+#endif /* __CRT_HAVE_SC(utime) */
 #if __CRT_HAVE_SC(utime64)
 __CDECLARE_SC(,__errno_t,utime64,(char const *__filename, struct __utimbuf64 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_SC(utime64) */
@@ -1931,6 +1935,9 @@ __CDECLARE_XSC(,__errno_t,ulimit,(void),())
 #if __CRT_HAVE_XSC(umount)
 __CDECLARE_XSC(,__errno_t,umount,(char const *__special_file),(__special_file))
 #endif /* __CRT_HAVE_XSC(umount) */
+#if __CRT_HAVE_XSC(utime)
+__CDECLARE_XSC(,__errno_t,utime,(char const *__filename, struct __utimbuf32 const *__times),(__filename,__times))
+#endif /* __CRT_HAVE_XSC(utime) */
 #if __CRT_HAVE_XSC(utime64)
 __CDECLARE_XSC(,__errno_t,utime64,(char const *__filename, struct __utimbuf64 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_XSC(utime64) */

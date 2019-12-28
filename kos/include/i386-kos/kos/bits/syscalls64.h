@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef4fcab6 */
+/* HASH CRC-32:0x483dd728 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -94,6 +94,7 @@ struct stat;
 struct termios;
 struct timezone;
 struct ucpustate64;
+struct utimbuf;
 struct winsize;
 
 #if __CRT_HAVE_SC(accept)
@@ -757,6 +758,9 @@ __CDECLARE_SC(,__errno_t,timerfd_settime,(__fd_t __ufd, __syscall_ulong_t __flag
 #if __CRT_HAVE_SC(tuxcall)
 __CDECLARE_SC(,__errno_t,tuxcall,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(tuxcall) */
+#if __CRT_HAVE_SC(utime)
+__CDECLARE_SC(,__errno_t,utime,(char const *__filename, struct utimbuf const *__times),(__filename,__times))
+#endif /* __CRT_HAVE_SC(utime) */
 #if __CRT_HAVE_SC(utimensat)
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, struct __timespecx64 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
@@ -1444,6 +1448,9 @@ __CDECLARE_XSC(,__errno_t,timerfd_settime,(__fd_t __ufd, __syscall_ulong_t __fla
 #if __CRT_HAVE_XSC(tuxcall)
 __CDECLARE_XSC(,__errno_t,tuxcall,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(tuxcall) */
+#if __CRT_HAVE_XSC(utime)
+__CDECLARE_XSC(,__errno_t,utime,(char const *__filename, struct utimbuf const *__times),(__filename,__times))
+#endif /* __CRT_HAVE_XSC(utime) */
 #if __CRT_HAVE_XSC(utimensat)
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, struct __timespecx64 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))

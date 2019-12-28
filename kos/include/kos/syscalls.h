@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3d4d610 */
+/* HASH CRC-32:0xdafe8dae */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,6 @@
 #include <bits/sigaction.h>
 #include <bits/statfs.h>
 #include <bits/types.h>
-#include <bits/utimebuf.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/fpu-state.h>
 #include <librpc/bits/syscall-info.h>
@@ -63,7 +62,6 @@ struct __cpu_set_struct;
 struct __itimerval32;
 struct __sigset_struct;
 struct __statfs32;
-struct __utimbuf32;
 struct epoll_event;
 struct file_handle;
 struct fpustate;
@@ -806,9 +804,6 @@ __CDECLARE_SC(,__errno_t,userfaultfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #if __CRT_HAVE_SC(ustat)
 __CDECLARE_SC(,__errno_t,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__ubuf))
 #endif /* __CRT_HAVE_SC(ustat) */
-#if __CRT_HAVE_SC(utime)
-__CDECLARE_SC(,__errno_t,utime,(char const *__filename, struct __utimbuf32 const *__times),(__filename,__times))
-#endif /* __CRT_HAVE_SC(utime) */
 #if __CRT_HAVE_SC(vfork)
 __CDECLARE_SC(,__pid_t,vfork,(void),())
 #endif /* __CRT_HAVE_SC(vfork) */
@@ -1537,9 +1532,6 @@ __CDECLARE_XSC(,__errno_t,userfaultfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #if __CRT_HAVE_XSC(ustat)
 __CDECLARE_XSC(,__errno_t,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__ubuf))
 #endif /* __CRT_HAVE_XSC(ustat) */
-#if __CRT_HAVE_XSC(utime)
-__CDECLARE_XSC(,__errno_t,utime,(char const *__filename, struct __utimbuf32 const *__times),(__filename,__times))
-#endif /* __CRT_HAVE_XSC(utime) */
 #if __CRT_HAVE_XSC(vfork)
 __CDECLARE_XSC(,__pid_t,vfork,(void),())
 #endif /* __CRT_HAVE_XSC(vfork) */

@@ -46,6 +46,9 @@ class SyscallArch {
 	@@Size of general-purpose registers used for passing system call arguments (in bits)
 	member platformGpRegisterSizeInBits: int;
 
+	@@Size of `sizeof(void *)'
+	member platformPointerSizeInBytes: int;
+
 	@@The number of registers used to pass system call arguments
 	member platformSyscallRegisterCount: int;
 
@@ -443,6 +446,18 @@ function i386_printKernelSyscallWrapper_sysenter(fp: File, f: Function, sysno: i
 /************************************************************************/
 final global x86_64SyscallArgumentRegisters = { "%rdi", "%rsi", "%rdx", "%r10", "%r8", "%r9" };
 final global x86_64SysvABIRegisters = { "%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9" };
+final global x86_64Reg8NamesOfReg32 = {
+	"%eax" : "%al", "%ecx" : "%cl",
+	"%edx" : "%dl", "%ebx" : "%bl",
+	"%esp" : "%spl", "%ebp" : "%bpl",
+	"%esi" : "%sil", "%edi" : "%dil",
+};
+final global x86_64Reg16NamesOfReg32 = {
+	"%eax" : "%ax", "%ecx" : "%cx",
+	"%edx" : "%dx", "%ebx" : "%bx",
+	"%esp" : "%sp", "%ebp" : "%bp",
+	"%esi" : "%si", "%edi" : "%di",
+};
 function x86_64_printLibcSyscallWrapperCommon(fp: File) {
 }
 
@@ -507,6 +522,17 @@ function x86_64_printKernelSyscallWrapper_asm64_syscall(fp: File, f: Function, s
 }
 
 
+function x86_64_getRegisterIndex32(reg: string): int {
+	local i = i386SyscallArgumentRegisters.find(reg);
+	if (i >= 0)
+		return i;
+	if (reg == "0(%rbp)")
+		return 4;
+	if (reg == "4(%rbp)")
+		return 5;
+	return none;
+}
+
 function x86_64_getRegisterName32(reg: string): string {
 	local i = i386SyscallArgumentRegisters.find(reg);
 	if (i >= 0)
@@ -548,7 +574,8 @@ function x86_64_formDoubleWideArgument64Ex(
 }
 
 function x86_64_assignRegister64(
-		fp: File, sysenter: bool, format: string,
+		fp: File, sysenter: bool,
+		registerSizeValues: {int...}, format: string,
 		clobber: string = none) {
 	if (sysenter) {
 		format = format
@@ -568,11 +595,30 @@ function x86_64_assignRegister64(
 			<< x86_64_getRegisterName64(b)
 			<< " */\n";
 	} else {
-		fp << "	movzlq " << b << ", " << a << " /* "
+		local regSize = 4;
+		local regI = x86_64_getRegisterIndex32(b);
+		if (regI !is none) {
+			assert regI <= #registerSizeValues;
+			regSize = registerSizeValues[regI];
+		}
+		switch (regSize) {
+		case 1:
+			fp << "	movzbq " << x86_64Reg8NamesOfReg32.get(b, b) << ", " << a;
+			break;
+		case 2:
+			fp << "	movzwq " << x86_64Reg16NamesOfReg32.get(b, b) << ", " << a;
+			break;
+		default:
+			fp << "	movzlq " << b << ", " << a;
+			break;
+		}
+		fp << " /* "
 			<< x86_64_getRegisterName64(a)
 			<< " = "
-			<< x86_64_getRegisterName32(b)
-			<< " */\n";
+			<< x86_64_getRegisterName32(b);
+		if (regSize != 4)
+			fp << " (" << (regSize * 8) << "-bit)";
+		fp << " */\n";
 	}
 }
 
@@ -591,6 +637,22 @@ function x86_64_printKernelSyscallWrapper_transformArguments(
 		for (local i: [:argumentCount])
 			if (f.args[i][0].isReg64)
 				i);
+	local registerSizeValues = Tuple([]{
+		for (local i: [:argumentCount]) {
+			if (i in doubleWideArguments) {
+				yield 4;
+				yield 4;
+				continue;
+			}
+			local temp = getSizeofCType(f.args[i][0], "i386", 4);
+			if (temp is none)
+				temp = 4;
+			if (temp !in [1, 2, 4])
+				temp = 4;
+			yield temp;
+		}
+	}());
+	assert #registerSizeValues == registerCount;
 	if (sysenter && registerCount > 4) {
 		fp << "	movzlq %ebp, %rbp\n"; /*  */
 		/* NOTE: By zero-extending the user-space EBP, we already
@@ -600,7 +662,7 @@ function x86_64_printKernelSyscallWrapper_transformArguments(
 		/*fp << "	cmpq   $(0), %rbp\n";
 		fp << "	jl     __asm32_bad_sysenter_extension\n";*/
 	}
-#define R(...) x86_64_assignRegister64(fp, sysenter, __VA_ARGS__)
+#define R(...) x86_64_assignRegister64(fp, sysenter, registerSizeValues, __VA_ARGS__)
 	switch (registerCount) {
 	case 0:
 		assert argumentCount == 0;
@@ -1042,6 +1104,7 @@ global ARCH: {string: SyscallArch} = {
 		platformArch: "i386",
 		platformSuffix: "32",
 		platformGpRegisterSizeInBits: 32,
+		platformPointerSizeInBytes: 4,
 		platformSyscallRegisterCount: 6,
 		platformEndian: "le",
 		platformSyscallTableCount: 2,
@@ -1060,9 +1123,25 @@ global ARCH: {string: SyscallArch} = {
 		platformArch: "i386",
 		platformSuffix: "64",
 		platformSyscallCompatArch: {
+			/* Define a header containing a listing of all 64-bit system calls that
+			 * should also be implemented as aliases for specific 32-bit system calls.
+			 * e.g.: The declaration `DEFINE_SYSCALL0(uid_t, getuid) { ... }' should is
+			 *       expanded at compile-time to also contain the following on x86_64:
+			 *       >> DEFINE_PUBLIC_ALIAS(sys32_setuid32, sys_setuid);
+			 *       >> DEFINE_PUBLIC_ALIAS(sys32_setuid, sys_setuid);
+			 * As such, `syscall3264-compat.h' contains the following definition:
+			 * >> #define __NR3264COMPAT_setuid   (2,(setuid32, setuid))
+			 * Or in more general terms (with 2 being the number of aliases):
+			 * >> #define __NR3264COMPAT_<sys_mysyscall>   (2,(<sys32_firstalias>, <sys32_secondalias>))
+			 * NOTE: In the case of functions such as `sys32_setuid` (which take a 16-bit
+			 *       argument), the underlying system call wrapper will (usually) have already
+			 *       truncated the argument (s.a. `__x86_asm32_int80_setuid', which contains a
+			 *       line `movzwq %bx, %rdi`).
+			 */
 			("include/i386-kos/asm/syscall3264-compat.h", "__NR3264COMPAT_", "i386"),
 		},
 		platformGpRegisterSizeInBits: 64,
+		platformPointerSizeInBytes: 8,
 		platformSyscallRegisterCount: 6,
 		platformEndian: "le",
 		platformSyscallTableCount: 2,
@@ -1081,6 +1160,7 @@ global ARCH: {string: SyscallArch} = {
 //		platformName: "arm-kos",
 //		platformArch: "arm",
 //		platformGpRegisterSizeInBits: 32,
+//		platformPointerSizeInBytes: 4,
 //		platformSyscallRegisterCount: 6,
 //		platformEndian: "le",
 //		platformSyscallTableCount: 2,

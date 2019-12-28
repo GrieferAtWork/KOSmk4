@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe38cad37 */
+/* HASH CRC-32:0xb629564 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -362,7 +362,7 @@
 #define SYS_getpgrp                __NR_getpgrp                /* pid_t getpgrp(void) */
 #define SYS_pause                  __NR_pause                  /* errno_t pause(void) */
 #define SYS_time                   __NR_time                   /* time32_t time(time32_t *timer) */
-#define SYS_utime                  __NR_utime                  /* errno_t utime(char const *filename, struct __utimbuf32 const *times) */
+#define SYS_utime                  __NR_utime                  /* errno_t utime(char const *filename, struct utimbuf const *times) */
 #define SYS_creat                  __NR_creat                  /* fd_t creat(char const *filename, mode_t mode) */
 #define SYS_getdents               __NR_getdents               /* ssize_t getdents(fd_t fd, struct linux_dirent *dirp, size_t count) */
 #define SYS_futimesat              __NR_futimesat              /* errno_t futimesat(fd_t dirfd, const char *filename, struct timeval const[2] times) */

@@ -132,6 +132,16 @@ DECL_END
 #define __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(t) __PRIVATE_SYSCALL_GET_ESCAPED_TYPE2 t
 #endif /* !__PRIVATE_SYSCALL_GET_ESCAPED_TYPE */
 
+#undef __ARCH_DEFINE_SYSCALL_COMMON
+/* TODO:
+ * >> #if defined(__NR3264COMPAT_##name)
+ * >> FOREACH(compat_name: __NR3264COMPAT_##name)
+ * >>     DEFINE_PUBLIC_ALIAS(sys32_##compat_name, sys_##name);
+ * >> #endif
+ */
+#define __ARCH_DEFINE_SYSCALL_COMMON(name) /* nothing */
+
+
 #define DEFINE_SYSCALL32_0(return_type, name)                                                                      \
 	STATIC_ASSERT(__NR32AC_##name == 0);                                                                           \
 	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NR32RT_##name), return_type)); \

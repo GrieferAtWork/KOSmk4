@@ -301,6 +301,11 @@ class Function {
 	operator != (other: Function) {
 		return !(this == other);
 	}
+	operator str(): string {
+		File.Writer tempfp;
+		printPrototype(tempfp);
+		return tempfp.string;
+	}
 
 	@@Function name
 	member name: string;
@@ -430,6 +435,21 @@ class ParserContext {
 
 @@Avaialble mappings for automatic type->str conversion
 global syscallTostrExpressions: {string: string} = Dict();
+
+@@Mapping for @{(aArchTypename: {(aArchName, bArchName, bArchTypename)...}}
+@@Note that @(aArchName <= bArchName)
+global xArchBinaryTypeCompatibilities:
+	{string: HashSet with (string, string, string)} = Dict();
+
+@@Mapping for @{typename: {archName: int}}
+global xArchTypeSizes: {string: {string: int}} = Dict();
+
+@@Mapping for @{functionName: {functionNames...}}
+@@Maps any grouped function name to a set of all function names (including the
+@@original group name) that do share functionality, and may share binary compatibility
+@@and should therefor be checked if binary compatibility is present as well.
+global possiblyCompatibleFunctionGroups: {string: HashSet with string} = Dict();
+
 
 final local BOOL_MAP = {
 	""      : true,
@@ -605,12 +625,275 @@ function parseTypeExpression(
 	return (returnType, returnName, i);
 }
 
+function parseTypeCompatTypeList(text: string, start: int): (int, {string...} | none) {
+	local textLen = #text;
+	if (text.issymstrt(start)) {
+		local nameEnd = start + 1;
+		while (nameEnd < textLen && text.issymcont(nameEnd))
+			++nameEnd;
+		return (nameEnd, { text[start:nameEnd] });
+	}
+	if (text[start] != "[")
+		return (start, none);
+	local result: {string...} = HashSet();
+	++start;
+	while (start < textLen) {
+		while (start < textLen && text.isspace(start))
+			++start;
+		if (start >= textLen)
+			break;
+		if (text[start] == "]")
+			break;
+		if (!text.issymstrt(start))
+			return (start, none);
+		local typenameStart = start;
+		++start;
+		while (start < textLen && text.issymcont(start))
+			++start;
+		result.insert(text[typenameStart:start]);
+		while (start < textLen && text.isspace(start))
+			++start;
+		if (text[start] != ",")
+			break;
+		++start;
+	}
+	if (text[start] != "]")
+		return (start, none);
+	++start;
+	return (start, result);
+}
+
+function registerXArchBinaryTypeCompatibility(
+		aArchName: string, aArchTypename: string,
+		bArchName: string, bArchTypename: string) {
+	assert aArchName <= bArchName;
+	local existCompatDefsForA: HashSet with (string, string, string);
+	local existCompatDefsForB: HashSet with (string, string, string);
+	existCompatDefsForA = xArchBinaryTypeCompatibilities.get(aArchTypename);
+	existCompatDefsForB = xArchBinaryTypeCompatibilities.get(bArchTypename);
+	local newCompatDef = (aArchName, bArchName, bArchTypename);
+	if (existCompatDefsForA !is none) {
+		if (newCompatDef in existCompatDefsForA)
+			return;
+		existCompatDefsForA.insert(newCompatDef);
+	} else {
+		existCompatDefsForA = HashSet({ newCompatDef });
+		xArchBinaryTypeCompatibilities[aArchTypename] = existCompatDefsForA;
+	}
+	for (local altAn, altBn, AltBt: existCompatDefsForB) {
+		/* altAt == bArchTypename */
+		if (altAn != bArchName)
+			continue;
+		/* Found an existing compatibility:
+		 * (bArchName,bArchTypename) <=> (altBn,AltBt) */
+		registerXArchBinaryTypeCompatibility(aArchName, aArchTypename, altBn, AltBt);
+	}
+}
+
+
+
+
+function registerXArchBinaryTypeCompatibilities(
+		aArchName: string, aArchTypeList: {string...},
+		bArchName: string, bArchTypeList: {string...}) {
+	if (aArchName == "*")
+		aArchName = "";
+	if (bArchName == "*")
+		bArchName = "";
+	if (bArchName < aArchName) {
+		local temp = bArchName;
+		bArchName = aArchName;
+		aArchName = temp;
+		local temp = aArchTypeList;
+		aArchTypeList = bArchTypeList;
+		bArchTypeList = temp;
+	} else if (aArchName == bArchName) {
+		local total = HashSet(aArchTypeList);
+		total.update(bArchTypeList);
+		aArchTypeList = total;
+		bArchTypeList = total;
+	}
+	for (local aArchTypename: aArchTypeList) {
+		for (local bArchTypename: bArchTypeList) {
+			registerXArchBinaryTypeCompatibility(
+				aArchName, aArchTypename,
+				bArchName, bArchTypename);
+		}
+	}
+}
+
+function getTypeSizeWithArch(typename: string, archName: string): int | none {
+again:
+	local typenameMap = xArchTypeSizes.get(typename);
+	local r = typenameMap.get(archName);
+	if (r is none)
+		r = typenameMap.get("");
+	if (r is string) {
+		typename = r;
+		goto again;
+	}
+	return r;
+}
+
+function areXArchTypesCompatibile(
+		aArchName: string, aArchTypename: string,
+		bArchName: string, bArchTypename: string) {
+	if (aArchName > bArchName) {
+		local temp = bArchName;
+		bArchName = aArchName;
+		aArchName = temp;
+		local temp = aArchTypename;
+		aArchTypename = bArchTypename;
+		bArchTypename = temp;
+	}
+	local compatArchList: HashSet with (string, string, string);
+	compatArchList = xArchBinaryTypeCompatibilities.get(aArchTypename);
+	if (compatArchList !is none) {
+		if ((aArchName, bArchName, bArchTypename) in compatArchList)
+			return true;
+		if ((aArchName, "", bArchTypename) in compatArchList)
+			return true;
+		if (("", bArchName, bArchTypename) in compatArchList)
+			return true;
+		if (("", "", bArchTypename) in compatArchList)
+			return true;
+	}
+	/* Fallback: Check if both types have the same size */
+	local aSize = getTypeSizeWithArch(aArchTypename, aArchName);
+	if (aSize !is none) {
+		local bSize = getTypeSizeWithArch(bArchTypename, bArchName);
+		if (bSize !is none && aSize == bSize)
+			return true;
+	}
+	return false;
+}
+
+function areCTypeNamesCompatible(
+		aTypename: string, aContext: ParserContext, aArch/*: SyscallArch*/, aArchName: string,
+		bTypename: string, bContext: ParserContext, bArch/*: SyscallArch*/, bArchName: string): bool {
+	if (!aTypename.endswith("*") && !bTypename.endswith("*")) {
+		/* Non-pointer (aka. literal) types are compatible when one of:
+		 *  - sizeof(aArchName:aTypename) >= sizeof(bArchName:bTypename)
+		 * Where `aArchName' is the ~real~ arch, and `bArchName' is the
+		 * arch for which compatibility is attempted. */
+		local aSize = getTypeSizeWithArch(aTypename, aArchName);
+		local bSize = getTypeSizeWithArch(bTypename, bArchName);
+		return aSize >= bSize;
+	}
+again:
+	if (aTypename.endswith("*") && bTypename.endswith("*")) {
+		local aBaseType = aTypename[:-1].rstrip();
+		local bBaseType = bTypename[:-1].rstrip();
+		if ("*" in aBaseType || "*" in bBaseType) {
+			if (aArch.platformPointerSizeInBytes != bArch.platformPointerSizeInBytes)
+				return false; /* Pointer-to-pointer, but different sizeof(void *) */
+		}
+		/* Check if pointed-to types are compatible */
+		if (areXArchTypesCompatibile(aArchName, aBaseType,
+		                             bArchName, bBaseType)) {
+			return true;
+		}
+		aTypename = aBaseType;
+		bTypename = bBaseType;
+		goto again;
+	}
+	return false;
+}
+
+function simpifyTypeName(x: string): string {
+	x = x.replace("const", "").replace("volatile", "")
+	     .replace("struct", "").replace("[]", "*");
+	for (;;) {
+		local r = x.replace("  ", "");
+		if (r.endswith("]"))
+			r = r[:r.rindex("[")] + "*";
+		r = r.replace(" *", "*").replace("* ", "*");
+		if (r == x)
+			break;
+		x = r;
+	}
+	return x.strip();
+}
+
+function getSizeofCType(cType: CType, archName: string, pointerSize: int): int | none {
+	local typename = simpifyTypeName(cType.typename);
+	if (typename.endswith("*"))
+		return pointerSize;
+	return getTypeSizeWithArch(typename, archName);
+}
+
+function areCTypesCompatible(
+		a: CType, aContext: ParserContext, aArch/*: SyscallArch*/, aArchName: string,
+		b: CType, bContext: ParserContext, bArch/*: SyscallArch*/, bArchName: string): bool {
+	return areCTypeNamesCompatible(
+		simpifyTypeName(a.typename), aContext, aArch, aArchName,
+		simpifyTypeName(b.typename), bContext, bArch, bArchName);
+}
+
+function areFunctionsBinaryCompatible(
+		a: Function, aContext: ParserContext, aArch/*: SyscallArch*/, aArchName: string,
+		b: Function, bContext: ParserContext, bArch/*: SyscallArch*/, bArchName: string): bool {
+	print "areFunctionsBinaryCompatible(a: ",;
+	print repr str a,;
+	print ", aArchName: ",;
+	print repr aArchName,;
+	print ", b: ",;
+	print repr str b,;
+	print ", bArchName: ",;
+	print repr bArchName,;
+	print ")";
+	if (a.isNoExcept != b.isNoExcept)
+		return false;
+	if (a.isCp != b.isCp)
+		return false;
+	if (a.isNoReturn != b.isNoReturn)
+		return false;
+	if (!areCTypesCompatible(a.returnType, aContext, aArch, aArchName,
+	                         b.returnType, bContext, bArch, bArchName))
+		return false;
+	local aArgs: {(CType, string)...} = a.args;
+	local bArgs: {(CType, string)...} = b.args;
+	if (#aArgs != #bArgs)
+		return false;
+	for (local i: [:#aArgs]) {
+		local aArgType: CType = aArgs[i][0];
+		local bArgType: CType = bArgs[i][0];
+		if (!areCTypesCompatible(aArgType, aContext, aArch, aArchName,
+		                         bArgType, bContext, bArch, bArchName))
+			return false;
+	}
+	return true;
+}
+
+function skipComments(text: string, pos: int): int {
+	if (pos + 1 < #text && text[pos] == "/") {
+		local n = text[pos + 1];
+		if (n == "*")
+			return text.index("*/", pos + 2) + 2;
+		if (n == "/")
+			return text.index("\n", pos + 2) + 1;
+	}
+	return pos;
+}
+
+function skipSpace(text: string, pos: int): int {
+	pos = skipComments(text, pos);
+	while (pos < #text && text.isspace(pos)) {
+		++pos;
+		pos = skipComments(text, pos);
+	}
+	return pos;
+}
+
+
 function parseSyscallDefs(context: ParserContext, text: string, filename: string) {
 	local i = 0;
 	local len = #text;
 	local currentFunction: Function | none = none;
 	local currentFunctionPos: int = -1;
 	local disallowFunctionOverride: HashSet with string = HashSet();
+	local currentGroup: HashSet with string = none;
+	local currentGroupPos: int = none;
 	function err(i: int, message: string) {
 		print getFilenameForLog(filename),;
 		print "(",;
@@ -708,6 +991,181 @@ function parseSyscallDefs(context: ParserContext, text: string, filename: string
 					case "mustundef": {
 						for (local x: directive_args.split(","))
 							syscallTypeMustPushMacro.insert(x.strip());
+					}	break;
+
+					case "startgroup": {
+						if (currentGroup !is none)
+							err(i, "Already within a group");
+						currentGroup = HashSet();
+						currentGroupPos = i;
+					}	break;
+
+					case "endgroup": {
+						if (currentGroup is none)
+							err(i, "Not inside of a group");
+						for (local x: currentGroup) {
+							if (x in possiblyCompatibleFunctionGroups)
+								err(i, "Function {!r} is already apart of different group {!r}"
+									.format({ x, possiblyCompatibleFunctionGroups[x] }));
+							possiblyCompatibleFunctionGroups[x] = currentGroup;
+						}
+						currentGroup = none;
+						currentGroupPos = none;
+					}	break;
+					case "group": {
+						/* Define a set of function names to share identical semantics,
+						 * such that binary compatibility ~may~ be possible. */
+						local group = HashSet(directive_args.split(",").each.strip());
+						for (local x: group) {
+							if (x in possiblyCompatibleFunctionGroups)
+								err(i, "Function {!r} is already apart of different group {!r}"
+									.format({ x, possiblyCompatibleFunctionGroups[x] }));
+							possiblyCompatibleFunctionGroups[x] = group;
+						}
+					}	break;
+
+					case "typecompat": {
+						/* in i386-kos/asm/syscalls32.def:
+						 * >> %[typecompat(i386:time64_t = x86_64:[time32_t,time64_t])]
+						 * Syntax:
+						 *  TYPELIST ::= (typename | ('[' ',' ~~ typename... ']'))
+						 *  ',' ~~ (aArchName ':' TYPELIST '=' bArchName ':' TYPELIST)...
+						 */
+						local j = 0;
+						local dlen = #directive_args;
+						while (j < dlen) {
+							j = skipSpace(directive_args, j);
+							if (j >= dlen)
+								break;
+							local aArchNameStart = j;
+							if (!directive_args.issymstrt(j) && directive_args[j] != "*")
+								err(i + j, "Expected aArchName after %[typecompat(, but got {!r}"
+									.format({ directive_args[j] }));
+							++j;
+							while (j < dlen && directive_args.issymcont(j))
+								++j;
+							local aArchName = directive_args[aArchNameStart:j];
+							j = skipSpace(directive_args, j);
+							if (j >= dlen || directive_args[j] != ":")
+								err(i + j, "Expected ':' after aArchName, but got {!r}"
+									.format({ directive_args.substr(j, j + 1) }));
+							++j;
+							j = skipSpace(directive_args, j);
+							local aArchTypeList: {string...};
+							j, aArchTypeList = parseTypeCompatTypeList(directive_args, j)...;
+							if (aArchTypeList is none)
+								err(i + j, "Expected 'aArchTypeList', but got {!r}"
+									.format({ directive_args.substr(j) }));
+							j = skipSpace(directive_args, j);
+							if (j >= dlen || directive_args[j] != "=")
+								err(i + j, "Expected '=' after aArchTypeList, but got {!r}"
+									.format({ directive_args.substr(j, j + 1) }));
+							++j;
+							j = skipSpace(directive_args, j);
+							if (j >= dlen || (!directive_args.issymstrt(j) && directive_args[j] != "*"))
+								err(i + j, "Expected bArchName after `%[typecompat({}:{} =' but got {!r}"
+									.format({ aArchName, List(aArchTypeList), directive_args.substr(j, j + 1) }));
+							local bArchNameStart = j;
+							++j;
+							while (j < dlen && directive_args.issymcont(j))
+								++j;
+							local bArchName = directive_args[bArchNameStart:j];
+							j = skipSpace(directive_args, j);
+							if (j >= dlen || directive_args[j] != ":")
+								err(i + j, "Expected ':' after bArchName, but got {!r}"
+									.format({ directive_args.substr(j, j + 1) }));
+							++j;
+							j = skipSpace(directive_args, j);
+							local bArchTypeList: {string...};
+							j, bArchTypeList = parseTypeCompatTypeList(directive_args, j)...;
+							if (bArchTypeList is none)
+								err(i + j, "Expected 'bArchTypeList', but got {!r}"
+									.format({ directive_args.substr(j) }));
+							registerXArchBinaryTypeCompatibilities(
+								aArchName, aArchTypeList, bArchName, bArchTypeList);
+							j = skipSpace(directive_args, j);
+							if (j >= dlen)
+								break;
+							if (directive_args[j] != ",")
+								err(i + j, "Expected ',' to define further type compatibilities, but got {!r}"
+									.format({ directive_args[j] }));
+							++j;
+						}
+					}	break;
+
+					case "typesize": {
+						/* in i386-kos/asm/syscalls32.def:
+						 * >> %[typesize(i386:size_t = 4)]
+						 * Syntax:
+						 *  TYPELIST ::= (typename | ('[' ',' ~~ typename... ']'))
+						 *  ',' ~~ (aArchName ':' TYPELIST '=' INTVAL)...
+						 */
+						local j = 0;
+						local dlen = #directive_args;
+						while (j < dlen) {
+							j = skipSpace(directive_args, j);
+							if (j >= dlen)
+								break;
+							local archNameStart = j;
+							if (!directive_args.issymstrt(j) && directive_args[j] != "*")
+								err(i + j, "Expected archName after %[typesize(, but got {!r}"
+									.format({ directive_args[j] }));
+							++j;
+							while (j < dlen && directive_args.issymcont(j))
+								++j;
+							local archName = directive_args[archNameStart:j];
+							j = skipSpace(directive_args, j);
+							if (j >= dlen || directive_args[j] != ":")
+								err(i + j, "Expected ':' after archName, but got {!r}"
+									.format({ directive_args.substr(j, j + 1) }));
+							++j;
+							j = skipSpace(directive_args, j);
+							local archTypeList: {string...};
+							j, archTypeList = parseTypeCompatTypeList(directive_args, j)...;
+							if (archTypeList is none)
+								err(i + j, "Expected 'archTypeList', but got {!r}"
+									.format({ directive_args.substr(j) }));
+							j = skipSpace(directive_args, j);
+							if (j >= dlen || directive_args[j] != "=")
+								err(i + j, "Expected '=' after archTypeList, but got {!r}"
+									.format({ directive_args.substr(j, j + 1) }));
+							++j;
+							j = skipSpace(directive_args, j);
+							if (j >= dlen || (!directive_args.isnumeric(j) && !directive_args.issymstrt(j)))
+								err(i + j, "Expected integer after `%[typesize({}:{} =' but got {!r}"
+									.format({ archName, List(archTypeList), directive_args.substr(j, j + 1) }));
+							local archTypeSizeStart = j;
+							++j;
+							while (j < dlen && directive_args.issymcont(j))
+								++j;
+							local archTypeSize = directive_args[archTypeSizeStart:j];
+							if (archTypeSize.isnumeric()) {
+								archTypeSize = try int(archTypeSize) catch (...) none;
+								if (archTypeSize is none)
+									err(i + j, "Malformed integer: {!r}"
+										.format({ directive_args[archTypeSizeStart:j] }));
+							}
+							local usedArchName = { "*" : "" }.get(archName, archName);
+							for (local typ: archTypeList) {
+								local archMaps = xArchTypeSizes.get(typ);
+								if (archMaps is none)
+									xArchTypeSizes[typ] = archMaps = Dict();
+								local archValue = archMaps.get(usedArchName);
+								if (archValue !is none && (
+								    type(archValue) != type(archTypeSize) || archValue != archTypeSize)) {
+									err(i + j, "Incompatible {}:sizeof({}) (was {!r}, now {!r})"
+										.format({ archName, typ, archValue, archTypeSize }));
+								}
+								archMaps[usedArchName] = archTypeSize;
+							}
+							j = skipSpace(directive_args, j);
+							if (j >= dlen)
+								break;
+							if (directive_args[j] != ",")
+								err(i + j, "Expected ',' to define further type sizes, but got {!r}"
+									.format({ directive_args[j] }));
+							++j;
+						}
 					}	break;
 
 					case "typeorg": {
@@ -950,6 +1408,7 @@ function parseSyscallDefs(context: ParserContext, text: string, filename: string
 					context.functions[currentFunction] = aliasFunc;
 					disallowFunctionOverride.insert(currentFunction);
 				}
+				currentGroup.insert(currentFunction);
 				currentFunction = none;
 				currentFunctionPos = -1;
 				++i;
@@ -1027,6 +1486,7 @@ done_argument_list:
 			print filename,;
 			print ": function:", currentFunction.name;
 			context.functions[currentFunction.name] = currentFunction;
+			currentGroup.insert(currentFunction.name);
 			disallowFunctionOverride.insert(currentFunction.name);
 			currentFunction = none;
 			currentFunctionPos = -1;
@@ -1036,6 +1496,8 @@ done_argument_list:
 	}
 	if (currentFunction !is none)
 		err(currentFunctionPos, "Unused function meta-data");
+	if (currentGroup !is none)
+		err(currentGroupPos, "Group wasn't terminated");
 }
 
 function parseSyscallDefsFile(context: ParserContext, filename: string) {
@@ -2016,7 +2478,7 @@ done:
 @@Generate src/kernel/core/arch/{name}/syscall/wrappers{suffix}.S
 function generateKernelCoreArchSyscallWrappersAssembly(
 		fp: File, context: ParserContext, arch/*: SyscallArch*/,
-		ARCH: {string: Object/*SyscallArch*/},
+		ALL_ARCH: {string: Object/*SyscallArch*/},
 		archContexts: {string: ParserContext}) {
 	local guard = arch
 		.formatPath("GUARD_KERNEL_CORE_ARCH_{arch}_SYSCALL_WRAPPERS{suffix}_S")
@@ -2030,7 +2492,7 @@ function generateKernelCoreArchSyscallWrappersAssembly(
 	arch.platformKernelSyscallWrappersCommon(fp);
 	fp << "\n";
 	for (local generator, srcArchName: arch.platformKernelSyscallWrappers) {
-		local srcArch/*: SyscallArch*/ = ARCH[srcArchName];
+		local srcArch/*: SyscallArch*/ = ALL_ARCH[srcArchName];
 		fp << "\n\n\n\n\n\n\n\n\n";
 		local srcContext = archContexts[srcArchName];
 		local srcIds = srcContext.sysidMappings.keys.sorted();
@@ -2092,50 +2554,91 @@ function generateLibcArchSyscallAssembly(
 	fp << "#endif /* " << guard << " */\n";
 }
 
+@@Enumerate the names of all functions that are allowed to be defined with binary
+@@compatibility for the given @name (so-long as they are actually binary-compatible)
+@@This function always at the very least re-yields @name itself
+function enumerateCompatibilityConsiderationFunctions(name: string): {string...} {
+	local group = possiblyCompatibleFunctionGroups.get(name);
+	if (group !is none) {
+		assert name in group;
+		yield group...;
+	} else {
+		yield name;
+	}
+}
+
 function generateSyscallCompatibilityHeader(
 		fp: File, prefix: string,
-		baseContext: ParserContext, baseArch/*: SyscallArch*/,
-		compatContext: ParserContext, compatArch/*: SyscallArch*/) {
+		baseContext: ParserContext, baseArch/*: SyscallArch*/, baseArchName: string,
+		compatContext: ParserContext, compatArch/*: SyscallArch*/, compatArchName: string) {
 	local baseFunctions = Dict(
 		for (local none, decl: baseContext.sysidMappings)
 			(decl[2], baseContext.functions[decl[2]]));
 	local compatFunctions = Dict(
 		for (local none, decl: compatContext.sysidMappings)
 			(decl[2], compatContext.functions[decl[2]]));
-	local compatFunctionNames: HashSet with string = HashSet();
+	local compatFunctionMap: {string: HashSet with string} = Dict();
 	for (local name, baseFunc: baseFunctions) {
-		local compatFunc = compatFunctions.get(name);
-		if (compatFunc is none)
-			continue;
-		if (baseFunc.returnType == compatFunc.returnType &&
-		    baseFunc.args == compatFunc.args &&
-		    baseFunc.restartMode == compatFunc.restartMode &&
-		    baseFunc.isCp == compatFunc.isCp &&
-		    baseFunc.isNoReturn == compatFunc.isNoReturn &&
-		    baseFunc.isNoExcept == compatFunc.isNoExcept)
-			compatFunctionNames.insert(name);
+		local compatNames = enumerateCompatibilityConsiderationFunctions(name);
+		if (baseFunc.name != name) {
+			compatNames = HashSet(compatNames);
+			compatNames.update(enumerateCompatibilityConsiderationFunctions(baseFunc.name));
+		}
+		for (local compatName: compatNames) {
+			local compatFunc = compatFunctions.get(compatName);
+			if (compatFunc is none)
+				continue;
+			if (areFunctionsBinaryCompatible(baseFunc, baseContext, baseArch, baseArchName,
+			                                 compatFunc, compatContext, compatArch, compatArchName)) {
+				local set = compatFunctionMap.get(name);
+				if (set is none)
+					compatFunctionMap[name] = set = HashSet();
+				set.insert(compatName);
+			}
+		}
 	}
-	compatFunctionNames = compatFunctionNames.sorted();
+	local compatFunctionNames: {string...} = compatFunctionMap.keys.sorted();
 	local longestNameLen = compatFunctionNames.each.length > ...;
 	fp << copyright << "\n";
-	local firstName = compatFunctionNames.first;
-	fp << "#ifndef " << prefix << firstName << "\n";
-	for (local n: compatFunctionNames) {
-		fp << "#define " << prefix << n
-			<< " " * (longestNameLen - #n)
-			<< " 1\n";
+	if (compatFunctionNames) {
+		local firstName = compatFunctionNames.first;
+		fp << "#ifndef " << prefix << firstName << "\n";
+		for (local n: compatFunctionNames) {
+			fp << "#define " << prefix << n
+				<< " " * (longestNameLen - #n);
+			local compatNames: {string...} = compatFunctionMap[n].sorted();
+			assert compatNames;
+			fp << " (" << #compatNames << ",(";
+			fp << ", ".join(compatNames);
+			fp << "))\n";
+		}
+		fp << "#endif /* !" << prefix << firstName << " */\n";
 	}
-	fp << "#endif /* !" << prefix << firstName << " */\n";
 }
 
 
 
-function main() {
+function main(archNames: {string...}) {
 	local baseContext: ParserContext = ParserContext();
+	local final ALL_ARCH = import(".generate_syscalls_arch").ARCH;
+	local ARCH = ALL_ARCH;
+	/* This doesn't work, because of `<kos/syscalls.h>' being set up as the
+	 * hub for fully portable system calls. FIXME: Get rid of the idea that
+	 * <kos/syscalls.h> should contain fully portable system calls, and simply
+	 * have each arch define its own (arch-specific) <kos/syscalls.h> header.
+	 * That way, we could make generate_syscalls.dee only have to parse def
+	 * files for specific architectures, rather than always having to parse
+	 * everything.
+	 */
+	//if (archNames) {
+	//	print "[generate_syscalls] Generating system calls for:", repr archNames;
+	//	ARCH = Dict(for (local name, a: ALL_ARCH) if (name in archNames) (name, a));
+	//} else {
+	//	print "[generate_syscalls] Generating system calls for all architectures";
+	//}
 	parseSyscallDefsFile(baseContext, "include/asm/syscalls.def");
 	local archContexts: {string: ParserContext} = Dict();
 	archContexts[""] = baseContext;
-	local final ARCH = import(".generate_syscalls_arch").ARCH;
 	for (local name, a: ARCH) {
 		local c = copy baseContext;
 		parseSyscallDefsFile(c, a.formatPath(
@@ -2287,16 +2790,24 @@ again_scan_common:
 	for (local name, a: ARCH) {
 		if (!a.platformSyscallCompatArch)
 			continue;
-		local baseContext = archContexts[name];
+		local archContext = archContexts[name];
 		for (local headerName, prefix, compatArchName:
 				a.platformSyscallCompatArch) {
-			local compatArch = ARCH[compatArchName];
+			local compatArch = ALL_ARCH[compatArchName];
+			if (compatArchName !in archContexts) {
+				/* Lazily load definitions for compatibility-mode architectures */
+				local a = ALL_ARCH[compatArchName];
+				local c = copy baseContext;
+				parseSyscallDefsFile(c, a.formatPath(
+					"include/{name}/asm/syscalls{suffix}.def"));
+				archContexts[compatArchName] = c;
+			}
 			local compatContext = archContexts[compatArchName];
 			writeHashedFile(headerName, [](fp){
 				generateSyscallCompatibilityHeader(
 					fp, prefix,
-					baseContext, a,
-					compatContext, compatArch);
+					archContext, a, name,
+					compatContext, compatArch, compatArchName);
 			});
 		}
 	}
@@ -2321,7 +2832,7 @@ again_scan_common:
 			"src/kernel/core/arch/{arch}/syscall/wrappers{suffix}.S"
 		), [](fp){
 			generateKernelCoreArchSyscallWrappersAssembly(
-				fp, c, a, ARCH, archContexts);
+				fp, c, a, ALL_ARCH, archContexts);
 		});
 	}
 
@@ -2344,6 +2855,6 @@ again_scan_common:
 
 #ifdef __MAIN__
 fs.chdir(fs.joinpath(fs.headof(__FILE__), "../.."));
-main();
+main(archNames: [...][1:]);
 #endif /* __MAIN__ */
 

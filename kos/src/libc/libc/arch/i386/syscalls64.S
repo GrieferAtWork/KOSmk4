@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a4bca11 */
+/* HASH CRC-32:0xc6a855a3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3256,7 +3256,7 @@ INTERN_FUNCTION(libc_sys_Xsigaltstack)
 END(libc_sys_Xsigaltstack)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsigaltstack, libc_sys_Xsigaltstack)
 
-/* errno_t utime(char const *filename, struct __utimbuf32 const *times) */
+/* errno_t utime(char const *filename, struct utimbuf const *times) */
 .section .text.crt.syscall.utime
 INTERN_FUNCTION(libc_sys_utime)
 	.cfi_startproc
@@ -3268,7 +3268,7 @@ INTERN_FUNCTION(libc_sys_utime)
 END(libc_sys_utime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_utime, libc_sys_utime)
 
-/* errno_t utime(char const *filename, struct __utimbuf32 const *times) */
+/* errno_t utime(char const *filename, struct utimbuf const *times) */
 .section .text.crt.syscall.Xutime
 INTERN_FUNCTION(libc_sys_Xutime)
 	.cfi_startproc

@@ -19,6 +19,19 @@
 /* Delete all generic definitions from include/asm/syscalls.def */
 %[clear_syscall_id_table]
 
+/* Define type sizes */
+%[typesize(i386:char  = 1)]
+%[typesize(i386:short = 2)]
+%[typesize(i386:int   = 4)]
+%[typesize(i386:long  = 4)]
+%[typesize(i386:llong = 8)]
+%[typesize(i386:socklen_t = 4)]
+%[typesize(i386:uintptr_t = 4)]
+%[typesize(i386:uintptr_half_t = 2)]
+
+%[typecompat(i386:__sigset_struct = *:__sigset_struct)]
+%[typecompat(i386:sockaddr = *:sockaddr)]
+
 
 @@Restore the specified register state when returning from a signal handler
 @@Note that the order and locations of arguments taken by this system call
@@ -65,6 +78,7 @@ setfsgid = setfsgid16;
 mmap = mmap32;
 
 /* Configure binding of multi-arch types in system calls. */
+utime = utime32;
 gettimeofday = gettimeofdayx32;
 gettimeofday64 = gettimeofdayx32_64;
 settimeofday = settimeofdayx32;

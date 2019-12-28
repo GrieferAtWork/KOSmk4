@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72640a46 */
+/* HASH CRC-32:0x455f5c20 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1362,7 +1362,7 @@
 #define __NRAT0_alarm                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_time                   (time32_t *, __time32_t *)
 #define __NRAT0_utime                  (char const *, char const *)
-#define __NRAT1_utime                  (struct __utimbuf32 const *, struct __utimbuf32 const *)
+#define __NRAT1_utime                  (struct utimbuf const *, struct utimbuf const *)
 #define __NRAT0_creat                  (char const *, char const *)
 #define __NRAT1_creat                  (mode_t, __mode_t)
 #define __NRAT0_getdents               (fd_t, __fd_t)
@@ -1706,7 +1706,7 @@
 #define __NRAM_getpgrp(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                /* nothing */
 #define __NRAM_pause(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  /* nothing */
 #define __NRAM_time(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (__time32_t *)a
-#define __NRAM_utime(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (char const *)a, (struct __utimbuf32 const *)b
+#define __NRAM_utime(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (char const *)a, (struct utimbuf const *)b
 #define __NRAM_creat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (char const *)a, (__mode_t)b
 #define __NRAM_getdents(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__fd_t)a, (struct linux_dirent *)b, (__size_t)c
 #define __NRAM_futimesat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a, (__const char *)b, (struct timeval const *)c

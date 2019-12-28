@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67bde252 */
+/* HASH CRC-32:0x511a9d0b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1080,7 +1080,7 @@
 #define __NR64AT0_sigaltstack            (struct sigaltstack const *, struct sigaltstack const *)
 #define __NR64AT1_sigaltstack            (struct sigaltstack *, struct sigaltstack *)
 #define __NR64AT0_utime                  (char const *, char const *)
-#define __NR64AT1_utime                  (struct __utimbuf32 const *, struct __utimbuf32 const *)
+#define __NR64AT1_utime                  (struct utimbuf const *, struct utimbuf const *)
 #define __NR64AT0_mknod                  (char const *, char const *)
 #define __NR64AT1_mknod                  (mode_t, __mode_t)
 #define __NR64AT2_mknod                  (dev_t, __dev_t)
@@ -1828,7 +1828,7 @@
 #define __NR64AM_rt_sigqueueinfo(a, b, c, d, e, f)        (__pid_t)a, (__syscall_ulong_t)b, (struct __siginfo64_struct const *)c
 #define __NR64AM_rt_sigsuspend(a, b, c, d, e, f)          (struct __sigset_struct const *)a, (__size_t)b
 #define __NR64AM_sigaltstack(a, b, c, d, e, f)            (struct sigaltstack const *)a, (struct sigaltstack *)b
-#define __NR64AM_utime(a, b, c, d, e, f)                  (char const *)a, (struct __utimbuf32 const *)b
+#define __NR64AM_utime(a, b, c, d, e, f)                  (char const *)a, (struct utimbuf const *)b
 #define __NR64AM_mknod(a, b, c, d, e, f)                  (char const *)a, (__mode_t)b, (__dev_t)c
 #define __NR64AM_uselib(a, b, c, d, e, f)                 (char const *)a
 #define __NR64AM_personality(a, b, c, d, e, f)            (int)a
