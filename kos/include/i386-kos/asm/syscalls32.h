@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf43c9847 */
+/* HASH CRC-32:0xa1eef9ae */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -572,7 +572,7 @@
  * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
  * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
 #define __NR_rpc_schedule            __UINT32_C(0x80000009) /* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR32(void) *arguments) */
-#define __NR_sysctl                  __UINT32_C(0x8000000a) /* syscall_slong_t sysctl(syscall_ulong_t command, void *arg) */
+#define __NR_ksysctl                 __UINT32_C(0x8000000a) /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
 /* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
 #define __NR_openpty                 __UINT32_C(0x8000000b) /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -1238,7 +1238,7 @@
 #define __NRRM_frealpath4              0
 #define __NRRM_frealpathat             0
 #define __NRRM_rpc_schedule            0
-#define __NRRM_sysctl                  0
+#define __NRRM_ksysctl                 0
 #define __NRRM_openpty                 0
 #define __NRRM_fchdirat                0
 #define __NRRM_time64                  0
@@ -1437,7 +1437,7 @@
 #define __NRCP_writef                  1
 #define __NRCP_frealpath4              1
 #define __NRCP_frealpathat             1
-#define __NRCP_sysctl                  1
+#define __NRCP_ksysctl                 1
 #define __NRCP_fchdirat                1
 #define __NRCP_lfutex                  1
 #define __NRCP_lseek64                 1
@@ -1867,7 +1867,7 @@
 #define __NRRC_frealpath4              4
 #define __NRRC_frealpathat             5
 #define __NRRC_rpc_schedule            4
-#define __NRRC_sysctl                  2
+#define __NRRC_ksysctl                 2
 #define __NRRC_openpty                 5
 #define __NRRC_fchdirat                3
 #define __NRRC_time64                  1

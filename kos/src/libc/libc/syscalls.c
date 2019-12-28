@@ -56,12 +56,12 @@ NOTHROW_NCX(VLIBCCALL libc_hopf)(fd_t fd, syscall_ulong_t cmd,
 	return result;
 }
 
-INTERN ATTR_SECTION(".text.crt.syscall.sysctl") syscall_slong_t
-NOTHROW_NCX(VLIBCCALL libc_sysctl)(syscall_ulong_t cmd, ... /*, void *arg*/) {
+INTERN ATTR_SECTION(".text.crt.syscall.ksysctl") syscall_slong_t
+NOTHROW_NCX(VLIBCCALL libc_ksysctl)(syscall_ulong_t cmd, ... /*, void *arg*/) {
 	syscall_slong_t result;
 	va_list args;
 	va_start(args, cmd);
-	result = sys_sysctl(cmd, va_arg(args, void *));
+	result = sys_ksysctl(cmd, va_arg(args, void *));
 	va_end(args);
 	if (E_ISERR(result))
 		result = libc_seterrno((errno_t)-result);
@@ -70,7 +70,7 @@ NOTHROW_NCX(VLIBCCALL libc_sysctl)(syscall_ulong_t cmd, ... /*, void *arg*/) {
 
 DEFINE_PUBLIC_ALIAS(hop, libc_hop);
 DEFINE_PUBLIC_ALIAS(hopf, libc_hopf);
-DEFINE_PUBLIC_ALIAS(sysctl, libc_sysctl);
+DEFINE_PUBLIC_ALIAS(ksysctl, libc_ksysctl);
 
 DECL_END
 

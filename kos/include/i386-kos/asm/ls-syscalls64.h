@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d9ce3b0 */
+/* HASH CRC-32:0x6246cd71 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -470,7 +470,7 @@ __TSYSCALL1(getdrives, 0x8, 0x8)
 __TSYSCALL1(frealpath4, 0x9, 0x9)
 __TSYSCALL1(frealpathat, 0xa, 0xa)
 __TSYSCALL1(rpc_schedule, 0xb, 0xb)
-__TSYSCALL1(sysctl, 0xc, 0xc)
+__TSYSCALL1(ksysctl, 0xc, 0xc)
 __TSYSCALL1(openpty, 0xd, 0xd)
 __TSYSCALL1(set_exception_handler, 0xe, 0xe)
 __TSYSCALL1(get_exception_handler, 0xf, 0xf)

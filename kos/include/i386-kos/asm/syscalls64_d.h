@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e7ba42e */
+/* HASH CRC-32:0xc0751b18 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -511,7 +511,7 @@
  * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
  * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
 #define __NR64_rpc_schedule           __UINT64_C(0xffffffff8000000b) /* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR64(void) *arguments) */
-#define __NR64_sysctl                 __UINT64_C(0xffffffff8000000c) /* syscall_slong_t sysctl(syscall_ulong_t command, void *arg) */
+#define __NR64_ksysctl                __UINT64_C(0xffffffff8000000c) /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
 /* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
 #define __NR64_openpty                __UINT64_C(0xffffffff8000000d) /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
 /* Set the exception handler mode for the calling thread.
@@ -1098,7 +1098,7 @@
 #define __NR64RM_frealpath4             0
 #define __NR64RM_frealpathat            0
 #define __NR64RM_rpc_schedule           0
-#define __NR64RM_sysctl                 0
+#define __NR64RM_ksysctl                0
 #define __NR64RM_openpty                0
 #define __NR64RM_set_exception_handler  2
 #define __NR64RM_get_exception_handler  2
@@ -1260,7 +1260,7 @@
 #define __NR64CP_klstat                 1
 #define __NR64CP_frealpath4             1
 #define __NR64CP_frealpathat            1
-#define __NR64CP_sysctl                 1
+#define __NR64CP_ksysctl                1
 #define __NR64CP_ioctlf                 1
 #define __NR64CP_pread64f               1
 #define __NR64CP_pwrite64f              1
@@ -1631,7 +1631,7 @@
 #define __NR64RC_frealpath4             4
 #define __NR64RC_frealpathat            5
 #define __NR64RC_rpc_schedule           4
-#define __NR64RC_sysctl                 2
+#define __NR64RC_ksysctl                2
 #define __NR64RC_openpty                5
 #define __NR64RC_set_exception_handler  3
 #define __NR64RC_get_exception_handler  3

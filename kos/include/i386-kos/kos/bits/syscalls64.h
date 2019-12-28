@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11544758 */
+/* HASH CRC-32:0x7802ff2c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -405,6 +405,9 @@ __CDECLARE_SC(,__ssize_t,kreaddirf,(__fd_t __fd, struct dirent *__buf, __size_t 
 #if __CRT_HAVE_SC(kstat)
 __CDECLARE_SC(,__errno_t,kstat,(char const *__filename, struct stat *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_SC(kstat) */
+#if __CRT_HAVE_SC(ksysctl)
+__CDECLARE_SC(,__syscall_slong_t,ksysctl,(__syscall_ulong_t __command, void *__arg),(__command,__arg))
+#endif /* __CRT_HAVE_SC(ksysctl) */
 #if __CRT_HAVE_SC(lchown)
 __CDECLARE_SC(,__errno_t,lchown,(char const *__filename, __uid_t __owner, __gid_t __group),(__filename,__owner,__group))
 #endif /* __CRT_HAVE_SC(lchown) */
@@ -726,9 +729,6 @@ __CDECLARE_SC(,__errno_t,shmdt,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #if __CRT_HAVE_SC(shmget)
 __CDECLARE_SC(,__errno_t,shmget,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(shmget) */
-#if __CRT_HAVE_SC(sysctl)
-__CDECLARE_SC(,__syscall_slong_t,sysctl,(__syscall_ulong_t __command, void *__arg),(__command,__arg))
-#endif /* __CRT_HAVE_SC(sysctl) */
 #if __CRT_HAVE_SC(sysfs)
 __CDECLARE_SC(,__errno_t,sysfs,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(sysfs) */
@@ -1086,6 +1086,9 @@ __CDECLARE_XSC(,__ssize_t,kreaddirf,(__fd_t __fd, struct dirent *__buf, __size_t
 #if __CRT_HAVE_XSC(kstat)
 __CDECLARE_XSC(,__errno_t,kstat,(char const *__filename, struct stat *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_XSC(kstat) */
+#if __CRT_HAVE_XSC(ksysctl)
+__CDECLARE_XSC(,__syscall_slong_t,ksysctl,(__syscall_ulong_t __command, void *__arg),(__command,__arg))
+#endif /* __CRT_HAVE_XSC(ksysctl) */
 #if __CRT_HAVE_XSC(lchown)
 __CDECLARE_XSC(,__errno_t,lchown,(char const *__filename, __uid_t __owner, __gid_t __group),(__filename,__owner,__group))
 #endif /* __CRT_HAVE_XSC(lchown) */
@@ -1407,9 +1410,6 @@ __CDECLARE_XSC(,__errno_t,shmdt,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #if __CRT_HAVE_XSC(shmget)
 __CDECLARE_XSC(,__errno_t,shmget,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(shmget) */
-#if __CRT_HAVE_XSC(sysctl)
-__CDECLARE_XSC(,__syscall_slong_t,sysctl,(__syscall_ulong_t __command, void *__arg),(__command,__arg))
-#endif /* __CRT_HAVE_XSC(sysctl) */
 #if __CRT_HAVE_XSC(sysfs)
 __CDECLARE_XSC(,__errno_t,sysfs,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(sysfs) */

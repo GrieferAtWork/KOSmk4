@@ -442,7 +442,7 @@ incdir("", "../../include");
 #include <kos/sys/stat.h>
 #include <kos/sys/ioctl.h>
 #include <kos/syscalls.h>
-#include <kos/sysctl.h>
+#include <kos/ksysctl.h>
 #include <kos/thread.h>
 #include <kos/types.h>
 #include <kos/ukern.h>

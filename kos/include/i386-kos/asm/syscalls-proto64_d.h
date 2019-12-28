@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f615a41 */
+/* HASH CRC-32:0x2083403c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -375,7 +375,7 @@
 #define __NR64AC_frealpath4             4
 #define __NR64AC_frealpathat            5
 #define __NR64AC_rpc_schedule           4
-#define __NR64AC_sysctl                 2
+#define __NR64AC_ksysctl                2
 #define __NR64AC_openpty                5
 #define __NR64AC_set_exception_handler  3
 #define __NR64AC_get_exception_handler  3
@@ -754,7 +754,7 @@
 #define __NR64RT_frealpath4             (ssize_t, __ssize_t)
 #define __NR64RT_frealpathat            (ssize_t, __ssize_t)
 #define __NR64RT_rpc_schedule           (syscall_slong_t, __syscall_slong_t)
-#define __NR64RT_sysctl                 (syscall_slong_t, __syscall_slong_t)
+#define __NR64RT_ksysctl                (syscall_slong_t, __syscall_slong_t)
 #define __NR64RT_openpty                (errno_t, __errno_t)
 #define __NR64RT_set_exception_handler  (errno_t, __errno_t)
 #define __NR64RT_get_exception_handler  (errno_t, __errno_t)
@@ -1552,8 +1552,8 @@
 #define __NR64AT1_rpc_schedule           (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT2_rpc_schedule           (uint8_t const *, __uint8_t const *)
 #define __NR64AT3_rpc_schedule           (__HYBRID_PTR64(void) *, __HYBRID_PTR64(void) *)
-#define __NR64AT0_sysctl                 (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT1_sysctl                 (void *, void *)
+#define __NR64AT0_ksysctl                (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT1_ksysctl                (void *, void *)
 #define __NR64AT0_openpty                (fd_t *, __fd_t *)
 #define __NR64AT1_openpty                (fd_t *, __fd_t *)
 #define __NR64AT2_openpty                (char *, char *)
@@ -2021,7 +2021,7 @@
 #define __NR64AM_frealpath4(a, b, c, d, e, f)             (__fd_t)a, (char *)b, (__size_t)c, (__atflag_t)d
 #define __NR64AM_frealpathat(a, b, c, d, e, f)            (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
 #define __NR64AM_rpc_schedule(a, b, c, d, e, f)           (__pid_t)a, (__syscall_ulong_t)b, (__uint8_t const *)c, (__HYBRID_PTR64(void) *)d
-#define __NR64AM_sysctl(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (void *)b
+#define __NR64AM_ksysctl(a, b, c, d, e, f)                (__syscall_ulong_t)a, (void *)b
 #define __NR64AM_openpty(a, b, c, d, e, f)                (__fd_t *)a, (__fd_t *)b, (char *)c, (struct termios const *)d, (struct winsize const *)e
 #define __NR64AM_set_exception_handler(a, b, c, d, e, f)  (__syscall_ulong_t)a, (__except_handler64_t)b, (void *)c
 #define __NR64AM_get_exception_handler(a, b, c, d, e, f)  (__ULONG64_TYPE__ *)a, (__except_handler64_t *)b, (__HYBRID_PTR64(void) *)c
@@ -2400,7 +2400,7 @@
 #define __NR64AP_frealpath4(a, b, c, d)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR64AP_frealpathat(a, b, c, d, e)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR64AP_rpc_schedule(a, b, c, d)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR64AP_sysctl(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR64AP_ksysctl(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR64AP_openpty(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR64AP_set_exception_handler(a, b, c)           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_get_exception_handler(a, b, c)           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c

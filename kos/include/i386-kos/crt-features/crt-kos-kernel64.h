@@ -1499,6 +1499,7 @@
 #define __CRT_HAVE_sys32_kreaddir 1
 #define __CRT_HAVE_sys32_kreaddirf 1
 #define __CRT_HAVE_sys32_kstat 1
+#define __CRT_HAVE_sys32_ksysctl 1
 #define __CRT_HAVE_sys32_lchown 1
 #define __CRT_HAVE_sys32_lchown32 1
 #define __CRT_HAVE_sys32_lfutex 1
@@ -1718,7 +1719,6 @@
 #define __CRT_HAVE_sys32_sync 1
 #define __CRT_HAVE_sys32_sync_file_range 1
 #define __CRT_HAVE_sys32_syncfs 1
-#define __CRT_HAVE_sys32_sysctl 1
 #define __CRT_HAVE_sys32_sysfs 1
 #define __CRT_HAVE_sys32_sysinfo 1
 #define __CRT_HAVE_sys32_syslog 1
@@ -1919,6 +1919,7 @@
 #define __CRT_HAVE_sys_kreaddir 1
 #define __CRT_HAVE_sys_kreaddirf 1
 #define __CRT_HAVE_sys_kstat 1
+#define __CRT_HAVE_sys_ksysctl 1
 #define __CRT_HAVE_sys_lchown 1
 #define __CRT_HAVE_sys_lfutex 1
 #define __CRT_HAVE_sys_lfutexexpr 1
@@ -2102,7 +2103,6 @@
 #define __CRT_HAVE_sys_sync 1
 #define __CRT_HAVE_sys_sync_file_range 1
 #define __CRT_HAVE_sys_syncfs 1
-#define __CRT_HAVE_sys_sysctl 1
 #define __CRT_HAVE_sys_sysfs 1
 #define __CRT_HAVE_sys_sysinfo 1
 #define __CRT_HAVE_sys_syslog 1

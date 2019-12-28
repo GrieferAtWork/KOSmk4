@@ -28,7 +28,7 @@
 #include <kos/sys/ioctl.h> /* Ioctl() */
 #include <kos/sys/stat.h>  /* Mkdir() */
 #include <kos/syscalls.h>  /* sys_Xmktty() */
-#include <kos/sysctl.h>    /* sysctl() */
+#include <kos/ksysctl.h>    /* sysctl() */
 #include <kos/types.h>     /* fd_t */
 #include <kos/unistd.h>    /* Dup2() */
 #include <sys/mount.h>     /* mount() */
@@ -91,7 +91,7 @@ int main(int argc, char *argv[], char *envp[]) {
 done_devfs:
 
 	/* Mount the /proc filesystem (but do this optionally). */
-	if (sysctl_insmod("procfs", NULL) >= 0) {
+	if (ksysctl_insmod("procfs", NULL) >= 0) {
 		if (mount(NULL, "/proc", "procfs", 0, NULL) < 0) {
 			if (errno == ENOENT) {
 				mkdir("/proc", 0755);
@@ -101,24 +101,24 @@ done_devfs:
 			}
 			syslog(LOG_ERR, "[init] Failed to mount procfs: %s\n",
 			       strerror(errno));
-			sysctl_delmod("procfs");
+			ksysctl_delmod("procfs");
 		}
 	}
 done_procfs:
 
 	/* Make sure there aren't any memory leaks. */
-	Sysctl(SYSCTL_SYSTEM_MEMORY_DUMP_LEAKS);
+	KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS);
 
 	/* Load some additional drivers that we need for the I/O console. */
-	SysctlInsmod("ps2", NULL); /* Keyboard */
-	SysctlInsmod("vga", NULL); /* Display */
+	KSysctlInsmod("ps2", NULL); /* Keyboard */
+	KSysctlInsmod("vga", NULL); /* Display */
 
 	/* TODO: Make it so that the PS/2 driver checks for (and disables) USB
 	 *       emulation, such that we only need to load the usb-hid drivers
 	 *       when the ps2 keyboard files are missing from /dev
 	 *       As it stands right now, PS/2 will still create device files,
 	 *       even when the devices stem from USB emulation. */
-	sysctl_insmod("usb-hid", NULL);
+	ksysctl_insmod("usb-hid", NULL);
 
 	/* Setup a couple of signals to-be ignored */
 	signal(SIGHUP, SIG_IGN);

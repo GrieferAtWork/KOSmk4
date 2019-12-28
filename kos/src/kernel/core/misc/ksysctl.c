@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MISC_SYSCTL_C
-#define GUARD_KERNEL_SRC_MISC_SYSCTL_C 1
+#ifndef GUARD_KERNEL_SRC_MISC_KSYSCTL_C
+#define GUARD_KERNEL_SRC_MISC_KSYSCTL_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -38,7 +38,7 @@
 
 #include <kos/except-inval.h>
 #include <kos/hop.h>
-#include <kos/sysctl.h>
+#include <kos/ksysctl.h>
 
 #include <errno.h>
 #include <stddef.h>
@@ -49,38 +49,38 @@ DECL_BEGIN
 /* The default library path.
  * By default, this string is simply set to "/os/drivers"
  * NOTE: This path can be restored with
- *      `sysctl_set_driver_library_path(SYSCTL_DRIVER_LIBRARY_PATH_DEFAULT)' */
+ *      `ksysctl_set_driver_library_path(KSYSCTL_DRIVER_LIBRARY_PATH_DEFAULT)' */
 INTDEF struct driver_library_path_string default_library_path;
 
 
-DEFINE_SYSCALL2(syscall_slong_t, sysctl, syscall_ulong_t, command,
+DEFINE_SYSCALL2(syscall_slong_t, ksysctl, syscall_ulong_t, command,
                 USER UNCHECKED void *, arg) {
 	switch (command) {
 
-	case SYSCTL_SYSTEM_CLEARCACHES:
+	case KSYSCTL_SYSTEM_CLEARCACHES:
 		return (syscall_slong_t)system_clearcaches();
 
-	case SYSCTL_SYSTEM_TRIMHEAPS:
+	case KSYSCTL_SYSTEM_TRIMHEAPS:
 		return (syscall_slong_t)system_trimheaps();
 
-	case SYSCTL_SYSTEM_MEMORY_DUMP_LEAKS:
+	case KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS:
 		return (syscall_slong_t)mall_dump_leaks(GFP_NORMAL);
 
-	case SYSCTL_SYSTEM_MEMORY_VALIDATE_PADDING:
+	case KSYSCTL_SYSTEM_MEMORY_VALIDATE_PADDING:
 		mall_validate_padding();
 		return 0;
 
-	case SYSCTL_SYSTEM_BRANCH_DUMP_STATS:
+	case KSYSCTL_SYSTEM_BRANCH_DUMP_STATS:
 		dump_branch_stats();
 		return 0;
 
-	case SYSCTL_SYSCALL_GET_TRACING_ENABLED:
+	case KSYSCTL_SYSCALL_GET_TRACING_ENABLED:
 		return syscall_tracing_getenabled() ? 1 : 0;
 
-	case SYSCTL_SYSCALL_SET_TRACING_ENABLED:
+	case KSYSCTL_SYSCALL_SET_TRACING_ENABLED:
 		return syscall_tracing_setenabled(arg != 0) ? 1 : 0;
 
-	case SYSCTL_SYSCALL_GET_PERSONALITY: {
+	case KSYSCTL_SYSCALL_GET_PERSONALITY: {
 		uintptr_t kp;
 		if unlikely((uintptr_t)arg & 1) {
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_FLAG,
@@ -97,7 +97,7 @@ DEFINE_SYSCALL2(syscall_slong_t, sysctl, syscall_ulong_t, command,
 		return has_personality(kp) ? 1 : 0;
 	}	break;
 
-	case SYSCTL_SYSCALL_SET_PERSONALITY: {
+	case KSYSCTL_SYSCALL_SET_PERSONALITY: {
 		uintptr_t kp, index;
 		bool enable = ((uintptr_t)arg & 1) != 0;
 		byte_t oldbyte, mask;
@@ -118,7 +118,7 @@ DEFINE_SYSCALL2(syscall_slong_t, sysctl, syscall_ulong_t, command,
 		return (oldbyte & mask) != 0 ? 1 : 0;
 	}	break;
 
-	case SYSCTL_DRIVER_LSMOD: {
+	case KSYSCTL_DRIVER_LSMOD: {
 		struct handle temp;
 		temp.h_type = HANDLE_TYPE_DRIVER_STATE;
 		temp.h_mode = IO_RDWR;
@@ -127,33 +127,33 @@ DEFINE_SYSCALL2(syscall_slong_t, sysctl, syscall_ulong_t, command,
 		handle_installhop((struct hop_openfd *)arg, temp);
 	}	break;
 
-	case SYSCTL_DRIVER_INSMOD: {
-		USER CHECKED struct sysctl_driver_insmod *data;
+	case KSYSCTL_DRIVER_INSMOD: {
+		USER CHECKED struct ksysctl_driver_insmod *data;
 		size_t struct_size;
 		u16 format;
 		USER CHECKED char const *commandline;
 		bool new_driver_loaded;
 		REF struct driver *drv;
 		unsigned int insmod_flags;
-		STATIC_ASSERT(SYSCTL_DRIVER_INSMOD_FNORMAL == DRIVER_INSMOD_FLAG_NORMAL);
-		STATIC_ASSERT(SYSCTL_DRIVER_INSMOD_FNOINIT == DRIVER_INSMOD_FLAG_NOINIT);
-		validate_writable(arg, sizeof(struct sysctl_driver_insmod));
-		data        = (struct sysctl_driver_insmod *)arg;
+		STATIC_ASSERT(KSYSCTL_DRIVER_INSMOD_FNORMAL == DRIVER_INSMOD_FLAG_NORMAL);
+		STATIC_ASSERT(KSYSCTL_DRIVER_INSMOD_FNOINIT == DRIVER_INSMOD_FLAG_NOINIT);
+		validate_writable(arg, sizeof(struct ksysctl_driver_insmod));
+		data        = (struct ksysctl_driver_insmod *)arg;
 		struct_size = ATOMIC_READ(data->im_struct_size);
-		if (struct_size != sizeof(struct sysctl_driver_insmod))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct sysctl_driver_insmod), struct_size);
+		if (struct_size != sizeof(struct ksysctl_driver_insmod))
+			THROW(E_BUFFER_TOO_SMALL, sizeof(struct ksysctl_driver_insmod), struct_size);
 		COMPILER_BARRIER();
 		format       = ATOMIC_READ(data->im_format);
 		commandline  = ATOMIC_READ(data->im_cmdline);
 		insmod_flags = ATOMIC_READ(data->im_flags);
 		validate_readable_opt(commandline, 1);
 		VALIDATE_FLAGSET(insmod_flags,
-		                 SYSCTL_DRIVER_INSMOD_FNORMAL |
-		                 SYSCTL_DRIVER_INSMOD_FNOINIT,
+		                 KSYSCTL_DRIVER_INSMOD_FNORMAL |
+		                 KSYSCTL_DRIVER_INSMOD_FNOINIT,
 		                 E_INVALID_ARGUMENT_CONTEXT_INSMOD_FLAGS);
 		switch (format) {
 
-		case SYSCTL_DRIVER_FORMAT_BLOB: {
+		case KSYSCTL_DRIVER_FORMAT_BLOB: {
 			USER CHECKED void const *base;
 			size_t size;
 			base = ATOMIC_READ(data->im_blob.b_base);
@@ -166,7 +166,7 @@ DEFINE_SYSCALL2(syscall_slong_t, sysctl, syscall_ulong_t, command,
 			                    insmod_flags);
 		}	break;
 
-		case SYSCTL_DRIVER_FORMAT_FILE: {
+		case KSYSCTL_DRIVER_FORMAT_FILE: {
 			REF struct regular_node *ino;
 			REF struct path *driver_path;
 			REF struct directory_entry *driver_dentry;
@@ -191,7 +191,7 @@ DEFINE_SYSCALL2(syscall_slong_t, sysctl, syscall_ulong_t, command,
 			                    insmod_flags);
 		}	break;
 
-		case SYSCTL_DRIVER_FORMAT_NAME: {
+		case KSYSCTL_DRIVER_FORMAT_NAME: {
 			USER CHECKED char const *name;
 			name = ATOMIC_READ(data->im_name);
 			validate_readable(name, 1);
@@ -221,38 +221,38 @@ DEFINE_SYSCALL2(syscall_slong_t, sysctl, syscall_ulong_t, command,
 		}
 	}	break;
 
-	case SYSCTL_DRIVER_DELMOD: {
-		USER CHECKED struct sysctl_driver_delmod *data;
+	case KSYSCTL_DRIVER_DELMOD: {
+		USER CHECKED struct ksysctl_driver_delmod *data;
 		size_t struct_size;
 		u16 format;
 		unsigned int delmod_flags, error;
-		STATIC_ASSERT(SYSCTL_DRIVER_DELMOD_FNORMAL == DRIVER_DELMOD_FLAG_NORMAL);
-		STATIC_ASSERT(SYSCTL_DRIVER_DELMOD_FDEPEND == DRIVER_DELMOD_FLAG_DEPEND);
-		STATIC_ASSERT(SYSCTL_DRIVER_DELMOD_SUCCESS == DRIVER_DELMOD_SUCCESS);
-		STATIC_ASSERT(SYSCTL_DRIVER_DELMOD_UNKNOWN == DRIVER_DELMOD_UNKNOWN);
-		STATIC_ASSERT(SYSCTL_DRIVER_DELMOD_INUSE == DRIVER_DELMOD_INUSE);
-		validate_writable(arg, sizeof(struct sysctl_driver_delmod));
-		data        = (struct sysctl_driver_delmod *)arg;
+		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_FNORMAL == DRIVER_DELMOD_FLAG_NORMAL);
+		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_FDEPEND == DRIVER_DELMOD_FLAG_DEPEND);
+		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_SUCCESS == DRIVER_DELMOD_SUCCESS);
+		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_UNKNOWN == DRIVER_DELMOD_UNKNOWN);
+		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_INUSE == DRIVER_DELMOD_INUSE);
+		validate_writable(arg, sizeof(struct ksysctl_driver_delmod));
+		data        = (struct ksysctl_driver_delmod *)arg;
 		struct_size = ATOMIC_READ(data->dm_struct_size);
-		if (struct_size != sizeof(struct sysctl_driver_delmod))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct sysctl_driver_delmod), struct_size);
+		if (struct_size != sizeof(struct ksysctl_driver_delmod))
+			THROW(E_BUFFER_TOO_SMALL, sizeof(struct ksysctl_driver_delmod), struct_size);
 		COMPILER_BARRIER();
 		format       = ATOMIC_READ(data->dm_format);
 		delmod_flags = ATOMIC_READ(data->dm_flags);
 		VALIDATE_FLAGSET(delmod_flags,
-		                 SYSCTL_DRIVER_DELMOD_FNORMAL |
-		                 SYSCTL_DRIVER_DELMOD_FDEPEND,
+		                 KSYSCTL_DRIVER_DELMOD_FNORMAL |
+		                 KSYSCTL_DRIVER_DELMOD_FDEPEND,
 		                 E_INVALID_ARGUMENT_CONTEXT_DELMOD_FLAGS);
 		switch (format) {
 
-		case SYSCTL_DRIVER_FORMAT_FILE: {
+		case KSYSCTL_DRIVER_FORMAT_FILE: {
 			REF struct regular_node *node;
 			node = handle_get_regular_node((unsigned int)ATOMIC_READ(data->dm_file));
 			FINALLY_DECREF_UNLIKELY(node);
 			error = driver_delmod(node, delmod_flags);
 		}	break;
 
-		case SYSCTL_DRIVER_FORMAT_NAME: {
+		case KSYSCTL_DRIVER_FORMAT_NAME: {
 			USER CHECKED char const *name;
 			name = ATOMIC_READ(data->dm_name);
 			validate_readable(name, 1);
@@ -267,27 +267,27 @@ DEFINE_SYSCALL2(syscall_slong_t, sysctl, syscall_ulong_t, command,
 		return error;
 	}	break;
 
-	case SYSCTL_DRIVER_GETMOD: {
-		USER CHECKED struct sysctl_driver_getmod *data;
+	case KSYSCTL_DRIVER_GETMOD: {
+		USER CHECKED struct ksysctl_driver_getmod *data;
 		size_t struct_size;
 		u16 format;
 		REF struct driver *drv;
-		validate_writable(arg, sizeof(struct sysctl_driver_getmod));
-		data        = (struct sysctl_driver_getmod *)arg;
+		validate_writable(arg, sizeof(struct ksysctl_driver_getmod));
+		data        = (struct ksysctl_driver_getmod *)arg;
 		struct_size = ATOMIC_READ(data->gm_struct_size);
-		if (struct_size != sizeof(struct sysctl_driver_getmod))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct sysctl_driver_getmod), struct_size);
+		if (struct_size != sizeof(struct ksysctl_driver_getmod))
+			THROW(E_BUFFER_TOO_SMALL, sizeof(struct ksysctl_driver_getmod), struct_size);
 		COMPILER_BARRIER();
 		format = ATOMIC_READ(data->gm_format);
 		switch (format) {
 
-		case SYSCTL_DRIVER_FORMAT_BLOB: {
+		case KSYSCTL_DRIVER_FORMAT_BLOB: {
 			void *addr = ATOMIC_READ(data->gm_addr);
 			COMPILER_READ_BARRIER();
 			drv = driver_at_address(addr);
 		}	break;
 
-		case SYSCTL_DRIVER_FORMAT_FILE: {
+		case KSYSCTL_DRIVER_FORMAT_FILE: {
 			REF struct regular_node *node;
 			unsigned int fileno = (unsigned int)ATOMIC_READ(data->gm_file);
 			COMPILER_READ_BARRIER();
@@ -296,7 +296,7 @@ DEFINE_SYSCALL2(syscall_slong_t, sysctl, syscall_ulong_t, command,
 			drv = driver_with_file(node);
 		}	break;
 
-		case SYSCTL_DRIVER_FORMAT_NAME: {
+		case KSYSCTL_DRIVER_FORMAT_NAME: {
 			USER CHECKED char const *name;
 			name = ATOMIC_READ(data->gm_name);
 			validate_readable(name, 1);
@@ -323,16 +323,16 @@ DEFINE_SYSCALL2(syscall_slong_t, sysctl, syscall_ulong_t, command,
 		}
 	}	break;
 
-	case SYSCTL_DRIVER_GET_LIBRARY_PATH: {
-		USER CHECKED struct sysctl_driver_get_library_path *data;
+	case KSYSCTL_DRIVER_GET_LIBRARY_PATH: {
+		USER CHECKED struct ksysctl_driver_get_library_path *data;
 		size_t struct_size, bufsize, reqsize;
 		USER UNCHECKED char *buffer;
 		REF struct driver_library_path_string *libpath;
-		validate_writable(arg, sizeof(struct sysctl_driver_get_library_path));
-		data        = (struct sysctl_driver_get_library_path *)arg;
+		validate_writable(arg, sizeof(struct ksysctl_driver_get_library_path));
+		data        = (struct ksysctl_driver_get_library_path *)arg;
 		struct_size = ATOMIC_READ(data->glp_struct_size);
-		if (struct_size != sizeof(struct sysctl_driver_get_library_path))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct sysctl_driver_get_library_path), struct_size);
+		if (struct_size != sizeof(struct ksysctl_driver_get_library_path))
+			THROW(E_BUFFER_TOO_SMALL, sizeof(struct ksysctl_driver_get_library_path), struct_size);
 
 		/* Read the user-space buffer address/size. */
 		COMPILER_READ_BARRIER();
@@ -365,22 +365,22 @@ DEFINE_SYSCALL2(syscall_slong_t, sysctl, syscall_ulong_t, command,
 		}
 	}	break;
 
-	case SYSCTL_DRIVER_SET_LIBRARY_PATH: {
-		USER CHECKED struct sysctl_driver_set_library_path *data;
+	case KSYSCTL_DRIVER_SET_LIBRARY_PATH: {
+		USER CHECKED struct ksysctl_driver_set_library_path *data;
 		USER UNCHECKED char const *oldpath, *newpath;
 		REF struct driver_library_path_string *newpath_string;
 		size_t struct_size;
-		validate_writable(arg, sizeof(struct sysctl_driver_set_library_path));
-		data        = (struct sysctl_driver_set_library_path *)arg;
+		validate_writable(arg, sizeof(struct ksysctl_driver_set_library_path));
+		data        = (struct ksysctl_driver_set_library_path *)arg;
 		struct_size = ATOMIC_READ(data->slp_struct_size);
-		if (struct_size != sizeof(struct sysctl_driver_set_library_path))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct sysctl_driver_set_library_path), struct_size);
+		if (struct_size != sizeof(struct ksysctl_driver_set_library_path))
+			THROW(E_BUFFER_TOO_SMALL, sizeof(struct ksysctl_driver_set_library_path), struct_size);
 		COMPILER_READ_BARRIER();
 		oldpath = data->slp_oldpath;
 		newpath = data->slp_newpath;
 		COMPILER_READ_BARRIER();
 		validate_readable_opt(oldpath, 1);
-		if (newpath == SYSCTL_DRIVER_LIBRARY_PATH_DEFAULT) {
+		if (newpath == KSYSCTL_DRIVER_LIBRARY_PATH_DEFAULT) {
 			newpath_string = incref(&default_library_path);
 		} else {
 			size_t newpath_len;
@@ -431,7 +431,7 @@ again_get_oldpath:
 		}
 	}	break;
 
-	case SYSCTL_OPEN_KERNEL_DRIVER: {
+	case KSYSCTL_OPEN_KERNEL_DRIVER: {
 		struct handle temp;
 		temp.h_type = HANDLE_TYPE_DRIVER;
 		temp.h_mode = IO_RDWR;
@@ -439,7 +439,7 @@ again_get_oldpath:
 		handle_installhop((struct hop_openfd *)arg, temp);
 	}	break;
 
-	case SYSCTL_OPEN_KERNEL_VFS: {
+	case KSYSCTL_OPEN_KERNEL_VFS: {
 		struct handle temp;
 		temp.h_type = HANDLE_TYPE_PATH;
 		temp.h_mode = IO_RDWR;
@@ -447,7 +447,7 @@ again_get_oldpath:
 		handle_installhop((struct hop_openfd *)arg, temp);
 	}	break;
 
-	case SYSCTL_OPEN_KERNEL_FS: {
+	case KSYSCTL_OPEN_KERNEL_FS: {
 		struct handle temp;
 		temp.h_type = HANDLE_TYPE_FS;
 		temp.h_mode = IO_RDWR;
@@ -455,7 +455,7 @@ again_get_oldpath:
 		handle_installhop((struct hop_openfd *)arg, temp);
 	}	break;
 
-	case SYSCTL_OPEN_KERNEL_VM: {
+	case KSYSCTL_OPEN_KERNEL_VM: {
 		struct handle temp;
 		temp.h_type = HANDLE_TYPE_FS;
 		temp.h_mode = IO_RDWR;
@@ -463,7 +463,7 @@ again_get_oldpath:
 		handle_installhop((struct hop_openfd *)arg, temp);
 	}	break;
 
-	case SYSCTL_OPEN_ROOT_PIDNS: {
+	case KSYSCTL_OPEN_ROOT_PIDNS: {
 		struct handle temp;
 		temp.h_type = HANDLE_TYPE_FS;
 		temp.h_mode = IO_RDWR;
@@ -471,7 +471,7 @@ again_get_oldpath:
 		handle_installhop((struct hop_openfd *)arg, temp);
 	}	break;
 
-	case SYSCTL_OPEN_BOOT_TASK: {
+	case KSYSCTL_OPEN_BOOT_TASK: {
 		struct handle temp;
 		temp.h_type = HANDLE_TYPE_TASK;
 		temp.h_mode = IO_RDWR;
@@ -482,7 +482,7 @@ again_get_oldpath:
 
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_SYSCTL_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_KSYSCTL_COMMAND,
 		      command);
 		break;
 	}
@@ -492,4 +492,4 @@ again_get_oldpath:
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_MISC_SYSCTL_C */
+#endif /* !GUARD_KERNEL_SRC_MISC_KSYSCTL_C */

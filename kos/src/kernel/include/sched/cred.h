@@ -63,7 +63,7 @@ FUNDEF void KCALL cred_require_debugtrap(void) THROWS(E_INSUFFICIENT_RIGHTS); /*
 FUNDEF void KCALL cred_require_mmap_uninitialized(void) THROWS(E_INSUFFICIENT_RIGHTS); /* Caller is allowed to use `MAP_UNINITIALIZED' */
 
 /* TODO: Go through all system calls already defined and add credential checks where necessary. */
-/* TODO: Add credential checks for individual sysctl() and hop() commands */
+/* TODO: Add credential checks for individual ksysctl() and hop() commands */
 
 #endif /* __CC__ */
 

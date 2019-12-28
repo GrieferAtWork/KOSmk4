@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86e131aa */
+/* HASH CRC-32:0xe04697b7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6931,21 +6931,21 @@ INTERN_FUNCTION(libc_sys_Xrpc_schedule)
 END(libc_sys_Xrpc_schedule)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xrpc_schedule, libc_sys_Xrpc_schedule)
 
-/* syscall_slong_t sysctl(syscall_ulong_t command, void *arg) */
-.section .text.crt.syscall.sysctl
-INTERN_FUNCTION(libc_sys_sysctl)
+/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+.section .text.crt.syscall.ksysctl
+INTERN_FUNCTION(libc_sys_ksysctl)
 	movl   $(0x8000000a), %eax
 	jmp    libc_x86_exec_syscall2
-END(libc_sys_sysctl)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_sysctl, libc_sys_sysctl)
+END(libc_sys_ksysctl)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_ksysctl, libc_sys_ksysctl)
 
-/* syscall_slong_t sysctl(syscall_ulong_t command, void *arg) */
-.section .text.crt.syscall.Xsysctl
-INTERN_FUNCTION(libc_sys_Xsysctl)
+/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+.section .text.crt.syscall.Xksysctl
+INTERN_FUNCTION(libc_sys_Xksysctl)
 	movl   $(0x8000000a), %eax
 	jmp    libc_x86_exec_Xsyscall2
-END(libc_sys_Xsysctl)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsysctl, libc_sys_Xsysctl)
+END(libc_sys_Xksysctl)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xksysctl, libc_sys_Xksysctl)
 
 /* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
 /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */

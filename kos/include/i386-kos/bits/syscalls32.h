@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7321edbb */
+/* HASH CRC-32:0x6f41caf8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -575,7 +575,7 @@
  * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
  * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
 #define SYS_rpc_schedule            __NR_rpc_schedule            /* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR32(void) *arguments) */
-#define SYS_sysctl                  __NR_sysctl                  /* syscall_slong_t sysctl(syscall_ulong_t command, void *arg) */
+#define SYS_ksysctl                 __NR_ksysctl                 /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
 /* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
 #define SYS_openpty                 __NR_openpty                 /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */

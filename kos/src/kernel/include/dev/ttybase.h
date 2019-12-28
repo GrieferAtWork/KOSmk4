@@ -31,29 +31,6 @@
 
 DECL_BEGIN
 
-/* TODO: Terminal display drivers such as VGA should not implement the
- *       tty interface. Instead, they should only need to implement
- *       the normal character_device interface and provide a write-operator
- *       that implements an ansi-compliant display port (using libansitty)
- *
- * An actual `struct tty' shouldn't actually be something that gets created
- * implicitly, but should be created explicitly (maybe using a sysctl()) by
- * combining 2 arbitrary file descriptors, one providing a read-operator and
- * presumably being implemented by something like the ps2 driver, and the
- * other providing a write-operator and presumably being implemented by
- * something like the VGA driver.
- *
- * The actual `struct tty' then uses `struct terminal' to implement the TERMIOS
- * interface, forwarding/pulling data from its connected read/write object handles
- * as needed, while also encapsulating all of the required POSIX job control
- *
- * On-top of this, it would then also be possible to allow the tty objects to
- * react to the CTRL+ALT+F{1-NN} key combinations to switch between each other.
- *
- */
-
-
-
 /* The base type for PTY and TTY devices */
 #ifdef __CC__
 struct ttybase_device

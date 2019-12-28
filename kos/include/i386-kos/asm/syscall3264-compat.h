@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf7b9201e */
+/* HASH CRC-32:0x89c2bd2e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -138,6 +138,7 @@
 #define __NR3264COMPAT_kreaddir               1
 #define __NR3264COMPAT_kreaddirf              1
 #define __NR3264COMPAT_kstat                  1
+#define __NR3264COMPAT_ksysctl                1
 #define __NR3264COMPAT_lgetxattr              1
 #define __NR3264COMPAT_link                   1
 #define __NR3264COMPAT_linkat                 1
@@ -272,7 +273,6 @@
 #define __NR3264COMPAT_sync                   1
 #define __NR3264COMPAT_sync_file_range        1
 #define __NR3264COMPAT_syncfs                 1
-#define __NR3264COMPAT_sysctl                 1
 #define __NR3264COMPAT_sysfs                  1
 #define __NR3264COMPAT_sysinfo                1
 #define __NR3264COMPAT_syslog                 1

@@ -2674,10 +2674,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys32_init_module; .quad sys32_init_module
 	.reloc ., R_X86_64_SIZE32, sys32_init_module; .int 0
 	.int 0xe20ed25
-	.quad 0 /* index: 668 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname668 /* index: 668 */
+	.weak sys32_ksysctl; .quad sys32_ksysctl
+	.reloc ., R_X86_64_SIZE32, sys32_ksysctl; .int 0
+	.int 0x9b6f29c
 	.quad 0 /* index: 669 */
 	.quad 0
 	.int 0
@@ -3902,10 +3902,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak kernel_debugtrap_on; .quad kernel_debugtrap_on
 	.reloc ., R_X86_64_SIZE32, kernel_debugtrap_on; .int 0
 	.int 0xfea93ce
-	.quad .Lname975 /* index: 975 */
-	.weak sys_quotactl; .quad sys_quotactl
-	.reloc ., R_X86_64_SIZE32, sys_quotactl; .int 0
-	.int 0xddaec2c
+	.quad 0 /* index: 975 */
+	.quad 0
+	.int 0
+	.int 0
 	.quad 0 /* index: 976 */
 	.quad 0
 	.int 0
@@ -6950,10 +6950,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 1737 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname1737 /* index: 1737 */
+	.weak sys_ksysctl; .quad sys_ksysctl
+	.reloc ., R_X86_64_SIZE32, sys_ksysctl; .int 0
+	.int 0x2eb93cc
 	.quad 0 /* index: 1738 */
 	.quad 0
 	.int 0
@@ -8303,9 +8303,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, this_tid_address; .int 0
 	.int 0xec6dbf3
 	.quad .Lname2075 /* index: 2075 */
-	.weak vm_protect; .quad vm_protect
-	.reloc ., R_X86_64_SIZE32, vm_protect; .int 0
-	.int 0x79178c4
+	.weak vm_ramfile_type; .quad vm_ramfile_type
+	.reloc ., R_X86_64_SIZE32, vm_ramfile_type; .int 0
+	.int 0x43f01b5
 	.quad .Lname2076 /* index: 2076 */
 	.weak json_parser_getbool; .quad json_parser_getbool
 	.reloc ., R_X86_64_SIZE32, json_parser_getbool; .int 0
@@ -8739,9 +8739,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, task_exec_asynchronous_rpc; .int 0
 	.int 0x1640cf3
 	.quad .Lname2184 /* index: 2184 */
-	.weak vm_ramfile_type; .quad vm_ramfile_type
-	.reloc ., R_X86_64_SIZE32, vm_ramfile_type; .int 0
-	.int 0x43f01b5
+	.weak x86_getiopl; .quad x86_getiopl
+	.reloc ., R_X86_64_SIZE32, x86_getiopl; .int 0
+	.int 0xdb15a3c
 	.quad 0 /* index: 2185 */
 	.quad 0
 	.int 0
@@ -9231,9 +9231,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname2307 /* index: 2307 */
-	.weak vm_datablock_debugheap_type; .quad vm_datablock_debugheap_type
-	.reloc ., R_X86_64_SIZE32, vm_datablock_debugheap_type; .int 0
-	.int 0xb4f91b5
+	.weak vm_protect; .quad vm_protect
+	.reloc ., R_X86_64_SIZE32, vm_protect; .int 0
+	.int 0x79178c4
 	.quad .Lname2308 /* index: 2308 */
 	.weak heap_allat; .quad heap_allat
 	.reloc ., R_X86_64_SIZE32, heap_allat; .int 0
@@ -10918,10 +10918,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak path_sprintentex; .quad path_sprintentex
 	.reloc ., R_X86_64_SIZE32, path_sprintentex; .int 0
 	.int 0xbc74aa8
-	.quad .Lname2729 /* index: 2729 */
-	.weak x86_getiopl; .quad x86_getiopl
-	.reloc ., R_X86_64_SIZE32, x86_getiopl; .int 0
-	.int 0xdb15a3c
+	.quad 0 /* index: 2729 */
+	.quad 0
+	.int 0
+	.int 0
 	.quad 0 /* index: 2730 */
 	.quad 0
 	.int 0
@@ -13887,9 +13887,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname3471 /* index: 3471 */
-	.weak sys32_sysctl; .quad sys32_sysctl
-	.reloc ., R_X86_64_SIZE32, sys32_sysctl; .int 0
-	.int 0x120fc2c
+	.weak sys_quotactl; .quad sys_quotactl
+	.reloc ., R_X86_64_SIZE32, sys_quotactl; .int 0
+	.int 0xddaec2c
 	.quad .Lname3472 /* index: 3472 */
 	.weak thisvm_x86_dr0; .quad thisvm_x86_dr0
 	.reloc ., R_X86_64_SIZE32, thisvm_x86_dr0; .int 0
@@ -14955,9 +14955,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, x86_idt; .int 0
 	.int 0xbbc5fc4
 	.quad .Lname3738 /* index: 3738 */
-	.weak sys_sysctl; .quad sys_sysctl
-	.reloc ., R_X86_64_SIZE32, sys_sysctl; .int 0
-	.int 0x6b72a3c
+	.weak vm_datablock_debugheap_type; .quad vm_datablock_debugheap_type
+	.reloc ., R_X86_64_SIZE32, vm_datablock_debugheap_type; .int 0
+	.int 0xb4f91b5
 	.quad .Lname3739 /* index: 3739 */
 	.weak sys_flock; .quad sys_flock
 	.reloc ., R_X86_64_SIZE32, sys_flock; .int 0
@@ -17354,6 +17354,8 @@ END(kernel_symbol_table)
 	.string "sys_pause"
 .Lname667:
 	.string "sys32_init_module"
+.Lname668:
+	.string "sys32_ksysctl"
 .Lname670:
 	.string "memmovedown"
 .Lname671:
@@ -17762,8 +17764,6 @@ END(kernel_symbol_table)
 	.string "fpustate_loadfrom"
 .Lname974:
 	.string "kernel_debugtrap_on"
-.Lname975:
-	.string "sys_quotactl"
 .Lname977:
 	.string "vm_prefault"
 .Lname978:
@@ -18782,6 +18782,8 @@ END(kernel_symbol_table)
 	.string "page_isfree"
 .Lname1733:
 	.string "dbg_hline"
+.Lname1737:
+	.string "sys_ksysctl"
 .Lname1741:
 	.string "sys_sysinfo"
 .Lname1742:
@@ -19207,7 +19209,7 @@ END(kernel_symbol_table)
 .Lname2074:
 	.string "this_tid_address"
 .Lname2075:
-	.string "vm_protect"
+	.string "vm_ramfile_type"
 .Lname2076:
 	.string "json_parser_getbool"
 .Lname2077:
@@ -19351,7 +19353,7 @@ END(kernel_symbol_table)
 .Lname2183:
 	.string "task_exec_asynchronous_rpc"
 .Lname2184:
-	.string "vm_ramfile_type"
+	.string "x86_getiopl"
 .Lname2187:
 	.string "vm_clrhwbreak"
 .Lname2188:
@@ -19517,7 +19519,7 @@ END(kernel_symbol_table)
 .Lname2302:
 	.string "krealign"
 .Lname2307:
-	.string "vm_datablock_debugheap_type"
+	.string "vm_protect"
 .Lname2308:
 	.string "heap_allat"
 .Lname2310:
@@ -20116,8 +20118,6 @@ END(kernel_symbol_table)
 	.string "slab_kmalloc_nx64"
 .Lname2728:
 	.string "path_sprintentex"
-.Lname2729:
-	.string "x86_getiopl"
 .Lname2731:
 	.string "cpu_addrunningtask"
 .Lname2732:
@@ -21171,7 +21171,7 @@ END(kernel_symbol_table)
 .Lname3469:
 	.string "sys_membarrier"
 .Lname3471:
-	.string "sys32_sysctl"
+	.string "sys_quotactl"
 .Lname3472:
 	.string "thisvm_x86_dr0"
 .Lname3473:
@@ -21553,7 +21553,7 @@ END(kernel_symbol_table)
 .Lname3737:
 	.string "x86_idt"
 .Lname3738:
-	.string "sys_sysctl"
+	.string "vm_datablock_debugheap_type"
 .Lname3739:
 	.string "sys_flock"
 .Lname3740:

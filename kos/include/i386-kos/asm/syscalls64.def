@@ -422,7 +422,7 @@ timer_gettime = timer_gettimex64;
 0xffffffff80000009:frealpath4
 0xffffffff8000000a:frealpathat
 0xffffffff8000000b:rpc_schedule
-0xffffffff8000000c:sysctl
+0xffffffff8000000c:ksysctl
 0xffffffff8000000d:openpty
 0xffffffff8000000e:set_exception_handler
 0xffffffff8000000f:get_exception_handler

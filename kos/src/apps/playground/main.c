@@ -33,7 +33,7 @@
 #include <kos/except.h>
 #include <kos/kernel/types.h>
 #include <kos/syscalls.h>
-#include <kos/sysctl.h>
+#include <kos/ksysctl.h>
 #include <kos/types.h>
 #include <kos/ukern.h>
 #include <kos/unistd.h>

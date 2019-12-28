@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd26f781a */
+/* HASH CRC-32:0x11868130 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -419,7 +419,7 @@
 #define __NRAC_frealpath4              4
 #define __NRAC_frealpathat             5
 #define __NRAC_rpc_schedule            4
-#define __NRAC_sysctl                  2
+#define __NRAC_ksysctl                 2
 #define __NRAC_openpty                 5
 #define __NRAC_fchdirat                3
 #define __NRAC_time64                  1
@@ -872,7 +872,7 @@
 #define __NRRT_frealpath4              (ssize_t, __ssize_t)
 #define __NRRT_frealpathat             (ssize_t, __ssize_t)
 #define __NRRT_rpc_schedule            (syscall_slong_t, __syscall_slong_t)
-#define __NRRT_sysctl                  (syscall_slong_t, __syscall_slong_t)
+#define __NRRT_ksysctl                 (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_openpty                 (errno_t, __errno_t)
 #define __NRRT_fchdirat                (errno_t, __errno_t)
 #define __NRRT_time64                  (time64_t, __time64_t)
@@ -1781,8 +1781,8 @@
 #define __NRAT1_rpc_schedule            (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT2_rpc_schedule            (uint8_t const *, __uint8_t const *)
 #define __NRAT3_rpc_schedule            (__HYBRID_PTR32(void) *, __HYBRID_PTR32(void) *)
-#define __NRAT0_sysctl                  (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT1_sysctl                  (void *, void *)
+#define __NRAT0_ksysctl                 (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT1_ksysctl                 (void *, void *)
 #define __NRAT0_openpty                 (fd_t *, __fd_t *)
 #define __NRAT1_openpty                 (fd_t *, __fd_t *)
 #define __NRAT2_openpty                 (char *, char *)
@@ -2380,7 +2380,7 @@
 #define __NRAM_frealpath4(a, b, c, d, e, f)              (__fd_t)a, (char *)b, (__size_t)c, (__atflag_t)d
 #define __NRAM_frealpathat(a, b, c, d, e, f)             (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
 #define __NRAM_rpc_schedule(a, b, c, d, e, f)            (__pid_t)a, (__syscall_ulong_t)b, (__uint8_t const *)c, (__HYBRID_PTR32(void) *)d
-#define __NRAM_sysctl(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (void *)b
+#define __NRAM_ksysctl(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (void *)b
 #define __NRAM_openpty(a, b, c, d, e, f)                 (__fd_t *)a, (__fd_t *)b, (char *)c, (struct termios const *)d, (struct winsize const *)e
 #define __NRAM_fchdirat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__atflag_t)c
 #define __NRAM_time64(a, b, c, d, e, f)                  (__time64_t *)a
@@ -2833,7 +2833,7 @@
 #define __NRAP_frealpath4(a, b, c, d)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_frealpathat(a, b, c, d, e)                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_rpc_schedule(a, b, c, d)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_sysctl(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NRAP_ksysctl(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_openpty(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_fchdirat(a, b, c)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_time64(a)                                 (__syscall_ulong_t)a

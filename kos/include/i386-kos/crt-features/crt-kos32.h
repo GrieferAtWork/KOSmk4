@@ -424,6 +424,7 @@
 #define __CRT_HAVE_KLStat64 1
 #define __CRT_HAVE_KStat 1
 #define __CRT_HAVE_KStat64 1
+#define __CRT_HAVE_KSysctl 1
 #define __CRT_HAVE_LChmod 1
 #define __CRT_HAVE_LChown 1
 #define __CRT_HAVE_LSeek 1
@@ -479,7 +480,6 @@
 #define __CRT_HAVE_SyncFs 1
 #define __CRT_HAVE_Syscall 1
 #define __CRT_HAVE_Syscall64 1
-#define __CRT_HAVE_Sysctl 1
 #define __CRT_HAVE_Truncate 1
 #define __CRT_HAVE_Truncate64 1
 #define __CRT_HAVE_UTimensAt 1
@@ -2542,6 +2542,7 @@
 #define __CRT_HAVE_kreaddirf64 1
 #define __CRT_HAVE_kstat 1
 #define __CRT_HAVE_kstat64 1
+#define __CRT_HAVE_ksysctl 1
 #define __CRT_HAVE_l64a 1
 #define __CRT_HAVE_labs 1
 #define __CRT_HAVE_lchmod 1
@@ -3703,6 +3704,7 @@
 #define __CRT_HAVE_sys_Xkreaddir 1
 #define __CRT_HAVE_sys_Xkreaddirf 1
 #define __CRT_HAVE_sys_Xkstat 1
+#define __CRT_HAVE_sys_Xksysctl 1
 #define __CRT_HAVE_sys_Xlchown 1
 #define __CRT_HAVE_sys_Xlchown32 1
 #define __CRT_HAVE_sys_Xlfutex 1
@@ -3920,7 +3922,6 @@
 #define __CRT_HAVE_sys_Xsync 1
 #define __CRT_HAVE_sys_Xsync_file_range 1
 #define __CRT_HAVE_sys_Xsyncfs 1
-#define __CRT_HAVE_sys_Xsysctl 1
 #define __CRT_HAVE_sys_Xsysfs 1
 #define __CRT_HAVE_sys_Xsysinfo 1
 #define __CRT_HAVE_sys_Xsyslog 1
@@ -4144,6 +4145,7 @@
 #define __CRT_HAVE_sys_kreaddir 1
 #define __CRT_HAVE_sys_kreaddirf 1
 #define __CRT_HAVE_sys_kstat 1
+#define __CRT_HAVE_sys_ksysctl 1
 #define __CRT_HAVE_sys_lchown 1
 #define __CRT_HAVE_sys_lchown32 1
 #define __CRT_HAVE_sys_lfutex 1
@@ -4363,7 +4365,6 @@
 #define __CRT_HAVE_sys_sync 1
 #define __CRT_HAVE_sys_sync_file_range 1
 #define __CRT_HAVE_sys_syncfs 1
-#define __CRT_HAVE_sys_sysctl 1
 #define __CRT_HAVE_sys_sysfs 1
 #define __CRT_HAVE_sys_sysinfo 1
 #define __CRT_HAVE_sys_syslog 1
@@ -4421,7 +4422,6 @@
 #define __CRT_HAVE_syscall 1
 #define __CRT_HAVE_syscall64 1
 #define __CRT_HAVE_sysconf 1
-#define __CRT_HAVE_sysctl 1
 #define __CRT_HAVE_sysinfo 1
 #define __CRT_HAVE_syslog 1
 #define __CRT_HAVE_syslog_printer 1

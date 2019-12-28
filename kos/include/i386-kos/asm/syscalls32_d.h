@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f2ce503 */
+/* HASH CRC-32:0xbb786e15 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -572,7 +572,7 @@
  * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
  * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
 #define __NR32_rpc_schedule            __UINT32_C(0x80000009) /* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR32(void) *arguments) */
-#define __NR32_sysctl                  __UINT32_C(0x8000000a) /* syscall_slong_t sysctl(syscall_ulong_t command, void *arg) */
+#define __NR32_ksysctl                 __UINT32_C(0x8000000a) /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
 /* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
 #define __NR32_openpty                 __UINT32_C(0x8000000b) /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -1238,7 +1238,7 @@
 #define __NR32RM_frealpath4              0
 #define __NR32RM_frealpathat             0
 #define __NR32RM_rpc_schedule            0
-#define __NR32RM_sysctl                  0
+#define __NR32RM_ksysctl                 0
 #define __NR32RM_openpty                 0
 #define __NR32RM_fchdirat                0
 #define __NR32RM_time64                  0
@@ -1437,7 +1437,7 @@
 #define __NR32CP_writef                  1
 #define __NR32CP_frealpath4              1
 #define __NR32CP_frealpathat             1
-#define __NR32CP_sysctl                  1
+#define __NR32CP_ksysctl                 1
 #define __NR32CP_fchdirat                1
 #define __NR32CP_lfutex                  1
 #define __NR32CP_lseek64                 1
@@ -1867,7 +1867,7 @@
 #define __NR32RC_frealpath4              4
 #define __NR32RC_frealpathat             5
 #define __NR32RC_rpc_schedule            4
-#define __NR32RC_sysctl                  2
+#define __NR32RC_ksysctl                 2
 #define __NR32RC_openpty                 5
 #define __NR32RC_fchdirat                3
 #define __NR32RC_time64                  1

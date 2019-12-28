@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd51b9785 */
+/* HASH CRC-32:0xf5ec75ac */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -14493,9 +14493,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_schedule)
 	.cfi_endproc
 END(__x86_asm32_int80_rpc_schedule)
 
-/* syscall_slong_t sysctl(syscall_ulong_t command, void *arg) */
-.section .text.x86.asm32_syscall_int80.sysctl
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_sysctl)
+/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+.section .text.x86.asm32_syscall_int80.ksysctl
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_ksysctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x8000000a
@@ -14515,8 +14515,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sysctl)
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_sysctl)
-	call   sys_sysctl
+	EXTERN(sys_ksysctl)
+	call   sys_ksysctl
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -14528,7 +14528,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sysctl)
 	.cfi_restore_iret_ds
 	iret
 	.cfi_endproc
-END(__x86_asm32_int80_sysctl)
+END(__x86_asm32_int80_ksysctl)
 
 /* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
 /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
@@ -31562,9 +31562,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rpc_schedule)
 	.cfi_endproc
 END(__x86_asm32_sysenter_rpc_schedule)
 
-/* syscall_slong_t sysctl(syscall_ulong_t command, void *arg) */
-.section .text.x86.asm32_syscall_sysenter.sysctl
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sysctl)
+/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+.section .text.x86.asm32_syscall_sysenter.ksysctl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ksysctl)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x8000000a
@@ -31584,8 +31584,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sysctl)
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_sysctl)
-	call   sys_sysctl
+	EXTERN(sys_ksysctl)
+	call   sys_ksysctl
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -31597,7 +31597,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sysctl)
 	.cfi_restore_iret_ds
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
-END(__x86_asm32_sysenter_sysctl)
+END(__x86_asm32_sysenter_ksysctl)
 
 /* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
 /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */

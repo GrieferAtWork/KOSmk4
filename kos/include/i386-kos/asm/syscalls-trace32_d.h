@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9235550 */
+/* HASH CRC-32:0x910ee105 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -862,8 +862,8 @@
 #define __NR32AN1_rpc_schedule            flags
 #define __NR32AN2_rpc_schedule            program
 #define __NR32AN3_rpc_schedule            arguments
-#define __NR32AN0_sysctl                  command
-#define __NR32AN1_sysctl                  arg
+#define __NR32AN0_ksysctl                 command
+#define __NR32AN1_ksysctl                 arg
 #define __NR32AN0_openpty                 amaster
 #define __NR32AN1_openpty                 aslave
 #define __NR32AN2_openpty                 name
@@ -2982,10 +2982,10 @@
 #define __NR32ATRA2_rpc_schedule(target, flags, program, arguments) ,program
 #define __NR32ATRF3_rpc_schedule            "%p"
 #define __NR32ATRA3_rpc_schedule(target, flags, program, arguments) ,arguments
-#define __NR32ATRF0_sysctl                  "%#" PRIxSIZ
-#define __NR32ATRA0_sysctl(command, arg)    ,(uintptr_t)(command)
-#define __NR32ATRF1_sysctl                  "%p"
-#define __NR32ATRA1_sysctl(command, arg)    ,arg
+#define __NR32ATRF0_ksysctl                 "%#" PRIxSIZ
+#define __NR32ATRA0_ksysctl(command, arg)   ,(uintptr_t)(command)
+#define __NR32ATRF1_ksysctl                 "%p"
+#define __NR32ATRA1_ksysctl(command, arg)   ,arg
 #define __NR32ATRF0_openpty                 "%p"
 #define __NR32ATRA0_openpty(amaster, aslave, name, termp, winp) ,amaster
 #define __NR32ATRF1_openpty                 "%p"

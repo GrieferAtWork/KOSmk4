@@ -253,7 +253,7 @@ local files = {
 	"../../include/bits/sigaction-struct.h",
 	"../../include/elf.h",
 	"../../include/kos/hop.h",
-	"../../include/kos/sysctl.h",
+	"../../include/kos/ksysctl.h",
 	"../../include/kos/exec/elf.h",
 	"../../include/kos/exec/bits/peb.h",
 	"../../include/kos/exec/bits/library-listdef.h",
@@ -793,7 +793,7 @@ STATIC_ASSERT(sizeof(struct hop_datapart_stat) == __SIZEOF_HOP_DATAPART_STAT);
 
 
 
-#include <kos/sysctl.h>
+#include <kos/ksysctl.h>
 
 /* struct hop_openfd */
 STATIC_ASSERT(offsetof(struct hop_openfd, of_flags) == __OFFSET_HOP_OPENFD_FLAGS);
@@ -801,49 +801,49 @@ STATIC_ASSERT(offsetof(struct hop_openfd, of_hint) == __OFFSET_HOP_OPENFD_HINT);
 STATIC_ASSERT(offsetof(struct hop_openfd, of_mode) == __OFFSET_HOP_OPENFD_MODE);
 STATIC_ASSERT(sizeof(struct hop_openfd) == __SIZEOF_HOP_OPENFD);
 
-/* struct sysctl_driver_insmod */
-STATIC_ASSERT(offsetof(struct sysctl_driver_insmod, im_blob.b_base) == __OFFSET_SYSCTL_DRIVER_INSMOD_BLOB_BASE);
-STATIC_ASSERT(offsetof(struct sysctl_driver_insmod, im_blob.b_size) == __OFFSET_SYSCTL_DRIVER_INSMOD_BLOB_SIZE);
-STATIC_ASSERT(offsetof(struct sysctl_driver_insmod, im_cmdline) == __OFFSET_SYSCTL_DRIVER_INSMOD_CMDLINE);
-STATIC_ASSERT(offsetof(struct sysctl_driver_insmod, im_driver) == __OFFSET_SYSCTL_DRIVER_INSMOD_DRIVER);
-STATIC_ASSERT(offsetof(struct sysctl_driver_insmod, im_file.f_dentry) == __OFFSET_SYSCTL_DRIVER_INSMOD_FILE_DENTRY);
-STATIC_ASSERT(offsetof(struct sysctl_driver_insmod, im_file.f_node) == __OFFSET_SYSCTL_DRIVER_INSMOD_FILE_NODE);
-STATIC_ASSERT(offsetof(struct sysctl_driver_insmod, im_file.f_path) == __OFFSET_SYSCTL_DRIVER_INSMOD_FILE_PATH);
-STATIC_ASSERT(offsetof(struct sysctl_driver_insmod, im_flags) == __OFFSET_SYSCTL_DRIVER_INSMOD_FLAGS);
-STATIC_ASSERT(offsetof(struct sysctl_driver_insmod, im_format) == __OFFSET_SYSCTL_DRIVER_INSMOD_FORMAT);
-STATIC_ASSERT(offsetof(struct sysctl_driver_insmod, im_name) == __OFFSET_SYSCTL_DRIVER_INSMOD_NAME);
-STATIC_ASSERT(offsetof(struct sysctl_driver_insmod, im_newdriver) == __OFFSET_SYSCTL_DRIVER_INSMOD_NEWDRIVER);
-STATIC_ASSERT(offsetof(struct sysctl_driver_insmod, im_struct_size) == __OFFSET_SYSCTL_DRIVER_INSMOD_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct sysctl_driver_insmod) == __SIZEOF_SYSCTL_DRIVER_INSMOD);
+/* struct ksysctl_driver_insmod */
+STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_blob.b_base) == __OFFSET_KSYSCTL_DRIVER_INSMOD_BLOB_BASE);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_blob.b_size) == __OFFSET_KSYSCTL_DRIVER_INSMOD_BLOB_SIZE);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_cmdline) == __OFFSET_KSYSCTL_DRIVER_INSMOD_CMDLINE);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_driver) == __OFFSET_KSYSCTL_DRIVER_INSMOD_DRIVER);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_file.f_dentry) == __OFFSET_KSYSCTL_DRIVER_INSMOD_FILE_DENTRY);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_file.f_node) == __OFFSET_KSYSCTL_DRIVER_INSMOD_FILE_NODE);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_file.f_path) == __OFFSET_KSYSCTL_DRIVER_INSMOD_FILE_PATH);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_flags) == __OFFSET_KSYSCTL_DRIVER_INSMOD_FLAGS);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_format) == __OFFSET_KSYSCTL_DRIVER_INSMOD_FORMAT);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_name) == __OFFSET_KSYSCTL_DRIVER_INSMOD_NAME);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_newdriver) == __OFFSET_KSYSCTL_DRIVER_INSMOD_NEWDRIVER);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_struct_size) == __OFFSET_KSYSCTL_DRIVER_INSMOD_STRUCT_SIZE);
+STATIC_ASSERT(sizeof(struct ksysctl_driver_insmod) == __SIZEOF_KSYSCTL_DRIVER_INSMOD);
 
-/* struct sysctl_driver_delmod */
-STATIC_ASSERT(offsetof(struct sysctl_driver_delmod, dm_file) == __OFFSET_SYSCTL_DRIVER_DELMOD_FILE);
-STATIC_ASSERT(offsetof(struct sysctl_driver_delmod, dm_flags) == __OFFSET_SYSCTL_DRIVER_DELMOD_FLAGS);
-STATIC_ASSERT(offsetof(struct sysctl_driver_delmod, dm_format) == __OFFSET_SYSCTL_DRIVER_DELMOD_FORMAT);
-STATIC_ASSERT(offsetof(struct sysctl_driver_delmod, dm_name) == __OFFSET_SYSCTL_DRIVER_DELMOD_NAME);
-STATIC_ASSERT(offsetof(struct sysctl_driver_delmod, dm_struct_size) == __OFFSET_SYSCTL_DRIVER_DELMOD_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct sysctl_driver_delmod) == __SIZEOF_SYSCTL_DRIVER_DELMOD);
+/* struct ksysctl_driver_delmod */
+STATIC_ASSERT(offsetof(struct ksysctl_driver_delmod, dm_file) == __OFFSET_KSYSCTL_DRIVER_DELMOD_FILE);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_delmod, dm_flags) == __OFFSET_KSYSCTL_DRIVER_DELMOD_FLAGS);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_delmod, dm_format) == __OFFSET_KSYSCTL_DRIVER_DELMOD_FORMAT);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_delmod, dm_name) == __OFFSET_KSYSCTL_DRIVER_DELMOD_NAME);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_delmod, dm_struct_size) == __OFFSET_KSYSCTL_DRIVER_DELMOD_STRUCT_SIZE);
+STATIC_ASSERT(sizeof(struct ksysctl_driver_delmod) == __SIZEOF_KSYSCTL_DRIVER_DELMOD);
 
-/* struct sysctl_driver_getmod */
-STATIC_ASSERT(offsetof(struct sysctl_driver_getmod, gm_addr) == __OFFSET_SYSCTL_DRIVER_GETMOD_ADDR);
-STATIC_ASSERT(offsetof(struct sysctl_driver_getmod, gm_driver) == __OFFSET_SYSCTL_DRIVER_GETMOD_DRIVER);
-STATIC_ASSERT(offsetof(struct sysctl_driver_getmod, gm_file) == __OFFSET_SYSCTL_DRIVER_GETMOD_FILE);
-STATIC_ASSERT(offsetof(struct sysctl_driver_getmod, gm_format) == __OFFSET_SYSCTL_DRIVER_GETMOD_FORMAT);
-STATIC_ASSERT(offsetof(struct sysctl_driver_getmod, gm_name) == __OFFSET_SYSCTL_DRIVER_GETMOD_NAME);
-STATIC_ASSERT(offsetof(struct sysctl_driver_getmod, gm_struct_size) == __OFFSET_SYSCTL_DRIVER_GETMOD_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct sysctl_driver_getmod) == __SIZEOF_SYSCTL_DRIVER_GETMOD);
+/* struct ksysctl_driver_getmod */
+STATIC_ASSERT(offsetof(struct ksysctl_driver_getmod, gm_addr) == __OFFSET_KSYSCTL_DRIVER_GETMOD_ADDR);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_getmod, gm_driver) == __OFFSET_KSYSCTL_DRIVER_GETMOD_DRIVER);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_getmod, gm_file) == __OFFSET_KSYSCTL_DRIVER_GETMOD_FILE);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_getmod, gm_format) == __OFFSET_KSYSCTL_DRIVER_GETMOD_FORMAT);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_getmod, gm_name) == __OFFSET_KSYSCTL_DRIVER_GETMOD_NAME);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_getmod, gm_struct_size) == __OFFSET_KSYSCTL_DRIVER_GETMOD_STRUCT_SIZE);
+STATIC_ASSERT(sizeof(struct ksysctl_driver_getmod) == __SIZEOF_KSYSCTL_DRIVER_GETMOD);
 
-/* struct sysctl_driver_get_library_path */
-STATIC_ASSERT(offsetof(struct sysctl_driver_get_library_path, glp_buf) == __OFFSET_SYSCTL_DRIVER_GET_LIBRARY_PATH_BUF);
-STATIC_ASSERT(offsetof(struct sysctl_driver_get_library_path, glp_size) == __OFFSET_SYSCTL_DRIVER_GET_LIBRARY_PATH_SIZE);
-STATIC_ASSERT(offsetof(struct sysctl_driver_get_library_path, glp_struct_size) == __OFFSET_SYSCTL_DRIVER_GET_LIBRARY_PATH_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct sysctl_driver_get_library_path) == __SIZEOF_SYSCTL_DRIVER_GET_LIBRARY_PATH);
+/* struct ksysctl_driver_get_library_path */
+STATIC_ASSERT(offsetof(struct ksysctl_driver_get_library_path, glp_buf) == __OFFSET_KSYSCTL_DRIVER_GET_LIBRARY_PATH_BUF);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_get_library_path, glp_size) == __OFFSET_KSYSCTL_DRIVER_GET_LIBRARY_PATH_SIZE);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_get_library_path, glp_struct_size) == __OFFSET_KSYSCTL_DRIVER_GET_LIBRARY_PATH_STRUCT_SIZE);
+STATIC_ASSERT(sizeof(struct ksysctl_driver_get_library_path) == __SIZEOF_KSYSCTL_DRIVER_GET_LIBRARY_PATH);
 
-/* struct sysctl_driver_set_library_path */
-STATIC_ASSERT(offsetof(struct sysctl_driver_set_library_path, slp_newpath) == __OFFSET_SYSCTL_DRIVER_SET_LIBRARY_PATH_NEWPATH);
-STATIC_ASSERT(offsetof(struct sysctl_driver_set_library_path, slp_oldpath) == __OFFSET_SYSCTL_DRIVER_SET_LIBRARY_PATH_OLDPATH);
-STATIC_ASSERT(offsetof(struct sysctl_driver_set_library_path, slp_struct_size) == __OFFSET_SYSCTL_DRIVER_SET_LIBRARY_PATH_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct sysctl_driver_set_library_path) == __SIZEOF_SYSCTL_DRIVER_SET_LIBRARY_PATH);
+/* struct ksysctl_driver_set_library_path */
+STATIC_ASSERT(offsetof(struct ksysctl_driver_set_library_path, slp_newpath) == __OFFSET_KSYSCTL_DRIVER_SET_LIBRARY_PATH_NEWPATH);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_set_library_path, slp_oldpath) == __OFFSET_KSYSCTL_DRIVER_SET_LIBRARY_PATH_OLDPATH);
+STATIC_ASSERT(offsetof(struct ksysctl_driver_set_library_path, slp_struct_size) == __OFFSET_KSYSCTL_DRIVER_SET_LIBRARY_PATH_STRUCT_SIZE);
+STATIC_ASSERT(sizeof(struct ksysctl_driver_set_library_path) == __SIZEOF_KSYSCTL_DRIVER_SET_LIBRARY_PATH);
 
 
 

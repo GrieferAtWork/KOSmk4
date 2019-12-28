@@ -36,7 +36,7 @@ sys.quota.c
 sys.raw.c  (Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
 sys.reg.c  (It only contains some macros, but those interact with sys/ucontext.h)
 sys.signalfd.c
-sys.sysctl.c (also: rename kos/sysctl.h; and sysctl(2) -- linux also has a function of that same name)
+sys.sysctl.c
 sys.vtimes.c
 
 gnu.libc-version.c

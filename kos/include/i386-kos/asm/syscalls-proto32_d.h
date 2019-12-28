@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12f39de0 */
+/* HASH CRC-32:0x99fb538f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -419,7 +419,7 @@
 #define __NR32AC_frealpath4              4
 #define __NR32AC_frealpathat             5
 #define __NR32AC_rpc_schedule            4
-#define __NR32AC_sysctl                  2
+#define __NR32AC_ksysctl                 2
 #define __NR32AC_openpty                 5
 #define __NR32AC_fchdirat                3
 #define __NR32AC_time64                  1
@@ -872,7 +872,7 @@
 #define __NR32RT_frealpath4              (ssize_t, __ssize_t)
 #define __NR32RT_frealpathat             (ssize_t, __ssize_t)
 #define __NR32RT_rpc_schedule            (syscall_slong_t, __syscall_slong_t)
-#define __NR32RT_sysctl                  (syscall_slong_t, __syscall_slong_t)
+#define __NR32RT_ksysctl                 (syscall_slong_t, __syscall_slong_t)
 #define __NR32RT_openpty                 (errno_t, __errno_t)
 #define __NR32RT_fchdirat                (errno_t, __errno_t)
 #define __NR32RT_time64                  (time64_t, __time64_t)
@@ -1781,8 +1781,8 @@
 #define __NR32AT1_rpc_schedule            (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT2_rpc_schedule            (uint8_t const *, __uint8_t const *)
 #define __NR32AT3_rpc_schedule            (__HYBRID_PTR32(void) *, __HYBRID_PTR32(void) *)
-#define __NR32AT0_sysctl                  (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32AT1_sysctl                  (void *, void *)
+#define __NR32AT0_ksysctl                 (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT1_ksysctl                 (void *, void *)
 #define __NR32AT0_openpty                 (fd_t *, __fd_t *)
 #define __NR32AT1_openpty                 (fd_t *, __fd_t *)
 #define __NR32AT2_openpty                 (char *, char *)
@@ -2380,7 +2380,7 @@
 #define __NR32AM_frealpath4(a, b, c, d, e, f)              (__fd_t)a, (char *)b, (__size_t)c, (__atflag_t)d
 #define __NR32AM_frealpathat(a, b, c, d, e, f)             (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
 #define __NR32AM_rpc_schedule(a, b, c, d, e, f)            (__pid_t)a, (__syscall_ulong_t)b, (__uint8_t const *)c, (__HYBRID_PTR32(void) *)d
-#define __NR32AM_sysctl(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (void *)b
+#define __NR32AM_ksysctl(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (void *)b
 #define __NR32AM_openpty(a, b, c, d, e, f)                 (__fd_t *)a, (__fd_t *)b, (char *)c, (struct termios const *)d, (struct winsize const *)e
 #define __NR32AM_fchdirat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__atflag_t)c
 #define __NR32AM_time64(a, b, c, d, e, f)                  (__time64_t *)a
@@ -2833,7 +2833,7 @@
 #define __NR32AP_frealpath4(a, b, c, d)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_frealpathat(a, b, c, d, e)                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_rpc_schedule(a, b, c, d)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR32AP_sysctl(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR32AP_ksysctl(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_openpty(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_fchdirat(a, b, c)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_time64(a)                                 (__syscall_ulong_t)a

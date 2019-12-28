@@ -535,7 +535,7 @@ timer_gettime64 = timer_gettimex32_64;
 0x80000007:frealpath4
 0x80000008:frealpathat
 0x80000009:rpc_schedule
-0x8000000a:sysctl
+0x8000000a:ksysctl
 0x8000000b:openpty
 0x8000000c:fchdirat
 0x8000000d:time64

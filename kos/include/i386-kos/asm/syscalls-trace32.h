@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd94772c3 */
+/* HASH CRC-32:0xd29291c3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -862,8 +862,8 @@
 #define __NRAN1_rpc_schedule            flags
 #define __NRAN2_rpc_schedule            program
 #define __NRAN3_rpc_schedule            arguments
-#define __NRAN0_sysctl                  command
-#define __NRAN1_sysctl                  arg
+#define __NRAN0_ksysctl                 command
+#define __NRAN1_ksysctl                 arg
 #define __NRAN0_openpty                 amaster
 #define __NRAN1_openpty                 aslave
 #define __NRAN2_openpty                 name
@@ -2982,10 +2982,10 @@
 #define __NRATRA2_rpc_schedule(target, flags, program, arguments) ,program
 #define __NRATRF3_rpc_schedule            "%p"
 #define __NRATRA3_rpc_schedule(target, flags, program, arguments) ,arguments
-#define __NRATRF0_sysctl                  "%#" PRIxSIZ
-#define __NRATRA0_sysctl(command, arg)    ,(uintptr_t)(command)
-#define __NRATRF1_sysctl                  "%p"
-#define __NRATRA1_sysctl(command, arg)    ,arg
+#define __NRATRF0_ksysctl                 "%#" PRIxSIZ
+#define __NRATRA0_ksysctl(command, arg)   ,(uintptr_t)(command)
+#define __NRATRF1_ksysctl                 "%p"
+#define __NRATRA1_ksysctl(command, arg)   ,arg
 #define __NRATRF0_openpty                 "%p"
 #define __NRATRA0_openpty(amaster, aslave, name, termp, winp) ,amaster
 #define __NRATRF1_openpty                 "%p"

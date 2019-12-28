@@ -1249,7 +1249,7 @@ rpc_schedule:(pid_t target,
 		syscall_ulong_t flags,
 	uint8_t const *program, __HYBRID_PTR64(void) *arguments) -> syscall_slong_t;
 
-[cp] sysctl:(syscall_ulong_t command, void *arg) -> syscall_slong_t;
+[cp] ksysctl:(syscall_ulong_t command, void *arg) -> syscall_slong_t;
 
 @@Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers.
 openpty:(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) -> errno_t;
